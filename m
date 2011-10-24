@@ -1,68 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH] Add new command and event for LTK storage support
-Date: Mon, 24 Oct 2011 14:26:27 +0200
-Message-Id: <1319459187-11092-1-git-send-email-vinicius.gomes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1319457038.15441.230.camel@aeonflux>
+References: <1319448004-8513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<CAE6HaMkxvTPa1eTj1Og7Lvqn=PvieuKJyzugPouwiUTOsnnW_g@mail.gmail.com>
+	<1319457038.15441.230.camel@aeonflux>
+Date: Mon, 24 Oct 2011 14:06:37 +0200
+Message-ID: <CAE6HaM=m40hr76CWirfEjnou_DfGswEjqrN_8F0if-XR8oFE5g@mail.gmail.com>
+Subject: Re: [PATCH bluez] add get_le/get_be helpers
+From: Vinicius Gomes <vinicius.gomes@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This documents the new command and event that are to be added to
-the Management API to add support for persistent pairing of LE
-devices.
----
- doc/mgmt-api.txt |   33 +++++++++++++++++++++++++++++++++
- 1 files changed, 33 insertions(+), 0 deletions(-)
+Hi Marcel,
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 8d5d8d5..44fef0b 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -356,6 +356,24 @@ Name Information Command
- 	expected for each Device Found event with the Confirm Name
- 	flag set.
- 
-+Load Long Term Keys Command
-+===========================
-+
-+	Command Code:		0x0021
-+	Controller Index:	<controller id>
-+	Command Parameters:	Debug Keys (1 Octet)
-+				Key Count (2 Octets)
-+				Key1 {
-+					Address (6 Octets)
-+					PIN_Length (1 Octet)
-+					Encryption Size (1 Octet)
-+					Enc. Diversifier (2 Octets)
-+					Random Number (8 Octets)
-+					Value (16 Octets)
-+				}
-+				Key2 {  }
-+				...
-+
- Read Tracing Buffer Size Command
- ================================
- 
-@@ -588,3 +606,18 @@ Device Unblocked Event
- Event Code		0x00016
- Controller Index	<controller id>
- Event Parameters	Address (6 Octets)
-+
-+New Long Term Key Event
-+=======================
-+
-+Event Code		0x0017
-+Controller Index	<controller id>
-+Event Parameters	Store Hint (1 Octet)
-+			Key {
-+				Address (6 Octets)
-+				PIN_Length (1 Octet)
-+				Encryption Size (1 Octet)
-+				Enc. Diversifier (2 Octets)
-+				Random Number (8 Octets)
-+				Value (16 Octets)
-+			}
+On Mon, Oct 24, 2011 at 1:50 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Vinicius,
+>
+>> Sorry if this comes too late, but here's an idea:
+>>
+>> How about changing the name of the functions to something a little
+>> more high level, for example: in attrib/att.h we have
+>> att_{get,put}_u16() that uses the byte order defined in the ATT spec
+>> (little endian).
+>>
+>> So my suggestion is to have bt_{get,put}_u*() and sdp_{get,put}_u*
+>> functions (perhaps also no_{get,put}_u* for cases when we use the host
+>> byte order). The bt_ functions will be used for everything that uses
+>> the Bluetooth byte order and the sdp_ ones for SDP, which is the only
+>> case of Big Endian defined by Bluetooth, correct me if I am wrong.
+>
+> lets not try to be too smart. We want the code clearly identify what
+> endian is expected. Same as the kernel handles this.
+>
+
+After reading Szymon comments I came to the same conclusion. This more
+explicit approach makes more sense.
+
+
+> Regards
+>
+> Marcel
+>
+>
+>
+
+
+Cheers,
 -- 
-1.7.7
-
+Vinicius
