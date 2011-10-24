@@ -1,161 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Krystad <pkrystad@codeaurora.org>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Peter Krystad <pkrystad@codeaurora.org>
-Subject: [PATCH bluez 2/2] Add A2MP definitions
-Date: Mon, 24 Oct 2011 16:06:19 -0700
-Message-Id: <1319497579-8859-3-git-send-email-pkrystad@codeaurora.org>
-In-Reply-To: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
-References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
+Subject: [PATCH] Bluetooth: Set HCI_MGMT flag only in read_controller_info
+Date: Mon, 24 Oct 2011 22:36:26 +0200
+Message-Id: <1319488586-2779-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- lib/a2mp.h |  131 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 131 insertions(+), 0 deletions(-)
- create mode 100644 lib/a2mp.h
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-diff --git a/lib/a2mp.h b/lib/a2mp.h
-new file mode 100644
-index 0000000..87babb3
---- /dev/null
-+++ b/lib/a2mp.h
-@@ -0,0 +1,131 @@
-+/*
-+ *
-+ *	BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *	Copyright (C) 2010-2011 Code Aurora Forum.  All rights reserved.
-+ *
-+ *	This program is free software; you can redistribute it and/or modify
-+ *	it under the terms of the GNU General Public License version 2 and
-+ *	only version 2 as published by the Free Software Foundation.
-+ *
-+ *	This program is distributed in the hope that it will be useful,
-+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *	GNU General Public License for more details.
-+ *
-+ */
-+
-+#ifndef __A2MP_H
-+#define __A2MP_H
-+
-+#ifdef __cplusplus
-+extern "C" {
-+#endif
-+
-+/* AMP manager codes */
-+#define AMP_COMMAND_REJ		0x01
-+#define AMP_DISCOVER_REQ	0x02
-+#define AMP_DISCOVER_RSP	0x03
-+#define AMP_CHANGE_NOTIFY	0x04
-+#define AMP_CHANGE_RSP		0x05
-+#define AMP_INFO_REQ		0x06
-+#define AMP_INFO_RSP		0x07
-+#define AMP_ASSOC_REQ		0x08
-+#define AMP_ASSOC_RSP		0x09
-+#define AMP_LINK_REQ		0x0a
-+#define AMP_LINK_RSP		0x0b
-+#define AMP_DISCONN_REQ		0x0c
-+#define AMP_DISCONN_RSP		0x0d
-+
-+typedef struct {
-+	uint8_t		code;
-+	uint8_t		ident;
-+	uint16_t	len;
-+} __attribute__ ((packed)) amp_mgr_hdr;
-+#define AMP_MGR_HDR_SIZE 4
-+
-+/* AMP ASSOC structure */
-+typedef struct {
-+	uint8_t		type_id;
-+	uint16_t	len;
-+	uint8_t		data[0];
-+} __attribute__ ((packed)) amp_assoc_tlv;
-+
-+typedef struct {
-+	uint16_t	reason;
-+} __attribute__ ((packed)) amp_cmd_rej_parms;
-+
-+typedef struct {
-+	uint16_t	mtu;
-+	uint16_t	mask;
-+} __attribute__ ((packed)) amp_discover_req_parms;
-+
-+typedef struct {
-+	uint16_t	mtu;
-+	uint16_t	mask;
-+	uint8_t		controller_list[0];
-+} __attribute__ ((packed)) amp_discover_rsp_parms;
-+
-+typedef struct {
-+	uint8_t		id;
-+} __attribute__ ((packed)) amp_info_req_parms;
-+
-+typedef struct {
-+	uint8_t		id;
-+	uint8_t		status;
-+	uint32_t	total_bandwidth;
-+	uint32_t	max_bandwidth;
-+	uint32_t	min_latency;
-+	uint16_t	pal_caps;
-+	uint16_t	assoc_size;
-+} __attribute__ ((packed)) amp_info_rsp_parms;
-+
-+typedef struct {
-+	uint8_t		id;
-+	uint8_t		status;
-+	amp_assoc_tlv	assoc;
-+} __attribute__ ((packed)) amp_assoc_rsp_parms;
-+
-+typedef struct {
-+	uint8_t		local_id;
-+	uint8_t		remote_id;
-+	amp_assoc_tlv	assoc;
-+} __attribute__ ((packed)) amp_link_req_parms;
-+
-+typedef struct {
-+	uint8_t		local_id;
-+	uint8_t		remote_id;
-+	uint8_t		status;
-+} __attribute__ ((packed)) amp_link_rsp_parms;
-+
-+typedef struct {
-+	uint8_t		local_id;
-+	uint8_t		remote_id;
-+} __attribute__ ((packed)) amp_disconn_req_parms;
-+
-+#define AMP_COMMAND_NOT_RECOGNIZED 0x0000
-+
-+/* AMP controller status */
-+#define AMP_CT_POWERED_DOWN		0x00
-+#define AMP_CT_BLUETOOTH_ONLY		0x01
-+#define AMP_CT_NO_CAPACITY		0x02
-+#define AMP_CT_LOW_CAPACITY		0x03
-+#define AMP_CT_MEDIUM_CAPACITY		0x04
-+#define AMP_CT_HIGH_CAPACITY		0x05
-+#define AMP_CT_FULL_CAPACITY		0x06
-+
-+/* AMP response status */
-+#define AMP_STATUS_SUCCESS				0x00
-+#define AMP_STATUS_INVALID_CTRL_ID			0x01
-+#define AMP_STATUS_UNABLE_START_LINK_CREATION		0x02
-+#define AMP_STATUS_NO_PHYSICAL_LINK_EXISTS		0x02
-+#define AMP_STATUS_COLLISION_OCCURED			0x03
-+#define AMP_STATUS_DISCONN_REQ_RECVD			0x04
-+#define AMP_STATUS_PHYS_LINK_EXISTS			0x05
-+#define AMP_STATUS_SECURITY_VIOLATION			0x06
-+
-+#ifdef __cplusplus
-+}
-+#endif
-+
-+#endif /* __A2MP_H */
+The HCI_MGMT flag should only be set when user space requests the full
+controller information. This way we avoid potential issues with setting
+change events ariving before the actual read_controller_info command
+finishes.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c |    2 --
+ 1 files changed, 0 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 9ffd7c3..b086c69 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -151,8 +151,6 @@ static int read_index_list(struct sock *sk)
+ 
+ 		hci_del_off_timer(d);
+ 
+-		set_bit(HCI_MGMT, &d->flags);
+-
+ 		if (test_bit(HCI_SETUP, &d->flags))
+ 			continue;
+ 
 -- 
 1.7.7
 
---
-Peter Krystad
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
