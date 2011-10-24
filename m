@@ -1,80 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4EA56B4D.9040306@monom.org>
+Date: Mon, 24 Oct 2011 15:42:37 +0200
+From: Daniel Wagner <wagi@monom.org>
 MIME-Version: 1.0
-In-Reply-To: <1319463058-29311-1-git-send-email-dh.herrmann@googlemail.com>
-References: <1319463058-29311-1-git-send-email-dh.herrmann@googlemail.com>
-From: Anderson Briglia <anderson.briglia@openbossa.org>
-Date: Mon, 24 Oct 2011 15:57:23 +0200
-Message-ID: <CALJ2SBJ3qgHV91sS-PXkrS6w7kaxMnHFM0Z-eM2KGUedCZy0nA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Bluetooth: Return proper error codes on rfcomm tty init
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Content-Type: text/plain; charset=ISO-8859-1
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [BUG] Invalid file descriptor.
+References: <4EA564C1.8070402@monom.org> <CAMOw1v6Ec=GXvp3nZWa0=vALwWguXO3uo_DHqRJMXyV=_htO_w@mail.gmail.com> <4EA566BC.6070204@monom.org> <CABBYNZL_FvdVDk8dH+uNxys=LRXLtWaBo0rKAfJ72dSfokkdgA@mail.gmail.com>
+In-Reply-To: <CABBYNZL_FvdVDk8dH+uNxys=LRXLtWaBo0rKAfJ72dSfokkdgA@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
-
-On Mon, Oct 24, 2011 at 3:30 PM, David Herrmann
-<dh.herrmann@googlemail.com> wrote:
-> Forward error codes from tty core to the rfcomm_init caller instead of using
-> generic -1 errors.
+On 10/24/2011 03:36 PM, Luiz Augusto von Dentz wrote:
+> Hi Daniel,
 >
-> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
-> ---
->  net/bluetooth/rfcomm/tty.c |    9 ++++++---
->  1 files changed, 6 insertions(+), 3 deletions(-)
+> On Mon, Oct 24, 2011 at 4:23 PM, Daniel Wagner<wagi@monom.org>  wrote:
+>>>
+>>> What about the patch?
+>>
+>> Sure, I will do as soon I have fixed all outstanding ConnMan bugs I found
+>> just recently. In other words don't expect very soon this patch :)
 >
-> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-> index c258796..2b753a3 100644
-> --- a/net/bluetooth/rfcomm/tty.c
-> +++ b/net/bluetooth/rfcomm/tty.c
-> @@ -1155,9 +1155,11 @@ static const struct tty_operations rfcomm_ops = {
+> Try with this:
 >
->  int __init rfcomm_init_ttys(void)
->  {
-> +       int error;
-> +
->        rfcomm_tty_driver = alloc_tty_driver(RFCOMM_TTY_PORTS);
->        if (!rfcomm_tty_driver)
-> -               return -1;
-> +               return -ENOMEM;
+> diff --git a/audio/manager.c b/audio/manager.c
+> index 818451c..3103824 100644
+> --- a/audio/manager.c
+> +++ b/audio/manager.c
+> @@ -607,7 +607,6 @@ static void hf_io_cb(GIOChannel *chan, gpointer data)
+>          if (perr<  0) {
+>                  DBG("Authorization denied!");
+>                  gateway_set_state(device, GATEWAY_STATE_DISCONNECTED);
+> -               goto drop;
+>          }
 >
->        rfcomm_tty_driver->owner        = THIS_MODULE;
->        rfcomm_tty_driver->driver_name  = "rfcomm";
-> @@ -1172,10 +1174,11 @@ int __init rfcomm_init_ttys(void)
->        rfcomm_tty_driver->init_termios.c_lflag &= ~ICANON;
->        tty_set_operations(rfcomm_tty_driver, &rfcomm_ops);
->
-> -       if (tty_register_driver(rfcomm_tty_driver)) {
-> +       error = tty_register_driver(rfcomm_tty_driver);
-> +       if (error) {
->                BT_ERR("Can't register RFCOMM TTY driver");
->                put_tty_driver(rfcomm_tty_driver);
-> -               return -1;
-> +               return error;
-
-Since you are defining a new variable (error), how about use it on
-other error paths and add a "goto out" and have just one return path?
-
-Regards,
-
-Anderson Briglia
-
->        }
->
->        BT_INFO("RFCOMM TTY layer initialized");
-> --
-> 1.7.7
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>          return;
 >
 
+Yes, that fixes the error message.
 
-
--- 
-INdT - Instituto Nokia de tecnologia
-+55 92 2126 1122
-+55 92 8423 3183
+Thanks,
+daniel
