@@ -1,33 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Peter Krystad" <pkrystad@codeaurora.org>
-To: "'Timur Mehrvarz'" <timur.mehrvarz@googlemail.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org> <4EA6143E.4000606@googlemail.com>
-In-Reply-To: <4EA6143E.4000606@googlemail.com>
-Subject: RE: Add BT 3.0+HS signalling definitions
-Date: Tue, 25 Oct 2011 07:41:38 -0700
-Message-ID: <000601cc9324$34a1b3a0$9de51ae0$@org>
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 25 Oct 2011 15:19:05 +0200
+Subject: RE: GATT Dbus API on BlueZ
+Message-ID: <7769C83744F2C34A841232EF77AEA20C01DCAA8F85@dnce01.ent.ti.com>
+References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
+	<4EA6143E.4000606@googlemail.com>
+	<7769C83744F2C34A841232EF77AEA20C01DCAA8D28@dnce01.ent.ti.com>
+ <CAKT1EBeJB2FDrv6Xp_bGV3eFDEe5ecvnBN0rKniYxw5++Q9NfA@mail.gmail.com>
+In-Reply-To: <CAKT1EBeJB2FDrv6Xp_bGV3eFDEe5ecvnBN0rKniYxw5++Q9NfA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-Hi Timur,
-
-> When will HS become available to Linux devices (PC/Smartphone)?
-> Thank you.
-> 
-> Timur
-
-Upstreaming HS to BlueZ is just getting started, it will take some time.
-
-You can check bluetooth.org for existing qualified 3.0+HS listings.
-
-Peter.
-
---Peter Krystad
-  Employee of Qualcomm Innovation Center, Inc.
-  Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
+Q2xhdWRpbw0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IENsYXVkaW8g
+VGFrYWhhc2kgW21haWx0bzpjbGF1ZGlvLnRha2FoYXNpQG9wZW5ib3NzYS5vcmddDQo+IFNlbnQ6
+IFR1ZXNkYXksIE9jdG9iZXIgMjUsIDIwMTEgMjo1MyBQTQ0KPiBUbzogR2FuaXIsIENoZW4NCj4g
+Q2M6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IEdBVFQg
+RGJ1cyBBUEkgb24gQmx1ZVoNCj4gDQo+IEhpIENoZW4gR2FuaXIsDQo+IA0KPiBPbiBUdWUsIE9j
+dCAyNSwgMjAxMSBhdCA0OjM4IEFNLCBHYW5pciwgQ2hlbiA8Y2hlbi5nYW5pckB0aS5jb20+IHdy
+b3RlOg0KPiA+IEhpLg0KPiA+DQo+ID4gQ3VycmVudGx5LCB0aGUgREJVUyBBUEkgZm9yIEdBVFQg
+Q2xpZW50IHdpbGwgYWxsb3cgZGlzY292ZXJpbmcNCj4gY2hhcmFjdGVyaXN0aWNzIGFuZCBzZXJ2
+aWNlcywgY29ubmVjdGluZyB0byB0aGUgcGVlciBkZXZpY2UgaWYNCj4gcmVxdWlyZWQuIEhvd2V2
+ZXIsIHdoZW4gdGhlIG9wZXJhdGlvbiBpcyBkb25lLCB0aGUgbGluayBpcyBkcm9wcGVkIChubw0K
+PiBtb3JlIGF0dGlvIHJlZ2lzdGVyZWQpLiBUaGUgb25seSB3YXkgdG8gcmVnaXN0ZXIgYSBnbG9i
+YWwgZ2F0dF9zZXJ2aWNlLQ0KPiA+YXR0aW8gYW5kIGtlZXAgdGhlIGNvbm5lY3Rpb24gYWxpdmUg
+YWxsIHRoZSB0aW1lIGlzIHRvIHJlZ2lzdGVyIGENCj4gY2hhcmFjdGVyaXN0aWMgd2F0Y2hlci4g
+SXMgdGhlcmUgYW5vdGhlciB3YXkgdG8gZG8gaXQgPyBJJ2QgbGlrZSB0bw0KPiBrZWVwIHRoZSBs
+aW5rIGEgbGl2ZSAoZm9yIGV4YW1wbGUsIGltcGxlbWVudGluZyBhIHByb3hpbWl0eSBsaW5rIGxv
+c3MNCj4gcHJvZmlsZSBvbiB0b3Agb2YgdGhlIERCVVMgR0FUVCBDbGllbnQpIHdpdGhvdXQgdGhl
+IG5lZWQgZm9yIGEgd2F0Y2hlci4NCj4gPg0KPiA+IFRoYW5rcywNCj4gPiBDaGVuIEdhbmlyDQo+
+ID4NCj4gPg0KPiANCj4gQXQgdGhlIG1vbWVudCB0aGVyZSBpc24ndCBhbm90aGVyIHdheSB0byBr
+ZWVwIHRoZSBsaW5rIHVwLiBHQVRUDQo+IFByb2ZpbGVzIGhhdmUgZGlmZmVyZW50IGNvbm5lY3Rp
+b24gcmVxdWlyZW1lbnRzLCB5b3Ugd2lsbCBuZWVkIGENCj4gZHluYW1pYyBtZWNoYW5pc20gYW55
+d2F5LiBUaGUgY2FsbGJhY2sgcmVnaXN0cmF0aW9uIGlzIHRoZSBtZWNoYW5pc20NCj4gdG8gaW5m
+b3JtIHRoZSBjb3JlIHRoYXQgY29ubmVjdGlvbiBpcyByZXF1aXJlZC4gSWYgeW91IGtlZXAgdGhl
+DQo+IGNvbm5lY3Rpb24gYWx3YXlzIHVwIGl0IHdpbGwgYmUgbmVjZXNzYXJ5IGEgZnVuY3Rpb24g
+dG8gZ2V0IGFjY2VzcyB0bw0KPiB0aGUgR0F0dHJpYiBpbnN0YW5jZSBhbmQgYSB3YXkgdG8gbm90
+aWZ5IHRoYXQgdGhlIGNvbm5lY3Rpb24gaGFzIGJlZW4NCj4gZXN0YWJsaXNoZWQuDQo+IA0KPiBJ
+IHRyaWVkIHRvIHJlbW92ZSB0aGUgYXNzb2NpYXRpb24gYmV0d2VlbiBHQXR0cmliIGFuZCBHSU9D
+aGFubmVsLiBUaGUNCj4gaWRlYSB3YXMgdG8gY3JlYXRlIEdBdHRyaWIgZXZlbiBpZiB0aGUgbGlu
+ayBpcyBkaXNjb25uZWN0ZWQsIGJ1dCB0aGUNCj4gZWZmb3J0IGRvZXNuJ3Qgd29ydGguIFdlIHdp
+bGwgaGF2ZSBwcm9ibGVtcyB3aXRoIE1UVSBhbmQgR0FUVA0KPiBhYnN0cmFjdGlvbnMgZm9yIHJl
+YWQgbG9uZy4NCj4gDQo+IERvIGhhdmUgYW5vdGhlciBzdWdnZXN0aW9uIHRvIGNvbnRyb2wgY29u
+bmVjdGlvbnMgYW5kIGNvbnRyb2wgdGhlIEFUVA0KPiByZXF1ZXN0L3Jlc3BvbnNlIHF1ZXVlPw0K
+PiANCj4gQlIsDQo+IENsYXVkaW8NCg0KVGhhbmtzIGZvciB0aGUgcmVwbHkuDQoNCkhvd2V2ZXIs
+IEkgZGlkIG5vdCBxdWl0ZSB1bmRlcnN0YW5kIHlvdXIgcmVzcG9uc2UsIG5vciB0aGUgcmVsZXZh
+bmN5IHRvIHJlYWQgbG9uZy4NCg0KTXkgYmFzaWMgcmVxdWlyZW1lbnQgaXMgdG8gYWxsb3cgYSBw
+cm9maWxlIHRvIGNvbnRyb2wgdGhlIGNvbm5lY3Rpb24gLSBtZWFuaW5nIHRoYXQgaWYgSSBpbXBs
+ZW1lbnQgYSBwcm94aW1pdHkgb3Igb3RoZXIgcHJvZmlsZSBvdmVyIGRidXMsIEkgd291bGQgbGlr
+ZSB0byBiZSBhYmxlIHRvIHRlbGwgaXQgdG8gY29ubmVjdCwgZGlzY292ZXIgc2VydmljZXMsIGRp
+c2NvdmVyIGNoYXJhY3RlcmlzdGljcywgcG9sbCBmcm9tIHRpbWUgdG8gdGltZSB0aGUgdmFsdWUg
+b2YgYSBjZXJ0YWluIEdBVFQgY2hhciwgb3Igc2ltcGx5IGlkbGUgYW5kIHdhaXQgZm9yIGRpc2Nv
+bm5lY3Rpb24gKGxpa2UgcHJveGltaXR5IGRvZXMpIG9yIG5vdGlmaWNhdGlvbi9pbmRpY2F0aW9u
+LiBXaGVuIHVzaW5nIGRidXMtc2VuZCBJIGVuZCB1cCB3aXRoIGEgZGlzY29ubmVjdGVkIGxpbmsg
+YXQgdGhlIGVuZCBvZiB0aGUgcHJvY2Vzcy4gRG8geW91IHRoaW5rIHRoZSBkaXNjb25uZWN0aW9u
+IHJlc3VsdHMgZnJvbSB0aGUgdGVybWluYXRpb24gb2YgdGhlIGRidXMtc2VuZCBhcHBsaWNhdGlv
+biwgb3IgaXMgaXQgc29tZXRoaW5nIGVsc2UgPw0KDQpUaGFua3MsDQpDaGVuIEdhbmlyLg0KDQo=
