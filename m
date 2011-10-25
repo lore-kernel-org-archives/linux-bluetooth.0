@@ -1,36 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: vkandukuri@atheros.com, sbalashanmugam@atheros.com,
-	padovan@profusion.mobi, David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH] Bluetooth: ath3k: Use GFP_KERNEL instead of GFP_ATOMIC
-Date: Tue, 25 Oct 2011 11:49:54 +0200
-Message-Id: <1319536194-4720-1-git-send-email-dh.herrmann@googlemail.com>
+Date: Tue, 25 Oct 2011 11:22:03 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH bluez] add get_le/get_be helpers
+Message-ID: <20111025092203.GA5154@fusion.localdomain>
+References: <1319448004-8513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20111025085242.GB3514@fusion.localdomain>
+ <CAMOw1v453iY4wKu46XcqtMQROT0T7Z0-xsTxAYWL6K0XQk=efQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CAMOw1v453iY4wKu46XcqtMQROT0T7Z0-xsTxAYWL6K0XQk=efQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We are allowed to sleep here so no need to use GFP_ATOMIC. The caller
-(ath3k_probe) calls request_firmware() which definitely sleeps. Hence, we should
-avoid using GFP_ATOMIC.
+Hi Lucas,
 
-Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
----
- drivers/bluetooth/ath3k.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Tue, Oct 25, 2011, Lucas De Marchi wrote:
+> On Tue, Oct 25, 2011 at 6:52 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> > Hi Andrei,
+> >
+> > On Mon, Oct 24, 2011, Emeltchenko Andrei wrote:
+> >> Helpers to access LE / BE values. In bluetooth there is a mixture
+> >> of LE / BE network byte order.
+> >> ---
+> >>  lib/bluetooth.h |   64 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >>  1 files changed, 64 insertions(+), 0 deletions(-)
+> >
+> > Applied. Thanks.
+> 
+> Should we convert code to use these new functions?
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index db7cb81..bcf9727 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -105,7 +105,7 @@ static int ath3k_load_firmware(struct usb_device *udev,
- 
- 	pipe = usb_sndctrlpipe(udev, 0);
- 
--	send_buf = kmalloc(BULK_SIZE, GFP_ATOMIC);
-+	send_buf = kmalloc(BULK_SIZE, GFP_KERNEL);
- 	if (!send_buf) {
- 		BT_ERR("Can't allocate memory chunk for firmware");
- 		return -ENOMEM;
--- 
-1.7.7.1
+Yes, please.
 
+Johan
