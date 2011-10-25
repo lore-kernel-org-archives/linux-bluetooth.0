@@ -1,56 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EA67552.1090703@canonical.com>
-Date: Tue, 25 Oct 2011 16:37:38 +0800
-From: Jesse Sung <jesse.sung@canonical.com>
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-CC: 812132@bugs.launchpad.net
-Subject: [PATCH] Bluetooth: set reset_resume handler
-Content-Type: multipart/mixed;
- boundary="------------000704000705030801070003"
+Subject: [PATCH BlueZ] Fix calling g_io_channel_shutdown twice for a gateway connection
+Date: Tue, 25 Oct 2011 11:26:35 +0300
+Message-Id: <1319531195-32637-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------000704000705030801070003
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This happens in the following circumstance:
 
-On some machines, it seems that usb hubs do not get power while
-being suspended. We can get something like this in dmesg:
-     usb usb2: root hub lost power or was reset
+bluetoothd[30869]: audio/manager.c:hf_io_cb() Authorization denied!
 
-When this is the case, .reset_resume is called instead of .resume.
-If .reset_resume is not set, bluetooth modules would stay in an unusable
-state because the resume function is not called.
+(bluetoothd:30869): GLib-WARNING **: Invalid file descriptor.
 
-Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
+Reported by Daniel Wagner <wagi@monom.org>
 ---
-  drivers/bluetooth/btusb.c |    1 +
-  1 files changed, 1 insertions(+), 0 deletions(-)
+ audio/manager.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
 
+diff --git a/audio/manager.c b/audio/manager.c
+index 818451c..3103824 100644
+--- a/audio/manager.c
++++ b/audio/manager.c
+@@ -607,7 +607,6 @@ static void hf_io_cb(GIOChannel *chan, gpointer data)
+ 	if (perr < 0) {
+ 		DBG("Authorization denied!");
+ 		gateway_set_state(device, GATEWAY_STATE_DISCONNECTED);
+-		goto drop;
+ 	}
+ 
+ 	return;
+-- 
+1.7.6.4
 
-
---------------000704000705030801070003
-Content-Type: text/x-patch;
- name="0001-Bluetooth-set-reset_resume-handler.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="0001-Bluetooth-set-reset_resume-handler.patch"
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index abfc4ee..db2a4d1 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1220,6 +1220,7 @@ static struct usb_driver btusb_driver = {
- #ifdef CONFIG_PM
- 	.suspend	= btusb_suspend,
- 	.resume		= btusb_resume,
-+	.reset_resume	= btusb_resume,
- #endif
- 	.id_table	= btusb_table,
- 	.supports_autosuspend = 1,
-
-
---------------000704000705030801070003--
