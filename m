@@ -1,37 +1,22 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] Fix calling g_io_channel_shutdown twice for a gateway connection
-Date: Tue, 25 Oct 2011 11:26:35 +0300
-Message-Id: <1319531195-32637-1-git-send-email-luiz.dentz@gmail.com>
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: "claudio.takahasi@openbossa.org" <claudio.takahasi@openbossa.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 25 Oct 2011 09:38:14 +0200
+Subject: GATT Dbus API on BlueZ
+Message-ID: <7769C83744F2C34A841232EF77AEA20C01DCAA8D28@dnce01.ent.ti.com>
+References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
+ <4EA6143E.4000606@googlemail.com>
+In-Reply-To: <4EA6143E.4000606@googlemail.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi.
 
-This happens in the following circumstance:
+Currently, the DBUS API for GATT Client will allow discovering characteristics and services, connecting to the peer device if required. However, when the operation is done, the link is dropped (no more attio registered). The only way to register a global gatt_service->attio and keep the connection alive all the time is to register a characteristic watcher. Is there another way to do it ? I'd like to keep the link a live (for example, implementing a proximity link loss profile on top of the DBUS GATT Client) without the need for a watcher.
 
-bluetoothd[30869]: audio/manager.c:hf_io_cb() Authorization denied!
-
-(bluetoothd:30869): GLib-WARNING **: Invalid file descriptor.
-
-Reported by Daniel Wagner <wagi@monom.org>
----
- audio/manager.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
-
-diff --git a/audio/manager.c b/audio/manager.c
-index 818451c..3103824 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -607,7 +607,6 @@ static void hf_io_cb(GIOChannel *chan, gpointer data)
- 	if (perr < 0) {
- 		DBG("Authorization denied!");
- 		gateway_set_state(device, GATEWAY_STATE_DISCONNECTED);
--		goto drop;
- 	}
- 
- 	return;
--- 
-1.7.6.4
+Thanks,
+Chen Ganir
 
