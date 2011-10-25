@@ -1,26 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Oct 2011 13:35:07 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Rafal Michalski <michalski.raf@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd] Code clean-up: Remove unnecessary code line
- breaking
-Message-ID: <20111025113507.GA6172@fusion.localdomain>
-References: <1319541114-16715-1-git-send-email-michalski.raf@gmail.com>
+Message-ID: <4EA69B6D.3000905@canonical.com>
+Date: Tue, 25 Oct 2011 19:20:13 +0800
+From: Jesse Sung <jesse.sung@canonical.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1319541114-16715-1-git-send-email-michalski.raf@gmail.com>
+To: Oliver Neukum <oneukum@suse.de>
+CC: linux-bluetooth@vger.kernel.org, 812132@bugs.launchpad.net
+Subject: Re: [PATCH] Bluetooth: set reset_resume handler
+References: <4EA67552.1090703@canonical.com> <201110251040.14016.oneukum@suse.de>
+In-Reply-To: <201110251040.14016.oneukum@suse.de>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafal,
+On 10/25/2011 04:40 PM, Oliver Neukum wrote:
+> Am Dienstag, 25. Oktober 2011, 10:37:38 schrieb Jesse Sung:
+>>
+>> On some machines, it seems that usb hubs do not get power while
+>> being suspended. We can get something like this in dmesg:
+>>       usb usb2: root hub lost power or was reset
+>>
+>> When this is the case, .reset_resume is called instead of .resume.
+>> If .reset_resume is not set, bluetooth modules would stay in an unusable
+>> state because the resume function is not called.
+>
+> Have you experimentally verified that? This state of affairs is years
+> old and should result in a virtual unplug/replug cycle. What are you
+> seeing?
+>
+> 	Regards
+> 		Oliver
 
-On Tue, Oct 25, 2011, Rafal Michalski wrote:
-> This patch removes unnecessary code line breaking.
-> ---
->  plugins/phonebook-tracker.c |    3 +--
->  1 files changed, 1 insertions(+), 2 deletions(-)
+Hi Oliver,
 
-Applied. Thanks.
+Humm... You're right, there is an unplug-replug cycle, but bluetooth 
+doesn't work until I restart bluetoothd. If the resume function is 
+called through .reset_resume, then bluetooth works right after resume.
 
-Johan
+Regards,
+Jesse
