@@ -1,46 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
+From: Oliver Neukum <oneukum@suse.de>
+To: Jesse Sung <jesse.sung@canonical.com>
+Subject: Re: [PATCH] Bluetooth: set reset_resume handler
+Date: Tue, 25 Oct 2011 13:43:49 +0200
+Cc: linux-bluetooth@vger.kernel.org, 812132@bugs.launchpad.net
+References: <4EA67552.1090703@canonical.com> <201110251040.14016.oneukum@suse.de> <4EA69B6D.3000905@canonical.com>
+In-Reply-To: <4EA69B6D.3000905@canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <7769C83744F2C34A841232EF77AEA20C01DCAA8D28@dnce01.ent.ti.com>
-References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
-	<4EA6143E.4000606@googlemail.com>
-	<7769C83744F2C34A841232EF77AEA20C01DCAA8D28@dnce01.ent.ti.com>
-Date: Tue, 25 Oct 2011 09:52:48 -0300
-Message-ID: <CAKT1EBeJB2FDrv6Xp_bGV3eFDEe5ecvnBN0rKniYxw5++Q9NfA@mail.gmail.com>
-Subject: Re: GATT Dbus API on BlueZ
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: "Ganir, Chen" <chen.ganir@ti.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Message-Id: <201110251343.49236.oneukum@suse.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen Ganir,
+Am Dienstag, 25. Oktober 2011, 13:20:13 schrieb Jesse Sung:
+> On 10/25/2011 04:40 PM, Oliver Neukum wrote:
+> > Am Dienstag, 25. Oktober 2011, 10:37:38 schrieb Jesse Sung:
+> >>
+> >> On some machines, it seems that usb hubs do not get power while
+> >> being suspended. We can get something like this in dmesg:
+> >>       usb usb2: root hub lost power or was reset
+> >>
+> >> When this is the case, .reset_resume is called instead of .resume.
+> >> If .reset_resume is not set, bluetooth modules would stay in an unusable
+> >> state because the resume function is not called.
+> >
+> > Have you experimentally verified that? This state of affairs is years
+> > old and should result in a virtual unplug/replug cycle. What are you
+> > seeing?
+> >
+> > 	Regards
+> > 		Oliver
+> 
+> Hi Oliver,
+> 
+> Humm... You're right, there is an unplug-replug cycle, but bluetooth 
+> doesn't work until I restart bluetoothd. If the resume function is 
+> called through .reset_resume, then bluetooth works right after resume.
 
-On Tue, Oct 25, 2011 at 4:38 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
-> Hi.
->
-> Currently, the DBUS API for GATT Client will allow discovering characteristics and services, connecting to the peer device if required. However, when the operation is done, the link is dropped (no more attio registered). The only way to register a global gatt_service->attio and keep the connection alive all the time is to register a characteristic watcher. Is there another way to do it ? I'd like to keep the link a live (for example, implementing a proximity link loss profile on top of the DBUS GATT Client) without the need for a watcher.
->
-> Thanks,
-> Chen Ganir
->
->
+Hi
 
-At the moment there isn't another way to keep the link up. GATT
-Profiles have different connection requirements, you will need a
-dynamic mechanism anyway. The callback registration is the mechanism
-to inform the core that connection is required. If you keep the
-connection always up it will be necessary a function to get access to
-the GAttrib instance and a way to notify that the connection has been
-established.
+Yes, but we fail to indicate to user space that connections may have been
+dropped. I doubt we can simply pretend the loss of power hasn't occured.
+Have you tested what happens if you go to S3 while eg. a file is transfered
+or audio played with your patch?
 
-I tried to remove the association between GAttrib and GIOChannel. The
-idea was to create GAttrib even if the link is disconnected, but the
-effort doesn't worth. We will have problems with MTU and GATT
-abstractions for read long.
-
-Do have another suggestion to control connections and control the ATT
-request/response queue?
-
-BR,
-Claudio
+	Regards
+		Oliver
