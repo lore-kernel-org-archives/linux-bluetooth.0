@@ -1,28 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oneukum@suse.de>
-To: Jesse Sung <jesse.sung@canonical.com>
-Subject: Re: [PATCH] Bluetooth: set reset_resume handler
-Date: Tue, 25 Oct 2011 20:29:55 +0200
-Cc: linux-bluetooth@vger.kernel.org, 812132@bugs.launchpad.net
-References: <4EA67552.1090703@canonical.com> <201110251343.49236.oneukum@suse.de> <4EA6CC5B.2020400@canonical.com>
-In-Reply-To: <4EA6CC5B.2020400@canonical.com>
+Message-ID: <4EA6CC5B.2020400@canonical.com>
+Date: Tue, 25 Oct 2011 22:48:59 +0800
+From: Jesse Sung <jesse.sung@canonical.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Message-Id: <201110252029.55900.oneukum@suse.de>
+To: Oliver Neukum <oneukum@suse.de>
+CC: linux-bluetooth@vger.kernel.org, 812132@bugs.launchpad.net
+Subject: Re: [PATCH] Bluetooth: set reset_resume handler
+References: <4EA67552.1090703@canonical.com> <201110251040.14016.oneukum@suse.de> <4EA69B6D.3000905@canonical.com> <201110251343.49236.oneukum@suse.de>
+In-Reply-To: <201110251343.49236.oneukum@suse.de>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am Dienstag, 25. Oktober 2011, 16:48:59 schrieb Jesse Sung:
+On 10/25/2011 07:43 PM, Oliver Neukum wrote:
+> Am Dienstag, 25. Oktober 2011, 13:20:13 schrieb Jesse Sung:
+>> On 10/25/2011 04:40 PM, Oliver Neukum wrote:
+>>> Am Dienstag, 25. Oktober 2011, 10:37:38 schrieb Jesse Sung:
+>>>>
+>>>> On some machines, it seems that usb hubs do not get power while
+>>>> being suspended. We can get something like this in dmesg:
+>>>>        usb usb2: root hub lost power or was reset
+>>>>
+>>>> When this is the case, .reset_resume is called instead of .resume.
+>>>> If .reset_resume is not set, bluetooth modules would stay in an unusable
+>>>> state because the resume function is not called.
+>>>
+>>> Have you experimentally verified that? This state of affairs is years
+>>> old and should result in a virtual unplug/replug cycle. What are you
+>>> seeing?
+>>
+>> Hi Oliver,
+>>
+>> Humm... You're right, there is an unplug-replug cycle, but bluetooth
+>> doesn't work until I restart bluetoothd. If the resume function is
+>> called through .reset_resume, then bluetooth works right after resume.
+>
+> Hi
+>
+> Yes, but we fail to indicate to user space that connections may have been
+> dropped. I doubt we can simply pretend the loss of power hasn't occured.
+> Have you tested what happens if you go to S3 while eg. a file is transfered
+> or audio played with your patch?
 
-> Just tested file transferring. If there's no active connection, 
-> everything goes fine. But if a file is transferring while going to S3, 
-> bluetooth is not working after resume. Use applet to disable and 
-> re-enable bluetooth makes it work again...
-> 
-> Wondering what is the right way to handle loss of power...
+Hi Oliver,
 
-A virtual unplug/plug worked until now, even if it was inelegant.
+Indeed, loss of power event should not be ignored.
 
-	Regards
-		Oliver
+Just tested file transferring. If there's no active connection, 
+everything goes fine. But if a file is transferring while going to S3, 
+bluetooth is not working after resume. Use applet to disable and 
+re-enable bluetooth makes it work again...
+
+Wondering what is the right way to handle loss of power...
+
+Regards,
+Jesse
