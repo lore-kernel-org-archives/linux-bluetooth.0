@@ -1,40 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EA69B6D.3000905@canonical.com>
-Date: Tue, 25 Oct 2011 19:20:13 +0800
-From: Jesse Sung <jesse.sung@canonical.com>
-MIME-Version: 1.0
-To: Oliver Neukum <oneukum@suse.de>
-CC: linux-bluetooth@vger.kernel.org, 812132@bugs.launchpad.net
-Subject: Re: [PATCH] Bluetooth: set reset_resume handler
-References: <4EA67552.1090703@canonical.com> <201110251040.14016.oneukum@suse.de>
-In-Reply-To: <201110251040.14016.oneukum@suse.de>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+From: Rafal Michalski <michalski.raf@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Rafal Michalski <michalski.raf@gmail.com>
+Subject: [PATCH obexd] Code clean-up: Remove unnecessary code line breaking
+Date: Tue, 25 Oct 2011 13:11:54 +0200
+Message-Id: <1319541114-16715-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 10/25/2011 04:40 PM, Oliver Neukum wrote:
-> Am Dienstag, 25. Oktober 2011, 10:37:38 schrieb Jesse Sung:
->>
->> On some machines, it seems that usb hubs do not get power while
->> being suspended. We can get something like this in dmesg:
->>       usb usb2: root hub lost power or was reset
->>
->> When this is the case, .reset_resume is called instead of .resume.
->> If .reset_resume is not set, bluetooth modules would stay in an unusable
->> state because the resume function is not called.
->
-> Have you experimentally verified that? This state of affairs is years
-> old and should result in a virtual unplug/replug cycle. What are you
-> seeing?
->
-> 	Regards
-> 		Oliver
+This patch removes unnecessary code line breaking.
+---
+ plugins/phonebook-tracker.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
-Hi Oliver,
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index 3be3a89..e4f2383 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -1120,8 +1120,7 @@ static void contact_add_addresses(struct phonebook_contact *contact,
+ 	int i;
+ 
+ 	/* Addresses from affilation */
+-	aff_addr = g_strsplit(reply[COL_ADDR_AFF], MAIN_DELIM,
+-								MAX_FIELDS);
++	aff_addr = g_strsplit(reply[COL_ADDR_AFF], MAIN_DELIM, MAX_FIELDS);
+ 
+ 	if (aff_addr)
+ 		for (i = 0; aff_addr[i] != NULL; ++i)
+-- 
+1.6.3.3
 
-Humm... You're right, there is an unplug-replug cycle, but bluetooth 
-doesn't work until I restart bluetoothd. If the resume function is 
-called through .reset_resume, then bluetooth works right after resume.
-
-Regards,
-Jesse
