@@ -2,99 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH] AVRCP: implement TRACK-REACHED-END event
-Date: Wed, 26 Oct 2011 11:02:26 -0200
-Message-Id: <1319634146-1643-2-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1319634146-1643-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1319634146-1643-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH] Fix check for PDU size
+Date: Wed, 26 Oct 2011 11:02:25 -0200
+Message-Id: <1319634146-1643-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Company ID became part of the avrcp header so its size is already
+accounted in the AVRCP_HEADER_LENGTH define.
 ---
-
-I had this originally implemented using timeouts, setting them up once the
-track started, the status or the position changed. It works, but IMO it's ugly
-since it relies on having the track duration and we can't handle it properly
-when we are in fast-forward/backward state. Thus I think it's better to rely on
-user setting the position as we do for "track reached start" event.
-
- audio/avrcp.c     |    2 ++
- audio/avrcp.h     |    1 +
- audio/media.c     |   11 +++++++++++
- doc/media-api.txt |    6 +++++-
- 4 files changed, 19 insertions(+), 1 deletions(-)
+ audio/avrcp.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
 diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 879e959..c9ec314 100644
+index f06afbf..879e959 100644
 --- a/audio/avrcp.c
 +++ b/audio/avrcp.c
-@@ -383,6 +383,7 @@ int avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data)
- 		memcpy(&pdu->params[1], data, sizeof(uint64_t));
+@@ -1053,7 +1053,7 @@ static size_t handle_vendordep_pdu(struct avctp *session, uint8_t transaction,
+ 	pdu->packet_type = 0;
+ 	pdu->rsvd = 0;
  
- 		break;
-+	case AVRCP_EVENT_TRACK_REACHED_END:
- 	case AVRCP_EVENT_TRACK_REACHED_START:
- 		size = 1;
- 		break;
-@@ -904,6 +905,7 @@ static uint8_t avrcp_handle_register_notification(struct avrcp_player *player,
- 		memcpy(&pdu->params[1], &uid, sizeof(uint64_t));
- 
- 		break;
-+	case AVRCP_EVENT_TRACK_REACHED_END:
- 	case AVRCP_EVENT_TRACK_REACHED_START:
- 		len = 1;
- 		break;
-diff --git a/audio/avrcp.h b/audio/avrcp.h
-index c798658..fb64f3b 100644
---- a/audio/avrcp.h
-+++ b/audio/avrcp.h
-@@ -71,6 +71,7 @@
- /* Notification events */
- #define AVRCP_EVENT_STATUS_CHANGED	0x01
- #define AVRCP_EVENT_TRACK_CHANGED	0x02
-+#define AVRCP_EVENT_TRACK_REACHED_END	0x03
- #define AVRCP_EVENT_TRACK_REACHED_START	0x04
- #define AVRCP_EVENT_LAST		AVRCP_EVENT_TRACK_REACHED_START
- 
-diff --git a/audio/media.c b/audio/media.c
-index 5528ada..587544d 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -1293,6 +1293,17 @@ static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
- 	if (!mp->position) {
- 		avrcp_player_event(mp->player,
- 					AVRCP_EVENT_TRACK_REACHED_START, NULL);
-+	} else {
-+		struct metadata_value *value;
-+
-+		value = g_hash_table_lookup(mp->track, GUINT_TO_POINTER(
-+					AVRCP_MEDIA_ATTRIBUTE_DURATION));
-+
-+		if ((value == NULL && mp->position == UINT32_MAX) ||
-+				(value && value->value.num == mp->position)) {
-+			avrcp_player_event(mp->player,
-+					AVRCP_EVENT_TRACK_REACHED_END, NULL);
-+		}
+-	if (operand_count + 3 < AVRCP_HEADER_LENGTH) {
++	if (operand_count < AVRCP_HEADER_LENGTH) {
+ 		pdu->params[0] = E_INVALID_COMMAND;
+ 		goto err_metadata;
  	}
- 
- 	return TRUE;
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index c748e50..01eb11a 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -84,7 +84,11 @@ Methods		void RegisterEndpoint(object endpoint, dict properties)
- 
- 				uint32 Position
- 
--					Playback position in milliseconds
-+					Playback position in milliseconds.
-+					"Track reached start" and "track
-+					reached end" event will be sent once 0
-+					or track's duration are set
-+					respectively.
- 
- 			Metadata:
- 
 -- 
 1.7.7.1
 
