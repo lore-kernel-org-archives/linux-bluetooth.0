@@ -1,43 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 26 Oct 2011 16:33:45 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Peter Krystad <pkrystad@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/4] Add parsing of A2MP signals
-Message-ID: <20111026133343.GE11385@aemeltch-MOBL1>
-References: <1319239802-22457-1-git-send-email-pkrystad@codeaurora.org>
- <1319239802-22457-3-git-send-email-pkrystad@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1319239802-22457-3-git-send-email-pkrystad@codeaurora.org>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH] AVRCP: implement TRACK-REACHED-END event
+Date: Wed, 26 Oct 2011 11:02:26 -0200
+Message-Id: <1319634146-1643-2-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1319634146-1643-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1319634146-1643-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+---
 
-On Fri, Oct 21, 2011 at 04:30:00PM -0700, Peter Krystad wrote:
-...
-> @@ -923,6 +1004,240 @@ static inline void move_cfm_rsp(int level, l2cap_cmd_hdr *cmd, struct frame *frm
->  	printf("Move cfm rsp: icid 0x%4.4x\n", icid);
->  }
->  
-> +static inline void amp_command_rej(int level, struct frame *frm)
-> +{
-> +	amp_cmd_rej_parms *h = frm->ptr;
-> +	uint16_t reason = btohs(h->reason);
-> +
-> +	if (p_filter(FILT_A2MP))
-> +		return;
-> +
-> +	printf("Command Reject: reason (%d)- ", reason);
-> +	p_indent(level + 1, frm);
+I had this originally implemented using timeouts, setting them up once the
+track started, the status or the position changed. It works, but IMO it's ugly
+since it relies on having the track duration and we can't handle it properly
+when we are in fast-forward/backward state. Thus I think it's better to rely on
+user setting the position as we do for "track reached start" event.
 
-This doesn't make sense to use p_indent if you print on the same line.
-Maybe you forgot "\n" ?
+ audio/avrcp.c     |    2 ++
+ audio/avrcp.h     |    1 +
+ audio/media.c     |   11 +++++++++++
+ doc/media-api.txt |    6 +++++-
+ 4 files changed, 19 insertions(+), 1 deletions(-)
 
-> +	printf("%s\n", ampreason2str(reason));
-> +}
-> +
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index 879e959..c9ec314 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -383,6 +383,7 @@ int avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data)
+ 		memcpy(&pdu->params[1], data, sizeof(uint64_t));
+ 
+ 		break;
++	case AVRCP_EVENT_TRACK_REACHED_END:
+ 	case AVRCP_EVENT_TRACK_REACHED_START:
+ 		size = 1;
+ 		break;
+@@ -904,6 +905,7 @@ static uint8_t avrcp_handle_register_notification(struct avrcp_player *player,
+ 		memcpy(&pdu->params[1], &uid, sizeof(uint64_t));
+ 
+ 		break;
++	case AVRCP_EVENT_TRACK_REACHED_END:
+ 	case AVRCP_EVENT_TRACK_REACHED_START:
+ 		len = 1;
+ 		break;
+diff --git a/audio/avrcp.h b/audio/avrcp.h
+index c798658..fb64f3b 100644
+--- a/audio/avrcp.h
++++ b/audio/avrcp.h
+@@ -71,6 +71,7 @@
+ /* Notification events */
+ #define AVRCP_EVENT_STATUS_CHANGED	0x01
+ #define AVRCP_EVENT_TRACK_CHANGED	0x02
++#define AVRCP_EVENT_TRACK_REACHED_END	0x03
+ #define AVRCP_EVENT_TRACK_REACHED_START	0x04
+ #define AVRCP_EVENT_LAST		AVRCP_EVENT_TRACK_REACHED_START
+ 
+diff --git a/audio/media.c b/audio/media.c
+index 5528ada..587544d 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -1293,6 +1293,17 @@ static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
+ 	if (!mp->position) {
+ 		avrcp_player_event(mp->player,
+ 					AVRCP_EVENT_TRACK_REACHED_START, NULL);
++	} else {
++		struct metadata_value *value;
++
++		value = g_hash_table_lookup(mp->track, GUINT_TO_POINTER(
++					AVRCP_MEDIA_ATTRIBUTE_DURATION));
++
++		if ((value == NULL && mp->position == UINT32_MAX) ||
++				(value && value->value.num == mp->position)) {
++			avrcp_player_event(mp->player,
++					AVRCP_EVENT_TRACK_REACHED_END, NULL);
++		}
+ 	}
+ 
+ 	return TRUE;
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index c748e50..01eb11a 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -84,7 +84,11 @@ Methods		void RegisterEndpoint(object endpoint, dict properties)
+ 
+ 				uint32 Position
+ 
+-					Playback position in milliseconds
++					Playback position in milliseconds.
++					"Track reached start" and "track
++					reached end" event will be sent once 0
++					or track's duration are set
++					respectively.
+ 
+ 			Metadata:
+ 
+-- 
+1.7.7.1
 
-Best regards 
-Andrei Emeltchenko 
