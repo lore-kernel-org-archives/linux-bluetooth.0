@@ -1,54 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arek Lichwa <arkadiusz.lichwa@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <iliak@ti.com>, <ulrik.lauren@stericsson.com>,
-	Arek Lichwa <arkadiusz.lichwa@tieto.com>
-Subject: [PATCH cover letter] Bluetooth: Revert: Fix L2CAP connection ... 
-Date: Wed, 26 Oct 2011 11:23:21 +0200
-Message-ID: <1319621002-7122-1-git-send-email-arkadiusz.lichwa@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: padovan@profusion.mobi,
+	marcel@holtmann.org,
+	David Herrmann <dh.herrmann@googlemail.com>
+Subject: [PATCH] Bluetooth: bfusb: Fix error path on firmware load
+Date: Wed, 26 Oct 2011 11:22:46 +0200
+Message-Id: <1319620966-11193-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+When loading the usb-configuration we do not signal the end of configuration on
+memory allocation error. This patch moves the memory allocation to the top so
+every error path uses "goto error" now to correctly send the usb-ctrl message
+when detecting some error.
 
-We found during testing problem when setting rfcomm (SPP) channel between
-two 2.1 devices. 
-The test case always failed mostly saying security block on l2cap level 
-but sometimes the fail root cause was 'Command not understood' on l2cap 
-as well.
-Analyzing security block issue, I found that there's unencrypted link when
-l2cap command 'connection request' is sent to remote.
-The second issue with 'command not understood' has turn out to be related to 
-expiration of l2cap timer and its implications.
+This also replaces GFP_ATOMIC with GFP_KERNEL as we are allowed to sleep here.
 
-Solution that I found to fix the problem seems to be related to old commit 
-330605423ca6eafafb8dcc27502bce1c585d1b06 made by Ilia Kolomisnky. When there's
-authentication ongoing, 'encryption pending' should be turn on, otherwise 
-there're situations when link stays unencrypted. 
-The issue with timer expiration is related to Andrzej Kaczmarek's patch 
-sent to community a couple days ago (~ 2011/10/20). 
-This patch actually recalculates (repairs) timer values on l2cap which were 
-wrongly converted before. 
-With this patch the expiration issue disappears during the test case 
-I've made, otherwise just reverting 330605423ca6eafafb8dcc27502bce1c585d1b06
-is not enough, since timer issue blocks very often passing the test case.
+Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
+---
+ drivers/bluetooth/bfusb.c |   13 +++++++------
+ 1 files changed, 7 insertions(+), 6 deletions(-)
 
-@Ilia: Can you point out what was the root cause of problems with time-outs
-on l2cap that push you send the patch [605423ca6eafafb8dcc27502bce1c585d1b06].
-Isn't it to be related to the patch that repairs the l2cap timer values 
-mentioned above ?
-
-BR,
-/Arek
-
-Arek Lichwa (1):
-  Bluetooth: Revert: Fix L2CAP connection establishment
-
- net/bluetooth/hci_conn.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
+diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
+index 6580d50..a936763 100644
+--- a/drivers/bluetooth/bfusb.c
++++ b/drivers/bluetooth/bfusb.c
+@@ -568,22 +568,23 @@ static int bfusb_load_firmware(struct bfusb_data *data,
+ 
+ 	BT_INFO("BlueFRITZ! USB loading firmware");
+ 
++	buf = kmalloc(BFUSB_MAX_BLOCK_SIZE + 3, GFP_KERNEL);
++	if (!buf) {
++		BT_ERR("Can't allocate memory chunk for firmware");
++		return -ENOMEM;
++	}
++
+ 	pipe = usb_sndctrlpipe(data->udev, 0);
+ 
+ 	if (usb_control_msg(data->udev, pipe, USB_REQ_SET_CONFIGURATION,
+ 				0, 1, 0, NULL, 0, USB_CTRL_SET_TIMEOUT) < 0) {
+ 		BT_ERR("Can't change to loading configuration");
++		kfree(buf);
+ 		return -EBUSY;
+ 	}
+ 
+ 	data->udev->toggle[0] = data->udev->toggle[1] = 0;
+ 
+-	buf = kmalloc(BFUSB_MAX_BLOCK_SIZE + 3, GFP_ATOMIC);
+-	if (!buf) {
+-		BT_ERR("Can't allocate memory chunk for firmware");
+-		return -ENOMEM;
+-	}
+-
+ 	pipe = usb_sndbulkpipe(data->udev, data->bulk_out_ep);
+ 
+ 	while (count) {
 -- 
-1.7.6
-
+1.7.7.1
