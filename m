@@ -1,84 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 26 Oct 2011 09:20:19 +0200
-Subject: GATT Dbus API on BlueZ - attirbute-api.txt modifications
-Message-ID: <7769C83744F2C34A841232EF77AEA20C01DCAA9265@dnce01.ent.ti.com>
-References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
-	<4EA6143E.4000606@googlemail.com>
-	<7769C83744F2C34A841232EF77AEA20C01DCAA8D28@dnce01.ent.ti.com>
-	<CAKT1EBeJB2FDrv6Xp_bGV3eFDEe5ecvnBN0rKniYxw5++Q9NfA@mail.gmail.com>
-	<7769C83744F2C34A841232EF77AEA20C01DCAA8F85@dnce01.ent.ti.com>
- <CAKT1EBcd6dQq3bzOsW3Fuwv=d8J=yDvsJjbp_ELEAQUjfyRx9g@mail.gmail.com>
-In-Reply-To: <CAKT1EBcd6dQq3bzOsW3Fuwv=d8J=yDvsJjbp_ELEAQUjfyRx9g@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <4EA7512A.6050303@googlemail.com>
+Date: Wed, 26 Oct 2011 02:15:38 +0200
+From: Timur Mehrvarz <timur.mehrvarz@googlemail.com>
 MIME-Version: 1.0
+To: Peter Krystad <pkrystad@codeaurora.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Add BT 3.0+HS signalling definitions
+References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org> <4EA6143E.4000606@googlemail.com> <000601cc9324$34a1b3a0$9de51ae0$@org>
+In-Reply-To: <000601cc9324$34a1b3a0$9de51ae0$@org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkuDQoNCkhlcmUncyBteSBwcm9wb3NhbCBmb3Igc29tZSBtb2RpZmljYXRpb25zIHRvIHRoZSBl
-eGlzdGluZyBhdHRyaWJ1dGUtYXBpLmRvYyBmaWxlLg0KDQpUaGVzZSBhZGRpdGlvbnMgaW5jbHVk
-ZSA6DQoxLiBTdXBwb3J0IGZvciBtb3JlIHByb3BlcnRpZXMsIHN1Y2ggYXMgd3JpdGFibGUsIHJl
-YWRhYmxlLCBub3RpZnkNCjIuIFJlbW92ZSBWYWx1ZSBmcm9tIHRoZSBwcm9wZXJ0aWVzLCBhbmQg
-aGFuZGxlIHdyaXRlL3JlYWQgd2l0aCBzcGVjaWZpYyBmdW5jdGlvbnMuIFRoaXMgd2FzIGRvbmUg
-c2luY2UgY3VycmVudGx5IHRoZSB2YWx1ZSBpcyBvbmx5IHJlYWQgb25jZSBmcm9tIHRoZSBzZXJ2
-ZXIsIGFuZCB0aGVyZSBpcyBubyB3YXkgdG8gcmVmcmVzaCB0aGUgdmFsdWUgdXNpbmcgdGhlIGRi
-dXMgQVBJLiBJbiBhZGRpdGlvbiwgdGhlIHZhbHVlIGNhbiBiZSB3cml0dGVuIGluIG11bHRpcGxl
-IHdheXMgKHdlIGN1cnJlbnRseSBzdXBwb3J0IHdyaXRlIHdpdGggcmVzcG9uc2UgYW5kIHdyaXRl
-IHdpdGhvdXQgcmVzcG9uc2UsIGJ1dCBmdXR1cmUgd3JpdGUgbWV0aG9kcyBpbmNsdWRlIHdyaXRl
-IHJlbGlhYmxlIGFuZCB3cml0ZSBzaWduZWQsIHdoaWNoIG1heSBiZSByZXF1aXJlZCBieSBwcm9m
-aWxlcyBpbiB0aGUgZnV0dXJlKS4NCg0KSGVyZSdzIHRoZSBkaWZmIGZyb20gdGhlIGN1cnJlbnQg
-ZG9jcy9hdHRyaWJ1dGUtYXBpLnR4dCBmaWxlIDoNCg0KLS0tLT44LS0tLS0tLS0tLS0tLS0tDQpk
-aWZmIC0tZ2l0IGEvZG9jL2F0dHJpYnV0ZS1hcGkudHh0IGIvZG9jL2F0dHJpYnV0ZS1hcGkudHh0
-DQppbmRleCA5OGQ3ZjMwLi5mYmM2OTU3IDEwMDY0NA0KLS0tIGEvZG9jL2F0dHJpYnV0ZS1hcGku
-dHh0DQorKysgYi9kb2MvYXR0cmlidXRlLWFwaS50eHQNCkBAIC0xMTIsNiArMTEyLDE3IEBAIE1l
-dGhvZHMJCWRpY3QgR2V0UHJvcGVydGllcygpDQogDQogCQkJUG9zc2libGUgRXJyb3JzOiBvcmcu
-Ymx1ZXouRXJyb3IuSW52YWxpZEFyZ3VtZW50cw0KIA0KKwkJYXJyYXl7Ynl0ZX0gUmVhZFZhbHVl
-KCkNCisNCisJCSAgICBSZWFkIHRoZSB2YWx1ZSBvZiB0aGUgY2hhcmFjdGVyaXN0aWMuDQorDQor
-CQlpbnQgV3JpdGVWYWx1ZShhcnJheXtieXRlfSB2YWx1ZSwgaW50IG1ldGhvZCkNCisNCisJCSAg
-ICBXcml0ZSB0aGUgdmFsdWUgb2YgdGhlIGNoYXJhY3RlcmlzdGljLCB3aXRoIHNwZWNpZmllZCBt
-ZXRob2QgOg0KKwkJICAgIDA6IFdyaXRlIHdpdGhvdXQgcmVzcG9uc2UuIEFsd2F5cyByZXR1cm4g
-MC4NCisJCSAgICAxOiBXcml0ZSB3aXRoIHJlc3BvbnNlLiBSZXR1cm4gc2VydmVyIHJlc3BvbnNl
-IGNvZGUuDQorCQkgICAgT3RoZXIgd3JpdGUgbWV0aG9kcyB3aWxsIGJlIGFkZGVkIGluIHRoZSBm
-dXR1cmUuDQorDQogUHJvcGVydGllcyAJc3RyaW5nIFVVSUQgW3JlYWRvbmx5XQ0KIA0KIAkJCVVV
-SUQxMjggb2YgdGhpcyBjaGFyYWN0ZXJpc3RpYy4NCkBAIC0xNDIsMTUgKzE1Myw1OCBAQCBQcm9w
-ZXJ0aWVzIAlzdHJpbmcgVVVJRCBbcmVhZG9ubHldDQogCQkJICB1aW50MTYgfCBEZXNjcmlwdGlv
-bjogRGVzY3JpcHRpb24gb2YgdGhlIGNoYXJhY3RlcmlzdGljIGRlZmluZWQNCiAJCQkgICAgICAg
-ICB8IGluIGEgaGlnaCBsYXllciBwcm9maWxlLg0KIA0KLQkJYXJyYXl7Ynl0ZX0gVmFsdWUgW3Jl
-YWR3cml0ZV0NCi0NCi0JCQlSYXcgdmFsdWUgb2YgdGhlIENoYXJhY3RlcmlzdGljIFZhbHVlIGF0
-dHJpYnV0ZS4NCi0NCiAJCXN0cmluZyBSZXByZXNlbnRhdGlvbiAob2YgdGhlIGJpbmFyeSBWYWx1
-ZSkgW3JlYWRvbmx5XQ0KIA0KIAkJCUZyaWVuZGx5IHJlcHJlc2VudGF0aW9uIG9mIHRoZSBDaGFy
-YWN0ZXJpc3RpYyBWYWx1ZQ0KIAkJCWJhc2VkIG9uIHRoZSBmb3JtYXQgYXR0cmlidXRlLg0KIA0K
-KwkJYm9vbGVhbiBCcm9hZGNhc3QgW3JlYWR3cml0ZV0NCisNCisJCSAgICBJbmRpY2F0ZXMgd2hl
-dGhlciB0aGlzIGNoYXJhY3RlcmlzdGljIGlzIGJyb2FkY2FzdGVkIG9yIG5vdC4NCisJCSAgICBJ
-ZiBHQVRUIFNlcnZlciBDaGFyYWN0ZXJpc3RpYyBDb25maWd1cmF0aW9uIGRlc2NyaXB0b3INCisJ
-CSAgICBpcyBub3QgYXZhaWxhYmxlIGZvciB0aGlzIGNoYXJhY3RlcmlzdGljLCBvciBpZiB0aGUg
-Y2hhcmFjdGVyaXN0aWMNCisJCSAgICBwcm9wZXJ0aWVzIGRvIG5vdCBhbGxvdyB0aGlzLCB3cml0
-aW5nIHRvIHRoaXMgcHJvcGVydHkgaXMgbm90DQorCQkgICAgYWxsb3dlZC4NCisNCisJCWJvb2xl
-YW4gSW5kaWNhdGUgW3JlYWR3cml0ZV0NCisNCisJCSAgICBJbmRpY2F0ZXMgd2hldGhlciB0aGlz
-IGNoYXJhY3RlcmlzdGljIGlzIG5vdGlmaWVkIG9yIG5vdC4NCisJCSAgICBJZiBHQVRUIENsaWVu
-dCBDaGFyYWN0ZXJpc3RpYyBDb25maWd1cmF0aW9uIGRlc2NyaXB0b3INCisJCSAgICBpcyBub3Qg
-YXZhaWxhYmxlIGZvciB0aGlzIGNoYXJhY3RlcmlzdGljLCBvciBpZiB0aGUgY2hhcmFjdGVyaXN0
-aWMNCisJCSAgICBwcm9wZXJ0aWVzIGRvIG5vdCBhbGxvdyB0aGlzLCB3cml0aW5nIHRvIHRoaXMg
-cHJvcGVydHkgaXMgbm90DQorCQkgICAgYWxsb3dlZC4NCisNCisJCWJvb2xlYW4gTm90aWZ5IFty
-ZWFkd3JpdGVdDQorDQorCQkgICAgSW5kaWNhdGVzIHdoZXRoZXIgdGhpcyBjaGFyYWN0ZXJpc3Rp
-YyBpcyBpbmRpY2F0ZWQgb3Igbm90Lg0KKwkJICAgIElmIEdBVFQgQ2xpZW50IENoYXJhY3Rlcmlz
-dGljIENvbmZpZ3VyYXRpb24gZGVzY3JpcHRvcg0KKwkJICAgIGlzIG5vdCBhdmFpbGFibGUgZm9y
-IHRoaXMgY2hhcmFjdGVyaXN0aWMsIG9yIGlmIHRoZSBjaGFyYWN0ZXJpc3RpYw0KKwkJICAgIHBy
-b3BlcnRpZXMgZG8gbm90IGFsbG93IHRoaXMsIHdyaXRpbmcgdG8gdGhpcyBwcm9wZXJ0eSBpcyBu
-b3QNCisJCSAgICBhbGxvd2VkLg0KKw0KKwkJYm9vbGVhbiBSZWFkYWJsZSBbcmVhZG9ubHldDQor
-DQorCQkgICAgSW5kaWNhdGVzIHdldGhlciB0aGlzIGNoYXJhY3RlcmlzdGljIHZhbHVlIGNhbiBi
-ZSByZWFkLg0KKw0KKwkJYm9vbGVhbiBXcml0YWJsZU5vUnNwIFtyZWFkb25seV0NCisNCisJCSAg
-ICBJbmRpY2F0ZXMgd2hldGhlciB0aGlzIGNoYXJhY3RlcmlzdGljIHZhbHVlIGNhbiBiZSB3cml0
-dGVuIHdpdGhvdXQNCisJCSAgICByZXNwb25zZS4NCisNCisJCWJvb2xlYW4gV3JpdGFibGVSc3Ag
-W3JlYWRvbmx5XQ0KKw0KKwkJICAgIEluZGljYXRlcyB3aGV0aGVyIHRoaXMgY2hhcmFjdGVyaXN0
-aWMgY2FuIGJlIHdyaXR0ZW4gd2l0aCByZXNwb25zZS4NCisNCisJCWJvb2xlYW4gV3JpdGFibGVT
-aWduZWQgW3JlYWRvbmx5XQ0KKw0KKwkJICAgIEluZGljYXRlcyB3aGV0aGVyIHRoaXMgY2hhcmFj
-dGVyaXN0aWMgY2FuIGJlIHdyaXR0ZW4gd2l0aCBzaWduZWQNCisJCSAgICBhdXRoZW50aWNhdGlv
-biBtZXRob2QuDQorDQorCQlib29sZWFuIFdyaXRhYmxlUmVsaWFibGUgW3JlYWRvbmx5XQ0KKw0K
-KwkJICAgIEluZGljYXRlcyB3aGV0aGVyIHRoaXMgY2hhcmFjdGVyaXN0aWMgY2FuIGJlIHdyaXR0
-ZW4gd2l0aCB0aGUNCisJCSAgICByZWxpYWJsZSB3cml0ZSBwcm9jZWR1cmUuDQorDQogDQogQ2hh
-cmFjdGVyaXN0aWMgV2F0Y2hlciBoaWVyYXJjaHkNCiA9PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09DQoNCi0tLS0tLS0tODwtLS0tLS0tLS0tLQ0KDQpJIHdvdWxkIGFwcHJlY2lhdGUgeW91
-ciBjb21tZW50cyBvbiB0aGlzLg0KDQpUaGFua3MsDQpDaGVuIEdhbmlyDQo=
+On 25.10.2011 16:41, Peter Krystad wrote:
+> 
+> Hi Timur,
+> 
+>> When will HS become available to Linux devices (PC/Smartphone)?
+>> Thank you.
+>>
+>> Timur
+> 
+> Upstreaming HS to BlueZ is just getting started, it will take some time.
+> 
+> You can check bluetooth.org for existing qualified 3.0+HS listings.
+> 
+> Peter.
+> 
+
+Hi Peter,
+
+Thank you very much for your response. I see several '+HS' items there,
+but the info leaves me with even more questions.
+
+It is difficult for me to assess what you mean by some time. But your
+answer implies that HS/AMP will indeed, at some point, be part of BlueZ.
+I have actually expected AMP to be transparent to the stack and to be
+implemented in a layer below. It's hard to get any detailed info on this
+matter. And this goes on for, what, two years? Three?
+
+I'm really just looking for some combination of devices that would allow
+me to establish HS/AMP RFCOMM connections myself. Anything that is
+available today? The new Macbook Air's and iPhone's are said to support
+BT4 (including HS?). Samsung Galaxy2 devices (and the new Galaxy Nexus
+devices) are said to support BT3+HS (true?). Or maybe I should just
+order some of these new BT3+HS dongles and try under Windows? Help.
+
+Timur
