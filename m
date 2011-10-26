@@ -1,107 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH] AVRCP: implement TRACK-REACHED-END event
-Date: Wed, 26 Oct 2011 21:20:07 -0200
-Message-Id: <1319671207-3023-1-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <CABBYNZKJxM7_FBCHHmn_VKMKvDyui=kJJMyCh45bm=sCmuZd8g@mail.gmail.com>
-References: <CABBYNZKJxM7_FBCHHmn_VKMKvDyui=kJJMyCh45bm=sCmuZd8g@mail.gmail.com>
+From: "Peter Krystad" <pkrystad@codeaurora.org>
+To: "'Andrei Emeltchenko'" <andrei.emeltchenko.news@gmail.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+References: <1319239802-22457-1-git-send-email-pkrystad@codeaurora.org> <1319239802-22457-3-git-send-email-pkrystad@codeaurora.org> <20111026133343.GE11385@aemeltch-MOBL1>
+In-Reply-To: <20111026133343.GE11385@aemeltch-MOBL1>
+Subject: RE: [PATCH 2/4] Add parsing of A2MP signals
+Date: Wed, 26 Oct 2011 11:49:41 -0700
+Message-ID: <000301cc9410$05ae5340$110af9c0$@org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="US-ASCII"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/avrcp.c     |    2 ++
- audio/avrcp.h     |    1 +
- audio/media.c     |   18 ++++++++++++++++++
- doc/media-api.txt |    6 +++++-
- 4 files changed, 26 insertions(+), 1 deletions(-)
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 879e959..c9ec314 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -383,6 +383,7 @@ int avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data)
- 		memcpy(&pdu->params[1], data, sizeof(uint64_t));
- 
- 		break;
-+	case AVRCP_EVENT_TRACK_REACHED_END:
- 	case AVRCP_EVENT_TRACK_REACHED_START:
- 		size = 1;
- 		break;
-@@ -904,6 +905,7 @@ static uint8_t avrcp_handle_register_notification(struct avrcp_player *player,
- 		memcpy(&pdu->params[1], &uid, sizeof(uint64_t));
- 
- 		break;
-+	case AVRCP_EVENT_TRACK_REACHED_END:
- 	case AVRCP_EVENT_TRACK_REACHED_START:
- 		len = 1;
- 		break;
-diff --git a/audio/avrcp.h b/audio/avrcp.h
-index c798658..fb64f3b 100644
---- a/audio/avrcp.h
-+++ b/audio/avrcp.h
-@@ -71,6 +71,7 @@
- /* Notification events */
- #define AVRCP_EVENT_STATUS_CHANGED	0x01
- #define AVRCP_EVENT_TRACK_CHANGED	0x02
-+#define AVRCP_EVENT_TRACK_REACHED_END	0x03
- #define AVRCP_EVENT_TRACK_REACHED_START	0x04
- #define AVRCP_EVENT_LAST		AVRCP_EVENT_TRACK_REACHED_START
- 
-diff --git a/audio/media.c b/audio/media.c
-index 5528ada..dd8ed6b 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -1280,6 +1280,7 @@ static gboolean set_status(struct media_player *mp, DBusMessageIter *iter)
- static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
- {
- 	uint32_t value;
-+	struct metadata_value *duration;
- 
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT32)
- 			return FALSE;
-@@ -1293,6 +1294,23 @@ static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
- 	if (!mp->position) {
- 		avrcp_player_event(mp->player,
- 					AVRCP_EVENT_TRACK_REACHED_START, NULL);
-+		return TRUE;
-+	}
-+
-+	duration = g_hash_table_lookup(mp->track, GUINT_TO_POINTER(
-+					AVRCP_MEDIA_ATTRIBUTE_DURATION));
-+
-+	/*
-+	 * If either there's no duration available in metadata and the user
-+	 * set 'position' to the maximum value allowed or the position matches
-+	 * the duration, send a track-reached-end event.
-+	 */
-+	if (duration == NULL && mp->position == UINT32_MAX) {
-+		avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_REACHED_END,
-+									NULL);
-+	} else if (duration != NULL && mp->position == duration->value.num) {
-+		avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_REACHED_END,
-+									NULL);
- 	}
- 
- 	return TRUE;
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index c748e50..01eb11a 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -84,7 +84,11 @@ Methods		void RegisterEndpoint(object endpoint, dict properties)
- 
- 				uint32 Position
- 
--					Playback position in milliseconds
-+					Playback position in milliseconds.
-+					"Track reached start" and "track
-+					reached end" event will be sent once 0
-+					or track's duration are set
-+					respectively.
- 
- 			Metadata:
- 
--- 
-1.7.7.1
+Hi Andrei,
+
+> >
+> > +static inline void amp_command_rej(int level, struct frame *frm)
+> > +{
+> > +	amp_cmd_rej_parms *h = frm->ptr;
+> > +	uint16_t reason = btohs(h->reason);
+> > +
+> > +	if (p_filter(FILT_A2MP))
+> > +		return;
+> > +
+> > +	printf("Command Reject: reason (%d)- ", reason);
+> > +	p_indent(level + 1, frm);
+> 
+> This doesn't make sense to use p_indent if you print on the same line.
+> Maybe you forgot "\n" ?
+> 
+> > +	printf("%s\n", ampreason2str(reason));
+> > +}
+> > +
+> 
+
+Will add a '\n'. 
+
+I'll repost this patch set after the bluez header patchset is approved.
+
+Peter.
+
+--Peter Krystad
+  Employee of Qualcomm Innovation Center, Inc.
+  Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
 
