@@ -2,44 +2,32 @@ Return-Path: <cyrus@holtmann.org>
 From: "Peter Krystad" <pkrystad@codeaurora.org>
 To: "'Andrei Emeltchenko'" <andrei.emeltchenko.news@gmail.com>
 Cc: <linux-bluetooth@vger.kernel.org>
-References: <1319239802-22457-1-git-send-email-pkrystad@codeaurora.org> <1319239802-22457-3-git-send-email-pkrystad@codeaurora.org> <20111026133343.GE11385@aemeltch-MOBL1>
-In-Reply-To: <20111026133343.GE11385@aemeltch-MOBL1>
-Subject: RE: [PATCH 2/4] Add parsing of A2MP signals
-Date: Wed, 26 Oct 2011 11:49:41 -0700
-Message-ID: <000301cc9410$05ae5340$110af9c0$@org>
+References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org> <20111026073641.GA11385@aemeltch-MOBL1>
+In-Reply-To: <20111026073641.GA11385@aemeltch-MOBL1>
+Subject: RE: [PATCH bluez 0/2] Add BT 3.0+HS signalling definitions
+Date: Wed, 26 Oct 2011 10:44:51 -0700
+Message-ID: <000001cc9406$f707f430$e517dc90$@org>
 MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="US-ASCII"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
 Hi Andrei,
-
-> >
-> > +static inline void amp_command_rej(int level, struct frame *frm)
-> > +{
-> > +	amp_cmd_rej_parms *h = frm->ptr;
-> > +	uint16_t reason = btohs(h->reason);
-> > +
-> > +	if (p_filter(FILT_A2MP))
-> > +		return;
-> > +
-> > +	printf("Command Reject: reason (%d)- ", reason);
-> > +	p_indent(level + 1, frm);
+ 
+> Patches looks OK (taking that typedef is a standard way in bluez).
 > 
-> This doesn't make sense to use p_indent if you print on the same line.
-> Maybe you forgot "\n" ?
-> 
-> > +	printf("%s\n", ampreason2str(reason));
-> > +}
-> > +
-> 
+> The only note: I think that we need to differentiate AMP and A2MP. When we
+> are dealing with A2MP protocol we could name structures / functions as
+> a2mp_*
 
-Will add a '\n'. 
+I tried to follow the convention of the spec, which uses A2MP only when
+referring to the protocol as a whole and when referring to the feature mask
+and the fixed channel. It uses AMP or 'AMP Protocol' in all other places,
+including individual protocol elements.
 
-I'll repost this patch set after the bluez header patchset is approved.
-
+Consider this, and if you still think it should be a2mp_ I'll do it.
+ 
 Peter.
 
 --Peter Krystad
