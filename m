@@ -1,36 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/2] Bluetooth: Ignore hci_unregister_dev return value
+Subject: Re: [PATCH 2/2] Bluetooth: bcm203x: Use GFP_KERNEL in workqueue
 From: Marcel Holtmann <marcel@holtmann.org>
 To: David Herrmann <dh.herrmann@googlemail.com>
 Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Date: Wed, 26 Oct 2011 10:55:17 +0200
-In-Reply-To: <1319618599-10938-1-git-send-email-dh.herrmann@googlemail.com>
-References: <1319618599-10938-1-git-send-email-dh.herrmann@googlemail.com>
+Date: Wed, 26 Oct 2011 10:54:10 +0200
+In-Reply-To: <1319570016-7439-2-git-send-email-dh.herrmann@googlemail.com>
+References: <1319570016-7439-1-git-send-email-dh.herrmann@googlemail.com>
+	 <1319570016-7439-2-git-send-email-dh.herrmann@googlemail.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1319619318.15441.251.camel@aeonflux>
+Message-ID: <1319619251.15441.250.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi David,
 
-> Make all bluetooth drivers ignore the return value of hci_unregister_dev as it
-> always returns 0. In the next step, hci_unregister_dev can be modified to return
-> void.
-> Some of the drivers already ignore the return value (including btusb), hence,
-> this will increase consitency in the bluetooth drivers.
+> A workqueue is allowed to sleep so we can safely use GFP_KERNEL instead of
+> GFP_ATOMIC. This is still legacy code when the driver used timer BHs and not a
+> worqueue.
 > 
 > Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 > ---
->  drivers/bluetooth/bfusb.c       |    4 +---
->  drivers/bluetooth/bluecard_cs.c |    4 +---
->  drivers/bluetooth/bt3c_cs.c     |    4 +---
->  drivers/bluetooth/btuart_cs.c   |    4 +---
->  drivers/bluetooth/dtl1_cs.c     |    4 +---
->  drivers/bluetooth/hci_vhci.c    |    5 +----
->  6 files changed, 6 insertions(+), 19 deletions(-)
+>  drivers/bluetooth/bcm203x.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-I am totally fine with this.
+good catch here. We should not use GFP_ATOMIC until we have to.
 
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
