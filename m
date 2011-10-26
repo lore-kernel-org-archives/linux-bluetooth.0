@@ -1,49 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EA7512A.6050303@googlemail.com>
-Date: Wed, 26 Oct 2011 02:15:38 +0200
-From: Timur Mehrvarz <timur.mehrvarz@googlemail.com>
 MIME-Version: 1.0
-To: Peter Krystad <pkrystad@codeaurora.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Add BT 3.0+HS signalling definitions
-References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org> <4EA6143E.4000606@googlemail.com> <000601cc9324$34a1b3a0$9de51ae0$@org>
-In-Reply-To: <000601cc9324$34a1b3a0$9de51ae0$@org>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <7769C83744F2C34A841232EF77AEA20C01DCAA8F85@dnce01.ent.ti.com>
+References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
+	<4EA6143E.4000606@googlemail.com>
+	<7769C83744F2C34A841232EF77AEA20C01DCAA8D28@dnce01.ent.ti.com>
+	<CAKT1EBeJB2FDrv6Xp_bGV3eFDEe5ecvnBN0rKniYxw5++Q9NfA@mail.gmail.com>
+	<7769C83744F2C34A841232EF77AEA20C01DCAA8F85@dnce01.ent.ti.com>
+Date: Tue, 25 Oct 2011 21:06:20 -0300
+Message-ID: <CAKT1EBcd6dQq3bzOsW3Fuwv=d8J=yDvsJjbp_ELEAQUjfyRx9g@mail.gmail.com>
+Subject: Re: GATT Dbus API on BlueZ
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: "Ganir, Chen" <chen.ganir@ti.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 25.10.2011 16:41, Peter Krystad wrote:
-> 
-> Hi Timur,
-> 
->> When will HS become available to Linux devices (PC/Smartphone)?
->> Thank you.
+Hi Chen Ganir,
+
+On Tue, Oct 25, 2011 at 10:19 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
+> Claudio
+>
+>> -----Original Message-----
+>> From: Claudio Takahasi [mailto:claudio.takahasi@openbossa.org]
+>> Sent: Tuesday, October 25, 2011 2:53 PM
+>> To: Ganir, Chen
+>> Cc: linux-bluetooth@vger.kernel.org
+>> Subject: Re: GATT Dbus API on BlueZ
 >>
->> Timur
-> 
-> Upstreaming HS to BlueZ is just getting started, it will take some time.
-> 
-> You can check bluetooth.org for existing qualified 3.0+HS listings.
-> 
-> Peter.
-> 
+>> Hi Chen Ganir,
+>>
+>> On Tue, Oct 25, 2011 at 4:38 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
+>> > Hi.
+>> >
+>> > Currently, the DBUS API for GATT Client will allow discovering
+>> characteristics and services, connecting to the peer device if
+>> required. However, when the operation is done, the link is dropped (no
+>> more attio registered). The only way to register a global gatt_service-
+>> >attio and keep the connection alive all the time is to register a
+>> characteristic watcher. Is there another way to do it ? I'd like to
+>> keep the link a live (for example, implementing a proximity link loss
+>> profile on top of the DBUS GATT Client) without the need for a watcher.
+>> >
+>> > Thanks,
+>> > Chen Ganir
+>> >
+>> >
+>>
+>> At the moment there isn't another way to keep the link up. GATT
+>> Profiles have different connection requirements, you will need a
+>> dynamic mechanism anyway. The callback registration is the mechanism
+>> to inform the core that connection is required. If you keep the
+>> connection always up it will be necessary a function to get access to
+>> the GAttrib instance and a way to notify that the connection has been
+>> established.
+>>
+>> I tried to remove the association between GAttrib and GIOChannel. The
+>> idea was to create GAttrib even if the link is disconnected, but the
+>> effort doesn't worth. We will have problems with MTU and GATT
+>> abstractions for read long.
+>>
+>> Do have another suggestion to control connections and control the ATT
+>> request/response queue?
+>>
+>> BR,
+>> Claudio
+>
+> Thanks for the reply.
+>
+> However, I did not quite understand your response, nor the relevancy to read long.
+>
+> My basic requirement is to allow a profile to control the connection - meaning that if I implement a proximity or other profile over dbus, I would like to be able to tell it to connect, discover services, discover characteristics, poll from time to time the value of a certain GATT char, or simply idle and wait for disconnection (like proximity does) or notification/indication. When using dbus-send I end up with a disconnected link at the end of the process. Do you think the disconnection results from the termination of the dbus-send application, or is it something else ?
+>
+> Thanks,
+> Chen Ganir.
+>
+>
 
-Hi Peter,
+You are disabling all the GATT plugins, so my suggestion is: open the
+ATT L2CAP socket directly in your JNI bindings. Using this approach
+you will have all the control that you need.
 
-Thank you very much for your response. I see several '+HS' items there,
-but the info leaves me with even more questions.
+We track the users/clients based on the D-Bus connection, if the
+client(dbus-send or any other) leaves the bus the core will disconnect
+link if watcher list is empty.
 
-It is difficult for me to assess what you mean by some time. But your
-answer implies that HS/AMP will indeed, at some point, be part of BlueZ.
-I have actually expected AMP to be transparent to the stack and to be
-implemented in a layer below. It's hard to get any detailed info on this
-matter. And this goes on for, what, two years? Three?
-
-I'm really just looking for some combination of devices that would allow
-me to establish HS/AMP RFCOMM connections myself. Anything that is
-available today? The new Macbook Air's and iPhone's are said to support
-BT4 (including HS?). Samsung Galaxy2 devices (and the new Galaxy Nexus
-devices) are said to support BT3+HS (true?). Or maybe I should just
-order some of these new BT3+HS dongles and try under Windows? Help.
-
-Timur
+BR,
+Claudio.
