@@ -1,50 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 26 Oct 2011 10:54:42 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Timur Mehrvarz <timur.mehrvarz@googlemail.com>
-Cc: Peter Krystad <pkrystad@codeaurora.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: Add BT 3.0+HS signalling definitions
-Message-ID: <20111026075440.GB11385@aemeltch-MOBL1>
-References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
- <4EA6143E.4000606@googlemail.com>
- <000601cc9324$34a1b3a0$9de51ae0$@org>
- <4EA7512A.6050303@googlemail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4EA7512A.6050303@googlemail.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Initialize tx_win_max for fixed channel
+Date: Wed, 26 Oct 2011 10:44:39 +0300
+Message-Id: <1319615079-11734-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Timur,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Wed, Oct 26, 2011 at 02:15:38AM +0200, Timur Mehrvarz wrote:
-> >> When will HS become available to Linux devices (PC/Smartphone)?
-> >> Thank you.
-> > Upstreaming HS to BlueZ is just getting started, it will take some time.
-> > You can check bluetooth.org for existing qualified 3.0+HS listings.
-> Thank you very much for your response. I see several '+HS' items there,
-> but the info leaves me with even more questions.
-> 
-> It is difficult for me to assess what you mean by some time. But your
-> answer implies that HS/AMP will indeed, at some point, be part of BlueZ.
-> I have actually expected AMP to be transparent to the stack and to be
-> implemented in a layer below. It's hard to get any detailed info on this
-> matter. And this goes on for, what, two years? Three?
-> 
-> I'm really just looking for some combination of devices that would allow
-> me to establish HS/AMP RFCOMM connections myself. Anything that is
-> available today? The new Macbook Air's and iPhone's are said to support
-> BT4 (including HS?). Samsung Galaxy2 devices (and the new Galaxy Nexus
-> devices) are said to support BT3+HS (true?). Or maybe I should just
-> order some of these new BT3+HS dongles and try under Windows? Help.
+tx_win_max is initialized during L2CAP configuration phase. For fixed
+channel (like A2MP) we want to have it initialized during channel setup.
 
-I do not know any public device having HS feature fully implemented. I
-would be happy if someone correct me here.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_sock.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-I have some dongles marked as "BT3+HS" but apparently it is marketing
-approach :-( as they do not report via USB level according to specs and
-otherwise behave like 2.1 devices.
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 9eb3320..7c953f5 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -964,6 +964,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		chan->fcs  = pchan->fcs;
+ 		chan->max_tx = pchan->max_tx;
+ 		chan->tx_win = pchan->tx_win;
++		chan->tx_win_max = pchan->tx_win_max;
+ 		chan->sec_level = pchan->sec_level;
+ 		chan->flags = pchan->flags;
+ 		chan->amp_pref = pchan->amp_pref;
+@@ -993,6 +994,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		chan->max_tx = L2CAP_DEFAULT_MAX_TX;
+ 		chan->fcs  = L2CAP_FCS_CRC16;
+ 		chan->tx_win = L2CAP_DEFAULT_TX_WINDOW;
++		chan->tx_win_max = L2CAP_DEFAULT_TX_WINDOW;
+ 		chan->sec_level = BT_SECURITY_LOW;
+ 		chan->flags = 0;
+ 		chan->amp_pref = BT_AMP_POLICY_REQUIRE_BR_EDR;
+-- 
+1.7.4.1
 
-Best regards 
-Andrei Emeltchenko 
