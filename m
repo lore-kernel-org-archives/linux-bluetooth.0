@@ -1,120 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: padovan@profusion.mobi,
-	marcel@holtmann.org,
-	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 1/2] Bluetooth: Ignore hci_unregister_dev return value
-Date: Wed, 26 Oct 2011 10:43:18 +0200
-Message-Id: <1319618599-10938-1-git-send-email-dh.herrmann@googlemail.com>
+Date: Wed, 26 Oct 2011 10:54:42 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Timur Mehrvarz <timur.mehrvarz@googlemail.com>
+Cc: Peter Krystad <pkrystad@codeaurora.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: Add BT 3.0+HS signalling definitions
+Message-ID: <20111026075440.GB11385@aemeltch-MOBL1>
+References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
+ <4EA6143E.4000606@googlemail.com>
+ <000601cc9324$34a1b3a0$9de51ae0$@org>
+ <4EA7512A.6050303@googlemail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4EA7512A.6050303@googlemail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Make all bluetooth drivers ignore the return value of hci_unregister_dev as it
-always returns 0. In the next step, hci_unregister_dev can be modified to return
-void.
-Some of the drivers already ignore the return value (including btusb), hence,
-this will increase consitency in the bluetooth drivers.
+Hi Timur,
 
-Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
----
- drivers/bluetooth/bfusb.c       |    4 +---
- drivers/bluetooth/bluecard_cs.c |    4 +---
- drivers/bluetooth/bt3c_cs.c     |    4 +---
- drivers/bluetooth/btuart_cs.c   |    4 +---
- drivers/bluetooth/dtl1_cs.c     |    4 +---
- drivers/bluetooth/hci_vhci.c    |    5 +----
- 6 files changed, 6 insertions(+), 19 deletions(-)
+On Wed, Oct 26, 2011 at 02:15:38AM +0200, Timur Mehrvarz wrote:
+> >> When will HS become available to Linux devices (PC/Smartphone)?
+> >> Thank you.
+> > Upstreaming HS to BlueZ is just getting started, it will take some time.
+> > You can check bluetooth.org for existing qualified 3.0+HS listings.
+> Thank you very much for your response. I see several '+HS' items there,
+> but the info leaves me with even more questions.
+> 
+> It is difficult for me to assess what you mean by some time. But your
+> answer implies that HS/AMP will indeed, at some point, be part of BlueZ.
+> I have actually expected AMP to be transparent to the stack and to be
+> implemented in a layer below. It's hard to get any detailed info on this
+> matter. And this goes on for, what, two years? Three?
+> 
+> I'm really just looking for some combination of devices that would allow
+> me to establish HS/AMP RFCOMM connections myself. Anything that is
+> available today? The new Macbook Air's and iPhone's are said to support
+> BT4 (including HS?). Samsung Galaxy2 devices (and the new Galaxy Nexus
+> devices) are said to support BT3+HS (true?). Or maybe I should just
+> order some of these new BT3+HS dongles and try under Windows? Help.
 
-diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
-index 005919a..6580d50 100644
---- a/drivers/bluetooth/bfusb.c
-+++ b/drivers/bluetooth/bfusb.c
-@@ -750,9 +750,7 @@ static void bfusb_disconnect(struct usb_interface *intf)
- 
- 	bfusb_close(hdev);
- 
--	if (hci_unregister_dev(hdev) < 0)
--		BT_ERR("Can't unregister HCI device %s", hdev->name);
--
-+	hci_unregister_dev(hdev);
- 	hci_free_dev(hdev);
- }
- 
-diff --git a/drivers/bluetooth/bluecard_cs.c b/drivers/bluetooth/bluecard_cs.c
-index aed1904..c6a0c61 100644
---- a/drivers/bluetooth/bluecard_cs.c
-+++ b/drivers/bluetooth/bluecard_cs.c
-@@ -844,9 +844,7 @@ static int bluecard_close(bluecard_info_t *info)
- 	/* Turn FPGA off */
- 	outb(0x80, iobase + 0x30);
- 
--	if (hci_unregister_dev(hdev) < 0)
--		BT_ERR("Can't unregister HCI device %s", hdev->name);
--
-+	hci_unregister_dev(hdev);
- 	hci_free_dev(hdev);
- 
- 	return 0;
-diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
-index 4fc0194..0c97e5d 100644
---- a/drivers/bluetooth/bt3c_cs.c
-+++ b/drivers/bluetooth/bt3c_cs.c
-@@ -636,9 +636,7 @@ static int bt3c_close(bt3c_info_t *info)
- 
- 	bt3c_hci_close(hdev);
- 
--	if (hci_unregister_dev(hdev) < 0)
--		BT_ERR("Can't unregister HCI device %s", hdev->name);
--
-+	hci_unregister_dev(hdev);
- 	hci_free_dev(hdev);
- 
- 	return 0;
-diff --git a/drivers/bluetooth/btuart_cs.c b/drivers/bluetooth/btuart_cs.c
-index 526b618..200b3a2 100644
---- a/drivers/bluetooth/btuart_cs.c
-+++ b/drivers/bluetooth/btuart_cs.c
-@@ -565,9 +565,7 @@ static int btuart_close(btuart_info_t *info)
- 
- 	spin_unlock_irqrestore(&(info->lock), flags);
- 
--	if (hci_unregister_dev(hdev) < 0)
--		BT_ERR("Can't unregister HCI device %s", hdev->name);
--
-+	hci_unregister_dev(hdev);
- 	hci_free_dev(hdev);
- 
- 	return 0;
-diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
-index 5e4c2de..969bb22 100644
---- a/drivers/bluetooth/dtl1_cs.c
-+++ b/drivers/bluetooth/dtl1_cs.c
-@@ -551,9 +551,7 @@ static int dtl1_close(dtl1_info_t *info)
- 
- 	spin_unlock_irqrestore(&(info->lock), flags);
- 
--	if (hci_unregister_dev(hdev) < 0)
--		BT_ERR("Can't unregister HCI device %s", hdev->name);
--
-+	hci_unregister_dev(hdev);
- 	hci_free_dev(hdev);
- 
- 	return 0;
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index 67c180c..2e302a1 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -264,10 +264,7 @@ static int vhci_release(struct inode *inode, struct file *file)
- 	struct vhci_data *data = file->private_data;
- 	struct hci_dev *hdev = data->hdev;
- 
--	if (hci_unregister_dev(hdev) < 0) {
--		BT_ERR("Can't unregister HCI device %s", hdev->name);
--	}
--
-+	hci_unregister_dev(hdev);
- 	hci_free_dev(hdev);
- 
- 	file->private_data = NULL;
--- 
-1.7.7.1
+I do not know any public device having HS feature fully implemented. I
+would be happy if someone correct me here.
+
+I have some dongles marked as "BT3+HS" but apparently it is marketing
+approach :-( as they do not report via USB level according to specs and
+otherwise behave like 2.1 devices.
+
+Best regards 
+Andrei Emeltchenko 
