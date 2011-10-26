@@ -1,49 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 26 Oct 2011 10:36:44 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Peter Krystad <pkrystad@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH bluez 0/2] Add BT 3.0+HS signalling definitions
-Message-ID: <20111026073641.GA11385@aemeltch-MOBL1>
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 26 Oct 2011 09:20:19 +0200
+Subject: GATT Dbus API on BlueZ - attirbute-api.txt modifications
+Message-ID: <7769C83744F2C34A841232EF77AEA20C01DCAA9265@dnce01.ent.ti.com>
 References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
+	<4EA6143E.4000606@googlemail.com>
+	<7769C83744F2C34A841232EF77AEA20C01DCAA8D28@dnce01.ent.ti.com>
+	<CAKT1EBeJB2FDrv6Xp_bGV3eFDEe5ecvnBN0rKniYxw5++Q9NfA@mail.gmail.com>
+	<7769C83744F2C34A841232EF77AEA20C01DCAA8F85@dnce01.ent.ti.com>
+ <CAKT1EBcd6dQq3bzOsW3Fuwv=d8J=yDvsJjbp_ELEAQUjfyRx9g@mail.gmail.com>
+In-Reply-To: <CAKT1EBcd6dQq3bzOsW3Fuwv=d8J=yDvsJjbp_ELEAQUjfyRx9g@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
-
-On Mon, Oct 24, 2011 at 04:06:17PM -0700, Peter Krystad wrote:
-> This patchset adds definitions for BT 3.0+HS signalling
-
-Patches looks OK (taking that typedef is a standard way in bluez).
-
-The only note: I think that we need to differentiate AMP and A2MP. When we
-are dealing with A2MP protocol we could name structures / functions as
-a2mp_*
-
-Best regards 
-Andrei Emeltchenko 
-
-> 
-> Peter Krystad (2):
->   Add L2CAP Create/Move Channel definitions
->   Add A2MP definitions
-> 
->  lib/a2mp.h  |  131 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  lib/l2cap.h |   44 ++++++++++++++++++++
->  2 files changed, 175 insertions(+), 0 deletions(-)
->  create mode 100644 lib/a2mp.h
-> 
-> -- 
-> 1.7.7
-> 
-> --
-> Peter Krystad
-> Employee of Qualcomm Innovation Center, Inc.
-> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+SGkuDQoNCkhlcmUncyBteSBwcm9wb3NhbCBmb3Igc29tZSBtb2RpZmljYXRpb25zIHRvIHRoZSBl
+eGlzdGluZyBhdHRyaWJ1dGUtYXBpLmRvYyBmaWxlLg0KDQpUaGVzZSBhZGRpdGlvbnMgaW5jbHVk
+ZSA6DQoxLiBTdXBwb3J0IGZvciBtb3JlIHByb3BlcnRpZXMsIHN1Y2ggYXMgd3JpdGFibGUsIHJl
+YWRhYmxlLCBub3RpZnkNCjIuIFJlbW92ZSBWYWx1ZSBmcm9tIHRoZSBwcm9wZXJ0aWVzLCBhbmQg
+aGFuZGxlIHdyaXRlL3JlYWQgd2l0aCBzcGVjaWZpYyBmdW5jdGlvbnMuIFRoaXMgd2FzIGRvbmUg
+c2luY2UgY3VycmVudGx5IHRoZSB2YWx1ZSBpcyBvbmx5IHJlYWQgb25jZSBmcm9tIHRoZSBzZXJ2
+ZXIsIGFuZCB0aGVyZSBpcyBubyB3YXkgdG8gcmVmcmVzaCB0aGUgdmFsdWUgdXNpbmcgdGhlIGRi
+dXMgQVBJLiBJbiBhZGRpdGlvbiwgdGhlIHZhbHVlIGNhbiBiZSB3cml0dGVuIGluIG11bHRpcGxl
+IHdheXMgKHdlIGN1cnJlbnRseSBzdXBwb3J0IHdyaXRlIHdpdGggcmVzcG9uc2UgYW5kIHdyaXRl
+IHdpdGhvdXQgcmVzcG9uc2UsIGJ1dCBmdXR1cmUgd3JpdGUgbWV0aG9kcyBpbmNsdWRlIHdyaXRl
+IHJlbGlhYmxlIGFuZCB3cml0ZSBzaWduZWQsIHdoaWNoIG1heSBiZSByZXF1aXJlZCBieSBwcm9m
+aWxlcyBpbiB0aGUgZnV0dXJlKS4NCg0KSGVyZSdzIHRoZSBkaWZmIGZyb20gdGhlIGN1cnJlbnQg
+ZG9jcy9hdHRyaWJ1dGUtYXBpLnR4dCBmaWxlIDoNCg0KLS0tLT44LS0tLS0tLS0tLS0tLS0tDQpk
+aWZmIC0tZ2l0IGEvZG9jL2F0dHJpYnV0ZS1hcGkudHh0IGIvZG9jL2F0dHJpYnV0ZS1hcGkudHh0
+DQppbmRleCA5OGQ3ZjMwLi5mYmM2OTU3IDEwMDY0NA0KLS0tIGEvZG9jL2F0dHJpYnV0ZS1hcGku
+dHh0DQorKysgYi9kb2MvYXR0cmlidXRlLWFwaS50eHQNCkBAIC0xMTIsNiArMTEyLDE3IEBAIE1l
+dGhvZHMJCWRpY3QgR2V0UHJvcGVydGllcygpDQogDQogCQkJUG9zc2libGUgRXJyb3JzOiBvcmcu
+Ymx1ZXouRXJyb3IuSW52YWxpZEFyZ3VtZW50cw0KIA0KKwkJYXJyYXl7Ynl0ZX0gUmVhZFZhbHVl
+KCkNCisNCisJCSAgICBSZWFkIHRoZSB2YWx1ZSBvZiB0aGUgY2hhcmFjdGVyaXN0aWMuDQorDQor
+CQlpbnQgV3JpdGVWYWx1ZShhcnJheXtieXRlfSB2YWx1ZSwgaW50IG1ldGhvZCkNCisNCisJCSAg
+ICBXcml0ZSB0aGUgdmFsdWUgb2YgdGhlIGNoYXJhY3RlcmlzdGljLCB3aXRoIHNwZWNpZmllZCBt
+ZXRob2QgOg0KKwkJICAgIDA6IFdyaXRlIHdpdGhvdXQgcmVzcG9uc2UuIEFsd2F5cyByZXR1cm4g
+MC4NCisJCSAgICAxOiBXcml0ZSB3aXRoIHJlc3BvbnNlLiBSZXR1cm4gc2VydmVyIHJlc3BvbnNl
+IGNvZGUuDQorCQkgICAgT3RoZXIgd3JpdGUgbWV0aG9kcyB3aWxsIGJlIGFkZGVkIGluIHRoZSBm
+dXR1cmUuDQorDQogUHJvcGVydGllcyAJc3RyaW5nIFVVSUQgW3JlYWRvbmx5XQ0KIA0KIAkJCVVV
+SUQxMjggb2YgdGhpcyBjaGFyYWN0ZXJpc3RpYy4NCkBAIC0xNDIsMTUgKzE1Myw1OCBAQCBQcm9w
+ZXJ0aWVzIAlzdHJpbmcgVVVJRCBbcmVhZG9ubHldDQogCQkJICB1aW50MTYgfCBEZXNjcmlwdGlv
+bjogRGVzY3JpcHRpb24gb2YgdGhlIGNoYXJhY3RlcmlzdGljIGRlZmluZWQNCiAJCQkgICAgICAg
+ICB8IGluIGEgaGlnaCBsYXllciBwcm9maWxlLg0KIA0KLQkJYXJyYXl7Ynl0ZX0gVmFsdWUgW3Jl
+YWR3cml0ZV0NCi0NCi0JCQlSYXcgdmFsdWUgb2YgdGhlIENoYXJhY3RlcmlzdGljIFZhbHVlIGF0
+dHJpYnV0ZS4NCi0NCiAJCXN0cmluZyBSZXByZXNlbnRhdGlvbiAob2YgdGhlIGJpbmFyeSBWYWx1
+ZSkgW3JlYWRvbmx5XQ0KIA0KIAkJCUZyaWVuZGx5IHJlcHJlc2VudGF0aW9uIG9mIHRoZSBDaGFy
+YWN0ZXJpc3RpYyBWYWx1ZQ0KIAkJCWJhc2VkIG9uIHRoZSBmb3JtYXQgYXR0cmlidXRlLg0KIA0K
+KwkJYm9vbGVhbiBCcm9hZGNhc3QgW3JlYWR3cml0ZV0NCisNCisJCSAgICBJbmRpY2F0ZXMgd2hl
+dGhlciB0aGlzIGNoYXJhY3RlcmlzdGljIGlzIGJyb2FkY2FzdGVkIG9yIG5vdC4NCisJCSAgICBJ
+ZiBHQVRUIFNlcnZlciBDaGFyYWN0ZXJpc3RpYyBDb25maWd1cmF0aW9uIGRlc2NyaXB0b3INCisJ
+CSAgICBpcyBub3QgYXZhaWxhYmxlIGZvciB0aGlzIGNoYXJhY3RlcmlzdGljLCBvciBpZiB0aGUg
+Y2hhcmFjdGVyaXN0aWMNCisJCSAgICBwcm9wZXJ0aWVzIGRvIG5vdCBhbGxvdyB0aGlzLCB3cml0
+aW5nIHRvIHRoaXMgcHJvcGVydHkgaXMgbm90DQorCQkgICAgYWxsb3dlZC4NCisNCisJCWJvb2xl
+YW4gSW5kaWNhdGUgW3JlYWR3cml0ZV0NCisNCisJCSAgICBJbmRpY2F0ZXMgd2hldGhlciB0aGlz
+IGNoYXJhY3RlcmlzdGljIGlzIG5vdGlmaWVkIG9yIG5vdC4NCisJCSAgICBJZiBHQVRUIENsaWVu
+dCBDaGFyYWN0ZXJpc3RpYyBDb25maWd1cmF0aW9uIGRlc2NyaXB0b3INCisJCSAgICBpcyBub3Qg
+YXZhaWxhYmxlIGZvciB0aGlzIGNoYXJhY3RlcmlzdGljLCBvciBpZiB0aGUgY2hhcmFjdGVyaXN0
+aWMNCisJCSAgICBwcm9wZXJ0aWVzIGRvIG5vdCBhbGxvdyB0aGlzLCB3cml0aW5nIHRvIHRoaXMg
+cHJvcGVydHkgaXMgbm90DQorCQkgICAgYWxsb3dlZC4NCisNCisJCWJvb2xlYW4gTm90aWZ5IFty
+ZWFkd3JpdGVdDQorDQorCQkgICAgSW5kaWNhdGVzIHdoZXRoZXIgdGhpcyBjaGFyYWN0ZXJpc3Rp
+YyBpcyBpbmRpY2F0ZWQgb3Igbm90Lg0KKwkJICAgIElmIEdBVFQgQ2xpZW50IENoYXJhY3Rlcmlz
+dGljIENvbmZpZ3VyYXRpb24gZGVzY3JpcHRvcg0KKwkJICAgIGlzIG5vdCBhdmFpbGFibGUgZm9y
+IHRoaXMgY2hhcmFjdGVyaXN0aWMsIG9yIGlmIHRoZSBjaGFyYWN0ZXJpc3RpYw0KKwkJICAgIHBy
+b3BlcnRpZXMgZG8gbm90IGFsbG93IHRoaXMsIHdyaXRpbmcgdG8gdGhpcyBwcm9wZXJ0eSBpcyBu
+b3QNCisJCSAgICBhbGxvd2VkLg0KKw0KKwkJYm9vbGVhbiBSZWFkYWJsZSBbcmVhZG9ubHldDQor
+DQorCQkgICAgSW5kaWNhdGVzIHdldGhlciB0aGlzIGNoYXJhY3RlcmlzdGljIHZhbHVlIGNhbiBi
+ZSByZWFkLg0KKw0KKwkJYm9vbGVhbiBXcml0YWJsZU5vUnNwIFtyZWFkb25seV0NCisNCisJCSAg
+ICBJbmRpY2F0ZXMgd2hldGhlciB0aGlzIGNoYXJhY3RlcmlzdGljIHZhbHVlIGNhbiBiZSB3cml0
+dGVuIHdpdGhvdXQNCisJCSAgICByZXNwb25zZS4NCisNCisJCWJvb2xlYW4gV3JpdGFibGVSc3Ag
+W3JlYWRvbmx5XQ0KKw0KKwkJICAgIEluZGljYXRlcyB3aGV0aGVyIHRoaXMgY2hhcmFjdGVyaXN0
+aWMgY2FuIGJlIHdyaXR0ZW4gd2l0aCByZXNwb25zZS4NCisNCisJCWJvb2xlYW4gV3JpdGFibGVT
+aWduZWQgW3JlYWRvbmx5XQ0KKw0KKwkJICAgIEluZGljYXRlcyB3aGV0aGVyIHRoaXMgY2hhcmFj
+dGVyaXN0aWMgY2FuIGJlIHdyaXR0ZW4gd2l0aCBzaWduZWQNCisJCSAgICBhdXRoZW50aWNhdGlv
+biBtZXRob2QuDQorDQorCQlib29sZWFuIFdyaXRhYmxlUmVsaWFibGUgW3JlYWRvbmx5XQ0KKw0K
+KwkJICAgIEluZGljYXRlcyB3aGV0aGVyIHRoaXMgY2hhcmFjdGVyaXN0aWMgY2FuIGJlIHdyaXR0
+ZW4gd2l0aCB0aGUNCisJCSAgICByZWxpYWJsZSB3cml0ZSBwcm9jZWR1cmUuDQorDQogDQogQ2hh
+cmFjdGVyaXN0aWMgV2F0Y2hlciBoaWVyYXJjaHkNCiA9PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09DQoNCi0tLS0tLS0tODwtLS0tLS0tLS0tLQ0KDQpJIHdvdWxkIGFwcHJlY2lhdGUgeW91
+ciBjb21tZW50cyBvbiB0aGlzLg0KDQpUaGFua3MsDQpDaGVuIEdhbmlyDQo=
