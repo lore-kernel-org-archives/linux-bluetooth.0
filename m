@@ -7,9 +7,9 @@ CC: Mat Martineau <mathewm@codeaurora.org>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
 	"bgix@codeaurora.org" <bgix@codeaurora.org>,
 	"ingas@codeaurora.org" <ingas@codeaurora.org>
-Date: Thu, 27 Oct 2011 17:06:53 +0200
+Date: Thu, 27 Oct 2011 16:58:42 +0200
 Subject: RE: GATT Dbus API on BlueZ - attirbute-api.txt modifications
-Message-ID: <7769C83744F2C34A841232EF77AEA20C01DCBC41E0@dnce01.ent.ti.com>
+Message-ID: <7769C83744F2C34A841232EF77AEA20C01DCBC41CE@dnce01.ent.ti.com>
 References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
 	<4EA6143E.4000606@googlemail.com>
 	<7769C83744F2C34A841232EF77AEA20C01DCAA8D28@dnce01.ent.ti.com>
@@ -20,61 +20,39 @@ References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
 	<alpine.DEB.2.02.1110270003090.30044@mathewm-linux>
 	<7769C83744F2C34A841232EF77AEA20C01DCBC3F03@dnce01.ent.ti.com>
 	<CABBYNZ+Hq4-AAg3TsLi-Vh0eC2p_ZtD2vthBfc3Unww+Km6-Mg@mail.gmail.com>
- <CAJdJm_Po7iAOoB673XW6D3gTsCn_ME8CHEo0VcWzi5FKX9xghA@mail.gmail.com>
-In-Reply-To: <CAJdJm_Po7iAOoB673XW6D3gTsCn_ME8CHEo0VcWzi5FKX9xghA@mail.gmail.com>
+	<CAJdJm_Po7iAOoB673XW6D3gTsCn_ME8CHEo0VcWzi5FKX9xghA@mail.gmail.com>
+ <CAJdJm_O8s6=tgq-e09xqfL6fq9ytDEKds0LCgPpT0H_KAtY=Sg@mail.gmail.com>
+In-Reply-To: <CAJdJm_O8s6=tgq-e09xqfL6fq9ytDEKds0LCgPpT0H_KAtY=Sg@mail.gmail.com>
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Anderson,Luiz, 
- 
-> 
-> Regarding caching reads and writes, the way LE works from my POV is
-> that most devices (except ones which rely on Proximity Link Loss) will
-> have Link Supervision Timeout of a few seconds at least. I have
-> already seen devices with 30 seconds LSTO.
-> 
-> For these high latency devices (which use conservative connection
-> parameters for saving battery) some caching is good. But we should
-> provide ways to let the D-Bus API user know whether the data has
-> effectively been written, or updated locally. This can be done by
-> means of D-Bus signals. Which point us back to the reason why we have
-> Value as a property in the first place.
-> 
-> Also imagine that the API might allow a couple of D-Bus clients
-> talking to the same device, but using different services. In case of
-> temporary link loss (or high latency), the values should be kept by
-> BlueZ, which will then write the value once connection is restored.
-> Otherwise, you would see many D-Bus clients trying to read/write data
-> while the link is not ok.
-> 
-Caching seems very wrong to me. A client expects the correct data from the server, and not something that is not correct. Why provide a cached value instead of notifying the client that the link is down ? What if the server changes the value, and the client keeps getting the wrong value ? I believe the client should be notified if the link is down and there is an error reading the correct value.
+Anderson,
 
-Regarding the multiple client scenario - Since dbus is still not my expertise, I would be happy to get some ideas here - currently the function is blocking. It means that it will not return until the server replies or the link is down. I assume that the dbus daemon will queue multiple requests to allow bluetoothd to handle each one at it's turn ? If this is not the case, I would be happy if someone could elaborate on this and highlight the correct usage in multiple client scenario.
-
-
+> -----Original Message-----
+> From: Anderson Lizardo [mailto:anderson.lizardo@openbossa.org]
+> Sent: Thursday, October 27, 2011 4:03 PM
+> To: Luiz Augusto von Dentz
+> Cc: Ganir, Chen; Mat Martineau; Claudio Takahasi; linux-
+> bluetooth@vger.kernel.org; bgix@codeaurora.org; ingas@codeaurora.org
+> Subject: Re: GATT Dbus API on BlueZ - attirbute-api.txt modifications
 > 
-> Luiz, while I totally agree with the D-Bus error instead of return
-> value (and you know about this stuff better than me :), how could we
-> pass the "custom"  ATT error codes to the client? Any profile can
-> define their own ATT error codes, and BlueZ cannot know all of them.
+> Hi,
 > 
-This is why I wanted it to be integer. 
+> On Thu, Oct 27, 2011 at 9:57 AM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+> > But, I don't see why have these (writable?) D-Bus properties if we
+> > already have RegisterCharacteristicsWatcher(). Are you suggesting
+> that
+> > confirmations (for indications) should be sent manually by each D-Bus
+> > client? Too error-prone IMHO.
+> 
+> To clarify, the question above was to Chen, not to Luiz.
+> 
 
+Characteristics have the ability to be notified or indicated, according to the profile requirements. We need to reflect those capabilities to the user, which can decide whether the characteristic will be notified or indicated. The bluetoothd will take care of the indication return code, and the watcher will be signaled with the existing mechanism.
 
-> >
-> > Create an array of string WriteMethods which represents the methods
-> > supported by the characteristic.
-> 
-> Agreed. They are readonly anyway. and makes it easier to extend.
-> 
-> I would just go with "SupportedWriteMethods" of something like that :)
-> (but it is a detail).
-> 
-I also agree here. This property will be changed to writableMethods string array, with string>Boolean dictionary.
-
-Thanks for your comments so far.
+Would you rather see the register watcher get a second parameter to tell it the correct method, and change the properties to CanNotify, CanBroadcast to indicate the characteristic capability only (according to the char properties and availability of client char config descriptor)? If this is the case, than we may implicitly force notify or indicate only, not both of them, although the spec does not prohibit such behavior, and manage the watcher method internally.
 
 Chen Ganir.
-
