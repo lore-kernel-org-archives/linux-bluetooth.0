@@ -1,54 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 27 Oct 2011 11:00:30 +0300
-From: 'Andrei Emeltchenko' <andrei.emeltchenko.news@gmail.com>
-To: Peter Krystad <pkrystad@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH bluez 0/2] Add BT 3.0+HS signalling definitions
-Message-ID: <20111027080028.GB27602@aemeltch-MOBL1>
-References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
- <20111026073641.GA11385@aemeltch-MOBL1>
- <000001cc9406$f707f430$e517dc90$@org>
+Message-ID: <4EA90C20.4080009@srdc.com.tr>
+Date: Thu, 27 Oct 2011 10:45:36 +0300
+From: =?ISO-8859-9?Q?Ali=FEan_YILMAZ?= <alisan@srdc.com.tr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <000001cc9406$f707f430$e517dc90$@org>
+To: linux-bluetooth@vger.kernel.org
+Subject: Compiling BlueZ Thermometer Example
+Content-Type: text/plain; charset=ISO-8859-9; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+Hello everybody,
+I am trying to compile thermometer example in BlueZ, but getting some 
+errors. Firstly, I configured and installed the bluez as explained in 
+readme file. I used some configuration parameters like --enable-health 
+--enable-thermometer. It gave me .o files for thermometer example, but 
+no executable file.
+When I tried to link these .o files myself, I got these errors:
 
-On Wed, Oct 26, 2011 at 10:44:51AM -0700, Peter Krystad wrote:
-> Hi Andrei,
->  
-> > Patches looks OK (taking that typedef is a standard way in bluez).
-> > 
-> > The only note: I think that we need to differentiate AMP and A2MP. When we
-> > are dealing with A2MP protocol we could name structures / functions as
-> > a2mp_*
-> 
-> I tried to follow the convention of the spec, which uses A2MP only when
-> referring to the protocol as a whole and when referring to the feature mask
-> and the fixed channel. It uses AMP or 'AMP Protocol' in all other places,
-> including individual protocol elements.
-> 
-> Consider this, and if you still think it should be a2mp_ I'll do it.
+/usr/lib/i386-linux-gnu/gcc/i686-linux-gnu/4.5.2/../../../crt1.o: In 
+function `_start':
+(.text+0x18): undefined reference to `main'
+manager.o: In function `thermometer_manager_init':
+manager.c:(.text+0x7c): undefined reference to `btd_register_device_driver'
+manager.c:(.text+0x8b): undefined reference to `dbus_connection_ref'
+manager.o: In function `thermometer_manager_exit':
+manager.c:(.text+0xbc): undefined reference to 
+`btd_unregister_device_driver'
+manager.c:(.text+0xca): undefined reference to `dbus_connection_unref'
+collect2: ld returned 1 exit status
 
-I think we can do a little brainstorming here :-)
+Could you please help me to compile and run the thermometer example?
 
-My idea is to use name A2MP when we are talking about 
-"AMP Manager Protocol" and use AMP when we are dealing with
-"Alternate MAC PHY" controller.
+Best regards,
+Alisan
 
-BTW: in your kernel repository you use correct names
-https://www.codeaurora.org/gitweb/quic/la/?p=kernel/msm.git;a=blob;f=include/net/bluetooth/amp.h;h=4b080791ffc74ad17fd504583f7949cd4df1fa82;hb=refs/heads/msm-3.0
-...
-/* A2MP command codes */
-#define A2MP_COMMAND_REJ         0x01
-#define A2MP_DISCOVER_REQ        0x02
-#define A2MP_DISCOVER_RSP        0x03
-...
+-- 
+Aliþan YILMAZ
 
-in your patch "[PATCH bluez 2/2] Add A2MP definitions" you use AMP instead
-of A2MP.
+Software Engineer
+Software Research, Development and Consultation (SRDC) Ltd.
+ODTU Teknokent Silikon Blok Kat:1 No:14
+Middle East Technical University Campus
+06531 Ankara TURKEY
 
-Best regards 
-Andrei Emeltchenko 
+Email: alisan@srdc.com.tr
+Phone: +90 (312) 210 1763
+Fax: +90 (312) 210 1837
+
