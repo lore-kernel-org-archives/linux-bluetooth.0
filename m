@@ -1,106 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: chen.ganir@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: anderson.lizardo@openbossa.org, luiz.dentz@gmail.com,
-	mathewm@codeaurora.org, claudio.takahasi@openbossa.org,
-	bgix@codeaurora.org, ingas@codeaurora.org,
-	Chen Ganir <chen.ganir@ti.com>
-Subject: [RFC Bluetooth] New Bluetooth GATT Client API
-Date: Thu, 27 Oct 2011 18:10:20 +0200
-Message-Id: <1319731820-10622-1-git-send-email-chen.ganir@ti.com>
+MIME-Version: 1.0
+In-Reply-To: <4EA9400D.2000100@srdc.com.tr>
+References: <4EA90C20.4080009@srdc.com.tr>
+	<CACLukz+zzWckuWPAPo1kru5MLqUES_jMn48fkaHAQf2-KHAOmQ@mail.gmail.com>
+	<4EA9400D.2000100@srdc.com.tr>
+Date: Thu, 27 Oct 2011 17:01:16 +0100
+Message-ID: <CACLukzLnWDM2pB9+-mgT1Uf4wPv5dqt8BcY_=R10-s5Y+UgAhw@mail.gmail.com>
+Subject: Re: Compiling BlueZ Thermometer Example
+From: Santiago Carot <sancane@gmail.com>
+To: =?ISO-8859-9?Q?Ali=FEan_YILMAZ?= <alisan@srdc.com.tr>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-9
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Ganir <chen.ganir@ti.com>
+Hello Alisan,
 
-New proposal for GATT Client API. This updates some existing API's and removes 
-unnecessary properties. This is a followup for the previous comments.
----
- doc/attribute-api.txt |   52 +++++++++++++++++++++++++++++++++++++++++++++---
- 1 files changed, 48 insertions(+), 4 deletions(-)
+2011/10/27 Aliþan YILMAZ <alisan@srdc.com.tr>:
+> Hello Santi,
+> Thanks for your quick response. Actually, we want to develope a health
+> device application that gets measurements from a Continua-Certified blood
+> pressure device using HDP.
+> I thought, it could be very helpful to look at that thermometer example, am
+> I wrong?
+>
 
-diff --git a/doc/attribute-api.txt b/doc/attribute-api.txt
-index 98d7f30..e1263c1 100644
---- a/doc/attribute-api.txt
-+++ b/doc/attribute-api.txt
-@@ -66,6 +66,9 @@ Methods 	dict GetProperties()
- 			notify about any changed characteristics in the service.
- 			This also notifies about any included characteristics.
- 
-+			The Indicate method will be used if possible, otherwise notification
-+			will be used. If none is possible, error will be returned.
-+
- 		UnregisterCharacteristicsWatcher(object agent)
- 
- 			Unregister a watcher.
-@@ -112,6 +115,18 @@ Methods		dict GetProperties()
- 
- 			Possible Errors: org.bluez.Error.InvalidArguments
- 
-+		array{byte} ReadValue()
-+
-+			Read the value of the characteristic.
-+
-+		void WriteValue(array{byte} value, String method)
-+
-+			Write the value of the characteristic, with specified method :
-+			Request |  Write without response.
-+			Command |  Write with response. Return error if failed.
-+
-+			Other write methods will be added in the future.
-+
- Properties 	string UUID [readonly]
- 
- 			UUID128 of this characteristic.
-@@ -142,15 +157,44 @@ Properties 	string UUID [readonly]
- 			  uint16 | Description: Description of the characteristic defined
- 			         | in a high layer profile.
- 
--		array{byte} Value [readwrite]
--
--			Raw value of the Characteristic Value attribute.
--
- 		string Representation (of the binary Value) [readonly]
- 
- 			Friendly representation of the Characteristic Value
- 			based on the format attribute.
- 
-+		boolean Broadcast [readwrite]
-+
-+			Indicates whether this characteristic is broadcasted or not.
-+			If GATT Server Characteristic Configuration descriptor
-+			is not available for this characteristic, or if the characteristic
-+			properties do not allow this, writing to this property is not
-+			allowed.
-+
-+		String[] SupportedValChangeSignal [readonly]
-+
-+			Indicates supported methods for signaling value changed from the
-+			server to the client. Valid options are :
-+			Indicate | This characteristic can be indicated.
-+			Notify   | This characteristic can be notified.
-+
-+			These capabilities will be taken from the client characteristic
-+			configuration descriptor availability and from the characteristic
-+			properties.
-+
-+		boolean Readable [readonly]
-+
-+			Indicates wether this characteristic value can be read.
-+
-+		String[] WritableMethod [readony]
-+
-+			Indicates which write operations are allowed on this characteristic.
-+			Values can be :
-+			Request    | Write request, with a server response.
-+			Command    | Write command, no server response.
-+			Auth       | Authenticated write (link must be encrypted).
-+			Signed     | Signed write (ATT packets need to be signed).
-+			Reliable   | Reliable write (server responds with the written val)
-+
- 
- Characteristic Watcher hierarchy
- ===============================
--- 
-1.7.4.1
+That code is just a plugin to manage thermometers. Health Thermometer
+Profiles is placed on top of GATT so you will need neither HDP nor
+MCAP. Onn the contrary, if your device is only using HDP this plugin
+is unusefull for you.
 
+> Also, if you share patches with us, we want to help you by testing and
+> developing the measurement plugins.
+>
+
+Of course, I don't have any problem to share my repo. I'll move it to
+a public repo in next days if you are still interested.
+
+> By the way, after executing bluetoothd, there were not any thermometer HDP
+> service in the running bluetooth services list. Does the problem occur due
+> to the codes or wrong installation?
+>
+
+I insist again, HTP profile is not related with HDP :-)
+
+When you pair your HDP device, the bluetooth daemon will load a proper
+driver to manage that device using the HDP D-Bus interface, you can
+see more info about HDP interface under doc folder. This interface
+enables you to create/destroy health channels and send 11073-20601
+APDUs.
+
+Regards.
