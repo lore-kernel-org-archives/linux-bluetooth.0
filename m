@@ -1,58 +1,194 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+CC: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"bgix@codeaurora.org" <bgix@codeaurora.org>,
+	"ingas@codeaurora.org" <ingas@codeaurora.org>
+Date: Thu, 27 Oct 2011 10:22:20 +0200
+Subject: RE: GATT Dbus API on BlueZ - attirbute-api.txt modifications
+Message-ID: <7769C83744F2C34A841232EF77AEA20C01DCBC3F03@dnce01.ent.ti.com>
+References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
+ <4EA6143E.4000606@googlemail.com>
+ <7769C83744F2C34A841232EF77AEA20C01DCAA8D28@dnce01.ent.ti.com>
+ <CAKT1EBeJB2FDrv6Xp_bGV3eFDEe5ecvnBN0rKniYxw5++Q9NfA@mail.gmail.com>
+ <7769C83744F2C34A841232EF77AEA20C01DCAA8F85@dnce01.ent.ti.com>
+ <CAKT1EBcd6dQq3bzOsW3Fuwv=d8J=yDvsJjbp_ELEAQUjfyRx9g@mail.gmail.com>
+ <7769C83744F2C34A841232EF77AEA20C01DCAA9265@dnce01.ent.ti.com>
+ <alpine.DEB.2.02.1110270003090.30044@mathewm-linux>
+In-Reply-To: <alpine.DEB.2.02.1110270003090.30044@mathewm-linux>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <4EA90C20.4080009@srdc.com.tr>
-References: <4EA90C20.4080009@srdc.com.tr>
-Date: Thu, 27 Oct 2011 11:30:24 +0200
-Message-ID: <CACLukz+zzWckuWPAPo1kru5MLqUES_jMn48fkaHAQf2-KHAOmQ@mail.gmail.com>
-Subject: Re: Compiling BlueZ Thermometer Example
-From: Santiago Carot <sancane@gmail.com>
-To: =?ISO-8859-9?Q?Ali=FEan_YILMAZ?= <alisan@srdc.com.tr>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-9
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Aliþan,
+Hi Mat.
 
-2011/10/27 Aliþan YILMAZ <alisan@srdc.com.tr>:
-> Hello everybody,
-> I am trying to compile thermometer example in BlueZ, but getting some
-> errors. Firstly, I configured and installed the bluez as explained in readme
-> file. I used some configuration parameters like --enable-health
-> --enable-thermometer. It gave me .o files for thermometer example, but no
-> executable file.
-> When I tried to link these .o files myself, I got these errors:
->
-> /usr/lib/i386-linux-gnu/gcc/i686-linux-gnu/4.5.2/../../../crt1.o: In
-> function `_start':
-> (.text+0x18): undefined reference to `main'
-> manager.o: In function `thermometer_manager_init':
-> manager.c:(.text+0x7c): undefined reference to `btd_register_device_driver'
-> manager.c:(.text+0x8b): undefined reference to `dbus_connection_ref'
-> manager.o: In function `thermometer_manager_exit':
-> manager.c:(.text+0xbc): undefined reference to
-> `btd_unregister_device_driver'
-> manager.c:(.text+0xca): undefined reference to `dbus_connection_unref'
-> collect2: ld returned 1 exit status
->
+> -----Original Message-----
+> From: Mat Martineau [mailto:mathewm@codeaurora.org]
+> Sent: Thursday, October 27, 2011 9:17 AM
+> Subject: Re: GATT Dbus API on BlueZ - attirbute-api.txt modifications
+> 
+> Hi Chen -
+> 
+> On Wed, 26 Oct 2011, Ganir, Chen wrote:
+> 
+> > Hi.
+> >
+> > Here's my proposal for some modifications to the existing attribute-
+> api.doc file.
+> >
+> > These additions include :
+> > 1. Support for more properties, such as writable, readable, notify
+> > 2. Remove Value from the properties, and handle write/read with
+> specific functions. This was done since currently the value is only
+> read once from the server, and there is no way to refresh the value
+> using the dbus API. In addition, the value can be written in multiple
+> ways (we currently support write with response and write without
+> response, but future write methods include write reliable and write
+> signed, which may be required by profiles in the future).
+> >
+> > Here's the diff from the current docs/attribute-api.txt file :
+> >
+> > ---->8---------------
+> > diff --git a/doc/attribute-api.txt b/doc/attribute-api.txt
+> > index 98d7f30..fbc6957 100644
+> > --- a/doc/attribute-api.txt
+> > +++ b/doc/attribute-api.txt
+> > @@ -112,6 +112,17 @@ Methods		dict GetProperties()
+> >
+> > 			Possible Errors: org.bluez.Error.InvalidArguments
+> >
+> > +		array{byte} ReadValue()
+> > +
+> > +		    Read the value of the characteristic.
+> > +
+> 
+> One aspect of the current client implementation is that it caches the
+> read values within bluetoothd.  Do you prefer to completely eliminate
+> that storage and always have ReadValue fetch from the remote device?
+> 
+> If there's still a use case for locally cached values (maybe there
+> isn't), a "method" parameter could specify the source of the data.  It
+> could also provide some future-proofing for ReadValue.
+> 
 
-I'm not sure what are you trying to do. Health and thermometer are
-built in plugin, that means that the bluetooth daemon will load it at
-starting time and it will load/unload the proper drivers to manage
-such devices.
+I do not see any reason why caching of data is required. Data should be read directly from the GATT server. Caching it may cause inconsistency. There is also no reason to read the values on characteristic object creation in the client.c file. I think the decision of reading the value should be by the user and not the system.
+In addition, Value is not a property of a characteristic. 
 
-By the way, health plugin it's only required if you want to enable
-Health Device Profile (HTP) and Multichannel Adaptation Protocol
-(MCAP). They are helpfull if you want to develop applications over
-11073-20601 specification. You don't need enable this if you  are only
-interested in thermometer capabilities.
 
-Anyway, HTP plugin is still under development, I've a lot of patches
-to upload yet so there is not much to do with it. If you are
-interested I could set my current git repository wich implements most
-of the thermeter functionality to any public site so that you can test
-it and help me in development by reporting errors, etc. Any feedback
-from your side will be very appreciated.
+> > +		int WriteValue(array{byte} value, int method)
+> > +
+> > +		    Write the value of the characteristic, with specified
+> method :
+> > +		    0: Write without response. Always return 0.
+> > +		    1: Write with response. Return server response code.
+> > +		    Other write methods will be added in the future.
+> > +
+> 
+> This addresses the shortcomings we saw with SetProperty, and also
+> gives options for the future - seems like a great idea to me!
+> 
+> 
+> > Properties 	string UUID [readonly]
+> >
+> > 			UUID128 of this characteristic.
+> > @@ -142,15 +153,58 @@ Properties 	string UUID [readonly]
+> > 			  uint16 | Description: Description of the
+> characteristic defined
+> > 			         | in a high layer profile.
+> >
+> > -		array{byte} Value [readwrite]
+> > -
+> > -			Raw value of the Characteristic Value attribute.
+> > -
+> > 		string Representation (of the binary Value) [readonly]
+> >
+> > 			Friendly representation of the Characteristic Value
+> > 			based on the format attribute.
+> >
+> > +		boolean Broadcast [readwrite]
+> > +
+> > +		    Indicates whether this characteristic is broadcasted or
+> not.
+> > +		    If GATT Server Characteristic Configuration descriptor
+> > +		    is not available for this characteristic, or if the
+> characteristic
+> > +		    properties do not allow this, writing to this property
+> is not
+> > +		    allowed.
+> > +
+> > +		boolean Indicate [readwrite]
+> > +
+> > +		    Indicates whether this characteristic is notified or
+> not.
+> > +		    If GATT Client Characteristic Configuration descriptor
+> > +		    is not available for this characteristic, or if the
+> characteristic
+> > +		    properties do not allow this, writing to this property
+> is not
+> > +		    allowed.
+> > +
+> > +		boolean Notify [readwrite]
+> > +
+> > +		    Indicates whether this characteristic is indicated or
+> not.
+> > +		    If GATT Client Characteristic Configuration descriptor
+> > +		    is not available for this characteristic, or if the
+> characteristic
+> > +		    properties do not allow this, writing to this property
+> is not
+> > +		    allowed.
+> > +
+> > +		boolean Readable [readonly]
+> > +
+> > +		    Indicates wether this characteristic value can be read.
+> > +
+> > +		boolean WritableNoRsp [readonly]
+> > +
+> > +		    Indicates whether this characteristic value can be
+> written without
+> > +		    response.
+> > +
+> > +		boolean WritableRsp [readonly]
+> > +
+> > +		    Indicates whether this characteristic can be written
+> with response.
+> > +
+> > +		boolean WritableSigned [readonly]
 
-Regards.
-Santi.
+The WritableSigned is going to be changed to WritableAuth (this is true for both Authenticated link or signed GATT Write commands).
+
+> > +
+> > +		    Indicates whether this characteristic can be written
+> with signed
+> > +		    authentication method.
+> > +
+> > +		boolean WritableReliable [readonly]
+> > +
+> > +		    Indicates whether this characteristic can be written
+> with the
+> > +		    reliable write procedure.
+> > +
+> >
+> > Characteristic Watcher hierarchy
+> > ===============================
+> >
+> > --------8<-----------
+> >
+> > I would appreciate your comments on this.
+> 
+> The additional properties also seem like nice additions, and work well
+> to provide clear differentiation between the characteristic value and
+> other metadata.
+> 
+> Thanks for the proposal!
+> 
+
+Thanks for the review. Do these changes break the current implementation of your solution?
+
+If there are no more comments, I think I'll start sending patches for the required changes to support this.
+
+
+Thanks,
+Chen Ganir
