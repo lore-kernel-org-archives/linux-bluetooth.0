@@ -4,86 +4,76 @@ To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	padovan@profusion.mobi,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [RFC 2/4] Bluetooth: Fix hci-sysfs ref-counts
-Date: Fri, 28 Oct 2011 15:00:02 +0200
-Message-Id: <1319806804-12230-3-git-send-email-dh.herrmann@googlemail.com>
+Subject: [RFC 4/4] Bluetooth: Correctly take device refcounts
+Date: Fri, 28 Oct 2011 15:00:04 +0200
+Message-Id: <1319806804-12230-5-git-send-email-dh.herrmann@googlemail.com>
 In-Reply-To: <1319806804-12230-1-git-send-email-dh.herrmann@googlemail.com>
 References: <1319806804-12230-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When registering a device object we need to take a module reference so
-the device-destruct function is available when the object is freed.
+The hci_dev->dev internal ref-count is used by hci core to protect the
+hci_dev structure. We need to make sure to take this refcount when
+calling hci_dev_hold/put(), otherwise we might end up with a valid
+reference but a freed hci_dev structure.
+
+We also entirely remove the second hci_dev->refcnt reference counter as
+it is not used for anything right now.
 
 Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 ---
- include/net/bluetooth/hci_core.h |    2 +-
- net/bluetooth/hci_core.c         |    6 +++++-
- net/bluetooth/hci_sysfs.c        |    8 +++++++-
- 3 files changed, 13 insertions(+), 3 deletions(-)
+ include/net/bluetooth/hci_core.h |    5 ++---
+ net/bluetooth/hci_core.c         |    2 +-
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 13a62ad..c8368a5 100644
+index e5dc220..7fa1ab8 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -580,7 +580,7 @@ int hci_recv_frame(struct sk_buff *skb);
- int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count);
- int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count);
+@@ -116,7 +116,6 @@ struct adv_entry {
+ struct hci_dev {
+ 	struct list_head list;
+ 	spinlock_t	lock;
+-	atomic_t	refcnt;
  
--void hci_init_sysfs(struct hci_dev *hdev);
-+int hci_init_sysfs(struct hci_dev *hdev);
- int hci_add_sysfs(struct hci_dev *hdev);
- void hci_del_sysfs(struct hci_dev *hdev);
- void hci_conn_init_sysfs(struct hci_conn *conn);
+ 	char		name[8];
+ 	unsigned long	flags;
+@@ -491,7 +490,7 @@ static inline void hci_conn_put(struct hci_conn *conn)
+ /* ----- HCI Devices ----- */
+ static inline void __hci_dev_put(struct hci_dev *d)
+ {
+-	atomic_dec(&d->refcnt);
++	put_device(&d->dev);
+ }
+ 
+ static inline void hci_dev_put(struct hci_dev *d)
+@@ -501,7 +500,7 @@ static inline void hci_dev_put(struct hci_dev *d)
+ 
+ static inline struct hci_dev *__hci_dev_hold(struct hci_dev *d)
+ {
+-	atomic_inc(&d->refcnt);
++	get_device(&d->dev);
+ 	return d;
+ }
+ 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index daa948f..20c3c97 100644
+index fb981bd..53e3585 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -912,7 +912,11 @@ struct hci_dev *hci_alloc_dev(void)
- 	if (!hdev)
- 		return NULL;
+@@ -1468,7 +1468,6 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	hdev->id = id;
+ 	list_add(&hdev->list, head);
  
--	hci_init_sysfs(hdev);
-+	if (hci_init_sysfs(hdev)) {
-+		kfree(hdev);
-+		return NULL;
-+	}
-+
- 	skb_queue_head_init(&hdev->driver_init);
+-	atomic_set(&hdev->refcnt, 1);
+ 	spin_lock_init(&hdev->lock);
  
- 	return hdev;
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 116401a..605cb2b 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -78,6 +78,7 @@ static void bt_link_release(struct device *dev)
- {
- 	void *data = dev_get_drvdata(dev);
- 	kfree(data);
-+	module_put(THIS_MODULE);
- }
+ 	hdev->flags = 0;
+@@ -1552,6 +1551,7 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	queue_work(hdev->workqueue, &hdev->power_on);
  
- static struct device_type bt_link = {
-@@ -540,15 +541,20 @@ static int auto_accept_delay_get(void *data, u64 *val)
- DEFINE_SIMPLE_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
- 					auto_accept_delay_set, "%llu\n");
+ 	hci_notify(hdev, HCI_DEV_REG);
++	__hci_dev_hold(hdev);
  
--void hci_init_sysfs(struct hci_dev *hdev)
-+int hci_init_sysfs(struct hci_dev *hdev)
- {
- 	struct device *dev = &hdev->dev;
+ 	return id;
  
-+	if (!try_module_get(THIS_MODULE))
-+		return -EIO;
-+
- 	dev->type = &bt_host;
- 	dev->class = bt_class;
- 
- 	dev_set_drvdata(dev, hdev);
- 	device_initialize(dev);
-+
-+	return 0;
- }
- 
- int hci_add_sysfs(struct hci_dev *hdev)
 -- 
 1.7.7.1
