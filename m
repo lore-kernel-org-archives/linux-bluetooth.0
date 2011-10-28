@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/4] Add support for MediaPlayer.Release to mpris-player
-Date: Fri, 28 Oct 2011 10:49:21 +0300
-Message-Id: <1319788162-5606-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/4] Add MediaPlayer.Release method
+Date: Fri, 28 Oct 2011 10:49:20 +0300
+Message-Id: <1319788162-5606-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1319788162-5606-1-git-send-email-luiz.dentz@gmail.com>
 References: <1319788162-5606-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,48 +11,82 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This is similar to MediaEndpoint.Release which is useful to notify the
+player that it is no longer registered/active.
 ---
- test/mpris-player.c |   20 ++++++++++++++++++++
- 1 files changed, 20 insertions(+), 0 deletions(-)
+ audio/media.c     |   26 +++++++++++++++++++++++++-
+ doc/media-api.txt |    8 ++++++++
+ 2 files changed, 33 insertions(+), 1 deletions(-)
 
-diff --git a/test/mpris-player.c b/test/mpris-player.c
-index 4592e5d..a1632f3 100644
---- a/test/mpris-player.c
-+++ b/test/mpris-player.c
-@@ -429,6 +429,22 @@ static char *sender2path(const char *sender)
- 	return g_strdelimit(path, ":.", '_');
+diff --git a/audio/media.c b/audio/media.c
+index 5528ada..cf157d7 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -870,11 +870,33 @@ static struct media_player *media_adapter_find_player(
+ 	return NULL;
  }
  
-+static DBusHandlerResult player_message(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
++static void release_player(struct media_player *mp)
 +{
-+	if (dbus_message_is_method_call(msg, "org.bluez.MediaPlayer",
-+								"Release")) {
-+		printf("Release\n");
-+		exit(1);
++	DBusMessage *msg;
++
++	DBG("sender=%s path=%s", mp->sender, mp->path);
++
++	msg = dbus_message_new_method_call(mp->sender, mp->path,
++						MEDIA_PLAYER_INTERFACE,
++						"Release");
++	if (msg == NULL) {
++		error("Couldn't allocate D-Bus message");
++		return;
 +	}
 +
-+	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
++	g_dbus_send_message(mp->adapter->conn, msg);
 +}
 +
-+static const DBusObjectPathVTable player_table = {
-+	.message_function = player_message,
-+};
-+
- static void add_player(DBusConnection *conn, const char *name,
- 							const char *sender)
+ static void media_player_free(gpointer data)
  {
-@@ -492,6 +508,10 @@ static void add_player(DBusConnection *conn, const char *name,
- 		goto done;
+ 	struct media_player *mp = data;
+ 	struct media_adapter *adapter = mp->adapter;
+ 
++	if (mp->player) {
++		adapter->players = g_slist_remove(adapter->players, mp);
++		release_player(mp);
++	}
++
+ 	g_dbus_remove_watch(adapter->conn, mp->watch);
+ 	g_dbus_remove_watch(adapter->conn, mp->property_watch);
+ 	g_dbus_remove_watch(adapter->conn, mp->track_watch);
+@@ -898,8 +920,10 @@ static void media_player_destroy(struct media_player *mp)
+ 	DBG("sender=%s path=%s", mp->sender, mp->path);
+ 
+ 	if (mp->player) {
++		struct avrcp_player *player = mp->player;
++		mp->player = NULL;
+ 		adapter->players = g_slist_remove(adapter->players, mp);
+-		avrcp_unregister_player(mp->player);
++		avrcp_unregister_player(player);
+ 		return;
  	}
  
-+	if (!dbus_connection_register_object_path(sys, path, &player_table,
-+								NULL))
-+		fprintf(stderr, "Can't register object path for agent\n");
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index 5a3aa3e..f10afe1 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -137,6 +137,14 @@ Methods		void SetProperty(string property, variant value)
+ 
+ 			On success this will emit a PropertyChanged signal.
+ 
++		void Release()
 +
- done:
- 	if (reply)
- 		dbus_message_unref(reply);
++			This method gets called when the service daemon
++			unregisters the player which can then perform
++			cleanup tasks. There is no need to unregister the
++			player, because when this method gets called it has
++			already been unregistered.
++
+ Signals		PropertyChanged(string setting, variant value)
+ 
+ 			This signal indicates a changed value of the given
 -- 
 1.7.6.4
 
