@@ -1,35 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH BlueZ v2] Fix incorrect use of atoi in maemo6
-Date: Fri, 28 Oct 2011 14:41:50 +0300
-Message-Id: <1319802110-29936-1-git-send-email-dmitriy.paliy@nokia.com>
+Date: Fri, 28 Oct 2011 14:17:21 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Peter Krystad <pkrystad@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 bluez 0/2] Add BT 3.0+HS definitions
+Message-ID: <20111028111713.GA13435@aemeltch-MOBL1>
+References: <1319761719-16363-1-git-send-email-pkrystad@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1319761719-16363-1-git-send-email-pkrystad@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use of atoi is incorrect and unsafe in maemo6 telephony and replaced
-by g_ascii_digit_value.
----
- audio/telephony-maemo6.c |    5 ++++-
- 1 files changed, 4 insertions(+), 1 deletions(-)
+On Thu, Oct 27, 2011 at 05:28:37PM -0700, Peter Krystad wrote:
+> This patchset adds BT 3.0+HS signalling definitions
+> 
+> v2 - Use A2MP/a2mp nomenclature
+> 
+> Peter Krystad (2):
+>   Add L2CAP Create/Move Channel definitions
+>   Add A2MP definitions
+> 
+>  lib/a2mp.h  |  133 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  lib/l2cap.h |   44 +++++++++++++++++++
+>  2 files changed, 177 insertions(+), 0 deletions(-)
+>  create mode 100644 lib/a2mp.h
 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index 5df3235..10967fb 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -823,7 +823,10 @@ static int tonegen_startevent(char tone)
- 		event_tone = DTMF_D;
- 		break;
- 	default:
--		event_tone = atoi(&tone);
-+		ret = g_ascii_digit_value(tone);
-+		if (ret < 0)
-+			return -EINVAL;
-+		event_tone = ret;
- 	}
- 
- 	ret = send_method_call(TONEGEN_BUS_NAME, TONEGEN_PATH,
--- 
-1.7.4.1
+ack (taking that typedef is a bluez standard way)
+
+Best regards 
+Andrei Emeltchenko 
 
