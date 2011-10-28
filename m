@@ -1,25 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Oct 2011 15:16:35 +0300
+Date: Fri, 28 Oct 2011 14:47:22 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/4] Add rule to allow sending messages to
- MediaPlayer interface
-Message-ID: <20111028121635.GA21308@fusion.localdomain>
-References: <1319788162-5606-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH BlueZ v2] Fix incorrect use of atoi in maemo6
+Message-ID: <20111028114722.GA20980@fusion.localdomain>
+References: <1319802110-29936-1-git-send-email-dmitriy.paliy@nokia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1319788162-5606-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1319802110-29936-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Dmitriy,
 
-On Fri, Oct 28, 2011, Luiz Augusto von Dentz wrote:
+On Fri, Oct 28, 2011, Dmitriy Paliy wrote:
+> Use of atoi is incorrect and unsafe in maemo6 telephony and replaced
+> by g_ascii_digit_value.
 > ---
->  src/bluetooth.conf |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
+>  audio/telephony-maemo6.c |    5 ++++-
+>  1 files changed, 4 insertions(+), 1 deletions(-)
 
-All four patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
