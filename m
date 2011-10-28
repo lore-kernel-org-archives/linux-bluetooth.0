@@ -1,99 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Peter Krystad" <pkrystad@codeaurora.org>
+To: "'Johan Hedberg'" <johan.hedberg@gmail.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+References: <1319761719-16363-1-git-send-email-pkrystad@codeaurora.org> <1319761719-16363-3-git-send-email-pkrystad@codeaurora.org> <20111028122242.GB21308@fusion.localdomain>
+In-Reply-To: <20111028122242.GB21308@fusion.localdomain>
+Subject: RE: [PATCH v2 bluez 2/2] Add A2MP definitions
+Date: Fri, 28 Oct 2011 14:04:26 -0700
+Message-ID: <000c01cc95b5$2d7cbaf0$887630d0$@org>
 MIME-Version: 1.0
-In-Reply-To: <1319806804-12230-3-git-send-email-dh.herrmann@googlemail.com>
-References: <1319806804-12230-1-git-send-email-dh.herrmann@googlemail.com>
-	<1319806804-12230-3-git-send-email-dh.herrmann@googlemail.com>
-Date: Sat, 29 Oct 2011 18:40:12 +0200
-Message-ID: <CANq1E4TDPiK18jDobqjrVYf60tHT0++8u384F_rOq3BWXK0FMA@mail.gmail.com>
-Subject: Re: [RFC 2/4] Bluetooth: Fix hci-sysfs ref-counts
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, padovan@profusion.mobi,
-	David Herrmann <dh.herrmann@googlemail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+	charset="US-ASCII"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 10/28/11, David Herrmann <dh.herrmann@googlemail.com> wrote:
-> When registering a device object we need to take a module reference so
-> the device-destruct function is available when the object is freed.
->
-> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
-> ---
->  include/net/bluetooth/hci_core.h |    2 +-
->  net/bluetooth/hci_core.c         |    6 +++++-
->  net/bluetooth/hci_sysfs.c        |    8 +++++++-
->  3 files changed, 13 insertions(+), 3 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci_core.h
-> b/include/net/bluetooth/hci_core.h
-> index 13a62ad..c8368a5 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -580,7 +580,7 @@ int hci_recv_frame(struct sk_buff *skb);
->  int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int
-> count);
->  int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count);
->
-> -void hci_init_sysfs(struct hci_dev *hdev);
-> +int hci_init_sysfs(struct hci_dev *hdev);
->  int hci_add_sysfs(struct hci_dev *hdev);
->  void hci_del_sysfs(struct hci_dev *hdev);
->  void hci_conn_init_sysfs(struct hci_conn *conn);
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index daa948f..20c3c97 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -912,7 +912,11 @@ struct hci_dev *hci_alloc_dev(void)
->  	if (!hdev)
->  		return NULL;
->
-> -	hci_init_sysfs(hdev);
-> +	if (hci_init_sysfs(hdev)) {
-> +		kfree(hdev);
-> +		return NULL;
-> +	}
-> +
->  	skb_queue_head_init(&hdev->driver_init);
->
->  	return hdev;
-> diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-> index 116401a..605cb2b 100644
-> --- a/net/bluetooth/hci_sysfs.c
-> +++ b/net/bluetooth/hci_sysfs.c
-> @@ -78,6 +78,7 @@ static void bt_link_release(struct device *dev)
->  {
->  	void *data = dev_get_drvdata(dev);
->  	kfree(data);
-> +	module_put(THIS_MODULE);
->  }
+Hi Johan,
+ 
+> Therefore, I think it'd be good if you'd from the start avoid them in
+> this a2mp code. Later it'd be good to have a cleanup patch to convert
+> the L2CAP and HCI definitions to not use them either.
+> 
+> Johan
 
-Ok I messed up. This needs to be inside bt_host_release and not
-bt_link_release, of course. Then everything works fine.
+I'll drop the typedefs and resend.
 
->  static struct device_type bt_link = {
-> @@ -540,15 +541,20 @@ static int auto_accept_delay_get(void *data, u64 *val)
->  DEFINE_SIMPLE_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
->  					auto_accept_delay_set, "%llu\n");
->
-> -void hci_init_sysfs(struct hci_dev *hdev)
-> +int hci_init_sysfs(struct hci_dev *hdev)
->  {
->  	struct device *dev = &hdev->dev;
->
-> +	if (!try_module_get(THIS_MODULE))
-> +		return -EIO;
-> +
->  	dev->type = &bt_host;
->  	dev->class = bt_class;
->
->  	dev_set_drvdata(dev, hdev);
->  	device_initialize(dev);
-> +
-> +	return 0;
->  }
->
->  int hci_add_sysfs(struct hci_dev *hdev)
-> --
-> 1.7.7.1
->
->
+Peter.
+
+--Peter Krystad
+  Employee of Qualcomm Innovation Center, Inc.
+  Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
