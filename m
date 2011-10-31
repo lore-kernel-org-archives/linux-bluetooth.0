@@ -1,30 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 31 Oct 2011 17:29:55 -0200
+Date: Mon, 31 Oct 2011 17:23:55 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: David Herrmann <dh.herrmann@googlemail.com>
+To: Szymon Janc <szymon@janc.net.pl>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Replace rfcomm tty tasklet by workqueue
-Message-ID: <20111031192955.GE10164@joana>
-References: <1319463058-29311-1-git-send-email-dh.herrmann@googlemail.com>
- <1319463058-29311-2-git-send-email-dh.herrmann@googlemail.com>
+Subject: Re: [PATCH] Bluetooth: Increase HCI reset timeout in hci_dev_do_close
+Message-ID: <20111031192355.GD10164@joana>
+References: <1318885549-14784-1-git-send-email-szymon@janc.net.pl>
+ <1318885549-14784-2-git-send-email-szymon@janc.net.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1319463058-29311-2-git-send-email-dh.herrmann@googlemail.com>
+In-Reply-To: <1318885549-14784-2-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Szymon,
 
-* David Herrmann <dh.herrmann@googlemail.com> [2011-10-24 15:30:58 +0200]:
+* Szymon Janc <szymon@janc.net.pl> [2011-10-17 23:05:49 +0200]:
 
-> Remove old tasklets and replace by workqueue. To avoid reentrancy (which
-> tasklets always avoid) we use the system_nrt_wq.
-> 
-> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
+> Signed-off-by: Szymon Janc <szymon@janc.net.pl>
 > ---
->  net/bluetooth/rfcomm/tty.c |   16 +++++++++-------
->  1 files changed, 9 insertions(+), 7 deletions(-)
+>  net/bluetooth/hci_core.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-Both patches have been applied, thanks.
+Applied to the bluetooth tree, thanks.
 
 	Gustavo
