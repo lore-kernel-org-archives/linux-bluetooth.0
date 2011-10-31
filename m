@@ -1,34 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 31 Oct 2011 17:22:54 -0200
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Mon, 31 Oct 2011 17:18:09 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, ulrik.lauren@stericsson.com,
-	henrik.possung@stericsson.com
-Subject: Re: [PATCH v2] Bluetooth: Use miliseconds for L2CAP channel timeouts
-Message-ID: <20111031192254.GC10164@joana>
-References: <1319095026-12517-1-git-send-email-andrzej.kaczmarek@tieto.com>
+To: "Cho, Yu-Chen" <acho@suse.com>
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, acho@novell.com, jlee@novell.com,
+	oneukum@suse.com
+Subject: Re: [PATCH 1/2] add device entry for Broadcom Valentine combo card
+Message-ID: <20111031191809.GB10164@joana>
+References: <2eb6d1b761a3fddea28294959bde7e9c7ef88043.1319086508.git.acho@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1319095026-12517-1-git-send-email-andrzej.kaczmarek@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <2eb6d1b761a3fddea28294959bde7e9c7ef88043.1319086508.git.acho@suse.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi Yu-Chen,
 
-* Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com> [2011-10-20 09:17:06 +0200]:
+* Cho, Yu-Chen <acho@suse.com> [2011-10-20 12:58:29 +0800]:
 
-> Timers set by __set_chan_timer() should use miliseconds instead of
-> jiffies. Commit 942ecc9c4643db5ce071562e0a23f99464d6b461 updated
-> l2cap_set_timer() so it expects timeout to be specified in msecs
-> instead of jiffies. This makes timeouts unreliable when CONFIG_HZ
-> is not set to 1000.
-> 
-> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-> ---
->  include/net/bluetooth/l2cap.h |    7 +++++--
->  net/bluetooth/l2cap_core.c    |   16 ++++++++--------
->  2 files changed, 13 insertions(+), 10 deletions(-)
+> This device declares itself to be vendor specific
+> It therefore needs to be added to the device table
+> to make btusb bind.
 
-Patch has been applied to bluetooth-next. Thanks.
+It would be good to have the output of usb-devices for this specific device in
+the commit message.
 
 	Gustavo
