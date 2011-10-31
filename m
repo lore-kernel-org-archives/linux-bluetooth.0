@@ -1,44 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Thu, 1 Sep 2011 00:58:33 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Linux Bluetooth mini-summit in Prague
-Message-ID: <20110901035833.GC15578@joana>
-References: <1312874654.3373.97.camel@aeonflux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1312874654.3373.97.camel@aeonflux>
+Date: Mon, 31 Oct 2011 20:11:22 -0300
+Message-ID: <CAKT1EBevp9_bygG8UNO6fj-nU8_C3HDfjOQBRrhMqJij103tBw@mail.gmail.com>
+Subject: Multiple instances of same characteristics (was: Re: GATT Dbus API on
+ BlueZ - attirbute-api.txt modifications)
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: "Tsai, Mike" <miketsai@qca.qualcomm.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Mike,
 
-This is a reminder about our Bluetooth Summit happening in October, in Prague.
+> [MT]How can this handle the multiple instances of same characteristics within a single service? The characteristic UUID will not be unique in that case. Also, how is the profile specific characteristic descriptor handled?
+>
+> Cheers,
+>
+> Mike
 
-The Kernel Summit staff would like to have our invite list soon, so contact
-Marcel or myself if you wanna join the Bluetooth mini-summit, also tell us if
-you have topic proposals.
+I am moving your question to another thread. The original thread is
+almost impossible to follow.
+Do you mean support for client characteristic configuration and other
+characteristics per device?
 
-	Gustavo
+In the Generic Attribute API(client), the represented characteristics
+are always per device. The abstraction for per device characteristic
+value needs to implemented in the server.
+The current attribute server supports CCC only, before implementing
+per device characteristics we need to cleanup the code.
 
-
-* Marcel Holtmann <marcel@holtmann.org> [2011-08-09 09:24:14 +0200]:
-
-> Hi everybody,
-> 
-> we decided to have Bluetooth mini-summit in Prague along with the Kernel
-> summit and the LinuxCon Europe.
-> 
-> http://events.linuxfoundation.org/events/linux-kernel-summit/schedule
-> 
-> If you are interested in joining us, please contact Gustavo and myself
-> for getting you on the invitation list.
-> 
-> We are also collecting proposal for the agenda now. Right now everything
-> is wide open, but the Bluetooth 3.0 and 4.0 will be two major topics as
-> it seems.
-> 
-> Regards
-> 
-> Marcel
+BR,
+Claudio.
