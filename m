@@ -1,33 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 31 Oct 2011 17:38:07 -0200
+Date: Mon, 31 Oct 2011 17:33:54 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: ath3k: Use GFP_KERNEL instead of GFP_ATOMIC
-Message-ID: <20111031193807.GH10164@joana>
-References: <1319536194-4720-1-git-send-email-dh.herrmann@googlemail.com>
- <1319537392-4993-1-git-send-email-dh.herrmann@googlemail.com>
+To: Jesse Sung <jesse.sung@canonical.com>
+Cc: linux-bluetooth@vger.kernel.org, 854399@bugs.launchpad.net
+Subject: Re: [PATCH] Bluetooth: Add support for Broadcom BCM20702A0.
+Message-ID: <20111031193354.GG10164@joana>
+References: <4E7840CF.5010805@canonical.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1319537392-4993-1-git-send-email-dh.herrmann@googlemail.com>
+In-Reply-To: <4E7840CF.5010805@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Jesse,
 
-* David Herrmann <dh.herrmann@googlemail.com> [2011-10-25 12:09:52 +0200]:
+* Jesse Sung <jesse.sung@canonical.com> [2011-09-20 15:29:19 +0800]:
 
-> We are allowed to sleep here so no need to use GFP_ATOMIC. The caller
-> (ath3k_probe) calls request_firmware() which definitely sleeps. Hence, we should
-> avoid using GFP_ATOMIC.
-> 
-> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
-> ---
-> V2: This fixes both occurences of GFP_ATOMIC in one patch.
-> 
->  drivers/bluetooth/ath3k.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
+> Add a new entry (413c:8197) to device ID table.
 
-Applied, thanks.
+Can I get the output of usbdevices in the commit message, please. Then we can
+prove that adding it to the device ID table is really necessary.
 
 	Gustavo
