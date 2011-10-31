@@ -1,33 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 31 Oct 2011 17:31:28 -0200
+Date: Mon, 31 Oct 2011 17:29:55 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: johan.hedberg@gmail.com
+To: David Herrmann <dh.herrmann@googlemail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Set HCI_MGMT flag only in read_controller_info
-Message-ID: <20111031193128.GF10164@joana>
-References: <1319488586-2779-1-git-send-email-johan.hedberg@gmail.com>
+Subject: Re: [PATCH 2/2] Bluetooth: Replace rfcomm tty tasklet by workqueue
+Message-ID: <20111031192955.GE10164@joana>
+References: <1319463058-29311-1-git-send-email-dh.herrmann@googlemail.com>
+ <1319463058-29311-2-git-send-email-dh.herrmann@googlemail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1319488586-2779-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1319463058-29311-2-git-send-email-dh.herrmann@googlemail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi David,
 
-* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-10-24 22:36:26 +0200]:
+* David Herrmann <dh.herrmann@googlemail.com> [2011-10-24 15:30:58 +0200]:
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
+> Remove old tasklets and replace by workqueue. To avoid reentrancy (which
+> tasklets always avoid) we use the system_nrt_wq.
 > 
-> The HCI_MGMT flag should only be set when user space requests the full
-> controller information. This way we avoid potential issues with setting
-> change events ariving before the actual read_controller_info command
-> finishes.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 > ---
->  net/bluetooth/mgmt.c |    2 --
->  1 files changed, 0 insertions(+), 2 deletions(-)
+>  net/bluetooth/rfcomm/tty.c |   16 +++++++++-------
+>  1 files changed, 9 insertions(+), 7 deletions(-)
 
-Applied, thanks.
+Both patches have been applied, thanks.
 
 	Gustavo
