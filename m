@@ -1,114 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Arkadiusz.Lichwa@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <iliak@ti.com>, <ulrik.lauren@stericsson.com>,
-	<Arkadiusz.Lichwa@tieto.com>
-Date: Mon, 31 Oct 2011 18:00:20 +0200
-Subject: RE: [PATCH] Bluetooth: Revert: Fix L2CAP connection establishment
-Message-ID: <BF2CDDEFEC2D1E42A67A8AE0508897EC3E9207D367@EXMB02.eu.tieto.com>
-References: <1319621002-7122-1-git-send-email-arkadiusz.lichwa@tieto.com>
- <1319621002-7122-2-git-send-email-arkadiusz.lichwa@tieto.com>
-In-Reply-To: <1319621002-7122-2-git-send-email-arkadiusz.lichwa@tieto.com>
-Content-Type: text/plain; charset="iso-8859-2"
 MIME-Version: 1.0
+In-Reply-To: <8DCFA6B89B9E70418E47A2348D55495A4790C33B@banasiexm01.ASIA.ROOT.PRI>
+References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
+	<4EA6143E.4000606@googlemail.com>
+	<7769C83744F2C34A841232EF77AEA20C01DCAA8D28@dnce01.ent.ti.com>
+	<CAKT1EBeJB2FDrv6Xp_bGV3eFDEe5ecvnBN0rKniYxw5++Q9NfA@mail.gmail.com>
+	<7769C83744F2C34A841232EF77AEA20C01DCAA8F85@dnce01.ent.ti.com>
+	<CAKT1EBcd6dQq3bzOsW3Fuwv=d8J=yDvsJjbp_ELEAQUjfyRx9g@mail.gmail.com>
+	<7769C83744F2C34A841232EF77AEA20C01DCAA9265@dnce01.ent.ti.com>
+	<alpine.DEB.2.02.1110270003090.30044@mathewm-linux>
+	<7769C83744F2C34A841232EF77AEA20C01DCBC3F03@dnce01.ent.ti.com>
+	<CABBYNZ+Hq4-AAg3TsLi-Vh0eC2p_ZtD2vthBfc3Unww+Km6-Mg@mail.gmail.com>
+	<CAJdJm_Po7iAOoB673XW6D3gTsCn_ME8CHEo0VcWzi5FKX9xghA@mail.gmail.com>
+	<7769C83744F2C34A841232EF77AEA20C01DCBC41E0@dnce01.ent.ti.com>
+	<CAJdJm_NKmrx-qieUFMibPSL3L17=-nwKEjQrfvmf77HFsU8yaw@mail.gmail.com>
+	<7769C83744F2C34A841232EF77AEA20C01DCBC4234@dnce01.ent.ti.com>
+	<CAJdJm_M5LS6o4yiiG-7-KedUF6_dafYbLX=Vqj0QJ4rV926gpg@mail.gmail.com>
+	<7769C83744F2C34A841232EF77AEA20C01DCBC4275@dnce01.ent.ti.com>
+	<CAJdJm_Pjn=7DWPES9fdZJntSfi_h14WxWfORuoRa+tWwnk9Dfw@mail.gmail.com>
+	<7769C83744F2C34A841232EF77AEA20C01DCBC472E@dnce01.ent.ti.com>
+	<CAJdJm_P2X+rMH1Apo7Z_TjwR4WCtdeQZL2Mq3f73xkgy1=UpJw@mail.gmail.com>
+	<7769C83744F2C34A841232EF77AEA20C01DCBC47E3@dnce01.ent.ti.com>
+	<CAJdJm_MWFbfwZ6LGdUnJV6LzT4XRLFC17rsKXV4jMwSAOd5PSQ@mail.gmail.com>
+	<7769C83744F2C34A841232EF77AEA20C01DCBC483B@dnce01.ent.ti.com>
+	<CAJdJm_M0cK5YzpHeWhjLdm+Tekej3nGue_Dc44nT-Ba6Fo7S+A@mail.gmail.com>
+	<8DCFA6B89B9E70418E47A2348D55495A4790C33B@banasiexm01.ASIA.ROOT.PRI>
+Date: Mon, 31 Oct 2011 16:53:29 +0200
+Message-ID: <CABBYNZJN=HarjUS_mTHGgUEYmetr7UG1nvOdhxe-dxnY_HCn5g@mail.gmail.com>
+Subject: Re: GATT Dbus API on BlueZ - attirbute-api.txt modifications
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ajay Pillai <Ajay.Pillai@csr.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	"Ganir, Chen" <chen.ganir@ti.com>,
+	Mat Martineau <mathewm@codeaurora.org>,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"bgix@codeaurora.org" <bgix@codeaurora.org>,
+	"ingas@codeaurora.org" <ingas@codeaurora.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+Hi,
 
->Subject: [PATCH] Bluetooth: Revert: Fix L2CAP connection establishment
+On Mon, Oct 31, 2011 at 3:35 PM, Ajay Pillai <Ajay.Pillai@csr.com> wrote:
+> Hi Anderson,
+> Hello Chen,
 >
->This reverts commit 330605423ca6eafafb8dcc27502bce1c585d1b06.
->The commit introduces regression when two 2.1 devices attempt
->establish rfcomm channel. Such connection is refused since there's
->a security block issue on l2cap. It means the link is unencrypted.
+>> What about writing the value? Should we allow the user to set the value with either Write request/Write Command/Write signed or do we >really want to keep that internal (like read/read blob) ?
 >
->2011-09-16 18:08:46.567616 < ACL data: handle 1 flags 0x00 dlen 24
->    0000: 14 00 40 00 06 00 02 00  0f 35 03 19 12 00 ff ff
->..@......5....ÿÿ
->    0010: 35 05 0a 00 00 ff ff 00                           5....ÿÿ.
->2011-09-16 18:08:46.572377 > HCI Event: Number of Completed Packets
->(0x13) plen 5
->    handle 1 packets 1
->2011-09-16 18:08:46.577931 > ACL data: handle 1 flags 0x02 dlen 88
->    L2CAP(d): cid 0x0040 len 84 [psm 0]
->      0000: 07 00 02 00 4f 00 4c 35  4a 35 48 09 00 00 0a 00
->....O.L5J5H.....
->      0010: 01 00 00 09 00 01 35 03  19 12 00 09 00 05 35 03
->......5.......5.
->      0020: 19 10 02 09 00 09 35 08  35 06 19 12 00 09 01 02
->......5.5.......
->      0030: 09 02 00 09 01 02 09 02  01 09 00 0a 09 02 02 09
->................
->      0040: 00 00 09 02 03 09 00 00  09 02 04 28 01 09 02 05
->...........(....
->      0050: 09 00 02 00                                       ....
->2011-09-16 18:08:46.626057 < HCI Command: Authentication Requested
->(0x01|0x0011) plen 2
->    handle 1
->2011-09-16 18:08:46.627614 > HCI Event: Command Status (0x0f) plen 4
->    Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
->2011-09-16 18:08:46.627675 > HCI Event: Link Key Request (0x17) plen 6
->    bdaddr 00:00:F2:6A:29:69
->2011-09-16 18:08:46.634999 < HCI Command: Link Key Request Reply
->(0x01|0x000b) plen 22
->    bdaddr 00:00:F2:6A:29:69 key 58CD393179FC902E5E8F512A855EE532
->2011-09-16 18:08:46.683278 > HCI Event: Command Complete (0x0e) plen 10
->    Link Key Request Reply (0x01|0x000b) ncmd 1
->    status 0x00 bdaddr 00:00:F2:6A:29:69
->2011-09-16 18:08:46.764729 > HCI Event: Auth Complete (0x06) plen 3
->    status 0x00 handle 1
->2011-09-16 18:08:46.764821 < ACL data: handle 1 flags 0x00 dlen 12
->    0000: 08 00 01 00 02 05 04 00  03 00 41 00              ..........A.
->2011-09-16 18:08:46.764851 > HCI Event: Command Status (0x0f) plen 4
->    Unknown (0x00|0x0000) status 0x00 ncmd 2
->2011-09-16 18:08:46.768117 > HCI Event: Number of Completed Packets
->(0x13) plen 5
->    handle 1 packets 1
->2011-09-16 18:08:46.770894 > ACL data: handle 1 flags 0x02 dlen 16
->    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0041 result 3 status 0
->      Connection refused - security block
->2011-09-16 18:08:49.000691 < ACL data: handle 1 flags 0x00 dlen 12
->    0000: 08 00 01 00 06 06 04 00  40 00 40 00              ........@.@.
->2011-09-16 18:08:49.015675 > HCI Event: Number of Completed Packets
->(0x13) plen 5
->    handle 1 packets 1
->2011-09-16 18:08:49.016927 > ACL data: handle 1 flags 0x02 dlen 12
->    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
->2011-09-16 18:08:51.009480 < HCI Command: Disconnect (0x01|0x0006) plen
->3
->    handle 1 reason 0x13
->    Reason: Remote User Terminated Connection
->2011-09-16 18:08:51.011525 > HCI Event: Command Status (0x0f) plen 4
->    Disconnect (0x01|0x0006) status 0x00 ncmd 1
->2011-09-16 18:08:51.123494 > HCI Event: Disconn Complete (0x05) plen 4
->    status 0x00 handle 1 reason 0x16
->    Reason: Connection Terminated by Local Host
+>>Again, If I were to implement it, I would stick with the core spec requirements, and checking Characteristic Properties and the link >encryption status for deciding which operation to use. But if you really think it is useful to allow D-Bus clients "break" spec >requirements some times, you can provide this control. This particular detail is not my main concern :).
 >
->Signed-off-by: Arek Lichwa <arkadiusz.lichwa@tieto.com>
->---
-> net/bluetooth/hci_conn.c |    2 +-
-> 1 files changed, 1 insertions(+), 1 deletions(-)
 >
->diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->index c1c597e..e0af723 100644
->--- a/net/bluetooth/hci_conn.c
->+++ b/net/bluetooth/hci_conn.c
->@@ -673,7 +673,7 @@ int hci_conn_security(struct hci_conn *conn, __u8
->sec_level, __u8 auth_type)
-> 		goto encrypt;
+> Can we detail out the "write" API design once again, please? There has been too much discussion and hence I am not sure, which way it is going.
 >
-> auth:
->-	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend))
->+	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend))
-> 		return 0;
+> There are two main aspects to write"
 >
-> 	if (!hci_conn_auth(conn, sec_level, auth_type))
->--
->1.7.6
+> 1) The write mechanism -
+>        a) Do we do a setproperty() or do we add a new API writeValue()?
+>        b) Is the method blocking or non-blocking?
+>        c) If non-blocking,what is the mechanism like?
+> My understanding - if the write is called while the connection is not active, then the value is going to be buffered in BlueZ while BlueZ tries to get the connection up. When the connection comes up, after the write operation is complete, BlueZ will emit a signal indicating that it is written.
 
-Is it something unclear in my original post ? Any comments ?
-Regression here is quite obvious in my opinion. 
+Do you guys really know what you are talking about? D-Bus does not
+support blocking calls, it basically waits the reply to return but it
+can get other messages while waiting which will be reorder to be
+dispatched after, so using pseudo blocking calls on production
+software is _not_ recommended. Besides we will always have to signal
+if there are multiple application watching the same characteristic,
+the user of SetProperty can use that to catch when the value was
+finally written but if an error occur then it is better to handle the
+return of SetProperty, or actually a method like Write would be better
+in this case so that a method can be given and an error can be
+returned. (btw this was part of Chen's initial suggestion).
 
-/Arek
+> 2) The choice of write operation - Does it lie within BlueZ or is it given to DBUS Apps. I guess Anderson is okay with giving some control to the DBUS App.
+>        a) write without response, write with response, signed write without response -
+> I believe the DBUS App must be allowed to indicate its preference among these to BlueZ. BlueZ must be able to meet this preference in most of the cases, but in cases where it cannot, BlueZ must throw an error. It would in most cases be a wrong request from App (using signed write on a long characteristic, for instance)
+>        b) Write long characteristics value
+> This, I believe, is a value add to Apps, if done autonomously within BlueZ.
+>        c) reliable write of one characteristic
+> Not covered in this discussion so far. But worth having a separate API like writeReliable(offset, value, {"prepare","execute"})?
+>        d) reliable write used for atomic write of multiple characteristics
+> Not covered in this discussion so far. Same API as above. But an "execute" operation on any char object will do complete the reliable write operation.
+>
+> Regarding reliable writes, we will need to figure out a state machine within BlueZ that blocks out other operations on a remote server during a prepare-execute cycle and also an exit criteria from that "block-other-operations" state to cater to Aps that disappear after doing a "prepare".
 
+You guys do realize D-Bus is an IPC so that round trips are expensive
+and does follow some standards when defining API, also blocking
+operations/returning errors is probably a bad idea we should probably
+queue the operation and send when the server is no longer busy.
+
+So IMO we basically need Read/Write methods, those need a connection
+and do not access the cache but they do always need to update the
+cache and emit PropertyChanged when the value has changed so Value
+property must stay so that GetProperties can be used as a lazy read
+which is very useful in case the characteristic doesn't change or the
+server notify its updates. Read method can be use to keep values in
+sync with the server, but keep in mind that polling will always have a
+interval where the value is not in sync so notification should be
+always preferable.
+
+-- 
+Luiz Augusto von Dentz
