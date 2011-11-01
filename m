@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 1 Nov 2011 14:42:51 -0200
+Date: Tue, 1 Nov 2011 14:41:00 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH 4/7] Bluetooth: prioritizing data over HCI
-Message-ID: <20111101164251.GI2580@joana>
+Message-ID: <20111101164100.GH2580@joana>
 References: <1320137942-25780-1-git-send-email-luiz.dentz@gmail.com>
  <1320137942-25780-4-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
@@ -120,102 +120,12 @@ Hi Luiz,
 >  int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
 >  void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags);
 > +void hci_chan_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
->  void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb);
->  
->  void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index ed38c08..c7aa766 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -450,6 +450,7 @@ struct l2cap_ops {
->  
->  struct l2cap_conn {
->  	struct hci_conn	*hcon;
-> +	struct hci_chan	*hchan;
->  
->  	bdaddr_t	*dst;
->  	bdaddr_t	*src;
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 6e98ff3..fb66597 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -374,6 +374,8 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
->  
->  	skb_queue_head_init(&conn->data_q);
->  
-> +	hci_chan_hash_init(conn);
-> +
->  	setup_timer(&conn->disc_timer, hci_conn_timeout, (unsigned long)conn);
->  	setup_timer(&conn->idle_timer, hci_conn_idle, (unsigned long)conn);
->  	setup_timer(&conn->auto_accept_timer, hci_conn_auto_accept,
-> @@ -432,6 +434,8 @@ int hci_conn_del(struct hci_conn *conn)
->  
->  	tasklet_disable(&hdev->tx_task);
->  
-> +	hci_chan_hash_flush(conn);
-> +
->  	hci_conn_hash_del(hdev, conn);
->  	if (hdev->notify)
->  		hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
-> @@ -950,3 +954,58 @@ int hci_get_auth_info(struct hci_dev *hdev, void __user *arg)
->  
->  	return copy_to_user(arg, &req, sizeof(req)) ? -EFAULT : 0;
->  }
-> +
-> +struct hci_chan *hci_chan_create(struct hci_conn *conn)
-> +{
-> +	struct hci_dev *hdev = conn->hdev;
-> +	struct hci_chan *chan;
-> +
-> +	BT_DBG("%s conn %p", hdev->name, conn);
-> +
-> +	chan = kzalloc(sizeof(struct hci_chan), GFP_ATOMIC);
-> +	if (!chan)
-> +		return NULL;
-> +
-> +	chan->conn = conn;
-> +	skb_queue_head_init(&chan->data_q);
-> +
-> +	tasklet_disable(&hdev->tx_task);
-> +	hci_chan_hash_add(conn, chan);
-> +	tasklet_enable(&hdev->tx_task);
-> +
-> +	return chan;
-> +}
-> +
-> +int hci_chan_del(struct hci_chan *chan)
-> +{
-> +	struct hci_conn *conn = chan->conn;
-> +	struct hci_dev *hdev = conn->hdev;
-> +
-> +	BT_DBG("%s conn %p chan %p", hdev->name, conn, chan);
-> +
-> +	tasklet_disable(&hdev->tx_task);
-> +	hci_chan_hash_del(conn, chan);
-> +	tasklet_enable(&hdev->tx_task);
-> +
-> +	skb_queue_purge(&chan->data_q);
-> +	kfree(chan);
-> +
-> +	return 0;
-> +}
-> +
-> +void hci_chan_hash_flush(struct hci_conn *conn)
-> +{
-> +	struct hci_chan_hash *h = &conn->chan_hash;
-> +	struct list_head *p;
-> +
-> +	BT_DBG("conn %p", conn);
-> +	p = h->list.next;
-> +	while (p != &h->list) {
-> +		struct hci_chan *chan;
-> +
-> +		chan = list_entry(p, struct hci_chan, list);
-> +		p = p->next;
-> +
-> +		hci_chan_del(chan);
-> +	}
 
-Can't this be list_for_each_entry_safe()?
+Your patch left only one user of hci_send_acl in l2cap_core.c:
+l2cap_send_sframe(). I don't see a reason to for this so let's fix this here
+and make all of them use the same sending function. Actually is a better idea
+to first covert l2cap_send_sframe() to use l2cap_do_send().
+
+And let's not change the function name here, hci_send_acl() is a good name.
 
 	Gustavo
