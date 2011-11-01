@@ -4,108 +4,47 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi, pkrystad@codeaurora.org,
 	andrei.emeltchenko@intel.com,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCHv3 4/9] Bluetooth: Add AMP-related data and structures for channel signals
-Date: Tue,  1 Nov 2011 15:29:23 -0700
-Message-Id: <1320186568-25493-5-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv3 7/9] Bluetooth: Use symbolic values for the fixed channel map
+Date: Tue,  1 Nov 2011 15:29:26 -0700
+Message-Id: <1320186568-25493-8-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1320186568-25493-1-git-send-email-mathewm@codeaurora.org>
 References: <1320186568-25493-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-AMP channel creation and channel moves are coordinated using the L2CAP
-signaling channel.  These definitions cover the "create channel",
-"move channel", and "move channel confirm" signals.
+The A2MP fixed channel bit is only set when high-speed mode is enabled.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- include/net/bluetooth/l2cap.h |   54 +++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 52 insertions(+), 2 deletions(-)
+ net/bluetooth/l2cap_core.c |    8 +++++++-
+ 1 files changed, 7 insertions(+), 1 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 0b021c0..f822ab9 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -97,6 +97,12 @@ struct l2cap_conninfo {
- #define L2CAP_ECHO_RSP		0x09
- #define L2CAP_INFO_REQ		0x0a
- #define L2CAP_INFO_RSP		0x0b
-+#define L2CAP_CREATE_CHAN_REQ	0x0c
-+#define L2CAP_CREATE_CHAN_RSP	0x0d
-+#define L2CAP_MOVE_CHAN_REQ	0x0e
-+#define L2CAP_MOVE_CHAN_RSP	0x0f
-+#define L2CAP_MOVE_CHAN_CFM	0x10
-+#define L2CAP_MOVE_CHAN_CFM_RSP	0x11
- #define L2CAP_CONN_PARAM_UPDATE_REQ	0x12
- #define L2CAP_CONN_PARAM_UPDATE_RSP	0x13
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 2a49cf3..b27b061 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -60,7 +60,7 @@ int disable_ertm;
+ int enable_hs;
  
-@@ -220,14 +226,15 @@ struct l2cap_conn_rsp {
- #define L2CAP_CID_DYN_START	0x0040
- #define L2CAP_CID_DYN_END	0xffff
+ static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
+-static u8 l2cap_fixed_chan[8] = { 0x02, };
++static u8 l2cap_fixed_chan[8] = { L2CAP_FC_L2CAP, };
  
--/* connect result */
-+/* connect/create channel results */
- #define L2CAP_CR_SUCCESS	0x0000
- #define L2CAP_CR_PEND		0x0001
- #define L2CAP_CR_BAD_PSM	0x0002
- #define L2CAP_CR_SEC_BLOCK	0x0003
- #define L2CAP_CR_NO_MEM		0x0004
-+#define L2CAP_CR_BAD_AMP	0x0005
- 
--/* connect status */
-+/* connect/create channel status */
- #define L2CAP_CS_NO_INFO	0x0000
- #define L2CAP_CS_AUTHEN_PEND	0x0001
- #define L2CAP_CS_AUTHOR_PEND	0x0002
-@@ -322,6 +329,49 @@ struct l2cap_info_rsp {
- 	__u8        data[0];
- } __packed;
- 
-+struct l2cap_create_chan_req {
-+	__le16      psm;
-+	__le16      scid;
-+	__u8        amp_id;
-+} __packed;
+ static LIST_HEAD(chan_list);
+ static DEFINE_RWLOCK(chan_list_lock);
+@@ -3032,6 +3032,12 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
+ 	} else if (type == L2CAP_IT_FIXED_CHAN) {
+ 		u8 buf[12];
+ 		struct l2cap_info_rsp *rsp = (struct l2cap_info_rsp *) buf;
 +
-+struct l2cap_create_chan_rsp {
-+	__le16      dcid;
-+	__le16      scid;
-+	__le16      result;
-+	__le16      status;
-+} __packed;
++		if (enable_hs)
++			l2cap_fixed_chan[0] |= L2CAP_FC_A2MP;
++		else
++			l2cap_fixed_chan[0] &= ~L2CAP_FC_A2MP;
 +
-+struct l2cap_move_chan_req {
-+	__le16      icid;
-+	__u8        dest_amp_id;
-+} __packed;
-+
-+struct l2cap_move_chan_rsp {
-+	__le16      icid;
-+	__le16      result;
-+} __packed;
-+
-+#define L2CAP_MR_SUCCESS	0x0000
-+#define L2CAP_MR_PEND		0x0001
-+#define L2CAP_MR_BAD_ID		0x0002
-+#define L2CAP_MR_SAME_ID	0x0003
-+#define L2CAP_MR_NOT_SUPP	0x0004
-+#define L2CAP_MR_COLLISION	0x0005
-+#define L2CAP_MR_NOT_ALLOWED	0x0006
-+
-+struct l2cap_move_chan_cfm {
-+	__le16      icid;
-+	__le16      result;
-+} __packed;
-+
-+#define L2CAP_MC_CONFIRMED	0x0000
-+#define L2CAP_MC_UNCONFIRMED	0x0001
-+
-+struct l2cap_move_chan_cfm_rsp {
-+	__le16      icid;
-+} __packed;
-+
- /* info type */
- #define L2CAP_IT_CL_MTU		0x0001
- #define L2CAP_IT_FEAT_MASK	0x0002
+ 		rsp->type   = cpu_to_le16(L2CAP_IT_FIXED_CHAN);
+ 		rsp->result = cpu_to_le16(L2CAP_IR_SUCCESS);
+ 		memcpy(rsp->data, l2cap_fixed_chan, sizeof(l2cap_fixed_chan));
 -- 
 1.7.7.1
 
