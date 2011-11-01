@@ -4,198 +4,47 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi, pkrystad@codeaurora.org,
 	andrei.emeltchenko@intel.com,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCHv3 8/9] Bluetooth: Add signal handlers for channel moves
-Date: Tue,  1 Nov 2011 15:29:27 -0700
-Message-Id: <1320186568-25493-9-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv3 9/9] Bluetooth: Guarantee BR-EDR device will be registered as hci0
+Date: Tue,  1 Nov 2011 15:29:28 -0700
+Message-Id: <1320186568-25493-10-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1320186568-25493-1-git-send-email-mathewm@codeaurora.org>
 References: <1320186568-25493-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-AMP channels can be moved between BR/EDR and AMP controllers using a
-sequence of signals. Every attempted channel move involves a series of
-four signals:
-
-   Move Initiator                 Move Responder
-        |                                 |
-        |       Move Channel Request      |
-        |  ---------------------------->  |
-        |                                 |
-        |       Move Channel Response     |
-        |  <----------------------------  |
-        |                                 |
-        |       Move Channel Confirm      |
-        |  ---------------------------->  |
-        |                                 |
-        |  Move Channel Confirm Response  |
-	|  <----------------------------  |
-
-All four signals are sent even if the move fails.
+It's convenient to use the HCI device index the AMP controller id, but
+the spec requires that an AMP controller never has id 0.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |  141 ++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 141 insertions(+), 0 deletions(-)
+ net/bluetooth/hci_core.c |    7 ++++++-
+ 1 files changed, 6 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b27b061..152ca66 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3146,6 +3146,130 @@ static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
- 	return l2cap_connect_rsp(conn, cmd, data);
- }
- 
-+static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
-+				u16 icid, u16 result)
-+{
-+	struct l2cap_move_chan_rsp rsp;
-+
-+	BT_DBG("icid %d, result %d", icid, result);
-+
-+	rsp.icid = cpu_to_le16(icid);
-+	rsp.result = cpu_to_le16(result);
-+
-+	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_RSP, sizeof(rsp), &rsp);
-+}
-+
-+static void l2cap_send_move_chan_cfm(struct l2cap_conn *conn,
-+				struct l2cap_chan *chan, u16 icid, u16 result)
-+{
-+	struct l2cap_move_chan_cfm cfm;
-+	u8 ident;
-+
-+	BT_DBG("icid %d, result %d", icid, result);
-+
-+	ident = l2cap_get_ident(conn);
-+	if (chan)
-+		chan->ident = ident;
-+
-+	cfm.icid = cpu_to_le16(icid);
-+	cfm.result = cpu_to_le16(result);
-+
-+	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM, sizeof(cfm), &cfm);
-+}
-+
-+static void l2cap_send_move_chan_cfm_rsp(struct l2cap_conn *conn, u8 ident,
-+					u16 icid)
-+{
-+	struct l2cap_move_chan_cfm_rsp rsp;
-+
-+	BT_DBG("icid %d", icid);
-+
-+	rsp.icid = cpu_to_le16(icid);
-+	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM_RSP, sizeof(rsp), &rsp);
-+}
-+
-+static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
-+					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
-+					void *data)
-+{
-+	struct l2cap_move_chan_req *req = data;
-+	u16 icid = 0;
-+	u16 result = L2CAP_MR_NOT_ALLOWED;
-+
-+	if (cmd_len != sizeof(*req))
-+		return -EPROTO;
-+
-+	icid = le16_to_cpu(req->icid);
-+
-+	BT_DBG("icid %d, dest_amp_id %d", icid, req->dest_amp_id);
-+
-+	if (!enable_hs)
-+		return -EINVAL;
-+
-+	/* Placeholder: Always refuse */
-+	l2cap_send_move_chan_rsp(conn, cmd->ident, icid, result);
-+
-+	return 0;
-+}
-+
-+static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
-+					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
-+					void *data)
-+{
-+	struct l2cap_move_chan_rsp *rsp = data;
-+	u16 icid, result;
-+
-+	if (cmd_len != sizeof(*rsp))
-+		return -EPROTO;
-+
-+	icid = le16_to_cpu(rsp->icid);
-+	result = le16_to_cpu(rsp->result);
-+
-+	BT_DBG("icid %d, result %d", icid, result);
-+
-+	/* Placeholder: Always unconfirmed */
-+	l2cap_send_move_chan_cfm(conn, NULL, icid, L2CAP_MC_UNCONFIRMED);
-+
-+	return 0;
-+}
-+
-+static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
-+					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
-+					void *data)
-+{
-+	struct l2cap_move_chan_cfm *cfm = data;
-+	u16 icid, result;
-+
-+	if (cmd_len != sizeof(*cfm))
-+		return -EPROTO;
-+
-+	icid = le16_to_cpu(cfm->icid);
-+	result = le16_to_cpu(cfm->result);
-+
-+	BT_DBG("icid %d, result %d", icid, result);
-+
-+	l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
-+
-+	return 0;
-+}
-+
-+static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
-+					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
-+					void *data)
-+{
-+	struct l2cap_move_chan_cfm_rsp *rsp = data;
-+	u16 icid;
-+
-+	if (cmd_len != sizeof(*rsp))
-+		return -EPROTO;
-+
-+	icid = le16_to_cpu(rsp->icid);
-+
-+	BT_DBG("icid %d", icid);
-+
-+	return 0;
-+}
-+
- static inline int l2cap_check_conn_param(u16 min, u16 max, u16 latency,
- 							u16 to_multiplier)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index f2ec434..cee7f87 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1410,7 +1410,7 @@ int hci_add_adv_entry(struct hci_dev *hdev,
+ int hci_register_dev(struct hci_dev *hdev)
  {
-@@ -3266,6 +3390,23 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		err = l2cap_create_channel_rsp(conn, cmd, data);
- 		break;
+ 	struct list_head *head = &hci_dev_list, *p;
+-	int i, id = 0, error;
++	int i, id, error;
  
-+	case L2CAP_MOVE_CHAN_REQ:
-+		err = l2cap_move_channel_req(conn, cmd, cmd_len, data);
-+		break;
+ 	BT_DBG("%p name %s bus %d owner %p", hdev, hdev->name,
+ 						hdev->bus, hdev->owner);
+@@ -1418,6 +1418,11 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	if (!hdev->open || !hdev->close || !hdev->destruct)
+ 		return -EINVAL;
+ 
++	/* Do not allow HCI_AMP devices to register at index 0,
++	 * so the index can be used as the AMP controller ID.
++	 */
++	id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
 +
-+	case L2CAP_MOVE_CHAN_RSP:
-+		err = l2cap_move_channel_rsp(conn, cmd, cmd_len, data);
-+		break;
-+
-+	case L2CAP_MOVE_CHAN_CFM:
-+		err = l2cap_move_channel_confirm(conn, cmd, cmd_len, data);
-+		break;
-+
-+	case L2CAP_MOVE_CHAN_CFM_RSP:
-+		err = l2cap_move_channel_confirm_rsp(conn, cmd, cmd_len, data);
-+		break;
-+
-+
- 	default:
- 		BT_ERR("Unknown BR/EDR signaling command 0x%2.2x", cmd->code);
- 		err = -EINVAL;
+ 	write_lock_bh(&hci_dev_list_lock);
+ 
+ 	/* Find first available device id */
 -- 
 1.7.7.1
 
