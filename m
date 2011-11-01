@@ -1,58 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 1 Nov 2011 12:07:07 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Ilia, Kolominsky" <iliak@ti.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Implementation of name-resolve procedures in mgmtops
-Message-ID: <20111101100707.GA4434@fusion.localdomain>
-References: <AC090B9732AB2B4DB7FF476E907FE660013BAEC43B@dnce02.ent.ti.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AC090B9732AB2B4DB7FF476E907FE660013BAEC43B@dnce02.ent.ti.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Cho, Yu-Chen" <acho@suse.com>
+To: marcel@holtmann.org,
+	padovan@profusion.mobi,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: acho@novell.com,
+	jlee@novell.com,
+	oneukum@suse.com,
+	acho@suse.com,
+	jlee@suse.com
+Subject: [PATCH 3/3] add device entry for other Broadcom combo card
+Date: Tue,  1 Nov 2011 17:33:07 +0800
+Message-Id: <6842576afea60f36a866fbf5000195c8cafb99f3.1320139612.git.acho@suse.com>
+In-Reply-To: <944af9667334f5677be87e89fe8f38486823cc95.1320139612.git.acho@suse.com>
+References: <944af9667334f5677be87e89fe8f38486823cc95.1320139612.git.acho@suse.com>
+In-Reply-To: <944af9667334f5677be87e89fe8f38486823cc95.1320139612.git.acho@suse.com>
+References: <944af9667334f5677be87e89fe8f38486823cc95.1320139612.git.acho@suse.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ilia,
+Those devices declare themselves to be vendor specific
+It therefore needs to be added to the device table
+to make btusb bind.
 
-On Mon, Oct 31, 2011, Ilia, Kolominsky wrote:
-> Could you please outline the intended mechanics for the new
-> Name-resolve procedures in mgmtops?
-> - What is the purpose of Confirm Name command?
-> ( I see that you`d added it but not implemented )
-> - What are the main differences in the mechanics between
-> the hciops and mgmtops?
-> - Are there any changes in user behavior?
+Signed-off-by: Cho, Yu-Chen <acho@suse.com>
+---
+ drivers/bluetooth/btusb.c |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
 
-We already discussed this on IRC, but I'll recap here so that it gets
-stored in the mailing list archives. This way people can also correct me
-if I remember something wrong about what we agreed in Prague.
-
-Regarding mgmtops vs hciops, the idea (as long as we hold on to hciops)
-is that hciops roughly emulates what the kernel will do when accessed
-through the mgmt interface. That also means that the adapter_ops API
-should be modeled more or less according to the mgmt interface (e.g. the
-resolve_name callback needs to go and a confirm_name callback needs to
-be added).
-
-During a device discovery session the kernel will set the (new) Confirm
-Name field in mgmt_ev_device_found to 1 whenever the kernel doesn't know
-if know the name for that device or not. Upon receiving such an event
-user-space (bluetoothd) will check its storage and respond with the
-(new) Confirm Name command. The field in mgmt_ev_device found would be
-set to 1 e.g. for any non-EIR inquiry result for a device we haven't
-received a confirm_name command for previously (during the same
-discovery session) and for any EIR result which doesn't contain a full
-name.
-
-Each "unknown name" device that user-space tells the kernel about gets
-added to a list and once the currently ongoing inquiry finishes the
-kernel proceeds with trying to resolve the name for each device in the
-list, one at a time. For efficiency, this list should be sorted by
-strongest RSSI first so that devices which are with a higher likelihood
-closer to us get their names resolved first. The kernel will also wait a
-few seconds (2 sounds like an ok value?) if user space hasn't yet
-responded with a name confirmation for a device when inquiry finishes.
-Once the list of names to be resolved is empty the device discovery is
-deemed complete.
-
-Johan
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8583aee..bc8f850 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -100,6 +100,12 @@ static struct usb_device_id btusb_table[] = {
+ 	/* Broadcom Valentine 802.11bgn 1x1 Combo HMC */
+ 	{ USB_DEVICE(0x0a5c, 0x21e3) },
+ 
++	{ USB_DEVICE(0x03f0, 0x2a1d) },
++	{ USB_DEVICE(0x03f0, 0x231d) },
++
++	/* BCM2070 Bluetooth 2.1 + EDR */
++	{ USB_DEVICE(0x0a5c, 0x21b4) },
++
+ 	/* Canyon CN-BTU1 with HID interfaces */
+ 	{ USB_DEVICE(0x0c10, 0x0000) },
+ 
+-- 
+1.7.3.4
