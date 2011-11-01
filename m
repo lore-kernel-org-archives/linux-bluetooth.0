@@ -1,44 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 1 Nov 2011 15:25:11 -0200
+Date: Tue, 1 Nov 2011 15:23:41 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hidp: Fix module reference cleanup
-Message-ID: <20111101172511.GM2580@joana>
-References: <20111101161242.GE2580@joana>
- <1320164870-13797-1-git-send-email-dh.herrmann@googlemail.com>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2011-11-01
+Message-ID: <20111101172341.GL2580@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320164870-13797-1-git-send-email-dh.herrmann@googlemail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi John,
 
-* David Herrmann <dh.herrmann@googlemail.com> [2011-11-01 17:27:50 +0100]:
+Some fixes for the 3.2 release, there are four fixes in our drivers code
+by David Hermann. Szymon Janc fixed a bug that was making some dongles not
+work well and a sleep in invalid context. And finally a bug fix in the mgmt
+code by Johan Hedberg.
 
-> Calling module_put(THIS_MODULE) is *never* safe when we cannot go sure that we
-> own at least two references. This is because the call may unload our module
-> before it returns and then the "return" will jump into invalid memory.
-> 
-> Gladly, module.h provides a wrapper for kthread-users: module_put_and_exit().
-> This puts our module and then exits the kthread without returning to the module.
-> 
-> This patch fixes the hidp kthread to use this wrapper instead of manually
-> freeing its own reference. See nfsd or lockd for other kthreads using this.
-> 
-> Calling __module_get() inside the kthread is safe as the hidp module will always
-> wait until the kthread sets "waiting_for_startup" to 0.
-> 
-> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
-> ---
-> V3: I rebased on top of bluetooth-next plus the patches already pending on the
-> ML. It should apply cleanly now. Otherwise, just tell me what tree to use for
-> the rebase ;) Or try "git am -3 ..."
-> 
->  net/bluetooth/hidp/core.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
-
-Applied, thanks.
+Please pull, thanks!
 
 	Gustavo
+
+The following changes since commit ba54238552625aad2d75f455a4d3db18ea7dec68:
+
+  ath9k: Fix a dma warning/memory leak (2011-09-26 14:55:51 -0400)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth.git master
+
+David Herrmann (4):
+      Bluetooth: ath3k: Use GFP_KERNEL instead of GFP_ATOMIC
+      Bluetooth: bcm203x: Fix race condition on disconnect
+      Bluetooth: bcm203x: Use GFP_KERNEL in workqueue
+      Bluetooth: bfusb: Fix error path on firmware load
+
+Johan Hedberg (1):
+      Bluetooth: Set HCI_MGMT flag only in read_controller_info
+
+Szymon Janc (2):
+      Bluetooth: rfcomm: Fix sleep in invalid context in rfcomm_security_cfm
+      Bluetooth: Increase HCI reset timeout in hci_dev_do_close
+
+ drivers/bluetooth/ath3k.c      |    4 ++--
+ drivers/bluetooth/bcm203x.c    |   12 +++++++++++-
+ drivers/bluetooth/bfusb.c      |   13 +++++++------
+ include/net/bluetooth/rfcomm.h |    1 +
+ net/bluetooth/hci_core.c       |    2 +-
+ net/bluetooth/mgmt.c           |    2 --
+ net/bluetooth/rfcomm/core.c    |    9 +++++++--
+ 7 files changed, 29 insertions(+), 14 deletions(-)
