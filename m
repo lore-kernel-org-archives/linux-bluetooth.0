@@ -1,131 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 1 Nov 2011 14:41:00 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/7] Bluetooth: prioritizing data over HCI
-Message-ID: <20111101164100.GH2580@joana>
-References: <1320137942-25780-1-git-send-email-luiz.dentz@gmail.com>
- <1320137942-25780-4-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320137942-25780-4-git-send-email-luiz.dentz@gmail.com>
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: padovan@profusion.mobi, David Herrmann <dh.herrmann@googlemail.com>
+Subject: [PATCH] Bluetooth: hidp: Fix module reference cleanup
+Date: Tue,  1 Nov 2011 17:27:50 +0100
+Message-Id: <1320164870-13797-1-git-send-email-dh.herrmann@googlemail.com>
+In-Reply-To: <20111101161242.GE2580@joana>
+References: <20111101161242.GE2580@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Calling module_put(THIS_MODULE) is *never* safe when we cannot go sure that we
+own at least two references. This is because the call may unload our module
+before it returns and then the "return" will jump into invalid memory.
 
-* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-11-01 10:58:59 +0200]:
+Gladly, module.h provides a wrapper for kthread-users: module_put_and_exit().
+This puts our module and then exits the kthread without returning to the module.
 
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This implement priority based scheduler using skbuffer priority set via
-> SO_PRIORITY socket option.
-> 
-> It introduces hci_chan_hash (list of HCI Channel/hci_chan) per connection,
-> each item in this list refer to a L2CAP connection and it is used to
-> queue the data for transmission.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->  include/net/bluetooth/hci_core.h |   42 ++++++++++
->  include/net/bluetooth/l2cap.h    |    1 +
->  net/bluetooth/hci_conn.c         |   59 ++++++++++++++
->  net/bluetooth/hci_core.c         |  159 ++++++++++++++++++++++++++++++++------
->  net/bluetooth/l2cap_core.c       |   18 ++++-
->  5 files changed, 252 insertions(+), 27 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 5d5fba9..1efad6b 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -67,6 +67,12 @@ struct hci_conn_hash {
->  	unsigned int     le_num;
->  };
->  
-> +struct hci_chan_hash {
-> +	struct list_head list;
-> +	spinlock_t       lock;
-> +	unsigned int     num;
-> +};
-> +
->  struct bdaddr_list {
->  	struct list_head list;
->  	bdaddr_t bdaddr;
-> @@ -287,6 +293,7 @@ struct hci_conn {
->  	unsigned int	sent;
->  
->  	struct sk_buff_head data_q;
-> +	struct hci_chan_hash chan_hash;
->  
->  	struct timer_list disc_timer;
->  	struct timer_list idle_timer;
-> @@ -309,6 +316,14 @@ struct hci_conn {
->  	void (*disconn_cfm_cb)	(struct hci_conn *conn, u8 reason);
->  };
->  
-> +struct hci_chan {
-> +	struct list_head list;
-> +
-> +	struct hci_conn *conn;
-> +	struct sk_buff_head data_q;
-> +	unsigned int	sent;
-> +};
-> +
->  extern struct hci_proto *hci_proto[];
->  extern struct list_head hci_dev_list;
->  extern struct list_head hci_cb_list;
-> @@ -469,6 +484,28 @@ static inline struct hci_conn *hci_conn_hash_lookup_state(struct hci_dev *hdev,
->  	return NULL;
->  }
->  
-> +static inline void hci_chan_hash_init(struct hci_conn *c)
-> +{
-> +	struct hci_chan_hash *h = &c->chan_hash;
-> +	INIT_LIST_HEAD(&h->list);
-> +	spin_lock_init(&h->lock);
-> +	h->num = 0;
-> +}
-> +
-> +static inline void hci_chan_hash_add(struct hci_conn *c, struct hci_chan *chan)
-> +{
-> +	struct hci_chan_hash *h = &c->chan_hash;
-> +	list_add(&chan->list, &h->list);
-> +	h->num++;
-> +}
-> +
-> +static inline void hci_chan_hash_del(struct hci_conn *c, struct hci_chan *chan)
-> +{
-> +	struct hci_chan_hash *h = &c->chan_hash;
-> +	list_del(&chan->list);
-> +	h->num--;
-> +}
-> +
->  void hci_acl_connect(struct hci_conn *conn);
->  void hci_acl_disconn(struct hci_conn *conn, __u8 reason);
->  void hci_add_sco(struct hci_conn *conn, __u16 handle);
-> @@ -480,6 +517,10 @@ int hci_conn_del(struct hci_conn *conn);
->  void hci_conn_hash_flush(struct hci_dev *hdev);
->  void hci_conn_check_pending(struct hci_dev *hdev);
->  
-> +struct hci_chan *hci_chan_create(struct hci_conn *conn);
-> +int hci_chan_del(struct hci_chan *chan);
-> +void hci_chan_hash_flush(struct hci_conn *conn);
-> +
->  struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
->  						__u8 sec_level, __u8 auth_type);
->  int hci_conn_check_link_mode(struct hci_conn *conn);
-> @@ -850,6 +891,7 @@ int hci_unregister_notifier(struct notifier_block *nb);
->  
->  int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
->  void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags);
-> +void hci_chan_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
+This patch fixes the hidp kthread to use this wrapper instead of manually
+freeing its own reference. See nfsd or lockd for other kthreads using this.
 
-Your patch left only one user of hci_send_acl in l2cap_core.c:
-l2cap_send_sframe(). I don't see a reason to for this so let's fix this here
-and make all of them use the same sending function. Actually is a better idea
-to first covert l2cap_send_sframe() to use l2cap_do_send().
+Calling __module_get() inside the kthread is safe as the hidp module will always
+wait until the kthread sets "waiting_for_startup" to 0.
 
-And let's not change the function name here, hci_send_acl() is a good name.
+Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
+---
+V3: I rebased on top of bluetooth-next plus the patches already pending on the
+ML. It should apply cleanly now. Otherwise, just tell me what tree to use for
+the rebase ;) Or try "git am -3 ..."
 
-	Gustavo
+ net/bluetooth/hidp/core.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 217ef47..ff42c20 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -93,7 +93,6 @@ static struct hidp_session *__hidp_get_session(bdaddr_t *bdaddr)
+ 
+ static void __hidp_link_session(struct hidp_session *session)
+ {
+-	__module_get(THIS_MODULE);
+ 	list_add(&session->list, &hidp_session_list);
+ }
+ 
+@@ -102,7 +101,6 @@ static void __hidp_unlink_session(struct hidp_session *session)
+ 	hci_conn_put_device(session->conn);
+ 
+ 	list_del(&session->list);
+-	module_put(THIS_MODULE);
+ }
+ 
+ static void __hidp_copy_session(struct hidp_session *session, struct hidp_conninfo *ci)
+@@ -702,6 +700,7 @@ static int hidp_session(void *arg)
+ 
+ 	BT_DBG("session %p", session);
+ 
++	__module_get(THIS_MODULE);
+ 	set_user_nice(current, -15);
+ 
+ 	init_waitqueue_entry(&ctrl_wait, current);
+@@ -780,6 +779,7 @@ static int hidp_session(void *arg)
+ 
+ 	kfree(session->rd_data);
+ 	kfree(session);
++	module_put_and_exit(0);
+ 	return 0;
+ }
+ 
+-- 
+1.7.7.1
+
