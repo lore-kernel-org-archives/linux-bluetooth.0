@@ -1,32 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Tue, 1 Nov 2011 14:15:49 -0200
+Date: Tue, 1 Nov 2011 14:13:33 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: "Cho, Yu-Chen" <acho@suse.com>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, acho@novell.com, jlee@novell.com,
-	oneukum@suse.com, jlee@suse.com
-Subject: Re: [PATCH 1/3] add device entry for Broadcom Valentine combo card
-Message-ID: <20111101161549.GG2580@joana>
-References: <944af9667334f5677be87e89fe8f38486823cc95.1320139612.git.acho@suse.com>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: correct debug output
+Message-ID: <20111101161333.GF2580@joana>
+References: <1320070641-19126-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <944af9667334f5677be87e89fe8f38486823cc95.1320139612.git.acho@suse.com>
+In-Reply-To: <1320070641-19126-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yu-Chen,
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-10-31 16:17:21 +0200]:
 
-* Cho, Yu-Chen <acho@suse.com> [2011-11-01 17:33:05 +0800]:
-
-> This device declares itself to be vendor specific
-> It therefore needs to be added to the device table
-> to make btusb bind.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Signed-off-by: Cho, Yu-Chen <acho@suse.com>
+> l2cap_set_timer function prints sk instead of chan pointer.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  drivers/bluetooth/btusb.c |    4 ++++
->  1 files changed, 4 insertions(+), 0 deletions(-)
+>  net/bluetooth/l2cap_core.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-Ok, but where is the output of usb-devices that I asked. Thanks.
+Applied, thanks.
 
-	 Gustavo
+	Gustavo
