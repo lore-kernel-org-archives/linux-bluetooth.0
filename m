@@ -1,52 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 1 Nov 2011 15:47:57 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Ilia, Kolominsky" <iliak@ti.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Implementation of name-resolve procedures in mgmtops
-Message-ID: <20111101134757.GA13263@fusion.localdomain>
+From: "Ilia, Kolominsky" <iliak@ti.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+Date: Tue, 1 Nov 2011 14:37:54 +0100
+Subject: RE: Implementation of name-resolve procedures in mgmtops
+Message-ID: <AC090B9732AB2B4DB7FF476E907FE660013BAEC903@dnce02.ent.ti.com>
 References: <7769C83744F2C34A841232EF77AEA20C01DCC8D2B7@dnce01.ent.ti.com>
- <AC090B9732AB2B4DB7FF476E907FE660013BAEC903@dnce02.ent.ti.com>
+In-Reply-To: <7769C83744F2C34A841232EF77AEA20C01DCC8D2B7@dnce01.ent.ti.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AC090B9732AB2B4DB7FF476E907FE660013BAEC903@dnce02.ent.ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ilia,
+Hi
 
-On Tue, Nov 01, 2011, Ilia, Kolominsky wrote:
-> Maybe we should keep resolve_name() method, so the user will be able to
-> perform name resolution for a specific device without
-> triggering the whole discovery process? This will allow more flexibility
-> for the user.
-
-We haven't had that in the higher level (D-Bus API) so far and it's not
-planned to be added for 5.x either. The name gets refreshed
-automatically every time there's a connection to the device without the
-need of an explicit API for it.
-
-> > Each "unknown name" device that user-space tells the kernel about gets
-> > added to a list and once the currently ongoing inquiry finishes the
-> > kernel proceeds with trying to resolve the name for each device in the
-> > list, one at a time. For efficiency, this list should be sorted by
-> > strongest RSSI first so that devices which are with a higher likelihood
-> > closer to us get their names resolved first. The kernel will also wait
-> > a
-> > few seconds (2 sounds like an ok value?) if user space hasn't yet
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Johan Hedberg
+> Sent: Tuesday, November 01, 2011 12:07 PM
+> To: Ilia, Kolominsky
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: Implementation of name-resolve procedures in mgmtops
 > 
-> Do we really need to wait here? - if this is to allow human interaction
-> then 2 sec will be not enough anyway, if this is to allow the ack for
-> the last ( the assumption is that the user will decide whether to ack or
-> not on more or less sequential way ) discovered device, then,
-> 2 sec is an overkill, so 1 or even 0.5 I think may be enough.
+> Hi Ilia,
+> 
+> On Mon, Oct 31, 2011, Ilia, Kolominsky wrote:
+> > Could you please outline the intended mechanics for the new
+> > Name-resolve procedures in mgmtops?
+> > - What is the purpose of Confirm Name command?
+> > ( I see that you`d added it but not implemented )
+> > - What are the main differences in the mechanics between
+> > the hciops and mgmtops?
+> > - Are there any changes in user behavior?
+> 
+> We already discussed this on IRC, but I'll recap here so that it gets
+> stored in the mailing list archives. This way people can also correct
+> me
+> if I remember something wrong about what we agreed in Prague.
+> 
+> Regarding mgmtops vs hciops, the idea (as long as we hold on to hciops)
+> is that hciops roughly emulates what the kernel will do when accessed
+> through the mgmt interface. That also means that the adapter_ops API
+> should be modeled more or less according to the mgmt interface (e.g.
+> the
+> resolve_name callback needs to go and a confirm_name callback needs to
+> be added).
 
-It's for the later case (e.g. for inquiry results that come right before
-the inquiry complete event). The question then is, for a system under
-heavy load what is a reasonable expectation to schedule in bluetoothd,
-let it respond to the event and send the command and then schedule the
-part of the kernel that handles the command from from bluetoothd. Maybe
-1 second is enough, but there really isn't any single right answer for
-this.
+Maybe we should keep resolve_name() method, so the user will be able to
+perform name resolution for a specific device without
+triggering the whole discovery process? This will allow more flexibility
+for the user.
 
-Johan
+> 
+> During a device discovery session the kernel will set the (new) Confirm
+> Name field in mgmt_ev_device_found to 1 whenever the kernel doesn't
+> know
+> if know the name for that device or not. Upon receiving such an event
+> user-space (bluetoothd) will check its storage and respond with the
+> (new) Confirm Name command. The field in mgmt_ev_device found would be
+> set to 1 e.g. for any non-EIR inquiry result for a device we haven't
+> received a confirm_name command for previously (during the same
+> discovery session) and for any EIR result which doesn't contain a full
+> name.
+> 
+> Each "unknown name" device that user-space tells the kernel about gets
+> added to a list and once the currently ongoing inquiry finishes the
+> kernel proceeds with trying to resolve the name for each device in the
+> list, one at a time. For efficiency, this list should be sorted by
+> strongest RSSI first so that devices which are with a higher likelihood
+> closer to us get their names resolved first. The kernel will also wait
+> a
+> few seconds (2 sounds like an ok value?) if user space hasn't yet
+
+Do we really need to wait here? - if this is to allow human interaction
+then 2 sec will be not enough anyway, if this is to allow the ack for
+the last ( the assumption is that the user will decide whether to ack or
+not on more or less sequential way ) discovered device, then,
+2 sec is an overkill, so 1 or even 0.5 I think may be enough.
+
+> responded with a name confirmation for a device when inquiry finishes.
+> Once the list of names to be resolved is empty the device discovery is
+> deemed complete.
+> 
+> Johan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-
+> bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Regards, 
+Ilia
