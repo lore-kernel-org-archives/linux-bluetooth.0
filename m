@@ -1,53 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <7769C83744F2C34A841232EF77AEA20C01DCC8D347@dnce01.ent.ti.com>
-References: <7769C83744F2C34A841232EF77AEA20C01DCC8D2B7@dnce01.ent.ti.com>
-	<AC090B9732AB2B4DB7FF476E907FE660013BAEC903@dnce02.ent.ti.com>
-	<20111101134757.GA13263@fusion.localdomain>
-	<20111101135225.GA13355@fusion.localdomain>
-	<AC090B9732AB2B4DB7FF476E907FE660013BAEC932@dnce02.ent.ti.com>
-	<7769C83744F2C34A841232EF77AEA20C01DCC8D347@dnce01.ent.ti.com>
-Date: Tue, 1 Nov 2011 17:15:26 +0200
-Message-ID: <CABBYNZKC2PEDAqZ0beKWvga=_5N-9eHbHX3NSJZOtn9K-gUy4w@mail.gmail.com>
-Subject: Re: Implementation of name-resolve procedures in mgmtops
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "Ganir, Chen" <chen.ganir@ti.com>
-Cc: "Ilia, Kolominsky" <iliak@ti.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=US-ASCII
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix command complete/status for discovery commands
+Date: Tue,  1 Nov 2011 17:06:44 +0200
+Message-Id: <1320160004-2012-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Tue, Nov 1, 2011 at 4:11 PM, Ganir, Chen <chen.ganir@ti.com> wrote:
-> Ilia, Johan,
->
->> >
->> > Actually there are two more context switches involved which probably
->> > introduce the most latency into the whole procedure: each time
->> > bluetoothd gets a device_found event with confirm_name set to 1 it'll
->> > need to access the file-system in /var/lib/bluetooth to check if the
->> > name is stored there.
->>
->> Alright then, to be on the safe, let's do it 2 sec, my idea was
->> to finish the whole process asap. But since io is involved, 2 sec
->> seems to be a reasonable balance.
->> >
->> > Johan
->>
->
-> Please keep in mind that if you do it 2 seconds, that will cause a problem. In interleaved scanning, we need to scan for BR/EDR devices for ~5 seconds ( T_GAP_100/2), and then LE devices for 5 seconds. If we wait 2 seconds for timeout, this means 2 seconds in which we do nothing. This will mean that we need to scan for BR/EDR for 1 second, wait 2 seconds for ack, and then we will have about 2 more seconds for name requests for legacy devices. We need to think of a better solution here, which will coexist with interleaved device discovery.
+This patch adds the necessary code to send proper command status or
+command complete events to the start/stop discovery management commands.
+Before this patch these events were completely missing.
 
-I guess we can tweak the page timeout as someone suggested in the
-meeting, anyway I have a feeling interleaved might change in the
-future, IMO the interval is big enough to annoy people.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_event.c        |    2 ++
+ net/bluetooth/mgmt.c             |   27 +++++++++++++++++++++++++++
+ 3 files changed, 30 insertions(+), 0 deletions(-)
 
-> What if we start name requests immediately after the inquiry is complete, according to what is already pending for name request (what the user has already confirmed for name request), and allow the user to confirm the name request for more devices up until we complete the name request process and return the SCAN_COMPLETE event ? The SCAN_COMPLETE event will be sent once the pending names list is clear, or any other limit we decide.
-
-You mean in parallel with LE scan? I don't think this is possible
-since name request involve paging so the baseband should be busy.
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 119b795..c6a3715 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -884,6 +884,7 @@ int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
+ int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
+ 								u8 *eir);
+ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
++int mgmt_inquiry_failed(u16 index, u8 status);
+ int mgmt_discovering(u16 index, u8 discovering);
+ int mgmt_device_blocked(u16 index, bdaddr_t *bdaddr);
+ int mgmt_device_unblocked(u16 index, bdaddr_t *bdaddr);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 41967fe..d8fa657 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -979,6 +979,8 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ 	if (status) {
+ 		hci_req_complete(hdev, HCI_OP_INQUIRY, status);
+ 		hci_conn_check_pending(hdev);
++		if (test_bit(HCI_MGMT, &hdev->flags))
++			mgmt_inquiry_failed(hdev->id, status);
+ 		return;
+ 	}
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b086c69..1625646 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2349,8 +2349,35 @@ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name)
+ 	return mgmt_event(MGMT_EV_REMOTE_NAME, index, &ev, sizeof(ev), NULL);
+ }
+ 
++int mgmt_inquiry_failed(u16 index, u8 status)
++{
++	struct pending_cmd *cmd;
++	int err;
++
++	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, index);
++	if (!cmd)
++		return -ENOENT;
++
++	err = cmd_status(cmd->sk, index, cmd->opcode, status);
++	mgmt_pending_remove(cmd);
++
++	return err;
++}
++
+ int mgmt_discovering(u16 index, u8 discovering)
+ {
++	struct pending_cmd *cmd;
++
++	if (discovering)
++		cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, index);
++	else
++		cmd = mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, index);
++
++	if (cmd != NULL) {
++		cmd_complete(cmd->sk, index, cmd->opcode, NULL, 0);
++		mgmt_pending_remove(cmd);
++	}
++
+ 	return mgmt_event(MGMT_EV_DISCOVERING, index, &discovering,
+ 						sizeof(discovering), NULL);
+ }
 -- 
-Luiz Augusto von Dentz
+1.7.7
+
