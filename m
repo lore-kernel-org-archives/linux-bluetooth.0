@@ -1,42 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Tsai, Mike" <miketsai@qca.qualcomm.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Multiple instances of same characteristics (was: Re: GATT Dbus
- API on BlueZ - attirbute-api.txt modifications)
-Date: Tue, 1 Nov 2011 20:15:24 +0000
-Message-ID: <BA94D6E7A9DD214BBCA409912857AA69012F1F9E@nasanexd02d.na.qualcomm.com>
-References: <CAKT1EBevp9_bygG8UNO6fj-nU8_C3HDfjOQBRrhMqJij103tBw@mail.gmail.com>
-In-Reply-To: <CAKT1EBevp9_bygG8UNO6fj-nU8_C3HDfjOQBRrhMqJij103tBw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1320062340.15441.265.camel@aeonflux>
+References: <1319806804-12230-1-git-send-email-dh.herrmann@googlemail.com>
+	<1320062340.15441.265.camel@aeonflux>
+Date: Tue, 1 Nov 2011 20:59:57 +0100
+Message-ID: <CANq1E4Tn-_2LiuAyxhVuTQ0_i14NJzq_zZD3CvnCo1-71nC68A@mail.gmail.com>
+Subject: Re: [RFC 0/4] Fix hci_dev ref-counts
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgQ2xhdWRpbywNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IENsYXVkaW8g
-VGFrYWhhc2kgW21haWx0bzpjbGF1ZGlvLnRha2FoYXNpQG9wZW5ib3NzYS5vcmddIA0KU2VudDog
-TW9uZGF5LCBPY3RvYmVyIDMxLCAyMDExIDQ6MTEgUE0NClRvOiBUc2FpLCBNaWtlDQpDYzogbGlu
-dXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogTXVsdGlwbGUgaW5zdGFuY2Vz
-IG9mIHNhbWUgY2hhcmFjdGVyaXN0aWNzICh3YXM6IFJlOiBHQVRUIERidXMgQVBJIG9uIEJsdWVa
-IC0gYXR0aXJidXRlLWFwaS50eHQgbW9kaWZpY2F0aW9ucykNCg0KSGkgTWlrZSwNCg0KPiBbTVRd
-SG93IGNhbiB0aGlzIGhhbmRsZSB0aGUgbXVsdGlwbGUgaW5zdGFuY2VzIG9mIHNhbWUgY2hhcmFj
-dGVyaXN0aWNzIHdpdGhpbiBhIHNpbmdsZSBzZXJ2aWNlPyBUaGUgY2hhcmFjdGVyaXN0aWMgVVVJ
-RCB3aWxsIG5vdCBiZSB1bmlxdWUgaW4gdGhhdCBjYXNlLiBBbHNvLCBob3cgaXMgdGhlIHByb2Zp
-bGUgc3BlY2lmaWMgY2hhcmFjdGVyaXN0aWMgZGVzY3JpcHRvciBoYW5kbGVkPw0KPg0KPiBDaGVl
-cnMsDQo+DQo+IE1pa2UNCg0KSSBhbSBtb3ZpbmcgeW91ciBxdWVzdGlvbiB0byBhbm90aGVyIHRo
-cmVhZC4gVGhlIG9yaWdpbmFsIHRocmVhZCBpcyBhbG1vc3QgaW1wb3NzaWJsZSB0byBmb2xsb3cu
-DQpEbyB5b3UgbWVhbiBzdXBwb3J0IGZvciBjbGllbnQgY2hhcmFjdGVyaXN0aWMgY29uZmlndXJh
-dGlvbiBhbmQgb3RoZXIgY2hhcmFjdGVyaXN0aWNzIHBlciBkZXZpY2U/DQoNCkluIHRoZSBHZW5l
-cmljIEF0dHJpYnV0ZSBBUEkoY2xpZW50KSwgdGhlIHJlcHJlc2VudGVkIGNoYXJhY3RlcmlzdGlj
-cyBhcmUgYWx3YXlzIHBlciBkZXZpY2UuIFRoZSBhYnN0cmFjdGlvbiBmb3IgcGVyIGRldmljZSBj
-aGFyYWN0ZXJpc3RpYyB2YWx1ZSBuZWVkcyB0byBpbXBsZW1lbnRlZCBpbiB0aGUgc2VydmVyLg0K
-VGhlIGN1cnJlbnQgYXR0cmlidXRlIHNlcnZlciBzdXBwb3J0cyBDQ0Mgb25seSwgYmVmb3JlIGlt
-cGxlbWVudGluZyBwZXIgZGV2aWNlIGNoYXJhY3RlcmlzdGljcyB3ZSBuZWVkIHRvIGNsZWFudXAg
-dGhlIGNvZGUuDQoNCltNVF1ZZXMsIEkgdGhpbmsgYmx1ZVogY2FuIGhhbmRsZSB0aGUgbXVsdGlw
-bGUgZGV2aWNlcyB3aXRoIHNhbWUgc2VydmljZSBiYXNlZCBvbiBpdHMgaW5oZXJlbnQgZGV2aWNl
-IGFyY2hpdGVjdHVyZS4gVGhlIHF1ZXN0aW9uIHdhcyByZWdhcmRpbmcgdGhlIHNhbWUgY2hhcmFj
-dGVyaXN0aWNzIHdpdGhpbiBhIHNpbmdsZSBzZXJ2aWNlIGluIGEgc2luZ2xlIGRldmljZS4gQmFz
-ZWQgb24gQW5kZXJzb24ncyBhbnN3ZXIsIEkgdGhpbmsgdGhlIHByb2JsZW0gaXMgYWxzbyByZXNv
-bHZlZC4NCg0KVGhlIHByb2ZpbGUgc3BlY2lmaWMgZGVzY3JpcHRvcnMgKGluIGF1dG9tYXRpb24g
-YW5kIGluIEhJRCBzZXJ2aWNlcykgd2lsbCBuZWVkIHRvIGJlIGFkZHJlc3NlZCBsYXRlciwNCg0K
-QlIsDQoNCk1pa2UNCg0KQlIsDQpDbGF1ZGlvLg0K
+On Mon, Oct 31, 2011 at 12:58 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi David,
+>
+>> We currently have two reference counters for each hci_dev. This patchset tries
+>> to reduce this to one ref-count and fix several bugs with them. The two
+>> available ref-counts currently are:
+>>
+>> 1) hci_dev->dev internal
+>> This ref-count is increased by hci_alloc_dev() and decreased inside
+>> hci_free_dev(). No other code currently uses this refcount. It can be set with
+>> get_device() and put_device().
+>> When this ref-count drops zero, then the hci_dev structure is deallocated (see
+>> bt_link_release inside hci_sysfs.c), hence, this ref-count is the most important
+>> one. However, we currently do not use it correctly.
+>>
+>> 2) hci_dev->refcnt
+>> This ref-count is used inside hci_dev_hold/put() and practically used as if it
+>> would protect the hci_dev structure. However, if this ref-count drops zero, then
+>> the ->destruct callback is called which is used by all drivers *exclusively* to
+>> deallocate driver structures and *not* to deallocate or destroy the hci_dev.
+>
+> actually I think we should convert the tasklets into one workqueue first
+> and then integrate deeper into sysfs before trying to hack around this
+> problem.
+
+I am currently playing around with several patches for that but I
+still need to get away from that single-threaded workqueue as it is
+quite ugly.
+
+> Our core driver registration code is from the 2.4 series and needs major
+> updating. The sysfs code is glued on top of it and not really well
+> integrated. So fixing that one properly might make some of these race
+> conditions go away.
+
+Ok. I'll will reconsider sending a new RFC when we fixed the workqueue
+stuff. As our system is a simple bus-system, it shouldn't be too hard
+to do that.
+
+> Regards
+>
+> Marcel
+
+Regards
+David
