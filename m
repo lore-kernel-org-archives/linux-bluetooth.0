@@ -1,52 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Cho, Yu-Chen" <acho@suse.com>
-To: marcel@holtmann.org,
-	padovan@profusion.mobi,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: acho@novell.com,
-	jlee@novell.com,
-	oneukum@suse.com,
-	acho@suse.com,
-	jlee@suse.com
-Subject: [PATCH 2/3] fix device id for Broadcom SoftSailing
-Date: Tue,  1 Nov 2011 17:33:06 +0800
-Message-Id: <441ba580885def5ff35d1172e265566c1870a60c.1320139612.git.acho@suse.com>
-In-Reply-To: <944af9667334f5677be87e89fe8f38486823cc95.1320139612.git.acho@suse.com>
-References: <944af9667334f5677be87e89fe8f38486823cc95.1320139612.git.acho@suse.com>
-In-Reply-To: <944af9667334f5677be87e89fe8f38486823cc95.1320139612.git.acho@suse.com>
-References: <944af9667334f5677be87e89fe8f38486823cc95.1320139612.git.acho@suse.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 7/7] Bluetooth: use buffer priority to mark URB_ISO_ASAP flag
+Date: Tue,  1 Nov 2011 10:59:02 +0200
+Message-Id: <1320137942-25780-7-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1320137942-25780-1-git-send-email-luiz.dentz@gmail.com>
+References: <1320137942-25780-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fixed the device VID:PID typo 05ac:21e1 to 0a5c:21e1
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Signed-off-by: Cho, Yu-Chen <acho@suse.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- drivers/bluetooth/btusb.c |    5 ++---
- 1 files changed, 2 insertions(+), 3 deletions(-)
+ drivers/bluetooth/btusb.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index be01260..8583aee 100644
+index abfc4ee..9db2476 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -60,9 +60,6 @@ static struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
- 	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
+@@ -727,6 +727,9 @@ static int btusb_send_frame(struct sk_buff *skb)
+ 		usb_fill_bulk_urb(urb, data->udev, pipe,
+ 				skb->data, skb->len, btusb_tx_complete, skb);
  
--	/* Broadcom SoftSailing reporting vendor specific */
--	{ USB_DEVICE(0x05ac, 0x21e1) },
--
- 	/* Apple MacBookPro 7,1 */
- 	{ USB_DEVICE(0x05ac, 0x8213) },
- 
-@@ -98,6 +95,8 @@ static struct usb_device_id btusb_table[] = {
- 	{ USB_DEVICE(0x0bdb, 0x1002) },
- 
- 	/* Broadcom 20702 Bluetooth 4.0 Adapter */
-+	/* Broadcom SoftSailing reporting vendor specific */
-+	{ USB_DEVICE(0x0a5c, 0x21e1) },
- 	/* Broadcom Valentine 802.11bgn 1x1 Combo HMC */
- 	{ USB_DEVICE(0x0a5c, 0x21e3) },
++		if (skb->priority >= HCI_PRIO_MAX - 1)
++			urb->transfer_flags  = URB_ISO_ASAP;
++
+ 		hdev->stat.acl_tx++;
+ 		break;
  
 -- 
-1.7.3.4
+1.7.6.4
+
