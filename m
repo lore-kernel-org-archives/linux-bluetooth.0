@@ -9,37 +9,31 @@ Cc: acho@novell.com,
 	oneukum@suse.com,
 	acho@suse.com,
 	jlee@suse.com
-Subject: [PATCH 3/3] add device entry for other Broadcom combo card
-Date: Tue,  1 Nov 2011 17:33:07 +0800
-Message-Id: <6842576afea60f36a866fbf5000195c8cafb99f3.1320139612.git.acho@suse.com>
-In-Reply-To: <944af9667334f5677be87e89fe8f38486823cc95.1320139612.git.acho@suse.com>
-References: <944af9667334f5677be87e89fe8f38486823cc95.1320139612.git.acho@suse.com>
-In-Reply-To: <944af9667334f5677be87e89fe8f38486823cc95.1320139612.git.acho@suse.com>
-References: <944af9667334f5677be87e89fe8f38486823cc95.1320139612.git.acho@suse.com>
+Subject: [PATCH 1/3] add device entry for Broadcom Valentine combo card
+Date: Tue,  1 Nov 2011 17:33:05 +0800
+Message-Id: <944af9667334f5677be87e89fe8f38486823cc95.1320139612.git.acho@suse.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Those devices declare themselves to be vendor specific
+This device declares itself to be vendor specific
 It therefore needs to be added to the device table
 to make btusb bind.
 
 Signed-off-by: Cho, Yu-Chen <acho@suse.com>
 ---
- drivers/bluetooth/btusb.c |    6 ++++++
- 1 files changed, 6 insertions(+), 0 deletions(-)
+ drivers/bluetooth/btusb.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 8583aee..bc8f850 100644
+index abfc4ee..be01260 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -100,6 +100,12 @@ static struct usb_device_id btusb_table[] = {
- 	/* Broadcom Valentine 802.11bgn 1x1 Combo HMC */
- 	{ USB_DEVICE(0x0a5c, 0x21e3) },
+@@ -97,6 +97,10 @@ static struct usb_device_id btusb_table[] = {
+ 	/* Ericsson with non-standard id */
+ 	{ USB_DEVICE(0x0bdb, 0x1002) },
  
-+	{ USB_DEVICE(0x03f0, 0x2a1d) },
-+	{ USB_DEVICE(0x03f0, 0x231d) },
-+
-+	/* BCM2070 Bluetooth 2.1 + EDR */
-+	{ USB_DEVICE(0x0a5c, 0x21b4) },
++	/* Broadcom 20702 Bluetooth 4.0 Adapter */
++	/* Broadcom Valentine 802.11bgn 1x1 Combo HMC */
++	{ USB_DEVICE(0x0a5c, 0x21e3) },
 +
  	/* Canyon CN-BTU1 with HID interfaces */
  	{ USB_DEVICE(0x0c10, 0x0000) },
