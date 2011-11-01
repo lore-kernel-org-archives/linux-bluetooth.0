@@ -1,64 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Tsai, Mike" <miketsai@qca.qualcomm.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>,
-	"Ganir, Chen" <chen.ganir@ti.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Subject: RE: Multiple instances of same characteristics (was: Re: GATT Dbus
  API on BlueZ - attirbute-api.txt modifications)
-Date: Tue, 1 Nov 2011 20:21:47 +0000
-Message-ID: <BA94D6E7A9DD214BBCA409912857AA69012F1FB3@nasanexd02d.na.qualcomm.com>
+Date: Tue, 1 Nov 2011 20:15:24 +0000
+Message-ID: <BA94D6E7A9DD214BBCA409912857AA69012F1F9E@nasanexd02d.na.qualcomm.com>
 References: <CAKT1EBevp9_bygG8UNO6fj-nU8_C3HDfjOQBRrhMqJij103tBw@mail.gmail.com>
- <CAJdJm_N-8b+FD8LSfeT3zhby5_WL7=-TWSTfAyZukqFDEzEHwA@mail.gmail.com>
-In-Reply-To: <CAJdJm_N-8b+FD8LSfeT3zhby5_WL7=-TWSTfAyZukqFDEzEHwA@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <CAKT1EBevp9_bygG8UNO6fj-nU8_C3HDfjOQBRrhMqJij103tBw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
-
-
------Original Message-----
-From: Anderson Lizardo [mailto:anderson.lizardo@openbossa.org] 
-Sent: Tuesday, November 01, 2011 3:57 AM
-To: Claudio Takahasi
-Cc: Tsai, Mike; linux-bluetooth@vger.kernel.org; Vijaykumar Dadmode; Ganir, Chen
-Subject: Re: Multiple instances of same characteristics (was: Re: GATT Dbus API on BlueZ - attirbute-api.txt modifications)
-
-Hi Mike,
-
->> [MT]How can this handle the multiple instances of same characteristics within a single service? The characteristic UUID will not be unique in that case.
-
-In BlueZ GATT services are represented by a D-Bus object path, in the format:
-
-<device-path>/service<handle1>/characteristic<handle2>
-
-Where <device-path> is a path specific to a device connected to a adapter (there can be multiple adapters on the same host), and <handle1>/<handle2> are attribute handles for the service and characteristic declarations, respectively.
-
-Example:
-
-/org/bluez/2161/hci0/dev_00_02_5B_00_D5_D0/service0001/characteristic000a
-
-So, even if you have multiple characteristics with same UUID, they will have different declaration handles, and thus different object paths in D-Bus.
-
-[MT]Thanks, that answers my question. Profile actually gets both characteristic UUID and Attribute handle during discovery, not just the UUID. Profile may either set property or read/write specific characteristic based on the combination of UUID+Attribute handle, not just the UUID. We should make sure that is also true to the new API and probably update the text inside attribute_api.text.
-
->> Also, how is the profile specific characteristic descriptor handled?
-
-I think Chen's proposal does not address this. But there was another proposal sent by Vijaykumar Dadmode on Oct 4th (subject "Proposal for GATT Client Dbus API") to this list where it was handling profile-specific descriptors. We made some comments on it, and we are waiting for an updated proposal.
-
-We need to consolidate at least these two proposals: Chen's and Vijaykumar's.
-
-[MT]Yes, this is required for upcoming profile/service like HID and Automation,
-
-Regards,
-
-Mike
-
-Regards,
---
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+SGkgQ2xhdWRpbywNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IENsYXVkaW8g
+VGFrYWhhc2kgW21haWx0bzpjbGF1ZGlvLnRha2FoYXNpQG9wZW5ib3NzYS5vcmddIA0KU2VudDog
+TW9uZGF5LCBPY3RvYmVyIDMxLCAyMDExIDQ6MTEgUE0NClRvOiBUc2FpLCBNaWtlDQpDYzogbGlu
+dXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogTXVsdGlwbGUgaW5zdGFuY2Vz
+IG9mIHNhbWUgY2hhcmFjdGVyaXN0aWNzICh3YXM6IFJlOiBHQVRUIERidXMgQVBJIG9uIEJsdWVa
+IC0gYXR0aXJidXRlLWFwaS50eHQgbW9kaWZpY2F0aW9ucykNCg0KSGkgTWlrZSwNCg0KPiBbTVRd
+SG93IGNhbiB0aGlzIGhhbmRsZSB0aGUgbXVsdGlwbGUgaW5zdGFuY2VzIG9mIHNhbWUgY2hhcmFj
+dGVyaXN0aWNzIHdpdGhpbiBhIHNpbmdsZSBzZXJ2aWNlPyBUaGUgY2hhcmFjdGVyaXN0aWMgVVVJ
+RCB3aWxsIG5vdCBiZSB1bmlxdWUgaW4gdGhhdCBjYXNlLiBBbHNvLCBob3cgaXMgdGhlIHByb2Zp
+bGUgc3BlY2lmaWMgY2hhcmFjdGVyaXN0aWMgZGVzY3JpcHRvciBoYW5kbGVkPw0KPg0KPiBDaGVl
+cnMsDQo+DQo+IE1pa2UNCg0KSSBhbSBtb3ZpbmcgeW91ciBxdWVzdGlvbiB0byBhbm90aGVyIHRo
+cmVhZC4gVGhlIG9yaWdpbmFsIHRocmVhZCBpcyBhbG1vc3QgaW1wb3NzaWJsZSB0byBmb2xsb3cu
+DQpEbyB5b3UgbWVhbiBzdXBwb3J0IGZvciBjbGllbnQgY2hhcmFjdGVyaXN0aWMgY29uZmlndXJh
+dGlvbiBhbmQgb3RoZXIgY2hhcmFjdGVyaXN0aWNzIHBlciBkZXZpY2U/DQoNCkluIHRoZSBHZW5l
+cmljIEF0dHJpYnV0ZSBBUEkoY2xpZW50KSwgdGhlIHJlcHJlc2VudGVkIGNoYXJhY3RlcmlzdGlj
+cyBhcmUgYWx3YXlzIHBlciBkZXZpY2UuIFRoZSBhYnN0cmFjdGlvbiBmb3IgcGVyIGRldmljZSBj
+aGFyYWN0ZXJpc3RpYyB2YWx1ZSBuZWVkcyB0byBpbXBsZW1lbnRlZCBpbiB0aGUgc2VydmVyLg0K
+VGhlIGN1cnJlbnQgYXR0cmlidXRlIHNlcnZlciBzdXBwb3J0cyBDQ0Mgb25seSwgYmVmb3JlIGlt
+cGxlbWVudGluZyBwZXIgZGV2aWNlIGNoYXJhY3RlcmlzdGljcyB3ZSBuZWVkIHRvIGNsZWFudXAg
+dGhlIGNvZGUuDQoNCltNVF1ZZXMsIEkgdGhpbmsgYmx1ZVogY2FuIGhhbmRsZSB0aGUgbXVsdGlw
+bGUgZGV2aWNlcyB3aXRoIHNhbWUgc2VydmljZSBiYXNlZCBvbiBpdHMgaW5oZXJlbnQgZGV2aWNl
+IGFyY2hpdGVjdHVyZS4gVGhlIHF1ZXN0aW9uIHdhcyByZWdhcmRpbmcgdGhlIHNhbWUgY2hhcmFj
+dGVyaXN0aWNzIHdpdGhpbiBhIHNpbmdsZSBzZXJ2aWNlIGluIGEgc2luZ2xlIGRldmljZS4gQmFz
+ZWQgb24gQW5kZXJzb24ncyBhbnN3ZXIsIEkgdGhpbmsgdGhlIHByb2JsZW0gaXMgYWxzbyByZXNv
+bHZlZC4NCg0KVGhlIHByb2ZpbGUgc3BlY2lmaWMgZGVzY3JpcHRvcnMgKGluIGF1dG9tYXRpb24g
+YW5kIGluIEhJRCBzZXJ2aWNlcykgd2lsbCBuZWVkIHRvIGJlIGFkZHJlc3NlZCBsYXRlciwNCg0K
+QlIsDQoNCk1pa2UNCg0KQlIsDQpDbGF1ZGlvLg0K
