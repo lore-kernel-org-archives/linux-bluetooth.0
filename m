@@ -1,42 +1,223 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 Nov 2011 17:21:53 +0200
+Date: Wed, 2 Nov 2011 17:20:14 +0200
 From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Mat Martineau <mathewm@codeaurora.org>, linux-bluetooth@vger.kernel.org,
-	padovan@profusion.mobi, pkrystad@codeaurora.org
-Subject: Re: [PATCHv3 0/9] AMP interface and signal framework
-Message-ID: <20111102152151.GC779@aemeltch-MOBL1>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	pkrystad@codeaurora.org
+Subject: Re: [PATCHv3 8/9] Bluetooth: Add signal handlers for channel moves
+Message-ID: <20111102152011.GB779@aemeltch-MOBL1>
 References: <1320186568-25493-1-git-send-email-mathewm@codeaurora.org>
- <1320215016.15441.268.camel@aeonflux>
+ <1320186568-25493-9-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320215016.15441.268.camel@aeonflux>
+In-Reply-To: <1320186568-25493-9-git-send-email-mathewm@codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
-
-On Wed, Nov 02, 2011 at 07:23:35AM +0100, Marcel Holtmann wrote:
-> Hi Mat,
+On Tue, Nov 01, 2011 at 03:29:27PM -0700, Mat Martineau wrote:
+> AMP channels can be moved between BR/EDR and AMP controllers using a
+> sequence of signals. Every attempted channel move involves a series of
+> four signals:
 > 
-> > This patch set includes the AMP policy socket option that was
-> > previously discussed and accepted in to bluetooth-testing, and the
-> > signaling framework for AMP channel creation and AMP channel moves.
+>    Move Initiator                 Move Responder
+>         |                                 |
+>         |       Move Channel Request      |
+>         |  ---------------------------->  |
+>         |                                 |
+>         |       Move Channel Response     |
+>         |  <----------------------------  |
+>         |                                 |
+>         |       Move Channel Confirm      |
+>         |  ---------------------------->  |
+>         |                                 |
+>         |  Move Channel Confirm Response  |
+> 	|  <----------------------------  |
 > 
-> the whole patch series looks good to me, besides one minor coding style
-> damage that I will point out ;)
+> All four signals are sent even if the move fails.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/l2cap_core.c |  141 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 141 insertions(+), 0 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index b27b061..152ca66 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -3146,6 +3146,130 @@ static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
+>  	return l2cap_connect_rsp(conn, cmd, data);
+>  }
+>  
+> +static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
+> +				u16 icid, u16 result)
+> +{
+> +	struct l2cap_move_chan_rsp rsp;
+> +
+> +	BT_DBG("icid %d, result %d", icid, result);
+> +
+> +	rsp.icid = cpu_to_le16(icid);
+> +	rsp.result = cpu_to_le16(result);
+> +
+> +	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_RSP, sizeof(rsp), &rsp);
+> +}
+> +
+> +static void l2cap_send_move_chan_cfm(struct l2cap_conn *conn,
+> +				struct l2cap_chan *chan, u16 icid, u16 result)
+> +{
+> +	struct l2cap_move_chan_cfm cfm;
+> +	u8 ident;
+> +
+> +	BT_DBG("icid %d, result %d", icid, result);
+> +
+> +	ident = l2cap_get_ident(conn);
+> +	if (chan)
+> +		chan->ident = ident;
+> +
+> +	cfm.icid = cpu_to_le16(icid);
+> +	cfm.result = cpu_to_le16(result);
+> +
+> +	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM, sizeof(cfm), &cfm);
+> +}
+> +
+> +static void l2cap_send_move_chan_cfm_rsp(struct l2cap_conn *conn, u8 ident,
+> +					u16 icid)
 
-and ack from me, besides minor style issues.
+Shall the last argument be aligned right?
+
+> +{
+> +	struct l2cap_move_chan_cfm_rsp rsp;
+> +
+> +	BT_DBG("icid %d", icid);
+> +
+> +	rsp.icid = cpu_to_le16(icid);
+> +	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM_RSP, sizeof(rsp), &rsp);
+> +}
+> +
+> +static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
+> +					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
+> +					void *data)
+
+Maybe matter of taste but could those 3 lines be reduced to 2 here and
+below?
 
 Best regards 
 Andrei Emeltchenko 
 
+> +{
+> +	struct l2cap_move_chan_req *req = data;
+> +	u16 icid = 0;
+> +	u16 result = L2CAP_MR_NOT_ALLOWED;
+> +
+> +	if (cmd_len != sizeof(*req))
+> +		return -EPROTO;
+> +
+> +	icid = le16_to_cpu(req->icid);
+> +
+> +	BT_DBG("icid %d, dest_amp_id %d", icid, req->dest_amp_id);
+> +
+> +	if (!enable_hs)
+> +		return -EINVAL;
+> +
+> +	/* Placeholder: Always refuse */
+> +	l2cap_send_move_chan_rsp(conn, cmd->ident, icid, result);
+> +
+> +	return 0;
+> +}
+> +
+> +static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
+> +					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
+> +					void *data)
+> +{
+> +	struct l2cap_move_chan_rsp *rsp = data;
+> +	u16 icid, result;
+> +
+> +	if (cmd_len != sizeof(*rsp))
+> +		return -EPROTO;
+> +
+> +	icid = le16_to_cpu(rsp->icid);
+> +	result = le16_to_cpu(rsp->result);
+> +
+> +	BT_DBG("icid %d, result %d", icid, result);
+> +
+> +	/* Placeholder: Always unconfirmed */
+> +	l2cap_send_move_chan_cfm(conn, NULL, icid, L2CAP_MC_UNCONFIRMED);
+> +
+> +	return 0;
+> +}
+> +
+> +static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
+> +					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
+> +					void *data)
+> +{
+> +	struct l2cap_move_chan_cfm *cfm = data;
+> +	u16 icid, result;
+> +
+> +	if (cmd_len != sizeof(*cfm))
+> +		return -EPROTO;
+> +
+> +	icid = le16_to_cpu(cfm->icid);
+> +	result = le16_to_cpu(cfm->result);
+> +
+> +	BT_DBG("icid %d, result %d", icid, result);
+> +
+> +	l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
+> +
+> +	return 0;
+> +}
+> +
+> +static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
+> +					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
+> +					void *data)
+> +{
+> +	struct l2cap_move_chan_cfm_rsp *rsp = data;
+> +	u16 icid;
+> +
+> +	if (cmd_len != sizeof(*rsp))
+> +		return -EPROTO;
+> +
+> +	icid = le16_to_cpu(rsp->icid);
+> +
+> +	BT_DBG("icid %d", icid);
+> +
+> +	return 0;
+> +}
+> +
+>  static inline int l2cap_check_conn_param(u16 min, u16 max, u16 latency,
+>  							u16 to_multiplier)
+>  {
+> @@ -3266,6 +3390,23 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
+>  		err = l2cap_create_channel_rsp(conn, cmd, data);
+>  		break;
+>  
+> +	case L2CAP_MOVE_CHAN_REQ:
+> +		err = l2cap_move_channel_req(conn, cmd, cmd_len, data);
+> +		break;
+> +
+> +	case L2CAP_MOVE_CHAN_RSP:
+> +		err = l2cap_move_channel_rsp(conn, cmd, cmd_len, data);
+> +		break;
+> +
+> +	case L2CAP_MOVE_CHAN_CFM:
+> +		err = l2cap_move_channel_confirm(conn, cmd, cmd_len, data);
+> +		break;
+> +
+> +	case L2CAP_MOVE_CHAN_CFM_RSP:
+> +		err = l2cap_move_channel_confirm_rsp(conn, cmd, cmd_len, data);
+> +		break;
+> +
+> +
+>  	default:
+>  		BT_ERR("Unknown BR/EDR signaling command 0x%2.2x", cmd->code);
+>  		err = -EINVAL;
+> -- 
+> 1.7.7.1
 > 
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> --
+> Mat Martineau
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 > 
-> Btw. once I acked a patch, feel free to carry that ack after your signed
-> of by line (if you have to an updated version). Makes it easier for
-> Gustavo to apply patches.
-> 
-> Regards
-> 
-> Marcel
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
