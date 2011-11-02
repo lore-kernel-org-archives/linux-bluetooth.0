@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 8/8] ftp: fix coding style
-Date: Wed,  2 Nov 2011 15:09:55 +0200
-Message-Id: <1320239395-29819-8-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 7/8] ftp: remove pcsuite code
+Date: Wed,  2 Nov 2011 15:09:54 +0200
+Message-Id: <1320239395-29819-7-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1320239395-29819-1-git-send-email-luiz.dentz@gmail.com>
 References: <1320239395-29819-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,57 +11,85 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Make use of tabs instead of spaces
 ---
- plugins/ftp.c |   30 +++++++++++++++---------------
- 1 files changed, 15 insertions(+), 15 deletions(-)
+ plugins/ftp.c |   55 -------------------------------------------------------
+ 1 files changed, 0 insertions(+), 55 deletions(-)
 
 diff --git a/plugins/ftp.c b/plugins/ftp.c
-index 30edc6b..0586326 100644
+index aebe411..30edc6b 100644
 --- a/plugins/ftp.c
 +++ b/plugins/ftp.c
-@@ -358,26 +358,26 @@ done:
+@@ -95,70 +95,15 @@
+   </attribute>								\
+ </record>"
  
- static gboolean is_valid_path(const char *path)
+-#define PCSUITE_CHANNEL 24
+-#define PCSUITE_WHO_SIZE 8
+-
+-#define PCSUITE_RECORD "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>	\
+-<record>								\
+-  <attribute id=\"0x0001\">						\
+-    <sequence>								\
+-      <uuid value=\"00005005-0000-1000-8000-0002ee000001\"/>		\
+-    </sequence>								\
+-  </attribute>								\
+-									\
+-  <attribute id=\"0x0004\">						\
+-    <sequence>								\
+-      <sequence>							\
+-        <uuid value=\"0x0100\"/>					\
+-      </sequence>							\
+-      <sequence>							\
+-        <uuid value=\"0x0003\"/>					\
+-        <uint8 value=\"%u\" name=\"channel\"/>				\
+-      </sequence>							\
+-      <sequence>							\
+-        <uuid value=\"0x0008\"/>					\
+-      </sequence>							\
+-    </sequence>								\
+-  </attribute>								\
+-									\
+-  <attribute id=\"0x0005\">						\
+-    <sequence>								\
+-      <uuid value=\"0x1002\"/>						\
+-    </sequence>								\
+-  </attribute>								\
+-									\
+-  <attribute id=\"0x0009\">						\
+-    <sequence>								\
+-      <sequence>							\
+-        <uuid value=\"00005005-0000-1000-8000-0002ee000001\"/>		\
+-        <uint16 value=\"0x0100\" name=\"version\"/>			\
+-      </sequence>							\
+-    </sequence>								\
+-  </attribute>								\
+-									\
+-  <attribute id=\"0x0100\">						\
+-    <text value=\"%s\" name=\"name\"/>					\
+-  </attribute>								\
+-</record>"
+-
+ static const uint8_t FTP_TARGET[TARGET_SIZE] = {
+ 			0xF9, 0xEC, 0x7B, 0xC4, 0x95, 0x3C, 0x11, 0xD2,
+ 			0x98, 0x4E, 0x52, 0x54, 0x00, 0xDC, 0x9E, 0x09 };
+ 
+-static const uint8_t PCSUITE_WHO[PCSUITE_WHO_SIZE] = {
+-			'P', 'C', ' ', 'S', 'u', 'i', 't', 'e' };
+-
+ struct ftp_session {
+ 	struct obex_session *os;
+ 	char *folder;
+ };
+ 
+-struct pcsuite_session {
+-	struct ftp_session *ftp;
+-	char *lock_file;
+-	int fd;
+-};
+-
+ static void set_folder(struct ftp_session *ftp, const char *new_folder)
  {
--        gchar **elements, **cur;
--        int depth = 0;
-+	gchar **elements, **cur;
-+	int depth = 0;
- 
--        elements = g_strsplit(path, "/", 0);
-+	elements = g_strsplit(path, "/", 0);
- 
--        for (cur = elements; *cur != NULL; cur++) {
--                if (**cur == '\0' || strcmp(*cur, ".") == 0)
--                        continue;
-+	for (cur = elements; *cur != NULL; cur++) {
-+		if (**cur == '\0' || strcmp(*cur, ".") == 0)
-+			continue;
- 
--                if (strcmp(*cur, "..") == 0) {
--                        depth--;
--                        if (depth < 0)
--                                break;
--                        continue;
--                }
-+		if (strcmp(*cur, "..") == 0) {
-+			depth--;
-+			if (depth < 0)
-+				break;
-+			continue;
-+		}
- 
--                depth++;
--        }
-+		depth++;
-+	}
- 
--        g_strfreev(elements);
-+	g_strfreev(elements);
- 
- 	if (depth < 0)
- 		return FALSE;
+ 	DBG("%p folder %s", ftp, new_folder);
 -- 
 1.7.6.4
 
