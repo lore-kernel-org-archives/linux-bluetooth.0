@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 09/20] Bluetooth: A2MP: process A2MP messages
-Date: Wed,  2 Nov 2011 16:02:37 +0200
-Message-Id: <1320242568-372-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv0 15/20] Bluetooth: A2MP: process A2MP Get AMP Assoc Request
+Date: Wed,  2 Nov 2011 16:02:43 +0200
+Message-Id: <1320242568-372-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1320242568-372-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1320242568-372-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,88 +11,50 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Implement basic processing for AMP Manager Protocol (A2MP).
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   57 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 56 insertions(+), 1 deletions(-)
+ net/bluetooth/a2mp.c |   20 ++++++++++++++++++++
+ 1 files changed, 20 insertions(+), 0 deletions(-)
 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index afb01e8..5071acc 100644
+index af3f2db..3e06c93 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -71,6 +71,61 @@ static void a2mp_send(struct socket *a2mp_sock, u8 code, u8 ident, u16 len,
- 	kfree(cmd);
+@@ -212,6 +212,23 @@ static inline int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
  }
  
-+/* Handle A2MP signalling */
-+void a2mp_receive(struct sock *sk, struct sk_buff *skb)
++static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
++							struct a2mp_cmd *hdr)
 +{
-+	struct a2mp_cmd *hdr = (struct a2mp_cmd *) skb->data;
-+	struct amp_mgr *mgr;
-+	int err = 0;
++	struct a2mp_amp_assoc_req *req =
++				(struct a2mp_amp_assoc_req *)skb->data;
 +
-+	mgr = get_amp_mgr_sk(sk);
-+	if (!mgr)
-+		return;
++	if (le16_to_cpu(hdr->len) < sizeof(*req))
++		return -EINVAL;
 +
-+	while (skb->len >= sizeof(*hdr)) {
-+		struct a2mp_cmd *hdr = (struct a2mp_cmd *) skb->data;
-+		u16 len = le16_to_cpu(hdr->len);
++	BT_DBG("id %d", req->id);
 +
-+		BT_DBG("code 0x%02x id %d len %d", hdr->code, hdr->ident, len);
++	/* TODO send A2MP_GETAMPASSOC_RSP */
 +
-+		skb_pull(skb, sizeof(*hdr));
-+
-+		if (len > skb->len || !hdr->ident) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
-+		switch (hdr->code) {
-+		case A2MP_COMMAND_REJ:
-+		case A2MP_DISCOVER_REQ:
-+		case A2MP_CHANGE_NOTIFY:
-+		case A2MP_GETINFO_REQ:
-+		case A2MP_GETAMPASSOC_REQ:
-+		case A2MP_CREATEPHYSLINK_REQ:
-+		case A2MP_DISCONNPHYSLINK_REQ:
-+		case A2MP_CHANGE_RSP:
-+		case A2MP_DISCOVER_RSP:
-+		case A2MP_GETINFO_RSP:
-+		case A2MP_GETAMPASSOC_RSP:
-+		case A2MP_CREATEPHYSLINK_RSP:
-+		case A2MP_DISCONNPHYSLINK_RSP:
-+		default:
-+			BT_ERR("Unknown A2MP signaling command 0x%2.2x",
-+				hdr->code);
-+			err = -EINVAL;
-+			break;
-+		}
-+	}
-+
-+	if (err && mgr) {
-+		struct a2mp_cmd_rej rej;
-+		rej.reason = cpu_to_le16(0);
-+
-+		a2mp_send(mgr->a2mp_sock, A2MP_COMMAND_REJ, hdr->ident,
-+							sizeof(rej), &rej);
-+	}
++	skb_pull(skb, sizeof(*req));
++	return 0;
 +}
 +
- static void data_ready_worker(struct work_struct *w)
+ /* Handle A2MP signalling */
+ void a2mp_receive(struct sock *sk, struct sk_buff *skb)
  {
- 	struct a2mp_work_data_ready *work = (struct a2mp_work_data_ready *) w;
-@@ -81,7 +136,7 @@ static void data_ready_worker(struct work_struct *w)
+@@ -254,6 +271,9 @@ void a2mp_receive(struct sock *sk, struct sk_buff *skb)
+ 			break;
  
- 	/* skb_dequeue() is thread-safe */
- 	while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
--		/* process a2mp here */
-+		a2mp_receive(sk, skb);
- 		kfree_skb(skb);
- 	}
- 
+ 		case A2MP_GETAMPASSOC_REQ:
++			err = a2mp_getampassoc_req(mgr, skb, hdr);
++			break;
++
+ 		case A2MP_CREATEPHYSLINK_REQ:
+ 		case A2MP_DISCONNPHYSLINK_REQ:
+ 		case A2MP_CHANGE_RSP:
 -- 
 1.7.4.1
 
