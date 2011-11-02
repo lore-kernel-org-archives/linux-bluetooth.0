@@ -4,36 +4,64 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi, pkrystad@codeaurora.org,
 	Andrei.Emeltchenko.news@gmail.com,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCHv4 2/9] Bluetooth: Change scope of the enable_hs module parameter
-Date: Wed,  2 Nov 2011 16:18:29 -0700
-Message-Id: <1320275916-32103-3-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv4 1/9] Bluetooth: Add BT_CHANNEL_POLICY socket option
+Date: Wed,  2 Nov 2011 16:18:28 -0700
+Message-Id: <1320275916-32103-2-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1320275916-32103-1-git-send-email-mathewm@codeaurora.org>
 References: <1320275916-32103-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This variable is currently only accessible within l2cap_core.c, but
-it is also needed in l2cap_sock.c
+Allow control of AMP functionality on L2CAP sockets. By default,
+connections will be restricted to BR/EDR.  Manipulating the
+BT_CHANNEL_POLICY option allows for channels to be moved to or created
+on AMP controllers.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ include/net/bluetooth/bluetooth.h |   27 +++++++++++++++++++++++++++
+ 1 files changed, 27 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 5a0a9c8..77df95e 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -736,6 +736,7 @@ static inline __u8 __ctrl_size(struct l2cap_chan *chan)
- }
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index fb1acb3..38cd3da 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -77,6 +77,33 @@ struct bt_power {
+ #define BT_POWER_FORCE_ACTIVE_OFF 0
+ #define BT_POWER_FORCE_ACTIVE_ON  1
  
- extern int disable_ertm;
-+extern int enable_hs;
++#define BT_CHANNEL_POLICY	10
++
++/* BR/EDR only (default policy)
++ *   AMP controllers cannot be used.
++ *   Channel move requests from the remote device are denied.
++ *   If the L2CAP channel is currently using AMP, move the channel to BR/EDR.
++ */
++#define BT_CHANNEL_POLICY_BREDR_ONLY		0
++
++/* BR/EDR Preferred
++ *   Allow use of AMP controllers.
++ *   If the L2CAP channel is currently on AMP, move it to BR/EDR.
++ *   Channel move requests from the remote device are allowed.
++ */
++#define BT_CHANNEL_POLICY_BREDR_PREFERRED	1
++
++/* AMP Preferred
++ *   Allow use of AMP controllers
++ *   If the L2CAP channel is currently on BR/EDR and AMP controller
++ *     resources are available, initiate a channel move to AMP.
++ *   Channel move requests from the remote device are allowed.
++ *   If the L2CAP socket has not been connected yet, try to create
++ *     and configure the channel directly on an AMP controller rather
++ *     than BR/EDR.
++ */
++#define BT_CHANNEL_POLICY_AMP_PREFERRED		2
++
+ __attribute__((format (printf, 2, 3)))
+ int bt_printk(const char *level, const char *fmt, ...);
  
- int l2cap_init_sockets(void);
- void l2cap_cleanup_sockets(void);
 -- 
 1.7.7.1
 
