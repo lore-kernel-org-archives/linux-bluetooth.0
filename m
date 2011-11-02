@@ -4,64 +4,42 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi, pkrystad@codeaurora.org,
 	Andrei.Emeltchenko.news@gmail.com,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCHv4 1/9] Bluetooth: Add BT_CHANNEL_POLICY socket option
-Date: Wed,  2 Nov 2011 16:18:28 -0700
-Message-Id: <1320275916-32103-2-git-send-email-mathewm@codeaurora.org>
-In-Reply-To: <1320275916-32103-1-git-send-email-mathewm@codeaurora.org>
-References: <1320275916-32103-1-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv4 0/9] AMP interface and signal framework
+Date: Wed,  2 Nov 2011 16:18:27 -0700
+Message-Id: <1320275916-32103-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Allow control of AMP functionality on L2CAP sockets. By default,
-connections will be restricted to BR/EDR.  Manipulating the
-BT_CHANNEL_POLICY option allows for channels to be moved to or created
-on AMP controllers.
+This patch set includes the AMP policy socket option that was
+previously discussed and accepted in to bluetooth-testing, and the
+signaling framework for AMP channel creation and AMP channel moves.
 
-Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/bluetooth.h |   27 +++++++++++++++++++++++++++
- 1 files changed, 27 insertions(+), 0 deletions(-)
+Next steps:
+ * L2CAP lockstep configuration
+ * HCI layer changes for AMP HCI commands and physical/logical links
+ * The rest of the create channel and move channel code
+ * Move channel coordination with ERTM
+ * AMP manager
+ * ERTM optimizations
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index fb1acb3..38cd3da 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -77,6 +77,33 @@ struct bt_power {
- #define BT_POWER_FORCE_ACTIVE_OFF 0
- #define BT_POWER_FORCE_ACTIVE_ON  1
- 
-+#define BT_CHANNEL_POLICY	10
-+
-+/* BR/EDR only (default policy)
-+ *   AMP controllers cannot be used.
-+ *   Channel move requests from the remote device are denied.
-+ *   If the L2CAP channel is currently using AMP, move the channel to BR/EDR.
-+ */
-+#define BT_CHANNEL_POLICY_BREDR_ONLY		0
-+
-+/* BR/EDR Preferred
-+ *   Allow use of AMP controllers.
-+ *   If the L2CAP channel is currently on AMP, move it to BR/EDR.
-+ *   Channel move requests from the remote device are allowed.
-+ */
-+#define BT_CHANNEL_POLICY_BREDR_PREFERRED	1
-+
-+/* AMP Preferred
-+ *   Allow use of AMP controllers
-+ *   If the L2CAP channel is currently on BR/EDR and AMP controller
-+ *     resources are available, initiate a channel move to AMP.
-+ *   Channel move requests from the remote device are allowed.
-+ *   If the L2CAP socket has not been connected yet, try to create
-+ *     and configure the channel directly on an AMP controller rather
-+ *     than BR/EDR.
-+ */
-+#define BT_CHANNEL_POLICY_AMP_PREFERRED		2
-+
- __attribute__((format (printf, 2, 3)))
- int bt_printk(const char *level, const char *fmt, ...);
- 
+Mat Martineau (9):
+  Bluetooth: Add BT_CHANNEL_POLICY socket option
+  Bluetooth: Change scope of the enable_hs module parameter
+  Bluetooth: Add channel policy to getsockopt/setsockopt
+  Bluetooth: Add AMP-related data and structures for channel signals
+  Bluetooth: Add signal handlers for channel creation
+  Bluetooth: Add definitions for L2CAP fixed channels
+  Bluetooth: Use symbolic values for the fixed channel map
+  Bluetooth: Add signal handlers for channel moves
+  Bluetooth: Guarantee BR-EDR device will be registered as hci0
+
+ include/net/bluetooth/bluetooth.h |   27 +++++
+ include/net/bluetooth/l2cap.h     |   60 +++++++++++-
+ net/bluetooth/hci_core.c          |    7 +-
+ net/bluetooth/l2cap_core.c        |  191 ++++++++++++++++++++++++++++++++++++-
+ net/bluetooth/l2cap_sock.c        |   35 +++++++
+ 5 files changed, 316 insertions(+), 4 deletions(-)
+
 -- 
 1.7.7.1
 
