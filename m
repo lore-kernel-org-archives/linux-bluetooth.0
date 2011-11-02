@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 4/8] Move secure flag to service driver
-Date: Wed,  2 Nov 2011 15:09:51 +0200
-Message-Id: <1320239395-29819-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 3/8] Remove options per server
+Date: Wed,  2 Nov 2011 15:09:50 +0200
+Message-Id: <1320239395-29819-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1320239395-29819-1-git-send-email-luiz.dentz@gmail.com>
 References: <1320239395-29819-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,222 +11,320 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The driver already define the channel so it makes sense to have the
-secure flag in the same place.
+Options are general so it is pointless to copy them to each server.
 ---
- plugins/bluetooth.c     |   18 +++++++++---------
- plugins/ftp.c           |    1 +
- plugins/irmc.c          |    1 +
- plugins/mas.c           |    1 +
- plugins/pbap.c          |    1 +
- plugins/pcsuite.c       |    1 +
- plugins/syncevolution.c |    1 +
- src/main.c              |   14 +++++++-------
- src/server.c            |    3 +--
- src/server.h            |    3 +--
- src/service.h           |    1 +
- 11 files changed, 25 insertions(+), 20 deletions(-)
+ plugins/ftp.c |   10 +++++-----
+ plugins/opp.c |    8 ++++----
+ src/main.c    |   32 +++++++++++++++++---------------
+ src/manager.c |    4 +++-
+ src/obex.c    |   25 -------------------------
+ src/obex.h    |    3 ---
+ src/obexd.h   |    2 ++
+ src/server.c  |   19 +++----------------
+ src/server.h  |    8 +-------
+ 9 files changed, 35 insertions(+), 76 deletions(-)
 
-diff --git a/plugins/bluetooth.c b/plugins/bluetooth.c
-index 1c9d92e..1a57654 100644
---- a/plugins/bluetooth.c
-+++ b/plugins/bluetooth.c
-@@ -500,12 +500,18 @@ drop:
- }
- 
- static GIOChannel *start(struct obex_server *server,
--				struct obex_service_driver *service,
--				BtIOSecLevel sec_level)
-+				struct obex_service_driver *service)
- {
-+	BtIOSecLevel sec_level;
- 	GIOChannel *io;
- 	GError *err = NULL;
- 
-+	if (service->secure == TRUE)
-+		sec_level = BT_IO_SEC_MEDIUM;
-+	else
-+		sec_level = BT_IO_SEC_LOW;
-+
-+
- 	io = bt_io_listen(BT_IO_RFCOMM, NULL, confirm_event,
- 				service, NULL, &err,
- 				BT_IO_OPT_CHANNEL, service->channel,
-@@ -523,20 +529,14 @@ static GIOChannel *start(struct obex_server *server,
- 
- static void *bluetooth_start(struct obex_server *server, int *err)
- {
--	BtIOSecLevel sec_level;
- 	GSList *ios = NULL;
- 	const GSList *l;
- 
--	if (server->secure == TRUE)
--		sec_level = BT_IO_SEC_MEDIUM;
--	else
--		sec_level = BT_IO_SEC_LOW;
--
- 	for (l = server->drivers; l; l = l->next) {
- 		struct obex_service_driver *service = l->data;
- 		GIOChannel *io;
- 
--		io = start(server, service, sec_level);
-+		io = start(server, service);
- 		if (io == NULL)
- 			continue;
- 
 diff --git a/plugins/ftp.c b/plugins/ftp.c
-index 3f32563..aebe411 100644
+index d5820b2..3f32563 100644
 --- a/plugins/ftp.c
 +++ b/plugins/ftp.c
-@@ -576,6 +576,7 @@ static struct obex_service_driver ftp = {
- 	.name = "File Transfer server",
- 	.service = OBEX_FTP,
- 	.channel = FTP_CHANNEL,
-+	.secure = TRUE,
- 	.record = FTP_RECORD,
- 	.target = FTP_TARGET,
- 	.target_size = TARGET_SIZE,
-diff --git a/plugins/irmc.c b/plugins/irmc.c
-index 3499ca7..4ea76c5 100644
---- a/plugins/irmc.c
-+++ b/plugins/irmc.c
-@@ -493,6 +493,7 @@ static struct obex_service_driver irmc = {
- 	.name = "IRMC Sync server",
- 	.service = OBEX_IRMC,
- 	.channel = IRMC_CHANNEL,
-+	.secure = TRUE,
- 	.record = IRMC_RECORD,
- 	.target = IRMC_TARGET,
- 	.target_size = IRMC_TARGET_SIZE,
-diff --git a/plugins/mas.c b/plugins/mas.c
-index 3e3670f..7d3d553 100644
---- a/plugins/mas.c
-+++ b/plugins/mas.c
-@@ -554,6 +554,7 @@ static struct obex_service_driver mas = {
- 	.name = "Message Access server",
- 	.service = OBEX_MAS,
- 	.channel = MAS_CHANNEL,
-+	.secure = TRUE,
- 	.record = MAS_RECORD,
- 	.target = MAS_TARGET,
- 	.target_size = TARGET_SIZE,
-diff --git a/plugins/pbap.c b/plugins/pbap.c
-index 066e37e..997b5bd 100644
---- a/plugins/pbap.c
-+++ b/plugins/pbap.c
-@@ -758,6 +758,7 @@ static struct obex_service_driver pbap = {
- 	.name = "Phonebook Access server",
- 	.service = OBEX_PBAP,
- 	.channel = PBAP_CHANNEL,
-+	.secure = TRUE,
- 	.record = PBAP_RECORD,
- 	.target = PBAP_TARGET,
- 	.target_size = TARGET_SIZE,
-diff --git a/plugins/pcsuite.c b/plugins/pcsuite.c
-index b93bd65..27a3496 100644
---- a/plugins/pcsuite.c
-+++ b/plugins/pcsuite.c
-@@ -253,6 +253,7 @@ static struct obex_service_driver pcsuite = {
- 	.name = "Nokia OBEX PC Suite Services",
- 	.service = OBEX_PCSUITE,
- 	.channel = PCSUITE_CHANNEL,
-+	.secure = TRUE,
- 	.record = PCSUITE_RECORD,
- 	.target = FTP_TARGET,
- 	.target_size = TARGET_SIZE,
-diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
-index a389783..fcf6d2b 100644
---- a/plugins/syncevolution.c
-+++ b/plugins/syncevolution.c
-@@ -450,6 +450,7 @@ static struct obex_service_driver synce = {
- 	.name = "OBEX server for SyncML, using SyncEvolution",
- 	.service = OBEX_SYNCEVOLUTION,
- 	.channel = SYNCEVOLUTION_CHANNEL,
-+	.secure = TRUE,
- 	.record = SYNCEVOLUTION_RECORD,
- 	.target = SYNCML_TARGET,
- 	.target_size = SYNCML_TARGET_SIZE,
+@@ -171,7 +171,7 @@ static void set_folder(struct ftp_session *ftp, const char *new_folder)
+ static int get_by_type(struct ftp_session *ftp, const char *type)
+ {
+ 	struct obex_session *os = ftp->os;
+-	const char *capability = obex_get_capability_path(os);
++	const char *capability = obex_option_capability();
+ 	const char *name = obex_get_name(os);
+ 	char *path;
+ 	int err;
+@@ -202,7 +202,7 @@ void *ftp_connect(struct obex_session *os, int *err)
+ 
+ 	DBG("");
+ 
+-	root_folder = obex_get_root_folder(os);
++	root_folder = obex_option_root_folder();
+ 
+ 	manager_register_session(os);
+ 
+@@ -322,7 +322,7 @@ int ftp_setpath(struct obex_session *os, obex_object_t *obj, void *user_data)
+ 	}
+ 
+ 	name = obex_get_name(os);
+-	root_folder = obex_get_root_folder(os);
++	root_folder = obex_option_root_folder();
+ 	root = g_str_equal(root_folder, ftp->folder);
+ 
+ 	DBG("%p name %s", ftp, name);
+@@ -446,12 +446,12 @@ static char *ftp_build_filename(struct ftp_session *ftp, const char *destname)
+ 
+ 	/* DestName can either be relative or absolute (FTP style) */
+ 	if (destname[0] == '/')
+-		filename = g_build_filename(obex_get_root_folder(ftp->os),
++		filename = g_build_filename(obex_option_root_folder(),
+                                                                 destname, NULL);
+ 	else
+ 		filename = g_build_filename(ftp->folder, destname, NULL);
+ 
+-	if (is_valid_path(filename + strlen(obex_get_root_folder(ftp->os))))
++	if (is_valid_path(filename + strlen(obex_option_root_folder())))
+ 		return filename;
+ 
+ 	g_free(filename);
+diff --git a/plugins/opp.c b/plugins/opp.c
+index 20ac5d1..ee4fecb 100644
+--- a/plugins/opp.c
++++ b/plugins/opp.c
+@@ -124,8 +124,8 @@ static int opp_chkput(struct obex_session *os, void *user_data)
+ 	if (t != NULL && !is_filename(t))
+ 		return -EBADR;
+ 
+-	if (obex_get_auto_accept(os)) {
+-		folder = g_strdup(obex_get_root_folder(os));
++	if (obex_option_auto_accept()) {
++		folder = g_strdup(obex_option_root_folder());
+ 		name = g_strdup(obex_get_name(os));
+ 		goto skip_auth;
+ 	}
+@@ -136,7 +136,7 @@ static int opp_chkput(struct obex_session *os, void *user_data)
+ 		return -EPERM;
+ 
+ 	if (folder == NULL)
+-		folder = g_strdup(obex_get_root_folder(os));
++		folder = g_strdup(obex_option_root_folder());
+ 
+ 	if (name == NULL)
+ 		name = g_strdup(obex_get_name(os));
+@@ -169,7 +169,7 @@ static int opp_put(struct obex_session *os, obex_object_t *obj,
+ 						void *user_data)
+ {
+ 	const char *name = obex_get_name(os);
+-	const char *folder = obex_get_root_folder(os);
++	const char *folder = obex_option_root_folder();
+ 
+ 	if (folder == NULL)
+ 		return -EPERM;
 diff --git a/src/main.c b/src/main.c
-index 73c1db5..114c215 100644
+index 7cfced7..73c1db5 100644
 --- a/src/main.c
 +++ b/src/main.c
-@@ -241,19 +241,19 @@ int main(int argc, char *argv[])
+@@ -116,6 +116,11 @@ static GOptionEntry options[] = {
+ 	{ NULL },
+ };
+ 
++gboolean obex_option_auto_accept(void)
++{
++	return option_autoaccept;
++}
++
+ const char *obex_option_root_folder(void)
+ {
+ 	return option_root;
+@@ -126,6 +131,11 @@ gboolean obex_option_symlinks(void)
+ 	return option_symlinks;
+ }
+ 
++const char *obex_option_capability(void)
++{
++	return option_capability;
++}
++
+ static gboolean is_dir(const char *dir) {
+ 	struct stat st;
+ 
+@@ -231,27 +241,19 @@ int main(int argc, char *argv[])
  
  	plugin_init(option_plugin, option_noplugin);
  
--	obex_server_init(OBEX_OPP, FALSE);
-+	obex_server_init(OBEX_OPP);
+-	obex_server_init(OBEX_OPP, option_root, FALSE,
+-				option_autoaccept, option_symlinks,
+-				NULL);
++	obex_server_init(OBEX_OPP, FALSE);
  
--	obex_server_init(OBEX_FTP, TRUE);
-+	obex_server_init(OBEX_FTP);
+-	obex_server_init(OBEX_FTP, option_root, TRUE,
+-				option_autoaccept, option_symlinks,
+-				option_capability);
++	obex_server_init(OBEX_FTP, TRUE);
  
--	obex_server_init(OBEX_PCSUITE, TRUE);
-+	obex_server_init(OBEX_PCSUITE);
+-	obex_server_init(OBEX_PCSUITE, option_root, TRUE,
+-				option_autoaccept, option_symlinks,
+-				option_capability);
++	obex_server_init(OBEX_PCSUITE, TRUE);
  
--	obex_server_init(OBEX_PBAP, TRUE);
-+	obex_server_init(OBEX_PBAP);
+-	obex_server_init(OBEX_PBAP, NULL, TRUE, FALSE, FALSE,
+-							option_capability);
++	obex_server_init(OBEX_PBAP, TRUE);
  
--	obex_server_init(OBEX_IRMC, TRUE);
-+	obex_server_init(OBEX_IRMC);
+-	obex_server_init(OBEX_IRMC, NULL, TRUE, FALSE, FALSE,
+-							option_capability);
++	obex_server_init(OBEX_IRMC, TRUE);
  
--	obex_server_init(OBEX_SYNCEVOLUTION, TRUE);
-+	obex_server_init(OBEX_SYNCEVOLUTION);
+-	obex_server_init(OBEX_SYNCEVOLUTION, NULL, TRUE, FALSE, FALSE, NULL);
++	obex_server_init(OBEX_SYNCEVOLUTION, TRUE);
  
--	obex_server_init(OBEX_MAS, TRUE);
-+	obex_server_init(OBEX_MAS);
+-	obex_server_init(OBEX_MAS, NULL, TRUE, FALSE, FALSE, NULL);
++	obex_server_init(OBEX_MAS, TRUE);
  
  	if (!root_folder_setup(option_root, option_root_setup)) {
  		error("Unable to setup root folder %s", option_root);
+diff --git a/src/manager.c b/src/manager.c
+index dc6608b..db5d67d 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -264,6 +264,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 	DBusMessageIter iter;
+ 	DBusMessageIter dict;
+ 	char *uuid;
++	const char *root;
+ 
+ 	reply = dbus_message_new_method_return(msg);
+ 	if (!reply)
+@@ -282,8 +283,9 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 	g_free(uuid);
+ 
+ 	/* Root folder */
++	root = obex_option_root_folder();
+ 	dbus_message_iter_append_dict_entry(&dict, "Root",
+-					DBUS_TYPE_STRING, &os->server->folder);
++					DBUS_TYPE_STRING, &root);
+ 
+ 	/* FIXME: Added Remote Address or USB */
+ 
+diff --git a/src/obex.c b/src/obex.c
+index a0c17c1..0d00f7f 100644
+--- a/src/obex.c
++++ b/src/obex.c
+@@ -1477,31 +1477,6 @@ const char *obex_get_type(struct obex_session *os)
+ 	return os->type;
+ }
+ 
+-const char *obex_get_root_folder(struct obex_session *os)
+-{
+-	return os->server->folder;
+-}
+-
+-uint16_t obex_get_service(struct obex_session *os)
+-{
+-	return os->service->service;
+-}
+-
+-gboolean obex_get_symlinks(struct obex_session *os)
+-{
+-	return os->server->symlinks;
+-}
+-
+-const char *obex_get_capability_path(struct obex_session *os)
+-{
+-	return os->server->capability;
+-}
+-
+-gboolean obex_get_auto_accept(struct obex_session *os)
+-{
+-	return os->server->auto_accept;
+-}
+-
+ int obex_remove(struct obex_session *os, const char *path)
+ {
+ 	if (os->driver == NULL)
+diff --git a/src/obex.h b/src/obex.h
+index f4fd159..0f3360b 100644
+--- a/src/obex.h
++++ b/src/obex.h
+@@ -38,10 +38,7 @@ const char *obex_get_destname(struct obex_session *os);
+ void obex_set_name(struct obex_session *os, const char *name);
+ ssize_t obex_get_size(struct obex_session *os);
+ const char *obex_get_type(struct obex_session *os);
+-const char *obex_get_root_folder(struct obex_session *os);
+ uint16_t obex_get_service(struct obex_session *os);
+-gboolean obex_get_symlinks(struct obex_session *os);
+-const char *obex_get_capability_path(struct obex_session *os);
+ gboolean obex_get_auto_accept(struct obex_session *os);
+ int obex_remove(struct obex_session *os, const char *path);
+ int obex_copy(struct obex_session *os, const char *source,
+diff --git a/src/obexd.h b/src/obexd.h
+index d18df5b..1c9b2b3 100644
+--- a/src/obexd.h
++++ b/src/obexd.h
+@@ -36,5 +36,7 @@ void plugin_cleanup(void);
+ gboolean manager_init(void);
+ void manager_cleanup(void);
+ 
++gboolean obex_option_auto_accept(void);
+ const char *obex_option_root_folder(void);
+ gboolean obex_option_symlinks(void);
++const char *obex_option_capability(void);
 diff --git a/src/server.c b/src/server.c
-index dc1ad6d..bf234ea 100644
+index 44a501c..dc1ad6d 100644
 --- a/src/server.c
 +++ b/src/server.c
-@@ -47,7 +47,7 @@
+@@ -47,16 +47,7 @@
  
  static GSList *servers = NULL;
  
--int obex_server_init(uint16_t service, gboolean secure)
-+int obex_server_init(uint16_t service)
+-static void obex_server_free(struct obex_server *server)
+-{
+-	g_free(server->folder);
+-	g_free(server->capability);
+-	g_free(server);
+-}
+-
+-int obex_server_init(uint16_t service, const char *folder,
+-				gboolean secure, gboolean auto_accept,
+-				gboolean symlinks, const char *capability)
++int obex_server_init(uint16_t service, gboolean secure)
  {
  	GSList *drivers;
  	GSList *transports;
-@@ -77,7 +77,6 @@ int obex_server_init(uint16_t service, gboolean secure)
+@@ -86,17 +77,13 @@ int obex_server_init(uint16_t service, const char *folder,
  		server = g_new0(struct obex_server, 1);
  		server->transport = transport;
  		server->drivers = drivers;
--		server->secure = secure;
+-		server->folder = g_strdup(folder);
+-		server->auto_accept = auto_accept;
+-		server->symlinks = symlinks;
+-		server->capability = g_strdup(capability);
+ 		server->secure = secure;
  
  		server->transport_data = transport->start(server, &err);
  		if (server->transport_data == NULL) {
+ 			DBG("Unable to start %s transport: %s (%d)",
+ 					transport->name, strerror(err), err);
+-			obex_server_free(server);
++			g_free(server);
+ 			continue;
+ 		}
+ 
+@@ -114,7 +101,7 @@ void obex_server_exit(void)
+ 		struct obex_server *server = l->data;
+ 
+ 		server->transport->stop(server->transport_data);
+-		obex_server_free(server);
++		g_free(server);
+ 	}
+ 
+ 	g_slist_free(servers);
 diff --git a/src/server.h b/src/server.h
-index beb8a9c..dd0df00 100644
+index f82ad2b..beb8a9c 100644
 --- a/src/server.h
 +++ b/src/server.h
-@@ -25,11 +25,10 @@
+@@ -25,17 +25,11 @@
  struct obex_server {
  	struct obex_transport_driver *transport;
  	void *transport_data;
--	gboolean secure;
+-	gboolean auto_accept;
+-	char *folder;
+-	gboolean symlinks;
+-	char *capability;
+ 	gboolean secure;
  	GSList *drivers;
  };
  
--int obex_server_init(uint16_t service, gboolean secure);
-+int obex_server_init(uint16_t service);
+-int obex_server_init(uint16_t service, const char *folder, gboolean secure,
+-		gboolean auto_accept, gboolean symlinks,
+-		const char *capability);
++int obex_server_init(uint16_t service, gboolean secure);
  
  void obex_server_exit(void);
  
-diff --git a/src/service.h b/src/service.h
-index 6633be3..68c4474 100644
---- a/src/service.h
-+++ b/src/service.h
-@@ -25,6 +25,7 @@ struct obex_service_driver {
- 	const char *name;
- 	uint16_t service;
- 	uint8_t channel;
-+	gboolean secure;
- 	const uint8_t *target;
- 	unsigned int target_size;
- 	const uint8_t *who;
 -- 
 1.7.6.4
 
