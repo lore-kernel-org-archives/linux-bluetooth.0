@@ -4,49 +4,195 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi, pkrystad@codeaurora.org,
 	Andrei.Emeltchenko.news@gmail.com,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCHv4 7/9] Bluetooth: Use symbolic values for the fixed channel map
-Date: Wed,  2 Nov 2011 16:18:34 -0700
-Message-Id: <1320275916-32103-8-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv4 8/9] Bluetooth: Add signal handlers for channel moves
+Date: Wed,  2 Nov 2011 16:18:35 -0700
+Message-Id: <1320275916-32103-9-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1320275916-32103-1-git-send-email-mathewm@codeaurora.org>
 References: <1320275916-32103-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The A2MP fixed channel bit is only set when high-speed mode is enabled.
+AMP channels can be moved between BR/EDR and AMP controllers using a
+sequence of signals. Every attempted channel move involves a series of
+four signals:
+
+   Move Initiator                 Move Responder
+        |                                 |
+        |       Move Channel Request      |
+        |  ---------------------------->  |
+        |                                 |
+        |       Move Channel Response     |
+        |  <----------------------------  |
+        |                                 |
+        |       Move Channel Confirm      |
+        |  ---------------------------->  |
+        |                                 |
+        |  Move Channel Confirm Response  |
+	|  <----------------------------  |
+
+All four signals are sent even if the move fails.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |    8 +++++++-
- 1 files changed, 7 insertions(+), 1 deletions(-)
+ net/bluetooth/l2cap_core.c |  136 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 136 insertions(+), 0 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2a49cf3..b27b061 100644
+index b27b061..5f253cf 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -60,7 +60,7 @@ int disable_ertm;
- int enable_hs;
+@@ -3146,6 +3146,126 @@ static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
+ 	return l2cap_connect_rsp(conn, cmd, data);
+ }
  
- static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
--static u8 l2cap_fixed_chan[8] = { 0x02, };
-+static u8 l2cap_fixed_chan[8] = { L2CAP_FC_L2CAP, };
++static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
++							u16 icid, u16 result)
++{
++	struct l2cap_move_chan_rsp rsp;
++
++	BT_DBG("icid %d, result %d", icid, result);
++
++	rsp.icid = cpu_to_le16(icid);
++	rsp.result = cpu_to_le16(result);
++
++	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_RSP, sizeof(rsp), &rsp);
++}
++
++static void l2cap_send_move_chan_cfm(struct l2cap_conn *conn,
++				struct l2cap_chan *chan, u16 icid, u16 result)
++{
++	struct l2cap_move_chan_cfm cfm;
++	u8 ident;
++
++	BT_DBG("icid %d, result %d", icid, result);
++
++	ident = l2cap_get_ident(conn);
++	if (chan)
++		chan->ident = ident;
++
++	cfm.icid = cpu_to_le16(icid);
++	cfm.result = cpu_to_le16(result);
++
++	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM, sizeof(cfm), &cfm);
++}
++
++static void l2cap_send_move_chan_cfm_rsp(struct l2cap_conn *conn, u8 ident,
++								u16 icid)
++{
++	struct l2cap_move_chan_cfm_rsp rsp;
++
++	BT_DBG("icid %d", icid);
++
++	rsp.icid = cpu_to_le16(icid);
++	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM_RSP, sizeof(rsp), &rsp);
++}
++
++static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
++			struct l2cap_cmd_hdr *cmd, u16 cmd_len, void *data)
++{
++	struct l2cap_move_chan_req *req = data;
++	u16 icid = 0;
++	u16 result = L2CAP_MR_NOT_ALLOWED;
++
++	if (cmd_len != sizeof(*req))
++		return -EPROTO;
++
++	icid = le16_to_cpu(req->icid);
++
++	BT_DBG("icid %d, dest_amp_id %d", icid, req->dest_amp_id);
++
++	if (!enable_hs)
++		return -EINVAL;
++
++	/* Placeholder: Always refuse */
++	l2cap_send_move_chan_rsp(conn, cmd->ident, icid, result);
++
++	return 0;
++}
++
++static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
++			struct l2cap_cmd_hdr *cmd, u16 cmd_len, void *data)
++{
++	struct l2cap_move_chan_rsp *rsp = data;
++	u16 icid, result;
++
++	if (cmd_len != sizeof(*rsp))
++		return -EPROTO;
++
++	icid = le16_to_cpu(rsp->icid);
++	result = le16_to_cpu(rsp->result);
++
++	BT_DBG("icid %d, result %d", icid, result);
++
++	/* Placeholder: Always unconfirmed */
++	l2cap_send_move_chan_cfm(conn, NULL, icid, L2CAP_MC_UNCONFIRMED);
++
++	return 0;
++}
++
++static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
++			struct l2cap_cmd_hdr *cmd, u16 cmd_len, void *data)
++{
++	struct l2cap_move_chan_cfm *cfm = data;
++	u16 icid, result;
++
++	if (cmd_len != sizeof(*cfm))
++		return -EPROTO;
++
++	icid = le16_to_cpu(cfm->icid);
++	result = le16_to_cpu(cfm->result);
++
++	BT_DBG("icid %d, result %d", icid, result);
++
++	l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
++
++	return 0;
++}
++
++static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
++			struct l2cap_cmd_hdr *cmd, u16 cmd_len, void *data)
++{
++	struct l2cap_move_chan_cfm_rsp *rsp = data;
++	u16 icid;
++
++	if (cmd_len != sizeof(*rsp))
++		return -EPROTO;
++
++	icid = le16_to_cpu(rsp->icid);
++
++	BT_DBG("icid %d", icid);
++
++	return 0;
++}
++
+ static inline int l2cap_check_conn_param(u16 min, u16 max, u16 latency,
+ 							u16 to_multiplier)
+ {
+@@ -3266,6 +3386,22 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
+ 		err = l2cap_create_channel_rsp(conn, cmd, data);
+ 		break;
  
- static LIST_HEAD(chan_list);
- static DEFINE_RWLOCK(chan_list_lock);
-@@ -3032,6 +3032,12 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
- 	} else if (type == L2CAP_IT_FIXED_CHAN) {
- 		u8 buf[12];
- 		struct l2cap_info_rsp *rsp = (struct l2cap_info_rsp *) buf;
++	case L2CAP_MOVE_CHAN_REQ:
++		err = l2cap_move_channel_req(conn, cmd, cmd_len, data);
++		break;
 +
-+		if (enable_hs)
-+			l2cap_fixed_chan[0] |= L2CAP_FC_A2MP;
-+		else
-+			l2cap_fixed_chan[0] &= ~L2CAP_FC_A2MP;
++	case L2CAP_MOVE_CHAN_RSP:
++		err = l2cap_move_channel_rsp(conn, cmd, cmd_len, data);
++		break;
 +
- 		rsp->type   = cpu_to_le16(L2CAP_IT_FIXED_CHAN);
- 		rsp->result = cpu_to_le16(L2CAP_IR_SUCCESS);
- 		memcpy(rsp->data, l2cap_fixed_chan, sizeof(l2cap_fixed_chan));
++	case L2CAP_MOVE_CHAN_CFM:
++		err = l2cap_move_channel_confirm(conn, cmd, cmd_len, data);
++		break;
++
++	case L2CAP_MOVE_CHAN_CFM_RSP:
++		err = l2cap_move_channel_confirm_rsp(conn, cmd, cmd_len, data);
++		break;
++
+ 	default:
+ 		BT_ERR("Unknown BR/EDR signaling command 0x%2.2x", cmd->code);
+ 		err = -EINVAL;
 -- 
 1.7.7.1
 
