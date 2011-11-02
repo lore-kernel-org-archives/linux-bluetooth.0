@@ -4,195 +4,92 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi, pkrystad@codeaurora.org,
 	Andrei.Emeltchenko.news@gmail.com,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCHv4 8/9] Bluetooth: Add signal handlers for channel moves
-Date: Wed,  2 Nov 2011 16:18:35 -0700
-Message-Id: <1320275916-32103-9-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv4 3/9] Bluetooth: Add channel policy to getsockopt/setsockopt
+Date: Wed,  2 Nov 2011 16:18:30 -0700
+Message-Id: <1320275916-32103-4-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1320275916-32103-1-git-send-email-mathewm@codeaurora.org>
 References: <1320275916-32103-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-AMP channels can be moved between BR/EDR and AMP controllers using a
-sequence of signals. Every attempted channel move involves a series of
-four signals:
+Each channel has a policy to require BR/EDR (the default),
+prefer BR/EDR, or prefer AMP.
 
-   Move Initiator                 Move Responder
-        |                                 |
-        |       Move Channel Request      |
-        |  ---------------------------->  |
-        |                                 |
-        |       Move Channel Response     |
-        |  <----------------------------  |
-        |                                 |
-        |       Move Channel Confirm      |
-        |  ---------------------------->  |
-        |                                 |
-        |  Move Channel Confirm Response  |
-	|  <----------------------------  |
-
-All four signals are sent even if the move fails.
+Check for valid policy value and L2CAP mode.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |  136 ++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 136 insertions(+), 0 deletions(-)
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/l2cap_sock.c    |   35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b27b061..5f253cf 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3146,6 +3146,126 @@ static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
- 	return l2cap_connect_rsp(conn, cmd, data);
- }
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 77df95e..0b021c0 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -370,6 +370,7 @@ struct l2cap_chan {
+ 	__u16		flush_to;
+ 	__u8		mode;
+ 	__u8		chan_type;
++	__u8		chan_policy;
  
-+static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
-+							u16 icid, u16 result)
-+{
-+	struct l2cap_move_chan_rsp rsp;
-+
-+	BT_DBG("icid %d, result %d", icid, result);
-+
-+	rsp.icid = cpu_to_le16(icid);
-+	rsp.result = cpu_to_le16(result);
-+
-+	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_RSP, sizeof(rsp), &rsp);
-+}
-+
-+static void l2cap_send_move_chan_cfm(struct l2cap_conn *conn,
-+				struct l2cap_chan *chan, u16 icid, u16 result)
-+{
-+	struct l2cap_move_chan_cfm cfm;
-+	u8 ident;
-+
-+	BT_DBG("icid %d, result %d", icid, result);
-+
-+	ident = l2cap_get_ident(conn);
-+	if (chan)
-+		chan->ident = ident;
-+
-+	cfm.icid = cpu_to_le16(icid);
-+	cfm.result = cpu_to_le16(result);
-+
-+	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM, sizeof(cfm), &cfm);
-+}
-+
-+static void l2cap_send_move_chan_cfm_rsp(struct l2cap_conn *conn, u8 ident,
-+								u16 icid)
-+{
-+	struct l2cap_move_chan_cfm_rsp rsp;
-+
-+	BT_DBG("icid %d", icid);
-+
-+	rsp.icid = cpu_to_le16(icid);
-+	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM_RSP, sizeof(rsp), &rsp);
-+}
-+
-+static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
-+			struct l2cap_cmd_hdr *cmd, u16 cmd_len, void *data)
-+{
-+	struct l2cap_move_chan_req *req = data;
-+	u16 icid = 0;
-+	u16 result = L2CAP_MR_NOT_ALLOWED;
-+
-+	if (cmd_len != sizeof(*req))
-+		return -EPROTO;
-+
-+	icid = le16_to_cpu(req->icid);
-+
-+	BT_DBG("icid %d, dest_amp_id %d", icid, req->dest_amp_id);
-+
-+	if (!enable_hs)
-+		return -EINVAL;
-+
-+	/* Placeholder: Always refuse */
-+	l2cap_send_move_chan_rsp(conn, cmd->ident, icid, result);
-+
-+	return 0;
-+}
-+
-+static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
-+			struct l2cap_cmd_hdr *cmd, u16 cmd_len, void *data)
-+{
-+	struct l2cap_move_chan_rsp *rsp = data;
-+	u16 icid, result;
-+
-+	if (cmd_len != sizeof(*rsp))
-+		return -EPROTO;
-+
-+	icid = le16_to_cpu(rsp->icid);
-+	result = le16_to_cpu(rsp->result);
-+
-+	BT_DBG("icid %d, result %d", icid, result);
-+
-+	/* Placeholder: Always unconfirmed */
-+	l2cap_send_move_chan_cfm(conn, NULL, icid, L2CAP_MC_UNCONFIRMED);
-+
-+	return 0;
-+}
-+
-+static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
-+			struct l2cap_cmd_hdr *cmd, u16 cmd_len, void *data)
-+{
-+	struct l2cap_move_chan_cfm *cfm = data;
-+	u16 icid, result;
-+
-+	if (cmd_len != sizeof(*cfm))
-+		return -EPROTO;
-+
-+	icid = le16_to_cpu(cfm->icid);
-+	result = le16_to_cpu(cfm->result);
-+
-+	BT_DBG("icid %d, result %d", icid, result);
-+
-+	l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
-+
-+	return 0;
-+}
-+
-+static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
-+			struct l2cap_cmd_hdr *cmd, u16 cmd_len, void *data)
-+{
-+	struct l2cap_move_chan_cfm_rsp *rsp = data;
-+	u16 icid;
-+
-+	if (cmd_len != sizeof(*rsp))
-+		return -EPROTO;
-+
-+	icid = le16_to_cpu(rsp->icid);
-+
-+	BT_DBG("icid %d", icid);
-+
-+	return 0;
-+}
-+
- static inline int l2cap_check_conn_param(u16 min, u16 max, u16 latency,
- 							u16 to_multiplier)
- {
-@@ -3266,6 +3386,22 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		err = l2cap_create_channel_rsp(conn, cmd, data);
+ 	__le16		sport;
+ 
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 646aefc..2520d2a 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -467,6 +467,16 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+ 
  		break;
  
-+	case L2CAP_MOVE_CHAN_REQ:
-+		err = l2cap_move_channel_req(conn, cmd, cmd_len, data);
-+		break;
++	case BT_CHANNEL_POLICY:
++		if (!enable_hs) {
++			err = -ENOPROTOOPT;
++			break;
++		}
 +
-+	case L2CAP_MOVE_CHAN_RSP:
-+		err = l2cap_move_channel_rsp(conn, cmd, cmd_len, data);
-+		break;
-+
-+	case L2CAP_MOVE_CHAN_CFM:
-+		err = l2cap_move_channel_confirm(conn, cmd, cmd_len, data);
-+		break;
-+
-+	case L2CAP_MOVE_CHAN_CFM_RSP:
-+		err = l2cap_move_channel_confirm_rsp(conn, cmd, cmd_len, data);
++		if (put_user(chan->chan_policy, (u32 __user *) optval))
++			err = -EFAULT;
 +		break;
 +
  	default:
- 		BT_ERR("Unknown BR/EDR signaling command 0x%2.2x", cmd->code);
- 		err = -EINVAL;
+ 		err = -ENOPROTOOPT;
+ 		break;
+@@ -690,6 +700,31 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+ 			clear_bit(FLAG_FORCE_ACTIVE, &chan->flags);
+ 		break;
+ 
++	case BT_CHANNEL_POLICY:
++		if (!enable_hs) {
++			err = -ENOPROTOOPT;
++			break;
++		}
++
++		if (get_user(opt, (u32 __user *) optval)) {
++			err = -EFAULT;
++			break;
++		}
++
++		if (opt > BT_CHANNEL_POLICY_AMP_PREFERRED) {
++			err = -EINVAL;
++			break;
++		}
++
++		if (chan->mode != L2CAP_MODE_ERTM &&
++				chan->mode != L2CAP_MODE_STREAMING) {
++			err = -EOPNOTSUPP;
++			break;
++		}
++
++		chan->chan_policy = (u8) opt;
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
 -- 
 1.7.7.1
 
