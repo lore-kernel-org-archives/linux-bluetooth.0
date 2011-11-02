@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 06/20] Bluetooth: A2MP: Remove AMP manager in state_change
-Date: Wed,  2 Nov 2011 16:02:34 +0200
-Message-Id: <1320242568-372-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv0 08/20] Bluetooth: A2MP: Definitions for A2MP commands
+Date: Wed,  2 Nov 2011 16:02:36 +0200
+Message-Id: <1320242568-372-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1320242568-372-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1320242568-372-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,39 +11,96 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Handle BT_CLOSED state change by removing AMP manager.
+Define A2MP command id and packet structures.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   14 +++++++++++++-
- 1 files changed, 13 insertions(+), 1 deletions(-)
+ include/net/bluetooth/a2mp.h |   72 ++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 72 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index d505c77..190827f 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -110,8 +110,20 @@ static void state_change_worker(struct work_struct *w)
- {
- 	struct a2mp_work_state_change *work = (struct a2mp_work_state_change *) w;
- 	struct sock *sk = work->sk;
-+	struct amp_mgr *mgr;
-+
-+	BT_DBG("sk %p state %d", sk, sk->sk_state);
-+
-+	switch(sk->sk_state) {
-+	case BT_CLOSED:
-+		mgr = get_amp_mgr_sk(sk);
-+		if (mgr) {
-+			BT_DBG("sk %p closing", sk);
-+			remove_amp_mgr(mgr);
-+		}
-+		break;
-+	}
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index aafaf09..e2eec2b 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -33,6 +33,78 @@ struct a2mp_cmd {
+ 	__u8	data[0];
+ } __packed;
  
--	BT_DBG("sk %p", sk);
- 	sock_put(work->sk);
- 	kfree(work);
- }
++/* A2MP command codes */
++#define A2MP_COMMAND_REJ         0x01
++struct a2mp_cmd_rej {
++	__le16	reason;
++} __packed;
++
++#define A2MP_DISCOVER_REQ        0x02
++struct a2mp_discov_req {
++	__le16	mtu;
++	__le16	ext_feat;
++} __packed;
++
++struct a2mp_cl {
++	__u8	id;
++	__u8	type;
++	__u8	status;
++} __packed;
++
++#define A2MP_DISCOVER_RSP        0x03
++struct a2mp_discov_rsp {
++	__le16     mtu;
++	__le16     ext_feat;
++	struct a2mp_cl cl[0];
++} __packed;
++
++#define A2MP_CHANGE_NOTIFY       0x04
++#define A2MP_CHANGE_RSP          0x05
++
++#define A2MP_GETINFO_REQ         0x06
++struct a2mp_info_req {
++	__u8       id;
++} __packed;
++
++#define A2MP_GETINFO_RSP         0x07
++struct a2mp_info_rsp {
++	__u8	id;
++	__u8	status;
++	__le32	total_bw;
++	__le32	max_bw;
++	__le32	min_latency;
++	__le16	pal_cap;
++	__le16	assoc_size;
++} __packed;
++
++#define A2MP_GETAMPASSOC_REQ     0x08
++struct a2mp_amp_assoc_req {
++	__u8	id;
++} __packed;
++
++#define A2MP_GETAMPASSOC_RSP     0x09
++struct a2mp_amp_assoc_rsp {
++	__u8	id;
++	__u8	status;
++	__u8	amp_assoc[0];
++} __packed;
++
++#define A2MP_CREATEPHYSLINK_REQ  0x0A
++#define A2MP_DISCONNPHYSLINK_REQ 0x0C
++struct a2mp_physlink_req {
++	__u8	local_id;
++	__u8	remote_id;
++	__u8	amp_assoc[0];
++} __packed;
++
++#define A2MP_CREATEPHYSLINK_RSP  0x0B
++#define A2MP_DISCONNPHYSLINK_RSP 0x0D
++struct a2mp_physlink_rsp {
++	__u8	local_id;
++	__u8	remote_id;
++	__u8	status;
++} __packed;
++
+ struct a2mp_work_data_ready {
+ 	struct work_struct work;
+ 	struct sock *sk;
 -- 
 1.7.4.1
 
