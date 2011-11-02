@@ -1,153 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Arkadiusz.Lichwa@tieto.com>
-To: <iliak@ti.com>, <linux-bluetooth@vger.kernel.org>
-CC: <ulrik.lauren@stericsson.com>
-Date: Wed, 2 Nov 2011 09:44:00 +0200
-Subject: RE: [PATCH] Bluetooth: Revert: Fix L2CAP connection establishment
-Message-ID: <BF2CDDEFEC2D1E42A67A8AE0508897EC3E92178F93@EXMB02.eu.tieto.com>
-References: <1319621002-7122-1-git-send-email-arkadiusz.lichwa@tieto.com>
- <1319621002-7122-2-git-send-email-arkadiusz.lichwa@tieto.com>
- <BF2CDDEFEC2D1E42A67A8AE0508897EC3E9207D367@EXMB02.eu.tieto.com>
- <AC090B9732AB2B4DB7FF476E907FE660013BAEC740@dnce02.ent.ti.com>
-In-Reply-To: <AC090B9732AB2B4DB7FF476E907FE660013BAEC740@dnce02.ent.ti.com>
-Content-Type: text/plain; charset="iso-8859-2"
-MIME-Version: 1.0
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8; format=flowed
+Message-id: <4EB0F3B0.6050902@samsung.com>
+Date: Wed, 02 Nov 2011 16:39:28 +0900
+From: Chanyeol Park <chanyeol.park@samsung.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Question about A2DP, Pulseaudio.
+References: <1318234286.16562.8.camel@chanten-desktop>
+ <CABBYNZJ8F7U5RpNkyv0QTrceK2LZbjitxsWAfnGMPeW7K=ti4g@mail.gmail.com>
+In-reply-to: <CABBYNZJ8F7U5RpNkyv0QTrceK2LZbjitxsWAfnGMPeW7K=ti4g@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ilia
+Hello
 
->From: Ilia, Kolominsky [mailto:iliak@ti.com]
->Sent: Tuesday, November 01, 2011 9:58 AM
->To: Lichwa Arkadiusz; linux-bluetooth@vger.kernel.org
->Cc: ulrik.lauren@stericsson.com
->Subject: RE: [PATCH] Bluetooth: Revert: Fix L2CAP connection establishment
+On 2011ë…„ 10ì›” 10ì¼ 22:59, Luiz Augusto von Dentz wrote:
+> Hi Chan-yeol,
 >
->Hi
+> On Mon, Oct 10, 2011 at 11:11 AM, Chan-yeol Park
+> <chanyeol.park@samsung.com>  wrote:
+>> Hello bluetooth developers.
+>>
+>> I have a few questions about BlueZ,PulseAudio.
+>> If there are any plan to develop. I want to discuss how to implement the
+>> below.
+>>
+>> 1. How to handle New Codec(A2DP) between BlueZ and PulseAudio
+>> As far as I understand puleaduio add_card() working by UUID info.
+>> however , in case of mpeg and other codec, we can't use it.
+> You can have whatever you want as capabilities including new codecs,
+> so yes it is, or intended to be, possible to have your own SEP
+> capabilities. UUID in that case only defines the profile/role of the
+> endpoint you are registering, in fact with test/simple-endpoint it is
+> already possible to register mp3 endpoints.
 >
->> -----Original Message-----
->> From: Arkadiusz.Lichwa@tieto.com [mailto:Arkadiusz.Lichwa@tieto.com]
->> Sent: Monday, October 31, 2011 6:00 PM
->> To: linux-bluetooth@vger.kernel.org
->> Cc: Ilia, Kolominsky; ulrik.lauren@stericsson.com;
->> Arkadiusz.Lichwa@tieto.com
->> Subject: RE: [PATCH] Bluetooth: Revert: Fix L2CAP connection
->> establishment
->>
->> Hi
->>
->> >Subject: [PATCH] Bluetooth: Revert: Fix L2CAP connection establishment
->> >
->> >This reverts commit 330605423ca6eafafb8dcc27502bce1c585d1b06.
->> >The commit introduces regression when two 2.1 devices attempt
->> >establish rfcomm channel. Such connection is refused since there's
->> >a security block issue on l2cap. It means the link is unencrypted.
->> >
->> >2011-09-16 18:08:46.567616 < ACL data: handle 1 flags 0x00 dlen 24
->> >    0000: 14 00 40 00 06 00 02 00  0f 35 03 19 12 00 ff ff
->> >..@......5....ÿÿ
->> >    0010: 35 05 0a 00 00 ff ff 00                           5....ÿÿ.
->> >2011-09-16 18:08:46.572377 > HCI Event: Number of Completed Packets
->> >(0x13) plen 5
->> >    handle 1 packets 1
->> >2011-09-16 18:08:46.577931 > ACL data: handle 1 flags 0x02 dlen 88
->> >    L2CAP(d): cid 0x0040 len 84 [psm 0]
->> >      0000: 07 00 02 00 4f 00 4c 35  4a 35 48 09 00 00 0a 00
->> >....O.L5J5H.....
->> >      0010: 01 00 00 09 00 01 35 03  19 12 00 09 00 05 35 03
->> >......5.......5.
->> >      0020: 19 10 02 09 00 09 35 08  35 06 19 12 00 09 01 02
->> >......5.5.......
->> >      0030: 09 02 00 09 01 02 09 02  01 09 00 0a 09 02 02 09
->> >................
->> >      0040: 00 00 09 02 03 09 00 00  09 02 04 28 01 09 02 05
->> >...........(....
->> >      0050: 09 00 02 00                                       ....
->> >2011-09-16 18:08:46.626057 < HCI Command: Authentication Requested
->> >(0x01|0x0011) plen 2
->> >    handle 1
->> >2011-09-16 18:08:46.627614 > HCI Event: Command Status (0x0f) plen 4
->> >    Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
->> >2011-09-16 18:08:46.627675 > HCI Event: Link Key Request (0x17) plen 6
->> >    bdaddr 00:00:F2:6A:29:69
->> >2011-09-16 18:08:46.634999 < HCI Command: Link Key Request Reply
->> >(0x01|0x000b) plen 22
->> >    bdaddr 00:00:F2:6A:29:69 key 58CD393179FC902E5E8F512A855EE532
->> >2011-09-16 18:08:46.683278 > HCI Event: Command Complete (0x0e) plen
->> 10
->> >    Link Key Request Reply (0x01|0x000b) ncmd 1
->> >    status 0x00 bdaddr 00:00:F2:6A:29:69
->> >2011-09-16 18:08:46.764729 > HCI Event: Auth Complete (0x06) plen 3
->> >    status 0x00 handle 1
->> >2011-09-16 18:08:46.764821 < ACL data: handle 1 flags 0x00 dlen 12
->> >    0000: 08 00 01 00 02 05 04 00  03 00 41 00
->> ..........A.
->> >2011-09-16 18:08:46.764851 > HCI Event: Command Status (0x0f) plen 4
->> >    Unknown (0x00|0x0000) status 0x00 ncmd 2
->> >2011-09-16 18:08:46.768117 > HCI Event: Number of Completed Packets
->> >(0x13) plen 5
->> >    handle 1 packets 1
->> >2011-09-16 18:08:46.770894 > ACL data: handle 1 flags 0x02 dlen 16
->> >    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0041 result 3 status 0
->> >      Connection refused - security block
->> >2011-09-16 18:08:49.000691 < ACL data: handle 1 flags 0x00 dlen 12
->> >    0000: 08 00 01 00 06 06 04 00  40 00 40 00
->> ........@.@.
->> >2011-09-16 18:08:49.015675 > HCI Event: Number of Completed Packets
->> >(0x13) plen 5
->> >    handle 1 packets 1
->> >2011-09-16 18:08:49.016927 > ACL data: handle 1 flags 0x02 dlen 12
->> >    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
->> >2011-09-16 18:08:51.009480 < HCI Command: Disconnect (0x01|0x0006)
->> plen
->> >3
->> >    handle 1 reason 0x13
->> >    Reason: Remote User Terminated Connection
->> >2011-09-16 18:08:51.011525 > HCI Event: Command Status (0x0f) plen 4
->> >    Disconnect (0x01|0x0006) status 0x00 ncmd 1
->> >2011-09-16 18:08:51.123494 > HCI Event: Disconn Complete (0x05) plen 4
->> >    status 0x00 handle 1 reason 0x16
->> >    Reason: Connection Terminated by Local Host
->> >
->> >Signed-off-by: Arek Lichwa <arkadiusz.lichwa@tieto.com>
->> >---
->> > net/bluetooth/hci_conn.c |    2 +-
->> > 1 files changed, 1 insertions(+), 1 deletions(-)
->> >
->> >diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->> >index c1c597e..e0af723 100644
->> >--- a/net/bluetooth/hci_conn.c
->> >+++ b/net/bluetooth/hci_conn.c
->> >@@ -673,7 +673,7 @@ int hci_conn_security(struct hci_conn *conn, __u8
->> >sec_level, __u8 auth_type)
->> > 		goto encrypt;
->> >
->> > auth:
->> >-	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend))
->> >+	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend))
->> > 		return 0;
+>> I think AudioSink dbus interface should provide codec info that headset
+>> supports. Based on it, PulseaAudio can know headset support codec info.
+> We are trying to avoid using device object to expose this info because
+> it creates a need of device detection on the clients which is not that
+> trivial to get it right e.g. PA module-bluetooth-discover. Also the
+> matching capabilities is done by bluetoothd, PA just receives the
+> transport configuration, the only thing that is not possible right now
+> is to force one specific endpoint over the others, what you can do
+> however is to register this specific endpoint using a dedicated
+> process/connection (e.g. a media player) and then call Audio.Connect
+> or AudioSink.Connect from that same process/connection, in other words
+> the sender's endpoint have higher priority than the other endpoint
+> registered.
 >
->Wouldn't that bit set in hci_conn_encrypt() the first time
->hci_conn_security() is called?
-
-This in this case has never happened. 
-First time the flow jumps to "auth" label in hci_conn_security(). 
-On auth_complete_evt the flow overpasses the encryption part since 
-the conn->state is not BT_CONFIG and pending HCI_CONN_ENCRYPT_PEND is never set. Rfcomm's l2cap is set in motion afterwards.
-
-The question is why you acctually have changed the code? 
-Isn't it to be related to too early l2cap timer expirations? ...which was also part of some regression that has been fixed in bluetooth-next now
-The old code was quite stable, for so pretty long time noone observed regression in this area. Am I wrong ?
-
-/Arek
+> Note that PA cannot mix audio encoded so it just a pass through, so it
+> is kind tricky to detect whether to use an endpoint or not specially
+> if the application is not streaming only encoded data.
 >
->> >
->> > 	if (!hci_conn_auth(conn, sec_level, auth_type))
->> >--
->> >1.7.6
+>> Bluez audio.conf should have option related to this.
 >>
->> Is it something unclear in my original post ? Any comments ?
->> Regression here is quite obvious in my opinion.
->>
->> /Arek
+>> 2. auto_connect.
+>> Could you explain this purpose?
+> This is only valid for the only API, when set this indicates to
+> bluetoothd that if the device is not connected to start connecting to
+> it, which means PA will be blocked until it connects which IMO is a
+> bad.
+>
+>> 4. Is there anyone could explain sco_sink, sco_source? If there are ALSA
+>> code related to it, could you tell me the link that explain ?
+> This is used when SCO packets are not routed to HCI, SCO socket
+> read/writes won't do anything, in that case we need a device to
+> read/write the data. Apparently some system don't even bother
+> exporting this audio path to the software stack because it is only
+> active while on call, if this is your case then it means we cannot
+> control the audio routing in software and we probably should do
+> nothing (e.g. set sco_sink/sco_source to "none" and when HFP/HSP is
+> active set card profile to 'Off'), but note that this type of
+> configuration has many limitation for instance a system like that
+> cannot do navigation or voice commands using SCO.
+>
+There is an example:
+Headset A2DP Sink(SEP 1:SBC,SEP 3:MP3),
+Player A2DP Source(SEP 1:SBC, SEP 2: MP3)
 
+Some user wants to use SBC codec connection or some user may want to use 
+MP3.
+
+However in the bluez, there is no module or interface to handle user 
+preference as far as I understand.
+
+And my understand is that bluez current implementation just try to find 
+the nearest sep combination.
+If they search from SEP 1, naturally SBC codec is selected..
+
+Could you explain my question?
+
+BR
+Chanyeol Park
