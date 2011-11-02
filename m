@@ -1,223 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 Nov 2011 17:20:14 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
-	pkrystad@codeaurora.org
-Subject: Re: [PATCHv3 8/9] Bluetooth: Add signal handlers for channel moves
-Message-ID: <20111102152011.GB779@aemeltch-MOBL1>
-References: <1320186568-25493-1-git-send-email-mathewm@codeaurora.org>
- <1320186568-25493-9-git-send-email-mathewm@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320186568-25493-9-git-send-email-mathewm@codeaurora.org>
+Subject: Re: [PATCH 1/4] Bluetooth: prioritizing data over HCI
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 02 Nov 2011 15:22:31 +0100
+In-Reply-To: <1320241924-2300-1-git-send-email-luiz.dentz@gmail.com>
+References: <1320241924-2300-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1320243753.15441.282.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Nov 01, 2011 at 03:29:27PM -0700, Mat Martineau wrote:
-> AMP channels can be moved between BR/EDR and AMP controllers using a
-> sequence of signals. Every attempted channel move involves a series of
-> four signals:
+Hi Luiz,
+
+> This implement priority based scheduler using skbuffer priority set via
+> SO_PRIORITY socket option.
 > 
->    Move Initiator                 Move Responder
->         |                                 |
->         |       Move Channel Request      |
->         |  ---------------------------->  |
->         |                                 |
->         |       Move Channel Response     |
->         |  <----------------------------  |
->         |                                 |
->         |       Move Channel Confirm      |
->         |  ---------------------------->  |
->         |                                 |
->         |  Move Channel Confirm Response  |
-> 	|  <----------------------------  |
+> It introduces hci_chan_hash (list of HCI Channel/hci_chan) per connection,
+> each item in this list refer to a L2CAP connection and it is used to
+> queue the data for transmission.
 > 
-> All four signals are sent even if the move fails.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
->  net/bluetooth/l2cap_core.c |  141 ++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 141 insertions(+), 0 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index b27b061..152ca66 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -3146,6 +3146,130 @@ static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
->  	return l2cap_connect_rsp(conn, cmd, data);
->  }
->  
-> +static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
-> +				u16 icid, u16 result)
-> +{
-> +	struct l2cap_move_chan_rsp rsp;
-> +
-> +	BT_DBG("icid %d, result %d", icid, result);
-> +
-> +	rsp.icid = cpu_to_le16(icid);
-> +	rsp.result = cpu_to_le16(result);
-> +
-> +	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_RSP, sizeof(rsp), &rsp);
-> +}
-> +
-> +static void l2cap_send_move_chan_cfm(struct l2cap_conn *conn,
-> +				struct l2cap_chan *chan, u16 icid, u16 result)
-> +{
-> +	struct l2cap_move_chan_cfm cfm;
-> +	u8 ident;
-> +
-> +	BT_DBG("icid %d, result %d", icid, result);
-> +
-> +	ident = l2cap_get_ident(conn);
-> +	if (chan)
-> +		chan->ident = ident;
-> +
-> +	cfm.icid = cpu_to_le16(icid);
-> +	cfm.result = cpu_to_le16(result);
-> +
-> +	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM, sizeof(cfm), &cfm);
-> +}
-> +
-> +static void l2cap_send_move_chan_cfm_rsp(struct l2cap_conn *conn, u8 ident,
-> +					u16 icid)
+>  include/net/bluetooth/hci_core.h |   43 +++++++++++-
+>  include/net/bluetooth/l2cap.h    |    1 +
+>  net/bluetooth/hci_conn.c         |   53 ++++++++++++++
+>  net/bluetooth/hci_core.c         |  143 ++++++++++++++++++++++++++++++++------
+>  net/bluetooth/l2cap_core.c       |   63 +++++++++--------
+>  net/bluetooth/smp.c              |    3 +-
+>  6 files changed, 251 insertions(+), 55 deletions(-)
 
-Shall the last argument be aligned right?
+I looked through all 4 patches and it seems fine to me. Lets get this
+merged and take it for a spin.
 
-> +{
-> +	struct l2cap_move_chan_cfm_rsp rsp;
-> +
-> +	BT_DBG("icid %d", icid);
-> +
-> +	rsp.icid = cpu_to_le16(icid);
-> +	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM_RSP, sizeof(rsp), &rsp);
-> +}
-> +
-> +static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
-> +					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
-> +					void *data)
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Maybe matter of taste but could those 3 lines be reduced to 2 here and
-below?
+Regards
 
-Best regards 
-Andrei Emeltchenko 
+Marcel
 
-> +{
-> +	struct l2cap_move_chan_req *req = data;
-> +	u16 icid = 0;
-> +	u16 result = L2CAP_MR_NOT_ALLOWED;
-> +
-> +	if (cmd_len != sizeof(*req))
-> +		return -EPROTO;
-> +
-> +	icid = le16_to_cpu(req->icid);
-> +
-> +	BT_DBG("icid %d, dest_amp_id %d", icid, req->dest_amp_id);
-> +
-> +	if (!enable_hs)
-> +		return -EINVAL;
-> +
-> +	/* Placeholder: Always refuse */
-> +	l2cap_send_move_chan_rsp(conn, cmd->ident, icid, result);
-> +
-> +	return 0;
-> +}
-> +
-> +static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
-> +					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
-> +					void *data)
-> +{
-> +	struct l2cap_move_chan_rsp *rsp = data;
-> +	u16 icid, result;
-> +
-> +	if (cmd_len != sizeof(*rsp))
-> +		return -EPROTO;
-> +
-> +	icid = le16_to_cpu(rsp->icid);
-> +	result = le16_to_cpu(rsp->result);
-> +
-> +	BT_DBG("icid %d, result %d", icid, result);
-> +
-> +	/* Placeholder: Always unconfirmed */
-> +	l2cap_send_move_chan_cfm(conn, NULL, icid, L2CAP_MC_UNCONFIRMED);
-> +
-> +	return 0;
-> +}
-> +
-> +static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
-> +					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
-> +					void *data)
-> +{
-> +	struct l2cap_move_chan_cfm *cfm = data;
-> +	u16 icid, result;
-> +
-> +	if (cmd_len != sizeof(*cfm))
-> +		return -EPROTO;
-> +
-> +	icid = le16_to_cpu(cfm->icid);
-> +	result = le16_to_cpu(cfm->result);
-> +
-> +	BT_DBG("icid %d, result %d", icid, result);
-> +
-> +	l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
-> +
-> +	return 0;
-> +}
-> +
-> +static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
-> +					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
-> +					void *data)
-> +{
-> +	struct l2cap_move_chan_cfm_rsp *rsp = data;
-> +	u16 icid;
-> +
-> +	if (cmd_len != sizeof(*rsp))
-> +		return -EPROTO;
-> +
-> +	icid = le16_to_cpu(rsp->icid);
-> +
-> +	BT_DBG("icid %d", icid);
-> +
-> +	return 0;
-> +}
-> +
->  static inline int l2cap_check_conn_param(u16 min, u16 max, u16 latency,
->  							u16 to_multiplier)
->  {
-> @@ -3266,6 +3390,23 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
->  		err = l2cap_create_channel_rsp(conn, cmd, data);
->  		break;
->  
-> +	case L2CAP_MOVE_CHAN_REQ:
-> +		err = l2cap_move_channel_req(conn, cmd, cmd_len, data);
-> +		break;
-> +
-> +	case L2CAP_MOVE_CHAN_RSP:
-> +		err = l2cap_move_channel_rsp(conn, cmd, cmd_len, data);
-> +		break;
-> +
-> +	case L2CAP_MOVE_CHAN_CFM:
-> +		err = l2cap_move_channel_confirm(conn, cmd, cmd_len, data);
-> +		break;
-> +
-> +	case L2CAP_MOVE_CHAN_CFM_RSP:
-> +		err = l2cap_move_channel_confirm_rsp(conn, cmd, cmd_len, data);
-> +		break;
-> +
-> +
->  	default:
->  		BT_ERR("Unknown BR/EDR signaling command 0x%2.2x", cmd->code);
->  		err = -EINVAL;
-> -- 
-> 1.7.7.1
-> 
-> --
-> Mat Martineau
-> Employee of Qualcomm Innovation Center, Inc.
-> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
