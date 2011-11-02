@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 08/20] Bluetooth: A2MP: Definitions for A2MP commands
-Date: Wed,  2 Nov 2011 16:02:36 +0200
-Message-Id: <1320242568-372-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv0 11/20] Bluetooth: A2MP: helper functions to count HCI devs
+Date: Wed,  2 Nov 2011 16:02:39 +0200
+Message-Id: <1320242568-372-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1320242568-372-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1320242568-372-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,96 +11,78 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Define A2MP command id and packet structures.
+Helper functions used to cound HCI devices (AMP controllers) and
+build controller list packet.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |   72 ++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 72 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci_core.h |   14 ++++++++++++++
+ net/bluetooth/a2mp.c             |   27 +++++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index aafaf09..e2eec2b 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -33,6 +33,78 @@ struct a2mp_cmd {
- 	__u8	data[0];
- } __packed;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index d037516..a9e5168 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -543,6 +543,20 @@ static inline struct hci_dev *hci_dev_hold(struct hci_dev *d)
+ 	return NULL;
+ }
  
-+/* A2MP command codes */
-+#define A2MP_COMMAND_REJ         0x01
-+struct a2mp_cmd_rej {
-+	__le16	reason;
-+} __packed;
++static inline uint8_t hci_num_ctrl(void)
++{
++	uint8_t count = 0;
++	struct list_head *p;
 +
-+#define A2MP_DISCOVER_REQ        0x02
-+struct a2mp_discov_req {
-+	__le16	mtu;
-+	__le16	ext_feat;
-+} __packed;
++	read_lock_bh(&hci_dev_list_lock);
++	list_for_each(p, &hci_dev_list) {
++		count++;
++	}
++	read_unlock_bh(&hci_dev_list_lock);
 +
-+struct a2mp_cl {
-+	__u8	id;
-+	__u8	type;
-+	__u8	status;
-+} __packed;
++	return count;
++}
 +
-+#define A2MP_DISCOVER_RSP        0x03
-+struct a2mp_discov_rsp {
-+	__le16     mtu;
-+	__le16     ext_feat;
-+	struct a2mp_cl cl[0];
-+} __packed;
+ #define hci_dev_lock(d)		spin_lock(&d->lock)
+ #define hci_dev_unlock(d)	spin_unlock(&d->lock)
+ #define hci_dev_lock_bh(d)	spin_lock_bh(&d->lock)
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 996a9dc..e10924e 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -71,6 +71,33 @@ static void a2mp_send(struct socket *a2mp_sock, u8 code, u8 ident, u16 len,
+ 	kfree(cmd);
+ }
+ 
++static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
++{
++	cl->id = 0;
++	cl->type = 0;
++	cl->status = 1;
++}
 +
-+#define A2MP_CHANGE_NOTIFY       0x04
-+#define A2MP_CHANGE_RSP          0x05
++static void __a2mp_add_cl(struct a2mp_cl *cl, u8 num_ctrl)
++{
++	int i = 0;
++	struct hci_dev *hdev;
 +
-+#define A2MP_GETINFO_REQ         0x06
-+struct a2mp_info_req {
-+	__u8       id;
-+} __packed;
++	read_lock_bh(&hci_dev_list_lock);
 +
-+#define A2MP_GETINFO_RSP         0x07
-+struct a2mp_info_rsp {
-+	__u8	id;
-+	__u8	status;
-+	__le32	total_bw;
-+	__le32	max_bw;
-+	__le32	min_latency;
-+	__le16	pal_cap;
-+	__le16	assoc_size;
-+} __packed;
++	__a2mp_cl_bredr(cl);
 +
-+#define A2MP_GETAMPASSOC_REQ     0x08
-+struct a2mp_amp_assoc_req {
-+	__u8	id;
-+} __packed;
++	list_for_each_entry(hdev, &hci_dev_list, list) {
++		if (++i >= num_ctrl)
++			goto out;
++		cl[i].id = hdev->id;
++		cl[i].type = hdev->amp_type;
++		cl[i].status = hdev->amp_status;
++	}
++out:
++	read_unlock_bh(&hci_dev_list_lock);
++}
 +
-+#define A2MP_GETAMPASSOC_RSP     0x09
-+struct a2mp_amp_assoc_rsp {
-+	__u8	id;
-+	__u8	status;
-+	__u8	amp_assoc[0];
-+} __packed;
-+
-+#define A2MP_CREATEPHYSLINK_REQ  0x0A
-+#define A2MP_DISCONNPHYSLINK_REQ 0x0C
-+struct a2mp_physlink_req {
-+	__u8	local_id;
-+	__u8	remote_id;
-+	__u8	amp_assoc[0];
-+} __packed;
-+
-+#define A2MP_CREATEPHYSLINK_RSP  0x0B
-+#define A2MP_DISCONNPHYSLINK_RSP 0x0D
-+struct a2mp_physlink_rsp {
-+	__u8	local_id;
-+	__u8	remote_id;
-+	__u8	status;
-+} __packed;
-+
- struct a2mp_work_data_ready {
- 	struct work_struct work;
- 	struct sock *sk;
+ /* Processing A2MP messages */
+ static inline int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
+ 						struct a2mp_cmd *hdr)
 -- 
 1.7.4.1
 
