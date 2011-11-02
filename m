@@ -1,46 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Define HCI reasons instead of magic number
+Subject: Re: How to add firmware uploader function to Bluez?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 02 Nov 2011 15:17:09 +0100
-In-Reply-To: <1320221534-13765-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1320221534-13765-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Al Cho <acho@suse.com>
+Cc: padovan@profusion.mobi, linux-bluetooth@vger.kernel.org,
+	oneukum@suse.com, jlee@suse.com
+Date: Wed, 02 Nov 2011 15:15:33 +0100
+In-Reply-To: <CAKzePapHJwC2VMpjgS_uK=NCUPCEAQt5+zDSEqRJNdPth-Aztw@mail.gmail.com>
+References: <CAKzePapHJwC2VMpjgS_uK=NCUPCEAQt5+zDSEqRJNdPth-Aztw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1320243430.15441.280.camel@aeonflux>
+Message-ID: <1320243335.15441.279.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Al,
 
-> Use HCI error reasons instead of magic numbers.
+> Broadcom BT4.0 module 0a5c:21e1 and 0a5c:21e3 need firmware
+> to setup(enable) at the first time we use.
+> We got the firmware and firmware uploader (brcm_patchram_plus_usb )
+> ( user space tool ) from Broadcom ,the Licence is GPLv2,
+> would it possible that add those to bluez package?or any idea for this?
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  include/net/bluetooth/hci.h      |    8 ++++++++
->  include/net/bluetooth/hci_core.h |    2 +-
->  net/bluetooth/hci_conn.c         |    2 +-
->  net/bluetooth/hci_event.c        |    4 ++--
->  net/bluetooth/l2cap_core.c       |    8 ++++----
->  5 files changed, 16 insertions(+), 8 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index c5fcd13..b9b0ca9 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -288,6 +288,10 @@ struct hci_cp_create_conn {
->  	__u8     role_switch;
->  } __packed;
->  
-> +#define HCI_REASON_DISC_AUTH_FAILURE	0x05
-> +#define HCI_REASON_DISC_REMOTE_USER	0x13
-> +#define HCI_REASON_DISC_LOCAL_HOST	0x16
-> +
+> please correct me if i got any mistake,thanks.
 
-actually these are HCI error/status codes that are well defined and go
-beyond just disconnect reason. Using REASON_DISC seems to be wrong here.
-Can you come up with better naming?
+can you post these firmware loader as a patch to this mailing list? Then
+we can discuss on how to integrate it best.
 
 Regards
 
