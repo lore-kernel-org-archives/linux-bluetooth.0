@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 05/20] Bluetooth: A2MP: AMP Manager basic functions
-Date: Wed,  2 Nov 2011 16:02:33 +0200
-Message-Id: <1320242568-372-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv0 12/20] Bluetooth: A2MP: process A2MP Discover Request
+Date: Wed,  2 Nov 2011 16:02:40 +0200
+Message-Id: <1320242568-372-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1320242568-372-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1320242568-372-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,118 +11,106 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Define AMP Manager and some basic functions.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |   11 +++++++
- net/bluetooth/a2mp.c         |   60 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 71 insertions(+), 0 deletions(-)
+ include/net/bluetooth/a2mp.h |    6 +++++
+ net/bluetooth/a2mp.c         |   51 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 57 insertions(+), 0 deletions(-)
 
 diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 7ead6a3..9827cec 100644
+index e2eec2b..1782f47 100644
 --- a/include/net/bluetooth/a2mp.h
 +++ b/include/net/bluetooth/a2mp.h
-@@ -15,6 +15,17 @@
+@@ -15,6 +15,8 @@
  #ifndef __A2MP_H
  #define __A2MP_H
  
-+struct amp_mgr *get_amp_mgr_sk(struct sock *sk);
-+struct amp_mgr *create_amp_mgr(struct l2cap_conn *conn);
-+void remove_amp_mgr(struct amp_mgr *mgr);
++#define A2MP_FEAT_EXT	0x8000
 +
-+struct amp_mgr {
-+	struct	list_head list;
-+	struct	l2cap_conn *l2cap_conn;
-+	struct	socket *a2mp_sock;
-+	unsigned long	flags;
+ struct amp_mgr *get_amp_mgr_sk(struct sock *sk);
+ struct amp_mgr *create_amp_mgr(struct l2cap_conn *conn);
+ void remove_amp_mgr(struct amp_mgr *mgr);
+@@ -105,6 +107,10 @@ struct a2mp_physlink_rsp {
+ 	__u8	status;
+ } __packed;
+ 
++enum {
++	FLAG_DISCOVERED,
 +};
 +
- struct a2mp_cmd {
- 	__u8	code;
- 	__u8	ident;
+ struct a2mp_work_data_ready {
+ 	struct work_struct work;
+ 	struct sock *sk;
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 2fe0004..d505c77 100644
+index e10924e..b67696f 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -13,6 +13,7 @@
- */
- 
- #include <linux/workqueue.h>
-+#include <linux/list.h>
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -21,6 +22,9 @@
- 
- static struct workqueue_struct *a2mp_workqueue;
- 
-+LIST_HEAD(amp_mgr_list);
-+DEFINE_RWLOCK(amp_mgr_list_lock);
-+
- /* A2MP build & send command helper functions */
- static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
- {
-@@ -205,3 +209,59 @@ static struct socket *open_a2mp_sock(struct l2cap_conn *conn)
- 	}
+@@ -114,6 +114,54 @@ static inline int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
  }
  
-+/* AMP Manager functions */
-+struct amp_mgr *get_amp_mgr_sk(struct sock *sk)
++static inline int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
++							struct a2mp_cmd *hdr)
 +{
-+	struct amp_mgr *mgr;
-+	struct amp_mgr *found = NULL;
++	struct a2mp_discov_req *req = (struct a2mp_discov_req *)skb->data;
++	struct a2mp_discov_rsp *rsp;
++	u16 ext_feat;
++	size_t len;
++	u8 num_ctrl;
 +
-+	read_lock(&amp_mgr_list_lock);
-+	list_for_each_entry(mgr, &amp_mgr_list, list) {
-+		if ((mgr->a2mp_sock) && (mgr->a2mp_sock->sk == sk)) {
-+			found = mgr;
++	if (skb->len < sizeof(*req))
++		return -EINVAL;
++
++	skb_pull(skb, sizeof(*req));
++
++	BT_DBG("mtu %d efm 0x%4.4x", le16_to_cpu(req->mtu),
++						le16_to_cpu(req->ext_feat));
++
++	ext_feat = le16_to_cpu(req->ext_feat);
++
++	/* check that packet is not broken for now */
++	while (ext_feat & A2MP_FEAT_EXT) {
++		if (skb->len < sizeof(ext_feat))
++			return -EINVAL;
++
++		ext_feat = get_unaligned_le16(skb->data);
++		BT_DBG("ext_feat 0x%4.4x", le16_to_cpu(req->ext_feat));
++		skb_pull(skb, sizeof(ext_feat));
++	}
++
++	num_ctrl = hci_num_ctrl();
++	len = num_ctrl * sizeof(struct a2mp_cl) + sizeof (*rsp);
++	rsp = kmalloc(len, GFP_KERNEL);
++	if (!rsp)
++		return -ENOMEM;
++
++	rsp->mtu = cpu_to_le16(L2CAP_A2MP_DEFAULT_MTU);
++	rsp->ext_feat = 0;
++
++	__a2mp_add_cl(rsp->cl, num_ctrl);
++
++	BT_DBG("num_ctrl = %d", num_ctrl);
++
++	a2mp_send(mgr->a2mp_sock, A2MP_DISCOVER_RSP, hdr->ident, len, rsp);
++
++	kfree(rsp);
++	return 0;
++}
++
+ /* Handle A2MP signalling */
+ void a2mp_receive(struct sock *sk, struct sk_buff *skb)
+ {
+@@ -144,6 +192,9 @@ void a2mp_receive(struct sock *sk, struct sk_buff *skb)
+ 			break;
+ 
+ 		case A2MP_DISCOVER_REQ:
++			err = a2mp_discover_req(mgr, skb, hdr);
 +			break;
-+		}
-+	}
-+	read_unlock(&amp_mgr_list_lock);
 +
-+	return found;
-+}
-+
-+void remove_amp_mgr(struct amp_mgr *mgr)
-+{
-+	BT_DBG("mgr %p", mgr);
-+
-+	write_lock(&amp_mgr_list_lock);
-+	sock_release(mgr->a2mp_sock);
-+	list_del(&mgr->list);
-+	write_unlock(&amp_mgr_list_lock);
-+
-+	kfree(mgr);
-+}
-+
-+struct amp_mgr *create_amp_mgr(struct l2cap_conn *conn)
-+{
-+	struct amp_mgr *mgr;
-+
-+	mgr = kzalloc(sizeof(*mgr), GFP_KERNEL);
-+	if (!mgr)
-+		goto finished;
-+
-+	BT_DBG("conn %p mgr %p", conn, mgr);
-+
-+	mgr->l2cap_conn = conn;
-+
-+	mgr->a2mp_sock = open_a2mp_sock(conn);
-+	if (!mgr->a2mp_sock) {
-+		kfree(mgr);
-+		mgr = NULL;
-+		goto finished;
-+	}
-+
-+	write_lock(&amp_mgr_list_lock);
-+	list_add(&(mgr->list), &amp_mgr_list);
-+	write_unlock(&amp_mgr_list_lock);
-+
-+finished:
-+	return mgr;
-+}
+ 		case A2MP_CHANGE_NOTIFY:
+ 		case A2MP_GETINFO_REQ:
+ 		case A2MP_GETAMPASSOC_REQ:
 -- 
 1.7.4.1
 
