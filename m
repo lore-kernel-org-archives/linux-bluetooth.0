@@ -1,55 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCHv3 8/9] Bluetooth: Add signal handlers for channel moves
+Subject: Re: [PATCHv3 0/9] AMP interface and signal framework
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Mat Martineau <mathewm@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
 	pkrystad@codeaurora.org, andrei.emeltchenko@intel.com
-Date: Wed, 02 Nov 2011 07:25:02 +0100
-In-Reply-To: <1320186568-25493-9-git-send-email-mathewm@codeaurora.org>
+Date: Wed, 02 Nov 2011 07:23:35 +0100
+In-Reply-To: <1320186568-25493-1-git-send-email-mathewm@codeaurora.org>
 References: <1320186568-25493-1-git-send-email-mathewm@codeaurora.org>
-	 <1320186568-25493-9-git-send-email-mathewm@codeaurora.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1320215103.15441.270.camel@aeonflux>
+Message-ID: <1320215016.15441.268.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mat,
 
-> AMP channels can be moved between BR/EDR and AMP controllers using a
-> sequence of signals. Every attempted channel move involves a series of
-> four signals:
+> This patch set includes the AMP policy socket option that was
+> previously discussed and accepted in to bluetooth-testing, and the
+> signaling framework for AMP channel creation and AMP channel moves.
 
-<snip>
+the whole patch series looks good to me, besides one minor coding style
+damage that I will point out ;)
 
->  {
-> @@ -3266,6 +3390,23 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
->  		err = l2cap_create_channel_rsp(conn, cmd, data);
->  		break;
->  
-> +	case L2CAP_MOVE_CHAN_REQ:
-> +		err = l2cap_move_channel_req(conn, cmd, cmd_len, data);
-> +		break;
-> +
-> +	case L2CAP_MOVE_CHAN_RSP:
-> +		err = l2cap_move_channel_rsp(conn, cmd, cmd_len, data);
-> +		break;
-> +
-> +	case L2CAP_MOVE_CHAN_CFM:
-> +		err = l2cap_move_channel_confirm(conn, cmd, cmd_len, data);
-> +		break;
-> +
-> +	case L2CAP_MOVE_CHAN_CFM_RSP:
-> +		err = l2cap_move_channel_confirm_rsp(conn, cmd, cmd_len, data);
-> +		break;
-> +
-> +
->  	default:
->  		BT_ERR("Unknown BR/EDR signaling command 0x%2.2x", cmd->code);
->  		err = -EINVAL;
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-and this is the coding style damage. You sneaked in two empty lines
-here.
+Btw. once I acked a patch, feel free to carry that ack after your signed
+of by line (if you have to an updated version). Makes it easier for
+Gustavo to apply patches.
 
 Regards
 
