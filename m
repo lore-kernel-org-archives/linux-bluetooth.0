@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 6/8] filesystem: remove unnecessary includes
-Date: Wed,  2 Nov 2011 15:09:53 +0200
-Message-Id: <1320239395-29819-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 5/8] Make obex_server_init to initialized all services registered
+Date: Wed,  2 Nov 2011 15:09:52 +0200
+Message-Id: <1320239395-29819-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1320239395-29819-1-git-send-email-luiz.dentz@gmail.com>
 References: <1320239395-29819-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,62 +11,141 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This way we don't have to keep adding new entries to main.c everytime
+a new service is introduced.
 ---
- plugins/filesystem.c |   12 ++++++------
- 1 files changed, 6 insertions(+), 6 deletions(-)
+ src/main.c    |   17 ++++-------------
+ src/server.c  |   43 +++++++++++++++++++++++++++----------------
+ src/server.h  |    2 +-
+ src/service.c |    3 +++
+ 4 files changed, 35 insertions(+), 30 deletions(-)
 
-diff --git a/plugins/filesystem.c b/plugins/filesystem.c
-index 4106c80..12ca209 100644
---- a/plugins/filesystem.c
-+++ b/plugins/filesystem.c
-@@ -48,9 +48,7 @@
- #include "obexd.h"
- #include "plugin.h"
- #include "log.h"
--#include "obex.h"
- #include "mimetype.h"
--#include "service.h"
- #include "filesystem.h"
+diff --git a/src/main.c b/src/main.c
+index 114c215..992a646 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -241,19 +241,10 @@ int main(int argc, char *argv[])
  
- #define EOL_CHARS "\n"
-@@ -79,7 +77,9 @@
- 			" modified=\"%s\" mem-type=\"DEV\"" \
- 			" created=\"%s\"/>" EOL_CHARS
+ 	plugin_init(option_plugin, option_noplugin);
  
--static const uint8_t FTP_TARGET[TARGET_SIZE] = {
-+#define FTP_TARGET_SIZE 16
+-	obex_server_init(OBEX_OPP);
+-
+-	obex_server_init(OBEX_FTP);
+-
+-	obex_server_init(OBEX_PCSUITE);
+-
+-	obex_server_init(OBEX_PBAP);
+-
+-	obex_server_init(OBEX_IRMC);
+-
+-	obex_server_init(OBEX_SYNCEVOLUTION);
+-
+-	obex_server_init(OBEX_MAS);
++	if (obex_server_init() < 0) {
++		error("obex_server_init failed");
++		exit(EXIT_FAILURE);
++	}
+ 
+ 	if (!root_folder_setup(option_root, option_root_setup)) {
+ 		error("Unable to setup root folder %s", option_root);
+diff --git a/src/server.c b/src/server.c
+index bf234ea..f91a622 100644
+--- a/src/server.c
++++ b/src/server.c
+@@ -47,24 +47,10 @@
+ 
+ static GSList *servers = NULL;
+ 
+-int obex_server_init(uint16_t service)
++static void init_server(uint16_t service, GSList *transports)
+ {
+-	GSList *drivers;
+-	GSList *transports;
+ 	GSList *l;
+ 
+-	drivers = obex_service_driver_list(service);
+-	if (drivers == NULL) {
+-		DBG("No service driver registered");
+-		return -EINVAL;
+-	}
+-
+-	transports = obex_transport_driver_list();
+-	if (transports == NULL) {
+-		DBG("No transport driver registered");
+-		return -EINVAL;
+-	}
+-
+ 	for (l = transports; l; l = l->next) {
+ 		struct obex_transport_driver *transport = l->data;
+ 		struct obex_server *server;
+@@ -76,7 +62,7 @@ int obex_server_init(uint16_t service)
+ 
+ 		server = g_new0(struct obex_server, 1);
+ 		server->transport = transport;
+-		server->drivers = drivers;
++		server->drivers = obex_service_driver_list(service);
+ 
+ 		server->transport_data = transport->start(server, &err);
+ 		if (server->transport_data == NULL) {
+@@ -88,6 +74,31 @@ int obex_server_init(uint16_t service)
+ 
+ 		servers = g_slist_prepend(servers, server);
+ 	}
++}
 +
-+static const uint8_t FTP_TARGET[FTP_TARGET_SIZE] = {
- 			0xF9, 0xEC, 0x7B, 0xC4,  0x95, 0x3C, 0x11, 0xD2,
- 			0x98, 0x4E, 0x52, 0x54,  0x00, 0xDC, 0x9E, 0x09  };
++int obex_server_init(void)
++{
++	GSList *drivers;
++	GSList *transports;
++	GSList *l;
++
++	drivers = obex_service_driver_list(0);
++	if (drivers == NULL) {
++		DBG("No service driver registered");
++		return -EINVAL;
++	}
++
++	transports = obex_transport_driver_list();
++	if (transports == NULL) {
++		DBG("No transport driver registered");
++		return -EINVAL;
++	}
++
++	for (l = drivers; l; l = l->next) {
++		struct obex_service_driver *driver = l->data;
++
++		init_server(driver->service, transports);
++	}
  
-@@ -669,7 +669,7 @@ static struct obex_mime_type_driver file = {
+ 	return 0;
+ }
+diff --git a/src/server.h b/src/server.h
+index dd0df00..81c0b5d 100644
+--- a/src/server.h
++++ b/src/server.h
+@@ -28,7 +28,7 @@ struct obex_server {
+ 	GSList *drivers;
+ };
  
- static struct obex_mime_type_driver capability = {
- 	.target = FTP_TARGET,
--	.target_size = TARGET_SIZE,
-+	.target_size = FTP_TARGET_SIZE,
- 	.mimetype = "x-obex/capability",
- 	.open = capability_open,
- 	.close = capability_close,
-@@ -678,7 +678,7 @@ static struct obex_mime_type_driver capability = {
+-int obex_server_init(uint16_t service);
++int obex_server_init(void);
  
- static struct obex_mime_type_driver folder = {
- 	.target = FTP_TARGET,
--	.target_size = TARGET_SIZE,
-+	.target_size = FTP_TARGET_SIZE,
- 	.mimetype = "x-obex/folder-listing",
- 	.open = folder_open,
- 	.close = string_free,
-@@ -687,7 +687,7 @@ static struct obex_mime_type_driver folder = {
+ void obex_server_exit(void);
  
- static struct obex_mime_type_driver pcsuite = {
- 	.target = FTP_TARGET,
--	.target_size = TARGET_SIZE,
-+	.target_size = FTP_TARGET_SIZE,
- 	.who = PCSUITE_WHO,
- 	.who_size = PCSUITE_WHO_SIZE,
- 	.mimetype = "x-obex/folder-listing",
+diff --git a/src/service.c b/src/service.c
+index f7c5a61..8116fc2 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -64,6 +64,9 @@ GSList *obex_service_driver_list(uint16_t services)
+ 	GSList *l;
+ 	GSList *list = NULL;
+ 
++	if (services == 0)
++		return drivers;
++
+ 	for (l = drivers; l && services; l = l->next) {
+ 		struct obex_service_driver *driver = l->data;
+ 
 -- 
 1.7.6.4
 
