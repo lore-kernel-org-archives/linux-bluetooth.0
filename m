@@ -1,67 +1,192 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/4] Bluetooth: handle priority change within quote
-Date: Wed,  2 Nov 2011 15:52:02 +0200
-Message-Id: <1320241924-2300-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1320241924-2300-1-git-send-email-luiz.dentz@gmail.com>
-References: <1320241924-2300-1-git-send-email-luiz.dentz@gmail.com>
+From: "Ilia, Kolominsky" <iliak@ti.com>
+To: "Arkadiusz.Lichwa@tieto.com" <Arkadiusz.Lichwa@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "ulrik.lauren@stericsson.com" <ulrik.lauren@stericsson.com>
+Date: Wed, 2 Nov 2011 14:19:24 +0100
+Subject: RE: [PATCH] Bluetooth: Revert: Fix L2CAP connection establishment
+Message-ID: <AC090B9732AB2B4DB7FF476E907FE660013BB7FDB6@dnce02.ent.ti.com>
+References: <1319621002-7122-1-git-send-email-arkadiusz.lichwa@tieto.com>
+ <1319621002-7122-2-git-send-email-arkadiusz.lichwa@tieto.com>
+ <BF2CDDEFEC2D1E42A67A8AE0508897EC3E9207D367@EXMB02.eu.tieto.com>
+ <AC090B9732AB2B4DB7FF476E907FE660013BAEC740@dnce02.ent.ti.com>
+ <BF2CDDEFEC2D1E42A67A8AE0508897EC3E92178F93@EXMB02.eu.tieto.com>
+In-Reply-To: <BF2CDDEFEC2D1E42A67A8AE0508897EC3E92178F93@EXMB02.eu.tieto.com>
+Content-Type: text/plain; charset="iso-8859-2"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Arek,
 
-The quote is calculated based on the first buffer in the queue so if the
-priority changes to something lower than the priority of the first skb
-the quote needs to be recalculated.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_core.c |   18 ++++++++++++++++--
- 1 files changed, 16 insertions(+), 2 deletions(-)
+> -----Original Message-----
+> From: Arkadiusz.Lichwa@tieto.com [mailto:Arkadiusz.Lichwa@tieto.com]
+> Sent: Wednesday, November 02, 2011 9:44 AM
+> To: Ilia, Kolominsky; linux-bluetooth@vger.kernel.org
+> Cc: ulrik.lauren@stericsson.com
+> Subject: RE: [PATCH] Bluetooth: Revert: Fix L2CAP connection
+> establishment
+> 
+> Hi Ilia
+> 
+> >From: Ilia, Kolominsky [mailto:iliak@ti.com]
+> >Sent: Tuesday, November 01, 2011 9:58 AM
+> >To: Lichwa Arkadiusz; linux-bluetooth@vger.kernel.org
+> >Cc: ulrik.lauren@stericsson.com
+> >Subject: RE: [PATCH] Bluetooth: Revert: Fix L2CAP connection
+> establishment
+> >
+> >Hi
+> >
+> >> -----Original Message-----
+> >> From: Arkadiusz.Lichwa@tieto.com [mailto:Arkadiusz.Lichwa@tieto.com]
+> >> Sent: Monday, October 31, 2011 6:00 PM
+> >> To: linux-bluetooth@vger.kernel.org
+> >> Cc: Ilia, Kolominsky; ulrik.lauren@stericsson.com;
+> >> Arkadiusz.Lichwa@tieto.com
+> >> Subject: RE: [PATCH] Bluetooth: Revert: Fix L2CAP connection
+> >> establishment
+> >>
+> >> Hi
+> >>
+> >> >Subject: [PATCH] Bluetooth: Revert: Fix L2CAP connection
+> establishment
+> >> >
+> >> >This reverts commit 330605423ca6eafafb8dcc27502bce1c585d1b06.
+> >> >The commit introduces regression when two 2.1 devices attempt
+> >> >establish rfcomm channel. Such connection is refused since there's
+> >> >a security block issue on l2cap. It means the link is unencrypted.
+> >> >
+> >> >2011-09-16 18:08:46.567616 < ACL data: handle 1 flags 0x00 dlen 24
+> >> >    0000: 14 00 40 00 06 00 02 00  0f 35 03 19 12 00 ff ff
+> >> >..@......5....ÿÿ
+> >> >    0010: 35 05 0a 00 00 ff ff 00
+> 5....ÿÿ.
+> >> >2011-09-16 18:08:46.572377 > HCI Event: Number of Completed Packets
+> >> >(0x13) plen 5
+> >> >    handle 1 packets 1
+> >> >2011-09-16 18:08:46.577931 > ACL data: handle 1 flags 0x02 dlen 88
+> >> >    L2CAP(d): cid 0x0040 len 84 [psm 0]
+> >> >      0000: 07 00 02 00 4f 00 4c 35  4a 35 48 09 00 00 0a 00
+> >> >....O.L5J5H.....
+> >> >      0010: 01 00 00 09 00 01 35 03  19 12 00 09 00 05 35 03
+> >> >......5.......5.
+> >> >      0020: 19 10 02 09 00 09 35 08  35 06 19 12 00 09 01 02
+> >> >......5.5.......
+> >> >      0030: 09 02 00 09 01 02 09 02  01 09 00 0a 09 02 02 09
+> >> >................
+> >> >      0040: 00 00 09 02 03 09 00 00  09 02 04 28 01 09 02 05
+> >> >...........(....
+> >> >      0050: 09 00 02 00                                       ....
+> >> >2011-09-16 18:08:46.626057 < HCI Command: Authentication Requested
+> >> >(0x01|0x0011) plen 2
+> >> >    handle 1
+> >> >2011-09-16 18:08:46.627614 > HCI Event: Command Status (0x0f) plen
+> 4
+> >> >    Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
+> >> >2011-09-16 18:08:46.627675 > HCI Event: Link Key Request (0x17)
+> plen 6
+> >> >    bdaddr 00:00:F2:6A:29:69
+> >> >2011-09-16 18:08:46.634999 < HCI Command: Link Key Request Reply
+> >> >(0x01|0x000b) plen 22
+> >> >    bdaddr 00:00:F2:6A:29:69 key 58CD393179FC902E5E8F512A855EE532
+> >> >2011-09-16 18:08:46.683278 > HCI Event: Command Complete (0x0e)
+> plen
+> >> 10
+> >> >    Link Key Request Reply (0x01|0x000b) ncmd 1
+> >> >    status 0x00 bdaddr 00:00:F2:6A:29:69
+> >> >2011-09-16 18:08:46.764729 > HCI Event: Auth Complete (0x06) plen 3
+> >> >    status 0x00 handle 1
+> >> >2011-09-16 18:08:46.764821 < ACL data: handle 1 flags 0x00 dlen 12
+> >> >    0000: 08 00 01 00 02 05 04 00  03 00 41 00
+> >> ..........A.
+> >> >2011-09-16 18:08:46.764851 > HCI Event: Command Status (0x0f) plen
+> 4
+> >> >    Unknown (0x00|0x0000) status 0x00 ncmd 2
+> >> >2011-09-16 18:08:46.768117 > HCI Event: Number of Completed Packets
+> >> >(0x13) plen 5
+> >> >    handle 1 packets 1
+> >> >2011-09-16 18:08:46.770894 > ACL data: handle 1 flags 0x02 dlen 16
+> >> >    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0041 result 3 status
+> 0
+> >> >      Connection refused - security block
+> >> >2011-09-16 18:08:49.000691 < ACL data: handle 1 flags 0x00 dlen 12
+> >> >    0000: 08 00 01 00 06 06 04 00  40 00 40 00
+> >> ........@.@.
+> >> >2011-09-16 18:08:49.015675 > HCI Event: Number of Completed Packets
+> >> >(0x13) plen 5
+> >> >    handle 1 packets 1
+> >> >2011-09-16 18:08:49.016927 > ACL data: handle 1 flags 0x02 dlen 12
+> >> >    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
+> >> >2011-09-16 18:08:51.009480 < HCI Command: Disconnect (0x01|0x0006)
+> >> plen
+> >> >3
+> >> >    handle 1 reason 0x13
+> >> >    Reason: Remote User Terminated Connection
+> >> >2011-09-16 18:08:51.011525 > HCI Event: Command Status (0x0f) plen
+> 4
+> >> >    Disconnect (0x01|0x0006) status 0x00 ncmd 1
+> >> >2011-09-16 18:08:51.123494 > HCI Event: Disconn Complete (0x05)
+> plen 4
+> >> >    status 0x00 handle 1 reason 0x16
+> >> >    Reason: Connection Terminated by Local Host
+> >> >
+> >> >Signed-off-by: Arek Lichwa <arkadiusz.lichwa@tieto.com>
+> >> >---
+> >> > net/bluetooth/hci_conn.c |    2 +-
+> >> > 1 files changed, 1 insertions(+), 1 deletions(-)
+> >> >
+> >> >diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> >> >index c1c597e..e0af723 100644
+> >> >--- a/net/bluetooth/hci_conn.c
+> >> >+++ b/net/bluetooth/hci_conn.c
+> >> >@@ -673,7 +673,7 @@ int hci_conn_security(struct hci_conn *conn,
+> __u8
+> >> >sec_level, __u8 auth_type)
+> >> > 		goto encrypt;
+> >> >
+> >> > auth:
+> >> >-	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend))
+> >> >+	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend))
+> >> > 		return 0;
+> >
+> >Wouldn't that bit set in hci_conn_encrypt() the first time
+> >hci_conn_security() is called?
+> 
+> This in this case has never happened.
+> First time the flow jumps to "auth" label in hci_conn_security().
+> On auth_complete_evt the flow overpasses the encryption part since
+> the conn->state is not BT_CONFIG and pending HCI_CONN_ENCRYPT_PEND is
+> never set. Rfcomm's l2cap is set in motion afterwards.
+> 
+> The question is why you acctually have changed the code?
+> Isn't it to be related to too early l2cap timer expirations? ...which
+> was also part of some regression that has been fixed in bluetooth-next
+> now
+> The old code was quite stable, for so pretty long time noone observed
+> regression in this area. Am I wrong ?
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 631327d..19e4453 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2193,10 +2193,17 @@ static inline void hci_sched_acl(struct hci_dev *hdev)
- 
- 	while (hdev->acl_cnt &&
- 			(chan = hci_chan_sent(hdev, ACL_LINK, &quote))) {
--		while (quote-- && (skb = skb_dequeue(&chan->data_q))) {
-+		u32 priority = (skb_peek(&chan->data_q))->priority;
-+		while (quote-- && (skb = skb_peek(&chan->data_q))) {
- 			BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
- 					skb->len, skb->priority);
- 
-+			/* Stop if priority has changed */
-+			if (skb->priority < priority)
-+				break;
-+
-+			skb = skb_dequeue(&chan->data_q);
-+
- 			hci_conn_enter_active_mode(chan->conn,
- 						bt_cb(skb)->force_active);
- 
-@@ -2278,10 +2285,17 @@ static inline void hci_sched_le(struct hci_dev *hdev)
- 
- 	cnt = hdev->le_pkts ? hdev->le_cnt : hdev->acl_cnt;
- 	while (cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
--		while (quote-- && (skb = skb_dequeue(&chan->data_q))) {
-+		u32 priority = (skb_peek(&chan->data_q))->priority;
-+		while (quote-- && (skb = skb_peek(&chan->data_q))) {
- 			BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
- 					skb->len, skb->priority);
- 
-+			/* Stop if priority has changed */
-+			if (skb->priority < priority)
-+				break;
-+
-+			skb = skb_dequeue(&chan->data_q);
-+
- 			hci_send_frame(skb);
- 			hdev->le_last_tx = jiffies;
- 
--- 
-1.7.6.4
+l2cap connection establishment time out was observed with 
+a number of old devices that I don't have in my possession now.
+So this patch was introduced to fix this issue.
+
+What you are saying seems reasonable, I think we can revert the patch.
+In case someone will be able to reproduce this time-out, we will know
+where to look
+
+Regards , Ilia.
+
+> 
+> /Arek
+> >
+> >> >
+> >> > 	if (!hci_conn_auth(conn, sec_level, auth_type))
+> >> >--
+> >> >1.7.6
+> >>
+> >> Is it something unclear in my original post ? Any comments ?
+> >> Regression here is quite obvious in my opinion.
+> >>
+> >> /Arek
 
