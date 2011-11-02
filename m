@@ -1,34 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 1/8] Remove config.h from src/obex.h
-Date: Wed,  2 Nov 2011 15:09:48 +0200
-Message-Id: <1320239395-29819-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 2 Nov 2011 12:01:14 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] Fix response on AT+CHLD=0 in maemo6
+Message-ID: <20111102100114.GB2326@fusion.localdomain>
+References: <1320223817-7391-1-git-send-email-dmitriy.paliy@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1320223817-7391-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Dmitriy,
 
-config.h should only be included in .c files
----
- src/obex.h |    4 ----
- 1 files changed, 0 insertions(+), 4 deletions(-)
+On Wed, Nov 02, 2011, Dmitriy Paliy wrote:
+> Currently, +CIEV indicator after AT+CHLD=0 command for one active call,
+> one held call, one incoming call scenario is incorrect. callheld=2
+> according to HFP 1.5 spec., p.70, means 'Call on hold, no active call'.
+> Hence, value 2 cannot be provided in +CIEV if there is an active call.
+> ---
+>  audio/telephony-maemo6.c |   10 +++++++---
+>  1 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/src/obex.h b/src/obex.h
-index 6b7dc7e..f4fd159 100644
---- a/src/obex.h
-+++ b/src/obex.h
-@@ -22,10 +22,6 @@
-  *
-  */
- 
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
- #define OBJECT_SIZE_UNKNOWN -1
- #define OBJECT_SIZE_DELETE -2
- 
--- 
-1.7.6.4
+Applied. Thanks.
 
+Johan
