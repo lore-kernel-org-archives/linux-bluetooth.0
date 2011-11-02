@@ -1,50 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20111102080259.GB12653@aemeltch-MOBL1>
-References: <CAKzePapHJwC2VMpjgS_uK=NCUPCEAQt5+zDSEqRJNdPth-Aztw@mail.gmail.com>
-	<20111102080259.GB12653@aemeltch-MOBL1>
-Date: Wed, 2 Nov 2011 18:00:48 +0800
-Message-ID: <CAKzePaq3pgktQeb9y9HzeGa-JO5aXYuo5e1WgQ+sE=FOVf5pPw@mail.gmail.com>
-Subject: Re: How to add firmware uploader function to Bluez?
-From: Al Cho <acho@suse.com>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Al Cho <acho@suse.com>, marcel@holtmann.org,
-	padovan@profusion.mobi, linux-bluetooth@vger.kernel.org,
-	oneukum@suse.com, jlee@suse.com
+In-Reply-To: <1319475848-4171-1-git-send-email-sancane@gmail.com>
+References: <1319475848-4171-1-git-send-email-sancane@gmail.com>
+Date: Wed, 2 Nov 2011 10:59:37 +0100
+Message-ID: <CACLukz+pg_ncY_nd-7j46KUdet=r5uMvQpy_8JRR-eLNFP=FXA@mail.gmail.com>
+Subject: Re: Health Thermometer Profile
+From: Santiago Carot <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
-
-On Wed, Nov 2, 2011 at 4:03 PM, Andrei Emeltchenko
-<andrei.emeltchenko.news@gmail.com> wrote:
-> Hi AL,
+2011/10/24 Santiago Carot-Nemesio <sancane@gmail.com>:
+> This set of patches enable applications to register watchers in order to
+> receive final measurements. Besides, all fixes suggested in the mailing
+> list have been applied.
 >
-> On Wed, Nov 02, 2011 at 03:55:50PM +0800, Al Cho wrote:
->> Hi All,
->>
->> Broadcom BT4.0 module 0a5c:21e1 and 0a5c:21e3 need firmware
->> to setup(enable) at the first time we use.
->> We got the firmware and firmware uploader (brcm_patchram_plus_usb )
->> ( user space tool ) from Broadcom ,the Licence is GPLv2,
->> would it possible that add those to bluez package?or any idea for this?
->
-> Should firmware come to linux-firmware package?
+> [PATCH 1/8] Process characteristic descriptors in the thermometer
+> [PATCH 2/8] Get valid range descriptor if it is supported
+> [PATCH 3/8] Implement D-Bus register watcher function
+> [PATCH 4/8] Implement D-Bus unregister watcher function
+> [PATCH 5/8] Enable final measurement indications when first watcher
+> [PATCH 6/8] Disable final measurements indication when last watcher
+> [PATCH 7/8] Manage watcher's disconnections from the bus
+> [PATCH 8/8] Implement D-Bus get properties function
 >
 
-Yes, I think so,
-but 0a5c:21e1 and 0a5c:21e3 use btusb driver,
-this firmware use at the first time to enable only,
-and that firmware uploader need to use the bluez hci library.
-So I guess add those to bluez would be better.
-
-> Description: Firmware for Linux kernel drivers
->  This package provides firmware used by Linux kernel drivers.
->
-> Do not know about "firmware-loader", probably we need to use available tools.
->
-
-
-BR,
-    AL
+ping
