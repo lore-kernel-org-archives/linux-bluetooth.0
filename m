@@ -1,47 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Peter Krystad" <pkrystad@codeaurora.org>
-To: "'Emeltchenko Andrei'" <Andrei.Emeltchenko.news@gmail.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-References: <1320242568-372-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1320242568-372-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Subject: RE: [RFCv0 00/20] RFC A2MP implementation
-Date: Thu, 3 Nov 2011 17:20:38 -0700
-Message-ID: <000f01cc9a87$94d0dc00$be729400$@org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="US-ASCII"
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] Bluetooth: Fix mgmt response when HCI_Write_Scan_Enable fails
+Date: Fri,  4 Nov 2011 00:17:47 +0200
+Message-Id: <1320358667-21086-3-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1320358667-21086-1-git-send-email-johan.hedberg@gmail.com>
+References: <1320358667-21086-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Hi Andrei,
+A proper mgmt_command_status should be returned to user-space if either
+discoverable or connectable enabling fails.
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> RFC meant to indicate our current development status.
-> 
-> Code based on Code Aurora (git://codeaurora.org/kernel/msm.git) and
-Atheros
-> (search for: [PATCH 2/3] Add a2mp protocol/AMP manager, by Atheros Linux
-BT3)
-> implementations (mostly Code Aurora). Main difference to the original code
-is
-> - code rebase against recent bluetooth-next
-> - rewritten way to send A2MP msgs
-> - handling fixed channel modifications
-> - I was trying to separate AMP vs A2MP name usage. AMP is used for
-> "Alternate MAC PHY" controller, A2MP for "AMP Manager Protocol".
-> - fixes related to PTS beta A2MP tests
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_event.c        |    9 ++++++---
+ net/bluetooth/mgmt.c             |   13 +++++++++++++
+ 3 files changed, 20 insertions(+), 3 deletions(-)
 
-I think your approach looks fine so far. Do you plan to continue on with
-adding detail to the patches in this series or will just do cleanup on them
-and then prepare another set?
-
-Peter.
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 5079598..6a17e5f 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -911,6 +911,7 @@ int mgmt_index_removed(u16 index);
+ int mgmt_powered(u16 index, u8 powered);
+ int mgmt_discoverable(u16 index, u8 discoverable);
+ int mgmt_connectable(u16 index, u8 connectable);
++int mgmt_write_scan_failed(u16 index, u8 scan, u8 status);
+ int mgmt_new_key(u16 index, struct link_key *key, u8 persistent);
+ int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type);
+ int mgmt_disconnected(u16 index, bdaddr_t *bdaddr);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index dd24d6e..a601baf 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -284,11 +284,14 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!sent)
+ 		return;
  
---Peter Krystad
-  Employee of Qualcomm Innovation Center, Inc.
-  Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
-
+-	if (status != 0)
+-		goto done;
+-
+ 	param = *((__u8 *) sent);
+ 
++	if (status != 0) {
++		mgmt_write_scan_failed(hdev->id, param, status);
++		hdev->discov_timeout = 0;
++		goto done;
++	}
++
+ 	old_pscan = test_and_clear_bit(HCI_PSCAN, &hdev->flags);
+ 	old_iscan = test_and_clear_bit(HCI_ISCAN, &hdev->flags);
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index efcde95..56e64dc 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2059,6 +2059,19 @@ int mgmt_connectable(u16 index, u8 connectable)
+ 	return ret;
+ }
+ 
++int mgmt_write_scan_failed(u16 index, u8 scan, u8 status)
++{
++	if (scan & SCAN_PAGE)
++		mgmt_pending_foreach(MGMT_OP_SET_CONNECTABLE, index,
++						cmd_status_rsp, &status);
++
++	if (scan & SCAN_INQUIRY)
++		mgmt_pending_foreach(MGMT_OP_SET_DISCOVERABLE, index,
++						cmd_status_rsp, &status);
++
++	return 0;
++}
++
+ int mgmt_new_key(u16 index, struct link_key *key, u8 persistent)
+ {
+ 	struct mgmt_ev_new_key ev;
+-- 
+1.7.7.1
 
