@@ -2,80 +2,66 @@ Return-Path: <cyrus@holtmann.org>
 From: Peter Krystad <pkrystad@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Peter Krystad <pkrystad@codeaurora.org>
-Subject: [PATCH v2 hcidump 1/5] Add L2CAP Create/Move channel definitions
-Date: Wed,  2 Nov 2011 17:56:53 -0700
-Message-Id: <1320281817-359-2-git-send-email-pkrystad@codeaurora.org>
+Subject: [PATCH v2 hcidump 5/5] Minor cleanup of indentation in output
+Date: Wed,  2 Nov 2011 17:56:57 -0700
+Message-Id: <1320281817-359-6-git-send-email-pkrystad@codeaurora.org>
 In-Reply-To: <1320281817-359-1-git-send-email-pkrystad@codeaurora.org>
 References: <1320281817-359-1-git-send-email-pkrystad@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Minor indentation cleanup and fix display of physical link key
 ---
- lib/l2cap.h |   44 ++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 44 insertions(+), 0 deletions(-)
+ parser/hci.c |   15 ++++++++++-----
+ 1 files changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/lib/l2cap.h b/lib/l2cap.h
-index 3880551..23a14a5 100644
---- a/lib/l2cap.h
-+++ b/lib/l2cap.h
-@@ -82,6 +82,12 @@ struct l2cap_conninfo {
- #define L2CAP_ECHO_RSP		0x09
- #define L2CAP_INFO_REQ		0x0a
- #define L2CAP_INFO_RSP		0x0b
-+#define L2CAP_CREATE_REQ	0x0c
-+#define L2CAP_CREATE_RSP	0x0d
-+#define L2CAP_MOVE_REQ		0x0e
-+#define L2CAP_MOVE_RSP		0x0f
-+#define L2CAP_MOVE_CFM		0x10
-+#define L2CAP_MOVE_CFM_RSP	0x11
+diff --git a/parser/hci.c b/parser/hci.c
+index a0e3034..e459e9e 100644
+--- a/parser/hci.c
++++ b/parser/hci.c
+@@ -1124,12 +1124,11 @@ static inline void create_physical_link_dump(int level, struct frame *frm)
+ 	int i;
  
- /* L2CAP extended feature mask */
- #define L2CAP_FEAT_FLOWCTL	0x00000001
-@@ -270,6 +276,44 @@ typedef struct {
- #define L2CAP_IR_SUCCESS	0x0000
- #define L2CAP_IR_NOTSUPP	0x0001
- 
-+typedef struct {
-+	uint16_t	psm;
-+	uint16_t	scid;
-+	uint8_t		id;
-+} __attribute__ ((packed)) l2cap_create_req;
-+#define L2CAP_CREATE_REQ_SIZE 5
-+
-+typedef struct {
-+	uint16_t	dcid;
-+	uint16_t	scid;
-+	uint16_t	result;
-+	uint16_t	status;
-+} __attribute__ ((packed)) l2cap_create_rsp;
-+#define L2CAP_CREATE_RSP_SIZE 8
-+
-+typedef struct {
-+	uint16_t	icid;
-+	uint8_t		id;
-+} __attribute__ ((packed)) l2cap_move_req;
-+#define L2CAP_MOVE_REQ_SIZE 3
-+
-+typedef struct {
-+	uint16_t	icid;
-+	uint16_t	result;
-+} __attribute__ ((packed)) l2cap_move_rsp;
-+#define L2CAP_MOVE_RSP_SIZE 4
-+
-+typedef struct {
-+	uint16_t	icid;
-+	uint16_t	result;
-+} __attribute__ ((packed)) l2cap_move_cfm;
-+#define L2CAP_MOVE_CFM_SIZE 4
-+
-+typedef struct {
-+	uint16_t	icid;
-+} __attribute__ ((packed)) l2cap_move_cfm_rsp;
-+#define L2CAP_MOVE_CFM_RSP_SIZE 2
-+
- #ifdef __cplusplus
+ 	p_indent(level, frm);
+-
+ 	printf("handle %d key length %d key type %d\n",
+ 		cp->handle, cp->key_length, cp->key_type);
++	p_indent(level, frm);
+ 	printf("key ");
+-
+-	for (i = 0; i < cp->key_length && cp->key_length < 32; i++)
++	for (i = 0; i < cp->key_length && cp->key_length <= 32; i++)
+ 		printf("%2.2x", cp->key[i]);
+ 	printf("\n");
  }
- #endif
+@@ -1140,12 +1139,16 @@ static inline void create_logical_link_dump(int level, struct frame *frm)
+ 	int i;
+ 
+ 	p_indent(level, frm);
+-
+ 	printf("handle %d\n", cp->handle);
++
++	p_indent(level, frm);
+ 	printf("tx_flow ");
+ 	for (i = 0; i < 16; i++)
+ 		printf("%2.2x", cp->tx_flow[i]);
+-	printf("\nrx_flow ");
++	printf("\n");
++
++	p_indent(level, frm);
++	printf("rx_flow ");
+ 	for (i = 0; i < 16; i++)
+ 		printf("%2.2x", cp->rx_flow[i]);
+ 	printf("\n");
+@@ -2605,6 +2608,8 @@ static inline void read_local_amp_assoc_dump(int level, struct frame *frm)
+ 		p_indent(level, frm);
+ 		printf("Error: %s\n", status2str(rp->status));
+ 	} else {
++		p_indent(level, frm);
++		printf("assoc data");
+ 		for (i = 0; i < len; i++) {
+ 			if (!(i % 16)) {
+ 				printf("\n");
 -- 
 1.7.7
 
