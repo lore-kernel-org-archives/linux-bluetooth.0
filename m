@@ -1,98 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 3 Nov 2011 20:49:00 +0100
-From: manday@gmx.net
-To: linux-bluetooth@vger.kernel.org
-Subject: Lack of configuration
-Message-ID: <20111103194900.GD10400@slate>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZLmfwA9ivmnTvSTsCsvZV9aejqRov7gX1hwnXWreExg5w@mail.gmail.com>
+References: <CAPGrrxXkvaNjnUT9vJ8sdnHuabF7zwtWnOnnbLD1+G0huvj1xw@mail.gmail.com>
+	<ca9f11c3ddb562558c25a7ff185407ad@mail.hendrik-sattler.de>
+	<CAPGrrxWm=gfcdr6bCVneQFJiGsrajKqojZ-iES28=isitC1jiw@mail.gmail.com>
+	<CABBYNZ+bqrdJwvOH3Uznbc54TaF=4c=VFBZ4ZG9_9aYOc2e=9w@mail.gmail.com>
+	<CAPGrrxWW4FM2ZkQP+toSeRPMYMQpSiRW5p8N9+8EM1LU3PvwdQ@mail.gmail.com>
+	<CABBYNZLmfwA9ivmnTvSTsCsvZV9aejqRov7gX1hwnXWreExg5w@mail.gmail.com>
+Date: Thu, 3 Nov 2011 20:01:36 +0100
+Message-ID: <CAPGrrxVpG_33A9T5XynmUBHcS4Wi7CrHE8Lgi5HJcdR31jM0mw@mail.gmail.com>
+Subject: Re: [RFC] API for MAP client in obex-client
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Hendrik Sattler <post@hendrik-sattler.de>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello everybody,
+On Thu, Nov 3, 2011 at 6:59 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Bartosz,
+>
+> On Thu, Nov 3, 2011 at 7:38 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+>> On Thu, Nov 3, 2011 at 4:13 PM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Bartosz,
+>>>
+>>> On Thu, Nov 3, 2011 at 4:16 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+>>>> On Thu, Nov 3, 2011 at 3:08 PM, Hendrik Sattler <post@hendrik-sattler.de> wrote:
+>>>>> Am 03.11.2011 14:44, schrieb Bartosz Szatkowski:
+>>>>>>
+>>>>>>               void SetFolder(boolean cdup, string name)
+>>>>>>
+>>>>>>                       Set working directory for current session.
+>>>>>>
+>>>>>>                       |  cdup  | folder name | operation    |
+>>>>>>                       |=====================================|
+>>>>>>                       | FALSE  | empty       | cd /         |
+>>>>>>                       |--------+-------------+--------------|
+>>>>>>                       | FALSE  | name        | cd name      |
+>>>>>>                       |--------+-------------+--------------|
+>>>>>>                       | TRUE   | [name]      | cd ..[/name] |
+>>>>>>                       +-------------------------------------+
+>>>>>
+>>>>> Why not simply
+>>>>>  void SetFolder(String cdString)
+>>>>>
+>>>>> and derive the obex command from that? It makes that API much easier to use.
+>>>>>
+>>>>> HS
+>>>>>
+>>>>> --
+>>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+>>>>> in
+>>>>> the body of a message to majordomo@vger.kernel.org
+>>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>>>
+>>>>
+>>>> Because it provoke more questions eg. what about failure in the middle
+>>>> of the path? Also i've planned to keep it at rather low level.
+>>>
+>>> Well we can make it only accept only one step at time, which it seems
+>>> is what g_obex_setpath does. Btw what is thing with GetMessage return,
+>>> fd? Do we really need that? Can't we just convert to string so that
+>>> user applications don't have to convert it themselves? Otherwise just
+>>> use an array of bytes ('ay') or pass a path where the message should
+>>> be stored like GetFile. If the concern is that the transfer may take
+>>> too long the client the client should not wait the reply and instead
+>>> track the transfer using an agent.
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>>>
+>>
+>> And what if you'll start downloading email with 10MB attachment?? So
+>> it's better to send file descriptor through DBus than lots (and lots)
+>> of data. And there is nothing to convert, client will get fd and then
+>> just read message from a file - it's simple enough.
+>
+> Then create a transfer object and notify the agent like we do for
+> GetFile, also with this you progress indication like we have with
+> normal files and you are also able to catch errors or cancel the
+> transfer.
+>
+> --
+> Luiz Augusto von Dentz
+>
 
+Generally you may be right, but i'm not sure whether actually tangling
+agent (client of the client?) is a good idea -- I'll check it
+tomorrow, but AFAIR it's  an additional reversed connection? And
+situation with this big message probably is not so often to cause such
+a confusion. I would really like to use such API in simplest possible
+way, by calling some method and receiving answer and its exactly what
+is accomplished with fd.
 
-I've sought help for getting bluetooth to work on my Gentoo box on irc
-and was helped, thank you JHE at this point.
-
-However, I've also realized that bluez has apparently stripped the user
-of any sort of useful configuration and documentation thereof.
-
-Now, I wouldn't usually care if some random program does that, I'd
-simply stop using it and look for an alternative, but bluez surely is
-not just another random program and instead integral part of linux.
-
-I was told it was after bluez 3.x that hcid.conf et al were removed in
-favor of an untransparent, undocumented and obscure configuration
-through dbus (latter I've not been told but claim by myself).
-
-I can't help it but wonder what has driven such bizarre decision to
-allow a fundamental component of linux no longer to be configured
-through configuration files.
-
-I take it certain people found it incredibly "elegant" and "progressive"
-to use dbus for everything they could possibly think of. Well, DBUS has
-its use and advantages which we are aware of, but using DBUS to write
-"Hello world" to the console or, in this case, making fundamental
-configuration, is no advantage and simply an unpractical obstacle.
-
-A user is looking forward to using the functionality of the linux
-bluetooth stack, bluez. So he install bluez and wants to configure it,
-like everything else on his system is configured.
-
-But no, not BlueZ! BlueZ is "advanced". BlueZ won't allow that. First
-of all, user, you will have to install DBUS, because BlueZ cannot be
-configured without a Desktop-Bus.
-
-Once you got DBUS, you still cannot configure BlueZ, because DBUS has no
-means for configuration, least of all has it ever been intended to
-maintain configuration.
-
-So next you will have to install our special front-ends to DBUS, which
-use a dedicated protocol to communicate the configuration. By now, the
-user asks himself "Why can I not just write that bloody config file like
-I always do?". Well, BlueZ knows better than you, what's best for you.
-So please, install the frontends, dear user...
-
-So the user installs two python scripts, but hold on, we need a python
-DBUS library for that. More installs ensue...
-
-Eventually, after an hour of endless compiles, configuration of DBUS,
-getting to know the python scripts, etc. pp., the user is finally ready
-to start configuring DBUS.
-
-"I could have written that config twice in that time, and would actually
-have had a clue what I configured", thinks the user.
-
-But BlueZ doesn't think so. BlueZ knows convenience, and it will rub it
-into the user's face, whether he wants it or not.
-
-Are we done? The user successfully configured BlueZ, paired his devices
-with the Python scripts. Although the user appreciates how bitterly
-elegant BlueZ' approach as configuration is, installing all of X.org
-just to get the GUI frontends working was a little too much for him to
-accept. Especially since he never wanted a frontend anyway. But BlueZ
-wanted it, so he did.
-
-Three months later, the user already forgot about the hassle he had
-with BlueZ' sadistic convenience and is happily using his bluetooth
-keyboard. Sadly, he has to re-setup his box.
-
-LUCKILY, Linux is configured through configuration files. So he backs up
-his configuration files, but wait, BlueZ! No, BlueZ is better than that.
-BlueZ cannot be backed up, because BlueZ is ELEGANT. BlueZ is configured
-through DBUS, did you forget? Actually he had, just as he had forgotten
-about how to set it up. Here we go again, "how convenient" thinks the
-user.
-
-And all so elegant.
-
-This should be an appeal to you to perhaps re-evaluate that design
-choise, for that user is not alone. I am that user. So are others.
-BlueZ' obsession with DBUS and obscuring things from the user, allegedly
-for the user's sake, are actually a self-centered attempt at being
-advanced, disregarding practicability and conformity.
-
-
-regards,
-a user (ManDay)
+-- 
+Pozdrowienia - Cheers,
+Bartosz Szatkowski
