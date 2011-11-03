@@ -1,74 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+bqrdJwvOH3Uznbc54TaF=4c=VFBZ4ZG9_9aYOc2e=9w@mail.gmail.com>
-References: <CAPGrrxXkvaNjnUT9vJ8sdnHuabF7zwtWnOnnbLD1+G0huvj1xw@mail.gmail.com>
-	<ca9f11c3ddb562558c25a7ff185407ad@mail.hendrik-sattler.de>
-	<CAPGrrxWm=gfcdr6bCVneQFJiGsrajKqojZ-iES28=isitC1jiw@mail.gmail.com>
-	<CABBYNZ+bqrdJwvOH3Uznbc54TaF=4c=VFBZ4ZG9_9aYOc2e=9w@mail.gmail.com>
-Date: Thu, 3 Nov 2011 16:41:57 +0100
-Message-ID: <CA+Hdrtekwo1Y+KZfB0y+9+08yueLFK37cMhjGe7w5Sv=+-Bocg@mail.gmail.com>
-Subject: Re: [RFC] API for MAP client in obex-client
-From: Anders Widen <mail@anderswiden.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 4/4] Add option to set priority for btiotest
+Date: Thu,  3 Nov 2011 17:15:40 +0200
+Message-Id: <1320333340-27112-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1320333340-27112-1-git-send-email-luiz.dentz@gmail.com>
+References: <1320333340-27112-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This API is directly linked to the MAP Specification for setFolder see
-P.49. Therefor it's already documented and easier to understand.
+Setting  a priority outside the range 0 to 6 requires the CAP_NET_ADMIN
+capability.
+---
+ test/btiotest.c |   18 ++++++++++++++----
+ 1 files changed, 14 insertions(+), 4 deletions(-)
 
-2011/11/3 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
-> Hi Bartosz,
->
-> On Thu, Nov 3, 2011 at 4:16 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
->> On Thu, Nov 3, 2011 at 3:08 PM, Hendrik Sattler <post@hendrik-sattler.de> wrote:
->>> Am 03.11.2011 14:44, schrieb Bartosz Szatkowski:
->>>>
->>>>               void SetFolder(boolean cdup, string name)
->>>>
->>>>                       Set working directory for current session.
->>>>
->>>>                       |  cdup  | folder name | operation    |
->>>>                       |=====================================|
->>>>                       | FALSE  | empty       | cd /         |
->>>>                       |--------+-------------+--------------|
->>>>                       | FALSE  | name        | cd name      |
->>>>                       |--------+-------------+--------------|
->>>>                       | TRUE   | [name]      | cd ..[/name] |
->>>>                       +-------------------------------------+
->>>
->>> Why not simply
->>>  void SetFolder(String cdString)
->>>
->>> and derive the obex command from that? It makes that API much easier to use.
->>>
->>> HS
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
->>> in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>
->>
->> Because it provoke more questions eg. what about failure in the middle
->> of the path? Also i've planned to keep it at rather low level.
->
-> Well we can make it only accept only one step at time, which it seems
-> is what g_obex_setpath does. Btw what is thing with GetMessage return,
-> fd? Do we really need that? Can't we just convert to string so that
-> user applications don't have to convert it themselves? Otherwise just
-> use an array of bytes ('ay') or pass a path where the message should
-> be stored like GetFile. If the concern is that the transfer may take
-> too long the client the client should not wait the reply and instead
-> track the transfer using an agent.
->
-> --
-> Luiz Augusto von Dentz
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+diff --git a/test/btiotest.c b/test/btiotest.c
+index c02a25a..91fc1d5 100644
+--- a/test/btiotest.c
++++ b/test/btiotest.c
+@@ -225,7 +225,8 @@ static void confirm_cb(GIOChannel *io, gpointer user_data)
+ }
+ 
+ static void l2cap_connect(const char *src, const char *dst, uint16_t psm,
+-						gint disconn, gint sec)
++						gint disconn, gint sec,
++						gint prio)
+ {
+ 	struct io_data *data;
+ 	GError *err = NULL;
+@@ -242,6 +243,7 @@ static void l2cap_connect(const char *src, const char *dst, uint16_t psm,
+ 						BT_IO_OPT_DEST, dst,
+ 						BT_IO_OPT_PSM, psm,
+ 						BT_IO_OPT_SEC_LEVEL, sec,
++						BT_IO_OPT_PRIORITY, prio,
+ 						BT_IO_OPT_INVALID);
+ 	else
+ 		data->io = bt_io_connect(BT_IO_L2CAP, connect_cb, data,
+@@ -250,6 +252,7 @@ static void l2cap_connect(const char *src, const char *dst, uint16_t psm,
+ 						BT_IO_OPT_DEST, dst,
+ 						BT_IO_OPT_PSM, psm,
+ 						BT_IO_OPT_SEC_LEVEL, sec,
++						BT_IO_OPT_PRIORITY, prio,
+ 						BT_IO_OPT_INVALID);
+ 
+ 	if (!data->io) {
+@@ -466,6 +469,7 @@ static gint opt_disconn = -1;
+ static gint opt_accept = DEFAULT_ACCEPT_TIMEOUT;
+ static gint opt_sec = 0;
+ static gboolean opt_master = FALSE;
++static gint opt_priority = 0;
+ 
+ static GMainLoop *main_loop;
+ 
+@@ -490,6 +494,10 @@ static GOptionEntry options[] = {
+ 				"Accept connection after N seconds" },
+ 	{ "master", 'm', 0, G_OPTION_ARG_NONE, &opt_master,
+ 				"Master role switch (incoming connections)" },
++	{ "priority", 'P', 0, G_OPTION_ARG_INT, &opt_priority,
++				"Transmission priority: Setting a priority "
++				"outside the range 0 to 6 requires the"
++				"CAP_NET_ADMIN capability." },
+ 	{ NULL },
+ };
+ 
+@@ -510,13 +518,15 @@ int main(int argc, char *argv[])
+ 
+ 	g_option_context_free(context);
+ 
+-	printf("accept=%d, reject=%d, discon=%d, defer=%d, sec=%d\n",
+-		opt_accept, opt_reject, opt_disconn, opt_defer, opt_sec);
++	printf("accept=%d, reject=%d, discon=%d, defer=%d, sec=%d, prio=%d\n",
++		opt_accept, opt_reject, opt_disconn, opt_defer, opt_sec,
++		opt_priority);
+ 
+ 	if (opt_psm) {
+ 		if (argc > 1)
+ 			l2cap_connect(opt_dev, argv[1], opt_psm,
+-							opt_disconn, opt_sec);
++							opt_disconn, opt_sec,
++							opt_priority);
+ 		else
+ 			l2cap_listen(opt_dev, opt_psm, opt_defer, opt_reject,
+ 					opt_disconn, opt_accept, opt_sec,
+-- 
+1.7.6.4
+
