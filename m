@@ -1,45 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 3 Nov 2011 12:10:31 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv4 2/3] Bluetooth: EFS: parse L2CAP config response
-Message-ID: <20111103141031.GD17890@joana>
-References: <1318851332-23700-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1318851332-23700-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20111017201008.GD2631@joana>
- <20111102075125.GA12653@aemeltch-MOBL1>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC] API for MAP client in obex-client
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111102075125.GA12653@aemeltch-MOBL1>
+Content-Type: text/plain;
+ charset=UTF-8;
+ format=flowed
+Date: Thu, 03 Nov 2011 15:08:19 +0100
+From: Hendrik Sattler <post@hendrik-sattler.de>
+In-Reply-To: <CAPGrrxXkvaNjnUT9vJ8sdnHuabF7zwtWnOnnbLD1+G0huvj1xw@mail.gmail.com>
+References: <CAPGrrxXkvaNjnUT9vJ8sdnHuabF7zwtWnOnnbLD1+G0huvj1xw@mail.gmail.com>
+Message-ID: <ca9f11c3ddb562558c25a7ff185407ad@mail.hendrik-sattler.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-02 09:51:28 +0200]:
+Am 03.11.2011 14:44, schrieb Bartosz Szatkowski:
+>                void SetFolder(boolean cdup, string name)
+>
+>                        Set working directory for current session.
+>
+>                        |  cdup  | folder name | operation    |
+>                        |=====================================|
+>                        | FALSE  | empty       | cd /         |
+>                        |--------+-------------+--------------|
+>                        | FALSE  | name        | cd name      |
+>                        |--------+-------------+--------------|
+>                        | TRUE   | [name]      | cd ..[/name] |
+>                        +-------------------------------------+
 
-> Hi Gustavo,
-> 
-> On Mon, Oct 17, 2011 at 06:10:08PM -0200, Gustavo Padovan wrote:
-> > Hi Andrei,
-> > 
-> > * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-10-17 14:35:31 +0300]:
-> > 
-> > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > 
-> > > Add parsing Extended Flow Specification in L2CAP Config Response.
-> > > Based upon haijun.liu <haijun.liu@atheros.com> series of patches
-> > > (sent Sun, 22 Aug 2010)
-> > > 
-> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > ---
-> > >  net/bluetooth/l2cap_core.c |   24 ++++++++++++++++++++++++
-> > >  1 files changed, 24 insertions(+), 0 deletions(-)
-> > 
-> > Applied, thanks.
-> 
-> Was this patch actually applied?
+Why not simply
+   void SetFolder(String cdString)
 
-Actually not, I did something wrong. I tried now and it doesn't apply anymore,
-could you please rebase? Thanks.
+and derive the obex command from that? It makes that API much easier to 
+use.
 
-	Gustavo
+HS
+
