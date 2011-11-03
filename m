@@ -1,138 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
-To: "'Anderson Lizardo'" <anderson.lizardo@openbossa.org>,
-	"'claudio.takahasi@openbossa.org'" <claudio.takahasi@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Proposal for GATT Client Dbus API.
-Date: Thu, 3 Nov 2011 10:32:13 +0000
-Message-ID: <F82830D409D80E4881C83250E051B74B4785205C@banasiexm01.ASIA.ROOT.PRI>
-References: <AcyCnA5DqBiEIGAzQEqnbRbpdBNd8AAAHtNw>
-	<F82830D409D80E4881C83250E051B74B4784BE4F@banasiexm01.ASIA.ROOT.PRI>
- <CAJdJm_O5Bf22=iJZqpJ9SgOCQ-MSxv7WPdwXYXko-mcyiTx=3Q@mail.gmail.com>
- <F82830D409D80E4881C83250E051B74B4784F0B3@banasiexm01.ASIA.ROOT.PRI>
-In-Reply-To: <F82830D409D80E4881C83250E051B74B4784F0B3@banasiexm01.ASIA.ROOT.PRI>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <7769C83744F2C34A841232EF77AEA20C01DCC8DB06@dnce01.ent.ti.com>
+References: <CAJdJm_NUjsuytSrKzQ=vsSp7oyPdogxSww+r15dX9Mv==TaRNQ@mail.gmail.com>
+	<4EB1B1D6.9060806@codeaurora.org>
+	<7769C83744F2C34A841232EF77AEA20C01DCC8DB06@dnce01.ent.ti.com>
+Date: Thu, 3 Nov 2011 11:47:18 +0200
+Message-ID: <CABBYNZLxDe75tsSVfsR3Tm=ifRQm9TXFmxMWyWTSJBTSAOv=3g@mail.gmail.com>
+Subject: Re: Designing a GATT write D-Bus API (was: Re: GATT Dbus API on BlueZ
+ - attirbute-api.txt modifications)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Ganir, Chen" <chen.ganir@ti.com>
+Cc: Brian Gix <bgix@codeaurora.org>,
+	Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	Ajay Pillai <Ajay.Pillai@csr.com>,
+	Mat Martineau <mathewm@codeaurora.org>,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"ingas@codeaurora.org" <ingas@codeaurora.org>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
-Here's my proposal for modification to existing attribute-api.doc.
-The addition include:
-1)Comments provided on this post.
-2)Comments taken from the discussion part of " GATT Dbus API on BlueZ - attirbute-api.txt modifications" post.
-3) Doesn't address ServiceChanged(), will discuss as part of another post. 
+Hi Chen,
 
-Queries:
-1) As the "Signals" are a broadcast, how do we direct it to the application which requests for it?
-2) Does bluez support SetConnectionParameters & UpdateConnectionParameters, if not do we need to add the APIs for the same ? 
+On Thu, Nov 3, 2011 at 10:37 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
+> Since ReadValue and WriteValue should be non-blocking, as far as I understand from what has been discussed so far. This means that we need to notify the D-BUS clients of write or read results.
 
+You seem to be confusing things here, Read/Write can and probably
+should return the value in case of success and anyway we need to
+return errors so bluetoothd cannot return until the server respond,
+but note that doesn't mean the clients should be using pseudo blocking
+calls for this methods nor bluetoothd should block while processing
+them. You can take a look at CreatePairedDevice as a reference since
+it also connects and return a value synchronously but the client don't
+have to block while waiting for it (see test/agent.c).
 
-diff --git a/doc/attribute-api.txt b/doc/attribute-api.txt
-index 98d7f30..34d77bc 100644
---- a/doc/attribute-api.txt
-+++ b/doc/attribute-api.txt
-@@ -110,8 +110,56 @@ Methods		dict GetProperties()
- 			read-write properties can be changed. On success
- 			this will emit a PropertyChanged signal.
- 
-+		void GetCharacteristicValue( )
-+
-+			Read the value of the characteristic.
-+			This will emit a ReadResponse signal with status code.
-+
-+		void SetCharacteristicValue(variant value, string method, uint16 offset)
-+
-+			Changes the value of the specified characteristic as per the offset and method. Only
-+			read-write characteristic value can be changed.
-+			This will emit a WriteResponse signal with status code.
-+			
-+			Write the value of the characreristic, with any of these specified method:
-+			"WriteWithResponse", "SignedWriteWithoutResponse", 
-+			"WriteLongCharacteristicValue", "PrepareWrite", "ExecuteWrite".
-+			 
-+		void  ReadDescriptor(uint16 handle)
-+                        
-+			Read the value of the specified characteristic descriptor matching the handle.
-+			This will emit a ReadDescriptorResponse signal with status code.
-+                        
-+		void  WriteDescriptor(uint16 handle, array{byte} value)
-+
-+			Changes the value of the specified characteristic descriptor matching the handle. Only
-+			read-write descriptors can be changed.
-+			This will emit a WriteDescriptorResponse signal with status code.
-+
- 			Possible Errors: org.bluez.Error.InvalidArguments
- 
-+Signals		PropertyChanged(string name, variant value)
-+
-+			This signal indicates a changed value of the given
-+			property.
-+		
-+		ReadResponse(uint8 status, variant value)
-+
-+			Parameter is the read value and status code for GetCharacteristicValue operation. 
-+
-+		WriteResponse(uint8 status)
-+
-+			Parameter is the status code for SetCharacteristicValue operation. 
-+			
-+
-+		ReadDescriptorResponse(uint8 status, variant value)
-+
-+			Parameter is the read value and status code for ReadDescriptor operation. 
-+
-+		WriteDescriptorResponse(uint8 status)
-+
-+			Parameter is the status code for WriteDescriptor operation. 
-+
- Properties 	string UUID [readonly]
- 
- 			UUID128 of this characteristic.
-@@ -121,12 +169,22 @@ Properties 	string UUID [readonly]
- 			Optional field containing a friendly name for the
- 			Characteristic UUID.
- 
-+		array{string} Properties [readonly]
-+
-+			The characteristic properties includes extended properties if defined, format defined by GATT spec. 
-+			Possible values representing each bit field: 
-+			{ "Broadcast", "Read", "WriteWithoutResponse", "Write", "Notify", "Indicate", "AuthenticatedSignedWrite", 					"ExtentedProperties", "ReliableWrite", "WritableAuxiliaries"}
-+
-+		uint16 ClientConfiguration [readwrite]
-+
-+			Optional field containing the client configuration value on the server.
-+
- 		string Description [readonly]
- 
- 			Textual optional characteristic descriptor describing
- 			the Characteristic Value.
- 
--		struct Format [readonly]
-+		array{struct} Format [readonly]
- 
- 			Optional Characteristic descriptor which defines the
- 			format of the Characteristic Value. For numeric
-@@ -151,6 +209,11 @@ Properties 	string UUID [readonly]
- 			Friendly representation of the Characteristic Value
- 			based on the format attribute.
- 
-+		dict Descriptors [readonly]
-+
-+			The value is a dictionary for all Characteristic descriptor with the handle as keys and the UUID as values.The key is 			uint16 and the value a string for this dictionary. Can be used with WriteDescriptor and ReadDescriptor.  
-+		      These attribute handle is only valid during the session, and should not be stored/cached by the client.
-+
+> One option is to use D-BUS events, but I would rather not use those, since it is broadcasted on the bus for everyone, and we already have registered watchers for this purpose.
 
+We can use unicast signals if we don't want them to be broadcasted,
+but the client requesting the read should receive the value as return
+so I don't see the problem here.
 
-> Hi,
-> Thanks for your inputs. I am extending the current doc/attribute-api.txt. Will work towards your proposed changes and > > update the same. 
+> The other option is to use the currently registered watchers, and use the ValueChanged message, which contains the path and value, both for read (if the read value is different from the cached one) and for write command (always sent after the write command) and write request (called only when the write response is received, with status success). However, I do see some problems with this convention :
+> 1. If read returns with the same value, and the watcher is not called, the D-BUS client has no idea whether the value was read or not.
 
-> Thanks,
-> Vijay
+Just return the value on read.
 
-Thanks,
-Vijay
+> 2. On write command, we have no idea if the server has updated the value or not. We can not call the ValueChanged in this case for sure.
 
+If write did not return an error then the value should have been
+updated otherwise an error should be return.
 
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
-More information can be found at www.csr.com. Follow CSR on Twitter at http://twitter.com/CSR_PLC and read our blog at www.csr.com/blog
+> 3. Current implementation sends the property changed event on "Connected" from the device, once the ACL is up and running. However, this may not indicate that the connection is ready for data, as we have SMP in progress. We need to find a better way to let the user know that the connection is really up, or fix the SMP issue and queue up requests when SMP is in progress.
+
+Thats is a bug in SMP we should be able to fix, as for
+ACL/Device.Connected we can always create a different interface to
+notify when a profile status.
+
+> I would suggest the following for solving this :
+> 1. The user MUST register a watcher for the service, if he wants to be notified of read/write results.
+> 2. Add ValueWritten and ValueRead messages to the watcher interface, to allow better reporting of read/write procedures.
+> 3. Read and Write commends sent to an offline client should not result in automatic reconnection procedure. A client must implement timeouts to figure out if a server will be available for write/read commands or not, and manage it's states accordingly. Something needs to be changed here somehow - I'm not so comfortable with the existing implementation.In addition, we got for the buffering/caching of the written value in bluez, while the connection is offline. What happens if a client writes a new value to the offline server? This will trigger a connection procedure, which may take anywhere from 1 second to infinity. What happens if in this gap, the d-bus client requests the properties? What should the value be ? The old one or the new one?
+
+Nope, clients should be using D-Bus pending calls with a proper
+timeout set and perhaps we should even consider having the timeout as
+parameter for read/write so that bluetoothd can abort if that expires,
+in addition if the client exit the bus while an operation is in
+progress bluetoothd should also abort the operation. IMO cached value
+only changes upon successful write/read.
+
+> What do you guys think ?
+
+Too much talk but no code actually being produced, how about creating
+a python test script for watchers and one for read/write
+characteristics, implement ReadValue/WriteValue and actually try
+things before we over engineer too much?
+
+-- 
+Luiz Augusto von Dentz
