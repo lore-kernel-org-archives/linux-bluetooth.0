@@ -1,99 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 3 Nov 2011 14:44:57 +0100
-Message-ID: <CAPGrrxXkvaNjnUT9vJ8sdnHuabF7zwtWnOnnbLD1+G0huvj1xw@mail.gmail.com>
-Subject: [RFC] API for MAP client in obex-client
-From: Bartosz Szatkowski <bulislaw@linux.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	johan.hedberg@gmail.com
-Content-Type: text/plain; charset=UTF-8
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Fix mgmt response when adapter goes down or is removed
+Date: Thu,  3 Nov 2011 14:40:33 +0200
+Message-Id: <1320324033-16280-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1320317931-15260-1-git-send-email-johan.hedberg@gmail.com>
+References: <1320317931-15260-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-below proposed API for MAP client in obex-client, for now just some
-generic functions and browsing support.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Messages Access hierarchy
-=========================
+When an adapter gets powered off or is removed any pending commands
+should receive a ENETDOWN or ENODEV status response.
 
-Service         org.openobex.client
-Interface       org.openobex.MessagesAccess
-Object path     [variable prefix]/{session0,session1,...}
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+v2: Fix uint8_t -> u8
 
-Methods         dict(uint8 tag, variant value) GetAppParams()
+ net/bluetooth/mgmt.c |   19 ++++++++++++++++++-
+ 1 files changed, 18 insertions(+), 1 deletions(-)
 
-                       Retrieve application parameters connected to the last MSE
-                       response. Application parameters corresponding
-to given call
-                       are accessible until next request is sent.
-
-                       Parameters are converted to unsigned integers
-of corresponding sizes
-                       (MAP specification section 6.3.1) or
-NULL-terminated strings.
-                       In case of parameters not mentioned in MAP
-specification value
-                       becomes struct of (uint8 length, array{uint8}).
-
-                       See MAP specification (section corresponding to
-given function)
-                       for more details on returned parameters.
-
-               void SetFolder(boolean cdup, string name)
-
-                       Set working directory for current session.
-
-                       |  cdup  | folder name | operation    |
-                       |=====================================|
-                       | FALSE  | empty       | cd /         |
-                       |--------+-------------+--------------|
-                       | FALSE  | name        | cd name      |
-                       |--------+-------------+--------------|
-                       | TRUE   | [name]      | cd ..[/name] |
-                       +-------------------------------------+
-
-               array{dict(string property, string value)}
-               GetFolderListing(dict(uint8 tag, uint16 value))
-
-                       Retrieve list of names (and all other
-properties returned by MSE)
-                       for directories in CWD.
-
-                       Parameters as in MAP specification section 5.4.
-
-               array{dict(string property, string value)}
-               GetMessageListing(string folder, array{uint8 tag, variant value})
-
-                       Return message listing for given subfolder of
-CWD or directly
-                       CWD if folder field is empty, format of each dict entry
-                       corresponds to the message listing format (MAP
-specification
-                       section 3.1.6).
-
-                       Parameters as in MAP specification section 5.5.
-
-               unix_fd msgfd
-               GetMessage(string handle, dict(uint8 tag, variant value))
-
-                       Retrieve message from remote device and return
-file descriptor,
-                       from which message data (in BMSG format) may be read.
-
-                       Parameters as in MAP specification section 5.6.
-
-               void SetMessageStatus(string handle, uint8 indicator,
-uint8 value)
-
-                       Modify status of a message on remote device.
-
-                       Parameters as in MAP specification section 5.7.
-
-               void UpdateInbox()
-
-                       Initiate update of inbox status on remote device.
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index cbc8a6d..747366a 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -262,7 +262,7 @@ static void mgmt_pending_foreach(u16 opcode, int index,
+ 
+ 		cmd = list_entry(p, struct pending_cmd, list);
+ 
+-		if (cmd->opcode != opcode)
++		if (opcode > 0 && cmd->opcode != opcode)
+ 			continue;
+ 
+ 		if (index >= 0 && cmd->index != index)
+@@ -1949,6 +1949,14 @@ done:
+ 	return err;
+ }
+ 
++static void cmd_status_rsp(struct pending_cmd *cmd, void *data)
++{
++	u8 *status = data;
++
++	cmd_status(cmd->sk, cmd->index, cmd->opcode, *status);
++	mgmt_pending_remove(cmd);
++}
++
+ int mgmt_index_added(u16 index)
+ {
+ 	return mgmt_event(MGMT_EV_INDEX_ADDED, index, NULL, 0, NULL);
+@@ -1956,6 +1964,10 @@ int mgmt_index_added(u16 index)
+ 
+ int mgmt_index_removed(u16 index)
+ {
++	u8 status = ENODEV;
++
++	mgmt_pending_foreach(0, index, cmd_status_rsp, &status);
++
+ 	return mgmt_event(MGMT_EV_INDEX_REMOVED, index, NULL, 0, NULL);
+ }
+ 
+@@ -1992,6 +2004,11 @@ int mgmt_powered(u16 index, u8 powered)
+ 
+ 	mgmt_pending_foreach(MGMT_OP_SET_POWERED, index, mode_rsp, &match);
+ 
++	if (!powered) {
++		u8 status = ENETDOWN;
++		mgmt_pending_foreach(0, index, cmd_status_rsp, &status);
++	}
++
+ 	ev.val = powered;
+ 
+ 	ret = mgmt_event(MGMT_EV_POWERED, index, &ev, sizeof(ev), match.sk);
 -- 
-Pozdrowienia - Cheers,
-Bartosz Szatkowski
+1.7.7.1
+
