@@ -1,220 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>,
-	"'Anderson Lizardo'" <anderson.lizardo@openbossa.org>,
-	"'claudio.takahasi@openbossa.org'" <claudio.takahasi@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 3 Nov 2011 13:21:15 +0100
-Subject: RE: Proposal for GATT Client Dbus API.
-Message-ID: <7769C83744F2C34A841232EF77AEA20C01DCC8DD1C@dnce01.ent.ti.com>
-References: <AcyCnA5DqBiEIGAzQEqnbRbpdBNd8AAAHtNw>
-	<F82830D409D80E4881C83250E051B74B4784BE4F@banasiexm01.ASIA.ROOT.PRI>
- <CAJdJm_O5Bf22=iJZqpJ9SgOCQ-MSxv7WPdwXYXko-mcyiTx=3Q@mail.gmail.com>
- <F82830D409D80E4881C83250E051B74B4784F0B3@banasiexm01.ASIA.ROOT.PRI>
- <F82830D409D80E4881C83250E051B74B4785205C@banasiexm01.ASIA.ROOT.PRI>
-In-Reply-To: <F82830D409D80E4881C83250E051B74B4785205C@banasiexm01.ASIA.ROOT.PRI>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix mgmt response when adapter goes down or is removed
+Date: Thu,  3 Nov 2011 12:58:51 +0200
+Message-Id: <1320317931-15260-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Vijay,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Vijaykumar Dadmode
-> Sent: Thursday, November 03, 2011 12:32 PM
-> To: 'Anderson Lizardo'; 'claudio.takahasi@openbossa.org'
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: RE: Proposal for GATT Client Dbus API.
-> 
-> Hi All,
-> Here's my proposal for modification to existing attribute-api.doc.
-> The addition include:
-> 1)Comments provided on this post.
-> 2)Comments taken from the discussion part of " GATT Dbus API on BlueZ -
-> attirbute-api.txt modifications" post.
-> 3) Doesn't address ServiceChanged(), will discuss as part of another
-> post.
-> 
-> Queries:
-> 1) As the "Signals" are a broadcast, how do we direct it to the
-> application which requests for it?
-We can use the existing watchers. At the moment, watchers are registered to be called when indication/notification arrives from the sever. This means that a watcher will receive ValueChanged message with characteristic path and new value. We could use this interface and add the ReadRespnse and WriteResponse to it.
+When an adapter gets powered off or is removed any pending commands
+should receive a ENETDOWN or ENODEV status response.
 
-> 2) Does bluez support SetConnectionParameters &
-> UpdateConnectionParameters, if not do we need to add the APIs for the
-> same ?
-> 
-> 
-> diff --git a/doc/attribute-api.txt b/doc/attribute-api.txt
-> index 98d7f30..34d77bc 100644
-> --- a/doc/attribute-api.txt
-> +++ b/doc/attribute-api.txt
-> @@ -110,8 +110,56 @@ Methods		dict GetProperties()
->  			read-write properties can be changed. On success
->  			this will emit a PropertyChanged signal.
-> 
-> +		void GetCharacteristicValue( )
-> +
-> +			Read the value of the characteristic.
-> +			This will emit a ReadResponse signal with status
-> code.
-When will this signal/message be sent ? Do we implement a timeout for connection timeout ? Can we set it as a parameter to this message?
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c |   19 ++++++++++++++++++-
+ 1 files changed, 18 insertions(+), 1 deletions(-)
 
-> +
-> +		void SetCharacteristicValue(variant value, string method,
-> uint16 offset)
-> +
-> +			Changes the value of the specified characteristic as
-> per the offset and method. Only
-> +			read-write characteristic value can be changed.
-What is this read-write char value you are referring to here ?
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index cbc8a6d..26b58ad 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -262,7 +262,7 @@ static void mgmt_pending_foreach(u16 opcode, int index,
+ 
+ 		cmd = list_entry(p, struct pending_cmd, list);
+ 
+-		if (cmd->opcode != opcode)
++		if (opcode > 0 && cmd->opcode != opcode)
+ 			continue;
+ 
+ 		if (index >= 0 && cmd->index != index)
+@@ -1949,6 +1949,14 @@ done:
+ 	return err;
+ }
+ 
++static void cmd_status_rsp(struct pending_cmd *cmd, void *data)
++{
++	uint8_t *status = data;
++
++	cmd_status(cmd->sk, cmd->index, cmd->opcode, *status);
++	mgmt_pending_remove(cmd);
++}
++
+ int mgmt_index_added(u16 index)
+ {
+ 	return mgmt_event(MGMT_EV_INDEX_ADDED, index, NULL, 0, NULL);
+@@ -1956,6 +1964,10 @@ int mgmt_index_added(u16 index)
+ 
+ int mgmt_index_removed(u16 index)
+ {
++	uint8_t status = ENODEV;
++
++	mgmt_pending_foreach(0, index, cmd_status_rsp, &status);
++
+ 	return mgmt_event(MGMT_EV_INDEX_REMOVED, index, NULL, 0, NULL);
+ }
+ 
+@@ -1992,6 +2004,11 @@ int mgmt_powered(u16 index, u8 powered)
+ 
+ 	mgmt_pending_foreach(MGMT_OP_SET_POWERED, index, mode_rsp, &match);
+ 
++	if (!powered) {
++		uint8_t status = ENETDOWN;
++		mgmt_pending_foreach(0, index, cmd_status_rsp, &status);
++	}
++
+ 	ev.val = powered;
+ 
+ 	ret = mgmt_event(MGMT_EV_POWERED, index, &ev, sizeof(ev), match.sk);
+-- 
+1.7.7.1
 
-> +			This will emit a WriteResponse signal with status
-> code.
-Again, we need some timeout, to allow clean upper level implementation.
-
-> +
-> +			Write the value of the characreristic, with any of
-> these specified method:
-> +			"WriteWithResponse", "SignedWriteWithoutResponse",
-> +			"WriteLongCharacteristicValue", "PrepareWrite",
-> "ExecuteWrite".
-> +
-> +		void  ReadDescriptor(uint16 handle)
-> +
-> +			Read the value of the specified characteristic
-> descriptor matching the handle.
-> +			This will emit a ReadDescriptorResponse signal with
-> status code.
-This will not go through. Handles should not be used by the users. In fact, all descriptors can be turned into D-BUS dictionaries, and be available as characteristic properties. This is already done today for some descriptors. However, not all of them should be exposed directly to user (client characteristic config descriptor for example can be exposed as properties Notify and Indicate, server char config descriptor can be exposed as property Broadcast, and so on. Format is already discovered and partially used in the existing code.
-
-> +
-> +		void  WriteDescriptor(uint16 handle, array{byte} value)
-> +
-> +			Changes the value of the specified characteristic
-> descriptor matching the handle. Only
-> +			read-write descriptors can be changed.
-> +			This will emit a WriteDescriptorResponse signal with
-> status code.
-> +
->  			Possible Errors: org.bluez.Error.InvalidArguments
-> 
-No use for this one - see above my previous comment.
-
-> +Signals		PropertyChanged(string name, variant value)
-> +
-> +			This signal indicates a changed value of the given
-> +			property.
-> +
-When will this be used? We already have readresponse, writeresponse. Other properties are fixed, and read on connection automatically. We will not need this. We can use this if we expose Notify, Indicate, Broadcast properties. Writing to these properties will cause the propertychanged event to be called, once the write has completed, if that's possible.
-
-> +		ReadResponse(uint8 status, variant value)
-> +
-> +			Parameter is the read value and status code for
-> GetCharacteristicValue operation.
-We need to add the characteristic path as well. We may issue multiple read requests, and receive them all after a while - we need to be able to understand which characteristic value we received.
-
-> +
-> +		WriteResponse(uint8 status)
-> +
-> +			Parameter is the status code for
-> SetCharacteristicValue operation.
-Same as above - we need the characteristic path.
-
-> +
-> +
-> +		ReadDescriptorResponse(uint8 status, variant value)
-> +
-> +			Parameter is the read value and status code for
-> ReadDescriptor operation.
-> +
-> +		WriteDescriptorResponse(uint8 status)
-> +
-> +			Parameter is the status code for WriteDescriptor
-> operation.
-> +
-No need for this.
-
->  Properties 	string UUID [readonly]
-> 
->  			UUID128 of this characteristic.
-> @@ -121,12 +169,22 @@ Properties 	string UUID [readonly]
->  			Optional field containing a friendly name for the
->  			Characteristic UUID.
-> 
-> +		array{string} Properties [readonly]
-> +
-> +			The characteristic properties includes extended
-> properties if defined, format defined by GATT spec.
-> +			Possible values representing each bit field:
-> +			{ "Broadcast", "Read", "WriteWithoutResponse",
-> "Write", "Notify", "Indicate", "AuthenticatedSignedWrite",
-> 			"ExtentedProperties", "ReliableWrite",
-> "WritableAuxiliaries"}
-> +
-Properties which can be changed, such as Broadcast, Indicate, Notify should be standalong, Boolean read/write properties. See above for more information on why we need these.
-
-> +		uint16 ClientConfiguration [readwrite]
-> +
-> +			Optional field containing the client configuration
-> value on the server.
-> +
-We should not expose bit fields to the users. We can abstract this to Notify/Indicate Boolean properties.
-
->  		string Description [readonly]
-> 
->  			Textual optional characteristic descriptor describing
->  			the Characteristic Value.
-> 
-> -		struct Format [readonly]
-> +		array{struct} Format [readonly]
-> 
->  			Optional Characteristic descriptor which defines the
->  			format of the Characteristic Value. For numeric
-> @@ -151,6 +209,11 @@ Properties 	string UUID [readonly]
->  			Friendly representation of the Characteristic Value
->  			based on the format attribute.
-> 
-This also needs to be simplified. We need to take the format strings from the spec, and apply the correct properties according to the format descriptor. Again, we should not expose raw bit fields here.
-
-> +		dict Descriptors [readonly]
-> +
-> +			The value is a dictionary for all Characteristic
-> descriptor with the handle as keys and the UUID as values.The key is
-> 			uint16 and the value a string for this dictionary.
-> Can be used with WriteDescriptor and ReadDescriptor.
-> +		      These attribute handle is only valid during the
-> session, and should not be stored/cached by the client.
-> +
-See above. Not needed.
-
-> 
-> 
-> > Hi,
-> > Thanks for your inputs. I am extending the current doc/attribute-
-> api.txt. Will work towards your proposed changes and > > update the
-> same.
-> 
-> > Thanks,
-> > Vijay
-> 
-> Thanks,
-> Vijay
-> 
-> 
-> Member of the CSR plc group of companies. CSR plc registered in England
-> and Wales, registered number 4187346, registered office Churchill
-> House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United
-> Kingdom
-> More information can be found at www.csr.com. Follow CSR on Twitter at
-> http://twitter.com/CSR_PLC and read our blog at www.csr.com/blog
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-
-> bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Thanks,
-Chen Ganir.
