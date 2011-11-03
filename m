@@ -1,32 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 3 Nov 2011 12:26:18 -0200
+Date: Thu, 3 Nov 2011 12:25:32 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2] Bluetooth: Initialize tx_win_max for fixed channel
-Message-ID: <20111103142618.GB23913@joana>
-References: <1320220630-13551-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH 4/4] Bluetooth: use buffer priority to mark URB_ISO_ASAP
+ flag
+Message-ID: <20111103142531.GA23913@joana>
+References: <1320241924-2300-1-git-send-email-luiz.dentz@gmail.com>
+ <1320241924-2300-4-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320220630-13551-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1320241924-2300-4-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-02 09:57:10 +0200]:
+* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-11-02 15:52:04 +0200]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> tx_win_max is initialized during L2CAP configuration phase. For fixed
-> channels (e.g. A2MP) we want to have it initialized when channel is
-> created.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
->  net/bluetooth/l2cap_sock.c |    2 ++
->  1 files changed, 2 insertions(+), 0 deletions(-)
+>  drivers/bluetooth/btusb.c |    3 +++
+>  1 files changed, 3 insertions(+), 0 deletions(-)
 
-Applied, thanks.
+All four patches applied, thanks.
 
 	Gustavo
