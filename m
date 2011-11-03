@@ -1,30 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 3 Nov 2011 12:25:32 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/4] Bluetooth: use buffer priority to mark URB_ISO_ASAP
- flag
-Message-ID: <20111103142531.GA23913@joana>
-References: <1320241924-2300-1-git-send-email-luiz.dentz@gmail.com>
- <1320241924-2300-4-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320241924-2300-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <ca9f11c3ddb562558c25a7ff185407ad@mail.hendrik-sattler.de>
+References: <CAPGrrxXkvaNjnUT9vJ8sdnHuabF7zwtWnOnnbLD1+G0huvj1xw@mail.gmail.com>
+	<ca9f11c3ddb562558c25a7ff185407ad@mail.hendrik-sattler.de>
+Date: Thu, 3 Nov 2011 15:16:18 +0100
+Message-ID: <CAPGrrxWm=gfcdr6bCVneQFJiGsrajKqojZ-iES28=isitC1jiw@mail.gmail.com>
+Subject: Re: [RFC] API for MAP client in obex-client
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: Hendrik Sattler <post@hendrik-sattler.de>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-11-02 15:52:04 +0200]:
-
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->  drivers/bluetooth/btusb.c |    3 +++
->  1 files changed, 3 insertions(+), 0 deletions(-)
-
-All four patches applied, thanks.
-
-	Gustavo
+T24gVGh1LCBOb3YgMywgMjAxMSBhdCAzOjA4IFBNLCBIZW5kcmlrIFNhdHRsZXIgPHBvc3RAaGVu
+ZHJpay1zYXR0bGVyLmRlPiB3cm90ZToKPiBBbSAwMy4xMS4yMDExIDE0OjQ0LCBzY2hyaWViIEJh
+cnRvc3ogU3phdGtvd3NraToKPj4KPj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgdm9pZCBTZXRGb2xk
+ZXIoYm9vbGVhbiBjZHVwLCBzdHJpbmcgbmFtZSkKPj4KPj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgU2V0IHdvcmtpbmcgZGlyZWN0b3J5IGZvciBjdXJyZW50IHNlc3Npb24uCj4+
+Cj4+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHwgwqBjZHVwIMKgfCBmb2xkZXIg
+bmFtZSB8IG9wZXJhdGlvbiDCoCDCoHwKPj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgfD09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT18Cj4+IMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIHwgRkFMU0UgwqB8IGVtcHR5IMKgIMKgIMKgIHwgY2QgLyDC
+oCDCoCDCoCDCoCB8Cj4+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHwtLS0tLS0t
+LSstLS0tLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tfAo+PiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCB8IEZBTFNFIMKgfCBuYW1lIMKgIMKgIMKgIMKgfCBjZCBuYW1lIMKgIMKgIMKg
+fAo+PiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCB8LS0tLS0tLS0rLS0tLS0tLS0t
+LS0tLSstLS0tLS0tLS0tLS0tLXwKPj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+fCBUUlVFIMKgIHwgW25hbWVdIMKgIMKgIMKgfCBjZCAuLlsvbmFtZV0gfAo+PiDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCArLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLSsKPgo+IFdoeSBub3Qgc2ltcGx5Cj4gwqB2b2lkIFNldEZvbGRlcihTdHJpbmcgY2RTdHJp
+bmcpCj4KPiBhbmQgZGVyaXZlIHRoZSBvYmV4IGNvbW1hbmQgZnJvbSB0aGF0PyBJdCBtYWtlcyB0
+aGF0IEFQSSBtdWNoIGVhc2llciB0byB1c2UuCj4KPiBIUwo+Cj4gLS0KPiBUbyB1bnN1YnNjcmli
+ZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgtYmx1ZXRv
+b3RoIgo+IGluCj4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5l
+bC5vcmcKPiBNb3JlIG1ham9yZG9tbyBpbmZvIGF0IMKgaHR0cDovL3ZnZXIua2VybmVsLm9yZy9t
+YWpvcmRvbW8taW5mby5odG1sCj4KCkJlY2F1c2UgaXQgcHJvdm9rZSBtb3JlIHF1ZXN0aW9ucyBl
+Zy4gd2hhdCBhYm91dCBmYWlsdXJlIGluIHRoZSBtaWRkbGUKb2YgdGhlIHBhdGg/IEFsc28gaSd2
+ZSBwbGFubmVkIHRvIGtlZXAgaXQgYXQgcmF0aGVyIGxvdyBsZXZlbC4KCi0tIApQb3pkcm93aWVu
+aWEgLSBDaGVlcnMsCkJhcnRvc3ogU3phdGtvd3NraQo=
