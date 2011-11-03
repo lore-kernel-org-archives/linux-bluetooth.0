@@ -1,133 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add timeout field to mgmt_set_discoverable
-Date: Thu,  3 Nov 2011 16:46:01 +0200
-Message-Id: <1320331561-17588-1-git-send-email-johan.hedberg@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <ulrik.lauren@stericsson.com>, <kanak.gupta@stericsson.com>,
+	Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 2/2] Bluetooth: Add ability to force local busy condition on L2CAP ERTM
+Date: Thu, 3 Nov 2011 16:05:45 +0100
+Message-ID: <1320332745-21750-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1320332745-21750-1-git-send-email-szymon.janc@tieto.com>
+References: <1320332745-21750-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+This is required to pass PTS TP/ERM/BV-07-C (Send S-Frame [RNR]).
 
-Based on the revised mgmt API set_discoverable has a timeout parameter
-to specify how long the adapter will remain discoverable. A value of 0
-means "indefinitively".
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
 ---
-This can be tested with latest user-space git, e.g.:
-	mgmt/btmgmt discov yes 5
+ net/bluetooth/l2cap_core.c |   43 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 42 insertions(+), 1 deletions(-)
 
- include/net/bluetooth/hci_core.h |    3 +++
- include/net/bluetooth/mgmt.h     |    4 ++++
- net/bluetooth/hci_core.c         |   25 +++++++++++++++++++++++++
- net/bluetooth/mgmt.c             |    7 ++++++-
- 4 files changed, 38 insertions(+), 1 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index f97792c..5079598 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -196,6 +196,9 @@ struct hci_dev {
- 	struct work_struct	power_off;
- 	struct timer_list	off_timer;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 9dcbf3d..6202009 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -59,6 +59,8 @@
+ int disable_ertm;
+ int enable_hs;
  
-+	__u16			discov_timeout;
-+	struct delayed_work	discov_off;
++static int force_local_busy;
 +
- 	struct timer_list	cmd_timer;
- 	struct tasklet_struct	cmd_task;
- 	struct tasklet_struct	rx_task;
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 3062fd3..b5320aa 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -69,6 +69,10 @@ struct mgmt_mode {
- #define MGMT_OP_SET_POWERED		0x0005
+ static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
+ static u8 l2cap_fixed_chan[8] = { 0x02, };
  
- #define MGMT_OP_SET_DISCOVERABLE	0x0006
-+struct mgmt_cp_set_discoverable {
-+	__u8 val;
-+	__u16 timeout;
-+} __packed;
+@@ -3522,7 +3524,7 @@ void l2cap_chan_busy(struct l2cap_chan *chan, int busy)
+ 	if (chan->mode == L2CAP_MODE_ERTM) {
+ 		if (busy)
+ 			l2cap_ertm_enter_local_busy(chan);
+-		else
++		else if (!force_local_busy)
+ 			l2cap_ertm_exit_local_busy(chan);
+ 	}
+ }
+@@ -4498,7 +4500,38 @@ static const struct file_operations l2cap_debugfs_fops = {
+ 	.release	= single_release,
+ };
  
- #define MGMT_OP_SET_CONNECTABLE		0x0007
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index b7f6b5b..0c75770 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -595,6 +595,11 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	tasklet_kill(&hdev->rx_task);
- 	tasklet_kill(&hdev->tx_task);
- 
-+	if (hdev->discov_timeout > 0) {
-+		cancel_delayed_work_sync(&hdev->discov_off);
-+		hdev->discov_timeout = 0;
++static int force_local_busy_set(void *data, u64 val)
++{
++	struct l2cap_chan *chan;
++
++	force_local_busy = val;
++
++	read_lock_bh(&chan_list_lock);
++
++	list_for_each_entry(chan, &chan_list, global_l) {
++		bh_lock_sock(chan->sk);
++		if (chan->state == BT_CONNECTED)
++			l2cap_chan_busy(chan, force_local_busy);
++		bh_unlock_sock(chan->sk);
 +	}
 +
- 	hci_dev_lock_bh(hdev);
- 	inquiry_cache_flush(hdev);
- 	hci_conn_hash_flush(hdev);
-@@ -968,6 +973,24 @@ void hci_del_off_timer(struct hci_dev *hdev)
- 	del_timer(&hdev->off_timer);
- }
- 
-+static void hci_discov_off(struct work_struct *work)
-+{
-+	struct hci_dev *hdev;
-+	u8 scan = SCAN_PAGE;
++	read_unlock_bh(&chan_list_lock);
 +
-+	hdev = container_of(work, struct hci_dev, discov_off.work);
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	hci_dev_lock_bh(hdev);
-+
-+	hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, sizeof(scan), &scan);
-+
-+	hdev->discov_timeout = 0;
-+
-+	hci_dev_unlock_bh(hdev);
++	return 0;
 +}
 +
- int hci_uuids_clear(struct hci_dev *hdev)
- {
- 	struct list_head *p, *n;
-@@ -1485,6 +1508,8 @@ int hci_register_dev(struct hci_dev *hdev)
- 	INIT_WORK(&hdev->power_off, hci_power_off);
- 	setup_timer(&hdev->off_timer, hci_auto_off, (unsigned long) hdev);
- 
-+	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
++static int force_local_busy_get(void *data, u64 *val)
++{
++	*val = force_local_busy;
 +
- 	memset(&hdev->stat, 0, sizeof(struct hci_dev_stats));
- 
- 	atomic_set(&hdev->promisc, 0);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 747366a..c3f0653 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -348,7 +348,7 @@ failed:
- static int set_discoverable(struct sock *sk, u16 index, unsigned char *data,
- 									u16 len)
- {
--	struct mgmt_mode *cp;
-+	struct mgmt_cp_set_discoverable *cp;
- 	struct hci_dev *hdev;
- 	struct pending_cmd *cmd;
- 	u8 scan;
-@@ -399,6 +399,11 @@ static int set_discoverable(struct sock *sk, u16 index, unsigned char *data,
- 	if (err < 0)
- 		mgmt_pending_remove(cmd);
- 
-+	hdev->discov_timeout = get_unaligned_le16(&cp->timeout);
-+	if (hdev->discov_timeout > 0)
-+		queue_delayed_work(hdev->workqueue, &hdev->discov_off,
-+				msecs_to_jiffies(hdev->discov_timeout * 1000));
++	return 0;
++}
 +
- failed:
- 	hci_dev_unlock_bh(hdev);
- 	hci_dev_put(hdev);
++DEFINE_SIMPLE_ATTRIBUTE(force_local_busy_fops, force_local_busy_get,
++					force_local_busy_set, "%llu\n");
++
+ static struct dentry *l2cap_debugfs;
++static struct dentry *force_local_busy_debugfs;
+ 
+ static struct hci_proto l2cap_hci_proto = {
+ 	.name		= "L2CAP",
+@@ -4531,6 +4564,13 @@ int __init l2cap_init(void)
+ 					bt_debugfs, NULL, &l2cap_debugfs_fops);
+ 		if (!l2cap_debugfs)
+ 			BT_ERR("Failed to create L2CAP debug file");
++
++		force_local_busy_debugfs =
++				debugfs_create_file("force_local_busy", 0444,
++							bt_debugfs, NULL,
++							&force_local_busy_fops);
++		if (!force_local_busy_debugfs)
++			BT_ERR("Failed to create ERTM debug file");
+ 	}
+ 
+ 	return 0;
+@@ -4543,6 +4583,7 @@ error:
+ void l2cap_exit(void)
+ {
+ 	debugfs_remove(l2cap_debugfs);
++	debugfs_remove(force_local_busy_debugfs);
+ 
+ 	if (hci_unregister_proto(&l2cap_hci_proto) < 0)
+ 		BT_ERR("L2CAP protocol unregistration failed");
 -- 
-1.7.7.1
+on behalf of ST-Ericsson
 
