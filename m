@@ -1,35 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 3 Nov 2011 12:30:29 -0200
+Date: Thu, 3 Nov 2011 12:26:18 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org,
-	Andrei.Emeltchenko.news@gmail.com
-Subject: Re: [PATCHv4 9/9] Bluetooth: Guarantee BR-EDR device will be
- registered as hci0
-Message-ID: <20111103143028.GC23913@joana>
-References: <1320275916-32103-1-git-send-email-mathewm@codeaurora.org>
- <1320275916-32103-10-git-send-email-mathewm@codeaurora.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2] Bluetooth: Initialize tx_win_max for fixed channel
+Message-ID: <20111103142618.GB23913@joana>
+References: <1320220630-13551-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320275916-32103-10-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1320220630-13551-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi Luiz,
 
-* Mat Martineau <mathewm@codeaurora.org> [2011-11-02 16:18:36 -0700]:
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-02 09:57:10 +0200]:
 
-> It's convenient to use the HCI device index the AMP controller id, but
-> the spec requires that an AMP controller never has id 0.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> tx_win_max is initialized during L2CAP configuration phase. For fixed
+> channels (e.g. A2MP) we want to have it initialized when channel is
+> created.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  net/bluetooth/hci_core.c |    7 ++++++-
->  1 files changed, 6 insertions(+), 1 deletions(-)
+>  net/bluetooth/l2cap_sock.c |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
 
-Nice work, everything is now applied. Let's go to the next AMP patchsets.
-Thanks. :)
+Applied, thanks.
 
 	Gustavo
