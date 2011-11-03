@@ -1,34 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <ulrik.lauren@stericsson.com>, <kanak.gupta@stericsson.com>,
-	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] Bluetooth: Add debug print to l2cap_chan_create
-Date: Thu, 3 Nov 2011 16:05:44 +0100
-Message-ID: <1320332745-21750-1-git-send-email-szymon.janc@tieto.com>
+Date: Thu, 3 Nov 2011 12:32:35 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: Fix mgmt response when adapter goes down
+ or is removed
+Message-ID: <20111103143235.GD23913@joana>
+References: <1320317931-15260-1-git-send-email-johan.hedberg@gmail.com>
+ <1320324033-16280-1-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1320324033-16280-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
----
- net/bluetooth/l2cap_core.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+Hi Johan,
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index af3e8c5..9dcbf3d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -294,6 +294,8 @@ struct l2cap_chan *l2cap_chan_create(struct sock *sk)
- 
- 	atomic_set(&chan->refcnt, 1);
- 
-+	BT_DBG("sk %p chan %p", sk, chan);
-+
- 	return chan;
- }
- 
--- 
-on behalf of ST-Ericsson
+* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-11-03 14:40:33 +0200]:
 
+> From: Johan Hedberg <johan.hedberg@intel.com>
+> 
+> When an adapter gets powered off or is removed any pending commands
+> should receive a ENETDOWN or ENODEV status response.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> v2: Fix uint8_t -> u8
+> 
+>  net/bluetooth/mgmt.c |   19 ++++++++++++++++++-
+>  1 files changed, 18 insertions(+), 1 deletions(-)
+
+Applied, thanks.
+
+	Gustavo
