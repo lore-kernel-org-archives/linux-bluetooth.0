@@ -1,36 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 0/4] High level GATT API for service registration
-Date: Fri,  4 Nov 2011 10:29:59 -0400
-Message-Id: <1320417003-23493-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH 1/2] Bluetooth: make L2CAP sockets to inherit parent's priority
+Date: Fri,  4 Nov 2011 16:03:49 +0200
+Message-Id: <1320415430-2054-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Following a previously sent RFC, this series implement an internal API that
-simplifies GATT service registration on server implementations. It is built on
-top of current "low level" attribute API, and both can be used at the same time
-without problem.
+This makes priority set on a listen socket to be passed when accepting
+new connections.
 
-It is currently being used for Phone Alert Status and Time profile server
-implementations which we are preparing to send upstream (we previously sent RFC
-patches for both of them).
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/l2cap_sock.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-As an example, I converted a service from the GATT example profile (see patch
-#4). Note the migration to this API is optional, and can be done incrementally.
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 664762e..5a5d2c6 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -968,6 +968,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		struct l2cap_chan *pchan = l2cap_pi(parent)->chan;
+ 
+ 		sk->sk_type = parent->sk_type;
++		sk->sk_priority = parent->sk_priority;
+ 		bt_sk(sk)->defer_setup = bt_sk(parent)->defer_setup;
+ 
+ 		chan->chan_type = pchan->chan_type;
+-- 
+1.7.6.4
 
-Still not implemented (but can be added later):
-
-* No support for aggregate format descriptors, included services (also we don't
-  have any example services using them)
-* No support for some GATT descriptors
-* No support for "static" characteristic values. Any readable or writeable
-  characteristic needs a corresponding read or write callback
-
-Best Regards,
---
-Anderson Lizardo
-Instituto Nokia de Tecnologia (INdT)
-Manaus - Brazil
