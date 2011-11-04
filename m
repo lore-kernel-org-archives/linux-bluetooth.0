@@ -1,130 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH BlueZ 4/4] Migrate example service to high level GATT API
-Date: Sun, 6 Nov 2011 07:26:58 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B026FF36@DNCE02.ent.ti.com>
-References: <1320417003-23493-1-git-send-email-anderson.lizardo@openbossa.org>
- <1320417003-23493-5-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1320417003-23493-5-git-send-email-anderson.lizardo@openbossa.org>
-Content-Type: text/plain; charset="us-ascii"
+Date: Fri, 4 Nov 2011 15:25:09 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+cc: Gustavo Padovan <padovan@profusion.mobi>,
+    Szymon Janc <szymon.janc@tieto.com>, linux-bluetooth@vger.kernel.org,
+    ulrik.lauren@stericsson.com, kanak.gupta@stericsson.com
+Subject: Re: [PATCH 2/2] Bluetooth: Add ability to force local busy condition
+ on L2CAP ERTM
+In-Reply-To: <1320441040.15441.303.camel@aeonflux>
+Message-ID: <alpine.DEB.2.02.1111041513330.11981@mathewm-linux>
+References: <1320332745-21750-1-git-send-email-szymon.janc@tieto.com>  <1320332745-21750-2-git-send-email-szymon.janc@tieto.com>  <20111104171518.GD6171@joana> <1320441040.15441.303.camel@aeonflux>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Anderson,
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Anderson Lizardo
-> Sent: Friday, November 04, 2011 4:30 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: Anderson Lizardo
-> Subject: [PATCH BlueZ 4/4] Migrate example service to high level GATT
-> API
-> 
-> This commit migrates the dummy "Battery Service" from example GATT
-> plugin to demonstrate how the new API is used.
-> ---
->  plugins/gatt-example.c |   61 +++++++++++++---------------------------
-> -------
->  1 files changed, 17 insertions(+), 44 deletions(-)
-> 
-> diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
-> index 955d9fa..1456284 100644
-> --- a/plugins/gatt-example.c
-> +++ b/plugins/gatt-example.c
-> @@ -33,6 +33,7 @@
->  #include "hcid.h"
->  #include "log.h"
->  #include "gattrib.h"
-> +#include "gatt-service.h"
->  #include "att.h"
->  #include "attrib-server.h"
-> 
-> @@ -57,54 +58,26 @@
-> 
->  static GSList *sdp_handles = NULL;
-> 
-> -static void register_battery_service(void)
-> +static uint8_t battery_state_read(struct attribute *a, gpointer
-> user_data)
->  {
-> -	uint16_t start_handle, h;
-> -	const int svc_size = 4;
-> -	uint32_t sdp_handle;
-> -	uint8_t atval[256];
-> -	bt_uuid_t uuid;
-> -
-> -	start_handle = attrib_db_find_avail(svc_size);
-> -	if (start_handle == 0) {
-> -		error("Not enough free handles to register service");
-> -		return;
-> -	}
-> +	uint8_t value;
-> 
-> -	DBG("start_handle=0x%04x", start_handle);
-> -
-> -	h = start_handle;
-> +	value = 0x04;
-> +	attrib_db_update(a->handle, NULL, &value, sizeof(value), NULL);
-> 
-Why do we need to update the db here ? will the server hold the value until we return from this callback, and only then send the saved value to the client? Do we have a timeout for user reply? 
+Hi everyone -
 
-> -	/* Battery state service: primary service definition */
-> -	bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
-> -	att_put_u16(BATTERY_STATE_SVC_UUID, &atval[0]);
-> -	attrib_db_add(h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
-> -
-> -	/* Battery: battery state characteristic */
-> -	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
-> -	atval[0] = ATT_CHAR_PROPER_READ | ATT_CHAR_PROPER_NOTIFY;
-> -	att_put_u16(h + 1, &atval[1]);
-> -	att_put_u16(BATTERY_STATE_UUID, &atval[3]);
-> -	attrib_db_add(h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
-> -
-> -	/* Battery: battery state attribute */
-> -	bt_uuid16_create(&uuid, BATTERY_STATE_UUID);
-> -	atval[0] = 0x04;
-> -	attrib_db_add(h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 1);
-> -
-> -	/* Battery: Client Characteristic Configuration */
-> -	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
-> -	atval[0] = 0x00;
-> -	atval[1] = 0x00;
-> -	attrib_db_add(h++, &uuid, ATT_NONE, ATT_AUTHENTICATION, atval,
-> 2);
-> -
-> -	g_assert(h - start_handle == svc_size);
-> +	return 0;
-What do the return code from the callback mean ? 0 = Read success/allow, other return value = read disallowed?
-> +}
-> 
-> -	/* Add an SDP record for the above service */
-> -	sdp_handle = attrib_create_sdp(start_handle, "Battery State
-> Service");
-> -	if (sdp_handle)
-> -		sdp_handles = g_slist_prepend(sdp_handles,
-> -						GUINT_TO_POINTER(sdp_handle));
-> +static void register_battery_service(void)
-> +{
-> +	gatt_service_add(GATT_PRIM_SVC_UUID, BATTERY_STATE_SVC_UUID,
-> +			/* battery state characteristic */
-> +			GATT_OPT_CHR_UUID, BATTERY_STATE_UUID,
-> +			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
-> +							ATT_CHAR_PROPER_NOTIFY,
-> +			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
-> battery_state_read,
-> +
-> +			GATT_OPT_INVALID);
->  }
-> 
->  static void register_termometer_service(const uint16_t manuf1[2],
-> --
-> 1.7.0.4
-> 
-> --
+On Fri, 4 Nov 2011, Marcel Holtmann wrote:
 
-Thanks,
-Chen Ganir
+> Hi Gustavo,
+>
+>>> This is required to pass PTS TP/ERM/BV-07-C (Send S-Frame [RNR]).
+>>>
+>>> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+>>> ---
+>>>  net/bluetooth/l2cap_core.c |   43 ++++++++++++++++++++++++++++++++++++++++++-
+>>>  1 files changed, 42 insertions(+), 1 deletions(-)
+>>>
+>>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>>> index 9dcbf3d..6202009 100644
+>>> --- a/net/bluetooth/l2cap_core.c
+>>> +++ b/net/bluetooth/l2cap_core.c
+>>> @@ -59,6 +59,8 @@
+>>>  int disable_ertm;
+>>>  int enable_hs;
+>>>
+>>> +static int force_local_busy;
+>>> +
+>>>  static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
+>>>  static u8 l2cap_fixed_chan[8] = { 0x02, };
+>>>
+>>> @@ -3522,7 +3524,7 @@ void l2cap_chan_busy(struct l2cap_chan *chan, int busy)
+>>>  	if (chan->mode == L2CAP_MODE_ERTM) {
+>>>  		if (busy)
+>>>  			l2cap_ertm_enter_local_busy(chan);
+>>> -		else
+>>> +		else if (!force_local_busy)
+>>>  			l2cap_ertm_exit_local_busy(chan);
+>>
+>> NACK on this. I don't wanna move code with the specific purpose of pass a PTS
+>> test into the tree. This kinda of thing can survive outside of the tree.
+>
+> actually it can not life outside the tree. We need to be able to pass
+> the PTS test cases with an upstream source.
+>
+> However instead of hacking this in, what is the actual test case details
+> here that we need to have support for?
+
+ERTM will send an RNR when the socket receive buffer fills up.  For 
+this test case, it works to just set the SO_RCVBUF sockopt to 
+a small enough value that the recv buffer fills before the transmit 
+window does - no kernel changes required.
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
