@@ -2,112 +2,103 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 1/2] Time Profile: add Current Time Service
-Date: Fri,  4 Nov 2011 11:59:27 -0400
-Message-Id: <1320422368-23820-2-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1320422368-23820-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1320422368-23820-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 4/4] Migrate example service to high level GATT API
+Date: Fri,  4 Nov 2011 10:30:03 -0400
+Message-Id: <1320417003-23493-5-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1320417003-23493-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1320417003-23493-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add support for the Current Time Service (CTS). From the spec:
-
-"This service defines how the current time can be exposed using the
-Generic Attribute Profile (GATT)."
+This commit migrates the dummy "Battery Service" from example GATT
+plugin to demonstrate how the new API is used.
 ---
- time/server.c |   75 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 75 insertions(+), 0 deletions(-)
+ plugins/gatt-example.c |   61 +++++++++++++----------------------------------
+ 1 files changed, 17 insertions(+), 44 deletions(-)
 
-diff --git a/time/server.c b/time/server.c
-index 89cc460..0e2de2a 100644
---- a/time/server.c
-+++ b/time/server.c
-@@ -26,10 +26,85 @@
- #include <config.h>
- #endif
- 
-+#include <glib.h>
-+#include <time.h>
-+#include <errno.h>
-+#include <bluetooth/uuid.h>
-+
-+#include "att.h"
-+#include "gattrib.h"
-+#include "attrib-server.h"
+diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
+index 955d9fa..1456284 100644
+--- a/plugins/gatt-example.c
++++ b/plugins/gatt-example.c
+@@ -33,6 +33,7 @@
+ #include "hcid.h"
+ #include "log.h"
+ #include "gattrib.h"
 +#include "gatt-service.h"
-+#include "log.h"
- #include "server.h"
+ #include "att.h"
+ #include "attrib-server.h"
  
-+#define CURRENT_TIME_SVC_UUID		0x1805
-+
-+#define CT_TIME_CHR_UUID		0x2A2B
-+
-+static int encode_current_time(uint8_t value[10])
-+{
-+	struct timespec tp;
-+	struct tm tm;
-+
-+	if (clock_gettime(CLOCK_REALTIME, &tp) == -1) {
-+		int err = errno;
-+
-+		error("clock_gettime: %s", strerror(err));
-+		return -err;
-+	}
-+
-+	if (localtime_r(&tp.tv_sec, &tm) == NULL) {
-+		error("localtime_r() failed");
-+		/* localtime_r() does not set errno */
-+		return -EINVAL;
-+	}
-+
-+	att_put_u16(1900 + tm.tm_year, &value[0]); /* Year */
-+	value[2] = tm.tm_mon + 1; /* Month */
-+	value[3] = tm.tm_mday; /* Day */
-+	value[4] = tm.tm_hour; /* Hours */
-+	value[5] = tm.tm_min; /* Minutes */
-+	value[6] = tm.tm_sec; /* Seconds */
-+	value[7] = tm.tm_wday == 0 ? 7 : tm.tm_wday; /* Day of Week */
-+	/* From Time Profile spec: "The number of 1/256 fractions of a second."
-+	 * In 1s there are 256 fractions, in 1ns there are 256/10^9 fractions.
-+	 * To avoid integer overflow, we use the equivalent 1/3906250 ratio. */
-+	value[8] = tp.tv_nsec / 3906250; /* Fractions256 */
-+	value[9] = 0x00; /* Adjust Reason */
-+
-+	return 0;
-+}
-+
-+static uint8_t current_time_read(struct attribute *a, gpointer user_data)
-+{
-+	uint8_t value[10];
-+
-+	if (encode_current_time(value) < 0)
-+		return ATT_ECODE_IO;
-+
-+	attrib_db_update(a->handle, NULL, value, sizeof(value), NULL);
-+
-+	return 0;
-+}
-+
-+static void register_current_time_service(void)
-+{
-+	/* Current Time service */
-+	gatt_service_add(GATT_PRIM_SVC_UUID, CURRENT_TIME_SVC_UUID,
-+				/* CT Time characteristic */
-+				GATT_OPT_CHR_UUID, CT_TIME_CHR_UUID,
-+				GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
-+							ATT_CHAR_PROPER_NOTIFY,
-+				GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
-+							current_time_read,
-+				GATT_OPT_INVALID);
-+}
-+
- int time_server_init(void)
+@@ -57,54 +58,26 @@
+ 
+ static GSList *sdp_handles = NULL;
+ 
+-static void register_battery_service(void)
++static uint8_t battery_state_read(struct attribute *a, gpointer user_data)
  {
-+	register_current_time_service();
+-	uint16_t start_handle, h;
+-	const int svc_size = 4;
+-	uint32_t sdp_handle;
+-	uint8_t atval[256];
+-	bt_uuid_t uuid;
+-
+-	start_handle = attrib_db_find_avail(svc_size);
+-	if (start_handle == 0) {
+-		error("Not enough free handles to register service");
+-		return;
+-	}
++	uint8_t value;
+ 
+-	DBG("start_handle=0x%04x", start_handle);
+-
+-	h = start_handle;
++	value = 0x04;
++	attrib_db_update(a->handle, NULL, &value, sizeof(value), NULL);
+ 
+-	/* Battery state service: primary service definition */
+-	bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+-	att_put_u16(BATTERY_STATE_SVC_UUID, &atval[0]);
+-	attrib_db_add(h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+-
+-	/* Battery: battery state characteristic */
+-	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
+-	atval[0] = ATT_CHAR_PROPER_READ | ATT_CHAR_PROPER_NOTIFY;
+-	att_put_u16(h + 1, &atval[1]);
+-	att_put_u16(BATTERY_STATE_UUID, &atval[3]);
+-	attrib_db_add(h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+-
+-	/* Battery: battery state attribute */
+-	bt_uuid16_create(&uuid, BATTERY_STATE_UUID);
+-	atval[0] = 0x04;
+-	attrib_db_add(h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 1);
+-
+-	/* Battery: Client Characteristic Configuration */
+-	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
+-	atval[0] = 0x00;
+-	atval[1] = 0x00;
+-	attrib_db_add(h++, &uuid, ATT_NONE, ATT_AUTHENTICATION, atval, 2);
+-
+-	g_assert(h - start_handle == svc_size);
++	return 0;
++}
+ 
+-	/* Add an SDP record for the above service */
+-	sdp_handle = attrib_create_sdp(start_handle, "Battery State Service");
+-	if (sdp_handle)
+-		sdp_handles = g_slist_prepend(sdp_handles,
+-						GUINT_TO_POINTER(sdp_handle));
++static void register_battery_service(void)
++{
++	gatt_service_add(GATT_PRIM_SVC_UUID, BATTERY_STATE_SVC_UUID,
++			/* battery state characteristic */
++			GATT_OPT_CHR_UUID, BATTERY_STATE_UUID,
++			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
++							ATT_CHAR_PROPER_NOTIFY,
++			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ, battery_state_read,
 +
- 	return 0;
++			GATT_OPT_INVALID);
  }
  
+ static void register_termometer_service(const uint16_t manuf1[2],
 -- 
 1.7.0.4
 
