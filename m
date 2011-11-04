@@ -1,51 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAPGrrxVpG_33A9T5XynmUBHcS4Wi7CrHE8Lgi5HJcdR31jM0mw@mail.gmail.com>
-References: <CAPGrrxXkvaNjnUT9vJ8sdnHuabF7zwtWnOnnbLD1+G0huvj1xw@mail.gmail.com>
-	<ca9f11c3ddb562558c25a7ff185407ad@mail.hendrik-sattler.de>
-	<CAPGrrxWm=gfcdr6bCVneQFJiGsrajKqojZ-iES28=isitC1jiw@mail.gmail.com>
-	<CABBYNZ+bqrdJwvOH3Uznbc54TaF=4c=VFBZ4ZG9_9aYOc2e=9w@mail.gmail.com>
-	<CAPGrrxWW4FM2ZkQP+toSeRPMYMQpSiRW5p8N9+8EM1LU3PvwdQ@mail.gmail.com>
-	<CABBYNZLmfwA9ivmnTvSTsCsvZV9aejqRov7gX1hwnXWreExg5w@mail.gmail.com>
-	<CAPGrrxVpG_33A9T5XynmUBHcS4Wi7CrHE8Lgi5HJcdR31jM0mw@mail.gmail.com>
-Date: Fri, 4 Nov 2011 14:00:36 +0200
-Message-ID: <CABBYNZLtfPpdj_-qDp4zXjq5EPt4aOG8_RqSHe3PtOSdt7QVZQ@mail.gmail.com>
-Subject: Re: [RFC] API for MAP client in obex-client
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <4EB3AA45.8050008@koala.ie>
+References: <20111103194900.GD10400@slate>
+	<20111104012028.GA32230@joana>
+	<4EB3AA45.8050008@koala.ie>
+Date: Fri, 4 Nov 2011 06:51:22 -0400
+Message-ID: <CAJdJm_O6VomXXLSc-rYD_sKbbMJcuDydC=Pc-Wyjia_pPcPQ7g@mail.gmail.com>
+Subject: Re: Lack of configuration
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Simon Kenyon <simon@koala.ie>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bartosz,
+Hi,
 
-On Thu, Nov 3, 2011 at 9:01 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+On Fri, Nov 4, 2011 at 5:03 AM, Simon Kenyon <simon@koala.ie> wrote:
+> On 04/11/2011 01:20, Gustavo Padovan wrote:
+>>
+>> The data you are talking about is at /var/lib/bluetooth. BlueZ keeps there
+>> the
+>> information of paired devices.
 >
-> Generally you may be right, but i'm not sure whether actually tangling
-> agent (client of the client?) is a good idea -- I'll check it
-> tomorrow, but AFAIR it's  an additional reversed connection? And
-> situation with this big message probably is not so often to cause such
-> a confusion. I would really like to use such API in simplest possible
-> way, by calling some method and receiving answer and its exactly what
-> is accomplished with fd.
+> is that documented anywhere?
 
-I haven't seen the implementation but I have a feeling it won't be
-that simple, if you use the pipe/unix socket to stream the data them
-you end up copying data and the stream still need to be handled  in
-client side which will very likely copy/convert the data again. We
-have tried such a thing before with A2DP and it was consider
-inefficient, so what we do nowadays is passing the bluetooth socket
-itself to PulseAudio but note that here it would not be a good idea
-since the client would have to deal with OBEX protocol directly.
+At least on my system (Ubuntu), "man bluetoothd" shows information
+about some files in /var/lib/bluetooth. It is not complete.
 
-You could return the transfer object on GetMessage, actually is is
-probably a good idea to do this also for GetFile/PutFile, so that the
-caller application have direct control on the transfers it has started
-and we can probable have a property e.g. Status (Transferring, Error,
-Complete) to indicate the transfer status, that would remove the need
-to have an agent in the application although the system may still have
-one to track the progress and keep history of the transfers.
-
+Regards,
 -- 
-Luiz Augusto von Dentz
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
