@@ -1,67 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 3/4] Add support for getting the handle of the CCC attribute
-Date: Fri,  4 Nov 2011 10:30:02 -0400
-Message-Id: <1320417003-23493-4-git-send-email-anderson.lizardo@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 2/4] Add GATT_OPT_CHR_VALUE_GET_HANDLE to gatt_service_add()
+Date: Fri,  4 Nov 2011 10:30:01 -0400
+Message-Id: <1320417003-23493-3-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1320417003-23493-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1320417003-23493-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-
+This new parameter accepts a pointer to a variable where the attribute
+handle for the characteristic value is stored.
 ---
- attrib/gatt-service.c |    9 ++++++++-
+ attrib/gatt-service.c |    7 +++++++
  attrib/gatt-service.h |    3 +++
- 2 files changed, 11 insertions(+), 1 deletions(-)
+ 2 files changed, 10 insertions(+), 0 deletions(-)
 
 diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
-index b8f2503..3199830 100644
+index 3d623de..b8f2503 100644
 --- a/attrib/gatt-service.c
 +++ b/attrib/gatt-service.c
-@@ -45,6 +45,7 @@ struct gatt_info {
+@@ -44,6 +44,7 @@ struct gatt_info {
+ 	int authorization;
  	GSList *callbacks;
  	unsigned int num_attrs;
- 	uint16_t *value_handle;
-+	uint16_t *ccc_handle;
++	uint16_t *value_handle;
  };
  
  struct attrib_cb {
-@@ -89,6 +90,9 @@ static GSList *parse_opts(gatt_option opt1, va_list args)
- 		case GATT_OPT_CHR_VALUE_GET_HANDLE:
- 			info->value_handle = va_arg(args, void *);
+@@ -85,6 +86,9 @@ static GSList *parse_opts(gatt_option opt1, va_list args)
+ 			cb->fn = va_arg(args, void *);
+ 			info->callbacks = g_slist_append(info->callbacks, cb);
  			break;
-+		case GATT_OPT_CCC_GET_HANDLE:
-+			info->ccc_handle = va_arg(args, void *);
++		case GATT_OPT_CHR_VALUE_GET_HANDLE:
++			info->value_handle = va_arg(args, void *);
 +			break;
  		case GATT_OPT_CHR_AUTHENTICATION:
  			info->authentication = va_arg(args, gatt_option);
  			break;
-@@ -220,8 +224,11 @@ static gboolean add_characteristic(uint16_t *handle, struct gatt_info *info)
- 		bt_uuid16_create(&bt_uuid, GATT_CLIENT_CHARAC_CFG_UUID);
- 		cfg_val[0] = 0x00;
- 		cfg_val[1] = 0x00;
--		attrib_db_add(h++, &bt_uuid, ATT_NONE, ATT_AUTHENTICATION,
-+		a = attrib_db_add(h++, &bt_uuid, ATT_NONE, ATT_AUTHENTICATION,
- 						cfg_val, sizeof(cfg_val));
-+
-+		if (info->ccc_handle)
-+			*info->ccc_handle = a->handle;
+@@ -206,6 +210,9 @@ static gboolean add_characteristic(uint16_t *handle, struct gatt_info *info)
+ 		}
  	}
  
- 	*handle = h;
++	if (info->value_handle)
++		*info->value_handle = a->handle;
++
+ 	/* client characteristic configuration descriptor */
+ 	if (info->props & (ATT_CHAR_PROPER_NOTIFY | ATT_CHAR_PROPER_INDICATE)) {
+ 		uint8_t cfg_val[2];
 diff --git a/attrib/gatt-service.h b/attrib/gatt-service.h
-index ab403fd..bacd987 100644
+index 83e0bea..ab403fd 100644
 --- a/attrib/gatt-service.h
 +++ b/attrib/gatt-service.h
-@@ -33,6 +33,9 @@ typedef enum {
- 	/* Get attribute handle for characteristic value */
- 	GATT_OPT_CHR_VALUE_GET_HANDLE,
+@@ -30,6 +30,9 @@ typedef enum {
+ 	GATT_OPT_CHR_AUTHENTICATION,
+ 	GATT_OPT_CHR_AUTHORIZATION,
  
-+	/* Get handle for ccc attribute */
-+	GATT_OPT_CCC_GET_HANDLE,
++	/* Get attribute handle for characteristic value */
++	GATT_OPT_CHR_VALUE_GET_HANDLE,
 +
  	/* arguments for authentication/authorization */
  	GATT_CHR_VALUE_READ,
