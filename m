@@ -1,67 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Fri, 4 Nov 2011 15:29:06 -0200
+Date: Fri, 4 Nov 2011 15:18:21 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Define HCI reasons instead of magic number
-Message-ID: <20111104172906.GF6171@joana>
-References: <1320221534-13765-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1320243430.15441.280.camel@aeonflux>
- <20111104085928.GB1313@aemeltch-MOBL1>
+To: Arkadiusz.Lichwa@tieto.com
+Cc: linux-bluetooth@vger.kernel.org, iliak@ti.com,
+	ulrik.lauren@stericsson.com
+Subject: Re: [PATCH cover letter] Bluetooth: Revert: Fix L2CAP connection ...
+Message-ID: <20111104171821.GE6171@joana>
+References: <1319621002-7122-1-git-send-email-arkadiusz.lichwa@tieto.com>
+ <20111031190129.GA10164@joana>
+ <BF2CDDEFEC2D1E42A67A8AE0508897EC3E92178FAA@EXMB02.eu.tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111104085928.GB1313@aemeltch-MOBL1>
+In-Reply-To: <BF2CDDEFEC2D1E42A67A8AE0508897EC3E92178FAA@EXMB02.eu.tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Arek,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-04 10:59:30 +0200]:
+* Arkadiusz.Lichwa@tieto.com <Arkadiusz.Lichwa@tieto.com> [2011-11-02 09:53:10 +0200]:
 
-> Hi Marcel,
 > 
-> On Wed, Nov 02, 2011 at 03:17:09PM +0100, Marcel Holtmann wrote:
-> > Hi Andrei,
-> > 
-> > > Use HCI error reasons instead of magic numbers.
-> > > 
-> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > ---
-> > >  include/net/bluetooth/hci.h      |    8 ++++++++
-> > >  include/net/bluetooth/hci_core.h |    2 +-
-> > >  net/bluetooth/hci_conn.c         |    2 +-
-> > >  net/bluetooth/hci_event.c        |    4 ++--
-> > >  net/bluetooth/l2cap_core.c       |    8 ++++----
-> > >  5 files changed, 16 insertions(+), 8 deletions(-)
-> > > 
-> > > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > > index c5fcd13..b9b0ca9 100644
-> > > --- a/include/net/bluetooth/hci.h
-> > > +++ b/include/net/bluetooth/hci.h
-> > > @@ -288,6 +288,10 @@ struct hci_cp_create_conn {
-> > >  	__u8     role_switch;
-> > >  } __packed;
-> > >  
-> > > +#define HCI_REASON_DISC_AUTH_FAILURE	0x05
-> > > +#define HCI_REASON_DISC_REMOTE_USER	0x13
-> > > +#define HCI_REASON_DISC_LOCAL_HOST	0x16
-> > > +
-> > 
-> > actually these are HCI error/status codes that are well defined and go
-> > beyond just disconnect reason. Using REASON_DISC seems to be wrong here.
-> > Can you come up with better naming?
+> Hi Gustavo
 > 
-> what about following:
+> >From: Gustavo F. Padovan [mailto:pao@profusion.mobi] On Behalf Of Gustavo
+> >Padovan
+> >Sent: Monday, October 31, 2011 8:01 PM
+> >To: Lichwa Arkadiusz
+> >Cc: linux-bluetooth@vger.kernel.org; iliak@ti.com; ulrik.lauren@stericsson.com
+> >Subject: Re: [PATCH cover letter] Bluetooth: Revert: Fix L2CAP connection ...
+> >
+> >Hi Arek,
+> >
+> >* Arek Lichwa <arkadiusz.lichwa@tieto.com> [2011-10-26 11:23:21 +0200]:
+> >
+> >> Hi
+> >>
+> >> We found during testing problem when setting rfcomm (SPP) channel between
+> >> two 2.1 devices.
+> >> The test case always failed mostly saying security block on l2cap level
+> >> but sometimes the fail root cause was 'Command not understood' on l2cap
+> >> as well.
+> >> Analyzing security block issue, I found that there's unencrypted link when
+> >> l2cap command 'connection request' is sent to remote.
+> >> The second issue with 'command not understood' has turn out to be related to
+> >> expiration of l2cap timer and its implications.
+> >>
+> >> Solution that I found to fix the problem seems to be related to old commit
+> >> 330605423ca6eafafb8dcc27502bce1c585d1b06 made by Ilia Kolomisnky. When
+> >there's
+> >> authentication ongoing, 'encryption pending' should be turn on, otherwise
+> >> there're situations when link stays unencrypted.
+> >> The issue with timer expiration is related to Andrzej Kaczmarek's patch
+> >> sent to community a couple days ago (~ 2011/10/20).
+> >> This patch actually recalculates (repairs) timer values on l2cap which were
+> >> wrongly converted before.
+> >> With this patch the expiration issue disappears during the test case
+> >> I've made, otherwise just reverting
+> >330605423ca6eafafb8dcc27502bce1c585d1b06
+> >> is not enough, since timer issue blocks very often passing the test case.
+> >
+> >Are you saying that Andrzej's patch together with revert of 330605423 fixes
+> >the problem? and are you sure that we are not creating any new regression?
+> >
+> >	Gustavo
 > 
-> +/* ---- HCI Error Codes ---- */
-> +#define HCI_ERROR_AUTH_FAILURE         0x05
-> +#define HCI_ERROR_REJ_BAD_ADDR         0x0f
-> +#define HCI_ERROR_REMOTE_USER_TERM     0x13
-> +#define HCI_ERROR_LOCAL_HOST_TERM      0x16
-> +#define HCI_ERROR_PAIRING_NOT_ALLOWED  0x18
-> +
+> Yes, that's right, it fixes. 
+> About potencial new regression, I don't think so since previous code before Ilia made change was stable and verified. Did you asked Ilia about regression report that time?
 
-These are fine to me.
+So did you test this in many different cases? with and without SSP, in all
+security levels, with and without MITM protection and so on?
 
 	Gustavo
