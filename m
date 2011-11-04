@@ -1,75 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Create hci_cancel_inquiry()
-Date: Fri,  4 Nov 2011 14:16:52 -0300
-Message-Id: <1320427013-5684-2-git-send-email-andre.guedes@openbossa.org>
-In-Reply-To: <1320427013-5684-1-git-send-email-andre.guedes@openbossa.org>
-References: <1320427013-5684-1-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 1/3] Bluetooth: Create hci_do_inquiry()
+Date: Fri,  4 Nov 2011 14:16:51 -0300
+Message-Id: <1320427013-5684-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds a function to hci_core to cancel an ongoing inquiry.
+This patch adds a function to hci_core to carry out inquiry.
 
-According to the Bluetooth spec, the inquiry cancel command should
-only be issued after the inquiry command has been issued, a command
-status event has been received for the inquiry command, and before
-the inquiry complete event occurs.
-
-As HCI_INQUIRY flag is only set just after an inquiry command status
-event occurs and it is cleared just after an inquiry complete event
-occurs, the inquiry cancel command should be issued only if HCI_INQUIRY
-flag is set.
-
-Additionally, cancel inquiry related code from stop_discovery() were
-replaced by a hci_cancel_inquiry() call.
+All inquiry code from start_discovery() were replaced by a
+hci_do_inquiry() call.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_core.c         |   10 ++++++++++
- net/bluetooth/mgmt.c             |    2 +-
- 3 files changed, 12 insertions(+), 1 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/hci_core.c         |   17 +++++++++++++++++
+ net/bluetooth/mgmt.c             |    9 +--------
+ 3 files changed, 20 insertions(+), 8 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ae36ac0..567e9b8 100644
+index f97792c..ae36ac0 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -971,5 +971,6 @@ void hci_le_ltk_reply(struct hci_conn *conn, u8 ltk[16]);
+@@ -970,4 +970,6 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
+ void hci_le_ltk_reply(struct hci_conn *conn, u8 ltk[16]);
  void hci_le_ltk_neg_reply(struct hci_conn *conn);
  
- int hci_do_inquiry(struct hci_dev *hdev, u8 length);
-+int hci_cancel_inquiry(struct hci_dev *hdev);
- 
++int hci_do_inquiry(struct hci_dev *hdev, u8 length);
++
  #endif /* __HCI_CORE_H */
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 098f26c..b57cb17 100644
+index b7f6b5b..098f26c 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2577,3 +2577,13 @@ int hci_do_inquiry(struct hci_dev *hdev, u8 length)
- 
- 	return hci_send_cmd(hdev, HCI_OP_INQUIRY, sizeof(cp), &cp);
+@@ -2560,3 +2560,20 @@ static void hci_cmd_task(unsigned long arg)
+ 		}
+ 	}
  }
 +
-+int hci_cancel_inquiry(struct hci_dev *hdev)
++int hci_do_inquiry(struct hci_dev *hdev, u8 length)
 +{
++	u8 lap[3] = { 0x33, 0x8b, 0x9e };
++	struct hci_cp_inquiry cp;
++
 +	BT_DBG("%s", hdev->name);
 +
-+	if (!test_bit(HCI_INQUIRY, &hdev->flags))
-+		return -EPERM;
++	if (test_bit(HCI_INQUIRY, &hdev->flags))
++		return -EINPROGRESS;
 +
-+	return hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
++	memset(&cp, 0, sizeof(cp));
++	memcpy(&cp.lap, lap, 3);
++	cp.length  = length;
++
++	return hci_send_cmd(hdev, HCI_OP_INQUIRY, sizeof(cp), &cp);
 +}
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 25dda47..73cf34b 100644
+index 747366a..25dda47 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1647,7 +1647,7 @@ static int stop_discovery(struct sock *sk, u16 index)
+@@ -1598,8 +1598,6 @@ static int remove_remote_oob_data(struct sock *sk, u16 index,
+ 
+ static int start_discovery(struct sock *sk, u16 index)
+ {
+-	u8 lap[3] = { 0x33, 0x8b, 0x9e };
+-	struct hci_cp_inquiry cp;
+ 	struct pending_cmd *cmd;
+ 	struct hci_dev *hdev;
+ 	int err;
+@@ -1618,12 +1616,7 @@ static int start_discovery(struct sock *sk, u16 index)
  		goto failed;
  	}
  
--	err = hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
-+	err = hci_cancel_inquiry(hdev);
+-	memset(&cp, 0, sizeof(cp));
+-	memcpy(&cp.lap, lap, 3);
+-	cp.length  = 0x08;
+-	cp.num_rsp = 0x00;
+-
+-	err = hci_send_cmd(hdev, HCI_OP_INQUIRY, sizeof(cp), &cp);
++	err = hci_do_inquiry(hdev, 0x08);
  	if (err < 0)
  		mgmt_pending_remove(cmd);
  
