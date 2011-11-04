@@ -1,60 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 2/2] Bluetooth: Add ability to force local busy
- condition on L2CAP ERTM
+Subject: Re: [PATCH] Bluetooth: Define HCI reasons instead of magic number
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Gustavo Padovan <padovan@profusion.mobi>
-Cc: Szymon Janc <szymon.janc@tieto.com>,
-	linux-bluetooth@vger.kernel.org, ulrik.lauren@stericsson.com,
-	kanak.gupta@stericsson.com
-Date: Fri, 04 Nov 2011 22:10:39 +0100
-In-Reply-To: <20111104171518.GD6171@joana>
-References: <1320332745-21750-1-git-send-email-szymon.janc@tieto.com>
-	 <1320332745-21750-2-git-send-email-szymon.janc@tieto.com>
-	 <20111104171518.GD6171@joana>
+Cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Date: Fri, 04 Nov 2011 22:07:42 +0100
+In-Reply-To: <20111104172906.GF6171@joana>
+References: <1320221534-13765-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1320243430.15441.280.camel@aeonflux>
+	 <20111104085928.GB1313@aemeltch-MOBL1> <20111104172906.GF6171@joana>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1320441040.15441.303.camel@aeonflux>
+Message-ID: <1320440863.15441.300.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Andrei,
 
-> > This is required to pass PTS TP/ERM/BV-07-C (Send S-Frame [RNR]).
+> > > > Use HCI error reasons instead of magic numbers.
+> > > > 
+> > > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > > ---
+> > > >  include/net/bluetooth/hci.h      |    8 ++++++++
+> > > >  include/net/bluetooth/hci_core.h |    2 +-
+> > > >  net/bluetooth/hci_conn.c         |    2 +-
+> > > >  net/bluetooth/hci_event.c        |    4 ++--
+> > > >  net/bluetooth/l2cap_core.c       |    8 ++++----
+> > > >  5 files changed, 16 insertions(+), 8 deletions(-)
+> > > > 
+> > > > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > > > index c5fcd13..b9b0ca9 100644
+> > > > --- a/include/net/bluetooth/hci.h
+> > > > +++ b/include/net/bluetooth/hci.h
+> > > > @@ -288,6 +288,10 @@ struct hci_cp_create_conn {
+> > > >  	__u8     role_switch;
+> > > >  } __packed;
+> > > >  
+> > > > +#define HCI_REASON_DISC_AUTH_FAILURE	0x05
+> > > > +#define HCI_REASON_DISC_REMOTE_USER	0x13
+> > > > +#define HCI_REASON_DISC_LOCAL_HOST	0x16
+> > > > +
+> > > 
+> > > actually these are HCI error/status codes that are well defined and go
+> > > beyond just disconnect reason. Using REASON_DISC seems to be wrong here.
+> > > Can you come up with better naming?
 > > 
-> > Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
-> > ---
-> >  net/bluetooth/l2cap_core.c |   43 ++++++++++++++++++++++++++++++++++++++++++-
-> >  1 files changed, 42 insertions(+), 1 deletions(-)
+> > what about following:
 > > 
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index 9dcbf3d..6202009 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -59,6 +59,8 @@
-> >  int disable_ertm;
-> >  int enable_hs;
-> >  
-> > +static int force_local_busy;
+> > +/* ---- HCI Error Codes ---- */
+> > +#define HCI_ERROR_AUTH_FAILURE         0x05
+> > +#define HCI_ERROR_REJ_BAD_ADDR         0x0f
+> > +#define HCI_ERROR_REMOTE_USER_TERM     0x13
+> > +#define HCI_ERROR_LOCAL_HOST_TERM      0x16
+> > +#define HCI_ERROR_PAIRING_NOT_ALLOWED  0x18
 > > +
-> >  static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
-> >  static u8 l2cap_fixed_chan[8] = { 0x02, };
-> >  
-> > @@ -3522,7 +3524,7 @@ void l2cap_chan_busy(struct l2cap_chan *chan, int busy)
-> >  	if (chan->mode == L2CAP_MODE_ERTM) {
-> >  		if (busy)
-> >  			l2cap_ertm_enter_local_busy(chan);
-> > -		else
-> > +		else if (!force_local_busy)
-> >  			l2cap_ertm_exit_local_busy(chan);
 > 
-> NACK on this. I don't wanna move code with the specific purpose of pass a PTS
-> test into the tree. This kinda of thing can survive outside of the tree.
+> These are fine to me.
 
-actually it can not life outside the tree. We need to be able to pass
-the PTS test cases with an upstream source.
-
-However instead of hacking this in, what is the actual test case details
-here that we need to have support for?
+fine with me as well.
 
 Regards
 
