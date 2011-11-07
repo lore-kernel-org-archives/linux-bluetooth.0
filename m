@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EB857CA.1000902@codeaurora.org>
-Date: Mon, 07 Nov 2011 14:12:26 -0800
+Message-ID: <4EB85527.30607@codeaurora.org>
+Date: Mon, 07 Nov 2011 14:01:11 -0800
 From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -35,19 +35,22 @@ On 11/7/2011 1:58 PM, Brian Gix wrote:
 > months, but may inadvertantly have undid some fixes.
 >
 
+This patch was rebased off of:
 
-I am also now going to commence rebasing the MGMTOPS changes that I made 
-to Bluez.  The changes are much less drastic, but of course important 
-for the support of the kernel side.  The existing MGMTOPS interface will 
-work with the Kernel changes with fairly minor changes, that include 
-usually a few extra parameters in the datagrams.
+commit 1e92e0b03905de28616d53c8b8c654defb16a096
+Author: Szymon Janc <szymon.janc@tieto.com>
+Date:   Thu Nov 3 16:05:44 2011 +0100
 
-Most significantly, we thought that the LE Address type (Random vs 
-Public) was important to store with the pairing information.  I know 
-that some here have been of the opinion that we can just do an LE scan 
-each time we want to connect to an LE device, but as we make the move 
-towards supporting LE Privacy, this piece of information (Random vs 
-Public) really is just an extension of the BD Addr being used.
+     Bluetooth: Add debug print to l2cap_chan_create
+
+     Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+     Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+
+
+
+
+
+
 
 -- 
 Brian Gix
