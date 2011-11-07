@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: Add address type fields to mgmt messages that need them
-Date: Mon,  7 Nov 2011 23:13:39 +0200
-Message-Id: <1320700419-4665-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/3] Bluetooth: Update link key mgmt APIs to match latest spec.
+Date: Mon,  7 Nov 2011 23:13:38 +0200
+Message-Id: <1320700419-4665-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1320700419-4665-1-git-send-email-johan.hedberg@gmail.com>
 References: <1320700419-4665-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,293 +11,224 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds address type info (typically BR/EDR vs LE) to management
-messages that need this. This also ensures conformance to the latest
-management API specification.
+BR/EDR link keys have their own commands and events (separate from SMP)
+and the remove_keys command (previously remove_key) removes keys of any
+kind for the specified remote address.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |   10 ++++----
- include/net/bluetooth/mgmt.h     |   23 ++++++++++--------
- net/bluetooth/hci_event.c        |   20 +++++++++-------
- net/bluetooth/mgmt.c             |   47 ++++++++++++++++++++++++++++---------
- 4 files changed, 64 insertions(+), 36 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 +-
+ include/net/bluetooth/mgmt.h     |   18 ++++++++--------
+ net/bluetooth/hci_core.c         |    4 +-
+ net/bluetooth/mgmt.c             |   43 ++++++++++++++++++++-----------------
+ 4 files changed, 35 insertions(+), 32 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 4ebc882..e6071d0 100644
+index bca53aa..4ebc882 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -912,10 +912,10 @@ int mgmt_discoverable(u16 index, u8 discoverable);
+@@ -911,7 +911,7 @@ int mgmt_powered(u16 index, u8 powered);
+ int mgmt_discoverable(u16 index, u8 discoverable);
  int mgmt_connectable(u16 index, u8 connectable);
  int mgmt_write_scan_failed(u16 index, u8 scan, u8 status);
- int mgmt_new_link_key(u16 index, struct link_key *key, u8 persistent);
--int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type);
--int mgmt_disconnected(u16 index, bdaddr_t *bdaddr);
-+int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 type);
-+int mgmt_disconnected(u16 index, bdaddr_t *bdaddr, u8 type);
+-int mgmt_new_key(u16 index, struct link_key *key, u8 persistent);
++int mgmt_new_link_key(u16 index, struct link_key *key, u8 persistent);
+ int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type);
+ int mgmt_disconnected(u16 index, bdaddr_t *bdaddr);
  int mgmt_disconnect_failed(u16 index);
--int mgmt_connect_failed(u16 index, bdaddr_t *bdaddr, u8 status);
-+int mgmt_connect_failed(u16 index, bdaddr_t *bdaddr, u8 type, u8 status);
- int mgmt_pin_code_request(u16 index, bdaddr_t *bdaddr, u8 secure);
- int mgmt_pin_code_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status);
- int mgmt_pin_code_neg_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status);
-@@ -928,8 +928,8 @@ int mgmt_auth_failed(u16 index, bdaddr_t *bdaddr, u8 status);
- int mgmt_set_local_name_complete(u16 index, u8 *name, u8 status);
- int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
- 								u8 status);
--int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
--								u8 *eir);
-+int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 type, u8 *dev_class,
-+							s8 rssi, u8 *eir);
- int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
- int mgmt_inquiry_failed(u16 index, u8 status);
- int mgmt_discovering(u16 index, u8 discovering);
 diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index fa33bc6..3e320c9 100644
+index b5320aa..fa33bc6 100644
 --- a/include/net/bluetooth/mgmt.h
 +++ b/include/net/bluetooth/mgmt.h
-@@ -128,10 +128,20 @@ struct mgmt_rp_disconnect {
+@@ -100,22 +100,22 @@ struct mgmt_cp_set_service_cache {
+ 	__u8 enable;
+ } __packed;
+ 
+-struct mgmt_key_info {
++struct mgmt_link_key_info {
  	bdaddr_t bdaddr;
+ 	u8 type;
+ 	u8 val[16];
+ 	u8 pin_len;
  } __packed;
  
-+#define MGMT_ADDR_BREDR			0x00
-+#define MGMT_ADDR_LE			0x01
-+#define MGMT_ADDR_BREDR_LE		0x02
-+#define MGMT_ADDR_INVALID		0xff
-+
-+struct mgmt_addr_info {
-+	bdaddr_t bdaddr;
-+	__u8 type;
-+} __packed;
-+
- #define MGMT_OP_GET_CONNECTIONS		0x0010
- struct mgmt_rp_get_connections {
- 	__le16 conn_count;
--	bdaddr_t conn[0];
-+	struct mgmt_addr_info addr[0];
+-#define MGMT_OP_LOAD_KEYS		0x000D
+-struct mgmt_cp_load_keys {
++#define MGMT_OP_LOAD_LINK_KEYS		0x000D
++struct mgmt_cp_load_link_keys {
+ 	__u8 debug_keys;
+ 	__le16 key_count;
+-	struct mgmt_key_info keys[0];
++	struct mgmt_link_key_info keys[0];
  } __packed;
  
- #define MGMT_OP_PIN_CODE_REPLY		0x0011
-@@ -254,19 +264,12 @@ struct mgmt_ev_new_link_key {
+-#define MGMT_OP_REMOVE_KEY		0x000E
+-struct mgmt_cp_remove_key {
++#define MGMT_OP_REMOVE_KEYS		0x000E
++struct mgmt_cp_remove_keys {
+ 	bdaddr_t bdaddr;
+ 	__u8 disconnect;
+ } __packed;
+@@ -247,10 +247,10 @@ struct mgmt_ev_controller_error {
+ 
+ #define MGMT_EV_PAIRABLE		0x0009
+ 
+-#define MGMT_EV_NEW_KEY			0x000A
+-struct mgmt_ev_new_key {
++#define MGMT_EV_NEW_LINK_KEY		0x000A
++struct mgmt_ev_new_link_key {
+ 	__u8 store_hint;
+-	struct mgmt_key_info key;
++	struct mgmt_link_key_info key;
  } __packed;
  
  #define MGMT_EV_CONNECTED		0x000B
--struct mgmt_ev_connected {
--	bdaddr_t bdaddr;
--	__u8 link_type;
--} __packed;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e4ddf36..693c0df 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1140,7 +1140,7 @@ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
  
- #define MGMT_EV_DISCONNECTED		0x000C
--struct mgmt_ev_disconnected {
--	bdaddr_t bdaddr;
--} __packed;
+ 	persistent = hci_persistent_key(hdev, conn, type, old_key_type);
  
- #define MGMT_EV_CONNECT_FAILED		0x000D
- struct mgmt_ev_connect_failed {
--	bdaddr_t bdaddr;
-+	struct mgmt_addr_info addr;
- 	__u8 status;
- } __packed;
+-	mgmt_new_key(hdev->id, key, persistent);
++	mgmt_new_link_key(hdev->id, key, persistent);
  
-@@ -296,7 +299,7 @@ struct mgmt_ev_local_name_changed {
+ 	if (!persistent) {
+ 		list_del(&key->list);
+@@ -1183,7 +1183,7 @@ int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
+ 	memcpy(id->rand, rand, sizeof(id->rand));
  
- #define MGMT_EV_DEVICE_FOUND		0x0012
- struct mgmt_ev_device_found {
--	bdaddr_t bdaddr;
-+	struct mgmt_addr_info addr;
- 	__u8 dev_class[3];
- 	__s8 rssi;
- 	__u8 eir[HCI_MAX_EIR_LENGTH];
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 176ceca..2fced8c 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1404,8 +1404,8 @@ static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *
- 		data.rssi		= 0x00;
- 		data.ssp_mode		= 0x00;
- 		hci_inquiry_cache_update(hdev, &data);
--		mgmt_device_found(hdev->id, &info->bdaddr, info->dev_class, 0,
--									NULL);
-+		mgmt_device_found(hdev->id, &info->bdaddr, ACL_LINK,
-+						info->dev_class, 0, NULL);
- 	}
+ 	if (new_key)
+-		mgmt_new_key(hdev->id, key, old_key_type);
++		mgmt_new_link_key(hdev->id, key, old_key_type);
  
- 	hci_dev_unlock(hdev);
-@@ -1471,7 +1471,8 @@ static inline void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *s
- 	} else {
- 		conn->state = BT_CLOSED;
- 		if (conn->type == ACL_LINK)
--			mgmt_connect_failed(hdev->id, &ev->bdaddr, ev->status);
-+			mgmt_connect_failed(hdev->id, &ev->bdaddr, conn->type,
-+								ev->status);
- 	}
- 
- 	if (conn->type == ACL_LINK)
-@@ -1584,7 +1585,7 @@ static inline void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff
- 	conn->state = BT_CLOSED;
- 
- 	if (conn->type == ACL_LINK || conn->type == LE_LINK)
--		mgmt_disconnected(hdev->id, &conn->dst);
-+		mgmt_disconnected(hdev->id, &conn->dst, conn->type);
- 
- 	hci_proto_disconn_cfm(conn, ev->reason);
- 	hci_conn_del(conn);
-@@ -2408,7 +2409,7 @@ static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct
- 			data.rssi		= info->rssi;
- 			data.ssp_mode		= 0x00;
- 			hci_inquiry_cache_update(hdev, &data);
--			mgmt_device_found(hdev->id, &info->bdaddr,
-+			mgmt_device_found(hdev->id, &info->bdaddr, ACL_LINK,
- 						info->dev_class, info->rssi,
- 						NULL);
- 		}
-@@ -2425,7 +2426,7 @@ static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct
- 			data.rssi		= info->rssi;
- 			data.ssp_mode		= 0x00;
- 			hci_inquiry_cache_update(hdev, &data);
--			mgmt_device_found(hdev->id, &info->bdaddr,
-+			mgmt_device_found(hdev->id, &info->bdaddr, ACL_LINK,
- 						info->dev_class, info->rssi,
- 						NULL);
- 		}
-@@ -2568,8 +2569,8 @@ static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct
- 		data.rssi		= info->rssi;
- 		data.ssp_mode		= 0x01;
- 		hci_inquiry_cache_update(hdev, &data);
--		mgmt_device_found(hdev->id, &info->bdaddr, info->dev_class,
--						info->rssi, info->data);
-+		mgmt_device_found(hdev->id, &info->bdaddr, ACL_LINK,
-+				info->dev_class, info->rssi, info->data);
- 	}
- 
- 	hci_dev_unlock(hdev);
-@@ -2832,7 +2833,8 @@ static inline void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff
- 	}
- 
- 	if (ev->status) {
--		mgmt_connect_failed(hdev->id, &ev->bdaddr, ev->status);
-+		mgmt_connect_failed(hdev->id, &ev->bdaddr, conn->type,
-+								ev->status);
- 		hci_proto_connect_cfm(conn, ev->status);
- 		conn->state = BT_CLOSED;
- 		hci_conn_del(conn);
+ 	return 0;
+ }
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 7d32981..950242e 100644
+index 16ccc7e..7d32981 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1069,6 +1069,18 @@ failed:
+@@ -908,30 +908,32 @@ static int set_service_cache(struct sock *sk, u16 index,  unsigned char *data,
  	return err;
  }
  
-+static u8 link_to_mgmt(u8 link_type)
-+{
-+	switch (link_type) {
-+	case LE_LINK:
-+		return MGMT_ADDR_LE;
-+	case ACL_LINK:
-+		return MGMT_ADDR_BREDR;
-+	default:
-+		return MGMT_ADDR_INVALID;
-+	}
-+}
-+
- static int get_connections(struct sock *sk, u16 index)
+-static int load_keys(struct sock *sk, u16 index, unsigned char *data, u16 len)
++static int load_link_keys(struct sock *sk, u16 index, unsigned char *data,
++								u16 len)
  {
- 	struct mgmt_rp_get_connections *rp;
-@@ -1092,7 +1104,7 @@ static int get_connections(struct sock *sk, u16 index)
- 		count++;
+ 	struct hci_dev *hdev;
+-	struct mgmt_cp_load_keys *cp;
++	struct mgmt_cp_load_link_keys *cp;
+ 	u16 key_count, expected_len;
+ 	int i;
+ 
+ 	cp = (void *) data;
+ 
+ 	if (len < sizeof(*cp))
+-		return cmd_status(sk, index, MGMT_OP_LOAD_KEYS, EINVAL);
++		return cmd_status(sk, index, MGMT_OP_LOAD_LINK_KEYS, EINVAL);
+ 
+ 	key_count = get_unaligned_le16(&cp->key_count);
+ 
+-	expected_len = sizeof(*cp) + key_count * sizeof(struct mgmt_key_info);
++	expected_len = sizeof(*cp) + key_count *
++					sizeof(struct mgmt_link_key_info);
+ 	if (expected_len != len) {
+-		BT_ERR("load_keys: expected %u bytes, got %u bytes",
++		BT_ERR("load_link_keys: expected %u bytes, got %u bytes",
+ 							len, expected_len);
+-		return cmd_status(sk, index, MGMT_OP_LOAD_KEYS, EINVAL);
++		return cmd_status(sk, index, MGMT_OP_LOAD_LINK_KEYS, EINVAL);
  	}
  
--	rp_len = sizeof(*rp) + (count * sizeof(bdaddr_t));
-+	rp_len = sizeof(*rp) + (count * sizeof(struct mgmt_addr_info));
- 	rp = kmalloc(rp_len, GFP_ATOMIC);
- 	if (!rp) {
- 		err = -ENOMEM;
-@@ -1102,8 +1114,16 @@ static int get_connections(struct sock *sk, u16 index)
- 	put_unaligned_le16(count, &rp->conn_count);
+ 	hdev = hci_dev_get(index);
+ 	if (!hdev)
+-		return cmd_status(sk, index, MGMT_OP_LOAD_KEYS, ENODEV);
++		return cmd_status(sk, index, MGMT_OP_LOAD_LINK_KEYS, ENODEV);
  
- 	i = 0;
--	list_for_each_entry(c, &hdev->conn_hash.list, list)
--		bacpy(&rp->conn[i++], &c->dst);
-+	list_for_each_entry(c, &hdev->conn_hash.list, list) {
-+		bacpy(&rp->addr[i].bdaddr, &c->dst);
-+		rp->addr[i].type = link_to_mgmt(c->type);
-+		if (rp->addr[i].type == MGMT_ADDR_INVALID)
-+			continue;
-+		i++;
-+	}
-+
-+	/* Recalculate length in case of filtered SCO connections, etc */
-+	rp_len = sizeof(*rp) + (i * sizeof(struct mgmt_addr_info));
+ 	BT_DBG("hci%u debug_keys %u key_count %u", index, cp->debug_keys,
+ 								key_count);
+@@ -948,7 +950,7 @@ static int load_keys(struct sock *sk, u16 index, unsigned char *data, u16 len)
+ 		clear_bit(HCI_DEBUG_KEYS, &hdev->flags);
  
- 	err = cmd_complete(sk, index, MGMT_OP_GET_CONNECTIONS, rp, rp_len);
+ 	for (i = 0; i < key_count; i++) {
+-		struct mgmt_key_info *key = &cp->keys[i];
++		struct mgmt_link_key_info *key = &cp->keys[i];
  
-@@ -2096,10 +2116,10 @@ int mgmt_new_link_key(u16 index, struct link_key *key, u8 persistent)
- 
- int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type)
- {
--	struct mgmt_ev_connected ev;
-+	struct mgmt_addr_info ev;
- 
- 	bacpy(&ev.bdaddr, bdaddr);
--	ev.link_type = link_type;
-+	ev.type = link_to_mgmt(link_type);
- 
- 	return mgmt_event(MGMT_EV_CONNECTED, index, &ev, sizeof(ev), NULL);
- }
-@@ -2120,15 +2140,16 @@ static void disconnect_rsp(struct pending_cmd *cmd, void *data)
- 	mgmt_pending_remove(cmd);
+ 		hci_add_link_key(hdev, NULL, 0, &key->bdaddr, key->val, key->type,
+ 								key->pin_len);
+@@ -960,27 +962,28 @@ static int load_keys(struct sock *sk, u16 index, unsigned char *data, u16 len)
+ 	return 0;
  }
  
--int mgmt_disconnected(u16 index, bdaddr_t *bdaddr)
-+int mgmt_disconnected(u16 index, bdaddr_t *bdaddr, u8 type)
+-static int remove_key(struct sock *sk, u16 index, unsigned char *data, u16 len)
++static int remove_keys(struct sock *sk, u16 index, unsigned char *data,
++								u16 len)
  {
--	struct mgmt_ev_disconnected ev;
-+	struct mgmt_addr_info ev;
- 	struct sock *sk = NULL;
+ 	struct hci_dev *hdev;
+-	struct mgmt_cp_remove_key *cp;
++	struct mgmt_cp_remove_keys *cp;
+ 	struct hci_conn *conn;
  	int err;
  
- 	mgmt_pending_foreach(MGMT_OP_DISCONNECT, index, disconnect_rsp, &sk);
+ 	cp = (void *) data;
  
- 	bacpy(&ev.bdaddr, bdaddr);
-+	ev.type = link_to_mgmt(type);
+ 	if (len != sizeof(*cp))
+-		return cmd_status(sk, index, MGMT_OP_REMOVE_KEY, EINVAL);
++		return cmd_status(sk, index, MGMT_OP_REMOVE_KEYS, EINVAL);
  
- 	err = mgmt_event(MGMT_EV_DISCONNECTED, index, &ev, sizeof(ev), sk);
+ 	hdev = hci_dev_get(index);
+ 	if (!hdev)
+-		return cmd_status(sk, index, MGMT_OP_REMOVE_KEY, ENODEV);
++		return cmd_status(sk, index, MGMT_OP_REMOVE_KEYS, ENODEV);
  
-@@ -2154,11 +2175,12 @@ int mgmt_disconnect_failed(u16 index)
- 	return err;
+ 	hci_dev_lock_bh(hdev);
+ 
+ 	err = hci_remove_link_key(hdev, &cp->bdaddr);
+ 	if (err < 0) {
+-		err = cmd_status(sk, index, MGMT_OP_REMOVE_KEY, -err);
++		err = cmd_status(sk, index, MGMT_OP_REMOVE_KEYS, -err);
+ 		goto unlock;
+ 	}
+ 
+@@ -1881,11 +1884,11 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 	case MGMT_OP_SET_SERVICE_CACHE:
+ 		err = set_service_cache(sk, index, buf + sizeof(*hdr), len);
+ 		break;
+-	case MGMT_OP_LOAD_KEYS:
+-		err = load_keys(sk, index, buf + sizeof(*hdr), len);
++	case MGMT_OP_LOAD_LINK_KEYS:
++		err = load_link_keys(sk, index, buf + sizeof(*hdr), len);
+ 		break;
+-	case MGMT_OP_REMOVE_KEY:
+-		err = remove_key(sk, index, buf + sizeof(*hdr), len);
++	case MGMT_OP_REMOVE_KEYS:
++		err = remove_keys(sk, index, buf + sizeof(*hdr), len);
+ 		break;
+ 	case MGMT_OP_DISCONNECT:
+ 		err = disconnect(sk, index, buf + sizeof(*hdr), len);
+@@ -2076,9 +2079,9 @@ int mgmt_write_scan_failed(u16 index, u8 scan, u8 status)
+ 	return 0;
  }
  
--int mgmt_connect_failed(u16 index, bdaddr_t *bdaddr, u8 status)
-+int mgmt_connect_failed(u16 index, bdaddr_t *bdaddr, u8 type, u8 status)
+-int mgmt_new_key(u16 index, struct link_key *key, u8 persistent)
++int mgmt_new_link_key(u16 index, struct link_key *key, u8 persistent)
  {
- 	struct mgmt_ev_connect_failed ev;
- 
--	bacpy(&ev.bdaddr, bdaddr);
-+	bacpy(&ev.addr.bdaddr, bdaddr);
-+	ev.addr.type = link_to_mgmt(type);
- 	ev.status = status;
- 
- 	return mgmt_event(MGMT_EV_CONNECT_FAILED, index, &ev, sizeof(ev), NULL);
-@@ -2346,14 +2368,15 @@ int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
- 	return err;
- }
- 
--int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
--								u8 *eir)
-+int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 type, u8 *dev_class,
-+							s8 rssi, u8 *eir)
- {
- 	struct mgmt_ev_device_found ev;
+-	struct mgmt_ev_new_key ev;
++	struct mgmt_ev_new_link_key ev;
  
  	memset(&ev, 0, sizeof(ev));
  
--	bacpy(&ev.bdaddr, bdaddr);
-+	bacpy(&ev.addr.bdaddr, bdaddr);
-+	ev.addr.type = link_to_mgmt(type);
- 	ev.rssi = rssi;
+@@ -2088,7 +2091,7 @@ int mgmt_new_key(u16 index, struct link_key *key, u8 persistent)
+ 	memcpy(ev.key.val, key->val, 16);
+ 	ev.key.pin_len = key->pin_len;
  
- 	if (eir)
+-	return mgmt_event(MGMT_EV_NEW_KEY, index, &ev, sizeof(ev), NULL);
++	return mgmt_event(MGMT_EV_NEW_LINK_KEY, index, &ev, sizeof(ev), NULL);
+ }
+ 
+ int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type)
 -- 
 1.7.7.1
 
