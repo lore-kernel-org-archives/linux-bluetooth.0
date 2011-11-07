@@ -1,32 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <henrik.possung@stericsson.com>, <ulrik.lauren@stericsson.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 0/4] SAP: Support for ongoing call
-Date: Mon, 7 Nov 2011 15:56:30 +0100
-Message-ID: <1320677790-32185-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: [PATCH 2/2] Bluetooth: Allow L2CAP to increase the security level
+Date: Mon,  7 Nov 2011 12:45:28 -0200
+Message-Id: <1320677128-25949-2-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1320677128-25949-1-git-send-email-padovan@profusion.mobi>
+References: <1320677128-25949-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Following patches adds support for handling 
-ongoing call in sap-u8500.c backend and 
-add couple fixes to SAP implementation related
-to this topic.
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 
-Lukasz Rymanowski (4):
-  SAP: Add support for handle ongoing call
-  SAP: Fix for connect response
-  SAP: Fix handling ongoing call
-  SAP: Fix handling ongoing call in sap-dummy
+Some incomming connections needs to increase the security level by
+requesting encryption for example (HID keyboard case). This change allows
+the userspace to change it through setsockopt with defer_setup enabled.
 
- sap/sap-dummy.c |    4 +---
- sap/sap-u8500.c |   53 ++++++++++++++++++++++++++++++++++++++++++++---------
- sap/server.c    |   41 +++++++++++++++++++++++++++++------------
- 3 files changed, 74 insertions(+), 24 deletions(-)
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+---
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/l2cap_core.c    |    2 +-
+ net/bluetooth/l2cap_sock.c    |   13 ++++++++++---
+ 3 files changed, 12 insertions(+), 4 deletions(-)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index fdb2b78..5ff38e9 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -810,5 +810,6 @@ int l2cap_chan_connect(struct l2cap_chan *chan);
+ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 								u32 priority);
+ void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
++int l2cap_chan_check_security(struct l2cap_chan *chan);
+ 
+ #endif /* __L2CAP_H */
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 793971c..6a5c1b2 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -516,7 +516,7 @@ static inline u8 l2cap_get_auth_type(struct l2cap_chan *chan)
+ }
+ 
+ /* Service level security */
+-static inline int l2cap_chan_check_security(struct l2cap_chan *chan)
++int l2cap_chan_check_security(struct l2cap_chan *chan)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+ 	__u8 auth_type;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 664762e..b58f40c 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -623,8 +623,12 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+ 
+ 		chan->sec_level = sec.level;
+ 
++		if (!chan->conn)
++			break;
++
+ 		conn = chan->conn;
+-		if (conn && chan->scid == L2CAP_CID_LE_DATA) {
++
++		if (chan->scid == L2CAP_CID_LE_DATA) {
+ 			if (!conn->hcon->out) {
+ 				err = -EINVAL;
+ 				break;
+@@ -632,9 +636,12 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+ 
+ 			if (smp_conn_security(conn, sec.level))
+ 				break;
+-
+-			err = 0;
+ 			sk->sk_state = BT_CONFIG;
++		} else if (sk->sk_state == BT_CONNECT2 &&
++					bt_sk(sk)->defer_setup) {
++			err = l2cap_chan_check_security(chan);
++		} else {
++			err = -EINVAL;
+ 		}
+ 		break;
+ 
 -- 
-on behalf of ST-Ericsson
+1.7.6.4
 
