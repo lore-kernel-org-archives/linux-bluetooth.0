@@ -1,134 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 Nov 2011 14:50:46 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] Bluetooth: Add timeout field to mgmt_set_discoverable
-Message-ID: <20111107165046.GA2651@joana>
-References: <1320358667-21086-1-git-send-email-johan.hedberg@gmail.com>
- <1320358667-21086-2-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320358667-21086-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <CABBYNZKW_fu1cqzV336PxqU3Vvb1Ht9cdX6S_OTob+a=1WSiaw@mail.gmail.com>
+References: <CAPGrrxXkvaNjnUT9vJ8sdnHuabF7zwtWnOnnbLD1+G0huvj1xw@mail.gmail.com>
+	<ca9f11c3ddb562558c25a7ff185407ad@mail.hendrik-sattler.de>
+	<CAPGrrxWm=gfcdr6bCVneQFJiGsrajKqojZ-iES28=isitC1jiw@mail.gmail.com>
+	<CABBYNZ+bqrdJwvOH3Uznbc54TaF=4c=VFBZ4ZG9_9aYOc2e=9w@mail.gmail.com>
+	<CAPGrrxWW4FM2ZkQP+toSeRPMYMQpSiRW5p8N9+8EM1LU3PvwdQ@mail.gmail.com>
+	<CABBYNZLmfwA9ivmnTvSTsCsvZV9aejqRov7gX1hwnXWreExg5w@mail.gmail.com>
+	<CAPGrrxVpG_33A9T5XynmUBHcS4Wi7CrHE8Lgi5HJcdR31jM0mw@mail.gmail.com>
+	<CABBYNZLtfPpdj_-qDp4zXjq5EPt4aOG8_RqSHe3PtOSdt7QVZQ@mail.gmail.com>
+	<CAPGrrxWJWc4NxKswgB2yu6UvfiUe-j+6r5M_wtpSh3TGs3QL8w@mail.gmail.com>
+	<CABBYNZJ7P2NAKD27D7sqHxP4QshiUx8ne=L57rugDoP__sHsyw@mail.gmail.com>
+	<CAPGrrxWa_sCC8OpCGhsc_aJfeRYm=hCrghUCLb+rian9SFrN4Q@mail.gmail.com>
+	<CABBYNZKW_fu1cqzV336PxqU3Vvb1Ht9cdX6S_OTob+a=1WSiaw@mail.gmail.com>
+Date: Mon, 7 Nov 2011 16:10:33 +0100
+Message-ID: <CAPGrrxUc6L_Ev3iQcCCFepLT_J_udiUwmTKAdU9SSGDcRNRbSQ@mail.gmail.com>
+Subject: Re: [RFC] API for MAP client in obex-client
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+On Mon, Nov 7, 2011 at 2:20 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Bartosz,
+>
+> On Mon, Nov 7, 2011 at 2:42 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+>> On Mon, Nov 7, 2011 at 11:37 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Bartosz,
+>>>
+>>> On Mon, Nov 7, 2011 at 11:46 AM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+>>>> On Fri, Nov 4, 2011 at 1:00 PM, Luiz Augusto von Dentz
+>>>> <luiz.dentz@gmail.com> wrote:
+>>>>> Hi Bartosz,
+>>>>>
+>>>>> On Thu, Nov 3, 2011 at 9:01 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+>>>>>>
+>>>>>> Generally you may be right, but i'm not sure whether actually tangling
+>>>>>> agent (client of the client?) is a good idea -- I'll check it
+>>>>>> tomorrow, but AFAIR it's  an additional reversed connection? And
+>>>>>> situation with this big message probably is not so often to cause such
+>>>>>> a confusion. I would really like to use such API in simplest possible
+>>>>>> way, by calling some method and receiving answer and its exactly what
+>>>>>> is accomplished with fd.
+>>>>>
+>>>>> I haven't seen the implementation but I have a feeling it won't be
+>>>>> that simple, if you use the pipe/unix socket to stream the data them
+>>>>> you end up copying data and the stream still need to be handled  in
+>>>>> client side which will very likely copy/convert the data again. We
+>>>>> have tried such a thing before with A2DP and it was consider
+>>>>> inefficient, so what we do nowadays is passing the bluetooth socket
+>>>>> itself to PulseAudio but note that here it would not be a good idea
+>>>>> since the client would have to deal with OBEX protocol directly.
+>>>>>
+>>>>> You could return the transfer object on GetMessage, actually is is
+>>>>> probably a good idea to do this also for GetFile/PutFile, so that the
+>>>>> caller application have direct control on the transfers it has started
+>>>>> and we can probable have a property e.g. Status (Transferring, Error,
+>>>>> Complete) to indicate the transfer status, that would remove the need
+>>>>> to have an agent in the application although the system may still have
+>>>>> one to track the progress and keep history of the transfers.
+>>>>>
+>>>>> --
+>>>>> Luiz Augusto von Dentz
+>>>>>
+>>>>
+>>>> As far as i can tell adding transfer would be good idea and it's not
+>>>> necessary to actually track it. But there is still question how to
+>>>> transfer data? I'm still convinced that passing fd is good idea, maybe
+>>>> even more flexible would be to pass it from user to obex-client in
+>>>> DBus call, so user may decide whether it would be more convenience to
+>>>> use file, pipe or whatever.
+>>>>
+>>>> So method may look something like this:
+>>>>
+>>>> string GetMessage(unix_fd msgfd, string handle, dict(uint8 tag, variant value))
+>>>>
+>>>> Returning path to the newly created transfer.
+>>>
+>>> As I told you passing a fd to pass data is not very efficient because
+>>> you are just adding an intermediate buffer since obexd will have to
+>>> copy from the socket to the fd where the client read (btw buffering
+>>> the whole message in the client is probably a bad idea), in the other
+>>> hand the fd could be of a file that would probably work better but it
+>>> is no much different than passing a path which was my initial
+>>> suggestion and is probably simpler to implement because we have been
+>>> doing this already. This way when the transfer is completed it just a
+>>> matter of reading the file.
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>>>
+>>
+>> Generally GetMessage (x-bt/message) is set to be buffered in
+>> obc_transfer_get - so there is (AFAICT) no real difference what we
+>> would do with this buffer. And if we would like to modify it to use
+>> file buffering, we can use usr provided fd rather then file name and
+>> let client decide where to store it. In sake of user app simplicity,
+>> as you say earlier.
+>
+> That is nothing that couldn't be changed, also whether it is a path or
+> not the user is still deciding where it should be stored but I guess a
+> path is actually less troublesome to the client to deal with since not
+> every binding supports fd passing which can be a problem to end user
+> application which I suppose this API should be targeting, also using
+> paths is consistent with other parts of the code GetFile/PutFile.
+>
+> --
+> Luiz Augusto von Dentz
+>
 
-* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-11-04 00:17:46 +0200]:
+OK, so maybe this fd passing would be confusing and may be problematic
+if somebody would use java or something.
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> Based on the revised mgmt API set_discoverable has a timeout parameter
-> to specify how long the adapter will remain discoverable. A value of 0
-> means "indefinitively".
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  include/net/bluetooth/hci_core.h |    3 +++
->  include/net/bluetooth/mgmt.h     |    4 ++++
->  net/bluetooth/hci_core.c         |   25 +++++++++++++++++++++++++
->  net/bluetooth/hci_event.c        |    5 +++++
->  net/bluetooth/mgmt.c             |    5 ++++-
->  5 files changed, 41 insertions(+), 1 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index f97792c..5079598 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -196,6 +196,9 @@ struct hci_dev {
->  	struct work_struct	power_off;
->  	struct timer_list	off_timer;
->  
-> +	__u16			discov_timeout;
-> +	struct delayed_work	discov_off;
-> +
->  	struct timer_list	cmd_timer;
->  	struct tasklet_struct	cmd_task;
->  	struct tasklet_struct	rx_task;
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 3062fd3..b5320aa 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -69,6 +69,10 @@ struct mgmt_mode {
->  #define MGMT_OP_SET_POWERED		0x0005
->  
->  #define MGMT_OP_SET_DISCOVERABLE	0x0006
-> +struct mgmt_cp_set_discoverable {
-> +	__u8 val;
-> +	__u16 timeout;
-> +} __packed;
->  
->  #define MGMT_OP_SET_CONNECTABLE		0x0007
->  
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index b7f6b5b..0c75770 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -595,6 +595,11 @@ static int hci_dev_do_close(struct hci_dev *hdev)
->  	tasklet_kill(&hdev->rx_task);
->  	tasklet_kill(&hdev->tx_task);
->  
-> +	if (hdev->discov_timeout > 0) {
-> +		cancel_delayed_work_sync(&hdev->discov_off);
-> +		hdev->discov_timeout = 0;
-> +	}
-> +
->  	hci_dev_lock_bh(hdev);
->  	inquiry_cache_flush(hdev);
->  	hci_conn_hash_flush(hdev);
-> @@ -968,6 +973,24 @@ void hci_del_off_timer(struct hci_dev *hdev)
->  	del_timer(&hdev->off_timer);
->  }
->  
-> +static void hci_discov_off(struct work_struct *work)
-> +{
-> +	struct hci_dev *hdev;
-> +	u8 scan = SCAN_PAGE;
-> +
-> +	hdev = container_of(work, struct hci_dev, discov_off.work);
-> +
-> +	BT_DBG("%s", hdev->name);
-> +
-> +	hci_dev_lock_bh(hdev);
-> +
-> +	hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, sizeof(scan), &scan);
-> +
-> +	hdev->discov_timeout = 0;
-> +
-> +	hci_dev_unlock_bh(hdev);
-> +}
-> +
->  int hci_uuids_clear(struct hci_dev *hdev)
->  {
->  	struct list_head *p, *n;
-> @@ -1485,6 +1508,8 @@ int hci_register_dev(struct hci_dev *hdev)
->  	INIT_WORK(&hdev->power_off, hci_power_off);
->  	setup_timer(&hdev->off_timer, hci_auto_off, (unsigned long) hdev);
->  
-> +	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
-> +
->  	memset(&hdev->stat, 0, sizeof(struct hci_dev_stats));
->  
->  	atomic_set(&hdev->promisc, 0);
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 8c81a75..dd24d6e 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -296,6 +296,11 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
->  		set_bit(HCI_ISCAN, &hdev->flags);
->  		if (!old_iscan)
->  			mgmt_discoverable(hdev->id, 1);
-> +		if (hdev->discov_timeout > 0) {
-> +			int to = msecs_to_jiffies(hdev->discov_timeout * 1000);
-> +			queue_delayed_work(hdev->workqueue, &hdev->discov_off,
-> +									to);
-> +		}
->  	} else if (old_iscan)
->  		mgmt_discoverable(hdev->id, 0);
+string GetMessage(string file_name, string handle, dict(uint8 tag,
+variant value))
 
-If we call set discoverable FALSE after call set discoverable TRUE and
-_before_ it timeouts expires we are leaking the delayed work. A
-cancel_delayed_work_sync() call seems to be missing in this case.
+i think that this is as good as we can settle in this discussion, if
+there is no serious issues in this model maybe i would start coding
+it? (I'll resend full api sometime soon)
 
-	Gustavo
+-- 
+Pozdrowienia - Cheers,
+Bartosz Szatkowski
