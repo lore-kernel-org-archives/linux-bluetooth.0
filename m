@@ -1,152 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Add timeout field to mgmt_set_discoverable
-Date: Mon,  7 Nov 2011 22:16:02 +0200
-Message-Id: <1320696964-3582-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20111107193648.GA2597@fusion.localdomain>
+References: <1320685115-20542-1-git-send-email-claudio.takahasi@openbossa.org>
+	<20111107193648.GA2597@fusion.localdomain>
+Date: Mon, 7 Nov 2011 16:08:45 -0400
+Message-ID: <CAJdJm_OgkKPLnM_5e7w+iLMHW-pvx2MVeagot5mkdp4erKFH9Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] btmgmt: fix used without initialization
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Johan,
 
-Based on the revised mgmt API set_discoverable has a timeout parameter
-to specify how long the adapter will remain discoverable. A value of 0
-means "indefinitively".
+On Mon, Nov 7, 2011 at 3:36 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Claudio,
+>
+> On Mon, Nov 07, 2011, Claudio Takahasi wrote:
+>> This patch fixes the following warning being treated as error:
+>> mgmt/main.c: In function 'mgmt_process_data':
+>> mgmt/main.c:508:3: error: 'len' may be used uninitialized in this
+>> function [-Werror=uninitialized]
+>> ---
+>>  mgmt/main.c |    6 ++++--
+>>  1 files changed, 4 insertions(+), 2 deletions(-)
+>
+> Thanks for the heads-up. Seems like my gcc is buggy since it doesn't
+> catch this even when I use bootstrap-configure. The original intent of
+> the code was to have return ret which is what I pushed as a fix (-errno
+> would be more sophisticated but then it'd make sense to fix several
+> other places in the code too). Btw, please keep "int err" variables
+> negative so that we have consistency in the code-base and avoid stupid
+> bugs.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h |    3 +++
- include/net/bluetooth/mgmt.h     |    4 ++++
- net/bluetooth/hci_core.c         |   25 +++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |    5 +++++
- net/bluetooth/mgmt.c             |    7 ++++++-
- 5 files changed, 43 insertions(+), 1 deletions(-)
+Actually we are not consistent yet:
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 20db034..5803c1e 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -196,6 +196,9 @@ struct hci_dev {
- 	struct work_struct	power_off;
- 	struct timer_list	off_timer;
- 
-+	__u16			discov_timeout;
-+	struct delayed_work	discov_off;
-+
- 	struct timer_list	cmd_timer;
- 	struct tasklet_struct	cmd_task;
- 	struct tasklet_struct	rx_task;
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 3062fd3..b5320aa 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -69,6 +69,10 @@ struct mgmt_mode {
- #define MGMT_OP_SET_POWERED		0x0005
- 
- #define MGMT_OP_SET_DISCOVERABLE	0x0006
-+struct mgmt_cp_set_discoverable {
-+	__u8 val;
-+	__u16 timeout;
-+} __packed;
- 
- #define MGMT_OP_SET_CONNECTABLE		0x0007
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 6a4bd2d..2da3f90 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -595,6 +595,11 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	tasklet_kill(&hdev->rx_task);
- 	tasklet_kill(&hdev->tx_task);
- 
-+	if (hdev->discov_timeout > 0) {
-+		cancel_delayed_work_sync(&hdev->discov_off);
-+		hdev->discov_timeout = 0;
-+	}
-+
- 	hci_dev_lock_bh(hdev);
- 	inquiry_cache_flush(hdev);
- 	hci_conn_hash_flush(hdev);
-@@ -968,6 +973,24 @@ void hci_del_off_timer(struct hci_dev *hdev)
- 	del_timer(&hdev->off_timer);
- }
- 
-+static void hci_discov_off(struct work_struct *work)
-+{
-+	struct hci_dev *hdev;
-+	u8 scan = SCAN_PAGE;
-+
-+	hdev = container_of(work, struct hci_dev, discov_off.work);
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	hci_dev_lock_bh(hdev);
-+
-+	hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, sizeof(scan), &scan);
-+
-+	hdev->discov_timeout = 0;
-+
-+	hci_dev_unlock_bh(hdev);
-+}
-+
- int hci_uuids_clear(struct hci_dev *hdev)
- {
- 	struct list_head *p, *n;
-@@ -1485,6 +1508,8 @@ int hci_register_dev(struct hci_dev *hdev)
- 	INIT_WORK(&hdev->power_off, hci_power_off);
- 	setup_timer(&hdev->off_timer, hci_auto_off, (unsigned long) hdev);
- 
-+	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
-+
- 	memset(&hdev->stat, 0, sizeof(struct hci_dev_stats));
- 
- 	atomic_set(&hdev->promisc, 0);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 0c11203..cf99265 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -292,6 +292,11 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
- 		set_bit(HCI_ISCAN, &hdev->flags);
- 		if (!old_iscan)
- 			mgmt_discoverable(hdev->id, 1);
-+		if (hdev->discov_timeout > 0) {
-+			int to = msecs_to_jiffies(hdev->discov_timeout * 1000);
-+			queue_delayed_work(hdev->workqueue, &hdev->discov_off,
-+									to);
-+		}
- 	} else if (old_iscan)
- 		mgmt_discoverable(hdev->id, 0);
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 0f9ef94..724d4fe 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -350,7 +350,7 @@ failed:
- static int set_discoverable(struct sock *sk, u16 index, unsigned char *data,
- 									u16 len)
- {
--	struct mgmt_mode *cp;
-+	struct mgmt_cp_set_discoverable *cp;
- 	struct hci_dev *hdev;
- 	struct pending_cmd *cmd;
- 	u8 scan;
-@@ -396,11 +396,16 @@ static int set_discoverable(struct sock *sk, u16 index, unsigned char *data,
- 
- 	if (cp->val)
- 		scan |= SCAN_INQUIRY;
-+	else
-+		cancel_delayed_work_sync(&hdev->discov_off);
- 
- 	err = hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
- 	if (err < 0)
- 		mgmt_pending_remove(cmd);
- 
-+	if (cp->val)
-+		hdev->discov_timeout = get_unaligned_le16(&cp->timeout);
-+
- failed:
- 	hci_dev_unlock_bh(hdev);
- 	hci_dev_put(hdev);
+$ grep -r 'int err.*errno;' *
+audio/avdtp.c:		int err = -errno;
+audio/avdtp.c:		int err = -errno;
+btio/btio.c:		int error = -errno;
+btio/btio.c:		int error = -errno;
+btio/btio.c:		int error = -errno;
+network/common.c:		int err = errno;
+network/common.c:		int err = errno;
+network/common.c:		int err = errno;
+serial/port.c:		int err = -errno;
+serial/port.c:		int err = -errno;
+time/server.c:		int err = errno;   (*)
+tools/hcitool.c:		int err = errno;
+
+This one is from a patch I sent (not yet applied), will fix.
+
+Regards,
 -- 
-1.7.7.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
