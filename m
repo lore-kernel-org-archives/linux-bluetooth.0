@@ -1,38 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ] btmgmt: fix used without initialization
-Date: Mon,  7 Nov 2011 13:58:35 -0300
-Message-Id: <1320685115-20542-1-git-send-email-claudio.takahasi@openbossa.org>
+Date: Mon, 7 Nov 2011 14:55:14 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/3] Bluetooth: Fix mgmt response when
+ HCI_Write_Scan_Enable fails
+Message-ID: <20111107165514.GC2651@joana>
+References: <1320358667-21086-1-git-send-email-johan.hedberg@gmail.com>
+ <1320358667-21086-3-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1320358667-21086-3-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes the following warning being treated as error:
-mgmt/main.c: In function 'mgmt_process_data':
-mgmt/main.c:508:3: error: 'len' may be used uninitialized in this
-function [-Werror=uninitialized]
----
- mgmt/main.c |    6 ++++--
- 1 files changed, 4 insertions(+), 2 deletions(-)
+Hi Johan,
 
-diff --git a/mgmt/main.c b/mgmt/main.c
-index c970f62..d939cca 100644
---- a/mgmt/main.c
-+++ b/mgmt/main.c
-@@ -504,8 +504,10 @@ static int mgmt_process_data(int mgmt_sk)
- 
- 	ret = read(mgmt_sk, buf, sizeof(buf));
- 	if (ret < 0) {
--		fprintf(stderr, "read: %s\n", strerror(errno));
--		return len;
-+		int err = errno;
-+
-+		fprintf(stderr, "read: %s\n", strerror(err));
-+		return -err;
- 	}
- 
- 	if (ret < MGMT_HDR_SIZE) {
--- 
-1.7.7.2
+* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-11-04 00:17:47 +0200]:
 
+> From: Johan Hedberg <johan.hedberg@intel.com>
+> 
+> A proper mgmt_command_status should be returned to user-space if either
+> discoverable or connectable enabling fails.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  include/net/bluetooth/hci_core.h |    1 +
+>  net/bluetooth/hci_event.c        |    9 ++++++---
+>  net/bluetooth/mgmt.c             |   13 +++++++++++++
+>  3 files changed, 20 insertions(+), 3 deletions(-)
+
+Applied, thanks.
+
+	Gustavo
