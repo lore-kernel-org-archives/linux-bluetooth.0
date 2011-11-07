@@ -1,34 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 Nov 2011 21:36:48 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Date: Mon, 7 Nov 2011 17:30:10 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] btmgmt: fix used without initialization
-Message-ID: <20111107193648.GA2597@fusion.localdomain>
-References: <1320685115-20542-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH] Bluetooth: Define HCI reasons instead of magic number
+Message-ID: <20111107193010.GC3707@joana>
+References: <1320668425-11251-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320685115-20542-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1320668425-11251-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Andrei,
 
-On Mon, Nov 07, 2011, Claudio Takahasi wrote:
-> This patch fixes the following warning being treated as error:
-> mgmt/main.c: In function 'mgmt_process_data':
-> mgmt/main.c:508:3: error: 'len' may be used uninitialized in this
-> function [-Werror=uninitialized]
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-07 14:20:25 +0200]:
+
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Use HCI error reasons instead of magic numbers.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  mgmt/main.c |    6 ++++--
->  1 files changed, 4 insertions(+), 2 deletions(-)
+>  include/net/bluetooth/hci.h      |    7 +++++++
+>  include/net/bluetooth/hci_core.h |    2 +-
+>  net/bluetooth/hci_conn.c         |    2 +-
+>  net/bluetooth/hci_event.c        |    4 ++--
+>  net/bluetooth/l2cap_core.c       |    8 ++++----
+>  5 files changed, 15 insertions(+), 8 deletions(-)
 
-Thanks for the heads-up. Seems like my gcc is buggy since it doesn't
-catch this even when I use bootstrap-configure. The original intent of
-the code was to have return ret which is what I pushed as a fix (-errno
-would be more sophisticated but then it'd make sense to fix several
-other places in the code too). Btw, please keep "int err" variables
-negative so that we have consistency in the code-base and avoid stupid
-bugs.
+Applied, thanks.
 
-Johan
+	Gustavo
