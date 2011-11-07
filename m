@@ -1,30 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 7 Nov 2011 14:23:11 +0200
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 1/2] gobex: remove extra define of G_OBEX_RSP_SUCCESS
-Date: Mon,  7 Nov 2011 14:29:17 +0200
-Message-Id: <1320668958-11238-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCHv4 2/3] Bluetooth: EFS: parse L2CAP config response
+Message-ID: <20111107122302.GB10810@aemeltch-MOBL1>
+References: <1318851332-23700-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1318851332-23700-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20111017201008.GD2631@joana>
+ <20111102075125.GA12653@aemeltch-MOBL1>
+ <20111103141031.GD17890@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20111103141031.GD17890@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Gustavo,
 
----
- gobex/gobex-packet.h |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
+On Thu, Nov 03, 2011 at 12:10:31PM -0200, Gustavo Padovan wrote:
+> * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-02 09:51:28 +0200]:
+> 
+> > Hi Gustavo,
+> > 
+> > On Mon, Oct 17, 2011 at 06:10:08PM -0200, Gustavo Padovan wrote:
+> > > Hi Andrei,
+> > > 
+> > > * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-10-17 14:35:31 +0300]:
+> > > 
+> > > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > > 
+> > > > Add parsing Extended Flow Specification in L2CAP Config Response.
+> > > > Based upon haijun.liu <haijun.liu@atheros.com> series of patches
+> > > > (sent Sun, 22 Aug 2010)
+> > > > 
+> > > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > > ---
+> > > >  net/bluetooth/l2cap_core.c |   24 ++++++++++++++++++++++++
+> > > >  1 files changed, 24 insertions(+), 0 deletions(-)
+> > > 
+> > > Applied, thanks.
+> > 
+> > Was this patch actually applied?
+> 
+> Actually not, I did something wrong. I tried now and it doesn't apply anymore,
+> could you please rebase? Thanks.
 
-diff --git a/gobex/gobex-packet.h b/gobex/gobex-packet.h
-index 24c9dcc..e4cea0b 100644
---- a/gobex/gobex-packet.h
-+++ b/gobex/gobex-packet.h
-@@ -41,7 +41,6 @@
- /* Response codes */
- #define G_OBEX_RSP_CONTINUE			0x10
- #define G_OBEX_RSP_SUCCESS			0x20
--#define G_OBEX_RSP_SUCCESS			0x20
- #define G_OBEX_RSP_CREATED			0x21
- #define G_OBEX_RSP_ACCEPTED			0x22
- #define G_OBEX_RSP_NON_AUTHORITATIVE		0x23
--- 
-1.7.6.4
+Sent. BTW: old patch has applied cleanly to bluetooth-next (with
+cherry-pick).
 
+Best regards 
+Andrei Emeltchenko 
