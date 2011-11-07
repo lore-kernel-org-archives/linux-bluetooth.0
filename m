@@ -1,121 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
-To: "'Ganir, Chen'" <chen.ganir@ti.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Proposal for GATT Client Dbus API.
-Date: Mon, 7 Nov 2011 13:35:22 +0000
-Message-ID: <F82830D409D80E4881C83250E051B74B478529E4@banasiexm01.ASIA.ROOT.PRI>
-References: <AcyCnA5DqBiEIGAzQEqnbRbpdBNd8AAAHtNw>
-	<F82830D409D80E4881C83250E051B74B4784BE4F@banasiexm01.ASIA.ROOT.PRI>
- <CAJdJm_O5Bf22=iJZqpJ9SgOCQ-MSxv7WPdwXYXko-mcyiTx=3Q@mail.gmail.com>
- <F82830D409D80E4881C83250E051B74B4784F0B3@banasiexm01.ASIA.ROOT.PRI>
- <F82830D409D80E4881C83250E051B74B4785205C@banasiexm01.ASIA.ROOT.PRI>
- <7769C83744F2C34A841232EF77AEA20C01DCC8DD1C@dnce01.ent.ti.com>
- <F82830D409D80E4881C83250E051B74B478523E8@banasiexm01.ASIA.ROOT.PRI>
- <F0070FBC0FB3174D8D11444EB2D5B0260106E6@DNCE02.ent.ti.com>
-In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B0260106E6@DNCE02.ent.ti.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <CAPGrrxWa_sCC8OpCGhsc_aJfeRYm=hCrghUCLb+rian9SFrN4Q@mail.gmail.com>
+References: <CAPGrrxXkvaNjnUT9vJ8sdnHuabF7zwtWnOnnbLD1+G0huvj1xw@mail.gmail.com>
+	<ca9f11c3ddb562558c25a7ff185407ad@mail.hendrik-sattler.de>
+	<CAPGrrxWm=gfcdr6bCVneQFJiGsrajKqojZ-iES28=isitC1jiw@mail.gmail.com>
+	<CABBYNZ+bqrdJwvOH3Uznbc54TaF=4c=VFBZ4ZG9_9aYOc2e=9w@mail.gmail.com>
+	<CAPGrrxWW4FM2ZkQP+toSeRPMYMQpSiRW5p8N9+8EM1LU3PvwdQ@mail.gmail.com>
+	<CABBYNZLmfwA9ivmnTvSTsCsvZV9aejqRov7gX1hwnXWreExg5w@mail.gmail.com>
+	<CAPGrrxVpG_33A9T5XynmUBHcS4Wi7CrHE8Lgi5HJcdR31jM0mw@mail.gmail.com>
+	<CABBYNZLtfPpdj_-qDp4zXjq5EPt4aOG8_RqSHe3PtOSdt7QVZQ@mail.gmail.com>
+	<CAPGrrxWJWc4NxKswgB2yu6UvfiUe-j+6r5M_wtpSh3TGs3QL8w@mail.gmail.com>
+	<CABBYNZJ7P2NAKD27D7sqHxP4QshiUx8ne=L57rugDoP__sHsyw@mail.gmail.com>
+	<CAPGrrxWa_sCC8OpCGhsc_aJfeRYm=hCrghUCLb+rian9SFrN4Q@mail.gmail.com>
+Date: Mon, 7 Nov 2011 15:20:21 +0200
+Message-ID: <CABBYNZKW_fu1cqzV336PxqU3Vvb1Ht9cdX6S_OTob+a=1WSiaw@mail.gmail.com>
+Subject: Re: [RFC] API for MAP client in obex-client
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
-Below is the latest diff, with all the changes incorporated. Let me know your view. 
+Hi Bartosz,
 
-diff --git a/doc/attribute-api.txt b/doc/attribute-api.txt
-index 98d7f30..9dd8222 100644
---- a/doc/attribute-api.txt
-+++ b/doc/attribute-api.txt
-@@ -110,6 +110,20 @@ Methods		dict GetProperties()
- 			read-write properties can be changed. On success
- 			this will emit a PropertyChanged signal.
- 
-+		void GetCharacteristicValue(uint16 timeout)
-+
-+			Read the value of the characteristic with timeout value in seconds. 
-+			This will emit a ReadResponse signal with status code.
-+
-+		void SetCharacteristicValue(variant value, string method, uint16 offset, uint16 timeout)
-+
-+			Changes the value of the specified characteristic as per the offset and method, with timeout value in seconds. 
-+			This will emit a WriteResponse signal with status code.
-+			
-+			Write the value of the characreristic, with any of these specified method:
-+			"WriteWithResponse", "SignedWriteWithoutResponse", 
-+			"WriteLongCharacteristicValue", "PrepareWrite", "ExecuteWrite".
-+
- 			Possible Errors: org.bluez.Error.InvalidArguments
- 
- Properties 	string UUID [readonly]
-@@ -126,7 +140,41 @@ Properties 	string UUID [readonly]
- 			Textual optional characteristic descriptor describing
- 			the Characteristic Value.
- 
-+		boolean Broadcast [readwrite]
-+
-+		    	Indicates whether this characteristic is broadcasted or not.
-+		    	If GATT Server Characteristic Configuration descriptor
-+		    	is not available for this characteristic, or if the characteristic
-+		    	properties do not allow this, writing to this property is not
-+		    	allowed.
-+
-+		boolean Indicate [readwrite]
-+
-+		    	Indicates whether this characteristic is notified or not.
-+		    	If GATT Client Characteristic Configuration descriptor
-+		    	is not available for this characteristic, or if the characteristic
-+		    	properties do not allow this, writing to this property is not
-+		    	allowed.
-+
-+		boolean Notify [readwrite]
-+
-+		    	Indicates whether this characteristic is indicated or not.
-+		    	If GATT Client Characteristic Configuration descriptor
-+		    	is not available for this characteristic, or if the characteristic
-+		    	properties do not allow this, writing to this property is not
-+		    	allowed.
-+
-+		boolean Readable [readonly]
-+
-+		    	Indicates wether this characteristic value can be read.
-+
-+		array{string} WriteMethods [readonly]
-+
-+			Write methods supported by the characteristic, includes extended properties if defined, format defined by GATT spec. 
-+			Possible values: 
-+			{ "WriteWithoutResponse", "Write", "AuthenticatedSignedWrite", "ReliableWrite", "WritableAuxiliaries"}
-+
+On Mon, Nov 7, 2011 at 2:42 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+> On Mon, Nov 7, 2011 at 11:37 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Bartosz,
+>>
+>> On Mon, Nov 7, 2011 at 11:46 AM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+>>> On Fri, Nov 4, 2011 at 1:00 PM, Luiz Augusto von Dentz
+>>> <luiz.dentz@gmail.com> wrote:
+>>>> Hi Bartosz,
+>>>>
+>>>> On Thu, Nov 3, 2011 at 9:01 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+>>>>>
+>>>>> Generally you may be right, but i'm not sure whether actually tangling
+>>>>> agent (client of the client?) is a good idea -- I'll check it
+>>>>> tomorrow, but AFAIR it's  an additional reversed connection? And
+>>>>> situation with this big message probably is not so often to cause such
+>>>>> a confusion. I would really like to use such API in simplest possible
+>>>>> way, by calling some method and receiving answer and its exactly what
+>>>>> is accomplished with fd.
+>>>>
+>>>> I haven't seen the implementation but I have a feeling it won't be
+>>>> that simple, if you use the pipe/unix socket to stream the data them
+>>>> you end up copying data and the stream still need to be handled  in
+>>>> client side which will very likely copy/convert the data again. We
+>>>> have tried such a thing before with A2DP and it was consider
+>>>> inefficient, so what we do nowadays is passing the bluetooth socket
+>>>> itself to PulseAudio but note that here it would not be a good idea
+>>>> since the client would have to deal with OBEX protocol directly.
+>>>>
+>>>> You could return the transfer object on GetMessage, actually is is
+>>>> probably a good idea to do this also for GetFile/PutFile, so that the
+>>>> caller application have direct control on the transfers it has started
+>>>> and we can probable have a property e.g. Status (Transferring, Error,
+>>>> Complete) to indicate the transfer status, that would remove the need
+>>>> to have an agent in the application although the system may still have
+>>>> one to track the progress and keep history of the transfers.
+>>>>
+>>>> --
+>>>> Luiz Augusto von Dentz
+>>>>
+>>>
+>>> As far as i can tell adding transfer would be good idea and it's not
+>>> necessary to actually track it. But there is still question how to
+>>> transfer data? I'm still convinced that passing fd is good idea, maybe
+>>> even more flexible would be to pass it from user to obex-client in
+>>> DBus call, so user may decide whether it would be more convenience to
+>>> use file, pipe or whatever.
+>>>
+>>> So method may look something like this:
+>>>
+>>> string GetMessage(unix_fd msgfd, string handle, dict(uint8 tag, variant value))
+>>>
+>>> Returning path to the newly created transfer.
+>>
+>> As I told you passing a fd to pass data is not very efficient because
+>> you are just adding an intermediate buffer since obexd will have to
+>> copy from the socket to the fd where the client read (btw buffering
+>> the whole message in the client is probably a bad idea), in the other
+>> hand the fd could be of a file that would probably work better but it
+>> is no much different than passing a path which was my initial
+>> suggestion and is probably simpler to implement because we have been
+>> doing this already. This way when the transfer is completed it just a
+>> matter of reading the file.
+>>
+>> --
+>> Luiz Augusto von Dentz
+>>
+>
+> Generally GetMessage (x-bt/message) is set to be buffered in
+> obc_transfer_get - so there is (AFAICT) no real difference what we
+> would do with this buffer. And if we would like to modify it to use
+> file buffering, we can use usr provided fd rather then file name and
+> let client decide where to store it. In sake of user app simplicity,
+> as you say earlier.
 
--		struct Format [readonly]
-+		array{struct} Format [readonly]
- 
- 			Optional Characteristic descriptor which defines the
- 			format of the Characteristic Value. For numeric
-@@ -142,6 +190,11 @@ Properties 	string UUID [readonly]
- 			  uint16 | Description: Description of the characteristic defined
- 			         | in a high layer profile.
- 
-+		array{object} CustomCharacteristicsDesc [readonly]
-+
-+			This list contains the user defined characteristics descriptors owned by this
-+			specific characteristics.
-+
- 		array{byte} Value [readwrite]
- 
- 			Raw value of the Characteristic Value attribute.
-@@ -162,3 +215,11 @@ Object path	freely definable
- Methods		void ValueChanged(object characteristic, array{byte})
- 
- 			New raw value of the Characteristic Value attribute.
-+
-+		void ReadResponse(object characteristic, uint8 status, variant value)
-+
-+			Value read and status code for Read Characteristic Value attribute operation. 
-+
-+		void WriteResponse(object characteristic, uint8 status)
-+
-+			Status code for Write Characteristic Value attribute opeartion.
+That is nothing that couldn't be changed, also whether it is a path or
+not the user is still deciding where it should be stored but I guess a
+path is actually less troublesome to the client to deal with since not
+every binding supports fd passing which can be a problem to end user
+application which I suppose this API should be targeting, also using
+paths is consistent with other parts of the code GetFile/PutFile.
 
-
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
-More information can be found at www.csr.com. Follow CSR on Twitter at http://twitter.com/CSR_PLC and read our blog at www.csr.com/blog
+-- 
+Luiz Augusto von Dentz
