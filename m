@@ -1,74 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/3] Bluetooth: Create hci_do_inquiry()
-Mime-Version: 1.0 (Apple Message framework v1251.1)
-Content-Type: text/plain; charset=us-ascii
-From: Andre Guedes <andre.guedes@openbossa.org>
-In-Reply-To: <20111107140901.GC10810@aemeltch-MOBL1>
-Date: Mon, 7 Nov 2011 11:27:26 -0300
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <E916740E-CCF6-4E94-96FB-C37F3564C77C@openbossa.org>
-References: <1320427013-5684-1-git-send-email-andre.guedes@openbossa.org> <20111107090343.GA10810@aemeltch-MOBL1> <6FA63277-5FDE-44FE-B4CC-17DACEDE7A18@openbossa.org> <20111107140901.GC10810@aemeltch-MOBL1>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ] Fix removing storage for device over BR/EDR
+Date: Mon,  7 Nov 2011 11:16:20 -0300
+Message-Id: <1320675380-23186-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+"characteristic", "attributes" and "ccc" files will be shared by both
+transports: LE and BR/EDR. Remove the entry from the "primary" file
+should be the last operation to clean the storage properly if the
+device operation mode is GATT/ATT over BR/EDR.
+---
+ Dependencies:
+ [PATCH BlueZ 0/7] CCC persistence
+ [PATCH BlueZ 0/2] CCC for bonded devices
 
-On Nov 7, 2011, at 11:09 AM, Andrei Emeltchenko wrote:
+ src/storage.c |   10 ++--------
+ 1 files changed, 2 insertions(+), 8 deletions(-)
 
-> Hi Andre,
-> 
-> On Mon, Nov 07, 2011 at 10:58:29AM -0300, Andre Guedes wrote:
->> Hi Andrei,
->> 
->> On Nov 7, 2011, at 6:03 AM, Andrei Emeltchenko wrote:
->> 
->>> Hi Andre,
->>> 
->>> On Fri, Nov 04, 2011 at 02:16:51PM -0300, Andre Guedes wrote:
->>>> This patch adds a function to hci_core to carry out inquiry.
->>>> 
->>>> All inquiry code from start_discovery() were replaced by a
->>>> hci_do_inquiry() call.
->>>> 
->>>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->>>> ---
->>>> include/net/bluetooth/hci_core.h |    2 ++
->>>> net/bluetooth/hci_core.c         |   17 +++++++++++++++++
->>>> net/bluetooth/mgmt.c             |    9 +--------
->>>> 3 files changed, 20 insertions(+), 8 deletions(-)
->>>> 
->>>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->>>> index f97792c..ae36ac0 100644
->>>> --- a/include/net/bluetooth/hci_core.h
->>>> +++ b/include/net/bluetooth/hci_core.h
->>>> @@ -970,4 +970,6 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
->>>> void hci_le_ltk_reply(struct hci_conn *conn, u8 ltk[16]);
->>>> void hci_le_ltk_neg_reply(struct hci_conn *conn);
->>>> 
->>>> +int hci_do_inquiry(struct hci_dev *hdev, u8 length);
->>>> +
->>>> #endif /* __HCI_CORE_H */
->>>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->>>> index b7f6b5b..098f26c 100644
->>>> --- a/net/bluetooth/hci_core.c
->>>> +++ b/net/bluetooth/hci_core.c
->>>> @@ -2560,3 +2560,20 @@ static void hci_cmd_task(unsigned long arg)
->>>> 		}
->>>> 	}
->>>> }
->>>> +
->>>> +int hci_do_inquiry(struct hci_dev *hdev, u8 length)
->>>> +{
->>>> +	u8 lap[3] = { 0x33, 0x8b, 0x9e };
->>> 
->>> what are those numbers above?
->> 
->> This is the general inquiry LAP value defined in page 314 of
->> Core spec.
-> 
-> Can we define those numbers (like HCI_GENERAL_INQ_LAP) or put comments?
+diff --git a/src/storage.c b/src/storage.c
+index e4ad4ab..a47720a 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -1170,17 +1170,10 @@ done:
+ int delete_device_service(const bdaddr_t *sba, const bdaddr_t *dba)
+ {
+ 	char filename[PATH_MAX + 1], address[18];
+-	int err;
+-
+-	create_filename(filename, PATH_MAX, sba, "primary");
+ 
+ 	memset(address, 0, sizeof(address));
+ 	ba2str(dba, address);
+ 
+-	err = textfile_del(filename, address);
+-	if (err < 0)
+-		return err;
+-
+ 	/* Deleting all characteristics of a given address */
+ 	create_filename(filename, PATH_MAX, sba, "characteristic");
+ 	delete_by_pattern(filename, address);
+@@ -1193,7 +1186,8 @@ int delete_device_service(const bdaddr_t *sba, const bdaddr_t *dba)
+ 	create_filename(filename, PATH_MAX, sba, "ccc");
+ 	delete_by_pattern(filename, address);
+ 
+-	return 0;
++	create_filename(filename, PATH_MAX, sba, "primary");
++	return textfile_del(filename, address);
+ }
+ 
+ char *read_device_services(const bdaddr_t *sba, const bdaddr_t *dba)
+-- 
+1.7.7.2
 
-Sure, I'll add a comment.
-
-Andre
