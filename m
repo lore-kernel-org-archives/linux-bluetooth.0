@@ -1,52 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 Nov 2011 14:23:11 +0200
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv4 2/3] Bluetooth: EFS: parse L2CAP config response
-Message-ID: <20111107122302.GB10810@aemeltch-MOBL1>
-References: <1318851332-23700-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1318851332-23700-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20111017201008.GD2631@joana>
- <20111102075125.GA12653@aemeltch-MOBL1>
- <20111103141031.GD17890@joana>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111103141031.GD17890@joana>
+Subject: [PATCH] Bluetooth: EFS: parse L2CAP config response
+Date: Mon,  7 Nov 2011 14:20:33 +0200
+Message-Id: <1320668433-11294-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Thu, Nov 03, 2011 at 12:10:31PM -0200, Gustavo Padovan wrote:
-> * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-02 09:51:28 +0200]:
-> 
-> > Hi Gustavo,
-> > 
-> > On Mon, Oct 17, 2011 at 06:10:08PM -0200, Gustavo Padovan wrote:
-> > > Hi Andrei,
-> > > 
-> > > * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-10-17 14:35:31 +0300]:
-> > > 
-> > > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > > 
-> > > > Add parsing Extended Flow Specification in L2CAP Config Response.
-> > > > Based upon haijun.liu <haijun.liu@atheros.com> series of patches
-> > > > (sent Sun, 22 Aug 2010)
-> > > > 
-> > > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > > ---
-> > > >  net/bluetooth/l2cap_core.c |   24 ++++++++++++++++++++++++
-> > > >  1 files changed, 24 insertions(+), 0 deletions(-)
-> > > 
-> > > Applied, thanks.
-> > 
-> > Was this patch actually applied?
-> 
-> Actually not, I did something wrong. I tried now and it doesn't apply anymore,
-> could you please rebase? Thanks.
+Add parsing Extended Flow Specification in L2CAP Config Response.
+Based upon haijun.liu <haijun.liu@atheros.com> series of patches
+(sent Sun, 22 Aug 2010)
 
-Sent. BTW: old patch has applied cleanly to bluetooth-next (with
-cherry-pick).
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |   24 ++++++++++++++++++++++++
+ 1 files changed, 24 insertions(+), 0 deletions(-)
 
-Best regards 
-Andrei Emeltchenko 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 6e0d4ce..20149ff 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2351,6 +2351,7 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
+ 	int type, olen;
+ 	unsigned long val;
+ 	struct l2cap_conf_rfc rfc;
++	struct l2cap_conf_efs efs;
+ 
+ 	BT_DBG("chan %p, rsp %p, len %d, req %p", chan, rsp, len, data);
+ 
+@@ -2393,6 +2394,19 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
+ 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EWS, 2,
+ 							chan->tx_win);
+ 			break;
++
++		case L2CAP_CONF_EFS:
++			if (olen == sizeof(efs))
++				memcpy(&efs, (void *)val, olen);
++
++			if (chan->local_stype != L2CAP_SERV_NOTRAFIC &&
++					efs.stype != L2CAP_SERV_NOTRAFIC &&
++					efs.stype != chan->local_stype)
++				return -ECONNREFUSED;
++
++			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
++					sizeof(efs), (unsigned long) &efs);
++			break;
+ 		}
+ 	}
+ 
+@@ -2407,7 +2421,17 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
+ 			chan->retrans_timeout = le16_to_cpu(rfc.retrans_timeout);
+ 			chan->monitor_timeout = le16_to_cpu(rfc.monitor_timeout);
+ 			chan->mps    = le16_to_cpu(rfc.max_pdu_size);
++
++			if (test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
++				chan->local_msdu = le16_to_cpu(efs.msdu);
++				chan->local_sdu_itime =
++						le32_to_cpu(efs.sdu_itime);
++				chan->local_acc_lat = le32_to_cpu(efs.acc_lat);
++				chan->local_flush_to =
++						le32_to_cpu(efs.flush_to);
++			}
+ 			break;
++
+ 		case L2CAP_MODE_STREAMING:
+ 			chan->mps    = le16_to_cpu(rfc.max_pdu_size);
+ 		}
+-- 
+1.7.4.1
+
