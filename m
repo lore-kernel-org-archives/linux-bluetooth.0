@@ -1,38 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Fix response for mgmt_start_discovery when powered off
-Date: Mon,  7 Nov 2011 23:13:37 +0200
-Message-Id: <1320700419-4665-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 7 Nov 2011 18:31:54 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/3] Bluetooth: Convert power off mechanism to use
+ delayed_work
+Message-ID: <20111107203153.GE3707@joana>
+References: <1320696964-3582-1-git-send-email-johan.hedberg@gmail.com>
+ <1320696964-3582-3-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1320696964-3582-3-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Johan,
 
-We should return a ENETDOWN status response if the adapter is powered
-off (i.e. the HCI_UP flag isn't set).
+* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-11-07 22:16:04 +0200]:
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+> From: Johan Hedberg <johan.hedberg@intel.com>
+> 
+> The power off code doesn't need to use its own custom timer since the
+> delayed_work API provides the exact same functionality.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  include/net/bluetooth/hci_core.h |    3 +-
+>  net/bluetooth/hci_core.c         |   39 ++++++++++++-------------------------
+>  net/bluetooth/mgmt.c             |    8 ++++--
+>  3 files changed, 19 insertions(+), 31 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 6f9e3cd..16ccc7e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1619,6 +1619,11 @@ static int start_discovery(struct sock *sk, u16 index)
- 
- 	hci_dev_lock_bh(hdev);
- 
-+	if (!test_bit(HCI_UP, &hdev->flags)) {
-+		err = cmd_status(sk, index, MGMT_OP_START_DISCOVERY, ENETDOWN);
-+		goto failed;
-+	}
-+
- 	cmd = mgmt_pending_add(sk, MGMT_OP_START_DISCOVERY, index, NULL, 0);
- 	if (!cmd) {
- 		err = -ENOMEM;
--- 
-1.7.7.1
+All 3 patches applied, thanks.
 
+	Gustavo
