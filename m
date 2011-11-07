@@ -2,84 +2,81 @@ Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH 2/2] Bluetooth: Allow L2CAP to increase the security level
-Date: Mon,  7 Nov 2011 12:45:28 -0200
-Message-Id: <1320677128-25949-2-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1320677128-25949-1-git-send-email-padovan@profusion.mobi>
-References: <1320677128-25949-1-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 1/2] Bluetooth: Rename l2cap_check_security()
+Date: Mon,  7 Nov 2011 12:45:27 -0200
+Message-Id: <1320677128-25949-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 
-Some incomming connections needs to increase the security level by
-requesting encryption for example (HID keyboard case). This change allows
-the userspace to change it through setsockopt with defer_setup enabled.
+rename to l2cap_chan_check_security() to make it consistent with other
+l2cap_exported functions. This function will be exported in a later
+commit.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/l2cap_core.c    |    2 +-
- net/bluetooth/l2cap_sock.c    |   13 ++++++++++---
- 3 files changed, 12 insertions(+), 4 deletions(-)
+ net/bluetooth/l2cap_core.c |   12 ++++++------
+ 1 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index fdb2b78..5ff38e9 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -810,5 +810,6 @@ int l2cap_chan_connect(struct l2cap_chan *chan);
- int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
- 								u32 priority);
- void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
-+int l2cap_chan_check_security(struct l2cap_chan *chan);
- 
- #endif /* __L2CAP_H */
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 793971c..6a5c1b2 100644
+index 1200814..793971c 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
 @@ -516,7 +516,7 @@ static inline u8 l2cap_get_auth_type(struct l2cap_chan *chan)
  }
  
  /* Service level security */
--static inline int l2cap_chan_check_security(struct l2cap_chan *chan)
-+int l2cap_chan_check_security(struct l2cap_chan *chan)
+-static inline int l2cap_check_security(struct l2cap_chan *chan)
++static inline int l2cap_chan_check_security(struct l2cap_chan *chan)
  {
  	struct l2cap_conn *conn = chan->conn;
  	__u8 auth_type;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 664762e..b58f40c 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -623,8 +623,12 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+@@ -662,7 +662,7 @@ static void l2cap_do_start(struct l2cap_chan *chan)
+ 		if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
+ 			return;
  
- 		chan->sec_level = sec.level;
+-		if (l2cap_check_security(chan) &&
++		if (l2cap_chan_check_security(chan) &&
+ 				__l2cap_no_conn_pending(chan)) {
+ 			struct l2cap_conn_req req;
+ 			req.scid = cpu_to_le16(chan->scid);
+@@ -752,7 +752,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 		if (chan->state == BT_CONNECT) {
+ 			struct l2cap_conn_req req;
  
-+		if (!chan->conn)
-+			break;
-+
- 		conn = chan->conn;
--		if (conn && chan->scid == L2CAP_CID_LE_DATA) {
-+
-+		if (chan->scid == L2CAP_CID_LE_DATA) {
- 			if (!conn->hcon->out) {
- 				err = -EINVAL;
- 				break;
-@@ -632,9 +636,12 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+-			if (!l2cap_check_security(chan) ||
++			if (!l2cap_chan_check_security(chan) ||
+ 					!__l2cap_no_conn_pending(chan)) {
+ 				bh_unlock_sock(sk);
+ 				continue;
+@@ -785,7 +785,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 			rsp.scid = cpu_to_le16(chan->dcid);
+ 			rsp.dcid = cpu_to_le16(chan->scid);
  
- 			if (smp_conn_security(conn, sec.level))
- 				break;
--
--			err = 0;
- 			sk->sk_state = BT_CONFIG;
-+		} else if (sk->sk_state == BT_CONNECT2 &&
-+					bt_sk(sk)->defer_setup) {
-+			err = l2cap_chan_check_security(chan);
-+		} else {
-+			err = -EINVAL;
- 		}
- 		break;
+-			if (l2cap_check_security(chan)) {
++			if (l2cap_chan_check_security(chan)) {
+ 				if (bt_sk(sk)->defer_setup) {
+ 					struct sock *parent = bt_sk(sk)->parent;
+ 					rsp.result = cpu_to_le16(L2CAP_CR_PEND);
+@@ -1179,7 +1179,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan)
+ 	if (hcon->state == BT_CONNECTED) {
+ 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+ 			__clear_chan_timer(chan);
+-			if (l2cap_check_security(chan))
++			if (l2cap_chan_check_security(chan))
+ 				l2cap_state_change(chan, BT_CONNECTED);
+ 		} else
+ 			l2cap_do_start(chan);
+@@ -2580,7 +2580,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 	chan->ident = cmd->ident;
  
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE) {
+-		if (l2cap_check_security(chan)) {
++		if (l2cap_chan_check_security(chan)) {
+ 			if (bt_sk(sk)->defer_setup) {
+ 				l2cap_state_change(chan, BT_CONNECT2);
+ 				result = L2CAP_CR_PEND;
 -- 
 1.7.6.4
 
