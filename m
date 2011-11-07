@@ -1,84 +1,152 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Fix mgmt response when HCI_Write_Scan_Enable fails
-Date: Mon,  7 Nov 2011 22:16:03 +0200
-Message-Id: <1320696964-3582-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1320696964-3582-1-git-send-email-johan.hedberg@gmail.com>
-References: <1320696964-3582-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/3] Bluetooth: Add timeout field to mgmt_set_discoverable
+Date: Mon,  7 Nov 2011 22:16:02 +0200
+Message-Id: <1320696964-3582-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-A proper mgmt_command_status should be returned to user-space if either
-discoverable or connectable enabling fails.
+Based on the revised mgmt API set_discoverable has a timeout parameter
+to specify how long the adapter will remain discoverable. A value of 0
+means "indefinitively".
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_event.c        |    9 ++++++---
- net/bluetooth/mgmt.c             |   13 +++++++++++++
- 3 files changed, 20 insertions(+), 3 deletions(-)
+ include/net/bluetooth/hci_core.h |    3 +++
+ include/net/bluetooth/mgmt.h     |    4 ++++
+ net/bluetooth/hci_core.c         |   25 +++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |    5 +++++
+ net/bluetooth/mgmt.c             |    7 ++++++-
+ 5 files changed, 43 insertions(+), 1 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 5803c1e..c233bce 100644
+index 20db034..5803c1e 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -911,6 +911,7 @@ int mgmt_index_removed(u16 index);
- int mgmt_powered(u16 index, u8 powered);
- int mgmt_discoverable(u16 index, u8 discoverable);
- int mgmt_connectable(u16 index, u8 connectable);
-+int mgmt_write_scan_failed(u16 index, u8 scan, u8 status);
- int mgmt_new_key(u16 index, struct link_key *key, u8 persistent);
- int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type);
- int mgmt_disconnected(u16 index, bdaddr_t *bdaddr);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index cf99265..176ceca 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -280,11 +280,14 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (!sent)
- 		return;
+@@ -196,6 +196,9 @@ struct hci_dev {
+ 	struct work_struct	power_off;
+ 	struct timer_list	off_timer;
  
--	if (status != 0)
--		goto done;
--
- 	param = *((__u8 *) sent);
++	__u16			discov_timeout;
++	struct delayed_work	discov_off;
++
+ 	struct timer_list	cmd_timer;
+ 	struct tasklet_struct	cmd_task;
+ 	struct tasklet_struct	rx_task;
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 3062fd3..b5320aa 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -69,6 +69,10 @@ struct mgmt_mode {
+ #define MGMT_OP_SET_POWERED		0x0005
  
-+	if (status != 0) {
-+		mgmt_write_scan_failed(hdev->id, param, status);
+ #define MGMT_OP_SET_DISCOVERABLE	0x0006
++struct mgmt_cp_set_discoverable {
++	__u8 val;
++	__u16 timeout;
++} __packed;
+ 
+ #define MGMT_OP_SET_CONNECTABLE		0x0007
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 6a4bd2d..2da3f90 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -595,6 +595,11 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 	tasklet_kill(&hdev->rx_task);
+ 	tasklet_kill(&hdev->tx_task);
+ 
++	if (hdev->discov_timeout > 0) {
++		cancel_delayed_work_sync(&hdev->discov_off);
 +		hdev->discov_timeout = 0;
-+		goto done;
 +	}
 +
- 	old_pscan = test_and_clear_bit(HCI_PSCAN, &hdev->flags);
- 	old_iscan = test_and_clear_bit(HCI_ISCAN, &hdev->flags);
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 724d4fe..0cb023e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2056,6 +2056,19 @@ int mgmt_connectable(u16 index, u8 connectable)
- 	return ret;
+ 	hci_dev_lock_bh(hdev);
+ 	inquiry_cache_flush(hdev);
+ 	hci_conn_hash_flush(hdev);
+@@ -968,6 +973,24 @@ void hci_del_off_timer(struct hci_dev *hdev)
+ 	del_timer(&hdev->off_timer);
  }
  
-+int mgmt_write_scan_failed(u16 index, u8 scan, u8 status)
++static void hci_discov_off(struct work_struct *work)
 +{
-+	if (scan & SCAN_PAGE)
-+		mgmt_pending_foreach(MGMT_OP_SET_CONNECTABLE, index,
-+						cmd_status_rsp, &status);
++	struct hci_dev *hdev;
++	u8 scan = SCAN_PAGE;
 +
-+	if (scan & SCAN_INQUIRY)
-+		mgmt_pending_foreach(MGMT_OP_SET_DISCOVERABLE, index,
-+						cmd_status_rsp, &status);
++	hdev = container_of(work, struct hci_dev, discov_off.work);
 +
-+	return 0;
++	BT_DBG("%s", hdev->name);
++
++	hci_dev_lock_bh(hdev);
++
++	hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, sizeof(scan), &scan);
++
++	hdev->discov_timeout = 0;
++
++	hci_dev_unlock_bh(hdev);
 +}
 +
- int mgmt_new_key(u16 index, struct link_key *key, u8 persistent)
+ int hci_uuids_clear(struct hci_dev *hdev)
  {
- 	struct mgmt_ev_new_key ev;
+ 	struct list_head *p, *n;
+@@ -1485,6 +1508,8 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	INIT_WORK(&hdev->power_off, hci_power_off);
+ 	setup_timer(&hdev->off_timer, hci_auto_off, (unsigned long) hdev);
+ 
++	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
++
+ 	memset(&hdev->stat, 0, sizeof(struct hci_dev_stats));
+ 
+ 	atomic_set(&hdev->promisc, 0);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0c11203..cf99265 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -292,6 +292,11 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ 		set_bit(HCI_ISCAN, &hdev->flags);
+ 		if (!old_iscan)
+ 			mgmt_discoverable(hdev->id, 1);
++		if (hdev->discov_timeout > 0) {
++			int to = msecs_to_jiffies(hdev->discov_timeout * 1000);
++			queue_delayed_work(hdev->workqueue, &hdev->discov_off,
++									to);
++		}
+ 	} else if (old_iscan)
+ 		mgmt_discoverable(hdev->id, 0);
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 0f9ef94..724d4fe 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -350,7 +350,7 @@ failed:
+ static int set_discoverable(struct sock *sk, u16 index, unsigned char *data,
+ 									u16 len)
+ {
+-	struct mgmt_mode *cp;
++	struct mgmt_cp_set_discoverable *cp;
+ 	struct hci_dev *hdev;
+ 	struct pending_cmd *cmd;
+ 	u8 scan;
+@@ -396,11 +396,16 @@ static int set_discoverable(struct sock *sk, u16 index, unsigned char *data,
+ 
+ 	if (cp->val)
+ 		scan |= SCAN_INQUIRY;
++	else
++		cancel_delayed_work_sync(&hdev->discov_off);
+ 
+ 	err = hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
+ 	if (err < 0)
+ 		mgmt_pending_remove(cmd);
+ 
++	if (cp->val)
++		hdev->discov_timeout = get_unaligned_le16(&cp->timeout);
++
+ failed:
+ 	hci_dev_unlock_bh(hdev);
+ 	hci_dev_put(hdev);
 -- 
 1.7.7.1
 
