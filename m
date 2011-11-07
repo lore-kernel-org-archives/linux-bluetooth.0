@@ -2,42 +2,96 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v2 6/7] Remove CCC entries when device is removed
-Date: Mon,  7 Nov 2011 11:00:01 -0300
-Message-Id: <1320674401-22745-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1318517004-17003-7-git-send-email-claudio.takahasi@openbossa.org>
-References: <1318517004-17003-7-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2 5/7] Remove notification and indication from server
+Date: Mon,  7 Nov 2011 10:59:56 -0300
+Message-Id: <1320674396-22709-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1318517004-17003-6-git-send-email-claudio.takahasi@openbossa.org>
+References: <1318517004-17003-6-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Upper layer should handle notification and indication since there are
+profiles especific constraints including timeouts and attributes values
+that should read only before sending it.
 ---
- src/storage.c |   16 ++++++++++++++++
- 1 files changed, 16 insertions(+), 0 deletions(-)
+ src/attrib-server.c |   46 ----------------------------------------------
+ 1 files changed, 0 insertions(+), 46 deletions(-)
 
-diff --git a/src/storage.c b/src/storage.c
-index babe7c7..e001987 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -1195,6 +1195,22 @@ int delete_device_service(const bdaddr_t *sba, const bdaddr_t *dba)
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 5bb0dab..b84b01d 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -53,8 +53,6 @@ static GSList *database = NULL;
+ struct gatt_channel {
+ 	bdaddr_t src;
+ 	bdaddr_t dst;
+-	GSList *notify;
+-	GSList *indicate;
+ 	GAttrib *attrib;
+ 	guint mtu;
+ 	gboolean le;
+@@ -697,8 +695,6 @@ static void attrib_free(void *data)
  
- 	g_slist_free_full(match.keys, g_free);
+ static void channel_free(struct gatt_channel *channel)
+ {
+-	g_slist_free(channel->notify);
+-	g_slist_free(channel->indicate);
+ 	g_attrib_unref(channel->attrib);
  
-+	/* Deleting all CCC values of a given address */
-+	memset(&match, 0, sizeof(match));
-+	match.pattern = address;
-+
-+	create_filename(filename, PATH_MAX, sba, "ccc");
-+	err = textfile_foreach(filename, filter_keys, &match);
-+	if (err < 0)
-+		return err;
-+
-+	for (l = match.keys; l; l = l->next) {
-+		const char *key = l->data;
-+		textfile_del(filename, key);
-+	}
-+
-+	g_slist_free_full(match.keys, g_free);
-+
+ 	g_free(channel);
+@@ -937,46 +933,6 @@ static void confirm_event(GIOChannel *io, void *user_data)
+ 	return;
+ }
+ 
+-static void attrib_notify_clients(struct attribute *attr)
+-{
+-	guint handle = attr->handle;
+-	GSList *l;
+-
+-	for (l = clients; l; l = l->next) {
+-		struct gatt_channel *channel = l->data;
+-
+-		/* Notification */
+-		if (g_slist_find_custom(channel->notify,
+-					GUINT_TO_POINTER(handle), handle_cmp)) {
+-			uint8_t pdu[ATT_MAX_MTU];
+-			uint16_t len;
+-
+-			len = enc_notification(attr->handle, attr->data,
+-						attr->len, pdu, channel->mtu);
+-			if (len == 0)
+-				continue;
+-
+-			g_attrib_send(channel->attrib, 0, pdu[0], pdu, len,
+-							NULL, NULL, NULL);
+-		}
+-
+-		/* Indication */
+-		if (g_slist_find_custom(channel->indicate,
+-					GUINT_TO_POINTER(handle), handle_cmp)) {
+-			uint8_t pdu[ATT_MAX_MTU];
+-			uint16_t len;
+-
+-			len = enc_indication(attr->handle, attr->data,
+-						attr->len, pdu, channel->mtu);
+-			if (len == 0)
+-				return;
+-
+-			g_attrib_send(channel->attrib, 0, pdu[0], pdu, len,
+-							NULL, NULL, NULL);
+-		}
+-	}
+-}
+-
+ static gboolean register_core_services(void)
+ {
+ 	uint8_t atval[256];
+@@ -1237,8 +1193,6 @@ int attrib_db_update(uint16_t handle, bt_uuid_t *uuid, const uint8_t *value,
+ 	if (attr)
+ 		*attr = a;
+ 
+-	attrib_notify_clients(a);
+-
  	return 0;
  }
  
