@@ -2,43 +2,42 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v2 2/7] Remove CCC for read by group
-Date: Mon,  7 Nov 2011 10:59:43 -0300
-Message-Id: <1320674383-22601-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1318517004-17003-3-git-send-email-claudio.takahasi@openbossa.org>
-References: <1318517004-17003-3-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2 0/7] CCC persistence
+Date: Mon,  7 Nov 2011 10:59:27 -0300
+Message-Id: <1320674367-22529-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1318517004-17003-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1318517004-17003-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Read by group is used to discover all primary services. Client
-Characteristic Configuration is not applied to service definition.
----
- src/attrib-server.c |    5 -----
- 1 files changed, 0 insertions(+), 5 deletions(-)
+Changes from previous version: rebase only
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index e412061..a996884 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -314,7 +314,6 @@ static uint16_t read_by_group(struct gatt_channel *channel, uint16_t start,
- 
- 	last_handle = end;
- 	for (l = database, groups = NULL, cur = NULL; l; l = l->next) {
--		struct attribute *client_attr;
- 
- 		a = l->data;
- 
-@@ -344,10 +343,6 @@ static uint16_t read_by_group(struct gatt_channel *channel, uint16_t start,
- 		status = att_check_reqs(channel, ATT_OP_READ_BY_GROUP_REQ,
- 								a->read_reqs);
- 
--		client_attr = client_cfg_attribute(channel, a, a->data, a->len);
--		if (client_attr)
--			a = client_attr;
--
- 		if (status == 0x00 && a->read_cb)
- 			status = a->read_cb(a, a->cb_user_data);
- 
+The following patches implement the storage of the Client Characteristic
+Configuration: controls notification & indication.
+
+Bonding verification is coming in the next patch series.
+
+Based on the requirements of the available profiles attrib server will
+require some changes. The future plan is to move attribute values to
+plugins (eg: time) and keep only the attribute declaration in the attrib
+server.
+
+Claudio Takahasi (6):
+  Remove CCC for read by group
+  Remove CCC for read by type
+  Add CCC persistence in attrib server
+  Remove notification and indication from server
+  Remove CCC entries when device is removed
+  Add generic function to delete by pattern
+
+Vinicius Costa Gomes (1):
+  Add storage functions to deal with CCC
+
+ src/attrib-server.c |  217 ++++++++++-----------------------------------------
+ src/storage.c       |  100 +++++++++++++++++-------
+ src/storage.h       |    4 +
+ 3 files changed, 116 insertions(+), 205 deletions(-)
+
 -- 
 1.7.7.2
 
