@@ -1,93 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EB8D188.2040407@canonical.com>
-Date: Tue, 08 Nov 2011 14:51:52 +0800
-From: Jesse Sung <jesse.sung@canonical.com>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org, 854399@bugs.launchpad.net,
-	padovan@profusion.mobi
-Subject: Re: [PATCH] Bluetooth: Add support for Broadcom BCM20702A0.
-References: <4E7840CF.5010805@canonical.com> <20111031193354.GG10164@joana>
-In-Reply-To: <20111031193354.GG10164@joana>
-Content-Type: multipart/mixed;
- boundary="------------060703070508080009020903"
+Subject: Re: [PATCH] Bluetooth:ath3k&btusb: Add support for Qualcomm Atheros
+ 3006 composite device
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Yao, Costa" <cqyao@qca.qualcomm.com>
+Cc: "padovan@profusion.mobi" <padovan@profusion.mobi>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 08 Nov 2011 15:16:03 +0900
+In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DEE9C62@nasanexd02b.na.qualcomm.com>
+References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEE9C62@nasanexd02b.na.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1320732967.15441.314.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------060703070508080009020903
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi Costa,
 
-On 11/01/2011 03:33 AM, Gustavo Padovan wrote:
-> Hi Jesse,
->
-> * Jesse Sung<jesse.sung@canonical.com>  [2011-09-20 15:29:19 +0800]:
->
->> Add a new entry (413c:8197) to device ID table.
->
-> Can I get the output of usbdevices in the commit message, please. Then we can
-> prove that adding it to the device ID table is really necessary.
->
-> 	Gustavo
+> From 312e18c8c46527cb7213fa57afc32094cdc9459c Mon Sep 17 00:00:00 2001
+> From: Costa yao <cqyao@qca.qualcomm.com>
+> Date: Thu, 3 Nov 2011 14:45:33 +0800
+> 
+> 
+> AR3006 is a composite device, and interface 0 is used for hid function, not bluetooth function.
+> So, we should make the following changes:
+> 1  Blacklist AR3006 PID/VID in btusb and ath3k to load patch and sysconfig files
+> 2  Add composite_device_table in btusb.c and ath3k_composite_device_table in ath3k.c
+>     to check whether it is bluetooth interface
+> 3  interface 3 is used for data->isoc
 
-Hi Gustavo,
+please send proper formatted patch. This one is all messed up and I am
+not even trying to review it.
 
-Sure! Modified patch attached. :)
+Also split this at least into 2 patches, one for btusb.c and one for the
+ath3k.c changes.
 
-Thanks,
-Jesse
+Regards
 
-
---------------060703070508080009020903
-Content-Type: text/x-patch;
- name="0001-Bluetooth-Add-support-for-Broadcom-BCM20702A0.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename*0="0001-Bluetooth-Add-support-for-Broadcom-BCM20702A0.patch"
-
->From 7ced2be26f17eadc63c6b7fe0d37f948d4fef87c Mon Sep 17 00:00:00 2001
-From: Wen-chien Jesse Sung <jesse.sung@canonical.com>
-Date: Tue, 8 Nov 2011 14:30:22 +0800
-Subject: [PATCH] Bluetooth: Add support for Broadcom BCM20702A0
-
-Since this device declares itself as vendor specific, must add
-a new entry to device ID table to support it.
-
-usb-device output of this device:
-
-T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=413c ProdID=8197 Rev=01.12
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM20702A0
-S:  SerialNumber=D0DF9AA9C9F1
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-
-Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
----
- drivers/bluetooth/btusb.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 9db2476..151a2d2 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -100,6 +100,9 @@ static struct usb_device_id btusb_table[] = {
- 	/* Canyon CN-BTU1 with HID interfaces */
- 	{ USB_DEVICE(0x0c10, 0x0000) },
- 
-+	/* Broadcom BCM20702A0 */
-+	{ USB_DEVICE(0x413c, 0x8197) },
-+
- 	{ }	/* Terminating entry */
- };
- 
--- 
-1.7.7.1
+Marcel
 
 
---------------060703070508080009020903--
