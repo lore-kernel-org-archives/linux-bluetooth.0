@@ -1,84 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Yao, Costa" <cqyao@qca.qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	"padovan@profusion.mobi" <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Bluetooth: ath3k: Add support for Qualcomm Atheros 3006
-Date: Tue, 8 Nov 2011 07:36:11 +0000
-Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEE9C89@nasanexd02b.na.qualcomm.com>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <4EB8D188.2040407@canonical.com>
+Date: Tue, 08 Nov 2011 14:51:52 +0800
+From: Jesse Sung <jesse.sung@canonical.com>
 MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org, 854399@bugs.launchpad.net,
+	padovan@profusion.mobi
+Subject: Re: [PATCH] Bluetooth: Add support for Broadcom BCM20702A0.
+References: <4E7840CF.5010805@canonical.com> <20111031193354.GG10164@joana>
+In-Reply-To: <20111031193354.GG10164@joana>
+Content-Type: multipart/mixed;
+ boundary="------------060703070508080009020903"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-QVIzMDA2IGlzIGEgY29tcG9zaXRlIGRldmljZSwgYW5kIGludGVyZmFjZSAwIGlzIHVzZWQgZm9y
-IGhpZCBmdW5jdGlvbiwgbm90IGZvciBibHVldG9vdGggZnVuY3Rpb24uDQpXZSBzaG91bGQgbWFr
-ZSB0aGUgZm9sbG93aW5nIGNoYW5nZXM6DQoxIEJsYWNrbGlzdCBBUjMwMDYgUElEL1ZJRCBpbiBh
-dGgza190YWJsZQ0KMiBBZGQgYXRoM2tfY29tcG9zaXRlX2RldmljZV90YWJsZSBpbiBhdGgzay5j
-IHRvIHJlZ2lzdGVyIGNvbXBvc2l0ZSBkZXZpY2UuDQozIExvYWQgcGF0Y2ggYW5kIHN5c2NvbmZp
-ZyBmaWxlcyBmb3IgQVIzMDA2DQoNClNpZ25lZC1vZmYtYnk6IENvc3RhIFlhbyA8Y3F5YW9AcWNh
-LnF1YWxjb21tLmNvbT4NCi0tLQ0KIGRyaXZlcnMvYmx1ZXRvb3RoL2F0aDNrLmMgfCAgIDY0ICsr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tDQogMSBmaWxlcyBjaGFu
-Z2VkLCA2MSBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEvZHJp
-dmVycy9ibHVldG9vdGgvYXRoM2suYyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2F0aDNrLmMNCmluZGV4
-IDE2MjI3NzIuLmE5ZDY2NzggMTAwNjQ0DQotLS0gYS9kcml2ZXJzL2JsdWV0b290aC9hdGgzay5j
-DQorKysgYi9kcml2ZXJzL2JsdWV0b290aC9hdGgzay5jDQpAQCAtNDAsNiArNDAsNyBAQA0KIA0K
-ICNkZWZpbmUgQVRIM0tfTU9ERV9NQVNLCQkJCTB4M0YNCiAjZGVmaW5lIEFUSDNLX05PUk1BTF9N
-T0RFCQkJMHgwRQ0KKyNkZWZpbmUgQVRIM0tfUFJFQk9PVF9NT0RFCQkJMHgwRA0KIA0KICNkZWZp
-bmUgQVRIM0tfUEFUQ0hfVVBEQVRFCQkJMHg4MA0KICNkZWZpbmUgQVRIM0tfU1lTQ0ZHX1VQREFU
-RQkJCTB4NDANCkBAIC03MSw2ICs3Miw3IEBAIHN0YXRpYyBzdHJ1Y3QgdXNiX2RldmljZV9pZCBh
-dGgza190YWJsZVtdID0gew0KIA0KIAkvKiBBdGhlcm9zIEFSMzAxMiB3aXRoIHNmbGFzaCBmaXJt
-d2FyZSovDQogCXsgVVNCX0RFVklDRSgweDBDRjMsIDB4MzAwNCkgfSwNCisJeyBVU0JfREVWSUNF
-KDB4MENGMywgMHgzMDA2KSB9LA0KIA0KIAkvKiBBdGhlcm9zIEFSNUJCVTEyIHdpdGggc2ZsYXNo
-IGZpcm13YXJlICovDQogCXsgVVNCX0RFVklDRSgweDA0ODksIDB4RTAyQykgfSwNCkBAIC04MSwx
-NiArODMsMjYgQEAgc3RhdGljIHN0cnVjdCB1c2JfZGV2aWNlX2lkIGF0aDNrX3RhYmxlW10gPSB7
-DQogTU9EVUxFX0RFVklDRV9UQUJMRSh1c2IsIGF0aDNrX3RhYmxlKTsNCiANCiAjZGVmaW5lIEJU
-VVNCX0FUSDMwMTIJCTB4ODANCisjZGVmaW5lIEJUVVNCX0FUSDMwMDYJCTB4MDEwMA0KIC8qIFRo
-aXMgdGFibGUgaXMgdG8gbG9hZCBwYXRjaCBhbmQgc3lzY29uZmlnIGZpbGVzDQogICogZm9yIEFS
-MzAxMiAqLw0KIHN0YXRpYyBzdHJ1Y3QgdXNiX2RldmljZV9pZCBhdGgza19ibGlzdF90YmxbXSA9
-IHsNCiANCiAJLyogQXRoZXJvcyBBUjMwMTIgd2l0aCBzZmxhc2ggZmlybXdhcmUqLw0KIAl7IFVT
-Ql9ERVZJQ0UoMHgwY2YzLCAweDMwMDQpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9BVEgzMDEyIH0s
-DQorCXsgVVNCX0RFVklDRSgweDBjZjMsIDB4MzAwNiksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0FU
-SDMwMDYgfSwNCiANCiAJeyB9CS8qIFRlcm1pbmF0aW5nIGVudHJ5ICovDQogfTsNCiANCisvKiBB
-dGhlcm9zIGNvbXBvc2l0ZSBkZXZpY2VzIHRhYmxlDQorICovDQorc3RhdGljIHN0cnVjdCB1c2Jf
-ZGV2aWNlX2lkIGF0aDNrX2NvbXBvc2l0ZV9kZXZpY2VfdGFibGVbXSA9IHsNCisNCisJeyBVU0Jf
-REVWSUNFKDB4MGNmMywgMHgzMDA2KSB9LA0KKw0KKwl7IH0JLyogVGVybWluYXRpbmcgZW50cnkg
-Ki8NCit9Ow0KICNkZWZpbmUgVVNCX1JFUV9ERlVfRE5MT0FECTENCiAjZGVmaW5lIEJVTEtfU0la
-RQkJNDA5Ng0KICNkZWZpbmUgRldfSERSX1NJWkUJCTIwDQpAQCAtMzYxLDExICszNzMsMTkgQEAg
-c3RhdGljIGludCBhdGgza19wcm9iZShzdHJ1Y3QgdXNiX2ludGVyZmFjZSAqaW50ZiwNCiAJY29u
-c3Qgc3RydWN0IGZpcm13YXJlICpmaXJtd2FyZTsNCiAJc3RydWN0IHVzYl9kZXZpY2UgKnVkZXYg
-PSBpbnRlcmZhY2VfdG9fdXNiZGV2KGludGYpOw0KIAlpbnQgcmV0Ow0KKwl1bnNpZ25lZCBjaGFy
-IGZ3X3N0YXRlOw0KKwljb25zdCBzdHJ1Y3QgdXNiX2RldmljZV9pZCAqbWF0Y2hfY29tcF9kZXY7
-DQogDQogCUJUX0RCRygiaW50ZiAlcCBpZCAlcCIsIGludGYsIGlkKTsNCi0NCi0JaWYgKGludGYt
-PmN1cl9hbHRzZXR0aW5nLT5kZXNjLmJJbnRlcmZhY2VOdW1iZXIgIT0gMCkNCi0JCXJldHVybiAt
-RU5PREVWOw0KKyAgICAvKiBGb3IgY29tcG9zaXRlIGRldmljZSAqLw0KKwltYXRjaF9jb21wX2Rl
-diA9IHVzYl9tYXRjaF9pZChpbnRmLCBhdGgza19jb21wb3NpdGVfZGV2aWNlX3RhYmxlKTsNCisJ
-aWYgKG1hdGNoX2NvbXBfZGV2KSB7DQorCQlpZiAoaW50Zi0+Y3VyX2FsdHNldHRpbmctPmRlc2Mu
-YkludGVyZmFjZU51bWJlciAhPSAyKQ0KKwkJCXJldHVybiAtRU5PREVWOw0KKwl9IGVsc2Ugew0K
-KwkJaWYgKGludGYtPmN1cl9hbHRzZXR0aW5nLT5kZXNjLmJJbnRlcmZhY2VOdW1iZXIgIT0gMCkN
-CisJCQlyZXR1cm4gLUVOT0RFVjsNCisJfQ0KIA0KIAkvKiBtYXRjaCBkZXZpY2UgSUQgaW4gYXRo
-M2sgYmxhY2tsaXN0IHRhYmxlICovDQogCWlmICghaWQtPmRyaXZlcl9pbmZvKSB7DQpAQCAtMzk5
-LDYgKzQxOSw0NCBAQCBzdGF0aWMgaW50IGF0aDNrX3Byb2JlKHN0cnVjdCB1c2JfaW50ZXJmYWNl
-ICppbnRmLA0KIAkJfQ0KIAkJYXRoM2tfc3dpdGNoX3BpZCh1ZGV2KTsNCiAJCXJldHVybiAwOw0K
-Kwl9IGVsc2UgaWYgKGlkLT5kcml2ZXJfaW5mbyAmIEJUVVNCX0FUSDMwMDYpIHsNCisNCisJCWlm
-IChsZTE2X3RvX2NwdSh1ZGV2LT5kZXNjcmlwdG9yLmJjZERldmljZSkgPiAweDAwMDEpIHsNCisJ
-CQlCVF9FUlIoImF0aDNrX3Byb2JlOiB1ZGV2LT5kZXNjcmlwdG9yLmJjZERldmljZSIpOw0KKwkJ
-CXJldHVybiAtRU5PREVWOw0KKwkJfQ0KKwkJcmV0ID0gYXRoM2tfZ2V0X3N0YXRlKHVkZXYsICZm
-d19zdGF0ZSk7DQorCQlpZiAocmV0IDwgMCkgew0KKwkJCUJUX0VSUigiYXRoM2tfcHJvYmU6IGF0
-aDNrX2dldF9zdGF0ZSBlcnIiKTsNCisJCQlyZXR1cm4gcmV0Ow0KKwkJfQ0KKwkJaWYgKChmd19z
-dGF0ZSAmIEFUSDNLX01PREVfTUFTSykgPT0gQVRIM0tfUFJFQk9PVF9NT0RFKSB7DQorCQkJQlRf
-RVJSKCJhdGgza19wcm9iZTogZmlybXdhcmUgYXJlIGluIHByZWJvb3QgbW9kZSBub3ciKTsNCisJ
-CQlCVF9FUlIoImF0aDNrX3Byb2JlOiB0cnkgdG8gc3dpdGNoIHRvIE5vcm1hbCBNb2RlIik7DQor
-CQkJcmV0ID0gYXRoM2tfc2V0X25vcm1hbF9tb2RlKHVkZXYpOw0KKwkJCWlmIChyZXQgPCAwKSB7
-DQorCQkJCUJUX0VSUigiYXRoM2tfcHJvYmU6IHNldCBub3JtYWwgbW9kZSBmYWlsZWQiKTsNCisJ
-CQkJcmV0dXJuIHJldDsNCisJCQl9DQorCQl9DQorCQkvKk5vdGUgd2Ugc2hvdWxkIHdhaXQgZm9y
-IGEgd2hpbGUqLw0KKwkJbWRlbGF5KDEwMCk7DQorCQlyZXQgPSBhdGgza19sb2FkX3BhdGNoKHVk
-ZXYpOw0KKwkJaWYgKHJldCA8IDApIHsNCisJCQlCVF9FUlIoImF0aDNrX3Byb2JlOiBMb2FkIHBh
-dGNoIGZpbGUgZmFpbGVkIik7DQorCQkJcmV0dXJuIHJldDsNCisJCX0NCisJCXJldCA9IGF0aDNr
-X2xvYWRfc3lzY2ZnKHVkZXYpOw0KKwkJaWYgKHJldCA8IDApIHsNCisJCQlCVF9FUlIoImF0aDNr
-X3Byb2JlOiBMb2FkIHN5c2NvbmZpZyBmaWxlIGZhaWxlZCIpOw0KKwkJCXJldHVybiByZXQ7DQor
-CQl9DQorCQlyZXQgPSBhdGgza19zd2l0Y2hfcGlkKHVkZXYpOw0KKwkJaWYgKHJldCA8IDApIHsN
-CisJCQlCVF9FUlIoImF0aDNrX3Byb2JlOiBzd2l0Y2ggcGlkIGZhaWxlZCIpOw0KKwkJCXJldHVy
-biByZXQ7DQorCQl9DQorCQlyZXR1cm4gMDsNCiAJfQ0KIA0KIAlyZXQgPSByZXF1ZXN0X2Zpcm13
-YXJlKCZmaXJtd2FyZSwgQVRIM0tfRklSTVdBUkUsICZ1ZGV2LT5kZXYpOw0KLS0gDQoxLjcuNC4x
-DQo=
+This is a multi-part message in MIME format.
+--------------060703070508080009020903
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+
+On 11/01/2011 03:33 AM, Gustavo Padovan wrote:
+> Hi Jesse,
+>
+> * Jesse Sung<jesse.sung@canonical.com>  [2011-09-20 15:29:19 +0800]:
+>
+>> Add a new entry (413c:8197) to device ID table.
+>
+> Can I get the output of usbdevices in the commit message, please. Then we can
+> prove that adding it to the device ID table is really necessary.
+>
+> 	Gustavo
+
+Hi Gustavo,
+
+Sure! Modified patch attached. :)
+
+Thanks,
+Jesse
+
+
+--------------060703070508080009020903
+Content-Type: text/x-patch;
+ name="0001-Bluetooth-Add-support-for-Broadcom-BCM20702A0.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename*0="0001-Bluetooth-Add-support-for-Broadcom-BCM20702A0.patch"
+
+>From 7ced2be26f17eadc63c6b7fe0d37f948d4fef87c Mon Sep 17 00:00:00 2001
+From: Wen-chien Jesse Sung <jesse.sung@canonical.com>
+Date: Tue, 8 Nov 2011 14:30:22 +0800
+Subject: [PATCH] Bluetooth: Add support for Broadcom BCM20702A0
+
+Since this device declares itself as vendor specific, must add
+a new entry to device ID table to support it.
+
+usb-device output of this device:
+
+T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=413c ProdID=8197 Rev=01.12
+S:  Manufacturer=Broadcom Corp
+S:  Product=BCM20702A0
+S:  SerialNumber=D0DF9AA9C9F1
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+
+Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
+---
+ drivers/bluetooth/btusb.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 9db2476..151a2d2 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -100,6 +100,9 @@ static struct usb_device_id btusb_table[] = {
+ 	/* Canyon CN-BTU1 with HID interfaces */
+ 	{ USB_DEVICE(0x0c10, 0x0000) },
+ 
++	/* Broadcom BCM20702A0 */
++	{ USB_DEVICE(0x413c, 0x8197) },
++
+ 	{ }	/* Terminating entry */
+ };
+ 
+-- 
+1.7.7.1
+
+
+--------------060703070508080009020903--
