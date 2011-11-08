@@ -1,89 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Remove redundant code from mgmt_block & mgmt_unblock
-Date: Tue,  8 Nov 2011 12:25:52 +0200
-Message-Id: <1320747952-10748-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 8 Nov 2011 10:52:56 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Brian Gix <bgix@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/3] Bluetooth: Add address type fields to mgmt messages
+ that need them
+Message-ID: <20111108085256.GA9733@fusion.localdomain>
+References: <1320700419-4665-1-git-send-email-johan.hedberg@gmail.com>
+ <1320700419-4665-3-git-send-email-johan.hedberg@gmail.com>
+ <4EB86A27.1030403@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4EB86A27.1030403@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Brian,
 
-There's no need to deal with mgmt_pending_cmd when blocking and
-unblocking devices since these actions are synchronous.
+On Mon, Nov 07, 2011, Brian Gix wrote:
+> >+#define MGMT_ADDR_BREDR			0x00
+> >+#define MGMT_ADDR_LE			0x01
+> >+#define MGMT_ADDR_BREDR_LE		0x02
+> >+#define MGMT_ADDR_INVALID		0xff
+> 
+> What would you think about overloading this Address type with the
+> Public/Random flag?
+> 
+> We are already seeing devices in the marketplace with Random
+> Addresses, effectively giving LE addresses 7 significant octets of
+> address information, rather than the standard 6 octet "MAC"
+> addresses.
+> 
+> 
+> >+
+> >+struct mgmt_addr_info {
+> >+	bdaddr_t bdaddr;
+> >+	__u8 type;
+> 
+> I would also support adding an additional octet here, which would be
+> essentially the "Address Type" as used in the HCI LE Connect
+> Command, and in the SMP LE Pairing protocol.
+> 
+> I have stated elsewhere, that I think this to be crucial information
+> to store with Long Term KEYs (LTKs) as well as future LE Signing
+> keys, and in future Address Resolution solutions. The earlier we get
+> this bit of information into the MGMT interface, the better IMO.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c |   21 ---------------------
- 1 files changed, 0 insertions(+), 21 deletions(-)
+This is the same impression I got also when looking into this several
+months ago. Thanks for reminding me!
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 950242e..4cb2f95 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1699,7 +1699,6 @@ static int block_device(struct sock *sk, u16 index, unsigned char *data,
- 								u16 len)
- {
- 	struct hci_dev *hdev;
--	struct pending_cmd *cmd;
- 	struct mgmt_cp_block_device *cp = (void *) data;
- 	int err;
- 
-@@ -1716,23 +1715,13 @@ static int block_device(struct sock *sk, u16 index, unsigned char *data,
- 
- 	hci_dev_lock_bh(hdev);
- 
--	cmd = mgmt_pending_add(sk, MGMT_OP_BLOCK_DEVICE, index, NULL, 0);
--	if (!cmd) {
--		err = -ENOMEM;
--		goto failed;
--	}
--
- 	err = hci_blacklist_add(hdev, &cp->bdaddr);
--
- 	if (err < 0)
- 		err = cmd_status(sk, index, MGMT_OP_BLOCK_DEVICE, -err);
- 	else
- 		err = cmd_complete(sk, index, MGMT_OP_BLOCK_DEVICE,
- 							NULL, 0);
- 
--	mgmt_pending_remove(cmd);
--
--failed:
- 	hci_dev_unlock_bh(hdev);
- 	hci_dev_put(hdev);
- 
-@@ -1743,7 +1732,6 @@ static int unblock_device(struct sock *sk, u16 index, unsigned char *data,
- 								u16 len)
- {
- 	struct hci_dev *hdev;
--	struct pending_cmd *cmd;
- 	struct mgmt_cp_unblock_device *cp = (void *) data;
- 	int err;
- 
-@@ -1760,12 +1748,6 @@ static int unblock_device(struct sock *sk, u16 index, unsigned char *data,
- 
- 	hci_dev_lock_bh(hdev);
- 
--	cmd = mgmt_pending_add(sk, MGMT_OP_UNBLOCK_DEVICE, index, NULL, 0);
--	if (!cmd) {
--		err = -ENOMEM;
--		goto failed;
--	}
--
- 	err = hci_blacklist_del(hdev, &cp->bdaddr);
- 
- 	if (err < 0)
-@@ -1774,9 +1756,6 @@ static int unblock_device(struct sock *sk, u16 index, unsigned char *data,
- 		err = cmd_complete(sk, index, MGMT_OP_UNBLOCK_DEVICE,
- 								NULL, 0);
- 
--	mgmt_pending_remove(cmd);
--
--failed:
- 	hci_dev_unlock_bh(hdev);
- 	hci_dev_put(hdev);
- 
--- 
-1.7.7.1
+The BREDR_LE option is there for the updated start_discovery command.
+You'll be able to specify whether you want BR/EDR-only, LE-only or
+interleaved discovery. I wouldn't add a completely new octet for public
+vs random information though but reuse the existing one instead. To be
+able to reuse our address type definitions for all purposes, how about
+making each value orthogonal to the others, e.g.:
 
+	ADDR_BREDR	0x01
+	ADDR_LE_PUBLIC	0x02
+	ADDR_LE_RANDOM	0x04
+
+For events like connected, found, etc you'd only have one of the bits
+set whereas for the start_discovery you could have any (but at least
+one).
+
+Johan
