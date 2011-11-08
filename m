@@ -1,82 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: mgmt_stop_discovery_failed()
-Date: Tue,  8 Nov 2011 19:40:02 -0300
-Message-Id: <1320792002-31151-2-git-send-email-andre.guedes@openbossa.org>
-In-Reply-To: <1320792002-31151-1-git-send-email-andre.guedes@openbossa.org>
-References: <1320792002-31151-1-git-send-email-andre.guedes@openbossa.org>
+Date: Wed, 9 Nov 2011 00:26:10 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/3] Bluetooth: Add missing hci_dev locking when calling
+ mgmt functions
+Message-ID: <20111108222610.GA17415@fusion.localdomain>
+References: <1320777616-15794-1-git-send-email-johan.hedberg@gmail.com>
+ <1320777616-15794-3-git-send-email-johan.hedberg@gmail.com>
+ <CAMXE1-qLHUj_QzkuyT9NQmj+DBVvWLD_djoXG4x_FyVast=_SQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CAMXE1-qLHUj_QzkuyT9NQmj+DBVvWLD_djoXG4x_FyVast=_SQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patches creates mgmt_stop_discovery_failed() which removes
-pending MGMT_OP_STOP_DISCOVERY commands and sends proper command
-status events.
+Hi Andrei,
 
-This patch also fixes the MGMT_OP_STOP_DISCOVERY command leak in
-case cancel inquiry fails.
+On Tue, Nov 08, 2011, Andrei Emeltchenko wrote:
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -549,8 +549,11 @@ int hci_dev_open(__u16 dev)
+> >                hci_dev_hold(hdev);
+> >                set_bit(HCI_UP, &hdev->flags);
+> >                hci_notify(hdev, HCI_DEV_UP);
+> > -               if (!test_bit(HCI_SETUP, &hdev->flags))
+> > +               if (!test_bit(HCI_SETUP, &hdev->flags)) {
+> > +                       hci_dev_lock_bh(hdev);
+> >                        mgmt_powered(hdev, 1);
+> > +                       hci_dev_unlock_bh(hdev);
+> 
+> Shall we acquire lock before test_bit here and below?
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
----
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_event.c        |    4 +++-
- net/bluetooth/mgmt.c             |   15 +++++++++++++++
- 3 files changed, 19 insertions(+), 1 deletions(-)
+Once the HCI_SETUP flag has been cleared it never gets set again for a
+hci_dev, so in the above case it doesn't really make a difference
+whether we lock before or after the test.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 4e00ae0..dba10c6 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -932,6 +932,7 @@ int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 type, u8 *dev_class,
- 							s8 rssi, u8 *eir);
- int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
- int mgmt_start_discovery_failed(u16 index, u8 status);
-+int mgmt_stop_discovery_failed(u16 index, u8 status);
- int mgmt_discovering(u16 index, u8 discovering);
- int mgmt_device_blocked(u16 index, bdaddr_t *bdaddr);
- int mgmt_device_unblocked(u16 index, bdaddr_t *bdaddr);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e29a3b1..78ba9c8 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -55,8 +55,10 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	BT_DBG("%s status 0x%x", hdev->name, status);
- 
--	if (status)
-+	if (status) {
-+		mgmt_stop_discovery_failed(hdev->id, status);
- 		return;
-+	}
- 
- 	clear_bit(HCI_INQUIRY, &hdev->flags);
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index dc938dc..d840600 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2394,6 +2394,21 @@ int mgmt_start_discovery_failed(u16 index, u8 status)
- 	return err;
- }
- 
-+int mgmt_stop_discovery_failed(u16 index, u8 status)
-+{
-+	struct pending_cmd *cmd;
-+	int err;
-+
-+	cmd = mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, index);
-+	if (!cmd)
-+		return -ENOENT;
-+
-+	err = cmd_status(cmd->sk, index, cmd->opcode, status);
-+	mgmt_pending_remove(cmd);
-+
-+	return err;
-+}
-+
- int mgmt_discovering(u16 index, u8 discovering)
- {
- 	struct pending_cmd *cmd;
--- 
-1.7.7.1
+> > @@ -1561,8 +1566,11 @@ void hci_unregister_dev(struct hci_dev *hdev)
+> >                kfree_skb(hdev->reassembly[i]);
+> >
+> >        if (!test_bit(HCI_INIT, &hdev->flags) &&
+> > -                                       !test_bit(HCI_SETUP, &hdev->flags))
+> > +                                       !test_bit(HCI_SETUP, &hdev->flags)) {
+> > +               hci_dev_lock_bh(hdev);
+> >                mgmt_index_removed(hdev);
+> > +               hci_dev_unlock_bh(hdev);
+> > +       }
 
+The same applies for the above. The only question there is about
+HCI_INIT. Since we're inside hci_unregister_dev and have already called
+hci_dev_do_close I don't think there's any problem here. Furthermore,
+the whole test for HCI_INIT looks unnecessary to me since testing for
+HCI_SETUP should be enough. I might send a separate patch for that later
+(it's anyway unrelated to this locking patch).
+
+Johan
