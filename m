@@ -1,147 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
 Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Tue, 8 Nov 2011 12:58:13 -0200
+Date: Tue, 8 Nov 2011 12:47:49 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: "Yao, Costa" <cqyao@qca.qualcomm.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: ath3k: Add support for Qualcomm Atheros 3006
-Message-ID: <20111108145813.GB25584@joana>
-References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEE9C89@nasanexd02b.na.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] Bluetooth: Create hci_do_inquiry()
+Message-ID: <20111108144749.GA25584@joana>
+References: <1320427013-5684-1-git-send-email-andre.guedes@openbossa.org>
+ <1320674372-5128-1-git-send-email-andre.guedes@openbossa.org>
+ <1320710040.15441.309.camel@aeonflux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DEE9C89@nasanexd02b.na.qualcomm.com>
+In-Reply-To: <1320710040.15441.309.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Costa,
+Hi Andre,
 
-* Yao, Costa <cqyao@qca.qualcomm.com> [2011-11-08 07:36:11 +0000]:
+* Marcel Holtmann <marcel@holtmann.org> [2011-11-08 08:53:57 +0900]:
 
-> AR3006 is a composite device, and interface 0 is used for hid function, not for bluetooth function.
-> We should make the following changes:
-> 1 Blacklist AR3006 PID/VID in ath3k_table
-> 2 Add ath3k_composite_device_table in ath3k.c to register composite device.
-> 3 Load patch and sysconfig files for AR3006
+> Hi Andre,
 > 
-> Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
-> ---
->  drivers/bluetooth/ath3k.c |   64 ++++++++++++++++++++++++++++++++++++++++++--
->  1 files changed, 61 insertions(+), 3 deletions(-)
+> > This patch adds a function to hci_core to carry out inquiry.
+> > 
+> > All inquiry code from start_discovery() were replaced by a
+> > hci_do_inquiry() call.
+> > 
+> > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> > ---
+> >  include/net/bluetooth/hci_core.h |    2 ++
+> >  net/bluetooth/hci_core.c         |   17 +++++++++++++++++
+> >  net/bluetooth/mgmt.c             |   11 +++--------
+> >  3 files changed, 22 insertions(+), 8 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-> index 1622772..a9d6678 100644
-> --- a/drivers/bluetooth/ath3k.c
-> +++ b/drivers/bluetooth/ath3k.c
-> @@ -40,6 +40,7 @@
->  
->  #define ATH3K_MODE_MASK				0x3F
->  #define ATH3K_NORMAL_MODE			0x0E
-> +#define ATH3K_PREBOOT_MODE			0x0D
->  
->  #define ATH3K_PATCH_UPDATE			0x80
->  #define ATH3K_SYSCFG_UPDATE			0x40
-> @@ -71,6 +72,7 @@ static struct usb_device_id ath3k_table[] = {
->  
->  	/* Atheros AR3012 with sflash firmware*/
->  	{ USB_DEVICE(0x0CF3, 0x3004) },
-> +	{ USB_DEVICE(0x0CF3, 0x3006) },
->  
->  	/* Atheros AR5BBU12 with sflash firmware */
->  	{ USB_DEVICE(0x0489, 0xE02C) },
-> @@ -81,16 +83,26 @@ static struct usb_device_id ath3k_table[] = {
->  MODULE_DEVICE_TABLE(usb, ath3k_table);
->  
->  #define BTUSB_ATH3012		0x80
-> +#define BTUSB_ATH3006		0x0100
->  /* This table is to load patch and sysconfig files
->   * for AR3012 */
->  static struct usb_device_id ath3k_blist_tbl[] = {
->  
->  	/* Atheros AR3012 with sflash firmware*/
->  	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-> +	{ USB_DEVICE(0x0cf3, 0x3006), .driver_info = BTUSB_ATH3006 },
->  
->  	{ }	/* Terminating entry */
->  };
->  
-> +/* Atheros composite devices table
-> + */
-> +static struct usb_device_id ath3k_composite_device_table[] = {
-> +
-> +	{ USB_DEVICE(0x0cf3, 0x3006) },
-> +
-> +	{ }	/* Terminating entry */
-> +};
->  #define USB_REQ_DFU_DNLOAD	1
->  #define BULK_SIZE		4096
->  #define FW_HDR_SIZE		20
-> @@ -361,11 +373,19 @@ static int ath3k_probe(struct usb_interface *intf,
->  	const struct firmware *firmware;
->  	struct usb_device *udev = interface_to_usbdev(intf);
->  	int ret;
-> +	unsigned char fw_state;
-> +	const struct usb_device_id *match_comp_dev;
->  
->  	BT_DBG("intf %p id %p", intf, id);
-> -
-> -	if (intf->cur_altsetting->desc.bInterfaceNumber != 0)
-> -		return -ENODEV;
-> +    /* For composite device */
-> +	match_comp_dev = usb_match_id(intf, ath3k_composite_device_table);
-> +	if (match_comp_dev) {
-> +		if (intf->cur_altsetting->desc.bInterfaceNumber != 2)
-> +			return -ENODEV;
-> +	} else {
-> +		if (intf->cur_altsetting->desc.bInterfaceNumber != 0)
-> +			return -ENODEV;
-> +	}
->  
->  	/* match device ID in ath3k blacklist table */
->  	if (!id->driver_info) {
-> @@ -399,6 +419,44 @@ static int ath3k_probe(struct usb_interface *intf,
->  		}
->  		ath3k_switch_pid(udev);
->  		return 0;
-> +	} else if (id->driver_info & BTUSB_ATH3006) {
-> +
-> +		if (le16_to_cpu(udev->descriptor.bcdDevice) > 0x0001) {
-> +			BT_ERR("ath3k_probe: udev->descriptor.bcdDevice");
-> +			return -ENODEV;
-> +		}
-> +		ret = ath3k_get_state(udev, &fw_state);
-> +		if (ret < 0) {
-> +			BT_ERR("ath3k_probe: ath3k_get_state err");
-> +			return ret;
-> +		}
-> +		if ((fw_state & ATH3K_MODE_MASK) == ATH3K_PREBOOT_MODE) {
-> +			BT_ERR("ath3k_probe: firmware are in preboot mode now");
-> +			BT_ERR("ath3k_probe: try to switch to Normal Mode");
-> +			ret = ath3k_set_normal_mode(udev);
-> +			if (ret < 0) {
-> +				BT_ERR("ath3k_probe: set normal mode failed");
-> +				return ret;
-> +			}
-> +		}
-> +		/*Note we should wait for a while*/
-> +		mdelay(100);
-> +		ret = ath3k_load_patch(udev);
-> +		if (ret < 0) {
-> +			BT_ERR("ath3k_probe: Load patch file failed");
-> +			return ret;
-> +		}
-> +		ret = ath3k_load_syscfg(udev);
-> +		if (ret < 0) {
-> +			BT_ERR("ath3k_probe: Load sysconfig file failed");
-> +			return ret;
-> +		}
-> +		ret = ath3k_switch_pid(udev);
-> +		if (ret < 0) {
-> +			BT_ERR("ath3k_probe: switch pid failed");
-> +			return ret;
-> +		}
-> +		return 0;
+> in general I am fine with this patch, besides some tiny nitpicks.
+> 
+> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> > index f97792c..ae36ac0 100644
+> > --- a/include/net/bluetooth/hci_core.h
+> > +++ b/include/net/bluetooth/hci_core.h
+> > @@ -970,4 +970,6 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
+> >  void hci_le_ltk_reply(struct hci_conn *conn, u8 ltk[16]);
+> >  void hci_le_ltk_neg_reply(struct hci_conn *conn);
+> >  
+> > +int hci_do_inquiry(struct hci_dev *hdev, u8 length);
+> > +
+> 
+> I think the name hci_send_inquiry would be better. Since you are just
+> sending the command and not handling the whole inquiry.
+> 
+> >  #endif /* __HCI_CORE_H */
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index b7f6b5b..5b861c7 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -2560,3 +2560,20 @@ static void hci_cmd_task(unsigned long arg)
+> >  		}
+> >  	}
+> >  }
+> > +
+> > +int hci_do_inquiry(struct hci_dev *hdev, u8 length)
+> > +{
+> > +	u8 lap[3] = { 0x33, 0x8b, 0x9e };
+> > +	struct hci_cp_inquiry cp;
+> > +
+> > +	BT_DBG("%s", hdev->name);
+> > +
+> > +	if (test_bit(HCI_INQUIRY, &hdev->flags))
+> > +		return -EINPROGRESS;
+> > +
+> > +	memset(&cp, 0, sizeof(cp));
+> > +	memcpy(&cp.lap, lap, sizeof(cp.lap));
+> > +	cp.length  = length;
+> > +
+> > +	return hci_send_cmd(hdev, HCI_OP_INQUIRY, sizeof(cp), &cp);
+> > +}
+> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> > index 747366a..17c7fbb 100644
+> > --- a/net/bluetooth/mgmt.c
+> > +++ b/net/bluetooth/mgmt.c
+> > @@ -32,6 +32,8 @@
+> >  #define MGMT_VERSION	0
+> >  #define MGMT_REVISION	1
+> >  
+> > +#define INQUIRY_LEN_BREDR 0x08 /* TGAP(100) */
+> > +
+> 
+> Please add an extra tab between the comment and the define. It is too
+> easy to get confused otherwise.
 
-You are duplicating some code here, care to merge the common parts between
-this and the handling of BTUSB_ATH3012?
+Please send a delta patch to this one, since I already applied it. Thanks.
 
 	Gustavo
