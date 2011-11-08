@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: Add missing hci_dev locking when calling mgmt functions
-Date: Tue,  8 Nov 2011 20:40:16 +0200
-Message-Id: <1320777616-15794-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/3] Bluetooth: Move pending management command list into struct hci_dev
+Date: Tue,  8 Nov 2011 20:40:15 +0200
+Message-Id: <1320777616-15794-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1320777616-15794-1-git-send-email-johan.hedberg@gmail.com>
 References: <1320777616-15794-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,265 +11,377 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Now that the pending commands are within struct hci_dev we can properly
-control access to them throught the hci_dev locking mechanism.
+This patch moves the pending management command list (previously global
+to mgmt.c) into struct hci_dev. This makes it possible to do proper
+locking when accessing it (through the existing hci_dev locks) and
+thereby avoid race conditions.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_core.c  |   12 ++++++++++--
- net/bluetooth/hci_event.c |   45 ++++++++++++++++++++++++++++++++++++++++-----
- net/bluetooth/mgmt.c      |   13 +++++++------
- 3 files changed, 57 insertions(+), 13 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 +
+ net/bluetooth/hci_core.c         |    6 +++
+ net/bluetooth/mgmt.c             |   79 +++++++++++++++++++-------------------
+ 3 files changed, 47 insertions(+), 40 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 0f35a39..0a5a05d 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -217,6 +217,8 @@ struct hci_dev {
+ 
+ 	__u16			init_last_cmd;
+ 
++	struct list_head	mgmt_pending;
++
+ 	struct inquiry_cache	inq_cache;
+ 	struct hci_conn_hash	conn_hash;
+ 	struct list_head	blacklist;
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e5cf013..f87bf24 100644
+index e4b5c63..e5cf013 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -549,8 +549,11 @@ int hci_dev_open(__u16 dev)
- 		hci_dev_hold(hdev);
- 		set_bit(HCI_UP, &hdev->flags);
- 		hci_notify(hdev, HCI_DEV_UP);
--		if (!test_bit(HCI_SETUP, &hdev->flags))
-+		if (!test_bit(HCI_SETUP, &hdev->flags)) {
-+			hci_dev_lock_bh(hdev);
- 			mgmt_powered(hdev, 1);
-+			hci_dev_unlock_bh(hdev);
-+		}
- 	} else {
- 		/* Init failed, cleanup */
- 		tasklet_kill(&hdev->rx_task);
-@@ -642,7 +645,9 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	 * and no tasks are scheduled. */
- 	hdev->close(hdev);
+@@ -1481,6 +1481,8 @@ int hci_register_dev(struct hci_dev *hdev)
  
-+	hci_dev_lock_bh(hdev);
- 	mgmt_powered(hdev, 0);
-+	hci_dev_unlock_bh(hdev);
+ 	hci_conn_hash_init(hdev);
  
- 	/* Clear flags */
- 	hdev->flags = 0;
-@@ -1561,8 +1566,11 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 		kfree_skb(hdev->reassembly[i]);
++	INIT_LIST_HEAD(&hdev->mgmt_pending);
++
+ 	INIT_LIST_HEAD(&hdev->blacklist);
  
- 	if (!test_bit(HCI_INIT, &hdev->flags) &&
--					!test_bit(HCI_SETUP, &hdev->flags))
-+					!test_bit(HCI_SETUP, &hdev->flags)) {
-+		hci_dev_lock_bh(hdev);
+ 	INIT_LIST_HEAD(&hdev->uuids);
+@@ -1562,6 +1564,10 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 					!test_bit(HCI_SETUP, &hdev->flags))
  		mgmt_index_removed(hdev);
-+		hci_dev_unlock_bh(hdev);
-+	}
  
- 	/* mgmt_index_removed should take care of emptying the
- 	 * pending list */
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8303f8f..a89cf1f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -60,7 +60,9 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	clear_bit(HCI_INQUIRY, &hdev->flags);
- 
-+	hci_dev_lock(hdev);
- 	mgmt_discovering(hdev, 0);
-+	hci_dev_unlock(hdev);
- 
- 	hci_req_complete(hdev, HCI_OP_INQUIRY_CANCEL, status);
- 
-@@ -201,13 +203,15 @@ static void hci_cc_write_local_name(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (!sent)
- 		return;
- 
-+	hci_dev_lock(hdev);
++	/* mgmt_index_removed should take care of emptying the
++	 * pending list */
++	BUG_ON(!list_empty(&hdev->mgmt_pending));
 +
- 	if (test_bit(HCI_MGMT, &hdev->flags))
- 		mgmt_set_local_name_complete(hdev, sent, status);
+ 	hci_notify(hdev, HCI_DEV_UNREG);
  
--	if (status)
--		return;
-+	if (status == 0)
-+		memcpy(hdev->dev_name, sent, HCI_MAX_NAME_LENGTH);
- 
--	memcpy(hdev->dev_name, sent, HCI_MAX_NAME_LENGTH);
-+	hci_dev_unlock(hdev);
- }
- 
- static void hci_cc_read_local_name(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -282,6 +286,8 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	param = *((__u8 *) sent);
- 
-+	hci_dev_lock(hdev);
-+
- 	if (status != 0) {
- 		mgmt_write_scan_failed(hdev, param, status);
- 		hdev->discov_timeout = 0;
-@@ -311,6 +317,7 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
- 		mgmt_connectable(hdev, 0);
- 
- done:
-+	hci_dev_unlock(hdev);
- 	hci_req_complete(hdev, HCI_OP_WRITE_SCAN_ENABLE, status);
- }
- 
-@@ -834,19 +841,24 @@ static void hci_cc_pin_code_reply(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	BT_DBG("%s status 0x%x", hdev->name, rp->status);
- 
-+	hci_dev_lock(hdev);
-+
- 	if (test_bit(HCI_MGMT, &hdev->flags))
- 		mgmt_pin_code_reply_complete(hdev, &rp->bdaddr, rp->status);
- 
- 	if (rp->status != 0)
--		return;
-+		goto unlock;
- 
- 	cp = hci_sent_cmd_data(hdev, HCI_OP_PIN_CODE_REPLY);
- 	if (!cp)
--		return;
-+		goto unlock;
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
- 	if (conn)
- 		conn->pin_length = cp->pin_len;
-+
-+unlock:
-+	hci_dev_unlock(hdev);
- }
- 
- static void hci_cc_pin_code_neg_reply(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -855,10 +867,15 @@ static void hci_cc_pin_code_neg_reply(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	BT_DBG("%s status 0x%x", hdev->name, rp->status);
- 
-+	hci_dev_lock(hdev);
-+
- 	if (test_bit(HCI_MGMT, &hdev->flags))
- 		mgmt_pin_code_neg_reply_complete(hdev, &rp->bdaddr,
- 								rp->status);
-+
-+	hci_dev_unlock(hdev);
- }
-+
- static void hci_cc_le_read_buffer_size(struct hci_dev *hdev,
- 				       struct sk_buff *skb)
- {
-@@ -885,9 +902,13 @@ static void hci_cc_user_confirm_reply(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	BT_DBG("%s status 0x%x", hdev->name, rp->status);
- 
-+	hci_dev_lock(hdev);
-+
- 	if (test_bit(HCI_MGMT, &hdev->flags))
- 		mgmt_user_confirm_reply_complete(hdev, &rp->bdaddr,
- 								rp->status);
-+
-+	hci_dev_unlock(hdev);
- }
- 
- static void hci_cc_user_confirm_neg_reply(struct hci_dev *hdev,
-@@ -897,9 +918,13 @@ static void hci_cc_user_confirm_neg_reply(struct hci_dev *hdev,
- 
- 	BT_DBG("%s status 0x%x", hdev->name, rp->status);
- 
-+	hci_dev_lock(hdev);
-+
- 	if (test_bit(HCI_MGMT, &hdev->flags))
- 		mgmt_user_confirm_neg_reply_complete(hdev, &rp->bdaddr,
- 								rp->status);
-+
-+	hci_dev_unlock(hdev);
- }
- 
- static void hci_cc_read_local_oob_data_reply(struct hci_dev *hdev,
-@@ -909,8 +934,10 @@ static void hci_cc_read_local_oob_data_reply(struct hci_dev *hdev,
- 
- 	BT_DBG("%s status 0x%x", hdev->name, rp->status);
- 
-+	hci_dev_lock(hdev);
- 	mgmt_read_local_oob_data_reply_complete(hdev, rp->hash,
- 						rp->randomizer, rp->status);
-+	hci_dev_unlock(hdev);
- }
- 
- static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
-@@ -985,14 +1012,18 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- 	if (status) {
- 		hci_req_complete(hdev, HCI_OP_INQUIRY, status);
- 		hci_conn_check_pending(hdev);
-+		hci_dev_lock(hdev);
- 		if (test_bit(HCI_MGMT, &hdev->flags))
- 			mgmt_inquiry_failed(hdev, status);
-+		hci_dev_unlock(hdev);
- 		return;
- 	}
- 
- 	set_bit(HCI_INQUIRY, &hdev->flags);
- 
-+	hci_dev_lock(hdev);
- 	mgmt_discovering(hdev, 1);
-+	hci_dev_unlock(hdev);
- }
- 
- static inline void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
-@@ -1378,7 +1409,9 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
- 	if (!test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
- 		return;
- 
-+	hci_dev_lock(hdev);
- 	mgmt_discovering(hdev, 0);
-+	hci_dev_unlock(hdev);
- }
- 
- static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -1572,7 +1605,9 @@ static inline void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff
- 	BT_DBG("%s status %d", hdev->name, ev->status);
- 
- 	if (ev->status) {
-+		hci_dev_lock(hdev);
- 		mgmt_disconnect_failed(hdev);
-+		hci_dev_unlock(hdev);
- 		return;
- 	}
- 
+ 	if (hdev->rfkill) {
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index be198f3..be4c3d0 100644
+index 2ca7b44..be198f3 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1335,16 +1335,19 @@ static void pairing_complete(struct pending_cmd *cmd, u8 status)
- static void pairing_complete_cb(struct hci_conn *conn, u8 status)
+@@ -43,8 +43,6 @@ struct pending_cmd {
+ 	void *user_data;
+ };
+ 
+-static LIST_HEAD(cmd_list);
+-
+ static int cmd_status(struct sock *sk, u16 index, u16 cmd, u8 status)
  {
- 	struct pending_cmd *cmd;
-+	struct hci_dev *hdev = conn->hdev;
- 
- 	BT_DBG("status %u", status);
- 
-+	hci_dev_lock_bh(hdev);
-+
- 	cmd = find_pairing(conn);
--	if (!cmd) {
-+	if (!cmd)
- 		BT_DBG("Unable to find a pending command");
--		return;
--	}
-+	else
-+		pairing_complete(cmd, status);
- 
--	pairing_complete(cmd, status);
-+	hci_dev_unlock_bh(hdev);
+ 	struct sk_buff *skb;
+@@ -227,7 +225,8 @@ static void mgmt_pending_free(struct pending_cmd *cmd)
  }
  
- static int pair_device(struct sock *sk, u16 index, unsigned char *data, u16 len)
-@@ -2302,9 +2305,7 @@ int mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status)
+ static struct pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
+-						u16 index, void *data, u16 len)
++							struct hci_dev *hdev,
++							void *data, u16 len)
+ {
+ 	struct pending_cmd *cmd;
+ 
+@@ -236,7 +235,7 @@ static struct pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
+ 		return NULL;
+ 
+ 	cmd->opcode = opcode;
+-	cmd->index = index;
++	cmd->index = hdev->id;
+ 
+ 	cmd->param = kmalloc(len, GFP_ATOMIC);
+ 	if (!cmd->param) {
+@@ -250,7 +249,7 @@ static struct pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
+ 	cmd->sk = sk;
+ 	sock_hold(sk);
+ 
+-	list_add(&cmd->list, &cmd_list);
++	list_add(&cmd->list, &hdev->mgmt_pending);
+ 
+ 	return cmd;
+ }
+@@ -261,7 +260,7 @@ static void mgmt_pending_foreach(u16 opcode, struct hci_dev *hdev,
+ {
+ 	struct list_head *p, *n;
+ 
+-	list_for_each_safe(p, n, &cmd_list) {
++	list_for_each_safe(p, n, &hdev->mgmt_pending) {
+ 		struct pending_cmd *cmd;
+ 
+ 		cmd = list_entry(p, struct pending_cmd, list);
+@@ -276,15 +275,15 @@ static void mgmt_pending_foreach(u16 opcode, struct hci_dev *hdev,
+ 	}
+ }
+ 
+-static struct pending_cmd *mgmt_pending_find(u16 opcode, int index)
++static struct pending_cmd *mgmt_pending_find(u16 opcode, struct hci_dev *hdev)
+ {
+ 	struct pending_cmd *cmd;
+ 
+-	list_for_each_entry(cmd, &cmd_list, list) {
++	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
+ 		if (cmd->opcode != opcode)
+ 			continue;
+ 
+-		if (index >= 0 && cmd->index != index)
++		if (hdev && cmd->index != hdev->id)
+ 			continue;
+ 
+ 		return cmd;
+@@ -325,12 +324,12 @@ static int set_powered(struct sock *sk, u16 index, unsigned char *data, u16 len)
  		goto failed;
  	}
  
--	hci_dev_lock_bh(hdev);
- 	update_eir(hdev);
--	hci_dev_unlock_bh(hdev);
+-	if (mgmt_pending_find(MGMT_OP_SET_POWERED, index)) {
++	if (mgmt_pending_find(MGMT_OP_SET_POWERED, hdev)) {
+ 		err = cmd_status(sk, index, MGMT_OP_SET_POWERED, EBUSY);
+ 		goto failed;
+ 	}
  
- 	err = cmd_complete(cmd->sk, hdev->id, MGMT_OP_SET_LOCAL_NAME, &ev,
- 								sizeof(ev));
+-	cmd = mgmt_pending_add(sk, MGMT_OP_SET_POWERED, index, data, len);
++	cmd = mgmt_pending_add(sk, MGMT_OP_SET_POWERED, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
+@@ -376,8 +375,8 @@ static int set_discoverable(struct sock *sk, u16 index, unsigned char *data,
+ 		goto failed;
+ 	}
+ 
+-	if (mgmt_pending_find(MGMT_OP_SET_DISCOVERABLE, index) ||
+-			mgmt_pending_find(MGMT_OP_SET_CONNECTABLE, index)) {
++	if (mgmt_pending_find(MGMT_OP_SET_DISCOVERABLE, hdev) ||
++			mgmt_pending_find(MGMT_OP_SET_CONNECTABLE, hdev)) {
+ 		err = cmd_status(sk, index, MGMT_OP_SET_DISCOVERABLE, EBUSY);
+ 		goto failed;
+ 	}
+@@ -388,7 +387,7 @@ static int set_discoverable(struct sock *sk, u16 index, unsigned char *data,
+ 		goto failed;
+ 	}
+ 
+-	cmd = mgmt_pending_add(sk, MGMT_OP_SET_DISCOVERABLE, index, data, len);
++	cmd = mgmt_pending_add(sk, MGMT_OP_SET_DISCOVERABLE, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
+@@ -442,8 +441,8 @@ static int set_connectable(struct sock *sk, u16 index, unsigned char *data,
+ 		goto failed;
+ 	}
+ 
+-	if (mgmt_pending_find(MGMT_OP_SET_DISCOVERABLE, index) ||
+-			mgmt_pending_find(MGMT_OP_SET_CONNECTABLE, index)) {
++	if (mgmt_pending_find(MGMT_OP_SET_DISCOVERABLE, hdev) ||
++			mgmt_pending_find(MGMT_OP_SET_CONNECTABLE, hdev)) {
+ 		err = cmd_status(sk, index, MGMT_OP_SET_CONNECTABLE, EBUSY);
+ 		goto failed;
+ 	}
+@@ -453,7 +452,7 @@ static int set_connectable(struct sock *sk, u16 index, unsigned char *data,
+ 		goto failed;
+ 	}
+ 
+-	cmd = mgmt_pending_add(sk, MGMT_OP_SET_CONNECTABLE, index, data, len);
++	cmd = mgmt_pending_add(sk, MGMT_OP_SET_CONNECTABLE, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
+@@ -1038,7 +1037,7 @@ static int disconnect(struct sock *sk, u16 index, unsigned char *data, u16 len)
+ 		goto failed;
+ 	}
+ 
+-	if (mgmt_pending_find(MGMT_OP_DISCONNECT, index)) {
++	if (mgmt_pending_find(MGMT_OP_DISCONNECT, hdev)) {
+ 		err = cmd_status(sk, index, MGMT_OP_DISCONNECT, EBUSY);
+ 		goto failed;
+ 	}
+@@ -1052,7 +1051,7 @@ static int disconnect(struct sock *sk, u16 index, unsigned char *data, u16 len)
+ 		goto failed;
+ 	}
+ 
+-	cmd = mgmt_pending_add(sk, MGMT_OP_DISCONNECT, index, data, len);
++	cmd = mgmt_pending_add(sk, MGMT_OP_DISCONNECT, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
+@@ -1143,7 +1142,7 @@ static int send_pin_code_neg_reply(struct sock *sk, u16 index,
+ 	struct pending_cmd *cmd;
+ 	int err;
+ 
+-	cmd = mgmt_pending_add(sk, MGMT_OP_PIN_CODE_NEG_REPLY, index, cp,
++	cmd = mgmt_pending_add(sk, MGMT_OP_PIN_CODE_NEG_REPLY, hdev, cp,
+ 								sizeof(*cp));
+ 	if (!cmd)
+ 		return -ENOMEM;
+@@ -1204,7 +1203,7 @@ static int pin_code_reply(struct sock *sk, u16 index, unsigned char *data,
+ 		goto failed;
+ 	}
+ 
+-	cmd = mgmt_pending_add(sk, MGMT_OP_PIN_CODE_REPLY, index, data, len);
++	cmd = mgmt_pending_add(sk, MGMT_OP_PIN_CODE_REPLY, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
+@@ -1297,7 +1296,7 @@ static inline struct pending_cmd *find_pairing(struct hci_conn *conn)
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct pending_cmd *cmd;
+ 
+-	list_for_each_entry(cmd, &cmd_list, list) {
++	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
+ 		if (cmd->opcode != MGMT_OP_PAIR_DEVICE)
+ 			continue;
+ 
+@@ -1396,7 +1395,7 @@ static int pair_device(struct sock *sk, u16 index, unsigned char *data, u16 len)
+ 		goto unlock;
+ 	}
+ 
+-	cmd = mgmt_pending_add(sk, MGMT_OP_PAIR_DEVICE, index, data, len);
++	cmd = mgmt_pending_add(sk, MGMT_OP_PAIR_DEVICE, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		hci_conn_put(conn);
+@@ -1458,7 +1457,7 @@ static int user_confirm_reply(struct sock *sk, u16 index, unsigned char *data,
+ 		goto failed;
+ 	}
+ 
+-	cmd = mgmt_pending_add(sk, mgmt_op, index, data, len);
++	cmd = mgmt_pending_add(sk, mgmt_op, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
+@@ -1495,7 +1494,7 @@ static int set_local_name(struct sock *sk, u16 index, unsigned char *data,
+ 
+ 	hci_dev_lock_bh(hdev);
+ 
+-	cmd = mgmt_pending_add(sk, MGMT_OP_SET_LOCAL_NAME, index, data, len);
++	cmd = mgmt_pending_add(sk, MGMT_OP_SET_LOCAL_NAME, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
+@@ -1541,12 +1540,12 @@ static int read_local_oob_data(struct sock *sk, u16 index)
+ 		goto unlock;
+ 	}
+ 
+-	if (mgmt_pending_find(MGMT_OP_READ_LOCAL_OOB_DATA, index)) {
++	if (mgmt_pending_find(MGMT_OP_READ_LOCAL_OOB_DATA, hdev)) {
+ 		err = cmd_status(sk, index, MGMT_OP_READ_LOCAL_OOB_DATA, EBUSY);
+ 		goto unlock;
+ 	}
+ 
+-	cmd = mgmt_pending_add(sk, MGMT_OP_READ_LOCAL_OOB_DATA, index, NULL, 0);
++	cmd = mgmt_pending_add(sk, MGMT_OP_READ_LOCAL_OOB_DATA, hdev, NULL, 0);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto unlock;
+@@ -1650,7 +1649,7 @@ static int start_discovery(struct sock *sk, u16 index)
+ 		goto failed;
+ 	}
+ 
+-	cmd = mgmt_pending_add(sk, MGMT_OP_START_DISCOVERY, index, NULL, 0);
++	cmd = mgmt_pending_add(sk, MGMT_OP_START_DISCOVERY, hdev, NULL, 0);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
+@@ -1681,7 +1680,7 @@ static int stop_discovery(struct sock *sk, u16 index)
+ 
+ 	hci_dev_lock_bh(hdev);
+ 
+-	cmd = mgmt_pending_add(sk, MGMT_OP_STOP_DISCOVERY, index, NULL, 0);
++	cmd = mgmt_pending_add(sk, MGMT_OP_STOP_DISCOVERY, hdev, NULL, 0);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
+@@ -2147,7 +2146,7 @@ int mgmt_disconnect_failed(struct hci_dev *hdev)
+ 	struct pending_cmd *cmd;
+ 	int err;
+ 
+-	cmd = mgmt_pending_find(MGMT_OP_DISCONNECT, hdev->id);
++	cmd = mgmt_pending_find(MGMT_OP_DISCONNECT, hdev);
+ 	if (!cmd)
+ 		return -ENOENT;
+ 
+@@ -2188,7 +2187,7 @@ int mgmt_pin_code_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	struct mgmt_rp_pin_code_reply rp;
+ 	int err;
+ 
+-	cmd = mgmt_pending_find(MGMT_OP_PIN_CODE_REPLY, hdev->id);
++	cmd = mgmt_pending_find(MGMT_OP_PIN_CODE_REPLY, hdev);
+ 	if (!cmd)
+ 		return -ENOENT;
+ 
+@@ -2210,7 +2209,7 @@ int mgmt_pin_code_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	struct mgmt_rp_pin_code_reply rp;
+ 	int err;
+ 
+-	cmd = mgmt_pending_find(MGMT_OP_PIN_CODE_NEG_REPLY, hdev->id);
++	cmd = mgmt_pending_find(MGMT_OP_PIN_CODE_NEG_REPLY, hdev);
+ 	if (!cmd)
+ 		return -ENOENT;
+ 
+@@ -2247,7 +2246,7 @@ static int confirm_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	struct mgmt_rp_user_confirm_reply rp;
+ 	int err;
+ 
+-	cmd = mgmt_pending_find(opcode, hdev->id);
++	cmd = mgmt_pending_find(opcode, hdev);
+ 	if (!cmd)
+ 		return -ENOENT;
+ 
+@@ -2293,7 +2292,7 @@ int mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status)
+ 	memset(&ev, 0, sizeof(ev));
+ 	memcpy(ev.name, name, HCI_MAX_NAME_LENGTH);
+ 
+-	cmd = mgmt_pending_find(MGMT_OP_SET_LOCAL_NAME, hdev->id);
++	cmd = mgmt_pending_find(MGMT_OP_SET_LOCAL_NAME, hdev);
+ 	if (!cmd)
+ 		goto send_event;
+ 
+@@ -2330,7 +2329,7 @@ int mgmt_read_local_oob_data_reply_complete(struct hci_dev *hdev, u8 *hash,
+ 
+ 	BT_DBG("%s status %u", hdev->name, status);
+ 
+-	cmd = mgmt_pending_find(MGMT_OP_READ_LOCAL_OOB_DATA, hdev->id);
++	cmd = mgmt_pending_find(MGMT_OP_READ_LOCAL_OOB_DATA, hdev);
+ 	if (!cmd)
+ 		return -ENOENT;
+ 
+@@ -2390,7 +2389,7 @@ int mgmt_inquiry_failed(struct hci_dev *hdev, u8 status)
+ 	struct pending_cmd *cmd;
+ 	int err;
+ 
+-	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev->id);
++	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
+ 	if (!cmd)
+ 		return -ENOENT;
+ 
+@@ -2405,9 +2404,9 @@ int mgmt_discovering(struct hci_dev *hdev, u8 discovering)
+ 	struct pending_cmd *cmd;
+ 
+ 	if (discovering)
+-		cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev->id);
++		cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
+ 	else
+-		cmd = mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, hdev->id);
++		cmd = mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, hdev);
+ 
+ 	if (cmd != NULL) {
+ 		cmd_complete(cmd->sk, hdev->id, cmd->opcode, NULL, 0);
+@@ -2423,7 +2422,7 @@ int mgmt_device_blocked(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 	struct pending_cmd *cmd;
+ 	struct mgmt_ev_device_blocked ev;
+ 
+-	cmd = mgmt_pending_find(MGMT_OP_BLOCK_DEVICE, hdev->id);
++	cmd = mgmt_pending_find(MGMT_OP_BLOCK_DEVICE, hdev);
+ 
+ 	bacpy(&ev.bdaddr, bdaddr);
+ 
+@@ -2436,7 +2435,7 @@ int mgmt_device_unblocked(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 	struct pending_cmd *cmd;
+ 	struct mgmt_ev_device_unblocked ev;
+ 
+-	cmd = mgmt_pending_find(MGMT_OP_UNBLOCK_DEVICE, hdev->id);
++	cmd = mgmt_pending_find(MGMT_OP_UNBLOCK_DEVICE, hdev);
+ 
+ 	bacpy(&ev.bdaddr, bdaddr);
+ 
 -- 
 1.7.7.1
 
