@@ -1,67 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 8 Nov 2011 10:52:56 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] Bluetooth: Add address type fields to mgmt messages
- that need them
-Message-ID: <20111108085256.GA9733@fusion.localdomain>
-References: <1320700419-4665-1-git-send-email-johan.hedberg@gmail.com>
- <1320700419-4665-3-git-send-email-johan.hedberg@gmail.com>
- <4EB86A27.1030403@codeaurora.org>
+From: "Yao, Costa" <cqyao@qca.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>, "padovan@profusion.mobi"
+	<padovan@profusion.mobi>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] Bluetooth: btusb: Add support for Qualcomm Atheros
+ composite chip 3006
+Date: Tue, 8 Nov 2011 08:38:17 +0000
+Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEE9C9B@nasanexd02b.na.qualcomm.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4EB86A27.1030403@codeaurora.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
-
-On Mon, Nov 07, 2011, Brian Gix wrote:
-> >+#define MGMT_ADDR_BREDR			0x00
-> >+#define MGMT_ADDR_LE			0x01
-> >+#define MGMT_ADDR_BREDR_LE		0x02
-> >+#define MGMT_ADDR_INVALID		0xff
-> 
-> What would you think about overloading this Address type with the
-> Public/Random flag?
-> 
-> We are already seeing devices in the marketplace with Random
-> Addresses, effectively giving LE addresses 7 significant octets of
-> address information, rather than the standard 6 octet "MAC"
-> addresses.
-> 
-> 
-> >+
-> >+struct mgmt_addr_info {
-> >+	bdaddr_t bdaddr;
-> >+	__u8 type;
-> 
-> I would also support adding an additional octet here, which would be
-> essentially the "Address Type" as used in the HCI LE Connect
-> Command, and in the SMP LE Pairing protocol.
-> 
-> I have stated elsewhere, that I think this to be crucial information
-> to store with Long Term KEYs (LTKs) as well as future LE Signing
-> keys, and in future Address Resolution solutions. The earlier we get
-> this bit of information into the MGMT interface, the better IMO.
-
-This is the same impression I got also when looking into this several
-months ago. Thanks for reminding me!
-
-The BREDR_LE option is there for the updated start_discovery command.
-You'll be able to specify whether you want BR/EDR-only, LE-only or
-interleaved discovery. I wouldn't add a completely new octet for public
-vs random information though but reuse the existing one instead. To be
-able to reuse our address type definitions for all purposes, how about
-making each value orthogonal to the others, e.g.:
-
-	ADDR_BREDR	0x01
-	ADDR_LE_PUBLIC	0x02
-	ADDR_LE_RANDOM	0x04
-
-For events like connected, found, etc you'd only have one of the bits
-set whereas for the start_discovery you could have any (but at least
-one).
-
-Johan
+QVIzMDA2IGlzIGEgY29tcG9zaXRlIGRldmljZSwgYW5kIGludGVyZmFjZSAwIGlzIHVzZWQgZm9y
+IGhpZCBmdW5jdGlvbiwgbm90IGZvciBibHVldG9vdGggZnVuY3Rpb24uDQpXZSBzaG91bGQgbWFr
+ZSB0aGUgZm9sbG93aW5nIGNoYW5nZXM6DQoxIEJsYWNrbGlzdCBBUjMwMDYgUElEL1ZJRCBpbiBi
+dHVzYl90YWJsZQ0KMiBBZGQgY29tcG9zaXRlX2RldmljZV90YWJsZSBpbiBidHVzYi5jIHRvIHJl
+Z2lzdGVyIGNvbXBvc2l0ZSBkZXZpY2UNCjMgRm9yIEFSMzAwNiBjb21wb3NpdGUgZGV2aWNlLCBp
+bnRlcmZhY2UgMyBpcyB1c2VkIGZvciBkYXRhLT5pc29jDQoNClNpZ25lZC1vZmYtYnk6IENvc3Rh
+IFlhbyA8Y3F5YW9AcWNhLnF1YWxjb21tLmNvbT4NCi0tLQ0KIGRyaXZlcnMvYmx1ZXRvb3RoL2J0
+dXNiLmMgfCAgIDM3ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0NCiAxIGZp
+bGVzIGNoYW5nZWQsIDM2IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1n
+aXQgYS9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2Iu
+Yw0KaW5kZXggOWRiMjQ3Ni4uZDMwNmRlYyAxMDA2NDQNCi0tLSBhL2RyaXZlcnMvYmx1ZXRvb3Ro
+L2J0dXNiLmMNCisrKyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCkBAIC01NSw2ICs1NSw3
+IEBAIHN0YXRpYyBzdHJ1Y3QgdXNiX2RyaXZlciBidHVzYl9kcml2ZXI7DQogI2RlZmluZSBCVFVT
+Ql9CUk9LRU5fSVNPQwkweDIwDQogI2RlZmluZSBCVFVTQl9XUk9OR19TQ09fTVRVCTB4NDANCiAj
+ZGVmaW5lIEJUVVNCX0FUSDMwMTIJCTB4ODANCisjZGVmaW5lIEJUVVNCX0FUSDMwMDYJCTB4MDEw
+MA0KIA0KIHN0YXRpYyBzdHJ1Y3QgdXNiX2RldmljZV9pZCBidHVzYl90YWJsZVtdID0gew0KIAkv
+KiBHZW5lcmljIEJsdWV0b290aCBVU0IgZGV2aWNlICovDQpAQCAtMTAwLDYgKzEwMSw5IEBAIHN0
+YXRpYyBzdHJ1Y3QgdXNiX2RldmljZV9pZCBidHVzYl90YWJsZVtdID0gew0KIAkvKiBDYW55b24g
+Q04tQlRVMSB3aXRoIEhJRCBpbnRlcmZhY2VzICovDQogCXsgVVNCX0RFVklDRSgweDBjMTAsIDB4
+MDAwMCkgfSwNCiANCisJLyogUXVhbGNvbW0gQXRoZXJvcyB3aXRoIEhJRCBpbnRlcmZhY2VzICov
+DQorCXsgVVNCX0RFVklDRSgweDBjZjMsIDB4MzAwNikgfSwNCisNCiAJeyB9CS8qIFRlcm1pbmF0
+aW5nIGVudHJ5ICovDQogfTsNCiANCkBAIC0xMjIsNiArMTI2LDcgQEAgc3RhdGljIHN0cnVjdCB1
+c2JfZGV2aWNlX2lkIGJsYWNrbGlzdF90YWJsZVtdID0gew0KIA0KIAkvKiBBdGhlcm9zIDMwMTIg
+d2l0aCBzZmxhc2ggZmlybXdhcmUgKi8NCiAJeyBVU0JfREVWSUNFKDB4MGNmMywgMHgzMDA0KSwg
+LmRyaXZlcl9pbmZvID0gQlRVU0JfQVRIMzAxMiB9LA0KKwl7IFVTQl9ERVZJQ0UoMHgwY2YzLCAw
+eDMwMDYpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9BVEgzMDA2IH0sDQogDQogCS8qIEF0aGVyb3Mg
+QVI1QkJVMTIgd2l0aCBzZmxhc2ggZmlybXdhcmUgKi8NCiAJeyBVU0JfREVWSUNFKDB4MDQ4OSwg
+MHhlMDJjKSwgLmRyaXZlcl9pbmZvID0gQlRVU0JfSUdOT1JFIH0sDQpAQCAtMTc5LDYgKzE4NCwx
+OCBAQCBzdGF0aWMgc3RydWN0IHVzYl9kZXZpY2VfaWQgYmxhY2tsaXN0X3RhYmxlW10gPSB7DQog
+CXsgfQkvKiBUZXJtaW5hdGluZyBlbnRyeSAqLw0KIH07DQogDQorLyoNCisgKiBGb3IgY29tcG9z
+aXRlIGRldmljZSwgaW50ZXJmYWNlIDAgbWF5IGJlIG5vdCBmb3IgYmx1ZXRvb3RoIGZ1bmN0aW9u
+Lg0KKyAqIEl0IGlzIGJldHRlciB0byBsZXQgdGhlIHZlbmRvciBjb2RlIHRvIGhhbmRsZSB0aGlz
+IHNpdHVhdGlvbi4NCisgKiBTbywgd2UgdXNlIGNvbXBvc2l0ZV9kZXZpY2VfdGFibGUgdG8gcmVj
+b3JkIHRoZSBjb21wb3NpdGUgZGV2aWNlcy4NCisgKi8NCitzdGF0aWMgc3RydWN0IHVzYl9kZXZp
+Y2VfaWQgY29tcG9zaXRlX2RldmljZV90YWJsZVtdID0gew0KKwkvKiBRdWFsY29tbSBBdGhlcm9z
+IGNvbXBvc2l0ZSBkZXZpY2UgMzAwNiAqLw0KKwl7IFVTQl9ERVZJQ0UoMHgwY2YzLCAweDMwMDYp
+IH0sDQorDQorCXsgfQkvKiBUZXJtaW5hdGluZyBlbnRyeSAqLw0KK307DQorDQogI2RlZmluZSBC
+VFVTQl9NQVhfSVNPQ19GUkFNRVMJMTANCiANCiAjZGVmaW5lIEJUVVNCX0lOVFJfUlVOTklORwkw
+DQpAQCAtOTEyLDEzICs5MjksMjUgQEAgc3RhdGljIGludCBidHVzYl9wcm9iZShzdHJ1Y3QgdXNi
+X2ludGVyZmFjZSAqaW50ZiwNCiAJc3RydWN0IGJ0dXNiX2RhdGEgKmRhdGE7DQogCXN0cnVjdCBo
+Y2lfZGV2ICpoZGV2Ow0KIAlpbnQgaSwgZXJyOw0KKwljb25zdCBzdHJ1Y3QgdXNiX2RldmljZV9p
+ZCAqbWF0Y2hfY29tcF9kZXY7DQogDQogCUJUX0RCRygiaW50ZiAlcCBpZCAlcCIsIGludGYsIGlk
+KTsNCiANCisJLyogRm9yIGNvbXBvc2l0ZSBkZXZpY2UNCisJKiBpdCBtYXkgbm90IHRoZSBjYXNl
+IHRoYXQgaW50ZXJmYWNlIDAgaXMgZm9yIGJsdWV0b290aCBmdW5jdGlvbi4NCisJKi8NCisJbWF0
+Y2hfY29tcF9kZXYgPSB1c2JfbWF0Y2hfaWQoaW50ZiwgY29tcG9zaXRlX2RldmljZV90YWJsZSk7
+DQorCWlmIChtYXRjaF9jb21wX2Rldikgew0KKwkJaWYgKGludGYtPmN1cl9hbHRzZXR0aW5nLT5k
+ZXNjLmJJbnRlcmZhY2VOdW1iZXIgIT0gMikNCisJCQlyZXR1cm4gLUVOT0RFVjsNCisJCWdvdG8g
+bWF0Y2hfaWQ7DQorCX0NCisNCiAJLyogaW50ZXJmYWNlIG51bWJlcnMgYXJlIGhhcmRjb2RlZCBp
+biB0aGUgc3BlYyAqLw0KIAlpZiAoaW50Zi0+Y3VyX2FsdHNldHRpbmctPmRlc2MuYkludGVyZmFj
+ZU51bWJlciAhPSAwKQ0KIAkJcmV0dXJuIC1FTk9ERVY7DQogDQorbWF0Y2hfaWQ6DQogCWlmICgh
+aWQtPmRyaXZlcl9pbmZvKSB7DQogCQljb25zdCBzdHJ1Y3QgdXNiX2RldmljZV9pZCAqbWF0Y2g7
+DQogCQltYXRjaCA9IHVzYl9tYXRjaF9pZChpbnRmLCBibGFja2xpc3RfdGFibGUpOw0KQEAgLTkz
+OCw3ICs5NjcsOCBAQCBzdGF0aWMgaW50IGJ0dXNiX3Byb2JlKHN0cnVjdCB1c2JfaW50ZXJmYWNl
+ICppbnRmLA0KIAlpZiAoaWdub3JlX3NuaWZmZXIgJiYgaWQtPmRyaXZlcl9pbmZvICYgQlRVU0Jf
+U05JRkZFUikNCiAJCXJldHVybiAtRU5PREVWOw0KIA0KLQlpZiAoaWQtPmRyaXZlcl9pbmZvICYg
+QlRVU0JfQVRIMzAxMikgew0KKwlpZiAoKGlkLT5kcml2ZXJfaW5mbyAmIEJUVVNCX0FUSDMwMTIp
+IHx8DQorCQkJCShpZC0+ZHJpdmVyX2luZm8gJiBCVFVTQl9BVEgzMDA2KSkgew0KIAkJc3RydWN0
+IHVzYl9kZXZpY2UgKnVkZXYgPSBpbnRlcmZhY2VfdG9fdXNiZGV2KGludGYpOw0KIA0KIAkJLyog
+T2xkIGZpcm13YXJlIHdvdWxkIG90aGVyd2lzZSBsZXQgYXRoM2sgZHJpdmVyIGxvYWQNCkBAIC0x
+MDYyLDYgKzEwOTIsMTEgQEAgc3RhdGljIGludCBidHVzYl9wcm9iZShzdHJ1Y3QgdXNiX2ludGVy
+ZmFjZSAqaW50ZiwNCiAJCX0NCiAJfQ0KIA0KKwlpZiAoaWQtPmRyaXZlcl9pbmZvICYgQlRVU0Jf
+QVRIMzAwNikgew0KKwkJQlRfRVJSKCJoYXJkY29kZWQ6IEludGVyZmFjZSAzIik7DQorCQlkYXRh
+LT5pc29jID0gdXNiX2lmbnVtX3RvX2lmKGRhdGEtPnVkZXYsIDMpOw0KKwl9DQorDQogCWlmIChk
+YXRhLT5pc29jKSB7DQogCQllcnIgPSB1c2JfZHJpdmVyX2NsYWltX2ludGVyZmFjZSgmYnR1c2Jf
+ZHJpdmVyLA0KIAkJCQkJCQlkYXRhLT5pc29jLCBkYXRhKTsNCi0tIA0KMS43LjQuMQ0K
