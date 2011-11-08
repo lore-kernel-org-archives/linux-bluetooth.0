@@ -1,116 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EB95698.4070402@codeaurora.org>
-Date: Tue, 08 Nov 2011 08:19:36 -0800
-From: Brian Gix <bgix@codeaurora.org>
+Date: Tue, 8 Nov 2011 13:34:26 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Jesse Sung <jesse.sung@canonical.com>
+Cc: linux-bluetooth@vger.kernel.org, 854399@bugs.launchpad.net
+Subject: Re: [PATCH] Bluetooth: Add support for Broadcom BCM20702A0.
+Message-ID: <20111108153426.GD25584@joana>
+References: <4E7840CF.5010805@canonical.com>
+ <20111031193354.GG10164@joana>
+ <4EB8D188.2040407@canonical.com>
 MIME-Version: 1.0
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] Bluetooth: Add address type fields to mgmt messages
- that need them
-References: <1320700419-4665-1-git-send-email-johan.hedberg@gmail.com>	<1320700419-4665-3-git-send-email-johan.hedberg@gmail.com>	<4EB86A27.1030403@codeaurora.org>	<20111108085256.GA9733@fusion.localdomain> <CAJdJm_NF07-4F+qkdLAbfG-sdXNRmXUY4Bhn9Bk0BrXy9jH3kw@mail.gmail.com>
-In-Reply-To: <CAJdJm_NF07-4F+qkdLAbfG-sdXNRmXUY4Bhn9Bk0BrXy9jH3kw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4EB8D188.2040407@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson/Johan,
+Hi Jesse,
 
-On 11/8/2011 3:39 AM, Anderson Lizardo wrote:
-> Hi Johan/Brian,
->
-> On Tue, Nov 8, 2011 at 4:52 AM, Johan Hedberg<johan.hedberg@gmail.com>  wrote:
->> Hi Brian,
->>
->> On Mon, Nov 07, 2011, Brian Gix wrote:
->>>> +#define MGMT_ADDR_BREDR                     0x00
->>>> +#define MGMT_ADDR_LE                        0x01
->>>> +#define MGMT_ADDR_BREDR_LE          0x02
->>>> +#define MGMT_ADDR_INVALID           0xff
->>>
->>> What would you think about overloading this Address type with the
->>> Public/Random flag?
->>>
->>> We are already seeing devices in the marketplace with Random
->>> Addresses, effectively giving LE addresses 7 significant octets of
->>> address information, rather than the standard 6 octet "MAC"
->>> addresses.
->>>
->>>
->>>> +
->>>> +struct mgmt_addr_info {
->>>> +    bdaddr_t bdaddr;
->>>> +    __u8 type;
->>>
->>> I would also support adding an additional octet here, which would be
->>> essentially the "Address Type" as used in the HCI LE Connect
->>> Command, and in the SMP LE Pairing protocol.
->
-> Brian: note that this address type is being used only on mgmt
-> messages. So it will be mostly useful (in LE context) for discovery
-> command and events.
->
-> For creating connections, we still do not have a way to indicate the
-> address type from userspace (currently we rely on the advertising
-> cache).
+* Jesse Sung <jesse.sung@canonical.com> [2011-11-08 14:51:52 +0800]:
 
-In the solution we have been working on here, we are storing the 
-(Public/Random) address type with the LTK, both in the BlueZ database, 
-and with the keys that we send back to the kernel which on the reworked 
-MGMT interface is the command "Load Long Term Keys".  We still rely on 
-the Advertising cache when pairing, but once paired can then reconnect 
-to LE devices (and know their Public/Random setting) via the LTK list.
+> On 11/01/2011 03:33 AM, Gustavo Padovan wrote:
+> >Hi Jesse,
+> >
+> >* Jesse Sung<jesse.sung@canonical.com>  [2011-09-20 15:29:19 +0800]:
+> >
+> >>Add a new entry (413c:8197) to device ID table.
+> >
+> >Can I get the output of usbdevices in the commit message, please. Then we can
+> >prove that adding it to the device ID table is really necessary.
+> >
+> >	Gustavo
+> 
+> Hi Gustavo,
+> 
+> Sure! Modified patch attached. :)
 
-Also remember that when we get around to supporting the LE GAP 
-Privacy/Reconnection (Vol 3, Part C, Sections 12.3 & 12.4), and SMP 
-Identity information (Vol 3, Part H, Sections 3.6.4 & 3.6.5) we will 
-need to track this (Public/Random) information as part of the overall 
-identity of remote peripherals. We will be unable to connect to 
-"Private" devices without the Public/Random info, because they will be 
-invisible to an LE Discovery scan.
+It's applied, thanks.
 
-Plus Also: other than for Pairing, I think that forcing an LE Discovery 
-each time you want to connect to a previously known device to be inelegant.
-
-
-
->
->>> I have stated elsewhere, that I think this to be crucial information
->>> to store with Long Term KEYs (LTKs) as well as future LE Signing
->>> keys, and in future Address Resolution solutions. The earlier we get
->>> this bit of information into the MGMT interface, the better IMO.
->>
->> This is the same impression I got also when looking into this several
->> months ago. Thanks for reminding me!
->>
->> The BREDR_LE option is there for the updated start_discovery command.
->> You'll be able to specify whether you want BR/EDR-only, LE-only or
->> interleaved discovery. I wouldn't add a completely new octet for public
->> vs random information though but reuse the existing one instead. To be
->> able to reuse our address type definitions for all purposes, how about
->> making each value orthogonal to the others, e.g.:
->>
->>         ADDR_BREDR      0x01
->>         ADDR_LE_PUBLIC  0x02
->>         ADDR_LE_RANDOM  0x04
->>
->> For events like connected, found, etc you'd only have one of the bits
->> set whereas for the start_discovery you could have any (but at least
->> one).
->
-> Johan: how would link_to_mgmt() in your code work in this case?
->
-> I see this will help simplifying how do we identify LE devices on
-> BlueZ (currently it is done by parsing AD flags, but broken devices
-> may lack the correct "BR/EDR not supported" flag, and thus we
-> incorrectly identify then as BR/EDR). Unfortunately, it will still not
-> allow us to correctly connect to LE devices without relying on the
-> kernel's advertising cache.
->
-> Regards,
-
-
--- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+	Gustavo
