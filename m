@@ -1,95 +1,163 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJdJm_NsyzABjO-dNSguvfycvL_0cYF6szok4u-BsN9XJtt5Tw@mail.gmail.com>
-References: <1320835923-10989-1-git-send-email-sancane@gmail.com>
-	<1320835923-10989-2-git-send-email-sancane@gmail.com>
-	<CAJdJm_OVgJbGrBmTgTUFaRHazDBweSagPJE0UP0eXa4MVFm61A@mail.gmail.com>
-	<CACLukzKhzKrH1htxNAAR2CtmzhxEQ6_VyMZUsssncWyXopaAJw@mail.gmail.com>
-	<CAJdJm_NsyzABjO-dNSguvfycvL_0cYF6szok4u-BsN9XJtt5Tw@mail.gmail.com>
-Date: Wed, 9 Nov 2011 17:50:00 +0100
-Message-ID: <CACLukzKpPGad_yUUiH0Q2qbfY6MhUGcn=BsfQyyuGQPOji53dw@mail.gmail.com>
-Subject: Re: [PATCH 1/6] Manage GATT attribute indications in handle callback.
-From: Santiago Carot <sancane@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Brian Gix <bgix@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Brian Gix <bgix@codeaurora.org>
+Subject: [PATCH 1/1] Bluetooth: Add support for LE Passkeys to MGMTOPS
+Date: Wed,  9 Nov 2011 08:21:06 -0800
+Message-Id: <1320855666-8471-1-git-send-email-bgix@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+LE pairing is a Host based algorythm that requires User entered
+passkeys to obtain Man-In-The-Middle (MITM) level protection,
+unlike it's BR/EDR based conterpart SSP. This interface addition
+enables this ability.
 
-2011/11/9 Anderson Lizardo <anderson.lizardo@openbossa.org>:
-> Hi Santiago,
->
-> On Wed, Nov 9, 2011 at 10:44 AM, Santiago Carot <sancane@gmail.com> wrote:
->>>>  static void ind_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
->>>>  {
->>>> -       /* TODO: Process indication */
->>>> +       struct thermometer *t = user_data;
->>>> +       const struct characteristic *ch;
->>>> +       uint8_t opdu[ATT_MAX_MTU];
->>>> +       uint16_t handle, olen;
->>>> +       GSList *l;
->>>> +
->>>> +       if (len < 3) {
->>>> +               DBG("Bad pdu received");
->>>> +               goto done;
->>>> +       }
->>>
->>> Are you sure we should send a confirmation even if the PDU received is
->>> invalid? What if it is not even an indication (you only check below)?
->>
->> This callback is supposed only to manage indications not notifications:
->> in the code:
->> ...
->> g_attrib_register(t->attrib, ATT_OP_HANDLE_IND,
->>                                                        ind_handler, t, NULL);
->>
->> Shall I expect another kind of notifications even if I have not
->> indicated it when I registered the callback?
->
-> I only made this comment because you do this check on the function:
->
-> +       if (pdu[0] != ATT_OP_HANDLE_IND) {
-> +               DBG("Not indication received");
-> +               return;
-> +       }
->
-> I think you can simply drop this check, as you mentioned it will only
-> be called for indications.
->
-> About the PDU size check, I think it is important to have it (to avoid
-> memory corruption on invalid PDU), but then the peer device is bogus,
-> so I think you should not send a confirmation for it, because you did
-> not receive a valid indication in the first place.
->
->>>> +
->>>> +       handle = att_get_u16(&pdu[1]);
->>>> +       l = g_slist_find_custom(t->chars, &handle, cmp_char_val_handle);
->>>> +       if (l == NULL)
->>>> +               goto done;
->>>
->>> Again, should we send a confirmation to the thermometer even if the
->>> indication's handle does not match any characteristic value?
->>>
->>> (note I didn't read the thermometer profile spec carefully yet. Not
->>> sure if it covers invalid PDUs.)
->>>
->>
->> As far as I know, the thermometer spec is not focused in such kind of
->> GATT details, so I guess it will depend of the implementation.  If we
->> don't send a reply to that indication the remote side will close the
->> connection when the timeout expired. So here is the question: what
->> would we rather do, to keep the connection alive or to let the remote
->> side to close it?
->
-> I believe that in general, if the peer device sends a bogus indication
-> (or if the communication channel was corrupted somehow), we should
-> *not* confirm it. I see confirmations as an "ack" that the indication
-> was received, processed and validated by BlueZ. If it is somehow
-> invalid (PDU size incorrect, invalid handle), we should not confirm
-> it.
+Signed-off-by: Brian Gix <bgix@codeaurora.org>
+---
+ include/net/bluetooth/mgmt.h |   11 ++++++
+ net/bluetooth/mgmt.c         |   77 ++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 86 insertions(+), 2 deletions(-)
 
-It makes sense for me, I'll send a new set of patches with the changes
-you have suggested.
-Thanks.
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 3e320c9..d67683f 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -228,6 +228,17 @@ struct mgmt_cp_set_fast_connectable {
+ 	__u8 enable;
+ } __packed;
+ 
++#define MGMT_OP_USER_PASSKEY_REPLY	0x0020
++struct mgmt_cp_user_passkey_reply {
++	bdaddr_t bdaddr;
++	__le32 passkey;
++} __packed;
++
++#define MGMT_OP_USER_PASSKEY_NEG_REPLY	0x0021
++struct mgmt_cp_user_passkey_neg_reply {
++	bdaddr_t bdaddr;
++} __packed;
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16 opcode;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 4cb2f95..c61b31e 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1429,6 +1429,7 @@ static int user_confirm_reply(struct sock *sk, u16 index, unsigned char *data,
+ 	u16 mgmt_op, hci_op;
+ 	struct pending_cmd *cmd;
+ 	struct hci_dev *hdev;
++	struct hci_conn *conn;
+ 	int err;
+ 
+ 	BT_DBG("");
+@@ -1452,19 +1453,85 @@ static int user_confirm_reply(struct sock *sk, u16 index, unsigned char *data,
+ 
+ 	if (!test_bit(HCI_UP, &hdev->flags)) {
+ 		err = cmd_status(sk, index, mgmt_op, ENETDOWN);
+-		goto failed;
++		goto done;
++	}
++
++	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
++	if (!conn) {
++		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->bdaddr);
++		if (!conn) {
++			err = cmd_status(sk, index, mgmt_op, ENOTCONN);
++			goto done;
++		}
++
++		/* Forward Confirm response to SMP */
++
++		err = cmd_status(sk, index, mgmt_op, 0);
++		goto done;
+ 	}
+ 
+ 	cmd = mgmt_pending_add(sk, mgmt_op, index, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+-		goto failed;
++		goto done;
+ 	}
+ 
+ 	err = hci_send_cmd(hdev, hci_op, sizeof(cp->bdaddr), &cp->bdaddr);
+ 	if (err < 0)
+ 		mgmt_pending_remove(cmd);
+ 
++done:
++	hci_dev_unlock_bh(hdev);
++	hci_dev_put(hdev);
++
++	return err;
++}
++
++static int user_passkey_reply(struct sock *sk, u16 index, unsigned char *data,
++							u16 len, int success)
++{
++	struct mgmt_cp_user_passkey_reply *cp = (void *) data;
++	u16 mgmt_op;
++	u32 passkey = 0;
++	struct hci_dev *hdev;
++	struct hci_conn *conn;
++	int expected_len, err = 0;
++
++	BT_DBG("");
++
++	if (success) {
++		mgmt_op = MGMT_OP_USER_PASSKEY_REPLY;
++		expected_len = sizeof(*cp);
++		passkey = le32_to_cpu(cp->passkey);
++	} else {
++		mgmt_op = MGMT_OP_USER_PASSKEY_NEG_REPLY;
++		expected_len = sizeof(struct mgmt_cp_user_passkey_neg_reply);
++	}
++
++	if (len != expected_len)
++		return cmd_status(sk, index, mgmt_op, EINVAL);
++
++	hdev = hci_dev_get(index);
++	if (!hdev)
++		return cmd_status(sk, index, mgmt_op, ENODEV);
++
++	hci_dev_lock_bh(hdev);
++
++	if (!test_bit(HCI_UP, &hdev->flags)) {
++		err = cmd_status(sk, index, mgmt_op, ENETDOWN);
++		goto failed;
++	}
++
++	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->bdaddr);
++	if (!conn) {
++		err = cmd_status(sk, index, mgmt_op, ENOTCONN);
++		goto failed;
++	}
++
++	/* Forward Passkey response to SMP */
++
++	err = cmd_status(sk, index, mgmt_op, 0);
++
+ failed:
+ 	hci_dev_unlock_bh(hdev);
+ 	hci_dev_put(hdev);
+@@ -1913,6 +1980,12 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 	case MGMT_OP_USER_CONFIRM_NEG_REPLY:
+ 		err = user_confirm_reply(sk, index, buf + sizeof(*hdr), len, 0);
+ 		break;
++	case MGMT_OP_USER_PASSKEY_REPLY:
++		err = user_passkey_reply(sk, index, buf + sizeof(*hdr), len, 1);
++		break;
++	case MGMT_OP_USER_PASSKEY_NEG_REPLY:
++		err = user_passkey_reply(sk, index, buf + sizeof(*hdr), len, 0);
++		break;
+ 	case MGMT_OP_SET_LOCAL_NAME:
+ 		err = set_local_name(sk, index, buf + sizeof(*hdr), len);
+ 		break;
+-- 
+1.7.7.1
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum 
