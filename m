@@ -1,154 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 Nov 2011 15:24:11 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/1] Bluetooth: Add support for LE Passkeys to MGMTOPS
-Message-ID: <20111109172411.GA2672@joana>
-References: <1320855666-8471-1-git-send-email-bgix@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320855666-8471-1-git-send-email-bgix@codeaurora.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1320850111.15441.342.camel@aeonflux>
+References: <1320332745-21750-1-git-send-email-szymon.janc@tieto.com>
+	<1320441040.15441.303.camel@aeonflux>
+	<alpine.DEB.2.02.1111041513330.11981@mathewm-linux>
+	<201111091446.28192.szymon.janc@tieto.com>
+	<1320850111.15441.342.camel@aeonflux>
+Date: Wed, 9 Nov 2011 19:15:49 +0200
+Message-ID: <CABBYNZLhjcj57ZPHUWD7qCL6EtSsQ5gmjCYn1+0aqOEtwrjzvg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Bluetooth: Add ability to force local busy condition
+ on L2CAP ERTM
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>, Mat Martineau <mathewm@codeaurora.org>,
+	Gustavo Padovan <padovan@profusion.mobi>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"ulrik.lauren@stericsson.com" <ulrik.lauren@stericsson.com>,
+	"kanak.gupta@stericsson.com" <kanak.gupta@stericsson.com>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+Hi Marcel,
 
-* Brian Gix <bgix@codeaurora.org> [2011-11-09 08:21:06 -0800]:
+On Wed, Nov 9, 2011 at 4:48 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> @Marcel
+>> This test case is to "Verify the IUT will send an S-Frame [RNR] when it detects a Local Busy condition."
+>>
+>> "Pass verdict:
+>> - ALT 1: The IUT immediately sends an S-Frame with function RNR after the Local
+>> Busy condition is set by the Upper Tester.
+>> - ALT 2: The IUT sends an S-Frame with function RNR after receiving I-Frame(s) from
+>> the Tester when the Local Busy condition is set by the Upper Tester."
+>>
+>>
+>> I was trying to pass ALT2 with Mat's suggestions but couldn't trigger local busy.
+>> Minimum possible value for SO_RCVBUF (at least here on 3.0 kernel) is 2224 bytes and this is
+>> still too high to allow PTS to trigger local busy (PTS tries to send txwin i-frames with 4 bytes of
+>> data only).
+>> [If it would possible to force PTS to send larger i-frames than it should work as well but I wasn't
+>> able to find any option that would do that... please correct me if it is possible]
+>>
+>> With forcing local busy on channels it is possible to pass ALT1 scenario: PTS ask IUT to enter
+>> local busy condition and just waits for RNR to be send.
+>>
+>> @Gustavo
+>> If you prefer not to temper with normal code path I could just get rid of force_local_busy variable
+>> and not hold channels in local busy state. This should be enough to pass test.
+>
+> so I like the idea to make this work with standard socket options. That
+> is how we should be doing this. So lets figure out on how to make Mat's
+> suggestion work for us.
 
-> LE pairing is a Host based algorythm that requires User entered
-> passkeys to obtain Man-In-The-Middle (MITM) level protection,
-> unlike it's BR/EDR based conterpart SSP. This interface addition
-> enables this ability.
-> 
-> Signed-off-by: Brian Gix <bgix@codeaurora.org>
-> ---
->  include/net/bluetooth/mgmt.h |   11 ++++++
->  net/bluetooth/mgmt.c         |   77 ++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 86 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 3e320c9..d67683f 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -228,6 +228,17 @@ struct mgmt_cp_set_fast_connectable {
->  	__u8 enable;
->  } __packed;
->  
-> +#define MGMT_OP_USER_PASSKEY_REPLY	0x0020
-> +struct mgmt_cp_user_passkey_reply {
-> +	bdaddr_t bdaddr;
-> +	__le32 passkey;
-> +} __packed;
-> +
-> +#define MGMT_OP_USER_PASSKEY_NEG_REPLY	0x0021
-> +struct mgmt_cp_user_passkey_neg_reply {
-> +	bdaddr_t bdaddr;
-> +} __packed;
-> +
->  #define MGMT_EV_CMD_COMPLETE		0x0001
->  struct mgmt_ev_cmd_complete {
->  	__le16 opcode;
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 4cb2f95..c61b31e 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -1429,6 +1429,7 @@ static int user_confirm_reply(struct sock *sk, u16 index, unsigned char *data,
->  	u16 mgmt_op, hci_op;
->  	struct pending_cmd *cmd;
->  	struct hci_dev *hdev;
-> +	struct hci_conn *conn;
->  	int err;
->  
->  	BT_DBG("");
-> @@ -1452,19 +1453,85 @@ static int user_confirm_reply(struct sock *sk, u16 index, unsigned char *data,
->  
->  	if (!test_bit(HCI_UP, &hdev->flags)) {
->  		err = cmd_status(sk, index, mgmt_op, ENETDOWN);
-> -		goto failed;
-> +		goto done;
-> +	}
-> +
-> +	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
-> +	if (!conn) {
-> +		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->bdaddr);
-> +		if (!conn) {
-> +			err = cmd_status(sk, index, mgmt_op, ENOTCONN);
-> +			goto done;
-> +		}
-> +
-> +		/* Forward Confirm response to SMP */
-> +
-> +		err = cmd_status(sk, index, mgmt_op, 0);
-> +		goto done;
+Any idea why it is not possible to overwrite the minimum for the
+socket buffer, its a bit annoying not being able to set them to 0
+which would be useful for making readonly/writeonly sockets when using
+the force socket option.
 
-user_confirm_reply changes should be in a separate commit. Let's not mix
-things here.
-
->  	}
->  
->  	cmd = mgmt_pending_add(sk, mgmt_op, index, data, len);
->  	if (!cmd) {
->  		err = -ENOMEM;
-> -		goto failed;
-> +		goto done;
->  	}
->  
->  	err = hci_send_cmd(hdev, hci_op, sizeof(cp->bdaddr), &cp->bdaddr);
->  	if (err < 0)
->  		mgmt_pending_remove(cmd);
->  
-> +done:
-> +	hci_dev_unlock_bh(hdev);
-> +	hci_dev_put(hdev);
-> +
-> +	return err;
-> +}
-> +
-> +static int user_passkey_reply(struct sock *sk, u16 index, unsigned char *data,
-> +							u16 len, int success)
-> +{
-> +	struct mgmt_cp_user_passkey_reply *cp = (void *) data;
-> +	u16 mgmt_op;
-> +	u32 passkey = 0;
-> +	struct hci_dev *hdev;
-> +	struct hci_conn *conn;
-> +	int expected_len, err = 0;
-> +
-> +	BT_DBG("");
-> +
-> +	if (success) {
-> +		mgmt_op = MGMT_OP_USER_PASSKEY_REPLY;
-> +		expected_len = sizeof(*cp);
-> +		passkey = le32_to_cpu(cp->passkey);
-> +	} else {
-> +		mgmt_op = MGMT_OP_USER_PASSKEY_NEG_REPLY;
-> +		expected_len = sizeof(struct mgmt_cp_user_passkey_neg_reply);
-> +	}
-> +
-> +	if (len != expected_len)
-> +		return cmd_status(sk, index, mgmt_op, EINVAL);
-> +
-> +	hdev = hci_dev_get(index);
-> +	if (!hdev)
-> +		return cmd_status(sk, index, mgmt_op, ENODEV);
-> +
-> +	hci_dev_lock_bh(hdev);
-> +
-> +	if (!test_bit(HCI_UP, &hdev->flags)) {
-> +		err = cmd_status(sk, index, mgmt_op, ENETDOWN);
-> +		goto failed;
-> +	}
-> +
-> +	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->bdaddr);
-> +	if (!conn) {
-> +		err = cmd_status(sk, index, mgmt_op, ENOTCONN);
-> +		goto failed;
-> +	}
-> +
-> +	/* Forward Passkey response to SMP */
-
-Passkey reply should work for both BR/EDR and LE, so let's do this a way that
-it works for both with the same command.
-
-	Gustavo
+-- 
+Luiz Augusto von Dentz
