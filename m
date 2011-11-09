@@ -1,440 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Cho, Yu-Chen" <acho@suse.com>
-To: marcel@holtmann.org,
-	padovan@profusion.mobi,
-	linux-bluetooth@vger.kernel.org
-Cc: oneukum@suse.com,
-	acho@suse.com,
-	jlee@suse.com
-Subject: How to add firmware uploader function to Bluez? (Broadcom firmware uploader)
-Date: Wed,  9 Nov 2011 12:09:23 +0800
-Message-Id: <1320811763-16209-1-git-send-email-acho@suse.com>
+From: "Yao, Costa" <cqyao@qca.qualcomm.com>
+To: Gustavo Padovan <padovan@profusion.mobi>
+CC: Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, "Fan, Hong" <hongfan@qca.qualcomm.com>,
+	"Wu, Frank" <fanwu@qca.qualcomm.com>, "Chen, Jack" <skchen@qca.qualcomm.com>,
+	"Chang, Robert" <rwchang@qca.qualcomm.com>, "Sumangala, Suraj"
+	<surajs@qca.qualcomm.com>, "Wang, Tom" <taowang@qca.qualcomm.com>, "Liu,
+ Haijun" <haijun@qca.qualcomm.com>, QCA.Mgr.Haijun.Liu-All
+	<QCA.Mgr.Haijun.Liu-All@qualcomm.com>
+Subject: RE: [PATCH] Bluetooth: ath3k: Add support for Qualcomm Atheros 3006
+Date: Wed, 9 Nov 2011 02:59:38 +0000
+Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEE9D21@nasanexd02b.na.qualcomm.com>
+References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEE9C89@nasanexd02b.na.qualcomm.com>
+ <20111108145813.GB25584@joana>
+In-Reply-To: <20111108145813.GB25584@joana>
+Content-Type: text/plain; charset="gb2312"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
-
-Broadcom BT4.0 module 0a5c:21e1 and 0a5c:21e3 need firmware
-to setup(enable) at the first time we use.
-We got the firmware and firmware uploader (brcm_patchram_plus_usb )
-( user space tool ) from Broadcom ,the Licence is GPLv2,
-would it possible that add those to bluez package?or any idea for this?
-
-Follow Marcel's suggestion I post this as a patch.
-please correct me if i got any mistake,thanks.
-And thanks you all guys' suggestion.
-
-Sincerely,
-           AL
-
-Signed-off-by: Cho, Yu-Chen <acho@suse.com>
----
- Makefile                 |    2 +
- brcm_patchram_plus_usb.c |  388 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 390 insertions(+), 0 deletions(-)
- create mode 100644 Makefile
- create mode 100644 brcm_patchram_plus_usb.c
-
-diff --git a/Makefile b/Makefile
-new file mode 100644
-index 0000000..544d872
---- /dev/null
-+++ b/Makefile
-@@ -0,0 +1,2 @@
-+LDFLAGS = -lbluetooth
-+brcm_patchram_plus_usb : brcm_patchram_plus_usb.o
-diff --git a/brcm_patchram_plus_usb.c b/brcm_patchram_plus_usb.c
-new file mode 100644
-index 0000000..df035a1
---- /dev/null
-+++ b/brcm_patchram_plus_usb.c
-@@ -0,0 +1,388 @@
-+/*
-+ *
-+ * brcm_patchram_plus_usb.c
-+ *
-+ * Copyright (C) 2009 Broadcom Corporation.
-+ *
-+ *
-+ * This software is licensed under the terms of the GNU General Public License,
-+ * version 2, as published by the Free Software Foundation (the "GPL"),
-+ * and may be copied, distributed, and modified under those terms.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-+ * See the GPL for more details.
-+ *
-+ * A copy of the GPL is available at http://www.broadcom.com/licenses/GPLv2.
-+ * php or by writing to the Free Software Foundation, Inc.,
-+ * 59 Temple Place - Suite 330,Boston, MA 02111-1307, USA.
-+ *
-+ */
-+
-+
-+/*
-+ *
-+ *  Name:          brcm_patchram_plus_usb.c
-+ *
-+ *  Description:   This program downloads a patchram files in the HCD format
-+ *                 to Broadcom Bluetooth based silicon and combo chips and
-+ *				   and other utility functions.
-+ *
-+ *                 It can be invoked from the command line in the form
-+ *						<-d> to print a debug log
-+ *						<--patchram patchram_file>
-+ *						<--bd_addr bd_address>
-+ *						bluez_device_name
-+ *
-+ *                 For example:
-+ *
-+ *                 brcm_patchram_plus -d --patchram  \
-+ *				BCM2045B2_002.002.011.0348.0349.hcd hci0
-+ *
-+ *                 It will return 0 for success and a number greater than 0
-+ *                 for any errors.
-+ *
-+ *                 For Android, this program invoked using a 
-+ *                 "system(2)" call from the beginning of the bt_enable
-+ *                 function inside the file
-+ *                 mydroid/system/bluetooth/bluedroid/bluetooth.c.
-+ *
-+ */
-+
-+#include <stdio.h>
-+#include <getopt.h>
-+#include <errno.h>
-+
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+
-+#include <stdlib.h>
-+
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/hci.h>
-+#include <bluetooth/hci_lib.h>
-+
-+#include <string.h>
-+#include <signal.h>
-+
-+int sock = -1;
-+int hcdfile_fd = -1;
-+int bdaddr_flag = 0;
-+int enable_lpm = 0;
-+int debug = 0;
-+
-+unsigned char buffer[1024];
-+
-+unsigned char hci_reset[] = { 0x01, 0x03, 0x0c, 0x00 };
-+
-+unsigned char hci_download_minidriver[] = { 0x01, 0x2e, 0xfc, 0x00 };
-+
-+unsigned char hci_write_bd_addr[] = { 0x01, 0x01, 0xfc, 0x06,
-+					0x00, 0x00, 0x00, 0x00,
-+					0x00, 0x00, 0x00 };
-+
-+#define HCIT_TYPE_COMMAND 1
-+
-+int parse_patchram(char *optarg)
-+{
-+	char *p;
-+
-+	p = strrchr(optarg, '.');
-+	if (!p) {
-+		fprintf(stderr, "file %s not an HCD file\n", optarg);
-+		exit(3);
-+	}
-+
-+	p++;
-+
-+	if (strcasecmp("hcd", p) != 0) {
-+		fprintf(stderr, "file %s not an HCD file\n", optarg);
-+		exit(4);
-+	}
-+
-+	hcdfile_fd = open(optarg, O_RDONLY);
-+	if (hcdfile_fd == -1) {
-+		fprintf(stderr, "file %s could not be opened, error %d\n",
-+								optarg, errno);
-+		exit(5);
-+	}
-+
-+	return 0;
-+}
-+
-+int parse_bdaddr(char *optarg)
-+{
-+	int bd_addr[6];
-+	int i;
-+
-+	sscanf(optarg, "%02x%02x%02x%02x%02x%02x",
-+		&bd_addr[0], &bd_addr[1], &bd_addr[2],
-+		&bd_addr[3], &bd_addr[4], &bd_addr[5]);
-+
-+	for (i = 0; i < 6; i++)
-+		hci_write_bd_addr[4 + i] = bd_addr[i];
-+
-+	bdaddr_flag = 1;
-+
-+	return 0;
-+}
-+
-+int parse_cmd_line(int argc, char **argv)
-+{
-+	int c;
-+	int digit_optind = 0;
-+	int dev_id;
-+
-+	typedef int (*PFI)();
-+
-+	PFI parse_param[] = { parse_patchram, parse_bdaddr };
-+
-+	while (1) {
-+		int this_option_optind = optind ? optind : 1;
-+		int option_index = 0;
-+
-+		static struct option long_options[] = {
-+						{"patchram", 1, 0, 0},
-+						{"bd_addr", 1, 0, 0},
-+						{0, 0, 0, 0}
-+		};
-+
-+		c = getopt_long_only(argc, argv, "d",
-+				long_options, &option_index);
-+
-+		if (c == -1)
-+			break;
-+
-+		switch (c) {
-+		case 0:
-+			printf("option %s", long_options[option_index].name);
-+
-+			if (optarg)
-+				printf(" with arg %s", optarg);
-+
-+			printf("\n");
-+
-+			(*parse_param[option_index])(optarg);
-+			break;
-+
-+		case 'd':
-+			debug = 1;
-+			break;
-+
-+		case '?':
-+			/* nobreak */
-+		default:
-+			printf("Usage %s:\n", argv[0]);
-+			printf("\t<-d> to print a debug log\n");
-+			printf("\t<--patchram patchram_file>\n");
-+			printf("\t<--bd_addr bd_address>\n");
-+			printf("\tbluez_device_name\n");
-+			break;
-+		}
-+	}
-+
-+	if (optind < argc) {
-+		printf("%s ", argv[optind]);
-+
-+		dev_id = hci_devid(argv[optind]);
-+		if (dev_id == -1) {
-+			fprintf(stderr, "device %s could not be found\n",
-+								argv[optind]);
-+			exit(1);
-+		}
-+
-+		printf("devid %d\n", dev_id);
-+
-+		sock = hci_open_dev(dev_id);
-+		if (sock == -1) {
-+			fprintf(stderr, "device %s could not be found\n",
-+								argv[optind]);
-+			exit(2);
-+		}
-+
-+		printf("sock %d\n", sock);
-+	}
-+
-+	printf("\n");
-+
-+	return 0;
-+}
-+
-+void init_hci()
-+{
-+	struct hci_filter flt;
-+
-+	hci_filter_clear(&flt);
-+	hci_filter_set_ptype(HCI_EVENT_PKT, &flt);
-+	hci_filter_all_events(&flt);
-+
-+	setsockopt(sock, SOL_HCI, HCI_FILTER, &flt, sizeof(flt));
-+}
-+
-+void dump(unsigned char *out, int len)
-+{
-+	int i;
-+
-+	for (i = 0; i < len; i++) {
-+		if (i && !(i % 16))
-+			fprintf(stderr, "\n");
-+
-+		fprintf(stderr, "%02x ", out[i]);
-+	}
-+	fprintf(stderr, "\n");
-+}
-+
-+void read_event(int fd, unsigned char *buffer)
-+{
-+	int i = 0;
-+	/* int len = 3;*/
-+	int len = 260;
-+	int count;
-+
-+/*
-+	while ((count = read(sock, &buffer[i], len)) < len) {
-+		i += count;
-+		len -= count;
-+	}
-+
-+	i += count;
-+	len = buffer[2];
-+
-+	while ((count = read(sock, &buffer[i], len)) >  len) {
-+		i += count;
-+		len -= count;
-+	}
-+*/
-+	count = read(sock, &buffer[i], 260);
-+
-+	if (debug) {
-+		count += i;
-+
-+		fprintf(stderr, "received %d\n", count);
-+		dump(buffer, count);
-+	}
-+}
-+
-+void hci_send_cmd_func(unsigned char *buf, int len)
-+{
-+	uint8_t type;
-+	hci_command_hdr hc;
-+	struct iovec iv[3];
-+	int ivn;
-+
-+	if (debug) {
-+		fprintf(stderr, "writing\n");
-+		dump(buf, len);
-+	}
-+
-+	if (buf[0] == HCIT_TYPE_COMMAND) {
-+		type = HCI_COMMAND_PKT;
-+	} else {
-+		while (write(sock, buf, len) < 0) {
-+			if (errno == EAGAIN || errno == EINTR)
-+				continue;
-+
-+			return;
-+		}
-+		return;
-+	}
-+
-+	hc.opcode = buf[1] | (buf[2] << 8);
-+	hc.plen = len - 4;
-+
-+	iv[0].iov_base = &type;
-+	iv[0].iov_len = 1;
-+	iv[1].iov_base = &hc;
-+	iv[1].iov_len = HCI_COMMAND_HDR_SIZE;
-+	ivn = 2;
-+
-+	if (len - 4) {
-+		iv[2].iov_base = &buf[4];
-+		iv[2].iov_len = len - 4;
-+		ivn = 3;
-+	}
-+
-+	while (writev(sock, iv, ivn) < 0) {
-+		if (errno == EAGAIN || errno == EINTR)
-+			continue;
-+
-+		return;
-+	}
-+
-+}
-+
-+void expired(int sig)
-+{
-+	hci_send_cmd_func(hci_reset, sizeof(hci_reset));
-+	alarm(4);
-+}
-+
-+void proc_reset()
-+{
-+	signal(SIGALRM, expired);
-+
-+	hci_send_cmd_func(hci_reset, sizeof(hci_reset));
-+
-+	alarm(4);
-+
-+	read_event(sock, buffer);
-+
-+	alarm(0);
-+}
-+
-+void proc_patchram()
-+{
-+	int len;
-+
-+	hci_send_cmd_func(hci_download_minidriver,
-+				sizeof(hci_download_minidriver));
-+
-+	read_event(sock, buffer);
-+
-+	/* read(sock, &buffer[0], 2); */
-+
-+	sleep(1);
-+
-+	while (read(hcdfile_fd, &buffer[1], 3)) {
-+		buffer[0] = 0x01;
-+
-+		len = buffer[3];
-+
-+		read(hcdfile_fd, &buffer[4], len);
-+
-+		hci_send_cmd_func(buffer, len + 4);
-+
-+		read_event(sock, buffer);
-+	}
-+
-+	proc_reset();
-+}
-+
-+void proc_bdaddr()
-+{
-+	hci_send_cmd_func(hci_write_bd_addr, sizeof(hci_write_bd_addr));
-+
-+	read_event(sock, buffer);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	parse_cmd_line(argc, argv);
-+
-+	if (sock < 0)
-+		exit(1);
-+
-+	init_hci();
-+
-+	proc_reset();
-+
-+	if (hcdfile_fd > 0)
-+		proc_patchram();
-+
-+	if (bdaddr_flag)
-+		proc_bdaddr();
-+
-+	return 0;
-+}
--- 
-1.7.3.4
+SGkgR3VzdGF2bywNCg0KICAgTm90IHRoZSBleGFjdGx5IGR1cGxpY2F0ZS4gQVIzMDA2LCBhcyBh
+IGNvbXBvc2l0ZSBkZXZpY2UsIHNob3VsZCB1c2UgZGlmZmVyZW50IGNvbW1hbmQgc2VxdWVuY2Ug
+YXMgQVIzMDEyLiANCiAgIEl0IHVzZXMgY29tbW9uIGZ1bmN0aW9ucywgYnV0IGl0IGlzIGRpZmZl
+cmVudCBjYWxsaW5nIHNlcXVlbmNlLg0KDQpDb3N0YSBZYW8NCg0KLS0tLS1PcmlnaW5hbCBNZXNz
+YWdlLS0tLS0NCkZyb206IEd1c3Rhdm8gRi4gUGFkb3ZhbiBbbWFpbHRvOnBhb0Bwcm9mdXNpb24u
+bW9iaV0gT24gQmVoYWxmIE9mIEd1c3Rhdm8gUGFkb3Zhbg0KU2VudDogMjAxMcTqMTHUwjjI1SAy
+Mjo1OA0KVG86IFlhbywgQ29zdGENCkNjOiBNYXJjZWwgSG9sdG1hbm47IGxpbnV4LWJsdWV0b290
+aEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJlOiBbUEFUQ0hdIEJsdWV0b290aDogYXRoM2s6
+IEFkZCBzdXBwb3J0IGZvciBRdWFsY29tbSBBdGhlcm9zIDMwMDYNCg0KSGkgQ29zdGEsDQoNCiog
+WWFvLCBDb3N0YSA8Y3F5YW9AcWNhLnF1YWxjb21tLmNvbT4gWzIwMTEtMTEtMDggMDc6MzY6MTEg
+KzAwMDBdOg0KDQo+IEFSMzAwNiBpcyBhIGNvbXBvc2l0ZSBkZXZpY2UsIGFuZCBpbnRlcmZhY2Ug
+MCBpcyB1c2VkIGZvciBoaWQgZnVuY3Rpb24sIG5vdCBmb3IgYmx1ZXRvb3RoIGZ1bmN0aW9uLg0K
+PiBXZSBzaG91bGQgbWFrZSB0aGUgZm9sbG93aW5nIGNoYW5nZXM6DQo+IDEgQmxhY2tsaXN0IEFS
+MzAwNiBQSUQvVklEIGluIGF0aDNrX3RhYmxlDQo+IDIgQWRkIGF0aDNrX2NvbXBvc2l0ZV9kZXZp
+Y2VfdGFibGUgaW4gYXRoM2suYyB0byByZWdpc3RlciBjb21wb3NpdGUgZGV2aWNlLg0KPiAzIExv
+YWQgcGF0Y2ggYW5kIHN5c2NvbmZpZyBmaWxlcyBmb3IgQVIzMDA2DQo+IA0KPiBTaWduZWQtb2Zm
+LWJ5OiBDb3N0YSBZYW8gPGNxeWFvQHFjYS5xdWFsY29tbS5jb20+DQo+IC0tLQ0KPiAgZHJpdmVy
+cy9ibHVldG9vdGgvYXRoM2suYyB8ICAgNjQgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrLS0NCj4gIDEgZmlsZXMgY2hhbmdlZCwgNjEgaW5zZXJ0aW9ucygrKSwgMyBk
+ZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9hdGgzay5j
+IGIvZHJpdmVycy9ibHVldG9vdGgvYXRoM2suYyANCj4gaW5kZXggMTYyMjc3Mi4uYTlkNjY3OCAx
+MDA2NDQNCj4gLS0tIGEvZHJpdmVycy9ibHVldG9vdGgvYXRoM2suYw0KPiArKysgYi9kcml2ZXJz
+L2JsdWV0b290aC9hdGgzay5jDQo+IEBAIC00MCw2ICs0MCw3IEBADQo+ICANCj4gICNkZWZpbmUg
+QVRIM0tfTU9ERV9NQVNLCQkJCTB4M0YNCj4gICNkZWZpbmUgQVRIM0tfTk9STUFMX01PREUJCQkw
+eDBFDQo+ICsjZGVmaW5lIEFUSDNLX1BSRUJPT1RfTU9ERQkJCTB4MEQNCj4gIA0KPiAgI2RlZmlu
+ZSBBVEgzS19QQVRDSF9VUERBVEUJCQkweDgwDQo+ICAjZGVmaW5lIEFUSDNLX1NZU0NGR19VUERB
+VEUJCQkweDQwDQo+IEBAIC03MSw2ICs3Miw3IEBAIHN0YXRpYyBzdHJ1Y3QgdXNiX2RldmljZV9p
+ZCBhdGgza190YWJsZVtdID0gew0KPiAgDQo+ICAJLyogQXRoZXJvcyBBUjMwMTIgd2l0aCBzZmxh
+c2ggZmlybXdhcmUqLw0KPiAgCXsgVVNCX0RFVklDRSgweDBDRjMsIDB4MzAwNCkgfSwNCj4gKwl7
+IFVTQl9ERVZJQ0UoMHgwQ0YzLCAweDMwMDYpIH0sDQo+ICANCj4gIAkvKiBBdGhlcm9zIEFSNUJC
+VTEyIHdpdGggc2ZsYXNoIGZpcm13YXJlICovDQo+ICAJeyBVU0JfREVWSUNFKDB4MDQ4OSwgMHhF
+MDJDKSB9LA0KPiBAQCAtODEsMTYgKzgzLDI2IEBAIHN0YXRpYyBzdHJ1Y3QgdXNiX2RldmljZV9p
+ZCBhdGgza190YWJsZVtdID0geyAgDQo+IE1PRFVMRV9ERVZJQ0VfVEFCTEUodXNiLCBhdGgza190
+YWJsZSk7DQo+ICANCj4gICNkZWZpbmUgQlRVU0JfQVRIMzAxMgkJMHg4MA0KPiArI2RlZmluZSBC
+VFVTQl9BVEgzMDA2CQkweDAxMDANCj4gIC8qIFRoaXMgdGFibGUgaXMgdG8gbG9hZCBwYXRjaCBh
+bmQgc3lzY29uZmlnIGZpbGVzDQo+ICAgKiBmb3IgQVIzMDEyICovDQo+ICBzdGF0aWMgc3RydWN0
+IHVzYl9kZXZpY2VfaWQgYXRoM2tfYmxpc3RfdGJsW10gPSB7DQo+ICANCj4gIAkvKiBBdGhlcm9z
+IEFSMzAxMiB3aXRoIHNmbGFzaCBmaXJtd2FyZSovDQo+ICAJeyBVU0JfREVWSUNFKDB4MGNmMywg
+MHgzMDA0KSwgLmRyaXZlcl9pbmZvID0gQlRVU0JfQVRIMzAxMiB9LA0KPiArCXsgVVNCX0RFVklD
+RSgweDBjZjMsIDB4MzAwNiksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0FUSDMwMDYgfSwNCj4gIA0K
+PiAgCXsgfQkvKiBUZXJtaW5hdGluZyBlbnRyeSAqLw0KPiAgfTsNCj4gIA0KPiArLyogQXRoZXJv
+cyBjb21wb3NpdGUgZGV2aWNlcyB0YWJsZQ0KPiArICovDQo+ICtzdGF0aWMgc3RydWN0IHVzYl9k
+ZXZpY2VfaWQgYXRoM2tfY29tcG9zaXRlX2RldmljZV90YWJsZVtdID0gew0KPiArDQo+ICsJeyBV
+U0JfREVWSUNFKDB4MGNmMywgMHgzMDA2KSB9LA0KPiArDQo+ICsJeyB9CS8qIFRlcm1pbmF0aW5n
+IGVudHJ5ICovDQo+ICt9Ow0KPiAgI2RlZmluZSBVU0JfUkVRX0RGVV9ETkxPQUQJMQ0KPiAgI2Rl
+ZmluZSBCVUxLX1NJWkUJCTQwOTYNCj4gICNkZWZpbmUgRldfSERSX1NJWkUJCTIwDQo+IEBAIC0z
+NjEsMTEgKzM3MywxOSBAQCBzdGF0aWMgaW50IGF0aDNrX3Byb2JlKHN0cnVjdCB1c2JfaW50ZXJm
+YWNlICppbnRmLA0KPiAgCWNvbnN0IHN0cnVjdCBmaXJtd2FyZSAqZmlybXdhcmU7DQo+ICAJc3Ry
+dWN0IHVzYl9kZXZpY2UgKnVkZXYgPSBpbnRlcmZhY2VfdG9fdXNiZGV2KGludGYpOw0KPiAgCWlu
+dCByZXQ7DQo+ICsJdW5zaWduZWQgY2hhciBmd19zdGF0ZTsNCj4gKwljb25zdCBzdHJ1Y3QgdXNi
+X2RldmljZV9pZCAqbWF0Y2hfY29tcF9kZXY7DQo+ICANCj4gIAlCVF9EQkcoImludGYgJXAgaWQg
+JXAiLCBpbnRmLCBpZCk7DQo+IC0NCj4gLQlpZiAoaW50Zi0+Y3VyX2FsdHNldHRpbmctPmRlc2Mu
+YkludGVyZmFjZU51bWJlciAhPSAwKQ0KPiAtCQlyZXR1cm4gLUVOT0RFVjsNCj4gKyAgICAvKiBG
+b3IgY29tcG9zaXRlIGRldmljZSAqLw0KPiArCW1hdGNoX2NvbXBfZGV2ID0gdXNiX21hdGNoX2lk
+KGludGYsIGF0aDNrX2NvbXBvc2l0ZV9kZXZpY2VfdGFibGUpOw0KPiArCWlmIChtYXRjaF9jb21w
+X2Rldikgew0KPiArCQlpZiAoaW50Zi0+Y3VyX2FsdHNldHRpbmctPmRlc2MuYkludGVyZmFjZU51
+bWJlciAhPSAyKQ0KPiArCQkJcmV0dXJuIC1FTk9ERVY7DQo+ICsJfSBlbHNlIHsNCj4gKwkJaWYg
+KGludGYtPmN1cl9hbHRzZXR0aW5nLT5kZXNjLmJJbnRlcmZhY2VOdW1iZXIgIT0gMCkNCj4gKwkJ
+CXJldHVybiAtRU5PREVWOw0KPiArCX0NCj4gIA0KPiAgCS8qIG1hdGNoIGRldmljZSBJRCBpbiBh
+dGgzayBibGFja2xpc3QgdGFibGUgKi8NCj4gIAlpZiAoIWlkLT5kcml2ZXJfaW5mbykgew0KPiBA
+QCAtMzk5LDYgKzQxOSw0NCBAQCBzdGF0aWMgaW50IGF0aDNrX3Byb2JlKHN0cnVjdCB1c2JfaW50
+ZXJmYWNlICppbnRmLA0KPiAgCQl9DQo+ICAJCWF0aDNrX3N3aXRjaF9waWQodWRldik7DQo+ICAJ
+CXJldHVybiAwOw0KPiArCX0gZWxzZSBpZiAoaWQtPmRyaXZlcl9pbmZvICYgQlRVU0JfQVRIMzAw
+Nikgew0KPiArDQo+ICsJCWlmIChsZTE2X3RvX2NwdSh1ZGV2LT5kZXNjcmlwdG9yLmJjZERldmlj
+ZSkgPiAweDAwMDEpIHsNCj4gKwkJCUJUX0VSUigiYXRoM2tfcHJvYmU6IHVkZXYtPmRlc2NyaXB0
+b3IuYmNkRGV2aWNlIik7DQo+ICsJCQlyZXR1cm4gLUVOT0RFVjsNCj4gKwkJfQ0KPiArCQlyZXQg
+PSBhdGgza19nZXRfc3RhdGUodWRldiwgJmZ3X3N0YXRlKTsNCj4gKwkJaWYgKHJldCA8IDApIHsN
+Cj4gKwkJCUJUX0VSUigiYXRoM2tfcHJvYmU6IGF0aDNrX2dldF9zdGF0ZSBlcnIiKTsNCj4gKwkJ
+CXJldHVybiByZXQ7DQo+ICsJCX0NCj4gKwkJaWYgKChmd19zdGF0ZSAmIEFUSDNLX01PREVfTUFT
+SykgPT0gQVRIM0tfUFJFQk9PVF9NT0RFKSB7DQo+ICsJCQlCVF9FUlIoImF0aDNrX3Byb2JlOiBm
+aXJtd2FyZSBhcmUgaW4gcHJlYm9vdCBtb2RlIG5vdyIpOw0KPiArCQkJQlRfRVJSKCJhdGgza19w
+cm9iZTogdHJ5IHRvIHN3aXRjaCB0byBOb3JtYWwgTW9kZSIpOw0KPiArCQkJcmV0ID0gYXRoM2tf
+c2V0X25vcm1hbF9tb2RlKHVkZXYpOw0KPiArCQkJaWYgKHJldCA8IDApIHsNCj4gKwkJCQlCVF9F
+UlIoImF0aDNrX3Byb2JlOiBzZXQgbm9ybWFsIG1vZGUgZmFpbGVkIik7DQo+ICsJCQkJcmV0dXJu
+IHJldDsNCj4gKwkJCX0NCj4gKwkJfQ0KPiArCQkvKk5vdGUgd2Ugc2hvdWxkIHdhaXQgZm9yIGEg
+d2hpbGUqLw0KPiArCQltZGVsYXkoMTAwKTsNCj4gKwkJcmV0ID0gYXRoM2tfbG9hZF9wYXRjaCh1
+ZGV2KTsNCj4gKwkJaWYgKHJldCA8IDApIHsNCj4gKwkJCUJUX0VSUigiYXRoM2tfcHJvYmU6IExv
+YWQgcGF0Y2ggZmlsZSBmYWlsZWQiKTsNCj4gKwkJCXJldHVybiByZXQ7DQo+ICsJCX0NCj4gKwkJ
+cmV0ID0gYXRoM2tfbG9hZF9zeXNjZmcodWRldik7DQo+ICsJCWlmIChyZXQgPCAwKSB7DQo+ICsJ
+CQlCVF9FUlIoImF0aDNrX3Byb2JlOiBMb2FkIHN5c2NvbmZpZyBmaWxlIGZhaWxlZCIpOw0KPiAr
+CQkJcmV0dXJuIHJldDsNCj4gKwkJfQ0KPiArCQlyZXQgPSBhdGgza19zd2l0Y2hfcGlkKHVkZXYp
+Ow0KPiArCQlpZiAocmV0IDwgMCkgew0KPiArCQkJQlRfRVJSKCJhdGgza19wcm9iZTogc3dpdGNo
+IHBpZCBmYWlsZWQiKTsNCj4gKwkJCXJldHVybiByZXQ7DQo+ICsJCX0NCj4gKwkJcmV0dXJuIDA7
+DQoNCllvdSBhcmUgZHVwbGljYXRpbmcgc29tZSBjb2RlIGhlcmUsIGNhcmUgdG8gbWVyZ2UgdGhl
+IGNvbW1vbiBwYXJ0cyBiZXR3ZWVuIHRoaXMgYW5kIHRoZSBoYW5kbGluZyBvZiBCVFVTQl9BVEgz
+MDEyPw0KDQoJR3VzdGF2bw0K
