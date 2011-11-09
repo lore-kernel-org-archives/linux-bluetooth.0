@@ -1,110 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJdJm_OVgJbGrBmTgTUFaRHazDBweSagPJE0UP0eXa4MVFm61A@mail.gmail.com>
-References: <1320835923-10989-1-git-send-email-sancane@gmail.com>
-	<1320835923-10989-2-git-send-email-sancane@gmail.com>
-	<CAJdJm_OVgJbGrBmTgTUFaRHazDBweSagPJE0UP0eXa4MVFm61A@mail.gmail.com>
-Date: Wed, 9 Nov 2011 15:44:09 +0100
-Message-ID: <CACLukzKhzKrH1htxNAAR2CtmzhxEQ6_VyMZUsssncWyXopaAJw@mail.gmail.com>
-Subject: Re: [PATCH 1/6] Manage GATT attribute indications in handle callback.
-From: Santiago Carot <sancane@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: Re: [PATCH 2/2] Bluetooth: mgmt_stop_discovery_failed()
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Wed, 09 Nov 2011 23:43:08 +0900
+In-Reply-To: <886E85F3-3878-4F83-B457-5C9EDA1597CF@openbossa.org>
+References: <1320792002-31151-1-git-send-email-andre.guedes@openbossa.org>
+	 <1320792002-31151-2-git-send-email-andre.guedes@openbossa.org>
+	 <1320824379.15441.321.camel@aeonflux>
+	 <886E85F3-3878-4F83-B457-5C9EDA1597CF@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1320849792.15441.338.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Andre,
 
-Please, see coments below,
+> >> This patches creates mgmt_stop_discovery_failed() which removes
+> >> pending MGMT_OP_STOP_DISCOVERY commands and sends proper command
+> >> status events.
+> >> 
+> >> This patch also fixes the MGMT_OP_STOP_DISCOVERY command leak in
+> >> case cancel inquiry fails.
+> >> 
+> >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> >> ---
+> >> include/net/bluetooth/hci_core.h |    1 +
+> >> net/bluetooth/hci_event.c        |    4 +++-
+> >> net/bluetooth/mgmt.c             |   15 +++++++++++++++
+> >> 3 files changed, 19 insertions(+), 1 deletions(-)
+> >> 
+> >> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> >> index 4e00ae0..dba10c6 100644
+> >> --- a/include/net/bluetooth/hci_core.h
+> >> +++ b/include/net/bluetooth/hci_core.h
+> >> @@ -932,6 +932,7 @@ int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 type, u8 *dev_class,
+> >> 							s8 rssi, u8 *eir);
+> >> int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
+> >> int mgmt_start_discovery_failed(u16 index, u8 status);
+> >> +int mgmt_stop_discovery_failed(u16 index, u8 status);
+> >> int mgmt_discovering(u16 index, u8 discovering);
+> >> int mgmt_device_blocked(u16 index, bdaddr_t *bdaddr);
+> >> int mgmt_device_unblocked(u16 index, bdaddr_t *bdaddr);
+> >> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> >> index e29a3b1..78ba9c8 100644
+> >> --- a/net/bluetooth/hci_event.c
+> >> +++ b/net/bluetooth/hci_event.c
+> >> @@ -55,8 +55,10 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+> >> 
+> >> 	BT_DBG("%s status 0x%x", hdev->name, status);
+> >> 
+> >> -	if (status)
+> >> +	if (status) {
+> >> +		mgmt_stop_discovery_failed(hdev->id, status);
+> >> 		return;
+> >> +	}
+> >> 
+> >> 	clear_bit(HCI_INQUIRY, &hdev->flags);
+> >> 
+> >> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> >> index dc938dc..d840600 100644
+> >> --- a/net/bluetooth/mgmt.c
+> >> +++ b/net/bluetooth/mgmt.c
+> >> @@ -2394,6 +2394,21 @@ int mgmt_start_discovery_failed(u16 index, u8 status)
+> >> 	return err;
+> >> }
+> >> 
+> >> +int mgmt_stop_discovery_failed(u16 index, u8 status)
+> >> +{
+> >> +	struct pending_cmd *cmd;
+> >> +	int err;
+> >> +
+> >> +	cmd = mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, index);
+> >> +	if (!cmd)
+> >> +		return -ENOENT;
+> >> +
+> >> +	err = cmd_status(cmd->sk, index, cmd->opcode, status);
+> >> +	mgmt_pending_remove(cmd);
+> >> +
+> >> +	return err;
+> >> +}
+> >> +
+> > 
+> > this looks like something that we might repeat over and over again.
+> > Would it not make sense to have a proper helper for this?
+> 
+> Yes, it seems we have three mgmt_*_failed functions that do the
+> same thing: find command, send cmd_status and remove command.
+> They are:
+> 
+> mgmt_disconnect_failed()
+> mgmt_start_discovery_failed()
+> mgmt_stop_discovery_failed()
+> 
+> We can create a helper function like mgmt_cmd_failed() that would
+> remove the command and would send the command status event. Then
+> we can do some refactoring in those three functions so they use
+> the mgmt_cmd_failed() function.
+> 
+> Since this patch fixes a mgmt command leak in the pending list
+> and the refactoring is not critical, IMO, we should apply it and
+> do the refactoring thing later.
 
-2011/11/9 Anderson Lizardo <anderson.lizardo@openbossa.org>:
-> Hi Santiago,
->
-> On Wed, Nov 9, 2011 at 6:51 AM, Santiago Carot-Nemesio
-> <sancane@gmail.com> wrote:
->> +static gint cmp_char_val_handle(gconstpointer a, gconstpointer b)
->> +{
->> +       const struct characteristic *ch = a;
->> +       const uint16_t *handle = b;
->> +
->> +       if (ch->attr.value_handle == *handle)
->> +               return 0;
->> +
->> +       return -1;
->> +}
->
-> Usually we implement the function above as:
->
-> return ch->attr.value_handle - *handle;
->
-> It will work exactly as your code.
->
-
-ok, that's only a nitpick.
-
-
->>  static void ind_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
->>  {
->> -       /* TODO: Process indication */
->> +       struct thermometer *t = user_data;
->> +       const struct characteristic *ch;
->> +       uint8_t opdu[ATT_MAX_MTU];
->> +       uint16_t handle, olen;
->> +       GSList *l;
->> +
->> +       if (len < 3) {
->> +               DBG("Bad pdu received");
->> +               goto done;
->> +       }
->
-> Are you sure we should send a confirmation even if the PDU received is
-> invalid? What if it is not even an indication (you only check below)?
-
-This callback is supposed only to manage indications not notifications:
-in the code:
-...
-g_attrib_register(t->attrib, ATT_OP_HANDLE_IND,
-							ind_handler, t, NULL);
-
-Shall I expect another kind of notifications even if I have not
-indicated it when I registered the callback?
-
->
->> +
->> +       if (pdu[0] != ATT_OP_HANDLE_IND) {
->> +               DBG("Not indication received");
->> +               return;
->> +       }
->
-> I suggest a more descriptive debug message here, something like:
->
-> DBG("Unexpected ATT opcode: 0x%02x", pdu[0]);
->
-
-OK, no problem.
-
->> +
->> +       handle = att_get_u16(&pdu[1]);
->> +       l = g_slist_find_custom(t->chars, &handle, cmp_char_val_handle);
->> +       if (l == NULL)
->> +               goto done;
->
-> Again, should we send a confirmation to the thermometer even if the
-> indication's handle does not match any characteristic value?
->
-> (note I didn't read the thermometer profile spec carefully yet. Not
-> sure if it covers invalid PDUs.)
->
-
-As far as I know, the thermometer spec is not focused in such kind of
-GATT details, so I guess it will depend of the implementation.  If we
-don't send a reply to that indication the remote side will close the
-connection when the timeout expired. So here is the question: what
-would we rather do, to keep the connection alive or to let the remote
-side to close it?
-
-Waiting comments.
+if you send the re-factoring patch right away, I am fine if we go ahead
+with this patch. However some time later is not acceptable. If we do
+that, then this gets forgotten and next time you add another function
+that does exactly the same thing.
 
 Regards
-Santiago
+
+Marcel
+
+
