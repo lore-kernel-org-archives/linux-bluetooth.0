@@ -1,52 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <5b8fef65004ab00b22b5bb4484d0d79e@mail.hendrik-sattler.de>
+In-Reply-To: <CAJdJm_PNH-1EZqVZp8ZXkU94p6cHJ-3yDcQ4srCX-JwTOSctXg@mail.gmail.com>
 References: <1320835923-10989-1-git-send-email-sancane@gmail.com>
-	<1320835923-10989-2-git-send-email-sancane@gmail.com>
-	<CAJdJm_OVgJbGrBmTgTUFaRHazDBweSagPJE0UP0eXa4MVFm61A@mail.gmail.com>
-	<61c23c74e4beaa75fd2cf48a13012190@mail.hendrik-sattler.de>
-	<CAJdJm_PDwZNJM2Ws2=bO_kF=vVASaBY3nPjEDgS3xWqLtPXv+A@mail.gmail.com>
-	<5b8fef65004ab00b22b5bb4484d0d79e@mail.hendrik-sattler.de>
-Date: Wed, 9 Nov 2011 10:17:17 -0400
-Message-ID: <CAJdJm_NWVP+yKufGho+8GUqotMugiDQjzKNrTM-6OkZC6LhQKA@mail.gmail.com>
-Subject: Re: [PATCH 1/6] Manage GATT attribute indications in handle callback.
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Hendrik Sattler <post@hendrik-sattler.de>
+	<CAJdJm_PNH-1EZqVZp8ZXkU94p6cHJ-3yDcQ4srCX-JwTOSctXg@mail.gmail.com>
+Date: Wed, 9 Nov 2011 15:03:17 +0100
+Message-ID: <CACLukzKUXMPqDjghjXx1cm1T_b95CsH=s5Sg8HcxCBFm4BxWCw@mail.gmail.com>
+Subject: Re: Health Thermometer Profile (HTP)
+From: Santiago Carot <sancane@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hendrik,
+Hi Anderson
 
-On Wed, Nov 9, 2011 at 9:53 AM, Hendrik Sattler <post@hendrik-sattler.de> wrote:
->> The idea here is to return 0 if they are same or non zero if they are
->> not same. The actual sign is not relevant because the comparison is
->> for finding items, not sorting them (in this case).
+2011/11/9 Anderson Lizardo <anderson.lizardo@openbossa.org>:
+> Hi Santiago,
 >
-> Kind of a lazy approach, no?
-> Ah well...
+> On Wed, Nov 9, 2011 at 6:51 AM, Santiago Carot-Nemesio
+> <sancane@gmail.com> wrote:
+>> This is a new set of patches to enhance thermometer plugin fuctionality.
+>> These patches enable watchers to receiave final/intermediate measurements
+>> from thermometers devices.
+>
+> Out of curiosity, with this latest series, will we be able to use LE
+> Health Thermometers? Or do you still have pending items?
+>
 
-I agree with you, and maybe it is even risky if soneone reuses these
-functions for list sorting as well without extending them, but this is
-the current procedure on BlueZ as a whole:
+Yes, of course, with these set of patches you should able to use a Thermometer.
 
-$ grep -R 'return.*handle - ' src/ attrib/
-src/sdpd-database.c:	return rec1->handle - rec2->handle;
-src/sdpd-database.c:	return rec1->handle - rec2->handle;
-src/device.c:	return r1->handle - r2->handle;
-src/attrib-server.c:	return attrib->handle - handle;
-src/attrib-server.c:	return attrib1->handle - attrib2->handle;
-attrib/client.c:	return chr->handle - handle;
+> It would be nice if you share your TODO list regarding this profile,
+> or current limitations (if any), on each series you send.
 
-(all these handles are unsigned.)
+Ok,
 
-Note that I'm not defending the current usage, but then it would need
-be "fixed" in a separate commit to fix all cases and maintain
-consistency.
+At present, I'm working on this repository:
+https://github.com/sancane/BlueZ
 
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+There you will able to see the current status of the plugin
+implementation, there you can also find some pending patches wich I've
+not yet submited to the list and so on.
+
+On the other hand, there is nothing left more in my TODO list than
+finishing the HTP implementation :-P
+
+Regards.
+
+>
+>> [PATCH 1/6] Manage GATT attribute indications in handle callback.
+>> [PATCH 2/6] Parse final measurement indication
+>> [PATCH 3/6] Add org.bluez.ThermometerWatcher interface to default
+>> [PATCH 4/6] Implement EnableIntermediateMeasurement D-Bus method
+>> [PATCH 5/6] Implement DisableIntermediateMeasurement D-Bus method
+>> [PATCH 6/6] Notify intermediate measurements
+>
+> Regards,
+> --
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
+>
