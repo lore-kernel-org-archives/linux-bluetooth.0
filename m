@@ -1,15 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: btusb: Add support for Qualcomm Atheros
- composite chip 3006
+Subject: Re: [PATCH] Bluetooth: ath3k: Add support for Qualcomm Atheros 3006
 From: Marcel Holtmann <marcel@holtmann.org>
 To: "Yao, Costa" <cqyao@qca.qualcomm.com>
 Cc: "padovan@profusion.mobi" <padovan@profusion.mobi>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 09 Nov 2011 16:48:33 +0900
-In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DEE9C9B@nasanexd02b.na.qualcomm.com>
-References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEE9C9B@nasanexd02b.na.qualcomm.com>
+Date: Wed, 09 Nov 2011 16:44:32 +0900
+In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DEE9C89@nasanexd02b.na.qualcomm.com>
+References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEE9C89@nasanexd02b.na.qualcomm.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1320824916.15441.328.camel@aeonflux>
+Message-ID: <1320824675.15441.324.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -18,129 +17,139 @@ Hi Costa,
 
 > AR3006 is a composite device, and interface 0 is used for hid function, not for bluetooth function.
 > We should make the following changes:
-> 1 Blacklist AR3006 PID/VID in btusb_table
-> 2 Add composite_device_table in btusb.c to register composite device
-> 3 For AR3006 composite device, interface 3 is used for data->isoc
+> 1 Blacklist AR3006 PID/VID in ath3k_table
+> 2 Add ath3k_composite_device_table in ath3k.c to register composite device.
+> 3 Load patch and sysconfig files for AR3006
 > 
 > Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
 > ---
->  drivers/bluetooth/btusb.c |   37 ++++++++++++++++++++++++++++++++++++-
->  1 files changed, 36 insertions(+), 1 deletions(-)
+>  drivers/bluetooth/ath3k.c |   64 ++++++++++++++++++++++++++++++++++++++++++--
+>  1 files changed, 61 insertions(+), 3 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 9db2476..d306dec 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -55,6 +55,7 @@ static struct usb_driver btusb_driver;
->  #define BTUSB_BROKEN_ISOC	0x20
->  #define BTUSB_WRONG_SCO_MTU	0x40
+> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> index 1622772..a9d6678 100644
+> --- a/drivers/bluetooth/ath3k.c
+> +++ b/drivers/bluetooth/ath3k.c
+> @@ -40,6 +40,7 @@
+>  
+>  #define ATH3K_MODE_MASK				0x3F
+>  #define ATH3K_NORMAL_MODE			0x0E
+> +#define ATH3K_PREBOOT_MODE			0x0D
+>  
+>  #define ATH3K_PATCH_UPDATE			0x80
+>  #define ATH3K_SYSCFG_UPDATE			0x40
+> @@ -71,6 +72,7 @@ static struct usb_device_id ath3k_table[] = {
+>  
+>  	/* Atheros AR3012 with sflash firmware*/
+>  	{ USB_DEVICE(0x0CF3, 0x3004) },
+> +	{ USB_DEVICE(0x0CF3, 0x3006) },
+
+why not use .driver_info here as well.
+ 
+>  	/* Atheros AR5BBU12 with sflash firmware */
+>  	{ USB_DEVICE(0x0489, 0xE02C) },
+> @@ -81,16 +83,26 @@ static struct usb_device_id ath3k_table[] = {
+>  MODULE_DEVICE_TABLE(usb, ath3k_table);
+>  
 >  #define BTUSB_ATH3012		0x80
 > +#define BTUSB_ATH3006		0x0100
+>  /* This table is to load patch and sysconfig files
+>   * for AR3012 */
+>  static struct usb_device_id ath3k_blist_tbl[] = {
 >  
->  static struct usb_device_id btusb_table[] = {
->  	/* Generic Bluetooth USB device */
-> @@ -100,6 +101,9 @@ static struct usb_device_id btusb_table[] = {
->  	/* Canyon CN-BTU1 with HID interfaces */
->  	{ USB_DEVICE(0x0c10, 0x0000) },
->  
-> +	/* Qualcomm Atheros with HID interfaces */
-> +	{ USB_DEVICE(0x0cf3, 0x3006) },
-> +
->  	{ }	/* Terminating entry */
->  };
->  
-> @@ -122,6 +126,7 @@ static struct usb_device_id blacklist_table[] = {
->  
->  	/* Atheros 3012 with sflash firmware */
+>  	/* Atheros AR3012 with sflash firmware*/
 >  	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
 > +	{ USB_DEVICE(0x0cf3, 0x3006), .driver_info = BTUSB_ATH3006 },
 >  
->  	/* Atheros AR5BBU12 with sflash firmware */
->  	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
-> @@ -179,6 +184,18 @@ static struct usb_device_id blacklist_table[] = {
 >  	{ }	/* Terminating entry */
 >  };
-
-I do not understand why the device has to be in both tables. That makes
-no sense to me.
- 
-> +/*
-> + * For composite device, interface 0 may be not for bluetooth function.
-> + * It is better to let the vendor code to handle this situation.
-> + * So, we use composite_device_table to record the composite devices.
+>  
+> +/* Atheros composite devices table
 > + */
-> +static struct usb_device_id composite_device_table[] = {
-> +	/* Qualcomm Atheros composite device 3006 */
+> +static struct usb_device_id ath3k_composite_device_table[] = {
+> +
 > +	{ USB_DEVICE(0x0cf3, 0x3006) },
 > +
 > +	{ }	/* Terminating entry */
 > +};
-> +
 
-And again, another 3rd table with the same entry. Why do you need this?
+I don't see a point in having another table here. Why can we not use the
+driver table?
 
->  #define BTUSB_MAX_ISOC_FRAMES	10
->  
->  #define BTUSB_INTR_RUNNING	0
-> @@ -912,13 +929,25 @@ static int btusb_probe(struct usb_interface *intf,
->  	struct btusb_data *data;
->  	struct hci_dev *hdev;
->  	int i, err;
+>  #define USB_REQ_DFU_DNLOAD	1
+>  #define BULK_SIZE		4096
+>  #define FW_HDR_SIZE		20
+> @@ -361,11 +373,19 @@ static int ath3k_probe(struct usb_interface *intf,
+>  	const struct firmware *firmware;
+>  	struct usb_device *udev = interface_to_usbdev(intf);
+>  	int ret;
+> +	unsigned char fw_state;
 > +	const struct usb_device_id *match_comp_dev;
 >  
 >  	BT_DBG("intf %p id %p", intf, id);
->  
-> +	/* For composite device
-> +	* it may not the case that interface 0 is for bluetooth function.
-> +	*/
-> +	match_comp_dev = usb_match_id(intf, composite_device_table);
+> -
+> -	if (intf->cur_altsetting->desc.bInterfaceNumber != 0)
+> -		return -ENODEV;
+> +    /* For composite device */
+> +	match_comp_dev = usb_match_id(intf, ath3k_composite_device_table);
 > +	if (match_comp_dev) {
 > +		if (intf->cur_altsetting->desc.bInterfaceNumber != 2)
 > +			return -ENODEV;
-> +		goto match_id;
+> +	} else {
+> +		if (intf->cur_altsetting->desc.bInterfaceNumber != 0)
+> +			return -ENODEV;
 > +	}
-> +
-
-So seriously, this can be done via the main table and .driver_info. The
-composite table is total waste.
-
->  	/* interface numbers are hardcoded in the spec */
->  	if (intf->cur_altsetting->desc.bInterfaceNumber != 0)
->  		return -ENODEV;
 >  
-> +match_id:
-
-I do not like this forward jump.
-
+>  	/* match device ID in ath3k blacklist table */
 >  	if (!id->driver_info) {
->  		const struct usb_device_id *match;
->  		match = usb_match_id(intf, blacklist_table);
-> @@ -938,7 +967,8 @@ static int btusb_probe(struct usb_interface *intf,
->  	if (ignore_sniffer && id->driver_info & BTUSB_SNIFFER)
->  		return -ENODEV;
->  
-> -	if (id->driver_info & BTUSB_ATH3012) {
-> +	if ((id->driver_info & BTUSB_ATH3012) ||
-> +				(id->driver_info & BTUSB_ATH3006)) {
->  		struct usb_device *udev = interface_to_usbdev(intf);
->  
->  		/* Old firmware would otherwise let ath3k driver load
-> @@ -1062,6 +1092,11 @@ static int btusb_probe(struct usb_interface *intf,
+> @@ -399,6 +419,44 @@ static int ath3k_probe(struct usb_interface *intf,
 >  		}
->  	}
->  
-> +	if (id->driver_info & BTUSB_ATH3006) {
-> +		BT_ERR("hardcoded: Interface 3");
-> +		data->isoc = usb_ifnum_to_if(data->udev, 3);
-> +	}
+>  		ath3k_switch_pid(udev);
+>  		return 0;
+> +	} else if (id->driver_info & BTUSB_ATH3006) {
 > +
->  	if (data->isoc) {
->  		err = usb_driver_claim_interface(&btusb_driver,
->  							data->isoc, data);
+> +		if (le16_to_cpu(udev->descriptor.bcdDevice) > 0x0001) {
+> +			BT_ERR("ath3k_probe: udev->descriptor.bcdDevice");
+> +			return -ENODEV;
+> +		}
+> +		ret = ath3k_get_state(udev, &fw_state);
+> +		if (ret < 0) {
+> +			BT_ERR("ath3k_probe: ath3k_get_state err");
+> +			return ret;
+> +		}
+> +		if ((fw_state & ATH3K_MODE_MASK) == ATH3K_PREBOOT_MODE) {
+> +			BT_ERR("ath3k_probe: firmware are in preboot mode now");
+> +			BT_ERR("ath3k_probe: try to switch to Normal Mode");
+> +			ret = ath3k_set_normal_mode(udev);
+> +			if (ret < 0) {
+> +				BT_ERR("ath3k_probe: set normal mode failed");
+> +				return ret;
+> +			}
+> +		}
+> +		/*Note we should wait for a while*/
+> +		mdelay(100);
+> +		ret = ath3k_load_patch(udev);
+> +		if (ret < 0) {
+> +			BT_ERR("ath3k_probe: Load patch file failed");
+> +			return ret;
+> +		}
+> +		ret = ath3k_load_syscfg(udev);
+> +		if (ret < 0) {
+> +			BT_ERR("ath3k_probe: Load sysconfig file failed");
+> +			return ret;
+> +		}
+> +		ret = ath3k_switch_pid(udev);
+> +		if (ret < 0) {
+> +			BT_ERR("ath3k_probe: switch pid failed");
+> +			return ret;
+> +		}
+> +		return 0;
+>  	}
 
-Actually I am more and more thinking that something is done here way too
-complicated. Please post the /proc/bus/usb/devices content for this
-device before and after firmware got loaded.
+This code is horrible. Can you please use the core table and
+utilize .driver_info. And then you might wanna split this extra handling
+into a separate function and not just hack it in via one big if
+statement.
 
 Regards
 
