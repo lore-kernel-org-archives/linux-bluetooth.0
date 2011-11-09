@@ -1,35 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 Nov 2011 12:34:44 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] Bluetooth: Add missing hci_dev locking when calling
- mgmt functions
-Message-ID: <20111109143444.GG25584@joana>
-References: <1320777616-15794-1-git-send-email-johan.hedberg@gmail.com>
- <1320777616-15794-3-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320777616-15794-3-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <5b8fef65004ab00b22b5bb4484d0d79e@mail.hendrik-sattler.de>
+References: <1320835923-10989-1-git-send-email-sancane@gmail.com>
+	<1320835923-10989-2-git-send-email-sancane@gmail.com>
+	<CAJdJm_OVgJbGrBmTgTUFaRHazDBweSagPJE0UP0eXa4MVFm61A@mail.gmail.com>
+	<61c23c74e4beaa75fd2cf48a13012190@mail.hendrik-sattler.de>
+	<CAJdJm_PDwZNJM2Ws2=bO_kF=vVASaBY3nPjEDgS3xWqLtPXv+A@mail.gmail.com>
+	<5b8fef65004ab00b22b5bb4484d0d79e@mail.hendrik-sattler.de>
+Date: Wed, 9 Nov 2011 10:17:17 -0400
+Message-ID: <CAJdJm_NWVP+yKufGho+8GUqotMugiDQjzKNrTM-6OkZC6LhQKA@mail.gmail.com>
+Subject: Re: [PATCH 1/6] Manage GATT attribute indications in handle callback.
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Hendrik Sattler <post@hendrik-sattler.de>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Hendrik,
 
-* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-11-08 20:40:16 +0200]:
+On Wed, Nov 9, 2011 at 9:53 AM, Hendrik Sattler <post@hendrik-sattler.de> wrote:
+>> The idea here is to return 0 if they are same or non zero if they are
+>> not same. The actual sign is not relevant because the comparison is
+>> for finding items, not sorting them (in this case).
+>
+> Kind of a lazy approach, no?
+> Ah well...
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> Now that the pending commands are within struct hci_dev we can properly
-> control access to them throught the hci_dev locking mechanism.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  net/bluetooth/hci_core.c  |   12 ++++++++++--
->  net/bluetooth/hci_event.c |   45 ++++++++++++++++++++++++++++++++++++++++-----
->  net/bluetooth/mgmt.c      |   13 +++++++------
->  3 files changed, 57 insertions(+), 13 deletions(-)
+I agree with you, and maybe it is even risky if soneone reuses these
+functions for list sorting as well without extending them, but this is
+the current procedure on BlueZ as a whole:
 
-The 3 patches where applied, thanks.
+$ grep -R 'return.*handle - ' src/ attrib/
+src/sdpd-database.c:	return rec1->handle - rec2->handle;
+src/sdpd-database.c:	return rec1->handle - rec2->handle;
+src/device.c:	return r1->handle - r2->handle;
+src/attrib-server.c:	return attrib->handle - handle;
+src/attrib-server.c:	return attrib1->handle - attrib2->handle;
+attrib/client.c:	return chr->handle - handle;
 
-	Gustavo
+(all these handles are unsigned.)
+
+Note that I'm not defending the current usage, but then it would need
+be "fixed" in a separate commit to fix all cases and maintain
+consistency.
+
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
