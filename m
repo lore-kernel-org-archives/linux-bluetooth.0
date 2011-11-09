@@ -1,35 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 2/3] Bluetooth: Remove redundant hci_dev comparisons in
- mgmt lookups
+Subject: Re: [PATCH 1/3] Bluetooth: Fix consistency with u16 integer type in
+ mgmt pending_cmd
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Gustavo Padovan <padovan@profusion.mobi>
-Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
-Date: Wed, 09 Nov 2011 23:46:11 +0900
-In-Reply-To: <20111109143831.GI25584@joana>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 09 Nov 2011 23:45:24 +0900
+In-Reply-To: <1320839938-24873-1-git-send-email-johan.hedberg@gmail.com>
 References: <1320839938-24873-1-git-send-email-johan.hedberg@gmail.com>
-	 <1320839938-24873-2-git-send-email-johan.hedberg@gmail.com>
-	 <20111109143831.GI25584@joana>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1320849974.15441.341.camel@aeonflux>
+Message-ID: <1320849927.15441.340.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Johan,
 
-> > Now that pending commands are hci_dev specific there's no need to check
-> > whether a command matches hci_dev when iterating through them.
-> > 
-> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> > ---
-> >  net/bluetooth/mgmt.c |   15 ++-------------
-> >  1 files changed, 2 insertions(+), 13 deletions(-)
+> For consistency the integer type should be u16 and not __u16.
 > 
-> Patch 1 and 2 were applied, thanks. 
-> I'll leave patch 3 here for more one or two days in case someone has a comment
-> to do. It's fine with me btw.
-
-this is fine with me as well.
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/mgmt.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
