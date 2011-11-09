@@ -1,52 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: [PATCH] Bluetooth: btusb: Add support for Qualcomm Atheros
- composite chip 3006
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Yao, Costa" <cqyao@qca.qualcomm.com>
-Cc: "padovan@profusion.mobi" <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Fan, Hong" <hongfan@qca.qualcomm.com>,
-	"Wu, Frank" <fanwu@qca.qualcomm.com>,
-	"Chen, Jack" <skchen@qca.qualcomm.com>,
-	"Chang, Robert" <rwchang@qca.qualcomm.com>,
-	"Wang, Tom" <taowang@qca.qualcomm.com>,
-	"Liu, Haijun" <haijun@qca.qualcomm.com>,
-	"QCA.Mgr.Haijun.Liu-All" <QCA.Mgr.Haijun.Liu-All@qualcomm.com>
-Date: Wed, 09 Nov 2011 23:41:40 +0900
-In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DEE9DC0@nasanexd02b.na.qualcomm.com>
-References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEE9C9B@nasanexd02b.na.qualcomm.com>
-	 <1320824916.15441.328.camel@aeonflux>
-	 <07BBB2AAB1A10A488A2AD166C7CB8B0DEE9DC0@nasanexd02b.na.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1320849706.15441.336.camel@aeonflux>
-Mime-Version: 1.0
+Date: Wed, 9 Nov 2011 12:40:29 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Bluetooth: Rename mgmt_inquiry_failed()
+Message-ID: <20111109144028.GJ25584@joana>
+References: <1320792002-31151-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1320792002-31151-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Costa,
+Hi Andre,
 
-please do not top post on this mailing list. Otherwise I am just
-ignoring your emails from the next time.
+* Andre Guedes <andre.guedes@openbossa.org> [2011-11-08 19:40:01 -0300]:
 
-> For your first comment, 
-> Yes, we can just add device with .driver_info in btusb_table, not in blacklist_table.
+> This patch renames the function mgmt_inquiry_failed() to
+> mgmt_start_discovery_failed(). This function is more related
+> to MGMT_OP_START_DISCOVERY command handling than to inquiry.
+> Besides, this functions will be reused by LE based discovery
+> procedures in case of failure.
 > 
-> For your other comments,
-> As the device has 4 USB interfaces and interface 2 is for Bluetooth function. We need to bypass the IF state in btusb.c as follow:
->       if (intf->cur_altsetting->desc.bInterfaceNuber !=0)
->       return -ENODEV;
->    
-> So we use a composite_device_table matching mechanism and use forward jump to bypass the bInterfaceNumber check.
-> And other vendors also can add their composite device in the composite_device_table to bypass the check.
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  include/net/bluetooth/hci_core.h |    2 +-
+>  net/bluetooth/hci_event.c        |    2 +-
+>  net/bluetooth/mgmt.c             |    2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
 
-And this can also be done via the .driver_info to select what interfaces
-to expect. So please get rid of the composite table.
+It doesn't apply anymore, please rebase on top of bluetooth-next and resend.
+Thanks.
 
-And post the content of /proc/bus/usb/devices so that I see how your
-enpoints do look like.
-
-Regards
-
-Marcel
-
-
+	Gustavo
