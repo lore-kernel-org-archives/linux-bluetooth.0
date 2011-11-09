@@ -1,34 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/2] Bluetooth: Rename mgmt_inquiry_failed()
+Subject: Re: [PATCH 3/3] Bluetooth: Add missing hci_dev locking when calling
+ mgmt functions
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+To: johan.hedberg@gmail.com
 Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 09 Nov 2011 16:38:17 +0900
-In-Reply-To: <1320792002-31151-1-git-send-email-andre.guedes@openbossa.org>
-References: <1320792002-31151-1-git-send-email-andre.guedes@openbossa.org>
+Date: Wed, 09 Nov 2011 16:36:42 +0900
+In-Reply-To: <1320777616-15794-3-git-send-email-johan.hedberg@gmail.com>
+References: <1320777616-15794-1-git-send-email-johan.hedberg@gmail.com>
+	 <1320777616-15794-3-git-send-email-johan.hedberg@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1320824300.15441.319.camel@aeonflux>
+Message-ID: <1320824205.15441.317.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Johan,
 
-> This patch renames the function mgmt_inquiry_failed() to
-> mgmt_start_discovery_failed(). This function is more related
-> to MGMT_OP_START_DISCOVERY command handling than to inquiry.
-> Besides, this functions will be reused by LE based discovery
-> procedures in case of failure.
+> Now that the pending commands are within struct hci_dev we can properly
+> control access to them throught the hci_dev locking mechanism.
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  include/net/bluetooth/hci_core.h |    2 +-
->  net/bluetooth/hci_event.c        |    2 +-
->  net/bluetooth/mgmt.c             |    2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
+>  net/bluetooth/hci_core.c  |   12 ++++++++++--
+>  net/bluetooth/hci_event.c |   45 ++++++++++++++++++++++++++++++++++++++++-----
+>  net/bluetooth/mgmt.c      |   13 +++++++------
+>  3 files changed, 57 insertions(+), 13 deletions(-)
 
-the name change makes sense to be. I hope it also leads to avoiding code
-duplication here in the long run.
+looks good to me.
 
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
