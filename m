@@ -1,33 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 Nov 2011 12:35:58 -0200
+Date: Wed, 9 Nov 2011 12:34:44 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
 To: johan.hedberg@gmail.com
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix cancel_delayed_work_sync usage with locks
-Message-ID: <20111109143558.GH25584@joana>
-References: <1320795862-18741-1-git-send-email-johan.hedberg@gmail.com>
+Subject: Re: [PATCH 3/3] Bluetooth: Add missing hci_dev locking when calling
+ mgmt functions
+Message-ID: <20111109143444.GG25584@joana>
+References: <1320777616-15794-1-git-send-email-johan.hedberg@gmail.com>
+ <1320777616-15794-3-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320795862-18741-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1320777616-15794-3-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-11-09 01:44:22 +0200]:
+* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-11-08 20:40:16 +0200]:
 
 > From: Johan Hedberg <johan.hedberg@intel.com>
 > 
-> The cancel_delayed_work_sync function should not be used if we hold any
-> locks. Luckily all places where this is the case it is also safe to use
-> the non-sync version.
+> Now that the pending commands are within struct hci_dev we can properly
+> control access to them throught the hci_dev locking mechanism.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  net/bluetooth/hci_core.c |    6 +++---
->  net/bluetooth/mgmt.c     |    4 ++--
->  2 files changed, 5 insertions(+), 5 deletions(-)
+>  net/bluetooth/hci_core.c  |   12 ++++++++++--
+>  net/bluetooth/hci_event.c |   45 ++++++++++++++++++++++++++++++++++++++++-----
+>  net/bluetooth/mgmt.c      |   13 +++++++------
+>  3 files changed, 57 insertions(+), 13 deletions(-)
 
-Applied, thanks.
+The 3 patches where applied, thanks.
 
 	Gustavo
