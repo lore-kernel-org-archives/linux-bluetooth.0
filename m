@@ -2,203 +2,117 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 2/6] Parse final measurement indication
-Date: Wed,  9 Nov 2011 11:51:59 +0100
-Message-Id: <1320835923-10989-3-git-send-email-sancane@gmail.com>
-In-Reply-To: <1320835923-10989-2-git-send-email-sancane@gmail.com>
+Subject: [PATCH 5/6] Implement DisableIntermediateMeasurement D-Bus method
+Date: Wed,  9 Nov 2011 11:52:02 +0100
+Message-Id: <1320835923-10989-6-git-send-email-sancane@gmail.com>
+In-Reply-To: <1320835923-10989-5-git-send-email-sancane@gmail.com>
 References: <1320835923-10989-1-git-send-email-sancane@gmail.com>
  <1320835923-10989-2-git-send-email-sancane@gmail.com>
+ <1320835923-10989-3-git-send-email-sancane@gmail.com>
+ <1320835923-10989-4-git-send-email-sancane@gmail.com>
+ <1320835923-10989-5-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- thermometer/thermometer.c |  154 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 153 insertions(+), 1 deletions(-)
+ thermometer/thermometer.c |   63 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 files changed, 60 insertions(+), 3 deletions(-)
 
 diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
-index 0928f15..3a82e20 100644
+index 2472f1e..849b040 100644
 --- a/thermometer/thermometer.c
 +++ b/thermometer/thermometer.c
-@@ -47,6 +47,13 @@
- #define INTERMEDIATE_TEMPERATURE_UUID	"00002a1e-0000-1000-8000-00805f9b34fb"
- #define MEASUREMENT_INTERVAL_UUID	"00002a21-0000-1000-8000-00805f9b34fb"
- 
-+/* Temperature measurement flag fields */
-+#define TEMP_UNITS		0x01
-+#define TEMP_TIME_STAMP		0x02
-+#define TEMP_TYPE		0x04
-+
-+#define FLOAT_MAX_MANTISSA	16777216 /* 2^24 */
-+
- struct thermometer {
- 	DBusConnection		*conn;		/* The connection to the bus */
- 	struct btd_device	*dev;		/* Device reference */
-@@ -84,8 +91,36 @@ struct watcher {
- 	gchar			*path;
- };
- 
-+struct measurement {
-+	gint16		exp;
-+	gint32		mant;
-+	guint64		time;
-+	gboolean	suptime;
-+	gchar		*unit;
-+	gchar		*type;
-+	gchar		*msmnt;
-+};
-+
- static GSList *thermometers = NULL;
- 
-+static gchar *temptype2str(uint8_t value)
-+{
-+	switch (value) {
-+	case 1: return "Armpit";
-+	case 2: return "Body";
-+	case 3: return "Ear";
-+	case 4: return "Finger";
-+	case 5: return "Intestines";
-+	case 6: return "Mouth";
-+	case 7: return "Rectum";
-+	case 8: return "Toe";
-+	case 9: return "Tympanum";
-+	default:
-+		error("Temperature type %d reserved for future use", value);
-+		return NULL;
-+	};
-+}
-+
- static void destroy_watcher(gpointer user_data)
- {
- 	struct watcher *watcher = user_data;
-@@ -714,10 +749,127 @@ static GDBusSignalTable thermometer_signals[] = {
- 	{ }
- };
- 
-+static void update_watcher(struct watcher *w, struct measurement *m)
-+{
-+	DBusConnection *conn = w->t->conn;
-+	DBusMessageIter iter;
-+	DBusMessageIter dict;
-+	DBusMessage *msg;
-+
-+	msg = dbus_message_new_method_call(w->srv, w->path,
-+				"org.bluez.ThermometerWatcher",
-+				"MeasurementReceived");
-+	if (msg == NULL)
-+		return;
-+
-+	dbus_message_iter_init_append(msg, &iter);
-+
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-+			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-+			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
-+
-+	dict_append_entry(&dict, "Exponent", DBUS_TYPE_INT16, &m->exp);
-+	dict_append_entry(&dict, "Mantissa", DBUS_TYPE_INT32, &m->mant);
-+	dict_append_entry(&dict, "Unit", DBUS_TYPE_STRING, &m->unit);
-+
-+	if (m->suptime)
-+		dict_append_entry(&dict, "Time", DBUS_TYPE_UINT64, &m->time);
-+
-+	dict_append_entry(&dict, "Type", DBUS_TYPE_STRING, &m->type);
-+	dict_append_entry(&dict, "Measurement", DBUS_TYPE_STRING, &m->msmnt);
-+
-+	dbus_message_iter_close_container(&iter, &dict);
-+
-+	dbus_message_set_no_reply(msg, TRUE);
-+	g_dbus_send_message(conn, msg);
-+}
-+
-+static void recv_measurement(struct thermometer *t, struct measurement *msmt)
-+{
-+	GSList *l;
-+
-+	if (g_strcmp0(msmt->msmnt, "Intermediate") == 0) {
-+		DBG("Notification of intermediate measurement not implemented");
-+		return;
-+	}
-+
-+	for (l = t->fwatchers; l; l = l->next)
-+		update_watcher(l->data, msmt);
-+}
-+
- static void proc_measurement(struct thermometer *t, const uint8_t *pdu,
- 						uint16_t len, gboolean final)
- {
--	DBG("TODO: Process measurement indication");
-+	struct measurement msmt;
-+	uint8_t flags;
-+	uint32_t raw;
-+
-+	if (len < 4) {
-+		DBG("Mandatory flags are not provided");
-+		return;
-+	}
-+
-+	flags = pdu[3];
-+	if (flags & TEMP_UNITS)
-+		msmt.unit = "Fahrenheit";
-+	else
-+		msmt.unit = "Celsius";
-+
-+	if (len < 8) {
-+		DBG("Temperature measurement value is not provided");
-+		return;
-+	}
-+
-+	raw = att_get_u32(&pdu[4]);
-+	msmt.mant = raw & 0x00FFFFFF;
-+	msmt.exp = ((gint32) raw) >> 24;
-+
-+	if (msmt.mant & 0x00800000) {
-+		/* convert to C2 negative value */
-+		msmt.mant = msmt.mant - FLOAT_MAX_MANTISSA;
-+	}
-+
-+	if (flags & TEMP_TIME_STAMP) {
-+		struct tm ts;
-+		time_t time;
-+
-+		if (len < 15) {
-+			DBG("Can't get time stamp value");
-+			return;
-+		}
-+
-+		ts.tm_year = att_get_u16(&pdu[8]) - 1900;
-+		ts.tm_mon = pdu[10];
-+		ts.tm_mday = pdu[11];
-+		ts.tm_hour = pdu[12];
-+		ts.tm_min = pdu[13];
-+		ts.tm_sec = pdu[14];
-+		ts.tm_isdst = -1;
-+
-+		time = mktime(&ts);
-+		msmt.time = (guint64) time;
-+		msmt.suptime = TRUE;
-+	} else
-+		msmt.suptime = FALSE;
-+
-+	if (flags & TEMP_TYPE) {
-+		if (len < 16) {
-+			DBG("Can't get temperature type");
-+			return;
-+		}
-+
-+		msmt.type = temptype2str(pdu[15]);
-+	} else if (t->has_type)
-+		msmt.type = temptype2str(t->type);
-+	else {
-+		DBG("Can't get temperature type");
-+		return;
-+	}
-+
-+	msmt.msmnt = final ? "Final" : "Intermediate";
-+
-+	recv_measurement(t, &msmt);
+@@ -650,6 +650,44 @@ static void disable_final_measurement(struct thermometer *t)
+ 	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
  }
  
- static void proc_measurement_interval(struct thermometer *t, const uint8_t *pdu,
++static void disable_intermediate_measurement(struct thermometer *t)
++{
++	struct characteristic *ch;
++	struct descriptor *desc;
++	bt_uuid_t btuuid;
++	uint8_t atval[2];
++	gchar *msg;
++
++	ch = get_characteristic(t, INTERMEDIATE_TEMPERATURE_UUID);
++	if (ch == NULL) {
++		DBG("Intermediate measurement characteristic not found");
++		return;
++	}
++
++	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
++	desc = get_descriptor(ch, &btuuid);
++	if (desc == NULL) {
++		DBG("Client characteristic configuration descriptor not found");
++		return;
++	}
++
++	atval[0] = 0x00;
++	atval[1] = 0x00;
++	msg = g_strdup("Disable intermediate measurement");
++	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
++}
++
++static void remove_int_watcher(struct thermometer *t, struct watcher *w)
++{
++	if (!g_slist_find(t->iwatchers, w))
++		return;
++
++	t->iwatchers = g_slist_remove(t->iwatchers, w);
++
++	if (g_slist_length(t->iwatchers) == 0)
++		disable_intermediate_measurement(t);
++}
++
+ static void watcher_exit(DBusConnection *conn, void *user_data)
+ {
+ 	struct watcher *watcher = user_data;
+@@ -657,6 +695,8 @@ static void watcher_exit(DBusConnection *conn, void *user_data)
+ 
+ 	DBG("Thermometer watcher %s disconnected", watcher->path);
+ 
++	remove_int_watcher(t, watcher);
++
+ 	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
+ 	watcher->id = 0;
+ 
+@@ -734,6 +774,8 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
+ 
+ 	DBG("Thermometer watcher %s unregistered", path);
+ 
++	remove_int_watcher(t, watcher);
++
+ 	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
+ 	destroy_watcher(watcher);
+ 
+@@ -778,9 +820,24 @@ static DBusMessage *enable_intermediate(DBusConnection *conn, DBusMessage *msg,
+ static DBusMessage *disable_intermediate(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
+-	/* TODO: */
+-	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
+-						"Function not implemented.");
++	const gchar *sender = dbus_message_get_sender(msg);
++	struct thermometer *t = data;
++	struct watcher *watcher;
++	gchar *path;
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
++							DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
++
++	watcher = find_watcher(t->iwatchers, sender, path);
++	if (watcher == NULL)
++		return btd_error_does_not_exist(msg);
++
++	DBG("Intermediate measurement %s unregistered", path);
++
++	remove_int_watcher(t, watcher);
++
++	return dbus_message_new_method_return(msg);
+ }
+ 
+ static GDBusMethodTable thermometer_methods[] = {
 -- 
 1.7.7.2
 
