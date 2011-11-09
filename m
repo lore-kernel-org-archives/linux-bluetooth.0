@@ -1,60 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1320850111.15441.342.camel@aeonflux>
-References: <1320332745-21750-1-git-send-email-szymon.janc@tieto.com>
-	<1320441040.15441.303.camel@aeonflux>
-	<alpine.DEB.2.02.1111041513330.11981@mathewm-linux>
-	<201111091446.28192.szymon.janc@tieto.com>
-	<1320850111.15441.342.camel@aeonflux>
-Date: Wed, 9 Nov 2011 19:15:49 +0200
-Message-ID: <CABBYNZLhjcj57ZPHUWD7qCL6EtSsQ5gmjCYn1+0aqOEtwrjzvg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Bluetooth: Add ability to force local busy condition
- on L2CAP ERTM
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Szymon Janc <szymon.janc@tieto.com>, Mat Martineau <mathewm@codeaurora.org>,
-	Gustavo Padovan <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"ulrik.lauren@stericsson.com" <ulrik.lauren@stericsson.com>,
-	"kanak.gupta@stericsson.com" <kanak.gupta@stericsson.com>
+In-Reply-To: <CAJdJm_NsyzABjO-dNSguvfycvL_0cYF6szok4u-BsN9XJtt5Tw@mail.gmail.com>
+References: <1320835923-10989-1-git-send-email-sancane@gmail.com>
+	<1320835923-10989-2-git-send-email-sancane@gmail.com>
+	<CAJdJm_OVgJbGrBmTgTUFaRHazDBweSagPJE0UP0eXa4MVFm61A@mail.gmail.com>
+	<CACLukzKhzKrH1htxNAAR2CtmzhxEQ6_VyMZUsssncWyXopaAJw@mail.gmail.com>
+	<CAJdJm_NsyzABjO-dNSguvfycvL_0cYF6szok4u-BsN9XJtt5Tw@mail.gmail.com>
+Date: Wed, 9 Nov 2011 17:50:00 +0100
+Message-ID: <CACLukzKpPGad_yUUiH0Q2qbfY6MhUGcn=BsfQyyuGQPOji53dw@mail.gmail.com>
+Subject: Re: [PATCH 1/6] Manage GATT attribute indications in handle callback.
+From: Santiago Carot <sancane@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Anderson,
 
-On Wed, Nov 9, 2011 at 4:48 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
->> @Marcel
->> This test case is to "Verify the IUT will send an S-Frame [RNR] when it detects a Local Busy condition."
->>
->> "Pass verdict:
->> - ALT 1: The IUT immediately sends an S-Frame with function RNR after the Local
->> Busy condition is set by the Upper Tester.
->> - ALT 2: The IUT sends an S-Frame with function RNR after receiving I-Frame(s) from
->> the Tester when the Local Busy condition is set by the Upper Tester."
->>
->>
->> I was trying to pass ALT2 with Mat's suggestions but couldn't trigger local busy.
->> Minimum possible value for SO_RCVBUF (at least here on 3.0 kernel) is 2224 bytes and this is
->> still too high to allow PTS to trigger local busy (PTS tries to send txwin i-frames with 4 bytes of
->> data only).
->> [If it would possible to force PTS to send larger i-frames than it should work as well but I wasn't
->> able to find any option that would do that... please correct me if it is possible]
->>
->> With forcing local busy on channels it is possible to pass ALT1 scenario: PTS ask IUT to enter
->> local busy condition and just waits for RNR to be send.
->>
->> @Gustavo
->> If you prefer not to temper with normal code path I could just get rid of force_local_busy variable
->> and not hold channels in local busy state. This should be enough to pass test.
+2011/11/9 Anderson Lizardo <anderson.lizardo@openbossa.org>:
+> Hi Santiago,
 >
-> so I like the idea to make this work with standard socket options. That
-> is how we should be doing this. So lets figure out on how to make Mat's
-> suggestion work for us.
+> On Wed, Nov 9, 2011 at 10:44 AM, Santiago Carot <sancane@gmail.com> wrote:
+>>>>  static void ind_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+>>>>  {
+>>>> -       /* TODO: Process indication */
+>>>> +       struct thermometer *t = user_data;
+>>>> +       const struct characteristic *ch;
+>>>> +       uint8_t opdu[ATT_MAX_MTU];
+>>>> +       uint16_t handle, olen;
+>>>> +       GSList *l;
+>>>> +
+>>>> +       if (len < 3) {
+>>>> +               DBG("Bad pdu received");
+>>>> +               goto done;
+>>>> +       }
+>>>
+>>> Are you sure we should send a confirmation even if the PDU received is
+>>> invalid? What if it is not even an indication (you only check below)?
+>>
+>> This callback is supposed only to manage indications not notifications:
+>> in the code:
+>> ...
+>> g_attrib_register(t->attrib, ATT_OP_HANDLE_IND,
+>>                                                        ind_handler, t, NULL);
+>>
+>> Shall I expect another kind of notifications even if I have not
+>> indicated it when I registered the callback?
+>
+> I only made this comment because you do this check on the function:
+>
+> +       if (pdu[0] != ATT_OP_HANDLE_IND) {
+> +               DBG("Not indication received");
+> +               return;
+> +       }
+>
+> I think you can simply drop this check, as you mentioned it will only
+> be called for indications.
+>
+> About the PDU size check, I think it is important to have it (to avoid
+> memory corruption on invalid PDU), but then the peer device is bogus,
+> so I think you should not send a confirmation for it, because you did
+> not receive a valid indication in the first place.
+>
+>>>> +
+>>>> +       handle = att_get_u16(&pdu[1]);
+>>>> +       l = g_slist_find_custom(t->chars, &handle, cmp_char_val_handle);
+>>>> +       if (l == NULL)
+>>>> +               goto done;
+>>>
+>>> Again, should we send a confirmation to the thermometer even if the
+>>> indication's handle does not match any characteristic value?
+>>>
+>>> (note I didn't read the thermometer profile spec carefully yet. Not
+>>> sure if it covers invalid PDUs.)
+>>>
+>>
+>> As far as I know, the thermometer spec is not focused in such kind of
+>> GATT details, so I guess it will depend of the implementation.  If we
+>> don't send a reply to that indication the remote side will close the
+>> connection when the timeout expired. So here is the question: what
+>> would we rather do, to keep the connection alive or to let the remote
+>> side to close it?
+>
+> I believe that in general, if the peer device sends a bogus indication
+> (or if the communication channel was corrupted somehow), we should
+> *not* confirm it. I see confirmations as an "ack" that the indication
+> was received, processed and validated by BlueZ. If it is somehow
+> invalid (PDU size incorrect, invalid handle), we should not confirm
+> it.
 
-Any idea why it is not possible to overwrite the minimum for the
-socket buffer, its a bit annoying not being able to set them to 0
-which would be useful for making readonly/writeonly sockets when using
-the force socket option.
-
--- 
-Luiz Augusto von Dentz
+It makes sense for me, I'll send a new set of patches with the changes
+you have suggested.
+Thanks.
