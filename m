@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 05/21] Bluetooth: A2MP: AMP Manager basic functions
-Date: Thu, 10 Nov 2011 16:54:12 +0200
-Message-Id: <1320936868-7978-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 04/21] Bluetooth: A2MP: Build and Send msg helpers
+Date: Thu, 10 Nov 2011 16:54:11 +0200
+Message-Id: <1320936868-7978-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1320936868-7978-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1320936868-7978-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,137 +11,89 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Define AMP Manager and some basic functions.
+Helper function to build and send A2MP messages.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |    8 ++++
- net/bluetooth/a2mp.c         |   82 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 90 insertions(+), 0 deletions(-)
+ include/net/bluetooth/a2mp.h |    7 ++++++
+ net/bluetooth/a2mp.c         |   46 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 53 insertions(+), 0 deletions(-)
 
 diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 7ead6a3..a89c506 100644
+index a3938f9..7ead6a3 100644
 --- a/include/net/bluetooth/a2mp.h
 +++ b/include/net/bluetooth/a2mp.h
-@@ -15,6 +15,14 @@
+@@ -15,6 +15,13 @@
  #ifndef __A2MP_H
  #define __A2MP_H
  
-+struct amp_mgr {
-+	struct list_head	list;
-+	struct l2cap_conn	*l2cap_conn;
-+	struct socket		*a2mp_sock;
-+	struct kref		kref;
-+	unsigned long		flags;
-+};
++struct a2mp_cmd {
++	__u8	code;
++	__u8	ident;
++	__le16	len;
++	__u8	data[0];
++} __packed;
 +
- struct a2mp_cmd {
- 	__u8	code;
- 	__u8	ident;
+ struct a2mp_work_data_ready {
+ 	struct work_struct work;
+ 	struct sock *sk;
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 1590b21..e7b7534 100644
+index df34114..1590b21 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -13,6 +13,7 @@
- */
- 
- #include <linux/workqueue.h>
-+#include <linux/list.h>
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -21,6 +22,13 @@
+@@ -21,6 +21,52 @@
  
  static struct workqueue_struct *a2mp_workqueue;
  
-+void inline amp_mgr_get(struct amp_mgr *mgr);
-+int amp_mgr_put(struct amp_mgr *mgr);
-+struct amp_mgr *get_amp_mgr_sk(struct sock *sk);
++/* A2MP build & send command helper functions */
++static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
++{
++	struct a2mp_cmd *cmd;
++	int plen;
 +
-+LIST_HEAD(amp_mgr_list);
-+DEFINE_RWLOCK(amp_mgr_list_lock);
++	plen = sizeof(*cmd) + len;
++	cmd = kzalloc(plen, GFP_KERNEL);
++	if (!cmd)
++		return NULL;
 +
- /* A2MP build & send command helper functions */
- static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
++	cmd->code = code;
++	cmd->ident = ident;
++	cmd->len = cpu_to_le16(len);
++
++	memcpy(cmd->data, data, len);
++
++	return cmd;
++}
++
++static inline int __a2mp_send(struct socket *sock, u8 *data, int len)
++{
++	struct kvec iv = { data, len };
++	struct msghdr msg;
++
++	memset(&msg, 0, sizeof(msg));
++
++	return kernel_sendmsg(sock, &msg, &iv, 1, len);
++}
++
++static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
++								void *data)
++{
++	struct a2mp_cmd *cmd;
++
++	if (!mgr->a2mp_sock)
++		return;
++
++	cmd = __a2mp_build(code, ident, len, data);
++	if (!cmd)
++		return;
++
++	__a2mp_send(mgr->a2mp_sock, (u8 *)cmd, len + sizeof(*cmd));
++	kfree(cmd);
++}
++
+ static void data_ready_worker(struct work_struct *w)
  {
-@@ -205,3 +213,77 @@ static struct socket *open_a2mp_sock(struct l2cap_conn *conn)
- 		return NULL;
- 	}
- }
-+
-+/* AMP Manager functions */
-+void inline amp_mgr_get(struct amp_mgr *mgr)
-+{
-+	kref_get(&mgr->kref);
-+}
-+
-+static void amp_mgr_destroy(struct kref *kref)
-+{
-+	struct amp_mgr *mgr;
-+	mgr = container_of(kref, struct amp_mgr, kref);
-+
-+	BT_ERR("Destroy amp_mgr %p", mgr);
-+
-+	write_lock(&amp_mgr_list_lock);
-+	list_del(&mgr->list);
-+	write_unlock(&amp_mgr_list_lock);
-+
-+	sock_release(mgr->a2mp_sock);
-+
-+	kfree(mgr);
-+}
-+
-+int inline amp_mgr_put(struct amp_mgr *mgr)
-+{
-+	return kref_put(&mgr->kref, &amp_mgr_destroy);
-+}
-+
-+struct amp_mgr *get_amp_mgr_sk(struct sock *sk)
-+{
-+	struct amp_mgr *mgr;
-+	struct amp_mgr *found = NULL;
-+
-+	read_lock(&amp_mgr_list_lock);
-+	list_for_each_entry(mgr, &amp_mgr_list, list) {
-+		if ((mgr->a2mp_sock) && (mgr->a2mp_sock->sk == sk)) {
-+			found = mgr;
-+			amp_mgr_get(mgr);
-+			break;
-+		}
-+	}
-+	read_unlock(&amp_mgr_list_lock);
-+
-+	return found;
-+}
-+
-+struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
-+{
-+	struct amp_mgr *mgr;
-+
-+	mgr = kzalloc(sizeof(*mgr), GFP_KERNEL);
-+	if (!mgr)
-+		goto finished;
-+
-+	BT_DBG("conn %p mgr %p", conn, mgr);
-+
-+	mgr->l2cap_conn = conn;
-+
-+	mgr->a2mp_sock = open_a2mp_sock(conn);
-+	if (!mgr->a2mp_sock) {
-+		kfree(mgr);
-+		mgr = NULL;
-+		goto finished;
-+	}
-+
-+	write_lock(&amp_mgr_list_lock);
-+	list_add(&(mgr->list), &amp_mgr_list);
-+	write_unlock(&amp_mgr_list_lock);
-+
-+	kref_init(&mgr->kref);
-+
-+finished:
-+	return mgr;
-+}
+ 	struct a2mp_work_data_ready *work = (struct a2mp_work_data_ready *) w;
 -- 
 1.7.4.1
 
