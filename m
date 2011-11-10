@@ -1,33 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1320415251-10350-2-git-send-email-radoslawjablonski@gmail.com>
-References: <1320415251-10350-1-git-send-email-radoslawjablonski@gmail.com>
-	<1320415251-10350-2-git-send-email-radoslawjablonski@gmail.com>
-Date: Thu, 10 Nov 2011 13:22:07 +0200
-Message-ID: <CAFy0spsO_9khjOA=-KYxhZBAwJya_bAYx4jqVf=f=fJxD+hRcA@mail.gmail.com>
-Subject: Re: [PATCH obexd 1/1] Fix missing URL vCard's field with OTHER subtype
-From: Mika Linnanoja <mika.linnanoja@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Radoslaw Jablonski <radoslawjablonski@gmail.com>,
-	michalski.raf@gmail.com
+In-Reply-To: <1320836152-2936-1-git-send-email-radoslawjablonski@gmail.com>
+References: <1320836152-2936-1-git-send-email-radoslawjablonski@gmail.com>
+Date: Thu, 10 Nov 2011 12:46:19 +0200
+Message-ID: <CABBYNZ+uEtBdBUWGLB=PyKo9R=+Kj9AY-4bkeT0XeAtp6i_M_g@mail.gmail.com>
+Subject: Re: [PATCHv2 obexd] Add cleanup of '.pcsuite' file on pcsuite_init
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Radoslaw Jablonski <radoslawjablonski@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Nov 4, 2011 at 4:00 PM, Radoslaw Jablonski
+Hi Radek,
+
+On Wed, Nov 9, 2011 at 12:55 PM, Radoslaw Jablonski
 <radoslawjablonski@gmail.com> wrote:
-> From: Rafal Michalski <michalski.raf@gmail.com>
+> File named '.pcsuite' is used to show to other applications
+> that PC-Suite connection is active - some operations shouldn't
+> be performed on device when synchronization is in progress.
+> In scenario when obexd will be killed or crashed during PC-Suite
+> connection this file will stay forever in filestystem, because
+> pcsuite_disconnect won't be called to do clean-up.
 >
-> Previously URL vCard's field (imported with default OTHER subtype) was
-> missing after pulling entire phonebook or single vCard (for phonebook
-> and each call history as well).
-> This patch fixes that issue by adjusting queries to URL field.
+> This patch adds function which will remove '.pcsuite' file
+> in such problematic scenarios on pcsuite_init.
 > ---
->  plugins/phonebook-tracker.c |   10 ++++------
->  1 files changed, 4 insertions(+), 6 deletions(-)
+>  plugins/pcsuite.c |   24 +++++++++++++++++++++++-
+>  1 files changed, 23 insertions(+), 1 deletions(-)
+>
+> diff --git a/plugins/pcsuite.c b/plugins/pcsuite.c
+> index 27a3496..69e184f 100644
+> --- a/plugins/pcsuite.c
+> +++ b/plugins/pcsuite.c
+> @@ -55,6 +55,7 @@
+>
+>  #define PCSUITE_CHANNEL 24
+>  #define PCSUITE_WHO_SIZE 8
+> +#define PCSUITE_FILE_NAME ".pcsuite"
+>
+>  #define PCSUITE_RECORD "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>    \
+>  <record>                                                               \
+> @@ -130,7 +131,7 @@ static void *pcsuite_connect(struct obex_session *os, int *err)
+>        if (ftp == NULL)
+>                return NULL;
+>
+> -       filename = g_build_filename(g_get_home_dir(), ".pcsuite", NULL);
+> +       filename = g_build_filename(g_get_home_dir(), PCSUITE_FILE_NAME, NULL);
+>
+>        fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0644);
+>        if (fd < 0 && errno != EEXIST) {
+> @@ -497,10 +498,31 @@ static struct obex_mime_type_driver backup = {
+>        .flush = backup_flush,
+>  };
+>
+> +static void pcsuite_file_cleanup(void)
+> +{
+> +       char *filename;
+> +       struct stat buf;
+> +
+> +       filename = g_build_filename(g_get_home_dir(), PCSUITE_FILE_NAME, NULL);
+> +
+> +       if (stat(filename, &buf) == 0) {
+> +               DBG("Removing unneeded pcsuite-file: %s", filename);
+> +               remove(filename);
+> +       }
+> +
+> +       g_free(filename);
+> +}
+> +
+>  static int pcsuite_init(void)
+>  {
+>        int err;
+>
+> +       /* In some cases '.pcsuite' file will be present on device even if
+> +        * there is no PC-Suite connection active in the moment(eg. obexd
+> +        * crashed or was killed while pcsuite connection was active)
+> +        * Removing this file if not needed. */
+> +       pcsuite_file_cleanup();
+> +
+>        err = obex_service_driver_register(&pcsuite);
+>        if (err < 0)
+>                return err;
+> --
+> 1.7.0.4
 
-Anybody any comments to this patch? It's well tested to work (is
-anything else using phonebook-tracker than N9?).
+Ack, this should really be a pid file created by the service we
+communicate but since this is probably not gonna be fixed then it
+seems this workaround is the only thing that can be done.
 
-Cheers,
-Mika
+-- 
+Luiz Augusto von Dentz
