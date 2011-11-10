@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 12/21] Bluetooth: A2MP: Helper functions to count HCI devs
-Date: Thu, 10 Nov 2011 16:54:19 +0200
-Message-Id: <1320936868-7978-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 03/21] Bluetooth: A2MP: Add sk_state_change for A2MP socket
+Date: Thu, 10 Nov 2011 16:54:10 +0200
+Message-Id: <1320936868-7978-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1320936868-7978-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1320936868-7978-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,96 +11,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Helper functions used to cound HCI devices (AMP controllers) and
-build controller list packet.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h      |    2 ++
- include/net/bluetooth/hci_core.h |   14 ++++++++++++++
- net/bluetooth/a2mp.c             |   31 +++++++++++++++++++++++++++++++
- 3 files changed, 47 insertions(+), 0 deletions(-)
+ include/net/bluetooth/a2mp.h |    5 +++++
+ net/bluetooth/a2mp.c         |   28 ++++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 139ce2a..77a071a 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -56,6 +56,8 @@
- #define HCI_BREDR	0x00
- #define HCI_AMP		0x01
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index 95dfaeb..a3938f9 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -21,4 +21,9 @@ struct a2mp_work_data_ready {
+ 	int bytes;
+ };
  
-+#define HCI_BREDR_ID	0
++struct a2mp_work_state_change {
++	struct work_struct work;
++	struct sock *sk;
++};
 +
- /* HCI device quirks */
- enum {
- 	HCI_QUIRK_NO_RESET,
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0a5a05d..58ad764 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -591,6 +591,20 @@ static inline struct hci_dev *hci_dev_hold(struct hci_dev *d)
- 	return NULL;
- }
- 
-+static inline uint8_t hci_num_ctrl(void)
-+{
-+	uint8_t count = 0;
-+	struct list_head *p;
-+
-+	read_lock_bh(&hci_dev_list_lock);
-+	list_for_each(p, &hci_dev_list) {
-+		count++;
-+	}
-+	read_unlock_bh(&hci_dev_list_lock);
-+
-+	return count;
-+}
-+
- #define hci_dev_lock(d)		spin_lock(&d->lock)
- #define hci_dev_unlock(d)	spin_unlock(&d->lock)
- #define hci_dev_lock_bh(d)	spin_lock_bh(&d->lock)
+ #endif /* __A2MP_H */
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 800a7a8..7f931a1 100644
+index 4475ec8..df34114 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -75,6 +75,37 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
- 	kfree(cmd);
+@@ -56,6 +56,32 @@ static void a2mp_data_ready(struct sock *sk, int bytes)
+ 	}
  }
  
-+static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
++static void state_change_worker(struct work_struct *w)
 +{
-+	cl->id = 0;
-+	cl->type = 0;
-+	cl->status = 1;
++	struct a2mp_work_state_change *work = (struct a2mp_work_state_change *) w;
++	struct sock *sk = work->sk;
++
++	BT_DBG("sk %p", sk);
++	sock_put(work->sk);
++	kfree(work);
 +}
 +
-+static void __a2mp_add_cl(struct a2mp_cl *cl, u8 num_ctrl)
++static void a2mp_state_change(struct sock *sk)
 +{
-+	int i = 0;
-+	struct hci_dev *hdev;
++	struct a2mp_work_state_change *work;
 +
-+	read_lock_bh(&hci_dev_list_lock);
-+
-+	__a2mp_cl_bredr(cl);
-+
-+	list_for_each_entry(hdev, &hci_dev_list, list) {
-+		if (i++ >= num_ctrl)
-+			goto out;
-+
-+		if (hdev->id == HCI_BREDR_ID)
-+			continue;
-+
-+		cl[i].id = hdev->id;
-+		cl[i].type = hdev->amp_type;
-+		cl[i].status = hdev->amp_status;
++	work = kmalloc(sizeof(*work), GFP_ATOMIC);
++	if (work) {
++		INIT_WORK(&work->work, state_change_worker);
++		sock_hold(sk);
++		work->sk = sk;
++		if (!queue_work(a2mp_workqueue, &work->work)) {
++			kfree(work);
++			sock_put(sk);
++		}
 +	}
-+out:
-+	read_unlock_bh(&hci_dev_list_lock);
 +}
 +
- /* Processing A2MP messages */
- static inline int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
- 							struct a2mp_cmd *hdr)
+ static void l2cap_fixed_channel_config(struct sock *sk)
+ {
+ 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+@@ -104,6 +130,8 @@ static struct socket *open_a2mp_sock(struct l2cap_conn *conn)
+ 
+ 	sk = sock->sk;
+ 	sk->sk_data_ready = a2mp_data_ready;
++	sk->sk_state_change = a2mp_state_change;
++
+ 	memset(&addr, 0, sizeof(addr));
+ 	bacpy(&addr.l2_bdaddr, conn->src);
+ 	addr.l2_family = AF_BLUETOOTH;
 -- 
 1.7.4.1
 
