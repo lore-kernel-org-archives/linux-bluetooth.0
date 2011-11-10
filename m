@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 04/21] Bluetooth: A2MP: Build and Send msg helpers
-Date: Thu, 10 Nov 2011 16:54:11 +0200
-Message-Id: <1320936868-7978-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 12/21] Bluetooth: A2MP: Helper functions to count HCI devs
+Date: Thu, 10 Nov 2011 16:54:19 +0200
+Message-Id: <1320936868-7978-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1320936868-7978-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1320936868-7978-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,89 +11,96 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Helper function to build and send A2MP messages.
+Helper functions used to cound HCI devices (AMP controllers) and
+build controller list packet.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |    7 ++++++
- net/bluetooth/a2mp.c         |   46 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 53 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci.h      |    2 ++
+ include/net/bluetooth/hci_core.h |   14 ++++++++++++++
+ net/bluetooth/a2mp.c             |   31 +++++++++++++++++++++++++++++++
+ 3 files changed, 47 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index a3938f9..7ead6a3 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -15,6 +15,13 @@
- #ifndef __A2MP_H
- #define __A2MP_H
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 139ce2a..77a071a 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -56,6 +56,8 @@
+ #define HCI_BREDR	0x00
+ #define HCI_AMP		0x01
  
-+struct a2mp_cmd {
-+	__u8	code;
-+	__u8	ident;
-+	__le16	len;
-+	__u8	data[0];
-+} __packed;
++#define HCI_BREDR_ID	0
 +
- struct a2mp_work_data_ready {
- 	struct work_struct work;
- 	struct sock *sk;
+ /* HCI device quirks */
+ enum {
+ 	HCI_QUIRK_NO_RESET,
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 0a5a05d..58ad764 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -591,6 +591,20 @@ static inline struct hci_dev *hci_dev_hold(struct hci_dev *d)
+ 	return NULL;
+ }
+ 
++static inline uint8_t hci_num_ctrl(void)
++{
++	uint8_t count = 0;
++	struct list_head *p;
++
++	read_lock_bh(&hci_dev_list_lock);
++	list_for_each(p, &hci_dev_list) {
++		count++;
++	}
++	read_unlock_bh(&hci_dev_list_lock);
++
++	return count;
++}
++
+ #define hci_dev_lock(d)		spin_lock(&d->lock)
+ #define hci_dev_unlock(d)	spin_unlock(&d->lock)
+ #define hci_dev_lock_bh(d)	spin_lock_bh(&d->lock)
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index df34114..1590b21 100644
+index 800a7a8..7f931a1 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -21,6 +21,52 @@
+@@ -75,6 +75,37 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
+ 	kfree(cmd);
+ }
  
- static struct workqueue_struct *a2mp_workqueue;
- 
-+/* A2MP build & send command helper functions */
-+static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
++static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
 +{
-+	struct a2mp_cmd *cmd;
-+	int plen;
-+
-+	plen = sizeof(*cmd) + len;
-+	cmd = kzalloc(plen, GFP_KERNEL);
-+	if (!cmd)
-+		return NULL;
-+
-+	cmd->code = code;
-+	cmd->ident = ident;
-+	cmd->len = cpu_to_le16(len);
-+
-+	memcpy(cmd->data, data, len);
-+
-+	return cmd;
++	cl->id = 0;
++	cl->type = 0;
++	cl->status = 1;
 +}
 +
-+static inline int __a2mp_send(struct socket *sock, u8 *data, int len)
++static void __a2mp_add_cl(struct a2mp_cl *cl, u8 num_ctrl)
 +{
-+	struct kvec iv = { data, len };
-+	struct msghdr msg;
++	int i = 0;
++	struct hci_dev *hdev;
 +
-+	memset(&msg, 0, sizeof(msg));
++	read_lock_bh(&hci_dev_list_lock);
 +
-+	return kernel_sendmsg(sock, &msg, &iv, 1, len);
++	__a2mp_cl_bredr(cl);
++
++	list_for_each_entry(hdev, &hci_dev_list, list) {
++		if (i++ >= num_ctrl)
++			goto out;
++
++		if (hdev->id == HCI_BREDR_ID)
++			continue;
++
++		cl[i].id = hdev->id;
++		cl[i].type = hdev->amp_type;
++		cl[i].status = hdev->amp_status;
++	}
++out:
++	read_unlock_bh(&hci_dev_list_lock);
 +}
 +
-+static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
-+								void *data)
-+{
-+	struct a2mp_cmd *cmd;
-+
-+	if (!mgr->a2mp_sock)
-+		return;
-+
-+	cmd = __a2mp_build(code, ident, len, data);
-+	if (!cmd)
-+		return;
-+
-+	__a2mp_send(mgr->a2mp_sock, (u8 *)cmd, len + sizeof(*cmd));
-+	kfree(cmd);
-+}
-+
- static void data_ready_worker(struct work_struct *w)
- {
- 	struct a2mp_work_data_ready *work = (struct a2mp_work_data_ready *) w;
+ /* Processing A2MP messages */
+ static inline int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
+ 							struct a2mp_cmd *hdr)
 -- 
 1.7.4.1
 
