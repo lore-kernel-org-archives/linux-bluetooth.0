@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 21/21] Bluetooth: A2MP: Manage incoming connections
-Date: Thu, 10 Nov 2011 16:54:28 +0200
-Message-Id: <1320936868-7978-22-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 17/21] Bluetooth: A2MP: Process A2MP Create Physlink Request
+Date: Thu, 10 Nov 2011 16:54:24 +0200
+Message-Id: <1320936868-7978-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1320936868-7978-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1320936868-7978-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,108 +11,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Handle incoming A2MP connection by creating AMP manager and
-processing A2MP messages in a workqueue.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |    8 ++++++++
- net/bluetooth/a2mp.c         |   34 ++++++++++++++++++++++++++++++++++
- net/bluetooth/l2cap_core.c   |   10 ++++++++--
- 3 files changed, 50 insertions(+), 2 deletions(-)
+ net/bluetooth/a2mp.c |   19 +++++++++++++++++++
+ 1 files changed, 19 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 31d98a8..d1abddc 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -17,6 +17,8 @@
- 
- #define A2MP_FEAT_EXT	0x8000
- 
-+void a2mp_incoming(struct l2cap_conn *conn, struct sk_buff *skb);
-+
- struct amp_mgr {
- 	struct list_head	list;
- 	struct l2cap_conn	*l2cap_conn;
-@@ -125,6 +127,12 @@ struct a2mp_work_state_change {
- 	struct sock *sk;
- };
- 
-+struct a2mp_work_incoming {
-+	struct work_struct work;
-+	struct l2cap_conn *conn;
-+	struct sk_buff *skb;
-+};
-+
- int a2mp_init(void);
- void a2mp_exit(void);
- 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 21e808d..2d9e975 100644
+index 8eeb70e..ba88f34 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -615,6 +615,40 @@ finished:
- 	return mgr;
+@@ -245,6 +245,22 @@ static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
  }
  
-+static void incoming_worker(struct work_struct *w)
++static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
++							struct a2mp_cmd *hdr)
 +{
-+	struct a2mp_work_incoming *work = (struct a2mp_work_incoming *) w;
-+	struct l2cap_conn *conn = work->conn;
-+	struct amp_mgr *mgr;
-+	struct sock *sk;
++	struct a2mp_physlink_req *req = (struct a2mp_physlink_req *)skb->data;
 +
-+	mgr = amp_mgr_create(conn);
-+	sk = mgr->a2mp_sock->sk;
++	if (le16_to_cpu(hdr->len) < sizeof(*req))
++		return -EINVAL;
 +
-+	BT_DBG("mgr %p sk %p", mgr, sk);
++	BT_DBG("local_id %d, remote_id %d", req->local_id, req->remote_id);
 +
-+	lock_sock(sk);
-+	sk->sk_backlog_rcv(sk, work->skb);
-+	release_sock(sk);
++	/* TODO process physlink create */
 +
-+	kfree(work);
++	skb_pull(skb, hdr->len);
++	return 0;
 +}
 +
-+void a2mp_incoming(struct l2cap_conn *conn, struct sk_buff *skb)
-+{
-+	struct a2mp_work_incoming *work;
-+
-+	BT_DBG("conn %p", conn);
-+	work = kmalloc(sizeof(*work), GFP_ATOMIC);
-+	if (work) {
-+		INIT_WORK((struct work_struct *) work, incoming_worker);
-+		work->conn = conn;
-+		work->skb = skb;
-+		if (queue_work(a2mp_workqueue, (struct work_struct *) work) == 0)
-+			kfree(work);
-+	}
-+}
-+
- int a2mp_init(void)
+ /* Handle A2MP signalling */
+ void a2mp_receive(struct sock *sk, struct sk_buff *skb)
  {
- 	a2mp_workqueue = create_singlethread_workqueue("a2mp");
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index cf57ae0..1c312b2 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4201,8 +4201,14 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+@@ -291,6 +307,9 @@ void a2mp_receive(struct sock *sk, struct sk_buff *skb)
+ 			break;
  
- 	chan = l2cap_get_chan_by_scid(conn, cid);
- 	if (!chan) {
--		BT_DBG("unknown cid 0x%4.4x", cid);
--		goto drop;
-+		if (cid == L2CAP_CID_A2MP) {
-+			BT_DBG("A2MP");
-+			a2mp_incoming(conn, skb);
-+			goto done;
-+		} else {
-+			BT_DBG("unknown cid 0x%4.4x", cid);
-+			goto drop;
-+		}
- 	}
- 
- 	sk = chan->sk;
+ 		case A2MP_CREATEPHYSLINK_REQ:
++			err = a2mp_createphyslink_req(mgr, skb, hdr);
++			break;
++
+ 		case A2MP_DISCONNPHYSLINK_REQ:
+ 		case A2MP_CHANGE_RSP:
+ 		case A2MP_DISCOVER_RSP:
 -- 
 1.7.4.1
 
