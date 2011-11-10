@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 06/21] Bluetooth: A2MP: Remove AMP manager in state_change
-Date: Thu, 10 Nov 2011 16:54:13 +0200
-Message-Id: <1320936868-7978-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 14/21] Bluetooth: A2MP: Process A2MP Change Notify
+Date: Thu, 10 Nov 2011 16:54:21 +0200
+Message-Id: <1320936868-7978-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1320936868-7978-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1320936868-7978-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,42 +11,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Handle BT_CLOSED state change by removing AMP manager.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   17 ++++++++++++++++-
- 1 files changed, 16 insertions(+), 1 deletions(-)
+ net/bluetooth/a2mp.c |   19 +++++++++++++++++++
+ 1 files changed, 19 insertions(+), 0 deletions(-)
 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index e7b7534..21fae45 100644
+index e4ad28d..c69e949 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -114,8 +114,23 @@ static void state_change_worker(struct work_struct *w)
- {
- 	struct a2mp_work_state_change *work = (struct a2mp_work_state_change *) w;
- 	struct sock *sk = work->sk;
-+	struct amp_mgr *mgr = NULL;
+@@ -168,6 +168,22 @@ static inline int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
+ }
  
--	BT_DBG("sk %p", sk);
-+	mgr = get_amp_mgr_sk(sk);
-+	if (!mgr)
-+		goto out;
++static inline int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
++							struct a2mp_cmd *hdr)
++{
++	struct a2mp_cl *cl = (struct a2mp_cl *)skb->data;
 +
-+	BT_DBG("sk %p mgr %p state %d", sk, mgr, sk->sk_state);
-+
-+	switch (sk->sk_state) {
-+	case BT_CLOSED:
-+		amp_mgr_put(mgr);
-+		break;
++	while (skb->len >= sizeof(*cl)) {
++		BT_DBG("Controller id %d type %d status %d", cl->id, cl->type,
++								cl->status);
++		cl = (struct a2mp_cl *) skb_pull(skb, sizeof(*cl));
 +	}
 +
-+	amp_mgr_put(mgr);
++	/* TODO send A2MP_CHANGE_RSP */
 +
-+out:
- 	sock_put(work->sk);
- 	kfree(work);
- }
++	return 0;
++}
++
+ /* Handle A2MP signalling */
+ void a2mp_receive(struct sock *sk, struct sk_buff *skb)
+ {
+@@ -202,6 +218,9 @@ void a2mp_receive(struct sock *sk, struct sk_buff *skb)
+ 			break;
+ 
+ 		case A2MP_CHANGE_NOTIFY:
++			err = a2mp_change_notify(mgr, skb, hdr);
++			break;
++
+ 		case A2MP_GETINFO_REQ:
+ 		case A2MP_GETAMPASSOC_REQ:
+ 		case A2MP_CREATEPHYSLINK_REQ:
 -- 
 1.7.4.1
 
