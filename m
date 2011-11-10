@@ -1,60 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 00/21] RFC Bluetooth A2MP implementation
-Date: Thu, 10 Nov 2011 16:54:07 +0200
-Message-Id: <1320936868-7978-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 08/21] Bluetooth: A2MP: Definitions for A2MP commands
+Date: Thu, 10 Nov 2011 16:54:15 +0200
+Message-Id: <1320936868-7978-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1320936868-7978-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1320936868-7978-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Changes:
-	* RFCv1 added refcnt to amp_mgr, fixed sleeping in atomic
+Define A2MP command id and packet structures.
 
-Code based on Code Aurora (git://codeaurora.org/kernel/msm.git) and Atheros
-(search for: [PATCH 2/3] Add a2mp protocol/AMP manager, by Atheros Linux BT3)
-implementations (mostly Code Aurora). Main difference to the original code is
-- code rebase against recent bluetooth-next
-- rewritten way to send A2MP msgs
-- handling fixed channel modifications
-- I was trying to separate AMP vs A2MP name usage. AMP is used for
-"Alternate MAC PHY" controller, A2MP for "AMP Manager Protocol".
-- fixes related to PTS beta A2MP tests
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/a2mp.h |   72 ++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 72 insertions(+), 0 deletions(-)
 
-Andrei Emeltchenko (21):
-  Bluetooth: A2MP: Create A2MP socket
-  Bluetooth: A2MP: Add sk_data_ready for A2MP socket
-  Bluetooth: A2MP: Add sk_state_change for A2MP socket
-  Bluetooth: A2MP: Build and Send msg helpers
-  Bluetooth: A2MP: AMP Manager basic functions
-  Bluetooth: A2MP: Remove AMP manager in state_change
-  Bluetooth: A2MP: AMP manager initialization
-  Bluetooth: A2MP: Definitions for A2MP commands
-  Bluetooth: A2MP: Define A2MP status codes
-  Bluetooth: A2MP: Process A2MP messages
-  Bluetooth: A2MP: Process A2MP Command Reject
-  Bluetooth: A2MP: Helper functions to count HCI devs
-  Bluetooth: A2MP: Process A2MP Discover Request
-  Bluetooth: A2MP: Process A2MP Change Notify
-  Bluetooth: A2MP: Process A2MP Get Info Request
-  Bluetooth: A2MP: Process A2MP Get AMP Assoc Request
-  Bluetooth: A2MP: Process A2MP Create Physlink Request
-  Bluetooth: A2MP: Process A2MP Disc Physlink Request
-  Bluetooth: A2MP: Process A2MP Command Responses
-  Bluetooth: A2MP: Handling fixed channel
-  Bluetooth: A2MP: Manage incoming connections
-
- include/net/bluetooth/a2mp.h     |  139 ++++++++
- include/net/bluetooth/hci.h      |    2 +
- include/net/bluetooth/hci_core.h |   14 +
- include/net/bluetooth/l2cap.h    |    5 +
- net/bluetooth/a2mp.c             |  664 ++++++++++++++++++++++++++++++++++++++
- net/bluetooth/l2cap_core.c       |   87 ++++--
- 6 files changed, 886 insertions(+), 25 deletions(-)
- create mode 100644 include/net/bluetooth/a2mp.h
- create mode 100644 net/bluetooth/a2mp.c
-
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index cba3d0f..35f6fcb 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -30,6 +30,78 @@ struct a2mp_cmd {
+ 	__u8	data[0];
+ } __packed;
+ 
++/* A2MP command codes */
++#define A2MP_COMMAND_REJ         0x01
++struct a2mp_cmd_rej {
++	__le16	reason;
++} __packed;
++
++#define A2MP_DISCOVER_REQ        0x02
++struct a2mp_discov_req {
++	__le16	mtu;
++	__le16	ext_feat;
++} __packed;
++
++struct a2mp_cl {
++	__u8	id;
++	__u8	type;
++	__u8	status;
++} __packed;
++
++#define A2MP_DISCOVER_RSP        0x03
++struct a2mp_discov_rsp {
++	__le16     mtu;
++	__le16     ext_feat;
++	struct a2mp_cl cl[0];
++} __packed;
++
++#define A2MP_CHANGE_NOTIFY       0x04
++#define A2MP_CHANGE_RSP          0x05
++
++#define A2MP_GETINFO_REQ         0x06
++struct a2mp_info_req {
++	__u8       id;
++} __packed;
++
++#define A2MP_GETINFO_RSP         0x07
++struct a2mp_info_rsp {
++	__u8	id;
++	__u8	status;
++	__le32	total_bw;
++	__le32	max_bw;
++	__le32	min_latency;
++	__le16	pal_cap;
++	__le16	assoc_size;
++} __packed;
++
++#define A2MP_GETAMPASSOC_REQ     0x08
++struct a2mp_amp_assoc_req {
++	__u8	id;
++} __packed;
++
++#define A2MP_GETAMPASSOC_RSP     0x09
++struct a2mp_amp_assoc_rsp {
++	__u8	id;
++	__u8	status;
++	__u8	amp_assoc[0];
++} __packed;
++
++#define A2MP_CREATEPHYSLINK_REQ  0x0A
++#define A2MP_DISCONNPHYSLINK_REQ 0x0C
++struct a2mp_physlink_req {
++	__u8	local_id;
++	__u8	remote_id;
++	__u8	amp_assoc[0];
++} __packed;
++
++#define A2MP_CREATEPHYSLINK_RSP  0x0B
++#define A2MP_DISCONNPHYSLINK_RSP 0x0D
++struct a2mp_physlink_rsp {
++	__u8	local_id;
++	__u8	remote_id;
++	__u8	status;
++} __packed;
++
+ struct a2mp_work_data_ready {
+ 	struct work_struct work;
+ 	struct sock *sk;
 -- 
 1.7.4.1
 
