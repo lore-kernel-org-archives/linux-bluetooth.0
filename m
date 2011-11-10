@@ -1,48 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EBC4D0A.7070704@codeaurora.org>
-Date: Thu, 10 Nov 2011 14:15:38 -0800
-From: Brian Gix <bgix@codeaurora.org>
-MIME-Version: 1.0
-To: johan.hedberg@gmail.com
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Add address type to mgmt_pair_device
-References: <1320962855-19036-1-git-send-email-johan.hedberg@gmail.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Fix mgmt_pair_device imediate error responses
+Date: Fri, 11 Nov 2011 00:07:35 +0200
+Message-Id: <1320962855-19036-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1320962855-19036-1-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+References: <1320962855-19036-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On 11/10/2011 2:07 PM, johan.hedberg@gmail.com wrote:
->
-> -	entry = hci_find_adv_entry(hdev,&cp->bdaddr);
-> -	if (entry)
-> -		conn = hci_connect(hdev, LE_LINK,&cp->bdaddr, sec_level,
-> +	if (cp->addr.type == MGMT_ADDR_BREDR)
-> +		conn = hci_connect(hdev, ACL_LINK,&cp->addr.bdaddr, sec_level,
->   								auth_type);
->   	else
-> -		conn = hci_connect(hdev, ACL_LINK,&cp->bdaddr, sec_level,
-> +		conn = hci_connect(hdev, LE_LINK,&cp->addr.bdaddr, sec_level,
->   								auth_type);
->
+When possible cmd_complete should be returned instead of cmd_status
+since it contains the remote address (this helps user-space track what
+exactly failed).
 
-Are we differentiating between Dual Mode and BR/EDR here?  If we are, we 
-may want to reverse the logic so that it connects with an LE_LINK if the 
-addr type == MGMT_ADDR_LE, and then connects to an ACL_LINK otherwise 
-(as the else).
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c |   13 +++++++++++--
+ 1 files changed, 11 insertions(+), 2 deletions(-)
 
-Unless this is being implimented as a bitmask, in which case the if 
-would be "if (cp->addr.type & MGMT_ADDR_BREDR)", at which point I have 
-no objection.
-
-Because of course Dual mode devices must use the ACL_LINK between each 
-other.
-
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 555e31f..3d33168 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1366,6 +1366,7 @@ static int pair_device(struct sock *sk, u16 index, unsigned char *data, u16 len)
+ {
+ 	struct hci_dev *hdev;
+ 	struct mgmt_cp_pair_device *cp;
++	struct mgmt_rp_pair_device rp;
+ 	struct pending_cmd *cmd;
+ 	u8 sec_level, auth_type;
+ 	struct hci_conn *conn;
+@@ -1397,14 +1398,22 @@ static int pair_device(struct sock *sk, u16 index, unsigned char *data, u16 len)
+ 		conn = hci_connect(hdev, LE_LINK, &cp->addr.bdaddr, sec_level,
+ 								auth_type);
+ 
++	memset(&rp, 0, sizeof(rp));
++	bacpy(&rp.addr.bdaddr, &cp->addr.bdaddr);
++	rp.addr.type = cp->addr.type;
++
+ 	if (IS_ERR(conn)) {
+-		err = PTR_ERR(conn);
++		rp.status = -PTR_ERR(conn);
++		err = cmd_complete(sk, index, MGMT_OP_PAIR_DEVICE,
++							&rp, sizeof(rp));
+ 		goto unlock;
+ 	}
+ 
+ 	if (conn->connect_cfm_cb) {
+ 		hci_conn_put(conn);
+-		err = cmd_status(sk, index, MGMT_OP_PAIR_DEVICE, EBUSY);
++		rp.status = EBUSY;
++		err = cmd_complete(sk, index, MGMT_OP_PAIR_DEVICE,
++							&rp, sizeof(rp));
+ 		goto unlock;
+ 	}
+ 
 -- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+1.7.7.1
+
