@@ -1,41 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <kanak.gupta@stericsson.com>, <ulrik.lauren@stericsson.com>,
-	<henrik.possung@stericsson.com>,
-	Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 0/2] Fix usage of sk_sndtimeo value in l2cap
-Date: Thu, 10 Nov 2011 10:37:23 +0100
-Message-ID: <1320917845-20135-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Thu, 10 Nov 2011 10:31:51 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, henrik.possung@stericsson.com,
+	ulrik.lauren@stericsson.com
+Subject: Re: [PATCH 1/4] SAP: Add support for handle ongoing call
+Message-ID: <20111110083151.GA4484@fusion.localdomain>
+References: <1320677803-32223-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1320677803-32223-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lukasz,
 
-It seems sk_sndtimeo is initialized incorrectly in l2cap_sock.c to
-miliseconds, this will cause invalid value to be set or read using
-SO_SNDTIMEO sockopt since it is assumed this value is specified in
-jiffies.
+On Mon, Nov 07, 2011, Lukasz Rymanowski wrote:
+> With this patch support for handling connect request
+> during ongoing call is added.
+> 
+> Change-Id: I7bd25273a33e5a14cc3698cfc560a5df47cd8f5a
+> ---
+>  sap/sap-u8500.c |   53 ++++++++++++++++++++++++++++++++++++++++++++---------
+>  1 files changed, 44 insertions(+), 9 deletions(-)
 
-Initial value of sk_sndtimeo was changed in 6be6b11f006840ba7d8d4b
-and I belive this was because of regression introduced by commit
-942ecc9c4643db5ce071562e0a23f99464d6b461.
+After fixing the Change-Id stuff and line widths in your commit messages
+all four patches have been pushed upstream. Thanks.
 
-My two patches revert mentioned commit and solve issue in proper way.
-Regression introduced by 942ecc9c4643db5ce071562e0a23f99464d6b461 is
-already fixed by other commit.
-
-
-Andrzej Kaczmarek (2):
-  Buetooth: Revert "Fixed wrong L2CAP Sock timer value"
-  Bluetooth: Fix usage of sk_sndtimeo value
-
- net/bluetooth/l2cap_core.c |    8 ++++----
- net/bluetooth/l2cap_sock.c |    2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
-
--- 
-on behalf of ST-Ericsson
-
+Johan
