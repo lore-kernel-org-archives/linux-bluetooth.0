@@ -1,96 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 1/9] gobex: add unit test for CONNECT request
-Date: Thu, 10 Nov 2011 16:43:50 +0200
-Message-Id: <1320936238-28360-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 3/3] Bluetooth: Add status parameter to mgmt_disconnect response
+Date: Thu, 10 Nov 2011 15:54:39 +0200
+Message-Id: <1320933279-12558-3-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1320933279-12558-1-git-send-email-johan.hedberg@gmail.com>
+References: <1320933279-12558-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
+Since disconnecting may fail the status needs to be communicated to user
+space. This also updates the implementation to match the latest mgmt API
+specification.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- unit/test-gobex-transfer.c |   56 ++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 56 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 +-
+ include/net/bluetooth/mgmt.h     |    1 +
+ net/bluetooth/hci_event.c        |   26 +++++++++++++-------------
+ net/bluetooth/mgmt.c             |   15 +++++++++++++--
+ 4 files changed, 28 insertions(+), 16 deletions(-)
 
-diff --git a/unit/test-gobex-transfer.c b/unit/test-gobex-transfer.c
-index a246418..ac6356d 100644
---- a/unit/test-gobex-transfer.c
-+++ b/unit/test-gobex-transfer.c
-@@ -65,6 +65,12 @@ static guint8 get_rsp_first[] = { G_OBEX_RSP_CONTINUE | FINAL_BIT, 0x00, 0x10,
- static guint8 get_rsp_last[] = { G_OBEX_RSP_SUCCESS | FINAL_BIT, 0x00, 0x06,
- 					G_OBEX_HDR_BODY_END, 0x00, 0x03 };
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 5f401e7..a67ff88 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -919,7 +919,7 @@ int mgmt_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 								u8 addr_type);
+ int mgmt_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 								u8 addr_type);
+-int mgmt_disconnect_failed(struct hci_dev *hdev);
++int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 status);
+ int mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 						u8 addr_type, u8 status);
+ int mgmt_pin_code_request(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 secure);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index e5a866a..8b07a83 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -130,6 +130,7 @@ struct mgmt_cp_disconnect {
+ } __packed;
+ struct mgmt_rp_disconnect {
+ 	bdaddr_t bdaddr;
++	__u8 status;
+ } __packed;
  
-+static guint8 conn_req[] = { G_OBEX_OP_CONNECT | FINAL_BIT, 0x00, 0x07,
-+					0x10, 0x00, 0x10, 0x00 };
-+static guint8 conn_rsp[] = { G_OBEX_RSP_SUCCESS | FINAL_BIT, 0x00, 0x0c,
-+					0x10, 0x00, 0x10, 0x00, 0xcb, 0x00,
-+					0x00, 0x00, 0x01 };
-+
- static guint8 hdr_type[] = "foo/bar";
- static guint8 body_data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+ #define MGMT_ADDR_BREDR			0x00
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index bbfaaa8..0d55d00 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1605,27 +1605,27 @@ static inline void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff
  
-@@ -614,10 +620,60 @@ static void test_get_rsp_eagain(void)
- 	g_assert_no_error(d.err);
+ 	BT_DBG("%s status %d", hdev->name, ev->status);
+ 
+-	if (ev->status) {
+-		hci_dev_lock(hdev);
+-		mgmt_disconnect_failed(hdev);
+-		hci_dev_unlock(hdev);
+-		return;
+-	}
+-
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
+ 	if (!conn)
+ 		goto unlock;
+ 
+-	conn->state = BT_CLOSED;
++	if (ev->status == 0)
++		conn->state = BT_CLOSED;
+ 
+-	if (conn->type == ACL_LINK || conn->type == LE_LINK)
+-		mgmt_disconnected(hdev, &conn->dst, conn->type,
++	if (conn->type == ACL_LINK || conn->type == LE_LINK) {
++		if (ev->status != 0)
++			mgmt_disconnect_failed(hdev, &conn->dst, ev->status);
++		else
++			mgmt_disconnected(hdev, &conn->dst, conn->type,
+ 							conn->dst_type);
++	}
+ 
+-	hci_proto_disconn_cfm(conn, ev->reason);
+-	hci_conn_del(conn);
++	if (ev->status == 0) {
++		hci_proto_disconn_cfm(conn, ev->reason);
++		hci_conn_del(conn);
++	}
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+@@ -2098,7 +2098,7 @@ static inline void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	case HCI_OP_DISCONNECT:
+ 		if (ev->status != 0)
+-			mgmt_disconnect_failed(hdev);
++			mgmt_disconnect_failed(hdev, NULL, ev->status);
+ 		break;
+ 
+ 	case HCI_OP_LE_CREATE_CONN:
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index dddb190..5562c21 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2128,6 +2128,7 @@ static void disconnect_rsp(struct pending_cmd *cmd, void *data)
+ 	struct mgmt_rp_disconnect rp;
+ 
+ 	bacpy(&rp.bdaddr, &cp->bdaddr);
++	rp.status = 0;
+ 
+ 	cmd_complete(cmd->sk, cmd->index, MGMT_OP_DISCONNECT, &rp, sizeof(rp));
+ 
+@@ -2176,7 +2177,7 @@ int mgmt_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	return err;
  }
  
-+static void conn_complete(GObex *obex, GError *err, GObexPacket *rsp,
-+							gpointer user_data)
-+{
-+	struct test_data *d = user_data;
-+
-+	if (err != NULL)
-+		d->err = g_error_copy(err);
-+
-+	g_main_loop_quit(d->mainloop);
-+}
-+
-+static void test_conn_req(void)
-+{
-+	GIOChannel *io;
-+	GIOCondition cond;
-+	guint io_id, timer_id;
-+	GObex *obex;
-+	struct test_data d = { 0, NULL, {
-+				{ conn_req, sizeof(conn_req) } }, {
-+				{ conn_rsp, sizeof(conn_rsp) } } };
-+
-+	create_endpoints(&obex, &io, SOCK_STREAM);
-+	d.obex = obex;
-+
-+	cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
-+	io_id = g_io_add_watch(io, cond, test_io_cb, &d);
-+
-+	d.mainloop = g_main_loop_new(NULL, FALSE);
-+
-+	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
-+
-+	g_obex_connect(obex, conn_complete, &d, &d.err, G_OBEX_HDR_INVALID);
-+	g_assert_no_error(d.err);
-+
-+	g_main_loop_run(d.mainloop);
-+
-+	g_assert_cmpuint(d.count, ==, 1);
-+
-+	g_main_loop_unref(d.mainloop);
-+
-+	g_source_remove(timer_id);
-+	g_io_channel_unref(io);
-+	g_source_remove(io_id);
-+	g_obex_unref(obex);
-+
-+	g_assert_no_error(d.err);
-+}
-+
- int main(int argc, char *argv[])
+-int mgmt_disconnect_failed(struct hci_dev *hdev)
++int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 status)
  {
- 	g_test_init(&argc, &argv, NULL);
+ 	struct pending_cmd *cmd;
+ 	int err;
+@@ -2185,7 +2186,17 @@ int mgmt_disconnect_failed(struct hci_dev *hdev)
+ 	if (!cmd)
+ 		return -ENOENT;
  
-+	g_test_add_func("/gobex/test_conn_req", test_conn_req);
+-	err = cmd_status(cmd->sk, hdev->id, MGMT_OP_DISCONNECT, EIO);
++	if (bdaddr) {
++		struct mgmt_rp_disconnect rp;
 +
- 	g_test_add_func("/gobex/test_put_req", test_put_req);
- 	g_test_add_func("/gobex/test_put_rsp", test_put_rsp);
++		bacpy(&rp.bdaddr, bdaddr);
++		rp.status = status;
++
++		err = cmd_complete(cmd->sk, cmd->index, MGMT_OP_DISCONNECT,
++							&rp, sizeof(rp));
++	} else
++		err = cmd_status(cmd->sk, hdev->id, MGMT_OP_DISCONNECT,
++								status);
+ 
+ 	mgmt_pending_remove(cmd);
  
 -- 
-1.7.6.4
+1.7.7.1
 
