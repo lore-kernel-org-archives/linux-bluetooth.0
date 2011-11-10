@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 17/21] Bluetooth: A2MP: Process A2MP Create Physlink Request
-Date: Thu, 10 Nov 2011 16:54:24 +0200
-Message-Id: <1320936868-7978-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 02/21] Bluetooth: A2MP: Add sk_data_ready for A2MP socket
+Date: Thu, 10 Nov 2011 16:54:09 +0200
+Message-Id: <1320936868-7978-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1320936868-7978-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1320936868-7978-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,46 +14,98 @@ From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   19 +++++++++++++++++++
- 1 files changed, 19 insertions(+), 0 deletions(-)
+ include/net/bluetooth/a2mp.h |   24 ++++++++++++++++++++++++
+ net/bluetooth/a2mp.c         |   39 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 63 insertions(+), 0 deletions(-)
+ create mode 100644 include/net/bluetooth/a2mp.h
 
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+new file mode 100644
+index 0000000..95dfaeb
+--- /dev/null
++++ b/include/net/bluetooth/a2mp.h
+@@ -0,0 +1,24 @@
++/*
++   Copyright (c) 2010-2011 Code Aurora Forum.  All rights reserved.
++   Copyright (c) 2011 Intel Corp.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License version 2 and
++   only version 2 as published by the Free Software Foundation.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++*/
++
++#ifndef __A2MP_H
++#define __A2MP_H
++
++struct a2mp_work_data_ready {
++	struct work_struct work;
++	struct sock *sk;
++	int bytes;
++};
++
++#endif /* __A2MP_H */
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 8eeb70e..ba88f34 100644
+index 293a765..4475ec8 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -245,6 +245,22 @@ static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	return 0;
- }
- 
-+static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
-+							struct a2mp_cmd *hdr)
+@@ -17,6 +17,44 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/l2cap.h>
++#include <net/bluetooth/a2mp.h>
++
++static struct workqueue_struct *a2mp_workqueue;
++
++static void data_ready_worker(struct work_struct *w)
 +{
-+	struct a2mp_physlink_req *req = (struct a2mp_physlink_req *)skb->data;
++	struct a2mp_work_data_ready *work = (struct a2mp_work_data_ready *) w;
++	struct sock *sk = work->sk;
++	struct sk_buff *skb;
 +
-+	if (le16_to_cpu(hdr->len) < sizeof(*req))
-+		return -EINVAL;
++	BT_DBG("sk %p", sk);
 +
-+	BT_DBG("local_id %d, remote_id %d", req->local_id, req->remote_id);
++	/* skb_dequeue() is thread-safe */
++	while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
++		/* process a2mp here */
++		kfree_skb(skb);
++	}
 +
-+	/* TODO process physlink create */
-+
-+	skb_pull(skb, hdr->len);
-+	return 0;
++	sock_put(work->sk);
++	kfree(work);
 +}
 +
- /* Handle A2MP signalling */
- void a2mp_receive(struct sock *sk, struct sk_buff *skb)
- {
-@@ -291,6 +307,9 @@ void a2mp_receive(struct sock *sk, struct sk_buff *skb)
- 			break;
- 
- 		case A2MP_CREATEPHYSLINK_REQ:
-+			err = a2mp_createphyslink_req(mgr, skb, hdr);
-+			break;
++static void a2mp_data_ready(struct sock *sk, int bytes)
++{
++	struct a2mp_work_data_ready *work;
 +
- 		case A2MP_DISCONNPHYSLINK_REQ:
- 		case A2MP_CHANGE_RSP:
- 		case A2MP_DISCOVER_RSP:
++	work = kmalloc(sizeof(*work), GFP_ATOMIC);
++	if (work) {
++		INIT_WORK(&work->work, data_ready_worker);
++		sock_hold(sk);
++		work->sk = sk;
++		work->bytes = bytes;
++		if (!queue_work(a2mp_workqueue, &work->work)) {
++			kfree(work);
++			sock_put(sk);
++		}
++	}
++}
+ 
+ static void l2cap_fixed_channel_config(struct sock *sk)
+ {
+@@ -65,6 +103,7 @@ static struct socket *open_a2mp_sock(struct l2cap_conn *conn)
+ 	}
+ 
+ 	sk = sock->sk;
++	sk->sk_data_ready = a2mp_data_ready;
+ 	memset(&addr, 0, sizeof(addr));
+ 	bacpy(&addr.l2_bdaddr, conn->src);
+ 	addr.l2_family = AF_BLUETOOTH;
 -- 
 1.7.4.1
 
