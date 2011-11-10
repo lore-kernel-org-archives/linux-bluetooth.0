@@ -1,93 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 10 Nov 2011 12:35:08 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com,
+	ulrik.lauren@stericsson.com, henrik.possung@stericsson.com
+Subject: Re: [PATCH 2/2] Bluetooth: Fix usage of sk_sndtimeo value
+Message-ID: <20111110103506.GB8486@aemeltch-MOBL1>
+References: <1320917845-20135-1-git-send-email-andrzej.kaczmarek@tieto.com>
+ <1320917845-20135-3-git-send-email-andrzej.kaczmarek@tieto.com>
+ <20111110095705.GA8486@aemeltch-MOBL1>
+ <4EBBA3E1.70904@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1320836152-2936-1-git-send-email-radoslawjablonski@gmail.com>
-References: <1320836152-2936-1-git-send-email-radoslawjablonski@gmail.com>
-Date: Thu, 10 Nov 2011 12:46:19 +0200
-Message-ID: <CABBYNZ+uEtBdBUWGLB=PyKo9R=+Kj9AY-4bkeT0XeAtp6i_M_g@mail.gmail.com>
-Subject: Re: [PATCHv2 obexd] Add cleanup of '.pcsuite' file on pcsuite_init
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Radoslaw Jablonski <radoslawjablonski@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4EBBA3E1.70904@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+Hi Andrzej,
 
-On Wed, Nov 9, 2011 at 12:55 PM, Radoslaw Jablonski
-<radoslawjablonski@gmail.com> wrote:
-> File named '.pcsuite' is used to show to other applications
-> that PC-Suite connection is active - some operations shouldn't
-> be performed on device when synchronization is in progress.
-> In scenario when obexd will be killed or crashed during PC-Suite
-> connection this file will stay forever in filestystem, because
-> pcsuite_disconnect won't be called to do clean-up.
->
-> This patch adds function which will remove '.pcsuite' file
-> in such problematic scenarios on pcsuite_init.
-> ---
->  plugins/pcsuite.c |   24 +++++++++++++++++++++++-
->  1 files changed, 23 insertions(+), 1 deletions(-)
->
-> diff --git a/plugins/pcsuite.c b/plugins/pcsuite.c
-> index 27a3496..69e184f 100644
-> --- a/plugins/pcsuite.c
-> +++ b/plugins/pcsuite.c
-> @@ -55,6 +55,7 @@
->
->  #define PCSUITE_CHANNEL 24
->  #define PCSUITE_WHO_SIZE 8
-> +#define PCSUITE_FILE_NAME ".pcsuite"
->
->  #define PCSUITE_RECORD "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>    \
->  <record>                                                               \
-> @@ -130,7 +131,7 @@ static void *pcsuite_connect(struct obex_session *os, int *err)
->        if (ftp == NULL)
->                return NULL;
->
-> -       filename = g_build_filename(g_get_home_dir(), ".pcsuite", NULL);
-> +       filename = g_build_filename(g_get_home_dir(), PCSUITE_FILE_NAME, NULL);
->
->        fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0644);
->        if (fd < 0 && errno != EEXIST) {
-> @@ -497,10 +498,31 @@ static struct obex_mime_type_driver backup = {
->        .flush = backup_flush,
->  };
->
-> +static void pcsuite_file_cleanup(void)
-> +{
-> +       char *filename;
-> +       struct stat buf;
-> +
-> +       filename = g_build_filename(g_get_home_dir(), PCSUITE_FILE_NAME, NULL);
-> +
-> +       if (stat(filename, &buf) == 0) {
-> +               DBG("Removing unneeded pcsuite-file: %s", filename);
-> +               remove(filename);
-> +       }
-> +
-> +       g_free(filename);
-> +}
-> +
->  static int pcsuite_init(void)
->  {
->        int err;
->
-> +       /* In some cases '.pcsuite' file will be present on device even if
-> +        * there is no PC-Suite connection active in the moment(eg. obexd
-> +        * crashed or was killed while pcsuite connection was active)
-> +        * Removing this file if not needed. */
-> +       pcsuite_file_cleanup();
-> +
->        err = obex_service_driver_register(&pcsuite);
->        if (err < 0)
->                return err;
-> --
-> 1.7.0.4
+On Thu, Nov 10, 2011 at 11:13:53AM +0100, Andrzej Kaczmarek wrote:
+> Hi Andrei,
+> 
+> On 10.11.2011 10:57, Andrei Emeltchenko wrote:
+> >Hi Andrzej,
+> >
+> >On Thu, Nov 10, 2011 at 10:37:25AM +0100, Andrzej Kaczmarek wrote:
+> >>sk_sndtimeo timeout value is specified in jiffes and should be
+> >>converted to miliseconds when used as input to __set_chan_timer.
+> >>
+> >>Signed-off-by: Andrzej Kaczmarek<andrzej.kaczmarek@tieto.com>
+> >>---
+> >>  net/bluetooth/l2cap_core.c |    8 ++++----
+> >>  1 files changed, 4 insertions(+), 4 deletions(-)
+> >>
+> >>diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> >>index f850684..3b0f807 100644
+> >>--- a/net/bluetooth/l2cap_core.c
+> >>+++ b/net/bluetooth/l2cap_core.c
+> >>@@ -446,7 +446,7 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
+> >>  		if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED&&
+> >>  					conn->hcon->type == ACL_LINK) {
+> >>  			__clear_chan_timer(chan);
+> >>-			__set_chan_timer(chan, sk->sk_sndtimeo);
+> >>+			__set_chan_timer(chan, jiffies_to_msecs(sk->sk_sndtimeo));
+> >
+> >Then __set_chan_timer do reverse conversion:
+> >mod_timer(timer, jiffies + msecs_to_jiffies(timeout))
+> >
+> >Look ugly :-(
+> 
+> Well, I agree. But problem here is that __set_chan_timer has
+> miliseconds as input and sk_sndtimeo has to be specified in jiffies
+> thus ugly double conversion.
 
-Ack, this should really be a pid file created by the service we
-communicate but since this is probably not gonna be fixed then it
-seems this workaround is the only thing that can be done.
+Maybe we can just use jiffies in  __set_chan_timer ?
 
--- 
-Luiz Augusto von Dentz
+Best regards 
+Andrei Emeltchenko 
+
+> 
+> But what about adding __set_chan_timer_jiffies macro and use it here?
+> 
+> BR,
+> Andrzej
