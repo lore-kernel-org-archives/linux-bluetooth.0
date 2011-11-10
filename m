@@ -1,144 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Add proper response to mgmt_remove_keys command
-Date: Thu, 10 Nov 2011 15:54:38 +0200
-Message-Id: <1320933279-12558-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1320933279-12558-1-git-send-email-johan.hedberg@gmail.com>
-References: <1320933279-12558-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/3] Bluetooth: Fix deadlock with mgmt_pair_device
+Date: Thu, 10 Nov 2011 15:54:37 +0200
+Message-Id: <1320933279-12558-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Since the command can fail we need to have a proper response with the
-remote address and a failure status for it. This also updates it to
-conform to the latest mgmt API spec.
+The hci_conn callbacks are called with the hci_dev lock already held so
+no locking should be attempted in them.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/mgmt.h |    4 +++
- net/bluetooth/mgmt.c         |   61 ++++++++++++++++++++++++++++++++++-------
- 2 files changed, 54 insertions(+), 11 deletions(-)
+ net/bluetooth/mgmt.c |    5 -----
+ 1 files changed, 0 insertions(+), 5 deletions(-)
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 76a3f16..e5a866a 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -119,6 +119,10 @@ struct mgmt_cp_remove_keys {
- 	bdaddr_t bdaddr;
- 	__u8 disconnect;
- } __packed;
-+struct mgmt_rp_remove_keys {
-+	bdaddr_t bdaddr;
-+	__u8 status;
-+};
- 
- #define MGMT_OP_DISCONNECT		0x000F
- struct mgmt_cp_disconnect {
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c3d7852..dddb190 100644
+index d23a803..c3d7852 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -961,6 +961,9 @@ static int remove_keys(struct sock *sk, u16 index, unsigned char *data,
+@@ -1331,19 +1331,14 @@ static void pairing_complete(struct pending_cmd *cmd, u8 status)
+ static void pairing_complete_cb(struct hci_conn *conn, u8 status)
  {
- 	struct hci_dev *hdev;
- 	struct mgmt_cp_remove_keys *cp;
-+	struct mgmt_rp_remove_keys rp;
-+	struct hci_cp_disconnect dc;
-+	struct pending_cmd *cmd;
- 	struct hci_conn *conn;
- 	int err;
+ 	struct pending_cmd *cmd;
+-	struct hci_dev *hdev = conn->hdev;
  
-@@ -975,27 +978,44 @@ static int remove_keys(struct sock *sk, u16 index, unsigned char *data,
+ 	BT_DBG("status %u", status);
  
- 	hci_dev_lock_bh(hdev);
- 
-+	memset(&rp, 0, sizeof(rp));
-+	bacpy(&rp.bdaddr, &cp->bdaddr);
-+
- 	err = hci_remove_link_key(hdev, &cp->bdaddr);
--	if (err < 0) {
--		err = cmd_status(sk, index, MGMT_OP_REMOVE_KEYS, -err);
-+	if (err < 0)
- 		goto unlock;
--	}
+-	hci_dev_lock_bh(hdev);
 -
--	err = 0;
- 
--	if (!test_bit(HCI_UP, &hdev->flags) || !cp->disconnect)
-+	if (!test_bit(HCI_UP, &hdev->flags) || !cp->disconnect) {
-+		err = cmd_complete(sk, index, MGMT_OP_REMOVE_KEYS, &rp,
-+								sizeof(rp));
- 		goto unlock;
-+	}
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
--	if (conn) {
--		struct hci_cp_disconnect dc;
-+	if (!conn) {
-+		err = cmd_complete(sk, index, MGMT_OP_REMOVE_KEYS, &rp,
-+								sizeof(rp));
-+		goto unlock;
-+	}
- 
--		put_unaligned_le16(conn->handle, &dc.handle);
--		dc.reason = 0x13; /* Remote User Terminated Connection */
--		err = hci_send_cmd(hdev, HCI_OP_DISCONNECT, sizeof(dc), &dc);
-+	cmd = mgmt_pending_add(sk, MGMT_OP_REMOVE_KEYS, hdev, cp, sizeof(*cp));
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto unlock;
- 	}
- 
-+	put_unaligned_le16(conn->handle, &dc.handle);
-+	dc.reason = 0x13; /* Remote User Terminated Connection */
-+	err = hci_send_cmd(hdev, HCI_OP_DISCONNECT, sizeof(dc), &dc);
-+	if (err < 0)
-+		mgmt_pending_remove(cmd);
-+
- unlock:
-+	if (err < 0) {
-+		rp.status = -err;
-+		err = cmd_complete(sk, index, MGMT_OP_REMOVE_KEYS, &rp,
-+								sizeof(rp));
-+	}
- 	hci_dev_unlock_bh(hdev);
- 	hci_dev_put(hdev);
- 
-@@ -2117,6 +2137,23 @@ static void disconnect_rsp(struct pending_cmd *cmd, void *data)
- 	mgmt_pending_remove(cmd);
+ 	cmd = find_pairing(conn);
+ 	if (!cmd)
+ 		BT_DBG("Unable to find a pending command");
+ 	else
+ 		pairing_complete(cmd, status);
+-
+-	hci_dev_unlock_bh(hdev);
  }
  
-+static void remove_keys_rsp(struct pending_cmd *cmd, void *data)
-+{
-+	u8 *status = data;
-+	struct mgmt_cp_remove_keys *cp = cmd->param;
-+	struct mgmt_rp_remove_keys rp;
-+
-+	memset(&rp, 0, sizeof(rp));
-+	bacpy(&rp.bdaddr, &cp->bdaddr);
-+	if (status != NULL)
-+		rp.status = *status;
-+
-+	cmd_complete(cmd->sk, cmd->index, MGMT_OP_REMOVE_KEYS, &rp,
-+								sizeof(rp));
-+
-+	mgmt_pending_remove(cmd);
-+}
-+
- int mgmt_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 								u8 addr_type)
- {
-@@ -2134,6 +2171,8 @@ int mgmt_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	if (sk)
- 		sock_put(sk);
- 
-+	mgmt_pending_foreach(MGMT_OP_REMOVE_KEYS, hdev, remove_keys_rsp, NULL);
-+
- 	return err;
- }
- 
+ static int pair_device(struct sock *sk, u16 index, unsigned char *data, u16 len)
 -- 
 1.7.7.1
 
