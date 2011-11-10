@@ -2,162 +2,117 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 4/6] Implement EnableIntermediateMeasurement D-Bus method
-Date: Thu, 10 Nov 2011 12:37:00 +0100
-Message-Id: <1320925022-21891-5-git-send-email-sancane@gmail.com>
-In-Reply-To: <1320925022-21891-4-git-send-email-sancane@gmail.com>
+Subject: [PATCH 6/6] Notify intermediate measurements
+Date: Thu, 10 Nov 2011 12:37:02 +0100
+Message-Id: <1320925022-21891-7-git-send-email-sancane@gmail.com>
+In-Reply-To: <1320925022-21891-6-git-send-email-sancane@gmail.com>
 References: <1320925022-21891-1-git-send-email-sancane@gmail.com>
  <1320925022-21891-2-git-send-email-sancane@gmail.com>
  <1320925022-21891-3-git-send-email-sancane@gmail.com>
  <1320925022-21891-4-git-send-email-sancane@gmail.com>
+ <1320925022-21891-5-git-send-email-sancane@gmail.com>
+ <1320925022-21891-6-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- thermometer/thermometer.c |   74 +++++++++++++++++++++++++++++++++++++-------
- 1 files changed, 62 insertions(+), 12 deletions(-)
+ thermometer/thermometer.c |   47 ++++++++++++++++++++++++++++++++++++++++----
+ 1 files changed, 42 insertions(+), 5 deletions(-)
 
 diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
-index 616c21d..49e6372 100644
+index 0663b3c..fb03b8d 100644
 --- a/thermometer/thermometer.c
 +++ b/thermometer/thermometer.c
-@@ -63,6 +63,7 @@ struct thermometer {
+@@ -61,6 +61,7 @@ struct thermometer {
+ 	struct att_range	*svc_range;	/* Thermometer range */
+ 	guint			attioid;	/* Att watcher id */
  	guint			attindid;	/* Att incications id */
++	guint			attnotid;	/* Att notifications id */
  	GSList			*chars;		/* Characteristics */
  	GSList			*fwatchers;     /* Final measurements */
-+	GSList			*iwatchers;     /* Intermediate measurements */
- 	gboolean		intermediate;
- 	guint8			type;
- 	guint16			interval;
-@@ -554,7 +555,7 @@ static struct descriptor *get_descriptor(struct characteristic *ch,
- 	return l->data;
+ 	GSList			*iwatchers;     /* Intermediate measurements */
+@@ -152,6 +153,9 @@ static void destroy_thermometer(gpointer user_data)
+ 	if (t->attindid > 0)
+ 		g_attrib_unregister(t->attrib, t->attindid);
+ 
++	if (t->attnotid > 0)
++		g_attrib_unregister(t->attrib, t->attnotid);
++
+ 	if (t->attrib != NULL)
+ 		g_attrib_unref(t->attrib);
+ 
+@@ -893,12 +897,14 @@ static void update_watcher(gpointer data, gpointer user_data)
+ 
+ static void recv_measurement(struct thermometer *t, struct measurement *msmt)
+ {
+-	if (g_strcmp0(msmt->msmnt, "Intermediate") == 0) {
+-		DBG("Notification of intermediate measurement not implemented");
+-		return;
+-	}
++	GSList *wlist;
+ 
+-	g_slist_foreach(t->fwatchers, update_watcher, msmt);
++	if (g_strcmp0(msmt->msmnt, "Intermediate") == 0)
++		wlist = t->iwatchers;
++	else
++		wlist = t->fwatchers;
++
++	g_slist_foreach(wlist, update_watcher, msmt);
  }
  
--static void final_measurement_cb(guint8 status, const guint8 *pdu,
-+static void measurement_cb(guint8 status, const guint8 *pdu,
- 						guint16 len, gpointer user_data)
- {
- 	gchar *msg = user_data;
-@@ -589,8 +590,34 @@ static void enable_final_measurement(struct thermometer *t)
- 	atval[0] = 0x02;
- 	atval[1] = 0x00;
- 	msg = g_strdup("Enable final measurement");
--	gatt_write_char(t->attrib, desc->handle, atval, 2,
--						final_measurement_cb, msg);
-+	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
+ static void proc_measurement(struct thermometer *t, const uint8_t *pdu,
+@@ -1015,6 +1021,30 @@ static void ind_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+ 									NULL);
+ }
+ 
++static void notif_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
++{
++	struct thermometer *t = user_data;
++	const struct characteristic *ch;
++	uint16_t handle;
++	GSList *l;
++
++	if (len < 3) {
++		DBG("Bad pdu received");
++		return;
++	}
++
++	handle = att_get_u16(&pdu[1]);
++	l = g_slist_find_custom(t->chars, &handle, cmp_char_val_handle);
++	if (l == NULL) {
++		DBG("Unexpected handle: 0x%04x", handle);
++		return;
++	}
++
++	ch = l->data;
++	if (g_strcmp0(ch->attr.uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0)
++		proc_measurement(t, pdu, len, FALSE);
 +}
 +
-+static void enable_intermediate_measurement(struct thermometer *t)
-+{
-+	struct characteristic *ch;
-+	struct descriptor *desc;
-+	bt_uuid_t btuuid;
-+	uint8_t atval[2];
-+	gchar *msg;
-+
-+	ch = get_characteristic(t, INTERMEDIATE_TEMPERATURE_UUID);
-+	if (ch == NULL) {
-+		DBG("Intermediate measurement characteristic not found");
-+		return;
+ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ {
+ 	struct thermometer *t = user_data;
+@@ -1023,6 +1053,8 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ 
+ 	t->attindid = g_attrib_register(t->attrib, ATT_OP_HANDLE_IND,
+ 							ind_handler, t, NULL);
++	t->attnotid = g_attrib_register(t->attrib, ATT_OP_HANDLE_NOTIFY,
++							notif_handler, t, NULL);
+ 	gatt_discover_char(t->attrib, t->svc_range->start, t->svc_range->end,
+ 					NULL, configure_thermometer_cb, t);
+ }
+@@ -1038,6 +1070,11 @@ static void attio_disconnected_cb(gpointer user_data)
+ 		t->attindid = 0;
+ 	}
+ 
++	if (t->attnotid > 0) {
++		g_attrib_unregister(t->attrib, t->attnotid);
++		t->attnotid = 0;
 +	}
 +
-+	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
-+	desc = get_descriptor(ch, &btuuid);
-+	if (desc == NULL) {
-+		DBG("Client characteristic configuration descriptor not found");
-+		return;
-+	}
-+
-+	atval[0] = 0x01;
-+	atval[1] = 0x00;
-+	msg = g_strdup("Enable intermediate measurement");
-+	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
+ 	g_attrib_unref(t->attrib);
+ 	t->attrib = NULL;
  }
- 
- static void disable_final_measurement(struct thermometer *t)
-@@ -617,8 +644,7 @@ static void disable_final_measurement(struct thermometer *t)
- 	atval[0] = 0x00;
- 	atval[1] = 0x00;
- 	msg = g_strdup("Disable final measurement");
--	gatt_write_char(t->attrib, desc->handle, atval, 2,
--						final_measurement_cb, msg);
-+	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
- }
- 
- static void watcher_exit(DBusConnection *conn, void *user_data)
-@@ -635,7 +661,7 @@ static void watcher_exit(DBusConnection *conn, void *user_data)
- 		disable_final_measurement(t);
- }
- 
--static struct watcher *find_watcher(struct thermometer *t, const gchar *sender,
-+static struct watcher *find_watcher(GSList *list, const gchar *sender,
- 							const gchar *path)
- {
- 	struct watcher *match;
-@@ -645,7 +671,7 @@ static struct watcher *find_watcher(struct thermometer *t, const gchar *sender,
- 	match->srv = g_strdup(sender);
- 	match->path = g_strdup(path);
- 
--	l = g_slist_find_custom(t->fwatchers, match, cmp_watcher);
-+	l = g_slist_find_custom(list, match, cmp_watcher);
- 	destroy_watcher(match);
- 
- 	if (l != NULL)
-@@ -666,7 +692,7 @@ static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
- 							DBUS_TYPE_INVALID))
- 		return btd_error_invalid_args(msg);
- 
--	watcher = find_watcher(t, sender, path);
-+	watcher = find_watcher(t->fwatchers, sender, path);
- 	if (watcher != NULL)
- 		return btd_error_already_exists(msg);
- 
-@@ -699,7 +725,7 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
- 							DBUS_TYPE_INVALID))
- 		return btd_error_invalid_args(msg);
- 
--	watcher = find_watcher(t, sender, path);
-+	watcher = find_watcher(t->fwatchers, sender, path);
- 	if (watcher == NULL)
- 		return btd_error_does_not_exist(msg);
- 
-@@ -717,9 +743,33 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
- static DBusMessage *enable_intermediate(DBusConnection *conn, DBusMessage *msg,
- 								void *data)
- {
--	/* TODO: */
--	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
--						"Function not implemented.");
-+	const gchar *sender = dbus_message_get_sender(msg);
-+	struct thermometer *t = data;
-+	struct watcher *watcher;
-+	gchar *path;
-+
-+	if (!t->intermediate)
-+		return btd_error_not_supported(msg);
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+							DBUS_TYPE_INVALID))
-+		return btd_error_invalid_args(msg);
-+
-+	watcher = find_watcher(t->fwatchers, sender, path);
-+	if (watcher == NULL)
-+		return btd_error_does_not_exist(msg);
-+
-+	if (find_watcher(t->iwatchers, sender, path))
-+		return btd_error_already_exists(msg);
-+
-+	DBG("Intermediate measurement watcher %s registered", path);
-+
-+	if (g_slist_length(t->iwatchers) == 0)
-+		enable_intermediate_measurement(t);
-+
-+	t->iwatchers = g_slist_prepend(t->iwatchers, watcher);
-+
-+	return dbus_message_new_method_return(msg);
- }
- 
- static DBusMessage *disable_intermediate(DBusConnection *conn, DBusMessage *msg,
 -- 
 1.7.7.3
 
