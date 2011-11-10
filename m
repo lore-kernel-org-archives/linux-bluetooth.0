@@ -2,78 +2,42 @@ Return-Path: <cyrus@holtmann.org>
 From: Brian Gix <bgix@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org,
 	Gustavo Padovan <padovan@profusion.mobi>
-Cc: Brian Gix <bgix@codeaurora.org>
-Subject: [PATCH 1/3] Bluetooth: Add SMP support to user_confirm_reply
-Date: Thu, 10 Nov 2011 12:52:53 -0800
-Message-Id: <1320958375-24425-2-git-send-email-bgix@codeaurora.org>
-In-Reply-To: <1320958375-24425-1-git-send-email-bgix@codeaurora.org>
-References: <1320958375-24425-1-git-send-email-bgix@codeaurora.org>
+Subject: [PATCH 0/3] Bluetooth: Add Passkey Entry and User Confirm hooks for SMP
+Date: Thu, 10 Nov 2011 12:52:52 -0800
+Message-Id: <1320958375-24425-1-git-send-email-bgix@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-to enable User Confirmation during LE-SMP pairing.
+While I actually prefer Johan's method of adding the User Confirm MGMT code,
+with it's code re-use between user_confirm_reply, and user_confirm_neg_reply,
+I have broken the user_passkey_reply out from user_passkey_neg_reply, and
+added an additional patch to hook in the HCI/SSP based usage of passkeys.
 
-Signed-off-by: Brian Gix <bgix@codeaurora.org>
----
- net/bluetooth/mgmt.c |   22 +++++++++++++++++++---
- 1 files changed, 19 insertions(+), 3 deletions(-)
+This makes sense, I suppose, since the regular and neg replies for passkeys
+are different sizes.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a6720c6..761d607 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1423,6 +1423,7 @@ static int user_confirm_reply(struct sock *sk, u16 index, unsigned char *data,
- 	u16 mgmt_op, hci_op;
- 	struct pending_cmd *cmd;
- 	struct hci_dev *hdev;
-+	struct hci_conn *conn;
- 	int err;
- 
- 	BT_DBG("");
-@@ -1446,20 +1447,35 @@ static int user_confirm_reply(struct sock *sk, u16 index, unsigned char *data,
- 
- 	if (!test_bit(HCI_UP, &hdev->flags)) {
- 		err = cmd_status(sk, index, mgmt_op, ENETDOWN);
--		goto failed;
-+		goto done;
-+	}
-+
-+	/* Route command to HCI (if ACL Link) or SMP (if LE Link) */
-+	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
-+	if (!conn) {
-+		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->bdaddr);
-+		if (!conn) {
-+			err = cmd_status(sk, index, mgmt_op, ENOTCONN);
-+			goto done;
-+		}
-+
-+		/* Forward Confirm response to SMP */
-+
-+		err = cmd_status(sk, index, mgmt_op, 0);
-+		goto done;
- 	}
- 
- 	cmd = mgmt_pending_add(sk, mgmt_op, hdev, data, len);
- 	if (!cmd) {
- 		err = -ENOMEM;
--		goto failed;
-+		goto done;
- 	}
- 
- 	err = hci_send_cmd(hdev, hci_op, sizeof(cp->bdaddr), &cp->bdaddr);
- 	if (err < 0)
- 		mgmt_pending_remove(cmd);
- 
--failed:
-+done:
- 	hci_dev_unlock_bh(hdev);
- 	hci_dev_put(hdev);
- 
--- 
-1.7.7.2
+Passkey's only come into play only if our OI_CAP happens to be
+KeyboardOnly (for BR/EDR/LER) or DisplayKeyboard (LE only).
+
+So the summary of the changes is:
+
+1. Addition of BR/EDR vs LE breakout in user_confirm_reply
+	1.1 Adds SMP placeholder
+	1.2 Keeps Johan's confirm_reply & confirm_neg_reply structure.
+		1.2.1 Johan can defend or change that himself, but the existing code works.
+
+2. Addition of user_passkey_reply, with both BR/EDR (SSP) and LE (SMP) handling
+	2.1 Adds approriate SSP HCI opcodes
+	2.2 Adds appropriate MGMT opcodes
+	2.3 Adds SMP placeholder
+	2.4 Seperate paths for passkey_reply & passkey_neg_reply
+
+3. Addition of HCI event handling and forwarding for the appropriate BR/EDR SSP events
+
 
 -- 
 Brian Gix
 bgix@codeaurora.org
 Employee of Qualcomm Innovation Center, Inc.
 Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum 
+
