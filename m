@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 6/9] gobex: add unit test for CONNECT followed by PUT response
-Date: Thu, 10 Nov 2011 16:43:55 +0200
-Message-Id: <1320936238-28360-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 5/9] gobex: add unit test for CONNECT followed by PUT request
+Date: Thu, 10 Nov 2011 16:43:54 +0200
+Message-Id: <1320936238-28360-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1320936238-28360-1-git-send-email-luiz.dentz@gmail.com>
 References: <1320936238-28360-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,55 +12,85 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- unit/test-gobex-transfer.c |   60 ++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 60 insertions(+), 0 deletions(-)
+ unit/test-gobex-transfer.c |   76 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 75 insertions(+), 1 deletions(-)
 
 diff --git a/unit/test-gobex-transfer.c b/unit/test-gobex-transfer.c
-index 860f129..f3eb0bf 100644
+index 95d4a93..860f129 100644
 --- a/unit/test-gobex-transfer.c
 +++ b/unit/test-gobex-transfer.c
-@@ -73,6 +73,9 @@ static guint8 conn_rsp[] = { G_OBEX_RSP_SUCCESS | FINAL_BIT, 0x00, 0x0c,
- static guint8 conn_rsp_2[] = { G_OBEX_RSP_SUCCESS | FINAL_BIT, 0x00, 0x0c,
- 					0x10, 0x00, 0x10, 0x00, 0xcb, 0x00,
- 					0x00, 0x00, 0x02 };
-+static guint8 conn_rsp_3[] = { G_OBEX_RSP_SUCCESS | FINAL_BIT, 0x00, 0x0c,
-+					0x10, 0x00, 0x10, 0x00, 0xcb, 0x00,
-+					0x00, 0x00, 0x03 };
+@@ -87,6 +87,15 @@ static guint8 conn_get_req_first_2[] = { G_OBEX_OP_GET | FINAL_BIT, 0x00, 0x28,
+ 	G_OBEX_HDR_NAME, 0x00, 0x15,
+ 	0, 'f', 0, 'i', 0, 'l', 0, 'e', 0, '.', 0, 't', 0, 'x', 0, 't', 0, 0 };
  
- static guint8 conn_get_req_first[] = { G_OBEX_OP_GET | FINAL_BIT, 0x00, 0x28,
- 	G_OBEX_HDR_CONNECTION, 0x00, 0x00, 0x00, 0x01,
-@@ -95,6 +98,14 @@ static guint8 conn_put_req_first[] = { G_OBEX_OP_PUT, 0x00, 0x35,
- 	0, 'f', 0, 'i', 0, 'l', 0, 'e', 0, '.', 0, 't', 0, 'x', 0, 't', 0, 0,
- 	G_OBEX_HDR_BODY, 0x00, 0x0d,
- 	0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-+static guint8 conn_put_req_first_3[] = { G_OBEX_OP_PUT, 0x00, 0x35,
-+	G_OBEX_HDR_CONNECTION, 0x00, 0x00, 0x00, 0x03,
++static guint8 conn_put_req_first[] = { G_OBEX_OP_PUT, 0x00, 0x35,
++	G_OBEX_HDR_CONNECTION, 0x00, 0x00, 0x00, 0x01,
 +	G_OBEX_HDR_TYPE, 0x00, 0x0b,
 +	'f', 'o', 'o', '/', 'b', 'a', 'r', '\0',
 +	G_OBEX_HDR_NAME, 0x00, 0x15,
 +	0, 'f', 0, 'i', 0, 'l', 0, 'e', 0, '.', 0, 't', 0, 'x', 0, 't', 0, 0,
 +	G_OBEX_HDR_BODY, 0x00, 0x0d,
 +	0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
- 
++
  static guint8 hdr_type[] = "foo/bar";
  static guint8 body_data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-@@ -921,6 +932,54 @@ static void test_conn_put_req(void)
+ 
+@@ -156,9 +165,12 @@ static gssize provide_eagain(void *buf, gsize len, gpointer user_data)
+ static gssize provide_data(void *buf, gsize len, gpointer user_data)
+ {
+ 	struct test_data *d = user_data;
++	static int count = 0;
+ 
+-	if (d->count > 0)
++	if (count > 0) {
++		count = 0;
+ 		return 0;
++	}
+ 
+ 	if (len < sizeof(body_data)) {
+ 		g_set_error(&d->err, TEST_ERROR, TEST_ERROR_UNEXPECTED,
+@@ -174,6 +186,8 @@ static gssize provide_data(void *buf, gsize len, gpointer user_data)
+ 		g_timeout_add(d->provide_delay, resume_obex, d->obex);
+ 	}
+ 
++	count++;
++
+ 	return sizeof(body_data);
+ }
+ 
+@@ -849,6 +863,64 @@ static void test_conn_get_rsp(void)
  	g_assert_no_error(d.err);
  }
  
-+static void test_conn_put_rsp(void)
++static void conn_complete_put_req(GObex *obex, GError *err, GObexPacket *rsp,
++							gpointer user_data)
++{
++	struct test_data *d = user_data;
++
++	if (err != NULL) {
++		d->err = g_error_copy(err);
++		g_main_loop_quit(d->mainloop);
++	}
++
++	g_obex_put_req(obex, provide_data, transfer_complete, d, &d->err,
++				G_OBEX_HDR_TYPE, hdr_type, sizeof(hdr_type),
++				G_OBEX_HDR_NAME, "file.txt",
++				G_OBEX_HDR_INVALID);
++}
++
++static void test_conn_put_req(void)
 +{
 +	GIOChannel *io;
 +	GIOCondition cond;
 +	guint io_id, timer_id;
 +	GObex *obex;
 +	struct test_data d = { 0, NULL, {
-+			{ conn_rsp_3, sizeof(conn_rsp_3) },
++			{ conn_req, sizeof(conn_req) },
++			{ conn_put_req_first, sizeof(conn_put_req_first) },
++			{ put_req_last, sizeof(put_req_last) }}, {
++			{ conn_rsp, sizeof(conn_rsp) } ,
 +			{ put_rsp_first, sizeof(put_rsp_first) },
-+			{ put_rsp_last, sizeof(put_rsp_last) } }, {
-+			{ conn_put_req_first_3, sizeof(conn_put_req_first_3) },
-+			{ put_req_last, sizeof(put_req_last) },
-+			{ NULL, 0 } } };
++			{ put_rsp_last, sizeof(put_rsp_last) } } };
 +
 +	create_endpoints(&obex, &io, SOCK_STREAM);
 +	d.obex = obex;
@@ -72,19 +102,13 @@ index 860f129..f3eb0bf 100644
 +
 +	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
 +
-+	g_obex_add_request_function(obex, G_OBEX_OP_CONNECT,
-+						handle_conn_rsp, &d);
-+
-+	g_obex_add_request_function(obex, G_OBEX_OP_PUT,
-+						handle_put, &d);
-+
-+	g_io_channel_write_chars(io, (char *) conn_req, sizeof(conn_req),
-+								NULL, &d.err);
++	g_obex_connect(obex, conn_complete_put_req, &d, &d.err,
++							G_OBEX_HDR_INVALID);
 +	g_assert_no_error(d.err);
 +
 +	g_main_loop_run(d.mainloop);
 +
-+	g_assert_cmpuint(d.count, ==, 2);
++	g_assert_cmpuint(d.count, ==, 3);
 +
 +	g_main_loop_unref(d.mainloop);
 +
@@ -99,14 +123,15 @@ index 860f129..f3eb0bf 100644
  int main(int argc, char *argv[])
  {
  	g_test_init(&argc, &argv, NULL);
-@@ -946,6 +1005,7 @@ int main(int argc, char *argv[])
+@@ -873,6 +945,8 @@ int main(int argc, char *argv[])
+ 	g_test_add_func("/gobex/test_conn_get_req", test_conn_get_req);
  	g_test_add_func("/gobex/test_conn_get_rsp", test_conn_get_rsp);
  
- 	g_test_add_func("/gobex/test_conn_put_req", test_conn_put_req);
-+	g_test_add_func("/gobex/test_conn_put_rsp", test_conn_put_rsp);
- 
++	g_test_add_func("/gobex/test_conn_put_req", test_conn_put_req);
++
  	g_test_run();
  
+ 	return 0;
 -- 
 1.7.6.4
 
