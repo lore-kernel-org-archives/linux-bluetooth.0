@@ -1,51 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ] Fix simple-player test script to make it work with dbus-python-0.84
-Date: Thu, 10 Nov 2011 21:58:35 -0300
-Message-Id: <1320973115-13322-1-git-send-email-vinicius.gomes@openbossa.org>
+Message-ID: <4EBC521A.2060703@codeaurora.org>
+Date: Thu, 10 Nov 2011 14:37:14 -0800
+From: Brian Gix <bgix@codeaurora.org>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: Add address type to mgmt_pair_device
+References: <1320962855-19036-1-git-send-email-johan.hedberg@gmail.com> <4EBC4D0A.7070704@codeaurora.org> <20111110223341.GA21131@fusion.localdomain>
+In-Reply-To: <20111110223341.GA21131@fusion.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
-In every machine that I tried with dbus-python 0.84, something like this was
-needed, but I didn't find out why nobody complained about this earlier.
+Hi Johan,
+
+On 11/10/2011 2:33 PM, Johan Hedberg wrote:
+> Hi Brian,
+>
+> On Thu, Nov 10, 2011, Brian Gix wrote:
+>> On 11/10/2011 2:07 PM, johan.hedberg@gmail.com wrote:
+>>>
+>>> -	entry = hci_find_adv_entry(hdev,&cp->bdaddr);
+>>> -	if (entry)
+>>> -		conn = hci_connect(hdev, LE_LINK,&cp->bdaddr, sec_level,
+>>> +	if (cp->addr.type == MGMT_ADDR_BREDR)
+>>> +		conn = hci_connect(hdev, ACL_LINK,&cp->addr.bdaddr, sec_level,
+>>>   								auth_type);
+>>>   	else
+>>> -		conn = hci_connect(hdev, ACL_LINK,&cp->bdaddr, sec_level,
+>>> +		conn = hci_connect(hdev, LE_LINK,&cp->addr.bdaddr, sec_level,
+>>>   								auth_type);
+>>>
+>>
+>> Are we differentiating between Dual Mode and BR/EDR here?  If we
+>> are, we may want to reverse the logic so that it connects with an
+>> LE_LINK if the addr type == MGMT_ADDR_LE, and then connects to an
+>> ACL_LINK otherwise (as the else).
+>>
+>> Unless this is being implimented as a bitmask, in which case the if
+>> would be "if (cp->addr.type&  MGMT_ADDR_BREDR)", at which point I
+>> have no objection.
+>>
+>> Because of course Dual mode devices must use the ACL_LINK between
+>> each other.
+>
+> The idea here isn't to push connection type selection to the kernel but
+> to expect user-space to explicitly say how it wants to connect. If
+> user-space wants to connect over LE it'll provide either ADDR_LE_PUBLIC
+> or ADDR_LE_PRIVATE. So it doesn't really matter what way around the
+> if-statement is formulated (I chose this way around since it meant one
+> comparison instead of two).
+
+OK, I'm fine with that.
 
 
- test/simple-player |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/test/simple-player b/test/simple-player
-index 166caff..70701da 100755
---- a/test/simple-player
-+++ b/test/simple-player
-@@ -104,7 +104,7 @@ if __name__ == '__main__':
- 					"Shuffle" : "off",
- 					"Scan" : "off",
- 					"Status" : "playing",
--					"Position" : dbus.UInt32(0) })
-+					"Position" : dbus.UInt32(0) }, signature="sv")
-
- 	metadata = dbus.Dictionary({ "Title" : "Title",
- 					"Artist" : "Artist",
-@@ -112,7 +112,7 @@ if __name__ == '__main__':
- 					"Genre" : "Genre",
- 					"NumberOfTracks" : dbus.UInt32(10),
- 					"Number" : dbus.UInt32(1),
--					"Duration" : dbus.UInt32(10000) })
-+					"Duration" : dbus.UInt32(10000) }, signature="sv")
-
- 	print('Register media player with:\n\tProperties: %s\n\tMetadata: %s' \
- 						% (properties, metadata))
-@@ -120,6 +120,6 @@ if __name__ == '__main__':
- 	handler = InputHandler(player)
- 	gobject.io_add_watch(sys.stdin, gobject.IO_IN, handler.handle)
-
--	media.RegisterPlayer(path, properties, metadata)
-+	media.RegisterPlayer(dbus.ObjectPath(path), properties, metadata)
-
- 	mainloop.run()
---
-1.7.7
-
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
