@@ -1,54 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC 2/2] Bluetooth: Do not set HCI_RAW when HS enabled
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 11 Nov 2011 23:29:57 +0900
-In-Reply-To: <1321020867-8938-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1321020867-8938-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1321020867-8938-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321021801.15441.397.camel@aeonflux>
-Mime-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH obexd 12/12 v3] gobex: make connection id check less strict
+Date: Fri, 11 Nov 2011 16:29:06 +0200
+Message-Id: <1321021746-5991-12-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1321021746-5991-1-git-send-email-luiz.dentz@gmail.com>
+References: <1321021746-5991-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
->  net/bluetooth/hci_core.c |    6 ++++--
->  1 files changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 189bada..1b08e4b 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -51,6 +51,7 @@
->  
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
-> +#include <net/bluetooth/l2cap.h>
->  
->  #define AUTO_OFF_TIMEOUT 2000
->  
-> @@ -570,8 +571,9 @@ int hci_dev_open(__u16 dev)
->  	if (test_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks))
->  		set_bit(HCI_RAW, &hdev->flags);
->  
-> -	/* Treat all non BR/EDR controllers as raw devices for now */
-> -	if (hdev->dev_type != HCI_BREDR)
-> +	/* Treat all non BR/EDR controllers as raw devices if
-> +	   enable_hs is not set */
-> +	if (hdev->dev_type != HCI_BREDR && !enable_hs)
->  		set_bit(HCI_RAW, &hdev->flags);
+OBEX spec says:
 
-this is fine with me. Even while the include of l2cap.h is kinda nasty.
-Maybe the enable_hs variable actually needs to be moved into hci_*.c
-files and not stay inside L2CAP.
+  Only the first packet in the request needs to contain the Connection
+  Id header...
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+  If a Connection Id header is received with an invalid connection
+  identifier, it is recommended that the operation be rejected with the
+  response code (0xD3) “Service Unavailable”.
 
-Regards
+Since not all requests packets need to contain Connection Id header we
+should only try to validate it in case a header is received.
 
-Marcel
+Reported by Hendrik Sattler <post@hendrik-sattler.de>
+---
+ gobex/gobex.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index 8a23485..7840304 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -694,7 +694,7 @@ static gboolean check_connid(GObex *obex, GObexPacket *pkt)
+ 
+ 	hdr = g_obex_packet_get_header(pkt, G_OBEX_HDR_CONNECTION);
+ 	if (hdr == NULL)
+-		return FALSE;
++		return TRUE;
+ 
+ 	g_obex_header_get_uint32(hdr, &id);
+ 
+-- 
+1.7.6.4
 
