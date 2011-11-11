@@ -1,54 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 1/2] Bluetooth: Allow to change type for virtual HCI
-Date: Fri, 11 Nov 2011 16:14:26 +0200
-Message-Id: <1321020867-8938-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1320973115-13322-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1320973115-13322-1-git-send-email-vinicius.gomes@openbossa.org>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Fri, 11 Nov 2011 11:23:45 -0200
+Message-ID: <CAMOw1v5hh9VGgzHayeukEFAz_KJxSN6T5DUfreRmmwi04kqBFg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Fix simple-player test script to make it work with dbus-python-0.84
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Vinicius
 
-Type can be changed during module loading.
----
- drivers/bluetooth/hci_vhci.c |   10 ++++++++++
- 1 files changed, 10 insertions(+), 0 deletions(-)
+On Thu, Nov 10, 2011 at 10:58 PM, Vinicius Costa Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> ---
+> In every machine that I tried with dbus-python 0.84, something like this was
+> needed, but I didn't find out why nobody complained about this earlier.
 
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index 2e302a1..4c4aec3 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -41,6 +41,8 @@
- 
- #define VERSION "1.3"
- 
-+static ushort type;
-+
- struct vhci_data {
- 	struct hci_dev *hdev;
- 
-@@ -239,6 +241,11 @@ static int vhci_open(struct inode *inode, struct file *file)
- 	hdev->bus = HCI_VIRTUAL;
- 	hdev->driver_data = data;
- 
-+	if (type > HCI_AMP)
-+		type = HCI_BREDR;
-+
-+	hdev->dev_type = type;
-+
- 	hdev->open     = vhci_open_dev;
- 	hdev->close    = vhci_close_dev;
- 	hdev->flush    = vhci_flush;
-@@ -303,6 +310,9 @@ static void __exit vhci_exit(void)
- module_init(vhci_init);
- module_exit(vhci_exit);
- 
-+module_param(type, ushort, 0444);
-+MODULE_PARM_DESC(type, "HCI device type");
-+
- MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
- MODULE_DESCRIPTION("Bluetooth virtual HCI driver ver " VERSION);
- MODULE_VERSION(VERSION);
--- 
-1.7.4.1
+Weird... I have exactly the same version here.
 
+>
+>
+>  test/simple-player |    6 +++---
+>  1 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/test/simple-player b/test/simple-player
+> index 166caff..70701da 100755
+> --- a/test/simple-player
+> +++ b/test/simple-player
+> @@ -104,7 +104,7 @@ if __name__ == '__main__':
+>                                        "Shuffle" : "off",
+>                                        "Scan" : "off",
+>                                        "Status" : "playing",
+> -                                       "Position" : dbus.UInt32(0) })
+> +                                       "Position" : dbus.UInt32(0) }, signature="sv")
+
+>From http://dbus.freedesktop.org/doc/dbus-python/api/: if signature is
+None (the default) it will be guessed from the elements in the dict.
+However, I think it doesn't hurt to put it explicitly.
+
+>
+>        metadata = dbus.Dictionary({ "Title" : "Title",
+>                                        "Artist" : "Artist",
+> @@ -112,7 +112,7 @@ if __name__ == '__main__':
+>                                        "Genre" : "Genre",
+>                                        "NumberOfTracks" : dbus.UInt32(10),
+>                                        "Number" : dbus.UInt32(1),
+> -                                       "Duration" : dbus.UInt32(10000) })
+> +                                       "Duration" : dbus.UInt32(10000) }, signature="sv")
+>
+>        print('Register media player with:\n\tProperties: %s\n\tMetadata: %s' \
+>                                                % (properties, metadata))
+> @@ -120,6 +120,6 @@ if __name__ == '__main__':
+>        handler = InputHandler(player)
+>        gobject.io_add_watch(sys.stdin, gobject.IO_IN, handler.handle)
+>
+> -       media.RegisterPlayer(path, properties, metadata)
+> +       media.RegisterPlayer(dbus.ObjectPath(path), properties, metadata)
+>
+>        mainloop.run()
+
+
+Anyway... it works here with your patch as well.
+
+ACK
