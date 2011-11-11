@@ -2,55 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 0/8] New LTK messages
-Date: Thu, 10 Nov 2011 22:03:48 -0300
-Message-Id: <1320973436-13399-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ] Fix simple-player test script to make it work with dbus-python-0.84
+Date: Thu, 10 Nov 2011 21:58:35 -0300
+Message-Id: <1320973115-13322-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+In every machine that I tried with dbus-python 0.84, something like this was
+needed, but I didn't find out why nobody complained about this earlier.
 
-These are the new version of the messages needed for permanent key
-storage (and allows a more permanent pairing).
 
-Changes from the last version:
-- new messages strutures;
-- support for only the LTK;
-- the LTKs are kept on their own list;
+ test/simple-player |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
-The last three patches are improvements needed for proper pairing.
+diff --git a/test/simple-player b/test/simple-player
+index 166caff..70701da 100755
+--- a/test/simple-player
++++ b/test/simple-player
+@@ -104,7 +104,7 @@ if __name__ == '__main__':
+ 					"Shuffle" : "off",
+ 					"Scan" : "off",
+ 					"Status" : "playing",
+-					"Position" : dbus.UInt32(0) })
++					"Position" : dbus.UInt32(0) }, signature="sv")
 
-As the mgmt interface in the kernel and in userspace are different,
-I wasn't able to test these patches with the latest userspace. To not
-pollute the list even more I will send the userspace side of things
-(already implemented) as soon as it seems that this the way to go.
+ 	metadata = dbus.Dictionary({ "Title" : "Title",
+ 					"Artist" : "Artist",
+@@ -112,7 +112,7 @@ if __name__ == '__main__':
+ 					"Genre" : "Genre",
+ 					"NumberOfTracks" : dbus.UInt32(10),
+ 					"Number" : dbus.UInt32(1),
+-					"Duration" : dbus.UInt32(10000) })
++					"Duration" : dbus.UInt32(10000) }, signature="sv")
 
-Cheers,
---
+ 	print('Register media player with:\n\tProperties: %s\n\tMetadata: %s' \
+ 						% (properties, metadata))
+@@ -120,6 +120,6 @@ if __name__ == '__main__':
+ 	handler = InputHandler(player)
+ 	gobject.io_add_watch(sys.stdin, gobject.IO_IN, handler.handle)
 
-Vinicius Costa Gomes (8):
-  Bluetooth: Add structures for the new LTK exchange messages
-  Bluetooth: Add a custom type for Short Term Keys
-  Bluetooth: Rename smp_key_size to enc_size
-  Bluetooth: Change SMP procedures to use the new key structures
-  Bluetooth: Add new mgmt handlers for Long Term Keys
-  Bluetooth: Add support for reusing the same hci_conn for LE links
-  Bluetooth: Disconnect the link if encryption fails
-  Bluetooth: Only increase the connection sec-level if encryption is
-    successful
+-	media.RegisterPlayer(path, properties, metadata)
++	media.RegisterPlayer(dbus.ObjectPath(path), properties, metadata)
 
- include/net/bluetooth/hci.h      |    1 +
- include/net/bluetooth/hci_core.h |   34 ++++++------
- include/net/bluetooth/mgmt.h     |   21 +++++++
- include/net/bluetooth/smp.h      |    2 +-
- net/bluetooth/hci_conn.c         |   27 +++++-----
- net/bluetooth/hci_core.c         |  107 +++++++++++++++++++++++--------------
- net/bluetooth/hci_event.c        |    5 ++-
- net/bluetooth/l2cap_core.c       |   58 ++++++++++++++-------
- net/bluetooth/mgmt.c             |   77 +++++++++++++++++++++++++++
- net/bluetooth/smp.c              |   44 +++++++++-------
- 10 files changed, 264 insertions(+), 112 deletions(-)
-
+ 	mainloop.run()
 --
 1.7.7
 
