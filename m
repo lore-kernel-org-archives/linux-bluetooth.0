@@ -1,144 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/6] Bluetooth: LE scan infra-structure
-Date: Fri, 11 Nov 2011 19:50:21 -0300
-Message-Id: <1321051824-5216-4-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 4/6] Bluetooth: Add 'eir_len' param to mgmt_device_found()
+Date: Fri, 11 Nov 2011 19:50:22 -0300
+Message-Id: <1321051824-5216-5-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1321051824-5216-1-git-send-email-andre.guedes@openbossa.org>
 References: <1321051824-5216-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds to hci_core the infra-structure to carry out the
-LE scan. Functions were created to init the LE scan and cancel
-an ongoing scanning (hci_do_le_scan and hci_cancel_le_scan).
+This patch adds a new parameter to mgmt_device_found() to inform
+the length of 'eir' pointer.
+
+EIR data from LE advertising report event doesn't have a fixed length
+as EIR data from extended inquiry result event does. We needed to
+change mgmt_device_found() so it copies 'eir_len' bytes instead of
+HCI_MAX_EIR_LENGTH.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |    5 +++
- net/bluetooth/hci_core.c         |   69 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 74 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci_core.h |    3 ++-
+ net/bluetooth/hci_event.c        |    9 +++++----
+ net/bluetooth/mgmt.c             |    8 ++++++--
+ 3 files changed, 13 insertions(+), 7 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index f6d5d90..69dda9b 100644
+index 69dda9b..9da5b69 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -232,6 +232,8 @@ struct hci_dev {
- 	struct list_head	adv_entries;
- 	struct timer_list	adv_timer;
+@@ -942,7 +942,8 @@ int mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status);
+ int mgmt_read_local_oob_data_reply_complete(struct hci_dev *hdev, u8 *hash,
+ 						u8 *randomizer, u8 status);
+ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+-				u8 addr_type, u8 *dev_class, s8 rssi, u8 *eir);
++					u8 addr_type, u8 *dev_class, s8 rssi,
++					u8 *eir,  u8 eir_len);
+ int mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *name);
+ int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status);
+ int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0beb633..6d60fec 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1448,7 +1448,7 @@ static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *
+ 		data.ssp_mode		= 0x00;
+ 		hci_inquiry_cache_update(hdev, &data);
+ 		mgmt_device_found(hdev, &info->bdaddr, ACL_LINK, 0x00,
+-						info->dev_class, 0, NULL);
++						info->dev_class, 0, NULL, 0);
+ 	}
  
-+	struct timer_list	le_scan_timer;
-+
- 	struct hci_dev_stats	stat;
+ 	hci_dev_unlock(hdev);
+@@ -2458,7 +2458,7 @@ static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct
+ 			hci_inquiry_cache_update(hdev, &data);
+ 			mgmt_device_found(hdev, &info->bdaddr, ACL_LINK, 0x00,
+ 						info->dev_class, info->rssi,
+-						NULL);
++						NULL, 0);
+ 		}
+ 	} else {
+ 		struct inquiry_info_with_rssi *info = (void *) (skb->data + 1);
+@@ -2475,7 +2475,7 @@ static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct
+ 			hci_inquiry_cache_update(hdev, &data);
+ 			mgmt_device_found(hdev, &info->bdaddr, ACL_LINK, 0x00,
+ 						info->dev_class, info->rssi,
+-						NULL);
++						NULL, 0);
+ 		}
+ 	}
  
- 	struct sk_buff_head	driver_init;
-@@ -987,5 +989,8 @@ void hci_le_ltk_neg_reply(struct hci_conn *conn);
+@@ -2617,7 +2617,8 @@ static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct
+ 		data.ssp_mode		= 0x01;
+ 		hci_inquiry_cache_update(hdev, &data);
+ 		mgmt_device_found(hdev, &info->bdaddr, ACL_LINK, 0x00,
+-				info->dev_class, info->rssi, info->data);
++					info->dev_class, info->rssi,
++					info->data, sizeof(info->data));
+ 	}
  
- int hci_do_inquiry(struct hci_dev *hdev, u8 length);
- int hci_cancel_inquiry(struct hci_dev *hdev);
-+int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
-+								int timeout);
-+int hci_cancel_le_scan(struct hci_dev *hdev);
- 
- #endif /* __HCI_CORE_H */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 64cdafe..c07dc15 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1423,6 +1423,23 @@ int hci_add_adv_entry(struct hci_dev *hdev,
- 	return 0;
+ 	hci_dev_unlock(hdev);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index bd77f54..b63a7d0 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2397,10 +2397,14 @@ int mgmt_read_local_oob_data_reply_complete(struct hci_dev *hdev, u8 *hash,
  }
  
-+static int le_scan(struct hci_dev *hdev, u8 enable)
-+{
-+	struct hci_cp_le_set_scan_enable cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.enable = enable;
-+
-+	return hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-+}
-+
-+static void le_scan_timeout(unsigned long arg)
-+{
-+	struct hci_dev *hdev = (void *) arg;
-+
-+	le_scan(hdev, 0);
-+}
-+
- /* Register HCI device */
- int hci_register_dev(struct hci_dev *hdev)
+ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+-				u8 addr_type, u8 *dev_class, s8 rssi, u8 *eir)
++					u8 addr_type, u8 *dev_class, s8 rssi,
++					u8 *eir, u8 eir_len)
  {
-@@ -1501,6 +1518,9 @@ int hci_register_dev(struct hci_dev *hdev)
- 	setup_timer(&hdev->adv_timer, hci_clear_adv_cache,
- 						(unsigned long) hdev);
+ 	struct mgmt_ev_device_found ev;
  
-+	setup_timer(&hdev->le_scan_timer, le_scan_timeout,
-+						(unsigned long) hdev);
++	if (eir_len > sizeof(ev.eir))
++		return -EINVAL;
 +
- 	INIT_WORK(&hdev->power_on, hci_power_on);
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+ 	memset(&ev, 0, sizeof(ev));
  
-@@ -1587,6 +1607,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	hci_del_sysfs(hdev);
+ 	bacpy(&ev.addr.bdaddr, bdaddr);
+@@ -2408,7 +2412,7 @@ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	ev.rssi = rssi;
  
- 	del_timer(&hdev->adv_timer);
-+	del_timer(&hdev->le_scan_timer);
+ 	if (eir)
+-		memcpy(ev.eir, eir, sizeof(ev.eir));
++		memcpy(ev.eir, eir, eir_len);
  
- 	destroy_workqueue(hdev->workqueue);
- 
-@@ -2615,3 +2636,51 @@ int hci_cancel_inquiry(struct hci_dev *hdev)
- 
- 	return hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
- }
-+
-+static int set_le_scan_param(struct hci_dev *hdev, u8 type, u16 interval,
-+								u16 window)
-+{
-+	struct hci_cp_le_set_scan_param cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.type = type;
-+	cp.interval = cpu_to_le16(interval);
-+	cp.window = cpu_to_le16(window);
-+
-+	return hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_PARAM, sizeof(cp), &cp);
-+}
-+
-+int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
-+								int timeout)
-+{
-+	int err;
-+
-+	if (test_bit(HCI_LE_SCAN, &hdev->hci_flags))
-+		return -EINPROGRESS;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	err = set_le_scan_param(hdev, type, interval, window);
-+	if (err < 0)
-+		return err;
-+
-+	err = le_scan(hdev, 1);
-+	if (err < 0)
-+		return err;
-+
-+	mod_timer(&hdev->le_scan_timer, jiffies + msecs_to_jiffies(timeout));
-+
-+	return 0;
-+}
-+
-+int hci_cancel_le_scan(struct hci_dev *hdev)
-+{
-+	if (!test_bit(HCI_LE_SCAN, &hdev->hci_flags))
-+		return -EPERM;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	del_timer(&hdev->le_scan_timer);
-+
-+	return le_scan(hdev, 0);
-+}
+ 	if (dev_class)
+ 		memcpy(ev.dev_class, dev_class, sizeof(ev.dev_class));
 -- 
 1.7.7.1
 
