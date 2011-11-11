@@ -1,80 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EBD7287.8080209@canonical.com>
-Date: Fri, 11 Nov 2011 19:07:51 +0000
-From: Gema Gomez <gema.gomez-solano@canonical.com>
+Date: Fri, 11 Nov 2011 19:40:31 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: Create a unique mgmt error code hierarchy
+Message-ID: <20111111174031.GA1176@fusion.localdomain>
+References: <1321021134-31809-2-git-send-email-johan.hedberg@gmail.com>
+ <1321027800-353-1-git-send-email-johan.hedberg@gmail.com>
+ <E91B9660-3CDC-4632-8718-4C3103362219@openbossa.org>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Patch for Dinovo Edge Keyboard udev
-Content-Type: multipart/mixed;
- boundary="------------020202020607080605070204"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <E91B9660-3CDC-4632-8718-4C3103362219@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------020202020607080605070204
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Hi Andre,
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+On Fri, Nov 11, 2011, Andre Guedes wrote:
+> > The management protocol uses a single byte for error codes (aka command
+> > status). In some places this value is directly copied from HCI and in
+> > other a POSIX error number is used. This makes it impossible for
+> > user-space to uniquily decipher the meaning of an error.
+> > 
+> > To solve this issue a new mgmt-specific set of error codes is added
+> > along with a conversion table for HCI status values.
+> 
+> Using _only_ POSIX error codes in management protocol doesn't solve
+> this problems? We could use the bt_to_errno() function to translate
+> HCI errors into POSIX errors.
 
-Hi,
+I think it's a bit too risky to restrict ourself to POSIX for all
+possible Bluetooth errors we may need to communicate to user-space.
+Considering that we still haven't added HS and LE based procedures to
+the protocol at least I'm not willing to bet that POSIX is enough, or at
+least that we'd get an intuitive mapping for it. Using our own codes
+gives us flexibility in the long run and it also allows for more clear
+and intuitive error names which you don't need to go digging in the
+kernel source to figure out exactly what HCI error they map to.
 
-I have been advised to send this patch to you. I use a Dinovo Edge
-keyboard that happens to be broken on Oneiric.
-
-As far as my testing goes, the patch works. You can see the
-conversations around the issue in this bug report:
-https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/123920
-
-Please, let me know if you need any further information to get the issue
-fixed. Apologies if this is the wrong mailing list for this request.
-
-Best Regards,
-Gema
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
-
-iQEcBAEBAgAGBQJOvXKGAAoJEGrsYwHIaYlg1mAIAJ1HeMDXU6vCkRoOcuNKPhHB
-FAjEeF0qUNrASzLvY6nVMppljNkXvAFHK9EySU5akMRRNXX/tmKKtGdorZcpOHe0
-c6roikYpki8E05T1wOrt3os6Ta32jiJYMNwuzbWAq2dRx5gr9OFRCKljcomZaPZ7
-AetcaMR73FtTJEx8kxB5EhAgyIg8v2ZhDZlQzJhVpnTLoikKAPOvpZxn5wTYMuuo
-eXQjNvAtqcnT7ZQnOR4BI5TPtel/nt4U2XatlknBGCgPPn2NrAtf+Pvizftm/iBT
-pudFHHWqXHWyu2JWkeCAgn8pnsUSGz8bLX6aMLACvO+5LYDDUhPH1UkN3qopOpM=
-=kgCX
------END PGP SIGNATURE-----
-
---------------020202020607080605070204
-Content-Type: text/x-patch;
- name="hid2hci.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="hid2hci.patch"
-
---- 62-bluez-hid2hci.rules.orig	2011-08-30 12:59:45.225387980 +0000
-+++ 62-bluez-hid2hci.rules	2011-08-30 13:00:52.025387190 +0000
-@@ -11,7 +11,7 @@
-   RUN+="hid2hci --method=dell --devpath=%p", ENV{HID2HCI_SWITCH}="1"
- 
- # Logitech devices
--KERNEL=="hiddev*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c70[345abce]|c71[34bc]", \
-+KERNEL=="hiddev*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c70[345abce]|c71[bc]", \
-   RUN+="hid2hci --method=logitech-hid --devpath=%p"
- 
- ENV{DEVTYPE}!="usb_device", GOTO="hid2hci_end"
-
---------------020202020607080605070204
-Content-Type: application/octet-stream;
- name="hid2hci.patch.sig"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="hid2hci.patch.sig"
-
-iQEcBAABAgAGBQJOvXKGAAoJEGrsYwHIaYlgmdQIAKFYc00S3cItGqgOLbQvLItMojR/Qffa
-I9URfJnVZEXaqumv/dielitYjyoUq3GrzLo1sNg/F1ODkwaZbrDpuQKgRCsGogytt42Q9TLY
-9CnLyNIo9sB8GGOE+6QNqR2AVeAiQon9pVcnQ7LCGI5VK6JkWP/TpuBB8Qs7B2UcBnAEH4C/
-3d6Wf4HOipyDXirk9nU6wjfy0tMlA8MMhDXbTsB93sM4vlwDE2qWEOm2Yr0I32isI+iHRJJz
-xFgEO47o+B62O9hc4+TDbYFqu4kVkDWeoUVNrhXSxG1g/oEtOGt1u5QkKDKRQFtVqo4F7284
-U11ToDJx5PmKHKMD2WJ2XV0=
---------------020202020607080605070204--
+Johan
