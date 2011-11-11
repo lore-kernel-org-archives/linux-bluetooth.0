@@ -1,41 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/6] LE-Only discovery procedure support
-Date: Fri, 11 Nov 2011 19:50:18 -0300
-Message-Id: <1321051824-5216-1-git-send-email-andre.guedes@openbossa.org>
+Subject: Re: [PATCH 3/3] Bluetooth: Do not set HCI_RAW when HS enabled
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sat, 12 Nov 2011 07:29:46 +0900
+In-Reply-To: <1321023735-11641-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1321023735-11641-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1321023735-11641-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1321050589.15441.401.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Andrei,
 
-This patch series implements the LE-Only discovery procedure.
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/hci_core.c |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
 
-These patches are based on the last patches I sent to ML (already
-acked by Marcel) but not upstream yet.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-BTW, I'm still working on interleaved discovery and should send
-its patches soon.
+Regards
 
-BR,
+Marcel
 
-Andre
-
-Andre Guedes (6):
-  Bluetooth: Add hci_flags to struct hci_dev
-  Bluetooth: Add LE Set Scan Parameter Command
-  Bluetooth: LE scan infra-structure
-  Bluetooth: Add 'eir_len' param to mgmt_device_found()
-  Bluetooth: Report LE devices
-  Bluetooth: Support LE-Only discovery procedure
-
- include/net/bluetooth/hci.h      |   18 ++++++++++
- include/net/bluetooth/hci_core.h |   11 +++++-
- net/bluetooth/hci_core.c         |   70 ++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |   45 ++++++++++++++++++++----
- net/bluetooth/mgmt.c             |   33 ++++++++++++++++--
- 5 files changed, 165 insertions(+), 12 deletions(-)
-
--- 
-1.7.7.1
 
