@@ -1,69 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EBD5378.7080303@codeaurora.org>
-Date: Fri, 11 Nov 2011 08:55:20 -0800
-From: Brian Gix <bgix@codeaurora.org>
-MIME-Version: 1.0
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/8] Bluetooth: Add a custom type for Short Term Keys
-References: <1320973436-13399-1-git-send-email-vinicius.gomes@openbossa.org> <1320973436-13399-3-git-send-email-vinicius.gomes@openbossa.org>
-In-Reply-To: <1320973436-13399-3-git-send-email-vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [PATCH v2] Bluetooth: Create a unique mgmt error code hierarchy
+Mime-Version: 1.0 (Apple Message framework v1251.1)
+Content-Type: text/plain; charset=us-ascii
+From: Andre Guedes <andre.guedes@openbossa.org>
+In-Reply-To: <1321027800-353-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 11 Nov 2011 13:49:07 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <E91B9660-3CDC-4632-8718-4C3103362219@openbossa.org>
+References: <1321021134-31809-2-git-send-email-johan.hedberg@gmail.com> <1321027800-353-1-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 11/10/2011 5:03 PM, Vinicius Costa Gomes wrote:
-> These keys are just used to encrypt the link, during SMP phase 2, they should
-> not be stored nor reused. We use the same list as the LTKs to temporarily store
-> them, but as soon as they are used they are removed from the list.
->
-> Signed-off-by: Vinicius Costa Gomes<vinicius.gomes@openbossa.org>
-> ---
->   include/net/bluetooth/hci.h |    1 +
->   1 files changed, 1 insertions(+), 0 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 139ce2a..069768c 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -260,6 +260,7 @@ enum {
->   #define HCI_LK_AUTH_COMBINATION		0x05
->   #define HCI_LK_CHANGED_COMBINATION	0x06
->   /* The spec doesn't define types for SMP keys */
-> +#define HCI_LK_SMP_STK			0x80
->   #define HCI_LK_SMP_LTK			0x81
->   #define HCI_LK_SMP_IRK			0x82
->   #define HCI_LK_SMP_CSRK			0x83
+Hi Johan,
 
+On Nov 11, 2011, at 1:10 PM, johan.hedberg@gmail.com wrote:
 
-At some point, we will also need to expand this list to include key 
-types for both Initiator and Responder (or rather, keys Locally 
-generated, and keys Remotely generated).  Although there are 3 base 
-types of LE keys (4 if you count the STK), there are in fact 6 different 
-keys for different situations (7 if you count STK).
+> From: Johan Hedberg <johan.hedberg@intel.com>
+> 
+> The management protocol uses a single byte for error codes (aka command
+> status). In some places this value is directly copied from HCI and in
+> other a POSIX error number is used. This makes it impossible for
+> user-space to uniquily decipher the meaning of an error.
+> 
+> To solve this issue a new mgmt-specific set of error codes is added
+> along with a conversion table for HCI status values.
 
-LTKs might be considered an exception, since most devices will only ever 
-be a Master or a Slave, and IRKs will often only need to be saved for 
-remote privacy supporting peripherals, if the local side does not use 
-privacy.
+Using _only_ POSIX error codes in management protocol doesn't solve
+this problems? We could use the bt_to_errno() function to translate
+HCI errors into POSIX errors.
 
-However, for the CSRKs, I suspect that we will need to strongly 
-differentiate between Locally and Remotely generated signing keys.  If 
-we have a server with a "Signed Write Cmd" Characteristic and the remote 
-device has one too, we will need to sign the outbound Write Cmds with 
-the key the remote side distributed to us, and they will use the key 
-that we sent them, so we need to keep them separate.
+BR,
 
-And once you start down that path, you should at least consider the 
-possibility of needing to distinguish between remote and local LTKs and 
-IRKs as well.  STKs at least do not have that problem: them are jointly 
-derived.
-
-Should we add _LCL_ and _REM_ to the naming conventions, and expand the 
-enumeration out to 0x86?
-
--- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Andre
