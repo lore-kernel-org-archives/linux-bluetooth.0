@@ -1,65 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4EBD7287.8080209@canonical.com>
+Date: Fri, 11 Nov 2011 19:07:51 +0000
+From: Gema Gomez <gema.gomez-solano@canonical.com>
 MIME-Version: 1.0
-Date: Fri, 11 Nov 2011 23:08:38 +0200
-Message-ID: <CAOazyz213Z61F4yiOE1hvCdrkgjWa1kBjoAaZ+b1WwDC1=ZtcA@mail.gmail.com>
-Subject: Out of tree plugins
-From: Alon Bar-Lev <alon.barlev@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Patch for Dinovo Edge Keyboard udev
+Content-Type: multipart/mixed;
+ boundary="------------020202020607080605070204"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+This is a multi-part message in MIME format.
+--------------020202020607080605070204
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-Reading the tread about Sixaxis [1], and actually want to use this device...
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-I could not figure out the end conclusion... as discussion was
-terminated in the middle.
+Hi,
 
-Bluez is already implemented in modular way.
+I have been advised to send this patch to you. I use a Dinovo Edge
+keyboard that happens to be broken on Oneiric.
 
-However, there is no sense in having the ability to be modular and not
-expose it to out of tree modules.
+As far as my testing goes, the patch works. You can see the
+conversations around the issue in this bug report:
+https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/123920
 
-And if there is out of tree modular support, features like new devices
-may be added without upstream involvement.
+Please, let me know if you need any further information to get the issue
+fixed. Apologies if this is the wrong mailing list for this request.
 
-I tried to compile the echo, wiiremote, sixaxis and most other, and
-found that plugins may be compiled using the simple command:
+Best Regards,
+Gema
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
 
-gcc \
-    -shared -fPIC -fpic -o a.out $f \
-   $(pkg-config --cflags glib-2.0) $(pkg-config --cflags dbus-1)
-$(pkg-config --cflags bluez) \
-   '-DVERSION="1"' -I../gdbus -Iextra_include
+iQEcBAEBAgAGBQJOvXKGAAoJEGrsYwHIaYlg1mAIAJ1HeMDXU6vCkRoOcuNKPhHB
+FAjEeF0qUNrASzLvY6nVMppljNkXvAFHK9EySU5akMRRNXX/tmKKtGdorZcpOHe0
+c6roikYpki8E05T1wOrt3os6Ta32jiJYMNwuzbWAq2dRx5gr9OFRCKljcomZaPZ7
+AetcaMR73FtTJEx8kxB5EhAgyIg8v2ZhDZlQzJhVpnTLoikKAPOvpZxn5wTYMuuo
+eXQjNvAtqcnT7ZQnOR4BI5TPtel/nt4U2XatlknBGCgPPn2NrAtf+Pvizftm/iBT
+pudFHHWqXHWyu2JWkeCAgn8pnsUSGz8bLX6aMLACvO+5LYDDUhPH1UkN3qopOpM=
+=kgCX
+-----END PGP SIGNATURE-----
 
-While /usr/include/bluetooth has whatever bluez installs.
-And while in extra_include the following files:
----
-adapter.h
-btio.h
-device.h
-hcid.h
-log.h
-manager.h
-oob.h
-plugin.h
-sdpd.h
-sdp-xml.h
-storage.h
-textfile.h
----
+--------------020202020607080605070204
+Content-Type: text/x-patch;
+ name="hid2hci.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="hid2hci.patch"
 
-Note: Not sure about the requirement of gdbus.h if dbus-glib is available.
+--- 62-bluez-hid2hci.rules.orig	2011-08-30 12:59:45.225387980 +0000
++++ 62-bluez-hid2hci.rules	2011-08-30 13:00:52.025387190 +0000
+@@ -11,7 +11,7 @@
+   RUN+="hid2hci --method=dell --devpath=%p", ENV{HID2HCI_SWITCH}="1"
+ 
+ # Logitech devices
+-KERNEL=="hiddev*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c70[345abce]|c71[34bc]", \
++KERNEL=="hiddev*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c70[345abce]|c71[bc]", \
+   RUN+="hid2hci --method=logitech-hid --devpath=%p"
+ 
+ ENV{DEVTYPE}!="usb_device", GOTO="hid2hci_end"
 
-Of course src/bluetooth.ver needs to be updated to export the above
-headers' symbols to make it work.
+--------------020202020607080605070204
+Content-Type: application/octet-stream;
+ name="hid2hci.patch.sig"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="hid2hci.patch.sig"
 
-After doing that, most of in-tree plugins may be split out of
-bluetoothd, and plugins as wiiremote, sixaxis may
-be maintained in its own repository and release cycle.
-
-Thoughts?
-Alon Bar-Lev.
-
-[1] http://thread.gmane.org/gmane.linux.bluez.kernel/15308
+iQEcBAABAgAGBQJOvXKGAAoJEGrsYwHIaYlgmdQIAKFYc00S3cItGqgOLbQvLItMojR/Qffa
+I9URfJnVZEXaqumv/dielitYjyoUq3GrzLo1sNg/F1ODkwaZbrDpuQKgRCsGogytt42Q9TLY
+9CnLyNIo9sB8GGOE+6QNqR2AVeAiQon9pVcnQ7LCGI5VK6JkWP/TpuBB8Qs7B2UcBnAEH4C/
+3d6Wf4HOipyDXirk9nU6wjfy0tMlA8MMhDXbTsB93sM4vlwDE2qWEOm2Yr0I32isI+iHRJJz
+xFgEO47o+B62O9hc4+TDbYFqu4kVkDWeoUVNrhXSxG1g/oEtOGt1u5QkKDKRQFtVqo4F7284
+U11ToDJx5PmKHKMD2WJ2XV0=
+--------------020202020607080605070204--
