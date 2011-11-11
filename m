@@ -1,68 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 2/9 v2] gobex: add unit test for CONNECT response
-Date: Fri, 11 Nov 2011 11:14:27 +0200
-Message-Id: <1321002874-31823-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1321002874-31823-1-git-send-email-luiz.dentz@gmail.com>
-References: <1321002874-31823-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 1/9 v2] gobex: add unit test for CONNECT request
+Date: Fri, 11 Nov 2011 11:14:26 +0200
+Message-Id: <1321002874-31823-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- unit/test-gobex-transfer.c |   65 ++++++++++++++++++++++++++++++++++++++++++-
- unit/util.c                |    3 ++
- 2 files changed, 66 insertions(+), 2 deletions(-)
+ unit/test-gobex-transfer.c |   56 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 56 insertions(+), 0 deletions(-)
 
 diff --git a/unit/test-gobex-transfer.c b/unit/test-gobex-transfer.c
-index ac6356d..c711876 100644
+index a246418..ac6356d 100644
 --- a/unit/test-gobex-transfer.c
 +++ b/unit/test-gobex-transfer.c
-@@ -68,8 +68,9 @@ static guint8 get_rsp_last[] = { G_OBEX_RSP_SUCCESS | FINAL_BIT, 0x00, 0x06,
- static guint8 conn_req[] = { G_OBEX_OP_CONNECT | FINAL_BIT, 0x00, 0x07,
- 					0x10, 0x00, 0x10, 0x00 };
- static guint8 conn_rsp[] = { G_OBEX_RSP_SUCCESS | FINAL_BIT, 0x00, 0x0c,
--					0x10, 0x00, 0x10, 0x00, 0xcb, 0x00,
--					0x00, 0x00, 0x01 };
-+					0x10, 0x00, 0x10, 0x00,
-+					G_OBEX_HDR_CONNECTION, 0x00, 0x00,
-+					0x00, 0x01 };
+@@ -65,6 +65,12 @@ static guint8 get_rsp_first[] = { G_OBEX_RSP_CONTINUE | FINAL_BIT, 0x00, 0x10,
+ static guint8 get_rsp_last[] = { G_OBEX_RSP_SUCCESS | FINAL_BIT, 0x00, 0x06,
+ 					G_OBEX_HDR_BODY_END, 0x00, 0x03 };
  
++static guint8 conn_req[] = { G_OBEX_OP_CONNECT | FINAL_BIT, 0x00, 0x07,
++					0x10, 0x00, 0x10, 0x00 };
++static guint8 conn_rsp[] = { G_OBEX_RSP_SUCCESS | FINAL_BIT, 0x00, 0x0c,
++					0x10, 0x00, 0x10, 0x00, 0xcb, 0x00,
++					0x00, 0x00, 0x01 };
++
  static guint8 hdr_type[] = "foo/bar";
  static guint8 body_data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-@@ -668,11 +669,71 @@ static void test_conn_req(void)
+ 
+@@ -614,10 +620,60 @@ static void test_get_rsp_eagain(void)
  	g_assert_no_error(d.err);
  }
  
-+static void handle_conn_rsp(GObex *obex, GObexPacket *req,
-+						gpointer user_data)
++static void conn_complete(GObex *obex, GError *err, GObexPacket *rsp,
++							gpointer user_data)
 +{
 +	struct test_data *d = user_data;
-+	guint8 op = g_obex_packet_get_operation(req, NULL);
-+	GObexPacket *rsp;
 +
-+	if (op != G_OBEX_OP_CONNECT) {
-+		d->err = g_error_new(TEST_ERROR, TEST_ERROR_UNEXPECTED,
-+					"Unexpected opcode 0x%02x", op);
-+		g_main_loop_quit(d->mainloop);
-+		return;
-+	}
++	if (err != NULL)
++		d->err = g_error_copy(err);
 +
-+	rsp = g_obex_packet_new(G_OBEX_RSP_SUCCESS, TRUE, G_OBEX_HDR_INVALID);
-+	g_obex_send(obex, rsp, &d->err);
++	g_main_loop_quit(d->mainloop);
 +}
 +
-+static void test_conn_rsp(void)
++static void test_conn_req(void)
 +{
 +	GIOChannel *io;
 +	GIOCondition cond;
 +	guint io_id, timer_id;
 +	GObex *obex;
 +	struct test_data d = { 0, NULL, {
-+			{ conn_rsp, sizeof(conn_rsp) } }, {
-+			{ NULL, 0 } } };
++				{ conn_req, sizeof(conn_req) } }, {
++				{ conn_rsp, sizeof(conn_rsp) } } };
 +
 +	create_endpoints(&obex, &io, SOCK_STREAM);
 +	d.obex = obex;
@@ -74,11 +65,7 @@ index ac6356d..c711876 100644
 +
 +	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
 +
-+	g_obex_add_request_function(obex, G_OBEX_OP_CONNECT,
-+						handle_conn_rsp, &d);
-+
-+	g_io_channel_write_chars(io, (char *) conn_req, sizeof(conn_req),
-+								NULL, &d.err);
++	g_obex_connect(obex, conn_complete, &d, &d.err, G_OBEX_HDR_INVALID);
 +	g_assert_no_error(d.err);
 +
 +	g_main_loop_run(d.mainloop);
@@ -99,25 +86,11 @@ index ac6356d..c711876 100644
  {
  	g_test_init(&argc, &argv, NULL);
  
- 	g_test_add_func("/gobex/test_conn_req", test_conn_req);
-+	g_test_add_func("/gobex/test_conn_rsp", test_conn_rsp);
- 
++	g_test_add_func("/gobex/test_conn_req", test_conn_req);
++
  	g_test_add_func("/gobex/test_put_req", test_put_req);
  	g_test_add_func("/gobex/test_put_rsp", test_put_rsp);
-diff --git a/unit/util.c b/unit/util.c
-index 630a70e..5788654 100644
---- a/unit/util.c
-+++ b/unit/util.c
-@@ -166,6 +166,9 @@ gboolean test_io_cb(GIOChannel *io, GIOCondition cond, gpointer user_data)
- 		goto failed;
- 	}
  
-+	if (send_buf_len == 0)
-+		goto failed;
-+
- 	g_io_channel_write_chars(io, send_buf, send_buf_len, &bytes_written,
- 									NULL);
- 	if (bytes_written != send_buf_len) {
 -- 
 1.7.6.4
 
