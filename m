@@ -1,48 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 12/12 v3] gobex: make connection id check less strict
-Date: Fri, 11 Nov 2011 16:29:06 +0200
-Message-Id: <1321021746-5991-12-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 10/12 v3] gobex: fix not tracking received responses
+Date: Fri, 11 Nov 2011 16:29:04 +0200
+Message-Id: <1321021746-5991-10-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1321021746-5991-1-git-send-email-luiz.dentz@gmail.com>
 References: <1321021746-5991-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-OBEX spec says:
-
-  Only the first packet in the request needs to contain the Connection
-  Id header...
-
-  If a Connection Id header is received with an invalid connection
-  identifier, it is recommended that the operation be rejected with the
-  response code (0xD3) “Service Unavailable”.
-
-Since not all requests packets need to contain Connection Id header we
-should only try to validate it in case a header is received.
-
-Reported by Hendrik Sattler <post@hendrik-sattler.de>
+obex->rx_last_op is only updated if there is no pending request which
+means it only store last received request.
 ---
- gobex/gobex.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ gobex/gobex.c |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/gobex/gobex.c b/gobex/gobex.c
-index 8a23485..7840304 100644
+index b0f3716..e2d9c6c 100644
 --- a/gobex/gobex.c
 +++ b/gobex/gobex.c
-@@ -694,7 +694,7 @@ static gboolean check_connid(GObex *obex, GObexPacket *pkt)
+@@ -860,19 +860,20 @@ static gboolean incoming_data(GIOChannel *io, GIOCondition cond,
+ 	if (obex->rx_data < 3 || obex->rx_data < obex->rx_pkt_len)
+ 		return TRUE;
  
- 	hdr = g_obex_packet_get_header(pkt, G_OBEX_HDR_CONNECTION);
- 	if (hdr == NULL)
--		return FALSE;
-+		return TRUE;
++	obex->rx_last_op = obex->rx_buf[0] & ~FINAL_BIT;
++
+ 	if (obex->pending_req) {
+ 		struct pending_pkt *p = obex->pending_req;
+ 		opcode = g_obex_packet_get_operation(p->pkt, NULL);
+ 		header_offset = rsp_header_offset(opcode);
+ 	} else {
+-		opcode = obex->rx_buf[0] & ~FINAL_BIT;
++		opcode = obex->rx_last_op;
+ 		/* Unexpected response -- fail silently */
+ 		if (opcode > 0x1f && opcode < 0xff) {
+ 			obex->rx_data = 0;
+ 			return TRUE;
+ 		}
+ 		header_offset = req_header_offset(opcode);
+-		obex->rx_last_op = opcode;
+ 	}
  
- 	g_obex_header_get_uint32(hdr, &id);
- 
+ 	if (header_offset < 0) {
 -- 
 1.7.6.4
 
