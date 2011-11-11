@@ -1,34 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 11 Nov 2011 17:59:26 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] Bluetooth: Create a unique mgmt error code hierarchy
-Message-ID: <20111111155926.GA32446@fusion.localdomain>
-References: <1321021134-31809-1-git-send-email-johan.hedberg@gmail.com>
- <1321021134-31809-2-git-send-email-johan.hedberg@gmail.com>
- <CAJdJm_PLSU5wckLrXRjnL8WJb-YAq49s1oMwA_Y72rTbE_pPEQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAJdJm_PLSU5wckLrXRjnL8WJb-YAq49s1oMwA_Y72rTbE_pPEQ@mail.gmail.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] Bluetooth: Do not set HCI_RAW when HS enabled
+Date: Fri, 11 Nov 2011 17:02:15 +0200
+Message-Id: <1321023735-11641-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1321023735-11641-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1321023735-11641-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Fri, Nov 11, 2011, Anderson Lizardo wrote:
-> On Fri, Nov 11, 2011 at 10:18 AM,  <johan.hedberg@gmail.com> wrote:
-> > +#ifndef NELEM
-> > +#define NELEM(arr) (sizeof(arr) / sizeof((arr)[0]))
-> > +#endif
-> > +
-> 
-> What about using ARRAY_SIZE() from  kernel.h ?
-> 
-> include/linux/kernel.h:#define ARRAY_SIZE(arr) (sizeof(arr) /
-> sizeof((arr)[0]) + __must_be_array(arr))
 
-Yeah, I was looking for something like that but failed to find it.
-Thanks for the pointer! I'll send an updated patch soon.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/hci_core.c |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
-Johan
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 189bada..02a6f15 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -570,8 +570,9 @@ int hci_dev_open(__u16 dev)
+ 	if (test_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks))
+ 		set_bit(HCI_RAW, &hdev->flags);
+ 
+-	/* Treat all non BR/EDR controllers as raw devices for now */
+-	if (hdev->dev_type != HCI_BREDR)
++	/* Treat all non BR/EDR controllers as raw devices if
++	   enable_hs is not set */
++	if (hdev->dev_type != HCI_BREDR && !enable_hs)
+ 		set_bit(HCI_RAW, &hdev->flags);
+ 
+ 	if (hdev->open(hdev)) {
+-- 
+1.7.4.1
+
