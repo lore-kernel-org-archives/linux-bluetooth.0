@@ -1,24 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 12 Nov 2011 20:23:13 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 01/12 v3] gobex: add unit test for CONNECT request
-Message-ID: <20111112182313.GA10965@x220.Elisa>
-References: <1321021746-5991-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321021746-5991-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <CAOazyz0RnY9_UjSLTafFvV0wVH9b+f3cCaXFT1t=cwL5Fb29gw@mail.gmail.com>
+References: <CAOazyz213Z61F4yiOE1hvCdrkgjWa1kBjoAaZ+b1WwDC1=ZtcA@mail.gmail.com>
+	<CAMOw1v6Z9aKnJ9V4SJCCK5ruU21JnZSbiHyMAZEfvi5rUKFRtw@mail.gmail.com>
+	<CAOazyz1MXi1v3O7RC-dTLhrLgPJ1Zk4+iKNu0ZMHQyFah1OFJg@mail.gmail.com>
+	<CAMOw1v4YrqrpVYiiEE5cUj0Zx7p=KRopskMA2pYLJMFa7fTusA@mail.gmail.com>
+	<CAOazyz2N++pmzPeoTrj=BGn1C6YfR1zbXD18-O8owWVDm7WLVg@mail.gmail.com>
+	<CAMOw1v6LEFsRx6ADbWAmRY4cY6J=7cex8aF0PEu1f8cK+hi72g@mail.gmail.com>
+	<CAOazyz0RnY9_UjSLTafFvV0wVH9b+f3cCaXFT1t=cwL5Fb29gw@mail.gmail.com>
+Date: Sat, 12 Nov 2011 13:03:48 +0200
+Message-ID: <CAOazyz31N-YQ5OUFSA6j3rthatXsxD6OGWh2C+O=AbG+=TTBkg@mail.gmail.com>
+Subject: Re: Out of tree plugins
+From: Alon Bar-Lev <alon.barlev@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-On Fri, Nov 11, 2011, Luiz Augusto von Dentz wrote:
+On Sat, Nov 12, 2011 at 2:29 AM, Alon Bar-Lev <alon.barlev@gmail.com> wrote:
+> On Sat, Nov 12, 2011 at 2:17 AM, Lucas De Marchi
+> <lucas.demarchi@profusion.mobi> wrote:
+>> ( e.g. in the mail thread you mentioned, dbus_connection_unref() and
+>> dbus_bus_get() are not right. If you need those you should link
+>> against d-bus instead when building as an external module )
+>
+> This is needed in order to get the address of the bluetooth controller.
+> I am no expert in this library so maybe there is another way to do so.
+>
+> The code currently uses:
 > ---
->  unit/test-gobex-transfer.c |   57 ++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 57 insertions(+), 0 deletions(-)
+> struct btd_device *adapter_get_device(DBusConnection *conn,
+>                                struct btd_adapter *adapter, const
+> char *address);
+> ---
+>
+> Can this be somehow be replaced with:
+> ---
+> struct btd_device *adapter_find_device(struct btd_adapter *adapter,
+> const char *dest);
+> ---
 
-All twelve patches have been applied. Thanks.
+I could not find how to do this, as the device should be created, and
+all creation funcitons needs dbus connection.
+How do you suggest to replace the adapter_get_device() to something
+else that does not need dbus?
 
-Johan
+Thanks,
+Alon.
