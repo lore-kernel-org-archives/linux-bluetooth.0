@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 3/5] Bluetooth: Add User Passkey entry to HCI Events
+Subject: Re: [PATCH 2/5] Bluetooth: Add MGMT opcode for User Passkey entry
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Brian Gix <bgix@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Sat, 12 Nov 2011 15:59:56 +0900
-In-Reply-To: <1321057441-7921-4-git-send-email-bgix@codeaurora.org>
+Date: Sat, 12 Nov 2011 15:57:32 +0900
+In-Reply-To: <1321057441-7921-3-git-send-email-bgix@codeaurora.org>
 References: <1321057441-7921-1-git-send-email-bgix@codeaurora.org>
-	 <1321057441-7921-4-git-send-email-bgix@codeaurora.org>
+	 <1321057441-7921-3-git-send-email-bgix@codeaurora.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321081199.15441.430.camel@aeonflux>
+Message-ID: <1321081055.15441.428.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -17,146 +17,196 @@ Hi Brian,
 
 > Signed-off-by: Brian Gix <bgix@codeaurora.org>
 > ---
->  include/net/bluetooth/hci.h      |    5 +++
->  include/net/bluetooth/hci_core.h |    4 ++
->  net/bluetooth/hci_event.c        |   62 ++++++++++++++++++++++++++++++++++++++
->  3 files changed, 71 insertions(+), 0 deletions(-)
+>  include/net/bluetooth/hci.h  |    8 +++
+>  include/net/bluetooth/mgmt.h |   11 +++
+>  net/bluetooth/mgmt.c         |  143 ++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 162 insertions(+), 0 deletions(-)
 > 
 > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index ac107b5..d1af139 100644
+> index 139ce2a..ac107b5 100644
 > --- a/include/net/bluetooth/hci.h
 > +++ b/include/net/bluetooth/hci.h
-> @@ -1084,6 +1084,11 @@ struct hci_ev_user_confirm_req {
->  	__le32		passkey;
->  } __packed;
+> @@ -453,6 +453,14 @@ struct hci_rp_user_confirm_reply {
 >  
-> +#define HCI_EV_USER_PASSKEY_REQUEST	0x34
-> +struct hci_ev_user_passkey_req {
-> +	bdaddr_t	bdaddr;
+>  #define HCI_OP_USER_CONFIRM_NEG_REPLY	0x042d
+>  
+> +#define HCI_OP_USER_PASSKEY_REPLY		0x042e
+> +struct hci_cp_user_passkey_reply {
+> +	bdaddr_t bdaddr;
+> +	__u32	passkey;
 > +} __packed;
 > +
->  #define HCI_EV_REMOTE_OOB_DATA_REQUEST	0x35
->  struct hci_ev_remote_oob_data_request {
+> +#define HCI_OP_USER_PASSKEY_NEG_REPLY	0x042f
+> +
+>  #define HCI_OP_REMOTE_OOB_DATA_REPLY	0x0430
+>  struct hci_cp_remote_oob_data_reply {
 >  	bdaddr_t bdaddr;
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index 8b07a83..190a9f5 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -233,6 +233,17 @@ struct mgmt_cp_set_fast_connectable {
+>  	__u8 enable;
+>  } __packed;
+>  
+> +#define MGMT_OP_USER_PASSKEY_REPLY	0x0020
+> +struct mgmt_cp_user_passkey_reply {
+> +	bdaddr_t bdaddr;
+> +	__le32 passkey;
+> +} __packed;
+> +
+> +#define MGMT_OP_USER_PASSKEY_NEG_REPLY	0x0021
+> +struct mgmt_cp_user_passkey_neg_reply {
+> +	bdaddr_t bdaddr;
+> +} __packed;
+> +
+>  #define MGMT_EV_CMD_COMPLETE		0x0001
+>  struct mgmt_ev_cmd_complete {
+>  	__le16 opcode;
 
-this should go into a separate patch. And please get into the habit of
-actually writing a commit message. Not just a commit subject.
+please split this part into a separate and then it is fine with me. Feel
+free to add the ACK right away.
 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index a67ff88..0b692ea 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -933,6 +933,10 @@ int mgmt_user_confirm_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
->  								u8 status);
->  int mgmt_user_confirm_neg_reply_complete(struct hci_dev *hdev,
->  						bdaddr_t *bdaddr, u8 status);
-> +int mgmt_user_passkey_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
-> +								u8 status);
-> +int mgmt_user_passkey_neg_reply_complete(struct hci_dev *hdev,
-> +						bdaddr_t *bdaddr, u8 status);
->  int mgmt_auth_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 status);
->  int mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status);
->  int mgmt_read_local_oob_data_reply_complete(struct hci_dev *hdev, u8 *hash,
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 0d55d00..a425926 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -927,6 +927,37 @@ static void hci_cc_user_confirm_neg_reply(struct hci_dev *hdev,
->  	hci_dev_unlock(hdev);
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 129424e..f0f2ae2 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -1504,6 +1504,128 @@ done:
+>  	return err;
 >  }
 >  
-> +static void hci_cc_user_passkey_reply(struct hci_dev *hdev, struct sk_buff *skb)
+> +static int user_passkey_reply(struct sock *sk, u16 index, unsigned char *data,
+> +									u16 len)
 > +{
-> +	struct hci_rp_user_confirm_reply *rp = (void *) skb->data;
+> +	struct mgmt_cp_user_passkey_reply *cp = (void *) data;
+> +	struct pending_cmd *cmd;
+> +	struct hci_dev *hdev;
+> +	struct hci_conn *conn;
+> +	int err = 0;
 > +
-> +	BT_DBG("%s status 0x%x", hdev->name, rp->status);
+> +	BT_DBG("");
 > +
-> +	hci_dev_lock(hdev);
+> +	if (len != sizeof(*cp))
+> +		return cmd_status(sk, index, MGMT_OP_USER_PASSKEY_REPLY,
+> +									EINVAL);
 > +
-> +	if (test_bit(HCI_MGMT, &hdev->flags))
-> +		mgmt_user_passkey_reply_complete(hdev, &rp->bdaddr,
-> +								rp->status);
+> +	hdev = hci_dev_get(index);
+> +	if (!hdev)
+> +		return cmd_status(sk, index, MGMT_OP_USER_PASSKEY_REPLY,
+> +									ENODEV);
 > +
-> +	hci_dev_unlock(hdev);
+> +	hci_dev_lock_bh(hdev);
+> +
+> +	if (!test_bit(HCI_UP, &hdev->flags)) {
+> +		err = cmd_status(sk, index, MGMT_OP_USER_PASSKEY_REPLY,
+> +								ENETDOWN);
+> +		goto done;
+> +	}
+> +
+> +	/* Route command to HCI (if ACL Link) or SMP (if LE Link) */
+> +	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
+> +	if (!conn) {
+> +		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->bdaddr);
+> +		if (!conn) {
+> +			err = cmd_status(sk, index, MGMT_OP_USER_PASSKEY_REPLY,
+> +								ENOTCONN);
+> +			goto done;
+> +		}
+> +
+> +		/* Forward Passkey response to SMP */
+> +
+> +		err = cmd_status(sk, index, MGMT_OP_USER_PASSKEY_REPLY, 0);
+> +		goto done;
+> +	}
+> +
+> +	cmd = mgmt_pending_add(sk, MGMT_OP_USER_PASSKEY_REPLY, hdev, data, len);
+> +	if (!cmd) {
+> +		err = -ENOMEM;
+> +		goto done;
+> +	}
+> +
+> +	err = hci_send_cmd(hdev, HCI_OP_USER_PASSKEY_REPLY, len, cp);
+> +	if (err < 0)
+> +		mgmt_pending_remove(cmd);
+> +
+> +done:
+> +	hci_dev_unlock_bh(hdev);
+> +	hci_dev_put(hdev);
+> +
+> +	return err;
 > +}
 > +
-> +static void hci_cc_user_passkey_neg_reply(struct hci_dev *hdev,
-> +							struct sk_buff *skb)
+> +static int user_passkey_neg_reply(struct sock *sk, u16 index,
+> +						unsigned char *data, u16 len)
 > +{
-> +	struct hci_rp_user_confirm_reply *rp = (void *) skb->data;
+> +	struct mgmt_cp_user_passkey_neg_reply *cp = (void *) data;
+> +	struct pending_cmd *cmd;
+> +	struct hci_dev *hdev;
+> +	struct hci_conn *conn;
+> +	int err = 0;
 > +
-> +	BT_DBG("%s status 0x%x", hdev->name, rp->status);
+> +	BT_DBG("");
 > +
-> +	hci_dev_lock(hdev);
+> +	if (len != sizeof(*cp))
+> +		return cmd_status(sk, index, MGMT_OP_USER_PASSKEY_NEG_REPLY,
+> +									EINVAL);
 > +
-> +	if (test_bit(HCI_MGMT, &hdev->flags))
-> +		mgmt_user_passkey_neg_reply_complete(hdev, &rp->bdaddr,
-> +								rp->status);
+> +	hdev = hci_dev_get(index);
+> +	if (!hdev)
+> +		return cmd_status(sk, index, MGMT_OP_USER_PASSKEY_NEG_REPLY,
+> +									ENODEV);
 > +
-> +	hci_dev_unlock(hdev);
+> +	hci_dev_lock_bh(hdev);
+> +
+> +	if (!test_bit(HCI_UP, &hdev->flags)) {
+> +		err = cmd_status(sk, index, MGMT_OP_USER_PASSKEY_NEG_REPLY,
+> +								ENETDOWN);
+> +		goto done;
+> +	}
+> +
+> +	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
+> +	if (!conn) {
+> +		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->bdaddr);
+> +		if (!conn) {
+> +			err = cmd_status(sk, index,
+> +					MGMT_OP_USER_PASSKEY_NEG_REPLY,
+> +					ENOTCONN);
+> +			goto done;
+> +		}
+> +
+> +		/* Forward Passkey response to SMP */
+> +
+> +		err = cmd_status(sk, index, MGMT_OP_USER_PASSKEY_NEG_REPLY, 0);
+> +		goto done;
+> +	}
+> +
+> +	cmd = mgmt_pending_add(sk, MGMT_OP_USER_PASSKEY_NEG_REPLY, hdev, data,
+> +									len);
+> +	if (!cmd) {
+> +		err = -ENOMEM;
+> +		goto done;
+> +	}
+> +
+> +	err = hci_send_cmd(hdev, HCI_OP_USER_PASSKEY_NEG_REPLY, len, cp);
+> +	if (err < 0)
+> +		mgmt_pending_remove(cmd);
+> +
+> +done:
+> +	hci_dev_unlock_bh(hdev);
+> +	hci_dev_put(hdev);
+> +
+> +	return err;
 > +}
-> +
->  static void hci_cc_read_local_oob_data_reply(struct hci_dev *hdev,
->  							struct sk_buff *skb)
->  {
-> @@ -2011,6 +2042,14 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
->  		hci_cc_user_confirm_neg_reply(hdev, skb);
->  		break;
->  
-> +	case HCI_OP_USER_PASSKEY_REPLY:
-> +		hci_cc_user_passkey_reply(hdev, skb);
-> +		break;
-> +
-> +	case HCI_OP_USER_PASSKEY_NEG_REPLY:
-> +		hci_cc_user_passkey_neg_reply(hdev, skb);
-> +		break;
-> +
->  	case HCI_OP_LE_SET_SCAN_ENABLE:
->  		hci_cc_le_set_scan_enable(hdev, skb);
->  		break;
-> @@ -2770,6 +2809,25 @@ unlock:
->  	hci_dev_unlock(hdev);
->  }
->  
-> +static inline void hci_user_passkey_request_evt(struct hci_dev *hdev,
-> +							struct sk_buff *skb)
-> +{
-> +	struct hci_ev_user_passkey_req *ev = (void *) skb->data;
-> +
-> +	BT_DBG("%s", hdev->name);
-> +
-> +	hci_dev_lock(hdev);
-> +
-> +	/* Passkey Request is a degenerate case of User Confirm */
-> +	if (test_bit(HCI_MGMT, &hdev->flags))
-> +		mgmt_user_confirm_request(hdev, &ev->bdaddr, 0, 0);
-> +	else
-> +		hci_send_cmd(hdev, HCI_OP_USER_PASSKEY_NEG_REPLY,
-> +					sizeof(ev->bdaddr), &ev->bdaddr);
 
-We might want a comment here that this needs fixing ;)
+Actually passkey, passkey-neg, confirm, neg-confirm contain a lot of the
+same code just with a different parameter. I can be all generalized into
+a helper function. Only the initial parsing of the HCI command needs to
+be different. So please clean this up.
 
-> +
-> +	hci_dev_unlock(hdev);
-> +}
-> +
->  static inline void hci_simple_pair_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
->  {
->  	struct hci_ev_simple_pair_complete *ev = (void *) skb->data;
-> @@ -3109,6 +3167,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
->  		hci_user_confirm_request_evt(hdev, skb);
->  		break;
->  
-> +	case HCI_EV_USER_PASSKEY_REQUEST:
-> +		hci_user_passkey_request_evt(hdev, skb);
-> +		break;
-> +
->  	case HCI_EV_SIMPLE_PAIR_COMPLETE:
->  		hci_simple_pair_complete_evt(hdev, skb);
->  		break;
-> -- 
-> 1.7.7.2
-> 
+Once we a nice common helper, the extra comments and also looking
+becomes central in one single place. Way nicer.
 
 Regards
 
