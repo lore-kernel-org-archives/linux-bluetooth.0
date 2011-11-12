@@ -1,32 +1,703 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 5/5] Bluetooth: Add support for MITM LE-SMP pairing
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Sun, 13 Nov 2011 08:12:29 +0900
-In-Reply-To: <1321057441-7921-6-git-send-email-bgix@codeaurora.org>
-References: <1321057441-7921-1-git-send-email-bgix@codeaurora.org>
-	 <1321057441-7921-6-git-send-email-bgix@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321139552.15441.436.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Date: Sat, 12 Nov 2011 22:35:38 +0200
+Message-ID: <CAOazyz00Jjtvx4SzCD3e=Mh7sy6ff-h5jkr5J+6O7p75jV4daQ@mail.gmail.com>
+Subject: bluez input regression 4.96->master
+From: Alon Bar-Lev <alon.barlev@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=20cf307f383497180104b18f94df
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+--20cf307f383497180104b18f94df
+Content-Type: text/plain; charset=UTF-8
 
-> Passkey entry and comparison only. Uses MGMT interface to request
-> passkey and confirmation from user space.
+Hello,
 
-can you please split this patch into smaller chunks. It looks like some
-of them are just small bug fixes for error handling.
+While trying to work on the sixaxis plugin as external plugin, I found
+that the same code
+that works with 4.96 does not work with trunk.
 
-And I see a lot of code duplication here as well. I prefer we introduce
-proper helpers for certain common patterns.
+In 4.96 the hidraw could have been read, in master the read is blocked
+until device
+disconnects, then it returns with i/o error.
 
-Regards
+I don't know how to produce more debug information, I appreciate if
+someone can help.
+I did not find any hint in git log... Maybe something should be
+changed in plugin, not sure.
 
-Marcel
+blocked code:
+---
+fd = open(hidraw_node, O_RDWR);
+if (read(fd, &c, 1) != 1)
+---
 
+I also think that actually no hid events are gotten at all... cat
+/dev/input/js0 produces nothing.
 
+Attached is the same patch that is used for both.
 
+Thanks,
+Alon Bar-Lev.
+
+---
+bluez-4.96 - working
+---
+bluetoothd[4399]: Bluetooth daemon 4.96
+bluetoothd[4399]: src/main.c:parse_config() parsing main.conf
+bluetoothd[4399]: src/main.c:parse_config() discovto=0
+bluetoothd[4399]: src/main.c:parse_config() pairto=0
+bluetoothd[4399]: src/main.c:parse_config() pageto=8192
+bluetoothd[4399]: src/main.c:parse_config() name=%h-%d
+bluetoothd[4399]: src/main.c:parse_config() class=0x000100
+bluetoothd[4399]: src/main.c:parse_config() discov_interval=30
+bluetoothd[4399]: src/main.c:parse_config() Key file does not have key
+'DeviceID'
+bluetoothd[4399]: Starting SDP server
+bluetoothd[4399]: src/plugin.c:plugin_init() Loading builtin plugins
+bluetoothd[4399]: src/plugin.c:add_plugin() Loading audio plugin
+bluetoothd[4399]: src/plugin.c:add_plugin() Loading input plugin
+bluetoothd[4399]: src/plugin.c:add_plugin() Loading serial plugin
+bluetoothd[4399]: src/plugin.c:add_plugin() Loading network plugin
+bluetoothd[4399]: src/plugin.c:add_plugin() Loading service plugin
+bluetoothd[4399]: src/plugin.c:add_plugin() Loading sixaxis plugin
+bluetoothd[4399]: src/plugin.c:add_plugin() Loading hciops plugin
+bluetoothd[4399]: src/plugin.c:add_plugin() Loading mgmtops plugin
+bluetoothd[4399]: src/plugin.c:add_plugin() Loading formfactor plugin
+bluetoothd[4399]: src/plugin.c:add_plugin() Loading storage plugin
+bluetoothd[4399]: src/plugin.c:add_plugin() Loading adaptername plugin
+bluetoothd[4399]: src/plugin.c:plugin_init() Loading plugins
+/usr/lib64/bluetooth/plugins
+bluetoothd[4399]: plugins/service.c:register_interface() path
+/org/bluez/4399/any
+bluetoothd[4399]: plugins/service.c:register_interface() Registered
+interface org.bluez.Service on path /org/bluez/4399/any
+bluetoothd[4399]: plugins/sixaxis.c:sixaxis_init() Setup Sixaxis cable plugin
+bluetoothd[4399]: network/manager.c:read_config()
+/etc/bluetooth/network.conf: Key file does not have key
+'DisableSecurity'
+bluetoothd[4399]: network/manager.c:read_config() Config options: Security=true
+bluetoothd[4399]: input/manager.c:input_manager_init() input.conf: Key
+file does not have key 'IdleTimeout'
+bluetoothd[4399]: audio/manager.c:audio_manager_init() audio.conf: Key
+file does not have key 'AutoConnect'
+bluetoothd[4399]: audio/unix.c:unix_init() Unix socket created: 9
+bluetoothd[4399]: Unable to start SCO server socket
+bluetoothd[4399]: Failed to init audio plugin
+bluetoothd[4399]: plugins/hciops.c:hciops_init()
+bluetoothd[4399]: plugins/hciops.c:hciops_setup()
+bluetoothd[4399]: src/main.c:main() Entering main loop
+bluetoothd[4399]: src/rfkill.c:rfkill_event() RFKILL event idx 0 type
+2 op 0 soft 0 hard 0
+bluetoothd[4399]: src/rfkill.c:rfkill_event() RFKILL event idx 1 type
+1 op 0 soft 0 hard 0
+bluetoothd[4399]: src/rfkill.c:rfkill_event() RFKILL event idx 11 type
+2 op 0 soft 0 hard 0
+bluetoothd[4399]: plugins/hciops.c:init_known_adapters()
+bluetoothd[4399]: plugins/hciops.c:init_device() hci0
+bluetoothd[4399]: Listening for HCI events on hci0
+bluetoothd[4399]: plugins/hciops.c:init_conn_list() hci0
+bluetoothd[4399]: HCI dev 0 up
+bluetoothd[4399]: plugins/hciops.c:device_devup_setup() hci0
+bluetoothd[4399]: plugins/hciops.c:read_local_version_complete() Got
+version for hci0
+bluetoothd[4399]: src/adapter.c:btd_adapter_ref() 0x7f9eca360a10: ref=1
+bluetoothd[4399]: plugins/hciops.c:hciops_read_bdaddr() hci0
+bluetoothd[4399]: src/sdpd-database.c:sdp_init_services_list()
+bluetoothd[4399]: plugins/hciops.c:hciops_add_uuid() hci0
+bluetoothd[4399]: plugins/hciops.c:update_service_classes() hci0 value 0
+bluetoothd[4399]: plugins/hciops.c:hciops_add_uuid() hci0
+bluetoothd[4399]: plugins/hciops.c:update_service_classes() hci0 value 0
+bluetoothd[4399]: plugins/service.c:register_interface() path
+/org/bluez/4399/hci0
+bluetoothd[4399]: plugins/service.c:register_interface() Registered
+interface org.bluez.Service on path /org/bluez/4399/hci0
+bluetoothd[4399]: network/manager.c:network_server_probe() path
+/org/bluez/4399/hci0
+bluetoothd[4399]: src/adapter.c:btd_adapter_ref() 0x7f9eca360a10: ref=2
+bluetoothd[4399]: network/server.c:server_register() Registered
+interface org.bluez.NetworkServer on path /org/bluez/4399/hci0
+bluetoothd[4399]: serial/manager.c:proxy_probe() path /org/bluez/4399/hci0
+bluetoothd[4399]: src/adapter.c:btd_adapter_ref() 0x7f9eca360a10: ref=3
+bluetoothd[4399]: serial/proxy.c:proxy_register() Registered interface
+org.bluez.SerialProxyManager on path /org/bluez/4399/hci0
+bluetoothd[4399]: src/adapter.c:btd_adapter_ref() 0x7f9eca360a10: ref=4
+bluetoothd[4399]: plugins/adaptername.c:adaptername_probe() Setting
+name 'localhost-0' for device 'hci0'
+bluetoothd[4399]: plugins/hciops.c:hciops_set_name() hci0, name localhost-0
+bluetoothd[4399]: plugins/hciops.c:update_ext_inquiry_response() hci0
+bluetoothd[4399]: Could not get the contents of DMI chassis type
+bluetoothd[4399]: plugins/hciops.c:hciops_unblock_device() hci0 dba
+00:00:00:00:00:00
+bluetoothd[4399]: src/device.c:device_create() Creating device
+/org/bluez/4399/hci0/dev_44_D8_32_A1_39_91
+bluetoothd[4399]: src/device.c:btd_device_ref() 0x7f9eca362490: ref=1
+bluetoothd[4399]: src/device.c:device_set_temporary() temporary 0
+bluetoothd[4399]: src/device.c:device_probe_drivers() Probing drivers
+for 44:D8:32:A1:39:91
+bluetoothd[4399]: input/manager.c:hid_device_probe() path
+/org/bluez/4399/hci0/dev_44_D8_32_A1_39_91
+bluetoothd[4399]: src/device.c:btd_device_ref() 0x7f9eca362490: ref=2
+bluetoothd[4399]: input/device.c:input_device_new() Registered
+interface org.bluez.Input on path
+/org/bluez/4399/hci0/dev_44_D8_32_A1_39_91
+bluetoothd[4399]: plugins/hciops.c:hciops_load_keys() hci0 keys 0 debug_keys 0
+bluetoothd[4399]: plugins/hciops.c:hciops_get_conn_list() hci0
+bluetoothd[4399]: src/manager.c:btd_manager_register_adapter() Adapter
+/org/bluez/4399/hci0 registered
+bluetoothd[4399]: src/adapter.c:btd_adapter_ref() 0x7f9eca360a10: ref=5
+bluetoothd[4399]: plugins/hciops.c:hciops_set_name() hci0, name localhost-0
+bluetoothd[4399]: plugins/hciops.c:update_ext_inquiry_response() hci0
+bluetoothd[4399]: plugins/hciops.c:hciops_set_dev_class() hci0 major 1 minor 0
+bluetoothd[4399]: plugins/hciops.c:hciops_disable_cod_cache() hci0
+cache_enable 1
+bluetoothd[4399]: plugins/hciops.c:hciops_disable_cod_cache() hci0
+current_cod 0x000000 wanted_cod 0x000100
+bluetoothd[4399]: plugins/hciops.c:write_class() hci0 class 0x000100
+bluetoothd[4399]: Adapter /org/bluez/4399/hci0 has been enabled
+bluetoothd[4399]: plugins/hciops.c:hciops_set_discoverable() hci0 discoverable 0
+bluetoothd[4399]: plugins/hciops.c:hciops_set_pairable() hci0 pairable 1
+bluetoothd[4399]: plugins/hciops.c:hciops_stop_inquiry() hci0
+bluetoothd[4399]: src/adapter.c:btd_adapter_unref() 0x7f9eca360a10: ref=4
+bluetoothd[4399]: src/adapter.c:register_agent() Agent registered for
+hci0 at :1.138:/blueDevil_agent
+bluetoothd[4399]: plugins/hciops.c:read_tx_power_complete() hci0 status 0
+bluetoothd[4399]: plugins/hciops.c:update_ext_inquiry_response() hci0
+bluetoothd[4399]: plugins/hciops.c:update_ext_inquiry_response() hci0
+bluetoothd[4399]: Inquiry Cancel Failed with status 0x12
+bluetoothd[4399]: plugins/hciops.c:read_local_name_complete() hci0 status 0
+bluetoothd[4399]: plugins/hciops.c:update_ext_inquiry_response() hci0
+bluetoothd[4399]: plugins/hciops.c:read_simple_pairing_mode_complete()
+hci0 status 0
+bluetoothd[4399]: plugins/hciops.c:update_ext_inquiry_response() hci0
+bluetoothd[4399]: plugins/hciops.c:read_local_name_complete() hci0 status 0
+bluetoothd[4399]: plugins/hciops.c:update_ext_inquiry_response() hci0
+bluetoothd[4399]: plugins/hciops.c:read_scan_complete() hci0 status 0
+bluetoothd[4399]: src/adapter.c:adapter_mode_changed() old 0x00 new 0x02
+bluetoothd[4399]: src/adapter.c:adapter_set_limited_discoverable() FALSE
+bluetoothd[4399]: plugins/hciops.c:hciops_set_limited_discoverable()
+hci0 limited 0
+bluetoothd[4399]: src/adapter.c:set_mode_complete()
+bluetoothd[4399]: plugins/hciops.c:conn_complete() status 0x00
+bluetoothd[4399]: src/adapter.c:adapter_get_device() 44:D8:32:A1:39:91
+bluetoothd[4399]: input/server.c:connect_event_cb() Incoming
+connection from 44:D8:32:A1:39:91 on PSM 17
+bluetoothd[4399]: plugins/hciops.c:remote_features_information() hci0 status 0
+bluetoothd[4399]: input/server.c:connect_event_cb() Incoming
+connection from 44:D8:32:A1:39:91 on PSM 19
+bluetoothd[4399]: plugins/hciops.c:remote_name_information() hci0 status 0
+bluetoothd[4399]: plugins/sixaxis.c:handle_device_plug() name:
+PLAYSTATION(R)3 Controller
+bluetoothd[4399]: plugins/sixaxis.c:handle_device_plug() Found a Sixaxis device
+bluetoothd[4399]: plugins/sixaxis.c:handle_device_plug() joypad device_num: 1
+bluetoothd[4399]: plugins/sixaxis.c:handle_device_plug() hidraw_node:
+/dev/hidraw0
+bluetoothd[4399]: plugins/sixaxis.c:handle_device_plug() driver: btusb
+bluetoothd[4399]: plugins/sixaxis.c:handle_device_plug() opening hidraw
+bluetoothd[4399]: plugins/sixaxis.c:handle_device_plug() waiting for events
+bluetoothd[4399]: plugins/sixaxis.c:set_leds() Setting leds
+bluetoothd[4399]: plugins/sixaxis.c:handle_device_plug() hidraw closed
+---
+
+---
+master
+---
+bluetoothd[11731]: Bluetooth daemon 4.96
+bluetoothd[11731]: src/main.c:parse_config() parsing main.conf
+bluetoothd[11731]: src/main.c:parse_config() discovto=0
+bluetoothd[11731]: src/main.c:parse_config() pairto=0
+bluetoothd[11731]: src/main.c:parse_config() pageto=8192
+bluetoothd[11731]: src/main.c:parse_config() auto_to=60
+bluetoothd[11731]: src/main.c:parse_config() name=%h-%d
+bluetoothd[11731]: src/main.c:parse_config() class=0x000100
+bluetoothd[11731]: src/main.c:parse_config() discov_interval=30
+bluetoothd[11731]: src/main.c:parse_config() Key file does not have
+key 'DeviceID'
+bluetoothd[11731]: Starting SDP server
+bluetoothd[11731]: src/plugin.c:plugin_init() Loading builtin plugins
+bluetoothd[11731]: src/plugin.c:add_plugin() Loading audio plugin
+bluetoothd[11731]: src/plugin.c:add_plugin() Loading input plugin
+bluetoothd[11731]: src/plugin.c:add_plugin() Loading serial plugin
+bluetoothd[11731]: src/plugin.c:add_plugin() Loading network plugin
+bluetoothd[11731]: src/plugin.c:add_plugin() Loading service plugin
+bluetoothd[11731]: src/plugin.c:add_plugin() Loading sixaxis plugin
+bluetoothd[11731]: src/plugin.c:add_plugin() Loading hciops plugin
+bluetoothd[11731]: src/plugin.c:add_plugin() Loading mgmtops plugin
+bluetoothd[11731]: src/plugin.c:add_plugin() Loading formfactor plugin
+bluetoothd[11731]: src/plugin.c:add_plugin() Loading storage plugin
+bluetoothd[11731]: src/plugin.c:add_plugin() Loading adaptername plugin
+bluetoothd[11731]: src/plugin.c:plugin_init() Loading plugins
+/usr/lib64/bluetooth/plugins
+bluetoothd[11731]: plugins/service.c:register_interface() path
+/org/bluez/11731/any
+bluetoothd[11731]: plugins/service.c:register_interface() Registered
+interface org.bluez.Service on path /org/bluez/11731/any
+bluetoothd[11731]: plugins/sixaxis.c:sixaxis_init() Setup Sixaxis cable plugin
+bluetoothd[11731]: network/manager.c:read_config()
+/etc/bluetooth/network.conf: Key file does not have key
+'DisableSecurity'
+bluetoothd[11731]: network/manager.c:read_config() Config options: Security=true
+bluetoothd[11731]: input/manager.c:input_manager_init() input.conf:
+Key file does not have key 'IdleTimeout'
+bluetoothd[11731]: audio/manager.c:audio_manager_init() audio.conf:
+Key file does not have key 'AutoConnect'
+bluetoothd[11731]: audio/unix.c:unix_init() Unix socket created: 10
+bluetoothd[11731]: Unable to start SCO server socket
+bluetoothd[11731]: Failed to init audio plugin
+bluetoothd[11731]: plugins/hciops.c:hciops_init()
+bluetoothd[11731]: plugins/hciops.c:hciops_setup()
+bluetoothd[11731]: src/main.c:main() Entering main loop
+bluetoothd[11731]: src/rfkill.c:rfkill_event() RFKILL event idx 0 type
+2 op 0 soft 0 hard 0
+bluetoothd[11731]: src/rfkill.c:rfkill_event() RFKILL event idx 1 type
+1 op 0 soft 0 hard 0
+bluetoothd[11731]: src/rfkill.c:rfkill_event() RFKILL event idx 11
+type 2 op 0 soft 0 hard 0
+bluetoothd[11731]: plugins/hciops.c:init_known_adapters()
+bluetoothd[11731]: plugins/hciops.c:init_device() hci0
+bluetoothd[11731]: Listening for HCI events on hci0
+bluetoothd[11731]: plugins/hciops.c:init_conn_list() hci0
+bluetoothd[11731]: HCI dev 0 up
+bluetoothd[11731]: plugins/hciops.c:device_devup_setup() hci0
+bluetoothd[11731]: plugins/hciops.c:read_local_version_complete() Got
+version for hci0
+bluetoothd[11731]: src/adapter.c:btd_adapter_ref() 0x7fc4b75d4cf0: ref=1
+bluetoothd[11731]: plugins/hciops.c:hciops_read_bdaddr() hci0
+bluetoothd[11731]: src/sdpd-database.c:sdp_init_services_list()
+bluetoothd[11731]: plugins/hciops.c:hciops_add_uuid() hci0
+bluetoothd[11731]: plugins/hciops.c:update_service_classes() hci0 value 0
+bluetoothd[11731]: plugins/hciops.c:hciops_add_uuid() hci0
+bluetoothd[11731]: plugins/hciops.c:update_service_classes() hci0 value 0
+bluetoothd[11731]: plugins/service.c:register_interface() path
+/org/bluez/11731/hci0
+bluetoothd[11731]: plugins/service.c:register_interface() Registered
+interface org.bluez.Service on path /org/bluez/11731/hci0
+bluetoothd[11731]: network/manager.c:network_server_probe() path
+/org/bluez/11731/hci0
+bluetoothd[11731]: src/adapter.c:btd_adapter_ref() 0x7fc4b75d4cf0: ref=2
+bluetoothd[11731]: network/server.c:server_register() Registered
+interface org.bluez.NetworkServer on path /org/bluez/11731/hci0
+bluetoothd[11731]: serial/manager.c:proxy_probe() path /org/bluez/11731/hci0
+bluetoothd[11731]: src/adapter.c:btd_adapter_ref() 0x7fc4b75d4cf0: ref=3
+bluetoothd[11731]: serial/proxy.c:proxy_register() Registered
+interface org.bluez.SerialProxyManager on path /org/bluez/11731/hci0
+bluetoothd[11731]: src/adapter.c:btd_adapter_ref() 0x7fc4b75d4cf0: ref=4
+bluetoothd[11731]: plugins/adaptername.c:adaptername_probe() Setting
+name 'localhost-0' for device 'hci0'
+bluetoothd[11731]: plugins/hciops.c:hciops_set_name() hci0, name localhost-0
+bluetoothd[11731]: plugins/hciops.c:update_ext_inquiry_response() hci0
+bluetoothd[11731]: Could not get the contents of DMI chassis type
+bluetoothd[11731]: plugins/hciops.c:hciops_unblock_device() hci0 dba
+00:00:00:00:00:00
+bluetoothd[11731]: src/device.c:device_create() Creating device
+/org/bluez/11731/hci0/dev_44_D8_32_A1_39_91
+bluetoothd[11731]: src/device.c:btd_device_ref() 0x7fc4b75d6510: ref=1
+bluetoothd[11731]: src/device.c:device_set_temporary() temporary 0
+bluetoothd[11731]: src/device.c:device_probe_drivers() Probing drivers
+for 44:D8:32:A1:39:91
+bluetoothd[11731]: input/manager.c:hid_device_probe() path
+/org/bluez/11731/hci0/dev_44_D8_32_A1_39_91
+bluetoothd[11731]: src/device.c:btd_device_ref() 0x7fc4b75d6510: ref=2
+bluetoothd[11731]: input/device.c:input_device_new() Registered
+interface org.bluez.Input on path
+/org/bluez/11731/hci0/dev_44_D8_32_A1_39_91
+bluetoothd[11731]: plugins/hciops.c:hciops_load_keys() hci0 keys 0 debug_keys 0
+bluetoothd[11731]: plugins/hciops.c:hciops_get_conn_list() hci0
+bluetoothd[11731]: src/manager.c:btd_manager_register_adapter()
+Adapter /org/bluez/11731/hci0 registered
+bluetoothd[11731]: src/adapter.c:btd_adapter_ref() 0x7fc4b75d4cf0: ref=5
+bluetoothd[11731]: plugins/hciops.c:hciops_set_dev_class() hci0 major 1 minor 0
+bluetoothd[11731]: plugins/hciops.c:hciops_disable_cod_cache() hci0
+cache_enable 1
+bluetoothd[11731]: plugins/hciops.c:hciops_disable_cod_cache() hci0
+current_cod 0x000000 wanted_cod 0x000100
+bluetoothd[11731]: plugins/hciops.c:write_class() hci0 class 0x000100
+bluetoothd[11731]: Adapter /org/bluez/11731/hci0 has been enabled
+bluetoothd[11731]: plugins/hciops.c:hciops_set_discoverable() hci0
+discoverable 0
+bluetoothd[11731]: plugins/hciops.c:hciops_set_pairable() hci0 pairable 1
+bluetoothd[11731]: plugins/hciops.c:hciops_stop_inquiry() hci0
+bluetoothd[11731]: src/adapter.c:btd_adapter_unref() 0x7fc4b75d4cf0: ref=4
+bluetoothd[11731]: plugins/hciops.c:read_local_ext_features_complete()
+hci0 status 0
+bluetoothd[11731]: src/adapter.c:register_agent() Agent registered for
+hci0 at :1.138:/blueDevil_agent
+bluetoothd[11731]: plugins/hciops.c:read_tx_power_complete() hci0 status 0
+bluetoothd[11731]: plugins/hciops.c:update_ext_inquiry_response() hci0
+bluetoothd[11731]: plugins/hciops.c:update_ext_inquiry_response() hci0
+bluetoothd[11731]: Inquiry Cancel Failed with status 0x12
+bluetoothd[11731]: plugins/hciops.c:read_local_name_complete() hci0 status 0
+bluetoothd[11731]: plugins/hciops.c:update_ext_inquiry_response() hci0
+bluetoothd[11731]:
+plugins/hciops.c:read_simple_pairing_mode_complete() hci0 status 0
+bluetoothd[11731]: plugins/hciops.c:update_ext_inquiry_response() hci0
+bluetoothd[11731]: plugins/hciops.c:read_scan_complete() hci0 status 0
+bluetoothd[11731]: src/adapter.c:adapter_mode_changed() old 0x00 new 0x02
+bluetoothd[11731]: src/adapter.c:adapter_set_limited_discoverable() FALSE
+bluetoothd[11731]: plugins/hciops.c:hciops_set_limited_discoverable()
+hci0 limited 0
+bluetoothd[11731]: src/adapter.c:set_mode_complete()
+bluetoothd[11731]: plugins/hciops.c:conn_complete() status 0x00
+bluetoothd[11731]: src/adapter.c:adapter_get_device() 44:D8:32:A1:39:91
+bluetoothd[11731]: input/server.c:connect_event_cb() Incoming
+connection from 44:D8:32:A1:39:91 on PSM 17
+bluetoothd[11731]: plugins/hciops.c:remote_features_information() hci0 status 0
+bluetoothd[11731]: plugins/hciops.c:remote_name_information() hci0 status 0
+bluetoothd[11731]: input/server.c:connect_event_cb() Incoming
+connection from 44:D8:32:A1:39:91 on PSM 19
+bluetoothd[11731]: plugins/sixaxis.c:handle_device_plug() name:
+PLAYSTATION(R)3 Controller
+bluetoothd[11731]: plugins/sixaxis.c:handle_device_plug() Found a Sixaxis device
+bluetoothd[11731]: plugins/sixaxis.c:handle_device_plug() joypad device_num: 1
+bluetoothd[11731]: plugins/sixaxis.c:handle_device_plug() hidraw_node:
+/dev/hidraw0
+bluetoothd[11731]: plugins/sixaxis.c:handle_device_plug() driver: btusb
+bluetoothd[11731]: plugins/sixaxis.c:handle_device_plug() opening hidraw
+bluetoothd[11731]: plugins/sixaxis.c:handle_device_plug() waiting for events
+---
+
+--20cf307f383497180104b18f94df
+Content-Type: text/x-patch; charset=US-ASCII; name="bluez-9999-sixaxis.patch"
+Content-Disposition: attachment; filename="bluez-9999-sixaxis.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gux2j6h40
+
+ZGlmZiAtLWdpdCBhL01ha2VmaWxlLmFtIGIvTWFrZWZpbGUuYW0KaW5kZXggMjgzYWY0ZC4uNTdm
+MDg0OCAxMDA2NDQKLS0tIGEvTWFrZWZpbGUuYW0KKysrIGIvTWFrZWZpbGUuYW0KQEAgLTI0OSw2
+ICsyNDksMTEgQEAgYnVpbHRpbl9zb3VyY2VzICs9IHRoZXJtb21ldGVyL21haW4uYyBcCiAJCQl0
+aGVybW9tZXRlci90aGVybW9tZXRlci5oIHRoZXJtb21ldGVyL3RoZXJtb21ldGVyLmMKIGVuZGlm
+CiAKK2lmIFNJWEFYSVNQTFVHSU4KK2J1aWx0aW5fbW9kdWxlcyArPSBzaXhheGlzCitidWlsdGlu
+X3NvdXJjZXMgKz0gcGx1Z2lucy9zaXhheGlzLmMKK2VuZGlmCisKIGJ1aWx0aW5fbW9kdWxlcyAr
+PSBoY2lvcHMgbWdtdG9wcwogYnVpbHRpbl9zb3VyY2VzICs9IHBsdWdpbnMvaGNpb3BzLmMgcGx1
+Z2lucy9tZ210b3BzLmMKIApAQCAtMzE3LDYgKzMyMiw5IEBAIHNyY19ibHVldG9vdGhkX1NPVVJD
+RVMgPSAkKGdkYnVzX3NvdXJjZXMpICQoYnVpbHRpbl9zb3VyY2VzKSBcCiAJCQlzcmMvb29iLmgg
+c3JjL29vYi5jIHNyYy9laXIuaCBzcmMvZWlyLmMKIHNyY19ibHVldG9vdGhkX0xEQUREID0gbGli
+L2xpYmJsdWV0b290aC1wcml2YXRlLmxhIEBHTElCX0xJQlNAIEBEQlVTX0xJQlNAIFwKIAkJCQkJ
+CQlAQ0FQTkdfTElCU0AgLWxkbCAtbHJ0CitpZiBTSVhBWElTUExVR0lOCitzcmNfYmx1ZXRvb3Ro
+ZF9MREFERCArPSBAVURFVl9MSUJTQAorZW5kaWYKIHNyY19ibHVldG9vdGhkX0xERkxBR1MgPSAt
+V2wsLS1leHBvcnQtZHluYW1pYyBcCiAJCQkJLVdsLC0tdmVyc2lvbi1zY3JpcHQ9JChzcmNkaXIp
+L3NyYy9ibHVldG9vdGgudmVyCiAKZGlmZiAtLWdpdCBhL2FjaW5jbHVkZS5tNCBiL2FjaW5jbHVk
+ZS5tNAppbmRleCAyMDk3ZDc3Li43ZWFlOWI5IDEwMDY0NAotLS0gYS9hY2luY2x1ZGUubTQKKysr
+IGIvYWNpbmNsdWRlLm00CkBAIC0xODYsNiArMTg2LDcgQEAgQUNfREVGVU4oW0FDX0FSR19CTFVF
+Wl0sIFsKIAlzbmRmaWxlX2VuYWJsZT0ke3NuZGZpbGVfZm91bmR9CiAJaGFsX2VuYWJsZT1ubwog
+CXVzYl9lbmFibGU9JHt1c2JfZm91bmR9CisJc2l4YXhpc19lbmFibGU9JHt1ZGV2X2ZvdW5kfQog
+CWFsc2FfZW5hYmxlPSR7YWxzYV9mb3VuZH0KIAlnc3RyZWFtZXJfZW5hYmxlPSR7Z3N0cmVhbWVy
+X2ZvdW5kfQogCWF1ZGlvX2VuYWJsZT15ZXMKQEAgLTI5Niw2ICsyOTcsMTAgQEAgQUNfREVGVU4o
+W0FDX0FSR19CTFVFWl0sIFsKIAkJdXNiX2VuYWJsZT0ke2VuYWJsZXZhbH0KIAldKQogCisJQUNf
+QVJHX0VOQUJMRShzaXhheGlzLCBBQ19IRUxQX1NUUklORyhbLS1lbmFibGUtc2l4YXhpc10sIFtl
+bmFibGUgU2l4YXhpcyBwbHVnaW5dKSwgWworCQlzaXhheGlzX2VuYWJsZT0ke2VuYWJsZXZhbH0K
+KwldKQorCiAJQUNfQVJHX0VOQUJMRSh0cmFjZXIsIEFDX0hFTFBfU1RSSU5HKFstLWVuYWJsZS10
+cmFjZXJdLCBbaW5zdGFsbCBUcmFjaW5nIGRhZW1vbl0pLCBbCiAJCXRyYWNlcl9lbmFibGU9JHtl
+bmFibGV2YWx9CiAJXSkKQEAgLTM5NSw2ICs0MDAsMTAgQEAgQUNfREVGVU4oW0FDX0FSR19CTFVF
+Wl0sIFsKIAkJQUNfREVGSU5FKEhBVkVfTElCVVNCLCAxLCBbRGVmaW5lIHRvIDEgaWYgeW91IGhh
+dmUgVVNCIGxpYnJhcnkuXSkKIAlmaQogCisJaWYgKHRlc3QgIiR7c2l4YXhpc19lbmFibGV9IiA9
+ICJ5ZXMiICYmIHRlc3QgIiR7dWRldl9mb3VuZH0iID0gInllcyIpOyB0aGVuCisJCUFDX0RFRklO
+RShIQVZFX1NJWEFYSVNfUExVR0lOLCAxLCBbRGVmaW5lIHRvIDEgaWYgeW91IGhhdmUgc2l4YXhp
+cyBwbHVnaW4uXSkKKwlmaQorCiAJQU1fQ09ORElUSU9OQUwoU05ERklMRSwgdGVzdCAiJHtzbmRm
+aWxlX2VuYWJsZX0iID0gInllcyIgJiYgdGVzdCAiJHtzbmRmaWxlX2ZvdW5kfSIgPSAieWVzIikK
+IAlBTV9DT05ESVRJT05BTChVU0IsIHRlc3QgIiR7dXNiX2VuYWJsZX0iID0gInllcyIgJiYgdGVz
+dCAiJHt1c2JfZm91bmR9IiA9ICJ5ZXMiKQogCUFNX0NPTkRJVElPTkFMKFNCQywgdGVzdCAiJHth
+bHNhX2VuYWJsZX0iID0gInllcyIgfHwgdGVzdCAiJHtnc3RyZWFtZXJfZW5hYmxlfSIgPSAieWVz
+IiB8fApAQCAtNDMzLDQgKzQ0Miw1IEBAIEFDX0RFRlVOKFtBQ19BUkdfQkxVRVpdLCBbCiAJQU1f
+Q09ORElUSU9OQUwoREJVU09PQlBMVUdJTiwgdGVzdCAiJHtkYnVzb29iX2VuYWJsZX0iID0gInll
+cyIpCiAJQU1fQ09ORElUSU9OQUwoV0lJTU9URVBMVUdJTiwgdGVzdCAiJHt3aWltb3RlX2VuYWJs
+ZX0iID0gInllcyIpCiAJQU1fQ09ORElUSU9OQUwoVEhFUk1PTUVURVJQTFVHSU4sIHRlc3QgIiR7
+dGhlcm1vbWV0ZXJfZW5hYmxlfSIgPSAieWVzIikKKwlBTV9DT05ESVRJT05BTChTSVhBWElTUExV
+R0lOLCB0ZXN0ICIke3NpeGF4aXNfZW5hYmxlfSIgPSAieWVzIiAmJiB0ZXN0ICIke3VkZXZfZm91
+bmR9IiA9ICJ5ZXMiKQogXSkKZGlmZiAtLWdpdCBhL3BsdWdpbnMvc2l4YXhpcy5jIGIvcGx1Z2lu
+cy9zaXhheGlzLmMKbmV3IGZpbGUgbW9kZSAxMDA2NDQKaW5kZXggMDAwMDAwMC4uYTVkNTg3Ngot
+LS0gL2Rldi9udWxsCisrKyBiL3BsdWdpbnMvc2l4YXhpcy5jCkBAIC0wLDAgKzEsNjMzIEBACisv
+KgorICogc2l4YXhpcyBwbHVnaW46IGRvIGNhYmxlIGFzc29jaWF0aW9uIGZvciBTaXhheGlzIGNv
+bnRyb2xsZXIKKyAqCisgKiBDb3B5cmlnaHQgKEMpIDIwMDkgIEJhc3RpZW4gTm9jZXJhIDxoYWRl
+c3NAaGFkZXNzLm5ldD4KKyAqIENvcHlyaWdodCAoQykgMjAxMSAgQW50b25pbyBPc3BpdGUgPG9z
+cGl0ZUBzdHVkZW50aS51bmluYS5pdD4KKyAqCisgKgorICogVGhpcyBwcm9ncmFtIGlzIGZyZWUg
+c29mdHdhcmU7IHlvdSBjYW4gcmVkaXN0cmlidXRlIGl0IGFuZC9vciBtb2RpZnkKKyAqIGl0IHVu
+ZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UgYXMgcHVibGlz
+aGVkIGJ5CisgKiB0aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uOyBlaXRoZXIgdmVyc2lvbiAy
+IG9mIHRoZSBMaWNlbnNlLCBvcgorICogKGF0IHlvdXIgb3B0aW9uKSBhbnkgbGF0ZXIgdmVyc2lv
+bi4KKyAqCisgKiBUaGlzIHByb2dyYW0gaXMgZGlzdHJpYnV0ZWQgaW4gdGhlIGhvcGUgdGhhdCBp
+dCB3aWxsIGJlIHVzZWZ1bCwKKyAqIGJ1dCBXSVRIT1VUIEFOWSBXQVJSQU5UWTsgd2l0aG91dCBl
+dmVuIHRoZSBpbXBsaWVkIHdhcnJhbnR5IG9mCisgKiBNRVJDSEFOVEFCSUxJVFkgb3IgRklUTkVT
+UyBGT1IgQSBQQVJUSUNVTEFSIFBVUlBPU0UuICBTZWUgdGhlCisgKiBHTlUgR2VuZXJhbCBQdWJs
+aWMgTGljZW5zZSBmb3IgbW9yZSBkZXRhaWxzLgorICoKKyAqIFlvdSBzaG91bGQgaGF2ZSByZWNl
+aXZlZCBhIGNvcHkgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlCisgKiBhbG9uZyB3
+aXRoIHRoaXMgcHJvZ3JhbTsgaWYgbm90LCB3cml0ZSB0byB0aGUgRnJlZSBTb2Z0d2FyZQorICog
+Rm91bmRhdGlvbiwgSW5jLiwgNTEgRnJhbmtsaW4gU3QsIEZpZnRoIEZsb29yLCBCb3N0b24sIE1B
+ICAwMjExMC0xMzAxICBVU0EKKyAqCisgKi8KKworLyoKKyAqIEluIHRoZSBmb2xsb3dpbmcgdGhp
+cyB0ZXJtaW5vbG9neSBpcyB1c2VkOgorICoKKyAqICAtIGNvbnRyb2xsZXI6IGEgU2l4YXhpcyBq
+b3lwYWQuCisgKiAgLSBhZGFwdGVyOiB0aGUgYmx1ZXRvb3RoIGRvbmdsZSBvbiB0aGUgaG9zdCBz
+eXN0ZW0uCisgKiAgLSBhZGFwdGVyX2JkYWRkcjogdGhlIGJkYWRkciBvZiB0aGUgYmx1ZXRvb3Ro
+IGFkYXB0ZXIuCisgKiAgLSBkZXZpY2VfYmRhZGRyOiB0aGUgYmRhZGRyIG9mIHRoZSBTaXhheGlz
+IGNvbnRyb2xsZXIuCisgKiAgLSBtYXN0ZXJfYmRhZGRyOiB0aGUgYmRhZGRyIG9mIHRoZSBhZGFw
+dGVyIHRvIGJlIGNvbmZpZ3VyZWQgaW50byB0aGUKKyAqICAgIFNpeGF4aXMgY29udHJvbGxlcgor
+ICovCisKKyNpZmRlZiBIQVZFX0NPTkZJR19ICisjaW5jbHVkZSA8Y29uZmlnLmg+CisjZW5kaWYK
+KworI2luY2x1ZGUgPHN0ZGlvLmg+CisjaW5jbHVkZSA8c3RkaW50Lmg+CisjaW5jbHVkZSA8c3Rk
+bGliLmg+CisjaW5jbHVkZSA8c3lzL2lvY3RsLmg+CisjaW5jbHVkZSA8c3lzL3R5cGVzLmg+Cisj
+aW5jbHVkZSA8c3lzL3N0YXQuaD4KKyNpbmNsdWRlIDxmY250bC5oPgorI2luY2x1ZGUgPHVuaXN0
+ZC5oPgorI2luY2x1ZGUgPGVycm5vLmg+CisjaW5jbHVkZSA8Z2xpYi5oPgorI2luY2x1ZGUgPGxp
+bnV4L2hpZHJhdy5oPgorCisjZGVmaW5lIExJQlVERVZfSV9LTk9XX1RIRV9BUElfSVNfU1VCSkVD
+VF9UT19DSEFOR0UgMQorI2luY2x1ZGUgPGxpYnVkZXYuaD4KKworI2luY2x1ZGUgInBsdWdpbi5o
+IgorI2luY2x1ZGUgImxvZy5oIgorI2luY2x1ZGUgImFkYXB0ZXIuaCIKKyNpbmNsdWRlICJkZXZp
+Y2UuaCIKKyNpbmNsdWRlICJtYW5hZ2VyLmgiCisjaW5jbHVkZSAic3RvcmFnZS5oIgorI2luY2x1
+ZGUgInNkcF9saWIuaCIKKworLyogRmFsbGJhY2sgZGVmaW5pdGlvbnMgdG8gY29tcGlsZSB3aXRo
+IG9sZGVyIGhlYWRlcnMgKi8KKyNpZm5kZWYgSElESU9DR0ZFQVRVUkUKKyNkZWZpbmUgSElESU9D
+R0ZFQVRVUkUobGVuKSAgICBfSU9DKF9JT0NfV1JJVEV8X0lPQ19SRUFELCAnSCcsIDB4MDcsIGxl
+bikKKyNlbmRpZgorCisjaWZuZGVmIEhJRElPQ1NGRUFUVVJFCisjZGVmaW5lIEhJRElPQ1NGRUFU
+VVJFKGxlbikgICAgX0lPQyhfSU9DX1dSSVRFfF9JT0NfUkVBRCwgJ0gnLCAweDA2LCBsZW4pCisj
+ZW5kaWYKKworI2RlZmluZSBCREFERFJfU1RSX1NJWkUgMTggLyogc3RybGVuKCIwMDowMDowMDow
+MDowMDowMCIpICsgMSAqLworCitzdHJ1Y3Qgc29ueV9jb250cm9sbGVyIHsKKwl1aW50MTZfdCB2
+ZW5kb3JfaWQ7CisJdWludDE2X3QgcHJvZHVjdF9pZDsKKwljaGFyICpuYW1lOworCWNoYXIgKnBu
+cF9yZWNvcmQ7CisJY2hhciAqaGlkX3V1aWQ7CisKKwkvKiBkZXZpY2Ugc3BlY2lmaWMgY2FsbGJh
+Y2tzIHRvIGdldCBtYXN0ZXIvZGV2aWNlIGJkYWRkciBhbmQgc2V0CisJICogbWFzdGVyIGJkYWRk
+cgorCSAqLworCWNoYXIgKiAoKmdldF9kZXZpY2VfYmRhZGRyKShpbnQpOworCWNoYXIgKiAoKmdl
+dF9tYXN0ZXJfYmRhZGRyKShpbnQpOworCWludCAoKnNldF9tYXN0ZXJfYmRhZGRyKSAoaW50LCBj
+aGFyICopOworfTsKKworc3RhdGljIGNoYXIgKnNpeGF4aXNfZ2V0X2RldmljZV9iZGFkZHIoaW50
+IGZkKTsKK3N0YXRpYyBjaGFyICpzaXhheGlzX2dldF9tYXN0ZXJfYmRhZGRyKGludCBmZCk7Citz
+dGF0aWMgaW50IHNpeGF4aXNfc2V0X21hc3Rlcl9iZGFkZHIoaW50IGZkLCBjaGFyICphZGFwdGVy
+X2JkYWRkcik7CisKK3N0YXRpYyBzdHJ1Y3Qgc29ueV9jb250cm9sbGVyIGNvbnRyb2xsZXJzW10g
+PSB7CisJeworCQkudmVuZG9yX2lkID0gMHgwNTRjLAorCQkucHJvZHVjdF9pZCA9IDB4MDI2OCwK
+KwkJLm5hbWUgPSAiUExBWVNUQVRJT04oUikzIENvbnRyb2xsZXIiLAorCQkucG5wX3JlY29yZCA9
+ICIzNjAxOTIwOTAwMDAwQTAwMDEwMDAwMDkwMDAxMzUwMzE5MTEyNDA5MDAwNDM1MEQzNTA2MTkw
+MTAwMDkwMDExMzUwMzE5MDAxMTA5MDAwNjM1MDkwOTY1NkUwOTAwNkEwOTAxMDAwOTAwMDkzNTA4
+MzUwNjE5MTEyNDA5MDEwMDA5MDAwRDM1MEYzNTBEMzUwNjE5MDEwMDA5MDAxMzM1MDMxOTAwMTEw
+OTAxMDAyNTEzNTc2OTcyNjU2QzY1NzM3MzIwNDM2RjZFNzQ3MjZGNkM2QzY1NzIwOTAxMDEyNTEz
+NTc2OTcyNjU2QzY1NzM3MzIwNDM2RjZFNzQ3MjZGNkM2QzY1NzIwOTAxMDIyNTFCNTM2RjZFNzky
+MDQzNkY2RDcwNzU3NDY1NzIyMDQ1NkU3NDY1NzI3NDYxNjk2RTZENjU2RTc0MDkwMjAwMDkwMTAw
+MDkwMjAxMDkwMTAwMDkwMjAyMDgwMDA5MDIwMzA4MjEwOTAyMDQyODAxMDkwMjA1MjgwMTA5MDIw
+NjM1OUEzNTk4MDgyMjI1OTQwNTAxMDkwNEExMDFBMTAyODUwMTc1MDg5NTAxMTUwMDI2RkYwMDgx
+MDM3NTAxOTUxMzE1MDAyNTAxMzUwMDQ1MDEwNTA5MTkwMTI5MTM4MTAyNzUwMTk1MEQwNjAwRkY4
+MTAzMTUwMDI2RkYwMDA1MDEwOTAxQTEwMDc1MDg5NTA0MzUwMDQ2RkYwMDA5MzAwOTMxMDkzMjA5
+MzU4MTAyQzAwNTAxNzUwODk1MjcwOTAxODEwMjc1MDg5NTMwMDkwMTkxMDI3NTA4OTUzMDA5MDFC
+MTAyQzBBMTAyODUwMjc1MDg5NTMwMDkwMUIxMDJDMEExMDI4NUVFNzUwODk1MzAwOTAxQjEwMkMw
+QTEwMjg1RUY3NTA4OTUzMDA5MDFCMTAyQzBDMDA5MDIwNzM1MDgzNTA2MDkwNDA5MDkwMTAwMDkw
+MjA4MjgwMDA5MDIwOTI4MDEwOTAyMEEyODAxMDkwMjBCMDkwMTAwMDkwMjBDMDkzRTgwMDkwMjBE
+MjgwMDA5MDIwRTI4MDAiLAorCQkuaGlkX3V1aWQgPSAiMDAwMDExMjQtMDAwMC0xMDAwLTgwMDAt
+MDA4MDVmOWIzNGZiIiwKKwkJLmdldF9kZXZpY2VfYmRhZGRyID0gc2l4YXhpc19nZXRfZGV2aWNl
+X2JkYWRkciwKKwkJLmdldF9tYXN0ZXJfYmRhZGRyID0gc2l4YXhpc19nZXRfbWFzdGVyX2JkYWRk
+ciwKKwkJLnNldF9tYXN0ZXJfYmRhZGRyID0gc2l4YXhpc19zZXRfbWFzdGVyX2JkYWRkciwKKwl9
+LAorfTsKKworCisjZGVmaW5lIExFRF8xICgweDAxIDw8IDEpCisjZGVmaW5lIExFRF8yICgweDAx
+IDw8IDIpCisjZGVmaW5lIExFRF8zICgweDAxIDw8IDMpCisjZGVmaW5lIExFRF80ICgweDAxIDw8
+IDQpCisKKyNkZWZpbmUgTEVEX1NUQVRVU19PRkYgMAorI2RlZmluZSBMRURfU1RBVFVTX09OICAx
+CisKK3N0YXRpYyBzdHJ1Y3QgdWRldiAqY3R4Oworc3RhdGljIHN0cnVjdCB1ZGV2X21vbml0b3Ig
+Km1vbml0b3I7CitzdGF0aWMgZ3VpbnQgd2F0Y2hfaWQ7CisKKworc3RhdGljIGludCBjcmVhdGVf
+Y29udHJvbGxlcl9hc3NvY2lhdGlvbihzdHJ1Y3QgYnRkX2FkYXB0ZXIgKmFkYXB0ZXIsCisJCQkJ
+CWNvbnN0IGNoYXIgKmFkZHJlc3MsCisJCQkJCXN0cnVjdCBzb255X2NvbnRyb2xsZXIgKmNvbnRy
+b2xsZXIpCit7CisJREJ1c0Nvbm5lY3Rpb24gKmNvbm47CisJc2RwX3JlY29yZF90ICpyZWM7CisJ
+c3RydWN0IGJ0ZF9kZXZpY2UgKmRldmljZTsKKwliZGFkZHJfdCBzcmMsIGRzdDsKKwljaGFyIHNy
+Y2FkZHJbMThdOworCWludCByZXQgPSAwOworCisJREJHKCJhc3NvY2lhdGlvbiIpOworCisJc3Ry
+MmJhKGFkZHJlc3MsICZkc3QpOworCWFkYXB0ZXJfZ2V0X2FkZHJlc3MoYWRhcHRlciwgJnNyYyk7
+CisJYmEyc3RyKCZzcmMsIHNyY2FkZHIpOworCisJd3JpdGVfZGV2aWNlX25hbWUoJmRzdCwgJnNy
+YywgY29udHJvbGxlci0+bmFtZSk7CisKKwkvKiBTdG9yZSB0aGUgZGV2aWNlJ3MgU0RQIHJlY29y
+ZCAqLworCXJlYyA9IHJlY29yZF9mcm9tX3N0cmluZyhjb250cm9sbGVyLT5wbnBfcmVjb3JkKTsK
+KwlzdG9yZV9yZWNvcmQoc3JjYWRkciwgYWRkcmVzcywgcmVjKTsKKwlzZHBfcmVjb3JkX2ZyZWUo
+cmVjKTsKKworCS8qIFNldCB0aGUgZGV2aWNlIGlkICovCisJc3RvcmVfZGV2aWNlX2lkKHNyY2Fk
+ZHIsIGFkZHJlc3MsIDB4ZmZmZiwgY29udHJvbGxlci0+dmVuZG9yX2lkLAorCQkJY29udHJvbGxl
+ci0+cHJvZHVjdF9pZCwgMCk7CisJLyogRG9uJ3Qgd3JpdGUgYSBwcm9maWxlIGhlcmUsCisJICog
+aXQgd2lsbCBiZSB1cGRhdGVkIHdoZW4gdGhlIGRldmljZSBjb25uZWN0cyAqLworCisJREJHKCJ0
+cnVzdCIpOworCXdyaXRlX3RydXN0KHNyY2FkZHIsIGFkZHJlc3MsICJbYWxsXSIsIFRSVUUpOwor
+CisJY29ubiA9IGRidXNfYnVzX2dldChEQlVTX0JVU19TWVNURU0sIE5VTEwpOworCWlmIChjb25u
+ID09IE5VTEwpIHsKKwkJREJHKCJGYWlsZWQgdG8gZ2V0IG9uIHRoZSBidXMiKTsKKwkJcmV0ID0g
+LUVQRVJNOworCQlnb3RvIGZhaWxfZGJ1czsKKwl9CisKKwlEQkcoImdldF9kZXZpY2UiKTsKKwlk
+ZXZpY2UgPSBhZGFwdGVyX2dldF9kZXZpY2UoY29ubiwgYWRhcHRlciwgYWRkcmVzcyk7CisJaWYg
+KGRldmljZSA9PSBOVUxMKSB7CisJCURCRygiRmFpbGVkIHRvIGdldCB0aGUgZGV2aWNlIik7CisJ
+CXJldCA9IC1FTk9ERVY7CisJCWdvdG8gZmFpbF9kZXZpY2U7CisJfQorCisJREJHKCJzZXQgZGV2
+aWNlIik7CisJZGV2aWNlX3NldF90ZW1wb3JhcnkoZGV2aWNlLCBGQUxTRSk7CisJZGV2aWNlX3Nl
+dF9uYW1lKGRldmljZSwgY29udHJvbGxlci0+bmFtZSk7CisJYnRkX2RldmljZV9hZGRfdXVpZChk
+ZXZpY2UsIGNvbnRyb2xsZXItPmhpZF91dWlkKTsKKwlEQkcoImZpbmlzaCIpOworCitmYWlsX2Rl
+dmljZToKKwlkYnVzX2Nvbm5lY3Rpb25fdW5yZWYoY29ubik7CitmYWlsX2RidXM6CisJcmV0dXJu
+IHJldDsKK30KKworLyogVXNiIGNhYmxlIHBhaXJpbmcgc2VjdGlvbiAqLworc3RhdGljIHVuc2ln
+bmVkIGNoYXIgKmdldF9mZWF0dXJlX3JlcG9ydChpbnQgZmQsIHVpbnQ4X3QgcmVwb3J0X251bWJl
+ciwKKwkJCQkJCXVuc2lnbmVkIGludCBsZW4pCit7CisJdW5zaWduZWQgY2hhciAqYnVmOworCWlu
+dCByZXQ7CisKKwlidWYgPSBjYWxsb2MobGVuLCBzaXplb2YoKmJ1ZikpOworCWlmIChidWYgPT0g
+TlVMTCkgeworCQllcnJvcigiJXM6JXMoKSBjYWxsb2MgZmFpbGVkIiwgX19GSUxFX18sIF9fZnVu
+Y19fKTsKKwkJcmV0dXJuIE5VTEw7CisJfQorCisJYnVmWzBdID0gcmVwb3J0X251bWJlcjsKKwor
+CXJldCA9IGlvY3RsKGZkLCBISURJT0NHRkVBVFVSRShsZW4pLCBidWYpOworCWlmIChyZXQgPCAw
+KSB7CisJCWVycm9yKCIlczolcygpIEhJRElPQ0dGRUFUVVJFIHJldCA9ICVkIiwKKwkJCV9fRklM
+RV9fLCBfX2Z1bmNfXywgcmV0KTsKKwkJZnJlZShidWYpOworCQlyZXR1cm4gTlVMTDsKKwl9CisK
+KwlyZXR1cm4gYnVmOworfQorCitzdGF0aWMgaW50IHNldF9mZWF0dXJlX3JlcG9ydChpbnQgZmQs
+IHVpbnQ4X3QgKnJlcG9ydCwgaW50IGxlbikKK3sKKwlpbnQgcmV0OworCisJcmV0ID0gaW9jdGwo
+ZmQsIEhJRElPQ1NGRUFUVVJFKGxlbiksIHJlcG9ydCk7CisJaWYgKHJldCA8IDApCisJCWVycm9y
+KCIlczolcygpIEhJRElPQ1NGRUFUVVJFIGZhaWxlZCwgcmV0ID0gJWQiLAorCQkJX19GSUxFX18s
+IF9fZnVuY19fLCByZXQpOworCisJcmV0dXJuIHJldDsKK30KKworc3RhdGljIGNoYXIgKnNpeGF4
+aXNfZ2V0X2RldmljZV9iZGFkZHIoaW50IGZkKQoreworCXVuc2lnbmVkIGNoYXIgKmJ1ZjsKKwlj
+aGFyICphZGRyZXNzOworCisJYnVmID0gZ2V0X2ZlYXR1cmVfcmVwb3J0KGZkLCAweGYyLCAxOCk7
+CisJaWYgKGJ1ZiA9PSBOVUxMKSB7CisJCWVycm9yKCIlczolcygpIGNhbm5vdCBnZXQgZmVhdHVy
+ZSByZXBvcnQiLCBfX0ZJTEVfXywgX19mdW5jX18pOworCQlyZXR1cm4gTlVMTDsKKwl9CisKKwlh
+ZGRyZXNzID0gY2FsbG9jKEJEQUREUl9TVFJfU0laRSwgc2l6ZW9mKCphZGRyZXNzKSk7CisJaWYg
+KGFkZHJlc3MgPT0gTlVMTCkgeworCQllcnJvcigiJXM6JXMoKSBjYWxsb2MgZmFpbGVkIiwgX19G
+SUxFX18sIF9fZnVuY19fKTsKKwkJZnJlZShidWYpOworCQlyZXR1cm4gTlVMTDsKKwl9CisKKwlz
+bnByaW50ZihhZGRyZXNzLCBCREFERFJfU1RSX1NJWkUsCisJCQkiJTAyWDolMDJYOiUwMlg6JTAy
+WDolMDJYOiUwMlgiLAorCQkJYnVmWzRdLCBidWZbNV0sIGJ1Zls2XSwgYnVmWzddLCBidWZbOF0s
+IGJ1Zls5XSk7CisKKwlmcmVlKGJ1Zik7CisJcmV0dXJuIGFkZHJlc3M7Cit9CisKK3N0YXRpYyBj
+aGFyICpzaXhheGlzX2dldF9tYXN0ZXJfYmRhZGRyKGludCBmZCkKK3sKKwl1bnNpZ25lZCBjaGFy
+ICpidWY7CisJY2hhciAqYWRkcmVzczsKKworCWJ1ZiA9IGdldF9mZWF0dXJlX3JlcG9ydChmZCwg
+MHhmNSwgOCk7CisJaWYgKGJ1ZiA9PSBOVUxMKSB7CisJCWVycm9yKCIlczolcygpIGNhbm5vdCBn
+ZXQgZmVhdHVyZSByZXBvcnQiLCBfX0ZJTEVfXywgX19mdW5jX18pOworCQlyZXR1cm4gTlVMTDsK
+Kwl9CisKKwlhZGRyZXNzID0gY2FsbG9jKEJEQUREUl9TVFJfU0laRSwgc2l6ZW9mKCphZGRyZXNz
+KSk7CisJaWYgKGFkZHJlc3MgPT0gTlVMTCkgeworCQllcnJvcigiJXM6JXMoKSBjYWxsb2MgZmFp
+bGVkIiwgX19GSUxFX18sIF9fZnVuY19fKTsKKwkJZnJlZShidWYpOworCQlyZXR1cm4gTlVMTDsK
+Kwl9CisKKwlzbnByaW50ZihhZGRyZXNzLCBCREFERFJfU1RSX1NJWkUsCisJCQkiJTAyWDolMDJY
+OiUwMlg6JTAyWDolMDJYOiUwMlgiLAorCQkJYnVmWzJdLCBidWZbM10sIGJ1Zls0XSwgYnVmWzVd
+LCBidWZbNl0sIGJ1Zls3XSk7CisKKwlmcmVlKGJ1Zik7CisJcmV0dXJuIGFkZHJlc3M7Cit9CisK
+K3N0YXRpYyBpbnQgc2l4YXhpc19zZXRfbWFzdGVyX2JkYWRkcihpbnQgZmQsIGNoYXIgKmFkYXB0
+ZXJfYmRhZGRyKQoreworCXVpbnQ4X3QgKnJlcG9ydDsKKwl1aW50OF90IGFkZHJbNl07CisJaW50
+IHJldDsKKworCXJldCA9IHNzY2FuZihhZGFwdGVyX2JkYWRkciwKKwkJCSIlMDJoaHg6JTAyaGh4
+OiUwMmhoeDolMDJoaHg6JTAyaGh4OiUwMmhoeCIsCisJCQkmYWRkclswXSwgJmFkZHJbMV0sICZh
+ZGRyWzJdLAorCQkJJmFkZHJbM10sICZhZGRyWzRdLCAmYWRkcls1XSk7CisJaWYgKHJldCAhPSA2
+KSB7CisKKwkJZXJyb3IoIiVzOiVzKCkgUGFyc2luZyB0aGUgYnQgYWRkcmVzcyBmYWlsZWQiLAor
+CQkJX19GSUxFX18sIF9fZnVuY19fKTsKKwkJcmV0dXJuIC1FSU5WQUw7CisJfQorCisJcmVwb3J0
+ID0gbWFsbG9jKDgpOworCWlmIChyZXBvcnQgPT0gTlVMTCkgeworCQllcnJvcigiJXM6JXMoKSBt
+YWxsb2MgZmFpbGVkIiwgX19GSUxFX18sIF9fZnVuY19fKTsKKwkJcmV0dXJuIC1FTk9NRU07CisJ
+fQorCisJcmVwb3J0WzBdID0gMHhmNTsKKwlyZXBvcnRbMV0gPSAweDAxOworCisJcmVwb3J0WzJd
+ID0gYWRkclswXTsKKwlyZXBvcnRbM10gPSBhZGRyWzFdOworCXJlcG9ydFs0XSA9IGFkZHJbMl07
+CisJcmVwb3J0WzVdID0gYWRkclszXTsKKwlyZXBvcnRbNl0gPSBhZGRyWzRdOworCXJlcG9ydFs3
+XSA9IGFkZHJbNV07CisKKwlyZXQgPSBzZXRfZmVhdHVyZV9yZXBvcnQoZmQsIHJlcG9ydCwgOCk7
+CisJaWYgKHJldCA8IDApIHsKKwkJZXJyb3IoIiVzOiVzKCkgY2Fubm90IHNldCBmZWF0dXJlIHJl
+cG9ydCIsCisJCQlfX0ZJTEVfXywgX19mdW5jX18pOworCQlnb3RvIG91dDsKKwl9CisKKwlEQkco
+Ik5ldyBNYXN0ZXIgQmx1ZXRvb3RoIGFkZHJlc3M6ICVzIiwgYWRhcHRlcl9iZGFkZHIpOworCitv
+dXQ6CisJZnJlZShyZXBvcnQpOworCXJldHVybiByZXQ7Cit9CisKK3N0YXRpYyBpbnQgY29udHJv
+bGxlcl9wYWlyKGludCBmZCwgc3RydWN0IGJ0ZF9hZGFwdGVyICphZGFwdGVyLCBzdHJ1Y3Qgc29u
+eV9jb250cm9sbGVyICpjb250cm9sbGVyKQoreworCWNoYXIgKmRldmljZV9iZGFkZHI7CisJY2hh
+ciAqbWFzdGVyX2JkYWRkcjsKKwljaGFyIGFkYXB0ZXJfYmRhZGRyWzE4XTsKKwliZGFkZHJfdCBk
+c3Q7CisJaW50IHJldCA9IDA7CisKKwlhZGFwdGVyX2dldF9hZGRyZXNzKGFkYXB0ZXIsICZkc3Qp
+OworCWJhMnN0cigmZHN0LCBhZGFwdGVyX2JkYWRkcik7CisJREJHKCJBZGFwdGVyIGJkYWRkciAl
+cyIsIGFkYXB0ZXJfYmRhZGRyKTsKKworCW1hc3Rlcl9iZGFkZHIgPSBjb250cm9sbGVyLT5nZXRf
+bWFzdGVyX2JkYWRkcihmZCk7CisJaWYgKG1hc3Rlcl9iZGFkZHIgPT0gTlVMTCkgeworCQlEQkco
+IkZhaWxlZCB0byBnZXQgdGhlIE9sZCBtYXN0ZXIgQmx1ZXRvb3RoIGFkZHJlc3MgZnJvbSB0aGUg
+ZGV2aWNlIik7CisJCXJldHVybiAtRVBFUk07CisJfQorCisJLyogT25seSBzZXQgdGhlIG1hc3Rl
+ciBiZGFkZHIgd2hlbiBuZWVkZWQsIHRoaXMgaXMgaG93IHRoZSBQUzMgZG9lcworCSAqIGl0LCBw
+ZXJoYXBzIHRvIGF2b2lkIHVubmVjZXNzYXJ5IHdyaXRlcyB0byBzb21lIGVlcHJvbS4KKwkgKi8K
+KwlpZiAoZ19zdHJjbXAwKG1hc3Rlcl9iZGFkZHIsIGFkYXB0ZXJfYmRhZGRyKSAhPSAwKSB7CisJ
+CURCRygiT2xkIG1hc3RlciBCbHVldG9vdGggYWRkcmVzcyB3YXM6ICVzIiwgbWFzdGVyX2JkYWRk
+cik7CisJCXJldCA9IGNvbnRyb2xsZXItPnNldF9tYXN0ZXJfYmRhZGRyKGZkLCBhZGFwdGVyX2Jk
+YWRkcik7CisJCWlmIChyZXQgPCAwKSB7CisJCQlEQkcoIkZhaWxlZCB0byBzZXQgdGhlIG1hc3Rl
+ciBCbHVldG9vdGggYWRkcmVzcyIpOworCQkJZnJlZShtYXN0ZXJfYmRhZGRyKTsKKwkJCXJldHVy
+biByZXQ7CisJCX0KKwl9CisKKwlkZXZpY2VfYmRhZGRyID0gY29udHJvbGxlci0+Z2V0X2Rldmlj
+ZV9iZGFkZHIoZmQpOworCWlmIChkZXZpY2VfYmRhZGRyID09IE5VTEwpIHsKKwkJREJHKCJGYWls
+ZWQgdG8gZ2V0IHRoZSBCbHVldG9vdGggYWRkcmVzcyBmcm9tIHRoZSBkZXZpY2UiKTsKKwkJZnJl
+ZShtYXN0ZXJfYmRhZGRyKTsKKwkJcmV0dXJuIC1FUEVSTTsKKwl9CisKKwlEQkcoIkRldmljZSBi
+ZGFkZHIgJXMiLCBkZXZpY2VfYmRhZGRyKTsKKworCXJldCA9IGNyZWF0ZV9jb250cm9sbGVyX2Fz
+c29jaWF0aW9uKGFkYXB0ZXIsIGRldmljZV9iZGFkZHIsIGNvbnRyb2xsZXIpOworCWZyZWUoZGV2
+aWNlX2JkYWRkcik7CisJZnJlZShtYXN0ZXJfYmRhZGRyKTsKKwlyZXR1cm4gcmV0OworfQorCisv
+KiBMZWQgc2V0dGluZyBzZWN0aW9uICovCitzdGF0aWMgaW50IHNldF9sZWRzKGludCBmZCwgdW5z
+aWduZWQgY2hhciBsZWRzX3N0YXR1c1s0XSkKK3sKKwlpbnQgcmV0OworCisJLyoKKwkgKiB0aGUg
+dG90YWwgdGltZSB0aGUgbGVkIGlzIGFjdGl2ZSAoMHhmZiBtZWFucyBmb3JldmVyKQorCSAqIHwg
+ICAgIGR1dHlfbGVuZ3RoOiBob3cgbG9uZyBhIGN5Y2xlIGlzIGluIGRlY2lzZWNvbmRzOgorCSAq
+IHwgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAoMCBtZWFucyAiYmxpbmsgdmVy
+eSBmYXN0IikKKwkgKiB8ICAgICB8ICAgICA/Pz8gKE1heWJlIGEgcGhhc2Ugc2hpZnQgb3IgZHV0
+eV9sZW5ndGggbXVsdGlwbGllcj8pCisJICogfCAgICAgfCAgICAgfCAgICAgJSBvZiBkdXR5X2xl
+bmd0aCBsZWQgaXMgb2ZmICgweGZmIG1lYW5zIDEwMCUpCisJICogfCAgICAgfCAgICAgfCAgICAg
+fCAgICAgJSBvZiBkdXR5X2xlbmd0aCBsZWQgaXMgb24gKDB4ZmYgaXMgMTAwJSkKKwkgKiB8ICAg
+ICB8ICAgICB8ICAgICB8ICAgICB8CisJICogMHhmZiwgMHgyNywgMHgxMCwgMHgwMCwgMHgzMiwK
+KwkgKi8KKwl1bnNpZ25lZCBjaGFyIGxlZHNfcmVwb3J0W10gPSB7CisJCTB4MDEsCisJCTB4MDAs
+IDB4MDAsIDB4MDAsIDB4MDAsIDB4MDAsIC8qIHJ1bWJsZSB2YWx1ZXMgVEJEICovCisJCTB4MDAs
+IDB4MDAsIDB4MDAsIDB4MDAsIDB4MWUsIC8qIExFRF8xPTB4MDIsIExFRF8yPTB4MDQgLi4uICov
+CisJCTB4ZmYsIDB4MjcsIDB4MTAsIDB4MDAsIDB4MzIsIC8qIExFRF80ICovCisJCTB4ZmYsIDB4
+MjcsIDB4MTAsIDB4MDAsIDB4MzIsIC8qIExFRF8zICovCisJCTB4ZmYsIDB4MjcsIDB4MTAsIDB4
+MDAsIDB4MzIsIC8qIExFRF8yICovCisJCTB4ZmYsIDB4MjcsIDB4MTAsIDB4MDAsIDB4MzIsIC8q
+IExFRF8xICovCisJCTB4MDAsIDB4MDAsIDB4MDAsIDB4MDAsIDB4MDAsCisJfTsKKworCWludCBs
+ZWRzID0gMDsKKwlpZiAobGVkc19zdGF0dXNbMF0pCisJCWxlZHMgfD0gTEVEXzE7CisJaWYgKGxl
+ZHNfc3RhdHVzWzFdKQorCQlsZWRzIHw9IExFRF8yOworCWlmIChsZWRzX3N0YXR1c1syXSkKKwkJ
+bGVkcyB8PSBMRURfMzsKKwlpZiAobGVkc19zdGF0dXNbM10pCisJCWxlZHMgfD0gTEVEXzQ7CisK
+KwlsZWRzX3JlcG9ydFsxMF0gPSBsZWRzOworCisJREJHKCJTZXR0aW5nIGxlZHMiKTsKKwlyZXQg
+PSB3cml0ZShmZCwgbGVkc19yZXBvcnQsIHNpemVvZihsZWRzX3JlcG9ydCkpOworCWlmIChyZXQg
+PCAoc3NpemVfdCkgc2l6ZW9mKGxlZHNfcmVwb3J0KSkKKwkJZXJyb3IoIiVzOiVzKCkgVW5hYmxl
+IHRvIHdyaXRlIHRvIGhpZHJhdyBkZXZpY2UiLAorCQkJX19GSUxFX18sIF9fZnVuY19fKTsKKwor
+CXJldHVybiByZXQ7Cit9CisKK3N0YXRpYyBpbnQgc2V0X2NvbnRyb2xsZXJfbnVtYmVyKGludCBm
+ZCwgdW5zaWduZWQgaW50IG4pCit7CisJdW5zaWduZWQgY2hhciBsZWRzX3N0YXR1c1s0XSA9IHsw
+LCAwLCAwLCAwfTsKKworCXN3aXRjaCAobikgeworCWNhc2UgMDoKKwkJYnJlYWs7CisJY2FzZSAx
+OgorCWNhc2UgMjoKKwljYXNlIDM6CisJY2FzZSA0OgorCQlsZWRzX3N0YXR1c1tuIC0gMV0gPSBM
+RURfU1RBVFVTX09OOworCQlicmVhazsKKwljYXNlIDU6CisJY2FzZSA2OgorCWNhc2UgNzoKKwkJ
+bGVkc19zdGF0dXNbNCAtIDFdID0gTEVEX1NUQVRVU19PTjsKKwkJbGVkc19zdGF0dXNbbiAtIDQg
+LSAxXSA9IExFRF9TVEFUVVNfT047CisJCWJyZWFrOworCWRlZmF1bHQ6CisJCWVycm9yKCIlczol
+cygpIE9ubHkgNyBjb250cm9sbGVycyBzdXBwb3J0ZWQgZm9yIG5vdyIsCisJCQlfX0ZJTEVfXywg
+X19mdW5jX18pOworCQlyZXR1cm4gLTE7CisJfQorCisJcmV0dXJuIHNldF9sZWRzKGZkLCBsZWRz
+X3N0YXR1cyk7Cit9CisKKworc3RhdGljIGlubGluZSBnYm9vbGVhbiBpc19zaXhheGlzKGNvbnN0
+IGNoYXIgKmhpZF9uYW1lKQoreworCXJldHVybiBnX3N0cl9oYXNfc3VmZml4KGhpZF9uYW1lLCAi
+UExBWVNUQVRJT04oUikzIENvbnRyb2xsZXIiKSB8fAorCQlnX3N0cl9oYXNfc3VmZml4KGhpZF9u
+YW1lLAorCQkJIlNvbnkgQ29tcHV0ZXIgRW50ZXJ0YWlubWVudCBXaXJlbGVzcyBDb250cm9sbGVy
+Iik7Cit9CisKK3N0YXRpYyB2b2lkIGhhbmRsZV9kZXZpY2VfcGx1ZyhzdHJ1Y3QgdWRldl9kZXZp
+Y2UgKnVkZXZpY2UpCit7CisJc3RydWN0IHVkZXZfZGV2aWNlICpoaWRfcGFyZW50OworCXN0cnVj
+dCB1ZGV2X2VudW1lcmF0ZSAqZW51bWVyYXRlOworCXN0cnVjdCB1ZGV2X2xpc3RfZW50cnkgKmRl
+dmljZXMsICpkZXZfbGlzdF9lbnRyeTsKKwljb25zdCBjaGFyICpoaWRfbmFtZTsKKwljb25zdCBj
+aGFyICpoaWRfcGh5czsKKwljb25zdCBjaGFyICpoaWRyYXdfbm9kZTsKKwl1bnNpZ25lZCBjaGFy
+IGlzX3VzYiA9IEZBTFNFOworCWludCBqc19udW0gPSAwOworCWludCBmZDsKKwlzdHJ1Y3Qgc29u
+eV9jb250cm9sbGVyICpjb250cm9sbGVyOworCisJaGlkX3BhcmVudCA9IHVkZXZfZGV2aWNlX2dl
+dF9wYXJlbnRfd2l0aF9zdWJzeXN0ZW1fZGV2dHlwZSh1ZGV2aWNlLAorCQkJCQkJCQkiaGlkIiwg
+TlVMTCk7CisJaWYgKCFoaWRfcGFyZW50KSB7CisJCWVycm9yKCIlczolcygpIGNhbm5vdCBnZXQg
+cGFyZW50IGhpZCBkZXZpY2UiLAorCQkJX19GSUxFX18sIF9fZnVuY19fKTsKKwkJcmV0dXJuOwor
+CX0KKworCWhpZF9uYW1lID0gdWRldl9kZXZpY2VfZ2V0X3Byb3BlcnR5X3ZhbHVlKGhpZF9wYXJl
+bnQsICJISURfTkFNRSIpOworCURCRygibmFtZTogJXMiLCBoaWRfbmFtZSk7CisKKwlpZiAoIWlz
+X3NpeGF4aXMoaGlkX25hbWUpKQorCQlyZXR1cm47CisKKwljb250cm9sbGVyID0gJmNvbnRyb2xs
+ZXJzWzBdOworCisJREJHKCJGb3VuZCBhIFNpeGF4aXMgZGV2aWNlIik7CisKKwloaWRyYXdfbm9k
+ZSA9IHVkZXZfZGV2aWNlX2dldF9kZXZub2RlKHVkZXZpY2UpOworCisJaGlkX3BoeXMgPSB1ZGV2
+X2RldmljZV9nZXRfcHJvcGVydHlfdmFsdWUoaGlkX3BhcmVudCwgIkhJRF9QSFlTIik7CisKKwkv
+KiBsb29raW5nIGZvciBqb3lzdGlja3MgKi8KKwllbnVtZXJhdGUgPSB1ZGV2X2VudW1lcmF0ZV9u
+ZXcodWRldl9kZXZpY2VfZ2V0X3VkZXYodWRldmljZSkpOworCXVkZXZfZW51bWVyYXRlX2FkZF9t
+YXRjaF9zeXNuYW1lKGVudW1lcmF0ZSwgImpzKiIpOworCXVkZXZfZW51bWVyYXRlX3NjYW5fZGV2
+aWNlcyhlbnVtZXJhdGUpOworCisJZGV2aWNlcyA9IHVkZXZfZW51bWVyYXRlX2dldF9saXN0X2Vu
+dHJ5KGVudW1lcmF0ZSk7CisJdWRldl9saXN0X2VudHJ5X2ZvcmVhY2goZGV2X2xpc3RfZW50cnks
+IGRldmljZXMpIHsKKwkJY29uc3QgY2hhciAqZGV2bmFtZTsKKwkJc3RydWN0IHVkZXZfZGV2aWNl
+ICpqc19kZXY7CisJCXN0cnVjdCB1ZGV2X2RldmljZSAqaW5wdXRfcGFyZW50OworCQljb25zdCBj
+aGFyICppbnB1dF9waHlzOworCisJCWRldm5hbWUgPSB1ZGV2X2xpc3RfZW50cnlfZ2V0X25hbWUo
+ZGV2X2xpc3RfZW50cnkpOworCQlqc19kZXYgPSB1ZGV2X2RldmljZV9uZXdfZnJvbV9zeXNwYXRo
+KHVkZXZfZGV2aWNlX2dldF91ZGV2KHVkZXZpY2UpLAorCQkJCQkJCWRldm5hbWUpOworCisJCWlu
+cHV0X3BhcmVudCA9IHVkZXZfZGV2aWNlX2dldF9wYXJlbnRfd2l0aF9zdWJzeXN0ZW1fZGV2dHlw
+ZShqc19kZXYsCisJCQkJCQkJImlucHV0IiwgTlVMTCk7CisJCWlmICghaW5wdXRfcGFyZW50KSB7
+CisJCQllcnJvcigiJXM6JXMoKSBjYW5ub3QgZ2V0IHBhcmVudCBpbnB1dCBkZXZpY2UuIiwKKwkJ
+CQlfX0ZJTEVfXywgX19mdW5jX18pOworCQkJY29udGludWU7CisJCX0KKworCQkvKiBjaGVjayB0
+aGlzIGlzIHRoZSBqb3lzdGljayByZWxhdGl2ZSB0bworCQkgKiB0aGUgaGlkcmF3IGRldmljZSBh
+Ym92ZSAqLworCQlpbnB1dF9waHlzID0gdWRldl9kZXZpY2VfZ2V0X3N5c2F0dHJfdmFsdWUoaW5w
+dXRfcGFyZW50LAorCQkJCQkJCQkicGh5cyIpOworCQlpZiAoZ19zdHJjbXAwKGlucHV0X3BoeXMs
+IGhpZF9waHlzKSA9PSAwKSB7CisJCQljb25zdCBjaGFyICp1c2JfZHJpdmVyOworCisJCQl1c2Jf
+ZHJpdmVyID0gdWRldl9kZXZpY2VfZ2V0X3Byb3BlcnR5X3ZhbHVlKGpzX2RldiwKKwkJCQkJCQki
+SURfVVNCX0RSSVZFUiIpOworCQkJanNfbnVtID0gYXRvaSh1ZGV2X2RldmljZV9nZXRfc3lzbnVt
+KGpzX2RldikpICsgMTsKKwkJCURCRygiam95cGFkIGRldmljZV9udW06ICVkIiwganNfbnVtKTsK
+KwkJCURCRygiaGlkcmF3X25vZGU6ICVzIiwgaGlkcmF3X25vZGUpOworCQkJREJHKCJkcml2ZXI6
+ICVzIiwgdXNiX2RyaXZlcik7CisKKwkJCWlmIChnX3N0cmNtcDAodXNiX2RyaXZlciwgInVzYmhp
+ZCIpID09IDApCisJCQkJaXNfdXNiID0gVFJVRTsKKwkJfQorCisJCXVkZXZfZGV2aWNlX3VucmVm
+KGpzX2Rldik7CisJfQorCisJdWRldl9lbnVtZXJhdGVfdW5yZWYoZW51bWVyYXRlKTsKKworCURC
+Rygib3BlbmluZyBoaWRyYXciKTsKKwlmZCA9IG9wZW4oaGlkcmF3X25vZGUsIE9fUkRXUik7CisJ
+aWYgKGZkIDwgMCkgeworCQllcnJvcigiJXM6JXMoKSBoaWRyYXcgb3BlbiIsIF9fRklMRV9fLCBf
+X2Z1bmNfXyk7CisJCXJldHVybjsKKwl9CisKKwlpZiAoaXNfdXNiKSB7CisJCXN0cnVjdCBidGRf
+YWRhcHRlciAqYWRhcHRlcjsKKworCQkvKiBMb29rIGZvciB0aGUgZGVmYXVsdCBhZGFwdGVyICov
+CisJCWFkYXB0ZXIgPSBtYW5hZ2VyX2dldF9kZWZhdWx0X2FkYXB0ZXIoKTsKKwkJaWYgKGFkYXB0
+ZXIgPT0gTlVMTCkgeworCQkJREJHKCJObyBhZGFwdGVycywgZXhpdGluZyIpOworCQkJcmV0dXJu
+OworCQl9CisJCWNvbnRyb2xsZXJfcGFpcihmZCwgYWRhcHRlciwgY29udHJvbGxlcik7CisJfQor
+CisJaWYgKGpzX251bSA+IDApIHsKKwkJY2hhciBjOworCisJCS8qIHdhaXQgZm9yIGV2ZW50cyBi
+ZWZvcmUgc2V0dGluZyBsZWRzICovCisJCURCRygid2FpdGluZyBmb3IgZXZlbnRzIik7CisJCWlm
+IChyZWFkKGZkLCAmYywgMSkgIT0gMSkKKwkJCXBlcnJvcigicmVhZCBlcnJvciIpOworCQlzZXRf
+Y29udHJvbGxlcl9udW1iZXIoZmQsIGpzX251bSk7CisJfQorCisJY2xvc2UoZmQpOworCURCRygi
+aGlkcmF3IGNsb3NlZCIpOworfQorCitzdGF0aWMgZ2Jvb2xlYW4gZGV2aWNlX2V2ZW50X2lkbGUo
+c3RydWN0IHVkZXZfZGV2aWNlICp1ZGV2aWNlKQoreworCWhhbmRsZV9kZXZpY2VfcGx1Zyh1ZGV2
+aWNlKTsKKwl1ZGV2X2RldmljZV91bnJlZih1ZGV2aWNlKTsKKwlyZXR1cm4gRkFMU0U7Cit9CisK
+K3N0YXRpYyBnYm9vbGVhbiBtb25pdG9yX2V2ZW50KEdJT0NoYW5uZWwgKnNvdXJjZSwgR0lPQ29u
+ZGl0aW9uIGNvbmRpdGlvbiwKKwkJCQlncG9pbnRlciBkYXRhKQoreworCXN0cnVjdCB1ZGV2X2Rl
+dmljZSAqdWRldmljZTsKKworCXVkZXZpY2UgPSB1ZGV2X21vbml0b3JfcmVjZWl2ZV9kZXZpY2Uo
+bW9uaXRvcik7CisJaWYgKHVkZXZpY2UgPT0gTlVMTCkKKwkJZ290byBvdXQ7CisJaWYgKGdfc3Ry
+Y21wMCh1ZGV2X2RldmljZV9nZXRfYWN0aW9uKHVkZXZpY2UpLCAiYWRkIikgIT0gMCkgeworCQl1
+ZGV2X2RldmljZV91bnJlZih1ZGV2aWNlKTsKKwkJZ290byBvdXQ7CisJfQorCisJLyogR2l2ZSBV
+REVWIHNvbWUgdGltZSB0byBsb2FkIGtlcm5lbCBtb2R1bGVzICovCisJZ190aW1lb3V0X2FkZF9z
+ZWNvbmRzKDEsIChHU291cmNlRnVuYykgZGV2aWNlX2V2ZW50X2lkbGUsIHVkZXZpY2UpOworCitv
+dXQ6CisJcmV0dXJuIFRSVUU7Cit9CisKK3N0YXRpYyBpbnQgc2l4YXhpc19pbml0KHZvaWQpCit7
+CisJR0lPQ2hhbm5lbCAqY2hhbm5lbDsKKworCURCRygiU2V0dXAgU2l4YXhpcyBjYWJsZSBwbHVn
+aW4iKTsKKworCWN0eCA9IHVkZXZfbmV3KCk7CisJbW9uaXRvciA9IHVkZXZfbW9uaXRvcl9uZXdf
+ZnJvbV9uZXRsaW5rKGN0eCwgInVkZXYiKTsKKwlpZiAobW9uaXRvciA9PSBOVUxMKSB7CisJCWVy
+cm9yKCIlczolcygpIENvdWxkIG5vdCBnZXQgdWRldiBtb25pdG9yIiwKKwkJCV9fRklMRV9fLCBf
+X2Z1bmNfXyk7CisJCXJldHVybiAtMTsKKwl9CisKKwkvKiBMaXN0ZW4gZm9yIG5ld2x5IGNvbm5l
+Y3RlZCBoaWRyYXcgaW50ZXJmYWNlcyAqLworCXVkZXZfbW9uaXRvcl9maWx0ZXJfYWRkX21hdGNo
+X3N1YnN5c3RlbV9kZXZ0eXBlKG1vbml0b3IsCisJCQkJCQkJImhpZHJhdyIsIE5VTEwpOworCXVk
+ZXZfbW9uaXRvcl9lbmFibGVfcmVjZWl2aW5nKG1vbml0b3IpOworCisJY2hhbm5lbCA9IGdfaW9f
+Y2hhbm5lbF91bml4X25ldyh1ZGV2X21vbml0b3JfZ2V0X2ZkKG1vbml0b3IpKTsKKwl3YXRjaF9p
+ZCA9IGdfaW9fYWRkX3dhdGNoKGNoYW5uZWwsIEdfSU9fSU4sIG1vbml0b3JfZXZlbnQsIE5VTEwp
+OworCWdfaW9fY2hhbm5lbF91bnJlZihjaGFubmVsKTsKKworCXJldHVybiAwOworfQorCitzdGF0
+aWMgdm9pZCBzaXhheGlzX2V4aXQodm9pZCkKK3sKKwlEQkcoIkNsZWFudXAgU2l4YXhpcyBjYWJs
+ZSBwbHVnaW4iKTsKKworCWlmICh3YXRjaF9pZCAhPSAwKSB7CisJCWdfc291cmNlX3JlbW92ZSh3
+YXRjaF9pZCk7CisJCXdhdGNoX2lkID0gMDsKKwl9CisJaWYgKG1vbml0b3IgIT0gTlVMTCkgewor
+CQl1ZGV2X21vbml0b3JfdW5yZWYobW9uaXRvcik7CisJCW1vbml0b3IgPSBOVUxMOworCX0KKwlp
+ZiAoY3R4ICE9IE5VTEwpIHsKKwkJdWRldl91bnJlZihjdHgpOworCQljdHggPSBOVUxMOworCX0K
+K30KKworQkxVRVRPT1RIX1BMVUdJTl9ERUZJTkUoc2l4YXhpcywgVkVSU0lPTiwKKwkJCUJMVUVU
+T09USF9QTFVHSU5fUFJJT1JJVFlfREVGQVVMVCwKKwkJCXNpeGF4aXNfaW5pdCwgc2l4YXhpc19l
+eGl0KQo=
+--20cf307f383497180104b18f94df--
