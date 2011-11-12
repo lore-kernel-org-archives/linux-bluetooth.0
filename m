@@ -1,43 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/2] Automake AM_CFLAGS, AM_LDFLAGS fixups
+Subject: Re: [PATCH 2/2] Resolve parallel build builtin.h
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Alon Bar-Lev <alon.barlev@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Sun, 13 Nov 2011 08:28:16 +0900
-In-Reply-To: <CAOazyz3PxrYfXXy4Weh68Vkz7Atp3nUFG14ufivcFrQJH65p5Q@mail.gmail.com>
-References: <CAOazyz26ywy+OWMCbL6JMdEd3zt9Ui8XTAWVXtLLRj_wKq+Uvw@mail.gmail.com>
-	 <1321139715.15441.438.camel@aeonflux>
-	 <CAOazyz3PxrYfXXy4Weh68Vkz7Atp3nUFG14ufivcFrQJH65p5Q@mail.gmail.com>
+Date: Sun, 13 Nov 2011 08:26:22 +0900
+In-Reply-To: <CAOazyz3eNUvJ_ft9-+E05mFScT7S-t2=PirZ++x9O--q3ehAtg@mail.gmail.com>
+References: <CAOazyz3eNUvJ_ft9-+E05mFScT7S-t2=PirZ++x9O--q3ehAtg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321140499.15441.441.camel@aeonflux>
+Message-ID: <1321140385.15441.439.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Alon,
 
-> >> Signed-off-by: Alon Bar-Lev <alon.barlev@gmail.com>
-> >
-> > please no Signed-off-by lines, we are not using them for the userspace
-> > parts.
+> builtin.h is generated source, the priority of build should
+> be unconditional.
 > 
-> I did not think it damage anything...
-
-our policy is to NOT use Signed-off-by. That simple.
-
-> > And also please send patches inline and via attachments.
+> The dependency in plugin.$(OBJEXT) cannot be trusted also it
+> does not work for me.
 > 
-> This would be difficult, as gmail does not allow no wrapping.
-> git accepts this correctly, I use:
-> 
-> $ curl article.gmane.org/gmane.linux.bluez.kernel/18337/raw | git am
-> 
-> If this is really important I will try to find some other mail client.
+> Signed-off-by: Alon Bar-Lev <alon.barlev@gmail.com>
+> ---
 
-This is not about being able to apply it, this is about being able to
-review it properly and give inline comments.
+see my comments from the other emails on how to submit patches.
 
-Also just use git send-email. Works perfectly fine.
+For this one, I fixed this anyway, since the change was simple.
 
 Regards
 
