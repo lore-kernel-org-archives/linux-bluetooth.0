@@ -1,171 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Sat, 12 Nov 2011 20:37:53 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/6] Parse final measurement indication
+Message-ID: <20111112183753.GA17859@x220.Elisa>
+References: <1320925022-21891-1-git-send-email-sancane@gmail.com>
+ <1320925022-21891-2-git-send-email-sancane@gmail.com>
+ <1320925022-21891-3-git-send-email-sancane@gmail.com>
 MIME-Version: 1.0
-Date: Sat, 12 Nov 2011 21:12:29 +0200
-Message-ID: <CAOazyz26ywy+OWMCbL6JMdEd3zt9Ui8XTAWVXtLLRj_wKq+Uvw@mail.gmail.com>
-Subject: [PATCH 1/2] Automake AM_CFLAGS, AM_LDFLAGS fixups
-From: Alon Bar-Lev <alon.barlev@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=bcaec51b9c71457a9004b18e6b00
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1320925022-21891-3-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---bcaec51b9c71457a9004b18e6b00
-Content-Type: text/plain; charset=UTF-8
+Hi Santiago,
 
-Reference: "Flag Variables Ordering"[1]
+On Thu, Nov 10, 2011, Santiago Carot-Nemesio wrote:
+> +struct measurement {
+> +	gint16		exp;
+> +	gint32		mant;
+> +	guint64		time;
+> +	gboolean	suptime;
+> +	gchar		*unit;
+> +	gchar		*type;
+> +	gchar		*msmnt;
 
-In automake, if you modify CFLAGS or LDFLAGS of a target you
-actually override the autoconf supplied flags. This is highly
-none standard and may lead to undesired results, as some
-targets will be compiled with the autoconf supplied flags and
-some won't.
+Is msmnt supposed to be short for measurement? Could you just spell it
+out please since to me that short version is far from obvious. Or would
+"value" be a more suitable name?
 
-This patch adds AM_CFLAGS, AM_LDFLAGS to any flags override.
+Also, please avoid usage of g* types where you're not directly accessing
+some GLib API that expects them (even then it's mostly fine to go ahead
+with uint16_t, char, etc). I can see that there are other places in
+thermometer.c using the g types too which should be fixed in a separate
+patch.
 
-Some notes:
+> +static gchar *temptype2str(uint8_t value)
+> +{
+> +	switch (value) {
+> +	case 1: return "Armpit";
+> +	case 2: return "Body";
+> +	case 3: return "Ear";
+> +	case 4: return "Finger";
+> +	case 5: return "Intestines";
+> +	case 6: return "Mouth";
+> +	case 7: return "Rectum";
+> +	case 8: return "Toe";
+> +	case 9: return "Tympanum";
+> +	default:
+> +		error("Temperature type %d reserved for future use", value);
+> +		return NULL;
+> +	};
 
-1. Remove none common flags:
-        -DBLUETOOTH_PLUGIN_BUILTIN -DPLUGINDIR=\""$(build_plugindir)"\"
-Moved to bluetoothd only, as BLUETOOTH_PLUGIN_BUILTIN should effect
-only sources compiled within it.
-And PLUGINDIR is used only by the daemon.
+Please follow the coding style with switch statements. All those return
+statements should be on their own line. However, in this case I think
+it'd be just easier to make a lookup table for those values, i.e.
 
-2. More targets now will be compiled with:
-        @DBUS_CFLAGS@ @GLIB_CFLAGS@ @CAPNG_CFLAGS@
-If this is a problem I will add these to specific targets.
+const char *temp_type[] {
+	"<unknown>",
+	"Armpit",
+	"Body",
+	...
 
-3. I am not sure there is a reason to set specific trivial CFLAGS for
-simple includes in target specific. Simpler is to put all at AM_CFLAGS.
+And then in the temptype2str function:
 
-4. All @XXX_XXFLAGS@ can actually be used as make macros $(XXX_XXFLAGS),
-Since AC_SUBST are automatically generated as make macros.
+	if (type > 0 && val < G_N_ELEMENTS(temp_type))
+		return temp_type[type];
 
-5. Why don't you split up the Makefile.am into smaller by
-directory/library? It would be easier to control the setup.
 
-[1] http://www.gnu.org/software/automake/manual/automake.html#Flag-Variables-Ordering
-
-Signed-off-by: Alon Bar-Lev <alon.barlev@gmail.com>
-
----
-
---bcaec51b9c71457a9004b18e6b00
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-PATCH-Automake-AM_CFLAGS-AM_LDFLAGS-fixups.patch"
-Content-Disposition: attachment;
-	filename="0001-PATCH-Automake-AM_CFLAGS-AM_LDFLAGS-fixups.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_guwzrl770
-
-RnJvbSAxODI3NWUzMWU5OWUxZWI0MDdiZWZmNjMwMWIzYTYzZTY0ZmE5ZmQ2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBbG9uIEJhci1MZXYgPGFsb24uYmFybGV2QGdtYWlsLmNvbT4K
-RGF0ZTogU2F0LCAxMiBOb3YgMjAxMSAyMDozOTowNCArMDIwMApTdWJqZWN0OiBbUEFUQ0ggMS8y
-XSBbUEFUQ0hdIEF1dG9tYWtlIEFNX0NGTEFHUywgQU1fTERGTEFHUyBmaXh1cHMKClJlZmVyZW5j
-ZTogIkZsYWcgVmFyaWFibGVzIE9yZGVyaW5nIlsxXQoKSW4gYXV0b21ha2UsIGlmIHlvdSBtb2Rp
-ZnkgQ0ZMQUdTIG9yIExERkxBR1Mgb2YgYSB0YXJnZXQgeW91CmFjdHVhbGx5IG92ZXJyaWRlIHRo
-ZSBhdXRvY29uZiBzdXBwbGllZCBmbGFncy4gVGhpcyBpcyBoaWdobHkKbm9uZSBzdGFuZGFyZCBh
-bmQgbWF5IGxlYWQgdG8gdW5kZXNpcmVkIHJlc3VsdHMsIGFzIHNvbWUKdGFyZ2V0cyB3aWxsIGJl
-IGNvbXBpbGVkIHdpdGggdGhlIGF1dG9jb25mIHN1cHBsaWVkIGZsYWdzIGFuZApzb21lIHdvbid0
-LgoKVGhpcyBwYXRjaCBhZGRzIEFNX0NGTEFHUywgQU1fTERGTEFHUyB0byBhbnkgZmxhZ3Mgb3Zl
-cnJpZGUuCgpTb21lIG5vdGVzOgoKMS4gUmVtb3ZlIG5vbmUgY29tbW9uIGZsYWdzOgoJLURCTFVF
-VE9PVEhfUExVR0lOX0JVSUxUSU4gLURQTFVHSU5ESVI9XCIiJChidWlsZF9wbHVnaW5kaXIpIlwi
-Ck1vdmVkIHRvIGJsdWV0b290aGQgb25seSwgYXMgQkxVRVRPT1RIX1BMVUdJTl9CVUlMVElOIHNo
-b3VsZCBlZmZlY3QKb25seSBzb3VyY2VzIGNvbXBpbGVkIHdpdGhpbiBpdC4KQW5kIFBMVUdJTkRJ
-UiBpcyB1c2VkIG9ubHkgYnkgdGhlIGRhZW1vbi4KCjIuIE1vcmUgdGFyZ2V0cyBub3cgd2lsbCBi
-ZSBjb21waWxlZCB3aXRoOgoJQERCVVNfQ0ZMQUdTQCBAR0xJQl9DRkxBR1NAIEBDQVBOR19DRkxB
-R1NACklmIHRoaXMgaXMgYSBwcm9ibGVtIEkgd2lsbCBhZGQgdGhlc2UgdG8gc3BlY2lmaWMgdGFy
-Z2V0cy4KCjMuIEkgYW0gbm90IHN1cmUgdGhlcmUgaXMgYSByZWFzb24gdG8gc2V0IHNwZWNpZmlj
-IHRyaXZpYWwgQ0ZMQUdTIGZvcgpzaW1wbGUgaW5jbHVkZXMgaW4gdGFyZ2V0IHNwZWNpZmljLiBT
-aW1wbGVyIGlzIHRvIHB1dCBhbGwgYXQgQU1fQ0ZMQUdTLgoKNC4gQWxsIEBYWFhfWFhGTEFHU0Ag
-Y2FuIGFjdHVhbGx5IGJlIHVzZWQgYXMgbWFrZSBtYWNyb3MgJChYWFhfWFhGTEFHUyksClNpbmNl
-IEFDX1NVQlNUIGFyZSBhdXRvbWF0aWNhbGx5IGdlbmVyYXRlZCBhcyBtYWtlIG1hY3Jvcy4KCjUu
-IFdoeSBkb24ndCB5b3Ugc3BsaXQgdXAgdGhlIE1ha2VmaWxlLmFtIGludG8gc21hbGxlciBieQpk
-aXJlY3RvcnkvbGlicmFyeT8gSXQgd291bGQgYmUgZWFzaWVyIHRvIGNvbnRyb2wgdGhlIHNldHVw
-LgoKWzFdIGh0dHA6Ly93d3cuZ251Lm9yZy9zb2Z0d2FyZS9hdXRvbWFrZS9tYW51YWwvYXV0b21h
-a2UuaHRtbCNGbGFnLVZhcmlhYmxlcy1PcmRlcmluZwoKU2lnbmVkLW9mZi1ieTogQWxvbiBCYXIt
-TGV2IDxhbG9uLmJhcmxldkBnbWFpbC5jb20+Ci0tLQogTWFrZWZpbGUuYW0gfCAgIDI3ICsrKysr
-KysrKysrKysrLS0tLS0tLS0tLS0tLQogMSBmaWxlcyBjaGFuZ2VkLCAxNCBpbnNlcnRpb25zKCsp
-LCAxMyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9NYWtlZmlsZS5hbSBiL01ha2VmaWxlLmFt
-CmluZGV4IDI4M2FmNGQuLjdmMmMxNTYgMTAwNjQ0Ci0tLSBhL01ha2VmaWxlLmFtCisrKyBiL01h
-a2VmaWxlLmFtCkBAIC03MCw3ICs3MCw3IEBAIGxpYl9MVExJQlJBUklFUyArPSBsaWIvbGliYmx1
-ZXRvb3RoLmxhCiAKIGxpYl9saWJibHVldG9vdGhfbGFfU09VUkNFUyA9ICQobGliX2hlYWRlcnMp
-IFwKIAkJCQlsaWIvYmx1ZXRvb3RoLmMgbGliL2hjaS5jIGxpYi9zZHAuYyBsaWIvdXVpZC5jCi1s
-aWJfbGliYmx1ZXRvb3RoX2xhX0xERkxBR1MgPSAtdmVyc2lvbi1pbmZvIDE0OjQ6MTEKK2xpYl9s
-aWJibHVldG9vdGhfbGFfTERGTEFHUyA9ICQoQU1fTERGTEFHUykgLXZlcnNpb24taW5mbyAxNDo0
-OjExCiBsaWJfbGliYmx1ZXRvb3RoX2xhX0RFUEVOREVOQ0lFUyA9ICQobG9jYWxfaGVhZGVycykK
-IAogbm9pbnN0X0xUTElCUkFSSUVTICs9IGxpYi9saWJibHVldG9vdGgtcHJpdmF0ZS5sYQpAQCAt
-ODcsNyArODcsNyBAQCBzYmNfbGlic2JjX2xhX1NPVVJDRVMgPSBzYmMvc2JjLmggc2JjL3NiYy5j
-IHNiYy9zYmNfbWF0aC5oIHNiYy9zYmNfdGFibGVzLmggXAogCQkJc2JjL3NiY19wcmltaXRpdmVz
-X25lb24uaCBzYmMvc2JjX3ByaW1pdGl2ZXNfbmVvbi5jIFwKIAkJCXNiYy9zYmNfcHJpbWl0aXZl
-c19hcm12Ni5oIHNiYy9zYmNfcHJpbWl0aXZlc19hcm12Ni5jCiAKLXNiY19saWJzYmNfbGFfQ0ZM
-QUdTID0gLWZpbmxpbmUtZnVuY3Rpb25zIC1mZ2NzZS1hZnRlci1yZWxvYWQgXAorc2JjX2xpYnNi
-Y19sYV9DRkxBR1MgPSAkKEFNX0NGTEFHUykgLWZpbmxpbmUtZnVuY3Rpb25zIC1mZ2NzZS1hZnRl
-ci1yZWxvYWQgXAogCQkJCQktZnVuc3dpdGNoLWxvb3BzIC1mdW5yb2xsLWxvb3BzCiAKIG5vaW5z
-dF9QUk9HUkFNUyArPSBzYmMvc2JjaW5mbyBzYmMvc2JjZGVjIHNiYy9zYmNlbmMKQEAgLTI4Niw4
-ICsyODYsOCBAQCBlbmRpZgogaWYgTUFJTlRBSU5FUl9NT0RFCiBwbHVnaW5fTFRMSUJSQVJJRVMg
-Kz0gcGx1Z2lucy9leHRlcm5hbC1kdW1teS5sYQogcGx1Z2luc19leHRlcm5hbF9kdW1teV9sYV9T
-T1VSQ0VTID0gcGx1Z2lucy9leHRlcm5hbC1kdW1teS5jCi1wbHVnaW5zX2V4dGVybmFsX2R1bW15
-X2xhX0xERkxBR1MgPSAtbW9kdWxlIC1hdm9pZC12ZXJzaW9uIC1uby11bmRlZmluZWQKLXBsdWdp
-bnNfZXh0ZXJuYWxfZHVtbXlfbGFfQ0ZMQUdTID0gLWZ2aXNpYmlsaXR5PWhpZGRlbgorcGx1Z2lu
-c19leHRlcm5hbF9kdW1teV9sYV9MREZMQUdTID0gJChBTV9MREZMQUdTKSAtbW9kdWxlIC1hdm9p
-ZC12ZXJzaW9uIC1uby11bmRlZmluZWQKK3BsdWdpbnNfZXh0ZXJuYWxfZHVtbXlfbGFfQ0ZMQUdT
-ID0gJChBTV9DRkxBR1MpIC1mdmlzaWJpbGl0eT1oaWRkZW4KIGVuZGlmCiAKIHNiaW5fUFJPR1JB
-TVMgKz0gc3JjL2JsdWV0b290aGQKQEAgLTMxNyw3ICszMTcsOSBAQCBzcmNfYmx1ZXRvb3RoZF9T
-T1VSQ0VTID0gJChnZGJ1c19zb3VyY2VzKSAkKGJ1aWx0aW5fc291cmNlcykgXAogCQkJc3JjL29v
-Yi5oIHNyYy9vb2IuYyBzcmMvZWlyLmggc3JjL2Vpci5jCiBzcmNfYmx1ZXRvb3RoZF9MREFERCA9
-IGxpYi9saWJibHVldG9vdGgtcHJpdmF0ZS5sYSBAR0xJQl9MSUJTQCBAREJVU19MSUJTQCBcCiAJ
-CQkJCQkJQENBUE5HX0xJQlNAIC1sZGwgLWxydAotc3JjX2JsdWV0b290aGRfTERGTEFHUyA9IC1X
-bCwtLWV4cG9ydC1keW5hbWljIFwKK3NyY19ibHVldG9vdGhkX0NGTEFHUyA9ICQoQU1fQ0ZMQUdT
-KSBcCisJCS1EQkxVRVRPT1RIX1BMVUdJTl9CVUlMVElOIC1EUExVR0lORElSPVwiIiQoYnVpbGRf
-cGx1Z2luZGlyKSJcIgorc3JjX2JsdWV0b290aGRfTERGTEFHUyA9ICQoQU1fTERGTEFHUykgLVds
-LC0tZXhwb3J0LWR5bmFtaWMgXAogCQkJCS1XbCwtLXZlcnNpb24tc2NyaXB0PSQoc3JjZGlyKS9z
-cmMvYmx1ZXRvb3RoLnZlcgogCiBzcmNfYmx1ZXRvb3RoZF9ERVBFTkRFTkNJRVMgPSBsaWIvbGli
-Ymx1ZXRvb3RoLXByaXZhdGUubGEKQEAgLTM1MCwxNyArMzUyLDE3IEBAIGFsc2FfTFRMSUJSQVJJ
-RVMgPSBhdWRpby9saWJhc291bmRfbW9kdWxlX3BjbV9ibHVldG9vdGgubGEgXAogCiBhdWRpb19s
-aWJhc291bmRfbW9kdWxlX3BjbV9ibHVldG9vdGhfbGFfU09VUkNFUyA9IGF1ZGlvL3BjbV9ibHVl
-dG9vdGguYyBcCiAJCQkJCWF1ZGlvL3J0cC5oIGF1ZGlvL2lwYy5oIGF1ZGlvL2lwYy5jCi1hdWRp
-b19saWJhc291bmRfbW9kdWxlX3BjbV9ibHVldG9vdGhfbGFfTERGTEFHUyA9IC1tb2R1bGUgLWF2
-b2lkLXZlcnNpb24gIy1leHBvcnQtc3ltYm9scy1yZWdleCBbX10qc25kX3BjbV8uKgorYXVkaW9f
-bGliYXNvdW5kX21vZHVsZV9wY21fYmx1ZXRvb3RoX2xhX0xERkxBR1MgPSAkKEFNX0xERkxBR1Mp
-IC1tb2R1bGUgLWF2b2lkLXZlcnNpb24gIy1leHBvcnQtc3ltYm9scy1yZWdleCBbX10qc25kX3Bj
-bV8uKgogYXVkaW9fbGliYXNvdW5kX21vZHVsZV9wY21fYmx1ZXRvb3RoX2xhX0xJQkFERCA9IHNi
-Yy9saWJzYmMubGEgXAogCQkJCQlsaWIvbGliYmx1ZXRvb3RoLXByaXZhdGUubGEgQEFMU0FfTElC
-U0AKLWF1ZGlvX2xpYmFzb3VuZF9tb2R1bGVfcGNtX2JsdWV0b290aF9sYV9DRkxBR1MgPSBAQUxT
-QV9DRkxBR1NACithdWRpb19saWJhc291bmRfbW9kdWxlX3BjbV9ibHVldG9vdGhfbGFfQ0ZMQUdT
-ID0gJChBTV9DRkxBR1MpIEBBTFNBX0NGTEFHU0AKIAogYXVkaW9fbGliYXNvdW5kX21vZHVsZV9j
-dGxfYmx1ZXRvb3RoX2xhX1NPVVJDRVMgPSBhdWRpby9jdGxfYmx1ZXRvb3RoLmMgXAogCQkJCQlh
-dWRpby9ydHAuaCBhdWRpby9pcGMuaCBhdWRpby9pcGMuYwotYXVkaW9fbGliYXNvdW5kX21vZHVs
-ZV9jdGxfYmx1ZXRvb3RoX2xhX0xERkxBR1MgPSAtbW9kdWxlIC1hdm9pZC12ZXJzaW9uICMtZXhw
-b3J0LXN5bWJvbHMtcmVnZXggW19dKnNuZF9jdGxfLioKK2F1ZGlvX2xpYmFzb3VuZF9tb2R1bGVf
-Y3RsX2JsdWV0b290aF9sYV9MREZMQUdTID0gJChBTV9MREZMQUdTKSAtbW9kdWxlIC1hdm9pZC12
-ZXJzaW9uICMtZXhwb3J0LXN5bWJvbHMtcmVnZXggW19dKnNuZF9jdGxfLioKIGF1ZGlvX2xpYmFz
-b3VuZF9tb2R1bGVfY3RsX2JsdWV0b290aF9sYV9MSUJBREQgPSBcCiAJCQkJCWxpYi9saWJibHVl
-dG9vdGgtcHJpdmF0ZS5sYSBAQUxTQV9MSUJTQAotYXVkaW9fbGliYXNvdW5kX21vZHVsZV9jdGxf
-Ymx1ZXRvb3RoX2xhX0NGTEFHUyA9IEBBTFNBX0NGTEFHU0AKK2F1ZGlvX2xpYmFzb3VuZF9tb2R1
-bGVfY3RsX2JsdWV0b290aF9sYV9DRkxBR1MgPSAkKEFNX0NGTEFHUykgQEFMU0FfQ0ZMQUdTQAog
-CiBpZiBEQVRBRklMRVMKIGFsc2Fjb25mZGlyID0gJChkYXRhZGlyKS9hbHNhCkBAIC0zODQsNyAr
-Mzg2LDcgQEAgYXVkaW9fbGliZ3N0Ymx1ZXRvb3RoX2xhX1NPVVJDRVMgPSBhdWRpby9nc3RibHVl
-dG9vdGguYyBhdWRpby9nc3RwcmFnbWEuaCBcCiAJCQkJYXVkaW8vZ3N0c2JjdXRpbC5oIGF1ZGlv
-L2dzdHNiY3V0aWwuYyBcCiAJCQkJYXVkaW8vZ3N0cnRwc2JjcGF5LmggYXVkaW8vZ3N0cnRwc2Jj
-cGF5LmMgXAogCQkJCWF1ZGlvL3J0cC5oIGF1ZGlvL2lwYy5oIGF1ZGlvL2lwYy5jCi1hdWRpb19s
-aWJnc3RibHVldG9vdGhfbGFfTERGTEFHUyA9IC1tb2R1bGUgLWF2b2lkLXZlcnNpb24KK2F1ZGlv
-X2xpYmdzdGJsdWV0b290aF9sYV9MREZMQUdTID0gJChBTV9MREZMQUdTKSAtbW9kdWxlIC1hdm9p
-ZC12ZXJzaW9uCiBhdWRpb19saWJnc3RibHVldG9vdGhfbGFfTElCQUREID0gc2JjL2xpYnNiYy5s
-YSBsaWIvbGliYmx1ZXRvb3RoLXByaXZhdGUubGEgXAogCQkJCUBEQlVTX0xJQlNAIEBHU1RSRUFN
-RVJfTElCU0AgLWxnc3RhdWRpby0wLjEwIC1sZ3N0cnRwLTAuMTAKIGF1ZGlvX2xpYmdzdGJsdWV0
-b290aF9sYV9DRkxBR1MgPSAtZnZpc2liaWxpdHk9aGlkZGVuIC1mbm8tc3RyaWN0LWFsaWFzaW5n
-IFwKQEAgLTQzMiw4ICs0MzQsNyBAQCBFWFRSQV9ESVNUICs9IGRvYy9tYW5hZ2VyLWFwaS50eHQg
-XAogCiBBTV9ZRkxBR1MgPSAtZAogCi1BTV9DRkxBR1MgPSBAREJVU19DRkxBR1NAIEBHTElCX0NG
-TEFHU0AgQENBUE5HX0NGTEFHU0AgXAotCQktREJMVUVUT09USF9QTFVHSU5fQlVJTFRJTiAtRFBM
-VUdJTkRJUj1cIiIkKGJ1aWxkX3BsdWdpbmRpcikiXCIKK0FNX0NGTEFHUyA9IEBEQlVTX0NGTEFH
-U0AgQEdMSUJfQ0ZMQUdTQCBAQ0FQTkdfQ0ZMQUdTQAogCiBJTkNMVURFUyA9IC1JJChidWlsZGRp
-cikvbGliIC1JJChidWlsZGRpcikvc3JjIC1JJChzcmNkaXIpL3NyYyBcCiAJCQktSSQoc3JjZGly
-KS9hdWRpbyAtSSQoc3JjZGlyKS9zYmMgLUkkKHNyY2RpcikvZ2RidXMgXApAQCAtNDUwLDcgKzQ1
-MSw3IEBAIHVuaXRfdGVzdHMgPSB1bml0L3Rlc3QtZWlyCiBub2luc3RfUFJPR1JBTVMgKz0gJCh1
-bml0X3Rlc3RzKQogCiB1bml0X3Rlc3RfZWlyX1NPVVJDRVMgPSB1bml0L3Rlc3QtZWlyLmMgc3Jj
-L2Vpci5jIHNyYy9nbGliLWhlbHBlci5jCi11bml0X3Rlc3RfZWlyX0NGTEFHUyA9IEBHTElCX0NG
-TEFHU0AgQENIRUNLX0NGTEFHU0AKK3VuaXRfdGVzdF9laXJfQ0ZMQUdTID0gJChBTV9DRkxBR1Mp
-IEBHTElCX0NGTEFHU0AgQENIRUNLX0NGTEFHU0AKIHVuaXRfdGVzdF9laXJfTERBREQgPSBsaWIv
-bGliYmx1ZXRvb3RoLXByaXZhdGUubGEgQEdMSUJfTElCU0AgQENIRUNLX0xJQlNACiB1bml0X29i
-amVjdHMgKz0gJCh1bml0X3Rlc3RfZWlyX09CSkVDVFMpCiAKLS0gCjEuNy4zLjQKCg==
---bcaec51b9c71457a9004b18e6b00--
+Johan
