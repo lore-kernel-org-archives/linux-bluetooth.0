@@ -1,47 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAOazyz3PxrYfXXy4Weh68Vkz7Atp3nUFG14ufivcFrQJH65p5Q@mail.gmail.com>
-References: <CAOazyz26ywy+OWMCbL6JMdEd3zt9Ui8XTAWVXtLLRj_wKq+Uvw@mail.gmail.com>
-	<1321139715.15441.438.camel@aeonflux>
-	<CAOazyz3PxrYfXXy4Weh68Vkz7Atp3nUFG14ufivcFrQJH65p5Q@mail.gmail.com>
-Date: Sat, 12 Nov 2011 19:43:33 -0400
-Message-ID: <CAJdJm_MSSsDqzFCmbQGVZ+3dyJ-dghwGJ3OuBoAQBP29rsAc3w@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Automake AM_CFLAGS, AM_LDFLAGS fixups
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Alon Bar-Lev <alon.barlev@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 3/8] Bluetooth: Rename smp_key_size to enc_size
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sun, 13 Nov 2011 08:35:44 +0900
+In-Reply-To: <1320973436-13399-4-git-send-email-vinicius.gomes@openbossa.org>
+References: <1320973436-13399-1-git-send-email-vinicius.gomes@openbossa.org>
+	 <1320973436-13399-4-git-send-email-vinicius.gomes@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1321140947.15441.446.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alon,
+Hi Vinicius,
 
-On Sat, Nov 12, 2011 at 7:24 PM, Alon Bar-Lev <alon.barlev@gmail.com> wrote:
->> And also please send patches inline and via attachments.
->
-> This would be difficult, as gmail does not allow no wrapping.
-> git accepts this correctly, I use:
->
-> $ curl article.gmane.org/gmane.linux.bluez.kernel/18337/raw | git am
->
-> If this is really important I will try to find some other mail client.
+> This makes clear that this is the size of the key used to
+> encrypt the link.
+> 
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> ---
+>  include/net/bluetooth/smp.h |    2 +-
+>  net/bluetooth/smp.c         |   18 +++++++++---------
+>  2 files changed, 10 insertions(+), 10 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/smp.h b/include/net/bluetooth/smp.h
+> index 15b97d5..cf3aab0 100644
+> --- a/include/net/bluetooth/smp.h
+> +++ b/include/net/bluetooth/smp.h
+> @@ -123,7 +123,7 @@ struct smp_chan {
+>  	u8              rrnd[16]; /* SMP Pairing Random (remote) */
+>  	u8		pcnf[16]; /* SMP Pairing Confirm */
+>  	u8		tk[16]; /* SMP Temporary Key */
+> -	u8		smp_key_size;
+> +	u8		enc_size;
 
-Complementing Marcel's suggestion, you can have this in your ~/.gitconfig:
+if we wanna be really clear, then enc_key_size would be the better name.
 
-[sendemail]
-	smtpserver = smtp.gmail.com
-	smtpuser = your.email@gmail.com
-	smtpssl = 1
+Regards
 
-And to send e-mail:
+Marcel
 
-git send-email --to linux-bluetooth@vger.kernel.org patch1.patch ...
 
-It will then ask for your password after confirmation.
-
-More information: man git-send-email
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
