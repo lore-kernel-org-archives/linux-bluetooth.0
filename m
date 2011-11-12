@@ -1,77 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Pass all message parameters to mgmt_start_discovery
-Date: Sat, 12 Nov 2011 11:51:55 +0200
-Message-Id: <1321091515-6543-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sat, 12 Nov 2011 11:29:26 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Brian Gix <bgix@codeaurora.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/5] Bluetooth: Add User Passkey entry to HCI Events
+Message-ID: <20111112092926.GA6151@fusion.localdomain>
+References: <1321057441-7921-1-git-send-email-bgix@codeaurora.org>
+ <1321057441-7921-4-git-send-email-bgix@codeaurora.org>
+ <1321081199.15441.430.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1321081199.15441.430.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-The mgmt_start_discovery command contains the type of discovery that
-should be started so this should be passed to the start_discovery
-function. This patch doesn't yet add any action depending on the type of
-the requested discovery.
+On Sat, Nov 12, 2011, Marcel Holtmann wrote:
+> > +static inline void hci_user_passkey_request_evt(struct hci_dev *hdev,
+> > +							struct sk_buff *skb)
+> > +{
+> > +	struct hci_ev_user_passkey_req *ev = (void *) skb->data;
+> > +
+> > +	BT_DBG("%s", hdev->name);
+> > +
+> > +	hci_dev_lock(hdev);
+> > +
+> > +	/* Passkey Request is a degenerate case of User Confirm */
+> > +	if (test_bit(HCI_MGMT, &hdev->flags))
+> > +		mgmt_user_confirm_request(hdev, &ev->bdaddr, 0, 0);
+> > +	else
+> > +		hci_send_cmd(hdev, HCI_OP_USER_PASSKEY_NEG_REPLY,
+> > +					sizeof(ev->bdaddr), &ev->bdaddr);
+> 
+> We might want a comment here that this needs fixing ;)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
-Note: This patch is intended to be applied after of the mgmt-specific
-error code patch.
+If HCI_MGMT isn't set this code should do nothing. In such a case it's
+likely that hciops is running in user-space and will take care of this
+request.
 
- include/net/bluetooth/mgmt.h |    3 +++
- net/bluetooth/mgmt.c         |   10 ++++++++--
- 2 files changed, 11 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index bd6995d..2e50182 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -232,6 +232,9 @@ struct mgmt_cp_remove_remote_oob_data {
- } __packed;
- 
- #define MGMT_OP_START_DISCOVERY		0x001B
-+struct mgmt_cp_start_discovery {
-+	__u8 type;
-+} __packed;
- 
- #define MGMT_OP_STOP_DISCOVERY		0x001C
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b761359..022aab1 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1779,14 +1779,20 @@ static int remove_remote_oob_data(struct sock *sk, u16 index,
- 	return err;
- }
- 
--static int start_discovery(struct sock *sk, u16 index)
-+static int start_discovery(struct sock *sk, u16 index,
-+						unsigned char *data, u16 len)
- {
-+	struct mgmt_cp_start_discovery *cp = (void *) data;
- 	struct pending_cmd *cmd;
- 	struct hci_dev *hdev;
- 	int err;
- 
- 	BT_DBG("hci%u", index);
- 
-+	if (len != sizeof(*cp))
-+		return cmd_status(sk, index, MGMT_OP_REMOVE_REMOTE_OOB_DATA,
-+						MGMT_STATUS_INVALID_PARAMS);
-+
- 	hdev = hci_dev_get(index);
- 	if (!hdev)
- 		return cmd_status(sk, index, MGMT_OP_START_DISCOVERY,
-@@ -2083,7 +2089,7 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- 									len);
- 		break;
- 	case MGMT_OP_START_DISCOVERY:
--		err = start_discovery(sk, index);
-+		err = start_discovery(sk, index, buf + sizeof(*hdr), len);
- 		break;
- 	case MGMT_OP_STOP_DISCOVERY:
- 		err = stop_discovery(sk, index);
--- 
-1.7.7.2
-
+Johan
