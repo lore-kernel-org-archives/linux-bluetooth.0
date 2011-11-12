@@ -1,34 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 2/2] Resolve parallel build builtin.h
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Alon Bar-Lev <alon.barlev@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1321139715.15441.438.camel@aeonflux>
+References: <CAOazyz26ywy+OWMCbL6JMdEd3zt9Ui8XTAWVXtLLRj_wKq+Uvw@mail.gmail.com>
+	<1321139715.15441.438.camel@aeonflux>
+Date: Sun, 13 Nov 2011 01:24:09 +0200
+Message-ID: <CAOazyz3PxrYfXXy4Weh68Vkz7Atp3nUFG14ufivcFrQJH65p5Q@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Automake AM_CFLAGS, AM_LDFLAGS fixups
+From: Alon Bar-Lev <alon.barlev@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Sun, 13 Nov 2011 08:26:22 +0900
-In-Reply-To: <CAOazyz3eNUvJ_ft9-+E05mFScT7S-t2=PirZ++x9O--q3ehAtg@mail.gmail.com>
-References: <CAOazyz3eNUvJ_ft9-+E05mFScT7S-t2=PirZ++x9O--q3ehAtg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321140385.15441.439.camel@aeonflux>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alon,
+On Sun, Nov 13, 2011 at 1:15 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Alon,
+>
+>> Reference: "Flag Variables Ordering"[1]
+>>
+>> In automake, if you modify CFLAGS or LDFLAGS of a target you
+>> actually override the autoconf supplied flags. This is highly
+>> none standard and may lead to undesired results, as some
+>> targets will be compiled with the autoconf supplied flags and
+>> some won't.
+>>
+>> This patch adds AM_CFLAGS, AM_LDFLAGS to any flags override.
+>>
+>> Some notes:
+>>
+>> 1. Remove none common flags:
+>> =C2=A0 =C2=A0 =C2=A0 =C2=A0 -DBLUETOOTH_PLUGIN_BUILTIN -DPLUGINDIR=3D\""=
+$(build_plugindir)"\"
+>> Moved to bluetoothd only, as BLUETOOTH_PLUGIN_BUILTIN should effect
+>> only sources compiled within it.
+>> And PLUGINDIR is used only by the daemon.
+>>
+>> 2. More targets now will be compiled with:
+>> =C2=A0 =C2=A0 =C2=A0 =C2=A0 @DBUS_CFLAGS@ @GLIB_CFLAGS@ @CAPNG_CFLAGS@
+>> If this is a problem I will add these to specific targets.
+>>
+>> 3. I am not sure there is a reason to set specific trivial CFLAGS for
+>> simple includes in target specific. Simpler is to put all at AM_CFLAGS.
+>>
+>> 4. All @XXX_XXFLAGS@ can actually be used as make macros $(XXX_XXFLAGS),
+>> Since AC_SUBST are automatically generated as make macros.
+>>
+>> 5. Why don't you split up the Makefile.am into smaller by
+>> directory/library? It would be easier to control the setup.
+>>
+>> [1] http://www.gnu.org/software/automake/manual/automake.html#Flag-Varia=
+bles-Ordering
+>>
+>> Signed-off-by: Alon Bar-Lev <alon.barlev@gmail.com>
+>
+> please no Signed-off-by lines, we are not using them for the userspace
+> parts.
 
-> builtin.h is generated source, the priority of build should
-> be unconditional.
-> 
-> The dependency in plugin.$(OBJEXT) cannot be trusted also it
-> does not work for me.
-> 
-> Signed-off-by: Alon Bar-Lev <alon.barlev@gmail.com>
-> ---
+I did not think it damage anything...
 
-see my comments from the other emails on how to submit patches.
+> And also please send patches inline and via attachments.
 
-For this one, I fixed this anyway, since the change was simple.
+This would be difficult, as gmail does not allow no wrapping.
+git accepts this correctly, I use:
 
-Regards
+$ curl article.gmane.org/gmane.linux.bluez.kernel/18337/raw | git am
 
-Marcel
+If this is really important I will try to find some other mail client.
 
+> I also prefer that you split this into two patches, one for CFLAGS and
+> one for LDFLAGS.
 
+In a few moments.
+
+Alon.
