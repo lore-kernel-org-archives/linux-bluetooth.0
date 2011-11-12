@@ -1,62 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/2] Automake AM_CFLAGS, AM_LDFLAGS fixups
+Subject: Re: [PATCH 5/5] Bluetooth: Add support for MITM LE-SMP pairing
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Alon Bar-Lev <alon.barlev@gmail.com>
+To: Brian Gix <bgix@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Sun, 13 Nov 2011 08:15:12 +0900
-In-Reply-To: <CAOazyz26ywy+OWMCbL6JMdEd3zt9Ui8XTAWVXtLLRj_wKq+Uvw@mail.gmail.com>
-References: <CAOazyz26ywy+OWMCbL6JMdEd3zt9Ui8XTAWVXtLLRj_wKq+Uvw@mail.gmail.com>
+Date: Sun, 13 Nov 2011 08:12:29 +0900
+In-Reply-To: <1321057441-7921-6-git-send-email-bgix@codeaurora.org>
+References: <1321057441-7921-1-git-send-email-bgix@codeaurora.org>
+	 <1321057441-7921-6-git-send-email-bgix@codeaurora.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321139715.15441.438.camel@aeonflux>
+Message-ID: <1321139552.15441.436.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alon,
+Hi Brian,
 
-> Reference: "Flag Variables Ordering"[1]
-> 
-> In automake, if you modify CFLAGS or LDFLAGS of a target you
-> actually override the autoconf supplied flags. This is highly
-> none standard and may lead to undesired results, as some
-> targets will be compiled with the autoconf supplied flags and
-> some won't.
-> 
-> This patch adds AM_CFLAGS, AM_LDFLAGS to any flags override.
-> 
-> Some notes:
-> 
-> 1. Remove none common flags:
->         -DBLUETOOTH_PLUGIN_BUILTIN -DPLUGINDIR=\""$(build_plugindir)"\"
-> Moved to bluetoothd only, as BLUETOOTH_PLUGIN_BUILTIN should effect
-> only sources compiled within it.
-> And PLUGINDIR is used only by the daemon.
-> 
-> 2. More targets now will be compiled with:
->         @DBUS_CFLAGS@ @GLIB_CFLAGS@ @CAPNG_CFLAGS@
-> If this is a problem I will add these to specific targets.
-> 
-> 3. I am not sure there is a reason to set specific trivial CFLAGS for
-> simple includes in target specific. Simpler is to put all at AM_CFLAGS.
-> 
-> 4. All @XXX_XXFLAGS@ can actually be used as make macros $(XXX_XXFLAGS),
-> Since AC_SUBST are automatically generated as make macros.
-> 
-> 5. Why don't you split up the Makefile.am into smaller by
-> directory/library? It would be easier to control the setup.
-> 
-> [1] http://www.gnu.org/software/automake/manual/automake.html#Flag-Variables-Ordering
-> 
-> Signed-off-by: Alon Bar-Lev <alon.barlev@gmail.com>
+> Passkey entry and comparison only. Uses MGMT interface to request
+> passkey and confirmation from user space.
 
-please no Signed-off-by lines, we are not using them for the userspace
-parts. And also please send patches inline and via attachments.
+can you please split this patch into smaller chunks. It looks like some
+of them are just small bug fixes for error handling.
 
-I also prefer that you split this into two patches, one for CFLAGS and
-one for LDFLAGS.
+And I see a lot of code duplication here as well. I prefer we introduce
+proper helpers for certain common patterns.
 
 Regards
 
 Marcel
+
 
 
