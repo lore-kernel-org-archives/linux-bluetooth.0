@@ -1,79 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Pass all message parameters to mgmt_start_discovery
-Date: Sat, 12 Nov 2011 11:58:22 +0200
-Message-Id: <1321091902-6815-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1321091515-6543-1-git-send-email-johan.hedberg@gmail.com>
-References: <1321091515-6543-1-git-send-email-johan.hedberg@gmail.com>
+Date: Sat, 12 Nov 2011 11:54:33 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 6/6] Bluetooth: Support LE-Only discovery procedure
+Message-ID: <20111112095433.GA6578@fusion.localdomain>
+References: <1321051824-5216-1-git-send-email-andre.guedes@openbossa.org>
+ <1321051824-5216-7-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1321051824-5216-7-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Andre,
 
-The mgmt_start_discovery command contains the type of discovery that
-should be started so this should be passed to the start_discovery
-function. This patch doesn't yet add any action depending on the type of
-the requested discovery.
+On Fri, Nov 11, 2011, Andre Guedes wrote:
+> @@ -1669,7 +1678,16 @@ static int start_discovery(struct sock *sk, u16 index)
+>  		goto failed;
+>  	}
+>  
+> -	err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
+> +	if (lmp_host_le_capable(hdev)) {
+> +		if (lmp_bredr_capable(hdev))
+> +			err = -ENOSYS;
+> +		else
+> +			err = hci_do_le_scan(hdev, LE_SCAN_TYPE, LE_SCAN_INT,
+> +					LE_SCAN_WIN, LE_SCAN_TIMEOUT_LE_ONLY);
+> +	} else {
+> +		err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
+> +	}
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
-v2: Fix stupid copy-paste error with the MGMT_OP in case of an invalid
-message length.
+This should really be looking at type parameter that gets passed in the
+mgmt_start_discovery command. User space has been sending it already for
+some time but the kernel side wasn't yet updated to care about it. I
+just sent a patch to add the necessary mgmt.h struct and to pass the
+data to the start_discovery function.
 
- include/net/bluetooth/mgmt.h |    3 +++
- net/bluetooth/mgmt.c         |   10 ++++++++--
- 2 files changed, 11 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index bd6995d..2e50182 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -232,6 +232,9 @@ struct mgmt_cp_remove_remote_oob_data {
- } __packed;
- 
- #define MGMT_OP_START_DISCOVERY		0x001B
-+struct mgmt_cp_start_discovery {
-+	__u8 type;
-+} __packed;
- 
- #define MGMT_OP_STOP_DISCOVERY		0x001C
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b761359..1482455 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1779,14 +1779,20 @@ static int remove_remote_oob_data(struct sock *sk, u16 index,
- 	return err;
- }
- 
--static int start_discovery(struct sock *sk, u16 index)
-+static int start_discovery(struct sock *sk, u16 index,
-+						unsigned char *data, u16 len)
- {
-+	struct mgmt_cp_start_discovery *cp = (void *) data;
- 	struct pending_cmd *cmd;
- 	struct hci_dev *hdev;
- 	int err;
- 
- 	BT_DBG("hci%u", index);
- 
-+	if (len != sizeof(*cp))
-+		return cmd_status(sk, index, MGMT_OP_START_DISCOVERY,
-+						MGMT_STATUS_INVALID_PARAMS);
-+
- 	hdev = hci_dev_get(index);
- 	if (!hdev)
- 		return cmd_status(sk, index, MGMT_OP_START_DISCOVERY,
-@@ -2083,7 +2089,7 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- 									len);
- 		break;
- 	case MGMT_OP_START_DISCOVERY:
--		err = start_discovery(sk, index);
-+		err = start_discovery(sk, index, buf + sizeof(*hdr), len);
- 		break;
- 	case MGMT_OP_STOP_DISCOVERY:
- 		err = stop_discovery(sk, index);
--- 
-1.7.7.2
-
+Johan
