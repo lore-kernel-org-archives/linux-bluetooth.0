@@ -1,23 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
+From: Alon Bar-Lev <alon.barlev@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/1] Remove driver only if remote has no matching UUID
-Date: Sun, 13 Nov 2011 20:25:29 +0200
-Message-Id: <1321208730-22957-1-git-send-email-dmitriy.paliy@nokia.com>
+Cc: Alon Bar-Lev <alon.barlev@gmail.com>
+Subject: [PATCH] Support libtool-2
+Date: Sun, 13 Nov 2011 12:03:40 +0200
+Message-Id: <1321178620-17297-1-git-send-email-alon.barlev@gmail.com>
+In-Reply-To: <1321177515-2908-1-git-send-email-alon.barlev@gmail.com>
+References: <1321177515-2908-1-git-send-email-alon.barlev@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Remove now obsolete AC_DISABLE_STATIC in favor of
+LT_INIT([disable-static])
+---
+ configure.ac |   10 ++++++++--
+ 1 files changed, 8 insertions(+), 2 deletions(-)
 
-This patch of Daniel Orstadius seems to be was left without attention,
-or lost. However, it fixes right thing. Currently, Headset interface
-is removed for a device if one of HFP or HSP SDP records was not
-provided. It doestn make sence, since the other profile is still valid.
-
-What is done here is search of suported UUIDs of the given interface
-on a remote device, and the interface is removed if none of supported
-ones is found.
-
-BR,
-Dmitriy
+diff --git a/configure.ac b/configure.ac
+index c1397f0..2157489 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -30,8 +30,14 @@ PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
+ m4_define([_LT_AC_TAGCONFIG], [])
+ m4_ifdef([AC_LIBTOOL_TAGS], [AC_LIBTOOL_TAGS([])])
+ 
+-AC_DISABLE_STATIC
+-ifdef([LT_INIT],[LT_INIT], [AC_PROG_LIBTOOL])
++ifdef(
++	[LT_INIT],
++	[LT_INIT([disable-static])],
++	[
++		AC_PROG_LIBTOOL
++		AC_DISABLE_STATIC
++	]
++)
+ 
+ AC_FUNC_PPOLL
+ 
+-- 
+1.7.3.4
 
