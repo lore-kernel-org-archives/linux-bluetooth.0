@@ -1,96 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20111112183753.GA17859@x220.Elisa>
-References: <1320925022-21891-1-git-send-email-sancane@gmail.com>
-	<1320925022-21891-2-git-send-email-sancane@gmail.com>
-	<1320925022-21891-3-git-send-email-sancane@gmail.com>
-	<20111112183753.GA17859@x220.Elisa>
-Date: Sun, 13 Nov 2011 10:18:33 +0100
-Message-ID: <CACLukzKZw03P1jXmtGQqFWQ9FJT5JJhuYpcoOsA4nK+6Ded21A@mail.gmail.com>
-Subject: Re: [PATCH 2/6] Parse final measurement indication
-From: Santiago Carot <sancane@gmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Alon Bar-Lev <alon.barlev@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Alon Bar-Lev <alon.barlev@gmail.com>
+Subject: [PATCH] Automake - do not override LDFLAGS
+Date: Sun, 13 Nov 2011 09:40:50 +0200
+Message-Id: <1321170050-18323-1-git-send-email-alon.barlev@gmail.com>
+In-Reply-To: <1321159852.15441.449.camel@aeonflux>
+References: <1321159852.15441.449.camel@aeonflux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Add AM_LDFLAGS to every _LDFLAGS, so that autoconf's
+LDFLAGS won't be overridden.
+---
+ Makefile.am |   12 ++++++------
+ 1 files changed, 6 insertions(+), 6 deletions(-)
 
-2011/11/12 Johan Hedberg <johan.hedberg@gmail.com>:
-> Hi Santiago,
->
-> On Thu, Nov 10, 2011, Santiago Carot-Nemesio wrote:
->> +struct measurement {
->> +     gint16          exp;
->> +     gint32          mant;
->> +     guint64         time;
->> +     gboolean        suptime;
->> +     gchar           *unit;
->> +     gchar           *type;
->> +     gchar           *msmnt;
->
-> Is msmnt supposed to be short for measurement? Could you just spell it
-> out please since to me that short version is far from obvious. Or would
-> "value" be a more suitable name?
->
+diff --git a/Makefile.am b/Makefile.am
+index 57aa33c..344699e 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -70,7 +70,7 @@ lib_LTLIBRARIES += lib/libbluetooth.la
+ 
+ lib_libbluetooth_la_SOURCES = $(lib_headers) \
+ 				lib/bluetooth.c lib/hci.c lib/sdp.c lib/uuid.c
+-lib_libbluetooth_la_LDFLAGS = -version-info 14:4:11
++lib_libbluetooth_la_LDFLAGS = $(AM_LDFLAGS) -version-info 14:4:11
+ lib_libbluetooth_la_DEPENDENCIES = $(local_headers)
+ 
+ noinst_LTLIBRARIES += lib/libbluetooth-private.la
+@@ -286,7 +286,7 @@ endif
+ if MAINTAINER_MODE
+ plugin_LTLIBRARIES += plugins/external-dummy.la
+ plugins_external_dummy_la_SOURCES = plugins/external-dummy.c
+-plugins_external_dummy_la_LDFLAGS = -module -avoid-version -no-undefined
++plugins_external_dummy_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version -no-undefined
+ plugins_external_dummy_la_CFLAGS = $(AM_CFLAGS) -fvisibility=hidden
+ endif
+ 
+@@ -317,7 +317,7 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
+ 			src/oob.h src/oob.c src/eir.h src/eir.c
+ src_bluetoothd_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@ @DBUS_LIBS@ \
+ 							@CAPNG_LIBS@ -ldl -lrt
+-src_bluetoothd_LDFLAGS = -Wl,--export-dynamic \
++src_bluetoothd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic \
+ 				-Wl,--version-script=$(srcdir)/src/bluetooth.ver
+ 
+ src_bluetoothd_DEPENDENCIES = lib/libbluetooth-private.la
+@@ -354,14 +354,14 @@ alsa_LTLIBRARIES = audio/libasound_module_pcm_bluetooth.la \
+ 
+ audio_libasound_module_pcm_bluetooth_la_SOURCES = audio/pcm_bluetooth.c \
+ 					audio/rtp.h audio/ipc.h audio/ipc.c
+-audio_libasound_module_pcm_bluetooth_la_LDFLAGS = -module -avoid-version #-export-symbols-regex [_]*snd_pcm_.*
++audio_libasound_module_pcm_bluetooth_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version #-export-symbols-regex [_]*snd_pcm_.*
+ audio_libasound_module_pcm_bluetooth_la_LIBADD = sbc/libsbc.la \
+ 					lib/libbluetooth-private.la @ALSA_LIBS@
+ audio_libasound_module_pcm_bluetooth_la_CFLAGS = $(AM_CFLAGS) @ALSA_CFLAGS@
+ 
+ audio_libasound_module_ctl_bluetooth_la_SOURCES = audio/ctl_bluetooth.c \
+ 					audio/rtp.h audio/ipc.h audio/ipc.c
+-audio_libasound_module_ctl_bluetooth_la_LDFLAGS = -module -avoid-version #-export-symbols-regex [_]*snd_ctl_.*
++audio_libasound_module_ctl_bluetooth_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version #-export-symbols-regex [_]*snd_ctl_.*
+ audio_libasound_module_ctl_bluetooth_la_LIBADD = \
+ 					lib/libbluetooth-private.la @ALSA_LIBS@
+ audio_libasound_module_ctl_bluetooth_la_CFLAGS = $(AM_CLAGS) @ALSA_CFLAGS@
+@@ -388,7 +388,7 @@ audio_libgstbluetooth_la_SOURCES = audio/gstbluetooth.c audio/gstpragma.h \
+ 				audio/gstsbcutil.h audio/gstsbcutil.c \
+ 				audio/gstrtpsbcpay.h audio/gstrtpsbcpay.c \
+ 				audio/rtp.h audio/ipc.h audio/ipc.c
+-audio_libgstbluetooth_la_LDFLAGS = -module -avoid-version
++audio_libgstbluetooth_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version
+ audio_libgstbluetooth_la_LIBADD = sbc/libsbc.la lib/libbluetooth-private.la \
+ 						@DBUS_LIBS@ @GSTREAMER_LIBS@ \
+ 						-lgstaudio-0.10 -lgstrtp-0.10
+-- 
+1.7.3.4
 
-Yes, that's supposed to be a kind of short for measurement, There's
-not problem to me in changing the name. The reason why I set that name
-was because I wanted to keep consistancy with the thermomether
-documentation in which we called it measurement.
-
-> Also, please avoid usage of g* types where you're not directly accessing
-> some GLib API that expects them (even then it's mostly fine to go ahead
-> with uint16_t, char, etc). I can see that there are other places in
-> thermometer.c using the g types too which should be fixed in a separate
-> patch.
->
-
-Ok, I used only glib types because I was confused about when I should
-use these or the other types, Having a look at some parts in BlueZ it
-seemed a little mess, but now It's clear to me. Thank you for your
-explanation,
-If you dont mind I would preffer to send a separate patch fixing that
-issue at the end of the new set in order to avoid too many conflicts
-rebasing in my local tree.
-
->> +static gchar *temptype2str(uint8_t value)
->> +{
->> +     switch (value) {
->> +     case 1: return "Armpit";
->> +     case 2: return "Body";
->> +     case 3: return "Ear";
->> +     case 4: return "Finger";
->> +     case 5: return "Intestines";
->> +     case 6: return "Mouth";
->> +     case 7: return "Rectum";
->> +     case 8: return "Toe";
->> +     case 9: return "Tympanum";
->> +     default:
->> +             error("Temperature type %d reserved for future use", value);
->> +             return NULL;
->> +     };
->
-> Please follow the coding style with switch statements. All those return
-> statements should be on their own line. However, in this case I think
-> it'd be just easier to make a lookup table for those values, i.e.
->
-> const char *temp_type[] {
->        "<unknown>",
->        "Armpit",
->        "Body",
->        ...
->
-> And then in the temptype2str function:
->
->        if (type > 0 && val < G_N_ELEMENTS(temp_type))
->                return temp_type[type];
->
->
-> Johan
->
-
-Ok, I'll redo these patches.
-Thanks a lot for your comments.
-
-Santiago
