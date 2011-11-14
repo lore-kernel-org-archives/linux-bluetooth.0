@@ -1,28 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Nov 2011 23:52:26 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
+Date: Mon, 14 Nov 2011 22:51:00 +0100
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: Brian Gix <bgix@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/6] Parse final measurement indication
-Message-ID: <20111114215226.GA21254@fusion.localdomain>
-References: <1321272680-16286-1-git-send-email-sancane@gmail.com>
- <1321272680-16286-2-git-send-email-sancane@gmail.com>
- <1321272680-16286-3-git-send-email-sancane@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321272680-16286-3-git-send-email-sancane@gmail.com>
+Subject: Re: Building master on Debian systems fails at linking "check".
+Message-Id: <20111114225100.c75e709827f4b22fa83e0327@studenti.unina.it>
+In-Reply-To: <4EC15A27.90305@codeaurora.org>
+References: <20111114155620.4fc2987fad25c9ccd724f68a@studenti.unina.it>
+	<4EC15A27.90305@codeaurora.org>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Mon__14_Nov_2011_22_51_00_+0100_Zds4lKM=IjaQB6B2"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+--Signature=_Mon__14_Nov_2011_22_51_00_+0100_Zds4lKM=IjaQB6B2
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 14, 2011, Santiago Carot-Nemesio wrote:
-> +	dict_append_entry(&dict, "Exponent", DBUS_TYPE_INT16, &m->exp);
-> +	dict_append_entry(&dict, "Mantissa", DBUS_TYPE_INT32, &m->mant);
+On Mon, 14 Nov 2011 10:12:55 -0800
+Brian Gix <bgix@codeaurora.org> wrote:
 
-Could you remind me why we have this kind of encoding in the D-Bus
-interface instead of using the native DBUS_TYPE_DOUBLE? Using
-DBUS_TYPE_DOUBLE seems like the obvious & clean approach from an API
-standpoint so there should be good reasons for not using it.
+> Hi Antonio,
+>=20
+> On 11/14/2011 6:56 AM, Antonio Ospite wrote:
+> > Hi,
+> >
+> > building the master branch (a267bc2) on Debian systems fails when
+> > linking the unit tests to the "check" library with this error:
+> >
+[...]
 
-Johan
+> >
+> > The workaround I use for now is:
+> >    - run "make" and let the build system fail
+> >    - show the  failing command with "make V=3D1"
+> >    - change -lcheck to -lcheck_pic and rerun the command
+> >    - "make" will now proceed with the build
+>=20
+>=20
+> This same solution works for me:  After running ./bootstrap-configure, I=
+=20
+> change the unit_test_eir_LDADD line in the Makefile to:
+>=20
+> unit_test_eir_LDADD =3D lib/libbluetooth-private.la -lglib-2.0   -lcheck_=
+pic
+>
+
+Eh Brian, this is surely a little prettier than what I am doing :)
+
+> There is probably a way to make this happen automatically, but I don't=20
+> know enough about the configure mechanism to know how to do this.
+>
+
+I think using a =E2=80=9Clibcheck_pic aware=E2=80=9D m4 macro is the way to=
+ go, ideally
+this should be provided in the check package itself, I'll try asking the
+Debian maintainers if there is no interest for a solution in BlueZ.
+
+Regards,
+   Antonio
+
+--=20
+Antonio Ospite
+http://ao2.it
+
+PGP public key ID: 0x4553B001
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
+
+--Signature=_Mon__14_Nov_2011_22_51_00_+0100_Zds4lKM=IjaQB6B2
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk7BjUUACgkQ5xr2akVTsAGHtACfRA4YOzpJMhAYr5PKaVV1PddR
+0NQAn33TwlUsfqzLErE8bdL+8bXhhekl
+=jvLm
+-----END PGP SIGNATURE-----
+
+--Signature=_Mon__14_Nov_2011_22_51_00_+0100_Zds4lKM=IjaQB6B2--
