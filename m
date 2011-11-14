@@ -1,28 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Nov 2011 12:57:35 +0200
+Date: Mon, 14 Nov 2011 12:53:24 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Syam Sidhardhan <s.syam@samsung.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] Fix simple-player test script to make it work with
- dbus-python-0.84
-Message-ID: <20111114105735.GB10396@fusion.localdomain>
-References: <1320973115-13322-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH obexd 1/2] Fix empty parameter list in function
+ declaration
+Message-ID: <20111114105324.GA10396@fusion.localdomain>
+References: <1320818380-17217-1-git-send-email-s.syam@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320973115-13322-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1320818380-17217-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Syam,
 
-On Thu, Nov 10, 2011, Vinicius Costa Gomes wrote:
+On Wed, Nov 09, 2011, Syam Sidhardhan wrote:
 > ---
-> In every machine that I tried with dbus-python 0.84, something like this was
-> needed, but I didn't find out why nobody complained about this earlier.
-> 
->  test/simple-player |    6 +++---
->  1 files changed, 3 insertions(+), 3 deletions(-)
+>  plugins/messages-tracker.c |    2 +-
+>  src/log.c                  |    2 +-
+>  src/manager.c              |    2 +-
+>  src/transport.c            |    2 +-
+>  4 files changed, 4 insertions(+), 4 deletions(-)
 
-Applied. Thanks.
+Both patches have been applied. Thanks.
 
 Johan
