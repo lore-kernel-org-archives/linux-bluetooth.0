@@ -1,39 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Nov 2011 20:54:15 +0200
+Date: Mon, 14 Nov 2011 20:54:01 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v2 0/2] CCC for bonded devices
-Message-ID: <20111114185415.GB12675@fusion.localdomain>
-References: <1318517589-17372-1-git-send-email-claudio.takahasi@openbossa.org>
- <1320674942-23004-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH BlueZ v2 0/7] CCC persistence
+Message-ID: <20111114185401.GA12675@fusion.localdomain>
+References: <1318517004-17003-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1320674367-22529-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320674942-23004-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1320674367-22529-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+HI Claudio,
 
 On Mon, Nov 07, 2011, Claudio Takahasi wrote:
 > Changes from previous version: rebase only
 > 
-> According to BT spec, CCC is persistent for bonded devices only.
-> If the device is NOT bonded, CCC entry is removed from the storage
-> when the connection is established. This approach is simpler than
-> keep different list/storage(and logic) for bonded and non-bonded devices.
+> The following patches implement the storage of the Client Characteristic
+> Configuration: controls notification & indication.
 > 
-> Dependency:
-> [PATCH BlueZ 0/7] CCC persistence
+> Bonding verification is coming in the next patch series.
 > 
-> Claudio Takahasi (2):
->   Add storage function to remove CCC of a device
->   Remove CCC if the device is not bonded
+> Based on the requirements of the available profiles attrib server will
+> require some changes. The future plan is to move attribute values to
+> plugins (eg: time) and keep only the attribute declaration in the attrib
+> server.
 > 
->  src/attrib-server.c |   15 +++++++++++++++
->  src/storage.c       |   11 +++++++++++
->  src/storage.h       |    1 +
->  3 files changed, 27 insertions(+), 0 deletions(-)
+> Claudio Takahasi (6):
+>   Remove CCC for read by group
+>   Remove CCC for read by type
+>   Add CCC persistence in attrib server
+>   Remove notification and indication from server
+>   Remove CCC entries when device is removed
+>   Add generic function to delete by pattern
+> 
+> Vinicius Costa Gomes (1):
+>   Add storage functions to deal with CCC
+> 
+>  src/attrib-server.c |  217 ++++++++++-----------------------------------------
+>  src/storage.c       |  100 +++++++++++++++++-------
+>  src/storage.h       |    4 +
+>  3 files changed, 116 insertions(+), 205 deletions(-)
 
 Applied. Thanks.
 
