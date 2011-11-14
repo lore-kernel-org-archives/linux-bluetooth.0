@@ -1,49 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Nov 2011 20:54:01 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v2 0/7] CCC persistence
-Message-ID: <20111114185401.GA12675@fusion.localdomain>
-References: <1318517004-17003-1-git-send-email-claudio.takahasi@openbossa.org>
- <1320674367-22529-1-git-send-email-claudio.takahasi@openbossa.org>
+Message-ID: <4EC15A27.90305@codeaurora.org>
+Date: Mon, 14 Nov 2011 10:12:55 -0800
+From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320674367-22529-1-git-send-email-claudio.takahasi@openbossa.org>
+To: Antonio Ospite <ospite@studenti.unina.it>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Building master on Debian systems fails at linking "check".
+References: <20111114155620.4fc2987fad25c9ccd724f68a@studenti.unina.it>
+In-Reply-To: <20111114155620.4fc2987fad25c9ccd724f68a@studenti.unina.it>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI Claudio,
+Hi Antonio,
 
-On Mon, Nov 07, 2011, Claudio Takahasi wrote:
-> Changes from previous version: rebase only
-> 
-> The following patches implement the storage of the Client Characteristic
-> Configuration: controls notification & indication.
-> 
-> Bonding verification is coming in the next patch series.
-> 
-> Based on the requirements of the available profiles attrib server will
-> require some changes. The future plan is to move attribute values to
-> plugins (eg: time) and keep only the attribute declaration in the attrib
-> server.
-> 
-> Claudio Takahasi (6):
->   Remove CCC for read by group
->   Remove CCC for read by type
->   Add CCC persistence in attrib server
->   Remove notification and indication from server
->   Remove CCC entries when device is removed
->   Add generic function to delete by pattern
-> 
-> Vinicius Costa Gomes (1):
->   Add storage functions to deal with CCC
-> 
->  src/attrib-server.c |  217 ++++++++++-----------------------------------------
->  src/storage.c       |  100 +++++++++++++++++-------
->  src/storage.h       |    4 +
->  3 files changed, 116 insertions(+), 205 deletions(-)
+On 11/14/2011 6:56 AM, Antonio Ospite wrote:
+> Hi,
+>
+> building the master branch (a267bc2) on Debian systems fails when
+> linking the unit tests to the "check" library with this error:
+>
+>    CCLD   unit/test-eir
+> /usr/bin/ld: /usr/lib/gcc/x86_64-linux-gnu/4.6/../../../../lib/libcheck.a
+> (check.o): relocation R_X86_64_32 against `.rodata.str1.1' can not be
+> used when making a shared object; recompile with
+> -fPIC /usr/lib/gcc/x86_64-linux-gnu/4.6/../../../../lib/libcheck.a:
+> could not read symbols: Bad value collect2: ld returned 1 exit status
+> make[1]: *** [unit/test-eir] Error 1 make: *** [all] Error 2
+>
+> [...]
 
-Applied. Thanks.
+I run into the same problem with an ubuntu-10.10 installation running in 
+a VM.
 
-Johan
+>
+> The workaround I use for now is:
+>    - run "make" and let the build system fail
+>    - show the  failing command with "make V=1"
+>    - change -lcheck to -lcheck_pic and rerun the command
+>    - "make" will now proceed with the build
+
+
+This same solution works for me:  After running ./bootstrap-configure, I 
+change the unit_test_eir_LDADD line in the Makefile to:
+
+unit_test_eir_LDADD = lib/libbluetooth-private.la -lglib-2.0   -lcheck_pic
+
+There is probably a way to make this happen automatically, but I don't 
+know enough about the configure mechanism to know how to do this.
+
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
