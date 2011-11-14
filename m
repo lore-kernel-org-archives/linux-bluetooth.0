@@ -1,38 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Nov 2011 21:17:32 +0200
+Date: Mon, 14 Nov 2011 21:17:13 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 0/2] Initial Time Profile implementation
-Message-ID: <20111114191732.GB15156@fusion.localdomain>
-References: <1320422368-23820-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: Re: [PATCH BlueZ 0/4] High level GATT API for service registration
+Message-ID: <20111114191713.GA15156@fusion.localdomain>
+References: <1320417003-23493-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320422368-23820-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1320417003-23493-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Lizardo,
 
 On Fri, Nov 04, 2011, Anderson Lizardo wrote:
-> This initial implementation for Time Profile contains the mandatory Current
-> Time Service (CTS), including the mandatory Current Time Characteristic and the
-> optional Local Time Information Characteristic.
+> Following a previously sent RFC, this series implement an internal API that
+> simplifies GATT service registration on server implementations. It is built on
+> top of current "low level" attribute API, and both can be used at the same time
+> without problem.
 > 
-> The only limitation is that notifications for the Current Time Characteristic
-> value are not being sent yet. The mechanism to detect changes on the system
-> time is platform specific, therefore we need more infrastructure to support
-> this and allow multiple platform support.
+> It is currently being used for Phone Alert Status and Time profile server
+> implementations which we are preparing to send upstream (we previously sent RFC
+> patches for both of them).
 > 
-> Future patches will address this (and also make sure the notifications enabled
-> by clients are persistent across reboots), and we will also introduce Reference
-> Time Update Service (which also depends on platform specific mechanisms.)
+> As an example, I converted a service from the GATT example profile (see patch
+> #4). Note the migration to this API is optional, and can be done incrementally.
 > 
-> This series depend on the "High level GATT API for service registration" series
-> sent a while ago. Note that, despite the limitation explained above, we
-> consider this code ready for upstream inclusion (it is mandatory for server to
-> implement it, but not mandatory for the client to enable the notification, it
-> can just read the current time on each connection.)
+> Still not implemented (but can be added later):
+> 
+> * No support for aggregate format descriptors, included services (also we don't
+>   have any example services using them)
+> * No support for some GATT descriptors
+> * No support for "static" characteristic values. Any readable or writeable
+>   characteristic needs a corresponding read or write callback
 
 Applied. Thanks.
 
