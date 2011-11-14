@@ -1,91 +1,174 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: btusb: Use USB_INTERFACE_INFO to do device
- matching
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Yao, Costa" <cqyao@qca.qualcomm.com>
-Cc: "padovan@profusion.mobi" <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 14 Nov 2011 18:32:20 +0900
-In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DEEEF58@nasanexd02b.na.qualcomm.com>
-References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEEEF58@nasanexd02b.na.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321263144.15441.465.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLJQgaCBF+Zame4fG_pN9Twu6_zaJb+42KmES8xvnZ1zg@mail.gmail.com>
+References: <1320763033-4072-1-git-send-email-bulislaw@linux.com>
+	<CABBYNZLJQgaCBF+Zame4fG_pN9Twu6_zaJb+42KmES8xvnZ1zg@mail.gmail.com>
+Date: Mon, 14 Nov 2011 09:21:47 +0100
+Message-ID: <CA+i+Aw3rTf3MxQUyeT9_FXZ6qU9mrDd4nppM4sP603Ah_4cxcw@mail.gmail.com>
+Subject: Re: [RFC] API v2 for MAP client in obex-client
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Bartosz Szatkowski <bulislaw@linux.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Costa,
+On Thu, Nov 10, 2011 at 12:28 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Bartosz,
+>
+> On Tue, Nov 8, 2011 at 4:37 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+>> Hi,
+>> below tweaked proposal for MAP client API.
+>>
+>> Messages Access hierarchy
+>> =========================
+>>
+>> Service         org.openobex.client
+>> Interface       org.openobex.MessagesAccess
+>> Object path     [variable prefix]/{session0,session1,...}
+>>
+>> Methods         dict(uint8 tag, variant value) GetAppParams()
+>>
+>>                        Retrieve application parameters connected to the last MSE
+>>                        response. Application parameters corresponding to given call
+>>                        are accessible until next request is sent.
+>>
+>>                        Parameters are converted to unsigned integers of corresponding sizes
+>>                        (MAP specification section 6.3.1) or NULL-terminated strings.
+>>                        In case of parameters not mentioned in MAP specification value
+>>                        becomes struct of (uint8 length, array{uint8}).
+>>
+>>                        See MAP specification (section corresponding to given function)
+>>                        for more details on returned parameters.
+>
+> Can't we have the tags as Properties, the direct mapping of the spec
+> is bad because then each application needs to know about every tag,
 
-> 1 Use USB_INTERFACE_INFO to do device matching, other than USB_DEVICE_INFO.
-> 2 And we try to find the first interface containing the interrupt endpoint.
-> 
-> Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
-> ---
->  drivers/bluetooth/btusb.c |   16 +++++++++++-----
->  1 files changed, 11 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 9db2476..80d7e2d 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -58,7 +58,7 @@ static struct usb_driver btusb_driver;
->  
->  static struct usb_device_id btusb_table[] = {
->  	/* Generic Bluetooth USB device */
-> -	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
-> +	{ USB_INTERFACE_INFO(0xe0, 0x01, 0x01) },
->  
->  	/* Broadcom SoftSailing reporting vendor specific */
->  	{ USB_DEVICE(0x05ac, 0x21e1) },
+Even though I'd rather go for tag names in strings instead of
+numerical form, I do not see a problem with this. Application does not
+need to know about each and every tag. It is enough to know the tags
+that the application is interested in and skip the rest.
 
-this actually means that some of the USB_DEVICE entries can be removed.
-Please go through our commit logs for btusb.c and figure out which ones
-can be removed and send a separate patch for that.
+> besides I don't want to have each of the clients polling this values
+> so there got to be a better way to deal with it.
 
-> @@ -915,9 +915,14 @@ static int btusb_probe(struct usb_interface *intf,
->  
->  	BT_DBG("intf %p id %p", intf, id);
->  
-> -	/* interface numbers are hardcoded in the spec */
-> -	if (intf->cur_altsetting->desc.bInterfaceNumber != 0)
-> +	for (i = 0; i < intf->cur_altsetting->desc.bNumEndpoints; i++) {
-> +		ep_desc = &intf->cur_altsetting->endpoint[i].desc;
-> +
-> +		if (usb_endpoint_is_int_in(ep_desc))
-> +			break;
-> +
->  		return -ENODEV;
-> +	}
+Well, as those can also be received after finished GetMessage, which
+seems to be asynchronous in this proposal, I guess this polling is
+quite reasonable.
 
-There is no point in walking the endpoint list twice in the probe
-function. Store possible candidates for int_in, bulk_out and bulk_in
-descriptors so that later on we can just assign them to our data.
+>>                void SetFolder(boolean cdup, string name)
+>>
+>>                        Set working directory for current session.
+>>
+>>                        |  cdup  | folder name | operation    |
+>>                        |=====================================|
+>>                        | FALSE  | empty       | cd /         |
+>>                        |--------+-------------+--------------|
+>>                        | FALSE  | name        | cd name      |
+>>                        |--------+-------------+--------------|
+>>                        | TRUE   | [name]      | cd ..[/name] |
+>>                        +-------------------------------------+
+>
+> I thought we agree to have it just with name to make it less
+> complicated and aligned with what we do for other profiles.
 
-Then we can just check if this interface has int and proper bulk
-endpoints available. And in error case return ENODEV.
+Not really complicated and allowing for full original functionality -
+i.e. one can go backwards and to subdirectory in one request. This is
+much easier than allowing for some "../subdir" as the only accepted
+path form (as no any other paths would be appropriate). Also there are
+no restrictions upon what characters could be used for folder name in
+MAP server implementation (even "..").
 
-Actually thinking about it, we already do that, so just removing the
-hardcoded check for desc.bInterfaceNumber != 0 should do the trick.
+>>                array{dict(string property, string value)}
+>>                GetFolderListing(dict(uint8 tag, uint16 value))
+>>
+>>                        Retrieve list of names (and all other properties returned by MSE)
+>>                        for directories in CWD.
+>>
+>>                        Parameters as in MAP specification section 5.4.
+>
+> IMO this is too low level and potentially creates a need of a
+> header/library to export what values can tag and value can assume.
+>
+>>                array{dict(string property, string value)}
+>>                GetMessageListing(string folder, array{uint8 tag, variant value})
+>>
+>>                        Return message listing for given subfolder of CWD or directly
+>>                        CWD if folder field is empty, format of each dict entry
+>>                        corresponds to the message listing format (MAP specification
+>>                        section 3.1.6).
+>>
+>>                        Parameters as in MAP specification section 5.5.
+>
+> Same as GetFolderListing, also we should probably only list Message of
+> the current folder otherwise we don't need ChangeFolder.
 
->  	if (!id->driver_info) {
->  		const struct usb_device_id *match;
-> @@ -1014,8 +1019,9 @@ static int btusb_probe(struct usb_interface *intf,
->  
->  	hdev->owner = THIS_MODULE;
->  
-> -	/* Interface numbers are hardcoded in the specification */
-> -	data->isoc = usb_ifnum_to_if(data->udev, 1);
-> +
-> +	data->isoc = usb_ifnum_to_if(data->udev,
-> +		1+intf->cur_altsetting->desc.bInterfaceNumber);
+In every place in MAP specification "folder" is a name of subfolder,
+no path is acceptable. This is the same here. This parameter is
+guaranteed by MAP specification, so you can list messages one level
+below your cwd (which is convenient). Same feature is also present in
+folder listing in OBEX specification in general, however MAP
+specification does not mandate name parameter for giving child dir in
+GetFolderListing - probably someone forgot about it...
 
-And here you need to to check all interfaces. Just assuming it is +1
-might not be good enough. Or at least put a proper comment in here that
-we expect the ISOC interface to be +1. And then don't do 1+, I prefer to
-have bInterfaceNumber + 1.
+>>                object_path
+>>                GetMessage(string handle, dict(uint8 tag, variant value), string filename)
+>>
+>>                        Retrieve message (in BMSG format) from remote device and save
+>>                        it to a file *filename* (filename should be an absolute path
+>>                        and the file would be overwritten if it already exists).
+>>
+>>                        A new Transfer object is created to represent this transaction
+>>                        and object_path pointing to it is returned.
+>>
+>>                        Parameters as in MAP specification section 5.6.
+>
+> Where this handle comes from? Also Im not sure what the second
+> parameter is for apparently it is use as a filter in other Methods but
+> here you want to read one single message so what this filter is for?
 
-Regards
+Handle is one of key terms in MAP. Those are unique in whole tree
+representation (i.e. getting message is independent from cwd). Those
+are retrieved in messages listing. For me (as I actually know MAP)
+also second parameter looks obvious - it's for setting optional
+parameters in request, and GetMessage can take those.
 
-Marcel
+>>
+>>                void SetMessageStatus(string handle, uint8 indicator, uint8 value)
+>>
+>>                        Modify status of a message on remote device.
+>>
+>>                        Parameters as in MAP specification section 5.7.
+>
+> What application will be using this? Can any application update the
+> status of a message?
 
+Yes it can. This is used for setting read status and (un)deleting messages.
 
+> Again by using a binary format defined in the
+> spec it gonna create either duplicated code to define them in each
+> client or a need for a header/library.
+>
+>>                void UpdateInbox()
+>>
+>>                        Initiate update of inbox status on remote device.
+>
+> Again what application want to use this? This looks like a
+> notification from the server, which should be done by obexd not
+> obex-client.
+
+>From MAP specification:
+
+<quote>
+5.9 UpdateInbox function
+This function allows the MCE to initiate an update of the MSE's inbox,
+i.e. the MSE shall
+contact the network (e.g. its mailbox) to retrieve new messages if available.
+</quote>
+
+MCE is obex-client.
+
+-- 
+Slawomir Bochenski
