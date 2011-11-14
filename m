@@ -1,178 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd] phonebook-tracker: Seek for contact name deeper
-Date: Mon, 14 Nov 2011 14:30:54 +0100
-Message-Id: <1321277454-25486-1-git-send-email-lkslawek@gmail.com>
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 5/6] Implement DisableIntermediateMeasurement D-Bus method
+Date: Mon, 14 Nov 2011 13:11:19 +0100
+Message-Id: <1321272680-16286-6-git-send-email-sancane@gmail.com>
+In-Reply-To: <1321272680-16286-5-git-send-email-sancane@gmail.com>
+References: <1321272680-16286-1-git-send-email-sancane@gmail.com>
+ <1321272680-16286-2-git-send-email-sancane@gmail.com>
+ <1321272680-16286-3-git-send-email-sancane@gmail.com>
+ <1321272680-16286-4-git-send-email-sancane@gmail.com>
+ <1321272680-16286-5-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some contacts in Tracker can have no name fields set nor nickname. This
-patch enhances the way the contact name is obtained:
-
-1) If there is no nco:nickname set for contact, use nco:imNickname from
-its related IM data.
-2) As the N field is mandatory in both vCard 2.1 and 3.0 and it's the
-most useful field for PBAP clients, if its components are not present
-in Tracker, use nco:fullname (thus promote FN to N) or if nco:fullname
-is also not present, then use previously obtained nickname for N field.
 ---
- plugins/phonebook-tracker.c |   91 ++++++++++++++++++++++++++++++++++++++-----
- 1 files changed, 81 insertions(+), 10 deletions(-)
+ thermometer/thermometer.c |   63 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 files changed, 60 insertions(+), 3 deletions(-)
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index a8b97c2..570ab37 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -113,7 +113,18 @@
- "?_role nco:hasPostalAddress ?aff_addr"					\
- "}) "									\
- "nco:birthDate(?_contact) "						\
--"nco:nickname(?_contact) "						\
-+"(SELECT "								\
-+"	?nick "								\
-+"	WHERE { "							\
-+"		{ "							\
-+"			?_contact nco:nickname ?nick "			\
-+"		} UNION { "						\
-+"			?_contact nco:hasAffiliation ?role . "		\
-+"			?role nco:hasIMAddress ?im . "			\
-+"			?im nco:imNickname ?nick "			\
-+"		} "							\
-+"	} "								\
-+") "									\
- "(SELECT GROUP_CONCAT(fn:concat( "					\
- 	"?url_val, \"\31\", tracker:coalesce(rdfs:label(?_role), \"\") "\
- 	"), \"\30\") "							\
-@@ -146,6 +157,18 @@
- 	"SELECT ?c nco:nameFamily(?c) "					\
- 	"nco:nameGiven(?c) nco:nameAdditional(?c) "			\
- 	"nco:nameHonorificPrefix(?c) nco:nameHonorificSuffix(?c) "	\
-+	"(SELECT "							\
-+		"?nick "						\
-+		"WHERE { "						\
-+			"{ "						\
-+				"?c nco:nickname ?nick "		\
-+			"} UNION { "					\
-+				"?c nco:hasAffiliation ?role . "	\
-+				"?role nco:hasIMAddress ?im . "		\
-+				"?im nco:imNickname ?nick "		\
-+			"} "						\
-+		"} "							\
-+	") "								\
- 	"nco:phoneNumber(?h) "						\
- 	"WHERE { "							\
- 		"?c a nco:PersonContact . "				\
-@@ -185,6 +208,18 @@ CONSTRAINT								\
- 	"nco:nameGiven(?_contact) nco:nameAdditional(?_contact) "	\
- 	"nco:nameHonorificPrefix(?_contact) "				\
- 	"nco:nameHonorificSuffix(?_contact) "				\
-+	"(SELECT "							\
-+		"?nick "						\
-+		"WHERE { "						\
-+			"{ "						\
-+				"?_contact nco:nickname ?nick "		\
-+			"} UNION { "					\
-+				"?_contact nco:hasAffiliation ?role . "	\
-+				"?role nco:hasIMAddress ?im . "		\
-+				"?im nco:imNickname ?nick "		\
-+			"} "						\
-+		"} "							\
-+	") "								\
- 	"nco:phoneNumber(?_cpn) "					\
- CALLS_CONSTRAINTS(CONSTRAINT)						\
- "ORDER BY DESC(nmo:sentDate(?_call)) "
-@@ -223,7 +258,18 @@ CALLS_CONSTRAINTS(CONSTRAINT)						\
- 	"?c_role nco:hasPostalAddress ?aff_addr"			\
- 	"}) "								\
- 	"nco:birthDate(?_contact) "					\
--	"nco:nickname(?_contact) "					\
-+"(SELECT "								\
-+	"?nick "							\
-+	"WHERE { "							\
-+	"	{ "							\
-+	"	?_contact nco:nickname ?nick "				\
-+	"		} UNION { "					\
-+	"			?_contact nco:hasAffiliation ?role . "	\
-+	"			?role nco:hasIMAddress ?im . "		\
-+	"			?im nco:imNickname ?nick "		\
-+	"		} "						\
-+	"	} "							\
-+	") "								\
- "(SELECT GROUP_CONCAT(fn:concat(?url_value, \"\31\", "			\
- 	"tracker:coalesce(rdfs:label(?c_role), \"\")), \"\30\") "	\
- 	"WHERE {"							\
-@@ -316,7 +362,19 @@ COMBINED_CONSTRAINT		\
- "?_role nco:hasPostalAddress ?aff_addr"					\
- "}) "									\
- "nco:birthDate(<%s>) "							\
--"nco:nickname(<%s>) "							\
-+"(SELECT "								\
-+"	?nick "								\
-+"	WHERE { "							\
-+"		{ "							\
-+"			?_contact nco:nickname ?nick "			\
-+"		} UNION { "						\
-+"			?_contact nco:hasAffiliation ?role . "		\
-+"			?role nco:hasIMAddress ?im . "			\
-+"			?im nco:imNickname ?nick "			\
-+"		} "							\
-+"		FILTER (?_contact = <%s>)"				\
-+"	} "								\
-+") "									\
- "(SELECT GROUP_CONCAT(fn:concat( "					\
- 	"?url_val, \"\31\", tracker:coalesce(rdfs:label(?_role), \"\") "\
- 	"), \"\30\") "							\
-@@ -972,12 +1030,23 @@ static void add_affiliation(char **field, const char *value)
- static void contact_init(struct phonebook_contact *contact,
- 							const char **reply)
- {
-+	if (reply[COL_FAMILY_NAME][0] == 0 &&
-+			reply[COL_GIVEN_NAME][0] == 0 &&
-+			reply[COL_ADDITIONAL_NAME][0] == 0 &&
-+			reply[COL_NAME_PREFIX][0] == 0 &&
-+			reply[COL_NAME_SUFFIX][0] == 0) {
-+		if (reply[COL_FULL_NAME][0] != 0)
-+			contact->family = g_strdup(reply[COL_FULL_NAME]);
-+		else
-+			contact->family = g_strdup(reply[COL_NICKNAME]);
-+	} else {
-+		contact->family = g_strdup(reply[COL_FAMILY_NAME]);
-+		contact->given = g_strdup(reply[COL_GIVEN_NAME]);
-+		contact->additional = g_strdup(reply[COL_ADDITIONAL_NAME]);
-+		contact->prefix = g_strdup(reply[COL_NAME_PREFIX]);
-+		contact->suffix = g_strdup(reply[COL_NAME_SUFFIX]);
+diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
+index 64b6aa6..0e38b19 100644
+--- a/thermometer/thermometer.c
++++ b/thermometer/thermometer.c
+@@ -651,6 +651,44 @@ static void disable_final_measurement(struct thermometer *t)
+ 	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
+ }
+ 
++static void disable_intermediate_measurement(struct thermometer *t)
++{
++	struct characteristic *ch;
++	struct descriptor *desc;
++	bt_uuid_t btuuid;
++	uint8_t atval[2];
++	gchar *msg;
++
++	ch = get_characteristic(t, INTERMEDIATE_TEMPERATURE_UUID);
++	if (ch == NULL) {
++		DBG("Intermediate measurement characteristic not found");
++		return;
 +	}
- 	contact->fullname = g_strdup(reply[COL_FULL_NAME]);
--	contact->family = g_strdup(reply[COL_FAMILY_NAME]);
--	contact->given = g_strdup(reply[COL_GIVEN_NAME]);
--	contact->additional = g_strdup(reply[COL_ADDITIONAL_NAME]);
--	contact->prefix = g_strdup(reply[COL_NAME_PREFIX]);
--	contact->suffix = g_strdup(reply[COL_NAME_SUFFIX]);
- 	contact->birthday = g_strdup(reply[COL_BIRTH_DATE]);
- 	contact->nickname = g_strdup(reply[COL_NICKNAME]);
- 	contact->photo = g_strdup(reply[COL_PHOTO]);
-@@ -1332,7 +1401,9 @@ static int add_to_cache(const char **reply, int num_fields, void *user_data)
- 			!g_str_equal(reply[0], TRACKER_DEFAULT_CONTACT_ME))
- 		return 0;
++
++	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
++	desc = get_descriptor(ch, &btuuid);
++	if (desc == NULL) {
++		DBG("Client characteristic configuration descriptor not found");
++		return;
++	}
++
++	atval[0] = 0x00;
++	atval[1] = 0x00;
++	msg = g_strdup("Disable intermediate measurement");
++	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
++}
++
++static void remove_int_watcher(struct thermometer *t, struct watcher *w)
++{
++	if (!g_slist_find(t->iwatchers, w))
++		return;
++
++	t->iwatchers = g_slist_remove(t->iwatchers, w);
++
++	if (g_slist_length(t->iwatchers) == 0)
++		disable_intermediate_measurement(t);
++}
++
+ static void watcher_exit(DBusConnection *conn, void *user_data)
+ {
+ 	struct watcher *watcher = user_data;
+@@ -658,6 +696,8 @@ static void watcher_exit(DBusConnection *conn, void *user_data)
  
--	if (i == 6)
-+	if (i == 7)
-+		formatted = g_strdup(reply[7]);
-+	else if (i == 6)
- 		formatted = g_strdup(reply[6]);
- 	else
- 		formatted = g_strdup_printf("%s;%s;%s;%s;%s",
-@@ -1640,7 +1711,7 @@ void *phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
- 	data->ready_cb = ready_cb;
- 	data->user_data = user_data;
+ 	DBG("Thermometer watcher %s disconnected", watcher->path);
  
--	ret = query_tracker(query, 7, add_to_cache, data);
-+	ret = query_tracker(query, 8, add_to_cache, data);
- 	if (err)
- 		*err = ret;
++	remove_int_watcher(t, watcher);
++
+ 	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
+ 	watcher->id = 0;
  
+@@ -735,6 +775,8 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
+ 
+ 	DBG("Thermometer watcher %s unregistered", path);
+ 
++	remove_int_watcher(t, watcher);
++
+ 	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
+ 	destroy_watcher(watcher);
+ 
+@@ -779,9 +821,24 @@ static DBusMessage *enable_intermediate(DBusConnection *conn, DBusMessage *msg,
+ static DBusMessage *disable_intermediate(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
+-	/* TODO: */
+-	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
+-						"Function not implemented.");
++	const gchar *sender = dbus_message_get_sender(msg);
++	struct thermometer *t = data;
++	struct watcher *watcher;
++	gchar *path;
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
++							DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
++
++	watcher = find_watcher(t->iwatchers, sender, path);
++	if (watcher == NULL)
++		return btd_error_does_not_exist(msg);
++
++	DBG("Intermediate measurement %s unregistered", path);
++
++	remove_int_watcher(t, watcher);
++
++	return dbus_message_new_method_return(msg);
+ }
+ 
+ static GDBusMethodTable thermometer_methods[] = {
 -- 
-1.7.4.1
+1.7.7.3
 
