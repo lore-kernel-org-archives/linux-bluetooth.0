@@ -1,82 +1,183 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Nov 2011 15:56:20 +0100
-From: Antonio Ospite <ospite@studenti.unina.it>
+From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Building master on Debian systems fails at linking "check".
-Message-Id: <20111114155620.4fc2987fad25c9ccd724f68a@studenti.unina.it>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Mon__14_Nov_2011_15_56_20_+0100_/p7QC.SysGJ8V=wF"
+Cc: Slawomir Bochenski <lkslawek@gmail.com>
+Subject: [PATCH v2 obexd] phonebook-tracker: Seek for contact name deeper
+Date: Mon, 14 Nov 2011 15:31:52 +0100
+Message-Id: <1321281112-26363-1-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <20111114141752.GA3457@fusion.localdomain>
+References: <20111114141752.GA3457@fusion.localdomain>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Signature=_Mon__14_Nov_2011_15_56_20_+0100_/p7QC.SysGJ8V=wF
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Some contacts in Tracker can have no name fields set nor nickname. This
+patch enhances the way the contact name is obtained:
 
-Hi,
+1) If there is no nco:nickname set for contact, use nco:imNickname from
+its related IM data.
+2) As the N field is mandatory in both vCard 2.1 and 3.0 and it's the
+most useful field for PBAP clients, if its components are not present
+in Tracker, use nco:fullname (thus promote FN to N) or if nco:fullname
+is also not present, then use previously obtained nickname for N field.
+---
 
-building the master branch (a267bc2) on Debian systems fails when=20
-linking the unit tests to the "check" library with this error:
+v2: changed 0 to '\0' in char type comparisons
 
-  CCLD   unit/test-eir
-/usr/bin/ld: /usr/lib/gcc/x86_64-linux-gnu/4.6/../../../../lib/libcheck.a
-(check.o): relocation R_X86_64_32 against `.rodata.str1.1' can not be
-used when making a shared object; recompile with
--fPIC /usr/lib/gcc/x86_64-linux-gnu/4.6/../../../../lib/libcheck.a:
-could not read symbols: Bad value collect2: ld returned 1 exit status
-make[1]: *** [unit/test-eir] Error 1 make: *** [all] Error 2
+ plugins/phonebook-tracker.c |   91 ++++++++++++++++++++++++++++++++++++++-----
+ 1 files changed, 81 insertions(+), 10 deletions(-)
 
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index a8b97c2..45ffaf0 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -113,7 +113,18 @@
+ "?_role nco:hasPostalAddress ?aff_addr"					\
+ "}) "									\
+ "nco:birthDate(?_contact) "						\
+-"nco:nickname(?_contact) "						\
++"(SELECT "								\
++"	?nick "								\
++"	WHERE { "							\
++"		{ "							\
++"			?_contact nco:nickname ?nick "			\
++"		} UNION { "						\
++"			?_contact nco:hasAffiliation ?role . "		\
++"			?role nco:hasIMAddress ?im . "			\
++"			?im nco:imNickname ?nick "			\
++"		} "							\
++"	} "								\
++") "									\
+ "(SELECT GROUP_CONCAT(fn:concat( "					\
+ 	"?url_val, \"\31\", tracker:coalesce(rdfs:label(?_role), \"\") "\
+ 	"), \"\30\") "							\
+@@ -146,6 +157,18 @@
+ 	"SELECT ?c nco:nameFamily(?c) "					\
+ 	"nco:nameGiven(?c) nco:nameAdditional(?c) "			\
+ 	"nco:nameHonorificPrefix(?c) nco:nameHonorificSuffix(?c) "	\
++	"(SELECT "							\
++		"?nick "						\
++		"WHERE { "						\
++			"{ "						\
++				"?c nco:nickname ?nick "		\
++			"} UNION { "					\
++				"?c nco:hasAffiliation ?role . "	\
++				"?role nco:hasIMAddress ?im . "		\
++				"?im nco:imNickname ?nick "		\
++			"} "						\
++		"} "							\
++	") "								\
+ 	"nco:phoneNumber(?h) "						\
+ 	"WHERE { "							\
+ 		"?c a nco:PersonContact . "				\
+@@ -185,6 +208,18 @@ CONSTRAINT								\
+ 	"nco:nameGiven(?_contact) nco:nameAdditional(?_contact) "	\
+ 	"nco:nameHonorificPrefix(?_contact) "				\
+ 	"nco:nameHonorificSuffix(?_contact) "				\
++	"(SELECT "							\
++		"?nick "						\
++		"WHERE { "						\
++			"{ "						\
++				"?_contact nco:nickname ?nick "		\
++			"} UNION { "					\
++				"?_contact nco:hasAffiliation ?role . "	\
++				"?role nco:hasIMAddress ?im . "		\
++				"?im nco:imNickname ?nick "		\
++			"} "						\
++		"} "							\
++	") "								\
+ 	"nco:phoneNumber(?_cpn) "					\
+ CALLS_CONSTRAINTS(CONSTRAINT)						\
+ "ORDER BY DESC(nmo:sentDate(?_call)) "
+@@ -223,7 +258,18 @@ CALLS_CONSTRAINTS(CONSTRAINT)						\
+ 	"?c_role nco:hasPostalAddress ?aff_addr"			\
+ 	"}) "								\
+ 	"nco:birthDate(?_contact) "					\
+-	"nco:nickname(?_contact) "					\
++"(SELECT "								\
++	"?nick "							\
++	"WHERE { "							\
++	"	{ "							\
++	"	?_contact nco:nickname ?nick "				\
++	"		} UNION { "					\
++	"			?_contact nco:hasAffiliation ?role . "	\
++	"			?role nco:hasIMAddress ?im . "		\
++	"			?im nco:imNickname ?nick "		\
++	"		} "						\
++	"	} "							\
++	") "								\
+ "(SELECT GROUP_CONCAT(fn:concat(?url_value, \"\31\", "			\
+ 	"tracker:coalesce(rdfs:label(?c_role), \"\")), \"\30\") "	\
+ 	"WHERE {"							\
+@@ -316,7 +362,19 @@ COMBINED_CONSTRAINT		\
+ "?_role nco:hasPostalAddress ?aff_addr"					\
+ "}) "									\
+ "nco:birthDate(<%s>) "							\
+-"nco:nickname(<%s>) "							\
++"(SELECT "								\
++"	?nick "								\
++"	WHERE { "							\
++"		{ "							\
++"			?_contact nco:nickname ?nick "			\
++"		} UNION { "						\
++"			?_contact nco:hasAffiliation ?role . "		\
++"			?role nco:hasIMAddress ?im . "			\
++"			?im nco:imNickname ?nick "			\
++"		} "							\
++"		FILTER (?_contact = <%s>)"				\
++"	} "								\
++") "									\
+ "(SELECT GROUP_CONCAT(fn:concat( "					\
+ 	"?url_val, \"\31\", tracker:coalesce(rdfs:label(?_role), \"\") "\
+ 	"), \"\30\") "							\
+@@ -972,12 +1030,23 @@ static void add_affiliation(char **field, const char *value)
+ static void contact_init(struct phonebook_contact *contact,
+ 							const char **reply)
+ {
++	if (reply[COL_FAMILY_NAME][0] == '\0' &&
++			reply[COL_GIVEN_NAME][0] == '\0' &&
++			reply[COL_ADDITIONAL_NAME][0] == '\0' &&
++			reply[COL_NAME_PREFIX][0] == '\0' &&
++			reply[COL_NAME_SUFFIX][0] == '\0') {
++		if (reply[COL_FULL_NAME][0] != '\0')
++			contact->family = g_strdup(reply[COL_FULL_NAME]);
++		else
++			contact->family = g_strdup(reply[COL_NICKNAME]);
++	} else {
++		contact->family = g_strdup(reply[COL_FAMILY_NAME]);
++		contact->given = g_strdup(reply[COL_GIVEN_NAME]);
++		contact->additional = g_strdup(reply[COL_ADDITIONAL_NAME]);
++		contact->prefix = g_strdup(reply[COL_NAME_PREFIX]);
++		contact->suffix = g_strdup(reply[COL_NAME_SUFFIX]);
++	}
+ 	contact->fullname = g_strdup(reply[COL_FULL_NAME]);
+-	contact->family = g_strdup(reply[COL_FAMILY_NAME]);
+-	contact->given = g_strdup(reply[COL_GIVEN_NAME]);
+-	contact->additional = g_strdup(reply[COL_ADDITIONAL_NAME]);
+-	contact->prefix = g_strdup(reply[COL_NAME_PREFIX]);
+-	contact->suffix = g_strdup(reply[COL_NAME_SUFFIX]);
+ 	contact->birthday = g_strdup(reply[COL_BIRTH_DATE]);
+ 	contact->nickname = g_strdup(reply[COL_NICKNAME]);
+ 	contact->photo = g_strdup(reply[COL_PHOTO]);
+@@ -1332,7 +1401,9 @@ static int add_to_cache(const char **reply, int num_fields, void *user_data)
+ 			!g_str_equal(reply[0], TRACKER_DEFAULT_CONTACT_ME))
+ 		return 0;
+ 
+-	if (i == 6)
++	if (i == 7)
++		formatted = g_strdup(reply[7]);
++	else if (i == 6)
+ 		formatted = g_strdup(reply[6]);
+ 	else
+ 		formatted = g_strdup_printf("%s;%s;%s;%s;%s",
+@@ -1640,7 +1711,7 @@ void *phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
+ 	data->ready_cb = ready_cb;
+ 	data->user_data = user_data;
+ 
+-	ret = query_tracker(query, 7, add_to_cache, data);
++	ret = query_tracker(query, 8, add_to_cache, data);
+ 	if (err)
+ 		*err = ret;
+ 
+-- 
+1.7.4.1
 
-AFAIU this is a Debian quirk, the facts of the issue are more or less
-these (please correct me if I am wrong):
-  - libcheck.a, as per upstream default, is generally built with -fPIC
-  - Debian policy tells that by default .a are not expected to be
-    built with -fPIC, so they provide libcheck_pic.a as alternative
-    instead.
-  - BlueZ build system tries to dynamically link the unit tests to
-    libcheck.a, but on Debian systems this is a non-PIC library and on
-    X86_64 linking to non PIC as shared library is not allowed.
-
-After a little bit of research I found out that gstreamer people also
-had run into that issue and they have a m4 macro to pickup
-libcheck_pic.a if present:
-
-  http://cgit.freedesktop.org/gstreamer/common/tree/m4/check.m4
-
-I have no idea if you BlueZ dev too want to handle this in-tree or
-leave the burden to distributors.
-
-The workaround I use for now is:
-  - run "make" and let the build system fail
-  - show the  failing command with "make V=3D1"
-  - change -lcheck to -lcheck_pic and rerun the command
-  - "make" will now proceed with the build
-
-Regards,
-   Antonio=20
-
---=20
-Antonio Ospite
-http://ao2.it
-
-PGP public key ID: 0x4553B001
-
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
-
---Signature=_Mon__14_Nov_2011_15_56_20_+0100_/p7QC.SysGJ8V=wF
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iEYEARECAAYFAk7BLBQACgkQ5xr2akVTsAFZNwCffa+puzpqlwMjiwFykvGx7sS6
-4CcAn0bMZbi1DPAXdILf+sOMNopHzCs/
-=Fm5B
------END PGP SIGNATURE-----
-
---Signature=_Mon__14_Nov_2011_15_56_20_+0100_/p7QC.SysGJ8V=wF--
