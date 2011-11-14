@@ -1,28 +1,22 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Nov 2011 12:53:24 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Syam Sidhardhan <s.syam@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/2] Fix empty parameter list in function
- declaration
-Message-ID: <20111114105324.GA10396@fusion.localdomain>
-References: <1320818380-17217-1-git-send-email-s.syam@samsung.com>
+Message-ID: <BAY150-W57EAA4967C9EF278A738E1A6C00@phx.gbl>
+From: Yeshodhan N <yeshn@hotmail.com>
+To: <linux-bluetooth@vger.kernel.org>
+Subject: upgrade Gingerbread kernel 2.6.35  to 2.6.37 or above
+Date: Mon, 14 Nov 2011 16:11:38 +0530
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320818380-17217-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
 
-On Wed, Nov 09, 2011, Syam Sidhardhan wrote:
-> ---
->  plugins/messages-tracker.c |    2 +-
->  src/log.c                  |    2 +-
->  src/manager.c              |    2 +-
->  src/transport.c            |    2 +-
->  4 files changed, 4 insertions(+), 4 deletions(-)
-
-Both patches have been applied. Thanks.
-
-Johan
+Hi,
+ 
+Any information on the below will be appreciated.
+ 
+1. How do I upgrade Gingerbread kernel 2.6.35  to 2.6.37 or above ? This is to integrate Bluez HDP support . HDP support is there only in 2.6.37 onwards.
+ 
+2. Is it possible to upgrade Froyo kernel 2.6.32  to 2.6.37 for HDP support. What changes are required for the same.
+ 
+Regards,
+Yesh 		 	   		  
