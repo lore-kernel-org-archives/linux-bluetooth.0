@@ -1,20 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Health Thermometer Profile (HTP)
-Date: Mon, 14 Nov 2011 13:11:14 +0100
-Message-Id: <1321272680-16286-1-git-send-email-sancane@gmail.com>
+Date: Mon, 14 Nov 2011 14:10:09 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] Fix enable fast connectable when connection allowed
+Message-ID: <20111114121009.GA13724@fusion.localdomain>
+References: <1321002710-19712-1-git-send-email-dmitriy.paliy@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1321002710-19712-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a new set of patches to enhance thermometer plugin fuctionality.
-These patches enable watchers to receiave final/intermediate measurements
-from thermometers devices. They also includes latest changes suggested
-in the list.
+Hi Dmitriy,
 
-[PATCH 1/6] Manage GATT attribute indications in handle callback.
-[PATCH 2/6] Parse final measurement indication
-[PATCH 3/6] Add org.bluez.ThermometerWatcher interface to default
-[PATCH 4/6] Implement EnableIntermediateMeasurement D-Bus method
-[PATCH 5/6] Implement DisableIntermediateMeasurement D-Bus method
-[PATCH 6/6] Notify intermediate measurements
+On Fri, Nov 11, 2011, Dmitriy Paliy wrote:
+> ---
+>  audio/manager.c |   13 ++++++++++---
+>  1 files changed, 10 insertions(+), 3 deletions(-)
+
+Applied after a couple of minor coding style fixes. Thanks.
+
+Johan
