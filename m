@@ -1,75 +1,167 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Yao, Costa" <cqyao@qca.qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "padovan@profusion.mobi" <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] Bluetooth: btusb: Use USB_INTERFACE_INFO to do device
- matching
-Date: Mon, 14 Nov 2011 10:20:40 +0000
-Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF05ED@nasanexd02b.na.qualcomm.com>
-References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEEEF58@nasanexd02b.na.qualcomm.com>
- <1321263144.15441.465.camel@aeonflux>
-In-Reply-To: <1321263144.15441.465.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
+Date: Mon, 14 Nov 2011 12:08:08 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 6/6] Bluetooth: Support LE-Only discovery procedure
+Message-ID: <20111114100806.GC13665@aemeltch-MOBL1>
+References: <1321051824-5216-1-git-send-email-andre.guedes@openbossa.org>
+ <1321051824-5216-7-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1321051824-5216-7-git-send-email-andre.guedes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hcmNl
-bCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddDQo+IFNlbnQ6IDIwMTHlubQx
-MeaciDE05pelIDE3OjMyDQo+IFRvOiBZYW8sIENvc3RhDQo+IENjOiBwYWRvdmFuQHByb2Z1c2lv
-bi5tb2JpOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBb
-UEFUQ0hdIEJsdWV0b290aDogYnR1c2I6IFVzZSBVU0JfSU5URVJGQUNFX0lORk8gdG8gZG8gZGV2
-aWNlDQo+IG1hdGNoaW5nDQo+IA0KPiBIaSBDb3N0YSwNCj4gDQo+ID4gMSBVc2UgVVNCX0lOVEVS
-RkFDRV9JTkZPIHRvIGRvIGRldmljZSBtYXRjaGluZywgb3RoZXIgdGhhbg0KPiBVU0JfREVWSUNF
-X0lORk8uDQo+ID4gMiBBbmQgd2UgdHJ5IHRvIGZpbmQgdGhlIGZpcnN0IGludGVyZmFjZSBjb250
-YWluaW5nIHRoZSBpbnRlcnJ1cHQgZW5kcG9pbnQuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBD
-b3N0YSBZYW8gPGNxeWFvQHFjYS5xdWFsY29tbS5jb20+DQo+ID4gLS0tDQo+ID4gIGRyaXZlcnMv
-Ymx1ZXRvb3RoL2J0dXNiLmMgfCAgIDE2ICsrKysrKysrKysrLS0tLS0NCj4gPiAgMSBmaWxlcyBj
-aGFuZ2VkLCAxMSBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAt
-LWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgYi9kcml2ZXJzL2JsdWV0b290aC9idHVz
-Yi5jDQo+ID4gaW5kZXggOWRiMjQ3Ni4uODBkN2UyZCAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJz
-L2JsdWV0b290aC9idHVzYi5jDQo+ID4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0K
-PiA+IEBAIC01OCw3ICs1OCw3IEBAIHN0YXRpYyBzdHJ1Y3QgdXNiX2RyaXZlciBidHVzYl9kcml2
-ZXI7DQo+ID4NCj4gPiAgc3RhdGljIHN0cnVjdCB1c2JfZGV2aWNlX2lkIGJ0dXNiX3RhYmxlW10g
-PSB7DQo+ID4gIAkvKiBHZW5lcmljIEJsdWV0b290aCBVU0IgZGV2aWNlICovDQo+ID4gLQl7IFVT
-Ql9ERVZJQ0VfSU5GTygweGUwLCAweDAxLCAweDAxKSB9LA0KPiA+ICsJeyBVU0JfSU5URVJGQUNF
-X0lORk8oMHhlMCwgMHgwMSwgMHgwMSkgfSwNCj4gPg0KPiA+ICAJLyogQnJvYWRjb20gU29mdFNh
-aWxpbmcgcmVwb3J0aW5nIHZlbmRvciBzcGVjaWZpYyAqLw0KPiA+ICAJeyBVU0JfREVWSUNFKDB4
-MDVhYywgMHgyMWUxKSB9LA0KPiANCj4gdGhpcyBhY3R1YWxseSBtZWFucyB0aGF0IHNvbWUgb2Yg
-dGhlIFVTQl9ERVZJQ0UgZW50cmllcyBjYW4gYmUgcmVtb3ZlZC4NCj4gUGxlYXNlIGdvIHRocm91
-Z2ggb3VyIGNvbW1pdCBsb2dzIGZvciBidHVzYi5jIGFuZCBmaWd1cmUgb3V0IHdoaWNoIG9uZXMg
-Y2FuIGJlDQo+IHJlbW92ZWQgYW5kIHNlbmQgYSBzZXBhcmF0ZSBwYXRjaCBmb3IgdGhhdC4NCk9r
-LiBJIHdpbGwgc2VuZCBhIHNlcGFyYXRlIHBhdGNoIGZvciByZW1vdmluZyBzb21lIFVTQl9ERVZJ
-Q0UgZW50cmllcy4gDQpJdCBtYWtlcyBzZW5zZSB0byBkbyByZW1vdmUgbGF0ZXIuIFNvIEkgd2ls
-bCBjb250aW51ZSB0byBtb2RpZnkgdGhpcyBwYXRjaCBmb3IgeW91ciByZXZpZXcgZmlyc3RseS4g
-DQoNCj4gDQo+ID4gQEAgLTkxNSw5ICs5MTUsMTQgQEAgc3RhdGljIGludCBidHVzYl9wcm9iZShz
-dHJ1Y3QgdXNiX2ludGVyZmFjZQ0KPiA+ICppbnRmLA0KPiA+DQo+ID4gIAlCVF9EQkcoImludGYg
-JXAgaWQgJXAiLCBpbnRmLCBpZCk7DQo+ID4NCj4gPiAtCS8qIGludGVyZmFjZSBudW1iZXJzIGFy
-ZSBoYXJkY29kZWQgaW4gdGhlIHNwZWMgKi8NCj4gPiAtCWlmIChpbnRmLT5jdXJfYWx0c2V0dGlu
-Zy0+ZGVzYy5iSW50ZXJmYWNlTnVtYmVyICE9IDApDQo+ID4gKwlmb3IgKGkgPSAwOyBpIDwgaW50
-Zi0+Y3VyX2FsdHNldHRpbmctPmRlc2MuYk51bUVuZHBvaW50czsgaSsrKSB7DQo+ID4gKwkJZXBf
-ZGVzYyA9ICZpbnRmLT5jdXJfYWx0c2V0dGluZy0+ZW5kcG9pbnRbaV0uZGVzYzsNCj4gPiArDQo+
-ID4gKwkJaWYgKHVzYl9lbmRwb2ludF9pc19pbnRfaW4oZXBfZGVzYykpDQo+ID4gKwkJCWJyZWFr
-Ow0KPiA+ICsNCj4gPiAgCQlyZXR1cm4gLUVOT0RFVjsNCj4gPiArCX0NCj4gDQo+IFRoZXJlIGlz
-IG5vIHBvaW50IGluIHdhbGtpbmcgdGhlIGVuZHBvaW50IGxpc3QgdHdpY2UgaW4gdGhlIHByb2Jl
-IGZ1bmN0aW9uLiBTdG9yZQ0KPiBwb3NzaWJsZSBjYW5kaWRhdGVzIGZvciBpbnRfaW4sIGJ1bGtf
-b3V0IGFuZCBidWxrX2luIGRlc2NyaXB0b3JzIHNvIHRoYXQgbGF0ZXIgb24NCj4gd2UgY2FuIGp1
-c3QgYXNzaWduIHRoZW0gdG8gb3VyIGRhdGEuDQo+IA0KPiBUaGVuIHdlIGNhbiBqdXN0IGNoZWNr
-IGlmIHRoaXMgaW50ZXJmYWNlIGhhcyBpbnQgYW5kIHByb3BlciBidWxrIGVuZHBvaW50cw0KPiBh
-dmFpbGFibGUuIEFuZCBpbiBlcnJvciBjYXNlIHJldHVybiBFTk9ERVYuDQo+IA0KPiBBY3R1YWxs
-eSB0aGlua2luZyBhYm91dCBpdCwgd2UgYWxyZWFkeSBkbyB0aGF0LCBzbyBqdXN0IHJlbW92aW5n
-IHRoZSBoYXJkY29kZWQNCj4gY2hlY2sgZm9yIGRlc2MuYkludGVyZmFjZU51bWJlciAhPSAwIHNo
-b3VsZCBkbyB0aGUgdHJpY2suDQo+IA0KPiA+ICAJaWYgKCFpZC0+ZHJpdmVyX2luZm8pIHsNCj4g
-PiAgCQljb25zdCBzdHJ1Y3QgdXNiX2RldmljZV9pZCAqbWF0Y2g7DQo+ID4gQEAgLTEwMTQsOCAr
-MTAxOSw5IEBAIHN0YXRpYyBpbnQgYnR1c2JfcHJvYmUoc3RydWN0IHVzYl9pbnRlcmZhY2UNCj4g
-PiAqaW50ZiwNCj4gPg0KPiA+ICAJaGRldi0+b3duZXIgPSBUSElTX01PRFVMRTsNCj4gPg0KPiA+
-IC0JLyogSW50ZXJmYWNlIG51bWJlcnMgYXJlIGhhcmRjb2RlZCBpbiB0aGUgc3BlY2lmaWNhdGlv
-biAqLw0KPiA+IC0JZGF0YS0+aXNvYyA9IHVzYl9pZm51bV90b19pZihkYXRhLT51ZGV2LCAxKTsN
-Cj4gPiArDQo+ID4gKwlkYXRhLT5pc29jID0gdXNiX2lmbnVtX3RvX2lmKGRhdGEtPnVkZXYsDQo+
-ID4gKwkJMStpbnRmLT5jdXJfYWx0c2V0dGluZy0+ZGVzYy5iSW50ZXJmYWNlTnVtYmVyKTsNCj4g
-DQo+IEFuZCBoZXJlIHlvdSBuZWVkIHRvIHRvIGNoZWNrIGFsbCBpbnRlcmZhY2VzLiBKdXN0IGFz
-c3VtaW5nIGl0IGlzICsxIG1pZ2h0IG5vdCBiZQ0KPiBnb29kIGVub3VnaC4gT3IgYXQgbGVhc3Qg
-cHV0IGEgcHJvcGVyIGNvbW1lbnQgaW4gaGVyZSB0aGF0IHdlIGV4cGVjdCB0aGUNCj4gSVNPQyBp
-bnRlcmZhY2UgdG8gYmUgKzEuIEFuZCB0aGVuIGRvbid0IGRvIDErLCBJIHByZWZlciB0byBoYXZl
-DQo+IGJJbnRlcmZhY2VOdW1iZXIgKyAxLg0KPiANCj4gUmVnYXJkcw0KPiANCj4gTWFyY2VsDQo+
-IA0KDQo=
+Hi Andre,
+
+On Fri, Nov 11, 2011 at 07:50:24PM -0300, Andre Guedes wrote:
+> This patch adds support for LE-Only discovery procedure through
+> management interface.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  include/net/bluetooth/hci.h      |    1 +
+>  include/net/bluetooth/hci_core.h |    1 +
+>  net/bluetooth/hci_event.c        |   25 ++++++++++++++++++++++---
+>  net/bluetooth/mgmt.c             |   25 +++++++++++++++++++++++--
+>  4 files changed, 47 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index bd3cecd..ca09998 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -210,6 +210,7 @@ enum {
+>  
+>  #define LMP_EV4		0x01
+>  #define LMP_EV5		0x02
+> +#define LMP_NO_BREDR	0x20
+>  #define LMP_LE		0x40
+>  
+>  #define LMP_SNIFF_SUBR	0x02
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 9da5b69..55b78ec 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -678,6 +678,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+>  #define lmp_ssp_capable(dev)       ((dev)->features[6] & LMP_SIMPLE_PAIR)
+>  #define lmp_no_flush_capable(dev)  ((dev)->features[6] & LMP_NO_FLUSH)
+>  #define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
+> +#define lmp_bredr_capable(dev)     (!((dev)->features[4] & LMP_NO_BREDR))
+>  
+>  /* ----- Extended LMP capabilities ----- */
+>  #define lmp_host_le_capable(dev)   ((dev)->extfeatures[0] & LMP_HOST_LE)
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index dcbbffe..037c7c0 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -954,24 +954,43 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+>  
+>  	BT_DBG("%s status 0x%x", hdev->name, status);
+>  
+> -	if (status)
+> -		return;
+> -
+>  	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_SCAN_ENABLE);
+>  	if (!cp)
+>  		return;
+>  
+>  	if (cp->enable == 0x01) {
+
+Can we fix also magic number here and below?
+
+Best regards 
+Andrei Emeltchenko 
+
+> +		if (status) {
+> +			hci_dev_lock(hdev);
+> +			mgmt_start_discovery_failed(hdev, status);
+> +			hci_dev_unlock(hdev);
+> +			return;
+> +		}
+> +
+>  		set_bit(HCI_LE_SCAN, &hdev->hci_flags);
+>  
+>  		del_timer(&hdev->adv_timer);
+>  
+>  		hci_dev_lock(hdev);
+> +
+> +		mgmt_discovering(hdev, 1);
+> +
+>  		hci_adv_entries_clear(hdev);
+> +
+>  		hci_dev_unlock(hdev);
+>  	} else if (cp->enable == 0x00) {
+> +		if (status) {
+> +			hci_dev_lock(hdev);
+> +			mgmt_stop_discovery_failed(hdev, status);
+> +			hci_dev_unlock(hdev);
+> +			return;
+> +		}
+> +
+>  		clear_bit(HCI_LE_SCAN, &hdev->hci_flags);
+>  
+> +		hci_dev_lock(hdev);
+> +		mgmt_discovering(hdev, 0);
+> +		hci_dev_unlock(hdev);
+> +
+>  		mod_timer(&hdev->adv_timer, jiffies + ADV_CLEAR_TIMEOUT);
+>  	}
+>  }
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index b63a7d0..6ca6e5d 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -32,7 +32,16 @@
+>  #define MGMT_VERSION	0
+>  #define MGMT_REVISION	1
+>  
+> -#define INQUIRY_LEN_BREDR 0x08 /* TGAP(100) */
+> +/*
+> + * These LE scan and inquiry parameters were chosen according to LE General
+> + * Discovery Procedure specification.
+> + */
+> +#define LE_SCAN_TYPE 0x01
+> +#define LE_SCAN_WIN 0x12
+> +#define LE_SCAN_INT 0x12
+> +#define LE_SCAN_TIMEOUT_LE_ONLY 10240		/* TGAP(gen_disc_scan_min) */
+> +
+> +#define INQUIRY_LEN_BREDR 0x08			/* TGAP(100) */
+>  
+>  struct pending_cmd {
+>  	struct list_head list;
+> @@ -1669,7 +1678,16 @@ static int start_discovery(struct sock *sk, u16 index)
+>  		goto failed;
+>  	}
+>  
+> -	err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
+> +	if (lmp_host_le_capable(hdev)) {
+> +		if (lmp_bredr_capable(hdev))
+> +			err = -ENOSYS;
+> +		else
+> +			err = hci_do_le_scan(hdev, LE_SCAN_TYPE, LE_SCAN_INT,
+> +					LE_SCAN_WIN, LE_SCAN_TIMEOUT_LE_ONLY);
+> +	} else {
+> +		err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
+> +	}
+> +
+>  	if (err < 0)
+>  		mgmt_pending_remove(cmd);
+>  
+> @@ -1701,6 +1719,9 @@ static int stop_discovery(struct sock *sk, u16 index)
+>  	}
+>  
+>  	err = hci_cancel_inquiry(hdev);
+> +	if (err == -EPERM)
+> +		err = hci_cancel_le_scan(hdev);
+> +
+>  	if (err < 0)
+>  		mgmt_pending_remove(cmd);
+>  
+> -- 
+> 1.7.7.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
