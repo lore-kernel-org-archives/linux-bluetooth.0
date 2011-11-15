@@ -1,11 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] rctest: fix not setting priority of accepted socket
-Date: Tue, 15 Nov 2011 13:06:24 +0200
-Message-Id: <1321355184-24628-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1321355184-24628-1-git-send-email-luiz.dentz@gmail.com>
-References: <1321355184-24628-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] l2test: fix not setting priority of accepted socket
+Date: Tue, 15 Nov 2011 13:06:23 +0200
+Message-Id: <1321355184-24628-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -14,29 +12,29 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 SO_PRIORITY is not inherited upon accept so it has to be set manually in
 the new socket.
 ---
- test/rctest.c |   15 ++++++++-------
+ test/l2test.c |   15 ++++++++-------
  1 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/test/rctest.c b/test/rctest.c
-index b8acfb7..4d7c90a 100644
---- a/test/rctest.c
-+++ b/test/rctest.c
-@@ -312,13 +312,6 @@ static void do_listen(void (*handler)(int sk))
- 		goto error;
+diff --git a/test/l2test.c b/test/l2test.c
+index 438d21c..5034775 100644
+--- a/test/l2test.c
++++ b/test/l2test.c
+@@ -469,13 +469,6 @@ static void do_listen(void (*handler)(int sk))
  	}
+ 
  
 -	if (priority > 0 && setsockopt(sk, SOL_SOCKET, SO_PRIORITY, &priority,
 -						sizeof(priority)) < 0) {
 -		syslog(LOG_ERR, "Can't set socket priority: %s (%d)",
--						strerror(errno), errno);
+-							strerror(errno), errno);
 -		goto error;
 -	}
 -
  	/* Listen for connections */
  	if (listen(sk, 10)) {
- 		syslog(LOG_ERR,"Can not listen on the socket: %s (%d)",
-@@ -369,6 +362,14 @@ static void do_listen(void (*handler)(int sk))
- 			//goto error;
+ 		syslog(LOG_ERR, "Can not listen on the socket: %s (%d)",
+@@ -542,6 +535,14 @@ static void do_listen(void (*handler)(int sk))
+ 			}
  		}
  
 +		if (priority > 0 && setsockopt(sk, SOL_SOCKET, SO_PRIORITY,
