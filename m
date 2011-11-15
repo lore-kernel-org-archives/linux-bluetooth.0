@@ -1,40 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Nov 2011 16:22:20 +0200
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 1/3] Bluetooth: Allow to set AMP type for virtual HCI
-Message-ID: <20111115142218.GB27081@aemeltch-MOBL1>
-References: <1321267370-15727-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1321267370-15727-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20111115120918.GA27081@aemeltch-MOBL1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111115120918.GA27081@aemeltch-MOBL1>
+Subject: [PATCHv4 0/5] Trivial fixes for emulating AMP HCI
+Date: Tue, 15 Nov 2011 16:15:42 +0200
+Message-Id: <1321366547-29462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, Nov 15, 2011 at 02:09:26PM +0200, Emeltchenko Andrei wrote:
-> > @@ -239,6 +241,9 @@ static int vhci_open(struct inode *inode, struct file *file)
-> >  	hdev->bus = HCI_VIRTUAL;
-> >  	hdev->driver_data = data;
-> >  
-> > +	if (amp)
-> > +		hdev->dev_type = HCI_AMP;
-> > +
-> 
-> I am thinking about changing lines above to:
-> 
-> -       if (amp)
-> +       if (amp) {
->                 hdev->dev_type = HCI_AMP;
-> +               hdev->amp_type = AMP_CTRL_BLUETOOTH_ONLY;
+Changes:
+	v4: Added 2 more patches making sure that BREDR is the 1st device in hci_dev_list;
+	added AMP definitions form Bluez patch sent by Peter Krystad <pkrystad@codeaurora.org>.
+	For VHCI set also amp_status.
+	v3: Changed parameter description
+        v2: Taken Marcel's comments about parameter name & permissions.
 
-actually it is amp_status, I have resent patches and removed ack from this
-specific patch.
+Those trivial patches help to emulate AMP HCI controller
+currently used for A2MP protocol verification.
 
-Best regards 
-Andrei Emeltchenko  
+Andrei Emeltchenko (5):
+  Bluetooth: Define AMP controller statuses
+  Bluetooth: Allow to set AMP type for virtual HCI
+  Bluetooth: Move scope of kernel parameter enable_hs
+  Bluetooth: Do not set HCI_RAW when HS enabled
+  Bluetooth: Assure BREDR HCI device first in the list
 
+ drivers/bluetooth/hci_vhci.c  |   10 ++++++++++
+ include/net/bluetooth/hci.h   |   11 +++++++++++
+ include/net/bluetooth/l2cap.h |    1 -
+ net/bluetooth/hci_core.c      |   11 ++++++++---
+ 4 files changed, 29 insertions(+), 4 deletions(-)
+
+-- 
+1.7.4.1
 
