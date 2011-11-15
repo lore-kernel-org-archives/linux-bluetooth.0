@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 4/5] Bluetooth: Do not set HCI_RAW when HS enabled
-Date: Tue, 15 Nov 2011 16:15:46 +0200
-Message-Id: <1321366547-29462-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 5/5] Bluetooth: Assure BREDR HCI device first in the list
+Date: Tue, 15 Nov 2011 16:15:47 +0200
+Message-Id: <1321366547-29462-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1321366547-29462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1321366547-29462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,28 +11,35 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Using different list_add to make sure that BR/EDR HCI device is the
+first device in the hci_dev_list. This is needed for e.g. A2MP Discover
+Command which requires that "entry for Controller ID 0x00 (Primary
+BR/EDR controller) shall always be sent and shall be the first entry
+in the Controller List.
+Also output from hciconfig looks nicer :-)
+
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_core.c |    6 +++++-
+ 1 files changed, 5 insertions(+), 1 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index fb3feeb..cf18f6d 100644
+index cf18f6d..e51e4aa 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -521,8 +521,9 @@ int hci_dev_open(__u16 dev)
- 	if (test_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks))
- 		set_bit(HCI_RAW, &hdev->flags);
+@@ -1452,7 +1452,11 @@ int hci_register_dev(struct hci_dev *hdev)
  
--	/* Treat all non BR/EDR controllers as raw devices for now */
--	if (hdev->dev_type != HCI_BREDR)
-+	/* Treat all non BR/EDR controllers as raw devices if
-+	   enable_hs is not set */
-+	if (hdev->dev_type != HCI_BREDR && !enable_hs)
- 		set_bit(HCI_RAW, &hdev->flags);
+ 	sprintf(hdev->name, "hci%d", id);
+ 	hdev->id = id;
+-	list_add(&hdev->list, head);
++
++	if (hdev->dev_type == HCI_BREDR)
++		list_add(&hdev->list, head);
++	else
++		list_add_tail(&hdev->list, head);
  
- 	if (hdev->open(hdev)) {
+ 	atomic_set(&hdev->refcnt, 1);
+ 	spin_lock_init(&hdev->lock);
 -- 
 1.7.4.1
 
