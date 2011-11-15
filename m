@@ -1,54 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 01/16] Remove unused function obex_aparam_write
-Date: Tue, 15 Nov 2011 15:27:52 +0200
-Message-Id: <1321363687-32490-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH] Bluetooth: Assure BREDR HCI device first in the list
+Date: Tue, 15 Nov 2011 14:58:59 +0200
+Message-Id: <1321361939-24024-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Using different list_add to make sure that BR/EDR HCI device is the
+first device in the hci_dev_list. This is needed for e.g. A2MP Discover
+Command which requires that "entry for Controller ID 0x00 (Primary
+BR/EDR controller) shall always be sent and shall be the first entry
+in the Controller List.
+Also output from hciconfig looks nicer :-)
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- src/obex.c |   11 -----------
- src/obex.h |    2 --
- 2 files changed, 0 insertions(+), 13 deletions(-)
+ net/bluetooth/hci_core.c |    6 +++++-
+ 1 files changed, 5 insertions(+), 1 deletions(-)
 
-diff --git a/src/obex.c b/src/obex.c
-index 0d00f7f..70a0c68 100644
---- a/src/obex.c
-+++ b/src/obex.c
-@@ -1548,17 +1548,6 @@ ssize_t obex_aparam_read(struct obex_session *os,
- 	return -EBADR;
- }
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 02a6f15..bf24218 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1501,7 +1501,11 @@ int hci_register_dev(struct hci_dev *hdev)
  
--int obex_aparam_write(struct obex_session *os,
--		obex_object_t *obj, const uint8_t *data, unsigned int size)
--{
--	obex_headerdata_t hd;
--
--	hd.bs = data;
--
--	return OBEX_ObjectAddHeader(os->obex, obj,
--			OBEX_HDR_APPARAM, hd, size, 0);
--}
--
- int memncmp0(const void *a, size_t na, const void *b, size_t nb)
- {
- 	if (na != nb)
-diff --git a/src/obex.h b/src/obex.h
-index 0f3360b..e3f399a 100644
---- a/src/obex.h
-+++ b/src/obex.h
-@@ -49,8 +49,6 @@ uint8_t obex_get_action_id(struct obex_session *os);
- char *obex_get_id(struct obex_session *os);
- ssize_t obex_aparam_read(struct obex_session *os, obex_object_t *obj,
- 						const uint8_t **buffer);
--int obex_aparam_write(struct obex_session *os, obex_object_t *obj,
--				const uint8_t *buffer, unsigned int size);
+ 	sprintf(hdev->name, "hci%d", id);
+ 	hdev->id = id;
+-	list_add(&hdev->list, head);
++
++	if (hdev->dev_type == HCI_BREDR)
++		list_add(&hdev->list, head);
++	else
++		list_add_tail(&hdev->list, head);
  
- /* Just a thin wrapper around memcmp to deal with NULL values */
- int memncmp0(const void *a, size_t na, const void *b, size_t nb);
+ 	atomic_set(&hdev->refcnt, 1);
+ 	spin_lock_init(&hdev->lock);
 -- 
-1.7.7.1
+1.7.4.1
 
