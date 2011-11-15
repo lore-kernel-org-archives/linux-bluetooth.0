@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 03/16] Introduce obex_get_non_header_data
-Date: Tue, 15 Nov 2011 15:27:54 +0200
-Message-Id: <1321363687-32490-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 02/16] Remove use of obex_object_t on obex.h
+Date: Tue, 15 Nov 2011 15:27:53 +0200
+Message-Id: <1321363687-32490-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1321363687-32490-1-git-send-email-luiz.dentz@gmail.com>
 References: <1321363687-32490-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,123 +11,107 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This function remove the need of calling OBEX_ObjectGetNonHdrData in the
-plugins.
+Plugins including obex.h need to include openobex headers because of
+this.
 ---
- plugins/ftp.c   |    4 ++--
- plugins/mas.c   |    4 ++--
- plugins/pbap.c  |    4 ++--
+ plugins/pbap.c  |    2 +-
  src/obex-priv.h |    2 ++
- src/obex.c      |   10 ++++++++++
- src/obex.h      |    2 ++
- 6 files changed, 20 insertions(+), 6 deletions(-)
+ src/obex.c      |   28 +++++++++++++---------------
+ src/obex.h      |    3 +--
+ 4 files changed, 17 insertions(+), 18 deletions(-)
 
-diff --git a/plugins/ftp.c b/plugins/ftp.c
-index 0586326..7a736ae 100644
---- a/plugins/ftp.c
-+++ b/plugins/ftp.c
-@@ -255,13 +255,13 @@ int ftp_setpath(struct obex_session *os, obex_object_t *obj, void *user_data)
- {
- 	struct ftp_session *ftp = user_data;
- 	const char *root_folder, *name;
--	uint8_t *nonhdr;
-+	const uint8_t *nonhdr;
- 	char *fullname;
- 	struct stat dstat;
- 	gboolean root;
- 	int err;
- 
--	if (OBEX_ObjectGetNonHdrData(obj, &nonhdr) != 2) {
-+	if (obex_get_non_header_data(os, &nonhdr) != 2) {
- 		error("Set path failed: flag and constants not found!");
- 		return -EBADMSG;
- 	}
-diff --git a/plugins/mas.c b/plugins/mas.c
-index 7d3d553..7d47212 100644
---- a/plugins/mas.c
-+++ b/plugins/mas.c
-@@ -410,10 +410,10 @@ static int mas_setpath(struct obex_session *os, obex_object_t *obj,
- 							void *user_data)
- {
- 	const char *name;
--	uint8_t *nonhdr;
-+	const uint8_t *nonhdr;
- 	struct mas_session *mas = user_data;
- 
--	if (OBEX_ObjectGetNonHdrData(obj, &nonhdr) != 2) {
-+	if (obex_get_non_header_data(os, &nonhdr) != 2) {
- 		error("Set path failed: flag and constants not found!");
- 		return -EBADR;
- 	}
 diff --git a/plugins/pbap.c b/plugins/pbap.c
-index fb82766..2e607b3 100644
+index 997b5bd..fb82766 100644
 --- a/plugins/pbap.c
 +++ b/plugins/pbap.c
-@@ -698,11 +698,11 @@ static int pbap_setpath(struct obex_session *os, obex_object_t *obj,
- {
- 	struct pbap_session *pbap = user_data;
- 	const char *name;
--	uint8_t *nonhdr;
-+	const uint8_t *nonhdr;
- 	char *fullname;
- 	int err;
+@@ -642,7 +642,7 @@ static int pbap_get(struct obex_session *os, obex_object_t *obj,
+ 	if (type == NULL)
+ 		return -EBADR;
  
--	if (OBEX_ObjectGetNonHdrData(obj, &nonhdr) != 2) {
-+	if (obex_get_non_header_data(os, &nonhdr) != 2) {
- 		error("Set path failed: flag and constants not found!");
- 		return -EBADMSG;
- 	}
+-	rsize = obex_aparam_read(os, obj, &buffer);
++	rsize = obex_get_apparam(os, &buffer);
+ 	if (rsize < 0) {
+ 		if (g_ascii_strcasecmp(type, VCARDENTRY_TYPE) != 0)
+ 			return -EBADR;
 diff --git a/src/obex-priv.h b/src/obex-priv.h
-index a834511..6a439b4 100644
+index 01b6496..a834511 100644
 --- a/src/obex-priv.h
 +++ b/src/obex-priv.h
-@@ -36,6 +36,8 @@ struct obex_session {
+@@ -34,6 +34,8 @@ struct obex_session {
+ 	char *type;
+ 	char *path;
  	time_t time;
- 	uint8_t *apparam;
- 	size_t apparam_len;
-+	uint8_t *nonhdr;
-+	size_t nonhdr_len;
++	uint8_t *apparam;
++	size_t apparam_len;
  	uint8_t *buf;
  	int64_t pending;
  	int64_t offset;
 diff --git a/src/obex.c b/src/obex.c
-index a1621b9..3a06775 100644
+index 70a0c68..a1621b9 100644
 --- a/src/obex.c
 +++ b/src/obex.c
-@@ -931,6 +931,8 @@ static void cmd_setpath(struct obex_session *os,
- 		break;
+@@ -312,6 +312,11 @@ static void os_reset_session(struct obex_session *os)
+ 		g_free(os->path);
+ 		os->path = NULL;
+ 	}
++	if (os->apparam) {
++		g_free(os->apparam);
++		os->apparam = NULL;
++		os->apparam_len = 0;
++	}
+ 
+ 	os->object = NULL;
+ 	os->obj = NULL;
+@@ -825,6 +830,11 @@ static void cmd_get(struct obex_session *os, obex_t *obex, obex_object_t *obj)
+ 						os->service->who_size);
+ 			break;
+ 		}
++
++		if (hi == OBEX_HDR_APPARAM) {
++			os->apparam = g_memdup(hd.bs, hlen);
++			os->apparam_len = hlen;
++		}
  	}
  
-+	os->nonhdr_len = OBEX_ObjectGetNonHdrData(obj, &os->nonhdr);
-+
- 	err = os->service->setpath(os, obj, os->service_data);
- 	os_set_response(obj, err);
- }
-@@ -1546,6 +1548,14 @@ ssize_t obex_get_apparam(struct obex_session *os, const uint8_t **buffer)
- 	return os->apparam_len;
+ 	if (os->type == NULL)
+@@ -1529,23 +1539,11 @@ char *obex_get_id(struct obex_session *os)
+ 	return g_strdup_printf("%s+%d", address, channel);
  }
  
-+ssize_t obex_get_non_header_data(struct obex_session *os,
-+							const uint8_t **data)
-+{
-+	*data = os->nonhdr;
-+
-+	return os->nonhdr_len;
-+}
-+
- int memncmp0(const void *a, size_t na, const void *b, size_t nb)
+-ssize_t obex_aparam_read(struct obex_session *os,
+-		obex_object_t *obj, const uint8_t **buffer)
++ssize_t obex_get_apparam(struct obex_session *os, const uint8_t **buffer)
  {
- 	if (na != nb)
+-	obex_headerdata_t hd;
+-	uint8_t hi;
+-	uint32_t hlen;
+-
+-	OBEX_ObjectReParseHeaders(os->obex, obj);
+-
+-	while (OBEX_ObjectGetNextHeader(os->obex, obj, &hi, &hd, &hlen)) {
+-		if (hi == OBEX_HDR_APPARAM) {
+-			*buffer = hd.bs;
+-			return hlen;
+-		}
+-	}
++	*buffer = os->apparam;
+ 
+-	return -EBADR;
++	return os->apparam_len;
+ }
+ 
+ int memncmp0(const void *a, size_t na, const void *b, size_t nb)
 diff --git a/src/obex.h b/src/obex.h
-index 6ede0a4..3e8ce00 100644
+index e3f399a..6ede0a4 100644
 --- a/src/obex.h
 +++ b/src/obex.h
-@@ -48,6 +48,8 @@ int obex_move(struct obex_session *os, const char *source,
+@@ -47,8 +47,7 @@ int obex_move(struct obex_session *os, const char *source,
+ 						const char *destination);
  uint8_t obex_get_action_id(struct obex_session *os);
  char *obex_get_id(struct obex_session *os);
- ssize_t obex_get_apparam(struct obex_session *os, const uint8_t **buffer);
-+ssize_t obex_get_non_header_data(struct obex_session *os,
-+							const uint8_t **data);
+-ssize_t obex_aparam_read(struct obex_session *os, obex_object_t *obj,
+-						const uint8_t **buffer);
++ssize_t obex_get_apparam(struct obex_session *os, const uint8_t **buffer);
  
  /* Just a thin wrapper around memcmp to deal with NULL values */
  int memncmp0(const void *a, size_t na, const void *b, size_t nb);
