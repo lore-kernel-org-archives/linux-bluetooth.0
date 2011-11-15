@@ -1,35 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1320440796.15441.299.camel@aeonflux>
-References: <1320415430-2054-1-git-send-email-luiz.dentz@gmail.com>
-	<1320440796.15441.299.camel@aeonflux>
-Date: Tue, 15 Nov 2011 11:53:17 +0200
-Message-ID: <CABBYNZK469cXc3GmBjrY5rVEycGrMb0RzqmoLSU8-R11kjhPFw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Bluetooth: make L2CAP sockets to inherit parent's priority
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [RFC 2/2] manager: add argument name
+Date: Tue, 15 Nov 2011 03:43:53 -0200
+Message-Id: <1321335833-16907-3-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1321335833-16907-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1321335833-16907-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+---
+ src/manager.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-On Fri, Nov 4, 2011 at 11:06 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Luiz,
->
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> This makes priority set on a listen socket to be passed when accepting
->> new connections.
->
-> I am in general fine with this, but is this the expected behavior of
-> SO_PRIORITY from other socket types?
-
-Apparently it is not inherited in other socket types, so I guess we
-should not inherit. In this case I will fix l2test/rctest to use
-setsockopt on accepted sockets, similar to what is done with
-SO_LINGER.
-
+diff --git a/src/manager.c b/src/manager.c
+index 464b0ca..2ea0d51 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -199,7 +199,8 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ static GDBusMethodTable manager_methods[] = {
+ 	{ "GetProperties",	"",	"a{sv}",get_properties	},
+ 	{ "DefaultAdapter",	"",	"o",	default_adapter	},
+-	{ "FindAdapter",	"s",	"o",	find_adapter	},
++	{ "FindAdapter",	"s",	"o",	find_adapter,
++					.arg_names = "pattern" },
+ 	{ "ListAdapters",	"",	"ao",	list_adapters,
+ 						G_DBUS_METHOD_FLAG_DEPRECATED},
+ 	{ }
 -- 
-Luiz Augusto von Dentz
+1.7.7.3
+
