@@ -1,46 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 3/5] Bluetooth: Move scope of kernel parameter enable_hs
-Date: Tue, 15 Nov 2011 16:15:45 +0200
-Message-Id: <1321366547-29462-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1321366547-29462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1321366547-29462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH obexd 15/16] syncevolution: remove unnecessary openobex includes
+Date: Tue, 15 Nov 2011 15:28:06 +0200
+Message-Id: <1321363687-32490-15-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1321363687-32490-1-git-send-email-luiz.dentz@gmail.com>
+References: <1321363687-32490-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h   |    2 ++
- include/net/bluetooth/l2cap.h |    1 -
- 2 files changed, 2 insertions(+), 1 deletions(-)
+ plugins/syncevolution.c |    3 ---
+ 1 files changed, 0 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index e79ed67..8496028 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1340,4 +1340,6 @@ struct hci_inquiry_req {
- };
- #define IREQ_CACHE_FLUSH 0x0001
+diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
+index 0a50a24..41386b3 100644
+--- a/plugins/syncevolution.c
++++ b/plugins/syncevolution.c
+@@ -34,9 +34,6 @@
  
-+extern int enable_hs;
-+
- #endif /* __HCI_H */
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 9280bff..7299df8 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -789,7 +789,6 @@ static inline __u8 __ctrl_size(struct l2cap_chan *chan)
- }
+ #include <bluetooth/bluetooth.h>
  
- extern int disable_ertm;
--extern int enable_hs;
- 
- int l2cap_init_sockets(void);
- void l2cap_cleanup_sockets(void);
+-#include <openobex/obex.h>
+-#include <openobex/obex_const.h>
+-
+ #include "plugin.h"
+ #include "obex.h"
+ #include "service.h"
 -- 
-1.7.4.1
+1.7.7.1
 
