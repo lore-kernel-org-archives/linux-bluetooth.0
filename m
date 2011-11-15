@@ -1,47 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20111115003748.21b23ec1532619ff3363a845@studenti.unina.it>
-References: <20111115003748.21b23ec1532619ff3363a845@studenti.unina.it>
-Date: Tue, 15 Nov 2011 11:59:12 +0200
-Message-ID: <CABBYNZLnhfPxN78D0vFJ_3b+ni7y+44k9zrb4pAJCELU1-ec7Q@mail.gmail.com>
-Subject: Re: Regression with Bluetooth HID devices.
+In-Reply-To: <1320440796.15441.299.camel@aeonflux>
+References: <1320415430-2054-1-git-send-email-luiz.dentz@gmail.com>
+	<1320440796.15441.299.camel@aeonflux>
+Date: Tue, 15 Nov 2011 11:53:17 +0200
+Message-ID: <CABBYNZK469cXc3GmBjrY5rVEycGrMb0RzqmoLSU8-R11kjhPFw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: make L2CAP sockets to inherit parent's priority
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Antonio Ospite <ospite@studenti.unina.it>
-Cc: linux-bluetooth@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Antonio,
+Hi Marcel,
 
-On Tue, Nov 15, 2011 at 1:37 AM, Antonio Ospite
-<ospite@studenti.unina.it> wrote:
-> Hi,
+On Fri, Nov 4, 2011 at 11:06 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
 >
-> with master (a267bc2) I am getting this in dmesg for Sixaxis
-> controllers:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> This makes priority set on a listen socket to be passed when accepting
+>> new connections.
 >
-> input: PLAYSTATION(R)3 Controller as /devices/pci0000:00/0000:00:02.0/...
-> generic-bluetooth 0005:0000:0000.0018: input,hidraw1: BLUETOOTH HID v0.00 ...
-> ^^^^^^^^^^^^^^^^^      ^^^^ ^^^^
->
-> generic driver is used because vendor_id and product_id are 0000!
-> while I would expect this:
->
-> input: PLAYSTATION(R)3 Controller as /devices/pci0000:00/0000:00:02.0/...
-> sony 0005:054C:0268.0017: input,hidraw1: BLUETOOTH HID v0.00 ...
-> ^^^^      ^^^^ ^^^^
->
-> Having vendor_id and product_id set to 0000 was making the device not
-> working, the story is briefly like that:
->  - the hid-sony kernel driver makes the controller operational;
->  - devices are bound to hid drivers using vendor_id and product_id;
->  - with those set to 0000, hid-sony ends up not being used at all.
+> I am in general fine with this, but is this the expected behavior of
+> SO_PRIORITY from other socket types?
 
-That is probably a bug in the code, does the device properties got the
-right values?
-
+Apparently it is not inherited in other socket types, so I guess we
+should not inherit. In this case I will fix l2test/rctest to use
+setsockopt on accepted sockets, similar to what is done with
+SO_LINGER.
 
 -- 
 Luiz Augusto von Dentz
