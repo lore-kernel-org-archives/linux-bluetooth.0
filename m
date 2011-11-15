@@ -1,37 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 0/5] Trivial fixes for emulating AMP HCI
-Date: Tue, 15 Nov 2011 16:15:42 +0200
-Message-Id: <1321366547-29462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 1/5] Bluetooth: Define AMP controller statuses
+Date: Tue, 15 Nov 2011 16:15:43 +0200
+Message-Id: <1321366547-29462-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1321366547-29462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1321366547-29462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Changes:
-	v4: Added 2 more patches making sure that BREDR is the 1st device in hci_dev_list;
-	added AMP definitions form Bluez patch sent by Peter Krystad <pkrystad@codeaurora.org>.
-	For VHCI set also amp_status.
-	v3: Changed parameter description
-        v2: Taken Marcel's comments about parameter name & permissions.
+AMP status codes copied from Bluez patch sent by Peter Krystad
+<pkrystad@codeaurora.org>.
 
-Those trivial patches help to emulate AMP HCI controller
-currently used for A2MP protocol verification.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/hci.h |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
-Andrei Emeltchenko (5):
-  Bluetooth: Define AMP controller statuses
-  Bluetooth: Allow to set AMP type for virtual HCI
-  Bluetooth: Move scope of kernel parameter enable_hs
-  Bluetooth: Do not set HCI_RAW when HS enabled
-  Bluetooth: Assure BREDR HCI device first in the list
-
- drivers/bluetooth/hci_vhci.c  |   10 ++++++++++
- include/net/bluetooth/hci.h   |   11 +++++++++++
- include/net/bluetooth/l2cap.h |    1 -
- net/bluetooth/hci_core.c      |   11 ++++++++---
- 4 files changed, 29 insertions(+), 4 deletions(-)
-
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 139ce2a..e79ed67 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -56,6 +56,15 @@
+ #define HCI_BREDR	0x00
+ #define HCI_AMP		0x01
+ 
++/* AMP controller status */
++#define AMP_CTRL_POWERED_DOWN			0x00
++#define AMP_CTRL_BLUETOOTH_ONLY			0x01
++#define AMP_CTRL_NO_CAPACITY			0x02
++#define AMP_CTRL_LOW_CAPACITY			0x03
++#define AMP_CTRL_MEDIUM_CAPACITY		0x04
++#define AMP_CTRL_HIGH_CAPACITY			0x05
++#define AMP_CTRL_FULL_CAPACITY			0x06
++
+ /* HCI device quirks */
+ enum {
+ 	HCI_QUIRK_NO_RESET,
 -- 
 1.7.4.1
 
