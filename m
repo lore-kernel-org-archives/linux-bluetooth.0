@@ -1,64 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1320243335.15441.279.camel@aeonflux>
-References: <CAKzePapHJwC2VMpjgS_uK=NCUPCEAQt5+zDSEqRJNdPth-Aztw@mail.gmail.com>
-	<1320243335.15441.279.camel@aeonflux>
-Date: Tue, 15 Nov 2011 11:18:39 +0800
-Message-ID: <CAKzePaqfsChbeJBB=R1FyicrpfCu0Lgaytzv6oQoHne1FWFAMg@mail.gmail.com>
-Subject: Re: How to add firmware uploader function to Bluez?
-From: Al Cho <acho@suse.com>
-To: Marcel Holtmann <marcel@holtmann.org>, padovan@profusion.mobi,
+Subject: Re: Building master on Debian systems fails at linking "check".
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Brian Gix <bgix@codeaurora.org>
+Cc: Antonio Ospite <ospite@studenti.unina.it>,
 	linux-bluetooth@vger.kernel.org
-Cc: oneukum@suse.com, jlee@suse.com
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Tue, 15 Nov 2011 11:59:38 +0900
+In-Reply-To: <4EC1D53D.4030500@codeaurora.org>
+References: <20111114155620.4fc2987fad25c9ccd724f68a@studenti.unina.it>
+			 <4EC15A27.90305@codeaurora.org>
+			 <20111114225100.c75e709827f4b22fa83e0327@studenti.unina.it>
+		 <1321323919.15441.475.camel@aeonflux> <4EC1CEEB.2000702@codeaurora.org>
+	 <1321325610.15441.479.camel@aeonflux> <4EC1D53D.4030500@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1321325981.15441.481.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi Brian,
 
-Would anyone could give me help kindly?
-I have sent the firmware uploader source code as a patch to this mailing list,
-named: "How to add firmware uploader function to Bluez? (Broadcom
-firmware uploader)"
-There are Make file and source code "brcm_patchram_plus_usb.c" in this patch.
-If you want to compiler this use "make" and need bluez-devel package
-for bluetooth.h,
-hci.h , and hci_lib.h..
+> >> I believe it is more likely an X86-64 issue.  And support for libcheck
+> >> is checked (and is there), but for some reason fails in this instance.
+> >
+> > So what does "pkg-config --libs check" actually tells you?
+> 
+> 
+> $ pkg-config --libs check
+> -lcheck
 
-I don't have enough knowledge about Bluez tool rules ,please correct
-me if i got any mistake.
+there you have your problem. It should return -lcheck_pic if that is
+required for building with a dynamic library. File a bug with Debian for
+this.
 
-Sincerely,
-              AL
+Regards
 
-
-On Wed, Nov 2, 2011 at 10:15 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Al,
->
->> Broadcom BT4.0 module 0a5c:21e1 and 0a5c:21e3 need firmware
->> to setup(enable) at the first time we use.
->> We got the firmware and firmware uploader (brcm_patchram_plus_usb )
->> ( user space tool ) from Broadcom ,the Licence is GPLv2,
->> would it possible that add those to bluez package?or any idea for this?
->>
->> please correct me if i got any mistake,thanks.
->
-> can you post these firmware loader as a patch to this mailing list? Then
-> we can discuss on how to integrate it best.
->
-> Regards
->
-> Marcel
->
->
->
+Marcel
 
 
-
--- 
-Al Yu-Chen Cho
-Software Engineer
-Room B, 26/F, No. 216 Tun-Hwa S. Road, Sec. 2
-Taipei, 106
-+8862-2376-0010 X20031
-acho@suse.com
-SUSE
