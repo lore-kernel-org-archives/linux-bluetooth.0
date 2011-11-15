@@ -1,65 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Yao, Costa" <cqyao@qca.qualcomm.com>
-To: "marcel@holtmann.org" <marcel@holtmann.org>,
-	"padovan@profusion.mobi" <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Bluetooth: btusb: Use USB_INTERFACE_INFO to do device
- matching
-Date: Tue, 15 Nov 2011 04:53:17 +0000
-Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF2759@nasanexd02b.na.qualcomm.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1320243335.15441.279.camel@aeonflux>
+References: <CAKzePapHJwC2VMpjgS_uK=NCUPCEAQt5+zDSEqRJNdPth-Aztw@mail.gmail.com>
+	<1320243335.15441.279.camel@aeonflux>
+Date: Tue, 15 Nov 2011 11:18:39 +0800
+Message-ID: <CAKzePaqfsChbeJBB=R1FyicrpfCu0Lgaytzv6oQoHne1FWFAMg@mail.gmail.com>
+Subject: Re: How to add firmware uploader function to Bluez?
+From: Al Cho <acho@suse.com>
+To: Marcel Holtmann <marcel@holtmann.org>, padovan@profusion.mobi,
+	linux-bluetooth@vger.kernel.org
+Cc: oneukum@suse.com, jlee@suse.com
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-1 Use USB_INTERFACE_INFO to do device matching, other than USB_DEVICE_INFO.
-2 Delete desc.bInterfaceNumber != 0 check.
+Hi All,
 
-Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
----
- drivers/bluetooth/btusb.c |   16 ++++++++--------
- 1 files changed, 8 insertions(+), 8 deletions(-)
+Would anyone could give me help kindly?
+I have sent the firmware uploader source code as a patch to this mailing list,
+named: "How to add firmware uploader function to Bluez? (Broadcom
+firmware uploader)"
+There are Make file and source code "brcm_patchram_plus_usb.c" in this patch.
+If you want to compiler this use "make" and need bluez-devel package
+for bluetooth.h,
+hci.h , and hci_lib.h..
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2bd87d4..fbac911 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -57,8 +57,8 @@ static struct usb_driver btusb_driver;
- #define BTUSB_ATH3012		0x80
- 
- static struct usb_device_id btusb_table[] = {
--	/* Generic Bluetooth USB device */
--	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
-+	/* Bluetooth USB interface */
-+	{ USB_INTERFACE_INFO(0xe0, 0x01, 0x01) },
- 
- 	/* Broadcom SoftSailing reporting vendor specific */
- 	{ USB_DEVICE(0x05ac, 0x21e1) },
-@@ -918,10 +918,6 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 	BT_DBG("intf %p id %p", intf, id);
- 
--	/* interface numbers are hardcoded in the spec */
--	if (intf->cur_altsetting->desc.bInterfaceNumber != 0)
--		return -ENODEV;
--
- 	if (!id->driver_info) {
- 		const struct usb_device_id *match;
- 		match = usb_match_id(intf, blacklist_table);
-@@ -1017,8 +1013,12 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 	hdev->owner = THIS_MODULE;
- 
--	/* Interface numbers are hardcoded in the specification */
--	data->isoc = usb_ifnum_to_if(data->udev, 1);
-+	/* According to HCI-USB specification, the interface for
-+	 * SCO data endpoint follows the interface for commands,
-+	 * events and ACL data
-+	 */
-+	data->isoc = usb_ifnum_to_if(data->udev,
-+		intf->cur_altsetting->desc.bInterfaceNumber + 1);
- 
- 	if (!reset)
- 		set_bit(HCI_QUIRK_NO_RESET, &hdev->quirks);
+I don't have enough knowledge about Bluez tool rules ,please correct
+me if i got any mistake.
+
+Sincerely,
+              AL
+
+
+On Wed, Nov 2, 2011 at 10:15 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Al,
+>
+>> Broadcom BT4.0 module 0a5c:21e1 and 0a5c:21e3 need firmware
+>> to setup(enable) at the first time we use.
+>> We got the firmware and firmware uploader (brcm_patchram_plus_usb )
+>> ( user space tool ) from Broadcom ,the Licence is GPLv2,
+>> would it possible that add those to bluez package?or any idea for this?
+>>
+>> please correct me if i got any mistake,thanks.
+>
+> can you post these firmware loader as a patch to this mailing list? Then
+> we can discuss on how to integrate it best.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+
+
+
 -- 
-1.7.4.1
+Al Yu-Chen Cho
+Software Engineer
+Room B, 26/F, No. 216 Tun-Hwa S. Road, Sec. 2
+Taipei, 106
++8862-2376-0010 X20031
+acho@suse.com
+SUSE
