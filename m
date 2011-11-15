@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 5/5] Bluetooth: Assure BREDR HCI device first in the list
-Date: Tue, 15 Nov 2011 16:15:47 +0200
-Message-Id: <1321366547-29462-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 2/5] Bluetooth: Allow to set AMP type for virtual HCI
+Date: Tue, 15 Nov 2011 16:15:44 +0200
+Message-Id: <1321366547-29462-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1321366547-29462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1321366547-29462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,35 +11,48 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Using different list_add to make sure that BR/EDR HCI device is the
-first device in the hci_dev_list. This is needed for e.g. A2MP Discover
-Command which requires that "entry for Controller ID 0x00 (Primary
-BR/EDR controller) shall always be sent and shall be the first entry
-in the Controller List.
-Also output from hciconfig looks nicer :-)
+Type can be changed during re-opening device /dev/vhci.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/hci_core.c |    6 +++++-
- 1 files changed, 5 insertions(+), 1 deletions(-)
+ drivers/bluetooth/hci_vhci.c |   10 ++++++++++
+ 1 files changed, 10 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index cf18f6d..e51e4aa 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1452,7 +1452,11 @@ int hci_register_dev(struct hci_dev *hdev)
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index 2e302a1..ac08adc 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -41,6 +41,8 @@
  
- 	sprintf(hdev->name, "hci%d", id);
- 	hdev->id = id;
--	list_add(&hdev->list, head);
+ #define VERSION "1.3"
+ 
++static bool amp;
 +
-+	if (hdev->dev_type == HCI_BREDR)
-+		list_add(&hdev->list, head);
-+	else
-+		list_add_tail(&hdev->list, head);
+ struct vhci_data {
+ 	struct hci_dev *hdev;
  
- 	atomic_set(&hdev->refcnt, 1);
- 	spin_lock_init(&hdev->lock);
+@@ -239,6 +241,11 @@ static int vhci_open(struct inode *inode, struct file *file)
+ 	hdev->bus = HCI_VIRTUAL;
+ 	hdev->driver_data = data;
+ 
++	if (amp) {
++		hdev->dev_type = HCI_AMP;
++		hdev->amp_status = AMP_CTRL_BLUETOOTH_ONLY;
++	}
++
+ 	hdev->open     = vhci_open_dev;
+ 	hdev->close    = vhci_close_dev;
+ 	hdev->flush    = vhci_flush;
+@@ -303,6 +310,9 @@ static void __exit vhci_exit(void)
+ module_init(vhci_init);
+ module_exit(vhci_exit);
+ 
++module_param(amp, bool, 0644);
++MODULE_PARM_DESC(amp, "Create AMP controller device");
++
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth virtual HCI driver ver " VERSION);
+ MODULE_VERSION(VERSION);
 -- 
 1.7.4.1
 
