@@ -1,66 +1,199 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Nov 2011 08:45:47 -0800 (PST)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
-Subject: Re: [PATCH] Bluetooth: Assure BREDR HCI device first in the list
-In-Reply-To: <1321361939-24024-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Message-ID: <alpine.DEB.2.02.1111150822270.7320@mathewm-linux>
-References: <1321361939-24024-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bartosz Szatkowski <bulislaw@linux.com>
+Subject: [PATCH] gobex: Fix setpath to match one from OBEX spec
+Date: Tue, 15 Nov 2011 15:44:54 +0100
+Message-Id: <1321368294-29379-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+OBEX spec states that when bit 0 is set in flags, server should backup a
+level before applying name. It's accomplished by moving parsing of the
+path to upper layers (as gobex is low level lib and I think it should be
+based on level defined in OBEX spec, upper profiles may wrap that as
+defined in correspondent specifications) and exposing *cdup* flag in
+function parameters.
+---
+ client/ftp.c      |    6 +++++-
+ client/pbap.c     |    4 ++--
+ gobex/gobex.c     |   16 ++++++++++------
+ gobex/gobex.h     |    5 +++--
+ unit/test-gobex.c |   46 ++++++++++++++++++++++++++++++++++++++++++++--
+ 5 files changed, 64 insertions(+), 13 deletions(-)
 
-Hi Andrei -
+diff --git a/client/ftp.c b/client/ftp.c
+index 336fc26..d9e31ad 100644
+--- a/client/ftp.c
++++ b/client/ftp.c
+@@ -82,7 +82,11 @@ static DBusMessage *change_folder(DBusConnection *connection,
+ 		return g_dbus_create_error(message,
+ 				"org.openobex.Error.InvalidArguments", NULL);
+ 
+-	g_obex_setpath(obex, folder, async_cb, message, &err);
++	if (g_strcmp0("..", folder) == 0)
++		g_obex_setpath(obex, NULL, TRUE, async_cb, message, &err);
++	else
++		g_obex_setpath(obex, folder, FALSE, async_cb, message, &err);
++
+ 	if (err != NULL) {
+ 		DBusMessage *reply;
+ 		reply =  g_dbus_create_error(message,
+diff --git a/client/pbap.c b/client/pbap.c
+index 9e9eb05..5055ad9 100644
+--- a/client/pbap.c
++++ b/client/pbap.c
+@@ -277,7 +277,7 @@ static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
+ 
+ 	data->index++;
+ 
+-	g_obex_setpath(obex, next, setpath_cb, data, &err);
++	g_obex_setpath(obex, next, FALSE, setpath_cb, data, &err);
+ 	if (err != NULL) {
+ 		setpath_complete(err, data);
+ 		g_error_free(err);
+@@ -292,7 +292,7 @@ static gboolean setpath(GObex *obex, const char *path, size_t max_elem,
+ 
+ 	data = g_new0(struct setpath_data, 1);
+ 
+-	g_obex_setpath(obex, "", setpath_cb, data, &err);
++	g_obex_setpath(obex, NULL, FALSE, setpath_cb, data, &err);
+ 	if (err != NULL) {
+ 		error("set_path: %s", err->message);
+ 		g_error_free(err);
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index 7840304..1085e78 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -1083,11 +1083,13 @@ guint g_obex_connect(GObex *obex, GObexResponseFunc func, gpointer user_data,
+ 	return g_obex_send_req(obex, req, -1, func, user_data, err);
+ }
+ 
+-guint g_obex_setpath(GObex *obex, const char *path, GObexResponseFunc func,
+-					gpointer user_data, GError **err)
++guint g_obex_setpath(GObex *obex, const char *folder, gboolean cdup,
++				GObexResponseFunc func, gpointer user_data,
++				GError **err)
+ {
+ 	GObexPacket *req;
+ 	struct setpath_data data;
++	GObexHeader *hdr;
+ 
+ 	g_obex_debug(G_OBEX_DEBUG_COMMAND, "conn %u", obex->conn_id);
+ 
+@@ -1095,12 +1097,14 @@ guint g_obex_setpath(GObex *obex, const char *path, GObexResponseFunc func,
+ 
+ 	memset(&data, 0, sizeof(data));
+ 
+-	if (strcmp(path, "..") == 0)
++	if (cdup)
+ 		data.flags = 0x03;
+-	else {
+-		GObexHeader *hdr;
++	else
+ 		data.flags = 0x02;
+-		hdr = g_obex_header_new_unicode(G_OBEX_HDR_NAME, path);
++
++	if (!cdup || (folder != NULL && folder[0] != '\0')) {
++		hdr = g_obex_header_new_unicode(G_OBEX_HDR_NAME,
++						folder != NULL ? folder : "");
+ 		g_obex_packet_add_header(req, hdr);
+ 	}
+ 
+diff --git a/gobex/gobex.h b/gobex/gobex.h
+index 1b20333..d9d470d 100644
+--- a/gobex/gobex.h
++++ b/gobex/gobex.h
+@@ -73,8 +73,9 @@ void g_obex_unref(GObex *obex);
+ guint g_obex_connect(GObex *obex, GObexResponseFunc func, gpointer user_data,
+ 				GError **err, guint8 first_hdr_id, ...);
+ 
+-guint g_obex_setpath(GObex *obex, const char *path, GObexResponseFunc func,
+-					gpointer user_data, GError **err);
++guint g_obex_setpath(GObex *obex, const char *folder, gboolean cdup,
++				GObexResponseFunc func, gpointer user_data,
++				GError **err);
+ 
+ guint g_obex_mkdir(GObex *obex, const char *path, GObexResponseFunc func,
+ 					gpointer user_data, GError **err);
+diff --git a/unit/test-gobex.c b/unit/test-gobex.c
+index 62443db..8b86dda 100644
+--- a/unit/test-gobex.c
++++ b/unit/test-gobex.c
+@@ -46,6 +46,10 @@ static uint8_t pkt_setpath_req[] = { G_OBEX_OP_SETPATH | FINAL_BIT, 0x00, 0x10,
+ 					0, 'd', 0, 'i', 0, 'r', 0, 0 };
+ static uint8_t pkt_setpath_up_req[] = { G_OBEX_OP_SETPATH | FINAL_BIT,
+ 					0x00, 0x05, 0x03, 0x00 };
++static uint8_t pkt_setpath_up_down_req[] = { G_OBEX_OP_SETPATH | FINAL_BIT,
++					0x00, 0x10, 0x03, 0x00,
++					G_OBEX_HDR_NAME, 0x00, 0x0b,
++					0, 'd', 0, 'i', 0, 'r', 0, 0 };
+ static uint8_t pkt_success_rsp[] = { 0x20 | FINAL_BIT, 0x00, 0x03 };
+ 
+ static uint8_t pkt_mkdir_req[] = { G_OBEX_OP_SETPATH | FINAL_BIT, 0x00, 0x10,
+@@ -890,7 +894,7 @@ static void test_setpath(void)
+ 
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+-	g_obex_setpath(obex, "dir", req_complete, &d, &d.err);
++	g_obex_setpath(obex, "dir", FALSE, req_complete, &d, &d.err);
+ 	g_assert_no_error(d.err);
+ 
+ 	g_main_loop_run(d.mainloop);
+@@ -926,7 +930,44 @@ static void test_setpath_up(void)
+ 
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+-	g_obex_setpath(obex, "..", req_complete, &d, &d.err);
++	g_obex_setpath(obex, "", TRUE, req_complete, &d, &d.err);
++	g_assert_no_error(d.err);
++
++	g_main_loop_run(d.mainloop);
++
++	g_assert_cmpuint(d.count, ==, 1);
++
++	g_main_loop_unref(d.mainloop);
++
++	g_source_remove(timer_id);
++	g_io_channel_unref(io);
++	g_source_remove(io_id);
++	g_obex_unref(obex);
++
++	g_assert_no_error(d.err);
++}
++
++static void test_setpath_up_down(void)
++{
++	GIOChannel *io;
++	GIOCondition cond;
++	guint io_id, timer_id;
++	GObex *obex;
++	struct test_data d = { 0, NULL, {
++			{ pkt_setpath_up_down_req,
++					sizeof(pkt_setpath_up_down_req) } }, {
++			{ pkt_success_rsp, sizeof(pkt_success_rsp) } } };
++
++	create_endpoints(&obex, &io, SOCK_STREAM);
++
++	cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
++	io_id = g_io_add_watch(io, cond, test_io_cb, &d);
++
++	d.mainloop = g_main_loop_new(NULL, FALSE);
++
++	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
++
++	g_obex_setpath(obex, "dir", TRUE, req_complete, &d, &d.err);
+ 	g_assert_no_error(d.err);
+ 
+ 	g_main_loop_run(d.mainloop);
+@@ -1142,6 +1183,7 @@ int main(int argc, char *argv[])
+ 
+ 	g_test_add_func("/gobex/test_setpath", test_setpath);
+ 	g_test_add_func("/gobex/test_setpath_up", test_setpath_up);
++	g_test_add_func("/gobex/test_setpath_up_down", test_setpath_up_down);
+ 
+ 	g_test_add_func("/gobex/test_mkdir", test_mkdir);
+ 
+-- 
+1.7.4.1
 
-On Tue, 15 Nov 2011, Emeltchenko Andrei wrote:
-
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Using different list_add to make sure that BR/EDR HCI device is the
-> first device in the hci_dev_list. This is needed for e.g. A2MP Discover
-> Command which requires that "entry for Controller ID 0x00 (Primary
-> BR/EDR controller) shall always be sent and shall be the first entry
-> in the Controller List.
-> Also output from hciconfig looks nicer :-)
->
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
-> net/bluetooth/hci_core.c |    6 +++++-
-> 1 files changed, 5 insertions(+), 1 deletions(-)
->
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 02a6f15..bf24218 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1501,7 +1501,11 @@ int hci_register_dev(struct hci_dev *hdev)
->
-> 	sprintf(hdev->name, "hci%d", id);
-> 	hdev->id = id;
-> -	list_add(&hdev->list, head);
-> +
-> +	if (hdev->dev_type == HCI_BREDR)
-> +		list_add(&hdev->list, head);
-> +	else
-> +		list_add_tail(&hdev->list, head);
->
-> 	atomic_set(&hdev->refcnt, 1);
-> 	spin_lock_init(&hdev->lock);
-> -- 
-> 1.7.4.1
-
-I'm don't think it works to depend on the ordering in hdev->list for 
-A2MP discover, since there might be multiple BR/EDR controllers.
-
-Controller 0x00 is the BR/EDR controller that received the A2MP 
-discover request.  The rest of the list should be only AMP 
-controllers, any other BR/EDR controllers should not be listed.  In 
-practice, this means that the 0x00 entry in the list is hard-coded and 
-hdev->list is only used to look for AMP controllers.
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
