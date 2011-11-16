@@ -1,50 +1,236 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Nov 2011 20:51:44 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Create a unique mgmt error code hierarchy
-Message-ID: <20111116225144.GA2660@joana>
-References: <1321021134-31809-2-git-send-email-johan.hedberg@gmail.com>
- <1321027800-353-1-git-send-email-johan.hedberg@gmail.com>
- <20111116181100.GF16865@joana>
- <20111116210535.GA1043@x220.Elisa>
-MIME-Version: 1.0
+Subject: Re: [PATCH 6/6] Bluetooth: Support LE-Only discovery procedure
+Mime-Version: 1.0 (Apple Message framework v1251.1)
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111116210535.GA1043@x220.Elisa>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Andre Guedes <andre.guedes@openbossa.org>
+In-Reply-To: <1321479940.15441.550.camel@aeonflux>
+Date: Wed, 16 Nov 2011 19:41:06 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <44EE3913-AD40-4EAC-A7AE-A2BC8812B186@openbossa.org>
+References: <1321051824-5216-1-git-send-email-andre.guedes@openbossa.org> <1321051824-5216-7-git-send-email-andre.guedes@openbossa.org> <1321080225.15441.417.camel@aeonflux> <A37EF08F-5B90-43F3-AA5B-BE0FD282E3D7@openbossa.org> <1321479940.15441.550.camel@aeonflux>
+To: Marcel Holtmann <marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2011-11-16 23:05:35 +0200]:
+On Nov 16, 2011, at 6:45 PM, Marcel Holtmann wrote:
 
-> Hi Gustavo,
-> 
-> On Wed, Nov 16, 2011, Gustavo Padovan wrote:
-> > > From: Johan Hedberg <johan.hedberg@intel.com>
-> > > 
-> > > The management protocol uses a single byte for error codes (aka command
-> > > status). In some places this value is directly copied from HCI and in
-> > > other a POSIX error number is used. This makes it impossible for
-> > > user-space to uniquily decipher the meaning of an error.
-> > > 
-> > > To solve this issue a new mgmt-specific set of error codes is added
-> > > along with a conversion table for HCI status values.
-> > > 
-> > > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> > > ---
-> > > v2: Use ARRAY_SIZE() instead of a custom NELEM()
-> > > 
-> > >  include/net/bluetooth/mgmt.h |   17 +++
-> > >  net/bluetooth/mgmt.c         |  315 ++++++++++++++++++++++++++++++------------
-> > >  2 files changed, 241 insertions(+), 91 deletions(-)
-> > 
-> > It doesn't apply anymore, please rebase.
-> 
-> This one's also already in your tree.
-> commit ca69b7957bf2e3bc0acc882b837a42617498ece1
+> Hi Andre,
+>=20
+>>>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>>>> ---
+>>>> include/net/bluetooth/hci.h      |    1 +
+>>>> include/net/bluetooth/hci_core.h |    1 +
+>>>> net/bluetooth/hci_event.c        |   25 ++++++++++++++++++++++---
+>>>> net/bluetooth/mgmt.c             |   25 +++++++++++++++++++++++--
+>>>> 4 files changed, 47 insertions(+), 5 deletions(-)
+>>>>=20
+>>>> diff --git a/include/net/bluetooth/hci.h =
+b/include/net/bluetooth/hci.h
+>>>> index bd3cecd..ca09998 100644
+>>>> --- a/include/net/bluetooth/hci.h
+>>>> +++ b/include/net/bluetooth/hci.h
+>>>> @@ -210,6 +210,7 @@ enum {
+>>>>=20
+>>>> #define LMP_EV4		0x01
+>>>> #define LMP_EV5		0x02
+>>>> +#define LMP_NO_BREDR	0x20
+>>>> #define LMP_LE		0x40
+>>>>=20
+>>>> #define LMP_SNIFF_SUBR	0x02
+>>>> diff --git a/include/net/bluetooth/hci_core.h =
+b/include/net/bluetooth/hci_core.h
+>>>> index 9da5b69..55b78ec 100644
+>>>> --- a/include/net/bluetooth/hci_core.h
+>>>> +++ b/include/net/bluetooth/hci_core.h
+>>>> @@ -678,6 +678,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+>>>> #define lmp_ssp_capable(dev)       ((dev)->features[6] & =
+LMP_SIMPLE_PAIR)
+>>>> #define lmp_no_flush_capable(dev)  ((dev)->features[6] & =
+LMP_NO_FLUSH)
+>>>> #define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
+>>>> +#define lmp_bredr_capable(dev)     (!((dev)->features[4] & =
+LMP_NO_BREDR))
+>>>=20
+>>> can you just split this into a separate patch first. We can just go
+>>> ahead and merge it.
+>>>=20
+>>>> /* ----- Extended LMP capabilities ----- */
+>>>> #define lmp_host_le_capable(dev)   ((dev)->extfeatures[0] & =
+LMP_HOST_LE)
+>>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>>>> index dcbbffe..037c7c0 100644
+>>>> --- a/net/bluetooth/hci_event.c
+>>>> +++ b/net/bluetooth/hci_event.c
+>>>> @@ -954,24 +954,43 @@ static void hci_cc_le_set_scan_enable(struct =
+hci_dev *hdev,
+>>>>=20
+>>>> 	BT_DBG("%s status 0x%x", hdev->name, status);
+>>>>=20
+>>>> -	if (status)
+>>>> -		return;
+>>>> -
+>>>> 	cp =3D hci_sent_cmd_data(hdev, HCI_OP_LE_SET_SCAN_ENABLE);
+>>>> 	if (!cp)
+>>>> 		return;
+>>>>=20
+>>>> 	if (cp->enable =3D=3D 0x01) {
+>>>> +		if (status) {
+>>>> +			hci_dev_lock(hdev);
+>>>> +			mgmt_start_discovery_failed(hdev, status);
+>>>> +			hci_dev_unlock(hdev);
+>>>> +			return;
+>>>> +		}
+>>>> +
+>>>> 		set_bit(HCI_LE_SCAN, &hdev->hci_flags);
+>>>>=20
+>>>> 		del_timer(&hdev->adv_timer);
+>>>>=20
+>>>> 		hci_dev_lock(hdev);
+>>>> +
+>>>> +		mgmt_discovering(hdev, 1);
+>>>> +
+>>>> 		hci_adv_entries_clear(hdev);
+>>>> +
+>>>> 		hci_dev_unlock(hdev);
+>>>> 	} else if (cp->enable =3D=3D 0x00) {
+>>>> +		if (status) {
+>>>> +			hci_dev_lock(hdev);
+>>>> +			mgmt_stop_discovery_failed(hdev, status);
+>>>> +			hci_dev_unlock(hdev);
+>>>> +			return;
+>>>> +		}
+>>>> +
+>>>> 		clear_bit(HCI_LE_SCAN, &hdev->hci_flags);
+>>>>=20
+>>>> +		hci_dev_lock(hdev);
+>>>> +		mgmt_discovering(hdev, 0);
+>>>> +		hci_dev_unlock(hdev);
+>>>> +
+>>>> 		mod_timer(&hdev->adv_timer, jiffies + =
+ADV_CLEAR_TIMEOUT);
+>>>> 	}
+>>>> }
+>>>=20
+>>> This part looks fine to me.
+>>>=20
+>>>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+>>>> index b63a7d0..6ca6e5d 100644
+>>>> --- a/net/bluetooth/mgmt.c
+>>>> +++ b/net/bluetooth/mgmt.c
+>>>> @@ -32,7 +32,16 @@
+>>>> #define MGMT_VERSION	0
+>>>> #define MGMT_REVISION	1
+>>>>=20
+>>>> -#define INQUIRY_LEN_BREDR 0x08 /* TGAP(100) */
+>>>> +/*
+>>>> + * These LE scan and inquiry parameters were chosen according to =
+LE General
+>>>> + * Discovery Procedure specification.
+>>>> + */
+>>>> +#define LE_SCAN_TYPE 0x01
+>>>> +#define LE_SCAN_WIN 0x12
+>>>> +#define LE_SCAN_INT 0x12
+>>>> +#define LE_SCAN_TIMEOUT_LE_ONLY 10240		/* =
+TGAP(gen_disc_scan_min) */
+>>>> +
+>>>> +#define INQUIRY_LEN_BREDR 0x08			/* TGAP(100) */
+>>>>=20
+>>>> struct pending_cmd {
+>>>> 	struct list_head list;
+>>>> @@ -1669,7 +1678,16 @@ static int start_discovery(struct sock *sk, =
+u16 index)
+>>>> 		goto failed;
+>>>> 	}
+>>>>=20
+>>>> -	err =3D hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
+>>>> +	if (lmp_host_le_capable(hdev)) {
+>>>> +		if (lmp_bredr_capable(hdev))
+>>>> +			err =3D -ENOSYS;
+>>>> +		else
+>>>> +			err =3D hci_do_le_scan(hdev, LE_SCAN_TYPE, =
+LE_SCAN_INT,
+>>>> +					LE_SCAN_WIN, =
+LE_SCAN_TIMEOUT_LE_ONLY);
+>>>> +	} else {
+>>>> +		err =3D hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
+>>>> +	}
+>>>> +
+>>>> 	if (err < 0)
+>>>> 		mgmt_pending_remove(cmd);
+>>>>=20
+>>>> @@ -1701,6 +1719,9 @@ static int stop_discovery(struct sock *sk, =
+u16 index)
+>>>> 	}
+>>>>=20
+>>>> 	err =3D hci_cancel_inquiry(hdev);
+>>>> +	if (err =3D=3D -EPERM)
+>>>> +		err =3D hci_cancel_le_scan(hdev);
+>>>> +
+>>>=20
+>>> And here, I have a serious problem with how the code is done. I =
+realize
+>>> that from using hdev->flags this ends up this crappy, but this is =
+not
+>>> how I wanna see things done.
+>>>=20
+>>> What you are doing is this:
+>>>=20
+>>> - We call a complete unrelated function anyway
+>>> - And if it fails with a specific error code then we call something
+>>> else instead
+>>>=20
+>>> I think it becomes pretty obvious now that we should just have had
+>>> hdev->mgmt_flags that tell us with discovery procedure is running =
+right
+>>> now. And thus we know how to cancel it.
+>>=20
+>> I'm not sure this will help us in case we have a interleaved =
+discovery
+>> running. My point is, even if we know what discovery procedure is =
+running,
+>> we need to know what the controller is doing right now (inquiring or =
+le
+>> scanning) so we can properly stop it, and, therefore, stop the =
+ongoing
+>> discovery procedure. IOW, telling us we have a interleaved discovery
+>> running does not help us to decide the right function to call
+>> (hci_cancel_inquiry or hci_cancel_le_scan).
+>>=20
+>> So, I think we need to check the controller flags (HCI_INQUIRY and
+>> HCI_LE_SCAN) in order to stop the ongoing discovery procedure =
+properly.
+>=20
+> I have nothing against separate flags. That makes fully sense. I have
+> something against weirdly calling one function and expecting it to =
+error
+> out. Relying on an error is a bad idea. You want to keep track of what
+> is currently going on.
 
-Oh, I get lost, people are sending so many patches and I forgot to reply here
-when I applied the patches.
+Ok, I agree with that too.
 
-	Gustavo
+The way I see to fix that is we have something like we had before:
+
+if (HCI_INQUIRY)
+	hci_cancel_inquiry()
+else if (HCI_LE_SCAN)
+	hci_cancel_le_scan()
+
+The drawback, as you already pointed, is the double check of these
+flags.
+
+But, as I said before, the flags checking in stop_discovery is to
+decide the right cancel helper function to call. The flag checking
+in hci_cancel_*() helper functions guarantees no cancel command is
+sent to the controller if there is no ongoing inquiry or le scan.
+The flag checking in stop_discovery() and hci_cancel_*() have
+different purposes.
+
+Since hci_cancel_*() are helper functions and they can be reused in
+future by other parts of the code, I think it is a good idea we keep
+the flag checking internally. This way we don't rely on the programmer
+doing the proper checking before calling these helper functions.
+
+BR,
+
+Andre
