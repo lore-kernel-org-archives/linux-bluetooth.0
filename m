@@ -1,83 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Nov 2011 10:21:50 -0800 (PST)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
-Subject: Re: [PATCH] Bluetooth: Assure BREDR HCI device first in the list
-In-Reply-To: <20111116084642.GE30662@aemeltch-MOBL1>
-Message-ID: <alpine.DEB.2.02.1111161017000.7320@mathewm-linux>
-References: <1321361939-24024-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <alpine.DEB.2.02.1111150822270.7320@mathewm-linux> <20111116084642.GE30662@aemeltch-MOBL1>
+Date: Wed, 16 Nov 2011 16:11:00 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: Create a unique mgmt error code hierarchy
+Message-ID: <20111116181100.GF16865@joana>
+References: <1321021134-31809-2-git-send-email-johan.hedberg@gmail.com>
+ <1321027800-353-1-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1321027800-353-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Johan,
 
-On Wed, 16 Nov 2011, Emeltchenko Andrei wrote:
+* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-11-11 18:10:00 +0200]:
 
-> Hi Mat,
->
-> On Tue, Nov 15, 2011 at 08:45:47AM -0800, Mat Martineau wrote:
->>> Using different list_add to make sure that BR/EDR HCI device is the
->>> first device in the hci_dev_list. This is needed for e.g. A2MP Discover
->>> Command which requires that "entry for Controller ID 0x00 (Primary
->>> BR/EDR controller) shall always be sent and shall be the first entry
->>> in the Controller List.
->>> Also output from hciconfig looks nicer :-)
->>>
->>> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->>> ---
->>> net/bluetooth/hci_core.c |    6 +++++-
->>> 1 files changed, 5 insertions(+), 1 deletions(-)
->>>
->>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->>> index 02a6f15..bf24218 100644
->>> --- a/net/bluetooth/hci_core.c
->>> +++ b/net/bluetooth/hci_core.c
->>> @@ -1501,7 +1501,11 @@ int hci_register_dev(struct hci_dev *hdev)
->>>
->>> 	sprintf(hdev->name, "hci%d", id);
->>> 	hdev->id = id;
->>> -	list_add(&hdev->list, head);
->>> +
->>> +	if (hdev->dev_type == HCI_BREDR)
->>> +		list_add(&hdev->list, head);
->>> +	else
->>> +		list_add_tail(&hdev->list, head);
->>>
->>> 	atomic_set(&hdev->refcnt, 1);
->>> 	spin_lock_init(&hdev->lock);
->>> --
->>> 1.7.4.1
->>
->> I'm don't think it works to depend on the ordering in hdev->list for
->> A2MP discover, since there might be multiple BR/EDR controllers.
->
-> What about following change:
->
-> -    list_add(&hdev->list, head);
-> +    list_add_tail(&hdev->list, head);
->
-> This way hci devices queued to the list as opposed to stacked now.
-> Usual use case is that we have the 1st device BR/EDR and second AMP.
+> From: Johan Hedberg <johan.hedberg@intel.com>
+> 
+> The management protocol uses a single byte for error codes (aka command
+> status). In some places this value is directly copied from HCI and in
+> other a POSIX error number is used. This makes it impossible for
+> user-space to uniquily decipher the meaning of an error.
+> 
+> To solve this issue a new mgmt-specific set of error codes is added
+> along with a conversion table for HCI status values.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> v2: Use ARRAY_SIZE() instead of a custom NELEM()
+> 
+>  include/net/bluetooth/mgmt.h |   17 +++
+>  net/bluetooth/mgmt.c         |  315 ++++++++++++++++++++++++++++++------------
+>  2 files changed, 241 insertions(+), 91 deletions(-)
 
-I think that's a harmless change.
+It doesn't apply anymore, please rebase.
 
-You can't really count on the controllers being added in a certain 
-order, though.  AMP controllers will be typically be implemented 
-within WiFi drivers, and those drivers may load before or after the 
-BR/EDR device is attached.
-
->> Controller 0x00 is the BR/EDR controller that received the A2MP
->> discover request.  The rest of the list should be only AMP
->> controllers, any other BR/EDR controllers should not be listed.  In
->> practice, this means that the 0x00 entry in the list is hard-coded
->> and hdev->list is only used to look for AMP controllers.
->
-> It is actually how it is done in my RFC, I wanted to make it nicer :-(
-
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+	Gustavo
