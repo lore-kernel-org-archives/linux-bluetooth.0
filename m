@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 12/17] network: Fix errno handling convention
-Date: Wed, 16 Nov 2011 09:19:59 -0400
-Message-Id: <1321449604-4188-13-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 11/17] sap-u8500: Fix errno handling convention
+Date: Wed, 16 Nov 2011 09:19:58 -0400
+Message-Id: <1321449604-4188-12-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1321449604-4188-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1321449604-4188-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,69 +14,54 @@ Variables which are assigned to the errno variable (usually called
 "err") should be negative, and "-err" should be used where a positive
 value is needed.
 ---
- network/common.c |   24 ++++++++++++------------
- 1 files changed, 12 insertions(+), 12 deletions(-)
+ sap/sap-u8500.c |   16 ++++++++--------
+ 1 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/network/common.c b/network/common.c
-index 6da9f0a..c498c25 100644
---- a/network/common.c
-+++ b/network/common.c
-@@ -108,10 +108,10 @@ int bnep_init(void)
- 	ctl = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_BNEP);
+diff --git a/sap/sap-u8500.c b/sap/sap-u8500.c
+index e699fd7..ef7d95c 100644
+--- a/sap/sap-u8500.c
++++ b/sap/sap-u8500.c
+@@ -571,9 +571,9 @@ static int simd_connect(void *sap_data)
  
- 	if (ctl < 0) {
--		int err = errno;
-+		int err = -errno;
- 		error("Failed to open control socket: %s (%d)",
--						strerror(err), err);
--		return -err;
-+						strerror(-err), -err);
-+		return err;
- 	}
- 
- 	return 0;
-@@ -131,10 +131,10 @@ int bnep_kill_connection(bdaddr_t *dst)
- 	baswap((bdaddr_t *)&req.dst, dst);
- 	req.flags = 0;
- 	if (ioctl(ctl, BNEPCONNDEL, &req)) {
--		int err = errno;
-+		int err = -errno;
- 		error("Failed to kill connection: %s (%d)",
--						strerror(err), err);
--		return -err;
-+						strerror(-err), -err);
-+		return err;
- 	}
- 	return 0;
- }
-@@ -150,10 +150,10 @@ int bnep_kill_all_connections(void)
- 	req.cnum = 7;
- 	req.ci   = ci;
- 	if (ioctl(ctl, BNEPGETCONNLIST, &req)) {
+ 	sock = socket(PF_UNIX, SOCK_STREAM, 0);
+ 	if (sock < 0) {
 -		err = errno;
+-		sap_error("creating socket failed: %s", strerror(err));
+-		return -err;
 +		err = -errno;
- 		error("Failed to get connection list: %s (%d)",
--						strerror(err), err);
--		return -err;
-+						strerror(-err), -err);
++		sap_error("creating socket failed: %s", strerror(-err));
 +		return err;
  	}
  
- 	for (i = 0; i < req.cnum; i++) {
-@@ -177,10 +177,10 @@ int bnep_connadd(int sk, uint16_t role, char *dev)
- 	req.sock = sk;
- 	req.role = role;
- 	if (ioctl(ctl, BNEPCONNADD, &req) < 0) {
--		int err = errno;
-+		int err = -errno;
- 		error("Failed to add device %s: %s(%d)",
--				dev, strerror(err), err);
--		return -err;
-+				dev, strerror(-err), -err);
-+		return err;
+ 	memset(&addr, 0, sizeof(addr));
+@@ -581,14 +581,14 @@ static int simd_connect(void *sap_data)
+ 	memcpy(addr.sun_path, STE_SIMD_SOCK, sizeof(STE_SIMD_SOCK) - 1);
+ 
+ 	if (connect(sock, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+-		err = errno;
+-		sap_error("connect to the socket failed: %s", strerror(err));
++		err = -errno;
++		sap_error("connect to the socket failed: %s", strerror(-err));
+ 		goto failed;
  	}
  
- 	strncpy(dev, req.device, 16);
+ 	if (fcntl(sock, F_SETFL, O_NONBLOCK) > 0) {
+-		err = errno;
+-		sap_error("setting up socket failed: %s", strerror(err));
++		err = -errno;
++		sap_error("setting up socket failed: %s", strerror(-err));
+ 		goto failed;
+ 	}
+ 
+@@ -598,7 +598,7 @@ static int simd_connect(void *sap_data)
+ 
+ failed:
+ 	close(sock);
+-	return -err;
++	return err;
+ }
+ 
+ void sap_connect_req(void *sap_device, uint16_t maxmsgsize)
 -- 
 1.7.0.4
 
