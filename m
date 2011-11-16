@@ -1,74 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: btusb: Add Qualcomm Atheros AR3006 in
- blacklist_table
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Yao, Costa" <cqyao@qca.qualcomm.com>
-Cc: "padovan@profusion.mobi" <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 16 Nov 2011 22:29:10 +0900
-In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3A49@nasanexd02b.na.qualcomm.com>
-References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3A49@nasanexd02b.na.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321450153.15441.548.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <4EC3B36F.5070109@bmw-carit.de>
+References: <4EC3B36F.5070109@bmw-carit.de>
+Date: Wed, 16 Nov 2011 15:28:47 +0200
+Message-ID: <CABBYNZL8ZfP-hWQxPXujZSc_RW=4YWgdiDHr7xXHa31WiPDgFA@mail.gmail.com>
+Subject: Re: [PATCH 1/3] media: release transport locks on acquisition failure
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Costa,
+Hi Mikel,
 
-> Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
+On Wed, Nov 16, 2011 at 2:58 PM, Mikel Astiz <mikel.astiz@bmw-carit.de> wrote:
 > ---
->  drivers/bluetooth/btusb.c |    5 ++++-
->  1 files changed, 4 insertions(+), 1 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 39dd65c..94124ad 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -55,6 +55,7 @@ static struct usb_driver btusb_driver;
->  #define BTUSB_BROKEN_ISOC	0x20
->  #define BTUSB_WRONG_SCO_MTU	0x40
->  #define BTUSB_ATH3012		0x80
-> +#define BTUSB_ATH3006		0x0100
->  
->  static struct usb_device_id btusb_table[] = {
->  	/* Bluetooth USB interface */
-> @@ -125,6 +126,7 @@ static struct usb_device_id blacklist_table[] = {
->  
->  	/* Atheros 3012 with sflash firmware */
->  	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-> +	{ USB_DEVICE(0x0cf3, 0x3006), .driver_info = BTUSB_ATH3006 },
->  
->  	/* Atheros AR5BBU12 with sflash firmware */
->  	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
-> @@ -937,7 +939,8 @@ static int btusb_probe(struct usb_interface *intf,
->  	if (ignore_sniffer && id->driver_info & BTUSB_SNIFFER)
->  		return -ENODEV;
->  
-> -	if (id->driver_info & BTUSB_ATH3012) {
-> +	if ((id->driver_info & BTUSB_ATH3012) ||
-> +				(id->driver_info & BTUSB_ATH3006)) {
->  		struct usb_device *udev = interface_to_usbdev(intf);
->  
->  		/* Old firmware would otherwise let ath3k driver load
+>  audio/transport.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
+>
+> diff --git a/audio/transport.c b/audio/transport.c
+> index 2739199..7bde32d 100644
+> --- a/audio/transport.c
+> +++ b/audio/transport.c
+> @@ -670,6 +670,7 @@ static DBusMessage *acquire(DBusConnection *conn,
+> DBusMessage *msg,
+>        owner = media_owner_create(conn, msg, accesstype);
+>        id = transport->resume(transport, owner);
+>        if (id == 0) {
+> +               media_transport_release(transport, accesstype);
+>                media_owner_free(owner);
+>                return btd_error_not_authorized(msg);
+>        }
+> --
+> 1.7.6.4
 
-        if (id->driver_info & BTUSB_ATH3012) {
-                struct usb_device *udev = interface_to_usbdev(intf);
+Ack.
 
-                /* Old firmware would otherwise let ath3k driver load
-                 * patch and sysconfig files */
-                if (le16_to_cpu(udev->descriptor.bcdDevice) <= 0x0001)
-                        return -ENODEV;
-        }
-
-are you sure this is true for the 3006 as well? Otherwise just using the
-BTUSB_IGNORE quirk to blacklist a device would be enough.
-
-And start writing detailed commit message that explains why this quirk
-is correct and needed.
-
-Regards
-
-Marcel
-
-
+-- 
+Luiz Augusto von Dentz
