@@ -1,26 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1321170050-18323-1-git-send-email-alon.barlev@gmail.com>
-References: <1321159852.15441.449.camel@aeonflux>
-	<1321170050-18323-1-git-send-email-alon.barlev@gmail.com>
-Date: Wed, 16 Nov 2011 20:38:47 +0200
-Message-ID: <CAOazyz1gyTFsnoRBaWSShUi+GLw3enZ_U=UGYNJxVBH4gbDVVg@mail.gmail.com>
-Subject: Re: [PATCH] Automake - do not override LDFLAGS
-From: Alon Bar-Lev <alon.barlev@gmail.com>
+From: Brian Gix <bgix@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Cc: Brian Gix <bgix@codeaurora.org>
+Subject: [PATCH-v3 1/9] Bluetooth: Add HCI defines for User Passkey entry
+Date: Wed, 16 Nov 2011 10:37:45 -0800
+Message-Id: <1321468673-13925-2-git-send-email-bgix@codeaurora.org>
+In-Reply-To: <1321468673-13925-1-git-send-email-bgix@codeaurora.org>
+References: <1321468673-13925-1-git-send-email-bgix@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Nov 13, 2011 at 9:40 AM, Alon Bar-Lev <alon.barlev@gmail.com> wrote:
-> Add AM_LDFLAGS to every _LDFLAGS, so that autoconf's
-> LDFLAGS won't be overridden.
-> ---
->  Makefile.am |   12 ++++++------
->  1 files changed, 6 insertions(+), 6 deletions(-)
->
+Signed-off-by: Brian Gix <bgix@codeaurora.org>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci.h |   13 +++++++++++++
+ 1 files changed, 13 insertions(+), 0 deletions(-)
 
-Hello,
-Any comment?
-If we fixed the CFLAGS, good to have the LDFLAGS synced.
-Thanks!
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 139ce2a..e284dd9 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -453,6 +453,14 @@ struct hci_rp_user_confirm_reply {
+ 
+ #define HCI_OP_USER_CONFIRM_NEG_REPLY	0x042d
+ 
++#define HCI_OP_USER_PASSKEY_REPLY		0x042e
++struct hci_cp_user_passkey_reply {
++	bdaddr_t bdaddr;
++	__le32	passkey;
++} __packed;
++
++#define HCI_OP_USER_PASSKEY_NEG_REPLY	0x042f
++
+ #define HCI_OP_REMOTE_OOB_DATA_REPLY	0x0430
+ struct hci_cp_remote_oob_data_reply {
+ 	bdaddr_t bdaddr;
+@@ -1076,6 +1084,11 @@ struct hci_ev_user_confirm_req {
+ 	__le32		passkey;
+ } __packed;
+ 
++#define HCI_EV_USER_PASSKEY_REQUEST	0x34
++struct hci_ev_user_passkey_req {
++	bdaddr_t	bdaddr;
++} __packed;
++
+ #define HCI_EV_REMOTE_OOB_DATA_REQUEST	0x35
+ struct hci_ev_remote_oob_data_request {
+ 	bdaddr_t bdaddr;
+-- 
+1.7.7.2
+
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum 
