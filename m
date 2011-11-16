@@ -1,158 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Nov 2011 20:47:07 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <padovan@profusion.mobi>
-Subject: Re: [PATCH-v4 5/9] Bluetooth: Add HCI User Passkey Req Evt handling
-Message-ID: <20111116234706.GA25686@samus.indt.org>
-References: <1321480400-17397-1-git-send-email-bgix@codeaurora.org>
- <1321480400-17397-6-git-send-email-bgix@codeaurora.org>
+Date: Wed, 16 Nov 2011 20:51:44 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: Create a unique mgmt error code hierarchy
+Message-ID: <20111116225144.GA2660@joana>
+References: <1321021134-31809-2-git-send-email-johan.hedberg@gmail.com>
+ <1321027800-353-1-git-send-email-johan.hedberg@gmail.com>
+ <20111116181100.GF16865@joana>
+ <20111116210535.GA1043@x220.Elisa>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321480400-17397-6-git-send-email-bgix@codeaurora.org>
+In-Reply-To: <20111116210535.GA1043@x220.Elisa>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+Hi Johan,
 
-Sorry if these comments appear so late in this series life.
+* Johan Hedberg <johan.hedberg@gmail.com> [2011-11-16 23:05:35 +0200]:
 
-On 13:53 Wed 16 Nov, Brian Gix wrote:
-> Some MITM scenarios require handling of the User Passkey Request event,
-> by querying the user, and passing the response back.
+> Hi Gustavo,
 > 
-> Signed-off-by: Brian Gix <bgix@codeaurora.org>
-> ---
->  include/net/bluetooth/hci_core.h |    5 +++
->  net/bluetooth/hci_event.c        |   58 ++++++++++++++++++++++++++++++++++++++
->  2 files changed, 63 insertions(+), 0 deletions(-)
+> On Wed, Nov 16, 2011, Gustavo Padovan wrote:
+> > > From: Johan Hedberg <johan.hedberg@intel.com>
+> > > 
+> > > The management protocol uses a single byte for error codes (aka command
+> > > status). In some places this value is directly copied from HCI and in
+> > > other a POSIX error number is used. This makes it impossible for
+> > > user-space to uniquily decipher the meaning of an error.
+> > > 
+> > > To solve this issue a new mgmt-specific set of error codes is added
+> > > along with a conversion table for HCI status values.
+> > > 
+> > > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> > > ---
+> > > v2: Use ARRAY_SIZE() instead of a custom NELEM()
+> > > 
+> > >  include/net/bluetooth/mgmt.h |   17 +++
+> > >  net/bluetooth/mgmt.c         |  315 ++++++++++++++++++++++++++++++------------
+> > >  2 files changed, 241 insertions(+), 91 deletions(-)
+> > 
+> > It doesn't apply anymore, please rebase.
 > 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 1795257..e7b2e25 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -933,6 +933,11 @@ int mgmt_user_confirm_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
->  								u8 status);
->  int mgmt_user_confirm_neg_reply_complete(struct hci_dev *hdev,
->  						bdaddr_t *bdaddr, u8 status);
-> +int mgmt_user_passkey_request(struct hci_dev *hdev, bdaddr_t *bdaddr);
-> +int mgmt_user_passkey_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
-> +								u8 status);
-> +int mgmt_user_passkey_neg_reply_complete(struct hci_dev *hdev,
-> +						bdaddr_t *bdaddr, u8 status);
->  int mgmt_auth_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 status);
->  int mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status);
->  int mgmt_read_local_oob_data_reply_complete(struct hci_dev *hdev, u8 *hash,
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index dfe6fbc..980da08 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -931,6 +931,37 @@ static void hci_cc_user_confirm_neg_reply(struct hci_dev *hdev,
->  	hci_dev_unlock(hdev);
->  }
->  
-> +static void hci_cc_user_passkey_reply(struct hci_dev *hdev, struct sk_buff *skb)
-> +{
-> +	struct hci_rp_user_confirm_reply *rp = (void *) skb->data;
-> +
-> +	BT_DBG("%s status 0x%x", hdev->name, rp->status);
-> +
-> +	hci_dev_lock(hdev);
-> +
-> +	if (test_bit(HCI_MGMT, &hdev->flags))
-> +		mgmt_user_passkey_reply_complete(hdev, &rp->bdaddr,
-> +								rp->status);
+> This one's also already in your tree.
+> commit ca69b7957bf2e3bc0acc882b837a42617498ece1
 
-I was with the impression that the check for the MGMT bit was being
-ignored on purpose on newer code, because mgmt is going to be the
-default some time in the (near) future and if there's no one listening
-for those events the overhead should be minimal. Can anyone confirm this
-impression?
+Oh, I get lost, people are sending so many patches and I forgot to reply here
+when I applied the patches.
 
-> +
-> +	hci_dev_unlock(hdev);
-> +}
-> +
-> +static void hci_cc_user_passkey_neg_reply(struct hci_dev *hdev,
-> +							struct sk_buff *skb)
-> +{
-> +	struct hci_rp_user_confirm_reply *rp = (void *) skb->data;
-> +
-> +	BT_DBG("%s status 0x%x", hdev->name, rp->status);
-> +
-> +	hci_dev_lock(hdev);
-> +
-> +	if (test_bit(HCI_MGMT, &hdev->flags))
-> +		mgmt_user_passkey_neg_reply_complete(hdev, &rp->bdaddr,
-> +								rp->status);
-> +
-> +	hci_dev_unlock(hdev);
-> +}
-> +
->  static void hci_cc_read_local_oob_data_reply(struct hci_dev *hdev,
->  							struct sk_buff *skb)
->  {
-> @@ -2015,6 +2046,14 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
->  		hci_cc_user_confirm_neg_reply(hdev, skb);
->  		break;
->  
-> +	case HCI_OP_USER_PASSKEY_REPLY:
-> +		hci_cc_user_passkey_reply(hdev, skb);
-> +		break;
-> +
-> +	case HCI_OP_USER_PASSKEY_NEG_REPLY:
-> +		hci_cc_user_passkey_neg_reply(hdev, skb);
-> +		break;
-> +
->  	case HCI_OP_LE_SET_SCAN_ENABLE:
->  		hci_cc_le_set_scan_enable(hdev, skb);
->  		break;
-> @@ -2774,6 +2813,21 @@ unlock:
->  	hci_dev_unlock(hdev);
->  }
->  
-> +static inline void hci_user_passkey_request_evt(struct hci_dev *hdev,
-> +							struct sk_buff *skb)
-> +{
-> +	struct hci_ev_user_passkey_req *ev = (void *) skb->data;
-> +
-> +	BT_DBG("%s", hdev->name);
-> +
-> +	hci_dev_lock(hdev);
-> +
-> +	if (test_bit(HCI_MGMT, &hdev->flags))
-> +		mgmt_user_passkey_request(hdev, &ev->bdaddr);
-> +
-> +	hci_dev_unlock(hdev);
-> +}
-> +
->  static inline void hci_simple_pair_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
->  {
->  	struct hci_ev_simple_pair_complete *ev = (void *) skb->data;
-> @@ -3113,6 +3167,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
->  		hci_user_confirm_request_evt(hdev, skb);
->  		break;
->  
-> +	case HCI_EV_USER_PASSKEY_REQUEST:
-> +		hci_user_passkey_request_evt(hdev, skb);
-> +		break;
-> +
->  	case HCI_EV_SIMPLE_PAIR_COMPLETE:
->  		hci_simple_pair_complete_evt(hdev, skb);
->  		break;
-> -- 
-> 1.7.7.2
-> 
-> -- 
-> Brian Gix
-> bgix@codeaurora.org
-> Employee of Qualcomm Innovation Center, Inc.
-> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
--- 
-Vinicius
+	Gustavo
