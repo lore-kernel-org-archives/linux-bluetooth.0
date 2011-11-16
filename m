@@ -1,52 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCHv4 1/5] Bluetooth: Define AMP controller statuses
+Subject: Re: [PATCHv4 2/5] Bluetooth: Allow to set AMP type for virtual HCI
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 16 Nov 2011 14:50:10 +0900
-In-Reply-To: <1321366547-29462-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 16 Nov 2011 14:48:24 +0900
+In-Reply-To: <1321366547-29462-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1321366547-29462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1321366547-29462-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1321366547-29462-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321422613.15441.513.camel@aeonflux>
+Message-ID: <1321422506.15441.511.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-> AMP status codes copied from Bluez patch sent by Peter Krystad
-> <pkrystad@codeaurora.org>.
+> Type can be changed during re-opening device /dev/vhci.
 > 
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  include/net/bluetooth/hci.h |    9 +++++++++
->  1 files changed, 9 insertions(+), 0 deletions(-)
+>  drivers/bluetooth/hci_vhci.c |   10 ++++++++++
+>  1 files changed, 10 insertions(+), 0 deletions(-)
 > 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 139ce2a..e79ed67 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -56,6 +56,15 @@
->  #define HCI_BREDR	0x00
->  #define HCI_AMP		0x01
+> diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+> index 2e302a1..ac08adc 100644
+> --- a/drivers/bluetooth/hci_vhci.c
+> +++ b/drivers/bluetooth/hci_vhci.c
+> @@ -41,6 +41,8 @@
 >  
-> +/* AMP controller status */
-> +#define AMP_CTRL_POWERED_DOWN			0x00
-> +#define AMP_CTRL_BLUETOOTH_ONLY			0x01
-> +#define AMP_CTRL_NO_CAPACITY			0x02
-> +#define AMP_CTRL_LOW_CAPACITY			0x03
-> +#define AMP_CTRL_MEDIUM_CAPACITY		0x04
-> +#define AMP_CTRL_HIGH_CAPACITY			0x05
-> +#define AMP_CTRL_FULL_CAPACITY			0x06
+>  #define VERSION "1.3"
+>  
+> +static bool amp;
+> +
+>  struct vhci_data {
+>  	struct hci_dev *hdev;
+>  
+> @@ -239,6 +241,11 @@ static int vhci_open(struct inode *inode, struct file *file)
+>  	hdev->bus = HCI_VIRTUAL;
+>  	hdev->driver_data = data;
+>  
+> +	if (amp) {
+> +		hdev->dev_type = HCI_AMP;
+> +		hdev->amp_status = AMP_CTRL_BLUETOOTH_ONLY;
+> +	}
 > +
 
-is hci.h really the right place for these? It is not HCI specific
-per-se. It is A2MP detail. And as mentioned earlier, I do not believe we
-should do it like this.
-
-I think we need to expose some sort of functionality that lets the AMP
-drivers handle this dynamically.
+I do not like doing this. You are not squeezing two patches into one.
+Please keep them separate. I already acked the previous one.
 
 Regards
 
