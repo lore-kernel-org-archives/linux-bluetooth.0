@@ -1,48 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Keng-Yu Lin <kengyu@canonical.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Keng-Yu Lin <kengyu@canonical.com>
-Subject: [PATCH] Bluetooth: Add AR30XX device ID on Asus laptops
-Date: Wed, 16 Nov 2011 11:21:23 +0800
-Message-Id: <1321413683-4502-1-git-send-email-kengyu@canonical.com>
+From: "Yao, Costa" <cqyao@qca.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "padovan@profusion.mobi" <padovan@profusion.mobi>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] Bluetooth: btusb: Use USB_INTERFACE_INFO to do device
+ matching
+Date: Wed, 16 Nov 2011 02:14:45 +0000
+Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF28C2@nasanexd02b.na.qualcomm.com>
+References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF2759@nasanexd02b.na.qualcomm.com>
+ <1321406185.15441.502.camel@aeonflux>
+In-Reply-To: <1321406185.15441.502.camel@aeonflux>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The ID is found on Asus K54HR and K53U.
-Blacklist the AR3011-based device ID [0489:e03d]
-and add to ath3k.c for firmware loading.
-
-Signed-off-by: Keng-Yu Lin <kengyu@canonical.com>
----
- drivers/bluetooth/ath3k.c |    1 +
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 2 insertions(+), 0 deletions(-)
-
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 106beb1..db811d2 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -64,6 +64,7 @@ static struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x0CF3, 0x3002) },
- 	{ USB_DEVICE(0x13d3, 0x3304) },
- 	{ USB_DEVICE(0x0930, 0x0215) },
-+	{ USB_DEVICE(0x0489, 0xE03D) },
- 
- 	/* Atheros AR9285 Malbec with sflash firmware */
- 	{ USB_DEVICE(0x03F0, 0x311D) },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f9b7260..bf1eb35 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -116,6 +116,7 @@ static struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
- 	{ USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
- 	{ USB_DEVICE(0x0930, 0x0215), .driver_info = BTUSB_IGNORE },
-+	{ USB_DEVICE(0x0489, 0xe03d), .driver_info = BTUSB_IGNORE },
- 
- 	/* Atheros AR9285 Malbec with sflash firmware */
- 	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
--- 
-1.7.5.4
+MSBVc2UgVVNCX0lOVEVSRkFDRV9JTkZPIHRvIGRvIGRldmljZSBtYXRjaGluZywgb3RoZXIgdGhh
+biBVU0JfREVWSUNFX0lORk8uDQoyIERlbGV0ZSBkZXNjLmJJbnRlcmZhY2VOdW1iZXIgIT0gMCBj
+aGVjay4NCg0KU2lnbmVkLW9mZi1ieTogQ29zdGEgWWFvIDxjcXlhb0BxY2EucXVhbGNvbW0uY29t
+Pg0KLS0tDQogZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyB8ICAgMTYgKysrKysrKystLS0tLS0t
+LQ0KIDEgZmlsZXMgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQ0KDQpk
+aWZmIC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyBiL2RyaXZlcnMvYmx1ZXRvb3Ro
+L2J0dXNiLmMNCmluZGV4IDJiZDg3ZDQuLjM5ZGQ2NWMgMTAwNjQ0DQotLS0gYS9kcml2ZXJzL2Js
+dWV0b290aC9idHVzYi5jDQorKysgYi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQpAQCAtNTcs
+OCArNTcsOCBAQCBzdGF0aWMgc3RydWN0IHVzYl9kcml2ZXIgYnR1c2JfZHJpdmVyOw0KICNkZWZp
+bmUgQlRVU0JfQVRIMzAxMgkJMHg4MA0KIA0KIHN0YXRpYyBzdHJ1Y3QgdXNiX2RldmljZV9pZCBi
+dHVzYl90YWJsZVtdID0gew0KLQkvKiBHZW5lcmljIEJsdWV0b290aCBVU0IgZGV2aWNlICovDQot
+CXsgVVNCX0RFVklDRV9JTkZPKDB4ZTAsIDB4MDEsIDB4MDEpIH0sDQorCS8qIEJsdWV0b290aCBV
+U0IgaW50ZXJmYWNlICovDQorCXsgVVNCX0lOVEVSRkFDRV9JTkZPKDB4ZTAsIDB4MDEsIDB4MDEp
+IH0sDQogDQogCS8qIEJyb2FkY29tIFNvZnRTYWlsaW5nIHJlcG9ydGluZyB2ZW5kb3Igc3BlY2lm
+aWMgKi8NCiAJeyBVU0JfREVWSUNFKDB4MDVhYywgMHgyMWUxKSB9LA0KQEAgLTkxOCwxMCArOTE4
+LDYgQEAgc3RhdGljIGludCBidHVzYl9wcm9iZShzdHJ1Y3QgdXNiX2ludGVyZmFjZSAqaW50ZiwN
+CiANCiAJQlRfREJHKCJpbnRmICVwIGlkICVwIiwgaW50ZiwgaWQpOw0KIA0KLQkvKiBpbnRlcmZh
+Y2UgbnVtYmVycyBhcmUgaGFyZGNvZGVkIGluIHRoZSBzcGVjICovDQotCWlmIChpbnRmLT5jdXJf
+YWx0c2V0dGluZy0+ZGVzYy5iSW50ZXJmYWNlTnVtYmVyICE9IDApDQotCQlyZXR1cm4gLUVOT0RF
+VjsNCi0NCiAJaWYgKCFpZC0+ZHJpdmVyX2luZm8pIHsNCiAJCWNvbnN0IHN0cnVjdCB1c2JfZGV2
+aWNlX2lkICptYXRjaDsNCiAJCW1hdGNoID0gdXNiX21hdGNoX2lkKGludGYsIGJsYWNrbGlzdF90
+YWJsZSk7DQpAQCAtMTAxNyw4ICsxMDEzLDEyIEBAIHN0YXRpYyBpbnQgYnR1c2JfcHJvYmUoc3Ry
+dWN0IHVzYl9pbnRlcmZhY2UgKmludGYsDQogDQogCWhkZXYtPm93bmVyID0gVEhJU19NT0RVTEU7
+DQogDQotCS8qIEludGVyZmFjZSBudW1iZXJzIGFyZSBoYXJkY29kZWQgaW4gdGhlIHNwZWNpZmlj
+YXRpb24gKi8NCi0JZGF0YS0+aXNvYyA9IHVzYl9pZm51bV90b19pZihkYXRhLT51ZGV2LCAxKTsN
+CisJLyogQWNjb3JkaW5nIHRvIEhDSS1VU0Igc3BlY2lmaWNhdGlvbiwgdGhlIGludGVyZmFjZSBm
+b3INCisJICogU0NPIGRhdGEgZW5kcG9pbnRzIGZvbGxvd3MgdGhlIGludGVyZmFjZSBmb3IgY29t
+bWFuZHMsDQorCSAqIGV2ZW50cyBhbmQgQUNMIGRhdGENCisJICovDQorCWRhdGEtPmlzb2MgPSB1
+c2JfaWZudW1fdG9faWYoZGF0YS0+dWRldiwNCisJCWludGYtPmN1cl9hbHRzZXR0aW5nLT5kZXNj
+LmJJbnRlcmZhY2VOdW1iZXIgKyAxKTsNCiANCiAJaWYgKCFyZXNldCkNCiAJCXNldF9iaXQoSENJ
+X1FVSVJLX05PX1JFU0VULCAmaGRldi0+cXVpcmtzKTsNCi0tIA0KMS43LjQuMQ0KDQoNCj4gLS0t
+LS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWFyY2VsIEhvbHRtYW5uIFttYWlsdG86
+bWFyY2VsQGhvbHRtYW5uLm9yZ10NCj4gU2VudDogMjAxMeW5tDEx5pyIMTbml6UgOToxNg0KPiBU
+bzogWWFvLCBDb3N0YQ0KPiBDYzogcGFkb3ZhbkBwcm9mdXNpb24ubW9iaTsgbGludXgtYmx1ZXRv
+b3RoQHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIXSBCbHVldG9vdGg6IGJ0
+dXNiOiBVc2UgVVNCX0lOVEVSRkFDRV9JTkZPIHRvIGRvIGRldmljZQ0KPiBtYXRjaGluZw0KPiAN
+Cj4gSGkgQ29zdGEsDQo+IA0KPiA+IDEgVXNlIFVTQl9JTlRFUkZBQ0VfSU5GTyB0byBkbyBkZXZp
+Y2UgbWF0Y2hpbmcsIG90aGVyIHRoYW4NCj4gVVNCX0RFVklDRV9JTkZPLg0KPiA+IDIgRGVsZXRl
+IGRlc2MuYkludGVyZmFjZU51bWJlciAhPSAwIGNoZWNrLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1i
+eTogQ29zdGEgWWFvIDxjcXlhb0BxY2EucXVhbGNvbW0uY29tPg0KPiA+IC0tLQ0KPiA+ICBkcml2
+ZXJzL2JsdWV0b290aC9idHVzYi5jIHwgICAxNiArKysrKysrKy0tLS0tLS0tDQo+ID4gIDEgZmls
+ZXMgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQ0KPiANCj4gdGhpcyBs
+b29rcyBmaW5lIHRvIG1lIG5vdy4gQW5kIGlzbid0IHRoaXMgYSBtdWNoIGNsZWFuZXIgcGF0Y2gg
+OykNCj4gDQo+ID4gLQkvKiBJbnRlcmZhY2UgbnVtYmVycyBhcmUgaGFyZGNvZGVkIGluIHRoZSBz
+cGVjaWZpY2F0aW9uICovDQo+ID4gLQlkYXRhLT5pc29jID0gdXNiX2lmbnVtX3RvX2lmKGRhdGEt
+PnVkZXYsIDEpOw0KPiA+ICsJLyogQWNjb3JkaW5nIHRvIEhDSS1VU0Igc3BlY2lmaWNhdGlvbiwg
+dGhlIGludGVyZmFjZSBmb3INCj4gPiArCSAqIFNDTyBkYXRhIGVuZHBvaW50IGZvbGxvd3MgdGhl
+IGludGVyZmFjZSBmb3IgY29tbWFuZHMsDQo+ID4gKwkgKiBldmVudHMgYW5kIEFDTCBkYXRhDQo+
+ID4gKwkgKi8NCj4gDQo+IE1pbm9yIG5pdHBpY2sgaGVyZS4gSXQgaXMgU0NPIGRhdGEgZW5kcG9p
+bnRzIChwbHVyYWwpLiBKdXN0IHJlc2VuZCB0aGUgcGF0Y2ggd2l0aA0KPiB0aGlzIGZpeGVkIGFu
+ZCBmZWVsIGZyZWUgdG8gYWRkIG15IEFDSy4NCj4gDQo+ID4gKwlkYXRhLT5pc29jID0gdXNiX2lm
+bnVtX3RvX2lmKGRhdGEtPnVkZXYsDQo+ID4gKwkJaW50Zi0+Y3VyX2FsdHNldHRpbmctPmRlc2Mu
+YkludGVyZmFjZU51bWJlciArIDEpOw0KPiA+DQo+ID4gIAlpZiAoIXJlc2V0KQ0KPiA+ICAJCXNl
+dF9iaXQoSENJX1FVSVJLX05PX1JFU0VULCAmaGRldi0+cXVpcmtzKTsNCj4gDQo+IEFja2VkLWJ5
+OiBNYXJjZWwgSG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5vcmc+DQo+IA0KPiBSZWdhcmRzDQo+
+IA0KPiBNYXJjZWwNCj4gDQoNCg==
