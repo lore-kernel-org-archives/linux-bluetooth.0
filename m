@@ -1,34 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Nov 2011 16:00:25 -0200
+Date: Wed, 16 Nov 2011 15:55:08 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: johan.hedberg@gmail.com
+To: Brian Gix <bgix@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Fix mgmt_pair_device imediate error
- responses
-Message-ID: <20111116180025.GE16865@joana>
-References: <1320962855-19036-1-git-send-email-johan.hedberg@gmail.com>
- <1320962855-19036-2-git-send-email-johan.hedberg@gmail.com>
+Subject: Re: [PATCH 2/3] Bluetooth: Add MGMT opcode for User Passkey entry
+Message-ID: <20111116175508.GD16865@joana>
+References: <1320958375-24425-1-git-send-email-bgix@codeaurora.org>
+ <1320958375-24425-3-git-send-email-bgix@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320962855-19036-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1320958375-24425-3-git-send-email-bgix@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+* Brian Gix <bgix@codeaurora.org> [2011-11-10 12:52:54 -0800]:
 
-* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-11-11 00:07:35 +0200]:
+> Signed-off-by: Brian Gix <bgix@codeaurora.org>
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> When possible cmd_complete should be returned instead of cmd_status
-> since it contains the remote address (this helps user-space track what
-> exactly failed).
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  net/bluetooth/mgmt.c |   13 +++++++++++--
->  1 files changed, 11 insertions(+), 2 deletions(-)
 
-Both patches were applied, thanks.
+Same here, better commit message please.
 
 	Gustavo
