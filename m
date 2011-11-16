@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 06/17] serial: Fix errno handling convention
-Date: Wed, 16 Nov 2011 09:19:53 -0400
-Message-Id: <1321449604-4188-7-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 05/17] audio: Fix errno handling convention
+Date: Wed, 16 Nov 2011 09:19:52 -0400
+Message-Id: <1321449604-4188-6-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1321449604-4188-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1321449604-4188-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,114 +14,82 @@ Variables which are assigned to the errno variable (usually called
 "err") should be negative, and "-err" should be used where a positive
 value is needed.
 ---
- serial/port.c  |    6 +++---
- serial/proxy.c |   39 ++++++++++++++++++---------------------
- 2 files changed, 21 insertions(+), 24 deletions(-)
+ audio/ctl_bluetooth.c |   13 +++++++------
+ audio/unix.c          |   21 ++++++++++++---------
+ 2 files changed, 19 insertions(+), 15 deletions(-)
 
-diff --git a/serial/port.c b/serial/port.c
-index fa302be..3b36d44 100644
---- a/serial/port.c
-+++ b/serial/port.c
-@@ -183,16 +183,16 @@ static int port_release(struct serial_port *port)
- 	req.flags = (1 << RFCOMM_HANGUP_NOW);
+diff --git a/audio/ctl_bluetooth.c b/audio/ctl_bluetooth.c
+index d941421..a16f476 100644
+--- a/audio/ctl_bluetooth.c
++++ b/audio/ctl_bluetooth.c
+@@ -257,18 +257,19 @@ static int bluetooth_read_event(snd_ctl_ext_t *ext, snd_ctl_elem_id_t *id,
+ 	struct bluetooth_data *data = ext->private_data;
+ 	char buf[BT_SUGGESTED_BUFFER_SIZE];
+ 	struct bt_control_ind *ind = (void *) buf;
+-	int ret;
++	int err;
+ 	const char *type, *name;
  
- 	if (ioctl(rfcomm_ctl, RFCOMMRELEASEDEV, &req) < 0) {
--		err = errno;
+ 	DBG("ext %p id %p", ext, id);
+ 
+ 	memset(buf, 0, sizeof(buf));
+ 
+-	ret = recv(data->sock, ind, BT_SUGGESTED_BUFFER_SIZE, MSG_DONTWAIT);
+-	if (ret < 0) {
+-		SNDERR("Failed while receiving data: %s (%d)",
+-				strerror(errno), errno);
+-		return -errno;
++	err = recv(data->sock, ind, BT_SUGGESTED_BUFFER_SIZE, MSG_DONTWAIT);
++	if (err < 0) {
 +		err = -errno;
- 		error("Can't release device %s: %s (%d)",
--				port->dev, strerror(err), err);
-+				port->dev, strerror(-err), -err);
++		SNDERR("Failed while receiving data: %s (%d)", strerror(-err),
++									-err);
++		return err;
  	}
  
- 	g_free(port->dev);
- 	port->dev = NULL;
- 	port->id = -1;
- 	close(rfcomm_ctl);
--	return -err;
-+	return err;
- }
+ 	type = bt_audio_strtype(ind->h.type);
+diff --git a/audio/unix.c b/audio/unix.c
+index 4e0a6f9..5199831 100644
+--- a/audio/unix.c
++++ b/audio/unix.c
+@@ -1864,25 +1864,28 @@ int unix_init(void)
  
- static void serial_port_free(void *data)
-diff --git a/serial/proxy.c b/serial/proxy.c
-index 371ad5f..736f690 100644
---- a/serial/proxy.c
-+++ b/serial/proxy.c
-@@ -289,19 +289,18 @@ static inline int unix_socket_connect(const char *address)
- 	/* Unix socket */
- 	sk = socket(AF_UNIX, SOCK_STREAM, 0);
+ 	sk = socket(PF_LOCAL, SOCK_STREAM, 0);
  	if (sk < 0) {
 -		err = errno;
-+		err = -errno;
- 		error("Unix socket(%s) create failed: %s(%d)",
--				address, strerror(err), err);
+-		error("Can't create unix socket: %s (%d)", strerror(err), err);
 -		return -err;
-+				address, strerror(-err), -err);
++		err = -errno;
++		error("Can't create unix socket: %s (%d)", strerror(-err),
++									-err);
 +		return err;
  	}
  
- 	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		err = errno;
+ 	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+-		error("Can't bind unix socket: %s (%d)", strerror(errno),
+-				errno);
 +		err = -errno;
- 		error("Unix socket(%s) connect failed: %s(%d)",
--				address, strerror(err), err);
-+				address, strerror(-err), -err);
++		error("Can't bind unix socket: %s (%d)", strerror(-err),
++									-err);
  		close(sk);
--		errno = err;
--		return -err;
+-		return -1;
 +		return err;
  	}
  
- 	return sk;
-@@ -329,18 +328,17 @@ static int tcp_socket_connect(const char *address)
+ 	set_nonblocking(sk);
  
- 	sk = socket(PF_INET, SOCK_STREAM, 0);
- 	if (sk < 0) {
--		err = errno;
+ 	if (listen(sk, 1) < 0) {
+-		error("Can't listen on unix socket: %s (%d)",
+-						strerror(errno), errno);
 +		err = -errno;
- 		error("TCP socket(%s) create failed %s(%d)", address,
--							strerror(err), err);
--		return -err;
-+							strerror(-err), -err);
-+		return err;
- 	}
- 	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		err = errno;
-+		err = -errno;
- 		error("TCP socket(%s) connect failed: %s(%d)",
--						address, strerror(err), err);
-+						address, strerror(-err), -err);
++		error("Can't listen on unix socket: %s (%d)", strerror(-err),
++									-err);
  		close(sk);
--		errno = err;
--		return -err;
-+		return err;
- 	}
- 	return sk;
- }
-@@ -351,18 +349,17 @@ static inline int tty_open(const char *tty, struct termios *ti)
- 
- 	sk = open(tty, O_RDWR | O_NOCTTY);
- 	if (sk < 0) {
--		err = errno;
--		error("Can't open TTY %s: %s(%d)", tty, strerror(err), err);
--		return -err;
-+		err = -errno;
-+		error("Can't open TTY %s: %s(%d)", tty, strerror(-err), -err);
+-		return -1;
 +		return err;
  	}
  
- 	if (ti && tcsetattr(sk, TCSANOW, ti) < 0) {
--		err = errno;
-+		err = -errno;
- 		error("Can't change serial settings: %s(%d)",
--				strerror(err), err);
-+				strerror(-err), -err);
- 		close(sk);
--		errno = err;
--		return -err;
-+		return err;
- 	}
- 
- 	return sk;
+ 	unix_sock = sk;
 -- 
 1.7.0.4
 
