@@ -1,71 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Nov 2011 10:46:43 +0200
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
-Subject: Re: [PATCH] Bluetooth: Assure BREDR HCI device first in the list
-Message-ID: <20111116084642.GE30662@aemeltch-MOBL1>
-References: <1321361939-24024-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <alpine.DEB.2.02.1111150822270.7320@mathewm-linux>
+From: "Yao, Costa" <cqyao@qca.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "padovan@profusion.mobi" <padovan@profusion.mobi>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] Bluetooth: btusb: Use USB_INTERFACE_INFO to do device
+ matching
+Date: Wed, 16 Nov 2011 08:29:32 +0000
+Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF39DB@nasanexd02b.na.qualcomm.com>
+References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEEEF58@nasanexd02b.na.qualcomm.com>
+ <1321263144.15441.465.camel@aeonflux>
+In-Reply-To: <1321263144.15441.465.camel@aeonflux>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.02.1111150822270.7320@mathewm-linux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
-
-On Tue, Nov 15, 2011 at 08:45:47AM -0800, Mat Martineau wrote:
-> >Using different list_add to make sure that BR/EDR HCI device is the
-> >first device in the hci_dev_list. This is needed for e.g. A2MP Discover
-> >Command which requires that "entry for Controller ID 0x00 (Primary
-> >BR/EDR controller) shall always be sent and shall be the first entry
-> >in the Controller List.
-> >Also output from hciconfig looks nicer :-)
-> >
-> >Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> >---
-> >net/bluetooth/hci_core.c |    6 +++++-
-> >1 files changed, 5 insertions(+), 1 deletions(-)
-> >
-> >diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> >index 02a6f15..bf24218 100644
-> >--- a/net/bluetooth/hci_core.c
-> >+++ b/net/bluetooth/hci_core.c
-> >@@ -1501,7 +1501,11 @@ int hci_register_dev(struct hci_dev *hdev)
-> >
-> >	sprintf(hdev->name, "hci%d", id);
-> >	hdev->id = id;
-> >-	list_add(&hdev->list, head);
-> >+
-> >+	if (hdev->dev_type == HCI_BREDR)
-> >+		list_add(&hdev->list, head);
-> >+	else
-> >+		list_add_tail(&hdev->list, head);
-> >
-> >	atomic_set(&hdev->refcnt, 1);
-> >	spin_lock_init(&hdev->lock);
-> >-- 
-> >1.7.4.1
-> 
-> I'm don't think it works to depend on the ordering in hdev->list for
-> A2MP discover, since there might be multiple BR/EDR controllers.
-
-What about following change:
-
--    list_add(&hdev->list, head);
-+    list_add_tail(&hdev->list, head);
-
-This way hci devices queued to the list as opposed to stacked now.
-Usual use case is that we have the 1st device BR/EDR and second AMP.
-
-> Controller 0x00 is the BR/EDR controller that received the A2MP
-> discover request.  The rest of the list should be only AMP
-> controllers, any other BR/EDR controllers should not be listed.  In
-> practice, this means that the 0x00 entry in the list is hard-coded
-> and hdev->list is only used to look for AMP controllers.
-
-It is actually how it is done in my RFC, I wanted to make it nicer :-(
-
-Best regards 
-Andrei Emeltchenko 
+SGkgTWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hcmNl
+bCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddDQo+IFNlbnQ6IDIwMTHlubQx
+MeaciDE05pelIDE3OjMyDQo+IFRvOiBZYW8sIENvc3RhDQo+IENjOiBwYWRvdmFuQHByb2Z1c2lv
+bi5tb2JpOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBb
+UEFUQ0hdIEJsdWV0b290aDogYnR1c2I6IFVzZSBVU0JfSU5URVJGQUNFX0lORk8gdG8gZG8gZGV2
+aWNlDQo+IG1hdGNoaW5nDQo+IA0KPiBIaSBDb3N0YSwNCj4gDQo+ID4gMSBVc2UgVVNCX0lOVEVS
+RkFDRV9JTkZPIHRvIGRvIGRldmljZSBtYXRjaGluZywgb3RoZXIgdGhhbg0KPiBVU0JfREVWSUNF
+X0lORk8uDQo+ID4gMiBBbmQgd2UgdHJ5IHRvIGZpbmQgdGhlIGZpcnN0IGludGVyZmFjZSBjb250
+YWluaW5nIHRoZSBpbnRlcnJ1cHQgZW5kcG9pbnQuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBD
+b3N0YSBZYW8gPGNxeWFvQHFjYS5xdWFsY29tbS5jb20+DQo+ID4gLS0tDQo+ID4gIGRyaXZlcnMv
+Ymx1ZXRvb3RoL2J0dXNiLmMgfCAgIDE2ICsrKysrKysrKysrLS0tLS0NCj4gPiAgMSBmaWxlcyBj
+aGFuZ2VkLCAxMSBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAt
+LWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgYi9kcml2ZXJzL2JsdWV0b290aC9idHVz
+Yi5jDQo+ID4gaW5kZXggOWRiMjQ3Ni4uODBkN2UyZCAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJz
+L2JsdWV0b290aC9idHVzYi5jDQo+ID4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0K
+PiA+IEBAIC01OCw3ICs1OCw3IEBAIHN0YXRpYyBzdHJ1Y3QgdXNiX2RyaXZlciBidHVzYl9kcml2
+ZXI7DQo+ID4NCj4gPiAgc3RhdGljIHN0cnVjdCB1c2JfZGV2aWNlX2lkIGJ0dXNiX3RhYmxlW10g
+PSB7DQo+ID4gIAkvKiBHZW5lcmljIEJsdWV0b290aCBVU0IgZGV2aWNlICovDQo+ID4gLQl7IFVT
+Ql9ERVZJQ0VfSU5GTygweGUwLCAweDAxLCAweDAxKSB9LA0KPiA+ICsJeyBVU0JfSU5URVJGQUNF
+X0lORk8oMHhlMCwgMHgwMSwgMHgwMSkgfSwNCj4gPg0KPiA+ICAJLyogQnJvYWRjb20gU29mdFNh
+aWxpbmcgcmVwb3J0aW5nIHZlbmRvciBzcGVjaWZpYyAqLw0KPiA+ICAJeyBVU0JfREVWSUNFKDB4
+MDVhYywgMHgyMWUxKSB9LA0KPiANCj4gdGhpcyBhY3R1YWxseSBtZWFucyB0aGF0IHNvbWUgb2Yg
+dGhlIFVTQl9ERVZJQ0UgZW50cmllcyBjYW4gYmUgcmVtb3ZlZC4NCj4gUGxlYXNlIGdvIHRocm91
+Z2ggb3VyIGNvbW1pdCBsb2dzIGZvciBidHVzYi5jIGFuZCBmaWd1cmUgb3V0IHdoaWNoIG9uZXMg
+Y2FuIGJlDQo+IHJlbW92ZWQgYW5kIHNlbmQgYSBzZXBhcmF0ZSBwYXRjaCBmb3IgdGhhdC4NCkkg
+aGF2ZSBnb25lIHRocm91Z2ggY29tbWl0cyBhYm91dCB0aGUgYWRkaW5nIG9mIFVTQl9ERVZJQ0Ug
+ZW50cnksIGFuZCBmb3VuZCBhcyBmb2xsb3c6DQoNCkZvciBCcm9hZGNvbSBTb2Z0U2FpbGluZyBy
+ZXBvcnRpbmcgdmVuZG9yIHNwZWNpZmljIGVudHJ5LCBubyBkZXRhaWxlZCBjb21taXQgZGVzY3Jp
+cHRpb24uDQoNCkZvciBBcHBsZSBNYWNCb29rUHJvNywxIGVudHJ5LCBpdHMgaW50ZXJmYWNlIGNs
+YXNzIGlzIDB4ZmYsIHNvIGNhbm5vdCBiZSByZW1vdmVkLg0KDQpGb3IgQXBwbGUgaU1hYzExLDEg
+ZW50cnksIGl0cyBpbnRlcmZhY2UgY2xhc3MgaXMgMHhmZiwgc28gY2Fubm90IGJlIHJlbW92ZWQu
+DQoNCkZvciBBcHBsZSBNYWNCb29rUHJvNiwyIGVudHJ5LCBpdHMgaW50ZXJmYWNlIGNsYXNzIGlz
+IDB4ZmYsIHNvIGNhbm5vdCBiZSByZW1vdmVkLg0KDQpGb3IgQXBwbGUgTWFjQm9va0FpcjMsMSwg
+TWFjQm9va0FpcjMsMiBlbnRyeSwgaXRzIGludGVyZmFjZSBjbGFzcyBpcyAweGZmLCBzbyBjYW5u
+b3QgYmUgcmVtb3ZlZC4NCg0KRm9yIEFwcGxlIE1hY0Jvb2tBaXI0LDEgZW50cnksIG5vIGRldGFp
+bGVkIGNvbW1pdCBkZXNjcmlwdGlvbi4NCg0KRm9yIEFwcGxlIE1hY0Jvb2tQcm84LDIgZW50cnks
+IG5vIGRldGFpbGVkIGNvbW1pdCBkZXNjcmlwdGlvbi4NCg0KRm9yIEFwcGxlIE1hY01pbmk1LDEs
+IG5vIGRldGFpbGVkIGNvbW1pdCBkZXNjcmlwdGlvbi4NCg0KRm9yIEVyaWNzc29uIGVudHJ5LCBu
+byBjb21taXQgZGVzY3JpcHRpb24uDQoNCkZvciBDYW55b24gQ04tQlRVMSBlbnRyeSwgbm8gZGV0
+YWlsZWQgY29tbWl0IGRlc2NyaXB0aW9uLg0KDQpGb3IgQkNNMjA3MDJBMCBlbnRyeSwgaXRzIGlu
+dGVyZmFjZSBjbGFzcyBpcyAweGZmLCBzbyBpdCBjYW5ub3QgYmUgcmVtb3ZlZC4NCg0KRm9yICJB
+Vk0gQmx1ZUZSSVRaIiwgIkJsdWV0b290aCBVbHR0cmFwb3J0IE1vZHVsZSBmcm9tIElCTSIsIGFu
+ZCAiQUxQUyBNb2R1bGVzIHdpdGggbm9uLXN0YW5kYXJkIGlkIiBlbnRyaWVzLCBubyByZWxhdGVk
+IGNvbW1pdCBkZXNjcmlwdGlvbi4NCg0KPiA+IEBAIC05MTUsOSArOTE1LDE0IEBAIHN0YXRpYyBp
+bnQgYnR1c2JfcHJvYmUoc3RydWN0IHVzYl9pbnRlcmZhY2UNCj4gPiAqaW50ZiwNCj4gPg0KPiA+
+ICAJQlRfREJHKCJpbnRmICVwIGlkICVwIiwgaW50ZiwgaWQpOw0KPiA+DQo+ID4gLQkvKiBpbnRl
+cmZhY2UgbnVtYmVycyBhcmUgaGFyZGNvZGVkIGluIHRoZSBzcGVjICovDQo+ID4gLQlpZiAoaW50
+Zi0+Y3VyX2FsdHNldHRpbmctPmRlc2MuYkludGVyZmFjZU51bWJlciAhPSAwKQ0KPiA+ICsJZm9y
+IChpID0gMDsgaSA8IGludGYtPmN1cl9hbHRzZXR0aW5nLT5kZXNjLmJOdW1FbmRwb2ludHM7IGkr
+Kykgew0KPiA+ICsJCWVwX2Rlc2MgPSAmaW50Zi0+Y3VyX2FsdHNldHRpbmctPmVuZHBvaW50W2ld
+LmRlc2M7DQo+ID4gKw0KPiA+ICsJCWlmICh1c2JfZW5kcG9pbnRfaXNfaW50X2luKGVwX2Rlc2Mp
+KQ0KPiA+ICsJCQlicmVhazsNCj4gPiArDQo+ID4gIAkJcmV0dXJuIC1FTk9ERVY7DQo+ID4gKwl9
+DQo+IA0KPiBUaGVyZSBpcyBubyBwb2ludCBpbiB3YWxraW5nIHRoZSBlbmRwb2ludCBsaXN0IHR3
+aWNlIGluIHRoZSBwcm9iZSBmdW5jdGlvbi4gU3RvcmUNCj4gcG9zc2libGUgY2FuZGlkYXRlcyBm
+b3IgaW50X2luLCBidWxrX291dCBhbmQgYnVsa19pbiBkZXNjcmlwdG9ycyBzbyB0aGF0IGxhdGVy
+IG9uDQo+IHdlIGNhbiBqdXN0IGFzc2lnbiB0aGVtIHRvIG91ciBkYXRhLg0KPiANCj4gVGhlbiB3
+ZSBjYW4ganVzdCBjaGVjayBpZiB0aGlzIGludGVyZmFjZSBoYXMgaW50IGFuZCBwcm9wZXIgYnVs
+ayBlbmRwb2ludHMNCj4gYXZhaWxhYmxlLiBBbmQgaW4gZXJyb3IgY2FzZSByZXR1cm4gRU5PREVW
+Lg0KPiANCj4gQWN0dWFsbHkgdGhpbmtpbmcgYWJvdXQgaXQsIHdlIGFscmVhZHkgZG8gdGhhdCwg
+c28ganVzdCByZW1vdmluZyB0aGUgaGFyZGNvZGVkDQo+IGNoZWNrIGZvciBkZXNjLmJJbnRlcmZh
+Y2VOdW1iZXIgIT0gMCBzaG91bGQgZG8gdGhlIHRyaWNrLg0KPiANCj4gPiAgCWlmICghaWQtPmRy
+aXZlcl9pbmZvKSB7DQo+ID4gIAkJY29uc3Qgc3RydWN0IHVzYl9kZXZpY2VfaWQgKm1hdGNoOw0K
+PiA+IEBAIC0xMDE0LDggKzEwMTksOSBAQCBzdGF0aWMgaW50IGJ0dXNiX3Byb2JlKHN0cnVjdCB1
+c2JfaW50ZXJmYWNlDQo+ID4gKmludGYsDQo+ID4NCj4gPiAgCWhkZXYtPm93bmVyID0gVEhJU19N
+T0RVTEU7DQo+ID4NCj4gPiAtCS8qIEludGVyZmFjZSBudW1iZXJzIGFyZSBoYXJkY29kZWQgaW4g
+dGhlIHNwZWNpZmljYXRpb24gKi8NCj4gPiAtCWRhdGEtPmlzb2MgPSB1c2JfaWZudW1fdG9faWYo
+ZGF0YS0+dWRldiwgMSk7DQo+ID4gKw0KPiA+ICsJZGF0YS0+aXNvYyA9IHVzYl9pZm51bV90b19p
+ZihkYXRhLT51ZGV2LA0KPiA+ICsJCTEraW50Zi0+Y3VyX2FsdHNldHRpbmctPmRlc2MuYkludGVy
+ZmFjZU51bWJlcik7DQo+IA0KPiBBbmQgaGVyZSB5b3UgbmVlZCB0byB0byBjaGVjayBhbGwgaW50
+ZXJmYWNlcy4gSnVzdCBhc3N1bWluZyBpdCBpcyArMSBtaWdodCBub3QgYmUNCj4gZ29vZCBlbm91
+Z2guIE9yIGF0IGxlYXN0IHB1dCBhIHByb3BlciBjb21tZW50IGluIGhlcmUgdGhhdCB3ZSBleHBl
+Y3QgdGhlDQo+IElTT0MgaW50ZXJmYWNlIHRvIGJlICsxLiBBbmQgdGhlbiBkb24ndCBkbyAxKywg
+SSBwcmVmZXIgdG8gaGF2ZQ0KPiBiSW50ZXJmYWNlTnVtYmVyICsgMS4NCj4gDQo+IFJlZ2FyZHMN
+Cj4gDQo+IE1hcmNlbA0KPiANCg0K
