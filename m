@@ -1,51 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Yao, Costa" <cqyao@qca.qualcomm.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>, "padovan@profusion.mobi"
+	<padovan@profusion.mobi>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] Bluetooth: btusb: Add Qualcomm Atheros AR3006 in
+ blacklist_table
+Date: Wed, 16 Nov 2011 11:09:12 +0000
+Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3A49@nasanexd02b.na.qualcomm.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <CAPGrrxWX2VupSpvh+sz57mdagCXExtkM5r=dHVAz0xQLnqwz6Q@mail.gmail.com>
-References: <1321368294-29379-1-git-send-email-bulislaw@linux.com>
-	<CABBYNZLMKiRjuc9de0g_26PW=OAmAgJfOSRaCFMHBSPSHjbnig@mail.gmail.com>
-	<CAPGrrxWX2VupSpvh+sz57mdagCXExtkM5r=dHVAz0xQLnqwz6Q@mail.gmail.com>
-Date: Wed, 16 Nov 2011 13:12:49 +0200
-Message-ID: <CABBYNZJ+vzT5Sp_pJyHWaO-=5N-wGgFmphSc4aphykaHchBXqQ@mail.gmail.com>
-Subject: Re: [PATCH] gobex: Fix setpath to match one from OBEX spec
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bartosz,
+Add Qualcomm Atheros AR3006 entry in blacklist_table in btusb.c for bcdDevi=
+ce check.
 
-On Wed, Nov 16, 2011 at 10:24 AM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
->
-> Come on did You even read it?? This function is OBEX level (an it
-> works before in similar way - only one dir at a time) - we may don't
-> like specification, but seriously? Just read the patch, i exposed on
-> OBEX level stuff defined in the OBEX specification (as MAP needs
-> operation like "go one level up and than down" in one step) and as it
-> would be possible to just add some "if" for "../dir" in previous
-> version, but it is better to fix broken things than to propagate them
-> (it's obex level function not high level abstraction - deal with it).
+Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
+---
+ drivers/bluetooth/btusb.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
 
-Yeah, lets create an API that we don't use, really? Your MAP API need
-it but that doesn't mean we agree on using it as it is, that table you
-use to explain how it works is already a sign that it is
-over-engineered and will be easily misinterpreted by applications. We
-will not break MAP by not exposing this complexity since we can still
-do it transparently, even doing cdup and another SetPath although
-inefficient would still work.
-
-> Each profile may use it multiple times for paths delivered through
-> dbus (but it provokes some questions, that i don't like). Generally
-> there is REALLY many gui that works like that (one level down or up at
-> a time) just look around (eg all file explorers) and it's all you
-> need, because its basically same context!
-
-Same context? What context, the folder listing is per folder, besides
-nowadays the file explores have abandon the tree view in favor of more
-simple one level like nautilus. But even with gui that uses tree view
-we can only jump one level or to the root so it is not that it would
-save that much of time.
-
--- 
-Luiz Augusto von Dentz
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 39dd65c..94124ad 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -55,6 +55,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_BROKEN_ISOC	0x20
+ #define BTUSB_WRONG_SCO_MTU	0x40
+ #define BTUSB_ATH3012		0x80
++#define BTUSB_ATH3006		0x0100
+=20
+ static struct usb_device_id btusb_table[] =3D {
+ 	/* Bluetooth USB interface */
+@@ -125,6 +126,7 @@ static struct usb_device_id blacklist_table[] =3D {
+=20
+ 	/* Atheros 3012 with sflash firmware */
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info =3D BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0x3006), .driver_info =3D BTUSB_ATH3006 },
+=20
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info =3D BTUSB_IGNORE },
+@@ -937,7 +939,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (ignore_sniffer && id->driver_info & BTUSB_SNIFFER)
+ 		return -ENODEV;
+=20
+-	if (id->driver_info & BTUSB_ATH3012) {
++	if ((id->driver_info & BTUSB_ATH3012) ||
++				(id->driver_info & BTUSB_ATH3006)) {
+ 		struct usb_device *udev =3D interface_to_usbdev(intf);
+=20
+ 		/* Old firmware would otherwise let ath3k driver load
+--=20
+1.7.4.1
