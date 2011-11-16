@@ -1,31 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Nov 2011 16:56:52 -0200
+Date: Wed, 16 Nov 2011 16:51:29 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: Brian Gix <bgix@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 3/3] Bluetooth: Do not set HCI_RAW when HS enabled
-Message-ID: <20111116185652.GK16865@joana>
-References: <1321267370-15727-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1321267370-15727-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH-v3 2/9] Bluetooth: Add MGMT opcodes for Passkey Entry
+Message-ID: <20111116185129.GJ16865@joana>
+References: <1321468673-13925-1-git-send-email-bgix@codeaurora.org>
+ <1321468673-13925-3-git-send-email-bgix@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321267370-15727-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1321468673-13925-3-git-send-email-bgix@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Brian,
 
+* Brian Gix <bgix@codeaurora.org> [2011-11-16 10:37:46 -0800]:
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-14 12:42:50 +0200]:
-
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Signed-off-by: Brian Gix <bgix@codeaurora.org>
 > Acked-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/hci_core.c |    5 +++--
->  1 files changed, 3 insertions(+), 2 deletions(-)
+>  include/net/bluetooth/mgmt.h |   16 ++++++++++++++++
+>  1 files changed, 16 insertions(+), 0 deletions(-)
 
-all three patches were applied, thanks.
+Patches 1 and 2 were applied. Thanks.
 
 	Gustavo
