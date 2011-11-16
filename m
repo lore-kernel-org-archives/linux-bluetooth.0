@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 07/17] hcitool: Fix errno handling convention
-Date: Wed, 16 Nov 2011 09:19:54 -0400
-Message-Id: <1321449604-4188-8-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 06/17] serial: Fix errno handling convention
+Date: Wed, 16 Nov 2011 09:19:53 -0400
+Message-Id: <1321449604-4188-7-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1321449604-4188-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1321449604-4188-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,61 +14,114 @@ Variables which are assigned to the errno variable (usually called
 "err") should be negative, and "-err" should be used where a positive
 value is needed.
 ---
- tools/hcitool.c |   16 ++++++++--------
- 1 files changed, 8 insertions(+), 8 deletions(-)
+ serial/port.c  |    6 +++---
+ serial/proxy.c |   39 ++++++++++++++++++---------------------
+ 2 files changed, 21 insertions(+), 24 deletions(-)
 
-diff --git a/tools/hcitool.c b/tools/hcitool.c
-index 5c4a0bc..5189d8d 100644
---- a/tools/hcitool.c
-+++ b/tools/hcitool.c
-@@ -2696,9 +2696,9 @@ static void cmd_lewladd(int dev_id, int argc, char **argv)
- 	hci_close_dev(dd);
+diff --git a/serial/port.c b/serial/port.c
+index fa302be..3b36d44 100644
+--- a/serial/port.c
++++ b/serial/port.c
+@@ -183,16 +183,16 @@ static int port_release(struct serial_port *port)
+ 	req.flags = (1 << RFCOMM_HANGUP_NOW);
  
- 	if (err < 0) {
+ 	if (ioctl(rfcomm_ctl, RFCOMMRELEASEDEV, &req) < 0) {
 -		err = errno;
 +		err = -errno;
- 		fprintf(stderr, "Can't add to white list: %s(%d)\n",
--							strerror(err), err);
-+							strerror(-err), -err);
- 		exit(1);
+ 		error("Can't release device %s: %s (%d)",
+-				port->dev, strerror(err), err);
++				port->dev, strerror(-err), -err);
  	}
+ 
+ 	g_free(port->dev);
+ 	port->dev = NULL;
+ 	port->id = -1;
+ 	close(rfcomm_ctl);
+-	return -err;
++	return err;
  }
-@@ -2786,9 +2786,9 @@ static void cmd_lewlsz(int dev_id, int argc, char **argv)
- 	hci_close_dev(dd);
  
- 	if (err < 0) {
+ static void serial_port_free(void *data)
+diff --git a/serial/proxy.c b/serial/proxy.c
+index 371ad5f..736f690 100644
+--- a/serial/proxy.c
++++ b/serial/proxy.c
+@@ -289,19 +289,18 @@ static inline int unix_socket_connect(const char *address)
+ 	/* Unix socket */
+ 	sk = socket(AF_UNIX, SOCK_STREAM, 0);
+ 	if (sk < 0) {
 -		err = errno;
 +		err = -errno;
- 		fprintf(stderr, "Can't read white list size: %s(%d)\n",
--							strerror(err), err);
-+							strerror(-err), -err);
- 		exit(1);
+ 		error("Unix socket(%s) create failed: %s(%d)",
+-				address, strerror(err), err);
+-		return -err;
++				address, strerror(-err), -err);
++		return err;
  	}
  
-@@ -2831,9 +2831,9 @@ static void cmd_lewlclr(int dev_id, int argc, char **argv)
- 	hci_close_dev(dd);
- 
- 	if (err < 0) {
+ 	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
 -		err = errno;
 +		err = -errno;
- 		fprintf(stderr, "Can't clear white list: %s(%d)\n",
--							strerror(err), err);
-+							strerror(-err), -err);
- 		exit(1);
+ 		error("Unix socket(%s) connect failed: %s(%d)",
+-				address, strerror(err), err);
++				address, strerror(-err), -err);
+ 		close(sk);
+-		errno = err;
+-		return -err;
++		return err;
  	}
+ 
+ 	return sk;
+@@ -329,18 +328,17 @@ static int tcp_socket_connect(const char *address)
+ 
+ 	sk = socket(PF_INET, SOCK_STREAM, 0);
+ 	if (sk < 0) {
+-		err = errno;
++		err = -errno;
+ 		error("TCP socket(%s) create failed %s(%d)", address,
+-							strerror(err), err);
+-		return -err;
++							strerror(-err), -err);
++		return err;
+ 	}
+ 	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+-		err = errno;
++		err = -errno;
+ 		error("TCP socket(%s) connect failed: %s(%d)",
+-						address, strerror(err), err);
++						address, strerror(-err), -err);
+ 		close(sk);
+-		errno = err;
+-		return -err;
++		return err;
+ 	}
+ 	return sk;
  }
-@@ -2961,9 +2961,9 @@ static void cmd_lecup(int dev_id, int argc, char **argv)
+@@ -351,18 +349,17 @@ static inline int tty_open(const char *tty, struct termios *ti)
  
- 	if (hci_le_conn_update(dd, htobs(handle), htobs(min), htobs(max),
- 				htobs(latency), htobs(timeout), 5000) < 0) {
--		int err = errno;
-+		int err = -errno;
- 		fprintf(stderr, "Could not change connection params: %s(%d)\n",
--							strerror(err), err);
-+							strerror(-err), -err);
+ 	sk = open(tty, O_RDWR | O_NOCTTY);
+ 	if (sk < 0) {
+-		err = errno;
+-		error("Can't open TTY %s: %s(%d)", tty, strerror(err), err);
+-		return -err;
++		err = -errno;
++		error("Can't open TTY %s: %s(%d)", tty, strerror(-err), -err);
++		return err;
  	}
  
- 	hci_close_dev(dd);
+ 	if (ti && tcsetattr(sk, TCSANOW, ti) < 0) {
+-		err = errno;
++		err = -errno;
+ 		error("Can't change serial settings: %s(%d)",
+-				strerror(err), err);
++				strerror(-err), -err);
+ 		close(sk);
+-		errno = err;
+-		return -err;
++		return err;
+ 	}
+ 
+ 	return sk;
 -- 
 1.7.0.4
 
