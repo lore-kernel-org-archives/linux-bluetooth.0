@@ -1,76 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Nov 2011 10:22:15 +0200
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCHv4 1/5] Bluetooth: Define AMP controller statuses
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 1/3] Bluetooth: Allow to set AMP type for virtual HCI
-Message-ID: <20111116082209.GC30662@aemeltch-MOBL1>
-References: <1321267370-15727-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1321267370-15727-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20111115120918.GA27081@aemeltch-MOBL1>
- <1321405993.15441.500.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321405993.15441.500.camel@aeonflux>
+Date: Wed, 16 Nov 2011 14:50:10 +0900
+In-Reply-To: <1321366547-29462-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1321366547-29462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1321366547-29462-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1321422613.15441.513.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Andrei,
 
-On Wed, Nov 16, 2011 at 10:13:10AM +0900, Marcel Holtmann wrote:
-> Hi Andrei,
+> AMP status codes copied from Bluez patch sent by Peter Krystad
+> <pkrystad@codeaurora.org>.
 > 
-> > > Type can be changed during re-opening device /dev/vhci.
-> > > 
-> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> > > ---
-> > >  drivers/bluetooth/hci_vhci.c |    8 ++++++++
-> > >  1 files changed, 8 insertions(+), 0 deletions(-)
-> > > 
-> > > diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-> > > index 2e302a1..2ed6ab1 100644
-> > > --- a/drivers/bluetooth/hci_vhci.c
-> > > +++ b/drivers/bluetooth/hci_vhci.c
-> > > @@ -41,6 +41,8 @@
-> > >  
-> > >  #define VERSION "1.3"
-> > >  
-> > > +static bool amp;
-> > > +
-> > >  struct vhci_data {
-> > >  	struct hci_dev *hdev;
-> > >  
-> > > @@ -239,6 +241,9 @@ static int vhci_open(struct inode *inode, struct file *file)
-> > >  	hdev->bus = HCI_VIRTUAL;
-> > >  	hdev->driver_data = data;
-> > >  
-> > > +	if (amp)
-> > > +		hdev->dev_type = HCI_AMP;
-> > > +
-> > 
-> > I am thinking about changing lines above to:
-> > 
-> > -       if (amp)
-> > +       if (amp) {
-> >                 hdev->dev_type = HCI_AMP;
-> > +               hdev->amp_type = AMP_CTRL_BLUETOOTH_ONLY;
-> > +       }
-> > 
-> > to indicate that that "the AMP Controller is only used by the Bluetooth
-> > technology and will not be shared with other non-Bluetooth technologies".
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  include/net/bluetooth/hci.h |    9 +++++++++
+>  1 files changed, 9 insertions(+), 0 deletions(-)
 > 
-> this can not be static information at this point. It will change
-> depending on how the WiFi subsystem or WiFi drivers want it to be.
-> 
-> And lets cross the bridge when we get to it. This is too early to figure
-> out what to do here.
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 139ce2a..e79ed67 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -56,6 +56,15 @@
+>  #define HCI_BREDR	0x00
+>  #define HCI_AMP		0x01
+>  
+> +/* AMP controller status */
+> +#define AMP_CTRL_POWERED_DOWN			0x00
+> +#define AMP_CTRL_BLUETOOTH_ONLY			0x01
+> +#define AMP_CTRL_NO_CAPACITY			0x02
+> +#define AMP_CTRL_LOW_CAPACITY			0x03
+> +#define AMP_CTRL_MEDIUM_CAPACITY		0x04
+> +#define AMP_CTRL_HIGH_CAPACITY			0x05
+> +#define AMP_CTRL_FULL_CAPACITY			0x06
+> +
 
-The code only emulates virtual HCI amp_type. The reason why I added it is
-to reply for A2MP Discover Req. If we leave field as 0 it would mean that
-that controller is powered down.
+is hci.h really the right place for these? It is not HCI specific
+per-se. It is A2MP detail. And as mentioned earlier, I do not believe we
+should do it like this.
 
-This value can be read with "read local amp info", I can implement this
-command in hciemu as other option.
+I think we need to expose some sort of functionality that lets the AMP
+drivers handle this dynamically.
 
-Best regards 
-Andrei Emeltchenko 
+Regards
+
+Marcel
+
+
