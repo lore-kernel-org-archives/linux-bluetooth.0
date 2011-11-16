@@ -1,95 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCHv4 1/5] Bluetooth: Define AMP controller statuses
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 16 Nov 2011 22:26:41 +0900
-In-Reply-To: <20111116100438.GI30662@aemeltch-MOBL1>
-References: <1321366547-29462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1321366547-29462-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1321422613.15441.513.camel@aeonflux>
-	 <20111116090325.GF30662@aemeltch-MOBL1>
-	 <1321434990.15441.526.camel@aeonflux>
-	 <20111116100438.GI30662@aemeltch-MOBL1>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321450004.15441.546.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <4EC3B372.6020309@bmw-carit.de>
+References: <4EC3B372.6020309@bmw-carit.de>
+Date: Wed, 16 Nov 2011 15:25:49 +0200
+Message-ID: <CABBYNZLjjU--EYe6WKnDCXwW1WgfdOHQ+1=c+e_YDKwZzr2dLg@mail.gmail.com>
+Subject: Re: [PATCH 2/3] media: sep registration fix
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Mikel,
 
-> > > > > AMP status codes copied from Bluez patch sent by Peter Krystad
-> > > > > <pkrystad@codeaurora.org>.
-> > > > > 
-> > > > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > > > ---
-> > > > >  include/net/bluetooth/hci.h |    9 +++++++++
-> > > > >  1 files changed, 9 insertions(+), 0 deletions(-)
-> > > > > 
-> > > > > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > > > > index 139ce2a..e79ed67 100644
-> > > > > --- a/include/net/bluetooth/hci.h
-> > > > > +++ b/include/net/bluetooth/hci.h
-> > > > > @@ -56,6 +56,15 @@
-> > > > >  #define HCI_BREDR	0x00
-> > > > >  #define HCI_AMP		0x01
-> > > > >  
-> > > > > +/* AMP controller status */
-> > > > > +#define AMP_CTRL_POWERED_DOWN			0x00
-> > > > > +#define AMP_CTRL_BLUETOOTH_ONLY			0x01
-> > > > > +#define AMP_CTRL_NO_CAPACITY			0x02
-> > > > > +#define AMP_CTRL_LOW_CAPACITY			0x03
-> > > > > +#define AMP_CTRL_MEDIUM_CAPACITY		0x04
-> > > > > +#define AMP_CTRL_HIGH_CAPACITY			0x05
-> > > > > +#define AMP_CTRL_FULL_CAPACITY			0x06
-> > > > > +
-> > > > 
-> > > > is hci.h really the right place for these? It is not HCI specific
-> > > > per-se. It is A2MP detail. And as mentioned earlier, I do not believe we
-> > > > should do it like this.
-> > > 
-> > > I believe that it is HCI device specific since hci_dev structure is
-> > > accountable for BR/EDR and AMP controllers and we currently keep
-> > > controller-specific information in hci_dev.
-> > > 
-> > > Those defines indicate AMP controller status like powered or not.
-> > > 
-> > > What would be the better place?
-> > > 
-> > > include/net/bluetooth/hci_core.h
-> > > include/net/bluetooth/amp.h
-> > > include/net/bluetooth/a2mp.h
-> > > 
-> > > 
-> > > > I think we need to expose some sort of functionality that lets the AMP
-> > > > drivers handle this dynamically.
-> > > 
-> > > This status and other AMP parameters would be normally returned when
-> > > "read local amp info" HCI command.
-> > 
-> > if these information come from the AMP controller, then this is clearly
-> > an A2MP specific detail. There is no point in storing them in hci_dev at
-> > all.
-> 
-> I thought that A2MP specific details are details related to A2MP
-> connection. Information about status of AMP controller does not depend on
-> A2MP connection.
+On Wed, Nov 16, 2011 at 2:58 PM, Mikel Astiz <mikel.astiz@bmw-carit.de> wrote:
+> ---
+>  audio/media.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/audio/media.c b/audio/media.c
+> index e5373b8..612408c 100644
+> --- a/audio/media.c
+> +++ b/audio/media.c
+> @@ -659,7 +659,7 @@ static struct media_endpoint
+> *media_endpoint_create(struct media_adapter *adapte
+>                        goto failed;
+>        } else if (strcasecmp(uuid, A2DP_SINK_UUID) == 0) {
+>                endpoint->sep = a2dp_add_sep(&adapter->src,
+> -                                       AVDTP_SEP_TYPE_SOURCE, codec,
+> +                                       AVDTP_SEP_TYPE_SINK, codec,
+>                                        delay_reporting, &a2dp_endpoint,
+>                                        endpoint, a2dp_destroy_endpoint,
+> err);
+>                if (endpoint->sep == NULL)
+> --
+> 1.7.6.4
 
-the only part using this information will be A2MP and it has to read it
-from the controller fresh almost every time. So yes, it belongs there
-and not inside HCI. At least that is how I read the AMP controller
-specification and how it is suppose to be used.
+Nice catch, ack.
 
-> > I think these definition can stay local in net/bluetooth/a2mp.c for now.
-> 
-> maybe a2mp.h then? As we use existing HCI command infrastructure to handle
-> AMP specific HCI commands we might need to source the header.
-
-As I said, leave it local for now. We can always move them around later.
-
-Regards
-
-Marcel
-
-
+-- 
+Luiz Augusto von Dentz
