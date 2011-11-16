@@ -1,38 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Nov 2011 23:02:36 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] Bluetooth: Add public/random LE address information
- to mgmt messages
-Message-ID: <20111116210236.GA879@x220.Elisa>
-References: <1320839938-24873-1-git-send-email-johan.hedberg@gmail.com>
- <1320839938-24873-3-git-send-email-johan.hedberg@gmail.com>
- <20111116171629.GA16865@joana>
+Date: Wed, 16 Nov 2011 18:44:08 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 2/3] Bluetooth: remove old code
+Message-ID: <20111116204408.GD6027@joana>
+References: <1321457422-31641-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1321457422-31641-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111116171629.GA16865@joana>
+In-Reply-To: <1321457422-31641-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-16 17:30:21 +0200]:
 
-On Wed, Nov 16, 2011, Gustavo Padovan wrote:
-> > From: Johan Hedberg <johan.hedberg@intel.com>
-> > 
-> > It's necessary to know the distinction between public and random LE
-> > addresses so the mgmt interface also needs to distinguish between them.
-> > 
-> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> > ---
-> >  include/net/bluetooth/hci_core.h |   14 ++++++++------
-> >  include/net/bluetooth/mgmt.h     |    4 ++--
-> >  net/bluetooth/hci_event.c        |   21 ++++++++++++---------
-> >  net/bluetooth/mgmt.c             |   35 ++++++++++++++++++++++-------------
-> >  4 files changed, 44 insertions(+), 30 deletions(-)
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> This patch doesn't apply anymore, please rebase.
+> Remove old code not touched for several years.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/hci_core.c |   12 ------------
+>  1 files changed, 0 insertions(+), 12 deletions(-)
 
-It doesn't apply because it's already in your tree :)
-commit 48264f06943e2db2c971b752949606f070d9d292
+In despite of this being an RFC I'm taking this patch. Applied, thanks.
 
-Johan
+	Gustavo
