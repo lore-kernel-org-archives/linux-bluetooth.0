@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 11/17] sap-u8500: Fix errno handling convention
-Date: Wed, 16 Nov 2011 09:19:58 -0400
-Message-Id: <1321449604-4188-12-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 10/17] sdp-client: Fix errno handling convention
+Date: Wed, 16 Nov 2011 09:19:57 -0400
+Message-Id: <1321449604-4188-11-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1321449604-4188-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1321449604-4188-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,54 +14,61 @@ Variables which are assigned to the errno variable (usually called
 "err") should be negative, and "-err" should be used where a positive
 value is needed.
 ---
- sap/sap-u8500.c |   16 ++++++++--------
- 1 files changed, 8 insertions(+), 8 deletions(-)
+ src/sdp-client.c |   18 +++++++++---------
+ 1 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/sap/sap-u8500.c b/sap/sap-u8500.c
-index e699fd7..ef7d95c 100644
---- a/sap/sap-u8500.c
-+++ b/sap/sap-u8500.c
-@@ -571,9 +571,9 @@ static int simd_connect(void *sap_data)
+diff --git a/src/sdp-client.c b/src/sdp-client.c
+index ebd760e..f119313 100644
+--- a/src/sdp-client.c
++++ b/src/sdp-client.c
+@@ -217,22 +217,22 @@ static gboolean connect_watch(GIOChannel *chan, GIOCondition cond,
+ 	sdp_list_t *search, *attrids;
+ 	uint32_t range = 0x0000ffff;
+ 	socklen_t len;
+-	int sk, err = 0;
++	int sk, err, sk_err = 0;
  
- 	sock = socket(PF_UNIX, SOCK_STREAM, 0);
- 	if (sock < 0) {
+ 	sk = g_io_channel_unix_get_fd(chan);
+ 	ctxt->io_id = 0;
+ 
+-	len = sizeof(err);
+-	if (getsockopt(sk, SOL_SOCKET, SO_ERROR, &err, &len) < 0) {
 -		err = errno;
--		sap_error("creating socket failed: %s", strerror(err));
--		return -err;
+-		goto failed;
+-	}
++	len = sizeof(sk_err);
++	if (getsockopt(sk, SOL_SOCKET, SO_ERROR, &sk_err, &len) < 0)
 +		err = -errno;
-+		sap_error("creating socket failed: %s", strerror(-err));
-+		return err;
- 	}
++	else
++		err = -sk_err;
  
- 	memset(&addr, 0, sizeof(addr));
-@@ -581,14 +581,14 @@ static int simd_connect(void *sap_data)
- 	memcpy(addr.sun_path, STE_SIMD_SOCK, sizeof(STE_SIMD_SOCK) - 1);
+ 	if (err != 0)
+ 		goto failed;
  
- 	if (connect(sock, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		err = errno;
--		sap_error("connect to the socket failed: %s", strerror(err));
-+		err = -errno;
-+		sap_error("connect to the socket failed: %s", strerror(-err));
+ 	if (sdp_set_notify(ctxt->session, search_completed_cb, ctxt) < 0) {
+-		err = EIO;
++		err = -EIO;
  		goto failed;
  	}
  
- 	if (fcntl(sock, F_SETFL, O_NONBLOCK) > 0) {
--		err = errno;
--		sap_error("setting up socket failed: %s", strerror(err));
-+		err = -errno;
-+		sap_error("setting up socket failed: %s", strerror(-err));
+@@ -242,7 +242,7 @@ static gboolean connect_watch(GIOChannel *chan, GIOCondition cond,
+ 				search, SDP_ATTR_REQ_RANGE, attrids) < 0) {
+ 		sdp_list_free(attrids, NULL);
+ 		sdp_list_free(search, NULL);
+-		err = EIO;
++		err = -EIO;
  		goto failed;
  	}
  
-@@ -598,7 +598,7 @@ static int simd_connect(void *sap_data)
+@@ -260,7 +260,7 @@ failed:
+ 	ctxt->session = NULL;
  
- failed:
- 	close(sock);
--	return -err;
-+	return err;
- }
+ 	if (ctxt->cb)
+-		ctxt->cb(NULL, -err, ctxt->user_data);
++		ctxt->cb(NULL, err, ctxt->user_data);
  
- void sap_connect_req(void *sap_device, uint16_t maxmsgsize)
+ 	search_context_cleanup(ctxt);
+ 
 -- 
 1.7.0.4
 
