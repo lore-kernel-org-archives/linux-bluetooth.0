@@ -1,36 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 0/3] Trivial fixes for emulating AMP HCI
-Date: Wed, 16 Nov 2011 17:27:36 +0200
-Message-Id: <1321457259-31485-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 1/3] Bluetooth: Move scope of kernel parameter enable_hs
+Date: Wed, 16 Nov 2011 17:27:37 +0200
+Message-Id: <1321457259-31485-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1321457259-31485-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1321457259-31485-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Changes:
-	v5: Keep patches already acked, other patches will be send as RFC first
-	v4: Added 2 more patches making sure that BREDR is the 1st device in hci_dev_list;
-	added AMP definitions form Bluez patch sent by Peter Krystad <pkrystad@codeaurora.org>.
-	For VHCI set also amp_status.
-	v3: Changed parameter description
-        v2: Taken Marcel's comments about parameter name & permissions.
-
-Those trivial patches help to emulate AMP HCI controller
-currently used for A2MP protocol verification.
-
-Andrei Emeltchenko (3):
-  Bluetooth: Move scope of kernel parameter enable_hs
-  Bluetooth: Allow to set AMP type for virtual HCI
-  Bluetooth: Do not set HCI_RAW when HS enabled
-
- drivers/bluetooth/hci_vhci.c  |    8 ++++++++
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
  include/net/bluetooth/hci.h   |    2 ++
  include/net/bluetooth/l2cap.h |    1 -
- net/bluetooth/hci_core.c      |    5 +++--
- 4 files changed, 13 insertions(+), 3 deletions(-)
+ 2 files changed, 2 insertions(+), 1 deletions(-)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 139ce2a..31ed71f 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1331,4 +1331,6 @@ struct hci_inquiry_req {
+ };
+ #define IREQ_CACHE_FLUSH 0x0001
+ 
++extern int enable_hs;
++
+ #endif /* __HCI_H */
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 9280bff..7299df8 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -789,7 +789,6 @@ static inline __u8 __ctrl_size(struct l2cap_chan *chan)
+ }
+ 
+ extern int disable_ertm;
+-extern int enable_hs;
+ 
+ int l2cap_init_sockets(void);
+ void l2cap_cleanup_sockets(void);
 -- 
 1.7.4.1
 
