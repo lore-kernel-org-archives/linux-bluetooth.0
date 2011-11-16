@@ -1,71 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Nov 2011 11:03:27 +0200
+Date: Wed, 16 Nov 2011 10:46:43 +0200
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv4 1/5] Bluetooth: Define AMP controller statuses
-Message-ID: <20111116090325.GF30662@aemeltch-MOBL1>
-References: <1321366547-29462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1321366547-29462-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1321422613.15441.513.camel@aeonflux>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
+Subject: Re: [PATCH] Bluetooth: Assure BREDR HCI device first in the list
+Message-ID: <20111116084642.GE30662@aemeltch-MOBL1>
+References: <1321361939-24024-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <alpine.DEB.2.02.1111150822270.7320@mathewm-linux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321422613.15441.513.camel@aeonflux>
+In-Reply-To: <alpine.DEB.2.02.1111150822270.7320@mathewm-linux>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Mat,
 
-On Wed, Nov 16, 2011 at 02:50:10PM +0900, Marcel Holtmann wrote:
-> Hi Andrei,
+On Tue, Nov 15, 2011 at 08:45:47AM -0800, Mat Martineau wrote:
+> >Using different list_add to make sure that BR/EDR HCI device is the
+> >first device in the hci_dev_list. This is needed for e.g. A2MP Discover
+> >Command which requires that "entry for Controller ID 0x00 (Primary
+> >BR/EDR controller) shall always be sent and shall be the first entry
+> >in the Controller List.
+> >Also output from hciconfig looks nicer :-)
+> >
+> >Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> >---
+> >net/bluetooth/hci_core.c |    6 +++++-
+> >1 files changed, 5 insertions(+), 1 deletions(-)
+> >
+> >diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> >index 02a6f15..bf24218 100644
+> >--- a/net/bluetooth/hci_core.c
+> >+++ b/net/bluetooth/hci_core.c
+> >@@ -1501,7 +1501,11 @@ int hci_register_dev(struct hci_dev *hdev)
+> >
+> >	sprintf(hdev->name, "hci%d", id);
+> >	hdev->id = id;
+> >-	list_add(&hdev->list, head);
+> >+
+> >+	if (hdev->dev_type == HCI_BREDR)
+> >+		list_add(&hdev->list, head);
+> >+	else
+> >+		list_add_tail(&hdev->list, head);
+> >
+> >	atomic_set(&hdev->refcnt, 1);
+> >	spin_lock_init(&hdev->lock);
+> >-- 
+> >1.7.4.1
 > 
-> > AMP status codes copied from Bluez patch sent by Peter Krystad
-> > <pkrystad@codeaurora.org>.
-> > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> >  include/net/bluetooth/hci.h |    9 +++++++++
-> >  1 files changed, 9 insertions(+), 0 deletions(-)
-> > 
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index 139ce2a..e79ed67 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -56,6 +56,15 @@
-> >  #define HCI_BREDR	0x00
-> >  #define HCI_AMP		0x01
-> >  
-> > +/* AMP controller status */
-> > +#define AMP_CTRL_POWERED_DOWN			0x00
-> > +#define AMP_CTRL_BLUETOOTH_ONLY			0x01
-> > +#define AMP_CTRL_NO_CAPACITY			0x02
-> > +#define AMP_CTRL_LOW_CAPACITY			0x03
-> > +#define AMP_CTRL_MEDIUM_CAPACITY		0x04
-> > +#define AMP_CTRL_HIGH_CAPACITY			0x05
-> > +#define AMP_CTRL_FULL_CAPACITY			0x06
-> > +
-> 
-> is hci.h really the right place for these? It is not HCI specific
-> per-se. It is A2MP detail. And as mentioned earlier, I do not believe we
-> should do it like this.
+> I'm don't think it works to depend on the ordering in hdev->list for
+> A2MP discover, since there might be multiple BR/EDR controllers.
 
-I believe that it is HCI device specific since hci_dev structure is
-accountable for BR/EDR and AMP controllers and we currently keep
-controller-specific information in hci_dev.
+What about following change:
 
-Those defines indicate AMP controller status like powered or not.
+-    list_add(&hdev->list, head);
++    list_add_tail(&hdev->list, head);
 
-What would be the better place?
+This way hci devices queued to the list as opposed to stacked now.
+Usual use case is that we have the 1st device BR/EDR and second AMP.
 
-include/net/bluetooth/hci_core.h
-include/net/bluetooth/amp.h
-include/net/bluetooth/a2mp.h
+> Controller 0x00 is the BR/EDR controller that received the A2MP
+> discover request.  The rest of the list should be only AMP
+> controllers, any other BR/EDR controllers should not be listed.  In
+> practice, this means that the 0x00 entry in the list is hard-coded
+> and hdev->list is only used to look for AMP controllers.
 
-
-> I think we need to expose some sort of functionality that lets the AMP
-> drivers handle this dynamically.
-
-This status and other AMP parameters would be normally returned when
-"read local amp info" HCI command.
+It is actually how it is done in my RFC, I wanted to make it nicer :-(
 
 Best regards 
 Andrei Emeltchenko 
