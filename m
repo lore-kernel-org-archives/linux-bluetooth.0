@@ -1,57 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Brian Gix <bgix@codeaurora.org>
+MIME-Version: 1.0
+In-Reply-To: <1321170050-18323-1-git-send-email-alon.barlev@gmail.com>
+References: <1321159852.15441.449.camel@aeonflux>
+	<1321170050-18323-1-git-send-email-alon.barlev@gmail.com>
+Date: Wed, 16 Nov 2011 20:38:47 +0200
+Message-ID: <CAOazyz1gyTFsnoRBaWSShUi+GLw3enZ_U=UGYNJxVBH4gbDVVg@mail.gmail.com>
+Subject: Re: [PATCH] Automake - do not override LDFLAGS
+From: Alon Bar-Lev <alon.barlev@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Brian Gix <bgix@codeaurora.org>
-Subject: [PATCH-v3 2/9] Bluetooth: Add MGMT opcodes for Passkey Entry
-Date: Wed, 16 Nov 2011 10:37:46 -0800
-Message-Id: <1321468673-13925-3-git-send-email-bgix@codeaurora.org>
-In-Reply-To: <1321468673-13925-1-git-send-email-bgix@codeaurora.org>
-References: <1321468673-13925-1-git-send-email-bgix@codeaurora.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: Brian Gix <bgix@codeaurora.org>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/mgmt.h |   16 ++++++++++++++++
- 1 files changed, 16 insertions(+), 0 deletions(-)
+On Sun, Nov 13, 2011 at 9:40 AM, Alon Bar-Lev <alon.barlev@gmail.com> wrote:
+> Add AM_LDFLAGS to every _LDFLAGS, so that autoconf's
+> LDFLAGS won't be overridden.
+> ---
+>  Makefile.am |   12 ++++++------
+>  1 files changed, 6 insertions(+), 6 deletions(-)
+>
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 8b07a83..3d58d7c 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -233,6 +233,17 @@ struct mgmt_cp_set_fast_connectable {
- 	__u8 enable;
- } __packed;
- 
-+#define MGMT_OP_USER_PASSKEY_REPLY	0x0020
-+struct mgmt_cp_user_passkey_reply {
-+	bdaddr_t bdaddr;
-+	__le32 passkey;
-+} __packed;
-+
-+#define MGMT_OP_USER_PASSKEY_NEG_REPLY	0x0021
-+struct mgmt_cp_user_passkey_neg_reply {
-+	bdaddr_t bdaddr;
-+} __packed;
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16 opcode;
-@@ -327,3 +338,8 @@ struct mgmt_ev_device_blocked {
- struct mgmt_ev_device_unblocked {
- 	bdaddr_t bdaddr;
- } __packed;
-+
-+#define MGMT_EV_USER_PASSKEY_REQUEST	0x0017
-+struct mgmt_ev_user_passkey_request {
-+	bdaddr_t bdaddr;
-+} __packed;
--- 
-1.7.7.2
-
--- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum 
+Hello,
+Any comment?
+If we fixed the CFLAGS, good to have the LDFLAGS synced.
+Thanks!
