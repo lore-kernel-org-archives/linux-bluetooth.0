@@ -1,35 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: [PATCH] Bluetooth: btusb: Use USB_INTERFACE_INFO to do device
- matching
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Yao, Costa" <cqyao@qca.qualcomm.com>
-Cc: "padovan@profusion.mobi" <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 16 Nov 2011 14:45:27 +0900
-In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF28C2@nasanexd02b.na.qualcomm.com>
-References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF2759@nasanexd02b.na.qualcomm.com>
-	 <1321406185.15441.502.camel@aeonflux>
-	 <07BBB2AAB1A10A488A2AD166C7CB8B0DEF28C2@nasanexd02b.na.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321422330.15441.508.camel@aeonflux>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Keng-Yu Lin <kengyu@canonical.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Keng-Yu Lin <kengyu@canonical.com>
+Subject: [PATCH] Bluetooth: Add AR30XX device ID on Asus laptops
+Date: Wed, 16 Nov 2011 11:21:23 +0800
+Message-Id: <1321413683-4502-1-git-send-email-kengyu@canonical.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Costa,
+The ID is found on Asus K54HR and K53U.
+Blacklist the AR3011-based device ID [0489:e03d]
+and add to ath3k.c for firmware loading.
 
-> 1 Use USB_INTERFACE_INFO to do device matching, other than USB_DEVICE_INFO.
-> 2 Delete desc.bInterfaceNumber != 0 check.
-> 
-> Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
-> ---
->  drivers/bluetooth/btusb.c |   16 ++++++++--------
->  1 files changed, 8 insertions(+), 8 deletions(-)
+Signed-off-by: Keng-Yu Lin <kengyu@canonical.com>
+---
+ drivers/bluetooth/ath3k.c |    1 +
+ drivers/bluetooth/btusb.c |    1 +
+ 2 files changed, 2 insertions(+), 0 deletions(-)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-Regards
-
-Marcel
-
-
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 106beb1..db811d2 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -64,6 +64,7 @@ static struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x0CF3, 0x3002) },
+ 	{ USB_DEVICE(0x13d3, 0x3304) },
+ 	{ USB_DEVICE(0x0930, 0x0215) },
++	{ USB_DEVICE(0x0489, 0xE03D) },
+ 
+ 	/* Atheros AR9285 Malbec with sflash firmware */
+ 	{ USB_DEVICE(0x03F0, 0x311D) },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f9b7260..bf1eb35 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -116,6 +116,7 @@ static struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
+ 	{ USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
+ 	{ USB_DEVICE(0x0930, 0x0215), .driver_info = BTUSB_IGNORE },
++	{ USB_DEVICE(0x0489, 0xe03d), .driver_info = BTUSB_IGNORE },
+ 
+ 	/* Atheros AR9285 Malbec with sflash firmware */
+ 	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
+-- 
+1.7.5.4
