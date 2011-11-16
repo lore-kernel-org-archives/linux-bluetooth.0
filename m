@@ -1,24 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Nov 2011 15:54:27 -0200
+Date: Wed, 16 Nov 2011 15:41:36 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Brian Gix <bgix@codeaurora.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Bluetooth: Add SMP support to user_confirm_reply
-Message-ID: <20111116175427.GC16865@joana>
-References: <1320958375-24425-1-git-send-email-bgix@codeaurora.org>
- <1320958375-24425-2-git-send-email-bgix@codeaurora.org>
+Subject: Re: [PATCH 2/3] Bluetooth: mgmt_stop_discovery_failed()
+Message-ID: <20111116174133.GB16865@joana>
+References: <1320869667-1373-1-git-send-email-andre.guedes@openbossa.org>
+ <1320869667-1373-2-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320958375-24425-2-git-send-email-bgix@codeaurora.org>
+In-Reply-To: <1320869667-1373-2-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Brian Gix <bgix@codeaurora.org> [2011-11-10 12:52:53 -0800]:
+Hi Andre,
 
-> to enable User Confirmation during LE-SMP pairing.
+* Andre Guedes <andre.guedes@openbossa.org> [2011-11-09 17:14:26 -0300]:
 
-Can I get a better commit message here as Marcel suggested?
-And please use -v2, -v3 and so on to version your patch sets to help us
-identify them.
+> This patches creates mgmt_stop_discovery_failed() which removes
+> pending MGMT_OP_STOP_DISCOVERY commands and sends proper command
+> status events.
+> 
+> This patch also fixes the MGMT_OP_STOP_DISCOVERY command leak in
+> case cancel inquiry fails.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  include/net/bluetooth/hci_core.h |    1 +
+>  net/bluetooth/hci_event.c        |    6 +++++-
+>  net/bluetooth/mgmt.c             |   15 +++++++++++++++
+>  3 files changed, 21 insertions(+), 1 deletions(-)
+
+Patches 1 and 2 have been applied, patch 3 doesn't apply anymore. Thanks.
 
 	Gustavo
