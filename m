@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 1/3] Bluetooth: Move scope of kernel parameter enable_hs
-Date: Wed, 16 Nov 2011 17:27:37 +0200
-Message-Id: <1321457259-31485-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 2/3] Bluetooth: Allow to set AMP type for virtual HCI
+Date: Wed, 16 Nov 2011 17:27:38 +0200
+Message-Id: <1321457259-31485-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1321457259-31485-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1321457259-31485-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,36 +11,47 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Type can be changed during re-opening device /dev/vhci.
+
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h   |    2 ++
- include/net/bluetooth/l2cap.h |    1 -
- 2 files changed, 2 insertions(+), 1 deletions(-)
+ drivers/bluetooth/hci_vhci.c |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 139ce2a..31ed71f 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1331,4 +1331,6 @@ struct hci_inquiry_req {
- };
- #define IREQ_CACHE_FLUSH 0x0001
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index 2e302a1..2ed6ab1 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -41,6 +41,8 @@
  
-+extern int enable_hs;
+ #define VERSION "1.3"
+ 
++static bool amp;
 +
- #endif /* __HCI_H */
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 9280bff..7299df8 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -789,7 +789,6 @@ static inline __u8 __ctrl_size(struct l2cap_chan *chan)
- }
+ struct vhci_data {
+ 	struct hci_dev *hdev;
  
- extern int disable_ertm;
--extern int enable_hs;
+@@ -239,6 +241,9 @@ static int vhci_open(struct inode *inode, struct file *file)
+ 	hdev->bus = HCI_VIRTUAL;
+ 	hdev->driver_data = data;
  
- int l2cap_init_sockets(void);
- void l2cap_cleanup_sockets(void);
++	if (amp)
++		hdev->dev_type = HCI_AMP;
++
+ 	hdev->open     = vhci_open_dev;
+ 	hdev->close    = vhci_close_dev;
+ 	hdev->flush    = vhci_flush;
+@@ -303,6 +308,9 @@ static void __exit vhci_exit(void)
+ module_init(vhci_init);
+ module_exit(vhci_exit);
+ 
++module_param(amp, bool, 0644);
++MODULE_PARM_DESC(amp, "Create AMP controller device");
++
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth virtual HCI driver ver " VERSION);
+ MODULE_VERSION(VERSION);
 -- 
 1.7.4.1
 
