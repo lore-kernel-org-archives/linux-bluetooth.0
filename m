@@ -1,31 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd] syncevolution: added missing header file
-Date: Wed, 16 Nov 2011 16:44:54 +0100
-Message-ID: <1321458294-20000-1-git-send-email-mikel.astiz@bmw-carit.de>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC 2/3] Bluetooth: remove old code
+Date: Wed, 16 Nov 2011 17:30:21 +0200
+Message-Id: <1321457422-31641-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1321457422-31641-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1321457422-31641-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- plugins/syncevolution.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
-index 41386b3..8a8b531 100644
---- a/plugins/syncevolution.c
-+++ b/plugins/syncevolution.c
-@@ -30,6 +30,7 @@
- #include <stdio.h>
- #include <errno.h>
- #include <glib.h>
-+#include <sys/types.h>
- #include <dbus/dbus.h>
+Remove old code not touched for several years.
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/hci_core.c |   12 ------------
+ 1 files changed, 0 insertions(+), 12 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index aee76fd..d1eef7c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -228,18 +228,6 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
+ 	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
+ 	hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
  
- #include <bluetooth/bluetooth.h>
+-#if 0
+-	/* Host buffer size */
+-	{
+-		struct hci_cp_host_buffer_size cp;
+-		cp.acl_mtu = cpu_to_le16(HCI_MAX_ACL_SIZE);
+-		cp.sco_mtu = HCI_MAX_SCO_SIZE;
+-		cp.acl_max_pkt = cpu_to_le16(0xffff);
+-		cp.sco_max_pkt = cpu_to_le16(0xffff);
+-		hci_send_cmd(hdev, HCI_OP_HOST_BUFFER_SIZE, sizeof(cp), &cp);
+-	}
+-#endif
+-
+ 	/* Read BD Address */
+ 	hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
+ 
 -- 
-1.7.6.4
+1.7.4.1
 
