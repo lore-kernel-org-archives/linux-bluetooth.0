@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 02/17] AVDTP: Fix errno handling convention
-Date: Wed, 16 Nov 2011 09:19:49 -0400
-Message-Id: <1321449604-4188-3-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 01/17] AVCTP: Fix errno handling convention
+Date: Wed, 16 Nov 2011 09:19:48 -0400
+Message-Id: <1321449604-4188-2-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1321449604-4188-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1321449604-4188-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,75 +13,90 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Variables which are assigned to the errno variable (usually called
 "err") should be negative, and "-err" should be used where a positive
 value is needed.
----
- audio/gstavdtpsink.c |   22 ++++++++++++----------
- 1 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/audio/gstavdtpsink.c b/audio/gstavdtpsink.c
-index 0f3abf3..f379469 100644
---- a/audio/gstavdtpsink.c
-+++ b/audio/gstavdtpsink.c
-@@ -279,10 +279,10 @@ static gint gst_avdtp_sink_bluetooth_recvmsg_fd(GstAvdtpSink *sink)
- 			g_io_channel_unix_get_fd(sink->server));
+This patch also fixes a bug related to not using an "err" variable to
+store the errno value before calling external library code.
+---
+ audio/avctp.c |   31 +++++++++++++------------------
+ 1 files changed, 13 insertions(+), 18 deletions(-)
+
+diff --git a/audio/avctp.c b/audio/avctp.c
+index df3b2b8..5bd5db1 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -502,10 +502,10 @@ static int uinput_create(char *name)
+ 		if (fd < 0) {
+ 			fd = open("/dev/misc/uinput", O_RDWR);
+ 			if (fd < 0) {
+-				err = errno;
++				err = -errno;
+ 				error("Can't open input device: %s (%d)",
+-							strerror(err), err);
+-				return -err;
++							strerror(-err), -err);
++				return err;
+ 			}
+ 		}
+ 	}
+@@ -520,12 +520,11 @@ static int uinput_create(char *name)
+ 	dev.id.version = 0x0000;
  
- 	if (ret < 0) {
+ 	if (write(fd, &dev, sizeof(dev)) < 0) {
 -		err = errno;
 +		err = -errno;
- 		GST_ERROR_OBJECT(sink, "Unable to receive fd: %s (%d)",
--				strerror(err), err);
+ 		error("Can't write device information: %s (%d)",
+-						strerror(err), err);
++						strerror(-err), -err);
+ 		close(fd);
+-		errno = err;
 -		return -err;
-+				strerror(-err), -err);
 +		return err;
  	}
  
- 	sink->stream = g_io_channel_unix_new(ret);
-@@ -1449,9 +1449,9 @@ static gboolean gst_avdtp_sink_start(GstBaseSink *basesink)
+ 	ioctl(fd, UI_SET_EVBIT, EV_KEY);
+@@ -537,12 +536,11 @@ static int uinput_create(char *name)
+ 		ioctl(fd, UI_SET_KEYBIT, key_map[i].uinput);
  
- 	sk = bt_audio_service_open();
- 	if (sk <= 0) {
+ 	if (ioctl(fd, UI_DEV_CREATE, NULL) < 0) {
 -		err = errno;
 +		err = -errno;
- 		GST_ERROR_OBJECT(self, "Cannot open connection to bt "
--			"audio service: %s %d", strerror(err), err);
-+			"audio service: %s %d", strerror(-err), -err);
- 		goto failed;
- 	}
- 
-@@ -1841,7 +1841,7 @@ static int gst_avdtp_sink_audioservice_send(GstAvdtpSink *self,
- 	ssize_t written;
- 	const char *type, *name;
- 	uint16_t length;
--	int fd;
-+	int fd, err;
- 
- 	length = msg->length ? msg->length : BT_SUGGESTED_BUFFER_SIZE;
- 
-@@ -1849,9 +1849,10 @@ static int gst_avdtp_sink_audioservice_send(GstAvdtpSink *self,
- 
- 	written = write(fd, msg, length);
- 	if (written < 0) {
-+		err = -errno;
- 		GST_ERROR_OBJECT(self, "Error sending data to audio service:"
--			" %s", strerror(errno));
--		return -errno;
-+			" %s", strerror(-err));
+ 		error("Can't create uinput device: %s (%d)",
+-						strerror(err), err);
++						strerror(-err), -err);
+ 		close(fd);
+-		errno = err;
+-		return -err;
 +		return err;
  	}
  
- 	type = bt_audio_strtype(msg->type);
-@@ -1876,9 +1877,10 @@ static int gst_avdtp_sink_audioservice_recv(GstAvdtpSink *self,
+ 	return fd;
+@@ -895,7 +893,7 @@ int avctp_send_vendordep(struct avctp *session, uint8_t transaction,
+ 	struct avctp_header *avctp;
+ 	struct avc_header *avc;
+ 	uint8_t *pdu;
+-	int sk, err;
++	int sk, err = 0;
+ 	uint16_t size;
  
- 	bytes_read = read(fd, inmsg, length);
- 	if (bytes_read < 0) {
-+		err = -errno;
- 		GST_ERROR_OBJECT(self, "Error receiving data from "
--				"audio service: %s", strerror(errno));
+ 	if (session->state != AVCTP_STATE_CONNECTED)
+@@ -920,14 +918,11 @@ int avctp_send_vendordep(struct avctp *session, uint8_t transaction,
+ 
+ 	memcpy(pdu, operands, operand_count);
+ 
+-	err = write(sk, buf, size);
+-	if (err < 0) {
+-		g_free(buf);
 -		return -errno;
-+				"audio service: %s", strerror(-err));
-+		return err;
- 	}
+-	}
++	if (write(sk, buf, size) < 0)
++		err = -errno;
  
- 	type = bt_audio_strtype(inmsg->type);
+ 	g_free(buf);
+-	return 0;
++	return err;
+ }
+ 
+ unsigned int avctp_add_state_cb(avctp_state_cb cb, void *user_data)
 -- 
 1.7.0.4
 
