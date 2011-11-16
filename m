@@ -1,42 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Nov 2011 23:05:35 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Create a unique mgmt error code hierarchy
-Message-ID: <20111116210535.GA1043@x220.Elisa>
-References: <1321021134-31809-2-git-send-email-johan.hedberg@gmail.com>
- <1321027800-353-1-git-send-email-johan.hedberg@gmail.com>
- <20111116181100.GF16865@joana>
-MIME-Version: 1.0
+Subject: Re: [PATCH 6/6] Bluetooth: Support LE-Only discovery procedure
+Mime-Version: 1.0 (Apple Message framework v1251.1)
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111116181100.GF16865@joana>
+From: Andre Guedes <andre.guedes@openbossa.org>
+In-Reply-To: <20111112095433.GA6578@fusion.localdomain>
+Date: Wed, 16 Nov 2011 18:04:01 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <35A26EEA-987F-474A-9385-622EBFE0AD7C@openbossa.org>
+References: <1321051824-5216-1-git-send-email-andre.guedes@openbossa.org> <1321051824-5216-7-git-send-email-andre.guedes@openbossa.org> <20111112095433.GA6578@fusion.localdomain>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Johan,
 
-On Wed, Nov 16, 2011, Gustavo Padovan wrote:
-> > From: Johan Hedberg <johan.hedberg@intel.com>
-> > 
-> > The management protocol uses a single byte for error codes (aka command
-> > status). In some places this value is directly copied from HCI and in
-> > other a POSIX error number is used. This makes it impossible for
-> > user-space to uniquily decipher the meaning of an error.
-> > 
-> > To solve this issue a new mgmt-specific set of error codes is added
-> > along with a conversion table for HCI status values.
-> > 
-> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> > ---
-> > v2: Use ARRAY_SIZE() instead of a custom NELEM()
-> > 
-> >  include/net/bluetooth/mgmt.h |   17 +++
-> >  net/bluetooth/mgmt.c         |  315 ++++++++++++++++++++++++++++++------------
-> >  2 files changed, 241 insertions(+), 91 deletions(-)
+On Nov 12, 2011, at 6:54 AM, Johan Hedberg wrote:
+
+> Hi Andre,
 > 
-> It doesn't apply anymore, please rebase.
+> On Fri, Nov 11, 2011, Andre Guedes wrote:
+>> @@ -1669,7 +1678,16 @@ static int start_discovery(struct sock *sk, u16 index)
+>> 		goto failed;
+>> 	}
+>> 
+>> -	err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
+>> +	if (lmp_host_le_capable(hdev)) {
+>> +		if (lmp_bredr_capable(hdev))
+>> +			err = -ENOSYS;
+>> +		else
+>> +			err = hci_do_le_scan(hdev, LE_SCAN_TYPE, LE_SCAN_INT,
+>> +					LE_SCAN_WIN, LE_SCAN_TIMEOUT_LE_ONLY);
+>> +	} else {
+>> +		err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
+>> +	}
+> 
+> This should really be looking at type parameter that gets passed in the
+> mgmt_start_discovery command. User space has been sending it already for
+> some time but the kernel side wasn't yet updated to care about it. I
+> just sent a patch to add the necessary mgmt.h struct and to pass the
+> data to the start_discovery function.
 
-This one's also already in your tree.
-commit ca69b7957bf2e3bc0acc882b837a42617498ece1
+The bluetooth-next tree didn't have those patches you are talking about
+when I sent this series.
 
-Johan
+I'll consider the type parameter in v2. Thanks.
+
+Andre
+
