@@ -1,27 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Add AR30XX device ID on Asus laptops
+Subject: RE: [PATCH] Bluetooth: btusb: Use USB_INTERFACE_INFO to do device
+ matching
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Keng-Yu Lin <kengyu@canonical.com>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Wed, 16 Nov 2011 14:46:46 +0900
-In-Reply-To: <1321413683-4502-1-git-send-email-kengyu@canonical.com>
-References: <1321413683-4502-1-git-send-email-kengyu@canonical.com>
+To: "Yao, Costa" <cqyao@qca.qualcomm.com>
+Cc: "padovan@profusion.mobi" <padovan@profusion.mobi>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 16 Nov 2011 14:45:27 +0900
+In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF28C2@nasanexd02b.na.qualcomm.com>
+References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF2759@nasanexd02b.na.qualcomm.com>
+	 <1321406185.15441.502.camel@aeonflux>
+	 <07BBB2AAB1A10A488A2AD166C7CB8B0DEF28C2@nasanexd02b.na.qualcomm.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321422409.15441.510.camel@aeonflux>
+Message-ID: <1321422330.15441.508.camel@aeonflux>
 Mime-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Keng-Yu,
+Hi Costa,
 
-> The ID is found on Asus K54HR and K53U.
-> Blacklist the AR3011-based device ID [0489:e03d]
-> and add to ath3k.c for firmware loading.
+> 1 Use USB_INTERFACE_INFO to do device matching, other than USB_DEVICE_INFO.
+> 2 Delete desc.bInterfaceNumber != 0 check.
+> 
+> Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
+> ---
+>  drivers/bluetooth/btusb.c |   16 ++++++++--------
+>  1 files changed, 8 insertions(+), 8 deletions(-)
 
-please include the output of /proc/bus/usb/devices or usb-devices script
-for this hardware before and after firmware loading. I want this as part
-of the commit message so we have it for future reference.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
