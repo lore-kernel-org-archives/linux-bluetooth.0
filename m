@@ -1,86 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Nov 2011 12:04:40 +0200
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv4 1/5] Bluetooth: Define AMP controller statuses
-Message-ID: <20111116100438.GI30662@aemeltch-MOBL1>
-References: <1321366547-29462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1321366547-29462-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1321422613.15441.513.camel@aeonflux>
- <20111116090325.GF30662@aemeltch-MOBL1>
- <1321434990.15441.526.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321434990.15441.526.camel@aeonflux>
+Subject: Re: [PATCH 1/2] add device entry for Broadcom Valentine combo card
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Al Cho <acho@suse.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	acho@novell.com, jlee@novell.com, oneukum@suse.com
+Date: Wed, 16 Nov 2011 18:19:32 +0900
+In-Reply-To: <CAKzePaqwKbg8oZ6ULcdXdnYAkLU+k6o3bQWVaLUfCEDrH2994g@mail.gmail.com>
+References: <2eb6d1b761a3fddea28294959bde7e9c7ef88043.1319086508.git.acho@suse.com>
+	 <20111031191809.GB10164@joana>
+	 <CAKzePaqwKbg8oZ6ULcdXdnYAkLU+k6o3bQWVaLUfCEDrH2994g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1321435176.15441.528.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Al,
 
-On Wed, Nov 16, 2011 at 06:16:27PM +0900, Marcel Holtmann wrote:
-> Hi Andrei,
+> > * Cho, Yu-Chen <acho@suse.com> [2011-10-20 12:58:29 +0800]:
+> >
+> >> This device declares itself to be vendor specific
+> >> It therefore needs to be added to the device table
+> >> to make btusb bind.
+> >
+> > It would be good to have the output of usb-devices for this specific device in
+> > the commit message.
 > 
-> > > > AMP status codes copied from Bluez patch sent by Peter Krystad
-> > > > <pkrystad@codeaurora.org>.
-> > > > 
-> > > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > > ---
-> > > >  include/net/bluetooth/hci.h |    9 +++++++++
-> > > >  1 files changed, 9 insertions(+), 0 deletions(-)
-> > > > 
-> > > > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > > > index 139ce2a..e79ed67 100644
-> > > > --- a/include/net/bluetooth/hci.h
-> > > > +++ b/include/net/bluetooth/hci.h
-> > > > @@ -56,6 +56,15 @@
-> > > >  #define HCI_BREDR	0x00
-> > > >  #define HCI_AMP		0x01
-> > > >  
-> > > > +/* AMP controller status */
-> > > > +#define AMP_CTRL_POWERED_DOWN			0x00
-> > > > +#define AMP_CTRL_BLUETOOTH_ONLY			0x01
-> > > > +#define AMP_CTRL_NO_CAPACITY			0x02
-> > > > +#define AMP_CTRL_LOW_CAPACITY			0x03
-> > > > +#define AMP_CTRL_MEDIUM_CAPACITY		0x04
-> > > > +#define AMP_CTRL_HIGH_CAPACITY			0x05
-> > > > +#define AMP_CTRL_FULL_CAPACITY			0x06
-> > > > +
-> > > 
-> > > is hci.h really the right place for these? It is not HCI specific
-> > > per-se. It is A2MP detail. And as mentioned earlier, I do not believe we
-> > > should do it like this.
-> > 
-> > I believe that it is HCI device specific since hci_dev structure is
-> > accountable for BR/EDR and AMP controllers and we currently keep
-> > controller-specific information in hci_dev.
-> > 
-> > Those defines indicate AMP controller status like powered or not.
-> > 
-> > What would be the better place?
-> > 
-> > include/net/bluetooth/hci_core.h
-> > include/net/bluetooth/amp.h
-> > include/net/bluetooth/a2mp.h
-> > 
-> > 
-> > > I think we need to expose some sort of functionality that lets the AMP
-> > > drivers handle this dynamically.
-> > 
-> > This status and other AMP parameters would be normally returned when
-> > "read local amp info" HCI command.
-> 
-> if these information come from the AMP controller, then this is clearly
-> an A2MP specific detail. There is no point in storing them in hci_dev at
-> all.
+> Would you please kindly explain what is "the output of usb-device" to me?
+> The patch is for Broadcom Valentine 802.11bgn 1x1 wireless and
+> bluetooth combo card.
 
-I thought that A2MP specific details are details related to A2MP
-connection. Information about status of AMP controller does not depend on
-A2MP connection.
+open an xterm and type "usb-devices", then press return. And we want to
+see the part about this device.
 
-> I think these definition can stay local in net/bluetooth/a2mp.c for now.
+Regards
 
-maybe a2mp.h then? As we use existing HCI command infrastructure to handle
-AMP specific HCI commands we might need to source the header.
+Marcel
 
-Best regards 
-Andrei Emeltchenko 
+
