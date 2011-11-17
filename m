@@ -1,197 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Nov 2011 11:45:41 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Peter Krystad <pkrystad@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 bluez 2/2] Add A2MP definitions
-Message-ID: <20111117094539.GC415@aemeltch-MOBL1>
-References: <005201cca4e0$e2467680$a6d36380$@org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <005201cca4e0$e2467680$a6d36380$@org>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH hciemu] Process Read Local AMP Info in hciemu
+Date: Thu, 17 Nov 2011 11:29:11 +0200
+Message-Id: <1321522151-7285-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Wed, Nov 16, 2011 at 08:25:05PM -0800, Peter Krystad wrote:
-> ---
->  lib/a2mp.h |  137
-> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 137 insertions(+), 0 deletions(-)
->  create mode 100644 lib/a2mp.h
-> 
-> diff --git a/lib/a2mp.h b/lib/a2mp.h
-> new file mode 100644
-> index 0000000..ce4bf53
-> --- /dev/null
-> +++ b/lib/a2mp.h
-> @@ -0,0 +1,137 @@
-> +/*
-> + *
-> + *	BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *	Copyright (C) 2010-2011 Code Aurora Forum.  All rights reserved.
-> + *
-> + *	This program is free software; you can redistribute it and/or modify
-> + *	it under the terms of the GNU General Public License version 2 and
-> + *	only version 2 as published by the Free Software Foundation.
-> + *
-> + *	This program is distributed in the hope that it will be useful,
-> + *	but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *	GNU General Public License for more details.
-> + *
-> + */
-> +
-> +#ifndef __A2MP_H
-> +#define __A2MP_H
-> +
-> +#ifdef __cplusplus
-> +extern "C" {
-> +#endif
-> +
-> +/* A2MP Protocol */
-> +
-> +/* A2MP command codes */
-> +
-> +#define A2MP_COMMAND_REJ	0x01
-> +#define A2MP_DISCOVER_REQ	0x02
-> +#define A2MP_DISCOVER_RSP	0x03
-> +#define A2MP_CHANGE_NOTIFY	0x04
-> +#define A2MP_CHANGE_RSP		0x05
-> +#define A2MP_INFO_REQ		0x06
-> +#define A2MP_INFO_RSP		0x07
-> +#define A2MP_ASSOC_REQ		0x08
-> +#define A2MP_ASSOC_RSP		0x09
-> +#define A2MP_CREATE_REQ		0x0a
-> +#define A2MP_CREATE_RSP		0x0b
-> +#define A2MP_DISCONN_REQ	0x0c
-> +#define A2MP_DISCONN_RSP	0x0d
-> +
-> +struct a2mp_hdr {
-> +	uint8_t		code;
-> +	uint8_t		ident;
-> +	uint16_t	len;
-> +} __attribute__ ((packed));
-> +#define A2MP_HDR_SIZE 4
-> +
-> +struct a2mp_command_rej {
-> +	uint16_t	reason;
-> +} __attribute__ ((packed));
-> +
-> +struct a2mp_discover_req {
-> +	uint16_t	mtu;
-> +	uint16_t	mask;
-> +} __attribute__ ((packed));
-> +
-> +struct a2mp_ctrl {
-> +	uint8_t		id;
-> +	uint8_t		type;
-> +	uint8_t		status;
-> +} __attribute__ ((packed));
-> +
-> +struct a2mp_discover_rsp {
-> +	uint16_t	mtu;
-> +	uint16_t	mask;
-> +	struct a2mp_ctrl ctrl_list[0];
-> +} __attribute__ ((packed));
-> +
-> +struct a2mp_info_req {
-> +	uint8_t		id;
-> +} __attribute__ ((packed));
-> +
-> +struct a2mp_info_rsp {
-> +	uint8_t		id;
-> +	uint8_t		status;
-> +	uint32_t	total_bw;
-> +	uint32_t	max_bw;
-> +	uint32_t	min_latency;
-> +	uint16_t	pal_caps;
-> +	uint16_t	assoc_size;
-> +} __attribute__ ((packed));
-> +
-> +struct a2mp_assoc_rsp {
-> +	uint8_t		id;
-> +	uint8_t		status;
-> +	uint8_t		assoc_data[0];
-> +} __attribute__ ((packed));
-> +
-> +struct a2mp_create_req {
-> +	uint8_t		local_id;
-> +	uint8_t		remote_id;
-> +	uint8_t		assoc_data[0];
-> +} __attribute__ ((packed));
-> +
-> +struct a2mp_create_rsp {
-> +	uint8_t		local_id;
-> +	uint8_t		remote_id;
-> +	uint8_t		status;
-> +} __attribute__ ((packed));
-> +
-> +struct a2mp_disconn_req {
-> +	uint8_t		local_id;
-> +	uint8_t		remote_id;
-> +} __attribute__ ((packed));
-> +
-> +#define A2MP_COMMAND_NOT_RECOGNIZED 0x0000
-> +
-> +/* AMP controller type */
-> +#define AMP_CTRL_BR_EDR		0x00
-> +#define AMP_CTRL_802_11		0x01
+Add processing of Read Local AMP Info in hciemu, the values returned are
+used to emulate AMP HCI.
 
-Do we need to define those values? Cannot you use already defined ones in
-hci.h?
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ test/hciemu.c |   34 ++++++++++++++++++++++++++++++++++
+ 1 files changed, 34 insertions(+), 0 deletions(-)
 
-in include/net/bluetooth/hci.h and lib/hci.h
-/* HCI controller types */
-#define HCI_BREDR       0x00
-#define HCI_AMP         0x01
+diff --git a/test/hciemu.c b/test/hciemu.c
+index 07bf3be..7f90ca6 100644
+--- a/test/hciemu.c
++++ b/test/hciemu.c
+@@ -47,6 +47,7 @@
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hci.h>
+ #include <bluetooth/hci_lib.h>
++#include <bluetooth/l2cap.h>
+ 
+ #include <netdb.h>
+ 
+@@ -797,6 +798,35 @@ static void hci_info_param(uint16_t ocf, int plen, uint8_t *data)
+ 		break;
+ 	}
+ }
++static void hci_status_param(uint16_t ocf, int plen, uint8_t *data)
++{
++	read_local_amp_info_rp ai;
++	uint8_t status;
++
++	const uint16_t ogf = OGF_STATUS_PARAM;
++
++	switch (ocf) {
++		case OCF_READ_LOCAL_AMP_INFO:
++			memset(&ai, 0, sizeof(ai));
++
++			/* BT only */
++			ai.amp_status = 0x01;
++			ai.max_pdu_size = htobl(L2CAP_DEFAULT_MTU);
++			ai.controller_type = HCI_AMP;
++			ai.max_amp_assoc_length = htobl(HCI_MAX_ACL_SIZE);
++			/* No flushing at all */
++			ai.max_flush_timeout = 0xFFFFFFFF;
++			ai.best_effort_flush_timeout = 0xFFFFFFFF;
++
++			command_complete(ogf, ocf, sizeof(ai), &ai);
++			break;
++
++		default:
++			status = 0x01;
++			command_complete(ogf, ocf, 1, &status);
++			break;
++	}
++}
+ 
+ static void hci_command(uint8_t *data)
+ {
+@@ -827,6 +857,10 @@ static void hci_command(uint8_t *data)
+ 	case OGF_INFO_PARAM:
+ 		hci_info_param(ocf, ch->plen, ptr);
+ 		break;
++
++	case OGF_STATUS_PARAM:
++		hci_status_param(ocf, ch->plen, ptr);
++		break;
+ 	}
+ }
+ 
+-- 
+1.7.4.1
 
-Maybe HCI_AMP is not the best way and at some point we might need to
-rename it according to BT Spec assigned numbers (like HCI_AMP_802_11)
-
-
-Otherwise
-
-Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Best regards 
-Andrei Emeltchenko 
-
-
-> +/* AMP controller status */
-> +#define AMP_CTRL_POWERED_DOWN		0x00
-> +#define AMP_CTRL_BLUETOOTH_ONLY		0x01
-> +#define AMP_CTRL_NO_CAPACITY		0x02
-> +#define AMP_CTRL_LOW_CAPACITY		0x03
-> +#define AMP_CTRL_MEDIUM_CAPACITY	0x04
-> +#define AMP_CTRL_HIGH_CAPACITY		0x05
-> +#define AMP_CTRL_FULL_CAPACITY		0x06
-> +
-> +/* A2MP response status */
-> +#define A2MP_STATUS_SUCCESS				0x00
-> +#define A2MP_STATUS_INVALID_CTRL_ID			0x01
-> +#define A2MP_STATUS_UNABLE_START_LINK_CREATION		0x02
-> +#define A2MP_STATUS_NO_PHYSICAL_LINK_EXISTS		0x02
-> +#define A2MP_STATUS_COLLISION_OCCURED			0x03
-> +#define A2MP_STATUS_DISCONN_REQ_RECVD			0x04
-> +#define A2MP_STATUS_PHYS_LINK_EXISTS			0x05
-> +#define A2MP_STATUS_SECURITY_VIOLATION			0x06
-> +
-> +#ifdef __cplusplus
-> +}
-> +#endif
-> +
-> +#endif /* __A2MP_H */
-> -- 
-> 1.7.7
-> --
-> Peter Krystad
-> Employee of Qualcomm Innovation Center, Inc.
-> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
