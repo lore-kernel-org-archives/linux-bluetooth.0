@@ -1,24 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Nov 2011 14:00:24 +0200
+Date: Thu, 17 Nov 2011 13:58:21 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix coding style issue regarding with pointer checks
-Message-ID: <20111117120024.GA12894@fusion.localdomain>
-References: <1321525460-5754-1-git-send-email-sancane@gmail.com>
+Subject: Re: [PATCH BlueZ 00/17] Fix errno handling convention
+Message-ID: <20111117115821.GA7004@fusion.localdomain>
+References: <1321449604-4188-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321525460-5754-1-git-send-email-sancane@gmail.com>
+In-Reply-To: <1321449604-4188-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+Hi Lizardo,
 
-On Thu, Nov 17, 2011, Santiago Carot-Nemesio wrote:
-> ---
->  attrib/gatt-service.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
+On Wed, Nov 16, 2011, Anderson Lizardo wrote:
+> This series fix various places where variables which get errno values (usually
+> named "err") are not following the convention of always being negative. The
+> last 3 patches are simple fixes found during this review.
 
-Applied. Thanks.
+All patches have been applied. Thanks.
 
 Johan
