@@ -1,75 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC 3/3] Bluetooth: Add AMP initialization
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 17 Nov 2011 16:45:14 +0100
-In-Reply-To: <20111117132047.GH415@aemeltch-MOBL1>
-References: <1321457422-31641-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1321457422-31641-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1321480186.15441.554.camel@aeonflux> <20111117132047.GH415@aemeltch-MOBL1>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321544714.15441.568.camel@aeonflux>
-Mime-Version: 1.0
+Message-ID: <4EC522B3.5080607@bmw-carit.de>
+Date: Thu, 17 Nov 2011 16:05:23 +0100
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+MIME-Version: 1.0
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: D-Bus API of obex-client
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi all,
 
-> > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > > index d1eef7c..290acb2 100644
-> > > --- a/net/bluetooth/hci_core.c
-> > > +++ b/net/bluetooth/hci_core.c
-> > > @@ -219,40 +219,56 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
-> > >  			hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
-> > >  	}
-> > >  
-> > > -	/* Read Local Supported Features */
-> > > -	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
-> > > -
-> > >  	/* Read Local Version */
-> > >  	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
-> > >  
-> > >  	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
-> > >  	hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
-> > >  
-> > > -	/* Read BD Address */
-> > > -	hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
-> > > +	switch (hdev->dev_type) {
-> > > +	case HCI_BREDR:
-> > 
-> > stop right here and first split this out into proper helper functions.
-> > Making this part longer and more convoluted is not going to work well in
-> > the long run.
-> 
-> Would following functions work:
-> 
-> __hci_common_init
-> __hci_bredr_init
-> __hci_amp_init
+After some tests with the obex-client, I would like to ask some 
+questions related to the D-Bus API:
 
-I would not bother with common init. I think there is nothing really
-common between AMP and BR/EDR/LE controllers.
+1. Transfers for OBEX-specific mime types: in obc_transfer_register, 
+these types are filtered out so no transfer is registered for them. Is 
+this a matter of overhead only? I mean, for considerable transfers such 
+as full phonebook downloads, it would still make sense to provide a 
+transfer. First, you could track the progress, and second, you could 
+cancel it. Am I missing any other reason not to want this registration?
 
-So just split it into bredr_init and amp_init.
+2. External monitoring of the active transfers: currently the agent 
+owning a session is the only component that is able to know about the 
+ongoing transfers. However it could be interesting to signal these 
+transfers publicly, so other "external" components can have knowledge of 
+them. Typically a GUI could be showing the progress of a download (even 
+though another component initiated it) but it could also be that certain 
+components would like to react accordingly (example, cancel a download 
+if A2DP starts).
 
-> > > -	if (test_bit(HCI_INIT, &hdev->flags))
-> > > +	if (hdev->dev_type == HCI_BREDR && test_bit(HCI_INIT, &hdev->flags))
-> > >  		hci_setup(hdev);
-> > >  }
-> > This is ugly. Why don't we set HCI_INIT for AMP controllers as well?
-> 
-> The purpose of the hunk is to avoid hci_setup for other controllers than
-> BR/EDR. Maybe later on we will come up with something like amp_setup for
-> AMP controllers.
-> 
-> Maybe I have to create special patch for it?
+In addition, this kind of API would be more consistent with the ones in 
+BlueZ or oFono, meaning that any interested component can keep track 
+(and modify) the state.
 
-I like to not see a temporary hack and just init the AMP controller.
-This needs to be done anyway. So lets just do it.
-
-Regards
-
-Marcel
-
+Cheers,
+Mikel
 
