@@ -1,67 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Yao, Costa" <cqyao@qca.qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "padovan@profusion.mobi" <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] Bluetooth: btusb: Add Qualcomm Atheros AR3006 in
- blacklist_table
-Date: Thu, 17 Nov 2011 05:15:13 +0000
-Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3C48@nasanexd02b.na.qualcomm.com>
-References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3A49@nasanexd02b.na.qualcomm.com>
- <1321450153.15441.548.camel@aeonflux>
-In-Reply-To: <1321450153.15441.548.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Bing Zhao <bzhao@marvell.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org,
+	Gustavo Padovan <padovan@profusion.mobi>,
+	Bing Zhao <bzhao@marvell.com>, Frank Huang <frankh@marvell.com>
+Subject: [PATCH] Bluetooth: btmrvl: support Marvell Bluetooth device SD8797
+Date: Wed, 16 Nov 2011 20:40:42 -0800
+Message-Id: <1321504842-11199-1-git-send-email-bzhao@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hcmNl
-bCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddDQo+IFNlbnQ6IDIwMTHlubQx
-MeaciDE25pelIDIxOjI5DQo+IFRvOiBZYW8sIENvc3RhDQo+IENjOiBwYWRvdmFuQHByb2Z1c2lv
-bi5tb2JpOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBb
-UEFUQ0hdIEJsdWV0b290aDogYnR1c2I6IEFkZCBRdWFsY29tbSBBdGhlcm9zIEFSMzAwNiBpbg0K
-PiBibGFja2xpc3RfdGFibGUNCj4gDQo+IEhpIENvc3RhLA0KPiANCj4gPiBTaWduZWQtb2ZmLWJ5
-OiBDb3N0YSBZYW8gPGNxeWFvQHFjYS5xdWFsY29tbS5jb20+DQo+ID4gLS0tDQo+ID4gIGRyaXZl
-cnMvYmx1ZXRvb3RoL2J0dXNiLmMgfCAgICA1ICsrKystDQo+ID4gIDEgZmlsZXMgY2hhbmdlZCwg
-NCBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2Ry
-aXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgYi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+ID4g
-aW5kZXggMzlkZDY1Yy4uOTQxMjRhZCAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL2JsdWV0b290
-aC9idHVzYi5jDQo+ID4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+IEBAIC01
-NSw2ICs1NSw3IEBAIHN0YXRpYyBzdHJ1Y3QgdXNiX2RyaXZlciBidHVzYl9kcml2ZXI7DQo+ID4g
-ICNkZWZpbmUgQlRVU0JfQlJPS0VOX0lTT0MJMHgyMA0KPiA+ICAjZGVmaW5lIEJUVVNCX1dST05H
-X1NDT19NVFUJMHg0MA0KPiA+ICAjZGVmaW5lIEJUVVNCX0FUSDMwMTIJCTB4ODANCj4gPiArI2Rl
-ZmluZSBCVFVTQl9BVEgzMDA2CQkweDAxMDANCj4gPg0KPiA+ICBzdGF0aWMgc3RydWN0IHVzYl9k
-ZXZpY2VfaWQgYnR1c2JfdGFibGVbXSA9IHsNCj4gPiAgCS8qIEJsdWV0b290aCBVU0IgaW50ZXJm
-YWNlICovDQo+ID4gQEAgLTEyNSw2ICsxMjYsNyBAQCBzdGF0aWMgc3RydWN0IHVzYl9kZXZpY2Vf
-aWQgYmxhY2tsaXN0X3RhYmxlW10gPSB7DQo+ID4NCj4gPiAgCS8qIEF0aGVyb3MgMzAxMiB3aXRo
-IHNmbGFzaCBmaXJtd2FyZSAqLw0KPiA+ICAJeyBVU0JfREVWSUNFKDB4MGNmMywgMHgzMDA0KSwg
-LmRyaXZlcl9pbmZvID0gQlRVU0JfQVRIMzAxMiB9LA0KPiA+ICsJeyBVU0JfREVWSUNFKDB4MGNm
-MywgMHgzMDA2KSwgLmRyaXZlcl9pbmZvID0gQlRVU0JfQVRIMzAwNiB9LA0KPiA+DQo+ID4gIAkv
-KiBBdGhlcm9zIEFSNUJCVTEyIHdpdGggc2ZsYXNoIGZpcm13YXJlICovDQo+ID4gIAl7IFVTQl9E
-RVZJQ0UoMHgwNDg5LCAweGUwMmMpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9JR05PUkUgfSwgQEAN
-Cj4gPiAtOTM3LDcgKzkzOSw4IEBAIHN0YXRpYyBpbnQgYnR1c2JfcHJvYmUoc3RydWN0IHVzYl9p
-bnRlcmZhY2UgKmludGYsDQo+ID4gIAlpZiAoaWdub3JlX3NuaWZmZXIgJiYgaWQtPmRyaXZlcl9p
-bmZvICYgQlRVU0JfU05JRkZFUikNCj4gPiAgCQlyZXR1cm4gLUVOT0RFVjsNCj4gPg0KPiA+IC0J
-aWYgKGlkLT5kcml2ZXJfaW5mbyAmIEJUVVNCX0FUSDMwMTIpIHsNCj4gPiArCWlmICgoaWQtPmRy
-aXZlcl9pbmZvICYgQlRVU0JfQVRIMzAxMikgfHwNCj4gPiArCQkJCShpZC0+ZHJpdmVyX2luZm8g
-JiBCVFVTQl9BVEgzMDA2KSkgew0KPiA+ICAJCXN0cnVjdCB1c2JfZGV2aWNlICp1ZGV2ID0gaW50
-ZXJmYWNlX3RvX3VzYmRldihpbnRmKTsNCj4gPg0KPiA+ICAJCS8qIE9sZCBmaXJtd2FyZSB3b3Vs
-ZCBvdGhlcndpc2UgbGV0IGF0aDNrIGRyaXZlciBsb2FkDQo+IA0KPiAgICAgICAgIGlmIChpZC0+
-ZHJpdmVyX2luZm8gJiBCVFVTQl9BVEgzMDEyKSB7DQo+ICAgICAgICAgICAgICAgICBzdHJ1Y3Qg
-dXNiX2RldmljZSAqdWRldiA9IGludGVyZmFjZV90b191c2JkZXYoaW50Zik7DQo+IA0KPiAgICAg
-ICAgICAgICAgICAgLyogT2xkIGZpcm13YXJlIHdvdWxkIG90aGVyd2lzZSBsZXQgYXRoM2sgZHJp
-dmVyIGxvYWQNCj4gICAgICAgICAgICAgICAgICAqIHBhdGNoIGFuZCBzeXNjb25maWcgZmlsZXMg
-Ki8NCj4gICAgICAgICAgICAgICAgIGlmIChsZTE2X3RvX2NwdSh1ZGV2LT5kZXNjcmlwdG9yLmJj
-ZERldmljZSkgPD0gMHgwMDAxKQ0KPiAgICAgICAgICAgICAgICAgICAgICAgICByZXR1cm4gLUVO
-T0RFVjsNCj4gICAgICAgICB9DQo+IA0KPiBhcmUgeW91IHN1cmUgdGhpcyBpcyB0cnVlIGZvciB0
-aGUgMzAwNiBhcyB3ZWxsPyBPdGhlcndpc2UganVzdCB1c2luZyB0aGUNCj4gQlRVU0JfSUdOT1JF
-IHF1aXJrIHRvIGJsYWNrbGlzdCBhIGRldmljZSB3b3VsZCBiZSBlbm91Z2guDQo+IA0KSSBzZW5k
-IHRoaXMgcGF0Y2gganVzdCBmb3IgYSAzMDEyIGNoaXAsIHdpdGggUElEIDMwMDYuIEJlY2F1c2Ug
-d2UgbmVlZCB0byBzZXBhcmF0ZSBpdCB3aXRoIGFub3RoZXIgMzAxMiBjaGlwKFBJRCAzMDA0KS4N
-ClNvIHdlIHVzZSBCVFVTQl9BVEgzMDEyIGZvciBQSUQgMzAwNCBhbmQgQlRVU0JfQVRIMzAwNiBm
-b3IgUElEIDMwMDYuDQoNCkFuZCBJIGFtIHN1cmUgdGhhdCB3ZSBuZWVkIHVzZSB0aGlzIHF1aXJr
-LCBub3QgQlRVU0JfSUdOT1JFLiBCZWNhdXNlIHdlIG5lZWQgdG8gY2hlY2sgd2hldGhlciBjaGlw
-IGhhcyBiZWVuIHBhdGNoZWQgb3Igbm90IHRocm91Z2ggYmNkRGV2aWNlIHZhbHVlLg0KPiBBbmQg
-c3RhcnQgd3JpdGluZyBkZXRhaWxlZCBjb21taXQgbWVzc2FnZSB0aGF0IGV4cGxhaW5zIHdoeSB0
-aGlzIHF1aXJrIGlzDQo+IGNvcnJlY3QgYW5kIG5lZWRlZC4NCj4gDQo+IFJlZ2FyZHMNCj4gDQo+
-IE1hcmNlbA0KPiANCg0KQmVzdCB3aXNoZXMsDQpDb3N0YSBZYW8NCg==
+The SD8797 firmware image is shared with mwifiex driver.
+Whoever gets loaded first will be responsible for firmware
+downloading.
+
+Signed-off-by: Bing Zhao <bzhao@marvell.com>
+Signed-off-by: Frank Huang <frankh@marvell.com>
+---
+ drivers/bluetooth/Kconfig       |    6 +++---
+ drivers/bluetooth/btmrvl_sdio.c |   15 +++++++++++++--
+ 2 files changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 11b41fd..5ccf142 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -188,7 +188,7 @@ config BT_MRVL
+ 	  The core driver to support Marvell Bluetooth devices.
+ 
+ 	  This driver is required if you want to support
+-	  Marvell Bluetooth devices, such as 8688/8787.
++	  Marvell Bluetooth devices, such as 8688/8787/8797.
+ 
+ 	  Say Y here to compile Marvell Bluetooth driver
+ 	  into the kernel or say M to compile it as module.
+@@ -201,8 +201,8 @@ config BT_MRVL_SDIO
+ 	  The driver for Marvell Bluetooth chipsets with SDIO interface.
+ 
+ 	  This driver is required if you want to use Marvell Bluetooth
+-	  devices with SDIO interface. Currently SD8688/SD8787 chipsets are
+-	  supported.
++	  devices with SDIO interface. Currently SD8688/SD8787/SD8797
++	  chipsets are supported.
+ 
+ 	  Say Y here to compile support for Marvell BT-over-SDIO driver
+ 	  into the kernel or say M to compile it as module.
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index c827d73..37b5639 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -64,7 +64,7 @@ static const struct btmrvl_sdio_card_reg btmrvl_reg_8688 = {
+ 	.io_port_1 = 0x01,
+ 	.io_port_2 = 0x02,
+ };
+-static const struct btmrvl_sdio_card_reg btmrvl_reg_8787 = {
++static const struct btmrvl_sdio_card_reg btmrvl_reg_87xx = {
+ 	.cfg = 0x00,
+ 	.host_int_mask = 0x02,
+ 	.host_intstatus = 0x03,
+@@ -91,7 +91,14 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8688 = {
+ static const struct btmrvl_sdio_device btmrvl_sdio_sd8787 = {
+ 	.helper		= NULL,
+ 	.firmware	= "mrvl/sd8787_uapsta.bin",
+-	.reg		= &btmrvl_reg_8787,
++	.reg		= &btmrvl_reg_87xx,
++	.sd_blksz_fw_dl	= 256,
++};
++
++static const struct btmrvl_sdio_device btmrvl_sdio_sd8797 = {
++	.helper		= NULL,
++	.firmware	= "mrvl/sd8797_uapsta.bin",
++	.reg		= &btmrvl_reg_87xx,
+ 	.sd_blksz_fw_dl	= 256,
+ };
+ 
+@@ -102,6 +109,9 @@ static const struct sdio_device_id btmrvl_sdio_ids[] = {
+ 	/* Marvell SD8787 Bluetooth device */
+ 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x911A),
+ 			.driver_data = (unsigned long) &btmrvl_sdio_sd8787 },
++	/* Marvell SD8797 Bluetooth device */
++	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x912A),
++			.driver_data = (unsigned long) &btmrvl_sdio_sd8797 },
+ 
+ 	{ }	/* Terminating entry */
+ };
+@@ -1075,3 +1085,4 @@ MODULE_LICENSE("GPL v2");
+ MODULE_FIRMWARE("sd8688_helper.bin");
+ MODULE_FIRMWARE("sd8688.bin");
+ MODULE_FIRMWARE("mrvl/sd8787_uapsta.bin");
++MODULE_FIRMWARE("mrvl/sd8797_uapsta.bin");
+-- 
+1.7.4.1
+
