@@ -1,39 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EC522B3.5080607@bmw-carit.de>
-Date: Thu, 17 Nov 2011 16:05:23 +0100
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH obexd v3] syncevolution: fix missing header file
+Date: Thu, 17 Nov 2011 14:46:05 +0100
+Message-ID: <1321537565-13123-1-git-send-email-mikel.astiz@bmw-carit.de>
 MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: D-Bus API of obex-client
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+This missing include directive makes the syncevolution plugin fail to
+compile. In Fedora 16 with gcc version 4.6.1 20110908, the output is:
 
-After some tests with the obex-client, I would like to ask some 
-questions related to the D-Bus API:
+make --no-print-directory all-am
+  CC     plugins/syncevolution.o
+In file included from plugins/syncevolution.c:40:0:
+./src/mimetype.h:33:46: error: unknown type name ‘mode_t’
+plugins/syncevolution.c:277:54: error: unknown type name ‘mode_t’
+plugins/syncevolution.c:438:2: error: unknown field ‘open’ specified in initializer
+plugins/syncevolution.c:438:10: error: ‘synce_open’ undeclared here (not in a function)
+make[1]: *** [plugins/syncevolution.o] Error 1
+---
+ plugins/syncevolution.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-1. Transfers for OBEX-specific mime types: in obc_transfer_register, 
-these types are filtered out so no transfer is registered for them. Is 
-this a matter of overhead only? I mean, for considerable transfers such 
-as full phonebook downloads, it would still make sense to provide a 
-transfer. First, you could track the progress, and second, you could 
-cancel it. Am I missing any other reason not to want this registration?
-
-2. External monitoring of the active transfers: currently the agent 
-owning a session is the only component that is able to know about the 
-ongoing transfers. However it could be interesting to signal these 
-transfers publicly, so other "external" components can have knowledge of 
-them. Typically a GUI could be showing the progress of a download (even 
-though another component initiated it) but it could also be that certain 
-components would like to react accordingly (example, cancel a download 
-if A2DP starts).
-
-In addition, this kind of API would be more consistent with the ones in 
-BlueZ or oFono, meaning that any interested component can keep track 
-(and modify) the state.
-
-Cheers,
-Mikel
+diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
+index 41386b3..8a8b531 100644
+--- a/plugins/syncevolution.c
++++ b/plugins/syncevolution.c
+@@ -30,6 +30,7 @@
+ #include <stdio.h>
+ #include <errno.h>
+ #include <glib.h>
++#include <sys/types.h>
+ #include <dbus/dbus.h>
+ 
+ #include <bluetooth/bluetooth.h>
+-- 
+1.7.6.4
 
