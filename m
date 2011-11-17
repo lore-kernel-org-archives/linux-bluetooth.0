@@ -1,49 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Nov 2011 21:11:44 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd v3] syncevolution: fix missing header file
-Message-ID: <20111117191144.GA18806@fusion.localdomain>
-References: <1321537565-13123-1-git-send-email-mikel.astiz@bmw-carit.de>
+From: "Peter Krystad" <pkrystad@codeaurora.org>
+To: "'Andrei Emeltchenko'" <andrei.emeltchenko.news@gmail.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+References: <005201cca4e0$e2467680$a6d36380$@org> <20111117094539.GC415@aemeltch-MOBL1>
+In-Reply-To: <20111117094539.GC415@aemeltch-MOBL1>
+Subject: RE: [PATCH v3 bluez 2/2] Add A2MP definitions
+Date: Thu, 17 Nov 2011 11:05:51 -0800
+Message-ID: <006301cca55b$ec7f6280$c57e2780$@org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1321537565-13123-1-git-send-email-mikel.astiz@bmw-carit.de>
+Content-Type: text/plain;
+	charset="US-ASCII"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
 
-On Thu, Nov 17, 2011, Mikel Astiz wrote:
-> This missing include directive makes the syncevolution plugin fail to
-> compile. In Fedora 16 with gcc version 4.6.1 20110908, the output is:
+Hi Andrei,
+
+> > +
+> > +/* AMP controller type */
+> > +#define AMP_CTRL_BR_EDR		0x00
+> > +#define AMP_CTRL_802_11		0x01
 > 
-> make --no-print-directory all-am
->   CC     plugins/syncevolution.o
-> In file included from plugins/syncevolution.c:40:0:
-> ./src/mimetype.h:33:46: error: unknown type name ‘mode_t’
-> plugins/syncevolution.c:277:54: error: unknown type name ‘mode_t’
-> plugins/syncevolution.c:438:2: error: unknown field ‘open’ specified in initializer
-> plugins/syncevolution.c:438:10: error: ‘synce_open’ undeclared here (not in a function)
-> make[1]: *** [plugins/syncevolution.o] Error 1
-> ---
->  plugins/syncevolution.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
+> Do we need to define those values? Cannot you use already defined ones in
+> hci.h?
+
+You're right, I'll remove them.
+
+> in include/net/bluetooth/hci.h and lib/hci.h
+> /* HCI controller types */
+> #define HCI_BREDR       0x00
+> #define HCI_AMP         0x01
 > 
-> diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
-> index 41386b3..8a8b531 100644
-> --- a/plugins/syncevolution.c
-> +++ b/plugins/syncevolution.c
-> @@ -30,6 +30,7 @@
->  #include <stdio.h>
->  #include <errno.h>
->  #include <glib.h>
-> +#include <sys/types.h>
->  #include <dbus/dbus.h>
->  
->  #include <bluetooth/bluetooth.h>
+> Maybe HCI_AMP is not the best way and at some point we might need to
+> rename it according to BT Spec assigned numbers (like HCI_AMP_802_11)
 
-Applied after a slight fix: the intended order for the includes is libc
-first and then the rest (i.e. sys/types.h should be before glib.h).
+Agreed it should be changed to reflect 802.11.
 
-Johan
+> Otherwise
+> 
+> Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+
+Regards,
+
+Peter.
+
+--Peter Krystad
+  Employee of Qualcomm Innovation Center, Inc.
+  Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
+
