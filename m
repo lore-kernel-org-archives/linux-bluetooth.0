@@ -1,94 +1,168 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org,
-	Gustavo Padovan <padovan@profusion.mobi>,
-	Bing Zhao <bzhao@marvell.com>, Frank Huang <frankh@marvell.com>
-Subject: [PATCH] Bluetooth: btmrvl: support Marvell Bluetooth device SD8797
-Date: Wed, 16 Nov 2011 20:40:42 -0800
-Message-Id: <1321504842-11199-1-git-send-email-bzhao@marvell.com>
+From: "Peter Krystad" <pkrystad@codeaurora.org>
+To: <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH v3 bluez 2/2] Add A2MP definitions
+Date: Wed, 16 Nov 2011 20:25:05 -0800
+Message-ID: <005201cca4e0$e2467680$a6d36380$@org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="US-ASCII"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The SD8797 firmware image is shared with mwifiex driver.
-Whoever gets loaded first will be responsible for firmware
-downloading.
-
-Signed-off-by: Bing Zhao <bzhao@marvell.com>
-Signed-off-by: Frank Huang <frankh@marvell.com>
 ---
- drivers/bluetooth/Kconfig       |    6 +++---
- drivers/bluetooth/btmrvl_sdio.c |   15 +++++++++++++--
- 2 files changed, 16 insertions(+), 5 deletions(-)
+ lib/a2mp.h |  137
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 137 insertions(+), 0 deletions(-)
+ create mode 100644 lib/a2mp.h
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 11b41fd..5ccf142 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -188,7 +188,7 @@ config BT_MRVL
- 	  The core driver to support Marvell Bluetooth devices.
- 
- 	  This driver is required if you want to support
--	  Marvell Bluetooth devices, such as 8688/8787.
-+	  Marvell Bluetooth devices, such as 8688/8787/8797.
- 
- 	  Say Y here to compile Marvell Bluetooth driver
- 	  into the kernel or say M to compile it as module.
-@@ -201,8 +201,8 @@ config BT_MRVL_SDIO
- 	  The driver for Marvell Bluetooth chipsets with SDIO interface.
- 
- 	  This driver is required if you want to use Marvell Bluetooth
--	  devices with SDIO interface. Currently SD8688/SD8787 chipsets are
--	  supported.
-+	  devices with SDIO interface. Currently SD8688/SD8787/SD8797
-+	  chipsets are supported.
- 
- 	  Say Y here to compile support for Marvell BT-over-SDIO driver
- 	  into the kernel or say M to compile it as module.
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index c827d73..37b5639 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -64,7 +64,7 @@ static const struct btmrvl_sdio_card_reg btmrvl_reg_8688 = {
- 	.io_port_1 = 0x01,
- 	.io_port_2 = 0x02,
- };
--static const struct btmrvl_sdio_card_reg btmrvl_reg_8787 = {
-+static const struct btmrvl_sdio_card_reg btmrvl_reg_87xx = {
- 	.cfg = 0x00,
- 	.host_int_mask = 0x02,
- 	.host_intstatus = 0x03,
-@@ -91,7 +91,14 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8688 = {
- static const struct btmrvl_sdio_device btmrvl_sdio_sd8787 = {
- 	.helper		= NULL,
- 	.firmware	= "mrvl/sd8787_uapsta.bin",
--	.reg		= &btmrvl_reg_8787,
-+	.reg		= &btmrvl_reg_87xx,
-+	.sd_blksz_fw_dl	= 256,
-+};
+diff --git a/lib/a2mp.h b/lib/a2mp.h
+new file mode 100644
+index 0000000..ce4bf53
+--- /dev/null
++++ b/lib/a2mp.h
+@@ -0,0 +1,137 @@
++/*
++ *
++ *	BlueZ - Bluetooth protocol stack for Linux
++ *
++ *	Copyright (C) 2010-2011 Code Aurora Forum.  All rights reserved.
++ *
++ *	This program is free software; you can redistribute it and/or modify
++ *	it under the terms of the GNU General Public License version 2 and
++ *	only version 2 as published by the Free Software Foundation.
++ *
++ *	This program is distributed in the hope that it will be useful,
++ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *	GNU General Public License for more details.
++ *
++ */
 +
-+static const struct btmrvl_sdio_device btmrvl_sdio_sd8797 = {
-+	.helper		= NULL,
-+	.firmware	= "mrvl/sd8797_uapsta.bin",
-+	.reg		= &btmrvl_reg_87xx,
- 	.sd_blksz_fw_dl	= 256,
- };
- 
-@@ -102,6 +109,9 @@ static const struct sdio_device_id btmrvl_sdio_ids[] = {
- 	/* Marvell SD8787 Bluetooth device */
- 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x911A),
- 			.driver_data = (unsigned long) &btmrvl_sdio_sd8787 },
-+	/* Marvell SD8797 Bluetooth device */
-+	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x912A),
-+			.driver_data = (unsigned long) &btmrvl_sdio_sd8797 },
- 
- 	{ }	/* Terminating entry */
- };
-@@ -1075,3 +1085,4 @@ MODULE_LICENSE("GPL v2");
- MODULE_FIRMWARE("sd8688_helper.bin");
- MODULE_FIRMWARE("sd8688.bin");
- MODULE_FIRMWARE("mrvl/sd8787_uapsta.bin");
-+MODULE_FIRMWARE("mrvl/sd8797_uapsta.bin");
++#ifndef __A2MP_H
++#define __A2MP_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/* A2MP Protocol */
++
++/* A2MP command codes */
++
++#define A2MP_COMMAND_REJ	0x01
++#define A2MP_DISCOVER_REQ	0x02
++#define A2MP_DISCOVER_RSP	0x03
++#define A2MP_CHANGE_NOTIFY	0x04
++#define A2MP_CHANGE_RSP		0x05
++#define A2MP_INFO_REQ		0x06
++#define A2MP_INFO_RSP		0x07
++#define A2MP_ASSOC_REQ		0x08
++#define A2MP_ASSOC_RSP		0x09
++#define A2MP_CREATE_REQ		0x0a
++#define A2MP_CREATE_RSP		0x0b
++#define A2MP_DISCONN_REQ	0x0c
++#define A2MP_DISCONN_RSP	0x0d
++
++struct a2mp_hdr {
++	uint8_t		code;
++	uint8_t		ident;
++	uint16_t	len;
++} __attribute__ ((packed));
++#define A2MP_HDR_SIZE 4
++
++struct a2mp_command_rej {
++	uint16_t	reason;
++} __attribute__ ((packed));
++
++struct a2mp_discover_req {
++	uint16_t	mtu;
++	uint16_t	mask;
++} __attribute__ ((packed));
++
++struct a2mp_ctrl {
++	uint8_t		id;
++	uint8_t		type;
++	uint8_t		status;
++} __attribute__ ((packed));
++
++struct a2mp_discover_rsp {
++	uint16_t	mtu;
++	uint16_t	mask;
++	struct a2mp_ctrl ctrl_list[0];
++} __attribute__ ((packed));
++
++struct a2mp_info_req {
++	uint8_t		id;
++} __attribute__ ((packed));
++
++struct a2mp_info_rsp {
++	uint8_t		id;
++	uint8_t		status;
++	uint32_t	total_bw;
++	uint32_t	max_bw;
++	uint32_t	min_latency;
++	uint16_t	pal_caps;
++	uint16_t	assoc_size;
++} __attribute__ ((packed));
++
++struct a2mp_assoc_rsp {
++	uint8_t		id;
++	uint8_t		status;
++	uint8_t		assoc_data[0];
++} __attribute__ ((packed));
++
++struct a2mp_create_req {
++	uint8_t		local_id;
++	uint8_t		remote_id;
++	uint8_t		assoc_data[0];
++} __attribute__ ((packed));
++
++struct a2mp_create_rsp {
++	uint8_t		local_id;
++	uint8_t		remote_id;
++	uint8_t		status;
++} __attribute__ ((packed));
++
++struct a2mp_disconn_req {
++	uint8_t		local_id;
++	uint8_t		remote_id;
++} __attribute__ ((packed));
++
++#define A2MP_COMMAND_NOT_RECOGNIZED 0x0000
++
++/* AMP controller type */
++#define AMP_CTRL_BR_EDR		0x00
++#define AMP_CTRL_802_11		0x01
++
++/* AMP controller status */
++#define AMP_CTRL_POWERED_DOWN		0x00
++#define AMP_CTRL_BLUETOOTH_ONLY		0x01
++#define AMP_CTRL_NO_CAPACITY		0x02
++#define AMP_CTRL_LOW_CAPACITY		0x03
++#define AMP_CTRL_MEDIUM_CAPACITY	0x04
++#define AMP_CTRL_HIGH_CAPACITY		0x05
++#define AMP_CTRL_FULL_CAPACITY		0x06
++
++/* A2MP response status */
++#define A2MP_STATUS_SUCCESS				0x00
++#define A2MP_STATUS_INVALID_CTRL_ID			0x01
++#define A2MP_STATUS_UNABLE_START_LINK_CREATION		0x02
++#define A2MP_STATUS_NO_PHYSICAL_LINK_EXISTS		0x02
++#define A2MP_STATUS_COLLISION_OCCURED			0x03
++#define A2MP_STATUS_DISCONN_REQ_RECVD			0x04
++#define A2MP_STATUS_PHYS_LINK_EXISTS			0x05
++#define A2MP_STATUS_SECURITY_VIOLATION			0x06
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* __A2MP_H */
 -- 
-1.7.4.1
+1.7.7
+--
+Peter Krystad
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
