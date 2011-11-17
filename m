@@ -1,42 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1321458294-20000-1-git-send-email-mikel.astiz@bmw-carit.de>
-References: <1321458294-20000-1-git-send-email-mikel.astiz@bmw-carit.de>
-Date: Thu, 17 Nov 2011 11:15:26 +0200
-Message-ID: <CABBYNZLN7zFCrK_wULf2t8KbVPOdO3H+NBy=NMCk5Ph=fWmptw@mail.gmail.com>
-Subject: Re: [PATCH obexd] syncevolution: added missing header file
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Date: Thu, 17 Nov 2011 10:59:07 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 6/6] Bluetooth: Support LE-Only discovery procedure
+Message-ID: <20111117085904.GB415@aemeltch-MOBL1>
+References: <1321051824-5216-1-git-send-email-andre.guedes@openbossa.org>
+ <1321051824-5216-7-git-send-email-andre.guedes@openbossa.org>
+ <20111114100806.GC13665@aemeltch-MOBL1>
+ <95D6271C-626F-409E-B4AB-92F6C7E2AC15@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <95D6271C-626F-409E-B4AB-92F6C7E2AC15@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Andre,
 
-On Wed, Nov 16, 2011 at 5:44 PM, Mikel Astiz <mikel.astiz@bmw-carit.de> wrote:
-> ---
->  plugins/syncevolution.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
->
-> diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
-> index 41386b3..8a8b531 100644
-> --- a/plugins/syncevolution.c
-> +++ b/plugins/syncevolution.c
-> @@ -30,6 +30,7 @@
->  #include <stdio.h>
->  #include <errno.h>
->  #include <glib.h>
-> +#include <sys/types.h>
->  #include <dbus/dbus.h>
->
->  #include <bluetooth/bluetooth.h>
-> --
-> 1.7.6.4
+On Wed, Nov 16, 2011 at 05:36:38PM -0300, Andre Guedes wrote:
 
-Could you please add a description to it and if it is a build error
-please attach it too, also it is suggested that bug fixes like this
-should start with fix e.g. syncevolution: fix... to be reviewed asap.
+...
 
--- 
-Luiz Augusto von Dentz
+> >> 
+> >> 	if (cp->enable == 0x01) {
+> > 
+> > Can we fix also magic number here and below?
+> 
+> I see your point here, but this is not a magic number, it is
+> just a true/false value.
+
+If this true/false no need to compare with hex numbers why not
+
+if(cp->enable) 
+	...
+
+Best regards 
+Andrei Emeltchenko 
