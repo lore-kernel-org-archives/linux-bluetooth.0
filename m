@@ -1,59 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Peter Krystad" <pkrystad@codeaurora.org>
+To: "'Johan Hedberg'" <johan.hedberg@gmail.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+References: <005201cca4e0$e2467680$a6d36380$@org> <20111117092627.GA2838@fusion.localdomain>
+In-Reply-To: <20111117092627.GA2838@fusion.localdomain>
+Subject: RE: [PATCH v3 bluez 2/2] Add A2MP definitions
+Date: Thu, 17 Nov 2011 10:19:20 -0800
+Message-ID: <006001cca555$6d6e2540$484a6fc0$@org>
 MIME-Version: 1.0
-Date: Thu, 17 Nov 2011 12:57:41 -0600
-Message-ID: <CABUK1ahtres=AGcpSNowRSdpWGY9pUfCCnsxtBs8MRU2XJ-4mg@mail.gmail.com>
-Subject: kpanic during hciconfig hci0 down.
-From: Pavan Savoy <pavan_savoy@sify.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain;
+	charset="US-ASCII"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-I am running some robustness tests in my btwilink driver - and every
-time I have a back to back hciconfig hci0 up/down, I see this crash.
-This is somehow not on the 2.6.xx-bluetooth-next but exists on the 3.0 kernel.
+> Hi Peter,
+> 
+> On Wed, Nov 16, 2011, Peter Krystad wrote:
+> > +++ b/lib/a2mp.h
+> > @@ -0,0 +1,137 @@
+> > +/*
+> > + *
+> > + *	BlueZ - Bluetooth protocol stack for Linux
+> > + *
+> > + *	Copyright (C) 2010-2011 Code Aurora Forum.  All rights reserved.
+> > + *
+> > + *	This program is free software; you can redistribute it and/or modify
+> > + *	it under the terms of the GNU General Public License version 2 and
+> > + *	only version 2 as published by the Free Software Foundation.
+> > + *
+> > + *	This program is distributed in the hope that it will be useful,
+> > + *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > + *	GNU General Public License for more details.
+> 
+> I haven't forgotten about these but just been waiting for feedback from
+> Marcel about this inconsistent (compared to the rest of the source tree)
+> license header that you have (this one is "GPL 2 only" whereas the rest
+> (including other files that you add content to) are "GPL 2 or later".
+> 
+> Johan
 
-Any pointers ???
+Thanks for the update.
 
-[ 1720.013305] Unable to handle kernel NULL pointer dereference at
-virtual address 00000000
-[ 1720.022216] pgd = c5fc4000
-[ 1720.025115] [00000000] *pgd=85f75831, *pte=00000000, *ppte=00000000
-[ 1720.031951] Internal error: Oops: 817 [#1] PREEMPT SMP
-[ 1720.037506] Modules linked in: wl12xx_sdio(-) wl12xx mac80211
-cfg80211 compat [last unloaded: wl12xx_sdio]
-[ 1720.048034] CPU: 0    Tainted: G        W    (3.0.8-00163-gd335b7f #1)
-[ 1720.055084] PC is at __skb_recv_datagram+0x10c/0x2a0
-[ 1720.060485] LR is at 0x1
-[ 1720.063232] pc : [<c049dac0>]    lr : [<00000001>]    psr: 60000093
-[ 1720.063232] sp : c5dfbd48  ip : 00000000  fp : c5dfbda4
-[ 1720.075683] r10: c5fb5c70  r9 : c5ff5000  r8 : c5dfa000
-[ 1720.081329] r7 : c5dfbd70  r6 : c5fb5c64  r5 : c5dfbd64  r4 : c5fb5c00
-[ 1720.088409] r3 : 00000000  r2 : 00000000  r1 : 60000013  r0 : 00000000
-[ 1720.095458] Flags: nZCv  IRQs off  FIQs on  Mode SVC_32  ISA ARM
-Segment user
-[ 1720.103271] Control: 10c5387d  Table: 85fc404a  DAC: 00000015
-[ 1720.109497]
-<snip ... >
-[ 1721.079681] [<c049d9b4>] (__skb_recv_datagram+0x0/0x2a0) from
-[<c049dc7c>] (skb_recv_datagram+0x28/0x30)
-[ 1721.089935] [<c049dc54>] (skb_recv_datagram+0x0/0x30) from
-[<c05af690>] (hci_sock_recvmsg+0x50/0x12c)
-[ 1721.099945] [<c05af640>] (hci_sock_recvmsg+0x0/0x12c) from
-[<c0490c28>] (sock_aio_read+0x18c/0x190)
-[ 1721.109741]  r8:00000404 r7:c5dfbe90 r6:00000000 r5:c6121400 r4:c5dfbe18
-[ 1721.117034] [<c0490a9c>] (sock_aio_read+0x0/0x190) from
-[<c01266cc>] (do_sync_read+0xb4/0xe4)
-[ 1721.126312] [<c0126618>] (do_sync_read+0x0/0xe4) from [<c012733c>]
-(vfs_read+0x130/0x138)
-[ 1721.135162] [<c012720c>] (vfs_read+0x0/0x138) from [<c0127420>]
-(sys_read+0x44/0x74)
-[ 1721.143524]  r8:00000000 r7:00000003 r6:00000404 r5:beaad6f8 r4:c69766c0
-[ 1721.150848] [<c01273dc>] (sys_read+0x0/0x74) from [<c0054f00>]
-(ret_fast_syscall+0x0/0x30)
-[ 1721.159820]  r9:c5dfa000 r8:c00550a8 r6:00000000 r5:000114a0 r4:beaad6f8
-[ 1721.167114] Code: e599c000 e5990004 e5893000 e5893004 (e580c000)
-[ 1721.173797] ---[ end trace 5ff7245745f21217 ]---
-[ 1721.178771] Kernel panic - not syncing: Fatal exception
+Regards,
+
+Peter.
+
+--Peter Krystad
+  Employee of Qualcomm Innovation Center, Inc.
+  Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
+
