@@ -1,33 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC hciconfig] Print features for AMP devices
-Date: Thu, 17 Nov 2011 14:52:35 +0200
-Message-Id: <1321534355-9517-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 17 Nov 2011 14:00:24 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix coding style issue regarding with pointer checks
+Message-ID: <20111117120024.GA12894@fusion.localdomain>
+References: <1321525460-5754-1-git-send-email-sancane@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1321525460-5754-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Santiago,
 
-Check for HCI device type, the magic shift is due to dev type is packed
-to dev_info type.
----
- tools/hciconfig.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Thu, Nov 17, 2011, Santiago Carot-Nemesio wrote:
+> ---
+>  attrib/gatt-service.c |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tools/hciconfig.c b/tools/hciconfig.c
-index cbd0d0e..0ee41ef 100644
---- a/tools/hciconfig.c
-+++ b/tools/hciconfig.c
-@@ -1870,7 +1870,7 @@ static void print_dev_info(int ctl, struct hci_dev_info *di)
- 		st->byte_tx, st->acl_tx, st->sco_tx, st->cmd_tx, st->err_tx);
- 
- 	if (all && !hci_test_bit(HCI_RAW, &di->flags) &&
--			bacmp(&di->bdaddr, BDADDR_ANY)) {
-+			(bacmp(&di->bdaddr, BDADDR_ANY) || (di->type >> 4))) {
- 		print_dev_features(di, 0);
- 		print_pkt_type(di);
- 		print_link_policy(di);
--- 
-1.7.4.1
+Applied. Thanks.
 
+Johan
