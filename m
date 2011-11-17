@@ -1,38 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Nov 2011 10:59:07 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 6/6] Bluetooth: Support LE-Only discovery procedure
-Message-ID: <20111117085904.GB415@aemeltch-MOBL1>
-References: <1321051824-5216-1-git-send-email-andre.guedes@openbossa.org>
- <1321051824-5216-7-git-send-email-andre.guedes@openbossa.org>
- <20111114100806.GC13665@aemeltch-MOBL1>
- <95D6271C-626F-409E-B4AB-92F6C7E2AC15@openbossa.org>
+From: "Yao, Costa" <cqyao@qca.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "padovan@profusion.mobi" <padovan@profusion.mobi>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] Bluetooth: btusb: Add Qualcomm Atheros AR3006 in
+ blacklist_table
+Date: Thu, 17 Nov 2011 05:15:13 +0000
+Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3C48@nasanexd02b.na.qualcomm.com>
+References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3A49@nasanexd02b.na.qualcomm.com>
+ <1321450153.15441.548.camel@aeonflux>
+In-Reply-To: <1321450153.15441.548.camel@aeonflux>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <95D6271C-626F-409E-B4AB-92F6C7E2AC15@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
-
-On Wed, Nov 16, 2011 at 05:36:38PM -0300, Andre Guedes wrote:
-
-...
-
-> >> 
-> >> 	if (cp->enable == 0x01) {
-> > 
-> > Can we fix also magic number here and below?
-> 
-> I see your point here, but this is not a magic number, it is
-> just a true/false value.
-
-If this true/false no need to compare with hex numbers why not
-
-if(cp->enable) 
-	...
-
-Best regards 
-Andrei Emeltchenko 
+SGkgTWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hcmNl
+bCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddDQo+IFNlbnQ6IDIwMTHlubQx
+MeaciDE25pelIDIxOjI5DQo+IFRvOiBZYW8sIENvc3RhDQo+IENjOiBwYWRvdmFuQHByb2Z1c2lv
+bi5tb2JpOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBb
+UEFUQ0hdIEJsdWV0b290aDogYnR1c2I6IEFkZCBRdWFsY29tbSBBdGhlcm9zIEFSMzAwNiBpbg0K
+PiBibGFja2xpc3RfdGFibGUNCj4gDQo+IEhpIENvc3RhLA0KPiANCj4gPiBTaWduZWQtb2ZmLWJ5
+OiBDb3N0YSBZYW8gPGNxeWFvQHFjYS5xdWFsY29tbS5jb20+DQo+ID4gLS0tDQo+ID4gIGRyaXZl
+cnMvYmx1ZXRvb3RoL2J0dXNiLmMgfCAgICA1ICsrKystDQo+ID4gIDEgZmlsZXMgY2hhbmdlZCwg
+NCBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2Ry
+aXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgYi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+ID4g
+aW5kZXggMzlkZDY1Yy4uOTQxMjRhZCAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL2JsdWV0b290
+aC9idHVzYi5jDQo+ID4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+IEBAIC01
+NSw2ICs1NSw3IEBAIHN0YXRpYyBzdHJ1Y3QgdXNiX2RyaXZlciBidHVzYl9kcml2ZXI7DQo+ID4g
+ICNkZWZpbmUgQlRVU0JfQlJPS0VOX0lTT0MJMHgyMA0KPiA+ICAjZGVmaW5lIEJUVVNCX1dST05H
+X1NDT19NVFUJMHg0MA0KPiA+ICAjZGVmaW5lIEJUVVNCX0FUSDMwMTIJCTB4ODANCj4gPiArI2Rl
+ZmluZSBCVFVTQl9BVEgzMDA2CQkweDAxMDANCj4gPg0KPiA+ICBzdGF0aWMgc3RydWN0IHVzYl9k
+ZXZpY2VfaWQgYnR1c2JfdGFibGVbXSA9IHsNCj4gPiAgCS8qIEJsdWV0b290aCBVU0IgaW50ZXJm
+YWNlICovDQo+ID4gQEAgLTEyNSw2ICsxMjYsNyBAQCBzdGF0aWMgc3RydWN0IHVzYl9kZXZpY2Vf
+aWQgYmxhY2tsaXN0X3RhYmxlW10gPSB7DQo+ID4NCj4gPiAgCS8qIEF0aGVyb3MgMzAxMiB3aXRo
+IHNmbGFzaCBmaXJtd2FyZSAqLw0KPiA+ICAJeyBVU0JfREVWSUNFKDB4MGNmMywgMHgzMDA0KSwg
+LmRyaXZlcl9pbmZvID0gQlRVU0JfQVRIMzAxMiB9LA0KPiA+ICsJeyBVU0JfREVWSUNFKDB4MGNm
+MywgMHgzMDA2KSwgLmRyaXZlcl9pbmZvID0gQlRVU0JfQVRIMzAwNiB9LA0KPiA+DQo+ID4gIAkv
+KiBBdGhlcm9zIEFSNUJCVTEyIHdpdGggc2ZsYXNoIGZpcm13YXJlICovDQo+ID4gIAl7IFVTQl9E
+RVZJQ0UoMHgwNDg5LCAweGUwMmMpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9JR05PUkUgfSwgQEAN
+Cj4gPiAtOTM3LDcgKzkzOSw4IEBAIHN0YXRpYyBpbnQgYnR1c2JfcHJvYmUoc3RydWN0IHVzYl9p
+bnRlcmZhY2UgKmludGYsDQo+ID4gIAlpZiAoaWdub3JlX3NuaWZmZXIgJiYgaWQtPmRyaXZlcl9p
+bmZvICYgQlRVU0JfU05JRkZFUikNCj4gPiAgCQlyZXR1cm4gLUVOT0RFVjsNCj4gPg0KPiA+IC0J
+aWYgKGlkLT5kcml2ZXJfaW5mbyAmIEJUVVNCX0FUSDMwMTIpIHsNCj4gPiArCWlmICgoaWQtPmRy
+aXZlcl9pbmZvICYgQlRVU0JfQVRIMzAxMikgfHwNCj4gPiArCQkJCShpZC0+ZHJpdmVyX2luZm8g
+JiBCVFVTQl9BVEgzMDA2KSkgew0KPiA+ICAJCXN0cnVjdCB1c2JfZGV2aWNlICp1ZGV2ID0gaW50
+ZXJmYWNlX3RvX3VzYmRldihpbnRmKTsNCj4gPg0KPiA+ICAJCS8qIE9sZCBmaXJtd2FyZSB3b3Vs
+ZCBvdGhlcndpc2UgbGV0IGF0aDNrIGRyaXZlciBsb2FkDQo+IA0KPiAgICAgICAgIGlmIChpZC0+
+ZHJpdmVyX2luZm8gJiBCVFVTQl9BVEgzMDEyKSB7DQo+ICAgICAgICAgICAgICAgICBzdHJ1Y3Qg
+dXNiX2RldmljZSAqdWRldiA9IGludGVyZmFjZV90b191c2JkZXYoaW50Zik7DQo+IA0KPiAgICAg
+ICAgICAgICAgICAgLyogT2xkIGZpcm13YXJlIHdvdWxkIG90aGVyd2lzZSBsZXQgYXRoM2sgZHJp
+dmVyIGxvYWQNCj4gICAgICAgICAgICAgICAgICAqIHBhdGNoIGFuZCBzeXNjb25maWcgZmlsZXMg
+Ki8NCj4gICAgICAgICAgICAgICAgIGlmIChsZTE2X3RvX2NwdSh1ZGV2LT5kZXNjcmlwdG9yLmJj
+ZERldmljZSkgPD0gMHgwMDAxKQ0KPiAgICAgICAgICAgICAgICAgICAgICAgICByZXR1cm4gLUVO
+T0RFVjsNCj4gICAgICAgICB9DQo+IA0KPiBhcmUgeW91IHN1cmUgdGhpcyBpcyB0cnVlIGZvciB0
+aGUgMzAwNiBhcyB3ZWxsPyBPdGhlcndpc2UganVzdCB1c2luZyB0aGUNCj4gQlRVU0JfSUdOT1JF
+IHF1aXJrIHRvIGJsYWNrbGlzdCBhIGRldmljZSB3b3VsZCBiZSBlbm91Z2guDQo+IA0KSSBzZW5k
+IHRoaXMgcGF0Y2gganVzdCBmb3IgYSAzMDEyIGNoaXAsIHdpdGggUElEIDMwMDYuIEJlY2F1c2Ug
+d2UgbmVlZCB0byBzZXBhcmF0ZSBpdCB3aXRoIGFub3RoZXIgMzAxMiBjaGlwKFBJRCAzMDA0KS4N
+ClNvIHdlIHVzZSBCVFVTQl9BVEgzMDEyIGZvciBQSUQgMzAwNCBhbmQgQlRVU0JfQVRIMzAwNiBm
+b3IgUElEIDMwMDYuDQoNCkFuZCBJIGFtIHN1cmUgdGhhdCB3ZSBuZWVkIHVzZSB0aGlzIHF1aXJr
+LCBub3QgQlRVU0JfSUdOT1JFLiBCZWNhdXNlIHdlIG5lZWQgdG8gY2hlY2sgd2hldGhlciBjaGlw
+IGhhcyBiZWVuIHBhdGNoZWQgb3Igbm90IHRocm91Z2ggYmNkRGV2aWNlIHZhbHVlLg0KPiBBbmQg
+c3RhcnQgd3JpdGluZyBkZXRhaWxlZCBjb21taXQgbWVzc2FnZSB0aGF0IGV4cGxhaW5zIHdoeSB0
+aGlzIHF1aXJrIGlzDQo+IGNvcnJlY3QgYW5kIG5lZWRlZC4NCj4gDQo+IFJlZ2FyZHMNCj4gDQo+
+IE1hcmNlbA0KPiANCg0KQmVzdCB3aXNoZXMsDQpDb3N0YSBZYW8NCg==
