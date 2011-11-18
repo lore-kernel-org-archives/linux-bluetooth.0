@@ -1,117 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 Nov 2011 15:54:15 +0200
-From: 'Emeltchenko Andrei' <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Peter Krystad <pkrystad@codeaurora.org>,
+Date: Fri, 18 Nov 2011 15:41:17 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Randy Dunlap <rdunlap@xenotime.net>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
 	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 3/3] Bluetooth: Add AMP initialization
-Message-ID: <20111118135412.GC24392@aemeltch-MOBL1>
-References: <1321457422-31641-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1321457422-31641-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1321480186.15441.554.camel@aeonflux>
- <20111117132047.GH415@aemeltch-MOBL1>
- <1321544714.15441.568.camel@aeonflux>
- <005d01cca555$280fa960$782efc20$@org>
- <1321593256.15441.575.camel@aeonflux>
+Subject: Re: linux-next: Tree for Nov 17 (bluetooth)
+Message-ID: <20111118134115.GB24392@aemeltch-MOBL1>
+References: <20111117150733.a70faf2c9030d511d5367e1e@canb.auug.org.au>
+ <4EC5496F.2080509@xenotime.net>
+ <20111118095855.GB9034@aemeltch-MOBL1>
+ <20111118133017.GA2131@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321593256.15441.575.camel@aeonflux>
+In-Reply-To: <20111118133017.GA2131@joana>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Gustavo,
 
-On Fri, Nov 18, 2011 at 06:14:13AM +0100, Marcel Holtmann wrote:
-> Hi Peter,
+On Fri, Nov 18, 2011 at 11:30:17AM -0200, Gustavo Padovan wrote:
+> Hi Andrei,
 > 
-> > > > > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > > > > > index d1eef7c..290acb2 100644
-> > > > > > --- a/net/bluetooth/hci_core.c
-> > > > > > +++ b/net/bluetooth/hci_core.c
-> > > > > > @@ -219,40 +219,56 @@ static void hci_init_req(struct hci_dev *hdev,
-> > > unsigned long opt)
-> > > > > >  			hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
-> > > > > >  	}
-> > > > > >
-> > > > > > -	/* Read Local Supported Features */
-> > > > > > -	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
-> > > > > > -
-> > > > > >  	/* Read Local Version */
-> > > > > >  	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
-> > > > > >
-> > > > > >  	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
-> > > > > >  	hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
-> > > > > >
-> > > > > > -	/* Read BD Address */
-> > > > > > -	hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
-> > > > > > +	switch (hdev->dev_type) {
-> > > > > > +	case HCI_BREDR:
-> > > > >
-> > > > > stop right here and first split this out into proper helper functions.
-> > > > > Making this part longer and more convoluted is not going to work well in
-> > > > > the long run.
-> > > >
-> > > > Would following functions work:
-> > > >
-> > > > __hci_common_init
-> > > > __hci_bredr_init
-> > > > __hci_amp_init
-> > > 
-> > > I would not bother with common init. I think there is nothing really
-> > > common between AMP and BR/EDR/LE controllers.
+> * Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2011-11-18 11:58:58 +0200]:
+> 
+> > Hi Randy,
 > > 
-> > The commands quoted above are the common part of init between BR-EDR and AMP, plus 
-> > there will be a few additional common commands when block-based flow control is added.
-> > Makes sense to me to split the controller-specific sequences into two helper funcs 
-> > called at this switch statement.
+> > On Thu, Nov 17, 2011 at 09:50:39AM -0800, Randy Dunlap wrote:
+> > > On 11/16/2011 08:07 PM, Stephen Rothwell wrote:
+> > > > Hi all,
+> > > 
+> > > 
+> > > When CONFIG_BT_L2CAP is not enabled:
+> > > 
+> > > net/built-in.o: In function `hci_dev_open':
+> > > (.text+0xdce9a): undefined reference to `enable_hs'
+> > 
+> > Despite not enabling L2CAP sounds strange we might find solution even for
+> > this usage :-)
+> > I am thinking about moving enable_hs to common part not depending on
+> > CONFIG_BT_L2CAP option:
 > 
-> with our current approach on handling this, I rather copy hci_send_cmd
-> than making this code more complicated.
-> 
-> However since we are talking about controller init. Can someone please
-> first propose a list of how we init AMP vs BR/EDR/LE controllers instead
-> of just dumping code here. I think it needs some clear strategy on how
-> to do it.
+> This is ok, please send a proper git patch so I can apply it.
 
-AMP controller is initialized following way in Code Aurora code:
-
-Common part:
-
-<------8<--------------------------------------------------
-|  /* Mandatory initialization */
-|
-|  /* Reset */
-|  if (!test_bit(HCI_QUIRK_NO_RESET, &hdev->quirks)) {
-|          set_bit(HCI_RESET, &hdev->flags);
-|          hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
-|  }
-|
-|  /* Read Local Version */
-|  hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
-|
-|  /* Read HCI Flow Control Mode */
-|  hci_send_cmd(hdev, HCI_OP_READ_FLOW_CONTROL_MODE, 0, NULL);
-|
-|  /* Read Buffer Size (ACL mtu, max pkt, etc.) */
-|  hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
-|
-|  /* Read Data Block Size (ACL mtu, max pkt, etc.) */
-|  hci_send_cmd(hdev, HCI_OP_READ_DATA_BLOCK_SIZE, 0, NULL);
-<------8<------------------------------------------------------
-
-AMP - specific part:
-
-<------8<---------------------------------------------------
-|  /* AMP initialization */
-|  /* Connection accept timeout ~5 secs */
-|  param = cpu_to_le16(0x1f40);
-|  hci_send_cmd(hdev, HCI_OP_WRITE_CA_TIMEOUT, 2, &param);
-|
-|  /* Read AMP Info */
-|  hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
-<------8<---------------------------------------------------
-
-Source:
-git://codeaurora.org/kernel/msm.git
+The patch is already sent to linux-bluetooth
 
 Best regards 
 Andrei Emeltchenko 
