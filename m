@@ -1,33 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20111118112748.GA5971@x220>
-References: <1321551160-8903-1-git-send-email-anderson.lizardo@openbossa.org>
-	<20111118112748.GA5971@x220>
-Date: Fri, 18 Nov 2011 08:15:15 -0400
-Message-ID: <CAJdJm_NH8eQT62CxFKMR1+jxN_B9w81ZCTZrjTJQhHuM2A1zwg@mail.gmail.com>
-Subject: Re: [PATCH RFC BlueZ] serial: Fix bogus errno usage
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ] serial: Fix error handling in connect_port()
+Date: Fri, 18 Nov 2011 08:11:47 -0400
+Message-Id: <1321618307-11456-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+If available, provide a more useful D-Bus error message instead of just
+the POSIX error. Also remove a bogus use of errno.
+---
+ serial/port.c |   27 +++++++++++++++++++--------
+ 1 files changed, 19 insertions(+), 8 deletions(-)
 
-On Fri, Nov 18, 2011 at 7:27 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> bt_io_connect is not supposed to touch errno, so please don't send
-> patches for that. If you want to get the exact error you pass a GError
-> pointer, however even without that it's valid to check at least for a
-> NULL return. A simple fix if you don't want to add GError to this port.c
-> function is to return e.g. -EIO in case bt_io_connect returns NULL.
-
-I just sent another patch that uses GError if it is set. I hope this
-way it works just like the bt_io_connect() call in get_record_cb(), on
-the same file.
-
-Regards,
+diff --git a/serial/port.c b/serial/port.c
+index 3b36d44..cbf06c5 100644
+--- a/serial/port.c
++++ b/serial/port.c
+@@ -438,7 +438,7 @@ failed:
+ 	g_dbus_send_message(device->conn, reply);
+ }
+ 
+-static int connect_port(struct serial_port *port)
++static int connect_port(struct serial_port *port, GError **gerr)
+ {
+ 	struct serial_device *device = port->device;
+ 	uuid_t uuid;
+@@ -458,15 +458,15 @@ static int connect_port(struct serial_port *port)
+ 
+ connect:
+ 	port->io = bt_io_connect(BT_IO_RFCOMM, rfcomm_connect_cb, port,
+-				NULL, NULL,
++				NULL, gerr,
+ 				BT_IO_OPT_SOURCE_BDADDR, &device->src,
+ 				BT_IO_OPT_DEST_BDADDR, &device->dst,
+ 				BT_IO_OPT_CHANNEL, port->channel,
+ 				BT_IO_OPT_INVALID);
+-	if (port->io)
+-		return 0;
++	if (port->io == NULL)
++		return -EIO;
+ 
+-	return -errno;
++	return 0;
+ }
+ 
+ static struct serial_port *create_port(struct serial_device *device,
+@@ -492,6 +492,7 @@ static DBusMessage *port_connect(DBusConnection *conn,
+ 	struct serial_device *device = user_data;
+ 	struct serial_port *port;
+ 	const char *pattern;
++	GError *gerr = NULL;
+ 	int err;
+ 
+ 	if (dbus_message_has_member(msg, "ConnectFD") && DBUS_TYPE_UNIX_FD < 0)
+@@ -523,13 +524,23 @@ static DBusMessage *port_connect(DBusConnection *conn,
+ 
+ 	port->msg = dbus_message_ref(msg);
+ 
+-	err = connect_port(port);
++	err = connect_port(port, &gerr);
+ 	if (err < 0) {
+-		error("%s", strerror(-err));
++		DBusMessage *reply;
++
++		if (gerr == NULL) {
++			error("%s", strerror(-err));
++			reply = btd_error_failed(msg, strerror(-err));
++		} else {
++			error("%s", gerr->message);
++			reply = btd_error_failed(msg, gerr->message);
++			g_error_free(gerr);
++		}
++
+ 		g_dbus_remove_watch(conn, port->listener_id);
+ 		port->listener_id = 0;
+ 
+-		return btd_error_failed(msg, strerror(-err));
++		return reply;
+ 	}
+ 
+ 	return NULL;
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.0.4
+
