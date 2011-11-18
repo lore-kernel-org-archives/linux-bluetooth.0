@@ -1,50 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 Nov 2011 15:41:17 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Randy Dunlap <rdunlap@xenotime.net>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: linux-next: Tree for Nov 17 (bluetooth)
-Message-ID: <20111118134115.GB24392@aemeltch-MOBL1>
-References: <20111117150733.a70faf2c9030d511d5367e1e@canb.auug.org.au>
- <4EC5496F.2080509@xenotime.net>
- <20111118095855.GB9034@aemeltch-MOBL1>
- <20111118133017.GA2131@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111118133017.GA2131@joana>
+In-Reply-To: <20111118123221.GA29001@fusion.localdomain>
+References: <1321618307-11456-1-git-send-email-anderson.lizardo@openbossa.org>
+	<20111118123221.GA29001@fusion.localdomain>
+Date: Fri, 18 Nov 2011 09:39:02 -0400
+Message-ID: <CAJdJm_NCdp4p2GB-QoY-BMdFb7d8wZFxEO0=vdKWDY1TKs1Dew@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] serial: Fix error handling in connect_port()
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Johan,
 
-On Fri, Nov 18, 2011 at 11:30:17AM -0200, Gustavo Padovan wrote:
-> Hi Andrei,
-> 
-> * Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2011-11-18 11:58:58 +0200]:
-> 
-> > Hi Randy,
-> > 
-> > On Thu, Nov 17, 2011 at 09:50:39AM -0800, Randy Dunlap wrote:
-> > > On 11/16/2011 08:07 PM, Stephen Rothwell wrote:
-> > > > Hi all,
-> > > 
-> > > 
-> > > When CONFIG_BT_L2CAP is not enabled:
-> > > 
-> > > net/built-in.o: In function `hci_dev_open':
-> > > (.text+0xdce9a): undefined reference to `enable_hs'
-> > 
-> > Despite not enabling L2CAP sounds strange we might find solution even for
-> > this usage :-)
-> > I am thinking about moving enable_hs to common part not depending on
-> > CONFIG_BT_L2CAP option:
-> 
-> This is ok, please send a proper git patch so I can apply it.
+On Fri, Nov 18, 2011 at 8:32 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> That's not quite how GError based APIs are supposed to be used and
+> implemented. Basically APIs that can report errors through GError make a
+> guarantee that if their return value indicates error then the GError
+> will also be set (if such a pointer was passed), so it's redundant to
+> check both for err < 0 and err != NULL. Furthermore, I wouldn't go
+> mixing POSIX errors and GError into the same API, so if you add GError
+> support make the function return a gboolean instead of an int (and then
+> either pass a GError and check for it when the function returns (but not
+> the return value) or don't pass a GError and check for a FALSE return
+> value.
 
-The patch is already sent to linux-bluetooth
+Besides the bt_io_connnect() call, connect_port() has calls to other
+functions which do not set GError on failure, but instead return a
+negative POSIX error. For these, we would need to use g_set_error() to
+always have a GError. I think that is too much code just for a single
+static function, given that the "serial" plugin is not using GError
+for its own errors.
 
-Best regards 
-Andrei Emeltchenko 
+So I will stick with your original suggestion and simply return -EIO
+if bt_io_connect() returns NULL (which will fix the original bug).
+This can be improved later by changing serial code to better handle
+GError for its own errors.
+
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
