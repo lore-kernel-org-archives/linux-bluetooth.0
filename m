@@ -1,75 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: [RFC 3/3] Bluetooth: Add AMP initialization
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Peter Krystad <pkrystad@codeaurora.org>
-Cc: 'Emeltchenko Andrei' <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Date: Fri, 18 Nov 2011 06:14:13 +0100
-In-Reply-To: <005d01cca555$280fa960$782efc20$@org>
-References: <1321457422-31641-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-		 <1321457422-31641-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-		 <1321480186.15441.554.camel@aeonflux>
-	 <20111117132047.GH415@aemeltch-MOBL1> <1321544714.15441.568.camel@aeonflux>
-	 <005d01cca555$280fa960$782efc20$@org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321593256.15441.575.camel@aeonflux>
-Mime-Version: 1.0
+From: "Yao, Costa" <cqyao@qca.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "padovan@profusion.mobi" <padovan@profusion.mobi>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] Bluetooth: btusb: Add Qualcomm Atheros AR3006 in
+ blacklist_table
+Date: Fri, 18 Nov 2011 02:22:09 +0000
+Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3D67@nasanexd02b.na.qualcomm.com>
+References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3A49@nasanexd02b.na.qualcomm.com>
+	 <1321450153.15441.548.camel@aeonflux>
+	 <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3C48@nasanexd02b.na.qualcomm.com>
+ <1321545089.15441.572.camel@aeonflux>
+In-Reply-To: <1321545089.15441.572.camel@aeonflux>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
-
-> > > > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > > > > index d1eef7c..290acb2 100644
-> > > > > --- a/net/bluetooth/hci_core.c
-> > > > > +++ b/net/bluetooth/hci_core.c
-> > > > > @@ -219,40 +219,56 @@ static void hci_init_req(struct hci_dev *hdev,
-> > unsigned long opt)
-> > > > >  			hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
-> > > > >  	}
-> > > > >
-> > > > > -	/* Read Local Supported Features */
-> > > > > -	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
-> > > > > -
-> > > > >  	/* Read Local Version */
-> > > > >  	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
-> > > > >
-> > > > >  	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
-> > > > >  	hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
-> > > > >
-> > > > > -	/* Read BD Address */
-> > > > > -	hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
-> > > > > +	switch (hdev->dev_type) {
-> > > > > +	case HCI_BREDR:
-> > > >
-> > > > stop right here and first split this out into proper helper functions.
-> > > > Making this part longer and more convoluted is not going to work well in
-> > > > the long run.
-> > >
-> > > Would following functions work:
-> > >
-> > > __hci_common_init
-> > > __hci_bredr_init
-> > > __hci_amp_init
-> > 
-> > I would not bother with common init. I think there is nothing really
-> > common between AMP and BR/EDR/LE controllers.
-> 
-> The commands quoted above are the common part of init between BR-EDR and AMP, plus 
-> there will be a few additional common commands when block-based flow control is added.
-> Makes sense to me to split the controller-specific sequences into two helper funcs 
-> called at this switch statement.
-
-with our current approach on handling this, I rather copy hci_send_cmd
-than making this code more complicated.
-
-However since we are talking about controller init. Can someone please
-first propose a list of how we init AMP vs BR/EDR/LE controllers instead
-of just dumping code here. I think it needs some clear strategy on how
-to do it.
-
-Regards
-
-Marcel
-
-
+SGkgTWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hcmNl
+bCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddDQo+IFNlbnQ6IDIwMTHlubQx
+MeaciDE35pelIDIzOjUxDQo+IFRvOiBZYW8sIENvc3RhDQo+IENjOiBwYWRvdmFuQHByb2Z1c2lv
+bi5tb2JpOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJFOiBb
+UEFUQ0hdIEJsdWV0b290aDogYnR1c2I6IEFkZCBRdWFsY29tbSBBdGhlcm9zIEFSMzAwNiBpbg0K
+PiBibGFja2xpc3RfdGFibGUNCj4gDQo+IEhpIENvc3RhLA0KPiANCj4gPiA+ID4gU2lnbmVkLW9m
+Zi1ieTogQ29zdGEgWWFvIDxjcXlhb0BxY2EucXVhbGNvbW0uY29tPg0KPiA+ID4gPiAtLS0NCj4g
+PiA+ID4gIGRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgfCAgICA1ICsrKystDQo+ID4gPiA+ICAx
+IGZpbGVzIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbnMoLSkNCj4gPiA+ID4N
+Cj4gPiA+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgYi9kcml2ZXJz
+L2JsdWV0b290aC9idHVzYi5jDQo+ID4gPiA+IGluZGV4IDM5ZGQ2NWMuLjk0MTI0YWQgMTAwNjQ0
+DQo+ID4gPiA+IC0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCj4gPiA+ID4gKysrIGIv
+ZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+ID4gPiBAQCAtNTUsNiArNTUsNyBAQCBzdGF0
+aWMgc3RydWN0IHVzYl9kcml2ZXIgYnR1c2JfZHJpdmVyOw0KPiA+ID4gPiAgI2RlZmluZSBCVFVT
+Ql9CUk9LRU5fSVNPQwkweDIwDQo+ID4gPiA+ICAjZGVmaW5lIEJUVVNCX1dST05HX1NDT19NVFUJ
+MHg0MA0KPiA+ID4gPiAgI2RlZmluZSBCVFVTQl9BVEgzMDEyCQkweDgwDQo+ID4gPiA+ICsjZGVm
+aW5lIEJUVVNCX0FUSDMwMDYJCTB4MDEwMA0KPiA+ID4gPg0KPiA+ID4gPiAgc3RhdGljIHN0cnVj
+dCB1c2JfZGV2aWNlX2lkIGJ0dXNiX3RhYmxlW10gPSB7DQo+ID4gPiA+ICAJLyogQmx1ZXRvb3Ro
+IFVTQiBpbnRlcmZhY2UgKi8NCj4gPiA+ID4gQEAgLTEyNSw2ICsxMjYsNyBAQCBzdGF0aWMgc3Ry
+dWN0IHVzYl9kZXZpY2VfaWQgYmxhY2tsaXN0X3RhYmxlW10NCj4gPiA+ID4gPSB7DQo+ID4gPiA+
+DQo+ID4gPiA+ICAJLyogQXRoZXJvcyAzMDEyIHdpdGggc2ZsYXNoIGZpcm13YXJlICovDQo+ID4g
+PiA+ICAJeyBVU0JfREVWSUNFKDB4MGNmMywgMHgzMDA0KSwgLmRyaXZlcl9pbmZvID0gQlRVU0Jf
+QVRIMzAxMiB9LA0KPiA+ID4gPiArCXsgVVNCX0RFVklDRSgweDBjZjMsIDB4MzAwNiksIC5kcml2
+ZXJfaW5mbyA9IEJUVVNCX0FUSDMwMDYgfSwNCj4gPiA+ID4NCj4gPiA+ID4gIAkvKiBBdGhlcm9z
+IEFSNUJCVTEyIHdpdGggc2ZsYXNoIGZpcm13YXJlICovDQo+ID4gPiA+ICAJeyBVU0JfREVWSUNF
+KDB4MDQ4OSwgMHhlMDJjKSwgLmRyaXZlcl9pbmZvID0gQlRVU0JfSUdOT1JFIH0sIEBADQo+ID4g
+PiA+IC05MzcsNyArOTM5LDggQEAgc3RhdGljIGludCBidHVzYl9wcm9iZShzdHJ1Y3QgdXNiX2lu
+dGVyZmFjZSAqaW50ZiwNCj4gPiA+ID4gIAlpZiAoaWdub3JlX3NuaWZmZXIgJiYgaWQtPmRyaXZl
+cl9pbmZvICYgQlRVU0JfU05JRkZFUikNCj4gPiA+ID4gIAkJcmV0dXJuIC1FTk9ERVY7DQo+ID4g
+PiA+DQo+ID4gPiA+IC0JaWYgKGlkLT5kcml2ZXJfaW5mbyAmIEJUVVNCX0FUSDMwMTIpIHsNCj4g
+PiA+ID4gKwlpZiAoKGlkLT5kcml2ZXJfaW5mbyAmIEJUVVNCX0FUSDMwMTIpIHx8DQo+ID4gPiA+
+ICsJCQkJKGlkLT5kcml2ZXJfaW5mbyAmIEJUVVNCX0FUSDMwMDYpKSB7DQo+ID4gPiA+ICAJCXN0
+cnVjdCB1c2JfZGV2aWNlICp1ZGV2ID0gaW50ZXJmYWNlX3RvX3VzYmRldihpbnRmKTsNCj4gPiA+
+ID4NCj4gPiA+ID4gIAkJLyogT2xkIGZpcm13YXJlIHdvdWxkIG90aGVyd2lzZSBsZXQgYXRoM2sg
+ZHJpdmVyIGxvYWQNCj4gPiA+DQo+ID4gPiAgICAgICAgIGlmIChpZC0+ZHJpdmVyX2luZm8gJiBC
+VFVTQl9BVEgzMDEyKSB7DQo+ID4gPiAgICAgICAgICAgICAgICAgc3RydWN0IHVzYl9kZXZpY2Ug
+KnVkZXYgPSBpbnRlcmZhY2VfdG9fdXNiZGV2KGludGYpOw0KPiA+ID4NCj4gPiA+ICAgICAgICAg
+ICAgICAgICAvKiBPbGQgZmlybXdhcmUgd291bGQgb3RoZXJ3aXNlIGxldCBhdGgzayBkcml2ZXIg
+bG9hZA0KPiA+ID4gICAgICAgICAgICAgICAgICAqIHBhdGNoIGFuZCBzeXNjb25maWcgZmlsZXMg
+Ki8NCj4gPiA+ICAgICAgICAgICAgICAgICBpZiAobGUxNl90b19jcHUodWRldi0+ZGVzY3JpcHRv
+ci5iY2REZXZpY2UpIDw9DQo+IDB4MDAwMSkNCj4gPiA+ICAgICAgICAgICAgICAgICAgICAgICAg
+IHJldHVybiAtRU5PREVWOw0KPiA+ID4gICAgICAgICB9DQo+ID4gPg0KPiA+ID4gYXJlIHlvdSBz
+dXJlIHRoaXMgaXMgdHJ1ZSBmb3IgdGhlIDMwMDYgYXMgd2VsbD8gT3RoZXJ3aXNlIGp1c3QgdXNp
+bmcNCj4gPiA+IHRoZSBCVFVTQl9JR05PUkUgcXVpcmsgdG8gYmxhY2tsaXN0IGEgZGV2aWNlIHdv
+dWxkIGJlIGVub3VnaC4NCj4gPiA+DQo+ID4gSSBzZW5kIHRoaXMgcGF0Y2gganVzdCBmb3IgYSAz
+MDEyIGNoaXAsIHdpdGggUElEIDMwMDYuIEJlY2F1c2Ugd2UgbmVlZCB0bw0KPiBzZXBhcmF0ZSBp
+dCB3aXRoIGFub3RoZXIgMzAxMiBjaGlwKFBJRCAzMDA0KS4NCj4gPiBTbyB3ZSB1c2UgQlRVU0Jf
+QVRIMzAxMiBmb3IgUElEIDMwMDQgYW5kIEJUVVNCX0FUSDMwMDYgZm9yIFBJRCAzMDA2Lg0KPiA+
+DQo+ID4gQW5kIEkgYW0gc3VyZSB0aGF0IHdlIG5lZWQgdXNlIHRoaXMgcXVpcmssIG5vdCBCVFVT
+Ql9JR05PUkUuIEJlY2F1c2Ugd2UNCj4gbmVlZCB0byBjaGVjayB3aGV0aGVyIGNoaXAgaGFzIGJl
+ZW4gcGF0Y2hlZCBvciBub3QgdGhyb3VnaCBiY2REZXZpY2UgdmFsdWUuDQo+IA0KPiBzbyB5b3Ug
+YXJlIHRlbGxpbmcgbWUgdGhhdCB5b3UgZ3V5cyBtYW5hZ2VkIHRvIHNjcmV3IHVwIGFub3RoZXIg
+c2V0IG9mDQo+IGhhcmR3YXJlIHdpdGggdGhlIHNhbWUgbWVzcyBhcyB0aGUgcHJldmlvdXMgb25l
+Lg0KPiANCj4gQXJlIHlvdSAxMDAlIHN1cmUgeW91IG5lZWQgdGhlIGJjZERldmljZSBjaGVjayBm
+b3IgdGhpcyBnZW5lcmF0aW9uIG9mDQo+IGhhcmR3YXJlPyBDYXJlIHRvIGV4cGxhaW4gdG8gbWUg
+aG93IHRoYXQgaXMgc3VwcG9zZSB0byB3b3JrLg0KWWVzLCBiZWZvcmUgZG93bmxvYWQgcGF0Y2gs
+IHRoZSBiY2REZXZpY2UgPD0gMHgwMDAxIGluIGJ0dXNiLmMsIHRoZW4gYXRoM2sgZHJpdmVyIGhh
+dmUgdGhlIG9wcG9ydHVuaXR5IHRvIGRvd25sb2FkIHRoZSBwYXRjaCBhbmQgcmVzZXQgdGhlIGJs
+dWV0b290aCBoYXJkd2FyZS4NCldoZW4gdGhlIGhhcmR3YXJlIGFyZSBlbnVtZXJhdGVkIHRoZSBz
+ZWNvbmQgdGltZSwgdGhlIGJjZERldmljZSB3aWxsIGxhcmdlciB0aGFuIDB4MDAwMS4gRm9yIHRo
+aXMgcmVhc29uLCBJIGFtIDEwMCUgc3VyZSB0aGF0IHdlIG5lZWQgZG8gYmNkRGV2aWNlIGNoZWNr
+Lg0KDQo+IEFuZCB3aHkgeW91IGFyZSBpbnRyb2R1Y2luZyBhIG5ldyBxdWlyayBpZiB0aGUgaGFu
+ZGxpbmcgaXMgZXhhY3RseSB0aGUgc2FtZS4NCkluIGJ0dXNiLmMsIHllcywgdGhlIGhhbmRsaW5n
+IGlzIHRoZSBzYW1lIGFzIEJUVVNCX0FUSDMwMTIuIFNvIG1heWJlIHdlIGNhbiB1c2UgdGhlIHNh
+bWUgcXVpcmsgQlRVU0JfQVRIMzAxMi4NCkJ1dCBpbiBhdGgzay5jLCB0aGUgaGFuZGxpbmcgZm9y
+IEJUVVNCX0FUSDMwMDYgaXMgZGlmZmVyZW50IGZyb20gQlRVU0JfQVRIMzAxMiwgc28gSSB3YW50
+IHRvIGludHJvZHVjZSBhIG5ldyBxdWlyayBCVFVTQl9BVEgzMDA2LiANCj4gDQo+IFJlZ2FyZHMN
+Cj4gDQo+IE1hcmNlbA0KPiANCg0K
