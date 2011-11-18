@@ -1,54 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 Nov 2011 13:27:48 +0200
+Date: Fri, 18 Nov 2011 13:15:29 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH RFC BlueZ] serial: Fix bogus errno usage
-Message-ID: <20111118112748.GA5971@x220>
-References: <1321551160-8903-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: Re: Health Thermometer Profile (HTP)
+Message-ID: <20111118111529.GA2586@x220>
+References: <1321272680-16286-1-git-send-email-sancane@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321551160-8903-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1321272680-16286-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Santiago,
 
-On Thu, Nov 17, 2011, Anderson Lizardo wrote:
-> There is no previous function setting errno, thus the original code may
-> return a undefined value.
-> ---
-> NOTE:
-> Is bt_io_connect() supposed to set errno on error? If yes, then the code is
-> correct and this patch is invalid.
+On Mon, Nov 14, 2011, Santiago Carot-Nemesio wrote:
+> This is a new set of patches to enhance thermometer plugin fuctionality.
+> These patches enable watchers to receiave final/intermediate measurements
+> from thermometers devices. They also includes latest changes suggested
+> in the list.
 > 
-> But in this case, bt_io_connect() needs to be modified as there are at least
-> two glib library calls before returning, and this may reset errno from the
-> underlying connect call. So I think it needs to be saved before calling these
-> library functions.
-> 
->  serial/port.c |    4 +---
->  1 files changed, 1 insertions(+), 3 deletions(-)
-> 
-> diff --git a/serial/port.c b/serial/port.c
-> index 3b36d44..1ceda7b 100644
-> --- a/serial/port.c
-> +++ b/serial/port.c
-> @@ -463,10 +463,8 @@ connect:
->  				BT_IO_OPT_DEST_BDADDR, &device->dst,
->  				BT_IO_OPT_CHANNEL, port->channel,
->  				BT_IO_OPT_INVALID);
-> -	if (port->io)
-> -		return 0;
->  
-> -	return -errno;
-> +	return 0;
->  }
+> [PATCH 1/6] Manage GATT attribute indications in handle callback.
+> [PATCH 2/6] Parse final measurement indication
+> [PATCH 3/6] Add org.bluez.ThermometerWatcher interface to default
+> [PATCH 4/6] Implement EnableIntermediateMeasurement D-Bus method
+> [PATCH 5/6] Implement DisableIntermediateMeasurement D-Bus method
+> [PATCH 6/6] Notify intermediate measurements
 
-bt_io_connect is not supposed to touch errno, so please don't send
-patches for that. If you want to get the exact error you pass a GError
-pointer, however even without that it's valid to check at least for a
-NULL return. A simple fix if you don't want to add GError to this port.c
-function is to return e.g. -EIO in case bt_io_connect returns NULL.
+All of these patches have been pushed upstream. Thanks.
 
 Johan
