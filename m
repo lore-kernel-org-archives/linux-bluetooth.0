@@ -1,65 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: making enable_hs independent from L2CAP
-Date: Fri, 18 Nov 2011 13:35:42 +0200
-Message-Id: <1321616142-19038-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 18 Nov 2011 13:27:48 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH RFC BlueZ] serial: Fix bogus errno usage
+Message-ID: <20111118112748.GA5971@x220>
+References: <1321551160-8903-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1321551160-8903-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Lizardo,
 
-Fixes bluetooth compiling when CONFIG_BT_L2CAP is not enabled
+On Thu, Nov 17, 2011, Anderson Lizardo wrote:
+> There is no previous function setting errno, thus the original code may
+> return a undefined value.
+> ---
+> NOTE:
+> Is bt_io_connect() supposed to set errno on error? If yes, then the code is
+> correct and this patch is invalid.
+> 
+> But in this case, bt_io_connect() needs to be modified as there are at least
+> two glib library calls before returning, and this may reset errno from the
+> underlying connect call. So I think it needs to be saved before calling these
+> library functions.
+> 
+>  serial/port.c |    4 +---
+>  1 files changed, 1 insertions(+), 3 deletions(-)
+> 
+> diff --git a/serial/port.c b/serial/port.c
+> index 3b36d44..1ceda7b 100644
+> --- a/serial/port.c
+> +++ b/serial/port.c
+> @@ -463,10 +463,8 @@ connect:
+>  				BT_IO_OPT_DEST_BDADDR, &device->dst,
+>  				BT_IO_OPT_CHANNEL, port->channel,
+>  				BT_IO_OPT_INVALID);
+> -	if (port->io)
+> -		return 0;
+>  
+> -	return -errno;
+> +	return 0;
+>  }
 
-net/built-in.o: In function `hci_dev_open':
-(.text+0xdce9a): undefined reference to `enable_hs'
+bt_io_connect is not supposed to touch errno, so please don't send
+patches for that. If you want to get the exact error you pass a GError
+pointer, however even without that it's valid to check at least for a
+NULL return. A simple fix if you don't want to add GError to this port.c
+function is to return e.g. -EIO in case bt_io_connect returns NULL.
 
-Reported-by: Randy Dunlap <rdunlap@xenotime.net>
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/hci_core.c   |    5 +++++
- net/bluetooth/l2cap_core.c |    4 ----
- 2 files changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2a0c8cf..9218888 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -54,6 +54,8 @@
- 
- #define AUTO_OFF_TIMEOUT 2000
- 
-+int enable_hs;
-+
- static void hci_cmd_task(unsigned long arg);
- static void hci_rx_task(unsigned long arg);
- static void hci_tx_task(unsigned long arg);
-@@ -2601,3 +2603,6 @@ int hci_cancel_inquiry(struct hci_dev *hdev)
- 
- 	return hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
- }
-+
-+module_param(enable_hs, bool, 0644);
-+MODULE_PARM_DESC(enable_hs, "Enable High Speed");
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index d63e670..bdbf919 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -57,7 +57,6 @@
- #include <net/bluetooth/smp.h>
- 
- int disable_ertm;
--int enable_hs;
- 
- static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
- static u8 l2cap_fixed_chan[8] = { L2CAP_FC_L2CAP, };
-@@ -4774,6 +4773,3 @@ void l2cap_exit(void)
- 
- module_param(disable_ertm, bool, 0644);
- MODULE_PARM_DESC(disable_ertm, "Disable enhanced retransmission mode");
--
--module_param(enable_hs, bool, 0644);
--MODULE_PARM_DESC(enable_hs, "Enable High Speed");
--- 
-1.7.4.1
-
+Johan
