@@ -1,102 +1,354 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC] LE: Low Latency GATT Write-Sign-Cmd
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Date: Fri, 18 Nov 2011 20:08:58 +0100
-In-Reply-To: <4EC6A13B.5030805@codeaurora.org>
-References: <4EC6A13B.5030805@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321643339.15441.622.camel@aeonflux>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 18 Nov 2011 19:40:17 +0100
+From: =?utf-8?B?VG9tw6HFoSBKYW5vdcWhZWs=?= <tomi@nomi.cz>
+To: Szymon Janc <szymon@janc.net.pl>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [REGRESSION] resume takes 10s longer due to e1b6eb3 (Bluetooth:
+	Increase HCI reset timeout ...)
+Message-ID: <20111118184017.GA5052@nomi.cz>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="VS++wcV0S1rZb1Fb"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
 
-> One of the useful features of Low Energy is the ability to rapidly 
-> establish a connection, send a responseless Signed Write Command, and 
-> tear the connection down.  The obvious use case for this would be a 
-> standard remote control, where extremely low latency is expected.
-> 
-> The difference between this use case, and something like one of the 
-> Health profiles, is that a Health device (Heart rate Monitor, or 
-> Thermometer) is that where the Health device would have a persistent 
-> connection with high latency (less frequent Beacons), the Remote Control 
-> use case would rarely be connected, but when it is it will be as low 
-> latency as possible.
-> 
-> Currently we do not support Write Signed Commands at all, although I 
-> hope to have that addressed in the not too distant future.  However the 
-> nature of it's usage model is not very well established here 
-> (BlueZ/Linux) so I would like to float a few ideas.
-> 
-> 
-> This is what should happen when the user hits a button on his remote 
-> control (or in his remote control linux APP):
-> 
-> 1. Request LE Connection with Low Latency Parameters
-> 2. Compose & sign the GATT Write Cmd (in parallel with Connect Req)
-> 3. When Successful Connect Cmplt Evt occurs, send the Write Cmd Pkt
-> 4. WAIT for the Num Completed Pkts Evt (VERY IMPORTANT)
-> 5. As soon as you have it, Disconnect
-> 
-> This use case is only valid for LE (GATT connections must be Secure on 
-> BR/EDR, and therefore will never be as fast, and will never in fact even 
-> need to be signed).  If done properly, the entire sequence can be 
-> completed in the 10's of milliseconds, from button press to Disconnect.
-> 
-> This calls for a different thread of operation from current GATT 
-> operation for a few reasons:
-> 
-> 1. Standard GATT connections will have different Connect Parameters
-> 
-> 2. Standard GATT connection establishment requires on a round trip from
-> User space--> Kernel --> Baseband and back before the ACL packet is even 
-> written to the Socket in User Space.
-> 
-> 3. The signing crypto code is in the Kernel, and must be applied to each 
-> signed write command in a way that suggests some LE-GATT-Write-Cmd 
-> knowledge must exist in the kernel, as opposed to being a simple ACL pipe.
+--VS++wcV0S1rZb1Fb
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-the kernel crypto can be easily used from userspace. See PF_ALG.
+Hello,
 
-So the real question is what's the price of a context switch for us?
+while testing the 3.2-rc kernel, I experienced that resume takes 10 seconds
+more than usual, and bisected this to be caused by e1b6eb3 (Bluetooth:
+Increase HCI reset timeout in hci_dev_do_close).
 
-> 4. There is no current mechanism for the Kernel to inform the User space 
-> code that the ACL packet has finished transmission, and that it is OK to 
-> disconnect.
-> 
-> 5. We already special case the handling of the LE-L2Cap CIDs for 
-> Signaling and SMP.
-> 
-> 
-> So I would like to suggest the following straw-man:
-> 
-> A new LE only MGMT command, which accepts as parameters the Remote 
-> Address, a length and a buffer.  The buffer would be reasonable sized (I 
-> would recommend 27 bytes, which is the default LE MTU+HDR). The byte 
-> stream itself could either be composed by the User space GATT code 
-> (L2CAP header, Attribute Handle, Write Data) or they could be structure 
-> fields in the MGMT packet. On the Kernel side, the MGMT code would 
-> shepherd the packet through the connection, signing, and send process. 
-> If the connection to the remote device was already established, the 
-> existing connection would be used, the signing would only be done if the 
-> link was not encrypted, and the connection would be left up. When the 
-> Num-Completed-Pkts evt arrives, send the MGMT cmd_status response.
-> 
-> I think this would be way cleaner than trying to wedge this use case 
-> into our current GATT usage model.
+My hardware is Lenovo ThinkPad T420, model number 4178-A3G, with a Broadcom
+Bluetooth adapter (I'm attaching the relevant part of lsusb).
 
-I think one of the most important questions that we have to ask
-ourselves at some point is if we wanna put ATT into the kernel.
+The relevant portion of dmesg is:
+[   76.502818] usb 1-1.4: reset full-speed USB device number 4 using ehci_hcd
+[   76.588225] btusb 1-1.4:1.0: no reset_resume for driver btusb?
+[   76.591870] btusb 1-1.4:1.1: no reset_resume for driver btusb?
+[   86.565269] PM: resume of devices complete after 10486.220 msecs
 
-The potential candidate that forces us to think about this is HID over
-Low Energy. However I like to see numbers on how the context switches
-with keeping ATT in userspace will effect our latency.
+My resume scripts did contain a hciconfig hci0 down followed by up, because
+on my previous notebook (and the kernel I used at the time) it was needed for
+BT to work after suspend. On this hardware, however, none of that is needed.
+Bluetooth after suspend works regardless of whether that patch is applied or
+not, and I believe it would wait indefinitely if given large enough timeout.
 
-Regards
+Aside from reverting the patch, doing the following before suspend also works
+around the issue:
+    echo disable > /proc/acpi/ibm/bluetooth
 
-Marcel
+Kind regards,
+-- 
+Tomáš Janoušek, a.k.a. Liskni_si, http://work.lisk.in/
 
+--VS++wcV0S1rZb1Fb
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: attachment; filename="bt.txt"
 
+Bus 001 Device 006: ID 0a5c:217f Broadcom Corp. Bluetooth Controller
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               2.00
+  bDeviceClass          224 Wireless
+  bDeviceSubClass         1 Radio Frequency
+  bDeviceProtocol         1 Bluetooth
+  bMaxPacketSize0        64
+  idVendor           0x0a5c Broadcom Corp.
+  idProduct          0x217f Bluetooth Controller
+  bcdDevice            7.48
+  iManufacturer           1 Broadcom Corp
+  iProduct                2 Broadcom Bluetooth Device
+  iSerial                 3 CCAF78EC8B4F
+  bNumConfigurations      1
+  Configuration Descriptor:
+    bLength                 9
+    bDescriptorType         2
+    wTotalLength          216
+    bNumInterfaces          4
+    bConfigurationValue     1
+    iConfiguration          0 
+    bmAttributes         0xe0
+      Self Powered
+      Remote Wakeup
+    MaxPower                0mA
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        0
+      bAlternateSetting       0
+      bNumEndpoints           3
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0010  1x 16 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x82  EP 2 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x02  EP 2 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0000  1x 0 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0000  1x 0 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       1
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0009  1x 9 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0009  1x 9 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       2
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0011  1x 17 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0011  1x 17 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       3
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0020  1x 32 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0020  1x 32 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       4
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       5
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        2
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass       255 Vendor Specific Class
+      bInterfaceSubClass    255 Vendor Specific Subclass
+      bInterfaceProtocol    255 Vendor Specific Protocol
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x84  EP 4 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0020  1x 32 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x04  EP 4 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0020  1x 32 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        3
+      bAlternateSetting       0
+      bNumEndpoints           0
+      bInterfaceClass       254 Application Specific Interface
+      bInterfaceSubClass      1 Device Firmware Update
+      bInterfaceProtocol      1 
+      iInterface              0 
+      Device Firmware Upgrade Interface Descriptor:
+        bLength                             7
+        bDescriptorType                    33
+        bmAttributes                        7
+          Will Not Detach
+          Manifestation Tolerant
+          Upload Supported
+          Download Supported
+        wDetachTimeout                   5000 milliseconds
+        wTransferSize                      64 bytes
+Device Status:     0x0001
+  Self Powered
+
+--VS++wcV0S1rZb1Fb--
