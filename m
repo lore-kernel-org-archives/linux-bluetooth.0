@@ -1,230 +1,151 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Yao, Costa" <cqyao@qca.qualcomm.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>, "padovan@profusion.mobi"
+	<padovan@profusion.mobi>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] Bluetooth: ath3k: Add supports for Qualcomm Atherose 3012
+ composite chip
+Date: Fri, 18 Nov 2011 09:59:26 +0000
+Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3E6E@nasanexd02b.na.qualcomm.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <1321606744-3605-1-git-send-email-mikel.astiz@bmw-carit.de>
-References: <1321606744-3605-1-git-send-email-mikel.astiz@bmw-carit.de>
-Date: Fri, 18 Nov 2011 12:14:03 +0200
-Message-ID: <CABBYNZKkrS2Dxfo1kveDdJ=DZSvJ6eisA19Yopy3mRh7CWmLOw@mail.gmail.com>
-Subject: Re: [PATCH v2] a2dp: avoid conversion between guint and pointers
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+1 Use USB_DEVICE_AND_INTERFACE_INFO to do device matching with PID/VID 0x30=
+06/0x0cf3.
+2 Delete desc.bInterfaceNumber !=3D 0 check.
+3 Add function ath3k_download_3006 to download firmware to hardware for 0x3=
+006
 
-On Fri, Nov 18, 2011 at 10:59 AM, Mikel Astiz <mikel.astiz@bmw-carit.de> wrote:
-> These conversions might cause a segmentation fault in 64 bit machines.
-> ---
->  audio/a2dp.c  |   21 ++++++++-------------
->  audio/a2dp.h  |   13 +++++++------
->  audio/media.c |   18 ++++++++++--------
->  3 files changed, 25 insertions(+), 27 deletions(-)
->
-> diff --git a/audio/a2dp.c b/audio/a2dp.c
-> index 75ad6ce..5ca105c 100644
-> --- a/audio/a2dp.c
-> +++ b/audio/a2dp.c
-> @@ -4,6 +4,7 @@
->  *
->  *  Copyright (C) 2006-2010  Nokia Corporation
->  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-> + *  Copyright (C) 2011  BMW Car IT GmbH. All rights reserved.
->  *
->  *
->  *  This program is free software; you can redistribute it and/or modify
-> @@ -638,11 +639,9 @@ static gboolean mpeg_getcap_ind(struct avdtp *session,
->        return TRUE;
->  }
->
-> -static void endpoint_setconf_cb(struct a2dp_sep *sep, guint setup_id,
-> -                                                               gboolean ret)
-> -{
-> -       struct a2dp_setup *setup = GUINT_TO_POINTER(setup_id);
->
-> +static void endpoint_setconf_cb(struct a2dp_setup *setup, gboolean ret)
-> +{
->        if (ret == FALSE) {
->                setup->err = g_new(struct avdtp_error, 1);
->                avdtp_error_init(setup->err, AVDTP_MEDIA_CODEC,
-> @@ -704,7 +703,7 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
->                ret = a2dp_sep->endpoint->set_configuration(a2dp_sep,
->                                                setup->dev, codec->data,
->                                                cap->length - sizeof(*codec),
-> -                                               GPOINTER_TO_UINT(setup),
-> +                                               setup,
->                                                endpoint_setconf_cb,
->                                                a2dp_sep->user_data);
->                if (ret == 0)
-> @@ -768,10 +767,8 @@ static gboolean endpoint_getcap_ind(struct avdtp *session,
->        return TRUE;
->  }
->
-> -static void endpoint_open_cb(struct a2dp_sep *sep, guint setup_id,
-> -                                                               gboolean ret)
-> +static void endpoint_open_cb(struct a2dp_setup *setup, gboolean ret)
->  {
-> -       struct a2dp_setup *setup = GUINT_TO_POINTER(setup_id);
->        int err;
->
->        if (ret == FALSE) {
-> @@ -839,7 +836,7 @@ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
->                err = a2dp_sep->endpoint->set_configuration(a2dp_sep, dev,
->                                                codec->data, service->length -
->                                                sizeof(*codec),
-> -                                               GPOINTER_TO_UINT(setup),
-> +                                               setup,
->                                                endpoint_open_cb,
->                                                a2dp_sep->user_data);
->                if (err == 0)
-> @@ -1885,10 +1882,8 @@ static gboolean select_capabilities(struct avdtp *session,
->        return TRUE;
->  }
->
-> -static void select_cb(struct a2dp_sep *sep, guint setup_id, void *ret,
-> -                                                               int size)
-> +static void select_cb(struct a2dp_setup *setup, void *ret, int size)
->  {
-> -       struct a2dp_setup *setup = GUINT_TO_POINTER(setup_id);
->        struct avdtp_service_capability *media_transport, *media_codec;
->        struct avdtp_media_codec_capability *cap;
->
-> @@ -2029,7 +2024,7 @@ unsigned int a2dp_select_capabilities(struct avdtp *session,
->
->        err = sep->endpoint->select_configuration(sep, codec->data,
->                                        service->length - sizeof(*codec),
-> -                                       GPOINTER_TO_UINT(setup),
-> +                                       setup,
->                                        select_cb, sep->user_data);
->        if (err == 0)
->                return cb_data->id;
-> diff --git a/audio/a2dp.h b/audio/a2dp.h
-> index 1637580..887c5ac 100644
-> --- a/audio/a2dp.h
-> +++ b/audio/a2dp.h
-> @@ -4,6 +4,7 @@
->  *
->  *  Copyright (C) 2006-2010  Nokia Corporation
->  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-> + *  Copyright (C) 2011  BMW Car IT GmbH. All rights reserved.
+Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
+---
+ drivers/bluetooth/ath3k.c |   65 +++++++++++++++++++++++++++++++++++++++++=
++---
+ 1 files changed, 61 insertions(+), 4 deletions(-)
 
-Usually we update the copyright in separate commits since we may not
-consider your contribution substantial enough to update the header.
-
->  *
->  *
->  *  This program is free software; you can redistribute it and/or modify
-> @@ -120,11 +121,11 @@ struct mpeg_codec_cap {
->  #endif
->
->  struct a2dp_sep;
-> +struct a2dp_setup;
->
-> -typedef void (*a2dp_endpoint_select_t) (struct a2dp_sep *sep, guint setup_id,
-> -                                                       void *ret, int size);
-> -typedef void (*a2dp_endpoint_config_t) (struct a2dp_sep *sep, guint setup_id,
-> -                                                               gboolean ret);
-> +typedef void (*a2dp_endpoint_select_t) (struct a2dp_setup *setup, void *ret,
-> +                                       int size);
-> +typedef void (*a2dp_endpoint_config_t) (struct a2dp_setup *setup, gboolean ret);
->
->  struct a2dp_endpoint {
->        const char *(*get_name) (struct a2dp_sep *sep, void *user_data);
-> @@ -134,14 +135,14 @@ struct a2dp_endpoint {
->        int (*select_configuration) (struct a2dp_sep *sep,
->                                                uint8_t *capabilities,
->                                                size_t length,
-> -                                               guint setup_id,
-> +                                               struct a2dp_setup *setup,
->                                                a2dp_endpoint_select_t cb,
->                                                void *user_data);
->        int (*set_configuration) (struct a2dp_sep *sep,
->                                                struct audio_device *dev,
->                                                uint8_t *configuration,
->                                                size_t length,
-> -                                               guint setup_id,
-> +                                               struct a2dp_setup *setup,
->                                                a2dp_endpoint_config_t cb,
->                                                void *user_data);
->        void (*clear_configuration) (struct a2dp_sep *sep, void *user_data);
-> diff --git a/audio/media.c b/audio/media.c
-> index 612408c..a2ef437 100644
-> --- a/audio/media.c
-> +++ b/audio/media.c
-> @@ -4,6 +4,7 @@
->  *
->  *  Copyright (C) 2006-2007  Nokia Corporation
->  *  Copyright (C) 2004-2009  Marcel Holtmann <marcel@holtmann.org>
-> + *  Copyright (C) 2011  BMW Car IT GmbH. All rights reserved.
->  *
->  *
->  *  This program is free software; you can redistribute it and/or modify
-> @@ -481,12 +482,12 @@ static size_t get_capabilities(struct a2dp_sep *sep, uint8_t **capabilities,
->  }
->
->  struct a2dp_config_data {
-> -       guint setup_id;
-> +       struct a2dp_setup *setup;
->        a2dp_endpoint_config_t cb;
->  };
->
->  struct a2dp_select_data {
-> -       guint setup_id;
-> +       struct a2dp_setup *setup;
->        a2dp_endpoint_select_t cb;
->  };
->
-> @@ -495,18 +496,18 @@ static void select_cb(struct media_endpoint *endpoint, void *ret, int size,
->  {
->        struct a2dp_select_data *data = user_data;
->
-> -       data->cb(endpoint->sep, data->setup_id, ret, size);
-> +       data->cb(data->setup, ret, size);
->  }
->
->  static int select_config(struct a2dp_sep *sep, uint8_t *capabilities,
-> -                               size_t length, guint setup_id,
-> +                               size_t length, struct a2dp_setup *setup,
->                                a2dp_endpoint_select_t cb, void *user_data)
->  {
->        struct media_endpoint *endpoint = user_data;
->        struct a2dp_select_data *data;
->
->        data = g_new0(struct a2dp_select_data, 1);
-> -       data->setup_id = setup_id;
-> +       data->setup = setup;
->        data->cb = cb;
->
->        if (select_configuration(endpoint, capabilities, length,
-> @@ -522,19 +523,20 @@ static void config_cb(struct media_endpoint *endpoint, void *ret, int size,
->  {
->        struct a2dp_config_data *data = user_data;
->
-> -       data->cb(endpoint->sep, data->setup_id, ret ? TRUE : FALSE);
-> +       data->cb(data->setup, ret ? TRUE : FALSE);
->  }
->
->  static int set_config(struct a2dp_sep *sep, struct audio_device *dev,
->                                uint8_t *configuration, size_t length,
-> -                               guint setup_id, a2dp_endpoint_config_t cb,
-> +                               struct a2dp_setup *setup,
-> +                               a2dp_endpoint_config_t cb,
->                                void *user_data)
->  {
->        struct media_endpoint *endpoint = user_data;
->        struct a2dp_config_data *data;
->
->        data = g_new0(struct a2dp_config_data, 1);
-> -       data->setup_id = setup_id;
-> +       data->setup = setup;
->        data->cb = cb;
->
->        if (set_configuration(endpoint, dev, configuration, length,
-> --
-> 1.7.6.4
-
-Besides that it looks good.
-
--- 
-Luiz Augusto von Dentz
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 1622772..b38cd16 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -40,6 +40,7 @@
+=20
+ #define ATH3K_MODE_MASK				0x3F
+ #define ATH3K_NORMAL_MODE			0x0E
++#define ATH3K_PREBOOT_MODE			0x0D
+=20
+ #define ATH3K_PATCH_UPDATE			0x80
+ #define ATH3K_SYSCFG_UPDATE			0x40
+@@ -49,6 +50,9 @@
+ #define ATH3K_XTAL_FREQ_19P2			0x02
+ #define ATH3K_NAME_LEN				0xFF
+=20
++#define BTUSB_ATH3012		0x80
++#define BTUSB_ATH3006		0x0100
++
+ struct ath3k_version {
+ 	unsigned int	rom_version;
+ 	unsigned int	build_version;
+@@ -71,6 +75,7 @@ static struct usb_device_id ath3k_table[] =3D {
+=20
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0CF3, 0x3004) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(0x0CF3, 0x3006, 0xe0, 0x01, 0x01) },
+=20
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -80,13 +85,13 @@ static struct usb_device_id ath3k_table[] =3D {
+=20
+ MODULE_DEVICE_TABLE(usb, ath3k_table);
+=20
+-#define BTUSB_ATH3012		0x80
+ /* This table is to load patch and sysconfig files
+  * for AR3012 */
+ static struct usb_device_id ath3k_blist_tbl[] =3D {
+=20
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info =3D BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0CF3, 0x3006), .driver_info =3D BTUSB_ATH3006 },
+=20
+ 	{ }	/* Terminating entry */
+ };
+@@ -355,6 +360,52 @@ static int ath3k_load_syscfg(struct usb_device *udev)
+ 	return ret;
+ }
+=20
++static int ath3k_download_3006(struct usb_device *udev)
++{
++	int ret;
++	unsigned char fw_state;
++
++	if (le16_to_cpu(udev->descriptor.bcdDevice) > 0x0001) {
++		BT_ERR("ath3k_probe: udev->descriptor.bcdDevice");
++		return -ENODEV;
++	}
++
++	ret =3D ath3k_get_state(udev, &fw_state);
++	if (ret < 0) {
++		BT_ERR("ath3k_probe: ath3k_get_state err");
++		return ret;
++	}
++
++	if ((fw_state & ATH3K_MODE_MASK) =3D=3D ATH3K_PREBOOT_MODE) {
++		BT_ERR("ath3k_probe: firmware are in preboot mode now");
++		BT_ERR("ath3k_probe: try to switch to Normal Mode");
++		ret =3D ath3k_set_normal_mode(udev);
++		if (ret < 0) {
++			BT_ERR("ath3k_probe: set normal mode failed");
++			return ret;
++		}
++	}
++
++	/* Note we should wait for a while */
++	mdelay(100);
++	ret =3D ath3k_load_patch(udev);
++	if (ret < 0) {
++		BT_ERR("ath3k_probe: Load patch file failed");
++		return ret;
++	}
++	ret =3D ath3k_load_syscfg(udev);
++	if (ret < 0) {
++		BT_ERR("ath3k_probe: Load sysconfig file failed");
++		return ret;
++	}
++	ret =3D ath3k_switch_pid(udev);
++	if (ret < 0) {
++		BT_ERR("ath3k_probe: switch pid failed");
++		return ret;
++	}
++	return 0;
++}
++
+ static int ath3k_probe(struct usb_interface *intf,
+ 			const struct usb_device_id *id)
+ {
+@@ -364,9 +415,6 @@ static int ath3k_probe(struct usb_interface *intf,
+=20
+ 	BT_DBG("intf %p id %p", intf, id);
+=20
+-	if (intf->cur_altsetting->desc.bInterfaceNumber !=3D 0)
+-		return -ENODEV;
+-
+ 	/* match device ID in ath3k blacklist table */
+ 	if (!id->driver_info) {
+ 		const struct usb_device_id *match;
+@@ -401,6 +449,15 @@ static int ath3k_probe(struct usb_interface *intf,
+ 		return 0;
+ 	}
+=20
++	if (id->driver_info & BTUSB_ATH3006) {
++		ret =3D ath3k_download_3006(udev);
++		if (ret < 0) {
++			BT_ERR("ath3k_probe: download_3006 failed");
++			return ret;
++		}
++		return 0;
++	}
++
+ 	ret =3D request_firmware(&firmware, ATH3K_FIRMWARE, &udev->dev);
+ 	if (ret < 0) {
+ 		if (ret =3D=3D -ENOENT)
+--=20
+1.7.4.1
