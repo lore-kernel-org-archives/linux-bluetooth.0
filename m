@@ -1,40 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] serial: Fix error handling in connect_port()
-Date: Fri, 18 Nov 2011 11:08:50 -0400
-Message-Id: <1321628930-13493-1-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1321618307-11456-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1321618307-11456-1-git-send-email-anderson.lizardo@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 18 Nov 2011 15:54:15 +0200
+From: 'Emeltchenko Andrei' <Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Peter Krystad <pkrystad@codeaurora.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 3/3] Bluetooth: Add AMP initialization
+Message-ID: <20111118135412.GC24392@aemeltch-MOBL1>
+References: <1321457422-31641-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1321457422-31641-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1321480186.15441.554.camel@aeonflux>
+ <20111117132047.GH415@aemeltch-MOBL1>
+ <1321544714.15441.568.camel@aeonflux>
+ <005d01cca555$280fa960$782efc20$@org>
+ <1321593256.15441.575.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1321593256.15441.575.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-bt_io_connect() does not set errno on error, instead it uses GError. For
-now, simply return -EIO if bt_io_connect() fails. The serial plug-in
-code can be changed later to use and set GError appropriately.
----
- serial/port.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+Hi Marcel,
 
-diff --git a/serial/port.c b/serial/port.c
-index 3b36d44..5b76d14 100644
---- a/serial/port.c
-+++ b/serial/port.c
-@@ -463,10 +463,10 @@ connect:
- 				BT_IO_OPT_DEST_BDADDR, &device->dst,
- 				BT_IO_OPT_CHANNEL, port->channel,
- 				BT_IO_OPT_INVALID);
--	if (port->io)
--		return 0;
-+	if (port->io == NULL)
-+		return -EIO;
- 
--	return -errno;
-+	return 0;
- }
- 
- static struct serial_port *create_port(struct serial_device *device,
--- 
-1.7.0.4
+On Fri, Nov 18, 2011 at 06:14:13AM +0100, Marcel Holtmann wrote:
+> Hi Peter,
+> 
+> > > > > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > > > > > index d1eef7c..290acb2 100644
+> > > > > > --- a/net/bluetooth/hci_core.c
+> > > > > > +++ b/net/bluetooth/hci_core.c
+> > > > > > @@ -219,40 +219,56 @@ static void hci_init_req(struct hci_dev *hdev,
+> > > unsigned long opt)
+> > > > > >  			hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
+> > > > > >  	}
+> > > > > >
+> > > > > > -	/* Read Local Supported Features */
+> > > > > > -	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
+> > > > > > -
+> > > > > >  	/* Read Local Version */
+> > > > > >  	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
+> > > > > >
+> > > > > >  	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
+> > > > > >  	hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
+> > > > > >
+> > > > > > -	/* Read BD Address */
+> > > > > > -	hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
+> > > > > > +	switch (hdev->dev_type) {
+> > > > > > +	case HCI_BREDR:
+> > > > >
+> > > > > stop right here and first split this out into proper helper functions.
+> > > > > Making this part longer and more convoluted is not going to work well in
+> > > > > the long run.
+> > > >
+> > > > Would following functions work:
+> > > >
+> > > > __hci_common_init
+> > > > __hci_bredr_init
+> > > > __hci_amp_init
+> > > 
+> > > I would not bother with common init. I think there is nothing really
+> > > common between AMP and BR/EDR/LE controllers.
+> > 
+> > The commands quoted above are the common part of init between BR-EDR and AMP, plus 
+> > there will be a few additional common commands when block-based flow control is added.
+> > Makes sense to me to split the controller-specific sequences into two helper funcs 
+> > called at this switch statement.
+> 
+> with our current approach on handling this, I rather copy hci_send_cmd
+> than making this code more complicated.
+> 
+> However since we are talking about controller init. Can someone please
+> first propose a list of how we init AMP vs BR/EDR/LE controllers instead
+> of just dumping code here. I think it needs some clear strategy on how
+> to do it.
 
+AMP controller is initialized following way in Code Aurora code:
+
+Common part:
+
+<------8<--------------------------------------------------
+|  /* Mandatory initialization */
+|
+|  /* Reset */
+|  if (!test_bit(HCI_QUIRK_NO_RESET, &hdev->quirks)) {
+|          set_bit(HCI_RESET, &hdev->flags);
+|          hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
+|  }
+|
+|  /* Read Local Version */
+|  hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
+|
+|  /* Read HCI Flow Control Mode */
+|  hci_send_cmd(hdev, HCI_OP_READ_FLOW_CONTROL_MODE, 0, NULL);
+|
+|  /* Read Buffer Size (ACL mtu, max pkt, etc.) */
+|  hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
+|
+|  /* Read Data Block Size (ACL mtu, max pkt, etc.) */
+|  hci_send_cmd(hdev, HCI_OP_READ_DATA_BLOCK_SIZE, 0, NULL);
+<------8<------------------------------------------------------
+
+AMP - specific part:
+
+<------8<---------------------------------------------------
+|  /* AMP initialization */
+|  /* Connection accept timeout ~5 secs */
+|  param = cpu_to_le16(0x1f40);
+|  hci_send_cmd(hdev, HCI_OP_WRITE_CA_TIMEOUT, 2, &param);
+|
+|  /* Read AMP Info */
+|  hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
+<------8<---------------------------------------------------
+
+Source:
+git://codeaurora.org/kernel/msm.git
+
+Best regards 
+Andrei Emeltchenko 
