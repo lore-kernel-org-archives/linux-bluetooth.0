@@ -1,196 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 3/6] Bluetooth: LE scan infra-structure
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Sat, 19 Nov 2011 07:11:29 +0100
-In-Reply-To: <944367C4-28CD-4EF2-8D4C-FF2FA1A734D5@openbossa.org>
-References: <1321051824-5216-1-git-send-email-andre.guedes@openbossa.org>
-	 <1321051824-5216-4-git-send-email-andre.guedes@openbossa.org>
-	 <1321053220.15441.411.camel@aeonflux>
-	 <944367C4-28CD-4EF2-8D4C-FF2FA1A734D5@openbossa.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1321683091.15441.626.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <4EC6ECAE.3010403@codeaurora.org>
+References: <4EC6B482.1070106@codeaurora.org>
+	<20111118220848.GA17225@samus.indt.org>
+	<CAKT1EBf8cE8=09rqHZR+8xzC3HhsGvWv_BJBBWVKE-=fHB9-Uw@mail.gmail.com>
+	<4EC6ECAE.3010403@codeaurora.org>
+Date: Sat, 19 Nov 2011 07:28:47 +0200
+Message-ID: <CAP2aRG+Wfvs-gEAjR5aKYx1FfMF69LmfMaHgRZnoxEbqUaYDGg@mail.gmail.com>
+Subject: Re: [RFC] LE based Remote Name Request
+From: Chen Ganir <chen.ganir@gmail.com>
+To: Brian Gix <bgix@codeaurora.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+On Sat, Nov 19, 2011 at 01:39, Brian Gix <bgix@codeaurora.org> wrote:
+> Hi Chen, Claudio,
+>
+> On 11/18/2011 2:30 PM, Claudio Takahasi wrote:
+>>
+>> Hi Brian/Vinicius,
+>>
+>> On Fri, Nov 18, 2011 at 7:08 PM, Vinicius Costa Gomes
+>> <vinicius.gomes@openbossa.org>  wrote:
+>>>
+>>> Hi Brian,
+>>>
+>>> On 11:39 Fri 18 Nov, Brian Gix wrote:
+>>>>
+>>>> LE does not have a Remote Name Request like BR/EDR has.  It does
+>>>> have the ability to fairly efficiently request the remote device
+>>>> name, however, which we should implement.  Currently the only
+>>>> support we offer for obtaining the remote device name is to pluck it
+>>>> out of the Advertising packets (Formatted identically to EIR) which
+>>>> works for most devices, but as with BR/EDR, there is no requirement
+>>>> that devices include their name in their advertising data.
+>>>>
+>>>> The Device Name characteristic is Mandatory, and may only exist once
+>>>> for a device.  If it is less than 20 bytes may therefore be read
+>>>> with a single ReadByType GATT command (uuid16: 0x2a00) over the full
+>>>> 1-0xFFFF range. It must also be readable without security, so can be
+>>>> done without first going through SMP.
+>>>>
+>>>> We may not want to featurize this particular functionality at all,
+>>>> since all of the components to obtain this info is already
+>>>> available: We just need to set up an ATT socket in BlueZ, and make
+>>>> the request.  However, when we talk about Scanning for devices, and
+>>>> automatically forwarding the Remote Name via a MGMT evevnt, the
+>>>> precedence is there to supply it from the kernel.  And if we were to
+>>>> go down that path, we would also want to simultaneously offer access
+>>>> to the equally Mandatory and Unsecured "Appearance" Characteristic
+>>>> (uuid16: 0x2a01) which is LE's sort-of equivilent to the BR/EDR
+>>>> Class-Of-Device.
+>>>>
+>>>> So: What are the feelings about doing Remote Name (And Appearance)
+>>>> discovery in the kernel, probably as part of the LE Discovery
+>>>> mechanism?  I favor putting it in the kernel, due to the equivalent
+>>>> functionality available to BR/EDR there.
+>>>
+>>> I am in favor of this, more because of the Appearance than the Name
+>>> discovery. The Name most well behaved devices will provide through
+>>> the Advertising Data, Appearance we can only discover via GATT and
+>>> it is very useful for the user.
+>>
+>> IMO, the first attempt needs to be in the userspace. Name, Appearance
+>> and *ServiceChanged* can be read on every reconnection. Appearance
+>> will be exposed though adv data also, it is being discussed by the BT SIG.
+>>
+>> If we implement the characteristic storage properly, I don't think we need
+>> to read the Name and Appearance always since it will not change.
+>>
+>> Another aspect against do it in the kernel as part of the discovery
+>> procedure is "connectable and bondable mode", probably we will have
+>> problems to re-connect. Peripherals may leave the bondable mode or
+>> doesn't send advertises automatically after disconnection.
+>
+> Those are otherwise good points (not all devices will automatically start
+> advertising again) however ServiceChanged should never be attempted to be
+> read.  We should only obtain this via an Indication from the remote device,
+> and at any rate it is only shared with Trusted devices, so we would have to
+> be Bonded.
+>
+> However, I would definitely NOT try to re-read Name/Appearance at every
+> connection.  Those should definitely be cached, and not re-read unless we
+> get the ServiceChanged Indication.
+>
+ServiceChanged is irrelevant here. ServiceChanged will only notify you
+if the handles changed, not if the value changed. Name and appearance
+can and should be read, since we may get only the short name in the
+advertising data, and we wil need the full name. In addition, a device
+may change its name, and we will not be notified of this (GAP name
+characteristic does not notify/indicate). Name may change just like it
+does in BR/EDR.
 
-> >> This patch adds to hci_core the infra-structure to carry out the
-> >> LE scan. Functions were created to init the LE scan and cancel
-> >> an ongoing scanning (hci_do_le_scan and hci_cancel_le_scan).
-> >> 
-> >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> >> ---
-> >> include/net/bluetooth/hci_core.h |    5 +++
-> >> net/bluetooth/hci_core.c         |   69 ++++++++++++++++++++++++++++++++++++++
-> >> 2 files changed, 74 insertions(+), 0 deletions(-)
-> >> 
-> >> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> >> index f6d5d90..69dda9b 100644
-> >> --- a/include/net/bluetooth/hci_core.h
-> >> +++ b/include/net/bluetooth/hci_core.h
-> >> @@ -232,6 +232,8 @@ struct hci_dev {
-> >> 	struct list_head	adv_entries;
-> >> 	struct timer_list	adv_timer;
-> >> 
-> >> +	struct timer_list	le_scan_timer;
-> >> +
-> >> 	struct hci_dev_stats	stat;
-> >> 
-> >> 	struct sk_buff_head	driver_init;
-> >> @@ -987,5 +989,8 @@ void hci_le_ltk_neg_reply(struct hci_conn *conn);
-> >> 
-> >> int hci_do_inquiry(struct hci_dev *hdev, u8 length);
-> >> int hci_cancel_inquiry(struct hci_dev *hdev);
-> >> +int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
-> >> +								int timeout);
-> >> +int hci_cancel_le_scan(struct hci_dev *hdev);
-> >> 
-> >> #endif /* __HCI_CORE_H */
-> >> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> >> index 64cdafe..c07dc15 100644
-> >> --- a/net/bluetooth/hci_core.c
-> >> +++ b/net/bluetooth/hci_core.c
-> >> @@ -1423,6 +1423,23 @@ int hci_add_adv_entry(struct hci_dev *hdev,
-> >> 	return 0;
-> >> }
-> >> 
-> >> +static int le_scan(struct hci_dev *hdev, u8 enable)
-> >> +{
-> >> +	struct hci_cp_le_set_scan_enable cp;
-> >> +
-> >> +	memset(&cp, 0, sizeof(cp));
-> >> +	cp.enable = enable;
-> >> +
-> >> +	return hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-> >> +}
-> >> +
-> >> +static void le_scan_timeout(unsigned long arg)
-> >> +{
-> >> +	struct hci_dev *hdev = (void *) arg;
-> >> +
-> >> +	le_scan(hdev, 0);
-> >> +}
-> >> +
-> >> /* Register HCI device */
-> >> int hci_register_dev(struct hci_dev *hdev)
-> >> {
-> >> @@ -1501,6 +1518,9 @@ int hci_register_dev(struct hci_dev *hdev)
-> >> 	setup_timer(&hdev->adv_timer, hci_clear_adv_cache,
-> >> 						(unsigned long) hdev);
-> >> 
-> >> +	setup_timer(&hdev->le_scan_timer, le_scan_timeout,
-> >> +						(unsigned long) hdev);
-> >> +
-> >> 	INIT_WORK(&hdev->power_on, hci_power_on);
-> >> 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
-> >> 
-> >> @@ -1587,6 +1607,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
-> >> 	hci_del_sysfs(hdev);
-> >> 
-> >> 	del_timer(&hdev->adv_timer);
-> >> +	del_timer(&hdev->le_scan_timer);
-> >> 
-> >> 	destroy_workqueue(hdev->workqueue);
-> >> 
-> >> @@ -2615,3 +2636,51 @@ int hci_cancel_inquiry(struct hci_dev *hdev)
-> >> 
-> >> 	return hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
-> >> }
-> >> +
-> >> +static int set_le_scan_param(struct hci_dev *hdev, u8 type, u16 interval,
-> >> +								u16 window)
-> >> +{
-> >> +	struct hci_cp_le_set_scan_param cp;
-> >> +
-> >> +	memset(&cp, 0, sizeof(cp));
-> >> +	cp.type = type;
-> >> +	cp.interval = cpu_to_le16(interval);
-> >> +	cp.window = cpu_to_le16(window);
-> >> +
-> >> +	return hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_PARAM, sizeof(cp), &cp);
-> >> +}
-> >> +
-> >> +int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
-> >> +								int timeout)
-> >> +{
-> >> +	int err;
-> >> +
-> >> +	if (test_bit(HCI_LE_SCAN, &hdev->hci_flags))
-> >> +		return -EINPROGRESS;
-> >> +
-> >> +	BT_DBG("%s", hdev->name);
-> >> +
-> >> +	err = set_le_scan_param(hdev, type, interval, window);
-> >> +	if (err < 0)
-> >> +		return err;
-> >> +
-> >> +	err = le_scan(hdev, 1);
-> >> +	if (err < 0)
-> >> +		return err;
-> > 
-> > since you are using hci_send_cmd, you never check the error from the
-> > controller for set_le_scan_param. We should be doing exactly that before
-> > just going ahead with a scan.
-> 
-> Yes, you're right, there is no error checking at this point.
-> 
-> I took some time thinking about this problem and I concluded we
-> should not bother so much about it (at least for now). The reasons
-> are:
-> 
-> 1. The spec says the Set LE Scan Parameters command fails if it
-> is issued when LE scan is enabled. We guarantee this doesn't happen
-> since we check the HCI_LE_SCAN flag before sending any command to
-> the controller.
-> 
-> 2. Even if the Set LE Scan Parameters command fails for some other
-> unknown reason, we would do the LE scanning with the last parameters
-> set. This doesn't seem to be a big deal.
-> 
-> 3. We've done lots of tests (with different dongles), but I've not
-> seen this error happening so far. It seems to be difficult to
-> reproduce it.
-> 
-> I also took some time thinking about a fix for that, but I didn't find
-> any easy/clean way to do it. 
-> 
-> So I think we should just log if the Set LE Scan Parameters command
-> fails and, if somehow, this becomes often we come up with a fix for it.
-
-so the proposed fix is to ignore the problem?
-
-> > It is also not guaranteed that the controller queues up these commands,
-> > it might just return busy from le_scan() if it can have more than one
-> > outstanding commands (which many controller can do).
-> 
-> I didn't follow you here. We have a mechanism to keep track of how
-> many commands the host is allowed to send to the controller. The
-> tasklet hdev->cmd_task only issue a command if the controller is
-> able to handle it.
-
-Yes, we do handle that, but we do not handle the controllers radio
-resources. There is no requirement for a controller to queue the command
-internally. If it does not have radio resources or is still busy with
-the previous command, it can just return busy.
-
-> Besides, other parts of the code send more than one command in sequence
-> and it doesn't seem to be a problem (see set_fast_connectable() in
-> mgmt.c, hci_init_req() in hci_core.c and hci_setup() in hci_event.c).
-
-The fast connectable thing is a problem then as well. The init code
-works different here. That is done via hci_request in a context that can
-sleep.
-
-> But anyway, if the controller returns error from le_scan(), we do the
-> proper handling in hci_cc_le_set_scan_enable().
-
-That is not the point here. That is obviously required.
-
-Regards
-
-Marcel
+> Does anyone object to permanently deciding to NOT do Remote Name/Appearance
+> request at device discovery time? Or in the kernel at all?  Particularly if
+> the SIG is heading towards exposing the Appearance in Advertising data, this
+> whole thing becomes nearly moot.  I agree with Chen and Claudio that
+> attempting this at Discovery will likely cause the rare IOP problem, and the
+> only drawback to Not doing it would be the rare BD Addr and no Appearance
+> shown during scanning.
+>
+> --
+> Brian Gix
+> bgix@codeaurora.org
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
 
+
+Chen Ganir
+chen.ganir@gmail.com
