@@ -1,34 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1321707222.1894.1.camel@aeonflux>
-Subject: Re: [PATCH 1/2] Bluetooth: cmtp: Fix module reference
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Date: Sat, 19 Nov 2011 13:53:42 +0100
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: padovan@profusion.mobi, David Herrmann <dh.herrmann@googlemail.com>
+Subject: [PATCH 2/2] Bluetooth: bnep: Fix module reference
+Date: Sat, 19 Nov 2011 13:23:33 +0100
+Message-Id: <1321705413-2598-2-git-send-email-dh.herrmann@googlemail.com>
 In-Reply-To: <1321705413-2598-1-git-send-email-dh.herrmann@googlemail.com>
 References: <1321705413-2598-1-git-send-email-dh.herrmann@googlemail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+We cannot call module_put(THIS_MODULE) if this is our last reference. Otherwise,
+this call may cleanup our module before it returns.
 
-> We cannot call module_put(THIS_MODULE) if this is our last reference. Otherwise,
-> this call may cleanup our module before it returns.
-> 
-> Gladly, the kthread API provides a simple wrapper for us. So lets use
-> module_put_and_exit() to avoid a race condition with the module cleanup code.
-> 
-> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
-> ---
->  net/bluetooth/cmtp/core.c |    5 +++--
->  1 files changed, 3 insertions(+), 2 deletions(-)
+Gladly, the kthread API provides a simple wrapper for us. So lets use
+module_put_and_exit() to avoid a race condition with the module cleanup code.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
+---
+ net/bluetooth/bnep/core.c |    8 +++-----
+ 1 files changed, 3 insertions(+), 5 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index a6cd856..42d53b8 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -77,17 +77,12 @@ static struct bnep_session *__bnep_get_session(u8 *dst)
+ 
+ static void __bnep_link_session(struct bnep_session *s)
+ {
+-	/* It's safe to call __module_get() here because sessions are added
+-	   by the socket layer which has to hold the reference to this module.
+-	 */
+-	__module_get(THIS_MODULE);
+ 	list_add(&s->list, &bnep_session_list);
+ }
+ 
+ static void __bnep_unlink_session(struct bnep_session *s)
+ {
+ 	list_del(&s->list);
+-	module_put(THIS_MODULE);
+ }
+ 
+ static int bnep_send(struct bnep_session *s, void *data, size_t len)
+@@ -528,6 +523,7 @@ static int bnep_session(void *arg)
+ 
+ 	up_write(&bnep_session_sem);
+ 	free_netdev(dev);
++	module_put_and_exit(0);
+ 	return 0;
+ }
+ 
+@@ -614,9 +610,11 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
+ 
+ 	__bnep_link_session(s);
+ 
++	__module_get(THIS_MODULE);
+ 	s->task = kthread_run(bnep_session, s, "kbnepd %s", dev->name);
+ 	if (IS_ERR(s->task)) {
+ 		/* Session thread start failed, gotta cleanup. */
++		module_put(THIS_MODULE);
+ 		unregister_netdev(dev);
+ 		__bnep_unlink_session(s);
+ 		err = PTR_ERR(s->task);
+-- 
+1.7.7.3
 
