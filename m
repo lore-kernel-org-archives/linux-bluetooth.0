@@ -1,357 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EC7F51F.6000004@linux.vnet.ibm.com>
-Date: Sat, 19 Nov 2011 23:57:43 +0530
-From: "Srivatsa S. Bhat" <srivatsa.bhat@linux.vnet.ibm.com>
+Message-ID: <4EC7D77F.7060505@codeaurora.org>
+Date: Sat, 19 Nov 2011 08:21:19 -0800
+From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-To: =?UTF-8?B?VG9tw6HFoSBKYW5vdcWhZWs=?= <tomi@nomi.cz>
-CC: Szymon Janc <szymon@janc.net.pl>,
-        "Gustavo F. Padovan" <padovan@profusion.mobi>,
-        Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Linux PM mailing list <linux-pm@vger.kernel.org>
-Subject: Re: [REGRESSION] resume takes 10s longer due to e1b6eb3 (Bluetooth:
- Increase HCI reset timeout ...)
-References: <20111118184017.GA5052@nomi.cz>
-In-Reply-To: <20111118184017.GA5052@nomi.cz>
-Content-Type: text/plain; charset=UTF-8
+To: Chen Ganir <chen.ganir@gmail.com>
+CC: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC] LE based Remote Name Request
+References: <4EC6B482.1070106@codeaurora.org>	<20111118220848.GA17225@samus.indt.org>	<CAKT1EBf8cE8=09rqHZR+8xzC3HhsGvWv_BJBBWVKE-=fHB9-Uw@mail.gmail.com>	<4EC6ECAE.3010403@codeaurora.org> <CAP2aRG+Wfvs-gEAjR5aKYx1FfMF69LmfMaHgRZnoxEbqUaYDGg@mail.gmail.com>
+In-Reply-To: <CAP2aRG+Wfvs-gEAjR5aKYx1FfMF69LmfMaHgRZnoxEbqUaYDGg@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Chen,
 
-[ Adding linux-pm mailing list to CC as well. ]
+On 11/18/2011 9:28 PM, Chen Ganir wrote:
+> On Sat, Nov 19, 2011 at 01:39, Brian Gix<bgix@codeaurora.org>  wrote:
+>> Those are otherwise good points (not all devices will automatically start
+>> advertising again) however ServiceChanged should never be attempted to be
+>> read.  We should only obtain this via an Indication from the remote device,
+>> and at any rate it is only shared with Trusted devices, so we would have to
+>> be Bonded.
+>>
+>> However, I would definitely NOT try to re-read Name/Appearance at every
+>> connection.  Those should definitely be cached, and not re-read unless we
+>> get the ServiceChanged Indication.
+>>
+> ServiceChanged is irrelevant here. ServiceChanged will only notify you
+> if the handles changed, not if the value changed. Name and appearance
+> can and should be read, since we may get only the short name in the
+> advertising data, and we wil need the full name. In addition, a device
+> may change its name, and we will not be notified of this (GAP name
+> characteristic does not notify/indicate). Name may change just like it
+> does in BR/EDR.
 
-Thanks,
-Srivatsa S. Bhat
+I don't think we should do anything automatically on start-up.
 
-On 11/19/2011 12:10 AM, Tomáš Janoušek wrote:
-> Hello,
-> 
-> while testing the 3.2-rc kernel, I experienced that resume takes 10 seconds
-> more than usual, and bisected this to be caused by e1b6eb3 (Bluetooth:
-> Increase HCI reset timeout in hci_dev_do_close).
-> 
-> My hardware is Lenovo ThinkPad T420, model number 4178-A3G, with a Broadcom
-> Bluetooth adapter (I'm attaching the relevant part of lsusb).
-> 
-> The relevant portion of dmesg is:
-> [   76.502818] usb 1-1.4: reset full-speed USB device number 4 using ehci_hcd
-> [   76.588225] btusb 1-1.4:1.0: no reset_resume for driver btusb?
-> [   76.591870] btusb 1-1.4:1.1: no reset_resume for driver btusb?
-> [   86.565269] PM: resume of devices complete after 10486.220 msecs
-> 
-> My resume scripts did contain a hciconfig hci0 down followed by up, because
-> on my previous notebook (and the kernel I used at the time) it was needed for
-> BT to work after suspend. On this hardware, however, none of that is needed.
-> Bluetooth after suspend works regardless of whether that patch is applied or
-> not, and I believe it would wait indefinitely if given large enough timeout.
-> 
-> Aside from reverting the patch, doing the following before suspend also works
-> around the issue:
->     echo disable > /proc/acpi/ibm/bluetooth
-> 
-> Kind regards,
-> -- Tomáš Janoušek, a.k.a. Liskni_si, http://work.lisk.in/
-> 
-> 
-> bt.txt
-> 
-> 
-> Bus 001 Device 006: ID 0a5c:217f Broadcom Corp. Bluetooth Controller
-> Device Descriptor:
->   bLength                18
->   bDescriptorType         1
->   bcdUSB               2.00
->   bDeviceClass          224 Wireless
->   bDeviceSubClass         1 Radio Frequency
->   bDeviceProtocol         1 Bluetooth
->   bMaxPacketSize0        64
->   idVendor           0x0a5c Broadcom Corp.
->   idProduct          0x217f Bluetooth Controller
->   bcdDevice            7.48
->   iManufacturer           1 Broadcom Corp
->   iProduct                2 Broadcom Bluetooth Device
->   iSerial                 3 CCAF78EC8B4F
->   bNumConfigurations      1
->   Configuration Descriptor:
->     bLength                 9
->     bDescriptorType         2
->     wTotalLength          216
->     bNumInterfaces          4
->     bConfigurationValue     1
->     iConfiguration          0 
->     bmAttributes         0xe0
->       Self Powered
->       Remote Wakeup
->     MaxPower                0mA
->     Interface Descriptor:
->       bLength                 9
->       bDescriptorType         4
->       bInterfaceNumber        0
->       bAlternateSetting       0
->       bNumEndpoints           3
->       bInterfaceClass       224 Wireless
->       bInterfaceSubClass      1 Radio Frequency
->       bInterfaceProtocol      1 Bluetooth
->       iInterface              0 
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x81  EP 1 IN
->         bmAttributes            3
->           Transfer Type            Interrupt
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0010  1x 16 bytes
->         bInterval               1
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x82  EP 2 IN
->         bmAttributes            2
->           Transfer Type            Bulk
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0040  1x 64 bytes
->         bInterval               1
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x02  EP 2 OUT
->         bmAttributes            2
->           Transfer Type            Bulk
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0040  1x 64 bytes
->         bInterval               1
->     Interface Descriptor:
->       bLength                 9
->       bDescriptorType         4
->       bInterfaceNumber        1
->       bAlternateSetting       0
->       bNumEndpoints           2
->       bInterfaceClass       224 Wireless
->       bInterfaceSubClass      1 Radio Frequency
->       bInterfaceProtocol      1 Bluetooth
->       iInterface              0 
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x83  EP 3 IN
->         bmAttributes            1
->           Transfer Type            Isochronous
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0000  1x 0 bytes
->         bInterval               1
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x03  EP 3 OUT
->         bmAttributes            1
->           Transfer Type            Isochronous
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0000  1x 0 bytes
->         bInterval               1
->     Interface Descriptor:
->       bLength                 9
->       bDescriptorType         4
->       bInterfaceNumber        1
->       bAlternateSetting       1
->       bNumEndpoints           2
->       bInterfaceClass       224 Wireless
->       bInterfaceSubClass      1 Radio Frequency
->       bInterfaceProtocol      1 Bluetooth
->       iInterface              0 
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x83  EP 3 IN
->         bmAttributes            1
->           Transfer Type            Isochronous
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0009  1x 9 bytes
->         bInterval               1
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x03  EP 3 OUT
->         bmAttributes            1
->           Transfer Type            Isochronous
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0009  1x 9 bytes
->         bInterval               1
->     Interface Descriptor:
->       bLength                 9
->       bDescriptorType         4
->       bInterfaceNumber        1
->       bAlternateSetting       2
->       bNumEndpoints           2
->       bInterfaceClass       224 Wireless
->       bInterfaceSubClass      1 Radio Frequency
->       bInterfaceProtocol      1 Bluetooth
->       iInterface              0 
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x83  EP 3 IN
->         bmAttributes            1
->           Transfer Type            Isochronous
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0011  1x 17 bytes
->         bInterval               1
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x03  EP 3 OUT
->         bmAttributes            1
->           Transfer Type            Isochronous
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0011  1x 17 bytes
->         bInterval               1
->     Interface Descriptor:
->       bLength                 9
->       bDescriptorType         4
->       bInterfaceNumber        1
->       bAlternateSetting       3
->       bNumEndpoints           2
->       bInterfaceClass       224 Wireless
->       bInterfaceSubClass      1 Radio Frequency
->       bInterfaceProtocol      1 Bluetooth
->       iInterface              0 
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x83  EP 3 IN
->         bmAttributes            1
->           Transfer Type            Isochronous
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0020  1x 32 bytes
->         bInterval               1
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x03  EP 3 OUT
->         bmAttributes            1
->           Transfer Type            Isochronous
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0020  1x 32 bytes
->         bInterval               1
->     Interface Descriptor:
->       bLength                 9
->       bDescriptorType         4
->       bInterfaceNumber        1
->       bAlternateSetting       4
->       bNumEndpoints           2
->       bInterfaceClass       224 Wireless
->       bInterfaceSubClass      1 Radio Frequency
->       bInterfaceProtocol      1 Bluetooth
->       iInterface              0 
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x83  EP 3 IN
->         bmAttributes            1
->           Transfer Type            Isochronous
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0040  1x 64 bytes
->         bInterval               1
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x03  EP 3 OUT
->         bmAttributes            1
->           Transfer Type            Isochronous
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0040  1x 64 bytes
->         bInterval               1
->     Interface Descriptor:
->       bLength                 9
->       bDescriptorType         4
->       bInterfaceNumber        1
->       bAlternateSetting       5
->       bNumEndpoints           2
->       bInterfaceClass       224 Wireless
->       bInterfaceSubClass      1 Radio Frequency
->       bInterfaceProtocol      1 Bluetooth
->       iInterface              0 
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x83  EP 3 IN
->         bmAttributes            1
->           Transfer Type            Isochronous
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0040  1x 64 bytes
->         bInterval               1
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x03  EP 3 OUT
->         bmAttributes            1
->           Transfer Type            Isochronous
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0040  1x 64 bytes
->         bInterval               1
->     Interface Descriptor:
->       bLength                 9
->       bDescriptorType         4
->       bInterfaceNumber        2
->       bAlternateSetting       0
->       bNumEndpoints           2
->       bInterfaceClass       255 Vendor Specific Class
->       bInterfaceSubClass    255 Vendor Specific Subclass
->       bInterfaceProtocol    255 Vendor Specific Protocol
->       iInterface              0 
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x84  EP 4 IN
->         bmAttributes            2
->           Transfer Type            Bulk
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0020  1x 32 bytes
->         bInterval               1
->       Endpoint Descriptor:
->         bLength                 7
->         bDescriptorType         5
->         bEndpointAddress     0x04  EP 4 OUT
->         bmAttributes            2
->           Transfer Type            Bulk
->           Synch Type               None
->           Usage Type               Data
->         wMaxPacketSize     0x0020  1x 32 bytes
->         bInterval               1
->     Interface Descriptor:
->       bLength                 9
->       bDescriptorType         4
->       bInterfaceNumber        3
->       bAlternateSetting       0
->       bNumEndpoints           0
->       bInterfaceClass       254 Application Specific Interface
->       bInterfaceSubClass      1 Device Firmware Update
->       bInterfaceProtocol      1 
->       iInterface              0 
->       Device Firmware Upgrade Interface Descriptor:
->         bLength                             7
->         bDescriptorType                    33
->         bmAttributes                        7
->           Will Not Detach
->           Manifestation Tolerant
->           Upload Supported
->           Download Supported
->         wDetachTimeout                   5000 milliseconds
->         wTransferSize                      64 bytes
-> Device Status:     0x0001
->   Self Powered
-> 
+If we know that we do not have the full name (if the Adv data has it 
+flagged as "Partial") then we should of course fetch the full name from 
+the characteristic.  However, if we get in the habit of re-reading data 
+just because it *may* have changed, then we lose track of what LE is all 
+about, which is minimization of over-the-air traffic.
+
+If a particular high level app wants refresh the Name and/or Appearance, 
+then of course which should provide that ability, but I might consider 
+that App to be poorly written barring a compelling need, like perhaps an 
+indication that it needs to be re-paired.  Single mode LE devices will 
+generally be single mode because they want to limit these unneeded 
+transactions.  LE Profiles are designed to not require Polling type 
+activities, which a Name or Appearance refresh would be.
+
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
