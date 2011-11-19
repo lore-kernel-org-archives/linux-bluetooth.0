@@ -2,11 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: David Herrmann <dh.herrmann@googlemail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi, David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 2/2] Bluetooth: bnep: Fix module reference
-Date: Sat, 19 Nov 2011 13:23:33 +0100
-Message-Id: <1321705413-2598-2-git-send-email-dh.herrmann@googlemail.com>
-In-Reply-To: <1321705413-2598-1-git-send-email-dh.herrmann@googlemail.com>
-References: <1321705413-2598-1-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 1/2] Bluetooth: cmtp: Fix module reference
+Date: Sat, 19 Nov 2011 13:23:32 +0100
+Message-Id: <1321705413-2598-1-git-send-email-dh.herrmann@googlemail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -18,51 +16,48 @@ module_put_and_exit() to avoid a race condition with the module cleanup code.
 
 Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 ---
- net/bluetooth/bnep/core.c |    8 +++-----
- 1 files changed, 3 insertions(+), 5 deletions(-)
+ net/bluetooth/cmtp/core.c |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-index a6cd856..42d53b8 100644
---- a/net/bluetooth/bnep/core.c
-+++ b/net/bluetooth/bnep/core.c
-@@ -77,17 +77,12 @@ static struct bnep_session *__bnep_get_session(u8 *dst)
+diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
+index 9e8940b..6c9c1fd 100644
+--- a/net/bluetooth/cmtp/core.c
++++ b/net/bluetooth/cmtp/core.c
+@@ -65,14 +65,12 @@ static struct cmtp_session *__cmtp_get_session(bdaddr_t *bdaddr)
  
- static void __bnep_link_session(struct bnep_session *s)
+ static void __cmtp_link_session(struct cmtp_session *session)
  {
--	/* It's safe to call __module_get() here because sessions are added
--	   by the socket layer which has to hold the reference to this module.
--	 */
 -	__module_get(THIS_MODULE);
- 	list_add(&s->list, &bnep_session_list);
+ 	list_add(&session->list, &cmtp_session_list);
  }
  
- static void __bnep_unlink_session(struct bnep_session *s)
+ static void __cmtp_unlink_session(struct cmtp_session *session)
  {
- 	list_del(&s->list);
+ 	list_del(&session->list);
 -	module_put(THIS_MODULE);
  }
  
- static int bnep_send(struct bnep_session *s, void *data, size_t len)
-@@ -528,6 +523,7 @@ static int bnep_session(void *arg)
+ static void __cmtp_copy_session(struct cmtp_session *session, struct cmtp_conninfo *ci)
+@@ -325,6 +323,7 @@ static int cmtp_session(void *arg)
+ 	up_write(&cmtp_session_sem);
  
- 	up_write(&bnep_session_sem);
- 	free_netdev(dev);
+ 	kfree(session);
 +	module_put_and_exit(0);
  	return 0;
  }
  
-@@ -614,9 +610,11 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
+@@ -374,9 +373,11 @@ int cmtp_add_connection(struct cmtp_connadd_req *req, struct socket *sock)
  
- 	__bnep_link_session(s);
+ 	__cmtp_link_session(session);
  
 +	__module_get(THIS_MODULE);
- 	s->task = kthread_run(bnep_session, s, "kbnepd %s", dev->name);
- 	if (IS_ERR(s->task)) {
- 		/* Session thread start failed, gotta cleanup. */
+ 	session->task = kthread_run(cmtp_session, session, "kcmtpd_ctr_%d",
+ 								session->num);
+ 	if (IS_ERR(session->task)) {
 +		module_put(THIS_MODULE);
- 		unregister_netdev(dev);
- 		__bnep_unlink_session(s);
- 		err = PTR_ERR(s->task);
+ 		err = PTR_ERR(session->task);
+ 		goto unlink;
+ 	}
 -- 
 1.7.7.3
 
