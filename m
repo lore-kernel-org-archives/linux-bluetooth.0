@@ -1,141 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Nov 2011 13:32:52 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH-v4 4/9] Bluetooth: Add User Passkey Response handling
-Message-ID: <20111121153252.GA2552@joana>
-References: <1321480400-17397-1-git-send-email-bgix@codeaurora.org>
- <1321480400-17397-5-git-send-email-bgix@codeaurora.org>
+Date: Mon, 21 Nov 2011 17:25:06 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-15?Q?Tom=E1=A8_Janou=A8ek?= <tomi@nomi.cz>
+Cc: Szymon Janc <szymon@janc.net.pl>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [REGRESSION] resume takes 10s longer due to e1b6eb3 (Bluetooth:
+ Increase HCI reset timeout ...)
+Message-ID: <20111121152506.GB15633@fusion.localdomain>
+References: <20111118184017.GA5052@nomi.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321480400-17397-5-git-send-email-bgix@codeaurora.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-15
+In-Reply-To: <20111118184017.GA5052@nomi.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+Hi Tomá¨,
 
-* Brian Gix <bgix@codeaurora.org> [2011-11-16 13:53:15 -0800]:
-
-> For some MITM protection pairing scenarios, the user is
-> required to enter or accept a 6 digit passkey.
+On Fri, Nov 18, 2011, Tomá¨ Janou¨ek wrote:
+> while testing the 3.2-rc kernel, I experienced that resume takes 10 seconds
+> more than usual, and bisected this to be caused by e1b6eb3 (Bluetooth:
+> Increase HCI reset timeout in hci_dev_do_close).
 > 
-> Signed-off-by: Brian Gix <bgix@codeaurora.org>
-> ---
->  net/bluetooth/mgmt.c |   74 +++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 files changed, 73 insertions(+), 1 deletions(-)
+> My hardware is Lenovo ThinkPad T420, model number 4178-A3G, with a Broadcom
+> Bluetooth adapter (I'm attaching the relevant part of lsusb).
 > 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index c06a05c..7a23f21 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -1618,7 +1618,15 @@ static int user_pairing_resp(struct sock *sk, u16 index, bdaddr_t *bdaddr,
->  	}
->  
->  	/* Continue with pairing via HCI */
-> -	err = hci_send_cmd(hdev, hci_op, sizeof(*bdaddr), bdaddr);
-> +	if (hci_op == HCI_OP_USER_PASSKEY_REPLY) {
-> +		struct hci_cp_user_passkey_reply cp;
-> +
-> +		bacpy(&cp.bdaddr, bdaddr);
-> +		cp.passkey = passkey;
-> +		err = hci_send_cmd(hdev, hci_op, sizeof(cp), &cp);
-> +	} else
-> +		err = hci_send_cmd(hdev, hci_op, sizeof(*bdaddr), bdaddr);
-> +
->  	if (err < 0)
->  		mgmt_pending_remove(cmd);
->  
-> @@ -1660,6 +1668,37 @@ static int user_confirm_neg_reply(struct sock *sk, u16 index, void *data,
->  			HCI_OP_USER_CONFIRM_NEG_REPLY, 0);
->  }
->  
-> +static int user_passkey_reply(struct sock *sk, u16 index, void *data, u16 len)
-> +{
-> +	struct mgmt_cp_user_passkey_reply *cp = (void *) data;
-> +
-> +	BT_DBG("");
-> +
-> +	if (len != sizeof(*cp))
-> +		return cmd_status(sk, index, MGMT_OP_USER_PASSKEY_REPLY,
-> +									EINVAL);
-> +
-> +	return user_pairing_resp(sk, index, &cp->bdaddr,
-> +			MGMT_OP_USER_PASSKEY_REPLY,
-> +			HCI_OP_USER_PASSKEY_REPLY, cp->passkey);
-> +}
-> +
-> +static int user_passkey_neg_reply(struct sock *sk, u16 index, void *data,
-> +									u16 len)
-> +{
-> +	struct mgmt_cp_user_passkey_neg_reply *cp = (void *) data;
-> +
-> +	BT_DBG("");
-> +
-> +	if (len != sizeof(*cp))
-> +		return cmd_status(sk, index, MGMT_OP_USER_PASSKEY_NEG_REPLY,
-> +									EINVAL);
-> +
-> +	return user_pairing_resp(sk, index, &cp->bdaddr,
-> +			MGMT_OP_USER_PASSKEY_NEG_REPLY,
-> +			HCI_OP_USER_PASSKEY_NEG_REPLY, 0);
-> +}
-> +
->  static int set_local_name(struct sock *sk, u16 index, unsigned char *data,
->  								u16 len)
->  {
-> @@ -2117,6 +2156,13 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
->  		err = user_confirm_neg_reply(sk, index, buf + sizeof(*hdr),
->  									len);
->  		break;
-> +	case MGMT_OP_USER_PASSKEY_REPLY:
-> +		err = user_passkey_reply(sk, index, buf + sizeof(*hdr), len);
-> +		break;
-> +	case MGMT_OP_USER_PASSKEY_NEG_REPLY:
-> +		err = user_passkey_neg_reply(sk, index, buf + sizeof(*hdr),
-> +									len);
-> +		break;
->  	case MGMT_OP_SET_LOCAL_NAME:
->  		err = set_local_name(sk, index, buf + sizeof(*hdr), len);
->  		break;
-> @@ -2477,6 +2523,18 @@ int mgmt_user_confirm_request(struct hci_dev *hdev, bdaddr_t *bdaddr,
->  									NULL);
->  }
->  
-> +int mgmt_user_passkey_request(struct hci_dev *hdev, bdaddr_t *bdaddr)
-> +{
-> +	struct mgmt_ev_user_passkey_request ev;
-> +
-> +	BT_DBG("%s", hdev->name);
-> +
-> +	bacpy(&ev.bdaddr, bdaddr);
-> +
-> +	return mgmt_event(MGMT_EV_USER_PASSKEY_REQUEST, hdev, &ev, sizeof(ev),
-> +									NULL);
-> +}
-> +
->  static int user_pairing_resp_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
->  							u8 status, u8 opcode)
->  {
-> @@ -2511,6 +2569,20 @@ int mgmt_user_confirm_neg_reply_complete(struct hci_dev *hdev,
->  					MGMT_OP_USER_CONFIRM_NEG_REPLY);
->  }
->  
-> +int mgmt_user_passkey_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
-> +								u8 status)
-> +{
-> +	return user_pairing_resp_complete(hdev, bdaddr, status,
-> +						MGMT_OP_USER_PASSKEY_REPLY);
-> +}
-> +
-> +int mgmt_user_passkey_neg_reply_complete(struct hci_dev *hdev,
-> +						bdaddr_t *bdaddr, u8 status)
-> +{
-> +	return user_pairing_resp_complete(hdev, bdaddr, status,
-> +					MGMT_OP_USER_PASSKEY_NEG_REPLY);
-> +}
-> +
+> The relevant portion of dmesg is:
+> [   76.502818] usb 1-1.4: reset full-speed USB device number 4 using ehci_hcd
+> [   76.588225] btusb 1-1.4:1.0: no reset_resume for driver btusb?
+> [   76.591870] btusb 1-1.4:1.1: no reset_resume for driver btusb?
+> [   86.565269] PM: resume of devices complete after 10486.220 msecs
+> 
+> My resume scripts did contain a hciconfig hci0 down followed by up, because
+> on my previous notebook (and the kernel I used at the time) it was needed for
+> BT to work after suspend. On this hardware, however, none of that is needed.
+> Bluetooth after suspend works regardless of whether that patch is applied or
+> not, and I believe it would wait indefinitely if given large enough timeout.
+> 
+> Aside from reverting the patch, doing the following before suspend also works
+> around the issue:
+>     echo disable > /proc/acpi/ibm/bluetooth
 
-You have to export these functions in hci_core.h right here in this commit.
+It might be worth to try out the two patches I just sent to
+linux-bluetooth for HCI command failure tracking. They make sure that
+failures are properly caught which should help avoid triggering the
+timeout in certain scenarios (and yours might be one of them).
 
-	Gustavo
+Johan
