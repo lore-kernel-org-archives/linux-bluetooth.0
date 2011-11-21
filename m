@@ -1,66 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 21 Nov 2011 22:15:07 +0100
+From: =?utf-8?B?VG9tw6HFoSBKYW5vdcWhZWs=?= <tomi@nomi.cz>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Szymon Janc <szymon@janc.net.pl>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Linux PM mailing list <linux-pm@vger.kernel.org>,
+	"Srivatsa S. Bhat" <srivatsa.bhat@linux.vnet.ibm.com>
+Subject: Re: [REGRESSION] resume takes 10s longer due to e1b6eb3
+	(Bluetooth: Increase HCI reset timeout ...)
+Message-ID: <20111121211506.GA16081@nomi.cz>
+References: <20111118184017.GA5052@nomi.cz> <20111121152506.GB15633@fusion.localdomain>
 MIME-Version: 1.0
-Date: Tue, 22 Nov 2011 00:59:04 +0000
-Message-ID: <CAKU8hCtjvexS6a9WpvQkcwFDhAagtqRYyFiX2De77ZYOVx8bBw@mail.gmail.com>
-Subject: Help troubleshooting Bluetooth on the Asus Zenbook UX31
-From: Eran Mes <eran.mes@gmail.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20111121152506.GB15633@fusion.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-I'm having trouble getting the built-in Bluetooth module on the Asus
-Zenbook UX31 to function: According to hciconfig there is a valid,
-active interface. However, no devices are detected when scanning
-through the command line / GUI. It's also impossible to establish
-connections using 'hci cc <btaddr>' manually (I/O timeout error).
+Hi Johan,
 
-I'll appreciate any advice anyone can provide on how to further troubleshoot.
-Basic device info (more info below):
-ID 13d3:3375 IMC Networks
-† iManufacturer † † † † † 1 Atheros Communications
-† iProduct † † † † † † † †2 Bluetooth USB Host Controller
-† iSerial † † † † † † † † 3 Alaska Day 2006
+On Mon, Nov 21, 2011 at 05:25:06PM +0200, Johan Hedberg wrote:
+> It might be worth to try out the two patches I just sent to
+> linux-bluetooth for HCI command failure tracking. They make sure that
+> failures are properly caught which should help avoid triggering the
+> timeout in certain scenarios (and yours might be one of them).
 
-What I tried:
-* verifying with rfkill that all wireless interfaces are enabled.
-* Trying out with various kernels: 3.0.0-1, 3.0.4, 3.0.9, 3.1.1
-* Looking up for bluetooth issues on other Asus laptops yielded the
-suggestion that I should use the 'ath3k' module to load a firmware
-first [1] [2] [3].
-* Based on the linuxwireless page description on 'AR3011 with SFLASH
-configurations' [4], I suspected this is the case with this module as
-well.
-* I did use the '13d3 3375' identifier rather than '13d3 3304' in the links.
-* However, the ath3k fails to load the firmware:
-Nov 21 01:01:18 fremkit kernel: [ †911.283280] ath3k_load_firmware:
-Error in firmware loading err = -110,len = 0, size = 4096
-Nov 21 01:01:18 fremkit kernel: [ †911.283346] ath3k: probe of
-1-1.8:1.0 failed with error -110
-* I dug up a different firmware, ath3k-2.fw. That failed loading in a
-similar way.
+No, these don't help. :-(
 
-Detailed information about the device:
-lsusb dump:†http://pastebin.com/KnPNxB61
-lspci output:†http://pastebin.com/0qAxuqX3
-hciconfig output (including features, version, revision):
-http://pastebin.com/WzwV028T
-dmesg:†http://pastebin.com/RsykRfCz
-dmesg snippet with firmware loading failure:†http://pastebin.com/NnUxsqAu
-version of userspace programs:†http://pastebin.com/wJuYrqm4
-
-At this point, I could do with help on the following:
-* Confirming that this bluetooth module does, indeed, require firmware upload.
-* Getting a hold of the firmware file for this module.
-
-I'd be otherwise happy to dig into the kernel's code, if some pointers
-can be provided.
-
-Thanks,
-Eran
-
-[1]†http://www.phlerion.com/blog/2011/02/04/bluetooth-for-exopc-in-ubuntu/
-[2]†https://help.ubuntu.com/community/Asus_N53#Bluetooth
-[3]†http://christianleber.blogspot.com/2011/06/asus-s1-s1-at5nm10e-bluetooth-with.html
-[4]†http://linuxwireless.org/en/users/Drivers/ath3k
+-- 
+Tom√°≈° Janou≈°ek, a.k.a. Liskni_si, http://work.lisk.in/
