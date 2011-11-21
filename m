@@ -1,64 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1321871817-8498-2-git-send-email-bulislaw@linux.com>
-References: <1321871817-8498-1-git-send-email-bulislaw@linux.com>
-	<1321871817-8498-2-git-send-email-bulislaw@linux.com>
-Date: Mon, 21 Nov 2011 13:01:17 +0200
-Message-ID: <CABBYNZKfubASk0RrPCop83wwu=2bw8vWjtFjNV+1Oyy-rOxc8A@mail.gmail.com>
-Subject: Re: [PATCH obexd 2/2] client: Fix invalid write in get_buf_xfer_progress
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>
+Date: Mon, 21 Nov 2011 13:00:59 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz@bmw-carit.de>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH v3 0/5] A2DP sources with Media API
+Message-ID: <20111121110059.GA10916@fusion.localdomain>
+References: <1321870064-20553-1-git-send-email-mikel.astiz@bmw-carit.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1321870064-20553-1-git-send-email-mikel.astiz@bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bartosz,
+Hi Mikel,
 
-On Mon, Nov 21, 2011 at 12:36 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
-> Segmentation fault occurred when there were no (NULL) params in
-> obc_session_get, but actual params were returned in response, as
-> corresponding structure is reused - but not created in the first place.
-> ---
->  client/session.c  |    2 +-
->  client/transfer.c |    2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/client/session.c b/client/session.c
-> index f288ecd..e51faf1 100644
-> --- a/client/session.c
-> +++ b/client/session.c
-> @@ -1231,8 +1231,8 @@ int obc_session_get(struct obc_session *session, const char *type,
->        if (session->obex == NULL)
->                return -ENOTCONN;
->
-> +       params = g_new0(struct obc_transfer_params, 1);
->        if (apparam != NULL) {
-> -               params = g_new0(struct obc_transfer_params, 1);
->                params->data = g_new(guint8, apparam_size);
->                memcpy(params->data, apparam, apparam_size);
->                params->size = apparam_size;
-> diff --git a/client/transfer.c b/client/transfer.c
-> index e072a42..8340cc3 100644
-> --- a/client/transfer.c
-> +++ b/client/transfer.c
-> @@ -536,7 +536,7 @@ int obc_transfer_get(struct obc_transfer *transfer, transfer_callback_t func,
->                g_obex_packet_add_bytes(req, G_OBEX_HDR_TYPE, transfer->type,
->                                                strlen(transfer->type) + 1);
->
-> -       if (transfer->params != NULL)
-> +       if (transfer->params != NULL && transfer->params->size != 0)
->                g_obex_packet_add_bytes(req, G_OBEX_HDR_APPARAM,
->                                                transfer->params->data,
->                                                transfer->params->size);
-> --
-> 1.7.4.1
->
+On Mon, Nov 21, 2011, Mikel Astiz wrote:
+> The following patches have been useful to make PulseAudio work using
+> the media API.
+> 
+> First two patches already acked by Luiz Augusto von Dentz.
+> 
+> Third patch solves a potential crash in 64 bit architectures.
+> 
+> Fourth and fifth patches split out the copyright statements.
+> 
+> Mikel Astiz (5):
+>   media: release transport locks on acquisition failure
+>   media: sep registration fix
+>   a2dp: avoid conversion between guint and pointers
+>   a2dp: update copyright statement
+>   media: update copyright statement
+> 
+>  audio/a2dp.c      |   21 ++++++++-------------
+>  audio/a2dp.h      |   13 +++++++------
+>  audio/media.c     |   20 +++++++++++---------
+>  audio/transport.c |    1 +
+>  4 files changed, 27 insertions(+), 28 deletions(-)
 
-After some offline discussion with Johan we think it is better to have
-this allocation completely on demand, so it means we should not
-allocate it before hand if the request doesn't have any apparam and
-then if the response has it then we allocate on get_buf_xfer_progress.
+All patches have been applied. Thanks.
 
--- 
-Luiz Augusto von Dentz
+Johan
