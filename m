@@ -1,27 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Nov 2011 17:03:31 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add thermometer python script
-Message-ID: <20111121150331.GA15177@fusion.localdomain>
-References: <1321884395-7904-1-git-send-email-sancane@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321884395-7904-1-git-send-email-sancane@gmail.com>
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bartosz Szatkowski <bulislaw@linux.com>
+Subject: [PATCH obexd] client: Fix app params memory management
+Date: Mon, 21 Nov 2011 15:44:47 +0100
+Message-Id: <1321886687-10662-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+---
+ client/transfer.c |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
 
-On Mon, Nov 21, 2011, Santiago Carot-Nemesio wrote:
-> ---
->  test/test-thermometer.py |   81 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 81 insertions(+), 0 deletions(-)
->  create mode 100644 test/test-thermometer.py
+diff --git a/client/transfer.c b/client/transfer.c
+index b6994d1..b314926 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -356,6 +356,12 @@ static void get_buf_xfer_progress(GObex *obex, GError *err, GObexPacket *rsp,
+ 	if (hdr) {
+ 		g_obex_header_get_bytes(hdr, &buf, &len);
+ 		if (len != 0) {
++			if (transfer->params == NULL)
++				transfer->params =
++					g_new0(struct obc_transfer_params, 1);
++			else if (transfer->params->data != NULL)
++				g_free(transfer->params->data);
++
+ 			transfer->params->data = g_memdup(buf, len);
+ 			transfer->params->size = len;
+ 		}
+-- 
+1.7.4.1
 
-Drop the .py suffix since no other test script uses that either, and add
-the script to EXTRA_DIST in Makefile.tools so that it gets included in
-"make dist".
-
-Johan
