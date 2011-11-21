@@ -1,36 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4ECA0E71.1000201@tieto.com>
-Date: Mon, 21 Nov 2011 09:40:17 +0100
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "kanak.gupta@stericsson.com" <kanak.gupta@stericsson.com>,
-	"ulrik.lauren@stericsson.com" <ulrik.lauren@stericsson.com>,
-	"henrik.possung@stericsson.com" <henrik.possung@stericsson.com>
-Subject: Re: [PATCH] Race condition between RFCOMM and L2CAP
-References: <1320844340-1966-1-git-send-email-andrzej.kaczmarek@tieto.com>
-In-Reply-To: <1320844340-1966-1-git-send-email-andrzej.kaczmarek@tieto.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bartosz Szatkowski <bulislaw@linux.com>
+Subject: [PATCH obexd 2/2] client: Fix invalid write in get_buf_xfer_progress
+Date: Mon, 21 Nov 2011 09:32:33 +0100
+Message-Id: <1321864353-3159-2-git-send-email-bulislaw@linux.com>
+In-Reply-To: <1321864353-3159-1-git-send-email-bulislaw@linux.com>
+References: <1321864353-3159-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Segmentation fault occurred when there were no (NULL) params in
+obc_session_get, but actual params were returned in response, as
+corresponding structure is reused - but not created in the first place.
+---
+ client/session.c  |    2 +-
+ client/transfer.c |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-On 09.11.2011 14:12, Kaczmarek Andrzej wrote:
-> Hi,
->
-> I recently came across race condition between RFCOMM and L2CAP.
->
-> When new rfcomm_session is allocated inside rfcomm_session_create there is also
-> L2CAP channel connection started there (and ACL link implicitly). And it can
-> happen that actions are scheduled in a way that rfcomm_security_cfm is called
-> before newly created rfcomm_session finished initialization and still has
-> refcnt set to 0 (because it's not yet linked to rfcomm_dlc). If this happens,
-> session will be deleted on rfcomm_session_put and connection will fail:
-(...)
+diff --git a/client/session.c b/client/session.c
+index f288ecd..e51faf1 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -1231,8 +1231,8 @@ int obc_session_get(struct obc_session *session, const char *type,
+ 	if (session->obex == NULL)
+ 		return -ENOTCONN;
+ 
++	params = g_new0(struct obc_transfer_params, 1);
+ 	if (apparam != NULL) {
+-		params = g_new0(struct obc_transfer_params, 1);
+ 		params->data = g_new(guint8, apparam_size);
+ 		memcpy(params->data, apparam, apparam_size);
+ 		params->size = apparam_size;
+diff --git a/client/transfer.c b/client/transfer.c
+index 334d8d4..0a44af5 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -533,7 +533,7 @@ int obc_transfer_get(struct obc_transfer *transfer, transfer_callback_t func,
+ 		g_obex_packet_add_bytes(req, G_OBEX_HDR_TYPE, transfer->type,
+ 						strlen(transfer->type) + 1);
+ 
+-	if (transfer->params != NULL) {
++	if (transfer->params != NULL && transfer->params->size != 0) {
+ 		g_obex_packet_add_bytes(req, G_OBEX_HDR_APPARAM,
+ 						transfer->params->data,
+ 						transfer->params->size);
+-- 
+1.7.4.1
 
-Any comments here? This does happen for me with some devices and it's 
-quite easily reproducible.
-
-BR,
-Andrzej
