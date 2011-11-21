@@ -2,32 +2,36 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v3 1/5] media: release transport locks on acquisition failure
-Date: Mon, 21 Nov 2011 11:07:40 +0100
-Message-ID: <1321870064-20553-2-git-send-email-mikel.astiz@bmw-carit.de>
-In-Reply-To: <1321870064-20553-1-git-send-email-mikel.astiz@bmw-carit.de>
-References: <1321870064-20553-1-git-send-email-mikel.astiz@bmw-carit.de>
+Subject: [PATCH v3 0/5] A2DP sources with Media API
+Date: Mon, 21 Nov 2011 11:07:39 +0100
+Message-ID: <1321870064-20553-1-git-send-email-mikel.astiz@bmw-carit.de>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/transport.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+The following patches have been useful to make PulseAudio work using
+the media API.
 
-diff --git a/audio/transport.c b/audio/transport.c
-index 2739199..7bde32d 100644
---- a/audio/transport.c
-+++ b/audio/transport.c
-@@ -670,6 +670,7 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
- 	owner = media_owner_create(conn, msg, accesstype);
- 	id = transport->resume(transport, owner);
- 	if (id == 0) {
-+		media_transport_release(transport, accesstype);
- 		media_owner_free(owner);
- 		return btd_error_not_authorized(msg);
- 	}
+First two patches already acked by Luiz Augusto von Dentz.
+
+Third patch solves a potential crash in 64 bit architectures.
+
+Fourth and fifth patches split out the copyright statements.
+
+Mikel Astiz (5):
+  media: release transport locks on acquisition failure
+  media: sep registration fix
+  a2dp: avoid conversion between guint and pointers
+  a2dp: update copyright statement
+  media: update copyright statement
+
+ audio/a2dp.c      |   21 ++++++++-------------
+ audio/a2dp.h      |   13 +++++++------
+ audio/media.c     |   20 +++++++++++---------
+ audio/transport.c |    1 +
+ 4 files changed, 27 insertions(+), 28 deletions(-)
+
 -- 
 1.7.6.4
 
