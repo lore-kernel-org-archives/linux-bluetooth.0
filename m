@@ -1,37 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Fix request completion for command status events
-Date: Mon, 21 Nov 2011 17:18:59 +0200
-Message-Id: <1321888740-15598-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 21 Nov 2011 17:03:31 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Add thermometer python script
+Message-ID: <20111121150331.GA15177@fusion.localdomain>
+References: <1321884395-7904-1-git-send-email-sancane@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1321884395-7904-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Santiago,
 
-If a HCI command triggered by hci_request() fails at the command status
-phase we need to properly inform the request tracking code of the
-completion of the request.
+On Mon, Nov 21, 2011, Santiago Carot-Nemesio wrote:
+> ---
+>  test/test-thermometer.py |   81 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 81 insertions(+), 0 deletions(-)
+>  create mode 100644 test/test-thermometer.py
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_event.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+Drop the .py suffix since no other test script uses that either, and add
+the script to EXTRA_DIST in Makefile.tools so that it gets included in
+"make dist".
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index dfe6fbc..236f895 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2055,6 +2055,9 @@ static inline void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	opcode = __le16_to_cpu(ev->opcode);
- 
-+	if (ev->status != 0)
-+		hci_req_complete(hdev, opcode, ev->status);
-+
- 	switch (opcode) {
- 	case HCI_OP_INQUIRY:
- 		hci_cs_inquiry(hdev, ev->status);
--- 
-1.7.7.3
-
+Johan
