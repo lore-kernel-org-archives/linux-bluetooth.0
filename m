@@ -1,75 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Nov 2011 12:22:02 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Date: Mon, 21 Nov 2011 12:13:33 +0200
+From: 'Emeltchenko Andrei' <Andrei.Emeltchenko.news@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Michael Schmitt <tcwardrobe@gmail.com>, linux-bluetooth@vger.kernel.org
-Subject: Re: 057c:3800 BlueFRITZ! Bluetooth Stick broken since 2.6.something
-Message-ID: <20111121102200.GF32261@aemeltch-MOBL1>
-References: <4EC679A0.7050309@gmail.com>
- <20111118153652.GA3647@fusion.localdomain>
- <4EC67E88.6060202@gmail.com>
- <20111118162111.GA4680@fusion.localdomain>
- <20111121085704.GB32261@aemeltch-MOBL1>
- <1321866829.2011.5.camel@aeonflux>
+Cc: Peter Krystad <pkrystad@codeaurora.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 3/3] Bluetooth: Add AMP initialization
+Message-ID: <20111121101331.GE32261@aemeltch-MOBL1>
+References: <1321457422-31641-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1321457422-31641-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1321480186.15441.554.camel@aeonflux>
+ <20111117132047.GH415@aemeltch-MOBL1>
+ <1321544714.15441.568.camel@aeonflux>
+ <005d01cca555$280fa960$782efc20$@org>
+ <1321593256.15441.575.camel@aeonflux>
+ <20111118135412.GC24392@aemeltch-MOBL1>
+ <1321633382.15441.618.camel@aeonflux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321866829.2011.5.camel@aeonflux>
+In-Reply-To: <1321633382.15441.618.camel@aeonflux>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Mon, Nov 21, 2011 at 10:13:49AM +0100, Marcel Holtmann wrote:
-> Hi Andrei,
+On Fri, Nov 18, 2011 at 05:23:01PM +0100, Marcel Holtmann wrote:
+> > > 
+> > > However since we are talking about controller init. Can someone please
+> > > first propose a list of how we init AMP vs BR/EDR/LE controllers instead
+> > > of just dumping code here. I think it needs some clear strategy on how
+> > > to do it.
+> > 
+> > AMP controller is initialized following way in Code Aurora code:
+> > 
+> > Common part:
+> > 
+> > <------8<--------------------------------------------------
+> > |  /* Mandatory initialization */
+> > |
+> > |  /* Reset */
+> > |  if (!test_bit(HCI_QUIRK_NO_RESET, &hdev->quirks)) {
+> > |          set_bit(HCI_RESET, &hdev->flags);
+> > |          hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
+> > |  }
 > 
-> > > On Fri, Nov 18, 2011, Michael Schmitt wrote:
-> > > > < HCI Command: Read Local Version Information (0x04|0x0001) plen 0
-> > > > > HCI Event: Command Complete (0x0e) plen 12
-> > > >     Read Local Version Information (0x04|0x0001) ncmd 1
-> > > >     status 0x00
-> > > >     HCI Version: 1.2 (0x2) HCI Revision: 0x2006
-> > > >     LMP Version: 1.2 (0x2) LMP Subversion: 0x1806
-> > > >     Manufacturer: AVM Berlin (31)
-> > > 
-> > > Ok, so this is a 1.2 adapter.
-> > > 
-> > > > < HCI Command: Read Local Supported Commands (0x04|0x0002) plen 0
-> > > > > HCI Event: Command Status (0x0f) plen 4
-> > > >     Read Local Supported Commands (0x04|0x0002) status 0x01 ncmd 1
-> > > >     Error: Unknown HCI Command
-> > > 
-> > > This is the reason why you're getting a timeout. Since the adapter
-> > > claims to support Bluetooth version 1.2 it should also support this HCI
-> > > command, so from that perspective it's not conforming to the
-> > 
-> > Apparently we check for "Bluetooth Core Specification 1.1" 
-> > 
-> > Shall we change to:
-> > 
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index f0fbb02..ed55b33 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -562,7 +562,7 @@ static void hci_setup(struct hci_dev *hdev)
-> >  {
-> >         hci_setup_event_mask(hdev);
-> >  
-> > -       if (hdev->lmp_ver > 1)
-> > +       if (hdev->lmp_ver > 2)
-> >                 hci_send_cmd(hdev, HCI_OP_READ_LOCAL_COMMANDS, 0, NULL);
+> this check for QUIRK_NO_RESET is pointless. That is just there for old
+> Bluetooth 1.0b controllers. Or broken hardware. Let's assume the AMP
+> controllers are fine and just issue OP_RESET.
 > 
-> 0x00 is 1.0b and 0x01 is 1.1. So you are changing the check from 1.2 to
-> 2.0. The command was introduced with 1.2 actually.
+> > |  /* Read Local Version */
+> > |  hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
+> > |
+> > |  /* Read HCI Flow Control Mode */
+> > |  hci_send_cmd(hdev, HCI_OP_READ_FLOW_CONTROL_MODE, 0, NULL);
+> > |
+> > |  /* Read Buffer Size (ACL mtu, max pkt, etc.) */
+> > |  hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
+> > |
+> > |  /* Read Data Block Size (ACL mtu, max pkt, etc.) */
+> > |  hci_send_cmd(hdev, HCI_OP_READ_DATA_BLOCK_SIZE, 0, NULL);
+> > <------8<------------------------------------------------------
+> 
+> This is not a generic sequence. We will not be reading flow control or
+> data block size commands. It will heavily fail on older controllers.
 
-Can we define in bluetooth.h something like:
+What about following code (basically BR/EDR initialization is the same as
+now and only amp_init is new). I use now virtual AMP device so any init is
+good, I need Read Version and Read AMP info commands.
 
-#define BLUETOOTH_LMP_VER_1.1	1
-#define BLUETOOTH_LMP_VER_1.2	2
+static void bredr_init(struct hci_dev *hdev)
+{
+	struct hci_cp_delete_stored_link_key cp;
+	__le16 param;
+	__u8 flt_type;
 
-> The only real change that needs to be done here is to check hci_ver
-> instead of lmp_ver. This command is a HCI feature and not a LMP feature
-> actually.
+	/* Mandatory initialization */
+	/* Reset */
+	if (!test_bit(HCI_QUIRK_NO_RESET, &hdev->quirks)) {
+		set_bit(HCI_RESET, &hdev->flags);
+		hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
+	}
 
-Maybe same define for HCI_VER ?
+	/* Read Local Supported Features */
+	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
+
+	/* Read Local Version */
+	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
+
+	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
+	hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
+
+	/* Read BD Address */
+	hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
+
+	/* Read Class of Device */
+	hci_send_cmd(hdev, HCI_OP_READ_CLASS_OF_DEV, 0, NULL);
+
+	/* Read Local Name */
+	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_NAME, 0, NULL);
+
+	/* Read Voice Setting */
+	hci_send_cmd(hdev, HCI_OP_READ_VOICE_SETTING, 0, NULL);
+
+	/* Optional initialization */
+	/* Clear Event Filters */
+	flt_type = HCI_FLT_CLEAR_ALL;
+	hci_send_cmd(hdev, HCI_OP_SET_EVENT_FLT, 1, &flt_type);
+
+	/* Connection accept timeout ~20 secs */
+	param = cpu_to_le16(0x7d00);
+	hci_send_cmd(hdev, HCI_OP_WRITE_CA_TIMEOUT, 2, &param);
+
+	bacpy(&cp.bdaddr, BDADDR_ANY);
+	cp.delete_all = 1;
+	hci_send_cmd(hdev, HCI_OP_DELETE_STORED_LINK_KEY, sizeof(cp), &cp);
+}
+
+static void amp_init(struct hci_dev *hdev)
+{
+	/* Mandatory initialization */
+	/* Reset */
+	hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
+
+	/* Read Local Version */
+	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
+
+	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
+	hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
+
+	/* Read AMP Info */
+	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
+}
 
 Best regards 
 Andrei Emeltchenko 
