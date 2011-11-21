@@ -1,47 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Ignore HCI_Read_Local_Commands failures
-Date: Mon, 21 Nov 2011 17:19:00 +0200
-Message-Id: <1321888740-15598-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1321888740-15598-1-git-send-email-johan.hedberg@gmail.com>
-References: <1321888740-15598-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: Fix request completion for command status events
+Date: Mon, 21 Nov 2011 17:18:59 +0200
+Message-Id: <1321888740-15598-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Some 1.2 controllers will fail the HCI_Read_Local_Commands HCI command
-even though (according to the specification) they should support it.
-Since this HCI command is part of the controller init sequence
-controllers broken in this manner would be unusable. Since not having
-the list of supported commands is not critical for these controllers it
-is better to just ignore failures in this case (additionally, this is
-also how older kernels used to behave).
+If a HCI command triggered by hci_request() fails at the command status
+phase we need to properly inform the request tracking code of the
+completion of the request.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_core.c |    7 +++++++
- 1 files changed, 7 insertions(+), 0 deletions(-)
+ net/bluetooth/hci_event.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 9218888..1719257 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -106,6 +106,13 @@ void hci_req_complete(struct hci_dev *hdev, __u16 cmd, int result)
- 	if (test_bit(HCI_INIT, &hdev->flags) && hdev->init_last_cmd != cmd)
- 		return;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index dfe6fbc..236f895 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2055,6 +2055,9 @@ static inline void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
  
-+	/* Some 1.2 controllers report failure for HCI_Read_Local_Commands
-+	 * even though they should support it. Since it's not a critical
-+	 * issue not to have a proper result from them just ignore a
-+	 * failure status */
-+	if (cmd == HCI_OP_READ_LOCAL_COMMANDS && result != 0)
-+		result = 0;
+ 	opcode = __le16_to_cpu(ev->opcode);
+ 
++	if (ev->status != 0)
++		hci_req_complete(hdev, opcode, ev->status);
 +
- 	if (hdev->req_status == HCI_REQ_PEND) {
- 		hdev->req_result = result;
- 		hdev->req_status = HCI_REQ_DONE;
+ 	switch (opcode) {
+ 	case HCI_OP_INQUIRY:
+ 		hci_cs_inquiry(hdev, ev->status);
 -- 
 1.7.7.3
 
