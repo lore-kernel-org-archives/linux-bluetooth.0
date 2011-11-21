@@ -1,91 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1321894407.2011.18.camel@aeonflux>
-Subject: Re: [RFC 3/3] Bluetooth: Add AMP initialization
-From: Marcel Holtmann <marcel@holtmann.org>
-To: james.steele@accenture.com
-Cc: Andrei.Emeltchenko.news@gmail.com, pkrystad@codeaurora.org,
-	linux-bluetooth@vger.kernel.org
-Date: Mon, 21 Nov 2011 17:53:27 +0100
-In-Reply-To: <81C9FA9C1C2E9E45A9AC3EDD1858BC4312A6E6CE@048-CH1MPN1-102.048d.mgd.msft.net>
-References: <81C9FA9C1C2E9E45A9AC3EDD1858BC4312A6E6CE@048-CH1MPN1-102.048d.mgd.msft.net>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Mon, 21 Nov 2011 14:46:36 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 1/3] Bluetooth: Use queue in the device list
+Message-ID: <20111121164636.GI2552@joana>
+References: <1321457422-31641-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1321457422-31641-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi James,
+Hi Andrei,
 
-> > actually I think the READ_AMP_INFO is wrong here. It should be only
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-16 17:30:20 +0200]:
+
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> > executed based on an AMP_Get_Info_Request during a connection setup
+> Use queue instead of stack discipline for device list. When processing
+> dev_list with list_for_each* devices will be prosessed in order they
+> were added (Usually BR/EDR first and AMP later).
 > 
-> > procedure.
+> Also output from hciconfig looks nicer :-)
 > 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/hci_core.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index cf18f6d..aee76fd 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1452,7 +1452,7 @@ int hci_register_dev(struct hci_dev *hdev)
 >  
-> 
-> You can read the AMP info over HCI upon receiving a request by A2MP,
-> but there are reasons to issue the READ_AMP_INFO command in advance.
-> For example, you need the Controller_Type for responding to the
-> AMP_Discover_Request.  Also you may (tenuously) want the know the
-> Max_PDU_Size in advance for selecting SDU sizes (w.r.t. segmentation).
-> 
+>  	sprintf(hdev->name, "hci%d", id);
+>  	hdev->id = id;
+> -	list_add(&hdev->list, head);
+> +	list_add_tail(&hdev->list, head);
 >  
-> 
-> Certainly READ_AMP_INFO is a command intended to be issued during
-> controller initialization, the majority of the values should not
-> change during the lifetime of the controller, and only once that
-> command has been issued will the Controller commence sending
-> AMP_Status_Change_Events to communicate changes in status.  At a
-> minimum READ_AMP_INFO must be issued for each AMP_Discover_Request
-> (and AMP_Get_Info_Request) received; but if AMP discovery is slower,
-> then transitioning a channel to an AMP link will be slower.
+>  	atomic_set(&hdev->refcnt, 1);
+>  	spin_lock_init(&hdev->lock);
 
-is the AMP_Status_Change event is issued, then I am fine with reading
-the AMP controller information ones at init and just caching it. Makes
-the link setup procedure simpler since we only have to deal with the
-assoc information.
+Applied, thanks.
 
-> > And even the READ_BUFFER_SIZE is the wrong command since by default
-> the
-> 
-> > AMP controller is in block based flow control mode. So you would
-> need to
-> 
-> > read the flow control mode first actually.
-> 
->  
-> 
-> Correct, although reading the flow control mode on an AMP controller
-> after a HCI_Reset *should* always return “data block mode” (as that is
-> the default).  The READ_BUFFER_SIZE should only be used if
-> HCI_Write_Flow_Control_Mode has been issued first (and successfully
-> enabled packet based flow control).  Instead I believe we should issue
-> the HCI_Read_Data_Block_Size command, where the correct information is
-> then provided for the host stack (with its "new" data block flow
-> control model for AMP controllers).  I don’t think there is any
-> requirement forcing an AMP controller to implement packet based flow
-> control, so if there is no data block flow control model in the host
-> yet then initialization has to be prepared to fail upon trying to
-> configure packet based flow control mode.
-
-Reading the flow control mode and data block size should be done via the
-init sequence.
-
-> Also for AMP Controller initialization, the HCI_Set_Event_Mask_Page_2
-> command should be issued to ensure the AMP related events are provided
-> by the controller (by default they are turned off).  A suitable
-> HCI_Set_Event_Mask command may also be needed if using enhanced flush
-> on the AMP controller.  Event filters also apply to AMP controllers
-> IIRC, so if following the BR/EDR example you may want to clear them
-> too (although I imagine such initialization could be added when
-> required).
-
-The filters should be cleared by HCI_Reset actually. So we might just
-ignore that one. I never found the HCI filters useful, but the event
-mask is a good point. We need to set that one.
-
-Regards
-
-Marcel
-
-
+	Gustavo
