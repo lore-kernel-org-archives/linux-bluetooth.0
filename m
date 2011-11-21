@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Nov 2011 12:35:47 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Mon, 21 Nov 2011 12:22:02 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Michael Schmitt <tcwardrobe@gmail.com>,
-	linux-bluetooth@vger.kernel.org
+Cc: Michael Schmitt <tcwardrobe@gmail.com>, linux-bluetooth@vger.kernel.org
 Subject: Re: 057c:3800 BlueFRITZ! Bluetooth Stick broken since 2.6.something
-Message-ID: <20111121103547.GA9093@fusion.localdomain>
+Message-ID: <20111121102200.GF32261@aemeltch-MOBL1>
 References: <4EC679A0.7050309@gmail.com>
  <20111118153652.GA3647@fusion.localdomain>
  <4EC67E88.6060202@gmail.com>
@@ -20,7 +18,9 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Mon, Nov 21, 2011, Marcel Holtmann wrote:
+On Mon, Nov 21, 2011 at 10:13:49AM +0100, Marcel Holtmann wrote:
+> Hi Andrei,
+> 
 > > > On Fri, Nov 18, 2011, Michael Schmitt wrote:
 > > > > < HCI Command: Read Local Version Information (0x04|0x0001) plen 0
 > > > > > HCI Event: Command Complete (0x0e) plen 12
@@ -59,15 +59,17 @@ On Mon, Nov 21, 2011, Marcel Holtmann wrote:
 > 
 > 0x00 is 1.0b and 0x01 is 1.1. So you are changing the check from 1.2 to
 > 2.0. The command was introduced with 1.2 actually.
-> 
+
+Can we define in bluetooth.h something like:
+
+#define BLUETOOTH_LMP_VER_1.1	1
+#define BLUETOOTH_LMP_VER_1.2	2
+
 > The only real change that needs to be done here is to check hci_ver
 > instead of lmp_ver. This command is a HCI feature and not a LMP feature
 > actually.
 
-That doesn't help much with this particular dongle though since the LMP
-and HCI versions are the same. What I'd propose is the patch which I
-already attached to an earlier email in this thread and then either a
-quirk for this adapter or just generally ignoring the
-HCI_Read_Local_Commands failure status.
+Maybe same define for HCI_VER ?
 
-Johan
+Best regards 
+Andrei Emeltchenko 
