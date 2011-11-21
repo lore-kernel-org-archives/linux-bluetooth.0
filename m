@@ -1,25 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Nov 2011 20:42:05 +0200
+Date: Mon, 21 Nov 2011 20:04:04 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd] client: Fix app params memory management
-Message-ID: <20111121184205.GA18774@fusion.localdomain>
-References: <1321886687-10662-1-git-send-email-bulislaw@linux.com>
+Subject: Re: [PATCH 2/2] Bluetooth: Ignore HCI_Read_Local_Commands failures
+Message-ID: <20111121180404.GA18007@fusion.localdomain>
+References: <1321888740-15598-1-git-send-email-johan.hedberg@gmail.com>
+ <1321888740-15598-2-git-send-email-johan.hedberg@gmail.com>
+ <1321893880.2011.14.camel@aeonflux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321886687-10662-1-git-send-email-bulislaw@linux.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1321893880.2011.14.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bartosz,
+Hi Marcel,
 
-On Mon, Nov 21, 2011, Bartosz Szatkowski wrote:
-> ---
->  client/transfer.c |    6 ++++++
->  1 files changed, 6 insertions(+), 0 deletions(-)
+On Mon, Nov 21, 2011, Marcel Holtmann wrote:
+> > Some 1.2 controllers will fail the HCI_Read_Local_Commands HCI command
+> > even though (according to the specification) they should support it.
+> > Since this HCI command is part of the controller init sequence
+> > controllers broken in this manner would be unusable. Since not having
+> > the list of supported commands is not critical for these controllers it
+> > is better to just ignore failures in this case (additionally, this is
+> > also how older kernels used to behave).
+> > 
+> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> > ---
+> >  net/bluetooth/hci_core.c |    7 +++++++
+> >  1 files changed, 7 insertions(+), 0 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index 9218888..1719257 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -106,6 +106,13 @@ void hci_req_complete(struct hci_dev *hdev, __u16 cmd, int result)
+> >  	if (test_bit(HCI_INIT, &hdev->flags) && hdev->init_last_cmd != cmd)
+> >  		return;
+> >  
+> > +	/* Some 1.2 controllers report failure for HCI_Read_Local_Commands
+> > +	 * even though they should support it. Since it's not a critical
+> > +	 * issue not to have a proper result from them just ignore a
+> > +	 * failure status */
+> > +	if (cmd == HCI_OP_READ_LOCAL_COMMANDS && result != 0)
+> > +		result = 0;
+> > +
+> 
+> this is pretty ugly handling. Can't we come up with something better?
 
-Applied after a minor fix (you don't need to check for NULL before
-calling g_free). Thanks.
+I just sent a second attempt at both patches. They accomplish the same
+thing but since we now do the handling inside the cmd_status switch
+statement the code becomes less hackish (at least in my opinion).
 
 Johan
