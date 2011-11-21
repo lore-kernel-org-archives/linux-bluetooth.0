@@ -1,81 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Nov 2011 10:57:06 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Michael Schmitt <tcwardrobe@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: 057c:3800 BlueFRITZ! Bluetooth Stick broken since 2.6.something
-Message-ID: <20111121085704.GB32261@aemeltch-MOBL1>
-References: <4EC679A0.7050309@gmail.com>
- <20111118153652.GA3647@fusion.localdomain>
- <4EC67E88.6060202@gmail.com>
- <20111118162111.GA4680@fusion.localdomain>
+From: "Zheng, Wu" <wu.zheng@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 21 Nov 2011 16:43:54 +0800
+Subject: Problems for obex-0.42 (obex-client)
+Message-ID: <CE761E84DADF2947A4AF22FB8D97A4736EBDA617@shsmsx501.ccr.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111118162111.GA4680@fusion.localdomain>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi:
 
-On Fri, Nov 18, 2011 at 06:21:11PM +0200, Johan Hedberg wrote:
-> Hi Michael,
-> 
-> On Fri, Nov 18, 2011, Michael Schmitt wrote:
-> > < HCI Command: Read Local Version Information (0x04|0x0001) plen 0
-> > > HCI Event: Command Complete (0x0e) plen 12
-> >     Read Local Version Information (0x04|0x0001) ncmd 1
-> >     status 0x00
-> >     HCI Version: 1.2 (0x2) HCI Revision: 0x2006
-> >     LMP Version: 1.2 (0x2) LMP Subversion: 0x1806
-> >     Manufacturer: AVM Berlin (31)
-> 
-> Ok, so this is a 1.2 adapter.
-> 
-> > < HCI Command: Read Local Supported Commands (0x04|0x0002) plen 0
-> > > HCI Event: Command Status (0x0f) plen 4
-> >     Read Local Supported Commands (0x04|0x0002) status 0x01 ncmd 1
-> >     Error: Unknown HCI Command
-> 
-> This is the reason why you're getting a timeout. Since the adapter
-> claims to support Bluetooth version 1.2 it should also support this HCI
-> command, so from that perspective it's not conforming to the
+We use the test script of obexd-0.42/test/ftp-client for testing ftp.
+Obex-0.41 is ok for the test. 
+However, for obex-0.42, We find the following issue:
 
-Apparently we check for "Bluetooth Core Specification 1.1" 
+obex-client[4144]: obex-client daemon 0.42
+obex-client[4144]: client/main.c:main() Entering main loop
+obex-client[4144]: client/session.c:session_ref() 0x9d80af8: ref=2
+obex-client[4144]: client/session.c:manager_reply() adapter path /org/bluez/345/hci0
+obex-client[4144]: manager replied with an error: org.bluez.Error.AgentNotAvailable, Agent Not Available
+obex-client[4144]: client/session.c:session_unref() 0x9d80af8: ref=1
+obex-client[4144]: client/session.c:owner_disconnected()
+obex-client[4144]: client/session.c:session_shutdown() 0x9d80af8
 
-Shall we change to:
+After checking the code of obexd-0.42 and obexd-0.41, we find that obexd-0.42 need to send dbus a message call to bluez for invoking RequestSession() 
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index f0fbb02..ed55b33 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -562,7 +562,7 @@ static void hci_setup(struct hci_dev *hdev)
- {
-        hci_setup_event_mask(hdev);
- 
--       if (hdev->lmp_ver > 1)
-+       if (hdev->lmp_ver > 2)
-                hci_send_cmd(hdev, HCI_OP_READ_LOCAL_COMMANDS, 0, NULL);
- 
-        if (hdev->features[6] & LMP_SIMPLE_PAIR) {
+In the function of RequestSession() in the file of adapter.c, 
+	if (!adapter->agent)
+		return btd_error_agent_not_available(msg);
 
-Reference:
-https://www.bluetooth.org/Technical/AssignedNumbers/link_manager.htm
+The root cause is that obex-client did not register a agent for bluez, therefore, the error is " manager replied with an error: org.bluez.Error.AgentNotAvailable, Agent Not Available ".
 
-Best regards 
-Andrei Emeltchenko 
+For the cases, I think that obex-client need to register a agent for bluez? Or the other idea?
+Someone has comments for it?
 
-> specification. Right now the kernel (lib/bluetooth/hci_event.c) is
-> completely missing a command status handler for this command. If such a
-> handler was in place instead of a timeout you would be getting an
-> immediate error (the kernel maps this HCI status code to EBADRQC).
-> 
-> However, since this is also not acceptable behavior (as the adapter
-> still wouldn't work for you) I suspect the need for some
-> adapter-specific quirk is in place or then the kernel should just ignore
-> any errors for HCI_Read_Local_Supported_Commands.
-> 
-> Johan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Best regards
+Zheng wu
