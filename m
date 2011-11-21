@@ -1,23 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1321866829.2011.5.camel@aeonflux>
-Subject: Re: 057c:3800 BlueFRITZ! Bluetooth Stick broken since 2.6.something
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-Cc: Michael Schmitt <tcwardrobe@gmail.com>,
+Date: Mon, 21 Nov 2011 11:12:55 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Michael Schmitt <tcwardrobe@gmail.com>,
 	linux-bluetooth@vger.kernel.org
-Date: Mon, 21 Nov 2011 10:13:49 +0100
-In-Reply-To: <20111121085704.GB32261@aemeltch-MOBL1>
+Subject: Re: 057c:3800 BlueFRITZ! Bluetooth Stick broken since 2.6.something
+Message-ID: <20111121091253.GC32261@aemeltch-MOBL1>
 References: <4EC679A0.7050309@gmail.com>
-	 <20111118153652.GA3647@fusion.localdomain> <4EC67E88.6060202@gmail.com>
-	 <20111118162111.GA4680@fusion.localdomain>
-	 <20111121085704.GB32261@aemeltch-MOBL1>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <20111118153652.GA3647@fusion.localdomain>
+ <4EC67E88.6060202@gmail.com>
+ <20111118162111.GA4680@fusion.localdomain>
+ <20111121085704.GB32261@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20111121085704.GB32261@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
-
+On Mon, Nov 21, 2011 at 10:57:06AM +0200, Andrei Emeltchenko wrote:
+> Hi Johan,
+> 
+> On Fri, Nov 18, 2011 at 06:21:11PM +0200, Johan Hedberg wrote:
+> > Hi Michael,
+> > 
 > > On Fri, Nov 18, 2011, Michael Schmitt wrote:
 > > > < HCI Command: Read Local Version Information (0x04|0x0001) plen 0
 > > > > HCI Event: Command Complete (0x0e) plen 12
@@ -38,7 +42,15 @@ Hi Andrei,
 > > claims to support Bluetooth version 1.2 it should also support this HCI
 > > command, so from that perspective it's not conforming to the
 > 
-> Apparently we check for "Bluetooth Core Specification 1.1" 
+> Apparently we check for "Bluetooth Core Specification 1.1"
+
+Sorry, it is already checking for it.
+
+Discard the code below.
+
+Best regards 
+Andrei Emeltchenko  
+
 > 
 > Shall we change to:
 > 
@@ -53,16 +65,31 @@ Hi Andrei,
 > -       if (hdev->lmp_ver > 1)
 > +       if (hdev->lmp_ver > 2)
 >                 hci_send_cmd(hdev, HCI_OP_READ_LOCAL_COMMANDS, 0, NULL);
-
-0x00 is 1.0b and 0x01 is 1.1. So you are changing the check from 1.2 to
-2.0. The command was introduced with 1.2 actually.
-
-The only real change that needs to be done here is to check hci_ver
-instead of lmp_ver. This command is a HCI feature and not a LMP feature
-actually.
-
-Regards
-
-Marcel
-
-
+>  
+>         if (hdev->features[6] & LMP_SIMPLE_PAIR) {
+> 
+> Reference:
+> https://www.bluetooth.org/Technical/AssignedNumbers/link_manager.htm
+> 
+> Best regards 
+> Andrei Emeltchenko 
+> 
+> > specification. Right now the kernel (lib/bluetooth/hci_event.c) is
+> > completely missing a command status handler for this command. If such a
+> > handler was in place instead of a timeout you would be getting an
+> > immediate error (the kernel maps this HCI status code to EBADRQC).
+> > 
+> > However, since this is also not acceptable behavior (as the adapter
+> > still wouldn't work for you) I suspect the need for some
+> > adapter-specific quirk is in place or then the kernel should just ignore
+> > any errors for HCI_Read_Local_Supported_Commands.
+> > 
+> > Johan
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
