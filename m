@@ -1,31 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Nov 2011 22:15:07 +0100
-From: =?utf-8?B?VG9tw6HFoSBKYW5vdcWhZWs=?= <tomi@nomi.cz>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Szymon Janc <szymon@janc.net.pl>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Linux PM mailing list <linux-pm@vger.kernel.org>,
-	"Srivatsa S. Bhat" <srivatsa.bhat@linux.vnet.ibm.com>
-Subject: Re: [REGRESSION] resume takes 10s longer due to e1b6eb3
-	(Bluetooth: Increase HCI reset timeout ...)
-Message-ID: <20111121211506.GA16081@nomi.cz>
-References: <20111118184017.GA5052@nomi.cz> <20111121152506.GB15633@fusion.localdomain>
+Date: Mon, 21 Nov 2011 20:42:05 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd] client: Fix app params memory management
+Message-ID: <20111121184205.GA18774@fusion.localdomain>
+References: <1321886687-10662-1-git-send-email-bulislaw@linux.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20111121152506.GB15633@fusion.localdomain>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1321886687-10662-1-git-send-email-bulislaw@linux.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Bartosz,
 
-On Mon, Nov 21, 2011 at 05:25:06PM +0200, Johan Hedberg wrote:
-> It might be worth to try out the two patches I just sent to
-> linux-bluetooth for HCI command failure tracking. They make sure that
-> failures are properly caught which should help avoid triggering the
-> timeout in certain scenarios (and yours might be one of them).
+On Mon, Nov 21, 2011, Bartosz Szatkowski wrote:
+> ---
+>  client/transfer.c |    6 ++++++
+>  1 files changed, 6 insertions(+), 0 deletions(-)
 
-No, these don't help. :-(
+Applied after a minor fix (you don't need to check for NULL before
+calling g_free). Thanks.
 
--- 
-Tomáš Janoušek, a.k.a. Liskni_si, http://work.lisk.in/
+Johan
