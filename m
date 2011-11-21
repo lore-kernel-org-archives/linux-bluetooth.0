@@ -1,105 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH] Add thermometer python script
-Date: Mon, 21 Nov 2011 15:06:35 +0100
-Message-Id: <1321884395-7904-1-git-send-email-sancane@gmail.com>
+Message-ID: <1321880678.2011.12.camel@aeonflux>
+Subject: Re: 057c:3800 BlueFRITZ! Bluetooth Stick broken since 2.6.something
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Michael Schmitt <tcwardrobe@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Date: Mon, 21 Nov 2011 14:04:38 +0100
+In-Reply-To: <20111121103547.GA9093@fusion.localdomain>
+References: <4EC679A0.7050309@gmail.com>
+	 <20111118153652.GA3647@fusion.localdomain> <4EC67E88.6060202@gmail.com>
+	 <20111118162111.GA4680@fusion.localdomain>
+	 <20111121085704.GB32261@aemeltch-MOBL1> <1321866829.2011.5.camel@aeonflux>
+	 <20111121103547.GA9093@fusion.localdomain>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- test/test-thermometer.py |   81 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 81 insertions(+), 0 deletions(-)
- create mode 100644 test/test-thermometer.py
+Hi Johan,
 
-diff --git a/test/test-thermometer.py b/test/test-thermometer.py
-new file mode 100644
-index 0000000..93dba86
---- /dev/null
-+++ b/test/test-thermometer.py
-@@ -0,0 +1,81 @@
-+#!/usr/bin/python
-+
-+'''
-+Thermometer test script
-+'''
-+
-+import gobject
-+
-+import sys
-+import dbus
-+import dbus.service
-+import dbus.mainloop.glib
-+from optparse import OptionParser, make_option
-+
-+class Watcher(dbus.service.Object):
-+	exit_on_release = True
-+
-+	def set_exit_on_release(self, exit_on_release):
-+		self.exit_on_release = exit_on_release
-+
-+	@dbus.service.method("org.bluez.ThermometerWatcher",
-+					in_signature="a{sv}", out_signature="")
-+	def MeasurementReceived(self, measure):
-+		print measure["Measurement"], " measurement received"
-+		print "Exponent: ", measure["Exponent"]
-+		print "Mantissa: ", measure["Mantissa"]
-+		print "Unit: ", measure["Unit"]
-+
-+		if measure.has_key("Time"):
-+			print "Time: ", measure["Time"]
-+
-+		print "Type: ", measure["Type"]
-+
-+def property_changed(name, value):
-+
-+	print "PropertyChanged('%s', '%s')" % (name, value)
-+
-+if __name__ == "__main__":
-+	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-+
-+	bus = dbus.SystemBus()
-+
-+	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
-+					"org.bluez.Manager")
-+
-+	option_list = [
-+		make_option("-i", "--adapter", action="store",
-+			type="string", dest="adapter"),
-+		make_option("-b", "--device", action="store",
-+			type="string", dest="address"),
-+		]
-+
-+	parser = OptionParser(option_list=option_list)
-+
-+	(options, args) = parser.parse_args()
-+
-+	if options.adapter:
-+		adapter_path = manager.FindAdapter(options.adapter)
-+	else:
-+		adapter_path = manager.DefaultAdapter()
-+
-+	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
-+							"org.bluez.Adapter")
-+
-+	device_path = adapter.FindDevice(options.address)
-+
-+	bus.add_signal_receiver(property_changed, bus_name="org.bluez",
-+				dbus_interface="org.bluez.Thermometer",
-+				signal_name="PropertyChanged")
-+
-+	thermometer = dbus.Interface(bus.get_object("org.bluez",
-+					device_path), "org.bluez.Thermometer")
-+
-+	path = "/test/watcher"
-+	watcher = Watcher(bus, path)
-+
-+	thermometer.RegisterWatcher(path)
-+	thermometer.EnableIntermediateMeasurement(path)
-+
-+	mainloop = gobject.MainLoop()
-+	mainloop.run()
--- 
-1.7.7.4
+> > > > On Fri, Nov 18, 2011, Michael Schmitt wrote:
+> > > > > < HCI Command: Read Local Version Information (0x04|0x0001) plen 0
+> > > > > > HCI Event: Command Complete (0x0e) plen 12
+> > > > >     Read Local Version Information (0x04|0x0001) ncmd 1
+> > > > >     status 0x00
+> > > > >     HCI Version: 1.2 (0x2) HCI Revision: 0x2006
+> > > > >     LMP Version: 1.2 (0x2) LMP Subversion: 0x1806
+> > > > >     Manufacturer: AVM Berlin (31)
+> > > > 
+> > > > Ok, so this is a 1.2 adapter.
+> > > > 
+> > > > > < HCI Command: Read Local Supported Commands (0x04|0x0002) plen 0
+> > > > > > HCI Event: Command Status (0x0f) plen 4
+> > > > >     Read Local Supported Commands (0x04|0x0002) status 0x01 ncmd 1
+> > > > >     Error: Unknown HCI Command
+> > > > 
+> > > > This is the reason why you're getting a timeout. Since the adapter
+> > > > claims to support Bluetooth version 1.2 it should also support this HCI
+> > > > command, so from that perspective it's not conforming to the
+> > > 
+> > > Apparently we check for "Bluetooth Core Specification 1.1" 
+> > > 
+> > > Shall we change to:
+> > > 
+> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > index f0fbb02..ed55b33 100644
+> > > --- a/net/bluetooth/hci_event.c
+> > > +++ b/net/bluetooth/hci_event.c
+> > > @@ -562,7 +562,7 @@ static void hci_setup(struct hci_dev *hdev)
+> > >  {
+> > >         hci_setup_event_mask(hdev);
+> > >  
+> > > -       if (hdev->lmp_ver > 1)
+> > > +       if (hdev->lmp_ver > 2)
+> > >                 hci_send_cmd(hdev, HCI_OP_READ_LOCAL_COMMANDS, 0, NULL);
+> > 
+> > 0x00 is 1.0b and 0x01 is 1.1. So you are changing the check from 1.2 to
+> > 2.0. The command was introduced with 1.2 actually.
+> > 
+> > The only real change that needs to be done here is to check hci_ver
+> > instead of lmp_ver. This command is a HCI feature and not a LMP feature
+> > actually.
+> 
+> That doesn't help much with this particular dongle though since the LMP
+> and HCI versions are the same. What I'd propose is the patch which I
+> already attached to an earlier email in this thread and then either a
+> quirk for this adapter or just generally ignoring the
+> HCI_Read_Local_Commands failure status.
+
+using lmp_ver instead of hci_ver is still a bug, but fair enough it is a
+different bug.
+
+I am fine just allowing Read_Local_Commands to fail. However that will
+serious limit some features since we have to be using the result more
+often in the future. But luckily that does not matter for 1.2 controller
+at all.
+
+Regards
+
+Marcel
+
 
