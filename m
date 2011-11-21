@@ -1,39 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Zheng, Wu" <wu.zheng@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 21 Nov 2011 16:43:54 +0800
-Subject: Problems for obex-0.42 (obex-client)
-Message-ID: <CE761E84DADF2947A4AF22FB8D97A4736EBDA617@shsmsx501.ccr.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <4ECA0E71.1000201@tieto.com>
+Date: Mon, 21 Nov 2011 09:40:17 +0100
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "kanak.gupta@stericsson.com" <kanak.gupta@stericsson.com>,
+	"ulrik.lauren@stericsson.com" <ulrik.lauren@stericsson.com>,
+	"henrik.possung@stericsson.com" <henrik.possung@stericsson.com>
+Subject: Re: [PATCH] Race condition between RFCOMM and L2CAP
+References: <1320844340-1966-1-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1320844340-1966-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi:
+Hi,
 
-We use the test script of obexd-0.42/test/ftp-client for testing ftp.
-Obex-0.41 is ok for the test. 
-However, for obex-0.42, We find the following issue:
+On 09.11.2011 14:12, Kaczmarek Andrzej wrote:
+> Hi,
+>
+> I recently came across race condition between RFCOMM and L2CAP.
+>
+> When new rfcomm_session is allocated inside rfcomm_session_create there is also
+> L2CAP channel connection started there (and ACL link implicitly). And it can
+> happen that actions are scheduled in a way that rfcomm_security_cfm is called
+> before newly created rfcomm_session finished initialization and still has
+> refcnt set to 0 (because it's not yet linked to rfcomm_dlc). If this happens,
+> session will be deleted on rfcomm_session_put and connection will fail:
+(...)
 
-obex-client[4144]: obex-client daemon 0.42
-obex-client[4144]: client/main.c:main() Entering main loop
-obex-client[4144]: client/session.c:session_ref() 0x9d80af8: ref=2
-obex-client[4144]: client/session.c:manager_reply() adapter path /org/bluez/345/hci0
-obex-client[4144]: manager replied with an error: org.bluez.Error.AgentNotAvailable, Agent Not Available
-obex-client[4144]: client/session.c:session_unref() 0x9d80af8: ref=1
-obex-client[4144]: client/session.c:owner_disconnected()
-obex-client[4144]: client/session.c:session_shutdown() 0x9d80af8
+Any comments here? This does happen for me with some devices and it's 
+quite easily reproducible.
 
-After checking the code of obexd-0.42 and obexd-0.41, we find that obexd-0.42 need to send dbus a message call to bluez for invoking RequestSession() 
-
-In the function of RequestSession() in the file of adapter.c, 
-	if (!adapter->agent)
-		return btd_error_agent_not_available(msg);
-
-The root cause is that obex-client did not register a agent for bluez, therefore, the error is " manager replied with an error: org.bluez.Error.AgentNotAvailable, Agent Not Available ".
-
-For the cases, I think that obex-client need to register a agent for bluez? Or the other idea?
-Someone has comments for it?
-
-Best regards
-Zheng wu
+BR,
+Andrzej
