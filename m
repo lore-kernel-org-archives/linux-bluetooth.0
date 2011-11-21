@@ -1,122 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAG5tN=XsnPsm7xWv=LgLeAUGEBfzspiQUYBgTqcEyXGMgeMYAg@mail.gmail.com>
-References: <CAG5tN=VUkkRz9UE72F_wHeypeBVnOUfVcrTeamLg6hERPL4Nyg@mail.gmail.com>
-	<CAG5tN=XsnPsm7xWv=LgLeAUGEBfzspiQUYBgTqcEyXGMgeMYAg@mail.gmail.com>
-Date: Mon, 21 Nov 2011 13:21:12 +0200
-Message-ID: <CABBYNZKOw4fkKamx0sYqm-T9LuBJw8CmsXjapVkSKKUwtbFTgg@mail.gmail.com>
-Subject: Re: Problems connecting Logitech Bluetooth headset
+In-Reply-To: <1321871817-8498-2-git-send-email-bulislaw@linux.com>
+References: <1321871817-8498-1-git-send-email-bulislaw@linux.com>
+	<1321871817-8498-2-git-send-email-bulislaw@linux.com>
+Date: Mon, 21 Nov 2011 13:01:17 +0200
+Message-ID: <CABBYNZKfubASk0RrPCop83wwu=2bw8vWjtFjNV+1Oyy-rOxc8A@mail.gmail.com>
+Subject: Re: [PATCH obexd 2/2] client: Fix invalid write in get_buf_xfer_progress
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Luciana Souza <lucianamssouza@gmail.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luciana,
+Hi Bartosz,
 
-On Mon, Nov 21, 2011 at 12:44 PM, Luciana Souza
-<lucianamssouza@gmail.com> wrote:
-> Dear list,
+On Mon, Nov 21, 2011 at 12:36 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+> Segmentation fault occurred when there were no (NULL) params in
+> obc_session_get, but actual params were returned in response, as
+> corresponding structure is reused - but not created in the first place.
+> ---
+>  client/session.c  |    2 +-
+>  client/transfer.c |    2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 >
-> Does anyone have an idea of what could be the source of the problem I
-> described below?
+> diff --git a/client/session.c b/client/session.c
+> index f288ecd..e51faf1 100644
+> --- a/client/session.c
+> +++ b/client/session.c
+> @@ -1231,8 +1231,8 @@ int obc_session_get(struct obc_session *session, const char *type,
+>        if (session->obex == NULL)
+>                return -ENOTCONN;
 >
-> Thanks in advance!
-> Luciana
+> +       params = g_new0(struct obc_transfer_params, 1);
+>        if (apparam != NULL) {
+> -               params = g_new0(struct obc_transfer_params, 1);
+>                params->data = g_new(guint8, apparam_size);
+>                memcpy(params->data, apparam, apparam_size);
+>                params->size = apparam_size;
+> diff --git a/client/transfer.c b/client/transfer.c
+> index e072a42..8340cc3 100644
+> --- a/client/transfer.c
+> +++ b/client/transfer.c
+> @@ -536,7 +536,7 @@ int obc_transfer_get(struct obc_transfer *transfer, transfer_callback_t func,
+>                g_obex_packet_add_bytes(req, G_OBEX_HDR_TYPE, transfer->type,
+>                                                strlen(transfer->type) + 1);
 >
-> On Sun, Nov 20, 2011 at 8:04 PM, Luciana Souza <lucianamssouza@gmail.com> wrote:
->> Hello everyone,
->>
->> I hope someone can help me find out what could possibly be wrong with my system.
->>
->> I am trying to get my new Logitech bluetooth headset to work
->> http://www.logitech.com/en-ch/tablet-accessories/for-ipad/devices/8452
->>
->> I am facing several problems, to get it work.
->>
->> Some info:
->> moreira@WS-LSO3:~$ uname -a
->> Linux WS-LSO3 3.0.0-12-generic #20-Ubuntu SMP Fri Oct 7 14:56:25 UTC
->> 2011 x86_64 x86_64 x86_64 GNU/Linux
->> moreira@WS-LSO3:~$ lsb_release -a
->> No LSB modules are available.
->> Distributor ID:    Ubuntu
->> Description:    Ubuntu 11.10
->> Release:    11.10
->> Codename:    oneiric
->>
->> I have put the bluetoothd and the pulseaudio to verbose the output.
->> This is what I am getting after pairing:
->>
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]: audio/unix.c:server_cb()
->> Accepted new client connection on unix socket (fd=30)
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]: audio/unix.c:client_cb()
->> Audio API: BT_REQUEST <- BT_GET_CAPABILITIES
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]:
->> audio/unix.c:unix_ipc_sendmsg() Audio API: BT_RESPONSE ->
->> BT_GET_CAPABILITIES
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]: audio/unix.c:client_cb()
->> Audio API: BT_REQUEST <- BT_GET_CAPABILITIES
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]:
->> audio/unix.c:unix_ipc_sendmsg() Audio API: BT_RESPONSE ->
->> BT_GET_CAPABILITIES
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]: audio/unix.c:client_cb()
->> Audio API: BT_REQUEST <- BT_OPEN
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]:
->> audio/unix.c:handle_sco_open() open sco -
->> object=/org/bluez/3606/hci0/dev_00_0D_44_A5_8C_E2 source=ANY
->> destination=ANY lock=readwrite
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]:
->> audio/unix.c:unix_ipc_sendmsg() Audio API: BT_RESPONSE -> BT_OPEN
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]: audio/unix.c:client_cb()
->> Audio API: BT_REQUEST <- BT_SET_CONFIGURATION
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]:
->> audio/unix.c:unix_ipc_sendmsg() Audio API: BT_RESPONSE ->
->> BT_SET_CONFIGURATION
->> Nov 20 11:58:40 WS-LSO3 rtkit-daemon[1296]: Successfully made thread
->> 3628 of process 3301 (n/a) owned by '1000' RT at priority 5.
->> Nov 20 11:58:40 WS-LSO3 rtkit-daemon[1296]: Supervising 4 threads of 1
->> processes of 1 users.
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]: audio/unix.c:client_cb()
->> Audio API: BT_REQUEST <- BT_START_STREAM
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]:
->> audio/headset.c:headset_set_state() State changed
->> /org/bluez/3606/hci0/dev_00_0D_44_A5_8C_E2: HEADSET_STATE_CONNECTED ->
->> HEADSET_STATE_PLAY_IN_PROGRESS
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]: Operation not supported (95)
+> -       if (transfer->params != NULL)
+> +       if (transfer->params != NULL && transfer->params->size != 0)
+>                g_obex_packet_add_bytes(req, G_OBEX_HDR_APPARAM,
+>                                                transfer->params->data,
+>                                                transfer->params->size);
+> --
+> 1.7.4.1
+>
 
-I suspect this error above will cause PulseAudio to unload/remove the card.
-
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]: headset_resume_complete: resume failed
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]:
->> audio/unix.c:unix_ipc_error() sending error Input/output error(5)
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]:
->> audio/unix.c:unix_ipc_sendmsg() Audio API: BT_ERROR -> BT_START_STREAM
->> Nov 20 12:58:40 WS-LSO3 pulseaudio[3301]: [bluetooth]
->> module-bluetooth-device.c: Received error condition: Input/output
->> error
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]:
->> audio/headset.c:headset_set_state() State changed
->> /org/bluez/3606/hci0/dev_00_0D_44_A5_8C_E2:
->> HEADSET_STATE_PLAY_IN_PROGRESS -> HEADSET_STATE_CONNECTED
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]: audio/unix.c:client_cb()
->> Unix client disconnected (fd=30)
->> Nov 20 12:58:40 WS-LSO3 bluetoothd[3606]: audio/unix.c:client_free()
->> client_free(0x7f830f181120)
->>
->> Even though the headset is added to the list of paired items, it is
->> not possible to use it right away. This is probably because of the
->> "Operation not supported" error.
-
-Yep
-
->> Can anyone give me a hint of what I could possibly be doing wrong?
-
-It could be that your local adapter has some problem with SCO
-connections, so perhaps if you try another adapter? If that is not
-possible you can try running hcidump -X to see what is going on HCI
-level.
+After some offline discussion with Johan we think it is better to have
+this allocation completely on demand, so it means we should not
+allocate it before hand if the request doesn't have any apparam and
+then if the response has it then we allocate on get_buf_xfer_progress.
 
 -- 
 Luiz Augusto von Dentz
