@@ -1,32 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd] gobex: fix removing wrong id on transfer_free
-Date: Mon, 21 Nov 2011 13:59:51 +0200
-Message-Id: <1321876791-30239-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZKfubASk0RrPCop83wwu=2bw8vWjtFjNV+1Oyy-rOxc8A@mail.gmail.com>
+References: <1321871817-8498-1-git-send-email-bulislaw@linux.com>
+	<1321871817-8498-2-git-send-email-bulislaw@linux.com>
+	<CABBYNZKfubASk0RrPCop83wwu=2bw8vWjtFjNV+1Oyy-rOxc8A@mail.gmail.com>
+Date: Mon, 21 Nov 2011 12:32:03 +0100
+Message-ID: <CAPGrrxUqj+wvzs9dWtkeYuBMqfeVaZq6w=sK2FBdGuz2ZCWWkw@mail.gmail.com>
+Subject: Re: [PATCH obexd 2/2] client: Fix invalid write in get_buf_xfer_progress
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Mon, Nov 21, 2011 at 12:01 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Bartosz,
+>
+> On Mon, Nov 21, 2011 at 12:36 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+>> Segmentation fault occurred when there were no (NULL) params in
+>> obc_session_get, but actual params were returned in response, as
+>> corresponding structure is reused - but not created in the first place.
+>> ---
+>>  client/session.c  |    2 +-
+>>  client/transfer.c |    2 +-
+>>  2 files changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/client/session.c b/client/session.c
+>> index f288ecd..e51faf1 100644
+>> --- a/client/session.c
+>> +++ b/client/session.c
+>> @@ -1231,8 +1231,8 @@ int obc_session_get(struct obc_session *session, const char *type,
+>>        if (session->obex == NULL)
+>>                return -ENOTCONN;
+>>
+>> +       params = g_new0(struct obc_transfer_params, 1);
+>>        if (apparam != NULL) {
+>> -               params = g_new0(struct obc_transfer_params, 1);
+>>                params->data = g_new(guint8, apparam_size);
+>>                memcpy(params->data, apparam, apparam_size);
+>>                params->size = apparam_size;
+>> diff --git a/client/transfer.c b/client/transfer.c
+>> index e072a42..8340cc3 100644
+>> --- a/client/transfer.c
+>> +++ b/client/transfer.c
+>> @@ -536,7 +536,7 @@ int obc_transfer_get(struct obc_transfer *transfer, transfer_callback_t func,
+>>                g_obex_packet_add_bytes(req, G_OBEX_HDR_TYPE, transfer->type,
+>>                                                strlen(transfer->type) + 1);
+>>
+>> -       if (transfer->params != NULL)
+>> +       if (transfer->params != NULL && transfer->params->size != 0)
+>>                g_obex_packet_add_bytes(req, G_OBEX_HDR_APPARAM,
+>>                                                transfer->params->data,
+>>                                                transfer->params->size);
+>> --
+>> 1.7.4.1
+>>
+>
+> After some offline discussion with Johan we think it is better to have
+> this allocation completely on demand, so it means we should not
+> allocate it before hand if the request doesn't have any apparam and
+> then if the response has it then we allocate on get_buf_xfer_progress.
+>
+> --
+> Luiz Augusto von Dentz
+>
 
-If statement checks for get_id handle but was removing req_id.
----
- gobex/gobex-transfer.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Ok,
+I'll send patch later this day.
 
-diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-index 6d2f7af..f5222cd 100644
---- a/gobex/gobex-transfer.c
-+++ b/gobex/gobex-transfer.c
-@@ -67,7 +67,7 @@ static void transfer_free(struct transfer *transfer)
- 
- 	if (transfer->get_id > 0)
- 		g_obex_remove_request_function(transfer->obex,
--							transfer->req_id);
-+							transfer->get_id);
- 
- 	if (transfer->abort_id > 0)
- 		g_obex_remove_request_function(transfer->obex,
 -- 
-1.7.7.1
-
+Pozdrowienia - Cheers,
+Bartosz Szatkowski
