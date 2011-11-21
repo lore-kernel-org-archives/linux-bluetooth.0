@@ -1,31 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Nov 2011 13:58:25 -0200
+Date: Mon, 21 Nov 2011 13:52:55 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH-v4 2/9] Bluetooth: User Pairing Response restructuring
-Message-ID: <20111121155825.GE2552@joana>
-References: <1321480400-17397-1-git-send-email-bgix@codeaurora.org>
- <1321480400-17397-3-git-send-email-bgix@codeaurora.org>
+To: Bing Zhao <bzhao@marvell.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
+	Frank Huang <frankh@marvell.com>
+Subject: Re: [PATCH] Bluetooth: btmrvl: support Marvell Bluetooth device
+ SD8797
+Message-ID: <20111121155255.GD2552@joana>
+References: <1321504842-11199-1-git-send-email-bzhao@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321480400-17397-3-git-send-email-bgix@codeaurora.org>
+In-Reply-To: <1321504842-11199-1-git-send-email-bzhao@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+Hi Bing,
 
-* Brian Gix <bgix@codeaurora.org> [2011-11-16 13:53:13 -0800]:
+* Bing Zhao <bzhao@marvell.com> [2011-11-16 20:40:42 -0800]:
 
-> There are 4 possible User Responses to pairing requests,
-> and they all share the same checks and handling. This
-> restructures the handling of the two Confirm responses
-> in preperation for the second two.
+> The SD8797 firmware image is shared with mwifiex driver.
+> Whoever gets loaded first will be responsible for firmware
+> downloading.
 > 
-> Signed-off-by: Brian Gix <bgix@codeaurora.org>
+> Signed-off-by: Bing Zhao <bzhao@marvell.com>
+> Signed-off-by: Frank Huang <frankh@marvell.com>
 > ---
->  net/bluetooth/mgmt.c |   76 +++++++++++++++++++++++++++++++-------------------
->  1 files changed, 47 insertions(+), 29 deletions(-)
+>  drivers/bluetooth/Kconfig       |    6 +++---
+>  drivers/bluetooth/btmrvl_sdio.c |   15 +++++++++++++--
+>  2 files changed, 16 insertions(+), 5 deletions(-)
 
 Applied, thanks.
 
