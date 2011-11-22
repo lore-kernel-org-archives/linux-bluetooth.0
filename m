@@ -1,38 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Yao, Costa" <cqyao@qca.qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "padovan@profusion.mobi" <padovan@profusion.mobi>,
+Message-ID: <1321947673.2011.21.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: btusb: Add AR3006 in blacklist_table
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Yao, Costa" <cqyao@qca.qualcomm.com>
+Cc: "padovan@profusion.mobi" <padovan@profusion.mobi>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] Bluetooth: btusb: Add AR3006 in blacklist_table
-Date: Tue, 22 Nov 2011 07:47:06 +0000
-Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF41DB@nasanexd02b.na.qualcomm.com>
+Date: Tue, 22 Nov 2011 08:41:13 +0100
+In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF417E@nasanexd02b.na.qualcomm.com>
 References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF417E@nasanexd02b.na.qualcomm.com>
- <1321947673.2011.21.camel@aeonflux>
-In-Reply-To: <1321947673.2011.21.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hcmNl
-bCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddDQo+IFNlbnQ6IDIwMTHlubQx
-MeaciDIy5pelIDE1OjQxDQo+IFRvOiBZYW8sIENvc3RhDQo+IENjOiBwYWRvdmFuQHByb2Z1c2lv
-bi5tb2JpOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBb
-UEFUQ0hdIEJsdWV0b290aDogYnR1c2I6IEFkZCBBUjMwMDYgaW4gYmxhY2tsaXN0X3RhYmxlDQo+
-IA0KPiBIaSBDb3N0YSwNCj4gDQo+ID4gRnJvbSBjMjFlZWRlNWZhZmQ4MTFmZGY2YzEwMDY5M2Ew
-N2E2NGY2MjFkZGVhIE1vbiBTZXAgMTcgMDA6MDA6MDANCj4gMjAwMQ0KPiA+IEZyb206IENvc3Rh
-IFlhbyA8Y3F5YW9AcWNhLnF1YWxjb21tLmNvbT4NCj4gPiBEYXRlOiBGcmksIDE4IE5vdiAyMDEx
-IDE0OjA4OjU2ICswODAwDQo+ID4gU3ViamVjdDogW1BBVENIXSBCbHVldG9vdGg6IGJ0dXNiOiBB
-ZGQgQVIzMDA2IGluIGJsYWNrbGlzdF90YWJsZS4NCj4gDQo+IHdoeSBkbyB3ZSBoYXZlIHRoaXMg
-dHdpY2UgaGVyZS4gUGxlYXNlIGZpeCB5b3VyIG1haWwgc3lzdGVtLiBJdCBpcyBub3QgR3VzdGF2
-bydzDQo+IGpvYiB0byBmaXggdXAgeW91ciBlbWFpbHMuDQo+IA0KPiA+IEFkZCBBUjMwMDYgZW50
-cnkgaW4gYmxhY2tsaXN0X3RhYmxlIGluIGJ0dXNiLmMgZm9yIGJjZERldmljZSBjaGVjay4NCj4g
-PiBUaGVuIGF0aDNrLmMgaGFzIHRoZSBjaGFuY2UgdG8gZG93bmxvYWQgZmlybXdhcmUgYW5kIHJl
-c2V0IGhhcmR3YXJlLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogQ29zdGEgWWFvIDxjcXlhb0Bx
-Y2EucXVhbGNvbW0uY29tPg0KPiANCj4gQW5kIGFzIEkgc2FpZCBvbmNlIEkgYWNrZWQgaXQgeW91
-IGNhbiBjYXJyeSB0aGF0IGFjayBhcm91bmQuIFlvdSBhcmUgbWFraW5nIHRoZQ0KPiBsaWZlIG9m
-IHRoZSBtYWludGFpbmVycyBleHRyYSBoYXJkIGhlcmUuDQo+IA0KU29ycnkuDQpQYWRvdmFuIGhh
-cyBzZW50IGEgZS1tYWlsIHRvIG1lLCBzYWlkIHRoYXQgdGhlIHBhdGNoIGJlZm9yZSB3YXMgbm90
-IGZvcm1hdHRlZCBwcm9wZXJseS4NClNvIEkgcmVjcmVhdGVkIHRoaXMgcGF0Y2guDQogDQo+IEFj
-a2VkLWJ5OiBNYXJjZWwgSG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5vcmc+DQo+IA0KPiBSZWdh
-cmRzDQo+IA0KPiBNYXJjZWwNCj4gDQpCZXN0IHdpc2hlcywNCkNvc3RhIFlhbw0K
+Hi Costa,
+
+> From c21eede5fafd811fdf6c100693a07a64f621ddea Mon Sep 17 00:00:00 2001
+> From: Costa Yao <cqyao@qca.qualcomm.com>
+> Date: Fri, 18 Nov 2011 14:08:56 +0800
+> Subject: [PATCH] Bluetooth: btusb: Add AR3006 in blacklist_table.
+
+why do we have this twice here. Please fix your mail system. It is not
+Gustavo's job to fix up your emails.
+
+> Add AR3006 entry in blacklist_table in btusb.c for bcdDevice check.
+> Then ath3k.c has the chance to download firmware and reset hardware.
+> 
+> Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
+
+And as I said once I acked it you can carry that ack around. You are
+making the life of the maintainers extra hard here.
+
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
+
+
