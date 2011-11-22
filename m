@@ -1,34 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Correct version check in hci_setup
-Date: Wed, 23 Nov 2011 11:23:34 +0200
-Message-Id: <1322040215-640-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 22 Nov 2011 23:58:22 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Don't set LE flags in mgmt_start_discovery()
+Message-ID: <20111122215822.GA23550@fusion.localdomain>
+References: <1321991470-2201-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1321991470-2201-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andre,
 
-Check for hci_ver instead of lmp_ver
+On Tue, Nov 22, 2011, Andre Guedes wrote:
+> Since LE based discovery procedures are not yet supported, we should
+> not set the LE flags in mgmt_start_discovery(). Otherwise, we might
+> get an error from management interface.
+> ---
+>  plugins/mgmtops.c |    2 --
+>  1 files changed, 0 insertions(+), 2 deletions(-)
+> 
+> diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+> index b9e9ad6..d28f89c 100644
+> --- a/plugins/mgmtops.c
+> +++ b/plugins/mgmtops.c
+> @@ -1689,8 +1689,6 @@ static int mgmt_start_discovery(int index)
+>  	hdr->index = htobs(index);
+>  
+>  	hci_set_bit(MGMT_ADDR_BREDR, &cp->type);
+> -	hci_set_bit(MGMT_ADDR_LE_PUBLIC, &cp->type);
+> -	hci_set_bit(MGMT_ADDR_LE_RANDOM, &cp->type);
+>  
+>  	if (write(mgmt_sock, buf, sizeof(buf)) < 0)
+>  		return -errno;
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/hci_event.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Since setting these bits is what user space needs to do anyway in the
+long run I don't thing it's worth to remove them temporarily. Instead
+I'd just make the kernel modifications initially so that an error is
+only triggered of MGMT_ADDR_BREDR isn't set and in other cases just do
+normal BR/EDR discovery (and ignore the LE bits).
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index dfe6fbc..7da7ef6 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -562,7 +562,7 @@ static void hci_setup(struct hci_dev *hdev)
- {
- 	hci_setup_event_mask(hdev);
- 
--	if (hdev->lmp_ver > 1)
-+	if (hdev->hci_ver > 1)
- 		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_COMMANDS, 0, NULL);
- 
- 	if (hdev->features[6] & LMP_SIMPLE_PAIR) {
--- 
-1.7.4.1
-
+Johan
