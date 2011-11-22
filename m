@@ -1,78 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Yao, Costa" <cqyao@qca.qualcomm.com>
-To: Gustavo Padovan <padovan@profusion.mobi>
-CC: Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] Bluetooth: btusb: Add Qualcomm Atheros AR3006 in
- blacklist_table
-Date: Tue, 22 Nov 2011 02:43:31 +0000
-Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF416D@nasanexd02b.na.qualcomm.com>
-References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3A49@nasanexd02b.na.qualcomm.com>
- <1321450153.15441.548.camel@aeonflux>
- <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3C48@nasanexd02b.na.qualcomm.com>
- <1321545089.15441.572.camel@aeonflux>
- <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3D67@nasanexd02b.na.qualcomm.com>
- <1321593478.15441.578.camel@aeonflux>
- <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3DD8@nasanexd02b.na.qualcomm.com>
- <20111121161620.GG2552@joana>
-In-Reply-To: <20111121161620.GG2552@joana>
-Content-Type: text/plain; charset="gb2312"
-MIME-Version: 1.0
+From: Cong Wang <amwang@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: akpm@linux-foundation.org, Marcel Holtmann <marcel@holtmann.org>,
+        "Gustavo F. Padovan" <padovan@profusion.mobi>,
+        WANG Cong <amwang@redhat.com>, linux-bluetooth@vger.kernel.org
+Subject: [Patch] btusb: fix a memory leak in btusb_send_frame()
+Date: Tue, 22 Nov 2011 09:32:57 +0800
+Message-Id: <1321925578-5407-1-git-send-email-amwang@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgUGFkb3ZhbiwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBHdXN0
-YXZvIEYuIFBhZG92YW4gW21haWx0bzpwYW9AcHJvZnVzaW9uLm1vYmldIE9uIEJlaGFsZiBPZiBH
-dXN0YXZvDQo+IFBhZG92YW4NCj4gU2VudDogMjAxMcTqMTHUwjIyyNUgMDoxNg0KPiBUbzogWWFv
-LCBDb3N0YQ0KPiBDYzogTWFyY2VsIEhvbHRtYW5uOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJu
-ZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0hdIEJsdWV0b290aDogYnR1c2I6IEFkZCBRdWFs
-Y29tbSBBdGhlcm9zIEFSMzAwNiBpbg0KPiBibGFja2xpc3RfdGFibGUNCj4gDQo+IEhpIENvc3Rh
-LA0KPiANCj4gKiBZYW8sIENvc3RhIDxjcXlhb0BxY2EucXVhbGNvbW0uY29tPiBbMjAxMS0xMS0x
-OCAwNjoxNToyNiArMDAwMF06DQo+IA0KPiA+IEFkZCBBUjMwMDYgZW50cnkgaW4gYmxhY2tsaXN0
-X3RhYmxlIGluIGJ0dXNiLmMgZm9yIGJjZERldmljZSBjaGVjay4NCj4gPiBUaGVuIGF0aDNrLmMg
-aGFzIHRoZSBjaGFuY2UgdG8gZG93bmxvYWQgZmlybXdhcmUgYW5kIHJlc2V0IGhhcmR3YXJlLg0K
-PiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogQ29zdGEgWWFvIDxjcXlhb0BxY2EucXVhbGNvbW0uY29t
-Pg0KPiA+IC0tLQ0KPiA+ICBkcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIHwgICAgNyArKysrLS0t
-DQo+ID4gIDEgZmlsZXMgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQ0K
-PiA+DQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgYi9kcml2ZXJz
-L2JsdWV0b290aC9idHVzYi5jDQo+ID4gaW5kZXggMzlkZDY1Yy4uNGJhNGZkZiAxMDA2NDQNCj4g
-PiAtLS0gYS9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+ID4gKysrIGIvZHJpdmVycy9ibHVl
-dG9vdGgvYnR1c2IuYw0KPiA+IEBAIC01NCw3ICs1NCw3IEBAIHN0YXRpYyBzdHJ1Y3QgdXNiX2Ry
-aXZlciBidHVzYl9kcml2ZXI7DQo+ID4gICNkZWZpbmUgQlRVU0JfQkNNOTIwMzUJCTB4MTANCj4g
-PiAgI2RlZmluZSBCVFVTQl9CUk9LRU5fSVNPQwkweDIwDQo+ID4gICNkZWZpbmUgQlRVU0JfV1JP
-TkdfU0NPX01UVQkweDQwDQo+ID4gLSNkZWZpbmUgQlRVU0JfQVRIMzAxMgkJMHg4MA0KPiA+ICsj
-ZGVmaW5lIEJUVVNCX0FUSDNLCQkJMHg4MA0KPiA+DQo+ID4gIHN0YXRpYyBzdHJ1Y3QgdXNiX2Rl
-dmljZV9pZCBidHVzYl90YWJsZVtdID0gew0KPiA+ICAJLyogQmx1ZXRvb3RoIFVTQiBpbnRlcmZh
-Y2UgKi8NCj4gPiBAQCAtMTI0LDcgKzEyNCw4IEBAIHN0YXRpYyBzdHJ1Y3QgdXNiX2RldmljZV9p
-ZCBibGFja2xpc3RfdGFibGVbXSA9IHsNCj4gPiAgCXsgVVNCX0RFVklDRSgweDAzZjAsIDB4MzEx
-ZCksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0lHTk9SRSB9LA0KPiA+DQo+ID4gIAkvKiBBdGhlcm9z
-IDMwMTIgd2l0aCBzZmxhc2ggZmlybXdhcmUgKi8NCj4gPiAtCXsgVVNCX0RFVklDRSgweDBjZjMs
-IDB4MzAwNCksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0FUSDMwMTIgfSwNCj4gPiArCXsgVVNCX0RF
-VklDRSgweDBjZjMsIDB4MzAwNCksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0FUSDNLIH0sDQo+ID4g
-Kwl7IFVTQl9ERVZJQ0UoMHgwY2YzLCAweDMwMDYpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9BVEgz
-SyB9LA0KPiA+DQo+ID4gIAkvKiBBdGhlcm9zIEFSNUJCVTEyIHdpdGggc2ZsYXNoIGZpcm13YXJl
-ICovDQo+ID4gIAl7IFVTQl9ERVZJQ0UoMHgwNDg5LCAweGUwMmMpLCAuZHJpdmVyX2luZm8gPSBC
-VFVTQl9JR05PUkUgfSwgQEANCj4gPiAtOTM3LDcgKzkzOCw3IEBAIHN0YXRpYyBpbnQgYnR1c2Jf
-cHJvYmUoc3RydWN0IHVzYl9pbnRlcmZhY2UgKmludGYsDQo+ID4gIAlpZiAoaWdub3JlX3NuaWZm
-ZXIgJiYgaWQtPmRyaXZlcl9pbmZvICYgQlRVU0JfU05JRkZFUikNCj4gPiAgCQlyZXR1cm4gLUVO
-T0RFVjsNCj4gPg0KPiA+IC0JaWYgKGlkLT5kcml2ZXJfaW5mbyAmIEJUVVNCX0FUSDMwMTIpIHsN
-Cj4gPiArCWlmIChpZC0+ZHJpdmVyX2luZm8gJiBCVFVTQl9BVEgzSykgew0KPiA+ICAJCXN0cnVj
-dCB1c2JfZGV2aWNlICp1ZGV2ID0gaW50ZXJmYWNlX3RvX3VzYmRldihpbnRmKTsNCj4gPg0KPiA+
-ICAJCS8qIE9sZCBmaXJtd2FyZSB3b3VsZCBvdGhlcndpc2UgbGV0IGF0aDNrIGRyaXZlciBsb2Fk
-DQo+IA0KPiANCj4gUGF0Y2ggZG9lcyBub3QgYXBwbHksIHBsZWFzZSBzZW5kIGEgcHJvcGVyIGFu
-ZCBjbGVhbiBnaXQgZm9ybWF0dGVkIHBhdGNoLiBZb3UNCj4gY2FuIHRlc3QgaWYgaXQgYXBwbGll
-cyB3aXRoIGdpdCBhbS4NCkkgdXNlZCBjaGVja3BhdGNoLnBsIHNjcmlwdCB0byBjaGVjayB0aGUg
-cGF0Y2ggZmlsZXMgc2VudCB0byB5b3UgYWxsLCB0aGUgcmVzdWx0IHdhcyBvay4NCkNvdWxkIHlv
-dSBwbGVhc2UgdGVsbCBtZSBhcmUgdGhlcmUgc29tZSBvdGhlciB0b29scyB0byBjaGVjayB0aGUg
-cGF0Y2ggZmlsZXM/DQoNCj4gYXBwbHlpbmc6IFJFOiBbUEFUQ0hdIEJsdWV0b290aDogYnR1c2I6
-IEFkZCBRdWFsY29tbSBBdGhlcm9zIEFSMzAwNiBpbg0KPiBibGFja2xpc3RfdGFibGUNCj4gL2hv
-bWUvcGFkb3Zhbi9wL2xpbnV4LXRyZWVzL2JsdWV0b290aC8uZ2l0L3JlYmFzZS1hcHBseS9wYXRj
-aDoxNDogdHJhaWxpbmcNCj4gd2hpdGVzcGFjZS4NCj4gI2RlZmluZSBCVFVTQl9BVEgzSyAgICAg
-ICAgICAgICAgICAgICAgIDB4ODANCj4gL2hvbWUvcGFkb3Zhbi9wL2xpbnV4LXRyZWVzL2JsdWV0
-b290aC8uZ2l0L3JlYmFzZS1hcHBseS9wYXRjaDoyMzogdHJhaWxpbmcNCj4gd2hpdGVzcGFjZS4N
-Cj4gICAgICAgICB7IFVTQl9ERVZJQ0UoMHgwY2YzLCAweDMwMDQpLCAuZHJpdmVyX2luZm8gPSBC
-VFVTQl9BVEgzSyB9LA0KPiAvaG9tZS9wYWRvdmFuL3AvbGludXgtdHJlZXMvYmx1ZXRvb3RoLy5n
-aXQvcmViYXNlLWFwcGx5L3BhdGNoOjI0OiB0cmFpbGluZw0KPiB3aGl0ZXNwYWNlLg0KPiAgICAg
-ICAgIHsgVVNCX0RFVklDRSgweDBjZjMsIDB4MzAwNiksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0FU
-SDNLIH0sDQo+IC9ob21lL3BhZG92YW4vcC9saW51eC10cmVlcy9ibHVldG9vdGgvLmdpdC9yZWJh
-c2UtYXBwbHkvcGF0Y2g6MzM6IHRyYWlsaW5nDQo+IHdoaXRlc3BhY2UuDQo+ICAgICAgICAgaWYg
-KGlkLT5kcml2ZXJfaW5mbyAmIEJUVVNCX0FUSDNLKSB7DQo+IA0KPiANCj4gCUd1c3Rhdm8NCg==
+This patch fixes the following memory leak reported by kmemleak:
+
+unreferenced object 0xffff880060a53840 (size 192):
+  comm "softirq", pid 0, jiffies 4320571771 (age 1406.569s)
+  hex dump (first 32 bytes):
+    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff81138a1c>] create_object+0x187/0x28b
+    [<ffffffff814be12e>] kmemleak_alloc+0x73/0x98
+    [<ffffffff811289d3>] __kmalloc+0xfc/0x123
+    [<ffffffff81386546>] usb_alloc_urb+0x1e/0x48
+    [<ffffffffa0130274>] btusb_send_frame+0x86/0x385 [btusb]
+    [<ffffffffa02d8230>] hci_send_frame+0xa0/0xa5 [bluetooth]
+    [<ffffffffa02d8a4e>] hci_cmd_task+0xa0/0xfb [bluetooth]
+    [<ffffffff81058548>] tasklet_action+0x8f/0xef
+    [<ffffffff81058a4c>] __do_softirq+0xf4/0x1db
+    [<ffffffff81058bb7>] run_ksoftirqd+0x84/0x129
+    [<ffffffff8106f1c4>] kthread+0xa0/0xa8
+    [<ffffffff814dd144>] kernel_thread_helper+0x4/0x10
+    [<ffffffffffffffff>] 0xffffffffffffffff
+
+The problem is that when inc_tx() returns non-zero, we forgot
+to call usb_free_urb().
+
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Signed-off-by: WANG Cong <amwang@redhat.com>
+
+---
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index fe4ebc3..eabc437 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -777,9 +777,8 @@ skip_waking:
+ 		usb_mark_last_busy(data->udev);
+ 	}
+ 
+-	usb_free_urb(urb);
+-
+ done:
++	usb_free_urb(urb);
+ 	return err;
+ }
+ 
