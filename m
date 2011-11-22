@@ -1,45 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 22 Nov 2011 23:58:22 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Don't set LE flags in mgmt_start_discovery()
-Message-ID: <20111122215822.GA23550@fusion.localdomain>
-References: <1321991470-2201-1-git-send-email-andre.guedes@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321991470-2201-1-git-send-email-andre.guedes@openbossa.org>
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Add BT_DBG to mgmt_discovering()
+Date: Tue, 22 Nov 2011 17:14:19 -0300
+Message-Id: <1321992859-12473-3-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1321992859-12473-1-git-send-email-andre.guedes@openbossa.org>
+References: <1321992859-12473-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ net/bluetooth/mgmt.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-On Tue, Nov 22, 2011, Andre Guedes wrote:
-> Since LE based discovery procedures are not yet supported, we should
-> not set the LE flags in mgmt_start_discovery(). Otherwise, we might
-> get an error from management interface.
-> ---
->  plugins/mgmtops.c |    2 --
->  1 files changed, 0 insertions(+), 2 deletions(-)
-> 
-> diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-> index b9e9ad6..d28f89c 100644
-> --- a/plugins/mgmtops.c
-> +++ b/plugins/mgmtops.c
-> @@ -1689,8 +1689,6 @@ static int mgmt_start_discovery(int index)
->  	hdr->index = htobs(index);
->  
->  	hci_set_bit(MGMT_ADDR_BREDR, &cp->type);
-> -	hci_set_bit(MGMT_ADDR_LE_PUBLIC, &cp->type);
-> -	hci_set_bit(MGMT_ADDR_LE_RANDOM, &cp->type);
->  
->  	if (write(mgmt_sock, buf, sizeof(buf)) < 0)
->  		return -errno;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index f615a5a..19503f9 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2680,6 +2680,8 @@ int mgmt_discovering(struct hci_dev *hdev, u8 discovering)
+ {
+ 	struct pending_cmd *cmd;
+ 
++	BT_DBG("%s discovering %u", hdev->name, discovering);
++
+ 	if (discovering)
+ 		cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
+ 	else
+-- 
+1.7.7.1
 
-Since setting these bits is what user space needs to do anyway in the
-long run I don't thing it's worth to remove them temporarily. Instead
-I'd just make the kernel modifications initially so that an error is
-only triggered of MGMT_ADDR_BREDR isn't set and in other cases just do
-normal BR/EDR discovery (and ignore the LE bits).
-
-Johan
