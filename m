@@ -1,18 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
+From: Bartosz Szatkowski <bulislaw@linux.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Health Thermometer Profile patches
-Date: Tue, 22 Nov 2011 15:49:42 +0100
-Message-Id: <1321973388-16300-1-git-send-email-sancane@gmail.com>
+Cc: Bartosz Szatkowski <bulislaw@linux.com>
+Subject: [PATCH obexd 4/4] Add simple helper for MAP client
+Date: Tue, 22 Nov 2011 15:46:38 +0100
+Message-Id: <1321973198-23091-4-git-send-email-bulislaw@linux.com>
+In-Reply-To: <1321973198-23091-1-git-send-email-bulislaw@linux.com>
+References: <1321973198-23091-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a new set of patches wich implement most of the features in
-HTP. GATT reconnections are the only missing feature up to now.
+---
+ test/map-client |   52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 52 insertions(+), 0 deletions(-)
+ create mode 100755 test/map-client
 
-[PATCH 1/6] Implement SetProperty D-Bus method
-[PATCH 2/6] Confiure C.C.C descriptor during the thermometer configuration
-[PATCH 3/6] Process measurements interval indication
-[PATCH 4/6] Fix possible null pointer deference
-[PATCH 5/6] Fix access to an invalid memory sector if time stamp is supported
-[PATCH 6/6] Use system types instead of GLIB ones.
+diff --git a/test/map-client b/test/map-client
+new file mode 100755
+index 0000000..450ad3e
+--- /dev/null
++++ b/test/map-client
+@@ -0,0 +1,52 @@
++#!/usr/bin/python
++
++import gobject
++
++import dbus
++import dbus.mainloop.glib
++from optparse import OptionParser
++
++def parse_options():
++    parser.add_option("-d", "--device", dest="device",
++                      help="Device to connect", metavar="DEVICE")
++    parser.add_option("-c", "--chdir", dest="new_dir",
++                      help="Change current directory to DIR", metavar="DIR")
++    parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
++
++    return parser.parse_args()
++
++def set_folder(session, new_dir):
++    for node in new_dir.split("/"):
++        session.SetFolder(node)
++
++if  __name__ == '__main__':
++
++    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++
++    parser = OptionParser()
++
++    (options, args) = parse_options()
++
++    if not options.device:
++        parser.print_help()
++        exit(0)
++
++    bus = dbus.SessionBus()
++    mainloop = gobject.MainLoop()
++
++    client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
++                            "org.openobex.Client")
++
++    session_path = client.CreateSession({ "Destination": options.device,
++                                          "Target": "map"})
++
++    session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
++                 "org.openobex.Session")
++
++    map = dbus.Interface(bus.get_object("org.openobex.client", session_path),
++                 "org.openobex.MessagesAccess")
++
++    if options.new_dir:
++        set_folder(map, options.new_dir)
++
++    mainloop.run()
+-- 
+1.7.4.1
+
