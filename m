@@ -1,63 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Yao, Costa" <cqyao@qca.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "padovan@profusion.mobi" <padovan@profusion.mobi>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] Bluetooth: btusb: Add AR3006 in blacklist_table
+Date: Tue, 22 Nov 2011 07:47:06 +0000
+Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF41DB@nasanexd02b.na.qualcomm.com>
+References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF417E@nasanexd02b.na.qualcomm.com>
+ <1321947673.2011.21.camel@aeonflux>
+In-Reply-To: <1321947673.2011.21.camel@aeonflux>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <4ECA7E29.6080909@bmw-carit.de>
-References: <4ECA7E29.6080909@bmw-carit.de>
-Date: Tue, 22 Nov 2011 11:24:45 +0200
-Message-ID: <CABBYNZJ38jvq+hicCwm+uJ1yL4R7J1eye=rmQYJdM-iBsXMLkw@mail.gmail.com>
-Subject: Re: Proposal for major API changes in obex-client
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
-
-On Mon, Nov 21, 2011 at 6:36 PM, Mikel Astiz <mikel.astiz@bmw-carit.de> wrote:
-> Hi all,
->
-> I would like to propose some changes in obex-client's D-Bus API, refactoring
-> parts of the existing API and rewriting others.
->
-> The main goals would be the following:
->
->    - Higher level representation of devices and sessions, following the
-> BlueZ style.
-
-Im fine with the representation of sessions, device representation may
-not be a bad idea but Im afraid this would not work very well for OPP
-since it doesn't require pairing the device may not exist so we have
-to support connecting by address anyway which defeats the purpose of
-having a device. On the other hand if we start creating devices for
-every device found that would solve the problem with OPP and we would
-be able to have e.g. Connect method per interface like we have in
-BlueZ.
-
->    - OPP operations wrapped into a specific session type, just like the
-> rest.
-
-It probably adds an extra round trip but it is much more clean that
-the current methods we have, and we can separate it from the core
-daemon and put it in a separate module.
-
->    - Transfer objects are created always, making the API more orthogonal.
-
-Yep
-
->    - Content of the pulled files is written to a file, avoiding dbus
-> overhead.
-
-Yep
-
->    - Removal of agent, since all requests are locally initiated.
-
-I guess it can be useful if someone wants to watch the progress of the
-transfers.
-
->    - Transfer progress reported using unicast signals to transfer initiator.
-
-Can be done, but I would like first to align the transfers with obexd.
-
--- 
-Luiz Augusto von Dentz
+SGkgTWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hcmNl
+bCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddDQo+IFNlbnQ6IDIwMTHlubQx
+MeaciDIy5pelIDE1OjQxDQo+IFRvOiBZYW8sIENvc3RhDQo+IENjOiBwYWRvdmFuQHByb2Z1c2lv
+bi5tb2JpOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBb
+UEFUQ0hdIEJsdWV0b290aDogYnR1c2I6IEFkZCBBUjMwMDYgaW4gYmxhY2tsaXN0X3RhYmxlDQo+
+IA0KPiBIaSBDb3N0YSwNCj4gDQo+ID4gRnJvbSBjMjFlZWRlNWZhZmQ4MTFmZGY2YzEwMDY5M2Ew
+N2E2NGY2MjFkZGVhIE1vbiBTZXAgMTcgMDA6MDA6MDANCj4gMjAwMQ0KPiA+IEZyb206IENvc3Rh
+IFlhbyA8Y3F5YW9AcWNhLnF1YWxjb21tLmNvbT4NCj4gPiBEYXRlOiBGcmksIDE4IE5vdiAyMDEx
+IDE0OjA4OjU2ICswODAwDQo+ID4gU3ViamVjdDogW1BBVENIXSBCbHVldG9vdGg6IGJ0dXNiOiBB
+ZGQgQVIzMDA2IGluIGJsYWNrbGlzdF90YWJsZS4NCj4gDQo+IHdoeSBkbyB3ZSBoYXZlIHRoaXMg
+dHdpY2UgaGVyZS4gUGxlYXNlIGZpeCB5b3VyIG1haWwgc3lzdGVtLiBJdCBpcyBub3QgR3VzdGF2
+bydzDQo+IGpvYiB0byBmaXggdXAgeW91ciBlbWFpbHMuDQo+IA0KPiA+IEFkZCBBUjMwMDYgZW50
+cnkgaW4gYmxhY2tsaXN0X3RhYmxlIGluIGJ0dXNiLmMgZm9yIGJjZERldmljZSBjaGVjay4NCj4g
+PiBUaGVuIGF0aDNrLmMgaGFzIHRoZSBjaGFuY2UgdG8gZG93bmxvYWQgZmlybXdhcmUgYW5kIHJl
+c2V0IGhhcmR3YXJlLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogQ29zdGEgWWFvIDxjcXlhb0Bx
+Y2EucXVhbGNvbW0uY29tPg0KPiANCj4gQW5kIGFzIEkgc2FpZCBvbmNlIEkgYWNrZWQgaXQgeW91
+IGNhbiBjYXJyeSB0aGF0IGFjayBhcm91bmQuIFlvdSBhcmUgbWFraW5nIHRoZQ0KPiBsaWZlIG9m
+IHRoZSBtYWludGFpbmVycyBleHRyYSBoYXJkIGhlcmUuDQo+IA0KU29ycnkuDQpQYWRvdmFuIGhh
+cyBzZW50IGEgZS1tYWlsIHRvIG1lLCBzYWlkIHRoYXQgdGhlIHBhdGNoIGJlZm9yZSB3YXMgbm90
+IGZvcm1hdHRlZCBwcm9wZXJseS4NClNvIEkgcmVjcmVhdGVkIHRoaXMgcGF0Y2guDQogDQo+IEFj
+a2VkLWJ5OiBNYXJjZWwgSG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5vcmc+DQo+IA0KPiBSZWdh
+cmRzDQo+IA0KPiBNYXJjZWwNCj4gDQpCZXN0IHdpc2hlcywNCkNvc3RhIFlhbw0K
