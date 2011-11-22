@@ -1,35 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1321947673.2011.21.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: btusb: Add AR3006 in blacklist_table
+Message-ID: <1321947516.2011.19.camel@aeonflux>
+Subject: Re: [Patch] btusb: fix a memory leak in btusb_send_frame()
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Yao, Costa" <cqyao@qca.qualcomm.com>
-Cc: "padovan@profusion.mobi" <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 22 Nov 2011 08:41:13 +0100
-In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF417E@nasanexd02b.na.qualcomm.com>
-References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF417E@nasanexd02b.na.qualcomm.com>
+To: Cong Wang <amwang@redhat.com>
+Cc: linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Date: Tue, 22 Nov 2011 08:38:36 +0100
+In-Reply-To: <1321925578-5407-1-git-send-email-amwang@redhat.com>
+References: <1321925578-5407-1-git-send-email-amwang@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Costa,
+Hi Cong,
 
-> From c21eede5fafd811fdf6c100693a07a64f621ddea Mon Sep 17 00:00:00 2001
-> From: Costa Yao <cqyao@qca.qualcomm.com>
-> Date: Fri, 18 Nov 2011 14:08:56 +0800
-> Subject: [PATCH] Bluetooth: btusb: Add AR3006 in blacklist_table.
-
-why do we have this twice here. Please fix your mail system. It is not
-Gustavo's job to fix up your emails.
-
-> Add AR3006 entry in blacklist_table in btusb.c for bcdDevice check.
-> Then ath3k.c has the chance to download firmware and reset hardware.
+> This patch fixes the following memory leak reported by kmemleak:
 > 
-> Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
-
-And as I said once I acked it you can carry that ack around. You are
-making the life of the maintainers extra hard here.
+> unreferenced object 0xffff880060a53840 (size 192):
+>   comm "softirq", pid 0, jiffies 4320571771 (age 1406.569s)
+>   hex dump (first 32 bytes):
+>     01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>   backtrace:
+>     [<ffffffff81138a1c>] create_object+0x187/0x28b
+>     [<ffffffff814be12e>] kmemleak_alloc+0x73/0x98
+>     [<ffffffff811289d3>] __kmalloc+0xfc/0x123
+>     [<ffffffff81386546>] usb_alloc_urb+0x1e/0x48
+>     [<ffffffffa0130274>] btusb_send_frame+0x86/0x385 [btusb]
+>     [<ffffffffa02d8230>] hci_send_frame+0xa0/0xa5 [bluetooth]
+>     [<ffffffffa02d8a4e>] hci_cmd_task+0xa0/0xfb [bluetooth]
+>     [<ffffffff81058548>] tasklet_action+0x8f/0xef
+>     [<ffffffff81058a4c>] __do_softirq+0xf4/0x1db
+>     [<ffffffff81058bb7>] run_ksoftirqd+0x84/0x129
+>     [<ffffffff8106f1c4>] kthread+0xa0/0xa8
+>     [<ffffffff814dd144>] kernel_thread_helper+0x4/0x10
+>     [<ffffffffffffffff>] 0xffffffffffffffff
+> 
+> The problem is that when inc_tx() returns non-zero, we forgot
+> to call usb_free_urb().
+> 
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
+> Signed-off-by: WANG Cong <amwang@redhat.com>
 
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
