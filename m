@@ -1,51 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4ECBE029.7060406@codeaurora.org>
-Date: Tue, 22 Nov 2011 09:47:21 -0800
-From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH-v4 6/9] Bluetooth: Cleanup blkcipher on SMP termination
-References: <1321480400-17397-1-git-send-email-bgix@codeaurora.org> <1321480400-17397-7-git-send-email-bgix@codeaurora.org> <20111121154829.GC2552@joana>
-In-Reply-To: <20111121154829.GC2552@joana>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <4ECBC6A0.7080006@linux.intel.com>
+References: <1321970484-10208-1-git-send-email-frederic.danis@linux.intel.com>
+	<20111122141502.GD15357@aemeltch-MOBL1>
+	<4ECBC6A0.7080006@linux.intel.com>
+Date: Tue, 22 Nov 2011 13:41:06 -0300
+Message-ID: <CAKT1EBdHj7E2stDSHT_P2F_O2-O43W6M5NwnPL+_d6ex_gm9nQ@mail.gmail.com>
+Subject: Re: [RFC 0/2] Add org.bluez.Telephony interface
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Frederic Danis <frederic.danis@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo
+Hi Frederic,
 
-On 11/21/2011 7:48 AM, Gustavo Padovan wrote:
-[...]
->>   void smp_chan_destroy(struct l2cap_conn *conn)
->>   {
->> -	kfree(conn->smp_chan);
->> +	struct smp_chan *smp = conn->smp_chan;
->> +
->> +	if (smp&&  !IS_ERR(smp->tfm))
->> +		crypto_free_blkcipher(smp->tfm);
+On Tue, Nov 22, 2011 at 12:58 PM, Frederic Danis
+<frederic.danis@linux.intel.com> wrote:
+> Hello Andrei,
 >
-> smp->tfm doesn't say what you want, if its allocation failed its value is
-> still 0. And I don't think we need to check for smp == NULL. It can't be null
-> at this point.
+> Le 22/11/2011 15:15, Andrei Emeltchenko a écrit :
+>>>
+>>> First patch add the new org.bluez.Telephony interface and remove
+>>> functions related to AT parsing from audio/headset.c.
+>>>
+>>> Second patch remove the telephony drivers (dummy, maemo5, maemo6
+>>
+>> is this really needed?
+>>
+>> Best regards
+>> Andrei Emeltchenko
+>>
 >
-> 	Gustavo
+> During latest BlueZ conf, it has been decided that telephony drivers should
+> be replaced by the telephony D-Bus interface for BlueZ 5.
 
-OK, so I see that smp_>tfm will never equal an Error, so that check is 
-meaningless.
+We will need also platform specific services/plugins to implement BLE
+GATT profiles. Phone Alert Status and Alert Notification need to get/set to
+platform specific information, such as incoming call, mute once, alert
+level, ...
 
-However, there are conditions where it can in fact be NULL, 
-particularily if the user aborts the paring process, and looking at the 
-blkcipher's FREE code, I am not confident that it couldn't get past the 
-"unlikely" NULL checks with all compilation parameters, so we should 
-keep at least a NULL check here.
+BT SIG designed BR/EDR and BLE GATT profiles avoiding(trying) features
+"overlap". However, from the development point of view the low layer will be
+shared by both. So, please keep the code flexible enough to be used by
+more than one profile.
 
-As far as NULL checking "smp", I think we can avoid it, but only if we 
-make sure that we clear the HCI_CONN_LE_SMP_PEND bit within the destroy 
-function itself.  A cursory look at the usage doesn't fill me with 
-confidence that the flag bit, and the allocation are rigorously kept in 
-sync.
-
--- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+BR,
+Claudio.
