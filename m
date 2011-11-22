@@ -1,60 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Yao, Costa" <cqyao@qca.qualcomm.com>
-To: "marcel@holtmann.org" <marcel@holtmann.org>,
-	"padovan@profusion.mobi" <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Bluetooth: btusb: Add AR3006 in blacklist_table
-Date: Tue, 22 Nov 2011 02:49:50 +0000
-Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF417E@nasanexd02b.na.qualcomm.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Gustavo Padovan <padovan@profusion.mobi>
+CC: Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] Bluetooth: btusb: Add Qualcomm Atheros AR3006 in
+ blacklist_table
+Date: Tue, 22 Nov 2011 02:43:31 +0000
+Message-ID: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF416D@nasanexd02b.na.qualcomm.com>
+References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3A49@nasanexd02b.na.qualcomm.com>
+ <1321450153.15441.548.camel@aeonflux>
+ <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3C48@nasanexd02b.na.qualcomm.com>
+ <1321545089.15441.572.camel@aeonflux>
+ <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3D67@nasanexd02b.na.qualcomm.com>
+ <1321593478.15441.578.camel@aeonflux>
+ <07BBB2AAB1A10A488A2AD166C7CB8B0DEF3DD8@nasanexd02b.na.qualcomm.com>
+ <20111121161620.GG2552@joana>
+In-Reply-To: <20111121161620.GG2552@joana>
+Content-Type: text/plain; charset="gb2312"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From c21eede5fafd811fdf6c100693a07a64f621ddea Mon Sep 17 00:00:00 2001
-From: Costa Yao <cqyao@qca.qualcomm.com>
-Date: Fri, 18 Nov 2011 14:08:56 +0800
-Subject: [PATCH] Bluetooth: btusb: Add AR3006 in blacklist_table.
-
-Add AR3006 entry in blacklist_table in btusb.c for bcdDevice check.
-Then ath3k.c has the chance to download firmware and reset hardware.
-
-Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
----
- drivers/bluetooth/btusb.c |    7 ++++---
- 1 files changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 39dd65c..4ba4fdf 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -54,7 +54,7 @@ static struct usb_driver btusb_driver;
- #define BTUSB_BCM92035		0x10
- #define BTUSB_BROKEN_ISOC	0x20
- #define BTUSB_WRONG_SCO_MTU	0x40
--#define BTUSB_ATH3012		0x80
-+#define BTUSB_ATH3K			0x80
- 
- static struct usb_device_id btusb_table[] = {
- 	/* Bluetooth USB interface */
-@@ -124,7 +124,8 @@ static struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
- 
- 	/* Atheros 3012 with sflash firmware */
--	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3K },
-+	{ USB_DEVICE(0x0cf3, 0x3006), .driver_info = BTUSB_ATH3K },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
-@@ -937,7 +938,7 @@ static int btusb_probe(struct usb_interface *intf,
- 	if (ignore_sniffer && id->driver_info & BTUSB_SNIFFER)
- 		return -ENODEV;
- 
--	if (id->driver_info & BTUSB_ATH3012) {
-+	if (id->driver_info & BTUSB_ATH3K) {
- 		struct usb_device *udev = interface_to_usbdev(intf);
- 
- 		/* Old firmware would otherwise let ath3k driver load
--- 
-1.7.4.1
+SGkgUGFkb3ZhbiwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBHdXN0
+YXZvIEYuIFBhZG92YW4gW21haWx0bzpwYW9AcHJvZnVzaW9uLm1vYmldIE9uIEJlaGFsZiBPZiBH
+dXN0YXZvDQo+IFBhZG92YW4NCj4gU2VudDogMjAxMcTqMTHUwjIyyNUgMDoxNg0KPiBUbzogWWFv
+LCBDb3N0YQ0KPiBDYzogTWFyY2VsIEhvbHRtYW5uOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJu
+ZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0hdIEJsdWV0b290aDogYnR1c2I6IEFkZCBRdWFs
+Y29tbSBBdGhlcm9zIEFSMzAwNiBpbg0KPiBibGFja2xpc3RfdGFibGUNCj4gDQo+IEhpIENvc3Rh
+LA0KPiANCj4gKiBZYW8sIENvc3RhIDxjcXlhb0BxY2EucXVhbGNvbW0uY29tPiBbMjAxMS0xMS0x
+OCAwNjoxNToyNiArMDAwMF06DQo+IA0KPiA+IEFkZCBBUjMwMDYgZW50cnkgaW4gYmxhY2tsaXN0
+X3RhYmxlIGluIGJ0dXNiLmMgZm9yIGJjZERldmljZSBjaGVjay4NCj4gPiBUaGVuIGF0aDNrLmMg
+aGFzIHRoZSBjaGFuY2UgdG8gZG93bmxvYWQgZmlybXdhcmUgYW5kIHJlc2V0IGhhcmR3YXJlLg0K
+PiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogQ29zdGEgWWFvIDxjcXlhb0BxY2EucXVhbGNvbW0uY29t
+Pg0KPiA+IC0tLQ0KPiA+ICBkcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIHwgICAgNyArKysrLS0t
+DQo+ID4gIDEgZmlsZXMgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQ0K
+PiA+DQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgYi9kcml2ZXJz
+L2JsdWV0b290aC9idHVzYi5jDQo+ID4gaW5kZXggMzlkZDY1Yy4uNGJhNGZkZiAxMDA2NDQNCj4g
+PiAtLS0gYS9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+ID4gKysrIGIvZHJpdmVycy9ibHVl
+dG9vdGgvYnR1c2IuYw0KPiA+IEBAIC01NCw3ICs1NCw3IEBAIHN0YXRpYyBzdHJ1Y3QgdXNiX2Ry
+aXZlciBidHVzYl9kcml2ZXI7DQo+ID4gICNkZWZpbmUgQlRVU0JfQkNNOTIwMzUJCTB4MTANCj4g
+PiAgI2RlZmluZSBCVFVTQl9CUk9LRU5fSVNPQwkweDIwDQo+ID4gICNkZWZpbmUgQlRVU0JfV1JP
+TkdfU0NPX01UVQkweDQwDQo+ID4gLSNkZWZpbmUgQlRVU0JfQVRIMzAxMgkJMHg4MA0KPiA+ICsj
+ZGVmaW5lIEJUVVNCX0FUSDNLCQkJMHg4MA0KPiA+DQo+ID4gIHN0YXRpYyBzdHJ1Y3QgdXNiX2Rl
+dmljZV9pZCBidHVzYl90YWJsZVtdID0gew0KPiA+ICAJLyogQmx1ZXRvb3RoIFVTQiBpbnRlcmZh
+Y2UgKi8NCj4gPiBAQCAtMTI0LDcgKzEyNCw4IEBAIHN0YXRpYyBzdHJ1Y3QgdXNiX2RldmljZV9p
+ZCBibGFja2xpc3RfdGFibGVbXSA9IHsNCj4gPiAgCXsgVVNCX0RFVklDRSgweDAzZjAsIDB4MzEx
+ZCksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0lHTk9SRSB9LA0KPiA+DQo+ID4gIAkvKiBBdGhlcm9z
+IDMwMTIgd2l0aCBzZmxhc2ggZmlybXdhcmUgKi8NCj4gPiAtCXsgVVNCX0RFVklDRSgweDBjZjMs
+IDB4MzAwNCksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0FUSDMwMTIgfSwNCj4gPiArCXsgVVNCX0RF
+VklDRSgweDBjZjMsIDB4MzAwNCksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0FUSDNLIH0sDQo+ID4g
+Kwl7IFVTQl9ERVZJQ0UoMHgwY2YzLCAweDMwMDYpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9BVEgz
+SyB9LA0KPiA+DQo+ID4gIAkvKiBBdGhlcm9zIEFSNUJCVTEyIHdpdGggc2ZsYXNoIGZpcm13YXJl
+ICovDQo+ID4gIAl7IFVTQl9ERVZJQ0UoMHgwNDg5LCAweGUwMmMpLCAuZHJpdmVyX2luZm8gPSBC
+VFVTQl9JR05PUkUgfSwgQEANCj4gPiAtOTM3LDcgKzkzOCw3IEBAIHN0YXRpYyBpbnQgYnR1c2Jf
+cHJvYmUoc3RydWN0IHVzYl9pbnRlcmZhY2UgKmludGYsDQo+ID4gIAlpZiAoaWdub3JlX3NuaWZm
+ZXIgJiYgaWQtPmRyaXZlcl9pbmZvICYgQlRVU0JfU05JRkZFUikNCj4gPiAgCQlyZXR1cm4gLUVO
+T0RFVjsNCj4gPg0KPiA+IC0JaWYgKGlkLT5kcml2ZXJfaW5mbyAmIEJUVVNCX0FUSDMwMTIpIHsN
+Cj4gPiArCWlmIChpZC0+ZHJpdmVyX2luZm8gJiBCVFVTQl9BVEgzSykgew0KPiA+ICAJCXN0cnVj
+dCB1c2JfZGV2aWNlICp1ZGV2ID0gaW50ZXJmYWNlX3RvX3VzYmRldihpbnRmKTsNCj4gPg0KPiA+
+ICAJCS8qIE9sZCBmaXJtd2FyZSB3b3VsZCBvdGhlcndpc2UgbGV0IGF0aDNrIGRyaXZlciBsb2Fk
+DQo+IA0KPiANCj4gUGF0Y2ggZG9lcyBub3QgYXBwbHksIHBsZWFzZSBzZW5kIGEgcHJvcGVyIGFu
+ZCBjbGVhbiBnaXQgZm9ybWF0dGVkIHBhdGNoLiBZb3UNCj4gY2FuIHRlc3QgaWYgaXQgYXBwbGll
+cyB3aXRoIGdpdCBhbS4NCkkgdXNlZCBjaGVja3BhdGNoLnBsIHNjcmlwdCB0byBjaGVjayB0aGUg
+cGF0Y2ggZmlsZXMgc2VudCB0byB5b3UgYWxsLCB0aGUgcmVzdWx0IHdhcyBvay4NCkNvdWxkIHlv
+dSBwbGVhc2UgdGVsbCBtZSBhcmUgdGhlcmUgc29tZSBvdGhlciB0b29scyB0byBjaGVjayB0aGUg
+cGF0Y2ggZmlsZXM/DQoNCj4gYXBwbHlpbmc6IFJFOiBbUEFUQ0hdIEJsdWV0b290aDogYnR1c2I6
+IEFkZCBRdWFsY29tbSBBdGhlcm9zIEFSMzAwNiBpbg0KPiBibGFja2xpc3RfdGFibGUNCj4gL2hv
+bWUvcGFkb3Zhbi9wL2xpbnV4LXRyZWVzL2JsdWV0b290aC8uZ2l0L3JlYmFzZS1hcHBseS9wYXRj
+aDoxNDogdHJhaWxpbmcNCj4gd2hpdGVzcGFjZS4NCj4gI2RlZmluZSBCVFVTQl9BVEgzSyAgICAg
+ICAgICAgICAgICAgICAgIDB4ODANCj4gL2hvbWUvcGFkb3Zhbi9wL2xpbnV4LXRyZWVzL2JsdWV0
+b290aC8uZ2l0L3JlYmFzZS1hcHBseS9wYXRjaDoyMzogdHJhaWxpbmcNCj4gd2hpdGVzcGFjZS4N
+Cj4gICAgICAgICB7IFVTQl9ERVZJQ0UoMHgwY2YzLCAweDMwMDQpLCAuZHJpdmVyX2luZm8gPSBC
+VFVTQl9BVEgzSyB9LA0KPiAvaG9tZS9wYWRvdmFuL3AvbGludXgtdHJlZXMvYmx1ZXRvb3RoLy5n
+aXQvcmViYXNlLWFwcGx5L3BhdGNoOjI0OiB0cmFpbGluZw0KPiB3aGl0ZXNwYWNlLg0KPiAgICAg
+ICAgIHsgVVNCX0RFVklDRSgweDBjZjMsIDB4MzAwNiksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0FU
+SDNLIH0sDQo+IC9ob21lL3BhZG92YW4vcC9saW51eC10cmVlcy9ibHVldG9vdGgvLmdpdC9yZWJh
+c2UtYXBwbHkvcGF0Y2g6MzM6IHRyYWlsaW5nDQo+IHdoaXRlc3BhY2UuDQo+ICAgICAgICAgaWYg
+KGlkLT5kcml2ZXJfaW5mbyAmIEJUVVNCX0FUSDNLKSB7DQo+IA0KPiANCj4gCUd1c3Rhdm8NCg==
