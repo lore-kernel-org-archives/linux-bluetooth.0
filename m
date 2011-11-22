@@ -2,76 +2,108 @@ Return-Path: <cyrus@holtmann.org>
 From: Bartosz Szatkowski <bulislaw@linux.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH obexd 3/4] Add response handling for MAP client
-Date: Tue, 22 Nov 2011 15:46:37 +0100
-Message-Id: <1321973198-23091-3-git-send-email-bulislaw@linux.com>
+Subject: [PATCH obexd 2/4] Add support for SetFolder in MAP client
+Date: Tue, 22 Nov 2011 15:46:36 +0100
+Message-Id: <1321973198-23091-2-git-send-email-bulislaw@linux.com>
 In-Reply-To: <1321973198-23091-1-git-send-email-bulislaw@linux.com>
 References: <1321973198-23091-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- client/map.c |   33 +++++++++++++++++++++++++++++++++
- 1 files changed, 33 insertions(+), 0 deletions(-)
+ client/map.c       |   54 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ doc/client-api.txt |    5 +++-
+ 2 files changed, 58 insertions(+), 1 deletions(-)
 
 diff --git a/client/map.c b/client/map.c
-index 54ab9c0..4f3eb89 100644
+index 3c211da..54ab9c0 100644
 --- a/client/map.c
 +++ b/client/map.c
-@@ -50,13 +50,41 @@ struct map_data {
- 	DBusMessage *msg;
- };
+@@ -39,6 +39,9 @@
+ 	"\xBB\x58\x2B\x40\x42\x0C\x11\xDB\xB0\xDE\x08\x00\x20\x0C\x9A\x66"
+ #define OBEX_MAS_UUID_LEN 16
  
-+static struct error_code {
-+	const char *name;
-+	guint8 code;
-+} map_errors[] = {
-+	{"Success", G_OBEX_RSP_SUCCESS},
-+	{"Bad Request", G_OBEX_RSP_BAD_REQUEST},
-+	{"Not Implemented", G_OBEX_RSP_NOT_IMPLEMENTED},
-+	{"Service Unavailable", G_OBEX_RSP_SERVICE_UNAVAILABLE},
-+	{"Forbidden", G_OBEX_RSP_FORBIDDEN},
-+	{"Unauthorized", G_OBEX_RSP_UNAUTHORIZED},
-+	{"Precondition Failed", G_OBEX_RSP_PRECONDITION_FAILED},
-+	{"Not Acceptable", G_OBEX_RSP_NOT_ACCEPTABLE},
-+	{"Not Found", G_OBEX_RSP_NOT_FOUND},
-+	{ }
-+};
++#define ERROR_INF MAP_INTERFACE ".Error"
++#define ERROR_FAILED_PATH "org.openobex.Error.Failed"
 +
+ #define MAP_INTERFACE  "org.openobex.MessagesAccess"
+ #define MAS_UUID "00001132-0000-1000-8000-00805f9b34fb"
+ 
+@@ -49,7 +52,58 @@ struct map_data {
+ 
  static DBusConnection *conn = NULL;
  
-+static const char *get_error_string(guint8 err_code)
++static void simple_cb(GObex *obex, GError *err, GObexPacket *rsp,
++							gpointer user_data)
 +{
-+	struct error_code *error;
++	DBusMessage *reply;
++	struct map_data *map = user_data;
 +
-+	for (error = map_errors; error != NULL; error++)
-+		if (error->code == err_code)
-+			return error->name;
++	if (err != NULL) {
++		reply = g_dbus_create_error(map->msg,
++						ERROR_FAILED_PATH,
++						"%s", err->message);
++
++		g_error_free(err);
++	} else {
++		reply = dbus_message_new_method_return(map->msg);
++	}
++
++	g_dbus_send_message(conn, reply);
++	dbus_message_unref(map->msg);
++}
++
++static DBusMessage *map_setpath(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	struct map_data *map = user_data;
++	const char *folder;
++	GObex *obex;
++	GError *err = NULL;
++
++	if (dbus_message_get_args(message, NULL, DBUS_TYPE_STRING, &folder,
++						DBUS_TYPE_INVALID) == FALSE)
++		return g_dbus_create_error(message,
++					ERROR_INF ".InvalidArguments", NULL);
++
++	obex = obc_session_get_obex(map->session);
++
++	g_obex_setpath(obex, folder, simple_cb, map, &err);
++	if (err != NULL) {
++		DBusMessage *reply;
++		reply =  g_dbus_create_error(message,
++						ERROR_FAILED_PATH,
++						"%s", err->message);
++		g_error_free(err);
++		return reply;
++	}
++
++	map->msg = dbus_message_ref(message);
 +
 +	return NULL;
 +}
 +
- static void simple_cb(GObex *obex, GError *err, GObexPacket *rsp,
- 							gpointer user_data)
- {
- 	DBusMessage *reply;
- 	struct map_data *map = user_data;
-+	guint8 err_code = g_obex_packet_get_operation(rsp, NULL);
+ static GDBusMethodTable map_methods[] = {
++	{ "SetFolder",	"s",	"",	map_setpath, G_DBUS_METHOD_FLAG_ASYNC },
+ 	{ }
+ };
  
- 	if (err != NULL) {
- 		reply = g_dbus_create_error(map->msg,
-@@ -64,6 +92,11 @@ static void simple_cb(GObex *obex, GError *err, GObexPacket *rsp,
- 						"%s", err->message);
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index 7d419e3..38a3e35 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -258,7 +258,10 @@ Service		org.openobex.client
+ Interface	org.openobex.MessagesAccess
+ Object path	[variable prefix]/{session0,session1,...}
  
- 		g_error_free(err);
-+	} else if (err_code != G_OBEX_RSP_SUCCESS) {
-+		reply = g_dbus_create_error(map->msg,
-+					"org.openobex.Error.Response",
-+					"%s(0x%X)", get_error_string(err_code),
-+					err_code);
- 	} else {
- 		reply = dbus_message_new_method_return(map->msg);
- 	}
+-Methods
++Methods		void SetFolder(string name)
++
++			Set working directory for current session, *name* may
++			be the directory name or '..[/dir]'.
+ 
+ Transfer hierarchy
+ ==================
 -- 
 1.7.4.1
 
