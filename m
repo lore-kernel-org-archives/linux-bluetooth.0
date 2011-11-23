@@ -1,65 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4ECCC3C4.20509@linux.intel.com>
-Date: Wed, 23 Nov 2011 10:58:28 +0100
-From: Frederic Danis <frederic.danis@linux.intel.com>
-MIME-Version: 1.0
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 0/2] Add org.bluez.Telephony interface
-References: <1321970484-10208-1-git-send-email-frederic.danis@linux.intel.com>	<20111122141502.GD15357@aemeltch-MOBL1>	<4ECBC6A0.7080006@linux.intel.com> <CAKT1EBdHj7E2stDSHT_P2F_O2-O43W6M5NwnPL+_d6ex_gm9nQ@mail.gmail.com>
-In-Reply-To: <CAKT1EBdHj7E2stDSHT_P2F_O2-O43W6M5NwnPL+_d6ex_gm9nQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Remove magic bluetooth version numbers
+Date: Wed, 23 Nov 2011 11:23:35 +0200
+Message-Id: <1322040215-640-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1322040215-640-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1322040215-640-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Claudio,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Le 22/11/2011 17:41, Claudio Takahasi a écrit :
-> Hi Frederic,
->
-> On Tue, Nov 22, 2011 at 12:58 PM, Frederic Danis
-> <frederic.danis@linux.intel.com>  wrote:
->> Hello Andrei,
->>
->> Le 22/11/2011 15:15, Andrei Emeltchenko a écrit :
->>>>
->>>> First patch add the new org.bluez.Telephony interface and remove
->>>> functions related to AT parsing from audio/headset.c.
->>>>
->>>> Second patch remove the telephony drivers (dummy, maemo5, maemo6
->>>
->>> is this really needed?
->>>
->>> Best regards
->>> Andrei Emeltchenko
->>>
->>
->> During latest BlueZ conf, it has been decided that telephony drivers should
->> be replaced by the telephony D-Bus interface for BlueZ 5.
->
-> We will need also platform specific services/plugins to implement BLE
-> GATT profiles. Phone Alert Status and Alert Notification need to get/set to
-> platform specific information, such as incoming call, mute once, alert
-> level, ...
->
-> BT SIG designed BR/EDR and BLE GATT profiles avoiding(trying) features
-> "overlap". However, from the development point of view the low layer will be
-> shared by both. So, please keep the code flexible enough to be used by
-> more than one profile.
+Use bluetooth names instead of BT SIG assigned numbers
 
-The new telephony D-Bus interface is just in charge of performing SDP 
-publication and RFComm connection. All Telephony related code is managed 
-by the agent (i.e. oFono).
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/bluetooth.h |    5 +++++
+ net/bluetooth/hci_conn.c          |    2 +-
+ net/bluetooth/hci_event.c         |    6 +++---
+ 3 files changed, 9 insertions(+), 4 deletions(-)
 
-I take a look to the Phone Alert Status and Alert Notification and I 
-thought that this should be implemented in the agent, or in a BlueZ 
-service accessible by the agent through D-Bus.
-
-Regards
-
-Fred
-
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 38cd3da..98ea1b1 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -36,6 +36,11 @@
+ #define PF_BLUETOOTH	AF_BLUETOOTH
+ #endif
+ 
++/* Bluetooth versions */
++#define BLUETOOTH_VER_1_1	1
++#define BLUETOOTH_VER_1_2	2
++#define BLUETOOTH_VER_2_0_EDR	3
++
+ /* Reserv for core and drivers use */
+ #define BT_SKB_RESERVE	8
+ 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index de0b93e..b328ac6 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -123,7 +123,7 @@ static void hci_acl_connect_cancel(struct hci_conn *conn)
+ 
+ 	BT_DBG("%p", conn);
+ 
+-	if (conn->hdev->hci_ver < 2)
++	if (conn->hdev->hci_ver < BLUETOOTH_VER_1_2)
+ 		return;
+ 
+ 	bacpy(&cp.bdaddr, &conn->dst);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7da7ef6..7790108 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -498,7 +498,7 @@ static void hci_setup_event_mask(struct hci_dev *hdev)
+ 
+ 	/* CSR 1.1 dongles does not accept any bitfield so don't try to set
+ 	 * any event mask for pre 1.2 devices */
+-	if (hdev->lmp_ver <= 1)
++	if (hdev->lmp_ver <= BLUETOOTH_VER_1_1)
+ 		return;
+ 
+ 	events[4] |= 0x01; /* Flow Specification Complete */
+@@ -562,7 +562,7 @@ static void hci_setup(struct hci_dev *hdev)
+ {
+ 	hci_setup_event_mask(hdev);
+ 
+-	if (hdev->hci_ver > 1)
++	if (hdev->hci_ver > BLUETOOTH_VER_1_1)
+ 		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_COMMANDS, 0, NULL);
+ 
+ 	if (hdev->features[6] & LMP_SIMPLE_PAIR) {
+@@ -1499,7 +1499,7 @@ static inline void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+ 		}
+ 
+ 		/* Set packet type for incoming connection */
+-		if (!conn->out && hdev->hci_ver < 3) {
++		if (!conn->out && hdev->hci_ver < BLUETOOTH_VER_2_0_EDR) {
+ 			struct hci_cp_change_conn_ptype cp;
+ 			cp.handle = ev->handle;
+ 			cp.pkt_type = cpu_to_le16(conn->pkt_type);
 -- 
-Frederic Danis                            Open Source Technology Centre
-frederic.danis@intel.com                              Intel Corporation
+1.7.4.1
 
