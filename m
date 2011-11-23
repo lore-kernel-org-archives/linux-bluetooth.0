@@ -1,57 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 Nov 2011 10:03:56 +0000
-From: eran <eran@over-here.org>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Adding USB device 13d3:3375 (a bluetooth module embedded
- in the Asus UX31) as an Atheros AR3012 device.
-Message-ID: <20111123100356.GB9838@over-here.org>
+Message-ID: <4ECCC3C4.20509@linux.intel.com>
+Date: Wed, 23 Nov 2011 10:58:28 +0100
+From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 0/2] Add org.bluez.Telephony interface
+References: <1321970484-10208-1-git-send-email-frederic.danis@linux.intel.com>	<20111122141502.GD15357@aemeltch-MOBL1>	<4ECBC6A0.7080006@linux.intel.com> <CAKT1EBdHj7E2stDSHT_P2F_O2-O43W6M5NwnPL+_d6ex_gm9nQ@mail.gmail.com>
+In-Reply-To: <CAKT1EBdHj7E2stDSHT_P2F_O2-O43W6M5NwnPL+_d6ex_gm9nQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Eran <eran@over-here.org>
+Hello Claudio,
 
-The bluetooth module in the Asus UX31/UX21 is based on Atheros AR3012 and requires a firmware to be uploaded before it's usable.
+Le 22/11/2011 17:41, Claudio Takahasi a écrit :
+> Hi Frederic,
+>
+> On Tue, Nov 22, 2011 at 12:58 PM, Frederic Danis
+> <frederic.danis@linux.intel.com>  wrote:
+>> Hello Andrei,
+>>
+>> Le 22/11/2011 15:15, Andrei Emeltchenko a écrit :
+>>>>
+>>>> First patch add the new org.bluez.Telephony interface and remove
+>>>> functions related to AT parsing from audio/headset.c.
+>>>>
+>>>> Second patch remove the telephony drivers (dummy, maemo5, maemo6
+>>>
+>>> is this really needed?
+>>>
+>>> Best regards
+>>> Andrei Emeltchenko
+>>>
+>>
+>> During latest BlueZ conf, it has been decided that telephony drivers should
+>> be replaced by the telephony D-Bus interface for BlueZ 5.
+>
+> We will need also platform specific services/plugins to implement BLE
+> GATT profiles. Phone Alert Status and Alert Notification need to get/set to
+> platform specific information, such as incoming call, mute once, alert
+> level, ...
+>
+> BT SIG designed BR/EDR and BLE GATT profiles avoiding(trying) features
+> "overlap". However, from the development point of view the low layer will be
+> shared by both. So, please keep the code flexible enough to be used by
+> more than one profile.
 
-Signed-off-by: Eran <eran@over-here.org>
----
- drivers/bluetooth/ath3k.c |    2 ++
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 3 insertions(+), 0 deletions(-)
+The new telephony D-Bus interface is just in charge of performing SDP 
+publication and RFComm connection. All Telephony related code is managed 
+by the agent (i.e. oFono).
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 106beb1..b94aae6 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -70,6 +70,7 @@ static struct usb_device_id ath3k_table[] = {
- 
- 	/* Atheros AR3012 with sflash firmware*/
- 	{ USB_DEVICE(0x0CF3, 0x3004) },
-+	{ USB_DEVICE(0x13d3, 0x3375) },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -86,6 +87,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
- 
- 	/* Atheros AR3012 with sflash firmware*/
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 
- 	{ }	/* Terminating entry */
- };
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f9b7260..a64f15a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -122,6 +122,7 @@ static struct usb_device_id blacklist_table[] = {
- 
- 	/* Atheros 3012 with sflash firmware */
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+I take a look to the Phone Alert Status and Alert Notification and I 
+thought that this should be implemented in the agent, or in a BlueZ 
+service accessible by the agent through D-Bus.
+
+Regards
+
+Fred
+
 -- 
-1.7.2.5
+Frederic Danis                            Open Source Technology Centre
+frederic.danis@intel.com                              Intel Corporation
 
