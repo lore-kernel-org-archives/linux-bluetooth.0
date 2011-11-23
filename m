@@ -1,20 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 Nov 2011 16:17:04 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <c594ae0af9ab028cb1d6e273cc8ae35b560f6fbb.1322040739.git.timo.gienger@nokia.com>
+References: <c594ae0af9ab028cb1d6e273cc8ae35b560f6fbb.1322040739.git.timo.gienger@nokia.com>
+Date: Wed, 23 Nov 2011 16:14:01 +0200
+Message-ID: <CABBYNZLWg0M7L-MNjJQV2Eya85qQXd7X-8=1qqNPZJZJGAdKXA@mail.gmail.com>
+Subject: Re: [PATCH] Fixed reading of on_mode in btd_adapter_get_mode
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Timo Gienger <timo.gienger@nokia.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fixed reading of on_mode in btd_adapter_get_mode
-Message-ID: <20111123141704.GA6456@fusion.localdomain>
-References: <c594ae0af9ab028cb1d6e273cc8ae35b560f6fbb.1322040739.git.timo.gienger@nokia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <c594ae0af9ab028cb1d6e273cc8ae35b560f6fbb.1322040739.git.timo.gienger@nokia.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Timo,
 
-On Wed, Nov 23, 2011, Timo Gienger wrote:
+On Wed, Nov 23, 2011 at 3:11 PM, Timo Gienger <timo.gienger@nokia.com> wrote:
 > If InitiallyPowered was set to false, it was not possible to
 > use hciconfig tool, as on_mode variable was set to MODE_OFF
 > making it impossible to enable BT via hciconfig until a DBUS
@@ -24,25 +24,41 @@ On Wed, Nov 23, 2011, Timo Gienger wrote:
 > done exactly the same. Removed also last else condition
 > as MODE_OFF should not be valid for on_mode.
 > Fix tested with hciops interface.
-> 
+>
 > Signed-off-by: Timo Gienger <timo.gienger@nokia.com>
 > ---
->  src/adapter.c |   10 ++--------
->  1 files changed, 2 insertions(+), 8 deletions(-)
+>  src/adapter.c |   10 ++--------
+>  1 files changed, 2 insertions(+), 8 deletions(-)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 2b4b7e3..c58eb47 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -2220,14 +2220,8 @@ void btd_adapter_get_mode(struct btd_adapter *adapter, uint8_t *mode,
+>                        *mode = main_opts.mode;
+>        }
+>
+> -       if (on_mode) {
+> -               if (main_opts.remember_powered == FALSE)
+> -                       *on_mode = get_mode(&adapter->bdaddr, "on");
+> -               else if (read_on_mode(address, str, sizeof(str)) == 0)
+> -                       *on_mode = get_mode(&adapter->bdaddr, str);
+> -               else
+> -                       *on_mode = main_opts.mode;
+> -       }
+> +       if (on_mode)
+> +               *on_mode = get_mode(&adapter->bdaddr, "on");
+>
+>        if (pairable)
+>                *pairable = adapter->pairable;
+> --
+> 1.7.0.4
+>
 
-The patch looks ok and I didn't find any issues when testing it either,
-so it's now pushed upstream. It'd be good if others test this too since
-the mode/on_mode logic with all various configuration combinations is
-far from simple.
+Looks good, the description is a little wrong in saying if-else being
+exactly the same when what happens is that get_mode calls read_on_mode
+when "on" is given so the result is the same but the code path is
+different.
 
-Before applying I did have to fix your commit message though. Please pay
-attention to the following:
-
-- The form of the summary line is "Fix ...", not "Fixing..."
-- We don't use signed-off-by in the user-space git
-- D-Bus is written D-Bus, not DBUS
-- You can have longer lines than 60 characters in the commit message
-  body (72 is a good limit). Let your editor automate this for you (it
-  looked like you might have manually done the formating).
-
-Johan
+-- 
+Luiz Augusto von Dentz
