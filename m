@@ -1,49 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4ECCC3C4.20509@linux.intel.com>
-References: <1321970484-10208-1-git-send-email-frederic.danis@linux.intel.com>
-	<20111122141502.GD15357@aemeltch-MOBL1>
-	<4ECBC6A0.7080006@linux.intel.com>
-	<CAKT1EBdHj7E2stDSHT_P2F_O2-O43W6M5NwnPL+_d6ex_gm9nQ@mail.gmail.com>
-	<4ECCC3C4.20509@linux.intel.com>
-Date: Wed, 23 Nov 2011 07:06:59 -0400
-Message-ID: <CAJdJm_Mn-v0HXf5d4-gxCJeA=y8WEUKqyiqNtLeh-pZSn-9PFg@mail.gmail.com>
-Subject: Re: [RFC 0/2] Add org.bluez.Telephony interface
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Frederic Danis <frederic.danis@linux.intel.com>
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+Date: Wed, 23 Nov 2011 12:04:49 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: james.steele@accenture.com, pkrystad@codeaurora.org,
 	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [RFC 3/3] Bluetooth: Add AMP initialization
+Message-ID: <20111123100446.GB28657@aemeltch-MOBL1>
+References: <81C9FA9C1C2E9E45A9AC3EDD1858BC4312A6E6CE@048-CH1MPN1-102.048d.mgd.msft.net>
+ <1321894407.2011.18.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1321894407.2011.18.camel@aeonflux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frederic,
+Hi Marcel, James,
 
-On Wed, Nov 23, 2011 at 5:58 AM, Frederic Danis
-<frederic.danis@linux.intel.com> wrote:
-> The new telephony D-Bus interface is just in charge of performing SDP
-> publication and RFComm connection. All Telephony related code is managed by
-> the agent (i.e. oFono).
+On Mon, Nov 21, 2011 at 05:53:27PM +0100, Marcel Holtmann wrote:
+> Hi James,
+> 
+> > > actually I think the READ_AMP_INFO is wrong here. It should be only
+> > > executed based on an AMP_Get_Info_Request during a connection setup
+> > > procedure.
+> > 
+> > You can read the AMP info over HCI upon receiving a request by A2MP,
+> > but there are reasons to issue the READ_AMP_INFO command in advance.
+> > For example, you need the Controller_Type for responding to the
+> > AMP_Discover_Request.  Also you may (tenuously) want the know the
+> > Max_PDU_Size in advance for selecting SDU sizes (w.r.t. segmentation).
+> > 
+> > Certainly READ_AMP_INFO is a command intended to be issued during
+> > controller initialization, the majority of the values should not
+> > change during the lifetime of the controller, and only once that
+> > command has been issued will the Controller commence sending
+> > AMP_Status_Change_Events to communicate changes in status.  At a
+> > minimum READ_AMP_INFO must be issued for each AMP_Discover_Request
+> > (and AMP_Get_Info_Request) received; but if AMP discovery is slower,
+> > then transitioning a channel to an AMP link will be slower.
+> 
+> is the AMP_Status_Change event is issued, then I am fine with reading
+> the AMP controller information ones at init and just caching it. Makes
+> the link setup procedure simpler since we only have to deal with the
+> assoc information.
 
-How t
+So we issue READ_AMP_INFO at the init phase. When we receive A2MP
+Discovery of A2MP Get Info requests we send cached data and issue 
+READ_AMP_INFO again. Then if data change we send AMP_Status_Change
+event.
 
-> I take a look to the Phone Alert Status and Alert Notification and I thought
-> that this should be implemented in the agent, or in a BlueZ service
-> accessible by the agent through D-Bus.
+> > > And even the READ_BUFFER_SIZE is the wrong command since by default
+> > the
+> > > AMP controller is in block based flow control mode. So you would
+> > need to
+> > > read the flow control mode first actually.
+> > 
+> > Correct, although reading the flow control mode on an AMP controller
+> > after a HCI_Reset *should* always return “data block mode” (as that is
+> > the default).  The READ_BUFFER_SIZE should only be used if
+> > HCI_Write_Flow_Control_Mode has been issued first (and successfully
+> > enabled packet based flow control).  Instead I believe we should issue
+> > the HCI_Read_Data_Block_Size command, where the correct information is
+> > then provided for the host stack (with its "new" data block flow
+> > control model for AMP controllers).  I don’t think there is any
+> > requirement forcing an AMP controller to implement packet based flow
+> > control, so if there is no data block flow control model in the host
+> > yet then initialization has to be prepared to fail upon trying to
+> > configure packet based flow control mode.
+> 
+> Reading the flow control mode and data block size should be done via the
+> init sequence.
 
-I'm wondering what exactly has been discussed/decided on the BlueZ summit.
+What about first separating init sequence to BR/EDR and AMP (making AMP
+sequence empty for now) and then adding functionality. Some commands like
+mentioned here READ_DATA_BLOCK_SIZE are missing from our implementation.
 
-Are we supposed to move everything "platform specific" to agents and
-remove all drivers from BlueZ? Are we okay with have BlueZ depending
-on multiple agents?
+Best regards 
+Andrei Emeltchenko 
 
-Besides that, I think your proposed Telephony API is too tied to
-HFP/HSP. I think it is interesting to have a more generic API so that
-other telephony related profiles (e.g. LE ones) could reuse it without
-requiring their own agent based API.
 
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+> > Also for AMP Controller initialization, the HCI_Set_Event_Mask_Page_2
+> > command should be issued to ensure the AMP related events are provided
+> > by the controller (by default they are turned off).  A suitable
+> > HCI_Set_Event_Mask command may also be needed if using enhanced flush
+> > on the AMP controller.  Event filters also apply to AMP controllers
+> > IIRC, so if following the BR/EDR example you may want to clear them
+> > too (although I imagine such initialization could be added when
+> > required).
+> 
+> The filters should be cleared by HCI_Reset actually. So we might just
+> ignore that one. I never found the HCI filters useful, but the event
+> mask is a good point. We need to set that one.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
