@@ -1,85 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Nov 2011 15:24:57 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Date: Thu, 24 Nov 2011 20:22:22 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC obexd 05/10] client-doc: replace parameter dict with
- conventional ones
-Message-ID: <20111124182457.GB20733@samus>
-References: <1322143742-31182-1-git-send-email-mikel.astiz@bmw-carit.de>
- <1322143742-31182-6-git-send-email-mikel.astiz@bmw-carit.de>
+Subject: Re: [PATCH] Don't set LE flags in mgmt_start_discovery()
+Message-ID: <20111124182222.GA23469@fusion.localdomain>
+References: <1321991470-2201-1-git-send-email-andre.guedes@openbossa.org>
+ <20111122215822.GA23550@fusion.localdomain>
+ <70B35869-720B-4A42-8E3C-84679BE805FC@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322143742-31182-6-git-send-email-mikel.astiz@bmw-carit.de>
+In-Reply-To: <70B35869-720B-4A42-8E3C-84679BE805FC@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Andre,
 
-On 15:08 Thu 24 Nov, Mikel Astiz wrote:
-> The usage of a dictionary as a parameter passing mechanism seems not to
-> be necessary any more.
-> ---
->  doc/client-api.txt |   22 ++++++++++------------
->  1 files changed, 10 insertions(+), 12 deletions(-)
+On Thu, Nov 24, 2011, Andre Guedes wrote:
+> I think I do not quite understand this change in start discovery
+> command. How should the command work now?
 > 
-> diff --git a/doc/client-api.txt b/doc/client-api.txt
-> index a6f30af..67355c6 100644
-> --- a/doc/client-api.txt
-> +++ b/doc/client-api.txt
-> @@ -12,27 +12,25 @@ Service		org.openobex.client
->  Interface	org.openobex.Client
->  Object path	/
->  
-> -Methods		object CreateSession(dict device)
-> +Methods		object CreateSession(string source, string destination,
-> +					string target)
->  
-> -			Create a new OBEX session. The device is configured
-> -			via properties like in SendFiles.
-> +			Create a new OBEX session for the given source (local)
-> +			address, destination (remote) address and target. The
-> +			supported target values are:
-> +				- "OPP"
-> +				- "FTP"
-> +				- "SYNC"
-> +				- "PBAP"
->  
->  		void RemoveSession(object session)
->  
->  			Unregister session and abort pending transfers.
->  
-> -		string GetCapabilities(dict device)
-> +		string GetCapabilities(string source, string destination)
->  
->  			Get remote device capabilities.
->  
-> -Properties	string Target
-> -
-> -		string Source
-> -
-> -		string Destination
-> -
-> -		byte Channel
+> For instance, let's say we have the userspace always setting those bits
+> (BR/EDR and LE). If the hardware doesn't support LE should the kernel
+> return error?
 
-I just wanted to say that for most of the cases doing the SDP seach 
-always is the right thing to do, but sometimes you want to avoid it.
+No.
 
-I agree that for now we can leave it, but it would be nice if there
-was a way to add it later if we ever need it.
+> Or do we expect it does a kind of "best effort" and runs the inquiry
+> only?
 
-> -
->  Session hierarchy
->  =================
->  
-> -- 
-> 1.7.6.4
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Yes, I think that would make most sense from user-space perspective
+"find all devices you can". As for BR/EDR specific discovery (with no LE
+bits) or LE specific discovery (BR/EDR bit not set) if the hardware
+doesn't support the request then in this case I think it would in fact
+make sense to return an error.
 
-Cheers,
--- 
-Vinicius
+Johan
