@@ -1,55 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4ECDE842.7010707@gmail.com>
-Date: Thu, 24 Nov 2011 00:46:26 -0600
-From: Denis Kenzior <denkenz@gmail.com>
-MIME-Version: 1.0
+Subject: Re: [PATCH] Don't set LE flags in mgmt_start_discovery()
+Mime-Version: 1.0 (Apple Message framework v1251.1)
+Content-Type: text/plain; charset=US-ASCII
+From: Andre Guedes <andre.guedes@openbossa.org>
+In-Reply-To: <CAJdJm_MgOZKANxtfqiXWLqrdVCAFPsjDM5WbXr50HrAFgb-C2A@mail.gmail.com>
+Date: Thu, 24 Nov 2011 15:44:20 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <35FC761F-6E35-4EB5-AD0C-28DCC8862C3B@openbossa.org>
+References: <1321991470-2201-1-git-send-email-andre.guedes@openbossa.org> <20111122215822.GA23550@fusion.localdomain> <70B35869-720B-4A42-8E3C-84679BE805FC@openbossa.org> <20111124182222.GA23469@fusion.localdomain> <CAJdJm_MgOZKANxtfqiXWLqrdVCAFPsjDM5WbXr50HrAFgb-C2A@mail.gmail.com>
 To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: Frederic Danis <frederic.danis@linux.intel.com>,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 0/2] Add org.bluez.Telephony interface
-References: <1321970484-10208-1-git-send-email-frederic.danis@linux.intel.com>	<20111122141502.GD15357@aemeltch-MOBL1>	<4ECBC6A0.7080006@linux.intel.com>	<CAKT1EBdHj7E2stDSHT_P2F_O2-O43W6M5NwnPL+_d6ex_gm9nQ@mail.gmail.com>	<4ECCC3C4.20509@linux.intel.com>	<CAJdJm_Mn-v0HXf5d4-gxCJeA=y8WEUKqyiqNtLeh-pZSn-9PFg@mail.gmail.com>	<4ECE6226.3010407@linux.intel.com> <CAJdJm_Pkn5h=sdX_zaN-yMQwP1mjFuGdimHsjnP8tEuk=jnx0Q@mail.gmail.com>
-In-Reply-To: <CAJdJm_Pkn5h=sdX_zaN-yMQwP1mjFuGdimHsjnP8tEuk=jnx0Q@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Johan/Lizardo,
 
+On Nov 24, 2011, at 3:29 PM, Anderson Lizardo wrote:
+
+> Hi,
 > 
-> Phone Alert Status has a method to silent the ringer during a incoming
-> call. It also allows to change to/from "silent" profile. Alert
-> notification allows to enable/disable notifications of incoming
-> calls/SMS.
+> On Thu, Nov 24, 2011 at 2:22 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>>> Or do we expect it does a kind of "best effort" and runs the inquiry
+>>> only?
+>> 
+>> Yes, I think that would make most sense from user-space perspective
+>> "find all devices you can". As for BR/EDR specific discovery (with no LE
+>> bits) or LE specific discovery (BR/EDR bit not set) if the hardware
+>> doesn't support the request then in this case I think it would in fact
+>> make sense to return an error.
 > 
-> All of this is platform specific, therefore if we are going this route
-> for BlueZ 5, we need a more complete telephony interface that allows
-> to implement platform specific telephony bits outside BlueZ.
-> 
+> So in summary, it should fail only if "requested_mask & supported_mask" is 0.
 
-These are indeed highly platform specific, moreover, they are UI/UX
-specific.
+To keep things simpler, IMO we should have some sort of this:
 
->> or should be implemented into telephony daemon.
-> 
-> Maybe myself or Claudio are not clear, but I think the
-> "org.bluez.Telephony" interface name were supposed to mean a generic
-> telephony interface for BlueZ (so any Telephony related component
-> could use), but for me looks like it is just a HFP/HSP "proxy"
-> interface.
-> 
-> In other words, if we wanted to move the Phone Alert Status or Alert
-> Notification to e.g. ofono, your interface (as is) would be not
-> suitable to connect to a LE socket.
+DISCOV_AUTO:     The kernel choose the discovery procedure based on the
+                 hardware capabilities.
+DISCOV_BREDR:    The kernel runs the BR/EDR discovery procedure
+DISCOV_LE:       The kernel runs the LE-Only discovery procedure
 
-It sounds like moving these to oFono is not a good idea in the first
-place, since oFono is not responsible for the UI, ringtone generation,
-etc.
+BR,
 
-The question is whether you want to reserve .Telephony interface for
-some LE specific bits (in which case we can use something like
-VoiceTelephony or HandsfreeTelephony for the current proposal) or try
-not expose the LE bits over D-Bus at all (e.g. using bluez plugins.)
-
-Regards,
--Denis
+Andre
