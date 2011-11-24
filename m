@@ -1,62 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Nov 2011 15:11:44 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC obexd 00/10] Major API changes in obex-client
-Message-ID: <20111124181144.GA20733@samus>
-References: <1322143742-31182-1-git-send-email-mikel.astiz@bmw-carit.de>
-MIME-Version: 1.0
+Subject: Re: [PATCH] Don't set LE flags in mgmt_start_discovery()
+Mime-Version: 1.0 (Apple Message framework v1251.1)
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322143742-31182-1-git-send-email-mikel.astiz@bmw-carit.de>
+From: Andre Guedes <andre.guedes@openbossa.org>
+In-Reply-To: <20111122215822.GA23550@fusion.localdomain>
+Date: Thu, 24 Nov 2011 15:06:14 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <70B35869-720B-4A42-8E3C-84679BE805FC@openbossa.org>
+References: <1321991470-2201-1-git-send-email-andre.guedes@openbossa.org> <20111122215822.GA23550@fusion.localdomain>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Johan,
 
-On 15:08 Thu 24 Nov, Mikel Astiz wrote:
-> This patch series splits the perviously proposed obex-client API into incremental changes. The goal is to agree on the desired API before starting with the implementation.
-> 
-> There are some differences with respect to the previous proposal, mainly:
-> 
-> - The representation of devices has been dropped for now and considered of lower priority.
-> 
-> - Progress-reporting signals are not defined as unicast signals, assuming that the perfomance overhead might not be significant.
+On Nov 22, 2011, at 6:58 PM, Johan Hedberg wrote:
 
-I am not so much worried about performance, I am more worried about
-waking processes listening in the session bus unecessarily.
+> Hi Andre,
+> 
+> On Tue, Nov 22, 2011, Andre Guedes wrote:
+>> Since LE based discovery procedures are not yet supported, we should
+>> not set the LE flags in mgmt_start_discovery(). Otherwise, we might
+>> get an error from management interface.
+>> ---
+>> plugins/mgmtops.c |    2 --
+>> 1 files changed, 0 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+>> index b9e9ad6..d28f89c 100644
+>> --- a/plugins/mgmtops.c
+>> +++ b/plugins/mgmtops.c
+>> @@ -1689,8 +1689,6 @@ static int mgmt_start_discovery(int index)
+>> 	hdr->index = htobs(index);
+>> 
+>> 	hci_set_bit(MGMT_ADDR_BREDR, &cp->type);
+>> -	hci_set_bit(MGMT_ADDR_LE_PUBLIC, &cp->type);
+>> -	hci_set_bit(MGMT_ADDR_LE_RANDOM, &cp->type);
+>> 
+>> 	if (write(mgmt_sock, buf, sizeof(buf)) < 0)
+>> 		return -errno;
+> 
+> Since setting these bits is what user space needs to do anyway in the
+> long run I don't thing it's worth to remove them temporarily. Instead
+> I'd just make the kernel modifications initially so that an error is
+> only triggered of MGMT_ADDR_BREDR isn't set and in other cases just do
+> normal BR/EDR discovery (and ignore the LE bits).
 
-The suggested API looks good, I just have some small comments about some
-changes.
+In that case, let's just ignore the kernel patch "Consider the type
+param in start_discovery" and keep ignoring the type parameter.
 
-> 
-> - Some operations such as PhonebookAccess.List have not been changed either, although it would be possible (as included in the previous proposal) to also use a file-based transfer here.
-> 
-> Also note that the Transfer interface has been left inside the client-specific API, but would ideally be shared with the server. This is something to be kept in mind now in the design of the API.
-> 
-> Mikel Astiz (10):
->   client-doc: reformatted to fit in 80 columns
->   client-doc: copyright statement added
->   client-doc: minor formatting changes
->   client-doc: wrap OPP into specific session type
->   client-doc: replace parameter dict with conventional ones
->   client-doc: remove agent in favour of transfer signals
->   client-doc: ObjectPush sessions return transports
->   client-doc: FileTransfer sessions return transports
->   client-doc: PhonebookAccess sessions return transports
->   client-doc: Synchronization sessions return transports
-> 
->  doc/client-api.txt |  265 +++++++++++++++++++++++++++++-----------------------
->  1 files changed, 148 insertions(+), 117 deletions(-)
-> 
-> -- 
-> 1.7.6.4
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I think I do not quite understand this change in start discovery
+command. How should the command work now?
 
-Cheers,
--- 
-Vinicius
+For instance, let's say we have the userspace always setting those bits
+(BR/EDR and LE). If the hardware doesn't support LE should the kernel
+return error? Or do we expect it does a kind of "best effort" and runs
+the inquiry only?
+
+BR,
+
+Andre
+
