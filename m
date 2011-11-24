@@ -1,36 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <4ECE3B67.1030909@globaledgesoft.com>
+Date: Thu, 24 Nov 2011 18:11:11 +0530
+From: sathish <sathish.n@globaledgesoft.com>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 0/6] AMP/BREDR initialization patches
-Date: Thu, 24 Nov 2011 14:51:59 +0200
-Message-Id: <1322139125-22377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: AVRCP metadat
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+  Hi,
+     I am working on implementing AVRCP 1.3 using the latest bluez that 
+i downloaded from repository bluez.kernel.org.git file and i am working 
+to get the metadata information from the media player "amarok" .
 
-RFC for AMP init and block flow control code.
+i already succeded in writing the code using dbus API on bluez-4.96. The 
+features such as VolumeUp, VolumeDown, Pause , Stop, 
+GetProperties(Status Connected Only) are working fine.
 
-Resubmit "remove old code" patch as it seems that there is little
-sense to copy it over.
+I want help to implement in getting metadata information, I want to know 
+which player to use that supports in sending the metadata information.
 
-Marcel is it OK? Otherwise I can copy-paste those commented lines to new
-functions.
-
-Andrei Emeltchenko (6):
-  Bluetooth: remove old code
-  Bluetooth: Split ctrl init to BREDR and AMP parts
-  Bluetooth: Add HCI Read Flow Control Mode function
-  Bluetooth: Initialize default flow control mode
-  Bluetooth: Add HCI Read Data Block Size function
-  Bluetooth: Recalculate sched for HCI block flow ctrl
-
- include/net/bluetooth/hci.h      |   18 +++++++
- include/net/bluetooth/hci_core.h |    4 ++
- net/bluetooth/hci_core.c         |  103 +++++++++++++++++++++++++------------
- net/bluetooth/hci_event.c        |   53 +++++++++++++++++++
- 4 files changed, 144 insertions(+), 34 deletions(-)
+and suggestions how to use dbus API requesting some more example code 
+for writing dbus in C.
 
 -- 
-1.7.4.1
+Thanks&  Regards,
+Sathish N
 
