@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 1/6] Bluetooth: remove old code
-Date: Thu, 24 Nov 2011 14:52:00 +0200
-Message-Id: <1322139125-22377-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 5/6] Bluetooth: Add HCI Read Data Block Size function
+Date: Thu, 24 Nov 2011 14:52:04 +0200
+Message-Id: <1322139125-22377-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1322139125-22377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1322139125-22377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,37 +11,97 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Remove old code not touched for several years.
+Upstream Code Aurora function with minor trivial fixes.
+Origin: git://codeaurora.org/kernel/msm.git
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- net/bluetooth/hci_core.c |   12 ------------
- 1 files changed, 0 insertions(+), 12 deletions(-)
+ include/net/bluetooth/hci.h      |    8 ++++++++
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/hci_event.c        |   31 +++++++++++++++++++++++++++++++
+ 3 files changed, 41 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ef0423e..bc71f96 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -230,18 +230,6 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
- 	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
- 	hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 67f7028..86884b4 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -741,6 +741,14 @@ struct hci_rp_read_bd_addr {
+ 	bdaddr_t bdaddr;
+ } __packed;
  
--#if 0
--	/* Host buffer size */
--	{
--		struct hci_cp_host_buffer_size cp;
--		cp.acl_mtu = cpu_to_le16(HCI_MAX_ACL_SIZE);
--		cp.sco_mtu = HCI_MAX_SCO_SIZE;
--		cp.acl_max_pkt = cpu_to_le16(0xffff);
--		cp.sco_max_pkt = cpu_to_le16(0xffff);
--		hci_send_cmd(hdev, HCI_OP_HOST_BUFFER_SIZE, sizeof(cp), &cp);
--	}
--#endif
--
- 	/* Read BD Address */
- 	hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
++#define HCI_OP_READ_DATA_BLOCK_SIZE	0x100a
++struct hci_rp_read_data_block_size {
++	__u8     status;
++	__le16   max_acl_len;
++	__le16   block_len;
++	__le16   num_blocks;
++} __packed;
++
+ #define HCI_OP_WRITE_PAGE_SCAN_ACTIVITY	0x0c1c
+ struct hci_cp_write_page_scan_activity {
+ 	__le16   interval;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a7fd63a..869ab72 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -172,6 +172,8 @@ struct hci_dev {
  
+ 	__u8		flow_ctl_mode;
+ 
++	__u16		block_len;
++
+ 	unsigned int	auto_accept_delay;
+ 
+ 	unsigned long	quirks;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 53e56b4..dfea1c6 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -774,6 +774,33 @@ static void hci_cc_read_bd_addr(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_req_complete(hdev, HCI_OP_READ_BD_ADDR, rp->status);
+ }
+ 
++static void hci_cc_read_data_block_size(struct hci_dev *hdev,
++							struct sk_buff *skb)
++{
++	struct hci_rp_read_data_block_size *rp = (void *) skb->data;
++
++	BT_DBG("%s status 0x%x", hdev->name, rp->status);
++
++	if (rp->status)
++		return;
++
++	if (hdev->flow_ctl_mode == HCI_BLOCK_BASED_FLOW_CTL_MODE) {
++		hdev->acl_mtu  = __le16_to_cpu(rp->max_acl_len);
++		hdev->sco_mtu = 0;
++		hdev->block_len = __le16_to_cpu(rp->block_len);
++		/* acl_pkts indicates the number of blocks */
++		hdev->acl_pkts = __le16_to_cpu(rp->num_blocks);
++		hdev->sco_pkts = 0;
++		hdev->acl_cnt = hdev->acl_pkts;
++		hdev->sco_cnt = 0;
++	}
++
++	BT_DBG("%s acl mtu %d:%d, block len %d", hdev->name, hdev->acl_mtu,
++					hdev->acl_cnt, hdev->block_len);
++
++	hci_req_complete(hdev, HCI_OP_READ_DATA_BLOCK_SIZE, rp->status);
++}
++
+ static void hci_cc_write_ca_timeout(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	__u8 status = *((__u8 *) skb->data);
+@@ -1981,6 +2008,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 		hci_cc_read_bd_addr(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_READ_DATA_BLOCK_SIZE:
++		hci_cc_read_data_block_size(hdev, skb);
++		break;
++
+ 	case HCI_OP_WRITE_CA_TIMEOUT:
+ 		hci_cc_write_ca_timeout(hdev, skb);
+ 		break;
 -- 
 1.7.4.1
 
