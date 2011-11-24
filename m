@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC obexd 04/10] client-doc: wrap OPP into specific session type
-Date: Thu, 24 Nov 2011 15:08:56 +0100
-Message-ID: <1322143742-31182-5-git-send-email-mikel.astiz@bmw-carit.de>
+Subject: [RFC obexd 03/10] client-doc: minor formatting changes
+Date: Thu, 24 Nov 2011 15:08:55 +0100
+Message-ID: <1322143742-31182-4-git-send-email-mikel.astiz@bmw-carit.de>
 In-Reply-To: <1322143742-31182-1-git-send-email-mikel.astiz@bmw-carit.de>
 References: <1322143742-31182-1-git-send-email-mikel.astiz@bmw-carit.de>
 MIME-Version: 1.0
@@ -12,74 +12,82 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This modification makes the OPP API more consistent with the rest of the
-supported target types, and also it allows to perform several operations
-on the same session.
 ---
- doc/client-api.txt |   44 +++++++++++++++++++++++++-------------------
- 1 files changed, 25 insertions(+), 19 deletions(-)
+ doc/client-api.txt |   22 +++++++++-------------
+ 1 files changed, 9 insertions(+), 13 deletions(-)
 
 diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 304e489..a6f30af 100644
+index e6f8270..304e489 100644
 --- a/doc/client-api.txt
 +++ b/doc/client-api.txt
-@@ -12,25 +12,7 @@ Service		org.openobex.client
- Interface	org.openobex.Client
- Object path	/
+@@ -51,7 +51,6 @@ Properties	string Target
  
--Methods		void SendFiles(dict device, array{string} files, object agent)
--
--			Send one or multiple local files to the specified
--			device. The device is configured via properties. At
--			least the Destination property should be specified.
--
--		void PullBusinessCard(dict device, string file)
--
--			Request the business card from a remote device and
--			store it in the local file.
--
--		void ExchangeBusinessCards(dict device, string clientfile,
--								string file)
--
--			Push the client's business card to the remote device
--			and then retrieve the remote business card and store
--			it in a local file.
--
--		object CreateSession(dict device)
-+Methods		object CreateSession(dict device)
+ 		byte Channel
  
- 			Create a new OBEX session. The device is configured
- 			via properties like in SendFiles.
-@@ -77,6 +59,30 @@ Properties	string Source [readonly]
+-
+ Session hierarchy
+ =================
  
- 		byte Channel [readonly]
+@@ -72,12 +71,11 @@ Methods		dict GetProperties()
  
-+Object Push hierarchy
-+=====================
-+
-+Service		org.openobex.client
-+Interface	org.openobex.ObjectPush
-+Object path	[variable prefix]/{session0,session1,...}
-+
-+Methods		void SendFiles(array{string} files, string destination,
-+								object agent)
-+
-+			Send one or multiple local files to the remote device,
-+			and the given destination.
-+
-+		void PullBusinessCard(string targetfile)
-+
-+			Request the business card from a remote device and
-+			store it in the local file.
-+
-+		void ExchangeBusinessCards(string clientfile, string targetfile)
-+
-+			Push the client's business card to the remote device
-+			and then retrieve the remote business card and store
-+			it in a local file.
-+
+ 			Release a previously assigned OBEX agent.
+ 
+-Properties	string Source [read-only]
+-
+-		string Destination [read-only]
++Properties	string Source [readonly]
+ 
+-		byte Channel [read-only]
++		string Destination [readonly]
+ 
++		byte Channel [readonly]
+ 
  File Transfer hierarchy
  =======================
+@@ -107,9 +105,9 @@ Methods		void ChangeFolder(string folder)
+ 						folder
+ 				string Permission : Group, owner and other
+ 							permission
+-				guint64 Modified : Last change
+-				guint64 Accessed : Last access
+-				guint64 Created : Creation date
++				uint64 Modified : Last change
++				uint64 Accessed : Last access
++				uint64 Created : Creation date
+ 
+ 		void GetFile(string targetfile, string sourcefile)
+ 
+@@ -141,7 +139,6 @@ Methods		void ChangeFolder(string folder)
+ 
+ 			Deletes the specified file/folder.
+ 
+-
+ Phonebook Access hierarchy
+ =======================
+ 
+@@ -280,20 +277,19 @@ Methods		dict GetProperties()
+ 
+ 			Cancels this transfer.
+ 
+-Properties	string Name [read-only]
++Properties	string Name [readonly]
+ 
+ 			Name of the transferred object.
+ 
+-		uint64 Size [read-only]
++		uint64 Size [readonly]
+ 
+ 			Size of the transferred object. If the size is
+ 			unknown, then this property will not be present.
+ 
+-		string Filename [read-only]
++		string Filename [readonly]
+ 
+ 			Complete name of the file being received or sent.
+ 
+-
+ Agent hierarchy
+ ===============
  
 -- 
 1.7.6.4
