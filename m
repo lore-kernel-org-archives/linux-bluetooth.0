@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 3/6] Bluetooth: Add HCI Read Flow Control Mode function
-Date: Thu, 24 Nov 2011 14:52:02 +0200
-Message-Id: <1322139125-22377-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 1/6] Bluetooth: remove old code
+Date: Thu, 24 Nov 2011 14:52:00 +0200
+Message-Id: <1322139125-22377-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1322139125-22377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1322139125-22377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,83 +11,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Upstream Code Aurora function with minor trivial fixes.
-Origin: git://codeaurora.org/kernel/msm.git
+Remove old code not touched for several years.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- include/net/bluetooth/hci.h      |    6 ++++++
- include/net/bluetooth/hci_core.h |    2 ++
- net/bluetooth/hci_event.c        |   19 +++++++++++++++++++
- 3 files changed, 27 insertions(+), 0 deletions(-)
+ net/bluetooth/hci_core.c |   12 ------------
+ 1 files changed, 0 insertions(+), 12 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 376c574..ee83c36 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -677,6 +677,12 @@ struct hci_rp_read_local_oob_data {
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index ef0423e..bc71f96 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -230,18 +230,6 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
+ 	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
+ 	hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
  
- #define HCI_OP_READ_INQ_RSP_TX_POWER	0x0c58
+-#if 0
+-	/* Host buffer size */
+-	{
+-		struct hci_cp_host_buffer_size cp;
+-		cp.acl_mtu = cpu_to_le16(HCI_MAX_ACL_SIZE);
+-		cp.sco_mtu = HCI_MAX_SCO_SIZE;
+-		cp.acl_max_pkt = cpu_to_le16(0xffff);
+-		cp.sco_max_pkt = cpu_to_le16(0xffff);
+-		hci_send_cmd(hdev, HCI_OP_HOST_BUFFER_SIZE, sizeof(cp), &cp);
+-	}
+-#endif
+-
+ 	/* Read BD Address */
+ 	hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
  
-+#define HCI_OP_READ_FLOW_CONTROL_MODE	0x0c66
-+struct hci_rp_read_flow_control_mode {
-+	__u8     status;
-+	__u8     mode;
-+} __packed;
-+
- #define HCI_OP_WRITE_LE_HOST_SUPPORTED	0x0c6d
- struct hci_cp_write_le_host_supported {
- 	__u8 le;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 1795257..a7fd63a 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -170,6 +170,8 @@ struct hci_dev {
- 	__u32		amp_max_flush_to;
- 	__u32		amp_be_flush_to;
- 
-+	__u8		flow_ctl_mode;
-+
- 	unsigned int	auto_accept_delay;
- 
- 	unsigned long	quirks;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 2e423eb..53e56b4 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -720,6 +720,21 @@ static void hci_cc_read_local_ext_features(struct hci_dev *hdev,
- 	hci_req_complete(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES, rp->status);
- }
- 
-+static void hci_cc_read_flow_control_mode(struct hci_dev *hdev,
-+						struct sk_buff *skb)
-+{
-+	struct hci_rp_read_flow_control_mode *rp = (void *) skb->data;
-+
-+	BT_DBG("%s status 0x%x", hdev->name, rp->status);
-+
-+	if (rp->status)
-+		return;
-+
-+	hdev->flow_ctl_mode = rp->mode;
-+
-+	hci_req_complete(hdev, HCI_OP_READ_FLOW_CONTROL_MODE, rp->status);
-+}
-+
- static void hci_cc_read_buffer_size(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_rp_read_buffer_size *rp = (void *) skb->data;
-@@ -1970,6 +1985,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
- 		hci_cc_write_ca_timeout(hdev, skb);
- 		break;
- 
-+	case HCI_OP_READ_FLOW_CONTROL_MODE:
-+		hci_cc_read_flow_control_mode(hdev, skb);
-+		break;
-+
- 	case HCI_OP_READ_LOCAL_AMP_INFO:
- 		hci_cc_read_local_amp_info(hdev, skb);
- 		break;
 -- 
 1.7.4.1
 
