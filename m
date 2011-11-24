@@ -1,33 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC obexd 02/10] client-doc: copyright statement added
-Date: Thu, 24 Nov 2011 15:08:54 +0100
-Message-ID: <1322143742-31182-3-git-send-email-mikel.astiz@bmw-carit.de>
-In-Reply-To: <1322143742-31182-1-git-send-email-mikel.astiz@bmw-carit.de>
-References: <1322143742-31182-1-git-send-email-mikel.astiz@bmw-carit.de>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <4ECE3B67.1030909@globaledgesoft.com>
+References: <4ECE3B67.1030909@globaledgesoft.com>
+Date: Thu, 24 Nov 2011 15:54:30 +0200
+Message-ID: <CABBYNZJMPhnX8DkOQEL76tGvHkP3riskm2c1pfu4=CyCU39sHg@mail.gmail.com>
+Subject: Re: AVRCP metadat
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: sathish <sathish.n@globaledgesoft.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/client-api.txt |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+Hi,
 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 476ebfd..e6f8270 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -2,6 +2,7 @@ OBEX client API description
- ***************************
- 
- Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-+Copyright (C) 2011  BMW Car IT GmbH. All rights reserved.
- 
- 
- Client hierarchy
+On Thu, Nov 24, 2011 at 2:41 PM, sathish <sathish.n@globaledgesoft.com> wrote:
+>  Hi,
+>    I am working on implementing AVRCP 1.3 using the latest bluez that i
+> downloaded from repository bluez.kernel.org.git file and i am working to get
+> the metadata information from the media player "amarok" .
+>
+> i already succeded in writing the code using dbus API on bluez-4.96. The
+> features such as VolumeUp, VolumeDown, Pause , Stop, GetProperties(Status
+> Connected Only) are working fine.
+>
+> I want help to implement in getting metadata information, I want to know
+> which player to use that supports in sending the metadata information.
+>
+> and suggestions how to use dbus API requesting some more example code for
+> writing dbus in C.
+
+You can use test/mpris-player.c as a C reference and there is also
+test/simple-player in python, it is quite possible that amarok
+implements mpris interface so that you can use mpris-player to
+extract/convert the metadata.
+
 -- 
-1.7.6.4
-
+Luiz Augusto von Dentz
