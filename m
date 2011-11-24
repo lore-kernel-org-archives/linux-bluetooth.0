@@ -1,134 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Nov 2011 11:19:08 +0000
-From: eran <eran@over-here.org>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Bluetooth: Adding USB device 13d3:3375 as an Atheros
- AR3012.
-Message-ID: <20111124111908.GA922@over-here.org>
-References: <20111123100356.GB9838@over-here.org>
- <20111123190500.GA7179@samus>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111123190500.GA7179@samus>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 2/2] Update gatt-exmaple to check if attributes were registered.
+Date: Thu, 24 Nov 2011 11:08:10 +0100
+Message-Id: <1322129290-10767-2-git-send-email-sancane@gmail.com>
+In-Reply-To: <1322129290-10767-1-git-send-email-sancane@gmail.com>
+References: <1322129290-10767-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Eran <eran@over-here.org>
-
-The bluetooth module in the Asus UX31/UX21 is based on Atheros AR3012
-and requires a firmware to be uploaded before it's usable.
-
-Signed-off-by: Eran <eran@over-here.org>
 ---
- drivers/bluetooth/ath3k.c |    2 ++
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 3 insertions(+), 0 deletions(-)
+ plugins/gatt-example.c |   11 ++++++++---
+ 1 files changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 106beb1..b94aae6 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -70,6 +70,7 @@ static struct usb_device_id ath3k_table[] = {
+diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
+index 1456284..6d9b6b8 100644
+--- a/plugins/gatt-example.c
++++ b/plugins/gatt-example.c
+@@ -28,6 +28,7 @@
  
- 	/* Atheros AR3012 with sflash firmware*/
- 	{ USB_DEVICE(0x0CF3, 0x3004) },
-+	{ USB_DEVICE(0x13d3, 0x3375) },
+ #include <glib.h>
+ #include <bluetooth/uuid.h>
++#include <errno.h>
  
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -86,6 +87,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ #include "plugin.h"
+ #include "hcid.h"
+@@ -68,9 +69,9 @@ static uint8_t battery_state_read(struct attribute *a, gpointer user_data)
+ 	return 0;
+ }
  
- 	/* Atheros AR3012 with sflash firmware*/
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+-static void register_battery_service(void)
++static gboolean register_battery_service(void)
+ {
+-	gatt_service_add(GATT_PRIM_SVC_UUID, BATTERY_STATE_SVC_UUID,
++	return gatt_service_add(GATT_PRIM_SVC_UUID, BATTERY_STATE_SVC_UUID,
+ 			/* battery state characteristic */
+ 			GATT_OPT_CHR_UUID, BATTERY_STATE_UUID,
+ 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
+@@ -445,7 +446,11 @@ static int gatt_example_init(void)
+ 		return -1;
+ 	}
  
- 	{ }	/* Terminating entry */
- };
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f9b7260..a64f15a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -122,6 +122,7 @@ static struct usb_device_id blacklist_table[] = {
- 
- 	/* Atheros 3012 with sflash firmware */
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+-	register_battery_service();
++	if (!register_battery_service()) {
++		DBG("Battery service could not be registered");
++		return -EIO;
++	}
++
+ 	register_manuf1_service(manuf1_range);
+ 	register_manuf2_service(manuf2_range);
+ 	register_termometer_service(manuf1_range, manuf2_range);
 -- 
-1.7.2.5
+1.7.7.4
 
-
-
-On Wed, Nov 23, 2011 at 04:05:00PM -0300, Vinicius Costa Gomes wrote:
-> Hi Eran,
-> 
-> Just a few cosmetic comments, and a disclaimer: I don't have any
-> idea why it seems that every new Atheros device needs another
-> entry in those tables.
-> 
-> Apart from those minor points it looks good.
-> 
-> On 10:03 Wed 23 Nov, eran wrote:
-> > From: Eran <eran@over-here.org>
-> 
-> Keep the subject line shorter, under 60 or so characters, i.e. remove
-> the part between parentheses. And prefix your subject with "Bluetooth:".
-> 
-> > 
-> > The bluetooth module in the Asus UX31/UX21 is based on Atheros AR3012 and requires a firmware to be uploaded before it's usable.
-> 
-> Please break the comment at 70 or so characters.
-> 
-> > 
-> > Signed-off-by: Eran <eran@over-here.org>
-> > ---
-> >  drivers/bluetooth/ath3k.c |    2 ++
-> >  drivers/bluetooth/btusb.c |    1 +
-> >  2 files changed, 3 insertions(+), 0 deletions(-)
-> > 
-> > diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-> > index 106beb1..b94aae6 100644
-> > --- a/drivers/bluetooth/ath3k.c
-> > +++ b/drivers/bluetooth/ath3k.c
-> > @@ -70,6 +70,7 @@ static struct usb_device_id ath3k_table[] = {
-> >  
-> >  	/* Atheros AR3012 with sflash firmware*/
-> >  	{ USB_DEVICE(0x0CF3, 0x3004) },
-> > +	{ USB_DEVICE(0x13d3, 0x3375) },
-> >  
-> >  	/* Atheros AR5BBU12 with sflash firmware */
-> >  	{ USB_DEVICE(0x0489, 0xE02C) },
-> > @@ -86,6 +87,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
-> >  
-> >  	/* Atheros AR3012 with sflash firmware*/
-> >  	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-> > +	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
-> >  
-> >  	{ }	/* Terminating entry */
-> >  };
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index f9b7260..a64f15a 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -122,6 +122,7 @@ static struct usb_device_id blacklist_table[] = {
-> >  
-> >  	/* Atheros 3012 with sflash firmware */
-> >  	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-> > +	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
-> >  
-> >  	/* Atheros AR5BBU12 with sflash firmware */
-> >  	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
-> > -- 
-> > 1.7.2.5
-> > 
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> Cheers,
-> -- 
-> Vinicius
