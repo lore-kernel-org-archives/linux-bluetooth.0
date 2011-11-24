@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC obexd 03/10] client-doc: minor formatting changes
-Date: Thu, 24 Nov 2011 15:08:55 +0100
-Message-ID: <1322143742-31182-4-git-send-email-mikel.astiz@bmw-carit.de>
+Subject: [RFC obexd 08/10] client-doc: FileTransfer sessions return transports
+Date: Thu, 24 Nov 2011 15:09:00 +0100
+Message-ID: <1322143742-31182-9-git-send-email-mikel.astiz@bmw-carit.de>
 In-Reply-To: <1322143742-31182-1-git-send-email-mikel.astiz@bmw-carit.de>
 References: <1322143742-31182-1-git-send-email-mikel.astiz@bmw-carit.de>
 MIME-Version: 1.0
@@ -13,81 +13,45 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/client-api.txt |   22 +++++++++-------------
- 1 files changed, 9 insertions(+), 13 deletions(-)
+ doc/client-api.txt |   17 +++++++++++------
+ 1 files changed, 11 insertions(+), 6 deletions(-)
 
 diff --git a/doc/client-api.txt b/doc/client-api.txt
-index e6f8270..304e489 100644
+index 5a23c6e..c6f19ea 100644
 --- a/doc/client-api.txt
 +++ b/doc/client-api.txt
-@@ -51,7 +51,6 @@ Properties	string Target
+@@ -125,21 +125,26 @@ Methods		void ChangeFolder(string folder)
+ 				uint64 Accessed : Last access
+ 				uint64 Created : Creation date
  
- 		byte Channel
+-		void GetFile(string targetfile, string sourcefile)
++		object GetFile(string targetfile, string sourcefile)
  
--
- Session hierarchy
- =================
+ 			Copy the source file (from remote device) to the
+ 			target file (on local filesystem).
  
-@@ -72,12 +71,11 @@ Methods		dict GetProperties()
+-			A new Transfer object is created to represent this
+-			transaction.
++			If an empty target file is given, a name will be
++			automatically calculated for the temporary file.
  
- 			Release a previously assigned OBEX agent.
+-		void PutFile(string sourcefile, string targetfile)
++			The returned path represents the newly created transfer,
++			which should be used to find out if the content has been
++			successfully transferred or if the operation fails.
++
++		object PutFile(string sourcefile, string targetfile)
  
--Properties	string Source [read-only]
--
--		string Destination [read-only]
-+Properties	string Source [readonly]
+ 			Copy the source file (from local filesystem) to the
+ 			target file (on remote device).
  
--		byte Channel [read-only]
-+		string Destination [readonly]
+-			A new Transfer object is created to represent this
+-			transaction.
++			The returned path represents the newly created transfer,
++			which should be used to find out if the content has been
++			successfully transferred or if the operation fails.
  
-+		byte Channel [readonly]
- 
- File Transfer hierarchy
- =======================
-@@ -107,9 +105,9 @@ Methods		void ChangeFolder(string folder)
- 						folder
- 				string Permission : Group, owner and other
- 							permission
--				guint64 Modified : Last change
--				guint64 Accessed : Last access
--				guint64 Created : Creation date
-+				uint64 Modified : Last change
-+				uint64 Accessed : Last access
-+				uint64 Created : Creation date
- 
- 		void GetFile(string targetfile, string sourcefile)
- 
-@@ -141,7 +139,6 @@ Methods		void ChangeFolder(string folder)
- 
- 			Deletes the specified file/folder.
- 
--
- Phonebook Access hierarchy
- =======================
- 
-@@ -280,20 +277,19 @@ Methods		dict GetProperties()
- 
- 			Cancels this transfer.
- 
--Properties	string Name [read-only]
-+Properties	string Name [readonly]
- 
- 			Name of the transferred object.
- 
--		uint64 Size [read-only]
-+		uint64 Size [readonly]
- 
- 			Size of the transferred object. If the size is
- 			unknown, then this property will not be present.
- 
--		string Filename [read-only]
-+		string Filename [readonly]
- 
- 			Complete name of the file being received or sent.
- 
--
- Agent hierarchy
- ===============
+ 		void CopyFile(string sourcefile, string targetfile)
  
 -- 
 1.7.6.4
