@@ -1,39 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4ECF9B0F.7040907@bmw-carit.de>
+Date: Fri, 25 Nov 2011 14:41:35 +0100
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 MIME-Version: 1.0
-Date: Fri, 25 Nov 2011 15:49:53 +0100
-Message-ID: <CA+HdrtciUmmqYi5MVyzEnu16z3i2BzOK83zkdh8zbmwkPBeyCA@mail.gmail.com>
-Subject: PBAP: Generate cache using absolute path instead of relative path.
-From: Anders Widen <mail@anderswiden.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC obexd 05/10] client-doc: replace parameter dict with conventional
+ ones
+References: <1322143742-31182-1-git-send-email-mikel.astiz@bmw-carit.de> <1322143742-31182-6-git-send-email-mikel.astiz@bmw-carit.de> <20111124182457.GB20733@samus> <CABBYNZ+T_j_4340NXefxH833tr-zdiy446yJnFDp58SoqDLnZw@mail.gmail.com>
+In-Reply-To: <CABBYNZ+T_j_4340NXefxH833tr-zdiy446yJnFDp58SoqDLnZw@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi Luiz, Vinicius,
 
-Possible error?
+> IMO it is better to leave as it is because then some parameters can be 
+> omitted such as adapter and target, and it also easier to extend if we 
+> need other parameters e.g. WHO header without breaking the signature. 
 
-Looking at the PBAP Specification P.27
+This might be a matter of personal preference, but IMO using a 
+dictionary to make an API more flexible is just hiding the problem. I 
+don't see why this method has more reasons than any other method to use 
+a dictionary instead of well-defined formal parameters.
 
-"5.3.3 Name
-This header specifies the name of the folder to be retrieved. The
-value shall not include
-any path information, since the PullvCardListing function uses
-relative paths. An empty
-name header may be sent to retrieve the folder that is the current directory."
+If the point is that some of the input parameters are optional, I would 
+rather propose using empty strings. Again, it's a matter of personal taste.
 
-and then in the backend implementations:
-/plugins/phonebook-tracker.c
-/plugins/phonebook-ebook.c
+Besides, I don't understand how the target could be omitted. Could you 
+further elaborate on this?
 
-both use absolute paths in the implementation of:
+Cheers,
+Mikel
 
-phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
-      phonebook_cache_ready_cb ready_cb, void *user_data, int *err)
-
-
-Is there something in PBAP Core I've missed?
-I looked for concats of the current_folder but it seems to pass the
-information to the implementation raw.
-
-//Anders Widén
