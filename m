@@ -1,32 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH] Fix bad epoch time stamp generation
-Date: Fri, 25 Nov 2011 16:37:28 +0100
-Message-Id: <1322235448-9638-1-git-send-email-sancane@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CA+HdrtciUmmqYi5MVyzEnu16z3i2BzOK83zkdh8zbmwkPBeyCA@mail.gmail.com>
+References: <CA+HdrtciUmmqYi5MVyzEnu16z3i2BzOK83zkdh8zbmwkPBeyCA@mail.gmail.com>
+Date: Fri, 25 Nov 2011 15:55:20 +0100
+Message-ID: <CA+i+Aw1qsE8PsoZPo8VVfE_Gy=52UvygcV5c_FJfO1gqAKfgpQ@mail.gmail.com>
+Subject: Re: PBAP: Generate cache using absolute path instead of relative path.
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: Anders Widen <mail@anderswiden.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The number of months is in the range 0 to 11, we have to decrease
-month number by 1 before getting the epoch.
----
- thermometer/thermometer.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Fri, Nov 25, 2011 at 3:49 PM, Anders Widen <mail@anderswiden.com> wrote:
+> Hi!
+>
+> Possible error?
+>
+> Looking at the PBAP Specification P.27
+>
+> "5.3.3 Name
+> This header specifies the name of the folder to be retrieved. The
+> value shall not include
+> any path information, since the PullvCardListing function uses
+> relative paths. An empty
+> name header may be sent to retrieve the folder that is the current directory."
+>
+> and then in the backend implementations:
+> /plugins/phonebook-tracker.c
+> /plugins/phonebook-ebook.c
+>
+> both use absolute paths in the implementation of:
+>
+> phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
+>      phonebook_cache_ready_cb ready_cb, void *user_data, int *err)
+>
+>
+> Is there something in PBAP Core I've missed?
+> I looked for concats of the current_folder but it seems to pass the
+> information to the implementation raw.
+I guess path is generated in pbap_get(). There is type comparison for
+VCARDLISTING_TYPE and then the stored name is built from current path
+and given name.
 
-diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
-index db33cdb..e3872c9 100644
---- a/thermometer/thermometer.c
-+++ b/thermometer/thermometer.c
-@@ -954,7 +954,7 @@ static void proc_measurement(struct thermometer *t, const uint8_t *pdu,
- 		}
- 
- 		ts.tm_year = att_get_u16(&pdu[8]) - 1900;
--		ts.tm_mon = pdu[10];
-+		ts.tm_mon = pdu[10] - 1;
- 		ts.tm_mday = pdu[11];
- 		ts.tm_hour = pdu[12];
- 		ts.tm_min = pdu[13];
 -- 
-1.7.7.4
-
+Slawomir Bochenski
