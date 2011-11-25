@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 6/6] Remove dependency on OpenOBEX
-Date: Fri, 25 Nov 2011 13:33:48 +0200
-Message-Id: <1322220828-10226-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 4/6] Remove obex_get_id
+Date: Fri, 25 Nov 2011 13:33:46 +0200
+Message-Id: <1322220828-10226-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1322220828-10226-1-git-send-email-luiz.dentz@gmail.com>
 References: <1322220828-10226-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,61 +11,82 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Now that the server also uses gobex there is no need to depend on
-OpenOBEX anymore.
+Plugins that need the peer address/name should use obex_getpeername which
+uses the transport driver to resolve it.
 ---
- Makefile.am  |   14 ++++++--------
- configure.ac |    5 -----
- 2 files changed, 6 insertions(+), 13 deletions(-)
+ plugins/syncevolution.c |    8 +++++++-
+ src/obex.c              |   17 -----------------
+ src/obex.h              |    1 -
+ 3 files changed, 7 insertions(+), 19 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 2582651..af03f2e 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -85,9 +85,8 @@ src_obexd_SOURCES = $(gdbus_sources) $(builtin_sources) $(btio_sources) \
- 			src/server.h src/server.c
+diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
+index e3b06f4..b0cd626 100644
+--- a/plugins/syncevolution.c
++++ b/plugins/syncevolution.c
+@@ -218,6 +218,7 @@ static void *synce_connect(struct obex_session *os, int *err)
+ {
+ 	DBusConnection *conn;
+ 	struct synce_context *context;
++	char *address;
  
- src_obexd_LDADD = @DBUS_LIBS@ @GLIB_LIBS@ @GTHREAD_LIBS@ \
--					@EBOOK_LIBS@ @OPENOBEX_LIBS@ \
--					@BLUEZ_LIBS@ @LIBICAL_LIBS@ \
--					@TRACKER_LIBS@ -ldl
-+					@EBOOK_LIBS@ @BLUEZ_LIBS@ \
-+					@LIBICAL_LIBS@ @TRACKER_LIBS@ -ldl
+ 	manager_register_session(os);
  
- src_obexd_LDFLAGS = -Wl,--export-dynamic
+@@ -228,9 +229,14 @@ static void *synce_connect(struct obex_session *os, int *err)
+ 	context = g_new0(struct synce_context, 1);
+ 	context->dbus_conn = conn;
+ 	context->lasterr = -EAGAIN;
+-	context->id = obex_get_id(os);
+ 	context->os = os;
  
-@@ -129,11 +128,10 @@ endif
++	if (obex_getpeername(os, &address) == 0) {
++		context->id = g_strdup_printf("%s+%d", address,
++							SYNCEVOLUTION_CHANNEL);
++		g_free(address);
++	}
++
+ 	if (err)
+ 		*err = 0;
  
- service_DATA = $(service_in_files:.service.in=.service)
+diff --git a/src/obex.c b/src/obex.c
+index 7f31c5d..a88306d 100644
+--- a/src/obex.c
++++ b/src/obex.c
+@@ -1524,23 +1524,6 @@ uint8_t obex_get_action_id(struct obex_session *os)
+ 	return os->action_id;
+ }
  
--AM_CFLAGS = @OPENOBEX_CFLAGS@ @BLUEZ_CFLAGS@ @EBOOK_CFLAGS@ \
--			@GTHREAD_CFLAGS@ @GLIB_CFLAGS@ @DBUS_CFLAGS@ \
--			@LIBICAL_CFLAGS@ -D_FILE_OFFSET_BITS=64 \
--			@TRACKER_CFLAGS@ \
--			-DOBEX_PLUGIN_BUILTIN -DPLUGINDIR=\""$(plugindir)"\"
-+AM_CFLAGS = @BLUEZ_CFLAGS@ @EBOOK_CFLAGS@ @GTHREAD_CFLAGS@ @GLIB_CFLAGS@ \
-+			@DBUS_CFLAGS@ @LIBICAL_CFLAGS@ @TRACKER_CFLAGS@ \
-+			-DOBEX_PLUGIN_BUILTIN -DPLUGINDIR=\""$(plugindir)"\" \
-+			-D_FILE_OFFSET_BITS=64
- 
- INCLUDES = -I$(builddir)/src -I$(srcdir)/src -I$(srcdir)/plugins \
- 				-I$(srcdir)/gdbus \
-diff --git a/configure.ac b/configure.ac
-index 962e2e7..fca284e 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -89,11 +89,6 @@ AC_CHECK_LIB(dbus-1, dbus_connection_can_send_type, dummy=yes,
- AC_SUBST(DBUS_CFLAGS)
- AC_SUBST(DBUS_LIBS)
- 
--PKG_CHECK_MODULES(OPENOBEX, openobex, dummy=yes,
--				AC_MSG_ERROR(libopenobex is required))
--AC_SUBST(OPENOBEX_CFLAGS)
--AC_SUBST(OPENOBEX_LIBS)
+-/* TODO: find a way to do this for tty or fix syncevolution */
+-char *obex_get_id(struct obex_session *os)
+-{
+-	GError *gerr = NULL;
+-	char address[18];
+-	uint8_t channel;
 -
- PKG_CHECK_MODULES(BLUEZ, bluez, dummy=yes,
- 				AC_MSG_ERROR(libbluetooth is required))
- AC_SUBST(BLUEZ_CFLAGS)
+-	bt_io_get(os->io, BT_IO_RFCOMM, &gerr,
+-			BT_IO_OPT_DEST, address,
+-			BT_IO_OPT_CHANNEL, &channel,
+-			BT_IO_OPT_INVALID);
+-	if (gerr)
+-		return NULL;
+-
+-	return g_strdup_printf("%s+%d", address, channel);
+-}
+-
+ ssize_t obex_get_apparam(struct obex_session *os, const uint8_t **buffer)
+ {
+ 	*buffer = os->apparam;
+diff --git a/src/obex.h b/src/obex.h
+index 3ec49a9..7f07fd2 100644
+--- a/src/obex.h
++++ b/src/obex.h
+@@ -46,7 +46,6 @@ int obex_copy(struct obex_session *os, const char *source,
+ int obex_move(struct obex_session *os, const char *source,
+ 						const char *destination);
+ uint8_t obex_get_action_id(struct obex_session *os);
+-char *obex_get_id(struct obex_session *os);
+ ssize_t obex_get_apparam(struct obex_session *os, const uint8_t **buffer);
+ ssize_t obex_get_non_header_data(struct obex_session *os,
+ 							const uint8_t **data);
 -- 
 1.7.7.3
 
