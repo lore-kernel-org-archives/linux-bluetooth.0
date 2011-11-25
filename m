@@ -1,38 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 Nov 2011 14:28:23 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jorge Fernandez Gonzalez <jorge.fernandez.gonzalez@gmail.com>
+Message-ID: <1322222621.29909.21.camel@aeonflux>
+Subject: Re: [PATCHv2 2/2] Bluetooth: Remove magic bluetooth version numbers
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add missing health test scripts to Makefile.tools
-Message-ID: <20111125122823.GA23467@x220>
-References: <1321974170-21111-1-git-send-email-jorge.fernandez.gonzalez@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321974170-21111-1-git-send-email-jorge.fernandez.gonzalez@gmail.com>
+Date: Fri, 25 Nov 2011 13:03:41 +0100
+In-Reply-To: <1322138190-21593-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1322138190-21593-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1322138190-21593-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jorge,
+Hi Andrei,
 
-On Tue, Nov 22, 2011, Jorge Fernandez Gonzalez wrote:
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  Makefile.tools |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  include/net/bluetooth/bluetooth.h |    5 +++++
+>  net/bluetooth/hci_conn.c          |    2 +-
+>  net/bluetooth/hci_event.c         |    6 +++---
+>  3 files changed, 9 insertions(+), 4 deletions(-)
 > 
-> diff --git a/Makefile.tools b/Makefile.tools
-> index c0a54d0..7fa4269 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -214,7 +214,7 @@ EXTRA_DIST += test/apitest test/sap-client test/hsplay test/hsmicro \
->  		test/simple-service test/simple-endpoint test/test-audio \
->  		test/test-input test/test-attrib test/test-proximity \
->  		test/test-sap-server test/test-oob test/test-serial-proxy \
-> -		test/test-thermometer \
-> +		test/test-thermometer test/test-health test/test-health-sink \
->  		test/service-record.dtd test/service-did.xml \
->  		test/service-spp.xml test/service-opp.xml test/service-ftp.xml
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 38cd3da..97264fc 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -36,6 +36,11 @@
+>  #define PF_BLUETOOTH	AF_BLUETOOTH
+>  #endif
 >  
+> +/* Bluetooth versions */
+> +#define BLUETOOTH_VER_1_1	1
+> +#define BLUETOOTH_VER_1_2	2
+> +#define BLUETOOTH_VER_2_0	3
+> +
+>  /* Reserv for core and drivers use */
+>  #define BT_SKB_RESERVE	8
+>  
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index de0b93e..b328ac6 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -123,7 +123,7 @@ static void hci_acl_connect_cancel(struct hci_conn *conn)
+>  
+>  	BT_DBG("%p", conn);
+>  
+> -	if (conn->hdev->hci_ver < 2)
+> +	if (conn->hdev->hci_ver < BLUETOOTH_VER_1_2)
+>  		return;
+>  
+>  	bacpy(&cp.bdaddr, &conn->dst);
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 7da7ef6..60651fa 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -498,7 +498,7 @@ static void hci_setup_event_mask(struct hci_dev *hdev)
+>  
+>  	/* CSR 1.1 dongles does not accept any bitfield so don't try to set
+>  	 * any event mask for pre 1.2 devices */
+> -	if (hdev->lmp_ver <= 1)
+> +	if (hdev->lmp_ver <= BLUETOOTH_VER_1_1)
+>  		return;
 
-Applied. Thanks.
+maybe in an extra patch we change this to < BLUETOOTH_VER_1_2 to match
+it exactly what the comment says about pre 1.2.
 
-Johan
+Regards
+
+Marcel
+
+
