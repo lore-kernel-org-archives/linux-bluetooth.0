@@ -1,33 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 1/6] bluetooth: make use of secure flag for authorization
-Date: Fri, 25 Nov 2011 13:33:43 +0200
-Message-Id: <1322220828-10226-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 25 Nov 2011 13:10:38 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd 1/4] gobex: add unit test for PUT response with
+ delay
+Message-ID: <20111125111038.GA20711@x220>
+References: <1322055729-7185-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1322055729-7185-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-Using secure flag is probably safer here as other services beside OPP
-may not require security/authorization.
----
- plugins/bluetooth.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Wed, Nov 23, 2011, Luiz Augusto von Dentz wrote:
+> ---
+>  unit/test-gobex-transfer.c |   86 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 86 insertions(+), 0 deletions(-)
 
-diff --git a/plugins/bluetooth.c b/plugins/bluetooth.c
-index c73beb6..7d5aedb 100644
---- a/plugins/bluetooth.c
-+++ b/plugins/bluetooth.c
-@@ -479,7 +479,7 @@ static void confirm_event(GIOChannel *io, void *user_data)
- 		goto drop;
- 	}
- 
--	if (driver->service != OBEX_OPP) {
-+	if (driver->secure == TRUE) {
- 		if (request_service_authorization(service, io, address) < 0)
- 			goto drop;
- 
--- 
-1.7.7.3
+All four patches have been applied. Thanks.
 
+Johan
