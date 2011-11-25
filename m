@@ -1,69 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1322222529.29909.20.camel@aeonflux>
-Subject: Re: [RFCv1 4/6] Bluetooth: Initialize default flow control mode
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1322143742-31182-7-git-send-email-mikel.astiz@bmw-carit.de>
+References: <1322143742-31182-1-git-send-email-mikel.astiz@bmw-carit.de>
+	<1322143742-31182-7-git-send-email-mikel.astiz@bmw-carit.de>
+Date: Fri, 25 Nov 2011 14:01:57 +0200
+Message-ID: <CABBYNZ+vw0+dDda4z9GXyfn=iRczEXvBUKC3KG270E1kjPRO_w@mail.gmail.com>
+Subject: Re: [RFC obexd 06/10] client-doc: remove agent in favour of transfer signals
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz@bmw-carit.de>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 25 Nov 2011 13:02:09 +0100
-In-Reply-To: <1322139125-22377-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1322139125-22377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1322139125-22377-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Mikel,
 
->  include/net/bluetooth/hci.h |    4 ++++
->  net/bluetooth/hci_core.c    |    4 ++++
->  2 files changed, 8 insertions(+), 0 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index ee83c36..67f7028 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -271,6 +271,10 @@ enum {
->  #define HCI_ERROR_LOCAL_HOST_TERM	0x16
->  #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
->  
-> +/* Flow control modes */
-> +#define HCI_PACKET_BASED_FLOW_CTL_MODE	0x00
-> +#define HCI_BLOCK_BASED_FLOW_CTL_MODE	0x01
+On Thu, Nov 24, 2011 at 4:08 PM, Mikel Astiz <mikel.astiz@bmw-carit.de> wrote:
+> Assuming that the request confirmation from the agent is not necessary,
+> the rest of the reports can be achieved using signals in the transfer
+> object itself.
+>
+> The main benefit of this is that the API is simpler and the client apps
+> do not have to register the agent, and can simply listen to the relevant
+> signals.
+> ---
+>  doc/client-api.txt |   67 ++++++++++++---------------------------------------
+>  1 files changed, 16 insertions(+), 51 deletions(-)
+>
+> diff --git a/doc/client-api.txt b/doc/client-api.txt
+> index 67355c6..eb06d6b 100644
+> --- a/doc/client-api.txt
+> +++ b/doc/client-api.txt
+> @@ -42,15 +42,6 @@ Methods              dict GetProperties()
+>
+>                        Returns all properties for the session.
+>
+> -               void AssignAgent(object agent)
+> -
+> -                       Assign an OBEX agent to this session. This allows
+> -                       detailed progress reports about the transactions.
+> -
+> -               void ReleaseAgent(object agent)
+> -
+> -                       Release a previously assigned OBEX agent.
+> -
+>  Properties     string Source [readonly]
+>
+>                string Destination [readonly]
+> @@ -64,8 +55,7 @@ Service               org.openobex.client
+>  Interface      org.openobex.ObjectPush
+>  Object path    [variable prefix]/{session0,session1,...}
+>
+> -Methods                void SendFiles(array{string} files, string destination,
+> -                                                               object agent)
+> +Methods                void SendFiles(array{string} files, string destination)
+>
+>                        Send one or multiple local files to the remote device,
+>                        and the given destination.
+> @@ -281,58 +271,33 @@ Methods           dict GetProperties()
+>
+>                        Cancels this transfer.
+>
+> -Properties     string Name [readonly]
+> -
+> -                       Name of the transferred object.
+> -
+> -               uint64 Size [readonly]
+> +Properties     uint64 Size [readonly, optional]
+>
+> -                       Size of the transferred object. If the size is
+> +                       Size of the transferred object(s). If the size is
+>                        unknown, then this property will not be present.
+>
+> -               string Filename [readonly]
+> -
+> -                       Complete name of the file being received or sent.
+> -
+> -Agent hierarchy
+> -===============
+> -
+> -Service                unique name
+> -Interface      org.openobex.Agent
+> -Object path    freely definable
+> -
+> -Methods                void Release()
+> -
+> -                       This method gets called when the service daemon
+> -                       unregisters the agent. An agent can use it to do
+> -                       cleanup tasks. There is no need to unregister the
+> -                       agent, because when this method gets called it has
+> -                       already been unregistered.
+> -
+> -               string Request(object transfer)
+> +               string LocalFile [readonly]
 
-see my other email. You have the naming backwards here.
+Im not sure why you think LocalFile would suite better here, IMO
+Filename is fine, also don't remove the Name as it may not match the
+Filename.
 
-> +
->  /* -----  HCI Commands ---- */
->  #define HCI_OP_NOP			0x0000
->  
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index a0247d3..2e4211e 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -198,6 +198,8 @@ static void bredr_init(struct hci_dev *hdev)
->  	__le16 param;
->  	__u8 flt_type;
->  
-> +	hdev->flow_ctl_mode = HCI_PACKET_BASED_FLOW_CTL_MODE;
-> +
->  	/* Mandatory initialization */
->  
->  	/* Reset */
-> @@ -244,6 +246,8 @@ static void bredr_init(struct hci_dev *hdev)
->  
->  static void amp_init(struct hci_dev *hdev)
->  {
-> +	hdev->flow_ctl_mode = HCI_BLOCK_BASED_FLOW_CTL_MODE;
-> +
->  	/* Reset */
->  	hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
->  
-
-Otherwise this is fine.
-
-Regards
-
-Marcel
-
-
+-- 
+Luiz Augusto von Dentz
