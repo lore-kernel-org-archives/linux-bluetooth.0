@@ -1,81 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1322496548.29909.26.camel@aeonflux>
-Subject: Re: [PATCHv2 2/2] Bluetooth: Remove magic bluetooth version numbers
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 28 Nov 2011 17:09:08 +0100
-In-Reply-To: <1322250832.21980.2.camel@Nokia-N900>
-References: <1322138190-21593-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1322138190-21593-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1322222621.29909.21.camel@aeonflux> <1322250832.21980.2.camel@Nokia-N900>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: Re: [PATCH v2 9/9] Bluetooth: Support LE-Only discovery procedure
+Mime-Version: 1.0 (Apple Message framework v1251.1)
+Content-Type: text/plain; charset=us-ascii
+From: Andre Guedes <andre.guedes@openbossa.org>
+In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B02641649D@DNCE02.ent.ti.com>
+Date: Mon, 28 Nov 2011 11:51:23 -0300
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <34209971-D1E6-4C56-A806-E060073D6D56@openbossa.org>
+References: <1322265226-6404-1-git-send-email-andre.guedes@openbossa.org> <1322265226-6404-10-git-send-email-andre.guedes@openbossa.org> <F0070FBC0FB3174D8D11444EB2D5B02641649D@DNCE02.ent.ti.com>
+To: "Ganir, Chen" <chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Chen,
 
-> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> > > ---
-> > > include/net/bluetooth/bluetooth.h |       5 +++++
-> > > net/bluetooth/hci_conn.c                   |       2 +-
-> > > net/bluetooth/hci_event.c                 |       6 +++---
-> > > 3 files changed, 9 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/include/net/bluetooth/bluetooth.h
-> > > b/include/net/bluetooth/bluetooth.h index 38cd3da..97264fc 100644
-> > > --- a/include/net/bluetooth/bluetooth.h
-> > > +++ b/include/net/bluetooth/bluetooth.h
-> > > @@ -36,6 +36,11 @@
-> > > #define PF_BLUETOOTH    AF_BLUETOOTH
-> > > #endif
-> > > 
-> > > +/* Bluetooth versions */
-> > > +#define BLUETOOTH_VER_1_1    1
-> > > +#define BLUETOOTH_VER_1_2    2
-> > > +#define BLUETOOTH_VER_2_0    3
-> > > +
-> > > /* Reserv for core and drivers use */
-> > > #define BT_SKB_RESERVE    8
-> > > 
-> > > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > > index de0b93e..b328ac6 100644
-> > > --- a/net/bluetooth/hci_conn.c
-> > > +++ b/net/bluetooth/hci_conn.c
-> > > @@ -123,7 +123,7 @@ static void hci_acl_connect_cancel(struct hci_conn
-> > > *conn)
-> > > 
-> > >     BT_DBG("%p", conn);
-> > > 
-> > > -    if (conn->hdev->hci_ver < 2)
-> > > +    if (conn->hdev->hci_ver < BLUETOOTH_VER_1_2)
-> > >         return;
-> > > 
-> > >     bacpy(&cp.bdaddr, &conn->dst);
-> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > index 7da7ef6..60651fa 100644
-> > > --- a/net/bluetooth/hci_event.c
-> > > +++ b/net/bluetooth/hci_event.c
-> > > @@ -498,7 +498,7 @@ static void hci_setup_event_mask(struct hci_dev
-> > > *hdev)
-> > > 
-> > >     /* CSR 1.1 dongles does not accept any bitfield so don't try to set
-> > >      * any event mask for pre 1.2 devices */
-> > > -    if (hdev->lmp_ver <= 1)
-> > > +    if (hdev->lmp_ver <= BLUETOOTH_VER_1_1)
-> > >         return;
-> > 
-> > maybe in an extra patch we change this to < BLUETOOTH_VER_1_2 to match
-> > it exactly what the comment says about pre 1.2.
-> 
-> Do you want it to be a separate patch?
+On Nov 27, 2011, at 3:44 AM, Ganir, Chen wrote:
 
-sure. Just add another patch on top of your stack.
+> Do we really need this kind of functionality ? The GAP spec defines how a single mode/dual mode devices should search for devices. In addition, the kernel has all the knowledge required to decide which of the GAP spec device discovery procedures to use, so why bother the bluetoothd with decisions of such kind ? Why create an option for mistake ? If a device is BR/EDR only, mgmt_start_discovery will start discovery of BR/EDR devices. If it is a single mode LE device, the mgmt_start_discovery will start a discovery for LE devices only. If the device is dual mode (BR/EDR/LE) then the mgmt_start_discovery command will do the interleaved scanning as the spec defines. Adding such complexity and allowing the selection of scan methods breaks the meaning of the spec. Why do we need to allow the user to scan for LE devices while in BR/EDR only mode, and return an error ? Why should the user even be aware of such an option ? I thought the whole idea behind the mgmtops (as opposite to hciops) was to encapsulate some logic into basic operations and procedures, and prevent the 1:1 reflection of hci commands. In this case, device discovery is opaque to the user - it will discover the devices as the spec defines, without any irrelevant errors and without too much understanding from the upper layers.
 
-Regards
+I'm not sure what were key reasons for this API change, but this is the
+way Start Discovery API was designed. I guess Johan or Marcel can answer
+your question about why the user would like to set the discovery procedure.
 
-Marcel
+BR,
 
+Andre
 
