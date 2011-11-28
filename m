@@ -1,104 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1322496770.29909.29.camel@aeonflux>
-Subject: Re: RFCOMM Remote Port Negotiation
+Message-ID: <1322496548.29909.26.camel@aeonflux>
+Subject: Re: [PATCHv2 2/2] Bluetooth: Remove magic bluetooth version numbers
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrea Galbusera <gizero@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 28 Nov 2011 17:12:50 +0100
-In-Reply-To: <CAC+thW2tkUHWAqFuRrQzw93jov=cr_oOiunvw_jZ4Jtu+0ApMg@mail.gmail.com>
-References: <CAC+thW2oKHuMU3Ky+bLwU6BOhhaeJ5dBapYhYc3ctPsNhMcLXQ@mail.gmail.com>
-	 <1322221581.29909.17.camel@aeonflux>
-	 <CAC+thW2tkUHWAqFuRrQzw93jov=cr_oOiunvw_jZ4Jtu+0ApMg@mail.gmail.com>
+Date: Mon, 28 Nov 2011 17:09:08 +0100
+In-Reply-To: <1322250832.21980.2.camel@Nokia-N900>
+References: <1322138190-21593-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1322138190-21593-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1322222621.29909.21.camel@aeonflux> <1322250832.21980.2.camel@Nokia-N900>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrea,
+Hi Andrei,
 
-> >> This days I have been thinking about a project, which involves
-> >> replacing a serial cable with a bluetooth based solution. Nothing new,
-> >> you'd say and that's exactly what I thought at first. Than I had to
-> >> face this fact. Such an application involves communication between two
-> >> host over a serial connection with a baudrate that changes over time.
-> >> What I need is a "fully transparent" replacement for a serial cable
-> >> and it needs to be compatible with the current software.
-> >>
-> >> I know RFCOMM standard does provide multiplexor frames and RPN
-> >> commands in particular, which allow for remote bluetooth device to be
-> >> aware of any change in serial communication parameters on the other
-> >> side. It also became pretty clear to me that what I'm supposed to
-> >> realize is an RFCOMM Type 2 device. According to RFCOMM specification,
-> >> a Type 2 device is an intermediate device that has a physical RS-232
-> >> serial port on top of RFCOMM.
-> >>
-> >> My question is? How would one implement such a thing with Linux? I'm
-> >> not a kernel expert at all but, if my understanding is correct,
-> >> rfcomm_recv_rpn() function in net/bluetooth/rfcomm/core.c is designed
-> >> to reply to RPN frames (as required by the protocol specification) but
-> >> does not provide any mechanism to signal other layers (maybe the tty
-> >> device) of any remote request for changing port settings. Is my
-> >> understanding correct? Does this mean that Linux RFCOMM kernel layer
-> >> is currently designed for Type 1 devices only?
-> >>
-> >> Even thinking to a user space solution for my problem does not seem
-> >> easy at all to me. When the remote host changes line settings, RFCOMM
-> >> layer will send RPN command accordingly (linux does so when changing
-> >> tty settings). How to get such an information on the other side if
-> >> rfcomm_recv_rpn() does, in fact, short-circuit RPN commands in the
-> >> kernel?
-> >>
-> >> I'm quite surprised no one ever had this requirement! I couldn't find
-> >> much about RPN in the list archives and even on google. Also I noticed
-> >> that many bluetooth-serial adapters on the market do behave the same
-> >> way Linux does, and they simply reply to RPN without carrying out any
-> >> request to change settings on their serial port. This could mean I'm
-> >> completely on a wrong path!
-> >>
-> >> Please! I ask you, bluetooth gurus, to improve my understanding, if
-> >> possible. If in the end you do think reasonable any extension to the
-> >> current kernel implementation, which take into account such a
-> >> scenario, I'd be glad to participate and help.
-> >
-> > the only way this works is with the RFCOMM TTY support anyway. Since
-> > with the RFCOMM socket we do not have any of these signals.
-> > To be honest here, nobody ever cared about this old fashion real serial
-> > emulation.
+> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> > > ---
+> > > include/net/bluetooth/bluetooth.h |       5 +++++
+> > > net/bluetooth/hci_conn.c                   |       2 +-
+> > > net/bluetooth/hci_event.c                 |       6 +++---
+> > > 3 files changed, 9 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/include/net/bluetooth/bluetooth.h
+> > > b/include/net/bluetooth/bluetooth.h index 38cd3da..97264fc 100644
+> > > --- a/include/net/bluetooth/bluetooth.h
+> > > +++ b/include/net/bluetooth/bluetooth.h
+> > > @@ -36,6 +36,11 @@
+> > > #define PF_BLUETOOTH    AF_BLUETOOTH
+> > > #endif
+> > > 
+> > > +/* Bluetooth versions */
+> > > +#define BLUETOOTH_VER_1_1    1
+> > > +#define BLUETOOTH_VER_1_2    2
+> > > +#define BLUETOOTH_VER_2_0    3
+> > > +
+> > > /* Reserv for core and drivers use */
+> > > #define BT_SKB_RESERVE    8
+> > > 
+> > > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> > > index de0b93e..b328ac6 100644
+> > > --- a/net/bluetooth/hci_conn.c
+> > > +++ b/net/bluetooth/hci_conn.c
+> > > @@ -123,7 +123,7 @@ static void hci_acl_connect_cancel(struct hci_conn
+> > > *conn)
+> > > 
+> > >     BT_DBG("%p", conn);
+> > > 
+> > > -    if (conn->hdev->hci_ver < 2)
+> > > +    if (conn->hdev->hci_ver < BLUETOOTH_VER_1_2)
+> > >         return;
+> > > 
+> > >     bacpy(&cp.bdaddr, &conn->dst);
+> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > index 7da7ef6..60651fa 100644
+> > > --- a/net/bluetooth/hci_event.c
+> > > +++ b/net/bluetooth/hci_event.c
+> > > @@ -498,7 +498,7 @@ static void hci_setup_event_mask(struct hci_dev
+> > > *hdev)
+> > > 
+> > >     /* CSR 1.1 dongles does not accept any bitfield so don't try to set
+> > >      * any event mask for pre 1.2 devices */
+> > > -    if (hdev->lmp_ver <= 1)
+> > > +    if (hdev->lmp_ver <= BLUETOOTH_VER_1_1)
+> > >         return;
+> > 
+> > maybe in an extra patch we change this to < BLUETOOTH_VER_1_2 to match
+> > it exactly what the comment says about pre 1.2.
 > 
-> In the industry we still have many application where, till this days,
-> the only available interface was the serial cable.
-> My primary interest is in metering, where laptops are being replaced
-> by smartphones and small netbooks in the toolboxes of technicians that
-> have to interface to metering devices on the field. In the case of
-> smartphones, even usb might not be an option. Hence my company, that
-> in the past designed serial cable based probes is now about to provide
-> a bluetooth based replacement for that.
-> 
-> > So you need to implement the hooks between the Linux TTY
-> > layer and Bluetooth RFCOMM TTY support to make this work.
-> 
-> As said, my experience in kernel development is not that much yet and
-> TTY things are scaring me a lot. However, your clarification is useful
-> to confirm that TTY should be the direction to look at.
-> Do you know of any other kernel layer with similar needs to notify TTY
-> of property changes?
-> 
-> > One thing that might will make this fail is the complicated looking in
-> > the TTY layer and the way how certain things are executed in interrupt
-> > context. So good luck here.
-> 
-> Any idea who could help here suggesting if this could fit somehow in
-> linux TTY layer?
+> Do you want it to be a separate patch?
 
-we do already support TTY emulation for RFCOMM. That has been there for
-ages and is actually well tested. It is just that we did not bother to
-go all the way in trying to emulate a real serial cable. Especially when
-it comes to RPN.
-
-You might need to look by yourself or find a contractor that does this
-for you. I can point you in a view directions if you don't wanna do it
-by yourself, but are willing to invest money to get this done. And
-honestly, I don't see anybody doing this just for fun.
+sure. Just add another patch on top of your stack.
 
 Regards
 
