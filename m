@@ -1,50 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 28 Nov 2011 10:42:08 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Michael Schmitt <tcwardrobe@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	padovan@profusion.mobi
+Subject: Re: 057c:3800 BlueFRITZ! Bluetooth Stick broken since 2.6.something
+Message-ID: <20111128084206.GB29363@aemeltch-MOBL1>
+References: <4EC679A0.7050309@gmail.com>
+ <20111118153652.GA3647@fusion.localdomain>
+ <4EC67E88.6060202@gmail.com>
+ <20111118162111.GA4680@fusion.localdomain>
+ <4EC68909.40108@gmail.com>
+ <20111118203019.GA24250@x220.ger.corp.intel.com>
+ <4EC91C7F.9070500@gmail.com>
+ <4ED20B2F.5010609@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B02641647C@DNCE02.ent.ti.com>
-References: <1322265226-6404-1-git-send-email-andre.guedes@openbossa.org>
-	<1322265226-6404-8-git-send-email-andre.guedes@openbossa.org>
-	<F0070FBC0FB3174D8D11444EB2D5B02641647C@DNCE02.ent.ti.com>
-Date: Mon, 28 Nov 2011 07:08:43 -0400
-Message-ID: <CAJdJm_NFpZv8_qaPw=UfTRAD0=FHCSs5ev-4QQdNRW4FLfE0_A@mail.gmail.com>
-Subject: Re: [PATCH v2 7/9] Bluetooth: Add 'eir_len' param to mgmt_device_found()
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: "Ganir, Chen" <chen.ganir@ti.com>
-Cc: Andre Guedes <andre.guedes@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4ED20B2F.5010609@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+Hi Michael,
 
-On Sun, Nov 27, 2011 at 2:37 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
-> Why do we really need this ? The GAP Spec clearly defines a fixed advertising size of 31 octets (Vol3, Part C, Section 11). Instead of reporting how much we got (may be other than 31 if the peer device does not conform to the spec as required), we should make sure that BlueZ will always report 31 octets, and make sure that the device found event always sends a buffer of 31 octets.
+On Sun, Nov 27, 2011 at 11:04:31AM +0100, Michael Schmitt wrote:
+> Just as a follow-up question (as I did not get a clear conclusion
+> out of the discussion and it seems to me the "discussion" did stop
+> without a real conclusion)...
+> 
+> What is the plan right now? Will there be a patch upstream (in the
+> kernel) at some point? Is it not clear how to fix that (broken?)
+> hardware driver-wise yet? Should I test something?
 
-These functions are also used for BR/EDR, where EIR data is 240 bytes.
-If I remember correctly, it has already been discussed on this list
-about dropping this length, and the decision was against dropping it,
-otherwise we would send always 240 bytes containing mostly zeroes (for
-LE case).
+Could you test Johan's patch:
 
-Also note these items from the AD section:
+http://permalink.gmane.org/gmane.linux.bluez.kernel/18752
 
-"If the Length field is set to zero, then the Data field has zero
-octets. This shall
-only occur to allow an early termination of the Advertising or Scan Response
-data."
+[PATCH 2/2] Bluetooth: Ignore HCI_Read_Local_Commands failures
 
-and:
+You can also apply the first patch.
 
-"Only the significant part of the Advertising or Scan Response data needs to be
-sent over the air."
+Best regards 
+Andrei Emeltchenko 
 
-So a device sending less than 31 bytes of AD is compliant as long as
-the last AD length field is zero. The receiving controller is not
-required to fill the remaining AD with zeroes before sending it to the
-host.
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+> 
+> regards
+> Michael
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
