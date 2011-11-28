@@ -1,26 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v2 9/9] Bluetooth: Support LE-Only discovery procedure
+Subject: Re: [PATCH v2 7/9] Bluetooth: Add 'eir_len' param to mgmt_device_found()
 Mime-Version: 1.0 (Apple Message framework v1251.1)
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
 From: Andre Guedes <andre.guedes@openbossa.org>
-In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B02641649D@DNCE02.ent.ti.com>
-Date: Mon, 28 Nov 2011 11:51:23 -0300
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <34209971-D1E6-4C56-A806-E060073D6D56@openbossa.org>
-References: <1322265226-6404-1-git-send-email-andre.guedes@openbossa.org> <1322265226-6404-10-git-send-email-andre.guedes@openbossa.org> <F0070FBC0FB3174D8D11444EB2D5B02641649D@DNCE02.ent.ti.com>
-To: "Ganir, Chen" <chen.ganir@ti.com>
+In-Reply-To: <CAJdJm_NFpZv8_qaPw=UfTRAD0=FHCSs5ev-4QQdNRW4FLfE0_A@mail.gmail.com>
+Date: Mon, 28 Nov 2011 11:06:17 -0300
+Cc: "Ganir, Chen" <chen.ganir@ti.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <06CD7C58-6858-4425-87C9-FF569E73881D@openbossa.org>
+References: <1322265226-6404-1-git-send-email-andre.guedes@openbossa.org> <1322265226-6404-8-git-send-email-andre.guedes@openbossa.org> <F0070FBC0FB3174D8D11444EB2D5B02641647C@DNCE02.ent.ti.com> <CAJdJm_NFpZv8_qaPw=UfTRAD0=FHCSs5ev-4QQdNRW4FLfE0_A@mail.gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Chen,
 
-On Nov 27, 2011, at 3:44 AM, Ganir, Chen wrote:
+On Nov 28, 2011, at 8:08 AM, Anderson Lizardo wrote:
 
-> Do we really need this kind of functionality ? The GAP spec defines how a single mode/dual mode devices should search for devices. In addition, the kernel has all the knowledge required to decide which of the GAP spec device discovery procedures to use, so why bother the bluetoothd with decisions of such kind ? Why create an option for mistake ? If a device is BR/EDR only, mgmt_start_discovery will start discovery of BR/EDR devices. If it is a single mode LE device, the mgmt_start_discovery will start a discovery for LE devices only. If the device is dual mode (BR/EDR/LE) then the mgmt_start_discovery command will do the interleaved scanning as the spec defines. Adding such complexity and allowing the selection of scan methods breaks the meaning of the spec. Why do we need to allow the user to scan for LE devices while in BR/EDR only mode, and return an error ? Why should the user even be aware of such an option ? I thought the whole idea behind the mgmtops (as opposite to hciops) was to encapsulate some logic into basic operations and procedures, and prevent the 1:1 reflection of hci commands. In this case, device discovery is opaque to the user - it will discover the devices as the spec defines, without any irrelevant errors and without too much understanding from the upper layers.
+> Hi Chen,
+> 
+> On Sun, Nov 27, 2011 at 2:37 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
+>> Why do we really need this ? The GAP Spec clearly defines a fixed advertising size of 31 octets (Vol3, Part C, Section 11). Instead of reporting how much we got (may be other than 31 if the peer device does not conform to the spec as required), we should make sure that BlueZ will always report 31 octets, and make sure that the device found event always sends a buffer of 31 octets.
+> 
+> These functions are also used for BR/EDR, where EIR data is 240 bytes.
+> If I remember correctly, it has already been discussed on this list
+> about dropping this length, and the decision was against dropping it,
+> otherwise we would send always 240 bytes containing mostly zeroes (for
+> LE case).
+> 
+> Also note these items from the AD section:
+> 
+> "If the Length field is set to zero, then the Data field has zero
+> octets. This shall
+> only occur to allow an early termination of the Advertising or Scan Response
+> data."
+> 
+> and:
+> 
+> "Only the significant part of the Advertising or Scan Response data needs to be
+> sent over the air."
+> 
+> So a device sending less than 31 bytes of AD is compliant as long as
+> the last AD length field is zero. The receiving controller is not
+> required to fill the remaining AD with zeroes before sending it to the
+> host.
 
-I'm not sure what were key reasons for this API change, but this is the
-way Start Discovery API was designed. I guess Johan or Marcel can answer
-your question about why the user would like to set the discovery procedure.
+I guess Lizardo already answered your question. Further info about this
+issue please take a look at the early discussion we had here in the ML.
+
+Subject: [PATCH v2 11/16] Bluetooth: Add 'eir_len' param to mgmt_device_found()
 
 BR,
 
