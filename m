@@ -1,18 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4ED4A576.8030102@globaledgesoft.com>
-Date: Tue, 29 Nov 2011 14:57:18 +0530
-From: sathish <sathish.n@globaledgesoft.com>
+Date: Tue, 29 Nov 2011 11:20:03 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd 1/2] Port core daemon to gobex
+Message-ID: <20111129092003.GA19348@x220>
+References: <1322557745-14542-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: metadata dbus
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1322557745-14542-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  Hi,
-Does the getting of metadata is supported now in the bluez .
+Hi Luiz,
 
--- 
-Thanks&  Regards,
-Sathish N
+On Tue, Nov 29, 2011, Luiz Augusto von Dentz wrote:
+> ---
+>  src/manager.c   |   26 +-
+>  src/obex-priv.h |   12 +-
+>  src/obex.c      | 1395 ++++++++++++++++++++++---------------------------------
+>  src/server.c    |    4 +-
+>  4 files changed, 577 insertions(+), 860 deletions(-)
 
+Both patches applied. Thanks.
+
+Johan
