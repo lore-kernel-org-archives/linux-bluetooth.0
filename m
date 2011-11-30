@@ -1,61 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 2/3] Bluetooth: AMP: Initialize and free amp_pending
-Date: Wed, 30 Nov 2011 15:54:31 +0200
-Message-Id: <1322661272-32027-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1322661272-32027-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1322661272-32027-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CA+_sZW8MnOX_oGThrTr6sb9xtoRBHx6vPabHHgtY4bR+8YyKnA@mail.gmail.com>
+References: <CA+_sZW8MnOX_oGThrTr6sb9xtoRBHx6vPabHHgtY4bR+8YyKnA@mail.gmail.com>
+Date: Wed, 30 Nov 2011 08:41:09 -0400
+Message-ID: <CAJdJm_PQbm-gmiquCKd08_3YZwQmj71-m_ds4xhDayq2wbP_Bw@mail.gmail.com>
+Subject: Re: [RFC] FindMe: Proposal to have separate dbus interface
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: vishal agarwal <vishal.bluez@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, naresh.gupta@stericsson.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Vishal,
 
-amp_pending is used as a callback when receiving HCI response event.
-Idea is taken from mgmt interface (mgmt_pending).
----
- net/bluetooth/hci_core.c |    7 +++++++
- 1 files changed, 7 insertions(+), 0 deletions(-)
+On Wed, Nov 30, 2011 at 7:40 AM, vishal agarwal <vishal.bluez@gmail.com> wrote:
+>  There is an existing DBus interface for proximity -
+> PROXIMITY_INTERFACE. SetProperty, GetProperties methods and
+> PropertyChanged signal is registered on this interface.
+>  SetProperty takes two arguments - Property(LinkLossAlertLevel or
+> ImmediateAlertLevel) and the value of alertlevel.
+>  Same is true for PropertyChanged signal. it returns - Property
+> (LinkLossAlertLevel or ImmediateAlertLevel) and the value of
+> alertlevel
+>
+>  Now if user wants to find the other device (using FindMe profile)
+> which is already connected to the Proximity monitor, for this,
+> SetProperty should be called. But now there is no way for BlueZ to
+> figure out whether it is called for Proximity(in this case, action
+> will be taken when PathLoss condition met) or for FindMe(it has to
+> write the alert level immediately).
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index fa33b27..331061f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -60,6 +60,8 @@ static void hci_cmd_task(unsigned long arg);
- static void hci_rx_task(unsigned long arg);
- static void hci_tx_task(unsigned long arg);
- 
-+void amp_pending_remove_all(struct hci_dev *hdev);
-+
- static DEFINE_RWLOCK(hci_task_lock);
- 
- /* HCI device list */
-@@ -1559,6 +1561,8 @@ int hci_register_dev(struct hci_dev *hdev)
- 
- 	INIT_LIST_HEAD(&hdev->mgmt_pending);
- 
-+	INIT_LIST_HEAD(&hdev->amp_pending);
-+
- 	INIT_LIST_HEAD(&hdev->blacklist);
- 
- 	INIT_LIST_HEAD(&hdev->uuids);
-@@ -1640,6 +1644,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 					!test_bit(HCI_SETUP, &hdev->flags)) {
- 		hci_dev_lock_bh(hdev);
- 		mgmt_index_removed(hdev);
-+		amp_pending_remove_all(hdev);
- 		hci_dev_unlock_bh(hdev);
- 	}
- 
-@@ -1647,6 +1652,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	 * pending list */
- 	BUG_ON(!list_empty(&hdev->mgmt_pending));
- 
-+	BUG_ON(!list_empty(&hdev->amp_pending));
-+
- 	hci_notify(hdev, HCI_DEV_UNREG);
- 
- 	if (hdev->rfkill) {
+If you do a SetProperty("ImmediateAlertLevel", <level>) it will always
+take immediately (i.e. try to connect if not already connected, and
+then write to the Immediate Alert Level characteristic). This is not
+specific to any profile (Proximity or FindMe), but to the Immediate
+Alert Service (IAS) behavior documented on the service spec.
+
+You should remember that, on the Reporter/Target side, there is only
+one Immediate Alert Service. If the device supports both profiles,
+they share this service. So it has no way (and no need, as far as I
+know) to tell the difference on which role is triggering the immediate
+alert.
+
+>  Same thing applies when we receive PropertyChanged signal. There is
+> no way for framework over DBus to figure out whether PropertyChanged
+> is for FindMe or for Proximity. If implementation is such that
+> Proximity reporter will alarm when it receives the PropertyChanged due
+> to path loss and there will be no alarm when PropertyChanged is called
+> for FindMe profile, framework has to know this.
+
+Sorry, but your paragraph above seems confusing to me. We do not
+implement a D-Bus API for Proximity Reporter or to Find Me Target, but
+only for monitor/locator. BlueZ's Proximity Reporter implementation is
+only for testing, and does not have a D-Bus API (see
+proximity/reporter.c).
+
+On the *proximity monitor* side, we may want to know if/when the
+ImmediateAlertLevel was written on the server (actually you can't tell
+it was successfully written, because the IAS uses Write Without
+Response, but you may want to know when it was attempted). If you want
+to monitor path loss (to issue alert on the monitor side), you should
+be watching for changes on the "SignalLevel" property.
+
+You cannot tell for sure whether the remote device is alerting. You
+can confirm by the visual/audible alert itself.
+
+>  One way to resolve these issues is to have seperate DBus interface
+> for Proximity and FindMe profiles.
+> Some benefits of using seperate interfaces for both the profiles -
+> 1. Code will be more clear
+> 2. Both BlueZ and framework above Dbus will easily distinguish
+> different methods and signals for these profiles
+> 3. Existing code will not break
+
+Please, take into consideration the points  I mentioned here, and let
+us know if you have any questions/doubts.
+
+Best Regards,
 -- 
-1.7.4.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
