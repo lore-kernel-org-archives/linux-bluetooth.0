@@ -1,59 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: Andre Guedes <andre.guedes@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH v2 9/9] Bluetooth: Support LE-Only discovery procedure
+Date: Wed, 30 Nov 2011 11:38:53 +0000
+Message-ID: <F0070FBC0FB3174D8D11444EB2D5B026428402@DNCE02.ent.ti.com>
+References: <1322265226-6404-1-git-send-email-andre.guedes@openbossa.org>
+ <1322265226-6404-10-git-send-email-andre.guedes@openbossa.org>
+ <F0070FBC0FB3174D8D11444EB2D5B02641649D@DNCE02.ent.ti.com>
+ <20111129091434.GB17393@x220>
+ <F0070FBC0FB3174D8D11444EB2D5B0264282C0@DNCE02.ent.ti.com>
+ <20111130112703.GA12146@x220>
+In-Reply-To: <20111130112703.GA12146@x220>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Date: Wed, 30 Nov 2011 17:10:44 +0530
-Message-ID: <CA+_sZW8MnOX_oGThrTr6sb9xtoRBHx6vPabHHgtY4bR+8YyKnA@mail.gmail.com>
-Subject: [RFC] FindMe: Proposal to have separate dbus interface
-From: vishal agarwal <vishal.bluez@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: naresh.gupta@stericsson.com
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Johan, 
 
-  I'm working on Proximity and FindMe profiles for BLE. I came across
-the need for a separate DBus interface for FindMe profile.
+> -----Original Message-----
+> From: Johan Hedberg [mailto:johan.hedberg@gmail.com]
+> Sent: Wednesday, November 30, 2011 1:27 PM
+> To: Ganir, Chen
+> Cc: Andre Guedes; linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCH v2 9/9] Bluetooth: Support LE-Only discovery
+> procedure
+> 
+> Hi Chen,
+> 
+> On Wed, Nov 30, 2011, Ganir, Chen wrote:
+> > > Firstly you should realize that this is not about functionality
+> exposed
+> > > to the user or applications, but functionality exposed to
+> bluetoothd.
+> > > The fact that we have something in the mgmt interface doesn't mean
+> that
+> > > it'll automatically be exposed in the D-Bus interface or bluetoothd
+> > > internal APIs.
+> > >
+> > > As for this particular case (allowing bluetoothd to restrict device
+> > > discovery to LE or BR/EDR) the reason is the concern that when
+> doing
+> > > discovery for a specific profile which is only applicable for
+> BR/EDR or
+> > > LE, you really don't want to waste the users time doing the "other"
+> > > discovery which will not yield any valuable results. Examples of
+> this
+> > > could be discovering devices to send a file over Object Push
+> (BR/EDR
+> > > only) or when running a application for a LE profile which utilizes
+> > > features only available though an LE radio.
+> > >
+> > > I'm not completely sure the need for this will be strong enough for
+> > > exposing it in the D-Bus API, but not having it in the kernel
+> interface
+> > > (mgmt) from the start makes it a lot harder to fix if we do end up
+> > > needing it later (as opposed to the D-Bus interface which would
+> "only"
+> > > mean doing a new major BlueZ version).
+> > >
+> > > Johan
+> >
+> > If this is the case, and we know that for now, we have no need for
+> > this, why introduce more complexity?
+> 
+> I really fail to see what you can consider complex about a single extra
+> parameter to start_discovery.
+> 
+> > How will the current GAP device search work?
+> 
+> Just like it has worked so far.
+> 
+> > How will interleaved scanning work?
+> 
+> Just like it would work without the extra parameter. It gets triggered
+> when user-space (bluetoothd) says it wants LE + BR/EDR discovery.
+> 
+> > Will it be triggered from the bluetoothd?
+> 
+> Yes, just like it would without the extra parameter.
+> 
+> > Will it be handled by the kernel ?
+> 
+> Yes, just like it would without the extra parameter.
+> 
+> Johan
 
-  Here's the detailed description of the use case.
+What I meant to ask was who is responsible for asking for dual mode or single mode scan now that the parameters were added ? Does the bluetoothd now needs to know if the controller and host support LE, so it can start a BR/EDR/LE scan ? or will the bluetoothd always ask for BR/EDR/LE scan, and the kernel will execute the supported search according to the LMP flags ?
 
-  Let's take an example where both the BLE devices support LinkLoss
-Service, Read Tx Power Service and Immediate Alert service. One device
-has Proxmity monitor and FindMe locator capabilities and Second device
-has Proximity reporter and FindMe reporter capabilities.
+Chen.
 
-  There is an existing DBus interface for proximity -
-PROXIMITY_INTERFACE. SetProperty, GetProperties methods and
-PropertyChanged signal is registered on this interface.
-  SetProperty takes two arguments - Property(LinkLossAlertLevel or
-ImmediateAlertLevel) and the value of alertlevel.
-  Same is true for PropertyChanged signal. it returns - Property
-(LinkLossAlertLevel or ImmediateAlertLevel) and the value of
-alertlevel
-
-  Now if user wants to find the other device (using FindMe profile)
-which is already connected to the Proximity monitor, for this,
-SetProperty should be called. But now there is no way for BlueZ to
-figure out whether it is called for Proximity(in this case, action
-will be taken when PathLoss condition met) or for FindMe(it has to
-write the alert level immediately).
-
-  Same thing applies when we receive PropertyChanged signal. There is
-no way for framework over DBus to figure out whether PropertyChanged
-is for FindMe or for Proximity. If implementation is such that
-Proximity reporter will alarm when it receives the PropertyChanged due
-to path loss and there will be no alarm when PropertyChanged is called
-for FindMe profile, framework has to know this.
-
-  One way to resolve these issues is to have seperate DBus interface
-for Proximity and FindMe profiles.
-Some benefits of using seperate interfaces for both the profiles -
-1. Code will be more clear
-2. Both BlueZ and framework above Dbus will easily distinguish
-different methods and signals for these profiles
-3. Existing code will not break
-
-
-Thanks
-Vishal Agarwal
-ST Ericsson
