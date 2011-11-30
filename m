@@ -1,71 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Peter Krystad" <pkrystad@codeaurora.org>
-To: "'Emeltchenko Andrei'" <Andrei.Emeltchenko.news@gmail.com>,
-	"'Marcel Holtmann'" <marcel@holtmann.org>
-Cc: <linux-bluetooth@vger.kernel.org>
-References: <1322661272-32027-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1322663484.26198.16.camel@aeonflux> <20111130151820.GB5158@aemeltch-MOBL1>
-In-Reply-To: <20111130151820.GB5158@aemeltch-MOBL1>
-Subject: RE: [RFCv0 0/3] AMP HCI interface from A2MP
-Date: Wed, 30 Nov 2011 22:19:00 -0800
-Message-ID: <000001ccaff1$1ee6c0c0$5cb44240$@org>
+Date: Wed, 30 Nov 2011 23:16:00 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Santiago Carot <sancane@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix byte order problems getting PSM through btio API
+Message-ID: <20111130211600.GA9230@fusion.localdomain>
+References: <1322670976-9517-1-git-send-email-sancane@gmail.com>
+ <CACLukzJWL5=w59ARvwKvz+_Q81=ZJ+4qj_tU0+AxmT4g6847Sw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="US-ASCII"
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CACLukzJWL5=w59ARvwKvz+_Q81=ZJ+4qj_tU0+AxmT4g6847Sw@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Santiago,
 
-Hi Andrei, Marcel
-
-> Hi Marcel,
-> > Hi Andrei,
-> > > The code adds AMP HCI commands from A2MP protocol. HCI events are handled
-> > > similar way as mgmt interface. amp_pending is a kind of copy of mgmt_pending.
+On Wed, Nov 30, 2011, Santiago Carot wrote:
+> 2011/11/30 Santiago Carot-Nemesio <sancane@gmail.com>:
+> > ---
+> >  btio/btio.c |    2 +-
+> >  1 files changed, 1 insertions(+), 1 deletions(-)
 > >
-> > this is all kernel internal code with no interface to user space. I do
-> > not see the need for such a complex infrastructure. Can not just have
-> > proper callbacks or event callback table like with L2CAP. Or just
-> > something similar.
+> > diff --git a/btio/btio.c b/btio/btio.c
+> > index a129bf9..f8c5cc7 100644
+> > --- a/btio/btio.c
+> > +++ b/btio/btio.c
+> > @@ -882,7 +882,7 @@ static gboolean l2cap_get(int sock, GError **err, BtIOOption opt1,
+> >                        break;
+> >                case BT_IO_OPT_PSM:
+> >                        *(va_arg(args, uint16_t *)) = src.l2_psm ?
+> > -                                               src.l2_psm : dst.l2_psm;
+> > +                                       btohs(src.l2_psm) : btohs(dst.l2_psm);
+> >                        break;
+> >                case BT_IO_OPT_CID:
+> >                        *(va_arg(args, uint16_t *)) = src.l2_cid ?
+> > --
+> > 1.7.7.4
+> >
 > 
-> I see this as a simple callback. amp_pending is just keeping context of HCI
-> command we need to handle. I also included reference counting since we had
-> bad experience with l2cap and rfcomm.
+> At a first sight, It seems there may be the same problems retrieving
+> CID, OMTU and IMTU on big endian architectures. I preffer waiting for
+> a more experienced comments before sending any patch fixing that.
 
-There does have to be some way to carry the A2MP message context while performing
-local HCI operations to service the message. A2MP Get Remote Assoc requires multiple
-HCI commands with data accumulated between the commands before the response can be
-sent. 
+To my understanding the L2CAP PSM is the only parameter that uses
+protocol endianess in the socket interface, so we should be safe with
+the other values.
 
-> > As far as I see it, we get an A2MP command over L2CAP fixed channel, we
-> > have to issue a HCI command or do some other task based on this and then
-> > respond to it. We only have one user of this first of all. And second of
-> > all, I think we can not really have pending A2MP commands anyway. This
-> > is pretty much one command at a time (per ACL link).
-
-A2MP commands are serialized by the sender, so A2MP message context could be
-associated with the hci_conn for BR-EDR.
-
---Peter Krystad
-  Employee of Qualcomm Innovation Center, Inc.
-  Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
-> The picture "Figure 7.1: Overview MSC for physical link create/accept"
-> BLUETOOTH SPECIFICATION Version 4.0 [Vol 5] page 49 of 60
-> shows quite a lot of commands between A2MP messages, I feel that if we
-> have just callback from HCI event to handle A2MP responses it might be
-> difficult to sync them.
-> 
-> Best regards
-> Andrei Emeltchenko
-> 
-> > If I am mistaken here, please correct here. It has been a while since I
-> > read that specification.
-> >
-> > Regards
-> >
-> > Marcel
-> >
-> >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Johan
