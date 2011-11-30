@@ -1,54 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Nov 2011 17:18:22 +0200
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <1322663587.26198.17.camel@aeonflux>
+Subject: Re: [PATCHv3 3/3] Bluetooth: trivial: correct check for LMP version
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv0 0/3] AMP HCI interface from A2MP
-Message-ID: <20111130151820.GB5158@aemeltch-MOBL1>
-References: <1322661272-32027-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1322663484.26198.16.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322663484.26198.16.camel@aeonflux>
+Date: Wed, 30 Nov 2011 15:33:07 +0100
+In-Reply-To: <20111130142708.GA5158@aemeltch-MOBL1>
+References: <1322642695-5784-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1322642695-5784-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1322662397.26198.0.camel@aeonflux> <20111130142708.GA5158@aemeltch-MOBL1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Andrei,
 
-On Wed, Nov 30, 2011 at 03:31:24PM +0100, Marcel Holtmann wrote:
-> Hi Andrei,
+> > > Make sure that code match exactly what comment says about pre 1.2
+> > > LMP version.
+> > > 
+> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > ---
+> > >  net/bluetooth/hci_event.c |    2 +-
+> > >  1 files changed, 1 insertions(+), 1 deletions(-)
+> > 
+> > Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> > 
+> > > 
+> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > index 60651fa..27b1ede 100644
+> > > --- a/net/bluetooth/hci_event.c
+> > > +++ b/net/bluetooth/hci_event.c
+> > > @@ -498,7 +498,7 @@ static void hci_setup_event_mask(struct hci_dev *hdev)
+> > >  
+> > >  	/* CSR 1.1 dongles does not accept any bitfield so don't try to set
+> > >  	 * any event mask for pre 1.2 devices */
+> > > -	if (hdev->lmp_ver <= BLUETOOTH_VER_1_1)
+> > > +	if (hdev->lmp_ver < BLUETOOTH_VER_1_2)
+> > >  		return;
+> > 
+> > However, even here you need to use hci_ver since it is a HCI detail and
+> > has nothing to do with the LMP version.
 > 
-> > The code adds AMP HCI commands from A2MP protocol. HCI events are handled
-> > similar way as mgmt interface. amp_pending is a kind of copy of mgmt_pending.
-> 
-> this is all kernel internal code with no interface to user space. I do
-> not see the need for such a complex infrastructure. Can not just have
-> proper callbacks or event callback table like with L2CAP. Or just
-> something similar.
+> Do you think can I amend this patch and change lmp/hci ?
 
-I see this as a simple callback. amp_pending is just keeping context of HCI
-command we need to handle. I also included reference counting since we had
-bad experience with l2cap and rfcomm.
+your choice actually. I do not care. Treat both possibilities as acked
+by me.
 
-> As far as I see it, we get an A2MP command over L2CAP fixed channel, we
-> have to issue a HCI command or do some other task based on this and then
-> respond to it. We only have one user of this first of all. And second of
-> all, I think we can not really have pending A2MP commands anyway. This
-> is pretty much one command at a time (per ACL link).
+Regards
 
-The picture "Figure 7.1: Overview MSC for physical link create/accept" 
-BLUETOOTH SPECIFICATION Version 4.0 [Vol 5] page 49 of 60
-shows quite a lot of commands between A2MP messages, I feel that if we
-have just callback from HCI event to handle A2MP responses it might be
-difficult to sync them.
+Marcel
 
-Best regards 
-Andrei Emeltchenko 
 
-> If I am mistaken here, please correct here. It has been a while since I
-> read that specification.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
