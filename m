@@ -1,37 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 0/6] AMP/BREDR initialization patches
-Date: Wed, 30 Nov 2011 11:35:59 +0200
-Message-Id: <1322645765-9519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 1/6] Bluetooth: remove old code
+Date: Wed, 30 Nov 2011 11:36:00 +0200
+Message-Id: <1322645765-9519-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1322645765-9519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1322645765-9519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Changes:
-	v1: Changed HCI_<block,packet>_FLOW_CTL_MODE => HCI_FLOW_CTL_MODE_<block,packet>
-	RFCv1: Initial version
+Remove old code not touched for several years.
 
-AMP initialization and block flow control code.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+---
+ net/bluetooth/hci_core.c |   12 ------------
+ 1 files changed, 0 insertions(+), 12 deletions(-)
 
-Resubmit "remove old code" patch as it seems that there is little
-sense to copy it over.
-
-Andrei Emeltchenko (6):
-  Bluetooth: remove old code
-  Bluetooth: Split ctrl init to BREDR and AMP parts
-  Bluetooth: Add HCI Read Flow Control Mode function
-  Bluetooth: Initialize default flow control mode
-  Bluetooth: Add HCI Read Data Block Size function
-  Bluetooth: Recalculate sched for HCI block flow ctrl
-
- include/net/bluetooth/hci.h      |   18 +++++++
- include/net/bluetooth/hci_core.h |    4 ++
- net/bluetooth/hci_core.c         |  103 +++++++++++++++++++++++++------------
- net/bluetooth/hci_event.c        |   53 +++++++++++++++++++
- 4 files changed, 144 insertions(+), 34 deletions(-)
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index ef0423e..bc71f96 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -230,18 +230,6 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
+ 	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
+ 	hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
+ 
+-#if 0
+-	/* Host buffer size */
+-	{
+-		struct hci_cp_host_buffer_size cp;
+-		cp.acl_mtu = cpu_to_le16(HCI_MAX_ACL_SIZE);
+-		cp.sco_mtu = HCI_MAX_SCO_SIZE;
+-		cp.acl_max_pkt = cpu_to_le16(0xffff);
+-		cp.sco_max_pkt = cpu_to_le16(0xffff);
+-		hci_send_cmd(hdev, HCI_OP_HOST_BUFFER_SIZE, sizeof(cp), &cp);
+-	}
+-#endif
+-
+ 	/* Read BD Address */
+ 	hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
+ 
 -- 
 1.7.4.1
 
