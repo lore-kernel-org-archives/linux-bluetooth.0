@@ -1,47 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 1/6] Bluetooth: remove old code
-Date: Wed, 30 Nov 2011 11:36:00 +0200
-Message-Id: <1322645765-9519-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1322645765-9519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1322645765-9519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 1/3] Bluetooth: Correct version check in hci_setup
+Date: Wed, 30 Nov 2011 10:44:53 +0200
+Message-Id: <1322642695-5784-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1322642695-5784-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1322642695-5784-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Remove old code not touched for several years.
+Check for hci_ver instead of lmp_ver
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c |   12 ------------
- 1 files changed, 0 insertions(+), 12 deletions(-)
+ net/bluetooth/hci_event.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ef0423e..bc71f96 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -230,18 +230,6 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
- 	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
- 	hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index dfe6fbc..7da7ef6 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -562,7 +562,7 @@ static void hci_setup(struct hci_dev *hdev)
+ {
+ 	hci_setup_event_mask(hdev);
  
--#if 0
--	/* Host buffer size */
--	{
--		struct hci_cp_host_buffer_size cp;
--		cp.acl_mtu = cpu_to_le16(HCI_MAX_ACL_SIZE);
--		cp.sco_mtu = HCI_MAX_SCO_SIZE;
--		cp.acl_max_pkt = cpu_to_le16(0xffff);
--		cp.sco_max_pkt = cpu_to_le16(0xffff);
--		hci_send_cmd(hdev, HCI_OP_HOST_BUFFER_SIZE, sizeof(cp), &cp);
--	}
--#endif
--
- 	/* Read BD Address */
- 	hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
+-	if (hdev->lmp_ver > 1)
++	if (hdev->hci_ver > 1)
+ 		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_COMMANDS, 0, NULL);
  
+ 	if (hdev->features[6] & LMP_SIMPLE_PAIR) {
 -- 
 1.7.4.1
 
