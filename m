@@ -1,70 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
-From: Keng-Yu Lin <kengyu@canonical.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Keng-Yu Lin <kengyu@canonical.com>
-Subject: [PATCH v2] Bluetooth: Add AR30XX device ID on Asus laptops
-Date: Wed, 30 Nov 2011 18:32:37 +0800
-Message-Id: <1322649157-20479-1-git-send-email-kengyu@canonical.com>
-In-Reply-To: <1321422409.15441.510.camel@aeonflux>
-References: <1321422409.15441.510.camel@aeonflux>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv1 2/6] Bluetooth: Split ctrl init to BREDR and AMP parts
+Date: Wed, 30 Nov 2011 11:36:01 +0200
+Message-Id: <1322645765-9519-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1322645765-9519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1322645765-9519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The ID is found on Asus K54HR and K53U.
-Blacklist the AR3011-based device ID [0489:e03d]
-and add to ath3k.c for firmware loading.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Below is the output of usb-devices script:
+Current controller initialization is moved tp bredr_init and new
+function added amp_init to handle later AMP init sequence. Current
+AMP init sequence include Reset and Read Local Version.
 
-Before the fiwmware loading:
-
-T:  Bus=01 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e03d Rev=00.01
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-
-After the fiwmware loading:
-
-T:  Bus=01 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  5 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cf3 ProdID=3005 Rev=00.01
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-
-Signed-off-by: Keng-Yu Lin <kengyu@canonical.com>
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/ath3k.c |    1 +
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 2 insertions(+), 0 deletions(-)
+ net/bluetooth/hci_core.c  |   64 ++++++++++++++++++++++++++++++++------------
+ net/bluetooth/hci_event.c |    3 ++
+ 2 files changed, 49 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 106beb1..db811d2 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -64,6 +64,7 @@ static struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x0CF3, 0x3002) },
- 	{ USB_DEVICE(0x13d3, 0x3304) },
- 	{ USB_DEVICE(0x0930, 0x0215) },
-+	{ USB_DEVICE(0x0489, 0xE03D) },
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index bc71f96..a0247d3 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -192,33 +192,18 @@ static void hci_reset_req(struct hci_dev *hdev, unsigned long opt)
+ 	hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
+ }
  
- 	/* Atheros AR9285 Malbec with sflash firmware */
- 	{ USB_DEVICE(0x03F0, 0x311D) },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index fe4ebc3..d5b9aa4 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -119,6 +119,7 @@ static struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
- 	{ USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
- 	{ USB_DEVICE(0x0930, 0x0215), .driver_info = BTUSB_IGNORE },
-+	{ USB_DEVICE(0x0489, 0xe03d), .driver_info = BTUSB_IGNORE },
+-static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
++static void bredr_init(struct hci_dev *hdev)
+ {
+ 	struct hci_cp_delete_stored_link_key cp;
+-	struct sk_buff *skb;
+ 	__le16 param;
+ 	__u8 flt_type;
  
- 	/* Atheros AR9285 Malbec with sflash firmware */
- 	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
+-	BT_DBG("%s %ld", hdev->name, opt);
+-
+-	/* Driver initialization */
+-
+-	/* Special commands */
+-	while ((skb = skb_dequeue(&hdev->driver_init))) {
+-		bt_cb(skb)->pkt_type = HCI_COMMAND_PKT;
+-		skb->dev = (void *) hdev;
+-
+-		skb_queue_tail(&hdev->cmd_q, skb);
+-		tasklet_schedule(&hdev->cmd_task);
+-	}
+-	skb_queue_purge(&hdev->driver_init);
+-
+ 	/* Mandatory initialization */
+ 
+ 	/* Reset */
+ 	if (!test_bit(HCI_QUIRK_NO_RESET, &hdev->quirks)) {
+-			set_bit(HCI_RESET, &hdev->flags);
+-			hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
++		set_bit(HCI_RESET, &hdev->flags);
++		hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
+ 	}
+ 
+ 	/* Read Local Supported Features */
+@@ -257,6 +242,49 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
+ 	hci_send_cmd(hdev, HCI_OP_DELETE_STORED_LINK_KEY, sizeof(cp), &cp);
+ }
+ 
++static void amp_init(struct hci_dev *hdev)
++{
++	/* Reset */
++	hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
++
++	/* Read Local Version */
++	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
++}
++
++static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
++{
++	struct sk_buff *skb;
++
++	BT_DBG("%s %ld", hdev->name, opt);
++
++	/* Driver initialization */
++
++	/* Special commands */
++	while ((skb = skb_dequeue(&hdev->driver_init))) {
++		bt_cb(skb)->pkt_type = HCI_COMMAND_PKT;
++		skb->dev = (void *) hdev;
++
++		skb_queue_tail(&hdev->cmd_q, skb);
++		tasklet_schedule(&hdev->cmd_task);
++	}
++	skb_queue_purge(&hdev->driver_init);
++
++	switch (hdev->dev_type) {
++	case HCI_BREDR:
++		bredr_init(hdev);
++		break;
++
++	case HCI_AMP:
++		amp_init(hdev);
++		break;
++
++	default:
++		BT_ERR("Unknown device type %d", hdev->dev_type);
++		break;
++	}
++
++}
++
+ static void hci_le_init_req(struct hci_dev *hdev, unsigned long opt)
+ {
+ 	BT_DBG("%s", hdev->name);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 27b1ede..f287e1c 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -560,6 +560,9 @@ static void hci_set_le_support(struct hci_dev *hdev)
+ 
+ static void hci_setup(struct hci_dev *hdev)
+ {
++	if (hdev->dev_type != HCI_BREDR)
++		return;
++
+ 	hci_setup_event_mask(hdev);
+ 
+ 	if (hdev->hci_ver > BLUETOOTH_VER_1_1)
 -- 
-1.7.5.4
+1.7.4.1
+
