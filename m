@@ -1,44 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Wed, 30 Nov 2011 20:27:28 +0100
-From: krisztian.kocsis@optimaster.eu
-To: <linux-bluetooth@vger.kernel.org>
-Subject: Cracking Sound
-Message-ID: <939a364c4487c47a6293b8584613af80@optimaster.eu>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH v2 5/9] Bluetooth: LE scan infra-structure
+Mime-Version: 1.0 (Apple Message framework v1251.1)
+Content-Type: text/plain; charset=us-ascii
+From: Andre Guedes <andre.guedes@openbossa.org>
+In-Reply-To: <1322497442.29909.36.camel@aeonflux>
+Date: Wed, 30 Nov 2011 15:11:47 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <65E3B21D-EC4E-4443-ADAB-39576B981F70@openbossa.org>
+References: <1322265226-6404-1-git-send-email-andre.guedes@openbossa.org> <1322265226-6404-6-git-send-email-andre.guedes@openbossa.org> <1322497442.29909.36.camel@aeonflux>
+To: Marcel Holtmann <marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi Marcel,
 
-I'm trying to get bluetooth audio working on a PowerPC machine, but it 
-has some strange effects.
-I'm using a bluetooth headset (HSP profile) via ALSA but it seems that 
-it has some problem with various sample rates and other data related 
-stuff.
-The asound.conf contains the appropriate device address, profiles is 
-set to voice, device is named as 'btheadset' (the 
-share/alsa/bluetooth.conf is also included).
+On Nov 28, 2011, at 1:24 PM, Marcel Holtmann wrote:
 
-In BlueZ's output it seems that is is playing (statu is 
-PLAY_IN_PROGRESS or PLAYING - I don't remember correctly) the stream.
-When BlueZ is connecting to the device I hear a beep in the headset but 
-the "stream" is only a cracking, clicking and poping noise, nothing from 
-the original sound.
-Also this sound comes if I force aplay to 4KHz or 8KHz, in other 
-settings or without forcing, it plays nothing (no sound, only beeps).
+> Hi Andre,
+> 
+>> This patch does the proper init of the structs required to carry
+>> out LE scan and implement the LE scan work.
+>> 
+>> The LE scan work sends the commands (Set LE Scan Parameters and Set
+>> LE Scan Enable) to the controller in order to start LE scanning. If
+>> commands were executed successfully the le_scan_timer is set to
+>> disable the ongoing scanning after some amount of time.
+>> 
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>> include/net/bluetooth/hci.h |    1 +
+>> net/bluetooth/hci_core.c    |   38 ++++++++++++++++++++++++++++++++++++++
+>> net/bluetooth/hci_event.c   |    5 +++++
+>> 3 files changed, 44 insertions(+), 0 deletions(-)
+> 
+> combine patch 4 and 5 since the split is weird.
 
-Do somebody know which problem can cause this side effect?
+Ok.
 
-I' using ALSA 1.0.24 and BlueZ 4.96 (both are untouched, no patches and 
-no config file modifications - except that I had to create an 
-asound.conf).
+> 
+>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+>> index b7c6452..6e2b88f 100644
+>> --- a/include/net/bluetooth/hci.h
+>> +++ b/include/net/bluetooth/hci.h
+>> @@ -130,6 +130,7 @@ enum {
+>> #define HCI_IDLE_TIMEOUT	(6000)	/* 6 seconds */
+>> #define HCI_INIT_TIMEOUT	(10000)	/* 10 seconds */
+>> #define HCI_CMD_TIMEOUT		(1000)	/* 1 seconds */
+>> +#define HCI_LE_SCAN_TIMEOUT	(3000)	/* 3 seconds */
+>> 
+>> /* HCI data types */
+>> #define HCI_COMMAND_PKT		0x01
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index 28ef2ac..8e96e3b 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -981,6 +981,33 @@ static void hci_power_on(struct work_struct *work)
+>> 		mgmt_index_added(hdev);
+>> }
+>> 
+>> +static void le_scan_req(struct hci_dev *hdev, unsigned long opt)
+>> +{
+>> +	struct le_scan_params *params = (void *) opt;
+>> +
+>> +	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags))
+>> +		return;
+>> +
+>> +	send_le_scan_param_cmd(hdev, params->type, params->interval,
+>> +							params->window);
+>> +	send_le_scan_enable_cmd(hdev, 1);
+>> +}
+>> +
+>> +static void hci_le_scan(struct work_struct *work)
+>> +{
+>> +	struct hci_dev *hdev = container_of(work, struct hci_dev, le_scan);
+>> +	struct le_scan_params *params = &hdev->le_scan_params;
+>> +	int err;
+>> +
+>> +	err = hci_request(hdev, le_scan_req, (unsigned long) params,
+>> +					msecs_to_jiffies(HCI_LE_SCAN_TIMEOUT));
+>> +	if (err < 0)
+>> +		return;
+>> +
+>> +	mod_timer(&hdev->le_scan_timer, jiffies +
+>> +					msecs_to_jiffies(params->timeout));
+>> +}
+>> +
+>> static void hci_power_off(struct work_struct *work)
+>> {
+>> 	struct hci_dev *hdev = container_of(work, struct hci_dev,
+>> @@ -1447,6 +1474,13 @@ int hci_add_adv_entry(struct hci_dev *hdev,
+>> 	return 0;
+>> }
+>> 
+>> +static void le_scan_timeout(unsigned long arg)
+>> +{
+>> +	struct hci_dev *hdev = (void *) arg;
+>> +
+>> +	send_le_scan_enable_cmd(hdev, 0);
+>> +}
+>> +
+>> /* Register HCI device */
+>> int hci_register_dev(struct hci_dev *hdev)
+>> {
+>> @@ -1500,6 +1534,8 @@ int hci_register_dev(struct hci_dev *hdev)
+>> 	skb_queue_head_init(&hdev->raw_q);
+>> 
+>> 	setup_timer(&hdev->cmd_timer, hci_cmd_timer, (unsigned long) hdev);
+>> +	setup_timer(&hdev->le_scan_timer, le_scan_timeout,
+>> +							(unsigned long) hdev);
+>> 
+>> 	for (i = 0; i < NUM_REASSEMBLY; i++)
+>> 		hdev->reassembly[i] = NULL;
+>> @@ -1526,6 +1562,7 @@ int hci_register_dev(struct hci_dev *hdev)
+>> 						(unsigned long) hdev);
+>> 
+>> 	INIT_WORK(&hdev->power_on, hci_power_on);
+>> +	INIT_WORK(&hdev->le_scan, hci_le_scan);
+>> 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+>> 
+>> 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
+> 
+> I am beginning to question how many work structs we really want here.
+> And more important that we need to ensure that they are scheduled from
+> the main workqueue that we have per HCI controller.
+> 
+> And while at this, we might wanna actually move away from tasklets
+> finally so that we actually can sleep and can reduce the number of work
+> structs here. I am open for ideas.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
 
-Is anything else I can provide about the problem?
-
-Thanks for the help!
-
-BR,
-Krisztian
-
+Andre
