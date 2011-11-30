@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 6/6] Bluetooth: Recalculate sched for HCI block flow ctrl
-Date: Wed, 30 Nov 2011 11:36:05 +0200
-Message-Id: <1322645765-9519-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 3/6] Bluetooth: Add HCI Read Flow Control Mode function
+Date: Wed, 30 Nov 2011 11:36:02 +0200
+Message-Id: <1322645765-9519-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1322645765-9519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1322645765-9519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,65 +11,84 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Upstream Code Aurora code with trivial fixes.
+Upstream Code Aurora function with minor trivial fixes.
 Origin: git://codeaurora.org/kernel/msm.git
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c |   25 ++++++++++++++++++++-----
- 1 files changed, 20 insertions(+), 5 deletions(-)
+ include/net/bluetooth/hci.h      |    6 ++++++
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/hci_event.c        |   19 +++++++++++++++++++
+ 3 files changed, 27 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 4a0391e..360b44c 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2290,10 +2290,12 @@ static inline void hci_sched_acl(struct hci_dev *hdev)
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 376c574..ee83c36 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -677,6 +677,12 @@ struct hci_rp_read_local_oob_data {
  
- 	cnt = hdev->acl_cnt;
+ #define HCI_OP_READ_INQ_RSP_TX_POWER	0x0c58
  
--	while (hdev->acl_cnt &&
-+	while (hdev->acl_cnt > 0 &&
- 			(chan = hci_chan_sent(hdev, ACL_LINK, &quote))) {
- 		u32 priority = (skb_peek(&chan->data_q))->priority;
--		while (quote-- && (skb = skb_peek(&chan->data_q))) {
-+		while (quote > 0 && (skb = skb_peek(&chan->data_q))) {
-+			int blocks = 1;
++#define HCI_OP_READ_FLOW_CONTROL_MODE	0x0c66
++struct hci_rp_read_flow_control_mode {
++	__u8     status;
++	__u8     mode;
++} __packed;
 +
- 			BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
- 					skb->len, skb->priority);
+ #define HCI_OP_WRITE_LE_HOST_SUPPORTED	0x0c6d
+ struct hci_cp_write_le_host_supported {
+ 	__u8 le;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 1795257..a7fd63a 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -170,6 +170,8 @@ struct hci_dev {
+ 	__u32		amp_max_flush_to;
+ 	__u32		amp_be_flush_to;
  
-@@ -2303,15 +2305,28 @@ static inline void hci_sched_acl(struct hci_dev *hdev)
- 
- 			skb = skb_dequeue(&chan->data_q);
- 
-+			if (hdev->flow_ctl_mode ==
-+					HCI_FLOW_CTL_MODE_BLOCK_BASED)
-+				/* Calculate count of blocks used by
-+				 * this packet
-+				 */
-+				blocks = DIV_ROUND_UP(skb->len -
-+					HCI_ACL_HDR_SIZE, hdev->block_len);
++	__u8		flow_ctl_mode;
 +
-+			if (blocks > hdev->acl_cnt)
-+				return;
+ 	unsigned int	auto_accept_delay;
+ 
+ 	unsigned long	quirks;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index f287e1c..b743fc3 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -720,6 +720,21 @@ static void hci_cc_read_local_ext_features(struct hci_dev *hdev,
+ 	hci_req_complete(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES, rp->status);
+ }
+ 
++static void hci_cc_read_flow_control_mode(struct hci_dev *hdev,
++						struct sk_buff *skb)
++{
++	struct hci_rp_read_flow_control_mode *rp = (void *) skb->data;
 +
- 			hci_conn_enter_active_mode(chan->conn,
- 						bt_cb(skb)->force_active);
- 
- 			hci_send_frame(skb);
- 			hdev->acl_last_tx = jiffies;
- 
--			hdev->acl_cnt--;
--			chan->sent++;
--			chan->conn->sent++;
-+			hdev->acl_cnt -= blocks;
-+			quote -= blocks;
++	BT_DBG("%s status 0x%x", hdev->name, rp->status);
 +
-+			chan->sent += blocks;
-+			chan->conn->sent += blocks;
- 		}
- 	}
++	if (rp->status)
++		return;
++
++	hdev->flow_ctl_mode = rp->mode;
++
++	hci_req_complete(hdev, HCI_OP_READ_FLOW_CONTROL_MODE, rp->status);
++}
++
+ static void hci_cc_read_buffer_size(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_rp_read_buffer_size *rp = (void *) skb->data;
+@@ -1970,6 +1985,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 		hci_cc_write_ca_timeout(hdev, skb);
+ 		break;
  
++	case HCI_OP_READ_FLOW_CONTROL_MODE:
++		hci_cc_read_flow_control_mode(hdev, skb);
++		break;
++
+ 	case HCI_OP_READ_LOCAL_AMP_INFO:
+ 		hci_cc_read_local_amp_info(hdev, skb);
+ 		break;
 -- 
 1.7.4.1
 
