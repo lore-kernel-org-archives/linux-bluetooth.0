@@ -1,69 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Nov 2011 13:27:03 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Ganir, Chen" <chen.ganir@ti.com>
-Cc: Andre Guedes <andre.guedes@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v2 9/9] Bluetooth: Support LE-Only discovery procedure
-Message-ID: <20111130112703.GA12146@x220>
-References: <1322265226-6404-1-git-send-email-andre.guedes@openbossa.org>
- <1322265226-6404-10-git-send-email-andre.guedes@openbossa.org>
- <F0070FBC0FB3174D8D11444EB2D5B02641649D@DNCE02.ent.ti.com>
- <20111129091434.GB17393@x220>
- <F0070FBC0FB3174D8D11444EB2D5B0264282C0@DNCE02.ent.ti.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B0264282C0@DNCE02.ent.ti.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Keng-Yu Lin <kengyu@canonical.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Keng-Yu Lin <kengyu@canonical.com>
+Subject: [PATCH v2] Bluetooth: Add AR30XX device ID on Asus laptops
+Date: Wed, 30 Nov 2011 18:32:37 +0800
+Message-Id: <1322649157-20479-1-git-send-email-kengyu@canonical.com>
+In-Reply-To: <1321422409.15441.510.camel@aeonflux>
+References: <1321422409.15441.510.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+The ID is found on Asus K54HR and K53U.
+Blacklist the AR3011-based device ID [0489:e03d]
+and add to ath3k.c for firmware loading.
 
-On Wed, Nov 30, 2011, Ganir, Chen wrote:
-> > Firstly you should realize that this is not about functionality exposed
-> > to the user or applications, but functionality exposed to bluetoothd.
-> > The fact that we have something in the mgmt interface doesn't mean that
-> > it'll automatically be exposed in the D-Bus interface or bluetoothd
-> > internal APIs.
-> > 
-> > As for this particular case (allowing bluetoothd to restrict device
-> > discovery to LE or BR/EDR) the reason is the concern that when doing
-> > discovery for a specific profile which is only applicable for BR/EDR or
-> > LE, you really don't want to waste the users time doing the "other"
-> > discovery which will not yield any valuable results. Examples of this
-> > could be discovering devices to send a file over Object Push (BR/EDR
-> > only) or when running a application for a LE profile which utilizes
-> > features only available though an LE radio.
-> > 
-> > I'm not completely sure the need for this will be strong enough for
-> > exposing it in the D-Bus API, but not having it in the kernel interface
-> > (mgmt) from the start makes it a lot harder to fix if we do end up
-> > needing it later (as opposed to the D-Bus interface which would "only"
-> > mean doing a new major BlueZ version).
-> > 
-> > Johan
-> 
-> If this is the case, and we know that for now, we have no need for
-> this, why introduce more complexity?
+Below is the output of usb-devices script:
 
-I really fail to see what you can consider complex about a single extra
-parameter to start_discovery.
+Before the fiwmware loading:
 
-> How will the current GAP device search work?
+T:  Bus=01 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0489 ProdID=e03d Rev=00.01
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-Just like it has worked so far.
+After the fiwmware loading:
 
-> How will interleaved scanning work?
+T:  Bus=01 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  5 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=3005 Rev=00.01
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-Just like it would work without the extra parameter. It gets triggered
-when user-space (bluetoothd) says it wants LE + BR/EDR discovery.
+Signed-off-by: Keng-Yu Lin <kengyu@canonical.com>
+---
+ drivers/bluetooth/ath3k.c |    1 +
+ drivers/bluetooth/btusb.c |    1 +
+ 2 files changed, 2 insertions(+), 0 deletions(-)
 
-> Will it be triggered from the bluetoothd?
-
-Yes, just like it would without the extra parameter.
-
-> Will it be handled by the kernel ?
-
-Yes, just like it would without the extra parameter.
-
-Johan
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 106beb1..db811d2 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -64,6 +64,7 @@ static struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x0CF3, 0x3002) },
+ 	{ USB_DEVICE(0x13d3, 0x3304) },
+ 	{ USB_DEVICE(0x0930, 0x0215) },
++	{ USB_DEVICE(0x0489, 0xE03D) },
+ 
+ 	/* Atheros AR9285 Malbec with sflash firmware */
+ 	{ USB_DEVICE(0x03F0, 0x311D) },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index fe4ebc3..d5b9aa4 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -119,6 +119,7 @@ static struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
+ 	{ USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
+ 	{ USB_DEVICE(0x0930, 0x0215), .driver_info = BTUSB_IGNORE },
++	{ USB_DEVICE(0x0489, 0xe03d), .driver_info = BTUSB_IGNORE },
+ 
+ 	/* Atheros AR9285 Malbec with sflash firmware */
+ 	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
+-- 
+1.7.5.4
