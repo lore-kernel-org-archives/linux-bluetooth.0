@@ -1,84 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 30 Nov 2011 13:44:41 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Ganir, Chen" <chen.ganir@ti.com>
+Cc: Andre Guedes <andre.guedes@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v2 9/9] Bluetooth: Support LE-Only discovery procedure
+Message-ID: <20111130114441.GA12605@x220>
+References: <1322265226-6404-1-git-send-email-andre.guedes@openbossa.org>
+ <1322265226-6404-10-git-send-email-andre.guedes@openbossa.org>
+ <F0070FBC0FB3174D8D11444EB2D5B02641649D@DNCE02.ent.ti.com>
+ <20111129091434.GB17393@x220>
+ <F0070FBC0FB3174D8D11444EB2D5B0264282C0@DNCE02.ent.ti.com>
+ <20111130112703.GA12146@x220>
+ <F0070FBC0FB3174D8D11444EB2D5B026428402@DNCE02.ent.ti.com>
 MIME-Version: 1.0
-In-Reply-To: <CA+_sZW8MnOX_oGThrTr6sb9xtoRBHx6vPabHHgtY4bR+8YyKnA@mail.gmail.com>
-References: <CA+_sZW8MnOX_oGThrTr6sb9xtoRBHx6vPabHHgtY4bR+8YyKnA@mail.gmail.com>
-Date: Wed, 30 Nov 2011 08:41:09 -0400
-Message-ID: <CAJdJm_PQbm-gmiquCKd08_3YZwQmj71-m_ds4xhDayq2wbP_Bw@mail.gmail.com>
-Subject: Re: [RFC] FindMe: Proposal to have separate dbus interface
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: vishal agarwal <vishal.bluez@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, naresh.gupta@stericsson.com
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B026428402@DNCE02.ent.ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vishal,
+Hi Chen,
 
-On Wed, Nov 30, 2011 at 7:40 AM, vishal agarwal <vishal.bluez@gmail.com> wrote:
->  There is an existing DBus interface for proximity -
-> PROXIMITY_INTERFACE. SetProperty, GetProperties methods and
-> PropertyChanged signal is registered on this interface.
->  SetProperty takes two arguments - Property(LinkLossAlertLevel or
-> ImmediateAlertLevel) and the value of alertlevel.
->  Same is true for PropertyChanged signal. it returns - Property
-> (LinkLossAlertLevel or ImmediateAlertLevel) and the value of
-> alertlevel
->
->  Now if user wants to find the other device (using FindMe profile)
-> which is already connected to the Proximity monitor, for this,
-> SetProperty should be called. But now there is no way for BlueZ to
-> figure out whether it is called for Proximity(in this case, action
-> will be taken when PathLoss condition met) or for FindMe(it has to
-> write the alert level immediately).
+On Wed, Nov 30, 2011, Ganir, Chen wrote:
+> What I meant to ask was who is responsible for asking for dual mode or
+> single mode scan now that the parameters were added? Does the
+> bluetoothd now needs to know if the controller and host support LE, so
+> it can start a BR/EDR/LE scan? or will the bluetoothd always ask for
+> BR/EDR/LE scan, and the kernel will execute the supported search
+> according to the LMP flags?
 
-If you do a SetProperty("ImmediateAlertLevel", <level>) it will always
-take immediately (i.e. try to connect if not already connected, and
-then write to the Immediate Alert Level characteristic). This is not
-specific to any profile (Proximity or FindMe), but to the Immediate
-Alert Service (IAS) behavior documented on the service spec.
+The latter (in fact that's what bluetoothd is already now doing; it's
+just that the necessary bits on the kernel side aren't in place yet).
 
-You should remember that, on the Reporter/Target side, there is only
-one Immediate Alert Service. If the device supports both profiles,
-they share this service. So it has no way (and no need, as far as I
-know) to tell the difference on which role is triggering the immediate
-alert.
-
->  Same thing applies when we receive PropertyChanged signal. There is
-> no way for framework over DBus to figure out whether PropertyChanged
-> is for FindMe or for Proximity. If implementation is such that
-> Proximity reporter will alarm when it receives the PropertyChanged due
-> to path loss and there will be no alarm when PropertyChanged is called
-> for FindMe profile, framework has to know this.
-
-Sorry, but your paragraph above seems confusing to me. We do not
-implement a D-Bus API for Proximity Reporter or to Find Me Target, but
-only for monitor/locator. BlueZ's Proximity Reporter implementation is
-only for testing, and does not have a D-Bus API (see
-proximity/reporter.c).
-
-On the *proximity monitor* side, we may want to know if/when the
-ImmediateAlertLevel was written on the server (actually you can't tell
-it was successfully written, because the IAS uses Write Without
-Response, but you may want to know when it was attempted). If you want
-to monitor path loss (to issue alert on the monitor side), you should
-be watching for changes on the "SignalLevel" property.
-
-You cannot tell for sure whether the remote device is alerting. You
-can confirm by the visual/audible alert itself.
-
->  One way to resolve these issues is to have seperate DBus interface
-> for Proximity and FindMe profiles.
-> Some benefits of using seperate interfaces for both the profiles -
-> 1. Code will be more clear
-> 2. Both BlueZ and framework above Dbus will easily distinguish
-> different methods and signals for these profiles
-> 3. Existing code will not break
-
-Please, take into consideration the points  I mentioned here, and let
-us know if you have any questions/doubts.
-
-Best Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
