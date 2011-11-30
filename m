@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 4/6] Bluetooth: Initialize default flow control mode
-Date: Wed, 30 Nov 2011 11:36:03 +0200
-Message-Id: <1322645765-9519-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 5/6] Bluetooth: Add HCI Read Data Block Size function
+Date: Wed, 30 Nov 2011 11:36:04 +0200
+Message-Id: <1322645765-9519-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1322645765-9519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1322645765-9519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,49 +11,97 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Upstream Code Aurora function with minor trivial fixes.
+Origin: git://codeaurora.org/kernel/msm.git
+
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h |    4 ++++
- net/bluetooth/hci_core.c    |    4 ++++
- 2 files changed, 8 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci.h      |    8 ++++++++
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/hci_event.c        |   31 +++++++++++++++++++++++++++++++
+ 3 files changed, 41 insertions(+), 0 deletions(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ee83c36..0290aeb 100644
+index 0290aeb..7d41bd7 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -271,6 +271,10 @@ enum {
- #define HCI_ERROR_LOCAL_HOST_TERM	0x16
- #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
+@@ -741,6 +741,14 @@ struct hci_rp_read_bd_addr {
+ 	bdaddr_t bdaddr;
+ } __packed;
  
-+/* Flow control modes */
-+#define HCI_FLOW_CTL_MODE_PACKET_BASED	0x00
-+#define HCI_FLOW_CTL_MODE_BLOCK_BASED	0x01
++#define HCI_OP_READ_DATA_BLOCK_SIZE	0x100a
++struct hci_rp_read_data_block_size {
++	__u8     status;
++	__le16   max_acl_len;
++	__le16   block_len;
++	__le16   num_blocks;
++} __packed;
 +
- /* -----  HCI Commands ---- */
- #define HCI_OP_NOP			0x0000
+ #define HCI_OP_WRITE_PAGE_SCAN_ACTIVITY	0x0c1c
+ struct hci_cp_write_page_scan_activity {
+ 	__le16   interval;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a7fd63a..869ab72 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -172,6 +172,8 @@ struct hci_dev {
  
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a0247d3..4a0391e 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -198,6 +198,8 @@ static void bredr_init(struct hci_dev *hdev)
- 	__le16 param;
- 	__u8 flt_type;
+ 	__u8		flow_ctl_mode;
  
-+	hdev->flow_ctl_mode = HCI_FLOW_CTL_MODE_PACKET_BASED;
++	__u16		block_len;
 +
- 	/* Mandatory initialization */
+ 	unsigned int	auto_accept_delay;
  
- 	/* Reset */
-@@ -244,6 +246,8 @@ static void bredr_init(struct hci_dev *hdev)
+ 	unsigned long	quirks;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index b743fc3..50482a6 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -774,6 +774,33 @@ static void hci_cc_read_bd_addr(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_req_complete(hdev, HCI_OP_READ_BD_ADDR, rp->status);
+ }
  
- static void amp_init(struct hci_dev *hdev)
++static void hci_cc_read_data_block_size(struct hci_dev *hdev,
++							struct sk_buff *skb)
++{
++	struct hci_rp_read_data_block_size *rp = (void *) skb->data;
++
++	BT_DBG("%s status 0x%x", hdev->name, rp->status);
++
++	if (rp->status)
++		return;
++
++	if (hdev->flow_ctl_mode == HCI_FLOW_CTL_MODE_BLOCK_BASED) {
++		hdev->acl_mtu  = __le16_to_cpu(rp->max_acl_len);
++		hdev->sco_mtu = 0;
++		hdev->block_len = __le16_to_cpu(rp->block_len);
++		/* acl_pkts indicates the number of blocks */
++		hdev->acl_pkts = __le16_to_cpu(rp->num_blocks);
++		hdev->sco_pkts = 0;
++		hdev->acl_cnt = hdev->acl_pkts;
++		hdev->sco_cnt = 0;
++	}
++
++	BT_DBG("%s acl mtu %d:%d, block len %d", hdev->name, hdev->acl_mtu,
++					hdev->acl_cnt, hdev->block_len);
++
++	hci_req_complete(hdev, HCI_OP_READ_DATA_BLOCK_SIZE, rp->status);
++}
++
+ static void hci_cc_write_ca_timeout(struct hci_dev *hdev, struct sk_buff *skb)
  {
-+	hdev->flow_ctl_mode = HCI_FLOW_CTL_MODE_BLOCK_BASED;
-+
- 	/* Reset */
- 	hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
+ 	__u8 status = *((__u8 *) skb->data);
+@@ -1981,6 +2008,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 		hci_cc_read_bd_addr(hdev, skb);
+ 		break;
  
++	case HCI_OP_READ_DATA_BLOCK_SIZE:
++		hci_cc_read_data_block_size(hdev, skb);
++		break;
++
+ 	case HCI_OP_WRITE_CA_TIMEOUT:
+ 		hci_cc_write_ca_timeout(hdev, skb);
+ 		break;
 -- 
 1.7.4.1
 
