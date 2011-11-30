@@ -1,122 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v2 6/9] Bluetooth: Add LE scan functions to hci_core
-Mime-Version: 1.0 (Apple Message framework v1251.1)
-Content-Type: text/plain; charset=us-ascii
-From: Andre Guedes <andre.guedes@openbossa.org>
-In-Reply-To: <1322497710.29909.40.camel@aeonflux>
-Date: Wed, 30 Nov 2011 15:11:19 -0300
+Date: Wed, 30 Nov 2011 14:24:28 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <D717F826-12B0-4441-91CD-D75CE7609D5C@openbossa.org>
-References: <1322265226-6404-1-git-send-email-andre.guedes@openbossa.org> <1322265226-6404-7-git-send-email-andre.guedes@openbossa.org> <1322497710.29909.40.camel@aeonflux>
-To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH 4/4] Bluetooth: use buffer priority to mark URB_ISO_ASAP
+ flag
+Message-ID: <20111130172428.GA9425@samus>
+References: <1320241924-2300-1-git-send-email-luiz.dentz@gmail.com>
+ <1320241924-2300-4-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1320241924-2300-4-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
 
-On Nov 28, 2011, at 1:28 PM, Marcel Holtmann wrote:
+On 15:52 Wed 02 Nov, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+>  drivers/bluetooth/btusb.c |    3 +++
+>  1 files changed, 3 insertions(+), 0 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index abfc4ee..9db2476 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -727,6 +727,9 @@ static int btusb_send_frame(struct sk_buff *skb)
+>  		usb_fill_bulk_urb(urb, data->udev, pipe,
+>  				skb->data, skb->len, btusb_tx_complete, skb);
+>  
+> +		if (skb->priority >= HCI_PRIO_MAX - 1)
+> +			urb->transfer_flags  = URB_ISO_ASAP;
+> +
 
-> Hi Andre,
->=20
->> This patch adds to hci_core functions to init LE scan and cancel
->> an ongoing scanning (hci_do_le_scan and hci_cancel_le_scan).
->>=20
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->> include/net/bluetooth/hci_core.h |    3 +++
->> net/bluetooth/hci_core.c         |   32 =
-++++++++++++++++++++++++++++++++
->> 2 files changed, 35 insertions(+), 0 deletions(-)
->>=20
->> diff --git a/include/net/bluetooth/hci_core.h =
-b/include/net/bluetooth/hci_core.h
->> index a48c699..db137ca 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -998,5 +998,8 @@ void hci_le_ltk_neg_reply(struct hci_conn *conn);
->>=20
->> int hci_do_inquiry(struct hci_dev *hdev, u8 length);
->> int hci_cancel_inquiry(struct hci_dev *hdev);
->> +int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 =
-window,
->> +								int =
-timeout);
->> +int hci_cancel_le_scan(struct hci_dev *hdev);
->>=20
->> #endif /* __HCI_CORE_H */
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index 8e96e3b..1e5d9db 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -2678,5 +2678,37 @@ int hci_cancel_inquiry(struct hci_dev *hdev)
->> 	return hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
->> }
->>=20
->> +int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 =
-window,
->> +								int =
-timeout)
->> +{
->> +	struct le_scan_params *params =3D &hdev->le_scan_params;
->> +
->> +	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags))
->> +		return -EINPROGRESS;
->> +
->> +	BT_DBG("%s", hdev->name);
->> +
->> +	params->type =3D type;
->> +	params->interval =3D interval;
->> +	params->window =3D window;
->> +	params->timeout =3D timeout;
->> +
->> +	queue_work(hdev->workqueue, &hdev->le_scan);
->=20
-> so you are using the controller workqueue already. That is good. =
-However
-> if the send command are already processed in a workqueue, we could =
-just
-> sleep for their results. No need for hci_req_complete handling that we
-> are using for ioctl based triggers. We could have a lot simpler
-> hci_request handling from within the workqueue.
+In case someone is having problems:
 
-Ok, I'll replace hci_request by another simpler mechanism.
+With CONFIG_USB_DEBUG enabled the check that the URB_ISO_ASAP flag is
+not valid for bulk endpoints is enabled, and that urb is rejected.
 
->> +
->> +	return 0;
->> +}
->> +
->> +int hci_cancel_le_scan(struct hci_dev *hdev)
->> +{
->> +	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
->> +		return -EPERM;
->> +
->> +	BT_DBG("%s", hdev->name);
->> +
->> +	del_timer(&hdev->le_scan_timer);
->> +
->> +	return send_le_scan_enable_cmd(hdev, 0);
->> +}
->> +
->=20
-> Don't you need to clear out the work struct as well? In case that one =
-is
-> still running? Meaning cancel gets called quickly after starting the
-> scan. The window might be small, but this is a race condition.
+>  		hdev->stat.acl_tx++;
+>  		break;
+>  
+> -- 
+> 1.7.6.4
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
-If we want to be able to cancel le scan during this small window we
-should cancel it (if it didn't start yet) or wait until "le scan" work
-finishes. To achieve that we can use cancel_work_sync(), but it
-blocks. So, we'll need another work to handle this.
-
-This is a bit tricky actually. Since hdev->workqueue is single thread,
-the "cancel le scan" work will always run after "le scan" work. So, if
-we enqueue "cancel le scan" work in hdev->workqueue we won't be able
-to cancel the "le scan" work if it is not started yet.
-
-Do you think we should enqueue "cancel le scan" work in the system-wide
-workqueue so we have the chance to cancel "le scan" work before it
-starts?
-
-BR,
-
-Andre
+Cheers,
+-- 
+Vinicius
