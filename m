@@ -1,37 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 3/3] Bluetooth: trivial: correct check for LMP version
-Date: Wed, 30 Nov 2011 10:44:55 +0200
-Message-Id: <1322642695-5784-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1322642695-5784-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1322642695-5784-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Hendrik Sattler <post@hendrik-sattler.de>
+To: Brian Gix <bgix@codeaurora.org>
+Subject: Re: FTP file authorization and transfer progress support
+Date: Wed, 30 Nov 2011 07:50:43 +0100
+Cc: Jaganath <jaganath.k@samsung.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+References: <4ED4A576.8030102@globaledgesoft.com> <B88DC7925BB14C2F8529CEC03B90B575@sisodomain.com> <4ED5D11D.1040709@codeaurora.org>
+In-Reply-To: <4ED5D11D.1040709@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201111300750.43956.post@hendrik-sattler.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Am Mittwoch, 30. November 2011, 07:45:49 schrieb Brian Gix:
+> If you are an FTP server, you are giving authorized remote users blanket
+> authority to read, write or browse, or some combination, your exposed
+> FTP file system.
 
-Make sure that code match exactly what comment says about pre 1.2
-LMP version.
+You could add OBEX authentication support for access control.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/hci_event.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 60651fa..27b1ede 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -498,7 +498,7 @@ static void hci_setup_event_mask(struct hci_dev *hdev)
- 
- 	/* CSR 1.1 dongles does not accept any bitfield so don't try to set
- 	 * any event mask for pre 1.2 devices */
--	if (hdev->lmp_ver <= BLUETOOTH_VER_1_1)
-+	if (hdev->lmp_ver < BLUETOOTH_VER_1_2)
- 		return;
- 
- 	events[4] |= 0x01; /* Flow Specification Complete */
--- 
-1.7.4.1
-
+HS
