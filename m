@@ -1,35 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Nov 2011 13:44:41 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Ganir, Chen" <chen.ganir@ti.com>
-Cc: Andre Guedes <andre.guedes@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v2 9/9] Bluetooth: Support LE-Only discovery procedure
-Message-ID: <20111130114441.GA12605@x220>
-References: <1322265226-6404-1-git-send-email-andre.guedes@openbossa.org>
- <1322265226-6404-10-git-send-email-andre.guedes@openbossa.org>
- <F0070FBC0FB3174D8D11444EB2D5B02641649D@DNCE02.ent.ti.com>
- <20111129091434.GB17393@x220>
- <F0070FBC0FB3174D8D11444EB2D5B0264282C0@DNCE02.ent.ti.com>
- <20111130112703.GA12146@x220>
- <F0070FBC0FB3174D8D11444EB2D5B026428402@DNCE02.ent.ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B026428402@DNCE02.ent.ti.com>
+Date: Wed, 30 Nov 2011 17:10:44 +0530
+Message-ID: <CA+_sZW8MnOX_oGThrTr6sb9xtoRBHx6vPabHHgtY4bR+8YyKnA@mail.gmail.com>
+Subject: [RFC] FindMe: Proposal to have separate dbus interface
+From: vishal agarwal <vishal.bluez@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: naresh.gupta@stericsson.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+Hello,
 
-On Wed, Nov 30, 2011, Ganir, Chen wrote:
-> What I meant to ask was who is responsible for asking for dual mode or
-> single mode scan now that the parameters were added? Does the
-> bluetoothd now needs to know if the controller and host support LE, so
-> it can start a BR/EDR/LE scan? or will the bluetoothd always ask for
-> BR/EDR/LE scan, and the kernel will execute the supported search
-> according to the LMP flags?
+  I'm working on Proximity and FindMe profiles for BLE. I came across
+the need for a separate DBus interface for FindMe profile.
 
-The latter (in fact that's what bluetoothd is already now doing; it's
-just that the necessary bits on the kernel side aren't in place yet).
+  Here's the detailed description of the use case.
 
-Johan
+  Let's take an example where both the BLE devices support LinkLoss
+Service, Read Tx Power Service and Immediate Alert service. One device
+has Proxmity monitor and FindMe locator capabilities and Second device
+has Proximity reporter and FindMe reporter capabilities.
+
+  There is an existing DBus interface for proximity -
+PROXIMITY_INTERFACE. SetProperty, GetProperties methods and
+PropertyChanged signal is registered on this interface.
+  SetProperty takes two arguments - Property(LinkLossAlertLevel or
+ImmediateAlertLevel) and the value of alertlevel.
+  Same is true for PropertyChanged signal. it returns - Property
+(LinkLossAlertLevel or ImmediateAlertLevel) and the value of
+alertlevel
+
+  Now if user wants to find the other device (using FindMe profile)
+which is already connected to the Proximity monitor, for this,
+SetProperty should be called. But now there is no way for BlueZ to
+figure out whether it is called for Proximity(in this case, action
+will be taken when PathLoss condition met) or for FindMe(it has to
+write the alert level immediately).
+
+  Same thing applies when we receive PropertyChanged signal. There is
+no way for framework over DBus to figure out whether PropertyChanged
+is for FindMe or for Proximity. If implementation is such that
+Proximity reporter will alarm when it receives the PropertyChanged due
+to path loss and there will be no alarm when PropertyChanged is called
+for FindMe profile, framework has to know this.
+
+  One way to resolve these issues is to have seperate DBus interface
+for Proximity and FindMe profiles.
+Some benefits of using seperate interfaces for both the profiles -
+1. Code will be more clear
+2. Both BlueZ and framework above Dbus will easily distinguish
+different methods and signals for these profiles
+3. Existing code will not break
+
+
+Thanks
+Vishal Agarwal
+ST Ericsson
