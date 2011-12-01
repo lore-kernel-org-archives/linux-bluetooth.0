@@ -1,46 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Dec 2011 08:38:40 +0900
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Brian Gix <bgix@codeaurora.org>
+Date: Thu, 1 Dec 2011 22:34:34 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Santiago Carot <sancane@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH-v5 5/6] Bluetooth: Add MITM mechanism to LE-SMP
-Message-ID: <20111201233840.GA2688@joana>
-References: <1322065718-11570-1-git-send-email-bgix@codeaurora.org>
- <1322065718-11570-6-git-send-email-bgix@codeaurora.org>
- <20111201141135.GE2894@joana>
- <4ED7C8F2.20600@codeaurora.org>
+Subject: Re: [PATCH] Fix byte order problems getting PSM through btio API
+Message-ID: <20111201203434.GA16339@fusion.localdomain>
+References: <1322670976-9517-1-git-send-email-sancane@gmail.com>
+ <CACLukzJWL5=w59ARvwKvz+_Q81=ZJ+4qj_tU0+AxmT4g6847Sw@mail.gmail.com>
+ <20111130211600.GA9230@fusion.localdomain>
+ <CACLukzJExFe0cYZBwAcU70ajDODJ5_RxVYx4pDxRq9DQCj2z7g@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4ED7C8F2.20600@codeaurora.org>
+In-Reply-To: <CACLukzJExFe0cYZBwAcU70ajDODJ5_RxVYx4pDxRq9DQCj2z7g@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+Hi Santiago,
 
-* Brian Gix <bgix@codeaurora.org> [2011-12-01 10:35:30 -0800]:
-
-> On 12/1/2011 6:11 AM, Gustavo Padovan wrote:
-> >Hi Brian,
+On Thu, Dec 01, 2011, Santiago Carot wrote:
+> As far as I see, CID uses little endian as well, There are some parts
+> in the code where the byte conversion is done when BT_IO_OPT_CID is
+> provided, for example in l2cap_connect, Conversely, this attribute is
+> being provided in bt_io_get without host endian conversion.
 > 
-> >>diff --git a/include/net/bluetooth/smp.h b/include/net/bluetooth/smp.h
-> >>index 15b97d5..43b6c49 100644
-> >>--- a/include/net/bluetooth/smp.h
-> >>+++ b/include/net/bluetooth/smp.h
-> >>@@ -124,6 +124,8 @@ struct smp_chan {
-> >>  	u8		pcnf[16]; /* SMP Pairing Confirm */
-> >>  	u8		tk[16]; /* SMP Temporary Key */
-> >>  	u8		smp_key_size;
-> >>+	u8		smp_tk_valid;
-> >>+	u8		smp_cfm_pending;
-> >
-> >Those two could be converted in a bitfield, you are using them as boolean.
-> >
-> 
-> Is there a mandate that bitfields must be manipulated/checked with
-> the clear_bit/set_bit/test_bit prototypes?  Or can I just use a
-> single u8 to represent both boolean values (as opposed to an
-> unsigned long), and use standard &=, |= and & to set/clear/check?
+> Diving in the code I can see that the gatt-server is getting it in
+> ./src/attrib-server.c:1039 so I guess that there is the same problem
+> that we had in big endian architectures.
 
-Please use clear/set/test_bit, it is the right way.
+Please also take a look at the kernel side since that's the only way to
+be sure. Last time I checked I saw byte-order conversion for CID but not
+for PSM (i.e. PSM was expected in little endian whereas CID wasn't).
 
-	Gustavo
+Johan
