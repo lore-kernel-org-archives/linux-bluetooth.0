@@ -1,41 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1322744973.26198.31.camel@aeonflux>
-Subject: Re: [PATCH 2/2] Bluetooth: Ignore HCI_Read_Local_Commands failures
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gustavo Padovan <padovan@profusion.mobi>
-Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
-Date: Thu, 01 Dec 2011 14:09:33 +0100
-In-Reply-To: <20111201124039.GB2894@joana>
-References: <1321898484-17952-1-git-send-email-johan.hedberg@gmail.com>
-	 <1321898484-17952-2-git-send-email-johan.hedberg@gmail.com>
-	 <20111201124039.GB2894@joana>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Thu, 1 Dec 2011 21:51:11 +0900
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: "Yao, Costa" <cqyao@qca.qualcomm.com>
+Cc: "marcel@holtmann.org" <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: btusb: Add AR3006 in blacklist_table
+Message-ID: <20111201125111.GD2894@joana>
+References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF417E@nasanexd02b.na.qualcomm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF417E@nasanexd02b.na.qualcomm.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Costa,
 
-> > Some 1.2 controllers will fail the HCI_Read_Local_Commands HCI command
-> > even though (according to the specification) they should support it.
-> > Since this HCI command is part of the controller init sequence
-> > controllers broken in this manner would be unusable. Since not having
-> > the list of supported commands is not critical for these controllers it
-> > is better to just ignore failures in this case (additionally, this is
-> > also how older kernels used to behave).
-> > 
-> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> > ---
-> >  net/bluetooth/hci_event.c |   16 ++++++++++++++++
-> >  1 files changed, 16 insertions(+), 0 deletions(-)
+* Yao, Costa <cqyao@qca.qualcomm.com> [2011-11-22 02:49:50 +0000]:
+
+> From c21eede5fafd811fdf6c100693a07a64f621ddea Mon Sep 17 00:00:00 2001
+> From: Costa Yao <cqyao@qca.qualcomm.com>
+> Date: Fri, 18 Nov 2011 14:08:56 +0800
+> Subject: [PATCH] Bluetooth: btusb: Add AR3006 in blacklist_table.
 > 
-> Both patches have been applied, thanks.
+> Add AR3006 entry in blacklist_table in btusb.c for bcdDevice check.
+> Then ath3k.c has the chance to download firmware and reset hardware.
+> 
+> Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
+> ---
+>  drivers/bluetooth/btusb.c |    7 ++++---
+>  1 files changed, 4 insertions(+), 3 deletions(-)
 
-I would have preferred you didn't. Since now I have to get this all
-fixed up as well.
+There is still something wrong with your patch. 
 
-Regards
+Applying: Bluetooth: btusb: Add AR3006 in blacklist_table
+error: patch failed: drivers/bluetooth/btusb.c:54
+error: drivers/bluetooth/btusb.c: patch does not apply
+Patch failed at 0001 Bluetooth: btusb: Add AR3006 in blacklist_table
+When you have resolved this problem run "git am --resolved".
+If you would prefer to skip this patch, instead run "git am --skip".
+To restore the original branch and stop patching run "git am --abort".
 
-Marcel
+Please fix your patch and resend.
 
-
+	Gustavo
