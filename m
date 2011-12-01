@@ -1,52 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1322745116.26198.33.camel@aeonflux>
-Subject: Re: [PATCHv2 7/8] Bluetooth: Use SNIFF mode only for BREDR
- controller
+Message-ID: <1322744973.26198.31.camel@aeonflux>
+Subject: Re: [PATCH 2/2] Bluetooth: Ignore HCI_Read_Local_Commands failures
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 01 Dec 2011 14:11:56 +0100
-In-Reply-To: <1322743335-8671-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1322743335-8671-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1322743335-8671-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Gustavo Padovan <padovan@profusion.mobi>
+Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
+Date: Thu, 01 Dec 2011 14:09:33 +0100
+In-Reply-To: <20111201124039.GB2894@joana>
+References: <1321898484-17952-1-git-send-email-johan.hedberg@gmail.com>
+	 <1321898484-17952-2-git-send-email-johan.hedberg@gmail.com>
+	 <20111201124039.GB2894@joana>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Gustavo,
 
->  net/bluetooth/hci_conn.c |    6 ++++++
->  1 files changed, 6 insertions(+), 0 deletions(-)
+> > Some 1.2 controllers will fail the HCI_Read_Local_Commands HCI command
+> > even though (according to the specification) they should support it.
+> > Since this HCI command is part of the controller init sequence
+> > controllers broken in this manner would be unusable. Since not having
+> > the list of supported commands is not critical for these controllers it
+> > is better to just ignore failures in this case (additionally, this is
+> > also how older kernels used to behave).
+> > 
+> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> > ---
+> >  net/bluetooth/hci_event.c |   16 ++++++++++++++++
+> >  1 files changed, 16 insertions(+), 0 deletions(-)
 > 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index b328ac6..beb280e 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -749,6 +749,9 @@ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active)
->  	if (test_bit(HCI_RAW, &hdev->flags))
->  		return;
->  
-> +	if (hdev->dev_type != HCI_BREDR)
-> +		return;
-> +
->  	if (conn->mode != HCI_CM_SNIFF)
->  		goto timer;
->  
-> @@ -783,6 +786,9 @@ void hci_conn_enter_sniff_mode(struct hci_conn *conn)
->  	if (conn->mode != HCI_CM_ACTIVE || !(conn->link_policy & HCI_LP_SNIFF))
->  		return;
->  
-> +	if (hdev->dev_type != HCI_BREDR)
-> +		return;
-> +
->  	if (lmp_sniffsubr_capable(hdev) && lmp_sniffsubr_capable(conn)) {
->  		struct hci_cp_sniff_subrate cp;
->  		cp.handle             = cpu_to_le16(conn->handle);
+> Both patches have been applied, thanks.
 
-I am really not sure that this is the best solution. It sounds like way
-to much overhead. Essentially I read this is being ignorant to what kind
-of controller we have and only last last minute we bother checking.
+I would have preferred you didn't. Since now I have to get this all
+fixed up as well.
 
 Regards
 
