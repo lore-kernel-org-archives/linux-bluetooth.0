@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 8/8] Bluetooth: Complete Read Local Version HCI cmd
-Date: Thu,  1 Dec 2011 14:42:15 +0200
-Message-Id: <1322743335-8671-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 2/8] Bluetooth: Split ctrl init to BREDR and AMP parts
+Date: Thu,  1 Dec 2011 14:42:09 +0200
+Message-Id: <1322743335-8671-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1322743335-8671-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1322743335-8671-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,34 +11,122 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Mark request status as done for Read Local Version HCI command.
----
- net/bluetooth/hci_event.c |    5 ++++-
- 1 files changed, 4 insertions(+), 1 deletions(-)
+Current controller initialization is moved tp bredr_init and new
+function added amp_init to handle later AMP init sequence. Current
+AMP init sequence include Reset and Read Local Version.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a646310..e064aa1 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -598,7 +598,7 @@ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
- 	BT_DBG("%s status 0x%x", hdev->name, rp->status);
- 
- 	if (rp->status)
--		return;
-+		goto done;
- 
- 	hdev->hci_ver = rp->hci_ver;
- 	hdev->hci_rev = __le16_to_cpu(rp->hci_rev);
-@@ -612,6 +612,9 @@ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	if (test_bit(HCI_INIT, &hdev->flags))
- 		hci_setup(hdev);
-+
-+done:
-+	hci_req_complete(hdev, HCI_OP_READ_LOCAL_VERSION, rp->status);
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c  |   64 ++++++++++++++++++++++++++++++++------------
+ net/bluetooth/hci_event.c |    3 ++
+ 2 files changed, 49 insertions(+), 18 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index bc71f96..a0247d3 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -192,33 +192,18 @@ static void hci_reset_req(struct hci_dev *hdev, unsigned long opt)
+ 	hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
  }
  
- static void hci_setup_link_policy(struct hci_dev *hdev)
+-static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
++static void bredr_init(struct hci_dev *hdev)
+ {
+ 	struct hci_cp_delete_stored_link_key cp;
+-	struct sk_buff *skb;
+ 	__le16 param;
+ 	__u8 flt_type;
+ 
+-	BT_DBG("%s %ld", hdev->name, opt);
+-
+-	/* Driver initialization */
+-
+-	/* Special commands */
+-	while ((skb = skb_dequeue(&hdev->driver_init))) {
+-		bt_cb(skb)->pkt_type = HCI_COMMAND_PKT;
+-		skb->dev = (void *) hdev;
+-
+-		skb_queue_tail(&hdev->cmd_q, skb);
+-		tasklet_schedule(&hdev->cmd_task);
+-	}
+-	skb_queue_purge(&hdev->driver_init);
+-
+ 	/* Mandatory initialization */
+ 
+ 	/* Reset */
+ 	if (!test_bit(HCI_QUIRK_NO_RESET, &hdev->quirks)) {
+-			set_bit(HCI_RESET, &hdev->flags);
+-			hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
++		set_bit(HCI_RESET, &hdev->flags);
++		hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
+ 	}
+ 
+ 	/* Read Local Supported Features */
+@@ -257,6 +242,49 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
+ 	hci_send_cmd(hdev, HCI_OP_DELETE_STORED_LINK_KEY, sizeof(cp), &cp);
+ }
+ 
++static void amp_init(struct hci_dev *hdev)
++{
++	/* Reset */
++	hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
++
++	/* Read Local Version */
++	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
++}
++
++static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
++{
++	struct sk_buff *skb;
++
++	BT_DBG("%s %ld", hdev->name, opt);
++
++	/* Driver initialization */
++
++	/* Special commands */
++	while ((skb = skb_dequeue(&hdev->driver_init))) {
++		bt_cb(skb)->pkt_type = HCI_COMMAND_PKT;
++		skb->dev = (void *) hdev;
++
++		skb_queue_tail(&hdev->cmd_q, skb);
++		tasklet_schedule(&hdev->cmd_task);
++	}
++	skb_queue_purge(&hdev->driver_init);
++
++	switch (hdev->dev_type) {
++	case HCI_BREDR:
++		bredr_init(hdev);
++		break;
++
++	case HCI_AMP:
++		amp_init(hdev);
++		break;
++
++	default:
++		BT_ERR("Unknown device type %d", hdev->dev_type);
++		break;
++	}
++
++}
++
+ static void hci_le_init_req(struct hci_dev *hdev, unsigned long opt)
+ {
+ 	BT_DBG("%s", hdev->name);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 957cdd5..f81b47b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -560,6 +560,9 @@ static void hci_set_le_support(struct hci_dev *hdev)
+ 
+ static void hci_setup(struct hci_dev *hdev)
+ {
++	if (hdev->dev_type != HCI_BREDR)
++		return;
++
+ 	hci_setup_event_mask(hdev);
+ 
+ 	if (hdev->hci_ver > BLUETOOTH_VER_1_1)
 -- 
 1.7.4.1
 
