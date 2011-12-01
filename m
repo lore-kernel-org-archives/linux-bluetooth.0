@@ -1,44 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Fri, 2 Dec 2011 09:02:47 +0900
+Date: Fri, 2 Dec 2011 08:38:40 +0900
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Ignore HCI_Read_Local_Commands failures
-Message-ID: <20111202000247.GB2688@joana>
-References: <1321898484-17952-1-git-send-email-johan.hedberg@gmail.com>
- <1321898484-17952-2-git-send-email-johan.hedberg@gmail.com>
- <20111201124039.GB2894@joana>
- <1322744973.26198.31.camel@aeonflux>
+To: Brian Gix <bgix@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH-v5 5/6] Bluetooth: Add MITM mechanism to LE-SMP
+Message-ID: <20111201233840.GA2688@joana>
+References: <1322065718-11570-1-git-send-email-bgix@codeaurora.org>
+ <1322065718-11570-6-git-send-email-bgix@codeaurora.org>
+ <20111201141135.GE2894@joana>
+ <4ED7C8F2.20600@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322744973.26198.31.camel@aeonflux>
+In-Reply-To: <4ED7C8F2.20600@codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Brian,
 
-* Marcel Holtmann <marcel@holtmann.org> [2011-12-01 14:09:33 +0100]:
+* Brian Gix <bgix@codeaurora.org> [2011-12-01 10:35:30 -0800]:
 
-> Hi Gustavo,
+> On 12/1/2011 6:11 AM, Gustavo Padovan wrote:
+> >Hi Brian,
 > 
-> > > Some 1.2 controllers will fail the HCI_Read_Local_Commands HCI command
-> > > even though (according to the specification) they should support it.
-> > > Since this HCI command is part of the controller init sequence
-> > > controllers broken in this manner would be unusable. Since not having
-> > > the list of supported commands is not critical for these controllers it
-> > > is better to just ignore failures in this case (additionally, this is
-> > > also how older kernels used to behave).
-> > > 
-> > > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> > > ---
-> > >  net/bluetooth/hci_event.c |   16 ++++++++++++++++
-> > >  1 files changed, 16 insertions(+), 0 deletions(-)
-> > 
-> > Both patches have been applied, thanks.
+> >>diff --git a/include/net/bluetooth/smp.h b/include/net/bluetooth/smp.h
+> >>index 15b97d5..43b6c49 100644
+> >>--- a/include/net/bluetooth/smp.h
+> >>+++ b/include/net/bluetooth/smp.h
+> >>@@ -124,6 +124,8 @@ struct smp_chan {
+> >>  	u8		pcnf[16]; /* SMP Pairing Confirm */
+> >>  	u8		tk[16]; /* SMP Temporary Key */
+> >>  	u8		smp_key_size;
+> >>+	u8		smp_tk_valid;
+> >>+	u8		smp_cfm_pending;
+> >
+> >Those two could be converted in a bitfield, you are using them as boolean.
+> >
 > 
-> I would have preferred you didn't. Since now I have to get this all
-> fixed up as well.
+> Is there a mandate that bitfields must be manipulated/checked with
+> the clear_bit/set_bit/test_bit prototypes?  Or can I just use a
+> single u8 to represent both boolean values (as opposed to an
+> unsigned long), and use standard &=, |= and & to set/clear/check?
 
-Is this for both of them?
+Please use clear/set/test_bit, it is the right way.
 
 	Gustavo
