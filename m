@@ -1,45 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Thu, 1 Dec 2011 21:51:11 +0900
+Date: Thu, 1 Dec 2011 21:47:41 +0900
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: "Yao, Costa" <cqyao@qca.qualcomm.com>
-Cc: "marcel@holtmann.org" <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: btusb: Add AR3006 in blacklist_table
-Message-ID: <20111201125111.GD2894@joana>
-References: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF417E@nasanexd02b.na.qualcomm.com>
+To: Cong Wang <amwang@redhat.com>
+Cc: linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [Patch] btusb: fix a memory leak in btusb_send_frame()
+Message-ID: <20111201124741.GC2894@joana>
+References: <1321925578-5407-1-git-send-email-amwang@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DEF417E@nasanexd02b.na.qualcomm.com>
+In-Reply-To: <1321925578-5407-1-git-send-email-amwang@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Costa,
+Hi Cong,
 
-* Yao, Costa <cqyao@qca.qualcomm.com> [2011-11-22 02:49:50 +0000]:
+* Cong Wang <amwang@redhat.com> [2011-11-22 09:32:57 +0800]:
 
-> From c21eede5fafd811fdf6c100693a07a64f621ddea Mon Sep 17 00:00:00 2001
-> From: Costa Yao <cqyao@qca.qualcomm.com>
-> Date: Fri, 18 Nov 2011 14:08:56 +0800
-> Subject: [PATCH] Bluetooth: btusb: Add AR3006 in blacklist_table.
+> This patch fixes the following memory leak reported by kmemleak:
 > 
-> Add AR3006 entry in blacklist_table in btusb.c for bcdDevice check.
-> Then ath3k.c has the chance to download firmware and reset hardware.
+> unreferenced object 0xffff880060a53840 (size 192):
+>   comm "softirq", pid 0, jiffies 4320571771 (age 1406.569s)
+>   hex dump (first 32 bytes):
+>     01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>   backtrace:
+>     [<ffffffff81138a1c>] create_object+0x187/0x28b
+>     [<ffffffff814be12e>] kmemleak_alloc+0x73/0x98
+>     [<ffffffff811289d3>] __kmalloc+0xfc/0x123
+>     [<ffffffff81386546>] usb_alloc_urb+0x1e/0x48
+>     [<ffffffffa0130274>] btusb_send_frame+0x86/0x385 [btusb]
+>     [<ffffffffa02d8230>] hci_send_frame+0xa0/0xa5 [bluetooth]
+>     [<ffffffffa02d8a4e>] hci_cmd_task+0xa0/0xfb [bluetooth]
+>     [<ffffffff81058548>] tasklet_action+0x8f/0xef
+>     [<ffffffff81058a4c>] __do_softirq+0xf4/0x1db
+>     [<ffffffff81058bb7>] run_ksoftirqd+0x84/0x129
+>     [<ffffffff8106f1c4>] kthread+0xa0/0xa8
+>     [<ffffffff814dd144>] kernel_thread_helper+0x4/0x10
+>     [<ffffffffffffffff>] 0xffffffffffffffff
 > 
-> Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
+> The problem is that when inc_tx() returns non-zero, we forgot
+> to call usb_free_urb().
+> 
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
+> Signed-off-by: WANG Cong <amwang@redhat.com>
+> 
 > ---
->  drivers/bluetooth/btusb.c |    7 ++++---
->  1 files changed, 4 insertions(+), 3 deletions(-)
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index fe4ebc3..eabc437 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -777,9 +777,8 @@ skip_waking:
+>  		usb_mark_last_busy(data->udev);
+>  	}
+>  
+> -	usb_free_urb(urb);
+> -
+>  done:
+> +	usb_free_urb(urb);
+>  	return err;
+>  }
 
-There is still something wrong with your patch. 
-
-Applying: Bluetooth: btusb: Add AR3006 in blacklist_table
-error: patch failed: drivers/bluetooth/btusb.c:54
-error: drivers/bluetooth/btusb.c: patch does not apply
-Patch failed at 0001 Bluetooth: btusb: Add AR3006 in blacklist_table
-When you have resolved this problem run "git am --resolved".
-If you would prefer to skip this patch, instead run "git am --skip".
-To restore the original branch and stop patching run "git am --abort".
-
-Please fix your patch and resend.
+Patch has been applied, thanks.
 
 	Gustavo
