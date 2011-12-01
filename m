@@ -1,68 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Thu, 1 Dec 2011 21:47:41 +0900
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Cong Wang <amwang@redhat.com>
-Cc: linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [Patch] btusb: fix a memory leak in btusb_send_frame()
-Message-ID: <20111201124741.GC2894@joana>
-References: <1321925578-5407-1-git-send-email-amwang@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321925578-5407-1-git-send-email-amwang@redhat.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 4/8] Bluetooth: Initialize default flow control mode
+Date: Thu,  1 Dec 2011 14:42:11 +0200
+Message-Id: <1322743335-8671-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1322743335-8671-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1322743335-8671-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Cong,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-* Cong Wang <amwang@redhat.com> [2011-11-22 09:32:57 +0800]:
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci.h |    4 ++++
+ net/bluetooth/hci_core.c    |    4 ++++
+ 2 files changed, 8 insertions(+), 0 deletions(-)
 
-> This patch fixes the following memory leak reported by kmemleak:
-> 
-> unreferenced object 0xffff880060a53840 (size 192):
->   comm "softirq", pid 0, jiffies 4320571771 (age 1406.569s)
->   hex dump (first 32 bytes):
->     01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace:
->     [<ffffffff81138a1c>] create_object+0x187/0x28b
->     [<ffffffff814be12e>] kmemleak_alloc+0x73/0x98
->     [<ffffffff811289d3>] __kmalloc+0xfc/0x123
->     [<ffffffff81386546>] usb_alloc_urb+0x1e/0x48
->     [<ffffffffa0130274>] btusb_send_frame+0x86/0x385 [btusb]
->     [<ffffffffa02d8230>] hci_send_frame+0xa0/0xa5 [bluetooth]
->     [<ffffffffa02d8a4e>] hci_cmd_task+0xa0/0xfb [bluetooth]
->     [<ffffffff81058548>] tasklet_action+0x8f/0xef
->     [<ffffffff81058a4c>] __do_softirq+0xf4/0x1db
->     [<ffffffff81058bb7>] run_ksoftirqd+0x84/0x129
->     [<ffffffff8106f1c4>] kthread+0xa0/0xa8
->     [<ffffffff814dd144>] kernel_thread_helper+0x4/0x10
->     [<ffffffffffffffff>] 0xffffffffffffffff
-> 
-> The problem is that when inc_tx() returns non-zero, we forgot
-> to call usb_free_urb().
-> 
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-> Signed-off-by: WANG Cong <amwang@redhat.com>
-> 
-> ---
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index fe4ebc3..eabc437 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -777,9 +777,8 @@ skip_waking:
->  		usb_mark_last_busy(data->udev);
->  	}
->  
-> -	usb_free_urb(urb);
-> -
->  done:
-> +	usb_free_urb(urb);
->  	return err;
->  }
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 453e7fc..a6a2509 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -271,6 +271,10 @@ enum {
+ #define HCI_ERROR_LOCAL_HOST_TERM	0x16
+ #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
+ 
++/* Flow control modes */
++#define HCI_FLOW_CTL_MODE_PACKET_BASED	0x00
++#define HCI_FLOW_CTL_MODE_BLOCK_BASED	0x01
++
+ /* -----  HCI Commands ---- */
+ #define HCI_OP_NOP			0x0000
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index a0247d3..4a0391e 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -198,6 +198,8 @@ static void bredr_init(struct hci_dev *hdev)
+ 	__le16 param;
+ 	__u8 flt_type;
+ 
++	hdev->flow_ctl_mode = HCI_FLOW_CTL_MODE_PACKET_BASED;
++
+ 	/* Mandatory initialization */
+ 
+ 	/* Reset */
+@@ -244,6 +246,8 @@ static void bredr_init(struct hci_dev *hdev)
+ 
+ static void amp_init(struct hci_dev *hdev)
+ {
++	hdev->flow_ctl_mode = HCI_FLOW_CTL_MODE_BLOCK_BASED;
++
+ 	/* Reset */
+ 	hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
+ 
+-- 
+1.7.4.1
 
-Patch has been applied, thanks.
-
-	Gustavo
