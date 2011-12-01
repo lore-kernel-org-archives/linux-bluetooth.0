@@ -1,32 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: <sachin.athanikar@accenture.com>
-To: <luiz.dentz@gmail.com>, <peter@hurleysoftware.com>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: GAVDP & GOEP Version
-Date: Thu, 1 Dec 2011 13:26:49 +0000
-Message-ID: <3F705F717ADC094BBC4D5259417231CA07361061@048-CH1MPN1-024.048d.mgd.msft.net>
-References: <1313161215.2254.6.camel@THOR>
-	<CABBYNZ+3jC+1LbvHgie5LX_8Xr_kRT6G-ed7dsn-pEUzoVam=g@mail.gmail.com>
-	<1313370363.2144.46.camel@THOR>
-	<CABBYNZJ5GMqnWr6=OzDcC=YxCTSMH2EEu8x4p04=OZYExyM6+g@mail.gmail.com>
-	<1313407360.2144.69.camel@THOR>
- <CABBYNZ+nf=hFxy8G5df__zNvxOKv2B8Sda3YR5B4b62uy2DRxg@mail.gmail.com>
-In-Reply-To: <CABBYNZ+nf=hFxy8G5df__zNvxOKv2B8Sda3YR5B4b62uy2DRxg@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Thu, 1 Dec 2011 15:23:29 +0200
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 8/8] Bluetooth: Complete Read Local Version HCI cmd
+Message-ID: <20111201132328.GD2216@aemeltch-MOBL1>
+References: <1322743335-8671-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1322743335-8671-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1322745177.26198.34.camel@aeonflux>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1322745177.26198.34.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-Please let me know the version of GAVDP & GOEP is used in BlueZ.
+On Thu, Dec 01, 2011 at 02:12:57PM +0100, Marcel Holtmann wrote:
+> Hi Andrei,
+> 
+> > Mark request status as done for Read Local Version HCI command.
+> > ---
+> >  net/bluetooth/hci_event.c |    5 ++++-
+> >  1 files changed, 4 insertions(+), 1 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index a646310..e064aa1 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -598,7 +598,7 @@ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
+> >  	BT_DBG("%s status 0x%x", hdev->name, rp->status);
+> >  
+> >  	if (rp->status)
+> > -		return;
+> > +		goto done;
+> >  
+> >  	hdev->hci_ver = rp->hci_ver;
+> >  	hdev->hci_rev = __le16_to_cpu(rp->hci_rev);
+> > @@ -612,6 +612,9 @@ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
+> >  
+> >  	if (test_bit(HCI_INIT, &hdev->flags))
+> >  		hci_setup(hdev);
+> > +
+> > +done:
+> > +	hci_req_complete(hdev, HCI_OP_READ_LOCAL_VERSION, rp->status);
+> >  }
+> 
+> this is all getting out of control. We call hci_req_complete for random
+> functions now. And that is because our init handling sucks.
 
-Thanks
-Sachin
+You are right here. The reason for this patch is AMP initialization where
+this HCI command is last and does not "complete itself".
 
-________________________________
-Subject to local law, communications with Accenture and its affiliates including telephone calls and emails (including content), may be monitored by our systems for the purposes of security and the assessment of internal compliance with Accenture policy.
-______________________________________________________________________________________
+Maybe we need to "complete" each HCI Request?
 
-www.accenture.com
-
+Best regards 
+Andrei Emeltchenko 
