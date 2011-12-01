@@ -1,89 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 1 Dec 2011 23:13:05 +0900
+Date: Thu, 1 Dec 2011 23:11:35 +0900
 From: Gustavo Padovan <padovan@profusion.mobi>
 To: Brian Gix <bgix@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH-v5 4/6] Bluetooth: Centralize SMP pairing failure handling
-Message-ID: <20111201141305.GF2894@joana>
+Subject: Re: [PATCH-v5 5/6] Bluetooth: Add MITM mechanism to LE-SMP
+Message-ID: <20111201141135.GE2894@joana>
 References: <1322065718-11570-1-git-send-email-bgix@codeaurora.org>
- <1322065718-11570-5-git-send-email-bgix@codeaurora.org>
+ <1322065718-11570-6-git-send-email-bgix@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322065718-11570-5-git-send-email-bgix@codeaurora.org>
+In-Reply-To: <1322065718-11570-6-git-send-email-bgix@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Brian,
 
-* Brian Gix <bgix@codeaurora.org> [2011-11-23 08:28:36 -0800]:
+* Brian Gix <bgix@codeaurora.org> [2011-11-23 08:28:37 -0800]:
 
+> To achive Man-In-The-Middle (MITM) level security with Low Energy,
+> we have to enable User Passkey Comparison.  This commit modifies the
+> hard-coded JUST-WORKS pairing mechanism to support query via the MGMT
+> interface of Passkey comparison and User Confirmation.
+> 
 > Signed-off-by: Brian Gix <bgix@codeaurora.org>
 > ---
->  net/bluetooth/smp.c |   22 ++++++++++++++++------
->  1 files changed, 16 insertions(+), 6 deletions(-)
+>  include/net/bluetooth/hci_core.h |    1 +
+>  include/net/bluetooth/smp.h      |    3 +
+>  net/bluetooth/smp.c              |  228 ++++++++++++++++++++++++++++++++++----
+>  3 files changed, 210 insertions(+), 22 deletions(-)
 > 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index e7b2e25..4aa417c 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -312,6 +312,7 @@ struct hci_conn {
+>  	struct hci_dev	*hdev;
+>  	void		*l2cap_data;
+>  	void		*sco_data;
+> +	void		*smp_conn;
+>  
+>  	struct hci_conn	*link;
+>  
+> diff --git a/include/net/bluetooth/smp.h b/include/net/bluetooth/smp.h
+> index 15b97d5..43b6c49 100644
+> --- a/include/net/bluetooth/smp.h
+> +++ b/include/net/bluetooth/smp.h
+> @@ -124,6 +124,8 @@ struct smp_chan {
+>  	u8		pcnf[16]; /* SMP Pairing Confirm */
+>  	u8		tk[16]; /* SMP Temporary Key */
+>  	u8		smp_key_size;
+> +	u8		smp_tk_valid;
+> +	u8		smp_cfm_pending;
+
+Those two could be converted in a bitfield, you are using them as boolean.
+
+>  	struct crypto_blkcipher	*tfm;
+>  	struct work_struct confirm;
+>  	struct work_struct random;
+> @@ -134,6 +136,7 @@ struct smp_chan {
+>  int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level);
+>  int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb);
+>  int smp_distribute_keys(struct l2cap_conn *conn, __u8 force);
+> +int smp_user_confirm_reply(struct hci_conn *conn, u16 mgmt_op, __le32 passkey);
+>  
+>  void smp_chan_destroy(struct l2cap_conn *conn);
+>  
 > diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index b9af488..0b96737 100644
+> index 0b96737..e1df0a2 100644
 > --- a/net/bluetooth/smp.c
 > +++ b/net/bluetooth/smp.c
-> @@ -232,6 +232,18 @@ static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
->  	return 0;
+> @@ -23,6 +23,7 @@
+>  #include <net/bluetooth/bluetooth.h>
+>  #include <net/bluetooth/hci_core.h>
+>  #include <net/bluetooth/l2cap.h>
+> +#include <net/bluetooth/mgmt.h>
+>  #include <net/bluetooth/smp.h>
+>  #include <linux/crypto.h>
+>  #include <linux/scatterlist.h>
+> @@ -188,24 +189,46 @@ static void smp_send_cmd(struct l2cap_conn *conn, u8 code, u16 len, void *data)
+>  					msecs_to_jiffies(SMP_TIMEOUT));
 >  }
 >  
-> +static void smp_failure(struct l2cap_conn *conn, u8 reason, u8 send)
+> +static __u8 authreq_to_seclevel(__u8 authreq)
 > +{
-> +	if (send)
-> +		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(reason),
-> +								&reason);
-> +
-> +	clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->hcon->pend);
-> +	mgmt_auth_failed(conn->hcon->hdev, conn->dst, reason);
-> +	del_timer(&conn->security_timer);
-> +	smp_chan_destroy(conn);
+> +	if (authreq & SMP_AUTH_MITM)
+> +		return BT_SECURITY_HIGH;
+> +	else
+> +		return BT_SECURITY_MEDIUM;
 > +}
 > +
->  static void confirm_work(struct work_struct *work)
+> +static __u8 seclevel_to_authreq(__u8 sec_level)
+> +{
+> +	switch (sec_level) {
+> +	case BT_SECURITY_HIGH:
+> +		return SMP_AUTH_MITM | SMP_AUTH_BONDING;
+> +	case BT_SECURITY_MEDIUM:
+> +		return SMP_AUTH_BONDING;
+> +	default:
+> +		return SMP_AUTH_NONE;
+> +	}
+> +}
+> +
+>  static void build_pairing_cmd(struct l2cap_conn *conn,
+>  				struct smp_cmd_pairing *req,
+>  				struct smp_cmd_pairing *rsp,
+>  				__u8 authreq)
 >  {
->  	struct smp_chan *smp = container_of(work, struct smp_chan, confirm);
-> @@ -270,8 +282,7 @@ static void confirm_work(struct work_struct *work)
->  	return;
+> -	u8 dist_keys;
+> +	u8 all_keys = 0;
+> +	u8 dist_keys = 0;
 >  
->  error:
-> -	smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(reason), &reason);
-> -	smp_chan_destroy(conn);
-> +	smp_failure(conn, reason, 1);
->  }
+> -	dist_keys = 0;
+>  	if (test_bit(HCI_PAIRABLE, &conn->hcon->hdev->flags)) {
+>  		dist_keys = SMP_DIST_ENC_KEY;
+>  		authreq |= SMP_AUTH_BONDING;
+> +	} else {
+> +		authreq &= ~SMP_AUTH_BONDING;
+>  	}
 >  
->  static void random_work(struct work_struct *work)
-> @@ -354,8 +365,7 @@ static void random_work(struct work_struct *work)
->  	return;
->  
->  error:
-> -	smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(reason), &reason);
-> -	smp_chan_destroy(conn);
-> +	smp_failure(conn, reason, 1);
->  }
->  
->  static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
-> @@ -655,6 +665,7 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
->  		break;
->  
->  	case SMP_CMD_PAIRING_FAIL:
-> +		smp_failure(conn, skb->data[0], 0);
->  		reason = 0;
->  		err = -EPERM;
->  		break;
-> @@ -700,8 +711,7 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
->  
->  done:
->  	if (reason)
-> -		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(reason),
-> -								&reason);
-> +		smp_failure(conn, reason, 1);
->  
->  	kfree_skb(skb);
->  	return err;
+>  	if (rsp == NULL) {
+>  		req->io_capability = conn->hcon->io_capability;
+>  		req->oob_flag = SMP_OOB_NOT_PRESENT;
+>  		req->max_key_size = SMP_MAX_ENC_KEY_SIZE;
+> -		req->init_key_dist = dist_keys;
+> +		req->init_key_dist = all_keys;
+>  		req->resp_key_dist = dist_keys;
+>  		req->auth_req = authreq;
+>  		return;
+> @@ -214,7 +237,7 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
+>  	rsp->io_capability = conn->hcon->io_capability;
+>  	rsp->oob_flag = SMP_OOB_NOT_PRESENT;
+>  	rsp->max_key_size = SMP_MAX_ENC_KEY_SIZE;
+> -	rsp->init_key_dist = req->init_key_dist & dist_keys;
+> +	rsp->init_key_dist = req->init_key_dist & all_keys;
 
-Patch 1 to 4 were applied. Thanks.
+all_keys is always zero. What's the purpose of create it?
 
 	Gustavo
