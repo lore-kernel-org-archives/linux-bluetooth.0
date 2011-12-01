@@ -1,60 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 1 Dec 2011 15:32:16 +0200
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 7/8] Bluetooth: Use SNIFF mode only for BREDR controller
-Message-ID: <20111201133215.GE2216@aemeltch-MOBL1>
-References: <1322743335-8671-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1322743335-8671-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1322745116.26198.33.camel@aeonflux>
+From: <sachin.athanikar@accenture.com>
+To: <luiz.dentz@gmail.com>, <peter@hurleysoftware.com>
+CC: <linux-bluetooth@vger.kernel.org>
+Subject: GAVDP & GOEP Version
+Date: Thu, 1 Dec 2011 13:26:49 +0000
+Message-ID: <3F705F717ADC094BBC4D5259417231CA07361061@048-CH1MPN1-024.048d.mgd.msft.net>
+References: <1313161215.2254.6.camel@THOR>
+	<CABBYNZ+3jC+1LbvHgie5LX_8Xr_kRT6G-ed7dsn-pEUzoVam=g@mail.gmail.com>
+	<1313370363.2144.46.camel@THOR>
+	<CABBYNZJ5GMqnWr6=OzDcC=YxCTSMH2EEu8x4p04=OZYExyM6+g@mail.gmail.com>
+	<1313407360.2144.69.camel@THOR>
+ <CABBYNZ+nf=hFxy8G5df__zNvxOKv2B8Sda3YR5B4b62uy2DRxg@mail.gmail.com>
+In-Reply-To: <CABBYNZ+nf=hFxy8G5df__zNvxOKv2B8Sda3YR5B4b62uy2DRxg@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322745116.26198.33.camel@aeonflux>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
 
-On Thu, Dec 01, 2011 at 02:11:56PM +0100, Marcel Holtmann wrote:
-> Hi Andrei,
-> 
-> >  net/bluetooth/hci_conn.c |    6 ++++++
-> >  1 files changed, 6 insertions(+), 0 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > index b328ac6..beb280e 100644
-> > --- a/net/bluetooth/hci_conn.c
-> > +++ b/net/bluetooth/hci_conn.c
-> > @@ -749,6 +749,9 @@ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active)
-> >  	if (test_bit(HCI_RAW, &hdev->flags))
-> >  		return;
-> >  
-> > +	if (hdev->dev_type != HCI_BREDR)
-> > +		return;
-> > +
-> >  	if (conn->mode != HCI_CM_SNIFF)
-> >  		goto timer;
-> >  
-> > @@ -783,6 +786,9 @@ void hci_conn_enter_sniff_mode(struct hci_conn *conn)
-> >  	if (conn->mode != HCI_CM_ACTIVE || !(conn->link_policy & HCI_LP_SNIFF))
-> >  		return;
-> >  
-> > +	if (hdev->dev_type != HCI_BREDR)
-> > +		return;
-> > +
-> >  	if (lmp_sniffsubr_capable(hdev) && lmp_sniffsubr_capable(conn)) {
-> >  		struct hci_cp_sniff_subrate cp;
-> >  		cp.handle             = cpu_to_le16(conn->handle);
-> 
-> I am really not sure that this is the best solution. It sounds like way
-> to much overhead. Essentially I read this is being ignorant to what kind
-> of controller we have and only last last minute we bother checking.
+Please let me know the version of GAVDP & GOEP is used in BlueZ.
 
-Do you think that the check shall be the first in
-enter_[sniff|active]_mode commands or it shall be somewhere before those functions?
+Thanks
+Sachin
 
-BTW: Can compiler do something for us if we use "unlikely" before those
-checks?
+________________________________
+Subject to local law, communications with Accenture and its affiliates including telephone calls and emails (including content), may be monitored by our systems for the purposes of security and the assessment of internal compliance with Accenture policy.
+______________________________________________________________________________________
 
-Best regards 
-Andrei Emeltchenko 
+www.accenture.com
+
