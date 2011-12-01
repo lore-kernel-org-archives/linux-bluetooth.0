@@ -1,13 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1322745177.26198.34.camel@aeonflux>
-Subject: Re: [PATCHv2 8/8] Bluetooth: Complete Read Local Version HCI cmd
+Message-ID: <1322745116.26198.33.camel@aeonflux>
+Subject: Re: [PATCHv2 7/8] Bluetooth: Use SNIFF mode only for BREDR
+ controller
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 01 Dec 2011 14:12:57 +0100
-In-Reply-To: <1322743335-8671-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 01 Dec 2011 14:11:56 +0100
+In-Reply-To: <1322743335-8671-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1322743335-8671-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1322743335-8671-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1322743335-8671-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,35 +16,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-> Mark request status as done for Read Local Version HCI command.
-> ---
->  net/bluetooth/hci_event.c |    5 ++++-
->  1 files changed, 4 insertions(+), 1 deletions(-)
+>  net/bluetooth/hci_conn.c |    6 ++++++
+>  1 files changed, 6 insertions(+), 0 deletions(-)
 > 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index a646310..e064aa1 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -598,7 +598,7 @@ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
->  	BT_DBG("%s status 0x%x", hdev->name, rp->status);
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index b328ac6..beb280e 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -749,6 +749,9 @@ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active)
+>  	if (test_bit(HCI_RAW, &hdev->flags))
+>  		return;
 >  
->  	if (rp->status)
-> -		return;
-> +		goto done;
->  
->  	hdev->hci_ver = rp->hci_ver;
->  	hdev->hci_rev = __le16_to_cpu(rp->hci_rev);
-> @@ -612,6 +612,9 @@ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
->  
->  	if (test_bit(HCI_INIT, &hdev->flags))
->  		hci_setup(hdev);
+> +	if (hdev->dev_type != HCI_BREDR)
+> +		return;
 > +
-> +done:
-> +	hci_req_complete(hdev, HCI_OP_READ_LOCAL_VERSION, rp->status);
->  }
+>  	if (conn->mode != HCI_CM_SNIFF)
+>  		goto timer;
+>  
+> @@ -783,6 +786,9 @@ void hci_conn_enter_sniff_mode(struct hci_conn *conn)
+>  	if (conn->mode != HCI_CM_ACTIVE || !(conn->link_policy & HCI_LP_SNIFF))
+>  		return;
+>  
+> +	if (hdev->dev_type != HCI_BREDR)
+> +		return;
+> +
+>  	if (lmp_sniffsubr_capable(hdev) && lmp_sniffsubr_capable(conn)) {
+>  		struct hci_cp_sniff_subrate cp;
+>  		cp.handle             = cpu_to_le16(conn->handle);
 
-this is all getting out of control. We call hci_req_complete for random
-functions now. And that is because our init handling sucks.
+I am really not sure that this is the best solution. It sounds like way
+to much overhead. Essentially I read this is being ignorant to what kind
+of controller we have and only last last minute we bother checking.
 
 Regards
 
