@@ -1,51 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <939a364c4487c47a6293b8584613af80@optimaster.eu>
-References: <939a364c4487c47a6293b8584613af80@optimaster.eu>
-Date: Thu, 1 Dec 2011 09:39:47 +0200
-Message-ID: <CABBYNZ+jerHKHri41gF+FytB7so9tHofpvPPhrQEobwF2pae+Q@mail.gmail.com>
-Subject: Re: Cracking Sound
+In-Reply-To: <20111130172428.GA9425@samus>
+References: <1320241924-2300-1-git-send-email-luiz.dentz@gmail.com>
+	<1320241924-2300-4-git-send-email-luiz.dentz@gmail.com>
+	<20111130172428.GA9425@samus>
+Date: Thu, 1 Dec 2011 09:23:09 +0200
+Message-ID: <CABBYNZKod-HNwzuFhoLRUQc66uJkEQL-u7NCknPAjbtvOMorgw@mail.gmail.com>
+Subject: Re: [PATCH 4/4] Bluetooth: use buffer priority to mark URB_ISO_ASAP flag
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: krisztian.kocsis@optimaster.eu
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Vinicius,
 
-On Wed, Nov 30, 2011 at 9:27 PM,  <krisztian.kocsis@optimaster.eu> wrote:
-> Hi!
+On Wed, Nov 30, 2011 at 7:24 PM, Vinicius Costa Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> Hi,
 >
-> I'm trying to get bluetooth audio working on a PowerPC machine, but it has
-> some strange effects.
-> I'm using a bluetooth headset (HSP profile) via ALSA but it seems that it
-> has some problem with various sample rates and other data related stuff.
-> The asound.conf contains the appropriate device address, profiles is set to
-> voice, device is named as 'btheadset' (the share/alsa/bluetooth.conf is also
-> included).
+> On 15:52 Wed 02 Nov, Luiz Augusto von Dentz wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> ---
+>>  drivers/bluetooth/btusb.c |    3 +++
+>>  1 files changed, 3 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>> index abfc4ee..9db2476 100644
+>> --- a/drivers/bluetooth/btusb.c
+>> +++ b/drivers/bluetooth/btusb.c
+>> @@ -727,6 +727,9 @@ static int btusb_send_frame(struct sk_buff *skb)
+>>               usb_fill_bulk_urb(urb, data->udev, pipe,
+>>                               skb->data, skb->len, btusb_tx_complete, skb);
+>>
+>> +             if (skb->priority >= HCI_PRIO_MAX - 1)
+>> +                     urb->transfer_flags  = URB_ISO_ASAP;
+>> +
 >
-> In BlueZ's output it seems that is is playing (statu is PLAY_IN_PROGRESS or
-> PLAYING - I don't remember correctly) the stream.
-> When BlueZ is connecting to the device I hear a beep in the headset but the
-> "stream" is only a cracking, clicking and poping noise, nothing from the
-> original sound.
-> Also this sound comes if I force aplay to 4KHz or 8KHz, in other settings or
-> without forcing, it plays nothing (no sound, only beeps).
+> In case someone is having problems:
 >
-> Do somebody know which problem can cause this side effect?
->
-> I' using ALSA 1.0.24 and BlueZ 4.96 (both are untouched, no patches and no
-> config file modifications - except that I had to create an asound.conf).
->
-> Is anything else I can provide about the problem?
+> With CONFIG_USB_DEBUG enabled the check that the URB_ISO_ASAP flag is
+> not valid for bulk endpoints is enabled, and that urb is rejected.
 
-ALSA plugin is consider deprecated since Media became the default API
-for requesting audio transport, in the future it will probably be
-removed as alsa plugin architecture do not allow a sane integration
-with mainloops necessary for Media API.
+Hmm, you are right URB_ISO_ASAP is not meant for bulk so usb_submit_urb drop it:
 
-If possible use PulseAudio.
+ 	/* fail if submitter gave bogus flags */
+	if (urb->transfer_flags != orig_flags) {
+		dev_err(&dev->dev, "BOGUS urb flags, %x --> %x\n",
+			orig_flags, urb->transfer_flags);
+		return -EINVAL;
+	}
+
+So we better remove asap.
 
 -- 
 Luiz Augusto von Dentz
