@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v3 3/6] audio: Remove maemo5 tel driver
-Date: Thu,  1 Dec 2011 16:14:02 +0100
-Message-Id: <1322752445-18771-4-git-send-email-frederic.danis@linux.intel.com>
+Subject: [RFC v3 1/6] audio: Move tel drivers to DBus interface
+Date: Thu,  1 Dec 2011 16:14:00 +0100
+Message-Id: <1322752445-18771-2-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1322752445-18771-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1322752445-18771-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -12,2120 +12,1563 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- audio/telephony-maemo5.c | 2104 ----------------------------------------------
- 1 files changed, 0 insertions(+), 2104 deletions(-)
- delete mode 100644 audio/telephony-maemo5.c
+ Makefile.am              |   13 +-
+ audio/headset.c          |  614 ++--------------------------------------------
+ audio/headset.h          |    2 +
+ audio/manager.c          |    4 +-
+ audio/telephony.c        |  529 +++++++++++++++++++++++++++++++++++++++
+ audio/telephony.h        |   25 +--
+ doc/assigned-numbers.txt |    1 +
+ doc/audio-api.txt        |   91 +++++++
+ 8 files changed, 648 insertions(+), 631 deletions(-)
+ create mode 100644 audio/telephony.c
 
-diff --git a/audio/telephony-maemo5.c b/audio/telephony-maemo5.c
-deleted file mode 100644
-index 23801c0..0000000
---- a/audio/telephony-maemo5.c
-+++ /dev/null
-@@ -1,2104 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2008-2010  Nokia Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
+diff --git a/Makefile.am b/Makefile.am
+index 07b8626..31c1083 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -154,14 +154,8 @@ builtin_sources += audio/main.c \
+ 			audio/unix.h audio/unix.c \
+ 			audio/media.h audio/media.c \
+ 			audio/transport.h audio/transport.c \
+-			audio/telephony.h audio/a2dp-codecs.h
+-builtin_nodist += audio/telephony.c
 -
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
+-noinst_LIBRARIES += audio/libtelephony.a
 -
--#include <stdlib.h>
--#include <stdio.h>
--#include <unistd.h>
--#include <fcntl.h>
--#include <stdint.h>
--#include <string.h>
--#include <glib.h>
--#include <dbus/dbus.h>
--#include <gdbus.h>
+-audio_libtelephony_a_SOURCES = audio/telephony.h audio/telephony-dummy.c \
+-				audio/telephony-maemo5.c audio/telephony-ofono.c \
+-				audio/telephony-maemo6.c
++			audio/telephony.h audio/telephony.c \
++			audio/a2dp-codecs.h
+ endif
+ 
+ if SAPPLUGIN
+@@ -476,9 +470,6 @@ MAINTAINERCLEANFILES = Makefile.in \
+ src/builtin.h: src/genbuiltin $(builtin_sources)
+ 	$(AM_V_GEN)$(srcdir)/src/genbuiltin $(builtin_modules) > $@
+ 
+-audio/telephony.c: audio/@TELEPHONY_DRIVER@
+-	$(AM_V_GEN)$(LN_S) $(abs_top_srcdir)/$< $@
 -
--#include "log.h"
--#include "telephony.h"
--#include "error.h"
--
--/* SSC D-Bus definitions */
--#define SSC_DBUS_NAME  "com.nokia.phone.SSC"
--#define SSC_DBUS_IFACE "com.nokia.phone.SSC"
--#define SSC_DBUS_PATH  "/com/nokia/phone/SSC"
--
--/* libcsnet D-Bus definitions */
--#define NETWORK_BUS_NAME		"com.nokia.phone.net"
--#define NETWORK_INTERFACE		"Phone.Net"
--#define NETWORK_PATH			"/com/nokia/phone/net"
--
--/* Mask bits for supported services */
--#define NETWORK_MASK_GPRS_SUPPORT	0x01
--#define NETWORK_MASK_CS_SERVICES	0x02
--#define NETWORK_MASK_EGPRS_SUPPORT	0x04
--#define NETWORK_MASK_HSDPA_AVAIL	0x08
--#define NETWORK_MASK_HSUPA_AVAIL	0x10
--
--/* network get cell info: cell type */
--#define NETWORK_UNKNOWN_CELL		0
--#define NETWORK_GSM_CELL		1
--#define NETWORK_WCDMA_CELL		2
--
--enum net_registration_status {
--	NETWORK_REG_STATUS_HOME = 0x00,
--	NETWORK_REG_STATUS_ROAM,
--	NETWORK_REG_STATUS_ROAM_BLINK,
--	NETWORK_REG_STATUS_NOSERV,
--	NETWORK_REG_STATUS_NOSERV_SEARCHING,
--	NETWORK_REG_STATUS_NOSERV_NOTSEARCHING,
--	NETWORK_REG_STATUS_NOSERV_NOSIM,
--	NETWORK_REG_STATUS_POWER_OFF = 0x08,
--	NETWORK_REG_STATUS_NSPS,
--	NETWORK_REG_STATUS_NSPS_NO_COVERAGE,
--	NETWORK_REG_STATUS_NOSERV_SIM_REJECTED_BY_NW
--};
--
--enum network_types {
--	NETWORK_GSM_HOME_PLMN = 0,
--	NETWORK_GSM_PREFERRED_PLMN,
--	NETWORK_GSM_FORBIDDEN_PLMN,
--	NETWORK_GSM_OTHER_PLMN,
--	NETWORK_GSM_NO_PLMN_AVAIL
--};
--
--enum network_alpha_tag_name_type {
--	NETWORK_HARDCODED_LATIN_OPER_NAME = 0,
--	NETWORK_HARDCODED_USC2_OPER_NAME,
--	NETWORK_NITZ_SHORT_OPER_NAME,
--	NETWORK_NITZ_FULL_OPER_NAME,
--};
--
--#define TELEPHONY_MAEMO_PATH		"/com/nokia/MaemoTelephony"
--#define TELEPHONY_MAEMO_INTERFACE	"com.nokia.MaemoTelephony"
--
--#define CALLERID_BASE		"/var/lib/bluetooth/maemo-callerid-"
--#define ALLOWED_FLAG_FILE	"/var/lib/bluetooth/maemo-callerid-allowed"
--#define RESTRICTED_FLAG_FILE	"/var/lib/bluetooth/maemo-callerid-restricted"
--#define NONE_FLAG_FILE		"/var/lib/bluetooth/maemo-callerid-none"
--
--static uint32_t callerid = 0;
--
--/* CSD CALL plugin D-Bus definitions */
--#define CSD_CALL_BUS_NAME	"com.nokia.csd.Call"
--#define CSD_CALL_INTERFACE	"com.nokia.csd.Call"
--#define CSD_CALL_INSTANCE	"com.nokia.csd.Call.Instance"
--#define CSD_CALL_CONFERENCE	"com.nokia.csd.Call.Conference"
--#define CSD_CALL_PATH		"/com/nokia/csd/call"
--#define CSD_CALL_CONFERENCE_PATH "/com/nokia/csd/call/conference"
--
--/* Call status values as exported by the CSD CALL plugin */
--#define CSD_CALL_STATUS_IDLE			0
--#define CSD_CALL_STATUS_CREATE			1
--#define CSD_CALL_STATUS_COMING			2
--#define CSD_CALL_STATUS_PROCEEDING		3
--#define CSD_CALL_STATUS_MO_ALERTING		4
--#define CSD_CALL_STATUS_MT_ALERTING		5
--#define CSD_CALL_STATUS_WAITING			6
--#define CSD_CALL_STATUS_ANSWERED		7
--#define CSD_CALL_STATUS_ACTIVE			8
--#define CSD_CALL_STATUS_MO_RELEASE		9
--#define CSD_CALL_STATUS_MT_RELEASE		10
--#define CSD_CALL_STATUS_HOLD_INITIATED		11
--#define CSD_CALL_STATUS_HOLD			12
--#define CSD_CALL_STATUS_RETRIEVE_INITIATED	13
--#define CSD_CALL_STATUS_RECONNECT_PENDING	14
--#define CSD_CALL_STATUS_TERMINATED		15
--#define CSD_CALL_STATUS_SWAP_INITIATED		16
--
--#define CALL_FLAG_NONE				0
--#define CALL_FLAG_PRESENTATION_ALLOWED		0x01
--#define CALL_FLAG_PRESENTATION_RESTRICTED	0x02
--
--/* SIM Phonebook D-Bus definitions */
--#define SIM_PHONEBOOK_BUS_NAME			"com.nokia.phone.SIM"
--#define SIM_PHONEBOOK_INTERFACE			"Phone.Sim.Phonebook"
--#define SIM_PHONEBOOK_PATH			"/com/nokia/phone/SIM/phonebook"
--
--#define PHONEBOOK_INDEX_FIRST_ENTRY		0xFFFF
--#define PHONEBOOK_INDEX_NEXT_FREE_LOCATION	0xFFFE
--
--enum sim_phonebook_type {
--	SIM_PHONEBOOK_TYPE_ADN = 0x0,
--	SIM_PHONEBOOK_TYPE_SDN,
--	SIM_PHONEBOOK_TYPE_FDN,
--	SIM_PHONEBOOK_TYPE_VMBX,
--	SIM_PHONEBOOK_TYPE_MBDN,
--	SIM_PHONEBOOK_TYPE_EN,
--	SIM_PHONEBOOK_TYPE_MSISDN
--};
--
--enum sim_phonebook_location_type {
--	SIM_PHONEBOOK_LOCATION_EXACT = 0x0,
--	SIM_PHONEBOOK_LOCATION_NEXT
--};
--
--struct csd_call {
--	char *object_path;
--	int status;
--	gboolean originating;
--	gboolean emergency;
--	gboolean on_hold;
--	gboolean conference;
--	char *number;
--	gboolean setup;
--};
--
--static struct {
--	uint8_t status;
--	uint16_t lac;
--	uint32_t cell_id;
--	uint32_t operator_code;
--	uint32_t country_code;
--	uint8_t network_type;
--	uint8_t supported_services;
--	uint16_t signals_bar;
--	char *operator_name;
--} net = {
--	.status = NETWORK_REG_STATUS_NOSERV,
--	.lac = 0,
--	.cell_id = 0,
--	.operator_code = 0,
--	.country_code = 0,
--	.network_type = NETWORK_GSM_NO_PLMN_AVAIL,
--	.supported_services = 0,
--	.signals_bar = 0,
--	.operator_name = NULL,
--};
--
--static DBusConnection *connection = NULL;
--
--static GSList *calls = NULL;
--
--/* Reference count for determining the call indicator status */
--static GSList *active_calls = NULL;
--
--static char *msisdn = NULL;	/* Subscriber number */
--static char *vmbx = NULL;	/* Voice mailbox number */
--
--/* HAL battery namespace key values */
--static int battchg_cur = -1;	/* "battery.charge_level.current" */
--static int battchg_last = -1;	/* "battery.charge_level.last_full" */
--static int battchg_design = -1;	/* "battery.charge_level.design" */
--
--static gboolean get_calls_active = FALSE;
--
--static gboolean events_enabled = FALSE;
--
--/* Supported set of call hold operations */
--static const char *chld_str = "0,1,1x,2,2x,3,4";
--
--static char *last_dialed_number = NULL;
--
--/* Timer for tracking call creation requests */
--static guint create_request_timer = 0;
--
--static struct indicator maemo_indicators[] =
+ sap/sap.c: sap/@SAP_DRIVER@
+ 	$(AM_V_GEN)$(LN_S) $(abs_top_srcdir)/$< $@
+ 
+diff --git a/audio/headset.c b/audio/headset.c
+index 6aef6a8..74eb7a4 100644
+--- a/audio/headset.c
++++ b/audio/headset.c
+@@ -70,8 +70,6 @@
+ #define HEADSET_GAIN_MICROPHONE 'M'
+ 
+ static struct {
+-	gboolean telephony_ready;	/* Telephony plugin initialized */
+-	uint32_t features;		/* HFP AG features */
+ 	const struct indicator *indicators;	/* Available HFP indicators */
+ 	int er_mode;			/* Event reporting mode */
+ 	int er_ind;			/* Event reporting for indicators */
+@@ -81,8 +79,6 @@ static struct {
+ 	guint ring_timer;		/* For incoming call indication */
+ 	const char *chld;		/* Response to AT+CHLD=? */
+ } ag = {
+-	.telephony_ready = FALSE,
+-	.features = 0,
+ 	.er_mode = 3,
+ 	.er_ind = 0,
+ 	.rh = BTRH_NOT_SUPPORTED,
+@@ -236,40 +232,6 @@ static void print_ag_features(uint32_t features)
+ 	g_free(str);
+ }
+ 
+-static void print_hf_features(uint32_t features)
 -{
--	{ "battchg",	"0-5",	5,	TRUE },
--	{ "signal",	"0-5",	0,	TRUE },
--	{ "service",	"0,1",	0,	TRUE },
--	{ "call",	"0,1",	0,	TRUE },
--	{ "callsetup",	"0-3",	0,	TRUE },
--	{ "callheld",	"0-2",	0,	FALSE },
--	{ "roam",	"0,1",	0,	TRUE },
--	{ NULL }
--};
+-	GString *gstr;
+-	char *str;
 -
--static char *call_status_str[] = {
--	"IDLE",
--	"CREATE",
--	"COMING",
--	"PROCEEDING",
--	"MO_ALERTING",
--	"MT_ALERTING",
--	"WAITING",
--	"ANSWERED",
--	"ACTIVE",
--	"MO_RELEASE",
--	"MT_RELEASE",
--	"HOLD_INITIATED",
--	"HOLD",
--	"RETRIEVE_INITIATED",
--	"RECONNECT_PENDING",
--	"TERMINATED",
--	"SWAP_INITIATED",
--	"???"
--};
--
--static struct csd_call *find_call(const char *path)
--{
--	GSList *l;
--
--	for (l = calls; l != NULL; l = l->next) {
--		struct csd_call *call = l->data;
--
--		if (g_str_equal(call->object_path, path))
--			return call;
+-	if (features == 0) {
+-		DBG("HFP HF features: (none)");
+-		return;
 -	}
 -
--	return NULL;
+-	gstr = g_string_new("HFP HF features: ");
+-
+-	if (features & HF_FEATURE_EC_ANDOR_NR)
+-		g_string_append(gstr, "\"EC and/or NR function\" ");
+-	if (features & HF_FEATURE_CALL_WAITING_AND_3WAY)
+-		g_string_append(gstr, "\"Call waiting and 3-way calling\" ");
+-	if (features & HF_FEATURE_CLI_PRESENTATION)
+-		g_string_append(gstr, "\"CLI presentation capability\" ");
+-	if (features & HF_FEATURE_VOICE_RECOGNITION)
+-		g_string_append(gstr, "\"Voice recognition activation\" ");
+-	if (features & HF_FEATURE_REMOTE_VOLUME_CONTROL)
+-		g_string_append(gstr, "\"Remote volume control\" ");
+-	if (features & HF_FEATURE_ENHANCED_CALL_STATUS)
+-		g_string_append(gstr, "\"Enhanced call status\" ");
+-	if (features & HF_FEATURE_ENHANCED_CALL_CONTROL)
+-		g_string_append(gstr, "\"Enhanced call control\" ");
+-
+-	str = g_string_free(gstr, FALSE);
+-
+-	DBG("%s", str);
+-
+-	g_free(str);
 -}
 -
--static struct csd_call *find_non_held_call(void)
+ static const char *state2str(headset_state_t state)
+ {
+ 	switch (state) {
+@@ -333,97 +295,6 @@ static int __attribute__((format(printf, 2, 3)))
+ 	return ret;
+ }
+ 
+-static int supported_features(struct audio_device *device, const char *buf)
 -{
--	GSList *l;
--
--	for (l = calls; l != NULL; l = l->next) {
--		struct csd_call *call = l->data;
--
--		if (call->status == CSD_CALL_STATUS_IDLE)
--			continue;
--
--		if (call->status != CSD_CALL_STATUS_HOLD)
--			return call;
--	}
--
--	return NULL;
--}
--
--static struct csd_call *find_non_idle_call(void)
--{
--	GSList *l;
--
--	for (l = calls; l != NULL; l = l->next) {
--		struct csd_call *call = l->data;
--
--		if (call->status != CSD_CALL_STATUS_IDLE)
--			return call;
--	}
--
--	return NULL;
--}
--
--static struct csd_call *find_call_with_status(int status)
--{
--	GSList *l;
--
--	for (l = calls; l != NULL; l = l->next) {
--		struct csd_call *call = l->data;
--
--		if (call->status == status)
--			return call;
--	}
--
--	return NULL;
--}
--
--static int release_conference(void)
--{
--	DBusMessage *msg;
--
--	DBG("telephony-maemo: releasing conference call");
--
--	msg = dbus_message_new_method_call(CSD_CALL_BUS_NAME,
--						CSD_CALL_CONFERENCE_PATH,
--						CSD_CALL_INSTANCE,
--						"Release");
--	if (!msg) {
--		error("Unable to allocate new D-Bus message");
--		return -ENOMEM;
--	}
--
--	g_dbus_send_message(connection, msg);
--
--	return 0;
--}
--
--static int release_call(struct csd_call *call)
--{
--	DBusMessage *msg;
--
--	msg = dbus_message_new_method_call(CSD_CALL_BUS_NAME,
--						call->object_path,
--						CSD_CALL_INSTANCE,
--						"Release");
--	if (!msg) {
--		error("Unable to allocate new D-Bus message");
--		return -ENOMEM;
--	}
--
--	g_dbus_send_message(connection, msg);
--
--	return 0;
--}
--
--static int answer_call(struct csd_call *call)
--{
--	DBusMessage *msg;
--
--	msg = dbus_message_new_method_call(CSD_CALL_BUS_NAME,
--						call->object_path,
--						CSD_CALL_INSTANCE,
--						"Answer");
--	if (!msg) {
--		error("Unable to allocate new D-Bus message");
--		return -ENOMEM;
--	}
--
--	g_dbus_send_message(connection, msg);
--
--	return 0;
--}
--
--static int split_call(struct csd_call *call)
--{
--	DBusMessage *msg;
--
--	msg = dbus_message_new_method_call(CSD_CALL_BUS_NAME,
--						call->object_path,
--						CSD_CALL_INSTANCE,
--						"Split");
--	if (!msg) {
--		error("Unable to allocate new D-Bus message");
--		return -ENOMEM;
--	}
--
--	g_dbus_send_message(connection, msg);
--
--	return 0;
--}
--
--static int unhold_call(struct csd_call *call)
--{
--	DBusMessage *msg;
--
--	msg = dbus_message_new_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
--						CSD_CALL_INTERFACE,
--						"Unhold");
--	if (!msg) {
--		error("Unable to allocate new D-Bus message");
--		return -ENOMEM;
--	}
--
--	g_dbus_send_message(connection, msg);
--
--	return 0;
--}
--
--static int hold_call(struct csd_call *call)
--{
--	DBusMessage *msg;
--
--	msg = dbus_message_new_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
--						CSD_CALL_INTERFACE,
--						"Hold");
--	if (!msg) {
--		error("Unable to allocate new D-Bus message");
--		return -ENOMEM;
--	}
--
--	g_dbus_send_message(connection, msg);
--
--	return 0;
--}
--
--static int swap_calls(void)
--{
--	DBusMessage *msg;
--
--	msg = dbus_message_new_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
--						CSD_CALL_INTERFACE,
--						"Swap");
--	if (!msg) {
--		error("Unable to allocate new D-Bus message");
--		return -ENOMEM;
--	}
--
--	g_dbus_send_message(connection, msg);
--
--	return 0;
--}
--
--static int create_conference(void)
--{
--	DBusMessage *msg;
--
--	msg = dbus_message_new_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
--						CSD_CALL_INTERFACE,
--						"Conference");
--	if (!msg) {
--		error("Unable to allocate new D-Bus message");
--		return -ENOMEM;
--	}
--
--	g_dbus_send_message(connection, msg);
--
--	return 0;
--}
--
--static int call_transfer(void)
--{
--	DBusMessage *msg;
--
--	msg = dbus_message_new_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
--						CSD_CALL_INTERFACE,
--						"Transfer");
--	if (!msg) {
--		error("Unable to allocate new D-Bus message");
--		return -ENOMEM;
--	}
--
--	g_dbus_send_message(connection, msg);
--
--	return 0;
--}
--
--static int number_type(const char *number)
--{
--	if (number == NULL)
--		return NUMBER_TYPE_TELEPHONY;
--
--	if (number[0] == '+' || strncmp(number, "00", 2) == 0)
--		return NUMBER_TYPE_INTERNATIONAL;
--
--	return NUMBER_TYPE_TELEPHONY;
--}
--
--void telephony_device_connected(void *telephony_device)
--{
--	struct csd_call *coming;
--
--	DBG("telephony-maemo: device %p connected", telephony_device);
--
--	coming = find_call_with_status(CSD_CALL_STATUS_MT_ALERTING);
--	if (coming) {
--		if (find_call_with_status(CSD_CALL_STATUS_ACTIVE))
--			telephony_call_waiting_ind(coming->number,
--						number_type(coming->number));
--		else
--			telephony_incoming_call_ind(coming->number,
--						number_type(coming->number));
--	}
--}
--
--void telephony_device_disconnected(void *telephony_device)
--{
--	DBG("telephony-maemo: device %p disconnected", telephony_device);
--	events_enabled = FALSE;
--}
--
--void telephony_event_reporting_req(void *telephony_device, int ind)
--{
--	events_enabled = ind == 1 ? TRUE : FALSE;
--
--	telephony_event_reporting_rsp(telephony_device, CME_ERROR_NONE);
--}
--
--void telephony_response_and_hold_req(void *telephony_device, int rh)
--{
--	telephony_response_and_hold_rsp(telephony_device,
--						CME_ERROR_NOT_SUPPORTED);
--}
--
--void telephony_last_dialed_number_req(void *telephony_device)
--{
--	DBG("telephony-maemo: last dialed number request");
--
--	if (last_dialed_number)
--		telephony_dial_number_req(telephony_device,
--						last_dialed_number);
--	else
--		telephony_last_dialed_number_rsp(telephony_device,
--						CME_ERROR_NOT_ALLOWED);
--}
--
--void telephony_terminate_call_req(void *telephony_device)
--{
--	struct csd_call *call;
+-	struct headset *hs = device->headset;
+-	struct headset_slc *slc = hs->slc;
 -	int err;
 -
--	call = find_call_with_status(CSD_CALL_STATUS_ACTIVE);
--	if (!call)
--		call = find_non_idle_call();
+-	if (strlen(buf) < 9)
+-		return -EINVAL;
 -
--	if (!call) {
--		error("No active call");
--		telephony_terminate_call_rsp(telephony_device,
--						CME_ERROR_NOT_ALLOWED);
--		return;
+-	slc->hf_features = strtoul(&buf[8], NULL, 10);
+-
+-	print_hf_features(slc->hf_features);
+-
+-	err = headset_send(hs, "\r\n+BRSF: %u\r\n", ag.features);
+-	if (err < 0)
+-		return err;
+-
+-	return headset_send(hs, "\r\nOK\r\n");
+-}
+-
+-static char *indicator_ranges(const struct indicator *indicators)
+-{
+-	int i;
+-	GString *gstr;
+-
+-	gstr = g_string_new("\r\n+CIND: ");
+-
+-	for (i = 0; indicators[i].desc != NULL; i++) {
+-		if (i == 0)
+-			g_string_append_printf(gstr, "(\"%s\",(%s))",
+-						indicators[i].desc,
+-						indicators[i].range);
+-		else
+-			g_string_append_printf(gstr, ",(\"%s\",(%s))",
+-						indicators[i].desc,
+-						indicators[i].range);
 -	}
 -
--	if (call->conference)
--		err = release_conference();
+-	g_string_append(gstr, "\r\n");
+-
+-	return g_string_free(gstr, FALSE);
+-}
+-
+-static char *indicator_values(const struct indicator *indicators)
+-{
+-	int i;
+-	GString *gstr;
+-
+-	gstr = g_string_new("\r\n+CIND: ");
+-
+-	for (i = 0; indicators[i].desc != NULL; i++) {
+-		if (i == 0)
+-			g_string_append_printf(gstr, "%d", indicators[i].val);
+-		else
+-			g_string_append_printf(gstr, ",%d", indicators[i].val);
+-	}
+-
+-	g_string_append(gstr, "\r\n");
+-
+-	return g_string_free(gstr, FALSE);
+-}
+-
+-static int report_indicators(struct audio_device *device, const char *buf)
+-{
+-	struct headset *hs = device->headset;
+-	int err;
+-	char *str;
+-
+-	if (strlen(buf) < 8)
+-		return -EINVAL;
+-
+-	if (ag.indicators == NULL) {
+-		error("HFP AG indicators not initialized");
+-		return headset_send(hs, "\r\nERROR\r\n");
+-	}
+-
+-	if (buf[7] == '=')
+-		str = indicator_ranges(ag.indicators);
 -	else
--		err = release_call(call);
+-		str = indicator_values(ag.indicators);
+-
+-	err = headset_send(hs, "%s", str);
+-
+-	g_free(str);
 -
 -	if (err < 0)
--		telephony_terminate_call_rsp(telephony_device,
--						CME_ERROR_AG_FAILURE);
--	else
--		telephony_terminate_call_rsp(telephony_device, CME_ERROR_NONE);
+-		return err;
+-
+-	return headset_send(hs, "\r\nOK\r\n");
 -}
 -
--void telephony_answer_call_req(void *telephony_device)
--{
--	struct csd_call *call;
+ static void pending_connect_complete(struct connect_cb *cb, struct audio_device *dev)
+ {
+ 	struct headset *hs = dev->headset;
+@@ -656,7 +527,7 @@ static int hfp_cmp(struct headset *hs)
+ 		return -1;
+ }
+ 
+-static void hfp_slc_complete(struct audio_device *dev)
++void headset_slc_complete(struct audio_device *dev)
+ {
+ 	struct headset *hs = dev->headset;
+ 	struct pending_connect *p = hs->pending;
+@@ -721,73 +592,10 @@ int telephony_event_reporting_rsp(void *telephony_device, cme_error_t err)
+ 		return 0;
+ 
+ 	if (slc->hf_features & HF_FEATURE_CALL_WAITING_AND_3WAY &&
+-			ag.features & AG_FEATURE_THREE_WAY_CALLING)
+-		return 0;
 -
--	call = find_call_with_status(CSD_CALL_STATUS_COMING);
--	if (!call)
--		call = find_call_with_status(CSD_CALL_STATUS_MT_ALERTING);
+-	hfp_slc_complete(device);
 -
--	if (!call)
--		call = find_call_with_status(CSD_CALL_STATUS_PROCEEDING);
--
--	if (!call)
--		call = find_call_with_status(CSD_CALL_STATUS_WAITING);
--
--	if (!call) {
--		telephony_answer_call_rsp(telephony_device,
--						CME_ERROR_NOT_ALLOWED);
--		return;
--	}
--
--	if (answer_call(call) < 0)
--		telephony_answer_call_rsp(telephony_device,
--						CME_ERROR_AG_FAILURE);
--	else
--		telephony_answer_call_rsp(telephony_device, CME_ERROR_NONE);
+-	return 0;
 -}
 -
--static int send_method_call(const char *dest, const char *path,
--				const char *interface, const char *method,
--				DBusPendingCallNotifyFunction cb,
--				void *user_data, int type, ...)
+-static int event_reporting(struct audio_device *dev, const char *buf)
 -{
--	DBusMessage *msg;
--	DBusPendingCall *call;
--	va_list args;
+-	char **tokens; /* <mode>, <keyp>, <disp>, <ind>, <bfr> */
 -
--	msg = dbus_message_new_method_call(dest, path, interface, method);
--	if (!msg) {
--		error("Unable to allocate new D-Bus %s message", method);
--		return -ENOMEM;
+-	if (strlen(buf) < 13)
+-		return -EINVAL;
+-
+-	tokens = g_strsplit(&buf[8], ",", 5);
+-	if (g_strv_length(tokens) < 4) {
+-		g_strfreev(tokens);
+-		return -EINVAL;
 -	}
 -
--	va_start(args, type);
+-	ag.er_mode = atoi(tokens[0]);
+-	ag.er_ind = atoi(tokens[3]);
 -
--	if (!dbus_message_append_args_valist(msg, type, args)) {
--		dbus_message_unref(msg);
--		va_end(args);
--		return -EIO;
+-	g_strfreev(tokens);
+-	tokens = NULL;
+-
+-	DBG("Event reporting (CMER): mode=%d, ind=%d",
+-			ag.er_mode, ag.er_ind);
+-
+-	switch (ag.er_ind) {
+-	case 0:
+-	case 1:
+-		telephony_event_reporting_req(dev, ag.er_ind);
+-		break;
+-	default:
+-		return -EINVAL;
 -	}
 -
--	va_end(args);
+-	return 0;
+-}
 -
--	if (!cb) {
--		g_dbus_send_message(connection, msg);
+-static int call_hold(struct audio_device *dev, const char *buf)
+-{
+-	struct headset *hs = dev->headset;
+-	int err;
+-
+-	if (strlen(buf) < 9)
+-		return -EINVAL;
+-
+-	if (buf[8] != '?') {
+-		telephony_call_hold_req(dev, &buf[8]);
++			telephony_get_ag_features() & AG_FEATURE_THREE_WAY_CALLING)
+ 		return 0;
+-	}
+ 
+-	err = headset_send(hs, "\r\n+CHLD: (%s)\r\n", ag.chld);
+-	if (err < 0)
+-		return err;
+-
+-	err = headset_send(hs, "\r\nOK\r\n");
+-	if (err < 0)
+-		return err;
+-
+-	if (hs->state != HEADSET_STATE_CONNECTING)
+-		return 0;
+-
+-	hfp_slc_complete(dev);
++	headset_slc_complete(device);
+ 
+ 	return 0;
+ }
+@@ -797,47 +605,11 @@ int telephony_key_press_rsp(void *telephony_device, cme_error_t err)
+ 	return telephony_generic_rsp(telephony_device, err);
+ }
+ 
+-static int key_press(struct audio_device *device, const char *buf)
+-{
+-	if (strlen(buf) < 9)
+-		return -EINVAL;
+-
+-	g_dbus_emit_signal(device->conn, device->path,
+-			AUDIO_HEADSET_INTERFACE, "AnswerRequested",
+-			DBUS_TYPE_INVALID);
+-
+-	if (ag.ring_timer) {
+-		g_source_remove(ag.ring_timer);
+-		ag.ring_timer = 0;
+-	}
+-
+-	telephony_key_press_req(device, &buf[8]);
+-
+-	return 0;
+-}
+-
+ int telephony_answer_call_rsp(void *telephony_device, cme_error_t err)
+ {
+ 	return telephony_generic_rsp(telephony_device, err);
+ }
+ 
+-static int answer_call(struct audio_device *device, const char *buf)
+-{
+-	if (ag.ring_timer) {
+-		g_source_remove(ag.ring_timer);
+-		ag.ring_timer = 0;
+-	}
+-
+-	if (ag.number) {
+-		g_free(ag.number);
+-		ag.number = NULL;
+-	}
+-
+-	telephony_answer_call_req(device);
+-
+-	return 0;
+-}
+-
+ int telephony_terminate_call_rsp(void *telephony_device,
+ 					cme_error_t err)
+ {
+@@ -854,99 +626,21 @@ int telephony_terminate_call_rsp(void *telephony_device,
+ 	return headset_send(hs, "\r\nOK\r\n");
+ }
+ 
+-static int terminate_call(struct audio_device *device, const char *buf)
+-{
+-	if (ag.number) {
+-		g_free(ag.number);
+-		ag.number = NULL;
+-	}
+-
+-	if (ag.ring_timer) {
+-		g_source_remove(ag.ring_timer);
+-		ag.ring_timer = 0;
+-	}
+-
+-	telephony_terminate_call_req(device);
+-
+-	return 0;
+-}
+-
+-static int cli_notification(struct audio_device *device, const char *buf)
+-{
+-	struct headset *hs = device->headset;
+-	struct headset_slc *slc = hs->slc;
+-
+-	if (strlen(buf) < 9)
+-		return -EINVAL;
+-
+-	slc->cli_active = buf[8] == '1' ? TRUE : FALSE;
+-
+-	return headset_send(hs, "\r\nOK\r\n");
+-}
+-
+ int telephony_response_and_hold_rsp(void *telephony_device, cme_error_t err)
+ {
+ 	return telephony_generic_rsp(telephony_device, err);
+ }
+ 
+-static int response_and_hold(struct audio_device *device, const char *buf)
+-{
+-	struct headset *hs = device->headset;
+-
+-	if (strlen(buf) < 8)
+-		return -EINVAL;
+-
+-	if (ag.rh == BTRH_NOT_SUPPORTED)
+-		return telephony_generic_rsp(device, CME_ERROR_NOT_SUPPORTED);
+-
+-	if (buf[7] == '=') {
+-		telephony_response_and_hold_req(device, atoi(&buf[8]) < 0);
 -		return 0;
 -	}
 -
--	if (!dbus_connection_send_with_reply(connection, msg, &call, -1)) {
--		error("Sending %s failed", method);
--		dbus_message_unref(msg);
--		return -EIO;
--	}
+-	if (ag.rh >= 0)
+-		headset_send(hs, "\r\n+BTRH: %d\r\n", ag.rh);
 -
--	dbus_pending_call_set_notify(call, cb, user_data, NULL);
--	dbus_pending_call_unref(call);
--	dbus_message_unref(msg);
+-	return headset_send(hs, "\r\nOK\r\n");
+-}
+-
+ int telephony_last_dialed_number_rsp(void *telephony_device, cme_error_t err)
+ {
+ 	return telephony_generic_rsp(telephony_device, err);
+ }
+ 
+-static int last_dialed_number(struct audio_device *device, const char *buf)
+-{
+-	telephony_last_dialed_number_req(device);
 -
 -	return 0;
 -}
 -
--static const char *memory_dial_lookup(int location)
+ int telephony_dial_number_rsp(void *telephony_device, cme_error_t err)
+ {
+ 	return telephony_generic_rsp(telephony_device, err);
+ }
+ 
+-static int dial_number(struct audio_device *device, const char *buf)
 -{
--	if (location == 1)
--		return vmbx;
--	else
--		return NULL;
--}
+-	char number[BUF_SIZE];
+-	size_t buf_len;
 -
--void telephony_dial_number_req(void *telephony_device, const char *number)
--{
--	uint32_t flags = callerid;
--	int ret;
+-	buf_len = strlen(buf);
 -
--	DBG("telephony-maemo: dial request to %s", number);
--
--	if (strncmp(number, "*31#", 4) == 0) {
--		number += 4;
--		flags = CALL_FLAG_PRESENTATION_ALLOWED;
--	} else if (strncmp(number, "#31#", 4) == 0) {
--		number += 4;
--		flags = CALL_FLAG_PRESENTATION_RESTRICTED;
--	} else if (number[0] == '>') {
--		const char *location = &number[1];
--
--		number = memory_dial_lookup(strtol(&number[1], NULL, 0));
--		if (!number) {
--			error("No number at memory location %s", location);
--			telephony_dial_number_rsp(telephony_device,
--						CME_ERROR_INVALID_INDEX);
--			return;
--		}
+-	if (buf[buf_len - 1] != ';') {
+-		DBG("Rejecting non-voice call dial request");
+-		return -EINVAL;
 -	}
 -
--	ret = send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
--				CSD_CALL_INTERFACE, "CreateWith",
--				NULL, NULL,
--				DBUS_TYPE_STRING, &number,
--				DBUS_TYPE_UINT32, &flags,
--				DBUS_TYPE_INVALID);
--	if (ret < 0) {
--		telephony_dial_number_rsp(telephony_device,
--						CME_ERROR_AG_FAILURE);
--		return;
--	}
+-	memset(number, 0, sizeof(number));
+-	strncpy(number, &buf[3], buf_len - 4);
 -
--	telephony_dial_number_rsp(telephony_device, CME_ERROR_NONE);
+-	telephony_dial_number_req(device, number);
+-
+-	return 0;
 -}
 -
--void telephony_transmit_dtmf_req(void *telephony_device, char tone)
+ static int headset_set_gain(struct audio_device *device, uint16_t gain, char type)
+ {
+ 	struct headset *hs = device->headset;
+@@ -994,111 +688,21 @@ static int headset_set_gain(struct audio_device *device, uint16_t gain, char typ
+ 	return 0;
+ }
+ 
+-static int signal_gain_setting(struct audio_device *device, const char *buf)
 -{
--	int ret;
--	char buf[2] = { tone, '\0' }, *buf_ptr = buf;
--
--	DBG("telephony-maemo: transmit dtmf: %s", buf);
--
--	ret = send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
--				CSD_CALL_INTERFACE, "SendDTMF",
--				NULL, NULL,
--				DBUS_TYPE_STRING, &buf_ptr,
--				DBUS_TYPE_INVALID);
--	if (ret < 0) {
--		telephony_transmit_dtmf_rsp(telephony_device,
--						CME_ERROR_AG_FAILURE);
--		return;
--	}
--
--	telephony_transmit_dtmf_rsp(telephony_device, CME_ERROR_NONE);
--}
--
--void telephony_subscriber_number_req(void *telephony_device)
--{
--	DBG("telephony-maemo: subscriber number request");
--	if (msisdn)
--		telephony_subscriber_number_ind(msisdn,
--						number_type(msisdn),
--						SUBSCRIBER_SERVICE_VOICE);
--	telephony_subscriber_number_rsp(telephony_device, CME_ERROR_NONE);
--}
--
--static int csd_status_to_hfp(struct csd_call *call)
--{
--	switch (call->status) {
--	case CSD_CALL_STATUS_IDLE:
--	case CSD_CALL_STATUS_MO_RELEASE:
--	case CSD_CALL_STATUS_MT_RELEASE:
--	case CSD_CALL_STATUS_TERMINATED:
--		return -1;
--	case CSD_CALL_STATUS_CREATE:
--		return CALL_STATUS_DIALING;
--	case CSD_CALL_STATUS_WAITING:
--		return CALL_STATUS_WAITING;
--	case CSD_CALL_STATUS_PROCEEDING:
--		/* PROCEEDING can happen in outgoing/incoming */
--		if (call->originating)
--			return CALL_STATUS_DIALING;
--		else
--			return CALL_STATUS_INCOMING;
--	case CSD_CALL_STATUS_COMING:
--		return CALL_STATUS_INCOMING;
--	case CSD_CALL_STATUS_MO_ALERTING:
--		return CALL_STATUS_ALERTING;
--	case CSD_CALL_STATUS_MT_ALERTING:
--		return CALL_STATUS_INCOMING;
--	case CSD_CALL_STATUS_ANSWERED:
--	case CSD_CALL_STATUS_ACTIVE:
--	case CSD_CALL_STATUS_RECONNECT_PENDING:
--	case CSD_CALL_STATUS_SWAP_INITIATED:
--	case CSD_CALL_STATUS_HOLD_INITIATED:
--		return CALL_STATUS_ACTIVE;
--	case CSD_CALL_STATUS_RETRIEVE_INITIATED:
--	case CSD_CALL_STATUS_HOLD:
--		return CALL_STATUS_HELD;
--	default:
--		return -1;
--	}
--}
--
--void telephony_list_current_calls_req(void *telephony_device)
--{
--	GSList *l;
--	int i;
--
--	DBG("telephony-maemo: list current calls request");
--
--	for (l = calls, i = 1; l != NULL; l = l->next, i++) {
--		struct csd_call *call = l->data;
--		int status, direction, multiparty;
--
--		status = csd_status_to_hfp(call);
--		if (status < 0)
--			continue;
--
--		direction = call->originating ?
--				CALL_DIR_OUTGOING : CALL_DIR_INCOMING;
--
--		multiparty = call->conference ?
--				CALL_MULTIPARTY_YES : CALL_MULTIPARTY_NO;
--
--		telephony_list_current_call_ind(i, direction, status,
--						CALL_MODE_VOICE, multiparty,
--						call->number,
--						number_type(call->number));
--	}
--
--	telephony_list_current_calls_rsp(telephony_device, CME_ERROR_NONE);
--}
--
--void telephony_operator_selection_req(void *telephony_device)
--{
--	telephony_operator_selection_ind(OPERATOR_MODE_AUTO,
--				net.operator_name ? net.operator_name : "");
--	telephony_operator_selection_rsp(telephony_device, CME_ERROR_NONE);
--}
--
--static void foreach_call_with_status(int status,
--					int (*func)(struct csd_call *call))
--{
--	GSList *l;
--
--	for (l = calls; l != NULL; l = l->next) {
--		struct csd_call *call = l->data;
--
--		if (call->status == status)
--			func(call);
--	}
--}
--
--void telephony_call_hold_req(void *telephony_device, const char *cmd)
--{
--	const char *idx;
--	struct csd_call *call;
--	int err = 0;
--
--	DBG("telephony-maemo: got call hold request %s", cmd);
--
--	if (strlen(cmd) > 1)
--		idx = &cmd[1];
--	else
--		idx = NULL;
--
--	if (idx)
--		call = g_slist_nth_data(calls, strtol(idx, NULL, 0) - 1);
--	else
--		call = NULL;
--
--	switch (cmd[0]) {
--	case '0':
--		foreach_call_with_status(CSD_CALL_STATUS_HOLD, release_call);
--		foreach_call_with_status(CSD_CALL_STATUS_WAITING,
--								release_call);
--		break;
--	case '1':
--		if (idx) {
--			if (call)
--				err = release_call(call);
--			break;
--		}
--		foreach_call_with_status(CSD_CALL_STATUS_ACTIVE, release_call);
--		call = find_call_with_status(CSD_CALL_STATUS_WAITING);
--		if (call)
--			err = answer_call(call);
--		break;
--	case '2':
--		if (idx) {
--			if (call)
--				err = split_call(call);
--		} else {
--			struct csd_call *held, *wait;
--
--			call = find_call_with_status(CSD_CALL_STATUS_ACTIVE);
--			held = find_call_with_status(CSD_CALL_STATUS_HOLD);
--			wait = find_call_with_status(CSD_CALL_STATUS_WAITING);
--
--			if (wait)
--				err = answer_call(wait);
--			else if (call && held)
--				err = swap_calls();
--			else {
--				if (call)
--					err = hold_call(call);
--				if (held)
--					err = unhold_call(held);
--			}
--		}
--		break;
--	case '3':
--		if (find_call_with_status(CSD_CALL_STATUS_HOLD) ||
--				find_call_with_status(CSD_CALL_STATUS_WAITING))
--			err = create_conference();
--		break;
--	case '4':
--		err = call_transfer();
--		break;
--	default:
--		DBG("Unknown call hold request");
--		break;
--	}
--
--	if (err)
--		telephony_call_hold_rsp(telephony_device,
--					CME_ERROR_AG_FAILURE);
--	else
--		telephony_call_hold_rsp(telephony_device, CME_ERROR_NONE);
--}
--
--void telephony_nr_and_ec_req(void *telephony_device, gboolean enable)
--{
--	DBG("telephony-maemo: got %s NR and EC request",
--			enable ? "enable" : "disable");
--	telephony_nr_and_ec_rsp(telephony_device, CME_ERROR_NONE);
--}
--
--void telephony_key_press_req(void *telephony_device, const char *keys)
--{
--	struct csd_call *active, *waiting;
+-	struct headset *hs = device->headset;
+-	dbus_uint16_t gain;
 -	int err;
 -
--	DBG("telephony-maemo: got key press request for %s", keys);
+-	if (strlen(buf) < 8) {
+-		error("Too short string for Gain setting");
+-		return -EINVAL;
+-	}
 -
--	waiting = find_call_with_status(CSD_CALL_STATUS_COMING);
--	if (!waiting)
--		waiting = find_call_with_status(CSD_CALL_STATUS_MT_ALERTING);
--	if (!waiting)
--		waiting = find_call_with_status(CSD_CALL_STATUS_PROCEEDING);
+-	gain = (dbus_uint16_t) strtol(&buf[7], NULL, 10);
 -
--	active = find_call_with_status(CSD_CALL_STATUS_ACTIVE);
+-	err = headset_set_gain(device, gain, buf[5]);
+-	if (err < 0 && err != -EALREADY)
+-		return err;
 -
--	if (waiting)
--		err = answer_call(waiting);
--	else if (active)
--		err = release_call(active);
+-	return headset_send(hs, "\r\nOK\r\n");
+-}
+-
+ int telephony_transmit_dtmf_rsp(void *telephony_device, cme_error_t err)
+ {
+ 	return telephony_generic_rsp(telephony_device, err);
+ }
+ 
+-static int dtmf_tone(struct audio_device *device, const char *buf)
+-{
+-	char tone;
+-
+-	if (strlen(buf) < 8) {
+-		error("Too short string for DTMF tone");
+-		return -EINVAL;
+-	}
+-
+-	tone = buf[7];
+-	if (tone >= '#' && tone <= 'D')
+-		telephony_transmit_dtmf_req(device, tone);
 -	else
--		err = 0;
+-		return -EINVAL;
 -
--	if (err < 0)
--		telephony_key_press_rsp(telephony_device,
--							CME_ERROR_AG_FAILURE);
+-	return 0;
+-}
+-
+ int telephony_subscriber_number_rsp(void *telephony_device, cme_error_t err)
+ {
+ 	return telephony_generic_rsp(telephony_device, err);
+ }
+ 
+-static int subscriber_number(struct audio_device *device, const char *buf)
+-{
+-	telephony_subscriber_number_req(device);
+-
+-	return 0;
+-}
+-
+ int telephony_list_current_calls_rsp(void *telephony_device, cme_error_t err)
+ {
+ 	return telephony_generic_rsp(telephony_device, err);
+ }
+ 
+-static int list_current_calls(struct audio_device *device, const char *buf)
+-{
+-	telephony_list_current_calls_req(device);
+-
+-	return 0;
+-}
+-
+-static int extended_errors(struct audio_device *device, const char *buf)
+-{
+-	struct headset *hs = device->headset;
+-	struct headset_slc *slc = hs->slc;
+-
+-	if (strlen(buf) < 9)
+-		return -EINVAL;
+-
+-	if (buf[8] == '1') {
+-		slc->cme_enabled = TRUE;
+-		DBG("CME errors enabled for headset %p", hs);
+-	} else {
+-		slc->cme_enabled = FALSE;
+-		DBG("CME errors disabled for headset %p", hs);
+-	}
+-
+-	return headset_send(hs, "\r\nOK\r\n");
+-}
+-
+-static int call_waiting_notify(struct audio_device *device, const char *buf)
+-{
+-	struct headset *hs = device->headset;
+-	struct headset_slc *slc = hs->slc;
+-
+-	if (strlen(buf) < 9)
+-		return -EINVAL;
+-
+-	if (buf[8] == '1') {
+-		slc->cwa_enabled = TRUE;
+-		DBG("Call waiting notification enabled for headset %p", hs);
+-	} else {
+-		slc->cwa_enabled = FALSE;
+-		DBG("Call waiting notification disabled for headset %p", hs);
+-	}
+-
+-	return headset_send(hs, "\r\nOK\r\n");
+-}
+-
+ int telephony_operator_selection_rsp(void *telephony_device, cme_error_t err)
+ {
+ 	return telephony_generic_rsp(telephony_device, err);
+@@ -1146,108 +750,6 @@ int telephony_operator_selection_ind(int mode, const char *oper)
+ 	return 0;
+ }
+ 
+-static int operator_selection(struct audio_device *device, const char *buf)
+-{
+-	struct headset *hs = device->headset;
+-
+-	if (strlen(buf) < 8)
+-		return -EINVAL;
+-
+-	switch (buf[7]) {
+-	case '?':
+-		telephony_operator_selection_req(device);
+-		break;
+-	case '=':
+-		return headset_send(hs, "\r\nOK\r\n");
+-	default:
+-		return -EINVAL;
+-	}
+-
+-	return 0;
+-}
+-
+-static int nr_and_ec(struct audio_device *device, const char *buf)
+-{
+-	struct headset *hs = device->headset;
+-	struct headset_slc *slc = hs->slc;
+-
+-	if (strlen(buf) < 9)
+-		return -EINVAL;
+-
+-	if (buf[8] == '0')
+-		slc->nrec_req = FALSE;
 -	else
--		telephony_key_press_rsp(telephony_device, CME_ERROR_NONE);
+-		slc->nrec_req = TRUE;
+-
+-	telephony_nr_and_ec_req(device, slc->nrec_req);
+-
+-	return 0;
 -}
 -
--void telephony_voice_dial_req(void *telephony_device, gboolean enable)
+-static int voice_dial(struct audio_device *device, const char *buf)
 -{
--	DBG("telephony-maemo: got %s voice dial request",
--			enable ? "enable" : "disable");
+-	gboolean enable;
 -
--	telephony_voice_dial_rsp(telephony_device, CME_ERROR_NOT_SUPPORTED);
--}
+-	if (strlen(buf) < 9)
+-		return -EINVAL;
 -
--static void handle_incoming_call(DBusMessage *msg)
--{
--	const char *number, *call_path;
--	struct csd_call *call;
--
--	if (!dbus_message_get_args(msg, NULL,
--					DBUS_TYPE_OBJECT_PATH, &call_path,
--					DBUS_TYPE_STRING, &number,
--					DBUS_TYPE_INVALID)) {
--		error("Unexpected parameters in Call.Coming() signal");
--		return;
--	}
--
--	call = find_call(call_path);
--	if (!call) {
--		error("Didn't find any matching call object for %s",
--				call_path);
--		return;
--	}
--
--	DBG("Incoming call to %s from number %s", call_path, number);
--
--	g_free(call->number);
--	call->number = g_strdup(number);
--
--	telephony_update_indicator(maemo_indicators, "callsetup",
--					EV_CALLSETUP_INCOMING);
--
--	if (find_call_with_status(CSD_CALL_STATUS_ACTIVE))
--		telephony_call_waiting_ind(call->number,
--						number_type(call->number));
+-	if (buf[8] == '0')
+-		enable = FALSE;
 -	else
--		telephony_incoming_call_ind(call->number,
--						number_type(call->number));
+-		enable = TRUE;
+-
+-	telephony_voice_dial_req(device, enable);
+-
+-	return 0;
 -}
 -
--static void handle_outgoing_call(DBusMessage *msg)
+-static int apple_command(struct audio_device *device, const char *buf)
 -{
--	const char *number, *call_path;
--	struct csd_call *call;
+-	DBG("Got Apple command: %s", buf);
 -
--	if (!dbus_message_get_args(msg, NULL,
--					DBUS_TYPE_OBJECT_PATH, &call_path,
--					DBUS_TYPE_STRING, &number,
--					DBUS_TYPE_INVALID)) {
--		error("Unexpected parameters in Call.Created() signal");
--		return;
--	}
--
--	call = find_call(call_path);
--	if (!call) {
--		error("Didn't find any matching call object for %s",
--				call_path);
--		return;
--	}
--
--	DBG("Outgoing call from %s to number %s", call_path, number);
--
--	g_free(call->number);
--	call->number = g_strdup(number);
--
--	g_free(last_dialed_number);
--	last_dialed_number = g_strdup(number);
--
--	if (create_request_timer) {
--		g_source_remove(create_request_timer);
--		create_request_timer = 0;
--	}
+-	return telephony_generic_rsp(device, CME_ERROR_NONE);
 -}
 -
--static gboolean create_timeout(gpointer user_data)
+-static struct event event_callbacks[] = {
+-	{ "ATA", answer_call },
+-	{ "ATD", dial_number },
+-	{ "AT+VG", signal_gain_setting },
+-	{ "AT+BRSF", supported_features },
+-	{ "AT+CIND", report_indicators },
+-	{ "AT+CMER", event_reporting },
+-	{ "AT+CHLD", call_hold },
+-	{ "AT+CHUP", terminate_call },
+-	{ "AT+CKPD", key_press },
+-	{ "AT+CLIP", cli_notification },
+-	{ "AT+BTRH", response_and_hold },
+-	{ "AT+BLDN", last_dialed_number },
+-	{ "AT+VTS", dtmf_tone },
+-	{ "AT+CNUM", subscriber_number },
+-	{ "AT+CLCC", list_current_calls },
+-	{ "AT+CMEE", extended_errors },
+-	{ "AT+CCWA", call_waiting_notify },
+-	{ "AT+COPS", operator_selection },
+-	{ "AT+NREC", nr_and_ec },
+-	{ "AT+BVRA", voice_dial },
+-	{ "AT+XAPL", apple_command },
+-	{ "AT+IPHONEACCEV", apple_command },
+-	{ 0 }
+-};
+-
+-static int handle_event(struct audio_device *device, const char *buf)
 -{
--	telephony_update_indicator(maemo_indicators, "callsetup",
--					EV_CALLSETUP_INACTIVE);
--	create_request_timer = 0;
+-	struct event *ev;
+-
+-	DBG("Received %s", buf);
+-
+-	for (ev = event_callbacks; ev->cmd; ev++) {
+-		if (!strncmp(buf, ev->cmd, strlen(ev->cmd)))
+-			return ev->callback(device, buf);
+-	}
+-
+-	return -EINVAL;
+-}
+-
+ static void close_sco(struct audio_device *device)
+ {
+ 	struct headset *hs = device->headset;
+@@ -1266,94 +768,6 @@ static void close_sco(struct audio_device *device)
+ 	}
+ }
+ 
+-static gboolean rfcomm_io_cb(GIOChannel *chan, GIOCondition cond,
+-				struct audio_device *device)
+-{
+-	struct headset *hs;
+-	struct headset_slc *slc;
+-	unsigned char buf[BUF_SIZE];
+-	ssize_t bytes_read;
+-	size_t free_space;
+-	int fd;
+-
+-	if (cond & G_IO_NVAL)
+-		return FALSE;
+-
+-	hs = device->headset;
+-	slc = hs->slc;
+-
+-	if (cond & (G_IO_ERR | G_IO_HUP)) {
+-		DBG("ERR or HUP on RFCOMM socket");
+-		goto failed;
+-	}
+-
+-	fd = g_io_channel_unix_get_fd(chan);
+-
+-	bytes_read = read(fd, buf, sizeof(buf) - 1);
+-	if (bytes_read < 0)
+-		return TRUE;
+-
+-	free_space = sizeof(slc->buf) - slc->data_start -
+-			slc->data_length - 1;
+-
+-	if (free_space < (size_t) bytes_read) {
+-		/* Very likely that the HS is sending us garbage so
+-		 * just ignore the data and disconnect */
+-		error("Too much data to fit incomming buffer");
+-		goto failed;
+-	}
+-
+-	memcpy(&slc->buf[slc->data_start], buf, bytes_read);
+-	slc->data_length += bytes_read;
+-
+-	/* Make sure the data is null terminated so we can use string
+-	 * functions */
+-	slc->buf[slc->data_start + slc->data_length] = '\0';
+-
+-	while (slc->data_length > 0) {
+-		char *cr;
+-		int err;
+-		off_t cmd_len;
+-
+-		cr = strchr(&slc->buf[slc->data_start], '\r');
+-		if (!cr)
+-			break;
+-
+-		cmd_len = 1 + (off_t) cr - (off_t) &slc->buf[slc->data_start];
+-		*cr = '\0';
+-
+-		if (cmd_len > 1)
+-			err = handle_event(device, &slc->buf[slc->data_start]);
+-		else
+-			/* Silently skip empty commands */
+-			err = 0;
+-
+-		if (err == -EINVAL) {
+-			error("Badly formated or unrecognized command: %s",
+-					&slc->buf[slc->data_start]);
+-			err = headset_send(hs, "\r\nERROR\r\n");
+-			if (err < 0)
+-				goto failed;
+-		} else if (err < 0)
+-			error("Error handling command %s: %s (%d)",
+-						&slc->buf[slc->data_start],
+-						strerror(-err), -err);
+-
+-		slc->data_start += cmd_len;
+-		slc->data_length -= cmd_len;
+-
+-		if (!slc->data_length)
+-			slc->data_start = 0;
+-	}
+-
+-	return TRUE;
+-
+-failed:
+-	headset_set_state(device, HEADSET_STATE_DISCONNECTED);
+-
 -	return FALSE;
 -}
 -
--static void handle_create_requested(DBusMessage *msg)
--{
--	DBG("Call.CreateRequested()");
--
--	if (create_request_timer)
--		g_source_remove(create_request_timer);
--
--	create_request_timer = g_timeout_add_seconds(5, create_timeout, NULL);
--
--	telephony_update_indicator(maemo_indicators, "callsetup",
--					EV_CALLSETUP_OUTGOING);
--}
--
--static void handle_call_status(DBusMessage *msg, const char *call_path)
--{
--	struct csd_call *call;
--	dbus_uint32_t status, cause_type, cause;
--	int callheld = telephony_get_indicator(maemo_indicators, "callheld");
--
--	if (!dbus_message_get_args(msg, NULL,
--					DBUS_TYPE_UINT32, &status,
--					DBUS_TYPE_UINT32, &cause_type,
--					DBUS_TYPE_UINT32, &cause,
--					DBUS_TYPE_INVALID)) {
--		error("Unexpected paramters in Instance.CallStatus() signal");
--		return;
--	}
--
--	call = find_call(call_path);
--	if (!call) {
--		error("Didn't find any matching call object for %s",
--				call_path);
--		return;
--	}
--
--	if (status > 16) {
--		error("Invalid call status %u", status);
--		return;
--	}
--
--	DBG("Call %s changed from %s to %s", call_path,
--		call_status_str[call->status], call_status_str[status]);
--
--	if (call->status == (int) status) {
--		DBG("Ignoring CSD Call state change to existing state");
--		return;
--	}
--
--	call->status = (int) status;
--
--	switch (status) {
--	case CSD_CALL_STATUS_IDLE:
--		if (call->setup) {
--			telephony_update_indicator(maemo_indicators,
--							"callsetup",
--							EV_CALLSETUP_INACTIVE);
--			if (!call->originating)
--				telephony_calling_stopped_ind();
--		}
--
--		g_free(call->number);
--		call->number = NULL;
--		call->originating = FALSE;
--		call->emergency = FALSE;
--		call->on_hold = FALSE;
--		call->conference = FALSE;
--		call->setup = FALSE;
--		break;
--	case CSD_CALL_STATUS_CREATE:
--		call->originating = TRUE;
--		call->setup = TRUE;
--		break;
--	case CSD_CALL_STATUS_COMING:
--		call->originating = FALSE;
--		call->setup = TRUE;
--		break;
--	case CSD_CALL_STATUS_PROCEEDING:
--		break;
--	case CSD_CALL_STATUS_MO_ALERTING:
--		telephony_update_indicator(maemo_indicators, "callsetup",
--						EV_CALLSETUP_ALERTING);
--		break;
--	case CSD_CALL_STATUS_MT_ALERTING:
--		break;
--	case CSD_CALL_STATUS_WAITING:
--		break;
--	case CSD_CALL_STATUS_ANSWERED:
--		break;
--	case CSD_CALL_STATUS_ACTIVE:
--		if (call->on_hold) {
--			call->on_hold = FALSE;
--			if (find_call_with_status(CSD_CALL_STATUS_HOLD))
--				telephony_update_indicator(maemo_indicators,
--							"callheld",
--							EV_CALLHELD_MULTIPLE);
--			else
--				telephony_update_indicator(maemo_indicators,
--							"callheld",
--							EV_CALLHELD_NONE);
--		} else {
--			if (!g_slist_find(active_calls, call))
--				active_calls = g_slist_prepend(active_calls, call);
--			if (g_slist_length(active_calls) == 1)
--				telephony_update_indicator(maemo_indicators,
--								"call",
--								EV_CALL_ACTIVE);
--			/* Upgrade callheld status if necessary */
--			if (callheld == EV_CALLHELD_ON_HOLD)
--				telephony_update_indicator(maemo_indicators,
--							"callheld",
--							EV_CALLHELD_MULTIPLE);
--			telephony_update_indicator(maemo_indicators,
--							"callsetup",
--							EV_CALLSETUP_INACTIVE);
--			if (!call->originating)
--				telephony_calling_stopped_ind();
--			call->setup = FALSE;
--		}
--		break;
--	case CSD_CALL_STATUS_MO_RELEASE:
--	case CSD_CALL_STATUS_MT_RELEASE:
--		active_calls = g_slist_remove(active_calls, call);
--		if (g_slist_length(active_calls) == 0)
--			telephony_update_indicator(maemo_indicators, "call",
--							EV_CALL_INACTIVE);
--		break;
--	case CSD_CALL_STATUS_HOLD_INITIATED:
--		break;
--	case CSD_CALL_STATUS_HOLD:
--		call->on_hold = TRUE;
--		if (find_non_held_call())
--			telephony_update_indicator(maemo_indicators,
--							"callheld",
--							EV_CALLHELD_MULTIPLE);
--		else
--			telephony_update_indicator(maemo_indicators,
--							"callheld",
--							EV_CALLHELD_ON_HOLD);
--		break;
--	case CSD_CALL_STATUS_RETRIEVE_INITIATED:
--		break;
--	case CSD_CALL_STATUS_RECONNECT_PENDING:
--		break;
--	case CSD_CALL_STATUS_TERMINATED:
--		if (call->on_hold &&
--				!find_call_with_status(CSD_CALL_STATUS_HOLD))
--			telephony_update_indicator(maemo_indicators,
--							"callheld",
--							EV_CALLHELD_NONE);
--		else if (callheld == EV_CALLHELD_MULTIPLE &&
--				find_call_with_status(CSD_CALL_STATUS_HOLD))
--			telephony_update_indicator(maemo_indicators,
--							"callheld",
--							EV_CALLHELD_ON_HOLD);
--		break;
--	case CSD_CALL_STATUS_SWAP_INITIATED:
--		break;
--	default:
--		error("Unknown call status %u", status);
--		break;
--	}
--}
--
--static void handle_conference(DBusMessage *msg, gboolean joined)
--{
--	const char *path;
--	struct csd_call *call;
--
--	if (!dbus_message_get_args(msg, NULL,
--					DBUS_TYPE_OBJECT_PATH, &path,
--					DBUS_TYPE_INVALID)) {
--		error("Unexpected parameters in Conference.%s",
--					dbus_message_get_member(msg));
--		return;
--	}
--
--	call = find_call(path);
--	if (!call) {
--		error("Conference signal for unknown call %s", path);
--		return;
--	}
--
--	DBG("Call %s %s the conference", path, joined ? "joined" : "left");
--
--	call->conference = joined;
--}
--
--static void get_operator_name_reply(DBusPendingCall *pending_call,
--					void *user_data)
--{
--	DBusMessage *reply;
--	DBusError err;
--	const char *name;
--	dbus_int32_t net_err;
--
--	reply = dbus_pending_call_steal_reply(pending_call);
--
--	dbus_error_init(&err);
--	if (dbus_set_error_from_message(&err, reply)) {
--		error("get_operator_name failed: %s, %s",
--			err.name, err.message);
--		dbus_error_free(&err);
--		goto done;
--	}
--
--	dbus_error_init(&err);
--	if (!dbus_message_get_args(reply, &err,
--					DBUS_TYPE_STRING, &name,
--					DBUS_TYPE_INT32, &net_err,
--					DBUS_TYPE_INVALID)) {
--		error("Unexpected get_operator_name reply parameters: %s, %s",
--			err.name, err.message);
--		dbus_error_free(&err);
--		goto done;
--	}
--
--	if (net_err != 0) {
--		error("get_operator_name failed with code %d", net_err);
--		goto done;
--	}
--
--	if (strlen(name) == 0)
--		goto done;
--
--	g_free(net.operator_name);
--	net.operator_name = g_strdup(name);
--
--	DBG("telephony-maemo: operator name updated: %s", name);
--
--done:
--	dbus_message_unref(reply);
--}
--
--static void resolve_operator_name(uint32_t operator, uint32_t country)
--{
--	uint8_t name_type = NETWORK_HARDCODED_LATIN_OPER_NAME;
--
--	send_method_call(NETWORK_BUS_NAME, NETWORK_PATH,
--				NETWORK_INTERFACE, "get_operator_name",
--				get_operator_name_reply, NULL,
--				DBUS_TYPE_BYTE, &name_type,
--				DBUS_TYPE_UINT32, &operator,
--				DBUS_TYPE_UINT32, &country,
--				DBUS_TYPE_INVALID);
--}
--
--static void update_registration_status(uint8_t status, uint16_t lac,
--					uint32_t cell_id,
--					uint32_t operator_code,
--					uint32_t country_code,
--					uint8_t network_type,
--					uint8_t supported_services)
--{
--	if (net.status != status) {
--		switch (status) {
--		case NETWORK_REG_STATUS_HOME:
--			telephony_update_indicator(maemo_indicators, "roam",
--							EV_ROAM_INACTIVE);
--			if (net.status >= NETWORK_REG_STATUS_NOSERV)
--				telephony_update_indicator(maemo_indicators,
--							"service",
--							EV_SERVICE_PRESENT);
--			break;
--		case NETWORK_REG_STATUS_ROAM:
--		case NETWORK_REG_STATUS_ROAM_BLINK:
--			telephony_update_indicator(maemo_indicators, "roam",
--							EV_ROAM_ACTIVE);
--			if (net.status >= NETWORK_REG_STATUS_NOSERV)
--				telephony_update_indicator(maemo_indicators,
--							"service",
--							EV_SERVICE_PRESENT);
--			break;
--		case NETWORK_REG_STATUS_NOSERV:
--		case NETWORK_REG_STATUS_NOSERV_SEARCHING:
--		case NETWORK_REG_STATUS_NOSERV_NOTSEARCHING:
--		case NETWORK_REG_STATUS_NOSERV_NOSIM:
--		case NETWORK_REG_STATUS_POWER_OFF:
--		case NETWORK_REG_STATUS_NSPS:
--		case NETWORK_REG_STATUS_NSPS_NO_COVERAGE:
--		case NETWORK_REG_STATUS_NOSERV_SIM_REJECTED_BY_NW:
--			if (net.status < NETWORK_REG_STATUS_NOSERV)
--				telephony_update_indicator(maemo_indicators,
--							"service",
--							EV_SERVICE_NONE);
--			break;
--		}
--
--		net.status = status;
--	}
--
--	net.lac = lac;
--	net.cell_id = cell_id;
--
--	if (net.operator_code != operator_code ||
--			net.country_code != country_code) {
--		g_free(net.operator_name);
--		net.operator_name = NULL;
--		resolve_operator_name(operator_code, country_code);
--		net.operator_code = operator_code;
--		net.country_code = country_code;
--	}
--
--	net.network_type = network_type;
--	net.supported_services = supported_services;
--}
--
--static void handle_registration_status_change(DBusMessage *msg)
--{
--	uint8_t status;
--	dbus_uint16_t lac, network_type, supported_services;
--	dbus_uint32_t cell_id, operator_code, country_code;
--
--	if (!dbus_message_get_args(msg, NULL,
--					DBUS_TYPE_BYTE, &status,
--					DBUS_TYPE_UINT16, &lac,
--					DBUS_TYPE_UINT32, &cell_id,
--					DBUS_TYPE_UINT32, &operator_code,
--					DBUS_TYPE_UINT32, &country_code,
--					DBUS_TYPE_BYTE, &network_type,
--					DBUS_TYPE_BYTE, &supported_services,
--					DBUS_TYPE_INVALID)) {
--		error("Unexpected parameters in registration_status_change");
--		return;
--	}
--
--	update_registration_status(status, lac, cell_id, operator_code,
--					country_code, network_type,
--					supported_services);
--}
--
--static void update_signal_strength(uint8_t signals_bar)
--{
--	int signal;
--
--	if (signals_bar > 100) {
--		DBG("signals_bar greater than expected: %u", signals_bar);
--		signals_bar = 100;
--	}
--
--	if (net.signals_bar == signals_bar)
--		return;
--
--	/* A simple conversion from 0-100 to 0-5 (used by HFP) */
--	signal = (signals_bar + 20) / 21;
--
--	telephony_update_indicator(maemo_indicators, "signal", signal);
--
--	net.signals_bar = signals_bar;
--
--	DBG("Signal strength updated: %u/100, %d/5", signals_bar, signal);
--}
--
--static void handle_signal_strength_change(DBusMessage *msg)
--{
--	uint8_t signals_bar, rssi_in_dbm;
--
--	if (!dbus_message_get_args(msg, NULL,
--					DBUS_TYPE_BYTE, &signals_bar,
--					DBUS_TYPE_BYTE, &rssi_in_dbm,
--					DBUS_TYPE_INVALID)) {
--		error("Unexpected parameters in signal_strength_change");
--		return;
--	}
--
--	update_signal_strength(signals_bar);
--}
--
--static gboolean iter_get_basic_args(DBusMessageIter *iter,
--					int first_arg_type, ...)
--{
--	int type;
--	va_list ap;
--
--	va_start(ap, first_arg_type);
--
--	for (type = first_arg_type; type != DBUS_TYPE_INVALID;
--			type = va_arg(ap, int)) {
--		void *value = va_arg(ap, void *);
--		int real_type = dbus_message_iter_get_arg_type(iter);
--
--		if (real_type != type) {
--			error("iter_get_basic_args: expected %c but got %c",
--					(char) type, (char) real_type);
--			break;
--		}
--
--		dbus_message_iter_get_basic(iter, value);
--		dbus_message_iter_next(iter);
--	}
--
--	va_end(ap);
--
--	return type == DBUS_TYPE_INVALID ? TRUE : FALSE;
--}
--
--static void hal_battery_level_reply(DBusPendingCall *call, void *user_data)
--{
--	DBusError err;
--	DBusMessage *reply;
--	dbus_int32_t level;
--	int *value = user_data;
--
--	reply = dbus_pending_call_steal_reply(call);
--
--	dbus_error_init(&err);
--	if (dbus_set_error_from_message(&err, reply)) {
--		error("hald replied with an error: %s, %s",
--				err.name, err.message);
--		dbus_error_free(&err);
--		goto done;
--	}
--
--	dbus_error_init(&err);
--	if (dbus_message_get_args(reply, &err,
--				DBUS_TYPE_INT32, &level,
--				DBUS_TYPE_INVALID) == FALSE) {
--		error("Unable to parse GetPropertyInteger reply: %s, %s",
--							err.name, err.message);
--		dbus_error_free(&err);
--		goto done;
--	}
--
--	*value = (int) level;
--
--	if (value == &battchg_last)
--		DBG("telephony-maemo: battery.charge_level.last_full is %d",
--				*value);
--	else if (value == &battchg_design)
--		DBG("telephony-maemo: battery.charge_level.design is %d",
--				*value);
--	else
--		DBG("telephony-maemo: battery.charge_level.current is %d",
--				*value);
--
--	if ((battchg_design > 0 || battchg_last > 0) && battchg_cur >= 0) {
--		int new, max;
--
--		if (battchg_last > 0)
--			max = battchg_last;
--		else
--			max = battchg_design;
--
--		new = battchg_cur * 5 / max;
--
--		telephony_update_indicator(maemo_indicators, "battchg", new);
--	}
--done:
--	dbus_message_unref(reply);
--}
--
--static void hal_get_integer(const char *path, const char *key, void *user_data)
--{
--	send_method_call("org.freedesktop.Hal", path,
--				"org.freedesktop.Hal.Device",
--				"GetPropertyInteger",
--				hal_battery_level_reply, user_data,
--				DBUS_TYPE_STRING, &key,
--				DBUS_TYPE_INVALID);
--}
--
--static void handle_hal_property_modified(DBusMessage *msg)
--{
--	DBusMessageIter iter, array;
--	dbus_int32_t num_changes;
--	const char *path;
--
--	path = dbus_message_get_path(msg);
--
--	dbus_message_iter_init(msg, &iter);
--
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_INT32) {
--		error("Unexpected signature in hal PropertyModified signal");
--		return;
--	}
--
--	dbus_message_iter_get_basic(&iter, &num_changes);
--	dbus_message_iter_next(&iter);
--
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY) {
--		error("Unexpected signature in hal PropertyModified signal");
--		return;
--	}
--
--	dbus_message_iter_recurse(&iter, &array);
--
--	while (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_INVALID) {
--		DBusMessageIter prop;
--		const char *name;
--		dbus_bool_t added, removed;
--
--		dbus_message_iter_recurse(&array, &prop);
--
--		if (!iter_get_basic_args(&prop,
--					DBUS_TYPE_STRING, &name,
--					DBUS_TYPE_BOOLEAN, &added,
--					DBUS_TYPE_BOOLEAN, &removed,
--					DBUS_TYPE_INVALID)) {
--			error("Invalid hal PropertyModified parameters");
--			break;
--		}
--
--		if (g_str_equal(name, "battery.charge_level.last_full"))
--			hal_get_integer(path, name, &battchg_last);
--		else if (g_str_equal(name, "battery.charge_level.current"))
--			hal_get_integer(path, name, &battchg_cur);
--		else if (g_str_equal(name, "battery.charge_level.design"))
--			hal_get_integer(path, name, &battchg_design);
--
--		dbus_message_iter_next(&array);
--	}
--}
--
--static void csd_call_free(struct csd_call *call)
--{
--	if (!call)
--		return;
--
--	g_free(call->object_path);
--	g_free(call->number);
--
--	g_free(call);
--}
--
--static void parse_call_list(DBusMessageIter *iter)
--{
--	do {
--		DBusMessageIter call_iter;
--		struct csd_call *call;
--		const char *object_path, *number;
--		dbus_uint32_t status;
--		dbus_bool_t originating, terminating, emerg, on_hold, conf;
--
--		if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRUCT) {
--			error("Unexpected signature in GetCallInfoAll reply");
--			break;
--		}
--
--		dbus_message_iter_recurse(iter, &call_iter);
--
--		if (!iter_get_basic_args(&call_iter,
--					DBUS_TYPE_OBJECT_PATH, &object_path,
--					DBUS_TYPE_UINT32, &status,
--					DBUS_TYPE_BOOLEAN, &originating,
--					DBUS_TYPE_BOOLEAN, &terminating,
--					DBUS_TYPE_BOOLEAN, &emerg,
--					DBUS_TYPE_BOOLEAN, &on_hold,
--					DBUS_TYPE_BOOLEAN, &conf,
--					DBUS_TYPE_STRING, &number,
--					DBUS_TYPE_INVALID)) {
--			error("Parsing call D-Bus parameters failed");
--			break;
--		}
--
--		call = find_call(object_path);
--		if (!call) {
--			call = g_new0(struct csd_call, 1);
--			call->object_path = g_strdup(object_path);
--			call->status = (int) status;
--			calls = g_slist_append(calls, call);
--			DBG("telephony-maemo: new csd call instance at %s",
--								object_path);
--		}
--
--		if (call->status == CSD_CALL_STATUS_IDLE)
--			continue;
--
--		/* CSD gives incorrect call_hold property sometimes */
--		if ((call->status != CSD_CALL_STATUS_HOLD && on_hold) ||
--				(call->status == CSD_CALL_STATUS_HOLD &&
--								!on_hold)) {
--			error("Conflicting call status and on_hold property!");
--			on_hold = call->status == CSD_CALL_STATUS_HOLD;
--		}
--
--		call->originating = originating;
--		call->on_hold = on_hold;
--		call->conference = conf;
--		g_free(call->number);
--		call->number = g_strdup(number);
--
--	} while (dbus_message_iter_next(iter));
--}
--
--static void signal_strength_reply(DBusPendingCall *call, void *user_data)
--{
--	DBusError err;
--	DBusMessage *reply;
--	uint8_t signals_bar, rssi_in_dbm;
--	dbus_int32_t net_err;
--
--	reply = dbus_pending_call_steal_reply(call);
--
--	dbus_error_init(&err);
--	if (dbus_set_error_from_message(&err, reply)) {
--		error("Unable to get signal strength: %s, %s",
--			err.name, err.message);
--		dbus_error_free(&err);
--		goto done;
--	}
--
--	dbus_error_init(&err);
--	if (!dbus_message_get_args(reply, &err,
--					DBUS_TYPE_BYTE, &signals_bar,
--					DBUS_TYPE_BYTE, &rssi_in_dbm,
--					DBUS_TYPE_INT32, &net_err,
--					DBUS_TYPE_INVALID)) {
--		error("Unable to parse signal_strength reply: %s, %s",
--							err.name, err.message);
--		dbus_error_free(&err);
--		return;
--	}
--
--	if (net_err != 0) {
--		error("get_signal_strength failed with code %d", net_err);
--		return;
--	}
--
--	update_signal_strength(signals_bar);
--
--done:
--	dbus_message_unref(reply);
--}
--
--static int get_signal_strength(void)
--{
--	return send_method_call(NETWORK_BUS_NAME, NETWORK_PATH,
--				NETWORK_INTERFACE, "get_signal_strength",
--				signal_strength_reply, NULL,
--				DBUS_TYPE_INVALID);
--}
--
--static void registration_status_reply(DBusPendingCall *call, void *user_data)
--{
--	DBusError err;
--	DBusMessage *reply;
--	uint8_t status;
--	dbus_uint16_t lac, network_type, supported_services;
--	dbus_uint32_t cell_id, operator_code, country_code;
--	dbus_int32_t net_err;
--
--	reply = dbus_pending_call_steal_reply(call);
--
--	dbus_error_init(&err);
--	if (dbus_set_error_from_message(&err, reply)) {
--		error("Unable to get registration status: %s, %s",
--				err.name, err.message);
--		dbus_error_free(&err);
--		goto done;
--	}
--
--	dbus_error_init(&err);
--	if (!dbus_message_get_args(reply, &err,
--					DBUS_TYPE_BYTE, &status,
--					DBUS_TYPE_UINT16, &lac,
--					DBUS_TYPE_UINT32, &cell_id,
--					DBUS_TYPE_UINT32, &operator_code,
--					DBUS_TYPE_UINT32, &country_code,
--					DBUS_TYPE_BYTE, &network_type,
--					DBUS_TYPE_BYTE, &supported_services,
--					DBUS_TYPE_INT32, &net_err,
--					DBUS_TYPE_INVALID)) {
--		error("Unable to parse registration_status_change reply:"
--					" %s, %s", err.name, err.message);
--		dbus_error_free(&err);
--		return;
--	}
--
--	if (net_err != 0) {
--		error("get_registration_status failed with code %d", net_err);
--		return;
--	}
--
--	update_registration_status(status, lac, cell_id, operator_code,
--					country_code, network_type,
--					supported_services);
--
--	get_signal_strength();
--
--done:
--	dbus_message_unref(reply);
--}
--
--static int get_registration_status(void)
--{
--	return send_method_call(NETWORK_BUS_NAME, NETWORK_PATH,
--				NETWORK_INTERFACE, "get_registration_status",
--				registration_status_reply, NULL,
--				DBUS_TYPE_INVALID);
--}
--
--static void call_info_reply(DBusPendingCall *call, void *user_data)
--{
--	DBusError err;
--	DBusMessage *reply;
--	DBusMessageIter iter, sub;
--
--	get_calls_active = FALSE;
--
--	reply = dbus_pending_call_steal_reply(call);
--
--	dbus_error_init(&err);
--	if (dbus_set_error_from_message(&err, reply)) {
--		error("csd replied with an error: %s, %s",
--				err.name, err.message);
--		dbus_error_free(&err);
--		goto done;
--	}
--
--	dbus_message_iter_init(reply, &iter);
--
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY) {
--		error("Unexpected signature in GetCallInfoAll return");
--		goto done;
--	}
--
--	dbus_message_iter_recurse(&iter, &sub);
--
--	parse_call_list(&sub);
--
--	get_registration_status();
--
--done:
--	dbus_message_unref(reply);
--}
--
--static void hal_find_device_reply(DBusPendingCall *call, void *user_data)
--{
--	DBusError err;
--	DBusMessage *reply;
--	DBusMessageIter iter, sub;
--	const char *path;
--	char match_string[256];
--	int type;
--
--	reply = dbus_pending_call_steal_reply(call);
--
--	dbus_error_init(&err);
--	if (dbus_set_error_from_message(&err, reply)) {
--		error("hald replied with an error: %s, %s",
--				err.name, err.message);
--		dbus_error_free(&err);
--		goto done;
--	}
--
--	dbus_message_iter_init(reply, &iter);
--
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY) {
--		error("Unexpected signature in FindDeviceByCapability return");
--		goto done;
--	}
--
--	dbus_message_iter_recurse(&iter, &sub);
--
--	type = dbus_message_iter_get_arg_type(&sub);
--
--	if (type != DBUS_TYPE_OBJECT_PATH && type != DBUS_TYPE_STRING) {
--		error("No hal device with battery capability found");
--		goto done;
--	}
--
--	dbus_message_iter_get_basic(&sub, &path);
--
--	DBG("telephony-maemo: found battery device at %s", path);
--
--	snprintf(match_string, sizeof(match_string),
--			"type='signal',"
--			"path='%s',"
--			"interface='org.freedesktop.Hal.Device',"
--			"member='PropertyModified'", path);
--	dbus_bus_add_match(connection, match_string, NULL);
--
--	hal_get_integer(path, "battery.charge_level.last_full", &battchg_last);
--	hal_get_integer(path, "battery.charge_level.current", &battchg_cur);
--	hal_get_integer(path, "battery.charge_level.design", &battchg_design);
--
--done:
--	dbus_message_unref(reply);
--}
--
--static void phonebook_read_reply(DBusPendingCall *call, void *user_data)
--{
--	DBusError derr;
--	DBusMessage *reply;
--	const char *name, *number;
--	char **number_type = user_data;
--	dbus_int32_t current_location, err;
--
--	reply = dbus_pending_call_steal_reply(call);
--
--	dbus_error_init(&derr);
--	if (dbus_set_error_from_message(&derr, reply)) {
--		error("SIM.Phonebook replied with an error: %s, %s",
--				derr.name, derr.message);
--		dbus_error_free(&derr);
--		goto done;
--	}
--
--	dbus_error_init(&derr);
--	if (dbus_message_get_args(reply, &derr,
--				DBUS_TYPE_STRING, &name,
--				DBUS_TYPE_STRING, &number,
--				DBUS_TYPE_INT32, &current_location,
--				DBUS_TYPE_INT32, &err,
--				DBUS_TYPE_INVALID) == FALSE) {
--		error("Unable to parse SIM.Phonebook.read arguments: %s, %s",
--				derr.name, derr.message);
--		dbus_error_free(&derr);
--		goto done;
--	}
--
--	if (err != 0) {
--		error("SIM.Phonebook.read failed with error %d", err);
--		if (number_type == &vmbx)
--			vmbx = g_strdup(getenv("VMBX_NUMBER"));
--		goto done;
--	}
--
--	if (number_type == &msisdn) {
--		g_free(msisdn);
--		msisdn = g_strdup(number);
--		DBG("Got MSISDN %s (%s)", number, name);
--	} else {
--		g_free(vmbx);
--		vmbx = g_strdup(number);
--		DBG("Got voice mailbox number %s (%s)", number, name);
--	}
--
--done:
--	dbus_message_unref(reply);
--}
--
--static void csd_init(void)
--{
--	dbus_uint32_t location;
--	uint8_t pb_type, location_type;
--	int ret;
--
--	ret = send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
--				CSD_CALL_INTERFACE, "GetCallInfoAll",
--				call_info_reply, NULL, DBUS_TYPE_INVALID);
--	if (ret < 0) {
--		error("Unable to sent GetCallInfoAll method call");
--		return;
--	}
--
--	get_calls_active = TRUE;
--
--	pb_type = SIM_PHONEBOOK_TYPE_MSISDN;
--	location = PHONEBOOK_INDEX_FIRST_ENTRY;
--	location_type = SIM_PHONEBOOK_LOCATION_NEXT;
--
--	ret = send_method_call(SIM_PHONEBOOK_BUS_NAME, SIM_PHONEBOOK_PATH,
--				SIM_PHONEBOOK_INTERFACE, "read",
--				phonebook_read_reply, &msisdn,
--				DBUS_TYPE_BYTE, &pb_type,
--				DBUS_TYPE_INT32, &location,
--				DBUS_TYPE_BYTE, &location_type,
--				DBUS_TYPE_INVALID);
--	if (ret < 0) {
--		error("Unable to send " SIM_PHONEBOOK_INTERFACE ".read()");
--		return;
--	}
--
--	pb_type = SIM_PHONEBOOK_TYPE_MBDN;
--	location = PHONEBOOK_INDEX_FIRST_ENTRY;
--	location_type = SIM_PHONEBOOK_LOCATION_NEXT;
--
--	ret = send_method_call(SIM_PHONEBOOK_BUS_NAME, SIM_PHONEBOOK_PATH,
--				SIM_PHONEBOOK_INTERFACE, "read",
--				phonebook_read_reply, &vmbx,
--				DBUS_TYPE_BYTE, &pb_type,
--				DBUS_TYPE_INT32, &location,
--				DBUS_TYPE_BYTE, &location_type,
--				DBUS_TYPE_INVALID);
--	if (ret < 0) {
--		error("Unable to send " SIM_PHONEBOOK_INTERFACE ".read()");
--		return;
--	}
--}
--
--static uint32_t get_callflag(const char *callerid_setting)
--{
--	if (callerid_setting != NULL) {
--		if (g_str_equal(callerid_setting, "allowed"))
--			return CALL_FLAG_PRESENTATION_ALLOWED;
--		else if (g_str_equal(callerid_setting, "restricted"))
--			return CALL_FLAG_PRESENTATION_RESTRICTED;
--		else
--			return CALL_FLAG_NONE;
--	} else
--		return CALL_FLAG_NONE;
--}
--
--static void generate_flag_file(const char *filename)
--{
--	int fd;
--
--	if (g_file_test(ALLOWED_FLAG_FILE, G_FILE_TEST_EXISTS) ||
--			g_file_test(RESTRICTED_FLAG_FILE, G_FILE_TEST_EXISTS) ||
--			g_file_test(NONE_FLAG_FILE, G_FILE_TEST_EXISTS))
--		return;
--
--	fd = open(filename, O_WRONLY | O_CREAT, 0);
--	if (fd >= 0)
--		close(fd);
--}
--
--static void save_callerid_to_file(const char *callerid_setting)
--{
--	char callerid_file[FILENAME_MAX];
--
--	snprintf(callerid_file, sizeof(callerid_file), "%s%s",
--					CALLERID_BASE, callerid_setting);
--
--	if (g_file_test(ALLOWED_FLAG_FILE, G_FILE_TEST_EXISTS))
--		rename(ALLOWED_FLAG_FILE, callerid_file);
--	else if (g_file_test(RESTRICTED_FLAG_FILE, G_FILE_TEST_EXISTS))
--		rename(RESTRICTED_FLAG_FILE, callerid_file);
--	else if (g_file_test(NONE_FLAG_FILE, G_FILE_TEST_EXISTS))
--		rename(NONE_FLAG_FILE, callerid_file);
--	else
--		generate_flag_file(callerid_file);
--}
--
--static uint32_t callerid_from_file(void)
--{
--	if (g_file_test(ALLOWED_FLAG_FILE, G_FILE_TEST_EXISTS))
--		return CALL_FLAG_PRESENTATION_ALLOWED;
--	else if (g_file_test(RESTRICTED_FLAG_FILE, G_FILE_TEST_EXISTS))
--		return CALL_FLAG_PRESENTATION_RESTRICTED;
--	else if (g_file_test(NONE_FLAG_FILE, G_FILE_TEST_EXISTS))
--		return CALL_FLAG_NONE;
--	else
--		return CALL_FLAG_NONE;
--}
--
--static DBusMessage *set_callerid(DBusConnection *conn, DBusMessage *msg,
--					void *data)
--{
--	const char *callerid_setting;
--
--	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING,
--						&callerid_setting,
--						DBUS_TYPE_INVALID) == FALSE)
--		return btd_error_invalid_args(msg);
--
--	if (g_str_equal(callerid_setting, "allowed") ||
--			g_str_equal(callerid_setting, "restricted") ||
--			g_str_equal(callerid_setting, "none")) {
--		save_callerid_to_file(callerid_setting);
--		callerid = get_callflag(callerid_setting);
--		DBG("telephony-maemo setting callerid flag: %s",
--							callerid_setting);
--		return dbus_message_new_method_return(msg);
--	}
--
--	error("telephony-maemo: invalid argument %s for method call"
--					" SetCallerId", callerid_setting);
--		return btd_error_invalid_args(msg);
--}
--
--static GDBusMethodTable telephony_maemo_methods[] = {
--	{"SetCallerId",		"s",	"",	set_callerid,
--						G_DBUS_METHOD_FLAG_ASYNC},
--	{ }
--};
--
--static void handle_modem_state(DBusMessage *msg)
--{
--	const char *state;
--
--	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &state,
--							DBUS_TYPE_INVALID)) {
--		error("Unexpected modem state parameters");
--		return;
--	}
--
--	DBG("SSC modem state: %s", state);
--
--	if (calls != NULL || get_calls_active)
--		return;
--
--	if (g_str_equal(state, "cmt_ready") || g_str_equal(state, "online"))
--		csd_init();
--}
--
--static void modem_state_reply(DBusPendingCall *call, void *user_data)
--{
--	DBusMessage *reply = dbus_pending_call_steal_reply(call);
--	DBusError err;
--
--	dbus_error_init(&err);
--	if (dbus_set_error_from_message(&err, reply)) {
--		error("get_modem_status: %s, %s", err.name, err.message);
--		dbus_error_free(&err);
--	} else
--		handle_modem_state(reply);
--
--	dbus_message_unref(reply);
--}
--
--static DBusHandlerResult signal_filter(DBusConnection *conn,
--						DBusMessage *msg, void *data)
--{
--	const char *path = dbus_message_get_path(msg);
--
--	if (dbus_message_get_type(msg) != DBUS_MESSAGE_TYPE_SIGNAL)
--		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--
--	if (dbus_message_is_signal(msg, CSD_CALL_INTERFACE, "Coming"))
--		handle_incoming_call(msg);
--	else if (dbus_message_is_signal(msg, CSD_CALL_INTERFACE, "Created"))
--		handle_outgoing_call(msg);
--	else if (dbus_message_is_signal(msg, CSD_CALL_INTERFACE,
--							"CreateRequested"))
--		handle_create_requested(msg);
--	else if (dbus_message_is_signal(msg, CSD_CALL_INSTANCE, "CallStatus"))
--		handle_call_status(msg, path);
--	else if (dbus_message_is_signal(msg, CSD_CALL_CONFERENCE, "Joined"))
--		handle_conference(msg, TRUE);
--	else if (dbus_message_is_signal(msg, CSD_CALL_CONFERENCE, "Left"))
--		handle_conference(msg, FALSE);
--	else if (dbus_message_is_signal(msg, NETWORK_INTERFACE,
--					"registration_status_change"))
--		handle_registration_status_change(msg);
--	else if (dbus_message_is_signal(msg, NETWORK_INTERFACE,
--					"signal_strength_change"))
--		handle_signal_strength_change(msg);
--	else if (dbus_message_is_signal(msg, "org.freedesktop.Hal.Device",
--					"PropertyModified"))
--		handle_hal_property_modified(msg);
--	else if (dbus_message_is_signal(msg, SSC_DBUS_IFACE,
--						"modem_state_changed_ind"))
--		handle_modem_state(msg);
--
--	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--}
--
--int telephony_init(void)
--{
--	const char *battery_cap = "battery";
--	uint32_t features = AG_FEATURE_EC_ANDOR_NR |
--				AG_FEATURE_INBAND_RINGTONE |
--				AG_FEATURE_REJECT_A_CALL |
--				AG_FEATURE_ENHANCED_CALL_STATUS |
--				AG_FEATURE_ENHANCED_CALL_CONTROL |
--				AG_FEATURE_EXTENDED_ERROR_RESULT_CODES |
--				AG_FEATURE_THREE_WAY_CALLING;
--
--	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
--
--	if (!dbus_connection_add_filter(connection, signal_filter,
--						NULL, NULL))
--		error("Can't add signal filter");
--
--	dbus_bus_add_match(connection,
--			"type=signal,interface=" CSD_CALL_INTERFACE, NULL);
--	dbus_bus_add_match(connection,
--			"type=signal,interface=" CSD_CALL_INSTANCE, NULL);
--	dbus_bus_add_match(connection,
--			"type=signal,interface=" CSD_CALL_CONFERENCE, NULL);
--	dbus_bus_add_match(connection,
--			"type=signal,interface=" NETWORK_INTERFACE, NULL);
--	dbus_bus_add_match(connection,
--				"type=signal,interface=" SSC_DBUS_IFACE
--				",member=modem_state_changed_ind", NULL);
--
--	if (send_method_call(SSC_DBUS_NAME, SSC_DBUS_PATH, SSC_DBUS_IFACE,
--					"get_modem_state", modem_state_reply,
--					NULL, DBUS_TYPE_INVALID) < 0)
--		error("Unable to send " SSC_DBUS_IFACE ".get_modem_state()");
--
--	generate_flag_file(NONE_FLAG_FILE);
--	callerid = callerid_from_file();
--
--	if (!g_dbus_register_interface(connection, TELEPHONY_MAEMO_PATH,
--			TELEPHONY_MAEMO_INTERFACE, telephony_maemo_methods,
--			NULL, NULL, NULL, NULL)) {
--		error("telephony-maemo interface %s init failed on path %s",
--			TELEPHONY_MAEMO_INTERFACE, TELEPHONY_MAEMO_PATH);
--	}
--
--	DBG("telephony-maemo registering %s interface on path %s",
--			TELEPHONY_MAEMO_INTERFACE, TELEPHONY_MAEMO_PATH);
--
--	telephony_ready_ind(features, maemo_indicators, BTRH_NOT_SUPPORTED,
--								chld_str);
--	if (send_method_call("org.freedesktop.Hal",
--				"/org/freedesktop/Hal/Manager",
--				"org.freedesktop.Hal.Manager",
--				"FindDeviceByCapability",
--				hal_find_device_reply, NULL,
--				DBUS_TYPE_STRING, &battery_cap,
--				DBUS_TYPE_INVALID) < 0)
--		error("Unable to send HAL method call");
--
--	return 0;
--}
--
--void telephony_exit(void)
--{
--	g_slist_foreach(calls, (GFunc) csd_call_free, NULL);
--	g_slist_free(calls);
--	calls = NULL;
--
--	dbus_connection_remove_filter(connection, signal_filter, NULL);
--
--	dbus_connection_unref(connection);
--	connection = NULL;
--
--	telephony_deinit();
--}
+ static gboolean sco_cb(GIOChannel *chan, GIOCondition cond,
+ 			struct audio_device *device)
+ {
+@@ -1381,7 +795,7 @@ void headset_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 	}
+ 
+ 	/* For HFP telephony isn't ready just disconnect */
+-	if (hs->hfp_active && !ag.telephony_ready) {
++	if (hs->hfp_active && !telephony_get_ready_state()) {
+ 		error("Unable to accept HFP connection since the telephony "
+ 				"subsystem isn't initialized");
+ 		goto failed;
+@@ -1397,8 +811,7 @@ void headset_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 	else
+ 		hs->auto_dc = FALSE;
+ 
+-	g_io_add_watch(chan, G_IO_IN | G_IO_ERR | G_IO_HUP| G_IO_NVAL,
+-			(GIOFunc) rfcomm_io_cb, dev);
++	hs->slc = telephony_device_connecting(chan, dev);
+ 
+ 	DBG("%s: Connected to %s", dev->path, hs_address);
+ 
+@@ -1740,7 +1153,7 @@ static DBusMessage *hs_connect(DBusConnection *conn, DBusMessage *msg,
+ 	else if (hs->state > HEADSET_STATE_CONNECTING)
+ 		return btd_error_already_connected(msg);
+ 
+-	if (hs->hfp_handle && !ag.telephony_ready)
++	if (hs->hfp_handle && !telephony_get_ready_state())
+ 		return btd_error_not_ready(msg);
+ 
+ 	device->auto_connect = FALSE;
+@@ -2245,7 +1658,7 @@ uint32_t headset_config_init(GKeyFile *config)
+ 
+ 	/* Use the default values if there is no config file */
+ 	if (config == NULL)
+-		return ag.features;
++		return telephony_get_ag_features();
+ 
+ 	str = g_key_file_get_string(config, "General", "SCORouting",
+ 					&err);
+@@ -2275,7 +1688,7 @@ uint32_t headset_config_init(GKeyFile *config)
+ 		g_free(str);
+ 	}
+ 
+-	return ag.features;
++	return telephony_get_ag_features();
+ }
+ 
+ static gboolean hs_dc_timeout(struct audio_device *dev)
+@@ -2518,6 +1931,10 @@ void headset_set_state(struct audio_device *dev, headset_state_t state)
+ 	case HEADSET_STATE_DISCONNECTED:
+ 		value = FALSE;
+ 		close_sco(dev);
++
++		if (dev->headset->slc)
++			telephony_device_disconnect(dev->headset->slc);
++
+ 		headset_close_rfcomm(dev);
+ 		emit_property_changed(dev->conn, dev->path,
+ 					AUDIO_HEADSET_INTERFACE, "State",
+@@ -2546,7 +1963,8 @@ void headset_set_state(struct audio_device *dev, headset_state_t state)
+ 					AUDIO_HEADSET_INTERFACE, "State",
+ 					DBUS_TYPE_STRING, &state_str);
+ 		if (hs->state < state) {
+-			if (ag.features & AG_FEATURE_INBAND_RINGTONE)
++			if (telephony_get_ag_features() &
++					AG_FEATURE_INBAND_RINGTONE)
+ 				slc->inband_ring = TRUE;
+ 			else
+ 				slc->inband_ring = FALSE;
+@@ -2880,15 +2298,13 @@ int telephony_ready_ind(uint32_t features,
+ 			const struct indicator *indicators, int rh,
+ 			const char *chld)
+ {
+-	ag.telephony_ready = TRUE;
+-	ag.features = features;
+ 	ag.indicators = indicators;
+ 	ag.rh = rh;
+ 	ag.chld = chld;
+ 
+ 	DBG("Telephony plugin initialized");
+ 
+-	print_ag_features(ag.features);
++	print_ag_features(telephony_get_ag_features());
+ 
+ 	return 0;
+ }
+diff --git a/audio/headset.h b/audio/headset.h
+index 99eeca8..d43952f 100644
+--- a/audio/headset.h
++++ b/audio/headset.h
+@@ -111,3 +111,5 @@ gboolean headset_unlock(struct audio_device *dev, headset_lock_t lock);
+ gboolean headset_suspend(struct audio_device *dev, void *data);
+ gboolean headset_play(struct audio_device *dev, void *data);
+ void headset_shutdown(struct audio_device *dev);
++
++void headset_slc_complete(struct audio_device *dev);
+diff --git a/audio/manager.c b/audio/manager.c
+index 8de5515..4624552 100644
+--- a/audio/manager.c
++++ b/audio/manager.c
+@@ -880,7 +880,7 @@ static void state_changed(struct btd_adapter *adapter, gboolean powered)
+ 		/* telephony driver already initialized*/
+ 		if (telephony == TRUE)
+ 			return;
+-		telephony_init();
++		telephony_init(adapter);
+ 		telephony = TRUE;
+ 		return;
+ 	}
+@@ -896,7 +896,7 @@ static void state_changed(struct btd_adapter *adapter, gboolean powered)
+ 			return;
+ 	}
+ 
+-	telephony_exit();
++	telephony_exit(adapter);
+ 	telephony = FALSE;
+ }
+ 
+diff --git a/audio/telephony.c b/audio/telephony.c
+new file mode 100644
+index 0000000..4aa3892
+--- /dev/null
++++ b/audio/telephony.c
+@@ -0,0 +1,529 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011  Intel Corporation
++ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2011  Frederic Danis <frederic.danis@intel.com>
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdlib.h>
++
++#include <dbus/dbus.h>
++#include <gdbus.h>
++
++#include <bluetooth/bluetooth.h>
++#include <bluetooth/sdp.h>
++#include <bluetooth/sdp_lib.h>
++
++#include "btio.h"
++#include "log.h"
++#include "device.h"
++#include "error.h"
++#include "glib-helper.h"
++#include "sdp-client.h"
++#include "headset.h"
++#include "telephony.h"
++#include "dbus-common.h"
++#include "../src/adapter.h"
++#include "../src/device.h"
++
++#define AUDIO_TELEPHONY_INTERFACE "org.bluez.Telephony"
++
++#define DEFAULT_HS_HS_CHANNEL 6
++#define DEFAULT_HF_HS_CHANNEL 7
++
++struct telsrv {
++	GSList *servers;	/* server list */
++};
++
++struct tel_device {
++	struct tel_agent	*agent;
++	struct audio_device	*au_dev;
++	GIOChannel		*rfcomm;
++	uint16_t		version;
++	uint16_t		features;
++};
++
++struct default_agent {
++	char			*uuid;		/* agent property UUID */
++	uint8_t			channel;
++	const char		*r_uuid;
++	uint16_t		r_class;
++	uint16_t		r_profile;
++};
++
++struct tel_agent {
++	char			*name;		/* agent DBus bus id */
++	char			*path;		/* agent object path */
++	uint16_t		version;
++	uint16_t		features;
++	struct default_agent	*properties;
++};
++
++static DBusConnection *connection = NULL;
++
++struct telsrv telsrv;
++
++static void free_agent(struct tel_agent *agent)
++{
++	if (agent->name)
++		g_free(agent->name);
++
++	if (agent->path)
++		g_free(agent->path);
++
++	g_free(agent);
++}
++
++static struct tel_agent *find_agent(const char *sender, const char *path,
++						const char *uuid)
++{
++	GSList *l;
++
++	for (l = telsrv.servers; l; l = l->next) {
++		struct tel_agent *agent = l->data;
++
++		if (sender && g_strcmp0(agent->name, sender) != 0)
++			continue;
++
++		if (path && g_strcmp0(agent->path, path) != 0)
++			continue;
++
++		if (uuid && g_strcmp0(agent->properties->uuid, uuid) != 0)
++			continue;
++
++		return agent;
++	}
++
++	return NULL;
++}
++
++static int parse_properties(DBusMessageIter *props, const char **uuid,
++				uint16_t *version, uint16_t *features)
++{
++	gboolean has_uuid = FALSE;
++
++	while (dbus_message_iter_get_arg_type(props) == DBUS_TYPE_DICT_ENTRY) {
++		const char *key;
++		DBusMessageIter value, entry;
++		int var;
++
++		dbus_message_iter_recurse(props, &entry);
++		dbus_message_iter_get_basic(&entry, &key);
++
++		dbus_message_iter_next(&entry);
++		dbus_message_iter_recurse(&entry, &value);
++
++		var = dbus_message_iter_get_arg_type(&value);
++		if (strcasecmp(key, "UUID") == 0) {
++			if (var != DBUS_TYPE_STRING)
++				return -EINVAL;
++			dbus_message_iter_get_basic(&value, uuid);
++			has_uuid = TRUE;
++		} else if (strcasecmp(key, "Version") == 0) {
++			if (var != DBUS_TYPE_UINT16)
++				return -EINVAL;
++			dbus_message_iter_get_basic(&value, version);
++		} else if (strcasecmp(key, "Features") == 0) {
++			if (var != DBUS_TYPE_UINT16)
++				return -EINVAL;
++			dbus_message_iter_get_basic(&value, features);
++		}
++
++		dbus_message_iter_next(props);
++	}
++
++	return (has_uuid) ? 0 : -EINVAL;
++}
++
++static int dev_close(struct tel_device *dev)
++{
++	int sock;
++
++	if (dev->rfcomm) {
++		sock = g_io_channel_unix_get_fd(dev->rfcomm);
++		shutdown(sock, SHUT_RDWR);
++	}
++
++	return 0;
++}
++
++static gboolean agent_sendfd(struct tel_device *dev, int fd,
++				DBusPendingCallNotifyFunction notify)
++{
++	struct tel_agent *agent = dev->agent;
++	DBusMessage *msg;
++	DBusMessageIter iter, dict;
++	char *str;
++	DBusPendingCall *call;
++
++	msg = dbus_message_new_method_call(agent->name, agent->path,
++			"org.bluez.TelephonyAgent", "NewConnection");
++
++	dbus_message_iter_init_append(msg, &iter);
++
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_UNIX_FD, &fd);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	str = g_strdup(agent->properties->uuid);
++	dict_append_entry(&dict, "UUID", DBUS_TYPE_STRING, &str);
++	g_free(str);
++
++	dict_append_entry(&dict, "Version", DBUS_TYPE_UINT16, &dev->version);
++
++	if (dev->features != 0xFFFF)
++		dict_append_entry(&dict, "Features", DBUS_TYPE_UINT16,
++							&dev->features);
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	if (dbus_connection_send_with_reply(connection, msg, &call, -1) == FALSE)
++		return FALSE;
++
++	dbus_pending_call_set_notify(call, notify, dev, NULL);
++	dbus_pending_call_unref(call);
++	dbus_message_unref(msg);
++
++	return TRUE;
++}
++
++static gboolean agent_disconnect_cb(GIOChannel *chan, GIOCondition cond,
++						struct tel_device *dev)
++{
++	if (cond & G_IO_NVAL)
++		return FALSE;
++
++	headset_set_state(dev->au_dev, HEADSET_STATE_DISCONNECTED);
++
++	return FALSE;
++}
++
++static void newconnection_reply(DBusPendingCall *call, void *user_data)
++{
++	struct tel_device *dev = user_data;
++	DBusMessage *reply = dbus_pending_call_steal_reply(call);
++	DBusError derr;
++
++	if (!dev->rfcomm) {
++		DBG("RFCOMM disconnected from server before agent reply");
++		goto done;
++	}
++
++	dbus_error_init(&derr);
++	if (!dbus_set_error_from_message(&derr, reply)) {
++		DBG("Agent reply: file descriptor passed successfully");
++		g_io_add_watch(dev->rfcomm, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++					(GIOFunc) agent_disconnect_cb, dev);
++		headset_slc_complete(dev->au_dev);
++		goto done;
++	}
++
++	DBG("Agent reply: %s", derr.message);
++
++	dbus_error_free(&derr);
++	dev_close(dev);
++	headset_set_state(dev->au_dev, HEADSET_STATE_DISCONNECTED);
++
++done:
++	dbus_message_unref(reply);
++}
++
++static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
++{
++	struct tel_device *dev = user_data;
++	sdp_data_t *sdpdata;
++	uuid_t uuid;
++	sdp_list_t *profiles;
++	sdp_profile_desc_t *desc;
++	int sk, ret;
++
++	if (err < 0) {
++		error("Unable to get service record: %s (%d)", strerror(-err),
++					-err);
++		goto failed;
++	}
++
++	if (!recs || !recs->data) {
++		error("No records found");
++		goto failed;
++	}
++
++	sdpdata = sdp_data_get(recs->data, SDP_ATTR_SUPPORTED_FEATURES);
++	if (sdpdata && sdpdata->dtd == SDP_UINT16)
++		dev->features = sdpdata->val.uint16;
++
++	sdp_uuid16_create(&uuid, dev->agent->properties->r_profile);
++
++	sdp_get_profile_descs(recs->data, &profiles);
++	if (profiles == NULL)
++		goto failed;
++
++	desc = profiles->data;
++
++	if (sdp_uuid16_cmp(&desc->uuid, &uuid) == 0)
++		dev->version = desc->version;
++
++	sdp_list_free(profiles, free);
++
++	sk = g_io_channel_unix_get_fd(dev->rfcomm);
++
++	ret = agent_sendfd(dev, sk, newconnection_reply);
++
++	return;
++
++failed:
++	headset_set_state(dev->au_dev, HEADSET_STATE_DISCONNECTED);
++}
++
++void *telephony_device_connecting(GIOChannel *io, void *telephony_device)
++{
++	struct audio_device *device = telephony_device;
++	struct tel_device *dev;
++	const char *agent_uuid;
++	struct tel_agent *agent;
++	uuid_t uuid;
++	int err;
++
++	/*TODO: check for HS roles */
++	if (headset_get_hfp_active(device))
++		agent_uuid = HFP_AG_UUID;
++	else
++		agent_uuid = HSP_AG_UUID;
++
++	agent = find_agent(NULL, NULL, agent_uuid);
++	if (agent == NULL) {
++		error("No agent registered for %s", agent_uuid);
++		return NULL;
++	}
++
++	dev = g_new0(struct tel_device, 1);
++	dev->agent = agent;
++	dev->au_dev = telephony_device;
++	dev->rfcomm = io;
++	dev->features = 0xFFFF;
++
++	sdp_uuid16_create(&uuid, agent->properties->r_class);
++
++	err = bt_search_service(&device->src, &device->dst, &uuid,
++						get_record_cb, dev, NULL);
++	if (err < 0) {
++		g_free(dev);
++		return NULL;
++	}
++
++	return dev;
++}
++
++void telephony_device_connected(void *telephony_device)
++{
++	DBG("telephony-dbus: device %p connected", telephony_device);
++}
++
++void telephony_device_disconnect(void *slc)
++{
++	struct tel_device *dev = slc;
++
++	dev_close(dev);
++}
++
++void telephony_device_disconnected(void *telephony_device)
++{
++	DBG("telephony-dbus: device %p disconnected", telephony_device);
++}
++
++gboolean telephony_get_ready_state(void)
++{
++	return find_agent(NULL, NULL, HFP_AG_UUID) ? TRUE : FALSE;
++}
++
++uint32_t telephony_get_ag_features(void)
++{
++	return 0;
++}
++
++static struct default_agent default_properties[] = {
++	{HSP_HS_UUID,
++		DEFAULT_HS_HS_CHANNEL,
++		HSP_AG_UUID,
++		HEADSET_AGW_SVCLASS_ID,
++		HEADSET_PROFILE_ID},
++	{HSP_AG_UUID,
++		DEFAULT_HS_AG_CHANNEL,
++		HSP_HS_UUID,
++		HEADSET_SVCLASS_ID,
++		HEADSET_PROFILE_ID},
++	{HFP_HS_UUID,
++		DEFAULT_HF_HS_CHANNEL,
++		HFP_AG_UUID,
++		HANDSFREE_AGW_SVCLASS_ID,
++		HANDSFREE_PROFILE_ID},
++	{HFP_AG_UUID,
++		DEFAULT_HF_AG_CHANNEL,
++		HFP_HS_UUID,
++		HANDSFREE_SVCLASS_ID,
++		HANDSFREE_PROFILE_ID}
++};
++
++static DBusMessage *register_agent(DBusConnection *conn,
++					DBusMessage *msg, void *data)
++{
++	DBusMessageIter args, props;
++	const char *sender, *path, *uuid;
++	uint16_t version = 0;
++	uint16_t features = 0xFFFF;
++	struct tel_agent *agent;
++	int i;
++
++	sender = dbus_message_get_sender(msg);
++
++	dbus_message_iter_init(msg, &args);
++
++	dbus_message_iter_get_basic(&args, &path);
++	dbus_message_iter_next(&args);
++
++	if (find_agent(sender, path, NULL) != NULL)
++		return btd_error_already_exists(msg);
++
++	dbus_message_iter_recurse(&args, &props);
++	if (dbus_message_iter_get_arg_type(&props) != DBUS_TYPE_DICT_ENTRY)
++		return btd_error_invalid_args(msg);
++
++	if (parse_properties(&props, &uuid, &version, &features) < 0)
++		return btd_error_invalid_args(msg);
++
++	if (find_agent(NULL, NULL, uuid) != NULL)
++		return btd_error_already_exists(msg);
++
++	/* initialize agent properties */
++	for (i=0 ; i<4; i++) {
++		if (strcasecmp(uuid, default_properties[i].uuid) == 0) {
++			agent = g_new0(struct tel_agent, 1);
++			agent->properties = &default_properties[i];
++			agent->name = g_strdup(sender);
++			agent->path = g_strdup(path);
++			agent->version = version;
++			agent->features = features;
++			break;
++		}
++	}
++
++	if (i == 4)
++		return btd_error_invalid_args(msg);
++
++	DBG("Register agent : %s%s for %s version 0x%04X with features 0x%02X",
++					sender, path, uuid, version, features);
++
++	telsrv.servers = g_slist_append(telsrv.servers, agent);
++
++	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++}
++
++static DBusMessage *unregister_agent(DBusConnection *conn,
++				DBusMessage *msg, void *data)
++{
++	const char *sender, *path;
++	struct tel_agent *agent;
++
++	if (!dbus_message_get_args(msg, NULL,
++				DBUS_TYPE_OBJECT_PATH, &path,
++				DBUS_TYPE_INVALID))
++		return NULL;
++
++	sender = dbus_message_get_sender(msg);
++
++	agent = find_agent(sender, path, NULL);
++	if (agent == NULL)
++		return btd_error_does_not_exist(msg);
++
++	telsrv.servers = g_slist_remove(telsrv.servers, agent);
++
++	DBG("Unregister agent : %s%s", sender, path);
++
++	free_agent(agent);
++
++	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++}
++
++static GDBusMethodTable telsrv_methods[] = {
++	{ "RegisterAgent", "oa{sv}", "", register_agent },
++	{ "UnregisterAgent", "o", "", unregister_agent },
++	{ NULL, NULL, NULL, NULL }
++};
++
++static void path_unregister(void *data)
++{
++	DBG("Unregistered interface %s", AUDIO_TELEPHONY_INTERFACE);
++}
++
++static int register_interface(void *adapter)
++{
++	const char *path;
++
++	if (DBUS_TYPE_UNIX_FD < 0)
++		return -1;
++
++	path = adapter_get_path(adapter);
++
++	if (!g_dbus_register_interface(connection, path,
++					AUDIO_TELEPHONY_INTERFACE,
++					telsrv_methods, NULL,
++					NULL, adapter, path_unregister)) {
++		error("D-Bus failed to register %s interface",
++				AUDIO_TELEPHONY_INTERFACE);
++		return -1;
++	}
++
++	DBG("Registered interface %s", AUDIO_TELEPHONY_INTERFACE);
++
++	return 0;
++}
++
++static void unregister_interface(void *adapter)
++{
++	g_dbus_unregister_interface(connection, adapter_get_path(adapter),
++			AUDIO_TELEPHONY_INTERFACE);
++}
++
++int telephony_init(void *adapter)
++{
++	DBG("");
++
++	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
++
++	return register_interface(adapter);
++}
++
++void telephony_exit(void *adapter)
++{
++	DBG("");
++
++	unregister_interface(adapter);
++
++	dbus_connection_unref(connection);
++	connection = NULL;
++}
+diff --git a/audio/telephony.h b/audio/telephony.h
+index 73b390c..7d1d337 100644
+--- a/audio/telephony.h
++++ b/audio/telephony.h
+@@ -144,26 +144,13 @@ struct indicator {
+ /* Notify telephony-*.c of connected/disconnected devices. Implemented by
+  * telephony-*.c
+  */
++void *telephony_device_connecting(GIOChannel *io, void *telephony_device);
+ void telephony_device_connected(void *telephony_device);
++void telephony_device_disconnect(void *slc);
+ void telephony_device_disconnected(void *telephony_device);
+ 
+-/* HF requests (sent by the handsfree device). These are implemented by
+- * telephony-*.c
+- */
+-void telephony_event_reporting_req(void *telephony_device, int ind);
+-void telephony_response_and_hold_req(void *telephony_device, int rh);
+-void telephony_last_dialed_number_req(void *telephony_device);
+-void telephony_terminate_call_req(void *telephony_device);
+-void telephony_answer_call_req(void *telephony_device);
+-void telephony_dial_number_req(void *telephony_device, const char *number);
+-void telephony_transmit_dtmf_req(void *telephony_device, char tone);
+-void telephony_subscriber_number_req(void *telephony_device);
+-void telephony_list_current_calls_req(void *telephony_device);
+-void telephony_operator_selection_req(void *telephony_device);
+-void telephony_call_hold_req(void *telephony_device, const char *cmd);
+-void telephony_nr_and_ec_req(void *telephony_device, gboolean enable);
+-void telephony_voice_dial_req(void *telephony_device, gboolean enable);
+-void telephony_key_press_req(void *telephony_device, const char *keys);
++gboolean telephony_get_ready_state(void);
++uint32_t telephony_get_ag_features(void);
+ 
+ /* AG responses to HF requests. These are implemented by headset.c */
+ int telephony_event_reporting_rsp(void *telephony_device, cme_error_t err);
+@@ -240,5 +227,5 @@ static inline int telephony_get_indicator(const struct indicator *indicators,
+ 	return -ENOENT;
+ }
+ 
+-int telephony_init(void);
+-void telephony_exit(void);
++int telephony_init(void *adapter);
++void telephony_exit(void *adapter);
+diff --git a/doc/assigned-numbers.txt b/doc/assigned-numbers.txt
+index cda934c..120d7ea 100644
+--- a/doc/assigned-numbers.txt
++++ b/doc/assigned-numbers.txt
+@@ -8,6 +8,7 @@ avoid conflicts.
+ Profile		Channel
+ -----------------------
+ DUN		1
++HSP HS		6
+ HFP HF		7
+ OPP		9
+ FTP		10
+diff --git a/doc/audio-api.txt b/doc/audio-api.txt
+index b85400b..73d87cc 100644
+--- a/doc/audio-api.txt
++++ b/doc/audio-api.txt
+@@ -456,3 +456,94 @@ properties	boolean Connected [readonly]
+ 		uint16 MicrophoneGain  [readonly]
+ 
+ 			The speaker gain when available.
++
++
++Telephony hierarchy [experiemental]
++===================
++
++Service		org.bluez
++Interface	org.bluez.Telephony
++Object path	[variable prefix]/{hci0,hci1,...}
++
++Methods		void RegisterAgent(object path, dict properties)
++
++			Register a TelephonyAgent to sender, the sender can
++			register as many agents as it likes.
++
++			Note: If the sender disconnects its agents are
++			automatically unregistered.
++
++			possible properties:
++
++				string UUID:
++
++					UUID of the profile which the agent is
++					for.
++
++				uint16 Version:
++
++					Version of the profile which the agent
++					implements.
++
++				uint16 Features:
++
++					Agent supported features as defined in
++					profile spec e.g. HFP.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++
++		void UnregisterAgent(object path)
++
++			Unregister sender agent.
++
++TelephonyAgent hierarchy
++========================
++
++Service		unique name
++Interface	org.bluez.TelephonyAgent
++Object path	freely definable
++
++Methods		void NewConnection(filedescriptor fd, dict properties)
++
++			This method gets called whenever a new connection
++			has been established. This method assumes that DBus
++			daemon with file descriptor passing capability is
++			being used.
++
++			The agent should only return successfully once the
++			establishment of the service level connection (SLC)
++			has been completed.  In the case of Handsfree this
++			means that BRSF exchange has been performed and
++			necessary initialization has been done.
++
++			possible properties:
++
++				strict Device:
++
++					BlueZ remote device object.
++
++				string UUID:
++
++					Profile UUID of the connection.
++
++				uint16 Version:
++
++					Remote profile version.
++
++				uint16 Features:
++
++					Remote profile features.
++
++				string MediaTransportPath:
++
++					Optional. MediaTransport object path.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.Failed
++
++		void Release()
++
++			This method gets called whenever the service daemon
++			unregisters the agent or whenever the Adapter where
++			the TelephonyAgent registers itself is removed.
 -- 
 1.7.1
 
