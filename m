@@ -1,60 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 4/8] Bluetooth: Initialize default flow control mode
-Date: Thu,  1 Dec 2011 14:42:11 +0200
-Message-Id: <1322743335-8671-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1322743335-8671-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1322743335-8671-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 0/8] AMP/BREDR initialization patches
+Date: Thu,  1 Dec 2011 14:42:07 +0200
+Message-Id: <1322743335-8671-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci.h |    4 ++++
- net/bluetooth/hci_core.c    |    4 ++++
- 2 files changed, 8 insertions(+), 0 deletions(-)
+Changes:
+	v2: added helper function for block calculation, added patches for
+	checking BREDR when going to Sniff mode and complete Read Local Version
+	HCI command.
+	v1: Changed HCI_<block,packet>_FLOW_CTL_MODE => HCI_FLOW_CTL_MODE_<block,packet>
+	RFCv1: Initial version
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 453e7fc..a6a2509 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -271,6 +271,10 @@ enum {
- #define HCI_ERROR_LOCAL_HOST_TERM	0x16
- #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
- 
-+/* Flow control modes */
-+#define HCI_FLOW_CTL_MODE_PACKET_BASED	0x00
-+#define HCI_FLOW_CTL_MODE_BLOCK_BASED	0x01
-+
- /* -----  HCI Commands ---- */
- #define HCI_OP_NOP			0x0000
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a0247d3..4a0391e 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -198,6 +198,8 @@ static void bredr_init(struct hci_dev *hdev)
- 	__le16 param;
- 	__u8 flt_type;
- 
-+	hdev->flow_ctl_mode = HCI_FLOW_CTL_MODE_PACKET_BASED;
-+
- 	/* Mandatory initialization */
- 
- 	/* Reset */
-@@ -244,6 +246,8 @@ static void bredr_init(struct hci_dev *hdev)
- 
- static void amp_init(struct hci_dev *hdev)
- {
-+	hdev->flow_ctl_mode = HCI_FLOW_CTL_MODE_BLOCK_BASED;
-+
- 	/* Reset */
- 	hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
- 
+AMP initialization and block flow control code.
+
+Resubmit "remove old code" patch as it seems that there is little
+sense to copy it over.
+
+Andrei Emeltchenko (8):
+  Bluetooth: remove old code
+  Bluetooth: Split ctrl init to BREDR and AMP parts
+  Bluetooth: Add HCI Read Flow Control Mode function
+  Bluetooth: Initialize default flow control mode
+  Bluetooth: Add HCI Read Data Block Size function
+  Bluetooth: Recalculate sched for HCI block flow ctrl
+  Bluetooth: Use SNIFF mode only for BREDR controller
+  Bluetooth: Complete Read Local Version HCI cmd
+
+ include/net/bluetooth/hci.h      |   18 ++++++
+ include/net/bluetooth/hci_core.h |    4 +
+ net/bluetooth/hci_conn.c         |    6 ++
+ net/bluetooth/hci_core.c         |  116 +++++++++++++++++++++++++++-----------
+ net/bluetooth/hci_event.c        |   58 +++++++++++++++++++-
+ 5 files changed, 167 insertions(+), 35 deletions(-)
+
 -- 
 1.7.4.1
 
