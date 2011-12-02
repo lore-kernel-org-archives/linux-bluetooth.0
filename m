@@ -1,193 +1,185 @@
 Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH RFC BlueZ 4/5] Add support for sending notifications for current time
-Date: Fri,  2 Dec 2011 14:34:09 -0400
-Message-Id: <1322850850-18019-5-git-send-email-anderson.lizardo@openbossa.org>
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH RFC BlueZ 3/5] Time Profile: Add "timed" time provider
+Date: Fri,  2 Dec 2011 14:34:08 -0400
+Message-Id: <1322850850-18019-4-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1322850850-18019-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1322850850-18019-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+From: Sheldon Demario <sheldon.demario@openbossa.org>
 
-Now, we are able to send notifications when the time gets updated,
-this should occur when, for example, the user changes the system's
-timezone.
+This provider adds support for timed, which is used on Harmattan for
+managing time information.
 ---
- time/server.c |  117 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- time/server.h |    2 +
- 2 files changed, 118 insertions(+), 1 deletions(-)
+ Makefile.am           |    2 +-
+ time/provider-timed.c |  141 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 142 insertions(+), 1 deletions(-)
+ create mode 100644 time/provider-timed.c
 
-diff --git a/time/server.c b/time/server.c
-index 56eecb1..df70d2f 100644
---- a/time/server.c
-+++ b/time/server.c
-@@ -29,10 +29,17 @@
- #include <glib.h>
- #include <time.h>
- #include <errno.h>
-+#include <stdlib.h>
- #include <bluetooth/uuid.h>
+diff --git a/Makefile.am b/Makefile.am
+index ac562b9..089d86f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -346,7 +346,7 @@ EXTRA_DIST += src/genbuiltin src/bluetooth.conf \
+ 			audio/audio.conf audio/telephony-dummy.c \
+ 			audio/telephony-maemo5.c audio/telephony-ofono.c \
+ 			audio/telephony-maemo6.c sap/sap-dummy.c sap/sap-u8500.c \
+-			time/provider-dummy.c \
++			time/provider-dummy.c time/provider-timed.c \
+ 			proximity/proximity.conf
  
-+#include "adapter.h"
-+#include "manager.h"
+ if ALSA
+diff --git a/time/provider-timed.c b/time/provider-timed.c
+new file mode 100644
+index 0000000..62774e1
+--- /dev/null
++++ b/time/provider-timed.c
+@@ -0,0 +1,141 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011  Nokia Corporation
++ *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
- #include "att.h"
- #include "gattrib.h"
-+#include "attio.h"
-+#include "textfile.h"
-+#include "storage.h"
- #include "attrib-server.h"
- #include "gatt-service.h"
- #include "log.h"
-@@ -46,6 +53,21 @@
- #define TIME_UPDATE_STAT_CHR_UUID	0x2A17
- #define CT_TIME_CHR_UUID		0x2A2B
- 
-+struct adapter_ccc {
-+	struct btd_adapter *adapter;
-+	uint16_t handle;
-+};
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
 +
-+struct notify_callback {
-+	struct btd_device *device;
-+	guint id;
-+};
++#include <glib.h>
++#include <time.h>
++#include <errno.h>
++#include <bluetooth/uuid.h>
++#include <bluetooth/sdp.h>
++#include <dbus/dbus.h>
++#include <gdbus.h>
 +
-+static GSList *devices_notify;
++#include "log.h"
++#include "server.h"
++#include "glib-helper.h"
 +
-+static uint16_t current_time_ccc_handle;
-+static uint16_t current_time_value_handle;
++static guint watch = 0;
++static DBusConnection *connection = NULL;
++static gboolean source_online = FALSE;
++static uint8_t update_state = UPDATE_STATE_IDLE;
++static uint8_t update_result = UPDATE_RESULT_NOT_ATTEMPTED;
 +
- static int encode_current_time(uint8_t value[10])
- {
- 	struct timespec tp;
-@@ -92,6 +114,94 @@ static uint8_t current_time_read(struct attribute *a, gpointer user_data)
- 	return 0;
- }
- 
-+static void filter_devices_notify(char *key, char *value, void *user_data)
++uint8_t time_provider_control(int op)
 +{
-+	struct adapter_ccc *ccc = user_data;
-+	struct btd_adapter *adapter = ccc->adapter;
-+	struct btd_device *device;
-+	char addr[18];
-+	uint16_t handle, ccc_val;
++	switch (op) {
++	case GET_REFERENCE_UPDATE:
++		/* Usually we should check for UPDATE_STATE_PENDING here, but
++		 * on Harmattan reference time updates are passive (through
++		 * cellular network). */
 +
-+	sscanf(key, "%17s#%04hX", addr, &handle);
++		update_state = UPDATE_STATE_IDLE;
++		if (!source_online)
++			update_result = UPDATE_RESULT_NO_CONN;
++		else
++			update_result = UPDATE_RESULT_SUCCESSFUL;
 +
-+	if (ccc->handle != handle)
-+		return;
-+
-+	ccc_val = strtol(value, NULL, 16);
-+	if (!(ccc_val & 0x0001))
-+		return;
-+
-+	device = adapter_find_device(adapter, addr);
-+	if (device == NULL)
-+		return;
-+
-+	if (g_slist_find(devices_notify, device))
-+		return;
-+
-+	devices_notify = g_slist_append(devices_notify, device);
-+}
-+
-+static GSList *devices_to_notify(struct btd_adapter *adapter, uint16_t ccc_hnd)
-+{
-+	struct adapter_ccc ccc_list = { adapter, ccc_hnd };
-+	char filename[PATH_MAX + 1];
-+	char srcaddr[18];
-+	bdaddr_t src;
-+
-+	adapter_get_address(adapter, &src);
-+	ba2str(&src, srcaddr);
-+
-+	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "ccc");
-+
-+	textfile_foreach(filename, filter_devices_notify, &ccc_list);
-+
-+	return devices_notify;
-+}
-+
-+static void send_notification(GAttrib *attrib, gpointer user_data)
-+{
-+	struct notify_callback *callback = user_data;
-+	uint8_t value[10], pdu[ATT_MAX_MTU];
-+	int err, len;
-+
-+	err = encode_current_time(value);
-+	if (err)
-+		goto done;
-+
-+	len = enc_notification(current_time_value_handle, value, sizeof(value),
-+							pdu, sizeof(pdu));
-+	g_attrib_send(attrib, 0, ATT_OP_HANDLE_NOTIFY, pdu, len,
-+							NULL, NULL, NULL);
-+
-+done:
-+	btd_device_remove_attio_callback(callback->device, callback->id);
-+	devices_notify = g_slist_remove(devices_notify, callback->device);
-+	g_free(callback);
-+}
-+
-+void current_time_updated(void)
-+{
-+	struct btd_adapter *adapter;
-+	GSList *devices, *l;
-+
-+	adapter = manager_get_default_adapter();
-+	if (adapter == NULL)
-+		return;
-+
-+	devices = devices_to_notify(adapter, current_time_ccc_handle);
-+
-+	for (l = devices; l; l = l->next) {
-+		struct btd_device *device = l->data;
-+		struct notify_callback *callback;
-+
-+		callback = g_new0(struct notify_callback, 1);
-+		callback->device = device;
-+
-+		callback->id = btd_device_add_attio_callback(device,
-+					send_notification, NULL, callback);
++		break;
++	case CANCEL_REFERENCE_UPDATE:
++		update_state = UPDATE_STATE_IDLE;
++		update_result = UPDATE_RESULT_CANCELED;
++		break;
++	default:
++		DBG("Invalid control point value: 0x%02x", op);
 +	}
++
++	return 0;
 +}
 +
- static uint8_t local_time_info_read(struct attribute *a, gpointer user_data)
- {
- 	uint8_t value[2];
-@@ -123,7 +233,10 @@ static void register_current_time_service(void)
- 							ATT_CHAR_PROPER_NOTIFY,
- 				GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
- 							current_time_read,
--
-+				GATT_OPT_CCC_GET_HANDLE,
-+						&current_time_ccc_handle,
-+				GATT_OPT_CHR_VALUE_GET_HANDLE,
-+						&current_time_value_handle,
- 				/* Local Time Information characteristic */
- 				GATT_OPT_CHR_UUID, LOCAL_TIME_INFO_CHR_UUID,
- 				GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ,
-@@ -193,4 +306,6 @@ int time_server_init(void)
- void time_server_exit(void)
- {
- 	time_provider_exit();
++void time_provider_status(uint8_t *state, uint8_t *result)
++{
++	*state = update_state;
++	*result = update_result;
++}
 +
-+	g_slist_free(devices_notify);
- }
-diff --git a/time/server.h b/time/server.h
-index 0e1f858..91be6e8 100644
---- a/time/server.h
-+++ b/time/server.h
-@@ -51,3 +51,5 @@ void time_provider_exit(void);
- /* Time provider control and status routines. Implemented by provider-*.c */
- void time_provider_status(uint8_t *state, uint8_t *result);
- uint8_t time_provider_control(int op);
++static gboolean settings_changed(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	DBusMessageIter iter, res;
 +
-+void current_time_updated(void);
++	DBG("");
++
++	update_state = UPDATE_STATE_IDLE;
++
++	dbus_message_iter_init(msg, &iter);
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRUCT) {
++		DBG("Unexpected signature");
++		update_result = UPDATE_RESULT_ERROR;
++
++		return TRUE;
++	}
++
++	dbus_message_iter_recurse(&iter, &res);
++	if (dbus_message_iter_get_arg_type(&res) != DBUS_TYPE_BOOLEAN) {
++		DBG("Unexpected signature");
++		update_result = UPDATE_RESULT_ERROR;
++
++		return TRUE;
++	}
++
++	dbus_message_iter_get_basic(&res, &source_online);
++	if (!source_online) {
++		DBG("No connection to reference time");
++		update_result = UPDATE_RESULT_NO_CONN;
++	} else
++		update_result = UPDATE_RESULT_SUCCESSFUL;
++
++	return TRUE;
++}
++
++int time_provider_init(void)
++{
++	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
++
++	watch = g_dbus_add_signal_watch(connection, "com.nokia.time",
++							"/com/nokia/time",
++							"com.nokia.time",
++							"settings_changed",
++							settings_changed,
++							NULL, NULL);
++
++	if (watch == 0) {
++		dbus_connection_unref(connection);
++		return -ENOMEM;
++	}
++
++	return 0;
++}
++
++void time_provider_exit(void)
++{
++	g_dbus_remove_watch(connection, watch);
++	watch = 0;
++
++	dbus_connection_unref(connection);
++	connection = NULL;
++}
 -- 
 1.7.0.4
 
