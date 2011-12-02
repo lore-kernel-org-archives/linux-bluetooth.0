@@ -1,30 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Dec 2011 20:22:25 +0900
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 2 Dec 2011 13:18:27 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Correct version check in hci_setup
-Message-ID: <20111202112225.GB2570@joana>
-References: <1322040215-640-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH 2/3] Remove unwanted GError* assignment to NULL
+Message-ID: <20111202111827.GB15891@x220.ger.corp.intel.com>
+References: <1322144076-1913-1-git-send-email-s.syam@samsung.com>
+ <1322144076-1913-2-git-send-email-s.syam@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322040215-640-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1322144076-1913-2-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Syam,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-23 11:23:34 +0200]:
-
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Check for hci_ver instead of lmp_ver
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Thu, Nov 24, 2011, Syam Sidhardhan wrote:
 > ---
->  net/bluetooth/hci_event.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  health/hdp.c |    1 -
+>  1 files changed, 0 insertions(+), 1 deletions(-)
+> 
+> diff --git a/health/hdp.c b/health/hdp.c
+> index d167ab0..403d4c8 100644
+> --- a/health/hdp.c
+> +++ b/health/hdp.c
+> @@ -551,7 +551,6 @@ static void hdp_get_dcpsm_cb(uint16_t dcpsm, gpointer user_data, GError *err)
+>  	hdp_tmp_dc_data_unref(hdp_conn);
+>  	hdp_conn->cb(hdp_chann->mdl, err, hdp_conn);
+>  	g_error_free(gerr);
+> -	gerr = NULL;
+>  }
 
-Applied to the bluetooth current tree. Thanks.
+Applied, however a bigger question is whether gerr is even needed in
+this function at all since it's never used after potentially being set.
 
-	Gustavo
+Johan
