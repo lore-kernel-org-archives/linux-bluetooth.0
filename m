@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CACLukz+aP0O_SXLpmA+EadYTFPHEHg6krjj4aqSkpu55ifdFHg@mail.gmail.com>
-References: <1321973388-16300-1-git-send-email-sancane@gmail.com>
-	<1321973388-16300-2-git-send-email-sancane@gmail.com>
-	<1321973388-16300-3-git-send-email-sancane@gmail.com>
-	<20111202112649.GB17203@x220.ger.corp.intel.com>
-	<CACLukz+aP0O_SXLpmA+EadYTFPHEHg6krjj4aqSkpu55ifdFHg@mail.gmail.com>
-Date: Fri, 2 Dec 2011 11:41:52 -0400
-Message-ID: <CAJdJm_OzQ-Oe9u8+-=VTp+caaGPrnsteq4yQKO-wDxy40ZrQOQ@mail.gmail.com>
-Subject: Re: [PATCH 2/6] Confiure C.C.C descriptor during the thermometer configuration
+In-Reply-To: <CACLukzK1YyqBszGc679Vj-Pf9+M+s+LaBpnd2_+pan8TCwHODA@mail.gmail.com>
+References: <1322129290-10767-1-git-send-email-sancane@gmail.com>
+	<20111202112957.GC17203@x220.ger.corp.intel.com>
+	<CACLukzK1YyqBszGc679Vj-Pf9+M+s+LaBpnd2_+pan8TCwHODA@mail.gmail.com>
+Date: Fri, 2 Dec 2011 11:36:41 -0400
+Message-ID: <CAJdJm_P5OU6vqs+-9xL36=1DWVtgzzY1CEPf6rD3Tws5BSik2g@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Provide return status in gatt_service_add function
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: Santiago Carot <sancane@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -18,26 +16,22 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Santiago,
 
-On Fri, Dec 2, 2011 at 7:52 AM, Santiago Carot <sancane@gmail.com> wrote:
-> These are GATT flags to enable/disable indications/notifications in
-> client characteristic configuration descriptor, I thought about this
-> issue, I haven't seen any macros mapping those values in GATT though.
-> I was thinking in sending a separate patch to deal with this issue but
-> I saw some Claudio's commits to deal with notification/indications so
-> I guess he is already working on it, so I decided no to  interfere and
-> wait to see how he is thinking to deal with this stuff.
+On Fri, Dec 2, 2011 at 7:43 AM, Santiago Carot <sancane@gmail.com> wrote:
+> When I was working in this stuff, I was wondering if there may exist
+> the case when a plugin registers several services and the last one
+> fails, Do you think it would have sense to provide the service ID as
+> return parameter to allow plugins remove their attributes before
+> aborting the loading operation?, On the other hand, this feature would
+> raise the posibility of finding gaps in the distribution of handlers
+> assigned in GATT due that plugins could add and remove services
+> dynamically, I'm not sure if that is expected in GATT.
 
-I think you can create these macros and then begin using it for
-thermometer code (feel free to modify generic GATT code to use them as
-well).
+I think that, before doing anything like this, we should ensure the
+handles allocated for GATT servers do not change after registration
+(i.e. they are kept in storage and reloaded when bluez starts). If
+possible, can you contribute on this regard?
 
-The commit you are referring to is on one of Claudio's development
-branches, right?  That commit will be probably discarded (it is
-incomplete, and was just an idea), so feel free to send your own
-version. Be sure to take into account that these values are bit masks,
-and that maybe we should define all the possible macros for them now.
-
-Regards,
+Thanks,
 -- 
 Anderson Lizardo
 Instituto Nokia de Tecnologia - INdT
