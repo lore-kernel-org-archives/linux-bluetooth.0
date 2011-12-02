@@ -1,34 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Dec 2011 20:50:25 +0900
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv1 2/6] Bluetooth: Split ctrl init to BREDR and AMP parts
-Message-ID: <20111202115025.GD2570@joana>
-References: <1322139125-22377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1322139125-22377-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322139125-22377-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <20111202112957.GC17203@x220.ger.corp.intel.com>
+References: <1322129290-10767-1-git-send-email-sancane@gmail.com>
+	<20111202112957.GC17203@x220.ger.corp.intel.com>
+Date: Fri, 2 Dec 2011 12:43:24 +0100
+Message-ID: <CACLukzK1YyqBszGc679Vj-Pf9+M+s+LaBpnd2_+pan8TCwHODA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Provide return status in gatt_service_add function
+From: Santiago Carot <sancane@gmail.com>
+To: Santiago Carot-Nemesio <sancane@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Johan,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-24 14:52:01 +0200]:
+2011/12/2 Johan Hedberg <johan.hedberg@gmail.com>:
+> Hi Santiago,
+>
+> On Thu, Nov 24, 2011, Santiago Carot-Nemesio wrote:
+>> Service plugins using the new GATT API may need to know if their attributes
+>> were successfuly retgistered. In this way, plugins might abort loading
+>> operation if they weren't registered.
+>> ---
+>>  attrib/gatt-service.c |   15 +++++++++------
+>>  attrib/gatt-service.h |    2 +-
+>>  2 files changed, 10 insertions(+), 7 deletions(-)
+>
+> Both patches applied after fixing typos in your commit messages. Thanks.
+>
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Current controller initialization is moved tp bredr_init and new
-> function added amp_init to handle later AMP init sequence. Current
-> AMP init sequence include Reset and Read Local Version.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/hci_core.c  |   64 ++++++++++++++++++++++++++++++++------------
->  net/bluetooth/hci_event.c |    3 ++
->  2 files changed, 49 insertions(+), 18 deletions(-)
+When I was working in this stuff, I was wondering if there may exist
+the case when a plugin registers several services and the last one
+fails, Do you think it would have sense to provide the service ID as
+return parameter to allow plugins remove their attributes before
+aborting the loading operation?, On the other hand, this feature would
+raise the posibility of finding gaps in the distribution of handlers
+assigned in GATT due that plugins could add and remove services
+dynamically, I'm not sure if that is expected in GATT.
 
-For some reason this patch doesn't apply, please rebase.
-
-	Gustavo
+Waiting comments.
+Regards
