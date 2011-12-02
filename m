@@ -1,116 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 3 Dec 2011 10:38:37 +0900
+Date: Sat, 3 Dec 2011 08:33:23 +0900
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2011-12-03
-Message-ID: <20111203013837.GA2816@joana>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Remove magic numbers from le scan cmd
+Message-ID: <20111202233323.GD13109@joana>
+References: <1322662630-32759-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20111202115910.GE2570@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20111202115910.GE2570@joana>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Andrei,
 
-Another big pull for -next. Some work on LE scanning from Andre Guedes, more
-AMP work from Andrei Emeltchenko. HCI Management Interface improvements from
-Johan Hedberg and Management and SMP work from Brian Gix. The rest are just
-fixes and clean ups.
+* Gustavo Padovan <padovan@profusion.mobi> [2011-12-02 20:59:10 +0900]:
 
-Please pull, or let me know any problems. Thanks.
+> * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-30 16:17:10 +0200]:
+> 
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > Make code readable by removing magic numbers.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  include/net/bluetooth/hci.h |    3 +++
+> >  net/bluetooth/hci_event.c   |   12 ++++++++++--
+> >  2 files changed, 13 insertions(+), 2 deletions(-)
+> 
+> Applied, thanks.
+
+I stepped back with this one to apply Andre's patches. Yours is trivial and
+can wait a bit. Care to resend it?
 
 	Gustavo
-
-The following changes since commit ba5736a5e9ac20c378ae4179e8a0ed3cc4b44351:
-
-  ath9k_hw: add default chainmask for AR9462 (2011-11-30 15:09:02 -0500)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next master
-
-Andre Guedes (4):
-      Bluetooth: Rename mgmt_inquiry_failed()
-      Bluetooth: mgmt_stop_discovery_failed()
-      Bluetooth: Add dev_flags to struct hci_dev
-      Bluetooth: LE Set Scan Parameter Command
-
-Andrei Emeltchenko (10):
-      Bluetooth: Move scope of kernel parameter enable_hs
-      Bluetooth: Do not set HCI_RAW when HS enabled
-      Bluetooth: Allow to set AMP type for virtual HCI
-      Bluetooth: making enable_hs independent from L2CAP
-      Bluetooth: Use queue in the device list
-      Bluetooth: Add HCI Read Flow Control Mode function
-      Bluetooth: remove old code
-      Bluetooth: Correct version check in hci_setup
-      Bluetooth: Remove magic bluetooth version numbers
-      Bluetooth: trivial: correct check for LMP version
-
-Bing Zhao (1):
-      Bluetooth: btmrvl: support Marvell Bluetooth device SD8797
-
-Brian Gix (9):
-      Bluetooth: Add HCI defines for User Passkey entry
-      Bluetooth: Add MGMT opcodes for Passkey Entry
-      Bluetooth: Add MGMT event for Passkey Entry
-      Bluetooth: User Pairing Response restructuring
-      Bluetooth: Differentiate LE User Pairing Responses
-      Bluetooth: Add User Passkey Response handling
-      Bluetooth: Add HCI User Passkey Req Evt handling
-      Bluetooth: Cleanup blkcipher on SMP termination
-      Bluetooth: Centralize SMP pairing failure handling
-
-Cong Wang (1):
-      btusb: fix a memory leak in btusb_send_frame()
-
-David Herrmann (2):
-      Bluetooth: cmtp: Fix module reference
-      Bluetooth: bnep: Fix module reference
-
-Gustavo F. Padovan (5):
-      Bluetooth: Rename l2cap_check_security()
-      Bluetooth: Allow L2CAP to increase the security level
-      Bluetooth: Only set ack_timer if we didn't send and ack
-      Bluetooth: Add user readable debug for state changes
-      Merge branch 'master' of git://git.kernel.org/.../padovan/bluetooth
-
-Johan Hedberg (10):
-      Bluetooth: Add public/random LE address information to mgmt messages
-      Bluetooth: Fix deadlock with mgmt_pair_device
-      Bluetooth: Add proper response to mgmt_remove_keys command
-      Bluetooth: Add status parameter to mgmt_disconnect response
-      Bluetooth: Add address type to mgmt_pair_device
-      Bluetooth: Fix mgmt_pair_device imediate error responses
-      Bluetooth: Return success instead of EALREADY for mgmt commands
-      Bluetooth: Create a unique mgmt error code hierarchy
-      Bluetooth: Add missing cmd_complete for mgmt_load_link_keys
-      Bluetooth: Pass all message parameters to mgmt_start_discovery
-
-Szymon Janc (5):
-      Bluetooth: Fix possible NULL pointer derefence in l2cap code
-      Bluetooth: Simplify l2cap_add_to_srej_queue
-      Bluetooth: Refactor loop in l2cap_retransmit_one_frame
-      Bluetooth: Simplify __l2cap_global_chan_by_addr
-      Bluetooth: Fix some checkpatch.pl errors and warnings
-
- drivers/bluetooth/Kconfig         |    6 +-
- drivers/bluetooth/btmrvl_sdio.c   |   15 +-
- drivers/bluetooth/btusb.c         |    3 +-
- drivers/bluetooth/hci_vhci.c      |    8 +
- include/net/bluetooth/bluetooth.h |    5 +
- include/net/bluetooth/hci.h       |   38 +++
- include/net/bluetooth/hci_core.h  |   28 ++-
- include/net/bluetooth/l2cap.h     |    2 +-
- include/net/bluetooth/mgmt.h      |   49 +++-
- net/bluetooth/bnep/core.c         |    8 +-
- net/bluetooth/cmtp/core.c         |    5 +-
- net/bluetooth/hci_conn.c          |    2 +-
- net/bluetooth/hci_core.c          |   31 +-
- net/bluetooth/hci_event.c         |  152 +++++++--
- net/bluetooth/l2cap_core.c        |  101 ++++--
- net/bluetooth/l2cap_sock.c        |   16 +-
- net/bluetooth/mgmt.c              |  660 ++++++++++++++++++++++++++++---------
- net/bluetooth/smp.c               |   32 ++-
- 18 files changed, 880 insertions(+), 281 deletions(-)
-
