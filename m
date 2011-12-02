@@ -1,27 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Dec 2011 13:23:42 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>
+Date: Fri, 2 Dec 2011 20:22:25 +0900
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/4] Add basic support for MAP client in obex-client
-Message-ID: <20111202112342.GA17203@x220.ger.corp.intel.com>
-References: <1321973198-23091-1-git-send-email-bulislaw@linux.com>
+Subject: Re: [PATCH 1/2] Bluetooth: Correct version check in hci_setup
+Message-ID: <20111202112225.GB2570@joana>
+References: <1322040215-640-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321973198-23091-1-git-send-email-bulislaw@linux.com>
+In-Reply-To: <1322040215-640-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bartosz,
+Hi Andrei,
 
-On Tue, Nov 22, 2011, Bartosz Szatkowski wrote:
-> +Messages Access hierarchy
-> +=========================
-> +
-> +Service		org.openobex.client
-> +Interface	org.openobex.MessagesAccess
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-23 11:23:34 +0200]:
 
-Could we call this just Message Access (i.e. in singular form) since
-that's what the profile is called too.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Check for hci_ver instead of lmp_ver
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/hci_event.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-Johan
+Applied to the bluetooth current tree. Thanks.
+
+	Gustavo
