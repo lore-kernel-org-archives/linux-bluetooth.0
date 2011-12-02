@@ -1,108 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1322839701.26198.37.camel@aeonflux>
-Subject: Re: [PATCHv2 5/8] Bluetooth: Add HCI Read Data Block Size function
+Message-ID: <1322839607.26198.36.camel@aeonflux>
+Subject: Re: [PATCH 2/2] Bluetooth: Ignore HCI_Read_Local_Commands failures
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 02 Dec 2011 16:28:21 +0100
-In-Reply-To: <20111202122555.GD12339@aemeltch-MOBL1>
-References: <1322743335-8671-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1322743335-8671-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1322745223.26198.35.camel@aeonflux> <20111201133731.GF2216@aemeltch-MOBL1>
-	 <20111202122555.GD12339@aemeltch-MOBL1>
+To: Gustavo Padovan <padovan@profusion.mobi>
+Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
+Date: Fri, 02 Dec 2011 16:26:47 +0100
+In-Reply-To: <20111202000247.GB2688@joana>
+References: <1321898484-17952-1-git-send-email-johan.hedberg@gmail.com>
+	 <1321898484-17952-2-git-send-email-johan.hedberg@gmail.com>
+	 <20111201124039.GB2894@joana> <1322744973.26198.31.camel@aeonflux>
+	 <20111202000247.GB2688@joana>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Gustavo,
 
-> > > > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> > > > index a7fd63a..869ab72 100644
-> > > > --- a/include/net/bluetooth/hci_core.h
-> > > > +++ b/include/net/bluetooth/hci_core.h
-> > > > @@ -172,6 +172,8 @@ struct hci_dev {
-> > > >  
-> > > >  	__u8		flow_ctl_mode;
-> > > >  
-> > > > +	__u16		block_len;
-> > > > +
-> 
-> What do you think about following:
-> 
-> <------8<----------------------------------------
-> |  diff --git a/include/net/bluetooth/hci_core.h
-> |  b/include/net/bluetooth/hci_core.h
-> |  index 44f130f..5a4e85c 100644
-> |  @@ -188,6 +188,11 @@ struct hci_dev {
-> |          unsigned int    sco_pkts;
-> |          unsigned int    le_pkts;
-> |
-> |  +       __u16           block_len;
-> |  +       __u16           block_mtu;
-> |  +       __u16           num_blocks;
-> |  +       __u16           block_cnt;
-> |  +
-> |          unsigned long   acl_last_tx;
-> |          unsigned long   sco_last_tx;
-> |          unsigned long   le_last_tx;
-> |
-> <------8<----------------------------------------
-
-lets see how this works out.
-
-> > > >  	unsigned int	auto_accept_delay;
-> > > >  
-> > > >  	unsigned long	quirks;
-> > > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > > index efad012..a646310 100644
-> > > > --- a/net/bluetooth/hci_event.c
-> > > > +++ b/net/bluetooth/hci_event.c
-> > > > @@ -774,6 +774,33 @@ static void hci_cc_read_bd_addr(struct hci_dev *hdev, struct sk_buff *skb)
-> > > >  	hci_req_complete(hdev, HCI_OP_READ_BD_ADDR, rp->status);
-> > > >  }
-> > > >  
-> > > > +static void hci_cc_read_data_block_size(struct hci_dev *hdev,
-> > > > +							struct sk_buff *skb)
-> > > > +{
-> > > > +	struct hci_rp_read_data_block_size *rp = (void *) skb->data;
-> > > > +
-> > > > +	BT_DBG("%s status 0x%x", hdev->name, rp->status);
-> > > > +
-> > > > +	if (rp->status)
-> > > > +		return;
-> > > > +
-> > > > +	if (hdev->flow_ctl_mode == HCI_FLOW_CTL_MODE_BLOCK_BASED) {
-> > > > +		hdev->acl_mtu  = __le16_to_cpu(rp->max_acl_len);
-> > > > +		hdev->sco_mtu = 0;
-> > > > +		hdev->block_len = __le16_to_cpu(rp->block_len);
-> > > > +		/* acl_pkts indicates the number of blocks */
-> > > > +		hdev->acl_pkts = __le16_to_cpu(rp->num_blocks);
-> > > > +		hdev->sco_pkts = 0;
-> > > > +		hdev->acl_cnt = hdev->acl_pkts;
-> > > > +		hdev->sco_cnt = 0;
-> > > > +	}
+> > > > Some 1.2 controllers will fail the HCI_Read_Local_Commands HCI command
+> > > > even though (according to the specification) they should support it.
+> > > > Since this HCI command is part of the controller init sequence
+> > > > controllers broken in this manner would be unusable. Since not having
+> > > > the list of supported commands is not critical for these controllers it
+> > > > is better to just ignore failures in this case (additionally, this is
+> > > > also how older kernels used to behave).
+> > > > 
+> > > > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> > > > ---
+> > > >  net/bluetooth/hci_event.c |   16 ++++++++++++++++
+> > > >  1 files changed, 16 insertions(+), 0 deletions(-)
 > > > 
-> > > I am still not convinced that overloading the variables is a good idea.
-> > > And so far nobody has me convinced that this is the best way.
+> > > Both patches have been applied, thanks.
 > > 
-> > I think that we can use different variables like block_cnt and acl_blocks,
-> > then function split as you mentioned in other comment does make sense.
+> > I would have preferred you didn't. Since now I have to get this all
+> > fixed up as well.
 > 
-> then here comes:
-> 
-> <------8<--------------------------------------------------------------
-> |  +       if (hdev->flow_ctl_mode == HCI_FLOW_CTL_MODE_BLOCK_BASED) {
-> |  +               hdev->block_mtu = __le16_to_cpu(rp->max_acl_len);
-> |  +               hdev->block_len = __le16_to_cpu(rp->block_len);
-> |  +               hdev->num_blocks = __le16_to_cpu(rp->num_blocks);
-> |  +
-> |  +               hdev->block_cnt = hdev->num_blocks;
-> |  +       }
-> <------8<--------------------------------------------------------------
+> Is this for both of them?
 
-Except that you do not need the if flow_ctl_mode check. Just set the
-variables. They are not overlapping anymore.
+yes, we need to stop hacking around here and once and for all solve this
+properly.
 
 Regards
 
