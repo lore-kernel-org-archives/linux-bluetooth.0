@@ -1,29 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Dec 2011 20:59:10 +0900
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Remove magic numbers from le scan cmd
-Message-ID: <20111202115910.GE2570@joana>
-References: <1322662630-32759-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 2 Dec 2011 13:56:39 +0200
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv1 2/6] Bluetooth: Split ctrl init to BREDR and AMP parts
+Message-ID: <20111202115633.GC12339@aemeltch-MOBL1>
+References: <1322139125-22377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1322139125-22377-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20111202115025.GD2570@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322662630-32759-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <20111202115025.GD2570@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-30 16:17:10 +0200]:
+Hi Gustavo,
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Fri, Dec 02, 2011 at 08:50:25PM +0900, Gustavo Padovan wrote:
+> Hi Andrei,
 > 
-> Make code readable by removing magic numbers.
+> * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-24 14:52:01 +0200]:
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  include/net/bluetooth/hci.h |    3 +++
->  net/bluetooth/hci_event.c   |   12 ++++++++++--
->  2 files changed, 13 insertions(+), 2 deletions(-)
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > Current controller initialization is moved tp bredr_init and new
+> > function added amp_init to handle later AMP init sequence. Current
+> > AMP init sequence include Reset and Read Local Version.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  net/bluetooth/hci_core.c  |   64 ++++++++++++++++++++++++++++++++------------
+> >  net/bluetooth/hci_event.c |    3 ++
+> >  2 files changed, 49 insertions(+), 18 deletions(-)
+> 
+> For some reason this patch doesn't apply, please rebase.
 
-Applied, thanks.
+Have you tried the more recent version:
+PATCHv2 2/8] Bluetooth: Split ctrl init to BREDR and AMP parts
 
-	Gustavo
+Best regards 
+Andrei Emeltchenko 
