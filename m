@@ -1,38 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CACLukzK1YyqBszGc679Vj-Pf9+M+s+LaBpnd2_+pan8TCwHODA@mail.gmail.com>
-References: <1322129290-10767-1-git-send-email-sancane@gmail.com>
-	<20111202112957.GC17203@x220.ger.corp.intel.com>
-	<CACLukzK1YyqBszGc679Vj-Pf9+M+s+LaBpnd2_+pan8TCwHODA@mail.gmail.com>
-Date: Fri, 2 Dec 2011 11:36:41 -0400
-Message-ID: <CAJdJm_P5OU6vqs+-9xL36=1DWVtgzzY1CEPf6rD3Tws5BSik2g@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Provide return status in gatt_service_add function
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Santiago Carot <sancane@gmail.com>
+Message-ID: <1322839701.26198.37.camel@aeonflux>
+Subject: Re: [PATCHv2 5/8] Bluetooth: Add HCI Read Data Block Size function
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Fri, 02 Dec 2011 16:28:21 +0100
+In-Reply-To: <20111202122555.GD12339@aemeltch-MOBL1>
+References: <1322743335-8671-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1322743335-8671-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1322745223.26198.35.camel@aeonflux> <20111201133731.GF2216@aemeltch-MOBL1>
+	 <20111202122555.GD12339@aemeltch-MOBL1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+Hi Andrei,
 
-On Fri, Dec 2, 2011 at 7:43 AM, Santiago Carot <sancane@gmail.com> wrote:
-> When I was working in this stuff, I was wondering if there may exist
-> the case when a plugin registers several services and the last one
-> fails, Do you think it would have sense to provide the service ID as
-> return parameter to allow plugins remove their attributes before
-> aborting the loading operation?, On the other hand, this feature would
-> raise the posibility of finding gaps in the distribution of handlers
-> assigned in GATT due that plugins could add and remove services
-> dynamically, I'm not sure if that is expected in GATT.
+> > > > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> > > > index a7fd63a..869ab72 100644
+> > > > --- a/include/net/bluetooth/hci_core.h
+> > > > +++ b/include/net/bluetooth/hci_core.h
+> > > > @@ -172,6 +172,8 @@ struct hci_dev {
+> > > >  
+> > > >  	__u8		flow_ctl_mode;
+> > > >  
+> > > > +	__u16		block_len;
+> > > > +
+> 
+> What do you think about following:
+> 
+> <------8<----------------------------------------
+> |  diff --git a/include/net/bluetooth/hci_core.h
+> |  b/include/net/bluetooth/hci_core.h
+> |  index 44f130f..5a4e85c 100644
+> |  @@ -188,6 +188,11 @@ struct hci_dev {
+> |          unsigned int    sco_pkts;
+> |          unsigned int    le_pkts;
+> |
+> |  +       __u16           block_len;
+> |  +       __u16           block_mtu;
+> |  +       __u16           num_blocks;
+> |  +       __u16           block_cnt;
+> |  +
+> |          unsigned long   acl_last_tx;
+> |          unsigned long   sco_last_tx;
+> |          unsigned long   le_last_tx;
+> |
+> <------8<----------------------------------------
 
-I think that, before doing anything like this, we should ensure the
-handles allocated for GATT servers do not change after registration
-(i.e. they are kept in storage and reloaded when bluez starts). If
-possible, can you contribute on this regard?
+lets see how this works out.
 
-Thanks,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+> > > >  	unsigned int	auto_accept_delay;
+> > > >  
+> > > >  	unsigned long	quirks;
+> > > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > > index efad012..a646310 100644
+> > > > --- a/net/bluetooth/hci_event.c
+> > > > +++ b/net/bluetooth/hci_event.c
+> > > > @@ -774,6 +774,33 @@ static void hci_cc_read_bd_addr(struct hci_dev *hdev, struct sk_buff *skb)
+> > > >  	hci_req_complete(hdev, HCI_OP_READ_BD_ADDR, rp->status);
+> > > >  }
+> > > >  
+> > > > +static void hci_cc_read_data_block_size(struct hci_dev *hdev,
+> > > > +							struct sk_buff *skb)
+> > > > +{
+> > > > +	struct hci_rp_read_data_block_size *rp = (void *) skb->data;
+> > > > +
+> > > > +	BT_DBG("%s status 0x%x", hdev->name, rp->status);
+> > > > +
+> > > > +	if (rp->status)
+> > > > +		return;
+> > > > +
+> > > > +	if (hdev->flow_ctl_mode == HCI_FLOW_CTL_MODE_BLOCK_BASED) {
+> > > > +		hdev->acl_mtu  = __le16_to_cpu(rp->max_acl_len);
+> > > > +		hdev->sco_mtu = 0;
+> > > > +		hdev->block_len = __le16_to_cpu(rp->block_len);
+> > > > +		/* acl_pkts indicates the number of blocks */
+> > > > +		hdev->acl_pkts = __le16_to_cpu(rp->num_blocks);
+> > > > +		hdev->sco_pkts = 0;
+> > > > +		hdev->acl_cnt = hdev->acl_pkts;
+> > > > +		hdev->sco_cnt = 0;
+> > > > +	}
+> > > 
+> > > I am still not convinced that overloading the variables is a good idea.
+> > > And so far nobody has me convinced that this is the best way.
+> > 
+> > I think that we can use different variables like block_cnt and acl_blocks,
+> > then function split as you mentioned in other comment does make sense.
+> 
+> then here comes:
+> 
+> <------8<--------------------------------------------------------------
+> |  +       if (hdev->flow_ctl_mode == HCI_FLOW_CTL_MODE_BLOCK_BASED) {
+> |  +               hdev->block_mtu = __le16_to_cpu(rp->max_acl_len);
+> |  +               hdev->block_len = __le16_to_cpu(rp->block_len);
+> |  +               hdev->num_blocks = __le16_to_cpu(rp->num_blocks);
+> |  +
+> |  +               hdev->block_cnt = hdev->num_blocks;
+> |  +       }
+> <------8<--------------------------------------------------------------
+
+Except that you do not need the if flow_ctl_mode check. Just set the
+variables. They are not overlapping anymore.
+
+Regards
+
+Marcel
+
+
