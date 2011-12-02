@@ -1,62 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Dec 2011 16:37:13 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 obexd 3/4] Add response handling for MAP client
-Message-ID: <20111202143713.GA24812@x220>
-References: <1322829142-7855-1-git-send-email-bulislaw@linux.com>
- <1322829142-7855-3-git-send-email-bulislaw@linux.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322829142-7855-3-git-send-email-bulislaw@linux.com>
+In-Reply-To: <90B4470ABE8C438C9650ED03BF611926@sisodomain.com>
+References: <1322827022-27391-1-git-send-email-jaganath.k@samsung.com>
+	<CABBYNZ+uimY=eA6PnND5mqeAj2411rk0hseXp1PXbdEDt6P4vw@mail.gmail.com>
+	<90B4470ABE8C438C9650ED03BF611926@sisodomain.com>
+Date: Fri, 2 Dec 2011 16:31:33 +0200
+Message-ID: <CABBYNZKvf=-GjM24J3jQOwRVrLJ90y8SvHXsQNSeHZMEEudFvg@mail.gmail.com>
+Subject: Re: [PATCH obexd] Fix file size issue in GetProperties
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jaganath <jaganath.k@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bartosz,
+Hi Jaganath,
 
-On Fri, Dec 02, 2011, Bartosz Szatkowski wrote:
-> +static struct error_code {
-> +	const char *name;
-> +	guint8 code;
-> +} map_errors[] = {
-> +	{"Success", G_OBEX_RSP_SUCCESS},
-> +	{"Bad Request", G_OBEX_RSP_BAD_REQUEST},
-> +	{"Not Implemented", G_OBEX_RSP_NOT_IMPLEMENTED},
-> +	{"Service Unavailable", G_OBEX_RSP_SERVICE_UNAVAILABLE},
-> +	{"Forbidden", G_OBEX_RSP_FORBIDDEN},
-> +	{"Unauthorized", G_OBEX_RSP_UNAUTHORIZED},
-> +	{"Precondition Failed", G_OBEX_RSP_PRECONDITION_FAILED},
-> +	{"Not Acceptable", G_OBEX_RSP_NOT_ACCEPTABLE},
-> +	{"Not Found", G_OBEX_RSP_NOT_FOUND},
-> +	{ }
+On Fri, Dec 2, 2011 at 3:00 PM, Jaganath <jaganath.k@samsung.com> wrote:
+>>
+>>
+>> Nice catch, but I would like to avoid another public function for
+>> this, so how about making obc_transfer_set_file static on transfer.c
+>> calling it in obc_transfer_register?
+>>
+>> --
+>> Luiz Augusto von Dentz
+>> --
+>
+>
+> obc_transfer_register is being called from obc_session_get which
+> eventually calls obc_transfer_get in which if transfer->name is NULL
+> transfer->filename is open with write mode. obc_session_get is used from
+> pbap and sync with name as NULL and filename as NOT NULL.
 
-The table is missing spaces on each line after { and before }
+Now I realize why I didn't do it since the beginning, because the
+application can skip the files it is probably better to not open them
+until they are acknowledged, also it is very bad idea to call back the
+daemon while within the Request as the daemon could be waiting the
+application to acknowledged it can cause a deadlock where both the
+application and obex-client are waiting for each other.
 
-> +static const char *get_error_string(guint8 err_code)
-> +{
-> +	struct error_code *error;
-> +
-> +	for (error = map_errors; error != NULL; error++)
-> +		if (error->code == err_code)
-> +			return error->name;
-> +
-> +	return NULL;
-> +}
+There are plans to change this API so OPP would also register a
+session and all transfers register an object, with this we will
+probably not need the agent interface anymore and things became a bit
+simpler as we return the transfer object directly on SendFile.
 
-It'd probably make sense to make this kind of function more widely
-available, maybe through gobex. However instead of a NULL return I'd
-return "<unknown>" to avoid passing NULL pointers to %s format
-specifiers like you're doing below (I know this will typically just work
-and add a "(null)" to the string, but it's still not a very good
-practice and can cause misleading logs:
-
-> +		reply = g_dbus_create_error(map->msg,
-> +					"org.openobex.Error.Response",
-> +					"%s(0x%X)", get_error_string(err_code),
-> +					err_code);
-
-You're also missing a space between %s and ( and please use 0x%02x for
-single byte values.
-
-Johan
+-- 
+Luiz Augusto von Dentz
