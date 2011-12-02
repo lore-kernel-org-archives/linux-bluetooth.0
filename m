@@ -1,27 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Dec 2011 13:26:49 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/6] Confiure C.C.C descriptor during the thermometer
- configuration
-Message-ID: <20111202112649.GB17203@x220.ger.corp.intel.com>
-References: <1321973388-16300-1-git-send-email-sancane@gmail.com>
- <1321973388-16300-2-git-send-email-sancane@gmail.com>
- <1321973388-16300-3-git-send-email-sancane@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321973388-16300-3-git-send-email-sancane@gmail.com>
+In-Reply-To: <20111202111827.GB15891@x220.ger.corp.intel.com>
+References: <1322144076-1913-1-git-send-email-s.syam@samsung.com>
+	<1322144076-1913-2-git-send-email-s.syam@samsung.com>
+	<20111202111827.GB15891@x220.ger.corp.intel.com>
+Date: Fri, 2 Dec 2011 12:25:37 +0100
+Message-ID: <CACLukzLHz+zc=hMVf=7O+gusa5W2959U-p7kHTGWSq5fgj2fVg@mail.gmail.com>
+Subject: Re: [PATCH 2/3] Remove unwanted GError* assignment to NULL
+From: Santiago Carot <sancane@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+Hi,
 
-On Tue, Nov 22, 2011, Santiago Carot-Nemesio wrote:
-> +			atval[0] = 0x02;
-> +			atval[1] = 0x00;
+2011/12/2 Johan Hedberg <johan.hedberg@gmail.com>:
+> Hi Syam,
+>
+> On Thu, Nov 24, 2011, Syam Sidhardhan wrote:
+>> ---
+>>  health/hdp.c |    1 -
+>>  1 files changed, 0 insertions(+), 1 deletions(-)
+>>
+>> diff --git a/health/hdp.c b/health/hdp.c
+>> index d167ab0..403d4c8 100644
+>> --- a/health/hdp.c
+>> +++ b/health/hdp.c
+>> @@ -551,7 +551,6 @@ static void hdp_get_dcpsm_cb(uint16_t dcpsm, gpointer user_data, GError *err)
+>>       hdp_tmp_dc_data_unref(hdp_conn);
+>>       hdp_conn->cb(hdp_chann->mdl, err, hdp_conn);
+>>       g_error_free(gerr);
+>> -     gerr = NULL;
+>>  }
+>
+> Applied, however a bigger question is whether gerr is even needed in
+> this function at all since it's never used after potentially being set.
+>
 
-What are these magic values? Could we have some defines for them or
-something else more readable?
+I think it would be better get ride of it at least we can add a debug
+message here if MCAP fails trying to connect the data channel.
 
-Johan
+Regards.
