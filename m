@@ -1,31 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Dec 2011 21:19:42 +0900
+Date: Fri, 2 Dec 2011 20:59:10 +0900
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Andre Guedes <andre.guedes@openbossa.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 2/9] Bluetooth: LE Set Scan Parameter Command
-Message-ID: <20111202121942.GF2570@joana>
-References: <1322265226-6404-1-git-send-email-andre.guedes@openbossa.org>
- <1322265226-6404-3-git-send-email-andre.guedes@openbossa.org>
+Subject: Re: [PATCH] Bluetooth: Remove magic numbers from le scan cmd
+Message-ID: <20111202115910.GE2570@joana>
+References: <1322662630-32759-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322265226-6404-3-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1322662630-32759-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-30 16:17:10 +0200]:
 
-* Andre Guedes <andre.guedes@openbossa.org> [2011-11-25 20:53:39 -0300]:
-
-> This patch adds the parameter struct and the command complete event
-> handler to the LE Set Scan Parameter HCI command.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> Make code readable by removing magic numbers.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  include/net/bluetooth/hci.h |    9 +++++++++
->  net/bluetooth/hci_event.c   |   11 +++++++++++
->  2 files changed, 20 insertions(+), 0 deletions(-)
+>  include/net/bluetooth/hci.h |    3 +++
+>  net/bluetooth/hci_event.c   |   12 ++++++++++--
+>  2 files changed, 13 insertions(+), 2 deletions(-)
 
-Patches 1 and 2 were applied, thanks.
+Applied, thanks.
 
 	Gustavo
