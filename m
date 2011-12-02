@@ -1,132 +1,121 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Dec 2011 21:53:46 +0900
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Arkadiusz.Lichwa@tieto.com
-Cc: linux-bluetooth@vger.kernel.org, iliak@ti.com,
-	ulrik.lauren@stericsson.com, peter@hurleysoftware.com
-Subject: Re: [PATCH cover letter] Bluetooth: Revert: Fix L2CAP connection ...
-Message-ID: <20111202125346.GI2570@joana>
-References: <1319621002-7122-1-git-send-email-arkadiusz.lichwa@tieto.com>
- <20111031190129.GA10164@joana>
- <BF2CDDEFEC2D1E42A67A8AE0508897EC3E92178FAA@EXMB02.eu.tieto.com>
- <20111104171821.GE6171@joana>
- <BF2CDDEFEC2D1E42A67A8AE0508897EC3E92179C49@EXMB02.eu.tieto.com>
- <20111107185401.GA3707@joana>
- <BF2CDDEFEC2D1E42A67A8AE0508897EC3E9238C49C@EXMB02.eu.tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <BF2CDDEFEC2D1E42A67A8AE0508897EC3E9238C49C@EXMB02.eu.tieto.com>
+In-Reply-To: <1322827022-27391-1-git-send-email-jaganath.k@samsung.com>
+References: <1322827022-27391-1-git-send-email-jaganath.k@samsung.com>
+Date: Fri, 2 Dec 2011 14:41:43 +0200
+Message-ID: <CABBYNZ+uimY=eA6PnND5mqeAj2411rk0hseXp1PXbdEDt6P4vw@mail.gmail.com>
+Subject: Re: [PATCH obexd] Fix file size issue in GetProperties
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: jaganath.k@samsung.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arek,
+Hi Jaganath,
 
-* Arkadiusz.Lichwa@tieto.com <Arkadiusz.Lichwa@tieto.com> [2011-11-22 15:27:17 +0200]:
+On Fri, Dec 2, 2011 at 1:57 PM,  <jaganath.k@samsung.com> wrote:
+> From: jaganath.k <jaganath.k@samsung.com>
+>
+> In SendFiles, If application calls GetProperties before
+> Request method returns then the file size is zero.
+> ---
+>  client/session.c  |    4 ++++
+>  client/transfer.c |   40 ++++++++++++++++++++++++----------------
+>  client/transfer.h |    1 +
+>  3 files changed, 29 insertions(+), 16 deletions(-)
+>
+> diff --git a/client/session.c b/client/session.c
+> index f288ecd..9f02512 100644
+> --- a/client/session.c
+> +++ b/client/session.c
+> @@ -1277,6 +1277,10 @@ int obc_session_send(struct obc_session *session, const char *filename,
+>        if (transfer == NULL)
+>                return -EINVAL;
+>
+> +       err = obc_transfer_set_file(transfer);
+> +       if (err < 0)
+> +               goto fail;
+> +
+>        /* Transfer should start if it is the first in the pending list */
+>        if (transfer != session->pending->data)
+>                return 0;
+> diff --git a/client/transfer.c b/client/transfer.c
+> index b6994d1..5b67d1e 100644
+> --- a/client/transfer.c
+> +++ b/client/transfer.c
+> @@ -563,8 +563,6 @@ int obc_transfer_put(struct obc_transfer *transfer, transfer_callback_t func,
+>        GObex *obex;
+>        GObexPacket *req;
+>        GObexDataProducer data_cb;
+> -       struct stat st;
+> -       int fd;
+>
+>        if (transfer->xfer != 0)
+>                return -EALREADY;
+> @@ -574,20 +572,6 @@ int obc_transfer_put(struct obc_transfer *transfer, transfer_callback_t func,
+>                goto done;
+>        }
+>
+> -       fd = open(transfer->filename, O_RDONLY);
+> -       if (fd < 0) {
+> -               error("open(): %s(%d)", strerror(errno), errno);
+> -               return -errno;
+> -       }
+> -
+> -       if (fstat(fd, &st) < 0) {
+> -               close(fd);
+> -               error("fstat(): %s(%d)", strerror(errno), errno);
+> -               return -errno;
+> -       }
+> -
+> -       transfer->fd = fd;
+> -       transfer->size = st.st_size;
+>        data_cb = put_xfer_progress;
+>
+>  done:
+> @@ -667,3 +651,27 @@ gint64 obc_transfer_get_size(struct obc_transfer *transfer)
+>  {
+>        return transfer->size;
+>  }
+> +
+> +int obc_transfer_set_file(struct obc_transfer *transfer)
+> +{
+> +       int fd;
+> +       struct stat st;
+> +
+> +       fd = open(transfer->filename, O_RDONLY);
+> +       if (fd < 0) {
+> +               error("open(): %s(%d)", strerror(errno), errno);
+> +               return -errno;
+> +       }
+> +
+> +       if (fstat(fd, &st) < 0) {
+> +               error("fstat(): %s(%d)", strerror(errno), errno);
+> +               close(fd);
+> +               return -errno;
+> +       }
+> +
+> +       transfer->fd = fd;
+> +       transfer->size = st.st_size;
+> +
+> +       return 0;
+> +}
+> +
+> diff --git a/client/transfer.h b/client/transfer.h
+> index ba53fd1..c051cbd 100644
+> --- a/client/transfer.h
+> +++ b/client/transfer.h
+> @@ -55,3 +55,4 @@ void obc_transfer_clear_buffer(struct obc_transfer *transfer);
+>  void obc_transfer_set_name(struct obc_transfer *transfer, const char *name);
+>  const char *obc_transfer_get_path(struct obc_transfer *transfer);
+>  gint64 obc_transfer_get_size(struct obc_transfer *transfer);
+> +int obc_transfer_set_file(struct obc_transfer *transfer);
+> --
 
-> Hi Gustavo
-> 
-> >-----Original Message-----
-> >From: Gustavo F. Padovan [mailto:pao@profusion.mobi] On Behalf Of Gustavo
-> >Padovan
-> >Sent: Monday, November 07, 2011 7:54 PM
-> >To: Lichwa Arkadiusz
-> >Cc: linux-bluetooth@vger.kernel.org; iliak@ti.com; ulrik.lauren@stericsson.com
-> >Subject: Re: [PATCH cover letter] Bluetooth: Revert: Fix L2CAP connection ...
-> >
-> >
-> >* Arkadiusz.Lichwa@tieto.com <Arkadiusz.Lichwa@tieto.com> [2011-11-07
-> >12:06:32 +0200]:
-> >
-> >>
-> >> >From: Gustavo F. Padovan [mailto:pao@profusion.mobi] On Behalf Of Gustavo
-> >> >Padovan
-> >> >Sent: Friday, November 04, 2011 6:18 PM
-> >> >To: Lichwa Arkadiusz
-> >> >Cc: linux-bluetooth@vger.kernel.org; iliak@ti.com; ulrik.lauren@stericsson.com
-> >> >Subject: Re: [PATCH cover letter] Bluetooth: Revert: Fix L2CAP connection ...
-> >> >
-> >> >Hi Arek,
-> >> >
-> >> >* Arkadiusz.Lichwa@tieto.com <Arkadiusz.Lichwa@tieto.com> [2011-11-02
-> >> >09:53:10 +0200]:
-> >> >
-> >> >>
-> >> >> Hi Gustavo
-> >> >>
-> >> >> >From: Gustavo F. Padovan [mailto:pao@profusion.mobi] On Behalf Of
-> >Gustavo
-> >> >> >Padovan
-> >> >> >Sent: Monday, October 31, 2011 8:01 PM
-> >> >> >To: Lichwa Arkadiusz
-> >> >> >Cc: linux-bluetooth@vger.kernel.org; iliak@ti.com;
-> >ulrik.lauren@stericsson.com
-> >> >> >Subject: Re: [PATCH cover letter] Bluetooth: Revert: Fix L2CAP connection ...
-> >> >> >
-> >> >> >Hi Arek,
-> >> >> >
-> >> >> >* Arek Lichwa <arkadiusz.lichwa@tieto.com> [2011-10-26 11:23:21 +0200]:
-> >> >> >
-> >> >> >> Hi
-> >> >> >>
-> >> >> >> We found during testing problem when setting rfcomm (SPP) channel
-> >between
-> >> >> >> two 2.1 devices.
-> >> >> >> The test case always failed mostly saying security block on l2cap level
-> >> >> >> but sometimes the fail root cause was 'Command not understood' on l2cap
-> >> >> >> as well.
-> >> >> >> Analyzing security block issue, I found that there's unencrypted link when
-> >> >> >> l2cap command 'connection request' is sent to remote.
-> >> >> >> The second issue with 'command not understood' has turn out to be related
-> >to
-> >> >> >> expiration of l2cap timer and its implications.
-> >> >> >>
-> >> >> >> Solution that I found to fix the problem seems to be related to old commit
-> >> >> >> 330605423ca6eafafb8dcc27502bce1c585d1b06 made by Ilia Kolomisnky.
-> >> >When
-> >> >> >there's
-> >> >> >> authentication ongoing, 'encryption pending' should be turn on, otherwise
-> >> >> >> there're situations when link stays unencrypted.
-> >> >> >> The issue with timer expiration is related to Andrzej Kaczmarek's patch
-> >> >> >> sent to community a couple days ago (~ 2011/10/20).
-> >> >> >> This patch actually recalculates (repairs) timer values on l2cap which were
-> >> >> >> wrongly converted before.
-> >> >> >> With this patch the expiration issue disappears during the test case
-> >> >> >> I've made, otherwise just reverting
-> >> >> >330605423ca6eafafb8dcc27502bce1c585d1b06
-> >> >> >> is not enough, since timer issue blocks very often passing the test case.
-> >> >> >
-> >> >> >Are you saying that Andrzej's patch together with revert of 330605423 fixes
-> >> >> >the problem? and are you sure that we are not creating any new regression?
-> >> >> >
-> >> >> >	Gustavo
-> >> >>
-> >> >> Yes, that's right, it fixes.
-> >> >> About potencial new regression, I don't think so since previous code before Ilia
-> >> >made change was stable and verified. Did you asked Ilia about regression report
-> >> >that time?
-> >> >
-> >> >So did you test this in many different cases? with and without SSP, in all
-> >> >security levels, with and without MITM protection and so on?
-> >>
-> >> Hi Gustavo,
-> >>
-> >> Should't such scenarios to be run/verified on bluez community's
-> >> common security regression test framework/set ?
-> >> Looks like now everyone (I hope) verify against his own and it's not trustable.
-> >>
-> >> To your questions, yes, I did, do you belive me ? :)
-> >
-> >Ok, I'm applying this one to the bluetooth tree (aka linux 3.2). Thanks.
-> >
-> >Also I verified the need of this patch while developing the security patches I
-> >just sent to the mailing list, it only works if I revert this patch.
-> >
-> >	Gustavo
-> 
-> Looks like the patch got to be reverted. 
-> More thorough / manual tests showed the problem on setting up subsequent
-> l2cap channels with legacy devices.
+Nice catch, but I would like to avoid another public function for
+this, so how about making obc_transfer_set_file static on transfer.c
+calling it in obc_transfer_register?
 
-What goes wrong? security block? Why does it happen?
-
-	Gustavo
+-- 
+Luiz Augusto von Dentz
