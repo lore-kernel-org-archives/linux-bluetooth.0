@@ -1,67 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <B6FA980DEB6A49D7B309B3B9F8E44D49@sisodomain.com>
-From: Jaganath <jaganath.k@samsung.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-References: <1322827022-27391-1-git-send-email-jaganath.k@samsung.com>
- <CABBYNZ+uimY=eA6PnND5mqeAj2411rk0hseXp1PXbdEDt6P4vw@mail.gmail.com>
- <90B4470ABE8C438C9650ED03BF611926@sisodomain.com>
- <CABBYNZKvf=-GjM24J3jQOwRVrLJ90y8SvHXsQNSeHZMEEudFvg@mail.gmail.com>
-In-reply-to: <CABBYNZKvf=-GjM24J3jQOwRVrLJ90y8SvHXsQNSeHZMEEudFvg@mail.gmail.com>
-Subject: Re: [PATCH obexd] Fix file size issue in GetProperties
-Date: Fri, 02 Dec 2011 20:28:26 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
+MIME-Version: 1.0
+In-Reply-To: <20111202143713.GA24812@x220>
+References: <1322829142-7855-1-git-send-email-bulislaw@linux.com>
+	<1322829142-7855-3-git-send-email-bulislaw@linux.com>
+	<20111202143713.GA24812@x220>
+Date: Fri, 2 Dec 2011 15:43:17 +0100
+Message-ID: <CAPGrrxXE57+L=t4yCsE+tQbUmxy=hE_2=LLprTJQdgL2Gqp61A@mail.gmail.com>
+Subject: Re: [PATCHv2 obexd 3/4] Add response handling for MAP client
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+On Fri, Dec 2, 2011 at 3:37 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Bartosz,
+>
+> On Fri, Dec 02, 2011, Bartosz Szatkowski wrote:
+>> +static struct error_code {
+>> +     const char *name;
+>> +     guint8 code;
+>> +} map_errors[] = {
+>> +     {"Success", G_OBEX_RSP_SUCCESS},
+>> +     {"Bad Request", G_OBEX_RSP_BAD_REQUEST},
+>> +     {"Not Implemented", G_OBEX_RSP_NOT_IMPLEMENTED},
+>> +     {"Service Unavailable", G_OBEX_RSP_SERVICE_UNAVAILABLE},
+>> +     {"Forbidden", G_OBEX_RSP_FORBIDDEN},
+>> +     {"Unauthorized", G_OBEX_RSP_UNAUTHORIZED},
+>> +     {"Precondition Failed", G_OBEX_RSP_PRECONDITION_FAILED},
+>> +     {"Not Acceptable", G_OBEX_RSP_NOT_ACCEPTABLE},
+>> +     {"Not Found", G_OBEX_RSP_NOT_FOUND},
+>> +     { }
+>
+> The table is missing spaces on each line after { and before }
+>
+>> +static const char *get_error_string(guint8 err_code)
+>> +{
+>> +     struct error_code *error;
+>> +
+>> +     for (error = map_errors; error != NULL; error++)
+>> +             if (error->code == err_code)
+>> +                     return error->name;
+>> +
+>> +     return NULL;
+>> +}
+>
+> It'd probably make sense to make this kind of function more widely
+> available, maybe through gobex. However instead of a NULL return I'd
+> return "<unknown>" to avoid passing NULL pointers to %s format
+> specifiers like you're doing below (I know this will typically just work
+> and add a "(null)" to the string, but it's still not a very good
+> practice and can cause misleading logs:
+>
+>> +             reply = g_dbus_create_error(map->msg,
+>> +                                     "org.openobex.Error.Response",
+>> +                                     "%s(0x%X)", get_error_string(err_code),
+>> +                                     err_code);
+>
+> You're also missing a space between %s and ( and please use 0x%02x for
+> single byte values.
+>
+> Johan
 
---------------------------------------------------
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Sent: Friday, December 02, 2011 8:01 PM
-To: "Jaganath" <jaganath.k@samsung.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH obexd] Fix file size issue in GetProperties
+OK
 
-> Hi Jaganath,
->
-> On Fri, Dec 2, 2011 at 3:00 PM, Jaganath <jaganath.k@samsung.com> wrote:
->>>
->>>
->>> Nice catch, but I would like to avoid another public function for
->>> this, so how about making obc_transfer_set_file static on transfer.c
->>> calling it in obc_transfer_register?
->>>
->>> --
->>> Luiz Augusto von Dentz
->>> --
->>
->>
->> obc_transfer_register is being called from obc_session_get which
->> eventually calls obc_transfer_get in which if transfer->name is NULL
->> transfer->filename is open with write mode. obc_session_get is used from
->> pbap and sync with name as NULL and filename as NOT NULL.
->
-> Now I realize why I didn't do it since the beginning, because the
-> application can skip the files it is probably better to not open them
-> until they are acknowledged, also it is very bad idea to call back the
-> daemon while within the Request as the daemon could be waiting the
-> application to acknowledged it can cause a deadlock where both the
-> application and obex-client are waiting for each other.
->
-> There are plans to change this API so OPP would also register a
-> session and all transfers register an object, with this we will
-> probably not need the agent interface anymore and things became a bit
-> simpler as we return the transfer object directly on SendFile.
->
-> -- 
-> Luiz Augusto von Dentz
-> --
-I accept that it is bad to have a dbus round trip. But I am unclear about 
-the deadlock
-scenario since deamon is calling "Request" method asynchronously.
-Since transfer is already registered before "Request" method, application 
-can
-call "GetProperties" at any point of time. 
-
+-- 
+Pozdrowienia - Cheers,
+Bartosz Szatkowski
