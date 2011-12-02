@@ -1,37 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Dec 2011 13:54:20 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/5] hdp_util: Fix coding style issues
-Message-ID: <20111202115418.GB12339@aemeltch-MOBL1>
-References: <1322823396-5941-1-git-send-email-sancane@gmail.com>
- <1322823396-5941-2-git-send-email-sancane@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322823396-5941-2-git-send-email-sancane@gmail.com>
+In-Reply-To: <20111202112649.GB17203@x220.ger.corp.intel.com>
+References: <1321973388-16300-1-git-send-email-sancane@gmail.com>
+	<1321973388-16300-2-git-send-email-sancane@gmail.com>
+	<1321973388-16300-3-git-send-email-sancane@gmail.com>
+	<20111202112649.GB17203@x220.ger.corp.intel.com>
+Date: Fri, 2 Dec 2011 12:52:00 +0100
+Message-ID: <CACLukz+aP0O_SXLpmA+EadYTFPHEHg6krjj4aqSkpu55ifdFHg@mail.gmail.com>
+Subject: Re: [PATCH 2/6] Confiure C.C.C descriptor during the thermometer configuration
+From: Santiago Carot <sancane@gmail.com>
+To: Santiago Carot-Nemesio <sancane@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-He All,
+Hi Johan,
 
-On Fri, Dec 02, 2011 at 11:56:32AM +0100, Santiago Carot-Nemesio wrote:
-> ---
->  health/hdp_util.c |  171 +++++++++++++++++++++++++++--------------------------
->  1 files changed, 86 insertions(+), 85 deletions(-)
-> 
-> diff --git a/health/hdp_util.c b/health/hdp_util.c
-> index e62ed46..7a234c1 100644
-> --- a/health/hdp_util.c
-> +++ b/health/hdp_util.c
-> @@ -362,24 +362,24 @@ static gboolean register_service_protocols(struct hdp_adapter *adapter,
->  	/* set l2cap information */
->  	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
->  	l2cap_list = sdp_list_append(NULL, &l2cap_uuid);
-> -	if (!l2cap_list) {
-> +	if (l2cap_list == NULL) {
+2011/12/2 Johan Hedberg <johan.hedberg@gmail.com>:
+> Hi Santiago,
+>
+> On Tue, Nov 22, 2011, Santiago Carot-Nemesio wrote:
+>> +                     atval[0] = 0x02;
+>> +                     atval[1] = 0x00;
+>
+> What are these magic values? Could we have some defines for them or
+> something else more readable?
 
-Is this a really better way?
+These are GATT flags to enable/disable indications/notifications in
+client characteristic configuration descriptor, I thought about this
+issue, I haven't seen any macros mapping those values in GATT though.
+I was thinking in sending a separate patch to deal with this issue but
+I saw some Claudio's commits to deal with notification/indications so
+I guess he is already working on it, so I decided no to  interfere and
+wait to see how he is thinking to deal with this stuff.
 
-Best regards 
-Andrei Emeltchenko 
+Regards.
