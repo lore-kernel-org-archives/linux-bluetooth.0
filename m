@@ -1,151 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Peter Krystad" <pkrystad@codeaurora.org>
-To: "'Marcel Holtmann'" <marcel@holtmann.org>
-Cc: "'Emeltchenko Andrei'" <Andrei.Emeltchenko.news@gmail.com>,
-	<linux-bluetooth@vger.kernel.org>
-References: <1322661272-32027-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>	 <1322663484.26198.16.camel@aeonflux> <20111130151820.GB5158@aemeltch-MOBL1>	 <000001ccaff1$1ee6c0c0$5cb44240$@org> <1322738467.26198.26.camel@aeonflux>
-In-Reply-To: <1322738467.26198.26.camel@aeonflux>
-Subject: RE: [RFCv0 0/3] AMP HCI interface from A2MP
-Date: Thu, 1 Dec 2011 22:39:03 -0800
-Message-ID: <000001ccb0bd$15c7e0b0$4157a210$@org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
+In-Reply-To: <CAJdJm_PQbm-gmiquCKd08_3YZwQmj71-m_ds4xhDayq2wbP_Bw@mail.gmail.com>
+References: <CA+_sZW8MnOX_oGThrTr6sb9xtoRBHx6vPabHHgtY4bR+8YyKnA@mail.gmail.com>
+	<CAJdJm_PQbm-gmiquCKd08_3YZwQmj71-m_ds4xhDayq2wbP_Bw@mail.gmail.com>
+Date: Fri, 2 Dec 2011 11:17:52 +0530
+Message-ID: <CA+_sZW-goZkbRoNEd2HsBQ0TqWWSGVR2_yPZ4YEgYUJZZdfkDQ@mail.gmail.com>
+Subject: Re: [RFC] FindMe: Proposal to have separate dbus interface
+From: vishal agarwal <vishal.bluez@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org, naresh.gupta@stericsson.com
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> -----Original Message-----
-> From: Marcel Holtmann [mailto:marcel@holtmann.org]
-> 
-> Hi Peter,
-> 
-> > > > > The code adds AMP HCI commands from A2MP protocol. HCI events are handled
-> > > > > similar way as mgmt interface. amp_pending is a kind of copy of mgmt_pending.
-> > > >
-> > > > this is all kernel internal code with no interface to user space. I do
-> > > > not see the need for such a complex infrastructure. Can not just have
-> > > > proper callbacks or event callback table like with L2CAP. Or just
-> > > > something similar.
-> > >
-> > > I see this as a simple callback. amp_pending is just keeping context of HCI
-> > > command we need to handle. I also included reference counting since we had
-> > > bad experience with l2cap and rfcomm.
-> >
-> > There does have to be some way to carry the A2MP message context while performing
-> > local HCI operations to service the message. A2MP Get Remote Assoc requires multiple
-> > HCI commands with data accumulated between the commands before the response can be
-> > sent.
-> 
-> I agree, but this amp_pending seems to be wrong. I talked about changing
-> the init handling and at the same time we might can apply this to the
-> A2MP handling.
+Hi Anderson,
 
-I don't think this amp_pending is the right approach either.
+Thanks for your comments.
 
-> Why not just set a bit in hdev->dev_flags or maybe even hcon->dev_flags
-> or something and based on that we do a nice async state machine that
-> sends the commands and results in calling back into A2MP core when its
-> finished.
+I will implement that part above DBus then.
 
-I agree we can build a nice async state machine. But it needs to be carry more data
-than a bit in the hci_dev->flags. 1) For every A2MP request received we have
-to hang onto the request identifier byte to be returned in the response.  
-2) For processing the A2MP Get AMP Assoc the partial assoc data has to be accumulated
-over multiple HCI calls before it can be returned in the response. 3) In the
-create physical link sequence the remote assoc has to be stored while it is fed
-to HCI in multiple commands, and after the channel select event the local assoc
-has to be accumulated before it can be sent back to the remote.
- 
-> That seems a bit simpler to me and more aligned in a way I wanna redo
-> the whole HCI command/event handling anyway. In addition we can just
-> expose these flags via debugfs as text and have a nice way of knowing
-> current states if something goes wrong.
+Thanks
+Vishal
 
-In the CAF implementation there is a separate set of data structures that track all
-this context. I (and I think Andrei) think that that isn't the way to go. Storing
-the context in the hci_conn seems the best without adding more complexity. It needs
-to be on hci_conn not hci_dev because it possible for more than one remote AMP to send
-an A2MP command at one time. There will still need to be a flag in hci_dev->flags
-that serializes create physical link attempts, as PALs may require these to be serialized.
-
-There is a union in the structure amp_ctx in the CAF code that summarizes the data
-that needs to kept around. I've included it at the end of this e-mail. I'm not suggesting
-use this as is, just that it shows what state has to be kept while processing
-the A2MP requests.
-   
-Regards,
-
-Peter.
-
-> > > > As far as I see it, we get an A2MP command over L2CAP fixed channel, we
-> > > > have to issue a HCI command or do some other task based on this and then
-> > > > respond to it. We only have one user of this first of all. And second of
-> > > > all, I think we can not really have pending A2MP commands anyway. This
-> > > > is pretty much one command at a time (per ACL link).
-> >
-> > A2MP commands are serialized by the sender, so A2MP message context could be
-> > associated with the hci_conn for BR-EDR.
-> 
-> That is what I thought. Thanks for confirming. So using hcon->dev_flags
-> seems like a possible way to make this a lot simpler.
-> 
-> And if the sender misbehaves, we just reject that commands that way.
-> Testing a flag is always cheaper then iterating a list.
-> 
-> Regards
-> 
-> Marcel
-> 
-
-/* Get AMP Assoc sequence */
-struct amp_gaa_state {
-	__u8       req_ident;
-	__u16      len_so_far;
-	__u8      *assoc;
-};
-
-/* Create Physical Link sequence */
-struct amp_cpl_state {
-	__u8       remote_id;
-	__u16      max_len;
-	__u8      *remote_assoc;
-	__u8      *local_assoc;
-	__u16      len_so_far;
-	__u16      rem_len;
-	__u8       phy_handle;
-};
-
-/* Accept Physical Link sequence */
-struct amp_apl_state {
-	__u8       remote_id;
-	__u8       req_ident;
-	__u8      *remote_assoc;
-	__u16      len_so_far;
-	__u16      rem_len;
-	__u8       phy_handle;
-};
-
-struct amp_ctx {
-	struct list_head list;
-	struct amp_mgr *mgr;
-	struct hci_dev *hdev;
-	__u8       type;
-	__u8       state;
-	union {
-		struct amp_gaa_state gaa;
-		struct amp_cpl_state cpl;
-		struct amp_apl_state apl;
-	} d;
-	__u8 evt_type;
-	__u8 evt_code;
-	__u16 opcode;
-	__u8 id;
-	__u8 rsp_ident;
-
-	struct sock *sk;
-	struct amp_ctx *deferred;
-	struct timer_list timer;
-};
-
---Peter Krystad
-  Employee of Qualcomm Innovation Center, Inc.
-  Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+On Wed, Nov 30, 2011 at 6:11 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Vishal,
+>
+> On Wed, Nov 30, 2011 at 7:40 AM, vishal agarwal <vishal.bluez@gmail.com> wrote:
+>>  There is an existing DBus interface for proximity -
+>> PROXIMITY_INTERFACE. SetProperty, GetProperties methods and
+>> PropertyChanged signal is registered on this interface.
+>>  SetProperty takes two arguments - Property(LinkLossAlertLevel or
+>> ImmediateAlertLevel) and the value of alertlevel.
+>>  Same is true for PropertyChanged signal. it returns - Property
+>> (LinkLossAlertLevel or ImmediateAlertLevel) and the value of
+>> alertlevel
+>>
+>>  Now if user wants to find the other device (using FindMe profile)
+>> which is already connected to the Proximity monitor, for this,
+>> SetProperty should be called. But now there is no way for BlueZ to
+>> figure out whether it is called for Proximity(in this case, action
+>> will be taken when PathLoss condition met) or for FindMe(it has to
+>> write the alert level immediately).
+>
+> If you do a SetProperty("ImmediateAlertLevel", <level>) it will always
+> take immediately (i.e. try to connect if not already connected, and
+> then write to the Immediate Alert Level characteristic). This is not
+> specific to any profile (Proximity or FindMe), but to the Immediate
+> Alert Service (IAS) behavior documented on the service spec.
+>
+> You should remember that, on the Reporter/Target side, there is only
+> one Immediate Alert Service. If the device supports both profiles,
+> they share this service. So it has no way (and no need, as far as I
+> know) to tell the difference on which role is triggering the immediate
+> alert.
+>
+>>  Same thing applies when we receive PropertyChanged signal. There is
+>> no way for framework over DBus to figure out whether PropertyChanged
+>> is for FindMe or for Proximity. If implementation is such that
+>> Proximity reporter will alarm when it receives the PropertyChanged due
+>> to path loss and there will be no alarm when PropertyChanged is called
+>> for FindMe profile, framework has to know this.
+>
+> Sorry, but your paragraph above seems confusing to me. We do not
+> implement a D-Bus API for Proximity Reporter or to Find Me Target, but
+> only for monitor/locator. BlueZ's Proximity Reporter implementation is
+> only for testing, and does not have a D-Bus API (see
+> proximity/reporter.c).
+>
+> On the *proximity monitor* side, we may want to know if/when the
+> ImmediateAlertLevel was written on the server (actually you can't tell
+> it was successfully written, because the IAS uses Write Without
+> Response, but you may want to know when it was attempted). If you want
+> to monitor path loss (to issue alert on the monitor side), you should
+> be watching for changes on the "SignalLevel" property.
+>
+> You cannot tell for sure whether the remote device is alerting. You
+> can confirm by the visual/audible alert itself.
+>
+>>  One way to resolve these issues is to have seperate DBus interface
+>> for Proximity and FindMe profiles.
+>> Some benefits of using seperate interfaces for both the profiles -
+>> 1. Code will be more clear
+>> 2. Both BlueZ and framework above Dbus will easily distinguish
+>> different methods and signals for these profiles
+>> 3. Existing code will not break
+>
+> Please, take into consideration the points  I mentioned here, and let
+> us know if you have any questions/doubts.
+>
+> Best Regards,
+> --
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
+>
