@@ -1,28 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Dec 2011 13:29:57 +0200
+Date: Fri, 2 Dec 2011 13:26:49 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Santiago Carot-Nemesio <sancane@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Provide return status in gatt_service_add function
-Message-ID: <20111202112957.GC17203@x220.ger.corp.intel.com>
-References: <1322129290-10767-1-git-send-email-sancane@gmail.com>
+Subject: Re: [PATCH 2/6] Confiure C.C.C descriptor during the thermometer
+ configuration
+Message-ID: <20111202112649.GB17203@x220.ger.corp.intel.com>
+References: <1321973388-16300-1-git-send-email-sancane@gmail.com>
+ <1321973388-16300-2-git-send-email-sancane@gmail.com>
+ <1321973388-16300-3-git-send-email-sancane@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322129290-10767-1-git-send-email-sancane@gmail.com>
+In-Reply-To: <1321973388-16300-3-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Santiago,
 
-On Thu, Nov 24, 2011, Santiago Carot-Nemesio wrote:
-> Service plugins using the new GATT API may need to know if their attributes
-> were successfuly retgistered. In this way, plugins might abort loading
-> operation if they weren't registered.
-> ---
->  attrib/gatt-service.c |   15 +++++++++------
->  attrib/gatt-service.h |    2 +-
->  2 files changed, 10 insertions(+), 7 deletions(-)
+On Tue, Nov 22, 2011, Santiago Carot-Nemesio wrote:
+> +			atval[0] = 0x02;
+> +			atval[1] = 0x00;
 
-Both patches applied after fixing typos in your commit messages. Thanks.
+What are these magic values? Could we have some defines for them or
+something else more readable?
 
 Johan
