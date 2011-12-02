@@ -1,104 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Dec 2011 14:25:57 +0200
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
+Date: Fri, 2 Dec 2011 21:25:22 +0900
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
 	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 5/8] Bluetooth: Add HCI Read Data Block Size function
-Message-ID: <20111202122555.GD12339@aemeltch-MOBL1>
-References: <1322743335-8671-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1322743335-8671-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1322745223.26198.35.camel@aeonflux>
- <20111201133731.GF2216@aemeltch-MOBL1>
+Subject: Re: [PATCH 4/4] Bluetooth: use buffer priority to mark URB_ISO_ASAP
+ flag
+Message-ID: <20111202122522.GG2570@joana>
+References: <1320241924-2300-1-git-send-email-luiz.dentz@gmail.com>
+ <1320241924-2300-4-git-send-email-luiz.dentz@gmail.com>
+ <20111130172428.GA9425@samus>
+ <CABBYNZKod-HNwzuFhoLRUQc66uJkEQL-u7NCknPAjbtvOMorgw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111201133731.GF2216@aemeltch-MOBL1>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CABBYNZKod-HNwzuFhoLRUQc66uJkEQL-u7NCknPAjbtvOMorgw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Luiz,
 
-On Thu, Dec 01, 2011 at 03:37:33PM +0200, Emeltchenko Andrei wrote:
-> > > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> > > index a7fd63a..869ab72 100644
-> > > --- a/include/net/bluetooth/hci_core.h
-> > > +++ b/include/net/bluetooth/hci_core.h
-> > > @@ -172,6 +172,8 @@ struct hci_dev {
-> > >  
-> > >  	__u8		flow_ctl_mode;
-> > >  
-> > > +	__u16		block_len;
-> > > +
+* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-12-01 09:23:09 +0200]:
 
-What do you think about following:
-
-<------8<----------------------------------------
-|  diff --git a/include/net/bluetooth/hci_core.h
-|  b/include/net/bluetooth/hci_core.h
-|  index 44f130f..5a4e85c 100644
-|  @@ -188,6 +188,11 @@ struct hci_dev {
-|          unsigned int    sco_pkts;
-|          unsigned int    le_pkts;
-|
-|  +       __u16           block_len;
-|  +       __u16           block_mtu;
-|  +       __u16           num_blocks;
-|  +       __u16           block_cnt;
-|  +
-|          unsigned long   acl_last_tx;
-|          unsigned long   sco_last_tx;
-|          unsigned long   le_last_tx;
-|
-<------8<----------------------------------------
-
-> > >  	unsigned int	auto_accept_delay;
-> > >  
-> > >  	unsigned long	quirks;
-> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > index efad012..a646310 100644
-> > > --- a/net/bluetooth/hci_event.c
-> > > +++ b/net/bluetooth/hci_event.c
-> > > @@ -774,6 +774,33 @@ static void hci_cc_read_bd_addr(struct hci_dev *hdev, struct sk_buff *skb)
-> > >  	hci_req_complete(hdev, HCI_OP_READ_BD_ADDR, rp->status);
-> > >  }
-> > >  
-> > > +static void hci_cc_read_data_block_size(struct hci_dev *hdev,
-> > > +							struct sk_buff *skb)
-> > > +{
-> > > +	struct hci_rp_read_data_block_size *rp = (void *) skb->data;
-> > > +
-> > > +	BT_DBG("%s status 0x%x", hdev->name, rp->status);
-> > > +
-> > > +	if (rp->status)
-> > > +		return;
-> > > +
-> > > +	if (hdev->flow_ctl_mode == HCI_FLOW_CTL_MODE_BLOCK_BASED) {
-> > > +		hdev->acl_mtu  = __le16_to_cpu(rp->max_acl_len);
-> > > +		hdev->sco_mtu = 0;
-> > > +		hdev->block_len = __le16_to_cpu(rp->block_len);
-> > > +		/* acl_pkts indicates the number of blocks */
-> > > +		hdev->acl_pkts = __le16_to_cpu(rp->num_blocks);
-> > > +		hdev->sco_pkts = 0;
-> > > +		hdev->acl_cnt = hdev->acl_pkts;
-> > > +		hdev->sco_cnt = 0;
-> > > +	}
-> > 
-> > I am still not convinced that overloading the variables is a good idea.
-> > And so far nobody has me convinced that this is the best way.
+> Hi Vinicius,
 > 
-> I think that we can use different variables like block_cnt and acl_blocks,
-> then function split as you mentioned in other comment does make sense.
+> On Wed, Nov 30, 2011 at 7:24 PM, Vinicius Costa Gomes
+> <vinicius.gomes@openbossa.org> wrote:
+> > Hi,
+> >
+> > On 15:52 Wed 02 Nov, Luiz Augusto von Dentz wrote:
+> >> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >>
+> >> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >> ---
+> >>  drivers/bluetooth/btusb.c |    3 +++
+> >>  1 files changed, 3 insertions(+), 0 deletions(-)
+> >>
+> >> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> >> index abfc4ee..9db2476 100644
+> >> --- a/drivers/bluetooth/btusb.c
+> >> +++ b/drivers/bluetooth/btusb.c
+> >> @@ -727,6 +727,9 @@ static int btusb_send_frame(struct sk_buff *skb)
+> >>               usb_fill_bulk_urb(urb, data->udev, pipe,
+> >>                               skb->data, skb->len, btusb_tx_complete, skb);
+> >>
+> >> +             if (skb->priority >= HCI_PRIO_MAX - 1)
+> >> +                     urb->transfer_flags  = URB_ISO_ASAP;
+> >> +
+> >
+> > In case someone is having problems:
+> >
+> > With CONFIG_USB_DEBUG enabled the check that the URB_ISO_ASAP flag is
+> > not valid for bulk endpoints is enabled, and that urb is rejected.
+> 
+> Hmm, you are right URB_ISO_ASAP is not meant for bulk so usb_submit_urb drop it:
+> 
+>  	/* fail if submitter gave bogus flags */
+> 	if (urb->transfer_flags != orig_flags) {
+> 		dev_err(&dev->dev, "BOGUS urb flags, %x --> %x\n",
+> 			orig_flags, urb->transfer_flags);
+> 		return -EINVAL;
+> 	}
+> 
+> So we better remove asap.
 
-then here comes:
+Can you prepare a patch?
 
-<------8<--------------------------------------------------------------
-|  +       if (hdev->flow_ctl_mode == HCI_FLOW_CTL_MODE_BLOCK_BASED) {
-|  +               hdev->block_mtu = __le16_to_cpu(rp->max_acl_len);
-|  +               hdev->block_len = __le16_to_cpu(rp->block_len);
-|  +               hdev->num_blocks = __le16_to_cpu(rp->num_blocks);
-|  +
-|  +               hdev->block_cnt = hdev->num_blocks;
-|  +       }
-<------8<--------------------------------------------------------------
-
-Best regards 
-Andrei Emeltchenko 
+	Gustavo
