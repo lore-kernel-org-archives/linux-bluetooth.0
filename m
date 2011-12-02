@@ -1,38 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 2 Dec 2011 20:50:25 +0900
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv1 2/6] Bluetooth: Split ctrl init to BREDR and AMP parts
+Message-ID: <20111202115025.GD2570@joana>
+References: <1322139125-22377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1322139125-22377-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20111202112649.GB17203@x220.ger.corp.intel.com>
-References: <1321973388-16300-1-git-send-email-sancane@gmail.com>
-	<1321973388-16300-2-git-send-email-sancane@gmail.com>
-	<1321973388-16300-3-git-send-email-sancane@gmail.com>
-	<20111202112649.GB17203@x220.ger.corp.intel.com>
-Date: Fri, 2 Dec 2011 12:52:00 +0100
-Message-ID: <CACLukz+aP0O_SXLpmA+EadYTFPHEHg6krjj4aqSkpu55ifdFHg@mail.gmail.com>
-Subject: Re: [PATCH 2/6] Confiure C.C.C descriptor during the thermometer configuration
-From: Santiago Carot <sancane@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1322139125-22377-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Andrei,
 
-2011/12/2 Johan Hedberg <johan.hedberg@gmail.com>:
-> Hi Santiago,
->
-> On Tue, Nov 22, 2011, Santiago Carot-Nemesio wrote:
->> +                     atval[0] = 0x02;
->> +                     atval[1] = 0x00;
->
-> What are these magic values? Could we have some defines for them or
-> something else more readable?
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-24 14:52:01 +0200]:
 
-These are GATT flags to enable/disable indications/notifications in
-client characteristic configuration descriptor, I thought about this
-issue, I haven't seen any macros mapping those values in GATT though.
-I was thinking in sending a separate patch to deal with this issue but
-I saw some Claudio's commits to deal with notification/indications so
-I guess he is already working on it, so I decided no to  interfere and
-wait to see how he is thinking to deal with this stuff.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Current controller initialization is moved tp bredr_init and new
+> function added amp_init to handle later AMP init sequence. Current
+> AMP init sequence include Reset and Read Local Version.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/hci_core.c  |   64 ++++++++++++++++++++++++++++++++------------
+>  net/bluetooth/hci_event.c |    3 ++
+>  2 files changed, 49 insertions(+), 18 deletions(-)
 
-Regards.
+For some reason this patch doesn't apply, please rebase.
+
+	Gustavo
