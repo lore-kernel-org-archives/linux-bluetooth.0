@@ -1,28 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Dec 2011 20:42:33 +0900
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 2 Dec 2011 13:29:57 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 1/2] Bluetooth: Add HCI Read Flow Control Mode function
-Message-ID: <20111202114233.GC2570@joana>
-References: <1322062515-8475-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH 1/2] Provide return status in gatt_service_add function
+Message-ID: <20111202112957.GC17203@x220.ger.corp.intel.com>
+References: <1322129290-10767-1-git-send-email-sancane@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322062515-8475-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1322129290-10767-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Santiago,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-23 17:35:14 +0200]:
+On Thu, Nov 24, 2011, Santiago Carot-Nemesio wrote:
+> Service plugins using the new GATT API may need to know if their attributes
+> were successfuly retgistered. In this way, plugins might abort loading
+> operation if they weren't registered.
+> ---
+>  attrib/gatt-service.c |   15 +++++++++------
+>  attrib/gatt-service.h |    2 +-
+>  2 files changed, 10 insertions(+), 7 deletions(-)
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Upstream Code Aurora function with minor trivial fixes.
-> Origin: git://codeaurora.org/kernel/msm.git
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Both patches applied after fixing typos in your commit messages. Thanks.
 
-Applied, thanks.
-
-	Gustavo
+Johan
