@@ -1,47 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1322839607.26198.36.camel@aeonflux>
-Subject: Re: [PATCH 2/2] Bluetooth: Ignore HCI_Read_Local_Commands failures
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gustavo Padovan <padovan@profusion.mobi>
-Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
-Date: Fri, 02 Dec 2011 16:26:47 +0100
-In-Reply-To: <20111202000247.GB2688@joana>
-References: <1321898484-17952-1-git-send-email-johan.hedberg@gmail.com>
-	 <1321898484-17952-2-git-send-email-johan.hedberg@gmail.com>
-	 <20111201124039.GB2894@joana> <1322744973.26198.31.camel@aeonflux>
-	 <20111202000247.GB2688@joana>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Message-id: <B6FA980DEB6A49D7B309B3B9F8E44D49@sisodomain.com>
+From: Jaganath <jaganath.k@samsung.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <1322827022-27391-1-git-send-email-jaganath.k@samsung.com>
+ <CABBYNZ+uimY=eA6PnND5mqeAj2411rk0hseXp1PXbdEDt6P4vw@mail.gmail.com>
+ <90B4470ABE8C438C9650ED03BF611926@sisodomain.com>
+ <CABBYNZKvf=-GjM24J3jQOwRVrLJ90y8SvHXsQNSeHZMEEudFvg@mail.gmail.com>
+In-reply-to: <CABBYNZKvf=-GjM24J3jQOwRVrLJ90y8SvHXsQNSeHZMEEudFvg@mail.gmail.com>
+Subject: Re: [PATCH obexd] Fix file size issue in GetProperties
+Date: Fri, 02 Dec 2011 20:28:26 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Luiz,
 
-> > > > Some 1.2 controllers will fail the HCI_Read_Local_Commands HCI command
-> > > > even though (according to the specification) they should support it.
-> > > > Since this HCI command is part of the controller init sequence
-> > > > controllers broken in this manner would be unusable. Since not having
-> > > > the list of supported commands is not critical for these controllers it
-> > > > is better to just ignore failures in this case (additionally, this is
-> > > > also how older kernels used to behave).
-> > > > 
-> > > > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> > > > ---
-> > > >  net/bluetooth/hci_event.c |   16 ++++++++++++++++
-> > > >  1 files changed, 16 insertions(+), 0 deletions(-)
-> > > 
-> > > Both patches have been applied, thanks.
-> > 
-> > I would have preferred you didn't. Since now I have to get this all
-> > fixed up as well.
-> 
-> Is this for both of them?
+--------------------------------------------------
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Sent: Friday, December 02, 2011 8:01 PM
+To: "Jaganath" <jaganath.k@samsung.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH obexd] Fix file size issue in GetProperties
 
-yes, we need to stop hacking around here and once and for all solve this
-properly.
-
-Regards
-
-Marcel
-
+> Hi Jaganath,
+>
+> On Fri, Dec 2, 2011 at 3:00 PM, Jaganath <jaganath.k@samsung.com> wrote:
+>>>
+>>>
+>>> Nice catch, but I would like to avoid another public function for
+>>> this, so how about making obc_transfer_set_file static on transfer.c
+>>> calling it in obc_transfer_register?
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>>> --
+>>
+>>
+>> obc_transfer_register is being called from obc_session_get which
+>> eventually calls obc_transfer_get in which if transfer->name is NULL
+>> transfer->filename is open with write mode. obc_session_get is used from
+>> pbap and sync with name as NULL and filename as NOT NULL.
+>
+> Now I realize why I didn't do it since the beginning, because the
+> application can skip the files it is probably better to not open them
+> until they are acknowledged, also it is very bad idea to call back the
+> daemon while within the Request as the daemon could be waiting the
+> application to acknowledged it can cause a deadlock where both the
+> application and obex-client are waiting for each other.
+>
+> There are plans to change this API so OPP would also register a
+> session and all transfers register an object, with this we will
+> probably not need the agent interface anymore and things became a bit
+> simpler as we return the transfer object directly on SendFile.
+>
+> -- 
+> Luiz Augusto von Dentz
+> --
+I accept that it is bad to have a dbus round trip. But I am unclear about 
+the deadlock
+scenario since deamon is calling "Request" method asynchronously.
+Since transfer is already registered before "Request" method, application 
+can
+call "GetProperties" at any point of time. 
 
