@@ -1,34 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Dec 2011 13:15:10 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Syam Sidhardhan <s.syam@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Fix dbus reply memory leak
-Message-ID: <20111202111510.GA15891@x220.ger.corp.intel.com>
-References: <1322144076-1913-1-git-send-email-s.syam@samsung.com>
+Date: Fri, 2 Dec 2011 20:15:11 +0900
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: eran <eran@over-here.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Adding USB device 13d3:3375 as an Atheros
+ AR3012.
+Message-ID: <20111202111511.GA2570@joana>
+References: <20111123100356.GB9838@over-here.org>
+ <20111123190500.GA7179@samus>
+ <20111124111908.GA922@over-here.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322144076-1913-1-git-send-email-s.syam@samsung.com>
+In-Reply-To: <20111124111908.GA922@over-here.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+Hi Eran,
 
-On Thu, Nov 24, 2011, Syam Sidhardhan wrote:
+* eran <eran@over-here.org> [2011-11-24 11:19:08 +0000]:
+
+> From: Eran <eran@over-here.org>
+> 
+> The bluetooth module in the Asus UX31/UX21 is based on Atheros AR3012
+> and requires a firmware to be uploaded before it's usable.
+> 
+> Signed-off-by: Eran <eran@over-here.org>
 > ---
->  audio/telephony-maemo5.c |    8 ++++----
->  cups/main.c              |   30 +++++++++++++++++++++++++-----
->  test/agent.c             |    2 ++
->  test/mpris-player.c      |    6 +++++-
->  4 files changed, 36 insertions(+), 10 deletions(-)
+>  drivers/bluetooth/ath3k.c |    2 ++
+>  drivers/bluetooth/btusb.c |    1 +
+>  2 files changed, 3 insertions(+), 0 deletions(-)
 
-Your commit message uses the word leak in singular form but there are
-multiple fixes in this patch, i.e. the commit message is misleading. In
-this case I'd split the patch into four separate ones:
+Please also add the output of the usb-devices scripts related to this device,
+then you can prove in the commit message that your change is really needed.
 
-telephony-maemo5: Fix D-Bus reply memory leaks
-cups: Fix D-Bus reply memory leaks
-agent: Fix D-Bus reply memory leaks
-mpris-player: Fix D-Bus reply memory leaks
-
-Johan
+	Gustavo
