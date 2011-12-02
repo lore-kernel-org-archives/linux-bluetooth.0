@@ -1,68 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Dec 2011 21:25:22 +0900
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/4] Bluetooth: use buffer priority to mark URB_ISO_ASAP
- flag
-Message-ID: <20111202122522.GG2570@joana>
-References: <1320241924-2300-1-git-send-email-luiz.dentz@gmail.com>
- <1320241924-2300-4-git-send-email-luiz.dentz@gmail.com>
- <20111130172428.GA9425@samus>
- <CABBYNZKod-HNwzuFhoLRUQc66uJkEQL-u7NCknPAjbtvOMorgw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CABBYNZKod-HNwzuFhoLRUQc66uJkEQL-u7NCknPAjbtvOMorgw@mail.gmail.com>
+From: jaganath.k@samsung.com
+To: linux-bluetooth@vger.kernel.org
+Cc: "jaganath.k" <jaganath.k@samsung.com>
+Subject: [PATCH obexd] Fix file size issue in GetProperties
+Date: Fri, 02 Dec 2011 17:27:02 +0530
+Message-id: <1322827022-27391-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: jaganath.k <jaganath.k@samsung.com>
 
-* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-12-01 09:23:09 +0200]:
+In SendFiles, If application calls GetProperties before
+Request method returns then the file size is zero.
+---
+ client/session.c  |    4 ++++
+ client/transfer.c |   40 ++++++++++++++++++++++++----------------
+ client/transfer.h |    1 +
+ 3 files changed, 29 insertions(+), 16 deletions(-)
 
-> Hi Vinicius,
-> 
-> On Wed, Nov 30, 2011 at 7:24 PM, Vinicius Costa Gomes
-> <vinicius.gomes@openbossa.org> wrote:
-> > Hi,
-> >
-> > On 15:52 Wed 02 Nov, Luiz Augusto von Dentz wrote:
-> >> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >>
-> >> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >> ---
-> >>  drivers/bluetooth/btusb.c |    3 +++
-> >>  1 files changed, 3 insertions(+), 0 deletions(-)
-> >>
-> >> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> >> index abfc4ee..9db2476 100644
-> >> --- a/drivers/bluetooth/btusb.c
-> >> +++ b/drivers/bluetooth/btusb.c
-> >> @@ -727,6 +727,9 @@ static int btusb_send_frame(struct sk_buff *skb)
-> >>               usb_fill_bulk_urb(urb, data->udev, pipe,
-> >>                               skb->data, skb->len, btusb_tx_complete, skb);
-> >>
-> >> +             if (skb->priority >= HCI_PRIO_MAX - 1)
-> >> +                     urb->transfer_flags  = URB_ISO_ASAP;
-> >> +
-> >
-> > In case someone is having problems:
-> >
-> > With CONFIG_USB_DEBUG enabled the check that the URB_ISO_ASAP flag is
-> > not valid for bulk endpoints is enabled, and that urb is rejected.
-> 
-> Hmm, you are right URB_ISO_ASAP is not meant for bulk so usb_submit_urb drop it:
-> 
->  	/* fail if submitter gave bogus flags */
-> 	if (urb->transfer_flags != orig_flags) {
-> 		dev_err(&dev->dev, "BOGUS urb flags, %x --> %x\n",
-> 			orig_flags, urb->transfer_flags);
-> 		return -EINVAL;
-> 	}
-> 
-> So we better remove asap.
+diff --git a/client/session.c b/client/session.c
+index f288ecd..9f02512 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -1277,6 +1277,10 @@ int obc_session_send(struct obc_session *session, const char *filename,
+ 	if (transfer == NULL)
+ 		return -EINVAL;
+ 
++	err = obc_transfer_set_file(transfer);
++	if (err < 0)
++		goto fail;
++
+ 	/* Transfer should start if it is the first in the pending list */
+ 	if (transfer != session->pending->data)
+ 		return 0;
+diff --git a/client/transfer.c b/client/transfer.c
+index b6994d1..5b67d1e 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -563,8 +563,6 @@ int obc_transfer_put(struct obc_transfer *transfer, transfer_callback_t func,
+ 	GObex *obex;
+ 	GObexPacket *req;
+ 	GObexDataProducer data_cb;
+-	struct stat st;
+-	int fd;
+ 
+ 	if (transfer->xfer != 0)
+ 		return -EALREADY;
+@@ -574,20 +572,6 @@ int obc_transfer_put(struct obc_transfer *transfer, transfer_callback_t func,
+ 		goto done;
+ 	}
+ 
+-	fd = open(transfer->filename, O_RDONLY);
+-	if (fd < 0) {
+-		error("open(): %s(%d)", strerror(errno), errno);
+-		return -errno;
+-	}
+-
+-	if (fstat(fd, &st) < 0) {
+-		close(fd);
+-		error("fstat(): %s(%d)", strerror(errno), errno);
+-		return -errno;
+-	}
+-
+-	transfer->fd = fd;
+-	transfer->size = st.st_size;
+ 	data_cb = put_xfer_progress;
+ 
+ done:
+@@ -667,3 +651,27 @@ gint64 obc_transfer_get_size(struct obc_transfer *transfer)
+ {
+ 	return transfer->size;
+ }
++
++int obc_transfer_set_file(struct obc_transfer *transfer)
++{
++	int fd;
++	struct stat st;
++
++	fd = open(transfer->filename, O_RDONLY);
++	if (fd < 0) {
++		error("open(): %s(%d)", strerror(errno), errno);
++		return -errno;
++	}
++
++	if (fstat(fd, &st) < 0) {
++		error("fstat(): %s(%d)", strerror(errno), errno);
++		close(fd);
++		return -errno;
++	}
++
++	transfer->fd = fd;
++	transfer->size = st.st_size;
++
++	return 0;
++}
++
+diff --git a/client/transfer.h b/client/transfer.h
+index ba53fd1..c051cbd 100644
+--- a/client/transfer.h
++++ b/client/transfer.h
+@@ -55,3 +55,4 @@ void obc_transfer_clear_buffer(struct obc_transfer *transfer);
+ void obc_transfer_set_name(struct obc_transfer *transfer, const char *name);
+ const char *obc_transfer_get_path(struct obc_transfer *transfer);
+ gint64 obc_transfer_get_size(struct obc_transfer *transfer);
++int obc_transfer_set_file(struct obc_transfer *transfer);
+-- 
+1.7.1
 
-Can you prepare a patch?
-
-	Gustavo
