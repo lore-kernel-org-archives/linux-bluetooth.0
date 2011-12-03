@@ -1,63 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	Santiago Carot <sancane@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH 1/2] Provide return status in gatt_service_add function
-Date: Sun, 4 Dec 2011 06:51:13 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B02643D9D0@DNCE02.ent.ti.com>
-References: <1322129290-10767-1-git-send-email-sancane@gmail.com>
-	<20111202112957.GC17203@x220.ger.corp.intel.com>
-	<CACLukzK1YyqBszGc679Vj-Pf9+M+s+LaBpnd2_+pan8TCwHODA@mail.gmail.com>
- <CAJdJm_P5OU6vqs+-9xL36=1DWVtgzzY1CEPf6rD3Tws5BSik2g@mail.gmail.com>
-In-Reply-To: <CAJdJm_P5OU6vqs+-9xL36=1DWVtgzzY1CEPf6rD3Tws5BSik2g@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+From: gene heskett <gheskett@wdtv.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] Fix dbus reply memory leak
+Date: Sat, 3 Dec 2011 16:00:26 -0500
+References: <1322144076-1913-1-git-send-email-s.syam@samsung.com> <20111202111510.GA15891@x220.ger.corp.intel.com> <4EDA85AA.3060400@gmail.com>
+In-Reply-To: <4EDA85AA.3060400@gmail.com>
 MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="windows-1256"
+Message-Id: <201112031600.26954.gheskett@wdtv.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Anderson,
+On Saturday, December 03, 2011 03:54:56 PM Syam Sidhardhan did opine:
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Anderson Lizardo
-> Sent: Friday, December 02, 2011 5:37 PM
-> To: Santiago Carot
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH 1/2] Provide return status in gatt_service_add
-> function
+> Hi Johan,
 > 
-> Hi Santiago,
+> On 12/2/2011 4:45 PM, Johan Hedberg wrote:
+> > Hi Syam,
+> > 
+> > On Thu, Nov 24, 2011, Syam Sidhardhan wrote:
+> >> ---
+> >> 
+> >>   audio/telephony-maemo5.c |    8 ++++----
+> >>   cups/main.c              |   30 +++++++++++++++++++++++++-----
+> >>   test/agent.c             |    2 ++
+> >>   test/mpris-player.c      |    6 +++++-
+> >>   4 files changed, 36 insertions(+), 10 deletions(-)
+> > 
+> > Your commit message uses the word leak in singular form but there are
+> > multiple fixes in this patch, i.e. the commit message is misleading.
+> > In this case I'd split the patch into four separate ones:
+> > 
+> > telephony-maemo5: Fix D-Bus reply memory leaks
+> > cups: Fix D-Bus reply memory leaks
+> > agent: Fix D-Bus reply memory leaks
+> > mpris-player: Fix D-Bus reply memory leaks
+> > 
+> > Johan
 > 
-> On Fri, Dec 2, 2011 at 7:43 AM, Santiago Carot <sancane@gmail.com>
-> wrote:
-> > When I was working in this stuff, I was wondering if there may exist
-> > the case when a plugin registers several services and the last one
-> > fails, Do you think it would have sense to provide the service ID as
-> > return parameter to allow plugins remove their attributes before
-> > aborting the loading operation?, On the other hand, this feature
-> would
-> > raise the posibility of finding gaps in the distribution of handlers
-> > assigned in GATT due that plugins could add and remove services
-> > dynamically, I'm not sure if that is expected in GATT.
+> Yes, you are correct. You can split it into multiple patches.
+> Thanks in advance.
 > 
-> I think that, before doing anything like this, we should ensure the
-> handles allocated for GATT servers do not change after registration
-> (i.e. they are kept in storage and reloaded when bluez starts). If
-> possible, can you contribute on this regard?
-> 
-> Thanks,
-> --
-> Anderson Lizardo
-> Instituto Nokia de Tecnologia - INdT
-> Manaus - Brazil
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-
-> bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Syam
 
-How do you ensure that? Do you assume that all servers will always initialize at bluetoothd startup, and always in the same order? Who's responsibility is it to send out the "service changed" notification when something changed? What is the proposed logic for this ?
+Probably off topic to this patch discussion, but whats chances, while you 
+folks are kicking dbus's tires, of fixing the thing so that if the target 
+doesn't exist, the message sent gets thrown under the buss instead of 
+blocking, which then requires a kill of both processes, and a proper 
+sequentially done restart (target started first) to make it work?
 
-Thanks,
-Chen Ganir
+Cheers, Gene
+-- 
+"There are four boxes to be used in defense of liberty:
+ soap, ballot, jury, and ammo. Please use in that order."
+-Ed Howdershelt (Author)
+My web page: <http://coyoteden.dyndns-free.com:85/gene>
+I am just a nice, clean-cut Mongolian boy.
+	-- Yul Brynner, 1956
