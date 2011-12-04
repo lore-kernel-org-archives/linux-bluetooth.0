@@ -1,30 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EDC77AA.3020801@globaledgesoft.com>
-Date: Mon, 05 Dec 2011 13:20:02 +0530
-From: Deepthi <deepthi.pv@globaledgesoft.com>
+Date: Sun, 4 Dec 2011 22:55:41 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Syam Sidhardhan <syamsidhardh@gmail.com>
+Cc: Syam Sidhardhan <s.syam@samsung.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] Fix dbus reply memory leak
+Message-ID: <20111204205541.GA3918@fusion.localdomain>
+References: <1322144076-1913-1-git-send-email-s.syam@samsung.com>
+ <20111202111510.GA15891@x220.ger.corp.intel.com>
+ <4EDA85AA.3060400@gmail.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-CC: "deepthi.pv@globaledgesoft.com" <deepthi.pv@globaledgesoft.com>
-Subject: mpris-player
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4EDA85AA.3060400@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Syam,
 
+On Sun, Dec 04, 2011, Syam Sidhardhan wrote:
+> >Your commit message uses the word leak in singular form but there are
+> >multiple fixes in this patch, i.e. the commit message is misleading. In
+> >this case I'd split the patch into four separate ones:
+> >
+> >telephony-maemo5: Fix D-Bus reply memory leaks
+> >cups: Fix D-Bus reply memory leaks
+> >agent: Fix D-Bus reply memory leaks
+> >mpris-player: Fix D-Bus reply memory leaks
+> >
+> >Johan
+> 
+> Yes, you are correct. You can split it into multiple patches.
+> Thanks in advance.
 
-Hello,
+Maybe I was a bit unclear: I'm expecting *you* to do this split and
+resend the patches. Thanks :)
 
-
-     While executing the mpris-player , I 'm getting error saying :No
-such Object path  /org/mpris/MediaPlayer2. Please help.
-
-
-
-
-Thanks&  Regards,
-Deepthi Elizabeth P V
-
-
-
-
-
+Johan
