@@ -1,38 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 4 Dec 2011 22:55:41 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Syam Sidhardhan <syamsidhardh@gmail.com>
-Cc: Syam Sidhardhan <s.syam@samsung.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Fix dbus reply memory leak
-Message-ID: <20111204205541.GA3918@fusion.localdomain>
-References: <1322144076-1913-1-git-send-email-s.syam@samsung.com>
- <20111202111510.GA15891@x220.ger.corp.intel.com>
- <4EDA85AA.3060400@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4EDA85AA.3060400@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Alexander Kozinko <xcariba@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-kernel@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Alexander Kozinko <xcariba@gmail.com>
+Subject: [PATCH 1/1] bluetooth: Fix for new AR3012 embeded modules in Acer Aspire S3 and Asus Zenbook UX31
+Date: Sun,  4 Dec 2011 20:16:37 +0400
+Message-Id: <1323015397-3017-1-git-send-email-xcariba@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+Added new ids for embeded bluetooth modules.
 
-On Sun, Dec 04, 2011, Syam Sidhardhan wrote:
-> >Your commit message uses the word leak in singular form but there are
-> >multiple fixes in this patch, i.e. the commit message is misleading. In
-> >this case I'd split the patch into four separate ones:
-> >
-> >telephony-maemo5: Fix D-Bus reply memory leaks
-> >cups: Fix D-Bus reply memory leaks
-> >agent: Fix D-Bus reply memory leaks
-> >mpris-player: Fix D-Bus reply memory leaks
-> >
-> >Johan
-> 
-> Yes, you are correct. You can split it into multiple patches.
-> Thanks in advance.
+Tested on both laptops.
 
-Maybe I was a bit unclear: I'm expecting *you* to do this split and
-resend the patches. Thanks :)
+Signed-off-by: Alexander Kozinko <xcariba@gmail.com>
+---
+ drivers/bluetooth/ath3k.c |    4 ++++
+ drivers/bluetooth/btusb.c |    2 ++
+ 2 files changed, 6 insertions(+), 0 deletions(-)
 
-Johan
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 106beb1..bc3c343 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -70,6 +70,8 @@ static struct usb_device_id ath3k_table[] = {
+ 
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0CF3, 0x3004) },
++	{ USB_DEVICE(0x13d3, 0x3375) },
++	{ USB_DEVICE(0x04ca, 0x3004) },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -86,6 +88,8 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
+ 
+ 	{ }	/* Terminating entry */
+ };
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index fe4ebc3..098a743 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -125,6 +125,8 @@ static struct usb_device_id blacklist_table[] = {
+ 
+ 	/* Atheros 3012 with sflash firmware */
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+-- 
+1.7.5.4
