@@ -1,107 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <8A7B76EFF5FC4713ABFDC465BD266EE1@sisodomain.com>
-From: Chethan T N <chethan.tn@samsung.com>
-To: sathish <sathish.n@globaledgesoft.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Jaganath <jaganath.k@samsung.com>, linux-bluetooth@vger.kernel.org
-References: <1322265226-6404-1-git-send-email-andre.guedes@openbossa.org>
- <1322265226-6404-6-git-send-email-andre.guedes@openbossa.org>
- <1322497442.29909.36.camel@aeonflux>
- <65E3B21D-EC4E-4443-ADAB-39576B981F70@openbossa.org>
- <65AF22C1CD4D4E948B9A22A50C0B504D@sisodomain.com>
- <CABBYNZL9qLM3aKk_pWBSMdR4VVGqCuUcdTA_rwh1mtXqB2QtyQ@mail.gmail.com>
- <4EDCC105.6070803@globaledgesoft.com>
-In-reply-to: <4EDCC105.6070803@globaledgesoft.com>
-Subject: Re: Query on Media Interface "RegisterPlayer" and Dbus signal
- "TrackChanged"
-Date: Tue, 06 Dec 2011 11:51:56 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=response
+Date: Mon, 5 Dec 2011 22:15:29 +0000
+From: eran <eran@over-here.org>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Adding USB device 13d3:3375 as an Atheros
+ AR3012.
+Message-ID: <20111205221529.GA21676@over-here.org>
+References: <20111123100356.GB9838@over-here.org>
+ <20111123190500.GA7179@samus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20111123190500.GA7179@samus>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Eran <eran@over-here.org>
 
---------------------------------------------------
-From: "sathish" <sathish.n@globaledgesoft.com>
-Sent: Monday, December 05, 2011 6:33 PM
-To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Cc: "Jaganath" <jaganath.k@samsung.com>; <linux-bluetooth@vger.kernel.org>
-Subject: Re: Query on Media Interface "RegisterPlayer" and Dbus signal 
-"TrackChanged"
+The bluetooth module in the Asus UX31/UX21 is based on Atheros AR3012
+and requires a firmware to be uploaded before it's usable.
 
->  On Friday 02 December 2011 04:37 PM, Luiz Augusto von Dentz wrote:
->> Hi Jaganath,
->>
->> On Fri, Dec 2, 2011 at 12:02 PM, Jaganath<jaganath.k@samsung.com>  wrote:
->>> Hi,
->>>
->>> I have come across a scenario related to Media Interface meant for AVRCP 
->>> 1.3
->>> features.
->>>
->>> Kindly please provide your opinions on this.
->>>
->>> If the Media Interface "RegisterPlayer" is called before the  headset
->>> connection, then player gets registered successfully and all the
->>> Vendor dependent commands are handled properly. And in case of any 
->>> change in
->>> the track, through the "TrackChanged" Dbus signal
->>> shall be sent with information about "Change of track" and "Start of 
->>> track".
->>> This scenario will work because we have registered for the
->>> callback  "state_changed"(audio/avrcp.c) through "avrcp_register_player"
->>> (audio/avrcp.c) API. When connection is ongoing "state_changed"
->>> callback shall be invoked with state as "AVCTP_STATE_CONNECTING" where 
->>> in
->>> "player->session" will be initialized.
->>>
->>>
->>> However if the "RegisterPlayer" is called after the headset connection, 
->>> then
->>> we will not be able to send the "TrackChanged" signal with
->>> information of "Change of track" and "Start of track". Since the headset 
->>> is
->>> already connected,"state_changed" callback will not be
->>> invoked, hence in the avrcp_player_event" API "player->session" is NULL.
->>>
->>> Is it not necessary to handle the above the mentioned scenario?
->> Yes that is probably a valid and common scenario, so we probably need
->> to change the code to update the session when this happen but
->> apparently there is no way to notify the remote device about this
->> since the concept of players and EVENT_AVAILABLE_PLAYERS_CHANGED was
->> introduced only on 1.4. So for 1.3 we might have to pretend we have a
->> player without any metadata and as soon as one is registered we
->> assigned it to the active session and notify the metadata has changed
->> via events.
->>
-> Hi,
->     Please provide the information about how to use mpris 2.0 spec , can u 
-> please provide me detail of platform that register player worked 
-> successfully. I am also working on getting these information .
->
-> Thanks & regards ,
-> sathish N
->
-> -- 
-> Thanks&  Regards,
-> Sathish N
->
-    You can directly make use of DBus methods specified in the media-api.txt 
-for
-registering/unregistering the player, also you can send the Dbus signals 
-using the
-PropertyChanged for the player settings changes and TrackChanged for 
-metadata
-attributes changes.
+output of usb-devices for this module:
+T:  Bus=01 Lev=02 Prnt=02 Port=07 Cnt=03 Dev#=  6 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=13d3 ProdID=3375 Rev=00.02
+S:  Manufacturer=Atheros Communications
+S:  Product=Bluetooth USB Host Controller
+S:  SerialNumber=Alaska Day 2006
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-Write a simple test application which makes uses of the Dbus methods and 
-signals
-provided in the media-api.txt.
 
-To implement the above methods need not to follow the specification of 
-mpris2.0 spec.
+Signed-off-by: Eran <eran@over-here.org>
+---
+ drivers/bluetooth/ath3k.c |    2 ++
+ drivers/bluetooth/btusb.c |    1 +
+ 2 files changed, 3 insertions(+), 0 deletions(-)
 
-Thanks and Regards
-Chethan 
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 106beb1..b94aae6 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -70,6 +70,7 @@ static struct usb_device_id ath3k_table[] = {
+ 
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0CF3, 0x3004) },
++	{ USB_DEVICE(0x13d3, 0x3375) },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -86,6 +87,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+ 
+ 	{ }	/* Terminating entry */
+ };
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f9b7260..a64f15a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -122,6 +122,7 @@ static struct usb_device_id blacklist_table[] = {
+ 
+ 	/* Atheros 3012 with sflash firmware */
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+-- 
+1.7.2.5
 
