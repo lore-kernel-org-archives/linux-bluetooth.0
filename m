@@ -1,85 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: Santiago Carot <sancane@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH 1/2] Provide return status in gatt_service_add function
-Date: Mon, 5 Dec 2011 11:42:18 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0264400C3@DNCE02.ent.ti.com>
-References: <1322129290-10767-1-git-send-email-sancane@gmail.com>
-	<20111202112957.GC17203@x220.ger.corp.intel.com>
-	<CACLukzK1YyqBszGc679Vj-Pf9+M+s+LaBpnd2_+pan8TCwHODA@mail.gmail.com>
-	<CAJdJm_P5OU6vqs+-9xL36=1DWVtgzzY1CEPf6rD3Tws5BSik2g@mail.gmail.com>
-	<F0070FBC0FB3174D8D11444EB2D5B02643D9D0@DNCE02.ent.ti.com>
-	<CAJdJm_PAC_HsEd-8-25r4V-ZqG0gfxpio=rnUZzG4AWJM2cNJQ@mail.gmail.com>
-	<F0070FBC0FB3174D8D11444EB2D5B02644008E@DNCE02.ent.ti.com>
- <CAJdJm_O0xPVm9D5MOE30t2Baxq7ot5-fWWLvo65gSNOJGf-2dQ@mail.gmail.com>
-In-Reply-To: <CAJdJm_O0xPVm9D5MOE30t2Baxq7ot5-fWWLvo65gSNOJGf-2dQ@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bartosz Szatkowski <bulislaw@linux.com>
+Subject: [PATCH obexd 6/6] Add support for PullMessagesListing in MAP client
+Date: Mon,  5 Dec 2011 12:41:49 +0100
+Message-Id: <1323085309-23094-6-git-send-email-bulislaw@linux.com>
+In-Reply-To: <1323085309-23094-1-git-send-email-bulislaw@linux.com>
+References: <1323085309-23094-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Anderson,
+---
+ client/map.c    |   31 +++++++++++++++++++++++++++++++
+ test/map-client |    5 +++++
+ 2 files changed, 36 insertions(+), 0 deletions(-)
 
-> -----Original Message-----
-> From: Anderson Lizardo [mailto:anderson.lizardo@openbossa.org]
-> Sent: Monday, December 05, 2011 1:37 PM
-> To: Ganir, Chen
-> Cc: Santiago Carot; linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH 1/2] Provide return status in gatt_service_add
-> function
-> 
-> Hi Chen,
-> 
-> On Mon, Dec 5, 2011 at 7:10 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
-> > What do you mean restoring the attribute handles ? Each of the
-> profiles registers its own services when the plugin is loaded,
-> according to the load order (which I assume will not change).
-> 
-> There is no guarantee in the load order. As we add more plugins, you
-> can't predict the order the plugins will be loaded.
-> 
-> > When a profile registers its attributes, it can specify callbacks for
-> read/write which are actually function pointers. How to you plan to
-> support this?
-> 
-> Only attribute *handles* are to be stored (for now). The mapping could
-> be based on service+characteristic UUIDs (but we need to pay attention
-> if we have multiple services with same service and characteristic
-> UUIDs; for this case, I'm not even sure how the client knows which one
-> to use).
-> 
-> > In addition, who will be responsible for reloading the database and
-> populating the values (profile plugin or bluetoothd core) ? how do you
-> synchronize them?
-> 
-> My suggestion would be to implement this in attrib/gatt-service.c so
-> gatt_service_add() could load attribute handles from storage
-> transparently. This could also avoid changing every profile.
-> 
-> Note this is only for *server* roles (e.g. PAS server, TIP server, PXP
-> reporter etc.).
-> 
-> I'm not sure what you mean with synchronization. The attribute handles
-> are to be stored when the service is registered (and you can't change
-> them after registration).
-> 
-> > Do you have an RFC or a simple design description which will allow
-> reviewing?
-> 
-> No. I am not working on this currently. This discussion started from
-> an idea from Santiago to how to handle registration failures (see
-> initial post), to which I responded that we may want first to address
-> attribute handle storage to make sure handles stay the same during
-> device lifetime (until it is factory reset).
-> 
-> Regards,
-> --
-> Anderson Lizardo
-> Instituto Nokia de Tecnologia - INdT
-> Manaus - Brazil
+diff --git a/client/map.c b/client/map.c
+index 397c170..0ce2a14 100644
+--- a/client/map.c
++++ b/client/map.c
+@@ -144,6 +144,35 @@ static DBusMessage *map_get_folder_listing(DBusConnection *connection,
+ 							NULL, NULL, NULL, 0,
+ 							buffer_cb, map);
+ 	if (err < 0)
++		return g_dbus_create_error(message,
++						"org.openobex.Error.Failed",
++						"Failed");
++
++	map->msg = dbus_message_ref(message);
++
++	return NULL;
++}
++
++static DBusMessage *map_get_messages_listing(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	struct map_data *map = user_data;
++	int err;
++	const char *folder;
++	DBusMessageIter msg_iter;
++
++	dbus_message_iter_init(message, &msg_iter);
++
++	if (dbus_message_iter_get_arg_type(&msg_iter) != DBUS_TYPE_STRING)
++		return g_dbus_create_error(message,
++				"org.openobex.Error.InvalidArguments", NULL);
++
++	dbus_message_iter_get_basic(&msg_iter, &folder);
++
++	err = obc_session_get(map->session, "x-bt/MAP-msg-listing", folder,
++							NULL, NULL, 0,
++							buffer_cb, map);
++	if (err < 0)
+ 		return g_dbus_create_error(message, ERROR_FAILED_PATH,
+ 								"Failed");
+ 
+@@ -157,6 +186,8 @@ static GDBusMethodTable map_methods[] = {
+ 						G_DBUS_METHOD_FLAG_ASYNC },
+ 	{ "GetFolderListing",	"a{ss}", "s",	map_get_folder_listing,
+ 						G_DBUS_METHOD_FLAG_ASYNC },
++	{ "GetMessagesListing",	"sa{ss}", "s",	map_get_messages_listing,
++						G_DBUS_METHOD_FLAG_ASYNC },
+ 	{ }
+ };
+ 
+diff --git a/test/map-client b/test/map-client
+index bcd2e66..1a4afdb 100755
+--- a/test/map-client
++++ b/test/map-client
+@@ -14,6 +14,8 @@ def parse_options():
+     parser.add_option("-l", "--lsdir", action="store_true", dest="ls_dir",
+                       help="List folders in current directory")
+     parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
++    parser.add_option("-L", "--lsmsg", action="store", dest="ls_msg",
++                      help="List messages in supplied CWD subdir")
+ 
+     return parser.parse_args()
+ 
+@@ -54,4 +56,7 @@ if  __name__ == '__main__':
+     if options.ls_dir:
+         print map.GetFolderListing(dict())
+ 
++    if options.ls_msg is not None:
++	print map.GetMessagesListing(options.ls_msg, dict())
++
+     mainloop.run()
+-- 
+1.7.4.1
 
-Thanks.
-
-Chen Ganir.
