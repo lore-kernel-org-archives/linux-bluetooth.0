@@ -1,267 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd v2] MAP: Skeleton of application parameters support
-Date: Mon,  5 Dec 2011 13:21:25 +0100
-Message-Id: <1323087685-9528-1-git-send-email-lkslawek@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAJdJm_O0xPVm9D5MOE30t2Baxq7ot5-fWWLvo65gSNOJGf-2dQ@mail.gmail.com>
+References: <1322129290-10767-1-git-send-email-sancane@gmail.com>
+	<20111202112957.GC17203@x220.ger.corp.intel.com>
+	<CACLukzK1YyqBszGc679Vj-Pf9+M+s+LaBpnd2_+pan8TCwHODA@mail.gmail.com>
+	<CAJdJm_P5OU6vqs+-9xL36=1DWVtgzzY1CEPf6rD3Tws5BSik2g@mail.gmail.com>
+	<F0070FBC0FB3174D8D11444EB2D5B02643D9D0@DNCE02.ent.ti.com>
+	<CAJdJm_PAC_HsEd-8-25r4V-ZqG0gfxpio=rnUZzG4AWJM2cNJQ@mail.gmail.com>
+	<F0070FBC0FB3174D8D11444EB2D5B02644008E@DNCE02.ent.ti.com>
+	<CAJdJm_O0xPVm9D5MOE30t2Baxq7ot5-fWWLvo65gSNOJGf-2dQ@mail.gmail.com>
+Date: Mon, 5 Dec 2011 13:00:14 +0100
+Message-ID: <CACLukzKSQS7Lsv_V4eK4pXM+_aaUPqVdQX8N+bYEfyaZ=ve9zA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Provide return status in gatt_service_add function
+From: Santiago Carot <sancane@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: "Ganir, Chen" <chen.ganir@ti.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This introduces skeleton of functions for supporting processing of
-Message Access Profile specific OBEX application parameters. The code is
-usable in both MSE (server) and MCE (client), thus the patch enables
-linking the code to obexd and obex-client.
----
-Changes as per comments to first version.
+Hi Chen, Lizardo,
 
- Makefile.am  |    6 ++-
- src/map_ap.c |   89 +++++++++++++++++++++++++++++++++++++++++++++
- src/map_ap.h |  115 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 208 insertions(+), 2 deletions(-)
- create mode 100644 src/map_ap.c
- create mode 100644 src/map_ap.h
+2011/12/5 Anderson Lizardo <anderson.lizardo@openbossa.org>:
+> Hi Chen,
+>
+> On Mon, Dec 5, 2011 at 7:10 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
+>> What do you mean restoring the attribute handles ? Each of the profiles registers its own services when the plugin is loaded, according to the load order (which I assume will not change).
+>
+> There is no guarantee in the load order. As we add more plugins, you
+> can't predict the order the plugins will be loaded.
+>
+>> When a profile registers its attributes, it can specify callbacks for read/write which are actually function pointers. How to you plan to support this?
+>
+> Only attribute *handles* are to be stored (for now). The mapping could
+> be based on service+characteristic UUIDs (but we need to pay attention
+> if we have multiple services with same service and characteristic
+> UUIDs; for this case, I'm not even sure how the client knows which one
+> to use).
+>
 
-diff --git a/Makefile.am b/Makefile.am
-index af03f2e..bdb961f 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -61,7 +61,8 @@ builtin_sources += plugins/pbap.c plugins/phonebook.h \
- 			plugins/vcard.h plugins/vcard.c
- 
- builtin_modules += mas
--builtin_sources += plugins/mas.c plugins/messages.h
-+builtin_sources += plugins/mas.c plugins/messages.h \
-+			src/map_ap.c src/map_ap.h
- 
- builtin_modules += irmc
- builtin_sources += plugins/irmc.c
-@@ -121,7 +122,8 @@ client_obex_client_SOURCES = $(gdbus_sources) $(gobex_sources) \
- 				client/opp.h client/opp.c \
- 				client/transfer.h client/transfer.c \
- 				client/agent.h client/agent.c \
--				client/driver.h client/driver.c
-+				client/driver.h client/driver.c \
-+				src/map_ap.h src/map_ap.c
- 
- client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @BLUEZ_LIBS@
- endif
-diff --git a/src/map_ap.c b/src/map_ap.c
-new file mode 100644
-index 0000000..9d13adf
---- /dev/null
-+++ b/src/map_ap.c
-@@ -0,0 +1,89 @@
-+/*
-+ *
-+ *  OBEX Server
-+ *
-+ *  Copyright (C) 2010-2011  Nokia Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include "map_ap.h"
-+
-+map_ap_t *map_ap_new(void)
-+{
-+	return NULL;
-+}
-+
-+void map_ap_free(map_ap_t *ap)
-+{
-+}
-+
-+map_ap_t *map_ap_decode(const uint8_t *buffer, size_t length)
-+{
-+	return NULL;
-+}
-+
-+uint8_t *map_ap_encode(map_ap_t *ap, size_t *length)
-+{
-+	*length = 0;
-+
-+	return NULL;
-+}
-+
-+gboolean map_ap_get_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t *val)
-+{
-+	return FALSE;
-+}
-+
-+gboolean map_ap_get_u16(map_ap_t *ap, enum map_ap_tag tag, uint16_t *val)
-+{
-+	return FALSE;
-+}
-+
-+gboolean map_ap_get_u32(map_ap_t *ap, enum map_ap_tag tag, uint32_t *val)
-+{
-+	return FALSE;
-+}
-+
-+const char *map_ap_get_string(map_ap_t *ap, enum map_ap_tag tag)
-+{
-+	return NULL;
-+}
-+
-+gboolean map_ap_set_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t val)
-+{
-+	return FALSE;
-+}
-+
-+gboolean map_ap_set_u16(map_ap_t *ap, enum map_ap_tag tag, uint16_t val)
-+{
-+	return FALSE;
-+}
-+
-+gboolean map_ap_set_u32(map_ap_t *ap, enum map_ap_tag tag, uint32_t val)
-+{
-+	return FALSE;
-+}
-+
-+gboolean map_ap_set_string(map_ap_t *ap, enum map_ap_tag tag, const char *val)
-+{
-+	return FALSE;
-+}
-diff --git a/src/map_ap.h b/src/map_ap.h
-new file mode 100644
-index 0000000..9743b54
---- /dev/null
-+++ b/src/map_ap.h
-@@ -0,0 +1,115 @@
-+/*
-+ *
-+ *  OBEX Server
-+ *
-+ *  Copyright (C) 2010-2011  Nokia Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <glib.h>
-+#include <inttypes.h>
-+
-+/* List of OBEX application parameters tags as per MAP specification. */
-+enum map_ap_tag {
-+	MAP_AP_MAXLISTCOUNT		= 0x01,		/* uint16_t	*/
-+	MAP_AP_STARTOFFSET		= 0x02,		/* uint16_t	*/
-+	MAP_AP_FILTERMESSAGETYPE	= 0x03,		/* uint8_t	*/
-+	MAP_AP_FILTERPERIODBEGIN	= 0x04,		/* char *	*/
-+	MAP_AP_FILTERPERIODEND		= 0x05,		/* char *	*/
-+	MAP_AP_FILTERREADSTATUS		= 0x06,		/* uint8_t	*/
-+	MAP_AP_FILTERRECIPIENT		= 0x07,		/* char *	*/
-+	MAP_AP_FILTERORIGINATOR		= 0x08,		/* char *	*/
-+	MAP_AP_FILTERPRIORITY		= 0x09,		/* uint8_t	*/
-+	MAP_AP_ATTACHMENT		= 0x0A,		/* uint8_t	*/
-+	MAP_AP_TRANSPARENT		= 0x0B,		/* uint8_t	*/
-+	MAP_AP_RETRY			= 0x0C,		/* uint8_t	*/
-+	MAP_AP_NEWMESSAGE		= 0x0D,		/* uint8_t	*/
-+	MAP_AP_NOTIFICATIONSTATUS	= 0x0E,		/* uint8_t	*/
-+	MAP_AP_MASINSTANCEID		= 0x0F,		/* uint8_t	*/
-+	MAP_AP_PARAMETERMASK		= 0x10,		/* uint32_t	*/
-+	MAP_AP_FOLDERLISTINGSIZE	= 0x11,		/* uint16_t	*/
-+	MAP_AP_MESSAGESLISTINGSIZE	= 0x12,		/* uint16_t	*/
-+	MAP_AP_SUBJECTLENGTH		= 0x13,		/* uint8_t	*/
-+	MAP_AP_CHARSET			= 0x14,		/* uint8_t	*/
-+	MAP_AP_FRACTIONREQUEST		= 0x15,		/* uint8_t	*/
-+	MAP_AP_FRACTIONDELIVER		= 0x16,		/* uint8_t	*/
-+	MAP_AP_STATUSINDICATOR		= 0x17,		/* uint8_t	*/
-+	MAP_AP_STATUSVALUE		= 0x18,		/* uint8_t	*/
-+	MAP_AP_MSETIME			= 0x19,		/* char *	*/
-+	MAP_AP_INVALID			= 0x100,
-+};
-+
-+/* Data type representing MAP application parameters. Consider opaque. */
-+typedef GHashTable map_ap_t;
-+
-+/* Creates a new empty MAP application parameters object. */
-+map_ap_t *map_ap_new(void);
-+
-+/* Frees all the memory used by MAP application parameters object. */
-+void map_ap_free(map_ap_t *ap);
-+
-+/* Parses given buffer that is a payload of OBEX application parameter header
-+ * with a given length. Returned value can be used in calls to map_ap_get_*()
-+ * and map_ap_set_*(). It has to be freed using map_ap_free(). It also takes
-+ * care of converting all the data to host byte order, so this is the byte order
-+ * used in map_ap_get_*()/map_ap_set_*().
-+ *
-+ * Returns NULL in case of failure.
-+ */
-+map_ap_t *map_ap_decode(const uint8_t *buffer, size_t length);
-+
-+/* Takes all parameters currently set and packs them into a buffer with OBEX
-+ * application parameters header payload format.
-+ *
-+ * Returns newly allocated buffer of size 'length'. Free with g_free().
-+ */
-+uint8_t *map_ap_encode(map_ap_t *ap, size_t *length);
-+
-+/* Following family of functions reads value of MAP parameter with given tag.
-+ * Use the one with appropriate type for a given tag, as noted above in
-+ * map_ap_tag declaration comments.
-+ *
-+ * Returns TRUE when value is present. FALSE if it is not or the function is
-+ * used get a parameter of a different type. When FALSE is returned, variable
-+ * pointed by 'val' is left intact.
-+ */
-+gboolean map_ap_get_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t *val);
-+gboolean map_ap_get_u16(map_ap_t *ap, enum map_ap_tag tag, uint16_t *val);
-+gboolean map_ap_get_u32(map_ap_t *ap, enum map_ap_tag tag, uint32_t *val);
-+
-+/* Reads value of MAP parameter with given tag that is of a string type.
-+ *
-+ * Returns NULL if parameter is not present in ap or given tag is not of a
-+ * string type.
-+ */
-+const char *map_ap_get_string(map_ap_t *ap, enum map_ap_tag tag);
-+
-+/* Following family of functions sets the value of MAP parameter with given tag.
-+ * Use the one with appropriate type for a given tag, as noted above in
-+ * map_ap_tag declaration comments.
-+ *
-+ * If there is already a parameter with given tag present, it will be replaced.
-+ * map_ap_set_string() makes its own copy of given string.
-+ *
-+ * Returns TRUE on success (the tag is known and the function chosen matches the
-+ * type of tag).
-+ */
-+gboolean map_ap_set_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t val);
-+gboolean map_ap_set_u16(map_ap_t *ap, enum map_ap_tag tag, uint16_t val);
-+gboolean map_ap_set_u32(map_ap_t *ap, enum map_ap_tag tag, uint32_t val);
-+gboolean map_ap_set_string(map_ap_t *ap, enum map_ap_tag tag, const char *val);
--- 
-1.7.4.1
+I was thinking in using a sort of server_id to distinguish between
+services registered among different plugins. That a first idea I have,
+I'm going to try to send a RFCs patches during these days. As always,
+I'll be updating my git repository at github if you want to follow my
+progress.
 
+
+>> In addition, who will be responsible for reloading the database and populating the values (profile plugin or bluetoothd core) ? how do you synchronize them?
+>
+> My suggestion would be to implement this in attrib/gatt-service.c so
+> gatt_service_add() could load attribute handles from storage
+> transparently. This could also avoid changing every profile.
+>
+> Note this is only for *server* roles (e.g. PAS server, TIP server, PXP
+> reporter etc.).
+>
+> I'm not sure what you mean with synchronization. The attribute handles
+> are to be stored when the service is registered (and you can't change
+> them after registration).
+>
+>> Do you have an RFC or a simple design description which will allow reviewing?
+>
+> No. I am not working on this currently. This discussion started from
+> an idea from Santiago to how to handle registration failures (see
+> initial post), to which I responded that we may want first to address
+> attribute handle storage to make sure handles stay the same during
+> device lifetime (until it is factory reset).
+>
+
+I'll put my hands on this issue.
+
+Regards
