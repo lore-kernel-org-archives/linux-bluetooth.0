@@ -1,83 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EDD1482.3000306@codeaurora.org>
-Date: Mon, 05 Dec 2011 10:59:14 -0800
-From: Brian Gix <bgix@codeaurora.org>
-MIME-Version: 1.0
-To: Hendrik Sattler <post@hendrik-sattler.de>
-CC: Hemant Gupta <hemant.gupta@stericsson.com>,
-	linux-bluetooth@vger.kernel.org,
-	Naresh Gupta <naresh.gupta@stericsson.com>,
-	Hemant Gupta <hemantgupta.ste@gmail.com>
-Subject: Re: [RFC] mgmt: Add support for Passkey handling
-References: <1323085586-4415-1-git-send-email-hemant.gupta@stericsson.com> <b5e0b125ccef74762e3665620069daad@mail.hendrik-sattler.de>
-In-Reply-To: <b5e0b125ccef74762e3665620069daad@mail.hendrik-sattler.de>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Message-ID: <1323110749.26198.57.camel@aeonflux>
+Subject: Re: [RFCv1 2/3] Bluetooth: Simplify num_comp_pkts_evt function
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 05 Dec 2011 19:45:49 +0100
+In-Reply-To: <20111205153222.GD23614@aemeltch-MOBL1>
+References: <1323089704-1005-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1323089704-1005-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1323093094.26198.49.camel@aeonflux>
+	 <20111205153222.GD23614@aemeltch-MOBL1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hendrik,
+Hi Andrei,
 
-On 12/5/2011 4:50 AM, Hendrik Sattler wrote:
-> Am 05.12.2011 12:46, schrieb Hemant Gupta:
-[...]
->> +static int mgmt_passkey_reply(int index, bdaddr_t *bdaddr, uint32_t
->> passkey)
->> +{
->> + char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_user_passkey_reply)];
->> + struct mgmt_hdr *hdr = (void *) buf;
->> + size_t buf_len;
->> + char addr[18];
->> +
->> + ba2str(bdaddr, addr);
->> + DBG("index %d addr %s passkey %06u", index, addr, passkey);
->> +
->> + memset(buf, 0, sizeof(buf));
->> +
->> + if (passkey == INVALID_PASSKEY) {
->> + struct mgmt_cp_user_passkey_neg_reply *cp;
->> +
->> + hdr->opcode = htobs(MGMT_OP_USER_PASSKEY_NEG_REPLY);
->> + hdr->len = htobs(sizeof(*cp));
->> + hdr->index = htobs(index);
->> +
->> + cp = (void *) &buf[sizeof(*hdr)];
->
-> By definition, that the same as:
-> cp = (void *) (hdr + 1);
-> And you can do it in the same line as the definition of *cp.
->
->> + bacpy(&cp->bdaddr, bdaddr);
->> +
->> + buf_len = sizeof(*hdr) + sizeof(*cp);
->> + } else {
->> + struct mgmt_cp_user_passkey_reply *cp;
->> +
->> + hdr->opcode = htobs(MGMT_OP_USER_PASSKEY_REPLY);
->> + hdr->len = htobs(sizeof(*cp));
->> + hdr->index = htobs(index);
->> +
->> + cp = (void *) &buf[sizeof(*hdr)];
->> + bacpy(&cp->bdaddr, bdaddr);
->> + cp->passkey = htobl(passkey);
->> +
->> + buf_len = sizeof(*hdr) + sizeof(*cp);
->> + }
->
-> Ever wondered why if and else look almost the same? They should be
-> merged as far as possible.
+> > > Simplify function and remove fourth level of indentation.
+> > > 
+> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > ---
+> > >  net/bluetooth/hci_event.c |   43 +++++++++++++++++++++++++------------------
+> > >  1 files changed, 25 insertions(+), 18 deletions(-)
+> > > 
+> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > index 273e1cb..fd7e6b5 100644
+> > > --- a/net/bluetooth/hci_event.c
+> > > +++ b/net/bluetooth/hci_event.c
+> > > @@ -2288,28 +2288,35 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+> > >  		count  = get_unaligned_le16(ptr++);
+> > 
+> > actually we first need a cleanup of this function. This part is
+> > horrible. It works because of our ptr cast to uint16, but we should
+> > actually use a proper struct here. Maybe an info struct like we use for
+> > inquiry result might be helpful here.
+> 
+> Something like the code below?
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index e33e468..403974c 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -1018,9 +1018,14 @@ struct hci_ev_role_change {
+>  } __packed;
+>  
+>  #define HCI_EV_NUM_COMP_PKTS           0x13
+> +struct hci_comp_pkts_info {
+> +       __le16   handle;
+> +       __le16   count;
+> +} __packed;
+> +
+>  struct hci_ev_num_comp_pkts {
+>         __u8     num_hndl;
+> -       /* variable length part */
+> +       struct hci_comp_pkts_info handles[0];
+>  } __packed;
+>  
+>  #define HCI_EV_MODE_CHANGE             0x14
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 238fb65..079b94f 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -2273,26 +2273,27 @@ static inline void hci_role_change_evt(struct
+> hci_dev *hdev, struct sk_buff *skb
+>  static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct
+> sk_buff *skb)
+>  {
+>         struct hci_ev_num_comp_pkts *ev = (void *) skb->data;
+> -       __le16 *ptr;
+> +       struct hci_comp_pkts_info *info;
+>         int i;
+>  
+>         skb_pull(skb, sizeof(*ev));
+>  
+>         BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
+>  
+> -       if (skb->len < ev->num_hndl * 4) {
+> +       if (skb->len < ev->num_hndl * sizeof(*info)) {
+>                 BT_DBG("%s bad parameters", hdev->name);
+>                 return;
+>         }
+>  
+>         tasklet_disable(&hdev->tx_task);
+>  
+> -       for (i = 0, ptr = (__le16 *) skb->data; i < ev->num_hndl; i++) {
+> +       for (i = 0; i < ev->num_hndl; i++) {
 
-I generally agree with this statement, but think it doesn't really apply 
-here.  Since the definition of "cp" is different between the IF and the 
-ELSE, the generated code is quite different, even though they look the 
-same:  The sizeof(*cp) is different, the MGMT_OP Opcode is different, 
-and the structure members might be named the same, but since they are in 
-different structures, they are in fact different as well.
+		struct hci_comp_pkts_info *info = &ev->handles[i];
 
-The only thing that could be safely "shared" is the hdr->index, I think.
+>                 struct hci_conn *conn;
+>                 __u16  handle, count;
+>  
+> -               handle = get_unaligned_le16(ptr++);
+> -               count  = get_unaligned_le16(ptr++);
+> +               info = &ev->handles[i];
+> +               handle = __le16_to_cpu(info->handle);
+> +               count  = __le16_to_cpu(info->count);
+>  
+>                 conn = hci_conn_hash_lookup_handle(hdev, handle);
+>                 if (!conn)
+
+And you need to remove the skb_pull above since otherwise you are
+pointing to the wrong memory location.
+
+Regards
+
+Marcel
 
 
--- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
