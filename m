@@ -1,74 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 5 Dec 2011 22:15:29 +0000
-From: eran <eran@over-here.org>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Adding USB device 13d3:3375 as an Atheros
- AR3012.
-Message-ID: <20111205221529.GA21676@over-here.org>
-References: <20111123100356.GB9838@over-here.org>
- <20111123190500.GA7179@samus>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111123190500.GA7179@samus>
+In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B026440280@DNCE02.ent.ti.com>
+References: <F0070FBC0FB3174D8D11444EB2D5B026440280@DNCE02.ent.ti.com>
+Date: Mon, 5 Dec 2011 17:51:09 -0300
+Message-ID: <CAKT1EBfB_WSh45sgZzZYTF4tiu0yb+ZTy1wPKbMdApfAZdKHvw@mail.gmail.com>
+Subject: Re: LE Connection issues
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: "Ganir, Chen" <chen.ganir@ti.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Eran <eran@over-here.org>
+Hi Chen,
 
-The bluetooth module in the Asus UX31/UX21 is based on Atheros AR3012
-and requires a firmware to be uploaded before it's usable.
+On Mon, Dec 5, 2011 at 12:38 PM, Ganir, Chen <chen.ganir@ti.com> wrote:
+> Hi everyone.
+>
+> I've tried investigating the LE connection procedure a bit, and I came up with some issues. For example, you MUST first scan for devices even if you have a device already paired, in order to connect to it. This is not the case for BR/EDR devices, where you can turn on the host, and try to connect to the paired device immediately. This has a major impact on user experience. I believe that the only relevant information from the advertising data is the address type, which can be sent to the host, and used later when trying to connect to the device again. I believe there were some discussions regarding this issue a while back, but I cannot recall what was done about this.
+>
+> In addition, a call for brd_device_add_attio_callback may fail immediately (without even calling the connect/disconnect callbacks) if the device is not present in the advertising cache (fail with error "no route to device"). This also results in a bad user experience, since a user may think that the host is trying to connect to the peer, while in fact the host failed and did not indicate this failure to the user. Since LE does not define a connection timeout, we have a problem here, since we failed on implementation and not spec issue, and we did not inform the user of this error.
+>
+> Did anyone else encounter these issues, or has anything to comment about these issues ?
 
-output of usb-devices for this module:
-T:  Bus=01 Lev=02 Prnt=02 Port=07 Cnt=03 Dev#=  6 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3375 Rev=00.02
-S:  Manufacturer=Atheros Communications
-S:  Product=Bluetooth USB Host Controller
-S:  SerialNumber=Alaska Day 2006
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+We don't have a final decision yet, but there are some suggestions.
+The fact is we need to have a functional implementation, even it is
+not the final solution. Andre Guedes has some patches to trigger
+scanning before each connect(if the address is not found in the
+cache). Search for "[PATCH 0/4] LE connection improvements" in the
+mailing list. However, considering that BlueZ will act as central it
+is necessary to use whitelist during the connection establishment to
+avoid the penalty for non connectable devices.
 
+IMO connections should not be triggered intermediately for paired
+devices. We need to provide more flexibility to allow apps/profiles
+controlling connections. Definitively, btd_device_add_attio_callback
+needs to be improved. We can't keep the timeout in the kernel since
+timeouts are defined by profiles.
 
-Signed-off-by: Eran <eran@over-here.org>
----
- drivers/bluetooth/ath3k.c |    2 ++
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 3 insertions(+), 0 deletions(-)
+L2CAP config timeout ~40 seconds for LE connections should be
+removed(discussed in Prague). Passive/background scanning if there is
+at least one key available or a socket/connect pending is still open,
+we need to discuss if it is feasible or not.
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 106beb1..b94aae6 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -70,6 +70,7 @@ static struct usb_device_id ath3k_table[] = {
- 
- 	/* Atheros AR3012 with sflash firmware*/
- 	{ USB_DEVICE(0x0CF3, 0x3004) },
-+	{ USB_DEVICE(0x13d3, 0x3375) },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -86,6 +87,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
- 
- 	/* Atheros AR3012 with sflash firmware*/
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 
- 	{ }	/* Terminating entry */
- };
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f9b7260..a64f15a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -122,6 +122,7 @@ static struct usb_device_id blacklist_table[] = {
- 
- 	/* Atheros 3012 with sflash firmware */
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
--- 
-1.7.2.5
-
+BR,
+Claudio
