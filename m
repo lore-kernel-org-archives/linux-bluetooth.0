@@ -1,65 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EDCC105.6070803@globaledgesoft.com>
-Date: Mon, 05 Dec 2011 18:33:01 +0530
-From: sathish <sathish.n@globaledgesoft.com>
-MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: Jaganath <jaganath.k@samsung.com>, linux-bluetooth@vger.kernel.org
-Subject: Re: Query on Media Interface "RegisterPlayer" and Dbus signal "TrackChanged"
-References: <1322265226-6404-1-git-send-email-andre.guedes@openbossa.org>	<1322265226-6404-6-git-send-email-andre.guedes@openbossa.org>	<1322497442.29909.36.camel@aeonflux>	<65E3B21D-EC4E-4443-ADAB-39576B981F70@openbossa.org>	<65AF22C1CD4D4E948B9A22A50C0B504D@sisodomain.com> <CABBYNZL9qLM3aKk_pWBSMdR4VVGqCuUcdTA_rwh1mtXqB2QtyQ@mail.gmail.com>
-In-Reply-To: <CABBYNZL9qLM3aKk_pWBSMdR4VVGqCuUcdTA_rwh1mtXqB2QtyQ@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFCv1 3/3] Bluetooth: Process num completed data blocks event
+Date: Mon,  5 Dec 2011 14:55:04 +0200
+Message-Id: <1323089704-1005-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1323089704-1005-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1323089704-1005-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  On Friday 02 December 2011 04:37 PM, Luiz Augusto von Dentz wrote:
-> Hi Jaganath,
->
-> On Fri, Dec 2, 2011 at 12:02 PM, Jaganath<jaganath.k@samsung.com>  wrote:
->> Hi,
->>
->> I have come across a scenario related to Media Interface meant for AVRCP 1.3
->> features.
->>
->> Kindly please provide your opinions on this.
->>
->> If the Media Interface "RegisterPlayer" is called before the  headset
->> connection, then player gets registered successfully and all the
->> Vendor dependent commands are handled properly. And in case of any change in
->> the track, through the "TrackChanged" Dbus signal
->> shall be sent with information about "Change of track" and "Start of track".
->> This scenario will work because we have registered for the
->> callback  "state_changed"(audio/avrcp.c) through "avrcp_register_player"
->> (audio/avrcp.c) API. When connection is ongoing "state_changed"
->> callback shall be invoked with state as "AVCTP_STATE_CONNECTING" where in
->> "player->session" will be initialized.
->>
->>
->> However if the "RegisterPlayer" is called after the headset connection, then
->> we will not be able to send the "TrackChanged" signal with
->> information of "Change of track" and "Start of track". Since the headset is
->> already connected,"state_changed" callback will not be
->> invoked, hence in the avrcp_player_event" API "player->session" is NULL.
->>
->> Is it not necessary to handle the above the mentioned scenario?
-> Yes that is probably a valid and common scenario, so we probably need
-> to change the code to update the session when this happen but
-> apparently there is no way to notify the remote device about this
-> since the concept of players and EVENT_AVAILABLE_PLAYERS_CHANGED was
-> introduced only on 1.4. So for 1.3 we might have to pretend we have a
-> player without any metadata and as soon as one is registered we
-> assigned it to the active session and notify the metadata has changed
-> via events.
->
-Hi,
-     Please provide the information about how to use mpris 2.0 spec , 
-can u please provide me detail of platform that register player worked 
-successfully. I am also working on getting these information .
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Thanks & regards ,
-sathish N
+Adds support for Number Of Completed Data Blocks Event. Highly
+modified version of Code Aurora code.
 
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/hci.h |    7 +++++
+ net/bluetooth/hci_event.c   |   61 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 68 insertions(+), 0 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 9490c2c..0a6193e 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1149,6 +1149,13 @@ struct hci_ev_le_meta {
+ 	__u8     subevent;
+ } __packed;
+ 
++#define HCI_EV_NUM_COMP_BLOCKS		0x48
++struct hci_ev_num_comp_blocks {
++	__le16   num_blocks;
++	__u8     num_hndl;
++	/* variable length part */
++} __packed;
++
+ /* Low energy meta events */
+ #define HCI_EV_LE_CONN_COMPLETE		0x01
+ struct hci_ev_le_conn_complete {
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index fd7e6b5..26e4d38 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2325,6 +2325,63 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+ 	tasklet_enable(&hdev->tx_task);
+ }
+ 
++static inline void hci_num_comp_blocks_evt(struct hci_dev *hdev,
++							struct sk_buff *skb)
++{
++	struct hci_ev_num_comp_blocks *ev = (void *) skb->data;
++	__le16 *ptr;
++	int i;
++
++	skb_pull(skb, sizeof(*ev));
++
++	BT_DBG("%s num_blocks %d num_hndl %d", hdev->name, ev->num_blocks,
++								ev->num_hndl);
++
++	if (skb->len < ev->num_hndl * 6) {
++		BT_DBG("%s bad parameters", hdev->name);
++		return;
++	}
++
++	if (hdev->dev_type != HCI_BREDR)
++		return;
++
++	tasklet_disable(&hdev->tx_task);
++
++	for (i = 0, ptr = (__le16 *) skb->data; i < ev->num_hndl; i++) {
++		struct hci_conn *conn;
++		__u16  handle, block_count;
++
++		handle = get_unaligned_le16(ptr++);
++
++		/* Skip packet count*/
++		ptr++;
++
++		block_count = get_unaligned_le16(ptr++);
++
++		conn = hci_conn_hash_lookup_handle(hdev, handle);
++		if (!conn)
++			continue;
++
++		conn->sent -= block_count;
++
++		switch (conn->type) {
++		case ACL_LINK:
++			hdev->block_cnt += block_count;
++			if (hdev->block_cnt > hdev->num_blocks)
++				hdev->block_cnt = hdev->num_blocks;
++			break;
++
++		default:
++			BT_ERR("Not implemented for type %d", conn->type);
++			break;
++		}
++	}
++
++	tasklet_schedule(&hdev->tx_task);
++
++	tasklet_enable(&hdev->tx_task);
++}
++
+ static inline void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_ev_mode_change *ev = (void *) skb->data;
+@@ -3264,6 +3321,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_remote_oob_data_request_evt(hdev, skb);
+ 		break;
+ 
++	case HCI_EV_NUM_COMP_BLOCKS:
++		hci_num_comp_blocks_evt(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s event 0x%x", hdev->name, event);
+ 		break;
 -- 
-Thanks&  Regards,
-Sathish N
+1.7.4.1
 
