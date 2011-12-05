@@ -1,42 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EDC8B7D.9060709@globaledgesoft.com>
-Date: Mon, 05 Dec 2011 14:44:37 +0530
-From: sathish <sathish.n@globaledgesoft.com>
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: SMP Key distribution
+Date: Mon, 5 Dec 2011 09:02:00 +0000
+Message-ID: <F0070FBC0FB3174D8D11444EB2D5B02643FFBB@DNCE02.ent.ti.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: Deepthi <deepthi.pv@globaledgesoft.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: mpris-player
-References: <4EDC77AA.3020801@globaledgesoft.com> <CABBYNZLrJsqwbN6hs_DU0aeL5T9DFuLMO3=ZEND+iE=DdhUA6A@mail.gmail.com>
-In-Reply-To: <CABBYNZLrJsqwbN6hs_DU0aeL5T9DFuLMO3=ZEND+iE=DdhUA6A@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  On Monday 05 December 2011 02:13 PM, Luiz Augusto von Dentz wrote:
-> Hi,
->
-> On Mon, Dec 5, 2011 at 9:50 AM, Deepthi<deepthi.pv@globaledgesoft.com>  wrote:
->>
->> Hello,
->>
->>
->>     While executing the mpris-player , I 'm getting error saying :No
->> such Object path  /org/mpris/MediaPlayer2. Please help.
-> This means your player is probably no following the mpris spec as it
-> should, http://www.mpris.org/2.1/spec/:
->
-> The media player must expose the /org/mpris/MediaPlayer2 object path,
-> which must implement the following interfaces:
-> org.mpris.MediaPlayer2
-> org.mpris.MediaPlayer2.Player
->
-> Version 1.0 of mpris is currently not supported by mpris-player.
->
-Hi,
-     How to change the mpris version  to 2.0 in ubuntu 10.04 LTS.
+Hi.
 
--- 
-Thanks&  Regards,
-Sathish N
+According to the SMP spec (Vol3, Part H, Appendix 5.3.4), keys are distributed in a specific order, where the slave first sends its LTK,EDIV, RAND , IRK, ADDR TYPE and signature key (according to the key distribution parameter. Only when the slave completes its key distribution, the master then starts distributing its own keys (same order, according to the master key distribution options). In the current implementation in the smp.c, it seems that we start distributing our keys too early (after the MASTER IDENTIFICATION message, ignoring the possibility of Addr type and signature keys which may come from the slave. This may break the key distribution phase.
 
+Has anyone seen this or has anything to comment on that ?
+
+Thanks,
+
+Chen Ganir 
