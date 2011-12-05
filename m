@@ -1,55 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EDC9019.6080405@globaledgesoft.com>
-Date: Mon, 05 Dec 2011 15:04:17 +0530
-From: Deepthi <deepthi.pv@globaledgesoft.com>
+Date: Mon, 5 Dec 2011 11:27:16 +0200
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Remove magic numbers from le scan cmd
+Message-ID: <20111205092714.GA23614@aemeltch-MOBL1>
+References: <1322662630-32759-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20111202115910.GE2570@joana>
+ <20111202233323.GD13109@joana>
 MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: mpris-player
-References: <4EDC77AA.3020801@globaledgesoft.com> <CABBYNZLrJsqwbN6hs_DU0aeL5T9DFuLMO3=ZEND+iE=DdhUA6A@mail.gmail.com>
-In-Reply-To: <CABBYNZLrJsqwbN6hs_DU0aeL5T9DFuLMO3=ZEND+iE=DdhUA6A@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20111202233323.GD13109@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Gustavo,
 
+On Sat, Dec 03, 2011 at 08:33:23AM +0900, Gustavo Padovan wrote:
+> Hi Andrei,
+> 
+> * Gustavo Padovan <padovan@profusion.mobi> [2011-12-02 20:59:10 +0900]:
+> 
+> > * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-11-30 16:17:10 +0200]:
+> > 
+> > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > 
+> > > Make code readable by removing magic numbers.
+> > > 
+> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > ---
+> > >  include/net/bluetooth/hci.h |    3 +++
+> > >  net/bluetooth/hci_event.c   |   12 ++++++++++--
+> > >  2 files changed, 13 insertions(+), 2 deletions(-)
+> > 
+> > Applied, thanks.
+> 
+> I stepped back with this one to apply Andre's patches. Yours is trivial and
+> can wait a bit. Care to resend it?
 
-On 12/05/2011 02:13 PM, Luiz Augusto von Dentz wrote:
-> Hi,
->
-> On Mon, Dec 5, 2011 at 9:50 AM, Deepthi<deepthi.pv@globaledgesoft.com>  wrote:
->    
->>
->> Hello,
->>
->>
->>     While executing the mpris-player , I 'm getting error saying :No
->> such Object path  /org/mpris/MediaPlayer2. Please help.
->>      
-> This means your player is probably no following the mpris spec as it
-> should, http://www.mpris.org/2.1/spec/:
->
-> The media player must expose the /org/mpris/MediaPlayer2 object path,
-> which must implement the following interfaces:
-> org.mpris.MediaPlayer2
-> org.mpris.MediaPlayer2.Player
->
-> Version 1.0 of mpris is currently not supported by mpris-player.
->    
+I have rebased and resent the patch.
 
-Hello,
-
-
-I am using slackware 13.1,  with kernel version 2.6.33 , and amarok 
-player with version 2.3.0 .
-
-Which version of mpris will support for mpris-player?
-
-
-
-Thanks & Regards,
-
-Deepthi Elizabeth P V
-
-
-
+Best regards 
+Andrei Emeltchenko 
