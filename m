@@ -1,54 +1,233 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EDCFCB6.5010206@codeaurora.org>
-Date: Mon, 05 Dec 2011 09:17:42 -0800
-From: Brian Gix <bgix@codeaurora.org>
+Date: Mon, 5 Dec 2011 18:26:04 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Hemant Gupta <hemantgupta.ste@gmail.com>
+Cc: Hemant Gupta <hemant.gupta@stericsson.com>,
+	linux-bluetooth@vger.kernel.org,
+	Naresh Gupta <naresh.gupta@stericsson.com>
+Subject: Re: [RFC] mgmt: Add support for Passkey handling
+Message-ID: <20111205162558.GA14236@aemeltch-MOBL1>
+References: <1323085586-4415-1-git-send-email-hemant.gupta@stericsson.com>
+ <20111205122211.GC23614@aemeltch-MOBL1>
+ <CACj007=e6RLZEJyi4H28TPSjsZEQk_O7suU42U+z9_PeNezsjA@mail.gmail.com>
 MIME-Version: 1.0
-To: "Ganir, Chen" <chen.ganir@ti.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: LE Connection issues
-References: <F0070FBC0FB3174D8D11444EB2D5B026440280@DNCE02.ent.ti.com>
-In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B026440280@DNCE02.ent.ti.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CACj007=e6RLZEJyi4H28TPSjsZEQk_O7suU42U+z9_PeNezsjA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+Hi Hemant,
 
-On 12/5/2011 7:38 AM, Ganir, Chen wrote:
-> Hi everyone.
->
-> I've tried investigating the LE connection procedure a bit, and I came up with some issues. For example, you MUST first scan for devices even if you have a device already paired, in order to connect to it. This is not the case for BR/EDR devices, where you can turn on the host, and try to connect to the paired device immediately. This has a major impact on user experience. I believe that the only relevant information from the advertising data is the address type, which can be sent to the host, and used later when trying to connect to the device again. I believe there were some discussions regarding this issue a while back, but I cannot recall what was done about this.
->
-> In addition, a call for brd_device_add_attio_callback may fail immediately (without even calling the connect/disconnect callbacks) if the device is not present in the advertising cache (fail with error "no route to device"). This also results in a bad user experience, since a user may think that the host is trying to connect to the peer, while in fact the host failed and did not indicate this failure to the user. Since LE does not define a connection timeout, we have a problem here, since we failed on implementation and not spec issue, and we did not inform the user of this error.
->
-> Did anyone else encounter these issues, or has anything to comment about these issues ?
+On Mon, Dec 05, 2011 at 07:42:00PM +0530, Hemant Gupta wrote:
+> Hi Andrei,
+> 
+> On Mon, Dec 5, 2011 at 5:52 PM, Andrei Emeltchenko <
+> andrei.emeltchenko.news@gmail.com> wrote:
+> 
+> > Hi Hemant,
+> >
+> > On Mon, Dec 05, 2011 at 05:16:26PM +0530, Hemant Gupta wrote:
+> > > This patch adds support for handling Passkey Requests
+> > > and response over management interface.
+> > > ---
+> > >  lib/mgmt.h        |   17 ++++++++++
+> > >  plugins/mgmtops.c |   86
+> > ++++++++++++++++++++++++++++++++++++++++++++++------
+> > >  2 files changed, 93 insertions(+), 10 deletions(-)
+> > >
+> > > diff --git a/lib/mgmt.h b/lib/mgmt.h
+> > > index 3960815..a85957d 100644
+> > > --- a/lib/mgmt.h
+> > > +++ b/lib/mgmt.h
+> > > @@ -242,6 +242,17 @@ struct mgmt_cp_set_fast_connectable {
+> > >       uint8_t enable;
+> > >  } __packed;
+> > >
+> > > +#define MGMT_OP_USER_PASSKEY_REPLY   0x0020
+> > > +struct mgmt_cp_user_passkey_reply {
+> > > +     bdaddr_t bdaddr;
+> > > +     __le32 passkey;
+> > > +} __packed;
+> > > +
+> > > +#define MGMT_OP_USER_PASSKEY_NEG_REPLY       0x0021
+> > > +struct mgmt_cp_user_passkey_neg_reply {
+> > > +     bdaddr_t bdaddr;
+> > > +} __packed;
+> > > +
+> > >  #define MGMT_EV_CMD_COMPLETE         0x0001
+> > >  struct mgmt_ev_cmd_complete {
+> > >       uint16_t opcode;
+> > > @@ -336,3 +347,9 @@ struct mgmt_ev_device_blocked {
+> > >  struct mgmt_ev_device_unblocked {
+> > >       bdaddr_t bdaddr;
+> > >  } __packed;
+> > > +
+> > > +#define MGMT_EV_USER_PASSKEY_REQUEST 0x0017
+> > > +struct mgmt_ev_user_passkey_request {
+> > > +     bdaddr_t bdaddr;
+> > > +} __packed;
+> > > +
+> > > diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+> > > index b9e9ad6..ef88ae6 100644
+> > > --- a/plugins/mgmtops.c
+> > > +++ b/plugins/mgmtops.c
+> > > @@ -615,6 +615,79 @@ static int mgmt_confirm_reply(int index, bdaddr_t
+> > *bdaddr, gboolean success)
+> > >       return 0;
+> > >  }
+> > >
+> > > +static int mgmt_passkey_reply(int index, bdaddr_t *bdaddr, uint32_t
+> > passkey)
+> > > +{
+> > > +     char buf[MGMT_HDR_SIZE + sizeof(struct
+> > mgmt_cp_user_passkey_reply)];
+> > > +     struct mgmt_hdr *hdr = (void *) buf;
+> > > +     size_t buf_len;
+> > > +     char addr[18];
+> > > +
+> > > +     ba2str(bdaddr, addr);
+> > > +     DBG("index %d addr %s passkey %06u", index, addr, passkey);
+> >
+> > isn't it too much overhead to fill in (and to have) buffer even when debug
+> > disabled?
+> 
+> 
+> I have tried to re-use the exisitng implementation in mgmtops.c. If you
+> look at the implementation of mgmt_pincode_reply(), you would find the
+> similar implementation. Are you suggesting that I should change the
+> existing implementation also, and prepare a patch accordingly or only
+> change the implementation in this API ?
+
+I think you can start from your implementation and then create patch
+against other cases. Johan could comment further here.
+
+Best regards 
+Andrei Emeltchenko 
 
 
-I have definitely dealt with the same issue, and it has indeed been 
-raised here.  I am equally unclear as to if it has been fully resolved, 
-but Johan has made some changes to the MGMT interface to create an 
-Address Type bit field, and package it along with the Address into a 
-struct called mgmt_addr_info, which is now used in the device found 
-event, connect failed event and pair device command.
+> 
+> 
+> > > +
+> > > +     memset(buf, 0, sizeof(buf));
+> > > +
+> > > +     if (passkey == INVALID_PASSKEY) {
+> > > +             struct mgmt_cp_user_passkey_neg_reply *cp;
+> > > +
+> > > +             hdr->opcode = htobs(MGMT_OP_USER_PASSKEY_NEG_REPLY);
+> > > +             hdr->len = htobs(sizeof(*cp));
+> > > +             hdr->index = htobs(index);
+> > > +
+> > > +             cp = (void *) &buf[sizeof(*hdr)];
+> >
+> > The code above is a cool hackers code :-)
+> >
+> > Best regards
+> > Andrei Emeltchenko
+> >
+> > > +             bacpy(&cp->bdaddr, bdaddr);
+> > > +
+> > > +             buf_len = sizeof(*hdr) + sizeof(*cp);
+> > > +     } else {
+> > > +             struct mgmt_cp_user_passkey_reply *cp;
+> > > +
+> > > +             hdr->opcode = htobs(MGMT_OP_USER_PASSKEY_REPLY);
+> > > +             hdr->len = htobs(sizeof(*cp));
+> > > +             hdr->index = htobs(index);
+> > > +
+> > > +             cp = (void *) &buf[sizeof(*hdr)];
+> > > +             bacpy(&cp->bdaddr, bdaddr);
+> > > +             cp->passkey = htobl(passkey);
+> > > +
+> > > +             buf_len = sizeof(*hdr) + sizeof(*cp);
+> > > +     }
+> > > +
+> > > +     if (write(mgmt_sock, buf, buf_len) < 0)
+> > > +             return -errno;
+> > > +
+> > > +     return 0;
+> > > +}
+> > > +
+> > > +static void mgmt_passkey_request(int sk, uint16_t index, void *buf,
+> > size_t len)
+> > > +{
+> > > +     struct mgmt_ev_user_passkey_request *ev = buf;
+> > > +     struct controller_info *info;
+> > > +     char addr[18];
+> > > +     int err;
+> > > +
+> > > +     if (len < sizeof(*ev)) {
+> > > +             error("Too small pin_code_request event");
+> > > +             return;
+> > > +     }
+> > > +
+> > > +     ba2str(&ev->bdaddr, addr);
+> > > +
+> > > +     DBG("hci%u %s", index, addr);
+> > > +
+> > > +     if (index > max_index) {
+> > > +             error("Unexpected index %u in passkey_request event",
+> > index);
+> > > +             return;
+> > > +     }
+> > > +
+> > > +     info = &controllers[index];
+> > > +
+> > > +     err = btd_event_user_passkey(&info->bdaddr, &ev->bdaddr);
+> > > +     if (err < 0) {
+> > > +             error("btd_event_request_pin: %s", strerror(-err));
+> > > +             mgmt_passkey_reply(index, &ev->bdaddr, INVALID_PASSKEY);
+> > > +     }
+> > > +}
+> > > +
+> > >  struct confirm_data {
+> > >       int index;
+> > >       bdaddr_t bdaddr;
+> > > @@ -1576,6 +1649,9 @@ static gboolean mgmt_event(GIOChannel *io,
+> > GIOCondition cond, gpointer user_data
+> > >       case MGMT_EV_DEVICE_UNBLOCKED:
+> > >               mgmt_device_unblocked(sk, index, buf + MGMT_HDR_SIZE, len);
+> > >               break;
+> > > +     case MGMT_EV_USER_PASSKEY_REQUEST:
+> > > +             mgmt_passkey_request(sk, index, buf + MGMT_HDR_SIZE, len);
+> > > +             break;
+> > >       default:
+> > >               error("Unknown Management opcode %u (index %u)", opcode,
+> > index);
+> > >               break;
+> > > @@ -1919,16 +1995,6 @@ static int mgmt_remove_bonding(int index,
+> > bdaddr_t *bdaddr)
+> > >       return 0;
+> > >  }
+> > >
+> > > -static int mgmt_passkey_reply(int index, bdaddr_t *bdaddr, uint32_t
+> > passkey)
+> > > -{
+> > > -     char addr[18];
+> > > -
+> > > -     ba2str(bdaddr, addr);
+> > > -     DBG("index %d addr %s passkey %06u", index, addr, passkey);
+> > > -
+> > > -     return -ENOSYS;
+> > > -}
+> > > -
+> > >  static int mgmt_encrypt_link(int index, bdaddr_t *dst, bt_hci_result_t
+> > cb,
+> > >                                                       gpointer user_data)
+> > >  {
+> > > --
+> > > 1.6.6.1
+> > >
+> > > --
+> > > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in
+> > > the body of a message to majordomo@vger.kernel.org
+> > > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> >
+> 
+> 
+> 
+> -- 
+> Best Regards
+> Hemant Gupta
+> ST-Ericsson India
 
-I would like to further extend the usage of this structure to replace 
-the simple bdaddr in the mgmt_link_key_info struct, so that once a 
-device has been paired, the kernel's database of Link keys will have a 
-copy of the address type.  This might not be a perfect fit, because not 
-all devices will support LTK's (opting instead perhaps for the CSRK, if 
-the usage model does not support links that remain open indefinitely). 
-However, if a "trusted relationship" (i.e. Paired) has been established, 
-I think some sort of key must exist, and each of these keys is 
-associated with a particular bdaddr, and the kernel will need to be 
-aware of it, which gives us the opportunity to make that connection (and 
-differentiation) between BR/LE-Public/LE-Random
-
-Johan has made the Address type be a bit field, such that the current 3 
-recognized types are "BR/EDR", "Public LE", and "Random LE".
-
-
--- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
