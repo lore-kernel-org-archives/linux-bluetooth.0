@@ -1,37 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B02643D9D0@DNCE02.ent.ti.com>
-References: <1322129290-10767-1-git-send-email-sancane@gmail.com>
-	<20111202112957.GC17203@x220.ger.corp.intel.com>
-	<CACLukzK1YyqBszGc679Vj-Pf9+M+s+LaBpnd2_+pan8TCwHODA@mail.gmail.com>
-	<CAJdJm_P5OU6vqs+-9xL36=1DWVtgzzY1CEPf6rD3Tws5BSik2g@mail.gmail.com>
-	<F0070FBC0FB3174D8D11444EB2D5B02643D9D0@DNCE02.ent.ti.com>
-Date: Mon, 5 Dec 2011 06:55:50 -0400
-Message-ID: <CAJdJm_PAC_HsEd-8-25r4V-ZqG0gfxpio=rnUZzG4AWJM2cNJQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Provide return status in gatt_service_add function
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: "Ganir, Chen" <chen.ganir@ti.com>
-Cc: Santiago Carot <sancane@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20111205092212.GA11653@fusion.localdomain>
+References: <1322224823-27366-1-git-send-email-lkslawek@gmail.com>
+	<20111205092212.GA11653@fusion.localdomain>
+Date: Mon, 5 Dec 2011 10:55:50 +0100
+Message-ID: <CA+i+Aw3Y3n1Z-gpKi+quKQ=R7Nnvk28NWLtbCY8=OAS-ubvwPQ@mail.gmail.com>
+Subject: Re: [PATCH obexd] MAP: Skeleton of application parameters support
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+On Mon, Dec 5, 2011 at 10:22 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Slawek,
+>
+> On Fri, Nov 25, 2011, Slawomir Bochenski wrote:
+>> + *  Author: Slawomir Bochenski <lkslawek@gmail.com>
+>
+> We don't have this convention in other files either so let's not break
+> the consistency. We have the AUTHORS file and the git commit history to
+> get this kind of info anyway.
+>
+>> +map_ap_t *map_ap_new(void)
+>> +{
+>> +     return NULL;
+>> +}
+>> +
+>> +void map_ap_free(map_ap_t *ap)
+>> +{
+>> +}
+>> +
+>> +map_ap_t *map_ap_parse(const uint8_t *buffer, uint32_t len)
+>> +{
+>> +     return NULL;
+>> +}
+>> +
+>> +GString *map_ap_output(map_ap_t *ap)
+>> +{
+>> +     return NULL;
+>> +}
+>
+> Is map_ap_output supposed to be the inverse of map_ap_parse? Why const
+> uint8_t * for parse but GString * for output? Also (assuming that they
+> really are supposed to be inverses) encode/decode would be clearer.
 
-On Sun, Dec 4, 2011 at 2:51 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
-> How do you ensure that? Do you assume that all servers will always initialize at bluetoothd startup, and always in the same order? Who's responsibility is it to send out the "service changed" notification when something changed? What is the proposed logic for this ?
+Yes, map_ap_output is inverse of map_ap_parse. uint8_t was chosen
+after obex_get_apparam(). GString only as a convenience type that
+stores together buffer and length. Would you prefer it to return size
+and pass uint8_t ** to it (or reverse way)? Encode/decode is fine with
+me.
 
-To make sure the handles do not change between bluetoothd restarts
-(and is not dependent on any loading order), we need to save/restore
-attribute handles, like is done for other BlueZ parts.
+>> +gboolean map_ap_get(map_ap_t *ap, enum map_ap_tag tag, void *value)
+>> +{
+>> +     return FALSE;
+>> +}
+>> +
+>> +gboolean map_ap_set(map_ap_t *ap, enum map_ap_tag tag, void *value)
+>> +{
+>> +     return FALSE;
+>> +}
+>
+> In a way having these generic get/set functions keeps the API small and
+> clean, but then again there are only four possible types: 1, 2 and 4
+> byte uints and strings. If there were get_u32, get_string, set_string,
+> etc, you wouldn't e.g. need temporary variables to pass uints to the set
+> functions but could pass constants directly and you'd also get the
+> compiler to do some type checking for you (of course you still need to
+> have an internal table to check which type a specific tag should have).
 
-"Service Changed" is not necessary to be sent if attribute handle
-storage is implemented. We have no plans to implement "Service
-Changed" now, but feel free to send patches :)
+Make the choice here. For me it doesn't make a big difference.
 
-Regards,
+> Btw, I assume that you've planned the API to take care of the big-endian
+> conversion internally?
+
+True. This is mentioned in documentation comment for map_ap_parse.
+
+>> +     MAP_AP_INVALID                  = 0x100,
+>
+> Where do you plan to use this value?
+
+This is leftover of implementation detail. I use it as a guard for
+array storing parameter types definitions.
+
+> Since we now have unit/* in place it'd be nice if you could also add
+> unit tests for this API as you go along implementing it.
+
+Have they to be present already in this patch or can be added a bit later?
+
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Slawomir Bochenski
