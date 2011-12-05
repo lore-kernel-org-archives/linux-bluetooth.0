@@ -1,38 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EDCE598.20808@codeaurora.org>
-Date: Mon, 05 Dec 2011 07:39:04 -0800
-From: Brian Gix <bgix@codeaurora.org>
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: LE Connection issues
+Date: Mon, 5 Dec 2011 15:38:24 +0000
+Message-ID: <F0070FBC0FB3174D8D11444EB2D5B026440280@DNCE02.ent.ti.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-To: "Ganir, Chen" <chen.ganir@ti.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: SMP Key distribution
-References: <F0070FBC0FB3174D8D11444EB2D5B02643FFBB@DNCE02.ent.ti.com>
-In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B02643FFBB@DNCE02.ent.ti.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+Hi everyone.
 
-On 12/5/2011 1:02 AM, Ganir, Chen wrote:
-> Hi.
->
-> According to the SMP spec (Vol3, Part H, Appendix 5.3.4), keys are distributed in a specific order, where the slave first sends its LTK,EDIV, RAND , IRK, ADDR TYPE and signature key (according to the key distribution parameter. Only when the slave completes its key distribution, the master then starts distributing its own keys (same order, according to the master key distribution options). In the current implementation in the smp.c, it seems that we start distributing our keys too early (after the MASTER IDENTIFICATION message, ignoring the possibility of Addr type and signature keys which may come from the slave. This may break the key distribution phase.
->
-> Has anyone seen this or has anything to comment on that ?
->
+I've tried investigating the LE connection procedure a bit, and I came up with some issues. For example, you MUST first scan for devices even if you have a device already paired, in order to connect to it. This is not the case for BR/EDR devices, where you can turn on the host, and try to connect to the paired device immediately. This has a major impact on user experience. I believe that the only relevant information from the advertising data is the address type, which can be sent to the host, and used later when trying to connect to the device again. I believe there were some discussions regarding this issue a while back, but I cannot recall what was done about this.
 
-Currently the SMP code is hard coded to only support a single key, which 
-is the LTK+MID from the Slave to the Master.
+In addition, a call for brd_device_add_attio_callback may fail immediately (without even calling the connect/disconnect callbacks) if the device is not present in the advertising cache (fail with error "no route to device"). This also results in a bad user experience, since a user may think that the host is trying to connect to the peer, while in fact the host failed and did not indicate this failure to the user. Since LE does not define a connection timeout, we have a problem here, since we failed on implementation and not spec issue, and we did not inform the user of this error.
 
-You are correct that we will need to ensure that all of the keys are 
-handled correctly, including ensuring proper order, once we add support 
-for additional key distribution.  At the moment though, that is a moot 
-question.
+Did anyone else encounter these issues, or has anything to comment about these issues ?
 
-
--- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Thanks,
+Chen Ganir.
