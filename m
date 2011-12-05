@@ -1,70 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Remove magic numbers from le scan cmd
-Date: Mon,  5 Dec 2011 11:26:15 +0200
-Message-Id: <1323077175-26299-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 5 Dec 2011 11:22:12 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd] MAP: Skeleton of application parameters support
+Message-ID: <20111205092212.GA11653@fusion.localdomain>
+References: <1322224823-27366-1-git-send-email-lkslawek@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1322224823-27366-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Slawek,
 
-Make code readable by removing magic numbers.
+On Fri, Nov 25, 2011, Slawomir Bochenski wrote:
+> + *  Author: Slawomir Bochenski <lkslawek@gmail.com>
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci.h |    3 +++
- net/bluetooth/hci_event.c   |   14 ++++++++++----
- 2 files changed, 13 insertions(+), 4 deletions(-)
+We don't have this convention in other files either so let's not break
+the consistency. We have the AUTHORS file and the git commit history to
+get this kind of info anyway.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 67ad984..5f8af41 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -791,6 +791,9 @@ struct hci_cp_le_set_scan_param {
- 	__u8    filter_policy;
- } __packed;
- 
-+#define LE_SCANNING_DISABLED		0x00
-+#define LE_SCANNING_ENABLED		0x01
-+
- #define HCI_OP_LE_SET_SCAN_ENABLE	0x200c
- struct hci_cp_le_set_scan_enable {
- 	__u8     enable;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 35cb56e..447071a 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1014,18 +1014,24 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 	if (!cp)
- 		return;
- 
--	if (cp->enable == 0x01) {
-+	switch (cp->enable) {
-+	case LE_SCANNING_ENABLED:
- 		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
--
- 		del_timer(&hdev->adv_timer);
- 
- 		hci_dev_lock(hdev);
- 		hci_adv_entries_clear(hdev);
- 		hci_dev_unlock(hdev);
--	} else if (cp->enable == 0x00) {
--		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
-+		break;
- 
-+	case LE_SCANNING_DISABLED:
-+		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 		mod_timer(&hdev->adv_timer, jiffies + ADV_CLEAR_TIMEOUT);
-+		break;
-+
-+	default:
-+		BT_ERR("Used reserved LE_Scan_Enable param %d", cp->enable);
-+		break;
- 	}
- }
- 
--- 
-1.7.4.1
+> +map_ap_t *map_ap_new(void)
+> +{
+> +	return NULL;
+> +}
+> +
+> +void map_ap_free(map_ap_t *ap)
+> +{
+> +}
+> +
+> +map_ap_t *map_ap_parse(const uint8_t *buffer, uint32_t len)
+> +{
+> +	return NULL;
+> +}
+> +
+> +GString *map_ap_output(map_ap_t *ap)
+> +{
+> +	return NULL;
+> +}
 
+Is map_ap_output supposed to be the inverse of map_ap_parse? Why const
+uint8_t * for parse but GString * for output? Also (assuming that they
+really are supposed to be inverses) encode/decode would be clearer.
+
+> +gboolean map_ap_get(map_ap_t *ap, enum map_ap_tag tag, void *value)
+> +{
+> +	return FALSE;
+> +}
+> +
+> +gboolean map_ap_set(map_ap_t *ap, enum map_ap_tag tag, void *value)
+> +{
+> +	return FALSE;
+> +}
+
+In a way having these generic get/set functions keeps the API small and
+clean, but then again there are only four possible types: 1, 2 and 4
+byte uints and strings. If there were get_u32, get_string, set_string,
+etc, you wouldn't e.g. need temporary variables to pass uints to the set
+functions but could pass constants directly and you'd also get the
+compiler to do some type checking for you (of course you still need to
+have an internal table to check which type a specific tag should have).
+
+Btw, I assume that you've planned the API to take care of the big-endian
+conversion internally?
+
+> +	MAP_AP_INVALID			= 0x100,
+
+Where do you plan to use this value?
+
+Since we now have unit/* in place it'd be nice if you could also add
+unit tests for this API as you go along implementing it.
+
+Johan
