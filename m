@@ -1,88 +1,167 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 5 Dec 2011 13:49:45 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd] MAP: Skeleton of application parameters support
-Message-ID: <20111205114945.GA24248@fusion.localdomain>
-References: <1322224823-27366-1-git-send-email-lkslawek@gmail.com>
- <20111205092212.GA11653@fusion.localdomain>
- <CA+i+Aw3Y3n1Z-gpKi+quKQ=R7Nnvk28NWLtbCY8=OAS-ubvwPQ@mail.gmail.com>
+From: Hemant Gupta <hemant.gupta@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: Naresh Gupta <naresh.gupta@stericsson.com>,
+	Hemant Gupta <hemantgupta.ste@gmail.com>,
+	Hemant Gupta <hemant.gupta@stericsson.com>
+Subject: [RFC] mgmt: Add support for Passkey handling
+Date: Mon, 5 Dec 2011 17:16:26 +0530
+Message-ID: <1323085586-4415-1-git-send-email-hemant.gupta@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CA+i+Aw3Y3n1Z-gpKi+quKQ=R7Nnvk28NWLtbCY8=OAS-ubvwPQ@mail.gmail.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Slawek,
+This patch adds support for handling Passkey Requests
+and response over management interface.
+---
+ lib/mgmt.h        |   17 ++++++++++
+ plugins/mgmtops.c |   86 ++++++++++++++++++++++++++++++++++++++++++++++------
+ 2 files changed, 93 insertions(+), 10 deletions(-)
 
-On Mon, Dec 05, 2011, Slawomir Bochenski wrote:
-> >> +map_ap_t *map_ap_parse(const uint8_t *buffer, uint32_t len)
-> >> +{
-> >> +     return NULL;
-> >> +}
-> >> +
-> >> +GString *map_ap_output(map_ap_t *ap)
-> >> +{
-> >> +     return NULL;
-> >> +}
-> >
-> > Is map_ap_output supposed to be the inverse of map_ap_parse? Why const
-> > uint8_t * for parse but GString * for output? Also (assuming that they
-> > really are supposed to be inverses) encode/decode would be clearer.
-> 
-> Yes, map_ap_output is inverse of map_ap_parse. uint8_t was chosen
-> after obex_get_apparam(). GString only as a convenience type that
-> stores together buffer and length. Would you prefer it to return size
-> and pass uint8_t ** to it (or reverse way)? Encode/decode is fine with
-> me.
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index 3960815..a85957d 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -242,6 +242,17 @@ struct mgmt_cp_set_fast_connectable {
+ 	uint8_t enable;
+ } __packed;
+ 
++#define MGMT_OP_USER_PASSKEY_REPLY	0x0020
++struct mgmt_cp_user_passkey_reply {
++	bdaddr_t bdaddr;
++	__le32 passkey;
++} __packed;
++
++#define MGMT_OP_USER_PASSKEY_NEG_REPLY	0x0021
++struct mgmt_cp_user_passkey_neg_reply {
++	bdaddr_t bdaddr;
++} __packed;
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	uint16_t opcode;
+@@ -336,3 +347,9 @@ struct mgmt_ev_device_blocked {
+ struct mgmt_ev_device_unblocked {
+ 	bdaddr_t bdaddr;
+ } __packed;
++
++#define MGMT_EV_USER_PASSKEY_REQUEST	0x0017
++struct mgmt_ev_user_passkey_request {
++	bdaddr_t bdaddr;
++} __packed;
++
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index b9e9ad6..ef88ae6 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -615,6 +615,79 @@ static int mgmt_confirm_reply(int index, bdaddr_t *bdaddr, gboolean success)
+ 	return 0;
+ }
+ 
++static int mgmt_passkey_reply(int index, bdaddr_t *bdaddr, uint32_t passkey)
++{
++	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_user_passkey_reply)];
++	struct mgmt_hdr *hdr = (void *) buf;
++	size_t buf_len;
++	char addr[18];
++
++	ba2str(bdaddr, addr);
++	DBG("index %d addr %s passkey %06u", index, addr, passkey);
++
++	memset(buf, 0, sizeof(buf));
++
++	if (passkey == INVALID_PASSKEY) {
++		struct mgmt_cp_user_passkey_neg_reply *cp;
++
++		hdr->opcode = htobs(MGMT_OP_USER_PASSKEY_NEG_REPLY);
++		hdr->len = htobs(sizeof(*cp));
++		hdr->index = htobs(index);
++
++		cp = (void *) &buf[sizeof(*hdr)];
++		bacpy(&cp->bdaddr, bdaddr);
++
++		buf_len = sizeof(*hdr) + sizeof(*cp);
++	} else {
++		struct mgmt_cp_user_passkey_reply *cp;
++
++		hdr->opcode = htobs(MGMT_OP_USER_PASSKEY_REPLY);
++		hdr->len = htobs(sizeof(*cp));
++		hdr->index = htobs(index);
++
++		cp = (void *) &buf[sizeof(*hdr)];
++		bacpy(&cp->bdaddr, bdaddr);
++		cp->passkey = htobl(passkey);
++
++		buf_len = sizeof(*hdr) + sizeof(*cp);
++	}
++
++	if (write(mgmt_sock, buf, buf_len) < 0)
++		return -errno;
++
++	return 0;
++}
++
++static void mgmt_passkey_request(int sk, uint16_t index, void *buf, size_t len)
++{
++	struct mgmt_ev_user_passkey_request *ev = buf;
++	struct controller_info *info;
++	char addr[18];
++	int err;
++
++	if (len < sizeof(*ev)) {
++		error("Too small pin_code_request event");
++		return;
++	}
++
++	ba2str(&ev->bdaddr, addr);
++
++	DBG("hci%u %s", index, addr);
++
++	if (index > max_index) {
++		error("Unexpected index %u in passkey_request event", index);
++		return;
++	}
++
++	info = &controllers[index];
++
++	err = btd_event_user_passkey(&info->bdaddr, &ev->bdaddr);
++	if (err < 0) {
++		error("btd_event_request_pin: %s", strerror(-err));
++		mgmt_passkey_reply(index, &ev->bdaddr, INVALID_PASSKEY);
++	}
++}
++
+ struct confirm_data {
+ 	int index;
+ 	bdaddr_t bdaddr;
+@@ -1576,6 +1649,9 @@ static gboolean mgmt_event(GIOChannel *io, GIOCondition cond, gpointer user_data
+ 	case MGMT_EV_DEVICE_UNBLOCKED:
+ 		mgmt_device_unblocked(sk, index, buf + MGMT_HDR_SIZE, len);
+ 		break;
++	case MGMT_EV_USER_PASSKEY_REQUEST:
++		mgmt_passkey_request(sk, index, buf + MGMT_HDR_SIZE, len);
++		break;
+ 	default:
+ 		error("Unknown Management opcode %u (index %u)", opcode, index);
+ 		break;
+@@ -1919,16 +1995,6 @@ static int mgmt_remove_bonding(int index, bdaddr_t *bdaddr)
+ 	return 0;
+ }
+ 
+-static int mgmt_passkey_reply(int index, bdaddr_t *bdaddr, uint32_t passkey)
+-{
+-	char addr[18];
+-
+-	ba2str(bdaddr, addr);
+-	DBG("index %d addr %s passkey %06u", index, addr, passkey);
+-
+-	return -ENOSYS;
+-}
+-
+ static int mgmt_encrypt_link(int index, bdaddr_t *dst, bt_hci_result_t cb,
+ 							gpointer user_data)
+ {
+-- 
+1.6.6.1
 
-Let's go with:
-
-map_ap_t *map_ap_decode(const uint8_t *buf, size_t len);
-uint8_t *map_ap_encode(map_ap_t *ap, size_t *len);
-
-> >> +gboolean map_ap_get(map_ap_t *ap, enum map_ap_tag tag, void *value)
-> >> +{
-> >> +     return FALSE;
-> >> +}
-> >> +
-> >> +gboolean map_ap_set(map_ap_t *ap, enum map_ap_tag tag, void *value)
-> >> +{
-> >> +     return FALSE;
-> >> +}
-> >
-> > In a way having these generic get/set functions keeps the API small and
-> > clean, but then again there are only four possible types: 1, 2 and 4
-> > byte uints and strings. If there were get_u32, get_string, set_string,
-> > etc, you wouldn't e.g. need temporary variables to pass uints to the set
-> > functions but could pass constants directly and you'd also get the
-> > compiler to do some type checking for you (of course you still need to
-> > have an internal table to check which type a specific tag should have).
-> 
-> Make the choice here. For me it doesn't make a big difference.
-
-Let's go with individual get/set functions for each type then. How
-about:
-
-gboolean map_ap_get_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t *val);
-gboolean map_ap_get_u16(map_ap_t *ap, enum map_ap_tag tag, uint16_t *val);
-gboolean map_ap_get_u32(map_ap_t *ap, enum map_ap_tag tag, uint32_t *val);
-const char *map_ap_get_string(map_ap_t *ap, enum map_ap_tag tag);
-
-gboolean map_ap_set_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t val);
-gboolean map_ap_set_u16(map_ap_t *ap, enum map_ap_tag tag, uint16_t val);
-gboolean map_ap_set_u32(map_ap_t *ap, enum map_ap_tag tag, uint32_t val);
-gboolean map_ap_set_string(map_ap_t *ap, enum map_ap_tag tag, const char *val);
-
-> > Since we now have unit/* in place it'd be nice if you could also add
-> > unit tests for this API as you go along implementing it.
-> 
-> Have they to be present already in this patch or can be added a bit later?
-
-Not necessarily in this first patch which only adds a skeleton, but it
-wouldn't hurt to have them part of subsequent patches which add the
-actual implementation (after all you'll probably want to test and verify
-the implementation before sending patches).
-
-Johan
