@@ -2,89 +2,110 @@ Return-Path: <cyrus@holtmann.org>
 From: Bartosz Szatkowski <bulislaw@linux.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH obexd 6/6] Add support for PullMessagesListing in MAP client
-Date: Mon,  5 Dec 2011 12:41:49 +0100
-Message-Id: <1323085309-23094-6-git-send-email-bulislaw@linux.com>
+Subject: [PATCH obexd 3/6] Add support for SetFolder in MAP client
+Date: Mon,  5 Dec 2011 12:41:46 +0100
+Message-Id: <1323085309-23094-3-git-send-email-bulislaw@linux.com>
 In-Reply-To: <1323085309-23094-1-git-send-email-bulislaw@linux.com>
 References: <1323085309-23094-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- client/map.c    |   31 +++++++++++++++++++++++++++++++
- test/map-client |    5 +++++
- 2 files changed, 36 insertions(+), 0 deletions(-)
+ client/map.c       |   56 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ doc/client-api.txt |    5 +++-
+ 2 files changed, 60 insertions(+), 1 deletions(-)
 
 diff --git a/client/map.c b/client/map.c
-index 397c170..0ce2a14 100644
+index bee49c5..bc45a13 100644
 --- a/client/map.c
 +++ b/client/map.c
-@@ -144,6 +144,35 @@ static DBusMessage *map_get_folder_listing(DBusConnection *connection,
- 							NULL, NULL, NULL, 0,
- 							buffer_cb, map);
- 	if (err < 0)
+@@ -40,6 +40,9 @@
+ #define OBEX_MAS_UUID_LEN 16
+ 
+ #define MAP_INTERFACE  "org.openobex.MessageAccess"
++#define ERROR_INF MAP_INTERFACE ".Error"
++#define ERROR_FAILED_PATH "org.openobex.Error.Failed"
++
+ #define MAS_UUID "00001132-0000-1000-8000-00805f9b34fb"
+ 
+ struct map_data {
+@@ -49,7 +52,60 @@ struct map_data {
+ 
+ static DBusConnection *conn = NULL;
+ 
++static void simple_cb(GObex *obex, GError *err, GObexPacket *rsp,
++							gpointer user_data)
++{
++	DBusMessage *reply;
++	struct map_data *map = user_data;
++	guint8 err_code = g_obex_packet_get_operation(rsp, NULL);
++
++	if (err != NULL)
++		reply = g_dbus_create_error(map->msg, ERROR_FAILED_PATH,
++							"%s", err->message);
++	else if (err_code != G_OBEX_RSP_SUCCESS)
++		reply = g_dbus_create_error(map->msg,
++						"org.openobex.Error.Response",
++						"%s (0x%02x)",
++						g_obex_strerror(err_code),
++						err_code);
++	else
++		reply = dbus_message_new_method_return(map->msg);
++
++	g_dbus_send_message(conn, reply);
++	dbus_message_unref(map->msg);
++}
++
++static DBusMessage *map_setpath(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	struct map_data *map = user_data;
++	const char *folder;
++	GObex *obex;
++	GError *err = NULL;
++
++	if (dbus_message_get_args(message, NULL, DBUS_TYPE_STRING, &folder,
++						DBUS_TYPE_INVALID) == FALSE)
 +		return g_dbus_create_error(message,
-+						"org.openobex.Error.Failed",
-+						"Failed");
++					ERROR_INF ".InvalidArguments", NULL);
++
++	obex = obc_session_get_obex(map->session);
++
++	g_obex_setpath(obex, folder, simple_cb, map, &err);
++	if (err != NULL) {
++		DBusMessage *reply;
++		reply =  g_dbus_create_error(message, ERROR_FAILED_PATH,
++							"%s", err->message);
++		g_error_free(err);
++		return reply;
++	}
 +
 +	map->msg = dbus_message_ref(message);
 +
 +	return NULL;
 +}
 +
-+static DBusMessage *map_get_messages_listing(DBusConnection *connection,
-+					DBusMessage *message, void *user_data)
-+{
-+	struct map_data *map = user_data;
-+	int err;
-+	const char *folder;
-+	DBusMessageIter msg_iter;
-+
-+	dbus_message_iter_init(message, &msg_iter);
-+
-+	if (dbus_message_iter_get_arg_type(&msg_iter) != DBUS_TYPE_STRING)
-+		return g_dbus_create_error(message,
-+				"org.openobex.Error.InvalidArguments", NULL);
-+
-+	dbus_message_iter_get_basic(&msg_iter, &folder);
-+
-+	err = obc_session_get(map->session, "x-bt/MAP-msg-listing", folder,
-+							NULL, NULL, 0,
-+							buffer_cb, map);
-+	if (err < 0)
- 		return g_dbus_create_error(message, ERROR_FAILED_PATH,
- 								"Failed");
- 
-@@ -157,6 +186,8 @@ static GDBusMethodTable map_methods[] = {
- 						G_DBUS_METHOD_FLAG_ASYNC },
- 	{ "GetFolderListing",	"a{ss}", "s",	map_get_folder_listing,
- 						G_DBUS_METHOD_FLAG_ASYNC },
-+	{ "GetMessagesListing",	"sa{ss}", "s",	map_get_messages_listing,
-+						G_DBUS_METHOD_FLAG_ASYNC },
+ static GDBusMethodTable map_methods[] = {
++	{ "SetFolder",	"s",	"",	map_setpath, G_DBUS_METHOD_FLAG_ASYNC },
  	{ }
  };
  
-diff --git a/test/map-client b/test/map-client
-index bcd2e66..1a4afdb 100755
---- a/test/map-client
-+++ b/test/map-client
-@@ -14,6 +14,8 @@ def parse_options():
-     parser.add_option("-l", "--lsdir", action="store_true", dest="ls_dir",
-                       help="List folders in current directory")
-     parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
-+    parser.add_option("-L", "--lsmsg", action="store", dest="ls_msg",
-+                      help="List messages in supplied CWD subdir")
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index ee8951f..fb5a8b2 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -258,7 +258,10 @@ Service		org.openobex.client
+ Interface	org.openobex.MessageAccess
+ Object path	[variable prefix]/{session0,session1,...}
  
-     return parser.parse_args()
- 
-@@ -54,4 +56,7 @@ if  __name__ == '__main__':
-     if options.ls_dir:
-         print map.GetFolderListing(dict())
- 
-+    if options.ls_msg is not None:
-+	print map.GetMessagesListing(options.ls_msg, dict())
+-Methods
++Methods		void SetFolder(string name)
 +
-     mainloop.run()
++			Set working directory for current session, *name* may
++			be the directory name or '..[/dir]'.
+ 
+ Transfer hierarchy
+ ==================
 -- 
 1.7.4.1
 
