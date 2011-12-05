@@ -1,55 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <124E43A676044D2D8CAE8E93A72BBD6C@sisodomain.com>
-From: Syam Sidhardhan <s.syam@samsung.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>,
-	Syam Sidhardhan <syamsidhardh@gmail.com>
+Message-ID: <1323093355.26198.53.camel@aeonflux>
+Subject: Re: [RFCv1 1/3] Bluetooth: Add HCI Read Data Block Size function
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-References: <1322144076-1913-1-git-send-email-s.syam@samsung.com>
- <20111202111510.GA15891@x220.ger.corp.intel.com> <4EDA85AA.3060400@gmail.com>
- <20111204205541.GA3918@fusion.localdomain>
-Subject: Re: [PATCH 1/3] Fix dbus reply memory leak
-Date: Mon, 05 Dec 2011 20:50:06 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
+Date: Mon, 05 Dec 2011 14:55:55 +0100
+In-Reply-To: <1323089704-1005-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1323089704-1005-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1323089704-1005-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Andrei,
 
------ Original Message ----- 
-From: "Johan Hedberg" <johan.hedberg@gmail.com>
-To: "Syam Sidhardhan" <syamsidhardh@gmail.com>
-Cc: "Syam Sidhardhan" <s.syam@samsung.com>; 
-<linux-bluetooth@vger.kernel.org>
-Sent: Monday, December 05, 2011 2:25 AM
-Subject: Re: [PATCH 1/3] Fix dbus reply memory leak
+> Implement block size read function. Use different variables for
+> packet-based and block-based flow control.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  include/net/bluetooth/hci.h      |    8 ++++++++
+>  include/net/bluetooth/hci_core.h |    5 +++++
+>  net/bluetooth/hci_event.c        |   26 ++++++++++++++++++++++++++
+>  3 files changed, 39 insertions(+), 0 deletions(-)
 
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-> Hi Syam,
->
-> On Sun, Dec 04, 2011, Syam Sidhardhan wrote:
->> >Your commit message uses the word leak in singular form but there are
->> >multiple fixes in this patch, i.e. the commit message is misleading. In
->> >this case I'd split the patch into four separate ones:
->> >
->> >telephony-maemo5: Fix D-Bus reply memory leaks
->> >cups: Fix D-Bus reply memory leaks
->> >agent: Fix D-Bus reply memory leaks
->> >mpris-player: Fix D-Bus reply memory leaks
->> >
->> >Johan
->>
->> Yes, you are correct. You can split it into multiple patches.
->> Thanks in advance.
->
-> Maybe I was a bit unclear: I'm expecting *you* to do this split and
-> resend the patches. Thanks :)
->
-> Johan
+Regards
 
-Ok :-),
-I'll split it and send.
+Marcel
 
-Regadrs,
-Syam 
 
