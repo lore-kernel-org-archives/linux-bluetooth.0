@@ -1,111 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1323110749.26198.57.camel@aeonflux>
-Subject: Re: [RFCv1 2/3] Bluetooth: Simplify num_comp_pkts_evt function
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 05 Dec 2011 19:45:49 +0100
-In-Reply-To: <20111205153222.GD23614@aemeltch-MOBL1>
-References: <1323089704-1005-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1323089704-1005-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1323093094.26198.49.camel@aeonflux>
-	 <20111205153222.GD23614@aemeltch-MOBL1>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Message-ID: <4EDD0312.1080309@codeaurora.org>
+Date: Mon, 05 Dec 2011 09:44:50 -0800
+From: Brian Gix <bgix@codeaurora.org>
+MIME-Version: 1.0
+To: "Ganir, Chen" <chen.ganir@ti.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: SMP Key distribution
+References: <F0070FBC0FB3174D8D11444EB2D5B02643FFBB@DNCE02.ent.ti.com> <4EDCE598.20808@codeaurora.org> <F0070FBC0FB3174D8D11444EB2D5B02644029C@DNCE02.ent.ti.com>
+In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B02644029C@DNCE02.ent.ti.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Chen,
 
-> > > Simplify function and remove fourth level of indentation.
-> > > 
-> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > ---
-> > >  net/bluetooth/hci_event.c |   43 +++++++++++++++++++++++++------------------
-> > >  1 files changed, 25 insertions(+), 18 deletions(-)
-> > > 
-> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > index 273e1cb..fd7e6b5 100644
-> > > --- a/net/bluetooth/hci_event.c
-> > > +++ b/net/bluetooth/hci_event.c
-> > > @@ -2288,28 +2288,35 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
-> > >  		count  = get_unaligned_le16(ptr++);
-> > 
-> > actually we first need a cleanup of this function. This part is
-> > horrible. It works because of our ptr cast to uint16, but we should
-> > actually use a proper struct here. Maybe an info struct like we use for
-> > inquiry result might be helpful here.
-> 
-> Something like the code below?
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index e33e468..403974c 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1018,9 +1018,14 @@ struct hci_ev_role_change {
->  } __packed;
->  
->  #define HCI_EV_NUM_COMP_PKTS           0x13
-> +struct hci_comp_pkts_info {
-> +       __le16   handle;
-> +       __le16   count;
-> +} __packed;
-> +
->  struct hci_ev_num_comp_pkts {
->         __u8     num_hndl;
-> -       /* variable length part */
-> +       struct hci_comp_pkts_info handles[0];
->  } __packed;
->  
->  #define HCI_EV_MODE_CHANGE             0x14
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 238fb65..079b94f 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2273,26 +2273,27 @@ static inline void hci_role_change_evt(struct
-> hci_dev *hdev, struct sk_buff *skb
->  static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct
-> sk_buff *skb)
->  {
->         struct hci_ev_num_comp_pkts *ev = (void *) skb->data;
-> -       __le16 *ptr;
-> +       struct hci_comp_pkts_info *info;
->         int i;
->  
->         skb_pull(skb, sizeof(*ev));
->  
->         BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
->  
-> -       if (skb->len < ev->num_hndl * 4) {
-> +       if (skb->len < ev->num_hndl * sizeof(*info)) {
->                 BT_DBG("%s bad parameters", hdev->name);
->                 return;
->         }
->  
->         tasklet_disable(&hdev->tx_task);
->  
-> -       for (i = 0, ptr = (__le16 *) skb->data; i < ev->num_hndl; i++) {
-> +       for (i = 0; i < ev->num_hndl; i++) {
+On 12/5/2011 7:48 AM, Ganir, Chen wrote:
+> Brian,
+>
+> I understand that we support only those keys, but I don't think that we can break the convention just because of our lack of support. We can ignore any other keys, but still we need to start distributing our keys only after the slave has finished sending all of his keys, and not do it automatically after the Master identification sent from the slave.
+>
 
-		struct hci_comp_pkts_info *info = &ev->handles[i];
+You are correct, and this is definitely one of the things I hope to 
+address (if someone else doesn't beat me to it) once I get the MITM 
+changes that I have submitted accepted into bluetooth-next.
 
->                 struct hci_conn *conn;
->                 __u16  handle, count;
->  
-> -               handle = get_unaligned_le16(ptr++);
-> -               count  = get_unaligned_le16(ptr++);
-> +               info = &ev->handles[i];
-> +               handle = __le16_to_cpu(info->handle);
-> +               count  = __le16_to_cpu(info->count);
->  
->                 conn = hci_conn_hash_lookup_handle(hdev, handle);
->                 if (!conn)
+> In addition, I believe there is a problem in the SMP code. In smp_cmd_master_ident, we do hci_add_ltk() with the conn->src instead of conn->dst, as in other places we call the hci_add_ltk():
+>
 
-And you need to remove the skb_pull above since otherwise you are
-pointing to the wrong memory location.
+This may or may not be a bug, depending on how you look at things.  When 
+"Privacy" is implemented, it will be possible for a remote device to 
+"change addresses" on us (either via the "Address Resolution" key 
+distribution, or via the GAP primary service) and it becomes "more 
+interesting" to keep track of who is who.  Saving the LTK with the SRC 
+(local) address might work, because LTK resolution is suppose to be done 
+by matching on the EDIV and Randomizer, not by address.
 
-Regards
+Having said that, however, If we are the Master (which most Dual mode 
+devices will generally be) we still need to know the remote devices 
+BDADDR, so that we can establish the connection, and thereafter kick off 
+link encryption.  So yes, I would still consider that the Bug:  The 
+Master gets an LTK+MID from the Slave, which will be used to encrypt 
+links as long as those roles do not change.  Therefore, the Master 
+should be storing the LTK+MID pair under that Slaves Identity (BDADDR).
 
-Marcel
+One of the catches being however, that if we get Address Resolution 
+keys, or the slaves GAP Primary Service tells us to use a different 
+Address, this storage "key" will need to be adjusted.
+
+> static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
+> {
+> 	struct smp_cmd_master_ident *rp = (void *) skb->data;
+> 	struct smp_chan *smp = conn->smp_chan;
+>
+> 	skb_pull(skb, sizeof(*rp));
+>
+> 	hci_add_ltk(conn->hcon->hdev, 1, conn->src, smp->smp_key_size,
+> 						rp->ediv, rp->rand, smp->tk);
+>
+> 	smp_distribute_keys(conn, 1);
+>
+> 	return 0;
+> }
+>
+> In addition, we call the hci_add_ltk twice in this case - once from this function, and once from the smp_distribute_keys. Is this intentional or is this a bug ?
+
+This is not actually a bug.  Or at least not what I would consider a 
+serious bug.  The LTK key that the Slave sends to the Master, is 
+distinct from the key the Master sends to the Slave.
+
+However, as I indicated above, an LTK+MID pair that is distributed 
+"outbound" should not be associated with the remote devices BDADDR. It 
+should be stored using a lookup key that is the EDIV, which is 
+authenticated with the Randomizer.
+
+>
+> Thanks,
+> Chen Ganir.
 
 
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
