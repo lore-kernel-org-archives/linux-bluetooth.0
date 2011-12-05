@@ -1,74 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJdJm_O0xPVm9D5MOE30t2Baxq7ot5-fWWLvo65gSNOJGf-2dQ@mail.gmail.com>
-References: <1322129290-10767-1-git-send-email-sancane@gmail.com>
-	<20111202112957.GC17203@x220.ger.corp.intel.com>
-	<CACLukzK1YyqBszGc679Vj-Pf9+M+s+LaBpnd2_+pan8TCwHODA@mail.gmail.com>
-	<CAJdJm_P5OU6vqs+-9xL36=1DWVtgzzY1CEPf6rD3Tws5BSik2g@mail.gmail.com>
-	<F0070FBC0FB3174D8D11444EB2D5B02643D9D0@DNCE02.ent.ti.com>
-	<CAJdJm_PAC_HsEd-8-25r4V-ZqG0gfxpio=rnUZzG4AWJM2cNJQ@mail.gmail.com>
-	<F0070FBC0FB3174D8D11444EB2D5B02644008E@DNCE02.ent.ti.com>
-	<CAJdJm_O0xPVm9D5MOE30t2Baxq7ot5-fWWLvo65gSNOJGf-2dQ@mail.gmail.com>
-Date: Mon, 5 Dec 2011 13:00:14 +0100
-Message-ID: <CACLukzKSQS7Lsv_V4eK4pXM+_aaUPqVdQX8N+bYEfyaZ=ve9zA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Provide return status in gatt_service_add function
-From: Santiago Carot <sancane@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: "Ganir, Chen" <chen.ganir@ti.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Santiago Carot-Nemesio <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH] btio: Fix byte order conversion when getting L2CAP CID
+Date: Mon,  5 Dec 2011 12:54:45 +0100
+Message-Id: <1323086085-26024-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen, Lizardo,
+The L2CAP CID is passed and received in little endian byte order
+through the socket interface so a conversion is in place before
+passing it onwards.
+---
+ btio/btio.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-2011/12/5 Anderson Lizardo <anderson.lizardo@openbossa.org>:
-> Hi Chen,
->
-> On Mon, Dec 5, 2011 at 7:10 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
->> What do you mean restoring the attribute handles ? Each of the profiles registers its own services when the plugin is loaded, according to the load order (which I assume will not change).
->
-> There is no guarantee in the load order. As we add more plugins, you
-> can't predict the order the plugins will be loaded.
->
->> When a profile registers its attributes, it can specify callbacks for read/write which are actually function pointers. How to you plan to support this?
->
-> Only attribute *handles* are to be stored (for now). The mapping could
-> be based on service+characteristic UUIDs (but we need to pay attention
-> if we have multiple services with same service and characteristic
-> UUIDs; for this case, I'm not even sure how the client knows which one
-> to use).
->
+diff --git a/btio/btio.c b/btio/btio.c
+index f8c5cc7..0d177a3 100644
+--- a/btio/btio.c
++++ b/btio/btio.c
+@@ -886,7 +886,7 @@ static gboolean l2cap_get(int sock, GError **err, BtIOOption opt1,
+ 			break;
+ 		case BT_IO_OPT_CID:
+ 			*(va_arg(args, uint16_t *)) = src.l2_cid ?
+-						src.l2_cid : dst.l2_cid;
++					btohs(src.l2_cid) : btohs(dst.l2_cid);
+ 			break;
+ 		case BT_IO_OPT_OMTU:
+ 			*(va_arg(args, uint16_t *)) = l2o.omtu;
+-- 
+1.7.8
 
-I was thinking in using a sort of server_id to distinguish between
-services registered among different plugins. That a first idea I have,
-I'm going to try to send a RFCs patches during these days. As always,
-I'll be updating my git repository at github if you want to follow my
-progress.
-
-
->> In addition, who will be responsible for reloading the database and populating the values (profile plugin or bluetoothd core) ? how do you synchronize them?
->
-> My suggestion would be to implement this in attrib/gatt-service.c so
-> gatt_service_add() could load attribute handles from storage
-> transparently. This could also avoid changing every profile.
->
-> Note this is only for *server* roles (e.g. PAS server, TIP server, PXP
-> reporter etc.).
->
-> I'm not sure what you mean with synchronization. The attribute handles
-> are to be stored when the service is registered (and you can't change
-> them after registration).
->
->> Do you have an RFC or a simple design description which will allow reviewing?
->
-> No. I am not working on this currently. This discussion started from
-> an idea from Santiago to how to handle registration failures (see
-> initial post), to which I responded that we may want first to address
-> attribute handle storage to make sure handles stay the same during
-> device lifetime (until it is factory reset).
->
-
-I'll put my hands on this issue.
-
-Regards
