@@ -1,99 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1323093094.26198.49.camel@aeonflux>
-Subject: Re: [RFCv1 2/3] Bluetooth: Simplify num_comp_pkts_evt function
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 05 Dec 2011 14:51:34 +0100
-In-Reply-To: <1323089704-1005-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1323089704-1005-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1323089704-1005-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Message-ID: <4EDCC7A2.1020008@linux.intel.com>
+Date: Mon, 05 Dec 2011 14:31:14 +0100
+From: Frederic Danis <frederic.danis@linux.intel.com>
+MIME-Version: 1.0
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v3 1/6] audio: Move tel drivers to DBus interface
+References: <1322752445-18771-1-git-send-email-frederic.danis@linux.intel.com> <1322752445-18771-2-git-send-email-frederic.danis@linux.intel.com> <CABBYNZJ75hK0eBkHFJh7kQncsoxDYHc3TGgk6UTAPSPYP_bDbA@mail.gmail.com>
+In-Reply-To: <CABBYNZJ75hK0eBkHFJh7kQncsoxDYHc3TGgk6UTAPSPYP_bDbA@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hello Luiz,
 
-> Simplify function and remove fourth level of indentation.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/hci_event.c |   43 +++++++++++++++++++++++++------------------
->  1 files changed, 25 insertions(+), 18 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 273e1cb..fd7e6b5 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2288,28 +2288,35 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
->  		count  = get_unaligned_le16(ptr++);
+Le 05/12/2011 10:00, Luiz Augusto von Dentz a écrit :
+> Hi Frédéric,
+>
+> 2011/12/1 Frédéric Danis<frederic.danis@linux.intel.com>:
+>> +static void free_agent(struct tel_agent *agent)
+>> +{
+>> +       if (agent->name)
+>> +               g_free(agent->name);
+>> +
+>> +       if (agent->path)
+>> +               g_free(agent->path);
+>
+> You can call g_free directly.
 
-actually we first need a cleanup of this function. This part is
-horrible. It works because of our ptr cast to uint16, but we should
-actually use a proper struct here. Maybe an info struct like we use for
-inquiry result might be helpful here.
+OK
 
-It also needs a check that we are in packet based flow control. If not,
-we need to just ignore this event and print an error message.
+>> +       g_free(agent);
+>> +}
+>> +
 
->  		conn = hci_conn_hash_lookup_handle(hdev, handle);
-> -		if (conn) {
-> -			conn->sent -= count;
-> -
-> -			if (conn->type == ACL_LINK) {
-> +		if (!conn)
-> +			continue;
-> +
-> +		conn->sent -= count;
-> +
-> +		switch (conn->type) {
-> +		case ACL_LINK:
-> +			hdev->acl_cnt += count;
-> +			if (hdev->acl_cnt > hdev->acl_pkts)
-> +				hdev->acl_cnt = hdev->acl_pkts;
-> +			break;
-> +
-> +		case LE_LINK:
-> +			if (hdev->le_pkts) {
-> +				hdev->le_cnt += count;
-> +				if (hdev->le_cnt > hdev->le_pkts)
-> +					hdev->le_cnt = hdev->le_pkts;
-> +			} else {
->  				hdev->acl_cnt += count;
->  				if (hdev->acl_cnt > hdev->acl_pkts)
->  					hdev->acl_cnt = hdev->acl_pkts;
-> -			} else if (conn->type == LE_LINK) {
-> -				if (hdev->le_pkts) {
-> -					hdev->le_cnt += count;
-> -					if (hdev->le_cnt > hdev->le_pkts)
-> -						hdev->le_cnt = hdev->le_pkts;
-> -				} else {
-> -					hdev->acl_cnt += count;
-> -					if (hdev->acl_cnt > hdev->acl_pkts)
-> -						hdev->acl_cnt = hdev->acl_pkts;
-> -				}
-> -			} else {
-> -				hdev->sco_cnt += count;
-> -				if (hdev->sco_cnt > hdev->sco_pkts)
-> -					hdev->sco_cnt = hdev->sco_pkts;
->  			}
-> +			break;
-> +
-> +		default:
-> +			hdev->sco_cnt += count;
-> +			if (hdev->sco_cnt > hdev->sco_pkts)
-> +				hdev->sco_cnt = hdev->sco_pkts;
-> +			break;
+>> +       if (find_agent(NULL, NULL, uuid) != NULL)
+>> +               return btd_error_already_exists(msg);
+>> +
+>> +       /* initialize agent properties */
+>> +       for (i=0 ; i<4; i++) {
+>> +               if (strcasecmp(uuid, default_properties[i].uuid) == 0) {
+>> +                       agent = g_new0(struct tel_agent, 1);
+>> +                       agent->properties =&default_properties[i];
+>> +                       agent->name = g_strdup(sender);
+>> +                       agent->path = g_strdup(path);
+>> +                       agent->version = version;
+>> +                       agent->features = features;
+>> +                       break;
+>> +               }
+>> +       }
+>> +
+>> +       if (i == 4)
+>> +               return btd_error_invalid_args(msg);
+>
+> I guess you can use sizeof(default_properties)/sizeof(struct
+> default_agent) to calculate the size of the array, anyway I would
+> probably split this part in a separate function e.g. agent_new.
 
-And this should be under SCO_LINK and default should print an error.
+OK
 
->  		}
->  	}
->  
+>> +       DBG("Register agent : %s%s for %s version 0x%04X with features 0x%02X",
+>> +                                       sender, path, uuid, version, features);
+>> +
+>> +       telsrv.servers = g_slist_append(telsrv.servers, agent);
+>> +
+>> +       return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+>> +}
+>> +
+
+>> diff --git a/doc/assigned-numbers.txt b/doc/assigned-numbers.txt
+>> index cda934c..120d7ea 100644
+>> --- a/doc/assigned-numbers.txt
+>> +++ b/doc/assigned-numbers.txt
+>> @@ -8,6 +8,7 @@ avoid conflicts.
+>>   Profile                Channel
+>>   -----------------------
+>>   DUN            1
+>> +HSP HS         6
+>
+> Why not HFP HS?
+>
+>>   HFP HF         7
+>>   OPP            9
+>>   FTP            10
+
+I am not sure to understand your comment as I do not touch HFP assigned 
+numbers. In HFP specification, roles are Hands-Free unit (HFP HF) and 
+Audio Gateway (HFP AG).
 
 Regards
 
-Marcel
+Fred
 
+
+
+-- 
+Frederic Danis                            Open Source Technology Centre
+frederic.danis@intel.com                              Intel Corporation
 
