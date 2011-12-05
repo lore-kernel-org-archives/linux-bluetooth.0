@@ -1,81 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EDD0312.1080309@codeaurora.org>
-Date: Mon, 05 Dec 2011 09:44:50 -0800
+Message-ID: <4EDCFCB6.5010206@codeaurora.org>
+Date: Mon, 05 Dec 2011 09:17:42 -0800
 From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
 To: "Ganir, Chen" <chen.ganir@ti.com>
 CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: SMP Key distribution
-References: <F0070FBC0FB3174D8D11444EB2D5B02643FFBB@DNCE02.ent.ti.com> <4EDCE598.20808@codeaurora.org> <F0070FBC0FB3174D8D11444EB2D5B02644029C@DNCE02.ent.ti.com>
-In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B02644029C@DNCE02.ent.ti.com>
+Subject: Re: LE Connection issues
+References: <F0070FBC0FB3174D8D11444EB2D5B026440280@DNCE02.ent.ti.com>
+In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B026440280@DNCE02.ent.ti.com>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Chen,
 
-On 12/5/2011 7:48 AM, Ganir, Chen wrote:
-> Brian,
+On 12/5/2011 7:38 AM, Ganir, Chen wrote:
+> Hi everyone.
 >
-> I understand that we support only those keys, but I don't think that we can break the convention just because of our lack of support. We can ignore any other keys, but still we need to start distributing our keys only after the slave has finished sending all of his keys, and not do it automatically after the Master identification sent from the slave.
+> I've tried investigating the LE connection procedure a bit, and I came up with some issues. For example, you MUST first scan for devices even if you have a device already paired, in order to connect to it. This is not the case for BR/EDR devices, where you can turn on the host, and try to connect to the paired device immediately. This has a major impact on user experience. I believe that the only relevant information from the advertising data is the address type, which can be sent to the host, and used later when trying to connect to the device again. I believe there were some discussions regarding this issue a while back, but I cannot recall what was done about this.
 >
-
-You are correct, and this is definitely one of the things I hope to 
-address (if someone else doesn't beat me to it) once I get the MITM 
-changes that I have submitted accepted into bluetooth-next.
-
-> In addition, I believe there is a problem in the SMP code. In smp_cmd_master_ident, we do hci_add_ltk() with the conn->src instead of conn->dst, as in other places we call the hci_add_ltk():
+> In addition, a call for brd_device_add_attio_callback may fail immediately (without even calling the connect/disconnect callbacks) if the device is not present in the advertising cache (fail with error "no route to device"). This also results in a bad user experience, since a user may think that the host is trying to connect to the peer, while in fact the host failed and did not indicate this failure to the user. Since LE does not define a connection timeout, we have a problem here, since we failed on implementation and not spec issue, and we did not inform the user of this error.
 >
+> Did anyone else encounter these issues, or has anything to comment about these issues ?
 
-This may or may not be a bug, depending on how you look at things.  When 
-"Privacy" is implemented, it will be possible for a remote device to 
-"change addresses" on us (either via the "Address Resolution" key 
-distribution, or via the GAP primary service) and it becomes "more 
-interesting" to keep track of who is who.  Saving the LTK with the SRC 
-(local) address might work, because LTK resolution is suppose to be done 
-by matching on the EDIV and Randomizer, not by address.
 
-Having said that, however, If we are the Master (which most Dual mode 
-devices will generally be) we still need to know the remote devices 
-BDADDR, so that we can establish the connection, and thereafter kick off 
-link encryption.  So yes, I would still consider that the Bug:  The 
-Master gets an LTK+MID from the Slave, which will be used to encrypt 
-links as long as those roles do not change.  Therefore, the Master 
-should be storing the LTK+MID pair under that Slaves Identity (BDADDR).
+I have definitely dealt with the same issue, and it has indeed been 
+raised here.  I am equally unclear as to if it has been fully resolved, 
+but Johan has made some changes to the MGMT interface to create an 
+Address Type bit field, and package it along with the Address into a 
+struct called mgmt_addr_info, which is now used in the device found 
+event, connect failed event and pair device command.
 
-One of the catches being however, that if we get Address Resolution 
-keys, or the slaves GAP Primary Service tells us to use a different 
-Address, this storage "key" will need to be adjusted.
+I would like to further extend the usage of this structure to replace 
+the simple bdaddr in the mgmt_link_key_info struct, so that once a 
+device has been paired, the kernel's database of Link keys will have a 
+copy of the address type.  This might not be a perfect fit, because not 
+all devices will support LTK's (opting instead perhaps for the CSRK, if 
+the usage model does not support links that remain open indefinitely). 
+However, if a "trusted relationship" (i.e. Paired) has been established, 
+I think some sort of key must exist, and each of these keys is 
+associated with a particular bdaddr, and the kernel will need to be 
+aware of it, which gives us the opportunity to make that connection (and 
+differentiation) between BR/LE-Public/LE-Random
 
-> static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
-> {
-> 	struct smp_cmd_master_ident *rp = (void *) skb->data;
-> 	struct smp_chan *smp = conn->smp_chan;
->
-> 	skb_pull(skb, sizeof(*rp));
->
-> 	hci_add_ltk(conn->hcon->hdev, 1, conn->src, smp->smp_key_size,
-> 						rp->ediv, rp->rand, smp->tk);
->
-> 	smp_distribute_keys(conn, 1);
->
-> 	return 0;
-> }
->
-> In addition, we call the hci_add_ltk twice in this case - once from this function, and once from the smp_distribute_keys. Is this intentional or is this a bug ?
-
-This is not actually a bug.  Or at least not what I would consider a 
-serious bug.  The LTK key that the Slave sends to the Master, is 
-distinct from the key the Master sends to the Slave.
-
-However, as I indicated above, an LTK+MID pair that is distributed 
-"outbound" should not be associated with the remote devices BDADDR. It 
-should be stored using a lookup key that is the EDIV, which is 
-authenticated with the Randomizer.
-
->
-> Thanks,
-> Chen Ganir.
+Johan has made the Address type be a bit field, such that the current 3 
+recognized types are "BR/EDR", "Public LE", and "Random LE".
 
 
 -- 
