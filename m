@@ -1,47 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4EDD1482.3000306@codeaurora.org>
+Date: Mon, 05 Dec 2011 10:59:14 -0800
+From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B026440280@DNCE02.ent.ti.com>
-References: <F0070FBC0FB3174D8D11444EB2D5B026440280@DNCE02.ent.ti.com>
-Date: Mon, 5 Dec 2011 17:51:09 -0300
-Message-ID: <CAKT1EBfB_WSh45sgZzZYTF4tiu0yb+ZTy1wPKbMdApfAZdKHvw@mail.gmail.com>
-Subject: Re: LE Connection issues
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: "Ganir, Chen" <chen.ganir@ti.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: Hendrik Sattler <post@hendrik-sattler.de>
+CC: Hemant Gupta <hemant.gupta@stericsson.com>,
+	linux-bluetooth@vger.kernel.org,
+	Naresh Gupta <naresh.gupta@stericsson.com>,
+	Hemant Gupta <hemantgupta.ste@gmail.com>
+Subject: Re: [RFC] mgmt: Add support for Passkey handling
+References: <1323085586-4415-1-git-send-email-hemant.gupta@stericsson.com> <b5e0b125ccef74762e3665620069daad@mail.hendrik-sattler.de>
+In-Reply-To: <b5e0b125ccef74762e3665620069daad@mail.hendrik-sattler.de>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+Hi Hendrik,
 
-On Mon, Dec 5, 2011 at 12:38 PM, Ganir, Chen <chen.ganir@ti.com> wrote:
-> Hi everyone.
+On 12/5/2011 4:50 AM, Hendrik Sattler wrote:
+> Am 05.12.2011 12:46, schrieb Hemant Gupta:
+[...]
+>> +static int mgmt_passkey_reply(int index, bdaddr_t *bdaddr, uint32_t
+>> passkey)
+>> +{
+>> + char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_user_passkey_reply)];
+>> + struct mgmt_hdr *hdr = (void *) buf;
+>> + size_t buf_len;
+>> + char addr[18];
+>> +
+>> + ba2str(bdaddr, addr);
+>> + DBG("index %d addr %s passkey %06u", index, addr, passkey);
+>> +
+>> + memset(buf, 0, sizeof(buf));
+>> +
+>> + if (passkey == INVALID_PASSKEY) {
+>> + struct mgmt_cp_user_passkey_neg_reply *cp;
+>> +
+>> + hdr->opcode = htobs(MGMT_OP_USER_PASSKEY_NEG_REPLY);
+>> + hdr->len = htobs(sizeof(*cp));
+>> + hdr->index = htobs(index);
+>> +
+>> + cp = (void *) &buf[sizeof(*hdr)];
 >
-> I've tried investigating the LE connection procedure a bit, and I came up with some issues. For example, you MUST first scan for devices even if you have a device already paired, in order to connect to it. This is not the case for BR/EDR devices, where you can turn on the host, and try to connect to the paired device immediately. This has a major impact on user experience. I believe that the only relevant information from the advertising data is the address type, which can be sent to the host, and used later when trying to connect to the device again. I believe there were some discussions regarding this issue a while back, but I cannot recall what was done about this.
+> By definition, that the same as:
+> cp = (void *) (hdr + 1);
+> And you can do it in the same line as the definition of *cp.
 >
-> In addition, a call for brd_device_add_attio_callback may fail immediately (without even calling the connect/disconnect callbacks) if the device is not present in the advertising cache (fail with error "no route to device"). This also results in a bad user experience, since a user may think that the host is trying to connect to the peer, while in fact the host failed and did not indicate this failure to the user. Since LE does not define a connection timeout, we have a problem here, since we failed on implementation and not spec issue, and we did not inform the user of this error.
+>> + bacpy(&cp->bdaddr, bdaddr);
+>> +
+>> + buf_len = sizeof(*hdr) + sizeof(*cp);
+>> + } else {
+>> + struct mgmt_cp_user_passkey_reply *cp;
+>> +
+>> + hdr->opcode = htobs(MGMT_OP_USER_PASSKEY_REPLY);
+>> + hdr->len = htobs(sizeof(*cp));
+>> + hdr->index = htobs(index);
+>> +
+>> + cp = (void *) &buf[sizeof(*hdr)];
+>> + bacpy(&cp->bdaddr, bdaddr);
+>> + cp->passkey = htobl(passkey);
+>> +
+>> + buf_len = sizeof(*hdr) + sizeof(*cp);
+>> + }
 >
-> Did anyone else encounter these issues, or has anything to comment about these issues ?
+> Ever wondered why if and else look almost the same? They should be
+> merged as far as possible.
 
-We don't have a final decision yet, but there are some suggestions.
-The fact is we need to have a functional implementation, even it is
-not the final solution. Andre Guedes has some patches to trigger
-scanning before each connect(if the address is not found in the
-cache). Search for "[PATCH 0/4] LE connection improvements" in the
-mailing list. However, considering that BlueZ will act as central it
-is necessary to use whitelist during the connection establishment to
-avoid the penalty for non connectable devices.
+I generally agree with this statement, but think it doesn't really apply 
+here.  Since the definition of "cp" is different between the IF and the 
+ELSE, the generated code is quite different, even though they look the 
+same:  The sizeof(*cp) is different, the MGMT_OP Opcode is different, 
+and the structure members might be named the same, but since they are in 
+different structures, they are in fact different as well.
 
-IMO connections should not be triggered intermediately for paired
-devices. We need to provide more flexibility to allow apps/profiles
-controlling connections. Definitively, btd_device_add_attio_callback
-needs to be improved. We can't keep the timeout in the kernel since
-timeouts are defined by profiles.
+The only thing that could be safely "shared" is the hdr->index, I think.
 
-L2CAP config timeout ~40 seconds for LE connections should be
-removed(discussed in Prague). Passive/background scanning if there is
-at least one key available or a socket/connect pending is still open,
-we need to discuss if it is feasible or not.
 
-BR,
-Claudio
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
