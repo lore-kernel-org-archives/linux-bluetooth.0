@@ -1,233 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 5 Dec 2011 18:26:04 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Hemant Gupta <hemantgupta.ste@gmail.com>
-Cc: Hemant Gupta <hemant.gupta@stericsson.com>,
-	linux-bluetooth@vger.kernel.org,
-	Naresh Gupta <naresh.gupta@stericsson.com>
-Subject: Re: [RFC] mgmt: Add support for Passkey handling
-Message-ID: <20111205162558.GA14236@aemeltch-MOBL1>
-References: <1323085586-4415-1-git-send-email-hemant.gupta@stericsson.com>
- <20111205122211.GC23614@aemeltch-MOBL1>
- <CACj007=e6RLZEJyi4H28TPSjsZEQk_O7suU42U+z9_PeNezsjA@mail.gmail.com>
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: Brian Gix <bgix@codeaurora.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: SMP Key distribution
+Date: Mon, 5 Dec 2011 15:48:31 +0000
+Message-ID: <F0070FBC0FB3174D8D11444EB2D5B02644029C@DNCE02.ent.ti.com>
+References: <F0070FBC0FB3174D8D11444EB2D5B02643FFBB@DNCE02.ent.ti.com>
+ <4EDCE598.20808@codeaurora.org>
+In-Reply-To: <4EDCE598.20808@codeaurora.org>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CACj007=e6RLZEJyi4H28TPSjsZEQk_O7suU42U+z9_PeNezsjA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hemant,
-
-On Mon, Dec 05, 2011 at 07:42:00PM +0530, Hemant Gupta wrote:
-> Hi Andrei,
+Brian,
+ 
+> -----Original Message-----
+> From: Brian Gix [mailto:bgix@codeaurora.org]
+> Sent: Monday, December 05, 2011 5:39 PM
+> To: Ganir, Chen
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: SMP Key distribution
 > 
-> On Mon, Dec 5, 2011 at 5:52 PM, Andrei Emeltchenko <
-> andrei.emeltchenko.news@gmail.com> wrote:
+> Hi Chen,
 > 
-> > Hi Hemant,
+> On 12/5/2011 1:02 AM, Ganir, Chen wrote:
+> > Hi.
 > >
-> > On Mon, Dec 05, 2011 at 05:16:26PM +0530, Hemant Gupta wrote:
-> > > This patch adds support for handling Passkey Requests
-> > > and response over management interface.
-> > > ---
-> > >  lib/mgmt.h        |   17 ++++++++++
-> > >  plugins/mgmtops.c |   86
-> > ++++++++++++++++++++++++++++++++++++++++++++++------
-> > >  2 files changed, 93 insertions(+), 10 deletions(-)
-> > >
-> > > diff --git a/lib/mgmt.h b/lib/mgmt.h
-> > > index 3960815..a85957d 100644
-> > > --- a/lib/mgmt.h
-> > > +++ b/lib/mgmt.h
-> > > @@ -242,6 +242,17 @@ struct mgmt_cp_set_fast_connectable {
-> > >       uint8_t enable;
-> > >  } __packed;
-> > >
-> > > +#define MGMT_OP_USER_PASSKEY_REPLY   0x0020
-> > > +struct mgmt_cp_user_passkey_reply {
-> > > +     bdaddr_t bdaddr;
-> > > +     __le32 passkey;
-> > > +} __packed;
-> > > +
-> > > +#define MGMT_OP_USER_PASSKEY_NEG_REPLY       0x0021
-> > > +struct mgmt_cp_user_passkey_neg_reply {
-> > > +     bdaddr_t bdaddr;
-> > > +} __packed;
-> > > +
-> > >  #define MGMT_EV_CMD_COMPLETE         0x0001
-> > >  struct mgmt_ev_cmd_complete {
-> > >       uint16_t opcode;
-> > > @@ -336,3 +347,9 @@ struct mgmt_ev_device_blocked {
-> > >  struct mgmt_ev_device_unblocked {
-> > >       bdaddr_t bdaddr;
-> > >  } __packed;
-> > > +
-> > > +#define MGMT_EV_USER_PASSKEY_REQUEST 0x0017
-> > > +struct mgmt_ev_user_passkey_request {
-> > > +     bdaddr_t bdaddr;
-> > > +} __packed;
-> > > +
-> > > diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-> > > index b9e9ad6..ef88ae6 100644
-> > > --- a/plugins/mgmtops.c
-> > > +++ b/plugins/mgmtops.c
-> > > @@ -615,6 +615,79 @@ static int mgmt_confirm_reply(int index, bdaddr_t
-> > *bdaddr, gboolean success)
-> > >       return 0;
-> > >  }
-> > >
-> > > +static int mgmt_passkey_reply(int index, bdaddr_t *bdaddr, uint32_t
-> > passkey)
-> > > +{
-> > > +     char buf[MGMT_HDR_SIZE + sizeof(struct
-> > mgmt_cp_user_passkey_reply)];
-> > > +     struct mgmt_hdr *hdr = (void *) buf;
-> > > +     size_t buf_len;
-> > > +     char addr[18];
-> > > +
-> > > +     ba2str(bdaddr, addr);
-> > > +     DBG("index %d addr %s passkey %06u", index, addr, passkey);
+> > According to the SMP spec (Vol3, Part H, Appendix 5.3.4), keys are
+> distributed in a specific order, where the slave first sends its
+> LTK,EDIV, RAND , IRK, ADDR TYPE and signature key (according to the key
+> distribution parameter. Only when the slave completes its key
+> distribution, the master then starts distributing its own keys (same
+> order, according to the master key distribution options). In the
+> current implementation in the smp.c, it seems that we start
+> distributing our keys too early (after the MASTER IDENTIFICATION
+> message, ignoring the possibility of Addr type and signature keys which
+> may come from the slave. This may break the key distribution phase.
 > >
-> > isn't it too much overhead to fill in (and to have) buffer even when debug
-> > disabled?
-> 
-> 
-> I have tried to re-use the exisitng implementation in mgmtops.c. If you
-> look at the implementation of mgmt_pincode_reply(), you would find the
-> similar implementation. Are you suggesting that I should change the
-> existing implementation also, and prepare a patch accordingly or only
-> change the implementation in this API ?
-
-I think you can start from your implementation and then create patch
-against other cases. Johan could comment further here.
-
-Best regards 
-Andrei Emeltchenko 
-
-
-> 
-> 
-> > > +
-> > > +     memset(buf, 0, sizeof(buf));
-> > > +
-> > > +     if (passkey == INVALID_PASSKEY) {
-> > > +             struct mgmt_cp_user_passkey_neg_reply *cp;
-> > > +
-> > > +             hdr->opcode = htobs(MGMT_OP_USER_PASSKEY_NEG_REPLY);
-> > > +             hdr->len = htobs(sizeof(*cp));
-> > > +             hdr->index = htobs(index);
-> > > +
-> > > +             cp = (void *) &buf[sizeof(*hdr)];
-> >
-> > The code above is a cool hackers code :-)
-> >
-> > Best regards
-> > Andrei Emeltchenko
-> >
-> > > +             bacpy(&cp->bdaddr, bdaddr);
-> > > +
-> > > +             buf_len = sizeof(*hdr) + sizeof(*cp);
-> > > +     } else {
-> > > +             struct mgmt_cp_user_passkey_reply *cp;
-> > > +
-> > > +             hdr->opcode = htobs(MGMT_OP_USER_PASSKEY_REPLY);
-> > > +             hdr->len = htobs(sizeof(*cp));
-> > > +             hdr->index = htobs(index);
-> > > +
-> > > +             cp = (void *) &buf[sizeof(*hdr)];
-> > > +             bacpy(&cp->bdaddr, bdaddr);
-> > > +             cp->passkey = htobl(passkey);
-> > > +
-> > > +             buf_len = sizeof(*hdr) + sizeof(*cp);
-> > > +     }
-> > > +
-> > > +     if (write(mgmt_sock, buf, buf_len) < 0)
-> > > +             return -errno;
-> > > +
-> > > +     return 0;
-> > > +}
-> > > +
-> > > +static void mgmt_passkey_request(int sk, uint16_t index, void *buf,
-> > size_t len)
-> > > +{
-> > > +     struct mgmt_ev_user_passkey_request *ev = buf;
-> > > +     struct controller_info *info;
-> > > +     char addr[18];
-> > > +     int err;
-> > > +
-> > > +     if (len < sizeof(*ev)) {
-> > > +             error("Too small pin_code_request event");
-> > > +             return;
-> > > +     }
-> > > +
-> > > +     ba2str(&ev->bdaddr, addr);
-> > > +
-> > > +     DBG("hci%u %s", index, addr);
-> > > +
-> > > +     if (index > max_index) {
-> > > +             error("Unexpected index %u in passkey_request event",
-> > index);
-> > > +             return;
-> > > +     }
-> > > +
-> > > +     info = &controllers[index];
-> > > +
-> > > +     err = btd_event_user_passkey(&info->bdaddr, &ev->bdaddr);
-> > > +     if (err < 0) {
-> > > +             error("btd_event_request_pin: %s", strerror(-err));
-> > > +             mgmt_passkey_reply(index, &ev->bdaddr, INVALID_PASSKEY);
-> > > +     }
-> > > +}
-> > > +
-> > >  struct confirm_data {
-> > >       int index;
-> > >       bdaddr_t bdaddr;
-> > > @@ -1576,6 +1649,9 @@ static gboolean mgmt_event(GIOChannel *io,
-> > GIOCondition cond, gpointer user_data
-> > >       case MGMT_EV_DEVICE_UNBLOCKED:
-> > >               mgmt_device_unblocked(sk, index, buf + MGMT_HDR_SIZE, len);
-> > >               break;
-> > > +     case MGMT_EV_USER_PASSKEY_REQUEST:
-> > > +             mgmt_passkey_request(sk, index, buf + MGMT_HDR_SIZE, len);
-> > > +             break;
-> > >       default:
-> > >               error("Unknown Management opcode %u (index %u)", opcode,
-> > index);
-> > >               break;
-> > > @@ -1919,16 +1995,6 @@ static int mgmt_remove_bonding(int index,
-> > bdaddr_t *bdaddr)
-> > >       return 0;
-> > >  }
-> > >
-> > > -static int mgmt_passkey_reply(int index, bdaddr_t *bdaddr, uint32_t
-> > passkey)
-> > > -{
-> > > -     char addr[18];
-> > > -
-> > > -     ba2str(bdaddr, addr);
-> > > -     DBG("index %d addr %s passkey %06u", index, addr, passkey);
-> > > -
-> > > -     return -ENOSYS;
-> > > -}
-> > > -
-> > >  static int mgmt_encrypt_link(int index, bdaddr_t *dst, bt_hci_result_t
-> > cb,
-> > >                                                       gpointer user_data)
-> > >  {
-> > > --
-> > > 1.6.6.1
-> > >
-> > > --
-> > > To unsubscribe from this list: send the line "unsubscribe
-> > linux-bluetooth" in
-> > > the body of a message to majordomo@vger.kernel.org
-> > > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> > Has anyone seen this or has anything to comment on that ?
 > >
 > 
+> Currently the SMP code is hard coded to only support a single key,
+> which
+> is the LTK+MID from the Slave to the Master.
+> 
+> You are correct that we will need to ensure that all of the keys are
+> handled correctly, including ensuring proper order, once we add support
+> for additional key distribution.  At the moment though, that is a moot
+> question.
 > 
 > 
-> -- 
-> Best Regards
-> Hemant Gupta
-> ST-Ericsson India
+> --
+> Brian Gix
+> bgix@codeaurora.org
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
+I understand that we support only those keys, but I don't think that we can break the convention just because of our lack of support. We can ignore any other keys, but still we need to start distributing our keys only after the slave has finished sending all of his keys, and not do it automatically after the Master identification sent from the slave.
+
+In addition, I believe there is a problem in the SMP code. In smp_cmd_master_ident, we do hci_add_ltk() with the conn->src instead of conn->dst, as in other places we call the hci_add_ltk():
+
+static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
+{
+	struct smp_cmd_master_ident *rp = (void *) skb->data;
+	struct smp_chan *smp = conn->smp_chan;
+
+	skb_pull(skb, sizeof(*rp));
+
+	hci_add_ltk(conn->hcon->hdev, 1, conn->src, smp->smp_key_size,
+						rp->ediv, rp->rand, smp->tk);
+
+	smp_distribute_keys(conn, 1);
+
+	return 0;
+}
+
+In addition, we call the hci_add_ltk twice in this case - once from this function, and once from the smp_distribute_keys. Is this intentional or is this a bug ?
+
+Thanks,
+Chen Ganir.
