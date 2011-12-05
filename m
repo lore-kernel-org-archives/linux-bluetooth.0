@@ -1,96 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bartosz Szatkowski <bulislaw@linux.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH obexd 1/6] gobex: Add translating error codes to strings
-Date: Mon,  5 Dec 2011 12:41:44 +0100
-Message-Id: <1323085309-23094-1-git-send-email-bulislaw@linux.com>
+MIME-Version: 1.0
+In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B02644008E@DNCE02.ent.ti.com>
+References: <1322129290-10767-1-git-send-email-sancane@gmail.com>
+	<20111202112957.GC17203@x220.ger.corp.intel.com>
+	<CACLukzK1YyqBszGc679Vj-Pf9+M+s+LaBpnd2_+pan8TCwHODA@mail.gmail.com>
+	<CAJdJm_P5OU6vqs+-9xL36=1DWVtgzzY1CEPf6rD3Tws5BSik2g@mail.gmail.com>
+	<F0070FBC0FB3174D8D11444EB2D5B02643D9D0@DNCE02.ent.ti.com>
+	<CAJdJm_PAC_HsEd-8-25r4V-ZqG0gfxpio=rnUZzG4AWJM2cNJQ@mail.gmail.com>
+	<F0070FBC0FB3174D8D11444EB2D5B02644008E@DNCE02.ent.ti.com>
+Date: Mon, 5 Dec 2011 07:36:37 -0400
+Message-ID: <CAJdJm_O0xPVm9D5MOE30t2Baxq7ot5-fWWLvo65gSNOJGf-2dQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Provide return status in gatt_service_add function
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: "Ganir, Chen" <chen.ganir@ti.com>
+Cc: Santiago Carot <sancane@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- gobex/gobex.c |   56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- gobex/gobex.h |    2 ++
- 2 files changed, 58 insertions(+), 0 deletions(-)
+Hi Chen,
 
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index b374b06..9fe7a1a 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -114,6 +114,62 @@ struct setpath_data {
- 	guint8 constants;
- } __attribute__ ((packed));
- 
-+struct error_code {
-+	guint8 code;
-+	const char *name;
-+} obex_errors[] = {
-+	{ G_OBEX_RSP_CONTINUE, "Continue" },
-+	{ G_OBEX_RSP_SUCCESS, "Success" },
-+	{ G_OBEX_RSP_CREATED, "Created" },
-+	{ G_OBEX_RSP_ACCEPTED, "Accepted" },
-+	{ G_OBEX_RSP_NON_AUTHORITATIVE, "Non Authoritative" },
-+	{ G_OBEX_RSP_NO_CONTENT, "No Content" },
-+	{ G_OBEX_RSP_RESET_CONTENT, "Reset Content" },
-+	{ G_OBEX_RSP_PARTIAL_CONTENT, "Partial Content" },
-+	{ G_OBEX_RSP_MULTIPLE_CHOICES, "Multiple Choices" },
-+	{ G_OBEX_RSP_MOVED_PERMANENTLY, "Moved Permanently" },
-+	{ G_OBEX_RSP_MOVED_TEMPORARILY, "Moved Temporarily" },
-+	{ G_OBEX_RSP_SEE_OTHER, "See Other" },
-+	{ G_OBEX_RSP_NOT_MODIFIED, "Not Modified" },
-+	{ G_OBEX_RSP_USE_PROXY, "Use Proxy" },
-+	{ G_OBEX_RSP_BAD_REQUEST, "Bad Request" },
-+	{ G_OBEX_RSP_UNAUTHORIZED, "Unauthorized" },
-+	{ G_OBEX_RSP_PAYMENT_REQUIRED, "Payment Required" },
-+	{ G_OBEX_RSP_FORBIDDEN, "Forbidden" },
-+	{ G_OBEX_RSP_NOT_FOUND, "Not Found" },
-+	{ G_OBEX_RSP_METHOD_NOT_ALLOWED, "Method Not Allowed" },
-+	{ G_OBEX_RSP_NOT_ACCEPTABLE, "Not Acceptable" },
-+	{ G_OBEX_RSP_PROXY_AUTH_REQUIRED, "Proxy Auth Required" },
-+	{ G_OBEX_RSP_REQUEST_TIME_OUT, "Request Time Out" },
-+	{ G_OBEX_RSP_CONFLICT, "Conflict" },
-+	{ G_OBEX_RSP_GONE, "Gone" },
-+	{ G_OBEX_RSP_LENGTH_REQUIRED, "Length Required" },
-+	{ G_OBEX_RSP_PRECONDITION_FAILED, "Precondition Failed" },
-+	{ G_OBEX_RSP_REQ_ENTITY_TOO_LARGE, "Req Entity Too Large" },
-+	{ G_OBEX_RSP_REQ_URL_TOO_LARGE, "Req Url Too Large" },
-+	{ G_OBEX_RSP_UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type" },
-+	{ G_OBEX_RSP_INTERNAL_SERVER_ERROR, "Internal Server Error" },
-+	{ G_OBEX_RSP_NOT_IMPLEMENTED, "Not Implemented" },
-+	{ G_OBEX_RSP_BAD_GATEWAY, "Bad Gateway" },
-+	{ G_OBEX_RSP_SERVICE_UNAVAILABLE, "Service Unavailable" },
-+	{ G_OBEX_RSP_GATEWAY_TIMEOUT, "Gateway Timeout" },
-+	{ G_OBEX_RSP_VERSION_NOT_SUPPORTED, "Version Not Supported" },
-+	{ G_OBEX_RSP_DATABASE_FULL, "Database Full" },
-+	{ G_OBEX_RSP_DATABASE_LOCKED, "Database Locked" },
-+	{ }
-+};
-+
-+const char *g_obex_strerror(guint8 err_code)
-+{
-+	struct error_code *error;
-+
-+	for (error = obex_errors; error != NULL; error++)
-+		if (error->code == err_code)
-+			return error->name;
-+
-+	return "<unknown>";
-+}
-+
- static ssize_t req_header_offset(guint8 opcode)
- {
- 	switch (opcode) {
-diff --git a/gobex/gobex.h b/gobex/gobex.h
-index 1b20333..81981ea 100644
---- a/gobex/gobex.h
-+++ b/gobex/gobex.h
-@@ -119,4 +119,6 @@ guint g_obex_get_rsp(GObex *obex, GObexDataProducer data_func,
- 
- gboolean g_obex_cancel_transfer(guint id);
- 
-+const char *g_obex_strerror(guint8 err_code);
-+
- #endif /* __GOBEX_H */
+On Mon, Dec 5, 2011 at 7:10 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
+> What do you mean restoring the attribute handles ? Each of the profiles registers its own services when the plugin is loaded, according to the load order (which I assume will not change).
+
+There is no guarantee in the load order. As we add more plugins, you
+can't predict the order the plugins will be loaded.
+
+> When a profile registers its attributes, it can specify callbacks for read/write which are actually function pointers. How to you plan to support this?
+
+Only attribute *handles* are to be stored (for now). The mapping could
+be based on service+characteristic UUIDs (but we need to pay attention
+if we have multiple services with same service and characteristic
+UUIDs; for this case, I'm not even sure how the client knows which one
+to use).
+
+> In addition, who will be responsible for reloading the database and populating the values (profile plugin or bluetoothd core) ? how do you synchronize them?
+
+My suggestion would be to implement this in attrib/gatt-service.c so
+gatt_service_add() could load attribute handles from storage
+transparently. This could also avoid changing every profile.
+
+Note this is only for *server* roles (e.g. PAS server, TIP server, PXP
+reporter etc.).
+
+I'm not sure what you mean with synchronization. The attribute handles
+are to be stored when the service is registered (and you can't change
+them after registration).
+
+> Do you have an RFC or a simple design description which will allow reviewing?
+
+No. I am not working on this currently. This discussion started from
+an idea from Santiago to how to handle registration failures (see
+initial post), to which I responded that we may want first to address
+attribute handle storage to make sure handles stay the same during
+device lifetime (until it is factory reset).
+
+Regards,
 -- 
-1.7.4.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
