@@ -1,23 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: 
-Date: Mon, 5 Dec 2011 15:32:02 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B026440263@DNCE02.ent.ti.com>
-Content-Type: text/plain; charset="windows-1255"
-MIME-Version: 1.0
+Message-id: <124E43A676044D2D8CAE8E93A72BBD6C@sisodomain.com>
+From: Syam Sidhardhan <s.syam@samsung.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>,
+	Syam Sidhardhan <syamsidhardh@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <1322144076-1913-1-git-send-email-s.syam@samsung.com>
+ <20111202111510.GA15891@x220.ger.corp.intel.com> <4EDA85AA.3060400@gmail.com>
+ <20111204205541.GA3918@fusion.localdomain>
+Subject: Re: [PATCH 1/3] Fix dbus reply memory leak
+Date: Mon, 05 Dec 2011 20:50:06 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi everyone.
+Hi Johan,
 
-I've tried investigating the LE connection procedure a bit, and I came up with some issues. For example, you MUST first scan for devices even if you have a device already paired, in order to connect to it. This is not the case for BR/EDR devices, where you can turn on the host, and try to connect to the paired device immediately. This has a major impact on user experience. I believe that the only relevant information from the advertising data is the address type, which can be sent to the host, and used later when trying to connect to the device again. I believe there were some discussions regarding this issue a while back, but I cannot recall what was done about this.
+----- Original Message ----- 
+From: "Johan Hedberg" <johan.hedberg@gmail.com>
+To: "Syam Sidhardhan" <syamsidhardh@gmail.com>
+Cc: "Syam Sidhardhan" <s.syam@samsung.com>; 
+<linux-bluetooth@vger.kernel.org>
+Sent: Monday, December 05, 2011 2:25 AM
+Subject: Re: [PATCH 1/3] Fix dbus reply memory leak
 
-In addition, a call for brd_device_add_attio_callback may fail immediately (without even calling the connect/disconnect callbacks) if the device is not present in the advertising cache (fail with error "no route to device"). This also results in a bad user experience, since a user may think that the host is trying to connect to the peer, while in fact the host failed and did not indicate this failure to the user. Since LE does not define a connection timeout, we have a problem here, since we failed on implementation and not spec issue, and we did not inform the user of this error.
 
-Did anyone else encounter these issues, or has anything to comment about these issues ?
+> Hi Syam,
+>
+> On Sun, Dec 04, 2011, Syam Sidhardhan wrote:
+>> >Your commit message uses the word leak in singular form but there are
+>> >multiple fixes in this patch, i.e. the commit message is misleading. In
+>> >this case I'd split the patch into four separate ones:
+>> >
+>> >telephony-maemo5: Fix D-Bus reply memory leaks
+>> >cups: Fix D-Bus reply memory leaks
+>> >agent: Fix D-Bus reply memory leaks
+>> >mpris-player: Fix D-Bus reply memory leaks
+>> >
+>> >Johan
+>>
+>> Yes, you are correct. You can split it into multiple patches.
+>> Thanks in advance.
+>
+> Maybe I was a bit unclear: I'm expecting *you* to do this split and
+> resend the patches. Thanks :)
+>
+> Johan
 
-Thanks,
-Chen Ganir.Chen Ganir | Texas Instruments | SW Engineer Mobile Connectivity Solutions | Direct: (972)-9-7906080 | Mobile: (972)-52-2438-406 | Zarhin 26,Ra'anana, Israel | http://www.ti.com | chen.ganir@ti.com
+Ok :-),
+I'll split it and send.
 
+Regadrs,
+Syam 
 
