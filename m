@@ -1,116 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Brian Gix <bgix@codeaurora.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: SMP Key distribution
-Date: Tue, 6 Dec 2011 07:43:13 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0264404E9@DNCE02.ent.ti.com>
-References: <F0070FBC0FB3174D8D11444EB2D5B02643FFBB@DNCE02.ent.ti.com>
- <4EDCE598.20808@codeaurora.org>
- <F0070FBC0FB3174D8D11444EB2D5B02644029C@DNCE02.ent.ti.com>
- <4EDD0312.1080309@codeaurora.org>
-In-Reply-To: <4EDD0312.1080309@codeaurora.org>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Message-id: <8A7B76EFF5FC4713ABFDC465BD266EE1@sisodomain.com>
+From: Chethan T N <chethan.tn@samsung.com>
+To: sathish <sathish.n@globaledgesoft.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Jaganath <jaganath.k@samsung.com>, linux-bluetooth@vger.kernel.org
+References: <1322265226-6404-1-git-send-email-andre.guedes@openbossa.org>
+ <1322265226-6404-6-git-send-email-andre.guedes@openbossa.org>
+ <1322497442.29909.36.camel@aeonflux>
+ <65E3B21D-EC4E-4443-ADAB-39576B981F70@openbossa.org>
+ <65AF22C1CD4D4E948B9A22A50C0B504D@sisodomain.com>
+ <CABBYNZL9qLM3aKk_pWBSMdR4VVGqCuUcdTA_rwh1mtXqB2QtyQ@mail.gmail.com>
+ <4EDCC105.6070803@globaledgesoft.com>
+In-reply-to: <4EDCC105.6070803@globaledgesoft.com>
+Subject: Re: Query on Media Interface "RegisterPlayer" and Dbus signal
+ "TrackChanged"
+Date: Tue, 06 Dec 2011 11:51:56 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=response
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Brian, 
+Hi,
 
-> -----Original Message-----
-> From: Brian Gix [mailto:bgix@codeaurora.org]
-> Sent: Monday, December 05, 2011 7:45 PM
-> To: Ganir, Chen
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: Re: SMP Key distribution
-> 
-> Hi Chen,
-> 
-> On 12/5/2011 7:48 AM, Ganir, Chen wrote:
-> > Brian,
-> >
-> > I understand that we support only those keys, but I don't think that
-> we can break the convention just because of our lack of support. We can
-> ignore any other keys, but still we need to start distributing our keys
-> only after the slave has finished sending all of his keys, and not do
-> it automatically after the Master identification sent from the slave.
-> >
-> 
-> You are correct, and this is definitely one of the things I hope to
-> address (if someone else doesn't beat me to it) once I get the MITM
-> changes that I have submitted accepted into bluetooth-next.
-> 
-So basically what we need to do is listen for the SMP_CMD_MASTER_IDENT, SMP_CMD_IDENT_INFO, SMP_CMD_IDENT_ADDR_INFO and SMP_CMD_SIGN_INFO, and check the slave key distribution options to see how many keys he is sending. If we get one of these and it is actually the last key from the slave, and then distribute the master keys with the smp_distribute_keys (simply call a new function like smp_check_last_slave_key() which will do this work). Am I correct ?
+--------------------------------------------------
+From: "sathish" <sathish.n@globaledgesoft.com>
+Sent: Monday, December 05, 2011 6:33 PM
+To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Cc: "Jaganath" <jaganath.k@samsung.com>; <linux-bluetooth@vger.kernel.org>
+Subject: Re: Query on Media Interface "RegisterPlayer" and Dbus signal 
+"TrackChanged"
 
-> > In addition, I believe there is a problem in the SMP code. In
-> smp_cmd_master_ident, we do hci_add_ltk() with the conn->src instead of
-> conn->dst, as in other places we call the hci_add_ltk():
-> >
-> 
-> This may or may not be a bug, depending on how you look at things.
-> When
-> "Privacy" is implemented, it will be possible for a remote device to
-> "change addresses" on us (either via the "Address Resolution" key
-> distribution, or via the GAP primary service) and it becomes "more
-> interesting" to keep track of who is who.  Saving the LTK with the SRC
-> (local) address might work, because LTK resolution is suppose to be
-> done
-> by matching on the EDIV and Randomizer, not by address.
-> 
-> Having said that, however, If we are the Master (which most Dual mode
-> devices will generally be) we still need to know the remote devices
-> BDADDR, so that we can establish the connection, and thereafter kick
-> off
-> link encryption.  So yes, I would still consider that the Bug:  The
-> Master gets an LTK+MID from the Slave, which will be used to encrypt
-> links as long as those roles do not change.  Therefore, the Master
-> should be storing the LTK+MID pair under that Slaves Identity (BDADDR).
-> 
-> One of the catches being however, that if we get Address Resolution
-> keys, or the slaves GAP Primary Service tells us to use a different
-> Address, this storage "key" will need to be adjusted.
-> 
-Calling the hci_add_ltk with the conn->src actually causes the code to call mgmt_new_link_key with the local and remote addresses to be the same, which then causes the btd_event_link_key_notify(...) -> get_adapter_and_device(...) -> adapter_get_device(...) -> adapter_create_device(...) to create a new device, with the local address instead of the remote one. This is mostly due to the fact that get_adapter_and_device is called with the create flag hard coded as TRUE, even for this problematic key. What do you think about this ?
+>  On Friday 02 December 2011 04:37 PM, Luiz Augusto von Dentz wrote:
+>> Hi Jaganath,
+>>
+>> On Fri, Dec 2, 2011 at 12:02 PM, Jaganath<jaganath.k@samsung.com>  wrote:
+>>> Hi,
+>>>
+>>> I have come across a scenario related to Media Interface meant for AVRCP 
+>>> 1.3
+>>> features.
+>>>
+>>> Kindly please provide your opinions on this.
+>>>
+>>> If the Media Interface "RegisterPlayer" is called before the  headset
+>>> connection, then player gets registered successfully and all the
+>>> Vendor dependent commands are handled properly. And in case of any 
+>>> change in
+>>> the track, through the "TrackChanged" Dbus signal
+>>> shall be sent with information about "Change of track" and "Start of 
+>>> track".
+>>> This scenario will work because we have registered for the
+>>> callback  "state_changed"(audio/avrcp.c) through "avrcp_register_player"
+>>> (audio/avrcp.c) API. When connection is ongoing "state_changed"
+>>> callback shall be invoked with state as "AVCTP_STATE_CONNECTING" where 
+>>> in
+>>> "player->session" will be initialized.
+>>>
+>>>
+>>> However if the "RegisterPlayer" is called after the headset connection, 
+>>> then
+>>> we will not be able to send the "TrackChanged" signal with
+>>> information of "Change of track" and "Start of track". Since the headset 
+>>> is
+>>> already connected,"state_changed" callback will not be
+>>> invoked, hence in the avrcp_player_event" API "player->session" is NULL.
+>>>
+>>> Is it not necessary to handle the above the mentioned scenario?
+>> Yes that is probably a valid and common scenario, so we probably need
+>> to change the code to update the session when this happen but
+>> apparently there is no way to notify the remote device about this
+>> since the concept of players and EVENT_AVAILABLE_PLAYERS_CHANGED was
+>> introduced only on 1.4. So for 1.3 we might have to pretend we have a
+>> player without any metadata and as soon as one is registered we
+>> assigned it to the active session and notify the metadata has changed
+>> via events.
+>>
+> Hi,
+>     Please provide the information about how to use mpris 2.0 spec , can u 
+> please provide me detail of platform that register player worked 
+> successfully. I am also working on getting these information .
+>
+> Thanks & regards ,
+> sathish N
+>
+> -- 
+> Thanks&  Regards,
+> Sathish N
+>
+    You can directly make use of DBus methods specified in the media-api.txt 
+for
+registering/unregistering the player, also you can send the Dbus signals 
+using the
+PropertyChanged for the player settings changes and TrackChanged for 
+metadata
+attributes changes.
 
-> > static int smp_cmd_master_ident(struct l2cap_conn *conn, struct
-> sk_buff *skb)
-> > {
-> > 	struct smp_cmd_master_ident *rp = (void *) skb->data;
-> > 	struct smp_chan *smp = conn->smp_chan;
-> >
-> > 	skb_pull(skb, sizeof(*rp));
-> >
-> > 	hci_add_ltk(conn->hcon->hdev, 1, conn->src, smp->smp_key_size,
-> > 						rp->ediv, rp->rand, smp->tk);
-> >
-> > 	smp_distribute_keys(conn, 1);
-> >
-> > 	return 0;
-> > }
-> >
-> > In addition, we call the hci_add_ltk twice in this case - once from
-> this function, and once from the smp_distribute_keys. Is this
-> intentional or is this a bug ?
-> 
-> This is not actually a bug.  Or at least not what I would consider a
-> serious bug.  The LTK key that the Slave sends to the Master, is
-> distinct from the key the Master sends to the Slave.
-> 
-> However, as I indicated above, an LTK+MID pair that is distributed
-> "outbound" should not be associated with the remote devices BDADDR. It
-> should be stored using a lookup key that is the EDIV, which is
-> authenticated with the Randomizer.
-> 
-> >
-> > Thanks,
-> > Chen Ganir.
-> 
-> 
-> --
-> Brian Gix
-> bgix@codeaurora.org
-> Employee of Qualcomm Innovation Center, Inc.
-> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Write a simple test application which makes uses of the Dbus methods and 
+signals
+provided in the media-api.txt.
 
-Thanks,
-Chen Ganir.
+To implement the above methods need not to follow the specification of 
+mpris2.0 spec.
+
+Thanks and Regards
+Chethan 
+
