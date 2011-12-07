@@ -1,106 +1,175 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 6 Dec 2011 21:54:16 -0300
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: "Ganir, Chen" <chen.ganir@ti.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: SMP Key distribution
-Message-ID: <20111207005416.GA15766@samus>
-References: <F0070FBC0FB3174D8D11444EB2D5B02643FFBB@DNCE02.ent.ti.com>
- <4EDCE598.20808@codeaurora.org>
- <F0070FBC0FB3174D8D11444EB2D5B02644029C@DNCE02.ent.ti.com>
- <4EDD0312.1080309@codeaurora.org>
- <F0070FBC0FB3174D8D11444EB2D5B0264404E9@DNCE02.ent.ti.com>
- <4EDE5BF5.3040309@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4EDE5BF5.3040309@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [RFC] Bluetooth: Add more specific types to SMP keys
+Date: Tue,  6 Dec 2011 21:53:54 -0300
+Message-Id: <1323219234-15903-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 10:16 Tue 06 Dec, Brian Gix wrote:
-> Hi Chen,
-> 
-> On 12/5/2011 11:43 PM, Ganir, Chen wrote:
-> >Brian,
-> >
-> [...]
-> >>You are correct, and this is definitely one of the things I hope to
-> >>address (if someone else doesn't beat me to it) once I get the MITM
-> >>changes that I have submitted accepted into bluetooth-next.
-> >>
-> >So basically what we need to do is listen for the SMP_CMD_MASTER_IDENT, SMP_CMD_IDENT_INFO, SMP_CMD_IDENT_ADDR_INFO and SMP_CMD_SIGN_INFO, and check the slave key distribution options to see how many keys he is sending. If we get one of these and it is actually the last key from the slave, and then distribute the master keys with the smp_distribute_keys (simply call a new function like smp_check_last_slave_key() which will do this work). Am I correct ?
-> 
-> Basically, Yes.
-> 
-> This will be necessary once support is added for those key types.
-> Until then, it is desirable, but not critical for correct
-> "over-the-air" operation.
-> 
-> >>>In addition, I believe there is a problem in the SMP code. In
-> >>smp_cmd_master_ident, we do hci_add_ltk() with the conn->src instead of
-> >>conn->dst, as in other places we call the hci_add_ltk():
-> >>>
-> >>
-> >>This may or may not be a bug, depending on how you look at things.
-> >>When
-> >>"Privacy" is implemented, it will be possible for a remote device to
-> >>"change addresses" on us (either via the "Address Resolution" key
-> >>distribution, or via the GAP primary service) and it becomes "more
-> >>interesting" to keep track of who is who.  Saving the LTK with the SRC
-> >>(local) address might work, because LTK resolution is suppose to be
-> >>done
-> >>by matching on the EDIV and Randomizer, not by address.
-> >>
-> >>Having said that, however, If we are the Master (which most Dual mode
-> >>devices will generally be) we still need to know the remote devices
-> >>BDADDR, so that we can establish the connection, and thereafter kick
-> >>off
-> >>link encryption.  So yes, I would still consider that the Bug:  The
-> >>Master gets an LTK+MID from the Slave, which will be used to encrypt
-> >>links as long as those roles do not change.  Therefore, the Master
-> >>should be storing the LTK+MID pair under that Slaves Identity (BDADDR).
-> >>
-> >>One of the catches being however, that if we get Address Resolution
-> >>keys, or the slaves GAP Primary Service tells us to use a different
-> >>Address, this storage "key" will need to be adjusted.
-> >>
-> >Calling the hci_add_ltk with the conn->src actually causes the code to call mgmt_new_link_key with the local and remote addresses to be the same, which then causes the btd_event_link_key_notify(...) ->  get_adapter_and_device(...) ->  adapter_get_device(...) ->  adapter_create_device(...) to create a new device, with the local address instead of the remote one. This is mostly due to the fact that get_adapter_and_device is called with the create flag hard coded as TRUE, even for this problematic key. What do you think about this ?
-> 
-> 
-> I'm sure that this needs to be worked on, and I am not suprised if
-> this is not currently working correctly. Our code over on
-> codeauroraforum.org already has made that equivilent change (to use
-> the dst addr instead of the local), but I have not submitted it here
-> yet, because I am trying to single-thread the changes versus fixes,
-> to simplify the upstreaming process (and for my own personal
-> sanity). If you were to submit it as a patch, you would have my full
-> support :-)
+This way we can better identify which kind of key we exchanging
+with userspace and userspace can take better decisions about
+what to do with each type of key.
 
-I agree that it should work better.
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ include/net/bluetooth/hci.h  |   10 +++++-----
+ include/net/bluetooth/mgmt.h |    1 +
+ net/bluetooth/hci_core.c     |    7 ++++---
+ net/bluetooth/hci_event.c    |    2 +-
+ net/bluetooth/mgmt.c         |   15 ++++++++++++---
+ net/bluetooth/smp.c          |    6 +++---
+ 6 files changed, 26 insertions(+), 15 deletions(-)
 
-When implementing it I was trying to avoid creating many custom
-types for each key, seems that it ended complicating things more
-than necessary.
-
-Having more specific type for each type of key seems to solve the
-problems, and will make userspace life easier, please take a look
-at the RFC that I just sent, and see what do you think.
-
-> 
-> 
-> 
-> 
-> -- 
-> Brian Gix
-> bgix@codeaurora.org
-> Employee of Qualcomm Innovation Center, Inc.
-> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Cheers,
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 5eb236e..a916e19 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -267,11 +267,11 @@ enum {
+ #define HCI_LK_UNAUTH_COMBINATION	0x04
+ #define HCI_LK_AUTH_COMBINATION		0x05
+ #define HCI_LK_CHANGED_COMBINATION	0x06
+-/* The spec doesn't define types for SMP keys */
+-#define HCI_LK_SMP_STK			0x80
+-#define HCI_LK_SMP_LTK			0x81
+-#define HCI_LK_SMP_IRK			0x82
+-#define HCI_LK_SMP_CSRK			0x83
++/* The spec doesn't define types for SMP keys, the _MASTER suffix is implied */
++#define HCI_SMP_STK			0x80
++#define HCI_SMP_STK_SLAVE		0x81
++#define HCI_SMP_LTK			0x82
++#define HCI_SMP_LTK_SLAVE		0x83
+ 
+ /* ---- HCI Error Codes ---- */
+ #define HCI_ERROR_AUTH_FAILURE		0x05
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 0f100fa9..db11475 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -268,6 +268,7 @@ struct mgmt_ltk_info {
+ 	bdaddr_t bdaddr;
+ 	__u8 pin_len;
+ 	__u8 enc_size;
++	__u8 master;
+ 	__le16 ediv;
+ 	__u8 rand[8];
+ 	__u8 val[16];
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 8d96125..f81c08b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1078,7 +1078,7 @@ struct smp_ltk *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8])
+ 			continue;
+ 
+ 		/* The STK should only be used once, no need to keep it */
+-		if (k->type == HCI_LK_SMP_STK)
++		if (k->type & HCI_SMP_STK)
+ 			list_del(&k->list);
+ 
+ 		return k;
+@@ -1161,7 +1161,7 @@ int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type, int new_key,
+ {
+ 	struct smp_ltk *key, *old_key;
+ 
+-	if (type != HCI_LK_SMP_STK && type != HCI_LK_SMP_LTK)
++	if (!(type & HCI_SMP_STK) && !(type & HCI_SMP_LTK))
+ 		return 0;
+ 
+ 	old_key = hci_find_ltk_addr(hdev, bdaddr);
+@@ -1179,12 +1179,13 @@ int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type, int new_key,
+ 	key->pin_len = pin_len;
+ 	key->ediv = ediv;
+ 	key->enc_size = enc_size;
++	key->type = type;
+ 	memcpy(key->rand, rand, sizeof(key->rand));
+ 
+ 	if (!new_key)
+ 		return 0;
+ 
+-	if (type == HCI_LK_SMP_LTK)
++	if (type & HCI_SMP_LTK)
+ 		mgmt_new_ltk(hdev, key, 1);
+ 
+ 	return 0;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index f2006e9..19cc22a 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3032,7 +3032,7 @@ static inline void hci_le_ltk_request_evt(struct hci_dev *hdev,
+ 
+ 	hci_send_cmd(hdev, HCI_OP_LE_LTK_REPLY, sizeof(cp), &cp);
+ 
+-	if (ltk->type == HCI_LK_SMP_STK)
++	if (ltk->type & HCI_SMP_STK)
+ 		kfree(ltk);
+ 
+ 	hci_dev_unlock(hdev);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index f7314d1..fd509ca 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2104,10 +2104,15 @@ static int load_long_term_keys(struct sock *sk, u16 index,
+ 
+ 	for (i = 0; i < key_count; i++) {
+ 		struct mgmt_ltk_info *key = &cp->keys[i];
++		u8 type;
+ 
+-		hci_add_ltk(hdev, &key->bdaddr, HCI_LK_SMP_LTK, 0,
+-				key->pin_len, key->val, key->enc_size,
+-				key->ediv, key->rand);
++		if (key->master)
++			type = HCI_SMP_LTK;
++		else
++			type = HCI_SMP_LTK_SLAVE;
++
++		hci_add_ltk(hdev, &key->bdaddr, type, 0, key->pin_len,
++				key->val, key->enc_size, key->ediv, key->rand);
+ 	}
+ 
+ 	hci_dev_unlock_bh(hdev);
+@@ -2417,6 +2422,10 @@ int mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, u8 persistent)
+ 	ev.key.pin_len = key->pin_len;
+ 	ev.key.enc_size = key->enc_size;
+ 	ev.key.ediv = key->ediv;
++
++	if (key->type == HCI_SMP_LTK)
++		ev.key.master = 1;
++
+ 	memcpy(ev.key.rand, key->rand, sizeof(key->rand));
+ 	memcpy(ev.key.val, key->val, sizeof(key->val));
+ 
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 4763719..14e554c 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -358,7 +358,7 @@ static void random_work(struct work_struct *work)
+ 		memset(stk + smp->enc_key_size, 0,
+ 				SMP_MAX_ENC_KEY_SIZE - smp->enc_key_size);
+ 
+-		hci_add_ltk(hcon->hdev, conn->dst, HCI_LK_SMP_STK, 0,
++		hci_add_ltk(hcon->hdev, conn->dst, HCI_SMP_STK_SLAVE, 0,
+ 				0, stk, smp->enc_key_size, ediv, rand);
+ 	}
+ 
+@@ -635,7 +635,7 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	skb_pull(skb, sizeof(*rp));
+ 
+ 	hci_dev_lock(hdev);
+-	hci_add_ltk(conn->hcon->hdev, conn->dst, HCI_LK_SMP_LTK, 1,
++	hci_add_ltk(conn->hcon->hdev, conn->dst, HCI_SMP_LTK, 1,
+ 					conn->hcon->pin_length, smp->tk,
+ 					smp->enc_key_size, rp->ediv, rp->rand);
+ 
+@@ -758,7 +758,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
+ 
+ 		smp_send_cmd(conn, SMP_CMD_ENCRYPT_INFO, sizeof(enc), &enc);
+ 
+-		hci_add_ltk(conn->hcon->hdev, conn->src, HCI_LK_SMP_LTK, 1,
++		hci_add_ltk(conn->hcon->hdev, conn->src, HCI_SMP_LTK_SLAVE, 1,
+ 					conn->hcon->pin_length, enc.ltk,
+ 					smp->enc_key_size, ediv, ident.rand);
+ 
 -- 
-Vinicius
+1.7.8
+
