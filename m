@@ -1,51 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+From: Mat Martineau <mathewm@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 0/8] Bluetooth: SMP Key Exchange
-Date: Tue,  6 Dec 2011 21:48:04 -0300
-Message-Id: <1323218892-15785-1-git-send-email-vinicius.gomes@openbossa.org>
+Cc: padovan@profusion.mobi, pkrystad@codeaurora.org,
+	Mat Martineau <mathewm@codeaurora.org>
+Subject: [PATCH 2/2] Bluetooth: Prevent uninitialized data access in L2CAP configuration
+Date: Tue,  6 Dec 2011 16:23:27 -0800
+Message-Id: <1323217407-2490-3-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1323217407-2490-1-git-send-email-mathewm@codeaurora.org>
+References: <1323217407-2490-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+When configuring an ERTM or streaming mode connection, remote devices
+are expected to send an RFC option in a successful config response.  A
+misbehaving remote device might not send an RFC option, and the L2CAP
+code should not access uninitialized data in this case.
 
-This is the newest version of SMP key exchange.
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ net/bluetooth/l2cap_core.c |   16 +++++++++++++++-
+ 1 files changed, 15 insertions(+), 1 deletions(-)
 
-For this to work, this depends on userspace having the address type of an
-LE device, so there is a functional dependency on Andre's LE Discovery
-series (patches 7/9 and 8/9 from his last series more specifically).
-
-What's new:
- - hci_add_ltk() now expects hdev to be locked;
-
---
-Cheers,
-
-
-Vinicius Costa Gomes (8):
-  Bluetooth: Add structures for the new LTK exchange messages
-  Bluetooth: Add a custom type for Short Term Keys
-  Bluetooth: Rename smp_key_size to enc_key_size
-  Bluetooth: Change SMP procedures to use the new key structures
-  Bluetooth: Add new mgmt handlers for Long Term Keys
-  Bluetooth: Add support for reusing the same hci_conn for LE links
-  Bluetooth: Disconnect the link if encryption fails
-  Bluetooth: Only increase the connection sec-level if encryption is
-    successful
-
- include/net/bluetooth/hci.h      |    1 +
- include/net/bluetooth/hci_core.h |   34 ++++++------
- include/net/bluetooth/mgmt.h     |   21 +++++++
- include/net/bluetooth/smp.h      |    2 +-
- net/bluetooth/hci_conn.c         |   33 ++++++-----
- net/bluetooth/hci_core.c         |  107 +++++++++++++++++++++++--------------
- net/bluetooth/hci_event.c        |    5 ++-
- net/bluetooth/l2cap_core.c       |   58 ++++++++++++++-------
- net/bluetooth/mgmt.c             |   77 +++++++++++++++++++++++++++
- net/bluetooth/smp.c              |   41 +++++++-------
- 10 files changed, 265 insertions(+), 114 deletions(-)
-
---
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 5ea94a1..49ae7df 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2152,7 +2152,7 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
+ 	void *ptr = req->data;
+ 	int type, olen;
+ 	unsigned long val;
+-	struct l2cap_conf_rfc rfc;
++	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
+ 
+ 	BT_DBG("chan %p, rsp %p, len %d, req %p", chan, rsp, len, data);
+ 
+@@ -2205,6 +2205,9 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
+ 			break;
+ 		case L2CAP_MODE_STREAMING:
+ 			chan->mps    = le16_to_cpu(rfc.max_pdu_size);
++			break;
++		default:
++			break;
+ 		}
+ 	}
+ 
+@@ -2271,6 +2274,14 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
+ 		}
+ 	}
+ 
++	/* Use sane default values in case a misbehaving remote device
++	 * did not send an RFC option.
++	 */
++	rfc.mode = chan->mode;
++	rfc.retrans_timeout = cpu_to_le16(chan->retrans_timeout);
++	rfc.monitor_timeout = cpu_to_le16(chan->monitor_timeout);
++	rfc.max_pdu_size = cpu_to_le16(chan->mps);
++
+ done:
+ 	switch (rfc.mode) {
+ 	case L2CAP_MODE_ERTM:
+@@ -2280,6 +2291,9 @@ done:
+ 		break;
+ 	case L2CAP_MODE_STREAMING:
+ 		chan->mps    = le16_to_cpu(rfc.max_pdu_size);
++		break;
++	default:
++		break;
+ 	}
+ }
+ 
+-- 
 1.7.8
 
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
