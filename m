@@ -1,32 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 7 Dec 2011 15:04:16 +0200
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH hciemu] Process Read Local AMP Info in hciemu
-Message-ID: <20111207130409.GA20533@aemeltch-MOBL1>
-References: <1321522151-7285-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20111207112329.GA14827@x220>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111207112329.GA14827@x220>
+Subject: [PATCH 2/2] Print features for AMP devices
+Date: Wed,  7 Dec 2011 15:03:25 +0200
+Message-Id: <1323263005-20552-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1323263005-20552-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1323263005-20552-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Wed, Dec 07, 2011 at 01:23:29PM +0200, Johan Hedberg wrote:
-> Hi Andrei,
-> 
-> On Thu, Nov 17, 2011, Emeltchenko Andrei wrote:
-> > Add processing of Read Local AMP Info in hciemu, the values returned are
-> > used to emulate AMP HCI.
-> > ---
-> >  test/hciemu.c |   34 ++++++++++++++++++++++++++++++++++
-> >  1 files changed, 34 insertions(+), 0 deletions(-)
-> 
-> Thanks to recent changes from Marcel this patch doesn't apply anymore.
+Check for HCI device type, the magic shift is due to dev type is packed
+to dev_info type.
+---
+ tools/hciconfig.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-I've just re-sent couple of patches.
+diff --git a/tools/hciconfig.c b/tools/hciconfig.c
+index 35b80b1..a7249db 100644
+--- a/tools/hciconfig.c
++++ b/tools/hciconfig.c
+@@ -1870,7 +1870,7 @@ static void print_dev_info(int ctl, struct hci_dev_info *di)
+ 		st->byte_tx, st->acl_tx, st->sco_tx, st->cmd_tx, st->err_tx);
+ 
+ 	if (all && !hci_test_bit(HCI_RAW, &di->flags) &&
+-			bacmp(&di->bdaddr, BDADDR_ANY)) {
++			(bacmp(&di->bdaddr, BDADDR_ANY) || (di->type >> 4))) {
+ 		print_dev_features(di, 0);
+ 		print_pkt_type(di);
+ 		print_link_policy(di);
+-- 
+1.7.4.1
 
-Best regards 
-Andrei Emeltchenko 
