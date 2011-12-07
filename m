@@ -3,41 +3,32 @@ From: Mat Martineau <mathewm@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi, pkrystad@codeaurora.org,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH 1/2] Bluetooth: Clear RFCOMM session timer when disconnecting last channel
-Date: Tue,  6 Dec 2011 16:23:26 -0800
-Message-Id: <1323217407-2490-2-git-send-email-mathewm@codeaurora.org>
-In-Reply-To: <1323217407-2490-1-git-send-email-mathewm@codeaurora.org>
-References: <1323217407-2490-1-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 0/2] Bug fixes for RFCOMM and L2CAP
+Date: Tue,  6 Dec 2011 16:23:25 -0800
+Message-Id: <1323217407-2490-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the last RFCOMM data channel is closed, a timer is normally set
-up to disconnect the control channel at a later time.  If the control
-channel disconnect command is sent with the timer pending, the timer
-needs to be cancelled.
+Here are two bug fixes for 
+git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth.git
 
-If the timer is not cancelled in this situation, the reference
-counting logic for the RFCOMM session does not work correctly when the
-remote device closes the L2CAP connection.  The session is freed at
-the wrong time, leading to a kernel panic.
+The first is a pretty obvious fix where an RFCOMM disconnect timer
+needs to be cancelled when the disconnect happens earlier.  It's not
+clear why the reference counting logic breaks down if this timer is
+not cancelled, but it's definitely more correct to cancel the timer.
 
-Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
----
+The L2CAP fix came up due to a buggy PTS test, which was not sending
+the L2CAP RFC option in an ERTM config response.  This was causing
+access to uninitialized data.
+
+Mat Martineau (2):
+  Bluetooth: Clear RFCOMM session timer when disconnecting last channel
+  Bluetooth: Prevent uninitialized data access in L2CAP configuration
+
+ net/bluetooth/l2cap_core.c  |   16 +++++++++++++++-
  net/bluetooth/rfcomm/core.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ 2 files changed, 16 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 4e32e18..2d28dfe 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -1146,6 +1146,7 @@ static int rfcomm_recv_ua(struct rfcomm_session *s, u8 dlci)
- 			if (list_empty(&s->dlcs)) {
- 				s->state = BT_DISCONN;
- 				rfcomm_send_disc(s, 0);
-+				rfcomm_session_clear_timer(s);
- 			}
- 
- 			break;
 -- 
 1.7.8
 
