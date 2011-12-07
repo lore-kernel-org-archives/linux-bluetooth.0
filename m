@@ -1,31 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 7 Dec 2011 16:58:51 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/6] Implement SetProperty D-Bus method
-Message-ID: <20111207145851.GA19842@x220>
-References: <1321973388-16300-1-git-send-email-sancane@gmail.com>
- <1321973388-16300-2-git-send-email-sancane@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1321973388-16300-2-git-send-email-sancane@gmail.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFCv2 3/6] Bluetooth: Check for flow control mode
+Date: Wed,  7 Dec 2011 15:56:53 +0200
+Message-Id: <1323266216-25261-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1323266216-25261-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1323266216-25261-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, Nov 22, 2011, Santiago Carot-Nemesio wrote:
-> ---
->  thermometer/thermometer.c |  118 +++++++++++++++++++++++++++++++++++++-------
->  1 files changed, 99 insertions(+), 19 deletions(-)
+---
+ net/bluetooth/hci_event.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-Is this patch set still valid? If so, could you resend it with proper
-commit messages. "Implement SetProperty D-Bus method" is much too
-generic. It'd be nice if you could start using the convention we've
-tried to adopt where we add context dependent prefixes to the message
-summaries. In this case "thermometer: Add SetProperty D-Bus method"
-would have already given enough of context to not have to look at the
-patch content to know what it does.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 493e08b..a06cc60 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2273,6 +2273,11 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+ 
+ 	BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
+ 
++	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_PACKET_BASED) {
++		BT_ERR("Wrong event for mode %d", hdev->flow_ctl_mode);
++		return;
++	}
++
+ 	if (skb->len < ev->num_hndl * 4) {
+ 		BT_DBG("%s bad parameters", hdev->name);
+ 		return;
+-- 
+1.7.4.1
 
-Johan
