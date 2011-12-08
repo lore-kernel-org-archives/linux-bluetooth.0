@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC obexd v2 07/21] client: GetCapabilities moved to session API
-Date: Thu, 8 Dec 2011 16:27:41 +0100
-Message-ID: <1323358075-27857-8-git-send-email-mikel.astiz@bmw-carit.de>
+Subject: [RFC obexd v2 01/21] client-doc: minor formatting changes
+Date: Thu, 8 Dec 2011 16:27:35 +0100
+Message-ID: <1323358075-27857-2-git-send-email-mikel.astiz@bmw-carit.de>
 In-Reply-To: <1323358075-27857-1-git-send-email-mikel.astiz@bmw-carit.de>
 References: <1323358075-27857-1-git-send-email-mikel.astiz@bmw-carit.de>
 MIME-Version: 1.0
@@ -13,281 +13,197 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- client/manager.c |   99 ------------------------------------------------------
- client/session.c |   75 +++++++++++++++++++++++++++++++++++-----
- 2 files changed, 65 insertions(+), 109 deletions(-)
+ doc/client-api.txt |   78 ++++++++++++++++++++++++++++-----------------------
+ 1 files changed, 43 insertions(+), 35 deletions(-)
 
-diff --git a/client/manager.c b/client/manager.c
-index efc6745..99c495a 100644
---- a/client/manager.c
-+++ b/client/manager.c
-@@ -218,110 +218,11 @@ static DBusMessage *remove_session(DBusConnection *connection,
- 	return dbus_message_new_method_return(message);
- }
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index 3e61cf7..ceb3c35 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -22,7 +22,8 @@ Methods		void SendFiles(dict device, array{string} files, object agent)
+ 			Request the business card from a remote device and
+ 			store it in the local file.
  
--static void capabilities_complete_callback(struct obc_session *session,
--						GError *err, void *user_data)
--{
--	struct obc_transfer *transfer = obc_session_get_transfer(session);
--	struct send_data *data = user_data;
--	const char *capabilities;
--	int size;
--
--	if (err != NULL) {
--		DBusMessage *error = g_dbus_create_error(data->message,
--					"org.openobex.Error.Failed",
--					"%s", err->message);
--		g_dbus_send_message(data->connection, error);
--		goto done;
--	}
--
--	capabilities = obc_transfer_get_buffer(transfer, &size);
--	if (size == 0)
--		capabilities = "";
--
--	g_dbus_send_reply(data->connection, data->message,
--			DBUS_TYPE_STRING, &capabilities,
--			DBUS_TYPE_INVALID);
--
--done:
--
--	shutdown_session(session);
--	dbus_message_unref(data->message);
--	dbus_connection_unref(data->connection);
--	g_free(data);
--}
--
--static void capability_obc_session_callback(struct obc_session *session,
--						GError *err, void *user_data)
--{
--	struct send_data *data = user_data;
--
--	if (err != NULL) {
--		DBusMessage *error = g_dbus_create_error(data->message,
--					"org.openobex.Error.Failed",
--					"%s", err->message);
--		g_dbus_send_message(data->connection, error);
--		shutdown_session(session);
--		goto done;
--	}
--
--	obc_session_pull(session, "x-obex/capability", NULL,
--				capabilities_complete_callback, data);
--
--	return;
--
--done:
--	dbus_message_unref(data->message);
--	dbus_connection_unref(data->connection);
--	g_free(data);
--}
--
--static DBusMessage *get_capabilities(DBusConnection *connection,
--					DBusMessage *message, void *user_data)
--{
--	DBusMessageIter iter, dict;
--	struct obc_session *session;
--	struct send_data *data;
--	const char *source = NULL, *dest = NULL, *target = NULL;
--	uint8_t channel = 0;
--
--	dbus_message_iter_init(message, &iter);
--	dbus_message_iter_recurse(&iter, &dict);
--
--	parse_device_dict(&dict, &source, &dest, &target, &channel);
--	if ((dest == NULL) || (target == NULL))
--		return g_dbus_create_error(message,
--				"org.openobex.Error.InvalidArguments", NULL);
--
--	data = g_try_malloc0(sizeof(*data));
--	if (data == NULL)
--		return g_dbus_create_error(message,
--					"org.openobex.Error.NoMemory", NULL);
--
--	data->connection = dbus_connection_ref(connection);
--	data->message = dbus_message_ref(message);
--
--	session = obc_session_create(source, dest, target, channel,
--					dbus_message_get_sender(message),
--					capability_obc_session_callback, data);
--	if (session != NULL) {
--		sessions = g_slist_append(sessions, session);
--		return NULL;
--	}
--
--	dbus_message_unref(data->message);
--	dbus_connection_unref(data->connection);
--	g_free(data);
--
--	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
--}
--
- static GDBusMethodTable client_methods[] = {
- 	{ "CreateSession", "a{sv}", "o", create_session,
- 						G_DBUS_METHOD_FLAG_ASYNC },
- 	{ "RemoveSession", "o", "", remove_session,
- 						G_DBUS_METHOD_FLAG_ASYNC },
--	{ "GetCapabilities", "a{sv}", "s", get_capabilities,
--						G_DBUS_METHOD_FLAG_ASYNC },
- 	{ }
- };
+-		void ExchangeBusinessCards(dict device, string clientfile, string file)
++		void ExchangeBusinessCards(dict device, string clientfile,
++								string file)
  
-diff --git a/client/session.c b/client/session.c
-index 9f02512..0d56a1c 100644
---- a/client/session.c
-+++ b/client/session.c
-@@ -91,7 +91,6 @@ struct obc_session {
- 	gchar *path;		/* Session path */
- 	DBusConnection *conn;
- 	DBusConnection *conn_system; /* system bus connection */
--	DBusMessage *msg;
- 	GObex *obex;
- 	GIOChannel *io;
- 	struct obc_agent *agent;
-@@ -100,7 +99,6 @@ struct obc_session {
- 	guint watch;
- 	GSList *pending;
- 	GSList *pending_calls;
--	void *priv;
- 	char *adapter;
- };
+ 			Push the client's business card to the remote device
+ 			and then retrieve the remote business card and store
+@@ -49,7 +50,6 @@ Properties	string Target
  
-@@ -694,6 +692,7 @@ static void adapter_reply(DBusPendingCall *call, void *user_data)
- 	struct callback_data *callback = user_data;
- 	struct obc_session *session = callback->session;
- 	struct pending_req *req = find_session_request(session, call);
-+	GError *gerr = NULL;
+ 		byte Channel
  
- 	reply = dbus_pending_call_steal_reply(call);
- 
-@@ -702,19 +701,26 @@ static void adapter_reply(DBusPendingCall *call, void *user_data)
- 
- 	dbus_error_init(&err);
- 	if (dbus_set_error_from_message(&err, reply)) {
--		error("manager replied with an error: %s, %s",
--				err.name, err.message);
-+		gerr = g_error_new(OBEX_IO_ERROR, -EIO,
-+					"adapter replied with an error: %s, %s",
-+					err.name, err.message);
-+		error(gerr->message);
- 		dbus_error_free(&err);
 -
- 		goto failed;
- 	}
+ Session hierarchy
+ =================
  
--	if (session_connect(session, callback) < 0)
-+	if (session_connect(session, callback) < 0) {
-+		gerr = g_error_new(OBEX_IO_ERROR, -EIO,
-+					"session connect error");
- 		goto failed;
-+	}
+@@ -70,12 +70,11 @@ Methods		dict GetProperties()
  
- 	goto proceed;
+ 			Release a previously assigned OBEX agent.
  
- failed:
-+	callback->func(session, gerr, callback->data);
-+	g_clear_error(&gerr);
-+
- 	obc_session_unref(session);
- 	g_free(callback);
- 
-@@ -730,6 +736,7 @@ static void manager_reply(DBusPendingCall *call, void *user_data)
- 	struct callback_data *callback = user_data;
- 	struct obc_session *session = callback->session;
- 	struct pending_req *req = find_session_request(session, call);
-+	GError *gerr = NULL;
- 
- 	reply = dbus_pending_call_steal_reply(call);
- 
-@@ -738,10 +745,11 @@ static void manager_reply(DBusPendingCall *call, void *user_data)
- 
- 	dbus_error_init(&err);
- 	if (dbus_set_error_from_message(&err, reply)) {
--		error("manager replied with an error: %s, %s",
--				err.name, err.message);
-+		gerr = g_error_new(OBEX_IO_ERROR, -EIO,
-+					"manager replied with an error: %s, %s",
-+					err.name, err.message);
-+		error(gerr->message);
- 		dbus_error_free(&err);
+-Properties	string Source [read-only]
 -
- 		goto failed;
- 	}
+-		string Destination [read-only]
++Properties	string Source [readonly]
  
-@@ -756,8 +764,11 @@ static void manager_reply(DBusPendingCall *call, void *user_data)
- 					BT_ADAPTER_IFACE, "RequestSession",
- 					adapter_reply, callback,
- 					DBUS_TYPE_INVALID);
--		if (!req)
-+		if (!req) {
-+			gerr = g_error_new(OBEX_IO_ERROR, -EIO,
-+						"RequestSession failed");
- 			goto failed;
-+		}
+-		byte Channel [read-only]
++		string Destination [readonly]
  
- 		session->pending_calls = g_slist_prepend(session->pending_calls,
- 									req);
-@@ -767,6 +778,9 @@ static void manager_reply(DBusPendingCall *call, void *user_data)
- 	goto proceed;
++		byte Channel [readonly]
  
- failed:
-+	callback->func(session, gerr, callback->data);
-+	g_clear_error(&gerr);
-+
- 	obc_session_unref(session);
- 	g_free(callback);
+ File Transfer hierarchy
+ =======================
+@@ -101,11 +100,13 @@ Methods		void ChangeFolder(string folder)
  
-@@ -1013,10 +1027,51 @@ static DBusMessage *session_get_properties(DBusConnection *connection,
- 	return reply;
- }
+ 				string Name : Object name in UTF-8 format
+ 				string Type : Either "folder" or "file"
+-				uint64 Size : Object size or number of items in folder
+-				string Permission : Group, owner and other permission
+-				guint64 Modified : Last change
+-				guint64 Accessed : Last access
+-				guint64 Created : Creation date
++				uint64 Size : Object size or number of items in
++						folder
++				string Permission : Group, owner and other
++							permission
++				uint64 Modified : Last change
++				uint64 Accessed : Last access
++				uint64 Created : Creation date
  
-+static void capabilities_complete_callback(struct obc_session *session,
-+						GError *err, void *user_data)
-+{
-+	struct obc_transfer *transfer = obc_session_get_transfer(session);
-+	DBusMessage *message = user_data;
-+	const char *capabilities;
-+	int size;
-+
-+	if (err != NULL) {
-+		DBusMessage *error = g_dbus_create_error(message,
-+					"org.openobex.Error.Failed",
-+					"%s", err->message);
-+		g_dbus_send_message(session->conn, error);
-+		goto done;
-+	}
-+
-+	capabilities = obc_transfer_get_buffer(transfer, &size);
-+	if (size == 0)
-+		capabilities = "";
-+
-+	g_dbus_send_reply(session->conn, message,
-+			DBUS_TYPE_STRING, &capabilities,
-+			DBUS_TYPE_INVALID);
-+
-+done:
-+	dbus_message_unref(message);
-+}
-+
-+static DBusMessage *get_capabilities(DBusConnection *connection,
-+					DBusMessage *message, void *user_data)
-+{
-+	struct obc_session *session = user_data;
-+
-+	obc_session_pull(session, "x-obex/capability", NULL,
-+				capabilities_complete_callback,
-+				dbus_message_ref(message));
-+
-+	return NULL;
-+}
-+
- static GDBusMethodTable session_methods[] = {
- 	{ "GetProperties",	"", "a{sv}",	session_get_properties	},
- 	{ "AssignAgent",	"o", "",	assign_agent	},
- 	{ "ReleaseAgent",	"o", "",	release_agent	},
-+	{ "GetCapabilities",	"", "s",	get_capabilities },
- 	{ }
- };
+ 		void GetFile(string targetfile, string sourcefile)
+ 
+@@ -137,7 +138,6 @@ Methods		void ChangeFolder(string folder)
+ 
+ 			Deletes the specified file/folder.
+ 
+-
+ Phonebook Access hierarchy
+ =======================
+ 
+@@ -150,7 +150,8 @@ Methods		void Select(string location, string phonebook)
+ 			Select the phonebook object for other operations. Should
+ 			be call before all the other operations.
+ 
+-			location : Where the phonebook is stored, possible inputs :
++			location : Where the phonebook is stored, possible
++			inputs :
+ 				"INT" ( "INTERNAL" which is default )
+ 				"SIM" ( "SIM1" )
+ 				"SIM2"
+@@ -171,7 +172,8 @@ Methods		void Select(string location, string phonebook)
+ 		array{string vcard, string name} List()
+ 
+ 			Return an array of vcard-listing data which contains the
+-			vcard : name paired string, for example "1.vcf" : "John".
++			vcard : name paired string, for example "1.vcf" :
++				"John".
+ 
+ 		string Pull(string vcard)
+ 
+@@ -190,36 +192,40 @@ Methods		void Select(string location, string phonebook)
+ 
+ 		uint16 GetSize()
+ 
+-			Return the number of the non-null entries in the selected
+-			phonebook object.
++			Return the number of the non-null entries in the
++			selected phonebook object.
+ 
+ 		void SetFormat(string format)
+ 
+-			Indicate the format of the vcard that should be return by
+-			related methods.
++			Indicate the format of the vcard that should be return
++			by related methods.
+ 
+ 			format : { "vcard21" (default) | "vcard30" }
+ 
+ 		void SetOrder(string order)
+ 
+-			Indicate the sorting method of the vcard-listing data returned
+-			by List and Search methods.
++			Indicate the sorting method of the vcard-listing data
++			returned by List and Search methods.
+ 
+-			order : { "indexed" (default) | "alphanumeric" | "phonetic" }
++			order : { "indexed" (default) | "alphanumeric" |
++					"phonetic" }
+ 
+ 		void SetFilter(array{string})
+ 
+-			Indicate fields that should be contained in vcards return by
+-			related methods.
++			Indicate fields that should be contained in vcards
++			return by related methods.
+ 
+-			Give an empty array will clear the filter and return all fields
+-			available in vcards. And this is the default behavior.
++			Give an empty array will clear the filter and return
++			all fields available in vcards. And this is the default
++			behavior.
+ 
+-			Possible filter fields : "VERSION", "FN", ..., "ALL", "bit[0-63]"
++			Possible filter fields : "VERSION", "FN", ..., "ALL",
++			"bit[0-63]"
+ 
+ 		array{string} ListFilterFields()
+ 
+-			Return All Available fields that can be used in SefFilter method.
++			Return All Available fields that can be used in
++			SefFilter method.
+ 
+ 		array{string} GetFilter()
+ 
+@@ -234,10 +240,12 @@ Object path	[variable prefix]/{session0,session1,...}
+ 
+ Methods		void SetLocation(string location)
+ 
+-			Set the phonebook object store location for other operations. Should
+-			be called before all the other operations.
++			Set the phonebook object store location for other
++			operations. Should be called before all the other
++			operations.
+ 
+-			location: Where the phonebook is stored, possible values:
++			location: Where the phonebook is stored, possible
++			values:
+ 				"INT" ( "INTERNAL" which is default )
+ 				"SIM1"
+ 				"SIM2"
+@@ -245,7 +253,8 @@ Methods		void SetLocation(string location)
+ 
+ 		string GetPhonebook()
+ 
+-			Retrieve an entire Phonebook Object store from remote device
++			Retrieve an entire Phonebook Object store from remote
++			device
+ 
+ 		void PutPhonebook(string obj)
+ 
+@@ -267,20 +276,19 @@ Methods		dict GetProperties()
+ 
+ 			Cancels this transfer.
+ 
+-Properties	string Name [read-only]
++Properties	string Name [readonly]
+ 
+ 			Name of the transferred object.
+ 
+-		uint64 Size [read-only]
++		uint64 Size [readonly]
+ 
+ 			Size of the transferred object. If the size is
+ 			unknown, then this property will not be present.
+ 
+-		string Filename [read-only]
++		string Filename [readonly]
+ 
+ 			Complete name of the file being received or sent.
+ 
+-
+ Agent hierarchy
+ ===============
  
 -- 
 1.7.6.4
