@@ -1,25 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 8 Dec 2011 14:39:36 +0200
+Date: Thu, 8 Dec 2011 14:37:40 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Sheldon Demario <sheldon.demario@openbossa.org>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Use alias for LE devices
-Message-ID: <20111208123936.GB12014@x220>
-References: <1322766108-7308-1-git-send-email-sheldon.demario@openbossa.org>
+Subject: Re: [PATCH] Fix bad epoch time stamp generation
+Message-ID: <20111208123740.GA12014@x220>
+References: <1322235448-9638-1-git-send-email-sancane@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322766108-7308-1-git-send-email-sheldon.demario@openbossa.org>
+In-Reply-To: <1322235448-9638-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sheldon,
+Hi Santiago,
 
-On Thu, Dec 01, 2011, Sheldon Demario wrote:
-> As in BR/EDR, use alias for LE devices or, if there is no alias, set
-> it to either the name or to the device address.
+On Fri, Nov 25, 2011, Santiago Carot-Nemesio wrote:
+> The number of months is in the range 0 to 11, we have to decrease
+> month number by 1 before getting the epoch.
 > ---
->  src/adapter.c |   50 +++++++++++++++++++++++++-------------------------
->  1 files changed, 25 insertions(+), 25 deletions(-)
+>  thermometer/thermometer.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
 Applied. Thanks.
 
