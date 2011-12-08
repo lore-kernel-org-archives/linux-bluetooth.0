@@ -1,29 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 8 Dec 2011 14:41:44 +0200
+Date: Thu, 8 Dec 2011 14:39:36 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
+To: Sheldon Demario <sheldon.demario@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Health Device Profile patches
-Message-ID: <20111208124144.GA19926@x220>
-References: <1322823396-5941-1-git-send-email-sancane@gmail.com>
+Subject: Re: [PATCH] Use alias for LE devices
+Message-ID: <20111208123936.GB12014@x220>
+References: <1322766108-7308-1-git-send-email-sheldon.demario@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1322823396-5941-1-git-send-email-sancane@gmail.com>
+In-Reply-To: <1322766108-7308-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+Hi Sheldon,
 
-On Fri, Dec 02, 2011, Santiago Carot-Nemesio wrote:
-> This is a set of changes which fix some coding style issues in HDP and
-> some small bugs I've seen reviewing the code.
-> 
-> [PATCH 1/5] hdp_util: Fix coding style issues
-> [PATCH 2/5] hdp_types: Fix unappropiated field type for dbus watcher
-> [PATCH 3/5] hdp_util: Fix potential NULL pointer dereference
-> [PATCH 4/5] hdp_manager: Fix coding style issues
-> [PATCH 5/5] hdp: Fix coding style issues
+On Thu, Dec 01, 2011, Sheldon Demario wrote:
+> As in BR/EDR, use alias for LE devices or, if there is no alias, set
+> it to either the name or to the device address.
+> ---
+>  src/adapter.c |   50 +++++++++++++++++++++++++-------------------------
+>  1 files changed, 25 insertions(+), 25 deletions(-)
 
-All five patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
