@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 5/6] Bluetooth: Correct packet len calculation
-Date: Thu,  8 Dec 2011 14:53:05 +0200
-Message-Id: <1323348786-18134-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 2/6] Bluetooth: Simplify num_comp_pkts_evt function
+Date: Thu,  8 Dec 2011 14:53:02 +0200
+Message-Id: <1323348786-18134-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1323348786-18134-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1323348786-18134-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,44 +11,76 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Remove unneeded skb_pull and correct packet length calculation
-removing magic number. Move BT_DBG after len check otherwise
-it could possibly access wrong memory.
+Simplify function and remove fourth level of indentation.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c |    9 ++++-----
- 1 files changed, 4 insertions(+), 5 deletions(-)
+ net/bluetooth/hci_event.c |   47 +++++++++++++++++++++++++++-----------------
+ 1 files changed, 29 insertions(+), 18 deletions(-)
 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 670903b..c96d580 100644
+index 273e1cb..493e08b 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -2268,20 +2268,19 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
- 	struct hci_ev_num_comp_pkts *ev = (void *) skb->data;
- 	int i;
+@@ -2288,28 +2288,39 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+ 		count  = get_unaligned_le16(ptr++);
  
--	skb_pull(skb, sizeof(*ev));
+ 		conn = hci_conn_hash_lookup_handle(hdev, handle);
+-		if (conn) {
+-			conn->sent -= count;
 -
--	BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
--
- 	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_PACKET_BASED) {
- 		BT_ERR("Wrong event for mode %d", hdev->flow_ctl_mode);
- 		return;
- 	}
- 
--	if (skb->len < ev->num_hndl * 4) {
-+	if (skb->len < sizeof(*ev) || skb->len < sizeof(*ev) +
-+			ev->num_hndl * sizeof(struct hci_comp_pkts_info)) {
- 		BT_DBG("%s bad parameters", hdev->name);
- 		return;
- 	}
- 
-+	BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
+-			if (conn->type == ACL_LINK) {
++		if (!conn)
++			continue;
 +
- 	tasklet_disable(&hdev->tx_task);
++		conn->sent -= count;
++
++		switch (conn->type) {
++		case ACL_LINK:
++			hdev->acl_cnt += count;
++			if (hdev->acl_cnt > hdev->acl_pkts)
++				hdev->acl_cnt = hdev->acl_pkts;
++			break;
++
++		case LE_LINK:
++			if (hdev->le_pkts) {
++				hdev->le_cnt += count;
++				if (hdev->le_cnt > hdev->le_pkts)
++					hdev->le_cnt = hdev->le_pkts;
++			} else {
+ 				hdev->acl_cnt += count;
+ 				if (hdev->acl_cnt > hdev->acl_pkts)
+ 					hdev->acl_cnt = hdev->acl_pkts;
+-			} else if (conn->type == LE_LINK) {
+-				if (hdev->le_pkts) {
+-					hdev->le_cnt += count;
+-					if (hdev->le_cnt > hdev->le_pkts)
+-						hdev->le_cnt = hdev->le_pkts;
+-				} else {
+-					hdev->acl_cnt += count;
+-					if (hdev->acl_cnt > hdev->acl_pkts)
+-						hdev->acl_cnt = hdev->acl_pkts;
+-				}
+-			} else {
+-				hdev->sco_cnt += count;
+-				if (hdev->sco_cnt > hdev->sco_pkts)
+-					hdev->sco_cnt = hdev->sco_pkts;
+ 			}
++			break;
++
++		case SCO_LINK:
++			hdev->sco_cnt += count;
++			if (hdev->sco_cnt > hdev->sco_pkts)
++				hdev->sco_cnt = hdev->sco_pkts;
++			break;
++
++		default:
++			BT_ERR("Unknown type %d conn %p", conn->type, conn);
++			break;
+ 		}
+ 	}
  
- 	for (i = 0; i < ev->num_hndl; i++) {
 -- 
 1.7.4.1
 
