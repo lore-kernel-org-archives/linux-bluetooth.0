@@ -1,96 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bartosz Szatkowski <bulislaw@linux.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH obexd 1/6] gobex: Add translating error codes to strings
-Date: Thu,  8 Dec 2011 14:07:53 +0100
-Message-Id: <1323349678-17905-1-git-send-email-bulislaw@linux.com>
+Subject: [PATCHv1 4/6] Bluetooth: Clean up magic pointers
+Date: Thu,  8 Dec 2011 14:53:04 +0200
+Message-Id: <1323348786-18134-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1323348786-18134-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1323348786-18134-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- gobex/gobex.c |   56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- gobex/gobex.h |    2 ++
- 2 files changed, 58 insertions(+), 0 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index b374b06..38d6812 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -114,6 +114,62 @@ struct setpath_data {
- 	guint8 constants;
- } __attribute__ ((packed));
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci.h |    7 ++++++-
+ net/bluetooth/hci_event.c   |    8 ++++----
+ 2 files changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 9490c2c..b9c0087 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -981,9 +981,14 @@ struct hci_ev_role_change {
+ } __packed;
  
-+struct error_code {
-+	guint8 code;
-+	const char *name;
-+} obex_errors[] = {
-+	{ G_OBEX_RSP_CONTINUE,			"Continue" },
-+	{ G_OBEX_RSP_SUCCESS,			"Success" },
-+	{ G_OBEX_RSP_CREATED,			"Created" },
-+	{ G_OBEX_RSP_ACCEPTED,			"Accepted" },
-+	{ G_OBEX_RSP_NON_AUTHORITATIVE,		"Non Authoritative" },
-+	{ G_OBEX_RSP_NO_CONTENT,		"No Content" },
-+	{ G_OBEX_RSP_RESET_CONTENT,		"Reset Content" },
-+	{ G_OBEX_RSP_PARTIAL_CONTENT,		"Partial Content" },
-+	{ G_OBEX_RSP_MULTIPLE_CHOICES,		"Multiple Choices" },
-+	{ G_OBEX_RSP_MOVED_PERMANENTLY,		"Moved Permanently" },
-+	{ G_OBEX_RSP_MOVED_TEMPORARILY,		"Moved Temporarily" },
-+	{ G_OBEX_RSP_SEE_OTHER,			"See Other" },
-+	{ G_OBEX_RSP_NOT_MODIFIED,		"Not Modified" },
-+	{ G_OBEX_RSP_USE_PROXY,			"Use Proxy" },
-+	{ G_OBEX_RSP_BAD_REQUEST,		"Bad Request" },
-+	{ G_OBEX_RSP_UNAUTHORIZED,		"Unauthorized" },
-+	{ G_OBEX_RSP_PAYMENT_REQUIRED,		"Payment Required" },
-+	{ G_OBEX_RSP_FORBIDDEN,			"Forbidden" },
-+	{ G_OBEX_RSP_NOT_FOUND,			"Not Found" },
-+	{ G_OBEX_RSP_METHOD_NOT_ALLOWED,	"Method Not Allowed" },
-+	{ G_OBEX_RSP_NOT_ACCEPTABLE,		"Not Acceptable" },
-+	{ G_OBEX_RSP_PROXY_AUTH_REQUIRED,	"Proxy Authentication Required" },
-+	{ G_OBEX_RSP_REQUEST_TIME_OUT,		"Request Time Out" },
-+	{ G_OBEX_RSP_CONFLICT,			"Conflict" },
-+	{ G_OBEX_RSP_GONE,			"Gone" },
-+	{ G_OBEX_RSP_LENGTH_REQUIRED,		"Length Required" },
-+	{ G_OBEX_RSP_PRECONDITION_FAILED,	"Precondition Failed" },
-+	{ G_OBEX_RSP_REQ_ENTITY_TOO_LARGE,	"Request Entity Too Large" },
-+	{ G_OBEX_RSP_REQ_URL_TOO_LARGE,		"Request URL Too Large" },
-+	{ G_OBEX_RSP_UNSUPPORTED_MEDIA_TYPE,	"Unsupported Media Type" },
-+	{ G_OBEX_RSP_INTERNAL_SERVER_ERROR,	"Internal Server Error" },
-+	{ G_OBEX_RSP_NOT_IMPLEMENTED,		"Not Implemented" },
-+	{ G_OBEX_RSP_BAD_GATEWAY,		"Bad Gateway" },
-+	{ G_OBEX_RSP_SERVICE_UNAVAILABLE,	"Service Unavailable" },
-+	{ G_OBEX_RSP_GATEWAY_TIMEOUT,		"Gateway Timeout" },
-+	{ G_OBEX_RSP_VERSION_NOT_SUPPORTED,	"Version Not Supported" },
-+	{ G_OBEX_RSP_DATABASE_FULL,		"Database Full" },
-+	{ G_OBEX_RSP_DATABASE_LOCKED,		"Database Locked" },
-+	{ 0x00,					NULL }
-+};
+ #define HCI_EV_NUM_COMP_PKTS		0x13
++struct hci_comp_pkts_info {
++	__le16   handle;
++	__le16   count;
++} __packed;
 +
-+const char *g_obex_strerror(guint8 err_code)
-+{
-+	struct error_code *error;
-+
-+	for (error = obex_errors; error->name != NULL; error++)
-+		if (error->code == err_code)
-+			return error->name;
-+
-+	return "<unknown>";
-+}
-+
- static ssize_t req_header_offset(guint8 opcode)
+ struct hci_ev_num_comp_pkts {
+ 	__u8     num_hndl;
+-	/* variable length part */
++	struct hci_comp_pkts_info handles[0];
+ } __packed;
+ 
+ #define HCI_EV_MODE_CHANGE		0x14
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index a06cc60..670903b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2266,7 +2266,6 @@ static inline void hci_role_change_evt(struct hci_dev *hdev, struct sk_buff *skb
+ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *skb)
  {
- 	switch (opcode) {
-diff --git a/gobex/gobex.h b/gobex/gobex.h
-index 1b20333..81981ea 100644
---- a/gobex/gobex.h
-+++ b/gobex/gobex.h
-@@ -119,4 +119,6 @@ guint g_obex_get_rsp(GObex *obex, GObexDataProducer data_func,
+ 	struct hci_ev_num_comp_pkts *ev = (void *) skb->data;
+-	__le16 *ptr;
+ 	int i;
  
- gboolean g_obex_cancel_transfer(guint id);
+ 	skb_pull(skb, sizeof(*ev));
+@@ -2285,12 +2284,13 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
  
-+const char *g_obex_strerror(guint8 err_code);
-+
- #endif /* __GOBEX_H */
+ 	tasklet_disable(&hdev->tx_task);
+ 
+-	for (i = 0, ptr = (__le16 *) skb->data; i < ev->num_hndl; i++) {
++	for (i = 0; i < ev->num_hndl; i++) {
++		struct hci_comp_pkts_info *info = &ev->handles[i];
+ 		struct hci_conn *conn;
+ 		__u16  handle, count;
+ 
+-		handle = get_unaligned_le16(ptr++);
+-		count  = get_unaligned_le16(ptr++);
++		handle = __le16_to_cpu(info->handle);
++		count  = __le16_to_cpu(info->count);
+ 
+ 		conn = hci_conn_hash_lookup_handle(hdev, handle);
+ 		if (!conn)
 -- 
 1.7.4.1
 
