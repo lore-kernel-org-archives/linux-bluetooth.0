@@ -1,59 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 8 Dec 2011 10:32:02 +0200
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <1323333043.1965.20.camel@aeonflux>
+Subject: Re: [RFCv2 5/6] Bluetooth: Correct packet len calculation
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Process Read Local AMP Info in hciemu
-Message-ID: <20111208083200.GB28028@aemeltch-MOBL1>
-References: <1323263005-20552-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1323331911.1965.6.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1323331911.1965.6.camel@aeonflux>
+Date: Thu, 08 Dec 2011 10:30:43 +0200
+In-Reply-To: <20111208082645.GA28028@aemeltch-MOBL1>
+References: <1323266216-25261-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1323266216-25261-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1323332283.1965.12.camel@aeonflux> <20111208082645.GA28028@aemeltch-MOBL1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Andrei,
 
-On Thu, Dec 08, 2011 at 10:11:51AM +0200, Marcel Holtmann wrote:
-> Hi Andrei,
-> 
-> > Add processing of Read Local AMP Info in hciemu, the values returned are
-> > used to emulate AMP HCI.
-> > ---
-> >  test/hciemu.c |   34 ++++++++++++++++++++++++++++++++++
-> >  1 files changed, 34 insertions(+), 0 deletions(-)
+> > > Remove unneeded skb_pull and correct packet length calculation
+> > > removing magic number.
+> > > ---
+> > >  net/bluetooth/hci_event.c |    5 ++---
+> > >  1 files changed, 2 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > index cfccf7e..21c1bf0 100644
+> > > --- a/net/bluetooth/hci_event.c
+> > > +++ b/net/bluetooth/hci_event.c
+> > > @@ -2268,8 +2268,6 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+> > >  	struct hci_ev_num_comp_pkts *ev = (void *) skb->data;
+> > >  	int i;
+> > >  
+> > > -	skb_pull(skb, sizeof(*ev));
+> > > -
+> > >  	BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
+> > >  
+> > >  	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_PACKET_BASED) {
+> > > @@ -2277,7 +2275,8 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+> > >  		return;
+> > >  	}
+> > >  
+> > > -	if (skb->len < ev->num_hndl * 4) {
+> > > +	if (skb->len < ev->num_hndl * sizeof(struct hci_comp_pkts_info) +
+> > > +			sizeof(*ev)) {
+> > >  		BT_DBG("%s bad parameters", hdev->name);
+> > >  		return;
+> > >  	}
 > > 
-> > diff --git a/test/hciemu.c b/test/hciemu.c
-> > index 38918f5..1022eb5 100644
-> > --- a/test/hciemu.c
-> > +++ b/test/hciemu.c
-> > @@ -44,6 +44,7 @@
-> >  #include <bluetooth/bluetooth.h>
-> >  #include <bluetooth/hci.h>
-> >  #include <bluetooth/hci_lib.h>
-> > +#include <bluetooth/l2cap.h>
-> >  
-> >  #define VHCI_DEV		"/dev/vhci"
-> >  
-> > @@ -777,6 +778,35 @@ static void hci_info_param(uint16_t ocf, int plen, uint8_t *data)
-> >  		break;
-> >  	}
-> >  }
-> > +static void hci_status_param(uint16_t ocf, int plen, uint8_t *data)
-> > +{
-> > +	read_local_amp_info_rp ai;
-> > +	uint8_t status;
-> > +
-> > +	const uint16_t ogf = OGF_STATUS_PARAM;
-> > +
-> > +	switch (ocf) {
-> > +		case OCF_READ_LOCAL_AMP_INFO:
+> > actually this check is not enough. You need to make this two-fold.
+> > 
+> > 	if (skb->len < sizeof(*ev)) {
 > 
-> one too many indentation here.
+> maybe:
+> 
+> if (skb->len < sizeof(*ev) || (...)) 
+> 	return;
 
-will fix this. BTW: What do you think about current approach that in this
-test tool I always reply for this AMP-specific command. Shall we have
-command-line parameter for controller type?
+that will work as well.
 
-Best regards 
-Andrei Emeltchenko 
+Regards
+
+Marcel
+
+
