@@ -1,54 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1323332741.1965.17.camel@aeonflux>
-Subject: Re: [PATCH 1/2] Bluetooth: Clear RFCOMM session timer when
- disconnecting last channel
+Message-ID: <1323332388.1965.14.camel@aeonflux>
+Subject: Re: [RFCv2 6/6] Bluetooth: Process num completed data blocks event
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
-	pkrystad@codeaurora.org
-Date: Thu, 08 Dec 2011 10:25:41 +0200
-In-Reply-To: <1323217407-2490-2-git-send-email-mathewm@codeaurora.org>
-References: <1323217407-2490-1-git-send-email-mathewm@codeaurora.org>
-	 <1323217407-2490-2-git-send-email-mathewm@codeaurora.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 08 Dec 2011 10:19:48 +0200
+In-Reply-To: <1323266216-25261-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1323266216-25261-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1323266216-25261-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi Andrei,
 
-> When the last RFCOMM data channel is closed, a timer is normally set
-> up to disconnect the control channel at a later time.  If the control
-> channel disconnect command is sent with the timer pending, the timer
-> needs to be cancelled.
-> 
-> If the timer is not cancelled in this situation, the reference
-> counting logic for the RFCOMM session does not work correctly when the
-> remote device closes the L2CAP connection.  The session is freed at
-> the wrong time, leading to a kernel panic.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> Adds support for Number Of Completed Data Blocks Event. Highly
+> modified version of Code Aurora code.
 > ---
->  net/bluetooth/rfcomm/core.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
+>  include/net/bluetooth/hci.h |   13 +++++++++
+>  net/bluetooth/hci_event.c   |   58 +++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 71 insertions(+), 0 deletions(-)
 > 
-> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-> index 4e32e18..2d28dfe 100644
-> --- a/net/bluetooth/rfcomm/core.c
-> +++ b/net/bluetooth/rfcomm/core.c
-> @@ -1146,6 +1146,7 @@ static int rfcomm_recv_ua(struct rfcomm_session *s, u8 dlci)
->  			if (list_empty(&s->dlcs)) {
->  				s->state = BT_DISCONN;
->  				rfcomm_send_disc(s, 0);
-> +				rfcomm_session_clear_timer(s);
->  			}
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index b9c0087..6846f3e 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -1154,6 +1154,19 @@ struct hci_ev_le_meta {
+>  	__u8     subevent;
+>  } __packed;
+>  
+> +#define HCI_EV_NUM_COMP_BLOCKS		0x48
+> +struct hci_comp_blocks_info {
+> +	__le16   handle;
+> +	__le16   pkts;
+> +	__le16   blocks;
+> +} __packed;
+> +
+> +struct hci_ev_num_comp_blocks {
+> +	__le16   num_blocks;
+> +	__u8     num_hndl;
+> +	struct hci_comp_blocks_info handles[0];
+> +} __packed;
+> +
+>  /* Low energy meta events */
+>  #define HCI_EV_LE_CONN_COMPLETE		0x01
+>  struct hci_ev_le_conn_complete {
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 21c1bf0..6a43bdb 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -2333,6 +2333,60 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+>  	tasklet_enable(&hdev->tx_task);
+>  }
+>  
+> +static inline void hci_num_comp_blocks_evt(struct hci_dev *hdev,
+> +							struct sk_buff *skb)
+> +{
+> +	struct hci_ev_num_comp_blocks *ev = (void *) skb->data;
+> +	int i;
+> +
+> +	BT_DBG("%s num_blocks %d num_hndl %d", hdev->name, ev->num_blocks,
+> +								ev->num_hndl);
+> +
+> +	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_BLOCK_BASED) {
+> +		BT_ERR("Wrong event for mode %d", hdev->flow_ctl_mode);
+> +		return;
+> +	}
+> +
+> +	if (skb->len < ev->num_hndl * sizeof(struct hci_comp_blocks_info) +
+> +								sizeof(*ev)) {
+> +		BT_DBG("%s bad parameters", hdev->name);
+> +		return;
+> +	}
 
-I am not 100% convinced that this is correct, but going through the code
-for over an hour I could not come up with a case where this would cause
-problems. It is just a feeling and with RFCOMM that could be just a
-bogus feeling ;)
+same comment applies here as from my other email.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> +	tasklet_disable(&hdev->tx_task);
+> +
+> +	for (i = 0; i < ev->num_hndl; i++) {
+> +		struct hci_conn *conn;
+> +		struct hci_comp_blocks_info *info = &ev->handles[i];
+
+Put hci_conn declaration after hci_comp_blocks_info. I prefer to have
+variables that get a value assigned before others.
+
+> +		__u16  handle, block_count;
+> +
+> +		handle = __le16_to_cpu(info->handle);
+> +		block_count = __le16_to_cpu(info->blocks);
+> +
+> +		conn = hci_conn_hash_lookup_handle(hdev, handle);
+> +		if (!conn)
+> +			continue;
+> +
+> +		conn->sent -= block_count;
+> +
+> +		switch (conn->type) {
+> +		case ACL_LINK:
+> +			hdev->block_cnt += block_count;
+> +			if (hdev->block_cnt > hdev->num_blocks)
+> +				hdev->block_cnt = hdev->num_blocks;
+> +			break;
+> +
+> +		default:
+> +			BT_ERR("Unknown type %d conn %p", conn->type, conn);
+> +			break;
+> +		}
+> +	}
+> +
+> +	tasklet_schedule(&hdev->tx_task);
+> +
+> +	tasklet_enable(&hdev->tx_task);
+> +}
+> +
+>  static inline void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>  {
+>  	struct hci_ev_mode_change *ev = (void *) skb->data;
+> @@ -3272,6 +3326,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+>  		hci_remote_oob_data_request_evt(hdev, skb);
+>  		break;
+>  
+> +	case HCI_EV_NUM_COMP_BLOCKS:
+> +		hci_num_comp_blocks_evt(hdev, skb);
+> +		break;
+> +
+>  	default:
+>  		BT_DBG("%s event 0x%x", hdev->name, event);
+>  		break;
+
+Rest looks fine to me.
 
 Regards
 
