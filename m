@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC obexd v2 10/21] client-doc: remove agent in favour of transfer signals
-Date: Thu, 8 Dec 2011 16:27:44 +0100
-Message-ID: <1323358075-27857-11-git-send-email-mikel.astiz@bmw-carit.de>
+Subject: [RFC obexd v2 03/21] client: wrap OPP into specific session type
+Date: Thu, 8 Dec 2011 16:27:37 +0100
+Message-ID: <1323358075-27857-4-git-send-email-mikel.astiz@bmw-carit.de>
 In-Reply-To: <1323358075-27857-1-git-send-email-mikel.astiz@bmw-carit.de>
 References: <1323358075-27857-1-git-send-email-mikel.astiz@bmw-carit.de>
 MIME-Version: 1.0
@@ -12,131 +12,730 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Assuming that the request confirmation from the agent is not necessary,
-the rest of the reports can be achieved using signals in the transfer
-object itself.
-
-The main benefit of this is that the API is simpler and the client apps
-do not have to register the agent, and can just listen to the relevant
-signals.
 ---
- doc/client-api.txt |   74 ++++++++++++++++++++-------------------------------
- 1 files changed, 29 insertions(+), 45 deletions(-)
+ client/manager.c             |  249 ++----------------------------------------
+ client/opp.c                 |  172 +++++++++++++++++++++++++++++-
+ test/exchange-business-cards |   10 ++-
+ test/get-capabilities        |   15 +--
+ test/pull-business-card      |    9 ++-
+ test/send-files              |   86 ++------------
+ 6 files changed, 216 insertions(+), 325 deletions(-)
 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index ad92869..0c30312 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -40,25 +40,26 @@ Methods		dict GetProperties()
+diff --git a/client/manager.c b/client/manager.c
+index dfb282b..efc6745 100644
+--- a/client/manager.c
++++ b/client/manager.c
+@@ -51,10 +51,6 @@
+ struct send_data {
+ 	DBusConnection *connection;
+ 	DBusMessage *message;
+-	gchar *sender;
+-	gchar *agent;
+-	char *filename;
+-	GPtrArray *files;
+ };
  
- 			Returns all properties for the session.
+ static GSList *sessions = NULL;
+@@ -81,7 +77,7 @@ static void create_callback(struct obc_session *session, GError *err,
+ 							void *user_data)
+ {
+ 	struct send_data *data = user_data;
+-	unsigned int i;
++	const char *path;
  
--		void AssignAgent(object agent)
--
--			Assign an OBEX agent to this session. This allows
--			detailed progress reports about the transactions.
--
--		void ReleaseAgent(object agent)
--
--			Release a previously assigned OBEX agent.
--
- 		string GetCapabilities()
+ 	if (err != NULL) {
+ 		DBusMessage *error = g_dbus_create_error(data->message,
+@@ -92,44 +88,16 @@ static void create_callback(struct obc_session *session, GError *err,
+ 		goto done;
+ 	}
  
- 			Get remote device capabilities.
+-	if (obc_session_get_target(session) != NULL) {
+-		const char *path;
  
-+		array{object,dict} GetTransfers()
+-		path = obc_session_register(session, unregister_session);
++	path = obc_session_register(session, unregister_session);
+ 
+-		g_dbus_send_reply(data->connection, data->message,
++	g_dbus_send_reply(data->connection, data->message,
+ 				DBUS_TYPE_OBJECT_PATH, &path,
+ 				DBUS_TYPE_INVALID);
+-		goto done;
+-	}
+-
+-	g_dbus_send_reply(data->connection, data->message, DBUS_TYPE_INVALID);
+-
+-	obc_session_set_agent(session, data->sender, data->agent);
+-
+-	for (i = 0; i < data->files->len; i++) {
+-		const gchar *filename = g_ptr_array_index(data->files, i);
+-		gchar *basename = g_path_get_basename(filename);
+-
+-		if (obc_session_send(session, filename, basename) < 0) {
+-			g_free(basename);
+-			break;
+-		}
+-
+-		g_free(basename);
+-	}
+-
+-	/* No need to keep a reference for SendFiles */
+-	sessions = g_slist_remove(sessions, session);
+-	obc_session_unref(session);
+ 
+ done:
+-	if (data->files)
+-		g_ptr_array_free(data->files, TRUE);
+ 	dbus_message_unref(data->message);
+ 	dbus_connection_unref(data->connection);
+-	g_free(data->sender);
+-	g_free(data->agent);
+ 	g_free(data);
+ }
+ 
+@@ -168,192 +136,6 @@ static int parse_device_dict(DBusMessageIter *iter,
+ 	return 0;
+ }
+ 
+-static DBusMessage *send_files(DBusConnection *connection,
+-					DBusMessage *message, void *user_data)
+-{
+-	DBusMessageIter iter, array;
+-	struct obc_session *session;
+-	GPtrArray *files;
+-	struct send_data *data;
+-	const char *agent, *source = NULL, *dest = NULL, *target = NULL;
+-	const char *sender;
+-	uint8_t channel = 0;
+-
+-	dbus_message_iter_init(message, &iter);
+-	dbus_message_iter_recurse(&iter, &array);
+-
+-	parse_device_dict(&array, &source, &dest, &target, &channel);
+-	if (dest == NULL)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.InvalidArguments", NULL);
+-
+-	dbus_message_iter_next(&iter);
+-	dbus_message_iter_recurse(&iter, &array);
+-
+-	files = g_ptr_array_new();
+-	if (files == NULL)
+-		return g_dbus_create_error(message,
+-					"org.openobex.Error.NoMemory", NULL);
+-
+-	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_STRING) {
+-		char *value;
+-
+-		dbus_message_iter_get_basic(&array, &value);
+-		g_ptr_array_add(files, value);
+-
+-		dbus_message_iter_next(&array);
+-	}
+-
+-	dbus_message_iter_next(&iter);
+-	dbus_message_iter_get_basic(&iter, &agent);
+-
+-	if (files->len == 0) {
+-		g_ptr_array_free(files, TRUE);
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.InvalidArguments", NULL);
+-	}
+-
+-	sender = dbus_message_get_sender(message);
+-
+-	data = g_try_malloc0(sizeof(*data));
+-	if (data == NULL) {
+-		g_ptr_array_free(files, TRUE);
+-		return g_dbus_create_error(message,
+-					"org.openobex.Error.NoMemory", NULL);
+-	}
+-
+-	data->connection = dbus_connection_ref(connection);
+-	data->message = dbus_message_ref(message);
+-	data->sender = g_strdup(sender);
+-	data->agent = g_strdup(agent);
+-	data->files = files;
+-
+-	session = obc_session_create(source, dest, "OPP", channel, sender,
+-							create_callback, data);
+-	if (session != NULL) {
+-		sessions = g_slist_append(sessions, session);
+-		return NULL;
+-	}
+-
+-	g_ptr_array_free(data->files, TRUE);
+-	dbus_message_unref(data->message);
+-	dbus_connection_unref(data->connection);
+-	g_free(data->sender);
+-	g_free(data->agent);
+-	g_free(data);
+-
+-	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
+-}
+-
+-static void pull_complete_callback(struct obc_session *session,
+-					GError *err, void *user_data)
+-{
+-	struct send_data *data = user_data;
+-
+-	if (err != NULL) {
+-		DBusMessage *error = g_dbus_create_error(data->message,
+-					"org.openobex.Error.Failed",
+-					"%s", err->message);
+-		g_dbus_send_message(data->connection, error);
+-		goto done;
+-	}
+-
+-	g_dbus_send_reply(data->connection, data->message, DBUS_TYPE_INVALID);
+-
+-done:
+-	shutdown_session(session);
+-	dbus_message_unref(data->message);
+-	dbus_connection_unref(data->connection);
+-	g_free(data->filename);
+-	g_free(data->sender);
+-	g_free(data);
+-}
+-
+-static void pull_obc_session_callback(struct obc_session *session,
+-					GError *err, void *user_data)
+-{
+-	struct send_data *data = user_data;
+-
+-	if (err != NULL) {
+-		DBusMessage *error = g_dbus_create_error(data->message,
+-					"org.openobex.Error.Failed",
+-					"%s", err->message);
+-		g_dbus_send_message(data->connection, error);
+-		shutdown_session(session);
+-		goto done;
+-	}
+-
+-	obc_session_pull(session, "text/x-vcard", data->filename,
+-						pull_complete_callback, data);
+-
+-	return;
+-
+-done:
+-	dbus_message_unref(data->message);
+-	dbus_connection_unref(data->connection);
+-	g_free(data->filename);
+-	g_free(data->sender);
+-	g_free(data);
+-}
+-
+-static DBusMessage *pull_business_card(DBusConnection *connection,
+-					DBusMessage *message, void *user_data)
+-{
+-	DBusMessageIter iter, dict;
+-	struct obc_session *session;
+-	struct send_data *data;
+-	const char *source = NULL, *dest = NULL, *target = NULL;
+-	const char *name = NULL;
+-	uint8_t channel = 0;
+-
+-	dbus_message_iter_init(message, &iter);
+-	dbus_message_iter_recurse(&iter, &dict);
+-
+-	parse_device_dict(&dict, &source, &dest, &target, &channel);
+-	if (dest == NULL)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.InvalidArguments", NULL);
+-
+-	dbus_message_iter_next(&iter);
+-
+-	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.InvalidArguments", NULL);
+-
+-	dbus_message_iter_get_basic(&iter, &name);
+-
+-	data = g_try_malloc0(sizeof(*data));
+-	if (data == NULL)
+-		return g_dbus_create_error(message,
+-					"org.openobex.Error.NoMemory", NULL);
+-
+-	data->connection = dbus_connection_ref(connection);
+-	data->message = dbus_message_ref(message);
+-	data->sender = g_strdup(dbus_message_get_sender(message));
+-	data->filename = g_strdup(name);
+-
+-	session = obc_session_create(source, dest, "OPP", channel, data->sender,
+-					pull_obc_session_callback, data);
+-	if (session != NULL) {
+-		sessions = g_slist_append(sessions, session);
+-		return NULL;
+-	}
+-
+-	dbus_message_unref(data->message);
+-	dbus_connection_unref(data->connection);
+-	g_free(data->sender);
+-	g_free(data->filename);
+-	g_free(data);
+-
+-	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
+-}
+-
+-static DBusMessage *exchange_business_cards(DBusConnection *connection,
+-					DBusMessage *message, void *user_data)
+-{
+-	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
+-}
+-
+ static struct obc_session *find_session(const char *path)
+ {
+ 	GSList *l;
+@@ -392,10 +174,10 @@ static DBusMessage *create_session(DBusConnection *connection,
+ 
+ 	data->connection = dbus_connection_ref(connection);
+ 	data->message = dbus_message_ref(message);
+-	data->sender = g_strdup(dbus_message_get_sender(message));
+ 
+-	session = obc_session_create(source, dest, target, channel, data->sender,
+-							create_callback, data);
++	session = obc_session_create(source, dest, target, channel,
++					dbus_message_get_sender(message),
++					create_callback, data);
+ 	if (session != NULL) {
+ 		sessions = g_slist_append(sessions, session);
+ 		return NULL;
+@@ -403,7 +185,6 @@ static DBusMessage *create_session(DBusConnection *connection,
+ 
+ 	dbus_message_unref(data->message);
+ 	dbus_connection_unref(data->connection);
+-	g_free(data->sender);
+ 	g_free(data);
+ 
+ 	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
+@@ -466,7 +247,6 @@ done:
+ 	shutdown_session(session);
+ 	dbus_message_unref(data->message);
+ 	dbus_connection_unref(data->connection);
+-	g_free(data->sender);
+ 	g_free(data);
+ }
+ 
+@@ -492,7 +272,6 @@ static void capability_obc_session_callback(struct obc_session *session,
+ done:
+ 	dbus_message_unref(data->message);
+ 	dbus_connection_unref(data->connection);
+-	g_free(data->sender);
+ 	g_free(data);
+ }
+ 
+@@ -509,7 +288,7 @@ static DBusMessage *get_capabilities(DBusConnection *connection,
+ 	dbus_message_iter_recurse(&iter, &dict);
+ 
+ 	parse_device_dict(&dict, &source, &dest, &target, &channel);
+-	if (dest == NULL)
++	if ((dest == NULL) || (target == NULL))
+ 		return g_dbus_create_error(message,
+ 				"org.openobex.Error.InvalidArguments", NULL);
+ 
+@@ -520,12 +299,9 @@ static DBusMessage *get_capabilities(DBusConnection *connection,
+ 
+ 	data->connection = dbus_connection_ref(connection);
+ 	data->message = dbus_message_ref(message);
+-	data->sender = g_strdup(dbus_message_get_sender(message));
+ 
+-	if (!target)
+-		target = "OPP";
+-
+-	session = obc_session_create(source, dest, target, channel, data->sender,
++	session = obc_session_create(source, dest, target, channel,
++					dbus_message_get_sender(message),
+ 					capability_obc_session_callback, data);
+ 	if (session != NULL) {
+ 		sessions = g_slist_append(sessions, session);
+@@ -534,19 +310,12 @@ static DBusMessage *get_capabilities(DBusConnection *connection,
+ 
+ 	dbus_message_unref(data->message);
+ 	dbus_connection_unref(data->connection);
+-	g_free(data->sender);
+ 	g_free(data);
+ 
+ 	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
+ }
+ 
+ static GDBusMethodTable client_methods[] = {
+-	{ "SendFiles", "a{sv}aso", "", send_files,
+-						G_DBUS_METHOD_FLAG_ASYNC },
+-	{ "PullBusinessCard", "a{sv}s", "", pull_business_card,
+-						G_DBUS_METHOD_FLAG_ASYNC },
+-	{ "ExchangeBusinessCards", "a{sv}ss", "", exchange_business_cards,
+-						G_DBUS_METHOD_FLAG_ASYNC },
+ 	{ "CreateSession", "a{sv}", "o", create_session,
+ 						G_DBUS_METHOD_FLAG_ASYNC },
+ 	{ "RemoveSession", "o", "", remove_session,
+diff --git a/client/opp.c b/client/opp.c
+index be382ef..5af18b5 100644
+--- a/client/opp.c
++++ b/client/opp.c
+@@ -25,6 +25,8 @@
+ #include <config.h>
+ #endif
+ 
++#include <errno.h>
 +
-+			Get existing (queued) transfers in this session. This
-+			method should only be called once, and further changes
-+			should be monitored using the appropriate signals.
+ #include "log.h"
+ 
+ #include "session.h"
+@@ -32,22 +34,190 @@
+ #include "opp.h"
+ 
+ #define OPP_UUID "00001105-0000-1000-8000-00805f9b34fb"
++#define OPP_INTERFACE "org.openobex.ObjectPush"
++#define ERROR_INF OPP_INTERFACE ".Error"
 +
- Properties	string Source [readonly]
- 
- 		string Destination [readonly]
- 
- 		byte Channel [readonly]
- 
-+Signals		void TransferAdded(object path, dict properties)
 +
-+			Informs that a new transfer has been created (queued).
++struct opp_data {
++	struct obc_session *session;
++};
 +
- Object Push hierarchy
- =====================
++struct pull_data {
++	DBusConnection *connection;
++	DBusMessage *message;
++};
++
++static DBusConnection *conn = NULL;
++
++static DBusMessage *opp_send_files(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	struct opp_data *opp = user_data;
++	DBusMessageIter iter, array;
++
++	dbus_message_iter_init(message, &iter);
++	dbus_message_iter_recurse(&iter, &array);
++
++	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_STRING) {
++		char *filename;
++		char *basename;
++
++		dbus_message_iter_get_basic(&array, &filename);
++		basename = g_path_get_basename(filename);
++
++		if (obc_session_send(opp->session, filename, basename) < 0) {
++			g_free(basename);
++			break;
++		}
++
++		g_free(basename);
++		dbus_message_iter_next(&array);
++	}
++
++	return dbus_message_new_method_return(message);
++}
++
++static void pull_complete_callback(struct obc_session *session,
++					GError *err, void *user_data)
++{
++	struct pull_data *data = user_data;
++
++	if (err != NULL) {
++		DBusMessage *error = g_dbus_create_error(data->message,
++					ERROR_INF ".Failed",
++					"%s", err->message);
++		g_dbus_send_message(data->connection, error);
++		goto done;
++	}
++
++	g_dbus_send_reply(data->connection, data->message, DBUS_TYPE_INVALID);
++
++done:
++	dbus_message_unref(data->message);
++	dbus_connection_unref(data->connection);
++}
++
++static DBusMessage *opp_pull_business_card(DBusConnection *connection,
++						DBusMessage *message,
++						void *user_data)
++{
++	struct opp_data *opp = user_data;
++	struct pull_data *data;
++	DBusMessageIter iter;
++	const char *filename = NULL;
++
++	dbus_message_iter_init(message, &iter);
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++		return g_dbus_create_error(message,
++				ERROR_INF ".InvalidArguments", NULL);
++
++	dbus_message_iter_get_basic(&iter, &filename);
++
++	data = g_try_malloc0(sizeof(*data));
++	if (!data)
++		return g_dbus_create_error(message,
++				ERROR_INF ".Failed", "No Memory");
++
++	data->connection = connection;
++	data->message = dbus_message_ref(message);
++
++	obc_session_pull(opp->session, "text/x-vcard", filename,
++						pull_complete_callback, data);
++
++	return NULL;
++}
++
++static DBusMessage *opp_exchange_business_cards(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	return g_dbus_create_error(message, ERROR_INF ".Failed", NULL);
++}
++
++static GDBusMethodTable opp_methods[] = {
++	{ "SendFiles",		"as",	"",	opp_send_files,
++						G_DBUS_METHOD_FLAG_ASYNC },
++	{ "PullBusinessCard",	"s",	"",	opp_pull_business_card,
++						G_DBUS_METHOD_FLAG_ASYNC },
++	{ "ExchangeBusinessCards", "ss", "",	opp_exchange_business_cards,
++						G_DBUS_METHOD_FLAG_ASYNC },
++	{ }
++};
++
++static void opp_free(void *data)
++{
++	struct opp_data *opp = data;
++
++	obc_session_unref(opp->session);
++	g_free(opp);
++}
++
++static int opp_probe(struct obc_session *session)
++{
++	struct opp_data *opp;
++	const char *path;
++
++	path = obc_session_get_path(session);
++
++	DBG("%s", path);
++
++	opp = g_try_new0(struct opp_data, 1);
++	if (!opp)
++		return -ENOMEM;
++
++	opp->session = obc_session_ref(session);
++
++	if (!g_dbus_register_interface(conn, path, OPP_INTERFACE, opp_methods,
++						NULL, NULL, opp, opp_free)) {
++		opp_free(opp);
++		return -ENOMEM;
++	}
++
++	return 0;
++}
++
++static void opp_remove(struct obc_session *session)
++{
++	const char *path = obc_session_get_path(session);
++
++	DBG("%s", path);
++
++	g_dbus_unregister_interface(conn, path, OPP_INTERFACE);
++}
  
-@@ -286,54 +287,37 @@ Properties	string Name [readonly]
+ static struct obc_driver opp = {
+ 	.service = "OPP",
+ 	.uuid = OPP_UUID,
++	.probe = opp_probe,
++	.remove = opp_remove
+ };
  
- 			Name of the transferred object.
+ int opp_init(void)
+ {
++	int err;
++
+ 	DBG("");
  
--		uint64 Size [readonly]
-+		string Location [readonly, optional]
+-	return obc_driver_register(&opp);
++	conn = dbus_bus_get(DBUS_BUS_SESSION, NULL);
++	if (!conn)
++		return -EIO;
++
++	err = obc_driver_register(&opp);
++	if (err < 0) {
++		dbus_connection_unref(conn);
++		conn = NULL;
++		return err;
++	}
++
++	return 0;
+ }
  
--			Size of the transferred object. If the size is
--			unknown, then this property will not be present.
+ void opp_exit(void)
+ {
+ 	DBG("");
+ 
++	dbus_connection_unref(conn);
++	conn = NULL;
++
+ 	obc_driver_unregister(&opp);
+ }
+diff --git a/test/exchange-business-cards b/test/exchange-business-cards
+index 4b0c7ed..548ad2d 100755
+--- a/test/exchange-business-cards
++++ b/test/exchange-business-cards
+@@ -11,5 +11,11 @@ if (len(sys.argv) < 4):
+ 	print "Usage: %s <device> <clientfile> <file>" % (sys.argv[0])
+ 	sys.exit(1)
+ 
+-client.ExchangeBusinessCards({ "Destination": sys.argv[1] },
+-						sys.argv[2], sys.argv[3])
++print "Creating Session"
++session_path = client.CreateSession({"Destination": sys.argv[1],
++					"Target": "OPP"})
++opp = dbus.Interface(bus.get_object("org.openobex.client",
++					session_path),
++					"org.openobex.ObjectPush")
++
++opp.ExchangeBusinessCards(sys.argv[2], sys.argv[3])
+diff --git a/test/get-capabilities b/test/get-capabilities
+index c835bd9..1bbc274 100755
+--- a/test/get-capabilities
++++ b/test/get-capabilities
+@@ -7,14 +7,13 @@ bus = dbus.SessionBus()
+ client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
+ 					"org.openobex.Client")
+ 
+-if (len(sys.argv) < 2):
+-	print "Usage: %s <device> [target]" % (sys.argv[0])
++if (len(sys.argv) < 3):
++	print "Usage: %s <device> <target>" % (sys.argv[0])
+ 	sys.exit(1)
+ 
+-if (len(sys.argv) == 3):
+-	dict = {"Destination": sys.argv[1],
+-		"Target": sys.argv[2]}
+-else:
+-	dict = {"Destination": sys.argv[1]}
++print "Creating Session"
++session_path = client.CreateSession("", sys.argv[1], sys.argv[2], dict())
++session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
++							"org.openobex.Session")
+ 
+-print client.GetCapabilities(dict)
++print session.GetCapabilities()
+diff --git a/test/pull-business-card b/test/pull-business-card
+index b13968d..5912155 100755
+--- a/test/pull-business-card
++++ b/test/pull-business-card
+@@ -28,7 +28,14 @@ if __name__ == '__main__':
+ 		print "Usage: %s <device> <file>" % (sys.argv[0])
+ 		sys.exit(1)
+ 
+-	client.PullBusinessCard({ "Destination": sys.argv[1] }, sys.argv[2],
++	print "Creating Session"
++	session_path = client.CreateSession({"Destination": sys.argv[1],
++						"Target": "OPP"})
++	opp = dbus.Interface(bus.get_object("org.openobex.client",
++						session_path),
++						"org.openobex.ObjectPush")
++
++	opp.PullBusinessCard(sys.argv[2],
+ 				reply_handler=success, error_handler=failure)
+ 
+ 	mainloop.run()
+diff --git a/test/send-files b/test/send-files
+index 52f9c04..6d634f5 100755
+--- a/test/send-files
++++ b/test/send-files
+@@ -1,82 +1,22 @@
+ #!/usr/bin/python
+ 
+-import gobject
 -
--		string Filename [readonly]
+-import os
+ import sys
+-import time
+ import dbus
+-import dbus.service
+-import dbus.mainloop.glib
 -
--			Complete name of the file being received or sent.
+-class Agent(dbus.service.Object):
+-	def __init__(self, conn=None, obj_path=None):
+-		dbus.service.Object.__init__(self, conn, obj_path)
 -
--Agent hierarchy
--===============
-+			Complete name of the local file being received or sent.
-+			For operations from or to memory, this property will not
-+			be present.
- 
--Service		unique name
--Interface	org.openobex.Agent
--Object path	freely definable
-+		uint64 Size [readonly, optional]
- 
--Methods		void Release()
+-	@dbus.service.method("org.openobex.Agent",
+-					in_signature="o", out_signature="s")
+-	def Request(self, path):
+-		print "Transfer Request"
+-		self.transfer = dbus.Interface(bus.get_object("org.openobex.client",
+-						path), "org.openobex.Transfer")
+-		properties = self.transfer.GetProperties()
+-		for key in properties.keys():
+-			print "  %s = %s" % (key, properties[key])
+-		self.start = True
+-		return ""
 -
--			This method gets called when the service daemon
--			unregisters the agent. An agent can use it to do
--			cleanup tasks. There is no need to unregister the
--			agent, because when this method gets called it has
--			already been unregistered.
+-	@dbus.service.method("org.openobex.Agent",
+-					in_signature="ot", out_signature="")
+-	def Progress(self, path, transferred):
+-		if (self.start):
+-			print "Transfer Started"
+-			properties = self.transfer.GetProperties()
+-			self.transfer_size = properties['Size']
+-			self.start_time = time.time()
+-			self.start = False
+-		else:
+-			speed = transferred / abs((time.time() - self.start_time) * 1000)
+-			progress = "(" + str(transferred) + "/" + str(self.transfer_size) + " bytes) @ " + str(int(speed)) + " kB/s"
+-			out = "\rTransfer progress " + progress
+-			sys.stdout.write(out)
+-			sys.stdout.flush()
+-		return
 -
--		string Request(object transfer)
-+			Size of the transferred object(s). If the size is
-+			unknown, then this property will not be present.
+-	@dbus.service.method("org.openobex.Agent",
+-					in_signature="o", out_signature="")
+-	def Complete(self, path):
+-		print "\nTransfer finished"
+-		return
+-
+-	@dbus.service.method("org.openobex.Agent",
+-					in_signature="os", out_signature="")
+-	def Error(self, path, error):
+-		print "\nTransfer finished with an error: %s" % (error)
+-		return
+-
+-	@dbus.service.method("org.openobex.Agent",
+-					in_signature="", out_signature="")
+-	def Release(self):
+-		mainloop.quit()
+-		return
+-
+-if __name__ == '__main__':
+-	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+-
+-	bus = dbus.SessionBus()
+-	client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
+-							"org.openobex.Client")
  
--			Accept or reject a new transfer (client and server)
--			and provide the filename for it.
-+		uint64 Progress [readonly, optional]
+-	if (len(sys.argv) < 3):
+-		print "Usage: %s <device> <file> [file*]" % (sys.argv[0])
+-		sys.exit(1)
++bus = dbus.SessionBus()
++client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
++						"org.openobex.Client")
  
--			In case of incoming transfers it is the filename
--			where to store the file and for outgoing transfers
--			it is the filename to show the remote device. If left
--			empty it will be calculated automatically.
-+			Number of bytes transferred. For queued transfers, this
-+			value will not be present. When a queued transfer
-+			begins, this property will take an initial value of 0.
+-	path = "/test/agent"
+-	agent = Agent(bus, path)
++if (len(sys.argv) < 3):
++	print "Usage: %s <device> <file> [file*]" % (sys.argv[0])
++	sys.exit(1)
  
--			Possible errors: org.openobex.Error.Rejected
--			                 org.openobex.Error.Canceled
-+Signals		PropertyChanged(string name, variant value)
+-	mainloop = gobject.MainLoop()
+-	files = [os.path.realpath(f) for f in sys.argv[2:]]
++files = [os.path.realpath(f) for f in sys.argv[2:]]
  
--		void Progress(object transfer, uint64 transferred)
-+			This signal indicates a changed value of the given
-+			property.
+-	client.SendFiles({ "Destination": sys.argv[1] }, files, path)
++print "Creating Session"
++session_path = client.CreateSession({"Destination": sys.argv[1],
++					"Target": "OPP"})
++opp = dbus.Interface(bus.get_object("org.openobex.client", session_path),
++					"org.openobex.ObjectPush")
  
--			Progress within the transfer has been made. The
--			number of transferred bytes is given as second
--			argument for convenience.
-+			Upon creation, a transfer object will emit a signal of
-+			type PropertyChanged("Progress", 0). This can be used
-+			to monitor existing transfers.
- 
--		void Complete(object transfer)
-+		void Complete()
- 
- 			Informs that the transfer has completed successfully.
- 
--		void Error(object transfer, string message)
-+		void Error(string message)
- 
- 			Informs that the transfer has been terminated because
- 			of some error.
+-	mainloop.run()
++opp.SendFiles(files)
 -- 
 1.7.6.4
 
