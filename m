@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC obexd v2 18/21] client-doc: PhonebookAccess sessions return transports
-Date: Thu, 8 Dec 2011 16:27:52 +0100
-Message-ID: <1323358075-27857-19-git-send-email-mikel.astiz@bmw-carit.de>
+Subject: [RFC obexd v2 05/21] client: replace SendFiles with SendFile
+Date: Thu, 8 Dec 2011 16:27:39 +0100
+Message-ID: <1323358075-27857-6-git-send-email-mikel.astiz@bmw-carit.de>
 In-Reply-To: <1323358075-27857-1-git-send-email-mikel.astiz@bmw-carit.de>
 References: <1323358075-27857-1-git-send-email-mikel.astiz@bmw-carit.de>
 MIME-Version: 1.0
@@ -13,54 +13,78 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/client-api.txt |   23 +++++++++++++++++++----
- 1 files changed, 19 insertions(+), 4 deletions(-)
+ client/opp.c    |   28 +++++++++++++---------------
+ test/send-files |    5 +++--
+ 2 files changed, 16 insertions(+), 17 deletions(-)
 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index b17eee9..e0dd29d 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -198,10 +198,18 @@ Methods		void Select(string location, string phonebook)
- 				"mch":	missing call history
- 				"cch":	combination of ich och mch
+diff --git a/client/opp.c b/client/opp.c
+index 5af18b5..bd83c25 100644
+--- a/client/opp.c
++++ b/client/opp.c
+@@ -49,29 +49,27 @@ struct pull_data {
  
--		string PullAll()
-+		object PullAll(string targetfile)
+ static DBusConnection *conn = NULL;
  
- 			Return the entire phonebook object from the PSE server
--			in plain string with vcard format.
-+			in plain string with vcard format, and store it in
-+			a local file.
-+
-+			If an empty target file is given, a name will be
-+			automatically calculated for the temporary file.
-+
-+			The returned path represents the newly created transfer,
-+			which should be used to find out if the content has been
-+			successfully transferred or if the operation fails.
+-static DBusMessage *opp_send_files(DBusConnection *connection,
++static DBusMessage *opp_send_file(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
+ {
+ 	struct opp_data *opp = user_data;
+-	DBusMessageIter iter, array;
++	DBusMessageIter iter;
++	char *filename;
++	char *basename;
  
- 		array{string vcard, string name} List()
+ 	dbus_message_iter_init(message, &iter);
+-	dbus_message_iter_recurse(&iter, &array);
+-
+-	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_STRING) {
+-		char *filename;
+-		char *basename;
  
-@@ -209,10 +217,17 @@ Methods		void Select(string location, string phonebook)
- 			vcard : name paired string, for example "1.vcf" :
- 				"John".
+-		dbus_message_iter_get_basic(&array, &filename);
+-		basename = g_path_get_basename(filename);
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++		return g_dbus_create_error(message,
++				ERROR_INF ".InvalidArguments", NULL);
  
--		string Pull(string vcard)
-+		object Pull(string vcard, string targetfile)
+-		if (obc_session_send(opp->session, filename, basename) < 0) {
+-			g_free(basename);
+-			break;
+-		}
++	dbus_message_iter_get_basic(&iter, &filename);
++	basename = g_path_get_basename(filename);
  
- 			Retrieve the vcard in the current phonebook object
--			for example : Pull("0.vcf")
-+			for example : Pull("0.vcf", "pull-result.vcf")
-+
-+			If an empty target file is given, a name will be
-+			automatically calculated for the temporary file.
-+
-+			The returned path represents the newly created transfer,
-+			which should be used to find out if the content has been
-+			successfully transferred or if the operation fails.
++	if (obc_session_send(opp->session, filename, basename) < 0) {
+ 		g_free(basename);
+-		dbus_message_iter_next(&array);
++		return g_dbus_create_error(message,
++				ERROR_INF ".Failed", NULL);
+ 	}
  
- 		array{string vcard, string name}
- 		Search(string field, string value)
+ 	return dbus_message_new_method_return(message);
+@@ -135,7 +133,7 @@ static DBusMessage *opp_exchange_business_cards(DBusConnection *connection,
+ }
+ 
+ static GDBusMethodTable opp_methods[] = {
+-	{ "SendFiles",		"as",	"",	opp_send_files,
++	{ "SendFile",		"s",	"",	opp_send_file,
+ 						G_DBUS_METHOD_FLAG_ASYNC },
+ 	{ "PullBusinessCard",	"s",	"",	opp_pull_business_card,
+ 						G_DBUS_METHOD_FLAG_ASYNC },
+diff --git a/test/send-files b/test/send-files
+index 6d634f5..e84d10f 100755
+--- a/test/send-files
++++ b/test/send-files
+@@ -18,5 +18,6 @@ session_path = client.CreateSession({"Destination": sys.argv[1],
+ 					"Target": "OPP"})
+ opp = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+ 					"org.openobex.ObjectPush")
+-
+-opp.SendFiles(files)
++for f in files:
++	print "Queueing '%s'" % f
++	opp.SendFile(f)
 -- 
 1.7.6.4
 
