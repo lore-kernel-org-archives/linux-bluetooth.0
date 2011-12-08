@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC obexd v2 21/21] client: update copyright statement
-Date: Thu, 8 Dec 2011 16:27:55 +0100
-Message-ID: <1323358075-27857-22-git-send-email-mikel.astiz@bmw-carit.de>
+Subject: [RFC obexd v2 17/21] client: Synchronization sessions return transports
+Date: Thu, 8 Dec 2011 16:27:51 +0100
+Message-ID: <1323358075-27857-18-git-send-email-mikel.astiz@bmw-carit.de>
 In-Reply-To: <1323358075-27857-1-git-send-email-mikel.astiz@bmw-carit.de>
 References: <1323358075-27857-1-git-send-email-mikel.astiz@bmw-carit.de>
 MIME-Version: 1.0
@@ -13,138 +13,132 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- client/ftp.c       |    1 +
- client/manager.c   |    1 +
- client/opp.c       |    1 +
- client/pbap.c      |    1 +
- client/session.c   |    1 +
- client/session.h   |    1 +
- client/sync.c      |    1 +
- client/transfer.c  |    1 +
- client/transfer.h  |    1 +
- doc/client-api.txt |    1 +
- 10 files changed, 10 insertions(+), 0 deletions(-)
+ client/sync.c |   76 +++++++++++++++++++++++++++------------------------------
+ 1 files changed, 36 insertions(+), 40 deletions(-)
 
-diff --git a/client/ftp.c b/client/ftp.c
-index 15b2b48..5bf7da9 100644
---- a/client/ftp.c
-+++ b/client/ftp.c
-@@ -3,6 +3,7 @@
-  *  OBEX Client
-  *
-  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2011  BMW Car IT GmbH. All rights reserved.
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-diff --git a/client/manager.c b/client/manager.c
-index 219da68..e33cb12 100644
---- a/client/manager.c
-+++ b/client/manager.c
-@@ -3,6 +3,7 @@
-  *  OBEX Client
-  *
-  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2011  BMW Car IT GmbH. All rights reserved.
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-diff --git a/client/opp.c b/client/opp.c
-index 5379222..338e69f 100644
---- a/client/opp.c
-+++ b/client/opp.c
-@@ -3,6 +3,7 @@
-  *  OBEX Client
-  *
-  *  Copyright (C) 2011 Intel Corporation
-+ *  Copyright (C) 2011  BMW Car IT GmbH. All rights reserved.
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-diff --git a/client/pbap.c b/client/pbap.c
-index da2c22d..bd3d320 100644
---- a/client/pbap.c
-+++ b/client/pbap.c
-@@ -4,6 +4,7 @@
-  *
-  *  Copyright (C) 2007-2010  Intel Corporation
-  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2011  BMW Car IT GmbH. All rights reserved.
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-diff --git a/client/session.c b/client/session.c
-index 98edaae..4fac72e 100644
---- a/client/session.c
-+++ b/client/session.c
-@@ -3,6 +3,7 @@
-  *  OBEX Client
-  *
-  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2011  BMW Car IT GmbH. All rights reserved.
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-diff --git a/client/session.h b/client/session.h
-index 2078e24..65fe586 100644
---- a/client/session.h
-+++ b/client/session.h
-@@ -3,6 +3,7 @@
-  *  OBEX Client
-  *
-  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2011  BMW Car IT GmbH. All rights reserved.
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
 diff --git a/client/sync.c b/client/sync.c
-index eb65c61..dfd69c1 100644
+index 25600e6..eb65c61 100644
 --- a/client/sync.c
 +++ b/client/sync.c
-@@ -4,6 +4,7 @@
-  *
-  *  Copyright (C) 2007-2010  Intel Corporation
-  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2011  BMW Car IT GmbH. All rights reserved.
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-diff --git a/client/transfer.c b/client/transfer.c
-index 3fa848a..a275367 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -3,6 +3,7 @@
-  *  OBEX Client
-  *
-  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2011  BMW Car IT GmbH. All rights reserved.
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-diff --git a/client/transfer.h b/client/transfer.h
-index afe23bb..4edaef6 100644
---- a/client/transfer.h
-+++ b/client/transfer.h
-@@ -3,6 +3,7 @@
-  *  OBEX Client
-  *
-  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2011  BMW Car IT GmbH. All rights reserved.
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index e0dd29d..feabbb9 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -2,6 +2,7 @@ OBEX client API description
- ***************************
+@@ -84,40 +84,21 @@ static DBusMessage *sync_setlocation(DBusConnection *connection,
+ 	return dbus_message_new_method_return(message);
+ }
  
- Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-+Copyright (C) 2011  BMW Car IT GmbH. All rights reserved.
+-static void sync_getphonebook_callback(struct obc_session *session,
+-					GError *err,
+-					const struct obc_transfer *transfer,
+-					void *user_data)
+-{
+-	struct sync_data *sync = user_data;
+-	DBusMessage *reply;
+-	const void *buf;
+-
+-	if (err) {
+-		reply = g_dbus_create_error(sync->msg,
+-						"org.openobex.Error.Failed",
+-						"%s", err->message);
+-		goto done;
+-	}
+-
+-	reply = dbus_message_new_method_return(sync->msg);
+-
+-	buf = obc_transfer_get_buffer(transfer);
+-
+-	dbus_message_append_args(reply,
+-		DBUS_TYPE_STRING, &buf,
+-		DBUS_TYPE_INVALID);
+-
+-done:
+-	g_dbus_send_message(conn, reply);
+-	dbus_message_unref(sync->msg);
+-	sync->msg = NULL;
+-}
+-
+ static DBusMessage *sync_getphonebook(DBusConnection *connection,
+ 			DBusMessage *message, void *user_data)
+ {
+ 	struct sync_data *sync = user_data;
++	DBusMessage *reply;
++	struct obc_transfer *transfer;
++	const char *path;
++	const char *targetfile;
++
++	if (dbus_message_get_args(message, NULL,
++					DBUS_TYPE_STRING, &targetfile,
++					DBUS_TYPE_INVALID) == FALSE)
++		return g_dbus_create_error(message,
++				"org.openobex.Error.InvalidArguments",
++				"Invalid arguments in method call");
  
+ 	if (sync->msg)
+ 		return g_dbus_create_error(message,
+@@ -128,14 +109,19 @@ static DBusMessage *sync_getphonebook(DBusConnection *connection,
+ 		sync->phonebook_path = g_strdup("telecom/pb.vcf");
  
- Client hierarchy
+ 	if (obc_session_get(sync->session, "phonebook", sync->phonebook_path,
+-				NULL, NULL, 0, sync_getphonebook_callback,
+-				sync, NULL) < 0)
++				targetfile, NULL, 0, NULL, NULL, &transfer) < 0)
+ 		return g_dbus_create_error(message,
+ 			ERROR_INF ".Failed", "Failed");
+ 
+-	sync->msg = dbus_message_ref(message);
++	path = obc_transfer_get_path(transfer);
++
++	reply = dbus_message_new_method_return(message);
+ 
+-	return NULL;
++	dbus_message_append_args(reply,
++			DBUS_TYPE_OBJECT_PATH, &path,
++			DBUS_TYPE_INVALID);
++
++	return reply;
+ }
+ 
+ static DBusMessage *sync_putphonebook(DBusConnection *connection,
+@@ -144,6 +130,9 @@ static DBusMessage *sync_putphonebook(DBusConnection *connection,
+ 	struct sync_data *sync = user_data;
+ 	const char *buf;
+ 	char *buffer;
++	DBusMessage *reply;
++	struct obc_transfer *transfer;
++	const char *path;
+ 
+ 	if (dbus_message_get_args(message, NULL,
+ 			DBUS_TYPE_STRING, &buf,
+@@ -158,19 +147,26 @@ static DBusMessage *sync_putphonebook(DBusConnection *connection,
+ 	buffer = g_strdup(buf);
+ 
+ 	if (obc_session_put_mem(sync->session, sync->phonebook_path,
+-				buffer, strlen(buffer), g_free, NULL) < 0)
++				buffer, strlen(buffer), g_free,
++				&transfer) < 0)
+ 		return g_dbus_create_error(message,
+ 				ERROR_INF ".Failed", "Failed");
+ 
+-	return dbus_message_new_method_return(message);
++	path = obc_transfer_get_path(transfer);
++
++	reply = dbus_message_new_method_return(message);
++
++	dbus_message_append_args(reply,
++			DBUS_TYPE_OBJECT_PATH, &path,
++			DBUS_TYPE_INVALID);
++
++	return reply;
+ }
+ 
+ static GDBusMethodTable sync_methods[] = {
+ 	{ "SetLocation", "s", "", sync_setlocation },
+-	{ "GetPhonebook", "", "s", sync_getphonebook,
+-			G_DBUS_METHOD_FLAG_ASYNC },
+-	{ "PutPhonebook", "s", "", sync_putphonebook,
+-			G_DBUS_METHOD_FLAG_ASYNC },
++	{ "GetPhonebook", "s", "o", sync_getphonebook },
++	{ "PutPhonebook", "s", "o", sync_putphonebook },
+ 	{}
+ };
+ 
 -- 
 1.7.6.4
 
