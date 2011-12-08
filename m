@@ -1,66 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 8 Dec 2011 10:26:51 +0200
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv2 5/6] Bluetooth: Correct packet len calculation
-Message-ID: <20111208082645.GA28028@aemeltch-MOBL1>
-References: <1323266216-25261-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1323266216-25261-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1323332283.1965.12.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1323332283.1965.12.camel@aeonflux>
+Message-ID: <1323332741.1965.17.camel@aeonflux>
+Subject: Re: [PATCH 1/2] Bluetooth: Clear RFCOMM session timer when
+ disconnecting last channel
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	pkrystad@codeaurora.org
+Date: Thu, 08 Dec 2011 10:25:41 +0200
+In-Reply-To: <1323217407-2490-2-git-send-email-mathewm@codeaurora.org>
+References: <1323217407-2490-1-git-send-email-mathewm@codeaurora.org>
+	 <1323217407-2490-2-git-send-email-mathewm@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Mat,
 
-On Thu, Dec 08, 2011 at 10:18:03AM +0200, Marcel Holtmann wrote:
-> Hi Andrei,
+> When the last RFCOMM data channel is closed, a timer is normally set
+> up to disconnect the control channel at a later time.  If the control
+> channel disconnect command is sent with the timer pending, the timer
+> needs to be cancelled.
 > 
-> > Remove unneeded skb_pull and correct packet length calculation
-> > removing magic number.
-> > ---
-> >  net/bluetooth/hci_event.c |    5 ++---
-> >  1 files changed, 2 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index cfccf7e..21c1bf0 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -2268,8 +2268,6 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
-> >  	struct hci_ev_num_comp_pkts *ev = (void *) skb->data;
-> >  	int i;
-> >  
-> > -	skb_pull(skb, sizeof(*ev));
-> > -
-> >  	BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
-> >  
-> >  	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_PACKET_BASED) {
-> > @@ -2277,7 +2275,8 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
-> >  		return;
-> >  	}
-> >  
-> > -	if (skb->len < ev->num_hndl * 4) {
-> > +	if (skb->len < ev->num_hndl * sizeof(struct hci_comp_pkts_info) +
-> > +			sizeof(*ev)) {
-> >  		BT_DBG("%s bad parameters", hdev->name);
-> >  		return;
-> >  	}
+> If the timer is not cancelled in this situation, the reference
+> counting logic for the RFCOMM session does not work correctly when the
+> remote device closes the L2CAP connection.  The session is freed at
+> the wrong time, leading to a kernel panic.
 > 
-> actually this check is not enough. You need to make this two-fold.
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/rfcomm/core.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 > 
-> 	if (skb->len < sizeof(*ev)) {
+> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> index 4e32e18..2d28dfe 100644
+> --- a/net/bluetooth/rfcomm/core.c
+> +++ b/net/bluetooth/rfcomm/core.c
+> @@ -1146,6 +1146,7 @@ static int rfcomm_recv_ua(struct rfcomm_session *s, u8 dlci)
+>  			if (list_empty(&s->dlcs)) {
+>  				s->state = BT_DISCONN;
+>  				rfcomm_send_disc(s, 0);
+> +				rfcomm_session_clear_timer(s);
+>  			}
 
-maybe:
+I am not 100% convinced that this is correct, but going through the code
+for over an hour I could not come up with a case where this would cause
+problems. It is just a feeling and with RFCOMM that could be just a
+bogus feeling ;)
 
-if (skb->len < sizeof(*ev) || (...)) 
-	return;
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-> This needs to be checked first. Otherwise you are accessing ev->num_hndl
-> before even knowing that it is valid. A malicious device could otherwise
-> sneak in some weird behavior.
+Regards
 
-Agree.
-Best regards 
-Andrei Emeltchenko 
+Marcel
+
+
