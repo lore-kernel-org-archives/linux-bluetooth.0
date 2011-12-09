@@ -1,65 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <4EE22B99.10600@samsung.com>
-Date: Sat, 10 Dec 2011 00:39:05 +0900
-From: Chanyeol Park <chanyeol.park@samsung.com>
-MIME-version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?B?7ISc7Zi47LKg?= <hocheol.seo@samsung.com>,
-	=?UTF-8?B?7Y6464+E?= =?UTF-8?B?7ZiE?= <dh79.pyun@samsung.com>
-Subject: How about adding Dbus log in gdbus?
-Content-type: text/plain; charset=UTF-8; format=flowed
+MIME-Version: 1.0
+In-Reply-To: <20111209132206.GA31478@x220>
+References: <1323349678-17905-1-git-send-email-bulislaw@linux.com>
+	<1323349678-17905-3-git-send-email-bulislaw@linux.com>
+	<20111209132206.GA31478@x220>
+Date: Fri, 9 Dec 2011 14:58:08 +0100
+Message-ID: <CAPGrrxU+DhEtjXt_wzkdV9q2Wycz3j4=48vxis0KZruFBATomA@mail.gmail.com>
+Subject: Re: [PATCH obexd 3/6] Add support for SetFolder in MAP client
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello
+On Fri, Dec 9, 2011 at 2:22 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Bartosz,
+>
+> On Thu, Dec 08, 2011, Bartosz Szatkowski wrote:
+>> ---
+>>  client/map.c       |   56 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  doc/client-api.txt |    5 +++-
+>>  2 files changed, 60 insertions(+), 1 deletions(-)
+>
+> The first two patches have been applied, but this had issues:
+>
+>> +#define ERROR_INF MAP_INTERFACE ".Error"
+>> +#define ERROR_FAILED_PATH "org.openobex.Error.Failed"
+>
+> First of all, this is not a path or an interface. It's the error name.
+> Secondly, do you really need these defines since in some places you
+> spell out the name inline in others you use a define. E.g. here it's
+> inline:
+>
+>> +     else if (err_code != G_OBEX_RSP_SUCCESS)
+>> +             reply = g_dbus_create_error(map->msg,
+>> +                                             "org.openobex.Error.Response",
+>> +                                             "%s (0x%02x)",
+>> +                                             g_obex_strerror(err_code),
+>> +                                             err_code);
+>
+> So please be consistent. Also think about whether we need MAP specific
+> errors at all or if we can just use generic ones for the entire client
+> (and maybe server too).
 
-How about adding dbus log in gdbus when we get method call from the 
-remote peer(application)?
+Ok, so for keeping things consistent with most common style in client
+code, I'll go with inlined "org.openobex.Error.*"
 
-Personally It could be very useful for begginer.Based on it many people 
-could understand
-call procedure easily. As far as I know this was removed when bluez 
-3.xx. but compared to the days,
-recently many dbus APIs have been introduced.
-
-But I know it is relatetd to many projects(bluez,obexd,connman,ofono).
-So we need to consider a few things such as dependency managing and user 
-preference.
-because curren gdbus does not have dependency with log.c/log.h.
-
-Is there good idea about this?
-
-
-BR
-Chanyeol Park.
-
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 8bc12f5..ac7f448 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -33,9 +33,7 @@
-
-  #include "gdbus.h"
-
--#define info(fmt...)
--#define error(fmt...)
--#define debug(fmt...)
-+#include "log.h"
-
-  struct generic_data {
-         unsigned int refcount;
-@@ -444,6 +442,9 @@ static DBusHandlerResult 
-generic_message(DBusConnection *connection,
-                                                 iface->user_data) == TRUE)
-                         return DBUS_HANDLER_RESULT_HANDLED;
-
-+               DBG("%s: %s.%s()",dbus_message_get_path(message),
-+                                               iface->name,method->name);
-+
-                 return process_message(connection, message, method,
-                                                         iface->user_data);
-         }
-
-
-Thanks
-Chanyeol Park
+-- 
+Pozdrowienia - Cheers,
+Bartosz Szatkowski
