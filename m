@@ -1,22 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Health Thermometer Profile patches
-Date: Fri,  9 Dec 2011 19:18:58 +0100
-Message-Id: <1323454744-14589-1-git-send-email-sancane@gmail.com>
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH] att.h: Add client characteristic configuration bit fields
+Date: Fri,  9 Dec 2011 19:03:43 +0100
+Message-Id: <1323453823-7905-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a new set of patches wich implement most of the features in
-HTP. GATT reconnections are the only missing feature up to now.
+---
+ attrib/att.h |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-These patches depend on the patch:
-att.h: Add client characteristic configuration bit fields
+diff --git a/attrib/att.h b/attrib/att.h
+index 851e6ba..dc266f1 100644
+--- a/attrib/att.h
++++ b/attrib/att.h
+@@ -106,6 +106,9 @@
+ #define ATT_CHAR_PROPER_AUTH			0x40
+ #define ATT_CHAR_PROPER_EXT_PROPER		0x80
+ 
++/* Client Characteristic Configuration bit field */
++#define ATT_CLIENT_CHAR_CONF_NOTIFICATION	0x0001
++#define ATT_CLIENT_CHAR_CONF_INDICATION		0x0002
+ 
+ #define ATT_MAX_MTU				256
+ #define ATT_DEFAULT_L2CAP_MTU			48
+-- 
+1.7.8
 
-Changes include next patches:
-[PATCH 1/6] thermometer.c: Implement SetProperty D-Bus method
-[PATCH 2/6] thermometer.c: Confiure C.C.C descriptor during the
-[PATCH 3/6] thermometer.c: Process measurement interval indications
-[PATCH 4/6] thermometer.c: Fix possible null pointer deference
-[PATCH 5/6] thermometer.c: Fix bad read operation when time stamp isn't provided
-[PATCH 6/6] thermometer.c: Use system types instead of GLIB ones.
