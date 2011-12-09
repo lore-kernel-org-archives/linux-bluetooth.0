@@ -1,38 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20111207145851.GA19842@x220>
-References: <1321973388-16300-1-git-send-email-sancane@gmail.com>
-	<1321973388-16300-2-git-send-email-sancane@gmail.com>
-	<20111207145851.GA19842@x220>
-Date: Fri, 9 Dec 2011 11:02:43 +0100
-Message-ID: <CACLukzJS4e3BOzmsC=scGZ93A-gHig6wTdnBpbRuYEecbJ0mOQ@mail.gmail.com>
-Subject: Re: [PATCH 1/6] Implement SetProperty D-Bus method
-From: Santiago Carot <sancane@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>,
+Date: Fri, 9 Dec 2011 10:48:28 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>
+Cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
 	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH hciemu v2 1/2] Process Read Local AMP Info in hciemu
+Message-ID: <20111209084828.GA24969@x220>
+References: <1323334477-32179-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20111208094032.GA28204@x220>
+ <4EE0D0A0.2000401@linux.intel.com>
+ <20111209081637.GB7256@aemeltch-MOBL1>
+ <4EE1CA0F.2040402@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <4EE1CA0F.2040402@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Frederic,
 
-2011/12/7 Johan Hedberg <johan.hedberg@gmail.com>:
-> Hi Santiago,
->
-> On Tue, Nov 22, 2011, Santiago Carot-Nemesio wrote:
->> ---
->>  thermometer/thermometer.c |  118 +++++++++++++++++++++++++++++++++++++-------
->>  1 files changed, 99 insertions(+), 19 deletions(-)
->
-> Is this patch set still valid? If so, could you resend it with proper
-> commit messages. "Implement SetProperty D-Bus method" is much too
-> generic. It'd be nice if you could start using the convention we've
-> tried to adopt where we add context dependent prefixes to the message
-> summaries. In this case "thermometer: Add SetProperty D-Bus method"
-> would have already given enough of context to not have to look at the
-> patch content to know what it does.
->
+On Fri, Dec 09, 2011, Frederic Danis wrote:
+> >>fdanis@fdanis-linux:bluez (master %)$ make
+> >>make --no-print-directory all-am
+> >>   CC     test/hciemu.o
+> >>cc1: warnings being treated as errors
+> >>test/hciemu.c: In function â€˜hci_host_controlâ€™:
+> >>test/hciemu.c:431: error: dereferencing pointer â€˜({anonymous})â€™ does
+> >>break strict-aliasing rules
+> >>test/hciemu.c:431: note: initialized from here
+> >>make[1]: *** [test/hciemu.o] Error 1
+> >>make: *** [all] Error 2
+> >
+> >Cannot reproduce this problem on my Ubuntu 11.04. Are you sure the error is
+> >attributed to my patch?
+> 
+> Yes, I replaced line 431 by:
+> 	sa.sin_port = ba.b[4];
+> and there is no more build error.
 
-Discard this set of patches for now, I'll prepare a new set after
-fixing the magic number issue in GATT.
-Regards.
+Ok, so the line *is* correct but the function reported by gcc isn't.
+This particular line was last changed way back in 2005 (check with git
+blame) by a commit from Marcel so I don't see how your issue could have
+been caused by recent changes. As I mentioned in the other email I'd
+expect you to provide a proper patch for this with a good commit message
+that explains why it is needed.
+
+Johan
