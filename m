@@ -1,31 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
+Message-id: <4EE22B99.10600@samsung.com>
+Date: Sat, 10 Dec 2011 00:39:05 +0900
+From: Chanyeol Park <chanyeol.park@samsung.com>
+MIME-version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH] att.h: Add client characteristic configuration bit fields
-Date: Fri,  9 Dec 2011 19:03:43 +0100
-Message-Id: <1323453823-7905-1-git-send-email-sancane@gmail.com>
+Cc: =?UTF-8?B?7ISc7Zi47LKg?= <hocheol.seo@samsung.com>,
+	=?UTF-8?B?7Y6464+E?= =?UTF-8?B?7ZiE?= <dh79.pyun@samsung.com>
+Subject: How about adding Dbus log in gdbus?
+Content-type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- attrib/att.h |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+Hello
 
-diff --git a/attrib/att.h b/attrib/att.h
-index 851e6ba..dc266f1 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
-@@ -106,6 +106,9 @@
- #define ATT_CHAR_PROPER_AUTH			0x40
- #define ATT_CHAR_PROPER_EXT_PROPER		0x80
- 
-+/* Client Characteristic Configuration bit field */
-+#define ATT_CLIENT_CHAR_CONF_NOTIFICATION	0x0001
-+#define ATT_CLIENT_CHAR_CONF_INDICATION		0x0002
- 
- #define ATT_MAX_MTU				256
- #define ATT_DEFAULT_L2CAP_MTU			48
--- 
-1.7.8
+How about adding dbus log in gdbus when we get method call from the 
+remote peer(application)?
 
+Personally It could be very useful for begginer.Based on it many people 
+could understand
+call procedure easily. As far as I know this was removed when bluez 
+3.xx. but compared to the days,
+recently many dbus APIs have been introduced.
+
+But I know it is relatetd to many projects(bluez,obexd,connman,ofono).
+So we need to consider a few things such as dependency managing and user 
+preference.
+because curren gdbus does not have dependency with log.c/log.h.
+
+Is there good idea about this?
+
+
+BR
+Chanyeol Park.
+
+diff --git a/gdbus/object.c b/gdbus/object.c
+index 8bc12f5..ac7f448 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -33,9 +33,7 @@
+
+  #include "gdbus.h"
+
+-#define info(fmt...)
+-#define error(fmt...)
+-#define debug(fmt...)
++#include "log.h"
+
+  struct generic_data {
+         unsigned int refcount;
+@@ -444,6 +442,9 @@ static DBusHandlerResult 
+generic_message(DBusConnection *connection,
+                                                 iface->user_data) == TRUE)
+                         return DBUS_HANDLER_RESULT_HANDLED;
+
++               DBG("%s: %s.%s()",dbus_message_get_path(message),
++                                               iface->name,method->name);
++
+                 return process_message(connection, message, method,
+                                                         iface->user_data);
+         }
+
+
+Thanks
+Chanyeol Park
