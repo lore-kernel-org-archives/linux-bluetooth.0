@@ -1,102 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bartosz Szatkowski <bulislaw@linux.com>
+Date: Mon, 12 Dec 2011 12:16:08 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH obexd 1/4] Add support for SetFolder in MAP client
-Date: Mon, 12 Dec 2011 16:31:04 +0100
-Message-Id: <1323703867-20577-1-git-send-email-bulislaw@linux.com>
+Subject: Re: [PATCH 1/8] Bluetooth: Add structures for the new LTK exchange
+ messages
+Message-ID: <20111212151608.GA10459@samus>
+References: <1323218892-15785-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1323218892-15785-2-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1323218892-15785-2-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- client/map.c       |   56 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- doc/client-api.txt |    5 +++-
- 2 files changed, 60 insertions(+), 1 deletions(-)
+Hi Gustavo,
 
-diff --git a/client/map.c b/client/map.c
-index bee49c5..51a7711 100644
---- a/client/map.c
-+++ b/client/map.c
-@@ -49,7 +49,63 @@ struct map_data {
- 
- static DBusConnection *conn = NULL;
- 
-+static void simple_cb(GObex *obex, GError *err, GObexPacket *rsp,
-+							gpointer user_data)
-+{
-+	DBusMessage *reply;
-+	struct map_data *map = user_data;
-+	guint8 err_code = g_obex_packet_get_operation(rsp, NULL);
-+
-+	if (err != NULL)
-+		reply = g_dbus_create_error(map->msg,
-+						"org.openobex.Error.Failed",
-+						"%s", err->message);
-+	else if (err_code != G_OBEX_RSP_SUCCESS)
-+		reply = g_dbus_create_error(map->msg,
-+						"org.openobex.Error.Failed",
-+						"%s (0x%02x)",
-+						g_obex_strerror(err_code),
-+						err_code);
-+	else
-+		reply = dbus_message_new_method_return(map->msg);
-+
-+	g_dbus_send_message(conn, reply);
-+	dbus_message_unref(map->msg);
-+}
-+
-+static DBusMessage *map_setpath(DBusConnection *connection,
-+					DBusMessage *message, void *user_data)
-+{
-+	struct map_data *map = user_data;
-+	const char *folder;
-+	GObex *obex;
-+	GError *err = NULL;
-+
-+	if (dbus_message_get_args(message, NULL, DBUS_TYPE_STRING, &folder,
-+						DBUS_TYPE_INVALID) == FALSE)
-+		return g_dbus_create_error(message,
-+					"org.openobex.Error.InvalidArguments",
-+					NULL);
-+
-+	obex = obc_session_get_obex(map->session);
-+
-+	g_obex_setpath(obex, folder, simple_cb, map, &err);
-+	if (err != NULL) {
-+		DBusMessage *reply;
-+		reply =  g_dbus_create_error(message,
-+						"org.openobex.Error.Failed",
-+						"%s", err->message);
-+		g_error_free(err);
-+		return reply;
-+	}
-+
-+	map->msg = dbus_message_ref(message);
-+
-+	return NULL;
-+}
-+
- static GDBusMethodTable map_methods[] = {
-+	{ "SetFolder",	"s",	"",	map_setpath, G_DBUS_METHOD_FLAG_ASYNC },
- 	{ }
- };
- 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index ee8951f..fb5a8b2 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -258,7 +258,10 @@ Service		org.openobex.client
- Interface	org.openobex.MessageAccess
- Object path	[variable prefix]/{session0,session1,...}
- 
--Methods
-+Methods		void SetFolder(string name)
-+
-+			Set working directory for current session, *name* may
-+			be the directory name or '..[/dir]'.
- 
- Transfer hierarchy
- ==================
+On 21:48 Tue 06 Dec, Vinicius Costa Gomes wrote:
+> This defines two in the kernel side of BlueZ two new messages, one
+> event that will inform userspace that a new Long Term Key was
+> exchanged and one that will allow userspace to load LTKs into
+> the kernel.
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> ---
+>  include/net/bluetooth/mgmt.h |   21 +++++++++++++++++++++
+>  1 files changed, 21 insertions(+), 0 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index 3b68806..0f100fa9 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -264,6 +264,21 @@ struct mgmt_cp_user_passkey_neg_reply {
+>  	bdaddr_t bdaddr;
+>  } __packed;
+>  
+> +struct mgmt_ltk_info {
+> +	bdaddr_t bdaddr;
+> +	__u8 pin_len;
+> +	__u8 enc_size;
+> +	__le16 ediv;
+> +	__u8 rand[8];
+> +	__u8 val[16];
+> +} __packed;
+
+As per a discussion on IRC right now, I will change this to include
+authenticated/unauthenticated information and remove pin_len.
+
+Please ignore this series.
+
+> +
+> +#define MGMT_OP_LOAD_LONG_TERM_KEYS	0x0023
+> +struct mgmt_cp_load_long_term_keys {
+> +	__u16 key_count;
+> +	struct mgmt_ltk_info keys[0];
+> +} __packed;
+> +
+>  #define MGMT_EV_CMD_COMPLETE		0x0001
+>  struct mgmt_ev_cmd_complete {
+>  	__le16 opcode;
+> @@ -363,3 +378,9 @@ struct mgmt_ev_device_unblocked {
+>  struct mgmt_ev_user_passkey_request {
+>  	bdaddr_t bdaddr;
+>  } __packed;
+> +
+> +#define MGMT_EV_NEW_LONG_TERM_KEY	0x0018
+> +struct mgmt_ev_new_long_term_key {
+> +	__u8 store_hint;
+> +	struct mgmt_ltk_info key;
+> +} __packed;
+> -- 
+> 1.7.8
+> 
+
+Cheers,
 -- 
-1.7.4.1
-
+Vinicius
