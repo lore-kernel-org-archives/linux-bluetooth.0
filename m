@@ -2,72 +2,74 @@ Return-Path: <cyrus@holtmann.org>
 From: Bartosz Szatkowski <bulislaw@linux.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH obexd 3/4] Add basic support for MAP folder listing
-Date: Mon, 12 Dec 2011 16:31:06 +0100
-Message-Id: <1323703867-20577-3-git-send-email-bulislaw@linux.com>
-In-Reply-To: <1323703867-20577-1-git-send-email-bulislaw@linux.com>
-References: <1323703867-20577-1-git-send-email-bulislaw@linux.com>
+Subject: [PATCH obexd 1/4] Add support for SetFolder in MAP client
+Date: Mon, 12 Dec 2011 16:31:04 +0100
+Message-Id: <1323703867-20577-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For now just basic functionality - returning whole listing as a string
-(no parsing for now) and no apparams handling.
 ---
- client/map.c    |   54 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- test/map-client |    5 +++++
- 2 files changed, 58 insertions(+), 1 deletions(-)
+ client/map.c       |   56 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ doc/client-api.txt |    5 +++-
+ 2 files changed, 60 insertions(+), 1 deletions(-)
 
 diff --git a/client/map.c b/client/map.c
-index 51a7711..0511e4c 100644
+index bee49c5..51a7711 100644
 --- a/client/map.c
 +++ b/client/map.c
-@@ -104,8 +104,60 @@ static DBusMessage *map_setpath(DBusConnection *connection,
- 	return NULL;
- }
+@@ -49,7 +49,63 @@ struct map_data {
  
-+static void buffer_cb(struct obc_session *session, GError *err,
-+							void *user_data)
+ static DBusConnection *conn = NULL;
+ 
++static void simple_cb(GObex *obex, GError *err, GObexPacket *rsp,
++							gpointer user_data)
 +{
-+	struct obc_transfer *transfer = obc_session_get_transfer(session);
-+	struct map_data *map = user_data;
 +	DBusMessage *reply;
-+	const char *buf;
-+	int size;
++	struct map_data *map = user_data;
++	guint8 err_code = g_obex_packet_get_operation(rsp, NULL);
 +
-+	if (err != NULL) {
++	if (err != NULL)
 +		reply = g_dbus_create_error(map->msg,
 +						"org.openobex.Error.Failed",
 +						"%s", err->message);
-+		goto done;
-+	}
++	else if (err_code != G_OBEX_RSP_SUCCESS)
++		reply = g_dbus_create_error(map->msg,
++						"org.openobex.Error.Failed",
++						"%s (0x%02x)",
++						g_obex_strerror(err_code),
++						err_code);
++	else
++		reply = dbus_message_new_method_return(map->msg);
 +
-+	buf = obc_transfer_get_buffer(transfer, &size);
-+	if (size == 0)
-+		buf = "";
-+
-+	reply = g_dbus_create_reply(map->msg, DBUS_TYPE_STRING, &buf,
-+							DBUS_TYPE_INVALID);
-+
-+	obc_transfer_clear_buffer(transfer);
-+
-+done:
 +	g_dbus_send_message(conn, reply);
 +	dbus_message_unref(map->msg);
-+	obc_transfer_unregister(transfer);
 +}
 +
-+static DBusMessage *map_get_folder_listing(DBusConnection *connection,
++static DBusMessage *map_setpath(DBusConnection *connection,
 +					DBusMessage *message, void *user_data)
 +{
 +	struct map_data *map = user_data;
-+	int err;
++	const char *folder;
++	GObex *obex;
++	GError *err = NULL;
 +
-+	err = obc_session_get(map->session, "x-obex/folder-listing",
-+							NULL, NULL, NULL, 0,
-+							buffer_cb, map);
-+	if (err < 0)
-+		return g_dbus_create_error(message, "org.openobex.Error.Failed",
-+									NULL);
++	if (dbus_message_get_args(message, NULL, DBUS_TYPE_STRING, &folder,
++						DBUS_TYPE_INVALID) == FALSE)
++		return g_dbus_create_error(message,
++					"org.openobex.Error.InvalidArguments",
++					NULL);
++
++	obex = obc_session_get_obex(map->session);
++
++	g_obex_setpath(obex, folder, simple_cb, map, &err);
++	if (err != NULL) {
++		DBusMessage *reply;
++		reply =  g_dbus_create_error(message,
++						"org.openobex.Error.Failed",
++						"%s", err->message);
++		g_error_free(err);
++		return reply;
++	}
 +
 +	map->msg = dbus_message_ref(message);
 +
@@ -75,35 +77,26 @@ index 51a7711..0511e4c 100644
 +}
 +
  static GDBusMethodTable map_methods[] = {
--	{ "SetFolder",	"s",	"",	map_setpath, G_DBUS_METHOD_FLAG_ASYNC },
-+	{ "SetFolder",		"s", "",	map_setpath,
-+						G_DBUS_METHOD_FLAG_ASYNC },
-+	{ "GetFolderListing",	"a{ss}", "s",	map_get_folder_listing,
-+						G_DBUS_METHOD_FLAG_ASYNC },
++	{ "SetFolder",	"s",	"",	map_setpath, G_DBUS_METHOD_FLAG_ASYNC },
  	{ }
  };
  
-diff --git a/test/map-client b/test/map-client
-index 5ee4331..bcd2e66 100755
---- a/test/map-client
-+++ b/test/map-client
-@@ -11,6 +11,8 @@ def parse_options():
-                       help="Device to connect", metavar="DEVICE")
-     parser.add_option("-c", "--chdir", dest="new_dir",
-                       help="Change current directory to DIR", metavar="DIR")
-+    parser.add_option("-l", "--lsdir", action="store_true", dest="ls_dir",
-+                      help="List folders in current directory")
-     parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index ee8951f..fb5a8b2 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -258,7 +258,10 @@ Service		org.openobex.client
+ Interface	org.openobex.MessageAccess
+ Object path	[variable prefix]/{session0,session1,...}
  
-     return parser.parse_args()
-@@ -49,4 +51,7 @@ if  __name__ == '__main__':
-     if options.new_dir:
-         set_folder(map, options.new_dir)
- 
-+    if options.ls_dir:
-+        print map.GetFolderListing(dict())
+-Methods
++Methods		void SetFolder(string name)
 +
-     mainloop.run()
++			Set working directory for current session, *name* may
++			be the directory name or '..[/dir]'.
+ 
+ Transfer hierarchy
+ ==================
 -- 
 1.7.4.1
 
