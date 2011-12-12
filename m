@@ -1,52 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Peter Krystad" <pkrystad@codeaurora.org>
-To: "'Johan Hedberg'" <johan.hedberg@gmail.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-References: <1320280606-32677-1-git-send-email-pkrystad@codeaurora.org> <1320280606-32677-3-git-send-email-pkrystad@codeaurora.org> <20111212104257.GA12316@x220>
-In-Reply-To: <20111212104257.GA12316@x220>
-Subject: RE: [PATCH v3 bluez 2/2] Add A2MP definitions
-Date: Mon, 12 Dec 2011 17:01:52 -0800
-Message-ID: <000301ccb932$cd654050$682fc0f0$@org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+In-Reply-To: <20111212110308.GA12769@x220>
+References: <1323686954-11899-1-git-send-email-frederic.danis@linux.intel.com>
+	<20111212110308.GA12769@x220>
+Date: Mon, 12 Dec 2011 23:24:17 +0200
+Message-ID: <CAHMBquUAfvjPas_9RZWf6vG+HDNmmyUY6aFU87GZurH4W5ZZaA@mail.gmail.com>
+Subject: Re: [RFC v4 0/6] Add org.bluez.Telephony interface
+From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
+To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Danis?=
+	<frederic.danis@linux.intel.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan (and Andrei),
+Hi,
 
-Sorry for the delay, I had to wait for an answer to a question.
+>> Second, third and fourth patches remove the telephony drivers (dummy,
+>> maemo5, maemo6 and ofono), functions used by telephony drivers and no
+>> more needed methods of org.bluez.Headset interface.
+>
+> Could you please add these descriptions (and possibly even more thorough
+> explanations) to the commit messages of each patch. We really should try
+> to avoid one-line commit messages for all but the most trivial patches
+> (and even for those I wont complain if you have longer explanations).
+> Remember that the summary line should be a very short summary of *what*
+> the patch does whereas the rest of the message can elaborate on it (if
+> necessary) but more importantly explain *why* the patch was needed and
+> how it goes about solving some issue.
 
-The answer is I really can only submit new files with the exact license text in my
-original patchset.
+I also would be interested to know justification of why removing those
+drivers is needed and what it fixes.
 
-Per Andrei's suggestion I will submit revised patchsets with all of the A2MP definitions
-added to the existing l2cap.h. 
-
-Peter.
-
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org]
-> On Behalf Of Johan Hedberg
-> Hi Peter,
-> 
-> On Wed, Nov 02, 2011, Peter Krystad wrote:
-> > + *	This program is free software; you can redistribute it and/or modify
-> > + *	it under the terms of the GNU General Public License version 2 and
-> > + *	only version 2 as published by the Free Software Foundation.
-> 
-> I'm still waiting for an update from you on this licensing detail issue.
-> As Marcel said we'd like to keep the license terms of all libbluetooth
-> (and also bluez user-space for that matter) consistent. Since you're
-> already contributing code under "GPL v2 or later" (for the existing .c
-> and .h files) would it be possible for you to use that for all parts of
-> your patches?
-> 
-> Johan
-
---Peter Krystad
-  Employee of Qualcomm Innovation Center, Inc.
-  Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
-
-
+Br,
+Dmitriy
