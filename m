@@ -1,35 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4EE63BC8.5020409@codeaurora.org>
+Date: Mon, 12 Dec 2011 09:37:12 -0800
+From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <20111212110308.GA12769@x220>
-References: <1323686954-11899-1-git-send-email-frederic.danis@linux.intel.com>
-	<20111212110308.GA12769@x220>
-Date: Mon, 12 Dec 2011 23:24:17 +0200
-Message-ID: <CAHMBquUAfvjPas_9RZWf6vG+HDNmmyUY6aFU87GZurH4W5ZZaA@mail.gmail.com>
-Subject: Re: [RFC v4 0/6] Add org.bluez.Telephony interface
-From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Danis?=
-	<frederic.danis@linux.intel.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+CC: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH 1/8] Bluetooth: Add structures for the new LTK exchange
+ messages
+References: <1323218892-15785-1-git-send-email-vinicius.gomes@openbossa.org> <1323218892-15785-2-git-send-email-vinicius.gomes@openbossa.org> <4EDFA4C6.4030201@codeaurora.org> <20111212130750.GA14194@samus>
+In-Reply-To: <20111212130750.GA14194@samus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Vinicius, Johan,
 
->> Second, third and fourth patches remove the telephony drivers (dummy,
->> maemo5, maemo6 and ofono), functions used by telephony drivers and no
->> more needed methods of org.bluez.Headset interface.
+On 12/12/2011 5:07 AM, Vinicius Costa Gomes wrote:
+> Hi Brian,
 >
-> Could you please add these descriptions (and possibly even more thorough
-> explanations) to the commit messages of each patch. We really should try
-> to avoid one-line commit messages for all but the most trivial patches
-> (and even for those I wont complain if you have longer explanations).
-> Remember that the summary line should be a very short summary of *what*
-> the patch does whereas the rest of the message can elaborate on it (if
-> necessary) but more importantly explain *why* the patch was needed and
-> how it goes about solving some issue.
+> On 09:39 Wed 07 Dec, Brian Gix wrote:
+>> >  Hi Vinicius,
+>> >
+>> >  On 12/6/2011 4:48 PM, Vinicius Costa Gomes wrote:
+>>> >  >This defines two in the kernel side of BlueZ two new messages, one
+>>> >  >event that will inform userspace that a new Long Term Key was
+>>> >  >exchanged and one that will allow userspace to load LTKs into
+>>> >  >the kernel.
+>>> >  >
+>>> >  >Acked-by: Marcel Holtmann<marcel@holtmann.org>
+>>> >  >Signed-off-by: Vinicius Costa Gomes<vinicius.gomes@openbossa.org>
+>>> >  >---
+>>> >  >    include/net/bluetooth/mgmt.h |   21 +++++++++++++++++++++
+>>> >  >    1 files changed, 21 insertions(+), 0 deletions(-)
+>>> >  >
+>>> >  >diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+>>> >  >index 3b68806..0f100fa9 100644
+>>> >  >--- a/include/net/bluetooth/mgmt.h
+>>> >  >+++ b/include/net/bluetooth/mgmt.h
+>>> >  >@@ -264,6 +264,21 @@ struct mgmt_cp_user_passkey_neg_reply {
+>>> >  >    	bdaddr_t bdaddr;
+>>> >  >    } __packed;
+>>> >  >
+>>> >  >+struct mgmt_ltk_info {
+>>> >  >+	bdaddr_t bdaddr;
+>>> >  >+	__u8 pin_len;
+>>> >  >+	__u8 enc_size;
+>>> >  >+	__le16 ediv;
+>>> >  >+	__u8 rand[8];
+>>> >  >+	__u8 val[16];
+>>> >  >+} __packed;
+>> >
+>> >  I think we definitely want to store the auth level (octet) that was
+>> >  used to generate this key and/or the sec_level. Some profiles may
+>> >  require MITM (high sec_level) and from this key definition, there is
+>> >  no way to tell if it is Medium (no MITM) or High.
+>> >
+> Yeah, I was thinking about infering the security level using the pin_len
+> field, but that assumption breaks once we have OOB. I will add this
+> field.
+>
 
-I also would be interested to know justification of why removing those
-drivers is needed and what it fixes.
 
-Br,
-Dmitriy
+Sorry I was not on the IRC when you were discussing the SMP-LTK 
+communication between Kernel and BluZ, but I was copied on the 
+conversation from a colleague.
+
+I think everything you guys said was sound.  An "authenticated" field 
+that is simply 0 or 1 should be sufficient for preserving the security 
+level that the key represents.
+
+Also, I have looked at Hemants patch and it looks correct.   It is 
+suitable for either SSP passkey request and entry, or SMP passkey 
+request and entry.
+
+It should have no impact on how we handle LTK communication and storage.
+
+
+
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
