@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC obexd v3 10/20] client-doc: remove agent in favour of transfer signals
-Date: Tue, 13 Dec 2011 17:44:13 +0100
-Message-ID: <1323794663-2711-11-git-send-email-mikel.astiz@bmw-carit.de>
+Subject: [RFC obexd v3 09/20] client: replace parameter dict with conventional ones
+Date: Tue, 13 Dec 2011 17:44:12 +0100
+Message-ID: <1323794663-2711-10-git-send-email-mikel.astiz@bmw-carit.de>
 In-Reply-To: <1323794663-2711-1-git-send-email-mikel.astiz@bmw-carit.de>
 References: <1323794663-2711-1-git-send-email-mikel.astiz@bmw-carit.de>
 MIME-Version: 1.0
@@ -12,128 +12,152 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Assuming that the request confirmation from the agent is not necessary,
-the rest of the reports can be achieved using signals in the transfer
-object itself.
-
-The main benefit of this is that the API is simpler and the client apps
-do not have to register the agent, and can just listen to the relevant
-signals.
 ---
- doc/client-api.txt |   72 ++++++++++++++++++---------------------------------
- 1 files changed, 26 insertions(+), 46 deletions(-)
+ client/manager.c             |   20 ++++++++++++++------
+ test/exchange-business-cards |    3 +--
+ test/ftp-client              |    3 +--
+ test/list-folders            |    2 +-
+ test/pbap-client             |    2 +-
+ test/pull-business-card      |    3 +--
+ test/send-files              |    3 +--
+ 7 files changed, 20 insertions(+), 16 deletions(-)
 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 3b87cb5..50b0b6f 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -45,25 +45,26 @@ Methods		dict GetProperties()
+diff --git a/client/manager.c b/client/manager.c
+index 50b8bcb..5d229b7 100644
+--- a/client/manager.c
++++ b/client/manager.c
+@@ -103,8 +103,7 @@ done:
+ }
  
- 			Returns all properties for the session.
+ static int parse_device_dict(DBusMessageIter *iter,
+-		const char **source, const char **dest, const char **target,
+-		uint8_t *channel)
++		const char **source, const char **target, uint8_t *channel)
+ {
+ 	while (dbus_message_iter_get_arg_type(iter) == DBUS_TYPE_DICT_ENTRY) {
+ 		DBusMessageIter entry, value;
+@@ -120,8 +119,6 @@ static int parse_device_dict(DBusMessageIter *iter,
+ 		case DBUS_TYPE_STRING:
+ 			if (g_str_equal(key, "Source") == TRUE)
+ 				dbus_message_iter_get_basic(&value, source);
+-			else if (g_str_equal(key, "Destination") == TRUE)
+-				dbus_message_iter_get_basic(&value, dest);
+ 			else if (g_str_equal(key, "Target") == TRUE)
+ 				dbus_message_iter_get_basic(&value, target);
+ 			break;
+@@ -161,9 +158,20 @@ static DBusMessage *create_session(DBusConnection *connection,
+ 	uint8_t channel = 0;
  
--		void AssignAgent(object agent)
--
--			Assign an OBEX agent to this session. This allows
--			detailed progress reports about the transactions.
--
--		void ReleaseAgent(object agent)
--
--			Release a previously assigned OBEX agent.
--
- 		string GetCapabilities()
- 
- 			Get remote device capabilities.
- 
-+		array{object,dict} GetTransfers()
+ 	dbus_message_iter_init(message, &iter);
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++		return g_dbus_create_error(message,
++				"org.openobex.Error.InvalidArguments", NULL);
 +
-+			Get existing (queued) transfers in this session. This
-+			method should only be called once, and further changes
-+			should be monitored using the appropriate signals.
++	dbus_message_iter_get_basic(&iter, &dest);
++	dbus_message_iter_next(&iter);
 +
- Properties	string Source [readonly]
- 
- 		string Destination [readonly]
- 
- 		byte Channel [readonly]
- 
-+Signals		void TransferAdded(object path, dict properties)
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
++		return g_dbus_create_error(message,
++				"org.openobex.Error.InvalidArguments", NULL);
 +
-+			Informs that a new transfer has been created (queued).
-+
- Object Push hierarchy
- =====================
+ 	dbus_message_iter_recurse(&iter, &dict);
  
-@@ -299,54 +300,33 @@ Properties	string Name [readonly]
+-	parse_device_dict(&dict, &source, &dest, &target, &channel);
++	parse_device_dict(&dict, &source, &target, &channel);
+ 	if (dest == NULL || target == NULL)
+ 		return g_dbus_create_error(message,
+ 				"org.openobex.Error.InvalidArguments", NULL);
+@@ -220,7 +228,7 @@ static DBusMessage *remove_session(DBusConnection *connection,
+ }
  
- 			Name of the transferred object.
+ static GDBusMethodTable client_methods[] = {
+-	{ "CreateSession", "a{sv}", "o", create_session,
++	{ "CreateSession", "sa{sv}", "o", create_session,
+ 						G_DBUS_METHOD_FLAG_ASYNC },
+ 	{ "RemoveSession", "o", "", remove_session,
+ 						G_DBUS_METHOD_FLAG_ASYNC },
+diff --git a/test/exchange-business-cards b/test/exchange-business-cards
+index 548ad2d..4abe426 100755
+--- a/test/exchange-business-cards
++++ b/test/exchange-business-cards
+@@ -12,8 +12,7 @@ if (len(sys.argv) < 4):
+ 	sys.exit(1)
  
--		uint64 Size [readonly]
-+		string Location [readonly, optional]
+ print "Creating Session"
+-session_path = client.CreateSession({"Destination": sys.argv[1],
+-					"Target": "OPP"})
++session_path = client.CreateSession(sys.argv[1], { "Target": "OPP" })
+ opp = dbus.Interface(bus.get_object("org.openobex.client",
+ 					session_path),
+ 					"org.openobex.ObjectPush")
+diff --git a/test/ftp-client b/test/ftp-client
+index 9bc038d..825f591 100755
+--- a/test/ftp-client
++++ b/test/ftp-client
+@@ -135,8 +135,7 @@ if  __name__ == '__main__':
+     client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
+                             "org.openobex.Client")
  
--			Size of the transferred object. If the size is
--			unknown, then this property will not be present.
--
--		string Filename [readonly]
--
--			Complete name of the file being received or sent.
--
--Agent hierarchy
--===============
-+			Complete name of the local file being received or sent.
-+			For operations from or to memory, this property will not
-+			be present.
+-    session_path = client.CreateSession({ "Destination": options.device,
+-                                          "Target": "ftp"})
++    session_path = client.CreateSession(options.device, { "Target": "ftp" })
  
--Service		unique name
--Interface	org.openobex.Agent
--Object path	freely definable
-+		uint64 Size [readonly, optional]
+     session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+                  "org.openobex.Session")
+diff --git a/test/list-folders b/test/list-folders
+index c7eec10..7239d6d 100755
+--- a/test/list-folders
++++ b/test/list-folders
+@@ -9,7 +9,7 @@ def list_folder(folder):
+ 	client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
+ 				"org.openobex.Client")
  
--Methods		void Release()
--
--			This method gets called when the service daemon
--			unregisters the agent. An agent can use it to do
--			cleanup tasks. There is no need to unregister the
--			agent, because when this method gets called it has
--			already been unregistered.
--
--		string Request(object transfer)
--
--			Accept or reject a new transfer (client and server)
--			and provide the filename for it.
-+			Size of the transferred object(s). If the size is
-+			unknown, then this property will not be present.
+-	session_path = client.CreateSession({ "Destination": sys.argv[1], "Target": "ftp"})
++	session_path = client.CreateSession(sys.argv[1], { "Target": "ftp" })
  
--			In case of incoming transfers it is the filename
--			where to store the file and for outgoing transfers
--			it is the filename to show the remote device. If left
--			empty it will be calculated automatically.
-+		uint64 Progress [readonly, optional]
+ 	ftp = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+ 			     "org.openobex.FileTransfer")
+diff --git a/test/pbap-client b/test/pbap-client
+index 7456c01..ecca14f 100755
+--- a/test/pbap-client
++++ b/test/pbap-client
+@@ -9,7 +9,7 @@ client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
+ 						"org.openobex.Client")
  
--			Possible errors: org.openobex.Error.Rejected
--			                 org.openobex.Error.Canceled
-+			Number of bytes transferred. For queued transfers, this
-+			value will not be present. When a queued transfer
-+			begins, this property will take an initial value of 0.
+ print "Creating Session"
+-session_path = client.CreateSession({"Destination": sys.argv[1], "Target": "PBAP"})
++session_path = client.CreateSession(sys.argv[1], { "Target": "PBAP" })
+ pbap = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+ 						"org.openobex.PhonebookAccess")
+ session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+diff --git a/test/pull-business-card b/test/pull-business-card
+index 5912155..6f9267b 100755
+--- a/test/pull-business-card
++++ b/test/pull-business-card
+@@ -29,8 +29,7 @@ if __name__ == '__main__':
+ 		sys.exit(1)
  
--		void Progress(object transfer, uint64 transferred)
-+Signals		PropertyChanged(string name, variant value)
+ 	print "Creating Session"
+-	session_path = client.CreateSession({"Destination": sys.argv[1],
+-						"Target": "OPP"})
++	session_path = client.CreateSession(sys.argv[1], { "Target": "OPP" })
+ 	opp = dbus.Interface(bus.get_object("org.openobex.client",
+ 						session_path),
+ 						"org.openobex.ObjectPush")
+diff --git a/test/send-files b/test/send-files
+index 504a066..f1e8aed 100755
+--- a/test/send-files
++++ b/test/send-files
+@@ -15,8 +15,7 @@ if (len(sys.argv) < 3):
+ files = [os.path.realpath(f) for f in sys.argv[2:]]
  
--			Progress within the transfer has been made. The
--			number of transferred bytes is given as second
--			argument for convenience.
-+			This signal indicates a changed value of the given
-+			property.
+ print "Creating Session"
+-session_path = client.CreateSession({"Destination": sys.argv[1],
+-					"Target": "OPP"})
++session_path = client.CreateSession(sys.argv[1], { "Target": "OPP" })
+ opp = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+ 					"org.openobex.ObjectPush")
  
--		void Complete(object transfer)
-+		void Complete()
- 
- 			Informs that the transfer has completed successfully.
- 
--		void Error(object transfer, string message)
-+		void Error(string message)
- 
- 			Informs that the transfer has been terminated because
- 			of some error.
 -- 
 1.7.6.4
 
