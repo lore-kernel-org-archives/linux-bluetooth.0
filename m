@@ -1,68 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v5 0/8] Add org.bluez.Telephony interface
-Date: Wed, 14 Dec 2011 10:05:02 +0100
-Message-Id: <1323853510-5195-1-git-send-email-frederic.danis@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ 5/5] Fix btio users to not expect a default security level
+Date: Tue, 13 Dec 2011 20:57:34 -0300
+Message-Id: <1323820654-16820-5-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1323820654-16820-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1323820654-16820-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+The users of btio should not expect that btio will set the security
+level to medium if it wasn't specified. Now, all the users specfify
+the security level needed.
+---
+ audio/avdtp.c        |    1 +
+ audio/gateway.c      |    2 ++
+ audio/headset.c      |    1 +
+ input/device.c       |    1 +
+ network/connection.c |    1 +
+ serial/port.c        |    2 ++
+ 6 files changed, 8 insertions(+), 0 deletions(-)
 
-This set of patches replaces telephony drivers for HeadSet/HandsFree
-Profiles by a new DBus interface (org.bluez.Telephony).
-
-This will simplify BlueZ code by focusing on Bluetooth communication
-part and by letting external application (i.e. oFono) take in charge
-the Telephony tasks (AT parsing and modem specific code, which can be
-removed from BlueZ code). So, it becomes simpler, easier to maintain
-and debug.
-
-External applications, which should implement AT parsing and telephony
-part of HeadSet or HandsFree Profiles, will have to register a telephony
-agent using this new interface.
-
-Any comments appreciated.
-
-Regards
-
-Fred
-
-
-
-Frédéric Danis (8):
-  audio: Move tel drivers to DBus interface
-  audio: Simplify org.bluez.Headset
-  audio: Remove dummy tel driver
-  audio: Remove maemo5 tel driver
-  audio: Remove maemo6 tel driver
-  audio: Remove oFono tel driver
-  audio: Move HFP/HSP AG servers to telephony.c
-  audio: Send transport path to telephony agent
-
- Makefile.am              |   17 +-
- audio/headset.c          | 1583 ++--------------------------------
- audio/headset.h          |   14 +-
- audio/manager.c          |  390 +--------
- audio/media.c            |    9 +-
- audio/telephony-dummy.c  |  433 ---------
- audio/telephony-maemo5.c | 2104 --------------------------------------------
- audio/telephony-maemo6.c | 2201 ----------------------------------------------
- audio/telephony-ofono.c  | 1638 ----------------------------------
- audio/telephony.c        |  968 ++++++++++++++++++++
- audio/telephony.h        |  198 +----
- audio/transport.c        |   10 +
- audio/unix.c             |    2 +
- doc/assigned-numbers.txt |    1 +
- doc/audio-api.txt        |  166 ++--
- 15 files changed, 1155 insertions(+), 8579 deletions(-)
- delete mode 100644 audio/telephony-dummy.c
- delete mode 100644 audio/telephony-maemo5.c
- delete mode 100644 audio/telephony-maemo6.c
- delete mode 100644 audio/telephony-ofono.c
- create mode 100644 audio/telephony.c
+diff --git a/audio/avdtp.c b/audio/avdtp.c
+index d3568ba..cd66fd4 100644
+--- a/audio/avdtp.c
++++ b/audio/avdtp.c
+@@ -2525,6 +2525,7 @@ static GIOChannel *l2cap_connect(struct avdtp *session)
+ 				BT_IO_OPT_SOURCE_BDADDR, &session->server->src,
+ 				BT_IO_OPT_DEST_BDADDR, &session->dst,
+ 				BT_IO_OPT_PSM, AVDTP_PSM,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+ 				BT_IO_OPT_INVALID);
+ 	if (!io) {
+ 		error("%s", err->message);
+diff --git a/audio/gateway.c b/audio/gateway.c
+index 9b1aab3..bde3e02 100644
+--- a/audio/gateway.c
++++ b/audio/gateway.c
+@@ -501,6 +501,7 @@ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
+ 	io = bt_io_connect(BT_IO_RFCOMM, rfcomm_connect_cb, dev, NULL, &gerr,
+ 				BT_IO_OPT_SOURCE_BDADDR, &dev->src,
+ 				BT_IO_OPT_DEST_BDADDR, &dev->dst,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+ 				BT_IO_OPT_CHANNEL, ch,
+ 				BT_IO_OPT_INVALID);
+ 	if (!io) {
+@@ -847,6 +848,7 @@ unsigned int gateway_request_stream(struct audio_device *dev,
+ 		io = bt_io_connect(BT_IO_SCO, sco_connect_cb, dev, NULL, &err,
+ 				BT_IO_OPT_SOURCE_BDADDR, &dev->src,
+ 				BT_IO_OPT_DEST_BDADDR, &dev->dst,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+ 				BT_IO_OPT_INVALID);
+ 		if (!io) {
+ 			error("%s", err->message);
+diff --git a/audio/headset.c b/audio/headset.c
+index 6aef6a8..abb9a51 100644
+--- a/audio/headset.c
++++ b/audio/headset.c
+@@ -1624,6 +1624,7 @@ static int rfcomm_connect(struct audio_device *dev, headset_stream_cb_t cb,
+ 					BT_IO_OPT_SOURCE_BDADDR, &dev->src,
+ 					BT_IO_OPT_DEST_BDADDR, &dev->dst,
+ 					BT_IO_OPT_CHANNEL, hs->rfcomm_ch,
++					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+ 					BT_IO_OPT_INVALID);
+ 
+ 	hs->rfcomm_ch = -1;
+diff --git a/input/device.c b/input/device.c
+index a1ecdd7..0ab63c0 100644
+--- a/input/device.c
++++ b/input/device.c
+@@ -368,6 +368,7 @@ static gboolean rfcomm_connect(struct input_conn *iconn, GError **err)
+ 				NULL, err,
+ 				BT_IO_OPT_SOURCE_BDADDR, &idev->src,
+ 				BT_IO_OPT_DEST_BDADDR, &idev->dst,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+ 				BT_IO_OPT_INVALID);
+ 	if (!io)
+ 		return FALSE;
+diff --git a/network/connection.c b/network/connection.c
+index ca1f4b2..f864972 100644
+--- a/network/connection.c
++++ b/network/connection.c
+@@ -373,6 +373,7 @@ static DBusMessage *connection_connect(DBusConnection *conn,
+ 				BT_IO_OPT_SOURCE_BDADDR, &peer->src,
+ 				BT_IO_OPT_DEST_BDADDR, &peer->dst,
+ 				BT_IO_OPT_PSM, BNEP_PSM,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+ 				BT_IO_OPT_OMTU, BNEP_MTU,
+ 				BT_IO_OPT_IMTU, BNEP_MTU,
+ 				BT_IO_OPT_INVALID);
+diff --git a/serial/port.c b/serial/port.c
+index 5b76d14..36e3bd6 100644
+--- a/serial/port.c
++++ b/serial/port.c
+@@ -422,6 +422,7 @@ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
+ 				BT_IO_OPT_SOURCE_BDADDR, &device->src,
+ 				BT_IO_OPT_DEST_BDADDR, &device->dst,
+ 				BT_IO_OPT_CHANNEL, port->channel,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+ 				BT_IO_OPT_INVALID);
+ 	if (!port->io) {
+ 		error("%s", gerr->message);
+@@ -462,6 +463,7 @@ connect:
+ 				BT_IO_OPT_SOURCE_BDADDR, &device->src,
+ 				BT_IO_OPT_DEST_BDADDR, &device->dst,
+ 				BT_IO_OPT_CHANNEL, port->channel,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+ 				BT_IO_OPT_INVALID);
+ 	if (port->io == NULL)
+ 		return -EIO;
+-- 
+1.7.8
 
