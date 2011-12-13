@@ -1,89 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd] gobex: fix transfer search in transfer_complete
-Date: Tue, 13 Dec 2011 17:21:22 +0100
-Message-ID: <1323793282-24497-1-git-send-email-mikel.astiz@bmw-carit.de>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Peter Krystad <pkrystad@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Peter Krystad <pkrystad@codeaurora.org>
+Subject: [PATCHv3 4/4] Minor cleanup of indentation in output
+Date: Mon, 12 Dec 2011 22:02:37 -0800
+Message-Id: <1323756157-15487-5-git-send-email-pkrystad@codeaurora.org>
+In-Reply-To: <1323756157-15487-1-git-send-email-pkrystad@codeaurora.org>
+References: <1323756157-15487-1-git-send-email-pkrystad@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The previous approach searched the transfer pointer itself, assuming
-that the transfers has not been modified if the pointer is in the list.
-However the callback could have removed the transfer and registered
-another one, which can eventually point to the same memory location.
-
-This is solved by looking for the transfer id instead of the pointer.
+Minor indentation cleanup and fix display of physical link key
 ---
- gobex/gobex-transfer.c |   30 +++++++++++++++++++-----------
- 1 files changed, 19 insertions(+), 11 deletions(-)
+ parser/hci.c |   15 ++++++++++-----
+ 1 files changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-index f5222cd..692d713 100644
---- a/gobex/gobex-transfer.c
-+++ b/gobex/gobex-transfer.c
-@@ -77,14 +77,30 @@ static void transfer_free(struct transfer *transfer)
- 	g_free(transfer);
- }
+diff --git a/parser/hci.c b/parser/hci.c
+index a0e3034..e459e9e 100644
+--- a/parser/hci.c
++++ b/parser/hci.c
+@@ -1124,12 +1124,11 @@ static inline void create_physical_link_dump(int level, struct frame *frm)
+ 	int i;
  
-+static struct transfer *find_transfer(guint id)
-+{
-+	GSList *l;
-+
-+	for (l = transfers; l != NULL; l = g_slist_next(l)) {
-+		struct transfer *t = l->data;
-+		if (t->id == id)
-+			return t;
-+	}
-+
-+	return NULL;
-+}
-+
- static void transfer_complete(struct transfer *transfer, GError *err)
- {
--	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
-+	guint id = transfer->id;
-+
-+	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", id);
- 
- 	transfer->complete_func(transfer->obex, err, transfer->user_data);
- 	/* Check if the complete_func removed the transfer */
--	if (g_slist_find(transfers, transfer) == NULL)
-+	if (find_transfer(id) == NULL)
- 		return;
-+
- 	transfer_free(transfer);
- }
- 
-@@ -425,7 +441,6 @@ guint g_obex_get_req_pkt(GObex *obex, GObexPacket *req,
- 
- 	transfer = transfer_new(obex, G_OBEX_OP_GET, complete_func, user_data);
- 	transfer->data_consumer = data_func;
+ 	p_indent(level, frm);
 -
- 	transfer->req_id = g_obex_send_req(obex, req, FIRST_PACKET_TIMEOUT,
- 					transfer_response, transfer, err);
- 	if (transfer->req_id == 0) {
-@@ -573,17 +588,10 @@ guint g_obex_get_rsp(GObex *obex, GObexDataProducer data_func,
- gboolean g_obex_cancel_transfer(guint id)
- {
- 	struct transfer *transfer = NULL;
--	GSList *l;
+ 	printf("handle %d key length %d key type %d\n",
+ 		cp->handle, cp->key_length, cp->key_type);
++	p_indent(level, frm);
+ 	printf("key ");
+-
+-	for (i = 0; i < cp->key_length && cp->key_length < 32; i++)
++	for (i = 0; i < cp->key_length && cp->key_length <= 32; i++)
+ 		printf("%2.2x", cp->key[i]);
+ 	printf("\n");
+ }
+@@ -1140,12 +1139,16 @@ static inline void create_logical_link_dump(int level, struct frame *frm)
+ 	int i;
  
- 	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", id);
- 
--	for (l = transfers; l != NULL; l = g_slist_next(l)) {
--		struct transfer *t = l->data;
--		if (t->id == id) {
--			transfer = t;
--			break;
--		}
--	}
-+	transfer = find_transfer(id);
- 
- 	if (transfer == NULL)
- 		return FALSE;
+ 	p_indent(level, frm);
+-
+ 	printf("handle %d\n", cp->handle);
++
++	p_indent(level, frm);
+ 	printf("tx_flow ");
+ 	for (i = 0; i < 16; i++)
+ 		printf("%2.2x", cp->tx_flow[i]);
+-	printf("\nrx_flow ");
++	printf("\n");
++
++	p_indent(level, frm);
++	printf("rx_flow ");
+ 	for (i = 0; i < 16; i++)
+ 		printf("%2.2x", cp->rx_flow[i]);
+ 	printf("\n");
+@@ -2605,6 +2608,8 @@ static inline void read_local_amp_assoc_dump(int level, struct frame *frm)
+ 		p_indent(level, frm);
+ 		printf("Error: %s\n", status2str(rp->status));
+ 	} else {
++		p_indent(level, frm);
++		printf("assoc data");
+ 		for (i = 0; i < len; i++) {
+ 			if (!(i % 16)) {
+ 				printf("\n");
 -- 
-1.7.6.4
+1.7.4.1
 
+--
+Peter Krystad
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
