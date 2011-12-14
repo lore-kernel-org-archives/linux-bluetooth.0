@@ -1,62 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH BlueZ 4/5] Remove the default security level from btio
-Date: Wed, 14 Dec 2011 11:43:47 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B026457760@DNCE02.ent.ti.com>
-References: <1323820654-16820-1-git-send-email-vinicius.gomes@openbossa.org>
- <1323820654-16820-4-git-send-email-vinicius.gomes@openbossa.org>
-In-Reply-To: <1323820654-16820-4-git-send-email-vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <1323793282-24497-1-git-send-email-mikel.astiz@bmw-carit.de>
+References: <1323793282-24497-1-git-send-email-mikel.astiz@bmw-carit.de>
+Date: Wed, 14 Dec 2011 12:21:15 +0200
+Message-ID: <CABBYNZJaFHYYHtPEj5zqOoSHEjiMKL6rtbGqimFVn=1BMFKyKg@mail.gmail.com>
+Subject: Re: [PATCH obexd] gobex: fix transfer search in transfer_complete
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Vinicius
+Hi Mikel,
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Vinicius Costa Gomes
-> Sent: Wednesday, December 14, 2011 1:58 AM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: Vinicius Costa Gomes
-> Subject: [PATCH BlueZ 4/5] Remove the default security level from btio
-> 
-> The default value of sec_level when setting *any* option
-> using bt_io_set() was BT_SECURITY_MEDIUM. This was causing
-> the security procedure being started in some situations that
-> it should not.
+On Tue, Dec 13, 2011 at 6:21 PM, Mikel Astiz <mikel.astiz@bmw-carit.de> wrote:
+> The previous approach searched the transfer pointer itself, assuming
+> that the transfers has not been modified if the pointer is in the list.
+> However the callback could have removed the transfer and registered
+> another one, which can eventually point to the same memory location.
+>
+> This is solved by looking for the transfer id instead of the pointer.
 > ---
->  btio/btio.c |    1 -
->  1 files changed, 0 insertions(+), 1 deletions(-)
-> 
-> diff --git a/btio/btio.c b/btio/btio.c
-> index 5641a9c..c26a734 100644
-> --- a/btio/btio.c
-> +++ b/btio/btio.c
-> @@ -698,7 +698,6 @@ static gboolean parse_set_opts(struct set_opts
-> *opts, GError **err,
->  	/* Set defaults */
->  	opts->defer = DEFAULT_DEFER_TIMEOUT;
->  	opts->master = -1;
-> -	opts->sec_level = BT_IO_SEC_MEDIUM;
 
-So removing this simply sets the default security level to none ?
+Ack.
 
->  	opts->mode = L2CAP_MODE_BASIC;
->  	opts->flushable = -1;
->  	opts->priority = 0;
-> --
-> 1.7.8
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-
-> bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Thanks,
-Chen Ganir
-
+-- 
+Luiz Augusto von Dentz
