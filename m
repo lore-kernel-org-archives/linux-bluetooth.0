@@ -1,50 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1323904340.1965.72.camel@aeonflux>
-Subject: Re: [PATCH 5/7] Bluetooth: Add timer for automatically disabling
- the service cache
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 15 Dec 2011 00:12:20 +0100
-In-Reply-To: <20111214222537.GA14468@x220.Elisa>
-References: <1323899524-13653-1-git-send-email-johan.hedberg@gmail.com>
-	 <1323899524-13653-6-git-send-email-johan.hedberg@gmail.com>
-	 <1323900964.1965.66.camel@aeonflux> <20111214222537.GA14468@x220.Elisa>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 7/7 v2] Bluetooth: Use correct struct for user_confirm_neg_reply
+Date: Thu, 15 Dec 2011 00:47:41 +0200
+Message-Id: <1323902861-15990-8-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1323902861-15990-1-git-send-email-johan.hedberg@gmail.com>
+References: <1323902861-15990-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> > > -	if (test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->flags))
-> > > +	if (test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->flags)) {
-> > > +		hci_dev_unlock_bh(hdev);
-> > > +		cancel_delayed_work_sync(&hdev->service_cache);
-> > > +		hci_dev_lock_bh(hdev);
-> > >  		update_eir(hdev);
-> > > +	}
-> > 
-> > We have to be a bit careful here since essentially the service cache
-> > (actually UUID cache to be precise) is a per mgmt socket feature and not
-> > a per hdev feature.
-> > 
-> > I have nothing against merging this first, but keep in mind that this
-> > needs to be updated since we can have two concurrent applications
-> > opening a mgmt socket.
-> 
-> I understand. It does get a bit tricky though since the UUID list is per
-> HCI device. I.e. do we keep our own list for each socket and hide it
-> from struct hci_dev until the (per-socket) cache gets disabled?
+This patch fixes user_confirm_neg_reply to use the appropriate struct
+for accessing the call parameters.
 
-that might be a good idea. Every mgmt socket should keep its list of
-added UUIDs and then maybe just call an update function that runs over
-all mgmt sockets and picks the union of it. If a socket closes, the list
-gets flushed and we update again. That way we do not have to play global
-reference counting tricks.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 4d531b9..054229f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1690,7 +1690,7 @@ static int user_confirm_reply(struct sock *sk, u16 index, void *data, u16 len)
+ static int user_confirm_neg_reply(struct sock *sk, u16 index, void *data,
+ 									u16 len)
+ {
+-	struct mgmt_cp_user_confirm_reply *cp = (void *) data;
++	struct mgmt_cp_user_confirm_neg_reply *cp = data;
+ 
+ 	BT_DBG("");
+ 
+-- 
+1.7.7.3
 
