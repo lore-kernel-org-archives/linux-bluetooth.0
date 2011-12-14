@@ -1,68 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 15 Dec 2011 00:25:37 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <1323901223.1965.70.camel@aeonflux>
+Subject: Re: [RFCv0] Bluetooth: General HCI callback implementation
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 5/7] Bluetooth: Add timer for automatically disabling the
- service cache
-Message-ID: <20111214222537.GA14468@x220.Elisa>
-References: <1323899524-13653-1-git-send-email-johan.hedberg@gmail.com>
- <1323899524-13653-6-git-send-email-johan.hedberg@gmail.com>
- <1323900964.1965.66.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1323900964.1965.66.camel@aeonflux>
+Date: Wed, 14 Dec 2011 23:20:23 +0100
+In-Reply-To: <1323436248-3736-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1323436248-3736-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Andrei,
 
-On Wed, Dec 14, 2011, Marcel Holtmann wrote:
-> > +static void service_cache_off(struct work_struct *work)
-> > +{
-> > +	struct hci_dev *hdev = container_of(work, struct hci_dev,
-> > +							service_cache.work);
-> > +
-> > +	if (!test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->flags))
-> > +		return;
-> > +
-> > +	hci_dev_lock_bh(hdev);
-> > +
-> > +	update_eir(hdev);
-> > +	update_class(hdev);
-> > +
-> > +	hci_dev_unlock_bh(hdev);
-> > +}
-> > +
-> > +static void mgmt_init_hdev(struct hci_dev *hdev)
-> > +{
-> > +	if (!test_and_set_bit(HCI_MGMT, &hdev->flags))
-> > +		INIT_DELAYED_WORK(&hdev->service_cache, service_cache_off);
+> Add general HCI callback implementation. Can be used for executing
+> HCI commands from A2MP protocol.
+> ---
+>  include/net/bluetooth/hci_core.h |   14 +++++++++++
+>  net/bluetooth/hci_core.c         |   47 ++++++++++++++++++++++++++++++++++++++
+>  net/bluetooth/hci_event.c        |    4 +++
+>  3 files changed, 65 insertions(+), 0 deletions(-)
 > 
-> Why does this depend on MGMT being enabled? Why do we bother here? Why
-> not just always initialize it when registering the controller.
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index cc5481d..e473cd2 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -121,6 +121,15 @@ struct adv_entry {
+>  	u8 bdaddr_type;
+>  };
+>  
+> +struct hci_dev;
+> +
+> +struct cb_cmd {
+> +	struct list_head list;
+> +	u16 opcode;
+> +	void *opt;
+> +	void (*cb)(struct hci_dev *hdev, void *opt);
+> +};
+> +
 
-Because the timer callback function is static and resides within mgmt.c
-(since it needs to call update_class & update_eir which are also static
-within mgmt.c).
+so I am actually thinking that we might just update hci_request into a
+bit more flexible schema.
 
-> > -	if (test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->flags))
-> > +	if (test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->flags)) {
-> > +		hci_dev_unlock_bh(hdev);
-> > +		cancel_delayed_work_sync(&hdev->service_cache);
-> > +		hci_dev_lock_bh(hdev);
-> >  		update_eir(hdev);
-> > +	}
-> 
-> We have to be a bit careful here since essentially the service cache
-> (actually UUID cache to be precise) is a per mgmt socket feature and not
-> a per hdev feature.
-> 
-> I have nothing against merging this first, but keep in mind that this
-> needs to be updated since we can have two concurrent applications
-> opening a mgmt socket.
+Gustavo is working on moving everything into a process context, so we
+can actually sleep. And we could just make a simple premise to only
+allow one request at a time. That would also then allow us to utilize
+hci_request. We just need a clean way to report back the result.
 
-I understand. It does get a bit tricky though since the UUID list is per
-HCI device. I.e. do we keep our own list for each socket and hide it
-from struct hci_dev until the (per-socket) cache gets disabled?
+Regards
 
-Johan
+Marcel
+
+
