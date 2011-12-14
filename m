@@ -1,88 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 1/5] Add support for getting the Encryption Key Size via btio
-Date: Wed, 14 Dec 2011 14:02:53 -0300
-Message-Id: <1323882173-8526-1-git-send-email-vinicius.gomes@openbossa.org>
-In-Reply-To: <1323820654-16820-1-git-send-email-vinicius.gomes@openbossa.org>
-References: <1323820654-16820-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <CAJdJm_OnyeExrgvainhqPMUgV9C2QU08PafyXZa9-oJxgkEaEg@mail.gmail.com>
+References: <CACj007n47KuT4uzJMDnHc2KKy_Mog469QvvrRm5mAE54Q6Y7Ug@mail.gmail.com>
+	<CAJdJm_OnyeExrgvainhqPMUgV9C2QU08PafyXZa9-oJxgkEaEg@mail.gmail.com>
+Date: Wed, 14 Dec 2011 13:46:33 -0300
+Message-ID: <CAKT1EBf+YPUggU6FX1EJjCtF7_C3zXCpwq=hG6Q+6DKyEo0=_A@mail.gmail.com>
+Subject: Re: [RFC BlueZ]Proximity Monitor: Immediate Alert Timeout
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	Hemant Gupta <hemantgupta.ste@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some profiles specify some restriction depending on the length
-of the key used to encrypt the link, this adds an way to retrieve
-that value from the kernel.
+Hi Hemant,
 
-Current kernels don't provide this information so the size is
-always zero.
----
- btio/btio.c     |   19 +++++++++++++++++++
- btio/btio.h     |    1 +
- lib/bluetooth.h |    1 +
- 3 files changed, 21 insertions(+), 0 deletions(-)
+On Wed, Dec 14, 2011 at 11:33 AM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Hemant,
+>
+> On Wed, Dec 14, 2011 at 10:18 AM, Hemant Gupta
+> <hemantgupta.ste@gmail.com> wrote:
+>> Hi,
+>>
+>> I am working on Proximity Monitor Role using BlueZ 4.96 + and have a
+>> query on the need for Timeout in case of Immediate Alert in file
+>> proximity/monitor.c.
+>>
+>> I feel that this timer is not required, because this will lead to
+>> following scenario in case of Proximity Profile:
+>>
+>> If Path loss has occurred and Immediate Alert has been written, then
+>> after Timeout (5 seconds), Proximity Monitor will set immediate alert
+>> level to “none”, which will indicate to Proximity Reporter that Path
+>> Loss is now within threshold, which actually might not be the case.
+>
+> I think this timeout is causing more harm than good (sometimes due to
+> temporary latency between the two writes, the "none" alert level may
+> arrive right after the previous level, which may cause the reporter to
+> remain silent), so I agree with you. But I will wait for Claudio's
+> opinion as he implemented this timeout in the first place :)
 
-diff --git a/btio/btio.c b/btio/btio.c
-index 0d177a3..2d71998 100644
---- a/btio/btio.c
-+++ b/btio/btio.c
-@@ -513,6 +513,21 @@ static int set_priority(int sock, uint32_t prio)
- 	return 0;
- }
- 
-+static gboolean get_key_size(int sock, int *size, GError **err)
-+{
-+	struct bt_security sec;
-+	socklen_t len;
-+
-+	memset(&sec, 0, sizeof(sec));
-+	len = sizeof(sec);
-+	if (getsockopt(sock, SOL_BLUETOOTH, BT_SECURITY, &sec, &len) == 0) {
-+		*size = sec.key_size;
-+		return TRUE;
-+	}
-+
-+	return FALSE;
-+}
-+
- static gboolean l2cap_set(int sock, int sec_level, uint16_t imtu,
- 				uint16_t omtu, uint8_t mode, int master,
- 				int flushable, uint32_t priority, GError **err)
-@@ -880,6 +895,10 @@ static gboolean l2cap_get(int sock, GError **err, BtIOOption opt1,
- 						va_arg(args, int *), err))
- 				return FALSE;
- 			break;
-+		case BT_IO_OPT_KEY_SIZE:
-+			if (!get_key_size(sock, va_arg(args, int *), err))
-+				return FALSE;
-+			break;
- 		case BT_IO_OPT_PSM:
- 			*(va_arg(args, uint16_t *)) = src.l2_psm ?
- 					btohs(src.l2_psm) : btohs(dst.l2_psm);
-diff --git a/btio/btio.h b/btio/btio.h
-index ae55b61..7e3e130 100644
---- a/btio/btio.h
-+++ b/btio/btio.h
-@@ -52,6 +52,7 @@ typedef enum {
- 	BT_IO_OPT_DEST_BDADDR,
- 	BT_IO_OPT_DEFER_TIMEOUT,
- 	BT_IO_OPT_SEC_LEVEL,
-+	BT_IO_OPT_KEY_SIZE,
- 	BT_IO_OPT_CHANNEL,
- 	BT_IO_OPT_SOURCE_CHANNEL,
- 	BT_IO_OPT_DEST_CHANNEL,
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index 5bd4f03..1dee6df 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -63,6 +63,7 @@ extern "C" {
- #define BT_SECURITY	4
- struct bt_security {
- 	uint8_t level;
-+	uint8_t key_size;
- };
- #define BT_SECURITY_SDP		0
- #define BT_SECURITY_LOW		1
--- 
-1.7.8
+Remember that Immediate Alert Service is used by Path Loss and Find Me.
+How are you testing it if kernel RSSI Monitor patches are not upstream?
 
+Removing the timeout and write to "none" has a side effect: the remote
+and the local value can have different values if the remote changes
+the value. Alert Level characteristic doesn't support read,
+notification or indication. Probably, all devices disable the alert
+after some seconds to avoid drain the battery or be annoying.
+The main problem is consistency: show to the user the correct value.
+
+>
+>> As per Sec 4.6 of Proximity Profile Spec,
+>> “If the path loss falls below a threshold set on the Proximity Monitor
+>> it shall write in the Alert Level characteristic of the Immediate
+>> Alert service, using the GATT Write Without Response sub-procedure, to
+>> cause the Proximity Reporter to end the alert. When the path loss is
+>> below the threshold the Proximity Monitor should stop alerting.”
+>>
+>> So this means that the proximity monitor should not change the alert
+>> level to “None” until the path loss is above Threshold.
+>
+> I think it is better to not have BlueZ itself change the alert level
+> to "none", instead the application can do this when it detects the
+> path loss above Threshold. This can be easily achieved by monitoring
+> the "SignalLevel" property changes on the Proximity API, and writing
+> to ImmediateAlertLevel as necessary. After all, the threshold is
+> dependent on the application settings.
+
+If this change doesn't cause problems to Find Me I agree with removing
+this timeout/write.
+
+Regards,
+Claudio
