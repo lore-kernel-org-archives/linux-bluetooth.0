@@ -1,66 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/7] Bluetooth: Add hci_do_le_scan() to hci_core
-Date: Wed, 14 Dec 2011 13:25:25 -0300
-Message-Id: <1323879926-15971-7-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 4/7] Bluetooth: Add helper functions to send LE scan commands
+Date: Wed, 14 Dec 2011 13:25:23 -0300
+Message-Id: <1323879926-15971-5-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1323879926-15971-1-git-send-email-andre.guedes@openbossa.org>
 References: <1323879926-15971-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds to hci_core the hci_do_le_scan function which should
-be used to scan LE devices.
+This patch creates two helper functions to send LE Set Scan
+Parameters and LE Set Scan Enable commands.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |    2 ++
- net/bluetooth/hci_core.c         |   21 +++++++++++++++++++++
- 2 files changed, 23 insertions(+), 0 deletions(-)
+ net/bluetooth/hci_core.c |   23 +++++++++++++++++++++++
+ 1 files changed, 23 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0ef3c7c..eab90b8 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1008,5 +1008,7 @@ void hci_le_ltk_neg_reply(struct hci_conn *conn);
- 
- int hci_do_inquiry(struct hci_dev *hdev, u8 length);
- int hci_cancel_inquiry(struct hci_dev *hdev);
-+int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
-+								int timeout);
- 
- #endif /* __HCI_CORE_H */
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 56fcc59..9b659af 100644
+index ce3727e..7923efc 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2688,5 +2688,26 @@ int hci_cancel_inquiry(struct hci_dev *hdev)
- 	return hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
+@@ -94,6 +94,29 @@ static void hci_notify(struct hci_dev *hdev, int event)
+ 	atomic_notifier_call_chain(&hci_notifier, event, hdev);
  }
  
-+int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
-+								int timeout)
++static int send_le_scan_param_cmd(struct hci_dev *hdev, u8 type, u16 interval,
++								u16 window)
 +{
-+	struct le_scan_params *params = &hdev->le_scan_params;
++	struct hci_cp_le_set_scan_param cp;
 +
-+	BT_DBG("%s", hdev->name);
++	memset(&cp, 0, sizeof(cp));
++	cp.type = type;
++	cp.interval = cpu_to_le16(interval);
++	cp.window = cpu_to_le16(window);
 +
-+	if (work_busy(&hdev->le_scan_wk) ||
-+				test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-+		return -EINPROGRESS;
-+
-+	params->type = type;
-+	params->interval = interval;
-+	params->window = window;
-+	params->timeout = timeout;
-+
-+	queue_work(hdev->workqueue, &hdev->le_scan_wk);
-+
-+	return 0;
++	return hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_PARAM, sizeof(cp), &cp);
 +}
 +
- module_param(enable_hs, bool, 0644);
- MODULE_PARM_DESC(enable_hs, "Enable High Speed");
++static int send_le_scan_enable_cmd(struct hci_dev *hdev, u8 enable)
++{
++	struct hci_cp_le_set_scan_enable cp;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.enable = enable;
++
++	return hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
++}
++
+ /* ---- HCI requests ---- */
+ 
+ void hci_req_complete(struct hci_dev *hdev, __u16 cmd, int result)
 -- 
 1.7.8
 
