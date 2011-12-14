@@ -1,52 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 14 Dec 2011 13:35:57 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/5] Add support for getting the Encryption Key
- Size via btio
-Message-ID: <20111214163557.GA17841@samus>
-References: <1323820654-16820-1-git-send-email-vinicius.gomes@openbossa.org>
- <CABBYNZJzb6nSbq6JpKOn3HxcaYvLSw0JWzzHQsYh+DtfFfb+7w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CABBYNZJzb6nSbq6JpKOn3HxcaYvLSw0JWzzHQsYh+DtfFfb+7w@mail.gmail.com>
+In-Reply-To: <CACj007n47KuT4uzJMDnHc2KKy_Mog469QvvrRm5mAE54Q6Y7Ug@mail.gmail.com>
+References: <CACj007n47KuT4uzJMDnHc2KKy_Mog469QvvrRm5mAE54Q6Y7Ug@mail.gmail.com>
+Date: Wed, 14 Dec 2011 10:33:48 -0400
+Message-ID: <CAJdJm_OnyeExrgvainhqPMUgV9C2QU08PafyXZa9-oJxgkEaEg@mail.gmail.com>
+Subject: Re: [RFC BlueZ]Proximity Monitor: Immediate Alert Timeout
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Hemant Gupta <hemantgupta.ste@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Hemant,
 
-On 14:09 Wed 14 Dec, Luiz Augusto von Dentz wrote:
-> Hi Vinicius,
-> 
-> On Wed, Dec 14, 2011 at 1:57 AM, Vinicius Costa Gomes
-> <vinicius.gomes@openbossa.org> wrote:
-> > +static gboolean get_key_size(int sock, BtIOType type, int *size,
-> > +                                                               GError **err)
-> > +{
-> > +       struct bt_security sec;
-> > +       socklen_t len;
-> > +
-> > +       memset(&sec, 0, sizeof(sec));
-> > +       len = sizeof(sec);
-> > +       if (getsockopt(sock, SOL_BLUETOOTH, BT_SECURITY, &sec, &len) == 0) {
-> > +               *size = sec.key_size;
-> > +               return TRUE;
-> > +       }
-> > +
-> > +       return FALSE;
-> > +}
-> 
-> It doesn't seems that the type is used for anything here, so you can
-> probably removed it.
+On Wed, Dec 14, 2011 at 10:18 AM, Hemant Gupta
+<hemantgupta.ste@gmail.com> wrote:
+> Hi,
+>
+> I am working on Proximity Monitor Role using BlueZ 4.96 + and have a
+> query on the need for Timeout in case of Immediate Alert in file
+> proximity/monitor.c.
+>
+> I feel that this timer is not required, because this will lead to
+> following scenario in case of Proximity Profile:
+>
+> If Path loss has occurred and Immediate Alert has been written, then
+> after Timeout (5 seconds), Proximity Monitor will set immediate alert
+> level to “none”, which will indicate to Proximity Reporter that Path
+> Loss is now within threshold, which actually might not be the case.
 
-True. I will fix it.
+I think this timeout is causing more harm than good (sometimes due to
+temporary latency between the two writes, the "none" alert level may
+arrive right after the previous level, which may cause the reporter to
+remain silent), so I agree with you. But I will wait for Claudio's
+opinion as he implemented this timeout in the first place :)
 
-> 
-> -- 
-> Luiz Augusto von Dentz
+> As per Sec 4.6 of Proximity Profile Spec,
+> “If the path loss falls below a threshold set on the Proximity Monitor
+> it shall write in the Alert Level characteristic of the Immediate
+> Alert service, using the GATT Write Without Response sub-procedure, to
+> cause the Proximity Reporter to end the alert. When the path loss is
+> below the threshold the Proximity Monitor should stop alerting.”
+>
+> So this means that the proximity monitor should not change the alert
+> level to “None” until the path loss is above Threshold.
 
+I think it is better to not have BlueZ itself change the alert level
+to "none", instead the application can do this when it detects the
+path loss above Threshold. This can be easily achieved by monitoring
+the "SignalLevel" property changes on the Proximity API, and writing
+to ImmediateAlertLevel as necessary. After all, the threshold is
+dependent on the application settings.
 
-Cheers,
+Regards,
 -- 
-Vinicius
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
