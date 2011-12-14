@@ -1,41 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Wed, 14 Dec 2011 19:48:24 +0530
-Message-ID: <CACj007n47KuT4uzJMDnHc2KKy_Mog469QvvrRm5mAE54Q6Y7Ug@mail.gmail.com>
-Subject: [RFC BlueZ]Proximity Monitor: Immediate Alert Timeout
-From: Hemant Gupta <hemantgupta.ste@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B026457760@DNCE02.ent.ti.com>
+References: <1323820654-16820-1-git-send-email-vinicius.gomes@openbossa.org>
+	<1323820654-16820-4-git-send-email-vinicius.gomes@openbossa.org>
+	<F0070FBC0FB3174D8D11444EB2D5B026457760@DNCE02.ent.ti.com>
+Date: Wed, 14 Dec 2011 10:56:27 -0300
+Message-ID: <CAE6HaMn_z7gUuQOVfM79jDAKFAHurCaWbsQKBcTWz=hGg2366g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 4/5] Remove the default security level from btio
+From: Vinicius Gomes <vinicius.gomes@openbossa.org>
+To: "Ganir, Chen" <chen.ganir@ti.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Chen,
 
-I am working on Proximity Monitor Role using BlueZ 4.96 + and have a
-query on the need for Timeout in case of Immediate Alert in file
-proximity/monitor.c.
+On Wed, Dec 14, 2011 at 8:43 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
+> Vinicius
+>
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> owner@vger.kernel.org] On Behalf Of Vinicius Costa Gomes
+>> Sent: Wednesday, December 14, 2011 1:58 AM
+>> To: linux-bluetooth@vger.kernel.org
+>> Cc: Vinicius Costa Gomes
+>> Subject: [PATCH BlueZ 4/5] Remove the default security level from btio
+>>
+>> The default value of sec_level when setting *any* option
+>> using bt_io_set() was BT_SECURITY_MEDIUM. This was causing
+>> the security procedure being started in some situations that
+>> it should not.
+>> ---
+>>  btio/btio.c |    1 -
+>>  1 files changed, 0 insertions(+), 1 deletions(-)
+>>
+>> diff --git a/btio/btio.c b/btio/btio.c
+>> index 5641a9c..c26a734 100644
+>> --- a/btio/btio.c
+>> +++ b/btio/btio.c
+>> @@ -698,7 +698,6 @@ static gboolean parse_set_opts(struct set_opts
+>> *opts, GError **err,
+>>       /* Set defaults */
+>>       opts->defer = DEFAULT_DEFER_TIMEOUT;
+>>       opts->master = -1;
+>> -     opts->sec_level = BT_IO_SEC_MEDIUM;
+>
+> So removing this simply sets the default security level to none ?
 
-I feel that this timer is not required, because this will lead to
-following scenario in case of Proximity Profile:
+Yes. But this is a fix for an API bug, that if I don't want the
+security level to increase to medium
+when setting an option using btio, I need to specify the security
+level on bt_io_set().
 
-If Path loss has occurred and Immediate Alert has been written, then
-after Timeout (5 seconds), Proximity Monitor will set immediate alert
-level to �none�, which will indicate to Proximity Reporter that Path
-Loss is now within threshold, which actually might not be the case.
+>
+>>       opts->mode = L2CAP_MODE_BASIC;
+>>       opts->flushable = -1;
+>>       opts->priority = 0;
+>> --
+>> 1.7.8
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-
+>> bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+> Thanks,
+> Chen Ganir
+>
 
-As per Sec 4.6 of Proximity Profile Spec,
-�If the path loss falls below a threshold set on the Proximity Monitor
-it shall write in the Alert Level characteristic of the Immediate
-Alert service, using the GATT Write Without Response sub-procedure, to
-cause the Proximity Reporter to end the alert. When the path loss is
-below the threshold the Proximity Monitor should stop alerting.�
 
-So this means that the proximity monitor should not change the alert
-level to �None� until the path loss is above Threshold.
-
-Please let me know if my understanding is correct.
-
+Cheers,
 -- 
-Best Regards
-Hemant Gupta
-ST-Ericsson India
+Vinicius
