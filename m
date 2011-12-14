@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/7 v2] Bluetooth: Remove mgmt_set_service_cache
-Date: Thu, 15 Dec 2011 00:47:37 +0200
-Message-Id: <1323902861-15990-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/7 v2] Bluetooth: Move mgmt_set_fast_connectable to the right location
+Date: Thu, 15 Dec 2011 00:47:36 +0200
+Message-Id: <1323902861-15990-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1323902861-15990-1-git-send-email-johan.hedberg@gmail.com>
 References: <1323902861-15990-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,163 +11,86 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Instead of having an explicit service cache command we can make the mgmt
-API simpler by implicitly enabling the cache when mgmt_read_info is
-called for the first time and disabling it when mgmt_set_dev_class is
-called.
+Fast connectable is logically after the connectable property so that's
+where it should show up in the code as well (it's also after connectable
+in the settings bitfield).
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |    4 +++
- include/net/bluetooth/mgmt.h     |    5 ---
- net/bluetooth/hci_sock.c         |    7 +++-
- net/bluetooth/mgmt.c             |   56 +++++---------------------------------
- 4 files changed, 16 insertions(+), 56 deletions(-)
+ include/net/bluetooth/mgmt.h |    7 ++-----
+ net/bluetooth/mgmt.c         |   12 ++++++------
+ 2 files changed, 8 insertions(+), 11 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e34cd71..4e67bb8 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -958,12 +958,16 @@ int mgmt_device_unblocked(struct hci_dev *hdev, bdaddr_t *bdaddr);
- /* HCI info for socket */
- #define hci_pi(sk) ((struct hci_pinfo *) sk)
- 
-+/* HCI socket flags */
-+#define HCI_PI_MGMT_INIT	0
-+
- struct hci_pinfo {
- 	struct bt_sock    bt;
- 	struct hci_dev    *hdev;
- 	struct hci_filter filter;
- 	__u32             cmsg_mask;
- 	unsigned short   channel;
-+	unsigned long     flags;
- };
- 
- /* HCI security filter */
 diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index bf217cc..bdb0a58 100644
+index 85e9c6e..bf217cc 100644
 --- a/include/net/bluetooth/mgmt.h
 +++ b/include/net/bluetooth/mgmt.h
-@@ -121,11 +121,6 @@ struct mgmt_cp_set_dev_class {
- 	__u8 minor;
+@@ -100,6 +100,8 @@ struct mgmt_cp_set_discoverable {
+ 
+ #define MGMT_OP_SET_CONNECTABLE		0x0007
+ 
++#define MGMT_OP_SET_FAST_CONNECTABLE	0x001F
++
+ #define MGMT_OP_SET_PAIRABLE		0x0008
+ 
+ #define MGMT_OP_ADD_UUID		0x0009
+@@ -255,11 +257,6 @@ struct mgmt_cp_unblock_device {
+ 	bdaddr_t bdaddr;
  } __packed;
  
--#define MGMT_OP_SET_SERVICE_CACHE	0x000C
--struct mgmt_cp_set_service_cache {
+-#define MGMT_OP_SET_FAST_CONNECTABLE	0x001F
+-struct mgmt_cp_set_fast_connectable {
 -	__u8 enable;
 -} __packed;
 -
- struct mgmt_link_key_info {
+ #define MGMT_OP_USER_PASSKEY_REPLY	0x0020
+ struct mgmt_cp_user_passkey_reply {
  	bdaddr_t bdaddr;
- 	u8 type;
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index f6afe3d..47febe8 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -343,8 +343,11 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
- 	if (haddr.hci_channel > HCI_CHANNEL_CONTROL)
- 		return -EINVAL;
- 
--	if (haddr.hci_channel == HCI_CHANNEL_CONTROL && !enable_mgmt)
--		return -EINVAL;
-+	if (haddr.hci_channel == HCI_CHANNEL_CONTROL) {
-+		if (!enable_mgmt)
-+			return -EINVAL;
-+		set_bit(HCI_PI_MGMT_INIT, &hci_pi(sk)->flags);
-+	}
- 
- 	lock_sock(sk);
- 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 54092c2..25e7bf9 100644
+index 629570c..54092c2 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -316,7 +316,10 @@ static int read_controller_info(struct sock *sk, u16 index)
- 
- 	hci_dev_lock_bh(hdev);
- 
--	set_bit(HCI_MGMT, &hdev->flags);
-+	if (test_and_clear_bit(HCI_PI_MGMT_INIT, &hci_pi(sk)->flags)) {
-+		set_bit(HCI_MGMT, &hdev->flags);
-+		set_bit(HCI_SERVICE_CACHE, &hdev->flags);
-+	}
- 
- 	memset(&rp, 0, sizeof(rp));
- 
-@@ -989,6 +992,9 @@ static int set_dev_class(struct sock *sk, u16 index, unsigned char *data,
- 	hdev->major_class = cp->major;
- 	hdev->minor_class = cp->minor;
- 
-+	if (test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->flags))
-+		update_eir(hdev);
-+
- 	err = update_class(hdev);
- 
- 	if (err == 0)
-@@ -1000,51 +1006,6 @@ static int set_dev_class(struct sock *sk, u16 index, unsigned char *data,
- 	return err;
- }
- 
--static int set_service_cache(struct sock *sk, u16 index,  unsigned char *data,
--									u16 len)
--{
--	struct hci_dev *hdev;
--	struct mgmt_cp_set_service_cache *cp;
--	int err;
--
--	cp = (void *) data;
--
--	if (len != sizeof(*cp))
--		return cmd_status(sk, index, MGMT_OP_SET_SERVICE_CACHE,
--						MGMT_STATUS_INVALID_PARAMS);
--
--	hdev = hci_dev_get(index);
--	if (!hdev)
--		return cmd_status(sk, index, MGMT_OP_SET_SERVICE_CACHE,
--						MGMT_STATUS_INVALID_PARAMS);
--
--	hci_dev_lock_bh(hdev);
--
--	BT_DBG("hci%u enable %d", index, cp->enable);
--
--	if (cp->enable) {
--		set_bit(HCI_SERVICE_CACHE, &hdev->flags);
--		err = 0;
--	} else {
--		clear_bit(HCI_SERVICE_CACHE, &hdev->flags);
--		err = update_class(hdev);
--		if (err == 0)
--			err = update_eir(hdev);
--	}
--
--	if (err == 0)
--		err = cmd_complete(sk, index, MGMT_OP_SET_SERVICE_CACHE, NULL,
--									0);
--	else
--		cmd_status(sk, index, MGMT_OP_SET_SERVICE_CACHE, -err);
--
--
--	hci_dev_unlock_bh(hdev);
--	hci_dev_put(hdev);
--
--	return err;
--}
--
- static int load_link_keys(struct sock *sk, u16 index, unsigned char *data,
- 								u16 len)
+@@ -2052,7 +2052,7 @@ static int set_fast_connectable(struct sock *sk, u16 index,
+ 					unsigned char *data, u16 len)
  {
-@@ -2170,9 +2131,6 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- 	case MGMT_OP_SET_DEV_CLASS:
- 		err = set_dev_class(sk, index, buf + sizeof(*hdr), len);
+ 	struct hci_dev *hdev;
+-	struct mgmt_cp_set_fast_connectable *cp = (void *) data;
++	struct mgmt_mode *cp = (void *) data;
+ 	struct hci_cp_write_page_scan_activity acp;
+ 	u8 type;
+ 	int err;
+@@ -2070,7 +2070,7 @@ static int set_fast_connectable(struct sock *sk, u16 index,
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	if (cp->enable) {
++	if (cp->val) {
+ 		type = PAGE_SCAN_TYPE_INTERLACED;
+ 		acp.interval = 0x0024;	/* 22.5 msec page scan interval */
+ 	} else {
+@@ -2154,6 +2154,10 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 	case MGMT_OP_SET_CONNECTABLE:
+ 		err = set_connectable(sk, index, buf + sizeof(*hdr), len);
  		break;
--	case MGMT_OP_SET_SERVICE_CACHE:
--		err = set_service_cache(sk, index, buf + sizeof(*hdr), len);
++	case MGMT_OP_SET_FAST_CONNECTABLE:
++		err = set_fast_connectable(sk, index, buf + sizeof(*hdr),
++								len);
++		break;
+ 	case MGMT_OP_SET_PAIRABLE:
+ 		err = set_pairable(sk, index, buf + sizeof(*hdr), len);
+ 		break;
+@@ -2232,10 +2236,6 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 	case MGMT_OP_UNBLOCK_DEVICE:
+ 		err = unblock_device(sk, index, buf + sizeof(*hdr), len);
+ 		break;
+-	case MGMT_OP_SET_FAST_CONNECTABLE:
+-		err = set_fast_connectable(sk, index, buf + sizeof(*hdr),
+-								len);
 -		break;
- 	case MGMT_OP_LOAD_LINK_KEYS:
- 		err = load_link_keys(sk, index, buf + sizeof(*hdr), len);
- 		break;
+ 	default:
+ 		BT_DBG("Unknown op %u", opcode);
+ 		err = cmd_status(sk, index, opcode,
 -- 
 1.7.7.3
 
