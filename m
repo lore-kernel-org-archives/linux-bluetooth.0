@@ -1,39 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1323900264.1965.56.camel@aeonflux>
-Subject: Re: [PATCH 1/7] Bluetooth: Update mgmt_read_info and related mgmt
- messages
-From: Marcel Holtmann <marcel@holtmann.org>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 14 Dec 2011 23:04:24 +0100
-In-Reply-To: <1323899524-13653-2-git-send-email-johan.hedberg@gmail.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 7/7] Bluetooth: Use correct struct for user_confirm_neg_reply
+Date: Wed, 14 Dec 2011 23:52:04 +0200
+Message-Id: <1323899524-13653-8-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1323899524-13653-1-git-send-email-johan.hedberg@gmail.com>
 References: <1323899524-13653-1-git-send-email-johan.hedberg@gmail.com>
-	 <1323899524-13653-2-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> This patch updates the mgmt_read_info and related messages to the latest
-> management API which uses a bitfield of settings instead of individual
-> boolean values.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  include/net/bluetooth/hci.h  |    1 +
->  include/net/bluetooth/mgmt.h |   29 +++++---
->  net/bluetooth/mgmt.c         |  146 +++++++++++++++++++++++++++---------------
->  3 files changed, 113 insertions(+), 63 deletions(-)
+This patch fixes user_confirm_neg_reply to use the appropriate struct
+for accessing the call parameters.
 
-I would have split the hci.h patch into a separate one, but since it is
-so tiny, this is fine with me as well.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 4d531b9..054229f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1690,7 +1690,7 @@ static int user_confirm_reply(struct sock *sk, u16 index, void *data, u16 len)
+ static int user_confirm_neg_reply(struct sock *sk, u16 index, void *data,
+ 									u16 len)
+ {
+-	struct mgmt_cp_user_confirm_reply *cp = (void *) data;
++	struct mgmt_cp_user_confirm_neg_reply *cp = (void *) data;
+ 
+ 	BT_DBG("");
+ 
+-- 
+1.7.7.3
 
