@@ -1,77 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJdJm_OnyeExrgvainhqPMUgV9C2QU08PafyXZa9-oJxgkEaEg@mail.gmail.com>
-References: <CACj007n47KuT4uzJMDnHc2KKy_Mog469QvvrRm5mAE54Q6Y7Ug@mail.gmail.com>
-	<CAJdJm_OnyeExrgvainhqPMUgV9C2QU08PafyXZa9-oJxgkEaEg@mail.gmail.com>
-Date: Wed, 14 Dec 2011 13:46:33 -0300
-Message-ID: <CAKT1EBf+YPUggU6FX1EJjCtF7_C3zXCpwq=hG6Q+6DKyEo0=_A@mail.gmail.com>
-Subject: Re: [RFC BlueZ]Proximity Monitor: Immediate Alert Timeout
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	Hemant Gupta <hemantgupta.ste@gmail.com>
+Date: Wed, 14 Dec 2011 13:35:57 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH BlueZ 1/5] Add support for getting the Encryption Key
+ Size via btio
+Message-ID: <20111214163557.GA17841@samus>
+References: <1323820654-16820-1-git-send-email-vinicius.gomes@openbossa.org>
+ <CABBYNZJzb6nSbq6JpKOn3HxcaYvLSw0JWzzHQsYh+DtfFfb+7w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CABBYNZJzb6nSbq6JpKOn3HxcaYvLSw0JWzzHQsYh+DtfFfb+7w@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hemant,
+Hi Luiz,
 
-On Wed, Dec 14, 2011 at 11:33 AM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Hemant,
->
-> On Wed, Dec 14, 2011 at 10:18 AM, Hemant Gupta
-> <hemantgupta.ste@gmail.com> wrote:
->> Hi,
->>
->> I am working on Proximity Monitor Role using BlueZ 4.96 + and have a
->> query on the need for Timeout in case of Immediate Alert in file
->> proximity/monitor.c.
->>
->> I feel that this timer is not required, because this will lead to
->> following scenario in case of Proximity Profile:
->>
->> If Path loss has occurred and Immediate Alert has been written, then
->> after Timeout (5 seconds), Proximity Monitor will set immediate alert
->> level to â€œnoneâ€, which will indicate to Proximity Reporter that Path
->> Loss is now within threshold, which actually might not be the case.
->
-> I think this timeout is causing more harm than good (sometimes due to
-> temporary latency between the two writes, the "none" alert level may
-> arrive right after the previous level, which may cause the reporter to
-> remain silent), so I agree with you. But I will wait for Claudio's
-> opinion as he implemented this timeout in the first place :)
+On 14:09 Wed 14 Dec, Luiz Augusto von Dentz wrote:
+> Hi Vinicius,
+> 
+> On Wed, Dec 14, 2011 at 1:57 AM, Vinicius Costa Gomes
+> <vinicius.gomes@openbossa.org> wrote:
+> > +static gboolean get_key_size(int sock, BtIOType type, int *size,
+> > +                                                               GError **err)
+> > +{
+> > +       struct bt_security sec;
+> > +       socklen_t len;
+> > +
+> > +       memset(&sec, 0, sizeof(sec));
+> > +       len = sizeof(sec);
+> > +       if (getsockopt(sock, SOL_BLUETOOTH, BT_SECURITY, &sec, &len) == 0) {
+> > +               *size = sec.key_size;
+> > +               return TRUE;
+> > +       }
+> > +
+> > +       return FALSE;
+> > +}
+> 
+> It doesn't seems that the type is used for anything here, so you can
+> probably removed it.
 
-Remember that Immediate Alert Service is used by Path Loss and Find Me.
-How are you testing it if kernel RSSI Monitor patches are not upstream?
+True. I will fix it.
 
-Removing the timeout and write to "none" has a side effect: the remote
-and the local value can have different values if the remote changes
-the value. Alert Level characteristic doesn't support read,
-notification or indication. Probably, all devices disable the alert
-after some seconds to avoid drain the battery or be annoying.
-The main problem is consistency: show to the user the correct value.
+> 
+> -- 
+> Luiz Augusto von Dentz
 
->
->> As per Sec 4.6 of Proximity Profile Spec,
->> â€œIf the path loss falls below a threshold set on the Proximity Monitor
->> it shall write in the Alert Level characteristic of the Immediate
->> Alert service, using the GATT Write Without Response sub-procedure, to
->> cause the Proximity Reporter to end the alert. When the path loss is
->> below the threshold the Proximity Monitor should stop alerting.â€
->>
->> So this means that the proximity monitor should not change the alert
->> level to â€œNoneâ€ until the path loss is above Threshold.
->
-> I think it is better to not have BlueZ itself change the alert level
-> to "none", instead the application can do this when it detects the
-> path loss above Threshold. This can be easily achieved by monitoring
-> the "SignalLevel" property changes on the Proximity API, and writing
-> to ImmediateAlertLevel as necessary. After all, the threshold is
-> dependent on the application settings.
 
-If this change doesn't cause problems to Find Me I agree with removing
-this timeout/write.
-
-Regards,
-Claudio
+Cheers,
+-- 
+Vinicius
