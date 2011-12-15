@@ -1,25 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 15 Dec 2011 15:23:31 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd] map: Fix dbus call after method rename
-Message-ID: <20111215132331.GA11594@x220>
-References: <1323953882-5261-1-git-send-email-bulislaw@linux.com>
+Message-ID: <4EE9F230.7020108@globaledgesoft.com>
+Date: Thu, 15 Dec 2011 18:42:16 +0530
+From: sathish <sathish.n@globaledgesoft.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1323953882-5261-1-git-send-email-bulislaw@linux.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: AVRCP
+References: <4E9CF709.6080706@globaledgesoft.com> <CAMOw1v7vqcsqFS3AmuoxHxQXXo-CWea8xJFSomyfDgkFo3b4FQ@mail.gmail.com>
+In-Reply-To: <CAMOw1v7vqcsqFS3AmuoxHxQXXo-CWea8xJFSomyfDgkFo3b4FQ@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Bartosz,
+  On Wednesday 19 October 2011 03:43 AM, Lucas De Marchi wrote:
+> Hi Sathish
+>
+> On Tue, Oct 18, 2011 at 1:48 AM, sathish<sathish.n@globaledgesoft.com>  wrote:
+>> Hi,
+>>    I like to know , how to implement avrcp between two systems in Linux using
+>> bluez . Is there any one one who can help me. where bluez supports both
+>> control and target. but how to implement it .
+> The functionality provided in control role is very limited. It's only
+> some pieces of 1.0 spec. Since target only reacts to commands coming
+> from CT, you'll not be able to do anything useful with 2 systems using
+> Linux.
+>
+>
+> If you want to use it only as target, it has all the mandatory
+> features of AVRCP 1.3 + some optional ones. Then you can use it by:
+>
+> 1) Enable the Media interface in /etc/bluetooth/audio.conf
+> 2) Start bluetoothd service
+> 3) Start test/mpris-player
+> 4) Use a media player that supports mpris 2.0: amarok, rhytmbox and a
+> few others.
+>
+> If you are going to implement it in a media player, I suggest
+> implementing our dbus interface, so you can cut the 3rd step.
+>
+>
+> regards,
+> Lucas De Marchi
+>
+Hi sir,
+     The target part you said is working fine. I want to know how to get 
+the control side information which dbus mwthod call will provide the 
+metadata information. In control-api there is no api for getting 
+metadata from the remote device. please help in the above mentioned 
+scenario which will be very useful for my understanding of avrcp in bluez
 
-On Thu, Dec 15, 2011, Bartosz Szatkowski wrote:
-> ---
->  test/map-client |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+-- 
 
-Applied. Btw, when not referring to a symbol in the code or something
-similar, please spell D-Bus as D-Bus (I fixed it this time).
+Thanks&  Regards,
+Sathish N
 
-Johan
