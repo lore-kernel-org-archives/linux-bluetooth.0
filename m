@@ -1,48 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Correct structures for AMP Assoc Read
-Date: Thu, 15 Dec 2011 11:48:03 +0200
-Message-Id: <1323942483-24779-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <1323942017.1965.79.camel@aeonflux>
+Subject: Re: [RFCv0] Bluetooth: General HCI callback implementation
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 15 Dec 2011 10:40:17 +0100
+In-Reply-To: <20111215091912.GD15283@aemeltch-MOBL1>
+References: <1323436248-3736-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1323901223.1965.70.camel@aeonflux> <20111215091912.GD15283@aemeltch-MOBL1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andrei,
 
-Make struct names similar to kernel and remove static array since
-fragment length can be other size than HCI_MAX_NAME_LENGTH, which
-is for totally different purpose.
----
- lib/hci.h |   11 +++++------
- 1 files changed, 5 insertions(+), 6 deletions(-)
+> > > Add general HCI callback implementation. Can be used for executing
+> > > HCI commands from A2MP protocol.
+> > > ---
+> > >  include/net/bluetooth/hci_core.h |   14 +++++++++++
+> > >  net/bluetooth/hci_core.c         |   47 ++++++++++++++++++++++++++++++++++++++
+> > >  net/bluetooth/hci_event.c        |    4 +++
+> > >  3 files changed, 65 insertions(+), 0 deletions(-)
+> > > 
+> > > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> > > index cc5481d..e473cd2 100644
+> > > --- a/include/net/bluetooth/hci_core.h
+> > > +++ b/include/net/bluetooth/hci_core.h
+> > > @@ -121,6 +121,15 @@ struct adv_entry {
+> > >  	u8 bdaddr_type;
+> > >  };
+> > >  
+> > > +struct hci_dev;
+> > > +
+> > > +struct cb_cmd {
+> > > +	struct list_head list;
+> > > +	u16 opcode;
+> > > +	void *opt;
+> > > +	void (*cb)(struct hci_dev *hdev, void *opt);
+> > > +};
+> > > +
+> > 
+> > so I am actually thinking that we might just update hci_request into a
+> > bit more flexible schema.
+> 
+> Do you mean that we can use blocking hci_request? This may work but some
+> commands requires special logic (like executing several Read AMP Assoc
+> data requests). I don't know would it be the best solution especially when
+> executing from A2MP/L2CAP code.
 
-diff --git a/lib/hci.h b/lib/hci.h
-index 51184ee..48692fa 100644
---- a/lib/hci.h
-+++ b/lib/hci.h
-@@ -1382,17 +1382,16 @@ typedef struct {
- #define OCF_READ_LOCAL_AMP_ASSOC	0x000A
- typedef struct {
- 	uint8_t		handle;
--	uint16_t	length_so_far;
--	uint16_t	assoc_length;
-+	uint16_t	len_so_far;
-+	uint16_t	max_len;
- } __attribute__ ((packed)) read_local_amp_assoc_cp;
--#define READ_LOCAL_AMP_ASSOC_CP_SIZE 5
-+
- typedef struct {
- 	uint8_t		status;
- 	uint8_t		handle;
--	uint16_t	length;
--	uint8_t		fragment[HCI_MAX_NAME_LENGTH];
-+	uint16_t	rem_len;
-+	uint8_t		frag[0];
- } __attribute__ ((packed)) read_local_amp_assoc_rp;
--#define READ_LOCAL_AMP_ASSOC_RP_SIZE 252
- 
- #define OCF_WRITE_REMOTE_AMP_ASSOC	0x000B
- typedef struct {
--- 
-1.7.4.1
+that is my point exactly. Once we do HCI processing in process context,
+we will also have L2CAP running fully in process context. Hence it could
+just wait for the result.
+
+> > Gustavo is working on moving everything into a process context, so we
+> > can actually sleep. And we could just make a simple premise to only
+> 
+> This would be good, meanwhile I have implemented callback execution in a
+> workqueue. I will send second RFC version later today.
+
+Not sure how that helps us right now. I rather wait a bit for Gustavo to
+submit his patchset and then we figure this out. It seems to be a more
+general problem anyway and we keep hitting it quite of often right now.
+
+Regards
+
+Marcel
+
 
