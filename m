@@ -1,49 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 15 Dec 2011 13:50:09 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd 4/4] Add support for PullMessagesListing in MAP
+ client
+Message-ID: <20111215115009.GB8056@x220>
+References: <1323703867-20577-1-git-send-email-bulislaw@linux.com>
+ <1323703867-20577-4-git-send-email-bulislaw@linux.com>
 MIME-Version: 1.0
-In-Reply-To: <1323943267-14576-5-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1323943267-14576-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1323943267-14576-5-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Thu, 15 Dec 2011 13:51:26 +0200
-Message-ID: <CABBYNZK3ABq0mzaBiQoD9cQGtBv0cx6sL1L2_rcapc9hz3VzBg@mail.gmail.com>
-Subject: Re: [PATCH 4/4] audio: do not disconnect on gateway SCO failure
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1323703867-20577-4-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Bartosz,
 
-On Thu, Dec 15, 2011 at 12:01 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> Failure on BlueZ-initiated SCO requests should not drop the RFCOMM
-> connection to the gateway. Instead, considering the stream as suspended
-> should be enough.
-> ---
->  audio/gateway.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/audio/gateway.c b/audio/gateway.c
-> index 9b1aab3..f28b14d 100644
-> --- a/audio/gateway.c
-> +++ b/audio/gateway.c
-> @@ -255,7 +255,7 @@ static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
->
->        if (err) {
->                error("sco_connect_cb(): %s", err->message);
-> -               gateway_close(dev);
-> +               gateway_suspend_stream(dev);
->                return;
->        }
->
-> --
-> 1.7.6.4
->
+On Mon, Dec 12, 2011, Bartosz Szatkowski wrote:
+> +	{ "GetMessagesListing",	"sa{ss}", "s",	map_get_messages_listing,
+> +						G_DBUS_METHOD_FLAG_ASYNC },
 
-Ack, this should be up to the endpoint to decided since it may want to retry.
+The name should be GetMessageListing and not GetMessagesListing (the
+latter isn't really proper english). I went ahead and changed it through
+a separate patch since I didn't notice before having already applied
+your patch. Also, all this seems to be missing from the API
+documentation (doc/*). Please send a patch for that.
 
--- 
-Luiz Augusto von Dentz
+Johan
