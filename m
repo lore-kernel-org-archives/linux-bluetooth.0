@@ -1,77 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1323853510-5195-2-git-send-email-frederic.danis@linux.intel.com>
-References: <1323853510-5195-1-git-send-email-frederic.danis@linux.intel.com>
-	<1323853510-5195-2-git-send-email-frederic.danis@linux.intel.com>
-Date: Thu, 15 Dec 2011 12:00:11 +0200
-Message-ID: <CABBYNZKyY40pn-Sm_VSxHLqzbrQ9q-63Sjwmf=kvh4Dy1x9-bw@mail.gmail.com>
-Subject: Re: [RFC v5 1/8] audio: Move tel drivers to DBus interface
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Danis?=
-	<frederic.danis@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Correct structures for AMP Assoc Read
+Date: Thu, 15 Dec 2011 11:48:03 +0200
+Message-Id: <1323942483-24779-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-2011/12/14 Frédéric Danis <frederic.danis@linux.intel.com>:
-> +TelephonyAgent hierarchy
-> +========================
-> +
-> +Service                unique name
-> +Interface      org.bluez.TelephonyAgent
-> +Object path    freely definable
-> +
-> +Methods                void NewConnection(filedescriptor fd, dict properties)
-> +
-> +                       This method gets called whenever a new connection
-> +                       has been established. This method assumes that DBus
-> +                       daemon with file descriptor passing capability is
-> +                       being used.
-> +
-> +                       The agent should only return successfully once the
-> +                       establishment of the service level connection (SLC)
-> +                       has been completed.  In the case of Handsfree this
-> +                       means that BRSF exchange has been performed and
-> +                       necessary initialization has been done.
-> +
-> +                       possible properties:
-> +
-> +                               strict Device:
-> +
-> +                                       BlueZ remote device object.
-> +
-> +                               string UUID:
-> +
-> +                                       Profile UUID of the connection.
-> +
-> +                               uint16 Version:
-> +
-> +                                       Remote profile version.
-> +
-> +                               uint16 Features:
-> +
-> +                                       Remote profile features.
-> +
-> +                               string MediaTransportPath:
-> +
-> +                                       Optional. MediaTransport object path.
+Make struct names similar to kernel and remove static array since
+fragment length can be other size than HCI_MAX_NAME_LENGTH, which
+is for totally different purpose.
+---
+ lib/hci.h |   11 +++++------
+ 1 files changed, 5 insertions(+), 6 deletions(-)
 
-I thought we had agreed in having the transport implemented directly
-inside the agent, at least that was my proposal, otherwise it keeps
-bluetoothd in the middle of the communication. It may not seem obvious
-but we should target low latency as we are dealing with audio the
-events need to be propagated fast.
-
-So instead of MediaTransportPath, what I suggest is sending the
-endpoint itself e.g. string,object Endpoint Connection id and object
-path of the MediaEndpoint to be used. This means the agent e.g. oFono
-will have to create an object which implements
-org.bluez.MediaTransport and then call
-org.bluez.MediaEndpoint.SetConfiguration in the received object.
-
-
+diff --git a/lib/hci.h b/lib/hci.h
+index 51184ee..48692fa 100644
+--- a/lib/hci.h
++++ b/lib/hci.h
+@@ -1382,17 +1382,16 @@ typedef struct {
+ #define OCF_READ_LOCAL_AMP_ASSOC	0x000A
+ typedef struct {
+ 	uint8_t		handle;
+-	uint16_t	length_so_far;
+-	uint16_t	assoc_length;
++	uint16_t	len_so_far;
++	uint16_t	max_len;
+ } __attribute__ ((packed)) read_local_amp_assoc_cp;
+-#define READ_LOCAL_AMP_ASSOC_CP_SIZE 5
++
+ typedef struct {
+ 	uint8_t		status;
+ 	uint8_t		handle;
+-	uint16_t	length;
+-	uint8_t		fragment[HCI_MAX_NAME_LENGTH];
++	uint16_t	rem_len;
++	uint8_t		frag[0];
+ } __attribute__ ((packed)) read_local_amp_assoc_rp;
+-#define READ_LOCAL_AMP_ASSOC_RP_SIZE 252
+ 
+ #define OCF_WRITE_REMOTE_AMP_ASSOC	0x000B
+ typedef struct {
 -- 
-Luiz Augusto von Dentz
+1.7.4.1
+
