@@ -1,48 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20111215121700.GA10535@x220>
-References: <1323703867-20577-1-git-send-email-bulislaw@linux.com>
-	<1323703867-20577-4-git-send-email-bulislaw@linux.com>
-	<20111215115009.GB8056@x220>
-	<CAPGrrxWWRPkCyKgRu2SkEmdhjdZgkjEQ+ES0DhfuoshvsVBUfw@mail.gmail.com>
-	<20111215121700.GA10535@x220>
-Date: Thu, 15 Dec 2011 13:45:09 +0100
-Message-ID: <CAPGrrxVH_S=bJopAv-9nzW_kL9YxJh4FHYGRby-dZQcjS+jvzw@mail.gmail.com>
-Subject: Re: [PATCH obexd 4/4] Add support for PullMessagesListing in MAP client
-From: Bartosz Szatkowski <bulislaw@linux.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [RFC] media: assertion to check that transport exists
+Date: Thu, 15 Dec 2011 13:33:55 +0100
+Message-Id: <1323952435-3244-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Dec 15, 2011 at 1:17 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Bartosz,
->
-> On Thu, Dec 15, 2011, Bartosz Szatkowski wrote:
->> > The name should be GetMessageListing and not GetMessagesListing (the
->> > latter isn't really proper english). I went ahead and changed it through
->> > a separate patch since I didn't notice before having already applied
->> > your patch. Also, all this seems to be missing from the API
->> > documentation (doc/*). Please send a patch for that.
->>
->> The function name is "GetMessagesListing" in spec.
->> There is no doc as at the moment there is no apparams handling and no
->> xml parsing, so I'll send patch with doc when we reach full
->> functionality.
->
-> So the plan is to return something else than the raw XML that MAP
-> provides? In that case I don't think it's necessary to hold on to the
-> exact spec naming of these functions. E.g. GetMessages or GetMessageList
-> might make more sense in the case that you return a pre-parsed
-> list/structure of some kind.
->
-> Johan
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-We planned to return dict {field: value}. Generally I don't care much
-about this name - we can go with GetMessageListing, as I seem to use
-both forms without noticing it anyway.
+>From my understanding, a transport should exist for any non-disconnected
+gateway.
 
+These assertions sometimes fail though. So I would like to clarify if
+that's a consistent state in BlueZ or there is some bug.
+---
+ audio/media.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/audio/media.c b/audio/media.c
+index a2ef437..c5fe3d9 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -28,6 +28,7 @@
+ #endif
+ 
+ #include <errno.h>
++#include <assert.h>
+ 
+ #include <glib.h>
+ #include <gdbus.h>
+@@ -620,8 +621,10 @@ static void gateway_state_changed(struct audio_device *dev,
+ 					gateway_setconf_cb, dev, NULL);
+ 		break;
+ 	case GATEWAY_STATE_CONNECTED:
++		assert(endpoint->transport != NULL);
+ 		break;
+ 	case GATEWAY_STATE_PLAYING:
++		assert(endpoint->transport != NULL);
+ 		break;
+ 	}
+ }
 -- 
-Pozdrowienia - Cheers,
-Bartosz Szatkowski
+1.7.6.4
+
