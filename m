@@ -1,83 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.02.1112151101550.24351@mathewm-linux>
-References: <1323879926-15971-1-git-send-email-andre.guedes@openbossa.org>
-	<1323879926-15971-6-git-send-email-andre.guedes@openbossa.org>
-	<1323891366.1965.55.camel@aeonflux>
-	<alpine.DEB.2.02.1112151101550.24351@mathewm-linux>
-Date: Thu, 15 Dec 2011 21:05:22 +0100
-Message-ID: <CANq1E4Qc9nrF=aBP8bfN8t4FhkomCoHqkz7h2pEcP5eG+XTJHQ@mail.gmail.com>
 Subject: Re: [PATCH 5/7] Bluetooth: LE scan infra-structure
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Andre Guedes <andre.guedes@openbossa.org>,
+Mime-Version: 1.0 (Apple Message framework v1251.1)
+Content-Type: text/plain; charset=us-ascii
+From: Andre Guedes <andre.guedes@openbossa.org>
+In-Reply-To: <alpine.DEB.2.02.1112151101550.24351@mathewm-linux>
+Date: Thu, 15 Dec 2011 17:00:28 -0300
+Cc: Marcel Holtmann <marcel@holtmann.org>,
 	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <C7FEB13E-1C6B-4220-AF1A-7A8F5208E5D1@openbossa.org>
+References: <1323879926-15971-1-git-send-email-andre.guedes@openbossa.org>  <1323879926-15971-6-git-send-email-andre.guedes@openbossa.org> <1323891366.1965.55.camel@aeonflux> <alpine.DEB.2.02.1112151101550.24351@mathewm-linux>
+To: Mat Martineau <mathewm@codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat
+Hi Mat,
 
-On Thu, Dec 15, 2011 at 8:25 PM, Mat Martineau <mathewm@codeaurora.org> wro=
-te:
->
+On Dec 15, 2011, at 4:25 PM, Mat Martineau wrote:
+
+> 
 > Marcel & Andre -
->
->
+> 
 > On Wed, 14 Dec 2011, Marcel Holtmann wrote:
->
+> 
 >> Hi Andre,
->>
+>> 
 >>> This patch adds to hci_core an infra-structure to scan LE devices.
->>>
+>>> 
 >>> The LE scan is implemented using a work_struct which is enqueued
 >>> on hdev->workqueue. The LE scan work sends commands (Set LE Scan
 >>> Parameters and Set LE Scan Enable) to the controller and waits for
 >>> its results. If commands were executed successfully a timer is set
 >>> to disable the ongoing scanning after some amount of time.
->>
->>
+>> 
 >> so I rather hold off on these until we get the tasklet removal patches
 >> merged. The mgmt processing will then also be done in process context
 >> and we can just sleep. This should make code like this a lot simpler.
->
->
->
-> While execution on a workqueue can sleep, it's not a good idea to block f=
-or
-> a long time like this patch does. =A0A single-threaded workqueue (like th=
-e
-> hdev workqueue) will not run the next scheduled work until the current wo=
-rk
-> function returns. =A0If code executing in a workqueue suspends execution =
-by
-> using a wait queue, like le_scan_workqueue(), then all other pending work=
- is
-> blocked until le_scan_workqueue() returns.
+> 
+> 
+> While execution on a workqueue can sleep, it's not a good idea to block for a long time like this patch does.  A single-threaded workqueue (like the hdev workqueue) will not run the next scheduled work until the current work function returns.  If code executing in a workqueue suspends execution by using a wait queue, like le_scan_workqueue(), then all other pending work is blocked until le_scan_workqueue() returns.
 
-Why do we use a single-threaded workqueue anyway? Why don't we switch
-to a non-reentrant workqueue? Otherwise, we are just blocking the
-whole hdev workqueue because we are too lazy to implement proper
-locking between work-structs that depend on each other.
+Yes, I'm aware of it. This is why we have the schedule_timeout(). Most
+of the time, we sleep for a short time since the controller sends the
+command result event just after we send the command. If the controller
+takes too long or simply doesn't send the command event we timeout
+and abort the le scan work. This way we don't starve other works
+enqueued on hdev->workqueue.
 
-> It might be better to think of workqueues as having similar restrictions =
-to
-> tasklets, except you can use GFP_KERNEL when allocating and can block whi=
-le
-> acquiring locks.
+Do you mean "block for a long time" the time we wait for the command
+result or the timeout?
 
-That sounds like a lot of work with almost no benefit. If we start the
-transition from tasklets to workqueues I think we should do it
-properly so we do not require a single-threaded workqueue.
+BR,
 
-> In getting rid of tasklets, I think we also need to not use timers (which
-> also execute in softirq context), and use the delayed_work calls instead.
-> =A0That way we can assume all net/bluetooth code runs in process context,
-> except for calls up from the driver layer.
+Andre
 
-Are there currently any pending patches? I've tried converting the
-tasklets to workqueues myself but I always ended up with several
-race-conditions. I haven't found a clean and easy way to fix them,
-yet. And it's also a quite frustrating work.
-
-Cheers
-David
