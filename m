@@ -1,59 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 15 Dec 2011 13:16:14 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Hemant Gupta <hemant.gupta@stericsson.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Naresh Gupta <naresh.gupta@stericsson.com>,
+	Hemant Gupta <hemantgupta.ste@gmail.com>
+Subject: Re: [PATCH v1] mgmt: Add support for Passkey handling
+Message-ID: <20111215111614.GA3396@x220>
+References: <1323157599-5735-1-git-send-email-hemant.gupta@stericsson.com>
 MIME-Version: 1.0
-In-Reply-To: <4EE9D453.6020503@linux.intel.com>
-References: <1323853510-5195-1-git-send-email-frederic.danis@linux.intel.com>
-	<1323853510-5195-2-git-send-email-frederic.danis@linux.intel.com>
-	<CABBYNZKyY40pn-Sm_VSxHLqzbrQ9q-63Sjwmf=kvh4Dy1x9-bw@mail.gmail.com>
-	<4EE9D453.6020503@linux.intel.com>
-Date: Thu, 15 Dec 2011 13:25:34 +0200
-Message-ID: <CABBYNZL3sCMtSQ4bVetdA25wRmoFZz8BWhsZoRcf4WpcCpi54w@mail.gmail.com>
-Subject: Re: [RFC v5 1/8] audio: Move tel drivers to DBus interface
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1323157599-5735-1-git-send-email-hemant.gupta@stericsson.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frederic,
+Hi Hemant,
 
-On Thu, Dec 15, 2011 at 1:04 PM, Frederic Danis
-<frederic.danis@linux.intel.com> wrote:
->>
->>
->> I thought we had agreed in having the transport implemented directly
->> inside the agent, at least that was my proposal, otherwise it keeps
->> bluetoothd in the middle of the communication. It may not seem obvious
->> but we should target low latency as we are dealing with audio the
->> events need to be propagated fast.
->>
->> So instead of MediaTransportPath, what I suggest is sending the
->> endpoint itself e.g. string,object Endpoint Connection id and object
->> path of the MediaEndpoint to be used. This means the agent e.g. oFono
->> will have to create an object which implements
->> org.bluez.MediaTransport and then call
->> org.bluez.MediaEndpoint.SetConfiguration in the received object.
->>
->>
->
-> If I understand correctly, passing Media Endpoint connection and path will
-> imply that the telephony agent will have to manage the SCO connection, which
-> means that we need to link the telephony agent with BlueZ libs.
-> As far as I understand, one of the goals is to remove telephony code from
-> BlueZ and bluetooth code from telephony daemon.
-> Am I wrong ?
->
-> Passing the MediaTransport allows to keep bluetooth part in BlueZ daemon and
-> telephony part in telephony agent.
+On Tue, Dec 06, 2011, Hemant Gupta wrote:
+> This patch adds support for handling Passkey Requests
+> and response over management interface.
+> ---
+>  lib/mgmt.h        |   17 ++++++++++
+>  plugins/mgmtops.c |   85 ++++++++++++++++++++++++++++++++++++++++++++++------
+>  2 files changed, 92 insertions(+), 10 deletions(-)
 
-I wonder how you gonna be able to synchronize things like volume
-changes then, because you can't depend on the signals since that don't
-have the information of who did it, and in this case both agent and
-endpoint will be talking to the same transport, besides imo having
-events propagated quickly is much more important here. Now you are
-right about SCO connections but that doesn't mean we cannot have
-bluetoothd to still handle it and pass it back to the agent similarly
-what we have done with ConnectFD in Serial.
+This will need to be rebased against latest upstream git since it
+doesn't apply anymore. Also note that the mgmt structs and definitions
+are already in place so you don't need to add those.
 
--- 
-Luiz Augusto von Dentz
+Johan
