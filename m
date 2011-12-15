@@ -1,44 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 15 Dec 2011 13:59:42 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/4] mcap_sync.c: Fix include paths
-Message-ID: <20111215115942.GA9850@x220>
-References: <1323857512-5626-1-git-send-email-sancane@gmail.com>
- <1323857512-5626-2-git-send-email-sancane@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1323857512-5626-2-git-send-email-sancane@gmail.com>
+In-Reply-To: <20111215115405.GA9571@x220>
+References: <1323703867-20577-1-git-send-email-bulislaw@linux.com>
+	<1323703867-20577-4-git-send-email-bulislaw@linux.com>
+	<20111215115009.GB8056@x220>
+	<20111215115405.GA9571@x220>
+Date: Thu, 15 Dec 2011 12:56:30 +0100
+Message-ID: <CAPGrrxW-W4T-Cc_hTu5_Pav3WEgOBCZu1Ke+DJTQ0agKkojCjg@mail.gmail.com>
+Subject: Re: [PATCH obexd 4/4] Add support for PullMessagesListing in MAP client
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+On Thu, Dec 15, 2011 at 12:54 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi,
+>
+> On Thu, Dec 15, 2011, Johan Hedberg wrote:
+>> On Mon, Dec 12, 2011, Bartosz Szatkowski wrote:
+>> > +   { "GetMessagesListing", "sa{ss}", "s",  map_get_messages_listing,
+>> > +                                           G_DBUS_METHOD_FLAG_ASYNC },
+>>
+>> The name should be GetMessageListing and not GetMessagesListing (the
+>> latter isn't really proper english).
+>
+> And now I notice that the spec. actually uses the plural form (which
+> still sounds to me like strange English). All this fuss could have been
+> avoided if we had had a proper discussion of the API beforehand and had
+> the documentation in place before these patches.
+>
+> Johan
 
-On Wed, Dec 14, 2011, Santiago Carot-Nemesio wrote:
-> ---
->  health/mcap_sync.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/health/mcap_sync.c b/health/mcap_sync.c
-> index 5545cea..e2d7715 100644
-> --- a/health/mcap_sync.c
-> +++ b/health/mcap_sync.c
-> @@ -28,8 +28,8 @@
->  #include <stdlib.h>
->  #include <bluetooth/bluetooth.h>
->  #include <bluetooth/l2cap.h>
-> -#include "../src/adapter.h"
-> -#include "../src/manager.h"
-> +#include <adapter.h>
-> +#include <manager.h>
->  #include <sys/ioctl.h>
->  
->  #include "config.h"
+I've sent API before I've started to work on patches - only Luiz
+responded, and there was discussion on other matters ...
 
-There's more to fix here than this. config.h should come before anything
-else (and should be inside a #ifdef HAVE_CONFIG_H) and we sort the libc
-includes first, then dbus,glib,etc and finally the bluez internal
-includes.
-
-Johan
+-- 
+Pozdrowienia - Cheers,
+Bartosz Szatkowski
