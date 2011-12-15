@@ -1,39 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 15 Dec 2011 14:17:00 +0200
+Date: Thu, 15 Dec 2011 14:13:00 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>
-Cc: linux-bluetooth@vger.kernel.org
+To: Bartosz Szatkowski <bulislaw@linux.com>,
+	linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH obexd 4/4] Add support for PullMessagesListing in MAP
  client
-Message-ID: <20111215121700.GA10535@x220>
+Message-ID: <20111215121300.GA10391@x220>
 References: <1323703867-20577-1-git-send-email-bulislaw@linux.com>
  <1323703867-20577-4-git-send-email-bulislaw@linux.com>
  <20111215115009.GB8056@x220>
- <CAPGrrxWWRPkCyKgRu2SkEmdhjdZgkjEQ+ES0DhfuoshvsVBUfw@mail.gmail.com>
+ <20111215115405.GA9571@x220>
+ <CAPGrrxW-W4T-Cc_hTu5_Pav3WEgOBCZu1Ke+DJTQ0agKkojCjg@mail.gmail.com>
+ <20111215121016.GB10113@x220>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAPGrrxWWRPkCyKgRu2SkEmdhjdZgkjEQ+ES0DhfuoshvsVBUfw@mail.gmail.com>
+In-Reply-To: <20111215121016.GB10113@x220>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bartosz,
+Hi,
 
-On Thu, Dec 15, 2011, Bartosz Szatkowski wrote:
-> > The name should be GetMessageListing and not GetMessagesListing (the
-> > latter isn't really proper english). I went ahead and changed it through
-> > a separate patch since I didn't notice before having already applied
-> > your patch. Also, all this seems to be missing from the API
-> > documentation (doc/*). Please send a patch for that.
+On Thu, Dec 15, 2011, Johan Hedberg wrote:
+> On Thu, Dec 15, 2011, Bartosz Szatkowski wrote:
+> > I've sent API before I've started to work on patches - only Luiz
+> > responded, and there was discussion on other matters ...
 > 
-> The function name is "GetMessagesListing" in spec.
-> There is no doc as at the moment there is no apparams handling and no
-> xml parsing, so I'll send patch with doc when we reach full
-> functionality.
+> It seems I've forgotten to apply the API patch then. Can you point me to
+> the email subject so we can get this into the tree?
 
-So the plan is to return something else than the raw XML that MAP
-provides? In that case I don't think it's necessary to hold on to the
-exact spec naming of these functions. E.g. GetMessages or GetMessageList
-might make more sense in the case that you return a pre-parsed
-list/structure of some kind.
+Nevermind. I noticed from your other email that there's no such patch
+(yet).
 
 Johan
