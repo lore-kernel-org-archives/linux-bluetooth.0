@@ -1,70 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1323942017.1965.79.camel@aeonflux>
-Subject: Re: [RFCv0] Bluetooth: General HCI callback implementation
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 15 Dec 2011 10:40:17 +0100
-In-Reply-To: <20111215091912.GD15283@aemeltch-MOBL1>
-References: <1323436248-3736-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1323901223.1965.70.camel@aeonflux> <20111215091912.GD15283@aemeltch-MOBL1>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFCv2 2/2] Bluetooth: Process HCI callbacks in a workqueue
+Date: Thu, 15 Dec 2011 11:31:18 +0200
+Message-Id: <1323941478-15961-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1323941478-15961-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1323941478-15961-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> > > Add general HCI callback implementation. Can be used for executing
-> > > HCI commands from A2MP protocol.
-> > > ---
-> > >  include/net/bluetooth/hci_core.h |   14 +++++++++++
-> > >  net/bluetooth/hci_core.c         |   47 ++++++++++++++++++++++++++++++++++++++
-> > >  net/bluetooth/hci_event.c        |    4 +++
-> > >  3 files changed, 65 insertions(+), 0 deletions(-)
-> > > 
-> > > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> > > index cc5481d..e473cd2 100644
-> > > --- a/include/net/bluetooth/hci_core.h
-> > > +++ b/include/net/bluetooth/hci_core.h
-> > > @@ -121,6 +121,15 @@ struct adv_entry {
-> > >  	u8 bdaddr_type;
-> > >  };
-> > >  
-> > > +struct hci_dev;
-> > > +
-> > > +struct cb_cmd {
-> > > +	struct list_head list;
-> > > +	u16 opcode;
-> > > +	void *opt;
-> > > +	void (*cb)(struct hci_dev *hdev, void *opt);
-> > > +};
-> > > +
-> > 
-> > so I am actually thinking that we might just update hci_request into a
-> > bit more flexible schema.
-> 
-> Do you mean that we can use blocking hci_request? This may work but some
-> commands requires special logic (like executing several Read AMP Assoc
-> data requests). I don't know would it be the best solution especially when
-> executing from A2MP/L2CAP code.
+---
+ include/net/bluetooth/hci_core.h |    2 +
+ net/bluetooth/hci_core.c         |   42 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+), 0 deletions(-)
 
-that is my point exactly. Once we do HCI processing in process context,
-we will also have L2CAP running fully in process context. Hence it could
-just wait for the result.
-
-> > Gustavo is working on moving everything into a process context, so we
-> > can actually sleep. And we could just make a simple premise to only
-> 
-> This would be good, meanwhile I have implemented callback execution in a
-> workqueue. I will send second RFC version later today.
-
-Not sure how that helps us right now. I rather wait a bit for Gustavo to
-submit his patchset and then we figure this out. It seems to be a more
-general problem anyway and we keep hitting it quite of often right now.
-
-Regards
-
-Marcel
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 7b9b0e3..1aa7ba0 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1054,5 +1054,7 @@ int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
+ 	void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd), void *opt,
+ 				void (*destructor)(struct cb_cmd *cmd));
+ void hci_remove_cb(struct cb_cmd *cmd);
++void hci_queue_cb(struct hci_dev * hdev, struct cb_cmd *cmd,
++					struct workqueue_struct *workqueue);
+ 
+ #endif /* __HCI_CORE_H */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d25dfa9..a32cd80 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2067,6 +2067,48 @@ struct cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
+ 	return NULL;
+ }
+ 
++struct cb_work {
++	struct work_struct work;
++	struct hci_dev *hdev;
++	struct cb_cmd *cmd;
++};
++
++static void hci_cb_work(struct work_struct *w)
++{
++	struct cb_work *work = (struct cb_work *) w;
++	struct cb_cmd *cmd = work->cmd;
++	struct hci_dev *hdev = work->hdev;
++
++	cmd->cb(hdev, cmd);
++
++	hci_dev_put(hdev);
++
++	hci_remove_cb(cmd);
++	kfree(w);
++}
++
++void hci_queue_cb(struct hci_dev * hdev, struct cb_cmd *cmd,
++					struct workqueue_struct *workqueue)
++{
++	struct cb_work *work;
++
++	BT_ERR("Queue cmd %p opt %p", cmd, cmd->opt);
++
++	work = kmalloc(sizeof(*work), GFP_ATOMIC);
++	if (!work)
++		return;
++
++	INIT_WORK(&work->work, hci_cb_work);
++	work->hdev = hdev;
++	work->cmd = cmd;
++	hci_dev_hold(hdev);
++
++	if (!queue_work(workqueue, &work->work)) {
++		kfree(work);
++		hci_dev_put(hdev);
++	}
++}
++
+ void hci_remove_cb(struct cb_cmd *cmd)
+ {
+ 	list_del(&cmd->list);
+-- 
+1.7.4.1
 
