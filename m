@@ -1,29 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 15 Dec 2011 13:33:28 +0200
+Date: Thu, 15 Dec 2011 13:29:22 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mikel Astiz <mikel.astiz@bmw-carit.de>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd] gobex: fix transfer search in transfer_complete
-Message-ID: <20111215113328.GA6824@x220>
-References: <1323793282-24497-1-git-send-email-mikel.astiz@bmw-carit.de>
+Subject: Re: [PATCH] att.h: Add client characteristic configuration bit fields
+Message-ID: <20111215112922.GC3396@x220>
+References: <1323453823-7905-1-git-send-email-sancane@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1323793282-24497-1-git-send-email-mikel.astiz@bmw-carit.de>
+In-Reply-To: <1323453823-7905-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Santiago,
 
-On Tue, Dec 13, 2011, Mikel Astiz wrote:
-> The previous approach searched the transfer pointer itself, assuming
-> that the transfers has not been modified if the pointer is in the list.
-> However the callback could have removed the transfer and registered
-> another one, which can eventually point to the same memory location.
-> 
-> This is solved by looking for the transfer id instead of the pointer.
+On Fri, Dec 09, 2011, Santiago Carot-Nemesio wrote:
 > ---
->  gobex/gobex-transfer.c |   30 +++++++++++++++++++-----------
->  1 files changed, 19 insertions(+), 11 deletions(-)
+>  attrib/att.h |    3 +++
+>  1 files changed, 3 insertions(+), 0 deletions(-)
 
 Applied. Thanks.
 
