@@ -1,52 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 15 Dec 2011 13:43:44 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd 1/4] Add support for SetFolder in MAP client
+Message-ID: <20111215114344.GA8056@x220>
+References: <1323703867-20577-1-git-send-email-bulislaw@linux.com>
 MIME-Version: 1.0
-In-Reply-To: <1323943267-14576-2-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1323943267-14576-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1323943267-14576-2-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Thu, 15 Dec 2011 13:46:06 +0200
-Message-ID: <CABBYNZL7-Aufrfa7e_S_n70LrkurL3Q6m0ncrM6tc4XGMmavkA@mail.gmail.com>
-Subject: Re: [PATCH 1/4] audio: remove unnecessary method call
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1323703867-20577-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Bartosz,
 
-On Thu, Dec 15, 2011 at 12:01 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> Calling gateway_suspend_stream should not be necessary given that
-> gateway_unlock with rw flags already does it.
+On Mon, Dec 12, 2011, Bartosz Szatkowski wrote:
 > ---
->  audio/transport.c |    1 -
->  1 files changed, 0 insertions(+), 1 deletions(-)
->
-> diff --git a/audio/transport.c b/audio/transport.c
-> index 7bde32d..6029528 100644
-> --- a/audio/transport.c
-> +++ b/audio/transport.c
-> @@ -535,7 +535,6 @@ static guint suspend_gateway(struct media_transport *transport,
->                return 0;
->        }
->
-> -       gateway_suspend_stream(device);
->        gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
->        g_idle_add(gateway_suspend_complete, owner);
->        return id++;
-> --
+>  client/map.c       |   56 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  doc/client-api.txt |    5 +++-
+>  2 files changed, 60 insertions(+), 1 deletions(-)
 
-gateway_suspend_stream as it is useless, but I think we should fix it
-to work similarly to headset_suspend_stream so we properly wait until
-the socket is closed before we unlock and reply, this is necessary in
-order to properly synchronize switching profiles otherwise
-gateway_suspend_complete maybe called without SCO being completely
-disconnected. Also when a fd is passed over to another process calling
-close/g_io_channel_shutdown is not enough since this only release our
-reference, in this case shutdown must be called.
+All four patches have been applied. Thanks.
 
--- 
-Luiz Augusto von Dentz
+Johan
