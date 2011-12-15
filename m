@@ -1,50 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20111215115942.GA9850@x220>
-References: <1323857512-5626-1-git-send-email-sancane@gmail.com>
-	<1323857512-5626-2-git-send-email-sancane@gmail.com>
-	<20111215115942.GA9850@x220>
-Date: Thu, 15 Dec 2011 13:57:13 +0100
-Message-ID: <CACLukzJ3g2Nnh7oTfD8h8g_RXzSffK4Ox5YrCpuvQoKtVxFHfA@mail.gmail.com>
-Subject: Re: [PATCH 2/4] mcap_sync.c: Fix include paths
-From: Santiago Carot <sancane@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>,
+In-Reply-To: <20111215121700.GA10535@x220>
+References: <1323703867-20577-1-git-send-email-bulislaw@linux.com>
+	<1323703867-20577-4-git-send-email-bulislaw@linux.com>
+	<20111215115009.GB8056@x220>
+	<CAPGrrxWWRPkCyKgRu2SkEmdhjdZgkjEQ+ES0DhfuoshvsVBUfw@mail.gmail.com>
+	<20111215121700.GA10535@x220>
+Date: Thu, 15 Dec 2011 13:45:09 +0100
+Message-ID: <CAPGrrxVH_S=bJopAv-9nzW_kL9YxJh4FHYGRby-dZQcjS+jvzw@mail.gmail.com>
+Subject: Re: [PATCH obexd 4/4] Add support for PullMessagesListing in MAP client
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>,
 	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-2011/12/15 Johan Hedberg <johan.hedberg@gmail.com>:
-> Hi Santiago,
+On Thu, Dec 15, 2011 at 1:17 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Bartosz,
 >
-> On Wed, Dec 14, 2011, Santiago Carot-Nemesio wrote:
->> ---
->>  health/mcap_sync.c |    4 ++--
->>  1 files changed, 2 insertions(+), 2 deletions(-)
+> On Thu, Dec 15, 2011, Bartosz Szatkowski wrote:
+>> > The name should be GetMessageListing and not GetMessagesListing (the
+>> > latter isn't really proper english). I went ahead and changed it through
+>> > a separate patch since I didn't notice before having already applied
+>> > your patch. Also, all this seems to be missing from the API
+>> > documentation (doc/*). Please send a patch for that.
 >>
->> diff --git a/health/mcap_sync.c b/health/mcap_sync.c
->> index 5545cea..e2d7715 100644
->> --- a/health/mcap_sync.c
->> +++ b/health/mcap_sync.c
->> @@ -28,8 +28,8 @@
->>  #include <stdlib.h>
->>  #include <bluetooth/bluetooth.h>
->>  #include <bluetooth/l2cap.h>
->> -#include "../src/adapter.h"
->> -#include "../src/manager.h"
->> +#include <adapter.h>
->> +#include <manager.h>
->>  #include <sys/ioctl.h>
->>
->>  #include "config.h"
+>> The function name is "GetMessagesListing" in spec.
+>> There is no doc as at the moment there is no apparams handling and no
+>> xml parsing, so I'll send patch with doc when we reach full
+>> functionality.
 >
-> There's more to fix here than this. config.h should come before anything
-> else (and should be inside a #ifdef HAVE_CONFIG_H) and we sort the libc
-> includes first, then dbus,glib,etc and finally the bluez internal
-> includes.
+> So the plan is to return something else than the raw XML that MAP
+> provides? In that case I don't think it's necessary to hold on to the
+> exact spec naming of these functions. E.g. GetMessages or GetMessageList
+> might make more sense in the case that you return a pre-parsed
+> list/structure of some kind.
 >
+> Johan
 
-You are right, I didn't notice it. I'll send a new patch solving this issue.
-Regards.
+We planned to return dict {field: value}. Generally I don't care much
+about this name - we can go with GetMessageListing, as I seem to use
+both forms without noticing it anyway.
+
+-- 
+Pozdrowienia - Cheers,
+Bartosz Szatkowski
