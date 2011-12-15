@@ -1,46 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hemant GUPTA <hemant.gupta@stericsson.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Naresh-kumar GUPTA <naresh.gupta@stericsson.com>,
-	Hemant Gupta <hemantgupta.ste@gmail.com>
-Date: Thu, 15 Dec 2011 12:37:16 +0100
-Subject: RE: [PATCH v1] mgmt: Add support for Passkey handling
-Message-ID: <AA50405D3B026C488CB3DB0AADE695401F5699724D@EXDCVYMBSTM005.EQ1STM.local>
-References: <1323157599-5735-1-git-send-email-hemant.gupta@stericsson.com>
- <20111215111614.GA3396@x220>
-In-Reply-To: <20111215111614.GA3396@x220>
-Content-Type: text/plain; charset="us-ascii"
+Date: Thu, 15 Dec 2011 13:33:28 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd] gobex: fix transfer search in transfer_complete
+Message-ID: <20111215113328.GA6824@x220>
+References: <1323793282-24497-1-git-send-email-mikel.astiz@bmw-carit.de>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1323793282-24497-1-git-send-email-mikel.astiz@bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Mikel,
 
------Original Message-----
-From: Johan Hedberg [mailto:johan.hedberg@gmail.com] 
-Sent: Thursday, December 15, 2011 4:46 PM
-To: Hemant GUPTA
-Cc: linux-bluetooth@vger.kernel.org; Naresh-kumar GUPTA; Hemant Gupta
-Subject: Re: [PATCH v1] mgmt: Add support for Passkey handling
-
-Hi Hemant,
-
-On Tue, Dec 06, 2011, Hemant Gupta wrote:
-> This patch adds support for handling Passkey Requests
-> and response over management interface.
+On Tue, Dec 13, 2011, Mikel Astiz wrote:
+> The previous approach searched the transfer pointer itself, assuming
+> that the transfers has not been modified if the pointer is in the list.
+> However the callback could have removed the transfer and registered
+> another one, which can eventually point to the same memory location.
+> 
+> This is solved by looking for the transfer id instead of the pointer.
 > ---
->  lib/mgmt.h        |   17 ++++++++++
->  plugins/mgmtops.c |   85 ++++++++++++++++++++++++++++++++++++++++++++++------
->  2 files changed, 92 insertions(+), 10 deletions(-)
+>  gobex/gobex-transfer.c |   30 +++++++++++++++++++-----------
+>  1 files changed, 19 insertions(+), 11 deletions(-)
 
-This will need to be rebased against latest upstream git since it
-doesn't apply anymore. Also note that the mgmt structs and definitions
-are already in place so you don't need to add those.
-
-Thanks for the info, I will rebase, and upload a new patch for review soon.
+Applied. Thanks.
 
 Johan
-
-BR
-Hemant
