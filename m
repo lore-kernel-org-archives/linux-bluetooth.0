@@ -1,33 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 15 Dec 2011 13:54:05 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 4/4] Add support for PullMessagesListing in MAP
- client
-Message-ID: <20111215115405.GA9571@x220>
-References: <1323703867-20577-1-git-send-email-bulislaw@linux.com>
- <1323703867-20577-4-git-send-email-bulislaw@linux.com>
- <20111215115009.GB8056@x220>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111215115009.GB8056@x220>
+In-Reply-To: <1323943267-14576-5-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1323943267-14576-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1323943267-14576-5-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Thu, 15 Dec 2011 13:51:26 +0200
+Message-ID: <CABBYNZK3ABq0mzaBiQoD9cQGtBv0cx6sL1L2_rcapc9hz3VzBg@mail.gmail.com>
+Subject: Re: [PATCH 4/4] audio: do not disconnect on gateway SCO failure
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Mikel,
 
-On Thu, Dec 15, 2011, Johan Hedberg wrote:
-> On Mon, Dec 12, 2011, Bartosz Szatkowski wrote:
-> > +	{ "GetMessagesListing",	"sa{ss}", "s",	map_get_messages_listing,
-> > +						G_DBUS_METHOD_FLAG_ASYNC },
-> 
-> The name should be GetMessageListing and not GetMessagesListing (the
-> latter isn't really proper english).
+On Thu, Dec 15, 2011 at 12:01 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>
+> Failure on BlueZ-initiated SCO requests should not drop the RFCOMM
+> connection to the gateway. Instead, considering the stream as suspended
+> should be enough.
+> ---
+>  audio/gateway.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/audio/gateway.c b/audio/gateway.c
+> index 9b1aab3..f28b14d 100644
+> --- a/audio/gateway.c
+> +++ b/audio/gateway.c
+> @@ -255,7 +255,7 @@ static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+>
+>        if (err) {
+>                error("sco_connect_cb(): %s", err->message);
+> -               gateway_close(dev);
+> +               gateway_suspend_stream(dev);
+>                return;
+>        }
+>
+> --
+> 1.7.6.4
+>
 
-And now I notice that the spec. actually uses the plural form (which
-still sounds to me like strange English). All this fuss could have been
-avoided if we had had a proper discussion of the API beforehand and had
-the documentation in place before these patches.
+Ack, this should be up to the endpoint to decided since it may want to retry.
 
-Johan
+-- 
+Luiz Augusto von Dentz
