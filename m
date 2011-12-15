@@ -1,33 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20111215132331.GA11594@x220>
-References: <1323953882-5261-1-git-send-email-bulislaw@linux.com>
-	<20111215132331.GA11594@x220>
-Date: Thu, 15 Dec 2011 14:30:42 +0100
-Message-ID: <CAPGrrxVv1VsDbn6bO2Ub5frJg_SWEMRSi=CtGfTLzjK7DT_QtA@mail.gmail.com>
-Subject: Re: [PATCH obexd] map: Fix dbus call after method rename
-From: Bartosz Szatkowski <bulislaw@linux.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Santiago Carot-Nemesio <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH] mcap_sync: fix import statements
+Date: Thu, 15 Dec 2011 14:19:19 +0100
+Message-Id: <1323955159-19799-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Dec 15, 2011 at 2:23 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi, Bartosz,
->
-> On Thu, Dec 15, 2011, Bartosz Szatkowski wrote:
->> ---
->>  test/map-client |    2 +-
->>  1 files changed, 1 insertions(+), 1 deletions(-)
->
-> Applied. Btw, when not referring to a symbol in the code or something
-> similar, please spell D-Bus as D-Bus (I fixed it this time).
->
-> Johan
+---
+ health/mcap_sync.c |   14 ++++++--------
+ 1 files changed, 6 insertions(+), 8 deletions(-)
 
-OK, thanks!
-
+diff --git a/health/mcap_sync.c b/health/mcap_sync.c
+index 5545cea..0e21877 100644
+--- a/health/mcap_sync.c
++++ b/health/mcap_sync.c
+@@ -21,21 +21,19 @@
+  *
+  */
+ 
+-#include "btio.h"
+ #include <stdint.h>
+ #include <netinet/in.h>
+ #include <time.h>
+ #include <stdlib.h>
+-#include <bluetooth/bluetooth.h>
+-#include <bluetooth/l2cap.h>
+-#include "../src/adapter.h"
+-#include "../src/manager.h"
+ #include <sys/ioctl.h>
+ 
+-#include "config.h"
+-#include "log.h"
+-
+ #include <bluetooth/bluetooth.h>
++#include <bluetooth/l2cap.h>
++#include <adapter.h>
++#include <manager.h>
++#include <btio.h>
++#include <log.h>
++
+ #include "mcap.h"
+ #include "mcap_lib.h"
+ #include "mcap_internal.h"
 -- 
-Pozdrowienia - Cheers,
-Bartosz Szatkowski
+1.7.8
+
