@@ -1,60 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1323966479.1965.81.camel@aeonflux>
-Subject: Re: [PATCH] Correct structures for AMP Assoc Read
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 15 Dec 2011 17:27:59 +0100
-In-Reply-To: <1323942483-24779-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1323942483-24779-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <CAKT1EBf+YPUggU6FX1EJjCtF7_C3zXCpwq=hG6Q+6DKyEo0=_A@mail.gmail.com>
+References: <CACj007n47KuT4uzJMDnHc2KKy_Mog469QvvrRm5mAE54Q6Y7Ug@mail.gmail.com>
+	<CAJdJm_OnyeExrgvainhqPMUgV9C2QU08PafyXZa9-oJxgkEaEg@mail.gmail.com>
+	<CAKT1EBf+YPUggU6FX1EJjCtF7_C3zXCpwq=hG6Q+6DKyEo0=_A@mail.gmail.com>
+Date: Thu, 15 Dec 2011 10:40:02 -0400
+Message-ID: <CAJdJm_M1VCjHpyZXAPmLH6VDxLdDOUjZj9_SGhfUNNdrKDih3Q@mail.gmail.com>
+Subject: Re: [RFC BlueZ]Proximity Monitor: Immediate Alert Timeout
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: Hemant Gupta <hemantgupta.ste@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Claudio,
 
-> Make struct names similar to kernel and remove static array since
-> fragment length can be other size than HCI_MAX_NAME_LENGTH, which
-> is for totally different purpose.
-> ---
->  lib/hci.h |   11 +++++------
->  1 files changed, 5 insertions(+), 6 deletions(-)
-> 
-> diff --git a/lib/hci.h b/lib/hci.h
-> index 51184ee..48692fa 100644
-> --- a/lib/hci.h
-> +++ b/lib/hci.h
-> @@ -1382,17 +1382,16 @@ typedef struct {
->  #define OCF_READ_LOCAL_AMP_ASSOC	0x000A
->  typedef struct {
->  	uint8_t		handle;
-> -	uint16_t	length_so_far;
-> -	uint16_t	assoc_length;
-> +	uint16_t	len_so_far;
-> +	uint16_t	max_len;
->  } __attribute__ ((packed)) read_local_amp_assoc_cp;
-> -#define READ_LOCAL_AMP_ASSOC_CP_SIZE 5
-> +
->  typedef struct {
->  	uint8_t		status;
->  	uint8_t		handle;
-> -	uint16_t	length;
-> -	uint8_t		fragment[HCI_MAX_NAME_LENGTH];
-> +	uint16_t	rem_len;
-> +	uint8_t		frag[0];
->  } __attribute__ ((packed)) read_local_amp_assoc_rp;
-> -#define READ_LOCAL_AMP_ASSOC_RP_SIZE 252
->  
->  #define OCF_WRITE_REMOTE_AMP_ASSOC	0x000B
->  typedef struct {
+On Wed, Dec 14, 2011 at 12:46 PM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+> Removing the timeout and write to "none" has a side effect: the remote
+> and the local value can have different values if the remote changes
+> the value. Alert Level characteristic doesn't support read,
+> notification or indication. Probably, all devices disable the alert
+> after some seconds to avoid drain the battery or be annoying.
+> The main problem is consistency: show to the user the correct value.
 
-I am fine with these changes.
+In this case, I think the ImmediateAlertLevel should be write only
+(not readable). This forces applications to always write the level
+they want the peer device to alert. It means some spurious ATT write
+commands, but I think the spec assumes this is the case (otherwise it
+would allow read or notify).
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+The problem is: is there such thing as "write only property" in BlueZ?
 
-Regards
-
-Marcel
-
-
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
