@@ -1,47 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20111215120851.GA10113@x220>
-References: <1323950056-28708-1-git-send-email-hemant.gupta@stericsson.com>
-	<20111215120851.GA10113@x220>
-Date: Thu, 15 Dec 2011 19:17:22 +0530
-Message-ID: <CACj007=R3bmR2e=xgAdSXPXb12OdkAPXh_0qGba+mM46KBjjyQ@mail.gmail.com>
-Subject: Re: [PATCHv2] mgmt: Add support for Passkey handling
-From: Hemant Gupta <hemantgupta.ste@gmail.com>
-To: Hemant Gupta <hemant.gupta@stericsson.com>,
+In-Reply-To: <20111215132331.GA11594@x220>
+References: <1323953882-5261-1-git-send-email-bulislaw@linux.com>
+	<20111215132331.GA11594@x220>
+Date: Thu, 15 Dec 2011 14:30:42 +0100
+Message-ID: <CAPGrrxVv1VsDbn6bO2Ub5frJg_SWEMRSi=CtGfTLzjK7DT_QtA@mail.gmail.com>
+Subject: Re: [PATCH obexd] map: Fix dbus call after method rename
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>,
 	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
-
-On Thu, Dec 15, 2011 at 5:38 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Hemant,
+On Thu, Dec 15, 2011 at 2:23 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi, Bartosz,
 >
-> On Thu, Dec 15, 2011, Hemant Gupta wrote:
->> @@ -218,7 +218,7 @@ struct mgmt_rp_user_confirm_reply {
->>  #define MGMT_OP_USER_PASSKEY_REPLY   0x001C
->>  struct mgmt_cp_user_passkey_reply {
->>       bdaddr_t bdaddr;
->> -     uint32_t passkey;
->> +     __le32 passkey;
->>  } __packed;
+> On Thu, Dec 15, 2011, Bartosz Szatkowski wrote:
+>> ---
+>> Â test/map-client | Â  Â 2 +-
+>> Â 1 files changed, 1 insertions(+), 1 deletions(-)
 >
-> Otherwise the patch looks ok but this change shouldn't be in it.  __le32
-> is only for the kernel side.
+> Applied. Btw, when not referring to a symbol in the code or something
+> similar, please spell D-Bus as D-Bus (I fixed it this time).
 >
-Tanks for the comment, I used it since the kernel was using le32, and
-the structure
-allocated was u32? Dont we require to do the type casting?
 > Johan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-
+OK, thanks!
 
 -- 
-Best Regards
-Hemant Gupta
-ST-Ericsson India
+Pozdrowienia - Cheers,
+Bartosz Szatkowski
