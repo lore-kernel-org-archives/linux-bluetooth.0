@@ -1,258 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 01/11] attrib-server: Initial steps to provide multi-adapter GATT server support
-Date: Fri, 16 Dec 2011 17:09:49 +0100
-Message-Id: <1324051799-21439-2-git-send-email-sancane@gmail.com>
-In-Reply-To: <1324051799-21439-1-git-send-email-sancane@gmail.com>
-References: <1324051799-21439-1-git-send-email-sancane@gmail.com>
+Subject: RFC: GATT server multi-adapter support
+Date: Fri, 16 Dec 2011 17:09:48 +0100
+Message-Id: <1324051799-21439-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch prepares the structures in att-server to start and stop
-GATT server whenever an adapter is plugged or unplugged.
----
- src/attrib-server.c |  168 +++++++++++++++++++++++++++++++++++----------------
- 1 files changed, 116 insertions(+), 52 deletions(-)
+This is an initial work to provide support for multiple adapters
+in GATT server. Current implementation manages handlers and device
+connections using global list without taking into account that we
+can have many adapters plugged. These patches propose a separation
+among handlers, clients management and other stuff in each adapter.
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index b767b72..e8dade8 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -71,12 +71,23 @@ struct group_elem {
- 	uint16_t len;
- };
- 
--static GIOChannel *l2cap_io = NULL;
- static GIOChannel *le_io = NULL;
- static GSList *clients = NULL;
- static uint32_t gatt_sdp_handle = 0;
- static uint32_t gap_sdp_handle = 0;
- 
-+struct gatt_adapter {
-+	struct btd_adapter	*adapter;
-+	GIOChannel		*l2cap_io;
-+	GIOChannel		*le_io;
-+	GSList			*clients;
-+	uint32_t		gatt_sdp_handle;
-+	uint32_t		gap_sdp_handle;
-+	GSList			*database;
-+};
-+
-+static GSList *adapters = NULL;
-+
- /* GAP attribute handles */
- static uint16_t name_handle = 0x0000;
- static uint16_t appearance_handle = 0x0000;
-@@ -94,6 +105,60 @@ static bt_uuid_t ccc_uuid = {
- 			.value.u16 = GATT_CLIENT_CHARAC_CFG_UUID
- };
- 
-+static void attrib_free(void *data)
-+{
-+	struct attribute *a = data;
-+
-+	g_free(a->data);
-+	g_free(a);
-+}
-+
-+static void channel_free(struct gatt_channel *channel)
-+{
-+	g_attrib_unref(channel->attrib);
-+
-+	g_free(channel);
-+}
-+
-+static void free_gatt_adapter(struct gatt_adapter *gatt_adapter)
-+{
-+	g_slist_free_full(gatt_adapter->database, attrib_free);
-+
-+	if (gatt_adapter->l2cap_io != NULL) {
-+		g_io_channel_unref(gatt_adapter->l2cap_io);
-+		g_io_channel_shutdown(gatt_adapter->l2cap_io, FALSE, NULL);
-+	}
-+
-+	if (gatt_adapter->le_io != NULL) {
-+		g_io_channel_unref(gatt_adapter->le_io);
-+		g_io_channel_shutdown(gatt_adapter->le_io, FALSE, NULL);
-+	}
-+
-+	g_slist_free_full(gatt_adapter->clients, (GDestroyNotify) channel_free);
-+
-+	if (gatt_adapter->gatt_sdp_handle > 0)
-+		remove_record_from_server(gatt_adapter->gatt_sdp_handle);
-+
-+	if (gatt_adapter->gap_sdp_handle > 0)
-+		remove_record_from_server(gatt_adapter->gap_sdp_handle);
-+
-+	if (gatt_adapter->adapter != NULL)
-+		btd_adapter_unref(gatt_adapter->adapter);
-+
-+	g_free(gatt_adapter);
-+}
-+
-+static gint adapter_cmp(gconstpointer a, gconstpointer b)
-+{
-+	const struct gatt_adapter *gatt_adapter = a;
-+	const struct btd_adapter *adapter = b;
-+
-+	if (gatt_adapter->adapter == adapter)
-+		return 0;
-+
-+	return -1;
-+}
-+
- static sdp_record_t *server_record_new(uuid_t *uuid, uint16_t start, uint16_t end)
- {
- 	sdp_list_t *svclass_id, *apseq, *proto[2], *root, *aproto;
-@@ -689,21 +754,6 @@ static uint16_t mtu_exchange(struct gatt_channel *channel, uint16_t mtu,
- 	return enc_mtu_resp(old_mtu, pdu, len);
- }
- 
--static void attrib_free(void *data)
--{
--	struct attribute *a = data;
--
--	g_free(a->data);
--	g_free(a);
--}
--
--static void channel_free(struct gatt_channel *channel)
--{
--	g_attrib_unref(channel->attrib);
--
--	g_free(channel);
--}
--
- static void channel_disconnect(void *user_data)
- {
- 	struct gatt_channel *channel = user_data;
-@@ -1012,74 +1062,88 @@ failed:
- 	return FALSE;
- }
- 
--int attrib_server_init(void)
-+static int attrib_adapter_probe(struct btd_adapter *adapter)
- {
-+	struct gatt_adapter *gatt_adapter;
- 	GError *gerr = NULL;
-+	bdaddr_t addr;
-+
-+	DBG("Start GATT server in %s", adapter_get_path(adapter));
-+
-+	gatt_adapter = g_new0(struct gatt_adapter, 1);
-+	gatt_adapter->adapter = btd_adapter_ref(adapter);
-+
-+	adapter_get_address(gatt_adapter->adapter, &addr);
- 
- 	/* BR/EDR socket */
--	l2cap_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
-+	gatt_adapter->l2cap_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
- 					NULL, NULL, &gerr,
--					BT_IO_OPT_SOURCE_BDADDR, BDADDR_ANY,
-+					BT_IO_OPT_SOURCE_BDADDR, &addr,
- 					BT_IO_OPT_PSM, ATT_PSM,
- 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
- 					BT_IO_OPT_INVALID);
--	if (l2cap_io == NULL) {
-+
-+	if (gatt_adapter->l2cap_io == NULL) {
- 		error("%s", gerr->message);
- 		g_error_free(gerr);
-+		free_gatt_adapter(gatt_adapter);
- 		return -1;
- 	}
- 
--	if (!register_core_services())
--		goto failed;
-+	if (!register_core_services()) {
-+		g_io_channel_unref(gatt_adapter->l2cap_io);
-+		free_gatt_adapter(gatt_adapter);
-+		return -1;
-+	}
- 
- 	/* LE socket */
--	le_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
--					&le_io, NULL, &gerr,
--					BT_IO_OPT_SOURCE_BDADDR, BDADDR_ANY,
-+	gatt_adapter->le_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
-+					&gatt_adapter->le_io, NULL, &gerr,
-+					BT_IO_OPT_SOURCE_BDADDR, &addr,
- 					BT_IO_OPT_CID, ATT_CID,
- 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
- 					BT_IO_OPT_INVALID);
--	if (le_io == NULL) {
-+
-+	if (gatt_adapter->le_io == NULL) {
- 		error("%s", gerr->message);
- 		g_error_free(gerr);
- 		/* Doesn't have LE support, continue */
- 	}
- 
-+	adapters = g_slist_prepend(adapters, gatt_adapter);
- 	return 0;
--
--failed:
--	g_io_channel_unref(l2cap_io);
--	l2cap_io = NULL;
--
--	if (le_io) {
--		g_io_channel_unref(le_io);
--		le_io = NULL;
--	}
--
--	return -1;
- }
- 
--void attrib_server_exit(void)
-+static void attrib_adapter_remove(struct btd_adapter *adapter)
- {
--	g_slist_free_full(database, attrib_free);
-+	struct gatt_adapter *gatt_adapter;
-+	GSList *l;
- 
--	if (l2cap_io) {
--		g_io_channel_unref(l2cap_io);
--		g_io_channel_shutdown(l2cap_io, FALSE, NULL);
--	}
-+	l = g_slist_find_custom(adapters, adapter, adapter_cmp);
-+	if (l == NULL)
-+		return;
- 
--	if (le_io) {
--		g_io_channel_unref(le_io);
--		g_io_channel_shutdown(le_io, FALSE, NULL);
--	}
-+	DBG("Stop GATT server in %s", adapter_get_path(adapter));
- 
--	g_slist_free_full(clients, (GDestroyNotify) channel_free);
-+	gatt_adapter = l->data;
-+	adapters = g_slist_remove(adapters, gatt_adapter);
-+	free_gatt_adapter(gatt_adapter);
-+}
- 
--	if (gatt_sdp_handle)
--		remove_record_from_server(gatt_sdp_handle);
-+static struct btd_adapter_driver attrib_adapter_driver = {
-+	.name	= "attrib-adapter-driver",
-+	.probe	= attrib_adapter_probe,
-+	.remove	= attrib_adapter_remove,
-+};
- 
--	if (gap_sdp_handle)
--		remove_record_from_server(gap_sdp_handle);
-+int attrib_server_init(void)
-+{
-+	return btd_register_adapter_driver(&attrib_adapter_driver);
-+}
-+
-+void attrib_server_exit(void)
-+{
-+	btd_unregister_adapter_driver(&attrib_adapter_driver);
- }
- 
- uint32_t attrib_create_sdp(uint16_t handle, const char *name)
--- 
-1.7.8
+In this way, GATT servers plugins should register their attributes
+on each adapter. Current interfaces doesn't provide support for that,
+future work include exposing adapters in the APIS and using adapter
+drivers to register attributes instead of doing that when the plugin
+is initialized.
 
+These patches don't modify current API yet, they use the default
+adapter to manage GATT stuff when the adapter is not provided in
+order to keep backward compatibility. In this way they can be
+applied without causing compilation problems in GATT dependant
+plugins which are using current GATT server interface.
+
+Comments are welcome.
+
+[PATCH 01/11] attrib-server: Initial steps to provide multi-adapter
+[PATCH 02/11] attrib-server: Register GATT SDP record per each
+[PATCH 03/11] attrib-server: Add attributes in adapter database
+[PATCH 04/11] attrib-server: Attach attrib_channel in adapter
+[PATCH 05/11] attrib-server: Remove global client list
+[PATCH 06/11] attrib-server: Remove global le_io variable
+[PATCH 07/11] attrib-server: Attah gatt channels to a adapters
+[PATCH 08/11] attrib-server: Remove global database list
+[PATCH 09/11] attrib-server: Mark attrib_channel_detach as
+[PATCH 10/11] attrib-server: Remove
+[PATCH 11/11] gatt-example: Use adapter driver to register GATT
