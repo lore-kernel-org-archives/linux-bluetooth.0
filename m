@@ -2,307 +2,257 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 02/11] attrib-server: Register GATT SDP record per each adapter
-Date: Fri, 16 Dec 2011 17:09:50 +0100
-Message-Id: <1324051799-21439-3-git-send-email-sancane@gmail.com>
-In-Reply-To: <1324051799-21439-2-git-send-email-sancane@gmail.com>
+Subject: [PATCH 01/11] attrib-server: Initial steps to provide multi-adapter GATT server support
+Date: Fri, 16 Dec 2011 17:09:49 +0100
+Message-Id: <1324051799-21439-2-git-send-email-sancane@gmail.com>
+In-Reply-To: <1324051799-21439-1-git-send-email-sancane@gmail.com>
 References: <1324051799-21439-1-git-send-email-sancane@gmail.com>
- <1324051799-21439-2-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Each adapter has its own SDP registry wich will be managed
-separately. This patch makes a wrapper over attrib_create_sdp
-function using the default adapter in order to keep backward
-compatibility with the gatt server interface until the api is
-finally updated.
+This patch prepares the structures in att-server to start and stop
+GATT server whenever an adapter is plugged or unplugged.
 ---
- src/attrib-server.c |  203 ++++++++++++++++++++++++++++++---------------------
- 1 files changed, 120 insertions(+), 83 deletions(-)
+ src/attrib-server.c |  168 +++++++++++++++++++++++++++++++++++----------------
+ 1 files changed, 116 insertions(+), 52 deletions(-)
 
 diff --git a/src/attrib-server.c b/src/attrib-server.c
-index e8dade8..5a5024c 100644
+index b767b72..e8dade8 100644
 --- a/src/attrib-server.c
 +++ b/src/attrib-server.c
-@@ -73,8 +73,6 @@ struct group_elem {
+@@ -71,12 +71,23 @@ struct group_elem {
+ 	uint16_t len;
+ };
  
+-static GIOChannel *l2cap_io = NULL;
  static GIOChannel *le_io = NULL;
  static GSList *clients = NULL;
--static uint32_t gatt_sdp_handle = 0;
--static uint32_t gap_sdp_handle = 0;
+ static uint32_t gatt_sdp_handle = 0;
+ static uint32_t gap_sdp_handle = 0;
  
- struct gatt_adapter {
- 	struct btd_adapter	*adapter;
-@@ -159,6 +157,30 @@ static gint adapter_cmp(gconstpointer a, gconstpointer b)
- 	return -1;
- }
++struct gatt_adapter {
++	struct btd_adapter	*adapter;
++	GIOChannel		*l2cap_io;
++	GIOChannel		*le_io;
++	GSList			*clients;
++	uint32_t		gatt_sdp_handle;
++	uint32_t		gap_sdp_handle;
++	GSList			*database;
++};
++
++static GSList *adapters = NULL;
++
+ /* GAP attribute handles */
+ static uint16_t name_handle = 0x0000;
+ static uint16_t appearance_handle = 0x0000;
+@@ -94,6 +105,60 @@ static bt_uuid_t ccc_uuid = {
+ 			.value.u16 = GATT_CLIENT_CHARAC_CFG_UUID
+ };
  
-+static struct gatt_adapter *get_default_gatt_adapter(void)
++static void attrib_free(void *data)
 +{
-+	struct gatt_adapter *gatt_adapter;
-+	struct btd_adapter *adapter;
-+	GSList *l;
++	struct attribute *a = data;
 +
-+	adapter = manager_get_default_adapter();
-+	if (adapter == NULL) {
-+		error("Can't get default adapter");
-+		return NULL;
++	g_free(a->data);
++	g_free(a);
++}
++
++static void channel_free(struct gatt_channel *channel)
++{
++	g_attrib_unref(channel->attrib);
++
++	g_free(channel);
++}
++
++static void free_gatt_adapter(struct gatt_adapter *gatt_adapter)
++{
++	g_slist_free_full(gatt_adapter->database, attrib_free);
++
++	if (gatt_adapter->l2cap_io != NULL) {
++		g_io_channel_unref(gatt_adapter->l2cap_io);
++		g_io_channel_shutdown(gatt_adapter->l2cap_io, FALSE, NULL);
 +	}
 +
-+	l = g_slist_find_custom(adapters, adapter, adapter_cmp);
-+	if (l == NULL) {
-+		error("Not GATT server initialized on adapter %s",
-+						adapter_get_path(adapter));
-+		return NULL;
++	if (gatt_adapter->le_io != NULL) {
++		g_io_channel_unref(gatt_adapter->le_io);
++		g_io_channel_shutdown(gatt_adapter->le_io, FALSE, NULL);
 +	}
 +
-+	gatt_adapter = l->data;
++	g_slist_free_full(gatt_adapter->clients, (GDestroyNotify) channel_free);
 +
-+	return gatt_adapter;
++	if (gatt_adapter->gatt_sdp_handle > 0)
++		remove_record_from_server(gatt_adapter->gatt_sdp_handle);
++
++	if (gatt_adapter->gap_sdp_handle > 0)
++		remove_record_from_server(gatt_adapter->gap_sdp_handle);
++
++	if (gatt_adapter->adapter != NULL)
++		btd_adapter_unref(gatt_adapter->adapter);
++
++	g_free(gatt_adapter);
++}
++
++static gint adapter_cmp(gconstpointer a, gconstpointer b)
++{
++	const struct gatt_adapter *gatt_adapter = a;
++	const struct btd_adapter *adapter = b;
++
++	if (gatt_adapter->adapter == adapter)
++		return 0;
++
++	return -1;
 +}
 +
  static sdp_record_t *server_record_new(uuid_t *uuid, uint16_t start, uint16_t end)
  {
  	sdp_list_t *svclass_id, *apseq, *proto[2], *root, *aproto;
-@@ -230,6 +252,85 @@ static int attribute_cmp(gconstpointer a1, gconstpointer a2)
- 	return attrib1->handle - attrib2->handle;
+@@ -689,21 +754,6 @@ static uint16_t mtu_exchange(struct gatt_channel *channel, uint16_t mtu,
+ 	return enc_mtu_resp(old_mtu, pdu, len);
  }
  
-+static struct attribute *find_primary_range(struct gatt_adapter *gatt_adapter,
-+						uint16_t start, uint16_t *end)
-+{
-+	struct attribute *attrib;
-+	guint h = start;
-+	GSList *l;
-+
-+	if (end == NULL)
-+		return NULL;
-+
-+	l = g_slist_find_custom(gatt_adapter->database, GUINT_TO_POINTER(h),
-+								handle_cmp);
-+	if (!l)
-+		return NULL;
-+
-+	attrib = l->data;
-+
-+	if (bt_uuid_cmp(&attrib->uuid, &prim_uuid) != 0)
-+		return NULL;
-+
-+	*end = start;
-+
-+	for (l = l->next; l; l = l->next) {
-+		struct attribute *a = l->data;
-+
-+		if (bt_uuid_cmp(&a->uuid, &prim_uuid) == 0 ||
-+				bt_uuid_cmp(&a->uuid, &snd_uuid) == 0)
-+			break;
-+
-+		*end = a->handle;
-+	}
-+
-+	return attrib;
-+}
-+
-+static uint32_t attrib_create_sdp_new(struct gatt_adapter *gatt_adapter,
-+					uint16_t handle, const char *name)
-+{
-+	sdp_record_t *record;
-+	struct attribute *a;
-+	uint16_t end = 0;
-+	uuid_t svc, gap_uuid;
-+	bdaddr_t addr;
-+
-+	a = find_primary_range(gatt_adapter, handle, &end);
-+
-+	if (a == NULL)
-+		return 0;
-+
-+	if (a->len == 2)
-+		sdp_uuid16_create(&svc, att_get_u16(a->data));
-+	else if (a->len == 16)
-+		sdp_uuid128_create(&svc, a->data);
-+	else
-+		return 0;
-+
-+	record = server_record_new(&svc, handle, end);
-+	if (record == NULL)
-+		return 0;
-+
-+	if (name)
-+		sdp_set_info_attr(record, name, "BlueZ", NULL);
-+
-+	sdp_uuid16_create(&gap_uuid, GENERIC_ACCESS_PROFILE_ID);
-+	if (sdp_uuid_cmp(&svc, &gap_uuid) == 0) {
-+		sdp_set_url_attr(record, "http://www.bluez.org/",
-+				"http://www.bluez.org/",
-+				"http://www.bluez.org/");
-+	}
-+
-+	adapter_get_address(gatt_adapter->adapter, &addr);
-+	if (add_record_to_server(&addr, record) < 0)
-+		sdp_record_free(record);
-+	else
-+		return record->handle;
-+
-+	return 0;
-+}
-+
- static uint8_t att_check_reqs(struct gatt_channel *channel, uint8_t opcode,
- 								int reqs)
- {
-@@ -586,39 +687,6 @@ static int find_by_type(uint16_t start, uint16_t end, bt_uuid_t *uuid,
- 	return len;
- }
- 
--static struct attribute *find_primary_range(uint16_t start, uint16_t *end)
+-static void attrib_free(void *data)
 -{
--	struct attribute *attrib;
--	guint h = start;
--	GSList *l;
+-	struct attribute *a = data;
 -
--	if (end == NULL)
--		return NULL;
--
--	l = g_slist_find_custom(database, GUINT_TO_POINTER(h), handle_cmp);
--	if (!l)
--		return NULL;
--
--	attrib = l->data;
--
--	if (bt_uuid_cmp(&attrib->uuid, &prim_uuid) != 0)
--		return NULL;
--
--	*end = start;
--
--	for (l = l->next; l; l = l->next) {
--		struct attribute *a = l->data;
--
--		if (bt_uuid_cmp(&a->uuid, &prim_uuid) == 0 ||
--				bt_uuid_cmp(&a->uuid, &snd_uuid) == 0)
--			break;
--
--		*end = a->handle;
--	}
--
--	return attrib;
+-	g_free(a->data);
+-	g_free(a);
 -}
 -
- static uint16_t read_value(struct gatt_channel *channel, uint16_t handle,
- 							uint8_t *pdu, int len)
+-static void channel_free(struct gatt_channel *channel)
+-{
+-	g_attrib_unref(channel->attrib);
+-
+-	g_free(channel);
+-}
+-
+ static void channel_disconnect(void *user_data)
  {
-@@ -998,7 +1066,7 @@ static void confirm_event(GIOChannel *io, void *user_data)
- 	return;
+ 	struct gatt_channel *channel = user_data;
+@@ -1012,74 +1062,88 @@ failed:
+ 	return FALSE;
  }
  
--static gboolean register_core_services(void)
-+static gboolean register_core_services(struct gatt_adapter *gatt_adapter)
+-int attrib_server_init(void)
++static int attrib_adapter_probe(struct btd_adapter *adapter)
  {
- 	uint8_t atval[256];
- 	bt_uuid_t uuid;
-@@ -1035,10 +1103,12 @@ static gboolean register_core_services(void)
- 	att_put_u16(appearance, &atval[0]);
- 	attrib_db_add(appearance_handle, &uuid, ATT_NONE, ATT_NOT_PERMITTED,
- 								atval, 2);
--	gap_sdp_handle = attrib_create_sdp(0x0001, "Generic Access Profile");
--	if (gap_sdp_handle == 0) {
++	struct gatt_adapter *gatt_adapter;
+ 	GError *gerr = NULL;
++	bdaddr_t addr;
 +
-+	gatt_adapter->gap_sdp_handle = attrib_create_sdp_new(gatt_adapter,
-+					0x0001, "Generic Access Profile");
-+	if (gatt_adapter->gap_sdp_handle == 0) {
- 		error("Failed to register GAP service record");
--		goto failed;
-+		return FALSE;
++	DBG("Start GATT server in %s", adapter_get_path(adapter));
++
++	gatt_adapter = g_new0(struct gatt_adapter, 1);
++	gatt_adapter->adapter = btd_adapter_ref(adapter);
++
++	adapter_get_address(gatt_adapter->adapter, &addr);
+ 
+ 	/* BR/EDR socket */
+-	l2cap_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
++	gatt_adapter->l2cap_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
+ 					NULL, NULL, &gerr,
+-					BT_IO_OPT_SOURCE_BDADDR, BDADDR_ANY,
++					BT_IO_OPT_SOURCE_BDADDR, &addr,
+ 					BT_IO_OPT_PSM, ATT_PSM,
+ 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+ 					BT_IO_OPT_INVALID);
+-	if (l2cap_io == NULL) {
++
++	if (gatt_adapter->l2cap_io == NULL) {
+ 		error("%s", gerr->message);
+ 		g_error_free(gerr);
++		free_gatt_adapter(gatt_adapter);
+ 		return -1;
  	}
  
- 	/* GATT service: primary service definition */
-@@ -1046,20 +1116,14 @@ static gboolean register_core_services(void)
- 	att_put_u16(GENERIC_ATTRIB_PROFILE_ID, &atval[0]);
- 	attrib_db_add(0x0010, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
- 
--	gatt_sdp_handle = attrib_create_sdp(0x0010,
--						"Generic Attribute Profile");
--	if (gatt_sdp_handle == 0) {
-+	gatt_adapter->gatt_sdp_handle = attrib_create_sdp_new(gatt_adapter,
-+					0x0010, "Generic Attribute Profile");
-+	if (gatt_adapter->gatt_sdp_handle == 0) {
- 		error("Failed to register GATT service record");
+-	if (!register_core_services())
 -		goto failed;
-+		return FALSE;;
++	if (!register_core_services()) {
++		g_io_channel_unref(gatt_adapter->l2cap_io);
++		free_gatt_adapter(gatt_adapter);
++		return -1;
++	}
+ 
+ 	/* LE socket */
+-	le_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
+-					&le_io, NULL, &gerr,
+-					BT_IO_OPT_SOURCE_BDADDR, BDADDR_ANY,
++	gatt_adapter->le_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
++					&gatt_adapter->le_io, NULL, &gerr,
++					BT_IO_OPT_SOURCE_BDADDR, &addr,
+ 					BT_IO_OPT_CID, ATT_CID,
+ 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+ 					BT_IO_OPT_INVALID);
+-	if (le_io == NULL) {
++
++	if (gatt_adapter->le_io == NULL) {
+ 		error("%s", gerr->message);
+ 		g_error_free(gerr);
+ 		/* Doesn't have LE support, continue */
  	}
  
- 	return TRUE;
++	adapters = g_slist_prepend(adapters, gatt_adapter);
+ 	return 0;
 -
 -failed:
--	if (gap_sdp_handle)
--		remove_record_from_server(gap_sdp_handle);
+-	g_io_channel_unref(l2cap_io);
+-	l2cap_io = NULL;
 -
--	return FALSE;
+-	if (le_io) {
+-		g_io_channel_unref(le_io);
+-		le_io = NULL;
+-	}
+-
+-	return -1;
  }
  
- static int attrib_adapter_probe(struct btd_adapter *adapter)
-@@ -1090,7 +1154,7 @@ static int attrib_adapter_probe(struct btd_adapter *adapter)
- 		return -1;
- 	}
- 
--	if (!register_core_services()) {
-+	if (!register_core_services(gatt_adapter)) {
- 		g_io_channel_unref(gatt_adapter->l2cap_io);
- 		free_gatt_adapter(gatt_adapter);
- 		return -1;
-@@ -1144,47 +1208,20 @@ int attrib_server_init(void)
- void attrib_server_exit(void)
+-void attrib_server_exit(void)
++static void attrib_adapter_remove(struct btd_adapter *adapter)
  {
- 	btd_unregister_adapter_driver(&attrib_adapter_driver);
-+	g_slist_free_full(database, attrib_free);
+-	g_slist_free_full(database, attrib_free);
++	struct gatt_adapter *gatt_adapter;
++	GSList *l;
+ 
+-	if (l2cap_io) {
+-		g_io_channel_unref(l2cap_io);
+-		g_io_channel_shutdown(l2cap_io, FALSE, NULL);
+-	}
++	l = g_slist_find_custom(adapters, adapter, adapter_cmp);
++	if (l == NULL)
++		return;
+ 
+-	if (le_io) {
+-		g_io_channel_unref(le_io);
+-		g_io_channel_shutdown(le_io, FALSE, NULL);
+-	}
++	DBG("Stop GATT server in %s", adapter_get_path(adapter));
+ 
+-	g_slist_free_full(clients, (GDestroyNotify) channel_free);
++	gatt_adapter = l->data;
++	adapters = g_slist_remove(adapters, gatt_adapter);
++	free_gatt_adapter(gatt_adapter);
++}
+ 
+-	if (gatt_sdp_handle)
+-		remove_record_from_server(gatt_sdp_handle);
++static struct btd_adapter_driver attrib_adapter_driver = {
++	.name	= "attrib-adapter-driver",
++	.probe	= attrib_adapter_probe,
++	.remove	= attrib_adapter_remove,
++};
+ 
+-	if (gap_sdp_handle)
+-		remove_record_from_server(gap_sdp_handle);
++int attrib_server_init(void)
++{
++	return btd_register_adapter_driver(&attrib_adapter_driver);
++}
++
++void attrib_server_exit(void)
++{
++	btd_unregister_adapter_driver(&attrib_adapter_driver);
  }
  
  uint32_t attrib_create_sdp(uint16_t handle, const char *name)
- {
--	sdp_record_t *record;
--	struct attribute *a;
--	uint16_t end = 0;
--	uuid_t svc, gap_uuid;
--
--	a = find_primary_range(handle, &end);
--
--	if (a == NULL)
--		return 0;
-+	struct gatt_adapter *gatt_adapter;
- 
--	if (a->len == 2)
--		sdp_uuid16_create(&svc, att_get_u16(a->data));
--	else if (a->len == 16)
--		sdp_uuid128_create(&svc, a->data);
--	else
--		return 0;
-+	DBG("Deprecated function");
- 
--	record = server_record_new(&svc, handle, end);
--	if (record == NULL)
-+	gatt_adapter = get_default_gatt_adapter();
-+	if (gatt_adapter == NULL)
- 		return 0;
- 
--	if (name)
--		sdp_set_info_attr(record, name, "BlueZ", NULL);
--
--	sdp_uuid16_create(&gap_uuid, GENERIC_ACCESS_PROFILE_ID);
--	if (sdp_uuid_cmp(&svc, &gap_uuid) == 0) {
--		sdp_set_url_attr(record, "http://www.bluez.org/",
--				"http://www.bluez.org/",
--				"http://www.bluez.org/");
--	}
--
--	if (add_record_to_server(BDADDR_ANY, record) < 0)
--		sdp_record_free(record);
--	else
--		return record->handle;
--
--	return 0;
-+	return attrib_create_sdp_new(gatt_adapter, handle, name);
- }
- 
- void attrib_free_sdp(uint32_t sdp_handle)
 -- 
 1.7.8
 
