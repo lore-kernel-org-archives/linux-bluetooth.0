@@ -1,116 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4EEAE12E.7020000@globaledgesoft.com>
+Date: Fri, 16 Dec 2011 11:41:58 +0530
+From: Deepthi <deepthi.pv@globaledgesoft.com>
 MIME-Version: 1.0
-In-Reply-To: <1323899524-13653-3-git-send-email-johan.hedberg@gmail.com>
-References: <1323899524-13653-1-git-send-email-johan.hedberg@gmail.com>
-	<1323899524-13653-3-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 16 Dec 2011 11:56:29 +0530
-Message-ID: <CACj007=5ecvj=-7xLB-tNN78J5pEaZfqRzAXRDn5WZsSJVpgaA@mail.gmail.com>
-Subject: Re: [PATCH 2/7] Bluetooth: Move mgmt_set_fast_connectable to the
- right location
-From: Hemant Gupta <hemantgupta.ste@gmail.com>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: lucas.demarchi@profusion.mobi
+CC: linux-bluetooth@vger.kernel.org
+Subject: dbus-send command
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hello Sir,
 
-On Thu, Dec 15, 2011 at 3:21 AM,  <johan.hedberg@gmail.com> wrote:
-> From: Johan Hedberg <johan.hedberg@intel.com>
->
-> Fast connetable is logically after the connectable property so that's
-connetable  -> connectable
-
-> where it should show up in the code as well (it's also after connectable
-> in the settings bitfield).
->
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  include/net/bluetooth/mgmt.h |    7 ++-----
->  net/bluetooth/mgmt.c         |   12 ++++++------
->  2 files changed, 8 insertions(+), 11 deletions(-)
->
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 85e9c6e..bf217cc 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -100,6 +100,8 @@ struct mgmt_cp_set_discoverable {
->
->  #define MGMT_OP_SET_CONNECTABLE                0x0007
->
-> +#define MGMT_OP_SET_FAST_CONNECTABLE   0x001F
-> +
->  #define MGMT_OP_SET_PAIRABLE           0x0008
->
->  #define MGMT_OP_ADD_UUID               0x0009
-> @@ -255,11 +257,6 @@ struct mgmt_cp_unblock_device {
->        bdaddr_t bdaddr;
->  } __packed;
->
-> -#define MGMT_OP_SET_FAST_CONNECTABLE   0x001F
-> -struct mgmt_cp_set_fast_connectable {
-> -       __u8 enable;
-> -} __packed;
-> -
->  #define MGMT_OP_USER_PASSKEY_REPLY     0x0020
->  struct mgmt_cp_user_passkey_reply {
->        bdaddr_t bdaddr;
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 629570c..54092c2 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -2052,7 +2052,7 @@ static int set_fast_connectable(struct sock *sk, u16 index,
->                                        unsigned char *data, u16 len)
->  {
->        struct hci_dev *hdev;
-> -       struct mgmt_cp_set_fast_connectable *cp = (void *) data;
-> +       struct mgmt_mode *cp = (void *) data;
->        struct hci_cp_write_page_scan_activity acp;
->        u8 type;
->        int err;
-> @@ -2070,7 +2070,7 @@ static int set_fast_connectable(struct sock *sk, u16 index,
->
->        hci_dev_lock(hdev);
->
-> -       if (cp->enable) {
-> +       if (cp->val) {
->                type = PAGE_SCAN_TYPE_INTERLACED;
->                acp.interval = 0x0024;  /* 22.5 msec page scan interval */
->        } else {
-> @@ -2154,6 +2154,10 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
->        case MGMT_OP_SET_CONNECTABLE:
->                err = set_connectable(sk, index, buf + sizeof(*hdr), len);
->                break;
-> +       case MGMT_OP_SET_FAST_CONNECTABLE:
-> +               err = set_fast_connectable(sk, index, buf + sizeof(*hdr),
-> +                                                               len);
-> +               break;
->        case MGMT_OP_SET_PAIRABLE:
->                err = set_pairable(sk, index, buf + sizeof(*hdr), len);
->                break;
-> @@ -2232,10 +2236,6 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
->        case MGMT_OP_UNBLOCK_DEVICE:
->                err = unblock_device(sk, index, buf + sizeof(*hdr), len);
->                break;
-> -       case MGMT_OP_SET_FAST_CONNECTABLE:
-> -               err = set_fast_connectable(sk, index, buf + sizeof(*hdr),
-> -                                                               len);
-> -               break;
->        default:
->                BT_DBG("Unknown op %u", opcode);
->                err = cmd_status(sk, index, opcode,
-> --
-> 1.7.7.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+         I would like to know , how to send a signal using dbus-send 
+command for TrackChange ,it takes dict as argument? Please Help,
 
 
 
--- 
-Best Regards
-Hemant Gupta
-ST-Ericsson India
+Thanks & Regards,
+Deepthi Elizabeth P V
