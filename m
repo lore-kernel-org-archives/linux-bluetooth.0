@@ -1,83 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EEB0421.4030407@linux.intel.com>
-Date: Fri, 16 Dec 2011 09:41:05 +0100
-From: Frederic Danis <frederic.danis@linux.intel.com>
+Date: Fri, 16 Dec 2011 10:14:18 +0200
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Correct structures for AMP Assoc Read
+Message-ID: <20111216081416.GA31152@aemeltch-MOBL1>
+References: <1323942483-24779-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1323966479.1965.81.camel@aeonflux>
 MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC v5 1/8] audio: Move tel drivers to DBus interface
-References: <1323853510-5195-1-git-send-email-frederic.danis@linux.intel.com> <1323853510-5195-2-git-send-email-frederic.danis@linux.intel.com> <CABBYNZKyY40pn-Sm_VSxHLqzbrQ9q-63Sjwmf=kvh4Dy1x9-bw@mail.gmail.com> <4EE9D453.6020503@linux.intel.com> <CABBYNZL3sCMtSQ4bVetdA25wRmoFZz8BWhsZoRcf4WpcCpi54w@mail.gmail.com>
-In-Reply-To: <CABBYNZL3sCMtSQ4bVetdA25wRmoFZz8BWhsZoRcf4WpcCpi54w@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1323966479.1965.81.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Luiz,
+Hi Marcel,
 
-Le 15/12/2011 12:25, Luiz Augusto von Dentz a écrit :
-> Hi Frederic,
->
-> On Thu, Dec 15, 2011 at 1:04 PM, Frederic Danis
-> <frederic.danis@linux.intel.com>  wrote:
->>>
->>>
->>> I thought we had agreed in having the transport implemented directly
->>> inside the agent, at least that was my proposal, otherwise it keeps
->>> bluetoothd in the middle of the communication. It may not seem obvious
->>> but we should target low latency as we are dealing with audio the
->>> events need to be propagated fast.
->>>
->>> So instead of MediaTransportPath, what I suggest is sending the
->>> endpoint itself e.g. string,object Endpoint Connection id and object
->>> path of the MediaEndpoint to be used. This means the agent e.g. oFono
->>> will have to create an object which implements
->>> org.bluez.MediaTransport and then call
->>> org.bluez.MediaEndpoint.SetConfiguration in the received object.
->>>
->>>
->>
->> If I understand correctly, passing Media Endpoint connection and path will
->> imply that the telephony agent will have to manage the SCO connection, which
->> means that we need to link the telephony agent with BlueZ libs.
->> As far as I understand, one of the goals is to remove telephony code from
->> BlueZ and bluetooth code from telephony daemon.
->> Am I wrong ?
->>
->> Passing the MediaTransport allows to keep bluetooth part in BlueZ daemon and
->> telephony part in telephony agent.
->
-> I wonder how you gonna be able to synchronize things like volume
-> changes then, because you can't depend on the signals since that don't
-> have the information of who did it, and in this case both agent and
-> endpoint will be talking to the same transport, besides imo having
-> events propagated quickly is much more important here. Now you are
-> right about SCO connections but that doesn't mean we cannot have
-> bluetoothd to still handle it and pass it back to the agent similarly
-> what we have done with ConnectFD in Serial.
->
+On Thu, Dec 15, 2011 at 05:27:59PM +0100, Marcel Holtmann wrote:
+> Hi Andrei,
+> 
+> > Make struct names similar to kernel and remove static array since
+> > fragment length can be other size than HCI_MAX_NAME_LENGTH, which
+> > is for totally different purpose.
+> > ---
+> >  lib/hci.h |   11 +++++------
+> >  1 files changed, 5 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/lib/hci.h b/lib/hci.h
+> > index 51184ee..48692fa 100644
+> > --- a/lib/hci.h
+> > +++ b/lib/hci.h
+> > @@ -1382,17 +1382,16 @@ typedef struct {
+> >  #define OCF_READ_LOCAL_AMP_ASSOC	0x000A
+> >  typedef struct {
+> >  	uint8_t		handle;
+> > -	uint16_t	length_so_far;
+> > -	uint16_t	assoc_length;
+> > +	uint16_t	len_so_far;
+> > +	uint16_t	max_len;
+> >  } __attribute__ ((packed)) read_local_amp_assoc_cp;
+> > -#define READ_LOCAL_AMP_ASSOC_CP_SIZE 5
+> > +
+> >  typedef struct {
+> >  	uint8_t		status;
+> >  	uint8_t		handle;
+> > -	uint16_t	length;
+> > -	uint8_t		fragment[HCI_MAX_NAME_LENGTH];
+> > +	uint16_t	rem_len;
+> > +	uint8_t		frag[0];
+> >  } __attribute__ ((packed)) read_local_amp_assoc_rp;
+> > -#define READ_LOCAL_AMP_ASSOC_RP_SIZE 252
+> >  
+> >  #define OCF_WRITE_REMOTE_AMP_ASSOC	0x000B
+> >  typedef struct {
+> 
+> I am fine with these changes.
 
-I wrote flowcharts for SCO connections and some AT commands (AT+NREC, 
-AT+VGS, ...) for the 2 approaches (side by side). This is available on 
-http://pastebin.com/sLBj7kpW
+BTW: What do you think about cleaning up those headers like copying all
+structures from kernel header and removing unneeded size defines (we can
+always use sizeof)?
 
-As you can see, when passing Media Transport path in NewConnection 
-method, the complexity is located during volume management.
-I do not think that we can have synchronization problems if property 
-changed signal is sent in all cases.
+Best regards 
+Andrei Emeltchenko 
 
-When moving MediaTransport to telephony agent (i.e. oFono), complexity 
-moves to SCO connections, passing SCO fd through oFono to PulseAudio.
-This will also imply to remove code from Media Transport, which will 
-complicate this set of patches.
-It will also break similarity between A2DP and HSP/HFP (currently both 
-media transport code are in BlueZ, breaking that will set one transport 
-in BlueZ, the other not).
-
-Regards
-
-Fred
-
--- 
-Frederic Danis                            Open Source Technology Centre
-frederic.danis@intel.com                              Intel Corporation
-
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
