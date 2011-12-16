@@ -1,71 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 Dec 2011 10:14:18 +0200
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Correct structures for AMP Assoc Read
-Message-ID: <20111216081416.GA31152@aemeltch-MOBL1>
-References: <1323942483-24779-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1323966479.1965.81.camel@aeonflux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1323966479.1965.81.camel@aeonflux>
+In-Reply-To: <1323899524-13653-3-git-send-email-johan.hedberg@gmail.com>
+References: <1323899524-13653-1-git-send-email-johan.hedberg@gmail.com>
+	<1323899524-13653-3-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 16 Dec 2011 11:56:29 +0530
+Message-ID: <CACj007=5ecvj=-7xLB-tNN78J5pEaZfqRzAXRDn5WZsSJVpgaA@mail.gmail.com>
+Subject: Re: [PATCH 2/7] Bluetooth: Move mgmt_set_fast_connectable to the
+ right location
+From: Hemant Gupta <hemantgupta.ste@gmail.com>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Thu, Dec 15, 2011 at 05:27:59PM +0100, Marcel Holtmann wrote:
-> Hi Andrei,
-> 
-> > Make struct names similar to kernel and remove static array since
-> > fragment length can be other size than HCI_MAX_NAME_LENGTH, which
-> > is for totally different purpose.
-> > ---
-> >  lib/hci.h |   11 +++++------
-> >  1 files changed, 5 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/lib/hci.h b/lib/hci.h
-> > index 51184ee..48692fa 100644
-> > --- a/lib/hci.h
-> > +++ b/lib/hci.h
-> > @@ -1382,17 +1382,16 @@ typedef struct {
-> >  #define OCF_READ_LOCAL_AMP_ASSOC	0x000A
-> >  typedef struct {
-> >  	uint8_t		handle;
-> > -	uint16_t	length_so_far;
-> > -	uint16_t	assoc_length;
-> > +	uint16_t	len_so_far;
-> > +	uint16_t	max_len;
-> >  } __attribute__ ((packed)) read_local_amp_assoc_cp;
-> > -#define READ_LOCAL_AMP_ASSOC_CP_SIZE 5
-> > +
-> >  typedef struct {
-> >  	uint8_t		status;
-> >  	uint8_t		handle;
-> > -	uint16_t	length;
-> > -	uint8_t		fragment[HCI_MAX_NAME_LENGTH];
-> > +	uint16_t	rem_len;
-> > +	uint8_t		frag[0];
-> >  } __attribute__ ((packed)) read_local_amp_assoc_rp;
-> > -#define READ_LOCAL_AMP_ASSOC_RP_SIZE 252
-> >  
-> >  #define OCF_WRITE_REMOTE_AMP_ASSOC	0x000B
-> >  typedef struct {
-> 
-> I am fine with these changes.
+On Thu, Dec 15, 2011 at 3:21 AM,  <johan.hedberg@gmail.com> wrote:
+> From: Johan Hedberg <johan.hedberg@intel.com>
+>
+> Fast connetable is logically after the connectable property so that's
+connetable  -> connectable
 
-BTW: What do you think about cleaning up those headers like copying all
-structures from kernel header and removing unneeded size defines (we can
-always use sizeof)?
+> where it should show up in the code as well (it's also after connectable
+> in the settings bitfield).
+>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  include/net/bluetooth/mgmt.h |    7 ++-----
+>  net/bluetooth/mgmt.c         |   12 ++++++------
+>  2 files changed, 8 insertions(+), 11 deletions(-)
+>
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index 85e9c6e..bf217cc 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -100,6 +100,8 @@ struct mgmt_cp_set_discoverable {
+>
+>  #define MGMT_OP_SET_CONNECTABLE                0x0007
+>
+> +#define MGMT_OP_SET_FAST_CONNECTABLE   0x001F
+> +
+>  #define MGMT_OP_SET_PAIRABLE           0x0008
+>
+>  #define MGMT_OP_ADD_UUID               0x0009
+> @@ -255,11 +257,6 @@ struct mgmt_cp_unblock_device {
+>        bdaddr_t bdaddr;
+>  } __packed;
+>
+> -#define MGMT_OP_SET_FAST_CONNECTABLE   0x001F
+> -struct mgmt_cp_set_fast_connectable {
+> -       __u8 enable;
+> -} __packed;
+> -
+>  #define MGMT_OP_USER_PASSKEY_REPLY     0x0020
+>  struct mgmt_cp_user_passkey_reply {
+>        bdaddr_t bdaddr;
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 629570c..54092c2 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -2052,7 +2052,7 @@ static int set_fast_connectable(struct sock *sk, u16 index,
+>                                        unsigned char *data, u16 len)
+>  {
+>        struct hci_dev *hdev;
+> -       struct mgmt_cp_set_fast_connectable *cp = (void *) data;
+> +       struct mgmt_mode *cp = (void *) data;
+>        struct hci_cp_write_page_scan_activity acp;
+>        u8 type;
+>        int err;
+> @@ -2070,7 +2070,7 @@ static int set_fast_connectable(struct sock *sk, u16 index,
+>
+>        hci_dev_lock(hdev);
+>
+> -       if (cp->enable) {
+> +       if (cp->val) {
+>                type = PAGE_SCAN_TYPE_INTERLACED;
+>                acp.interval = 0x0024;  /* 22.5 msec page scan interval */
+>        } else {
+> @@ -2154,6 +2154,10 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+>        case MGMT_OP_SET_CONNECTABLE:
+>                err = set_connectable(sk, index, buf + sizeof(*hdr), len);
+>                break;
+> +       case MGMT_OP_SET_FAST_CONNECTABLE:
+> +               err = set_fast_connectable(sk, index, buf + sizeof(*hdr),
+> +                                                               len);
+> +               break;
+>        case MGMT_OP_SET_PAIRABLE:
+>                err = set_pairable(sk, index, buf + sizeof(*hdr), len);
+>                break;
+> @@ -2232,10 +2236,6 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+>        case MGMT_OP_UNBLOCK_DEVICE:
+>                err = unblock_device(sk, index, buf + sizeof(*hdr), len);
+>                break;
+> -       case MGMT_OP_SET_FAST_CONNECTABLE:
+> -               err = set_fast_connectable(sk, index, buf + sizeof(*hdr),
+> -                                                               len);
+> -               break;
+>        default:
+>                BT_DBG("Unknown op %u", opcode);
+>                err = cmd_status(sk, index, opcode,
+> --
+> 1.7.7.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Best regards 
-Andrei Emeltchenko 
 
-> 
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
+
+-- 
+Best Regards
+Hemant Gupta
+ST-Ericsson India
