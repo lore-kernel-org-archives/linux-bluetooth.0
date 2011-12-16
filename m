@@ -1,60 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4EEB0421.4030407@linux.intel.com>
+Date: Fri, 16 Dec 2011 09:41:05 +0100
+From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1323952435-3244-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1323952435-3244-1-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Fri, 16 Dec 2011 10:43:15 +0200
-Message-ID: <CABBYNZJ9QgLPJQoudjRGZfMF5CHV5LaHUNZf8Hcojh5bjMgaTQ@mail.gmail.com>
-Subject: Re: [RFC] media: assertion to check that transport exists
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v5 1/8] audio: Move tel drivers to DBus interface
+References: <1323853510-5195-1-git-send-email-frederic.danis@linux.intel.com> <1323853510-5195-2-git-send-email-frederic.danis@linux.intel.com> <CABBYNZKyY40pn-Sm_VSxHLqzbrQ9q-63Sjwmf=kvh4Dy1x9-bw@mail.gmail.com> <4EE9D453.6020503@linux.intel.com> <CABBYNZL3sCMtSQ4bVetdA25wRmoFZz8BWhsZoRcf4WpcCpi54w@mail.gmail.com>
+In-Reply-To: <CABBYNZL3sCMtSQ4bVetdA25wRmoFZz8BWhsZoRcf4WpcCpi54w@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hello Luiz,
 
-On Thu, Dec 15, 2011 at 2:33 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Le 15/12/2011 12:25, Luiz Augusto von Dentz a écrit :
+> Hi Frederic,
 >
-> From my understanding, a transport should exist for any non-disconnected
-> gateway.
+> On Thu, Dec 15, 2011 at 1:04 PM, Frederic Danis
+> <frederic.danis@linux.intel.com>  wrote:
+>>>
+>>>
+>>> I thought we had agreed in having the transport implemented directly
+>>> inside the agent, at least that was my proposal, otherwise it keeps
+>>> bluetoothd in the middle of the communication. It may not seem obvious
+>>> but we should target low latency as we are dealing with audio the
+>>> events need to be propagated fast.
+>>>
+>>> So instead of MediaTransportPath, what I suggest is sending the
+>>> endpoint itself e.g. string,object Endpoint Connection id and object
+>>> path of the MediaEndpoint to be used. This means the agent e.g. oFono
+>>> will have to create an object which implements
+>>> org.bluez.MediaTransport and then call
+>>> org.bluez.MediaEndpoint.SetConfiguration in the received object.
+>>>
+>>>
+>>
+>> If I understand correctly, passing Media Endpoint connection and path will
+>> imply that the telephony agent will have to manage the SCO connection, which
+>> means that we need to link the telephony agent with BlueZ libs.
+>> As far as I understand, one of the goals is to remove telephony code from
+>> BlueZ and bluetooth code from telephony daemon.
+>> Am I wrong ?
+>>
+>> Passing the MediaTransport allows to keep bluetooth part in BlueZ daemon and
+>> telephony part in telephony agent.
 >
-> These assertions sometimes fail though. So I would like to clarify if
-> that's a consistent state in BlueZ or there is some bug.
-> ---
->  audio/media.c |    3 +++
->  1 files changed, 3 insertions(+), 0 deletions(-)
+> I wonder how you gonna be able to synchronize things like volume
+> changes then, because you can't depend on the signals since that don't
+> have the information of who did it, and in this case both agent and
+> endpoint will be talking to the same transport, besides imo having
+> events propagated quickly is much more important here. Now you are
+> right about SCO connections but that doesn't mean we cannot have
+> bluetoothd to still handle it and pass it back to the agent similarly
+> what we have done with ConnectFD in Serial.
 >
-> diff --git a/audio/media.c b/audio/media.c
-> index a2ef437..c5fe3d9 100644
-> --- a/audio/media.c
-> +++ b/audio/media.c
-> @@ -28,6 +28,7 @@
->  #endif
->
->  #include <errno.h>
-> +#include <assert.h>
->
->  #include <glib.h>
->  #include <gdbus.h>
-> @@ -620,8 +621,10 @@ static void gateway_state_changed(struct audio_device *dev,
->                                        gateway_setconf_cb, dev, NULL);
->                break;
->        case GATEWAY_STATE_CONNECTED:
-> +               assert(endpoint->transport != NULL);
->                break;
->        case GATEWAY_STATE_PLAYING:
-> +               assert(endpoint->transport != NULL);
->                break;
->        }
->  }
-> --
-> 1.7.6.4
 
-IMO assert on daemon are not that great, it may help while developing
-but why not run with valgrind and let it crash?
+I wrote flowcharts for SCO connections and some AT commands (AT+NREC, 
+AT+VGS, ...) for the 2 approaches (side by side). This is available on 
+http://pastebin.com/sLBj7kpW
+
+As you can see, when passing Media Transport path in NewConnection 
+method, the complexity is located during volume management.
+I do not think that we can have synchronization problems if property 
+changed signal is sent in all cases.
+
+When moving MediaTransport to telephony agent (i.e. oFono), complexity 
+moves to SCO connections, passing SCO fd through oFono to PulseAudio.
+This will also imply to remove code from Media Transport, which will 
+complicate this set of patches.
+It will also break similarity between A2DP and HSP/HFP (currently both 
+media transport code are in BlueZ, breaking that will set one transport 
+in BlueZ, the other not).
+
+Regards
+
+Fred
 
 -- 
-Luiz Augusto von Dentz
+Frederic Danis                            Open Source Technology Centre
+frederic.danis@intel.com                              Intel Corporation
+
