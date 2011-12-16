@@ -1,196 +1,167 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 Dec 2011 15:35:22 -0800 (PST)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Gustavo Padovan <padovan@profusion.mobi>
-cc: David Herrmann <dh.herrmann@googlemail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Andre Guedes <andre.guedes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: Does it make sense to have the hdev workqueue serialized?
-In-Reply-To: <20111216200514.GB7046@joana>
-Message-ID: <alpine.DEB.2.02.1112161504350.24351@mathewm-linux>
-References: <1323879926-15971-1-git-send-email-andre.guedes@openbossa.org> <1323879926-15971-6-git-send-email-andre.guedes@openbossa.org> <1323891366.1965.55.camel@aeonflux> <alpine.DEB.2.02.1112151101550.24351@mathewm-linux>
- <CANq1E4Qc9nrF=aBP8bfN8t4FhkomCoHqkz7h2pEcP5eG+XTJHQ@mail.gmail.com> <alpine.DEB.2.02.1112161021100.24351@mathewm-linux> <20111216200514.GB7046@joana>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=ISO-8859-15
+From: Brian Gix <bgix@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Brian Gix <bgix@codeaurora.org>
+Subject: [RFC 1/1] Bluetooth: Add LE Data signing smp_sign_pkt()
+Date: Fri, 16 Dec 2011 14:40:49 -0800
+Message-Id: <1324075249-5755-2-git-send-email-bgix@codeaurora.org>
+In-Reply-To: <1324075249-5755-1-git-send-email-bgix@codeaurora.org>
+References: <1324075249-5755-1-git-send-email-bgix@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+The LE packet signing algorythm is based on RFC-4493, and is
+used by the GATT procedure Write Signed Command. This implementation
+is self contained, takes as inputs a Packet to be signed, a Serial
+number, and CSRK, all in Network order. It's output is a fully
+signed datagram for Transmission or Verification.
 
-On Fri, 16 Dec 2011, Gustavo Padovan wrote:
+Signed-off-by: Brian Gix <bgix@codeaurora.org>
+---
+ include/net/bluetooth/smp.h |    3 +-
+ net/bluetooth/smp.c         |  103 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 105 insertions(+), 1 deletions(-)
 
-> Hi Mat,
->
-> * Mat Martineau <mathewm@codeaurora.org> [2011-12-16 11:20:21 -0800]:
->
->>
->>
->> On Thu, 15 Dec 2011, David Herrmann wrote:
->>
->>> Hi Mat
->>>
->>> On Thu, Dec 15, 2011 at 8:25 PM, Mat Martineau <mathewm@codeaurora.org> wrote:
->>>>
->>>> Marcel & Andre -
->>>>
->>>>
->>>> On Wed, 14 Dec 2011, Marcel Holtmann wrote:
->>>>
->>>>> Hi Andre,
->>>>>
->>>>>> This patch adds to hci_core an infra-structure to scan LE devices.
->>>>>>
->>>>>> The LE scan is implemented using a work_struct which is enqueued
->>>>>> on hdev->workqueue. The LE scan work sends commands (Set LE Scan
->>>>>> Parameters and Set LE Scan Enable) to the controller and waits for
->>>>>> its results. If commands were executed successfully a timer is set
->>>>>> to disable the ongoing scanning after some amount of time.
->>>>>
->>>>>
->>>>> so I rather hold off on these until we get the tasklet removal patches
->>>>> merged. The mgmt processing will then also be done in process context
->>>>> and we can just sleep. This should make code like this a lot simpler.
->>>>
->>>>
->>>>
->>>> While execution on a workqueue can sleep, it's not a good idea to block for
->>>> a long time like this patch does.  A single-threaded workqueue (like the
->>>> hdev workqueue) will not run the next scheduled work until the current work
->>>> function returns.  If code executing in a workqueue suspends execution by
->>>> using a wait queue, like le_scan_workqueue(), then all other pending work is
->>>> blocked until le_scan_workqueue() returns.
->>>
->>> Why do we use a single-threaded workqueue anyway? Why don't we switch
->>> to a non-reentrant workqueue? Otherwise, we are just blocking the
->>> whole hdev workqueue because we are too lazy to implement proper
->>> locking between work-structs that depend on each other.
->>
->> Before 2.6.36, creating a workqueue would create a dedicated thread
->> per processor (or just one thread for a single threaded workqueue).
->> I think I've seen Marcel comment that we didn't have enough work to
->> justify the extra resources for multiple threads.
->>
->> Since 2.6.36, there are dynamic thread pools for each processor that
->> do not depend on the number of workqueues.  Threads are instead
->> allocated based on the amount of concurrent work present in the
->> system.  See http://lwn.net/Articles/403891/
->>
->>>> It might be better to think of workqueues as having similar restrictions to
->>>> tasklets, except you can use GFP_KERNEL when allocating and can block while
->>>> acquiring locks.
->>>
->>> That sounds like a lot of work with almost no benefit. If we start the
->>> transition from tasklets to workqueues I think we should do it
->>> properly so we do not require a single-threaded workqueue.
->>
->> The benefit would be in having no need to keep track of which
->> context functions are executing in.  It's been a big headache with
->> the ERTM and AMP changes, and there is a bunch of code that could
->> work better in process context if it didn't have to also handle
->> calls from tasklets.
->>
->> That said, after learning more about how workqueues are implemented
->> now, it may be worthwhile to change the "use one single-threaded
->> workqueue for everything" assumption.  alloc_workqueue() has a
->> max_active parameter, and it is possible to have many work items
->> running concurrently.  Some of those threads could be suspended,
->> like Andre does in his patch.  Workqueues created with the old
->> create_workqueue() or create_singlethread_workqueue() have
->> max_active == 1, which enforces serialization on each processor.
->
-> I didn't know alloc_workqueue() either, I think its a good idea go for it.
->
->>
->>
->> So there are two big questions:  Do we want to keep pushing
->> everything on the hdev workqueue, since workqueues are not as
->> heavyweight as they used to be?  And does it make sense to keep our
->> workqueues serialized?
->>
->>
->> Advantages of serialization:
->>  * An HCI device is serialized by the transport anyway, so it makes
->> sense to match that model.
->>  * Ordering is maintained.  The order of incoming HCI events may
->> queue work in a particular order and need to assume the work will be
->> executed in that order.
->>  * Simplicity.
->>  * No lock contention between multiple workers.
->>
->> Advantages of not serializing:
->>  * Takes advantage of SMP
->>  * Workers can block without affecting the rest of the queue,
->> enabling workers to be long-lived and use state on the thread stack
->> instead of complicated lists of pending operations and dynamic
->> allocation.
->>  * We need to have proper locking to deal with user processes
->> anyway, so why not allow more concurrency internally.
->>  * Some work can proceed while waiting for locks in other workers.
->>  * Can use WQ_HIGHPRI to keep tx/rx data moving even when workers
->> are waiting for locks
->>
->>
->> I think what's called for is a hybrid approach that serializes where
->> necessary, but uses multiple workqueues.  How about this:
->>
->>  * Use the serialized hdev workqueue for rx/tx only.  This could use
->> WQ_HIGHPRI to help performance.
->
-> I agree with this one.
->
->>  * Have a serialized workqueue for each L2CAP channel to handle
->> per-channel timeouts.
->
-> Isn't it too much? maybe one workqueue per l2cap_conn is better.
+diff --git a/include/net/bluetooth/smp.h b/include/net/bluetooth/smp.h
+index 15b97d5..987a864 100644
+--- a/include/net/bluetooth/smp.h
++++ b/include/net/bluetooth/smp.h
+@@ -134,7 +134,8 @@ struct smp_chan {
+ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level);
+ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb);
+ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force);
+-
++int smp_sign_pkt(u8 *src, int slen, u8 *dst, int *dlen, __le32 serial,
++								u8 *csrk);
+ void smp_chan_destroy(struct l2cap_conn *conn);
+ 
+ #endif /* __SMP_H */
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 0b96737..d53dbe4 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -30,6 +30,17 @@
+ 
+ #define SMP_TIMEOUT 30000 /* 30 seconds */
+ 
++static inline void lshift128(u8 target[16])
++{
++	int i;
++	for (i = 0; i < 15; i++) {
++		target[i] <<= 1;
++		if (target[i+1] & 0x80)
++			target[i] |= 0x01;
++	}
++	target[15] <<= 1;
++}
++
+ static inline void swap128(u8 src[16], u8 dst[16])
+ {
+ 	int i;
+@@ -145,6 +156,98 @@ static int smp_rand(u8 *buf)
+ 	return 0;
+ }
+ 
++int smp_sign_pkt(u8 *src, int slen, u8 *dst, int *dlen, __le32 serial, u8 *csrk)
++{
++	struct crypto_blkcipher *tfm;
++	u8 k[16], sub_k[16], tmp[16];
++	int test_msb, i, err, enc_size = slen + sizeof(u32);
++	u32 serial_num = le32_to_cpu(serial);
++
++	if (!src || !dst || !csrk || !dlen || !slen || *dlen < enc_size + 8)
++		return -EINVAL;
++
++	tfm = crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
++	if (IS_ERR(tfm))
++		return -ENOTSUPP;
++
++	/* Put key into required order (Big Endian) */
++	swap128(csrk, k);
++
++	/* Calculate SubKey per RFC-4493 section 2.3 Step 1 */
++	memset(sub_k, 0, sizeof(sub_k));
++	err = smp_e(tfm, k, sub_k);
++	if (err) {
++		BT_ERR("SubKey generation failed: %d", err);
++		goto error;
++	}
++
++	/* Calculate K1 per RFC-4493 section 2.3 Step 2 */
++	test_msb = sub_k[0] & 0x80;
++	lshift128(sub_k);
++	if (test_msb)
++		sub_k[15] ^= 0x87;
++
++	/* Calculate K2 per RFC-4493 section 2.3 Step 3 (if needed) */
++	if (enc_size % 16) {
++		test_msb = sub_k[0] & 0x80;
++		lshift128(sub_k);
++		if (test_msb)
++			sub_k[15] ^= 0x87;
++	}
++
++	/* Stage data for encryption in dst buffer (Big Endian) */
++	put_unaligned_be32(serial_num, dst);
++	for (i = 0; i < slen; i++)
++		dst[i + sizeof(u32)] = src[slen - i - 1];
++
++
++	/* Apply blocks 1 to N-1 and Encrypt per RFC-4493 section 2.4 */
++	memset(tmp, 0, 16);
++	for (i = 0; i < enc_size - 16; i += 16) {
++		u128_xor((u128 *) tmp, (u128 *) tmp, (u128 *) &dst[i]);
++		err = smp_e(tfm, k, tmp);
++		if (err) {
++			BT_ERR("mid block(%d) encryption failed: %d", i, err);
++			goto error;
++		}
++	}
++
++	/* Apply SubKey for last block */
++	u128_xor((u128 *) tmp, (u128 *) tmp, (u128 *) sub_k);
++
++	/* Apply last block, and pad as needed */
++	if (enc_size % 16) {
++		/* reuse sub_k to pad target data to 16 bytes */
++		memset(sub_k, 0, 16);
++		memcpy(sub_k, &dst[i], enc_size - i);
++		sub_k[enc_size - i] = 0x80;
++
++		u128_xor((u128 *) tmp, (u128 *) tmp, (u128 *) sub_k);
++	} else {
++		u128_xor((u128 *) tmp, (u128 *) tmp, (u128 *) &dst[i]);
++	}
++
++	/* Encrypt last block */
++	err = smp_e(tfm, k, tmp);
++	if (err) {
++		BT_ERR("last block encryption failed: %d", err);
++		goto error;
++	}
++
++	/* Signature calculation complete */
++	swap128(tmp, k);
++
++	/* Construct final dst buffer (Little Endian) */
++	memcpy(dst, src, slen);
++	put_unaligned_le32(serial_num, &dst[slen]);
++	memcpy(&dst[slen + sizeof(u32)], &k[8], 8);
++	*dlen = slen + sizeof(u32) + 8;
++
++error:
++	crypto_free_blkcipher(tfm);
++	return err;
++}
++
+ static struct sk_buff *smp_build_cmd(struct l2cap_conn *conn, u8 code,
+ 						u16 dlen, void *data)
+ {
+-- 
+1.7.8
 
-l2cap_conn does make more sense.
-
->>  * Have a global, non-serialized workqueue for stuff like sysfs and
->> mgmt to use.
->
-> Some of the workqueue usage we have today might go away after the workqueue
-> change patches, we can check later if such workqueue will be really needed.
-
-I was thinking it would be useful for jobs like Andre has (a 
-longer-running thread that blocks at different stages), but one of the 
-system workqueues (like system_long_wq) would work fine for that.  No 
-need for a special Bluetooth queue.
-
-A long-running thread like this could even be useful for the AMP 
-manager work that's going on - AMP manager state could be built up in 
-a thread instead of building an async state machine.
-
->
->>
->>
->> Does that sound workable?
->>
->>
->>>> In getting rid of tasklets, I think we also need to not use timers (which
->>>> also execute in softirq context), and use the delayed_work calls instead.
->>>>  That way we can assume all net/bluetooth code runs in process context,
->>>> except for calls up from the driver layer.
->>>
->>> Are there currently any pending patches? I've tried converting the
->>> tasklets to workqueues myself but I always ended up with several
->>> race-conditions. I haven't found a clean and easy way to fix them,
->>> yet. And it's also a quite frustrating work.
->>
->> Gustavo's working on it, starting from Marcel's patch.  I think it's
->> this one: http://www.spinics.net/lists/linux-bluetooth/msg06892.html
->
-> As I said on the other e-mail, code is here:
->
-> http://git.kernel.org/?p=linux/kernel/git/padovan/bluetooth-testing.git
->
-> Comments are welcome!
-
-Thanks for the pointer to bluetooth-testing - I hadn't checked on it 
-in a while!  I will look over your changes.
-
-
---
-Mat Martineau
+-- 
+Brian Gix
+bgix@codeaurora.org
 Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum 
