@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 11/11] gatt-example: Use adapter driver to register GATT attributes
-Date: Fri, 16 Dec 2011 17:09:59 +0100
-Message-Id: <1324051799-21439-12-git-send-email-sancane@gmail.com>
-In-Reply-To: <1324051799-21439-11-git-send-email-sancane@gmail.com>
+Subject: [PATCH 10/11] attrib-server: Remove attrib_server_exit/attrib_server_exit functions
+Date: Fri, 16 Dec 2011 17:09:58 +0100
+Message-Id: <1324051799-21439-11-git-send-email-sancane@gmail.com>
+In-Reply-To: <1324051799-21439-10-git-send-email-sancane@gmail.com>
 References: <1324051799-21439-1-git-send-email-sancane@gmail.com>
  <1324051799-21439-2-git-send-email-sancane@gmail.com>
  <1324051799-21439-3-git-send-email-sancane@gmail.com>
@@ -16,116 +16,156 @@ References: <1324051799-21439-1-git-send-email-sancane@gmail.com>
  <1324051799-21439-8-git-send-email-sancane@gmail.com>
  <1324051799-21439-9-git-send-email-sancane@gmail.com>
  <1324051799-21439-10-git-send-email-sancane@gmail.com>
- <1324051799-21439-11-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-GATT servers should register their attributes on each adapter when
-it is plugged instead of doing that when the plugins is loaded. This
-patch registers a new adapter driver to manage plug and unplug
-events in order to register attributes in each GATT served managed
-in each adapter.
+We need neither to init nor stop gatt server whenever the demon starts
+and finishes the execution, instead of doing that, we init or stop the
+GATT server when the adapter is initialized or removed. Furthermore,
+we don't use btd_adapter_driver any more because the GATT server must
+be already initialized before any plugin use it.
 ---
- plugins/gatt-example.c |   46 +++++++++++++++++++++++++++++++++++++++-------
- 1 files changed, 39 insertions(+), 7 deletions(-)
+ src/adapter.c       |    7 +++++++
+ src/adapter.h       |    3 +++
+ src/attrib-server.c |   24 ++++--------------------
+ src/hcid.h          |    3 ---
+ src/main.c          |    8 --------
+ 5 files changed, 14 insertions(+), 31 deletions(-)
 
-diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
-index 6d9b6b8..c719697 100644
---- a/plugins/gatt-example.c
-+++ b/plugins/gatt-example.c
-@@ -29,6 +29,7 @@
- #include <glib.h>
- #include <bluetooth/uuid.h>
- #include <errno.h>
-+#include <adapter.h>
- 
- #include "plugin.h"
- #include "hcid.h"
-@@ -59,6 +60,8 @@
- 
- static GSList *sdp_handles = NULL;
- 
-+static gboolean started = FALSE;
-+
- static uint8_t battery_state_read(struct attribute *a, gpointer user_data)
- {
- 	uint8_t value;
-@@ -436,19 +439,19 @@ static void register_weight_service(const uint16_t vendor[2])
- 						GUINT_TO_POINTER(sdp_handle));
- }
- 
--static int gatt_example_init(void)
-+static int gatt_example_adapter_probe(struct btd_adapter *adapter)
- {
- 	uint16_t manuf1_range[2] = {0, 0}, manuf2_range[2] = {0, 0};
- 	uint16_t vendor_range[2] = {0, 0};
- 
--	if (!main_opts.attrib_server) {
--		DBG("Attribute server is disabled");
-+	/* FIXME: Add support for more than one adapter */
-+
-+	if (started)
- 		return -1;
--	}
- 
- 	if (!register_battery_service()) {
- 		DBG("Battery service could not be registered");
--		return -EIO;
-+		return -1;
+diff --git a/src/adapter.c b/src/adapter.c
+index 1a701a4..200e9d9 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2483,6 +2483,10 @@ gboolean adapter_init(struct btd_adapter *adapter)
  	}
  
- 	register_manuf1_service(manuf1_range);
-@@ -457,12 +460,15 @@ static int gatt_example_init(void)
- 	register_vendor_service(vendor_range);
- 	register_weight_service(vendor_range);
+ 	sdp_init_services_list(&adapter->bdaddr);
++
++	if (main_opts.attrib_server)
++		btd_adapter_gatt_server_start(adapter);
++
+ 	load_drivers(adapter);
+ 	clear_blocked(adapter);
+ 	load_devices(adapter);
+@@ -2542,6 +2546,9 @@ void adapter_remove(struct btd_adapter *adapter)
+ 	g_slist_free(adapter->devices);
  
-+	started = TRUE;
+ 	unload_drivers(adapter);
++	if (main_opts.attrib_server)
++		btd_adapter_gatt_server_stop(adapter);
++
+ 	g_slist_free(adapter->pin_callbacks);
+ 
+ 	/* Return adapter to down state if it was not up on init */
+diff --git a/src/adapter.h b/src/adapter.h
+index ff1d659..2f8f125 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -275,3 +275,6 @@ int btd_adapter_add_remote_oob_data(struct btd_adapter *adapter,
+ 
+ int btd_adapter_remove_remote_oob_data(struct btd_adapter *adapter,
+ 							bdaddr_t *bdaddr);
++
++int btd_adapter_gatt_server_start(struct btd_adapter *adapter);
++void btd_adapter_gatt_server_stop(struct btd_adapter *adapter);
+\ No newline at end of file
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 0414ff7..12065fa 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -1210,13 +1210,13 @@ static gboolean register_core_services(struct gatt_adapter *gatt_adapter)
+ 	return TRUE;
+ }
+ 
+-static int attrib_adapter_probe(struct btd_adapter *adapter)
++int btd_adapter_gatt_server_start(struct btd_adapter *adapter)
+ {
+ 	struct gatt_adapter *gatt_adapter;
+ 	GError *gerr = NULL;
+ 	bdaddr_t addr;
+ 
+-	DBG("Start GATT server in %s", adapter_get_path(adapter));
++	DBG("Start GATT server in hci%d", adapter_get_dev_id(adapter));
+ 
+ 	gatt_adapter = g_new0(struct gatt_adapter, 1);
+ 	gatt_adapter->adapter = btd_adapter_ref(adapter);
+@@ -1262,7 +1262,7 @@ static int attrib_adapter_probe(struct btd_adapter *adapter)
  	return 0;
  }
  
--static void gatt_example_exit(void)
-+static void gatt_example_adapter_remove(struct btd_adapter *adapter)
+-static void attrib_adapter_remove(struct btd_adapter *adapter)
++void btd_adapter_gatt_server_stop(struct btd_adapter *adapter)
  {
--	if (!main_opts.attrib_server)
-+	/* FIXME: Add support for more than one adapter */
-+
-+	if (!started)
+ 	struct gatt_adapter *gatt_adapter;
+ 	GSList *l;
+@@ -1271,29 +1271,13 @@ static void attrib_adapter_remove(struct btd_adapter *adapter)
+ 	if (l == NULL)
  		return;
  
- 	while (sdp_handles) {
-@@ -471,6 +477,32 @@ static void gatt_example_exit(void)
- 		attrib_free_sdp(handle);
- 		sdp_handles = g_slist_remove(sdp_handles, sdp_handles->data);
- 	}
-+
-+	started = FALSE;
-+}
-+
-+static struct btd_adapter_driver gatt_example_adapter_driver = {
-+	.name	= "hdp-adapter-driver",
-+	.probe	= gatt_example_adapter_probe,
-+	.remove	= gatt_example_adapter_remove,
-+};
-+
-+static int gatt_example_init(void)
-+{
-+	if (!main_opts.attrib_server) {
-+		DBG("Attribute server is disabled");
-+		return -1;
-+	}
-+
-+	return btd_register_adapter_driver(&gatt_example_adapter_driver);
-+}
-+
-+static void gatt_example_exit(void)
-+{
-+	if (!main_opts.attrib_server)
-+		return;
-+
-+	btd_register_adapter_driver(&gatt_example_adapter_driver);
+-	DBG("Stop GATT server in %s", adapter_get_path(adapter));
++	DBG("Stop GATT server in hci%d", adapter_get_dev_id(adapter));
+ 
+ 	gatt_adapter = l->data;
+ 	adapters = g_slist_remove(adapters, gatt_adapter);
+ 	free_gatt_adapter(gatt_adapter);
  }
  
- BLUETOOTH_PLUGIN_DEFINE(gatt_example, VERSION, BLUETOOTH_PLUGIN_PRIORITY_LOW,
+-static struct btd_adapter_driver attrib_adapter_driver = {
+-	.name	= "attrib-adapter-driver",
+-	.probe	= attrib_adapter_probe,
+-	.remove	= attrib_adapter_remove,
+-};
+-
+-int attrib_server_init(void)
+-{
+-	return btd_register_adapter_driver(&attrib_adapter_driver);
+-}
+-
+-void attrib_server_exit(void)
+-{
+-	btd_unregister_adapter_driver(&attrib_adapter_driver);
+-}
+-
+ uint32_t attrib_create_sdp(uint16_t handle, const char *name)
+ {
+ 	struct gatt_adapter *gatt_adapter;
+diff --git a/src/hcid.h b/src/hcid.h
+index e993a16..1987b7d 100644
+--- a/src/hcid.h
++++ b/src/hcid.h
+@@ -63,6 +63,3 @@ void plugin_cleanup(void);
+ 
+ void rfkill_init(void);
+ void rfkill_exit(void);
+-
+-int attrib_server_init(void);
+-void attrib_server_exit(void);
+diff --git a/src/main.c b/src/main.c
+index 3031f09..74ec3fa 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -521,11 +521,6 @@ int main(int argc, char *argv[])
+ 
+ 	start_sdp_server(mtu, main_opts.deviceid, SDP_SERVER_COMPAT);
+ 
+-	if (main_opts.attrib_server) {
+-		if (attrib_server_init() < 0)
+-			error("Can't initialize attribute server");
+-	}
+-
+ 	/* Loading plugins has to be done after D-Bus has been setup since
+ 	 * the plugins might wanna expose some paths on the bus. However the
+ 	 * best order of how to init various subsystems of the Bluetooth
+@@ -551,9 +546,6 @@ int main(int argc, char *argv[])
+ 
+ 	plugin_cleanup();
+ 
+-	if (main_opts.attrib_server)
+-		attrib_server_exit();
+-
+ 	stop_sdp_server();
+ 
+ 	agent_exit();
 -- 
 1.7.8
 
