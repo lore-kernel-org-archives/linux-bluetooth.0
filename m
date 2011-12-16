@@ -1,81 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 Dec 2011 14:45:33 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Mikel Astiz <mikel.astiz.oss@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [RFC] media: assertion to check that transport exists
-Message-ID: <20111216174533.GA9701@samus>
-References: <1323952435-3244-1-git-send-email-mikel.astiz.oss@gmail.com>
- <CABBYNZJ9QgLPJQoudjRGZfMF5CHV5LaHUNZf8Hcojh5bjMgaTQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CABBYNZJ9QgLPJQoudjRGZfMF5CHV5LaHUNZf8Hcojh5bjMgaTQ@mail.gmail.com>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 11/11] gatt-example: Use adapter driver to register GATT attributes
+Date: Fri, 16 Dec 2011 17:09:59 +0100
+Message-Id: <1324051799-21439-12-git-send-email-sancane@gmail.com>
+In-Reply-To: <1324051799-21439-11-git-send-email-sancane@gmail.com>
+References: <1324051799-21439-1-git-send-email-sancane@gmail.com>
+ <1324051799-21439-2-git-send-email-sancane@gmail.com>
+ <1324051799-21439-3-git-send-email-sancane@gmail.com>
+ <1324051799-21439-4-git-send-email-sancane@gmail.com>
+ <1324051799-21439-5-git-send-email-sancane@gmail.com>
+ <1324051799-21439-6-git-send-email-sancane@gmail.com>
+ <1324051799-21439-7-git-send-email-sancane@gmail.com>
+ <1324051799-21439-8-git-send-email-sancane@gmail.com>
+ <1324051799-21439-9-git-send-email-sancane@gmail.com>
+ <1324051799-21439-10-git-send-email-sancane@gmail.com>
+ <1324051799-21439-11-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+GATT servers should register their attributes on each adapter when
+it is plugged instead of doing that when the plugins is loaded. This
+patch registers a new adapter driver to manage plug and unplug
+events in order to register attributes in each GATT served managed
+in each adapter.
+---
+ plugins/gatt-example.c |   46 +++++++++++++++++++++++++++++++++++++++-------
+ 1 files changed, 39 insertions(+), 7 deletions(-)
 
-On 10:43 Fri 16 Dec, Luiz Augusto von Dentz wrote:
-> Hi Mikel,
-> 
-> On Thu, Dec 15, 2011 at 2:33 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> > From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-> >
-> > From my understanding, a transport should exist for any non-disconnected
-> > gateway.
-> >
-> > These assertions sometimes fail though. So I would like to clarify if
-> > that's a consistent state in BlueZ or there is some bug.
-> > ---
-> >  audio/media.c |    3 +++
-> >  1 files changed, 3 insertions(+), 0 deletions(-)
-> >
-> > diff --git a/audio/media.c b/audio/media.c
-> > index a2ef437..c5fe3d9 100644
-> > --- a/audio/media.c
-> > +++ b/audio/media.c
-> > @@ -28,6 +28,7 @@
-> >  #endif
-> >
-> >  #include <errno.h>
-> > +#include <assert.h>
-> >
-> >  #include <glib.h>
-> >  #include <gdbus.h>
-> > @@ -620,8 +621,10 @@ static void gateway_state_changed(struct audio_device *dev,
-> >                                        gateway_setconf_cb, dev, NULL);
-> >                break;
-> >        case GATEWAY_STATE_CONNECTED:
-> > +               assert(endpoint->transport != NULL);
-> >                break;
-> >        case GATEWAY_STATE_PLAYING:
-> > +               assert(endpoint->transport != NULL);
-> >                break;
-> >        }
-> >  }
-> > --
-> > 1.7.6.4
-> 
-> IMO assert on daemon are not that great, it may help while developing
-> but why not run with valgrind and let it crash?
-
-This information may help with your worries, from the assert(3) man page:
-"If the macro NDEBUG was defined at the moment <assert.h> was last included,
-the macro assert() generates no code, and hence does nothing at all."
-
-So we can have assert() do something only when it is compiled in developer mode.
-
-> 
-> -- 
-> Luiz Augusto von Dentz
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
+diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
+index 6d9b6b8..c719697 100644
+--- a/plugins/gatt-example.c
++++ b/plugins/gatt-example.c
+@@ -29,6 +29,7 @@
+ #include <glib.h>
+ #include <bluetooth/uuid.h>
+ #include <errno.h>
++#include <adapter.h>
+ 
+ #include "plugin.h"
+ #include "hcid.h"
+@@ -59,6 +60,8 @@
+ 
+ static GSList *sdp_handles = NULL;
+ 
++static gboolean started = FALSE;
++
+ static uint8_t battery_state_read(struct attribute *a, gpointer user_data)
+ {
+ 	uint8_t value;
+@@ -436,19 +439,19 @@ static void register_weight_service(const uint16_t vendor[2])
+ 						GUINT_TO_POINTER(sdp_handle));
+ }
+ 
+-static int gatt_example_init(void)
++static int gatt_example_adapter_probe(struct btd_adapter *adapter)
+ {
+ 	uint16_t manuf1_range[2] = {0, 0}, manuf2_range[2] = {0, 0};
+ 	uint16_t vendor_range[2] = {0, 0};
+ 
+-	if (!main_opts.attrib_server) {
+-		DBG("Attribute server is disabled");
++	/* FIXME: Add support for more than one adapter */
++
++	if (started)
+ 		return -1;
+-	}
+ 
+ 	if (!register_battery_service()) {
+ 		DBG("Battery service could not be registered");
+-		return -EIO;
++		return -1;
+ 	}
+ 
+ 	register_manuf1_service(manuf1_range);
+@@ -457,12 +460,15 @@ static int gatt_example_init(void)
+ 	register_vendor_service(vendor_range);
+ 	register_weight_service(vendor_range);
+ 
++	started = TRUE;
+ 	return 0;
+ }
+ 
+-static void gatt_example_exit(void)
++static void gatt_example_adapter_remove(struct btd_adapter *adapter)
+ {
+-	if (!main_opts.attrib_server)
++	/* FIXME: Add support for more than one adapter */
++
++	if (!started)
+ 		return;
+ 
+ 	while (sdp_handles) {
+@@ -471,6 +477,32 @@ static void gatt_example_exit(void)
+ 		attrib_free_sdp(handle);
+ 		sdp_handles = g_slist_remove(sdp_handles, sdp_handles->data);
+ 	}
++
++	started = FALSE;
++}
++
++static struct btd_adapter_driver gatt_example_adapter_driver = {
++	.name	= "hdp-adapter-driver",
++	.probe	= gatt_example_adapter_probe,
++	.remove	= gatt_example_adapter_remove,
++};
++
++static int gatt_example_init(void)
++{
++	if (!main_opts.attrib_server) {
++		DBG("Attribute server is disabled");
++		return -1;
++	}
++
++	return btd_register_adapter_driver(&gatt_example_adapter_driver);
++}
++
++static void gatt_example_exit(void)
++{
++	if (!main_opts.attrib_server)
++		return;
++
++	btd_register_adapter_driver(&gatt_example_adapter_driver);
+ }
+ 
+ BLUETOOTH_PLUGIN_DEFINE(gatt_example, VERSION, BLUETOOTH_PLUGIN_PRIORITY_LOW,
 -- 
-Vinicius
+1.7.8
+
