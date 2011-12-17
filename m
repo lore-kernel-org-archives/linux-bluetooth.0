@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 3/3] gobex: reduce duplicated code in g_obex_put_req
-Date: Sat, 17 Dec 2011 12:17:47 +0200
-Message-Id: <1324117067-12459-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 2/3] gobex: add defines for possible values of SRMP header
+Date: Sat, 17 Dec 2011 12:17:46 +0200
+Message-Id: <1324117067-12459-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1324117067-12459-1-git-send-email-luiz.dentz@gmail.com>
 References: <1324117067-12459-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,51 +11,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-g_obex_put_req is quite similar to g_obex_put_req_pkt so now it just
-call it to avoid duplicating this code.
+Also rename G_OBEX_HDR_SRM_PARAMETERS to just G_OBEX_HDR_SRMP as the spec
+normally refer to it.
 ---
- gobex/gobex-transfer.c |   18 ++----------------
- 1 files changed, 2 insertions(+), 16 deletions(-)
+ gobex/gobex-header.h |    7 ++++++-
+ 1 files changed, 6 insertions(+), 1 deletions(-)
 
-diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-index 692d713..0a7a29f 100644
---- a/gobex/gobex-transfer.c
-+++ b/gobex/gobex-transfer.c
-@@ -277,32 +277,18 @@ guint g_obex_put_req(GObex *obex, GObexDataProducer data_func,
- 			GObexFunc complete_func, gpointer user_data,
- 			GError **err, guint8 first_hdr_id, ...)
- {
--	struct transfer *transfer;
- 	GObexPacket *req;
- 	va_list args;
+diff --git a/gobex/gobex-header.h b/gobex/gobex-header.h
+index 3320cfa..2ee8364 100644
+--- a/gobex/gobex-header.h
++++ b/gobex/gobex-header.h
+@@ -53,7 +53,7 @@
+ #define G_OBEX_HDR_DESTNAME		0x15
+ #define G_OBEX_HDR_PERMISSIONS		0xd6
+ #define G_OBEX_HDR_SRM			0x97
+-#define G_OBEX_HDR_SRM_PARAMETERS	0x98
++#define G_OBEX_HDR_SRMP			0x98
  
- 	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "obex %p", obex);
+ /* Action header values */
+ #define G_OBEX_ACTION_COPY		0x00
+@@ -65,6 +65,11 @@
+ #define G_OBEX_SRM_ENABLE		0x01
+ #define G_OBEX_SRM_INDICATE		0x02
  
--	transfer = transfer_new(obex, G_OBEX_OP_PUT, complete_func, user_data);
--	transfer->data_producer = data_func;
--
- 	va_start(args, first_hdr_id);
- 	req = g_obex_packet_new_valist(G_OBEX_OP_PUT, FALSE,
- 							first_hdr_id, args);
- 	va_end(args);
++/* SRMP header values */
++#define G_OBEX_SRMP_NEXT		0x00
++#define G_OBEX_SRMP_WAIT		0x01
++#define G_OBEX_SRMP_NEXT_WAIT		0x02
++
+ typedef struct _GObexHeader GObexHeader;
  
--	g_obex_packet_add_body(req, put_get_data, transfer);
--
--	transfer->req_id = g_obex_send_req(obex, req, FIRST_PACKET_TIMEOUT,
--					transfer_response, transfer, err);
--	if (transfer->req_id == 0) {
--		transfer_free(transfer);
--		return 0;
--	}
--
--	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
--
--	return transfer->id;
-+	return g_obex_put_req_pkt(obex, req, data_func, complete_func,
-+							user_data, err);
- }
- 
- static void transfer_abort_req(GObex *obex, GObexPacket *req, gpointer user_data)
+ gboolean g_obex_header_get_unicode(GObexHeader *header, const char **str);
 -- 
 1.7.7.4
 
