@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [RFC 17/22] Bluetooth: remove power_on work_struct
-Date: Sat, 17 Dec 2011 19:29:37 -0200
-Message-Id: <1324157382-1815-18-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1324157382-1815-17-git-send-email-padovan@profusion.mobi>
+Subject: [RFC 16/22] Bluetooth: convert info timer to delayed_work
+Date: Sat, 17 Dec 2011 19:29:36 -0200
+Message-Id: <1324157382-1815-17-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1324157382-1815-16-git-send-email-padovan@profusion.mobi>
 References: <1324157382-1815-1-git-send-email-padovan@profusion.mobi>
  <1324157382-1815-2-git-send-email-padovan@profusion.mobi>
  <1324157382-1815-3-git-send-email-padovan@profusion.mobi>
@@ -22,88 +22,105 @@ References: <1324157382-1815-1-git-send-email-padovan@profusion.mobi>
  <1324157382-1815-14-git-send-email-padovan@profusion.mobi>
  <1324157382-1815-15-git-send-email-padovan@profusion.mobi>
  <1324157382-1815-16-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-17-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 
-Since now we run in process context, we can now call hci_power_on
-directly.
+Another step of remove interrupt context from Bluetooth Core.
+Use the system workqueue.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- include/net/bluetooth/hci_core.h |    2 +-
- net/bluetooth/hci_core.c         |    7 ++-----
- net/bluetooth/mgmt.c             |    2 +-
- 3 files changed, 4 insertions(+), 7 deletions(-)
+ include/net/bluetooth/l2cap.h |    2 +-
+ net/bluetooth/l2cap_core.c    |   18 +++++++++---------
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 5d1bb51..662877a 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -187,7 +187,6 @@ struct hci_dev {
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index a175091..f791374 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -522,7 +522,7 @@ struct l2cap_conn {
+ 	__u8		info_state;
+ 	__u8		info_ident;
  
- 	struct workqueue_struct	*workqueue;
+-	struct timer_list info_timer;
++	struct delayed_work info_work;
  
--	struct work_struct	power_on;
- 	struct delayed_work	power_off;
+ 	spinlock_t	lock;
  
- 	__u16			discov_timeout;
-@@ -597,6 +596,7 @@ int hci_register_dev(struct hci_dev *hdev);
- void hci_unregister_dev(struct hci_dev *hdev);
- int hci_suspend_dev(struct hci_dev *hdev);
- int hci_resume_dev(struct hci_dev *hdev);
-+void hci_power_on(struct hci_dev *hdev);
- int hci_dev_open(__u16 dev);
- int hci_dev_close(__u16 dev);
- int hci_dev_reset(__u16 dev);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index fbc7968..5c7fec8 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -928,10 +928,8 @@ void hci_free_dev(struct hci_dev *hdev)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 5c5948f..a78cdf7 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -698,7 +698,7 @@ static void l2cap_do_start(struct l2cap_chan *chan)
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_SENT;
+ 		conn->info_ident = l2cap_get_ident(conn);
+ 
+-		mod_timer(&conn->info_timer, jiffies +
++		schedule_delayed_work(&conn->info_work,
+ 					msecs_to_jiffies(L2CAP_INFO_TIMEOUT));
+ 
+ 		l2cap_send_cmd(conn, conn->info_ident,
+@@ -998,9 +998,10 @@ static void l2cap_conn_unreliable(struct l2cap_conn *conn, int err)
+ 	mutex_unlock(&conn->chan_lock);
  }
- EXPORT_SYMBOL(hci_free_dev);
  
--static void hci_power_on(struct work_struct *work)
-+void hci_power_on(struct hci_dev *hdev)
+-static void l2cap_info_timeout(unsigned long arg)
++static void l2cap_info_timeout(struct work_struct *work)
  {
--	struct hci_dev *hdev = container_of(work, struct hci_dev, power_on);
--
- 	BT_DBG("%s", hdev->name);
+-	struct l2cap_conn *conn = (void *) arg;
++	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
++							info_work.work);
  
- 	if (hci_dev_open(hdev->id) < 0)
-@@ -1490,7 +1488,6 @@ int hci_register_dev(struct hci_dev *hdev)
- 	INIT_LIST_HEAD(&hdev->adv_entries);
+ 	conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+ 	conn->info_ident = 0;
+@@ -1033,7 +1034,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 	hci_chan_del(conn->hchan);
  
- 	INIT_DELAYED_WORK(&hdev->adv_work, hci_clear_adv_cache);
--	INIT_WORK(&hdev->power_on, hci_power_on);
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+-		del_timer_sync(&conn->info_timer);
++		cancel_delayed_work_sync(&conn->info_work);
  
- 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
-@@ -1522,7 +1519,7 @@ int hci_register_dev(struct hci_dev *hdev)
- 
- 	set_bit(HCI_AUTO_OFF, &hdev->flags);
- 	set_bit(HCI_SETUP, &hdev->flags);
--	queue_work(hdev->workqueue, &hdev->power_on);
-+	hci_power_on(hdev);
- 
- 	hci_notify(hdev, HCI_DEV_REG);
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ad4817c..30cbdd7 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -415,7 +415,7 @@ static int set_powered(struct sock *sk, u16 index, unsigned char *data, u16 len)
- 	}
- 
- 	if (cp->val)
--		queue_work(hdev->workqueue, &hdev->power_on);
-+		hci_power_on(hdev);
+ 	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->pend)) {
+ 		del_timer(&conn->security_timer);
+@@ -1094,8 +1095,7 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+ 		setup_timer(&conn->security_timer, security_timeout,
+ 						(unsigned long) conn);
  	else
- 		queue_work(hdev->workqueue, &hdev->power_off.work);
+-		setup_timer(&conn->info_timer, l2cap_info_timeout,
+-						(unsigned long) conn);
++		INIT_DELAYED_WORK(&conn->info_work, l2cap_info_timeout);
  
+ 	conn->disc_reason = HCI_ERROR_REMOTE_USER_TERM;
+ 
+@@ -2530,7 +2530,7 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 
+ 	if ((conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT) &&
+ 					cmd->ident == conn->info_ident) {
+-		del_timer(&conn->info_timer);
++		cancel_delayed_work_sync(&conn->info_work);
+ 
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+ 		conn->info_ident = 0;
+@@ -2656,7 +2656,7 @@ sendresp:
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_SENT;
+ 		conn->info_ident = l2cap_get_ident(conn);
+ 
+-		mod_timer(&conn->info_timer, jiffies +
++		schedule_delayed_work(&conn->info_work,
+ 					msecs_to_jiffies(L2CAP_INFO_TIMEOUT));
+ 
+ 		l2cap_send_cmd(conn, conn->info_ident,
+@@ -3081,7 +3081,7 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
+ 			conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE)
+ 		return 0;
+ 
+-	del_timer(&conn->info_timer);
++	cancel_delayed_work_sync(&conn->info_work);
+ 
+ 	if (result != L2CAP_IR_SUCCESS) {
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
 -- 
 1.7.6.4
 
