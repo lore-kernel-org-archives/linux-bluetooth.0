@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [RFC 21/22] Bluetooth: Use new alloc_workqueue()
-Date: Sat, 17 Dec 2011 19:29:41 -0200
-Message-Id: <1324157382-1815-22-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1324157382-1815-21-git-send-email-padovan@profusion.mobi>
+Subject: [RFC 20/22] Bluetooth: move power_off to system workqueue
+Date: Sat, 17 Dec 2011 19:29:40 -0200
+Message-Id: <1324157382-1815-21-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1324157382-1815-20-git-send-email-padovan@profusion.mobi>
 References: <1324157382-1815-1-git-send-email-padovan@profusion.mobi>
  <1324157382-1815-2-git-send-email-padovan@profusion.mobi>
  <1324157382-1815-3-git-send-email-padovan@profusion.mobi>
@@ -26,34 +26,46 @@ References: <1324157382-1815-1-git-send-email-padovan@profusion.mobi>
  <1324157382-1815-18-git-send-email-padovan@profusion.mobi>
  <1324157382-1815-19-git-send-email-padovan@profusion.mobi>
  <1324157382-1815-20-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-21-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 
-Update hdev workqueue API usage to use the new interface, this new
-interface also allow us to mark this workqueue as WQ_HIGHPRI, so now rx
-and tx work gets higher priority when running.
+hdev->workqueue will be only for for rx/tx/cmd processing, all other small
+works should go to the system workqueue for now.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
  net/bluetooth/hci_core.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ net/bluetooth/mgmt.c     |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e4ff7b6..21816dd 100644
+index 5c7fec8..e4ff7b6 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -1498,7 +1498,7 @@ int hci_register_dev(struct hci_dev *hdev)
+@@ -936,7 +936,7 @@ void hci_power_on(struct hci_dev *hdev)
+ 		return;
  
- 	write_unlock_bh(&hci_dev_list_lock);
+ 	if (test_bit(HCI_AUTO_OFF, &hdev->flags))
+-		queue_delayed_work(hdev->workqueue, &hdev->power_off,
++		schedule_delayed_work(&hdev->power_off,
+ 					msecs_to_jiffies(AUTO_OFF_TIMEOUT));
  
--	hdev->workqueue = create_singlethread_workqueue(hdev->name);
-+	hdev->workqueue = alloc_workqueue(hdev->name, WQ_HIGHPRI, 1);
- 	if (!hdev->workqueue) {
- 		error = -ENOMEM;
- 		goto err;
+ 	if (test_and_clear_bit(HCI_SETUP, &hdev->flags))
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 30cbdd7..4402c4d 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -417,7 +417,7 @@ static int set_powered(struct sock *sk, u16 index, unsigned char *data, u16 len)
+ 	if (cp->val)
+ 		hci_power_on(hdev);
+ 	else
+-		queue_work(hdev->workqueue, &hdev->power_off.work);
++		schedule_work(&hdev->power_off.work);
+ 
+ 	err = 0;
+ 
 -- 
 1.7.6.4
 
