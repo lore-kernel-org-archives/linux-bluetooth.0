@@ -2,98 +2,95 @@ Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [RFC 13/22] Bluetooth: Don't disable tasklets to call hdev->notify()
-Date: Sat, 17 Dec 2011 19:29:33 -0200
-Message-Id: <1324157382-1815-14-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1324157382-1815-13-git-send-email-padovan@profusion.mobi>
+Subject: [RFC 03/22] Bluetooth: Use delayed_work for connection timeout
+Date: Sat, 17 Dec 2011 19:29:23 -0200
+Message-Id: <1324157382-1815-4-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1324157382-1815-3-git-send-email-padovan@profusion.mobi>
 References: <1324157382-1815-1-git-send-email-padovan@profusion.mobi>
  <1324157382-1815-2-git-send-email-padovan@profusion.mobi>
  <1324157382-1815-3-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-4-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-5-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-6-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-7-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-8-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-9-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-10-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-11-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-12-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-13-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 
-It's pointless, we aren't protecting anything since btusb_notify()
-schedules a work to run, then all it operation happens without protection.
-If protection is really needed here, we will fix it further.
+Bluetooth rx task runs now in a workqueue, so it a good approach run any
+timer that share locking with process context code also in a workqueue.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- net/bluetooth/hci_conn.c  |   10 ++--------
- net/bluetooth/hci_event.c |   10 ++--------
- 2 files changed, 4 insertions(+), 16 deletions(-)
+ include/net/bluetooth/hci_core.h |    8 +++++---
+ net/bluetooth/hci_conn.c         |    9 +++++----
+ 2 files changed, 10 insertions(+), 7 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index e7dbe59..d915908 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -297,7 +297,7 @@ struct hci_conn {
+ 	struct sk_buff_head data_q;
+ 	struct list_head chan_list;
+ 
+-	struct timer_list disc_timer;
++	struct delayed_work disc_work;
+ 	struct timer_list idle_timer;
+ 	struct timer_list auto_accept_timer;
+ 
+@@ -517,7 +517,7 @@ void hci_conn_put_device(struct hci_conn *conn);
+ static inline void hci_conn_hold(struct hci_conn *conn)
+ {
+ 	atomic_inc(&conn->refcnt);
+-	del_timer(&conn->disc_timer);
++	cancel_delayed_work_sync(&conn->disc_work);
+ }
+ 
+ static inline void hci_conn_put(struct hci_conn *conn)
+@@ -536,7 +536,9 @@ static inline void hci_conn_put(struct hci_conn *conn)
+ 		} else {
+ 			timeo = msecs_to_jiffies(10);
+ 		}
+-		mod_timer(&conn->disc_timer, jiffies + timeo);
++		cancel_delayed_work_sync(&conn->disc_work);
++		queue_delayed_work(conn->hdev->workqueue,
++					&conn->disc_work, jiffies + timeo);
+ 	}
+ }
+ 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 5e9e193..385cccb 100644
+index d45783d..7d88a61 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -419,11 +419,8 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- 	hci_dev_hold(hdev);
- 
- 	hci_conn_hash_add(hdev, conn);
--	if (hdev->notify) {
--		tasklet_disable(&hdev->tx_task);
-+	if (hdev->notify)
- 		hdev->notify(hdev, HCI_NOTIFY_CONN_ADD);
--		tasklet_enable(&hdev->tx_task);
--	}
- 
- 	atomic_set(&conn->devref, 0);
- 
-@@ -468,11 +465,8 @@ int hci_conn_del(struct hci_conn *conn)
- 	hci_chan_list_flush(conn);
- 
- 	hci_conn_hash_del(hdev, conn);
--	if (hdev->notify) {
--		tasklet_disable(&hdev->tx_task);
-+	if (hdev->notify)
- 		hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
--		tasklet_enable(&hdev->tx_task);
--	}
- 
- 	skb_queue_purge(&conn->data_q);
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 0a9501f..93ecb2d 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -378,11 +378,8 @@ static void hci_cc_read_voice_setting(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	BT_DBG("%s voice setting 0x%04x", hdev->name, setting);
- 
--	if (hdev->notify) {
--		tasklet_disable(&hdev->tx_task);
-+	if (hdev->notify)
- 		hdev->notify(hdev, HCI_NOTIFY_VOICE_SETTING);
--		tasklet_enable(&hdev->tx_task);
--	}
+@@ -275,9 +275,10 @@ void hci_sco_setup(struct hci_conn *conn, __u8 status)
+ 	}
  }
  
- static void hci_cc_write_voice_setting(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -409,11 +406,8 @@ static void hci_cc_write_voice_setting(struct hci_dev *hdev, struct sk_buff *skb
+-static void hci_conn_timeout(unsigned long arg)
++static void hci_conn_timeout(struct work_struct *work)
+ {
+-	struct hci_conn *conn = (void *) arg;
++	struct hci_conn *conn = container_of(work, struct hci_conn,
++							disc_work.work);
+ 	struct hci_dev *hdev = conn->hdev;
+ 	__u8 reason;
  
- 	BT_DBG("%s voice setting 0x%04x", hdev->name, setting);
+@@ -412,7 +413,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
  
--	if (hdev->notify) {
--		tasklet_disable(&hdev->tx_task);
-+	if (hdev->notify)
- 		hdev->notify(hdev, HCI_NOTIFY_VOICE_SETTING);
--		tasklet_enable(&hdev->tx_task);
--	}
- }
+ 	INIT_LIST_HEAD(&conn->chan_list);;
  
- static void hci_cc_host_buffer_size(struct hci_dev *hdev, struct sk_buff *skb)
+-	setup_timer(&conn->disc_timer, hci_conn_timeout, (unsigned long)conn);
++	INIT_DELAYED_WORK(&conn->disc_work, hci_conn_timeout);
+ 	setup_timer(&conn->idle_timer, hci_conn_idle, (unsigned long)conn);
+ 	setup_timer(&conn->auto_accept_timer, hci_conn_auto_accept,
+ 							(unsigned long) conn);
+@@ -444,7 +445,7 @@ int hci_conn_del(struct hci_conn *conn)
+ 
+ 	del_timer(&conn->idle_timer);
+ 
+-	del_timer(&conn->disc_timer);
++	cancel_delayed_work_sync(&conn->disc_work);
+ 
+ 	del_timer(&conn->auto_accept_timer);
+ 
 -- 
 1.7.6.4
 
