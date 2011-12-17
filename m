@@ -1,16 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: LE SM Testing
-Date: Sun, 18 Dec 2011 12:19:26 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B02607D2C752@DNCE02.ent.ti.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Message-ID: <1324160268.1965.92.camel@aeonflux>
+Subject: Re: [RFC 00/22] Bluetooth: change tasklets to workqueue
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sat, 17 Dec 2011 14:17:48 -0800
+In-Reply-To: <1324157382-1815-1-git-send-email-padovan@profusion.mobi>
+References: <1324157382-1815-1-git-send-email-padovan@profusion.mobi>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi.
-Does anyone have an idea how can I establish an LE link with SM fixed channel to a remote peer to test the SMP functionality ? I do not see any possibility to do this at the moment. Hcitool does not connect the SMP, and btiotest requires a remote l2cap channel listener other than the SMP. Gatttool will not help as well, since it requires an ATT server at the peer device.
+Hi Gustavo,
 
-Thanks,
-Chen Ganir 
+> Here are the patches to run the receive path in workqueue.  With these patches
+> l2cap and rfcomm seems to be working fine, but some more work still needs to be
+> done.
+
+so besides my two comments, this looks fine to me.
+
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
+
+
