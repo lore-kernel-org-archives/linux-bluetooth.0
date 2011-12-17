@@ -1,84 +1,141 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <4EEB5D07.1010104@linux.intel.com>
-References: <1323853510-5195-1-git-send-email-frederic.danis@linux.intel.com>
-	<1323853510-5195-2-git-send-email-frederic.danis@linux.intel.com>
-	<CABBYNZKyY40pn-Sm_VSxHLqzbrQ9q-63Sjwmf=kvh4Dy1x9-bw@mail.gmail.com>
-	<4EE9D453.6020503@linux.intel.com>
-	<CABBYNZL3sCMtSQ4bVetdA25wRmoFZz8BWhsZoRcf4WpcCpi54w@mail.gmail.com>
-	<4EEB0421.4030407@linux.intel.com>
-	<CABBYNZJzczoFhUzvz3wJ5Ssxc8t191UFB7H8ckTygtDXWpNObA@mail.gmail.com>
-	<4EEB5D07.1010104@linux.intel.com>
-Date: Sat, 17 Dec 2011 12:15:26 +0200
-Message-ID: <CABBYNZJQF2yDtcXc01i_UUjUx-KUC5r-BFLe-sNMqY0ajYsWGA@mail.gmail.com>
-Subject: Re: [RFC v5 1/8] audio: Move tel drivers to DBus interface
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1324051799-21439-12-git-send-email-sancane@gmail.com>
+References: <1324051799-21439-1-git-send-email-sancane@gmail.com>
+	<1324051799-21439-2-git-send-email-sancane@gmail.com>
+	<1324051799-21439-3-git-send-email-sancane@gmail.com>
+	<1324051799-21439-4-git-send-email-sancane@gmail.com>
+	<1324051799-21439-5-git-send-email-sancane@gmail.com>
+	<1324051799-21439-6-git-send-email-sancane@gmail.com>
+	<1324051799-21439-7-git-send-email-sancane@gmail.com>
+	<1324051799-21439-8-git-send-email-sancane@gmail.com>
+	<1324051799-21439-9-git-send-email-sancane@gmail.com>
+	<1324051799-21439-10-git-send-email-sancane@gmail.com>
+	<1324051799-21439-11-git-send-email-sancane@gmail.com>
+	<1324051799-21439-12-git-send-email-sancane@gmail.com>
+Date: Sat, 17 Dec 2011 10:28:48 +0100
+Message-ID: <CACLukzLeRzqP17-T50ib9q2=1r50kdTw4Oqwuju-Q7AM7nBpSA@mail.gmail.com>
+Subject: Re: [PATCH 11/11] gatt-example: Use adapter driver to register GATT attributes
+From: Santiago Carot <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frederic,
+Hi everybody,
 
-On Fri, Dec 16, 2011 at 5:00 PM, Frederic Danis
-<frederic.danis@linux.intel.com> wrote:
->> Good work putting this together, probably we should add this to the
->> documentation, btw this already shows us the latency won't be that
->> great with this solution.
+2011/12/16 Santiago Carot-Nemesio <sancane@gmail.com>:
+> GATT servers should register their attributes on each adapter when
+> it is plugged instead of doing that when the plugins is loaded. This
+> patch registers a new adapter driver to manage plug and unplug
+> events in order to register attributes in each GATT served managed
+> in each adapter.
+> ---
+>  plugins/gatt-example.c |   46 +++++++++++++++++++++++++++++++++++++++-------
+>  1 files changed, 39 insertions(+), 7 deletions(-)
 >
+> diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
+> index 6d9b6b8..c719697 100644
+> --- a/plugins/gatt-example.c
+> +++ b/plugins/gatt-example.c
+> @@ -29,6 +29,7 @@
+>  #include <glib.h>
+>  #include <bluetooth/uuid.h>
+>  #include <errno.h>
+> +#include <adapter.h>
 >
-> Thanks
-> Which solution is not great ? both ?
-
-Both have problems, endpoint add extra round trips per connection
-which can be a problem for audio transfer/SCO reconnections.
-
-> Currently, if I take volume speaker as sample, BlueZ sends
-> SpeakerGainChanged signal on reception of SetSpeakerGain method call (user
-> action on the phone) or AT+VGS command (user action on headset).
+>  #include "plugin.h"
+>  #include "hcid.h"
+> @@ -59,6 +60,8 @@
 >
-> This signal should only be sent by the Media Transport object, i.e. :
->  - for "Transport path" proposal, this signal should be moved
->        from headset.c to transport.c.
->  - for "Media Endpoint" proposal, this signal should be moved
->        to the Media Transport of the telephony agent.
+>  static GSList *sdp_handles = NULL;
 >
-> I do not understand why a ping-pong effect should start (no application
-> should react to SpeakerGainChanged signal by a SetSpeakerGain method call).
-
-Yep, IMO the gains/volume need to be moved to transport, btw both
-agent and endpoint need to react to events such as volume change, the
-agent need to send AT+VG commands and the endpoint notify the
-application when the volume change completes.
-
-Now, I don't think it is impossible to handle this it is just tricky
-and we cannot detect errors easily, but volume changes is already
-tricky (see PulseAudio), so I think it might be fine to try this first
-and see the results.
-
-> Not yet, but your are right this test should be removed.
-> We must make it possible to set Noise Reduction, Echo Cancellation, speaker
-> or microphone gain values before the audio is connected.
-> Those values should be stored in the Media Transport object.
-
-Whenever you give the transport object you have to give permission to
-the agent, but don't simplify let any process changes those values.
-
->> True, but are you sure the agent wont have to deal directly with the
->> SCO connection? Afaik there were some AT commands to do the audio
->> transfer, although for HFP it seems to be directly by
->> connecting/disconnecting SCO.
->>
+> +static gboolean started = FALSE;
+> +
+>  static uint8_t battery_state_read(struct attribute *a, gpointer user_data)
+>  {
+>        uint8_t value;
+> @@ -436,19 +439,19 @@ static void register_weight_service(const uint16_t vendor[2])
+>                                                GUINT_TO_POINTER(sdp_handle));
+>  }
 >
-> My understanding is that BlueZ/oFono are not involved in decision to set-up
-> or not the SCO connection, this decision should be taken by PulseAudio or a
-> policy manager component, and SCO connection will be performed on Acquire
-> method called by PulseAudio.
+> -static int gatt_example_init(void)
+> +static int gatt_example_adapter_probe(struct btd_adapter *adapter)
+>  {
+>        uint16_t manuf1_range[2] = {0, 0}, manuf2_range[2] = {0, 0};
+>        uint16_t vendor_range[2] = {0, 0};
+>
+> -       if (!main_opts.attrib_server) {
+> -               DBG("Attribute server is disabled");
+> +       /* FIXME: Add support for more than one adapter */
+> +
+> +       if (started)
+>                return -1;
+> -       }
+>
+>        if (!register_battery_service()) {
+>                DBG("Battery service could not be registered");
+> -               return -EIO;
+> +               return -1;
+>        }
+>
+>        register_manuf1_service(manuf1_range);
+> @@ -457,12 +460,15 @@ static int gatt_example_init(void)
+>        register_vendor_service(vendor_range);
+>        register_weight_service(vendor_range);
+>
+> +       started = TRUE;
+>        return 0;
+>  }
+>
+> -static void gatt_example_exit(void)
+> +static void gatt_example_adapter_remove(struct btd_adapter *adapter)
+>  {
+> -       if (!main_opts.attrib_server)
+> +       /* FIXME: Add support for more than one adapter */
+> +
+> +       if (!started)
+>                return;
+>
+>        while (sdp_handles) {
+> @@ -471,6 +477,32 @@ static void gatt_example_exit(void)
+>                attrib_free_sdp(handle);
+>                sdp_handles = g_slist_remove(sdp_handles, sdp_handles->data);
+>        }
+> +
+> +       started = FALSE;
+> +}
+> +
+> +static struct btd_adapter_driver gatt_example_adapter_driver = {
+> +       .name   = "hdp-adapter-driver",
+> +       .probe  = gatt_example_adapter_probe,
+> +       .remove = gatt_example_adapter_remove,
+> +};
+> +
+> +static int gatt_example_init(void)
+> +{
+> +       if (!main_opts.attrib_server) {
+> +               DBG("Attribute server is disabled");
+> +               return -1;
+> +       }
+> +
+> +       return btd_register_adapter_driver(&gatt_example_adapter_driver);
+> +}
+> +
+> +static void gatt_example_exit(void)
+> +{
+> +       if (!main_opts.attrib_server)
+> +               return;
+> +
+> +       btd_register_adapter_driver(&gatt_example_adapter_driver);
+>  }
+>
+>  BLUETOOTH_PLUGIN_DEFINE(gatt_example, VERSION, BLUETOOTH_PLUGIN_PRIORITY_LOW,
+> --
+> 1.7.8
+>
 
-Audio transfer is both ways, but apparently there is no AT command for
-triggering it, iirc it was part of HSP spec, but I don't think we have
-to worry too much about HSP nowadays.
-
--- 
-Luiz Augusto von Dentz
+This last patch is only a proof of concept, don't waste your time
+rewieging it, just discard it
+Regards
