@@ -1,31 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 18 Dec 2011 21:31:21 -0200
+Date: Sun, 18 Dec 2011 17:45:43 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com,
-	ulrik.lauren@stericsson.com, henrik.possung@stericsson.com
-Subject: Re: [PATCH 2/2] Bluetooth: Fix usage of sk_sndtimeo value
-Message-ID: <20111218233121.GE2621@joana>
-References: <1320917845-20135-1-git-send-email-andrzej.kaczmarek@tieto.com>
- <1320917845-20135-3-git-send-email-andrzej.kaczmarek@tieto.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 5/7 v2] Bluetooth: Add timer for automatically disabling
+ the service cache
+Message-ID: <20111218194543.GC2621@joana>
+References: <1323902861-15990-1-git-send-email-johan.hedberg@gmail.com>
+ <1323902861-15990-6-git-send-email-johan.hedberg@gmail.com>
+ <20111215000814.GA22803@samus>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320917845-20135-3-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <20111215000814.GA22803@samus>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej.
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-12-14 21:08:14 -0300]:
 
-* Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com> [2011-11-10 10:37:25 +0100]:
-
-> sk_sndtimeo timeout value is specified in jiffes and should be
-> converted to miliseconds when used as input to __set_chan_timer.
+> Hi Johan,
 > 
-> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-> ---
->  net/bluetooth/l2cap_core.c |    8 ++++----
->  1 files changed, 4 insertions(+), 4 deletions(-)
+> On 00:47 Thu 15 Dec, johan.hedberg@gmail.com wrote:
+> > From: Johan Hedberg <johan.hedberg@intel.com>
+> > 
+> > We do not want the service cache to be enabled indefinitely after
+> > mgmt_read_info is called. The solve this a timer is added which will
+> 
+> Minor nitpick: "To solve this".
 
-I think those one doesn't make sense anymore after the move to workqueues.
+I fixed this as well.
 
 	Gustavo
