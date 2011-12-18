@@ -1,35 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 18 Dec 2011 17:45:11 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 7/7 v2] Bluetooth: Use correct struct for
- user_confirm_neg_reply
-Message-ID: <20111218194511.GB2621@joana>
-References: <1323902861-15990-1-git-send-email-johan.hedberg@gmail.com>
- <1323902861-15990-8-git-send-email-johan.hedberg@gmail.com>
+Message-ID: <4EEE1FE5.80204@codeaurora.org>
+Date: Sun, 18 Dec 2011 09:16:21 -0800
+From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1323902861-15990-8-git-send-email-johan.hedberg@gmail.com>
+To: "Ganir, Chen" <chen.ganir@ti.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: LE SM Testing
+References: <F0070FBC0FB3174D8D11444EB2D5B02607D2C752@DNCE02.ent.ti.com>
+In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B02607D2C752@DNCE02.ent.ti.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Chen,
 
-* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-12-15 00:47:41 +0200]:
+On 12/18/2011 4:19 AM, Ganir, Chen wrote:
+> Hi.
+> Does anyone have an idea how can I establish an LE link with SM fixed channel to a remote peer to test the SMP functionality ? I do not see any possibility to do this at the moment. Hcitool does not connect the SMP, and btiotest requires a remote l2cap channel listener other than the SMP. Gatttool will not help as well, since it requires an ATT server at the peer device.
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> This patch fixes user_confirm_neg_reply to use the appropriate struct
-> for accessing the call parameters.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/mgmt.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+Fixed channels (including the LE fixed channels) require no setup beyond 
+ACL establishment.  So you can "establish" the SM channel simply by 
+creating an LE link.
 
-All patches were applied, I also fixed some places to have them working with
-the new workqueue patches. Thanks.
+Using gatttool -I, you can establish a connection a connection to a 
+remote LE device. SM functionality can then be triggered by elevating 
+security. ("sec-level medium" from gatttool).  This should be the 
+equivilent of "General Bonding" in the BR/EDR world.
 
-	Gustavo
+I think hcitool also has an "lecc" command that specifically calls the 
+"Create LE connection" HCI command, which could be used if you just need 
+to establish an LE connection.
+
+Also, hasn't the "pair device" via the MGMT interface been 
+implemented/enabled in BlueZ? This would be the "Dedicated Bonding" 
+equivalent of BR/EDR.
+
+
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
