@@ -1,36 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Sun, 18 Dec 2011 21:57:39 -0200
+Date: Sun, 18 Dec 2011 21:55:12 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org,
-	marcel@holtmann.org, jaikumar@google.com,
-	andrei.emeltchenko@intel.com
-Subject: Re: [PATCH] Bluetooth: Incoming ACL packets do not force active mode
-Message-ID: <20111218235739.GL2621@joana>
-References: <1323817562-26262-1-git-send-email-mathewm@codeaurora.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv1 3/6] Bluetooth: Check for flow control mode
+Message-ID: <20111218235512.GK2621@joana>
+References: <1323348786-18134-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1323348786-18134-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20111218234735.GJ2621@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1323817562-26262-1-git-send-email-mathewm@codeaurora.org>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20111218234735.GJ2621@joana>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi Andrei,
 
-* Mat Martineau <mathewm@codeaurora.org> [2011-12-13 15:06:02 -0800]:
+* Gustavo Padovan <padovan@profusion.mobi> [2011-12-18 21:47:35 -0200]:
 
-> Incoming sk_buffs always have bt_cb(skb)->force_active set to 0, so
-> it's misleading to use that value from the control block when calling
-> hci_conn_enter_active_mode() for incoming data. The destination socket
-> is not known in the HCI layer, so the force_active setting for each
-> socket isn't known either. Hard-coding the force_active parameter does
-> not change any behavior, but makes it obvious that incoming ACL data
-> never exits sniff mode.
+> Hi Andrei,
 > 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  net/bluetooth/hci_core.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+> * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-12-08 14:53:03 +0200]:
+> 
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> > ---
+> >  net/bluetooth/hci_event.c |    5 +++++
+> >  1 files changed, 5 insertions(+), 0 deletions(-)
+> 
+> Found the new ones! This one is applied, and the others need rebase against
+> bluetooth-next. Thanks.
 
-Applied, thanks.
+net/bluetooth/hci_event.c: In function ‘hci_num_comp_pkts_evt’:
+net/bluetooth/hci_event.c:2263:29: error: ‘HCI_FLOW_CTL_MODE_PACKET_BASED’
+undeclared (first use in this function)
+
+I remove this patch, please fix this.
 
 	Gustavo
