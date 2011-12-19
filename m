@@ -1,37 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Add missing confirm_name field to mgmt_ev_device_found
-Date: Mon, 19 Dec 2011 14:29:06 +0200
-Message-Id: <1324297748-8546-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 19 Dec 2011 13:05:05 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 06/22] Bluetooth: Move L2CAP timers to workqueue
+Message-ID: <20111219110504.GD3982@aemeltch-MOBL1>
+References: <1324157382-1815-1-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-2-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-3-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-4-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-5-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-6-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-7-git-send-email-padovan@profusion.mobi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1324157382-1815-7-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Gustavo,
 
-This patch adds a missing confirm_name field to mgmt_ev_device_found.
-Support for setting the correct value for this field is not implemented
-yet, but having it part of the struct definition ensures that user-space
-gets correct sized device_found events and is thereby able to do at
-least rudimentary parsing of them.
+On Sat, Dec 17, 2011 at 07:29:26PM -0200, Gustavo F. Padovan wrote:
+> From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+> 
+> L2CAP timers also need to run in process context. As the works in l2cap
+> are small we are using the system worqueue.
+> 
+> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> ---
+>  include/net/bluetooth/l2cap.h |   17 +++++-----
+>  net/bluetooth/l2cap_core.c    |   70 ++++++++++++++++++-----------------------
+>  2 files changed, 40 insertions(+), 47 deletions(-)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/mgmt.h |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+...
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 2b1059d..9f7a956 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -357,6 +357,7 @@ struct mgmt_ev_device_found {
- 	struct mgmt_addr_info addr;
- 	__u8 dev_class[3];
- 	__s8 rssi;
-+	__u8 confirm_name;
- 	__u8 eir[HCI_MAX_EIR_LENGTH];
- } __packed;
- 
--- 
-1.7.7.3
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 0369a9b..89cda6d 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -213,20 +213,18 @@ static u16 l2cap_alloc_cid(struct l2cap_conn *conn)
+>  	return 0;
+>  }
+>  
+> -static void l2cap_set_timer(struct l2cap_chan *chan, struct timer_list *timer, long timeout)
+> +static void l2cap_set_timer(struct l2cap_chan *chan, struct delayed_work *work, long timeout)
+>  {
+>  	BT_DBG("chan %p state %d timeout %ld", chan, chan->state, timeout);
+>  
+> -	if (!mod_timer(timer, jiffies + msecs_to_jiffies(timeout)))
+> -		chan_hold(chan);
+> +	cancel_delayed_work_sync(work);
+> +
+> +	schedule_delayed_work(work, timeout);
+>  }
+>  
+> -static void l2cap_clear_timer(struct l2cap_chan *chan, struct timer_list *timer)
+> +static void l2cap_clear_timer(struct delayed_work *work)
+>  {
+> -	BT_DBG("chan %p state %d", chan, chan->state);
+> -
+> -	if (timer_pending(timer) && del_timer(timer))
+> -		chan_put(chan);
+> +	cancel_delayed_work_sync(work);
+>  }
+
+
+Do you think we do not need to use chan_hold / chan_put?
+
+Best regards 
+Andrei Emeltchenko 
 
