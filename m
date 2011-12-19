@@ -1,48 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAKT1EBc=VRa9doQMDsOU+tBTZCrBjcsEkSD9Z_b37wO_CF15dg@mail.gmail.com>
-References: <1324051799-21439-1-git-send-email-sancane@gmail.com>
-	<1324051799-21439-2-git-send-email-sancane@gmail.com>
-	<CAKT1EBc=VRa9doQMDsOU+tBTZCrBjcsEkSD9Z_b37wO_CF15dg@mail.gmail.com>
-Date: Mon, 19 Dec 2011 10:35:26 -0400
-Message-ID: <CAJdJm_NSkwUBKHUx=7AsdCypN4O6uP7nXwaWo9MbFPag8VX6xQ@mail.gmail.com>
-Subject: Re: [PATCH 01/11] attrib-server: Initial steps to provide
- multi-adapter GATT server support
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv3 3/5] Bluetooth: Check for flow control mode
+Date: Mon, 19 Dec 2011 16:31:29 +0200
+Message-Id: <1324305091-19393-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1324305091-19393-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1324305091-19393-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Mon, Dec 19, 2011 at 10:08 AM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
->> +static struct btd_adapter_driver attrib_adapter_driver = {
->> +       .name   = "attrib-adapter-driver",
->> +       .probe  = attrib_adapter_probe,
->> +       .remove = attrib_adapter_remove,
->> +};
->
-> Is there race condition here? Remember that plugins can also register
-> an adapter driver.
-> If a GATT "plugin" wants to register attributes during the probing the
-> attribute server needs to be ready.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_event.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-I agree with Claudio here. We should not rely on adapter drivers for
-initializing the attribute server (although I previously thought it
-could be that simple as well). Otherwise, plugins can't also use
-adapter driver's probe() to register attributes , which defeats the
-idea of per-adapter ATT attributes.
-
-I think the attribute server should be initialized at an early stage,
-after the adapter is created, but prior to having the adapter drivers
-called.
-
-Regards,
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index ceb7979..5138caf 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2271,6 +2271,11 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+ 
+ 	BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
+ 
++	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_PACKET_BASED) {
++		BT_ERR("Wrong event for mode %d", hdev->flow_ctl_mode);
++		return;
++	}
++
+ 	if (skb->len < ev->num_hndl * 4) {
+ 		BT_DBG("%s bad parameters", hdev->name);
+ 		return;
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.4.1
+
