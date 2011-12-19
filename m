@@ -1,48 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1324258083.1965.96.camel@aeonflux>
-Subject: Re: Bluetooth: btusb: urb->interval speed check in
- btusb_submit_isoc_urb()
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Bing Zhao <bzhao@marvell.com>
-Cc: Gustavo Padovan <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Sun, 18 Dec 2011 17:28:03 -0800
-In-Reply-To: <477F20668A386D41ADCC57781B1F704308185E345D@SC-VEXCH1.marvell.com>
-References: <1321504842-11199-1-git-send-email-bzhao@marvell.com>
-	 <20111121155255.GD2552@joana>
-	 <477F20668A386D41ADCC57781B1F704308185E345D@SC-VEXCH1.marvell.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sun, 18 Dec 2011 22:36:52 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: David Fries <david@fries.net>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Arek Lichwa <arkadiusz.lichwa@tieto.com>, iliak@ti.com,
+	ulrik.lauren@stericsson.com, peter@hurleysoftware.com
+Subject: Re: [REGRESSION] 3.2.0-rc3 Bluetooth L2CAP Linux to Linux rfcomm
+ fails
+Message-ID: <20111219003652.GN2621@joana>
+References: <1319621002-7122-1-git-send-email-arkadiusz.lichwa@tieto.com>
+ <20111031190129.GA10164@joana>
+ <20111211051624.GA12050@spacedout.fries.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20111211051624.GA12050@spacedout.fries.net>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bing,
+Hi David,
 
-> In drivers/Bluetooth/btusb.c, function btusb_send_frame(), we call
+* David Fries <david@fries.net> [2011-12-10 23:16:24 -0600]:
+
+> On Mon, Oct 31, 2011 at 05:01:29PM -0200, Gustavo Padovan wrote:
+> > Hi Arek,
+> > 
+> > * Arek Lichwa <arkadiusz.lichwa@tieto.com> [2011-10-26 11:23:21 +0200]:
+> > 
+> > > Hi
+> > > 
+> > > We found during testing problem when setting rfcomm (SPP) channel between
+> > > two 2.1 devices. 
+> > > The test case always failed mostly saying security block on l2cap level 
+> > > but sometimes the fail root cause was 'Command not understood' on l2cap 
+> > > as well.
+> > > Analyzing security block issue, I found that there's unencrypted link when
+> > > l2cap command 'connection request' is sent to remote.
+> > > The second issue with 'command not understood' has turn out to be related to 
+> > > expiration of l2cap timer and its implications.
+> > > 
+> > > Solution that I found to fix the problem seems to be related to old commit 
+> > > 330605423ca6eafafb8dcc27502bce1c585d1b06 made by Ilia Kolomisnky. When there's
+> > > authentication ongoing, 'encryption pending' should be turn on, otherwise 
+> > > there're situations when link stays unencrypted. 
+> > > The issue with timer expiration is related to Andrzej Kaczmarek's patch 
+> > > sent to community a couple days ago (~ 2011/10/20). 
+> > > This patch actually recalculates (repairs) timer values on l2cap which were 
+> > > wrongly converted before. 
+> > > With this patch the expiration issue disappears during the test case 
+> > > I've made, otherwise just reverting 330605423ca6eafafb8dcc27502bce1c585d1b06
+> > > is not enough, since timer issue blocks very often passing the test case.
+> > 
+> > Are you saying that Andrzej's patch together with revert of 330605423 fixes
+> > the problem? and are you sure that we are not creating any new regression?
+> > 
+> > 	Gustavo
 > 
->         usb_fill_int_urb(urb, data->udev, pipe,
->                         skb->data, skb->len, btusb_isoc_tx_complete,
->                         skb, data->isoc_tx_ep->bInterval);
-> 
-> in case HCI_SCODATA_PKT. The inline function usb_fill_int_urb will check USB_SPEED_HIGH or USB_SPEED_SUPER to assign different value to urb->interval.
-> 
->         if (dev->speed == USB_SPEED_HIGH || dev->speed == USB_SPEED_SUPER)
->                 urb->interval = 1 << (interval - 1);
->         else
->                 urb->interval = interval;
-> 
-> Shall we do the same check for btusb_submit_isoc_urb()?
+> I just found that I can't connect rfcomm any more from Linux (desktop)
+> to Linux (N900) with bluetooth.  On the desktop side, 3.2.0-rc2 works,
+> but 3.2.0-rc3 (and on) fails, I even merged in
+> git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next
+> master 5a13b09531420d230616bd524b68a5b0c23cd487 without any change.
+> Fortunately there were only three bluetooth patches between rc2 and rc3.
+> Reverting 4dff523a913197e3314c7b0d08734ab037709093 fixed the issue and
+> I can connect again.
 
-I honestly do not know. Maybe just using usb_fill_int_urb here might be
-a good idea. One is the TX and one is the RX URB. You need to go into
-the USB subsystem and see if it actually makes a different.
+I wen ahead and reverted this one.
 
-However we should not handcode anything from the USB subsystem. We made
-that mistake before with hci_usb.c from the 2.4.x times and it was a
-valuable lesson learned on things not to do.
-
-Regards
-
-Marcel
-
-
+	Gustavo
