@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 3/5] Bluetooth: Check for flow control mode
-Date: Mon, 19 Dec 2011 16:31:29 +0200
-Message-Id: <1324305091-19393-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 2/5] Bluetooth: Initialize default flow control mode
+Date: Mon, 19 Dec 2011 16:31:28 +0200
+Message-Id: <1324305091-19393-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1324305091-19393-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1324305091-19393-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,25 +14,47 @@ From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci.h |    4 ++++
+ net/bluetooth/hci_core.c    |    4 ++++
+ 2 files changed, 8 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index ceb7979..5138caf 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2271,6 +2271,11 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index c019b27..4ab1880 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -280,6 +280,10 @@ enum {
+ #define HCI_ERROR_LOCAL_HOST_TERM	0x16
+ #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
  
- 	BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
- 
-+	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_PACKET_BASED) {
-+		BT_ERR("Wrong event for mode %d", hdev->flow_ctl_mode);
-+		return;
-+	}
++/* Flow control modes */
++#define HCI_FLOW_CTL_MODE_PACKET_BASED	0x00
++#define HCI_FLOW_CTL_MODE_BLOCK_BASED	0x01
 +
- 	if (skb->len < ev->num_hndl * 4) {
- 		BT_DBG("%s bad parameters", hdev->name);
- 		return;
+ /* -----  HCI Commands ---- */
+ #define HCI_OP_NOP			0x0000
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index bb089e3..884eb85 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -199,6 +199,8 @@ static void bredr_init(struct hci_dev *hdev)
+ 	__le16 param;
+ 	__u8 flt_type;
+ 
++	hdev->flow_ctl_mode = HCI_FLOW_CTL_MODE_PACKET_BASED;
++
+ 	/* Mandatory initialization */
+ 
+ 	/* Reset */
+@@ -245,6 +247,8 @@ static void bredr_init(struct hci_dev *hdev)
+ 
+ static void amp_init(struct hci_dev *hdev)
+ {
++	hdev->flow_ctl_mode = HCI_FLOW_CTL_MODE_BLOCK_BASED;
++
+ 	/* Reset */
+ 	hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
+ 
 -- 
 1.7.4.1
 
