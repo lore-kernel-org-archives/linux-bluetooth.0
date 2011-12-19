@@ -1,201 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 19 Dec 2011 11:53:30 -0200
+Date: Mon, 19 Dec 2011 11:49:12 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 19/22] Bluetooth: Change l2cap chan_list to use RCU
-Message-ID: <20111219135330.GD2610@joana>
-References: <1324157382-1815-12-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-13-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-14-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-15-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-16-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-17-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-18-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-19-git-send-email-padovan@profusion.mobi>
- <1324157382-1815-20-git-send-email-padovan@profusion.mobi>
- <20111219104254.GC3982@aemeltch-MOBL1>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next 2011-12-19
+Message-ID: <20111219134912.GC2610@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111219104254.GC3982@aemeltch-MOBL1>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi John,
 
-* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2011-12-19 12:42:57 +0200]:
+Another set of patches for 3.3. The biggest change here is a long-waited move
+from tasklets to workqueue. All our bluetooth core processing is now done in
+process context. Besides that there is some update from Johan to management
+interface and some other fix/improvements over the three.
 
-> Hi Gustavo,
-> 
-> On Sat, Dec 17, 2011 at 07:29:39PM -0200, Gustavo F. Padovan wrote:
-> > From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-> > 
-> > This list has much more reads than writes, so RCU makes senses here, also
-> > it avoid deadlock against the socket lock.
-> > 
-> > Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-> > ---
-> >  net/bluetooth/l2cap_core.c |  117 +++++++++++++++++++++----------------------
-> >  1 files changed, 57 insertions(+), 60 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index d616519..a212295 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -89,24 +89,36 @@ static inline void chan_put(struct l2cap_chan *c)
-> >  
-> >  static struct l2cap_chan *__l2cap_get_chan_by_dcid(struct l2cap_conn *conn, u16 cid)
-> >  {
-> > -	struct l2cap_chan *c;
-> > +	struct l2cap_chan *c, *r = NULL;
-> >  
-> > -	list_for_each_entry(c, &conn->chan_l, list) {
-> > -		if (c->dcid == cid)
-> > -			return c;
-> > +	rcu_read_lock();
-> > +
-> > +	list_for_each_entry_rcu(c, &conn->chan_l, list) {
-> > +		if (c->dcid == cid) {
-> > +			r = c;
-> > +			break;
-> > +		}
-> >  	}
-> > +
-> > +	rcu_read_unlock();
-> >  	return NULL;
-> >  }
-> >  
-> >  static struct l2cap_chan *__l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 cid)
-> >  {
-> > -	struct l2cap_chan *c;
-> > +	struct l2cap_chan *c, *r = NULL;
-> >  
-> > -	list_for_each_entry(c, &conn->chan_l, list) {
-> > -		if (c->scid == cid)
-> > -			return c;
-> > +	rcu_read_lock();
-> > +
-> > +	list_for_each_entry_rcu(c, &conn->chan_l, list) {
-> > +		if (c->scid == cid) {
-> > +			r = c;
-> > +			break;
-> > +		}
-> >  	}
-> > -	return NULL;
-> > +
-> > +	rcu_read_unlock();
-> > +	return r;
-> >  }
-> >  
-> >  /* Find channel with given SCID.
-> > @@ -115,34 +127,36 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 ci
-> >  {
-> >  	struct l2cap_chan *c;
-> >  
-> > -	mutex_lock(&conn->chan_lock);
-> >  	c = __l2cap_get_chan_by_scid(conn, cid);
-> >  	if (c)
-> >  		lock_sock(c->sk);
-> > -	mutex_unlock(&conn->chan_lock);
-> >  	return c;
-> >  }
-> >  
-> >  static struct l2cap_chan *__l2cap_get_chan_by_ident(struct l2cap_conn *conn, u8 ident)
-> >  {
-> > -	struct l2cap_chan *c;
-> > +	struct l2cap_chan *c, *r = NULL;
-> >  
-> > -	list_for_each_entry(c, &conn->chan_l, list) {
-> > -		if (c->ident == ident)
-> > -			return c;
-> > +	rcu_read_lock();
-> > +
-> > +	list_for_each_entry_rcu(c, &conn->chan_l, list) {
-> > +		if (c->ident == ident) {
-> > +			r = c;
-> > +			break;
-> > +		}
-> >  	}
-> > -	return NULL;
-> > +
-> > +	rcu_read_unlock();
-> > +	return r;
-> >  }
-> >  
-> >  static inline struct l2cap_chan *l2cap_get_chan_by_ident(struct l2cap_conn *conn, u8 ident)
-> >  {
-> >  	struct l2cap_chan *c;
-> >  
-> > -	mutex_lock(&conn->chan_lock);
-> >  	c = __l2cap_get_chan_by_ident(conn, ident);
-> >  	if (c)
-> >  		lock_sock(c->sk);
-> > -	mutex_unlock(&conn->chan_lock);
-> >  	return c;
-> >  }
-> >  
-> > @@ -323,7 +337,7 @@ void l2cap_chan_destroy(struct l2cap_chan *chan)
-> >  	chan_put(chan);
-> >  }
-> >  
-> > -static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
-> > +static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
-> >  {
-> >  	BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
-> >  			chan->psm, chan->dcid);
-> > @@ -364,7 +378,7 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
-> >  
-> >  	chan_hold(chan);
-> >  
-> > -	list_add(&chan->list, &conn->chan_l);
-> > +	list_add_rcu(&chan->list, &conn->chan_l);
-> >  }
-> >  
-> >  /* Delete channel.
-> > @@ -381,9 +395,9 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
-> >  
-> >  	if (conn) {
-> >  		/* Delete from channel list */
-> > -		mutex_lock(&conn->chan_lock);
-> > -		list_del(&chan->list);
-> > -		mutex_unlock(&conn->chan_lock);
-> > +		list_del_rcu(&chan->list);
-> > +		synchronize_rcu();
-> > +
-> >  		chan_put(chan);
-> >  
-> >  		chan->conn = NULL;
-> > @@ -750,13 +764,13 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
-> >  /* ---- L2CAP connections ---- */
-> >  static void l2cap_conn_start(struct l2cap_conn *conn)
-> >  {
-> > -	struct l2cap_chan *chan, *tmp;
-> > +	struct l2cap_chan *chan;
-> >  
-> >  	BT_DBG("conn %p", conn);
-> >  
-> > -	mutex_lock(&conn->chan_lock);
-> > +	rcu_read_lock();
-> >  
-> > -	list_for_each_entry_safe(chan, tmp, &conn->chan_l, list) {
-> > +	list_for_each_entry_rcu(chan, &conn->chan_l, list) {
-> >  		struct sock *sk = chan->sk;
-> >  
-> >  		bh_lock_sock(sk);
-> > @@ -780,9 +794,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
-> >  					&chan->conf_state)) {
-> >  				/* l2cap_chan_close() calls list_del(chan)
-> >  				 * so release the lock */
-> > -				mutex_unlock(&conn->chan_lock);
-> >  				l2cap_chan_close(chan, ECONNRESET);
-> > -				utex_lock(&conn->chan_lock);
-> 
-> OK, I see why this works. BTW: IMO the mutex and rcu patches shall be
-> amended, otherwise we do unneeded work of implementing mutexes and then
-> changing them to RCU.
-
-Indeed, but unfortunately I pushed the patches already and forgot to ammend
-both path patches. I was trying to push this ASAP so you guys could rebase
-your work on top of it.
+Please pull, thanks!
 
 	Gustavo
+
+The following changes since commit 5bd5e9a6ae5137a61d0b5c277eac61892d89fc4f:
+
+  ath9k: Support RSN Mesh (2011-12-16 09:30:43 -0500)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next master
+
+Andrei Emeltchenko (2):
+      Bluetooth: Add HCI Read Data Block Size function
+      Bluetooth: Simplify num_comp_pkts_evt function
+
+Gustavo F. Padovan (30):
+      Bluetooth: remove struct hci_chan_hash
+      Bluetooth: remove lock from struct conn_hash
+      Bluetooth: Initialize LE connection count
+      Bluetooth: Use chan instead of l2cap_pi macro
+      Bluetooth: Use list_for_each_entry in hci_conn_hash_flush()
+      Bluetooth: make hci_conn_enter_sniff_mode static
+      Bluetooth: Replace spin_lock by mutex in hci_dev
+      Bluetooth: Use delayed_work for connection timeout
+      Bluetooth: Use delayed work for advertisiment cache timeout
+      Bluetooth: hci_conn_auto_accept() doesn't need locking
+      Bluetooth: Move L2CAP timers to workqueue
+      Bluetooth: Don't use spin_lock socket lock anymore
+      Bluetooth: Remove sk_backlog usage from L2CAP
+      Bluetooth: move hci_task_lock to mutex
+      Bluetooth: convert chan_lock to mutex
+      Bluetooth: Use RCU to manipulate chan_list
+      Bluetooth: convert conn hash to RCU
+      Bluetooth: Don't disable tasklets to call hdev->notify()
+      Bluetooth: Move command task to workqueue
+      Bluetooth: convert tx_task to workqueue
+      Bluetooth: convert info timer to delayed_work
+      Bluetooth: invert locking order in connect path
+      Bluetooth: Change l2cap chan_list to use RCU
+      Bluetooth: move power_off to system workqueue
+      Bluetooth: Use new alloc_workqueue()
+      Bluetooth: Remove work_add and work_del from hci_sysfs
+      Bluetooth: Use system workqueue to schedule power_on
+      Bluetooth: Add ProFUSION's copyright
+      Revert "Bluetooth: Revert: Fix L2CAP connection establishment"
+      Merge git://git.kernel.org/.../padovan/bluetooth
+
+Johan Hedberg (10):
+      Bluetooth: Update mgmt_read_info and related mgmt messages
+      Bluetooth: Move mgmt_set_fast_connectable to the right location
+      Bluetooth: Remove mgmt_set_service_cache
+      Bluetooth: Move EIR and CoD update functions to a better position
+      Bluetooth: Add timer for automatically disabling the service cache
+      Bluetooth: Update ordering and opcodes of mgmt messages
+      Bluetooth: Use correct struct for user_confirm_neg_reply
+      Bluetooth: Add missing confirm_name field to mgmt_ev_device_found
+      Bluetooth: Fix mgmt_(block,unblock)_device opcodes
+      Bluetooth: Add missing mgmt_confirm_name command definition
+
+Marcel Holtmann (1):
+      Bluetooth: Process recv path in a workqueue instead of a tasklet
+
+Mat Martineau (3):
+      Bluetooth: Incoming ACL packets do not force active mode
+      Bluetooth: Prevent uninitialized data access in L2CAP configuration
+      Bluetooth: Clear RFCOMM session timer when disconnecting last channel
+
+ include/net/bluetooth/hci.h      |    9 +
+ include/net/bluetooth/hci_core.h |  118 +++----
+ include/net/bluetooth/l2cap.h    |   24 +-
+ include/net/bluetooth/mgmt.h     |  191 ++++++-----
+ net/bluetooth/hci_conn.c         |  137 ++++-----
+ net/bluetooth/hci_core.c         |  173 ++++++-----
+ net/bluetooth/hci_event.c        |   99 ++++--
+ net/bluetooth/hci_sock.c         |   21 +-
+ net/bluetooth/hci_sysfs.c        |   91 ++---
+ net/bluetooth/hidp/core.c        |    4 +-
+ net/bluetooth/l2cap_core.c       |  360 +++++++++++----------
+ net/bluetooth/l2cap_sock.c       |   62 +----
+ net/bluetooth/mgmt.c             |  696 ++++++++++++++++++++------------------
+ net/bluetooth/rfcomm/core.c      |    1 +
+ net/bluetooth/sco.c              |    4 +-
+ 15 files changed, 1015 insertions(+), 975 deletions(-)
