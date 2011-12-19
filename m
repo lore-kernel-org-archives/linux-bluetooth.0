@@ -1,35 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 19 Dec 2011 11:30:15 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] Bluetooth: Add missing mgmt_confirm_name command
- definition
-Message-ID: <20111219133015.GA2610@joana>
-References: <1324297748-8546-1-git-send-email-johan.hedberg@gmail.com>
- <1324297748-8546-3-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1324297748-8546-3-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <20111219110504.GD3982@aemeltch-MOBL1>
+References: <1324157382-1815-1-git-send-email-padovan@profusion.mobi>
+	<1324157382-1815-2-git-send-email-padovan@profusion.mobi>
+	<1324157382-1815-3-git-send-email-padovan@profusion.mobi>
+	<1324157382-1815-4-git-send-email-padovan@profusion.mobi>
+	<1324157382-1815-5-git-send-email-padovan@profusion.mobi>
+	<1324157382-1815-6-git-send-email-padovan@profusion.mobi>
+	<1324157382-1815-7-git-send-email-padovan@profusion.mobi>
+	<20111219110504.GD3982@aemeltch-MOBL1>
+Date: Mon, 19 Dec 2011 10:59:17 -0200
+Message-ID: <CAA37ikaGqA0ATef8760UiwmJ7dg14UBN_t2T8VFJn6PRfMkcww@mail.gmail.com>
+Subject: Re: [RFC 06/22] Bluetooth: Move L2CAP timers to workqueue
+From: Ulisses Furquim <ulisses@profusion.mobi>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Andrei,
 
-* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-12-19 14:29:08 +0200]:
+On Mon, Dec 19, 2011 at 9:05 AM, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+> Hi Gustavo,
+>
+> On Sat, Dec 17, 2011 at 07:29:26PM -0200, Gustavo F. Padovan wrote:
+>> From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+>>
+>> L2CAP timers also need to run in process context. As the works in l2cap
+>> are small we are using the system worqueue.
+>>
+>> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+>> ---
+>>  include/net/bluetooth/l2cap.h |   17 +++++-----
+>>  net/bluetooth/l2cap_core.c    |   70 ++++++++++++++++++-----------------------
+>>  2 files changed, 40 insertions(+), 47 deletions(-)
+>
+> ...
+>
+>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>> index 0369a9b..89cda6d 100644
+>> --- a/net/bluetooth/l2cap_core.c
+>> +++ b/net/bluetooth/l2cap_core.c
+>> @@ -213,20 +213,18 @@ static u16 l2cap_alloc_cid(struct l2cap_conn *conn)
+>>       return 0;
+>>  }
+>>
+>> -static void l2cap_set_timer(struct l2cap_chan *chan, struct timer_list *timer, long timeout)
+>> +static void l2cap_set_timer(struct l2cap_chan *chan, struct delayed_work *work, long timeout)
+>>  {
+>>       BT_DBG("chan %p state %d timeout %ld", chan, chan->state, timeout);
+>>
+>> -     if (!mod_timer(timer, jiffies + msecs_to_jiffies(timeout)))
+>> -             chan_hold(chan);
+>> +     cancel_delayed_work_sync(work);
+>> +
+>> +     schedule_delayed_work(work, timeout);
+>>  }
+>>
+>> -static void l2cap_clear_timer(struct l2cap_chan *chan, struct timer_list *timer)
+>> +static void l2cap_clear_timer(struct delayed_work *work)
+>>  {
+>> -     BT_DBG("chan %p state %d", chan, chan->state);
+>> -
+>> -     if (timer_pending(timer) && del_timer(timer))
+>> -             chan_put(chan);
+>> +     cancel_delayed_work_sync(work);
+>>  }
+>
+>
+> Do you think we do not need to use chan_hold / chan_put?
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> This patch adds the necessary structs for the Confirm Name command. This
-> ensures that the protocol definitions are up to date with the latest
-> mgmt specification. The actual implementation of the command will follow
-> in a later patch-set.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  include/net/bluetooth/mgmt.h |   10 ++++++++++
->  1 files changed, 10 insertions(+), 0 deletions(-)
+It's good you spotted it too. It's a known issue Padovan is looking at. Thanks.
 
-The 3 patches have been applied. Thanks.
+Best regards,
 
-	Gustavo
+-- 
+Ulisses Furquim
+ProFUSION embedded systems
+http://profusion.mobi
+Mobile: +55 19 9250 0942
+Skype: ulissesffs
