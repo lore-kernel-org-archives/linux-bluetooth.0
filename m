@@ -1,272 +1,201 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 19 Dec 2011 11:53:30 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 19/22] Bluetooth: Change l2cap chan_list to use RCU
+Message-ID: <20111219135330.GD2610@joana>
+References: <1324157382-1815-12-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-13-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-14-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-15-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-16-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-17-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-18-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-19-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-20-git-send-email-padovan@profusion.mobi>
+ <20111219104254.GC3982@aemeltch-MOBL1>
 MIME-Version: 1.0
-In-Reply-To: <1324051799-21439-2-git-send-email-sancane@gmail.com>
-References: <1324051799-21439-1-git-send-email-sancane@gmail.com>
-	<1324051799-21439-2-git-send-email-sancane@gmail.com>
-Date: Mon, 19 Dec 2011 11:08:45 -0300
-Message-ID: <CAKT1EBc=VRa9doQMDsOU+tBTZCrBjcsEkSD9Z_b37wO_CF15dg@mail.gmail.com>
-Subject: Re: [PATCH 01/11] attrib-server: Initial steps to provide
- multi-adapter GATT server support
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20111219104254.GC3982@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+Hi Andrei,
 
-On Fri, Dec 16, 2011 at 1:09 PM, Santiago Carot-Nemesio
-<sancane@gmail.com> wrote:
-> This patch prepares the structures in att-server to start and stop
-> GATT server whenever an adapter is plugged or unplugged.
-> ---
->  src/attrib-server.c |  168 +++++++++++++++++++++++++++++++++++----------------
->  1 files changed, 116 insertions(+), 52 deletions(-)
->
-> diff --git a/src/attrib-server.c b/src/attrib-server.c
-> index b767b72..e8dade8 100644
-> --- a/src/attrib-server.c
-> +++ b/src/attrib-server.c
-> @@ -71,12 +71,23 @@ struct group_elem {
->        uint16_t len;
->  };
->
-> -static GIOChannel *l2cap_io = NULL;
->  static GIOChannel *le_io = NULL;
-le_io is not being used anymore.
+* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2011-12-19 12:42:57 +0200]:
 
->  static GSList *clients = NULL;
->  static uint32_t gatt_sdp_handle = 0;
->  static uint32_t gap_sdp_handle = 0;
->
-> +struct gatt_adapter {
-> +       struct btd_adapter      *adapter;
-> +       GIOChannel              *l2cap_io;
-> +       GIOChannel              *le_io;
-> +       GSList                  *clients;
-> +       uint32_t                gatt_sdp_handle;
-> +       uint32_t                gap_sdp_handle;
-> +       GSList                  *database;
+> Hi Gustavo,
+> 
+> On Sat, Dec 17, 2011 at 07:29:39PM -0200, Gustavo F. Padovan wrote:
+> > From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+> > 
+> > This list has much more reads than writes, so RCU makes senses here, also
+> > it avoid deadlock against the socket lock.
+> > 
+> > Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> > ---
+> >  net/bluetooth/l2cap_core.c |  117 +++++++++++++++++++++----------------------
+> >  1 files changed, 57 insertions(+), 60 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index d616519..a212295 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -89,24 +89,36 @@ static inline void chan_put(struct l2cap_chan *c)
+> >  
+> >  static struct l2cap_chan *__l2cap_get_chan_by_dcid(struct l2cap_conn *conn, u16 cid)
+> >  {
+> > -	struct l2cap_chan *c;
+> > +	struct l2cap_chan *c, *r = NULL;
+> >  
+> > -	list_for_each_entry(c, &conn->chan_l, list) {
+> > -		if (c->dcid == cid)
+> > -			return c;
+> > +	rcu_read_lock();
+> > +
+> > +	list_for_each_entry_rcu(c, &conn->chan_l, list) {
+> > +		if (c->dcid == cid) {
+> > +			r = c;
+> > +			break;
+> > +		}
+> >  	}
+> > +
+> > +	rcu_read_unlock();
+> >  	return NULL;
+> >  }
+> >  
+> >  static struct l2cap_chan *__l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 cid)
+> >  {
+> > -	struct l2cap_chan *c;
+> > +	struct l2cap_chan *c, *r = NULL;
+> >  
+> > -	list_for_each_entry(c, &conn->chan_l, list) {
+> > -		if (c->scid == cid)
+> > -			return c;
+> > +	rcu_read_lock();
+> > +
+> > +	list_for_each_entry_rcu(c, &conn->chan_l, list) {
+> > +		if (c->scid == cid) {
+> > +			r = c;
+> > +			break;
+> > +		}
+> >  	}
+> > -	return NULL;
+> > +
+> > +	rcu_read_unlock();
+> > +	return r;
+> >  }
+> >  
+> >  /* Find channel with given SCID.
+> > @@ -115,34 +127,36 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 ci
+> >  {
+> >  	struct l2cap_chan *c;
+> >  
+> > -	mutex_lock(&conn->chan_lock);
+> >  	c = __l2cap_get_chan_by_scid(conn, cid);
+> >  	if (c)
+> >  		lock_sock(c->sk);
+> > -	mutex_unlock(&conn->chan_lock);
+> >  	return c;
+> >  }
+> >  
+> >  static struct l2cap_chan *__l2cap_get_chan_by_ident(struct l2cap_conn *conn, u8 ident)
+> >  {
+> > -	struct l2cap_chan *c;
+> > +	struct l2cap_chan *c, *r = NULL;
+> >  
+> > -	list_for_each_entry(c, &conn->chan_l, list) {
+> > -		if (c->ident == ident)
+> > -			return c;
+> > +	rcu_read_lock();
+> > +
+> > +	list_for_each_entry_rcu(c, &conn->chan_l, list) {
+> > +		if (c->ident == ident) {
+> > +			r = c;
+> > +			break;
+> > +		}
+> >  	}
+> > -	return NULL;
+> > +
+> > +	rcu_read_unlock();
+> > +	return r;
+> >  }
+> >  
+> >  static inline struct l2cap_chan *l2cap_get_chan_by_ident(struct l2cap_conn *conn, u8 ident)
+> >  {
+> >  	struct l2cap_chan *c;
+> >  
+> > -	mutex_lock(&conn->chan_lock);
+> >  	c = __l2cap_get_chan_by_ident(conn, ident);
+> >  	if (c)
+> >  		lock_sock(c->sk);
+> > -	mutex_unlock(&conn->chan_lock);
+> >  	return c;
+> >  }
+> >  
+> > @@ -323,7 +337,7 @@ void l2cap_chan_destroy(struct l2cap_chan *chan)
+> >  	chan_put(chan);
+> >  }
+> >  
+> > -static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+> > +static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+> >  {
+> >  	BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
+> >  			chan->psm, chan->dcid);
+> > @@ -364,7 +378,7 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+> >  
+> >  	chan_hold(chan);
+> >  
+> > -	list_add(&chan->list, &conn->chan_l);
+> > +	list_add_rcu(&chan->list, &conn->chan_l);
+> >  }
+> >  
+> >  /* Delete channel.
+> > @@ -381,9 +395,9 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+> >  
+> >  	if (conn) {
+> >  		/* Delete from channel list */
+> > -		mutex_lock(&conn->chan_lock);
+> > -		list_del(&chan->list);
+> > -		mutex_unlock(&conn->chan_lock);
+> > +		list_del_rcu(&chan->list);
+> > +		synchronize_rcu();
+> > +
+> >  		chan_put(chan);
+> >  
+> >  		chan->conn = NULL;
+> > @@ -750,13 +764,13 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
+> >  /* ---- L2CAP connections ---- */
+> >  static void l2cap_conn_start(struct l2cap_conn *conn)
+> >  {
+> > -	struct l2cap_chan *chan, *tmp;
+> > +	struct l2cap_chan *chan;
+> >  
+> >  	BT_DBG("conn %p", conn);
+> >  
+> > -	mutex_lock(&conn->chan_lock);
+> > +	rcu_read_lock();
+> >  
+> > -	list_for_each_entry_safe(chan, tmp, &conn->chan_l, list) {
+> > +	list_for_each_entry_rcu(chan, &conn->chan_l, list) {
+> >  		struct sock *sk = chan->sk;
+> >  
+> >  		bh_lock_sock(sk);
+> > @@ -780,9 +794,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+> >  					&chan->conf_state)) {
+> >  				/* l2cap_chan_close() calls list_del(chan)
+> >  				 * so release the lock */
+> > -				mutex_unlock(&conn->chan_lock);
+> >  				l2cap_chan_close(chan, ECONNRESET);
+> > -				utex_lock(&conn->chan_lock);
+> 
+> OK, I see why this works. BTW: IMO the mutex and rcu patches shall be
+> amended, otherwise we do unneeded work of implementing mutexes and then
+> changing them to RCU.
 
-I recommend to introduce new variable when the it is really being
-used. "database" and "clients" are used by free functions only, but
-new elements are not being added in the list by this patch.
+Indeed, but unfortunately I pushed the patches already and forgot to ammend
+both path patches. I was trying to push this ASAP so you guys could rebase
+your work on top of it.
 
-> +};
-> +
-> +static GSList *adapters = NULL;
-> +
->  /* GAP attribute handles */
->  static uint16_t name_handle = 0x0000;
->  static uint16_t appearance_handle = 0x0000;
-> @@ -94,6 +105,60 @@ static bt_uuid_t ccc_uuid = {
->                        .value.u16 = GATT_CLIENT_CHARAC_CFG_UUID
->  };
->
-> +static void attrib_free(void *data)
-> +{
-> +       struct attribute *a = data;
-> +
-> +       g_free(a->data);
-> +       g_free(a);
-> +}
-> +
-> +static void channel_free(struct gatt_channel *channel)
-> +{
-> +       g_attrib_unref(channel->attrib);
-> +
-> +       g_free(channel);
-> +}
-> +
-> +static void free_gatt_adapter(struct gatt_adapter *gatt_adapter)
-the coding style is "free" at the end of the function name
-
-> +{
-> +       g_slist_free_full(gatt_adapter->database, attrib_free);
-> +
-> +       if (gatt_adapter->l2cap_io != NULL) {
-> +               g_io_channel_unref(gatt_adapter->l2cap_io);
-> +               g_io_channel_shutdown(gatt_adapter->l2cap_io, FALSE, NULL);
-> +       }
-> +
-> +       if (gatt_adapter->le_io != NULL) {
-> +               g_io_channel_unref(gatt_adapter->le_io);
-> +               g_io_channel_shutdown(gatt_adapter->le_io, FALSE, NULL);
-> +       }
-> +
-> +       g_slist_free_full(gatt_adapter->clients, (GDestroyNotify) channel_free);
-> +
-> +       if (gatt_adapter->gatt_sdp_handle > 0)
-> +               remove_record_from_server(gatt_adapter->gatt_sdp_handle);
-> +
-> +       if (gatt_adapter->gap_sdp_handle > 0)
-> +               remove_record_from_server(gatt_adapter->gap_sdp_handle);
-
-Removing gap_sdp_handle again
-
-> +
-> +       if (gatt_adapter->adapter != NULL)
-> +               btd_adapter_unref(gatt_adapter->adapter);
-> +
-> +       g_free(gatt_adapter);
-> +}
-> +
-> +static gint adapter_cmp(gconstpointer a, gconstpointer b)
-> +{
-> +       const struct gatt_adapter *gatt_adapter = a;
-> +       const struct btd_adapter *adapter = b;
-> +
-> +       if (gatt_adapter->adapter == adapter)
-> +               return 0;
-> +
-> +       return -1;
-> +}
-> +
->  static sdp_record_t *server_record_new(uuid_t *uuid, uint16_t start, uint16_t end)
->  {
->        sdp_list_t *svclass_id, *apseq, *proto[2], *root, *aproto;
-> @@ -689,21 +754,6 @@ static uint16_t mtu_exchange(struct gatt_channel *channel, uint16_t mtu,
->        return enc_mtu_resp(old_mtu, pdu, len);
->  }
->
-> -static void attrib_free(void *data)
-> -{
-> -       struct attribute *a = data;
-> -
-> -       g_free(a->data);
-> -       g_free(a);
-> -}
-> -
-> -static void channel_free(struct gatt_channel *channel)
-> -{
-> -       g_attrib_unref(channel->attrib);
-> -
-> -       g_free(channel);
-> -}
-> -
->  static void channel_disconnect(void *user_data)
->  {
->        struct gatt_channel *channel = user_data;
-> @@ -1012,74 +1062,88 @@ failed:
->        return FALSE;
->  }
->
-> -int attrib_server_init(void)
-> +static int attrib_adapter_probe(struct btd_adapter *adapter)
->  {
-> +       struct gatt_adapter *gatt_adapter;
->        GError *gerr = NULL;
-> +       bdaddr_t addr;
-> +
-> +       DBG("Start GATT server in %s", adapter_get_path(adapter));
-> +
-> +       gatt_adapter = g_new0(struct gatt_adapter, 1);
-> +       gatt_adapter->adapter = btd_adapter_ref(adapter);
-> +
-> +       adapter_get_address(gatt_adapter->adapter, &addr);
->
->        /* BR/EDR socket */
-> -       l2cap_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
-> +       gatt_adapter->l2cap_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
->                                        NULL, NULL, &gerr,
-> -                                       BT_IO_OPT_SOURCE_BDADDR, BDADDR_ANY,
-> +                                       BT_IO_OPT_SOURCE_BDADDR, &addr,
->                                        BT_IO_OPT_PSM, ATT_PSM,
->                                        BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
->                                        BT_IO_OPT_INVALID);
-> -       if (l2cap_io == NULL) {
-> +
-> +       if (gatt_adapter->l2cap_io == NULL) {
->                error("%s", gerr->message);
->                g_error_free(gerr);
-> +               free_gatt_adapter(gatt_adapter);
->                return -1;
->        }
->
-> -       if (!register_core_services())
-> -               goto failed;
-> +       if (!register_core_services()) {
-> +               g_io_channel_unref(gatt_adapter->l2cap_io);
-> +               free_gatt_adapter(gatt_adapter);
-
-Two unref calls for l2cap_io here. free function also calls unref for l2cap_io
-
-> +               return -1;
-> +       }
->
->        /* LE socket */
-> -       le_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
-> -                                       &le_io, NULL, &gerr,
-> -                                       BT_IO_OPT_SOURCE_BDADDR, BDADDR_ANY,
-> +       gatt_adapter->le_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
-> +                                       &gatt_adapter->le_io, NULL, &gerr,
-> +                                       BT_IO_OPT_SOURCE_BDADDR, &addr,
->                                        BT_IO_OPT_CID, ATT_CID,
->                                        BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
->                                        BT_IO_OPT_INVALID);
-> -       if (le_io == NULL) {
-> +
-> +       if (gatt_adapter->le_io == NULL) {
->                error("%s", gerr->message);
->                g_error_free(gerr);
->                /* Doesn't have LE support, continue */
->        }
->
-> +       adapters = g_slist_prepend(adapters, gatt_adapter);
->        return 0;
-> -
-> -failed:
-> -       g_io_channel_unref(l2cap_io);
-> -       l2cap_io = NULL;
-> -
-> -       if (le_io) {
-> -               g_io_channel_unref(le_io);
-> -               le_io = NULL;
-> -       }
-> -
-> -       return -1;
->  }
->
-> -void attrib_server_exit(void)
-> +static void attrib_adapter_remove(struct btd_adapter *adapter)
->  {
-> -       g_slist_free_full(database, attrib_free);
-> +       struct gatt_adapter *gatt_adapter;
-> +       GSList *l;
->
-> -       if (l2cap_io) {
-> -               g_io_channel_unref(l2cap_io);
-> -               g_io_channel_shutdown(l2cap_io, FALSE, NULL);
-> -       }
-> +       l = g_slist_find_custom(adapters, adapter, adapter_cmp);
-> +       if (l == NULL)
-> +               return;
->
-> -       if (le_io) {
-> -               g_io_channel_unref(le_io);
-> -               g_io_channel_shutdown(le_io, FALSE, NULL);
-> -       }
-> +       DBG("Stop GATT server in %s", adapter_get_path(adapter));
->
-> -       g_slist_free_full(clients, (GDestroyNotify) channel_free);
-> +       gatt_adapter = l->data;
-> +       adapters = g_slist_remove(adapters, gatt_adapter);
-> +       free_gatt_adapter(gatt_adapter);
-> +}
->
-> -       if (gatt_sdp_handle)
-> -               remove_record_from_server(gatt_sdp_handle);
-> +static struct btd_adapter_driver attrib_adapter_driver = {
-> +       .name   = "attrib-adapter-driver",
-> +       .probe  = attrib_adapter_probe,
-> +       .remove = attrib_adapter_remove,
-> +};
-
-Is there race condition here? Remember that plugins can also register
-an adapter driver.
-If a GATT "plugin" wants to register attributes during the probing the
-attribute server needs to be ready.
-
-BR,
-Claudio
+	Gustavo
