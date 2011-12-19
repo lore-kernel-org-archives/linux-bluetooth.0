@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 2/5] Bluetooth: Initialize default flow control mode
-Date: Mon, 19 Dec 2011 16:31:28 +0200
-Message-Id: <1324305091-19393-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 5/5] Bluetooth: Correct packet len calculation
+Date: Mon, 19 Dec 2011 16:31:31 +0200
+Message-Id: <1324305091-19393-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1324305091-19393-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1324305091-19393-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,50 +11,44 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci.h |    4 ++++
- net/bluetooth/hci_core.c    |    4 ++++
- 2 files changed, 8 insertions(+), 0 deletions(-)
+Remove unneeded skb_pull and correct packet length calculation
+removing magic number. Move BT_DBG after len check otherwise
+it could possibly access wrong memory.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index c019b27..4ab1880 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -280,6 +280,10 @@ enum {
- #define HCI_ERROR_LOCAL_HOST_TERM	0x16
- #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/hci_event.c |    9 ++++-----
+ 1 files changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 919e3c0..47e1476 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2266,20 +2266,19 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+ 	struct hci_ev_num_comp_pkts *ev = (void *) skb->data;
+ 	int i;
  
-+/* Flow control modes */
-+#define HCI_FLOW_CTL_MODE_PACKET_BASED	0x00
-+#define HCI_FLOW_CTL_MODE_BLOCK_BASED	0x01
+-	skb_pull(skb, sizeof(*ev));
+-
+-	BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
+-
+ 	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_PACKET_BASED) {
+ 		BT_ERR("Wrong event for mode %d", hdev->flow_ctl_mode);
+ 		return;
+ 	}
+ 
+-	if (skb->len < ev->num_hndl * 4) {
++	if (skb->len < sizeof(*ev) || skb->len < sizeof(*ev) +
++			ev->num_hndl * sizeof(struct hci_comp_pkts_info)) {
+ 		BT_DBG("%s bad parameters", hdev->name);
+ 		return;
+ 	}
+ 
++	BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
 +
- /* -----  HCI Commands ---- */
- #define HCI_OP_NOP			0x0000
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index bb089e3..884eb85 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -199,6 +199,8 @@ static void bredr_init(struct hci_dev *hdev)
- 	__le16 param;
- 	__u8 flt_type;
- 
-+	hdev->flow_ctl_mode = HCI_FLOW_CTL_MODE_PACKET_BASED;
-+
- 	/* Mandatory initialization */
- 
- 	/* Reset */
-@@ -245,6 +247,8 @@ static void bredr_init(struct hci_dev *hdev)
- 
- static void amp_init(struct hci_dev *hdev)
- {
-+	hdev->flow_ctl_mode = HCI_FLOW_CTL_MODE_BLOCK_BASED;
-+
- 	/* Reset */
- 	hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
- 
+ 	for (i = 0; i < ev->num_hndl; i++) {
+ 		struct hci_comp_pkts_info *info = &ev->handles[i];
+ 		struct hci_conn *conn;
 -- 
 1.7.4.1
 
