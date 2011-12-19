@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 5/5] Bluetooth: Correct packet len calculation
-Date: Mon, 19 Dec 2011 16:31:31 +0200
-Message-Id: <1324305091-19393-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 4/5] Bluetooth: Clean up magic pointers
+Date: Mon, 19 Dec 2011 16:31:30 +0200
+Message-Id: <1324305091-19393-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1324305091-19393-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1324305091-19393-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,44 +11,62 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Remove unneeded skb_pull and correct packet length calculation
-removing magic number. Move BT_DBG after len check otherwise
-it could possibly access wrong memory.
-
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c |    9 ++++-----
- 1 files changed, 4 insertions(+), 5 deletions(-)
+ include/net/bluetooth/hci.h |    7 ++++++-
+ net/bluetooth/hci_event.c   |    8 ++++----
+ 2 files changed, 10 insertions(+), 5 deletions(-)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 4ab1880..5b2fed5 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -982,9 +982,14 @@ struct hci_ev_role_change {
+ } __packed;
+ 
+ #define HCI_EV_NUM_COMP_PKTS		0x13
++struct hci_comp_pkts_info {
++	__le16   handle;
++	__le16   count;
++} __packed;
++
+ struct hci_ev_num_comp_pkts {
+ 	__u8     num_hndl;
+-	/* variable length part */
++	struct hci_comp_pkts_info handles[0];
+ } __packed;
+ 
+ #define HCI_EV_MODE_CHANGE		0x14
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 919e3c0..47e1476 100644
+index 5138caf..919e3c0 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -2266,20 +2266,19 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+@@ -2264,7 +2264,6 @@ static inline void hci_role_change_evt(struct hci_dev *hdev, struct sk_buff *skb
+ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
  	struct hci_ev_num_comp_pkts *ev = (void *) skb->data;
+-	__le16 *ptr;
  	int i;
  
--	skb_pull(skb, sizeof(*ev));
--
--	BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
--
- 	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_PACKET_BASED) {
- 		BT_ERR("Wrong event for mode %d", hdev->flow_ctl_mode);
+ 	skb_pull(skb, sizeof(*ev));
+@@ -2281,12 +2280,13 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
  		return;
  	}
  
--	if (skb->len < ev->num_hndl * 4) {
-+	if (skb->len < sizeof(*ev) || skb->len < sizeof(*ev) +
-+			ev->num_hndl * sizeof(struct hci_comp_pkts_info)) {
- 		BT_DBG("%s bad parameters", hdev->name);
- 		return;
- 	}
- 
-+	BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
-+
- 	for (i = 0; i < ev->num_hndl; i++) {
- 		struct hci_comp_pkts_info *info = &ev->handles[i];
+-	for (i = 0, ptr = (__le16 *) skb->data; i < ev->num_hndl; i++) {
++	for (i = 0; i < ev->num_hndl; i++) {
++		struct hci_comp_pkts_info *info = &ev->handles[i];
  		struct hci_conn *conn;
+ 		__u16  handle, count;
+ 
+-		handle = get_unaligned_le16(ptr++);
+-		count  = get_unaligned_le16(ptr++);
++		handle = __le16_to_cpu(info->handle);
++		count  = __le16_to_cpu(info->count);
+ 
+ 		conn = hci_conn_hash_lookup_handle(hdev, handle);
+ 		if (!conn)
 -- 
 1.7.4.1
 
