@@ -1,43 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Gustavo Padovan <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 20 Dec 2011 15:30:19 -0800
-Subject: RE: Bluetooth: btusb: urb->interval speed check in
- btusb_submit_isoc_urb()
-Message-ID: <477F20668A386D41ADCC57781B1F704308185E3C27@SC-VEXCH1.marvell.com>
-References: <1321504842-11199-1-git-send-email-bzhao@marvell.com>
-	 <20111121155255.GD2552@joana>
-	 <477F20668A386D41ADCC57781B1F704308185E345D@SC-VEXCH1.marvell.com>
- <1324258083.1965.96.camel@aeonflux>
-In-Reply-To: <1324258083.1965.96.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Message-ID: <1324417223.1965.137.camel@aeonflux>
+Subject: Re: [RFC BlueZ]Proximity Monitor Discussion
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Hemant Gupta <hemantgupta.ste@gmail.com>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	Anderson Briglia <anderson.briglia@openbossa.org>,
+	Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Date: Tue, 20 Dec 2011 13:40:23 -0800
+In-Reply-To: <CACj007=vVUEwvaqr7JhMqJ8VK95j2epK+1_Z+_cJ=1-+UwVnGw@mail.gmail.com>
+References: <CACj007=vVUEwvaqr7JhMqJ8VK95j2epK+1_Z+_cJ=1-+UwVnGw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQo+IFN1YmplY3Q6IFJlOiBCbHVldG9vdGg6IGJ0dXNiOiB1cmItPmludGVy
-dmFsIHNwZWVkIGNoZWNrIGluIGJ0dXNiX3N1Ym1pdF9pc29jX3VyYigpDQo+IA0KPiBIaSBCaW5n
-LA0KPiANCj4gPiBJbiBkcml2ZXJzL0JsdWV0b290aC9idHVzYi5jLCBmdW5jdGlvbiBidHVzYl9z
-ZW5kX2ZyYW1lKCksIHdlIGNhbGwNCj4gPg0KPiA+ICAgICAgICAgdXNiX2ZpbGxfaW50X3VyYih1
-cmIsIGRhdGEtPnVkZXYsIHBpcGUsDQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgc2tiLT5k
-YXRhLCBza2ItPmxlbiwgYnR1c2JfaXNvY190eF9jb21wbGV0ZSwNCj4gPiAgICAgICAgICAgICAg
-ICAgICAgICAgICBza2IsIGRhdGEtPmlzb2NfdHhfZXAtPmJJbnRlcnZhbCk7DQo+ID4NCj4gPiBp
-biBjYXNlIEhDSV9TQ09EQVRBX1BLVC4gVGhlIGlubGluZSBmdW5jdGlvbiB1c2JfZmlsbF9pbnRf
-dXJiIHdpbGwgY2hlY2sgVVNCX1NQRUVEX0hJR0ggb3INCj4gVVNCX1NQRUVEX1NVUEVSIHRvIGFz
-c2lnbiBkaWZmZXJlbnQgdmFsdWUgdG8gdXJiLT5pbnRlcnZhbC4NCj4gPg0KPiA+ICAgICAgICAg
-aWYgKGRldi0+c3BlZWQgPT0gVVNCX1NQRUVEX0hJR0ggfHwgZGV2LT5zcGVlZCA9PSBVU0JfU1BF
-RURfU1VQRVIpDQo+ID4gICAgICAgICAgICAgICAgIHVyYi0+aW50ZXJ2YWwgPSAxIDw8IChpbnRl
-cnZhbCAtIDEpOw0KPiA+ICAgICAgICAgZWxzZQ0KPiA+ICAgICAgICAgICAgICAgICB1cmItPmlu
-dGVydmFsID0gaW50ZXJ2YWw7DQo+ID4NCj4gPiBTaGFsbCB3ZSBkbyB0aGUgc2FtZSBjaGVjayBm
-b3IgYnR1c2Jfc3VibWl0X2lzb2NfdXJiKCk/DQo+IA0KPiBJIGhvbmVzdGx5IGRvIG5vdCBrbm93
-LiBNYXliZSBqdXN0IHVzaW5nIHVzYl9maWxsX2ludF91cmIgaGVyZSBtaWdodCBiZQ0KPiBhIGdv
-b2QgaWRlYS4gT25lIGlzIHRoZSBUWCBhbmQgb25lIGlzIHRoZSBSWCBVUkIuIFlvdSBuZWVkIHRv
-IGdvIGludG8NCj4gdGhlIFVTQiBzdWJzeXN0ZW0gYW5kIHNlZSBpZiBpdCBhY3R1YWxseSBtYWtl
-cyBhIGRpZmZlcmVudC4NCg0KVGhhbmtzIGZvciB5b3VyIHN1Z2dlc3Rpb24uIEkgd2lsbCBzZW5k
-IGEgcGF0Y2ggdXNpbmcgdXNiX2ZpbGxfaW50X3VyYigpIGZvciBSWCBVUkIuDQoNClJlZ2FyZHMs
-DQpCaW5nDQoNCj4gDQo+IEhvd2V2ZXIgd2Ugc2hvdWxkIG5vdCBoYW5kY29kZSBhbnl0aGluZyBm
-cm9tIHRoZSBVU0Igc3Vic3lzdGVtLiBXZSBtYWRlDQo+IHRoYXQgbWlzdGFrZSBiZWZvcmUgd2l0
-aCBoY2lfdXNiLmMgZnJvbSB0aGUgMi40LnggdGltZXMgYW5kIGl0IHdhcyBhDQo+IHZhbHVhYmxl
-IGxlc3NvbiBsZWFybmVkIG9uIHRoaW5ncyBub3QgdG8gZG8uDQo+IA0KPiBSZWdhcmRzDQo+IA0K
-PiBNYXJjZWwNCj4gDQoNCg==
+Hi Hemant,
+
+> > Please sync with Anderson Briglia, he already sent a RFC to the ML
+> > some months ago.
+> > In the Bluetooth Summit(Prague), we decided to not proceed with RSSI
+> > monitor emulation in the kernel until we have a clear idea or spec
+> > defining how the controllers will implement RSSI monitoring.
+> Could you please provide some details about what was discussed in the summit.
+> 
+> > The ideia was to provide transparency, the userspace doesn't need to
+> > know if RSSI monitoring is emulated or not.
+> 
+> As per my understanding the BT spec (4.0, Volume 2, Part E, Section
+> 7.5.4) the HCI_Read_RSSI command can be used to retrieve the RSSI from
+> the controller. In our case, I have tested it against ST-Ericsson BT
+> controller  and it works in our case. Are you suggesting that until we
+> know how the RSSI is determined in controller, we should not implement
+> this functionality in kernel ? I ask this because in Proximity Spec,
+> it is mentioned that the monitor should use appropriate calculations
+> to prevent false alerts on reporter, so if we leave this to layer
+> above BlueZ to do this part, then we are pretty independent with the
+> approach of implementation of Path Loss RSSI Monitoring in BlueZ and
+> Kernel.
+> 
+> If I misunderstood anything please clarify.
+
+we need proper notifications about RSSI changes triggered by the
+Bluetooth controller and not having the host polling the controller all
+the time. So just the existence of HCI_Read_RSSI is not enough to make
+this part efficient. And we can only emulate the RSSI notification via
+polling once we know how the new HCI commands will look like. We are
+kinda stuck here.
+
+Regards
+
+Marcel
+
+
