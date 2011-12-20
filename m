@@ -1,91 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1312930360-30860-5-git-send-email-andre.guedes@openbossa.org>
-References: <1312930360-30860-1-git-send-email-andre.guedes@openbossa.org>
-	<1312930360-30860-5-git-send-email-andre.guedes@openbossa.org>
-Date: Tue, 20 Dec 2011 15:34:49 +0530
-Message-ID: <CAO6mCFnkgNNTz+OAxCx71nzNtTdm9VKghFm+6LxZXsz6_GMb9Q@mail.gmail.com>
-Subject: Re: [PATCH 4/4] Bluetooth: LE passive scan trigger in hci_connect()
-From: Sumit Bajpai <sumit.btle@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-id: <4EF04767.3040306@samsung.com>
+Date: Tue, 20 Dec 2011 17:29:27 +0900
+From: DoHyun Pyun <dh79.pyun@samsung.com>
+MIME-version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd] pbap: Fix NULL check rutine
+References: <1324366024-19523-1-git-send-email-dh79.pyun@samsung.com>
+In-reply-to: <1324366024-19523-1-git-send-email-dh79.pyun@samsung.com>
+Content-type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi, All
 
-Is there any update on this patch acceptance from community ?
-
-Best Regards
-Hemant
-
-On Wed, Aug 10, 2011 at 4:22 AM, Andre Guedes
-<andre.guedes@openbossa.org> wrote:
-> During LE connection, if the entry isn't found in the advertising
-> cache the passive scan is triggered and the connection creation is
-> postponed until the passive scan finishes.
+2011/12/20 16:27, DoHyun Pyun wrote:
+> If obj->buffer is NULL, we should exit the function.
+> Because the crash will be occured in string_read() function.
 >
-> The scan parameters were chosen based on some simulation results sent
-> to Bluetooth SIG mailing list (GATT Profile Architecture Working Group)
-> in April 2011.
->
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> THe previous statement returns the error when both obj->buffer and obj->aparams is NULL.
 > ---
->  net/bluetooth/hci_conn.c  |   18 ++++++++++++++----
->  net/bluetooth/hci_event.c |    2 ++
->  2 files changed, 16 insertions(+), 4 deletions(-)
+>   plugins/pbap.c |    2 +-
+>   1 files changed, 1 insertions(+), 1 deletions(-)
 >
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index cc36358..1f404cf 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -507,14 +507,24 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
->                if (le)
->                        return ERR_PTR(-EBUSY);
+> diff --git a/plugins/pbap.c b/plugins/pbap.c
+> index 0f07c46..e642599 100644
+> --- a/plugins/pbap.c
+> +++ b/plugins/pbap.c
+> @@ -996,7 +996,7 @@ static ssize_t vobject_pull_read(void *object, void *buf, size_t count)
+>   	DBG("buffer %p maxlistcount %d", obj->buffer,
+>   						pbap->params->maxlistcount);
 >
-> -               entry = hci_find_adv_entry(hdev, dst);
-> -               if (!entry)
-> -                       return ERR_PTR(-EHOSTUNREACH);
-> -
->                le = hci_conn_add(hdev, LE_LINK, dst);
->                if (!le)
->                        return ERR_PTR(-ENOMEM);
+> -	if (!obj->buffer&&  !obj->aparams)
+> +	if (!obj->buffer || !obj->aparams)
+>   		return -EAGAIN;
 >
-> +               entry = hci_find_adv_entry(hdev, dst);
-> +               if (!entry) {
-> +                       int err;
-> +
-> +                       err = hci_do_le_scan(hdev, 3869, 0x00, 0x60, 0x30);
-> +                       if (err < 0) {
-> +                               hci_conn_del(le);
-> +                               return ERR_PTR(err);
-> +                       }
-> +
-> +                       hci_conn_hold(le);
-> +                       return le;
-> +               }
-> +
->                le->dst_type = entry->bdaddr_type;
->
->                hci_le_connect(le);
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 6bbf4d7..540ee81 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -941,6 +941,8 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
->                        mgmt_start_discovery_complete(hdev->id);
->                        hci_dev_unlock(hdev);
->                }
-> +
-> +               hci_conn_check_pending(hdev, LE_LINK);
->        }
->  }
->
-> --
-> 1.7.5.2
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>   	if (pbap->params->maxlistcount == 0)
+
+I found some problems in this patch, and I will re-write the patch.
+So please ignore this patch.
+
+Thanks,
+Pyun
