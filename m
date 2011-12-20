@@ -2,204 +2,221 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 4/8] attrib-server: Attach attrib_channel in adapter clients list
-Date: Tue, 20 Dec 2011 16:57:57 +0100
-Message-Id: <1324396681-27276-5-git-send-email-sancane@gmail.com>
-In-Reply-To: <1324396681-27276-4-git-send-email-sancane@gmail.com>
+Subject: [PATCH 3/8] attrib-server: Add attributes in adapter database
+Date: Tue, 20 Dec 2011 16:57:56 +0100
+Message-Id: <1324396681-27276-4-git-send-email-sancane@gmail.com>
+In-Reply-To: <1324396681-27276-3-git-send-email-sancane@gmail.com>
 References: <1324396681-27276-1-git-send-email-sancane@gmail.com>
  <1324396681-27276-2-git-send-email-sancane@gmail.com>
  <1324396681-27276-3-git-send-email-sancane@gmail.com>
- <1324396681-27276-4-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch attaches attribute channels to the adapter list instead
-of using the global client list. Furthermore, we use the default
-adapter when attrib_channel_detach is invoked in order to keep
-backward compatibility until the interface is updated to accept
-the adapter too.
+Each adapter has its own database so the global database list
+will be removed. This patch makes a wrapper over attrib_db_add
+function to get the default adapter in order to add attributes
+in the default adapter, int his way we keep backward compatibility
+with the gatt server interface until the api is updated.
 ---
- src/attrib-server.c |   74 +++++++++++++++++++++++++++++++++++++++-----------
- 1 files changed, 57 insertions(+), 17 deletions(-)
+ src/attrib-server.c |   95 ++++++++++++++++++++++++++++++++------------------
+ 1 files changed, 61 insertions(+), 34 deletions(-)
 
 diff --git a/src/attrib-server.c b/src/attrib-server.c
-index c9b7796..8681652 100644
+index 68e8524..c9b7796 100644
 --- a/src/attrib-server.c
 +++ b/src/attrib-server.c
-@@ -62,6 +62,7 @@ struct gatt_adapter {
+@@ -61,6 +61,7 @@ struct gatt_adapter {
+ 	GIOChannel *le_io;
  	uint32_t gatt_sdp_handle;
  	uint32_t gap_sdp_handle;
- 	GSList *database;
-+	GSList *clients;
++	GSList *database;
  };
  
  struct gatt_channel {
-@@ -72,6 +73,7 @@ struct gatt_channel {
- 	gboolean le;
- 	guint id;
- 	gboolean encrypted;
-+	struct gatt_adapter *gadapter;
+@@ -100,8 +101,18 @@ static bt_uuid_t ccc_uuid = {
+ 			.value.u16 = GATT_CLIENT_CHARAC_CFG_UUID
  };
  
- struct group_elem {
-@@ -82,7 +84,6 @@ struct group_elem {
- };
- 
- static GIOChannel *le_io = NULL;
--static GSList *clients = NULL;
- 
- /* GAP attribute handles */
- static uint16_t name_handle = 0x0000;
-@@ -109,6 +110,13 @@ static void attrib_free(void *data)
- 	g_free(a);
- }
- 
-+static void channel_free(struct gatt_channel *channel)
++static void attrib_free(void *data)
 +{
-+	g_attrib_unref(channel->attrib);
++	struct attribute *a = data;
 +
-+	g_free(channel);
++	g_free(a->data);
++	g_free(a);
 +}
 +
  static void gatt_adapter_free(struct gatt_adapter *gadapter)
  {
- 	g_slist_free_full(gadapter->database, attrib_free);
-@@ -123,6 +131,8 @@ static void gatt_adapter_free(struct gatt_adapter *gadapter)
- 		g_io_channel_shutdown(gadapter->le_io, FALSE, NULL);
- 	}
- 
-+	g_slist_free_full(gadapter->clients, (GDestroyNotify) channel_free);
++	g_slist_free_full(gadapter->database, attrib_free);
 +
- 	if (gadapter->gatt_sdp_handle > 0)
- 		remove_record_from_server(gadapter->gatt_sdp_handle);
- 
-@@ -135,6 +145,17 @@ static void gatt_adapter_free(struct gatt_adapter *gadapter)
- 	g_free(gadapter);
+ 	if (gadapter->l2cap_io != NULL) {
+ 		g_io_channel_unref(gadapter->l2cap_io);
+ 		g_io_channel_shutdown(gadapter->l2cap_io, FALSE, NULL);
+@@ -227,7 +238,8 @@ static int attribute_cmp(gconstpointer a1, gconstpointer a2)
+ 	return attrib1->handle - attrib2->handle;
  }
  
-+static gint adapter_cmp_addr(gconstpointer a, gconstpointer b)
-+{
-+	const struct gatt_adapter *gadapter = a;
-+	const bdaddr_t *bdaddr = b;
-+	bdaddr_t src;
-+
-+	adapter_get_address(gadapter->adapter, &src);
-+
-+	return bacmp(&src, bdaddr);
-+}
-+
- static gint adapter_cmp(gconstpointer a, gconstpointer b)
+-static struct attribute *find_primary_range(uint16_t start, uint16_t *end)
++static struct attribute *find_primary_range(struct gatt_adapter *gadapter,
++						uint16_t start, uint16_t *end)
  {
- 	const struct gatt_adapter *gatt_adapter = a;
-@@ -146,6 +167,22 @@ static gint adapter_cmp(gconstpointer a, gconstpointer b)
- 	return -1;
+ 	struct attribute *attrib;
+ 	guint h = start;
+@@ -236,7 +248,8 @@ static struct attribute *find_primary_range(uint16_t start, uint16_t *end)
+ 	if (end == NULL)
+ 		return NULL;
+ 
+-	l = g_slist_find_custom(database, GUINT_TO_POINTER(h), handle_cmp);
++	l = g_slist_find_custom(gadapter->database, GUINT_TO_POINTER(h),
++								handle_cmp);
+ 	if (!l)
+ 		return NULL;
+ 
+@@ -269,7 +282,7 @@ static uint32_t attrib_create_sdp_new(struct gatt_adapter *gadapter,
+ 	uuid_t svc, gap_uuid;
+ 	bdaddr_t addr;
+ 
+-	a = find_primary_range(handle, &end);
++	a = find_primary_range(gadapter, handle, &end);
+ 
+ 	if (a == NULL)
+ 		return 0;
+@@ -303,6 +316,33 @@ static uint32_t attrib_create_sdp_new(struct gatt_adapter *gadapter,
+ 	return 0;
  }
  
-+static struct gatt_adapter *find_gatt_adapter(const bdaddr_t *bdaddr)
++static struct attribute *attrib_db_add_new(struct gatt_adapter *gadapter,
++				uint16_t handle, bt_uuid_t *uuid, int read_reqs,
++				int write_reqs, const uint8_t *value, int len)
 +{
-+	GSList *l;
++	struct attribute *a;
++	guint h = handle;
 +
-+	l = g_slist_find_custom(adapters, bdaddr, adapter_cmp_addr);
-+	if (l == NULL) {
-+		char addr[18];
++	DBG("handle=0x%04x", handle);
 +
-+		ba2str(bdaddr, addr);
-+		error("Not GATT adapter found for address %s", addr);
++	if (g_slist_find_custom(gadapter->database, GUINT_TO_POINTER(h),
++								handle_cmp))
 +		return NULL;
-+	}
 +
-+	return l->data;
++	a = g_new0(struct attribute, 1);
++	a->len = len;
++	a->data = g_memdup(value, len);
++	a->handle = handle;
++	a->uuid = *uuid;
++	a->read_reqs = read_reqs;
++	a->write_reqs = write_reqs;
++
++	gadapter->database = g_slist_insert_sorted(gadapter->database,
++							a, attribute_cmp);
++
++	return a;
 +}
 +
- static struct gatt_adapter *get_default_gatt_adapter(void)
+ static uint8_t att_check_reqs(struct gatt_channel *channel, uint8_t opcode,
+ 								int reqs)
  {
- 	struct btd_adapter *adapter;
-@@ -834,18 +871,12 @@ static uint16_t mtu_exchange(struct gatt_channel *channel, uint16_t mtu,
+@@ -794,14 +834,6 @@ static uint16_t mtu_exchange(struct gatt_channel *channel, uint16_t mtu,
  	return enc_mtu_resp(old_mtu, pdu, len);
  }
  
--static void channel_free(struct gatt_channel *channel)
+-static void attrib_free(void *data)
 -{
--	g_attrib_unref(channel->attrib);
+-	struct attribute *a = data;
 -
--	g_free(channel);
+-	g_free(a->data);
+-	g_free(a);
 -}
 -
- static void channel_disconnect(void *user_data)
+ static void channel_free(struct gatt_channel *channel)
  {
- 	struct gatt_channel *channel = user_data;
+ 	g_attrib_unref(channel->attrib);
+@@ -1062,7 +1094,8 @@ static gboolean register_core_services(struct gatt_adapter *gadapter)
+ 	/* GAP service: primary service definition */
+ 	bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+ 	att_put_u16(GENERIC_ACCESS_PROFILE_ID, &atval[0]);
+-	attrib_db_add(0x0001, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
++	attrib_db_add_new(gadapter, 0x0001, &uuid, ATT_NONE, ATT_NOT_PERMITTED,
++								atval, 2);
  
--	clients = g_slist_remove(clients, channel);
-+	channel->gadapter->clients = g_slist_remove(channel->gadapter->clients,
-+								channel);
- 	channel_free(channel);
- }
+ 	/* GAP service: device name characteristic */
+ 	name_handle = 0x0006;
+@@ -1070,12 +1103,13 @@ static gboolean register_core_services(struct gatt_adapter *gadapter)
+ 	atval[0] = ATT_CHAR_PROPER_READ;
+ 	att_put_u16(name_handle, &atval[1]);
+ 	att_put_u16(GATT_CHARAC_DEVICE_NAME, &atval[3]);
+-	attrib_db_add(0x0004, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
++	attrib_db_add_new(gadapter, 0x0004, &uuid, ATT_NONE, ATT_NOT_PERMITTED,
++								atval, 5);
  
-@@ -975,7 +1006,7 @@ done:
+ 	/* GAP service: device name attribute */
+ 	bt_uuid16_create(&uuid, GATT_CHARAC_DEVICE_NAME);
+-	attrib_db_add(name_handle, &uuid, ATT_NONE, ATT_NOT_PERMITTED,
+-								NULL, 0);
++	attrib_db_add_new(gadapter, name_handle, &uuid, ATT_NONE,
++						ATT_NOT_PERMITTED, NULL, 0);
  
- guint attrib_channel_attach(GAttrib *attrib, gboolean out)
+ 	/* GAP service: device appearance characteristic */
+ 	appearance_handle = 0x0008;
+@@ -1083,13 +1117,14 @@ static gboolean register_core_services(struct gatt_adapter *gadapter)
+ 	atval[0] = ATT_CHAR_PROPER_READ;
+ 	att_put_u16(appearance_handle, &atval[1]);
+ 	att_put_u16(GATT_CHARAC_APPEARANCE, &atval[3]);
+-	attrib_db_add(0x0007, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
++	attrib_db_add_new(gadapter, 0x0007, &uuid, ATT_NONE, ATT_NOT_PERMITTED,
++								atval, 5);
+ 
+ 	/* GAP service: device appearance attribute */
+ 	bt_uuid16_create(&uuid, GATT_CHARAC_APPEARANCE);
+ 	att_put_u16(appearance, &atval[0]);
+-	attrib_db_add(appearance_handle, &uuid, ATT_NONE, ATT_NOT_PERMITTED,
+-								atval, 2);
++	attrib_db_add_new(gadapter, appearance_handle, &uuid, ATT_NONE,
++						ATT_NOT_PERMITTED, atval, 2);
+ 	gadapter->gap_sdp_handle = attrib_create_sdp_new(gadapter, 0x0001,
+ 						"Generic Access Profile");
+ 	if (gadapter->gap_sdp_handle == 0) {
+@@ -1100,7 +1135,8 @@ static gboolean register_core_services(struct gatt_adapter *gadapter)
+ 	/* GATT service: primary service definition */
+ 	bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+ 	att_put_u16(GENERIC_ATTRIB_PROFILE_ID, &atval[0]);
+-	attrib_db_add(0x0010, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
++	attrib_db_add_new(gadapter, 0x0010, &uuid, ATT_NONE, ATT_NOT_PERMITTED,
++								atval, 2);
+ 
+ 	gadapter->gatt_sdp_handle = attrib_create_sdp_new(gadapter, 0x0010,
+ 						"Generic Attribute Profile");
+@@ -1232,25 +1268,16 @@ uint16_t attrib_db_find_avail(uint16_t nitems)
+ struct attribute *attrib_db_add(uint16_t handle, bt_uuid_t *uuid, int read_reqs,
+ 				int write_reqs, const uint8_t *value, int len)
  {
--	struct btd_adapter *adapter;
+-	struct attribute *a;
+-	guint h = handle;
 +	struct gatt_adapter *gadapter;
- 	struct btd_device *device;
- 	struct gatt_channel *channel;
- 	GIOChannel *io;
-@@ -1000,10 +1031,14 @@ guint attrib_channel_attach(GAttrib *attrib, gboolean out)
- 		return 0;
- 	}
  
--	adapter = manager_find_adapter(&channel->src);
-+	gadapter = find_gatt_adapter(&channel->src);
-+	if (gadapter == NULL)
-+		return 0;
-+
-+	channel->gadapter = gadapter;
+-	DBG("handle=0x%04x", handle);
++	DBG("Deprecated function!");
  
- 	ba2str(&channel->dst, addr);
--	device = adapter_find_device(adapter, addr);
-+	device = adapter_find_device(gadapter->adapter, addr);
- 
- 	if (device_is_bonded(device) == FALSE)
- 		delete_device_ccc(&channel->src, &channel->dst);
-@@ -1025,7 +1060,7 @@ guint attrib_channel_attach(GAttrib *attrib, gboolean out)
- 		g_attrib_set_disconnect_function(channel->attrib,
- 						channel_disconnect, channel);
- 
--	clients = g_slist_append(clients, channel);
-+	gadapter->clients = g_slist_append(gadapter->clients, channel);
- 
- 	return channel->id;
- }
-@@ -1040,11 +1075,18 @@ static gint channel_id_cmp(gconstpointer data, gconstpointer user_data)
- 
- gboolean attrib_channel_detach(guint id)
- {
-+	struct gatt_adapter *gadapter;
- 	struct gatt_channel *channel;
- 	GSList *l;
- 
--	l = g_slist_find_custom(clients, GUINT_TO_POINTER(id),
--						channel_id_cmp);
-+	DBG("Deprecated function");
-+
+-	if (g_slist_find_custom(database, GUINT_TO_POINTER(h), handle_cmp))
 +	gadapter = get_default_gatt_adapter();
 +	if (gadapter == NULL)
-+		return FALSE;
-+
-+	l = g_slist_find_custom(gadapter->clients, GUINT_TO_POINTER(id),
-+								channel_id_cmp);
- 	if (!l)
- 		return FALSE;
+ 		return NULL;
  
-@@ -1215,8 +1257,6 @@ void btd_adapter_gatt_server_stop(struct btd_adapter *adapter)
- 	gatt_adapter_free(gadapter);
- 
- 	g_slist_free_full(database, attrib_free);
+-	a = g_new0(struct attribute, 1);
+-	a->len = len;
+-	a->data = g_memdup(value, len);
+-	a->handle = handle;
+-	a->uuid = *uuid;
+-	a->read_reqs = read_reqs;
+-	a->write_reqs = write_reqs;
 -
--	g_slist_free_full(clients, (GDestroyNotify) channel_free);
+-	database = g_slist_insert_sorted(database, a, attribute_cmp);
+-
+-	return a;
++	return attrib_db_add_new(gadapter, handle, uuid, read_reqs, write_reqs,
++								value, len);
  }
  
- uint32_t attrib_create_sdp(uint16_t handle, const char *name)
+ int attrib_db_update(uint16_t handle, bt_uuid_t *uuid, const uint8_t *value,
 -- 
 1.7.8
 
