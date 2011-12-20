@@ -1,19 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Brian Gix <bgix@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH-v7 0/2] Bluetooth: Add MITM protection to LE-SMP
-Date: Tue, 20 Dec 2011 17:04:40 -0800
-Message-Id: <1324429482-2755-1-git-send-email-bgix@codeaurora.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Bing Zhao <bzhao@marvell.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Gustavo Padovan <padovan@profusion.mobi>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 20 Dec 2011 15:30:19 -0800
+Subject: RE: Bluetooth: btusb: urb->interval speed check in
+ btusb_submit_isoc_urb()
+Message-ID: <477F20668A386D41ADCC57781B1F704308185E3C27@SC-VEXCH1.marvell.com>
+References: <1321504842-11199-1-git-send-email-bzhao@marvell.com>
+	 <20111121155255.GD2552@joana>
+	 <477F20668A386D41ADCC57781B1F704308185E345D@SC-VEXCH1.marvell.com>
+ <1324258083.1965.96.camel@aeonflux>
+In-Reply-To: <1324258083.1965.96.camel@aeonflux>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-These patches are identical to Version 6 of the same patchset, except
-that they have been rebased onto the latest code, including the new
-work queue patches.
-
--- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum 
+SGkgTWFyY2VsLA0KDQo+IFN1YmplY3Q6IFJlOiBCbHVldG9vdGg6IGJ0dXNiOiB1cmItPmludGVy
+dmFsIHNwZWVkIGNoZWNrIGluIGJ0dXNiX3N1Ym1pdF9pc29jX3VyYigpDQo+IA0KPiBIaSBCaW5n
+LA0KPiANCj4gPiBJbiBkcml2ZXJzL0JsdWV0b290aC9idHVzYi5jLCBmdW5jdGlvbiBidHVzYl9z
+ZW5kX2ZyYW1lKCksIHdlIGNhbGwNCj4gPg0KPiA+ICAgICAgICAgdXNiX2ZpbGxfaW50X3VyYih1
+cmIsIGRhdGEtPnVkZXYsIHBpcGUsDQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgc2tiLT5k
+YXRhLCBza2ItPmxlbiwgYnR1c2JfaXNvY190eF9jb21wbGV0ZSwNCj4gPiAgICAgICAgICAgICAg
+ICAgICAgICAgICBza2IsIGRhdGEtPmlzb2NfdHhfZXAtPmJJbnRlcnZhbCk7DQo+ID4NCj4gPiBp
+biBjYXNlIEhDSV9TQ09EQVRBX1BLVC4gVGhlIGlubGluZSBmdW5jdGlvbiB1c2JfZmlsbF9pbnRf
+dXJiIHdpbGwgY2hlY2sgVVNCX1NQRUVEX0hJR0ggb3INCj4gVVNCX1NQRUVEX1NVUEVSIHRvIGFz
+c2lnbiBkaWZmZXJlbnQgdmFsdWUgdG8gdXJiLT5pbnRlcnZhbC4NCj4gPg0KPiA+ICAgICAgICAg
+aWYgKGRldi0+c3BlZWQgPT0gVVNCX1NQRUVEX0hJR0ggfHwgZGV2LT5zcGVlZCA9PSBVU0JfU1BF
+RURfU1VQRVIpDQo+ID4gICAgICAgICAgICAgICAgIHVyYi0+aW50ZXJ2YWwgPSAxIDw8IChpbnRl
+cnZhbCAtIDEpOw0KPiA+ICAgICAgICAgZWxzZQ0KPiA+ICAgICAgICAgICAgICAgICB1cmItPmlu
+dGVydmFsID0gaW50ZXJ2YWw7DQo+ID4NCj4gPiBTaGFsbCB3ZSBkbyB0aGUgc2FtZSBjaGVjayBm
+b3IgYnR1c2Jfc3VibWl0X2lzb2NfdXJiKCk/DQo+IA0KPiBJIGhvbmVzdGx5IGRvIG5vdCBrbm93
+LiBNYXliZSBqdXN0IHVzaW5nIHVzYl9maWxsX2ludF91cmIgaGVyZSBtaWdodCBiZQ0KPiBhIGdv
+b2QgaWRlYS4gT25lIGlzIHRoZSBUWCBhbmQgb25lIGlzIHRoZSBSWCBVUkIuIFlvdSBuZWVkIHRv
+IGdvIGludG8NCj4gdGhlIFVTQiBzdWJzeXN0ZW0gYW5kIHNlZSBpZiBpdCBhY3R1YWxseSBtYWtl
+cyBhIGRpZmZlcmVudC4NCg0KVGhhbmtzIGZvciB5b3VyIHN1Z2dlc3Rpb24uIEkgd2lsbCBzZW5k
+IGEgcGF0Y2ggdXNpbmcgdXNiX2ZpbGxfaW50X3VyYigpIGZvciBSWCBVUkIuDQoNClJlZ2FyZHMs
+DQpCaW5nDQoNCj4gDQo+IEhvd2V2ZXIgd2Ugc2hvdWxkIG5vdCBoYW5kY29kZSBhbnl0aGluZyBm
+cm9tIHRoZSBVU0Igc3Vic3lzdGVtLiBXZSBtYWRlDQo+IHRoYXQgbWlzdGFrZSBiZWZvcmUgd2l0
+aCBoY2lfdXNiLmMgZnJvbSB0aGUgMi40LnggdGltZXMgYW5kIGl0IHdhcyBhDQo+IHZhbHVhYmxl
+IGxlc3NvbiBsZWFybmVkIG9uIHRoaW5ncyBub3QgdG8gZG8uDQo+IA0KPiBSZWdhcmRzDQo+IA0K
+PiBNYXJjZWwNCj4gDQoNCg==
