@@ -1,52 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1324417223.1965.137.camel@aeonflux>
-Subject: Re: [RFC BlueZ]Proximity Monitor Discussion
+Message-ID: <1324414977.1965.135.camel@aeonflux>
+Subject: Re: [PATCHv3 5/5] Bluetooth: Correct packet len calculation
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Hemant Gupta <hemantgupta.ste@gmail.com>
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	Anderson Briglia <anderson.briglia@openbossa.org>,
-	Anderson Lizardo <anderson.lizardo@openbossa.org>,
+To: Gustavo Padovan <padovan@profusion.mobi>
+Cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
 	linux-bluetooth@vger.kernel.org
-Date: Tue, 20 Dec 2011 13:40:23 -0800
-In-Reply-To: <CACj007=vVUEwvaqr7JhMqJ8VK95j2epK+1_Z+_cJ=1-+UwVnGw@mail.gmail.com>
-References: <CACj007=vVUEwvaqr7JhMqJ8VK95j2epK+1_Z+_cJ=1-+UwVnGw@mail.gmail.com>
+Date: Tue, 20 Dec 2011 13:02:57 -0800
+In-Reply-To: <20111220190504.GA24612@joana>
+References: <1324305091-19393-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1324305091-19393-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <20111220190504.GA24612@joana>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hemant,
+Hi Gustavo,
 
-> > Please sync with Anderson Briglia, he already sent a RFC to the ML
-> > some months ago.
-> > In the Bluetooth Summit(Prague), we decided to not proceed with RSSI
-> > monitor emulation in the kernel until we have a clear idea or spec
-> > defining how the controllers will implement RSSI monitoring.
-> Could you please provide some details about what was discussed in the summit.
+> > Remove unneeded skb_pull and correct packet length calculation
+> > removing magic number. Move BT_DBG after len check otherwise
+> > it could possibly access wrong memory.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  net/bluetooth/hci_event.c |    9 ++++-----
+> >  1 files changed, 4 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index 919e3c0..47e1476 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -2266,20 +2266,19 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+> >  	struct hci_ev_num_comp_pkts *ev = (void *) skb->data;
+> >  	int i;
+> >  
+> > -	skb_pull(skb, sizeof(*ev));
+> > -
+> > -	BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
+> > -
+> >  	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_PACKET_BASED) {
+> >  		BT_ERR("Wrong event for mode %d", hdev->flow_ctl_mode);
+> >  		return;
+> >  	}
+> >  
+> > -	if (skb->len < ev->num_hndl * 4) {
+> > +	if (skb->len < sizeof(*ev) || skb->len < sizeof(*ev) +
+> > +			ev->num_hndl * sizeof(struct hci_comp_pkts_info)) {
 > 
-> > The ideia was to provide transparency, the userspace doesn't need to
-> > know if RSSI monitoring is emulated or not.
-> 
-> As per my understanding the BT spec (4.0, Volume 2, Part E, Section
-> 7.5.4) the HCI_Read_RSSI command can be used to retrieve the RSSI from
-> the controller. In our case, I have tested it against ST-Ericsson BT
-> controller  and it works in our case. Are you suggesting that until we
-> know how the RSSI is determined in controller, we should not implement
-> this functionality in kernel ? I ask this because in Proximity Spec,
-> it is mentioned that the monitor should use appropriate calculations
-> to prevent false alerts on reporter, so if we leave this to layer
-> above BlueZ to do this part, then we are pretty independent with the
-> approach of implementation of Path Loss RSSI Monitoring in BlueZ and
-> Kernel.
-> 
-> If I misunderstood anything please clarify.
+> I think you can remove the first part of this check.
 
-we need proper notifications about RSSI changes triggered by the
-Bluetooth controller and not having the host polling the controller all
-the time. So just the existence of HCI_Read_RSSI is not enough to make
-this part efficient. And we can only emulate the RSSI notification via
-polling once we know how the new HCI commands will look like. We are
-kinda stuck here.
+you are accessing ev->num_handl, so you need to ensure that you have at
+least ev->num_handl size of data in your SKB. So this code is correct.
 
 Regards
 
