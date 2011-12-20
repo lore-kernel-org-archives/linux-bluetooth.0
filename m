@@ -1,28 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: RFC: Multi-adapter GATT server support
-Date: Tue, 20 Dec 2011 16:57:53 +0100
-Message-Id: <1324396681-27276-1-git-send-email-sancane@gmail.com>
+Date: Tue, 20 Dec 2011 13:47:26 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH hcidump] Restore --verbose/-V option
+Message-ID: <20111220154726.GA18981@joana>
+References: <1324388833-28015-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1324388833-28015-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Here you have a new set of rearranged patches wich initialize and stop
-a GATT server in each adapter. Now, all GATT stuff is managed separately
-in the adapter instead using global lists and variables.
+Hi Szymon,
 
-Next step is to modify gatt server api in order to provide the adapter
-in which GATT servers will able to register the attributes for each
-service. This feature will enable plugins to register services when each
-adapter is plugged instead doing that when the plugins are initialized.
+* Szymon Janc <szymon.janc@tieto.com> [2011-12-20 14:47:13 +0100]:
 
-comments are welcome.
+> Ignore --verbose and -V options instead of printing usage info. This
+> is for compatibility with hcidump 1.x to not break scripts.
 
-[PATCH 1/8] attrib-server: Initial steps towards multi-adapter GATT
-[PATCH 2/8] attrib-server: Register GATT SDP record per each adapter
-[PATCH 3/8] attrib-server: Add attributes in adapter database
-[PATCH 4/8] attrib-server: Attach attrib_channel in adapter clients
-[PATCH 5/8] attrib-server: Remove global le_io variable
-[PATCH 6/8] attrib-server: Remove global database list
-[PATCH 7/8] attrib-server: Mark attrib_channel_detach as deprecated
-[PATCH 8/8] gatt-example: Use adapter driver to register GATT
+Why do we need to keep compatibility between major versions?
+If the -V option means nothing we should inform the user about that and show
+hem the help.
+
+	Gustavo
