@@ -1,25 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1324400033.1965.123.camel@aeonflux>
-Subject: Re: [PATCH hcidump] Restore --verbose/-V option
+Message-ID: <1324399902.1965.121.camel@aeonflux>
+Subject: Re: [PATCH 3/3] Bluetooth: Rename info_work to info_timer
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Szymon Janc <szymon.janc@tieto.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 20 Dec 2011 08:53:53 -0800
-In-Reply-To: <1324388833-28015-1-git-send-email-szymon.janc@tieto.com>
-References: <1324388833-28015-1-git-send-email-szymon.janc@tieto.com>
+Date: Tue, 20 Dec 2011 08:51:42 -0800
+In-Reply-To: <1324385848-19101-3-git-send-email-padovan@profusion.mobi>
+References: <1324385848-19101-1-git-send-email-padovan@profusion.mobi>
+	 <1324385848-19101-2-git-send-email-padovan@profusion.mobi>
+	 <1324385848-19101-3-git-send-email-padovan@profusion.mobi>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Gustavo,
 
-> Ignore --verbose and -V options instead of printing usage info. This
-> is for compatibility with hcidump 1.x to not break scripts.
+> It makes more sense this way, since info_timer is a timer using delayed
+> work API.
+> 
+> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> ---
+>  include/net/bluetooth/l2cap.h |    2 +-
+>  net/bluetooth/l2cap_core.c    |   14 +++++++-------
+>  2 files changed, 8 insertions(+), 8 deletions(-)
 
-it is a new major version and scripts will break eventually. You are
-just trying to delay this. And when I make 3.x and then the same patch
-will come up again. You might wanna look into a tool called sed ;)
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
