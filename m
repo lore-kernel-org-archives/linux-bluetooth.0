@@ -1,63 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+From: Ulisses Furquim <ulisses@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH 1/2] Bluetooth: fix bt_accept_dequeue() to work in process context
-Date: Tue, 20 Dec 2011 17:15:56 -0200
-Message-Id: <1324408558-24653-1-git-send-email-padovan@profusion.mobi>
+Cc: padovan@profusion.mobi, Ulisses Furquim <ulisses@profusion.mobi>
+Subject: [PATCH] Bluetooth: Remove global mutex hci_task_lock
+Date: Tue, 20 Dec 2011 17:10:51 -0200
+Message-Id: <1324408251-8116-1-git-send-email-ulisses@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+The hci_task_lock mutex (previously a lock) was supposed to protect the
+register/unregister of HCI protocols against RX/TX tasks. This will not
+be needed anymore because SCO and L2CAP will always be compiled.
 
-No local_bh_disable is needed there once we run everything in process
-context. The same goes for the replacement of bh_lock_sock() by
-lock_sock().
+Moreover, with the recent move of RX/TX to workqueues per device the
+global hci_task_lock was causing starvation between different HCI
+devices.
 
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
 ---
- net/bluetooth/af_bluetooth.c |   11 ++++-------
- 1 files changed, 4 insertions(+), 7 deletions(-)
+ net/bluetooth/hci_core.c |   21 +--------------------
+ 1 files changed, 1 insertions(+), 20 deletions(-)
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 062124c..cdcfcab 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -199,15 +199,14 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d6382db..b45b745 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -61,8 +61,6 @@ static void hci_rx_work(struct work_struct *work);
+ static void hci_cmd_work(struct work_struct *work);
+ static void hci_tx_work(struct work_struct *work);
  
- 	BT_DBG("parent %p", parent);
+-static DEFINE_MUTEX(hci_task_lock);
+-
+ /* HCI device list */
+ LIST_HEAD(hci_dev_list);
+ DEFINE_RWLOCK(hci_dev_list_lock);
+@@ -1800,8 +1798,7 @@ EXPORT_SYMBOL(hci_recv_stream_fragment);
  
--	local_bh_disable();
- 	list_for_each_safe(p, n, &bt_sk(parent)->accept_q) {
- 		sk = (struct sock *) list_entry(p, struct bt_sock, accept_q);
+ /* ---- Interface to upper protocols ---- */
  
--		bh_lock_sock(sk);
-+		lock_sock(sk);
+-/* Register/Unregister protocols.
+- * hci_task_lock is used to ensure that no tasks are running. */
++/* Register/Unregister protocols. */
+ int hci_register_proto(struct hci_proto *hp)
+ {
+ 	int err = 0;
+@@ -1811,15 +1808,11 @@ int hci_register_proto(struct hci_proto *hp)
+ 	if (hp->id >= HCI_MAX_PROTO)
+ 		return -EINVAL;
  
- 		/* FIXME: Is this check still needed */
- 		if (sk->sk_state == BT_CLOSED) {
--			bh_unlock_sock(sk);
-+			release_sock(sk);
- 			bt_accept_unlink(sk);
- 			continue;
- 		}
-@@ -218,14 +217,12 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
- 			if (newsock)
- 				sock_graft(sk, newsock);
+-	mutex_lock(&hci_task_lock);
+-
+ 	if (!hci_proto[hp->id])
+ 		hci_proto[hp->id] = hp;
+ 	else
+ 		err = -EEXIST;
  
--			bh_unlock_sock(sk);
--			local_bh_enable();
-+			release_sock(sk);
- 			return sk;
- 		}
- 
--		bh_unlock_sock(sk);
-+		release_sock(sk);
- 	}
--	local_bh_enable();
- 
- 	return NULL;
+-	mutex_unlock(&hci_task_lock);
+-
+ 	return err;
  }
+ EXPORT_SYMBOL(hci_register_proto);
+@@ -1833,15 +1826,11 @@ int hci_unregister_proto(struct hci_proto *hp)
+ 	if (hp->id >= HCI_MAX_PROTO)
+ 		return -EINVAL;
+ 
+-	mutex_lock(&hci_task_lock);
+-
+ 	if (hci_proto[hp->id])
+ 		hci_proto[hp->id] = NULL;
+ 	else
+ 		err = -ENOENT;
+ 
+-	mutex_unlock(&hci_task_lock);
+-
+ 	return err;
+ }
+ EXPORT_SYMBOL(hci_unregister_proto);
+@@ -2407,8 +2396,6 @@ static void hci_tx_work(struct work_struct *work)
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev, tx_work);
+ 	struct sk_buff *skb;
+ 
+-	mutex_lock(&hci_task_lock);
+-
+ 	BT_DBG("%s acl %d sco %d le %d", hdev->name, hdev->acl_cnt,
+ 		hdev->sco_cnt, hdev->le_cnt);
+ 
+@@ -2425,8 +2412,6 @@ static void hci_tx_work(struct work_struct *work)
+ 	/* Send next queued raw (unknown type) packet */
+ 	while ((skb = skb_dequeue(&hdev->raw_q)))
+ 		hci_send_frame(skb);
+-
+-	mutex_unlock(&hci_task_lock);
+ }
+ 
+ /* ----- HCI RX task (incoming data processing) ----- */
+@@ -2514,8 +2499,6 @@ static void hci_rx_work(struct work_struct *work)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+-	mutex_lock(&hci_task_lock);
+-
+ 	while ((skb = skb_dequeue(&hdev->rx_q))) {
+ 		if (atomic_read(&hdev->promisc)) {
+ 			/* Send copy to the sockets */
+@@ -2559,8 +2542,6 @@ static void hci_rx_work(struct work_struct *work)
+ 			break;
+ 		}
+ 	}
+-
+-	mutex_unlock(&hci_task_lock);
+ }
+ 
+ static void hci_cmd_work(struct work_struct *work)
 -- 
-1.7.6.4
+1.7.8.rc4
 
