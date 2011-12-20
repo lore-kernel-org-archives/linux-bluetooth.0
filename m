@@ -1,94 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1324414682.1965.130.camel@aeonflux>
-References: <1324408251-8116-1-git-send-email-ulisses@profusion.mobi>
-	<1324414682.1965.130.camel@aeonflux>
-Date: Tue, 20 Dec 2011 19:02:29 -0200
-Message-ID: <CAA37ika0HPrGURF+oCaDJUYcW2m+ScNVXd75cPkj7wFbF7WfWQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Remove global mutex hci_task_lock
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1324414866.1965.133.camel@aeonflux>
+Subject: Re: [PATCH 2/2] Bluetooth: Remove HCI_PRIO_MAX from ctrl cdm in
+ RFCOMM
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 20 Dec 2011 13:01:06 -0800
+In-Reply-To: <1324408558-24653-2-git-send-email-padovan@profusion.mobi>
+References: <1324408558-24653-1-git-send-email-padovan@profusion.mobi>
+	 <1324408558-24653-2-git-send-email-padovan@profusion.mobi>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Gustavo,
 
-On Tue, Dec 20, 2011 at 6:58 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Ulisses,
->
->> The hci_task_lock mutex (previously a lock) was supposed to protect the
->> register/unregister of HCI protocols against RX/TX tasks. This will not
->> be needed anymore because SCO and L2CAP will always be compiled.
->>
->> Moreover, with the recent move of RX/TX to workqueues per device the
->> global hci_task_lock was causing starvation between different HCI
->> devices.
->>
->> Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
->> ---
->> =A0net/bluetooth/hci_core.c | =A0 21 +--------------------
->> =A01 files changed, 1 insertions(+), 20 deletions(-)
->
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
->
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index d6382db..b45b745 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -61,8 +61,6 @@ static void hci_rx_work(struct work_struct *work);
->> =A0static void hci_cmd_work(struct work_struct *work);
->> =A0static void hci_tx_work(struct work_struct *work);
->>
->> -static DEFINE_MUTEX(hci_task_lock);
->> -
->> =A0/* HCI device list */
->> =A0LIST_HEAD(hci_dev_list);
->> =A0DEFINE_RWLOCK(hci_dev_list_lock);
->> @@ -1800,8 +1798,7 @@ EXPORT_SYMBOL(hci_recv_stream_fragment);
->>
->> =A0/* ---- Interface to upper protocols ---- */
->>
->> -/* Register/Unregister protocols.
->> - * hci_task_lock is used to ensure that no tasks are running. */
->> +/* Register/Unregister protocols. */
->> =A0int hci_register_proto(struct hci_proto *hp)
->> =A0{
->> =A0 =A0 =A0 int err =3D 0;
->> @@ -1811,15 +1808,11 @@ int hci_register_proto(struct hci_proto *hp)
->> =A0 =A0 =A0 if (hp->id >=3D HCI_MAX_PROTO)
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
->>
->> - =A0 =A0 mutex_lock(&hci_task_lock);
->> -
->> =A0 =A0 =A0 if (!hci_proto[hp->id])
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 hci_proto[hp->id] =3D hp;
->> =A0 =A0 =A0 else
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D -EEXIST;
->>
->> - =A0 =A0 mutex_unlock(&hci_task_lock);
->> -
->> =A0 =A0 =A0 return err;
->> =A0}
->
-> This only works fine because we are registering the protocols from the
-> module init. So what I like to see is that we get rid of this altogether
-> and just call directly into the specific event functions for L2CAP and
-> SCO since there are the only users anyway. Making them replaceable was a
-> nice idea, but it is not practical anymore.
+> RFCOMM needs a proper priority mechanism inside itself and not try to use
+> l2cap priority to fix its own problem.
 
-Exactly, I'm on it right now.
+<snip>
+ 
+>  static void rfcomm_make_uih(struct sk_buff *skb, u8 addr)
+> @@ -1786,8 +1776,15 @@ static inline int rfcomm_process_tx(struct rfcomm_dlc *d)
+>  		return skb_queue_len(&d->tx_queue);
+>  
+>  	while (d->tx_credits && (skb = skb_dequeue(&d->tx_queue))) {
+> -		err = rfcomm_send_frame(d->session, skb->data, skb->len,
+> -							skb->priority);
+> +		struct socket *sock = d->session->sock;
+> +		struct sock *sk = sock->sk;
+> +
+> +		if (sk->sk_priority != skb->priority) {
+> +			lock_sock(sk);
+> +			sk->sk_priority = skb->priority;
+> +			release_sock(sk);
+> +		}
+> +		err = rfcomm_send_frame(d->session, skb->data, skb->len);
+>  		if (err < 0) {
+>  			skb_queue_head(&d->tx_queue, skb);
+>  			break;
 
-> Regards
->
-> Marcel
+coming to think about this, we might not even bother setting the
+sk->sk_priority at all here. Lets just forget about RFCOMM.
 
-Regards,
+Regards
 
---=20
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+Marcel
+
+
