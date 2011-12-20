@@ -1,105 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAO6mCFnkgNNTz+OAxCx71nzNtTdm9VKghFm+6LxZXsz6_GMb9Q@mail.gmail.com>
-References: <1312930360-30860-1-git-send-email-andre.guedes@openbossa.org>
-	<1312930360-30860-5-git-send-email-andre.guedes@openbossa.org>
-	<CAO6mCFnkgNNTz+OAxCx71nzNtTdm9VKghFm+6LxZXsz6_GMb9Q@mail.gmail.com>
-Date: Tue, 20 Dec 2011 10:08:19 -0300
-Message-ID: <CACJA=fWDxsjBiG+mDAhq8Tk3aqtKxt6h7tsjEbJnzuD8jfLuaQ@mail.gmail.com>
-Subject: Re: [PATCH 4/4] Bluetooth: LE passive scan trigger in hci_connect()
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Sumit Bajpai <sumit.btle@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: [PATCH 3/3] Bluetooth: Rename info_work to info_timer
+Date: Tue, 20 Dec 2011 10:57:28 -0200
+Message-Id: <1324385848-19101-3-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1324385848-19101-2-git-send-email-padovan@profusion.mobi>
+References: <1324385848-19101-1-git-send-email-padovan@profusion.mobi>
+ <1324385848-19101-2-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hemant,
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 
-This work depends on discovery patches which are not upstream yet. I'm
-rebasing discovery series and I'll resend it by the end of this week.
+It makes more sense this way, since info_timer is a timer using delayed
+work API.
 
-As soon as we have discovery upstream we'll work on this LE connection
-improvements.
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+---
+ include/net/bluetooth/l2cap.h |    2 +-
+ net/bluetooth/l2cap_core.c    |   14 +++++++-------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-BR,
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index fc481d1..f141fbe 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -522,7 +522,7 @@ struct l2cap_conn {
+ 	__u8		info_state;
+ 	__u8		info_ident;
+ 
+-	struct delayed_work info_work;
++	struct delayed_work info_timer;
+ 
+ 	spinlock_t	lock;
+ 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index d006455..a898285 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -699,7 +699,7 @@ static void l2cap_do_start(struct l2cap_chan *chan)
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_SENT;
+ 		conn->info_ident = l2cap_get_ident(conn);
+ 
+-		schedule_delayed_work(&conn->info_work,
++		schedule_delayed_work(&conn->info_timer,
+ 					msecs_to_jiffies(L2CAP_INFO_TIMEOUT));
+ 
+ 		l2cap_send_cmd(conn, conn->info_ident,
+@@ -996,7 +996,7 @@ static void l2cap_conn_unreliable(struct l2cap_conn *conn, int err)
+ static void l2cap_info_timeout(struct work_struct *work)
+ {
+ 	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
+-							info_work.work);
++							info_timer.work);
+ 
+ 	conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+ 	conn->info_ident = 0;
+@@ -1029,7 +1029,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 	hci_chan_del(conn->hchan);
+ 
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+-		cancel_delayed_work_sync(&conn->info_work);
++		cancel_delayed_work_sync(&conn->info_timer);
+ 
+ 	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->pend)) {
+ 		cancel_delayed_work_sync(&conn->security_timer);
+@@ -1089,7 +1089,7 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+ 	if (hcon->type == LE_LINK)
+ 		INIT_DELAYED_WORK(&conn->security_timer, security_timeout);
+ 	else
+-		INIT_DELAYED_WORK(&conn->info_work, l2cap_info_timeout);
++		INIT_DELAYED_WORK(&conn->info_timer, l2cap_info_timeout);
+ 
+ 	conn->disc_reason = HCI_ERROR_REMOTE_USER_TERM;
+ 
+@@ -2583,7 +2583,7 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 
+ 	if ((conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT) &&
+ 					cmd->ident == conn->info_ident) {
+-		cancel_delayed_work_sync(&conn->info_work);
++		cancel_delayed_work_sync(&conn->info_timer);
+ 
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+ 		conn->info_ident = 0;
+@@ -2704,7 +2704,7 @@ sendresp:
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_SENT;
+ 		conn->info_ident = l2cap_get_ident(conn);
+ 
+-		schedule_delayed_work(&conn->info_work,
++		schedule_delayed_work(&conn->info_timer,
+ 					msecs_to_jiffies(L2CAP_INFO_TIMEOUT));
+ 
+ 		l2cap_send_cmd(conn, conn->info_ident,
+@@ -3129,7 +3129,7 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
+ 			conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE)
+ 		return 0;
+ 
+-	cancel_delayed_work_sync(&conn->info_work);
++	cancel_delayed_work_sync(&conn->info_timer);
+ 
+ 	if (result != L2CAP_IR_SUCCESS) {
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+-- 
+1.7.6.4
 
-Andre
-
-On Tue, Dec 20, 2011 at 7:04 AM, Sumit Bajpai <sumit.btle@gmail.com> wrote:
-> Hi Andre,
->
-> Is there any update on this patch acceptance from community ?
->
-> Best Regards
-> Hemant
->
-> On Wed, Aug 10, 2011 at 4:22 AM, Andre Guedes
-> <andre.guedes@openbossa.org> wrote:
->> During LE connection, if the entry isn't found in the advertising
->> cache the passive scan is triggered and the connection creation is
->> postponed until the passive scan finishes.
->>
->> The scan parameters were chosen based on some simulation results sent
->> to Bluetooth SIG mailing list (GATT Profile Architecture Working Group)
->> in April 2011.
->>
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->>  net/bluetooth/hci_conn.c  |   18 ++++++++++++++----
->>  net/bluetooth/hci_event.c |    2 ++
->>  2 files changed, 16 insertions(+), 4 deletions(-)
->>
->> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->> index cc36358..1f404cf 100644
->> --- a/net/bluetooth/hci_conn.c
->> +++ b/net/bluetooth/hci_conn.c
->> @@ -507,14 +507,24 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
->>                if (le)
->>                        return ERR_PTR(-EBUSY);
->>
->> -               entry = hci_find_adv_entry(hdev, dst);
->> -               if (!entry)
->> -                       return ERR_PTR(-EHOSTUNREACH);
->> -
->>                le = hci_conn_add(hdev, LE_LINK, dst);
->>                if (!le)
->>                        return ERR_PTR(-ENOMEM);
->>
->> +               entry = hci_find_adv_entry(hdev, dst);
->> +               if (!entry) {
->> +                       int err;
->> +
->> +                       err = hci_do_le_scan(hdev, 3869, 0x00, 0x60, 0x30);
->> +                       if (err < 0) {
->> +                               hci_conn_del(le);
->> +                               return ERR_PTR(err);
->> +                       }
->> +
->> +                       hci_conn_hold(le);
->> +                       return le;
->> +               }
->> +
->>                le->dst_type = entry->bdaddr_type;
->>
->>                hci_le_connect(le);
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index 6bbf4d7..540ee81 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -941,6 +941,8 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
->>                        mgmt_start_discovery_complete(hdev->id);
->>                        hci_dev_unlock(hdev);
->>                }
->> +
->> +               hci_conn_check_pending(hdev, LE_LINK);
->>        }
->>  }
->>
->> --
->> 1.7.5.2
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
