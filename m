@@ -1,46 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@googlemail.com>
+Date: Wed, 21 Dec 2011 14:53:45 +0200
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: johan.hedberg@gmail.com,
-	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH] Add support for 3rd party Memorex Wiimote
-Date: Wed, 21 Dec 2011 14:13:48 +0100
-Message-Id: <1324473228-9482-1-git-send-email-dh.herrmann@googlemail.com>
+Subject: Re: [PATCH] Bluetooth: Remove magic numbers from le scan cmd
+Message-ID: <20111221125343.GD21295@aemeltch-MOBL1>
+References: <1324304058-18944-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1324304058-18944-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The 3rd party Memorex Wiimote is compatible with the normal wiimote but uses
-different VID/PID values.
-If we add more combinations we probably need some lookup-table, but for now this
-seems ok.
----
- plugins/wiimote.c |    6 +++++-
- 1 files changed, 5 insertions(+), 1 deletions(-)
+On Mon, Dec 19, 2011 at 04:14:18PM +0200, Emeltchenko Andrei wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Make code readable by removing magic numbers.
 
-diff --git a/plugins/wiimote.c b/plugins/wiimote.c
-index fead72a..45e5729 100644
---- a/plugins/wiimote.c
-+++ b/plugins/wiimote.c
-@@ -53,6 +53,10 @@
-  * to the input service, then auto-reconnect is not enabled.
-  * If enabled, the wiimote connects to the host automatically when any button
-  * is pressed.
-+ *
-+ * Knwon VID/PID combinations:
-+ *  - 057e:0306 Official Nintendo Wii Remotes
-+ *  - 054c:0306 Memorex Wii Remotes (3rd party)
-  */
- 
- static ssize_t wii_pincb(struct btd_adapter *adapter, struct btd_device *device,
-@@ -67,7 +71,7 @@ static ssize_t wii_pincb(struct btd_adapter *adapter, struct btd_device *device,
- 	ba2str(&dba, addr);
- 
- 	vendor = btd_device_get_vendor(device);
--	if (vendor != 0x057e)
-+	if (vendor != 0x057e && vendor != 0x054c)
- 		return 0;
- 
- 	product = btd_device_get_product(device);
--- 
-1.7.8
+Gustavo what do you think about this one?
+
+Best regards 
+Andrei Emeltchenko 
+
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  include/net/bluetooth/hci.h |    3 +++
+>  net/bluetooth/hci_event.c   |   12 ++++++++++--
+>  2 files changed, 13 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 2e48d32..c019b27 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -800,6 +800,9 @@ struct hci_cp_le_set_scan_param {
+>  	__u8    filter_policy;
+>  } __packed;
+>  
+> +#define LE_SCANNING_DISABLED		0x00
+> +#define LE_SCANNING_ENABLED		0x01
+> +
+>  #define HCI_OP_LE_SET_SCAN_ENABLE	0x200c
+>  struct hci_cp_le_set_scan_enable {
+>  	__u8     enable;
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index fc5338f..4275816 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1030,7 +1030,8 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+>  	if (!cp)
+>  		return;
+>  
+> -	if (cp->enable == 0x01) {
+> +	switch (cp->enable) {
+> +	case LE_SCANNING_ENABLED:
+>  		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
+>  
+>  		cancel_delayed_work_sync(&hdev->adv_work);
+> @@ -1038,12 +1039,19 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+>  		hci_dev_lock(hdev);
+>  		hci_adv_entries_clear(hdev);
+>  		hci_dev_unlock(hdev);
+> -	} else if (cp->enable == 0x00) {
+> +		break;
+> +
+> +	case LE_SCANNING_DISABLED:
+>  		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
+>  
+>  		cancel_delayed_work_sync(&hdev->adv_work);
+>  		queue_delayed_work(hdev->workqueue, &hdev->adv_work,
+>  						 jiffies + ADV_CLEAR_TIMEOUT);
+> +		break;
+> +
+> +	default:
+> +		BT_ERR("Used reserved LE_Scan_Enable param %d", cp->enable);
+> +		break;
+>  	}
+>  }
 
