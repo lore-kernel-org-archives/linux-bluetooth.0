@@ -2,46 +2,61 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 2/2] Fix consecutive set value when disconnected
-Date: Wed, 21 Dec 2011 18:41:50 -0300
-Message-Id: <1324503710-29815-2-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1324503710-29815-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1324503710-29815-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 1/2] Fix GAttrib ref counting in Generic Attribute
+Date: Wed, 21 Dec 2011 18:41:49 -0300
+Message-Id: <1324503710-29815-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SetProperty for "Value" property needs to be queued when disconnected.
-Registering ATTIO connection callback does not mean that the link is
-established, GAttrib instance is assigned in the connection callback.
+Although ATT connection callbacks control GAttrib reference, each
+entity using GAttrib should be increment the GAttrib reference to
+keep the code standard.
 ---
- attrib/client.c |    8 +++++---
- 1 files changed, 5 insertions(+), 3 deletions(-)
+ attrib/client.c |   10 +++++++---
+ 1 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/attrib/client.c b/attrib/client.c
-index 5f1e6ce..4c8474c 100644
+index 1b22139..5f1e6ce 100644
 --- a/attrib/client.c
 +++ b/attrib/client.c
-@@ -420,15 +420,17 @@ static DBusMessage *set_value(DBusConnection *conn, DBusMessage *msg,
+@@ -318,7 +318,7 @@ static void attio_connected(GAttrib *attrib, gpointer user_data)
+ {
+ 	struct gatt_service *gatt = user_data;
  
- 	characteristic_set_value(chr, value, len);
+-	gatt->attrib = attrib;
++	gatt->attrib = g_attrib_ref(attrib);
  
--	if (gatt->attioid == 0) {
-+	if (gatt->attioid == 0)
- 		gatt->attioid = btd_device_add_attio_callback(gatt->dev,
- 							attio_connected,
- 							attio_disconnected,
- 							gatt);
--		gatt->offline_chars = g_slist_append(gatt->offline_chars, chr);
--	} else
-+
-+	if (gatt->attrib)
- 		gatt_write_cmd(gatt->attrib, chr->handle, value, len,
- 								NULL, NULL);
-+	else
-+		gatt->offline_chars = g_slist_append(gatt->offline_chars, chr);
+ 	g_attrib_register(gatt->attrib, ATT_OP_HANDLE_NOTIFY,
+ 					events_handler, gatt, NULL);
+@@ -332,7 +332,10 @@ static void attio_disconnected(gpointer user_data)
+ {
+ 	struct gatt_service *gatt = user_data;
  
- 	return dbus_message_new_method_return(msg);
+-	gatt->attrib = NULL;
++	if (gatt->attrib) {
++		g_attrib_unref(gatt->attrib);
++		gatt->attrib = NULL;
++	}
  }
+ 
+ static DBusMessage *register_watcher(DBusConnection *conn,
+@@ -892,7 +895,7 @@ static void send_discover(GAttrib *attrib, gpointer user_data)
+ 	struct gatt_service *gatt = qchr->gatt;
+ 	struct att_primary *prim = gatt->prim;
+ 
+-	gatt->attrib = attrib;
++	gatt->attrib = g_attrib_ref(attrib);
+ 
+ 	gatt_discover_char(gatt->attrib, prim->start, prim->end, NULL,
+ 						char_discovered_cb, qchr);
+@@ -903,6 +906,7 @@ static void cancel_discover(gpointer user_data)
+ 	struct query_data *qchr = user_data;
+ 	struct gatt_service *gatt = qchr->gatt;
+ 
++	g_attrib_unref(gatt->attrib);
+ 	gatt->attrib = NULL;
+ }
+ 
 -- 
 1.7.8
 
