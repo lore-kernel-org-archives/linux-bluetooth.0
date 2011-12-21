@@ -1,41 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1324511576.1965.186.camel@aeonflux>
-Subject: Re: [PATCH-v8 1/2] Bluetooth: Add MITM mechanism to LE-SMP
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 21 Dec 2011 15:52:56 -0800
-In-Reply-To: <1324505319-3881-2-git-send-email-bgix@codeaurora.org>
-References: <1324505319-3881-1-git-send-email-bgix@codeaurora.org>
-	 <1324505319-3881-2-git-send-email-bgix@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+Date: Wed, 21 Dec 2011 16:40:53 -0600
+Message-ID: <CAMk70DBANeAndgm-nV=9Cgt2tvz=dRmd8WdpnJkNTe=a2LDugA@mail.gmail.com>
+Subject: Bluetooth Headset Connection Issue Linux v3.0
+From: bubba junk <junkbubba2@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+I am new to posting to mailing lists, so forgive me in advance if I am not
+following protocol. I have an issue connecting to my bluetooth headset in
+Ubuntu 11.10 Linux Kernel 3.0.0-14-generic. I am able to pair and connect
+at first. But after disconnecting, I am no longer able to connect. I have to
+un-pair then re-pair the device to connect again. After re-paring the headset
+, it stays connected until I disconnect. Then again after disconnecting,
+I am not able to connect. I saw some regression bug documentation to something
+similar in Linux 2.6. Is this a known bug in 3.0?
 
-> +static const u8	gen_method[5][5] = {
-
-can the tab between u8 and gen_method please go away.
-
-> +	{ JUST_WORKS, JUST_CFM, REQ_PASSKEY, JUST_WORKS, REQ_PASSKEY     },
-> +	{ JUST_WORKS, JUST_CFM, REQ_PASSKEY, JUST_WORKS, REQ_PASSKEY     },
-> +	{ CFM_PASSKEY, CFM_PASSKEY, REQ_PASSKEY, JUST_WORKS, CFM_PASSKEY },
-> +	{ JUST_WORKS, JUST_CFM, JUST_WORKS, JUST_WORKS, JUST_CFM         },
-> +	{ CFM_PASSKEY, CFM_PASSKEY, REQ_PASSKEY, JUST_WORKS, OVERLAP     },
-> +};
-
-Can you make sure all elements are aligned like you had it before. So
-the table becomes readable. If you go over 80 chars here then that is
-fine. So be it.
-
-For the rest I am happy with it.
-
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-Regards
-
-Marcel
-
-
+Thanks in advance for your help. Sorry for such a newbie question.
