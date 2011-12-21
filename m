@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1324433442.1965.148.camel@aeonflux>
-Subject: Re: [PATCH 2/2] Bluetooth: Make HCI call directly into SCO and
- L2CAP event functions
+Message-ID: <1324432579.1965.140.camel@aeonflux>
+Subject: Re: [PATCH 1/2] Bluetooth: Always compile SCO and L2CAP in
+ Bluetooth Core
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Ulisses Furquim <ulisses@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Date: Tue, 20 Dec 2011 18:10:42 -0800
-In-Reply-To: <1324430302-3002-2-git-send-email-ulisses@profusion.mobi>
+Date: Tue, 20 Dec 2011 17:56:19 -0800
+In-Reply-To: <1324430302-3002-1-git-send-email-ulisses@profusion.mobi>
 References: <1324430302-3002-1-git-send-email-ulisses@profusion.mobi>
-	 <1324430302-3002-2-git-send-email-ulisses@profusion.mobi>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,57 +15,192 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Ulisses,
 
-> The struct hci_proto and all related register/unregister and dispatching
-> code was removed. HCI core code now call directly the SCO and L2CAP
-> event functions.
-
-<snip>
-
->  static inline int hci_proto_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
->  								__u8 type)
->  {
-> -	register struct hci_proto *hp;
->  	int mask = 0;
+> The handling of SCO audio links and the L2CAP protocol are essential to
+> any system with Bluetooth thus are always compiled in from now on.
+> 
+> Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
+> ---
+>  include/net/bluetooth/bluetooth.h |   22 ----------------------
+>  net/bluetooth/Kconfig             |   36 ++++++++----------------------------
+>  net/bluetooth/Makefile            |    4 +---
+>  net/bluetooth/bnep/Kconfig        |    2 +-
+>  net/bluetooth/cmtp/Kconfig        |    2 +-
+>  net/bluetooth/hidp/Kconfig        |    2 +-
+>  net/bluetooth/rfcomm/Kconfig      |    2 +-
+>  7 files changed, 13 insertions(+), 57 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 980e59f..abaad6e 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -250,32 +250,10 @@ extern void bt_sysfs_cleanup(void);
 >  
-> -	hp = hci_proto[HCI_PROTO_L2CAP];
-> -	if (hp && hp->connect_ind)
-> -		mask |= hp->connect_ind(hdev, bdaddr, type);
-> -
-> -	hp = hci_proto[HCI_PROTO_SCO];
-> -	if (hp && hp->connect_ind)
-> -		mask |= hp->connect_ind(hdev, bdaddr, type);
-> +	mask |= l2cap_connect_ind(hdev, bdaddr, type);
-> +	mask |= sco_connect_ind(hdev, bdaddr, type);
-
-I am fine if you wanna do this in two steps for a more clean process of
-getting where need to go, but we are not leaving it like this.
-
-We do already know where the packet is going. So we can just check the
-type up front. Remove the type check in the L2CAP/SCO and remove the
-type parameter altogether.
-
-No point in calling a function if we already know it just returns EINVAL
-anyway.
-
->  	return mask;
->  }
+>  extern struct dentry *bt_debugfs;
 >  
->  static inline void hci_proto_connect_cfm(struct hci_conn *conn, __u8 status)
->  {
-> -	register struct hci_proto *hp;
+> -#ifdef CONFIG_BT_L2CAP
+>  int l2cap_init(void);
+>  void l2cap_exit(void);
+> -#else
+> -static inline int l2cap_init(void)
+> -{
+> -	return 0;
+> -}
 > -
-> -	hp = hci_proto[HCI_PROTO_L2CAP];
-> -	if (hp && hp->connect_cfm)
-> -		hp->connect_cfm(conn, status);
+> -static inline void l2cap_exit(void)
+> -{
+> -}
+> -#endif
+>  
+> -#ifdef CONFIG_BT_SCO
+>  int sco_init(void);
+>  void sco_exit(void);
+> -#else
+> -static inline int sco_init(void)
+> -{
+> -	return 0;
+> -}
 > -
-> -	hp = hci_proto[HCI_PROTO_SCO];
-> -	if (hp && hp->connect_cfm)
-> -		hp->connect_cfm(conn, status);
-> +	l2cap_connect_cfm(conn, status);
-> +	sco_connect_cfm(conn, status);
+> -static inline void sco_exit(void)
+> -{
+> -}
+> -#endif
+>  
+>  #endif /* __BLUETOOTH_H */
+> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+> index bfb3dc0..0d3f0aa 100644
+> --- a/net/bluetooth/Kconfig
+> +++ b/net/bluetooth/Kconfig
+> @@ -6,7 +6,11 @@ menuconfig BT
+>  	tristate "Bluetooth subsystem support"
+>  	depends on NET && !S390
+>  	depends on RFKILL || !RFKILL
+> +	select CRC16
+>  	select CRYPTO
+> +	select CRYPTO_BLKCIPHER
+> +	select CRYPTO_AES
+> +	select CRYPTO_ECB
+>  	help
+>  	  Bluetooth is low-cost, low-power, short-range wireless technology.
+>  	  It was designed as a replacement for cables and other short-range
+> @@ -15,10 +19,11 @@ menuconfig BT
+>  	  Bluetooth can be found at <http://www.bluetooth.com/>.
+>  
+>  	  Linux Bluetooth subsystem consist of several layers:
+> -	     Bluetooth Core (HCI device and connection manager, scheduler)
+> +	     Bluetooth Core
+> +		HCI device and connection manager, scheduler
+> +		SCO audio links
+> +		L2CAP (Logical Link Control and Adaptation Protocol)
 
-Same here since conn->type will give you the link type. And so on for
-all the others.
+I would mention SMP here as well. Especially since it was mentioned in
+the L2CAP section that you remove later on.
+
+>  	     HCI Device drivers (Interface to the hardware)
+> -	     SCO Module (SCO audio links)
+> -	     L2CAP Module (Logical Link Control and Adaptation Protocol)
+>  	     RFCOMM Module (RFCOMM Protocol)  
+>  	     BNEP Module (Bluetooth Network Encapsulation Protocol)
+>  	     CMTP Module (CAPI Message Transport Protocol)
+> @@ -33,31 +38,6 @@ menuconfig BT
+>  	  to Bluetooth kernel modules are provided in the BlueZ packages.  For
+>  	  more information, see <http://www.bluez.org/>.
+>  
+> -if BT != n
+> -
+> -config BT_L2CAP
+> -	bool "L2CAP protocol support"
+> -	select CRC16
+> -	select CRYPTO
+> -	select CRYPTO_BLKCIPHER
+> -	select CRYPTO_AES
+> -	select CRYPTO_ECB
+> -	help
+> -	  L2CAP (Logical Link Control and Adaptation Protocol) provides
+> -	  connection oriented and connection-less data transport.  L2CAP
+> -	  support is required for most Bluetooth applications.
+> -
+> -	  Also included is support for SMP (Security Manager Protocol) which
+> -	  is the security layer on top of LE (Low Energy) links.
+> -
+> -config BT_SCO
+> -	bool "SCO links support"
+> -	help
+> -	  SCO link provides voice transport over Bluetooth.  SCO support is
+> -	  required for voice applications like Headset and Audio.
+> -
+> -endif
+> -
+>  source "net/bluetooth/rfcomm/Kconfig"
+>  
+>  source "net/bluetooth/bnep/Kconfig"
+> diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+> index 9b67f3d..297718a 100644
+> --- a/net/bluetooth/Makefile
+> +++ b/net/bluetooth/Makefile
+> @@ -8,6 +8,4 @@ obj-$(CONFIG_BT_BNEP)	+= bnep/
+>  obj-$(CONFIG_BT_CMTP)	+= cmtp/
+>  obj-$(CONFIG_BT_HIDP)	+= hidp/
+>  
+> -bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o hci_sock.o hci_sysfs.o lib.o
+> -bluetooth-$(CONFIG_BT_L2CAP)	+= l2cap_core.o l2cap_sock.o smp.o
+> -bluetooth-$(CONFIG_BT_SCO)	+= sco.o
+> +bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o
+
+Please break this down into two lines an honor the same width limitation
+we impose on the code.
+
+> diff --git a/net/bluetooth/bnep/Kconfig b/net/bluetooth/bnep/Kconfig
+> index 35158b0..71791fc 100644
+> --- a/net/bluetooth/bnep/Kconfig
+> +++ b/net/bluetooth/bnep/Kconfig
+> @@ -1,6 +1,6 @@
+>  config BT_BNEP
+>  	tristate "BNEP protocol support"
+> -	depends on BT && BT_L2CAP
+> +	depends on BT
+>  	select CRC32
+>  	help
+>  	  BNEP (Bluetooth Network Encapsulation Protocol) is Ethernet
+> diff --git a/net/bluetooth/cmtp/Kconfig b/net/bluetooth/cmtp/Kconfig
+> index d6b0382..94cbf42 100644
+> --- a/net/bluetooth/cmtp/Kconfig
+> +++ b/net/bluetooth/cmtp/Kconfig
+> @@ -1,6 +1,6 @@
+>  config BT_CMTP
+>  	tristate "CMTP protocol support"
+> -	depends on BT && BT_L2CAP && ISDN_CAPI
+> +	depends on BT && ISDN_CAPI
+>  	help
+>  	  CMTP (CAPI Message Transport Protocol) is a transport layer
+>  	  for CAPI messages.  CMTP is required for the Bluetooth Common
+> diff --git a/net/bluetooth/hidp/Kconfig b/net/bluetooth/hidp/Kconfig
+> index 86a9154..4deaca7 100644
+> --- a/net/bluetooth/hidp/Kconfig
+> +++ b/net/bluetooth/hidp/Kconfig
+> @@ -1,6 +1,6 @@
+>  config BT_HIDP
+>  	tristate "HIDP protocol support"
+> -	depends on BT && BT_L2CAP && INPUT && HID_SUPPORT
+> +	depends on BT && INPUT && HID_SUPPORT
+>  	select HID
+>  	help
+>  	  HIDP (Human Interface Device Protocol) is a transport layer
+> diff --git a/net/bluetooth/rfcomm/Kconfig b/net/bluetooth/rfcomm/Kconfig
+> index 405a0e6..22e718b 100644
+> --- a/net/bluetooth/rfcomm/Kconfig
+> +++ b/net/bluetooth/rfcomm/Kconfig
+> @@ -1,6 +1,6 @@
+>  config BT_RFCOMM
+>  	tristate "RFCOMM protocol support"
+> -	depends on BT && BT_L2CAP
+> +	depends on BT
+>  	help
+>  	  RFCOMM provides connection oriented stream transport.  RFCOMM
+>  	  support is required for Dialup Networking, OBEX and other Bluetooth
+
+Once these two are fixed, this looks good.
+
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
