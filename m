@@ -1,34 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 21 Dec 2011 02:20:20 -0200
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Wed, 21 Dec 2011 02:18:35 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Ulisses Furquim <ulisses@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Remove global mutex hci_task_lock
-Message-ID: <20111221042020.GC2729@joana>
-References: <1324408251-8116-1-git-send-email-ulisses@profusion.mobi>
+To: Bing Zhao <bzhao@marvell.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: btusb: fix bInterval for high/super speed
+ isochronous endpoints
+Message-ID: <20111221041835.GB2729@joana>
+References: <1324433940-16838-1-git-send-email-bzhao@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1324408251-8116-1-git-send-email-ulisses@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1324433940-16838-1-git-send-email-bzhao@marvell.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ulisses,
+Hi Bing,
 
-* Ulisses Furquim <ulisses@profusion.mobi> [2011-12-20 17:10:51 -0200]:
+* Bing Zhao <bzhao@marvell.com> [2011-12-20 18:19:00 -0800]:
 
-> The hci_task_lock mutex (previously a lock) was supposed to protect the
-> register/unregister of HCI protocols against RX/TX tasks. This will not
-> be needed anymore because SCO and L2CAP will always be compiled.
+> For high-speed/super-speed isochronous endpoints, the bInterval
+> value is used as exponent, 2^(bInterval-1). Luckily we have
+> usb_fill_int_urb() function that handles it correctly. So we just
+> call this function to fill in the RX URB.
 > 
-> Moreover, with the recent move of RX/TX to workqueues per device the
-> global hci_task_lock was causing starvation between different HCI
-> devices.
-> 
-> Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Bing Zhao <bzhao@marvell.com>
 > ---
->  net/bluetooth/hci_core.c |   21 +--------------------
->  1 files changed, 1 insertions(+), 20 deletions(-)
+>  drivers/bluetooth/btusb.c |    9 ++-------
+>  1 files changed, 2 insertions(+), 7 deletions(-)
 
-Patch has been applied, thanks.
+Applied, thanks.
 
 	Gustavo
