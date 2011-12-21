@@ -1,127 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1324511784.1965.189.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Fix deadlocks with sock lock and L2CAP
- timers locks
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Ulisses Furquim <ulisses@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Date: Wed, 21 Dec 2011 15:56:24 -0800
-In-Reply-To: <1324504956-16840-1-git-send-email-ulisses@profusion.mobi>
-References: <1324504956-16840-1-git-send-email-ulisses@profusion.mobi>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <4EF27216.4030905@codeaurora.org>
+Date: Wed, 21 Dec 2011 15:56:06 -0800
+From: Brian Gix <bgix@codeaurora.org>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH-v8 1/2] Bluetooth: Add MITM mechanism to LE-SMP
+References: <1324505319-3881-1-git-send-email-bgix@codeaurora.org>	 <1324505319-3881-2-git-send-email-bgix@codeaurora.org> <1324511576.1965.186.camel@aeonflux>
+In-Reply-To: <1324511576.1965.186.camel@aeonflux>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ulisses,
+Hi Marcel,
 
-> When cancelling a delayed work (timer) in L2CAP we can not sleep holding
-> the sock mutex otherwise we might deadlock with an L2CAP timer handler.
-> This is possible because RX/TX and L2CAP timers run in different workqueues.
-> The scenario below illustrates the problem. Thus we are now avoiding to
-> sleep on the timers locks.
-> 
->  ======================================================
->  [ INFO: possible circular locking dependency detected ]
->  3.1.0-05270-ga978dc7-dirty #239
->  -------------------------------------------------------
->  kworker/1:1/873 is trying to acquire lock:
->   (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+...}, at: [<ffffffffa002ceac>] l2cap_chan_timeout+0x3c/0xe0 [bluetooth]
-> 
->  but task is already holding lock:
->   ((&(&chan->chan_timer)->work)){+.+...}, at: [<ffffffff81051a86>] process_one_work+0x126/0x450
-> 
->  which lock already depends on the new lock.
-> 
->  the existing dependency chain (in reverse order) is:
-> 
->  -> #1 ((&(&chan->chan_timer)->work)){+.+...}:
->         [<ffffffff8106b276>] check_prevs_add+0xf6/0x170
->         [<ffffffff8106b903>] validate_chain+0x613/0x790
->         [<ffffffff8106dfee>] __lock_acquire+0x4be/0xac0
->         [<ffffffff8106ec2d>] lock_acquire+0x8d/0xb0
->         [<ffffffff81052a6f>] wait_on_work+0x4f/0x160
->         [<ffffffff81052ca3>] __cancel_work_timer+0x73/0x80
->         [<ffffffff81052cbd>] cancel_delayed_work_sync+0xd/0x10
->         [<ffffffffa002f2ed>] l2cap_chan_connect+0x22d/0x470 [bluetooth]
->         [<ffffffffa002fb51>] l2cap_sock_connect+0xb1/0x140 [bluetooth]
->         [<ffffffff8130811b>] kernel_connect+0xb/0x10
->         [<ffffffffa00cf98a>] rfcomm_session_create+0x12a/0x1c0 [rfcomm]
->         [<ffffffffa00cfbe7>] __rfcomm_dlc_open+0x1c7/0x240 [rfcomm]
->         [<ffffffffa00d07c2>] rfcomm_dlc_open+0x42/0x70 [rfcomm]
->         [<ffffffffa00d3b03>] rfcomm_sock_connect+0x103/0x150 [rfcomm]
->         [<ffffffff8130bd7e>] sys_connect+0xae/0xc0
->         [<ffffffff813368d2>] compat_sys_socketcall+0xb2/0x220
->         [<ffffffff813b2089>] sysenter_dispatch+0x7/0x30
-> 
->  -> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+...}:
->         [<ffffffff8106b16d>] check_prev_add+0x6cd/0x6e0
->         [<ffffffff8106b276>] check_prevs_add+0xf6/0x170
->         [<ffffffff8106b903>] validate_chain+0x613/0x790
->         [<ffffffff8106dfee>] __lock_acquire+0x4be/0xac0
->         [<ffffffff8106ec2d>] lock_acquire+0x8d/0xb0
->         [<ffffffff8130d91a>] lock_sock_nested+0x8a/0xa0
->         [<ffffffffa002ceac>] l2cap_chan_timeout+0x3c/0xe0 [bluetooth]
->         [<ffffffff81051ae4>] process_one_work+0x184/0x450
->         [<ffffffff8105276e>] worker_thread+0x15e/0x340
->         [<ffffffff81057bb6>] kthread+0x96/0xa0
->         [<ffffffff813b1ef4>] kernel_thread_helper+0x4/0x10
-> 
->  other info that might help us debug this:
-> 
->   Possible unsafe locking scenario:
-> 
->         CPU0                    CPU1
->         ----                    ----
->    lock((&(&chan->chan_timer)->work));
->                                 lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
->                                 lock((&(&chan->chan_timer)->work));
->    lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
-> 
->   *** DEADLOCK ***
-> 
->  2 locks held by kworker/1:1/873:
->   #0:  (events){.+.+.+}, at: [<ffffffff81051a86>] process_one_work+0x126/0x450
->   #1:  ((&(&chan->chan_timer)->work)){+.+...}, at: [<ffffffff81051a86>] process_one_work+0x126/0x450
-> 
->  stack backtrace:
->  Pid: 873, comm: kworker/1:1 Not tainted 3.1.0-05270-ga978dc7-dirty #239
->  Call Trace:
->   [<ffffffff813a0f6e>] print_circular_bug+0xd2/0xe3
->   [<ffffffff8106b16d>] check_prev_add+0x6cd/0x6e0
->   [<ffffffff8106b276>] check_prevs_add+0xf6/0x170
->   [<ffffffff8106b903>] validate_chain+0x613/0x790
->   [<ffffffff8106dfee>] __lock_acquire+0x4be/0xac0
->   [<ffffffff8130d8f6>] ? lock_sock_nested+0x66/0xa0
->   [<ffffffff8106ea30>] ? lock_release_nested+0x100/0x110
->   [<ffffffff8130d8f6>] ? lock_sock_nested+0x66/0xa0
->   [<ffffffff8106ec2d>] lock_acquire+0x8d/0xb0
->   [<ffffffffa002ceac>] ? l2cap_chan_timeout+0x3c/0xe0 [bluetooth]
->   [<ffffffff8130d91a>] lock_sock_nested+0x8a/0xa0
->   [<ffffffffa002ceac>] ? l2cap_chan_timeout+0x3c/0xe0 [bluetooth]
->   [<ffffffff81051a86>] ? process_one_work+0x126/0x450
->   [<ffffffffa002ceac>] l2cap_chan_timeout+0x3c/0xe0 [bluetooth]
->   [<ffffffff81051ae4>] process_one_work+0x184/0x450
->   [<ffffffff81051a86>] ? process_one_work+0x126/0x450
->   [<ffffffffa002ce70>] ? l2cap_security_cfm+0x4e0/0x4e0 [bluetooth]
->   [<ffffffff8105276e>] worker_thread+0x15e/0x340
->   [<ffffffff81052610>] ? manage_workers+0x110/0x110
->   [<ffffffff81057bb6>] kthread+0x96/0xa0
->   [<ffffffff813b1ef4>] kernel_thread_helper+0x4/0x10
->   [<ffffffff813af69d>] ? retint_restore_args+0xe/0xe
->   [<ffffffff81057b20>] ? __init_kthread_worker+0x70/0x70
->   [<ffffffff813b1ef0>] ? gs_change+0xb/0xb
-> 
-> Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
-> ---
->  include/net/bluetooth/l2cap.h |   29 +++++++++++++++++++++--------
->  net/bluetooth/l2cap_core.c    |   29 +++++++++--------------------
->  2 files changed, 30 insertions(+), 28 deletions(-)
+On 12/21/2011 3:52 PM, Marcel Holtmann wrote:
+> Hi Brian,
+>
+>> +static const u8	gen_method[5][5] = {
+>
+> can the tab between u8 and gen_method please go away.
+>
+>> +	{ JUST_WORKS, JUST_CFM, REQ_PASSKEY, JUST_WORKS, REQ_PASSKEY     },
+>> +	{ JUST_WORKS, JUST_CFM, REQ_PASSKEY, JUST_WORKS, REQ_PASSKEY     },
+>> +	{ CFM_PASSKEY, CFM_PASSKEY, REQ_PASSKEY, JUST_WORKS, CFM_PASSKEY },
+>> +	{ JUST_WORKS, JUST_CFM, JUST_WORKS, JUST_WORKS, JUST_CFM         },
+>> +	{ CFM_PASSKEY, CFM_PASSKEY, REQ_PASSKEY, JUST_WORKS, OVERLAP     },
+>> +};
+>
+> Can you make sure all elements are aligned like you had it before. So
+> the table becomes readable. If you go over 80 chars here then that is
+> fine. So be it.
+>
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-Regards
-
-Marcel
+Sure.  Sorry, I misunderstood which tab you were referring to last time.
 
 
+> For the rest I am happy with it.
+>
+> Acked-by: Marcel Holtmann<marcel@holtmann.org>
+>
+
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
