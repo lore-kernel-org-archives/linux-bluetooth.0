@@ -1,58 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1324511946.1965.192.camel@aeonflux>
-Subject: Re: [PATCH] Add USB ID of HP's Broadcom BCM2035 Bluetooth
+Message-ID: <1324511784.1965.189.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Fix deadlocks with sock lock and L2CAP
+ timers locks
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Albert Pool <albertpool@solcon.nl>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-Date: Wed, 21 Dec 2011 15:59:06 -0800
-In-Reply-To: <4EF24036.3010400@solcon.nl>
-References: <4EF24036.3010400@solcon.nl>
+To: Ulisses Furquim <ulisses@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
+Date: Wed, 21 Dec 2011 15:56:24 -0800
+In-Reply-To: <1324504956-16840-1-git-send-email-ulisses@profusion.mobi>
+References: <1324504956-16840-1-git-send-email-ulisses@profusion.mobi>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Albert,
+Hi Ulisses,
 
-> HP's Broadcom Bluetooth 1.2 interface (USB 03f0:011d) found in HP Compaq 
-> nc6120 laptop, fails to detect other devices, and pair with them.
-> With BTUSB_BCM92035 it now works.
+> When cancelling a delayed work (timer) in L2CAP we can not sleep holding
+> the sock mutex otherwise we might deadlock with an L2CAP timer handler.
+> This is possible because RX/TX and L2CAP timers run in different workqueues.
+> The scenario below illustrates the problem. Thus we are now avoiding to
+> sleep on the timers locks.
 > 
-> I've also tried using BTUSB_WRONG_SCO_MTU, but with that setting it 
-> failed to enable the device 50% of the time.
+>  ======================================================
+>  [ INFO: possible circular locking dependency detected ]
+>  3.1.0-05270-ga978dc7-dirty #239
+>  -------------------------------------------------------
+>  kworker/1:1/873 is trying to acquire lock:
+>   (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+...}, at: [<ffffffffa002ceac>] l2cap_chan_timeout+0x3c/0xe0 [bluetooth]
 > 
-> If I didn't properly submit the patch, please let me know.
-
-don't include such a sentence in the commit message. It belongs after
---- and before the diffstat.
-
-Include the output of usb-devices in the commit message.
-
+>  but task is already holding lock:
+>   ((&(&chan->chan_timer)->work)){+.+...}, at: [<ffffffff81051a86>] process_one_work+0x126/0x450
 > 
-> Signed-off-by: Albert Pool <albertpool@solcon.nl>
-> - - -
-
-And please fix your email client. It is messing up whitespaces.
-
->   drivers/bluetooth/btusb.c |    3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -142,7 +142,8 @@ static struct usb_device_id blacklist_ta
->       { USB_DEVICE(0x0a5c, 0x201e), .driver_info = BTUSB_WRONG_SCO_MTU },
->       { USB_DEVICE(0x0a5c, 0x2110), .driver_info = BTUSB_WRONG_SCO_MTU },
+>  which lock already depends on the new lock.
 > 
-> -    /* HP laptop with Broadcom chip */
-> +    /* HP laptops with Broadcom chip */
-> +    { USB_DEVICE(0x03f0, 0x011d), .driver_info = BTUSB_BCM92035 },
-
-You need a tab here and not space.
-
->       { USB_DEVICE(0x03f0, 0x171d), .driver_info = BTUSB_WRONG_SCO_MTU },
+>  the existing dependency chain (in reverse order) is:
 > 
->       /* Dell laptop with Broadcom chip */
+>  -> #1 ((&(&chan->chan_timer)->work)){+.+...}:
+>         [<ffffffff8106b276>] check_prevs_add+0xf6/0x170
+>         [<ffffffff8106b903>] validate_chain+0x613/0x790
+>         [<ffffffff8106dfee>] __lock_acquire+0x4be/0xac0
+>         [<ffffffff8106ec2d>] lock_acquire+0x8d/0xb0
+>         [<ffffffff81052a6f>] wait_on_work+0x4f/0x160
+>         [<ffffffff81052ca3>] __cancel_work_timer+0x73/0x80
+>         [<ffffffff81052cbd>] cancel_delayed_work_sync+0xd/0x10
+>         [<ffffffffa002f2ed>] l2cap_chan_connect+0x22d/0x470 [bluetooth]
+>         [<ffffffffa002fb51>] l2cap_sock_connect+0xb1/0x140 [bluetooth]
+>         [<ffffffff8130811b>] kernel_connect+0xb/0x10
+>         [<ffffffffa00cf98a>] rfcomm_session_create+0x12a/0x1c0 [rfcomm]
+>         [<ffffffffa00cfbe7>] __rfcomm_dlc_open+0x1c7/0x240 [rfcomm]
+>         [<ffffffffa00d07c2>] rfcomm_dlc_open+0x42/0x70 [rfcomm]
+>         [<ffffffffa00d3b03>] rfcomm_sock_connect+0x103/0x150 [rfcomm]
+>         [<ffffffff8130bd7e>] sys_connect+0xae/0xc0
+>         [<ffffffff813368d2>] compat_sys_socketcall+0xb2/0x220
+>         [<ffffffff813b2089>] sysenter_dispatch+0x7/0x30
 > 
+>  -> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+...}:
+>         [<ffffffff8106b16d>] check_prev_add+0x6cd/0x6e0
+>         [<ffffffff8106b276>] check_prevs_add+0xf6/0x170
+>         [<ffffffff8106b903>] validate_chain+0x613/0x790
+>         [<ffffffff8106dfee>] __lock_acquire+0x4be/0xac0
+>         [<ffffffff8106ec2d>] lock_acquire+0x8d/0xb0
+>         [<ffffffff8130d91a>] lock_sock_nested+0x8a/0xa0
+>         [<ffffffffa002ceac>] l2cap_chan_timeout+0x3c/0xe0 [bluetooth]
+>         [<ffffffff81051ae4>] process_one_work+0x184/0x450
+>         [<ffffffff8105276e>] worker_thread+0x15e/0x340
+>         [<ffffffff81057bb6>] kthread+0x96/0xa0
+>         [<ffffffff813b1ef4>] kernel_thread_helper+0x4/0x10
+> 
+>  other info that might help us debug this:
+> 
+>   Possible unsafe locking scenario:
+> 
+>         CPU0                    CPU1
+>         ----                    ----
+>    lock((&(&chan->chan_timer)->work));
+>                                 lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
+>                                 lock((&(&chan->chan_timer)->work));
+>    lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
+> 
+>   *** DEADLOCK ***
+> 
+>  2 locks held by kworker/1:1/873:
+>   #0:  (events){.+.+.+}, at: [<ffffffff81051a86>] process_one_work+0x126/0x450
+>   #1:  ((&(&chan->chan_timer)->work)){+.+...}, at: [<ffffffff81051a86>] process_one_work+0x126/0x450
+> 
+>  stack backtrace:
+>  Pid: 873, comm: kworker/1:1 Not tainted 3.1.0-05270-ga978dc7-dirty #239
+>  Call Trace:
+>   [<ffffffff813a0f6e>] print_circular_bug+0xd2/0xe3
+>   [<ffffffff8106b16d>] check_prev_add+0x6cd/0x6e0
+>   [<ffffffff8106b276>] check_prevs_add+0xf6/0x170
+>   [<ffffffff8106b903>] validate_chain+0x613/0x790
+>   [<ffffffff8106dfee>] __lock_acquire+0x4be/0xac0
+>   [<ffffffff8130d8f6>] ? lock_sock_nested+0x66/0xa0
+>   [<ffffffff8106ea30>] ? lock_release_nested+0x100/0x110
+>   [<ffffffff8130d8f6>] ? lock_sock_nested+0x66/0xa0
+>   [<ffffffff8106ec2d>] lock_acquire+0x8d/0xb0
+>   [<ffffffffa002ceac>] ? l2cap_chan_timeout+0x3c/0xe0 [bluetooth]
+>   [<ffffffff8130d91a>] lock_sock_nested+0x8a/0xa0
+>   [<ffffffffa002ceac>] ? l2cap_chan_timeout+0x3c/0xe0 [bluetooth]
+>   [<ffffffff81051a86>] ? process_one_work+0x126/0x450
+>   [<ffffffffa002ceac>] l2cap_chan_timeout+0x3c/0xe0 [bluetooth]
+>   [<ffffffff81051ae4>] process_one_work+0x184/0x450
+>   [<ffffffff81051a86>] ? process_one_work+0x126/0x450
+>   [<ffffffffa002ce70>] ? l2cap_security_cfm+0x4e0/0x4e0 [bluetooth]
+>   [<ffffffff8105276e>] worker_thread+0x15e/0x340
+>   [<ffffffff81052610>] ? manage_workers+0x110/0x110
+>   [<ffffffff81057bb6>] kthread+0x96/0xa0
+>   [<ffffffff813b1ef4>] kernel_thread_helper+0x4/0x10
+>   [<ffffffff813af69d>] ? retint_restore_args+0xe/0xe
+>   [<ffffffff81057b20>] ? __init_kthread_worker+0x70/0x70
+>   [<ffffffff813b1ef0>] ? gs_change+0xb/0xb
+> 
+> Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
+> ---
+>  include/net/bluetooth/l2cap.h |   29 +++++++++++++++++++++--------
+>  net/bluetooth/l2cap_core.c    |   29 +++++++++--------------------
+>  2 files changed, 30 insertions(+), 28 deletions(-)
+
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
