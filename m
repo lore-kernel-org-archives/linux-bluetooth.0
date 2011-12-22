@@ -1,32 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 22 Dec 2011 14:03:50 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Remove magic numbers from le scan cmd
-Message-ID: <20111222160350.GA2730@joana>
-References: <1324304058-18944-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1324304058-18944-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <CACj007=vVUEwvaqr7JhMqJ8VK95j2epK+1_Z+_cJ=1-+UwVnGw@mail.gmail.com>
+References: <CACj007=vVUEwvaqr7JhMqJ8VK95j2epK+1_Z+_cJ=1-+UwVnGw@mail.gmail.com>
+Date: Thu, 22 Dec 2011 19:40:15 +0530
+Message-ID: <CACj007=3Nj+1ApymvJp-etEQL-NTsFi3QbVuRdK9ohA6cyxHSA@mail.gmail.com>
+Subject: Re: [RFC BlueZ]Proximity Monitor Discussion
+From: Hemant Gupta <hemantgupta.ste@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	Anderson Briglia <anderson.briglia@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Claudio,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-12-19 16:14:18 +0200]:
+Do you have any comments on the below section of email about Proximity
+and Find Me .
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Make code readable by removing magic numbers.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci.h |    3 +++
->  net/bluetooth/hci_event.c   |   12 ++++++++++--
->  2 files changed, 13 insertions(+), 2 deletions(-)
+Thanks.
 
-Patch has been applied, thanks.
+On Tue, Dec 20, 2011 at 9:35 AM, Hemant Gupta <hemantgupta.ste@gmail.com> wrote:
+> Hi Claudio, Anderson,
+>
+>> Please sync with Anderson Briglia, he already sent a RFC to the ML
+>> some months ago.
+>> In the Bluetooth Summit(Prague), we decided to not proceed with RSSI
+>> monitor emulation in the kernel until we have a clear idea or spec
+>> defining how the controllers will implement RSSI monitoring.
+> Could you please provide some details about what was discussed in the summit.
+>
+>> The ideia was to provide transparency, the userspace doesn't need to
+>> know if RSSI monitoring is emulated or not.
+>
+> As per my understanding the BT spec (4.0, Volume 2, Part E, Section
+> 7.5.4) the HCI_Read_RSSI command can be used to retrieve the RSSI from
+> the controller. In our case, I have tested it against ST-Ericsson BT
+> controller  and it works in our case. Are you suggesting that until we
+> know how the RSSI is determined in controller, we should not implement
+> this functionality in kernel ? I ask this because in Proximity Spec,
+> it is mentioned that the monitor should use appropriate calculations
+> to prevent false alerts on reporter, so if we leave this to layer
+> above BlueZ to do this part, then we are pretty independent with the
+> approach of implementation of Path Loss RSSI Monitoring in BlueZ and
+> Kernel.
+>
+> If I misunderstood anything please clarify.
+>
+>
+>> The timer is there to trigger overwriting the value if it is already
+>> "none" or to disable the alert. The behavior in the remote side can be
+>> implementation specific, the user can also interfere disabling the
+>> alert(eg: pressing a button).
+>> My point is: think in the UI elements behavior to implement the Find
+>> Me Locator APP. It is easy to implement a event driven action than add
+>> timers in the APP to control/block the user to press the
+>> button(control states).
+>>
+>> Does it help if we add a new property? eg: ImmediateAlertTimeout, zero
+>> means disabled.
+>>
+>> When both are enabled it not possible to determine which service
+>> triggered the IAS alert. If my previous suggestion doesn't help, I
+>> don't see another way to keep both services qualifiable unless we
+>> remove the timer and move the logic to the upper layer(I'd like to
+>> avoid if possible).
+>
+> After doing some more study and analysis at my end, I have come to
+> following points in case
+> both Proximity and FindMe services are supported by remote device
+> - There is no need of timer for immediate alert service if this is
+> initiated by Path Loss.
+> - Timer to be used only if this is triggered for FindMe. Once timer is
+> fired, the immediate alert is set to none and ATT connection is
+> maintained as Proximity Profile is still connected.
+>
+> In case only FindMe Profile is supported on remote device.
+> - Timer is triggered, and on expiration, ATT connection is
+> disconnected in accordance with FindMe Specification
+> - Before timer is fired, if user of Monitor sets alert level to None,
+> same is sent to remote side for stopping the alert.
+>
+> In short we need the following things to support the above use cases -
+> 1) An extra parameter in Immediate alert SetProperty to determine if
+> this alert is for Proximity or FindMe Profile.
+> 2) Mechanism to disconnect the ATT connection if only FindMe is
+> supported on remote device (Currently there is no provision to
+> disconnect the ATT connection in monitor.c, except explicit call to
+> monitor_destroy, which I think is not intended for that)
+>
+> Please let me know you views on this.
+>
+> --
+> Best Regards
+> Hemant Gupta
+> ST-Ericsson India
 
-	Gustavo
+
+
+-- 
+Best Regards
+Hemant Gupta
+ST-Ericsson India
