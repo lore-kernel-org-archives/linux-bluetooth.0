@@ -1,56 +1,167 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Thu, 22 Dec 2011 16:12:40 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv2 01/20] Bluetooth: A2MP: Create A2MP socket
+Message-ID: <20111222181240.GF2730@joana>
+References: <1324551986-29431-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1324551986-29431-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1324574296.1965.217.camel@aeonflux>
 MIME-Version: 1.0
-In-Reply-To: <4EF30EE3.6050602@monom.org>
-References: <CAMk70DBANeAndgm-nV=9Cgt2tvz=dRmd8WdpnJkNTe=a2LDugA@mail.gmail.com>
-	<4EF30EE3.6050602@monom.org>
-Date: Thu, 22 Dec 2011 12:38:26 -0600
-Message-ID: <CAMk70DAh0gaydUbj-ryqeo350+64j=vn-_-yGUk_wo=fYSuXYw@mail.gmail.com>
-Subject: Re: Bluetooth Headset Connection Issue Linux v3.0
-From: bubba junk <junkbubba2@gmail.com>
-To: Daniel Wagner <wagi@monom.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1324574296.1965.217.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for your reply. I forgot to mention in my original post that I
-have beenusing the same BT usb dongle and BT headset in Ubuntu 10.10,
-11.04, and 11.10.Everything worked fine in Ubuntu 10.10 and 11.04
-which I think were based onLinux Kernel 2.6.35 and 2.6.38
-respectively. In those versions, I was able topair and connect /
-disconnect / connect without issue. I've seen other postselsewhere
-that other folks are having the same bluetooth headset issue
-afterUbuntu 11.04. The symptoms and behavior appear to be the same.
-I'd love to try to help debug the issue so that it can be resolved. I
-would justneed some guidance on how to capture any needed information.
-I will try tocapture it and post it. Let me know how I can help.
+Hi Marcel,
 
-On Thu, Dec 22, 2011 at 5:05 AM, Daniel Wagner <wagi@monom.org> wrote:
-> Hi bubba,
->
-> On 21.12.2011 23:40, bubba junk wrote:
->> I am new to posting to mailing lists, so forgive me in advance if I am not
->> following protocol. I have an issue connecting to my bluetooth headset in
->> Ubuntu 11.10 Linux Kernel 3.0.0-14-generic. I am able to pair and connect
->> at first. But after disconnecting, I am no longer able to connect. I have to
->> un-pair then re-pair the device to connect again. After re-paring the headset
->> , it stays connected until I disconnect. Then again after disconnecting,
->> I am not able to connect. I saw some regression bug documentation to something
->> similar in Linux 2.6. Is this a known bug in 3.0?
->>
->> Thanks in advance for your help. Sorry for such a newbie question.
->
-> I am experience the something very similar here. I though my setup is
-> broken but maybe it isn't only on my system.
->
-> I started to debug it but had to fix other pressing things first. My
-> current understanding is that in on my system for some reasons the PC
-> does after a fresh pairing a correct encryption of the connection. After
-> that it does not encrypt it anymore and the device rejects the connection.
->
-> Be aware that this is not really proven yet. Luckily I have a BT sniffer
-> on my table... just need more time...
->
-> cheers,
-> daniel
->
+* Marcel Holtmann <marcel@holtmann.org> [2011-12-22 09:18:16 -0800]:
+
+> Hi Andrei,
+> 
+> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> > index f141fbe..b6ed4e5 100644
+> > --- a/include/net/bluetooth/l2cap.h
+> > +++ b/include/net/bluetooth/l2cap.h
+> > @@ -51,6 +51,8 @@
+> >  #define L2CAP_CONN_TIMEOUT             (40000) /* 40 seconds */
+> >  #define L2CAP_INFO_TIMEOUT             (4000)  /*  4 seconds */
+> >  
+> > +#define L2CAP_A2MP_DEFAULT_MTU		670
+> > +
+> >  /* L2CAP socket address */
+> >  struct sockaddr_l2 {
+> >  	sa_family_t	l2_family;
+> > @@ -224,6 +226,7 @@ struct l2cap_conn_rsp {
+> >  /* channel indentifier */
+> >  #define L2CAP_CID_SIGNALING	0x0001
+> >  #define L2CAP_CID_CONN_LESS	0x0002
+> > +#define L2CAP_CID_A2MP		0x0003
+> >  #define L2CAP_CID_LE_DATA	0x0004
+> >  #define L2CAP_CID_LE_SIGNALING	0x0005
+> >  #define L2CAP_CID_SMP		0x0006
+> > @@ -827,5 +830,6 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+> >  								u32 priority);
+> >  void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+> >  int l2cap_chan_check_security(struct l2cap_chan *chan);
+> > +void l2cap_ertm_init(struct l2cap_chan *chan);
+> 
+> these kind of changes that change the scope of a function deserve a
+> separate patch and proper commit message why we are doing it.
+>  
+> >  #endif /* __L2CAP_H */
+> > diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+> > new file mode 100644
+> > index 0000000..a5e9d17
+> > --- /dev/null
+> > +++ b/net/bluetooth/a2mp.c
+> > @@ -0,0 +1,91 @@
+> > +/*
+> > +   Copyright (c) 2010-2011 Code Aurora Forum.  All rights reserved.
+> > +   Copyright (c) 2011 Intel Corp.
+> > +
+> > +   This program is free software; you can redistribute it and/or modify
+> > +   it under the terms of the GNU General Public License version 2 and
+> > +   only version 2 as published by the Free Software Foundation.
+> > +
+> > +   This program is distributed in the hope that it will be useful,
+> > +   but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > +   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > +   GNU General Public License for more details.
+> > +*/
+> > +
+> > +#include <net/bluetooth/bluetooth.h>
+> > +#include <net/bluetooth/l2cap.h>
+> > +
+> > +static void l2cap_fixed_channel_config(struct sock *sk)
+> > +{
+> > +	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+> > +
+> > +	lock_sock(sk);
+> > +
+> > +	chan->omtu = L2CAP_A2MP_DEFAULT_MTU;
+> > +	chan->imtu = L2CAP_A2MP_DEFAULT_MTU;
+> > +	chan->flush_to = L2CAP_DEFAULT_FLUSH_TO;
+> > +	chan->fcs = L2CAP_FCS_CRC16;
+> > +
+> > +	chan->max_tx = 0xFF;
+> > +	chan->remote_max_tx = chan->max_tx;
+> > +
+> > +	/* Send 10 packets without ack */
+> > +	chan->tx_win = 10;
+> > +	chan->remote_tx_win = chan->tx_win;
+> > +
+> > +	chan->remote_mps = chan->omtu;
+> > +	chan->mps = chan->omtu;
+> > +
+> > +	chan->retrans_timeout = L2CAP_DEFAULT_RETRANS_TO;
+> > +	chan->monitor_timeout = L2CAP_DEFAULT_MONITOR_TO;
+> > +
+> > +	skb_queue_head_init(&chan->tx_q);
+> > +
+> > +	chan->mode = L2CAP_MODE_ERTM;
+> > +	l2cap_ertm_init(chan);
+> > +
+> > +	release_sock(sk);
+> > +}
+> > +
+> > +static struct socket *open_a2mp_sock(struct l2cap_conn *conn)
+> > +{
+> > +	int err;
+> > +	struct socket *sock;
+> > +	struct sockaddr_l2 addr;
+> > +	struct sock *sk;
+> > +
+> > +	err = sock_create_kern(PF_BLUETOOTH, SOCK_SEQPACKET,
+> > +					BTPROTO_L2CAP, &sock);
+> > +	if (err) {
+> > +		BT_ERR("sock_create_kern failed %d", err);
+> > +		return NULL;
+> > +	}
+> > +
+> > +	sk = sock->sk;
+> > +	memset(&addr, 0, sizeof(addr));
+> > +	bacpy(&addr.l2_bdaddr, conn->src);
+> > +	addr.l2_family = AF_BLUETOOTH;
+> > +	addr.l2_cid = L2CAP_CID_A2MP;
+> > +	err = kernel_bind(sock, (struct sockaddr *) &addr, sizeof(addr));
+> > +	if (err) {
+> > +		BT_ERR("kernel_bind failed %d", err);
+> > +		sock_release(sock);
+> > +		return NULL;
+> > +	}
+> > +
+> > +	l2cap_fixed_channel_config(sk);
+> > +
+> > +	memset(&addr, 0, sizeof(addr));
+> > +	bacpy(&addr.l2_bdaddr, conn->dst);
+> > +	addr.l2_family = AF_BLUETOOTH;
+> > +	addr.l2_cid = L2CAP_CID_A2MP;
+> > +	err = kernel_connect(sock, (struct sockaddr *) &addr, sizeof(addr),
+> > +							O_NONBLOCK);
+> > +	if ((err == 0) || (err == -EINPROGRESS))
+> > +		return sock;
+> > +	else {
+> > +		BT_ERR("kernel_connect failed %d", err);
+> > +		sock_release(sock);
+> > +		return NULL;
+> > +	}
+> > +}
+> 
+> And now I am confused. So either we use the socket inside the kernel
+> directly or we make internal calls to L2CAP. However this looks like a
+> really weird mix between we do whatever we please.
+> 
+> If this is has a long term plan that I am not away, I like to see these
+> parts properly commented in the code. Otherwise we end up in a disaster
+> area later on.
+
+We can also understand this as another call to create a proper way to access
+L2CAP inside the kernel. A big part of the work to create such interface is
+done, though the hardest part was left to the final.
+We could go L2CAP and fix this first and then create clean A2DP right from the
+beginning.
+
+	Gustavo
