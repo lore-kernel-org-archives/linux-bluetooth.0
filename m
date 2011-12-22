@@ -1,36 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1324583358.1965.225.camel@aeonflux>
-Subject: Re: [PATCH 05/12] Bluetooth: Don't use *_bh locks anymore
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Thu, 22 Dec 2011 17:49:39 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 22 Dec 2011 11:49:18 -0800
-In-Reply-To: <1324580173-24957-5-git-send-email-padovan@profusion.mobi>
+Subject: Re: [PATCH 09/12] Bluetooth: remove *_bh usage from hci_dev_list and
+ hci_cb_list
+Message-ID: <20111222194939.GG2730@joana>
 References: <1324580173-24957-1-git-send-email-padovan@profusion.mobi>
-	 <1324580173-24957-2-git-send-email-padovan@profusion.mobi>
-	 <1324580173-24957-3-git-send-email-padovan@profusion.mobi>
-	 <1324580173-24957-4-git-send-email-padovan@profusion.mobi>
-	 <1324580173-24957-5-git-send-email-padovan@profusion.mobi>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+ <1324580173-24957-2-git-send-email-padovan@profusion.mobi>
+ <1324580173-24957-3-git-send-email-padovan@profusion.mobi>
+ <1324580173-24957-4-git-send-email-padovan@profusion.mobi>
+ <1324580173-24957-5-git-send-email-padovan@profusion.mobi>
+ <1324580173-24957-6-git-send-email-padovan@profusion.mobi>
+ <1324580173-24957-7-git-send-email-padovan@profusion.mobi>
+ <1324580173-24957-8-git-send-email-padovan@profusion.mobi>
+ <1324580173-24957-9-git-send-email-padovan@profusion.mobi>
+ <1324583121.1965.221.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1324583121.1965.221.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Marcel,
 
-> Those locks are not shared between interrupt and process context anymore,
-> so remove the part that disable interruption. We are stiff safe because
-> preeption is disabled.
+* Marcel Holtmann <marcel@holtmann.org> [2011-12-22 11:45:21 -0800]:
+
+> Hi Gustavo,
 > 
-> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-> ---
->  net/bluetooth/l2cap_core.c |   24 ++++++++++++------------
->  1 files changed, 12 insertions(+), 12 deletions(-)
+> > They don't need to disable interruption anymore, we only run in interrupt
+> > context now.
+> 
+> I assume you mean process context here.
 
-any reason why this can not be converted into RCU usage?
+Yes. I left some typos in the messages. Ulisses helped me here to fix all of
+them.
 
-Regards
-
-Marcel
-
-
+	Gustavo
