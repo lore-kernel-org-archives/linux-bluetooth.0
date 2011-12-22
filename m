@@ -1,91 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 02/20] Bluetooth: A2MP: Add data_ready and state_change
-Date: Thu, 22 Dec 2011 13:06:08 +0200
-Message-Id: <1324551986-29431-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1324551986-29431-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1324551986-29431-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <1324522254.1965.193.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Add support for BCM20702A0 [0a5c:21e3]
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jesse Sung <jesse.sung@canonical.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 21 Dec 2011 18:50:54 -0800
+In-Reply-To: <1324522127-9039-1-git-send-email-jesse.sung@canonical.com>
+References: <1324522127-9039-1-git-send-email-jesse.sung@canonical.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Jesse,
 
-Adds sk_data_ready and sk_state_change for A2MP socket
+> Add another vendor specific ID for BCM20702A0.
+> 
+> output of usb-devices:
+> T: Bus=06 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#= 4 Spd=12 MxCh= 0
+> D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+> P: Vendor=0a5c ProdID=21e3 Rev=01.12
+> S: Manufacturer=Broadcom Corp
+> S: Product=BCM20702A0
+> S: SerialNumber=9439E5CBF66C
+> C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+> I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+> 
+> Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
+> ---
+>  drivers/bluetooth/btusb.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
+> 
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/a2mp.h |   20 ++++++++++++++++++++
- net/bluetooth/a2mp.c         |   22 ++++++++++++++++++++++
- 2 files changed, 42 insertions(+), 0 deletions(-)
- create mode 100644 include/net/bluetooth/a2mp.h
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-new file mode 100644
-index 0000000..97a0752
---- /dev/null
-+++ b/include/net/bluetooth/a2mp.h
-@@ -0,0 +1,20 @@
-+/*
-+   Copyright (c) 2010-2011 Code Aurora Forum.  All rights reserved.
-+   Copyright (c) 2011 Intel Corp.
-+
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License version 2 and
-+   only version 2 as published by the Free Software Foundation.
-+
-+   This program is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+   GNU General Public License for more details.
-+*/
-+
-+#ifndef __A2MP_H
-+#define __A2MP_H
-+
-+void a2mp_incoming(struct l2cap_conn *conn, struct sk_buff *skb);
-+
-+#endif /* __A2MP_H */
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index a5e9d17..87ff996 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -14,6 +14,25 @@
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/l2cap.h>
-+#include <net/bluetooth/a2mp.h>
-+
-+static void a2mp_data_ready(struct sock *sk, int bytes)
-+{
-+	struct sk_buff *skb;
-+
-+	BT_DBG("sk %p", sk);
-+
-+	/* skb_dequeue() is thread-safe */
-+	while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
-+		/* process a2mp here */
-+		kfree_skb(skb);
-+	}
-+}
-+
-+static void a2mp_state_change(struct sock *sk)
-+{
-+	BT_DBG("sk %p", sk);
-+}
- 
- static void l2cap_fixed_channel_config(struct sock *sk)
- {
-@@ -62,6 +81,9 @@ static struct socket *open_a2mp_sock(struct l2cap_conn *conn)
- 	}
- 
- 	sk = sock->sk;
-+	sk->sk_data_ready = a2mp_data_ready;
-+	sk->sk_state_change = a2mp_state_change;
-+
- 	memset(&addr, 0, sizeof(addr));
- 	bacpy(&addr.l2_bdaddr, conn->src);
- 	addr.l2_family = AF_BLUETOOTH;
--- 
-1.7.4.1
+Regards
+
+Marcel
+
 
