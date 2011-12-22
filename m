@@ -1,79 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 21 Dec 2011 22:07:35 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/4] Bluetooth: use buffer priority to mark URB_ISO_ASAP
- flag
-Message-ID: <20111222010735.GA22179@samus>
-References: <1320241924-2300-1-git-send-email-luiz.dentz@gmail.com>
- <1320241924-2300-4-git-send-email-luiz.dentz@gmail.com>
- <20111130172428.GA9425@samus>
- <CABBYNZKod-HNwzuFhoLRUQc66uJkEQL-u7NCknPAjbtvOMorgw@mail.gmail.com>
- <20111202122522.GG2570@joana>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20111202122522.GG2570@joana>
+From: Brian Gix <bgix@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Brian Gix <bgix@codeaurora.org>
+Subject: [PATCH-v9 2/2] Bluetooth: Add SMP to User Passkey and Confirm
+Date: Wed, 21 Dec 2011 16:12:13 -0800
+Message-Id: <1324512733-13510-3-git-send-email-bgix@codeaurora.org>
+In-Reply-To: <1324512733-13510-1-git-send-email-bgix@codeaurora.org>
+References: <1324512733-13510-1-git-send-email-bgix@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Low Energy pairing is performed through the SMP (Security Manager Protocol)
+mechanism rather than HCI.
 
-On 21:25 Fri 02 Dec, Gustavo Padovan wrote:
-> Hi Luiz,
-> 
-> * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-12-01 09:23:09 +0200]:
-> 
-> > Hi Vinicius,
-> > 
-> > On Wed, Nov 30, 2011 at 7:24 PM, Vinicius Costa Gomes
-> > <vinicius.gomes@openbossa.org> wrote:
-> > > Hi,
-> > >
-> > > On 15:52 Wed 02 Nov, Luiz Augusto von Dentz wrote:
-> > >> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > >>
-> > >> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > >> ---
-> > >>  drivers/bluetooth/btusb.c |    3 +++
-> > >>  1 files changed, 3 insertions(+), 0 deletions(-)
-> > >>
-> > >> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > >> index abfc4ee..9db2476 100644
-> > >> --- a/drivers/bluetooth/btusb.c
-> > >> +++ b/drivers/bluetooth/btusb.c
-> > >> @@ -727,6 +727,9 @@ static int btusb_send_frame(struct sk_buff *skb)
-> > >>               usb_fill_bulk_urb(urb, data->udev, pipe,
-> > >>                               skb->data, skb->len, btusb_tx_complete, skb);
-> > >>
-> > >> +             if (skb->priority >= HCI_PRIO_MAX - 1)
-> > >> +                     urb->transfer_flags  = URB_ISO_ASAP;
-> > >> +
-> > >
-> > > In case someone is having problems:
-> > >
-> > > With CONFIG_USB_DEBUG enabled the check that the URB_ISO_ASAP flag is
-> > > not valid for bulk endpoints is enabled, and that urb is rejected.
-> > 
-> > Hmm, you are right URB_ISO_ASAP is not meant for bulk so usb_submit_urb drop it:
-> > 
-> >  	/* fail if submitter gave bogus flags */
-> > 	if (urb->transfer_flags != orig_flags) {
-> > 		dev_err(&dev->dev, "BOGUS urb flags, %x --> %x\n",
-> > 			orig_flags, urb->transfer_flags);
-> > 		return -EINVAL;
-> > 	}
-> > 
-> > So we better remove asap.
-> 
-> Can you prepare a patch?
+Signed-off-by: Brian Gix <bgix@codeaurora.org>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c |   10 +++++++++-
+ 1 files changed, 9 insertions(+), 1 deletions(-)
 
-I forgot about this and got bitten again. Please don't forget about
-this ;-)
-
-> 
-> 	Gustavo
-
-Cheers,
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index fbcbef6..2540944 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -30,6 +30,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/mgmt.h>
++#include <net/bluetooth/smp.h>
+ 
+ #define MGMT_VERSION	0
+ #define MGMT_REVISION	1
+@@ -1642,8 +1643,15 @@ static int user_pairing_resp(struct sock *sk, u16 index, bdaddr_t *bdaddr,
+ 		}
+ 
+ 		/* Continue with pairing via SMP */
++		err = smp_user_confirm_reply(conn, mgmt_op, passkey);
++
++		if (!err)
++			err = cmd_status(sk, index, mgmt_op,
++							MGMT_STATUS_SUCCESS);
++		else
++			err = cmd_status(sk, index, mgmt_op,
++							MGMT_STATUS_FAILED);
+ 
+-		err = cmd_status(sk, index, mgmt_op, MGMT_STATUS_SUCCESS);
+ 		goto done;
+ 	}
+ 
 -- 
-Vinicius
+1.7.8
+
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum 
