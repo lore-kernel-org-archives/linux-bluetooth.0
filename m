@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 04/20] Bluetooth: A2MP: Build and Send msg helpers
-Date: Thu, 22 Dec 2011 13:06:10 +0200
-Message-Id: <1324551986-29431-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] Bluetooth: A2MP: Manage incoming connections
+Date: Thu, 22 Dec 2011 13:06:06 +0200
+Message-Id: <1324551986-29431-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1324551986-29431-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1324551986-29431-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,89 +11,106 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Helper function to build and send A2MP messages.
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Handle incoming A2MP connection by creating AMP manager and
+processing A2MP messages.
 ---
- include/net/bluetooth/a2mp.h |    7 ++++++
- net/bluetooth/a2mp.c         |   46 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 53 insertions(+), 0 deletions(-)
+ include/net/bluetooth/a2mp.h  |    5 +++++
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/a2mp.c          |   13 +++++++++++++
+ net/bluetooth/l2cap_core.c    |   13 ++++++++-----
+ 4 files changed, 27 insertions(+), 5 deletions(-)
 
 diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index ee42c86..6c160d4 100644
+index d204802..903a3e7 100644
 --- a/include/net/bluetooth/a2mp.h
 +++ b/include/net/bluetooth/a2mp.h
-@@ -26,6 +26,13 @@ struct amp_mgr {
- 	unsigned long		flags;
- };
+@@ -15,8 +15,13 @@
+ #ifndef __A2MP_H
+ #define __A2MP_H
  
-+struct a2mp_cmd {
-+	__u8	code;
-+	__u8	ident;
-+	__le16	len;
-+	__u8	data[0];
-+} __packed;
++#include <net/bluetooth/l2cap.h>
 +
- void amp_mgr_get(struct amp_mgr *mgr);
- int amp_mgr_put(struct amp_mgr *mgr);
+ #define A2MP_FEAT_EXT	0x8000
  
++
++int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb);
++
+ void a2mp_incoming(struct l2cap_conn *conn, struct sk_buff *skb);
+ 
+ struct amp_mgr {
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index c5dabf0..8bc6fb4 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -832,5 +832,6 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+ int l2cap_chan_check_security(struct l2cap_chan *chan);
+ void l2cap_ertm_init(struct l2cap_chan *chan);
++int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb);
+ 
+ #endif /* __L2CAP_H */
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index aa1fc95..3f69823 100644
+index da3873b..63e6aaf 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -21,6 +21,52 @@ static struct amp_mgr *get_amp_mgr_sk(struct sock *sk);
- LIST_HEAD(amp_mgr_list);
- DEFINE_MUTEX(amp_mgr_list_lock);
+@@ -568,6 +568,19 @@ finished:
+ 	return mgr;
+ }
  
-+/* A2MP build & send command helper functions */
-+static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
++void a2mp_incoming(struct l2cap_conn *conn, struct sk_buff *skb)
 +{
-+	struct a2mp_cmd *cmd;
-+	int plen;
++	struct amp_mgr *mgr;
++	struct sock *sk;
 +
-+	plen = sizeof(*cmd) + len;
-+	cmd = kzalloc(plen, GFP_KERNEL);
-+	if (!cmd)
-+		return NULL;
++	mgr = amp_mgr_create(conn);
++	sk = mgr->a2mp_sock->sk;
 +
-+	cmd->code = code;
-+	cmd->ident = ident;
-+	cmd->len = cpu_to_le16(len);
++	BT_DBG("mgr %p sk %p", mgr, sk);
 +
-+	memcpy(cmd->data, data, len);
-+
-+	return cmd;
++	l2cap_ertm_data_rcv(sk, skb);
 +}
 +
-+static inline int __a2mp_send(struct socket *sock, u8 *data, int len)
-+{
-+	struct kvec iv = { data, len };
-+	struct msghdr msg;
-+
-+	memset(&msg, 0, sizeof(msg));
-+
-+	return kernel_sendmsg(sock, &msg, &iv, 1, len);
-+}
-+
-+static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
-+								void *data)
-+{
-+	struct a2mp_cmd *cmd;
-+
-+	if (!mgr->a2mp_sock)
-+		return;
-+
-+	cmd = __a2mp_build(code, ident, len, data);
-+	if (!cmd)
-+		return;
-+
-+	__a2mp_send(mgr->a2mp_sock, (u8 *)cmd, len + sizeof(*cmd));
-+	kfree(cmd);
-+}
-+
- static void a2mp_data_ready(struct sock *sk, int bytes)
+ int a2mp_init(void)
  {
- 	struct sk_buff *skb;
+ #if 0
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 6fbe7ba..ba0f132 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -74,8 +74,6 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data);
+ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
+ 				struct l2cap_chan *chan, int err);
+ 
+-static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb);
+-
+ /* ---- L2CAP channels ---- */
+ 
+ static inline void chan_hold(struct l2cap_chan *c)
+@@ -4167,7 +4165,7 @@ static inline int l2cap_data_channel_sframe(struct l2cap_chan *chan, u32 rx_cont
+ 	return 0;
+ }
+ 
+-static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb)
++int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+ 	u32 control;
+@@ -4244,8 +4242,13 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 
+ 	chan = l2cap_get_chan_by_scid(conn, cid);
+ 	if (!chan) {
+-		BT_DBG("unknown cid 0x%4.4x", cid);
+-		goto drop;
++		if (cid == L2CAP_CID_A2MP) {
++			a2mp_incoming(conn, skb);
++			goto done;
++		} else {
++			BT_DBG("unknown cid 0x%4.4x", cid);
++			goto drop;
++		}
+ 	}
+ 
+ 	sk = chan->sk;
 -- 
 1.7.4.1
 
