@@ -1,61 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jesse Sung <jesse.sung@canonical.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add support for BCM20702A0 [0a5c:21e3]
-Date: Thu, 22 Dec 2011 10:48:47 +0800
-Message-Id: <1324522127-9039-1-git-send-email-jesse.sung@canonical.com>
+Date: Wed, 21 Dec 2011 22:07:35 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 4/4] Bluetooth: use buffer priority to mark URB_ISO_ASAP
+ flag
+Message-ID: <20111222010735.GA22179@samus>
+References: <1320241924-2300-1-git-send-email-luiz.dentz@gmail.com>
+ <1320241924-2300-4-git-send-email-luiz.dentz@gmail.com>
+ <20111130172428.GA9425@samus>
+ <CABBYNZKod-HNwzuFhoLRUQc66uJkEQL-u7NCknPAjbtvOMorgw@mail.gmail.com>
+ <20111202122522.GG2570@joana>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="------------1.7.7.3"
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20111202122522.GG2570@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Wen-chien Jesse Sung <jesse.sung@canonical.com>
+Hi Luiz,
 
-This is a multi-part message in MIME format.
---------------1.7.7.3
-Content-Type: text/plain; charset=UTF-8; format=fixed
-Content-Transfer-Encoding: 8bit
+On 21:25 Fri 02 Dec, Gustavo Padovan wrote:
+> Hi Luiz,
+> 
+> * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-12-01 09:23:09 +0200]:
+> 
+> > Hi Vinicius,
+> > 
+> > On Wed, Nov 30, 2011 at 7:24 PM, Vinicius Costa Gomes
+> > <vinicius.gomes@openbossa.org> wrote:
+> > > Hi,
+> > >
+> > > On 15:52 Wed 02 Nov, Luiz Augusto von Dentz wrote:
+> > >> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > >>
+> > >> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > >> ---
+> > >>  drivers/bluetooth/btusb.c |    3 +++
+> > >>  1 files changed, 3 insertions(+), 0 deletions(-)
+> > >>
+> > >> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > >> index abfc4ee..9db2476 100644
+> > >> --- a/drivers/bluetooth/btusb.c
+> > >> +++ b/drivers/bluetooth/btusb.c
+> > >> @@ -727,6 +727,9 @@ static int btusb_send_frame(struct sk_buff *skb)
+> > >>               usb_fill_bulk_urb(urb, data->udev, pipe,
+> > >>                               skb->data, skb->len, btusb_tx_complete, skb);
+> > >>
+> > >> +             if (skb->priority >= HCI_PRIO_MAX - 1)
+> > >> +                     urb->transfer_flags  = URB_ISO_ASAP;
+> > >> +
+> > >
+> > > In case someone is having problems:
+> > >
+> > > With CONFIG_USB_DEBUG enabled the check that the URB_ISO_ASAP flag is
+> > > not valid for bulk endpoints is enabled, and that urb is rejected.
+> > 
+> > Hmm, you are right URB_ISO_ASAP is not meant for bulk so usb_submit_urb drop it:
+> > 
+> >  	/* fail if submitter gave bogus flags */
+> > 	if (urb->transfer_flags != orig_flags) {
+> > 		dev_err(&dev->dev, "BOGUS urb flags, %x --> %x\n",
+> > 			orig_flags, urb->transfer_flags);
+> > 		return -EINVAL;
+> > 	}
+> > 
+> > So we better remove asap.
+> 
+> Can you prepare a patch?
 
+I forgot about this and got bitten again. Please don't forget about
+this ;-)
 
-Add another vendor specific ID for BCM20702A0.
+> 
+> 	Gustavo
 
-output of usb-devices:
-T: Bus=06 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#= 4 Spd=12 MxCh= 0
-D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-P: Vendor=0a5c ProdID=21e3 Rev=01.12
-S: Manufacturer=Broadcom Corp
-S: Product=BCM20702A0
-S: SerialNumber=9439E5CBF66C
-C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-
-Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
----
- drivers/bluetooth/btusb.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
-
-
---------------1.7.7.3
-Content-Type: text/x-patch; name="0001-Bluetooth-Add-support-for-BCM20702A0-0a5c-21e3.patch"
-Content-Transfer-Encoding: 8bit
-Content-Disposition: attachment; filename="0001-Bluetooth-Add-support-for-BCM20702A0-0a5c-21e3.patch"
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index a67c6db..fbfba80 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -101,6 +101,7 @@ static struct usb_device_id btusb_table[] = {
- 	{ USB_DEVICE(0x0c10, 0x0000) },
- 
- 	/* Broadcom BCM20702A0 */
-+	{ USB_DEVICE(0x0a5c, 0x21e3) },
- 	{ USB_DEVICE(0x413c, 0x8197) },
- 
- 	{ }	/* Terminating entry */
-
---------------1.7.7.3--
-
-
+Cheers,
+-- 
+Vinicius
