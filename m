@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 12/20] Bluetooth: A2MP: Process A2MP Discover Request
-Date: Thu, 22 Dec 2011 13:06:18 +0200
-Message-Id: <1324551986-29431-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 09/20] Bluetooth: A2MP: Process A2MP messages
+Date: Thu, 22 Dec 2011 13:06:15 +0200
+Message-Id: <1324551986-29431-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1324551986-29431-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1324551986-29431-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,103 +11,89 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Process A2MP Discover Request, code makes sure that first
-controller in the list is BREDR one. Trace is shown below:
+Implement basic processing for AMP Manager Protocol (A2MP).
+
+Example below shows processing unrecognized command.
 ...
-> ACL data: handle 11 flags 0x02 dlen 16
-    A2MP: Discover req: mtu/mps 670 mask: 0x0000
-< ACL data: handle 11 flags 0x00 dlen 19
-    A2MP: Discover rsp: mtu/mps 670 mask: 0x0000
-      Controller list:
-        id 0, type 0, status 0x01 (Bluetooth only)
+> ACL data: handle 11 flags 0x02 dlen 12
+    A2MP: code 0x00 ident 3 len 0
+< ACL data: handle 11 flags 0x00 dlen 14
+    A2MP: Command Reject: reason (0) - Command not recognized
 ...
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |    2 +
- net/bluetooth/a2mp.c         |   49 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 51 insertions(+), 0 deletions(-)
+ net/bluetooth/a2mp.c |   57 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 57 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 2b6fa0f..d204802 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -15,6 +15,8 @@
- #ifndef __A2MP_H
- #define __A2MP_H
- 
-+#define A2MP_FEAT_EXT	0x8000
-+
- void a2mp_incoming(struct l2cap_conn *conn, struct sk_buff *skb);
- 
- struct amp_mgr {
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index c18eb59..ae1a5671 100644
+index 44b0887..3c75de9 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -117,6 +117,52 @@ static inline int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
- 	return 0;
+@@ -67,6 +67,63 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
+ 	kfree(cmd);
  }
  
-+static inline int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
-+							struct a2mp_cmd *hdr)
++/* Handle A2MP signalling */
++void a2mp_receive(struct sock *sk, struct sk_buff *skb)
 +{
-+	struct a2mp_discov_req *req = (struct a2mp_discov_req *)skb->data;
-+	struct a2mp_discov_rsp *rsp;
-+	u16 ext_feat;
-+	size_t len;
-+	u8 num_ctrl;
++	struct a2mp_cmd *hdr = (struct a2mp_cmd *) skb->data;
++	struct amp_mgr *mgr;
++	int err = 0;
 +
-+	if (le16_to_cpu(hdr->len) < sizeof(*req))
-+		return -EINVAL;
++	mgr = get_amp_mgr_sk(sk);
++	if (!mgr)
++		return;
 +
-+	skb_pull(skb, sizeof(*req));
++	while (skb->len >= sizeof(*hdr)) {
++		struct a2mp_cmd *hdr = (struct a2mp_cmd *) skb->data;
++		u16 len = le16_to_cpu(hdr->len);
 +
-+	BT_DBG("mtu %d efm 0x%4.4x", le16_to_cpu(req->mtu),
-+						le16_to_cpu(req->ext_feat));
++		BT_DBG("code 0x%02x id %d len %d", hdr->code, hdr->ident, len);
 +
-+	ext_feat = le16_to_cpu(req->ext_feat);
++		skb_pull(skb, sizeof(*hdr));
 +
-+	/* check that packet is not broken for now */
-+	while (ext_feat & A2MP_FEAT_EXT) {
-+		if (skb->len < sizeof(ext_feat))
-+			return -EINVAL;
++		if (len > skb->len || !hdr->ident) {
++			err = -EINVAL;
++			break;
++		}
 +
-+		ext_feat = get_unaligned_le16(skb->data);
-+		BT_DBG("ext_feat 0x%4.4x", le16_to_cpu(req->ext_feat));
-+		skb_pull(skb, sizeof(ext_feat));
++		switch (hdr->code) {
++		case A2MP_COMMAND_REJ:
++		case A2MP_DISCOVER_REQ:
++		case A2MP_CHANGE_NOTIFY:
++		case A2MP_GETINFO_REQ:
++		case A2MP_GETAMPASSOC_REQ:
++		case A2MP_CREATEPHYSLINK_REQ:
++		case A2MP_DISCONNPHYSLINK_REQ:
++		case A2MP_CHANGE_RSP:
++		case A2MP_DISCOVER_RSP:
++		case A2MP_GETINFO_RSP:
++		case A2MP_GETAMPASSOC_RSP:
++		case A2MP_CREATEPHYSLINK_RSP:
++		case A2MP_DISCONNPHYSLINK_RSP:
++		default:
++			BT_ERR("Unknown A2MP signaling command 0x%2.2x",
++								hdr->code);
++			err = -EINVAL;
++			break;
++		}
 +	}
 +
-+	num_ctrl = hci_num_ctrl();
-+	len = num_ctrl * sizeof(struct a2mp_cl) + sizeof(*rsp);
-+	rsp = kmalloc(len, GFP_KERNEL);
-+	if (!rsp)
-+		return -ENOMEM;
++	if (err) {
++		struct a2mp_cmd_rej rej;
++		rej.reason = cpu_to_le16(0);
 +
-+	rsp->mtu = cpu_to_le16(L2CAP_A2MP_DEFAULT_MTU);
-+	rsp->ext_feat = 0;
++		a2mp_send(mgr, A2MP_COMMAND_REJ, hdr->ident, sizeof(rej),
++									&rej);
++	}
 +
-+	__a2mp_add_cl(mgr, rsp->cl, num_ctrl);
-+
-+	a2mp_send(mgr, A2MP_DISCOVER_RSP, hdr->ident, len, rsp);
-+
-+	kfree(rsp);
-+	return 0;
++	amp_mgr_put(mgr);
 +}
 +
- /* Handle A2MP signalling */
- void a2mp_receive(struct sock *sk, struct sk_buff *skb)
+ static void a2mp_data_ready(struct sock *sk, int bytes)
  {
-@@ -147,6 +193,9 @@ void a2mp_receive(struct sock *sk, struct sk_buff *skb)
- 			break;
- 
- 		case A2MP_DISCOVER_REQ:
-+			err = a2mp_discover_req(mgr, skb, hdr);
-+			break;
-+
- 		case A2MP_CHANGE_NOTIFY:
- 		case A2MP_GETINFO_REQ:
- 		case A2MP_GETAMPASSOC_REQ:
+ 	struct sk_buff *skb;
 -- 
 1.7.4.1
 
