@@ -2,49 +2,56 @@ Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH 08/12] Bluetooth: Remove local_bh_disable() from hci_sock.c
-Date: Thu, 22 Dec 2011 16:56:09 -0200
-Message-Id: <1324580173-24957-8-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1324580173-24957-7-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 07/12] Bluetooth: Remove lock from inquiry_cache
+Date: Thu, 22 Dec 2011 16:56:08 -0200
+Message-Id: <1324580173-24957-7-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1324580173-24957-6-git-send-email-padovan@profusion.mobi>
 References: <1324580173-24957-1-git-send-email-padovan@profusion.mobi>
  <1324580173-24957-2-git-send-email-padovan@profusion.mobi>
  <1324580173-24957-3-git-send-email-padovan@profusion.mobi>
  <1324580173-24957-4-git-send-email-padovan@profusion.mobi>
  <1324580173-24957-5-git-send-email-padovan@profusion.mobi>
  <1324580173-24957-6-git-send-email-padovan@profusion.mobi>
- <1324580173-24957-7-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 
-Everything is in process context now, we do not need such a call.
+It was never used, so removing it.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- net/bluetooth/hci_sock.c |    2 --
- 1 files changed, 0 insertions(+), 2 deletions(-)
+ include/net/bluetooth/hci_core.h |    7 -------
+ 1 files changed, 0 insertions(+), 7 deletions(-)
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 189a667..896a72f 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -767,7 +767,6 @@ static int hci_sock_dev_event(struct notifier_block *this, unsigned long event,
- 		/* Detach sockets from device */
- 		read_lock(&hci_sk_list.lock);
- 		sk_for_each(sk, node, &hci_sk_list.head) {
--			local_bh_disable();
- 			bh_lock_sock_nested(sk);
- 			if (hci_pi(sk)->hdev == hdev) {
- 				hci_pi(sk)->hdev = NULL;
-@@ -778,7 +777,6 @@ static int hci_sock_dev_event(struct notifier_block *this, unsigned long event,
- 				hci_dev_put(hdev);
- 			}
- 			bh_unlock_sock(sk);
--			local_bh_enable();
- 		}
- 		read_unlock(&hci_sk_list.lock);
- 	}
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 4ff08d6..37d7cb8 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -50,7 +50,6 @@ struct inquiry_entry {
+ };
+ 
+ struct inquiry_cache {
+-	spinlock_t		lock;
+ 	__u32			timestamp;
+ 	struct inquiry_entry	*list;
+ };
+@@ -349,15 +348,9 @@ extern int sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb);
+ #define INQUIRY_CACHE_AGE_MAX   (HZ*30)   /* 30 seconds */
+ #define INQUIRY_ENTRY_AGE_MAX   (HZ*60)   /* 60 seconds */
+ 
+-#define inquiry_cache_lock(c)		spin_lock(&c->lock)
+-#define inquiry_cache_unlock(c)		spin_unlock(&c->lock)
+-#define inquiry_cache_lock_bh(c)	spin_lock_bh(&c->lock)
+-#define inquiry_cache_unlock_bh(c)	spin_unlock_bh(&c->lock)
+-
+ static inline void inquiry_cache_init(struct hci_dev *hdev)
+ {
+ 	struct inquiry_cache *c = &hdev->inq_cache;
+-	spin_lock_init(&c->lock);
+ 	c->list = NULL;
+ }
+ 
 -- 
 1.7.6.4
 
