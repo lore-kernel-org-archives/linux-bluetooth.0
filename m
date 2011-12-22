@@ -1,60 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 00/20] RFC Bluetooth A2MP implementation
-Date: Thu, 22 Dec 2011 13:06:04 +0200
-Message-Id: <1324551986-29431-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 02/20] Bluetooth: A2MP: Add data_ready and state_change
+Date: Thu, 22 Dec 2011 13:06:08 +0200
+Message-Id: <1324551986-29431-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1324551986-29431-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1324551986-29431-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Changes:
-	* RFCv2 rebased against "workqueue" patches.
-	* RFCv1 added refcnt to amp_mgr, fixed sleeping in atomic
+Adds sk_data_ready and sk_state_change for A2MP socket
 
-Code based on Code Aurora (git://codeaurora.org/kernel/msm.git) and Atheros
-(search for: [PATCH 2/3] Add a2mp protocol/AMP manager, by Atheros Linux BT3)
-implementations (mostly Code Aurora). Main difference to the original code is
-- code rebase against recent bluetooth-next
-- rewritten way to send A2MP msgs
-- handling fixed channel modifications
-- I was trying to separate AMP vs A2MP name usage. AMP is used for
-"Alternate MAC PHY" controller, A2MP for "AMP Manager Protocol".
-- fixes related to PTS beta A2MP tests
-
-Andrei Emeltchenko (20):
-  Bluetooth: A2MP: Create A2MP socket
-  Bluetooth: A2MP: Add data_ready and state_change
-  Bluetooth: A2MP: AMP Manager basic functions
-  Bluetooth: A2MP: Build and Send msg helpers
-  Bluetooth: A2MP: Remove AMP manager in state_change
-  Bluetooth: A2MP: AMP manager initialization
-  Bluetooth: A2MP: Definitions for A2MP commands
-  Bluetooth: A2MP: Define A2MP status codes
-  Bluetooth: A2MP: Process A2MP messages
-  Bluetooth: A2MP: Process A2MP Command Reject
-  Bluetooth: A2MP: Helper functions to count HCI devs
-  Bluetooth: A2MP: Process A2MP Discover Request
-  Bluetooth: A2MP: Process A2MP Change Notify
-  Bluetooth: A2MP: Process A2MP Get Info Request
-  Bluetooth: A2MP: Process A2MP Get AMP Assoc Request
-  Bluetooth: A2MP: Process A2MP Create Physlink Request
-  Bluetooth: A2MP: Process A2MP Disc Physlink Request
-  Bluetooth: A2MP: Process A2MP Command Responses
-  Bluetooth: A2MP: Handling fixed channel
-  Bluetooth: A2MP: Manage incoming connections
-
- include/net/bluetooth/a2mp.h     |  128 ++++++++
- include/net/bluetooth/hci.h      |    2 +
- include/net/bluetooth/hci_core.h |   14 +
- include/net/bluetooth/l2cap.h    |    6 +
- net/bluetooth/a2mp.c             |  600 ++++++++++++++++++++++++++++++++++++++
- net/bluetooth/l2cap_core.c       |   90 ++++--
- 6 files changed, 812 insertions(+), 28 deletions(-)
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/a2mp.h |   20 ++++++++++++++++++++
+ net/bluetooth/a2mp.c         |   22 ++++++++++++++++++++++
+ 2 files changed, 42 insertions(+), 0 deletions(-)
  create mode 100644 include/net/bluetooth/a2mp.h
- create mode 100644 net/bluetooth/a2mp.c
 
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+new file mode 100644
+index 0000000..97a0752
+--- /dev/null
++++ b/include/net/bluetooth/a2mp.h
+@@ -0,0 +1,20 @@
++/*
++   Copyright (c) 2010-2011 Code Aurora Forum.  All rights reserved.
++   Copyright (c) 2011 Intel Corp.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License version 2 and
++   only version 2 as published by the Free Software Foundation.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++*/
++
++#ifndef __A2MP_H
++#define __A2MP_H
++
++void a2mp_incoming(struct l2cap_conn *conn, struct sk_buff *skb);
++
++#endif /* __A2MP_H */
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index a5e9d17..87ff996 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -14,6 +14,25 @@
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/l2cap.h>
++#include <net/bluetooth/a2mp.h>
++
++static void a2mp_data_ready(struct sock *sk, int bytes)
++{
++	struct sk_buff *skb;
++
++	BT_DBG("sk %p", sk);
++
++	/* skb_dequeue() is thread-safe */
++	while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
++		/* process a2mp here */
++		kfree_skb(skb);
++	}
++}
++
++static void a2mp_state_change(struct sock *sk)
++{
++	BT_DBG("sk %p", sk);
++}
+ 
+ static void l2cap_fixed_channel_config(struct sock *sk)
+ {
+@@ -62,6 +81,9 @@ static struct socket *open_a2mp_sock(struct l2cap_conn *conn)
+ 	}
+ 
+ 	sk = sock->sk;
++	sk->sk_data_ready = a2mp_data_ready;
++	sk->sk_state_change = a2mp_state_change;
++
+ 	memset(&addr, 0, sizeof(addr));
+ 	bacpy(&addr.l2_bdaddr, conn->src);
+ 	addr.l2_family = AF_BLUETOOTH;
 -- 
 1.7.4.1
 
