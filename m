@@ -1,43 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH v3] Add USB ID of HP's Broadcom BCM2035 Bluetooth
-From: Albert Pool <albertpool@solcon.nl>
-To: marcel@holtmann.org, padovan@profusion.mobi
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Date: Sat, 24 Dec 2011 13:01:04 +0100
-Message-ID: <1324728064.3074.5.camel@albert-ASUSTeK-P4P800SE>
-Mime-Version: 1.0
+Date: Fri, 23 Dec 2011 19:10:20 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2011-12-23
+Message-ID: <20111223211020.GH5287@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add USB ID of HP's Broadcom BCM2035 Bluetooth 03f0:011d
+Hi John,
 
->From usb-devices:
-T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=03f0 ProdID=011d Rev=00.17
-S:  Manufacturer=Broadcom
-S:  Product=HP integrated Bluetooth module
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
+This commit was causing resume issues in a Thinkpad laptop, please pull it.
+Can we make this for 3.2? Thanks.
 
-Signed-off-by: Albert Pool <albertpool@solcon.nl> 
-- - - 
-It now pairs to my laptop (which has the other HP device 03f0:171d) but does not yet pair to my desktop with 0a12:0001 Cambridge Silicon Radio dongle.
-I've also tried using BTUSB_WRONG_SCO_MTU, but with that setting it often failed to enable the device.
-This patch is at least an improvement as it used to pair to nothing at all. Perhaps anyone knows a better solution with which it pairs to everything just like on Windows XP?
+	Gustavo
 
---- a/drivers/bluetooth/btusb.c 
-+++ b/drivers/bluetooth/btusb.c 
-@@ -142,7 +142,8 @@ static struct usb_device_id blacklist_ta 
- 	{ USB_DEVICE(0x0a5c, 0x201e), .driver_info = BTUSB_WRONG_SCO_MTU }, 
- 	{ USB_DEVICE(0x0a5c, 0x2110), .driver_info = BTUSB_WRONG_SCO_MTU }, 
- 
--	/* HP laptop with Broadcom chip */ 
-+	/* HP laptops with Broadcom chip */ 
-+	{ USB_DEVICE(0x03f0, 0x011d), .driver_info = BTUSB_BCM92035 }, 
- 	{ USB_DEVICE(0x03f0, 0x171d), .driver_info = BTUSB_WRONG_SCO_MTU }, 
- 
- 	/* Dell laptop with Broadcom chip */ 
+The following changes since commit 96f1f05af76b601ab21a7dc603ae0a1cea4efc3d:
+
+  iwlwifi: update SCD BC table for all SCD queues (2011-12-19 14:20:39 -0500)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth master
+
+Gustavo F. Padovan (1):
+      Revert "Bluetooth: Increase HCI reset timeout in hci_dev_do_close"
+
+ net/bluetooth/hci_core.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
