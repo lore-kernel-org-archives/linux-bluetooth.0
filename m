@@ -1,39 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Fri, 23 Dec 2011 14:54:29 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: =?utf-8?B?VG9tw6HFoSBKYW5vdcWhZWs=?= <tomi@nomi.cz>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	Szymon Janc <szymon@janc.net.pl>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Linux PM mailing list <linux-pm@vger.kernel.org>,
-	"Srivatsa S. Bhat" <srivatsa.bhat@linux.vnet.ibm.com>
-Subject: Re: [REGRESSION] resume takes 10s longer due to e1b6eb3 (Bluetooth:
- Increase HCI reset timeout ...)
-Message-ID: <20111223165429.GA5287@joana>
-References: <20111118184017.GA5052@nomi.cz>
- <20111121152506.GB15633@fusion.localdomain>
- <20111121211506.GA16081@nomi.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20111121211506.GA16081@nomi.cz>
+From: Radoslaw Jablonski <radoslawjablonski@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Radoslaw Jablonski <radoslawjablonski@gmail.com>
+Subject: [PATCH] audio: Use headset_shutdown in headset_setconf_cb
+Date: Fri, 23 Dec 2011 12:18:00 +0100
+Message-Id: <1324639080-32467-1-git-send-email-radoslawjablonski@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tom=C3=A1=C5=A1,
+If pending connection will stay after state has been changed
+to HEADSET_STATE_DISCONNECTED, then crash may happen (e.g. when
+hs_connect will be called quickly again after that)
+To avoid that kind of problems using headset_shutdown,
+which does necessary cleanup first (finalizes pending connections)
+and after that changes state to HEADSET_STATE_DISCONNECTED.
+---
+ audio/media.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-* Tom=C3=A1=C5=A1 Janou=C5=A1ek <tomi@nomi.cz> [2011-11-21 22:15:07 +0100]:
+diff --git a/audio/media.c b/audio/media.c
+index a2ef437..a363b8e 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -197,7 +197,7 @@ static void headset_setconf_cb(struct media_endpoint *endpoint, void *ret,
+ 	if (ret != NULL)
+ 		return;
+ 
+-	headset_set_state(dev, HEADSET_STATE_DISCONNECTED);
++	headset_shutdown(dev);
+ }
+ 
+ static void clear_configuration(struct media_endpoint *endpoint)
+-- 
+1.7.0.4
 
-> Hi Johan,
->=20
-> On Mon, Nov 21, 2011 at 05:25:06PM +0200, Johan Hedberg wrote:
-> > It might be worth to try out the two patches I just sent to
-> > linux-bluetooth for HCI command failure tracking. They make sure that
-> > failures are properly caught which should help avoid triggering the
-> > timeout in certain scenarios (and yours might be one of them).
->=20
-> No, these don't help. :-(
-
-Is this still happening? If yes I'm going to revert this patch.
-
-	Gustavo
