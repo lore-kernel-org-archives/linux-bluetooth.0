@@ -1,41 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 23 Dec 2011 21:48:49 +0100
-From: =?utf-8?B?VG9tw6HFoSBKYW5vdcWhZWs=?= <tomi@nomi.cz>
-To: Szymon Janc <szymon@janc.net.pl>
-Cc: Gustavo Padovan <padovan@profusion.mobi>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Linux PM mailing list <linux-pm@vger.kernel.org>,
-	"Srivatsa S. Bhat" <srivatsa.bhat@linux.vnet.ibm.com>
-Subject: Re: [REGRESSION] resume takes 10s longer due to e1b6eb3
-	(Bluetooth: Increase HCI reset timeout ...)
-Message-ID: <20111223204849.GA23712@nomi.cz>
-References: <20111118184017.GA5052@nomi.cz> <20111121211506.GA16081@nomi.cz> <20111223165429.GA5287@joana> <201112232143.20937.szymon@janc.net.pl>
+From: Szymon Janc <szymon@janc.net.pl>
+To: Gustavo Padovan <padovan@profusion.mobi>
+Subject: Re: [REGRESSION] resume takes 10s longer due to e1b6eb3 (Bluetooth: Increase HCI reset timeout ...)
+Date: Fri, 23 Dec 2011 21:43:20 +0100
+Cc: =?utf-8?q?Tom=C3=A1=C5=A1_Janou=C5=A1ek?= <tomi@nomi.cz>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Linux PM mailing list <linux-pm@vger.kernel.org>,
+ "Srivatsa S. Bhat" <srivatsa.bhat@linux.vnet.ibm.com>
+References: <20111118184017.GA5052@nomi.cz> <20111121211506.GA16081@nomi.cz> <20111223165429.GA5287@joana>
+In-Reply-To: <20111223165429.GA5287@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <201112232143.20937.szymon@janc.net.pl>
+Content-Type: Text/Plain;
+  charset="utf-8"
+Message-Id: <201112232143.20937.szymon@janc.net.pl>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+On Friday 23 December 2011 17:54:29 Gustavo Padovan wrote:
 
-On Fri, Dec 23, 2011 at 09:43:20PM +0100, Szymon Janc wrote:
-> > Is this still happening? If yes I'm going to revert this patch.
+Hi,
 
-Yes, it is.
+> > On Mon, Nov 21, 2011 at 05:25:06PM +0200, Johan Hedberg wrote:
+> > > It might be worth to try out the two patches I just sent to
+> > > linux-bluetooth for HCI command failure tracking. They make sure that
+> > > failures are properly caught which should help avoid triggering the
+> > > timeout in certain scenarios (and yours might be one of them).
+> > 
+> > No, these don't help. :-(
+> 
+> Is this still happening? If yes I'm going to revert this patch.
 
-> I kindly ask to not revert this patch yet as this will bring back issue on my 
-> CSR dongle.
+I kindly ask to not revert this patch yet as this will bring back issue on my 
+CSR dongle.
 
-As far as I'm concerned, I don't mind either way. There's a trivial
-workaround and I didn't have to think about this ever since I applied it.
+If this regression still happening I can try investigate it next week (as long 
+as Tomáš is willing to provide more detailed logs and do some tests if 
+needed).
 
-> If this regression still happening I can try investigate it next week (as long 
-> as Tomáš is willing to provide more detailed logs and do some tests if 
-> needed).
 
-Tell me what you need and how can I get that, and I'm all yours.
-
-Regards,
 -- 
-Tomáš Janoušek, a.k.a. Liskni_si, http://work.lisk.in/
+Szymon K. Janc
+szymon@janc.net.pl // GG: 1383435
