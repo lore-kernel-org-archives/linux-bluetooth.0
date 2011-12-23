@@ -1,42 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH v2] Add USB ID of HP's Broadcom BCM2035 Bluetooth
-From: Albert Pool <albertpool@solcon.nl>
-To: marcel@holtmann.org, padovan@profusion.mobi
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 23 Dec 2011 11:41:59 +0100
-Message-ID: <1324636919.2912.0.camel@albert-ASUSTeK-P4P800SE>
-Mime-Version: 1.0
+Message-ID: <4EF4582E.6020308@visionsystems.de>
+Date: Fri, 23 Dec 2011 11:30:06 +0100
+From: Yegor Yefremov <yegor_sub1@visionsystems.de>
+Reply-To: yegor_sub1@visionsystems.de
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+CC: Marcel Holtmann <marcel@holtmann.org>, johan.hedberg@gmail.com
+Subject: bluez-4.97: check dependnecy
+Content-Type: text/plain; charset=ISO-8859-15
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add USB ID of HP's Broadcom BCM2035 Bluetooth 03f0:011d
+I was cross compiling bluez-4.97 under Buildroot and with the same configuration as for 4.96 configure failed by not being able to find check framework. Could this dependency be dropped if I don't want to compile tests? I mean it doesn't make much sense using check on x86 build host for arm binaries.
 
-Signed-off-by: Albert Pool <albertpool@solcon.nl> 
-- - - 
-With this patch the Bluetooth device of the HP Compaq nc6120 is able to pair to other devices.
-I've also tried using BTUSB_WRONG_SCO_MTU, but with that setting it often failed to enable the device.
-
->From usb-devices:
-T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=03f0 ProdID=011d Rev=00.17
-S:  Manufacturer=Broadcom
-S:  Product=HP integrated Bluetooth module
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
-
---- a/drivers/bluetooth/btusb.c 
-+++ b/drivers/bluetooth/btusb.c 
-@@ -142,7 +142,8 @@ static struct usb_device_id blacklist_ta 
- 	{ USB_DEVICE(0x0a5c, 0x201e), .driver_info = BTUSB_WRONG_SCO_MTU }, 
- 	{ USB_DEVICE(0x0a5c, 0x2110), .driver_info = BTUSB_WRONG_SCO_MTU }, 
- 
--	/* HP laptop with Broadcom chip */ 
-+	/* HP laptops with Broadcom chip */ 
-+	{ USB_DEVICE(0x03f0, 0x011d), .driver_info = BTUSB_BCM92035 }, 
- 	{ USB_DEVICE(0x03f0, 0x171d), .driver_info = BTUSB_WRONG_SCO_MTU }, 
- 
- 	/* Dell laptop with Broadcom chip */ 
+Best regards,
+Yegor
