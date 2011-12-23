@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Fri, 23 Dec 2011 19:05:13 -0200
+Date: Fri, 23 Dec 2011 19:03:43 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Szymon Janc <szymon@janc.net.pl>
-Cc: =?utf-8?B?VG9tw6HFoSBKYW5vdcWhZWs=?= <tomi@nomi.cz>,
+To: =?utf-8?B?VG9tw6HFoSBKYW5vdcWhZWs=?= <tomi@nomi.cz>
+Cc: Szymon Janc <szymon@janc.net.pl>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -11,46 +11,28 @@ Cc: =?utf-8?B?VG9tw6HFoSBKYW5vdcWhZWs=?= <tomi@nomi.cz>,
 	"Srivatsa S. Bhat" <srivatsa.bhat@linux.vnet.ibm.com>
 Subject: Re: [REGRESSION] resume takes 10s longer due to e1b6eb3 (Bluetooth:
  Increase HCI reset timeout ...)
-Message-ID: <20111223210513.GG5287@joana>
+Message-ID: <20111223210343.GF5287@joana>
 References: <20111118184017.GA5052@nomi.cz>
  <20111121211506.GA16081@nomi.cz>
  <20111223165429.GA5287@joana>
  <201112232143.20937.szymon@janc.net.pl>
+ <20111223204849.GA23712@nomi.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <201112232143.20937.szymon@janc.net.pl>
+In-Reply-To: <20111223204849.GA23712@nomi.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Tom=C3=A1=C5=A1,
 
-* Szymon Janc <szymon@janc.net.pl> [2011-12-23 21:43:20 +0100]:
+* Tom=C3=A1=C5=A1 Janou=C5=A1ek <tomi@nomi.cz> [2011-12-23 21:48:49 +0100]:
 
-> On Friday 23 December 2011 17:54:29 Gustavo Padovan wrote:
+> Hello,
 >=20
-> Hi,
+> On Fri, Dec 23, 2011 at 09:43:20PM +0100, Szymon Janc wrote:
+> > > Is this still happening? If yes I'm going to revert this patch.
 >=20
-> > > On Mon, Nov 21, 2011 at 05:25:06PM +0200, Johan Hedberg wrote:
-> > > > It might be worth to try out the two patches I just sent to
-> > > > linux-bluetooth for HCI command failure tracking. They make sure th=
-at
-> > > > failures are properly caught which should help avoid triggering the
-> > > > timeout in certain scenarios (and yours might be one of them).
-> > >=20
-> > > No, these don't help. :-(
-> >=20
-> > Is this still happening? If yes I'm going to revert this patch.
->=20
-> I kindly ask to not revert this patch yet as this will bring back issue o=
-n my=20
-> CSR dongle.
->=20
-> If this regression still happening I can try investigate it next week (as=
- long=20
-> as Tom=C3=A1=C5=A1 is willing to provide more detailed logs and do some t=
-ests if=20
-> needed).
+> Yes, it is.
 
-Sure, we can figure out what is going wrong for both of you, but until this
-commit will reverted for safety.
+The commit is now reverted. It should be mainline before the 3.2 release.
 
 	Gustavo
