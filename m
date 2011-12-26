@@ -1,23 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hemant Gupta <hemant.gupta@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: Naresh Gupta <naresh.gupta@stericsson.com>,
-	Hemant Gupta <hemantgupta.ste@gmail.com>,
-	Hemant Gupta <hemant.gupta@stericsson.com>
-Subject: [PATCH BlueZ 0/1] Add support for KeyboardDisplay IO Capability
-Date: Mon, 26 Dec 2011 12:05:10 +0530
-Message-ID: <1324881311-26211-1-git-send-email-hemant.gupta@stericsson.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: DoHyun Pyun <dh79.pyun@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: DoHyun Pyun <dh79.pyun@samsung.com>
+Subject: [PATCH] Fix incorrect spelling
+Date: Mon, 26 Dec 2011 10:00:25 +0900
+Message-id: <1324861225-3977-1-git-send-email-dh79.pyun@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Without this patch if local device tries to set KeyboardDisplay IO
-Capability, error is returned by BlueZ while registering the agent.
+This patch fixes incorrect spelling.
+---
+ doc/adapter-api.txt |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Hemant Gupta (1):
-  Add KeyboardDisplay IO Capability.
-
- src/adapter.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 3a29295..20cef03 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -257,7 +257,7 @@ Properties	string Address [readonly]
+ 			Note that this property only affects incoming pairing
+ 			requests.
+ 
+-		uint32 PaireableTimeout [readwrite]
++		uint32 PairableTimeout [readwrite]
+ 
+ 			The pairable timeout in seconds. A value of zero
+ 			means that the timeout is disabled and it will stay in
+-- 
+1.7.4.1
 
