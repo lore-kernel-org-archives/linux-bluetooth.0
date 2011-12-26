@@ -1,22 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Smriti GUPTA <smriti.gupta@stericsson.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: Naresh-kumar GUPTA <naresh.gupta@stericsson.com>
-Date: Mon, 26 Dec 2011 11:04:03 +0100
-Subject: [RFC Bluez] ATT Disconnect
-Message-ID: <7E02D43720E46647A0E6521055937EC915D8CE4DAF@EXDCVYMBSTM005.EQ1STM.local>
-Content-Type: text/plain; charset="iso-8859-1"
+From: Hemant Gupta <hemant.gupta@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: Naresh Gupta <naresh.gupta@stericsson.com>,
+	Hemant Gupta <hemantgupta.ste@gmail.com>,
+	Hemant Gupta <hemant.gupta@stericsson.com>
+Subject: [PATCH BlueZ 1/1] Add KeyboardDisplay IO Capability.
+Date: Mon, 26 Dec 2011 12:05:11 +0530
+Message-ID: <1324881311-26211-2-git-send-email-hemant.gupta@stericsson.com>
+In-Reply-To: <1324881311-26211-1-git-send-email-hemant.gupta@stericsson.com>
+References: <1324881311-26211-1-git-send-email-hemant.gupta@stericsson.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This patch adds suppport for KeyboardDisplay IO capability in BlueZ.
+---
+ src/adapter.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-I am working on Proximity Monitor Role using BlueZ 4.96+ and I am planning to implement the "disconnect" function to terminate connection from the monitor side.
-I have added a new  function "att_disconnect" in device.c for the same.
+diff --git a/src/adapter.c b/src/adapter.c
+index 2d9e368..3bdf525 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -74,6 +74,7 @@
+ #define IO_CAPABILITY_DISPLAYYESNO	0x01
+ #define IO_CAPABILITY_KEYBOARDONLY	0x02
+ #define IO_CAPABILITY_NOINPUTNOOUTPUT	0x03
++#define IO_CAPABILITY_KEYBOARDDISPLAY	0x04
+ #define IO_CAPABILITY_INVALID		0xFF
+ 
+ #define check_address(address) bachk(address)
+@@ -1634,6 +1635,8 @@ static uint8_t parse_io_capability(const char *capability)
+ 		return IO_CAPABILITY_KEYBOARDONLY;
+ 	if (g_str_equal(capability, "NoInputNoOutput"))
+ 		return IO_CAPABILITY_NOINPUTNOOUTPUT;
++	if (g_str_equal(capability, "KeyboardDisplay"))
++		return IO_CAPABILITY_KEYBOARDDISPLAY;
+ 	return IO_CAPABILITY_INVALID;
+ }
+ 
+-- 
+1.6.6.1
 
-Please have a look at the patch, I am about to send and let me know your comments.
-
-Thanks
-Smriti Gupta
-ST-Ericsson India
