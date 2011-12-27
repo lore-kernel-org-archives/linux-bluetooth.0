@@ -1,60 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v3] Add USB ID of HP's Broadcom BCM2035 Bluetooth
- [SOLVED]
-From: Albert Pool <albertpool@solcon.nl>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <padovan@profusion.mobi>,
- linux-bluetooth@vger.kernel.org
-In-Reply-To: <1325012849.1965.273.camel@aeonflux>
-References: <1324728064.3074.5.camel@albert-ASUSTeK-P4P800SE>
-	 <20111227160323.GA8298@joana>  <1325008493.1965.270.camel@aeonflux>
-	 <1325012535.2109.10.camel@albert-ASUSTeK-P4P800SE>
-	 <1325012849.1965.273.camel@aeonflux>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 27 Dec 2011 21:30:42 +0100
-Message-ID: <1325017842.13539.10.camel@albert-ASUSTeK-P4P800SE>
-Mime-Version: 1.0
+Date: Tue, 27 Dec 2011 18:30:08 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Rene Herman <rene.herman@gmail.com>
+Cc: Andre Guedes <andre.guedes@openbossa.org>,
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [bluetooth] linux-3.x regression (bisected)
+Message-ID: <20111227203008.GA13870@joana>
+References: <4EF3BACA.1080405@gmail.com>
+ <CACJA=fVezGGcgAtbzG=+ouWq0PiHbgXN1YPwL+VDUphWS7wnrw@mail.gmail.com>
+ <4EFA1EB8.9090005@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4EFA1EB8.9090005@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Op dinsdag 27-12-2011 om 11:07 uur [tijdzone -0800], schreef Marcel
-Holtmann:
-> Hi Albert,
-> 
-> please refrain from top-posting on this mailing list.
-> 
-> The need for WRONG_SCO_MTU detail can be easily determined. Check the
-> output of hciconfig without this quirk. If the SCO MTU essentially shows
-> 0 values, then you need it.
-> 
-> But then again, you are just randomly adding quirks without
-> understanding what they are for. This makes me worry a lot.
-> 
-> Are you actually running a recent 3.x kernel or are you just using an
-> outdated kernel?
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-Hi Marcel (and Gustavo),
+Hi Rene,
 
-You were right. I was using and old kernel, 2.6.38, and picking the
-fixes from other Broadcom hardware to get Bluetooth working on that
-kernel, and applying those fixes to the btusb module of compat-wireless.
-I wasn't aware of hciconfig.
-Using a recent btusb module (compat-wireless 2011-12-18) without any
-patch, it's magically working 'just fine'. And it pairs to my desktop.
-It still amazes me how some Broadcom 2035's need a patch while others
-don't. I assumed that this Broadcom 2035 would need a patch as well, so
-I hadn't even tried getting a recent kernel or module.
-(Perhaps it would be a good idea to get a more recent btusb module on my
-desktop as well...)
-Anyway, thanks for pointing me into the right direction. I'm sorry for
-disturbing you and your mailing list with what turned out to be
-nonsense. I've learnt a lot about Bluetooth on Linux from this
-adventure.
+* Rene Herman <rene.herman@gmail.com> [2011-12-27 20:38:32 +0100]:
 
-Regards,
+> On 27-12-11 18:22, Andre Guedes wrote:
+> 
+> >Could you please send us the kernel log messages with Bluetooth debug
+> >enabled? Here goes the instructions:
+> >
+> >1. Compile kernel with CONFIG_DYNAMIC_DEBUG=y.
+> >2. Load Bluetooth module.
+> >3. Run the following commands to turn debug on (remember to mount debugfs
+> >first):
+> >--
+> >$ echo "file hci_core.c +pf">  /sys/kernel/debug/dynamic_debug/control
+> >$ echo "file hci_event.c +pf">  /sys/kernel/debug/dynamic_debug/control
+> >$ echo "file mgmt.c +pf">  /sys/kernel/debug/dynamic_debug/control
+> >$ echo "file btusb.c +pf">  /sys/kernel/debug/dynamic_debug/control
+> >--
+> >4. Plug the Bluetooth adapter.
+> 
+> Thanks for the verbosity. Here's a -- full, just in case it's useful
+> -- dmesg from vanilla 3.1.6 (i.e., when bluetooth does not work)
+> generated per the above. The bluetooth bit is the last part.
 
-Albert
+snip
+
+> 
+> hci_le_init_req:hci0
+> hci_send_cmd:hci0 opcode 0x2002 plen 0
+> hci_send_cmd:skb len 3
+> hci_cmd_task:hci0 cmd 1
+> hci_send_frame:hci0 type 1 len 3
+> btusb_send_frame:hci0
+> btusb_tx_complete:hci0 urb e6900700 status 0 count 3
+> Bluetooth: hci0 command tx timeout
+> hci_cmd_task:hci0 cmd 1
+> __hci_request:hci0 end: err -110
+
+Seems your extfeatures is telling you something different from what it really
+supports. Can you try with the following diff (use the dynamic debug that Andre
+told you) 
+
+Also the output of hcidump would nice.
+
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 919e3c0..4c9f1aa 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -711,6 +711,8 @@ static void hci_cc_read_local_ext_features(struct hci_dev *hdev,
+        if (rp->status)
+                return;
+ 
++       BT_DBG("features 0x%2.2x", rp->features[0]);
++
+        memcpy(hdev->extfeatures, rp->features, 8);
+ 
+        hci_req_complete(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES, rp->status);
+
+
+	Gustavo
