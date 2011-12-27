@@ -1,63 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Tue, 27 Dec 2011 14:03:23 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Albert Pool <albertpool@solcon.nl>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3] Add USB ID of HP's Broadcom BCM2035 Bluetooth
-Message-ID: <20111227160323.GA8298@joana>
-References: <1324728064.3074.5.camel@albert-ASUSTeK-P4P800SE>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1324728064.3074.5.camel@albert-ASUSTeK-P4P800SE>
+In-Reply-To: <1324978182-5707-1-git-send-email-sancane@gmail.com>
+References: <1324978182-5707-1-git-send-email-sancane@gmail.com>
+Date: Tue, 27 Dec 2011 15:46:56 +0100
+Message-ID: <CACLukz+FjR=Pq_5G1FOj7J1C2+PdK39pf+Jj4m-1J7tC6adR=A@mail.gmail.com>
+Subject: Re: Multi-adapter GATT server support
+From: Santiago Carot <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Albert,
+Hi
 
-* Albert Pool <albertpool@solcon.nl> [2011-12-24 13:01:04 +0100]:
+2011/12/27 Santiago Carot-Nemesio <sancane@gmail.com>:
+> These set of patches completes multi-adapter GATT server support.
+> They depend on the latest patches sent on December the 20th.
+> These patches change the gatt server interface to provide a new
+> paramenter that is the adapter in which the operation takes place.
+>
+> The only pending task after applying these pacthes is to refactor
+> the code for GATT server plugins in order to register their attributes
+> whenever an adapter is plugged instead of doing that when the plugin
+> is loaded.
+>
+> Plugins what will need a refactorization after this set of patches are
+> time and proximity. Example plugin is already fixed.
+>
+> [PATCH 1/8] attrib-server: Add blutooth adapter to
+> [PATCH 2/8] attrib-server: Add bluetooth adapter in attrib_db_add
+> [PATCH 3/8] gatt-service: Add bluetooth adapter in gatt_service_add
+> [PATCH 4/8] attrib-server: Add bluetooth adapter in attrib_db_update
+> [PATCH 5/8] attrib-server: Add bluetooth adapter in attrib_gap_set
+> [PATCH 6/8] attrib-server: Add bluetooth adapter in attrib_db_del
+> [PATCH 7/8] attrib-server: Add bluetooth adapter in
+> [PATCH 8/8] attrib-server: Add Gattrib in attrib_channel_detach
 
-> Add USB ID of HP's Broadcom BCM2035 Bluetooth 03f0:011d
-> 
-> From usb-devices:
-> T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=03f0 ProdID=011d Rev=00.17
-> S:  Manufacturer=Broadcom
-> S:  Product=HP integrated Bluetooth module
-> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
-> 
-> Signed-off-by: Albert Pool <albertpool@solcon.nl> 
-> - - - 
-> It now pairs to my laptop (which has the other HP device 03f0:171d) but does not yet pair to my desktop with 0a12:0001 Cambridge Silicon Radio dongle.
-> I've also tried using BTUSB_WRONG_SCO_MTU, but with that setting it often failed to enable the device.
-> This patch is at least an improvement as it used to pair to nothing at all. Perhaps anyone knows a better solution with which it pairs to everything just like on Windows XP?
-> 
-> --- a/drivers/bluetooth/btusb.c 
-> +++ b/drivers/bluetooth/btusb.c 
-> @@ -142,7 +142,8 @@ static struct usb_device_id blacklist_ta 
->  	{ USB_DEVICE(0x0a5c, 0x201e), .driver_info = BTUSB_WRONG_SCO_MTU }, 
->  	{ USB_DEVICE(0x0a5c, 0x2110), .driver_info = BTUSB_WRONG_SCO_MTU }, 
->  
-> -	/* HP laptop with Broadcom chip */ 
-> +	/* HP laptops with Broadcom chip */ 
-> +	{ USB_DEVICE(0x03f0, 0x011d), .driver_info = BTUSB_BCM92035 }, 
->  	{ USB_DEVICE(0x03f0, 0x171d), .driver_info = BTUSB_WRONG_SCO_MTU }, 
->  
->  	/* Dell laptop with Broadcom chip */ 
+Please, ignore this set of patches because it requires some
+modifications after making the changes suggested for the patches wich
+this set depends on, so they will result in conflicts when applying.
 
-Please fix this and resend. Also add "Bluetooth: " to your commit subject.
-
-
-Applying: Add USB ID of HP's Broadcom BCM2035 Bluetooth
-/home/padovan/p/linux-trees/bluetooth-next/.git/rebase-apply/patch:8: trailing whitespace.
-        /* HP laptops with Broadcom chip */ 
-/home/padovan/p/linux-trees/bluetooth-next/.git/rebase-apply/patch:9: trailing whitespace.
-        { USB_DEVICE(0x03f0, 0x011d), .driver_info = BTUSB_BCM92035 }, 
-error: drivers/bluetooth/btusb.c : does not exist in index
-Patch failed at 0001 Add USB ID of HP's Broadcom BCM2035 Bluetooth
-
-	Gustavo
+I'll send another set fixing this issue.
+Regards.
