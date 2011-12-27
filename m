@@ -1,52 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Dec 2011 12:15:02 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Hemant Gupta <hemant.gupta@stericsson.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Naresh Gupta <naresh.gupta@stericsson.com>,
-	Hemant Gupta <hemantgupta.ste@gmail.com>
-Subject: Re: [PATCH BlueZ 1/1] Add KeyboardDisplay IO Capability.
-Message-ID: <20111227101502.GE5584@x220.P-661HNU-F1>
-References: <1324881311-26211-1-git-send-email-hemant.gupta@stericsson.com>
- <1324881311-26211-2-git-send-email-hemant.gupta@stericsson.com>
+Message-ID: <4EF99954.9000409@linux.intel.com>
+Date: Tue, 27 Dec 2011 11:09:24 +0100
+From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1324881311-26211-2-git-send-email-hemant.gupta@stericsson.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v5 1/8] audio: Move tel drivers to DBus interface
+References: <1323853510-5195-1-git-send-email-frederic.danis@linux.intel.com> <1323853510-5195-2-git-send-email-frederic.danis@linux.intel.com> <CABBYNZKyY40pn-Sm_VSxHLqzbrQ9q-63Sjwmf=kvh4Dy1x9-bw@mail.gmail.com> <4EE9D453.6020503@linux.intel.com> <CABBYNZL3sCMtSQ4bVetdA25wRmoFZz8BWhsZoRcf4WpcCpi54w@mail.gmail.com> <4EEB0421.4030407@linux.intel.com> <CABBYNZJzczoFhUzvz3wJ5Ssxc8t191UFB7H8ckTygtDXWpNObA@mail.gmail.com> <4EEB5D07.1010104@linux.intel.com> <CABBYNZJQF2yDtcXc01i_UUjUx-KUC5r-BFLe-sNMqY0ajYsWGA@mail.gmail.com>
+In-Reply-To: <CABBYNZJQF2yDtcXc01i_UUjUx-KUC5r-BFLe-sNMqY0ajYsWGA@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hemant,
+Hello Luiz,
 
-On Mon, Dec 26, 2011, Hemant Gupta wrote:
-> This patch adds suppport for KeyboardDisplay IO capability in BlueZ.
-> ---
->  src/adapter.c |    3 +++
->  1 files changed, 3 insertions(+), 0 deletions(-)
-> 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 2d9e368..3bdf525 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -74,6 +74,7 @@
->  #define IO_CAPABILITY_DISPLAYYESNO	0x01
->  #define IO_CAPABILITY_KEYBOARDONLY	0x02
->  #define IO_CAPABILITY_NOINPUTNOOUTPUT	0x03
-> +#define IO_CAPABILITY_KEYBOARDDISPLAY	0x04
->  #define IO_CAPABILITY_INVALID		0xFF
->  
->  #define check_address(address) bachk(address)
-> @@ -1634,6 +1635,8 @@ static uint8_t parse_io_capability(const char *capability)
->  		return IO_CAPABILITY_KEYBOARDONLY;
->  	if (g_str_equal(capability, "NoInputNoOutput"))
->  		return IO_CAPABILITY_NOINPUTNOOUTPUT;
-> +	if (g_str_equal(capability, "KeyboardDisplay"))
-> +		return IO_CAPABILITY_KEYBOARDDISPLAY;
->  	return IO_CAPABILITY_INVALID;
->  }
+Le 17/12/2011 11:15, Luiz Augusto von Dentz a écrit :
+>>> Good work putting this together, probably we should add this to the
+>>> documentation, btw this already shows us the latency won't be that
+>>> great with this solution.
+>>
+>>
+>> Thanks
+>> Which solution is not great ? both ?
+>
+> Both have problems, endpoint add extra round trips per connection
+> which can be a problem for audio transfer/SCO reconnections.
 
-We will also need a patch to hciops to ensure that this is only used for
-SMP whereas for SSP KEYBOARDDISPLAY needs to be mapped to DISPLAYYESNO.
-Are you working on that? The same will also be needed for the mgmt code
-in the kernel, but I can do that part unless someone beats me to it.
+OK, So I will continue with "Transport path" proposal.
 
-Johan
+>> Currently, if I take volume speaker as sample, BlueZ sends
+>> SpeakerGainChanged signal on reception of SetSpeakerGain method call (user
+>> action on the phone) or AT+VGS command (user action on headset).
+>>
+>> This signal should only be sent by the Media Transport object, i.e. :
+>>   - for "Transport path" proposal, this signal should be moved
+>>         from headset.c to transport.c.
+>>   - for "Media Endpoint" proposal, this signal should be moved
+>>         to the Media Transport of the telephony agent.
+>>
+>> I do not understand why a ping-pong effect should start (no application
+>> should react to SpeakerGainChanged signal by a SetSpeakerGain method call).
+>
+> Yep, IMO the gains/volume need to be moved to transport, btw both
+> agent and endpoint need to react to events such as volume change, the
+> agent need to send AT+VG commands and the endpoint notify the
+> application when the volume change completes.
+
+In case of Telephony agent implementing the Audio Gateway part of 
+HSP/HFP, it will send a +VG unsolicited result, which will not get reply 
+from the Headset.
+So, endpoint will not be able to notify the application when the volume 
+change completes.
+
+> Now, I don't think it is impossible to handle this it is just tricky
+> and we cannot detect errors easily, but volume changes is already
+> tricky (see PulseAudio), so I think it might be fine to try this first
+> and see the results.
+
+OK
+
+>> Not yet, but your are right this test should be removed.
+>> We must make it possible to set Noise Reduction, Echo Cancellation, speaker
+>> or microphone gain values before the audio is connected.
+>> Those values should be stored in the Media Transport object.
+>
+> Whenever you give the transport object you have to give permission to
+> the agent, but don't simplify let any process changes those values.
+
+OK, I will add Telephony agent to the test.
+
+>>> True, but are you sure the agent wont have to deal directly with the
+>>> SCO connection? Afaik there were some AT commands to do the audio
+>>> transfer, although for HFP it seems to be directly by
+>>> connecting/disconnecting SCO.
+>>>
+>>
+>> My understanding is that BlueZ/oFono are not involved in decision to set-up
+>> or not the SCO connection, this decision should be taken by PulseAudio or a
+>> policy manager component, and SCO connection will be performed on Acquire
+>> method called by PulseAudio.
+>
+> Audio transfer is both ways, but apparently there is no AT command for
+> triggering it, iirc it was part of HSP spec, but I don't think we have
+> to worry too much about HSP nowadays.
+
+OK
+
+Regards
+
+Fred
+
+-- 
+Frederic Danis                            Open Source Technology Center
+frederic.danis@intel.com                              Intel Corporation
+
