@@ -1,92 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Dec 2011 14:21:03 -0200
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Tue, 27 Dec 2011 14:03:23 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2011-12-27
-Message-ID: <20111227162103.GB8298@joana>
+To: Albert Pool <albertpool@solcon.nl>
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3] Add USB ID of HP's Broadcom BCM2035 Bluetooth
+Message-ID: <20111227160323.GA8298@joana>
+References: <1324728064.3074.5.camel@albert-ASUSTeK-P4P800SE>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1324728064.3074.5.camel@albert-ASUSTeK-P4P800SE>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Albert,
 
-This is my last pull request to 3.3. A good part of the changes here are still
-related to the workqueue changes, they are both by me and Ulisses Furquim.
-Besides that there are more AMP work from Andrei and SMP work from Brian Gix
-plus some other fix/improvements.
+* Albert Pool <albertpool@solcon.nl> [2011-12-24 13:01:04 +0100]:
 
-Please pull.
+> Add USB ID of HP's Broadcom BCM2035 Bluetooth 03f0:011d
+> 
+> From usb-devices:
+> T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=03f0 ProdID=011d Rev=00.17
+> S:  Manufacturer=Broadcom
+> S:  Product=HP integrated Bluetooth module
+> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
+> 
+> Signed-off-by: Albert Pool <albertpool@solcon.nl> 
+> - - - 
+> It now pairs to my laptop (which has the other HP device 03f0:171d) but does not yet pair to my desktop with 0a12:0001 Cambridge Silicon Radio dongle.
+> I've also tried using BTUSB_WRONG_SCO_MTU, but with that setting it often failed to enable the device.
+> This patch is at least an improvement as it used to pair to nothing at all. Perhaps anyone knows a better solution with which it pairs to everything just like on Windows XP?
+> 
+> --- a/drivers/bluetooth/btusb.c 
+> +++ b/drivers/bluetooth/btusb.c 
+> @@ -142,7 +142,8 @@ static struct usb_device_id blacklist_ta 
+>  	{ USB_DEVICE(0x0a5c, 0x201e), .driver_info = BTUSB_WRONG_SCO_MTU }, 
+>  	{ USB_DEVICE(0x0a5c, 0x2110), .driver_info = BTUSB_WRONG_SCO_MTU }, 
+>  
+> -	/* HP laptop with Broadcom chip */ 
+> +	/* HP laptops with Broadcom chip */ 
+> +	{ USB_DEVICE(0x03f0, 0x011d), .driver_info = BTUSB_BCM92035 }, 
+>  	{ USB_DEVICE(0x03f0, 0x171d), .driver_info = BTUSB_WRONG_SCO_MTU }, 
+>  
+>  	/* Dell laptop with Broadcom chip */ 
+
+Please fix this and resend. Also add "Bluetooth: " to your commit subject.
+
+
+Applying: Add USB ID of HP's Broadcom BCM2035 Bluetooth
+/home/padovan/p/linux-trees/bluetooth-next/.git/rebase-apply/patch:8: trailing whitespace.
+        /* HP laptops with Broadcom chip */ 
+/home/padovan/p/linux-trees/bluetooth-next/.git/rebase-apply/patch:9: trailing whitespace.
+        { USB_DEVICE(0x03f0, 0x011d), .driver_info = BTUSB_BCM92035 }, 
+error: drivers/bluetooth/btusb.c : does not exist in index
+Patch failed at 0001 Add USB ID of HP's Broadcom BCM2035 Bluetooth
 
 	Gustavo
-
-
-The following changes since commit 27bf88829f50cf1af2b052ecee2f6f0dbe4a5141:
-
-  mac80211: Fixing sparse warning at sta_info.c (2011-12-19 15:06:09 -0500)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next master
-
-Andrei Emeltchenko (5):
-      Bluetooth: Split ctrl init to BREDR and AMP parts
-      Bluetooth: Initialize default flow control mode
-      Bluetooth: Check for flow control mode
-      Bluetooth: Clean up magic pointers
-      Bluetooth: Remove magic numbers from le scan cmd
-
-Bing Zhao (1):
-      Bluetooth: btusb: fix bInterval for high/super speed isochronous endpoints
-
-Brian Gix (2):
-      Bluetooth: Add MITM mechanism to LE-SMP
-      Bluetooth: Add SMP to User Passkey and Confirm
-
-Gustavo F. Padovan (9):
-      Bluetooth: Move l2cap_{set,clear}_timer to l2cap.h
-      Bluetooth: convert security timer to delayed_work
-      Bluetooth: Rename info_work to info_timer
-      Bluetooth: fix bt_accept_dequeue() to work in process context
-      Bluetooth: Remove l2cap priority from inside RFCOMM.
-      Bluetooth: add debug output to l2cap_ack_timeout()
-      Bluetooth: Remove lock from inquiry_cache
-      Bluetooth: remove *_bh usage from hci_dev_list and hci_cb_list
-      Bluetooth: Don't disable interrupt when locking the queue
-
-Hemant Gupta (1):
-      Bluetooth: Incorrect address while storing LTK.
-
-Jesse Sung (1):
-      Bluetooth: Add support for BCM20702A0 [0a5c:21e3]
-
-Ulisses Furquim (4):
-      Bluetooth: Remove global mutex hci_task_lock
-      Bluetooth: Always compile SCO and L2CAP in Bluetooth Core
-      Bluetooth: Make HCI call directly into SCO and L2CAP event functions
-      Bluetooth: Fix deadlocks with sock lock and L2CAP timers locks
-
- drivers/bluetooth/btusb.c         |   10 +-
- include/net/bluetooth/bluetooth.h |   22 ----
- include/net/bluetooth/hci.h       |   14 ++-
- include/net/bluetooth/hci_core.h  |  162 +++++++++++---------------
- include/net/bluetooth/l2cap.h     |   40 ++++++-
- include/net/bluetooth/smp.h       |    6 +
- net/bluetooth/Kconfig             |   37 ++-----
- net/bluetooth/Makefile            |    5 +-
- net/bluetooth/af_bluetooth.c      |   11 +-
- net/bluetooth/bnep/Kconfig        |    2 +-
- net/bluetooth/cmtp/Kconfig        |    2 +-
- net/bluetooth/hci_conn.c          |    4 +-
- net/bluetooth/hci_core.c          |  172 +++++++++++-----------------
- net/bluetooth/hci_event.c         |   28 ++++-
- net/bluetooth/hidp/Kconfig        |    2 +-
- net/bluetooth/l2cap_core.c        |  112 ++++--------------
- net/bluetooth/mgmt.c              |   10 ++-
- net/bluetooth/rfcomm/Kconfig      |    2 +-
- net/bluetooth/rfcomm/core.c       |   44 +++-----
- net/bluetooth/sco.c               |   38 +------
- net/bluetooth/smp.c               |  235 +++++++++++++++++++++++++++++++++----
- 21 files changed, 499 insertions(+), 459 deletions(-)
-
