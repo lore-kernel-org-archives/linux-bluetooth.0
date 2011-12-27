@@ -1,151 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Ilia, Kolominsky" <iliak@ti.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Gustavo Padovan <padovan@profusion.mobi>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Gustavo Padovan <padovan@profusion.mobi>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Subject: RE: BUG: Reordering of L2CAP connection pending/accesspted replies
-Date: Tue, 27 Dec 2011 12:27:59 +0000
-Message-ID: <A7CD2DBA66569F478A0C1ECFC39E1C520A654F84@DLEE74.ent.ti.com>
+Date: Tue, 27 Dec 2011 11:58:54 +0000
+Message-ID: <A7CD2DBA66569F478A0C1ECFC39E1C520A654F6D@DLEE74.ent.ti.com>
 References: <A7CD2DBA66569F478A0C1ECFC39E1C520A654C79@DLEE74.ent.ti.com>
- <CABBYNZLyjn5FFg+Rjdpzx=L0J=y69ELoxE9iN=43m+W+bj3GYg@mail.gmail.com>
-In-Reply-To: <CABBYNZLyjn5FFg+Rjdpzx=L0J=y69ELoxE9iN=43m+W+bj3GYg@mail.gmail.com>
-Content-Type: text/plain; charset="windows-1255"
+	 <20111226125012.GA16370@joana>
+	 <A7CD2DBA66569F478A0C1ECFC39E1C520A654D61@DLEE74.ent.ti.com>
+ <1324928592.1965.267.camel@aeonflux>
+In-Reply-To: <1324928592.1965.267.camel@aeonflux>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-> Hi Ilia,
-> 
-> 2011/12/25 Ilia, Kolominsky <iliak@ti.com>:
-> > Hi BlueZ community!
-> >
-> > I have encountered an incorrect behavior of l2cap connection
-> > establishment mechanism when handling an incoming connection
-> > request:
-> >
-> >> ACL data: handle 1 flags 0x02 dlen 12
-> >    L2CAP(s): Connect req: psm 23 scid 0x0083
-> > < ACL data: handle 1 flags 0x00 dlen 16
-> >    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0083 result 0 status 0
-> >      Connection successful
-> > < HCI Command: Exit Sniff Mode (0x02|0x0004) plen 2
-> >    handle 1
-> > < ACL data: handle 1 flags 0x00 dlen 12
-> >    L2CAP(s): Config req: dcid 0x0083 flags 0x00 clen 0
-> >> HCI Event: Mode Change (0x14) plen 6
-> >    status 0x00 handle 1 mode 0x00 interval 0
-> >    Mode: Active
-> > < ACL data: handle 1 flags 0x00 dlen 16
-> >    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0083 result 1 status 2
-> >      Connection pending - Authorization pending
-> >
-> > After analyzing the code, it seems to me that there is indeed a
-> > clear possibility that replies will egress out of order on
-> > multicore systems:
-> >
-> > CPU0 (Tasklet: hci_rx_task)          CPU1 (user process)
-> > ...                                  sk = sys_accept()
-> > ...                                    l2cap_sock_accept()
-> > ...                                    add_wait_queue_exclusive()
-> > l2cap_connect_req()                  ...
-> >  result = L2CAP_CR_PEND;            ...
-> >  status = L2CAP_CS_AUTHOR_PEND;     ...
-> >  parent->sk_data_ready(parent, 0)   ...
-> >  ...                                sys_recvmsg(sk,...)
-> >  ...                                          l2cap_sock_recvmsg()
-> >  ...
->  __l2cap_connect_rsp_defer()
-> >  ...                                                <Send
-> L2CAP_CR_SUCCESS>
-> >  ...
-> >  <Send L2CAP_CR_PEND>            ...
-> 
-> That sounds weird, so the user process is actually quicker to notify
-> POLL_IN to user space and receive the some data that triggers a
-> response before the tasklet is done with l2cap_connect_req? That
-> sounds impossible given that the tasklet run on software interrupt
-> mode, so they cannot sleep.
-This is not impossible since we are talking about multicore hardware -
-One CPU may be serving a system call while other runs the tasklet
-(or workqueue). That indeed sounds weird, especially given the fact
-that amount of code that CPU1 should run to enqueue L2CAP_CR_SUCCESS
-before CPU0 enqueues L2CAP_CR_PEND is incomparable ( although it does
-not matter if we are considering worqueues since they may be preempted ).
-
- Are you sure the responses are from those
-> functions you mentioned and not some place else?
-
-Quite sure, could not find other flow for the given hci dump.
-> 
-> > I tried to identify mechanism that should prevent such race but found
-> none.
-> > (Did I miss it ?)
-> > As temporary solution I moved the sk_data_ready() to the end of the
-> function:
-> >
-> > @@ -2540,6 +2543,7 @@ static inline int l2cap_connect_req(struct
-> l2cap_conn *conn, struct l2cap_cmd_hd
-> >        struct l2cap_chan *chan = NULL, *pchan;
-> >        struct sock *parent, *sk = NULL;
-> >        int result, status = L2CAP_CS_NO_INFO;
-> > +       int wake_parent = 0;
-> >
-> >        u16 dcid = 0, scid = __le16_to_cpu(req->scid);
-> >        __le16 psm = req->psm;
-> > @@ -2612,7 +2616,11 @@ static inline int l2cap_connect_req(struct
-> l2cap_conn *conn, struct l2cap_cmd_hd
-> >                                l2cap_state_change(chan, BT_CONNECT2);
-> >                                result = L2CAP_CR_PEND;
-> >                                status = L2CAP_CS_AUTHOR_PEND;
-> > -                               parent->sk_data_ready(parent, 0);
-> > +                               /* can trigger
-> __l2cap_connect_rsp_defer before
-> > +                                * the result is sent (on smp).
-> Indeed?
-> > +                                * parent->sk_data_ready(parent, 0);
-> > +                                */
-> > +                               wake_parent = 1;
-> >                        } else {
-> >                                l2cap_state_change(chan, BT_CONFIG);
-> >                                result = L2CAP_CR_SUCCESS;
-> > @@ -2664,6 +2672,13 @@ sendresp:
-> >                chan->num_conf_req++;
-> >        }
-> >
-> > +       if (wake_parent) {
-> > +               /* Is locking really required? */
-> > +               bh_lock_sock(parent);
-> > +               parent->sk_data_ready(parent, 0);
-> > +               bh_unlock_sock(parent);
-> > +       }
-> > +
-> >        return 0;
-> >  }
-> >
-> > I don’t really like this solution but it does the job.
-> > Comments will be appreciated.
-> 
-> If that is really happening than you could check if the state is still
-> BT_CONNECT2, since in case we had responded it should be BT_CONFIG
-> already.
-
-Seems to me like still a potential race:
-
-l2cap_connect_req():
-	...
-	If (state == BT_CONNECT2) {
-         <----switch/or CPU1 advances
-		l2cap_sock_recvmsg():
-			...
-			sk->sk_state = BT_CONFIG;
-			__l2cap_connect_rsp_defer(pi->chan);
-				<Send L2CAP_CR_SUCCESS>
-         <----switch back/CPU0 catches up
-		
-		<Send L2CAP_CR_PEND>
-	}
-> 
-> --
-> Luiz Augusto von Dentz
+SGkgTWFyY2VsDQogDQo+IEhpIElsaWEsDQo+IA0KPiA+ID4gPiBJIGhhdmUgZW5jb3VudGVyZWQg
+YW4gaW5jb3JyZWN0IGJlaGF2aW9yIG9mIGwyY2FwIGNvbm5lY3Rpb24NCj4gPiA+ID4gZXN0YWJs
+aXNobWVudCBtZWNoYW5pc20gd2hlbiBoYW5kbGluZyBhbiBpbmNvbWluZyBjb25uZWN0aW9uDQo+
+ID4gPiA+IHJlcXVlc3Q6DQo+ID4gPiA+DQo+ID4gPiA+ID4gQUNMIGRhdGE6IGhhbmRsZSAxIGZs
+YWdzIDB4MDIgZGxlbiAxMg0KPiA+ID4gPiAgICAgTDJDQVAocyk6IENvbm5lY3QgcmVxOiBwc20g
+MjMgc2NpZCAweDAwODMNCj4gPiA+ID4gPCBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMCBk
+bGVuIDE2DQo+ID4gPiA+ICAgICBMMkNBUChzKTogQ29ubmVjdCByc3A6IGRjaWQgMHgwMDQwIHNj
+aWQgMHgwMDgzIHJlc3VsdCAwDQo+IHN0YXR1cyAwDQo+ID4gPiA+ICAgICAgIENvbm5lY3Rpb24g
+c3VjY2Vzc2Z1bA0KPiA+ID4gPiA8IEhDSSBDb21tYW5kOiBFeGl0IFNuaWZmIE1vZGUgKDB4MDJ8
+MHgwMDA0KSBwbGVuIDINCj4gPiA+ID4gICAgIGhhbmRsZSAxDQo+ID4gPiA+IDwgQUNMIGRhdGE6
+IGhhbmRsZSAxIGZsYWdzIDB4MDAgZGxlbiAxMg0KPiA+ID4gPiAgICAgTDJDQVAocyk6IENvbmZp
+ZyByZXE6IGRjaWQgMHgwMDgzIGZsYWdzIDB4MDAgY2xlbiAwDQo+ID4gPiA+ID4gSENJIEV2ZW50
+OiBNb2RlIENoYW5nZSAoMHgxNCkgcGxlbiA2DQo+ID4gPiA+ICAgICBzdGF0dXMgMHgwMCBoYW5k
+bGUgMSBtb2RlIDB4MDAgaW50ZXJ2YWwgMA0KPiA+ID4gPiAgICAgTW9kZTogQWN0aXZlDQo+ID4g
+PiA+IDwgQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdzIDB4MDAgZGxlbiAxNg0KPiA+ID4gPiAgICAg
+TDJDQVAocyk6IENvbm5lY3QgcnNwOiBkY2lkIDB4MDA0MCBzY2lkIDB4MDA4MyByZXN1bHQgMQ0K
+PiBzdGF0dXMgMg0KPiA+ID4gPiAgICAgICBDb25uZWN0aW9uIHBlbmRpbmcgLSBBdXRob3JpemF0
+aW9uIHBlbmRpbmcNCj4gPiA+ID4NCj4gPiA+ID4gQWZ0ZXIgYW5hbHl6aW5nIHRoZSBjb2RlLCBp
+dCBzZWVtcyB0byBtZSB0aGF0IHRoZXJlIGlzIGluZGVlZCBhDQo+ID4gPiA+IGNsZWFyIHBvc3Np
+YmlsaXR5IHRoYXQgcmVwbGllcyB3aWxsIGVncmVzcyBvdXQgb2Ygb3JkZXIgb24NCj4gPiA+ID4g
+bXVsdGljb3JlIHN5c3RlbXM6DQo+ID4gPiA+DQo+ID4gPiA+IENQVTAgKFRhc2tsZXQ6IGhjaV9y
+eF90YXNrKSAgICAgICAgICBDUFUxICh1c2VyIHByb2Nlc3MpDQo+ID4gPg0KPiA+ID4gQ2FuIHlv
+dSBjaGVjayBpZiB0aGlzIGFsc28gaGFwcGVucyBhZnRlciB0aGUgbW92ZSB0byB3b3JrcXVldWUN
+Cj4gPiA+IHByb2Nlc3Npbmc/DQo+ID4gPiBUaGUgd29ya3F1ZXVlIGhhbmRsaW5nIGlzIHF1aXRl
+IGRpZmZlcmVudCwgdGhlbiB0aGlzIHByb2JsZW0gbWlnaHQNCj4gbm90DQo+ID4gPiBiZQ0KPiA+
+ID4gdGhlcmUgYW55bW9yZS4NCj4gPg0KPiA+IEZpcnN0bHksIEkgdGhpbmsgd29ya3F1ZXVlIHNo
+b3VsZCBvbmx5IG1ha2UgdGhlIG1hdHRlcnMgd29yc2UgLQ0KPiA+IHNpbmNlIGl0IGNhbiBiZSBw
+cmVlbXB0ZWQgKCB1bmxpa2UgdGFza2xldHMgKSB0aGlzIGNhbg0KPiA+IGhhcHBlbiBldmVuIG9u
+IHNpbmdsZSBDUFUuICkgZS5nLiByZXNjaGVkIGp1c3QgYmVmb3JlIHNlbmRfcmVzcA0KPiBsYWJl
+bCkuDQo+ID4gU2Vjb25kbHksIGFzIHdpdGggYW55IHJhY2Ugc2l0dWF0aW9ucywgdGhpcyBidWcg
+aXMgZGlmZmljdWx0IHRvDQo+IHJlcHJvZHVjZSwNCj4gPiBJIHNhdyBpdCBvbmx5IGEgY291cGxl
+IG9mIHRpbWVzLCB0aHVzIEkgY2FsbCBmb3IgdGhlb3JldGljYWwNCj4gYW5hbHlzaXMuDQo+IA0K
+PiB3ZSBhcmUgYWN0dWFsbHkgdXNpbmcgYSBDUFUgdW5ib3VuZCB3b3JrcXVldWUgd2hlcmUgdGhl
+IGtlcm5lbCBlbnN1cmVzDQo+IHRoYXQgb25seSBvbmUgd2lsbCBiZSBhY3RpdmUgYWNyb3NzIHRo
+ZSBzZXQgb2YgQ1BVcy4gQm90aCBSWCBhbmQgVFggYXJlDQo+IGV4ZWN1dGVkIGZyb20gdGhhdCBz
+YW1lIHdvcmtxdWV1ZS4gU28gdGhlIG9ubHkgd2F5IHRoaXMgY2FuIGhhcHBlbiBpcw0KPiBpZg0K
+PiBvbmUgd29yayBpcyBzY2hlZHVsZWQgZnJvbSB0aGUgb3RoZXIuIEhvd2V2ZXIgc2luY2UgdGhl
+IGV2ZW50DQo+IHByb2Nlc3NpbmcNCj4gaXMgbm93IGFsc28gcnVuIGZyb20gdGhhdCBzYW1lIHdv
+cmtxdWV1ZSwgSSBmYWlsIHRvIHNlZSBob3cgdGhhdCBjb3VsZA0KPiBoYXBwZW4uDQoNCkkgYW0g
+cHV0dGluZyBiYWNrIHRoZSBvcmlnaW5hbCBkaWFncmFtIGJlY2F1c2UgSSBmZWVsIHRoYXQgaXQg
+aXMNCnF1aXRlIHJlbGV2YW50IHRvIHRoZSBkaXNjdXNzaW9uOg0KDQpDUFUwIChUYXNrbGV0OiBo
+Y2lfcnhfdGFzaykgICAgICAgICAgQ1BVMSAodXNlciBwcm9jZXNzKQ0KLi4uICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHNrID0gc3lzX2FjY2VwdCgpDQouLi4gICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBsMmNhcF9zb2NrX2FjY2VwdCgpDQouLi4gICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBhZGRfd2FpdF9xdWV1ZV9leGNsdXNpdmUoKQ0KbDJj
+YXBfY29ubmVjdF9yZXEoKSAgICAgICAgICAgICAgICAgIC4uLg0KICByZXN1bHQgPSBMMkNBUF9D
+Ul9QRU5EOyAgICAgICAgICAgIC4uLiANCiAgc3RhdHVzID0gTDJDQVBfQ1NfQVVUSE9SX1BFTkQ7
+ICAgICAuLi4NCiAgcGFyZW50LT5za19kYXRhX3JlYWR5KHBhcmVudCwgMCkgICAuLi4NCiAgLi4u
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzeXNfcmVjdm1zZyhzaywuLi4pDQogIC4u
+LgkJCQkJICAgICAgIGwyY2FwX3NvY2tfcmVjdm1zZygpDQogIC4uLgkJCQkJCSAgIF9fbDJjYXBf
+Y29ubmVjdF9yc3BfZGVmZXIoKQ0KICAuLi4JCQkJCQkgICAgIDxTZW5kIEwyQ0FQX0NSX1NVQ0NF
+U1M+DQogIC4uLg0KICA8U2VuZCBMMkNBUF9DUl9QRU5EPiAgICAgICAgICAgIC4uLg0KDQpUaGUg
+ZmFjdCB0aGF0IGJvdGggUlggYW5kIFRYIGFyZSBleGVjdXRlZCBmcm9tIHRoZSBzYW1lIHdvcmtx
+dWV1ZQ0KZG9lcyBub3QgaGVscCBoZXJlLCBiZWNhdXNlIHRoZSBpc3N1ZSBoZXJlIGlzIHRoZSBv
+cmRlciBvZiANCnNrYl9xdWV1ZV90YWlsIGNhbGxzIChsMmNhcF9zZW5kX2NtZC0+aGNpX3NlbmRf
+YWNsLT5za2JfcXVldWVfdGFpbCkuDQpPbmUgY2FsbCBjYW4gYmUgbWFkZSB3aGlsZSBpbiB3b3Jr
+cXVldWUocHJldi4gdGFza2xldCksIHRoZSBvdGhlcg0Kd2hpbGUgc2VydmluZyBzeXN0ZW0gY2Fs
+bCAoIENQVTEgKSBhbmQgdGhlcmUgc2VlbXMgdG8gYmUgDQpubyBzeW5jaHJvbml6aW5nIG1lY2hh
+bmlzbSBiZXR3ZWVuIHRoZW0uDQoNCj4gDQo+IFJlZ2FyZHMNCj4gDQo+IE1hcmNlbA0KPiANClJl
+Z2FyZHMsDQpJbGlhLg0KDQo=
