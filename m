@@ -1,42 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Dec 2011 14:52:01 -0200
+Date: Tue, 27 Dec 2011 14:21:03 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: linville@tuxdriver.com, linux-wireless@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2011-12-27
-Message-ID: <20111227165201.GC8298@joana>
-References: <20111227162103.GB8298@joana>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next 2011-12-27
+Message-ID: <20111227162103.GB8298@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111227162103.GB8298@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi John,
 
-* Gustavo Padovan <padovan@profusion.mobi> [2011-12-27 14:21:03 -0200]:
+This is my last pull request to 3.3. A good part of the changes here are still
+related to the workqueue changes, they are both by me and Ulisses Furquim.
+Besides that there are more AMP work from Andrei and SMP work from Brian Gix
+plus some other fix/improvements.
 
-> Hi John,
-> 
-> This is my last pull request to 3.3. A good part of the changes here are still
-> related to the workqueue changes, they are both by me and Ulisses Furquim.
-> Besides that there are more AMP work from Andrei and SMP work from Brian Gix
-> plus some other fix/improvements.
-
-Unfortunately I left a compile warning in my tree, I committed a fix.
-This is the only difference from the previous one:
-
-    Bluetooth: Fix a compile warning in RFCOMM
-
-
-Thanks,
+Please pull.
 
 	Gustavo
 
 
-The following changes since commit aef6c928a92481f75fbd548eb8c1e840912444b8:
+The following changes since commit 27bf88829f50cf1af2b052ecee2f6f0dbe4a5141:
 
-  mac80211: Keep skb->piority for relayed frames in AP mode (2011-12-21 15:07:52 -0500)
+  mac80211: Fixing sparse warning at sta_info.c (2011-12-19 15:06:09 -0500)
 
 are available in the git repository at:
   git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next master
@@ -55,7 +44,7 @@ Brian Gix (2):
       Bluetooth: Add MITM mechanism to LE-SMP
       Bluetooth: Add SMP to User Passkey and Confirm
 
-Gustavo F. Padovan (10):
+Gustavo F. Padovan (9):
       Bluetooth: Move l2cap_{set,clear}_timer to l2cap.h
       Bluetooth: convert security timer to delayed_work
       Bluetooth: Rename info_work to info_timer
@@ -65,7 +54,6 @@ Gustavo F. Padovan (10):
       Bluetooth: Remove lock from inquiry_cache
       Bluetooth: remove *_bh usage from hci_dev_list and hci_cb_list
       Bluetooth: Don't disable interrupt when locking the queue
-      Bluetooth: Fix a compile warning in RFCOMM
 
 Hemant Gupta (1):
       Bluetooth: Incorrect address while storing LTK.
@@ -97,8 +85,8 @@ Ulisses Furquim (4):
  net/bluetooth/l2cap_core.c        |  112 ++++--------------
  net/bluetooth/mgmt.c              |   10 ++-
  net/bluetooth/rfcomm/Kconfig      |    2 +-
- net/bluetooth/rfcomm/core.c       |   41 +++-----
+ net/bluetooth/rfcomm/core.c       |   44 +++-----
  net/bluetooth/sco.c               |   38 +------
  net/bluetooth/smp.c               |  235 +++++++++++++++++++++++++++++++++----
- 21 files changed, 496 insertions(+), 459 deletions(-)
+ 21 files changed, 499 insertions(+), 459 deletions(-)
 
