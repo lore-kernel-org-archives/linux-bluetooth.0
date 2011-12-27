@@ -1,67 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20111227101502.GE5584@x220.P-661HNU-F1>
-References: <1324881311-26211-1-git-send-email-hemant.gupta@stericsson.com>
-	<1324881311-26211-2-git-send-email-hemant.gupta@stericsson.com>
-	<20111227101502.GE5584@x220.P-661HNU-F1>
-Date: Wed, 28 Dec 2011 00:18:12 +0530
-Message-ID: <CACj007kGDGHDPLP1Gq2_vK1E8gi4YnrxnRURyVywGXbaWus=vg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/1] Add KeyboardDisplay IO Capability.
-From: Hemant Gupta <hemantgupta.ste@gmail.com>
-To: Hemant Gupta <hemant.gupta@stericsson.com>,
-	linux-bluetooth@vger.kernel.org,
-	Naresh Gupta <naresh.gupta@stericsson.com>,
-	Hemant Gupta <hemantgupta.ste@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1325008493.1965.270.camel@aeonflux>
+Subject: Re: [PATCH v3] Add USB ID of HP's Broadcom BCM2035 Bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Gustavo Padovan <padovan@profusion.mobi>
+Cc: Albert Pool <albertpool@solcon.nl>, linux-bluetooth@vger.kernel.org
+Date: Tue, 27 Dec 2011 09:54:53 -0800
+In-Reply-To: <20111227160323.GA8298@joana>
+References: <1324728064.3074.5.camel@albert-ASUSTeK-P4P800SE>
+	 <20111227160323.GA8298@joana>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Gustavo,
 
-On Tue, Dec 27, 2011 at 3:45 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Hemant,
->
-> On Mon, Dec 26, 2011, Hemant Gupta wrote:
->> This patch adds suppport for KeyboardDisplay IO capability in BlueZ.
->> ---
->>  src/adapter.c |    3 +++
->>  1 files changed, 3 insertions(+), 0 deletions(-)
->>
->> diff --git a/src/adapter.c b/src/adapter.c
->> index 2d9e368..3bdf525 100644
->> --- a/src/adapter.c
->> +++ b/src/adapter.c
->> @@ -74,6 +74,7 @@
->>  #define IO_CAPABILITY_DISPLAYYESNO   0x01
->>  #define IO_CAPABILITY_KEYBOARDONLY   0x02
->>  #define IO_CAPABILITY_NOINPUTNOOUTPUT        0x03
->> +#define IO_CAPABILITY_KEYBOARDDISPLAY        0x04
->>  #define IO_CAPABILITY_INVALID                0xFF
->>
->>  #define check_address(address) bachk(address)
->> @@ -1634,6 +1635,8 @@ static uint8_t parse_io_capability(const char *capability)
->>               return IO_CAPABILITY_KEYBOARDONLY;
->>       if (g_str_equal(capability, "NoInputNoOutput"))
->>               return IO_CAPABILITY_NOINPUTNOOUTPUT;
->> +     if (g_str_equal(capability, "KeyboardDisplay"))
->> +             return IO_CAPABILITY_KEYBOARDDISPLAY;
->>       return IO_CAPABILITY_INVALID;
->>  }
->
-> We will also need a patch to hciops to ensure that this is only used for
-> SMP whereas for SSP KEYBOARDDISPLAY needs to be mapped to DISPLAYYESNO.
-> Are you working on that? The same will also be needed for the mgmt code
-> in the kernel, but I can do that part unless someone beats me to it.
->
-Thanks for pointing this out. At the moment I had not worked on that
-part but if no one else is working on it I will submit the patches for
-same as well soon (most probably early next week).
+> * Albert Pool <albertpool@solcon.nl> [2011-12-24 13:01:04 +0100]:
+> 
+> > Add USB ID of HP's Broadcom BCM2035 Bluetooth 03f0:011d
+> > 
+> > From usb-devices:
+> > T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+> > D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> > P:  Vendor=03f0 ProdID=011d Rev=00.17
+> > S:  Manufacturer=Broadcom
+> > S:  Product=HP integrated Bluetooth module
+> > C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+> > I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> > I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> > I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> > I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
+> > 
+> > Signed-off-by: Albert Pool <albertpool@solcon.nl> 
+> > - - - 
+> > It now pairs to my laptop (which has the other HP device 03f0:171d) but does not yet pair to my desktop with 0a12:0001 Cambridge Silicon Radio dongle.
+> > I've also tried using BTUSB_WRONG_SCO_MTU, but with that setting it often failed to enable the device.
+> > This patch is at least an improvement as it used to pair to nothing at all. Perhaps anyone knows a better solution with which it pairs to everything just like on Windows XP?
+> > 
+> > --- a/drivers/bluetooth/btusb.c 
+> > +++ b/drivers/bluetooth/btusb.c 
+> > @@ -142,7 +142,8 @@ static struct usb_device_id blacklist_ta 
+> >  	{ USB_DEVICE(0x0a5c, 0x201e), .driver_info = BTUSB_WRONG_SCO_MTU }, 
+> >  	{ USB_DEVICE(0x0a5c, 0x2110), .driver_info = BTUSB_WRONG_SCO_MTU }, 
+> >  
+> > -	/* HP laptop with Broadcom chip */ 
+> > +	/* HP laptops with Broadcom chip */ 
+> > +	{ USB_DEVICE(0x03f0, 0x011d), .driver_info = BTUSB_BCM92035 }, 
+> >  	{ USB_DEVICE(0x03f0, 0x171d), .driver_info = BTUSB_WRONG_SCO_MTU }, 
+> >  
+> >  	/* Dell laptop with Broadcom chip */ 
+> 
+> Please fix this and resend. Also add "Bluetooth: " to your commit subject.
 
-> Johan
+actually I am not convinced this is the right fix. Adding random driver
+flags and hoping that it makes them works is a bad idea. The BCM92035
+was one specific behavior to switch HID proxy mode into working dongle,
+but that is ancient behavior. These days just HCI_Reset is enough for
+Broadcom dongles.
+
+Also the fact that it still does not complete work makes me highly
+suspicious that this fix is actually wrong. And without having seen the
+hcidump's for the failing pairing, I would not bother here at all.
+
+Regards
+
+Marcel
 
 
-
--- 
-Best Regards
-Hemant Gupta
-ST-Ericsson India
