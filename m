@@ -1,32 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Dec 2011 12:00:59 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/8] attrib-server: Initial steps towards multi-adapter
- GATT server support
-Message-ID: <20111227100059.GA5379@x220.P-661HNU-F1>
-References: <1324396681-27276-1-git-send-email-sancane@gmail.com>
- <1324396681-27276-2-git-send-email-sancane@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1324396681-27276-2-git-send-email-sancane@gmail.com>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 7/8] attrib-server: Add bluetooth adapter in attrib_create_sdp function
+Date: Tue, 27 Dec 2011 10:29:41 +0100
+Message-Id: <1324978182-5707-8-git-send-email-sancane@gmail.com>
+In-Reply-To: <1324978182-5707-7-git-send-email-sancane@gmail.com>
+References: <1324978182-5707-1-git-send-email-sancane@gmail.com>
+ <1324978182-5707-2-git-send-email-sancane@gmail.com>
+ <1324978182-5707-3-git-send-email-sancane@gmail.com>
+ <1324978182-5707-4-git-send-email-sancane@gmail.com>
+ <1324978182-5707-5-git-send-email-sancane@gmail.com>
+ <1324978182-5707-6-git-send-email-sancane@gmail.com>
+ <1324978182-5707-7-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+---
+ plugins/gatt-example.c |    6 ++++--
+ src/attrib-server.c    |   13 ++++++-------
+ src/attrib-server.h    |    3 ++-
+ 3 files changed, 12 insertions(+), 10 deletions(-)
 
-On Tue, Dec 20, 2011, Santiago Carot-Nemesio wrote:
-> +struct gatt_adapter {
-> +	struct btd_adapter *adapter;
-> +	GIOChannel *l2cap_io;
-> +	GIOChannel *le_io;
-> +};
+diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
+index 332c190..ae9d41d 100644
+--- a/plugins/gatt-example.c
++++ b/plugins/gatt-example.c
+@@ -231,7 +231,8 @@ static void register_termometer_service(struct gatt_example_adapter *adapter,
+ 	g_assert(h - start_handle == svc_size);
+ 
+ 	/* Add an SDP record for the above service */
+-	sdp_handle = attrib_create_sdp(start_handle, "Thermometer");
++	sdp_handle = attrib_create_sdp(adapter->adapter, start_handle,
++								"Thermometer");
+ 	if (sdp_handle)
+ 		adapter->sdp_handles = g_slist_prepend(adapter->sdp_handles,
+ 						GUINT_TO_POINTER(sdp_handle));
+@@ -496,7 +497,8 @@ static void register_weight_service(struct gatt_example_adapter *adapter,
+ 	g_assert(h - start_handle == svc_size);
+ 
+ 	/* Add an SDP record for the above service */
+-	sdp_handle = attrib_create_sdp(start_handle, "Weight Service");
++	sdp_handle = attrib_create_sdp(adapter->adapter, start_handle,
++							"Weight Service");
+ 	if (sdp_handle)
+ 		adapter->sdp_handles = g_slist_prepend(adapter->sdp_handles,
+ 						GUINT_TO_POINTER(sdp_handle));
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 3a469c6..929a505 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -1264,17 +1264,16 @@ void btd_adapter_gatt_server_stop(struct btd_adapter *adapter)
+ 	gatt_adapter_free(gadapter);
+ }
+ 
+-uint32_t attrib_create_sdp(uint16_t handle, const char *name)
++uint32_t attrib_create_sdp(struct btd_adapter *adapter, uint16_t handle,
++							const char *name)
+ {
+-	struct gatt_adapter *gadapter;
+-
+-	DBG("Deprecated function!");
++	GSList *l;
+ 
+-	gadapter = get_default_gatt_adapter();
+-	if (gadapter == NULL)
++	l = g_slist_find_custom(adapters, adapter, adapter_cmp);
++	if (l == NULL)
+ 		return 0;
+ 
+-	return attrib_create_sdp_new(gadapter, handle, name);
++	return attrib_create_sdp_new(l->data, handle, name);
+ }
+ 
+ void attrib_free_sdp(uint32_t sdp_handle)
+diff --git a/src/attrib-server.h b/src/attrib-server.h
+index becb3a8..dc08bfb 100644
+--- a/src/attrib-server.h
++++ b/src/attrib-server.h
+@@ -32,7 +32,8 @@ int attrib_db_update(struct btd_adapter *adapter, uint16_t handle,
+ int attrib_db_del(struct btd_adapter *adapter, uint16_t handle);
+ int attrib_gap_set(struct btd_adapter *adapter, uint16_t uuid,
+ 						const uint8_t *value, int len);
+-uint32_t attrib_create_sdp(uint16_t handle, const char *name);
++uint32_t attrib_create_sdp(struct btd_adapter *adapter, uint16_t handle,
++							const char *name);
+ void attrib_free_sdp(uint32_t sdp_handle);
+ guint attrib_channel_attach(GAttrib *attrib, gboolean out);
+ gboolean attrib_channel_detach(guint id);
+-- 
+1.7.8.1
 
-Could we just call this struct attrib_server? That would be less
-confusing than having different types of adapters when in reality you
-only have one adapter. What we have here is an attrib server running on
-a specific adapter, so struct attrib_server would make most sense to me.
-Also update the corresponding function names to reflect this.
-
-Johan
