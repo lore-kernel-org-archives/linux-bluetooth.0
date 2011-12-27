@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 15/16] gobex: handle Single Response Mode (SRM) headers
-Date: Tue, 27 Dec 2011 11:07:16 +0200
-Message-Id: <1324976837-11914-15-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 14/16] gobex: simplify naming of tests when transfering sequence of packets
+Date: Tue, 27 Dec 2011 11:07:15 +0200
+Message-Id: <1324976837-11914-14-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1324976837-11914-1-git-send-email-luiz.dentz@gmail.com>
 References: <1324976837-11914-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,478 +11,807 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+Before random was used but the number of packets were not really random
+so now seq is used instead.
 ---
- gobex/gobex-transfer.c |   54 +++++++++++--
- gobex/gobex.c          |  199 ++++++++++++++++++++++++++++++++++++++++++------
- gobex/gobex.h          |    1 +
- 3 files changed, 222 insertions(+), 32 deletions(-)
+ unit/test-gobex-transfer.c |  364 +++++++++++++++++++++----------------------
+ 1 files changed, 178 insertions(+), 186 deletions(-)
 
-diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-index 0a7a29f..ca7834b 100644
---- a/gobex/gobex-transfer.c
-+++ b/gobex/gobex-transfer.c
-@@ -33,6 +33,9 @@
- 
- static GSList *transfers = NULL;
- 
-+static void transfer_response(GObex *obex, GError *err, GObexPacket *rsp,
-+							gpointer user_data);
-+
- struct transfer {
- 	guint id;
- 	guint8 opcode;
-@@ -130,16 +133,30 @@ static gssize put_get_data(void *buf, gsize len, gpointer user_data)
- 	gssize ret;
- 
- 	ret = transfer->data_producer(buf, len, transfer->user_data);
--	if (ret >= 0)
-+	if (ret == 0 || ret == -EAGAIN)
- 		return ret;
- 
--	if (ret == -EAGAIN)
--		return ret;
-+	if (ret > 0) {
-+		/* Check if SRM is enable */
-+		if (g_obex_get_srm(transfer->obex) != G_OBEX_SRM_ENABLE)
-+			return ret;
-+
-+		/* Generate next packet */
-+		req = g_obex_packet_new(transfer->opcode, FALSE,
-+							G_OBEX_HDR_INVALID);
-+		g_obex_packet_add_body(req, put_get_data, transfer);
-+		transfer->req_id = g_obex_send_req(transfer->obex, req, -1,
-+						transfer_response, transfer,
-+						&err);
-+		goto done;
-+	}
- 
- 	req = g_obex_packet_new(G_OBEX_OP_ABORT, TRUE, G_OBEX_HDR_INVALID);
-+
- 	transfer->req_id = g_obex_send_req(transfer->obex, req, -1,
- 						transfer_abort_response,
- 						transfer, &err);
-+done:
- 	if (err != NULL) {
- 		transfer_complete(transfer, err);
- 		g_error_free(err);
-@@ -209,10 +226,11 @@ static void transfer_response(GObex *obex, GError *err, GObexPacket *rsp,
- 		req = g_obex_packet_new(transfer->opcode, FALSE,
- 							G_OBEX_HDR_INVALID);
- 		g_obex_packet_add_body(req, put_get_data, transfer);
--	} else {
-+	} else if (g_obex_get_srm(transfer->obex) != G_OBEX_SRM_ENABLE) {
- 		req = g_obex_packet_new(transfer->opcode, TRUE,
- 							G_OBEX_HDR_INVALID);
--	}
-+	} else
-+		return;
- 
- 	transfer->req_id = g_obex_send_req(obex, req, -1, transfer_response,
- 							transfer, &err);
-@@ -350,6 +368,7 @@ static void transfer_put_req_first(struct transfer *transfer, GObexPacket *req,
- 	rspcode = put_get_bytes(transfer, req);
- 
- 	rsp = g_obex_packet_new_valist(rspcode, TRUE, first_hdr_id, args);
-+
- 	if (!g_obex_send(transfer->obex, rsp, &err)) {
- 		transfer_complete(transfer, err);
- 		g_error_free(err);
-@@ -370,12 +389,19 @@ static void transfer_put_req(GObex *obex, GObexPacket *req, gpointer user_data)
- 
- 	rspcode = put_get_bytes(transfer, req);
- 
-+	/* Don't send continue while in SRM */
-+	if (g_obex_get_srm(transfer->obex) == G_OBEX_SRM_ENABLE &&
-+				rspcode == G_OBEX_RSP_CONTINUE)
-+		goto done;
-+
- 	rsp = g_obex_packet_new(rspcode, TRUE, G_OBEX_HDR_INVALID);
-+
- 	if (!g_obex_send(obex, rsp, &err)) {
- 		transfer_complete(transfer, err);
- 		g_error_free(err);
- 	}
- 
-+done:
- 	if (rspcode != G_OBEX_RSP_CONTINUE)
- 		transfer_complete(transfer, NULL);
- }
-@@ -472,15 +498,29 @@ guint g_obex_get_req(GObex *obex, GObexDataConsumer data_func,
- static gssize get_get_data(void *buf, gsize len, gpointer user_data)
- {
- 	struct transfer *transfer = user_data;
--	GObexPacket *req;
-+	GObexPacket *req, *rsp;
- 	GError *err = NULL;
- 	gssize ret;
- 
- 	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
- 
- 	ret = transfer->data_producer(buf, len, transfer->user_data);
--	if (ret > 0)
-+	if (ret > 0) {
-+		if (g_obex_get_srm(transfer->obex) != G_OBEX_SRM_ENABLE)
-+			return ret;
-+
-+		/* Generate next response */
-+		rsp = g_obex_packet_new(G_OBEX_RSP_CONTINUE, TRUE,
-+							G_OBEX_HDR_INVALID);
-+		g_obex_packet_add_body(rsp, get_get_data, transfer);
-+
-+		if (!g_obex_send(transfer->obex, rsp, &err)) {
-+			transfer_complete(transfer, err);
-+			g_error_free(err);
-+		}
-+
- 		return ret;
-+	}
- 
- 	if (ret == -EAGAIN)
- 		return ret;
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index 036a44a..54d19ed 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -46,6 +46,15 @@
- 
- guint gobex_debug = 0;
- 
-+struct srm_setup {
-+	guint8 op;
-+	enum {
-+		SRM_DISABLED		= 0,
-+		SRM_INDICATING		= 1,
-+		SRM_ENABLED		= 2,
-+	} state;
-+};
-+
- struct _GObex {
- 	gint ref_count;
- 	GIOChannel *io;
-@@ -65,6 +74,8 @@ struct _GObex {
- 
- 	gboolean suspended;
- 
-+	struct srm_setup *srm;
-+
- 	guint write_source;
- 
- 	gssize io_rx_mtu;
-@@ -308,12 +319,16 @@ static gboolean write_data(GIOChannel *io, GIOCondition cond,
- 		if (p == NULL)
- 			goto stop_tx;
- 
-+		if (g_obex_get_srm(obex) == G_OBEX_SRM_ENABLE)
-+			goto encode;
-+
- 		/* Can't send a request while there's a pending one */
- 		if (obex->pending_req && p->id > 0) {
- 			g_queue_push_head(obex->tx_queue, p);
- 			goto stop_tx;
- 		}
- 
-+encode:
- 		len = g_obex_packet_encode(p->pkt, obex->tx_buf, obex->tx_mtu);
- 		if (len == -EAGAIN) {
- 			g_queue_push_head(obex->tx_queue, p);
-@@ -327,6 +342,8 @@ static gboolean write_data(GIOChannel *io, GIOCondition cond,
- 		}
- 
- 		if (p->id > 0) {
-+			if (obex->pending_req != NULL)
-+				pending_pkt_free(obex->pending_req);
- 			obex->pending_req = p;
- 			p->timeout_id = g_timeout_add_seconds(p->timeout,
- 							req_timeout, obex);
-@@ -427,6 +444,84 @@ static void prepare_connect_rsp(GObex *obex, GObexPacket *rsp)
- 	g_obex_packet_prepend_header(rsp, connid);
+diff --git a/unit/test-gobex-transfer.c b/unit/test-gobex-transfer.c
+index dfac3b0..eb6a55e 100644
+--- a/unit/test-gobex-transfer.c
++++ b/unit/test-gobex-transfer.c
+@@ -188,7 +188,7 @@ static gboolean resume_obex(gpointer user_data)
+ 	return FALSE;
  }
  
-+static const char *state2str(guint mode)
-+{
-+	switch (mode) {
-+	case SRM_DISABLED:
-+		return "SRM Disabled";
-+	case SRM_INDICATING:
-+		return "SRM Indicating";
-+	case SRM_ENABLED:
-+		return "SRM Enabled";
-+	default:
-+		return "Unkown";
-+	}
-+}
-+
-+static void set_srm(GObex *obex, guint8 op, guint8 srm)
-+{
-+	struct srm_setup *setup = obex->srm;
-+
-+	if (setup == NULL) {
-+		if (srm == G_OBEX_SRM_DISABLE)
-+			return;
-+
-+		setup = g_new0(struct srm_setup, 1);
-+		setup->op = op;
-+		obex->srm = setup;
-+		return;
-+	}
-+
-+	switch (srm) {
-+	case G_OBEX_SRM_DISABLE:
-+		setup->state = SRM_DISABLED;
-+		break;
-+	case G_OBEX_SRM_ENABLE:
-+		setup->state = SRM_ENABLED;
-+		break;
-+	case G_OBEX_SRM_INDICATE:
-+		setup->state = SRM_INDICATING;
-+		break;
-+	}
-+
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "%s", state2str(setup->state));
-+
-+	if (setup->state == SRM_DISABLED) {
-+		g_free(obex->srm);
-+		obex->srm = NULL;
-+	}
-+}
-+
-+static void setup_srm(GObex *obex, GObexPacket *pkt)
-+{
-+	GObexHeader *hdr;
-+	guint8 op;
-+	gboolean final;
-+
-+	op = g_obex_packet_get_operation(pkt, &final);
-+
-+	hdr = g_obex_packet_get_header(pkt, G_OBEX_HDR_SRM);
-+	if (hdr != NULL) {
-+		guint8 srm;
-+		g_obex_header_get_uint8(hdr, &srm);
-+		g_obex_debug(G_OBEX_DEBUG_COMMAND, "srm 0x%02x", srm);
-+		set_srm(obex, op, srm);
-+	}
-+
-+	if (obex->srm == NULL || obex->srm->state == SRM_DISABLED || !final)
-+		return;
-+
-+	switch (obex->srm->op) {
-+	case G_OBEX_OP_CONNECT:
-+		return;
-+	default:
-+		if (op <= G_OBEX_RSP_CONTINUE)
-+			return;
-+	}
-+
-+	set_srm(obex, op, G_OBEX_SRM_DISABLE);
-+}
-+
- gboolean g_obex_send(GObex *obex, GObexPacket *pkt, GError **err)
+-static gssize provide_random(void *buf, gsize len, gpointer user_data)
++static gssize provide_seq(void *buf, gsize len, gpointer user_data)
  {
- 	struct pending_pkt *p;
-@@ -444,6 +539,8 @@ gboolean g_obex_send(GObex *obex, GObexPacket *pkt, GError **err)
- 	if (obex->rx_last_op == G_OBEX_OP_CONNECT)
- 		prepare_connect_rsp(obex, pkt);
- 
-+	setup_srm(obex, pkt);
-+
- 	p = g_new0(struct pending_pkt, 1);
- 	p->pkt = pkt;
- 
-@@ -458,25 +555,30 @@ guint g_obex_send_req(GObex *obex, GObexPacket *req, gint timeout,
- 			GObexResponseFunc func, gpointer user_data,
- 			GError **err)
- {
--	GObexHeader *connid;
-+	GObexHeader *hdr;
- 	struct pending_pkt *p;
- 	static guint id = 1;
- 
- 	g_obex_debug(G_OBEX_DEBUG_COMMAND, "conn %u", obex->conn_id);
- 
-+	setup_srm(obex, req);
-+
- 	if (obex->conn_id == CONNID_INVALID)
- 		goto create_pending;
- 
- 	if (obex->rx_last_op == G_OBEX_RSP_CONTINUE)
- 		goto create_pending;
- 
--	connid = g_obex_packet_get_header(req, G_OBEX_HDR_CONNECTION);
--	if (connid != NULL)
-+	if (g_obex_get_srm(obex) == G_OBEX_SRM_ENABLE &&
-+						obex->pending_req != NULL)
- 		goto create_pending;
- 
--	connid = g_obex_header_new_uint32(G_OBEX_HDR_CONNECTION,
--							obex->conn_id);
--	g_obex_packet_prepend_header(req, connid);
-+	hdr = g_obex_packet_get_header(req, G_OBEX_HDR_CONNECTION);
-+	if (hdr != NULL)
-+		goto create_pending;
-+
-+	hdr = g_obex_header_new_uint32(G_OBEX_HDR_CONNECTION, obex->conn_id);
-+	g_obex_packet_prepend_header(req, hdr);
- 
- create_pending:
- 	p = g_new0(struct pending_pkt, 1);
-@@ -675,6 +777,15 @@ void g_obex_resume(GObex *obex)
- 		enable_tx(obex);
+ 	struct test_data *d = user_data;
+ 	int fd;
+@@ -382,12 +382,12 @@ static void test_put_rsp(void)
+ 	g_assert_no_error(d.err);
  }
  
-+guint8 g_obex_get_srm(GObex *obex)
-+{
-+	if (obex->srm == NULL)
-+		return G_OBEX_SRM_DISABLE;
-+
-+	return obex->srm->state == SRM_ENABLED ? G_OBEX_SRM_ENABLE :
-+							G_OBEX_SRM_DISABLE;
-+}
-+
- static void parse_connect_data(GObex *obex, GObexPacket *pkt)
+-static gboolean rcv_random(const void *buf, gsize len, gpointer user_data)
++static gboolean rcv_seq(const void *buf, gsize len, gpointer user_data)
  {
- 	const struct connect_data *data;
-@@ -698,21 +809,46 @@ static void parse_connect_data(GObex *obex, GObexPacket *pkt)
- 		g_obex_header_get_uint32(connid, &obex->conn_id);
+ 	return TRUE;
  }
  
--static void handle_response(GObex *obex, GError *err, GObexPacket *rsp)
-+static gboolean parse_response(GObex *obex, GObexPacket *rsp)
+-static void handle_put_random(GObex *obex, GObexPacket *req,
++static void handle_put_seq(GObex *obex, GObexPacket *req,
+ 							gpointer user_data)
  {
- 	struct pending_pkt *p = obex->pending_req;
--	gboolean disconn = err ? TRUE : FALSE, final_rsp = TRUE;
-+	guint8 opcode, rspcode;
-+	gboolean final;
- 
--	if (rsp != NULL) {
--		guint8 opcode;
-+	rspcode = g_obex_packet_get_operation(rsp, &final);
- 
--		g_obex_packet_get_operation(rsp, &final_rsp);
-+	opcode = g_obex_packet_get_operation(p->pkt, NULL);
-+	if (opcode == G_OBEX_OP_CONNECT)
-+		parse_connect_data(obex, rsp);
- 
--		opcode = g_obex_packet_get_operation(p->pkt, NULL);
--		if (opcode == G_OBEX_OP_CONNECT)
--			parse_connect_data(obex, rsp);
-+	setup_srm(obex, rsp);
-+
-+	if (g_obex_get_srm(obex) != G_OBEX_SRM_ENABLE)
-+		return final;
-+
-+	/*
-+	 * Resposes have final bit set but in case of GET with SRM
-+	 * we should not remove the request since the remote side will
-+	 * continue sending responses until the transfer is finished
-+	 */
-+	if (opcode == G_OBEX_OP_GET && rspcode == G_OBEX_RSP_CONTINUE) {
-+		g_source_remove(p->timeout_id);
-+		p->timeout_id = g_timeout_add_seconds(p->timeout, req_timeout,
-+									obex);
-+		return FALSE;
- 	}
- 
-+	return final;
-+}
-+
-+static void handle_response(GObex *obex, GError *err, GObexPacket *rsp)
-+{
-+	struct pending_pkt *p = obex->pending_req;
-+	gboolean disconn = err ? TRUE : FALSE, final_rsp = TRUE;
-+
-+	if (rsp != NULL)
-+		final_rsp = parse_response(obex, rsp);
-+
- 	if (p->cancelled)
- 		err = g_error_new(G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED,
- 					"The operation was cancelled");
-@@ -720,7 +856,6 @@ static void handle_response(GObex *obex, GError *err, GObexPacket *rsp)
- 	if (err)
- 		g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", err->message);
- 
--
- 	if (p->rsp_func) {
- 		p->rsp_func(obex, err, rsp, p->rsp_data);
- 
-@@ -758,13 +893,12 @@ static gboolean check_connid(GObex *obex, GObexPacket *pkt)
- 	return obex->conn_id == id;
- }
- 
--static void handle_request(GObex *obex, GObexPacket *req)
-+static guint8 parse_request(GObex *obex, GObexPacket *req)
- {
--	GSList *match;
- 	guint op;
-+	gboolean final;
- 
--	op = g_obex_packet_get_operation(req, NULL);
--
-+	op = g_obex_packet_get_operation(req, &final);
- 	switch (op) {
- 	case G_OBEX_OP_CONNECT:
- 		parse_connect_data(obex, req);
-@@ -775,12 +909,23 @@ static void handle_request(GObex *obex, GObexPacket *req)
- 		if (check_connid(obex, req))
- 			break;
- 
--		g_obex_debug(G_OBEX_DEBUG_ERROR, "Invalid Connection ID");
--		g_obex_send_rsp(obex, G_OBEX_RSP_SERVICE_UNAVAILABLE, NULL,
--							G_OBEX_HDR_INVALID);
--		return;
-+		return G_OBEX_RSP_SERVICE_UNAVAILABLE;
- 	}
- 
-+	setup_srm(obex, req);
-+
-+	return op;
-+}
-+
-+static void handle_request(GObex *obex, GObexPacket *req)
-+{
-+	GSList *match;
-+	guint op;
-+
-+	op = parse_request(obex, req);
-+	if (op >= G_OBEX_RSP_CONTINUE && op != G_OBEX_OP_ABORT)
-+		goto done;
-+
- 	match = g_slist_find_custom(obex->req_handlers, GUINT_TO_POINTER(op),
- 							req_handler_cmpop);
- 	if (match) {
-@@ -789,8 +934,11 @@ static void handle_request(GObex *obex, GObexPacket *req)
+ 	struct test_data *d = user_data;
+@@ -401,35 +401,13 @@ static void handle_put_random(GObex *obex, GObexPacket *req,
  		return;
  	}
  
--	g_obex_send_rsp(obex, G_OBEX_RSP_NOT_IMPLEMENTED, NULL,
--							G_OBEX_HDR_INVALID);
-+	op = G_OBEX_RSP_NOT_IMPLEMENTED;
-+
-+done:
-+	g_obex_debug(G_OBEX_DEBUG_ERROR, "Invalid Connection ID");
-+	g_obex_send_rsp(obex, op, NULL, G_OBEX_HDR_INVALID);
+-	id = g_obex_put_rsp(obex, req, rcv_random, transfer_complete, d,
++	id = g_obex_put_rsp(obex, req, rcv_seq, transfer_complete, d,
+ 						&d->err, G_OBEX_HDR_INVALID);
+ 	if (id == 0)
+ 		g_main_loop_quit(d->mainloop);
  }
  
- static gboolean read_stream(GObex *obex, GError **err)
-@@ -1111,6 +1259,7 @@ void g_obex_unref(GObex *obex)
+-static void handle_put_random_srm(GObex *obex, GObexPacket *req,
+-							gpointer user_data)
+-{
+-	struct test_data *d = user_data;
+-	guint8 op = g_obex_packet_get_operation(req, NULL);
+-	guint id;
+-
+-	if (op != G_OBEX_OP_PUT) {
+-		d->err = g_error_new(TEST_ERROR, TEST_ERROR_UNEXPECTED,
+-					"Unexpected opcode 0x%02x", op);
+-		g_main_loop_quit(d->mainloop);
+-		return;
+-	}
+-
+-	id = g_obex_put_rsp(obex, req, rcv_random, transfer_complete, d,
+-					&d->err,
+-					G_OBEX_HDR_SRM, G_OBEX_SRM_ENABLE,
+-					G_OBEX_HDR_INVALID);
+-	if (id == 0)
+-		g_main_loop_quit(d->mainloop);
+-}
+-
+-static void test_put_rsp_random(int sock_type)
++static void test_put_rsp_seq(int sock_type)
+ {
+ 	GIOChannel *io;
+ 	GIOCondition cond;
+@@ -454,7 +432,7 @@ static void test_put_rsp_random(int sock_type)
  
- 	g_free(obex->rx_buf);
- 	g_free(obex->tx_buf);
-+	g_free(obex->srm);
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
  
- 	if (obex->pending_req)
- 		pending_pkt_free(obex->pending_req);
-diff --git a/gobex/gobex.h b/gobex/gobex.h
-index 81981ea..cbc4482 100644
---- a/gobex/gobex.h
-+++ b/gobex/gobex.h
-@@ -61,6 +61,7 @@ gboolean g_obex_remove_request_function(GObex *obex, guint id);
+-	g_obex_add_request_function(obex, G_OBEX_OP_PUT, handle_put_random,
++	g_obex_add_request_function(obex, G_OBEX_OP_PUT, handle_put_seq,
+ 									&d);
  
- void g_obex_suspend(GObex *obex);
- void g_obex_resume(GObex *obex);
-+guint8 g_obex_get_srm(GObex *obex);
+ 	g_io_channel_write_chars(io, (char *) put_req_first,
+@@ -475,17 +453,17 @@ static void test_put_rsp_random(int sock_type)
+ 	g_assert_no_error(d.err);
+ }
  
- GObex *g_obex_new(GIOChannel *io, GObexTransportType transport_type,
- 						gssize rx_mtu, gssize tx_mtu);
+-static void test_stream_put_rsp_random(void)
++static void test_stream_put_rsp(void)
+ {
+-	test_put_rsp_random(SOCK_STREAM);
++	test_put_rsp_seq(SOCK_STREAM);
+ }
+ 
+-static void test_packet_put_rsp_random(void)
++static void test_packet_put_rsp(void)
+ {
+-	test_put_rsp_random(SOCK_SEQPACKET);
++	test_put_rsp_seq(SOCK_SEQPACKET);
+ }
+ 
+-static void handle_put_random_wait(GObex *obex, GObexPacket *req,
++static void handle_put_seq_wait(GObex *obex, GObexPacket *req,
+ 							gpointer user_data)
+ {
+ 	struct test_data *d = user_data;
+@@ -499,7 +477,7 @@ static void handle_put_random_wait(GObex *obex, GObexPacket *req,
+ 		return;
+ 	}
+ 
+-	id = g_obex_put_rsp(obex, req, rcv_random, transfer_complete, d,
++	id = g_obex_put_rsp(obex, req, rcv_seq, transfer_complete, d,
+ 					&d->err,
+ 					G_OBEX_HDR_SRM, G_OBEX_SRM_ENABLE,
+ 					G_OBEX_HDR_SRMP, G_OBEX_SRMP_WAIT,
+@@ -508,7 +486,7 @@ static void handle_put_random_wait(GObex *obex, GObexPacket *req,
+ 		g_main_loop_quit(d->mainloop);
+ }
+ 
+-static void test_put_rsp_random_srm_wait(int sock_type)
++static void test_put_rsp_seq_srm_wait(int sock_type)
+ {
+ 	GIOChannel *io;
+ 	GIOCondition cond;
+@@ -534,7 +512,7 @@ static void test_put_rsp_random_srm_wait(int sock_type)
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+ 	g_obex_add_request_function(obex, G_OBEX_OP_PUT,
+-						handle_put_random_wait, &d);
++						handle_put_seq_wait, &d);
+ 
+ 	g_io_channel_write_chars(io, (char *) put_req_first_srm,
+ 					sizeof(put_req_first_srm), NULL,
+@@ -555,17 +533,39 @@ static void test_put_rsp_random_srm_wait(int sock_type)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void test_stream_put_rsp_random_srm_wait(void)
++static void test_stream_put_rsp_srm_wait(void)
+ {
+-	test_put_rsp_random_srm_wait(SOCK_STREAM);
++	test_put_rsp_seq_srm_wait(SOCK_STREAM);
+ }
+ 
+-static void test_packet_put_rsp_random_srm_wait(void)
++static void test_packet_put_rsp_srm_wait(void)
+ {
+-	test_put_rsp_random_srm_wait(SOCK_SEQPACKET);
++	test_put_rsp_seq_srm_wait(SOCK_SEQPACKET);
++}
++
++static void handle_put_seq_srm(GObex *obex, GObexPacket *req,
++							gpointer user_data)
++{
++	struct test_data *d = user_data;
++	guint8 op = g_obex_packet_get_operation(req, NULL);
++	guint id;
++
++	if (op != G_OBEX_OP_PUT) {
++		d->err = g_error_new(TEST_ERROR, TEST_ERROR_UNEXPECTED,
++					"Unexpected opcode 0x%02x", op);
++		g_main_loop_quit(d->mainloop);
++		return;
++	}
++
++	id = g_obex_put_rsp(obex, req, rcv_seq, transfer_complete, d,
++					&d->err,
++					G_OBEX_HDR_SRM, G_OBEX_SRM_ENABLE,
++					G_OBEX_HDR_INVALID);
++	if (id == 0)
++		g_main_loop_quit(d->mainloop);
+ }
+ 
+-static void test_put_rsp_random_srm(int sock_type)
++static void test_put_rsp_seq_srm(int sock_type)
+ {
+ 	GIOChannel *io;
+ 	GIOCondition cond;
+@@ -590,7 +590,7 @@ static void test_put_rsp_random_srm(int sock_type)
+ 
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+-	g_obex_add_request_function(obex, G_OBEX_OP_PUT, handle_put_random_srm,
++	g_obex_add_request_function(obex, G_OBEX_OP_PUT, handle_put_seq_srm,
+ 									&d);
+ 
+ 	g_io_channel_write_chars(io, (char *) put_req_first_srm,
+@@ -612,14 +612,14 @@ static void test_put_rsp_random_srm(int sock_type)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void test_stream_put_rsp_random_srm(void)
++static void test_stream_put_rsp_srm(void)
+ {
+-	test_put_rsp_random_srm(SOCK_STREAM);
++	test_put_rsp_seq_srm(SOCK_STREAM);
+ }
+ 
+-static void test_packet_put_rsp_random_srm(void)
++static void test_packet_put_rsp_srm(void)
+ {
+-	test_put_rsp_random_srm(SOCK_SEQPACKET);
++	test_put_rsp_seq_srm(SOCK_SEQPACKET);
+ }
+ 
+ static void test_get_req(void)
+@@ -663,7 +663,7 @@ static void test_get_req(void)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void test_get_req_random(int sock_type)
++static void test_get_req_seq(int sock_type)
+ {
+ 	GIOChannel *io;
+ 	GIOCondition cond;
+@@ -688,7 +688,7 @@ static void test_get_req_random(int sock_type)
+ 
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+-	g_obex_get_req(obex, rcv_random, transfer_complete, &d, &d.err,
++	g_obex_get_req(obex, rcv_seq, transfer_complete, &d, &d.err,
+ 				G_OBEX_HDR_TYPE, hdr_type, sizeof(hdr_type),
+ 				G_OBEX_HDR_NAME, "file.txt",
+ 				G_OBEX_HDR_INVALID);
+@@ -708,17 +708,17 @@ static void test_get_req_random(int sock_type)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void test_stream_get_req_random(void)
++static void test_stream_get_req(void)
+ {
+-	test_get_req_random(SOCK_STREAM);
++	test_get_req_seq(SOCK_STREAM);
+ }
+ 
+-static void test_packet_get_req_random(void)
++static void test_packet_get_req(void)
+ {
+-	test_get_req_random(SOCK_SEQPACKET);
++	test_get_req_seq(SOCK_SEQPACKET);
+ }
+ 
+-static void test_get_req_random_srm(int sock_type)
++static void test_get_req_seq_srm(int sock_type)
+ {
+ 	GIOChannel *io;
+ 	GIOCondition cond;
+@@ -743,7 +743,7 @@ static void test_get_req_random_srm(int sock_type)
+ 
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+-	g_obex_get_req(obex, rcv_random, transfer_complete, &d, &d.err,
++	g_obex_get_req(obex, rcv_seq, transfer_complete, &d, &d.err,
+ 				G_OBEX_HDR_TYPE, hdr_type, sizeof(hdr_type),
+ 				G_OBEX_HDR_NAME, "file.txt",
+ 				G_OBEX_HDR_SRM, G_OBEX_SRM_ENABLE,
+@@ -764,17 +764,17 @@ static void test_get_req_random_srm(int sock_type)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void test_stream_get_req_random_srm(void)
++static void test_stream_get_req_srm(void)
+ {
+-	test_get_req_random_srm(SOCK_STREAM);
++	test_get_req_seq_srm(SOCK_STREAM);
+ }
+ 
+-static void test_packet_get_req_random_srm(void)
++static void test_packet_get_req_srm(void)
+ {
+-	test_get_req_random_srm(SOCK_SEQPACKET);
++	test_get_req_seq_srm(SOCK_SEQPACKET);
+ }
+ 
+-static void test_get_req_random_srm_wait(int sock_type)
++static void test_get_req_seq_srm_wait(int sock_type)
+ {
+ 	GIOChannel *io;
+ 	GIOCondition cond;
+@@ -799,7 +799,7 @@ static void test_get_req_random_srm_wait(int sock_type)
+ 
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+-	g_obex_get_req(obex, rcv_random, transfer_complete, &d, &d.err,
++	g_obex_get_req(obex, rcv_seq, transfer_complete, &d, &d.err,
+ 				G_OBEX_HDR_TYPE, hdr_type, sizeof(hdr_type),
+ 				G_OBEX_HDR_NAME, "file.txt",
+ 				G_OBEX_HDR_SRM, G_OBEX_SRM_ENABLE,
+@@ -821,17 +821,17 @@ static void test_get_req_random_srm_wait(int sock_type)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void test_stream_get_req_random_srm_wait(void)
++static void test_stream_get_req_srm_wait(void)
+ {
+-	test_get_req_random_srm_wait(SOCK_STREAM);
++	test_get_req_seq_srm_wait(SOCK_STREAM);
+ }
+ 
+-static void test_packet_get_req_random_srm_wait(void)
++static void test_packet_get_req_srm_wait(void)
+ {
+-	test_get_req_random_srm_wait(SOCK_SEQPACKET);
++	test_get_req_seq_srm_wait(SOCK_SEQPACKET);
+ }
+ 
+-static void test_get_req_random_srm_wait_next(int sock_type)
++static void test_get_req_seq_srm_wait_next(int sock_type)
+ {
+ 	GIOChannel *io;
+ 	GIOCondition cond;
+@@ -857,7 +857,7 @@ static void test_get_req_random_srm_wait_next(int sock_type)
+ 
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+-	g_obex_get_req(obex, rcv_random, transfer_complete, &d, &d.err,
++	g_obex_get_req(obex, rcv_seq, transfer_complete, &d, &d.err,
+ 				G_OBEX_HDR_TYPE, hdr_type, sizeof(hdr_type),
+ 				G_OBEX_HDR_NAME, "file.txt",
+ 				G_OBEX_HDR_SRM, G_OBEX_SRM_ENABLE,
+@@ -878,14 +878,14 @@ static void test_get_req_random_srm_wait_next(int sock_type)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void test_stream_get_req_random_srm_wait_next(void)
++static void test_stream_get_req_srm_wait_next(void)
+ {
+-	test_get_req_random_srm_wait_next(SOCK_STREAM);
++	test_get_req_seq_srm_wait_next(SOCK_STREAM);
+ }
+ 
+-static void test_packet_get_req_random_srm_wait_next(void)
++static void test_packet_get_req_srm_wait_next(void)
+ {
+-	test_get_req_random_srm_wait_next(SOCK_SEQPACKET);
++	test_get_req_seq_srm_wait_next(SOCK_SEQPACKET);
+ }
+ 
+ static void test_get_req_app(void)
+@@ -971,7 +971,7 @@ static void handle_get(GObex *obex, GObexPacket *req, gpointer user_data)
+ 		g_main_loop_quit(d->mainloop);
+ }
+ 
+-static void test_put_req_random(int sock_type)
++static void test_put_req_seq(int sock_type)
+ {
+ 	GIOChannel *io;
+ 	GIOCondition cond;
+@@ -997,7 +997,7 @@ static void test_put_req_random(int sock_type)
+ 
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+-	g_obex_put_req(obex, provide_random, transfer_complete, &d, &d.err,
++	g_obex_put_req(obex, provide_seq, transfer_complete, &d, &d.err,
+ 					G_OBEX_HDR_TYPE, hdr_type, sizeof(hdr_type),
+ 					G_OBEX_HDR_NAME, "random.bin",
+ 					G_OBEX_HDR_INVALID);
+@@ -1017,17 +1017,17 @@ static void test_put_req_random(int sock_type)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void test_stream_put_req_random(void)
++static void test_stream_put_req(void)
+ {
+-	test_put_req_random(SOCK_STREAM);
++	test_put_req_seq(SOCK_STREAM);
+ }
+ 
+-static void test_packet_put_req_random(void)
++static void test_packet_put_req(void)
+ {
+-	test_put_req_random(SOCK_SEQPACKET);
++	test_put_req_seq(SOCK_SEQPACKET);
+ }
+ 
+-static void test_put_req_random_srm_wait(int sock_type)
++static void test_put_req_seq_srm_wait(int sock_type)
+ {
+ 	GIOChannel *io;
+ 	GIOCondition cond;
+@@ -1053,7 +1053,7 @@ static void test_put_req_random_srm_wait(int sock_type)
+ 
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+-	g_obex_put_req(obex, provide_random, transfer_complete, &d, &d.err,
++	g_obex_put_req(obex, provide_seq, transfer_complete, &d, &d.err,
+ 					G_OBEX_HDR_TYPE, hdr_type, sizeof(hdr_type),
+ 					G_OBEX_HDR_NAME, "random.bin",
+ 					G_OBEX_HDR_SRM, G_OBEX_SRM_ENABLE,
+@@ -1074,17 +1074,17 @@ static void test_put_req_random_srm_wait(int sock_type)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void test_stream_put_req_random_srm_wait(void)
++static void test_stream_put_req_srm_wait(void)
+ {
+-	test_put_req_random_srm_wait(SOCK_STREAM);
++	test_put_req_seq_srm_wait(SOCK_STREAM);
+ }
+ 
+-static void test_packet_put_req_random_srm_wait(void)
++static void test_packet_put_req_srm_wait(void)
+ {
+-	test_put_req_random_srm_wait(SOCK_SEQPACKET);
++	test_put_req_seq_srm_wait(SOCK_SEQPACKET);
+ }
+ 
+-static void test_put_req_random_srm(int sock_type)
++static void test_put_req_seq_srm(int sock_type)
+ {
+ 	GIOChannel *io;
+ 	GIOCondition cond;
+@@ -1110,7 +1110,7 @@ static void test_put_req_random_srm(int sock_type)
+ 
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+-	g_obex_put_req(obex, provide_random, transfer_complete, &d, &d.err,
++	g_obex_put_req(obex, provide_seq, transfer_complete, &d, &d.err,
+ 					G_OBEX_HDR_TYPE, hdr_type, sizeof(hdr_type),
+ 					G_OBEX_HDR_NAME, "random.bin",
+ 					G_OBEX_HDR_SRM, G_OBEX_SRM_ENABLE,
+@@ -1131,14 +1131,14 @@ static void test_put_req_random_srm(int sock_type)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void test_stream_put_req_random_srm(void)
++static void test_stream_put_req_srm(void)
+ {
+-	test_put_req_random_srm(SOCK_STREAM);
++	test_put_req_seq_srm(SOCK_STREAM);
+ }
+ 
+-static void test_packet_put_req_random_srm(void)
++static void test_packet_put_req_srm(void)
+ {
+-	test_put_req_random_srm(SOCK_SEQPACKET);
++	test_put_req_seq_srm(SOCK_SEQPACKET);
+ }
+ 
+ static void test_put_req_eagain(void)
+@@ -1225,7 +1225,7 @@ static void test_get_rsp(void)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void handle_get_random(GObex *obex, GObexPacket *req,
++static void handle_get_seq(GObex *obex, GObexPacket *req,
+ 							gpointer user_data)
+ {
+ 	struct test_data *d = user_data;
+@@ -1239,13 +1239,13 @@ static void handle_get_random(GObex *obex, GObexPacket *req,
+ 		return;
+ 	}
+ 
+-	id = g_obex_get_rsp(obex, provide_random, transfer_complete, d,
++	id = g_obex_get_rsp(obex, provide_seq, transfer_complete, d,
+ 						&d->err, G_OBEX_HDR_INVALID);
+ 	if (id == 0)
+ 		g_main_loop_quit(d->mainloop);
+ }
+ 
+-static void test_get_rsp_random(int sock_type)
++static void test_get_rsp_seq(int sock_type)
+ {
+ 	GIOChannel *io;
+ 	GIOCondition cond;
+@@ -1269,7 +1269,7 @@ static void test_get_rsp_random(int sock_type)
+ 
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+-	g_obex_add_request_function(obex, G_OBEX_OP_GET, handle_get_random,
++	g_obex_add_request_function(obex, G_OBEX_OP_GET, handle_get_seq,
+ 									&d);
+ 
+ 	g_io_channel_write_chars(io, (char *) get_req_first,
+@@ -1290,17 +1290,17 @@ static void test_get_rsp_random(int sock_type)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void test_stream_get_rsp_random(void)
++static void test_stream_get_rsp(void)
+ {
+-	test_get_rsp_random(SOCK_STREAM);
++	test_get_rsp_seq(SOCK_STREAM);
+ }
+ 
+-static void test_packet_get_rsp_random(void)
++static void test_packet_get_rsp(void)
+ {
+-	test_get_rsp_random(SOCK_SEQPACKET);
++	test_get_rsp_seq(SOCK_SEQPACKET);
+ }
+ 
+-static void handle_get_random_srm(GObex *obex, GObexPacket *req,
++static void handle_get_seq_srm(GObex *obex, GObexPacket *req,
+ 							gpointer user_data)
+ {
+ 	struct test_data *d = user_data;
+@@ -1314,7 +1314,7 @@ static void handle_get_random_srm(GObex *obex, GObexPacket *req,
+ 		return;
+ 	}
+ 
+-	id = g_obex_get_rsp(obex, provide_random, transfer_complete, d,
++	id = g_obex_get_rsp(obex, provide_seq, transfer_complete, d,
+ 					&d->err,
+ 					G_OBEX_HDR_SRM, G_OBEX_SRM_ENABLE,
+ 					G_OBEX_HDR_INVALID);
+@@ -1322,7 +1322,7 @@ static void handle_get_random_srm(GObex *obex, GObexPacket *req,
+ 		g_main_loop_quit(d->mainloop);
+ }
+ 
+-static void test_get_rsp_random_srm(int sock_type)
++static void test_get_rsp_seq_srm(int sock_type)
+ {
+ 	GIOChannel *io;
+ 	GIOCondition cond;
+@@ -1346,7 +1346,7 @@ static void test_get_rsp_random_srm(int sock_type)
+ 
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+-	g_obex_add_request_function(obex, G_OBEX_OP_GET, handle_get_random_srm,
++	g_obex_add_request_function(obex, G_OBEX_OP_GET, handle_get_seq_srm,
+ 									&d);
+ 
+ 	g_io_channel_write_chars(io, (char *) get_req_first_srm,
+@@ -1368,17 +1368,17 @@ static void test_get_rsp_random_srm(int sock_type)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void test_stream_get_rsp_random_srm(void)
++static void test_stream_get_rsp_srm(void)
+ {
+-	test_get_rsp_random_srm(SOCK_STREAM);
++	test_get_rsp_seq_srm(SOCK_STREAM);
+ }
+ 
+-static void test_packet_get_rsp_random_srm(void)
++static void test_packet_get_rsp_srm(void)
+ {
+-	test_get_rsp_random_srm(SOCK_SEQPACKET);
++	test_get_rsp_seq_srm(SOCK_SEQPACKET);
+ }
+ 
+-static void handle_get_random_srm_wait(GObex *obex, GObexPacket *req,
++static void handle_get_seq_srm_wait(GObex *obex, GObexPacket *req,
+ 							gpointer user_data)
+ {
+ 	struct test_data *d = user_data;
+@@ -1392,7 +1392,7 @@ static void handle_get_random_srm_wait(GObex *obex, GObexPacket *req,
+ 		return;
+ 	}
+ 
+-	id = g_obex_get_rsp(obex, provide_random, transfer_complete, d,
++	id = g_obex_get_rsp(obex, provide_seq, transfer_complete, d,
+ 					&d->err,
+ 					G_OBEX_HDR_SRM, G_OBEX_SRM_ENABLE,
+ 					G_OBEX_HDR_SRMP, G_OBEX_SRMP_WAIT,
+@@ -1401,7 +1401,7 @@ static void handle_get_random_srm_wait(GObex *obex, GObexPacket *req,
+ 		g_main_loop_quit(d->mainloop);
+ }
+ 
+-static void test_get_rsp_random_srm_wait(int sock_type)
++static void test_get_rsp_seq_srm_wait(int sock_type)
+ {
+ 	GIOChannel *io;
+ 	GIOCondition cond;
+@@ -1426,7 +1426,7 @@ static void test_get_rsp_random_srm_wait(int sock_type)
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+ 	g_obex_add_request_function(obex, G_OBEX_OP_GET,
+-					handle_get_random_srm_wait, &d);
++					handle_get_seq_srm_wait, &d);
+ 
+ 	g_io_channel_write_chars(io, (char *) get_req_first_srm,
+ 					sizeof(get_req_first_srm), NULL,
+@@ -1447,14 +1447,14 @@ static void test_get_rsp_random_srm_wait(int sock_type)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void test_stream_get_rsp_random_srm_wait(void)
++static void test_stream_get_rsp_srm_wait(void)
+ {
+-	test_get_rsp_random_srm_wait(SOCK_STREAM);
++	test_get_rsp_seq_srm_wait(SOCK_STREAM);
+ }
+ 
+-static void test_packet_get_rsp_random_srm_wait(void)
++static void test_packet_get_rsp_srm_wait(void)
+ {
+-	test_get_rsp_random_srm_wait(SOCK_SEQPACKET);
++	test_get_rsp_seq_srm_wait(SOCK_SEQPACKET);
+ }
+ 
+ static void handle_get_app(GObex *obex, GObexPacket *req, gpointer user_data)
+@@ -2145,7 +2145,7 @@ static void test_conn_get_wrg_rsp(void)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void conn_complete_put_req_random(GObex *obex, GError *err,
++static void conn_complete_put_req_seq(GObex *obex, GError *err,
+ 					GObexPacket *rsp, gpointer user_data)
+ {
+ 	struct test_data *d = user_data;
+@@ -2155,13 +2155,13 @@ static void conn_complete_put_req_random(GObex *obex, GError *err,
+ 		g_main_loop_quit(d->mainloop);
+ 	}
+ 
+-	g_obex_put_req(obex, provide_random, transfer_complete, d, &d->err,
++	g_obex_put_req(obex, provide_seq, transfer_complete, d, &d->err,
+ 					G_OBEX_HDR_TYPE, hdr_type, sizeof(hdr_type),
+ 					G_OBEX_HDR_NAME, "random.bin",
+ 					G_OBEX_HDR_INVALID);
+ }
+ 
+-static void test_conn_put_req_random(void)
++static void test_conn_put_req_seq(void)
+ {
+ 	GIOChannel *io;
+ 	GIOCondition cond;
+@@ -2187,7 +2187,7 @@ static void test_conn_put_req_random(void)
+ 
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+-	g_obex_connect(obex, conn_complete_put_req_random, &d, &d.err,
++	g_obex_connect(obex, conn_complete_put_req_seq, &d, &d.err,
+ 							G_OBEX_HDR_INVALID);
+ 	g_assert_no_error(d.err);
+ 
+@@ -2205,7 +2205,7 @@ static void test_conn_put_req_random(void)
+ 	g_assert_no_error(d.err);
+ }
+ 
+-static void conn_complete_put_req_random_srm(GObex *obex, GError *err,
++static void conn_complete_put_req_seq_srm(GObex *obex, GError *err,
+ 					GObexPacket *rsp, gpointer user_data)
+ {
+ 	struct test_data *d = user_data;
+@@ -2215,14 +2215,14 @@ static void conn_complete_put_req_random_srm(GObex *obex, GError *err,
+ 		g_main_loop_quit(d->mainloop);
+ 	}
+ 
+-	g_obex_put_req(obex, provide_random, transfer_complete, d, &d->err,
++	g_obex_put_req(obex, provide_seq, transfer_complete, d, &d->err,
+ 					G_OBEX_HDR_SRM, G_OBEX_SRM_ENABLE,
+ 					G_OBEX_HDR_TYPE, hdr_type, sizeof(hdr_type),
+ 					G_OBEX_HDR_NAME, "random.bin",
+ 					G_OBEX_HDR_INVALID);
+ }
+ 
+-static void test_conn_put_req_random_srm(void)
++static void test_conn_put_req_seq_srm(void)
+ {
+ 	GIOChannel *io;
+ 	GIOCondition cond;
+@@ -2248,7 +2248,7 @@ static void test_conn_put_req_random_srm(void)
+ 
+ 	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
+ 
+-	g_obex_connect(obex, conn_complete_put_req_random_srm, &d, &d.err,
++	g_obex_connect(obex, conn_complete_put_req_seq_srm, &d, &d.err,
+ 					G_OBEX_HDR_SRM, G_OBEX_SRM_INDICATE,
+ 					G_OBEX_HDR_INVALID);
+ 	g_assert_no_error(d.err);
+@@ -2292,25 +2292,17 @@ int main(int argc, char *argv[])
+ 	g_test_add_func("/gobex/test_put_req_eagain", test_put_req_eagain);
+ 	g_test_add_func("/gobex/test_get_req_eagain", test_get_rsp_eagain);
+ 
+-	g_test_add_func("/gobex/test_stream_put_req_random",
+-						test_stream_put_req_random);
+-	g_test_add_func("/gobex/test_packet_put_req_random",
+-						test_packet_put_req_random);
++	g_test_add_func("/gobex/test_stream_put_req", test_stream_put_req);
++	g_test_add_func("/gobex/test_packet_put_req", test_packet_put_req);
+ 
+-	g_test_add_func("/gobex/test_stream_put_rsp_random",
+-						test_stream_put_rsp_random);
+-	g_test_add_func("/gobex/test_packet_put_rsp_random",
+-						test_packet_put_rsp_random);
++	g_test_add_func("/gobex/test_stream_put_rsp", test_stream_put_rsp);
++	g_test_add_func("/gobex/test_packet_put_rsp", test_packet_put_rsp);
+ 
+-	g_test_add_func("/gobex/test_stream_get_req_random",
+-						test_stream_get_req_random);
+-	g_test_add_func("/gobex/test_packet_get_req_random",
+-						test_packet_get_req_random);
++	g_test_add_func("/gobex/test_stream_get_req", test_stream_get_req);
++	g_test_add_func("/gobex/test_packet_get_req", test_packet_get_req);
+ 
+-	g_test_add_func("/gobex/test_stream_get_rsp_random",
+-						test_stream_get_rsp_random);
+-	g_test_add_func("/gobex/test_packet_get_rsp_random",
+-						test_packet_get_rsp_random);
++	g_test_add_func("/gobex/test_stream_get_rsp", test_stream_get_rsp);
++	g_test_add_func("/gobex/test_packet_get_rsp", test_packet_get_rsp);
+ 
+ 	g_test_add_func("/gobex/test_conn_get_req", test_conn_get_req);
+ 	g_test_add_func("/gobex/test_conn_get_rsp", test_conn_get_rsp);
+@@ -2320,56 +2312,56 @@ int main(int argc, char *argv[])
+ 
+ 	g_test_add_func("/gobex/test_conn_get_wrg_rsp", test_conn_get_wrg_rsp);
+ 
+-	g_test_add_func("/gobex/test_conn_put_req_random",
+-						test_conn_put_req_random);
+-
+-	g_test_add_func("/gobex/test_stream_put_req_random_srm",
+-					test_stream_put_req_random_srm);
+-	g_test_add_func("/gobex/test_packet_put_req_random_srm",
+-					test_packet_put_req_random_srm);
+-
+-	g_test_add_func("/gobex/test_stream_put_req_random_srm_wait",
+-					test_stream_put_req_random_srm_wait);
+-	g_test_add_func("/gobex/test_packet_put_req_random_srm_wait",
+-					test_packet_put_req_random_srm_wait);
+-
+-	g_test_add_func("/gobex/test_stream_put_rsp_random_srm",
+-					test_stream_put_rsp_random_srm);
+-	g_test_add_func("/gobex/test_packet_put_rsp_random_srm",
+-					test_packet_put_rsp_random_srm);
+-
+-	g_test_add_func("/gobex/test_stream_put_rsp_random_srm_wait",
+-					test_stream_put_rsp_random_srm_wait);
+-	g_test_add_func("/gobex/test_packet_put_rsp_random_srm_wait",
+-					test_packet_put_rsp_random_srm_wait);
+-
+-	g_test_add_func("/gobex/test_stream_get_rsp_random_srm",
+-					test_stream_get_rsp_random_srm);
+-	g_test_add_func("/gobex/test_packet_get_rsp_random_srm",
+-					test_packet_get_rsp_random_srm);
+-
+-	g_test_add_func("/gobex/test_stream_get_rsp_random_srm_wait",
+-					test_stream_get_rsp_random_srm_wait);
+-	g_test_add_func("/gobex/test_packet_get_rsp_random_srm_wait",
+-					test_packet_get_rsp_random_srm_wait);
+-
+-	g_test_add_func("/gobex/test_stream_get_req_random_srm",
+-					test_stream_get_req_random_srm);
+-	g_test_add_func("/gobex/test_packet_get_req_random_srm",
+-					test_packet_get_req_random_srm);
+-
+-	g_test_add_func("/gobex/test_stream_get_req_random_srm_wait",
+-					test_stream_get_req_random_srm_wait);
+-	g_test_add_func("/gobex/test_packet_get_req_random_srm_wait",
+-					test_packet_get_req_random_srm_wait);
+-
+-	g_test_add_func("/gobex/test_stream_get_req_random_srm_wait_next",
+-				test_stream_get_req_random_srm_wait_next);
+-	g_test_add_func("/gobex/test_packet_get_req_random_srm_wait_next",
+-				test_packet_get_req_random_srm_wait_next);
+-
+-	g_test_add_func("/gobex/test_conn_put_req_random_srm",
+-						test_conn_put_req_random_srm);
++	g_test_add_func("/gobex/test_conn_put_req_seq",
++						test_conn_put_req_seq);
++
++	g_test_add_func("/gobex/test_stream_put_req_srm",
++						test_stream_put_req_srm);
++	g_test_add_func("/gobex/test_packet_put_req_srm",
++						test_packet_put_req_srm);
++
++	g_test_add_func("/gobex/test_stream_put_req_srm_wait",
++						test_stream_put_req_srm_wait);
++	g_test_add_func("/gobex/test_packet_put_req_srm_wait",
++						test_packet_put_req_srm_wait);
++
++	g_test_add_func("/gobex/test_stream_put_rsp_srm",
++						test_stream_put_rsp_srm);
++	g_test_add_func("/gobex/test_packet_put_rsp_srm",
++						test_packet_put_rsp_srm);
++
++	g_test_add_func("/gobex/test_stream_put_rsp_srm_wait",
++						test_stream_put_rsp_srm_wait);
++	g_test_add_func("/gobex/test_packet_put_rsp_srm_wait",
++						test_packet_put_rsp_srm_wait);
++
++	g_test_add_func("/gobex/test_stream_get_rsp_srm",
++						test_stream_get_rsp_srm);
++	g_test_add_func("/gobex/test_packet_get_rsp_srm",
++						test_packet_get_rsp_srm);
++
++	g_test_add_func("/gobex/test_stream_get_rsp_srm_wait",
++						test_stream_get_rsp_srm_wait);
++	g_test_add_func("/gobex/test_packet_get_rsp_srm_wait",
++						test_packet_get_rsp_srm_wait);
++
++	g_test_add_func("/gobex/test_stream_get_req_srm",
++						test_stream_get_req_srm);
++	g_test_add_func("/gobex/test_packet_get_req_srm",
++						test_packet_get_req_srm);
++
++	g_test_add_func("/gobex/test_stream_get_req_srm_wait",
++						test_stream_get_req_srm_wait);
++	g_test_add_func("/gobex/test_packet_get_req_srm_wait",
++						test_packet_get_req_srm_wait);
++
++	g_test_add_func("/gobex/test_stream_get_req_srm_wait_next",
++					test_stream_get_req_srm_wait_next);
++	g_test_add_func("/gobex/test_packet_get_req_srm_wait_next",
++					test_packet_get_req_srm_wait_next);
++
++	g_test_add_func("/gobex/test_conn_put_req_seq_srm",
++						test_conn_put_req_seq_srm);
+ 
+ 	g_test_run();
+ 
 -- 
 1.7.7.4
 
