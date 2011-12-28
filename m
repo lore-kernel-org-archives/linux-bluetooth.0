@@ -1,64 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4EFB957A.5070606@gmail.com>
+Date: Wed, 28 Dec 2011 23:17:30 +0100
+From: Rene Herman <rene.herman@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAOnmHE9wynBS2CG4nTbbLTpP8B7btzf8+sF_233Fb3WwrWtAjw@mail.gmail.com>
-References: <CACj007=vVUEwvaqr7JhMqJ8VK95j2epK+1_Z+_cJ=1-+UwVnGw@mail.gmail.com>
-	<CAKT1EBdLu5ZBhaXWE208q4ctotd8vF1DyTBOY9hQVwKkpewEGw@mail.gmail.com>
-	<CAOnmHE9wynBS2CG4nTbbLTpP8B7btzf8+sF_233Fb3WwrWtAjw@mail.gmail.com>
-Date: Wed, 28 Dec 2011 19:26:02 -0300
-Message-ID: <CAKT1EBd-GNzQERzUcHg5w14c1AUbDfXV9ozE18DtjJPpZ5fQJw@mail.gmail.com>
-Subject: Re: [RFC BlueZ]Proximity Monitor Discussion
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: "Arun K. Singh" <arunkat@gmail.com>
-Cc: Hemant Gupta <hemantgupta.ste@gmail.com>,
-	Anderson Briglia <anderson.briglia@openbossa.org>,
-	Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org,
-	Arun Kumar SINGH <arunkr.singh@stericsson.com>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Gustavo Padovan <padovan@profusion.mobi>,
+ Andre Guedes <andre.guedes@openbossa.org>,
+ linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [bluetooth] linux-3.x regression (bisected)
+References: <4EF3BACA.1080405@gmail.com> <CACJA=fVezGGcgAtbzG=+ouWq0PiHbgXN1YPwL+VDUphWS7wnrw@mail.gmail.com> <4EFA1EB8.9090005@gmail.com> <20111227203008.GA13870@joana> <4EFA447C.3030906@gmail.com> <20111228012248.GC13870@joana> <20111228012850.GD13870@joana> <4EFA7696.6060506@gmail.com> <20111228155225.GA23292@joana> <1325090923.1965.282.camel@aeonflux>
+In-Reply-To: <1325090923.1965.282.camel@aeonflux>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arun,
+On 28-12-11 17:48, Marcel Holtmann wrote:
 
-On Wed, Dec 28, 2011 at 4:27 PM, Arun K. Singh <arunkat@gmail.com> wrote:
-> Hi Claudio,
+> < HCI Command: Read Local Extended Features (0x04|0x0004) plen 1
+>       page 1
+> > HCI Event: Command Complete (0x0e) plen 14
+>       Read Local Extended Features (0x04|0x0004) ncmd 1
+>       status 0x00 page 0 max 0
+>       Features: 0xff 0xfe 0xff 0x7e 0x98 0x19 0x00 0x80
 >
->> If the remote supports both services, there is no way in the
->> client(Proximity plugin) to figure out which scenario is happening.
->> The upper layer(app external to BlueZ) implements the logic to control
->> the ImmediateAlertLevel. My suggestion are:
->> 1) add a new property ImmediateAlertTimeout
->
-> The problem that I see with this new Timeout is that both Proximity
-> and Findme app - above Bluez have to have the intelligence of knowing
-> what services are supported on the remote side and then setting this
-> level accordingly. This can further complicate such apps as these may
-> not be standard profile applications and may be different from LE
-> stacks where both the proximity and FindMe profiles are implemented
-> pretty independently.
->
->> 2) or split ImmediateAlertLevel into: FindMeLevel and PathLossLevel
->> mapping into the same remote characteristic.
->
-> This would need immediate Immediate alert to propogate to both such
-> levels(FindMe/PAthLoss) from a remote side. May not be that bad except
-> pushing extra logic into higher level apps. But still may be more
-> appealing than the timeout complexities of approach (a).
->
->> Opinions?
-> Would suggest (b) except that what happens to existing
-> ImediateAlertLevel timeout. Who shall now decide to disconnect the ATT
-> connection for FindMeLevel and retaining it for PathLoss. May be we
-> need to export ATT disconnect too as a property in this case?
+> And this is correct. Page 0 is the same as local features. Storing this
+> as page 1 is the issue here. We request page 1, but we are getting page
+> 0 instead. So yes, the controller is broken, but not as broken as it
+> gets us false information.
 
-At the moment, there isn't a mechanism in the Proximity API to control
-connections.
+By the way, while the bluetooth (2.0) spec seems to consist of a 1230 
+page document that I am most certainly not going to study ...
 
-If the remote supports Link Loss or TX power, the link will NOT be
-disconnected. If the remote supports Immediate Alert Service only, the
-link can be disconnected after some seconds(after writing the level).
-For Proximity, it seems enough. I don't think we need to expose ATT
-disconnect property or method.
+... I couldn't help noticing that the HCI_Read_Local_Extended_Features 
+command is in fact specified to return "The highest features page number 
+which contains non-zero bits for the local device", and if I look at the 
+above, it seems to indeed return max=0.
 
-BR,
-Claudio
+Is it as such not in fact the case that the dongle is spec-compliant, 
+whereas it's the linux code that neglects to check that return value in 
+order to make sure that it requested a valid page?
+
+Rene.
