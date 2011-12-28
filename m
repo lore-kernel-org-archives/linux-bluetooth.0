@@ -1,135 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1325090923.1965.282.camel@aeonflux>
-Subject: Re: [bluetooth] linux-3.x regression (bisected)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gustavo Padovan <padovan@profusion.mobi>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Wed, 28 Dec 2011 14:16:44 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: David Herrmann <dh.herrmann@googlemail.com>
 Cc: Rene Herman <rene.herman@gmail.com>,
 	Andre Guedes <andre.guedes@openbossa.org>,
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Date: Wed, 28 Dec 2011 08:48:43 -0800
-In-Reply-To: <20111228155225.GA23292@joana>
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [bluetooth] linux-3.x regression (bisected)
+Message-ID: <20111228161644.GB23292@joana>
 References: <4EF3BACA.1080405@gmail.com>
-	 <CACJA=fVezGGcgAtbzG=+ouWq0PiHbgXN1YPwL+VDUphWS7wnrw@mail.gmail.com>
-	 <4EFA1EB8.9090005@gmail.com> <20111227203008.GA13870@joana>
-	 <4EFA447C.3030906@gmail.com> <20111228012248.GC13870@joana>
-	 <20111228012850.GD13870@joana> <4EFA7696.6060506@gmail.com>
-	 <20111228155225.GA23292@joana>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+ <CACJA=fVezGGcgAtbzG=+ouWq0PiHbgXN1YPwL+VDUphWS7wnrw@mail.gmail.com>
+ <4EFA1EB8.9090005@gmail.com>
+ <20111227203008.GA13870@joana>
+ <4EFA447C.3030906@gmail.com>
+ <20111228012248.GC13870@joana>
+ <20111228012850.GD13870@joana>
+ <4EFA7696.6060506@gmail.com>
+ <20111228155225.GA23292@joana>
+ <CANq1E4ROqGMkd-M+zMJtzdqC1j9AcUztJ+L2S0tsqtyiQhA89A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CANq1E4ROqGMkd-M+zMJtzdqC1j9AcUztJ+L2S0tsqtyiQhA89A@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi David,
 
-> > >>For some reason your adapter is returning here the same value of
-> > >>Read Local Features. I would say your device is broken.  The only
-> > >>fix I have in mind now is throw away the device.
-> > >
-> > >Yes, I have one of these ISSC devices, it's completely broken
-> > >device.
-> > 
-> > It worked well upto and including 2.6.29 though.
-> 
-> We never used Extended Features before 2.6.39
-> 
-> > 
-> > This would seem to be the kind of thing other subsystems use quirk
-> > handling for. The device identifies itself as "1131:1004":
-> > 
-> > Bus 002 Device 002: ID 1131:1004 Integrated System Solution Corp.
-> > Bluetooth Device
-> > 
-> > Do you guys have infra-structure in place for adapter-specific
-> > (quitk) handling?
-> 
-> I think this patch can do handling, let's see what others think.
-> 
-> 	Gustavo
-> 
-> 
-> ---
-> Author: Gustavo F. Padovan <padovan@profusion.mobi>
-> Date:   Wed Dec 28 13:40:02 2011 -0200
-> 
->     Bluetooth: Fix lmp_host_le_capable() check for broken devices
->     
->     Some dongles reports a wrong Local Extended Features leading the kernel
->     think that dongle support LE while it don't.
->     
->     The fix here is just rely on a bit in Local Features (LE Capable) to tell
->     us if the device really supports LE.
->     
->     LE Host Capable is the only bit used from Local Extended Features in our
->     kernel.
->     
->     Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 5e2e984..c693111 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -676,7 +676,11 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
->  #define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
->  
->  /* ----- Extended LMP capabilities ----- */
-> -#define lmp_host_le_capable(dev)   ((dev)->extfeatures[0] & LMP_HOST_LE)
-> +/* Some crap dongles does not report a proper Local Extended Features causing
+* David Herrmann <dh.herrmann@googlemail.com> [2011-12-28 17:04:11 +0100]:
 
-the page 1 is called host features and not local extended features.
+> On Wed, Dec 28, 2011 at 4:52 PM, Gustavo Padovan <padovan@profusion.mobi>=
+ wrote:
+> ..snip..
+> > I think this patch can do handling, let's see what others think.
+> >
+> > =A0 =A0 =A0 =A0Gustavo
+> >
+> >
+> > ---
+> > Author: Gustavo F. Padovan <padovan@profusion.mobi>
+> > Date: =A0 Wed Dec 28 13:40:02 2011 -0200
+> >
+> > =A0 =A0Bluetooth: Fix lmp_host_le_capable() check for broken devices
+> >
+> > =A0 =A0Some dongles reports a wrong Local Extended Features leading the=
+ kernel
+> > =A0 =A0think that dongle support LE while it don't.
+> >
+> > =A0 =A0The fix here is just rely on a bit in Local Features (LE Capable=
+) to tell
+> > =A0 =A0us if the device really supports LE.
+> >
+> > =A0 =A0LE Host Capable is the only bit used from Local Extended Feature=
+s in our
+> > =A0 =A0kernel.
+> >
+> > =A0 =A0Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> >
+> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/h=
+ci_core.h
+> > index 5e2e984..c693111 100644
+> > --- a/include/net/bluetooth/hci_core.h
+> > +++ b/include/net/bluetooth/hci_core.h
+> > @@ -676,7 +676,11 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+> > =A0#define lmp_le_capable(dev) =A0 =A0 =A0 =A0((dev)->features[4] & LMP=
+_LE)
+> >
+> > =A0/* ----- Extended LMP capabilities ----- */
+> > -#define lmp_host_le_capable(dev) =A0 ((dev)->extfeatures[0] & LMP_HOST=
+_LE)
+> > +/* Some crap dongles does not report a proper Local Extended Features =
+causing
+> > + * the kernel to wrongly init it as a LE device. So first check if it =
+is LE
+> > + * capable (controller) which is a info from the Local Features */
+> > +#define lmp_host_le_capable(dev) =A0 =A0( lmp_le_capable(dev) && \
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 (dev)->extfeatures[0] & LMP_HOST_LE)
+> >
+> > =A0/* ----- HCI protocols ----- */
+> > =A0static inline int hci_proto_connect_ind(struct hci_dev *hdev, bdaddr=
+_t *bdaddr,
+>=20
+> Next time we use the extfeatures for something else, we will break
+> this device again. Can't we fix dev->extfeatures on initialization
+> based on a blacklist/quirklist? Or is dev->extfeatures modified after
+> initialzation of the device somewhere?
 
-> + * the kernel to wrongly init it as a LE device. So first check if it is LE
-> + * capable (controller) which is a info from the Local Features */
-> +#define lmp_host_le_capable(dev)    ( lmp_le_capable(dev) && \
-> +                                       (dev)->extfeatures[0] & LMP_HOST_LE)
+Sure, we will, but I don't see us using another bit of extfeatures in the n=
+ear
+future (after the next Core Spec release maybe) and I don't wanna got that =
+far
+in this fix right now.
 
-< HCI Command: Read Local Extended Features (0x04|0x0004) plen 1
-     page 1
-> HCI Event: Command Complete (0x0e) plen 14
-     Read Local Extended Features (0x04|0x0004) ncmd 1
-     status 0x00 page 0 max 0
-     Features: 0xff 0xfe 0xff 0x7e 0x98 0x19 0x00 0x80
-
-And this is correct. Page 0 is the same as local features. Storing this
-as page 1 is the issue here. We request page 1, but we are getting page
-0 instead. So yes, the controller is broken, but not as broken as it
-gets us false information. We are just getting different information
-than we requested. And we are being stupid here.
-
-Here is the original patch that introduced this behavior:
-
-commit 971e3a4bbcbf7378315b85150853d86be59cffe0
-Author: Andre Guedes <andre.guedes@openbossa.org>
-Date:   Thu Jun 30 19:20:52 2011 -0300
-
-    Bluetooth: Add extfeatures to struct hci_dev
-
-And even here we should have called this hostfeatures since that is what
-page 1 really is.
-
-The correct patch would be something like this:
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 919e3c0..b6eb9c5 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -711,7 +711,8 @@ static void hci_cc_read_local_ext_features(struct hci_dev *h
-        if (rp->status)
-                return;
- 
--       memcpy(hdev->extfeatures, rp->features, 8);
-+       if (rp->page == 1)
-+               memcpy(hdev->extfeatures, rp->features, 8);
- 
-        hci_req_complete(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES, rp->status);
- }
-
-The current patch is actually fully broken anyway. So besides switching
-LE on when requesting page 0, you will also switch it off when
-requesting any other page and it accidentally returns 0x00 since we
-unconditionally overwrite it.
-
-Regards
-
-Marcel
-
-
+	Gustavo
