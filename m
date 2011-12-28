@@ -1,28 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EFB49E2.7010404@gmail.com>
-Date: Wed, 28 Dec 2011 17:54:58 +0100
-From: Rene Herman <rene.herman@gmail.com>
 MIME-Version: 1.0
-To: Andre Guedes <andre.guedes@openbossa.org>
-CC: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [bluetooth] linux-3.x regression (bisected)
-References: <4EF3BACA.1080405@gmail.com> <CACJA=fVezGGcgAtbzG=+ouWq0PiHbgXN1YPwL+VDUphWS7wnrw@mail.gmail.com> <4EFA1EB8.9090005@gmail.com> <20111227203008.GA13870@joana> <4EFA447C.3030906@gmail.com> <20111228012248.GC13870@joana> <20111228012850.GD13870@joana> <4EFA7696.6060506@gmail.com> <20111228155225.GA23292@joana>
-In-Reply-To: <20111228155225.GA23292@joana>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Date: Wed, 28 Dec 2011 12:20:15 -0430
+Message-ID: <CAH=dYrHhttmRjkVuo9QvJ5_Uqd+BJGCJJkaMw8153RW1SFv9dA@mail.gmail.com>
+Subject: firmware loading failure for AR3011 (0cf3:3000 or 0cf3:3005 ?)
+From: Andres Cimmarusti <acimmarusti@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Jonathan Nieder <jrnieder@gmail.com>,
+	641749@bugs.debian.org, info@linuxcertified.com
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 28-12-11 16:52, Gustavo Padovan wrote:
+Dear all,
 
-> I think this patch can do handling, let's see what others think.
+This is an upstream bug report for known bugs in at least 3 linux distros:
 
-I can confirm that this works for me.
+Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=641749
+Fedora: https://bugzilla.redhat.com/show_bug.cgi?id=702375
 
-Might it be useful to specify the currently observed crap dongle (ie, 
-USB 1131:1004) in the changelog or comment? That way, if the handling 
-ever changes in the manner that David suggests, maybe this specific 
-dongle will find its way into the list immediately.
+***Steps to reproduce***
 
-But... works for me as is.
+- Boot current Debian testing / Fedora 16 / Ubuntu 11.10 (using
+kernels 3.1.x and 3.0.x)
 
-Rene.
+***Expected behavior***
+
+- Working bluetooth and no problems in rebooting laptop as occurs
+using Ubuntu 11.04 / Fedora 15 and/or Debian Squeeze (using kernels
+2.6.38 or newer)
+
+- lsusb reveals this:
+
+Bus 001 Device 004: ID 0cf3:3005 Atheros Communications, Inc. AR3011 Bluetooth
+
+***Actual Result***
+
+- Boot process stalls and fails to load firmware for this Atheros
+AR3011 bluetooth module:
+
+[    9.335184] ath3k_load_firmware: Can't change to loading configuration err
+[    9.335413] ath3k: probe of 1-1.3:1.0 failed with error -110
+[    9.335459] usbcore: registered new interface driver ath3k
+
+- lsusb of the device shows this:
+
+Bus 001 Device 003: ID 0cf3:3000 Atheros Communications, Inc. AR3011
+Bluetooth (no firmware)
+
+- After login bluetooth does not work. Furthermore, choosing to
+"Restart" the laptop causes it to hang at first pre-bios post screen.
+
+***Things I've tried***
+
+The weird part about this bug is that using Debian squeeze as a base,
+I can run the newest kernels (2.6.39, 3.0.x and 3.1.x) and I have no
+problems at all. Also the output of lsusb differs substantially from
+the working vs broken system. Ubuntu 11.04 and Fedora 15 also work
+fine using kernel 2.6.38.
+
+Here is an example dmesg, using kernel 3.0.8 on Squeeze (no problem):
+
+http://bugs.debian.org/cgi-bin/bugreport.cgi?msg=56;filename=dmesg_stable%2B3.0.8.txt;att=2;bug=641749
+
+And here is a similar 3.0.x Debian mainline kernel running on top of
+Debian testing (wheezy):
+
+http://bugs.debian.org/cgi-bin/bugreport.cgi?msg=56;filename=dmesg_testing%2B3.0.0-2.txt;att=1;bug=641749
+
+If you browse the Debian bug report link listed at the beginning of
+this email, you will also be able to get logs for kernel 3.1.x.
+Furthermore, I've tested downgrading the version of udev to the one
+found in Debian squeeze (version 164) as well as usb-modeswitch (also
+tried upgrading to the latest versions in Debian unstable), but this
+has yielded no progress and no clues at all...the error messages
+remain the same.
+
+Help debugging this issue would be most welcome.
+
+Best Regards
+
+Andres Cimmarusti
+
+PS: For reference this is a Linux Certified laptop model LC2131, also
+known as the Zareason Strata Pro 13 or the ASI SpringPeak 13
