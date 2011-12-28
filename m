@@ -1,89 +1,241 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Wed, 28 Dec 2011 13:52:25 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Rene Herman <rene.herman@gmail.com>
-Cc: Andre Guedes <andre.guedes@openbossa.org>, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [bluetooth] linux-3.x regression (bisected)
-Message-ID: <20111228155225.GA23292@joana>
-References: <4EF3BACA.1080405@gmail.com>
- <CACJA=fVezGGcgAtbzG=+ouWq0PiHbgXN1YPwL+VDUphWS7wnrw@mail.gmail.com>
- <4EFA1EB8.9090005@gmail.com>
- <20111227203008.GA13870@joana>
- <4EFA447C.3030906@gmail.com>
- <20111228012248.GC13870@joana>
- <20111228012850.GD13870@joana>
- <4EFA7696.6060506@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4EFA7696.6060506@gmail.com>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+	<frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC v6 8/8] audio: Send transport path to telephony agent
+Date: Wed, 28 Dec 2011 14:48:13 +0100
+Message-Id: <1325080093-20469-9-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1325080093-20469-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1325080093-20469-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rene,
+Add the ability to set MediaTransport path to the HSP/HFP agent during
+the call of the NewConnection method.
+Accept MediaTransport property change from telephony agent in addition
+to Media Endpoint.
 
-* Rene Herman <rene.herman@gmail.com> [2011-12-28 02:53:26 +0100]:
-
-> On 28-12-11 02:28, Gustavo Padovan wrote:
-> 
-> >>For some reason your adapter is returning here the same value of
-> >>Read Local Features. I would say your device is broken.  The only
-> >>fix I have in mind now is throw away the device.
-> >
-> >Yes, I have one of these ISSC devices, it's completely broken
-> >device.
-> 
-> It worked well upto and including 2.6.29 though.
-
-We never used Extended Features before 2.6.39
-
-> 
-> This would seem to be the kind of thing other subsystems use quirk
-> handling for. The device identifies itself as "1131:1004":
-> 
-> Bus 002 Device 002: ID 1131:1004 Integrated System Solution Corp.
-> Bluetooth Device
-> 
-> Do you guys have infra-structure in place for adapter-specific
-> (quitk) handling?
-
-I think this patch can do handling, let's see what others think.
-
-	Gustavo
-
-
+This allows external program, implementing telephony agent, to change
+Noise Reduction/Echo Cancellation (ECNR), Inband ringtone, speaker
+and microphone volume settings of the audio system (i.e. Pulse Audio)
+through the MediaTransport.
 ---
-Author: Gustavo F. Padovan <padovan@profusion.mobi>
-Date:   Wed Dec 28 13:40:02 2011 -0200
+ audio/headset.c   |   29 +++++++++++++++++++++++++++++
+ audio/headset.h   |    3 +++
+ audio/media.c     |    9 ++++++++-
+ audio/telephony.c |   19 +++++++++++++++++++
+ audio/telephony.h |    2 ++
+ audio/transport.c |   14 +++++++++++---
+ 6 files changed, 72 insertions(+), 4 deletions(-)
 
-    Bluetooth: Fix lmp_host_le_capable() check for broken devices
-    
-    Some dongles reports a wrong Local Extended Features leading the kernel
-    think that dongle support LE while it don't.
-    
-    The fix here is just rely on a bit in Local Features (LE Capable) to tell
-    us if the device really supports LE.
-    
-    LE Host Capable is the only bit used from Local Extended Features in our
-    kernel.
-    
-    Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+diff --git a/audio/headset.c b/audio/headset.c
+index 9fe1404..e97eb2d 100644
+--- a/audio/headset.c
++++ b/audio/headset.c
+@@ -109,6 +109,7 @@ struct headset {
+ 	GIOChannel *rfcomm;
+ 	GIOChannel *tmp_rfcomm;
+ 	void *connecting_agent;
++	const char *connecting_path;
+ 	GIOChannel *sco;
+ 	guint sco_id;
+ 
+@@ -415,6 +416,8 @@ void headset_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 
+ 	hs->slc = telephony_device_connecting(chan, dev);
+ 	hs->connecting_agent = NULL;
++	telephony_set_media_transport_path(hs->slc, hs->connecting_path);
++	hs->connecting_path = NULL;
+ 
+ 	DBG("%s: Connected to %s", dev->path, hs_address);
+ 
+@@ -546,6 +549,7 @@ failed_not_supported:
+ failed:
+ 	p->svclass = 0;
+ 	hs->connecting_agent = NULL;
++	hs->connecting_path = NULL;
+ 	pending_connect_finalize(dev);
+ 	headset_set_state(dev, HEADSET_STATE_DISCONNECTED);
+ }
+@@ -1228,6 +1232,31 @@ void *headset_get_connecting_agent(struct audio_device *dev)
+ 	return hs->connecting_agent;
+ }
+ 
++void headset_set_media_transport_path(struct audio_device *dev,
++							const char *path)
++{
++	struct headset *hs = dev->headset;
++
++	DBG("MediaTransport path: %s", path);
++
++	if (hs->slc == NULL) {
++		hs->connecting_path = path;
++		return;
++	}
++
++	telephony_set_media_transport_path(hs->slc, path);
++}
++
++const char *headset_get_telephony_agent_name(struct audio_device *dev)
++{
++	struct headset *hs = dev->headset;
++
++	if (hs == NULL || hs->slc == NULL)
++		return NULL;
++
++	return telephony_get_agent_name(hs->slc);
++}
++
+ int headset_connect_rfcomm(struct audio_device *dev, GIOChannel *io)
+ {
+ 	struct headset *hs = dev->headset;
+diff --git a/audio/headset.h b/audio/headset.h
+index d156eb3..cc1ad31 100644
+--- a/audio/headset.h
++++ b/audio/headset.h
+@@ -107,3 +107,6 @@ void headset_shutdown(struct audio_device *dev);
+ void headset_slc_complete(struct audio_device *dev);
+ void headset_set_connecting_agent(struct audio_device *dev, void *agent);
+ void *headset_get_connecting_agent(struct audio_device *dev);
++void headset_set_media_transport_path(struct audio_device *dev,
++							const char *path);
++const char *headset_get_telephony_agent_name(struct audio_device *dev);
+diff --git a/audio/media.c b/audio/media.c
+index a363b8e..33eb14a 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -440,6 +440,7 @@ static void headset_state_changed(struct audio_device *dev,
+ 					void *user_data)
+ {
+ 	struct media_endpoint *endpoint = user_data;
++	const char *path;
+ 
+ 	DBG("");
+ 
+@@ -455,6 +456,8 @@ static void headset_state_changed(struct audio_device *dev,
+ 	case HEADSET_STATE_CONNECTING:
+ 		set_configuration(endpoint, dev, NULL, 0, headset_setconf_cb,
+ 								dev, NULL);
++		path = media_transport_get_path(endpoint->transport);
++		headset_set_media_transport_path(dev, path);
+ 		break;
+ 	case HEADSET_STATE_CONNECTED:
+ 		break;
+@@ -669,14 +672,18 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
+ 	} else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
+ 					strcasecmp(uuid, HSP_AG_UUID) == 0) {
+ 		struct audio_device *dev;
++		const char *t_path;
+ 
+ 		endpoint->hs_watch = headset_add_state_cb(headset_state_changed,
+ 								endpoint);
+ 		dev = manager_find_device(NULL, &adapter->src, BDADDR_ANY,
+ 						AUDIO_HEADSET_INTERFACE, TRUE);
+-		if (dev)
++		if (dev) {
+ 			set_configuration(endpoint, dev, NULL, 0,
+ 						headset_setconf_cb, dev, NULL);
++			t_path = media_transport_get_path(endpoint->transport);
++			headset_set_media_transport_path(dev, t_path);
++		}
+ 	} else if (strcasecmp(uuid, HFP_HS_UUID) == 0 ||
+ 					strcasecmp(uuid, HSP_HS_UUID) == 0) {
+ 		struct audio_device *dev;
+diff --git a/audio/telephony.c b/audio/telephony.c
+index f828f2f..1c25eee 100644
+--- a/audio/telephony.c
++++ b/audio/telephony.c
+@@ -65,6 +65,7 @@ struct tel_device {
+ 	struct tel_agent	*agent;
+ 	struct audio_device	*au_dev;
+ 	GIOChannel		*rfcomm;
++	const char		*transport_path;
+ 	uint16_t		version;
+ 	uint16_t		features;
+ };
+@@ -217,6 +218,10 @@ static gboolean agent_sendfd(struct tel_device *dev, int fd,
+ 		dict_append_entry(&dict, "Features", DBUS_TYPE_UINT16,
+ 							&dev->features);
+ 
++	if (dev->transport_path != NULL)
++		dict_append_entry(&dict, "MediaTransportPath", DBUS_TYPE_STRING,
++							&dev->transport_path);
++
+ 	dbus_message_iter_close_container(&iter, &dict);
+ 
+ 	if (dbus_connection_send_with_reply(connection, msg, &call, -1)
+@@ -360,6 +365,20 @@ void telephony_device_disconnected(void *telephony_device)
+ 	DBG("telephony-dbus: device %p disconnected", telephony_device);
+ }
+ 
++void telephony_set_media_transport_path(void *slc, const char *path)
++{
++	struct tel_device *dev = slc;
++
++	dev->transport_path = path;
++}
++
++const char *telephony_get_agent_name(void *slc)
++{
++	struct tel_device *dev = slc;
++
++	return dev->agent->name;
++}
++
+ gboolean telephony_get_ready_state(void)
+ {
+ 	return find_agent(NULL, NULL, HFP_AG_UUID) ? TRUE : FALSE;
+diff --git a/audio/telephony.h b/audio/telephony.h
+index de3bdb1..96350da 100644
+--- a/audio/telephony.h
++++ b/audio/telephony.h
+@@ -52,6 +52,8 @@ void *telephony_device_connecting(GIOChannel *io, void *telephony_device);
+ void telephony_device_connected(void *telephony_device);
+ void telephony_device_disconnect(void *slc);
+ void telephony_device_disconnected(void *telephony_device);
++void telephony_set_media_transport_path(void *slc, const char *path);
++const char *telephony_get_agent_name(void *slc);
+ 
+ gboolean telephony_get_ready_state(void);
+ void *telephony_agent_by_uuid(const char *uuid);
+diff --git a/audio/transport.c b/audio/transport.c
+index 181678e..71da19e 100644
+--- a/audio/transport.c
++++ b/audio/transport.c
+@@ -833,8 +833,9 @@ static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
+ 	struct media_transport *transport = data;
+ 	DBusMessageIter iter;
+ 	DBusMessageIter value;
+-	const char *property, *sender;
++	const char *property, *sender, *tel_agent;
+ 	GSList *l;
++	gboolean sender_ok = FALSE;
+ 	int err;
+ 
+ 	if (!dbus_message_iter_init(msg, &iter))
+@@ -858,12 +859,19 @@ static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
+ 		struct media_owner *owner = l->data;
+ 
+ 		if (g_strcmp0(owner->name, sender) == 0) {
+-			err = transport->set_property(transport, property,
+-								&value);
++			sender_ok = TRUE;
+ 			break;
+ 		}
+ 	}
+ 
++	/* Check if Telephony agent does this request */
++	tel_agent = headset_get_telephony_agent_name(transport->device);
++	if (tel_agent != NULL && g_strcmp0(tel_agent, sender) == 0)
++		sender_ok = TRUE;
++
++	if (sender_ok)
++		err = transport->set_property(transport, property, &value);
++
+ 	if (err < 0) {
+ 		if (err == -EINVAL)
+ 			return btd_error_invalid_args(msg);
+-- 
+1.7.1
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 5e2e984..c693111 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -676,7 +676,11 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
- 
- /* ----- Extended LMP capabilities ----- */
--#define lmp_host_le_capable(dev)   ((dev)->extfeatures[0] & LMP_HOST_LE)
-+/* Some crap dongles does not report a proper Local Extended Features causing
-+ * the kernel to wrongly init it as a LE device. So first check if it is LE
-+ * capable (controller) which is a info from the Local Features */
-+#define lmp_host_le_capable(dev)    ( lmp_le_capable(dev) && \
-+                                       (dev)->extfeatures[0] & LMP_HOST_LE)
- 
- /* ----- HCI protocols ----- */
- static inline int hci_proto_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
