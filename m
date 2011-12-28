@@ -1,26 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
+From: yegorslists@googlemail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: Multi-Adapter GATT server (finish) 
-Date: Wed, 28 Dec 2011 11:24:42 +0100
-Message-Id: <1325067890-6953-1-git-send-email-sancane@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: marcel@holtmann.org,
+	Yegor Yefremov <yegorslists@googlemail.com>
+Subject: [PATCH 2/2] add tools to include folder list
+Date: Wed, 28 Dec 2011 10:53:37 +0100
+Message-Id: <1325066017-2384-3-git-send-email-yegorslists@googlemail.com>
+In-Reply-To: <1325066017-2384-1-git-send-email-yegorslists@googlemail.com>
+References: <1325066017-2384-1-git-send-email-yegorslists@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This set of patches complete the multi-adapter gatt server support. They
-modify the gatt server interface to provide the bluetooth adapter which
-the gatt server is running. These patches can safetily be applyied on top
-of the latest patches sent wich introduces the changes suggested in the
-mailing list to provide the initial support for multi-adapter support.
+From: Yegor Yefremov <yegorslists@googlemail.com>
 
-Time and Proximity plugins still need a code refactorization to be
-consistent with this new architecture.
+adding tools to include folder list avoids out-of-source build
+breakage
+---
+ Makefile.am |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-[PATCH 1/8] attrib-server: Add blutooth adapter to
-[PATCH 2/8] attrib-server: Add bluetooth adapter in attrib_db_add
-[PATCH 3/8] gatt-service: Add bluetooth adapter in gatt_service_add
-[PATCH 4/8] attrib-server: Add bluetooth adapter in attrib_db_update
-[PATCH 5/8] attrib-server: Add bluetooth adapter in attrib_gap_set
-[PATCH 6/8] attrib-server: Add bluetooth adapter in attrib_db_del
-[PATCH 7/8] attrib-server: Add bluetooth adapter in
-[PATCH 8/8] attrib-server: Add Gattrib in attrib_channel_detach
+diff --git a/Makefile.am b/Makefile.am
+index 9f26b06..8bc6cfe 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -441,7 +441,8 @@ AM_CFLAGS = @DBUS_CFLAGS@ @GLIB_CFLAGS@ @CAPNG_CFLAGS@
+ 
+ INCLUDES = -I$(builddir)/lib -I$(builddir)/src -I$(srcdir)/src \
+ 			-I$(srcdir)/audio -I$(srcdir)/sbc -I$(srcdir)/gdbus \
+-			-I$(srcdir)/attrib -I$(srcdir)/btio
++			-I$(srcdir)/attrib -I$(srcdir)/btio -I$(srcdir)/tools \
++			-I$(builddir)/tools
+ 
+ if MCAP
+ INCLUDES += -I$(builddir)/health
+-- 
+1.7.5.4
