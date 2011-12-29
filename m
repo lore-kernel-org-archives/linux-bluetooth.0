@@ -1,67 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1325080093-20469-2-git-send-email-frederic.danis@linux.intel.com>
-References: <1325080093-20469-1-git-send-email-frederic.danis@linux.intel.com>
-	<1325080093-20469-2-git-send-email-frederic.danis@linux.intel.com>
-Date: Thu, 29 Dec 2011 10:49:07 +0200
-Message-ID: <CABBYNZJGakUpv=vbq47h7qxaCNV5p808Jq5YYj7TxwmbBH6oEA@mail.gmail.com>
-Subject: Re: [RFC v6 1/8] audio: Move tel drivers to DBus interface
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Danis?=
-	<frederic.danis@linux.intel.com>
+In-Reply-To: <1325094105.1965.284.camel@aeonflux>
+References: <1325066017-2384-1-git-send-email-yegorslists@googlemail.com> <1325094105.1965.284.camel@aeonflux>
+From: Yegor Yefremov <yegorslists@googlemail.com>
+Date: Thu, 29 Dec 2011 09:10:29 +0100
+Message-ID: <CAGm1_kt6Q3pyudT6K8KyeQfYqRGbB3A6md=kw9YaYC1qw8qJxA@mail.gmail.com>
+Subject: Re: Fix out-of-source build breakage
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Hi Marcel,
 
-2011/12/28 Frédéric Danis <frederic.danis@linux.intel.com>:
-> +TelephonyAgent hierarchy
-> +========================
-> +
-> +Service                unique name
-> +Interface      org.bluez.TelephonyAgent
-> +Object path    freely definable
-> +
-> +Methods                void NewConnection(filedescriptor fd, dict properties)
-> +
-> +                       This method gets called whenever a new connection
-> +                       has been established. This method assumes that DBus
-> +                       daemon with file descriptor passing capability is
-> +                       being used.
-> +
-> +                       The agent should only return successfully once the
-> +                       establishment of the service level connection (SLC)
-> +                       has been completed.  In the case of Handsfree this
-> +                       means that BRSF exchange has been performed and
-> +                       necessary initialization has been done.
-> +
-> +                       possible properties:
-> +
-> +                               strict Device:
-> +
-> +                                       BlueZ remote device object.
-> +
-> +                               string UUID:
-> +
-> +                                       Profile UUID of the connection.
-> +
-> +                               uint16 Version:
-> +
-> +                                       Remote profile version.
-> +
-> +                               uint16 Features:
-> +
-> +                                       Remote profile features.
-> +
-> +                               string MediaTransportPath:
-> +
-> +                                       Optional. MediaTransport object path.
+>> These patches fix out-of-source build breakage. The first one fixes
+>> link creation and the second one adds tools to includ folder list.
+>>
+>> The patches were tested for both in-source and out-of-source scenarios.
+>>
+>> Following patch was included in this patch set and can be ignored:
+>> [PATCH] fix lib header linking for out-of-source build
+>
+> I pushed both patches now.
 
-This should be an object not a string and IMO it should be called
-Transport just to keep it sort.
+Thanks.
 
+What is going on with
+http://git.kernel.org/?p=bluetooth/bluez-gnome.git;a=summary? Are you
+planning to revive it?
 
--- 
-Luiz Augusto von Dentz
+Regards,
+Yegor
