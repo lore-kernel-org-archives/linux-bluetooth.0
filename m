@@ -1,34 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1325180937.1965.294.camel@aeonflux>
-Subject: Re: [PATCH 1/5] Bluetooth: Remove obsolete hci-destruct callback
+Message-ID: <1325180758.1965.291.camel@aeonflux>
+Subject: Re: [PATCH 2/2] Bluetooth: Remove HCI_PRIO_MAX from ctrl cdm in
+ RFCOMM
 From: Marcel Holtmann <marcel@holtmann.org>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Date: Thu, 29 Dec 2011 09:48:57 -0800
-In-Reply-To: <1325173242-12264-2-git-send-email-dh.herrmann@googlemail.com>
-References: <1325173242-12264-1-git-send-email-dh.herrmann@googlemail.com>
-	 <1325173242-12264-2-git-send-email-dh.herrmann@googlemail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Date: Thu, 29 Dec 2011 09:45:58 -0800
+In-Reply-To: <CABBYNZ+w0hqxHW2j4JrY_LQ8tG_aEy+Jk1TEXpixKo4aMbCQRA@mail.gmail.com>
+References: <1324408558-24653-1-git-send-email-padovan@profusion.mobi>
+	 <1324408558-24653-2-git-send-email-padovan@profusion.mobi>
+	 <1324414866.1965.133.camel@aeonflux>
+	 <CABBYNZ+w0hqxHW2j4JrY_LQ8tG_aEy+Jk1TEXpixKo4aMbCQRA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Luiz,
 
-> The destruct-callback is used by *all* drivers to remove their platform
-> data only. However, all drivers call hci_unregister_dev() before this
-> callback is executed. Therefore, there is no reason to keep platform
-> data alive after the driver was unregistered. Hence, we can free platform data
-> directly and then remove the hci-destruct callback entirely.
+> >> RFCOMM needs a proper priority mechanism inside itself and not try to use
+> >> l2cap priority to fix its own problem.
+> >
+> > <snip>
+> >
+> >>  static void rfcomm_make_uih(struct sk_buff *skb, u8 addr)
+> >> @@ -1786,8 +1776,15 @@ static inline int rfcomm_process_tx(struct rfcomm_dlc *d)
+> >>               return skb_queue_len(&d->tx_queue);
+> >>
+> >>       while (d->tx_credits && (skb = skb_dequeue(&d->tx_queue))) {
+> >> -             err = rfcomm_send_frame(d->session, skb->data, skb->len,
+> >> -                                                     skb->priority);
+> >> +             struct socket *sock = d->session->sock;
+> >> +             struct sock *sk = sock->sk;
+> >> +
+> >> +             if (sk->sk_priority != skb->priority) {
+> >> +                     lock_sock(sk);
+> >> +                     sk->sk_priority = skb->priority;
+> >> +                     release_sock(sk);
+> >> +             }
+> >> +             err = rfcomm_send_frame(d->session, skb->data, skb->len);
+> >>               if (err < 0) {
+> >>                       skb_queue_head(&d->tx_queue, skb);
+> >>                       break;
+> >
+> > coming to think about this, we might not even bother setting the
+> > sk->sk_priority at all here. Lets just forget about RFCOMM.
 > 
-> Some drivers already depend on this behaviour, since they erroneously
-> already free the data after calling hci_free_dev(). This patch makes all
-> drivers behave that way and removes the callback entirely.
+> I guess you guys don't remember, but I tried to explain why the
+> priority has to be set even for RFCOMM, any frame sent by the kernel
+> with a timeout needs to be scheduled as soon as possible otherwise it
+> may timeout due to quote being consumed by other channels with higher
+> priority, so in this case if an A2DP stream in ongoing you will never
+> be able to complete a RFCOMM connection because there wont be enough
+> quote to schedule them before they timeout (usually 10 out 10 attempt
+> end up like that in my setup).
+> 
+> Perhaps if we assign a dedicated queue/hci_chan per RFCOMM socket that
+> should get rid of this resetting sk_priority on every frame, but that
+> means not depending on socket API at all to pass frames from RFCOMM to
+> L2CAP, so we need an API to create L2CAP frames directly in RFCOMM
+> modules and queue them in its hci_chan.
 
-it is important to not end up with a race condition between sysfs and
-hci_dev here. For example a cat /sys/class/bluetooth/hci0/name could
-still have sysfs file open and we need to keep the memory around until
-it gets destructed.
+yes, we need exactly this. Not using the L2CAP socket and interfacing
+with L2CAP directly is a good idea. Same came up with A2MP as well.
 
 Regards
 
