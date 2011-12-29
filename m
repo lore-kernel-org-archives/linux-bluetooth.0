@@ -1,53 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+From: mindentropy <mindentropy@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Correct packet len calculation
-Date: Fri, 30 Dec 2011 12:07:47 +0200
-Message-Id: <1325239667-9198-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Regarding bluez connection problems.
+Date: Fri, 30 Dec 2011 03:05:04 +0530
+Message-ID: <2225979.B3tFglpjRu@terranet>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi,
 
-Remove unneeded skb_pull and correct packet length calculation
-removing magic number. Move BT_DBG after len check otherwise
-it could possibly access wrong memory.
+  I have developed a very simple bluez server application. It works in kernel 
+2.6.xx(ubuntu lucid) but when I run on kernel 3.0 I am not able to connect at 
+all. Pairing is successful. The application listens on channel 1 but my client 
+app on my mobile phone is not able to connect to it. Initially there was DUN 
+on channel 1 which I removed using sdptool del <classid> but still did not 
+make any difference. What am I doing wrong?
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_event.c |    9 ++++-----
- 1 files changed, 4 insertions(+), 5 deletions(-)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 919e3c0..47e1476 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2266,20 +2266,19 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
- 	struct hci_ev_num_comp_pkts *ev = (void *) skb->data;
- 	int i;
- 
--	skb_pull(skb, sizeof(*ev));
--
--	BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
--
- 	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_PACKET_BASED) {
- 		BT_ERR("Wrong event for mode %d", hdev->flow_ctl_mode);
- 		return;
- 	}
- 
--	if (skb->len < ev->num_hndl * 4) {
-+	if (skb->len < sizeof(*ev) || skb->len < sizeof(*ev) +
-+			ev->num_hndl * sizeof(struct hci_comp_pkts_info)) {
- 		BT_DBG("%s bad parameters", hdev->name);
- 		return;
- 	}
- 
-+	BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
-+
- 	for (i = 0; i < ev->num_hndl; i++) {
- 		struct hci_comp_pkts_info *info = &ev->handles[i];
- 		struct hci_conn *conn;
--- 
-1.7.4.1
-
+Thanks.
