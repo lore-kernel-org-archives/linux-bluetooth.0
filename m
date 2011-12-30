@@ -1,43 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Fri, 30 Dec 2011 13:26:21 +0000
-Message-ID: <CAMp=V3rgF2GdEqcTpkpB6QGc03JHmawh7GM0h=rvqyHcQHdg7g@mail.gmail.com>
-Subject: Bluetooth audio skipping
-From: Michael Maddern <michael.maddern@gmail.com>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 4/4] gatt-example: Fix memory leak.
+Date: Fri, 30 Dec 2011 12:45:09 +0100
+Message-Id: <1325245509-14359-4-git-send-email-sancane@gmail.com>
+In-Reply-To: <1325245509-14359-3-git-send-email-sancane@gmail.com>
+References: <1325245509-14359-1-git-send-email-sancane@gmail.com>
+ <1325245509-14359-2-git-send-email-sancane@gmail.com>
+ <1325245509-14359-3-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Remove the example-plugin data element from the list whenever an adapter
+is removed.
+---
+ plugins/gatt-example.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-I'm not sure I'm supposed to be posting here, but on bluez.org both
-the development and user mailings lists point here.
+diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
+index 5af07ea..701c1d7 100644
+--- a/plugins/gatt-example.c
++++ b/plugins/gatt-example.c
+@@ -541,6 +541,7 @@ static void gatt_example_adapter_remove(struct btd_adapter *adapter)
+ 		return;
+ 
+ 	gadapter = l->data;
++	adapters = g_slist_remove(adapters, gadapter);
+ 	gatt_example_adapter_free(gadapter);
+ }
+ 
+-- 
+1.7.8.1
 
-I'm having problems getting bluetooth audio (a2dp) to work without
-stuttering, skipping, speeding up etc. I'm using bluetooth speakers
-(Creative D100). It works okay if it is right next to my laptop, but
-when I touch the speaker or move it more than about 1 meter, it starts
-stuttering.
-
-The bluetooth adapter is a Broadcom BCM2070 (which is a class 1
-adapter). I'm using kernel 3.1.5-1.
-
-I've tested it with the Bluez 4.96, and I've also compiled 4.97 but
-it's no better. I've tried using Alsa and PulseAudio, the problem is
-the same with both.  I've tried adjusting the link mode
-(accept,master) and link policies (hold,park) as recommended but it
-makes no difference.
-
-I've tried disabling WiFi, turning off my router, and all other
-bluetooth devices, it still makes no difference at all.
-
-When I dual boot my laptop into Windows 7 and connect the speaker it
-works flawlessly. I'm able to take the speaker through 2 rooms (about
-10 minutes), and it's still playing smoothly.
-
-I really want it to work as well under Linux, so any help would be
-greatly appreciated.
-
-Thank you,
-Michael
