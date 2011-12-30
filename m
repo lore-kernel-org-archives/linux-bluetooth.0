@@ -1,57 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 Dec 2011 13:16:44 +0200
+Date: Fri, 30 Dec 2011 13:11:10 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Mikel Astiz <mikel.astiz.oss@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [PATCH 1/4] audio: remove unnecessary method call
-Message-ID: <20111230111644.GA6315@x220>
-References: <1323943267-14576-1-git-send-email-mikel.astiz.oss@gmail.com>
- <1323943267-14576-2-git-send-email-mikel.astiz.oss@gmail.com>
- <CABBYNZL7-Aufrfa7e_S_n70LrkurL3Q6m0ncrM6tc4XGMmavkA@mail.gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] Fix strict-aliasing rules handling for hciemu and
+ IP ports
+Message-ID: <20111230111110.GC32368@x220>
+References: <1325184068-30979-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CABBYNZL7-Aufrfa7e_S_n70LrkurL3Q6m0ncrM6tc4XGMmavkA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1325184068-30979-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lizardo,
 
-On Thu, Dec 15, 2011, Luiz Augusto von Dentz wrote:
-> On Thu, Dec 15, 2011 at 12:01 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> > From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-> >
-> > Calling gateway_suspend_stream should not be necessary given that
-> > gateway_unlock with rw flags already does it.
-> > ---
-> >  audio/transport.c |    1 -
-> >  1 files changed, 0 insertions(+), 1 deletions(-)
-> >
-> > diff --git a/audio/transport.c b/audio/transport.c
-> > index 7bde32d..6029528 100644
-> > --- a/audio/transport.c
-> > +++ b/audio/transport.c
-> > @@ -535,7 +535,6 @@ static guint suspend_gateway(struct media_transport *transport,
-> >                return 0;
-> >        }
-> >
-> > -       gateway_suspend_stream(device);
-> >        gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
-> >        g_idle_add(gateway_suspend_complete, owner);
-> >        return id++;
-> > --
+On Thu, Dec 29, 2011, Anderson Lizardo wrote:
+> This fix is based on commit 97046eaf3fc44b4451157b1a1bbc166ab0f4dda8.
+> ---
 > 
-> gateway_suspend_stream as it is useless, but I think we should fix it
-> to work similarly to headset_suspend_stream so we properly wait until
-> the socket is closed before we unlock and reply, this is necessary in
-> order to properly synchronize switching profiles otherwise
-> gateway_suspend_complete maybe called without SCO being completely
-> disconnected. Also when a fd is passed over to another process calling
-> close/g_io_channel_shutdown is not enough since this only release our
-> reference, in this case shutdown must be called.
+> Due to some recent change, gcc 4.4.3 (from Ubuntu 10.04) started complaining
+> about this code:
+> 
+> test/hciemu.c: In function â€˜hci_host_controlâ€™:
+> test/hciemu.c:431: error: dereferencing pointer â€˜({anonymous})â€™ does break
+> strict-aliasing rules
+> test/hciemu.c:431: note: initialized from here
+> 
+> 
+>  test/hciemu.c |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
 
-The subsequent patches in the set fail to apply without this first one,
-so the whole patch set is on hold until we get an update for it.
+Applied, but I had to move the stuff below --- to the actual commit
+message since it's important to retain the reasons for the patches in
+the git commit history.
 
 Johan
