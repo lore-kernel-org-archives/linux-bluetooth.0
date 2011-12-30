@@ -1,28 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 Dec 2011 13:06:38 +0200
+Date: Fri, 30 Dec 2011 13:03:52 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: David Herrmann <dh.herrmann@googlemail.com>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix wiimote device_get_address to use new API
-Message-ID: <20111230110638.GA32368@x220>
-References: <1325177984-26383-1-git-send-email-dh.herrmann@googlemail.com>
+Subject: Re: Multi-Adapter GATT server (finish)
+Message-ID: <20111230110352.GB26159@x220>
+References: <1325067890-6953-1-git-send-email-sancane@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1325177984-26383-1-git-send-email-dh.herrmann@googlemail.com>
+In-Reply-To: <1325067890-6953-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Santiago,
 
-On Thu, Dec 29, 2011, David Herrmann wrote:
-> Commit b06899eace1f484b387aae0e568fb1da988b468c introduced a new API
-> for device_get_name but apparently missed fixing the call in
-> plugins/wiimote.c. This patch converts the plugin to use the new API.
-> ---
->  plugins/wiimote.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+On Wed, Dec 28, 2011, Santiago Carot-Nemesio wrote:
+> [PATCH 1/8] attrib-server: Add blutooth adapter to
+> [PATCH 2/8] attrib-server: Add bluetooth adapter in attrib_db_add
+> [PATCH 3/8] gatt-service: Add bluetooth adapter in gatt_service_add
+> [PATCH 4/8] attrib-server: Add bluetooth adapter in attrib_db_update
+> [PATCH 5/8] attrib-server: Add bluetooth adapter in attrib_gap_set
+> [PATCH 6/8] attrib-server: Add bluetooth adapter in attrib_db_del
+> [PATCH 7/8] attrib-server: Add bluetooth adapter in
+> [PATCH 8/8] attrib-server: Add Gattrib in attrib_channel_detach
 
-Applied after the obvious s/get_name/get_address/ in the commit message.
-Thanks.
+All patches in this set have also been applied. Thanks.
 
 Johan
