@@ -1,24 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 1 Nov 2011 10:14:34 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Remove unnecessary casting in thermometer plugin
-Message-ID: <20111101081434.GA969@fusion.localdomain>
-References: <1320066965-27742-1-git-send-email-sancane@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1320066965-27742-1-git-send-email-sancane@gmail.com>
+In-Reply-To: <20111230224753.6729859cbc78e1c68d8563af@studenti.unina.it>
+References: <1325273171-24698-1-git-send-email-anderson.lizardo@openbossa.org>
+	<1325273171-24698-3-git-send-email-anderson.lizardo@openbossa.org>
+	<20111230224753.6729859cbc78e1c68d8563af@studenti.unina.it>
+Date: Sat, 31 Dec 2011 08:22:24 -0400
+Message-ID: <CAJdJm_M4jpat-Uc=O61C5sRFN59eigX7911pTukFKsZXNDe0OQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/4] Enable input/sixpair build (but no installation)
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: linux-bluetooth@vger.kernel.org,
+	Bastien Nocera <hadess@hadess.net>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+Hi Antonio,
 
-On Mon, Oct 31, 2011, Santiago Carot-Nemesio wrote:
-> ---
->  thermometer/thermometer.c |    6 ++----
->  1 files changed, 2 insertions(+), 4 deletions(-)
+On Fri, Dec 30, 2011 at 5:47 PM, Antonio Ospite
+<ospite@studenti.unina.it> wrote:
+> I'd say the .c file can be removed if you want to, when I have time I am
+> going to resend the playstation-peripheral plugin and the prerequisite
+> patches to have it as an _external_ plugin, I hope to do that next
+> week.
 
-Applied. Thanks.
+Given that you are still actively working on this plugin, I will ask
+Johan to ignore this patch. This way, you can still remove it on your
+patch series.
 
-Johan
+Best Regards/Happy New Year,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
