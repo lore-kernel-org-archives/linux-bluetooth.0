@@ -1,57 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1325529836.1965.392.camel@aeonflux>
-Subject: Re: [PATCH 2/2] Bluetooth: Remove HCI_PRIO_MAX from ctrl cdm in
- RFCOMM
-From: Marcel Holtmann <marcel@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZJvJKWHpecJyYw2bbEGyM_jqBLysX4pmmfdNRwdxi05vA@mail.gmail.com>
+References: <CAMp=V3rgF2GdEqcTpkpB6QGc03JHmawh7GM0h=rvqyHcQHdg7g@mail.gmail.com>
+	<CABBYNZJvJKWHpecJyYw2bbEGyM_jqBLysX4pmmfdNRwdxi05vA@mail.gmail.com>
+Date: Mon, 2 Jan 2012 18:22:55 +0000
+Message-ID: <CAMp=V3oZNL_HucJ7RNBqJFXu9tVKX-=K6C6xwk5eb-Wi233rhg@mail.gmail.com>
+Subject: Re: Bluetooth audio skipping
+From: Michael Maddern <michael.maddern@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-Date: Mon, 02 Jan 2012 10:43:56 -0800
-In-Reply-To: <CABBYNZ+CAnxi18+6wwWxpy61tdC0fyF1zi6PWz03q1+5NwtZFA@mail.gmail.com>
-References: <1324408558-24653-1-git-send-email-padovan@profusion.mobi>
-	 <1324408558-24653-2-git-send-email-padovan@profusion.mobi>
-	 <1324414866.1965.133.camel@aeonflux>
-	 <CABBYNZ+w0hqxHW2j4JrY_LQ8tG_aEy+Jk1TEXpixKo4aMbCQRA@mail.gmail.com>
-	 <1325180758.1965.291.camel@aeonflux>
-	 <CABBYNZ+CAnxi18+6wwWxpy61tdC0fyF1zi6PWz03q1+5NwtZFA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-> >> I guess you guys don't remember, but I tried to explain why the
-> >> priority has to be set even for RFCOMM, any frame sent by the kernel
-> >> with a timeout needs to be scheduled as soon as possible otherwise it
-> >> may timeout due to quote being consumed by other channels with higher
-> >> priority, so in this case if an A2DP stream in ongoing you will never
-> >> be able to complete a RFCOMM connection because there wont be enough
-> >> quote to schedule them before they timeout (usually 10 out 10 attempt
-> >> end up like that in my setup).
-> >>
-> >> Perhaps if we assign a dedicated queue/hci_chan per RFCOMM socket that
-> >> should get rid of this resetting sk_priority on every frame, but that
-> >> means not depending on socket API at all to pass frames from RFCOMM to
-> >> L2CAP, so we need an API to create L2CAP frames directly in RFCOMM
-> >> modules and queue them in its hci_chan.
-> >
-> > yes, we need exactly this. Not using the L2CAP socket and interfacing
-> > with L2CAP directly is a good idea. Same came up with A2MP as well.
-> 
-> Right, so I will work on this next, but in the meantime I think we
-> should keep the current logic (it doesn't seems to cause any problem
-> although the locking is pretty bad) until we got a proper solution and
-> at least it is able to complete connections.
 
-the locking is broken with the move to workqueues. So feel free to
-figure out a locking that works, but right now it is screwed up.
+On 2 January 2012 13:06, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Michael,
+>
+> On Fri, Dec 30, 2011 at 3:26 PM, Michael Maddern
+> <michael.maddern@gmail.com> wrote:
+>> Hello,
+>>
+>> I'm not sure I'm supposed to be posting here, but on bluez.org both
+>> the development and user mailings lists point here.
+>>
+>> I'm having problems getting bluetooth audio (a2dp) to work without
+>> stuttering, skipping, speeding up etc. I'm using bluetooth speakers
+>> (Creative D100). It works okay if it is right next to my laptop, but
+>> when I touch the speaker or move it more than about 1 meter, it starts
+>> stuttering.
+>
+> I have the D100 and haven't noticed such a problem.
+>
+>> The bluetooth adapter is a Broadcom BCM2070 (which is a class 1
+>> adapter). I'm using kernel 3.1.5-1.
+>>
+>> I've tested it with the Bluez 4.96, and I've also compiled 4.97 but
+>> it's no better. I've tried using Alsa and PulseAudio, the problem is
+>> the same with both.  I've tried adjusting the link mode
+>> (accept,master) and link policies (hold,park) as recommended but it
+>> makes no difference.
+>
+> What version of PulseAudio are you using? This problems with audio
+> skips are usually related to high bitpool, but there already exist a
+> fix upstream which reduces the bitpool in such cases.
+>
+>> When I dual boot my laptop into Windows 7 and connect the speaker it
+>> works flawlessly. I'm able to take the speaker through 2 rooms (about
+>> 10 minutes), and it's still playing smoothly.
+>
+> Not sure what bitpool Win 7 uses, but I suspect it is not as high as
+> the default in PA which allows up to 64 if the remote device supports.
+>
+> --
+> Luiz Augusto von Dentz
 
-Be my guest to set a MAX_PRIO - 1 by default for RFCOMM and see how that
-works out.
 
-Regards
+Thanks for the reply. Good to know you have the same speaker working well.
 
-Marcel
+I'm using Pulse Audio version 1.1.
+
+In the bluetooth log when the speaker is connected it reports
+"Bitpool: 2-53". I compiled the patch suggested here:
+
+https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/424215/comments/34
+
+I guess this would reduce the maximum bitpool by 20 but it didn't
+appear to make much difference.
 
 
+Regards,
+Michael
