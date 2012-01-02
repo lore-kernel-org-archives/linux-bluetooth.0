@@ -1,44 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 2 Jan 2012 21:50:15 +0100
-Message-ID: <CABMX=Ww6G0sofOfHKVTL_PgrMW_K4ByWQa0SF5XZijAp+r9PgQ@mail.gmail.com>
-Subject: Re: bluez-4.97: check dependnecy
-From: nello martuscielli <ppc.addon@gmail.com>
+From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH] Bluetooth: Fix mgmt_stop_discovery_failed()
+Date: Mon,  2 Jan 2012 16:50:53 -0300
+Message-Id: <1325533853-10101-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hi,
-i'm trying to build bluez-4.97 on my system (CRUX PPC 32bit) and i'd
-like to build it without 'check' dependency.
-I patched sources using :
-build: Move libcheck under TEST conditional
-author	Marcel Holtmann <marcel@holtmann.org>	
-	Wed, 28 Dec 2011 04:09:56 +0000 (20:09 -0800)
-commit	bf5d45f2fbd1b1463512f4eb8d30bffb3478ccc7
+Stop Discovery Command Status Event should use mgmt status code.
 
-and adding --disable-test to my configure but i still receive:
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ net/bluetooth/mgmt.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-[...]
-checking whether yytext is a pointer... yes
-checking for CHECK... configure: error: Package requirements (check >=
-0.9.4) were not met:
-
-No package 'check' found
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables CHECK_CFLAGS
-and CHECK_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-
-
-cheers,
-nello
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 2540944..fb0b15e 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2756,7 +2756,7 @@ int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status)
+ 	if (!cmd)
+ 		return -ENOENT;
+ 
+-	err = cmd_status(cmd->sk, hdev->id, cmd->opcode, status);
++	err = cmd_status(cmd->sk, hdev->id, cmd->opcode, mgmt_status(status));
+ 	mgmt_pending_remove(cmd);
+ 
+ 	return err;
 -- 
-my blog: http://linuxpowerpc.blogspot.com/
---
-Power Mac G4 AGP 450MHz - CRUX PPC (32bit)
+1.7.8.1
+
