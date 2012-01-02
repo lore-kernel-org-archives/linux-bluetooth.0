@@ -1,34 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1325542684.1965.394.camel@aeonflux>
-Subject: Re: [PATCH 1/5] Bluetooth: Fix context in rfcomm_sock_lock
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 02 Jan 2012 14:18:04 -0800
-In-Reply-To: <1325006928-3338-1-git-send-email-padovan@profusion.mobi>
-References: <1325006928-3338-1-git-send-email-padovan@profusion.mobi>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Queue adv_work on system workqueue
+Date: Mon,  2 Jan 2012 19:18:11 -0300
+Message-Id: <1325542691-6235-2-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1325542691-6235-1-git-send-email-andre.guedes@openbossa.org>
+References: <1325542691-6235-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+This patch queues hdev->adv_work on the system-wide workqueue
+instead of on hdev->workqueue. This way we keep only tx/rx works
+on hdev->workqueue.
 
-> Code now run in process context, does not need to disable interrupt
-> anymore.
-> 
-> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-> ---
->  net/bluetooth/rfcomm/sock.c |   12 ++++++------
->  1 files changed, 6 insertions(+), 6 deletions(-)
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ net/bluetooth/hci_event.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-However I get the feeling that we might should mover all the Bluetooth
-specific socket list locking to RCU.
-
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 871a864..3184f17 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1047,8 +1047,7 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 	case LE_SCANNING_DISABLED:
+ 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
+ 
+-		queue_delayed_work(hdev->workqueue, &hdev->adv_work,
+-							ADV_CLEAR_TIMEOUT);
++		schedule_delayed_work(&hdev->adv_work, ADV_CLEAR_TIMEOUT);
+ 		break;
+ 
+ 	default:
+-- 
+1.7.8.1
 
