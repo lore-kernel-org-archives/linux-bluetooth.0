@@ -1,38 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Mon, 2 Jan 2012 22:18:27 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
+Date: Tue, 3 Jan 2012 00:48:22 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/5] Bluetooth: Fix context in rfcomm_sock_lock
-Message-ID: <20120103001826.GB1472@joana>
-References: <1325006928-3338-1-git-send-email-padovan@profusion.mobi>
- <1325542684.1965.394.camel@aeonflux>
+Cc: Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix mgmt_stop_discovery_failed()
+Message-ID: <20120102224822.GA7603@fusion.localdomain>
+References: <1325533853-10101-1-git-send-email-andre.guedes@openbossa.org>
+ <1325543108.1965.403.camel@aeonflux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1325542684.1965.394.camel@aeonflux>
+In-Reply-To: <1325543108.1965.403.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-* Marcel Holtmann <marcel@holtmann.org> [2012-01-02 14:18:04 -0800]:
-
-> Hi Gustavo,
-> 
-> > Code now run in process context, does not need to disable interrupt
-> > anymore.
+On Mon, Jan 02, 2012, Marcel Holtmann wrote:
+> > Stop Discovery Command Status Event should use mgmt status code.
 > > 
-> > Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > > ---
-> >  net/bluetooth/rfcomm/sock.c |   12 ++++++------
-> >  1 files changed, 6 insertions(+), 6 deletions(-)
+> >  net/bluetooth/mgmt.c |    2 +-
+> >  1 files changed, 1 insertions(+), 1 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> > index 2540944..fb0b15e 100644
+> > --- a/net/bluetooth/mgmt.c
+> > +++ b/net/bluetooth/mgmt.c
+> > @@ -2756,7 +2756,7 @@ int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status)
+> >  	if (!cmd)
+> >  		return -ENOENT;
+> >  
+> > -	err = cmd_status(cmd->sk, hdev->id, cmd->opcode, status);
+> > +	err = cmd_status(cmd->sk, hdev->id, cmd->opcode, mgmt_status(status));
+> >  	mgmt_pending_remove(cmd);
 > 
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> 
-> However I get the feeling that we might should mover all the Bluetooth
-> specific socket list locking to RCU.
+> patch does look reasonable to me, but I am not this is the expected
+> behavior. I leave this up to Johan to ACK or NAK.
 
-I agree, but I can't go ahead with such a change now, the merge windows is
-around the corner.
+Looks good to me.
 
-	Gustavo
+Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+
+Johan
