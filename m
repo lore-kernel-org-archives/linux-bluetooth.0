@@ -1,46 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1325180758.1965.291.camel@aeonflux>
-References: <1324408558-24653-1-git-send-email-padovan@profusion.mobi>
-	<1324408558-24653-2-git-send-email-padovan@profusion.mobi>
-	<1324414866.1965.133.camel@aeonflux>
-	<CABBYNZ+w0hqxHW2j4JrY_LQ8tG_aEy+Jk1TEXpixKo4aMbCQRA@mail.gmail.com>
-	<1325180758.1965.291.camel@aeonflux>
-Date: Mon, 2 Jan 2012 15:16:31 +0200
-Message-ID: <CABBYNZ+CAnxi18+6wwWxpy61tdC0fyF1zi6PWz03q1+5NwtZFA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Bluetooth: Remove HCI_PRIO_MAX from ctrl cdm in RFCOMM
+In-Reply-To: <CAMp=V3rgF2GdEqcTpkpB6QGc03JHmawh7GM0h=rvqyHcQHdg7g@mail.gmail.com>
+References: <CAMp=V3rgF2GdEqcTpkpB6QGc03JHmawh7GM0h=rvqyHcQHdg7g@mail.gmail.com>
+Date: Mon, 2 Jan 2012 15:06:58 +0200
+Message-ID: <CABBYNZJvJKWHpecJyYw2bbEGyM_jqBLysX4pmmfdNRwdxi05vA@mail.gmail.com>
+Subject: Re: Bluetooth audio skipping
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>, linux-bluetooth@vger.kernel.org
+To: Michael Maddern <michael.maddern@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Michael,
 
-On Thu, Dec 29, 2011 at 7:45 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
->>
->> I guess you guys don't remember, but I tried to explain why the
->> priority has to be set even for RFCOMM, any frame sent by the kernel
->> with a timeout needs to be scheduled as soon as possible otherwise it
->> may timeout due to quote being consumed by other channels with higher
->> priority, so in this case if an A2DP stream in ongoing you will never
->> be able to complete a RFCOMM connection because there wont be enough
->> quote to schedule them before they timeout (usually 10 out 10 attempt
->> end up like that in my setup).
->>
->> Perhaps if we assign a dedicated queue/hci_chan per RFCOMM socket that
->> should get rid of this resetting sk_priority on every frame, but that
->> means not depending on socket API at all to pass frames from RFCOMM to
->> L2CAP, so we need an API to create L2CAP frames directly in RFCOMM
->> modules and queue them in its hci_chan.
+On Fri, Dec 30, 2011 at 3:26 PM, Michael Maddern
+<michael.maddern@gmail.com> wrote:
+> Hello,
 >
-> yes, we need exactly this. Not using the L2CAP socket and interfacing
-> with L2CAP directly is a good idea. Same came up with A2MP as well.
+> I'm not sure I'm supposed to be posting here, but on bluez.org both
+> the development and user mailings lists point here.
+>
+> I'm having problems getting bluetooth audio (a2dp) to work without
+> stuttering, skipping, speeding up etc. I'm using bluetooth speakers
+> (Creative D100). It works okay if it is right next to my laptop, but
+> when I touch the speaker or move it more than about 1 meter, it starts
+> stuttering.
 
-Right, so I will work on this next, but in the meantime I think we
-should keep the current logic (it doesn't seems to cause any problem
-although the locking is pretty bad) until we got a proper solution and
-at least it is able to complete connections.
+I have the D100 and haven't noticed such a problem.
+
+> The bluetooth adapter is a Broadcom BCM2070 (which is a class 1
+> adapter). I'm using kernel 3.1.5-1.
+>
+> I've tested it with the Bluez 4.96, and I've also compiled 4.97 but
+> it's no better. I've tried using Alsa and PulseAudio, the problem is
+> the same with both.  I've tried adjusting the link mode
+> (accept,master) and link policies (hold,park) as recommended but it
+> makes no difference.
+
+What version of PulseAudio are you using? This problems with audio
+skips are usually related to high bitpool, but there already exist a
+fix upstream which reduces the bitpool in such cases.
+
+> When I dual boot my laptop into Windows 7 and connect the speaker it
+> works flawlessly. I'm able to take the speaker through 2 rooms (about
+> 10 minutes), and it's still playing smoothly.
+
+Not sure what bitpool Win 7 uses, but I suspect it is not as high as
+the default in PA which allows up to 64 if the remote device supports.
 
 -- 
 Luiz Augusto von Dentz
