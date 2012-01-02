@@ -1,36 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 2 Jan 2012 14:14:32 +0100
+From: Per-Henrik Lundblom <ph@whatever.nu>
+To: linux-bluetooth@vger.kernel.org
+Subject: bluetooth-alsa: Connection fix for kernel >= 2.6.30
+Message-ID: <20120102131432.GB12738@whatever.nu>
 MIME-Version: 1.0
-In-Reply-To: <CAOFmnYASjAK0y0E-sUW21V_xxYN_BdYN8075LMUxkF-uZypT-g@mail.gmail.com>
-References: <CAOFmnYASjAK0y0E-sUW21V_xxYN_BdYN8075LMUxkF-uZypT-g@mail.gmail.com>
-Date: Mon, 2 Jan 2012 15:52:32 +0200
-Message-ID: <CABBYNZLDn3NtoSHyztPGR=fb8q2-e16bQrKqqac8RrxM9bFy4A@mail.gmail.com>
-Subject: Re: Getting sco_connect_cb(): Connection refused (111) [Bluez-Ofono-PulseAudio]
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: JEETENDRA BHATTAD <bhattad.jeetendra@gmail.com>
-Cc: Michael Maddern <michael.maddern@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: multipart/mixed; boundary="CE+1k2dSO48ffgeK"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+
+--CE+1k2dSO48ffgeK
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
 Hi,
 
-On Mon, Jan 2, 2012 at 3:38 PM, JEETENDRA BHATTAD
-<bhattad.jeetendra@gmail.com> wrote:
-> Hello All,
->
-> When I am trying to connect my Nokia N97 or Nokia Xpress Music 5800, Samsung
-> Galaxy Note on my IMX53 board.
->
-> It gets connected and disconnects immediately.
->
-> Getting sco_connect_cb(): Connection refused (111)  after which phone gets
-> disconnected.
+After trying to get bluetooth-alsa working on Ubuntu 11.10 (kernel
+3.0.0) I realized that the struct sockaddr_l2 struct was changed in
+kernel 2.6.30 to include a l2_cid variable. This variable is of course
+not set in the a2dpd code which results in a socket connect() call
+returning -EINVAL.
 
-Please add the hcidump log if possible, I suspect you are trying to
-initiate the SCO connection which iirc is not recommended when acting
-as a headset/carkit, some phones may block the connection attempt
-specially if there is no active call.
+Simple fix is to memset struct before use. Patch is attached.
+Unfortunately I don't have any idea where to send the patch, hope this
+list isn't totally wrong.
 
--- 
-Luiz Augusto von Dentz
+/PH
+
+--
+Per-Henrik Lundblom           epost: ph@whatever.nu
+telefon: 0733-20 71 26        hemsida: www.whatever.nu
+
+
+--CE+1k2dSO48ffgeK
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="sockaddr_l2-fix.patch"
+
+Index: a2dpd_tools.c
+===================================================================
+RCS file: /cvsroot/bluetooth-alsa/plugz/alsa-plugins/a2dpd/a2dpd_tools.c,v
+retrieving revision 1.8
+diff -u -r1.8 a2dpd_tools.c
+--- a2dpd_tools.c	26 Jul 2007 13:33:54 -0000	1.8
++++ a2dpd_tools.c	1 Jan 2012 22:31:12 -0000
+@@ -212,6 +212,7 @@
+ 	{
+ 		struct sockaddr_l2 sa;
+ 
++                memset(&sa, 0, sizeof(sa));
+ 		// create L2CAP connection
+ 		session->sock = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
+ 		session->local = 0;
+
+--CE+1k2dSO48ffgeK--
