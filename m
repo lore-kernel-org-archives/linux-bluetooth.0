@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1325543108.1965.403.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Fix mgmt_stop_discovery_failed()
+Message-ID: <1325543072.1965.402.camel@aeonflux>
+Subject: Re: [PATCH 2/2] Bluetooth: Queue adv_work on system workqueue
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 02 Jan 2012 14:25:08 -0800
-In-Reply-To: <1325533853-10101-1-git-send-email-andre.guedes@openbossa.org>
-References: <1325533853-10101-1-git-send-email-andre.guedes@openbossa.org>
+Date: Mon, 02 Jan 2012 14:24:32 -0800
+In-Reply-To: <1325542691-6235-2-git-send-email-andre.guedes@openbossa.org>
+References: <1325542691-6235-1-git-send-email-andre.guedes@openbossa.org>
+	 <1325542691-6235-2-git-send-email-andre.guedes@openbossa.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,27 +15,16 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-> Stop Discovery Command Status Event should use mgmt status code.
+> This patch queues hdev->adv_work on the system-wide workqueue
+> instead of on hdev->workqueue. This way we keep only tx/rx works
+> on hdev->workqueue.
 > 
 > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
->  net/bluetooth/mgmt.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 2540944..fb0b15e 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -2756,7 +2756,7 @@ int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status)
->  	if (!cmd)
->  		return -ENOENT;
->  
-> -	err = cmd_status(cmd->sk, hdev->id, cmd->opcode, status);
-> +	err = cmd_status(cmd->sk, hdev->id, cmd->opcode, mgmt_status(status));
->  	mgmt_pending_remove(cmd);
+>  net/bluetooth/hci_event.c |    3 +--
+>  1 files changed, 1 insertions(+), 2 deletions(-)
 
-patch does look reasonable to me, but I am not this is the expected
-behavior. I leave this up to Johan to ACK or NAK.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
