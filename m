@@ -1,88 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <DB3CC7D472F94DC69C73FE320121B451@sisodomain.com>
-From: Chethan T N <chethan.tn@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-References: <1325054785-15073-1-git-send-email-chethan.tn@samsung.com>
- <CABBYNZLnkW6BkeqmQbgbdV5SARqPYhvKL2SM1Yd19740icT2og@mail.gmail.com>
-In-reply-to: <CABBYNZLnkW6BkeqmQbgbdV5SARqPYhvKL2SM1Yd19740icT2og@mail.gmail.com>
-Subject: Re: [PATCH] audio: Fix headset crash
-Date: Tue, 03 Jan 2012 18:29:57 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
+MIME-Version: 1.0
+In-Reply-To: <1325588033-4831-1-git-send-email-wagi@monom.org>
+References: <1325588033-4831-1-git-send-email-wagi@monom.org>
+Date: Tue, 3 Jan 2012 14:04:55 +0200
+Message-ID: <CABBYNZKOx_iOO7GQuyD0k1ZJoge50OXOvPYQyntiCmy7V4gxeA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Don't mark non xfer isoc endpoint URBs with URB_ISO_ASAP
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Daniel Wagner <wagi@monom.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Daniel Wagner <daniel.wagner@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Daniel,
 
---------------------------------------------------
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Sent: Wednesday, December 28, 2011 2:52 PM
-To: "Chethan T N" <chethan.tn@samsung.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] audio: Fix headset crash
-
-> Hi Chethan,
+On Tue, Jan 3, 2012 at 12:53 PM, Daniel Wagner <wagi@monom.org> wrote:
+> From: Daniel Wagner <daniel.wagner@bmw-carit.de>
 >
-> On Wed, Dec 28, 2011 at 8:46 AM, Chethan T N <chethan.tn@samsung.com> 
-> wrote:
->> Original patch by Chan-yeol Park <chanyeol.park@samsung.com>
->>
->> Once the headset struct is freed, rfcomm_io_cb would be called and
->> it might lead to a crash. So when g_io_shutdown rfcomm channel,
->> additionally we remove g_io_add_watch() source id handle to avoid
->> unwanted call. And even though rfcomm_io_cb is called and in case
->> that struct headset is NULL, rfcomm_io_cb would return with FALSE.
+> [ 2096.384084] btusb_send_frame:684: hci0
+> [ 2096.384087] usb 3-1: BOGUS urb flags, 2 --> 0
+> [ 2096.384091] Bluetooth: hci0 urb ffff8801b61d3a80 submission failed (22)
 >
-> I don't think this is true, iirc this will lead to G_IO_NVAL which is
-> handled in rfcomm_io_cb, so there might be a bug somewhere else if the
-> callback is still called after headset_close_rfcomm and the condition
-> is not G_IO_NVAL. Btw it is a good practice to add the backtrace of
-> the crash you are fixing.
+> According the documentation in usb_submit_urb() URB_ISO_ASAP
+> flag is only allowed for endpoints of type USB_ENDPOINT_XFER_ISOC.
 >
-> Now holding the source id is probably a good idea since it reduces the
-> extra call to the callback while disconnecting.
+> This reverts commit b8aabfc92249b239c425da7e4ca85b7e4855e984.
 >
->>  audio/headset.c |   19 +++++++++++++++++--
->>  1 files changed, 17 insertions(+), 2 deletions(-)
->>
->> diff --git a/audio/headset.c b/audio/headset.c
->> index 6aef6a8..77883d2 100644
->> --- a/audio/headset.c
->> +++ b/audio/headset.c
->> @@ -165,6 +165,7 @@ struct headset {
->>        gboolean auto_dc;
->>
->>        guint dc_timer;
->> +       guint rfcomm_io_id;
->>
->>        gboolean hfp_active;
->>        gboolean search_hfp;
->> @@ -1280,6 +1281,9 @@ static gboolean rfcomm_io_cb(GIOChannel *chan, 
->> GIOCondition cond,
->>                return FALSE;
->>
->>        hs = device->headset;
->> +       if (!hs)
->> +               return FALSE;
->> +
+> Signed-off-by: Daniel Wagner <daniel.wagner@bmw-carit.de>
+> ---
 >
-> That is another evidence that there is something else broken, the
-> callback should not be called after its gsource is removed, so this
-> prevent the crash but masquerade the real issue.
+> forgot the sign-off :)
 >
+>  drivers/bluetooth/btusb.c |    3 ---
+>  1 files changed, 0 insertions(+), 3 deletions(-)
 >
-> -- 
-> Luiz Augusto von Dentz
-
-Thanks for your valuable inputs.
-I will investigate with few more headsets and shall share the information 
-with logs.
-
-Thanks and Regards
-Chethan
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index fbfba80..77b9f7b 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -726,9 +726,6 @@ static int btusb_send_frame(struct sk_buff *skb)
+>                usb_fill_bulk_urb(urb, data->udev, pipe,
+>                                skb->data, skb->len, btusb_tx_complete, skb);
+>
+> -               if (skb->priority >= HCI_PRIO_MAX - 1)
+> -                       urb->transfer_flags  = URB_ISO_ASAP;
+> -
+>                hdev->stat.acl_tx++;
+>                break;
+>
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html 
+> 1.7.8.110.g4cb5d1
 
+Acked-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+-- 
+Luiz Augusto von Dentz
