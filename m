@@ -1,26 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1325596098.19462.9.camel@milan>
-Subject: Re: Disabling Bluetooth also kills WiFi
-From: Milan Bouchet-Valat <nalimilan@club.fr>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 03 Jan 2012 14:08:18 +0100
-In-Reply-To: <1325542990.1965.400.camel@aeonflux>
-References: <1325457984.19462.3.camel@milan>
-	 <1325542990.1965.400.camel@aeonflux>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Message-id: <DB3CC7D472F94DC69C73FE320121B451@sisodomain.com>
+From: Chethan T N <chethan.tn@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+References: <1325054785-15073-1-git-send-email-chethan.tn@samsung.com>
+ <CABBYNZLnkW6BkeqmQbgbdV5SARqPYhvKL2SM1Yd19740icT2og@mail.gmail.com>
+In-reply-to: <CABBYNZLnkW6BkeqmQbgbdV5SARqPYhvKL2SM1Yd19740icT2og@mail.gmail.com>
+Subject: Re: [PATCH] audio: Fix headset crash
+Date: Tue, 03 Jan 2012 18:29:57 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Le lundi 02 janvier 2012 à 14:23 -0800, Marcel Holtmann a écrit :
-> the hp-bluetooth platform switch also killing the hci0 switch is
-> expected. They are essentially for the same device. That is okay.
-> 
-> That the platform switch kills also WiFi is something you have to take
-> up with hp-bluetooth platform driver authors. This is the wrong mailing
-> list unless these guys hang out here as well.
-Ah, sorry, I didn't understand that the hp-bluetooth device was handled
-by hp-wmi. I'll ask on LKML then.
+Hi Luiz,
 
+--------------------------------------------------
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Sent: Wednesday, December 28, 2011 2:52 PM
+To: "Chethan T N" <chethan.tn@samsung.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] audio: Fix headset crash
 
-Regards
+> Hi Chethan,
+>
+> On Wed, Dec 28, 2011 at 8:46 AM, Chethan T N <chethan.tn@samsung.com> 
+> wrote:
+>> Original patch by Chan-yeol Park <chanyeol.park@samsung.com>
+>>
+>> Once the headset struct is freed, rfcomm_io_cb would be called and
+>> it might lead to a crash. So when g_io_shutdown rfcomm channel,
+>> additionally we remove g_io_add_watch() source id handle to avoid
+>> unwanted call. And even though rfcomm_io_cb is called and in case
+>> that struct headset is NULL, rfcomm_io_cb would return with FALSE.
+>
+> I don't think this is true, iirc this will lead to G_IO_NVAL which is
+> handled in rfcomm_io_cb, so there might be a bug somewhere else if the
+> callback is still called after headset_close_rfcomm and the condition
+> is not G_IO_NVAL. Btw it is a good practice to add the backtrace of
+> the crash you are fixing.
+>
+> Now holding the source id is probably a good idea since it reduces the
+> extra call to the callback while disconnecting.
+>
+>>  audio/headset.c |   19 +++++++++++++++++--
+>>  1 files changed, 17 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/audio/headset.c b/audio/headset.c
+>> index 6aef6a8..77883d2 100644
+>> --- a/audio/headset.c
+>> +++ b/audio/headset.c
+>> @@ -165,6 +165,7 @@ struct headset {
+>>        gboolean auto_dc;
+>>
+>>        guint dc_timer;
+>> +       guint rfcomm_io_id;
+>>
+>>        gboolean hfp_active;
+>>        gboolean search_hfp;
+>> @@ -1280,6 +1281,9 @@ static gboolean rfcomm_io_cb(GIOChannel *chan, 
+>> GIOCondition cond,
+>>                return FALSE;
+>>
+>>        hs = device->headset;
+>> +       if (!hs)
+>> +               return FALSE;
+>> +
+>
+> That is another evidence that there is something else broken, the
+> callback should not be called after its gsource is removed, so this
+> prevent the crash but masquerade the real issue.
+>
+>
+> -- 
+> Luiz Augusto von Dentz
+
+Thanks for your valuable inputs.
+I will investigate with few more headsets and shall share the information 
+with logs.
+
+Thanks and Regards
+Chethan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html 
+
