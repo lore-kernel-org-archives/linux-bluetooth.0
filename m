@@ -1,58 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 3 Jan 2012 14:03:53 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [BUG] Sleeping inside a RCU reader
+Message-ID: <20120103120351.GA12920@aemeltch-MOBL1>
+References: <20120103015131.GA1239@samus>
 MIME-Version: 1.0
-In-Reply-To: <1325588033-4831-1-git-send-email-wagi@monom.org>
-References: <1325588033-4831-1-git-send-email-wagi@monom.org>
-Date: Tue, 3 Jan 2012 14:04:55 +0200
-Message-ID: <CABBYNZKOx_iOO7GQuyD0k1ZJoge50OXOvPYQyntiCmy7V4gxeA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Don't mark non xfer isoc endpoint URBs with URB_ISO_ASAP
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Daniel Wagner <wagi@monom.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Daniel Wagner <daniel.wagner@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120103015131.GA1239@samus>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+Hi Vinicius,
 
-On Tue, Jan 3, 2012 at 12:53 PM, Daniel Wagner <wagi@monom.org> wrote:
-> From: Daniel Wagner <daniel.wagner@bmw-carit.de>
->
-> [ 2096.384084] btusb_send_frame:684: hci0
-> [ 2096.384087] usb 3-1: BOGUS urb flags, 2 --> 0
-> [ 2096.384091] Bluetooth: hci0 urb ffff8801b61d3a80 submission failed (22)
->
-> According the documentation in usb_submit_urb() URB_ISO_ASAP
-> flag is only allowed for endpoints of type USB_ENDPOINT_XFER_ISOC.
->
-> This reverts commit b8aabfc92249b239c425da7e4ca85b7e4855e984.
->
-> Signed-off-by: Daniel Wagner <daniel.wagner@bmw-carit.de>
-> ---
->
-> forgot the sign-off :)
->
->  drivers/bluetooth/btusb.c |    3 ---
->  1 files changed, 0 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index fbfba80..77b9f7b 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -726,9 +726,6 @@ static int btusb_send_frame(struct sk_buff *skb)
->                usb_fill_bulk_urb(urb, data->udev, pipe,
->                                skb->data, skb->len, btusb_tx_complete, skb);
->
-> -               if (skb->priority >= HCI_PRIO_MAX - 1)
-> -                       urb->transfer_flags  = URB_ISO_ASAP;
-> -
->                hdev->stat.acl_tx++;
->                break;
->
-> --
-> 1.7.8.110.g4cb5d1
+On Mon, Jan 02, 2012 at 10:51:31PM -0300, Vinicius Costa Gomes wrote:
+> Hi,
+> 
+> I found this bug (trace attached) and I don't think I will be able to
+> start working on it in the next 11 hours, so this email is to make
+> the life of anyone who wants to work on it a little easier. (If anyone
+> wishes to work on this, please respond this email).
+> 
+> I was able to reproduce it consistenly doing a "hciconfig <dev> down"
+> with an established connection. I was using LE devices, but it seems that
+> the types of the devices don't matter.
+> 
+> The problem is that cancel_delayed_work_sync() called inside
+> hci_conn_del() is blocking, because of and called in the context of an RCU
+> (inside hci_conn_hash_flush()).
 
-Acked-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+I think that if the RCU code is not protected by rcu_read_{,un}lock then
+it is OK to sleep (and this is updater anyway).
 
--- 
-Luiz Augusto von Dentz
+In that function "hci_conn_hash_flush" maybe it is better to use
+list_for_each_entry instead of list_for_each_entry_rcu for better
+readability?
+
+Best regards 
+Andrei Emeltchenko 
+
