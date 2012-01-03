@@ -1,42 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1325613241.6454.0.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Don't mark non xfer isoc endpoint URBs with
- URB_ISO_ASAP
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Daniel Wagner <wagi@monom.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Daniel Wagner <daniel.wagner@bmw-carit.de>
-Date: Tue, 03 Jan 2012 09:54:01 -0800
-In-Reply-To: <1325588033-4831-1-git-send-email-wagi@monom.org>
-References: <1325588033-4831-1-git-send-email-wagi@monom.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Hendrik Sattler <post@hendrik-sattler.de>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd 3/4] gobex: automatically use SRM when transport type is SOCK_SEQPACKET
+Date: Tue, 3 Jan 2012 16:58:16 +0100
+References: <1325598744-18855-1-git-send-email-luiz.dentz@gmail.com> <1325598744-18855-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1325598744-18855-3-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Message-Id: <201201031658.17771.post@hendrik-sattler.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
-
-> [ 2096.384084] btusb_send_frame:684: hci0
-> [ 2096.384087] usb 3-1: BOGUS urb flags, 2 --> 0
-> [ 2096.384091] Bluetooth: hci0 urb ffff8801b61d3a80 submission failed (22)
+Am Dienstag, 3. Januar 2012, 14:52:23 schrieb Luiz Augusto von Dentz:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> According the documentation in usb_submit_urb() URB_ISO_ASAP
-> flag is only allowed for endpoints of type USB_ENDPOINT_XFER_ISOC.
+> This simplifies the applications so SRM setup phase became transparent
+> while using SOCK_SEQPACKET which is useful for GOEP 2.0 since in that
+> case we can only use SRM if the transport is L2CAP.
 > 
-> This reverts commit b8aabfc92249b239c425da7e4ca85b7e4855e984.
+> This also follows GOEP 2.0 Page 14 - 4.6 Using Single Response Mode:
 > 
-> Signed-off-by: Daniel Wagner <daniel.wagner@bmw-carit.de>
-> ---
+>   "The Server cannot issue an enable request, but can only issue a
+>   response to an enable request from the Client. SRM will remain in
+>   effect for the duration of the operation that enabled it (PUT or GET)
+>   ...
+>   SRM headers shall not be sent in CONNECT request or response packets."
 > 
-> forgot the sign-off :)
+> and Page 22 - 5.4 Establishment of OBEX Connection:
 > 
->  drivers/bluetooth/btusb.c |    3 ---
->  1 files changed, 0 insertions(+), 3 deletions(-)
+>   "SRM headers shall not be sent in the Connect request or response
+>   packets (note, this is to preserve backwards compatibility). SRM shall
+>   be enabled through Put and Get operations only."
+> 
+> So only in case of PUT or GET requests SRM is automatically configured,
+> applications can still enable it manually for other operations by adding
+> the headers like before but it is not recommended.
+> 
+> Note that it would be a good practice to indicate SRM support by using
+> value 0x02, but since that should happens during CONNECT command it is
+> not done automatically for requests when acting as a client, server
+> responding to indicate requests will automatically add SRM headers though.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+I think you misread the specs here.
 
-Regards
+SRM is not enabled for "requests" but for sessions and SRM is valid until 
+disabled again. This includes _all_ requests and responses, not only GET and 
+PUT but the authors of the OBEX spec have a strange way to write things.
+The SRMP headers only affect PUT and PUT, though.
 
-Marcel
+Additionally, the spec says:
+"Client devices supporting SRM must issue a Single Response Mode (SRM) header 
+[...] during all CONNECT requests [...]".
 
-
+HS
