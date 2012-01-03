@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Daniel Wagner <wagi@monom.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Daniel Wagner <daniel.wagner@bmw-carit.de>
-Subject: [PATCH] Bluetooth: Don't mark non xfer isoc endpoint URBs with URB_ISO_ASAP
-Date: Tue,  3 Jan 2012 11:53:53 +0100
-Message-Id: <1325588033-4831-1-git-send-email-wagi@monom.org>
+Subject: [PATCH] Bluetooth: Don't mark URB_ISO_ASAP urbs for non xfer isoc endpoints
+Date: Tue,  3 Jan 2012 11:47:56 +0100
+Message-Id: <1325587676-4540-1-git-send-email-wagi@monom.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -18,12 +18,7 @@ According the documentation in usb_submit_urb() URB_ISO_ASAP
 flag is only allowed for endpoints of type USB_ENDPOINT_XFER_ISOC.
 
 This reverts commit b8aabfc92249b239c425da7e4ca85b7e4855e984.
-
-Signed-off-by: Daniel Wagner <daniel.wagner@bmw-carit.de>
 ---
-
-forgot the sign-off :)
-
  drivers/bluetooth/btusb.c |    3 ---
  1 files changed, 0 insertions(+), 3 deletions(-)
 
