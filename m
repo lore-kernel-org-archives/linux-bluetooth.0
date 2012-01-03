@@ -1,41 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Daniel Wagner <wagi@monom.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Daniel Wagner <daniel.wagner@bmw-carit.de>
-Subject: [PATCH] Bluetooth: Don't mark URB_ISO_ASAP urbs for non xfer isoc endpoints
-Date: Tue,  3 Jan 2012 11:47:56 +0100
-Message-Id: <1325587676-4540-1-git-send-email-wagi@monom.org>
+From: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
+To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
+Subject: Multiple Thermometer device connections. 
+Date: Tue, 3 Jan 2012 09:47:11 +0000
+Message-ID: <F82830D409D80E4881C83250E051B74B4A040CBD@banasiexm01.ASIA.ROOT.PRI>
+References: <F82830D409D80E4881C83250E051B74B4784BC9E@banasiexm01.ASIA.ROOT.PRI>
+In-Reply-To: <F82830D409D80E4881C83250E051B74B4784BC9E@banasiexm01.ASIA.ROOT.PRI>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Daniel Wagner <daniel.wagner@bmw-carit.de>
+Hi,
+Could you please help me with below query? 
 
-[ 2096.384084] btusb_send_frame:684: hci0
-[ 2096.384087] usb 3-1: BOGUS urb flags, 2 --> 0
-[ 2096.384091] Bluetooth: hci0 urb ffff8801b61d3a80 submission failed (22)
+Usecase:
+Have 2 temperature devices connected and set the CCC(Client Char Config) to receive the temperature updates.
 
-According the documentation in usb_submit_urb() URB_ISO_ASAP
-flag is only allowed for endpoints of type USB_ENDPOINT_XFER_ISOC.
+Issue:
+-- In attio_connected_cb we are calling g_attrib_register(user_data) were we are passing the "user_data" which has the "Device Reference". 
 
-This reverts commit b8aabfc92249b239c425da7e4ca85b7e4855e984.
----
- drivers/bluetooth/btusb.c |    3 ---
- 1 files changed, 0 insertions(+), 3 deletions(-)
+So in the callback function "notif_handler" we are getting notified from the 1st connected device, using the "user_data" we are trying to get the "Device Reference", which has the data/info of the 2nd device rather than the 1st device. 
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index fbfba80..77b9f7b 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -726,9 +726,6 @@ static int btusb_send_frame(struct sk_buff *skb)
- 		usb_fill_bulk_urb(urb, data->udev, pipe,
- 				skb->data, skb->len, btusb_tx_complete, skb);
- 
--		if (skb->priority >= HCI_PRIO_MAX - 1)
--			urb->transfer_flags  = URB_ISO_ASAP;
--
- 		hdev->stat.acl_tx++;
- 		break;
- 
--- 
-1.7.8.110.g4cb5d1
+How do we retrieve the handle/device reference for the device which is sending the "NOTIFY"? 
 
+
+Thanks,
+Vijay
+
+
+Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
+More information can be found at www.csr.com. Follow CSR on Twitter at http://twitter.com/CSR_PLC and read our blog at www.csr.com/blog
