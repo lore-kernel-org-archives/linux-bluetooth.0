@@ -1,29 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 2 Jan 2012 22:23:00 -0200
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Mon, 2 Jan 2012 22:18:27 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Andre Guedes <aguedespe@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, andre.guedes@openbossa.org
-Subject: Re: [PATCH 2/2] Bluetooh: Fix hci_cc_read_local_ext_features()
-Message-ID: <20120103002300.GC1472@joana>
-References: <1325252044-21134-1-git-send-email-aguedespe@gmail.com>
- <1325252044-21134-2-git-send-email-aguedespe@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/5] Bluetooth: Fix context in rfcomm_sock_lock
+Message-ID: <20120103001826.GB1472@joana>
+References: <1325006928-3338-1-git-send-email-padovan@profusion.mobi>
+ <1325542684.1965.394.camel@aeonflux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1325252044-21134-2-git-send-email-aguedespe@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1325542684.1965.394.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Marcel,
 
-* Andre Guedes <aguedespe@gmail.com> [2011-12-30 10:34:04 -0300]:
+* Marcel Holtmann <marcel@holtmann.org> [2012-01-02 14:18:04 -0800]:
 
-> Copy the Features value according to the Page number.
+> Hi Gustavo,
 > 
-> Signed-off-by: Andre Guedes <aguedespe@gmail.com>
-> ---
->  net/bluetooth/hci_event.c |    9 ++++++++-
->  1 files changed, 8 insertions(+), 1 deletions(-)
+> > Code now run in process context, does not need to disable interrupt
+> > anymore.
+> > 
+> > Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> > ---
+> >  net/bluetooth/rfcomm/sock.c |   12 ++++++------
+> >  1 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> 
+> However I get the feeling that we might should mover all the Bluetooth
+> specific socket list locking to RCU.
 
-Both patches have been applied, thanks.
+I agree, but I can't go ahead with such a change now, the merge windows is
+around the corner.
 
 	Gustavo
