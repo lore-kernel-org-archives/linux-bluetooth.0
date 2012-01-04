@@ -1,48 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F0428FE.4000300@monom.org>
-Date: Wed, 04 Jan 2012 11:25:02 +0100
+Message-ID: <4F04285E.1070500@monom.org>
+Date: Wed, 04 Jan 2012 11:22:22 +0100
 From: Daniel Wagner <wagi@monom.org>
 MIME-Version: 1.0
-To: Szymon Janc <szymon.janc@tieto.com>
-CC: Marcel Holtmann <marcel@holtmann.org>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- Peter Hurley <peter@hurleysoftware.com>
-Subject: Re: rfcomm & encryption
-References: <4F0362F8.9000000@monom.org> <1325622857.6454.12.camel@aeonflux> <201201040910.02057.szymon.janc@tieto.com>
-In-Reply-To: <201201040910.02057.szymon.janc@tieto.com>
-Content-Type: text/plain; charset=ISO-8859-1
+To: Peter Hurley <peter@hurleysoftware.com>
+CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
+References: <1312921615.2261.1.camel@THOR>
+In-Reply-To: <1312921615.2261.1.camel@THOR>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Peter,
 
-On 04.01.2012 09:10, Szymon Janc wrote:
-> Hi,
+On 09.08.2011 22:26, Peter Hurley wrote:
+> Commit 330605423c fixed l2cap conn establishment for non-ssp remote
+> devices by not setting HCI_CONN_ENCRYPT_PEND every time conn security
+> is tested (which was always returning failure on any subsequent
+> security checks).
 > 
->> so we are establishing the connection with security level of SDP only
->> hence no encryption required. Which is the only exception to run without
->> encryption when using SSP.
->>
->> Since we do not disconnected in between SDP and RFCOMM channels, we have
->> to do a security level upgrade here. And for some reason that gets
->> triggered, but does not force encryption to be switched on.
->>
->> With SSP enabled you should always switch on encryption when getting
->> authentication complete event. Actually generally speaking you should
->> always switch on encryption after authentication. Otherwise the
->> authentication is rather pointless anyway.
->>
->> Look at commit d7556e20, then this code got re-ordered. It does not look
->> correct to me anymore. We might need to redo the whole auth and encrypt
->> callback handling.
+> However, this broke l2cap conn establishment for ssp remote devices
+> when an ACL link was already established at SDP-level security. This
+> fix ensures that encryption must be pending whenever authentication
+> is also pending.
 > 
-> Some time ago there was a patch from Peter Hurley that should fixed that issue.
-> I've just noticed that for some reason it was not merged upstream..
-> (we use it in our own branch for some time already)
-> 
-> [PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
-> http://www.spinics.net/lists/linux-bluetooth/msg15312.html
+> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 
-Thanks for the pointer. This patch fixes the problem.
+git am complaines:
+
+Applying: Bluetooth: Fix l2cap conn failures for ssp devices
+/home/wagi/src/bluetooth-next/.git/rebase-apply/patch:18: trailing whitespace.
+
+/home/wagi/src/bluetooth-next/.git/rebase-apply/patch:19: trailing whitespace.
+                /* encrypt must be pending if auth is also pending */
+/home/wagi/src/bluetooth-next/.git/rebase-apply/patch:20: trailing whitespace.
+                set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend);
+/home/wagi/src/bluetooth-next/.git/rebase-apply/patch:21: trailing whitespace.
+
+
+But it fixes the problem I was debugging. From what I have
+learned in the last two days I would say it is also the right fix :)
+
+Tested-by: Daniel Wagner <daniel.wagner@bmw-carit.de>
 
 cheers,
 daniel
