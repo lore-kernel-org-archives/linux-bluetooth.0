@@ -1,44 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F044042.2080502@gmail.com>
-Date: Wed, 04 Jan 2012 13:04:18 +0100
-From: Rene Herman <rene.herman@gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <kanak.gupta@stericsson.com>,
+	Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 2/2] Bluetooth: l2cap_set_timer needs jiffies as timeout value
+Date: Wed, 4 Jan 2012 12:10:42 +0100
+Message-ID: <1325675442-24658-3-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1325675442-24658-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1325675442-24658-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Gustavo Padovan <padovan@profusion.mobi>,
- Andre Guedes <andre.guedes@openbossa.org>,
- linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [bluetooth] linux-3.x regression (bisected)
-References: <4EF3BACA.1080405@gmail.com> <CACJA=fVezGGcgAtbzG=+ouWq0PiHbgXN1YPwL+VDUphWS7wnrw@mail.gmail.com> <4EFA1EB8.9090005@gmail.com> <20111227203008.GA13870@joana> <4EFA447C.3030906@gmail.com> <20111228012248.GC13870@joana> <20111228012850.GD13870@joana> <4EFA7696.6060506@gmail.com> <20111228155225.GA23292@joana> <1325090923.1965.282.camel@aeonflux>
-In-Reply-To: <1325090923.1965.282.camel@aeonflux>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+After moving L2CAP timers to workqueues l2cap_set_timer expects timeout
+value to be specified in jiffies but constants defined in miliseconds
+are used. This makes timeouts unreliable when CONFIG_HZ is not set to
+1000.
 
-On 28-12-11 17:48, Marcel Holtmann wrote:
+__set_chan_timer macro still uses jiffies as input to avoid multiple
+conversions from/to jiffies for sk_sndtimeo value which is already
+specified in jiffies.
 
-> The correct patch would be something like this:
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 919e3c0..b6eb9c5 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -711,7 +711,8 @@ static void hci_cc_read_local_ext_features(struct hci_dev *h
->          if (rp->status)
->                  return;
->
-> -       memcpy(hdev->extfeatures, rp->features, 8);
-> +       if (rp->page == 1)
-> +               memcpy(hdev->extfeatures, rp->features, 8);
->
->          hci_req_complete(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES, rp->status);
->   }
->
-> The current patch is actually fully broken anyway. So besides switching
-> LE on when requesting page 0, you will also switch it off when
-> requesting any other page and it accidentally returns 0x00 since we
-> unconditionally overwrite it.
+Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+---
+ include/net/bluetooth/l2cap.h |    6 +++---
+ net/bluetooth/l2cap_core.c    |   12 ++++++++----
+ 2 files changed, 11 insertions(+), 7 deletions(-)
 
-Any word on a final fix for this?
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 9572cbd..b564142 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -626,13 +626,13 @@ static inline void l2cap_clear_timer(struct l2cap_chan *chan,
+ #define __set_chan_timer(c, t) l2cap_set_timer(c, &c->chan_timer, (t))
+ #define __clear_chan_timer(c) l2cap_clear_timer(c, &c->chan_timer)
+ #define __set_retrans_timer(c) l2cap_set_timer(c, &c->retrans_timer, \
+-		L2CAP_DEFAULT_RETRANS_TO);
++		msecs_to_jiffies(L2CAP_DEFAULT_RETRANS_TO));
+ #define __clear_retrans_timer(c) l2cap_clear_timer(c, &c->retrans_timer)
+ #define __set_monitor_timer(c) l2cap_set_timer(c, &c->monitor_timer, \
+-		L2CAP_DEFAULT_MONITOR_TO);
++		msecs_to_jiffies(L2CAP_DEFAULT_MONITOR_TO));
+ #define __clear_monitor_timer(c) l2cap_clear_timer(c, &c->monitor_timer)
+ #define __set_ack_timer(c) l2cap_set_timer(c, &chan->ack_timer, \
+-		L2CAP_DEFAULT_ACK_TO);
++		msecs_to_jiffies(L2CAP_DEFAULT_ACK_TO));
+ #define __clear_ack_timer(c) l2cap_clear_timer(c, &c->ack_timer)
+ 
+ static inline int __seq_offset(struct l2cap_chan *chan, __u16 seq1, __u16 seq2)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 3ee9bde..97f8549 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2970,7 +2970,8 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 
+ 	default:
+ 		sk->sk_err = ECONNRESET;
+-		__set_chan_timer(chan, L2CAP_DISC_REJ_TIMEOUT);
++		__set_chan_timer(chan,
++				msecs_to_jiffies(L2CAP_DISC_REJ_TIMEOUT));
+ 		l2cap_send_disconn_req(conn, chan, ECONNRESET);
+ 		goto done;
+ 	}
+@@ -4478,7 +4479,8 @@ static inline void l2cap_check_encryption(struct l2cap_chan *chan, u8 encrypt)
+ 	if (encrypt == 0x00) {
+ 		if (chan->sec_level == BT_SECURITY_MEDIUM) {
+ 			__clear_chan_timer(chan);
+-			__set_chan_timer(chan, L2CAP_ENC_TIMEOUT);
++			__set_chan_timer(chan,
++					msecs_to_jiffies(L2CAP_ENC_TIMEOUT));
+ 		} else if (chan->sec_level == BT_SECURITY_HIGH)
+ 			l2cap_chan_close(chan, ECONNREFUSED);
+ 	} else {
+@@ -4546,7 +4548,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 					L2CAP_CONN_REQ, sizeof(req), &req);
+ 			} else {
+ 				__clear_chan_timer(chan);
+-				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
++				__set_chan_timer(chan,
++					msecs_to_jiffies(L2CAP_DISC_TIMEOUT));
+ 			}
+ 		} else if (chan->state == BT_CONNECT2) {
+ 			struct l2cap_conn_rsp rsp;
+@@ -4566,7 +4569,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 				}
+ 			} else {
+ 				l2cap_state_change(chan, BT_DISCONN);
+-				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
++				__set_chan_timer(chan,
++					msecs_to_jiffies(L2CAP_DISC_TIMEOUT));
+ 				res = L2CAP_CR_SEC_BLOCK;
+ 				stat = L2CAP_CS_NO_INFO;
+ 			}
+-- 
+on behalf of ST-Ericsson
 
-Regards,
-Rene Herman
