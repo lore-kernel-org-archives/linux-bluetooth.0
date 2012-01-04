@@ -1,80 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hendrik Sattler <post@hendrik-sattler.de>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: Re: [PATCH obexd 3/4] gobex: automatically use SRM when transport type is SOCK_SEQPACKET
-Date: Wed, 4 Jan 2012 19:48:19 +0100
-Cc: linux-bluetooth@vger.kernel.org
-References: <1325598744-18855-1-git-send-email-luiz.dentz@gmail.com> <201201031658.17771.post@hendrik-sattler.de> <CABBYNZK2upSD5i37vNbV7Fcdp65dsnekVYYqmfR4q_cLVwqp_Q@mail.gmail.com>
-In-Reply-To: <CABBYNZK2upSD5i37vNbV7Fcdp65dsnekVYYqmfR4q_cLVwqp_Q@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201201041948.19890.post@hendrik-sattler.de>
+Message-ID: <1325692928.6454.44.camel@aeonflux>
+Subject: Re: How does other application know bt adapter discoverabletimeout ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Chanyeol Park <chanyeol.park@samsung.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	=?UTF-8?Q?=ED=8E=B8=EB=8F=84=ED=98=84?= <dh79.pyun@samsung.com>,
+	=?UTF-8?Q?=EC=84=9C=ED=98=B8=EC=B2=A0?= <hocheol.seo@samsung.com>
+Date: Wed, 04 Jan 2012 08:02:08 -0800
+In-Reply-To: <4F044EC7.6000803@samsung.com>
+References: <4F044EC7.6000803@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Chanyeol,
 
-Am Dienstag, 3. Januar 2012, 23:31:13 schrieb Luiz Augusto von Dentz:
-> On Tue, Jan 3, 2012 at 5:58 PM, Hendrik Sattler <post@hendrik-sattler.de> 
-wrote:
-> >> So only in case of PUT or GET requests SRM is automatically configured,
-> >> applications can still enable it manually for other operations by adding
-> >> the headers like before but it is not recommended.
-> >> 
-> >> Note that it would be a good practice to indicate SRM support by using
-> >> value 0x02, but since that should happens during CONNECT command it is
-> >> not done automatically for requests when acting as a client, server
-> >> responding to indicate requests will automatically add SRM headers
-> >> though.
-> > 
-> > I think you misread the specs here.
-> > 
-> > SRM is not enabled for "requests" but for sessions and SRM is valid until
-> > disabled again. This includes _all_ requests and responses, not only GET
-> > and PUT but the authors of the OBEX spec have a strange way to write
-> > things. The SRMP headers only affect PUT and PUT, though.
-
-s/PUT and PUT/PUT and GET/
-
-> That is what the OBEX spec says, but GOEP 2.0 says otherwise, actually
-> PUT and GET may also be used without CONNECT and the even the OBEX
-> spec state both PUT, GET and SETPATH supporting SRM headers.
-
-Using PUT and GET without CONNECT is not very efficient as you limit yourself 
-to the lowest MTU and default inbox (OPP). This was only there for some kind 
-of stateless IrDA connection which does not qualify for the requirements of 
-SRM, anyway
-
-> > Additionally, the spec says:
-> > "Client devices supporting SRM must issue a Single Response Mode (SRM)
-> > header [...] during all CONNECT requests [...]".
+> regarding bluetooth discoverable timeout, I have a question.
 > 
-> That is still possible, by adding the headers manually, but
-
-How should the application ever know better than the part that implements the 
-low-level details of OBEX? That is a very unlikely case.
-
-> automatically configuration will only be done for PUT/GET because of
-> the way GOEP 2.0 is using SRM restrict that:
-> >   "SRM headers shall not be sent in the Connect request or response
-> >   packets (note, this is to preserve backwards compatibility). SRM shall
-> >   be enabled through Put and Get operations only."
+> As far as I understand, if we set DiscoverableTimeout ,
+>   setting application should count down DiscoverableTimeout in order to 
+> display Timeout.
 > 
-> You can get GOEP 2.0 from bluetooth.org, you might find it interesting
-> specially the examples are completely different from the ones OBEX
-> spec has and we have to support them both.
+> But in case of other application , how could they know exact remained 
+> timeout?
 
-I have read that. BTW, it should be noticed that GOEP v2.0 references OBEX 
-v1.5, not v1.4. Maybe those differences come from the latest OBEX 
-specification?
+they don't know and they also should not need know.
 
-Also note that the first example (page 14) is _wrong_ as the "SRM disabled" in 
-the last line of the table is wrong. See all following examples that do not 
-have the entry. Also, this would directly contradict the OBEX specification. 
-The Bluetooth spec should get an errata for this, ASAP, as this will most 
-likely cause interoperability issues.
+If you are designing a system where another application needs to know
+the expired seconds of the discoverable timeout, then I would strongly
+suggest to rethink the interaction design with the end user.
 
-SRM is a complete mess, anyway.
+I would actually not even expose such a setting to the user if you are
+building a phone. My current take on this is either you are always
+discoverable by user choice or you are only switching on discoverability
+when the user is in the Bluetooth settings menu.
 
-HS
+The iPhone iOS for example got this part really figured. As soon as you
+enter the Bluetooth settings menu, the device makes itself discoverable
+and lets the user know that it did. As soon as you leave that menu or
+switch to another application/home screen it goes invisible again. That
+is pretty much a good design. No extra clutter or confusion for the end
+user.
+
+That said, it is not unreasonable to use the discoverable timeout, but
+it should only be used from the same UI application. Doing this cross
+applications is not going to work out.
+
+Regards
+
+Marcel
+
+
