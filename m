@@ -1,41 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <kanak.gupta@stericsson.com>,
-	Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 0/2] Fix L2CAP timeout values
-Date: Wed, 4 Jan 2012 12:10:40 +0100
-Message-ID: <1325675442-24658-1-git-send-email-andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Process num completed data blocks event
+Date: Wed,  4 Jan 2012 12:41:58 +0200
+Message-Id: <1325673718-18915-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-After moving L2CAP timers to workqueues there is problem with timeout
-values which are defined in miliseconds but timer functions works with
-jiffies. As a result, timers are unreliable on platforms with CONFIG_HZ
-not set to 1000.
+Adds support for Number Of Completed Data Blocks Event.
 
-Similar problem was fixed before workqueues but now it's apparently
-back. This time however I left l2ca_set_timer to use values in jiffies
-to avoid confusion and make code less prone to similar issues in
-future (I hope).
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci.h |   13 ++++++++++
+ net/bluetooth/hci_event.c   |   54 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 67 insertions(+), 0 deletions(-)
 
-Also together with patch from Peter Hurley it should fix problems with
-SSP and RFCOMM as recently discovered (on platforms with
-CONFIG_HZ != 1000).
-
-Andrzej Kaczmarek (2):
-  Bluetooth: Fix sk_sndtimeo initialization for L2CAP socket
-  Bluetooth: l2cap_set_timer needs jiffies as timeout value
-
- include/net/bluetooth/l2cap.h |    6 +++---
- net/bluetooth/l2cap_core.c    |   12 ++++++++----
- net/bluetooth/l2cap_sock.c    |    2 +-
- 3 files changed, 12 insertions(+), 8 deletions(-)
-
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 5b2fed5..cd52d21 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1155,6 +1155,19 @@ struct hci_ev_le_meta {
+ 	__u8     subevent;
+ } __packed;
+ 
++#define HCI_EV_NUM_COMP_BLOCKS		0x48
++struct hci_comp_blocks_info {
++	__le16   handle;
++	__le16   pkts;
++	__le16   blocks;
++} __packed;
++
++struct hci_ev_num_comp_blocks {
++	__le16   num_blocks;
++	__u8     num_hndl;
++	struct hci_comp_blocks_info handles[0];
++} __packed;
++
+ /* Low energy meta events */
+ #define HCI_EV_LE_CONN_COMPLETE		0x01
+ struct hci_ev_le_conn_complete {
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index d37f5b2..215d893 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2332,6 +2332,56 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+ 	queue_work(hdev->workqueue, &hdev->tx_work);
+ }
+ 
++static inline void hci_num_comp_blocks_evt(struct hci_dev *hdev,
++							struct sk_buff *skb)
++{
++	struct hci_ev_num_comp_blocks *ev = (void *) skb->data;
++	int i;
++
++	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_BLOCK_BASED) {
++		BT_ERR("Wrong event for mode %d", hdev->flow_ctl_mode);
++		return;
++	}
++
++	if (skb->len < sizeof(*ev) || skb->len < sizeof(*ev) +
++			ev->num_hndl * sizeof(struct hci_comp_blocks_info)) {
++		BT_DBG("%s bad parameters", hdev->name);
++		return;
++	}
++
++	BT_DBG("%s num_blocks %d num_hndl %d", hdev->name, ev->num_blocks,
++								ev->num_hndl);
++
++	for (i = 0; i < ev->num_hndl; i++) {
++		struct hci_comp_blocks_info *info = &ev->handles[i];
++		struct hci_conn *conn;
++		__u16  handle, block_count;
++
++		handle = __le16_to_cpu(info->handle);
++		block_count = __le16_to_cpu(info->blocks);
++
++		conn = hci_conn_hash_lookup_handle(hdev, handle);
++		if (!conn)
++			continue;
++
++		conn->sent -= block_count;
++
++		switch (conn->type) {
++		case ACL_LINK:
++			hdev->block_cnt += block_count;
++			if (hdev->block_cnt > hdev->num_blocks)
++				hdev->block_cnt = hdev->num_blocks;
++			break;
++
++		default:
++			BT_ERR("Unknown type %d conn %p", conn->type, conn);
++			break;
++		}
++	}
++
++	queue_work(hdev->workqueue, &hdev->tx_work);
++}
++
+ static inline void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_ev_mode_change *ev = (void *) skb->data;
+@@ -3271,6 +3321,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_remote_oob_data_request_evt(hdev, skb);
+ 		break;
+ 
++	case HCI_EV_NUM_COMP_BLOCKS:
++		hci_num_comp_blocks_evt(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s event 0x%x", hdev->name, event);
+ 		break;
 -- 
-on behalf of ST-Ericsson
+1.7.4.1
 
