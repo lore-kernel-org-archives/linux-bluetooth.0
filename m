@@ -1,30 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: About needing to run "udevadm trigger" to get bluetooth adapter
- detected at boot
-From: Pacho Ramos <pachoramos@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+Message-ID: <1325706543.6454.64.camel@aeonflux>
+Subject: Re: BlueZ old releases have different checksums
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Denys Dmytriyenko <denis@denix.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 04 Jan 2012 11:49:03 -0800
+In-Reply-To: <20120104175522.GC587@denix.org>
+References: <20120104175522.GC587@denix.org>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 04 Jan 2012 22:59:16 +0100
-Message-ID: <1325714356.10711.2.camel@belkin4>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello
+Hi Denys,
 
-I would like to know why do we need to run things like:
-udevadm trigger --subsystem-match=bluetooth --action=add
+> Sorry if it was covered previously, but my various searches didn't bring any 
+> relevant results...
+> 
+> On December 22/23 the entire archive of previous BlueZ/obexd/hcidump releases 
+> re-appeared on kernel.org after missing for long time due to the server 
+> compromise. Well, it looks like all the tarballs were re-created and 
+> re-packaged, thus they all have new checksums. Unfortunately, since filenames 
+> were not changed (i.e. FSF had to re-publish all releases of binutils and they 
+> added an 'a' suffix to filenames), this breaks Linux distributions that fetch 
+> and build from sources (like OpenEmbedded and Yocto based distros), since 
+> checksums don't match. The situation is even worse since many mirrors have old 
+> copies of the tarballs...
+> 
+> The question I have is whether this is known and was it done on purpose? What 
+> can be done to fix this situation for users of the old releases, besides 
+> upgrading to the very latest releases of BlueZ/obexd/hcidump? Thank you for 
+> your attention.
 
-or even simpler:
-udevadm trigger
+I have no idea what these kernel.org people did with it, but I uploaded
+the original tar.gz release. However just taking the 4.0 release, you
+are correct, there is a difference.
 
-Manually or using a "bluetooth" init.d script to simply run that or,
-otherwise, bluetooth adapter is not detected. Reading OpenSuSE Changelog
-in their bluez package seems that this is caused because dbus needs to
-be running to get it detected. In that case, I would like to know why
-only bluez looks to be affected by this problem and, also, know if there
-is another way to workaround (or fix) this issue than needing to add a
-bluez init.d script to simply run this
+@@ -1,4 +1,4 @@
+-0000000 8b1f 0008 b6f4 4ef3 0302 3cec 7ff1 b6da
++0000000 8b1f 0008 dbf0 4899 0302 3cec 7ff1 b6da
+ 0000010 fdb3 fe35 342b 96c6 0590 da12 dda4 6592
+ 0000020 135f 0870 04af 00f8 db59 fdad c6ba f018
+ 0000030 6c6a b6be 9b49 fdad dfdf 49dd 65b2 4930
 
-Thanks a lot
+I have no idea why they unpacked and re-packed the tar.gz files, but I
+can not really do much about it.
+
+Regards
+
+Marcel
+
 
