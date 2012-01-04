@@ -1,119 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Process num completed data blocks event
-Date: Wed,  4 Jan 2012 12:41:58 +0200
-Message-Id: <1325673718-18915-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <201201040910.02057.szymon.janc@tieto.com>
+References: <4F0362F8.9000000@monom.org>
+	<1325622857.6454.12.camel@aeonflux>
+	<201201040910.02057.szymon.janc@tieto.com>
+Date: Wed, 4 Jan 2012 12:29:52 +0200
+Message-ID: <CABBYNZK0CDF1QRDF+6LNqFW2+ymOu56z2bDgmo6Zh9DDYXpXbA@mail.gmail.com>
+Subject: Re: rfcomm & encryption
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Daniel Wagner <wagi@monom.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Peter Hurley <peter@hurleysoftware.com>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Szymon,
 
-Adds support for Number Of Completed Data Blocks Event.
+On Wed, Jan 4, 2012 at 10:10 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Hi,
+>
+>> so we are establishing the connection with security level of SDP only
+>> hence no encryption required. Which is the only exception to run without
+>> encryption when using SSP.
+>>
+>> Since we do not disconnected in between SDP and RFCOMM channels, we have
+>> to do a security level upgrade here. And for some reason that gets
+>> triggered, but does not force encryption to be switched on.
+>>
+>> With SSP enabled you should always switch on encryption when getting
+>> authentication complete event. Actually generally speaking you should
+>> always switch on encryption after authentication. Otherwise the
+>> authentication is rather pointless anyway.
+>>
+>> Look at commit d7556e20, then this code got re-ordered. It does not look
+>> correct to me anymore. We might need to redo the whole auth and encrypt
+>> callback handling.
+>
+> Some time ago there was a patch from Peter Hurley that should fixed that issue.
+> I've just noticed that for some reason it was not merged upstream..
+> (we use it in our own branch for some time already)
+>
+> [PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
+> http://www.spinics.net/lists/linux-bluetooth/msg15312.html
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci.h |   13 ++++++++++
- net/bluetooth/hci_event.c   |   54 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 67 insertions(+), 0 deletions(-)
+Indeed it seems to fix the problem, but I wonder why the
+test_and_set_bit was removed in the first place, the commit messages
+of the patch which introduces the regression only says that under some
+situation it can cause connection timeouts but I fail to see why. Also
+we should be more careful which such changes, at least there should be
+more details about what it is fixing and a bit more testing since this
+regression is very easy to reproduce I don't think it was tested with
+ssp.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 5b2fed5..cd52d21 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1155,6 +1155,19 @@ struct hci_ev_le_meta {
- 	__u8     subevent;
- } __packed;
- 
-+#define HCI_EV_NUM_COMP_BLOCKS		0x48
-+struct hci_comp_blocks_info {
-+	__le16   handle;
-+	__le16   pkts;
-+	__le16   blocks;
-+} __packed;
-+
-+struct hci_ev_num_comp_blocks {
-+	__le16   num_blocks;
-+	__u8     num_hndl;
-+	struct hci_comp_blocks_info handles[0];
-+} __packed;
-+
- /* Low energy meta events */
- #define HCI_EV_LE_CONN_COMPLETE		0x01
- struct hci_ev_le_conn_complete {
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index d37f5b2..215d893 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2332,6 +2332,56 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
- 	queue_work(hdev->workqueue, &hdev->tx_work);
- }
- 
-+static inline void hci_num_comp_blocks_evt(struct hci_dev *hdev,
-+							struct sk_buff *skb)
-+{
-+	struct hci_ev_num_comp_blocks *ev = (void *) skb->data;
-+	int i;
-+
-+	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_BLOCK_BASED) {
-+		BT_ERR("Wrong event for mode %d", hdev->flow_ctl_mode);
-+		return;
-+	}
-+
-+	if (skb->len < sizeof(*ev) || skb->len < sizeof(*ev) +
-+			ev->num_hndl * sizeof(struct hci_comp_blocks_info)) {
-+		BT_DBG("%s bad parameters", hdev->name);
-+		return;
-+	}
-+
-+	BT_DBG("%s num_blocks %d num_hndl %d", hdev->name, ev->num_blocks,
-+								ev->num_hndl);
-+
-+	for (i = 0; i < ev->num_hndl; i++) {
-+		struct hci_comp_blocks_info *info = &ev->handles[i];
-+		struct hci_conn *conn;
-+		__u16  handle, block_count;
-+
-+		handle = __le16_to_cpu(info->handle);
-+		block_count = __le16_to_cpu(info->blocks);
-+
-+		conn = hci_conn_hash_lookup_handle(hdev, handle);
-+		if (!conn)
-+			continue;
-+
-+		conn->sent -= block_count;
-+
-+		switch (conn->type) {
-+		case ACL_LINK:
-+			hdev->block_cnt += block_count;
-+			if (hdev->block_cnt > hdev->num_blocks)
-+				hdev->block_cnt = hdev->num_blocks;
-+			break;
-+
-+		default:
-+			BT_ERR("Unknown type %d conn %p", conn->type, conn);
-+			break;
-+		}
-+	}
-+
-+	queue_work(hdev->workqueue, &hdev->tx_work);
-+}
-+
- static inline void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_mode_change *ev = (void *) skb->data;
-@@ -3271,6 +3321,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_remote_oob_data_request_evt(hdev, skb);
- 		break;
- 
-+	case HCI_EV_NUM_COMP_BLOCKS:
-+		hci_num_comp_blocks_evt(hdev, skb);
-+		break;
-+
- 	default:
- 		BT_DBG("%s event 0x%x", hdev->name, event);
- 		break;
 -- 
-1.7.4.1
-
+Luiz Augusto von Dentz
