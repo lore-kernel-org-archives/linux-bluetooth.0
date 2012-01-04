@@ -1,40 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4F044EC7.6000803@samsung.com>
-References: <4F044EC7.6000803@samsung.com>
-Date: Wed, 4 Jan 2012 16:47:40 +0200
-Message-ID: <CABBYNZKA4BMG0uk5MXRT96WvJ16GdFpnw9Kcj4xJT5Y5rsn8mA@mail.gmail.com>
-Subject: Re: How does other application know bt adapter discoverabletimeout ?
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Chanyeol Park <chanyeol.park@samsung.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	=?UTF-8?B?7Y6464+E7ZiE?= <dh79.pyun@samsung.com>,
-	=?UTF-8?B?7ISc7Zi47LKg?= <hocheol.seo@samsung.com>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Remove magic number from ACL TO
+Date: Wed,  4 Jan 2012 16:42:26 +0200
+Message-Id: <1325688146-19896-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chanyeol,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-2012/1/4 Chanyeol Park <chanyeol.park@samsung.com>:
-> Hello
->
-> regarding bluetooth discoverable timeout, I have a question.
->
-> As far as I understand, if we set DiscoverableTimeout ,
->  setting application should count down DiscoverableTimeout in order to
-> display Timeout.
->
-> But in case of other application , how could they know exact remained
-> timeout?
+Adds HCI_ACL_TX_TIMEOUT and clear conversion from msec to jiffies
 
-Currently we don't emit the count down and you have to be more
-specific about such use case, because I don't see much of a point for
-e.g. a phone or IVI system to have such behavior, DiscoverableTimeout
-is useful for system where you dont want to set discoverable property
-persistently e.g. no display/ui systems such as headset or routers
-then you basically press some buttons and it will be discoverable for
-some fixed amount of time.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/hci.h |    1 +
+ net/bluetooth/hci_core.c    |    3 ++-
+ 2 files changed, 3 insertions(+), 1 deletions(-)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 5b2fed5..e6dbff2 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -130,6 +130,7 @@ enum {
+ #define HCI_IDLE_TIMEOUT	(6000)	/* 6 seconds */
+ #define HCI_INIT_TIMEOUT	(10000)	/* 10 seconds */
+ #define HCI_CMD_TIMEOUT		(1000)	/* 1 seconds */
++#define HCI_ACL_TX_TIMEOUT	(45000)	/* 45 seconds */
+ 
+ /* HCI data types */
+ #define HCI_COMMAND_PKT		0x01
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 6d38d80..8f74a52 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2249,7 +2249,8 @@ static inline void hci_sched_acl(struct hci_dev *hdev)
+ 	if (!test_bit(HCI_RAW, &hdev->flags)) {
+ 		/* ACL tx timeout must be longer than maximum
+ 		 * link supervision timeout (40.9 seconds) */
+-		if (!hdev->acl_cnt && time_after(jiffies, hdev->acl_last_tx + HZ * 45))
++		if (!hdev->acl_cnt && time_after(jiffies, hdev->acl_last_tx +
++					msecs_to_jiffies(HCI_ACL_TX_TIMEOUT)))
+ 			hci_link_tx_to(hdev, ACL_LINK);
+ 	}
+ 
 -- 
-Luiz Augusto von Dentz
+1.7.4.1
+
