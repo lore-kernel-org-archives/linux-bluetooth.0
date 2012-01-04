@@ -3,38 +3,39 @@ From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <kanak.gupta@stericsson.com>,
 	Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 1/2] Bluetooth: Fix sk_sndtimeo initialization for L2CAP socket
-Date: Wed, 4 Jan 2012 12:10:41 +0100
-Message-ID: <1325675442-24658-2-git-send-email-andrzej.kaczmarek@tieto.com>
-In-Reply-To: <1325675442-24658-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1325675442-24658-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 0/2] Fix L2CAP timeout values
+Date: Wed, 4 Jan 2012 12:10:40 +0100
+Message-ID: <1325675442-24658-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-sk_sndtime value should be specified in jiffies thus initial value
-needs to be converted from miliseconds. Otherwise this timeout is
-unreliable when CONFIG_HZ is not set to 1000.
+Hi,
 
-Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
----
- net/bluetooth/l2cap_sock.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+After moving L2CAP timers to workqueues there is problem with timeout
+values which are defined in miliseconds but timer functions works with
+jiffies. As a result, timers are unreliable on platforms with CONFIG_HZ
+not set to 1000.
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index c61d967..c57027f 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1002,7 +1002,7 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock, int p
- 	INIT_LIST_HEAD(&bt_sk(sk)->accept_q);
- 
- 	sk->sk_destruct = l2cap_sock_destruct;
--	sk->sk_sndtimeo = L2CAP_CONN_TIMEOUT;
-+	sk->sk_sndtimeo = msecs_to_jiffies(L2CAP_CONN_TIMEOUT);
- 
- 	sock_reset_flag(sk, SOCK_ZAPPED);
- 
+Similar problem was fixed before workqueues but now it's apparently
+back. This time however I left l2ca_set_timer to use values in jiffies
+to avoid confusion and make code less prone to similar issues in
+future (I hope).
+
+Also together with patch from Peter Hurley it should fix problems with
+SSP and RFCOMM as recently discovered (on platforms with
+CONFIG_HZ != 1000).
+
+Andrzej Kaczmarek (2):
+  Bluetooth: Fix sk_sndtimeo initialization for L2CAP socket
+  Bluetooth: l2cap_set_timer needs jiffies as timeout value
+
+ include/net/bluetooth/l2cap.h |    6 +++---
+ net/bluetooth/l2cap_core.c    |   12 ++++++++----
+ net/bluetooth/l2cap_sock.c    |    2 +-
+ 3 files changed, 12 insertions(+), 8 deletions(-)
+
 -- 
 on behalf of ST-Ericsson
 
