@@ -1,48 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F04285E.1070500@monom.org>
-Date: Wed, 04 Jan 2012 11:22:22 +0100
-From: Daniel Wagner <wagi@monom.org>
+Date: Wed, 4 Jan 2012 12:18:44 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Peter Krystad <pkrystad@codeaurora.org>, johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3 0/4] Add BT 3.0+HS parsing
+Message-ID: <20120104101842.GD16309@aemeltch-MOBL1>
+References: <1323756157-15487-1-git-send-email-pkrystad@codeaurora.org>
 MIME-Version: 1.0
-To: Peter Hurley <peter@hurleysoftware.com>
-CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
-References: <1312921615.2261.1.camel@THOR>
-In-Reply-To: <1312921615.2261.1.camel@THOR>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1323756157-15487-1-git-send-email-pkrystad@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+Hi,
 
-On 09.08.2011 22:26, Peter Hurley wrote:
-> Commit 330605423c fixed l2cap conn establishment for non-ssp remote
-> devices by not setting HCI_CONN_ENCRYPT_PEND every time conn security
-> is tested (which was always returning failure on any subsequent
-> security checks).
+On Mon, Dec 12, 2011 at 10:02:33PM -0800, Peter Krystad wrote:
+> This patch adds parsing and display of BT 3.0+HS signalling
 > 
-> However, this broke l2cap conn establishment for ssp remote devices
-> when an ACL link was already established at SDP-level security. This
-> fix ensures that encryption must be pending whenever authentication
-> is also pending.
+> v3 - same content but A2MP definitions placed in l2cap.h
+
+Looks OK, despite I would not mix typedefs and normal structs in one
+patch (maybe we can even remove typedefs later).
+
+Johan, as definitions moved to existing header, hence without modifying
+license can these patches be applied?
+
+Best regards 
+Andrei Emeltchenko 
+
 > 
-> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+> Peter Krystad (4):
+>   Add L2CAP Create/Move channel and A2MP definitions
+>   Add parsing of L2CAP Create/Move Channel signals
+>   Add parsing of A2MP signals
+>   Minor cleanup of indentation in output
+> 
+>  lib/l2cap.h     |  159 +++++++++++++++++++-
+>  parser/hci.c    |   15 ++-
+>  parser/l2cap.c  |  449 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  parser/parser.h |    1 +
+>  src/hcidump.c   |    1 +
+>  5 files changed, 619 insertions(+), 6 deletions(-)
+> 
 
-git am complaines:
-
-Applying: Bluetooth: Fix l2cap conn failures for ssp devices
-/home/wagi/src/bluetooth-next/.git/rebase-apply/patch:18: trailing whitespace.
-
-/home/wagi/src/bluetooth-next/.git/rebase-apply/patch:19: trailing whitespace.
-                /* encrypt must be pending if auth is also pending */
-/home/wagi/src/bluetooth-next/.git/rebase-apply/patch:20: trailing whitespace.
-                set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend);
-/home/wagi/src/bluetooth-next/.git/rebase-apply/patch:21: trailing whitespace.
-
-
-But it fixes the problem I was debugging. From what I have
-learned in the last two days I would say it is also the right fix :)
-
-Tested-by: Daniel Wagner <daniel.wagner@bmw-carit.de>
-
-cheers,
-daniel
