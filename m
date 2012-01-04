@@ -1,45 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 4 Jan 2012 12:18:44 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Peter Krystad <pkrystad@codeaurora.org>, johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 0/4] Add BT 3.0+HS parsing
-Message-ID: <20120104101842.GD16309@aemeltch-MOBL1>
-References: <1323756157-15487-1-git-send-email-pkrystad@codeaurora.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: rfcomm & encryption
+Date: Wed, 4 Jan 2012 09:10:01 +0100
+CC: Daniel Wagner <wagi@monom.org>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, Peter Hurley <peter@hurleysoftware.com>
+References: <4F0362F8.9000000@monom.org> <1325622857.6454.12.camel@aeonflux>
+In-Reply-To: <1325622857.6454.12.camel@aeonflux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1323756157-15487-1-git-send-email-pkrystad@codeaurora.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Message-ID: <201201040910.02057.szymon.janc@tieto.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Mon, Dec 12, 2011 at 10:02:33PM -0800, Peter Krystad wrote:
-> This patch adds parsing and display of BT 3.0+HS signalling
+> so we are establishing the connection with security level of SDP only
+> hence no encryption required. Which is the only exception to run without
+> encryption when using SSP.
 > 
-> v3 - same content but A2MP definitions placed in l2cap.h
-
-Looks OK, despite I would not mix typedefs and normal structs in one
-patch (maybe we can even remove typedefs later).
-
-Johan, as definitions moved to existing header, hence without modifying
-license can these patches be applied?
-
-Best regards 
-Andrei Emeltchenko 
-
+> Since we do not disconnected in between SDP and RFCOMM channels, we have
+> to do a security level upgrade here. And for some reason that gets
+> triggered, but does not force encryption to be switched on.
 > 
-> Peter Krystad (4):
->   Add L2CAP Create/Move channel and A2MP definitions
->   Add parsing of L2CAP Create/Move Channel signals
->   Add parsing of A2MP signals
->   Minor cleanup of indentation in output
+> With SSP enabled you should always switch on encryption when getting
+> authentication complete event. Actually generally speaking you should
+> always switch on encryption after authentication. Otherwise the
+> authentication is rather pointless anyway.
 > 
->  lib/l2cap.h     |  159 +++++++++++++++++++-
->  parser/hci.c    |   15 ++-
->  parser/l2cap.c  |  449 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  parser/parser.h |    1 +
->  src/hcidump.c   |    1 +
->  5 files changed, 619 insertions(+), 6 deletions(-)
-> 
+> Look at commit d7556e20, then this code got re-ordered. It does not look
+> correct to me anymore. We might need to redo the whole auth and encrypt
+> callback handling.
 
+Some time ago there was a patch from Peter Hurley that should fixed that issue.
+I've just noticed that for some reason it was not merged upstream..
+(we use it in our own branch for some time already)
+
+[PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
+http://www.spinics.net/lists/linux-bluetooth/msg15312.html
+
+-- 
+BR
+Szymon Janc
