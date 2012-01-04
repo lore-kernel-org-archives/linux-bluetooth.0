@@ -1,27 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Aj, SanthoshX" <santhoshx.aj@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "Holtmann, Marcel" <marcel.holtmann@intel.com>,
-	"Nair, Rashmi G" <rashmi.g.nair@intel.com>
-Subject: Breaks in A2DP playback during device search
-Date: Thu, 5 Jan 2012 04:35:22 +0000
-Message-ID: <001F63875E1AF5428162B5A2D3ED1BDD8E8D@IRSMSX101.ger.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: Re: About needing to run "udevadm trigger" to get bluetooth
+ adapter detected at boot
+From: Pacho Ramos <pachoramos@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1325714356.10711.2.camel@belkin4>
+References: <1325714356.10711.2.camel@belkin4>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 04 Jan 2012 23:11:46 +0100
+Message-ID: <1325715106.3277.1.camel@belkin4>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-We are facing Issue with A2DP playback & device search.
-To solve the issue of audio breaks the controller expects the latency to be set to lesser value.
-It's been found HOST is able to send the data but to process the data the latency in the controller to be set (12ms).
+El mié, 04-01-2012 a las 22:59 +0100, Pacho Ramos escribió:
+> Hello
+> 
+> I would like to know why do we need to run things like:
+> udevadm trigger --subsystem-match=bluetooth --action=add
+> 
+> or even simpler:
+> udevadm trigger
+> 
+> Manually or using a "bluetooth" init.d script to simply run that or,
+> otherwise, bluetooth adapter is not detected. Reading OpenSuSE Changelog
+> in their bluez package seems that this is caused because dbus needs to
+> be running to get it detected. In that case, I would like to know why
+> only bluez looks to be affected by this problem and, also, know if there
+> is another way to workaround (or fix) this issue than needing to add a
+> bluez init.d script to simply run this
+> 
+> Thanks a lot
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
 
-We are currently using Android Froyo (2.2.2) which has bluez version 4.47 & kernel version 2.6.32.
-We found there was already a hack for Broadcom chip in audio/device.c to set the priority using vendor specific command.
-We used the same space to send the HCI QoS Setup command to set the latency.
+Looks like, on Gentoo, we have an init.d script that runs:
+udevadm trigger --type=failed -v
 
-I am attaching the patch for your review in next mail. Please give your comments & suggestion.
-
-Regards
-Santhosh AJ
+after dbus is running, but looks like running udevadm trigger with
+"--type=failed" option won't start bluetoothd... will investigate it a
+bit more, sorry for the noise :S
 
