@@ -1,236 +1,227 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ilia, Kolominsky" <iliak@ti.com>
-To: "Aj, SanthoshX" <santhoshx.aj@intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "Holtmann, Marcel" <marcel.holtmann@intel.com>,
-	"Nair, Rashmi G" <rashmi.g.nair@intel.com>
-Subject: RE: [PATCH] Breaks in A2DP playback during device search
-Date: Thu, 5 Jan 2012 12:07:46 +0000
-Message-ID: <A7CD2DBA66569F478A0C1ECFC39E1C520C9F69E0@DNCE03.ent.ti.com>
-References: <001F63875E1AF5428162B5A2D3ED1BDD8E98@IRSMSX101.ger.corp.intel.com>
-In-Reply-To: <001F63875E1AF5428162B5A2D3ED1BDD8E98@IRSMSX101.ger.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Message-id: <D2678C10D11A4905B04F48DD0DE37088@sisodomain.com>
+From: Divya Yadav <divya.yadav@samsung.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <1325756632-29335-1-git-send-email-divya.yadav@samsung.com>
+ <CA+i+Aw1wpoPZxAHZeGEz3HZ0EPSqexLOkCYbPAx_-2WD_=8OXw@mail.gmail.com>
+In-reply-to: <CA+i+Aw1wpoPZxAHZeGEz3HZ0EPSqexLOkCYbPAx_-2WD_=8OXw@mail.gmail.com>
+Subject: Re: [PATCH obexd] MAP: Add UpdateInbox Function
+Date: Thu, 05 Jan 2012 17:10:54 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
-I`d suggest using HCI_Flow_Specification instead, since you
-want to specifly params for outgoing traffic. That command
-allows to do it in a more clearer way, since it accepts the
-direction param.
+Hello,
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Aj, SanthoshX
-> Sent: Thursday, January 05, 2012 6:39 AM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: Holtmann, Marcel; Nair, Rashmi G
-> Subject: [PATCH] Breaks in A2DP playback during device search
-> 
-> From 8ecb4074305613a113d1c8dd220ab856c5f7ebc1 Mon Sep 17 00:00:00 2001
-> From: Santhosh <santhoshx.aj@intel.com>
-> Date: Wed, 4 Jan 2012 12:44:37 +0530
-> Subject: [PATCH] To change the latency of controller
->  This change is done to fix the a2dp breaks as the IMC controller
->  expects the latency to be set explicitly by calling HCI QoS setup
-> 
-> ---
->  audio/device.c         |    7 +++
->  common/Android.mk      |    3 +-
->  common/android_bluez.c |  111 ++++++++++++++++++++++++++++++++++++++--
-> -------
->  3 files changed, 98 insertions(+), 23 deletions(-)
-> 
-> diff --git a/audio/device.c b/audio/device.c
-> index 9662dec..3e30ea3 100644
-> --- a/audio/device.c
-> +++ b/audio/device.c
-> @@ -66,6 +66,9 @@
->  #define AVDTP_CONNECT_TIMEOUT 1
->  #define HEADSET_CONNECT_TIMEOUT 1
-> 
-> +#define QoS_LATENCY_12_MS 0x00002EE0  // 12 ms
-> +#define QoS_LATENCY_25_MS 0x000061A8  // 25 ms
-> +
->  typedef enum {
->  	AUDIO_STATE_DISCONNECTED,
->  	AUDIO_STATE_CONNECTING,
-> @@ -341,6 +344,9 @@ static void device_sink_cb(struct audio_device
-> *dev,
-> 
->  	switch (new_state) {
->  	case SINK_STATE_DISCONNECTED:
-> +#ifdef ANDROID
-> +		android_set_qos_latency(&dev->dst,QoS_LATENCY_25_MS);
-> +#endif
->  		if (dev->control) {
->  			device_remove_control_timer(dev);
->  			avrcp_disconnect(dev);
-> @@ -368,6 +374,7 @@ static void device_sink_cb(struct audio_device
-> *dev,
->  			break;
->  #ifdef ANDROID
->  		android_set_high_priority(&dev->dst);
-> +		android_set_qos_latency(&dev->dst,QoS_LATENCY_12_MS);
->  #endif
->  		if (dev->auto_connect) {
->  			if (!dev->headset)
-> diff --git a/common/Android.mk b/common/Android.mk
-> index 74c0bec..38d6b23 100644
-> --- a/common/Android.mk
-> +++ b/common/Android.mk
-> @@ -13,7 +13,8 @@ LOCAL_SRC_FILES:= \
-> 
->  LOCAL_CFLAGS+= \
->  	-O3 \
-> -	-DNEED_DBUS_WATCH_GET_UNIX_FD
-> +	-DNEED_DBUS_WATCH_GET_UNIX_FD \
-> +	-DBOARD_HAVE_BLUETOOTH_IMC
-> 
->  ifeq ($(BOARD_HAVE_BLUETOOTH_BCM),true)
->  LOCAL_CFLAGS += \
-> diff --git a/common/android_bluez.c b/common/android_bluez.c
-> index be85563..3f3b849 100644
-> --- a/common/android_bluez.c
-> +++ b/common/android_bluez.c
-> @@ -78,28 +78,6 @@ static int write_flush_timeout(int fd, uint16_t
-> handle,
->      return 0;
->  }
-> 
-> -#ifdef BOARD_HAVE_BLUETOOTH_BCM
-> -static int vendor_high_priority(int fd, uint16_t handle) {
-> -    unsigned char hci_sleep_cmd[] = {
-> -        0x01,               // HCI command packet
-> -        0x57, 0xfc,         // HCI_Write_High_Priority_Connection
-> -        0x02,               // Length
-> -        0x00, 0x00          // Handle
-> -    };
-> -
-> -    hci_sleep_cmd[4] = (uint8_t)handle;
-> -    hci_sleep_cmd[5] = (uint8_t)(handle >> 8);
-> -
-> -    int ret = write(fd, hci_sleep_cmd, sizeof(hci_sleep_cmd));
-> -    if (ret < 0) {
-> -        error("write(): %s (%d)]", strerror(errno), errno);
-> -        return -1;
-> -    } else if (ret != sizeof(hci_sleep_cmd)) {
-> -        error("write(): unexpected length %d", ret);
-> -        return -1;
-> -    }
-> -    return 0;
-> -}
-> 
->  static int get_hci_sock() {
->      int sock = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-> @@ -167,6 +145,30 @@ out:
->      return ret;
->  }
-> 
-> +
-> +#ifdef BOARD_HAVE_BLUETOOTH_BCM
-> +static int vendor_high_priority(int fd, uint16_t handle) {
-> +    unsigned char hci_sleep_cmd[] = {
-> +        0x01,               // HCI command packet
-> +        0x57, 0xfc,         // HCI_Write_High_Priority_Connection
-> +        0x02,               // Length
-> +        0x00, 0x00          // Handle
-> +    };
-> +
-> +    hci_sleep_cmd[4] = (uint8_t)handle;
-> +    hci_sleep_cmd[5] = (uint8_t)(handle >> 8);
-> +
-> +    int ret = write(fd, hci_sleep_cmd, sizeof(hci_sleep_cmd));
-> +    if (ret < 0) {
-> +        error("write(): %s (%d)]", strerror(errno), errno);
-> +        return -1;
-> +    } else if (ret != sizeof(hci_sleep_cmd)) {
-> +        error("write(): unexpected length %d", ret);
-> +        return -1;
-> +    }
-> +    return 0;
-> +}
-> +
->  /* Request that the ACL link to a given Bluetooth connection be high
-> priority,
->   * for improved coexistance support
->   */
-> @@ -202,3 +204,68 @@ int android_set_high_priority(bdaddr_t *ba) {
->  }
-> 
->  #endif
-> +
-> +#ifdef BOARD_HAVE_BLUETOOTH_IMC
-> +
-> +static int android_hci_qos_setup(int fd, uint16_t handle, uint32_t
-> latency) {
-> +    unsigned char hci_qos_cmd[] = {
-> +
-> +	0x01, 					// HCI command packet
-> +	0x07, 0x08, 			// QoS Setup Command
-> +	0x14, 					// Length
-> +	0x00, 0x01, 			// Connection_Handle
-> +	0x00, 					//Flags
-> +	0x01, 					//Service_Type
-> +	0x00, 0x00, 0xE1, 0x00, //Token_Rate
-> +	0x00, 0x00, 0x00, 0x00, //Peak_Bandwidth
-> +	0xE0, 0x2E, 0x00, 0x00, //Latency
-> +	0x00, 0x00, 0x00, 0x00	//Delay_Variation
-> +	};
-> +
-> +    hci_qos_cmd[4] = (uint8_t)handle;
-> +    hci_qos_cmd[5] = (uint8_t)(handle >> 8);
-> +
-> +	hci_qos_cmd[16] = (uint8_t)latency;
-> +    hci_qos_cmd[17] = (uint8_t)(latency >> 8);
-> +	hci_qos_cmd[18] = (uint8_t)(latency >> 16);
-> +	hci_qos_cmd[19] = (uint8_t)(latency >> 24);
-> +
-> +	int ret = write(fd, hci_qos_cmd, sizeof(hci_qos_cmd));
-> +    if (ret < 0) {
-> +        error("write(): %s (%d)]", strerror(errno), errno);
-> +        return -1;
-> +    } else if (ret != sizeof(hci_qos_cmd)) {
-> +        error("write(): unexpected length %d", ret);
-> +        return -1;
-> +    }
-> +    return 0;
-> +}
-> +
-> +int android_set_qos_latency(bdaddr_t *ba,  uint32_t latency) {
-> +	int ret;
-> +   	int fd = get_hci_sock();
-> +   	int acl_handle;
-> +
-> +   if (fd < 0)
-> +	   return fd;
-> +
-> +   acl_handle = get_acl_handle(fd, ba);
-> +   if (acl_handle < 0) {
-> +	   ret = acl_handle;
-> +	   goto out;
-> +   }
-> +    ret = android_hci_qos_setup(fd, acl_handle, latency);
-> +    if (ret < 0)
-> +        goto out;
-> +
-> +out:
-> +	   close(fd);
-> +
-> +	   return ret;
-> +}
-> +#else
-> +int android_set_qos_latency(bdaddr_t *ba,  uint32_t latency) {
-> +    return 0;
-> +}
-> +#endif
-> +
+--------------------------------------------------
+From: "Slawomir Bochenski" <lkslawek@gmail.com>
+Sent: Thursday, January 05, 2012 4:45 PM
+To: "Divya Yadav" <divya.yadav@samsung.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH obexd] MAP: Add UpdateInbox Function
+
+> Hi!
+>
+> On Thu, Jan 5, 2012 at 10:43 AM, Divya Yadav <divya.yadav@samsung.com> 
+> wrote:
+>> UpdateInbox function allows remote device to initiate an update of
+>> the server's inbox, i.e. the Map server shall contact the network
+>
+> Maybe better to call it "MSE inbox".
+>
+>> to retrieve new messages if available. If the server does not allow
+>> the network update it shall answer with a 'Not implemented'
+>> error response.
+>
+> More like "does not support" than "does not allow".
+>
+>> ---
+>>  plugins/mas.c              |   32 +++++++++++++++++++++++++++++++-
+>>  plugins/messages-dummy.c   |    7 +++++++
+>>  plugins/messages-tracker.c |   10 +++++++++-
+>>  plugins/messages.h         |   14 ++++++++++++++
+>>  4 files changed, 61 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/plugins/mas.c b/plugins/mas.c
+>> index 3c3104c..639d0b6 100644
+>> --- a/plugins/mas.c
+>> +++ b/plugins/mas.c
+>> @@ -503,6 +503,36 @@ static void *message_open(const char *name, int 
+>> oflag, mode_t mode,
+>>                return mas;
+>>  }
+>>
+>> +static void inbox_update_cb(void *session, int err, void *user_data)
+>
+> Callbacks added previously are all following each other, before the
+> section with *_open functions, so I'd rather move this one up. Also
+> I'd rather call it update_inbox_cb(), to be consistent with the
+> typedef.
+>
+>> +{
+>> +       struct mas_session *mas = user_data;
+>> +
+>> +       DBG("");
+>> +
+>> +       mas->finished = TRUE;
+>> +
+>> +       if (err < 0)
+>> +               obex_object_set_io_flags(mas, G_IO_ERR, err);
+>> +       else
+>> +               obex_object_set_io_flags(mas, G_IO_OUT, 0);
+>> +}
+>> +
+>> +static void *message_update_open(const char *name, int oflag, mode_t 
+>> mode,
+>> +                               void *driver_data, size_t *size, int 
+>> *err)
+>> +{
+>> +       struct mas_session *mas = driver_data;
+>> +
+>> +       DBG("");
+>> +
+>> +       *err = messages_update_inbox(mas->backend_data, inbox_update_cb, 
+>> mas);
+>> +
+>> +       if (*err < 0) {
+>> +               mas->finished = TRUE;
+>
+> No need for this. If open returns NULL, no read/write is going to be 
+> called.
+>
+>> +               return NULL;
+>> +       } else
+>> +               return mas;
+>> +}
+>
+> This function is missing check for oflag value - this MIME type should
+> return error on GET.
+>
+>> +
+>>  static void *any_open(const char *name, int oflag, mode_t mode,
+>>                                void *driver_data, size_t *size, int *err)
+>>  {
+>> @@ -628,7 +658,7 @@ static struct obex_mime_type_driver 
+>> mime_message_update = {
+>>        .target = MAS_TARGET,
+>>        .target_size = TARGET_SIZE,
+>>        .mimetype = "x-bt/MAP-messageUpdate",
+>> -       .open = any_open,
+>> +       .open = message_update_open,
+>>        .close = any_close,
+>>        .read = any_read,
+>>        .write = any_write,
+>> diff --git a/plugins/messages-dummy.c b/plugins/messages-dummy.c
+>> index e96b13b..58f04f6 100644
+>> --- a/plugins/messages-dummy.c
+>> +++ b/plugins/messages-dummy.c
+>> @@ -173,3 +173,10 @@ int messages_get_message(void *session,
+>>  void messages_abort(void *session)
+>>  {
+>>  }
+>> +
+>> +int messages_update_inbox(void *session,
+>> +               messages_update_inbox_cb callback,
+>> +               void *user_data)
+>> +{
+>> +       return -EINVAL;
+>> +}
+>
+> Put this before messages_abort().
+>
+>> diff --git a/plugins/messages-tracker.c b/plugins/messages-tracker.c
+>> index 8f9b30a..6a68b5b 100644
+>> --- a/plugins/messages-tracker.c
+>> +++ b/plugins/messages-tracker.c
+>> @@ -237,7 +237,8 @@ int messages_set_folder(void *s, const char *name, 
+>> gboolean cdup)
+>>        return 0;
+>>  }
+>>
+>> -static gboolean async_get_folder_listing(void *s) {
+>> +static gboolean async_get_folder_listing(void *s)
+>> +{
+>
+> This belongs into a separate patch.
+>
+>>        struct session *session = s;
+>>        gboolean count = FALSE;
+>>        int folder_count = 0;
+>> @@ -324,3 +325,10 @@ int messages_get_message(void *session,
+>>  void messages_abort(void *session)
+>>  {
+>>  }
+>> +
+>> +int messages_update_inbox(void *session,
+>> +               messages_update_inbox_cb callback,
+>> +               void *user_data)
+>> +{
+>> +       return -EINVAL;
+>> +}
+>
+> Same as for messages-dummy.c.
+>
+>> diff --git a/plugins/messages.h b/plugins/messages.h
+>> index 6982edd..ea231a3 100644
+>> --- a/plugins/messages.h
+>> +++ b/plugins/messages.h
+>> @@ -273,3 +273,17 @@ int messages_get_message(void *session,
+>>  * session: Backend session.
+>>  */
+>>  void messages_abort(void *session);
+>> +
+>> +/*  Informs Message Server to Update Inbox via network
+>
+> One space after asterisk, dot at the end.
+>
+>> + *
+>> + * session: Backend session.
+>> + * user_data: User data if any to be sent
+>
+> Missing new line. Also missing dot at the end of second line.
+>
+>> + * Callback shall be called for every update inbox request, where if any 
+>> error
+>> + * should be reported to the remote end.
+>
+> "shall be called once" maybe. Second part not very understandable. I
+> also guess you mean error during initiating inbox update, because the
+> update procedure itself should take place after UpdateInbox MAP
+> request returns.
+>
+>> + */
+>> +typedef void (*messages_update_inbox_cb)(void *session, int err,
+>> +               void *user_data);
+>> +
+>> +int messages_update_inbox(void *session,
+>> +               messages_update_inbox_cb callback,
+>> +               void *user_data);
+>
+> This I'd also like to be moved before messages_abort().
+>
+>> --
+>> 1.7.0.4
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe 
+>> linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> -- 
+> Slawomir Bochenski
+
+Thanks for your valuable comments. I will correct it and send it as multiple 
+patches.
+
+Divya
 > --
-> 1.7.0.4
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-
-> bluetooth" in
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
+> in
 > the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html 
+
