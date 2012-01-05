@@ -1,133 +1,236 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Ilia, Kolominsky" <iliak@ti.com>
+To: "Aj, SanthoshX" <santhoshx.aj@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "Holtmann, Marcel" <marcel.holtmann@intel.com>,
+	"Nair, Rashmi G" <rashmi.g.nair@intel.com>
+Subject: RE: [PATCH] Breaks in A2DP playback during device search
+Date: Thu, 5 Jan 2012 12:07:46 +0000
+Message-ID: <A7CD2DBA66569F478A0C1ECFC39E1C520C9F69E0@DNCE03.ent.ti.com>
+References: <001F63875E1AF5428162B5A2D3ED1BDD8E98@IRSMSX101.ger.corp.intel.com>
+In-Reply-To: <001F63875E1AF5428162B5A2D3ED1BDD8E98@IRSMSX101.ger.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <201201041948.19890.post@hendrik-sattler.de>
-References: <1325598744-18855-1-git-send-email-luiz.dentz@gmail.com>
-	<201201031658.17771.post@hendrik-sattler.de>
-	<CABBYNZK2upSD5i37vNbV7Fcdp65dsnekVYYqmfR4q_cLVwqp_Q@mail.gmail.com>
-	<201201041948.19890.post@hendrik-sattler.de>
-Date: Thu, 5 Jan 2012 14:11:01 +0200
-Message-ID: <CABBYNZJZ1yaswJsrO4G4gdaNENAoJSb85TvdgMQFbUA6vQyiRA@mail.gmail.com>
-Subject: Re: [PATCH obexd 3/4] gobex: automatically use SRM when transport
- type is SOCK_SEQPACKET
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Hendrik Sattler <post@hendrik-sattler.de>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hendrik,
+Hi
+I`d suggest using HCI_Flow_Specification instead, since you
+want to specifly params for outgoing traffic. That command
+allows to do it in a more clearer way, since it accepts the
+direction param.
 
-On Wed, Jan 4, 2012 at 8:48 PM, Hendrik Sattler <post@hendrik-sattler.de> wrote:
->> That is what the OBEX spec says, but GOEP 2.0 says otherwise, actually
->> PUT and GET may also be used without CONNECT and the even the OBEX
->> spec state both PUT, GET and SETPATH supporting SRM headers.
->
-> Using PUT and GET without CONNECT is not very efficient as you limit yourself
-> to the lowest MTU and default inbox (OPP). This was only there for some kind
-> of stateless IrDA connection which does not qualify for the requirements of
-> SRM, anyway
-
-Efficiency was no much of the point here, but what operation do
-support as stated in 2.2.23 Single Response Mode (SRM):
-
-  "This header shall be used during CONNECT, DISCONNECT, SETPATH, PUT
-and GET operations only (see the table below)."
-
-This is also restated in 3. Session Protocol:
-  " 2) Single Response Mode (SRM) can be negotiated during CONNECT,
-PUT, GET, or SETPATH, which will remain enabled until a DISCONNECT or
-OBEX transport disconnect occur."
-
-And it continues stating that SRM can be enable outside of connection scope:
-  "If this mode is enabled outside the scope of an OBEX connection,
-SRM is automatically disabled when the operation that enabled this
-mode completes."
-
-So I can only interpret this statements as PUT and GET can be used to
-enable SRM at any point like GOEP 2.0 is doing.
-
-Now after that comes an interesting part, and that one I think makes
-GOEP 2.0 to not adopt SRM headers on CONNECT is the following:
-"This mode will allow multiple outstanding request or response packets
-during the context of an OBEX connection (or OBEX operation). Since
-SRM allows multiple outstanding packets, this mode also makes
-available the ability for multiple outstanding OBEX operations to
-exist at a time."
-
-Now look at the example 7.14 PUT and GET during Single Response Mode (SRM):
-
-"Start GET operation without waiting for the Server to respond to the
-outstanding PUT operation. Since only one response occurs per
-operation, it is known that the first Server response packet will
-pertain to the PUT operation."
-
-I believe this is why GOEP 2.0 want to avoid using SRM per connection,
-because multiple outstanding operations are not very easy to be
-handled without an id/serial to identify them which OBEX doesn't have,
-for instance there could be SRMP headers in responses which alters SRM
-and breaks the assumption that only one response occurs per operation.
-IMO what the OBEX spec writer suggests is that the operations are
-queued by the server, so it only starts responding once the previous
-operation is finished, but this doesn't have any benefit over enabling
-SRM per operation as GOEP 2.0 suggests.
-
->> > Additionally, the spec says:
->> > "Client devices supporting SRM must issue a Single Response Mode (SRM)
->> > header [...] during all CONNECT requests [...]".
->>
->> That is still possible, by adding the headers manually, but
->
-> How should the application ever know better than the part that implements the
-> low-level details of OBEX? That is a very unlikely case.
-
-I mean we have an API to add headers to a packet which the application
-can use to modify the behavior in e.g. CONNECT, but we won't be adding
-this headers automatically because there are not always recommended by
-specification using OBEX as GOEP 2.0. The impact is minimal since we
-still enable SRM per operation.
-
->> automatically configuration will only be done for PUT/GET because of
->> the way GOEP 2.0 is using SRM restrict that:
->> >   "SRM headers shall not be sent in the Connect request or response
->> >   packets (note, this is to preserve backwards compatibility). SRM shall
->> >   be enabled through Put and Get operations only."
->>
->> You can get GOEP 2.0 from bluetooth.org, you might find it interesting
->> specially the examples are completely different from the ones OBEX
->> spec has and we have to support them both.
->
-> I have read that. BTW, it should be noticed that GOEP v2.0 references OBEX
-> v1.5, not v1.4. Maybe those differences come from the latest OBEX
-> specification?
-
-Good point, I don't have 1.5 yet, hope to get some clarification about
-it during the next UPF.
-
-> Also note that the first example (page 14) is _wrong_ as the "SRM disabled" in
-> the last line of the table is wrong. See all following examples that do not
-> have the entry. Also, this would directly contradict the OBEX specification.
-> The Bluetooth spec should get an errata for this, ASAP, as this will most
-> likely cause interoperability issues.
-
-The way the author appears to interpret is that if SRM was enable in
-PUT/GET it will remain active only during that operation:
-
-GOEP 2.0 Page 1.4 - 4.6 Using Single Response Mode:
-
-"SRM will remain in effect for the duration of the operation that
-enabled it (PUT or GET), at which time it will automatically be
-disabled and revert back to the normal GOEP request/response model."
-
-OBEX spec says that if SRM is enabled during the connection context it
-is valid to all subsequent operations, I guess GOEP 2.0 interpret
-context as just within CONNECT request/response. Again I think this is
-to avoid having to support multiple outstanding operations, but it is
-not stated anywhere so it is just my guess.
-
-> SRM is a complete mess, anyway.
-
-Indeed.
-
--- 
-Luiz Augusto von Dentz
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Aj, SanthoshX
+> Sent: Thursday, January 05, 2012 6:39 AM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: Holtmann, Marcel; Nair, Rashmi G
+> Subject: [PATCH] Breaks in A2DP playback during device search
+> 
+> From 8ecb4074305613a113d1c8dd220ab856c5f7ebc1 Mon Sep 17 00:00:00 2001
+> From: Santhosh <santhoshx.aj@intel.com>
+> Date: Wed, 4 Jan 2012 12:44:37 +0530
+> Subject: [PATCH] To change the latency of controller
+>  This change is done to fix the a2dp breaks as the IMC controller
+>  expects the latency to be set explicitly by calling HCI QoS setup
+> 
+> ---
+>  audio/device.c         |    7 +++
+>  common/Android.mk      |    3 +-
+>  common/android_bluez.c |  111 ++++++++++++++++++++++++++++++++++++++--
+> -------
+>  3 files changed, 98 insertions(+), 23 deletions(-)
+> 
+> diff --git a/audio/device.c b/audio/device.c
+> index 9662dec..3e30ea3 100644
+> --- a/audio/device.c
+> +++ b/audio/device.c
+> @@ -66,6 +66,9 @@
+>  #define AVDTP_CONNECT_TIMEOUT 1
+>  #define HEADSET_CONNECT_TIMEOUT 1
+> 
+> +#define QoS_LATENCY_12_MS 0x00002EE0  // 12 ms
+> +#define QoS_LATENCY_25_MS 0x000061A8  // 25 ms
+> +
+>  typedef enum {
+>  	AUDIO_STATE_DISCONNECTED,
+>  	AUDIO_STATE_CONNECTING,
+> @@ -341,6 +344,9 @@ static void device_sink_cb(struct audio_device
+> *dev,
+> 
+>  	switch (new_state) {
+>  	case SINK_STATE_DISCONNECTED:
+> +#ifdef ANDROID
+> +		android_set_qos_latency(&dev->dst,QoS_LATENCY_25_MS);
+> +#endif
+>  		if (dev->control) {
+>  			device_remove_control_timer(dev);
+>  			avrcp_disconnect(dev);
+> @@ -368,6 +374,7 @@ static void device_sink_cb(struct audio_device
+> *dev,
+>  			break;
+>  #ifdef ANDROID
+>  		android_set_high_priority(&dev->dst);
+> +		android_set_qos_latency(&dev->dst,QoS_LATENCY_12_MS);
+>  #endif
+>  		if (dev->auto_connect) {
+>  			if (!dev->headset)
+> diff --git a/common/Android.mk b/common/Android.mk
+> index 74c0bec..38d6b23 100644
+> --- a/common/Android.mk
+> +++ b/common/Android.mk
+> @@ -13,7 +13,8 @@ LOCAL_SRC_FILES:= \
+> 
+>  LOCAL_CFLAGS+= \
+>  	-O3 \
+> -	-DNEED_DBUS_WATCH_GET_UNIX_FD
+> +	-DNEED_DBUS_WATCH_GET_UNIX_FD \
+> +	-DBOARD_HAVE_BLUETOOTH_IMC
+> 
+>  ifeq ($(BOARD_HAVE_BLUETOOTH_BCM),true)
+>  LOCAL_CFLAGS += \
+> diff --git a/common/android_bluez.c b/common/android_bluez.c
+> index be85563..3f3b849 100644
+> --- a/common/android_bluez.c
+> +++ b/common/android_bluez.c
+> @@ -78,28 +78,6 @@ static int write_flush_timeout(int fd, uint16_t
+> handle,
+>      return 0;
+>  }
+> 
+> -#ifdef BOARD_HAVE_BLUETOOTH_BCM
+> -static int vendor_high_priority(int fd, uint16_t handle) {
+> -    unsigned char hci_sleep_cmd[] = {
+> -        0x01,               // HCI command packet
+> -        0x57, 0xfc,         // HCI_Write_High_Priority_Connection
+> -        0x02,               // Length
+> -        0x00, 0x00          // Handle
+> -    };
+> -
+> -    hci_sleep_cmd[4] = (uint8_t)handle;
+> -    hci_sleep_cmd[5] = (uint8_t)(handle >> 8);
+> -
+> -    int ret = write(fd, hci_sleep_cmd, sizeof(hci_sleep_cmd));
+> -    if (ret < 0) {
+> -        error("write(): %s (%d)]", strerror(errno), errno);
+> -        return -1;
+> -    } else if (ret != sizeof(hci_sleep_cmd)) {
+> -        error("write(): unexpected length %d", ret);
+> -        return -1;
+> -    }
+> -    return 0;
+> -}
+> 
+>  static int get_hci_sock() {
+>      int sock = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+> @@ -167,6 +145,30 @@ out:
+>      return ret;
+>  }
+> 
+> +
+> +#ifdef BOARD_HAVE_BLUETOOTH_BCM
+> +static int vendor_high_priority(int fd, uint16_t handle) {
+> +    unsigned char hci_sleep_cmd[] = {
+> +        0x01,               // HCI command packet
+> +        0x57, 0xfc,         // HCI_Write_High_Priority_Connection
+> +        0x02,               // Length
+> +        0x00, 0x00          // Handle
+> +    };
+> +
+> +    hci_sleep_cmd[4] = (uint8_t)handle;
+> +    hci_sleep_cmd[5] = (uint8_t)(handle >> 8);
+> +
+> +    int ret = write(fd, hci_sleep_cmd, sizeof(hci_sleep_cmd));
+> +    if (ret < 0) {
+> +        error("write(): %s (%d)]", strerror(errno), errno);
+> +        return -1;
+> +    } else if (ret != sizeof(hci_sleep_cmd)) {
+> +        error("write(): unexpected length %d", ret);
+> +        return -1;
+> +    }
+> +    return 0;
+> +}
+> +
+>  /* Request that the ACL link to a given Bluetooth connection be high
+> priority,
+>   * for improved coexistance support
+>   */
+> @@ -202,3 +204,68 @@ int android_set_high_priority(bdaddr_t *ba) {
+>  }
+> 
+>  #endif
+> +
+> +#ifdef BOARD_HAVE_BLUETOOTH_IMC
+> +
+> +static int android_hci_qos_setup(int fd, uint16_t handle, uint32_t
+> latency) {
+> +    unsigned char hci_qos_cmd[] = {
+> +
+> +	0x01, 					// HCI command packet
+> +	0x07, 0x08, 			// QoS Setup Command
+> +	0x14, 					// Length
+> +	0x00, 0x01, 			// Connection_Handle
+> +	0x00, 					//Flags
+> +	0x01, 					//Service_Type
+> +	0x00, 0x00, 0xE1, 0x00, //Token_Rate
+> +	0x00, 0x00, 0x00, 0x00, //Peak_Bandwidth
+> +	0xE0, 0x2E, 0x00, 0x00, //Latency
+> +	0x00, 0x00, 0x00, 0x00	//Delay_Variation
+> +	};
+> +
+> +    hci_qos_cmd[4] = (uint8_t)handle;
+> +    hci_qos_cmd[5] = (uint8_t)(handle >> 8);
+> +
+> +	hci_qos_cmd[16] = (uint8_t)latency;
+> +    hci_qos_cmd[17] = (uint8_t)(latency >> 8);
+> +	hci_qos_cmd[18] = (uint8_t)(latency >> 16);
+> +	hci_qos_cmd[19] = (uint8_t)(latency >> 24);
+> +
+> +	int ret = write(fd, hci_qos_cmd, sizeof(hci_qos_cmd));
+> +    if (ret < 0) {
+> +        error("write(): %s (%d)]", strerror(errno), errno);
+> +        return -1;
+> +    } else if (ret != sizeof(hci_qos_cmd)) {
+> +        error("write(): unexpected length %d", ret);
+> +        return -1;
+> +    }
+> +    return 0;
+> +}
+> +
+> +int android_set_qos_latency(bdaddr_t *ba,  uint32_t latency) {
+> +	int ret;
+> +   	int fd = get_hci_sock();
+> +   	int acl_handle;
+> +
+> +   if (fd < 0)
+> +	   return fd;
+> +
+> +   acl_handle = get_acl_handle(fd, ba);
+> +   if (acl_handle < 0) {
+> +	   ret = acl_handle;
+> +	   goto out;
+> +   }
+> +    ret = android_hci_qos_setup(fd, acl_handle, latency);
+> +    if (ret < 0)
+> +        goto out;
+> +
+> +out:
+> +	   close(fd);
+> +
+> +	   return ret;
+> +}
+> +#else
+> +int android_set_qos_latency(bdaddr_t *ba,  uint32_t latency) {
+> +    return 0;
+> +}
+> +#endif
+> +
+> --
+> 1.7.0.4
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-
+> bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
