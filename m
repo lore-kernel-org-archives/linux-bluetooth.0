@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/9] Bluetooth: Move Extended Inquiry Response defines to hci.h
-Date: Thu,  5 Jan 2012 17:16:16 +0200
-Message-Id: <1325776582-10314-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/9] Bluetooth: Convert inquiry cache to use standard list types
+Date: Thu,  5 Jan 2012 17:16:15 +0200
+Message-Id: <1325776582-10314-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1325776582-10314-1-git-send-email-johan.hedberg@gmail.com>
 References: <1325776582-10314-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,63 +11,142 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The EIR defines are needed also outside of mgmt.c (e.g. in hci_event.c
-to check if EIR data has the complete name) so it's better to have them
-in a single public place, i.e. hci.h.
+This makes it possible to use the convenience functions provided for
+standard kernel list types and it also makes it easier to extend the use
+of the cache for the management interface where e.g. name resolving
+control will be needed.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci.h |   13 +++++++++++++
- net/bluetooth/mgmt.c        |   12 ------------
- 2 files changed, 13 insertions(+), 12 deletions(-)
+ include/net/bluetooth/hci_core.h |   10 ++++------
+ net/bluetooth/hci_core.c         |   31 +++++++++++++++++--------------
+ net/bluetooth/hci_sysfs.c        |    2 +-
+ 3 files changed, 22 insertions(+), 21 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 5b2fed5..ce5133b 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -284,6 +284,19 @@ enum {
- #define HCI_FLOW_CTL_MODE_PACKET_BASED	0x00
- #define HCI_FLOW_CTL_MODE_BLOCK_BASED	0x01
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index ea9231f..91d1baf 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -44,14 +44,14 @@ struct inquiry_data {
+ };
  
-+/* Extended Inquiry Response field types */
-+#define EIR_FLAGS		0x01 /* flags */
-+#define EIR_UUID16_SOME		0x02 /* 16-bit UUID, more available */
-+#define EIR_UUID16_ALL		0x03 /* 16-bit UUID, all listed */
-+#define EIR_UUID32_SOME		0x04 /* 32-bit UUID, more available */
-+#define EIR_UUID32_ALL		0x05 /* 32-bit UUID, all listed */
-+#define EIR_UUID128_SOME	0x06 /* 128-bit UUID, more available */
-+#define EIR_UUID128_ALL		0x07 /* 128-bit UUID, all listed */
-+#define EIR_NAME_SHORT		0x08 /* shortened local name */
-+#define EIR_NAME_COMPLETE	0x09 /* complete local name */
-+#define EIR_TX_POWER		0x0A /* transmit power level */
-+#define EIR_DEVICE_ID		0x10 /* device ID */
-+
- /* -----  HCI Commands ---- */
- #define HCI_OP_NOP			0x0000
+ struct inquiry_entry {
+-	struct inquiry_entry	*next;
++	struct list_head	list;
+ 	__u32			timestamp;
+ 	struct inquiry_data	data;
+ };
  
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index bc8e59d..851cb19 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -303,18 +303,6 @@ static u32 get_current_settings(struct hci_dev *hdev)
- 	return settings;
+ struct inquiry_cache {
++	struct list_head	list;
+ 	__u32			timestamp;
+-	struct inquiry_entry	*list;
+ };
+ 
+ struct hci_conn_hash {
+@@ -350,14 +350,12 @@ extern int sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb);
+ 
+ static inline void inquiry_cache_init(struct hci_dev *hdev)
+ {
+-	struct inquiry_cache *c = &hdev->inq_cache;
+-	c->list = NULL;
++	INIT_LIST_HEAD(&hdev->inq_cache.list);
  }
  
--#define EIR_FLAGS		0x01 /* flags */
--#define EIR_UUID16_SOME		0x02 /* 16-bit UUID, more available */
--#define EIR_UUID16_ALL		0x03 /* 16-bit UUID, all listed */
--#define EIR_UUID32_SOME		0x04 /* 32-bit UUID, more available */
--#define EIR_UUID32_ALL		0x05 /* 32-bit UUID, all listed */
--#define EIR_UUID128_SOME	0x06 /* 128-bit UUID, more available */
--#define EIR_UUID128_ALL		0x07 /* 128-bit UUID, all listed */
--#define EIR_NAME_SHORT		0x08 /* shortened local name */
--#define EIR_NAME_COMPLETE	0x09 /* complete local name */
--#define EIR_TX_POWER		0x0A /* transmit power level */
--#define EIR_DEVICE_ID		0x10 /* device ID */
--
- #define PNP_INFO_SVCLASS_ID		0x1200
+ static inline int inquiry_cache_empty(struct hci_dev *hdev)
+ {
+-	struct inquiry_cache *c = &hdev->inq_cache;
+-	return c->list == NULL;
++	return list_empty(&hdev->inq_cache.list);
+ }
  
- static u8 bluetooth_base_uuid[] = {
+ static inline long inquiry_cache_age(struct hci_dev *hdev)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 52edc11..39214e1 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -357,15 +357,11 @@ struct hci_dev *hci_dev_get(int index)
+ /* ---- Inquiry support ---- */
+ static void inquiry_cache_flush(struct hci_dev *hdev)
+ {
+-	struct inquiry_cache *cache = &hdev->inq_cache;
+-	struct inquiry_entry *next  = cache->list, *e;
+-
+-	BT_DBG("cache %p", cache);
++	struct inquiry_entry *p, *n;
+ 
+-	cache->list = NULL;
+-	while ((e = next)) {
+-		next = e->next;
+-		kfree(e);
++	list_for_each_entry_safe(p, n, &hdev->inq_cache.list, list) {
++		list_del(&p->list);
++		kfree(p);
+ 	}
+ }
+ 
+@@ -376,10 +372,12 @@ struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev, bdaddr_t *b
+ 
+ 	BT_DBG("cache %p, %s", cache, batostr(bdaddr));
+ 
+-	for (e = cache->list; e; e = e->next)
++	list_for_each_entry(e, &cache->list, list) {
+ 		if (!bacmp(&e->data.bdaddr, bdaddr))
+-			break;
+-	return e;
++			return e;
++	}
++
++	return NULL;
+ }
+ 
+ void hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data)
+@@ -396,8 +394,7 @@ void hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data)
+ 		if (!ie)
+ 			return;
+ 
+-		ie->next = cache->list;
+-		cache->list = ie;
++		list_add(&ie->list, &cache->list);
+ 	}
+ 
+ 	memcpy(&ie->data, data, sizeof(*data));
+@@ -412,15 +409,21 @@ static int inquiry_cache_dump(struct hci_dev *hdev, int num, __u8 *buf)
+ 	struct inquiry_entry *e;
+ 	int copied = 0;
+ 
+-	for (e = cache->list; e && copied < num; e = e->next, copied++) {
++	list_for_each_entry(e, &cache->list, list) {
+ 		struct inquiry_data *data = &e->data;
++
++		if (copied >= num)
++			break;
++
+ 		bacpy(&info->bdaddr, &data->bdaddr);
+ 		info->pscan_rep_mode	= data->pscan_rep_mode;
+ 		info->pscan_period_mode	= data->pscan_period_mode;
+ 		info->pscan_mode	= data->pscan_mode;
+ 		memcpy(info->dev_class, data->dev_class, 3);
+ 		info->clock_offset	= data->clock_offset;
++
+ 		info++;
++		copied++;
+ 	}
+ 
+ 	BT_DBG("cache %p, copied %d", cache, copied);
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 5210956..ed9ccee 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -388,7 +388,7 @@ static int inquiry_cache_show(struct seq_file *f, void *p)
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	for (e = cache->list; e; e = e->next) {
++	list_for_each_entry(e, &cache->list, list) {
+ 		struct inquiry_data *data = &e->data;
+ 		seq_printf(f, "%s %d %d %d 0x%.2x%.2x%.2x 0x%.4x %d %d %u\n",
+ 			   batostr(&data->bdaddr),
 -- 
 1.7.7.3
 
