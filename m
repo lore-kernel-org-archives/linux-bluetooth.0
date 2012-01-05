@@ -1,163 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hendrik Sattler <post@hendrik-sattler.de>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: Re: [PATCH obexd 3/4] gobex: automatically use SRM when transport type is SOCK_SEQPACKET
-Date: Thu, 5 Jan 2012 23:40:54 +0100
+Date: Thu, 5 Jan 2012 17:57:34 +0100
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: Thomas Perl <th.perl@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-References: <1325598744-18855-1-git-send-email-luiz.dentz@gmail.com> <201201041948.19890.post@hendrik-sattler.de> <CABBYNZJZ1yaswJsrO4G4gdaNENAoJSb85TvdgMQFbUA6vQyiRA@mail.gmail.com>
-In-Reply-To: <CABBYNZJZ1yaswJsrO4G4gdaNENAoJSb85TvdgMQFbUA6vQyiRA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201201052340.55020.post@hendrik-sattler.de>
+Subject: Re: Device-initiated HID connections: How to pair? (PS Move)
+Message-Id: <20120105175734.84f51f316f4069b9c4d5375d@studenti.unina.it>
+In-Reply-To: <CA+uOhx5kPJd8efy+AOsMURN61buitD5v==n7Xfanr9RuNUywxw@mail.gmail.com>
+References: <CA+uOhx5kPJd8efy+AOsMURN61buitD5v==n7Xfanr9RuNUywxw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Thu__5_Jan_2012_17_57_35_+0100_PT7PyUMtoL+EJojd"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am Donnerstag, 5. Januar 2012, 13:11:01 schrieb Luiz Augusto von Dentz:
-> Hi Hendrik,
-> 
-> On Wed, Jan 4, 2012 at 8:48 PM, Hendrik Sattler <post@hendrik-sattler.de> 
-wrote:
-> >> That is what the OBEX spec says, but GOEP 2.0 says otherwise, actually
-> >> PUT and GET may also be used without CONNECT and the even the OBEX
-> >> spec state both PUT, GET and SETPATH supporting SRM headers.
-> > 
-> > Using PUT and GET without CONNECT is not very efficient as you limit
-> > yourself to the lowest MTU and default inbox (OPP). This was only there
-> > for some kind of stateless IrDA connection which does not qualify for
-> > the requirements of SRM, anyway
-> 
-> Efficiency was no much of the point here, but what operation do
-> support as stated in 2.2.23 Single Response Mode (SRM):
-> 
->   "This header shall be used during CONNECT, DISCONNECT, SETPATH, PUT
-> and GET operations only (see the table below)."
-> 
-> This is also restated in 3. Session Protocol:
->   " 2) Single Response Mode (SRM) can be negotiated during CONNECT,
-> PUT, GET, or SETPATH, which will remain enabled until a DISCONNECT or
-> OBEX transport disconnect occur."
-> 
-> And it continues stating that SRM can be enable outside of connection
-> scope: "If this mode is enabled outside the scope of an OBEX connection,
-> SRM is automatically disabled when the operation that enabled this mode
-> completes."
+--Signature=_Thu__5_Jan_2012_17_57_35_+0100_PT7PyUMtoL+EJojd
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I guess this is only specified if there is ever a transport that actually 
-specifies this. GOEP v2.0 does not do that.
+On Thu, 5 Jan 2012 14:07:25 +0100
+Thomas Perl <th.perl@gmail.com> wrote:
 
-> So I can only interpret this statements as PUT and GET can be used to
-> enable SRM at any point like GOEP 2.0 is doing.
+> Hi,
+>=20
+> I'm working on getting the PS Move Controller to work with Linux[1].
+> Right now, I'm disabling bluetoothd's "input" plugin and listen to the
+> two l2cap sockets directly, which is ugly and prevents using "normal"
+> Bluetooth HID devices together with a PS Move controller. Ideally, I
+> want bluetoothd to accept the connection and use Linux' hidraw
+> interface to communicate with the controller. The GUI pairing in GNOME
+> 3 doesn't work, no matter what PIN mode (automatic, 0000, do not pair)
+> I select. On Windows, it works after pairing it without PIN, and OS X
+> apparently allows the connection without any question or pairing.
+>
 
-Yes.
+I worked on the Sixaxis pairing and the mechanism should be similar
+read below.
 
-> Now after that comes an interesting part, and that one I think makes
-> GOEP 2.0 to not adopt SRM headers on CONNECT is the following:
-> "This mode will allow multiple outstanding request or response packets
-> during the context of an OBEX connection (or OBEX operation). Since
-> SRM allows multiple outstanding packets, this mode also makes
-> available the ability for multiple outstanding OBEX operations to
-> exist at a time."
-> 
-> Now look at the example 7.14 PUT and GET during Single Response Mode (SRM):
+> Is there any way to tell bluetoothd "here's a Bluetooth address, and
+> if you get a HID connection from it, accept the connection"? I added
+> an entry "XX:XX:XX:XX:XX:XX [all]" to
+> /var/lib/bluetooth/YY:YY:YY:YY:YY:YY/trusts, but this entry gets
+> removed at first connection (the X-address being the controller's
+> address and the Y-address being my host adapter's address) and I'm
+> pretty sure that I'm not supposed to hand-edit files in
+> /var/lib/bluetooth/ ;) When pressing the PS button on the controller
+> (which tries to establish a Bluetooth connection with the host), I
+> get:
+>=20
+> bluetoothd[5487]: Refusing input device connect: No such file or director=
+y (2)
+>
 
-This example is the core of the SRM mess.
+Just setting the "trust" file is not enough TTBOMK, you have to set also
+a "did" (device ID? ) file with the SDP record relative to the device.
 
-> "Start GET operation without waiting for the Server to respond to the
-> outstanding PUT operation. Since only one response occurs per
-> operation, it is known that the first Server response packet will
-> pertain to the PUT operation."
-> 
-> I believe this is why GOEP 2.0 want to avoid using SRM per connection,
-> because multiple outstanding operations are not very easy to be
-> handled without an id/serial to identify them which OBEX doesn't have,
-> for instance there could be SRMP headers in responses which alters SRM
-> and breaks the assumption that only one response occurs per operation.
+> The pairing works about the same way as with the Sixaxis controller
+> (use USB HID feature reports to "upload" the Bluetooth host address to
+> the controller, and then the controller will connect to this address
+> as HID device).
+>
 
-No. Unless the server does not correctly handle SRM, this assumption is not 
-broken. The main problem is actually when sending an ABORT after the GET that 
-comes too late. Then you get responses: one SUCCESS for GET and one SUCCESS 
-for ABORT instead of one SUCCESS for GET. This can break the synchronisation 
-of client and server and the writers of the OBEX spec did not consider this.
+Are the Feature reports the same as the Sixaxis? (0xF2 to read the
+device bdaddr and 0xF5 to read and write the master bdaddr?).
 
-> IMO what the OBEX spec writer suggests is that the operations are
-> queued by the server, so it only starts responding once the previous
-> operation is finished, but this doesn't have any benefit over enabling
-> SRM per operation as GOEP 2.0 suggests.
+> I'd be also be grateful for any hints on where to start writing a
+> patch if device-initiated HID connections are not supported - I dug
+> around a bit in bluetoothd's input module code, but got stuck.
+>=20
 
-And there is the problem: "SRM per operation" is not specified by OBEX v1.4. 
-There, it is always "SRM per connection", so this must be something new from 
-OBEX v1.5.
+Check out these patches for the BlueZ playstation-peripheral plugin:
 
-> >> > Additionally, the spec says:
-> >> > "Client devices supporting SRM must issue a Single Response Mode (SRM)
-> >> > header [...] during all CONNECT requests [...]".
-> >> 
-> >> That is still possible, by adding the headers manually, but
-> > 
-> > How should the application ever know better than the part that implements
-> > the low-level details of OBEX? That is a very unlikely case.
-> 
-> I mean we have an API to add headers to a packet which the application
-> can use to modify the behavior in e.g. CONNECT, but we won't be adding
-> this headers automatically because there are not always recommended by
-> specification using OBEX as GOEP 2.0. The impact is minimal since we
-> still enable SRM per operation.
-> 
-> >> automatically configuration will only be done for PUT/GET because of
-> >> 
-> >> the way GOEP 2.0 is using SRM restrict that:
-> >> >   "SRM headers shall not be sent in the Connect request or response
-> >> >   packets (note, this is to preserve backwards compatibility). SRM
-> >> > shall be enabled through Put and Get operations only."
-> >> 
-> >> You can get GOEP 2.0 from bluetooth.org, you might find it interesting
-> >> specially the examples are completely different from the ones OBEX
-> >> spec has and we have to support them both.
-> > 
-> > I have read that. BTW, it should be noticed that GOEP v2.0 references
-> > OBEX v1.5, not v1.4. Maybe those differences come from the latest OBEX
-> > specification?
-> 
-> Good point, I don't have 1.5 yet, hope to get some clarification about
-> it during the next UPF.
-> 
-> > Also note that the first example (page 14) is _wrong_ as the "SRM
-> > disabled" in the last line of the table is wrong. See all following
-> > examples that do not have the entry. Also, this would directly
-> > contradict the OBEX specification. The Bluetooth spec should get an
-> > errata for this, ASAP, as this will most likely cause interoperability
-> > issues.
-> 
-> The way the author appears to interpret is that if SRM was enable in
-> PUT/GET it will remain active only during that operation:
-> 
-> GOEP 2.0 Page 1.4 - 4.6 Using Single Response Mode:
-> 
-> "SRM will remain in effect for the duration of the operation that
-> enabled it (PUT or GET), at which time it will automatically be
-> disabled and revert back to the normal GOEP request/response model."
-> 
-> OBEX spec says that if SRM is enabled during the connection context it
-> is valid to all subsequent operations, I guess GOEP 2.0 interpret
-> context as just within CONNECT request/response. Again I think this is
-> to avoid having to support multiple outstanding operations, but it is
-> not stated anywhere so it is just my guess.
+http://ao2.it/tmp/__tmp_bluez_playstation-peripheral_plugin.patch
 
-This must be from OBEX v1.5. Good guess, then :-)
-Strange enough they chose to support SRM but only a less efficient setup (you 
-still have twice as much RTTs for each PUT and GET than with SRM enabled with 
-CONNECT.
+(apply with "git am" on top of 474c85f), in particular the
+btd_device_set_trusted() bits (use a clean /var/lib/bluetooth for a
+sane run).
 
-Unrelated to this new information about SRM, I saw this in GOEP v2.0:
-"The non-Body headers such as Name or Description that may exceed the allowed
-OBEX packet size may be issued multiple times in consecutive packets within a 
-single PUT/GET operation."
+The plugin supports only the sixaxis for now, but it is written
+with other devices in mind. Tell me if you want me to add you to the CC
+list when I submit them again for inclusion in BlueZ.
 
-Does this mean that the value of a second NAME header gets appended to the 
-value of the first NAME header? Ouch.
+Regards,
+   Antonio
 
-HS
+P.S. Thomas you can contact me on IRC or via XMPP/Gtalk as well, look at
+http://ao2.it/en/contact
 
+--=20
+Antonio Ospite
+http://ao2.it
 
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
 
+--Signature=_Thu__5_Jan_2012_17_57_35_+0100_PT7PyUMtoL+EJojd
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk8F1n8ACgkQ5xr2akVTsAEYgACfeN7TV+BtTnQez6a+tIuNGsrI
+3VQAmQGbxgow6vAECdlYswJdixzk+6JD
+=0mhw
+-----END PGP SIGNATURE-----
+
+--Signature=_Thu__5_Jan_2012_17_57_35_+0100_PT7PyUMtoL+EJojd--
