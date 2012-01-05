@@ -1,31 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Scott James Remnant <keybuk@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Scott James Remnant <keybuk@chromium.org>
-Subject: [PATCH] build: increase check requirement to 0.9.6
-Date: Thu,  5 Jan 2012 17:07:11 -0800
-Message-Id: <1325812031-28953-1-git-send-email-keybuk@chromium.org>
+Message-ID: <1325805036.6454.70.camel@aeonflux>
+Subject: Re: [PATCH 1/9] Bluetooth: Fix persistency of the HCI_MGMT flag
+From: Marcel Holtmann <marcel@holtmann.org>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 05 Jan 2012 15:10:36 -0800
+In-Reply-To: <1325776582-10314-2-git-send-email-johan.hedberg@gmail.com>
+References: <1325776582-10314-1-git-send-email-johan.hedberg@gmail.com>
+	 <1325776582-10314-2-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ck_assert, used by unit/test-eir.c wasn't added to check until 0.9.6
----
- acinclude.m4 |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Hi Johan,
 
-diff --git a/acinclude.m4 b/acinclude.m4
-index 753b994..0aa1526 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -171,7 +171,7 @@ AC_DEFUN([AC_PATH_READLINE], [
- ])
- 
- AC_DEFUN([AC_PATH_CHECK], [
--	PKG_CHECK_MODULES(CHECK, check >= 0.9.4, check_found=yes, check_found=no)
-+	PKG_CHECK_MODULES(CHECK, check >= 0.9.6, check_found=yes, check_found=no)
- 	AC_SUBST(CHECK_CFLAGS)
- 	AC_SUBST(CHECK_LIBS)
- ])
--- 
-1.7.3.1
+> The HCI_MGMT flag needs to remain set even after closing an HCI device.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/hci_core.c |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 6d38d80..52edc11 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -670,8 +670,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+>  	mgmt_powered(hdev, 0);
+>  	hci_dev_unlock(hdev);
+>  
+> -	/* Clear flags */
+> -	hdev->flags = 0;
+> +	/* Clear flags, except persistent ones like HCI_MGMT */
+> +	hdev->flags &= BIT(HCI_MGMT);
+>  
+>  	hci_req_unlock(hdev);
+>  
+
+can we just move this away from hdev->flags into a hdev->dev_flags.
+
+Regards
+
+Marcel
+
 
