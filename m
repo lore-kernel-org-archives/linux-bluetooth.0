@@ -1,132 +1,208 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] l2test: Add option 'H' to set socket receive buffer size
-Date: Thu, 5 Jan 2012 10:23:38 +0100
-Message-ID: <1325755419-6157-1-git-send-email-szymon.janc@tieto.com>
+From: "Aj, SanthoshX" <santhoshx.aj@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "Holtmann, Marcel" <marcel.holtmann@intel.com>,
+	"Nair, Rashmi G" <rashmi.g.nair@intel.com>
+Subject: [PATCH] Breaks in A2DP playback during device search
+Date: Thu, 5 Jan 2012 04:39:18 +0000
+Message-ID: <001F63875E1AF5428162B5A2D3ED1BDD8E98@IRSMSX101.ger.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Size is set using SO_RCVBUF, see man 7 socket for more details.
----
- test/l2test.c |   49 ++++++++++++++++++++++++++++++++++++++++++++-----
- 1 files changed, 44 insertions(+), 5 deletions(-)
+>From 8ecb4074305613a113d1c8dd220ab856c5f7ebc1 Mon Sep 17 00:00:00 2001
+From: Santhosh <santhoshx.aj@intel.com>
+Date: Wed, 4 Jan 2012 12:44:37 +0530
+Subject: [PATCH] To change the latency of controller
+ This change is done to fix the a2dp breaks as the IMC controller
+ expects the latency to be set explicitly by calling HCI QoS setup
 
-diff --git a/test/l2test.c b/test/l2test.c
-index 5034775..35f8ce3 100644
---- a/test/l2test.c
-+++ b/test/l2test.c
-@@ -112,6 +112,7 @@ static int reliable = 0;
- static int timestamp = 0;
- static int defer_setup = 0;
- static int priority = -1;
-+static int rcvbuf = 0;
+---
+ audio/device.c         |    7 +++
+ common/Android.mk      |    3 +-
+ common/android_bluez.c |  111 ++++++++++++++++++++++++++++++++++++++---------
+ 3 files changed, 98 insertions(+), 23 deletions(-)
+
+diff --git a/audio/device.c b/audio/device.c
+index 9662dec..3e30ea3 100644
+--- a/audio/device.c
++++ b/audio/device.c
+@@ -66,6 +66,9 @@
+ #define AVDTP_CONNECT_TIMEOUT 1
+ #define HEADSET_CONNECT_TIMEOUT 1
  
- static struct {
- 	char	*name;
-@@ -309,6 +310,21 @@ static int do_connect(char *svr)
- 		goto error;
- 	}
- 
-+	/* Set receive buffer size */
-+	if (rcvbuf && setsockopt(sk, SOL_SOCKET, SO_RCVBUF,
-+						&rcvbuf, sizeof(rcvbuf)) < 0) {
-+		syslog(LOG_ERR, "Can't set socket rcv buf size: %s (%d)",
-+							strerror(errno), errno);
-+		goto error;
-+	}
++#define QoS_LATENCY_12_MS 0x00002EE0  // 12 ms
++#define QoS_LATENCY_25_MS 0x000061A8  // 25 ms
 +
-+	optlen = sizeof(rcvbuf);
-+	if (getsockopt(sk, SOL_SOCKET, SO_RCVBUF, &rcvbuf, &optlen) < 0) {
-+		syslog(LOG_ERR, "Can't get socket rcv buf size: %s (%d)",
-+							strerror(errno), errno);
-+		goto error;
-+	}
-+
- 	/* Connect to remote device */
- 	memset(&addr, 0, sizeof(addr));
- 	addr.l2_family = AF_BLUETOOTH;
-@@ -360,9 +376,10 @@ static int do_connect(char *svr)
- 	}
+ typedef enum {
+ 	AUDIO_STATE_DISCONNECTED,
+ 	AUDIO_STATE_CONNECTING,
+@@ -341,6 +344,9 @@ static void device_sink_cb(struct audio_device *dev,
  
- 	syslog(LOG_INFO, "Connected [imtu %d, omtu %d, flush_to %d, "
--		"mode %d, handle %d, class 0x%02x%02x%02x, priority %d]",
-+		"mode %d, handle %d, class 0x%02x%02x%02x, priority %d, rcvbuf %d]",
- 		opts.imtu, opts.omtu, opts.flush_to, opts.mode, conn.hci_handle,
--		conn.dev_class[2], conn.dev_class[1], conn.dev_class[0], opt);
-+		conn.dev_class[2], conn.dev_class[1], conn.dev_class[0], opt,
-+		rcvbuf);
- 
- 	omtu = (opts.omtu > buffer_size) ? buffer_size : opts.omtu;
- 	imtu = (opts.imtu > buffer_size) ? buffer_size : opts.imtu;
-@@ -509,6 +526,22 @@ static void do_listen(void (*handler)(int sk))
- 		/* Child */
- 		close(sk);
- 
-+		/* Set receive buffer size */
-+		if (rcvbuf && setsockopt(nsk, SOL_SOCKET, SO_RCVBUF, &rcvbuf,
-+							sizeof(rcvbuf)) < 0) {
-+			syslog(LOG_ERR, "Can't set rcv buf size: %s (%d)",
-+							strerror(errno), errno);
-+			goto error;
-+		}
-+
-+		optlen = sizeof(rcvbuf);
-+		if (getsockopt(nsk, SOL_SOCKET, SO_RCVBUF, &rcvbuf, &optlen)
-+									< 0) {
-+			syslog(LOG_ERR, "Can't get rcv buf size: %s (%d)",
-+							strerror(errno), errno);
-+			goto error;
-+		}
-+
- 		/* Get current options */
- 		memset(&opts, 0, sizeof(opts));
- 		optlen = sizeof(opts);
-@@ -553,10 +586,11 @@ static void do_listen(void (*handler)(int sk))
- 		ba2str(&addr.l2_bdaddr, ba);
- 		syslog(LOG_INFO, "Connect from %s [imtu %d, omtu %d, "
- 				"flush_to %d, mode %d, handle %d, "
--				"class 0x%02x%02x%02x, priority %d]",
-+				"class 0x%02x%02x%02x, priority %d, rcvbuf %d]",
- 				ba, opts.imtu, opts.omtu, opts.flush_to,
- 				opts.mode, conn.hci_handle, conn.dev_class[2],
--				conn.dev_class[1], conn.dev_class[0], opt);
-+				conn.dev_class[1], conn.dev_class[0], opt,
-+				rcvbuf);
- 
- 		omtu = (opts.omtu > buffer_size) ? buffer_size : opts.omtu;
- 		imtu = (opts.imtu > buffer_size) ? buffer_size : opts.imtu;
-@@ -1144,6 +1178,7 @@ static void usage(void)
- 		"\t[-Q num] Max Transmit value (default = 3)\n"
- 		"\t[-Z size] Transmission Window size (default = 63)\n"
- 		"\t[-Y priority] socket priority\n"
-+		"\t[-H size] Maximum receive buffer size\n"
- 		"\t[-R] reliable mode\n"
- 		"\t[-G] use connectionless channel (datagram)\n"
- 		"\t[-U] use sock stream\n"
-@@ -1161,7 +1196,7 @@ int main(int argc, char *argv[])
- 
- 	bacpy(&bdaddr, BDADDR_ANY);
- 
--	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:J:B:N:L:W:C:D:X:F:Q:Z:Y:RUGAESMT")) != EOF) {
-+	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:J:B:N:L:W:C:D:X:F:Q:Z:Y:H:RUGAESMT")) != EOF) {
- 		switch(opt) {
- 		case 'r':
- 			mode = RECV;
-@@ -1340,6 +1375,10 @@ int main(int argc, char *argv[])
- 			cid = atoi(optarg);
+ 	switch (new_state) {
+ 	case SINK_STATE_DISCONNECTED:
++#ifdef ANDROID
++		android_set_qos_latency(&dev->dst,QoS_LATENCY_25_MS);
++#endif
+ 		if (dev->control) {
+ 			device_remove_control_timer(dev);
+ 			avrcp_disconnect(dev);
+@@ -368,6 +374,7 @@ static void device_sink_cb(struct audio_device *dev,
  			break;
+ #ifdef ANDROID
+ 		android_set_high_priority(&dev->dst);
++		android_set_qos_latency(&dev->dst,QoS_LATENCY_12_MS);
+ #endif
+ 		if (dev->auto_connect) {
+ 			if (!dev->headset)
+diff --git a/common/Android.mk b/common/Android.mk
+index 74c0bec..38d6b23 100644
+--- a/common/Android.mk
++++ b/common/Android.mk
+@@ -13,7 +13,8 @@ LOCAL_SRC_FILES:= \
  
-+		case 'H':
-+			rcvbuf = atoi(optarg);
-+			break;
+ LOCAL_CFLAGS+= \
+ 	-O3 \
+-	-DNEED_DBUS_WATCH_GET_UNIX_FD
++	-DNEED_DBUS_WATCH_GET_UNIX_FD \
++	-DBOARD_HAVE_BLUETOOTH_IMC
+ 
+ ifeq ($(BOARD_HAVE_BLUETOOTH_BCM),true)
+ LOCAL_CFLAGS += \
+diff --git a/common/android_bluez.c b/common/android_bluez.c
+index be85563..3f3b849 100644
+--- a/common/android_bluez.c
++++ b/common/android_bluez.c
+@@ -78,28 +78,6 @@ static int write_flush_timeout(int fd, uint16_t handle,
+     return 0;
+ }
+ 
+-#ifdef BOARD_HAVE_BLUETOOTH_BCM
+-static int vendor_high_priority(int fd, uint16_t handle) {
+-    unsigned char hci_sleep_cmd[] = {
+-        0x01,               // HCI command packet
+-        0x57, 0xfc,         // HCI_Write_High_Priority_Connection
+-        0x02,               // Length
+-        0x00, 0x00          // Handle
+-    };
+-
+-    hci_sleep_cmd[4] = (uint8_t)handle;
+-    hci_sleep_cmd[5] = (uint8_t)(handle >> 8);
+-
+-    int ret = write(fd, hci_sleep_cmd, sizeof(hci_sleep_cmd));
+-    if (ret < 0) {
+-        error("write(): %s (%d)]", strerror(errno), errno);
+-        return -1;
+-    } else if (ret != sizeof(hci_sleep_cmd)) {
+-        error("write(): unexpected length %d", ret);
+-        return -1;
+-    }
+-    return 0;
+-}
+ 
+ static int get_hci_sock() {
+     int sock = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+@@ -167,6 +145,30 @@ out:
+     return ret;
+ }
+ 
 +
- 		default:
- 			usage();
- 			exit(1);
++#ifdef BOARD_HAVE_BLUETOOTH_BCM
++static int vendor_high_priority(int fd, uint16_t handle) {
++    unsigned char hci_sleep_cmd[] = {
++        0x01,               // HCI command packet
++        0x57, 0xfc,         // HCI_Write_High_Priority_Connection
++        0x02,               // Length
++        0x00, 0x00          // Handle
++    };
++
++    hci_sleep_cmd[4] = (uint8_t)handle;
++    hci_sleep_cmd[5] = (uint8_t)(handle >> 8);
++
++    int ret = write(fd, hci_sleep_cmd, sizeof(hci_sleep_cmd));
++    if (ret < 0) {
++        error("write(): %s (%d)]", strerror(errno), errno);
++        return -1;
++    } else if (ret != sizeof(hci_sleep_cmd)) {
++        error("write(): unexpected length %d", ret);
++        return -1;
++    }
++    return 0;
++}
++
+ /* Request that the ACL link to a given Bluetooth connection be high priority,
+  * for improved coexistance support
+  */
+@@ -202,3 +204,68 @@ int android_set_high_priority(bdaddr_t *ba) {
+ }
+ 
+ #endif
++
++#ifdef BOARD_HAVE_BLUETOOTH_IMC
++
++static int android_hci_qos_setup(int fd, uint16_t handle, uint32_t latency) {
++    unsigned char hci_qos_cmd[] = {
++ 
++	0x01, 					// HCI command packet
++	0x07, 0x08, 			// QoS Setup Command
++	0x14, 					// Length
++	0x00, 0x01, 			// Connection_Handle
++	0x00, 					//Flags
++	0x01, 					//Service_Type
++	0x00, 0x00, 0xE1, 0x00, //Token_Rate
++	0x00, 0x00, 0x00, 0x00, //Peak_Bandwidth
++	0xE0, 0x2E, 0x00, 0x00, //Latency 
++	0x00, 0x00, 0x00, 0x00	//Delay_Variation 
++	};
++
++    hci_qos_cmd[4] = (uint8_t)handle;
++    hci_qos_cmd[5] = (uint8_t)(handle >> 8);
++
++	hci_qos_cmd[16] = (uint8_t)latency;
++    hci_qos_cmd[17] = (uint8_t)(latency >> 8);
++	hci_qos_cmd[18] = (uint8_t)(latency >> 16);
++	hci_qos_cmd[19] = (uint8_t)(latency >> 24);
++	
++	int ret = write(fd, hci_qos_cmd, sizeof(hci_qos_cmd));
++    if (ret < 0) {
++        error("write(): %s (%d)]", strerror(errno), errno);
++        return -1;
++    } else if (ret != sizeof(hci_qos_cmd)) {
++        error("write(): unexpected length %d", ret);
++        return -1;
++    }
++    return 0;
++}
++
++int android_set_qos_latency(bdaddr_t *ba,  uint32_t latency) {
++	int ret;
++   	int fd = get_hci_sock();
++   	int acl_handle;
++	
++   if (fd < 0)
++	   return fd;
++
++   acl_handle = get_acl_handle(fd, ba);
++   if (acl_handle < 0) {
++	   ret = acl_handle;
++	   goto out;
++   }
++    ret = android_hci_qos_setup(fd, acl_handle, latency);
++    if (ret < 0)
++        goto out;
++   
++out:
++	   close(fd);
++   
++	   return ret;
++}
++#else
++int android_set_qos_latency(bdaddr_t *ba,  uint32_t latency) {
++    return 0;
++}
++#endif
++
 -- 
-on behalf of ST-Ericsson
+1.7.0.4
 
