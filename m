@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 9/9] Bluetooth: Add name resolving support for mgmt based discovery
-Date: Thu,  5 Jan 2012 17:16:22 +0200
-Message-Id: <1325776582-10314-10-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 7/9] Bluetooth: Rename hdev->inq_cache to hdev->discovery
+Date: Thu,  5 Jan 2012 17:16:20 +0200
+Message-Id: <1325776582-10314-8-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1325776582-10314-1-git-send-email-johan.hedberg@gmail.com>
 References: <1325776582-10314-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,316 +11,152 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds the necessary logic to perform name lookups after
-inquiry completes. This is done by checking for entries in the resolve
-list after each inquiry complete and remote name complete HCI event.
+This struct is used for not just inquiry caching but also for general
+device discovery state tracking so it's better to rename it to something
+more appropriate.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    8 +++-
- net/bluetooth/hci_core.c         |   34 +++++++++++++++-
- net/bluetooth/hci_event.c        |   81 ++++++++++++++++++++++++++++++++++++--
- net/bluetooth/mgmt.c             |   37 +++++++++++++++--
- 4 files changed, 149 insertions(+), 11 deletions(-)
+ include/net/bluetooth/hci_core.h |   16 ++++++++--------
+ net/bluetooth/hci_core.c         |   12 ++++++------
+ net/bluetooth/hci_sysfs.c        |    2 +-
+ net/bluetooth/mgmt.c             |    2 +-
+ 4 files changed, 16 insertions(+), 16 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 2f19de4..a8680da 100644
+index 236f7f0..5a566fd 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -60,7 +60,8 @@ struct discovery_state {
- 	enum {
- 		DISCOVERY_STOPPED,
- 		DISCOVERY_STARTING,
--		DISCOVERY_ACTIVE,
-+		DISCOVERY_INQUIRY,
-+		DISCOVERY_RESOLVING,
- 		DISCOVERY_STOPPING,
- 	} state;
- 	struct list_head all;		/* All devices found during inquiry */
-@@ -371,6 +372,8 @@ static inline void discovery_init(struct hci_dev *hdev)
- 	INIT_LIST_HEAD(&hdev->discovery.resolve);
- }
+@@ -56,7 +56,7 @@ struct inquiry_entry {
+ 	struct inquiry_data	data;
+ };
  
-+bool hci_discovery_active(struct hci_dev *hdev);
-+
- void hci_discovery_set_state(struct hci_dev *hdev, int state);
+-struct inquiry_cache {
++struct discovery_state {
+ 	struct list_head all;		/* All devices found during inquiry */
+ 	struct list_head unknown;	/* Name state not known */
+ 	struct list_head resolve;	/* Name needs to be resolved */
+@@ -226,7 +226,7 @@ struct hci_dev {
+ 
+ 	struct list_head	mgmt_pending;
+ 
+-	struct inquiry_cache	inq_cache;
++	struct discovery_state	discovery;
+ 	struct hci_conn_hash	conn_hash;
+ 	struct list_head	blacklist;
+ 
+@@ -357,21 +357,21 @@ extern int sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb);
+ #define INQUIRY_CACHE_AGE_MAX   (HZ*30)   /* 30 seconds */
+ #define INQUIRY_ENTRY_AGE_MAX   (HZ*60)   /* 60 seconds */
+ 
+-static inline void inquiry_cache_init(struct hci_dev *hdev)
++static inline void discovery_init(struct hci_dev *hdev)
+ {
+-	INIT_LIST_HEAD(&hdev->inq_cache.all);
+-	INIT_LIST_HEAD(&hdev->inq_cache.unknown);
+-	INIT_LIST_HEAD(&hdev->inq_cache.resolve);
++	INIT_LIST_HEAD(&hdev->discovery.all);
++	INIT_LIST_HEAD(&hdev->discovery.unknown);
++	INIT_LIST_HEAD(&hdev->discovery.resolve);
+ }
  
  static inline int inquiry_cache_empty(struct hci_dev *hdev)
-@@ -393,6 +396,9 @@ struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev,
- 							bdaddr_t *bdaddr);
- struct inquiry_entry *hci_inquiry_cache_lookup_unknown(struct hci_dev *hdev,
- 							bdaddr_t *bdaddr);
-+struct inquiry_entry *hci_inquiry_cache_lookup_resolve(struct hci_dev *hdev,
-+							bdaddr_t *bdaddr,
-+							int state);
- bool hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data,
- 							bool name_known);
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index f3aaa3c..803655f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -356,6 +356,17 @@ struct hci_dev *hci_dev_get(int index)
- 
- /* ---- Inquiry support ---- */
- 
-+bool hci_discovery_active(struct hci_dev *hdev)
-+{
-+	struct discovery_state *discov = &hdev->discovery;
-+
-+	if (discov->state == DISCOVERY_INQUIRY ||
-+					discov->state == DISCOVERY_RESOLVING)
-+		return true;
-+
-+	return false;
-+}
-+
- void hci_discovery_set_state(struct hci_dev *hdev, int state)
  {
- 	BT_DBG("%s state %u -> %u", hdev->name, hdev->discovery.state, state);
-@@ -369,9 +380,11 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
- 		break;
- 	case DISCOVERY_STARTING:
- 		break;
--	case DISCOVERY_ACTIVE:
-+	case DISCOVERY_INQUIRY:
- 		mgmt_discovering(hdev, 1);
- 		break;
-+	case DISCOVERY_RESOLVING:
-+		break;
- 	case DISCOVERY_STOPPING:
- 		break;
- 	}
-@@ -425,6 +438,25 @@ struct inquiry_entry *hci_inquiry_cache_lookup_unknown(struct hci_dev *hdev,
- 	return NULL;
+-	return list_empty(&hdev->inq_cache.all);
++	return list_empty(&hdev->discovery.all);
  }
  
-+struct inquiry_entry *hci_inquiry_cache_lookup_resolve(struct hci_dev *hdev,
-+							bdaddr_t *bdaddr,
-+							int state)
-+{
+ static inline long inquiry_cache_age(struct hci_dev *hdev)
+ {
+-	struct inquiry_cache *c = &hdev->inq_cache;
++	struct discovery_state *c = &hdev->discovery;
+ 	return jiffies - c->timestamp;
+ }
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 5c0a1e7..82829c1 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -357,7 +357,7 @@ struct hci_dev *hci_dev_get(int index)
+ /* ---- Inquiry support ---- */
+ static void inquiry_cache_flush(struct hci_dev *hdev)
+ {
+-	struct inquiry_cache *cache = &hdev->inq_cache;
 +	struct discovery_state *cache = &hdev->discovery;
-+	struct inquiry_entry *e;
-+
-+	BT_DBG("cache %p bdaddr %s state %d", cache, batostr(bdaddr), state);
-+
-+	list_for_each_entry(e, &cache->resolve, list) {
-+		if (!bacmp(bdaddr, BDADDR_ANY) && e->name_state == state)
-+			return e;
-+		if (!bacmp(&e->data.bdaddr, bdaddr))
-+			return e;
-+	}
-+
-+	return NULL;
-+}
-+
+ 	struct inquiry_entry *p, *n;
+ 
+ 	list_for_each_entry_safe(p, n, &cache->all, all) {
+@@ -371,7 +371,7 @@ static void inquiry_cache_flush(struct hci_dev *hdev)
+ 
+ struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ {
+-	struct inquiry_cache *cache = &hdev->inq_cache;
++	struct discovery_state *cache = &hdev->discovery;
+ 	struct inquiry_entry *e;
+ 
+ 	BT_DBG("cache %p, %s", cache, batostr(bdaddr));
+@@ -387,7 +387,7 @@ struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev, bdaddr_t *b
+ struct inquiry_entry *hci_inquiry_cache_lookup_unknown(struct hci_dev *hdev,
+ 							bdaddr_t *bdaddr)
+ {
+-	struct inquiry_cache *cache = &hdev->inq_cache;
++	struct discovery_state *cache = &hdev->discovery;
+ 	struct inquiry_entry *e;
+ 
+ 	BT_DBG("cache %p, %s", cache, batostr(bdaddr));
+@@ -403,7 +403,7 @@ struct inquiry_entry *hci_inquiry_cache_lookup_unknown(struct hci_dev *hdev,
  bool hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data,
  							bool name_known)
  {
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 6213b5f..43bbf32 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1119,7 +1119,7 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- 	set_bit(HCI_INQUIRY, &hdev->flags);
+-	struct inquiry_cache *cache = &hdev->inq_cache;
++	struct discovery_state *cache = &hdev->discovery;
+ 	struct inquiry_entry *ie;
  
- 	hci_dev_lock(hdev);
--	hci_discovery_set_state(hdev, DISCOVERY_ACTIVE);
-+	hci_discovery_set_state(hdev, DISCOVERY_INQUIRY);
- 	hci_dev_unlock(hdev);
- }
+ 	BT_DBG("cache %p, %s", cache, batostr(&data->bdaddr));
+@@ -445,7 +445,7 @@ update:
  
-@@ -1271,6 +1271,50 @@ static int hci_outgoing_auth_needed(struct hci_dev *hdev,
- 	return 1;
- }
- 
-+static inline int hci_resolve_name(struct hci_dev *hdev, struct inquiry_entry *e)
-+{
-+	struct hci_cp_remote_name_req cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+
-+	bacpy(&cp.bdaddr, &e->data.bdaddr);
-+	cp.pscan_rep_mode = e->data.pscan_rep_mode;
-+	cp.pscan_mode = e->data.pscan_mode;
-+	cp.clock_offset = e->data.clock_offset;
-+
-+	return hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ, sizeof(cp), &cp);
-+}
-+
-+static void hci_resolve_next_name(struct hci_dev *hdev, bdaddr_t *bdaddr)
-+{
-+	struct discovery_state *discov = &hdev->discovery;
-+	struct inquiry_entry *e;
-+
-+	if (discov->state == DISCOVERY_STOPPING)
-+		goto discov_complete;
-+
-+	if (discov->state != DISCOVERY_RESOLVING)
-+		return;
-+
-+	e = hci_inquiry_cache_lookup_resolve(hdev, bdaddr, NAME_PENDING);
-+	if (e) {
-+		e->name_state = NAME_KNOWN;
-+		list_del(&e->list);
-+	}
-+
-+	if (list_empty(&discov->resolve))
-+		goto discov_complete;
-+
-+	e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY, NAME_NEEDED);
-+	if (hci_resolve_name(hdev, e) == 0) {
-+		e->name_state = NAME_PENDING;
-+		return;
-+	}
-+
-+discov_complete:
-+	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+}
-+
- static void hci_cs_remote_name_req(struct hci_dev *hdev, __u8 status)
+ static int inquiry_cache_dump(struct hci_dev *hdev, int num, __u8 *buf)
  {
- 	struct hci_cp_remote_name_req *cp;
-@@ -1289,6 +1333,9 @@ static void hci_cs_remote_name_req(struct hci_dev *hdev, __u8 status)
+-	struct inquiry_cache *cache = &hdev->inq_cache;
++	struct discovery_state *cache = &hdev->discovery;
+ 	struct inquiry_info *info = (struct inquiry_info *) buf;
+ 	struct inquiry_entry *e;
+ 	int copied = 0;
+@@ -1546,7 +1546,7 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	init_waitqueue_head(&hdev->req_wait_q);
+ 	mutex_init(&hdev->req_lock);
  
- 	hci_dev_lock(hdev);
+-	inquiry_cache_init(hdev);
++	discovery_init(hdev);
  
-+	if (test_bit(HCI_MGMT, &hdev->flags))
-+		hci_resolve_next_name(hdev, &cp->bdaddr);
-+
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
- 	if (!conn)
- 		goto unlock;
-@@ -1496,6 +1543,8 @@ static void hci_cs_le_start_enc(struct hci_dev *hdev, u8 status)
- static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_conn_hash_init(hdev);
+ 
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 3600d78..74b49e3 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -383,7 +383,7 @@ static struct device_type bt_host = {
+ static int inquiry_cache_show(struct seq_file *f, void *p)
  {
- 	__u8 status = *((__u8 *) skb->data);
-+	struct discovery_state *discov = &hdev->discovery;
-+	struct inquiry_entry *e;
- 
- 	BT_DBG("%s status %d", hdev->name, status);
- 
-@@ -1506,8 +1555,28 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
- 	if (!test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
- 		return;
- 
-+	if (!test_bit(HCI_MGMT, &hdev->flags))
-+		return;
-+
- 	hci_dev_lock(hdev);
--	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+
-+	if (discov->state != DISCOVERY_INQUIRY)
-+		goto unlock;
-+
-+	if (list_empty(&discov->resolve)) {
-+		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+		goto unlock;
-+	}
-+
-+	e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY, NAME_NEEDED);
-+	if (e && hci_resolve_name(hdev, e) == 0) {
-+		e->name_state = NAME_PENDING;
-+		hci_discovery_set_state(hdev, DISCOVERY_RESOLVING);
-+	} else {
-+		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+	}
-+
-+unlock:
- 	hci_dev_unlock(hdev);
- }
- 
-@@ -1807,8 +1876,12 @@ static inline void hci_remote_name_evt(struct hci_dev *hdev, struct sk_buff *skb
+ 	struct hci_dev *hdev = f->private;
+-	struct inquiry_cache *cache = &hdev->inq_cache;
++	struct discovery_state *cache = &hdev->discovery;
+ 	struct inquiry_entry *e;
  
  	hci_dev_lock(hdev);
- 
--	if (ev->status == 0 && test_bit(HCI_MGMT, &hdev->flags))
--		mgmt_remote_name(hdev, &ev->bdaddr, ev->name);
-+	if (test_bit(HCI_MGMT, &hdev->flags)) {
-+		if (ev->status == 0)
-+			mgmt_remote_name(hdev, &ev->bdaddr, ev->name);
-+
-+		hci_resolve_next_name(hdev, &ev->bdaddr);
-+	}
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
- 	if (!conn)
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 590966d..295cfc8 100644
+index 3977511..894f11b 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1947,6 +1947,8 @@ static int stop_discovery(struct sock *sk, u16 index)
- {
- 	struct hci_dev *hdev;
- 	struct pending_cmd *cmd;
-+	struct hci_cp_remote_name_req_cancel cp;
-+	struct inquiry_entry *e;
- 	int err;
- 
- 	BT_DBG("hci%u", index);
-@@ -1958,25 +1960,44 @@ static int stop_discovery(struct sock *sk, u16 index)
- 
- 	hci_dev_lock(hdev);
- 
--	if (hdev->discovery.state != DISCOVERY_ACTIVE) {
-+	if (!hci_discovery_active(hdev)) {
- 		err = cmd_status(sk, index, MGMT_OP_STOP_DISCOVERY,
- 						MGMT_STATUS_REJECTED);
--		goto failed;
-+		goto unlock;
+@@ -2000,7 +2000,7 @@ static int confirm_name(struct sock *sk, u16 index, unsigned char *data,
+ 		list_del(&e->list);
+ 	} else {
+ 		e->name_state = NAME_NEEDED;
+-		list_move(&e->list, &hdev->inq_cache.resolve);
++		list_move(&e->list, &hdev->discovery.resolve);
  	}
  
- 	cmd = mgmt_pending_add(sk, MGMT_OP_STOP_DISCOVERY, hdev, NULL, 0);
- 	if (!cmd) {
- 		err = -ENOMEM;
--		goto failed;
-+		goto unlock;
-+	}
-+
-+	if (hdev->discovery.state == DISCOVERY_INQUIRY) {
-+		err = hci_cancel_inquiry(hdev);
-+		if (err < 0)
-+			mgmt_pending_remove(cmd);
-+		else
-+			hci_discovery_set_state(hdev, DISCOVERY_STOPPING);
-+		goto unlock;
-+	}
-+
-+	e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY, NAME_PENDING);
-+	if (!e) {
-+		mgmt_pending_remove(cmd);
-+		err = cmd_complete(sk, index, MGMT_OP_STOP_DISCOVERY, NULL, 0);
-+		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+		goto unlock;
- 	}
- 
--	err = hci_cancel_inquiry(hdev);
-+	bacpy(&cp.bdaddr, &e->data.bdaddr);
-+	err = hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ_CANCEL,
-+							sizeof(cp), &cp);
- 	if (err < 0)
- 		mgmt_pending_remove(cmd);
- 	else
- 		hci_discovery_set_state(hdev, DISCOVERY_STOPPING);
- 
--failed:
-+unlock:
- 	hci_dev_unlock(hdev);
- 	hci_dev_put(hdev);
- 
-@@ -2004,6 +2025,12 @@ static int confirm_name(struct sock *sk, u16 index, unsigned char *data,
- 
- 	hci_dev_lock(hdev);
- 
-+	if (!hci_discovery_active(hdev)) {
-+		err = cmd_status(sk, index, MGMT_OP_CONFIRM_NAME,
-+							MGMT_STATUS_FAILED);
-+		goto failed;
-+	}
-+
- 	e = hci_inquiry_cache_lookup_unknown(hdev, &cp->bdaddr);
- 	if (!e) {
- 		err = cmd_status (sk, index, MGMT_OP_CONFIRM_NAME,
+ 	err = 0;
 -- 
 1.7.7.3
 
