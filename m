@@ -1,137 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: Divya Yadav <divya.yadav@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Divya Yadav <divya.yadav@samsung.com>
-Subject: [PATCH obexd] MAP: Add UpdateInbox Function
-Date: Thu, 05 Jan 2012 15:13:52 +0530
-Message-id: <1325756632-29335-1-git-send-email-divya.yadav@samsung.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 2/2] l2test: Add option 'K' to set delay before receiving
+Date: Thu, 5 Jan 2012 10:23:39 +0100
+Message-ID: <1325755419-6157-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1325755419-6157-1-git-send-email-szymon.janc@tieto.com>
+References: <1325755419-6157-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-UpdateInbox function allows remote device to initiate an update of
-the server's inbox, i.e. the Map server shall contact the network
-to retrieve new messages if available. If the server does not allow
-the network update it shall answer with a 'Not implemented'
-error response.
 ---
- plugins/mas.c              |   32 +++++++++++++++++++++++++++++++-
- plugins/messages-dummy.c   |    7 +++++++
- plugins/messages-tracker.c |   10 +++++++++-
- plugins/messages.h         |   14 ++++++++++++++
- 4 files changed, 61 insertions(+), 2 deletions(-)
+ test/l2test.c |   21 ++++++++++++++++-----
+ 1 files changed, 16 insertions(+), 5 deletions(-)
 
-diff --git a/plugins/mas.c b/plugins/mas.c
-index 3c3104c..639d0b6 100644
---- a/plugins/mas.c
-+++ b/plugins/mas.c
-@@ -503,6 +503,36 @@ static void *message_open(const char *name, int oflag, mode_t mode,
- 		return mas;
+diff --git a/test/l2test.c b/test/l2test.c
+index 35f8ce3..c5bc3d3 100644
+--- a/test/l2test.c
++++ b/test/l2test.c
+@@ -97,7 +97,10 @@ static int num_frames = -1;
+ static int count = 1;
+ 
+ /* Default delay after sending count number of frames */
+-static unsigned long delay = 0;
++static unsigned long send_delay = 0;
++
++/* Default delay before receiving */
++static unsigned long recv_delay = 0;
+ 
+ static char *filename = NULL;
+ 
+@@ -722,6 +725,9 @@ static void recv_mode(int sk)
+ 			syslog(LOG_INFO, "Initial bytes %d", len);
+ 	}
+ 
++	if (recv_delay)
++		usleep(recv_delay);
++
+ 	syslog(LOG_INFO, "Receiving ...");
+ 
+ 	memset(ts, 0, sizeof(ts));
+@@ -865,8 +871,8 @@ static void do_send(int sk)
+ 			size -= len;
+ 		}
+ 
+-		if (num_frames && delay && count && !(seq % count))
+-			usleep(delay);
++		if (num_frames && send_delay && count && !(seq % count))
++			usleep(send_delay);
+ 	}
  }
  
-+static void inbox_update_cb(void *session, int err, void *user_data)
-+{
-+	struct mas_session *mas = user_data;
-+
-+	DBG("");
-+
-+	mas->finished = TRUE;
-+
-+	if (err < 0)
-+		obex_object_set_io_flags(mas, G_IO_ERR, err);
-+	else
-+		obex_object_set_io_flags(mas, G_IO_OUT, 0);
-+}
-+
-+static void *message_update_open(const char *name, int oflag, mode_t mode,
-+				void *driver_data, size_t *size, int *err)
-+{
-+	struct mas_session *mas = driver_data;
-+
-+	DBG("");
-+
-+	*err = messages_update_inbox(mas->backend_data, inbox_update_cb, mas);
-+
-+	if (*err < 0) {
-+		mas->finished = TRUE;
-+		return NULL;
-+	} else
-+		return mas;
-+}
-+
- static void *any_open(const char *name, int oflag, mode_t mode,
- 				void *driver_data, size_t *size, int *err)
- {
-@@ -628,7 +658,7 @@ static struct obex_mime_type_driver mime_message_update = {
- 	.target = MAS_TARGET,
- 	.target_size = TARGET_SIZE,
- 	.mimetype = "x-bt/MAP-messageUpdate",
--	.open = any_open,
-+	.open = message_update_open,
- 	.close = any_close,
- 	.read = any_read,
- 	.write = any_write,
-diff --git a/plugins/messages-dummy.c b/plugins/messages-dummy.c
-index e96b13b..58f04f6 100644
---- a/plugins/messages-dummy.c
-+++ b/plugins/messages-dummy.c
-@@ -173,3 +173,10 @@ int messages_get_message(void *session,
- void messages_abort(void *session)
- {
- }
-+
-+int messages_update_inbox(void *session,
-+		messages_update_inbox_cb callback,
-+		void *user_data)
-+{
-+	return -EINVAL;
-+}
-diff --git a/plugins/messages-tracker.c b/plugins/messages-tracker.c
-index 8f9b30a..6a68b5b 100644
---- a/plugins/messages-tracker.c
-+++ b/plugins/messages-tracker.c
-@@ -237,7 +237,8 @@ int messages_set_folder(void *s, const char *name, gboolean cdup)
- 	return 0;
- }
+@@ -1173,6 +1179,7 @@ static void usage(void)
+ 		"\t[-N num] send num frames (default = infinite)\n"
+ 		"\t[-C num] send num frames before delay (default = 1)\n"
+ 		"\t[-D milliseconds] delay after sending num frames (default = 0)\n"
++		"\t[-K milliseconds] delay before receiving (default = 0)\n"
+ 		"\t[-X mode] l2cap mode (help for list, default = basic)\n"
+ 		"\t[-F fcs] use CRC16 check (default = 1)\n"
+ 		"\t[-Q num] Max Transmit value (default = 3)\n"
+@@ -1196,7 +1203,7 @@ int main(int argc, char *argv[])
  
--static gboolean async_get_folder_listing(void *s) {
-+static gboolean async_get_folder_listing(void *s)
-+{
- 	struct session *session = s;
- 	gboolean count = FALSE;
- 	int folder_count = 0;
-@@ -324,3 +325,10 @@ int messages_get_message(void *session,
- void messages_abort(void *session)
- {
- }
+ 	bacpy(&bdaddr, BDADDR_ANY);
+ 
+-	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:J:B:N:L:W:C:D:X:F:Q:Z:Y:H:RUGAESMT")) != EOF) {
++	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:J:B:N:L:W:C:D:X:F:Q:Z:Y:H:K:RUGAESMT")) != EOF) {
+ 		switch(opt) {
+ 		case 'r':
+ 			mode = RECV;
+@@ -1306,7 +1313,11 @@ int main(int argc, char *argv[])
+ 			break;
+ 
+ 		case 'D':
+-			delay = atoi(optarg) * 1000;
++			send_delay = atoi(optarg) * 1000;
++			break;
 +
-+int messages_update_inbox(void *session,
-+		messages_update_inbox_cb callback,
-+		void *user_data)
-+{
-+	return -EINVAL;
-+}
-diff --git a/plugins/messages.h b/plugins/messages.h
-index 6982edd..ea231a3 100644
---- a/plugins/messages.h
-+++ b/plugins/messages.h
-@@ -273,3 +273,17 @@ int messages_get_message(void *session,
-  * session: Backend session.
-  */
- void messages_abort(void *session);
-+
-+/*  Informs Message Server to Update Inbox via network
-+ *
-+ * session: Backend session.
-+ * user_data: User data if any to be sent
-+ * Callback shall be called for every update inbox request, where if any error
-+ * should be reported to the remote end.
-+ */
-+typedef void (*messages_update_inbox_cb)(void *session, int err,
-+		void *user_data);
-+
-+int messages_update_inbox(void *session,
-+		messages_update_inbox_cb callback,
-+		void *user_data);
++		case 'K':
++			recv_delay = atoi(optarg) * 1000;
+ 			break;
+ 
+ 		case 'X':
 -- 
-1.7.0.4
+on behalf of ST-Ericsson
 
