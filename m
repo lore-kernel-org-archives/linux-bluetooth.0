@@ -2,87 +2,131 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/2] l2test: Add option 'K' to set delay before receiving
-Date: Thu, 5 Jan 2012 10:23:39 +0100
-Message-ID: <1325755419-6157-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1325755419-6157-1-git-send-email-szymon.janc@tieto.com>
-References: <1325755419-6157-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/2] l2test: Add option 'H' to set socket receive buffer size
+Date: Thu, 5 Jan 2012 10:23:38 +0100
+Message-ID: <1325755419-6157-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Size is set using SO_RCVBUF, see man 7 socket for more details.
 ---
- test/l2test.c |   21 ++++++++++++++++-----
- 1 files changed, 16 insertions(+), 5 deletions(-)
+ test/l2test.c |   49 ++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 files changed, 44 insertions(+), 5 deletions(-)
 
 diff --git a/test/l2test.c b/test/l2test.c
-index 35f8ce3..c5bc3d3 100644
+index 5034775..35f8ce3 100644
 --- a/test/l2test.c
 +++ b/test/l2test.c
-@@ -97,7 +97,10 @@ static int num_frames = -1;
- static int count = 1;
+@@ -112,6 +112,7 @@ static int reliable = 0;
+ static int timestamp = 0;
+ static int defer_setup = 0;
+ static int priority = -1;
++static int rcvbuf = 0;
  
- /* Default delay after sending count number of frames */
--static unsigned long delay = 0;
-+static unsigned long send_delay = 0;
-+
-+/* Default delay before receiving */
-+static unsigned long recv_delay = 0;
- 
- static char *filename = NULL;
- 
-@@ -722,6 +725,9 @@ static void recv_mode(int sk)
- 			syslog(LOG_INFO, "Initial bytes %d", len);
+ static struct {
+ 	char	*name;
+@@ -309,6 +310,21 @@ static int do_connect(char *svr)
+ 		goto error;
  	}
  
-+	if (recv_delay)
-+		usleep(recv_delay);
++	/* Set receive buffer size */
++	if (rcvbuf && setsockopt(sk, SOL_SOCKET, SO_RCVBUF,
++						&rcvbuf, sizeof(rcvbuf)) < 0) {
++		syslog(LOG_ERR, "Can't set socket rcv buf size: %s (%d)",
++							strerror(errno), errno);
++		goto error;
++	}
 +
- 	syslog(LOG_INFO, "Receiving ...");
- 
- 	memset(ts, 0, sizeof(ts));
-@@ -865,8 +871,8 @@ static void do_send(int sk)
- 			size -= len;
- 		}
- 
--		if (num_frames && delay && count && !(seq % count))
--			usleep(delay);
-+		if (num_frames && send_delay && count && !(seq % count))
-+			usleep(send_delay);
++	optlen = sizeof(rcvbuf);
++	if (getsockopt(sk, SOL_SOCKET, SO_RCVBUF, &rcvbuf, &optlen) < 0) {
++		syslog(LOG_ERR, "Can't get socket rcv buf size: %s (%d)",
++							strerror(errno), errno);
++		goto error;
++	}
++
+ 	/* Connect to remote device */
+ 	memset(&addr, 0, sizeof(addr));
+ 	addr.l2_family = AF_BLUETOOTH;
+@@ -360,9 +376,10 @@ static int do_connect(char *svr)
  	}
- }
  
-@@ -1173,6 +1179,7 @@ static void usage(void)
- 		"\t[-N num] send num frames (default = infinite)\n"
- 		"\t[-C num] send num frames before delay (default = 1)\n"
- 		"\t[-D milliseconds] delay after sending num frames (default = 0)\n"
-+		"\t[-K milliseconds] delay before receiving (default = 0)\n"
- 		"\t[-X mode] l2cap mode (help for list, default = basic)\n"
- 		"\t[-F fcs] use CRC16 check (default = 1)\n"
+ 	syslog(LOG_INFO, "Connected [imtu %d, omtu %d, flush_to %d, "
+-		"mode %d, handle %d, class 0x%02x%02x%02x, priority %d]",
++		"mode %d, handle %d, class 0x%02x%02x%02x, priority %d, rcvbuf %d]",
+ 		opts.imtu, opts.omtu, opts.flush_to, opts.mode, conn.hci_handle,
+-		conn.dev_class[2], conn.dev_class[1], conn.dev_class[0], opt);
++		conn.dev_class[2], conn.dev_class[1], conn.dev_class[0], opt,
++		rcvbuf);
+ 
+ 	omtu = (opts.omtu > buffer_size) ? buffer_size : opts.omtu;
+ 	imtu = (opts.imtu > buffer_size) ? buffer_size : opts.imtu;
+@@ -509,6 +526,22 @@ static void do_listen(void (*handler)(int sk))
+ 		/* Child */
+ 		close(sk);
+ 
++		/* Set receive buffer size */
++		if (rcvbuf && setsockopt(nsk, SOL_SOCKET, SO_RCVBUF, &rcvbuf,
++							sizeof(rcvbuf)) < 0) {
++			syslog(LOG_ERR, "Can't set rcv buf size: %s (%d)",
++							strerror(errno), errno);
++			goto error;
++		}
++
++		optlen = sizeof(rcvbuf);
++		if (getsockopt(nsk, SOL_SOCKET, SO_RCVBUF, &rcvbuf, &optlen)
++									< 0) {
++			syslog(LOG_ERR, "Can't get rcv buf size: %s (%d)",
++							strerror(errno), errno);
++			goto error;
++		}
++
+ 		/* Get current options */
+ 		memset(&opts, 0, sizeof(opts));
+ 		optlen = sizeof(opts);
+@@ -553,10 +586,11 @@ static void do_listen(void (*handler)(int sk))
+ 		ba2str(&addr.l2_bdaddr, ba);
+ 		syslog(LOG_INFO, "Connect from %s [imtu %d, omtu %d, "
+ 				"flush_to %d, mode %d, handle %d, "
+-				"class 0x%02x%02x%02x, priority %d]",
++				"class 0x%02x%02x%02x, priority %d, rcvbuf %d]",
+ 				ba, opts.imtu, opts.omtu, opts.flush_to,
+ 				opts.mode, conn.hci_handle, conn.dev_class[2],
+-				conn.dev_class[1], conn.dev_class[0], opt);
++				conn.dev_class[1], conn.dev_class[0], opt,
++				rcvbuf);
+ 
+ 		omtu = (opts.omtu > buffer_size) ? buffer_size : opts.omtu;
+ 		imtu = (opts.imtu > buffer_size) ? buffer_size : opts.imtu;
+@@ -1144,6 +1178,7 @@ static void usage(void)
  		"\t[-Q num] Max Transmit value (default = 3)\n"
-@@ -1196,7 +1203,7 @@ int main(int argc, char *argv[])
+ 		"\t[-Z size] Transmission Window size (default = 63)\n"
+ 		"\t[-Y priority] socket priority\n"
++		"\t[-H size] Maximum receive buffer size\n"
+ 		"\t[-R] reliable mode\n"
+ 		"\t[-G] use connectionless channel (datagram)\n"
+ 		"\t[-U] use sock stream\n"
+@@ -1161,7 +1196,7 @@ int main(int argc, char *argv[])
  
  	bacpy(&bdaddr, BDADDR_ANY);
  
--	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:J:B:N:L:W:C:D:X:F:Q:Z:Y:H:RUGAESMT")) != EOF) {
-+	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:J:B:N:L:W:C:D:X:F:Q:Z:Y:H:K:RUGAESMT")) != EOF) {
+-	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:J:B:N:L:W:C:D:X:F:Q:Z:Y:RUGAESMT")) != EOF) {
++	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:J:B:N:L:W:C:D:X:F:Q:Z:Y:H:RUGAESMT")) != EOF) {
  		switch(opt) {
  		case 'r':
  			mode = RECV;
-@@ -1306,7 +1313,11 @@ int main(int argc, char *argv[])
+@@ -1340,6 +1375,10 @@ int main(int argc, char *argv[])
+ 			cid = atoi(optarg);
  			break;
  
- 		case 'D':
--			delay = atoi(optarg) * 1000;
-+			send_delay = atoi(optarg) * 1000;
++		case 'H':
++			rcvbuf = atoi(optarg);
 +			break;
 +
-+		case 'K':
-+			recv_delay = atoi(optarg) * 1000;
- 			break;
- 
- 		case 'X':
+ 		default:
+ 			usage();
+ 			exit(1);
 -- 
 on behalf of ST-Ericsson
 
