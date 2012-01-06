@@ -1,49 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 6 Jan 2012 14:42:23 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/9] Bluetooth: Fix persistency of the HCI_MGMT flag
-Message-ID: <20120106124223.GA12600@x220.Elisa>
-References: <1325776582-10314-1-git-send-email-johan.hedberg@gmail.com>
- <1325776582-10314-2-git-send-email-johan.hedberg@gmail.com>
- <1325805036.6454.70.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1325805036.6454.70.camel@aeonflux>
+From: Divya Yadav <divya.yadav@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Divya Yadav <divya.yadav@samsung.com>
+Subject: [PATCH obexd] MAP: Correction in coding style
+Date: Fri, 06 Jan 2012 15:37:28 +0530
+Message-id: <1325844448-9951-1-git-send-email-divya.yadav@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Starting brace for a function should start on the next line.
+---
+ plugins/messages-tracker.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-On Thu, Jan 05, 2012, Marcel Holtmann wrote:
-> > The HCI_MGMT flag needs to remain set even after closing an HCI device.
-> > 
-> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> > ---
-> >  net/bluetooth/hci_core.c |    4 ++--
-> >  1 files changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index 6d38d80..52edc11 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -670,8 +670,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
-> >  	mgmt_powered(hdev, 0);
-> >  	hci_dev_unlock(hdev);
-> >  
-> > -	/* Clear flags */
-> > -	hdev->flags = 0;
-> > +	/* Clear flags, except persistent ones like HCI_MGMT */
-> > +	hdev->flags &= BIT(HCI_MGMT);
-> >  
-> >  	hci_req_unlock(hdev);
-> >  
-> 
-> can we just move this away from hdev->flags into a hdev->dev_flags.
+diff --git a/plugins/messages-tracker.c b/plugins/messages-tracker.c
+index 8f9b30a..9c60f2c 100644
+--- a/plugins/messages-tracker.c
++++ b/plugins/messages-tracker.c
+@@ -237,7 +237,8 @@ int messages_set_folder(void *s, const char *name, gboolean cdup)
+ 	return 0;
+ }
+ 
+-static gboolean async_get_folder_listing(void *s) {
++static gboolean async_get_folder_listing(void *s)
++{
+ 	struct session *session = s;
+ 	gboolean count = FALSE;
+ 	int folder_count = 0;
+-- 
+1.7.0.4
 
-Yes, that should be done (and not just for HCI_MGMT but also for other
-related flags) but it should imo be in a separate patch. Simply moving
-to dev_flags won't fix this particular bug since there's a similar
-"hdev->dev_flags = 0;" inside hci_cc_reset() in hci_event.c.
-
-Johan
