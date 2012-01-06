@@ -1,37 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1325828850.6454.71.camel@aeonflux>
-Subject: Re: [PATCH 2/9] Bluetooth: Convert inquiry cache to use standard
- list types
-From: Marcel Holtmann <marcel@holtmann.org>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 05 Jan 2012 21:47:30 -0800
-In-Reply-To: <1325776582-10314-3-git-send-email-johan.hedberg@gmail.com>
-References: <1325776582-10314-1-git-send-email-johan.hedberg@gmail.com>
-	 <1325776582-10314-3-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Scott James Remnant <keybuk@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Scott James Remnant <keybuk@chromium.org>
+Subject: [PATCH] build: increase check requirement to 0.9.6
+Date: Thu,  5 Jan 2012 17:07:11 -0800
+Message-Id: <1325812031-28953-1-git-send-email-keybuk@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+ck_assert, used by unit/test-eir.c wasn't added to check until 0.9.6
+---
+ acinclude.m4 |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-> This makes it possible to use the convenience functions provided for
-> standard kernel list types and it also makes it easier to extend the use
-> of the cache for the management interface where e.g. name resolving
-> control will be needed.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  include/net/bluetooth/hci_core.h |   10 ++++------
->  net/bluetooth/hci_core.c         |   31 +++++++++++++++++--------------
->  net/bluetooth/hci_sysfs.c        |    2 +-
->  3 files changed, 22 insertions(+), 21 deletions(-)
-
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-Regards
-
-Marcel
-
+diff --git a/acinclude.m4 b/acinclude.m4
+index 753b994..0aa1526 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -171,7 +171,7 @@ AC_DEFUN([AC_PATH_READLINE], [
+ ])
+ 
+ AC_DEFUN([AC_PATH_CHECK], [
+-	PKG_CHECK_MODULES(CHECK, check >= 0.9.4, check_found=yes, check_found=no)
++	PKG_CHECK_MODULES(CHECK, check >= 0.9.6, check_found=yes, check_found=no)
+ 	AC_SUBST(CHECK_CFLAGS)
+ 	AC_SUBST(CHECK_LIBS)
+ ])
+-- 
+1.7.3.1
 
