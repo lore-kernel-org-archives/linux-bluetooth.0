@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1325970249.6454.126.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: hci-uart-ath: Use GFP_ATOMIC in open()
+Message-ID: <1325970227.6454.125.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: hci-uart-bcsp: Use GFP_ATOMIC in open()
 From: Marcel Holtmann <marcel@holtmann.org>
 To: David Herrmann <dh.herrmann@googlemail.com>
 Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Date: Sat, 07 Jan 2012 13:04:09 -0800
-In-Reply-To: <1325945981-11330-4-git-send-email-dh.herrmann@googlemail.com>
+Date: Sat, 07 Jan 2012 13:03:47 -0800
+In-Reply-To: <1325945981-11330-3-git-send-email-dh.herrmann@googlemail.com>
 References: <1325945981-11330-1-git-send-email-dh.herrmann@googlemail.com>
-	 <1325945981-11330-4-git-send-email-dh.herrmann@googlemail.com>
+	 <1325945981-11330-3-git-send-email-dh.herrmann@googlemail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -21,7 +21,7 @@ Hi David,
 > 
 > Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 > ---
->  drivers/bluetooth/hci_ath.c |    2 +-
+>  drivers/bluetooth/hci_bcsp.c |    2 +-
 >  1 files changed, 1 insertions(+), 1 deletions(-)
 
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
