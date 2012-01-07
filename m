@@ -4,64 +4,61 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi,
 	marcel@holtmann.org,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 11/18] Bluetooth: bpa10x: Free private driver data on usb shutdown
-Date: Sat,  7 Jan 2012 15:47:17 +0100
-Message-Id: <1325947644-11736-12-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 10/18] Bluetooth: btusb: Free driver data on USB shutdown
+Date: Sat,  7 Jan 2012 15:47:16 +0100
+Message-Id: <1325947644-11736-11-git-send-email-dh.herrmann@googlemail.com>
 In-Reply-To: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
 References: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Instead of waiting for the hci-device to be destroyed we now free the private
-driver data on driver shutdown right away. We call hci_unregister_dev() on
-driver shutdown, that means, the hci-core will never ever call our callbacks
-again except the destruct callback. It also does not access hdev->driver_data so
-there is no reason to keep that alive.
-We simply set the destruct cb to NULL to avoid getting called again.
+Instead of using the hci-destruct callback we free our private driver data on
+USB shutdown. We already called hci_unregister_dev() here so the hci core will
+never ever call our callbacks again except the destruct callback.
+
+However, there is no reason to keep our *private* driver data alive if we get
+never called again and the hci-core does never touch it the data. So we simply
+free it right away and set the destruct callback to NULL.
 
 Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 ---
- drivers/bluetooth/bpa10x.c |   15 +++------------
- 1 files changed, 3 insertions(+), 12 deletions(-)
+ drivers/bluetooth/btusb.c |   11 +----------
+ 1 files changed, 1 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
-index 751b338..92c2424 100644
---- a/drivers/bluetooth/bpa10x.c
-+++ b/drivers/bluetooth/bpa10x.c
-@@ -432,17 +432,6 @@ static int bpa10x_send_frame(struct sk_buff *skb)
- 	return 0;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index fbfba80..85bb17d 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -786,15 +786,6 @@ done:
+ 	return err;
  }
  
--static void bpa10x_destruct(struct hci_dev *hdev)
+-static void btusb_destruct(struct hci_dev *hdev)
 -{
--	struct bpa10x_data *data = hdev->driver_data;
+-	struct btusb_data *data = hdev->driver_data;
 -
 -	BT_DBG("%s", hdev->name);
 -
--	kfree_skb(data->rx_skb[0]);
--	kfree_skb(data->rx_skb[1]);
 -	kfree(data);
 -}
 -
- static int bpa10x_probe(struct usb_interface *intf, const struct usb_device_id *id)
+ static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
  {
- 	struct bpa10x_data *data;
-@@ -480,7 +469,6 @@ static int bpa10x_probe(struct usb_interface *intf, const struct usb_device_id *
- 	hdev->close    = bpa10x_close;
- 	hdev->flush    = bpa10x_flush;
- 	hdev->send     = bpa10x_send_frame;
--	hdev->destruct = bpa10x_destruct;
+ 	struct btusb_data *data = hdev->driver_data;
+@@ -1007,7 +998,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 	hdev->close    = btusb_close;
+ 	hdev->flush    = btusb_flush;
+ 	hdev->send     = btusb_send_frame;
+-	hdev->destruct = btusb_destruct;
+ 	hdev->notify   = btusb_notify;
  
  	hdev->owner = THIS_MODULE;
+@@ -1111,6 +1101,7 @@ static void btusb_disconnect(struct usb_interface *intf)
+ 	__hci_dev_put(hdev);
  
-@@ -512,6 +500,9 @@ static void bpa10x_disconnect(struct usb_interface *intf)
- 	hci_unregister_dev(data->hdev);
- 
- 	hci_free_dev(data->hdev);
-+	kfree_skb(data->rx_skb[0]);
-+	kfree_skb(data->rx_skb[1]);
+ 	hci_free_dev(hdev);
 +	kfree(data);
  }
  
- static struct usb_driver bpa10x_driver = {
+ #ifdef CONFIG_PM
 -- 
 1.7.8.1
