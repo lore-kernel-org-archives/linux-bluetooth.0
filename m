@@ -1,43 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CANq1E4Qc+DixjbUwDqH696mR6r3nNYLPq6tZEPmO=HxaRLtv4Q@mail.gmail.com>
-References: <1325173242-12264-1-git-send-email-dh.herrmann@googlemail.com>
-	<1325173242-12264-2-git-send-email-dh.herrmann@googlemail.com>
-	<1325180937.1965.294.camel@aeonflux>
-	<CANq1E4Qc+DixjbUwDqH696mR6r3nNYLPq6tZEPmO=HxaRLtv4Q@mail.gmail.com>
-Date: Sat, 7 Jan 2012 15:13:09 +0100
-Message-ID: <CANq1E4Qkdy+9HEcLzK2yx5bPBMX8DW2vyNP-KQ1MokANRDw9JQ@mail.gmail.com>
-Subject: Re: [PATCH 1/5] Bluetooth: Remove obsolete hci-destruct callback
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1325900406.6454.116.camel@aeonflux>
+Subject: Re: Bluetooth 2.1 keyboard not sending keypress notifications
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Scott James Remnant <keybuk@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 06 Jan 2012 17:40:06 -0800
+In-Reply-To: <CAHZ1yCkPoHMA52dxMPp=5g_zibOjQui=ffiSGXR1GAiOqUGciA@mail.gmail.com>
+References: <CAHZ1yC=3Ecj-4-SAHnD93S7_YVF+f_o__Hb2PYFcaoCs_NDoPw@mail.gmail.com>
+	 <1325893697.6454.113.camel@aeonflux>
+	 <CAHZ1yCkPoHMA52dxMPp=5g_zibOjQui=ffiSGXR1GAiOqUGciA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel
+Hi Scott,
 
-On Thu, Dec 29, 2011 at 7:04 PM, David Herrmann
-<dh.herrmann@googlemail.com> wrote:
-> On Thu, Dec 29, 2011 at 6:48 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
->> Hi David,
->>
->>> The destruct-callback is used by *all* drivers to remove their platform
->>> data only. However, all drivers call hci_unregister_dev() before this
->>> callback is executed. Therefore, there is no reason to keep platform
->>> data alive after the driver was unregistered. Hence, we can free platform data
->>> directly and then remove the hci-destruct callback entirely.
->>>
->>> Some drivers already depend on this behaviour, since they erroneously
->>> already free the data after calling hci_free_dev(). This patch makes all
->>> drivers behave that way and removes the callback entirely.
->>
->> it is important to not end up with a race condition between sysfs and
->> hci_dev here. For example a cat /sys/class/bluetooth/hci0/name could
->> still have sysfs file open and we need to keep the memory around until
->> it gets destructed.
+> >> Have been testing a Bluetooth 2.1 keyboard, but we don't get any
+> >> keypress notifications from it as the pincode is typed and the Agent's
+> >> DisplayPasskey D-Bus method is never called (with two or three
+> >> arguments).
+> >>
+> >> Any ideas where to begin debugging this?
+> >
+> > first, start with hcidump to see what commands and events are actually
+> > send by the keyboard. And capture the bluetoothd debug output.
+> >
+> > And I am pretty sure that a real 2.1 keyboard with Secure Simple Pairing
+> > is not working at all. We never managed to purchase one of these. If you
+> > managed to find one, then let us know where you got it from.
+> >
+> I have both of those attached, the keyboard is the Apple Wireless
+> Keyboard - it at least behaves in a manner consistent with 2.1 SSP
+> under OS X, complete with hilighting the passkey as it's typed.
+> 
+> One thing I noticed from the log is that neither side exchanges IO
+> capabilities which seems to be a pre-requisite for SSP?
 
-I will resend this as sequential patches which thorough explanations
-so it might be more clear why this callback is obsolete.
+you are correct here and the usage of PIN Code Request makes it clear
+that this is 2.0 only keyboard. Can you create a binary dump in BTSnoop
+format. Since I see a bunch of vendor events, maybe that is how OS X
+does it.
 
-Cheers
-David
+In addition OS X comes with a tool called Packet Logger (from the SDK)
+which allows you also to create a dump file. hcidump can actually read
+these as well. So having that one to compare would be nice.
+
+That said, since this is 2.0 without SSP, it should actually work. Have
+you tried to use simple-agent test script from the source?
+
+Regards
+
+Marcel
+
+
