@@ -4,42 +4,43 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi,
 	marcel@holtmann.org,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 03/18] Bluetooth: bt3c-cs: Remove empty destruct cb
-Date: Sat,  7 Jan 2012 15:47:09 +0100
-Message-Id: <1325947644-11736-4-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 02/18] Bluetooth: bluecard-cs: Remove empty destruct cb
+Date: Sat,  7 Jan 2012 15:47:08 +0100
+Message-Id: <1325947644-11736-3-git-send-email-dh.herrmann@googlemail.com>
 In-Reply-To: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
 References: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The callback is optional and we provide an empty callback so remove it.
+The destruct callback is optional and we provide an empty callback so remove it
+entirely to avoid unnecessary code.
 
 Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 ---
- drivers/bluetooth/bt3c_cs.c |    6 ------
+ drivers/bluetooth/bluecard_cs.c |    6 ------
  1 files changed, 0 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
-index 0c97e5d..e74334d 100644
---- a/drivers/bluetooth/bt3c_cs.c
-+++ b/drivers/bluetooth/bt3c_cs.c
-@@ -456,11 +456,6 @@ static int bt3c_hci_send_frame(struct sk_buff *skb)
+diff --git a/drivers/bluetooth/bluecard_cs.c b/drivers/bluetooth/bluecard_cs.c
+index c6a0c61..5cb325a 100644
+--- a/drivers/bluetooth/bluecard_cs.c
++++ b/drivers/bluetooth/bluecard_cs.c
+@@ -691,11 +691,6 @@ static int bluecard_hci_send_frame(struct sk_buff *skb)
  }
  
  
--static void bt3c_hci_destruct(struct hci_dev *hdev)
+-static void bluecard_hci_destruct(struct hci_dev *hdev)
 -{
 -}
 -
 -
- static int bt3c_hci_ioctl(struct hci_dev *hdev, unsigned int cmd, unsigned long arg)
+ static int bluecard_hci_ioctl(struct hci_dev *hdev, unsigned int cmd, unsigned long arg)
  {
  	return -ENOIOCTLCMD;
-@@ -587,7 +582,6 @@ static int bt3c_open(bt3c_info_t *info)
- 	hdev->close    = bt3c_hci_close;
- 	hdev->flush    = bt3c_hci_flush;
- 	hdev->send     = bt3c_hci_send_frame;
--	hdev->destruct = bt3c_hci_destruct;
- 	hdev->ioctl    = bt3c_hci_ioctl;
+@@ -741,7 +736,6 @@ static int bluecard_open(bluecard_info_t *info)
+ 	hdev->close    = bluecard_hci_close;
+ 	hdev->flush    = bluecard_hci_flush;
+ 	hdev->send     = bluecard_hci_send_frame;
+-	hdev->destruct = bluecard_hci_destruct;
+ 	hdev->ioctl    = bluecard_hci_ioctl;
  
  	hdev->owner = THIS_MODULE;
 -- 
