@@ -4,43 +4,46 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi,
 	marcel@holtmann.org,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 07/18] Bluetooth: dtl1-cs: Remove empty destruct cb
-Date: Sat,  7 Jan 2012 15:47:13 +0100
-Message-Id: <1325947644-11736-8-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 06/18] Bluetooth: btwilink: Remove empty destruct cb
+Date: Sat,  7 Jan 2012 15:47:12 +0100
+Message-Id: <1325947644-11736-7-git-send-email-dh.herrmann@googlemail.com>
 In-Reply-To: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
 References: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The destruct cb is optional so we can safely remove our dummy cb.
+The destruct cb is optional so remove our empty dummy cb.
 
 Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 ---
- drivers/bluetooth/dtl1_cs.c |    6 ------
- 1 files changed, 0 insertions(+), 6 deletions(-)
+ drivers/bluetooth/btwilink.c |    9 ---------
+ 1 files changed, 0 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
-index b2db5e9..aae40ca 100644
---- a/drivers/bluetooth/dtl1_cs.c
-+++ b/drivers/bluetooth/dtl1_cs.c
-@@ -439,11 +439,6 @@ static int dtl1_hci_send_frame(struct sk_buff *skb)
+diff --git a/drivers/bluetooth/btwilink.c b/drivers/bluetooth/btwilink.c
+index b5f83b4..da9cf6a 100644
+--- a/drivers/bluetooth/btwilink.c
++++ b/drivers/bluetooth/btwilink.c
+@@ -291,14 +291,6 @@ static int ti_st_send_frame(struct sk_buff *skb)
+ 	return 0;
  }
  
- 
--static void dtl1_hci_destruct(struct hci_dev *hdev)
+-static void ti_st_destruct(struct hci_dev *hdev)
 -{
+-	BT_DBG("%s", hdev->name);
+-	/* do nothing here, since platform remove
+-	 * would free the hdev->driver_data
+-	 */
 -}
 -
--
- static int dtl1_hci_ioctl(struct hci_dev *hdev, unsigned int cmd,  unsigned long arg)
+ static int bt_ti_probe(struct platform_device *pdev)
  {
- 	return -ENOIOCTLCMD;
-@@ -487,7 +482,6 @@ static int dtl1_open(dtl1_info_t *info)
- 	hdev->close    = dtl1_hci_close;
- 	hdev->flush    = dtl1_hci_flush;
- 	hdev->send     = dtl1_hci_send_frame;
--	hdev->destruct = dtl1_hci_destruct;
- 	hdev->ioctl    = dtl1_hci_ioctl;
- 
+ 	static struct ti_st *hst;
+@@ -325,7 +317,6 @@ static int bt_ti_probe(struct platform_device *pdev)
+ 	hdev->close = ti_st_close;
+ 	hdev->flush = NULL;
+ 	hdev->send = ti_st_send_frame;
+-	hdev->destruct = ti_st_destruct;
  	hdev->owner = THIS_MODULE;
+ 
+ 	err = hci_register_dev(hdev);
 -- 
 1.7.8.1
