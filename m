@@ -4,54 +4,78 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi,
 	marcel@holtmann.org,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 01/18] Bluetooth: Make hci-destruct callback optional
-Date: Sat,  7 Jan 2012 15:47:07 +0100
-Message-Id: <1325947644-11736-2-git-send-email-dh.herrmann@googlemail.com>
-In-Reply-To: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
-References: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 00/18] Cleanup HCI reference counts
+Date: Sat,  7 Jan 2012 15:47:06 +0100
+Message-Id: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Several drivers already provide an empty callback so we can actually make this
-optional and then remove all those empty callbacks in the drivers.
+Hi
 
-This callback isn't needed at all by most drivers as they can remove their
-allocated structures on device disconnect and not on hci destruction.
+This is the same as my previous patchset but split into sequential patches. The
+first patch makes the destruct-cb optional so the patches 2-7 can remove the
+empty callbacks.
+Patches 8-14 make the remaining drivers drop the destruct-callback and directly
+free the driver data.
+Patches 15-18 then remove the (now unused!) destruct callback and then properly
+fixes the reference counts (same patches as already posted).
 
-Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
----
- include/net/bluetooth/hci_core.h |    6 ++++--
- net/bluetooth/hci_core.c         |    2 +-
- 2 files changed, 5 insertions(+), 3 deletions(-)
+I hope the first 14 patches make clear that half of our drivers already work
+without the destruct callback and the other half can be safely converted into
+not using it. In fact, the drivers that use it introduce some memleaks which are
+fixed by simply dropping the callback and freeing everything right away.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 5e2e984..b2c23e6 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -568,8 +568,10 @@ static inline void hci_conn_put(struct hci_conn *conn)
- /* ----- HCI Devices ----- */
- static inline void __hci_dev_put(struct hci_dev *d)
- {
--	if (atomic_dec_and_test(&d->refcnt))
--		d->destruct(d);
-+	if (atomic_dec_and_test(&d->refcnt)) {
-+		if (d->destruct)
-+			d->destruct(d);
-+	}
- }
- 
- /*
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 6d38d80..6fdd6e5 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1450,7 +1450,7 @@ int hci_register_dev(struct hci_dev *hdev)
- 	BT_DBG("%p name %s bus %d owner %p", hdev, hdev->name,
- 						hdev->bus, hdev->owner);
- 
--	if (!hdev->open || !hdev->close || !hdev->destruct)
-+	if (!hdev->open || !hdev->close)
- 		return -EINVAL;
- 
- 	/* Do not allow HCI_AMP devices to register at index 0,
+I've added detailed commit messages to each driver. If a single step is unclear,
+please point me to it.
+
+
+By the way, this fixes several bugs we currently have, including some mem-leaks
+as described in the commits and the fact that hci_free_dev() currently
+*directly* destroys the hci object regardless of any previous calls to
+hci_hold_dev/hci_put_dev(). This is because the hci->refcnt counter is in no way
+linked to the lifetime of the hci object. See hci_sysfs the release_host
+callback which actually frees the hci object. It is in no way triggered by
+hci->refcnt.
+This patchset fixes all this and introduces proper reference counting.
+
+Cheers
+David
+
+David Herrmann (18):
+  Bluetooth: Make hci-destruct callback optional
+  Bluetooth: bluecard-cs: Remove empty destruct cb
+  Bluetooth: bt3c-cs: Remove empty destruct cb
+  Bluetooth: btmrvl: Remove empty destruct cb
+  Bluetooth: btuart-cs: Remove empty destruct cb
+  Bluetooth: btwilink: Remove empty destruct cb
+  Bluetooth: dtl1-cs: Remove empty destruct cb
+  Bluetooth: vhci: Free driver_data on file release
+  Bluetooth: bfusb: Free driver_data on USB shutdown
+  Bluetooth: btusb: Free driver data on USB shutdown
+  Bluetooth: bpa10x: Free private driver data on usb shutdown
+  Bluetooth: btsdio: Free driver data on SDIO shutdown
+  Bluetooth: uart-ldisc: Fix memory leak and remove destruct cb
+  Bluetooth: Remove unused hci-destruct cb
+  Bluetooth: Correctly acquire module ref
+  Bluetooth: Remove HCI-owner field
+  Bluetooth: Correctly take hci_dev->dev refcount
+  Bluetooth: Remove __hci_dev_put/hold
+
+ drivers/bluetooth/bfusb.c        |   13 +------------
+ drivers/bluetooth/bluecard_cs.c  |    8 --------
+ drivers/bluetooth/bpa10x.c       |   17 +++--------------
+ drivers/bluetooth/bt3c_cs.c      |    8 --------
+ drivers/bluetooth/btmrvl_main.c  |    6 ------
+ drivers/bluetooth/btsdio.c       |   13 +------------
+ drivers/bluetooth/btuart_cs.c    |    8 --------
+ drivers/bluetooth/btusb.c        |   17 +++--------------
+ drivers/bluetooth/btwilink.c     |   10 ----------
+ drivers/bluetooth/dtl1_cs.c      |    8 --------
+ drivers/bluetooth/hci_ldisc.c    |   14 ++------------
+ drivers/bluetooth/hci_vhci.c     |    9 +--------
+ include/net/bluetooth/hci_core.h |   28 ++++------------------------
+ net/bluetooth/hci_core.c         |    9 ++++-----
+ net/bluetooth/hci_sysfs.c        |    2 ++
+ 15 files changed, 21 insertions(+), 149 deletions(-)
+
 -- 
 1.7.8.1
