@@ -4,63 +4,66 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi,
 	marcel@holtmann.org,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 09/18] Bluetooth: bfusb: Free driver_data on USB shutdown
-Date: Sat,  7 Jan 2012 15:47:15 +0100
-Message-Id: <1325947644-11736-10-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 08/18] Bluetooth: vhci: Free driver_data on file release
+Date: Sat,  7 Jan 2012 15:47:14 +0100
+Message-Id: <1325947644-11736-9-git-send-email-dh.herrmann@googlemail.com>
 In-Reply-To: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
 References: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This frees the private driver data on USB shutdown instead of using the
-hci-destruct callback. We already call usb_set_intfdata(intf, NULL) but we do
-not do the same with the hci object. This would be totally safe, though.
+This removes the hci-destruct callback and instead frees the private driver data
+in the vhci_release file release function. There is no reason to keep private
+driver data available if the driver has already shut down.
 
-After calling hci_unregister_dev()/hci_free_dev() the hdev object will never
-call any callback of us again except the destruct callback. Therefore, we can
-safely set the destruct callback to NULL and free the driver data right away.
-This allows to unload the module without waiting for the hdev device to be
-released.
+After vhci_release is called our module can be unloaded. The only reason it is
+kept alive is the hci-core having a module-ref on us because of our destruct
+callback. However, this callback only frees hdev->driver_data. That is, we wait
+for the hdev-device to get destroyed to free our internal driver-data. In fact,
+the hci-core does never touch hdev->driver_data so it doesn't care if it is
+NULL. Therefore, we simply free it when unloading the driver.
+
+Another important fact is that the hdev core does not call any callbacks other
+than the destruct-cb after hci_unregister_dev() has been called. So there is no
+function of our module that will be called nor does the hci-core touch
+hdev->driver_data. Hence, no other code can touch hdev->driver_data after our
+cleanup so the destruct callback is definitely unnecessary here.
 
 Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 ---
- drivers/bluetooth/bfusb.c |   11 +----------
- 1 files changed, 1 insertions(+), 10 deletions(-)
+ drivers/bluetooth/hci_vhci.c |    7 +------
+ 1 files changed, 1 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
-index a936763..857a951 100644
---- a/drivers/bluetooth/bfusb.c
-+++ b/drivers/bluetooth/bfusb.c
-@@ -544,15 +544,6 @@ static int bfusb_send_frame(struct sk_buff *skb)
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index 2ed6ab1..44a8012 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -103,11 +103,6 @@ static int vhci_send_frame(struct sk_buff *skb)
  	return 0;
  }
  
--static void bfusb_destruct(struct hci_dev *hdev)
+-static void vhci_destruct(struct hci_dev *hdev)
 -{
--	struct bfusb_data *data = hdev->driver_data;
--
--	BT_DBG("hdev %p bfusb %p", hdev, data);
--
--	kfree(data);
+-	kfree(hdev->driver_data);
 -}
 -
- static int bfusb_ioctl(struct hci_dev *hdev, unsigned int cmd, unsigned long arg)
+ static inline ssize_t vhci_get_user(struct vhci_data *data,
+ 					const char __user *buf, size_t count)
  {
- 	return -ENOIOCTLCMD;
-@@ -712,7 +703,6 @@ static int bfusb_probe(struct usb_interface *intf, const struct usb_device_id *i
- 	hdev->close    = bfusb_close;
- 	hdev->flush    = bfusb_flush;
- 	hdev->send     = bfusb_send_frame;
--	hdev->destruct = bfusb_destruct;
- 	hdev->ioctl    = bfusb_ioctl;
+@@ -248,7 +243,6 @@ static int vhci_open(struct inode *inode, struct file *file)
+ 	hdev->close    = vhci_close_dev;
+ 	hdev->flush    = vhci_flush;
+ 	hdev->send     = vhci_send_frame;
+-	hdev->destruct = vhci_destruct;
  
  	hdev->owner = THIS_MODULE;
-@@ -753,6 +743,7 @@ static void bfusb_disconnect(struct usb_interface *intf)
  
- 	hci_unregister_dev(hdev);
+@@ -273,6 +267,7 @@ static int vhci_release(struct inode *inode, struct file *file)
  	hci_free_dev(hdev);
-+	kfree(data);
- }
  
- static struct usb_driver bfusb_driver = {
+ 	file->private_data = NULL;
++	kfree(data);
+ 
+ 	return 0;
+ }
 -- 
 1.7.8.1
