@@ -4,42 +4,43 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi,
 	marcel@holtmann.org,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 04/18] Bluetooth: btmrvl: Remove empty destruct cb
-Date: Sat,  7 Jan 2012 15:47:10 +0100
-Message-Id: <1325947644-11736-5-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 03/18] Bluetooth: bt3c-cs: Remove empty destruct cb
+Date: Sat,  7 Jan 2012 15:47:09 +0100
+Message-Id: <1325947644-11736-4-git-send-email-dh.herrmann@googlemail.com>
 In-Reply-To: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
 References: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The callback is optional and we provide an empty callback so remove it entirely.
+The callback is optional and we provide an empty callback so remove it.
 
 Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 ---
- drivers/bluetooth/btmrvl_main.c |    5 -----
- 1 files changed, 0 insertions(+), 5 deletions(-)
+ drivers/bluetooth/bt3c_cs.c |    6 ------
+ 1 files changed, 0 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index a88a78c..d62fc0d 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -387,10 +387,6 @@ static int btmrvl_ioctl(struct hci_dev *hdev,
- 	return -ENOIOCTLCMD;
+diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
+index 0c97e5d..e74334d 100644
+--- a/drivers/bluetooth/bt3c_cs.c
++++ b/drivers/bluetooth/bt3c_cs.c
+@@ -456,11 +456,6 @@ static int bt3c_hci_send_frame(struct sk_buff *skb)
  }
  
--static void btmrvl_destruct(struct hci_dev *hdev)
+ 
+-static void bt3c_hci_destruct(struct hci_dev *hdev)
 -{
 -}
 -
- static int btmrvl_send_frame(struct sk_buff *skb)
+-
+ static int bt3c_hci_ioctl(struct hci_dev *hdev, unsigned int cmd, unsigned long arg)
  {
- 	struct hci_dev *hdev = (struct hci_dev *) skb->dev;
-@@ -555,7 +551,6 @@ int btmrvl_register_hdev(struct btmrvl_private *priv)
- 	hdev->close = btmrvl_close;
- 	hdev->flush = btmrvl_flush;
- 	hdev->send = btmrvl_send_frame;
--	hdev->destruct = btmrvl_destruct;
- 	hdev->ioctl = btmrvl_ioctl;
- 	hdev->owner = THIS_MODULE;
+ 	return -ENOIOCTLCMD;
+@@ -587,7 +582,6 @@ static int bt3c_open(bt3c_info_t *info)
+ 	hdev->close    = bt3c_hci_close;
+ 	hdev->flush    = bt3c_hci_flush;
+ 	hdev->send     = bt3c_hci_send_frame;
+-	hdev->destruct = bt3c_hci_destruct;
+ 	hdev->ioctl    = bt3c_hci_ioctl;
  
+ 	hdev->owner = THIS_MODULE;
 -- 
 1.7.8.1
