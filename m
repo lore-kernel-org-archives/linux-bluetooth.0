@@ -1,25 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 8 Jan 2012 22:13:22 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: padovan@profusion.mobi, linville@tuxdriver.com, marcel@holtmann.org
-Subject: Temporary bluetooth-next tree
-Message-ID: <20120108201322.GA15796@x220.P-661HNU-F1>
+From: "Ilia, Kolominsky" <iliak@ti.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Connectable PANU state for PTS certifications?
+Date: Sun, 8 Jan 2012 17:51:55 +0000
+Message-ID: <A7CD2DBA66569F478A0C1ECFC39E1C521064C56B@DLEE74.ent.ti.com>
+Content-Type: text/plain; charset="windows-1255"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi!
 
-Since Gustavo is taking a break for about a month, and as requested by
-Marcel, I've set up my own bluetooth-next.git tree to help us
-synchronize our work. It's right now based on Gustavos latest
-bluetooth-next.git with all patches acked by Marcel applied on top of
-it:
+I am trying to pass PTS tests for PANU.
+Number of them try to initialize connection to PANU ( IUT ) and 
+fail because of " bluetoothd[298]: Server unavailable: (0x1115)".
+Spec. says that support for connectable mode in PANU is optional, 
+and the code ( server.c:: server_register() ) seems to register 
+only NAP server.
 
-http://git.kernel.org/?p=linux/kernel/git/jh/bluetooth-next.git;a=summary
+The question is - is it possible to enable the connectable PANU
+mode ( maybe via configuration or light modifications to the code )?
 
-I'll reply to those patch emails in a minute to help track what has been
-applied and I'll also continue to do the same for any new patches.
 
-Johan
+Kind regards,
+Ilia Kolominsky
+iliak@ti.com
+Direct:  +972(9)7906231
+Mobile: +972(54)909009
+
+
+
+
