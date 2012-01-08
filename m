@@ -1,32 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon@janc.net.pl>
-To: =?utf-8?q?Tom=C3=A1=C5=A1_Janou=C5=A1ek?= <tomi@nomi.cz>
-Subject: Re: [REGRESSION] resume takes 10s longer due to e1b6eb3 (Bluetooth: Increase HCI reset timeout ...)
-Date: Sun, 8 Jan 2012 22:14:50 +0100
-Cc: Gustavo Padovan <padovan@profusion.mobi>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Linux PM mailing list <linux-pm@vger.kernel.org>,
- "Srivatsa S. Bhat" <srivatsa.bhat@linux.vnet.ibm.com>
-References: <20111118184017.GA5052@nomi.cz> <20111223204849.GA23712@nomi.cz> <201112282021.04658.szymon@janc.net.pl>
-In-Reply-To: <201112282021.04658.szymon@janc.net.pl>
+Date: Sun, 8 Jan 2012 22:37:12 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	marcel@holtmann.org
+Subject: Re: [PATCH] Bluetooth: dtl1: Fix memleak in probe()
+Message-ID: <20120108203712.GK16731@x220.P-661HNU-F1>
+References: <1325945981-11330-1-git-send-email-dh.herrmann@googlemail.com>
+ <1325945981-11330-5-git-send-email-dh.herrmann@googlemail.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Message-Id: <201201082214.51277.szymon@janc.net.pl>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1325945981-11330-5-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tomáš,
- 
-> > Tell me what you need and how can I get that, and I'm all yours.
+Hi David,
+
+On Sat, Jan 07, 2012, David Herrmann wrote:
+> We currently leak the driver info structure if dtl1_config fails. If we add a
+> kfree() to dtl1_release to fix this, then dtl1_release and dtl1_detach are
+> identical so this merges both functions.
 > 
-> We need to figure out why command complete event to reset command is not
-> received and we get timeout for your bt chip.
+> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
+> ---
+>  drivers/bluetooth/dtl1_cs.c |   20 +++-----------------
+>  1 files changed, 3 insertions(+), 17 deletions(-)
 
-Any chance to get those logs?
+Applied to my bluetooth-next tree. Thanks.
 
--- 
-Szymon K. Janc
-szymon@janc.net.pl
+Johan
