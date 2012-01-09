@@ -1,54 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1326137984.6454.152.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Add support for BCM20702A0 [0489:e031]
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Thilo Cestonaro <thilo@cestona.ro>
+MIME-Version: 1.0
+In-Reply-To: <1325900406.6454.116.camel@aeonflux>
+References: <CAHZ1yC=3Ecj-4-SAHnD93S7_YVF+f_o__Hb2PYFcaoCs_NDoPw@mail.gmail.com>
+	<1325893697.6454.113.camel@aeonflux>
+	<CAHZ1yCkPoHMA52dxMPp=5g_zibOjQui=ffiSGXR1GAiOqUGciA@mail.gmail.com>
+	<1325900406.6454.116.camel@aeonflux>
+Date: Mon, 9 Jan 2012 11:37:32 -0800
+Message-ID: <CAHZ1yCkDf9zM3mzvQT-6A+WWY506vtW9Hk8r_RW8+-A-7mcfgA@mail.gmail.com>
+Subject: Re: Bluetooth 2.1 keyboard not sending keypress notifications
+From: Scott James Remnant <keybuk@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 09 Jan 2012 11:39:44 -0800
-In-Reply-To: <4F0ACADF.1060906@cestona.ro>
-References: <4F0ACADF.1060906@cestona.ro>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Thilo,
+On Fri, Jan 6, 2012 at 5:40 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
+:
 
-> output of usb-devices:
-> T:  Bus=02 Lev=02 Prnt=02 Port=03 Cnt=03 Dev#=  5 Spd=12  MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0489 ProdID=e031 Rev=01.12
-> S:  Manufacturer=Broadcom Corp
-> S:  Product=BCM20702A0
-> S:  SerialNumber=EC55F9EADE09
-> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+Thanks for the pointers!
 
-you need to signed-of-by your patches.
+> > >> Have been testing a Bluetooth 2.1 keyboard, but we don't get any
+> > >> keypress notifications from it as the pincode is typed and the Agent=
+'s
+> > >> DisplayPasskey D-Bus method is never called (with two or three
+> > >> arguments).
+> > >>
+> > >> Any ideas where to begin debugging this?
+> > >
+> > > first, start with hcidump to see what commands and events are actuall=
+y
+> > > send by the keyboard. And capture the bluetoothd debug output.
+> > >
+> > > And I am pretty sure that a real 2.1 keyboard with Secure Simple Pair=
+ing
+> > > is not working at all. We never managed to purchase one of these. If =
+you
+> > > managed to find one, then let us know where you got it from.
+> > >
+> > I have both of those attached, the keyboard is the Apple Wireless
+> > Keyboard - it at least behaves in a manner consistent with 2.1 SSP
+> > under OS X, complete with hilighting the passkey as it's typed.
+> >
+> > One thing I noticed from the log is that neither side exchanges IO
+> > capabilities which seems to be a pre-requisite for SSP?
+>
+> you are correct here and the usage of PIN Code Request makes it clear
+> that this is 2.0 only keyboard. Can you create a binary dump in BTSnoop
+> format. Since I see a bunch of vendor events, maybe that is how OS X
+> does it.
+>
+Yup, sending by hand a Remote Version command means the keyboard does
+admit that it's 2.0 not 2.1, so the only devices we can find that are
+2.1 are the host controllers in all of the hosts :-)
 
-> ---
->   drivers/bluetooth/btusb.c |    1 +
->   1 files changed, 1 insertions(+), 0 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 55ac349..07622141a 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -101,6 +101,7 @@ static struct usb_device_id btusb_table[] = {
->       { USB_DEVICE(0x0c10, 0x0000) },
-> 
->       /* Broadcom BCM20702A0 */
-> +    { USB_DEVICE(0x0489, 0xe031) },
->       { USB_DEVICE(0x0a5c, 0x21e3) },
->       { USB_DEVICE(0x413c, 0x8197) },
-
-And please follow the coding style. This needs to be a tab here.
-
-Regards
-
-Marcel
+> That said, since this is 2.0 without SSP, it should actually work. Have
+> you tried to use simple-agent test script from the source?
+>
+Pairing works, it's just ugly compared to OS X with it's pretty
+light-as-you-type stuff, and you know how those UI designers are ...
 
 
+So it turns out that the Mac isn't doing anything special either; it's
+doing ordinary 2.0 authentication. But the twist is an L2CAP
+connection and configuration request/response before authentication is
+requested, this seems to enable the keyboard sending a Vendor Event
+every time a key is pressed during authentication.
+
+Investigating that now
+
+Scott
+--
+Scott James Remnant=A0|=A0Chrome OS Systems=A0|=A0keybuk@google.com=A0|=A0G=
+oogle
