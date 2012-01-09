@@ -1,130 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 1/2] Bluetooth: Recalculate sched HCI blk/pkt flow ctrl
-Date: Mon,  9 Jan 2012 10:59:53 +0200
-Message-Id: <1326099594-982-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <4F0AA5A2.4070903@monom.org>
+Date: Mon, 09 Jan 2012 09:30:26 +0100
+From: Daniel Wagner <wagi@monom.org>
+MIME-Version: 1.0
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: Peter Hurley <peter@hurleysoftware.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
+References: <1312921615.2261.1.camel@THOR> <4F04285E.1070500@monom.org>
+In-Reply-To: <4F04285E.1070500@monom.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Johan,
 
-Split HCI scheduling for block and packet flow control.
+On 04.01.2012 11:22, Daniel Wagner wrote:
+> Hi Peter,
+> 
+> On 09.08.2011 22:26, Peter Hurley wrote:
+>> Commit 330605423c fixed l2cap conn establishment for non-ssp remote
+>> devices by not setting HCI_CONN_ENCRYPT_PEND every time conn security
+>> is tested (which was always returning failure on any subsequent
+>> security checks).
+>>
+>> However, this broke l2cap conn establishment for ssp remote devices
+>> when an ACL link was already established at SDP-level security. This
+>> fix ensures that encryption must be pending whenever authentication
+>> is also pending.
+>>
+>> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+> 
+> git am complaines:
+> 
+> Applying: Bluetooth: Fix l2cap conn failures for ssp devices
+> /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:18: trailing whitespace.
+> 
+> /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:19: trailing whitespace.
+>                 /* encrypt must be pending if auth is also pending */
+> /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:20: trailing whitespace.
+>                 set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend);
+> /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:21: trailing whitespace.
+> 
+> 
+> But it fixes the problem I was debugging. From what I have
+> learned in the last two days I would say it is also the right fix :)
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/hci_core.c |   85 ++++++++++++++++++++++++++++++++++++++++++---
- 1 files changed, 79 insertions(+), 6 deletions(-)
+Is there any chance to get this patch in? If it helps I could send a
+whitespace fixed version.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index bd1a5c0..de10e86 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2335,18 +2335,19 @@ static void hci_prio_recalculate(struct hci_dev *hdev, __u8 type)
- 
- }
- 
--static inline void hci_sched_acl(struct hci_dev *hdev)
-+static inline int __get_blocks(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	/* Calculate count of blocks used by this packet */
-+	return DIV_ROUND_UP(skb->len - HCI_ACL_HDR_SIZE, hdev->block_len);
-+}
-+
-+static inline void hci_sched_acl_pkt(struct hci_dev *hdev)
- {
- 	struct hci_chan *chan;
- 	struct sk_buff *skb;
- 	int quote;
- 	unsigned int cnt;
- 
--	BT_DBG("%s", hdev->name);
--
--	if (!hci_conn_num(hdev, ACL_LINK))
--		return;
--
- 	if (!test_bit(HCI_RAW, &hdev->flags)) {
- 		/* ACL tx timeout must be longer than maximum
- 		 * link supervision timeout (40.9 seconds) */
-@@ -2386,6 +2387,78 @@ static inline void hci_sched_acl(struct hci_dev *hdev)
- 		hci_prio_recalculate(hdev, ACL_LINK);
- }
- 
-+static inline void hci_sched_acl_blk(struct hci_dev *hdev)
-+{
-+	struct hci_chan *chan;
-+	struct sk_buff *skb;
-+	int quote;
-+	unsigned int cnt;
-+
-+	if (!test_bit(HCI_RAW, &hdev->flags)) {
-+		/* ACL tx timeout must be longer than maximum
-+		 * link supervision timeout (40.9 seconds) */
-+		if (!hdev->block_cnt && time_after(jiffies, hdev->acl_last_tx +
-+					msecs_to_jiffies(HCI_ACL_TX_TIMEOUT)))
-+			hci_link_tx_to(hdev, ACL_LINK);
-+	}
-+
-+	cnt = hdev->block_cnt;
-+
-+	while (hdev->block_cnt > 0 &&
-+			(chan = hci_chan_sent(hdev, ACL_LINK, &quote))) {
-+		u32 priority = (skb_peek(&chan->data_q))->priority;
-+		while (quote > 0 && (skb = skb_peek(&chan->data_q))) {
-+			int blocks;
-+
-+			BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
-+						skb->len, skb->priority);
-+
-+			/* Stop if priority has changed */
-+			if (skb->priority < priority)
-+				break;
-+
-+			skb = skb_dequeue(&chan->data_q);
-+
-+			blocks = __get_blocks(hdev, skb);
-+			if (blocks > hdev->block_cnt)
-+				return;
-+
-+			hci_conn_enter_active_mode(chan->conn,
-+						bt_cb(skb)->force_active);
-+
-+			hci_send_frame(skb);
-+			hdev->acl_last_tx = jiffies;
-+
-+			hdev->block_cnt -= blocks;
-+			quote -= blocks;
-+
-+			chan->sent += blocks;
-+			chan->conn->sent += blocks;
-+		}
-+	}
-+
-+	if (cnt != hdev->block_cnt)
-+		hci_prio_recalculate(hdev, ACL_LINK);
-+}
-+
-+static inline void hci_sched_acl(struct hci_dev *hdev)
-+{
-+	BT_DBG("%s", hdev->name);
-+
-+	if (!hci_conn_num(hdev, ACL_LINK))
-+		return;
-+
-+	switch (hdev->flow_ctl_mode) {
-+	case HCI_FLOW_CTL_MODE_PACKET_BASED:
-+		hci_sched_acl_pkt(hdev);
-+		break;
-+
-+	case HCI_FLOW_CTL_MODE_BLOCK_BASED:
-+		hci_sched_acl_blk(hdev);
-+		break;
-+	}
-+}
-+
- /* Schedule SCO */
- static inline void hci_sched_sco(struct hci_dev *hdev)
- {
--- 
-1.7.4.1
-
+cheers,
+daniel
