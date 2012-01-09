@@ -1,53 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] Bluetooth: Remove bogus inline declaration from l2cap_chan_connect
-Date: Mon,  9 Jan 2012 13:46:02 +0200
-Message-Id: <1326109565-32631-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 9 Jan 2012 13:44:17 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	marcel@holtmann.org
+Subject: Re: [PATCH 00/18] Cleanup HCI reference counts
+Message-ID: <20120109114417.GA31957@x220>
+References: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi David,
 
-As reported by Dan Carpenter this function causes a Sparse warning and
-shouldn't be declared inline:
+On Sat, Jan 07, 2012, David Herrmann wrote:
+> David Herrmann (18):
+>   Bluetooth: Make hci-destruct callback optional
+>   Bluetooth: bluecard-cs: Remove empty destruct cb
+>   Bluetooth: bt3c-cs: Remove empty destruct cb
+>   Bluetooth: btmrvl: Remove empty destruct cb
+>   Bluetooth: btuart-cs: Remove empty destruct cb
+>   Bluetooth: btwilink: Remove empty destruct cb
+>   Bluetooth: dtl1-cs: Remove empty destruct cb
+>   Bluetooth: vhci: Free driver_data on file release
+>   Bluetooth: bfusb: Free driver_data on USB shutdown
+>   Bluetooth: btusb: Free driver data on USB shutdown
+>   Bluetooth: bpa10x: Free private driver data on usb shutdown
+>   Bluetooth: btsdio: Free driver data on SDIO shutdown
+>   Bluetooth: uart-ldisc: Fix memory leak and remove destruct cb
+>   Bluetooth: Remove unused hci-destruct cb
+>   Bluetooth: Correctly acquire module ref
+>   Bluetooth: Remove HCI-owner field
+>   Bluetooth: Correctly take hci_dev->dev refcount
+>   Bluetooth: Remove __hci_dev_put/hold
+> 
+>  drivers/bluetooth/bfusb.c        |   13 +------------
+>  drivers/bluetooth/bluecard_cs.c  |    8 --------
+>  drivers/bluetooth/bpa10x.c       |   17 +++--------------
+>  drivers/bluetooth/bt3c_cs.c      |    8 --------
+>  drivers/bluetooth/btmrvl_main.c  |    6 ------
+>  drivers/bluetooth/btsdio.c       |   13 +------------
+>  drivers/bluetooth/btuart_cs.c    |    8 --------
+>  drivers/bluetooth/btusb.c        |   17 +++--------------
+>  drivers/bluetooth/btwilink.c     |   10 ----------
+>  drivers/bluetooth/dtl1_cs.c      |    8 --------
+>  drivers/bluetooth/hci_ldisc.c    |   14 ++------------
+>  drivers/bluetooth/hci_vhci.c     |    9 +--------
+>  include/net/bluetooth/hci_core.h |   28 ++++------------------------
+>  net/bluetooth/hci_core.c         |    9 ++++-----
+>  net/bluetooth/hci_sysfs.c        |    2 ++
+>  15 files changed, 21 insertions(+), 149 deletions(-)
 
-include/net/bluetooth/l2cap.h:837:30 error: marked inline, but without a
-definition"
+All of these patches have been applied to my bluetooth-next tree. In the
+future please adjust your editor settings so that your commit message
+lines aren't longer than 72 characters. The message should be fully
+visible with git log (which indents the messages) on a 80-wide terminal
+I ended up fixing the messages manually this time.
 
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/l2cap.h |    2 +-
- net/bluetooth/l2cap_core.c    |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index b564142..370214f 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -834,7 +834,7 @@ int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
- struct l2cap_chan *l2cap_chan_create(struct sock *sk);
- void l2cap_chan_close(struct l2cap_chan *chan, int reason);
- void l2cap_chan_destroy(struct l2cap_chan *chan);
--inline int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
-+int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 								bdaddr_t *dst);
- int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
- 								u32 priority);
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 97f8549..90f5b5d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1120,7 +1120,7 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr
- 	return c1;
- }
- 
--inline int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *dst)
-+int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *dst)
- {
- 	struct sock *sk = chan->sk;
- 	bdaddr_t *src = &bt_sk(sk)->src;
--- 
-1.7.8.2
-
+Johan
