@@ -1,44 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1326104817.6454.141.camel@aeonflux>
+From: "Ilia, Kolominsky" <iliak@ti.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Subject: RE: Connectable PANU state for PTS certifications?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Ilia, Kolominsky" <iliak@ti.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 09 Jan 2012 02:26:57 -0800
-In-Reply-To: <A7CD2DBA66569F478A0C1ECFC39E1C52106517B7@DNCE03.ent.ti.com>
+Date: Mon, 9 Jan 2012 09:20:44 +0000
+Message-ID: <A7CD2DBA66569F478A0C1ECFC39E1C52106517B7@DNCE03.ent.ti.com>
 References: <A7CD2DBA66569F478A0C1ECFC39E1C521064C56B@DLEE74.ent.ti.com>
-	 <1326054253.6454.135.camel@aeonflux>
-	 <A7CD2DBA66569F478A0C1ECFC39E1C52106517B7@DNCE03.ent.ti.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+ <1326054253.6454.135.camel@aeonflux>
+In-Reply-To: <1326054253.6454.135.camel@aeonflux>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ilia,
-
-> > > I am trying to pass PTS tests for PANU.
-> > > Number of them try to initialize connection to PANU ( IUT ) and
-> > > fail because of " bluetoothd[298]: Server unavailable: (0x1115)".
-> > > Spec. says that support for connectable mode in PANU is optional,
-> > > and the code ( server.c:: server_register() ) seems to register
-> > > only NAP server.
-> > >
-> > > The question is - is it possible to enable the connectable PANU
-> > > mode ( maybe via configuration or light modifications to the code )?
-> > 
-> > look at doc/network-api.txt. So in theory you can do something like
-> > NetworkServer.Register("panu", "br0").
-> > 
-> > However I have the slight suspicion that only "nap" is really fully
-> > implemented and tested.
-> 
-> Seems so - register_server() explicitly checks that uuid to is "nap"
-> and emits btd_error_failed in case it is not.
-
-feel free to send patches for it.
-
-Regards
-
-Marcel
-
-
+SGkgTWFyY2VsLA0KVGhhbmtzIGZvciByZXBseSwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2Ut
+LS0tLQ0KPiBGcm9tOiBNYXJjZWwgSG9sdG1hbm4gW21haWx0bzptYXJjZWxAaG9sdG1hbm4ub3Jn
+XQ0KPiBTZW50OiBTdW5kYXksIEphbnVhcnkgMDgsIDIwMTIgMTA6MjQgUE0NCj4gVG86IElsaWEs
+IEtvbG9taW5za3kNCj4gQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4gU3Vi
+amVjdDogUmU6IENvbm5lY3RhYmxlIFBBTlUgc3RhdGUgZm9yIFBUUyBjZXJ0aWZpY2F0aW9ucz8N
+Cj4gDQo+IEhpIElsaWEsDQo+IA0KPiA+IEkgYW0gdHJ5aW5nIHRvIHBhc3MgUFRTIHRlc3RzIGZv
+ciBQQU5VLg0KPiA+IE51bWJlciBvZiB0aGVtIHRyeSB0byBpbml0aWFsaXplIGNvbm5lY3Rpb24g
+dG8gUEFOVSAoIElVVCApIGFuZA0KPiA+IGZhaWwgYmVjYXVzZSBvZiAiIGJsdWV0b290aGRbMjk4
+XTogU2VydmVyIHVuYXZhaWxhYmxlOiAoMHgxMTE1KSIuDQo+ID4gU3BlYy4gc2F5cyB0aGF0IHN1
+cHBvcnQgZm9yIGNvbm5lY3RhYmxlIG1vZGUgaW4gUEFOVSBpcyBvcHRpb25hbCwNCj4gPiBhbmQg
+dGhlIGNvZGUgKCBzZXJ2ZXIuYzo6IHNlcnZlcl9yZWdpc3RlcigpICkgc2VlbXMgdG8gcmVnaXN0
+ZXINCj4gPiBvbmx5IE5BUCBzZXJ2ZXIuDQo+ID4NCj4gPiBUaGUgcXVlc3Rpb24gaXMgLSBpcyBp
+dCBwb3NzaWJsZSB0byBlbmFibGUgdGhlIGNvbm5lY3RhYmxlIFBBTlUNCj4gPiBtb2RlICggbWF5
+YmUgdmlhIGNvbmZpZ3VyYXRpb24gb3IgbGlnaHQgbW9kaWZpY2F0aW9ucyB0byB0aGUgY29kZSAp
+Pw0KPiANCj4gbG9vayBhdCBkb2MvbmV0d29yay1hcGkudHh0LiBTbyBpbiB0aGVvcnkgeW91IGNh
+biBkbyBzb21ldGhpbmcgbGlrZQ0KPiBOZXR3b3JrU2VydmVyLlJlZ2lzdGVyKCJwYW51IiwgImJy
+MCIpLg0KPiANCj4gSG93ZXZlciBJIGhhdmUgdGhlIHNsaWdodCBzdXNwaWNpb24gdGhhdCBvbmx5
+ICJuYXAiIGlzIHJlYWxseSBmdWxseQ0KPiBpbXBsZW1lbnRlZCBhbmQgdGVzdGVkLg0KDQpTZWVt
+cyBzbyAtIHJlZ2lzdGVyX3NlcnZlcigpIGV4cGxpY2l0bHkgY2hlY2tzIHRoYXQgdXVpZCB0byBp
+cyAibmFwIg0KYW5kIGVtaXRzIGJ0ZF9lcnJvcl9mYWlsZWQgaW4gY2FzZSBpdCBpcyBub3QuDQo+
+IA0KPiBSZWdhcmRzDQo+IA0KPiBNYXJjZWwNCj4gDQoNCkJlc3RzLCBJbGlhLg0K
