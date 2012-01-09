@@ -1,44 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F0AA1EA.4060500@gmx.de>
-Date: Mon, 09 Jan 2012 09:14:34 +0100
-From: Harvey <harv@gmx.de>
-Reply-To: harv@gmx.de
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Kernel 3.2 and Broacom BCM20702A0
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Message-ID: <1326095651.6454.140.camel@aeonflux>
+Subject: Re: [PATCH 00/18] Cleanup HCI reference counts
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
+Date: Sun, 08 Jan 2012 23:54:11 -0800
+In-Reply-To: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
+References: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi David,
 
-I was eagerly awaiting kernel 3.2 as it has support for the usb 
-bluetooth builtin adapter in my new laptop, a Fuijitsu Lifebook E751.
+> This is the same as my previous patchset but split into sequential patches. The
+> first patch makes the destruct-cb optional so the patches 2-7 can remove the
+> empty callbacks.
+> Patches 8-14 make the remaining drivers drop the destruct-callback and directly
+> free the driver data.
+> Patches 15-18 then remove the (now unused!) destruct callback and then properly
+> fixes the reference counts (same patches as already posted).
+> 
+> I hope the first 14 patches make clear that half of our drivers already work
+> without the destruct callback and the other half can be safely converted into
+> not using it. In fact, the drivers that use it introduce some memleaks which are
+> fixed by simply dropping the callback and freeing everything right away.
+> 
+> I've added detailed commit messages to each driver. If a single step is unclear,
+> please point me to it.
+> 
+> 
+> By the way, this fixes several bugs we currently have, including some mem-leaks
+> as described in the commits and the fact that hci_free_dev() currently
+> *directly* destroys the hci object regardless of any previous calls to
+> hci_hold_dev/hci_put_dev(). This is because the hci->refcnt counter is in no way
+> linked to the lifetime of the hci object. See hci_sysfs the release_host
+> callback which actually frees the hci object. It is in no way triggered by
+> hci->refcnt.
+> This patchset fixes all this and introduces proper reference counting.
 
-To my disappaointment it doesn't seem to work right.
+I went through the patches again and after thinking about it for a bit,
+this all looks good.
 
-Output of usb-devices:
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-T:  Bus=02 Lev=02 Prnt=02 Port=03 Cnt=03 Dev#=  5 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e031 Rev=01.12
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM20702A0
-S:  SerialNumber=3859F9CD2AEE
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+Johan, feel free to include this patchset into your tree.
 
-Seems to be another vendor specific ID for the same adapter...
+Regards
 
-For a quick test I did load the btusb module manually and did a
-'echo "0489 e031" >> /sys/bus/usb/drivers/btusb/new_id'
+Marcel
 
-'hcitool dev' then shows my BT adapter's MAC. It seems to work but it 
-does not find any other devices.
 
-Under windows XP in a virtual machine all is working well.
-
-Harvey
