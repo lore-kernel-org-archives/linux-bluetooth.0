@@ -1,74 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 3/5] Bluetooth: Clear ack_timer when sending ack
+Date: Mon, 9 Jan 2012 16:19:49 +0100
+Message-ID: <1326122391-8438-4-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1326122391-8438-1-git-send-email-szymon.janc@tieto.com>
+References: <1326122391-8438-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1325900406.6454.116.camel@aeonflux>
-References: <CAHZ1yC=3Ecj-4-SAHnD93S7_YVF+f_o__Hb2PYFcaoCs_NDoPw@mail.gmail.com>
-	<1325893697.6454.113.camel@aeonflux>
-	<CAHZ1yCkPoHMA52dxMPp=5g_zibOjQui=ffiSGXR1GAiOqUGciA@mail.gmail.com>
-	<1325900406.6454.116.camel@aeonflux>
-Date: Mon, 9 Jan 2012 11:37:32 -0800
-Message-ID: <CAHZ1yCkDf9zM3mzvQT-6A+WWY506vtW9Hk8r_RW8+-A-7mcfgA@mail.gmail.com>
-Subject: Re: Bluetooth 2.1 keyboard not sending keypress notifications
-From: Scott James Remnant <keybuk@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jan 6, 2012 at 5:40 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
-:
+ack_timer should be cleared when sending ACK to avoid acking I-frames
+twice.
 
-Thanks for the pointers!
+Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+---
+ net/bluetooth/l2cap_core.c |   10 ++++++++--
+ 1 files changed, 8 insertions(+), 2 deletions(-)
 
-> > >> Have been testing a Bluetooth 2.1 keyboard, but we don't get any
-> > >> keypress notifications from it as the pincode is typed and the Agent=
-'s
-> > >> DisplayPasskey D-Bus method is never called (with two or three
-> > >> arguments).
-> > >>
-> > >> Any ideas where to begin debugging this?
-> > >
-> > > first, start with hcidump to see what commands and events are actuall=
-y
-> > > send by the keyboard. And capture the bluetoothd debug output.
-> > >
-> > > And I am pretty sure that a real 2.1 keyboard with Secure Simple Pair=
-ing
-> > > is not working at all. We never managed to purchase one of these. If =
-you
-> > > managed to find one, then let us know where you got it from.
-> > >
-> > I have both of those attached, the keyboard is the Apple Wireless
-> > Keyboard - it at least behaves in a manner consistent with 2.1 SSP
-> > under OS X, complete with hilighting the passkey as it's typed.
-> >
-> > One thing I noticed from the log is that neither side exchanges IO
-> > capabilities which seems to be a pre-requisite for SSP?
->
-> you are correct here and the usage of PIN Code Request makes it clear
-> that this is 2.0 only keyboard. Can you create a binary dump in BTSnoop
-> format. Since I see a bunch of vendor events, maybe that is how OS X
-> does it.
->
-Yup, sending by hand a Remote Version command means the keyboard does
-admit that it's 2.0 not 2.1, so the only devices we can find that are
-2.1 are the host controllers in all of the hosts :-)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 308d9d7..b9e232e 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1478,7 +1478,7 @@ static int l2cap_retransmit_frames(struct l2cap_chan *chan)
+ 	return ret;
+ }
+ 
+-static void l2cap_send_ack(struct l2cap_chan *chan)
++static void __l2cap_send_ack(struct l2cap_chan *chan)
+ {
+ 	u32 control = 0;
+ 
+@@ -1498,6 +1498,12 @@ static void l2cap_send_ack(struct l2cap_chan *chan)
+ 	l2cap_send_sframe(chan, control);
+ }
+ 
++static void l2cap_send_ack(struct l2cap_chan *chan)
++{
++	__clear_ack_timer(chan);
++	__l2cap_send_ack(chan);
++}
++
+ static void l2cap_send_srejtail(struct l2cap_chan *chan)
+ {
+ 	struct srej_list *tail;
+@@ -1988,7 +1994,7 @@ static void l2cap_ack_timeout(struct work_struct *work)
+ 	BT_DBG("chan %p", chan);
+ 
+ 	lock_sock(chan->sk);
+-	l2cap_send_ack(chan);
++	__l2cap_send_ack(chan);
+ 	release_sock(chan->sk);
+ }
+ 
+-- 
+on behalf of ST-Ericsson
 
-> That said, since this is 2.0 without SSP, it should actually work. Have
-> you tried to use simple-agent test script from the source?
->
-Pairing works, it's just ugly compared to OS X with it's pretty
-light-as-you-type stuff, and you know how those UI designers are ...
-
-
-So it turns out that the Mac isn't doing anything special either; it's
-doing ordinary 2.0 authentication. But the twist is an L2CAP
-connection and configuration request/response before authentication is
-requested, this seems to enable the keyboard sending a Vendor Event
-every time a key is pressed during authentication.
-
-Investigating that now
-
-Scott
---
-Scott James Remnant=A0|=A0Chrome OS Systems=A0|=A0keybuk@google.com=A0|=A0G=
-oogle
