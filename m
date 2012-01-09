@@ -1,34 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 9 Jan 2012 11:38:45 +0100
-From: =?utf-8?B?VG9tw6HFoSBKYW5vdcWhZWs=?= <tomi@nomi.cz>
-To: Szymon Janc <szymon@janc.net.pl>
-Cc: Gustavo Padovan <padovan@profusion.mobi>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Linux PM mailing list <linux-pm@vger.kernel.org>,
-	"Srivatsa S. Bhat" <srivatsa.bhat@linux.vnet.ibm.com>
-Subject: Re: [REGRESSION] resume takes 10s longer due to e1b6eb3
-	(Bluetooth: Increase HCI reset timeout ...)
-Message-ID: <20120109103845.GA30361@nomi.cz>
-References: <20111118184017.GA5052@nomi.cz> <20111223204849.GA23712@nomi.cz> <201112282021.04658.szymon@janc.net.pl> <201201082214.51277.szymon@janc.net.pl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <201201082214.51277.szymon@janc.net.pl>
+Message-ID: <1326104817.6454.141.camel@aeonflux>
+Subject: RE: Connectable PANU state for PTS certifications?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Ilia, Kolominsky" <iliak@ti.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 09 Jan 2012 02:26:57 -0800
+In-Reply-To: <A7CD2DBA66569F478A0C1ECFC39E1C52106517B7@DNCE03.ent.ti.com>
+References: <A7CD2DBA66569F478A0C1ECFC39E1C521064C56B@DLEE74.ent.ti.com>
+	 <1326054253.6454.135.camel@aeonflux>
+	 <A7CD2DBA66569F478A0C1ECFC39E1C52106517B7@DNCE03.ent.ti.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Ilia,
 
-On Sun, Jan 08, 2012 at 10:14:50PM +0100, Szymon Janc wrote:
-> > > Tell me what you need and how can I get that, and I'm all yours.
+> > > I am trying to pass PTS tests for PANU.
+> > > Number of them try to initialize connection to PANU ( IUT ) and
+> > > fail because of " bluetoothd[298]: Server unavailable: (0x1115)".
+> > > Spec. says that support for connectable mode in PANU is optional,
+> > > and the code ( server.c:: server_register() ) seems to register
+> > > only NAP server.
+> > >
+> > > The question is - is it possible to enable the connectable PANU
+> > > mode ( maybe via configuration or light modifications to the code )?
 > > 
-> > We need to figure out why command complete event to reset command is not
-> > received and we get timeout for your bt chip.
+> > look at doc/network-api.txt. So in theory you can do something like
+> > NetworkServer.Register("panu", "br0").
+> > 
+> > However I have the slight suspicion that only "nap" is really fully
+> > implemented and tested.
 > 
-> Any chance to get those logs?
+> Seems so - register_server() explicitly checks that uuid to is "nap"
+> and emits btd_error_failed in case it is not.
 
-I'm sorry, I've been quite busy lately. I'll try what I can do, but no sooner
-than the weekend (and even that is quite optimistic). :-(
+feel free to send patches for it.
 
--- 
-Tomáš Janoušek, a.k.a. Liskni_si, http://work.lisk.in/
+Regards
+
+Marcel
+
+
