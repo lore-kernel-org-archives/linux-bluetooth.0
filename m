@@ -1,35 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ilia, Kolominsky" <iliak@ti.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Connectable PANU state for PTS certifications?
-Date: Mon, 9 Jan 2012 09:20:44 +0000
-Message-ID: <A7CD2DBA66569F478A0C1ECFC39E1C52106517B7@DNCE03.ent.ti.com>
-References: <A7CD2DBA66569F478A0C1ECFC39E1C521064C56B@DLEE74.ent.ti.com>
- <1326054253.6454.135.camel@aeonflux>
-In-Reply-To: <1326054253.6454.135.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFCv1 2/2] Bluetooth: Helper removes duplicated code
+Date: Mon,  9 Jan 2012 10:59:54 +0200
+Message-Id: <1326099594-982-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1326099594-982-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1326099594-982-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KVGhhbmtzIGZvciByZXBseSwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2Ut
-LS0tLQ0KPiBGcm9tOiBNYXJjZWwgSG9sdG1hbm4gW21haWx0bzptYXJjZWxAaG9sdG1hbm4ub3Jn
-XQ0KPiBTZW50OiBTdW5kYXksIEphbnVhcnkgMDgsIDIwMTIgMTA6MjQgUE0NCj4gVG86IElsaWEs
-IEtvbG9taW5za3kNCj4gQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4gU3Vi
-amVjdDogUmU6IENvbm5lY3RhYmxlIFBBTlUgc3RhdGUgZm9yIFBUUyBjZXJ0aWZpY2F0aW9ucz8N
-Cj4gDQo+IEhpIElsaWEsDQo+IA0KPiA+IEkgYW0gdHJ5aW5nIHRvIHBhc3MgUFRTIHRlc3RzIGZv
-ciBQQU5VLg0KPiA+IE51bWJlciBvZiB0aGVtIHRyeSB0byBpbml0aWFsaXplIGNvbm5lY3Rpb24g
-dG8gUEFOVSAoIElVVCApIGFuZA0KPiA+IGZhaWwgYmVjYXVzZSBvZiAiIGJsdWV0b290aGRbMjk4
-XTogU2VydmVyIHVuYXZhaWxhYmxlOiAoMHgxMTE1KSIuDQo+ID4gU3BlYy4gc2F5cyB0aGF0IHN1
-cHBvcnQgZm9yIGNvbm5lY3RhYmxlIG1vZGUgaW4gUEFOVSBpcyBvcHRpb25hbCwNCj4gPiBhbmQg
-dGhlIGNvZGUgKCBzZXJ2ZXIuYzo6IHNlcnZlcl9yZWdpc3RlcigpICkgc2VlbXMgdG8gcmVnaXN0
-ZXINCj4gPiBvbmx5IE5BUCBzZXJ2ZXIuDQo+ID4NCj4gPiBUaGUgcXVlc3Rpb24gaXMgLSBpcyBp
-dCBwb3NzaWJsZSB0byBlbmFibGUgdGhlIGNvbm5lY3RhYmxlIFBBTlUNCj4gPiBtb2RlICggbWF5
-YmUgdmlhIGNvbmZpZ3VyYXRpb24gb3IgbGlnaHQgbW9kaWZpY2F0aW9ucyB0byB0aGUgY29kZSAp
-Pw0KPiANCj4gbG9vayBhdCBkb2MvbmV0d29yay1hcGkudHh0LiBTbyBpbiB0aGVvcnkgeW91IGNh
-biBkbyBzb21ldGhpbmcgbGlrZQ0KPiBOZXR3b3JrU2VydmVyLlJlZ2lzdGVyKCJwYW51IiwgImJy
-MCIpLg0KPiANCj4gSG93ZXZlciBJIGhhdmUgdGhlIHNsaWdodCBzdXNwaWNpb24gdGhhdCBvbmx5
-ICJuYXAiIGlzIHJlYWxseSBmdWxseQ0KPiBpbXBsZW1lbnRlZCBhbmQgdGVzdGVkLg0KDQpTZWVt
-cyBzbyAtIHJlZ2lzdGVyX3NlcnZlcigpIGV4cGxpY2l0bHkgY2hlY2tzIHRoYXQgdXVpZCB0byBp
-cyAibmFwIg0KYW5kIGVtaXRzIGJ0ZF9lcnJvcl9mYWlsZWQgaW4gY2FzZSBpdCBpcyBub3QuDQo+
-IA0KPiBSZWdhcmRzDQo+IA0KPiBNYXJjZWwNCj4gDQoNCkJlc3RzLCBJbGlhLg0K
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+
+Use __check_timout helper to remove duplicated code
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/hci_core.c |   31 +++++++++++++------------------
+ 1 files changed, 13 insertions(+), 18 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index de10e86..aeed666 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2341,22 +2341,25 @@ static inline int __get_blocks(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return DIV_ROUND_UP(skb->len - HCI_ACL_HDR_SIZE, hdev->block_len);
+ }
+ 
+-static inline void hci_sched_acl_pkt(struct hci_dev *hdev)
++static inline void __check_timeout(struct hci_dev *hdev, unsigned int cnt)
+ {
+-	struct hci_chan *chan;
+-	struct sk_buff *skb;
+-	int quote;
+-	unsigned int cnt;
+-
+ 	if (!test_bit(HCI_RAW, &hdev->flags)) {
+ 		/* ACL tx timeout must be longer than maximum
+ 		 * link supervision timeout (40.9 seconds) */
+-		if (!hdev->acl_cnt && time_after(jiffies, hdev->acl_last_tx +
++		if (!cnt && time_after(jiffies, hdev->acl_last_tx +
+ 					msecs_to_jiffies(HCI_ACL_TX_TIMEOUT)))
+ 			hci_link_tx_to(hdev, ACL_LINK);
+ 	}
++}
+ 
+-	cnt = hdev->acl_cnt;
++static inline void hci_sched_acl_pkt(struct hci_dev *hdev)
++{
++	unsigned int cnt = hdev->acl_cnt;
++	struct hci_chan *chan;
++	struct sk_buff *skb;
++	int quote;
++
++	__check_timeout(hdev, cnt);
+ 
+ 	while (hdev->acl_cnt &&
+ 			(chan = hci_chan_sent(hdev, ACL_LINK, &quote))) {
+@@ -2389,20 +2392,12 @@ static inline void hci_sched_acl_pkt(struct hci_dev *hdev)
+ 
+ static inline void hci_sched_acl_blk(struct hci_dev *hdev)
+ {
++	unsigned int cnt = hdev->block_cnt;
+ 	struct hci_chan *chan;
+ 	struct sk_buff *skb;
+ 	int quote;
+-	unsigned int cnt;
+-
+-	if (!test_bit(HCI_RAW, &hdev->flags)) {
+-		/* ACL tx timeout must be longer than maximum
+-		 * link supervision timeout (40.9 seconds) */
+-		if (!hdev->block_cnt && time_after(jiffies, hdev->acl_last_tx +
+-					msecs_to_jiffies(HCI_ACL_TX_TIMEOUT)))
+-			hci_link_tx_to(hdev, ACL_LINK);
+-	}
+ 
+-	cnt = hdev->block_cnt;
++	__check_timeout(hdev, cnt);
+ 
+ 	while (hdev->block_cnt > 0 &&
+ 			(chan = hci_chan_sent(hdev, ACL_LINK, &quote))) {
+-- 
+1.7.4.1
+
