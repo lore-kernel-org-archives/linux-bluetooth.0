@@ -1,49 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1326140173.6454.168.camel@aeonflux>
-References: <CAHZ1yC=3Ecj-4-SAHnD93S7_YVF+f_o__Hb2PYFcaoCs_NDoPw@mail.gmail.com>
-	<1325893697.6454.113.camel@aeonflux>
-	<CAHZ1yCkPoHMA52dxMPp=5g_zibOjQui=ffiSGXR1GAiOqUGciA@mail.gmail.com>
-	<1325900406.6454.116.camel@aeonflux>
-	<CAHZ1yCkDf9zM3mzvQT-6A+WWY506vtW9Hk8r_RW8+-A-7mcfgA@mail.gmail.com>
-	<1326138887.6454.165.camel@aeonflux>
-	<CAHZ1yCmLV6RS6EA7+p2+VDG05YNSNUxCbo8gLcq2t04Ahn2Kcw@mail.gmail.com>
-	<1326140173.6454.168.camel@aeonflux>
-Date: Mon, 9 Jan 2012 17:10:34 -0800
-Message-ID: <CAHZ1yCnOegQhL-Vy_vf8ex9rTsXOb98geaYzzT6wpDuqM-sbsg@mail.gmail.com>
-Subject: Re: Bluetooth 2.1 keyboard not sending keypress notifications
-From: Scott James Remnant <keybuk@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [RFC BlueZ] Add Proximity Reporter interface - Proposal 2
+Date: Mon,  9 Jan 2012 18:04:41 -0300
+Message-Id: <1326143081-30005-2-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1326143081-30005-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1326143081-30005-1-git-send-email-claudio.takahasi@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jan 9, 2012 at 12:16 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
+Adds API for Immediate Alert Service(IAS) abstraction. Abstraction for
+Link Loss is not planned. IAS is used by Proximity Monitors and Find
+Me Locators to notify the user that the device(or key fob) has been
+found. This new interface combines Proximity Reporter and Find Me
+Target in the same API providing the flexibility to implement external
+applications to control the alerts(including per device alerts).
 
-> > Right now it looks like it's just making a connection to the HID
-> > Interrupt PSM (0x13), and while that connection is open, seeing the
-> > keypresses.
-> >
-> > Is there an L2CAP debugger on the Linux side, so I can make sure I'm
-> > replicating what it's doing packetwise?
->
-> hcidump can record binary logfiles with -w. If you use hcidump 2.x then
-> it automatically record into BTSnoop format. Supported by Wireshark as
-> well. You can also use -R to see the raw data packets.
->
-Ok, so here's what's happening:
+This abstraction allows the development of platform specific
+applications to control Immediate Alert coming from Proximity Monitor
+and Find Me Locator. This provides flexibility to define different level
+and tone for each device.
+---
+ doc/proximity-api.txt |   25 +++++++++++++++++++++++--
+ 1 files changed, 23 insertions(+), 2 deletions(-)
 
-When it sees that it's pairing with an Apple keyboard, OS X makes an
-L2CAP connection to the HID Interrupt PSM (0x13) between the initial
-connection to the keyboard and the authentication request.
+diff --git a/doc/proximity-api.txt b/doc/proximity-api.txt
+index cf64bbf..c825fc7 100644
+--- a/doc/proximity-api.txt
++++ b/doc/proximity-api.txt
+@@ -4,8 +4,8 @@ BlueZ D-Bus Proximity API description
+ Copyright (C) 2011  Claudio Takahasi <claudio.takahasi@openbossa.org>
+ 
+ 
+-Proximity hierarchy
+-=================
++Proximity Monitor hierarchy
++===========================
+ 
+ Service		org.bluez
+ Interface	org.bluez.ProximityMonitor
+@@ -52,3 +52,24 @@ Properties
+ 			"none" will be emitted after the configured timeout.
+ 			When changing the level, signal is the confirmation
+ 			that the value was written in the remote.
++
++Proximity Reporter hierarchy
++===========================
++
++Shared service used by Proximity Path Loss and Find Me. Allows per device
++alert level handling.
++
++Service		org.bluez
++Interface	org.bluez.ProximityReporter
++Object path	[variable prefix]/{hci0,hci1,...}
++
++Methods
++
++
++Signals		ImmediateAlertChanged(object device, string value)
++
++			This signal indicates that Immediate Alert Level
++			characteristic was changed by the remote device.
++			Values: "none", "mild", "high".
++
++Properties
+-- 
+1.7.8.1
 
-This connection receives a notification every time a key is pressed
-(any key, OS X doesn't care, it moves along to the next).
-
-Once authentication is complete, OS X drops this L2CAP connection
-
-Scott
---
-Scott James Remnant=A0|=A0Chrome OS Systems=A0|=A0keybuk@google.com=A0|=A0G=
-oogle
