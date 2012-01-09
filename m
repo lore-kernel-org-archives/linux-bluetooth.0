@@ -1,61 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 9 Jan 2012 13:44:17 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
-	marcel@holtmann.org
-Subject: Re: [PATCH 00/18] Cleanup HCI reference counts
-Message-ID: <20120109114417.GA31957@x220>
-References: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
+Message-ID: <4F0ACADF.1060906@cestona.ro>
+Date: Mon, 09 Jan 2012 12:09:19 +0100
+From: Thilo Cestonaro <thilo@cestona.ro>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1325947644-11736-1-git-send-email-dh.herrmann@googlemail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Add support for BCM20702A0 [0489:e031]
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Add another vendor specific ID for BCM20702A0.
 
-On Sat, Jan 07, 2012, David Herrmann wrote:
-> David Herrmann (18):
->   Bluetooth: Make hci-destruct callback optional
->   Bluetooth: bluecard-cs: Remove empty destruct cb
->   Bluetooth: bt3c-cs: Remove empty destruct cb
->   Bluetooth: btmrvl: Remove empty destruct cb
->   Bluetooth: btuart-cs: Remove empty destruct cb
->   Bluetooth: btwilink: Remove empty destruct cb
->   Bluetooth: dtl1-cs: Remove empty destruct cb
->   Bluetooth: vhci: Free driver_data on file release
->   Bluetooth: bfusb: Free driver_data on USB shutdown
->   Bluetooth: btusb: Free driver data on USB shutdown
->   Bluetooth: bpa10x: Free private driver data on usb shutdown
->   Bluetooth: btsdio: Free driver data on SDIO shutdown
->   Bluetooth: uart-ldisc: Fix memory leak and remove destruct cb
->   Bluetooth: Remove unused hci-destruct cb
->   Bluetooth: Correctly acquire module ref
->   Bluetooth: Remove HCI-owner field
->   Bluetooth: Correctly take hci_dev->dev refcount
->   Bluetooth: Remove __hci_dev_put/hold
-> 
->  drivers/bluetooth/bfusb.c        |   13 +------------
->  drivers/bluetooth/bluecard_cs.c  |    8 --------
->  drivers/bluetooth/bpa10x.c       |   17 +++--------------
->  drivers/bluetooth/bt3c_cs.c      |    8 --------
->  drivers/bluetooth/btmrvl_main.c  |    6 ------
->  drivers/bluetooth/btsdio.c       |   13 +------------
->  drivers/bluetooth/btuart_cs.c    |    8 --------
->  drivers/bluetooth/btusb.c        |   17 +++--------------
->  drivers/bluetooth/btwilink.c     |   10 ----------
->  drivers/bluetooth/dtl1_cs.c      |    8 --------
->  drivers/bluetooth/hci_ldisc.c    |   14 ++------------
->  drivers/bluetooth/hci_vhci.c     |    9 +--------
->  include/net/bluetooth/hci_core.h |   28 ++++------------------------
->  net/bluetooth/hci_core.c         |    9 ++++-----
->  net/bluetooth/hci_sysfs.c        |    2 ++
->  15 files changed, 21 insertions(+), 149 deletions(-)
+output of usb-devices:
+T:  Bus=02 Lev=02 Prnt=02 Port=03 Cnt=03 Dev#=  5 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0489 ProdID=e031 Rev=01.12
+S:  Manufacturer=Broadcom Corp
+S:  Product=BCM20702A0
+S:  SerialNumber=EC55F9EADE09
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+---
+  drivers/bluetooth/btusb.c |    1 +
+  1 files changed, 1 insertions(+), 0 deletions(-)
 
-All of these patches have been applied to my bluetooth-next tree. In the
-future please adjust your editor settings so that your commit message
-lines aren't longer than 72 characters. The message should be fully
-visible with git log (which indents the messages) on a 80-wide terminal
-I ended up fixing the messages manually this time.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 55ac349..07622141a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -101,6 +101,7 @@ static struct usb_device_id btusb_table[] = {
+      { USB_DEVICE(0x0c10, 0x0000) },
 
-Johan
+      /* Broadcom BCM20702A0 */
++    { USB_DEVICE(0x0489, 0xe031) },
+      { USB_DEVICE(0x0a5c, 0x21e3) },
+      { USB_DEVICE(0x413c, 0x8197) },
+
+-- 
+1.7.5.4
+
