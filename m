@@ -1,84 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [RFC BlueZ] Add Proximity Reporter interface - Proposal 1
-Date: Mon,  9 Jan 2012 18:04:40 -0300
-Message-Id: <1326143081-30005-1-git-send-email-claudio.takahasi@openbossa.org>
+Message-ID: <1326140173.6454.168.camel@aeonflux>
+Subject: Re: Bluetooth 2.1 keyboard not sending keypress notifications
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Scott James Remnant <keybuk@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 09 Jan 2012 12:16:13 -0800
+In-Reply-To: <CAHZ1yCmLV6RS6EA7+p2+VDG05YNSNUxCbo8gLcq2t04Ahn2Kcw@mail.gmail.com>
+References: <CAHZ1yC=3Ecj-4-SAHnD93S7_YVF+f_o__Hb2PYFcaoCs_NDoPw@mail.gmail.com>
+	 <1325893697.6454.113.camel@aeonflux>
+	 <CAHZ1yCkPoHMA52dxMPp=5g_zibOjQui=ffiSGXR1GAiOqUGciA@mail.gmail.com>
+	 <1325900406.6454.116.camel@aeonflux>
+	 <CAHZ1yCkDf9zM3mzvQT-6A+WWY506vtW9Hk8r_RW8+-A-7mcfgA@mail.gmail.com>
+	 <1326138887.6454.165.camel@aeonflux>
+	 <CAHZ1yCmLV6RS6EA7+p2+VDG05YNSNUxCbo8gLcq2t04Ahn2Kcw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds API for Immediate Alert Service(IAS) abstraction. Abstraction for
-Link Loss is not planned. IAS is used by Proximity Monitors and Find
-Me Locators to notify the user that the device(or key fob) has been
-found. This new interface combines Proximity Reporter and Find Me
-Target in the same API providing the flexibility to implement external
-applications to control the alerts(including per device alerts).
+Hi Scott,
 
-This abstraction allows the development of platform specific
-applications to control Immediate Alert coming from Proximity Monitor
-and Find Me Locator. This provides flexibility to define different level
-and tone for each known device.
+> >> So it turns out that the Mac isn't doing anything special either; it's
+> >> doing ordinary 2.0 authentication. But the twist is an L2CAP
+> >> connection and configuration request/response before authentication is
+> >> requested, this seems to enable the keyboard sending a Vendor Event
+> >> every time a key is pressed during authentication.
+> >
+> > that is what I thought. Get your Packet Logger in OS X running and hope
+> > that it decodes a bit more. However getting this integrated into BlueZ
+> > might be a lot trickier. This is nasty stuff.
+> >
+> Right now it looks like it's just making a connection to the HID
+> Interrupt PSM (0x13), and while that connection is open, seeing the
+> keypresses.
+> 
+> Is there an L2CAP debugger on the Linux side, so I can make sure I'm
+> replicating what it's doing packetwise?
 
---
-Alternatively, ImmediateAlertChanged signal containing device object
-path and the alert level could be exposed avoiding the device object
-path in the Proximity Reporter hierarchy. For this case Adapter object
-path should be used. Use the Adapter object path makes more difficult
-to track alert level changes related to a given device, on other hand
-it is more aligned with the current BR/EDR APIs.
----
- doc/proximity-api.txt |   33 +++++++++++++++++++++++++++++++--
- 1 files changed, 31 insertions(+), 2 deletions(-)
+hcidump can record binary logfiles with -w. If you use hcidump 2.x then
+it automatically record into BTSnoop format. Supported by Wireshark as
+well. You can also use -R to see the raw data packets.
 
-diff --git a/doc/proximity-api.txt b/doc/proximity-api.txt
-index cf64bbf..10f4fa6 100644
---- a/doc/proximity-api.txt
-+++ b/doc/proximity-api.txt
-@@ -4,8 +4,8 @@ BlueZ D-Bus Proximity API description
- Copyright (C) 2011  Claudio Takahasi <claudio.takahasi@openbossa.org>
- 
- 
--Proximity hierarchy
--=================
-+Proximity Monitor hierarchy
-+===========================
- 
- Service		org.bluez
- Interface	org.bluez.ProximityMonitor
-@@ -52,3 +52,32 @@ Properties
- 			"none" will be emitted after the configured timeout.
- 			When changing the level, signal is the confirmation
- 			that the value was written in the remote.
-+
-+Proximity Reporter hierarchy
-+===========================
-+
-+Shared service used by Proximity Path Loss and Find Me. Allows per device
-+alert level handling.
-+
-+Service		org.bluez
-+Interface	org.bluez.ProximityReporter
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-+
-+Methods		dict GetProperties()
-+
-+			Returns all properties for the interface. See the
-+			properties section for available properties.
-+
-+Signals		PropertyChanged(string name, variant value)
-+
-+			This signal indicates a changed value of a given
-+			property.
-+
-+Properties
-+
-+		string ImmediateAlertLevel [readonly]
-+
-+			New Immediate Alert Level Characteristic value
-+			has been written by the remote device. Property
-+			shared between Path Loss and Find Me. Values:
-+			"none", "mild", "high". Default value is "none".
--- 
-1.7.8.1
+Regards
+
+Marcel
+
 
