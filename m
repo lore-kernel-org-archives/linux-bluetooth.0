@@ -1,53 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F0AA5A2.4070903@monom.org>
-Date: Mon, 09 Jan 2012 09:30:26 +0100
-From: Daniel Wagner <wagi@monom.org>
+Message-ID: <4F0AA1EA.4060500@gmx.de>
+Date: Mon, 09 Jan 2012 09:14:34 +0100
+From: Harvey <harv@gmx.de>
+Reply-To: harv@gmx.de
 MIME-Version: 1.0
-To: Johan Hedberg <johan.hedberg@gmail.com>
-CC: Peter Hurley <peter@hurleysoftware.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
-References: <1312921615.2261.1.camel@THOR> <4F04285E.1070500@monom.org>
-In-Reply-To: <4F04285E.1070500@monom.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: Kernel 3.2 and Broacom BCM20702A0
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hello,
 
-On 04.01.2012 11:22, Daniel Wagner wrote:
-> Hi Peter,
-> 
-> On 09.08.2011 22:26, Peter Hurley wrote:
->> Commit 330605423c fixed l2cap conn establishment for non-ssp remote
->> devices by not setting HCI_CONN_ENCRYPT_PEND every time conn security
->> is tested (which was always returning failure on any subsequent
->> security checks).
->>
->> However, this broke l2cap conn establishment for ssp remote devices
->> when an ACL link was already established at SDP-level security. This
->> fix ensures that encryption must be pending whenever authentication
->> is also pending.
->>
->> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
-> 
-> git am complaines:
-> 
-> Applying: Bluetooth: Fix l2cap conn failures for ssp devices
-> /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:18: trailing whitespace.
-> 
-> /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:19: trailing whitespace.
->                 /* encrypt must be pending if auth is also pending */
-> /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:20: trailing whitespace.
->                 set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend);
-> /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:21: trailing whitespace.
-> 
-> 
-> But it fixes the problem I was debugging. From what I have
-> learned in the last two days I would say it is also the right fix :)
+I was eagerly awaiting kernel 3.2 as it has support for the usb 
+bluetooth builtin adapter in my new laptop, a Fuijitsu Lifebook E751.
 
-Is there any chance to get this patch in? If it helps I could send a
-whitespace fixed version.
+To my disappaointment it doesn't seem to work right.
 
-cheers,
-daniel
+Output of usb-devices:
+
+T:  Bus=02 Lev=02 Prnt=02 Port=03 Cnt=03 Dev#=  5 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0489 ProdID=e031 Rev=01.12
+S:  Manufacturer=Broadcom Corp
+S:  Product=BCM20702A0
+S:  SerialNumber=3859F9CD2AEE
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+
+Seems to be another vendor specific ID for the same adapter...
+
+For a quick test I did load the btusb module manually and did a
+'echo "0489 e031" >> /sys/bus/usb/drivers/btusb/new_id'
+
+'hcitool dev' then shows my BT adapter's MAC. It seems to work but it 
+does not find any other devices.
+
+Under windows XP in a virtual machine all is working well.
+
+Harvey
