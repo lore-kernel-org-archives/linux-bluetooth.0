@@ -1,41 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 0/7] MGMT Start Discovery command LE-Only Support
-Date: Tue, 10 Jan 2012 18:20:48 -0300
-Message-Id: <1326230455-9117-1-git-send-email-andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <20120110210042.GA7954@x220.ger.corp.intel.com>
+References: <1326227630-2556-1-git-send-email-festevam@gmail.com>
+	<20120110210042.GA7954@x220.ger.corp.intel.com>
+Date: Tue, 10 Jan 2012 19:08:45 -0200
+Message-ID: <CAOMZO5BLGwvJEJCrv9hooj5PTMuOQire2nz=Bc6S3i+VjUEEjw@mail.gmail.com>
+Subject: Re: [PATCH] net: bluetooth: Fix 'enable_hs' type
+From: Fabio Estevam <festevam@gmail.com>
+To: Fabio Estevam <festevam@gmail.com>, linux-bluetooth@vger.kernel.org,
+	padovan@profusion.mobi, marcel@holtmann.org,
+	Fabio Estevam <fabio.estevam@freescale.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+On Tue, Jan 10, 2012 at 7:00 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
 
-This patch series is basically a rebased version of the previous
-series.
+> The patch has been applied to my bluetooth-next tree. Don't you get the
+> same warning for enable_mgmt and enable_le as well? Those seem to be
+> declared in a similar manner.
 
-Coming patch series:
-  * MGMT Stop Discovery command LE-Only support
-  * Interleaved discovery support to MGMT Discovery commands
+No, because enable_mgmt and enable_le are already declared as 'bool'.
 
-BR,
+Regards,
 
-Andre
-
-Andre Guedes (7):
-  Bluetooth: Add 'eir_len' param to mgmt_device_found()
-  Bluetooth: Report LE devices
-  Bluetooth: LE scan should send Discovering events
-  Bluetooth: Add helper functions to send LE scan commands
-  Bluetooth: LE scan infrastructure
-  Bluetooth: Add hci_do_le_scan() to hci_core
-  Bluetooth: MGMT start discovery LE-Only support
-
- include/net/bluetooth/hci.h      |    1 +
- include/net/bluetooth/hci_core.h |   18 ++++++-
- net/bluetooth/hci_core.c         |  106 ++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |   35 ++++++++++---
- net/bluetooth/mgmt.c             |   30 +++++++++--
- 5 files changed, 178 insertions(+), 12 deletions(-)
-
--- 
-1.7.8.1
-
+Fabio Estevam
