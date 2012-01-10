@@ -1,35 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F0C355E.5050609@gmx.de>
-Date: Tue, 10 Jan 2012 13:55:58 +0100
-From: Harvey <harv@gmx.de>
-Reply-To: harv@gmx.de
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add support for BCM20702A0 [0489:e031]
-References: <4F0ACADF.1060906@cestona.ro>  <1326137984.6454.152.camel@aeonflux> <4F0BE4CB.30907@gmx.de> <1326183061.6454.194.camel@aeonflux>
-In-Reply-To: <1326183061.6454.194.camel@aeonflux>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Message-ID: <1326188164.6454.205.camel@aeonflux>
+Subject: Re: [PATCH 3/5] Bluetooth: Clear ack_timer when sending ack
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"kanak.gupta@stericsson.com" <kanak.gupta@stericsson.com>
+Date: Tue, 10 Jan 2012 01:36:04 -0800
+In-Reply-To: <201201101004.38182.szymon.janc@tieto.com>
+References: <1326122391-8438-1-git-send-email-szymon.janc@tieto.com>
+	 <1326122391-8438-4-git-send-email-szymon.janc@tieto.com>
+	 <1326138634.6454.161.camel@aeonflux>
+	 <201201101004.38182.szymon.janc@tieto.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI Marcel,
+Hi Szymon,
 
->>   From a short look in the Windows inf. file:
->> Fujitsu is listed there in a separate section called RAMUSBE031. There
->> is also this "BCM20702A0_001.001.024.0023.0055.hex" file copied along
->> with the driver, which is then referenced in the registry as
->> "RAMPatchFileName". There is a long list of other 20702 adapters divided
->> in those that need a 'RAM patch' or not. Maybe you could complete your
->> list of compatible devices bases on this.
->
-> this most likely means that your device is a ROM chip that needs some
-> patching (kinda firmware download) to fix some bugs in the ROM mask.
->
-> Have a USB sniffer handy and figure out on how they upload this file
-> into the chip. Most likely they are some HCI vendor commands.
+> > > ack_timer should be cleared when sending ACK to avoid acking I-frames
+> > > twice.
+> > 
+> > explain why you are creating a helper for it. Since that is clearly not
+> > obvious to me.
+> 
+> To avoid code duplication - helper is not clearing ack timer and is used by
+> both l2cap_send_ack and l2cap_ack_timeout.
+> There is no need to clear ack timer in timer funtion.
+> 
+> But if you prefer to not have helper and are fine with clearing ack timer also in
+> l2cap_ack_timeout then ack timer can be clear in l2cap_send_ack.
 
-Can you suggest one which is especially helpful for this task? I will 
-try this in a virtualbox xp machine if possible. BTW, I'm not really a 
-crack but will try to do my best to help here if you want me to.
+put that in the commit message please.
 
-Harvey
+> > > 
+> > > Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> > > ---
+> > >  net/bluetooth/l2cap_core.c |   10 ++++++++--
+> > >  1 files changed, 8 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > > index 308d9d7..b9e232e 100644
+> > > --- a/net/bluetooth/l2cap_core.c
+> > > +++ b/net/bluetooth/l2cap_core.c
+> > > @@ -1478,7 +1478,7 @@ static int l2cap_retransmit_frames(struct l2cap_chan *chan)
+> > >  	return ret;
+> > >  }
+> > >  
+> > > -static void l2cap_send_ack(struct l2cap_chan *chan)
+> > > +static void __l2cap_send_ack(struct l2cap_chan *chan)
+> > >  {
+> > >  	u32 control = 0;
+> > >  
+> > > @@ -1498,6 +1498,12 @@ static void l2cap_send_ack(struct l2cap_chan *chan)
+> > >  	l2cap_send_sframe(chan, control);
+> > >  }
+> > >  
+> > > +static void l2cap_send_ack(struct l2cap_chan *chan)
+> > > +{
+> > > +	__clear_ack_timer(chan);
+> > > +	__l2cap_send_ack(chan);
+> > > +}
+> > > +
+> > >  static void l2cap_send_srejtail(struct l2cap_chan *chan)
+> > >  {
+> > >  	struct srej_list *tail;
+> > > @@ -1988,7 +1994,7 @@ static void l2cap_ack_timeout(struct work_struct *work)
+> > >  	BT_DBG("chan %p", chan);
+> > >  
+> > >  	lock_sock(chan->sk);
+> > 
+> > I would have just added
+> > 
+> > 	__clear_ack_timer(chan):
+> > 
+> > here.
+> 
+> This is a timer function so there is no need to clear timer here.
+> 
+> > > -	l2cap_send_ack(chan);
+> > > +	__l2cap_send_ack(chan);
+> > >  	release_sock(chan->sk);
+> > >  }
+> > >  
+
+You are absolutely correct of course. I confused myself here. This also
+means that either we add proper comments here or make it simpler to
+follow the code. See what makes more sense.
+
+Regards
+
+Marcel
+
+
