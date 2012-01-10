@@ -1,51 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F0D3DA5.3010602@cestona.ro>
-Date: Wed, 11 Jan 2012 08:43:33 +0100
-From: Thilo Cestonaro <thilo@cestona.ro>
-Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="=_spielplatz-878-1326267797-0001-2"
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add support for BCM20702A0 [0489:e031]
-References: <4F0ACADF.1060906@cestona.ro> <1326137984.6454.152.camel@aeonflux>
-In-Reply-To: <1326137984.6454.152.camel@aeonflux>
+Date: Wed, 11 Jan 2012 00:48:05 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Fabio Estevam <festevam@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	marcel@holtmann.org, Fabio Estevam <fabio.estevam@freescale.com>
+Subject: Re: [PATCH] net: bluetooth: Fix 'enable_hs' type
+Message-ID: <20120110224804.GA10526@x220.ger.corp.intel.com>
+References: <1326227630-2556-1-git-send-email-festevam@gmail.com>
+ <20120110210042.GA7954@x220.ger.corp.intel.com>
+ <CAOMZO5BLGwvJEJCrv9hooj5PTMuOQire2nz=Bc6S3i+VjUEEjw@mail.gmail.com>
+ <20120110213134.GA8679@x220.ger.corp.intel.com>
+ <CAOMZO5ANrmCNZep0-5OJ9gKzvDBrCdqfU91o81f_2FjSjXnAHw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAOMZO5ANrmCNZep0-5OJ9gKzvDBrCdqfU91o81f_2FjSjXnAHw@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a MIME-formatted message.  If you see this text it means that your
-E-mail software does not support MIME-formatted messages.
+Hi Fabio,
 
---=_spielplatz-878-1326267797-0001-2
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+On Tue, Jan 10, 2012, Fabio Estevam wrote:
+> Hi Johan,
+> 
+> On Tue, Jan 10, 2012 at 7:31 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> > Hi Fabio,
+> >
+> > On Tue, Jan 10, 2012, Fabio Estevam wrote:
+> >> > The patch has been applied to my bluetooth-next tree. Don't you get the
+> >> > same warning for enable_mgmt and enable_le as well? Those seem to be
+> >> > declared in a similar manner.
+> >>
+> >> No, because enable_mgmt and enable_le are already declared as 'bool'.
+> >
+> > I don't know what tree you're looking at but at least in mine they're
+> > both "static int".
+> 
+> I am using linux-next. Please check:
+> 
+> http://git.kernel.org/?p=linux%2Fkernel%2Fgit%2Fnext%2Flinux-next-history.git&a=search&h=refs%2Fheads%2Fmaster&st=grep&s=enable_mgmt
 
-Hey Marcel,
+Yep, seems commit eb939922 from Rusty Russel took care of this, but the
+commit has not yet made it to the bluetooth-next tree.
 
-I attached my patch as my mail client converts the tabs into spaces :(.
-
-Thx for your quick review.
-
-Regards,
-Thilo
-
---=_spielplatz-878-1326267797-0001-2
-Content-Type: application/x-gzip; name="Bluetooth-Add-support-for-BCM20702A0-0489-e031.patch.gz"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="Bluetooth-Add-support-for-BCM20702A0-0489-e031.patch.gz"
-
-H4sICDI9DU8AA0JsdWV0b290aC1BZGQtc3VwcG9ydC1mb3ItQkNNMjA3MDJBMC0wNDg5LWUw
-MzEucGF0Y2gAnVRdb9owFH2ef8WVeKGDBDsfBKJlKgSqMY0Jja4vVYWcxG4z0ThKHMbU7b/v
-OrB1XdduWhTliutzjs9xcjmr1C1IwYaeDNhw5HHPEVlAvaHvjhJXJNk4EYEYBtIX3IGlKmAt
-SmABUBq2NziUMnKGMiGc3+RbBbGotSp4peCVNo3T9NCwK/WazLgWodHpwxje8gLpzAHmhNQL
-GYUeZZSSdZN8EqkO4XI1OY/fXMF02witlL4JYZJlUDdlqSoNUlUwjZcODagzoXBJvdE4FNRl
-V4QYHC+QIirYiSJDaF2KNJd5CovZb1SbENXostGgJDR1YmVil6PtkJyHANOmjqgD78TOlFVV
-6Laig4i6EBdtmYldJwLwYV1mEUaC5T6+iYCSGSpciCoCx8bTird1JGXXOLJPAINGlKGk0qYu
-96t1NPSgE8vrGsUYWbVk4z4y4QwyW8wikxE+GD/MZg5ZI2rJi0byVDcV7jWtFM9SfLOxqsp2
-2RCbVEf3mdv2WlQ5375vbhNkzWPfPxvPJ7M5HZMYVzsLiTY8QDuYjcFEV7i1sfkZ/dxOyAJB
-C4lrFCZbbUpnvkKK+3zOWZXvcL9E41Hfa7CHGs7/aDh/15DyoIH1qNEtVCFO7kXchyLHlya6
-vCxteMrIUYSs8+tCZJaS0kq+/NNIWJZFIGtV6kHy40sftMnsFL4CXgx6BB8y34oa0hteXIus
-j428qEWlc1XU3d5JH61mYisOvy00k+WY0rKucw188PQWydNrJC8ysQff56nrjW2bBkPHYR7j
-gIM69Dzj/jlt0uv1ntU/PQWLUdYfQs+UALBRa65xTGtd4Sdr5nFzmMdNnkHL22iebMXlFURw
-R+DFHXxcTzez+cUinnfpnqaM4lnsKV4n8K1PADGDl/BzKn75z3g5IL1HfJw0wzdTduA/QnA/
-NQiHCffPCI+5LWLExsHRAx4UYXZg+7ZHyHcaouqCeAUAAA==
---=_spielplatz-878-1326267797-0001-2--
+Johan
