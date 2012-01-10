@@ -1,53 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Fabio Estevam <festevam@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: padovan@profusion.mobi,
-	marcel@holtmann.org,
-	Fabio Estevam <festevam@gmail.com>,
-	Fabio Estevam <fabio.estevam@freescale.com>
-Subject: [PATCH] net: bluetooth: Fix 'enable_hs' type
-Date: Tue, 10 Jan 2012 18:33:50 -0200
-Message-Id: <1326227630-2556-1-git-send-email-festevam@gmail.com>
+Message-ID: <1326214276.6454.212.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Add support for BCM20702A0 [0489:e031]
+From: Marcel Holtmann <marcel@holtmann.org>
+To: harv@gmx.de
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 10 Jan 2012 08:51:16 -0800
+In-Reply-To: <4F0C355E.5050609@gmx.de>
+References: <4F0ACADF.1060906@cestona.ro>
+	  <1326137984.6454.152.camel@aeonflux> <4F0BE4CB.30907@gmx.de>
+	 <1326183061.6454.194.camel@aeonflux> <4F0C355E.5050609@gmx.de>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix the following build warning:
+Hi Harvey,
 
-  CC [M]  net/bluetooth/hci_core.o
-net/bluetooth/hci_core.c: In function ‘__check_enable_hs’:
-net/bluetooth/hci_core.c:2587: warning: return from incompatible pointer type
+> >>   From a short look in the Windows inf. file:
+> >> Fujitsu is listed there in a separate section called RAMUSBE031. There
+> >> is also this "BCM20702A0_001.001.024.0023.0055.hex" file copied along
+> >> with the driver, which is then referenced in the registry as
+> >> "RAMPatchFileName". There is a long list of other 20702 adapters divided
+> >> in those that need a 'RAM patch' or not. Maybe you could complete your
+> >> list of compatible devices bases on this.
+> >
+> > this most likely means that your device is a ROM chip that needs some
+> > patching (kinda firmware download) to fix some bugs in the ROM mask.
+> >
+> > Have a USB sniffer handy and figure out on how they upload this file
+> > into the chip. Most likely they are some HCI vendor commands.
+> 
+> Can you suggest one which is especially helpful for this task? I will 
+> try this in a virtualbox xp machine if possible. BTW, I'm not really a 
+> crack but will try to do my best to help here if you want me to.
 
-module_param in hci_core.c passes 'enable_hs' as bool format, so fix this variable definition type.
+virtualbox and then running either usbmon or Wireshark on your Linux
+system should work just fine.
 
-Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
----
- include/net/bluetooth/hci.h |    2 +-
- net/bluetooth/hci_core.c    |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Regards
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 5b2fed5..00596e8 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1388,6 +1388,6 @@ struct hci_inquiry_req {
- };
- #define IREQ_CACHE_FLUSH 0x0001
- 
--extern int enable_hs;
-+extern bool enable_hs;
- 
- #endif /* __HCI_H */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 845da3e..9de9371 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -55,7 +55,7 @@
- 
- #define AUTO_OFF_TIMEOUT 2000
- 
--int enable_hs;
-+bool enable_hs;
- 
- static void hci_rx_work(struct work_struct *work);
- static void hci_cmd_work(struct work_struct *work);
--- 
-1.7.1
+Marcel
+
+
