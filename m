@@ -1,208 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 5/7] Bluetooth: LE scan infrastructure
-Date: Tue, 10 Jan 2012 18:20:53 -0300
-Message-Id: <1326230455-9117-6-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v2 4/7] Bluetooth: Add helper functions to send LE scan commands
+Date: Tue, 10 Jan 2012 18:20:52 -0300
+Message-Id: <1326230455-9117-5-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1326230455-9117-1-git-send-email-andre.guedes@openbossa.org>
 References: <1326230455-9117-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds to hci_core an infrastructure to scan LE devices.
-
-Two works were created to handle the LE scan. The le_scan_enable
-work sends commands to the controller and waits for its results.
-If the commands were executed successfully a delayed work
-(le_scan_disable) is scheduled to disable the ongoing scanning
-after some amount of time.
-
-The le_scan_enable work should be queue on system_long_wq since
-it can sleep for a few seconds in the worst case.
+This patch creates two helper functions to send LE Set Scan
+Parameters and LE Set Scan Enable commands.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h      |    1 +
- include/net/bluetooth/hci_core.h |   13 ++++++++
- net/bluetooth/hci_core.c         |   61 ++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |   15 +++++++--
- 4 files changed, 87 insertions(+), 3 deletions(-)
+ net/bluetooth/hci_core.c |   23 +++++++++++++++++++++++
+ 1 files changed, 23 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 3ee39ed..5a45538 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -276,6 +276,7 @@ enum {
- 
- /* ---- HCI Error Codes ---- */
- #define HCI_ERROR_AUTH_FAILURE		0x05
-+#define HCI_ERROR_TIMEOUT		0x08
- #define HCI_ERROR_REJ_BAD_ADDR		0x0f
- #define HCI_ERROR_REMOTE_USER_TERM	0x13
- #define HCI_ERROR_LOCAL_HOST_TERM	0x16
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 954a577..07b9681 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -126,6 +126,13 @@ struct adv_entry {
- 	u8 bdaddr_type;
- };
- 
-+struct le_scan_params {
-+	u8 type;
-+	u16 interval;
-+	u16 window;
-+	int timeout;
-+};
-+
- #define NUM_REASSEMBLY 4
- struct hci_dev {
- 	struct list_head list;
-@@ -264,6 +271,12 @@ struct hci_dev {
- 
- 	unsigned long		dev_flags;
- 
-+	struct work_struct	le_scan_enable;
-+	struct delayed_work	le_scan_disable;
-+	struct le_scan_params	le_scan_params;
-+	wait_queue_head_t	le_scan_wait_q;
-+	u8			le_scan_result;
-+
- 	int (*open)(struct hci_dev *hdev);
- 	int (*close)(struct hci_dev *hdev);
- 	int (*flush)(struct hci_dev *hdev);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 0f8884f..46bb069 100644
+index 29bc1c6..0f8884f 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -778,6 +778,9 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	if (test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->dev_flags))
- 		cancel_delayed_work(&hdev->service_cache);
- 
-+	cancel_work_sync(&hdev->le_scan_enable);
-+	cancel_delayed_work_sync(&hdev->le_scan_disable);
-+
- 	hci_dev_lock(hdev);
- 	inquiry_cache_flush(hdev);
- 	hci_conn_hash_flush(hdev);
-@@ -1592,6 +1595,60 @@ int hci_add_adv_entry(struct hci_dev *hdev,
- 	return 0;
+@@ -89,6 +89,29 @@ static void hci_notify(struct hci_dev *hdev, int event)
+ 	atomic_notifier_call_chain(&hci_notifier, event, hdev);
  }
  
-+static void le_scan_enable_work(struct work_struct *work)
++static int send_le_scan_param_cmd(struct hci_dev *hdev, u8 type, u16 interval,
++								u16 window)
 +{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev,
-+							le_scan_enable);
-+	struct le_scan_params *params = &hdev->le_scan_params;
-+	long timeout = msecs_to_jiffies(3000);
-+	DECLARE_WAITQUEUE(wait, current);
++	struct hci_cp_le_set_scan_param cp;
 +
-+	BT_DBG("%s", hdev->name);
++	memset(&cp, 0, sizeof(cp));
++	cp.type = type;
++	cp.interval = cpu_to_le16(interval);
++	cp.window = cpu_to_le16(window);
 +
-+	add_wait_queue(&hdev->le_scan_wait_q, &wait);
-+
-+	/* Send LE Set Scan Parameter command and wait for the result */
-+	hdev->le_scan_result = HCI_ERROR_TIMEOUT;
-+	send_le_scan_param_cmd(hdev, params->type, params->interval,
-+							params->window);
-+
-+	schedule_timeout_uninterruptible(timeout);
-+	if (hdev->le_scan_result)
-+		goto failed;
-+
-+	/* Send LE Set Scan Enable command and wait for the result */
-+	hdev->le_scan_result = HCI_ERROR_TIMEOUT;
-+	send_le_scan_enable_cmd(hdev, 1);
-+
-+	schedule_timeout_uninterruptible(timeout);
-+	if (hdev->le_scan_result)
-+		goto failed;
-+
-+	remove_wait_queue(&hdev->le_scan_wait_q, &wait);
-+
-+	schedule_delayed_work(&hdev->le_scan_disable,
-+					msecs_to_jiffies(params->timeout));
-+
-+	return;
-+
-+failed:
-+	remove_wait_queue(&hdev->le_scan_wait_q, &wait);
-+
-+	hci_dev_lock(hdev);
-+	mgmt_start_discovery_failed(hdev, hdev->le_scan_result);
-+	hci_dev_unlock(hdev);
++	return hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_PARAM, sizeof(cp), &cp);
 +}
 +
-+static void le_scan_disable_work(struct work_struct *work)
++static int send_le_scan_enable_cmd(struct hci_dev *hdev, u8 enable)
 +{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev,
-+						le_scan_disable.work);
++	struct hci_cp_le_set_scan_enable cp;
 +
-+	BT_DBG("%s", hdev->name);
++	memset(&cp, 0, sizeof(cp));
++	cp.enable = enable;
 +
-+	send_le_scan_enable_cmd(hdev, 0);
++	return hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
 +}
 +
- /* Register HCI device */
- int hci_register_dev(struct hci_dev *hdev)
- {
-@@ -1677,6 +1734,10 @@ int hci_register_dev(struct hci_dev *hdev)
+ /* ---- HCI requests ---- */
  
- 	atomic_set(&hdev->promisc, 0);
- 
-+	INIT_WORK(&hdev->le_scan_enable, le_scan_enable_work);
-+	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
-+	init_waitqueue_head(&hdev->le_scan_wait_q);
-+
- 	write_unlock(&hci_dev_list_lock);
- 
- 	hdev->workqueue = alloc_workqueue(hdev->name, WQ_HIGHPRI | WQ_UNBOUND |
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 2d86604..9ef2057 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1024,6 +1024,9 @@ static void hci_cc_le_set_scan_param(struct hci_dev *hdev, struct sk_buff *skb)
- 	__u8 status = *((__u8 *) skb->data);
- 
- 	BT_DBG("%s status 0x%x", hdev->name, status);
-+
-+	hdev->le_scan_result = status;
-+	wake_up(&hdev->le_scan_wait_q);
- }
- 
- static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
-@@ -1034,15 +1037,18 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 
- 	BT_DBG("%s status 0x%x", hdev->name, status);
- 
--	if (status)
--		return;
--
- 	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_SCAN_ENABLE);
- 	if (!cp)
- 		return;
- 
- 	switch (cp->enable) {
- 	case LE_SCANNING_ENABLED:
-+		hdev->le_scan_result = status;
-+		wake_up(&hdev->le_scan_wait_q);
-+
-+		if (status)
-+			return;
-+
- 		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 
- 		cancel_delayed_work_sync(&hdev->adv_work);
-@@ -1054,6 +1060,9 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 		break;
- 
- 	case LE_SCANNING_DISABLED:
-+		if (status)
-+			return;
-+
- 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 
- 		hci_dev_lock(hdev);
+ void hci_req_complete(struct hci_dev *hdev, __u16 cmd, int result)
 -- 
 1.7.8.1
 
