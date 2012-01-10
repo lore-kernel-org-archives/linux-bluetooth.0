@@ -1,46 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sunil Kumar Behera <sunil.behera@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sunil Kumar Behera <sunil.behera@samsung.com>
-Subject: [PATCH obexd] PBAP: Fix possible invalid memory access
-Date: Tue, 10 Jan 2012 12:43:25 +0530
-Message-id: <1326179605-3380-1-git-send-email-sunil.behera@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1326140173.6454.168.camel@aeonflux>
+References: <CAHZ1yC=3Ecj-4-SAHnD93S7_YVF+f_o__Hb2PYFcaoCs_NDoPw@mail.gmail.com>
+	<1325893697.6454.113.camel@aeonflux>
+	<CAHZ1yCkPoHMA52dxMPp=5g_zibOjQui=ffiSGXR1GAiOqUGciA@mail.gmail.com>
+	<1325900406.6454.116.camel@aeonflux>
+	<CAHZ1yCkDf9zM3mzvQT-6A+WWY506vtW9Hk8r_RW8+-A-7mcfgA@mail.gmail.com>
+	<1326138887.6454.165.camel@aeonflux>
+	<CAHZ1yCmLV6RS6EA7+p2+VDG05YNSNUxCbo8gLcq2t04Ahn2Kcw@mail.gmail.com>
+	<1326140173.6454.168.camel@aeonflux>
+Date: Mon, 9 Jan 2012 17:10:34 -0800
+Message-ID: <CAHZ1yCnOegQhL-Vy_vf8ex9rTsXOb98geaYzzT6wpDuqM-sbsg@mail.gmail.com>
+Subject: Re: Bluetooth 2.1 keyboard not sending keypress notifications
+From: Scott James Remnant <keybuk@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Issue: As reported by static code analyzer (Coverity), if
-buffer is NULL and aparams is not NULL, then buffer gets
-dereferenced in string_read function.
-Fix: Application parameter is allocated only if maxlistcount
-is zero during phonebooksize request and buffer is allocated
-in case of pull phonebook request, hence modify logic to avoid
-application parameter check, as it is tightly coupled with
-maxlistcount.
----
- plugins/pbap.c |    9 +++++----
- 1 files changed, 5 insertions(+), 4 deletions(-)
+On Mon, Jan 9, 2012 at 12:16 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
 
-diff --git a/plugins/pbap.c b/plugins/pbap.c
-index 0f07c46..eb2bc9c 100644
---- a/plugins/pbap.c
-+++ b/plugins/pbap.c
-@@ -996,11 +996,12 @@ static ssize_t vobject_pull_read(void *object, void *buf, size_t count)
- 	DBG("buffer %p maxlistcount %d", obj->buffer,
- 						pbap->params->maxlistcount);
- 
--	if (!obj->buffer && !obj->aparams)
--		return -EAGAIN;
-+	if (!obj->buffer) {
-+		if (pbap->params->maxlistcount == 0)
-+			return -ENOSTR;
- 
--	if (pbap->params->maxlistcount == 0)
--		return -ENOSTR;
-+		return -EAGAIN;
-+	}
- 
- 	len = string_read(obj->buffer, buf, count);
- 	if (len == 0 && !obj->lastpart) {
--- 
-1.7.4.1
+> > Right now it looks like it's just making a connection to the HID
+> > Interrupt PSM (0x13), and while that connection is open, seeing the
+> > keypresses.
+> >
+> > Is there an L2CAP debugger on the Linux side, so I can make sure I'm
+> > replicating what it's doing packetwise?
+>
+> hcidump can record binary logfiles with -w. If you use hcidump 2.x then
+> it automatically record into BTSnoop format. Supported by Wireshark as
+> well. You can also use -R to see the raw data packets.
+>
+Ok, so here's what's happening:
 
+When it sees that it's pairing with an Apple keyboard, OS X makes an
+L2CAP connection to the HID Interrupt PSM (0x13) between the initial
+connection to the keyboard and the authentication request.
+
+This connection receives a notification every time a key is pressed
+(any key, OS X doesn't care, it moves along to the next).
+
+Once authentication is complete, OS X drops this L2CAP connection
+
+Scott
+--
+Scott James Remnant=A0|=A0Chrome OS Systems=A0|=A0keybuk@google.com=A0|=A0G=
+oogle
