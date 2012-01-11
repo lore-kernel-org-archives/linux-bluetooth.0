@@ -1,34 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 Jan 2012 13:21:54 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
-Subject: Re: [PATCH v2 0/5] Some ERTM improvements
-Message-ID: <20120111112154.GA23277@x220>
-References: <1326275989-32226-1-git-send-email-szymon.janc@tieto.com>
+Message-ID: <4F0D6EB4.8060409@gmx.de>
+Date: Wed, 11 Jan 2012 12:12:52 +0100
+From: Harvey <harv@gmx.de>
+Reply-To: harv@gmx.de
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1326275989-32226-1-git-send-email-szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Add support for BCM20702A0 [0489:e031]
+References: <4F0ACADF.1060906@cestona.ro>     <1326137984.6454.152.camel@aeonflux> <4F0BE4CB.30907@gmx.de>    <1326183061.6454.194.camel@aeonflux> <4F0C355E.5050609@gmx.de>   <1326214276.6454.212.camel@aeonflux> <4F0D450F.3000600@gmx.de>  <1326278147.6454.225.camel@aeonflux> <4F0D6924.8070105@gmx.de> <1326279411.6454.227.camel@aeonflux>
+In-Reply-To: <1326279411.6454.227.camel@aeonflux>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Marcel,
 
-On Wed, Jan 11, 2012, Szymon Janc wrote:
-> No code changes since v1.
-> Only improved commits messages as requested by Marcel.
-> 
-> Szymon Janc (5):
->   Bluetooth: Make l2cap_clear_timer return if timer was running or not
->   Bluetooth: Set P-bit for SREJ frame only if there are I-frames to ack
->   Bluetooth: Clear ack_timer when sending ack
->   Bluetooth: Don't send RNR immediately when entering local busy
->   Bluetooth: Drop L2CAP chan reference if ERTM ack_timer fired
-> 
->  include/net/bluetooth/l2cap.h |    9 +++++++--
->  net/bluetooth/l2cap_core.c    |   33 ++++++++++++++++++---------------
->  2 files changed, 25 insertions(+), 17 deletions(-)
+>>> so there is clearly some binary download in the capture file. It will
+>>> most likely match the files that a referenced in the .inf file. However
+>>> I am not reverse engineering this stuff for anybody. Someone else has to
+>>> do that job.
+>>
+>> So we're at an end here? I simply can't do it, you won't do it - game over?
+>
+> most likely. Unless you find someone that does the reverse engineering
+> for you. I bet it is pretty trivial, but I have no bandwidth for this.
 
-All five patches have been applied to my bluetooth-next tree. Thanks.
+Although this is disappointing for me, I understand completely. This is 
+not your job. Broadcom or Fujitsu are coming to my mind :P
 
-Johan
+>> BTW, I get your answers twice, once on the list, once as PM. Is this
+>> intended?
+>
+> You are setting the Reply-to: field. And complain to GMX if they do not
+> manage to do duplicate filtering correctly.
+
+Ah, I see. But I don't see how to convince thunderbird not to do this. 
+And GMX... :/
+So I will just delete the doubles ;)
+
+Heads up
+Harvey
