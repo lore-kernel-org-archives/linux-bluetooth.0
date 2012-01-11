@@ -1,62 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 Jan 2012 13:26:46 +0200
+Date: Wed, 11 Jan 2012 13:21:54 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Daniel Wagner <wagi@monom.org>
-Cc: Peter Hurley <peter@hurleysoftware.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
-Message-ID: <20120111112646.GB23277@x220>
-References: <1312921615.2261.1.camel@THOR>
- <4F04285E.1070500@monom.org>
- <4F0AA5A2.4070903@monom.org>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
+Subject: Re: [PATCH v2 0/5] Some ERTM improvements
+Message-ID: <20120111112154.GA23277@x220>
+References: <1326275989-32226-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4F0AA5A2.4070903@monom.org>
+In-Reply-To: <1326275989-32226-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+Hi Szymon,
 
-On Mon, Jan 09, 2012, Daniel Wagner wrote:
-> Hi Johan,
+On Wed, Jan 11, 2012, Szymon Janc wrote:
+> No code changes since v1.
+> Only improved commits messages as requested by Marcel.
 > 
-> On 04.01.2012 11:22, Daniel Wagner wrote:
-> > Hi Peter,
-> > 
-> > On 09.08.2011 22:26, Peter Hurley wrote:
-> >> Commit 330605423c fixed l2cap conn establishment for non-ssp remote
-> >> devices by not setting HCI_CONN_ENCRYPT_PEND every time conn security
-> >> is tested (which was always returning failure on any subsequent
-> >> security checks).
-> >>
-> >> However, this broke l2cap conn establishment for ssp remote devices
-> >> when an ACL link was already established at SDP-level security. This
-> >> fix ensures that encryption must be pending whenever authentication
-> >> is also pending.
-> >>
-> >> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
-> > 
-> > git am complaines:
-> > 
-> > Applying: Bluetooth: Fix l2cap conn failures for ssp devices
-> > /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:18: trailing whitespace.
-> > 
-> > /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:19: trailing whitespace.
-> >                 /* encrypt must be pending if auth is also pending */
-> > /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:20: trailing whitespace.
-> >                 set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend);
-> > /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:21: trailing whitespace.
-> > 
-> > 
-> > But it fixes the problem I was debugging. From what I have
-> > learned in the last two days I would say it is also the right fix :)
+> Szymon Janc (5):
+>   Bluetooth: Make l2cap_clear_timer return if timer was running or not
+>   Bluetooth: Set P-bit for SREJ frame only if there are I-frames to ack
+>   Bluetooth: Clear ack_timer when sending ack
+>   Bluetooth: Don't send RNR immediately when entering local busy
+>   Bluetooth: Drop L2CAP chan reference if ERTM ack_timer fired
 > 
-> Is there any chance to get this patch in? If it helps I could send a
-> whitespace fixed version.
+>  include/net/bluetooth/l2cap.h |    9 +++++++--
+>  net/bluetooth/l2cap_core.c    |   33 ++++++++++++++++++---------------
+>  2 files changed, 25 insertions(+), 17 deletions(-)
 
-Feel free to send a whitespace-fixed version, but even then I only apply
-patches with Marcel's ack on them. Btw, have you verified that this
-doesn't break non-SSP cases? Is this how the code used to behave before
-the regression?
+All five patches have been applied to my bluetooth-next tree. Thanks.
 
 Johan
