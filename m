@@ -1,96 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Sender: lexicall@gmail.com
-In-Reply-To: <1322649157-20479-1-git-send-email-kengyu@canonical.com>
-References: <1321422409.15441.510.camel@aeonflux> <1322649157-20479-1-git-send-email-kengyu@canonical.com>
-From: =?UTF-8?B?S2VuZy1Zw7wgTGlu?= <kengyu@canonical.com>
-Date: Thu, 12 Jan 2012 10:23:38 +0100
-Message-ID: <CADXHx7ZP=kGfP7Pz3Wq-Kpae9D=4JRmQOWXkiy5T2tfAVewQMQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Add AR30XX device ID on Asus laptops
-To: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan" <padovan@profusion.mobi>,
+In-Reply-To: <20120103120351.GA12920@aemeltch-MOBL1>
+References: <20120103015131.GA1239@samus>
+	<20120103120351.GA12920@aemeltch-MOBL1>
+Date: Wed, 11 Jan 2012 17:54:44 -0200
+Message-ID: <CAA37ikZLk8JXP=B++XfWEvU6iosUBuWM45+Hn1fXRXYzVQREwA@mail.gmail.com>
+Subject: Re: [BUG] Sleeping inside a RCU reader
+From: Ulisses Furquim <ulisses@profusion.mobi>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
 	linux-bluetooth@vger.kernel.org
-Cc: Anthony Wong <anthony.wong@canonical.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Heya,
- No intent to push in rush, but the patch is not applied in the tree
-after a while. just want to make sure it looks ok and is ready to be
-applied in the next round.
+Hi,
 
-  Thanks,
--kengyu
+Is this bug still present? I haven't seen any more updates on this thread.
 
-On Wed, Nov 30, 2011 at 11:32 AM, Keng-Yu Lin <kengyu@canonical.com> wrote:
-> The ID is found on Asus K54HR and K53U.
-> Blacklist the AR3011-based device ID [0489:e03d]
-> and add to ath3k.c for firmware loading.
+Thanks,
+Regards,
+
+-- Ulisses
+
+On Tue, Jan 3, 2012 at 10:03 AM, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+> Hi Vinicius,
 >
-> Below is the output of usb-devices script:
+> On Mon, Jan 02, 2012 at 10:51:31PM -0300, Vinicius Costa Gomes wrote:
+>> Hi,
+>>
+>> I found this bug (trace attached) and I don't think I will be able to
+>> start working on it in the next 11 hours, so this email is to make
+>> the life of anyone who wants to work on it a little easier. (If anyone
+>> wishes to work on this, please respond this email).
+>>
+>> I was able to reproduce it consistenly doing a "hciconfig <dev> down"
+>> with an established connection. I was using LE devices, but it seems that
+>> the types of the devices don't matter.
+>>
+>> The problem is that cancel_delayed_work_sync() called inside
+>> hci_conn_del() is blocking, because of and called in the context of an RCU
+>> (inside hci_conn_hash_flush()).
 >
-> Before the fiwmware loading:
+> I think that if the RCU code is not protected by rcu_read_{,un}lock then
+> it is OK to sleep (and this is updater anyway).
 >
-> T: =C2=A0Bus=3D01 Lev=3D02 Prnt=3D02 Port=3D00 Cnt=3D01 Dev#=3D =C2=A03 S=
-pd=3D12 =C2=A0MxCh=3D 0
-> D: =C2=A0Ver=3D 1.10 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=
-=3D =C2=A01
-> P: =C2=A0Vendor=3D0489 ProdID=3De03d Rev=3D00.01
-> C: =C2=A0#Ifs=3D 2 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
-> I: =C2=A0If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 D=
-river=3Dbtusb
-> I: =C2=A0If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 D=
-river=3Dbtusb
+> In that function "hci_conn_hash_flush" maybe it is better to use
+> list_for_each_entry instead of list_for_each_entry_rcu for better
+> readability?
 >
-> After the fiwmware loading:
+> Best regards
+> Andrei Emeltchenko
 >
-> T: =C2=A0Bus=3D01 Lev=3D02 Prnt=3D02 Port=3D00 Cnt=3D01 Dev#=3D =C2=A05 S=
-pd=3D12 =C2=A0MxCh=3D 0
-> D: =C2=A0Ver=3D 1.10 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=
-=3D =C2=A01
-> P: =C2=A0Vendor=3D0cf3 ProdID=3D3005 Rev=3D00.01
-> C: =C2=A0#Ifs=3D 2 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
-> I: =C2=A0If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 D=
-river=3Dbtusb
-> I: =C2=A0If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 D=
-river=3Dbtusb
->
-> Signed-off-by: Keng-Yu Lin <kengyu@canonical.com>
-> ---
-> =C2=A0drivers/bluetooth/ath3k.c | =C2=A0 =C2=A01 +
-> =C2=A0drivers/bluetooth/btusb.c | =C2=A0 =C2=A01 +
-> =C2=A02 files changed, 2 insertions(+), 0 deletions(-)
->
-> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-> index 106beb1..db811d2 100644
-> --- a/drivers/bluetooth/ath3k.c
-> +++ b/drivers/bluetooth/ath3k.c
-> @@ -64,6 +64,7 @@ static struct usb_device_id ath3k_table[] =3D {
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x0CF3, 0x3002) },
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x13d3, 0x3304) },
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x0930, 0x0215) },
-> + =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x0489, 0xE03D) },
->
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Atheros AR9285 Malbec with sflash firmware =
-*/
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x03F0, 0x311D) },
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index fe4ebc3..d5b9aa4 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -119,6 +119,7 @@ static struct usb_device_id blacklist_table[] =3D {
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x0cf3, 0x3002), .driver_info =3D=
- BTUSB_IGNORE },
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x13d3, 0x3304), .driver_info =3D=
- BTUSB_IGNORE },
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x0930, 0x0215), .driver_info =3D=
- BTUSB_IGNORE },
-> + =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x0489, 0xe03d), .driver_info =3D BTU=
-SB_IGNORE },
->
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Atheros AR9285 Malbec with sflash firmware =
-*/
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x03f0, 0x311d), .driver_info =3D=
- BTUSB_IGNORE },
 > --
-> 1.7.5.4
->
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Ulisses Furquim
+ProFUSION embedded systems
+http://profusion.mobi
+Mobile: +55 19 9250 0942
+Skype: ulissesffs
