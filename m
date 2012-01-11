@@ -1,61 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 11 Jan 2012 16:56:26 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Sunil Kumar Behera <sunil.behera@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd] PBAP: Fix possible invalid memory access
+Message-ID: <20120111145626.GA32565@x220>
+References: <1326179605-3380-1-git-send-email-sunil.behera@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <F82830D409D80E4881C83250E051B74B4A05D3CB@banasiexm01.ASIA.ROOT.PRI>
-References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
-	<4EA6143E.4000606@googlemail.com>
-	<7769C83744F2C34A841232EF77AEA20C01DCAA8D28@dnce01.ent.ti.com>
-	<CAKT1EBeJB2FDrv6Xp_bGV3eFDEe5ecvnBN0rKniYxw5++Q9NfA@mail.gmail.com>
-	<7769C83744F2C34A841232EF77AEA20C01DCAA8F85@dnce01.ent.ti.com>
-	<CAKT1EBcd6dQq3bzOsW3Fuwv=d8J=yDvsJjbp_ELEAQUjfyRx9g@mail.gmail.com>
-	<F82830D409D80E4881C83250E051B74B4A05D3CB@banasiexm01.ASIA.ROOT.PRI>
-Date: Wed, 11 Jan 2012 11:57:31 -0300
-Message-ID: <CAKT1EBdXx9=U9J8roTZT==fhHvH4ke5An5QSY3zc7xcyj9TMjA@mail.gmail.com>
-Subject: Re: GATT Dbus API on BlueZ
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
-Cc: "Ganir, Chen" <chen.ganir@ti.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1326179605-3380-1-git-send-email-sunil.behera@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vijay,
+Hi Sunil,
 
-On Wed, Jan 11, 2012 at 11:25 AM, Vijaykumar Dadmode
-<Vijaykumar.Dadmode@csr.com> wrote:
->
-> Hi,
->
->> You are disabling all the GATT plugins, so my suggestion is: open the
->> ATT L2CAP socket directly in your JNI bindings. Using this approach
->> you will have all the control that you need.
->
->> We track the users/clients based on the D-Bus connection, if the
->> client(dbus-send or any other) leaves the bus the core will disconnect
->> link if watcher list is empty.
->
->> BR,
->> Claudio.
->
-> If we are using plugins, considering the case, the device sends disconnect request if there is no activity on the device. On GATT Client we get GATT Disconnect (attio_disconnect). Then once there is some activity on device then it will start sending a ADV_DIREC_IND.
+On Tue, Jan 10, 2012, Sunil Kumar Behera wrote:
+> Issue: As reported by static code analyzer (Coverity), if
+> buffer is NULL and aparams is not NULL, then buffer gets
+> dereferenced in string_read function.
+> Fix: Application parameter is allocated only if maxlistcount
+> is zero during phonebooksize request and buffer is allocated
+> in case of pull phonebook request, hence modify logic to avoid
+> application parameter check, as it is tightly coupled with
+> maxlistcount.
+> ---
+>  plugins/pbap.c |    9 +++++----
+>  1 files changed, 5 insertions(+), 4 deletions(-)
 
-The plan is to get the disconnection reason through the
-socket(getsockopt SO_ERROR).
+Applied. Thanks.
 
-I suppose that you are talking about HoG(HID over GATT). Indeed,
-background LE scanning(in the kernel) needs to be active if the
-service requires automatic reconnection. If we detect power
-consumption problems one additional command can be added in the
-management interface. Basically, the idea is to control LE scanning
-and connections automatically in the kernel based on inputs provided
-by the userspace: keys, socket(connection requested).
-
->
-> How do we handle this case? As we have to again CONNECT/DISCOVER ?
-
-Services/plugins need to keep the ATTIO callback registered only.
-Scanning and connections should be handled automatically by the
-bluetoothd core and kernel.
-
-BR,
-Claudio
+Johan
