@@ -1,32 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 Jan 2012 16:56:26 +0200
+Date: Wed, 11 Jan 2012 16:45:10 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Sunil Kumar Behera <sunil.behera@samsung.com>
+To: jaganath.k@samsung.com
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd] PBAP: Fix possible invalid memory access
-Message-ID: <20120111145626.GA32565@x220>
-References: <1326179605-3380-1-git-send-email-sunil.behera@samsung.com>
+Subject: Re: [PATCH obexd 1/2] Fix incorrect transfer path id during request
+ authorization
+Message-ID: <20120111144510.GA31139@x220>
+References: <1326292215-17824-1-git-send-email-jaganath.k@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1326179605-3380-1-git-send-email-sunil.behera@samsung.com>
+In-Reply-To: <1326292215-17824-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sunil,
+Hi Jaganath,
 
-On Tue, Jan 10, 2012, Sunil Kumar Behera wrote:
-> Issue: As reported by static code analyzer (Coverity), if
-> buffer is NULL and aparams is not NULL, then buffer gets
-> dereferenced in string_read function.
-> Fix: Application parameter is allocated only if maxlistcount
-> is zero during phonebooksize request and buffer is allocated
-> in case of pull phonebook request, hence modify logic to avoid
-> application parameter check, as it is tightly coupled with
-> maxlistcount.
+On Wed, Jan 11, 2012, jaganath.k@samsung.com wrote:
+> From: jaganath.k <jaganath.k@samsung.com>
+> 
+> Transfer is registered with id as cid, but authorize method
+> is called with id as pointer to obex session structure
 > ---
->  plugins/pbap.c |    9 +++++----
->  1 files changed, 5 insertions(+), 4 deletions(-)
+>  src/manager.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-Applied. Thanks.
+Both of these patches look fine to me, but you need to fix your git
+author name. Once you've done that please resend the patches.
+
+I also noticed that I've by mistake already applied another patch from
+you in December with the same bogus author name, so you'll end up
+getting your own entry in our infamous .mailmap file.
 
 Johan
