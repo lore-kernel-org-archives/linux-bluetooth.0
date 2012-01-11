@@ -1,68 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 11 Jan 2012 18:42:46 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Send the Extended Error result code, if requested in the
+ failure cases
+Message-ID: <20120111164246.GA10746@fusion.localdomain>
+References: <1326297791-8533-1-git-send-email-s.syam@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <20120103120351.GA12920@aemeltch-MOBL1>
-References: <20120103015131.GA1239@samus>
-	<20120103120351.GA12920@aemeltch-MOBL1>
-Date: Wed, 11 Jan 2012 17:54:44 -0200
-Message-ID: <CAA37ikZLk8JXP=B++XfWEvU6iosUBuWM45+Hn1fXRXYzVQREwA@mail.gmail.com>
-Subject: Re: [BUG] Sleeping inside a RCU reader
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1326297791-8533-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Syam,
 
-Is this bug still present? I haven't seen any more updates on this thread.
+On Wed, Jan 11, 2012, Syam Sidhardhan wrote:
+> If HF has already requested for the Extended Error result code reporting,
+> then send the same in certain failure cases. Earlier in this case we were
+> sending normal Error.
+> ---
+>  audio/headset.c |    8 +++++++-
+>  1 files changed, 7 insertions(+), 1 deletions(-)
+> 
+> diff --git a/audio/headset.c b/audio/headset.c
+> index 6aef6a8..5455340 100644
+> --- a/audio/headset.c
+> +++ b/audio/headset.c
+> @@ -1331,7 +1331,13 @@ static gboolean rfcomm_io_cb(GIOChannel *chan, GIOCondition cond,
+>  		if (err == -EINVAL) {
+>  			error("Badly formated or unrecognized command: %s",
+>  					&slc->buf[slc->data_start]);
+> -			err = headset_send(hs, "\r\nERROR\r\n");
+> +
+> +			if (slc->cme_enabled)
+> +				err = headset_send(hs, "\r\n+CME ERROR: %d\r\n",
+> +						CME_ERROR_NOT_SUPPORTED);
+> +			else
+> +				err = headset_send(hs, "\r\nERROR\r\n");
+> +
+>  			if (err < 0)
+>  				goto failed;
+>  		} else if (err < 0)
 
-Thanks,
-Regards,
+In this case it'd be easier to just do this:
 
--- Ulisses
+	err = telephony_generic_rsp(device, CME_ERROR_NOT_SUPPORTED);
 
-On Tue, Jan 3, 2012 at 10:03 AM, Andrei Emeltchenko
-<andrei.emeltchenko.news@gmail.com> wrote:
-> Hi Vinicius,
->
-> On Mon, Jan 02, 2012 at 10:51:31PM -0300, Vinicius Costa Gomes wrote:
->> Hi,
->>
->> I found this bug (trace attached) and I don't think I will be able to
->> start working on it in the next 11 hours, so this email is to make
->> the life of anyone who wants to work on it a little easier. (If anyone
->> wishes to work on this, please respond this email).
->>
->> I was able to reproduce it consistenly doing a "hciconfig <dev> down"
->> with an established connection. I was using LE devices, but it seems that
->> the types of the devices don't matter.
->>
->> The problem is that cancel_delayed_work_sync() called inside
->> hci_conn_del() is blocking, because of and called in the context of an RCU
->> (inside hci_conn_hash_flush()).
->
-> I think that if the RCU code is not protected by rcu_read_{,un}lock then
-> it is OK to sleep (and this is updater anyway).
->
-> In that function "hci_conn_hash_flush" maybe it is better to use
-> list_for_each_entry instead of list_for_each_entry_rcu for better
-> readability?
->
-> Best regards
-> Andrei Emeltchenko
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+It'll do the cme_enabled check for you and send the right response
+string.
 
-
-
--- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+Johan
