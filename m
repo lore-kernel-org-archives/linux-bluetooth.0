@@ -1,45 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
-To: "'Claudio Takahasi'" <claudio.takahasi@openbossa.org>,
-	"Ganir, Chen" <chen.ganir@ti.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: GATT Dbus API on BlueZ
-Date: Wed, 11 Jan 2012 14:25:44 +0000
-Message-ID: <F82830D409D80E4881C83250E051B74B4A05D3CB@banasiexm01.ASIA.ROOT.PRI>
+MIME-Version: 1.0
+In-Reply-To: <F82830D409D80E4881C83250E051B74B4A05D3CB@banasiexm01.ASIA.ROOT.PRI>
 References: <1319497579-8859-1-git-send-email-pkrystad@codeaurora.org>
 	<4EA6143E.4000606@googlemail.com>
 	<7769C83744F2C34A841232EF77AEA20C01DCAA8D28@dnce01.ent.ti.com>
 	<CAKT1EBeJB2FDrv6Xp_bGV3eFDEe5ecvnBN0rKniYxw5++Q9NfA@mail.gmail.com>
 	<7769C83744F2C34A841232EF77AEA20C01DCAA8F85@dnce01.ent.ti.com>
- <CAKT1EBcd6dQq3bzOsW3Fuwv=d8J=yDvsJjbp_ELEAQUjfyRx9g@mail.gmail.com>
-In-Reply-To: <CAKT1EBcd6dQq3bzOsW3Fuwv=d8J=yDvsJjbp_ELEAQUjfyRx9g@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+	<CAKT1EBcd6dQq3bzOsW3Fuwv=d8J=yDvsJjbp_ELEAQUjfyRx9g@mail.gmail.com>
+	<F82830D409D80E4881C83250E051B74B4A05D3CB@banasiexm01.ASIA.ROOT.PRI>
+Date: Wed, 11 Jan 2012 11:57:31 -0300
+Message-ID: <CAKT1EBdXx9=U9J8roTZT==fhHvH4ke5An5QSY3zc7xcyj9TMjA@mail.gmail.com>
+Subject: Re: GATT Dbus API on BlueZ
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
+Cc: "Ganir, Chen" <chen.ganir@ti.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQpIaSwNCg0KPiBZb3UgYXJlIGRpc2FibGluZyBhbGwgdGhlIEdBVFQgcGx1
-Z2lucywgc28gbXkgc3VnZ2VzdGlvbiBpczogb3BlbiB0aGUNCj4gQVRUIEwy
-Q0FQIHNvY2tldCBkaXJlY3RseSBpbiB5b3VyIEpOSSBiaW5kaW5ncy4gVXNp
-bmcgdGhpcyBhcHByb2FjaA0KPiB5b3Ugd2lsbCBoYXZlIGFsbCB0aGUgY29u
-dHJvbCB0aGF0IHlvdSBuZWVkLg0KDQo+IFdlIHRyYWNrIHRoZSB1c2Vycy9j
-bGllbnRzIGJhc2VkIG9uIHRoZSBELUJ1cyBjb25uZWN0aW9uLCBpZiB0aGUN
-Cj4gY2xpZW50KGRidXMtc2VuZCBvciBhbnkgb3RoZXIpIGxlYXZlcyB0aGUg
-YnVzIHRoZSBjb3JlIHdpbGwgZGlzY29ubmVjdA0KPiBsaW5rIGlmIHdhdGNo
-ZXIgbGlzdCBpcyBlbXB0eS4NCg0KPiBCUiwNCj4gQ2xhdWRpby4NCg0KSWYg
-d2UgYXJlIHVzaW5nIHBsdWdpbnMsIGNvbnNpZGVyaW5nIHRoZSBjYXNlLCB0
-aGUgZGV2aWNlIHNlbmRzIGRpc2Nvbm5lY3QgcmVxdWVzdCBpZiB0aGVyZSBp
-cyBubyBhY3Rpdml0eSBvbiB0aGUgZGV2aWNlLiBPbiBHQVRUIENsaWVudCB3
-ZSBnZXQgR0FUVCBEaXNjb25uZWN0IChhdHRpb19kaXNjb25uZWN0KS4gVGhl
-biBvbmNlIHRoZXJlIGlzIHNvbWUgYWN0aXZpdHkgb24gZGV2aWNlIHRoZW4g
-aXQgd2lsbCBzdGFydCBzZW5kaW5nIGEgQURWX0RJUkVDX0lORC4NCg0KSG93
-IGRvIHdlIGhhbmRsZSB0aGlzIGNhc2U/IEFzIHdlIGhhdmUgdG8gYWdhaW4g
-Q09OTkVDVC9ESVNDT1ZFUiA/IA0KDQpUaGFua3MsDQpWaWpheQ0KDQoKCk1l
-bWJlciBvZiB0aGUgQ1NSIHBsYyBncm91cCBvZiBjb21wYW5pZXMuIENTUiBw
-bGMgcmVnaXN0ZXJlZCBpbiBFbmdsYW5kIGFuZCBXYWxlcywgcmVnaXN0ZXJl
-ZCBudW1iZXIgNDE4NzM0NiwgcmVnaXN0ZXJlZCBvZmZpY2UgQ2h1cmNoaWxs
-IEhvdXNlLCBDYW1icmlkZ2UgQnVzaW5lc3MgUGFyaywgQ293bGV5IFJvYWQs
-IENhbWJyaWRnZSwgQ0I0IDBXWiwgVW5pdGVkIEtpbmdkb20KTW9yZSBpbmZv
-cm1hdGlvbiBjYW4gYmUgZm91bmQgYXQgd3d3LmNzci5jb20uIEZvbGxvdyBD
-U1Igb24gVHdpdHRlciBhdCBodHRwOi8vdHdpdHRlci5jb20vQ1NSX1BMQyBh
-bmQgcmVhZCBvdXIgYmxvZyBhdCB3d3cuY3NyLmNvbS9ibG9nCg==
+Hi Vijay,
+
+On Wed, Jan 11, 2012 at 11:25 AM, Vijaykumar Dadmode
+<Vijaykumar.Dadmode@csr.com> wrote:
+>
+> Hi,
+>
+>> You are disabling all the GATT plugins, so my suggestion is: open the
+>> ATT L2CAP socket directly in your JNI bindings. Using this approach
+>> you will have all the control that you need.
+>
+>> We track the users/clients based on the D-Bus connection, if the
+>> client(dbus-send or any other) leaves the bus the core will disconnect
+>> link if watcher list is empty.
+>
+>> BR,
+>> Claudio.
+>
+> If we are using plugins, considering the case, the device sends disconnect request if there is no activity on the device. On GATT Client we get GATT Disconnect (attio_disconnect). Then once there is some activity on device then it will start sending a ADV_DIREC_IND.
+
+The plan is to get the disconnection reason through the
+socket(getsockopt SO_ERROR).
+
+I suppose that you are talking about HoG(HID over GATT). Indeed,
+background LE scanning(in the kernel) needs to be active if the
+service requires automatic reconnection. If we detect power
+consumption problems one additional command can be added in the
+management interface. Basically, the idea is to control LE scanning
+and connections automatically in the kernel based on inputs provided
+by the userspace: keys, socket(connection requested).
+
+>
+> How do we handle this case? As we have to again CONNECT/DISCOVER ?
+
+Services/plugins need to keep the ATTIO callback registered only.
+Scanning and connections should be handled automatically by the
+bluetoothd core and kernel.
+
+BR,
+Claudio
