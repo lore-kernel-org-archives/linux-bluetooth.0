@@ -1,28 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 12 Jan 2012 21:41:22 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Syam Sidhardhan <s.syam@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] Send the Extended Error result code, if requested
- in the failure cases
-Message-ID: <20120112194122.GA7453@fusion.localdomain>
-References: <1326381301-25862-1-git-send-email-s.syam@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1326381301-25862-1-git-send-email-s.syam@samsung.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ] Add missing "Legacy" property for LE devices
+Date: Thu, 12 Jan 2012 14:59:41 -0400
+Message-Id: <1326394781-465-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+Some UIs may assume that a device lacking the Legacy property is
+pre 2.1. To be more consistent with BR/EDR devices, always set Legacy
+property explicitly to False. This makes these UIs not ask for a PIN
+code when doing Just Works pairing for LE devices.
+---
+ src/adapter.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-On Thu, Jan 12, 2012, Syam Sidhardhan wrote:
-> If HF has already requested for the Extended Error result code reporting,
-> then send the same in certain failure cases. Earlier in this case we were
-> sending normal error.
-> ---
->  audio/headset.c |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
+diff --git a/src/adapter.c b/src/adapter.c
+index e65780e..7e4bbb6 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2671,11 +2671,14 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 		else
+ 			broadcaster = TRUE;
+ 
++		dev->legacy = FALSE;
++
+ 		emit_device_found(adapter->path, paddr,
+ 				"Address", DBUS_TYPE_STRING, &paddr,
+ 				"RSSI", DBUS_TYPE_INT16, &rssi,
+ 				"Name", DBUS_TYPE_STRING, &dev->name,
+ 				"Alias", DBUS_TYPE_STRING, &alias,
++				"LegacyPairing", DBUS_TYPE_BOOLEAN, &dev->legacy,
+ 				"Paired", DBUS_TYPE_BOOLEAN, &paired,
+ 				"Broadcaster", DBUS_TYPE_BOOLEAN, &broadcaster,
+ 				"UUIDs", DBUS_TYPE_ARRAY, &dev->uuids, uuid_count,
+-- 
+1.7.5.4
 
-Applied. Thanks.
-
-Johan
