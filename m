@@ -1,296 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-From: Divya Yadav <divya.yadav@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Divya Yadav <divya.yadav@samsung.com>
-Subject: [PATCH obexd] MAP: Add application parameter parsing support
-Date: Thu, 12 Jan 2012 18:29:21 +0530
-Message-id: <1326373161-4618-1-git-send-email-divya.yadav@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Sender: lexicall@gmail.com
+In-Reply-To: <1322649157-20479-1-git-send-email-kengyu@canonical.com>
+References: <1321422409.15441.510.camel@aeonflux> <1322649157-20479-1-git-send-email-kengyu@canonical.com>
+From: =?UTF-8?B?S2VuZy1Zw7wgTGlu?= <kengyu@canonical.com>
+Date: Thu, 12 Jan 2012 10:23:38 +0100
+Message-ID: <CADXHx7ZP=kGfP7Pz3Wq-Kpae9D=4JRmQOWXkiy5T2tfAVewQMQ@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Add AR30XX device ID on Asus laptops
+To: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Cc: Anthony Wong <anthony.wong@canonical.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add application parameter parsing and check for
-mandatory parameters.
----
- plugins/mas.c      |  187 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- plugins/messages.h |   19 +++++
- 2 files changed, 199 insertions(+), 7 deletions(-)
+Heya,
+ No intent to push in rush, but the patch is not applied in the tree
+after a while. just want to make sure it looks ok and is ready to be
+applied in the next round.
 
-diff --git a/plugins/mas.c b/plugins/mas.c
-index 17e54d8..d16015c 100644
---- a/plugins/mas.c
-+++ b/plugins/mas.c
-@@ -29,6 +29,7 @@
- #include <glib.h>
- #include <fcntl.h>
- #include <inttypes.h>
-+#include <string.h>
- 
- #include "obexd.h"
- #include "plugin.h"
-@@ -102,18 +103,134 @@
- #define ML_BODY_BEGIN "<MAP-msg-listing version=\"1.0\">"
- #define ML_BODY_END "</MAP-msg-listing>"
- 
-+enum mas_apparam_tag {
-+	MAXLISTCOUNT_T = 0x01,
-+	STARTOFFSET_T = 0x02,
-+	FILTERMESSAGETYPE_T = 0x03,
-+	FILTERPERIODBEGIN_T = 0x04,
-+	FILTERPERIODEND_T = 0x05,
-+	FILTERREADSTATUS_T = 0x06,
-+	FILTERRECIPIENT_T = 0x07,
-+	FILTERORIGINATOR_T = 0x08,
-+	FILTERPRIORITY_T = 0x09,
-+	ATTACHMENT_T = 0x0A,
-+	TRANSPARENT_T = 0x0B,
-+	RETRY_T = 0x0C,
-+	NEWMESSAGE_T = 0x0D,
-+	NOTIFICATIONSTATUS_T = 0x0E,
-+	MASINSTANCEID_T = 0x0F,
-+	PARAMETERMASK_T = 0x10,
-+	FOLDERLISTINGSIZE_T = 0x11,
-+	MESSAGESLISTINGSIZE_T = 0x12,
-+	SUBJECTLENGTH_T = 0x13,
-+	CHARSET_T = 0x14,
-+	FRACTIONREQUEST_T = 0x15,
-+	FRACTIONDELIVER_T = 0x16,
-+	STATUSINDICATOR_T = 0x17,
-+	STATUSVALUE_T = 0x18,
-+	MSETIME_T = 0x19,
-+	INVALID_T = 0x99,
-+};
-+
-+#define MAXLISTCOUNT_L 2
-+#define STARTOFFSET_L 2
-+#define ATTACHMENT_L 1
-+#define CHARSET_L 1
-+#define STATUSINDICATOR_L 1
-+#define STATUSVALUE_L 1
-+
- struct mas_session {
- 	struct mas_request *request;
- 	void *backend_data;
- 	gboolean finished;
- 	gboolean nth_call;
- 	GString *buffer;
-+	struct apparam_field *apparams;
- };
- 
- static const uint8_t MAS_TARGET[TARGET_SIZE] = {
- 			0xbb, 0x58, 0x2b, 0x40, 0x42, 0x0c, 0x11, 0xdb,
- 			0xb0, 0xde, 0x08, 0x00, 0x20, 0x0c, 0x9a, 0x66  };
- 
-+struct apparam_header {
-+	uint8_t tag;
-+	uint8_t len;
-+	uint8_t val[0];
-+} __attribute__ ((packed));
-+
-+static struct apparam_field *msg_parse_apparam(const uint8_t *buffer,
-+							uint32_t hlen)
-+{
-+	struct apparam_field *param = NULL;
-+	struct apparam_header *hdr = NULL;
-+	uint32_t len = 0;
-+	uint16_t val16;
-+
-+	param = g_new0(struct apparam_field, 1);
-+
-+	while (len < hlen) {
-+		hdr = (void *) (buffer + len);
-+
-+		switch (hdr->tag) {
-+		case MAXLISTCOUNT_T:
-+			if (hdr->len != MAXLISTCOUNT_L)
-+				goto failed;
-+
-+			memcpy(&val16, hdr->val, sizeof(val16));
-+			param->maxlistcount = GUINT16_FROM_BE(val16);
-+			break;
-+
-+		case STARTOFFSET_T:
-+			if (hdr->len != STARTOFFSET_L)
-+				goto failed;
-+
-+			memcpy(&val16, hdr->val, sizeof(val16));
-+			param->offset = GUINT16_FROM_BE(val16);
-+			break;
-+
-+		case ATTACHMENT_T:
-+			if (hdr->len != ATTACHMENT_L)
-+				goto failed;
-+
-+			param->attachment = hdr->val[0];
-+			break;
-+
-+		case CHARSET_T:
-+			if (hdr->len != CHARSET_L)
-+				goto failed;
-+
-+			param->charset = hdr->val[0];
-+			break;
-+
-+		case STATUSINDICATOR_T:
-+			if (hdr->len != STATUSINDICATOR_L)
-+				goto failed;
-+
-+			param->status_indicator = hdr->val[0];
-+			break;
-+
-+		case STATUSVALUE_T:
-+			if (hdr->len != STATUSVALUE_L)
-+				goto failed;
-+
-+			param->status_value = hdr->val[0];
-+			break;
-+
-+		default:
-+			goto failed;
-+		}
-+
-+		len += hdr->len + sizeof(struct apparam_header);
-+	}
-+
-+	return param;
-+
-+failed:
-+	g_free(param);
-+
-+	return NULL;
-+}
-+
- static void reset_request(struct mas_session *mas)
- {
- 	if (mas->buffer) {
-@@ -121,6 +238,11 @@ static void reset_request(struct mas_session *mas)
- 		mas->buffer = NULL;
- 	}
- 
-+	if (mas->apparams) {
-+		g_free(mas->apparams);
-+		mas->apparams = NULL;
-+	}
-+
- 	mas->nth_call = FALSE;
- 	mas->finished = FALSE;
- }
-@@ -170,14 +292,39 @@ static int mas_get(struct obex_session *os, void *user_data)
- 	struct mas_session *mas = user_data;
- 	const char *type = obex_get_type(os);
- 	const char *name = obex_get_name(os);
--	int ret;
--
--	DBG("GET: name %s type %s mas %p",
--			name, type, mas);
-+	struct apparam_field *apparams = NULL;
-+	const uint8_t *buffer = NULL;
-+	ssize_t rsize = 0;
-+	int ret = 0;
- 
- 	if (type == NULL)
- 		return -EBADR;
- 
-+	if (mas->apparams) {
-+		g_free(mas->apparams);
-+		mas->apparams = NULL;
-+	}
-+
-+	DBG("GET: name %s type %s mas %p", name, type, mas);
-+
-+	rsize = obex_get_apparam(os, &buffer);
-+
-+	if (rsize <= 0) {
-+		if (g_ascii_strcasecmp(type, "x-bt/message") == 0) {
-+			ret = -EBADR;
-+			goto failed;
-+		}
-+	} else  {
-+		apparams = msg_parse_apparam(buffer, rsize);
-+
-+		if (apparams == NULL) {
-+			ret = -EBADR;
-+			goto failed;
-+		}
-+
-+		mas->apparams = apparams;
-+	}
-+
- 	ret = obex_get_stream_start(os, name);
- 	if (ret < 0)
- 		goto failed;
-@@ -195,13 +342,39 @@ static int mas_put(struct obex_session *os, void *user_data)
- 	struct mas_session *mas = user_data;
- 	const char *type = obex_get_type(os);
- 	const char *name = obex_get_name(os);
--	int ret;
--
--	DBG("PUT: name %s type %s mas %p", name, type, mas);
-+	struct apparam_field *apparams = NULL;
-+	const uint8_t *buffer = NULL;
-+	int ret = 0;
-+	ssize_t rsize = 0;
- 
- 	if (type == NULL)
- 		return -EBADR;
- 
-+	if (mas->apparams) {
-+		g_free(mas->apparams);
-+		mas->apparams = NULL;
-+	}
-+
-+	DBG("PUT: name %s type %s mas %p", name, type, mas);
-+
-+	rsize = obex_get_apparam(os, &buffer);
-+	if (rsize <= 0) {
-+		if (g_ascii_strcasecmp(type, "x-bt/messageStatus") == 0 ||
-+			g_ascii_strcasecmp(type, "x-bt/message") == 0) {
-+			ret = -EBADR;
-+			goto failed;
-+		}
-+	} else {
-+		apparams = msg_parse_apparam(buffer, rsize);
-+
-+		if (apparams == NULL) {
-+			ret = -EBADR;
-+			goto failed;
-+		}
-+
-+		mas->apparams = apparams;
-+	}
-+
- 	ret = obex_put_stream_start(os, name);
- 	if (ret < 0)
- 		goto failed;
-diff --git a/plugins/messages.h b/plugins/messages.h
-index 00a040c..6cd0e0e 100644
---- a/plugins/messages.h
-+++ b/plugins/messages.h
-@@ -119,6 +119,25 @@ struct messages_filter {
- 	uint8_t priority;
- };
- 
-+/* To store Application parameters.
-+ * maxlistcount - Maximum number of Messages or folders to be sent,
-+ *		if not mentioned it is 1024.
-+ * offset - Offset from where the list is to be sent, if not mentioned it is 0.
-+ * attachment - Indicates if any attachment i.e. ON or OFF.
-+ * charset - Determines trans-coding of the text i.e. "Native" or "UTF-8".
-+ * status_indicator - Indicates which status information is to be modified
-+ *		i.e. "readStatus" or "deletedStatus".
-+ * status_value - Indicates value to status_indicator i.e. "yes" or "no".
-+ */
-+struct apparam_field {
-+	uint16_t maxlistcount;
-+	uint16_t offset;
-+	uint8_t attachment;
-+	uint8_t charset;
-+	uint8_t status_indicator;
-+	uint8_t status_value;
-+};
-+
- /* This is called once after server starts.
-  *
-  * Returns value less than zero if error. This will prevent MAP plugin from
--- 
-1.7.0.4
+  Thanks,
+-kengyu
 
+On Wed, Nov 30, 2011 at 11:32 AM, Keng-Yu Lin <kengyu@canonical.com> wrote:
+> The ID is found on Asus K54HR and K53U.
+> Blacklist the AR3011-based device ID [0489:e03d]
+> and add to ath3k.c for firmware loading.
+>
+> Below is the output of usb-devices script:
+>
+> Before the fiwmware loading:
+>
+> T: =C2=A0Bus=3D01 Lev=3D02 Prnt=3D02 Port=3D00 Cnt=3D01 Dev#=3D =C2=A03 S=
+pd=3D12 =C2=A0MxCh=3D 0
+> D: =C2=A0Ver=3D 1.10 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=
+=3D =C2=A01
+> P: =C2=A0Vendor=3D0489 ProdID=3De03d Rev=3D00.01
+> C: =C2=A0#Ifs=3D 2 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
+> I: =C2=A0If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 D=
+river=3Dbtusb
+> I: =C2=A0If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 D=
+river=3Dbtusb
+>
+> After the fiwmware loading:
+>
+> T: =C2=A0Bus=3D01 Lev=3D02 Prnt=3D02 Port=3D00 Cnt=3D01 Dev#=3D =C2=A05 S=
+pd=3D12 =C2=A0MxCh=3D 0
+> D: =C2=A0Ver=3D 1.10 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=
+=3D =C2=A01
+> P: =C2=A0Vendor=3D0cf3 ProdID=3D3005 Rev=3D00.01
+> C: =C2=A0#Ifs=3D 2 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
+> I: =C2=A0If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 D=
+river=3Dbtusb
+> I: =C2=A0If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 D=
+river=3Dbtusb
+>
+> Signed-off-by: Keng-Yu Lin <kengyu@canonical.com>
+> ---
+> =C2=A0drivers/bluetooth/ath3k.c | =C2=A0 =C2=A01 +
+> =C2=A0drivers/bluetooth/btusb.c | =C2=A0 =C2=A01 +
+> =C2=A02 files changed, 2 insertions(+), 0 deletions(-)
+>
+> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> index 106beb1..db811d2 100644
+> --- a/drivers/bluetooth/ath3k.c
+> +++ b/drivers/bluetooth/ath3k.c
+> @@ -64,6 +64,7 @@ static struct usb_device_id ath3k_table[] =3D {
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x0CF3, 0x3002) },
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x13d3, 0x3304) },
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x0930, 0x0215) },
+> + =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x0489, 0xE03D) },
+>
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Atheros AR9285 Malbec with sflash firmware =
+*/
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x03F0, 0x311D) },
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index fe4ebc3..d5b9aa4 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -119,6 +119,7 @@ static struct usb_device_id blacklist_table[] =3D {
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x0cf3, 0x3002), .driver_info =3D=
+ BTUSB_IGNORE },
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x13d3, 0x3304), .driver_info =3D=
+ BTUSB_IGNORE },
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x0930, 0x0215), .driver_info =3D=
+ BTUSB_IGNORE },
+> + =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x0489, 0xe03d), .driver_info =3D BTU=
+SB_IGNORE },
+>
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Atheros AR9285 Malbec with sflash firmware =
+*/
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0{ USB_DEVICE(0x03f0, 0x311d), .driver_info =3D=
+ BTUSB_IGNORE },
+> --
+> 1.7.5.4
+>
