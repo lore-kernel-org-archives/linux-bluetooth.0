@@ -1,50 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bruna Moreira <bruna.moreira@openbossa.org>
+From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH] Fix EIR name parsing
-Date: Thu, 12 Jan 2012 14:33:37 -0400
-Message-Id: <1326393217-13111-1-git-send-email-bruna.moreira@openbossa.org>
+Cc: Syam Sidhardhan <s.syam@samsung.com>
+Subject: [PATCH BlueZ] Send the Extended Error result code,
+ if requested in the failure cases
+Date: Thu, 12 Jan 2012 20:45:01 +0530
+Message-id: <1326381301-25862-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some vendors put a NUL byte terminator on EIR name field. If that is the
-case, use -1 as string length so g_utf8_validade() can parse it
-properly.
+If HF has already requested for the Extended Error result code reporting,
+then send the same in certain failure cases. Earlier in this case we were
+sending normal error.
 ---
- src/eir.c |   11 ++++++++++-
- 1 files changed, 10 insertions(+), 1 deletions(-)
+ audio/headset.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-diff --git a/src/eir.c b/src/eir.c
-index e4554e8..3826f55 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -119,6 +119,7 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
- 
- 	while (len < eir_len - 1) {
- 		uint8_t field_len = eir_data[0];
-+		ssize_t name_len;
- 
- 		/* Check for the end of EIR */
- 		if (field_len == 0)
-@@ -154,8 +155,16 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
- 
- 		case EIR_NAME_SHORT:
- 		case EIR_NAME_COMPLETE:
-+			/* Some vendors put a NUL byte terminator. If that is
-+			 * the case, use -1 as string length so
-+			 * g_utf8_validade() can parse it properly. */
-+			if (eir_data[field_len] == '\0')
-+				name_len = -1;
-+			else
-+				name_len = field_len - 1;
-+
- 			if (!g_utf8_validate((char *) &eir_data[2],
--							field_len - 1, NULL))
-+								name_len, NULL))
- 				break;
- 
- 			g_free(eir->name);
+diff --git a/audio/headset.c b/audio/headset.c
+index 6aef6a8..c5ea58b 100644
+--- a/audio/headset.c
++++ b/audio/headset.c
+@@ -1331,7 +1331,8 @@ static gboolean rfcomm_io_cb(GIOChannel *chan, GIOCondition cond,
+ 		if (err == -EINVAL) {
+ 			error("Badly formated or unrecognized command: %s",
+ 					&slc->buf[slc->data_start]);
+-			err = headset_send(hs, "\r\nERROR\r\n");
++			err = telephony_generic_rsp(device,
++						CME_ERROR_NOT_SUPPORTED);
+ 			if (err < 0)
+ 				goto failed;
+ 		} else if (err < 0)
 -- 
-1.7.0.4
+1.7.4.1
 
