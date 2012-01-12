@@ -1,40 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] Add missing "Legacy" property for LE devices
-Date: Thu, 12 Jan 2012 14:59:41 -0400
-Message-Id: <1326394781-465-1-git-send-email-anderson.lizardo@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH] Fix EIR name parsing
+Date: Thu, 12 Jan 2012 14:33:37 -0400
+Message-Id: <1326393217-13111-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some UIs may assume that a device lacking the Legacy property is
-pre 2.1. To be more consistent with BR/EDR devices, always set Legacy
-property explicitly to False. This makes these UIs not ask for a PIN
-code when doing Just Works pairing for LE devices.
+Some vendors put a NUL byte terminator on EIR name field. If that is the
+case, use -1 as string length so g_utf8_validade() can parse it
+properly.
 ---
- src/adapter.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ src/eir.c |   11 ++++++++++-
+ 1 files changed, 10 insertions(+), 1 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index e65780e..7e4bbb6 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2671,11 +2671,14 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
- 		else
- 			broadcaster = TRUE;
+diff --git a/src/eir.c b/src/eir.c
+index e4554e8..3826f55 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -119,6 +119,7 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
  
-+		dev->legacy = FALSE;
+ 	while (len < eir_len - 1) {
+ 		uint8_t field_len = eir_data[0];
++		ssize_t name_len;
+ 
+ 		/* Check for the end of EIR */
+ 		if (field_len == 0)
+@@ -154,8 +155,16 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
+ 
+ 		case EIR_NAME_SHORT:
+ 		case EIR_NAME_COMPLETE:
++			/* Some vendors put a NUL byte terminator. If that is
++			 * the case, use -1 as string length so
++			 * g_utf8_validade() can parse it properly. */
++			if (eir_data[field_len] == '\0')
++				name_len = -1;
++			else
++				name_len = field_len - 1;
 +
- 		emit_device_found(adapter->path, paddr,
- 				"Address", DBUS_TYPE_STRING, &paddr,
- 				"RSSI", DBUS_TYPE_INT16, &rssi,
- 				"Name", DBUS_TYPE_STRING, &dev->name,
- 				"Alias", DBUS_TYPE_STRING, &alias,
-+				"LegacyPairing", DBUS_TYPE_BOOLEAN, &dev->legacy,
- 				"Paired", DBUS_TYPE_BOOLEAN, &paired,
- 				"Broadcaster", DBUS_TYPE_BOOLEAN, &broadcaster,
- 				"UUIDs", DBUS_TYPE_ARRAY, &dev->uuids, uuid_count,
+ 			if (!g_utf8_validate((char *) &eir_data[2],
+-							field_len - 1, NULL))
++								name_len, NULL))
+ 				break;
+ 
+ 			g_free(eir->name);
 -- 
-1.7.5.4
+1.7.0.4
 
