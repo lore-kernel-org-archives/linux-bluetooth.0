@@ -1,67 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4F105375.6010107@bmw-carit.de>
+Date: Fri, 13 Jan 2012 16:53:25 +0100
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 MIME-Version: 1.0
-In-Reply-To: <1326460244.2112.48.camel@novo.hadess.net>
-References: <1326460244.2112.48.camel@novo.hadess.net>
-Date: Fri, 13 Jan 2012 18:26:57 +0200
-Message-ID: <CACY+gR0GRKzPWiLwfaoY0Gp1hEEpL-nSAV95KSVDjcetzexmdg@mail.gmail.com>
-Subject: Re: 4.98 fails to build with newer gcc
-From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC obexd 00/10] Major API changes in obex-client
+References: <1322143742-31182-1-git-send-email-mikel.astiz@bmw-carit.de> <CABBYNZLtFnm9RTBfn2s9hdtwWHF=hXQgP+p+cMR_Uch+ErvuyA@mail.gmail.com>
+In-Reply-To: <CABBYNZLtFnm9RTBfn2s9hdtwWHF=hXQgP+p+cMR_Uch+ErvuyA@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jan 13, 2012 at 3:10 PM, Bastien Nocera <hadess@hadess.net> wrote:
-> A few warnings:
->
-> sbc/sbc.c:766:34: warning: always_inline function might not be inlinable [-Wattributes]
-> sbc/sbc.c:558:34: warning: always_inline function might not be inlinable [-Wattributes]
-> sbc/sbc.c:163:31: warning: always_inline function might not be inlinable [-Wattributes]
+Hi Luiz,
 
-Looks like the new version of gcc requires both "inline" and
-"__attribute__((always_inline))" to be used in SBC_ALWAYS_INLINE
-according to [1].
+> I will be doing some cleanups before we integrate this code, some are
+> based on your mega patch that  you have sent (actually it never made
+> to the list due to its size), but I would like to separate the
+> transport code to modules e.g. bluetooth like we did for obexd so the
+> session just call e.g. .connect/.disconnect and the driver takes care
+> of the transport details such as requesting a session and discovering
+> records, this should simplify quite a lot session.c
 
-> and an error
->
-> sbc/sbc_primitives_mmx.c: In function 'sbc_calc_scalefactors_mmx':
-> sbc/sbc_primitives_mmx.c:294:4: warning: asm operand 2 probably doesn't match constraints [enabled by default]
-> sbc/sbc_primitives_mmx.c:294:4: error: impossible constraint in 'asm'
+I agree it would be convenient to have a simplified session.c. Right now 
+there is definitely too much in there.
 
-Here gcc 4.7 thinks that
-				"i" ((char *) &sb_sample_f[1][0][0] -
-					(char *) &sb_sample_f[0][0][0]),
-is an impossible constraint. According to [2], "i" means "An immediate
-integer operand (one with constant value) is allowed. This includes
-symbolic constants whose values will be known only at assembly time or
-later".
-Earlier versions of gcc could see that this expression is a compile
-time constant, but gcc 4.7 can't. As a workaround, "i" can be changed
-to "r" here. The downside is that this needs one more register for
-inline assembly and the number of available registers is really
-limited for 32-bit x86 systems. As a test, it is possible to try "gcc
--O2 -mmmx -c -m32 -fno-omit-frame-pointer -fPIC sbc_primitives_mmx.c".
-Both "-fno-omit-frame-pointer" and "-fPIC" options reduce the number
-of available registers.
+I am about to finish a split of the mega-patch you mention, trying to 
+separate the internal changes from the dbus-related changes, as we 
+discussed. You may want to wait until I send this new proposal.
 
-> Full build log:
-> http://koji.fedoraproject.org/koji/getfile?taskID=3657376&name=build.log
-> Using gcc 4.7.0 as mentioned in root log:
-> http://koji.fedoraproject.org/koji/getfile?taskID=3657376&name=root.log
->
-> The same build works correctly with gcc 4.6.1 on Fedora 16.
->
-> Any ideas?
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> The only problem is how we gonna interpret the address, by default it
+> should be Bluetooth but perhaps we should support urls for other
+> transport e.g. usb://, how about that?
 
-1. http://gcc.gnu.org/bugzilla/show_bug.cgi?id=49139#c1
-2. http://gcc.gnu.org/onlinedocs/gcc-4.6.2/gcc/Simple-Constraints.html#Simple-Constraints
+Sounds fine to me.
 
--- 
-Best regards,
-Siarhei Siamashka
+Cheers,
+Mikel
+
