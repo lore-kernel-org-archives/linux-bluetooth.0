@@ -1,40 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F105375.6010107@bmw-carit.de>
-Date: Fri, 13 Jan 2012 16:53:25 +0100
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC obexd 00/10] Major API changes in obex-client
-References: <1322143742-31182-1-git-send-email-mikel.astiz@bmw-carit.de> <CABBYNZLtFnm9RTBfn2s9hdtwWHF=hXQgP+p+cMR_Uch+ErvuyA@mail.gmail.com>
-In-Reply-To: <CABBYNZLtFnm9RTBfn2s9hdtwWHF=hXQgP+p+cMR_Uch+ErvuyA@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC 1/2] Bluetooth: Use chan instead of sk
+Date: Fri, 13 Jan 2012 17:21:42 +0200
+Message-Id: <1326468103-12731-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> I will be doing some cleanups before we integrate this code, some are
-> based on your mega patch that  you have sent (actually it never made
-> to the list due to its size), but I would like to separate the
-> transport code to modules e.g. bluetooth like we did for obexd so the
-> session just call e.g. .connect/.disconnect and the driver takes care
-> of the transport details such as requesting a session and discovering
-> records, this should simplify quite a lot session.c
+Remove unneeded conversion from sk to chan.
 
-I agree it would be convenient to have a simplified session.c. Right now 
-there is definitely too much in there.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |    7 +++----
+ 1 files changed, 3 insertions(+), 4 deletions(-)
 
-I am about to finish a split of the mega-patch you mention, trying to 
-separate the internal changes from the dbus-related changes, as we 
-discussed. You may want to wait until I send this new proposal.
-
-> The only problem is how we gonna interpret the address, by default it
-> should be Bluetooth but perhaps we should support urls for other
-> transport e.g. usb://, how about that?
-
-Sounds fine to me.
-
-Cheers,
-Mikel
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index a75ee3b..52c7412 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -73,7 +73,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data);
+ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
+ 				struct l2cap_chan *chan, int err);
+ 
+-static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb);
++static int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb);
+ 
+ /* ---- L2CAP channels ---- */
+ 
+@@ -4138,9 +4138,8 @@ static inline int l2cap_data_channel_sframe(struct l2cap_chan *chan, u32 rx_cont
+ 	return 0;
+ }
+ 
+-static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb)
++int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
+ {
+-	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+ 	u32 control;
+ 	u16 req_seq;
+ 	int len, next_tx_seq_offset, req_seq_offset;
+@@ -4241,7 +4240,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 		break;
+ 
+ 	case L2CAP_MODE_ERTM:
+-		l2cap_ertm_data_rcv(sk, skb);
++		l2cap_ertm_data_rcv(chan, skb);
+ 
+ 		goto done;
+ 
+-- 
+1.7.4.1
 
