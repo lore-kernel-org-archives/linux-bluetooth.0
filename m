@@ -1,102 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Jan 2012 15:01:27 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Hendrik Sattler <post@hendrik-sattler.de>
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 2/2] gobex: Fix ABORT request not processing
-Message-ID: <20120113130127.GA8173@x220>
-References: <1326448613-8367-1-git-send-email-jaganath.k@samsung.com>
- <adc3f64ff0de3606125dfbdea3f6b2ac@mail.hendrik-sattler.de>
- <20120113105420.GA4490@x220>
- <8d043367426e37a570df29ff2f4b298b@mail.hendrik-sattler.de>
- <20120113112111.GA5880@x220>
- <82c765e00dbfd5c5b2adf4059f7205b7@mail.hendrik-sattler.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <82c765e00dbfd5c5b2adf4059f7205b7@mail.hendrik-sattler.de>
+In-Reply-To: <CA+i+Aw1Ws-aTyoaNH9Gmwc9-LtXaw+f-1se1NGU6aSvOzPU1dA@mail.gmail.com>
+References: <1326451712-21784-1-git-send-email-lkslawek@gmail.com>
+	<CABBYNZ+7ogaWV-9Xo6k6hKFRAAZ4tU1zd=FRcBF=w0EMJ0Zx+A@mail.gmail.com>
+	<CA+i+Aw1Ws-aTyoaNH9Gmwc9-LtXaw+f-1se1NGU6aSvOzPU1dA@mail.gmail.com>
+Date: Fri, 13 Jan 2012 13:55:23 +0100
+Message-ID: <CA+i+Aw0YM3y=d-AUT8dp_ZP80Sv=QW3y-tzpFPuyEkiJa9frCA@mail.gmail.com>
+Subject: Re: [PATCH obexd 1/4] MAP: Implementation of MAP AP core functions
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hendrik,
-
-On Fri, Jan 13, 2012, Hendrik Sattler wrote:
->Am 13.01.2012 12:21, schrieb Johan Hedberg:
->>Hi Hendrik,
+On Fri, Jan 13, 2012 at 1:37 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
+> On Fri, Jan 13, 2012 at 1:02 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Slawomir,
 >>
->>On Fri, Jan 13, 2012, Hendrik Sattler wrote:
->>>>>>		opcode = obex->rx_last_op;
->>>>>>		/* Unexpected response -- fail silently */
->>>>>> -		if (opcode > 0x1f && opcode < 0xff) {
->>>>>> +		if (opcode > G_OBEX_OP_ABORT && opcode < 0xff) {
->>>>>>			obex->rx_data = 0;
->>>>>>			return TRUE;
->>>>>>		}
->>>>>
->>>>> This one always evaluates to false because 0xff ==
->>>>> G_OBEX_OP_ABORT |
->>>>> FINAL_BIT.
->>>>
->>>> The value of obex->rx_last_op is stored with the final bit cleared,
->>>> so the < 0xff part could also be removed from the test. The value
->>>> 0x1f has been picked because the IrDA OBEX specification defines
->>>> 0x10 - 0x1f as a user-definable range, so anything between 0x1f and
->>>> 0x7f isn't actually valid. The correct test would then become:
->>>>
->>>>	if (opcode > 0x1f && opcode != G_OBEX_OP_ABORT)
->>>>
->>>> Jaganath, with the above change the patch should be ok, but the
->>>> more surprising thing to me here is that this implies we're missing
->>>> one or more unit tests for Abort. Could you create a patch to add
->>>> those too?  (if we're really strict those tests should go in before
->>>> this patch so that it's actually possible to see that the patch
->>>> makes a difference).
+>> On Fri, Jan 13, 2012 at 12:48 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
+>>>  map_ap_t *map_ap_new(void)
+>>>  {
+>>> -       return NULL;
+>>> +       return g_hash_table_new_full(NULL, NULL, NULL, ap_entry_free);
+>>
+>> I supposed you would like to use g_direct_hash and g_direct_equal
+>> here, even if NULL mean the same it easier to understand and maintain
+>> that way. Also it is not clear why the return of map_ap_new is
+>> map_ap_t not a GHashTable?
+>
+> _I_ would like to use NULL - as you said yourself this is easier to
+> understand and maintain. And this is explicitly documented default
+
+I have misread you. You said fully spelled function are easier to
+maintain. Although I do not believe so, I can see that both in BlueZ
+and in oFono it is used that way, so I can make it that way for the
+sake of consistency between projects.
+
+> behavior. map_ap_t was agreed earlier for the implementation to be
+> interchangeable - map_ap_t is opaque from the map_ap_* API user point
+> of view.
+>
+>>
+>>>  }
 >>>
->>> User-definable does not mean invalid. It only means that these can
->>> be used for custom commands. These are still bound to the rules of
->>> the OBEX protocol. I've never seen one using that, though.
+>>>  void map_ap_free(map_ap_t *ap)
+>>>  {
+>>> +       if (!ap)
+>>> +               return;
 >>
->> Exactly. You might want to re-read what I said and the test I
->> proposed.
-> 
-> I did.
-
-I interpreted your message as you thinking that I was wanting to filter
-out or equate user-definable values as invalid. Seems I was wrong then.
-
->>> Else you'd also have to filter 0x04 and the range 0x08-0x0f because
->>> these are marked as "reserved".
+>> Are you sure you need this check, iirc most functions of glib does
+>> NULL check already and sometime it even print warnings, so if this
+>> check is to prevent warning I would suggest no to have because  it
+>> will hide real bugs behind it.
+>
+> Destroy function here would print critical error message on NULL
+> GHashTable. I like map_ap_free(NULL) call to be valid just like
+> g_free(NULL).
+>
 >>
->> With the test I proposed we filter neither reserved (since they might
->> get meaning in new spec versions) nor user-defined opcodes.
-> 
-> Your propose if-line discards all packets with opcodes in the range
-> 0x20-0x1e.
+>> --
+>> Luiz Augusto von Dentz
+>
+>
+>
+> --
+> Slawomir Bochenski
 
-I suppose you mean 0x20-0x7f (since 0x1e is less than 0x20)? Yes, and in
-addition to that it also discards 0x80-0xff.
 
-> I would remove that if-line (and also the wrong comments that talks
-> about responses but means requests).
 
-No, it does mean responses. In the case that we've timed out waiting for
-a response it is possible that we still receive it later (if we time out
-while the packet is already on its way to us). This test is meant to
-discard such packets (i.e. any packet that isn't an obvious command).
-
-> OTOH, the reserved and user-defined packets will fail immediately
-> after that anyway due to the check of the length of non-header data
-> returning -1 for those cases.
-
-For this one possible solution is to add the capability for defining
-custom header offsets for user-defined opcodes. But we'll do that only
-once someone has a real use-case for it and requests the feature.
-
-> Not only that but it immediately drops connection because of that? It
-> could at least get the packet and send a negative response.
-
-That's true, an error response could be added instead of discarding the
-connection as unusable. One question to answer though is should we
-inform the application about this somehow.
-
-Johan
+-- 
+Slawomir Bochenski
