@@ -2,149 +2,101 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 3/8] Bluetooth: Add new structures for handling SMP Long Term Keys
-Date: Fri, 13 Jan 2012 16:39:35 -0300
-Message-Id: <1326483580-11243-4-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH 2/8] Bluetooth: Rename smp_key_size to enc_key_size
+Date: Fri, 13 Jan 2012 16:39:34 -0300
+Message-Id: <1326483580-11243-3-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1326483580-11243-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1326483580-11243-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This includes a new list for storing the keys and a new structure used
-to represent each key.
-
-Some notes: authenticated is used to identify that the key may be used
-to setup a HIGH security link. As the same list is used to store both
-the STK's and the LTK's the type field is used so we can separate
-between those two types of keys and if the key should be used when
-in the master or slave role.
+This makes clear that this is the size of the key used to
+encrypt the link.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- include/net/bluetooth/hci.h      |    5 +++++
- include/net/bluetooth/hci_core.h |   15 +++++++++++++++
- net/bluetooth/hci_core.c         |   31 +++++++++++++++++++++++++++++++
- 3 files changed, 51 insertions(+), 0 deletions(-)
+ include/net/bluetooth/smp.h |    2 +-
+ net/bluetooth/smp.c         |   18 +++++++++---------
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 8499307..3056115 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -273,6 +273,11 @@ enum {
- #define HCI_LK_SMP_LTK			0x81
- #define HCI_LK_SMP_IRK			0x82
- #define HCI_LK_SMP_CSRK			0x83
-+/* The spec doesn't define types for SMP keys, the _MASTER suffix is implied */
-+#define HCI_SMP_STK			0x80
-+#define HCI_SMP_STK_SLAVE		0x81
-+#define HCI_SMP_LTK			0x82
-+#define HCI_SMP_LTK_SLAVE		0x83
+diff --git a/include/net/bluetooth/smp.h b/include/net/bluetooth/smp.h
+index aeaf5fa..7b3acdd 100644
+--- a/include/net/bluetooth/smp.h
++++ b/include/net/bluetooth/smp.h
+@@ -127,7 +127,7 @@ struct smp_chan {
+ 	u8              rrnd[16]; /* SMP Pairing Random (remote) */
+ 	u8		pcnf[16]; /* SMP Pairing Confirm */
+ 	u8		tk[16]; /* SMP Temporary Key */
+-	u8		smp_key_size;
++	u8		enc_key_size;
+ 	unsigned long	smp_flags;
+ 	struct crypto_blkcipher	*tfm;
+ 	struct work_struct confirm;
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 65a9024..b7f2fd1 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -250,7 +250,7 @@ static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
+ 			(max_key_size < SMP_MIN_ENC_KEY_SIZE))
+ 		return SMP_ENC_KEY_SIZE;
  
- /* ---- HCI Error Codes ---- */
- #define HCI_ERROR_AUTH_FAILURE		0x05
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 59e3541..9d77a66 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -88,6 +88,18 @@ struct bt_uuid {
- 	u8 svc_hint;
- };
+-	smp->smp_key_size = max_key_size;
++	smp->enc_key_size = max_key_size;
  
-+struct smp_ltk {
-+	struct list_head list;
-+	bdaddr_t bdaddr;
-+	u8 bdaddr_type;
-+	u8 authenticated;
-+	u8 type;
-+	u8 enc_size;
-+	__le16 ediv;
-+	u8 rand[8];
-+	u8 val[16];
-+} __packed;
-+
- struct key_master_id {
- 	__le16 ediv;
- 	u8 rand[8];
-@@ -240,6 +252,8 @@ struct hci_dev {
- 
- 	struct list_head	link_keys;
- 
-+	struct list_head	ltks;
-+
- 	struct list_head	remote_oob_data;
- 
- 	struct list_head	adv_entries;
-@@ -643,6 +657,7 @@ struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
- int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
- 			u8 key_size, __le16 ediv, u8 rand[8], u8 ltk[16]);
- int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
-+int hci_smp_ltks_clear(struct hci_dev *hdev);
- 
- int hci_remote_oob_data_clear(struct hci_dev *hdev);
- struct oob_data *hci_find_remote_oob_data(struct hci_dev *hdev,
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a7b7200..3b5902d 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1163,6 +1163,18 @@ int hci_link_keys_clear(struct hci_dev *hdev)
  	return 0;
  }
+@@ -446,8 +446,8 @@ static void random_work(struct work_struct *work)
+ 		smp_s1(tfm, smp->tk, smp->rrnd, smp->prnd, key);
+ 		swap128(key, stk);
  
-+int hci_smp_ltks_clear(struct hci_dev *hdev)
-+{
-+	struct smp_ltk *k, *tmp;
-+
-+	list_for_each_entry_safe(k, tmp, &hdev->ltks, list) {
-+		list_del(&k->list);
-+		kfree(k);
-+	}
-+
-+	return 0;
-+}
-+
- struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
- {
- 	struct link_key *k;
-@@ -1355,6 +1367,23 @@ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
- 	return 0;
- }
+-		memset(stk + smp->smp_key_size, 0,
+-				SMP_MAX_ENC_KEY_SIZE - smp->smp_key_size);
++		memset(stk + smp->enc_key_size, 0,
++				SMP_MAX_ENC_KEY_SIZE - smp->enc_key_size);
  
-+int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr)
-+{
-+	struct smp_ltk *k, *tmp;
-+
-+	list_for_each_entry_safe(k, tmp, &hdev->ltks, list) {
-+		if (bacmp(bdaddr, &k->bdaddr))
-+			continue;
-+
-+		BT_DBG("%s removing %s", hdev->name, batostr(bdaddr));
-+
-+		list_del(&k->list);
-+		kfree(k);
-+	}
-+
-+	return 0;
-+}
-+
- /* HCI command timer function */
- static void hci_cmd_timer(unsigned long arg)
- {
-@@ -1638,6 +1667,7 @@ int hci_register_dev(struct hci_dev *hdev)
- 	INIT_LIST_HEAD(&hdev->uuids);
+ 		if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend)) {
+ 			reason = SMP_UNSPECIFIED;
+@@ -455,7 +455,7 @@ static void random_work(struct work_struct *work)
+ 		}
  
- 	INIT_LIST_HEAD(&hdev->link_keys);
-+	INIT_LIST_HEAD(&hdev->ltks);
+ 		hci_le_start_enc(hcon, ediv, rand, stk);
+-		hcon->enc_key_size = smp->smp_key_size;
++		hcon->enc_key_size = smp->enc_key_size;
+ 	} else {
+ 		u8 stk[16], r[16], rand[8];
+ 		__le16 ediv;
+@@ -469,10 +469,10 @@ static void random_work(struct work_struct *work)
+ 		smp_s1(tfm, smp->tk, smp->prnd, smp->rrnd, key);
+ 		swap128(key, stk);
  
- 	INIT_LIST_HEAD(&hdev->remote_oob_data);
+-		memset(stk + smp->smp_key_size, 0,
+-				SMP_MAX_ENC_KEY_SIZE - smp->smp_key_size);
++		memset(stk + smp->enc_key_size, 0,
++				SMP_MAX_ENC_KEY_SIZE - smp->enc_key_size);
  
-@@ -1739,6 +1769,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	hci_blacklist_clear(hdev);
- 	hci_uuids_clear(hdev);
- 	hci_link_keys_clear(hdev);
-+	hci_smp_ltks_clear(hdev);
- 	hci_remote_oob_data_clear(hdev);
- 	hci_adv_entries_clear(hdev);
- 	hci_dev_unlock(hdev);
+-		hci_add_ltk(hcon->hdev, 0, conn->dst, smp->smp_key_size,
++		hci_add_ltk(hcon->hdev, 0, conn->dst, smp->enc_key_size,
+ 							ediv, rand, stk);
+ 	}
+ 
+@@ -820,7 +820,7 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ 	skb_pull(skb, sizeof(*rp));
+ 
+-	hci_add_ltk(conn->hcon->hdev, 1, conn->dst, smp->smp_key_size,
++	hci_add_ltk(conn->hcon->hdev, 1, conn->dst, smp->enc_key_size,
+ 						rp->ediv, rp->rand, smp->tk);
+ 
+ 	smp_distribute_keys(conn, 1);
+@@ -941,7 +941,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
+ 
+ 		smp_send_cmd(conn, SMP_CMD_ENCRYPT_INFO, sizeof(enc), &enc);
+ 
+-		hci_add_ltk(conn->hcon->hdev, 1, conn->dst, smp->smp_key_size,
++		hci_add_ltk(conn->hcon->hdev, 1, conn->dst, smp->enc_key_size,
+ 						ediv, ident.rand, enc.ltk);
+ 
+ 		ident.ediv = cpu_to_le16(ediv);
 -- 
 1.7.8.1
 
