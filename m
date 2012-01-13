@@ -1,1023 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
-From: Daniel Wagner <wagi@monom.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Daniel Wagner <daniel.wagner@bmw-carit.de>,
-	Peter Hurley <peter@hurleysoftware.com>
-Subject: [PATCH] Bluetooth: Fix l2cap conn failures for ssp devices
-Date: Fri, 13 Jan 2012 14:49:03 +0100
-Message-Id: <1326462543-7190-1-git-send-email-wagi@monom.org>
+To: Hendrik Sattler <post@hendrik-sattler.de>,
+	Jaganath Kanakkassery <jaganath.k@samsung.com>,
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH obexd 2/2] gobex: Fix ABORT request not processing
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8;
+ format=flowed
+Date: Fri, 13 Jan 2012 14:36:54 +0100
+From: Hendrik Sattler <post@hendrik-sattler.de>
+In-Reply-To: <20120113130127.GA8173@x220>
+References: <1326448613-8367-1-git-send-email-jaganath.k@samsung.com>
+ <adc3f64ff0de3606125dfbdea3f6b2ac@mail.hendrik-sattler.de>
+ <20120113105420.GA4490@x220>
+ <8d043367426e37a570df29ff2f4b298b@mail.hendrik-sattler.de>
+ <20120113112111.GA5880@x220>
+ <82c765e00dbfd5c5b2adf4059f7205b7@mail.hendrik-sattler.de>
+ <20120113130127.GA8173@x220>
+Message-ID: <51b47fcb808c7f5a99274ed0c3008c44@mail.hendrik-sattler.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Daniel Wagner <daniel.wagner@bmw-carit.de>
-
-From: Peter Hurley <peter@hurleysoftware.com>
-
-Commit 330605423c fixed l2cap conn establishment for non-ssp remote
-devices by not setting HCI_CONN_ENCRYPT_PEND every time conn security
-is tested (which was always returning failure on any subsequent
-security checks).
-
-However, this broke l2cap conn establishment for ssp remote devices
-when an ACL link was already established at SDP-level security. This
-fix ensures that encryption must be pending whenever authentication
-is also pending.
-
-Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
-Tested-by: Daniel Wagner <daniel.wagner@bmw-carit.de>
----
-
-Hi,
-
-Find below some test results.
-
-Test 1:
-
-./l2test -n -P 1 A0:4E:04:F6:F5:05
-./l2test -n -P 3 A0:4E:04:F6:F5:05
-
-Test 2:
-
-./l2test -n -S -P 1 A0:4E:04:F6:F5:05
-./l2test -n -P 3 A0:4E:04:F6:F5:05
-
-for legacy pairing and simple paiing and with and without the patch.
-
-cheers,
-daniel
-
-
-Without Path
-============
-
-- Legacy Pairing
-
--- Test 1:
-
-./l2test -n -P 1 A0:4E:04:F6:F5:05
-./l2test -n -P 3 A0:4E:04:F6:F5:05
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr A0:4E:04:F6:F5:05 ptype 0x0018 rswitch 0x00 clkoffset 0x0000
-    Packet type: DM1 DH1 
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 43 bdaddr A0:4E:04:F6:F5:05 type ACL encrypt 0x00
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-    handle 43
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-    bdaddr A0:4E:04:F6:F5:05 mode 1
-> HCI Event: Max Slots Change (0x1b) plen 3
-    handle 43 slots 5
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-    status 0x00 handle 43
-    Features: 0xbf 0xee 0x0f 0xce 0x98 0xbd 0x59 0x83
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr A0:4E:04:F6:F5:05 mode 2 clkoffset 0x0000
-< ACL data: handle 43 flags 0x02 dlen 10
-    L2CAP(s): Info req: type 2
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Info rsp: type 2 result 0
-      Extended feature mask 0x0000
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-      Connection successful
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-      MTU 65535 
-< ACL data: handle 43 flags 0x02 dlen 18
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-      MTU 65535 
-> ACL data: handle 43 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr A0:4E:04:F6:F5:05 name 'Nokia 6303i classic'
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 0 status 0
-      Connection successful
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 0
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
-      MTU 32772 
-< ACL data: handle 43 flags 0x02 dlen 18
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4
-      MTU 32772 
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
-      Success
-
-> ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x004
-
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-    handle 43 reason 0x13
-    Reason: Remote User Terminated Connection
-> HCI Event: Command Status (0x0f) plen 4
-    Disconnect (0x01|0x0006) status 0x00 ncmd 1
-> HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 43 reason 0x16
-    Reason: Connection Terminated by Local Host
-
--- Test 2:
-
-./l2test -n -S -P 1 A0:4E:04:F6:F5:05
-./l2test -n -P 3 A0:4E:04:F6:F5:05
-
- HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr A0:4E:04:F6:F5:05 ptype 0x0018 rswitch 0x00 clkoffset 0x0000
-    Packet type: DM1 DH1 
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 43 bdaddr A0:4E:04:F6:F5:05 type ACL encrypt 0x00
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-    handle 43
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-    bdaddr A0:4E:04:F6:F5:05 mode 1
-> HCI Event: Max Slots Change (0x1b) plen 3
-    handle 43 slots 5
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-    status 0x00 handle 43
-    Features: 0xbf 0xee 0x0f 0xce 0x98 0xbd 0x59 0x83
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr A0:4E:04:F6:F5:05 mode 2 clkoffset 0x0000
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr A0:4E:04:F6:F5:05 name 'Nokia 6303i classic'
-< HCI Command: Authentication Requested (0x01|0x0011) plen 2
-    handle 43
-> HCI Event: Command Status (0x0f) plen 4
-    Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr A0:4E:04:F6:F5:05
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-    bdaddr A0:4E:04:F6:F5:05 key 5EB1D3000ABE8C2A12950DACD44ADA2C
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-    status 0x00 bdaddr A0:4E:04:F6:F5:05
-> HCI Event: Auth Complete (0x06) plen 3
-    status 0x00 handle 43
-< ACL data: handle 43 flags 0x02 dlen 10
-    L2CAP(s): Info req: type 2
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Info rsp: type 2 result 0
-      Extended feature mask 0x0000
-< HCI Command: Set Connection Encryption (0x01|0x0013) plen 3
-    handle 43 encrypt 0x01
-> HCI Event: Command Status (0x0f) plen 4
-    Set Connection Encryption (0x01|0x0013) status 0x00 ncmd 1
-> HCI Event: Encrypt Change (0x08) plen 4
-    status 0x00 handle 43 encrypt 0x01
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-      Connection successful
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-      MTU 65535 
-< ACL data: handle 43 flags 0x02 dlen 18
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-      MTU 65535 
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 0 status 0
-      Connection successful
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 0
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
-      MTU 32772 
-< ACL data: handle 43 flags 0x02 dlen 18
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4
-      MTU 32772 
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
-      Success
-
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0041
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-    handle 43 reason 0x13
-    Reason: Remote User Terminated Connection
-> HCI Event: Command Status (0x0f) plen 4
-    Disconnect (0x01|0x0006) status 0x00 ncmd 1
-> HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 43 reason 0x16
-    Reason: Connection Terminated by Local Host
-
-- Simple Pairing
-
--- Test 1:
-
-./l2test -n -P 1 A0:4E:04:F6:F5:05
-./l2test -n -P 3 A0:4E:04:F6:F5:05
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr A0:4E:04:F6:F5:05 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 43 bdaddr A0:4E:04:F6:F5:05 type ACL encrypt 0x00
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-    handle 43
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-    bdaddr A0:4E:04:F6:F5:05 mode 1
-> HCI Event: Max Slots Change (0x1b) plen 3
-    handle 43 slots 5
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-    status 0x00 handle 43
-    Features: 0xbf 0xee 0x0f 0xce 0x98 0xbd 0x59 0x83
-< HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
-    handle 43 page 1
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
-> HCI Event: Read Remote Extended Features (0x23) plen 13
-    status 0x00 handle 43 page 1 max 1
-    Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr A0:4E:04:F6:F5:05 mode 2 clkoffset 0x0000
-< ACL data: handle 43 flags 0x00 dlen 10
-    L2CAP(s): Info req: type 2
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Info rsp: type 2 result 0
-      Extended feature mask 0x0000
-< ACL data: handle 43 flags 0x00 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-      Connection successful
-< ACL data: handle 43 flags 0x00 dlen 12
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-      MTU 65535 
-< ACL data: handle 43 flags 0x00 dlen 18
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-      MTU 65535 
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr A0:4E:04:F6:F5:05 name 'Nokia 6303i classic'
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-
-< HCI Command: Authentication Requested (0x01|0x0011) plen 2
-    handle 43
-> HCI Event: Command Status (0x0f) plen 4
-    Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr A0:4E:04:F6:F5:05
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-    bdaddr A0:4E:04:F6:F5:05 key 6713574AEE7358B4B5EC2773E87F2421
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-    status 0x00 bdaddr A0:4E:04:F6:F5:05
-> HCI Event: Auth Complete (0x06) plen 3
-    status 0x00 handle 43
-< ACL data: handle 43 flags 0x00 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0041 result 3 status 0
-      Connection refused - security block
-
-< ACL data: handle 43 flags 0x00 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-    handle 43 reason 0x13
-    Reason: Remote User Terminated Connection
-> HCI Event: Command Status (0x0f) plen 4
-    Disconnect (0x01|0x0006) status 0x00 ncmd 1
-> HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 43 reason 0x16
-    Reason: Connection Terminated by Local Host
-
--- Test 2:
-
-./l2test -n -S -P 1 A0:4E:04:F6:F5:05
-./l2test -n -P 3 A0:4E:04:F6:F5:05
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr A0:4E:04:F6:F5:05 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 43 bdaddr A0:4E:04:F6:F5:05 type ACL encrypt 0x00
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-    handle 43
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-    bdaddr A0:4E:04:F6:F5:05 mode 1
-> HCI Event: Max Slots Change (0x1b) plen 3
-    handle 43 slots 5
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-    status 0x00 handle 43
-    Features: 0xbf 0xee 0x0f 0xce 0x98 0xbd 0x59 0x83
-< HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
-    handle 43 page 1
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
-> HCI Event: Read Remote Extended Features (0x23) plen 13
-    status 0x00 handle 43 page 1 max 1
-    Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr A0:4E:04:F6:F5:05 mode 2 clkoffset 0x0000
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr A0:4E:04:F6:F5:05 name 'Nokia 6303i classic'
-< HCI Command: Authentication Requested (0x01|0x0011) plen 2
-    handle 43
-> HCI Event: Command Status (0x0f) plen 4
-    Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr A0:4E:04:F6:F5:05
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-    bdaddr A0:4E:04:F6:F5:05 key 6713574AEE7358B4B5EC2773E87F2421
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-    status 0x00 bdaddr A0:4E:04:F6:F5:05
-> HCI Event: Auth Complete (0x06) plen 3
-    status 0x00 handle 43
-< HCI Command: Set Connection Encryption (0x01|0x0013) plen 3
-    handle 43 encrypt 0x01
-> HCI Event: Command Status (0x0f) plen 4
-    Set Connection Encryption (0x01|0x0013) status 0x00 ncmd 1
-> HCI Event: Encrypt Change (0x08) plen 4
-    status 0x00 handle 43 encrypt 0x01
-< ACL data: handle 43 flags 0x00 dlen 10
-    L2CAP(s): Info req: type 2
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Info rsp: type 2 result 0
-      Extended feature mask 0x0000
-< ACL data: handle 43 flags 0x00 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-      Connection successful
-< ACL data: handle 43 flags 0x00 dlen 12
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-      MTU 65535 
-< ACL data: handle 43 flags 0x00 dlen 18
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-      MTU 65535 
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-
-< ACL data: handle 43 flags 0x00 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 0 status 0
-      Connection successful
-< ACL data: handle 43 flags 0x00 dlen 12
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 0
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
-      MTU 32772 
-< ACL data: handle 43 flags 0x00 dlen 18
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4
-      MTU 32772 
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
-      Success
-
-< ACL data: handle 43 flags 0x00 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-
-< ACL data: handle 43 flags 0x00 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0041
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-    handle 43 reason 0x13
-    Reason: Remote User Terminated Connection
-> HCI Event: Command Status (0x0f) plen 4
-    Disconnect (0x01|0x0006) status 0x00 ncmd 1
-> HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 43 reason 0x16
-    Reason: Connection Terminated by Local Host
-
-
-
-With Path
-=========
-
--- Test 1:
-
-./l2test -n -P 1 A0:4E:04:F6:F5:05
-./l2test -n -P 3 A0:4E:04:F6:F5:05
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr A0:4E:04:F6:F5:05 ptype 0x0018 rswitch 0x00 clkoffset 0x0000
-    Packet type: DM1 DH1 
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 43 bdaddr A0:4E:04:F6:F5:05 type ACL encrypt 0x00
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-    handle 43
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-    bdaddr A0:4E:04:F6:F5:05 mode 1
-> HCI Event: Max Slots Change (0x1b) plen 3
-    handle 43 slots 5
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-    status 0x00 handle 43
-    Features: 0xbf 0xee 0x0f 0xce 0x98 0xbd 0x59 0x83
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr A0:4E:04:F6:F5:05 mode 2 clkoffset 0x0000
-< ACL data: handle 43 flags 0x02 dlen 10
-    L2CAP(s): Info req: type 2
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Info rsp: type 2 result 0
-      Extended feature mask 0x0000
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-      Connection successful
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-      MTU 65535 
-< ACL data: handle 43 flags 0x02 dlen 18
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-      MTU 65535 
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr A0:4E:04:F6:F5:05 name 'Nokia 6303i classic'
-> ACL data: handle 43 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 0 status 0
-      Connection successful
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 0
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
-      MTU 32772 
-< ACL data: handle 43 flags 0x02 dlen 18
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4
-      MTU 32772 
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
-      Success
-
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0041
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-    handle 43 reason 0x13
-    Reason: Remote User Terminated Connection
-> HCI Event: Command Status (0x0f) plen 4
-    Disconnect (0x01|0x0006) status 0x00 ncmd 1
-> HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 43 reason 0x16
-    Reason: Connection Terminated by Local Host
-
--- Test 2:
-
-./l2test -n -S -P 1 A0:4E:04:F6:F5:05
-./l2test -n -P 3 A0:4E:04:F6:F5:05
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr A0:4E:04:F6:F5:05 ptype 0x0018 rswitch 0x00 clkoffset 0x0000
-    Packet type: DM1 DH1 
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 43 bdaddr A0:4E:04:F6:F5:05 type ACL encrypt 0x00
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-    handle 43
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-    bdaddr A0:4E:04:F6:F5:05 mode 1
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 0
-> HCI Event: Max Slots Change (0x1b) plen 3
-    handle 43 slots 5
-> HCI Event: Command Status (0x0f) plen 4
-    Unknown (0x00|0x0000) status 0x00 ncmd 1
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-    status 0x00 handle 43
-    Features: 0xbf 0xee 0x0f 0xce 0x98 0xbd 0x59 0x83
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr A0:4E:04:F6:F5:05 mode 2 clkoffset 0x0000
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr A0:4E:04:F6:F5:05 name 'Nokia 6303i classic'
-< HCI Command: Authentication Requested (0x01|0x0011) plen 2
-    handle 43
-> HCI Event: Command Status (0x0f) plen 4
-    Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr A0:4E:04:F6:F5:05
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-    bdaddr A0:4E:04:F6:F5:05 key CC52E0B991B112753406D2BA5EC9C127
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-    status 0x00 bdaddr A0:4E:04:F6:F5:05
-> HCI Event: Auth Complete (0x06) plen 3
-    status 0x00 handle 43
-< ACL data: handle 43 flags 0x02 dlen 10
-    L2CAP(s): Info req: type 2
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Info rsp: type 2 result 0
-      Extended feature mask 0x0000
-< HCI Command: Set Connection Encryption (0x01|0x0013) plen 3
-    handle 43 encrypt 0x01
-> HCI Event: Command Status (0x0f) plen 4
-    Set Connection Encryption (0x01|0x0013) status 0x00 ncmd 1
-> HCI Event: Encrypt Change (0x08) plen 4
-    status 0x00 handle 43 encrypt 0x01
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-      Connection successful
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-      MTU 65535 
-< ACL data: handle 43 flags 0x02 dlen 18
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-      MTU 65535 
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 0 status 0
-      Connection successful
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 0
-> ACL data: handle 43 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
-      MTU 32772 
-< ACL data: handle 43 flags 0x02 dlen 18
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4
-      MTU 32772 
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
-      Success
-
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-
-< ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 43 packets 1
-> ACL data: handle 43 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0041
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-    handle 43 reason 0x13
-    Reason: Remote User Terminated Connection
-> HCI Event: Command Status (0x0f) plen 4
-    Disconnect (0x01|0x0006) status 0x00 ncmd 1
-> HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 43 reason 0x16
-    Reason: Connection Terminated by Local Host
-
-- Simple Pairing
-
--- Test 1:
-
-./l2test -n -P 1 A0:4E:04:F6:F5:05
-./l2test -n -P 3 A0:4E:04:F6:F5:05
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr A0:4E:04:F6:F5:05 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 42 bdaddr A0:4E:04:F6:F5:05 type ACL encrypt 0x00
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-    handle 42
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-    bdaddr A0:4E:04:F6:F5:05 mode 1
-> HCI Event: Max Slots Change (0x1b) plen 3
-    handle 42 slots 5
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-    status 0x00 handle 42
-    Features: 0xbf 0xee 0x0f 0xce 0x98 0xbd 0x59 0x83
-< HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
-    handle 42 page 1
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
-> HCI Event: Read Remote Extended Features (0x23) plen 13
-    status 0x00 handle 42 page 1 max 1
-    Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr A0:4E:04:F6:F5:05 mode 2 clkoffset 0x0000
-< ACL data: handle 42 flags 0x00 dlen 10
-    L2CAP(s): Info req: type 2
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-> ACL data: handle 42 flags 0x02 dlen 16
-    L2CAP(s): Info rsp: type 2 result 0
-      Extended feature mask 0x0000
-< ACL data: handle 42 flags 0x00 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-> ACL data: handle 42 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-      Connection successful
-< ACL data: handle 42 flags 0x00 dlen 12
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-> ACL data: handle 42 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-      MTU 65535 
-< ACL data: handle 42 flags 0x00 dlen 18
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-      MTU 65535 
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr A0:4E:04:F6:F5:05 name 'Nokia 6303i classic'
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-
-< HCI Command: Authentication Requested (0x01|0x0011) plen 2
-    handle 44
-> HCI Event: Command Status (0x0f) plen 4
-    Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr A0:4E:04:F6:F5:05
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-    bdaddr A0:4E:04:F6:F5:05 key F1E52B6F2E73A1563FE74E369A545916
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-    status 0x00 bdaddr A0:4E:04:F6:F5:05
-> HCI Event: Auth Complete (0x06) plen 3
-    status 0x00 handle 44
-< HCI Command: Set Connection Encryption (0x01|0x0013) plen 3
-    handle 44 encrypt 0x01
-> HCI Event: Command Status (0x0f) plen 4
-    Set Connection Encryption (0x01|0x0013) status 0x00 ncmd 1
-> HCI Event: Encrypt Change (0x08) plen 4
-    status 0x00 handle 44 encrypt 0x01
-< ACL data: handle 44 flags 0x00 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 44 packets 1
-> ACL data: handle 44 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 0 status 0
-      Connection successful
-< ACL data: handle 44 flags 0x00 dlen 12
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 0
-> ACL data: handle 44 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
-      MTU 32772 
-< ACL data: handle 44 flags 0x00 dlen 18
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4
-      MTU 32772 
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 44 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 44 packets 1
-> ACL data: handle 44 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
-      Success
-
-< ACL data: handle 44 flags 0x00 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 44 packets 1
-> ACL data: handle 44 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-
-< ACL data: handle 44 flags 0x00 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 44 packets 1
-> ACL data: handle 44 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0041
-
--- Test 2:
-
-./l2test -n -S -P 1 A0:4E:04:F6:F5:05
-./l2test -n -P 3 A0:4E:04:F6:F5:05
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr A0:4E:04:F6:F5:05 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 42 bdaddr A0:4E:04:F6:F5:05 type ACL encrypt 0x00
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-    handle 42
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 0
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-    bdaddr A0:4E:04:F6:F5:05 mode 1
-> HCI Event: Max Slots Change (0x1b) plen 3
-    handle 42 slots 5
-> HCI Event: Command Status (0x0f) plen 4
-    Unknown (0x00|0x0000) status 0x00 ncmd 1
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-    status 0x00 handle 42
-    Features: 0xbf 0xee 0x0f 0xce 0x98 0xbd 0x59 0x83
-< HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
-    handle 42 page 1
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
-> HCI Event: Read Remote Extended Features (0x23) plen 13
-    status 0x00 handle 42 page 1 max 1
-    Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr A0:4E:04:F6:F5:05 mode 2 clkoffset 0x0000
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr A0:4E:04:F6:F5:05 name 'Nokia 6303i classic'
-< HCI Command: Authentication Requested (0x01|0x0011) plen 2
-    handle 42
-> HCI Event: Command Status (0x0f) plen 4
-    Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr A0:4E:04:F6:F5:05
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-    bdaddr A0:4E:04:F6:F5:05 key F1E52B6F2E73A1563FE74E369A545916
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-    status 0x00 bdaddr A0:4E:04:F6:F5:05
-> HCI Event: Auth Complete (0x06) plen 3
-    status 0x00 handle 42
-< HCI Command: Set Connection Encryption (0x01|0x0013) plen 3
-    handle 42 encrypt 0x01
-> HCI Event: Command Status (0x0f) plen 4
-    Set Connection Encryption (0x01|0x0013) status 0x00 ncmd 1
-> HCI Event: Encrypt Change (0x08) plen 4
-    status 0x00 handle 42 encrypt 0x01
-< ACL data: handle 42 flags 0x00 dlen 10
-    L2CAP(s): Info req: type 2
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-> ACL data: handle 42 flags 0x02 dlen 16
-    L2CAP(s): Info rsp: type 2 result 0
-      Extended feature mask 0x0000
-< ACL data: handle 42 flags 0x00 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-> ACL data: handle 42 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-      Connection successful
-< ACL data: handle 42 flags 0x00 dlen 12
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-> ACL data: handle 42 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-      MTU 65535 
-< ACL data: handle 42 flags 0x00 dlen 18
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-      MTU 65535 
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-
-< ACL data: handle 42 flags 0x00 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-> ACL data: handle 42 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 0 status 0
-      Connection successful
-< ACL data: handle 42 flags 0x00 dlen 12
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 0
-> ACL data: handle 42 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
-      MTU 32772 
-< ACL data: handle 42 flags 0x00 dlen 18
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4
-      MTU 32772 
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
-      Success
-
-< ACL data: handle 42 flags 0x00 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-> ACL data: handle 42 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-
-< ACL data: handle 42 flags 0x00 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-> ACL data: handle 42 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0041
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-    handle 42 reason 0x13
-    Reason: Remote User Terminated Connection
-> HCI Event: Command Status (0x0f) plen 4
-    Disconnect (0x01|0x0006) status 0x00 ncmd 1
-> HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 42 reason 0x16
-    Reason: Connection Terminated by Local Host
-
-
- net/bluetooth/hci_conn.c |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
-
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 3db4324..07bc69e 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -635,6 +635,10 @@ static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
- 
- 	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->pend)) {
- 		struct hci_cp_auth_requested cp;
-+
-+		/* encrypt must be pending if auth is also pending */
-+		set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend);
-+
- 		cp.handle = cpu_to_le16(conn->handle);
- 		hci_send_cmd(conn->hdev, HCI_OP_AUTH_REQUESTED,
- 							sizeof(cp), &cp);
--- 
-1.7.8.2.325.g247f9
+Am 13.01.2012 14:01, schrieb Johan Hedberg:
+> Hi Hendrik,
+>
+> On Fri, Jan 13, 2012, Hendrik Sattler wrote:
+>>Am 13.01.2012 12:21, schrieb Johan Hedberg:
+>>>Hi Hendrik,
+>>>
+>>>On Fri, Jan 13, 2012, Hendrik Sattler wrote:
+>>>>>>>		opcode = obex->rx_last_op;
+>>>>>>>		/* Unexpected response -- fail silently */
+>>>>>>> -		if (opcode > 0x1f && opcode < 0xff) {
+>>>>>>> +		if (opcode > G_OBEX_OP_ABORT && opcode < 0xff) {
+>>>>>>>			obex->rx_data = 0;
+>>>>>>>			return TRUE;
+>>>>>>>		}
+>>>>>>
+>>>>>> This one always evaluates to false because 0xff ==
+>>>>>> G_OBEX_OP_ABORT |
+>>>>>> FINAL_BIT.
+>>>>>
+>>>>> The value of obex->rx_last_op is stored with the final bit 
+>>>>> cleared,
+>>>>> so the < 0xff part could also be removed from the test. The value
+>>>>> 0x1f has been picked because the IrDA OBEX specification defines
+>>>>> 0x10 - 0x1f as a user-definable range, so anything between 0x1f 
+>>>>> and
+>>>>> 0x7f isn't actually valid. The correct test would then become:
+>>>>>
+>>>>>	if (opcode > 0x1f && opcode != G_OBEX_OP_ABORT)
+>>>>>
+>>>>> Jaganath, with the above change the patch should be ok, but the
+>>>>> more surprising thing to me here is that this implies we're 
+>>>>> missing
+>>>>> one or more unit tests for Abort. Could you create a patch to add
+>>>>> those too?  (if we're really strict those tests should go in 
+>>>>> before
+>>>>> this patch so that it's actually possible to see that the patch
+>>>>> makes a difference).
+>>>>
+>>>> User-definable does not mean invalid. It only means that these can
+>>>> be used for custom commands. These are still bound to the rules of
+>>>> the OBEX protocol. I've never seen one using that, though.
+>>>
+>>> Exactly. You might want to re-read what I said and the test I
+>>> proposed.
+>>
+>> I did.
+>
+> I interpreted your message as you thinking that I was wanting to 
+> filter
+> out or equate user-definable values as invalid. Seems I was wrong 
+> then.
+>
+>>>> Else you'd also have to filter 0x04 and the range 0x08-0x0f 
+>>>> because
+>>>> these are marked as "reserved".
+>>>
+>>> With the test I proposed we filter neither reserved (since they 
+>>> might
+>>> get meaning in new spec versions) nor user-defined opcodes.
+>>
+>> Your propose if-line discards all packets with opcodes in the range
+>> 0x20-0x1e.
+>
+> I suppose you mean 0x20-0x7f (since 0x1e is less than 0x20)?
+
+Yes :-)
+
+> Yes, and in addition to that it also discards 0x80-0xff.
+
+No, that bit is filtered, the highest value _is_ 0x7F.
+
+>> I would remove that if-line (and also the wrong comments that talks
+>> about responses but means requests).
+>
+> No, it does mean responses. In the case that we've timed out waiting 
+> for
+> a response it is possible that we still receive it later (if we time 
+> out
+> while the packet is already on its way to us). This test is meant to
+> discard such packets (i.e. any packet that isn't an obvious command).
+
+The values we are talking about here are request values, not response 
+values.
+You cannot differ response or request by pure opcode values but only by 
+the
+role (client or server) that your are in.
+This if-check looks like for the server-role. And a server only takes
+requests, not responses.
+
+>> OTOH, the reserved and user-defined packets will fail immediately
+>> after that anyway due to the check of the length of non-header data
+>> returning -1 for those cases.
+>
+> For this one possible solution is to add the capability for defining
+> custom header offsets for user-defined opcodes. But we'll do that 
+> only
+> once someone has a real use-case for it and requests the feature.
+>
+>> Not only that but it immediately drops connection because of that? 
+>> It
+>> could at least get the packet and send a negative response.
+>
+> That's true, an error response could be added instead of discarding 
+> the
+> connection as unusable. One question to answer though is should we
+> inform the application about this somehow.
+
+I guess not unless you also add the ability to make the application 
+handle
+user-defined opcodes. It's ok to only add this ability on request.
+
+Just imaging a client that tests a user-defined opcode for special 
+devices
+but can also go on without that for normal devices. Theoretically, of 
+course.
+
+HS
 
