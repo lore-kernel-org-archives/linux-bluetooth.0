@@ -1,143 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd v2 1/4] MAP: Implementation of MAP AP core functions
-Date: Fri, 13 Jan 2012 14:33:35 +0100
-Message-Id: <1326461618-26864-1-git-send-email-lkslawek@gmail.com>
+Message-ID: <1326460723.6454.264.camel@aeonflux>
+Subject: Re: [RFC] Bluetooth: Use flush_work instead of cancel_work
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 13 Jan 2012 14:18:43 +0100
+In-Reply-To: <1326457010-10216-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1326457010-10216-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds implementation for creation and destruction of map_ap_t and
-the definitions of MAP supported application parameters.
----
- src/map_ap.c |  107 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 106 insertions(+), 1 deletions(-)
+Hi Andrei,
 
-diff --git a/src/map_ap.c b/src/map_ap.c
-index 9d13adf..8040b6d 100644
---- a/src/map_ap.c
-+++ b/src/map_ap.c
-@@ -27,13 +27,118 @@
- 
- #include "map_ap.h"
- 
-+enum ap_type {
-+	APT_UINT8,
-+	APT_UINT16,
-+	APT_UINT32,
-+	APT_STR
-+};
-+
-+static const struct ap_def {
-+	enum map_ap_tag tag;
-+	const char *name;
-+	enum ap_type type;
-+} ap_defs[] = {
-+	{ MAP_AP_MAXLISTCOUNT,		"MAXLISTCOUNT",
-+		APT_UINT16					},
-+	{ MAP_AP_STARTOFFSET,		"STARTOFFSET",
-+		APT_UINT16					},
-+	{ MAP_AP_FILTERMESSAGETYPE,	"FILTERMESSAGETYPE",
-+		APT_UINT8					},
-+	{ MAP_AP_FILTERPERIODBEGIN,	"FILTERPERIODBEGIN",
-+		APT_STR						},
-+	{ MAP_AP_FILTERPERIODEND,	"FILTERPERIODEND",
-+		APT_STR						},
-+	{ MAP_AP_FILTERREADSTATUS,	"FILTERREADSTATUS",
-+		APT_UINT8					},
-+	{ MAP_AP_FILTERRECIPIENT,	"FILTERRECIPIENT",
-+		APT_STR						},
-+	{ MAP_AP_FILTERORIGINATOR,	"FILTERORIGINATOR",
-+		APT_STR						},
-+	{ MAP_AP_FILTERPRIORITY,	"FILTERPRIORITY",
-+		APT_UINT8					},
-+	{ MAP_AP_ATTACHMENT,		"ATTACHMENT",
-+		APT_UINT8					},
-+	{ MAP_AP_TRANSPARENT,		"TRANSPARENT",
-+		APT_UINT8					},
-+	{ MAP_AP_RETRY,			"RETRY",
-+		APT_UINT8					},
-+	{ MAP_AP_NEWMESSAGE,		"NEWMESSAGE",
-+		APT_UINT8					},
-+	{ MAP_AP_NOTIFICATIONSTATUS,	"NOTIFICATIONSTATUS",
-+		APT_UINT8					},
-+	{ MAP_AP_MASINSTANCEID,		"MASINSTANCEID",
-+		APT_UINT8					},
-+	{ MAP_AP_PARAMETERMASK,		"PARAMETERMASK",
-+		APT_UINT32					},
-+	{ MAP_AP_FOLDERLISTINGSIZE,	"FOLDERLISTINGSIZE",
-+		APT_UINT16					},
-+	{ MAP_AP_MESSAGESLISTINGSIZE,	"MESSAGESLISTINGSIZE",
-+		APT_UINT16					},
-+	{ MAP_AP_SUBJECTLENGTH,		"SUBJECTLENGTH",
-+		APT_UINT8					},
-+	{ MAP_AP_CHARSET,		"CHARSET",
-+		APT_UINT8					},
-+	{ MAP_AP_FRACTIONREQUEST,	"FRACTIONREQUEST",
-+		APT_UINT8					},
-+	{ MAP_AP_FRACTIONDELIVER,	"FRACTIONDELIVER",
-+		APT_UINT8					},
-+	{ MAP_AP_STATUSINDICATOR,	"STATUSINDICATOR",
-+		APT_UINT8					},
-+	{ MAP_AP_STATUSVALUE,		"STATUSVALUE",
-+		APT_UINT8					},
-+	{ MAP_AP_MSETIME,		"MSETIME",
-+		APT_STR						},
-+	{ MAP_AP_INVALID,		NULL,
-+		0						},
-+};
-+
-+struct ap_entry {
-+	enum map_ap_tag tag;
-+	union {
-+		uint32_t val32u;
-+		uint16_t val16u;
-+		uint8_t val8u;
-+		char *valstr;
-+	};
-+};
-+
-+static int find_ap_def(uint8_t tag)
-+{
-+	int i;
-+
-+	for (i = 0; ap_defs[i].tag != MAP_AP_INVALID; ++i)
-+		if (ap_defs[i].tag == tag)
-+			return i;
-+
-+	return -1;
-+}
-+
-+static void ap_entry_free(gpointer val)
-+{
-+	struct ap_entry *entry = val;
-+	int tago;
-+
-+	tago = find_ap_def(entry->tag);
-+
-+	if (tago >= 0 && ap_defs[tago].type == APT_STR)
-+		g_free(entry->valstr);
-+
-+	g_free(entry);
-+}
-+
- map_ap_t *map_ap_new(void)
- {
--	return NULL;
-+	return g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,
-+								ap_entry_free);
- }
- 
- void map_ap_free(map_ap_t *ap)
- {
-+	if (!ap)
-+		return;
-+
-+	g_hash_table_destroy(ap);
- }
- 
- map_ap_t *map_ap_decode(const uint8_t *buffer, size_t length)
--- 
-1.7.4.1
+> Fix deadlock when cancelling delayed work.
+> 
+> [  584.676126] ======================================================
+> [  584.676126] [ INFO: possible circular locking dependency detected ]
+> [  584.676126] 3.2.0-rc2niko+ #44
+> [  584.676126] -------------------------------------------------------
+> [  584.676126] kworker/u:1/30 is trying to acquire lock:
+> [  584.676126]  (&hdev->lock){+.+.+.}, at: [<f81f001c>] hci_conn_timeout+0x6c/0x190 [bluetooth]
+> [  584.676126]
+> [  584.676126] but task is already holding lock:
+> [  584.676126]  ((&(&conn->disc_work)->work)){+.+...}, at: [<c1065a78>] process_one_work+0x108/0x460
+> [  584.676126]
+> [  584.676126] which lock already depends on the new lock.
+> [  584.676126]
+> [  584.676126]
+> [  584.676126] the existing dependency chain (in reverse order) is:
+> [  584.676126]
+> [  584.676126] -> #1 ((&(&conn->disc_work)->work)){+.+...}:
+> [  584.676126]        [<c1086748>] lock_acquire+0x88/0x110
+> [  584.676126]        [<c1066041>] wait_on_work+0x61/0x210
+> [  584.676126]        [<c106630a>] __cancel_work_timer+0x6a/0x110
+> [  584.676126]        [<c10663c0>] cancel_delayed_work_sync+0x10/0x20
+> [  584.676126]        [<f81f935b>] hci_event_packet+0x3b2b/0x4610 [bluetooth]
+> [  584.676126]        [<f81ea78e>] hci_rx_work+0x20e/0x4c0 [bluetooth]
+> [  584.676126]        [<c1065aec>] process_one_work+0x17c/0x460
+> [  584.676126]        [<c10672e4>] worker_thread+0x124/0x2c0
+> [  584.676126]        [<c106be44>] kthread+0x84/0x90
+> [  584.676126]        [<c1567f42>] kernel_thread_helper+0x6/0x10
+> [  584.676126]
+> [  584.676126] -> #0 (&hdev->lock){+.+.+.}:
+> [  584.676126]        [<c10852cd>] __lock_acquire+0xc0d/0x1ab0
+> [  584.676126]        [<c1086748>] lock_acquire+0x88/0x110
+> [  584.676126]        [<c155de50>] mutex_lock_nested+0x70/0x320
+> [  584.676126]        [<f81f001c>] hci_conn_timeout+0x6c/0x190 [bluetooth]
+> [  584.676126]        [<c1065aec>] process_one_work+0x17c/0x460
+> [  584.676126]        [<c10672e4>] worker_thread+0x124/0x2c0
+> [  584.676126]        [<c106be44>] kthread+0x84/0x90
+> [  584.676126]        [<c1567f42>] kernel_thread_helper+0x6/0x10
+> [  584.676126]
+> [  584.676126] other info that might help us debug this:
+> [  584.676126]
+> [  584.676126]  Possible unsafe locking scenario:
+> [  584.676126]
+> [  584.676126]        CPU0                    CPU1
+> [  584.676126]        ----                    ----
+> [  584.676126]   lock((&(&conn->disc_work)->work));
+> [  584.676126]                                lock(&hdev->lock);
+> [  584.676126]                                lock((&(&conn->disc_work)->work));
+> [  584.676126]   lock(&hdev->lock);
+> [  584.676126]
+> [  584.676126]  *** DEADLOCK ***
+> [  584.676126]
+> [  584.676126] 2 locks held by kworker/u:1/30:
+> [  584.676126]  #0:  (hdev->name){.+.+.+}, at: [<c1065a78>] process_one_work+0x108/0x460
+> [  584.676126]  #1:  ((&(&conn->disc_work)->work)){+.+...}, at: [<c1065a78>] process_one_work+0x108/0x460
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/hci_conn.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
+
 
