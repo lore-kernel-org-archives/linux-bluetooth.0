@@ -1,51 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1326464270-20110-1-git-send-email-s.syam@samsung.com>
-References: <1326464270-20110-1-git-send-email-s.syam@samsung.com>
-Date: Fri, 13 Jan 2012 18:35:23 +0200
-Message-ID: <CABBYNZKd1wWb4k=25KZ8PQ7MUc4ozYRJ21iU3t1k23ovKk6u9Q@mail.gmail.com>
-Subject: Re: [PATCH obexd] client: Remove unused code in pbap
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Syam Sidhardhan <s.syam@samsung.com>
+In-Reply-To: <1326460244.2112.48.camel@novo.hadess.net>
+References: <1326460244.2112.48.camel@novo.hadess.net>
+Date: Fri, 13 Jan 2012 18:26:57 +0200
+Message-ID: <CACY+gR0GRKzPWiLwfaoY0Gp1hEEpL-nSAV95KSVDjcetzexmdg@mail.gmail.com>
+Subject: Re: 4.98 fails to build with newer gcc
+From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+On Fri, Jan 13, 2012 at 3:10 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> A few warnings:
+>
+> sbc/sbc.c:766:34: warning: always_inline function might not be inlinable [-Wattributes]
+> sbc/sbc.c:558:34: warning: always_inline function might not be inlinable [-Wattributes]
+> sbc/sbc.c:163:31: warning: always_inline function might not be inlinable [-Wattributes]
 
-On Fri, Jan 13, 2012 at 4:17 PM, Syam Sidhardhan <s.syam@samsung.com> wrote:
-> ---
->  client/pbap.c |    2 --
->  1 files changed, 0 insertions(+), 2 deletions(-)
+Looks like the new version of gcc requires both "inline" and
+"__attribute__((always_inline))" to be used in SBC_ALWAYS_INLINE
+according to [1].
+
+> and an error
 >
-> diff --git a/client/pbap.c b/client/pbap.c
-> index 9e9eb05..73d496a 100644
-> --- a/client/pbap.c
-> +++ b/client/pbap.c
-> @@ -364,7 +364,6 @@ static void read_return_apparam(struct obc_session *session,
->  {
->        struct obc_transfer *transfer = obc_session_get_transfer(session);
->        struct obc_transfer_params params;
-> -       unsigned char *buf;
->        size_t size = 0;
+> sbc/sbc_primitives_mmx.c: In function 'sbc_calc_scalefactors_mmx':
+> sbc/sbc_primitives_mmx.c:294:4: warning: asm operand 2 probably doesn't match constraints [enabled by default]
+> sbc/sbc_primitives_mmx.c:294:4: error: impossible constraint in 'asm'
+
+Here gcc 4.7 thinks that
+				"i" ((char *) &sb_sample_f[1][0][0] -
+					(char *) &sb_sample_f[0][0][0]),
+is an impossible constraint. According to [2], "i" means "An immediate
+integer operand (one with constant value) is allowed. This includes
+symbolic constants whose values will be known only at assembly time or
+later".
+Earlier versions of gcc could see that this expression is a compile
+time constant, but gcc 4.7 can't. As a workaround, "i" can be changed
+to "r" here. The downside is that this needs one more register for
+inline assembly and the number of available registers is really
+limited for 32-bit x86 systems. As a test, it is possible to try "gcc
+-O2 -mmmx -c -m32 -fno-omit-frame-pointer -fPIC sbc_primitives_mmx.c".
+Both "-fno-omit-frame-pointer" and "-fPIC" options reduce the number
+of available registers.
+
+> Full build log:
+> http://koji.fedoraproject.org/koji/getfile?taskID=3657376&name=build.log
+> Using gcc 4.7.0 as mentioned in root log:
+> http://koji.fedoraproject.org/koji/getfile?taskID=3657376&name=root.log
 >
->        *phone_book_size = 0;
-> @@ -404,7 +403,6 @@ static void read_return_apparam(struct obc_session *session,
->                                        hdr->tag, hdr->len);
->                }
+> The same build works correctly with gcc 4.6.1 on Fedora 16.
 >
-> -               buf += APPARAM_HDR_SIZE + hdr->len;
->                size -= APPARAM_HDR_SIZE + hdr->len;
->        }
->  }
+> Any ideas?
+>
 > --
-> 1.7.4.1
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at Â http://vger.kernel.org/majordomo-info.html
 
-Actually this is still wrong since hdr pointer is never updated it is
-only processing the first header, I was just fixing it today while
-doing some other cleanups , apparently we never got any problem
-because the responses normally only contain one hdr/parameter.
+1. http://gcc.gnu.org/bugzilla/show_bug.cgi?id=49139#c1
+2. http://gcc.gnu.org/onlinedocs/gcc-4.6.2/gcc/Simple-Constraints.html#Simple-Constraints
 
 -- 
-Luiz Augusto von Dentz
+Best regards,
+Siarhei Siamashka
