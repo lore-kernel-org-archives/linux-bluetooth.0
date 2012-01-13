@@ -1,142 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd 1/4] MAP: Implementation of MAP AP core functions
-Date: Fri, 13 Jan 2012 11:48:29 +0100
-Message-Id: <1326451712-21784-1-git-send-email-lkslawek@gmail.com>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: Re: [PATCH obexd 2/2] gobex: Fix ABORT request not processing
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8;
+ format=flowed
+Date: Fri, 13 Jan 2012 11:29:04 +0100
+From: Hendrik Sattler <post@hendrik-sattler.de>
+Cc: <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1326448613-8367-1-git-send-email-jaganath.k@samsung.com>
+References: <1326448613-8367-1-git-send-email-jaganath.k@samsung.com>
+Message-ID: <adc3f64ff0de3606125dfbdea3f6b2ac@mail.hendrik-sattler.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds implementation for creation and destruction of map_ap_t and
-the definitions of MAP supported application parameters.
----
- src/map_ap.c |  106 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 105 insertions(+), 1 deletions(-)
+Am 13.01.2012 10:56, schrieb Jaganath Kanakkassery:
+> G_OBEX_OP_ABORT is defined as 0x7f but error checking of opcode is
+> done for greater than 0x1f. So abort request is simply ignored.
+> So corrected the error checking.
+> ---
+>  gobex/gobex.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/gobex/gobex.c b/gobex/gobex.c
+> index 33b77fd..bfb9f37 100644
+> --- a/gobex/gobex.c
+> +++ b/gobex/gobex.c
+> @@ -1150,7 +1150,7 @@ static gboolean incoming_data(GIOChannel *io,
+> GIOCondition cond,
+>  	} else {
+>  		opcode = obex->rx_last_op;
+>  		/* Unexpected response -- fail silently */
+> -		if (opcode > 0x1f && opcode < 0xff) {
+> +		if (opcode > G_OBEX_OP_ABORT && opcode < 0xff) {
+>  			obex->rx_data = 0;
+>  			return TRUE;
+>  		}
 
-diff --git a/src/map_ap.c b/src/map_ap.c
-index 9d13adf..bec2cc5 100644
---- a/src/map_ap.c
-+++ b/src/map_ap.c
-@@ -27,13 +27,117 @@
- 
- #include "map_ap.h"
- 
-+enum ap_type {
-+	APT_UINT8,
-+	APT_UINT16,
-+	APT_UINT32,
-+	APT_STR
-+};
-+
-+static const struct ap_def {
-+	enum map_ap_tag tag;
-+	const char *name;
-+	enum ap_type type;
-+} ap_defs[] = {
-+	{ MAP_AP_MAXLISTCOUNT,		"MAXLISTCOUNT",
-+		APT_UINT16					},
-+	{ MAP_AP_STARTOFFSET,		"STARTOFFSET",
-+		APT_UINT16					},
-+	{ MAP_AP_FILTERMESSAGETYPE,	"FILTERMESSAGETYPE",
-+		APT_UINT8					},
-+	{ MAP_AP_FILTERPERIODBEGIN,	"FILTERPERIODBEGIN",
-+		APT_STR						},
-+	{ MAP_AP_FILTERPERIODEND,	"FILTERPERIODEND",
-+		APT_STR						},
-+	{ MAP_AP_FILTERREADSTATUS,	"FILTERREADSTATUS",
-+		APT_UINT8					},
-+	{ MAP_AP_FILTERRECIPIENT,	"FILTERRECIPIENT",
-+		APT_STR						},
-+	{ MAP_AP_FILTERORIGINATOR,	"FILTERORIGINATOR",
-+		APT_STR						},
-+	{ MAP_AP_FILTERPRIORITY,	"FILTERPRIORITY",
-+		APT_UINT8					},
-+	{ MAP_AP_ATTACHMENT,		"ATTACHMENT",
-+		APT_UINT8					},
-+	{ MAP_AP_TRANSPARENT,		"TRANSPARENT",
-+		APT_UINT8					},
-+	{ MAP_AP_RETRY,			"RETRY",
-+		APT_UINT8					},
-+	{ MAP_AP_NEWMESSAGE,		"NEWMESSAGE",
-+		APT_UINT8					},
-+	{ MAP_AP_NOTIFICATIONSTATUS,	"NOTIFICATIONSTATUS",
-+		APT_UINT8					},
-+	{ MAP_AP_MASINSTANCEID,		"MASINSTANCEID",
-+		APT_UINT8					},
-+	{ MAP_AP_PARAMETERMASK,		"PARAMETERMASK",
-+		APT_UINT32					},
-+	{ MAP_AP_FOLDERLISTINGSIZE,	"FOLDERLISTINGSIZE",
-+		APT_UINT16					},
-+	{ MAP_AP_MESSAGESLISTINGSIZE,	"MESSAGESLISTINGSIZE",
-+		APT_UINT16					},
-+	{ MAP_AP_SUBJECTLENGTH,		"SUBJECTLENGTH",
-+		APT_UINT8					},
-+	{ MAP_AP_CHARSET,		"CHARSET",
-+		APT_UINT8					},
-+	{ MAP_AP_FRACTIONREQUEST,	"FRACTIONREQUEST",
-+		APT_UINT8					},
-+	{ MAP_AP_FRACTIONDELIVER,	"FRACTIONDELIVER",
-+		APT_UINT8					},
-+	{ MAP_AP_STATUSINDICATOR,	"STATUSINDICATOR",
-+		APT_UINT8					},
-+	{ MAP_AP_STATUSVALUE,		"STATUSVALUE",
-+		APT_UINT8					},
-+	{ MAP_AP_MSETIME,		"MSETIME",
-+		APT_STR						},
-+	{ MAP_AP_INVALID,		NULL,
-+		0						},
-+};
-+
-+struct ap_entry {
-+	enum map_ap_tag tag;
-+	union {
-+		uint32_t val32u;
-+		uint16_t val16u;
-+		uint8_t val8u;
-+		char *valstr;
-+	};
-+};
-+
-+static int find_ap_def(uint8_t tag)
-+{
-+	int i;
-+
-+	for (i = 0; ap_defs[i].tag != MAP_AP_INVALID; ++i)
-+		if (ap_defs[i].tag == tag)
-+			return i;
-+
-+	return -1;
-+}
-+
-+static void ap_entry_free(gpointer val)
-+{
-+	struct ap_entry *entry = val;
-+	int tago;
-+
-+	tago = find_ap_def(entry->tag);
-+
-+	if (tago >= 0 && ap_defs[tago].type == APT_STR)
-+		g_free(entry->valstr);
-+
-+	g_free(entry);
-+}
-+
- map_ap_t *map_ap_new(void)
- {
--	return NULL;
-+	return g_hash_table_new_full(NULL, NULL, NULL, ap_entry_free);
- }
- 
- void map_ap_free(map_ap_t *ap)
- {
-+	if (!ap)
-+		return;
-+
-+	g_hash_table_destroy(ap);
- }
- 
- map_ap_t *map_ap_decode(const uint8_t *buffer, size_t length)
--- 
-1.7.4.1
+This one always evaluates to false because 0xff == G_OBEX_OP_ABORT | 
+FINAL_BIT.
+
+HS
 
