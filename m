@@ -1,42 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: MGMT stop discovery LE support
-Date: Fri, 13 Jan 2012 18:03:52 -0300
-Message-Id: <1326488632-16759-4-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 2/3] Bluetooth: Consider DISCOVERY_LE_SCAN state in hci_discovery_active
+Date: Fri, 13 Jan 2012 18:03:51 -0300
+Message-Id: <1326488632-16759-3-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1326488632-16759-1-git-send-email-andre.guedes@openbossa.org>
 References: <1326488632-16759-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support to MGMT stop discovery command so now we are
-able to cancel LE-based discovery procedures.
-
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/mgmt.c |    9 +++++++++
- 1 files changed, 9 insertions(+), 0 deletions(-)
+ net/bluetooth/hci_core.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 05e6c1f..a8b60dc 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2000,6 +2000,15 @@ static int stop_discovery(struct sock *sk, u16 index)
- 		goto unlock;
- 	}
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index ae765c4..6d6d3db 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -384,6 +384,7 @@ bool hci_discovery_active(struct hci_dev *hdev)
+ 	struct discovery_state *discov = &hdev->discovery;
  
-+	if (hdev->discovery.state == DISCOVERY_LE_SCAN) {
-+		err = hci_cancel_le_scan(hdev);
-+		if (err < 0)
-+			mgmt_pending_remove(cmd);
-+		else
-+			hci_discovery_set_state(hdev, DISCOVERY_STOPPING);
-+		goto unlock;
-+	}
-+
- 	e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY, NAME_PENDING);
- 	if (!e) {
- 		mgmt_pending_remove(cmd);
+ 	if (discov->state == DISCOVERY_INQUIRY ||
++					discov->state == DISCOVERY_LE_SCAN ||
+ 					discov->state == DISCOVERY_RESOLVING)
+ 		return true;
+ 
 -- 
 1.7.8.3
 
