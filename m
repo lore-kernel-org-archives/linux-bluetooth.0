@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1326451712-21784-3-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <1326451712-21784-1-git-send-email-lkslawek@gmail.com>
 References: <1326451712-21784-1-git-send-email-lkslawek@gmail.com>
-	<1326451712-21784-3-git-send-email-lkslawek@gmail.com>
-Date: Fri, 13 Jan 2012 14:09:47 +0200
-Message-ID: <CABBYNZL75FwxCZeNjXOX=p1Ev7NwEL7rMJP8XNY2edU3aMAF4g@mail.gmail.com>
-Subject: Re: [PATCH obexd 3/4] map_ap.c: Add implementation for map_ap_decode()
+Date: Fri, 13 Jan 2012 14:02:04 +0200
+Message-ID: <CABBYNZ+7ogaWV-9Xo6k6hKFRAAZ4tU1zd=FRcBF=w0EMJ0Zx+A@mail.gmail.com>
+Subject: Re: [PATCH obexd 1/4] MAP: Implementation of MAP AP core functions
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Slawomir Bochenski <lkslawek@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -13,49 +12,30 @@ Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgU2xhd29taXIsCgpPbiBGcmksIEphbiAxMywgMjAxMiBhdCAxMjo0OCBQTSwgU2xhd29taXIg
-Qm9jaGVuc2tpIDxsa3NsYXdla0BnbWFpbC5jb20+IHdyb3RlOgo+ICsgoCCgIKAgoCCgIKAgoCBz
-d2l0Y2ggKGFwX2RlZnNbdGFnb10udHlwZSkgewo+ICsgoCCgIKAgoCCgIKAgoCBjYXNlIEFQVF9V
-SU5UODoKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBpZiAoaGRyLT5sZW4gIT0gMSkgewo+ICsg
-oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgREJHKCJWYWx1ZSBvZiB0YWcgJXMgKCVkKSBp
-cyAlZCBieXRlcyBsb25nICIKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgIKAgoCAiaW5zdGVhZCBvZiBleHBlY3RlZCAxIGJ5dGUgLSAiCj4gKyCgIKAgoCCgIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgInNraXBwZWQhIiwgYXBfZGVmc1t0
-YWdvXS5uYW1lLAo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
-oCCgIGhkci0+dGFnLCBoZHItPmxlbik7Cj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
-oCBicmVhazsKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCB9Cj4gKwo+ICsgoCCgIKAgoCCgIKAg
-oCCgIKAgoCCgIG1hcF9hcF9zZXRfdTgoYXAsIGhkci0+dGFnLCBoZHItPnZhbFswXSk7Cj4gKwo+
-ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIGJyZWFrOwo+ICsgoCCgIKAgoCCgIKAgoCBjYXNlIEFQ
-VF9VSU5UMTY6Cj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgaWYgKGhkci0+bGVuICE9IDIpIHsK
-PiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIERCRygiVmFsdWUgb2YgdGFnICVzICgl
-ZCkgaXMgJWQgYnl0ZXMgbG9uZyAiCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgIKAgoCCgIKAgImluc3RlYWQgb2YgZXhwZWN0ZWQgMiBieXRlcyAtICIKPiArIKAgoCCg
-IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCAic2tpcHBlZCEiLCBhcF9k
-ZWZzW3RhZ29dLm5hbWUsCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgIKAgaGRyLT50YWcsIGhkci0+bGVuKTsKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgIGJyZWFrOwo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIH0KPiArCj4gKyCgIKAgoCCg
-IKAgoCCgIKAgoCCgIKAgbWVtY3B5KCZ2YWwxNiwgaGRyLT52YWwsIHNpemVvZih2YWwxNikpOwo+
-ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIG1hcF9hcF9zZXRfdTE2KGFwLCBoZHItPnRhZywgR1VJ
-TlQxNl9GUk9NX0JFKHZhbDE2KSk7Cj4gKwo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIGJyZWFr
-Owo+ICsgoCCgIKAgoCCgIKAgoCBjYXNlIEFQVF9VSU5UMzI6Cj4gKyCgIKAgoCCgIKAgoCCgIKAg
-oCCgIKAgaWYgKGhkci0+bGVuICE9IDQpIHsKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
-oCCgIERCRygiVmFsdWUgb2YgdGFnICVzICglZCkgaXMgJWQgYnl0ZXMgbG9uZyAiCj4gKyCgIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgImluc3RlYWQgb2YgZXhw
-ZWN0ZWQgNCBieXRlcyAtICIKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgIKAgoCAic2tpcHBlZCEiLCBhcF9kZWZzW3RhZ29dLm5hbWUsCj4gKyCgIKAgoCCgIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgaGRyLT50YWcsIGhkci0+bGVuKTsK
-PiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIGJyZWFrOwo+ICsgoCCgIKAgoCCgIKAg
-oCCgIKAgoCCgIH0KPiArCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgbWVtY3B5KCZ2YWwzMiwg
-aGRyLT52YWwsIHNpemVvZih2YWwzMikpOwo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIG1hcF9h
-cF9zZXRfdTMyKGFwLCBoZHItPnRhZywgR1VJTlQzMl9GUk9NX0JFKHZhbDMyKSk7Cj4gKwo+ICsg
-oCCgIKAgoCCgIKAgoCCgIKAgoCCgIGJyZWFrOwo+ICsgoCCgIKAgoCCgIKAgoCBjYXNlIEFQVF9T
-VFI6Cj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgdmFsc3RyID0gZ19tYWxsb2MwKGhkci0+bGVu
-ICsgMSk7Cj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgbWVtY3B5KHZhbHN0ciwgaGRyLT52YWws
-IGhkci0+bGVuKTsKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBtYXBfYXBfc2V0X3N0cmluZyhh
-cCwgaGRyLT50YWcsIHZhbHN0cik7Cj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgZ19mcmVlKHZh
-bHN0cik7Cj4gKwo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIGJyZWFrOwo+ICsgoCCgIKAgoCCg
-IKAgoCB9CgpQZXJoYXBzIHRoaXMgcGFydHMgY2FuIGJlIGludGVncmF0ZWQgZGlyZWN0bHkgaW4g
-dGhlaXIgcmVzcGVjdGl2ZQptYXBfYXBfc2V0XyogZnVuY3Rpb25zIG9yIGlmIHlvdSBhcmUgcGxh
-bmluZyB0byByZXVzZSB0aGVtIG5vdCBvbmx5CmZvciBkZWNvZGluZyB0aGVuIHlvdSBjYW4gdXNl
-IGRlZGljYXRlZCBkZWNvZGVyIGZ1bmN0aW9uIGUuZy4KbWFwX2FwX2RlY29kZV91OC4KCi0tIApM
-dWl6IEF1Z3VzdG8gdm9uIERlbnR6Cg==
+Hi Slawomir,
+
+On Fri, Jan 13, 2012 at 12:48 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
+>  map_ap_t *map_ap_new(void)
+>  {
+> -       return NULL;
+> +       return g_hash_table_new_full(NULL, NULL, NULL, ap_entry_free);
+
+I supposed you would like to use g_direct_hash and g_direct_equal
+here, even if NULL mean the same it easier to understand and maintain
+that way. Also it is not clear why the return of map_ap_new is
+map_ap_t not a GHashTable?
+
+>  }
+>
+>  void map_ap_free(map_ap_t *ap)
+>  {
+> +       if (!ap)
+> +               return;
+
+Are you sure you need this check, iirc most functions of glib does
+NULL check already and sometime it even print warnings, so if this
+check is to prevent warning I would suggest no to have because  it
+will hide real bugs behind it.
+
+-- 
+Luiz Augusto von Dentz
