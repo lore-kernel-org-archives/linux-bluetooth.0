@@ -1,66 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 13 Jan 2012 17:07:48 +0200
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 2/2] Bluetooth: Change sk to l2cap_chan
-Date: Fri, 13 Jan 2012 17:21:43 +0200
-Message-Id: <1326468103-12731-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1326468103-12731-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1326468103-12731-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] Bluetooth: Use flush_work instead of cancel_work
+Message-ID: <20120113150746.GB1336@aemeltch-MOBL1>
+References: <1326457010-10216-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1326460723.6454.264.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1326460723.6454.264.camel@aeonflux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Marcel,
 
+On Fri, Jan 13, 2012 at 02:18:43PM +0100, Marcel Holtmann wrote:
+> Hi Andrei,
+> 
+> > Fix deadlock when cancelling delayed work.
+> > 
+> > [  584.676126] ======================================================
+> > [  584.676126] [ INFO: possible circular locking dependency detected ]
+> > [  584.676126] 3.2.0-rc2niko+ #44
+> > [  584.676126] -------------------------------------------------------
+> > [  584.676126] kworker/u:1/30 is trying to acquire lock:
+> > [  584.676126]  (&hdev->lock){+.+.+.}, at: [<f81f001c>] hci_conn_timeout+0x6c/0x190 [bluetooth]
+> > [  584.676126]
+> > [  584.676126] but task is already holding lock:
+> > [  584.676126]  ((&(&conn->disc_work)->work)){+.+...}, at: [<c1065a78>] process_one_work+0x108/0x460
+> > [  584.676126]
+> > [  584.676126] which lock already depends on the new lock.
+> > [  584.676126]
+> > [  584.676126]
+> > [  584.676126] the existing dependency chain (in reverse order) is:
+> > [  584.676126]
+> > [  584.676126] -> #1 ((&(&conn->disc_work)->work)){+.+...}:
+> > [  584.676126]        [<c1086748>] lock_acquire+0x88/0x110
+> > [  584.676126]        [<c1066041>] wait_on_work+0x61/0x210
+> > [  584.676126]        [<c106630a>] __cancel_work_timer+0x6a/0x110
+> > [  584.676126]        [<c10663c0>] cancel_delayed_work_sync+0x10/0x20
+> > [  584.676126]        [<f81f935b>] hci_event_packet+0x3b2b/0x4610 [bluetooth]
+> > [  584.676126]        [<f81ea78e>] hci_rx_work+0x20e/0x4c0 [bluetooth]
+> > [  584.676126]        [<c1065aec>] process_one_work+0x17c/0x460
+> > [  584.676126]        [<c10672e4>] worker_thread+0x124/0x2c0
+> > [  584.676126]        [<c106be44>] kthread+0x84/0x90
+> > [  584.676126]        [<c1567f42>] kernel_thread_helper+0x6/0x10
+> > [  584.676126]
+> > [  584.676126] -> #0 (&hdev->lock){+.+.+.}:
+> > [  584.676126]        [<c10852cd>] __lock_acquire+0xc0d/0x1ab0
+> > [  584.676126]        [<c1086748>] lock_acquire+0x88/0x110
+> > [  584.676126]        [<c155de50>] mutex_lock_nested+0x70/0x320
+> > [  584.676126]        [<f81f001c>] hci_conn_timeout+0x6c/0x190 [bluetooth]
+> > [  584.676126]        [<c1065aec>] process_one_work+0x17c/0x460
+> > [  584.676126]        [<c10672e4>] worker_thread+0x124/0x2c0
+> > [  584.676126]        [<c106be44>] kthread+0x84/0x90
+> > [  584.676126]        [<c1567f42>] kernel_thread_helper+0x6/0x10
+> > [  584.676126]
+> > [  584.676126] other info that might help us debug this:
+> > [  584.676126]
+> > [  584.676126]  Possible unsafe locking scenario:
+> > [  584.676126]
+> > [  584.676126]        CPU0                    CPU1
+> > [  584.676126]        ----                    ----
+> > [  584.676126]   lock((&(&conn->disc_work)->work));
+> > [  584.676126]                                lock(&hdev->lock);
+> > [  584.676126]                                lock((&(&conn->disc_work)->work));
+> > [  584.676126]   lock(&hdev->lock);
+> > [  584.676126]
+> > [  584.676126]  *** DEADLOCK ***
+> > [  584.676126]
+> > [  584.676126] 2 locks held by kworker/u:1/30:
+> > [  584.676126]  #0:  (hdev->name){.+.+.+}, at: [<c1065a78>] process_one_work+0x108/0x460
+> > [  584.676126]  #1:  ((&(&conn->disc_work)->work)){+.+...}, at: [<c1065a78>] process_one_work+0x108/0x460
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  net/bluetooth/hci_conn.c |    2 +-
+> >  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/l2cap_core.c |   11 ++++++-----
- 1 files changed, 6 insertions(+), 5 deletions(-)
+Apparently it does not fix it completely, the reason might be hci_dev_lock
+in hci_conn_timeout. Maybe instead of lock we could use hold/put?
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 52c7412..0087db8 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1518,9 +1518,10 @@ static void l2cap_send_srejtail(struct l2cap_chan *chan)
- 	l2cap_send_sframe(chan, control);
- }
- 
--static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, int len, int count, struct sk_buff *skb)
-+static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan, struct msghdr *msg, int len, int count, struct sk_buff *skb)
- {
--	struct l2cap_conn *conn = l2cap_pi(sk)->chan->conn;
-+	struct sock *sk = chan->sk;
-+	struct l2cap_conn *conn = chan->conn;
- 	struct sk_buff **frag;
- 	int err, sent = 0;
- 
-@@ -1578,7 +1579,7 @@ static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
- 	lh->len = cpu_to_le16(len + (hlen - L2CAP_HDR_SIZE));
- 	put_unaligned_le16(chan->psm, skb_put(skb, 2));
- 
--	err = l2cap_skbuff_fromiovec(sk, msg, len, count, skb);
-+	err = l2cap_skbuff_fromiovec(chan, msg, len, count, skb);
- 	if (unlikely(err < 0)) {
- 		kfree_skb(skb);
- 		return ERR_PTR(err);
-@@ -1611,7 +1612,7 @@ static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
- 	lh->cid = cpu_to_le16(chan->dcid);
- 	lh->len = cpu_to_le16(len + (hlen - L2CAP_HDR_SIZE));
- 
--	err = l2cap_skbuff_fromiovec(sk, msg, len, count, skb);
-+	err = l2cap_skbuff_fromiovec(chan, msg, len, count, skb);
- 	if (unlikely(err < 0)) {
- 		kfree_skb(skb);
- 		return ERR_PTR(err);
-@@ -1661,7 +1662,7 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
- 	if (sdulen)
- 		put_unaligned_le16(sdulen, skb_put(skb, L2CAP_SDULEN_SIZE));
- 
--	err = l2cap_skbuff_fromiovec(sk, msg, len, count, skb);
-+	err = l2cap_skbuff_fromiovec(chan, msg, len, count, skb);
- 	if (unlikely(err < 0)) {
- 		kfree_skb(skb);
- 		return ERR_PTR(err);
--- 
-1.7.4.1
+I will investigate this issue further.
 
+Best regards 
+Andrei Emeltchenko 
