@@ -1,31 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F11FC4B.9020104@wetterstedt.se>
-Date: Sat, 14 Jan 2012 23:06:03 +0100
-From: Martin Wetterstedt <martin@wetterstedt.se>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Setting up a bluetooth PAN and NAP without password and possibly
- using bluetooth low energy (BT 4.0)
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: keybuk@google.com
+In-Reply-To: <1326559307.6454.270.camel@aeonflux>
+References: <1326505957-27555-1-git-send-email-keybuk@chromium.org>
+	<1326505957-27555-3-git-send-email-keybuk@chromium.org>
+	<1326559307.6454.270.camel@aeonflux>
+Date: Sat, 14 Jan 2012 12:34:07 -0800
+Message-ID: <CAHZ1yCm1SuTFrcFscRjg2WdnfkseCw75G+46RL+uZSSH5UFf6Q@mail.gmail.com>
+Subject: Re: [PATCH 2/2] agent: allow agent to reply to RequestPinCode with bytes
+From: Scott James Remnant <keybuk@chromium.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+On Sat, Jan 14, 2012 at 8:41 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
 
-I would like to set up a Bluetooth NAP to facilitate a PAN at home. I 
-have managed previously, but it has been quite unstable and 
-authenticated host have been needed to be removed and then re-added from 
-time to time. So I stopped using it because there was to much hassle. 
-Now I would like to give it another go.  Two questions:
+> > Since the specification allows the PIN to be a sequence of arbitrary
+> > octets, and not a UTF-8 string, allow the userspace agent to reply
+> > with such a sequence (as a D-Bus Array of Bytes).
+> >
+> > This means a userspace agent can deal with devices that require their
+> > BD_ADDR (or the host's) as a PIN, and take care of trying multiple of
+> > such requirements.
+>
+> this has been discussed before and the answer is a clear no to this.
+>
 
-1. Is it possible to set up a PAN/NAP that does not require a password, 
-ie. don't require any authentication? How?
+Why a no? I couldn't find the discussion in the archives.
 
-2. The new bluetooth low energy present in Bluetooth 4.0, can it be used 
-for PAN/NAP?
+> You can however write a plugin that can handle binary PIN codes.
+>
 
-I am an Ubuntu user, so if you want to be Ubunutu specific I don't mind.
+The problem there is that the plugin can only try one, and can't retry
+the authentication if that PIN fails.
 
-Thanks in advance!
-
-
+Scott
