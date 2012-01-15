@@ -1,55 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 15 Jan 2012 12:58:18 +0200
+Date: Sun, 15 Jan 2012 12:52:03 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: David Strobach <lalochcz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add support for BCM20702A0 [0489:e031]
-Message-ID: <20120115105818.GA12769@x220.P-661HNU-F1>
-References: <1326278147.6454.225.camel@aeonflux>
- <1686528.W7zB9hRLAY@uriel>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blutetooth: Remove bogus inline for l2cap_chan_connect()
+Message-ID: <20120115105203.GA12584@x220.P-661HNU-F1>
+References: <1326622076-957-1-git-send-email-geert@linux-m68k.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1686528.W7zB9hRLAY@uriel>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1326622076-957-1-git-send-email-geert@linux-m68k.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Geert,
 
-On Sat, Jan 14, 2012, David Strobach wrote:
-> > > > virtualbox and then running either usbmon or Wireshark on your Linux
-> > > > system should work just fine.
-> > > 
-> > > O.K., here's what I found: running windows in virtualbox first then 
-> > > shutting it down again: the adapter works in linux too until the next 
-> > > reboot (still have to load the module and echo the ID to new_ID because 
-> > > of the adapter not reconigzed by the actual bt module)
-> > > Doing a capture with wireshark on usb port 2 gives me the capture file 
-> > > attached.
-> > 
-> > so there is clearly some binary download in the capture file. It will
-> > most likely match the files that a referenced in the .inf file. However
-> > I am not reverse engineering this stuff for anybody. Someone else has to
-> > do that job.
+On Sun, Jan 15, 2012, Geert Uytterhoeven wrote:
+> commit 03a001948166d966d0d580cddb8ae3a23f8b795b ("Bluetooth: invert locking
+> order in connect path") marked l2cap_chan_connect() inline for both the
+> prototype in include/net/bluetooth/l2cap.h and the implementation in
+> net/bluetooth/l2cap_core.c.
 > 
-> based on the trace and the .hex files I extracted from the Windows driver 
-> package I wrote a simple python rampatch downloader script. I also started 
-> writing a downloader kernel module. I have two questions though.
+> As the former doesn't contain an implementation, net/bluetooth/l2cap_sock.c
+> now fails to build, e.g. for m68k allmodconfig:
 > 
-> Is there a need for a driver module at all?
-> The script seems to work well, so I think it would be sufficient to write a 
-> statically linked libusb based binary downloader and distribute it along with 
-> the rampatch files and an udev rule file.
+>     net/bluetooth/l2cap_sock.c: In function ‘l2cap_sock_connect’:
+>     include/net/bluetooth/l2cap.h:838: sorry, unimplemented: inlining failed in call to ‘l2cap_chan_connect’: function body not available
+>     net/bluetooth/l2cap_sock.c:126: sorry, unimplemented: called from here
+>     make[1]: *** [net/bluetooth/l2cap_sock.o] Error 1
 > 
-> If the module is needed for whatever reason, is there a way to implement it 
-> using btusb HCI interface functions?
-> The rampatch download process is basically a series of HCI commans sent to 
-> control or bulk out endpoint. I could of course implement the payload 
-> packaging myself, but I feel somehow, that a cleaner solution would be to use 
-> some common subsystem mechanism.
+> As l2cap_chan_connect() is not that small and also called from
+> net/bluetooth/l2cap_sock.c, I removed both inline keywords.
+> 
+> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> --
+> As I can't seem to find anyone else getting this, I guess it's only
+> triggered by some versions of gcc. Mine is
+> 
+> gcc version 4.1.2 20061115 (prerelease) (Ubuntu 4.1.1-21)
+> ---
+>  include/net/bluetooth/l2cap.h |    2 +-
+>  net/bluetooth/l2cap_core.c    |    2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
-How is this all related to the Broadcom firmware uploader that was sent
-to this list back in November, or is that for some separate piece of
-hardware:
-http://www.spinics.net/lists/linux-bluetooth/msg17785.html
+This was already reported[1] earlier this month and a patch[2] was also
+created for it which right now resides in my bluetooth-next tree[3].
 
 Johan
+
+[1] http://www.spinics.net/lists/linux-bluetooth/msg19851.html
+[2] http://www.spinics.net/lists/linux-bluetooth/msg20009.html
+[3] http://git.kernel.org/?p=linux/kernel/git/jh/bluetooth-next.git;a=commitdiff;h=cd555072d0b0738c8a107776fe91902da686f94d
