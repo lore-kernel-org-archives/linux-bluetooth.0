@@ -1,45 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1326696332.6454.272.camel@aeonflux>
-Subject: Re: As long as we're adding to the Device Connected mgmt event...
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Mat Martineau <mathewm@codeaurora.org>,
-	linux-bluetooth@vger.kernel.org, skrovvid@codeaurora.org
-Date: Mon, 16 Jan 2012 07:45:32 +0100
-In-Reply-To: <20120115110354.GA12977@x220.P-661HNU-F1>
-References: <alpine.DEB.2.02.1201131159420.24403@mathewm-linux>
-	 <20120115110354.GA12977@x220.P-661HNU-F1>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLn=tZ_cmaOO7_9wmW2YU7Ych3JqYoTEATBfq+e+QR4iQ@mail.gmail.com>
+References: <CALO1QdHwejgjOQdyN0Dx97Ziuf3sAsvJLaGJi10OZYSWw2Sn6w@mail.gmail.com>
+ <CABBYNZLn=tZ_cmaOO7_9wmW2YU7Ych3JqYoTEATBfq+e+QR4iQ@mail.gmail.com>
+From: Islam Amer <pharon@gmail.com>
+Date: Mon, 16 Jan 2012 00:21:11 +0200
+Message-ID: <CALO1QdHW12yagbdrQcE0OBv8wprk3yzhFTwoqgLAhBT4ckDfkg@mail.gmail.com>
+Subject: Re: obex-client fails with Connection refused (111) most of the time
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+On Sun, Jan 15, 2012 at 11:32 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
+>
+> On Sun, Jan 15, 2012 at 9:17 PM, Islam Amer <pharon@gmail.com> wrote:
+>> Hello,
+>>
+>> Using obex-client and the send-files test app on my thinkpad to send
+>> a single file to two different Nokia phones I get this error 90% of the time:
+>>
+>> Connection refused (111)
+>
+> You are probably hitting a kernel regression, there is a fix already
+> just search for [PATCH] Bluetooth: Fix l2cap conn failures for ssp
+> devices, you can also try to disable ssp by doing: sudo hciconfig hci0
+> sspmode 0
 
-> > I noticed your recent bluez.git commit that modifies the Device
-> > Connected event.  Would it also make sense to add the results of the
-> > READ_REMOTE_VERSION command?
-> > 
-> > lmp_ver
-> > manufacturer
-> > lmp_subver
-> > 
-> > This information was captured in bluetoothd when using hciops, but
-> > has so far been missing with mgmtops.
-> 
-> Do you have a real use-case for it? It'd expect that info to be at most
-> useful to the kernel side but not so much for user-space. FWIW, we came
-> to the conclusion with Marcel that a better approach with this
-> mgmt_ev_device_connected is to encode both the class and the name as an
-> EIR blob. We'll also do that for the class that's currently as a
-> separate parameter in mgmt_ev_device_found. This simplifies the
-> structure of both events and also allows for future extensibility.
+The hciconfig command fixes the issue. Thanks!
+The patch you mention has been around for some time, so the
+regression must have been around for even longer (which shows when searching
+for the issue). Yet the patch is not applied in 3.2.1 upstream.
 
-in addition, these information are purely debugging details and I think
-it would be better to use sysfs or debugfs for it.
+Does it need testing against a recent kernel ?
 
-Regards
-
-Marcel
-
-
+Thanks again!
