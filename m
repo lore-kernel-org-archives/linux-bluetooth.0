@@ -1,177 +1,209 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F132D37.7030405@gmail.com>
-Date: Mon, 16 Jan 2012 01:17:03 +0530
-From: mahendra singh meena <mahendra.devel@gmail.com>
 MIME-Version: 1.0
-To: marcel@holtmann.org
-CC: padovan@profusion.mobi, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: bfusb: Fixed some coding style issues
+From: Islam Amer <pharon@gmail.com>
+Date: Sun, 15 Jan 2012 21:17:32 +0200
+Message-ID: <CALO1QdHwejgjOQdyN0Dx97Ziuf3sAsvJLaGJi10OZYSWw2Sn6w@mail.gmail.com>
+Subject: obex-client fails with Connection refused (111) most of the time
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hello,
 
-Fixed some coding style issues shown by scripts/checkpatch.pl
+Using obex-client and the send-files test app on my thinkpad to send
+a single file to two different Nokia phones I get this error 90% of the time:
 
-Signed-off-by: Mahendra Singh Meena <mahendra.devel@gmail.com>
+Connection refused (111)
+
+This problem has been manifesting for some time but this test is on Debian
+unstable with linux-image-3.2.0-rc7-amd64, bluez 4.97 , and self
+compiled obexd 0.44
+
+I tried debugging the issue myself but haven't reached any results so far.
+
+I have some of the debugging output of several failed trials, and then
+a successful
+operation. Usually a successful operation happens when it is started
+very close after
+a failed one.
+
+Any pointers or help are greatly appreciated. Thanks in advance.
 ---
- drivers/bluetooth/bfusb.c |   52 ++++++++++++++++++++++++++++++--------------
- 1 files changed, 35 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
-index a323bae..e74062a 100644
---- a/drivers/bluetooth/bfusb.c
-+++ b/drivers/bluetooth/bfusb.c
-@@ -127,11 +127,13 @@ static int bfusb_send_bulk(struct bfusb_data *data, struct sk_buff *skb)
- {
- 	struct bfusb_data_scb *scb = (void *) skb->cb;
- 	struct urb *urb = bfusb_get_completed(data);
-+	struct urb *urb_chk = urb;
- 	int err, pipe;
+~/Workspace/Compile/obexd-0.44 $ ./test/send-files xx:xx:xx:xx:xx:xx /tmp/new
+Traceback (most recent call last):
+  File "./test/send-files", line 80, in <module>
+    client.SendFiles({ "Destination": sys.argv[1] }, files, path)
+  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 68, in __call__
+    return self._proxy_method(*args, **keywords)
+  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 143, in __call__
+    **keywords)
+  File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line
+630, in call_blocking
+    message, timeout)
+dbus.exceptions.DBusException: org.openobex.Error.Failed: Connection
+refused (111)
+~/Workspace/Compile/obexd-0.44 $ ./test/send-files xx:xx:xx:xx:xx:xx /tmp/new
+Traceback (most recent call last):
+  File "./test/send-files", line 80, in <module>
+    client.SendFiles({ "Destination": sys.argv[1] }, files, path)
+  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 68, in __call__
+    return self._proxy_method(*args, **keywords)
+  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 143, in __call__
+    **keywords)
+  File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line
+630, in call_blocking
+    message, timeout)
+dbus.exceptions.DBusException: org.openobex.Error.Failed: Connection
+refused (111)
+~/Workspace/Compile/obexd-0.44 $ ./test/send-files xx:xx:xx:xx:xx:xx /tmp/new
+Traceback (most recent call last):
+  File "./test/send-files", line 80, in <module>
+    client.SendFiles({ "Destination": sys.argv[1] }, files, path)
+  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 68, in __call__
+    return self._proxy_method(*args, **keywords)
+  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 143, in __call__
+    **keywords)
+  File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line
+630, in call_blocking
+    message, timeout)
+dbus.exceptions.DBusException: org.openobex.Error.Failed: Connection
+refused (111)
+~/Workspace/Compile/obexd-0.44 $ ./test/send-files xx:xx:xx:xx:xx:xx /tmp/new
+Traceback (most recent call last):
+  File "./test/send-files", line 80, in <module>
+    client.SendFiles({ "Destination": sys.argv[1] }, files, path)
+  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 68, in __call__
+    return self._proxy_method(*args, **keywords)
+  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 143, in __call__
+    **keywords)
+  File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line
+630, in call_blocking
+    message, timeout)
+dbus.exceptions.DBusException: org.openobex.Error.Failed: Connection
+refused (111)
+~/Workspace/Compile/obexd-0.44 $ ./test/send-files xx:xx:xx:xx:xx:xx /tmp/new
+Traceback (most recent call last):
+  File "./test/send-files", line 80, in <module>
+    client.SendFiles({ "Destination": sys.argv[1] }, files, path)
+  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 68, in __call__
+    return self._proxy_method(*args, **keywords)
+  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 143, in __call__
+    **keywords)
+  File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line
+630, in call_blocking
+    message, timeout)
+dbus.exceptions.DBusException: org.openobex.Error.Failed: Connection
+refused (111)
+~/Workspace/Compile/obexd-0.44 $ ./test/send-files xx:xx:xx:xx:xx:xx /tmp/new
+Transfer Request
+  Filename = /tmp/new
+  Name = new
+  Size = 2108
+Transfer Started
+Transfer progress (2108/2108 bytes) @ 3 kB/s
+Transfer finished
 
- 	BT_DBG("bfusb %p skb %p len %d", data, skb, skb->len);
-+	urb = usb_alloc_urb(0, GFP_ATOMIC);
+---
 
--	if (!urb && !(urb = usb_alloc_urb(0, GFP_ATOMIC)))
-+	if (!urb_chk && !urb)
- 		return -ENOMEM;
-
- 	pipe = usb_sndbulkpipe(data->udev, data->bulk_out_ep);
-@@ -145,7 +147,7 @@ static int bfusb_send_bulk(struct bfusb_data *data, struct sk_buff *skb)
-
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
- 	if (err) {
--		BT_ERR("%s bulk tx submit failed urb %p err %d",
-+		BT_ERR("%s bulk tx submit failed urb %p err %d",
- 					data->hdev->name, urb, err);
- 		skb_unlink(skb, &data->pending_q);
- 		usb_free_urb(urb);
-@@ -214,11 +216,13 @@ static int bfusb_rx_submit(struct bfusb_data *data, struct urb *urb)
- {
- 	struct bfusb_data_scb *scb;
- 	struct sk_buff *skb;
-+	struct urb *urb_chk = urb;
- 	int err, pipe, size = HCI_MAX_FRAME_SIZE + 32;
-
- 	BT_DBG("bfusb %p urb %p", data, urb);
-+	urb = usb_alloc_urb(0, GFP_ATOMIC);
-
--	if (!urb && !(urb = usb_alloc_urb(0, GFP_ATOMIC)))
-+	if (!urb && !urb_chk)
- 		return -ENOMEM;
-
- 	skb = bt_skb_alloc(size, GFP_ATOMIC);
-@@ -251,7 +255,8 @@ static int bfusb_rx_submit(struct bfusb_data *data, struct urb *urb)
- 	return err;
- }
-
--static inline int bfusb_recv_block(struct bfusb_data *data, int hdr, unsigned char *buf, int len)
-+static inline int bfusb_recv_block(struct bfusb_data *data, int hdr,
-+						 unsigned char *buf, int len)
- {
- 	BT_DBG("bfusb %p hdr 0x%02x data %p len %d", data, hdr, buf, len);
-
-@@ -283,30 +288,37 @@ static inline int bfusb_recv_block(struct bfusb_data *data, int hdr, unsigned ch
- 		switch (pkt_type) {
- 		case HCI_EVENT_PKT:
- 			if (len >= HCI_EVENT_HDR_SIZE) {
--				struct hci_event_hdr *hdr = (struct hci_event_hdr *) buf;
-+				struct hci_event_hdr *hdr;
-+				hdr = (struct hci_event_hdr *) buf;
- 				pkt_len = HCI_EVENT_HDR_SIZE + hdr->plen;
- 			} else {
--				BT_ERR("%s event block is too short", data->hdev->name);
-+				BT_ERR("%s event block is too short",
-+							 data->hdev->name);
- 				return -EILSEQ;
- 			}
- 			break;
-
- 		case HCI_ACLDATA_PKT:
- 			if (len >= HCI_ACL_HDR_SIZE) {
--				struct hci_acl_hdr *hdr = (struct hci_acl_hdr *) buf;
--				pkt_len = HCI_ACL_HDR_SIZE + __le16_to_cpu(hdr->dlen);
-+				struct hci_acl_hdr *hdr;
-+				hdr = (struct hci_acl_hdr *) buf;
-+				pkt_len = HCI_ACL_HDR_SIZE;
-+				pkt_len = pkt_len + __le16_to_cpu(hdr->dlen);
- 			} else {
--				BT_ERR("%s data block is too short", data->hdev->name);
-+				BT_ERR("%s data block is too short",
-+							 data->hdev->name);
- 				return -EILSEQ;
- 			}
- 			break;
-
- 		case HCI_SCODATA_PKT:
- 			if (len >= HCI_SCO_HDR_SIZE) {
--				struct hci_sco_hdr *hdr = (struct hci_sco_hdr *) buf;
-+				struct hci_sco_hdr *hdr;
-+				hdr = (struct hci_sco_hdr *) buf;
- 				pkt_len = HCI_SCO_HDR_SIZE + hdr->dlen;
- 			} else {
--				BT_ERR("%s audio block is too short", data->hdev->name);
-+				BT_ERR("%s audio block is too short",
-+							 data->hdev->name);
- 				return -EILSEQ;
- 			}
- 			break;
-@@ -324,7 +336,8 @@ static inline int bfusb_recv_block(struct bfusb_data *data, int hdr, unsigned ch
- 		data->reassembly = skb;
- 	} else {
- 		if (!data->reassembly) {
--			BT_ERR("%s unexpected continuation block", data->hdev->name);
-+			BT_ERR("%s unexpected continuation block",
-+							 data->hdev->name);
- 			return -EIO;
- 		}
- 	}
-@@ -473,7 +486,8 @@ static int bfusb_send_frame(struct sk_buff *skb)
- 	unsigned char buf[3];
- 	int sent = 0, size, count;
-
--	BT_DBG("hdev %p skb %p type %d len %d", hdev, skb, bt_cb(skb)->pkt_type, skb->len);
-+	BT_DBG("hdev %p skb %p type %d len %d",
-+				 hdev, skb, bt_cb(skb)->pkt_type, skb->len);
-
- 	if (!hdev) {
- 		BT_ERR("Frame for unknown HCI device (hdev=NULL)");
-@@ -514,12 +528,14 @@ static int bfusb_send_frame(struct sk_buff *skb)
- 	while (count) {
- 		size = min_t(uint, count, BFUSB_MAX_BLOCK_SIZE);
-
--		buf[0] = 0xc1 | ((sent == 0) ? 0x04 : 0) | ((count == size) ? 0x08 : 0);
-+		buf[0] = 0xc1 | ((sent == 0) ? 0x04 : 0) |
-+						((count == size) ? 0x08 : 0);
- 		buf[1] = 0x00;
- 		buf[2] = (size == BFUSB_MAX_BLOCK_SIZE) ? 0 : size;
-
- 		memcpy(skb_put(nskb, 3), buf, 3);
--		skb_copy_from_linear_data_offset(skb, sent, skb_put(nskb, size), size);
-+		skb_copy_from_linear_data_offset(skb, sent,
-+						 skb_put(nskb, size), size);
-
- 		sent  += size;
- 		count -= size;
-@@ -553,7 +569,8 @@ static void bfusb_destruct(struct hci_dev *hdev)
- 	kfree(data);
- }
-
--static int bfusb_ioctl(struct hci_dev *hdev, unsigned int cmd, unsigned long arg)
-+static int bfusb_ioctl(struct hci_dev *hdev, unsigned int cmd,
-+							 unsigned long arg)
- {
- 	return -ENOIOCTLCMD;
- }
-@@ -638,7 +655,8 @@ error:
- 	return err;
- }
-
--static int bfusb_probe(struct usb_interface *intf, const struct usb_device_id *id)
-+static int bfusb_probe(struct usb_interface *intf,
-+						 const struct usb_device_id *id)
- {
- 	const struct firmware *firmware;
- 	struct usb_device *udev = interface_to_usbdev(intf);
--- 
-1.7.0.4
+./client/obex-client -d -s
+obex-client[28987]: obex-client daemon 0.44
+obex-client[28987]: client/opp.c:opp_init()
+obex-client[28987]: client/driver.c:obc_driver_register() driver
+0x6224c0 service OPP registered
+obex-client[28987]: client/manager.c:manager_init() Target opp loaded
+obex-client[28987]: client/ftp.c:ftp_init()
+obex-client[28987]: client/driver.c:obc_driver_register() driver
+0x6222c0 service FTP registered
+obex-client[28987]: client/driver.c:obc_driver_register() driver
+0x622300 service PCSUITE registered
+obex-client[28987]: client/manager.c:manager_init() Target ftp loaded
+obex-client[28987]: client/pbap.c:pbap_init()
+obex-client[28987]: client/driver.c:obc_driver_register() driver
+0x6220a0 service PBAP registered
+obex-client[28987]: client/manager.c:manager_init() Target pbap loaded
+obex-client[28987]: client/sync.c:sync_init()
+obex-client[28987]: client/driver.c:obc_driver_register() driver
+0x621fc0 service SYNC registered
+obex-client[28987]: client/manager.c:manager_init() Target sync loaded
+obex-client[28987]: client/map.c:map_init()
+obex-client[28987]: client/driver.c:obc_driver_register() driver
+0x622500 service MAP registered
+obex-client[28987]: client/manager.c:manager_init() Target map loaded
+obex-client[28987]: client/main.c:main() Entering main loop
+obex-client[28987]: client/session.c:obc_session_create() driver OPP
+obex-client[28987]: client/session.c:obc_session_ref() 0x17d27b0: ref=2
+obex-client[28987]: client/session.c:manager_reply() adapter path
+/org/bluez/28955/hci0
+obex-client[28987]: client/session.c:rfcomm_connect()
+obex-client[28987]: client/session.c:rfcomm_callback()
+obex-client[28987]: Connection refused (111)
+obex-client[28987]: client/session.c:obc_session_shutdown() 0x17d27b0
+obex-client[28987]: client/session.c:obc_session_ref() 0x17d27b0: ref=3
+obex-client[28987]: client/session.c:obc_session_unref() 0x17d27b0: ref=2
+obex-client[28987]: client/session.c:obc_session_unref() 0x17d27b0: ref=1
+obex-client[28987]: client/session.c:obc_session_unref() 0x17d27b0: ref=0
+obex-client[28987]: client/session.c:session_free() 0x17d27b0
+obex-client[28987]: client/session.c:obc_session_create() driver OPP
+obex-client[28987]: client/session.c:obc_session_ref() 0x17cf5e0: ref=2
+obex-client[28987]: client/session.c:manager_reply() adapter path
+/org/bluez/28955/hci0
+obex-client[28987]: client/session.c:rfcomm_connect()
+obex-client[28987]: client/session.c:rfcomm_callback()
+obex-client[28987]: Connection refused (111)
+obex-client[28987]: client/session.c:obc_session_shutdown() 0x17cf5e0
+obex-client[28987]: client/session.c:obc_session_ref() 0x17cf5e0: ref=3
+obex-client[28987]: client/session.c:obc_session_unref() 0x17cf5e0: ref=2
+obex-client[28987]: client/session.c:obc_session_unref() 0x17cf5e0: ref=1
+obex-client[28987]: client/session.c:obc_session_unref() 0x17cf5e0: ref=0
+obex-client[28987]: client/session.c:session_free() 0x17cf5e0
+obex-client[28987]: client/session.c:obc_session_create() driver OPP
+obex-client[28987]: client/session.c:obc_session_ref() 0x17d2b70: ref=2
+obex-client[28987]: client/session.c:manager_reply() adapter path
+/org/bluez/28955/hci0
+obex-client[28987]: client/session.c:rfcomm_connect()
+obex-client[28987]: client/session.c:rfcomm_callback()
+obex-client[28987]: Connection refused (111)
+obex-client[28987]: client/session.c:obc_session_shutdown() 0x17d2b70
+obex-client[28987]: client/session.c:obc_session_ref() 0x17d2b70: ref=3
+obex-client[28987]: client/session.c:obc_session_unref() 0x17d2b70: ref=2
+obex-client[28987]: client/session.c:obc_session_unref() 0x17d2b70: ref=1
+obex-client[28987]: client/session.c:obc_session_unref() 0x17d2b70: ref=0
+obex-client[28987]: client/session.c:session_free() 0x17d2b70
+obex-client[28987]: client/session.c:obc_session_create() driver OPP
+obex-client[28987]: client/session.c:obc_session_ref() 0x17cf600: ref=2
+obex-client[28987]: client/session.c:manager_reply() adapter path
+/org/bluez/28955/hci0
+obex-client[28987]: client/session.c:rfcomm_connect()
+obex-client[28987]: client/session.c:rfcomm_callback()
+obex-client[28987]: client/session.c:obc_session_ref() 0x17cf600: ref=3
+obex-client[28987]: client/transfer.c:obc_transfer_register()
+0x17d2750 registered /org/openobex/transfer0
+obex-client[28987]: client/agent.c:obc_agent_request() /org/openobex/transfer0
+obex-client[28987]: client/session.c:obc_session_unref() 0x17cf600: ref=2
+obex-client[28987]: client/session.c:obc_session_unref() 0x17cf600: ref=1
+obex-client[28987]: client/session.c:session_request_reply()
+Agent.Request() reply:
+obex-client[28987]: client/session.c:session_prepare_put()
+Transfer(0x17d2750) started
+obex-client[28987]: client/agent.c:obc_agent_notify_progress()
+/org/openobex/transfer0
+obex-client[28987]: client/session.c:session_notify_progress()
+Transfer(0x17d2750) progress: 0 bytes
+obex-client[28987]: client/agent.c:obc_agent_notify_progress()
+/org/openobex/transfer0
+obex-client[28987]: client/session.c:session_notify_progress()
+Transfer(0x17d2750) progress: 2108 bytes
+obex-client[28987]: client/agent.c:obc_agent_notify_complete()
+/org/openobex/transfer0
+obex-client[28987]: client/session.c:session_notify_complete()
+Transfer(0x17d2750) complete
+obex-client[28987]: client/session.c:obc_session_ref() 0x17cf600: ref=2
+obex-client[28987]: client/transfer.c:obc_transfer_unregister()
+0x17d2750 unregistered /org/openobex/transfer0
+obex-client[28987]: client/transfer.c:obc_transfer_free() 0x17d2750
+obex-client[28987]: client/session.c:obc_session_unref() 0x17cf600: ref=1
+obex-client[28987]: client/session.c:obc_session_unref() 0x17cf600: ref=0
+obex-client[28987]: client/session.c:session_free() 0x17cf600
+obex-client[28987]: client/agent.c:obc_agent_release()
