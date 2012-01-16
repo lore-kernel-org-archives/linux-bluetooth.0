@@ -1,46 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F13E0CD.50704@monom.org>
-Date: Mon, 16 Jan 2012 09:33:17 +0100
-From: Daniel Wagner <wagi@monom.org>
-MIME-Version: 1.0
-To: bubba junk <junkbubba2@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Bluetooth Headset Connection Issue Linux v3.0
-References: <CAMk70DBANeAndgm-nV=9Cgt2tvz=dRmd8WdpnJkNTe=a2LDugA@mail.gmail.com> <4EF30EE3.6050602@monom.org> <CAMk70DAh0gaydUbj-ryqeo350+64j=vn-_-yGUk_wo=fYSuXYw@mail.gmail.com>
-In-Reply-To: <CAMk70DAh0gaydUbj-ryqeo350+64j=vn-_-yGUk_wo=fYSuXYw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1326702341.3360.107.camel@pohly-mobl1.fritz.box>
+Subject: bluez 4.97: build failure when used in C++ apps
+From: Patrick Ohly <patrick.ohly@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Milan Crha <mcrha@redhat.com>, ying.an.deng@intel.com,
+	ulf.hofemeier@intel.com, ning.w.wang@intel.com
+Date: Mon, 16 Jan 2012 09:25:41 +0100
+Content-Type: multipart/mixed; boundary="=-6boj0tJ+j9l94lrtwY/k"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi bubba,
 
-Sorry for the late response.
+--=-6boj0tJ+j9l94lrtwY/k
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On 22.12.2011 19:38, bubba junk wrote:
-> Thanks for your reply. I forgot to mention in my original post that I
-> have beenusing the same BT usb dongle and BT headset in Ubuntu 10.10,
-> 11.04, and 11.10.Everything worked fine in Ubuntu 10.10 and 11.04
-> which I think were based onLinux Kernel 2.6.35 and 2.6.38
-> respectively. In those versions, I was able topair and connect /
-> disconnect / connect without issue. I've seen other postselsewhere
-> that other folks are having the same bluetooth headset issue
-> afterUbuntu 11.04. The symptoms and behavior appear to be the same.
-> I'd love to try to help debug the issue so that it can be resolved. I
-> would justneed some guidance on how to capture any needed information.
-> I will try tocapture it and post it. Let me know how I can help.
+Hello!
 
-After debugging a bit and some discussions my problem seem to be a  with
-simple pairing and promotion of an already existing connection to a
-higher security level (that means enable encryption).
+Bluez 4.97 has entered some distros recently (Fedora Core, MeeGo 1.2
+update), which broke compilation of the C++ code in SyncEvolution
+using /usr/lib/bluetooth.h.
 
-There is a patch from Peter Hurley called
+The compiler error is:
+/usr/include/bluetooth/bluetooth.h::131:9: error: invalid conversion from 'void*' to 'bt_get_le64(void*)::<anonymous struct>*'
+...
 
-"[PATCH] Bluetooth: Fix l2cap connfailures for ssp devices"
+The reason is that C++, in contrast to C, does not allow conversion of
+void * to anything, and this code gets compiled as C++ when the app is
+written in C++. The macro with the assignment itself is older, but only
+recent Bluez starts to use it in inline functions, thus triggering the
+problem.
 
-which might help in the case you are suffering from the same problem.
+Attached is a proposed solution. Note that I have only verified that it
+now compiles in C and C++, I have not actually tested the resulting
+Bluez, because compilation fails for me on Debian Testing for another
+reason (libcheck.a linked into shared object, doesn't work because not
+relocatable).
 
-There are also some bug reports about this one:
-https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/839157
+-- 
+Best Regards, Patrick Ohly
 
-cheers,
-daniel
+The content of this message is my personal opinion only and although
+I am an employee of Intel, the statements I make here in no way
+represent Intel's position on the issue, nor am I authorized to speak
+on behalf of Intel on this matter.
+
+
+--=-6boj0tJ+j9l94lrtwY/k
+Content-Disposition: attachment; filename="bluez-4.97-cplusplus.patch"
+Content-Type: text/x-patch; name="bluez-4.97-cplusplus.patch"; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+*** bluez-4.97/lib/bluetooth.h.orig	2012-01-16 09:06:07.171931288 +0100
+--- bluez-4.97/lib/bluetooth.h	2012-01-16 09:07:02.523930152 +0100
+***************
+*** 113,119 ****
+  ({						\
+  	struct __attribute__((packed)) {	\
+  		typeof(*(ptr)) __v;		\
+! 	} *__p = (void *) (ptr);		\
+  	__p->__v;				\
+  })
+  
+--- 113,119 ----
+  ({						\
+  	struct __attribute__((packed)) {	\
+  		typeof(*(ptr)) __v;		\
+! 	} *__p = (typeof(__p)) (ptr);		\
+  	__p->__v;				\
+  })
+  
+***************
+*** 121,127 ****
+  do {						\
+  	struct __attribute__((packed)) {	\
+  		typeof(*(ptr)) __v;		\
+! 	} *__p = (void *) (ptr);		\
+  	__p->__v = (val);			\
+  } while(0)
+  
+--- 121,127 ----
+  do {						\
+  	struct __attribute__((packed)) {	\
+  		typeof(*(ptr)) __v;		\
+! 	} *__p = (typeof(__p)) (ptr);		\
+  	__p->__v = (val);			\
+  } while(0)
+  
+
+--=-6boj0tJ+j9l94lrtwY/k--
+
