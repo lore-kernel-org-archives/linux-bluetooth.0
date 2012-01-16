@@ -1,54 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Jan 2012 01:14:23 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-	skrovvid@codeaurora.org
-Subject: Re: As long as we're adding to the Device Connected mgmt event...
-Message-ID: <20120116231423.GA13647@x220.P-661HNU-F1>
-References: <alpine.DEB.2.02.1201131159420.24403@mathewm-linux>
- <20120115110354.GA12977@x220.P-661HNU-F1>
- <1326696332.6454.272.camel@aeonflux>
- <alpine.DEB.2.02.1201160807170.29809@mathewm-linux>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>,
+	Daniel Wagner <wagi@monom.org>
+CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Mon, 16 Jan 2012 14:37:11 -0500
+Subject: Re: [PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
+Message-ID: <1326742631.32064.21.camel@thor>
+References: <1312921615.2261.1.camel@THOR> <4F04285E.1070500@monom.org>
+	 <4F0AA5A2.4070903@monom.org> <20120111112646.GB23277@x220>
+In-Reply-To: <20120111112646.GB23277@x220>
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.02.1201160807170.29809@mathewm-linux>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi Daniel & Johan,
 
-On Mon, Jan 16, 2012, Mat Martineau wrote:
-> >>>I noticed your recent bluez.git commit that modifies the Device
-> >>>Connected event.  Would it also make sense to add the results of the
-> >>>READ_REMOTE_VERSION command?
-> >>>
-> >>>lmp_ver
-> >>>manufacturer
-> >>>lmp_subver
-> >>>
-> >>>This information was captured in bluetoothd when using hciops, but
-> >>>has so far been missing with mgmtops.
-> >>
-> >>Do you have a real use-case for it? It'd expect that info to be at most
-> >>useful to the kernel side but not so much for user-space. FWIW, we came
-> >>to the conclusion with Marcel that a better approach with this
-> >>mgmt_ev_device_connected is to encode both the class and the name as an
-> >>EIR blob. We'll also do that for the class that's currently as a
-> >>separate parameter in mgmt_ev_device_found. This simplifies the
-> >>structure of both events and also allows for future extensibility.
-> >
-> >in addition, these information are purely debugging details and I think
-> >it would be better to use sysfs or debugfs for it.
+On Wed, 2012-01-11 at 06:26 -0500, Johan Hedberg wrote:
+> Hi Daniel,
 > 
-> The use case involves checking the remote LMP version to figure out
-> if the remote device supports EDR, to get a rough estimate of
-> available bandwidth.  Lower bandwidth devices can then use different
-> settings at the profile or application layer.
+> On Mon, Jan 09, 2012, Daniel Wagner wrote:
+> > Hi Johan,
+> > 
+> > On 04.01.2012 11:22, Daniel Wagner wrote:
+> > > Hi Peter,
+> > > 
+> > > On 09.08.2011 22:26, Peter Hurley wrote:
+> > >> Commit 330605423c fixed l2cap conn establishment for non-ssp remote
+> > >> devices by not setting HCI_CONN_ENCRYPT_PEND every time conn security
+> > >> is tested (which was always returning failure on any subsequent
+> > >> security checks).
+> > >>
+> > >> However, this broke l2cap conn establishment for ssp remote devices
+> > >> when an ACL link was already established at SDP-level security. This
+> > >> fix ensures that encryption must be pending whenever authentication
+> > >> is also pending.
+> > >>
+> > >> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+> > > 
+> > > git am complaines:
+> > > 
+> > > Applying: Bluetooth: Fix l2cap conn failures for ssp devices
+> > > /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:18: trailing whitespace.
+> > > 
+> > > /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:19: trailing whitespace.
+> > >                 /* encrypt must be pending if auth is also pending */
+> > > /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:20: trailing whitespace.
+> > >                 set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend);
+> > > /home/wagi/src/bluetooth-next/.git/rebase-apply/patch:21: trailing whitespace.
+> > > 
+> > > 
+> > > But it fixes the problem I was debugging. From what I have
+> > > learned in the last two days I would say it is also the right fix :)
+> > 
+> > Is there any chance to get this patch in? If it helps I could send a
+> > whitespace fixed version.
+> 
+> Feel free to send a whitespace-fixed version, but even then I only apply
+> patches with Marcel's ack on them. Btw, have you verified that this
+> doesn't break non-SSP cases? Is this how the code used to behave before
+> the regression?
+> 
+> Johan
 
-If something like that is really needed then I think some sort of a
-socket option might make more sense, i.e. the application could call
-getsockopt (or some higher level wrapper like BtIO) to figure this out.
-In any case it's not enough for the remote device to support EDR if the
-local device isn't capable of it.
+The situation with this patch is that I asked Gustavo not to apply it
+(via IRC). Although the patch works, the overall logic of the
+auth/encryption system is flawed.
 
-Johan
+With respect to this issue specifically (ie, ssp vs. non-ssp auth +
+encrypt), the flaw is that the semantic meaning of the
+HCI_CONN_ENCRYPT_PEND bit is overloaded. The meaning of one sense is
+that an actual HCI_OP_SET_CONN_ENCRYPT command is in-flight, and thus,
+for this hci connection, neither an auth nor encrypt request should be
+sent. The second meaning is that the event handler *should* submit an
+encrypt request upon receiving a successful auth complete event.
+
+At the time, I had a patch prepared which addressed this duality as part
+of a series which enabled true re-auth & sec_level promotion.
+Unfortunately, I discovered that a prior patch had been submitted and
+applied which specifically disables sec_level promotion for non-ssp
+devices. The ml conversation died here
+http://marc.info/?l=linux-bluetooth&m=131609282919575&w=2 so I dropped
+it.
+
+Regards,
+Peter Hurley
