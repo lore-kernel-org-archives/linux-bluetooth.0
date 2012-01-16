@@ -1,29 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 16 Jan 2012 11:57:13 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 1/2] Bluetooth: Use chan instead of sk
-Message-ID: <20120116095713.GA19971@x220>
-References: <1326468103-12731-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1326468103-12731-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <1326705845.6454.274.camel@aeonflux>
+Subject: Re: bluez 4.97: build failure when used in C++ apps
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Patrick Ohly <patrick.ohly@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, Milan Crha <mcrha@redhat.com>,
+	ying.an.deng@intel.com, ulf.hofemeier@intel.com,
+	ning.w.wang@intel.com
+Date: Mon, 16 Jan 2012 10:24:05 +0100
+In-Reply-To: <1326702341.3360.107.camel@pohly-mobl1.fritz.box>
+References: <1326702341.3360.107.camel@pohly-mobl1.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Patrick,
 
-On Fri, Jan 13, 2012, Emeltchenko Andrei wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Bluez 4.97 has entered some distros recently (Fedora Core, MeeGo 1.2
+> update), which broke compilation of the C++ code in SyncEvolution
+> using /usr/lib/bluetooth.h.
 > 
-> Remove unneeded conversion from sk to chan.
+> The compiler error is:
+> /usr/include/bluetooth/bluetooth.h::131:9: error: invalid conversion from 'void*' to 'bt_get_le64(void*)::<anonymous struct>*'
+> ...
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c |    7 +++----
->  1 files changed, 3 insertions(+), 4 deletions(-)
+> The reason is that C++, in contrast to C, does not allow conversion of
+> void * to anything, and this code gets compiled as C++ when the app is
+> written in C++. The macro with the assignment itself is older, but only
+> recent Bluez starts to use it in inline functions, thus triggering the
+> problem.
+> 
+> Attached is a proposed solution. Note that I have only verified that it
+> now compiles in C and C++, I have not actually tested the resulting
+> Bluez, because compilation fails for me on Debian Testing for another
+> reason (libcheck.a linked into shared object, doesn't work because not
+> relocatable).
 
-Both patches have been applied to my bluetooth-next tree. Thanks.
+please can we get inline patches from git format-patch. Also this topic
+has been raised before and I need confirmation for a GCC guru to confirm
+that this does exactly the same all all platforms.
 
-Johan
+Tested this on x86 hardware is useless since it does unaligned access
+properly anyway. ARM, MIPS and PowerPC would be interesting.
+
+Regards
+
+Marcel
+
+
+
