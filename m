@@ -1,93 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1326702341.3360.107.camel@pohly-mobl1.fritz.box>
-Subject: bluez 4.97: build failure when used in C++ apps
-From: Patrick Ohly <patrick.ohly@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Milan Crha <mcrha@redhat.com>, ying.an.deng@intel.com,
-	ulf.hofemeier@intel.com, ning.w.wang@intel.com
-Date: Mon, 16 Jan 2012 09:25:41 +0100
-Content-Type: multipart/mixed; boundary="=-6boj0tJ+j9l94lrtwY/k"
-Mime-Version: 1.0
+From: Hemant Gupta <hemant.gupta@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: Hemant Gupta <hemantgupta.ste@gmail.com>,
+	Hemant Gupta <hemant.gupta@stericsson.com>
+Subject: [PATCH v1 1/1] Add KeyboardDisplay IO Capability
+Date: Mon, 16 Jan 2012 13:36:42 +0530
+Message-ID: <1326701202-23977-2-git-send-email-hemant.gupta@stericsson.com>
+In-Reply-To: <1326701202-23977-1-git-send-email-hemant.gupta@stericsson.com>
+References: <1326701202-23977-1-git-send-email-hemant.gupta@stericsson.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This patch adds suppport for KeyboardDisplay IO capability in BlueZ.
+It is ensured that the new capability is set only if management
+interface is being used. For hciops Keyboarddisplay capability is
+mapped to DisplayYesNo.
+---
+ plugins/hciops.c |    8 +++++++-
+ src/adapter.c    |    3 +++
+ 2 files changed, 10 insertions(+), 1 deletions(-)
 
---=-6boj0tJ+j9l94lrtwY/k
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-
-Hello!
-
-Bluez 4.97 has entered some distros recently (Fedora Core, MeeGo 1.2
-update), which broke compilation of the C++ code in SyncEvolution
-using /usr/lib/bluetooth.h.
-
-The compiler error is:
-/usr/include/bluetooth/bluetooth.h::131:9: error: invalid conversion from 'void*' to 'bt_get_le64(void*)::<anonymous struct>*'
-...
-
-The reason is that C++, in contrast to C, does not allow conversion of
-void * to anything, and this code gets compiled as C++ when the app is
-written in C++. The macro with the assignment itself is older, but only
-recent Bluez starts to use it in inline functions, thus triggering the
-problem.
-
-Attached is a proposed solution. Note that I have only verified that it
-now compiles in C and C++, I have not actually tested the resulting
-Bluez, because compilation fails for me on Debian Testing for another
-reason (libcheck.a linked into shared object, doesn't work because not
-relocatable).
-
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 77d2421..4102537 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -3573,7 +3573,13 @@ static int hciops_set_io_capability(int index, uint8_t io_capability)
+ {
+ 	struct dev_info *dev = &devs[index];
+ 
+-	dev->io_capability = io_capability;
++	/*
++	 * Hciops is not to be used for SMP
++	 * pairing for LE devices. So change the IO
++	 * capability from KeyboardDisplay to
++	 * DisplayYesNo in case it is set.
++	 */
++	dev->io_capability = (io_capability == 0x04) ? 0x01 : io_capability;
+ 
+ 	return 0;
+ }
+diff --git a/src/adapter.c b/src/adapter.c
+index 7e4bbb6..ba86cd4 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -74,6 +74,7 @@
+ #define IO_CAPABILITY_DISPLAYYESNO	0x01
+ #define IO_CAPABILITY_KEYBOARDONLY	0x02
+ #define IO_CAPABILITY_NOINPUTNOOUTPUT	0x03
++#define IO_CAPABILITY_KEYBOARDDISPLAY	0x04
+ #define IO_CAPABILITY_INVALID		0xFF
+ 
+ #define check_address(address) bachk(address)
+@@ -1533,6 +1534,8 @@ static uint8_t parse_io_capability(const char *capability)
+ 		return IO_CAPABILITY_KEYBOARDONLY;
+ 	if (g_str_equal(capability, "NoInputNoOutput"))
+ 		return IO_CAPABILITY_NOINPUTNOOUTPUT;
++	if (g_str_equal(capability, "KeyboardDisplay"))
++		return IO_CAPABILITY_KEYBOARDDISPLAY;
+ 	return IO_CAPABILITY_INVALID;
+ }
+ 
 -- 
-Best Regards, Patrick Ohly
-
-The content of this message is my personal opinion only and although
-I am an employee of Intel, the statements I make here in no way
-represent Intel's position on the issue, nor am I authorized to speak
-on behalf of Intel on this matter.
-
-
---=-6boj0tJ+j9l94lrtwY/k
-Content-Disposition: attachment; filename="bluez-4.97-cplusplus.patch"
-Content-Type: text/x-patch; name="bluez-4.97-cplusplus.patch"; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-
-*** bluez-4.97/lib/bluetooth.h.orig	2012-01-16 09:06:07.171931288 +0100
---- bluez-4.97/lib/bluetooth.h	2012-01-16 09:07:02.523930152 +0100
-***************
-*** 113,119 ****
-  ({						\
-  	struct __attribute__((packed)) {	\
-  		typeof(*(ptr)) __v;		\
-! 	} *__p = (void *) (ptr);		\
-  	__p->__v;				\
-  })
-  
---- 113,119 ----
-  ({						\
-  	struct __attribute__((packed)) {	\
-  		typeof(*(ptr)) __v;		\
-! 	} *__p = (typeof(__p)) (ptr);		\
-  	__p->__v;				\
-  })
-  
-***************
-*** 121,127 ****
-  do {						\
-  	struct __attribute__((packed)) {	\
-  		typeof(*(ptr)) __v;		\
-! 	} *__p = (void *) (ptr);		\
-  	__p->__v = (val);			\
-  } while(0)
-  
---- 121,127 ----
-  do {						\
-  	struct __attribute__((packed)) {	\
-  		typeof(*(ptr)) __v;		\
-! 	} *__p = (typeof(__p)) (ptr);		\
-  	__p->__v = (val);			\
-  } while(0)
-  
-
---=-6boj0tJ+j9l94lrtwY/k--
+1.6.6.1
 
