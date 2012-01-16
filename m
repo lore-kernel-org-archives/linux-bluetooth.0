@@ -1,32 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 16 Jan 2012 12:36:12 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 2/7] Bluetooth: Report LE devices
-Message-ID: <20120116103612.GA20110@x220>
-References: <1326230455-9117-1-git-send-email-andre.guedes@openbossa.org>
- <1326230455-9117-3-git-send-email-andre.guedes@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1326230455-9117-3-git-send-email-andre.guedes@openbossa.org>
+Message-ID: <1326708715.3360.135.camel@pohly-mobl1.fritz.box>
+Subject: [PATCH] bluetooth.h: fix compile issue when using in C++
+From: Patrick Ohly <patrick.ohly@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Date: Mon, 16 Jan 2012 11:11:55 +0100
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+The compiler error is:
+ /usr/include/bluetooth/bluetooth.h::131:9: error: invalid conversion from 'void*' to 'bt_get_le64(void*)::<anonymous struct>*'
+ ...
 
-On Tue, Jan 10, 2012, Andre Guedes wrote:
-> Devices found during LE scan should be reported to userspace through
-> mgmt_device_found events.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_event.c |    5 +++++
->  1 files changed, 5 insertions(+), 0 deletions(-)
+The reason is that C++, in contrast to C, does not allow conversion of
+void * to anything, and this code gets compiled as C++ when the app is
+written in C++. The macro with the assignment itself is older, but only
+recent Bluez starts to use it in inline functions, thus triggering the
+problem.
 
-Patches 1 and 2 have been applied to my bluetooth-next tree (they were
-the only ones with Marcels ack and I need those as a base to update the
-kernel side to match the latest mgmt-api.txt in user space).
+This patch keeps the "struct __attribute__((packed))" magic and merely
+changes the typecast so that it works in C and C++. Like the existing
+macro this patch relies on support for typeof.
+---
+ lib/bluetooth.h |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-Johan
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index 5bd4f03..2fee4ac 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -113,7 +113,7 @@ enum {
+ ({						\
+ 	struct __attribute__((packed)) {	\
+ 		typeof(*(ptr)) __v;		\
+-	} *__p = (void *) (ptr);		\
++	} *__p = (typeof(__p)) (ptr);		\
+ 	__p->__v;				\
+ })
+ 
+@@ -121,7 +121,7 @@ enum {
+ do {						\
+ 	struct __attribute__((packed)) {	\
+ 		typeof(*(ptr)) __v;		\
+-	} *__p = (void *) (ptr);		\
++	} *__p = (typeof(__p)) (ptr);		\
+ 	__p->__v = (val);			\
+ } while(0)
+ 
+-- 
+1.7.7.3
+
+
