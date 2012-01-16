@@ -1,54 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 16 Jan 2012 08:26:30 -0800 (PST)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-cc: Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, skrovvid@codeaurora.org
-Subject: Re: As long as we're adding to the Device Connected mgmt event...
-In-Reply-To: <1326696332.6454.272.camel@aeonflux>
-Message-ID: <alpine.DEB.2.02.1201160807170.29809@mathewm-linux>
-References: <alpine.DEB.2.02.1201131159420.24403@mathewm-linux>  <20120115110354.GA12977@x220.P-661HNU-F1> <1326696332.6454.272.camel@aeonflux>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CAHZ1yCm1SuTFrcFscRjg2WdnfkseCw75G+46RL+uZSSH5UFf6Q@mail.gmail.com>
+References: <1326505957-27555-1-git-send-email-keybuk@chromium.org>
+	<1326505957-27555-3-git-send-email-keybuk@chromium.org>
+	<1326559307.6454.270.camel@aeonflux>
+	<CAHZ1yCm1SuTFrcFscRjg2WdnfkseCw75G+46RL+uZSSH5UFf6Q@mail.gmail.com>
+Date: Mon, 16 Jan 2012 16:44:04 +0100
+Message-ID: <CANq1E4TG3=9GZ3G0NKLj1GKd8Vm7L3GV_-CWdKCX3sk5=gVUoQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] agent: allow agent to reply to RequestPinCode with bytes
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: Scott James Remnant <keybuk@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Scott
 
-Hi Johan -
-
-On Mon, 16 Jan 2012, Marcel Holtmann wrote:
-
-> Hi Mat,
+On Sat, Jan 14, 2012 at 9:34 PM, Scott James Remnant
+<keybuk@chromium.org> wrote:
+> On Sat, Jan 14, 2012 at 8:41 AM, Marcel Holtmann <marcel@holtmann.org> wr=
+ote:
 >
->>> I noticed your recent bluez.git commit that modifies the Device
->>> Connected event.  Would it also make sense to add the results of the
->>> READ_REMOTE_VERSION command?
->>>
->>> lmp_ver
->>> manufacturer
->>> lmp_subver
->>>
->>> This information was captured in bluetoothd when using hciops, but
->>> has so far been missing with mgmtops.
+>> > Since the specification allows the PIN to be a sequence of arbitrary
+>> > octets, and not a UTF-8 string, allow the userspace agent to reply
+>> > with such a sequence (as a D-Bus Array of Bytes).
+>> >
+>> > This means a userspace agent can deal with devices that require their
+>> > BD_ADDR (or the host's) as a PIN, and take care of trying multiple of
+>> > such requirements.
 >>
->> Do you have a real use-case for it? It'd expect that info to be at most
->> useful to the kernel side but not so much for user-space. FWIW, we came
->> to the conclusion with Marcel that a better approach with this
->> mgmt_ev_device_connected is to encode both the class and the name as an
->> EIR blob. We'll also do that for the class that's currently as a
->> separate parameter in mgmt_ev_device_found. This simplifies the
->> structure of both events and also allows for future extensibility.
+>> this has been discussed before and the answer is a clear no to this.
+>>
 >
-> in addition, these information are purely debugging details and I think
-> it would be better to use sysfs or debugfs for it.
+> Why a no? I couldn't find the discussion in the archives.
 
-The use case involves checking the remote LMP version to figure out if 
-the remote device supports EDR, to get a rough estimate of available 
-bandwidth.  Lower bandwidth devices can then use different settings at 
-the profile or application layer.
+See here:
+http://thread.gmane.org/gmane.linux.bluez.kernel/13380
 
+>> You can however write a plugin that can handle binary PIN codes.
+>>
+>
+> The problem there is that the plugin can only try one, and can't retry
+> the authentication if that PIN fails.
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Does your device provide proper PID/VID information? Then I see no
+need to try several different PINs. Could you provide more information
+with what kind of devices you are working here?
+
+> Scott
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
