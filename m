@@ -1,46 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Yu A Wang <arron.wang@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Yu A Wang <arron.wang@intel.com>
-Subject: [PATCH 1/2] adapter: Export set powered operation
-Date: Mon, 16 Jan 2012 04:02:42 -0500
-Message-Id: <1326704562-22825-1-git-send-email-arron.wang@intel.com>
+From: "Deng, Ying An" <ying.an.deng@intel.com>
+To: "Ohly, Patrick" <patrick.ohly@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: Milan Crha <mcrha@redhat.com>,
+	"Hofemeier, Ulf" <ulf.hofemeier@intel.com>,
+	"Wang, Ning W" <ning.w.wang@intel.com>
+Subject: RE: bluez 4.97: build failure when used in C++ apps
+Date: Mon, 16 Jan 2012 08:48:38 +0000
+Message-ID: <688E999A39D0DD478D9CFCDC485D64820FC99662@SHSMSX102.ccr.corp.intel.com>
+References: <1326702341.3360.107.camel@pohly-mobl1.fritz.box>
+In-Reply-To: <1326702341.3360.107.camel@pohly-mobl1.fritz.box>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/adapter.c |    5 +++++
- src/adapter.h |    1 +
- 2 files changed, 6 insertions(+), 0 deletions(-)
-
-diff --git a/src/adapter.c b/src/adapter.c
-index 7e4bbb6..e124010 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3363,6 +3363,11 @@ int adapter_ops_setup(void)
- 	return ret;
- }
- 
-+int adapter_ops_set_powered(int index, gboolean powered)
-+{
-+	return adapter_ops->set_powered(index, powered);
-+}
-+
- void btd_adapter_register_powered_callback(struct btd_adapter *adapter,
- 						btd_adapter_powered_cb cb)
- {
-diff --git a/src/adapter.h b/src/adapter.h
-index fb1dcdf..9dfd927 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -214,6 +214,7 @@ struct btd_adapter_ops {
- int btd_register_adapter_ops(struct btd_adapter_ops *ops, gboolean priority);
- void btd_adapter_cleanup_ops(struct btd_adapter_ops *btd_adapter_ops);
- int adapter_ops_setup(void);
-+int adapter_ops_set_powered(int index, gboolean powered);
- 
- typedef void (*btd_adapter_powered_cb) (struct btd_adapter *adapter,
- 						gboolean powered);
--- 
-1.7.2.2
-
+DQo+LS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj5Gcm9tOiBQYXRyaWNrIE9obHkgW21haWx0
+bzpwYXRyaWNrLm9obHlAaW50ZWwuY29tXQ0KPlNlbnQ6IE1vbmRheSwgSmFudWFyeSAxNiwgMjAx
+MiA0OjI2IFBNDQo+VG86IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj5DYzogTWls
+YW4gQ3JoYTsgRGVuZywgWWluZyBBbjsgSG9mZW1laWVyLCBVbGY7IFdhbmcsIE5pbmcgVw0KPlN1
+YmplY3Q6IGJsdWV6IDQuOTc6IGJ1aWxkIGZhaWx1cmUgd2hlbiB1c2VkIGluIEMrKyBhcHBzDQo+
+DQo+SGVsbG8hDQo+DQo+Qmx1ZXogNC45NyBoYXMgZW50ZXJlZCBzb21lIGRpc3Ryb3MgcmVjZW50
+bHkgKEZlZG9yYSBDb3JlLCBNZWVHbyAxLjIgdXBkYXRlKSwNCj53aGljaCBicm9rZSBjb21waWxh
+dGlvbiBvZiB0aGUgQysrIGNvZGUgaW4gU3luY0V2b2x1dGlvbiB1c2luZw0KPi91c3IvbGliL2Js
+dWV0b290aC5oLg0KPg0KPlRoZSBjb21waWxlciBlcnJvciBpczoNCj4vdXNyL2luY2x1ZGUvYmx1
+ZXRvb3RoL2JsdWV0b290aC5oOjoxMzE6OTrigIJlcnJvcjrigIJpbnZhbGlk4oCCY29udmVyc2lv
+biBmcm9t4oCCDQo+J3ZvaWQqJ+KAgnRv4oCCJ2J0X2dldF9sZTY0KHZvaWQqKTo6PGFub255bW91
+c+KAgnN0cnVjdD4qJw0KPi4uLg0KPg0KPlRoZSByZWFzb24gaXMgdGhhdCBDKyssIGluIGNvbnRy
+YXN0IHRvIEMsIGRvZXMgbm90IGFsbG93IGNvbnZlcnNpb24gb2Ygdm9pZCAqIHRvDQo+YW55dGhp
+bmcsIGFuZCB0aGlzIGNvZGUgZ2V0cyBjb21waWxlZCBhcyBDKysgd2hlbiB0aGUgYXBwIGlzIHdy
+aXR0ZW4gaW4gQysrLiBUaGUNCj5tYWNybyB3aXRoIHRoZSBhc3NpZ25tZW50IGl0c2VsZiBpcyBv
+bGRlciwgYnV0IG9ubHkgcmVjZW50IEJsdWV6IHN0YXJ0cyB0byB1c2UgaXQgaW4NCj5pbmxpbmUg
+ZnVuY3Rpb25zLCB0aHVzIHRyaWdnZXJpbmcgdGhlIHByb2JsZW0uDQo+DQo+QXR0YWNoZWQgaXMg
+YSBwcm9wb3NlZCBzb2x1dGlvbi4gTm90ZSB0aGF0IEkgaGF2ZSBvbmx5IHZlcmlmaWVkIHRoYXQg
+aXQgbm93DQo+Y29tcGlsZXMgaW4gQyBhbmQgQysrLCBJIGhhdmUgbm90IGFjdHVhbGx5IHRlc3Rl
+ZCB0aGUgcmVzdWx0aW5nIEJsdWV6LCBiZWNhdXNlDQo+Y29tcGlsYXRpb24gZmFpbHMgZm9yIG1l
+IG9uIERlYmlhbiBUZXN0aW5nIGZvciBhbm90aGVyIHJlYXNvbiAobGliY2hlY2suYSBsaW5rZWQN
+Cj5pbnRvIHNoYXJlZCBvYmplY3QsIGRvZXNuJ3Qgd29yayBiZWNhdXNlIG5vdCByZWxvY2F0YWJs
+ZSkuDQo+DQoNClZlcmlmaWVkIGluIEJsdWV6LCBhbmQgaXQgY29tcGlsZXMgc3VjY2Vzc2Z1bGx5
+Lg0KVGhhbmtzLg0KDQo+LS0NCj5CZXN0IFJlZ2FyZHMsIFBhdHJpY2sgT2hseQ0KPg0KPlRoZSBj
+b250ZW50IG9mIHRoaXMgbWVzc2FnZSBpcyBteSBwZXJzb25hbCBvcGluaW9uIG9ubHkgYW5kIGFs
+dGhvdWdoIEkgYW0gYW4NCj5lbXBsb3llZSBvZiBJbnRlbCwgdGhlIHN0YXRlbWVudHMgSSBtYWtl
+IGhlcmUgaW4gbm8gd2F5IHJlcHJlc2VudCBJbnRlbCdzDQo+cG9zaXRpb24gb24gdGhlIGlzc3Vl
+LCBub3IgYW0gSSBhdXRob3JpemVkIHRvIHNwZWFrIG9uIGJlaGFsZiBvZiBJbnRlbCBvbiB0aGlz
+DQo+bWF0dGVyLg0KDQo=
