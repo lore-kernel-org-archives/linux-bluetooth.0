@@ -2,42 +2,45 @@ Return-Path: <cyrus@holtmann.org>
 From: Yu A Wang <arron.wang@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Yu A Wang <arron.wang@intel.com>
-Subject: [PATCH 2/2] rfkill: Set device powered even adapter is not created
-Date: Mon, 16 Jan 2012 04:02:50 -0500
-Message-Id: <1326704570-22854-1-git-send-email-arron.wang@intel.com>
+Subject: [PATCH 1/2] adapter: Export set powered operation
+Date: Mon, 16 Jan 2012 04:02:42 -0500
+Message-Id: <1326704562-22825-1-git-send-email-arron.wang@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/rfkill.c |   13 ++++++++++---
- 1 files changed, 10 insertions(+), 3 deletions(-)
+ src/adapter.c |    5 +++++
+ src/adapter.h |    1 +
+ 2 files changed, 6 insertions(+), 0 deletions(-)
 
-diff --git a/src/rfkill.c b/src/rfkill.c
-index b40c6e7..5d32fac 100644
---- a/src/rfkill.c
-+++ b/src/rfkill.c
-@@ -128,11 +128,18 @@ static gboolean rfkill_event(GIOChannel *chan,
- 	if (id < 0)
- 		return TRUE;
+diff --git a/src/adapter.c b/src/adapter.c
+index 7e4bbb6..e124010 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3363,6 +3363,11 @@ int adapter_ops_setup(void)
+ 	return ret;
+ }
  
-+	DBG("RFKILL unblock for hci%d", id);
++int adapter_ops_set_powered(int index, gboolean powered)
++{
++	return adapter_ops->set_powered(index, powered);
++}
 +
- 	adapter = manager_find_adapter_by_id(id);
--	if (!adapter)
-+	if (!adapter) {
-+		/*
-+		 * If device is rfkilled, the initialize operation
-+		 * may failed and adapter is not created, then we
-+		 * need to set the device powered directly.
-+		 */
-+		adapter_ops_set_powered(id, TRUE);
- 		return TRUE;
--
--	DBG("RFKILL unblock for hci%d", id);
-+	}
+ void btd_adapter_register_powered_callback(struct btd_adapter *adapter,
+ 						btd_adapter_powered_cb cb)
+ {
+diff --git a/src/adapter.h b/src/adapter.h
+index fb1dcdf..9dfd927 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -214,6 +214,7 @@ struct btd_adapter_ops {
+ int btd_register_adapter_ops(struct btd_adapter_ops *ops, gboolean priority);
+ void btd_adapter_cleanup_ops(struct btd_adapter_ops *btd_adapter_ops);
+ int adapter_ops_setup(void);
++int adapter_ops_set_powered(int index, gboolean powered);
  
- 	btd_adapter_restore_powered(adapter);
- 
+ typedef void (*btd_adapter_powered_cb) (struct btd_adapter *adapter,
+ 						gboolean powered);
 -- 
 1.7.2.2
 
