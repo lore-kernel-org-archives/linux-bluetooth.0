@@ -1,53 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Jan 2012 10:27:25 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: Daniel Wagner <wagi@monom.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
-Message-ID: <20120117082725.GA14943@x220.P-661HNU-F1>
-References: <1312921615.2261.1.camel@THOR>
- <4F04285E.1070500@monom.org>
- <4F0AA5A2.4070903@monom.org>
- <20120111112646.GB23277@x220>
- <1326742631.32064.21.camel@thor>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1326742631.32064.21.camel@thor>
+Message-ID: <1326786758.6454.287.camel@aeonflux>
+Subject: Re: As long as we're adding to the Device Connected mgmt event...
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Mat Martineau <mathewm@codeaurora.org>,
+	linux-bluetooth@vger.kernel.org, skrovvid@codeaurora.org
+Date: Tue, 17 Jan 2012 08:52:38 +0100
+In-Reply-To: <20120116231423.GA13647@x220.P-661HNU-F1>
+References: <alpine.DEB.2.02.1201131159420.24403@mathewm-linux>
+	 <20120115110354.GA12977@x220.P-661HNU-F1>
+	 <1326696332.6454.272.camel@aeonflux>
+	 <alpine.DEB.2.02.1201160807170.29809@mathewm-linux>
+	 <20120116231423.GA13647@x220.P-661HNU-F1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+Hi Johan,
 
-On Mon, Jan 16, 2012, Peter Hurley wrote:
-> The situation with this patch is that I asked Gustavo not to apply it
-> (via IRC). Although the patch works, the overall logic of the
-> auth/encryption system is flawed.
+> > >>>I noticed your recent bluez.git commit that modifies the Device
+> > >>>Connected event.  Would it also make sense to add the results of the
+> > >>>READ_REMOTE_VERSION command?
+> > >>>
+> > >>>lmp_ver
+> > >>>manufacturer
+> > >>>lmp_subver
+> > >>>
+> > >>>This information was captured in bluetoothd when using hciops, but
+> > >>>has so far been missing with mgmtops.
+> > >>
+> > >>Do you have a real use-case for it? It'd expect that info to be at most
+> > >>useful to the kernel side but not so much for user-space. FWIW, we came
+> > >>to the conclusion with Marcel that a better approach with this
+> > >>mgmt_ev_device_connected is to encode both the class and the name as an
+> > >>EIR blob. We'll also do that for the class that's currently as a
+> > >>separate parameter in mgmt_ev_device_found. This simplifies the
+> > >>structure of both events and also allows for future extensibility.
+> > >
+> > >in addition, these information are purely debugging details and I think
+> > >it would be better to use sysfs or debugfs for it.
+> > 
+> > The use case involves checking the remote LMP version to figure out
+> > if the remote device supports EDR, to get a rough estimate of
+> > available bandwidth.  Lower bandwidth devices can then use different
+> > settings at the profile or application layer.
 > 
-> With respect to this issue specifically (ie, ssp vs. non-ssp auth +
-> encrypt), the flaw is that the semantic meaning of the
-> HCI_CONN_ENCRYPT_PEND bit is overloaded. The meaning of one sense is
-> that an actual HCI_OP_SET_CONN_ENCRYPT command is in-flight, and thus,
-> for this hci connection, neither an auth nor encrypt request should be
-> sent. The second meaning is that the event handler *should* submit an
-> encrypt request upon receiving a successful auth complete event.
-> 
-> At the time, I had a patch prepared which addressed this duality as part
-> of a series which enabled true re-auth & sec_level promotion.
-> Unfortunately, I discovered that a prior patch had been submitted and
-> applied which specifically disables sec_level promotion for non-ssp
-> devices. The ml conversation died here
-> http://marc.info/?l=linux-bluetooth&m=131609282919575&w=2 so I dropped
-> it.
+> If something like that is really needed then I think some sort of a
+> socket option might make more sense, i.e. the application could call
+> getsockopt (or some higher level wrapper like BtIO) to figure this out.
+> In any case it's not enough for the remote device to support EDR if the
+> local device isn't capable of it.
 
-I think it'd be important to continue with this work. Even for
-controllers that don't allow a "security upgrade" you can still detect
-the situation when you get an auth_complete without any preceding
-link_key or PIN request and just drop the connection in such a case. For
-legacy pairing this would only happen when going from MEDIUM to HIGH
-since LOW means that you don't have a link key yet.
+if we look a little bit ahead of this and trying to do this right, then
+we better add some SCM data that indicates what our current possible
+bandwidth might be. And we do that while receiving a packet and not with
+some socket option. We just have to enable it via a socket option. This
+could account for BR or EDR or even HS and in case it changes on the
+fly. I am pretty sure I mentioned this already some time before.
 
-Btw, could you tell me the commit id of this "patch which specifically
-disables sec_level promotion for non-ssp devices"?
+The only real bummer is that the BR/EDR packet mask is just a simple
+indication that we are giving to the controller. It does not mean that
+it will always give us the maximum bandwidth possible. Especially if we
+also have SCO connection open.
 
-Johan
+Most likely still better than magically assuming something based on the
+remote LMP version ;)
+
+Regards
+
+Marcel
+
+
