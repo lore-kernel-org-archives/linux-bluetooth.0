@@ -2,73 +2,57 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 03/11] Add storage functions to handle SMP keys
-Date: Tue, 17 Jan 2012 20:28:42 -0300
-Message-Id: <1326842930-31623-3-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ 02/11] Add messages to the mgmt interface to handle SMP key storage
+Date: Tue, 17 Jan 2012 20:28:41 -0300
+Message-Id: <1326842930-31623-2-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For now, only the Long Term Key (LTK) is stored.
+The SMP keys are to be communicated to/from userspace using these
+messages.
 ---
- src/storage.c |   32 ++++++++++++++++++++++++++++++++
- src/storage.h |    2 ++
- 2 files changed, 34 insertions(+), 0 deletions(-)
+ lib/mgmt.h |   22 ++++++++++++++++++++++
+ 1 files changed, 22 insertions(+), 0 deletions(-)
 
-diff --git a/src/storage.c b/src/storage.c
-index a47720a..960eeb5 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -1310,3 +1310,35 @@ void delete_device_ccc(bdaddr_t *local, bdaddr_t *peer)
- 	create_filename(filename, PATH_MAX, local, "ccc");
- 	delete_by_pattern(filename, addr);
- }
-+
-+int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key)
-+{
-+	char filename[PATH_MAX + 1], addr[18];
-+
-+	if (!key)
-+		return -EINVAL;
-+
-+	create_filename(filename, PATH_MAX, local, "longtermkeys");
-+
-+	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-+
-+	ba2str(peer, addr);
-+	return textfile_put(filename, addr, key);
-+}
-+
-+gboolean has_longtermkeys(bdaddr_t *local, bdaddr_t *peer)
-+{
-+	char filename[PATH_MAX + 1], addr[18], *str;
-+
-+	create_filename(filename, PATH_MAX, local, "longtermkeys");
-+
-+	ba2str(peer, addr);
-+
-+	str = textfile_caseget(filename, addr);
-+	if (str) {
-+		free(str);
-+		return TRUE;
-+	}
-+
-+	return FALSE;
-+}
-diff --git a/src/storage.h b/src/storage.h
-index 51259f6..604cc49 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -88,6 +88,8 @@ int read_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint16_t handle,
- int write_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint16_t handle,
- 							uint16_t value);
- void delete_device_ccc(bdaddr_t *local, bdaddr_t *peer);
-+int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key);
-+gboolean has_longtermkeys(bdaddr_t *local, bdaddr_t *peer);
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index fa684e8..eae8deb 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -275,6 +275,22 @@ struct mgmt_cp_unblock_device {
+ 	bdaddr_t bdaddr;
+ } __packed;
  
- #define PNP_UUID		"00001200-0000-1000-8000-00805f9b34fb"
- 
++struct mgmt_ltk_info {
++	struct mgmt_addr_info addr;
++	uint8_t authenticated;
++	uint8_t master;
++	uint8_t enc_size;
++	uint16_t ediv;
++	uint8_t rand[8];
++	uint8_t val[16];
++} __packed;
++
++#define MGMT_OP_LOAD_LONG_TERM_KEYS	0x0026
++struct mgmt_cp_load_long_term_keys {
++	uint16_t key_count;
++	struct mgmt_ltk_info keys[0];
++} __packed;
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	uint16_t opcode;
+@@ -374,3 +390,9 @@ struct mgmt_ev_device_blocked {
+ struct mgmt_ev_device_unblocked {
+ 	bdaddr_t bdaddr;
+ } __packed;
++
++#define MGMT_EV_NEW_LONG_TERM_KEY	0x0016
++struct mgmt_ev_new_long_term_key {
++	uint8_t store_hint;
++	struct mgmt_ltk_info key;
++} __packed;
 -- 
 1.7.8.1
 
