@@ -2,30 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 11/11] Remove the SMP Long Term Key when the device is removed
-Date: Tue, 17 Jan 2012 20:28:50 -0300
-Message-Id: <1326842930-31623-11-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ 10/11] Fix memory leak when loading keys
+Date: Tue, 17 Jan 2012 20:28:49 -0300
+Message-Id: <1326842930-31623-10-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+If we need a copy of those keys we should copy them.
 ---
- src/device.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ plugins/hciops.c |   13 ++++++++++++-
+ 1 files changed, 12 insertions(+), 1 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 16855b1..8d02c2c 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1088,6 +1088,7 @@ static void device_remove_stored(struct btd_device *device)
- 	if (device_is_bonded(device)) {
- 		delete_entry(&src, "linkkeys", addr);
- 		delete_entry(&src, "aliases", addr);
-+		delete_entry(&src, "longtermkeys", addr);
- 		device_set_bonded(device, FALSE);
- 		device->paired = FALSE;
- 		btd_adapter_remove_bonding(device->adapter, &device->bdaddr);
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index f519e0c..72c12cb 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -3558,6 +3558,7 @@ static int hciops_restore_powered(int index)
+ static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
+ {
+ 	struct dev_info *dev = &devs[index];
++	GSList *l, *new;
+ 
+ 	DBG("hci%d keys %d debug_keys %d", index, g_slist_length(keys),
+ 								debug_keys);
+@@ -3565,7 +3566,17 @@ static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
+ 	if (dev->keys != NULL)
+ 		return -EEXIST;
+ 
+-	dev->keys = keys;
++	for (new = NULL, l = keys; l; l = l->next) {
++		struct link_key_info *orig, *dup;
++
++		orig = l->data;
++
++		dup = g_memdup(orig, sizeof(*orig));
++
++		new = g_slist_prepend(new, dup);
++	}
++
++	dev->keys = new;
+ 	dev->debug_keys = debug_keys;
+ 
+ 	return 0;
 -- 
 1.7.8.1
 
