@@ -1,34 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 1/3] Fix wrong offset in EIR name parsing
-Date: Tue, 17 Jan 2012 12:18:00 -0400
-Message-Id: <1326817082-6787-1-git-send-email-anderson.lizardo@openbossa.org>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: Daniel Wagner <wagi@monom.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Tue, 17 Jan 2012 07:34:33 -0500
+Subject: Re: [PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
+Message-ID: <1326803673.4432.2.camel@thor>
+References: <1312921615.2261.1.camel@THOR> <4F04285E.1070500@monom.org>
+	 <4F0AA5A2.4070903@monom.org> <20120111112646.GB23277@x220>
+	 <1326742631.32064.21.camel@thor> <20120117082725.GA14943@x220.P-661HNU-F1>
+In-Reply-To: <20120117082725.GA14943@x220.P-661HNU-F1>
+Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When looking for NUL byte terminators on EIR names, the first two bytes
-of the EIR field should be skipped, which correspond to field length and
-EIR type.
----
- src/eir.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+Hi Johan,
 
-diff --git a/src/eir.c b/src/eir.c
-index 1b68949..ff50cf8 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -159,7 +159,8 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
- 			 * the name */
- 			name_len = field_len - 1;
- 
--			while (name_len > 0 && eir_data[name_len - 1] == '\0')
-+			while (name_len > 0 &&
-+					eir_data[2 + name_len - 1] == '\0')
- 				name_len--;
- 
- 			if (!g_utf8_validate((char *) &eir_data[2],
--- 
-1.7.0.4
+On Tue, 2012-01-17 at 03:27 -0500, Johan Hedberg wrote:
+> Hi Peter,
+> 
+> On Mon, Jan 16, 2012, Peter Hurley wrote:
+> > The situation with this patch is that I asked Gustavo not to apply it
+> > (via IRC). Although the patch works, the overall logic of the
+> > auth/encryption system is flawed.
+> > 
+> > With respect to this issue specifically (ie, ssp vs. non-ssp auth +
+> > encrypt), the flaw is that the semantic meaning of the
+> > HCI_CONN_ENCRYPT_PEND bit is overloaded. The meaning of one sense is
+> > that an actual HCI_OP_SET_CONN_ENCRYPT command is in-flight, and thus,
+> > for this hci connection, neither an auth nor encrypt request should be
+> > sent. The second meaning is that the event handler *should* submit an
+> > encrypt request upon receiving a successful auth complete event.
+> > 
+> > At the time, I had a patch prepared which addressed this duality as part
+> > of a series which enabled true re-auth & sec_level promotion.
+> > Unfortunately, I discovered that a prior patch had been submitted and
+> > applied which specifically disables sec_level promotion for non-ssp
+> > devices. The ml conversation died here
+> > http://marc.info/?l=linux-bluetooth&m=131609282919575&w=2 so I dropped
+> > it.
+> 
+> I think it'd be important to continue with this work. Even for
+> controllers that don't allow a "security upgrade" you can still detect
+> the situation when you get an auth_complete without any preceding
+> link_key or PIN request and just drop the connection in such a case. For
+> legacy pairing this would only happen when going from MEDIUM to HIGH
+> since LOW means that you don't have a link key yet.
+> 
+> Btw, could you tell me the commit id of this "patch which specifically
+> disables sec_level promotion for non-ssp devices"?
 
+19f8def Bluetooth: Fix auth_complete_evt for legacy units
+
+Peter
