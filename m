@@ -1,56 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-CC: Daniel Wagner <wagi@monom.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Tue, 17 Jan 2012 07:34:33 -0500
-Subject: Re: [PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
-Message-ID: <1326803673.4432.2.camel@thor>
-References: <1312921615.2261.1.camel@THOR> <4F04285E.1070500@monom.org>
-	 <4F0AA5A2.4070903@monom.org> <20120111112646.GB23277@x220>
-	 <1326742631.32064.21.camel@thor> <20120117082725.GA14943@x220.P-661HNU-F1>
-In-Reply-To: <20120117082725.GA14943@x220.P-661HNU-F1>
-Content-Type: text/plain; charset=US-ASCII
+Date: Tue, 17 Jan 2012 14:22:53 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
+Subject: Re: [PATCH 1/2] Bluetooth: Make l2cap_ertm_data_rcv static
+Message-ID: <20120117122250.GA18057@aemeltch-MOBL1>
+References: <1326796951-16377-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1326796951-16377-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Szymon,
 
-On Tue, 2012-01-17 at 03:27 -0500, Johan Hedberg wrote:
-> Hi Peter,
-> 
-> On Mon, Jan 16, 2012, Peter Hurley wrote:
-> > The situation with this patch is that I asked Gustavo not to apply it
-> > (via IRC). Although the patch works, the overall logic of the
-> > auth/encryption system is flawed.
-> > 
-> > With respect to this issue specifically (ie, ssp vs. non-ssp auth +
-> > encrypt), the flaw is that the semantic meaning of the
-> > HCI_CONN_ENCRYPT_PEND bit is overloaded. The meaning of one sense is
-> > that an actual HCI_OP_SET_CONN_ENCRYPT command is in-flight, and thus,
-> > for this hci connection, neither an auth nor encrypt request should be
-> > sent. The second meaning is that the event handler *should* submit an
-> > encrypt request upon receiving a successful auth complete event.
-> > 
-> > At the time, I had a patch prepared which addressed this duality as part
-> > of a series which enabled true re-auth & sec_level promotion.
-> > Unfortunately, I discovered that a prior patch had been submitted and
-> > applied which specifically disables sec_level promotion for non-ssp
-> > devices. The ml conversation died here
-> > http://marc.info/?l=linux-bluetooth&m=131609282919575&w=2 so I dropped
-> > it.
-> 
-> I think it'd be important to continue with this work. Even for
-> controllers that don't allow a "security upgrade" you can still detect
-> the situation when you get an auth_complete without any preceding
-> link_key or PIN request and just drop the connection in such a case. For
-> legacy pairing this would only happen when going from MEDIUM to HIGH
-> since LOW means that you don't have a link key yet.
-> 
-> Btw, could you tell me the commit id of this "patch which specifically
-> disables sec_level promotion for non-ssp devices"?
+On Tue, Jan 17, 2012 at 11:42:30AM +0100, Szymon Janc wrote:
+> It is not used outside of l2cap_core.c.
 
-19f8def Bluetooth: Fix auth_complete_evt for legacy units
+Actually I am going to use it outside of l2cap_core. I will send my
+patches implementing A2MP without using kernel sockets soon.
 
-Peter
+Best regards 
+Andrei Emeltchenko 
+
+> 
+> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> ---
+>  net/bluetooth/l2cap_core.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 0087db8..d66c368 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -4139,7 +4139,7 @@ static inline int l2cap_data_channel_sframe(struct l2cap_chan *chan, u32 rx_cont
+>  	return 0;
+>  }
+>  
+> -int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
+> +static int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
+>  {
+>  	u32 control;
+>  	u16 req_seq;
+> -- 
+
