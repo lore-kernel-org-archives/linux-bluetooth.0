@@ -2,72 +2,123 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 07/11] Add support for handing the New LTK mgmt event
-Date: Tue, 17 Jan 2012 20:28:46 -0300
-Message-Id: <1326842930-31623-7-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ 06/11] Add support for storing a LTK when it enters bluetoothd
+Date: Tue, 17 Jan 2012 20:28:45 -0300
+Message-Id: <1326842930-31623-6-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This event would cause this key to be permanently stored.
 ---
- plugins/mgmtops.c |   35 +++++++++++++++++++++++++++++++++++
- 1 files changed, 35 insertions(+), 0 deletions(-)
+ src/event.c |   74 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/event.h |    4 +++
+ 2 files changed, 78 insertions(+), 0 deletions(-)
 
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 6d98ad9..610bb72 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -1386,6 +1386,38 @@ static void mgmt_device_unblocked(int sk, uint16_t index, void *buf, size_t len)
- 	btd_event_device_unblocked(&info->bdaddr, &ev->bdaddr);
+diff --git a/src/event.c b/src/event.c
+index d0e192b..e1d49a1 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -345,6 +345,56 @@ void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
+ 		device_set_name(device, name);
  }
  
-+static void mgmt_new_ltk(int sk, uint16_t index, void *buf, size_t len)
++static char *buf2str(uint8_t *data, int datalen)
 +{
-+	struct mgmt_ev_new_long_term_key *ev = buf;
-+	struct controller_info *info;
++	char *buf;
++	int i;
 +
-+	if (len != sizeof(*ev)) {
-+		error("new_smp_key event size mismatch (%zu != %zu)",
-+							len, sizeof(*ev));
-+		return;
-+	}
++	buf = g_try_new0(char, (datalen * 2) + 1);
++	if (buf == NULL)
++		return NULL;
 +
-+	DBG("Controller %u new LTK authenticated %u enc_size %u", index,
-+				ev->key.authenticated, ev->key.enc_size);
++	for (i = 0; i < datalen; i++)
++		sprintf(buf + (i * 2), "%2.2x", data[i]);
 +
-+	if (index > max_index) {
-+		error("Unexpected index %u in new_key event", index);
-+		return;
-+	}
-+
-+	info = &controllers[index];
-+
-+	if (ev->store_hint) {
-+		btd_event_ltk_notify(&info->bdaddr, &ev->key.addr.bdaddr,
-+				ev->key.addr.type, ev->key.val,
-+				ev->key.authenticated, ev->key.enc_size,
-+				ev->key.master, ev->key.ediv, ev->key.rand);
-+	}
-+
-+	if (ev->key.master)
-+		bonding_complete(info, &ev->key.addr.bdaddr, 0);
++	return buf;
 +}
 +
- static gboolean mgmt_event(GIOChannel *io, GIOCondition cond, gpointer user_data)
++static int store_longtermkey(bdaddr_t *local, bdaddr_t *peer,
++				addr_type_t addr_type, 	unsigned char *key,
++				uint8_t master, uint8_t authenticated,
++				uint8_t enc_size, uint16_t ediv, uint8_t rand[8])
++{
++	GString *newkey;
++	char *val, *str;
++	int err;
++
++	val = buf2str(key, 16);
++	if (val == NULL)
++		return -ENOMEM;
++
++	newkey = g_string_new(val);
++	g_free(val);
++
++	g_string_append_printf(newkey, " %d %d %d %d %d ", addr_type,
++					authenticated, master, enc_size, ediv);
++
++	str = buf2str(rand, 8);
++	if (str == NULL) {
++		g_string_free(newkey, TRUE);
++		return -ENOMEM;
++	}
++
++	newkey = g_string_append(newkey, str);
++	g_free(str);
++
++	err = write_longtermkeys(local, peer, newkey->str);
++
++	g_string_free(newkey, TRUE);
++
++	return err;
++}
++
+ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
+ 				uint8_t *key, uint8_t key_type,
+ 				uint8_t pin_length)
+@@ -370,6 +420,30 @@ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
+ 	return ret;
+ }
+ 
++int btd_event_ltk_notify(bdaddr_t *local, bdaddr_t *peer, addr_type_t addr_type,
++					uint8_t *key, uint8_t master,
++					uint8_t authenticated, uint8_t enc_size,
++					uint16_t ediv, 	uint8_t rand[8])
++{
++	struct btd_adapter *adapter;
++	struct btd_device *device;
++	int ret;
++
++	if (!get_adapter_and_device(local, peer, &adapter, &device, TRUE))
++		return -ENODEV;
++
++	ret = store_longtermkey(local, peer, addr_type, key, master,
++					authenticated, enc_size, ediv, rand);
++	if (ret == 0) {
++		device_set_bonded(device, TRUE);
++
++		if (device_is_temporary(device))
++			device_set_temporary(device, FALSE);
++	}
++
++	return ret;
++}
++
+ void btd_event_conn_complete(bdaddr_t *local, bdaddr_t *peer,
+ 						char *name, uint8_t *dev_class)
  {
- 	char buf[MGMT_BUF_SIZE];
-@@ -1487,6 +1519,9 @@ static gboolean mgmt_event(GIOChannel *io, GIOCondition cond, gpointer user_data
- 	case MGMT_EV_USER_PASSKEY_REQUEST:
- 		mgmt_passkey_request(sk, index, buf + MGMT_HDR_SIZE, len);
- 		break;
-+	case MGMT_EV_NEW_LONG_TERM_KEY:
-+		mgmt_new_ltk(sk, index, buf + MGMT_HDR_SIZE, len);
-+		break;
- 	default:
- 		error("Unknown Management opcode %u (index %u)", opcode, index);
- 		break;
+diff --git a/src/event.h b/src/event.h
+index 57b7fd9..ec38e3e 100644
+--- a/src/event.h
++++ b/src/event.h
+@@ -42,3 +42,7 @@ void btd_event_device_blocked(bdaddr_t *local, bdaddr_t *peer);
+ void btd_event_device_unblocked(bdaddr_t *local, bdaddr_t *peer);
+ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
+ 					uint8_t key_type, uint8_t pin_length);
++int btd_event_ltk_notify(bdaddr_t *local, bdaddr_t *peer, addr_type_t addr_type,
++					uint8_t *key, uint8_t master,
++					uint8_t authenticated, uint8_t enc_size,
++					uint16_t ediv, 	uint8_t rand[8]);
 -- 
 1.7.8.1
 
