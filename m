@@ -1,76 +1,296 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: keybuk@google.com
-In-Reply-To: <CANq1E4TG3=9GZ3G0NKLj1GKd8Vm7L3GV_-CWdKCX3sk5=gVUoQ@mail.gmail.com>
-References: <1326505957-27555-1-git-send-email-keybuk@chromium.org>
-	<1326505957-27555-3-git-send-email-keybuk@chromium.org>
-	<1326559307.6454.270.camel@aeonflux>
-	<CAHZ1yCm1SuTFrcFscRjg2WdnfkseCw75G+46RL+uZSSH5UFf6Q@mail.gmail.com>
-	<CANq1E4TG3=9GZ3G0NKLj1GKd8Vm7L3GV_-CWdKCX3sk5=gVUoQ@mail.gmail.com>
-Date: Mon, 16 Jan 2012 22:23:45 -0800
-Message-ID: <CAHZ1yCkKKu2Yk0Q7xU--MJZ9_0-v5U3WAQpkYTVa7gGf6ug8LQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] agent: allow agent to reply to RequestPinCode with bytes
-From: Scott James Remnant <keybuk@chromium.org>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH 4/8] Bluetooth: Use the updated key structures for handling LTKs
+Date: Mon, 16 Jan 2012 21:17:28 -0300
+Message-Id: <1326759448-2160-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <20120113214339.GB13470@samus>
+References: <20120113214339.GB13470@samus>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jan 16, 2012 at 7:44 AM, David Herrmann
-<dh.herrmann@googlemail.com> wrote:
+This updates all the users of the older way, that was using the
+link_keys list to store the SMP keys, to use the new way.
 
-> On Sat, Jan 14, 2012 at 9:34 PM, Scott James Remnant
-> <keybuk@chromium.org> wrote:
->> On Sat, Jan 14, 2012 at 8:41 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
->>
->>> > Since the specification allows the PIN to be a sequence of arbitrary
->>> > octets, and not a UTF-8 string, allow the userspace agent to reply
->>> > with such a sequence (as a D-Bus Array of Bytes).
->>> >
->>> > This means a userspace agent can deal with devices that require their
->>> > BD_ADDR (or the host's) as a PIN, and take care of trying multiple of
->>> > such requirements.
->>>
->>> this has been discussed before and the answer is a clear no to this.
->>>
->>
->> Why a no? I couldn't find the discussion in the archives.
->
-> See here:
-> http://thread.gmane.org/gmane.linux.bluez.kernel/13380
->
+This includes defining new types for the keys, we have a type for each
+combination of STK/LTK and Master/Slave.
 
-This thread doesn't give a rationale for why support for Binary PINs
-couldn't be added to BlueZ, just an alternate implementation in the
-case of the WiiMote.
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ include/net/bluetooth/hci_core.h |   11 +++--
+ net/bluetooth/hci_core.c         |   79 ++++++++++++++++++--------------------
+ net/bluetooth/hci_event.c        |    9 +++-
+ net/bluetooth/smp.c              |   38 +++++++++++-------
+ 4 files changed, 73 insertions(+), 64 deletions(-)
 
->>> You can however write a plugin that can handle binary PIN codes.
->>>
->>
->> The problem there is that the plugin can only try one, and can't retry
->> the authentication if that PIN fails.
->
-> Does your device provide proper PID/VID information? Then I see no
-> need to try several different PINs. Could you provide more information
-> with what kind of devices you are working here?
->
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 2884509..3f93fd2 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -651,12 +651,13 @@ int hci_link_keys_clear(struct hci_dev *hdev);
+ struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+ 			bdaddr_t *bdaddr, u8 *val, u8 type, u8 pin_len);
+-struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8]);
+-struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
+-					bdaddr_t *bdaddr, u8 type);
+-int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
+-			u8 key_size, __le16 ediv, u8 rand[8], u8 ltk[16]);
++struct smp_ltk *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8]);
++int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type, u8 type,
++				int new_key, u8 authenticated, u8 tk[16],
++				u8 enc_size, u16 ediv, u8 rand[8]);
+ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
++struct smp_ltk *hci_find_ltk_addr(struct hci_dev *hdev, bdaddr_t *bdaddr,
++								u8 addr_type);
+ int hci_smp_ltks_clear(struct hci_dev *hdev);
+ 
+ int hci_remote_oob_data_clear(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 3b5902d..69d07e1 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1222,41 +1222,40 @@ static int hci_persistent_key(struct hci_dev *hdev, struct hci_conn *conn,
+ 	return 0;
+ }
+ 
+-struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8])
++/* If the returned key is a STK it should be free'd by the caller */
++struct smp_ltk *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8])
+ {
+-	struct link_key *k;
+-
+-	list_for_each_entry(k, &hdev->link_keys, list) {
+-		struct key_master_id *id;
++	struct smp_ltk *k, *tmp;
+ 
+-		if (k->type != HCI_LK_SMP_LTK)
++	list_for_each_entry_safe(k, tmp, &hdev->ltks, list) {
++		if (k->ediv != ediv ||
++				memcmp(rand, k->rand, sizeof(k->rand)))
+ 			continue;
+ 
+-		if (k->dlen != sizeof(*id))
+-			continue;
++		/* The STK should only be used once, no need to keep it */
++		if (k->type & HCI_SMP_STK)
++			list_del(&k->list);
+ 
+-		id = (void *) &k->data;
+-		if (id->ediv == ediv &&
+-				(memcmp(rand, id->rand, sizeof(id->rand)) == 0))
+-			return k;
++		return k;
+ 	}
+ 
+ 	return NULL;
+ }
+ EXPORT_SYMBOL(hci_find_ltk);
+ 
+-struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
+-					bdaddr_t *bdaddr, u8 type)
++struct smp_ltk *hci_find_ltk_addr(struct hci_dev *hdev, bdaddr_t *bdaddr,
++								u8 addr_type)
+ {
+-	struct link_key *k;
++	struct smp_ltk *k;
+ 
+-	list_for_each_entry(k, &hdev->link_keys, list)
+-		if (k->type == type && bacmp(bdaddr, &k->bdaddr) == 0)
++	list_for_each_entry(k, &hdev->ltks, list)
++		if (addr_type == k->bdaddr_type &&
++					bacmp(bdaddr, &k->bdaddr) == 0)
+ 			return k;
+ 
+ 	return NULL;
+ }
+-EXPORT_SYMBOL(hci_find_link_key_type);
++EXPORT_SYMBOL(hci_find_ltk_addr);
+ 
+ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+ 				bdaddr_t *bdaddr, u8 *val, u8 type, u8 pin_len)
+@@ -1313,40 +1312,36 @@ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+ 	return 0;
+ }
+ 
+-int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
+-			u8 key_size, __le16 ediv, u8 rand[8], u8 ltk[16])
++int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type, u8 type,
++				int new_key, u8 authenticated, u8 tk[16],
++				u8 enc_size, u16 ediv, u8 rand[8])
+ {
+-	struct link_key *key, *old_key;
+-	struct key_master_id *id;
+-	u8 old_key_type;
++	struct smp_ltk *key, *old_key;
+ 
+-	BT_DBG("%s addr %s", hdev->name, batostr(bdaddr));
++	if (!(type & HCI_SMP_STK) && !(type & HCI_SMP_LTK))
++		return 0;
+ 
+-	old_key = hci_find_link_key_type(hdev, bdaddr, HCI_LK_SMP_LTK);
+-	if (old_key) {
++	old_key = hci_find_ltk_addr(hdev, bdaddr, addr_type);
++	if (old_key)
+ 		key = old_key;
+-		old_key_type = old_key->type;
+-	} else {
+-		key = kzalloc(sizeof(*key) + sizeof(*id), GFP_ATOMIC);
++	else {
++		key = kzalloc(sizeof(*key), GFP_ATOMIC);
+ 		if (!key)
+ 			return -ENOMEM;
+-		list_add(&key->list, &hdev->link_keys);
+-		old_key_type = 0xff;
++		list_add(&key->list, &hdev->ltks);
+ 	}
+ 
+-	key->dlen = sizeof(*id);
+-
+ 	bacpy(&key->bdaddr, bdaddr);
+-	memcpy(key->val, ltk, sizeof(key->val));
+-	key->type = HCI_LK_SMP_LTK;
+-	key->pin_len = key_size;
+-
+-	id = (void *) &key->data;
+-	id->ediv = ediv;
+-	memcpy(id->rand, rand, sizeof(id->rand));
++	key->bdaddr_type = addr_type;
++	memcpy(key->val, tk, sizeof(key->val));
++	key->authenticated = authenticated;
++	key->ediv = ediv;
++	key->enc_size = enc_size;
++	key->type = type;
++	memcpy(key->rand, rand, sizeof(key->rand));
+ 
+-	if (new_key)
+-		mgmt_new_link_key(hdev, key, old_key_type);
++	if (!new_key)
++		return 0;
+ 
+ 	return 0;
+ }
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index c2fe964..7251e00 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3234,7 +3234,7 @@ static inline void hci_le_ltk_request_evt(struct hci_dev *hdev,
+ 	struct hci_cp_le_ltk_reply cp;
+ 	struct hci_cp_le_ltk_neg_reply neg;
+ 	struct hci_conn *conn;
+-	struct link_key *ltk;
++	struct smp_ltk *ltk;
+ 
+ 	BT_DBG("%s handle %d", hdev->name, cpu_to_le16(ev->handle));
+ 
+@@ -3250,10 +3250,15 @@ static inline void hci_le_ltk_request_evt(struct hci_dev *hdev,
+ 
+ 	memcpy(cp.ltk, ltk->val, sizeof(ltk->val));
+ 	cp.handle = cpu_to_le16(conn->handle);
+-	conn->pin_length = ltk->pin_len;
++
++	if (ltk->authenticated)
++		conn->sec_level = BT_SECURITY_HIGH;
+ 
+ 	hci_send_cmd(hdev, HCI_OP_LE_LTK_REPLY, sizeof(cp), &cp);
+ 
++	if (ltk->type & HCI_SMP_STK)
++		kfree(ltk);
++
+ 	hci_dev_unlock(hdev);
+ 
+ 	return;
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index b7f2fd1..7bc82e4 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -472,8 +472,9 @@ static void random_work(struct work_struct *work)
+ 		memset(stk + smp->enc_key_size, 0,
+ 				SMP_MAX_ENC_KEY_SIZE - smp->enc_key_size);
+ 
+-		hci_add_ltk(hcon->hdev, 0, conn->dst, smp->enc_key_size,
+-							ediv, rand, stk);
++		hci_add_ltk(hcon->hdev, conn->dst, hcon->dst_type,
++						HCI_SMP_STK_SLAVE, 0, 0, stk,
++						smp->enc_key_size, ediv, rand);
+ 	}
+ 
+ 	return;
+@@ -698,12 +699,10 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ static u8 smp_ltk_encrypt(struct l2cap_conn *conn)
+ {
+-	struct link_key *key;
+-	struct key_master_id *master;
++	struct smp_ltk *key;
+ 	struct hci_conn *hcon = conn->hcon;
+ 
+-	key = hci_find_link_key_type(hcon->hdev, conn->dst,
+-						HCI_LK_SMP_LTK);
++	key = hci_find_ltk_addr(hcon->hdev, conn->dst, hcon->dst_type);
+ 	if (!key)
+ 		return 0;
+ 
+@@ -711,10 +710,8 @@ static u8 smp_ltk_encrypt(struct l2cap_conn *conn)
+ 					&hcon->pend))
+ 		return 1;
+ 
+-	master = (void *) key->data;
+-	hci_le_start_enc(hcon, master->ediv, master->rand,
+-						key->val);
+-	hcon->enc_key_size = key->pin_len;
++	hci_le_start_enc(hcon, key->ediv, key->rand, key->val);
++	hcon->enc_key_size = key->enc_size;
+ 
+ 	return 1;
+ 
+@@ -817,13 +814,19 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+ 	struct smp_cmd_master_ident *rp = (void *) skb->data;
+ 	struct smp_chan *smp = conn->smp_chan;
++	struct hci_dev *hdev = conn->hcon->hdev;
++	struct hci_conn *hcon = conn->hcon;
++	u8 authenticated;
+ 
+ 	skb_pull(skb, sizeof(*rp));
+ 
+-	hci_add_ltk(conn->hcon->hdev, 1, conn->dst, smp->enc_key_size,
+-						rp->ediv, rp->rand, smp->tk);
+-
++	hci_dev_lock(hdev);
++	authenticated = (conn->hcon->sec_level == BT_SECURITY_HIGH);
++	hci_add_ltk(conn->hcon->hdev, conn->dst, hcon->dst_type,
++					HCI_SMP_LTK, 1, authenticated, smp->tk,
++					smp->enc_key_size, rp->ediv, rp->rand);
+ 	smp_distribute_keys(conn, 1);
++	hci_dev_unlock(hdev);
+ 
+ 	return 0;
+ }
+@@ -933,6 +936,8 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
+ 	if (*keydist & SMP_DIST_ENC_KEY) {
+ 		struct smp_cmd_encrypt_info enc;
+ 		struct smp_cmd_master_ident ident;
++		struct hci_conn *hcon = conn->hcon;
++		u8 authenticated;
+ 		__le16 ediv;
+ 
+ 		get_random_bytes(enc.ltk, sizeof(enc.ltk));
+@@ -941,8 +946,11 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
+ 
+ 		smp_send_cmd(conn, SMP_CMD_ENCRYPT_INFO, sizeof(enc), &enc);
+ 
+-		hci_add_ltk(conn->hcon->hdev, 1, conn->dst, smp->enc_key_size,
+-						ediv, ident.rand, enc.ltk);
++		authenticated = hcon->sec_level == BT_SECURITY_HIGH;
++		hci_add_ltk(conn->hcon->hdev, conn->dst, hcon->dst_type,
++					HCI_SMP_LTK_SLAVE, 1, authenticated,
++					enc.ltk, smp->enc_key_size,
++					ediv, ident.rand);
+ 
+ 		ident.ediv = cpu_to_le16(ediv);
+ 
+-- 
+1.7.8.1
 
-No, but the name of the device can be strcmp()d to identify it
-
-But that's not the problem - the problem is that the PIN varies on the
-device depending on the exact mode being paired - and that's not
-something we can tell from the host.
-
-We simply need to try one of three PINs, two of which are annoyingly
-binary (they're the Bluetooth address of the device and the host
-respectively)
-
-It's kinda difficult to do this in a plugin since each authentication
-request only gets one shot - it's easier (and far cleaner) in the
-agent, which can outlive each connection attempt and be used for both,
-keeping track of the PINs it's tried.
-
-(Likewise the agent is already trying "0000" on devices, and dealing
-with not presenting a PIN for keyboards, etc.)
-
-Scott
