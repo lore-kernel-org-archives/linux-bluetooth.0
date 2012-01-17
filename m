@@ -2,166 +2,149 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 09/11] Add support for creating devices from the stored LTK's
-Date: Tue, 17 Jan 2012 20:28:48 -0300
-Message-Id: <1326842930-31623-9-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ 08/11] Add support for sending the Load Long Term Keys commands
+Date: Tue, 17 Jan 2012 20:28:47 -0300
+Message-Id: <1326842930-31623-8-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Also this adds another method to the adapter_ops method table,
+this method allows LTKs to be loaded to the kernel.
 ---
- src/adapter.c |  114 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 111 insertions(+), 3 deletions(-)
+ plugins/hciops.c  |    6 +++++
+ plugins/mgmtops.c |   55 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/adapter.h     |   12 +++++++++++
+ 3 files changed, 73 insertions(+), 0 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 2984d80..f549d40 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1829,6 +1829,65 @@ static struct link_key_info *get_key_info(const char *addr, const char *value)
- 	return info;
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 0c59c31..f519e0c 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -3779,6 +3779,11 @@ static int hciops_confirm_name(int index, bdaddr_t *bdaddr,
+ 	return 0;
  }
  
-+static int str2buf(const char *str, uint8_t *buf, size_t blen)
++static int hciops_load_ltks(int index, GSList *keys)
 +{
-+	int i, dlen;
-+
-+	if (str == NULL)
-+		return -EINVAL;
-+
-+	memset(buf, 0, blen);
-+
-+	dlen = MIN((strlen(str) / 2), blen);
-+
-+	for (i = 0; i < dlen; i++)
-+		sscanf(str + (i * 2), "%02hhX", &buf[i]);
-+
-+	return 0;
++	return -ENOSYS;
 +}
 +
-+static struct smp_ltk_info *get_ltk_info(const char *addr, const char *value)
-+{
-+	struct smp_ltk_info *ltk;
-+	char tmp[3], *ptr;
-+	int i, ret, total;
-+
-+	total = strlen(value);
-+	if (total < 60) {
-+		error("Unexpectedly short (%zu) LTK", strlen(value));
-+		return NULL;
-+	}
-+
-+	ltk = g_new0(struct smp_ltk_info, 1);
-+
-+	str2ba(addr, &ltk->bdaddr);
-+
-+	memset(tmp, 0, sizeof(tmp));
-+
-+	for (i = 0; i < 16; i++) {
-+		memcpy(tmp, value + (i * 2), 2);
-+		ltk->val[i] = (uint8_t) strtol(tmp, NULL, 16);
-+	}
-+
-+	ptr = (char *) value + 33;
-+	total -= 33;
-+
-+	ret = sscanf(ptr, " %hhd %hhd %hhd %hhd %hd %n",
-+					(uint8_t *) &ltk->addr_type,
-+					&ltk->authenticated, &ltk->master,
-+					&ltk->enc_size, &ltk->ediv, &i);
-+	if (ret < 2) {
-+		g_free(ltk);
-+		return NULL;
-+	}
-+	ptr += i;
-+	total -= i;
-+
-+	str2buf(ptr, ltk->rand, sizeof(ltk->rand));
-+
-+	return ltk;
-+}
-+
- static void create_stored_device_from_linkkeys(char *key, char *value,
- 							void *user_data)
- {
-@@ -1852,6 +1911,37 @@ static void create_stored_device_from_linkkeys(char *key, char *value,
- 	}
+ static struct btd_adapter_ops hci_ops = {
+ 	.setup = hciops_setup,
+ 	.cleanup = hciops_cleanup,
+@@ -3815,6 +3820,7 @@ static struct btd_adapter_ops hci_ops = {
+ 	.add_remote_oob_data = hciops_add_remote_oob_data,
+ 	.remove_remote_oob_data = hciops_remove_remote_oob_data,
+ 	.confirm_name = hciops_confirm_name,
++	.load_ltks = hciops_load_ltks,
+ };
+ 
+ static int hciops_init(void)
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index 610bb72..40e1572 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -2075,6 +2075,60 @@ static int mgmt_confirm_name(int index, bdaddr_t *bdaddr, gboolean name_known)
+ 	return 0;
  }
  
-+static void create_stored_device_from_ltks(char *key, char *value,
-+							void *user_data)
++
++static int mgmtops_load_ltks(int index, GSList *keys)
 +{
-+	struct adapter_keys *keys = user_data;
-+	struct btd_adapter *adapter = keys->adapter;
-+	struct btd_device *device;
-+	struct smp_ltk_info *info;
-+	char srcaddr[18];
-+	bdaddr_t src;
++	char *buf;
++	struct mgmt_hdr *hdr;
++	struct mgmt_cp_load_long_term_keys *cp;
++	struct mgmt_ltk_info *key;
++	size_t key_count, cp_size;
++	GSList *l;
++	int err;
 +
-+	info = get_ltk_info(key, value);
-+	if (info)
-+		keys->keys = g_slist_append(keys->keys, info);
++	key_count = g_slist_length(keys);
 +
-+	if (g_slist_find_custom(adapter->devices, key,
-+					(GCompareFunc) device_address_cmp))
-+		return;
++	DBG("index %d keys %zu", index, key_count);
 +
-+	adapter_get_address(adapter, &src);
-+	ba2str(&src, srcaddr);
++	cp_size = sizeof(*cp) + (key_count * sizeof(*key));
 +
-+	if (g_strcmp0(srcaddr, key) == 0)
-+		return;
++	buf = g_try_malloc0(sizeof(*hdr) + cp_size);
++	if (buf == NULL)
++		return -ENOMEM;
 +
-+	device = device_create(connection, adapter, key, info->addr_type);
-+	if (device) {
-+		device_set_temporary(device, FALSE);
-+		adapter->devices = g_slist_append(adapter->devices, device);
++	memset(buf, 0, sizeof(buf));
++
++	hdr = (void *) buf;
++	hdr->opcode = htobs(MGMT_OP_LOAD_LONG_TERM_KEYS);
++	hdr->len = htobs(cp_size);
++	hdr->index = htobs(index);
++
++	cp = (void *) (buf + sizeof(*hdr));
++	cp->key_count = htobs(key_count);
++
++	for (l = keys, key = cp->keys; l != NULL; l = g_slist_next(l), key++) {
++		struct smp_ltk_info *info = l->data;
++
++		bacpy(&key->addr.bdaddr, &info->bdaddr);
++		key->addr.type = info->addr_type;
++		memcpy(key->val, info->val, sizeof(info->val));
++		memcpy(key->rand, info->rand, sizeof(info->rand));
++		memcpy(&key->ediv, &info->ediv, sizeof(key->ediv));
++		key->authenticated = info->authenticated;
++		key->master = info->master;
++		key->enc_size = info->enc_size;
 +	}
++
++	if (write(mgmt_sock, buf, sizeof(*hdr) + cp_size) < 0)
++		err = -errno;
++	else
++		err = 0;
++
++	g_free(buf);
++
++	return err;
 +}
 +
- static void create_stored_device_from_blocked(char *key, char *value,
- 							void *user_data)
- {
-@@ -1939,6 +2029,13 @@ static void create_stored_device_from_primary(char *key, char *value,
- 	g_slist_free(uuids);
- }
+ static struct btd_adapter_ops mgmt_ops = {
+ 	.setup = mgmt_setup,
+ 	.cleanup = mgmt_cleanup,
+@@ -2111,6 +2165,7 @@ static struct btd_adapter_ops mgmt_ops = {
+ 	.add_remote_oob_data = mgmt_add_remote_oob_data,
+ 	.remove_remote_oob_data = mgmt_remove_remote_oob_data,
+ 	.confirm_name = mgmt_confirm_name,
++	.load_ltks = mgmtops_load_ltks,
+ };
  
-+static void smp_key_free(void *data)
-+{
-+	struct smp_ltk_info *info = data;
-+
-+	g_free(info);
-+}
-+
- static void load_devices(struct btd_adapter *adapter)
- {
- 	char filename[PATH_MAX + 1];
-@@ -1961,11 +2058,22 @@ static void load_devices(struct btd_adapter *adapter)
+ static int mgmt_init(void)
+diff --git a/src/adapter.h b/src/adapter.h
+index fb1dcdf..1e11e93 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -56,6 +56,17 @@ struct link_key_info {
+ 	uint8_t pin_len;
+ };
  
- 	err = adapter_ops->load_keys(adapter->dev_id, keys.keys,
- 							main_opts.debug_keys);
--	if (err < 0) {
-+	if (err < 0)
- 		error("Unable to load keys to adapter_ops: %s (%d)",
- 							strerror(-err), -err);
--		g_slist_free_full(keys.keys, g_free);
--	}
++struct smp_ltk_info {
++	bdaddr_t bdaddr;
++	addr_type_t addr_type;
++	uint8_t authenticated;
++	uint8_t master;
++	uint8_t enc_size;
++	uint16_t ediv;
++	uint8_t rand[8];
++	uint8_t val[16];
++};
 +
-+	g_slist_free_full(keys.keys, g_free);
-+	keys.keys = NULL;
-+
-+	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "longtermkeys");
-+	textfile_foreach(filename, create_stored_device_from_ltks, &keys);
-+
-+	err = adapter_ops->load_ltks(adapter->dev_id, keys.keys);
-+	if (err < 0)
-+		error("Unable to load keys to adapter_ops: %s (%d)",
-+							strerror(-err), -err);
-+	g_slist_free_full(keys.keys, smp_key_free);
-+	keys.keys = NULL;
+ struct remote_dev_info {
+ 	bdaddr_t bdaddr;
+ 	addr_type_t type;
+@@ -209,6 +220,7 @@ struct btd_adapter_ops {
+ 							uint8_t *randomizer);
+ 	int (*remove_remote_oob_data) (int index, bdaddr_t *bdaddr);
+ 	int (*confirm_name) (int index, bdaddr_t *bdaddr, gboolean name_known);
++	int (*load_ltks) (int index, GSList *keys);
+ };
  
- 	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "blocked");
- 	textfile_foreach(filename, create_stored_device_from_blocked, adapter);
+ int btd_register_adapter_ops(struct btd_adapter_ops *ops, gboolean priority);
 -- 
 1.7.8.1
 
