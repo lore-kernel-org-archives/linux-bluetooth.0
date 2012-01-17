@@ -1,56 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1326785993.6454.276.camel@aeonflux>
-Subject: Re: As long as we're adding to the Device Connected mgmt event...
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, skrovvid@codeaurora.org
-Date: Tue, 17 Jan 2012 08:39:53 +0100
-In-Reply-To: <alpine.DEB.2.02.1201160807170.29809@mathewm-linux>
-References: <alpine.DEB.2.02.1201131159420.24403@mathewm-linux>
-	  <20120115110354.GA12977@x220.P-661HNU-F1>
-	 <1326696332.6454.272.camel@aeonflux>
-	 <alpine.DEB.2.02.1201160807170.29809@mathewm-linux>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Sender: keybuk@google.com
+In-Reply-To: <CANq1E4TG3=9GZ3G0NKLj1GKd8Vm7L3GV_-CWdKCX3sk5=gVUoQ@mail.gmail.com>
+References: <1326505957-27555-1-git-send-email-keybuk@chromium.org>
+	<1326505957-27555-3-git-send-email-keybuk@chromium.org>
+	<1326559307.6454.270.camel@aeonflux>
+	<CAHZ1yCm1SuTFrcFscRjg2WdnfkseCw75G+46RL+uZSSH5UFf6Q@mail.gmail.com>
+	<CANq1E4TG3=9GZ3G0NKLj1GKd8Vm7L3GV_-CWdKCX3sk5=gVUoQ@mail.gmail.com>
+Date: Mon, 16 Jan 2012 22:23:45 -0800
+Message-ID: <CAHZ1yCkKKu2Yk0Q7xU--MJZ9_0-v5U3WAQpkYTVa7gGf6ug8LQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] agent: allow agent to reply to RequestPinCode with bytes
+From: Scott James Remnant <keybuk@chromium.org>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+On Mon, Jan 16, 2012 at 7:44 AM, David Herrmann
+<dh.herrmann@googlemail.com> wrote:
 
-> >>> I noticed your recent bluez.git commit that modifies the Device
-> >>> Connected event.  Would it also make sense to add the results of the
-> >>> READ_REMOTE_VERSION command?
-> >>>
-> >>> lmp_ver
-> >>> manufacturer
-> >>> lmp_subver
-> >>>
-> >>> This information was captured in bluetoothd when using hciops, but
-> >>> has so far been missing with mgmtops.
-> >>
-> >> Do you have a real use-case for it? It'd expect that info to be at most
-> >> useful to the kernel side but not so much for user-space. FWIW, we came
-> >> to the conclusion with Marcel that a better approach with this
-> >> mgmt_ev_device_connected is to encode both the class and the name as an
-> >> EIR blob. We'll also do that for the class that's currently as a
-> >> separate parameter in mgmt_ev_device_found. This simplifies the
-> >> structure of both events and also allows for future extensibility.
-> >
-> > in addition, these information are purely debugging details and I think
-> > it would be better to use sysfs or debugfs for it.
-> 
-> The use case involves checking the remote LMP version to figure out if 
-> the remote device supports EDR, to get a rough estimate of available 
-> bandwidth.  Lower bandwidth devices can then use different settings at 
-> the profile or application layer.
+> On Sat, Jan 14, 2012 at 9:34 PM, Scott James Remnant
+> <keybuk@chromium.org> wrote:
+>> On Sat, Jan 14, 2012 at 8:41 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>>
+>>> > Since the specification allows the PIN to be a sequence of arbitrary
+>>> > octets, and not a UTF-8 string, allow the userspace agent to reply
+>>> > with such a sequence (as a D-Bus Array of Bytes).
+>>> >
+>>> > This means a userspace agent can deal with devices that require their
+>>> > BD_ADDR (or the host's) as a PIN, and take care of trying multiple of
+>>> > such requirements.
+>>>
+>>> this has been discussed before and the answer is a clear no to this.
+>>>
+>>
+>> Why a no? I couldn't find the discussion in the archives.
+>
+> See here:
+> http://thread.gmane.org/gmane.linux.bluez.kernel/13380
+>
 
-I can see your point here, but that check is wrong way in achieving
-this. Such a thing needs to be done a) via supported features and b) via
-the actual allowed packets. Looking at remote LMP version is wrong.
+This thread doesn't give a rationale for why support for Binary PINs
+couldn't be added to BlueZ, just an alternate implementation in the
+case of the WiiMote.
 
-Regards
+>>> You can however write a plugin that can handle binary PIN codes.
+>>>
+>>
+>> The problem there is that the plugin can only try one, and can't retry
+>> the authentication if that PIN fails.
+>
+> Does your device provide proper PID/VID information? Then I see no
+> need to try several different PINs. Could you provide more information
+> with what kind of devices you are working here?
+>
 
-Marcel
+No, but the name of the device can be strcmp()d to identify it
 
+But that's not the problem - the problem is that the PIN varies on the
+device depending on the exact mode being paired - and that's not
+something we can tell from the host.
 
+We simply need to try one of three PINs, two of which are annoyingly
+binary (they're the Bluetooth address of the device and the host
+respectively)
+
+It's kinda difficult to do this in a plugin since each authentication
+request only gets one shot - it's easier (and far cleaner) in the
+agent, which can outlive each connection attempt and be used for both,
+keeping track of the PINs it's tried.
+
+(Likewise the agent is already trying "0000" on devices, and dealing
+with not presenting a PIN for keyboards, etc.)
+
+Scott
