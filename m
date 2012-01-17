@@ -1,96 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1326786461.6454.283.camel@aeonflux>
-Subject: Re: [PATCH 2/2] agent: allow agent to reply to RequestPinCode with
- bytes
+Message-ID: <1326785993.6454.276.camel@aeonflux>
+Subject: Re: As long as we're adding to the Device Connected mgmt event...
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Scott James Remnant <keybuk@chromium.org>
-Cc: David Herrmann <dh.herrmann@googlemail.com>,
-	linux-bluetooth@vger.kernel.org
-Date: Tue, 17 Jan 2012 08:47:41 +0100
-In-Reply-To: <CAHZ1yCkKKu2Yk0Q7xU--MJZ9_0-v5U3WAQpkYTVa7gGf6ug8LQ@mail.gmail.com>
-References: <1326505957-27555-1-git-send-email-keybuk@chromium.org>
-	 <1326505957-27555-3-git-send-email-keybuk@chromium.org>
-	 <1326559307.6454.270.camel@aeonflux>
-	 <CAHZ1yCm1SuTFrcFscRjg2WdnfkseCw75G+46RL+uZSSH5UFf6Q@mail.gmail.com>
-	 <CANq1E4TG3=9GZ3G0NKLj1GKd8Vm7L3GV_-CWdKCX3sk5=gVUoQ@mail.gmail.com>
-	 <CAHZ1yCkKKu2Yk0Q7xU--MJZ9_0-v5U3WAQpkYTVa7gGf6ug8LQ@mail.gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org, skrovvid@codeaurora.org
+Date: Tue, 17 Jan 2012 08:39:53 +0100
+In-Reply-To: <alpine.DEB.2.02.1201160807170.29809@mathewm-linux>
+References: <alpine.DEB.2.02.1201131159420.24403@mathewm-linux>
+	  <20120115110354.GA12977@x220.P-661HNU-F1>
+	 <1326696332.6454.272.camel@aeonflux>
+	 <alpine.DEB.2.02.1201160807170.29809@mathewm-linux>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Scott,
+Hi Mat,
 
-> >> On Sat, Jan 14, 2012 at 8:41 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> >>
-> >>> > Since the specification allows the PIN to be a sequence of arbitrary
-> >>> > octets, and not a UTF-8 string, allow the userspace agent to reply
-> >>> > with such a sequence (as a D-Bus Array of Bytes).
-> >>> >
-> >>> > This means a userspace agent can deal with devices that require their
-> >>> > BD_ADDR (or the host's) as a PIN, and take care of trying multiple of
-> >>> > such requirements.
+> >>> I noticed your recent bluez.git commit that modifies the Device
+> >>> Connected event.  Would it also make sense to add the results of the
+> >>> READ_REMOTE_VERSION command?
 > >>>
-> >>> this has been discussed before and the answer is a clear no to this.
+> >>> lmp_ver
+> >>> manufacturer
+> >>> lmp_subver
 > >>>
+> >>> This information was captured in bluetoothd when using hciops, but
+> >>> has so far been missing with mgmtops.
 > >>
-> >> Why a no? I couldn't find the discussion in the archives.
+> >> Do you have a real use-case for it? It'd expect that info to be at most
+> >> useful to the kernel side but not so much for user-space. FWIW, we came
+> >> to the conclusion with Marcel that a better approach with this
+> >> mgmt_ev_device_connected is to encode both the class and the name as an
+> >> EIR blob. We'll also do that for the class that's currently as a
+> >> separate parameter in mgmt_ev_device_found. This simplifies the
+> >> structure of both events and also allows for future extensibility.
 > >
-> > See here:
-> > http://thread.gmane.org/gmane.linux.bluez.kernel/13380
-> >
+> > in addition, these information are purely debugging details and I think
+> > it would be better to use sysfs or debugfs for it.
 > 
-> This thread doesn't give a rationale for why support for Binary PINs
-> couldn't be added to BlueZ, just an alternate implementation in the
-> case of the WiiMote.
+> The use case involves checking the remote LMP version to figure out if 
+> the remote device supports EDR, to get a rough estimate of available 
+> bandwidth.  Lower bandwidth devices can then use different settings at 
+> the profile or application layer.
 
-the BlueZ agent request is a direct question to the user. And the
-question is meant to give something they can understand and something
-they will also be entering on the other side.
-
-It is not for trying to shoehorn Legacy Pairing into Simple Pairing.
-Never was and never will be. Hence we are doing UTF-8 only strings.
-
-> >>> You can however write a plugin that can handle binary PIN codes.
-> >>>
-> >>
-> >> The problem there is that the plugin can only try one, and can't retry
-> >> the authentication if that PIN fails.
-> >
-> > Does your device provide proper PID/VID information? Then I see no
-> > need to try several different PINs. Could you provide more information
-> > with what kind of devices you are working here?
-> >
-> 
-> No, but the name of the device can be strcmp()d to identify it
-> 
-> But that's not the problem - the problem is that the PIN varies on the
-> device depending on the exact mode being paired - and that's not
-> something we can tell from the host.
-> 
-> We simply need to try one of three PINs, two of which are annoyingly
-> binary (they're the Bluetooth address of the device and the host
-> respectively)
-> 
-> It's kinda difficult to do this in a plugin since each authentication
-> request only gets one shot - it's easier (and far cleaner) in the
-> agent, which can outlive each connection attempt and be used for both,
-> keeping track of the PINs it's tried.
-
-I have to send you back to reading the Bluetooth specification for
-Legacy Pairing when trying multiple pairing attempts. There is a
-built-in security concept that will make this concept really
-complicated.
-
-Nothing you should handle inside the UI anyway. The agent is not meant
-for this. Built a plugin that can handle this for you. We support that
-for exactly these weird devices that wanna emulate Simple Pairing, but
-are too lazy to do just use a Bluetooth 2.1 stack + device.
-
-And now I have to ask the question, why are we bothering this heavy with
-trying to do auto pairing with Legacy Pairing where almost everything
-has moved on the Simple Pairing and the users have been trained to enter
-0000 for their HID and headset devices if they ever get asked?
+I can see your point here, but that check is wrong way in achieving
+this. Such a thing needs to be done a) via supported features and b) via
+the actual allowed packets. Looking at remote LMP version is wrong.
 
 Regards
 
