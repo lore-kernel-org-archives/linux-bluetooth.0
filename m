@@ -2,123 +2,57 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 06/11] Add support for storing a LTK when it enters bluetoothd
-Date: Tue, 17 Jan 2012 20:28:45 -0300
-Message-Id: <1326842930-31623-6-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ 05/11] Fix using "magic" values for the key types
+Date: Tue, 17 Jan 2012 20:28:44 -0300
+Message-Id: <1326842930-31623-5-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/event.c |   74 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/event.h |    4 +++
- 2 files changed, 78 insertions(+), 0 deletions(-)
+ plugins/hciops.c |   10 ++++++----
+ 1 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/src/event.c b/src/event.c
-index d0e192b..e1d49a1 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -345,6 +345,56 @@ void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
- 		device_set_name(device, name);
- }
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 0ebf533..0c59c31 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -1028,12 +1028,12 @@ static void link_key_notify(int index, void *ptr)
+ 	DBG("local auth 0x%02x and remote auth 0x%02x",
+ 					conn->loc_auth, conn->rem_auth);
  
-+static char *buf2str(uint8_t *data, int datalen)
-+{
-+	char *buf;
-+	int i;
-+
-+	buf = g_try_new0(char, (datalen * 2) + 1);
-+	if (buf == NULL)
-+		return NULL;
-+
-+	for (i = 0; i < datalen; i++)
-+		sprintf(buf + (i * 2), "%2.2x", data[i]);
-+
-+	return buf;
-+}
-+
-+static int store_longtermkey(bdaddr_t *local, bdaddr_t *peer,
-+				addr_type_t addr_type, 	unsigned char *key,
-+				uint8_t master, uint8_t authenticated,
-+				uint8_t enc_size, uint16_t ediv, uint8_t rand[8])
-+{
-+	GString *newkey;
-+	char *val, *str;
-+	int err;
-+
-+	val = buf2str(key, 16);
-+	if (val == NULL)
-+		return -ENOMEM;
-+
-+	newkey = g_string_new(val);
-+	g_free(val);
-+
-+	g_string_append_printf(newkey, " %d %d %d %d %d ", addr_type,
-+					authenticated, master, enc_size, ediv);
-+
-+	str = buf2str(rand, 8);
-+	if (str == NULL) {
-+		g_string_free(newkey, TRUE);
-+		return -ENOMEM;
-+	}
-+
-+	newkey = g_string_append(newkey, str);
-+	g_free(str);
-+
-+	err = write_longtermkeys(local, peer, newkey->str);
-+
-+	g_string_free(newkey, TRUE);
-+
-+	return err;
-+}
-+
- int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
- 				uint8_t *key, uint8_t key_type,
- 				uint8_t pin_length)
-@@ -370,6 +420,30 @@ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
- 	return ret;
- }
+-	if (key_type == 0x06) {
++	if (key_type == HCI_LK_CHANGED_COMBINATION) {
+ 		/* Some buggy controller combinations generate a changed
+ 		 * combination key for legacy pairing even when there's no
+ 		 * previous key */
+ 		if (conn->rem_auth == 0xff && old_key_type == 0xff)
+-			key_type = 0x00;
++			key_type = HCI_LK_COMBINATION;
+ 		else if (old_key_type != 0xff)
+ 			key_type = old_key_type;
+ 		else
+@@ -1045,7 +1045,7 @@ static void link_key_notify(int index, void *ptr)
+ 	key_info->type = key_type;
  
-+int btd_event_ltk_notify(bdaddr_t *local, bdaddr_t *peer, addr_type_t addr_type,
-+					uint8_t *key, uint8_t master,
-+					uint8_t authenticated, uint8_t enc_size,
-+					uint16_t ediv, 	uint8_t rand[8])
-+{
-+	struct btd_adapter *adapter;
-+	struct btd_device *device;
-+	int ret;
-+
-+	if (!get_adapter_and_device(local, peer, &adapter, &device, TRUE))
-+		return -ENODEV;
-+
-+	ret = store_longtermkey(local, peer, addr_type, key, master,
-+					authenticated, enc_size, ediv, rand);
-+	if (ret == 0) {
-+		device_set_bonded(device, TRUE);
-+
-+		if (device_is_temporary(device))
-+			device_set_temporary(device, FALSE);
-+	}
-+
-+	return ret;
-+}
-+
- void btd_event_conn_complete(bdaddr_t *local, bdaddr_t *peer,
- 						char *name, uint8_t *dev_class)
- {
-diff --git a/src/event.h b/src/event.h
-index 57b7fd9..ec38e3e 100644
---- a/src/event.h
-+++ b/src/event.h
-@@ -42,3 +42,7 @@ void btd_event_device_blocked(bdaddr_t *local, bdaddr_t *peer);
- void btd_event_device_unblocked(bdaddr_t *local, bdaddr_t *peer);
- int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
- 					uint8_t key_type, uint8_t pin_length);
-+int btd_event_ltk_notify(bdaddr_t *local, bdaddr_t *peer, addr_type_t addr_type,
-+					uint8_t *key, uint8_t master,
-+					uint8_t authenticated, uint8_t enc_size,
-+					uint16_t ediv, 	uint8_t rand[8]);
+ 	/* Skip the storage check if this is a debug key */
+-	if (key_type == 0x03)
++	if (key_type == HCI_LK_DEBUG_COMBINATION)
+ 		goto done;
+ 
+ 	/* Store the link key persistently if one of the following is true:
+@@ -1059,7 +1059,9 @@ static void link_key_notify(int index, void *ptr)
+ 	 * If none of the above match only keep the link key around for
+ 	 * this connection and set the temporary flag for the device.
+ 	 */
+-	if (key_type < 0x03 || (key_type == 0x06 && old_key_type != 0xff) ||
++	if (key_type < HCI_LK_DEBUG_COMBINATION ||
++			(key_type == HCI_LK_CHANGED_COMBINATION
++					&& old_key_type != HCI_LK_INVALID) ||
+ 			(conn->loc_auth > 0x01 && conn->rem_auth > 0x01) ||
+ 			(conn->loc_auth == 0x02 || conn->loc_auth == 0x03) ||
+ 			(conn->rem_auth == 0x02 || conn->rem_auth == 0x03)) {
 -- 
 1.7.8.1
 
