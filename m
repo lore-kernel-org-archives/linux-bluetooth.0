@@ -2,39 +2,73 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 04/11] Add macros for the possible link key types
-Date: Tue, 17 Jan 2012 20:28:43 -0300
-Message-Id: <1326842930-31623-4-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ 03/11] Add storage functions to handle SMP keys
+Date: Tue, 17 Jan 2012 20:28:42 -0300
+Message-Id: <1326842930-31623-3-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+For now, only the Long Term Key (LTK) is stored.
 ---
- lib/hci.h |   10 ++++++++++
- 1 files changed, 10 insertions(+), 0 deletions(-)
+ src/storage.c |   32 ++++++++++++++++++++++++++++++++
+ src/storage.h |    2 ++
+ 2 files changed, 34 insertions(+), 0 deletions(-)
 
-diff --git a/lib/hci.h b/lib/hci.h
-index 48692fa..7f68ea0 100644
---- a/lib/hci.h
-+++ b/lib/hci.h
-@@ -293,6 +293,16 @@ enum {
- #define HCI_LM_RELIABLE	0x0010
- #define HCI_LM_SECURE	0x0020
- 
-+/* Link Key types */
-+#define HCI_LK_COMBINATION		0x00
-+#define HCI_LK_LOCAL_UNIT		0x01
-+#define HCI_LK_REMOTE_UNIT		0x02
-+#define HCI_LK_DEBUG_COMBINATION	0x03
-+#define HCI_LK_UNAUTH_COMBINATION	0x04
-+#define HCI_LK_AUTH_COMBINATION		0x05
-+#define HCI_LK_CHANGED_COMBINATION	0x06
-+#define HCI_LK_INVALID			0xFF
+diff --git a/src/storage.c b/src/storage.c
+index a47720a..960eeb5 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -1310,3 +1310,35 @@ void delete_device_ccc(bdaddr_t *local, bdaddr_t *peer)
+ 	create_filename(filename, PATH_MAX, local, "ccc");
+ 	delete_by_pattern(filename, addr);
+ }
 +
- /* -----  HCI Commands ----- */
++int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key)
++{
++	char filename[PATH_MAX + 1], addr[18];
++
++	if (!key)
++		return -EINVAL;
++
++	create_filename(filename, PATH_MAX, local, "longtermkeys");
++
++	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
++
++	ba2str(peer, addr);
++	return textfile_put(filename, addr, key);
++}
++
++gboolean has_longtermkeys(bdaddr_t *local, bdaddr_t *peer)
++{
++	char filename[PATH_MAX + 1], addr[18], *str;
++
++	create_filename(filename, PATH_MAX, local, "longtermkeys");
++
++	ba2str(peer, addr);
++
++	str = textfile_caseget(filename, addr);
++	if (str) {
++		free(str);
++		return TRUE;
++	}
++
++	return FALSE;
++}
+diff --git a/src/storage.h b/src/storage.h
+index 51259f6..604cc49 100644
+--- a/src/storage.h
++++ b/src/storage.h
+@@ -88,6 +88,8 @@ int read_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint16_t handle,
+ int write_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint16_t handle,
+ 							uint16_t value);
+ void delete_device_ccc(bdaddr_t *local, bdaddr_t *peer);
++int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key);
++gboolean has_longtermkeys(bdaddr_t *local, bdaddr_t *peer);
  
- /* Link Control */
+ #define PNP_UUID		"00001200-0000-1000-8000-00805f9b34fb"
+ 
 -- 
 1.7.8.1
 
