@@ -1,24 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 Jan 2012 14:06:22 +0200
+Date: Wed, 18 Jan 2012 13:57:35 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/2] gobex: Remove reduntant NULL assignment
-Message-ID: <20120118120622.GA6655@x220>
-References: <1326448552-8297-1-git-send-email-jaganath.k@samsung.com>
+Subject: Re: [PATCH BlueZ 02/11] Add messages to the mgmt interface to handle
+ SMP key storage
+Message-ID: <20120118115735.GA5970@x220>
+References: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1326842930-31623-2-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1326448552-8297-1-git-send-email-jaganath.k@samsung.com>
+In-Reply-To: <1326842930-31623-2-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi Vinicius,
 
-On Fri, Jan 13, 2012, Jaganath Kanakkassery wrote:
-> ---
->  gobex/gobex.c |    2 --
->  1 files changed, 0 insertions(+), 2 deletions(-)
+On Tue, Jan 17, 2012, Vinicius Costa Gomes wrote:
+> +#define MGMT_EV_NEW_LONG_TERM_KEY	0x0016
+> +struct mgmt_ev_new_long_term_key {
+> +	uint8_t store_hint;
+> +	struct mgmt_ltk_info key;
+> +} __packed;
 
-This patch has been applied. Thanks.
+I've pushed the first patch, but this doesn't match mgmt-api.txt. In the
+API doc the event code is 0x0015.
 
 Johan
