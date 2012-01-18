@@ -2,50 +2,46 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ v2 3/4] Fix memory leak when loading keys
-Date: Wed, 18 Jan 2012 20:13:31 -0300
-Message-Id: <1326928412-25910-3-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ v2 2/4] Use the helper function to convert a string to a binary buffer
+Date: Wed, 18 Jan 2012 20:13:30 -0300
+Message-Id: <1326928412-25910-2-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1326928412-25910-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1326928412-25910-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If we need a copy of those keys we should copy them.
+When loading Link Keys from storage we are able to re-use the function
+that was introduced earlier for the LTK case.
 ---
- plugins/hciops.c |   13 ++++++++++++-
- 1 files changed, 12 insertions(+), 1 deletions(-)
+ src/adapter.c |    8 +-------
+ 1 files changed, 1 insertions(+), 7 deletions(-)
 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index d4d219c..4e0729e 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -3563,6 +3563,7 @@ static int hciops_restore_powered(int index)
- static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
- {
- 	struct dev_info *dev = &devs[index];
-+	GSList *l, *new;
+diff --git a/src/adapter.c b/src/adapter.c
+index 6e8552b..d5075db 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1819,7 +1819,6 @@ static struct link_key_info *get_key_info(const char *addr, const char *value)
+ 	struct link_key_info *info;
+ 	char tmp[3];
+ 	long int l;
+-	int i;
  
- 	DBG("hci%d keys %d debug_keys %d", index, g_slist_length(keys),
- 								debug_keys);
-@@ -3570,7 +3571,17 @@ static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
- 	if (dev->keys != NULL)
- 		return -EEXIST;
+ 	if (strlen(value) < 36) {
+ 		error("Unexpectedly short (%zu) link key line", strlen(value));
+@@ -1830,12 +1829,7 @@ static struct link_key_info *get_key_info(const char *addr, const char *value)
  
--	dev->keys = keys;
-+	for (new = NULL, l = keys; l; l = l->next) {
-+		struct link_key_info *orig, *dup;
-+
-+		orig = l->data;
-+
-+		dup = g_memdup(orig, sizeof(*orig));
-+
-+		new = g_slist_prepend(new, dup);
-+	}
-+
-+	dev->keys = new;
- 	dev->debug_keys = debug_keys;
+ 	str2ba(addr, &info->bdaddr);
  
- 	return 0;
+-	memset(tmp, 0, sizeof(tmp));
+-
+-	for (i = 0; i < 16; i++) {
+-		memcpy(tmp, value + (i * 2), 2);
+-		info->key[i] = (uint8_t) strtol(tmp, NULL, 16);
+-	}
++	str2buf(value, info->key, sizeof(info->key));
+ 
+ 	memcpy(tmp, value + 33, 2);
+ 	info->type = (uint8_t) strtol(tmp, NULL, 10);
 -- 
 1.7.8.1
 
