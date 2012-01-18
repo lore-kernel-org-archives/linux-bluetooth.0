@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1326914334.6454.410.camel@aeonflux>
-Subject: Re: [PATCH 14/15] Bluetooth: Rename hdev->flags to
- hdev->compat_flags
+Message-ID: <1326914231.6454.409.camel@aeonflux>
+Subject: Re: [PATCH 13/15] Bluetooth: Update device_connected and
+ device_found events to latest API
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 18 Jan 2012 20:18:54 +0100
-In-Reply-To: <1326912717-6347-15-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 18 Jan 2012 20:17:11 +0100
+In-Reply-To: <1326912717-6347-14-git-send-email-johan.hedberg@gmail.com>
 References: <1326912717-6347-1-git-send-email-johan.hedberg@gmail.com>
-	 <1326912717-6347-15-git-send-email-johan.hedberg@gmail.com>
+	 <1326912717-6347-14-git-send-email-johan.hedberg@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,42 +16,22 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> These flags mostly exist for legacy reasons and no new flags should be
-> added to this set, so compat_flags is a better name.
+> This patch updates mgmt_ev_device_connected and mgmt_ev_device found to
+> include an EIR-encoded remote name and class whenever possible. With
+> this addition the mgmt_ev_remote_name event becomes unnecessary and can
+> be removed. Since the connected event doesn't map to hci_conn_complete
+> anymore a HCI_CONN_MGMT_CONNECTED flag is added to track when mgmt has
+> been notified about a connection.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  drivers/bluetooth/bfusb.c        |   12 +++---
->  drivers/bluetooth/bpa10x.c       |   12 +++---
->  drivers/bluetooth/btmrvl_main.c  |    9 +++--
->  drivers/bluetooth/btusb.c        |   20 +++++-----
->  drivers/bluetooth/hci_ldisc.c    |    6 ++--
->  drivers/bluetooth/hci_vhci.c     |    6 ++--
->  include/net/bluetooth/hci.h      |    7 +---
->  include/net/bluetooth/hci_core.h |    2 +-
->  net/bluetooth/hci_conn.c         |    7 ++--
->  net/bluetooth/hci_core.c         |   71 +++++++++++++++++++------------------
->  net/bluetooth/hci_event.c        |   43 ++++++++++++-----------
->  net/bluetooth/hci_sock.c         |    8 ++--
->  net/bluetooth/mgmt.c             |   38 ++++++++++----------
->  13 files changed, 121 insertions(+), 120 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
-> index e97f42a..8f77290 100644
-> --- a/drivers/bluetooth/bfusb.c
-> +++ b/drivers/bluetooth/bfusb.c
-> @@ -191,7 +191,7 @@ static void bfusb_tx_complete(struct urb *urb)
->  
->  	atomic_dec(&data->pending_tx);
->  
-> -	if (!test_bit(HCI_RUNNING, &data->hdev->flags))
-> +	if (!test_bit(HCI_RUNNING, &data->hdev->compat_flags))
->  		return;
+>  include/net/bluetooth/hci_core.h |    7 ++-
+>  include/net/bluetooth/mgmt.h     |   17 ++++----
+>  net/bluetooth/hci_event.c        |   78 +++++++++++++++++++++++++++-----------
+>  net/bluetooth/mgmt.c             |   56 ++++++++++++++++++++-------
+>  4 files changed, 110 insertions(+), 48 deletions(-)
 
-I do not like this change at all.
-
-Can we just add a BT specific helper for setting/testing HCI_RUNNING and
-hiding the fact of hdev->flags.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
