@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: lkslawek@gmail.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd v4 4/4] map_ap.c: Add dumping of map_ap_t after decoding
-Date: Wed, 18 Jan 2012 20:06:25 +0100
-Message-Id: <4f171845.9c010e0a.7b51.1df7@mx.google.com>
+Subject: [PATCH obexd v4 3/4] map_ap.c: Add implementation for map_ap_decode()
+Date: Wed, 18 Jan 2012 20:06:24 +0100
+Message-Id: <4f171844.9c010e0a.7b51.1df4@mx.google.com>
 In-Reply-To: <1326913585-14577-1-git-send-email-y>
 References: <1326913585-14577-1-git-send-email-y>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,52 +13,134 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 
 ---
- src/map_ap.c |   25 +++++++++++++++++++++++++
- 1 files changed, 25 insertions(+), 0 deletions(-)
+ src/map_ap.c |   98 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 97 insertions(+), 1 deletions(-)
 
 diff --git a/src/map_ap.c b/src/map_ap.c
-index 657d86b..168d163 100644
+index 04b370f..657d86b 100644
 --- a/src/map_ap.c
 +++ b/src/map_ap.c
-@@ -125,6 +125,29 @@ static int find_ap_def_offset(uint8_t tag)
- 	return -1;
+@@ -25,6 +25,10 @@
+ #include <config.h>
+ #endif
+ 
++#include <string.h>
++
++#include "log.h"
++
+ #include "map_ap.h"
+ 
+ enum ap_type {
+@@ -103,6 +107,13 @@ struct ap_entry {
+ 	} val;
+ };
+ 
++/* This comes from OBEX specs */
++struct obex_ap_header {
++	uint8_t tag;
++	uint8_t len;
++	uint8_t val[0];
++} __attribute__ ((packed));
++
+ static int find_ap_def_offset(uint8_t tag)
+ {
+ 	int i;
+@@ -141,9 +152,94 @@ void map_ap_free(map_ap_t *ap)
+ 	g_hash_table_destroy(ap);
  }
  
-+static void ap_entry_dump(gpointer tag, gpointer val, gpointer user_data)
++static void ap_decode_u8(map_ap_t *ap, const struct obex_ap_header *hdr)
 +{
-+	struct ap_entry *entry = val;
-+	int offset;
-+
-+	offset = find_ap_def_offset(GPOINTER_TO_INT(tag));
-+
-+	switch (ap_defs[offset].type) {
-+	case APT_UINT8:
-+		DBG("%-30s %08x", ap_defs[offset].name, entry->val.u8);
-+		break;
-+	case APT_UINT16:
-+		DBG("%-30s %08x", ap_defs[offset].name, entry->val.u16);
-+		break;
-+	case APT_UINT32:
-+		DBG("%-30s %08x", ap_defs[offset].name, entry->val.u32);
-+		break;
-+	case APT_STR:
-+		DBG("%-30s %s", ap_defs[offset].name, entry->val.str);
-+		break;
++	if (hdr->len != 1) {
++		DBG("Value of tag %d is %d bytes long instead of expected "
++				"1 byte - skipped!", hdr->tag, hdr->len);
++		return;
 +	}
++
++	map_ap_set_u8(ap, hdr->tag, hdr->val[0]);
 +}
 +
- static void ap_entry_free(gpointer val)
- {
- 	struct ap_entry *entry = val;
-@@ -239,6 +262,8 @@ map_ap_t *map_ap_decode(const uint8_t *buffer, size_t length)
- 		}
- 	}
- 
-+	g_hash_table_foreach(ap, ap_entry_dump, NULL);
++static void ap_decode_u16(map_ap_t *ap, const struct obex_ap_header *hdr)
++{
++	uint16_t val;
 +
- 	return ap;
++	if (hdr->len != 2) {
++		DBG("Value of tag %d is %d bytes long instead of expected "
++				"2 bytes - skipped!", hdr->tag, hdr->len);
++		return;
++	}
++
++	memcpy(&val, hdr->val, sizeof(val));
++	map_ap_set_u16(ap, hdr->tag, GUINT16_FROM_BE(val));
++}
++
++static void ap_decode_u32(map_ap_t *ap, const struct obex_ap_header *hdr)
++{
++	uint32_t val;
++
++	if (hdr->len != 4) {
++		DBG("Value of tag %d is %d bytes long instead of expected "
++				"4 bytes - skipped!", hdr->tag, hdr->len);
++		return;
++	}
++
++	memcpy(&val, hdr->val, sizeof(val));
++	map_ap_set_u32(ap, hdr->tag, GUINT32_FROM_BE(val));
++}
++
++static void ap_decode_str(map_ap_t *ap, const struct obex_ap_header *hdr)
++{
++	char *val = g_malloc0(hdr->len + 1);
++
++	memcpy(val, hdr->val, hdr->len);
++	map_ap_set_string(ap, hdr->tag, val);
++
++	g_free(val);
++}
++
+ map_ap_t *map_ap_decode(const uint8_t *buffer, size_t length)
+ {
+-	return NULL;
++	map_ap_t *ap;
++	struct obex_ap_header *hdr;
++	uint32_t done;
++	int offset;
++
++	ap = map_ap_new();
++	if (!ap)
++		return NULL;
++
++	for (done = 0;  done < length; done += hdr->len + sizeof(*hdr)) {
++		hdr = (void *) buffer + done;
++
++		offset = find_ap_def_offset(hdr->tag);
++
++		if (offset < 0) {
++			DBG("Unknown tag %d (length %d) - skipped.",
++							hdr->tag, hdr->len);
++			continue;
++		}
++
++		switch (ap_defs[offset].type) {
++		case APT_UINT8:
++			ap_decode_u8(ap, hdr);
++			break;
++		case APT_UINT16:
++			ap_decode_u16(ap, hdr);
++			break;
++		case APT_UINT32:
++			ap_decode_u32(ap, hdr);
++			break;
++		case APT_STR:
++			ap_decode_str(ap, hdr);
++			break;
++		}
++	}
++
++	return ap;
  }
  
+ uint8_t *map_ap_encode(map_ap_t *ap, size_t *length)
 -- 
 1.7.5.1
 
