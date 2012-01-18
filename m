@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 09/15] Bluetooth: Merge boolean members of struct hci_conn into flags
-Date: Wed, 18 Jan 2012 20:51:51 +0200
-Message-Id: <1326912717-6347-10-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 08/15] Bluetooth: Rename conn->pend to conn->flags
+Date: Wed, 18 Jan 2012 20:51:50 +0200
+Message-Id: <1326912717-6347-9-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1326912717-6347-1-git-send-email-johan.hedberg@gmail.com>
 References: <1326912717-6347-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,188 +11,381 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Now that the flags member of struct hci_conn is supposed to accommodate
-any boolean type values we can easily merge all boolean members into it.
+These flags can and will be used for more general purpose values than
+just pending state transitions so the more common name "flags" makes
+more sense than "pend".
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
  include/net/bluetooth/hci_core.h |    6 +++---
- net/bluetooth/hci_conn.c         |   15 +++++++++------
- net/bluetooth/hci_event.c        |   21 +++++++++++++--------
- 3 files changed, 25 insertions(+), 17 deletions(-)
+ net/bluetooth/hci_conn.c         |   20 ++++++++++----------
+ net/bluetooth/hci_event.c        |   36 ++++++++++++++++++------------------
+ net/bluetooth/l2cap_core.c       |    2 +-
+ net/bluetooth/smp.c              |   19 +++++++++----------
+ 5 files changed, 41 insertions(+), 42 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c8ae176..5f6cb35 100644
+index 02aa0f9..c8ae176 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -286,7 +286,6 @@ struct hci_conn {
- 	__u8		attempt;
- 	__u8		dev_class[3];
- 	__u8		features[8];
--	__u8		ssp_mode;
- 	__u16		interval;
- 	__u16		pkt_type;
- 	__u16		link_policy;
-@@ -298,12 +297,10 @@ struct hci_conn {
- 	__u8		pin_length;
- 	__u8		enc_key_size;
+@@ -300,7 +300,7 @@ struct hci_conn {
  	__u8		io_capability;
--	__u8		power_save;
+ 	__u8		power_save;
  	__u16		disc_timeout;
- 	unsigned long	flags;
+-	unsigned long	pend;
++	unsigned long	flags;
  
  	__u8		remote_cap;
--	__u8		remote_oob;
- 	__u8		remote_auth;
+ 	__u8		remote_oob;
+@@ -764,7 +764,7 @@ static inline void hci_proto_auth_cfm(struct hci_conn *conn, __u8 status)
+ 	if (conn->type != ACL_LINK && conn->type != LE_LINK)
+ 		return;
  
- 	unsigned int	sent;
-@@ -409,6 +406,9 @@ enum {
- 	HCI_CONN_MODE_CHANGE_PEND,
- 	HCI_CONN_SCO_SETUP_PEND,
- 	HCI_CONN_LE_SMP_PEND,
-+	HCI_CONN_SSP_SUPPORT,
-+	HCI_CONN_POWER_SAVE,
-+	HCI_CONN_REMOTE_OOB,
- };
+-	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend))
++	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags))
+ 		return;
  
- static inline void hci_conn_hash_init(struct hci_dev *hdev)
+ 	encrypt = (conn->link_mode & HCI_LM_ENCRYPT) ? 0x01 : 0x00;
+@@ -805,7 +805,7 @@ static inline void hci_auth_cfm(struct hci_conn *conn, __u8 status)
+ 
+ 	hci_proto_auth_cfm(conn, status);
+ 
+-	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend))
++	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags))
+ 		return;
+ 
+ 	encrypt = (conn->link_mode & HCI_LM_ENCRYPT) ? 0x01 : 0x00;
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 8a4678a..566254f 100644
+index 3db4324..8a4678a 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -105,7 +105,8 @@ void hci_acl_connect(struct hci_conn *conn)
- 		}
- 
- 		memcpy(conn->dev_class, ie->data.dev_class, 3);
--		conn->ssp_mode = ie->data.ssp_mode;
-+		if (ie->data.ssp_mode > 0)
-+			set_bit(HCI_CONN_SSP_SUPPORT, &conn->flags);
+@@ -337,7 +337,7 @@ static void hci_conn_enter_sniff_mode(struct hci_conn *conn)
+ 		hci_send_cmd(hdev, HCI_OP_SNIFF_SUBRATE, sizeof(cp), &cp);
  	}
  
- 	cp.pkt_type = cpu_to_le16(conn->pkt_type);
-@@ -386,7 +387,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- 	conn->remote_auth = 0xff;
- 	conn->key_type = 0xff;
- 
--	conn->power_save = 1;
-+	set_bit(HCI_CONN_POWER_SAVE, &conn->flags);
- 	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
- 
- 	switch (type) {
-@@ -586,7 +587,7 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
- 
- 	if (acl->state == BT_CONNECTED &&
- 			(sco->state == BT_OPEN || sco->state == BT_CLOSED)) {
--		acl->power_save = 1;
-+		set_bit(HCI_CONN_POWER_SAVE, &acl->flags);
+-	if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend)) {
++	if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags)) {
+ 		struct hci_cp_sniff_mode cp;
+ 		cp.handle       = cpu_to_le16(conn->handle);
+ 		cp.max_interval = cpu_to_le16(hdev->sniff_max_interval);
+@@ -589,9 +589,9 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
+ 		acl->power_save = 1;
  		hci_conn_enter_active_mode(acl, BT_POWER_FORCE_ACTIVE_ON);
  
- 		if (test_bit(HCI_CONN_MODE_CHANGE_PEND, &acl->flags)) {
-@@ -607,7 +608,8 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
+-		if (test_bit(HCI_CONN_MODE_CHANGE_PEND, &acl->pend)) {
++		if (test_bit(HCI_CONN_MODE_CHANGE_PEND, &acl->flags)) {
+ 			/* defer SCO setup until mode change completed */
+-			set_bit(HCI_CONN_SCO_SETUP_PEND, &acl->pend);
++			set_bit(HCI_CONN_SCO_SETUP_PEND, &acl->flags);
+ 			return sco;
+ 		}
+ 
+@@ -633,13 +633,13 @@ static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
+ 
+ 	conn->auth_type = auth_type;
+ 
+-	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->pend)) {
++	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->flags)) {
+ 		struct hci_cp_auth_requested cp;
+ 		cp.handle = cpu_to_le16(conn->handle);
+ 		hci_send_cmd(conn->hdev, HCI_OP_AUTH_REQUESTED,
+ 							sizeof(cp), &cp);
+ 		if (conn->key_type != 0xff)
+-			set_bit(HCI_CONN_REAUTH_PEND, &conn->pend);
++			set_bit(HCI_CONN_REAUTH_PEND, &conn->flags);
+ 	}
+ 
+ 	return 0;
+@@ -650,7 +650,7 @@ static void hci_conn_encrypt(struct hci_conn *conn)
  {
  	BT_DBG("conn %p", conn);
  
--	if (conn->ssp_mode > 0 && conn->hdev->ssp_mode > 0 &&
-+	if (test_bit(HCI_CONN_SSP_SUPPORT, &conn->flags) &&
-+					conn->hdev->ssp_mode > 0 &&
- 					!(conn->link_mode & HCI_LM_ENCRYPT))
+-	if (!test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend)) {
++	if (!test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags)) {
+ 		struct hci_cp_set_conn_encrypt cp;
+ 		cp.handle  = cpu_to_le16(conn->handle);
+ 		cp.encrypt = 0x01;
+@@ -700,7 +700,7 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
+ 		goto encrypt;
+ 
+ auth:
+-	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend))
++	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags))
  		return 0;
  
-@@ -671,7 +673,8 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
- 	/* For non 2.1 devices and low security level we don't need the link
- 	   key. */
- 	if (sec_level == BT_SECURITY_LOW &&
--				(!conn->ssp_mode || !conn->hdev->ssp_mode))
-+			(!test_bit(HCI_CONN_SSP_SUPPORT, &conn->flags) ||
-+							!conn->hdev->ssp_mode))
+ 	if (!hci_conn_auth(conn, sec_level, auth_type))
+@@ -735,7 +735,7 @@ int hci_conn_change_link_key(struct hci_conn *conn)
+ {
+ 	BT_DBG("conn %p", conn);
+ 
+-	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->pend)) {
++	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->flags)) {
+ 		struct hci_cp_change_conn_link_key cp;
+ 		cp.handle = cpu_to_le16(conn->handle);
+ 		hci_send_cmd(conn->hdev, HCI_OP_CHANGE_CONN_LINK_KEY,
+@@ -754,7 +754,7 @@ int hci_conn_switch_role(struct hci_conn *conn, __u8 role)
+ 	if (!role && conn->link_mode & HCI_LM_MASTER)
  		return 1;
  
- 	/* For other security levels we need the link key. */
-@@ -778,7 +781,7 @@ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active)
- 	if (conn->mode != HCI_CM_SNIFF)
+-	if (!test_and_set_bit(HCI_CONN_RSWITCH_PEND, &conn->pend)) {
++	if (!test_and_set_bit(HCI_CONN_RSWITCH_PEND, &conn->flags)) {
+ 		struct hci_cp_switch_role cp;
+ 		bacpy(&cp.bdaddr, &conn->dst);
+ 		cp.role = role;
+@@ -781,7 +781,7 @@ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active)
+ 	if (!conn->power_save && !force_active)
  		goto timer;
  
--	if (!conn->power_save && !force_active)
-+	if (!test_bit(HCI_CONN_POWER_SAVE, &conn->flags) && !force_active)
- 		goto timer;
- 
- 	if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags)) {
+-	if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend)) {
++	if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags)) {
+ 		struct hci_cp_exit_sniff_mode cp;
+ 		cp.handle = cpu_to_le16(conn->handle);
+ 		hci_send_cmd(hdev, HCI_OP_EXIT_SNIFF_MODE, sizeof(cp), &cp);
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 373ae73..e592ddc 100644
+index a50e857..373ae73 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -1264,7 +1264,8 @@ static int hci_outgoing_auth_needed(struct hci_dev *hdev,
- 
- 	/* Only request authentication for SSP connections or non-SSP
- 	 * devices with sec_level HIGH or if MITM protection is requested */
--	if (!(hdev->ssp_mode > 0 && conn->ssp_mode > 0) &&
-+	if (!(hdev->ssp_mode > 0 &&
-+			test_bit(HCI_CONN_SSP_SUPPORT, &conn->flags)) &&
- 				conn->pending_sec_level != BT_SECURITY_HIGH &&
- 				!(conn->auth_type & 0x01))
- 		return 0;
-@@ -1816,7 +1817,8 @@ static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+@@ -1344,7 +1344,7 @@ static void hci_cs_remote_name_req(struct hci_dev *hdev, __u8 status)
+ 	if (!hci_outgoing_auth_needed(hdev, conn))
  		goto unlock;
  
- 	if (!ev->status) {
--		if (!(conn->ssp_mode > 0 && hdev->ssp_mode > 0) &&
-+		if (!(test_bit(HCI_CONN_SSP_SUPPORT, &conn->flags) &&
-+							hdev->ssp_mode > 0) &&
- 				test_bit(HCI_CONN_REAUTH_PEND,	&conn->flags)) {
- 			BT_INFO("re-auth of legacy device is not possible.");
- 		} else {
-@@ -1831,7 +1833,8 @@ static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *s
- 	clear_bit(HCI_CONN_REAUTH_PEND, &conn->flags);
+-	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->pend)) {
++	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->flags)) {
+ 		struct hci_cp_auth_requested cp;
+ 		cp.handle = __cpu_to_le16(conn->handle);
+ 		hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
+@@ -1461,9 +1461,9 @@ static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
  
- 	if (conn->state == BT_CONFIG) {
--		if (!ev->status && hdev->ssp_mode > 0 && conn->ssp_mode > 0) {
-+		if (!ev->status && hdev->ssp_mode > 0 &&
-+				test_bit(HCI_CONN_SSP_SUPPORT, &conn->flags)) {
- 			struct hci_cp_set_conn_encrypt cp;
- 			cp.handle  = ev->handle;
- 			cp.encrypt = 0x01;
-@@ -2476,9 +2479,9 @@ static inline void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb
+ 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
+ 	if (conn) {
+-		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
++		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags);
  
- 		if (!test_and_clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags)) {
- 			if (conn->mode == HCI_CM_ACTIVE)
--				conn->power_save = 1;
-+				set_bit(HCI_CONN_POWER_SAVE, &conn->flags);
- 			else
--				conn->power_save = 0;
-+				clear_bit(HCI_CONN_POWER_SAVE, &conn->flags);
- 		}
- 
- 		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->flags))
-@@ -2751,7 +2754,8 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
- 		if (ie)
- 			ie->data.ssp_mode = (ev->features[0] & 0x01);
- 
--		conn->ssp_mode = (ev->features[0] & 0x01);
-+		if (ev->features[0] & 0x01)
-+			set_bit(HCI_CONN_SSP_SUPPORT, &conn->flags);
+-		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->pend))
++		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->flags))
+ 			hci_sco_setup(conn, status);
  	}
  
- 	if (conn->state != BT_CONFIG)
-@@ -2930,7 +2934,7 @@ static inline void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff
- 		conn->auth_type = hci_get_auth_req(conn);
- 		cp.authentication = conn->auth_type;
+@@ -1488,9 +1488,9 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
  
--		if ((conn->out == 0x01 || conn->remote_oob == 0x01) &&
-+		if ((conn->out || test_bit(HCI_CONN_REMOTE_OOB, &conn->flags)) &&
- 				hci_find_remote_oob_data(hdev, &conn->dst))
- 			cp.oob_data = 0x01;
- 		else
-@@ -2966,8 +2970,9 @@ static inline void hci_io_capa_reply_evt(struct hci_dev *hdev, struct sk_buff *s
+ 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
+ 	if (conn) {
+-		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
++		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags);
+ 
+-		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->pend))
++		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->flags))
+ 			hci_sco_setup(conn, status);
+ 	}
+ 
+@@ -1817,7 +1817,7 @@ static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+ 
+ 	if (!ev->status) {
+ 		if (!(conn->ssp_mode > 0 && hdev->ssp_mode > 0) &&
+-				test_bit(HCI_CONN_REAUTH_PEND,	&conn->pend)) {
++				test_bit(HCI_CONN_REAUTH_PEND,	&conn->flags)) {
+ 			BT_INFO("re-auth of legacy device is not possible.");
+ 		} else {
+ 			conn->link_mode |= HCI_LM_AUTH;
+@@ -1827,8 +1827,8 @@ static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+ 		mgmt_auth_failed(hdev, &conn->dst, ev->status);
+ 	}
+ 
+-	clear_bit(HCI_CONN_AUTH_PEND, &conn->pend);
+-	clear_bit(HCI_CONN_REAUTH_PEND, &conn->pend);
++	clear_bit(HCI_CONN_AUTH_PEND, &conn->flags);
++	clear_bit(HCI_CONN_REAUTH_PEND, &conn->flags);
+ 
+ 	if (conn->state == BT_CONFIG) {
+ 		if (!ev->status && hdev->ssp_mode > 0 && conn->ssp_mode > 0) {
+@@ -1850,7 +1850,7 @@ static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+ 		hci_conn_put(conn);
+ 	}
+ 
+-	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend)) {
++	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags)) {
+ 		if (!ev->status) {
+ 			struct hci_cp_set_conn_encrypt cp;
+ 			cp.handle  = ev->handle;
+@@ -1858,7 +1858,7 @@ static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+ 			hci_send_cmd(hdev, HCI_OP_SET_CONN_ENCRYPT, sizeof(cp),
+ 									&cp);
+ 		} else {
+-			clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend);
++			clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
+ 			hci_encrypt_cfm(conn, ev->status, 0x00);
+ 		}
+ 	}
+@@ -1892,7 +1892,7 @@ static inline void hci_remote_name_evt(struct hci_dev *hdev, struct sk_buff *skb
+ 	if (!hci_outgoing_auth_needed(hdev, conn))
  		goto unlock;
  
- 	conn->remote_cap = ev->capability;
--	conn->remote_oob = ev->oob_data;
- 	conn->remote_auth = ev->authentication;
-+	if (ev->oob_data)
-+		set_bit(HCI_CONN_REMOTE_OOB, &conn->flags);
+-	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->pend)) {
++	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->flags)) {
+ 		struct hci_cp_auth_requested cp;
+ 		cp.handle = __cpu_to_le16(conn->handle);
+ 		hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
+@@ -1923,7 +1923,7 @@ static inline void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *
+ 				conn->link_mode &= ~HCI_LM_ENCRYPT;
+ 		}
  
- unlock:
- 	hci_dev_unlock(hdev);
+-		clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend);
++		clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
+ 
+ 		if (conn->state == BT_CONFIG) {
+ 			if (!ev->status)
+@@ -1952,7 +1952,7 @@ static inline void hci_change_link_key_complete_evt(struct hci_dev *hdev, struct
+ 		if (!ev->status)
+ 			conn->link_mode |= HCI_LM_SECURE;
+ 
+-		clear_bit(HCI_CONN_AUTH_PEND, &conn->pend);
++		clear_bit(HCI_CONN_AUTH_PEND, &conn->flags);
+ 
+ 		hci_key_change_cfm(conn, ev->status);
+ 	}
+@@ -2336,7 +2336,7 @@ static inline void hci_role_change_evt(struct hci_dev *hdev, struct sk_buff *skb
+ 				conn->link_mode |= HCI_LM_MASTER;
+ 		}
+ 
+-		clear_bit(HCI_CONN_RSWITCH_PEND, &conn->pend);
++		clear_bit(HCI_CONN_RSWITCH_PEND, &conn->flags);
+ 
+ 		hci_role_switch_cfm(conn, ev->status, ev->role);
+ 	}
+@@ -2474,14 +2474,14 @@ static inline void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb
+ 		conn->mode = ev->mode;
+ 		conn->interval = __le16_to_cpu(ev->interval);
+ 
+-		if (!test_and_clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend)) {
++		if (!test_and_clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags)) {
+ 			if (conn->mode == HCI_CM_ACTIVE)
+ 				conn->power_save = 1;
+ 			else
+ 				conn->power_save = 0;
+ 		}
+ 
+-		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->pend))
++		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->flags))
+ 			hci_sco_setup(conn, ev->status);
+ 	}
+ 
+@@ -3013,7 +3013,7 @@ static inline void hci_user_confirm_request_evt(struct hci_dev *hdev,
+ 		/* If we're not the initiators request authorization to
+ 		 * proceed from user space (mgmt_user_confirm with
+ 		 * confirm_hint set to 1). */
+-		if (!test_bit(HCI_CONN_AUTH_PEND, &conn->pend)) {
++		if (!test_bit(HCI_CONN_AUTH_PEND, &conn->flags)) {
+ 			BT_DBG("Confirming auto-accept as acceptor");
+ 			confirm_hint = 1;
+ 			goto confirm;
+@@ -3074,7 +3074,7 @@ static inline void hci_simple_pair_complete_evt(struct hci_dev *hdev, struct sk_
+ 	 * initiated the authentication. A traditional auth_complete
+ 	 * event gets always produced as initiator and is also mapped to
+ 	 * the mgmt_auth_failed event */
+-	if (!test_bit(HCI_CONN_AUTH_PEND, &conn->pend) && ev->status != 0)
++	if (!test_bit(HCI_CONN_AUTH_PEND, &conn->flags) && ev->status != 0)
+ 		mgmt_auth_failed(hdev, &conn->dst, ev->status);
+ 
+ 	hci_conn_put(conn);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 0087db8..e42999c 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1020,7 +1020,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+ 		__cancel_delayed_work(&conn->info_timer);
+ 
+-	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->pend)) {
++	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags)) {
+ 		__cancel_delayed_work(&conn->security_timer);
+ 		smp_chan_destroy(conn);
+ 	}
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 65a9024..e08fe6c 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -261,7 +261,7 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason, u8 send)
+ 		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(reason),
+ 								&reason);
+ 
+-	clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->hcon->pend);
++	clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->hcon->flags);
+ 	mgmt_auth_failed(conn->hcon->hdev, conn->dst, reason);
+ 	cancel_delayed_work_sync(&conn->security_timer);
+ 	smp_chan_destroy(conn);
+@@ -449,7 +449,7 @@ static void random_work(struct work_struct *work)
+ 		memset(stk + smp->smp_key_size, 0,
+ 				SMP_MAX_ENC_KEY_SIZE - smp->smp_key_size);
+ 
+-		if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend)) {
++		if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->flags)) {
+ 			reason = SMP_UNSPECIFIED;
+ 			goto error;
+ 		}
+@@ -506,7 +506,7 @@ void smp_chan_destroy(struct l2cap_conn *conn)
+ {
+ 	struct smp_chan *smp = conn->smp_chan;
+ 
+-	clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->pend);
++	clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags);
+ 
+ 	if (smp->tfm)
+ 		crypto_free_blkcipher(smp->tfm);
+@@ -571,7 +571,7 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (conn->hcon->link_mode & HCI_LM_MASTER)
+ 		return SMP_CMD_NOTSUPP;
+ 
+-	if (!test_and_set_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->pend))
++	if (!test_and_set_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags))
+ 		smp = smp_chan_create(conn);
+ 
+ 	smp = conn->smp_chan;
+@@ -707,8 +707,7 @@ static u8 smp_ltk_encrypt(struct l2cap_conn *conn)
+ 	if (!key)
+ 		return 0;
+ 
+-	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND,
+-					&hcon->pend))
++	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->flags))
+ 		return 1;
+ 
+ 	master = (void *) key->data;
+@@ -733,7 +732,7 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (smp_ltk_encrypt(conn))
+ 		return 0;
+ 
+-	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->pend))
++	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
+ 		return 0;
+ 
+ 	smp = smp_chan_create(conn);
+@@ -772,7 +771,7 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
+ 		if (smp_ltk_encrypt(conn))
+ 			goto done;
+ 
+-	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->pend))
++	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
+ 		return 0;
+ 
+ 	smp = smp_chan_create(conn);
+@@ -908,7 +907,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
+ 
+ 	BT_DBG("conn %p force %d", conn, force);
+ 
+-	if (!test_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->pend))
++	if (!test_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags))
+ 		return 0;
+ 
+ 	rsp = (void *) &smp->prsp[1];
+@@ -982,7 +981,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
+ 	}
+ 
+ 	if (conn->hcon->out || force) {
+-		clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->pend);
++		clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags);
+ 		cancel_delayed_work_sync(&conn->security_timer);
+ 		smp_chan_destroy(conn);
+ 	}
 -- 
 1.7.8.3
 
