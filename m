@@ -1,37 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B0260B41DE13@DNCE02.ent.ti.com>
-References: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
-	<F0070FBC0FB3174D8D11444EB2D5B0260B41DE13@DNCE02.ent.ti.com>
-Date: Wed, 18 Jan 2012 06:40:42 -0400
-Message-ID: <CAJdJm_OXhZeB-Vx900PR7gwb1A0xiJzgyp6BP9x-hbgE6Gx7Nw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 01/11] mgmt-api: Update the commands for exchanging LTK's
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B0260B41DE35@DNCE02.ent.ti.com>
+References: <F0070FBC0FB3174D8D11444EB2D5B0260B41DE35@DNCE02.ent.ti.com>
+Date: Wed, 18 Jan 2012 11:56:34 +0200
+Message-ID: <CABBYNZ+FbZbRCmkLnypBjoU2mYN5RgEvrh6Qstwncm5aQaMwZQ@mail.gmail.com>
+Subject: Re: Creating LE device nodes in BlueZ
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: "Ganir, Chen" <chen.ganir@ti.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Chen,
 
-On Wed, Jan 18, 2012 at 3:17 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
-> Storing the address type in the LTK is not perfect. For this to work properly, you will store the address type only for devices which exchanged keys. What if we have devices which do not do pairing or exchange keys at all ? What if we use the CreateDevice instead of CreatePairedDevice? In that case we will not have the address type for future reconnections. We need to store the device address type in a separate file (for example, addresstypes) and manage it separately from the LTK management.
+On Wed, Jan 18, 2012 at 9:47 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
+> All,
+>
+> I've encountered some usage problems with the current connection and device node creation schemes, which I believe need to be changed for LE devices.
+>
+> In today's implementation, in order to connect to an LE device, we first need to create it's node (using adapter function CreateDevice or CreatePairedDevice). This causes the bluez stack to create the node, browse for SDP in BR/EDR devices, or do primary services search on an LE device. This requires connecting to a device. This causes the first usability issue - what happens to the device after we are done searching for primary services ? What if the device requires user interaction for getting into discoverable/connectable mode ? In that case, the user will have to push a button on the device again, so we can connect to it for GATT profiles. This is a serious flaw in the user experience, and is caused by trying to mimic the BR/EDR experience, where you have the full list of services once device node is created.
+>
+> Another problematic user experience issue is caused due to the fact that we try to do "Dedicated bonding" with an LE device, although we do not have such an operation method in the LE specs.
+>
+> We need to think of a better way to manage and handle LE devices.
+>
+> For example, device nodes will be created upon device found events, in the bluetoothd. Whenever a device found, a node will be created, without browsing for primary services at all. To manage the list properly, whenever a device search is initiated, the list is cleaned from unbounded devices, which do not have any primary services discovered for it. This way we can keep the persistant list short, containing only relevant devices (Ones that we've already connected to, or bonded devices.
+>
+> Another example is to eliminate the possibility to CreatePairedDevice with LE devices. There is no such procedure, and there is not point in creating such a method when it is not defined by the specs or user scenarios.
+>
+> We should always search for primary services on connection, if needed. This is actually how the spec defines this. When a GATT client connects to a remote GATT server, it may search for primary services (profile specs actually describe this as part of the profile behavior). If the device is bonded, and the service list is already populated, it is not needed to go through this procedure, since the GATT client supports the Service Changed notification (Mandatory on clients) and the GATT server must support Service Changed notification if it supports dynamic services. So the basic procedure should be connect->check if not bonded or list empty->search for services. This can be handled internally by the bluetoothd. For this to work properly we need to change the way connection is established with a remote LE device as well, since you cannot register a service watcher on a service, which was not yet discovered. On the other hand, a profile always knows the remote service which it needs to register for, so you can always register for a service, and never get notified if the remote service does not exist, or get an error, depending on the implementation we choose.
+>
+> In addition, connection must be established in Mode 1 Level 1 (no security). If we try to do something that requires security, we may :
+> 1. Change security level if we have a key.
+> 2. Respond correctly for an incoming SMP pairing request from the slave
+> 3. Raise the security level if we need to (GATT authentication error, profile initiated security request). This will require either encryption start request if we have a key, or pairing request if we do not have one.
+>
+> We also need to allow a profile to request a specific security mode. This is the profile responsibility, and not the bluetoothd responsibility to decide which security level to use.
+>
+> What do you guys think ?
 
-Note that BlueZ is still relying on the kernel LE advertising cache
-(which is refreshed with either the automatic scanning prior to
-connection, or with the future background scanning support) for
-detecting address type for non-bonded devices. We have no plans to
-change that in near feature, because IIRC it would require changing
-bluetooth socket API (which would break all current BR/EDR
-applications).
+While some points like creating device object for devices found maybe
+be a good idea, you have to keep in mind that for upcoming specs it
+might become possible to pair/connect dual mode devices, so aligning
+the API for both LE and BD/EDR is necessary.
 
-This is an issue separate from LTK storage, if you are interested on
-pursuing this, feel free to make a proposal.
 
-Best Regards,
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Luiz Augusto von Dentz
