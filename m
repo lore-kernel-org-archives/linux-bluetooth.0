@@ -1,31 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Jan 2012 00:34:26 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 08/11] Add support for sending the Load Long Term
- Keys commands
-Message-ID: <20120118223426.GA14634@x220.P-661HNU-F1>
-References: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
- <1326842930-31623-8-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1326842930-31623-8-git-send-email-vinicius.gomes@openbossa.org>
+Date: Wed, 18 Jan 2012 13:50:16 -0800
+Message-ID: <CA+bD78jG+f2kaq66YTdJnOhBGE-=gfeoHYPpmpe6OxZUyBZv7Q@mail.gmail.com>
+Subject: RFA: Implementing HID spec recommendation for Keyboard PINs
+From: Scott James Remnant <scott@netsplit.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+The Bluetooth HID profile recommends (4.1, p24) that rather than
+prompting the user for a PIN on the host, which then needs to be
+entered into the connecting keyboard, instead the host simply generate
+the PIN and display it to the user instead. Part of this will be
+implemented as a plugin, but since UI is involved, the Agent is
+involved as well. As far as I can tell, there are two options:
 
-On Tue, Jan 17, 2012, Vinicius Costa Gomes wrote:
-> Also this adds another method to the adapter_ops method table,
-> this method allows LTKs to be loaded to the kernel.
-> ---
->  plugins/hciops.c  |    6 +++++
->  plugins/mgmtops.c |   55 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  src/adapter.h     |   12 +++++++++++
->  3 files changed, 73 insertions(+), 0 deletions(-)
+ 1) re-use the existing DisplayPasskey(object device, uint32 passkey) method
 
-All patches up until this one have been applied. I'm waiting for an
-update for the rest based on our discussion in IRC.
+    Disadvantages:
+    - this isn't a Passkey but a PIN, which means it would have to be
+converted to a numeric before display. So the plugin would have to
+generate a numeric, stuff it into a 0-padded 6-digit string for return
+as the PIN but then we'd have to convert back to a numeric again for
+sending to the agent.
 
-Johan
+    - the agent would not know that this isn't a Bluetooth 2.1 device,
+but a 2.0 device following the HID recommendation - agents might want
+to format the display differently, e.g. knowing that it will never get
+keypress notification for these devices
+
+ 2) add a new DisplayPinCode(object device, string pin) method
+
+    Disadvantages:
+    - this adds a new method existing agents would have to implement,
+but only in the cases where the plugin was enabled so hopefully the
+distribution is at least aware of it - otherwise the important step of
+what PIN to type would be lost
+
+    - slightly larger code change.
+
+
+My preference is for #2, but I wanted to request advice before proceeding.
+
+Scott
+--
+Have you ever, ever felt like this?
+Had strange things happen?  Are you going round the twist?
