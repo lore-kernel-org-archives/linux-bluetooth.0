@@ -1,34 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 Jan 2012 21:25:22 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <1326914334.6454.410.camel@aeonflux>
+Subject: Re: [PATCH 14/15] Bluetooth: Rename hdev->flags to
+ hdev->compat_flags
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 09/15] Bluetooth: Merge boolean members of struct
- hci_conn into flags
-Message-ID: <20120118192522.GA27730@fusion.localdomain>
+Date: Wed, 18 Jan 2012 20:18:54 +0100
+In-Reply-To: <1326912717-6347-15-git-send-email-johan.hedberg@gmail.com>
 References: <1326912717-6347-1-git-send-email-johan.hedberg@gmail.com>
- <1326912717-6347-10-git-send-email-johan.hedberg@gmail.com>
- <1326913969.6454.405.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1326913969.6454.405.camel@aeonflux>
+	 <1326912717-6347-15-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Wed, Jan 18, 2012, Marcel Holtmann wrote:
-> >  	unsigned int	sent;
-> > @@ -409,6 +406,9 @@ enum {
-> >  	HCI_CONN_MODE_CHANGE_PEND,
-> >  	HCI_CONN_SCO_SETUP_PEND,
-> >  	HCI_CONN_LE_SMP_PEND,
-> > +	HCI_CONN_SSP_SUPPORT,
+> These flags mostly exist for legacy reasons and no new flags should be
+> added to this set, so compat_flags is a better name.
 > 
-> didn't we agree on naming this SSP_ENABLED?
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  drivers/bluetooth/bfusb.c        |   12 +++---
+>  drivers/bluetooth/bpa10x.c       |   12 +++---
+>  drivers/bluetooth/btmrvl_main.c  |    9 +++--
+>  drivers/bluetooth/btusb.c        |   20 +++++-----
+>  drivers/bluetooth/hci_ldisc.c    |    6 ++--
+>  drivers/bluetooth/hci_vhci.c     |    6 ++--
+>  include/net/bluetooth/hci.h      |    7 +---
+>  include/net/bluetooth/hci_core.h |    2 +-
+>  net/bluetooth/hci_conn.c         |    7 ++--
+>  net/bluetooth/hci_core.c         |   71 +++++++++++++++++++------------------
+>  net/bluetooth/hci_event.c        |   43 ++++++++++++-----------
+>  net/bluetooth/hci_sock.c         |    8 ++--
+>  net/bluetooth/mgmt.c             |   38 ++++++++++----------
+>  13 files changed, 121 insertions(+), 120 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
+> index e97f42a..8f77290 100644
+> --- a/drivers/bluetooth/bfusb.c
+> +++ b/drivers/bluetooth/bfusb.c
+> @@ -191,7 +191,7 @@ static void bfusb_tx_complete(struct urb *urb)
+>  
+>  	atomic_dec(&data->pending_tx);
+>  
+> -	if (!test_bit(HCI_RUNNING, &data->hdev->flags))
+> +	if (!test_bit(HCI_RUNNING, &data->hdev->compat_flags))
+>  		return;
 
-We agreed about that for hci_dev but not for hci_conn (or then I
-misunderstood you). I used "support" here since it means that the remote
-device can support it if we have it enabled (and hence "enabled" for the
-hci_dev flag). But I can change it anyway you like.
+I do not like this change at all.
 
-Johan
+Can we just add a BT specific helper for setting/testing HCI_RUNNING and
+hiding the fact of hdev->flags.
+
+Regards
+
+Marcel
+
+
