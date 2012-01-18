@@ -1,33 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd] client: fix not being able to read apparams when transfer is complete
-Date: Wed, 18 Jan 2012 13:37:37 +0200
-Message-Id: <1326886657-10264-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd v3] client: fix parsing of apparam on pbap driver
+Date: Wed, 18 Jan 2012 13:36:14 +0200
+Message-Id: <1326886574-10210-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Transfer id/xfer is set to zero when it is completed which should not
-prevent the profiles to read the apparam of the last response.
+Both hdr and size need to be updated otherwise no parameters will be
+parsed.
 ---
- client/transfer.c |    3 ---
- 1 files changed, 0 insertions(+), 3 deletions(-)
+v3: fix invalid read caused by updating hdr before size
 
-diff --git a/client/transfer.c b/client/transfer.c
-index c481378..2532294 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -614,9 +614,6 @@ done:
- int obc_transfer_get_params(struct obc_transfer *transfer,
- 					struct obc_transfer_params *params)
+ client/pbap.c |   11 ++++++-----
+ 1 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/client/pbap.c b/client/pbap.c
+index 9e9eb05..8efa568 100644
+--- a/client/pbap.c
++++ b/client/pbap.c
+@@ -364,8 +364,8 @@ static void read_return_apparam(struct obc_session *session,
  {
--	if (transfer->xfer == 0)
--		return -ENOTCONN;
--
- 	params->data = transfer->params->data;
- 	params->size = transfer->params->size;
+ 	struct obc_transfer *transfer = obc_session_get_transfer(session);
+ 	struct obc_transfer_params params;
+-	unsigned char *buf;
+-	size_t size = 0;
++	struct apparam_hdr *hdr;
++	size_t size;
+ 
+ 	*phone_book_size = 0;
+ 	*new_missed_calls = 0;
+@@ -376,9 +376,10 @@ static void read_return_apparam(struct obc_session *session,
+ 	if (params.size < APPARAM_HDR_SIZE)
+ 		return;
+ 
+-	while (size > APPARAM_HDR_SIZE) {
+-		struct apparam_hdr *hdr = (struct apparam_hdr *) params.data;
++	hdr = (struct apparam_hdr *) params.data;
++	size = params.size;
+ 
++	while (size > APPARAM_HDR_SIZE) {
+ 		if (hdr->len > size - APPARAM_HDR_SIZE) {
+ 			error("Unexpected PBAP pullphonebook app"
+ 					" length, tag %d, len %d",
+@@ -404,8 +405,8 @@ static void read_return_apparam(struct obc_session *session,
+ 					hdr->tag, hdr->len);
+ 		}
+ 
+-		buf += APPARAM_HDR_SIZE + hdr->len;
+ 		size -= APPARAM_HDR_SIZE + hdr->len;
++		hdr += APPARAM_HDR_SIZE + hdr->len;
+ 	}
+ }
  
 -- 
 1.7.7.5
