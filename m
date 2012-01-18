@@ -1,53 +1,147 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/15] Bluetooth: Update to latest mgmt API
-Date: Wed, 18 Jan 2012 20:51:42 +0200
-Message-Id: <1326912717-6347-1-git-send-email-johan.hedberg@gmail.com>
+Cc: Slawomir Bochenski <lkslawek@gmail.com>
+Subject: [PATCH obexd v3 3/4] map_ap.c: Add implementation for map_ap_decode()
+Date: Wed, 18 Jan 2012 19:44:13 +0100
+Message-Id: <1326912254-10668-3-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <1326912254-10668-1-git-send-email-lkslawek@gmail.com>
+References: <1326912254-10668-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ src/map_ap.c |  101 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 100 insertions(+), 1 deletions(-)
 
-These patches update the device_found and device_connected mgmt events
-to correspond to the latest API. The patches should work with latest
-user space git. There are also some bugfixes like the persistent flags
-one and some cosmetic changes like the flags variable renames. Also,
-sorry about the slightly big patch 13/15. I tried to look into splitting
-it but didn't find any simple way.
-
-Johan Hedberg (15):
-      Bluetooth: Fix clearing persistent flags
-      Bluetooth: Rename mgmt connected events to match user space
-      Bluetooth: Add eir_len parameter to mgmt_ev_device_found
-      Bluetooth: Rename eir_has_complete_name to eir_has_data_type
-      Bluetooth: Add missing EIR defines to hci.h
-      Bluetooth: Move eir_has_data_field to hci_core.h
-      Bluetooth: Merge device class into the EIR data in mgmt_ev_device_found
-      Bluetooth: Rename conn->pend to conn->flags
-      Bluetooth: Merge boolean members of struct hci_conn into flags
-      Bluetooth: Add a convenience function to check for SSP enabled
-      Bluetooth: Convert hdev->ssp_mode to a flag
-      Bluetooth: Convert hdev->out to a bool type
-      Bluetooth: Update device_connected and device_found events to latest API
-      Bluetooth: Rename hdev->flags to hdev->compat_flags
-      Bluetooth: Rename hdev->dev_flags to hdev-flags
-
- drivers/bluetooth/bfusb.c        |   12 +-
- drivers/bluetooth/bpa10x.c       |   12 +-
- drivers/bluetooth/btmrvl_main.c  |    9 +-
- drivers/bluetooth/btusb.c        |   20 ++--
- drivers/bluetooth/hci_ldisc.c    |    6 +-
- drivers/bluetooth/hci_vhci.c     |    6 +-
- include/net/bluetooth/hci.h      |   29 ++--
- include/net/bluetooth/hci_core.h |   77 +++++++++---
- include/net/bluetooth/mgmt.h     |   25 ++--
- net/bluetooth/hci_conn.c         |   50 ++++----
- net/bluetooth/hci_core.c         |  101 ++++++++-------
- net/bluetooth/hci_event.c        |  264 ++++++++++++++++++++------------------
- net/bluetooth/hci_sock.c         |    8 +-
- net/bluetooth/l2cap_core.c       |    2 +-
- net/bluetooth/mgmt.c             |  166 +++++++++++++++----------
- net/bluetooth/smp.c              |   21 ++--
- 16 files changed, 455 insertions(+), 353 deletions(-)
+diff --git a/src/map_ap.c b/src/map_ap.c
+index 04b370f..3ebdf4d 100644
+--- a/src/map_ap.c
++++ b/src/map_ap.c
+@@ -25,6 +25,10 @@
+ #include <config.h>
+ #endif
+ 
++#include <string.h>
++
++#include "log.h"
++
+ #include "map_ap.h"
+ 
+ enum ap_type {
+@@ -103,6 +107,13 @@ struct ap_entry {
+ 	} val;
+ };
+ 
++/* This comes from OBEX specs */
++struct obex_ap_header {
++	uint8_t tag;
++	uint8_t len;
++	uint8_t val[0];
++} __attribute__ ((packed));
++
+ static int find_ap_def_offset(uint8_t tag)
+ {
+ 	int i;
+@@ -141,9 +152,97 @@ void map_ap_free(map_ap_t *ap)
+ 	g_hash_table_destroy(ap);
+ }
+ 
++static void ap_decode_u8(map_ap_t *ap, const struct obex_ap_header *hdr)
++{
++	if (hdr->len != 1) {
++		DBG("Value of tag %d is %d bytes long instead of expected "
++				"1 byte - skipped!", hdr->tag, hdr->len);
++		return;
++	}
++
++	map_ap_set_u8(ap, hdr->tag, hdr->val[0]);
++}
++
++static void ap_decode_u16(map_ap_t *ap, const struct obex_ap_header *hdr)
++{
++	uint16_t val;
++
++	if (hdr->len != 2) {
++		DBG("Value of tag %d is %d bytes long instead of expected "
++				"2 bytes - skipped!", hdr->tag, hdr->len);
++		return;
++	}
++
++	memcpy(&val, hdr->val, sizeof(val));
++	map_ap_set_u16(ap, hdr->tag, GUINT16_FROM_BE(val));
++}
++
++static void ap_decode_u32(map_ap_t *ap, const struct obex_ap_header *hdr)
++{
++	uint32_t val;
++
++	if (hdr->len != 4) {
++		DBG("Value of tag %d is %d bytes long instead of expected "
++				"4 bytes - skipped!", hdr->tag, hdr->len);
++		return;
++	}
++
++	memcpy(&val, hdr->val, sizeof(val));
++	map_ap_set_u32(ap, hdr->tag, GUINT32_FROM_BE(val));
++}
++
++static void ap_decode_str(map_ap_t *ap, const struct obex_ap_header *hdr)
++{
++	char *val = g_malloc0(hdr->len + 1);
++
++	memcpy(val, hdr->val, hdr->len);
++	map_ap_set_string(ap, hdr->tag, val);
++
++	g_free(val);
++}
++
+ map_ap_t *map_ap_decode(const uint8_t *buffer, size_t length)
+ {
+-	return NULL;
++	map_ap_t *ap;
++	struct obex_ap_header *hdr;
++	uint32_t done = 0;
++	int offset;
++
++	ap = map_ap_new();
++	if (!ap)
++		return NULL;
++
++	while (done < length) {
++		hdr = (void *) buffer + done;
++
++		offset = find_ap_def_offset(hdr->tag);
++
++		if (offset < 0) {
++			DBG("Unknown tag %d (length %d) - skipped.",
++							hdr->tag, hdr->len);
++			goto skip;
++		}
++
++		switch (ap_defs[offset].type) {
++		case APT_UINT8:
++			ap_decode_u8(ap, hdr);
++			break;
++		case APT_UINT16:
++			ap_decode_u16(ap, hdr);
++			break;
++		case APT_UINT32:
++			ap_decode_u32(ap, hdr);
++			break;
++		case APT_STR:
++			ap_decode_str(ap, hdr);
++			break;
++		}
++
++skip:
++		done += hdr->len + sizeof(struct obex_ap_header);
++	}
++
++	return ap;
+ }
+ 
+ uint8_t *map_ap_encode(map_ap_t *ap, size_t *length)
+-- 
+1.7.4.1
 
