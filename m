@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 15/15] Bluetooth: Rename hdev->dev_flags to hdev-flags
-Date: Wed, 18 Jan 2012 20:51:57 +0200
-Message-Id: <1326912717-6347-16-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 13/15] Bluetooth: Update device_connected and device_found events to latest API
+Date: Wed, 18 Jan 2012 20:51:55 +0200
+Message-Id: <1326912717-6347-14-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1326912717-6347-1-git-send-email-johan.hedberg@gmail.com>
 References: <1326912717-6347-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,567 +11,351 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch renames hdev->dev_flags to simply hdev->flags as these are
-now the "default" set of flags and the place where new flags should be
-added. To be consistent with struct hci_conn flags naming each flag also
-receives a HCI_DEV_* prefix instead of just HCI_*.
+This patch updates mgmt_ev_device_connected and mgmt_ev_device found to
+include an EIR-encoded remote name and class whenever possible. With
+this addition the mgmt_ev_remote_name event becomes unnecessary and can
+be removed. Since the connected event doesn't map to hci_conn_complete
+anymore a HCI_CONN_MGMT_CONNECTED flag is added to track when mgmt has
+been notified about a connection.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci.h      |   22 +++++++-------
- include/net/bluetooth/hci_core.h |    4 +-
- net/bluetooth/hci_core.c         |   32 ++++++++++----------
- net/bluetooth/hci_event.c        |   59 +++++++++++++++++++------------------
- net/bluetooth/mgmt.c             |   34 +++++++++++-----------
- net/bluetooth/smp.c              |    2 +-
- 6 files changed, 77 insertions(+), 76 deletions(-)
+ include/net/bluetooth/hci_core.h |    7 ++-
+ include/net/bluetooth/mgmt.h     |   17 ++++----
+ net/bluetooth/hci_event.c        |   78 +++++++++++++++++++++++++++-----------
+ net/bluetooth/mgmt.c             |   56 ++++++++++++++++++++-------
+ 4 files changed, 110 insertions(+), 48 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 8797c3f..28a0087 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -80,18 +80,18 @@ enum {
- 	HCI_RESET,
- };
- 
--/* hdev->dev_flags */
-+/* hdev->flags */
- enum {
--	HCI_SETUP,
--	HCI_AUTO_OFF,
--	HCI_MGMT,
--	HCI_PAIRABLE,
--	HCI_SERVICE_CACHE,
--	HCI_LINK_KEYS,
--	HCI_DEBUG_KEYS,
--
--	HCI_LE_SCAN,
--	HCI_SSP_ENABLED,
-+	HCI_DEV_SETUP,
-+	HCI_DEV_AUTO_OFF,
-+	HCI_DEV_MGMT,
-+	HCI_DEV_PAIRABLE,
-+	HCI_DEV_SERVICE_CACHE,
-+	HCI_DEV_LINK_KEYS,
-+	HCI_DEV_DEBUG_KEYS,
-+
-+	HCI_DEV_LE_SCAN,
-+	HCI_DEV_SSP_ENABLED,
- };
- 
- /* HCI ioctl defines */
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c972406..071d359 100644
+index 40efe33..ab1a626 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -260,7 +260,7 @@ struct hci_dev {
+@@ -408,6 +408,7 @@ enum {
+ 	HCI_CONN_SSP_SUPPORT,
+ 	HCI_CONN_POWER_SAVE,
+ 	HCI_CONN_REMOTE_OOB,
++	HCI_CONN_MGMT_CONNECTED,
+ };
  
- 	struct rfkill		*rfkill;
- 
--	unsigned long		dev_flags;
-+	unsigned long		flags;
- 
- 	int (*open)(struct hci_dev *hdev);
- 	int (*close)(struct hci_dev *hdev);
-@@ -414,7 +414,7 @@ enum {
  static inline bool hci_conn_ssp_support(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
--	return (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
-+	return (test_bit(HCI_DEV_SSP_ENABLED, &hdev->flags) &&
- 				test_bit(HCI_CONN_SSP_SUPPORT, &conn->flags));
- }
+@@ -939,7 +940,8 @@ int mgmt_write_scan_failed(struct hci_dev *hdev, u8 scan, u8 status);
+ int mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key,
+ 								u8 persistent);
+ int mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+-								u8 addr_type);
++					u8 addr_type, u8 *name, u8 name_len,
++					u8 *dev_class);
+ int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 						u8 link_type, u8 addr_type);
+ int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 status);
+@@ -968,7 +970,8 @@ int mgmt_read_local_oob_data_reply_complete(struct hci_dev *hdev, u8 *hash,
+ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 					u8 addr_type, u8 *dev_class, s8 rssi,
+ 					u8 cfm_name, u8 *eir, u16 eir_len);
+-int mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *name);
++int mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
++			u8 addr_type, s8 rssi, u8 *name, u8 name_len);
+ int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status);
+ int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status);
+ int mgmt_discovering(struct hci_dev *hdev, u8 discovering);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index bdace52..6f37983 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -329,6 +329,11 @@ struct mgmt_ev_new_link_key {
+ } __packed;
  
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ff01f0a..2de4c72 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -695,7 +695,7 @@ int hci_dev_open(__u16 dev)
- 		hci_dev_hold(hdev);
- 		set_bit(HCI_UP, &hdev->compat_flags);
- 		hci_notify(hdev, HCI_DEV_UP);
--		if (!test_bit(HCI_SETUP, &hdev->dev_flags)) {
-+		if (!test_bit(HCI_DEV_SETUP, &hdev->flags)) {
- 			hci_dev_lock(hdev);
- 			mgmt_powered(hdev, 1);
- 			hci_dev_unlock(hdev);
-@@ -749,10 +749,10 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 		hdev->discov_timeout = 0;
- 	}
+ #define MGMT_EV_DEVICE_CONNECTED	0x000A
++struct mgmt_ev_device_connected {
++	struct mgmt_addr_info addr;
++	__le16 eir_len;
++	__u8 eir[0];
++} __packed;
  
--	if (test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags))
-+	if (test_and_clear_bit(HCI_DEV_AUTO_OFF, &hdev->flags))
- 		cancel_delayed_work(&hdev->power_off);
+ #define MGMT_EV_DEVICE_DISCONNECTED	0x000B
  
--	if (test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->dev_flags))
-+	if (test_and_clear_bit(HCI_DEV_SERVICE_CACHE, &hdev->flags))
- 		cancel_delayed_work(&hdev->service_cache);
+@@ -371,20 +376,14 @@ struct mgmt_ev_device_found {
+ 	__u8 eir[0];
+ } __packed;
  
- 	hci_dev_lock(hdev);
-@@ -974,11 +974,11 @@ int hci_get_dev_list(void __user *arg)
+-#define MGMT_EV_REMOTE_NAME		0x0012
+-struct mgmt_ev_remote_name {
+-	bdaddr_t bdaddr;
+-	__u8 name[MGMT_MAX_NAME_LENGTH];
+-} __packed;
+-
+-#define MGMT_EV_DISCOVERING		0x0013
++#define MGMT_EV_DISCOVERING		0x0012
  
- 	read_lock(&hci_dev_list_lock);
- 	list_for_each_entry(hdev, &hci_dev_list, list) {
--		if (test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags))
-+		if (test_and_clear_bit(HCI_DEV_AUTO_OFF, &hdev->flags))
- 			cancel_delayed_work(&hdev->power_off);
+-#define MGMT_EV_DEVICE_BLOCKED		0x0014
++#define MGMT_EV_DEVICE_BLOCKED		0x0013
+ struct mgmt_ev_device_blocked {
+ 	bdaddr_t bdaddr;
+ } __packed;
  
--		if (!test_bit(HCI_MGMT, &hdev->dev_flags))
--			set_bit(HCI_PAIRABLE, &hdev->dev_flags);
-+		if (!test_bit(HCI_DEV_MGMT, &hdev->flags))
-+			set_bit(HCI_DEV_PAIRABLE, &hdev->flags);
- 
- 		(dr + n)->dev_id  = hdev->id;
- 		(dr + n)->dev_opt = hdev->compat_flags;
-@@ -1010,11 +1010,11 @@ int hci_get_dev_info(void __user *arg)
- 	if (!hdev)
- 		return -ENODEV;
- 
--	if (test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags))
-+	if (test_and_clear_bit(HCI_DEV_AUTO_OFF, &hdev->flags))
- 		cancel_delayed_work_sync(&hdev->power_off);
- 
--	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
--		set_bit(HCI_PAIRABLE, &hdev->dev_flags);
-+	if (!test_bit(HCI_DEV_MGMT, &hdev->flags))
-+		set_bit(HCI_DEV_PAIRABLE, &hdev->flags);
- 
- 	strcpy(di.name, hdev->name);
- 	di.bdaddr   = hdev->bdaddr;
-@@ -1094,11 +1094,11 @@ static void hci_power_on(struct work_struct *work)
- 	if (hci_dev_open(hdev->id) < 0)
- 		return;
- 
--	if (test_bit(HCI_AUTO_OFF, &hdev->dev_flags))
-+	if (test_bit(HCI_DEV_AUTO_OFF, &hdev->flags))
- 		schedule_delayed_work(&hdev->power_off,
- 					msecs_to_jiffies(AUTO_OFF_TIMEOUT));
- 
--	if (test_and_clear_bit(HCI_SETUP, &hdev->dev_flags))
-+	if (test_and_clear_bit(HCI_DEV_SETUP, &hdev->flags))
- 		mgmt_index_added(hdev);
- }
- 
-@@ -1109,7 +1109,7 @@ static void hci_power_off(struct work_struct *work)
- 
- 	BT_DBG("%s", hdev->name);
- 
--	clear_bit(HCI_AUTO_OFF, &hdev->dev_flags);
-+	clear_bit(HCI_DEV_AUTO_OFF, &hdev->flags);
- 
- 	hci_dev_close(hdev->id);
- }
-@@ -1601,7 +1601,7 @@ int hci_register_dev(struct hci_dev *hdev)
- 	mutex_init(&hdev->lock);
- 
- 	hdev->compat_flags = 0;
--	hdev->dev_flags = 0;
-+	hdev->flags = 0;
- 	hdev->pkt_type  = (HCI_DM1 | HCI_DH1 | HCI_HV1);
- 	hdev->esco_type = (ESCO_HV1);
- 	hdev->link_mode = (HCI_LM_ACCEPT);
-@@ -1676,8 +1676,8 @@ int hci_register_dev(struct hci_dev *hdev)
- 		}
- 	}
- 
--	set_bit(HCI_AUTO_OFF, &hdev->dev_flags);
--	set_bit(HCI_SETUP, &hdev->dev_flags);
-+	set_bit(HCI_DEV_AUTO_OFF, &hdev->flags);
-+	set_bit(HCI_DEV_SETUP, &hdev->flags);
- 	schedule_work(&hdev->power_on);
- 
- 	hci_notify(hdev, HCI_DEV_REG);
-@@ -1713,7 +1713,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 		kfree_skb(hdev->reassembly[i]);
- 
- 	if (!test_bit(HCI_INIT, &hdev->compat_flags) &&
--				!test_bit(HCI_SETUP, &hdev->dev_flags)) {
-+				!test_bit(HCI_DEV_SETUP, &hdev->flags)) {
- 		hci_dev_lock(hdev);
- 		mgmt_index_removed(hdev);
- 		hci_dev_unlock(hdev);
+-#define MGMT_EV_DEVICE_UNBLOCKED	0x0015
++#define MGMT_EV_DEVICE_UNBLOCKED	0x0014
+ struct mgmt_ev_device_unblocked {
+ 	bdaddr_t bdaddr;
+ } __packed;
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 6817c52..987cedf 100644
+index f49f64f..d469b99 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -196,7 +196,8 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
- 	hci_req_complete(hdev, HCI_OP_RESET, status);
- 
- 	/* Reset all flags, except persistent ones */
--	hdev->dev_flags &= BIT(HCI_MGMT) | BIT(HCI_SETUP) | BIT(HCI_AUTO_OFF);
-+	hdev->flags &= BIT(HCI_DEV_MGMT) | BIT(HCI_DEV_SETUP) |
-+							BIT(HCI_DEV_AUTO_OFF);
+@@ -1292,11 +1292,36 @@ static inline int hci_resolve_name(struct hci_dev *hdev, struct inquiry_entry *e
+ 	return hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ, sizeof(cp), &cp);
  }
  
- static void hci_cc_write_local_name(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -212,7 +213,7 @@ static void hci_cc_write_local_name(struct hci_dev *hdev, struct sk_buff *skb)
+-static void hci_resolve_next_name(struct hci_dev *hdev, bdaddr_t *bdaddr)
++static bool hci_resolve_next_name(struct hci_dev *hdev)
+ {
+ 	struct discovery_state *discov = &hdev->discovery;
+ 	struct inquiry_entry *e;
  
- 	hci_dev_lock(hdev);
++	if (list_empty(&discov->resolve))
++		return false;
++
++	e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY, NAME_NEEDED);
++	if (hci_resolve_name(hdev, e) == 0) {
++		e->name_state = NAME_PENDING;
++		return true;
++	}
++
++	return false;
++}
++
++static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
++					bdaddr_t *bdaddr, u8 *name, u8 name_len)
++{
++	struct discovery_state *discov = &hdev->discovery;
++	struct inquiry_entry *e;
++
++	if (conn && !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
++		mgmt_device_connected(hdev, bdaddr, ACL_LINK, 0x00,
++					name, name_len, conn->dev_class);
++
++	if (discov->state == DISCOVERY_STOPPED)
++		return;
++
+ 	if (discov->state == DISCOVERY_STOPPING)
+ 		goto discov_complete;
  
--	if (test_bit(HCI_MGMT, &hdev->dev_flags))
-+	if (test_bit(HCI_DEV_MGMT, &hdev->flags))
- 		mgmt_set_local_name_complete(hdev, sent, status);
+@@ -1307,16 +1332,13 @@ static void hci_resolve_next_name(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 	if (e) {
+ 		e->name_state = NAME_KNOWN;
+ 		list_del(&e->list);
++		if (name)
++			mgmt_remote_name(hdev, bdaddr, ACL_LINK, 0x00,
++					e->data.rssi, name, name_len);
+ 	}
  
- 	if (status == 0)
-@@ -430,9 +431,9 @@ static void hci_cc_read_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
+-	if (list_empty(&discov->resolve))
+-		goto discov_complete;
+-
+-	e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY, NAME_NEEDED);
+-	if (hci_resolve_name(hdev, e) == 0) {
+-		e->name_state = NAME_PENDING;
++	if (hci_resolve_next_name(hdev))
  		return;
+-	}
  
- 	if (rp->mode)
--		set_bit(HCI_SSP_ENABLED, &hdev->compat_flags);
-+		set_bit(HCI_DEV_SSP_ENABLED, &hdev->compat_flags);
- 	else
--		clear_bit(HCI_SSP_ENABLED, &hdev->compat_flags);
-+		clear_bit(HCI_DEV_SSP_ENABLED, &hdev->compat_flags);
- }
- 
- static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -450,9 +451,9 @@ static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
- 		return;
- 
- 	if (*(u8 *) sent)
--		set_bit(HCI_SSP_ENABLED, &hdev->compat_flags);
-+		set_bit(HCI_DEV_SSP_ENABLED, &hdev->compat_flags);
- 	else
--		clear_bit(HCI_SSP_ENABLED, &hdev->compat_flags);
-+		clear_bit(HCI_DEV_SSP_ENABLED, &hdev->compat_flags);
- }
- 
- static u8 hci_get_inquiry_mode(struct hci_dev *hdev)
-@@ -898,7 +899,7 @@ static void hci_cc_pin_code_reply(struct hci_dev *hdev, struct sk_buff *skb)
+ discov_complete:
+ 	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+@@ -1340,10 +1362,11 @@ static void hci_cs_remote_name_req(struct hci_dev *hdev, __u8 status)
  
  	hci_dev_lock(hdev);
  
--	if (test_bit(HCI_MGMT, &hdev->dev_flags))
-+	if (test_bit(HCI_DEV_MGMT, &hdev->flags))
- 		mgmt_pin_code_reply_complete(hdev, &rp->bdaddr, rp->status);
++	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
++
+ 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
+-		hci_resolve_next_name(hdev, &cp->bdaddr);
++		hci_check_pending_name(hdev, conn, &cp->bdaddr, NULL, 0);
  
- 	if (rp->status != 0)
-@@ -924,7 +925,7 @@ static void hci_cc_pin_code_neg_reply(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	hci_dev_lock(hdev);
- 
--	if (test_bit(HCI_MGMT, &hdev->dev_flags))
-+	if (test_bit(HCI_DEV_MGMT, &hdev->flags))
- 		mgmt_pin_code_neg_reply_complete(hdev, &rp->bdaddr,
- 								rp->status);
- 
-@@ -959,7 +960,7 @@ static void hci_cc_user_confirm_reply(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	hci_dev_lock(hdev);
- 
--	if (test_bit(HCI_MGMT, &hdev->dev_flags))
-+	if (test_bit(HCI_DEV_MGMT, &hdev->flags))
- 		mgmt_user_confirm_reply_complete(hdev, &rp->bdaddr,
- 								rp->status);
- 
-@@ -975,7 +976,7 @@ static void hci_cc_user_confirm_neg_reply(struct hci_dev *hdev,
- 
- 	hci_dev_lock(hdev);
- 
--	if (test_bit(HCI_MGMT, &hdev->dev_flags))
-+	if (test_bit(HCI_DEV_MGMT, &hdev->flags))
- 		mgmt_user_confirm_neg_reply_complete(hdev, &rp->bdaddr,
- 								rp->status);
- 
-@@ -990,7 +991,7 @@ static void hci_cc_user_passkey_reply(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	hci_dev_lock(hdev);
- 
--	if (test_bit(HCI_MGMT, &hdev->dev_flags))
-+	if (test_bit(HCI_DEV_MGMT, &hdev->flags))
- 		mgmt_user_passkey_reply_complete(hdev, &rp->bdaddr,
- 								rp->status);
- 
-@@ -1006,7 +1007,7 @@ static void hci_cc_user_passkey_neg_reply(struct hci_dev *hdev,
- 
- 	hci_dev_lock(hdev);
- 
--	if (test_bit(HCI_MGMT, &hdev->dev_flags))
-+	if (test_bit(HCI_DEV_MGMT, &hdev->flags))
- 		mgmt_user_passkey_neg_reply_complete(hdev, &rp->bdaddr,
- 								rp->status);
- 
-@@ -1050,7 +1051,7 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 
- 	switch (cp->enable) {
- 	case LE_SCANNING_ENABLED:
--		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
-+		set_bit(HCI_DEV_LE_SCAN, &hdev->flags);
- 
- 		cancel_delayed_work_sync(&hdev->adv_work);
- 
-@@ -1060,7 +1061,7 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 		break;
- 
- 	case LE_SCANNING_DISABLED:
--		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
-+		clear_bit(HCI_DEV_LE_SCAN, &hdev->flags);
- 
- 		schedule_delayed_work(&hdev->adv_work, ADV_CLEAR_TIMEOUT);
- 		break;
-@@ -1118,7 +1119,7 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- 		hci_req_complete(hdev, HCI_OP_INQUIRY, status);
- 		hci_conn_check_pending(hdev);
- 		hci_dev_lock(hdev);
--		if (test_bit(HCI_MGMT, &hdev->dev_flags))
-+		if (test_bit(HCI_DEV_MGMT, &hdev->flags))
- 			mgmt_start_discovery_failed(hdev, status);
- 		hci_dev_unlock(hdev);
- 		return;
-@@ -1365,7 +1366,7 @@ static void hci_cs_remote_name_req(struct hci_dev *hdev, __u8 status)
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
- 
--	if (test_bit(HCI_MGMT, &hdev->dev_flags))
-+	if (test_bit(HCI_DEV_MGMT, &hdev->flags))
- 		hci_check_pending_name(hdev, conn, &cp->bdaddr, NULL, 0);
- 
+-	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
  	if (!conn)
-@@ -1586,7 +1587,7 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
- 	if (!test_and_clear_bit(HCI_INQUIRY, &hdev->compat_flags))
- 		return;
+ 		goto unlock;
  
--	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
-+	if (!test_bit(HCI_DEV_MGMT, &hdev->flags))
- 		return;
+@@ -1649,8 +1672,6 @@ static inline void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+ 			conn->state = BT_CONFIG;
+ 			hci_conn_hold(conn);
+ 			conn->disc_timeout = HCI_DISCONN_TIMEOUT;
+-			mgmt_device_connected(hdev, &ev->bdaddr, conn->type,
+-							conn->dst_type);
+ 		} else
+ 			conn->state = BT_CONNECTED;
  
- 	hci_dev_lock(hdev);
-@@ -1909,7 +1910,7 @@ static inline void hci_remote_name_evt(struct hci_dev *hdev, struct sk_buff *skb
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
- 
--	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
-+	if (!test_bit(HCI_DEV_MGMT, &hdev->flags))
- 		goto check_auth;
- 
+@@ -1791,7 +1812,8 @@ static inline void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff
  	if (ev->status == 0)
-@@ -2543,10 +2544,10 @@ static inline void hci_pin_code_request_evt(struct hci_dev *hdev, struct sk_buff
- 		hci_conn_put(conn);
+ 		conn->state = BT_CLOSED;
+ 
+-	if (conn->type == ACL_LINK || conn->type == LE_LINK) {
++	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
++			(conn->type == ACL_LINK || conn->type == LE_LINK)) {
+ 		if (ev->status != 0)
+ 			mgmt_disconnect_failed(hdev, &conn->dst, ev->status);
+ 		else
+@@ -1884,14 +1906,18 @@ static inline void hci_remote_name_evt(struct hci_dev *hdev, struct sk_buff *skb
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	if (test_bit(HCI_MGMT, &hdev->dev_flags)) {
+-		if (ev->status == 0)
+-			mgmt_remote_name(hdev, &ev->bdaddr, ev->name);
++	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+ 
+-		hci_resolve_next_name(hdev, &ev->bdaddr);
+-	}
++	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
++		goto check_auth;
+ 
+-	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
++	if (ev->status == 0)
++		hci_check_pending_name(hdev, conn, &ev->bdaddr, ev->name,
++					strnlen(ev->name, HCI_MAX_NAME_LENGTH));
++	else
++		hci_check_pending_name(hdev, conn, &ev->bdaddr, NULL, 0);
++
++check_auth:
+ 	if (!conn)
+ 		goto unlock;
+ 
+@@ -2000,7 +2026,10 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
+ 		bacpy(&cp.bdaddr, &conn->dst);
+ 		cp.pscan_rep_mode = 0x02;
+ 		hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ, sizeof(cp), &cp);
+-	}
++	} else if (!test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
++		mgmt_device_connected(hdev, &conn->dst, conn->type,
++						conn->dst_type, NULL, 0,
++						conn->dev_class);
+ 
+ 	if (!hci_outgoing_auth_needed(hdev, conn)) {
+ 		conn->state = BT_CONNECTED;
+@@ -2770,7 +2799,10 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
+ 		bacpy(&cp.bdaddr, &conn->dst);
+ 		cp.pscan_rep_mode = 0x02;
+ 		hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ, sizeof(cp), &cp);
+-	}
++	} else if (!test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
++		mgmt_device_connected(hdev, &conn->dst, conn->type,
++						conn->dst_type, NULL, 0,
++						conn->dev_class);
+ 
+ 	if (!hci_outgoing_auth_needed(hdev, conn)) {
+ 		conn->state = BT_CONNECTED;
+@@ -3172,7 +3204,9 @@ static inline void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 		goto unlock;
  	}
  
--	if (!test_bit(HCI_PAIRABLE, &hdev->dev_flags))
-+	if (!test_bit(HCI_DEV_PAIRABLE, &hdev->flags))
- 		hci_send_cmd(hdev, HCI_OP_PIN_CODE_NEG_REPLY,
- 					sizeof(ev->bdaddr), &ev->bdaddr);
--	else if (test_bit(HCI_MGMT, &hdev->dev_flags)) {
-+	else if (test_bit(HCI_DEV_MGMT, &hdev->flags)) {
- 		u8 secure;
+-	mgmt_device_connected(hdev, &ev->bdaddr, conn->type, conn->dst_type);
++	if (!test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
++		mgmt_device_connected(hdev, &ev->bdaddr, conn->type,
++						conn->dst_type, NULL, 0, 0);
  
- 		if (conn->pending_sec_level == BT_SECURITY_HIGH)
-@@ -2570,7 +2571,7 @@ static inline void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff
- 
- 	BT_DBG("%s", hdev->name);
- 
--	if (!test_bit(HCI_LINK_KEYS, &hdev->dev_flags))
-+	if (!test_bit(HCI_DEV_LINK_KEYS, &hdev->flags))
- 		return;
- 
- 	hci_dev_lock(hdev);
-@@ -2585,7 +2586,7 @@ static inline void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff
- 	BT_DBG("%s found key type %u for %s", hdev->name, key->type,
- 							batostr(&ev->bdaddr));
- 
--	if (!test_bit(HCI_DEBUG_KEYS, &hdev->dev_flags) &&
-+	if (!test_bit(HCI_DEV_DEBUG_KEYS, &hdev->flags) &&
- 				key->type == HCI_LK_DEBUG_COMBINATION) {
- 		BT_DBG("%s ignoring debug key", hdev->name);
- 		goto not_found;
-@@ -2647,7 +2648,7 @@ static inline void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff
- 		hci_conn_put(conn);
- 	}
- 
--	if (test_bit(HCI_LINK_KEYS, &hdev->dev_flags))
-+	if (test_bit(HCI_DEV_LINK_KEYS, &hdev->flags))
- 		hci_add_link_key(hdev, conn, 1, &ev->bdaddr, ev->link_key,
- 							ev->key_type, pin_len);
- 
-@@ -2907,7 +2908,7 @@ static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct
- 		data.rssi		= info->rssi;
- 		data.ssp_mode		= 0x01;
- 
--		if (test_bit(HCI_MGMT, &hdev->dev_flags))
-+		if (test_bit(HCI_DEV_MGMT, &hdev->flags))
- 			name_known = eir_has_data_type(info->data,
- 							sizeof(info->data),
- 							EIR_NAME_COMPLETE);
-@@ -2958,10 +2959,10 @@ static inline void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff
- 
- 	hci_conn_hold(conn);
- 
--	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
-+	if (!test_bit(HCI_DEV_MGMT, &hdev->flags))
- 		goto unlock;
- 
--	if (test_bit(HCI_PAIRABLE, &hdev->dev_flags) ||
-+	if (test_bit(HCI_DEV_PAIRABLE, &hdev->flags) ||
- 			(conn->remote_auth & ~0x01) == HCI_AT_NO_BONDING) {
- 		struct hci_cp_io_capability_reply cp;
- 
-@@ -3025,7 +3026,7 @@ static inline void hci_user_confirm_request_evt(struct hci_dev *hdev,
- 
- 	hci_dev_lock(hdev);
- 
--	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
-+	if (!test_bit(HCI_DEV_MGMT, &hdev->flags))
- 		goto unlock;
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
-@@ -3091,7 +3092,7 @@ static inline void hci_user_passkey_request_evt(struct hci_dev *hdev,
- 
- 	hci_dev_lock(hdev);
- 
--	if (test_bit(HCI_MGMT, &hdev->dev_flags))
-+	if (test_bit(HCI_DEV_MGMT, &hdev->flags))
- 		mgmt_user_passkey_request(hdev, &ev->bdaddr);
- 
- 	hci_dev_unlock(hdev);
-@@ -3150,7 +3151,7 @@ static inline void hci_remote_oob_data_request_evt(struct hci_dev *hdev,
- 
- 	hci_dev_lock(hdev);
- 
--	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
-+	if (!test_bit(HCI_DEV_MGMT, &hdev->flags))
- 		goto unlock;
- 
- 	data = hci_find_remote_oob_data(hdev, &ev->bdaddr);
+ 	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->handle = __le16_to_cpu(ev->handle);
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index de07f7c..2016c1c 100644
+index c851579..8d5f8b9 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -226,10 +226,10 @@ static int read_index_list(struct sock *sk)
+@@ -1244,7 +1244,6 @@ static int get_connections(struct sock *sk, u16 index)
+ 	struct mgmt_rp_get_connections *rp;
+ 	struct hci_dev *hdev;
+ 	struct hci_conn *c;
+-	struct list_head *p;
+ 	size_t rp_len;
+ 	u16 count;
+ 	int i, err;
+@@ -1259,8 +1258,9 @@ static int get_connections(struct sock *sk, u16 index)
+ 	hci_dev_lock(hdev);
+ 
+ 	count = 0;
+-	list_for_each(p, &hdev->conn_hash.list) {
+-		count++;
++	list_for_each_entry(c, &hdev->conn_hash.list, list) {
++		if (test_bit(HCI_CONN_MGMT_CONNECTED, &c->flags))
++			count++;
+ 	}
+ 
+ 	rp_len = sizeof(*rp) + (count * sizeof(struct mgmt_addr_info));
+@@ -1274,6 +1274,8 @@ static int get_connections(struct sock *sk, u16 index)
  
  	i = 0;
- 	list_for_each_entry(d, &hci_dev_list, list) {
--		if (test_and_clear_bit(HCI_AUTO_OFF, &d->dev_flags))
-+		if (test_and_clear_bit(HCI_DEV_AUTO_OFF, &d->flags))
- 			cancel_delayed_work(&d->power_off);
- 
--		if (test_bit(HCI_SETUP, &d->dev_flags))
-+		if (test_bit(HCI_DEV_SETUP, &d->flags))
- 			continue;
- 
- 		put_unaligned_le16(d->id, &rp->index[i++]);
-@@ -285,7 +285,7 @@ static u32 get_current_settings(struct hci_dev *hdev)
- 	if (test_bit(HCI_ISCAN, &hdev->compat_flags))
- 		settings |= MGMT_SETTING_DISCOVERABLE;
- 
--	if (test_bit(HCI_PAIRABLE, &hdev->dev_flags))
-+	if (test_bit(HCI_DEV_PAIRABLE, &hdev->flags))
- 		settings |= MGMT_SETTING_PAIRABLE;
- 
- 	if (!(hdev->features[4] & LMP_NO_BREDR))
-@@ -297,7 +297,7 @@ static u32 get_current_settings(struct hci_dev *hdev)
- 	if (test_bit(HCI_AUTH, &hdev->compat_flags))
- 		settings |= MGMT_SETTING_LINK_SECURITY;
- 
--	if (test_bit(HCI_SSP_ENABLED, &hdev->compat_flags))
-+	if (test_bit(HCI_DEV_SSP_ENABLED, &hdev->compat_flags))
- 		settings |= MGMT_SETTING_SSP;
- 
- 	return settings;
-@@ -416,10 +416,10 @@ static int update_eir(struct hci_dev *hdev)
- 	if (!(hdev->features[6] & LMP_EXT_INQ))
- 		return 0;
- 
--	if (!test_bit(HCI_SSP_ENABLED, &hdev->compat_flags))
-+	if (!test_bit(HCI_DEV_SSP_ENABLED, &hdev->compat_flags))
- 		return 0;
- 
--	if (test_bit(HCI_SERVICE_CACHE, &hdev->dev_flags))
-+	if (test_bit(HCI_DEV_SERVICE_CACHE, &hdev->flags))
- 		return 0;
- 
- 	memset(&cp, 0, sizeof(cp));
-@@ -451,7 +451,7 @@ static int update_class(struct hci_dev *hdev)
- 
- 	BT_DBG("%s", hdev->name);
- 
--	if (test_bit(HCI_SERVICE_CACHE, &hdev->dev_flags))
-+	if (test_bit(HCI_DEV_SERVICE_CACHE, &hdev->flags))
- 		return 0;
- 
- 	cod[0] = hdev->minor_class;
-@@ -469,7 +469,7 @@ static void service_cache_off(struct work_struct *work)
- 	struct hci_dev *hdev = container_of(work, struct hci_dev,
- 							service_cache.work);
- 
--	if (!test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->dev_flags))
-+	if (!test_and_clear_bit(HCI_DEV_SERVICE_CACHE, &hdev->flags))
- 		return;
- 
- 	hci_dev_lock(hdev);
-@@ -482,10 +482,10 @@ static void service_cache_off(struct work_struct *work)
- 
- static void mgmt_init_hdev(struct hci_dev *hdev)
- {
--	if (!test_and_set_bit(HCI_MGMT, &hdev->dev_flags))
-+	if (!test_and_set_bit(HCI_DEV_MGMT, &hdev->flags))
- 		INIT_DELAYED_WORK(&hdev->service_cache, service_cache_off);
- 
--	if (!test_and_set_bit(HCI_SERVICE_CACHE, &hdev->dev_flags))
-+	if (!test_and_set_bit(HCI_DEV_SERVICE_CACHE, &hdev->flags))
- 		schedule_delayed_work(&hdev->service_cache,
- 				msecs_to_jiffies(SERVICE_CACHE_TIMEOUT));
+ 	list_for_each_entry(c, &hdev->conn_hash.list, list) {
++		if (!test_bit(HCI_CONN_MGMT_CONNECTED, &c->flags))
++			continue;
+ 		bacpy(&rp->addr[i].bdaddr, &c->dst);
+ 		rp->addr[i].type = link_to_mgmt(c->type, c->dst_type);
+ 		if (rp->addr[i].type == MGMT_ADDR_INVALID)
+@@ -2465,15 +2467,28 @@ int mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key,
  }
-@@ -502,7 +502,7 @@ static int read_controller_info(struct sock *sk, u16 index)
- 		return cmd_status(sk, index, MGMT_OP_READ_INFO,
- 						MGMT_STATUS_INVALID_PARAMS);
  
--	if (test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags))
-+	if (test_and_clear_bit(HCI_DEV_AUTO_OFF, &hdev->flags))
- 		cancel_delayed_work_sync(&hdev->power_off);
- 
- 	hci_dev_lock(hdev);
-@@ -851,9 +851,9 @@ static int set_pairable(struct sock *sk, u16 index, unsigned char *data,
- 	hci_dev_lock(hdev);
- 
- 	if (cp->val)
--		set_bit(HCI_PAIRABLE, &hdev->dev_flags);
-+		set_bit(HCI_DEV_PAIRABLE, &hdev->flags);
- 	else
--		clear_bit(HCI_PAIRABLE, &hdev->dev_flags);
-+		clear_bit(HCI_DEV_PAIRABLE, &hdev->flags);
- 
- 	err = send_settings_rsp(sk, MGMT_OP_SET_PAIRABLE, hdev);
- 	if (err < 0)
-@@ -1008,7 +1008,7 @@ static int set_dev_class(struct sock *sk, u16 index, unsigned char *data,
- 	hdev->major_class = cp->major;
- 	hdev->minor_class = cp->minor;
- 
--	if (test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->dev_flags)) {
-+	if (test_and_clear_bit(HCI_DEV_SERVICE_CACHE, &hdev->flags)) {
- 		hci_dev_unlock(hdev);
- 		cancel_delayed_work_sync(&hdev->service_cache);
- 		hci_dev_lock(hdev);
-@@ -1063,12 +1063,12 @@ static int load_link_keys(struct sock *sk, u16 index, unsigned char *data,
- 
- 	hci_link_keys_clear(hdev);
- 
--	set_bit(HCI_LINK_KEYS, &hdev->dev_flags);
-+	set_bit(HCI_DEV_LINK_KEYS, &hdev->flags);
- 
- 	if (cp->debug_keys)
--		set_bit(HCI_DEBUG_KEYS, &hdev->dev_flags);
-+		set_bit(HCI_DEV_DEBUG_KEYS, &hdev->flags);
- 	else
--		clear_bit(HCI_DEBUG_KEYS, &hdev->dev_flags);
-+		clear_bit(HCI_DEV_DEBUG_KEYS, &hdev->flags);
- 
- 	for (i = 0; i < key_count; i++) {
- 		struct mgmt_link_key_info *key = &cp->keys[i];
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index e08fe6c..1c5e103 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -217,7 +217,7 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
+ int mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+-								u8 addr_type)
++					u8 addr_type, u8 *name, u8 name_len,
++					u8 *dev_class)
  {
- 	u8 dist_keys = 0;
+-	struct mgmt_addr_info ev;
++	char buf[512];
++	struct mgmt_ev_device_connected *ev = (void *) buf;
++	u16 eir_len = 0;
  
--	if (test_bit(HCI_PAIRABLE, &conn->hcon->hdev->dev_flags)) {
-+	if (test_bit(HCI_DEV_PAIRABLE, &conn->hcon->hdev->flags)) {
- 		dist_keys = SMP_DIST_ENC_KEY;
- 		authreq |= SMP_AUTH_BONDING;
- 	} else {
+-	bacpy(&ev.bdaddr, bdaddr);
+-	ev.type = link_to_mgmt(link_type, addr_type);
++	bacpy(&ev->addr.bdaddr, bdaddr);
++	ev->addr.type = link_to_mgmt(link_type, addr_type);
+ 
+-	return mgmt_event(MGMT_EV_DEVICE_CONNECTED, hdev, &ev, sizeof(ev),
+-									NULL);
++	if (name_len > 0)
++		eir_len = eir_append_data(ev->eir, 0, EIR_NAME_COMPLETE,
++								name, name_len);
++
++	if (dev_class && memcmp(dev_class, "\0\0\0", 3) != 0)
++		eir_len = eir_append_data(&ev->eir[eir_len], eir_len,
++					EIR_CLASS_OF_DEV, dev_class, 3);
++
++	put_unaligned_le16(eir_len, &ev->eir_len);
++
++	return mgmt_event(MGMT_EV_DEVICE_CONNECTED, hdev, buf,
++						sizeof(*ev) + eir_len, NULL);
+ }
+ 
+ static void disconnect_rsp(struct pending_cmd *cmd, void *data)
+@@ -2813,16 +2828,27 @@ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	return mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev, ev_size, NULL);
+ }
+ 
+-int mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *name)
++int mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
++				u8 addr_type, s8 rssi, u8 *name, u8 name_len)
+ {
+-	struct mgmt_ev_remote_name ev;
++	struct mgmt_ev_device_found *ev;
++	char buf[sizeof(*ev) + HCI_MAX_NAME_LENGTH + 2];
++	u16 eir_len;
+ 
+-	memset(&ev, 0, sizeof(ev));
++	ev = (struct mgmt_ev_device_found *) buf;
+ 
+-	bacpy(&ev.bdaddr, bdaddr);
+-	memcpy(ev.name, name, HCI_MAX_NAME_LENGTH);
++	memset(buf, 0, sizeof(buf));
++
++	bacpy(&ev->addr.bdaddr, bdaddr);
++	ev->addr.type = link_to_mgmt(link_type, addr_type);
++	ev->rssi = rssi;
++
++	eir_len = eir_append_data(ev->eir, 0, EIR_NAME_COMPLETE, name,
++								name_len);
++
++	put_unaligned_le16(eir_len, &ev->eir_len);
+ 
+-	return mgmt_event(MGMT_EV_REMOTE_NAME, hdev, &ev, sizeof(ev), NULL);
++	return mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, &ev, sizeof(ev), NULL);
+ }
+ 
+ int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
 -- 
 1.7.8.3
 
