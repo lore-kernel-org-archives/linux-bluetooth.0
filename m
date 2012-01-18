@@ -1,40 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1326914231.6454.409.camel@aeonflux>
-Subject: Re: [PATCH 13/15] Bluetooth: Update device_connected and
- device_found events to latest API
-From: Marcel Holtmann <marcel@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1326912717-6347-8-git-send-email-johan.hedberg@gmail.com>
+References: <1326912717-6347-1-git-send-email-johan.hedberg@gmail.com>
+	<1326912717-6347-8-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 18 Jan 2012 15:18:33 -0400
+Message-ID: <CAJdJm_MfgdPvF00C2M=huzPk3TpZu5JivN2WdAK0-=BBJhyYsA@mail.gmail.com>
+Subject: Re: [PATCH 07/15] Bluetooth: Merge device class into the EIR data in mgmt_ev_device_found
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 18 Jan 2012 20:17:11 +0100
-In-Reply-To: <1326912717-6347-14-git-send-email-johan.hedberg@gmail.com>
-References: <1326912717-6347-1-git-send-email-johan.hedberg@gmail.com>
-	 <1326912717-6347-14-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> This patch updates mgmt_ev_device_connected and mgmt_ev_device found to
-> include an EIR-encoded remote name and class whenever possible. With
-> this addition the mgmt_ev_remote_name event becomes unnecessary and can
-> be removed. Since the connected event doesn't map to hci_conn_complete
-> anymore a HCI_CONN_MGMT_CONNECTED flag is added to track when mgmt has
-> been notified about a connection.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  include/net/bluetooth/hci_core.h |    7 ++-
->  include/net/bluetooth/mgmt.h     |   17 ++++----
->  net/bluetooth/hci_event.c        |   78 +++++++++++++++++++++++++++-----------
->  net/bluetooth/mgmt.c             |   56 ++++++++++++++++++++-------
->  4 files changed, 110 insertions(+), 48 deletions(-)
+On Wed, Jan 18, 2012 at 2:51 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> +static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
+> +                                                               u16 data_len)
+> +{
+> +       eir[eir_len++] = sizeof(type) + data_len;
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Isn't it better to have data_len as u8? It is impossible for a EIR or
+AD entry to have more than 255 octets (given the length field is one
+octet).
 
-Regards
+> +       eir[eir_len++] = type;
+> +       memcpy(&eir[eir_len], data, data_len);
+> +       eir_len += data_len;
+> +
+> +       return eir_len;
+> +}
 
-Marcel
-
-
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
