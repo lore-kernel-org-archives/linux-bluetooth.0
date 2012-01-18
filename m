@@ -1,41 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 Jan 2012 22:29:16 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 07/15] Bluetooth: Merge device class into the EIR data in
- mgmt_ev_device_found
-Message-ID: <20120118202916.GA28661@fusion.localdomain>
-References: <1326912717-6347-1-git-send-email-johan.hedberg@gmail.com>
- <1326912717-6347-8-git-send-email-johan.hedberg@gmail.com>
- <CAJdJm_MfgdPvF00C2M=huzPk3TpZu5JivN2WdAK0-=BBJhyYsA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CAJdJm_MfgdPvF00C2M=huzPk3TpZu5JivN2WdAK0-=BBJhyYsA@mail.gmail.com>
+In-Reply-To: <CACJA=fX_TTf+1ecuY_31xRRHsBQFOMhX=zaDi1=4cQcYYmJCpQ@mail.gmail.com>
+References: <1326890884-16678-1-git-send-email-ulisses@profusion.mobi>
+	<1326890884-16678-2-git-send-email-ulisses@profusion.mobi>
+	<CACJA=fX_TTf+1ecuY_31xRRHsBQFOMhX=zaDi1=4cQcYYmJCpQ@mail.gmail.com>
+Date: Wed, 18 Jan 2012 17:40:15 -0200
+Message-ID: <CAA37ikZRPfucbQZSMB+rdgDnBz4MnkrD1k=Kb4Dk+1RAvJ=DmQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Bluetooth: Remove wait for delayed work to finish
+From: Ulisses Furquim <ulisses@profusion.mobi>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Andre,
 
-On Wed, Jan 18, 2012, Anderson Lizardo wrote:
-> Hi Johan,
-> 
-> On Wed, Jan 18, 2012 at 2:51 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> > +static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
-> > +                                                               u16 data_len)
-> > +{
-> > +       eir[eir_len++] = sizeof(type) + data_len;
-> 
-> Isn't it better to have data_len as u8? It is impossible for a EIR or
-> AD entry to have more than 255 octets (given the length field is one
-> octet).
+On Wed, Jan 18, 2012 at 5:34 PM, Andre Guedes
+<andre.guedes@openbossa.org> wrote:
+> Hi Ulisses,
+>
+> On Wed, Jan 18, 2012 at 9:48 AM, Ulisses Furquim <ulisses@profusion.mobi> wrote:
+>> Do not wait for delayed work to finish where it's not needed. In the
+>> case of adv_work the handler is already protected by the hdev lock
+>> and removing the wait we also avoid introducing deadlocks involving
+>> the delayed work lock.
+>>
+>> Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
+>> ---
+>>  net/bluetooth/hci_core.c  |    2 +-
+>>  net/bluetooth/hci_event.c |    2 +-
+>>  2 files changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index a7b7200..b4041be 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -1731,7 +1731,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
+>>
+>>        hci_del_sysfs(hdev);
+>>
+>> -       cancel_delayed_work_sync(&hdev->adv_work);
+>> +       cancel_delayed_work(&hdev->adv_work);
+>
+> I'm afraid we'll introduce a race condition if we don't use the
+> _sync variant at hci_unregister_dev.
+>
+> If we don't wait adv_work finish it may be running after hdev
+> object is freed.
 
-Since we've taken up the habit of appending items to the data (such as
-the device class) before passing it on to user space we thought it'd be
-more future proof to use two octets. The mgmt messages use two octets as
-well. I was also initially of the opinion that one should be enough but
-Marcel convinced me that two is better since we're living very close to
-the limit and would have to break the API if at any point in the future
-we suddenly need more space.
+Indeed, you're right. And I was going through the uses of _sync() and
+skipped those in paths where we free the object but didn't see this
+one.
 
-Johan
+Regards,
+
+-- 
+Ulisses Furquim
+ProFUSION embedded systems
+http://profusion.mobi
+Mobile: +55 19 9250 0942
+Skype: ulissesffs
