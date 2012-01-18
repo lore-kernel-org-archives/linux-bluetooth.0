@@ -1,60 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd v3] client: fix parsing of apparam on pbap driver
-Date: Wed, 18 Jan 2012 13:36:14 +0200
-Message-Id: <1326886574-10210-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B0260B41DE13@DNCE02.ent.ti.com>
+References: <1326842930-31623-1-git-send-email-vinicius.gomes@openbossa.org>
+	<F0070FBC0FB3174D8D11444EB2D5B0260B41DE13@DNCE02.ent.ti.com>
+Date: Wed, 18 Jan 2012 06:40:42 -0400
+Message-ID: <CAJdJm_OXhZeB-Vx900PR7gwb1A0xiJzgyp6BP9x-hbgE6Gx7Nw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 01/11] mgmt-api: Update the commands for exchanging LTK's
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: "Ganir, Chen" <chen.ganir@ti.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Chen,
 
-Both hdr and size need to be updated otherwise no parameters will be
-parsed.
----
-v3: fix invalid read caused by updating hdr before size
+On Wed, Jan 18, 2012 at 3:17 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
+> Storing the address type in the LTK is not perfect. For this to work properly, you will store the address type only for devices which exchanged keys. What if we have devices which do not do pairing or exchange keys at all ? What if we use the CreateDevice instead of CreatePairedDevice? In that case we will not have the address type for future reconnections. We need to store the device address type in a separate file (for example, addresstypes) and manage it separately from the LTK management.
 
- client/pbap.c |   11 ++++++-----
- 1 files changed, 6 insertions(+), 5 deletions(-)
+Note that BlueZ is still relying on the kernel LE advertising cache
+(which is refreshed with either the automatic scanning prior to
+connection, or with the future background scanning support) for
+detecting address type for non-bonded devices. We have no plans to
+change that in near feature, because IIRC it would require changing
+bluetooth socket API (which would break all current BR/EDR
+applications).
 
-diff --git a/client/pbap.c b/client/pbap.c
-index 9e9eb05..8efa568 100644
---- a/client/pbap.c
-+++ b/client/pbap.c
-@@ -364,8 +364,8 @@ static void read_return_apparam(struct obc_session *session,
- {
- 	struct obc_transfer *transfer = obc_session_get_transfer(session);
- 	struct obc_transfer_params params;
--	unsigned char *buf;
--	size_t size = 0;
-+	struct apparam_hdr *hdr;
-+	size_t size;
- 
- 	*phone_book_size = 0;
- 	*new_missed_calls = 0;
-@@ -376,9 +376,10 @@ static void read_return_apparam(struct obc_session *session,
- 	if (params.size < APPARAM_HDR_SIZE)
- 		return;
- 
--	while (size > APPARAM_HDR_SIZE) {
--		struct apparam_hdr *hdr = (struct apparam_hdr *) params.data;
-+	hdr = (struct apparam_hdr *) params.data;
-+	size = params.size;
- 
-+	while (size > APPARAM_HDR_SIZE) {
- 		if (hdr->len > size - APPARAM_HDR_SIZE) {
- 			error("Unexpected PBAP pullphonebook app"
- 					" length, tag %d, len %d",
-@@ -404,8 +405,8 @@ static void read_return_apparam(struct obc_session *session,
- 					hdr->tag, hdr->len);
- 		}
- 
--		buf += APPARAM_HDR_SIZE + hdr->len;
- 		size -= APPARAM_HDR_SIZE + hdr->len;
-+		hdr += APPARAM_HDR_SIZE + hdr->len;
- 	}
- }
- 
+This is an issue separate from LTK storage, if you are interested on
+pursuing this, feel free to make a proposal.
+
+Best Regards,
 -- 
-1.7.7.5
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
