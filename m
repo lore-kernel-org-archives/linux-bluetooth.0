@@ -1,66 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1326890884-16678-2-git-send-email-ulisses@profusion.mobi>
-References: <1326890884-16678-1-git-send-email-ulisses@profusion.mobi>
-	<1326890884-16678-2-git-send-email-ulisses@profusion.mobi>
-Date: Wed, 18 Jan 2012 16:34:23 -0300
-Message-ID: <CACJA=fX_TTf+1ecuY_31xRRHsBQFOMhX=zaDi1=4cQcYYmJCpQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Bluetooth: Remove wait for delayed work to finish
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Ulisses Furquim <ulisses@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1326915115.6454.411.camel@aeonflux>
+Subject: Re: [PATCH 09/15] Bluetooth: Merge boolean members of struct
+ hci_conn into flags
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 18 Jan 2012 20:31:55 +0100
+In-Reply-To: <20120118192522.GA27730@fusion.localdomain>
+References: <1326912717-6347-1-git-send-email-johan.hedberg@gmail.com>
+	 <1326912717-6347-10-git-send-email-johan.hedberg@gmail.com>
+	 <1326913969.6454.405.camel@aeonflux>
+	 <20120118192522.GA27730@fusion.localdomain>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ulisses,
+Hi Johan,
 
-On Wed, Jan 18, 2012 at 9:48 AM, Ulisses Furquim <ulisses@profusion.mobi> wrote:
-> Do not wait for delayed work to finish where it's not needed. In the
-> case of adv_work the handler is already protected by the hdev lock
-> and removing the wait we also avoid introducing deadlocks involving
-> the delayed work lock.
->
-> Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
-> ---
->  net/bluetooth/hci_core.c  |    2 +-
->  net/bluetooth/hci_event.c |    2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index a7b7200..b4041be 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1731,7 +1731,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
->
->        hci_del_sysfs(hdev);
->
-> -       cancel_delayed_work_sync(&hdev->adv_work);
-> +       cancel_delayed_work(&hdev->adv_work);
+> > >  	unsigned int	sent;
+> > > @@ -409,6 +406,9 @@ enum {
+> > >  	HCI_CONN_MODE_CHANGE_PEND,
+> > >  	HCI_CONN_SCO_SETUP_PEND,
+> > >  	HCI_CONN_LE_SMP_PEND,
+> > > +	HCI_CONN_SSP_SUPPORT,
+> > 
+> > didn't we agree on naming this SSP_ENABLED?
+> 
+> We agreed about that for hci_dev but not for hci_conn (or then I
+> misunderstood you). I used "support" here since it means that the remote
+> device can support it if we have it enabled (and hence "enabled" for the
+> hci_dev flag). But I can change it anyway you like.
 
-I'm afraid we'll introduce a race condition if we don't use the
-_sync variant at hci_unregister_dev.
+since this is the host features of the remote side, it does actually
+mean it is enabled. So using SSP_ENABLED is actually better.
 
-If we don't wait adv_work finish it may be running after hdev
-object is freed.
+Regards
 
->
->        destroy_workqueue(hdev->workqueue);
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index c2fe964..f28cbae 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1045,7 +1045,7 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
->        case LE_SCANNING_ENABLED:
->                set_bit(HCI_LE_SCAN, &hdev->dev_flags);
->
-> -               cancel_delayed_work_sync(&hdev->adv_work);
-> +               cancel_delayed_work(&hdev->adv_work);
->
->                hci_dev_lock(hdev);
->                hci_adv_entries_clear(hdev);
+Marcel
 
-BR,
 
-Andre
