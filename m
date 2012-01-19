@@ -1,79 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CAJdJm_N9f0Za56Xh3gD55iT7vO5bSkT-ujXX9pdv-hjZrFS9PQ@mail.gmail.com>
+References: <1326143081-30005-2-git-send-email-claudio.takahasi@openbossa.org>
+	<1326485995-707-1-git-send-email-claudio.takahasi@openbossa.org>
+	<20120118121731.GC6655@x220>
+	<CAJdJm_N9f0Za56Xh3gD55iT7vO5bSkT-ujXX9pdv-hjZrFS9PQ@mail.gmail.com>
+Date: Thu, 19 Jan 2012 15:21:38 -0300
+Message-ID: <CAKT1EBfCGV8GjzVdJ-UKRZOuKRZ_ftijCwJ_DRuRssac7+yYiw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] Add Proximity Reporter API
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 1/2] Add Proximity Reporter API
-Date: Thu, 19 Jan 2012 15:36:59 -0300
-Message-Id: <1326998219-2255-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <CAKT1EBfCGV8GjzVdJ-UKRZOuKRZ_ftijCwJ_DRuRssac7+yYiw@mail.gmail.com>
-References: <CAKT1EBfCGV8GjzVdJ-UKRZOuKRZ_ftijCwJ_DRuRssac7+yYiw@mail.gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds API for Immediate Alert Service(IAS) abstraction. IAS is used
-by Proximity Monitors and Find Me Locators to notify the user that
-reporter/target has been found. This new interface combines Proximity
-Reporter and Find Me Target in the same API providing the flexibility
-to implement external applications to control alerts(including per
-device alerts).
+Hi Johan,
 
-This abstraction allows the development of platform specific
-applications to control Immediate Alert coming from Proximity Monitor
-and Find Me Locator. This provides flexibility to define different level
-and tone for each device. Use case: watch finding a mobile phone.
----
- doc/proximity-api.txt |   34 ++++++++++++++++++++++++++++++++--
- 1 files changed, 32 insertions(+), 2 deletions(-)
+On Wed, Jan 18, 2012 at 9:49 AM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Johan,
+>
+> On Wed, Jan 18, 2012 at 8:17 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> Hi Claudio,
+>>
+>> On Fri, Jan 13, 2012, Claudio Takahasi wrote:
+>>> +Proximity Reporter hierarchy
+>>> +===========================
+>>> +
+>>> +Service used by Proximity Path Loss and Find Me. Allows per device
+>>> +alert level handling.
+>>> +
+>>> +Service              org.bluez
+>>> +Interface    org.bluez.ProximityReporter
+>>> +Object path  [variable prefix]/{hci0,hci1,...}
+>>> +
+>>> +Methods
+>>> +
+>>> +
+>>> +Signals              ImmediateAlertLevelChanged(object device, string value)
+>>> +
+>>> +                     This signal indicates that Immediate Alert Level
+>>> +                     characteristic was changed by the remote device.
+>>> +                     Values: "none", "mild", "high".
+>>> +
+>>> +Properties
+>>
+>> Shouldn't ImmediateAlertLevel and LinkLossAlertLevel be defined as
+>> properties and then you'd have PropertyChanged instead of these custom
+>> signals?
+>
+> Initially, we discarded one approach where we could have Properties on
+> the _device_ object path, because we would need to monitor each new
+> created device, check if it has the Immediate/LinkLossAlertLevel
+> property on the ProximityReporter interface, and if so, listen to the
+> PropertyChanged signal. This seems too much overhead IMHO.
+>
+> Unless you are proposing keeping the interface and properties on the
+> adapter object path? In this case, we will lose the information about
+> the peer device which issued the alert. I'm unsure if this is a big
+> problem or not (given that the alert is "global" to the Proximity
+> Reporter, not a per peer state).
+>
+> On the other hand, this "custom signal" approach allows to have only
+> one (or two) listener, no matter how many devices are connected to the
+> reporter, and still know which peer triggered the alert.
+>
+> One benefit of knowing which device triggered the alert, is to have
+> custom alerts (e.g. different sounds) for each device, or if the
+> reporter has a display, show which device is making alerts.
+>
+> Any ideas?
+> --
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
 
-diff --git a/doc/proximity-api.txt b/doc/proximity-api.txt
-index cf64bbf..3e49149 100644
---- a/doc/proximity-api.txt
-+++ b/doc/proximity-api.txt
-@@ -4,8 +4,8 @@ BlueZ D-Bus Proximity API description
- Copyright (C) 2011  Claudio Takahasi <claudio.takahasi@openbossa.org>
- 
- 
--Proximity hierarchy
--=================
-+Proximity Monitor hierarchy
-+===========================
- 
- Service		org.bluez
- Interface	org.bluez.ProximityMonitor
-@@ -52,3 +52,33 @@ Properties
- 			"none" will be emitted after the configured timeout.
- 			When changing the level, signal is the confirmation
- 			that the value was written in the remote.
-+
-+Proximity Reporter hierarchy
-+===========================
-+
-+Shared service used by Proximity Path Loss and Find Me. Allows per device
-+alert level handling.
-+
-+Service		org.bluez
-+Interface	org.bluez.ProximityReporter
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-+
-+Methods		dict GetProperties()
-+
-+			Returns all properties for the interface. See the
-+			properties section for available properties.
-+
-+Signals		PropertyChanged(string name, variant value)
-+
-+			This signal indicates a changed value of a given
-+			property.
-+
-+Properties
-+
-+		string ImmediateAlertLevel [readonly]
-+
-+			This property indicates that Immediate Alert Level
-+			characteristic in the local Immediate Alert Service
-+			was changed by the remote device. Property shared
-+			between Path Loss and Find Me. Values: "none", "mild",
-+			"high".
--- 
-1.7.8.1
+I will send the proposal that you are suggesting to collect more
+feedbacks, it is the RFC "proposal "1 sent some weeks ago.
+Complementing what Lizardo wrote, use the device object path is not
+aligned with the current APIs.
+PropertyChanged for ImmediateAlertLevel or LinkLossAlertLevel will be
+sent when the remote device(GATT client) writes a new value in the
+alert level characteristic of the local GATT service(Link Loss or
+Immediate Alert). If this concept of sending PropertyChanged signal
+using the device's object path for an action triggered by the remote
+is clear to everyone we can continue this approach.
 
+BR,
+Claudio
