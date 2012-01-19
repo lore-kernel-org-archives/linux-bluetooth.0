@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 21/34] Bluetooth: A2MP: Process A2MP Get Info Request
-Date: Thu, 19 Jan 2012 11:20:10 +0200
-Message-Id: <1326964823-26747-22-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 23/34] Bluetooth: A2MP: Process A2MP Create Physlink Request
+Date: Thu, 19 Jan 2012 11:20:12 +0200
+Message-Id: <1326964823-26747-24-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1326964823-26747-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1326964823-26747-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,88 +11,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Example of trace log for invalid controller id is shown below:
-...
-> ACL data: handle 11 flags 0x02 dlen 13
-    A2MP: Get Info req: id 238
-< ACL data: handle 11 flags 0x00 dlen 30
-    A2MP: Get Info rsp: id 238 status (1) Invalid Controller ID
-      total bandwidth -381650496
-      max guaranteed bandwidth -274362188
-      min latency -158843144
-      pal capabilities 0x9750
-      assoc size 49478
-...
-Note that If the Status field is set to Invalid Controller ID all subsequent
-fields in the AMP Get Info Response shall be ignored by the receiver.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   37 +++++++++++++++++++++++++++++++++++++
- 1 files changed, 37 insertions(+), 0 deletions(-)
+ net/bluetooth/a2mp.c |   19 +++++++++++++++++++
+ 1 files changed, 19 insertions(+), 0 deletions(-)
 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 7b54130..b26817d 100644
+index 6996fd9..ea881a9 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -12,6 +12,8 @@
-    GNU General Public License for more details.
- */
- 
-+#include <linux/module.h>
-+
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/l2cap.h>
-@@ -179,6 +181,38 @@ static inline int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
+@@ -242,6 +242,22 @@ static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
  	return 0;
  }
  
-+static inline int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
++static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
 +							struct a2mp_cmd *hdr)
 +{
-+	struct a2mp_info_req *req  = (struct a2mp_info_req *)skb->data;
-+	struct hci_dev *hdev;
-+	struct a2mp_info_rsp rsp;
++	struct a2mp_physlink_req *req = (struct a2mp_physlink_req *)skb->data;
 +
 +	if (le16_to_cpu(hdr->len) < sizeof(*req))
 +		return -EINVAL;
 +
-+	rsp.id = req->id;
-+	rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
++	BT_DBG("local_id %d, remote_id %d", req->local_id, req->remote_id);
 +
-+	hdev = hci_dev_get(req->id);
-+	if (hdev && hdev->amp_type != HCI_BREDR) {
-+		rsp.status = 0;
-+		rsp.total_bw = cpu_to_le32(hdev->amp_total_bw);
-+		rsp.max_bw = cpu_to_le32(hdev->amp_max_bw);
-+		rsp.min_latency = cpu_to_le32(hdev->amp_min_latency);
-+		rsp.pal_cap = cpu_to_le16(hdev->amp_pal_cap);
-+		rsp.assoc_size = cpu_to_le16(hdev->amp_assoc_size);
-+	}
++	/* TODO process physlink create */
 +
-+	if (hdev)
-+		hci_dev_put(hdev);
-+
-+	a2mp_send(mgr, A2MP_GETINFO_RSP, hdr->ident, sizeof(rsp), &rsp);
-+
-+	skb_pull(skb, sizeof(*req));
++	skb_pull(skb, hdr->len);
 +	return 0;
 +}
 +
  /* Handle A2MP signalling */
  int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
  {
-@@ -215,6 +249,9 @@ int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+@@ -286,6 +302,9 @@ int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
  			break;
  
- 		case A2MP_GETINFO_REQ:
-+			err = a2mp_getinfo_req(mgr, skb, hdr);
+ 		case A2MP_CREATEPHYSLINK_REQ:
++			err = a2mp_createphyslink_req(mgr, skb, hdr);
 +			break;
 +
- 		case A2MP_GETAMPASSOC_REQ:
- 		case A2MP_CREATEPHYSLINK_REQ:
  		case A2MP_DISCONNPHYSLINK_REQ:
+ 		case A2MP_CHANGE_RSP:
+ 		case A2MP_DISCOVER_RSP:
 -- 
 1.7.4.1
 
