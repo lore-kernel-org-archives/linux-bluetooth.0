@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 15/34] Bluetooth: A2MP: Define A2MP status codes
-Date: Thu, 19 Jan 2012 11:20:04 +0200
-Message-Id: <1326964823-26747-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 08/34] Bluetooth: Make l2cap_chan_add available
+Date: Thu, 19 Jan 2012 11:19:57 +0200
+Message-Id: <1326964823-26747-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1326964823-26747-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1326964823-26747-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,35 +11,38 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-A2MP status codes copied from Bluez patch sent by Peter Krystad
-<pkrystad@codeaurora.org>.
+Function will be used when creating fixed channels
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |   10 ++++++++++
- 1 files changed, 10 insertions(+), 0 deletions(-)
+ include/net/bluetooth/l2cap.h |    2 ++
+ net/bluetooth/l2cap_core.c    |    2 +-
+ 2 files changed, 3 insertions(+), 1 deletions(-)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 6e6202a..c99c375 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -103,6 +103,16 @@ struct a2mp_physlink_rsp {
- 	__u8	status;
- } __packed;
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 3c7406f..33acd7d 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -850,4 +850,6 @@ int l2cap_chan_check_security(struct l2cap_chan *chan);
+ void l2cap_ertm_init(struct l2cap_chan *chan);
+ int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb);
  
-+/* A2MP response status */
-+#define A2MP_STATUS_SUCCESS			0x00
-+#define A2MP_STATUS_INVALID_CTRL_ID		0x01
-+#define A2MP_STATUS_UNABLE_START_LINK_CREATION	0x02
-+#define A2MP_STATUS_NO_PHYSICAL_LINK_EXISTS	0x02
-+#define A2MP_STATUS_COLLISION_OCCURED		0x03
-+#define A2MP_STATUS_DISCONN_REQ_RECVD		0x04
-+#define A2MP_STATUS_PHYS_LINK_EXISTS		0x05
-+#define A2MP_STATUS_SECURITY_VIOLATION		0x06
++void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
 +
- void amp_mgr_get(struct amp_mgr *mgr);
- int amp_mgr_put(struct amp_mgr *mgr);
+ #endif /* __L2CAP_H */
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 643bab8..0ac81cc 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -311,7 +311,7 @@ void l2cap_chan_destroy(struct l2cap_chan *chan)
+ 	l2cap_chan_put(chan);
+ }
  
+-static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
++void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ {
+ 	BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
+ 			chan->psm, chan->dcid);
 -- 
 1.7.4.1
 
