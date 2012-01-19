@@ -1,88 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v8 0/9] Add org.bluez.Telephony interface
-Date: Thu, 19 Jan 2012 15:24:31 +0100
-Message-Id: <1326983080-10927-1-git-send-email-frederic.danis@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <1326979849.1955.15.camel@aeonflux>
+Subject: Re: [RFC] Bluetooth: Add alloc_skb chan operator
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 19 Jan 2012 14:30:49 +0100
+In-Reply-To: <1326978832-9888-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1326978832-9888-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Andrei,
 
-This set of patches replaces telephony drivers for HeadSet/HandsFree
-Profiles by a new DBus interface (org.bluez.Telephony).
+> Add channel-specific skb allocation method
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  include/net/bluetooth/l2cap.h |    3 +++
+>  net/bluetooth/l2cap_core.c    |   22 +++++++++++++++-------
+>  net/bluetooth/l2cap_sock.c    |    9 +++++++++
+>  3 files changed, 27 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 34a882b..ed390ad 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -506,6 +506,9 @@ struct l2cap_ops {
+>  	int			(*recv) (void *data, struct sk_buff *skb);
+>  	void			(*close) (void *data);
+>  	void			(*state_change) (void *data, int state);
+> +	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
+> +					unsigned long len, int nb, int *err);
+> +
+>  };
+>  
+>  struct l2cap_conn {
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 598805b..f9bd130 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1531,7 +1531,9 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan, struct msghdr
+>  	while (len) {
+>  		count = min_t(unsigned int, conn->mtu, len);
+>  
+> -		*frag = bt_skb_send_alloc(sk, count, msg->msg_flags & MSG_DONTWAIT, &err);
+> +		*frag = chan->ops->alloc_skb(chan, count,
+> +					msg->msg_flags & MSG_DONTWAIT, &err);
+> +
+>  		if (!*frag)
+>  			return err;
+>  		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
+> @@ -1561,8 +1563,10 @@ static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
+>  	BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
+>  
+>  	count = min_t(unsigned int, (conn->mtu - hlen), len);
+> -	skb = bt_skb_send_alloc(sk, count + hlen,
+> -			msg->msg_flags & MSG_DONTWAIT, &err);
+> +
+> +	skb = chan->ops->alloc_skb(chan, count + hlen,
+> +					msg->msg_flags & MSG_DONTWAIT, &err);
+> +
+>  	if (!skb)
+>  		return ERR_PTR(err);
+>  
+> @@ -1595,8 +1599,10 @@ static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
+>  	BT_DBG("sk %p len %d", sk, (int)len);
+>  
+>  	count = min_t(unsigned int, (conn->mtu - hlen), len);
+> -	skb = bt_skb_send_alloc(sk, count + hlen,
+> -			msg->msg_flags & MSG_DONTWAIT, &err);
+> +
+> +	skb = chan->ops->alloc_skb(chan, count + hlen,
+> +					msg->msg_flags & MSG_DONTWAIT, &err);
+> +
+>  	if (!skb)
+>  		return ERR_PTR(err);
+>  
+> @@ -1642,8 +1648,10 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
+>  		hlen += L2CAP_FCS_SIZE;
+>  
+>  	count = min_t(unsigned int, (conn->mtu - hlen), len);
+> -	skb = bt_skb_send_alloc(sk, count + hlen,
+> -			msg->msg_flags & MSG_DONTWAIT, &err);
+> +
+> +	skb = chan->ops->alloc_skb(chan, count + hlen,
+> +					msg->msg_flags & MSG_DONTWAIT, &err);
+> +
+>  	if (!skb)
+>  		return ERR_PTR(err);
+>  
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index c57027f..4640c12 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -897,12 +897,21 @@ static void l2cap_sock_state_change_cb(void *data, int state)
+>  	sk->sk_state = state;
+>  }
+>  
+> +static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
+> +					unsigned long len, int nb, int *err)
+> +{
+> +	struct sock *sk = chan->sk;
+> +
+> +	return bt_skb_send_alloc(sk, len, nb, err);
+> +}
+> +
+>  static struct l2cap_ops l2cap_chan_ops = {
+>  	.name		= "L2CAP Socket Interface",
+>  	.new_connection	= l2cap_sock_new_connection_cb,
+>  	.recv		= l2cap_sock_recv_cb,
+>  	.close		= l2cap_sock_close_cb,
+>  	.state_change	= l2cap_sock_state_change_cb,
+> +	.alloc_skb	= l2cap_sock_alloc_skb_cb,
+>  };
+>  
+>  static void l2cap_sock_destruct(struct sock *sk)
 
-This will simplify BlueZ code by focusing on the Bluetooth
-communication part and by letting the external application (i.e. oFono)
-take charge of the Telephony tasks (AT parsing and modem specific code,
-which can be removed from BlueZ code). So, it becomes simpler, easier
-to maintain and debug.
+if nobody else objects here, then I am fine with. It does have one extra
+indirection that is a bit of a downside, but we might wanna go with it
+for now and figure out the rest later.
 
-External applications, which should implement AT parsing and telephony
-part of HeadSet or HandsFree Profiles, will have to register a telephony
-agent using this new interface.
-
-Any comments appreciated.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
-PS: Since latest RFC :
-  - update telephony.c to support multiple roles (headset.c and gateway.c)
-Patch 1:
-  - remove experimental flag for org.bluez.Telephony interface
-  - fix Device property type of TelephonyAgent and send it upon connection
-  - remove HS roles, will be integrated in patch 9
-  - add watcher on agent disconnection in telephony.c
-Patch 2:
-  - remove deprecated APIs (IsConnected, IsPlaying and Play) of org.bluez.Headset interface
-  - remove useless methods from org.bluez.HeadsetGateway
-New patch 9:
-  - move HFP HF server from audio/manager.c to audio/telephony.c
-  - update audio/gateway.c to reflect this change and use new interface
+Marcel
 
-Fred
-
-Frédéric Danis (9):
-  audio: Move tel drivers to DBus interface
-  audio: Simplify org.bluez.Headset
-  audio: Remove dummy tel driver
-  audio: Remove maemo5 tel driver
-  audio: Remove maemo6 tel driver
-  audio: Remove oFono tel driver
-  audio: Move HFP/HSP AG servers to telephony.c
-  audio: Send transport path to telephony agent
-  audio: Move HFP HF server to telephony.c
-
- Makefile.am                    |   17 +-
- audio/device.h                 |    1 +
- audio/gateway.c                |  392 ++------
- audio/gateway.h                |    8 +
- audio/headset.c                | 1728 ++------------------------------
- audio/headset.h                |   16 +-
- audio/manager.c                |  534 +----------
- audio/media.c                  |   18 +-
- audio/telephony-dummy.c        |  433 --------
- audio/telephony-maemo5.c       | 2104 --------------------------------------
- audio/telephony-maemo6.c       | 2201 ----------------------------------------
- audio/telephony-ofono.c        | 1638 ------------------------------
- audio/telephony.c              | 1185 +++++++++++++++++++++
- audio/telephony.h              |  196 +----
- audio/transport.c              |  114 ++-
- audio/unix.c                   |    2 +
- doc/assigned-numbers.txt       |    1 +
- doc/audio-api.txt              |  244 ++---
- doc/audio-telephony-design.txt |   91 ++
- doc/hfp-api.txt                |   48 -
- doc/media-api.txt              |   15 +-
- 21 files changed, 1690 insertions(+), 9296 deletions(-)
- delete mode 100644 audio/telephony-dummy.c
- delete mode 100644 audio/telephony-maemo5.c
- delete mode 100644 audio/telephony-maemo6.c
- delete mode 100644 audio/telephony-ofono.c
- create mode 100644 audio/telephony.c
- create mode 100644 doc/audio-telephony-design.txt
 
