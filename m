@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 29/34] Bluetooth: physical link HCI interface to AMP
-Date: Thu, 19 Jan 2012 11:20:18 +0200
-Message-Id: <1326964823-26747-30-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 19/34] Bluetooth: A2MP: Process A2MP Discover Request
+Date: Thu, 19 Jan 2012 11:20:08 +0200
+Message-Id: <1326964823-26747-20-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1326964823-26747-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1326964823-26747-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,114 +11,109 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Adds support for physical link create/acceppt/disconnect AMP HCI
-commands. To be used by the upper layer.
-Backport from CodeAurora & Atheros
+Process A2MP Discover Request, code makes sure that first
+controller in the list is BREDR one. Trace is shown below:
+...
+> ACL data: handle 11 flags 0x02 dlen 16
+    A2MP: Discover req: mtu/mps 670 mask: 0x0000
+< ACL data: handle 11 flags 0x00 dlen 19
+    A2MP: Discover rsp: mtu/mps 670 mask: 0x0000
+      Controller list:
+        id 0, type 0, status 0x01 (Bluetooth only)
+...
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h |   24 ++++++++++++++++++++++
- net/bluetooth/hci_core.c    |   45 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 69 insertions(+), 0 deletions(-)
+ include/net/bluetooth/a2mp.h |    2 +
+ net/bluetooth/a2mp.c         |   55 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 57 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index eed7a55..fcd8fa9 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -30,6 +30,8 @@
- #define HCI_MAX_EVENT_SIZE	260
- #define HCI_MAX_FRAME_SIZE	(HCI_MAX_ACL_SIZE + 4)
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index c99c375..a748ab0 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -15,6 +15,8 @@
+ #ifndef __A2MP_H
+ #define __A2MP_H
  
-+#define HCI_MAX_AMP_KEY_SIZE	32
++#define A2MP_FEAT_EXT	0x8000
 +
- /* HCI dev events */
- #define HCI_DEV_REG			1
- #define HCI_DEV_UNREG			2
-@@ -511,6 +513,28 @@ struct hci_cp_io_capability_neg_reply {
- 	__u8     reason;
- } __packed;
- 
-+#define HCI_OP_CREATE_PHY_LINK		0x0435
-+struct hci_cp_create_phy_link {
-+	__u8     handle;
-+	__u8     key_len;
-+	__u8     key_type;
-+	__u8     key[HCI_MAX_AMP_KEY_SIZE];
-+} __packed;
-+
-+#define HCI_OP_ACCEPT_PHY_LINK		0x0436
-+struct hci_cp_accept_phy_link {
-+	__u8	handle;
-+	__u8	key_len;
-+	__u8	key_type;
-+	__u8	key[HCI_MAX_AMP_KEY_SIZE];
-+} __packed;
-+
-+#define HCI_OP_DISC_PHY_LINK		0x0437
-+struct hci_cp_disc_phy_link {
-+	__u8     handle;
-+	__u8     reason;
-+} __packed;
-+
- #define HCI_OP_SNIFF_MODE		0x0803
- struct hci_cp_sniff_mode {
- 	__le16   handle;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 29bd53d..95ece9d 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -332,6 +332,51 @@ static void hci_linkpol_req(struct hci_dev *hdev, unsigned long opt)
- 	hci_send_cmd(hdev, HCI_OP_WRITE_DEF_LINK_POLICY, 2, &policy);
+ struct amp_mgr {
+ 	struct list_head	list;
+ 	struct l2cap_conn	*l2cap_conn;
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index f31cb07..8371d55 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -111,6 +111,58 @@ static inline int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
  }
  
-+/* AMP HCI interface */
-+void hci_phylink_create_req(struct hci_dev *hdev, __u8 handle, __u8 key_len,
-+						__u8 key_type, __u8 *key)
++static inline int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
++							struct a2mp_cmd *hdr)
 +{
-+	struct hci_cp_create_phy_link cp;
++	struct a2mp_discov_req *req = (struct a2mp_discov_req *)skb->data;
++	struct a2mp_discov_rsp *rsp;
++	u16 ext_feat;
++	size_t len;
++	u8 num_ctrl;
 +
-+	cp.handle	= handle;
-+	cp.key_type	= key_type;
-+	cp.key_len	= min_t(__u8, key_len, HCI_MAX_AMP_KEY_SIZE);
++	if (le16_to_cpu(hdr->len) < sizeof(*req))
++		return -EINVAL;
 +
-+	BT_DBG("key len %d, phy handle %d", cp.key_len, cp.handle);
++	skb_pull(skb, sizeof(*req));
 +
-+	memcpy(cp.key, key, cp.key_len);
-+	hci_send_cmd(hdev, HCI_OP_CREATE_PHY_LINK, sizeof(cp), &cp);
++	BT_DBG("mtu %d efm 0x%4.4x", le16_to_cpu(req->mtu),
++						le16_to_cpu(req->ext_feat));
++
++	ext_feat = le16_to_cpu(req->ext_feat);
++
++	/* check that packet is not broken for now */
++	while (ext_feat & A2MP_FEAT_EXT) {
++		if (skb->len < sizeof(ext_feat))
++			return -EINVAL;
++
++		ext_feat = get_unaligned_le16(skb->data);
++		BT_DBG("ext_feat 0x%4.4x", le16_to_cpu(req->ext_feat));
++		skb_pull(skb, sizeof(ext_feat));
++	}
++
++	read_lock(&hci_dev_list_lock);
++
++	num_ctrl = __hci_num_ctrl();
++	len = num_ctrl * sizeof(struct a2mp_cl) + sizeof(*rsp);
++	rsp = kmalloc(len, GFP_ATOMIC);
++	if (!rsp) {
++		read_unlock(&hci_dev_list_lock);
++		return -ENOMEM;
++	}
++
++	rsp->mtu = cpu_to_le16(L2CAP_A2MP_DEFAULT_MTU);
++	rsp->ext_feat = 0;
++
++	__a2mp_add_cl(mgr, rsp->cl, num_ctrl);
++
++	read_unlock(&hci_dev_list_lock);
++
++	a2mp_send(mgr, A2MP_DISCOVER_RSP, hdr->ident, len, rsp);
++
++	kfree(rsp);
++	return 0;
 +}
-+EXPORT_SYMBOL(hci_phylink_create_req);
 +
-+void hci_phylink_accept_req(struct hci_dev *hdev, __u8 handle, __u8 key_len,
-+						__u8 key_type, __u8 *key)
-+{
-+	struct hci_cp_accept_phy_link cp;
+ /* Handle A2MP signalling */
+ int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ {
+@@ -139,6 +191,9 @@ int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 			break;
+ 
+ 		case A2MP_DISCOVER_REQ:
++			err = a2mp_discover_req(mgr, skb, hdr);
++			break;
 +
-+	cp.handle	= handle;
-+	cp.key_type	= key_type;
-+	cp.key_len	= min_t(__u8, key_len, HCI_MAX_AMP_KEY_SIZE);
-+
-+	BT_DBG("key len %d, phy handle %d", cp.key_len, cp.handle);
-+
-+	memcpy(cp.key, key, cp.key_len);
-+	hci_send_cmd(hdev, HCI_OP_ACCEPT_PHY_LINK, sizeof(cp), &cp);
-+}
-+EXPORT_SYMBOL(hci_phylink_accept_req);
-+
-+void hci_phylink_disc_req(struct hci_dev *hdev, __u8 handle, __u8 reason)
-+{
-+	struct hci_cp_disc_phy_link cp;
-+
-+	BT_DBG("handle %d reason %d", handle, reason);
-+
-+	cp.handle = handle;
-+	cp.reason = reason;
-+	hci_send_cmd(hdev, HCI_OP_DISC_PHY_LINK, sizeof(cp), &cp);
-+}
-+EXPORT_SYMBOL(hci_phylink_disc_req);
-+
- /* Get HCI device by index.
-  * Device is held on return. */
- struct hci_dev *hci_dev_get(int index)
+ 		case A2MP_CHANGE_NOTIFY:
+ 		case A2MP_GETINFO_REQ:
+ 		case A2MP_GETAMPASSOC_REQ:
 -- 
 1.7.4.1
 
