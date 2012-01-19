@@ -1,26 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vishal Agarwal <vishal.agarwal@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: <naresh.gupta@stericsson.com>,
-	Vishal Agarwal <vishal.agarwal@stericsson.com>
-Subject: [PATCH BlueZ v1 0/1] Add Support for BLE Services to Adapter
-Date: Thu, 19 Jan 2012 10:37:33 +0530
-Message-ID: <1326949654-23244-1-git-send-email-vishal.agarwal@stericsson.com>
+Message-ID: <4F175FC1.3060403@codeaurora.org>
+Date: Wed, 18 Jan 2012 16:11:45 -0800
+From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: uuid_t and bt_uuid_t
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When DBUS command of "GetProperties" is sent to BlueZ on ADAPTER_INTERFACE, it is expected that in the property "UUIDs" it should return uuids of all the profiles and services that it supports. But right now it does not include uuids of BLE services. For example UUIDs of LinkLossService, ImmediateAlert etc are not included in the list of UUIDs returned by BlueZ in response of GetProperties.
 
+Can anybody tell me why we have to almost-but-not-quite equivalent 
+storage mechanisms for UUIDs in (user-space) BlueZ?  This is accompanied 
+by multiple sets of utilities as well.  It looks like one is targeting 
+SDP and one isn't.  However, I need to occasionally translate from one 
+form to the other.
 
-As the structures of sdp-record (for BR/EDR profiles) and primary-services (for BLE services) is different, I propose to have another variable "primary" (of type GSList*) in btd_adapter.It will contain UUIDs of all the primary services.
+They both include a "type" which is a u8 in one instance, and an enum in 
+the other.  And then they both include a union for the u16, u32 and u128.
 
-Vishal Agarwal (1):
-  Add Support for BLE Services to Adapter
+Is one suppose to be in network order, and the other native?  I can't 
+tell just from looking at the various usages.
 
- proximity/manager.c |   23 +++++++++++++++++++
- src/adapter.c       |   61 +++++++++++++++++++++++++++++++++++++++++++++++++-
- src/adapter.h       |    2 +
- 3 files changed, 84 insertions(+), 2 deletions(-)
-
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
