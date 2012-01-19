@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 04/34] Bluetooth: Make l2cap_ertm_data_rcv available
-Date: Thu, 19 Jan 2012 11:19:53 +0200
-Message-Id: <1326964823-26747-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 20/34] Bluetooth: A2MP: Process A2MP Change Notify
+Date: Thu, 19 Jan 2012 11:20:09 +0200
+Message-Id: <1326964823-26747-21-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1326964823-26747-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1326964823-26747-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,38 +11,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Function l2cap_ertm_data_rcv will be used by A2MP
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/l2cap_core.c    |    2 --
- 2 files changed, 1 insertions(+), 2 deletions(-)
+ net/bluetooth/a2mp.c |   19 +++++++++++++++++++
+ 1 files changed, 19 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 60092cb..34a882b 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -846,5 +846,6 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
- void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
- int l2cap_chan_check_security(struct l2cap_chan *chan);
- void l2cap_ertm_init(struct l2cap_chan *chan);
-+int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb);
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 8371d55..7b54130 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -163,6 +163,22 @@ static inline int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
+ }
  
- #endif /* __L2CAP_H */
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e36aaab..598805b 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -73,8 +73,6 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data);
- static void l2cap_send_disconn_req(struct l2cap_conn *conn,
- 				struct l2cap_chan *chan, int err);
++static inline int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
++							struct a2mp_cmd *hdr)
++{
++	struct a2mp_cl *cl = (struct a2mp_cl *)skb->data;
++
++	while (skb->len >= sizeof(*cl)) {
++		BT_DBG("Controller id %d type %d status %d", cl->id, cl->type,
++								cl->status);
++		cl = (struct a2mp_cl *) skb_pull(skb, sizeof(*cl));
++	}
++
++	/* TODO send A2MP_CHANGE_RSP */
++
++	return 0;
++}
++
+ /* Handle A2MP signalling */
+ int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ {
+@@ -195,6 +211,9 @@ int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 			break;
  
--static int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb);
--
- /* ---- L2CAP channels ---- */
- 
- static struct l2cap_chan *__l2cap_get_chan_by_dcid(struct l2cap_conn *conn, u16 cid)
+ 		case A2MP_CHANGE_NOTIFY:
++			err = a2mp_change_notify(mgr, skb, hdr);
++			break;
++
+ 		case A2MP_GETINFO_REQ:
+ 		case A2MP_GETAMPASSOC_REQ:
+ 		case A2MP_CREATEPHYSLINK_REQ:
 -- 
 1.7.4.1
 
