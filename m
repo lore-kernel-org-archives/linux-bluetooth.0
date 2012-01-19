@@ -1,74 +1,220 @@
 Return-Path: <cyrus@holtmann.org>
-From: Smriti GUPTA <smriti.gupta@stericsson.com>
-To: "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
-Cc: Naresh-kumar GUPTA <naresh.gupta@stericsson.com>,
-	"smritigupta2008@gmail.com" <smritigupta2008@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 19 Jan 2012 06:33:13 +0100
-Subject: RE: [RFC BlueZ 1/1] Add provision for terminating an ATT connection
-Message-ID: <7E02D43720E46647A0E6521055937EC915DAF58D0F@EXDCVYMBSTM005.EQ1STM.local>
-References: <1324894570-15226-1-git-send-email-smriti.gupta@stericsson.com>
- <1324894570-15226-2-git-send-email-smriti.gupta@stericsson.com>
-In-Reply-To: <1324894570-15226-2-git-send-email-smriti.gupta@stericsson.com>
-Content-Type: text/plain; charset="us-ascii"
+From: Vishal Agarwal <vishal.agarwal@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: <naresh.gupta@stericsson.com>,
+	Vishal Agarwal <vishal.agarwal@stericsson.com>
+Subject: [PATCH BlueZ v1 1/1] Add Support for BLE Services to Adapter
+Date: Thu, 19 Jan 2012 10:37:34 +0530
+Message-ID: <1326949654-23244-2-git-send-email-vishal.agarwal@stericsson.com>
+In-Reply-To: <1326949654-23244-1-git-send-email-vishal.agarwal@stericsson.com>
+References: <1326949654-23244-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
-
-Do you have any comments on the below patch.
-
-
------Original Message-----
-From: Smriti GUPTA 
-Sent: Monday, December 26, 2011 3:46 PM
-To: linux-bluetooth@vger.kernel.org
-Cc: Naresh-kumar GUPTA; Smriti GUPTA
-Subject: [RFC BlueZ 1/1] Add provision for terminating an ATT connection
-
-This patch adds a function for disconnecting an ATT connection
-from the client side.
+This patch adds support for adding primary service UUIDs
+to adapter's list. These uuids can then be sent to upper
+layers using the DBUS method of get_properties and signal
+adapter_emit_uuids_updated.
 ---
- src/device.c |   14 ++++++++++++++
- src/device.h |    1 +
- 2 files changed, 15 insertions(+), 0 deletions(-)
+ proximity/manager.c |   23 +++++++++++++++++++
+ src/adapter.c       |   61 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ src/adapter.h       |    2 +
+ 3 files changed, 84 insertions(+), 2 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index e49e9bc..552df6e 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2880,3 +2880,17 @@ gboolean btd_device_remove_attio_callback(struct btd_device *device, guint id)
- 
- 	return TRUE;
+diff --git a/proximity/manager.c b/proximity/manager.c
+index a767554..ff5af6d 100644
+--- a/proximity/manager.c
++++ b/proximity/manager.c
+@@ -83,6 +83,21 @@ static void attio_device_remove(struct btd_device *device)
+ 	monitor_unregister(connection, device);
  }
-+
-+void att_disconnect(struct btd_device *device)
+ 
++static int proximity_adapter_probe(struct btd_adapter *adapter)
 +{
-+	GIOChannel *io;
++	add_primary(adapter, LINK_LOSS_SERVICE_ID);
++	add_primary(adapter, IMMEDIATE_ALERT_SERVICE_ID);
++	add_primary(adapter, TX_POWER_SERVICE_ID);
++	return 0;
++}
 +
-+	if (!device)
-+		return;
++static void proximity_adapter_remove(struct btd_adapter *adapter)
++{
++	remove_primary(adapter, LINK_LOSS_SERVICE_ID);
++	remove_primary(adapter, IMMEDIATE_ALERT_SERVICE_ID);
++	remove_primary(adapter, TX_POWER_SERVICE_ID);
++}
 +
-+	io = g_attrib_get_channel(device->attrib);
-+	if (io) {
-+		g_io_channel_shutdown(io, FALSE, NULL);
-+		g_io_channel_unref(io);
+ static struct btd_device_driver monitor_driver = {
+ 	.name = "Proximity GATT Driver",
+ 	.uuids = BTD_UUIDS(IMMEDIATE_ALERT_UUID, LINK_LOSS_UUID, TX_POWER_UUID),
+@@ -90,6 +105,12 @@ static struct btd_device_driver monitor_driver = {
+ 	.remove = attio_device_remove,
+ };
+ 
++static struct btd_adapter_driver proximity_adapter = {
++	.name = "Proximity",
++	.probe = proximity_adapter_probe,
++	.remove = proximity_adapter_remove,
++};
++
+ static void load_config_file(GKeyFile *config)
+ {
+ 	char **list;
+@@ -118,6 +139,7 @@ int proximity_manager_init(DBusConnection *conn, GKeyFile *config)
+ 
+ 	load_config_file(config);
+ 
++	btd_register_adapter_driver(&proximity_adapter);
+ 	/* TODO: Register Proximity Monitor/Reporter drivers */
+ 	ret = btd_register_device_driver(&monitor_driver);
+ 	if (ret < 0)
+@@ -132,5 +154,6 @@ void proximity_manager_exit(void)
+ {
+ 	reporter_exit();
+ 	btd_unregister_device_driver(&monitor_driver);
++	btd_unregister_adapter_driver(&proximity_adapter);
+ 	dbus_connection_unref(connection);
+ }
+diff --git a/src/adapter.c b/src/adapter.c
+index a75a0c4..c206a20 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -154,6 +154,7 @@ struct btd_adapter {
+ 	GSList *pin_callbacks;
+ 
+ 	GSList *loaded_drivers;
++	GSList *primaries;
+ };
+ 
+ static void dev_info_free(void *data)
+@@ -879,11 +880,12 @@ static void adapter_emit_uuids_updated(struct btd_adapter *adapter)
+ 	char **uuids;
+ 	int i;
+ 	sdp_list_t *list;
++	GSList *primary_list;
+ 
+ 	if (!adapter->initialized)
+ 		return;
+ 
+-	uuids = g_new0(char *, sdp_list_len(adapter->services) + 1);
++	uuids = g_new0(char *, sdp_list_len(adapter->services) + g_slist_length(adapter->primaries) + 1);
+ 
+ 	for (i = 0, list = adapter->services; list; list = list->next) {
+ 		char *uuid;
+@@ -894,6 +896,15 @@ static void adapter_emit_uuids_updated(struct btd_adapter *adapter)
+ 			uuids[i++] = uuid;
+ 	}
+ 
++	for (primary_list = adapter->primaries; primary_list; primary_list = primary_list->next) {
++		char *uuid;
++		uuid_t *rec = primary_list->data;
++
++		uuid = bt_uuid2string(rec);
++		if (uuid)
++			uuids[i++] = uuid;
++	}
++
+ 	emit_array_property_changed(connection, adapter->path,
+ 			ADAPTER_INTERFACE, "UUIDs", DBUS_TYPE_STRING, &uuids, i);
+ 
+@@ -986,6 +997,41 @@ void adapter_service_remove(struct btd_adapter *adapter, void *r)
+ 	adapter_emit_uuids_updated(adapter);
+ }
+ 
++static void adapter_primary_insert(struct btd_adapter *adapter, void *u)
++{
++	uuid_t *uuid = u;
++	if (!g_slist_find_custom(adapter->primaries, uuid, (GCompareFunc) sdp_uuid_cmp))
++		adapter->primaries = g_slist_append(adapter->primaries, uuid);
++	else
++		free(u);
++}
++
++static void adapter_primary_remove(struct btd_adapter *adapter, void *u)
++{
++	uuid_t *uuid = u;
++	GSList *list_pos;
++
++	list_pos = g_slist_find_custom(adapter->primaries, uuid, (GCompareFunc) sdp_uuid_cmp);
++	if (!list_pos) {
++		adapter->primaries = g_slist_remove(adapter->primaries, list_pos->data);
++		free(list_pos->data);
 +	}
 +}
-diff --git a/src/device.h b/src/device.h
-index 13005ae..bd14315 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -119,3 +119,4 @@ int device_block(DBusConnection *conn, struct btd_device *device,
- 						gboolean update_only);
- int device_unblock(DBusConnection *conn, struct btd_device *device,
- 					gboolean silent, gboolean update_only);
-+void att_disconnect(struct btd_device *device);
-\ No newline at end of file
++
++void add_primary(struct btd_adapter *adapter, uint16_t val)
++{
++	uuid_t *primary = malloc(sizeof(uuid_t));
++	sdp_uuid16_create(primary, val);
++	adapter_primary_insert(adapter, primary);
++}
++
++void remove_primary(struct btd_adapter *adapter, uint16_t val)
++{
++	uuid_t primary;
++	sdp_uuid16_create(&primary, val);
++	adapter_primary_remove(adapter, &primary);
++}
++
+ static struct btd_device *adapter_create_device(DBusConnection *conn,
+ 						struct btd_adapter *adapter,
+ 						const char *address,
+@@ -1148,6 +1194,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 	int i;
+ 	GSList *l;
+ 	sdp_list_t *list;
++	GSList *primary_list;
+ 
+ 	ba2str(&adapter->bdaddr, srcaddr);
+ 
+@@ -1214,7 +1261,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 	g_free(devices);
+ 
+ 	/* UUIDs */
+-	uuids = g_new0(char *, sdp_list_len(adapter->services) + 1);
++	uuids = g_new0(char *, sdp_list_len(adapter->services) + g_slist_length(adapter->primaries) + 1);
+ 
+ 	for (i = 0, list = adapter->services; list; list = list->next) {
+ 		sdp_record_t *rec = list->data;
+@@ -1225,6 +1272,15 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 			uuids[i++] = uuid;
+ 	}
+ 
++	for (primary_list = adapter->primaries; primary_list; primary_list = primary_list->next) {
++		char *uuid;
++		uuid_t *rec = primary_list->data;
++
++		uuid = bt_uuid2string(rec);
++		if (uuid)
++			uuids[i++] = uuid;
++	}
++
+ 	dict_append_array(&dict, "UUIDs", DBUS_TYPE_STRING, &uuids, i);
+ 
+ 	g_strfreev(uuids);
+@@ -2324,6 +2380,7 @@ static void adapter_free(gpointer user_data)
+ 		off_timer_remove(adapter);
+ 
+ 	sdp_list_free(adapter->services, NULL);
++	g_slist_free(adapter->primaries);
+ 
+ 	g_slist_free_full(adapter->found_devices, dev_info_free);
+ 
+diff --git a/src/adapter.h b/src/adapter.h
+index c1f981a..c1228ae 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -123,6 +123,8 @@ int adapter_set_name(struct btd_adapter *adapter, const char *name);
+ void adapter_name_changed(struct btd_adapter *adapter, const char *name);
+ void adapter_service_insert(struct btd_adapter *adapter, void *rec);
+ void adapter_service_remove(struct btd_adapter *adapter, void *rec);
++void add_primary(struct btd_adapter *adapter, uint16_t val);
++void remove_primary(struct btd_adapter *adapter, uint16_t val);
+ void btd_adapter_class_changed(struct btd_adapter *adapter,
+ 							uint32_t new_class);
+ void btd_adapter_pairable_changed(struct btd_adapter *adapter,
 -- 
 1.7.0.4
-
-Regards,
-Smriti
 
