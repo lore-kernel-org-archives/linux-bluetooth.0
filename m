@@ -1,117 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+From: Ulisses Furquim <ulisses@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: Add alloc_skb chan operator
-Date: Thu, 19 Jan 2012 15:13:52 +0200
-Message-Id: <1326978832-9888-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: padovan@profusion.mobi
+Subject: [PATCH v2] Bluetooth: Remove usage of __cancel_delayed_work()
+Date: Thu, 19 Jan 2012 10:10:33 -0200
+Message-Id: <1326975033-2668-1-git-send-email-ulisses@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+__cancel_delayed_work() is being used in some paths where we cannot
+sleep waiting for the delayed work to finish. However, that function
+might return while the timer is running and the work will be queued
+again. Replace the calls with safer cancel_delayed_work() version
+which spins until the timer handler finishes in other CPUs and
+cancels the delayed work.
 
-Add channel-specific skb allocation method
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
 ---
- include/net/bluetooth/l2cap.h |    3 +++
- net/bluetooth/l2cap_core.c    |   22 +++++++++++++++-------
- net/bluetooth/l2cap_sock.c    |    9 +++++++++
- 3 files changed, 27 insertions(+), 7 deletions(-)
+
+v2 - rebased against newer bluetooth-next
+
+ include/net/bluetooth/l2cap.h |    4 ++--
+ net/bluetooth/l2cap_core.c    |   10 +++++-----
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 34a882b..ed390ad 100644
+index 18242ea..dd2dbe8 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -506,6 +506,9 @@ struct l2cap_ops {
- 	int			(*recv) (void *data, struct sk_buff *skb);
- 	void			(*close) (void *data);
- 	void			(*state_change) (void *data, int state);
-+	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
-+					unsigned long len, int nb, int *err);
-+
- };
+@@ -611,7 +611,7 @@ static inline void l2cap_set_timer(struct l2cap_chan *chan,
+ {
+ 	BT_DBG("chan %p state %d timeout %ld", chan, chan->state, timeout);
  
- struct l2cap_conn {
+-	if (!__cancel_delayed_work(work))
++	if (!cancel_delayed_work(work))
+ 		l2cap_chan_hold(chan);
+ 	schedule_delayed_work(work, timeout);
+ }
+@@ -621,7 +621,7 @@ static inline bool l2cap_clear_timer(struct l2cap_chan *chan,
+ {
+ 	bool ret;
+ 
+-	ret = __cancel_delayed_work(work);
++	ret = cancel_delayed_work(work);
+ 	if (ret)
+ 		l2cap_chan_put(chan);
+ 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 598805b..f9bd130 100644
+index e42999c..29d642b 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1531,7 +1531,9 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan, struct msghdr
- 	while (len) {
- 		count = min_t(unsigned int, conn->mtu, len);
+@@ -1018,10 +1018,10 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 	hci_chan_del(conn->hchan);
  
--		*frag = bt_skb_send_alloc(sk, count, msg->msg_flags & MSG_DONTWAIT, &err);
-+		*frag = chan->ops->alloc_skb(chan, count,
-+					msg->msg_flags & MSG_DONTWAIT, &err);
-+
- 		if (!*frag)
- 			return err;
- 		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
-@@ -1561,8 +1563,10 @@ static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
- 	BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+-		__cancel_delayed_work(&conn->info_timer);
++		cancel_delayed_work(&conn->info_timer);
  
- 	count = min_t(unsigned int, (conn->mtu - hlen), len);
--	skb = bt_skb_send_alloc(sk, count + hlen,
--			msg->msg_flags & MSG_DONTWAIT, &err);
-+
-+	skb = chan->ops->alloc_skb(chan, count + hlen,
-+					msg->msg_flags & MSG_DONTWAIT, &err);
-+
- 	if (!skb)
- 		return ERR_PTR(err);
+ 	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags)) {
+-		__cancel_delayed_work(&conn->security_timer);
++		cancel_delayed_work(&conn->security_timer);
+ 		smp_chan_destroy(conn);
+ 	}
  
-@@ -1595,8 +1599,10 @@ static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
- 	BT_DBG("sk %p len %d", sk, (int)len);
+@@ -2583,7 +2583,7 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn, struct l2cap_cmd_hd
  
- 	count = min_t(unsigned int, (conn->mtu - hlen), len);
--	skb = bt_skb_send_alloc(sk, count + hlen,
--			msg->msg_flags & MSG_DONTWAIT, &err);
-+
-+	skb = chan->ops->alloc_skb(chan, count + hlen,
-+					msg->msg_flags & MSG_DONTWAIT, &err);
-+
- 	if (!skb)
- 		return ERR_PTR(err);
+ 	if ((conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT) &&
+ 					cmd->ident == conn->info_ident) {
+-		__cancel_delayed_work(&conn->info_timer);
++		cancel_delayed_work(&conn->info_timer);
  
-@@ -1642,8 +1648,10 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
- 		hlen += L2CAP_FCS_SIZE;
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+ 		conn->info_ident = 0;
+@@ -3130,7 +3130,7 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
+ 			conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE)
+ 		return 0;
  
- 	count = min_t(unsigned int, (conn->mtu - hlen), len);
--	skb = bt_skb_send_alloc(sk, count + hlen,
--			msg->msg_flags & MSG_DONTWAIT, &err);
-+
-+	skb = chan->ops->alloc_skb(chan, count + hlen,
-+					msg->msg_flags & MSG_DONTWAIT, &err);
-+
- 	if (!skb)
- 		return ERR_PTR(err);
+-	__cancel_delayed_work(&conn->info_timer);
++	cancel_delayed_work(&conn->info_timer);
  
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index c57027f..4640c12 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -897,12 +897,21 @@ static void l2cap_sock_state_change_cb(void *data, int state)
- 	sk->sk_state = state;
- }
+ 	if (result != L2CAP_IR_SUCCESS) {
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+@@ -4504,7 +4504,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
  
-+static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
-+					unsigned long len, int nb, int *err)
-+{
-+	struct sock *sk = chan->sk;
-+
-+	return bt_skb_send_alloc(sk, len, nb, err);
-+}
-+
- static struct l2cap_ops l2cap_chan_ops = {
- 	.name		= "L2CAP Socket Interface",
- 	.new_connection	= l2cap_sock_new_connection_cb,
- 	.recv		= l2cap_sock_recv_cb,
- 	.close		= l2cap_sock_close_cb,
- 	.state_change	= l2cap_sock_state_change_cb,
-+	.alloc_skb	= l2cap_sock_alloc_skb_cb,
- };
+ 	if (hcon->type == LE_LINK) {
+ 		smp_distribute_keys(conn, 0);
+-		__cancel_delayed_work(&conn->security_timer);
++		cancel_delayed_work(&conn->security_timer);
+ 	}
  
- static void l2cap_sock_destruct(struct sock *sk)
+ 	rcu_read_lock();
 -- 
-1.7.4.1
+1.7.8.rc4
 
