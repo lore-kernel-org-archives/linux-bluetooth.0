@@ -1,95 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: padovan@profusion.mobi
-Subject: [PATCH v2] Bluetooth: Remove usage of __cancel_delayed_work()
-Date: Thu, 19 Jan 2012 10:10:33 -0200
-Message-Id: <1326975033-2668-1-git-send-email-ulisses@profusion.mobi>
+MIME-Version: 1.0
+In-Reply-To: <1326966173-20105-2-git-send-email-johan.hedberg@gmail.com>
+References: <1326966173-20105-1-git-send-email-johan.hedberg@gmail.com>
+	<1326966173-20105-2-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 19 Jan 2012 07:38:58 -0400
+Message-ID: <CAJdJm_Pa7EbOE7uxPajMvS5ZVZ=djbuTMgcswH5ZuOud_DDrSA@mail.gmail.com>
+Subject: Re: [PATCH 1/3] Bluetooth: Merge boolean members of struct hci_conn
+ into flags
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-__cancel_delayed_work() is being used in some paths where we cannot
-sleep waiting for the delayed work to finish. However, that function
-might return while the timer is running and the work will be queued
-again. Replace the calls with safer cancel_delayed_work() version
-which spins until the timer handler finishes in other CPUs and
-cancels the delayed work.
+Hi Johan,
 
-Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
----
+Not sure if this is actually a bug, but mentioning anyway.
 
-v2 - rebased against newer bluetooth-next
+On Thu, Jan 19, 2012 at 5:42 AM,  <johan.hedberg@gmail.com> wrote:
+> @@ -105,7 +105,8 @@ void hci_acl_connect(struct hci_conn *conn)
+>                }
+>
+>                memcpy(conn->dev_class, ie->data.dev_class, 3);
+> -               conn->ssp_mode = ie->data.ssp_mode;
+> +               if (ie->data.ssp_mode > 0)
+> +                       set_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
+>        }
 
- include/net/bluetooth/l2cap.h |    4 ++--
- net/bluetooth/l2cap_core.c    |   10 +++++-----
- 2 files changed, 7 insertions(+), 7 deletions(-)
+Note that the code above is not semantically equivalent to the old
+one. Given "conn" was not created on this function, the old code was
+actually equivalent to:
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 18242ea..dd2dbe8 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -611,7 +611,7 @@ static inline void l2cap_set_timer(struct l2cap_chan *chan,
- {
- 	BT_DBG("chan %p state %d timeout %ld", chan, chan->state, timeout);
- 
--	if (!__cancel_delayed_work(work))
-+	if (!cancel_delayed_work(work))
- 		l2cap_chan_hold(chan);
- 	schedule_delayed_work(work, timeout);
- }
-@@ -621,7 +621,7 @@ static inline bool l2cap_clear_timer(struct l2cap_chan *chan,
- {
- 	bool ret;
- 
--	ret = __cancel_delayed_work(work);
-+	ret = cancel_delayed_work(work);
- 	if (ret)
- 		l2cap_chan_put(chan);
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e42999c..29d642b 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1018,10 +1018,10 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 	hci_chan_del(conn->hchan);
- 
- 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
--		__cancel_delayed_work(&conn->info_timer);
-+		cancel_delayed_work(&conn->info_timer);
- 
- 	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags)) {
--		__cancel_delayed_work(&conn->security_timer);
-+		cancel_delayed_work(&conn->security_timer);
- 		smp_chan_destroy(conn);
- 	}
- 
-@@ -2583,7 +2583,7 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 
- 	if ((conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT) &&
- 					cmd->ident == conn->info_ident) {
--		__cancel_delayed_work(&conn->info_timer);
-+		cancel_delayed_work(&conn->info_timer);
- 
- 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
- 		conn->info_ident = 0;
-@@ -3130,7 +3130,7 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
- 			conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE)
- 		return 0;
- 
--	__cancel_delayed_work(&conn->info_timer);
-+	cancel_delayed_work(&conn->info_timer);
- 
- 	if (result != L2CAP_IR_SUCCESS) {
- 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
-@@ -4504,7 +4504,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 
- 	if (hcon->type == LE_LINK) {
- 		smp_distribute_keys(conn, 0);
--		__cancel_delayed_work(&conn->security_timer);
-+		cancel_delayed_work(&conn->security_timer);
- 	}
- 
- 	rcu_read_lock();
+if (ie->data.ssp_mode)
+    conn->ssp_mode = 1;
+else
+    conn->ssp_mode = 0;
+
+So I think you need set_bit/clear_bit branches here.
+
+>
+>        cp.pkt_type = cpu_to_le16(conn->pkt_type);
+> [...]
+> @@ -2780,7 +2783,8 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
+>                if (ie)
+>                        ie->data.ssp_mode = (ev->features[0] & 0x01);
+>
+> -               conn->ssp_mode = (ev->features[0] & 0x01);
+> +               if (ev->features[0] & 0x01)
+> +                       set_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
+>        }
+
+Same here.
+
+>
+>        if (conn->state != BT_CONFIG)
+> [...]
+> @@ -2998,8 +3002,9 @@ static inline void hci_io_capa_reply_evt(struct hci_dev *hdev, struct sk_buff *s
+>                goto unlock;
+>
+>        conn->remote_cap = ev->capability;
+> -       conn->remote_oob = ev->oob_data;
+>        conn->remote_auth = ev->authentication;
+> +       if (ev->oob_data)
+> +               set_bit(HCI_CONN_REMOTE_OOB, &conn->flags);
+
+Same here.
+
+>
+>  unlock:
+>        hci_dev_unlock(hdev);
+
+Regards,
 -- 
-1.7.8.rc4
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
