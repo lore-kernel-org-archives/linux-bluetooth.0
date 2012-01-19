@@ -1,18 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/3] New versions of some previous mgmt patches
-Date: Thu, 19 Jan 2012 11:42:50 +0200
-Message-Id: <1326966173-20105-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 19 Jan 2012 11:39:56 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 10/15] Bluetooth: Add a convenience function to check for
+ SSP enabled
+Message-ID: <20120119093956.GA19936@x220>
+References: <1326912717-6347-1-git-send-email-johan.hedberg@gmail.com>
+ <1326912717-6347-11-git-send-email-johan.hedberg@gmail.com>
+ <20120119093021.GC20598@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120119093021.GC20598@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrei,
 
-These are fixed versions of the previous patch set that had a clear
-consensus on how to proceed. The two patches left out are the flag
-renaming since there still wasn't an exact consensus on e.g. how
-HCI_RUNNING should be handled.
+On Thu, Jan 19, 2012, Andrei Emeltchenko wrote:
+> > +static inline bool hci_conn_ssp_support(struct hci_conn *conn)
+> 
+> Maybe matter of taste but cold this be named hci_conn_ssp_supported ?
+> Then in if condition below it would be seen more natural and similar to
+> other "-ed" functions.
+
+Based on Marcel's preference for the define names it will be called
+hci_conn_ssp_enabled.
 
 Johan
-
