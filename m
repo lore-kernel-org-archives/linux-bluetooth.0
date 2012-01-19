@@ -1,77 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 00/34] RFC Bluetooth A2MP implementation
-Date: Thu, 19 Jan 2012 11:19:49 +0200
-Message-Id: <1326964823-26747-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <1326962166.6454.413.camel@aeonflux>
+Subject: Re: RFA: Implementing HID spec recommendation for Keyboard PINs
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Scott James Remnant <scott@netsplit.com>,
+	linux-bluetooth@vger.kernel.org
+Date: Thu, 19 Jan 2012 09:36:06 +0100
+In-Reply-To: <20120119081401.GA17764@x220.P-661HNU-F1>
+References: <CA+bD78jG+f2kaq66YTdJnOhBGE-=gfeoHYPpmpe6OxZUyBZv7Q@mail.gmail.com>
+	 <20120118225634.GA15541@x220.P-661HNU-F1>
+	 <CA+bD78gWACGpx_eNUCQ5xDZMV72exEeRTWavmU4qBdr3A0ihDw@mail.gmail.com>
+	 <20120119081401.GA17764@x220.P-661HNU-F1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Johan,
 
-Changes:
-	* RFCv3 redesign code to use l2cap functions instead of kernel sockets
-	L2CAP functions modified to work with channels without sk.
-	* RFCv2 rebased against "workqueue" patches.
-	* RFCv1 added refcnt to amp_mgr, fixed sleeping in atomic
+> > > On Wed, Jan 18, 2012, Scott James Remnant wrote:
+> > >> The Bluetooth HID profile recommends (4.1, p24) that rather than
+> > >> prompting the user for a PIN on the host, which then needs to be
+> > >> entered into the connecting keyboard, instead the host simply generate
+> > >> the PIN and display it to the user instead. Part of this will be
+> > >> implemented as a plugin, but since UI is involved, the Agent is
+> > >> involved as well. As far as I can tell, there are two options:
+> > >>
+> > >>
+> > > 3) Keep using RequestPinCode and have let the agent be responsible for
+> > > generating and showing a PIN to the user which is immediately sent as a
+> > > reply to the agent callback (while the UI prompt remains).
+> > >
+> > 
+> > Marcel has specifically instructed me not to do that, stating that the
+> > Agent is not supposed to be "smart" like this but only to directly
+> > interact with the user.
+> > 
+> > See http://thread.gmane.org/gmane.linux.bluez.kernel/20391 yesterday
+> 
+> Well, it's what most BlueZ UIs do already now. They look for the
+> LegacyPairing property in DeviceFound signals, and if it's True they
+> will pre-generate and show a PIN to the user even before calling
+> CreatePairedDevice (for devices that can be assumed to have an
+> interactive PIN entering method).
+> 
+> One problem that you'll face is that it's not guaranteed that your side
+> will get the PIN request first or even at the same time as the other
+> side.  IIRC this depends on the controller manufacturer, who initiated
+> the connection, what security mode you're using (3 has some special
+> behavior), etc. I.e. in the worst case the user has already entered the
+> PIN on the remote side when you get the request on your side. Then when
+> you decide to auto-generate a PIN it's most certainly not going to match
+> what the user already entered on the other device.
+> 
+> For best interoperability with quirky devices I think the safest way
+> would be to make your best guess whether the user is able to enter the
+> PIN on the remote side (e.g. yes for a mobile phone, no for a headset
+> and yes for a keyboard) but still give the possibility to override this
+> if the user wants to enter the PIN by himself after all.
 
-Some code based of reference implementations below.
+I personally would prefer if we get this handling out of the UI code and
+just do this for the UI. Do you think it is not possible to handle this
+in a smart way one level down in bluetoothd?
 
-References: Code Aurora (git://codeaurora.org/kernel/msm.git) and Atheros
-(search for: [PATCH 2/3] Add a2mp protocol/AMP manager, by Atheros Linux BT3)
-implementations (mostly Code Aurora).
+Regards
 
-Andrei Emeltchenko (34):
-  Bluetooth: trivial: space correction
-  Bluetooth: trivial: clean up of l2cap_chan_connect
-  Bluetooth: Make ertm_init available
-  Bluetooth: Make l2cap_ertm_data_rcv available
-  Bluetooth: Allocate skb depending on sk
-  Bluetooth: Check sk before assigning sk_err
-  Bluetooth: Add send function to chan ops
-  Bluetooth: Make l2cap_chan_add available
-  Bluetooth: A2MP: Create A2MP channel
-  Bluetooth: A2MP: AMP Manager basic functions
-  Bluetooth: A2MP: Add channel close callback
-  Bluetooth: Add state_change for A2MP channel
-  Bluetooth: A2MP: Build and Send msg helpers
-  Bluetooth: A2MP: Definitions for A2MP commands
-  Bluetooth: A2MP: Define A2MP status codes
-  Bluetooth: A2MP: Process A2MP messages
-  Bluetooth: A2MP: Process A2MP Command Reject
-  Bluetooth: A2MP: Helper functions to count HCI devs
-  Bluetooth: A2MP: Process A2MP Discover Request
-  Bluetooth: A2MP: Process A2MP Change Notify
-  Bluetooth: A2MP: Process A2MP Get Info Request
-  Bluetooth: A2MP: Process A2MP Get AMP Assoc Request
-  Bluetooth: A2MP: Process A2MP Create Physlink Request
-  Bluetooth: A2MP: Process A2MP Disc Physlink Request
-  Bluetooth: A2MP: Process A2MP Command Responses
-  Bluetooth: Clean up l2cap_chan_add
-  Bluetooth: A2MP: Handling fixed channels
-  Bluetooth: A2MP: Manage incoming connections
-  Bluetooth: physical link HCI interface to AMP
-  Bluetooth: Define AMP controller statuses
-  Bluetooth: General HCI callback implementation
-  Bluetooth: Process HCI callbacks in a workqueue
-  Bluetooth: AMP: Use HCI callback for Read AMP Info
-  Bluetooth: AMP: Read Local Assoc support
+Marcel
 
- include/net/bluetooth/a2mp.h     |  127 +++++++++
- include/net/bluetooth/hci.h      |   50 ++++
- include/net/bluetooth/hci_core.h |   41 +++
- include/net/bluetooth/l2cap.h    |   10 +
- net/bluetooth/Makefile           |    4 +-
- net/bluetooth/a2mp.c             |  527 ++++++++++++++++++++++++++++++++++++++
- net/bluetooth/amp.c              |   91 +++++++
- net/bluetooth/hci_core.c         |  144 +++++++++++
- net/bluetooth/hci_event.c        |   58 ++++-
- net/bluetooth/l2cap_core.c       |   99 ++++++--
- 10 files changed, 1121 insertions(+), 30 deletions(-)
- create mode 100644 include/net/bluetooth/a2mp.h
- create mode 100644 net/bluetooth/a2mp.c
- create mode 100644 net/bluetooth/amp.c
-
--- 
-1.7.4.1
 
