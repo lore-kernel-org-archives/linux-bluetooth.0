@@ -1,43 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Check for chan_type before locking sk
-Date: Fri, 20 Jan 2012 16:35:00 +0200
-Message-Id: <1327070100-4852-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 20 Jan 2012 15:25:50 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>,
+	linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
+Subject: Re: [PATCH 1/2] Bluetooth: Make l2cap_ertm_data_rcv static
+Message-ID: <20120120132547.GA11112@aemeltch-MOBL1>
+References: <1326796951-16377-1-git-send-email-szymon.janc@tieto.com>
+ <20120117122250.GA18057@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120117122250.GA18057@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Szymon,
 
-Removes un-needed locking/unlocking if chan_type is not
-L2CAP_CHAN_CONN_ORIENTED and also protects from locking
-zero sk.
+On Tue, Jan 17, 2012 at 02:22:53PM +0200, Andrei Emeltchenko wrote:
+> Hi Szymon,
+> 
+> On Tue, Jan 17, 2012 at 11:42:30AM +0100, Szymon Janc wrote:
+> > It is not used outside of l2cap_core.c.
+> 
+> Actually I am going to use it outside of l2cap_core. I will send my
+> patches implementing A2MP without using kernel sockets soon.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/l2cap_core.c |    5 ++---
- 1 files changed, 2 insertions(+), 3 deletions(-)
+I reworked my code so that I do not call l2cap_ertm_data_rcv directly. So
+the patches looks OK now though I would merge them together.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b303eae..916ddb1 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -770,13 +770,12 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 	list_for_each_entry_rcu(chan, &conn->chan_l, list) {
- 		struct sock *sk = chan->sk;
- 
--		bh_lock_sock(sk);
--
- 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
--			bh_unlock_sock(sk);
- 			continue;
- 		}
- 
-+		bh_lock_sock(sk);
-+
- 		if (chan->state == BT_CONNECT) {
- 			struct l2cap_conn_req req;
- 
--- 
-1.7.4.1
-
+Best regards 
+Andrei Emeltchenko 
