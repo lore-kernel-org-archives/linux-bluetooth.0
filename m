@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 4/6] client: add bluetooth transport driver
-Date: Fri, 20 Jan 2012 11:49:59 +0200
-Message-Id: <1327053001-9506-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 3/6] client: add support for transport drivers
+Date: Fri, 20 Jan 2012 11:49:58 +0200
+Message-Id: <1327053001-9506-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1327053001-9506-1-git-send-email-luiz.dentz@gmail.com>
 References: <1327053001-9506-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,34 +13,33 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
  Makefile.am        |    1 +
- client/bluetooth.c |   69 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- client/bluetooth.h |   25 +++++++++++++++++++
- client/manager.c   |   20 ++++++++-------
- 4 files changed, 106 insertions(+), 9 deletions(-)
- create mode 100644 client/bluetooth.c
- create mode 100644 client/bluetooth.h
+ client/transport.c |   82 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ client/transport.h |   37 +++++++++++++++++++++++
+ 3 files changed, 120 insertions(+), 0 deletions(-)
+ create mode 100644 client/transport.c
+ create mode 100644 client/transport.h
 
 diff --git a/Makefile.am b/Makefile.am
-index 32ccc89..6697fa1 100644
+index f65a3dc..32ccc89 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -117,6 +117,7 @@ client_obex_client_SOURCES = $(gdbus_sources) $(gobex_sources) \
- 				client/main.c src/log.h src/log.c \
- 				client/manager.h client/manager.c \
- 				client/session.h client/session.c \
-+				client/bluetooth.h client/bluetooth.c \
- 				client/sync.h client/sync.c \
- 				client/pbap.h client/pbap.c \
- 				client/ftp.h client/ftp.c \
-diff --git a/client/bluetooth.c b/client/bluetooth.c
+@@ -124,6 +124,7 @@ client_obex_client_SOURCES = $(gdbus_sources) $(gobex_sources) \
+ 				client/map.h client/map.c \
+ 				client/transfer.h client/transfer.c \
+ 				client/agent.h client/agent.c \
++				client/transport.h client/transport.c \
+ 				client/driver.h client/driver.c \
+ 				src/map_ap.h src/map_ap.c
+ 
+diff --git a/client/transport.c b/client/transport.c
 new file mode 100644
-index 0000000..5bde9be
+index 0000000..77e52f7
 --- /dev/null
-+++ b/client/bluetooth.c
-@@ -0,0 +1,69 @@
++++ b/client/transport.c
+@@ -0,0 +1,82 @@
 +/*
 + *
-+ *  OBEX Client
++ *  OBEX Server
 + *
 + *  Copyright (C) 2012 Intel Corporation
 + *
@@ -65,59 +64,72 @@ index 0000000..5bde9be
 +#include <config.h>
 +#endif
 +
++#include <string.h>
 +#include <errno.h>
++#include <glib.h>
 +#include <inttypes.h>
 +
-+#include <glib.h>
-+
-+#include "log.h"
 +#include "transport.h"
-+#include "bluetooth.h"
++#include "log.h"
 +
-+static guint bluetooth_connect(const char *source, const char *destination,
-+				const char *service, uint16_t port,
-+				obc_transport_func func, void *user_data)
++static GSList *transports = NULL;
++
++struct obc_transport *obc_transport_find(const char *name)
 +{
-+	DBG("");
++	GSList *l;
++
++	for (l = transports; l; l = l->next) {
++		struct obc_transport *transport = l->data;
++
++		if (strcasecmp(name, transport->name) == 0)
++			return transport;
++	}
++
++	return NULL;
++}
++
++int obc_transport_register(struct obc_transport *transport)
++{
++	if (!transport) {
++		error("Invalid transport");
++		return -EINVAL;
++	}
++
++	if (obc_transport_find(transport->name)) {
++		error("Permission denied: transport %s already registered",
++							transport->name);
++		return -EPERM;
++	}
++
++	DBG("transport %p name %s registered", transport, transport->name);
++
++	transports = g_slist_append(transports, transport);
 +
 +	return 0;
 +}
 +
-+static void bluetooth_disconnect(guint id)
++void obc_transport_unregister(struct obc_transport *transport)
 +{
-+	DBG("");
++	if (!g_slist_find(transports, transport)) {
++		error("Unable to unregister: No such transport %p", transport);
++		return;
++	}
++
++	DBG("transport %p name %s unregistered", transport, transport->name);
++
++	transports = g_slist_remove(transports, transport);
 +}
-+
-+static struct obc_transport bluetooth = {
-+	.name = "Bluetooth",
-+	.connect = bluetooth_connect,
-+	.disconnect = bluetooth_disconnect,
-+};
-+
-+int bluetooth_init(void)
-+{
-+	DBG("");
-+
-+	return obc_transport_register(&bluetooth);
-+}
-+
-+void bluetooth_exit(void)
-+{
-+	DBG("");
-+
-+	obc_transport_unregister(&bluetooth);
-+}
-diff --git a/client/bluetooth.h b/client/bluetooth.h
+diff --git a/client/transport.h b/client/transport.h
 new file mode 100644
-index 0000000..968e131
+index 0000000..4c9bf2d
 --- /dev/null
-+++ b/client/bluetooth.h
-@@ -0,0 +1,25 @@
++++ b/client/transport.h
+@@ -0,0 +1,37 @@
 +/*
 + *
-+ *  OBEX Client
++ *  OBEX Server
 + *
-+ *  Copyright (C) 2011 Intel Corporation
++ *  Copyright (C) 2012 Intel Corporation
 + *
 + *
 + *  This program is free software; you can redistribute it and/or modify
@@ -136,76 +148,20 @@ index 0000000..968e131
 + *
 + */
 +
-+int bluetooth_init(void);
-+void bluetooth_exit(void);
-diff --git a/client/manager.c b/client/manager.c
-index 7841753..2e01e54 100644
---- a/client/manager.c
-+++ b/client/manager.c
-@@ -37,6 +37,7 @@
- #include "log.h"
- #include "session.h"
- #include "manager.h"
-+#include "bluetooth.h"
- #include "opp.h"
- #include "ftp.h"
- #include "pbap.h"
-@@ -557,11 +558,12 @@ static GDBusMethodTable client_methods[] = {
- 
- static DBusConnection *conn = NULL;
- 
--static struct target_module {
-+static struct obc_module {
- 	const char *name;
- 	int (*init) (void);
- 	void (*exit) (void);
--} targets[] = {
-+} modules[] = {
-+	{ "bluetooth", bluetooth_init, bluetooth_exit },
- 	{ "opp", opp_init, opp_exit },
- 	{ "ftp", ftp_init, ftp_exit },
- 	{ "pbap", pbap_init, pbap_exit },
-@@ -573,7 +575,7 @@ static struct target_module {
- int manager_init(void)
- {
- 	DBusError derr;
--	struct target_module *target;
-+	struct obc_module *module;
- 
- 	dbus_error_init(&derr);
- 
-@@ -593,11 +595,11 @@ int manager_init(void)
- 		return -1;
- 	}
- 
--	for (target = targets; target && target->init; target++) {
--		if (target->init() < 0)
-+	for (module = modules; module && module->init; module++) {
-+		if (module->init() < 0)
- 			continue;
- 
--		DBG("Target %s loaded", target->name);
-+		DBG("Module %s loaded", module->name);
- 	}
- 
- 	return 0;
-@@ -605,13 +607,13 @@ int manager_init(void)
- 
- void manager_exit(void)
- {
--	struct target_module *target;
-+	struct obc_module *module;
- 
- 	if (conn == NULL)
- 		return;
- 
--	for (target = targets; target && target->exit; target++)
--		target->exit();
-+	for (module = modules; module && module->exit; module++)
-+		module->exit();
- 
- 	g_dbus_unregister_interface(conn, CLIENT_PATH, CLIENT_INTERFACE);
- 	dbus_connection_unref(conn);
++typedef void (*obc_transport_func)(GIOChannel *io, GError *err,
++							gpointer user_data);
++
++struct obc_transport {
++	const char *name;
++	guint (*connect) (const char *source, const char *destination,
++				const char *service, uint16_t port,
++				obc_transport_func func, void *user_data);
++	void (*disconnect) (guint id);
++};
++
++int obc_transport_register(struct obc_transport *transport);
++void obc_transport_unregister(struct obc_transport *transport);
++struct obc_transport *obc_transport_find(const char *name);
 -- 
 1.7.7.5
 
