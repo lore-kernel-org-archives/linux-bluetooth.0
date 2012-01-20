@@ -2,253 +2,172 @@ Return-Path: <cyrus@holtmann.org>
 From: Scott James Remnant <scott@netsplit.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: keybuk@chromium.org, Scott James Remnant <scott@netsplit.com>
-Subject: [RFC PATCH 2/3] agent: add DisplayPinCode method
-Date: Fri, 20 Jan 2012 15:05:43 -0800
-Message-Id: <1327100744-28782-3-git-send-email-scott@netsplit.com>
+Subject: [RFC PATCH 1/3] lib: add header of device class constants
+Date: Fri, 20 Jan 2012 15:05:42 -0800
+Message-Id: <1327100744-28782-2-git-send-email-scott@netsplit.com>
 In-Reply-To: <1327100744-28782-1-git-send-email-scott@netsplit.com>
 References: <1327100744-28782-1-git-send-email-scott@netsplit.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add a second notification type that requests the agent displays a
-string PinCode rather than the numeric Passkey.
 ---
- doc/agent-api.txt |   12 ++++++++++++
- src/agent.c       |   27 +++++++++++++++++++++++++++
- src/agent.h       |    2 ++
- src/device.c      |   24 ++++++++++++++++--------
- src/device.h      |    5 +++--
- src/event.c       |   10 +++++-----
- test/simple-agent |    5 +++++
- 7 files changed, 70 insertions(+), 15 deletions(-)
+ Makefile.am  |    2 +-
+ lib/bt_ids.h |  133 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 134 insertions(+), 1 deletions(-)
+ create mode 100644 lib/bt_ids.h
 
-diff --git a/doc/agent-api.txt b/doc/agent-api.txt
-index 9ab2063..0b32d70 100644
---- a/doc/agent-api.txt
-+++ b/doc/agent-api.txt
-@@ -61,6 +61,18 @@ Methods		void Release()
- 			so the display should be zero-padded at the start if
- 			the value contains less than 6 digits.
+diff --git a/Makefile.am b/Makefile.am
+index 102ee62..8dbe603 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -59,7 +59,7 @@ plugin_LTLIBRARIES =
  
-+		void DisplayPinCode(object device, string pincode)
+ lib_headers = lib/bluetooth.h lib/hci.h lib/hci_lib.h lib/mgmt.h \
+ 		lib/sco.h lib/l2cap.h lib/sdp.h lib/sdp_lib.h lib/uuid.h \
+-		lib/rfcomm.h lib/bnep.h lib/cmtp.h lib/hidp.h
++		lib/rfcomm.h lib/bnep.h lib/cmtp.h lib/hidp.h lib/bt_ids.h
+ local_headers = $(foreach file,$(lib_headers), lib/bluetooth/$(notdir $(file)))
+ 
+ BUILT_SOURCES = $(local_headers) src/builtin.h
+diff --git a/lib/bt_ids.h b/lib/bt_ids.h
+new file mode 100644
+index 0000000..6aa0848
+--- /dev/null
++++ b/lib/bt_ids.h
+@@ -0,0 +1,133 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012  Google Inc.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+			This method gets called when the service daemon
-+			needs to display a pincode for an authentication.
++#ifndef __BT_IDS_H
++#define __BT_IDS_H
 +
-+			An empty reply should be returned. When the pincode
-+			needs no longer to be displayed, the Cancel method
-+			of the agent will be called.
++/* Service classes */
++#define BLUETOOTH_SERVICE_CLASS_BITMASK                 0xFFE000
++#define BLUETOOTH_SERVICE_CLASS_LIMITED_DISCOVERABILITY 0x002000
++#define BLUETOOTH_SERVICE_CLASS_POSITIONING             0x010000
++#define BLUETOOTH_SERVICE_CLASS_NETWORKING              0x020000
++#define BLUETOOTH_SERVICE_CLASS_RENDER                  0x040000
++#define BLUETOOTH_SERVICE_CLASS_CAPTURE                 0x080000
++#define BLUETOOTH_SERVICE_CLASS_OBJECT_TRANSFER         0x100000
++#define BLUETOOTH_SERVICE_CLASS_AUDIO                   0x200000
++#define BLUETOOTH_SERVICE_CLASS_TELEPHONE               0x400000
++#define BLUETOOTH_SERVICE_CLASS_INFORMATION             0x800000
 +
-+			During the pairing process this method might be
-+			called multiple times to update the entered value.
++#define BLUETOOTH_SERVICE_CLASS(_class) \
++                                ((_class) & BLUETOOTH_SERVICE_CLASS_BITMASK)
 +
- 		void RequestConfirmation(object device, uint32 passkey)
- 
- 			This method gets called when the service daemon
-diff --git a/src/agent.c b/src/agent.c
-index 9b942e8..7866ed0 100644
---- a/src/agent.c
-+++ b/src/agent.c
-@@ -699,6 +699,33 @@ int agent_display_passkey(struct agent *agent, struct btd_device *device,
- 	return 0;
- }
- 
-+int agent_display_pincode(struct agent *agent, struct btd_device *device,
-+				const char *pincode)
-+{
-+	DBusMessage *message;
-+	const gchar *dev_path = device_get_path(device);
++/* Major device classes */
++#define BLUETOOTH_MAJOR_DEVICE_CLASS_BITMASK       0x1F00
++#define BLUETOOTH_MAJOR_DEVICE_CLASS_MISC          0x0000
++#define BLUETOOTH_MAJOR_DEVICE_CLASS_COMPUTER      0x0100
++#define BLUETOOTH_MAJOR_DEVICE_CLASS_PHONE         0x0200
++#define BLUETOOTH_MAJOR_DEVICE_CLASS_NETWORKING    0x0300
++#define BLUETOOTH_MAJOR_DEVICE_CLASS_AUDIO_VIDEO   0x0400
++#define BLUETOOTH_MAJOR_DEVICE_CLASS_PERIPHERAL    0x0500
++#define BLUETOOTH_MAJOR_DEVICE_CLASS_IMAGING       0x0600
++#define BLUETOOTH_MAJOR_DEVICE_CLASS_WEARABLE      0x0700
++#define BLUETOOTH_MAJOR_DEVICE_CLASS_TOY           0x0800
++#define BLUETOOTH_MAJOR_DEVICE_CLASS_HEATLH        0x0900
++#define BLUETOOTH_MAJOR_DEVICE_CLASS_UNCATEGORIZED 0x1F00
 +
-+	message = dbus_message_new_method_call(agent->name, agent->path,
-+				"org.bluez.Agent", "DisplayPinCode");
-+	if (!message) {
-+		error("Couldn't allocate D-Bus message");
-+		return -1;
-+	}
++#define BLUETOOTH_MAJOR_DEVICE_CLASS(_class) \
++                        ((_class) & BLUETOOTH_MAJOR_DEVICE_CLASS_BITMASK)
 +
-+	dbus_message_append_args(message,
-+				DBUS_TYPE_OBJECT_PATH, &dev_path,
-+				DBUS_TYPE_STRING, &pincode,
-+				DBUS_TYPE_INVALID);
++/* Minor device classes (includes major class) */
++#define BLUETOOTH_DEVICE_CLASS_BITMASK 0x1FFC
 +
-+	if (!g_dbus_send_message(connection, message)) {
-+		error("D-Bus send failed");
-+		dbus_message_unref(message);
-+		return -1;
-+	}
++#define BLUETOOTH_DEVICE_CLASS(_class) \
++                                ((_class) & BLUETOOTH_DEVICE_CLASS_BITMASK)
 +
-+	return 0;
-+}
++/* Devices in the COMPUTER major class */
++#define BLUETOOTH_DEVICE_CLASS_COMPUTER_UNCATEGORIZED    0x0100
++#define BLUETOOTH_DEVICE_CLASS_COMPUTER_DESKTOP          0x0104
++#define BLUETOOTH_DEVICE_CLASS_COMPUTER_SERVER           0x0108
++#define BLUETOOTH_DEVICE_CLASS_COMPUTER_LAPTOP           0x010C
++#define BLUETOOTH_DEVICE_CLASS_COMPUTER_HANDHELD_PC_PDA  0x0110
++#define BLUETOOTH_DEVICE_CLASS_COMPUTER_PALM_SIZE_PC_PDA 0x0114
++#define BLUETOOTH_DEVICE_CLASS_COMPUTER_WEARABLE         0x0118
 +
- uint8_t agent_get_io_capability(struct agent *agent)
- {
- 	return agent->capability;
-diff --git a/src/agent.h b/src/agent.h
-index f62bf3b..838180d 100644
---- a/src/agent.h
-+++ b/src/agent.h
-@@ -63,6 +63,8 @@ int agent_request_confirmation(struct agent *agent, struct btd_device *device,
- 
- int agent_display_passkey(struct agent *agent, struct btd_device *device,
- 				uint32_t passkey);
-+int agent_display_pincode(struct agent *agent, struct btd_device *device,
-+				const char *pincode);
- 
- int agent_cancel(struct agent *agent);
- 
-diff --git a/src/device.c b/src/device.c
-index 16855b1..df58b06 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2330,7 +2330,8 @@ void device_simple_pairing_complete(struct btd_device *device, uint8_t status)
- {
- 	struct authentication_req *auth = device->authr;
- 
--	if (auth && auth->type == AUTH_TYPE_NOTIFY && auth->agent)
-+	if (auth && (auth->type == AUTH_TYPE_NOTIFY_PASSKEY
-+		     || auth->type == AUTH_TYPE_NOTIFY_PINCODE) && auth->agent)
- 		agent_cancel(auth->agent);
- }
- 
-@@ -2347,7 +2348,8 @@ void device_bonding_complete(struct btd_device *device, uint8_t status)
- 
- 	DBG("bonding %p status 0x%02x", bonding, status);
- 
--	if (auth && auth->type == AUTH_TYPE_NOTIFY && auth->agent)
-+	if (auth && (auth->type == AUTH_TYPE_NOTIFY_PASSKEY
-+		     || auth->type == AUTH_TYPE_NOTIFY_PINCODE) && auth->agent)
- 		agent_cancel(auth->agent);
- 
- 	if (status) {
-@@ -2554,7 +2556,7 @@ done:
- }
- 
- int device_request_authentication(struct btd_device *device, auth_type_t type,
--				uint32_t passkey, gboolean secure, void *cb)
-+				void *data, gboolean secure, void *cb)
- {
- 	struct authentication_req *auth;
- 	struct agent *agent;
-@@ -2580,7 +2582,7 @@ int device_request_authentication(struct btd_device *device, auth_type_t type,
- 	auth->device = device;
- 	auth->cb = cb;
- 	auth->type = type;
--	auth->passkey = passkey;
-+	auth->passkey = data ? *(uint32_t *)data : 0;
- 	auth->secure = secure;
- 	device->authr = auth;
- 
-@@ -2594,11 +2596,14 @@ int device_request_authentication(struct btd_device *device, auth_type_t type,
- 								auth, NULL);
- 		break;
- 	case AUTH_TYPE_CONFIRM:
--		err = agent_request_confirmation(agent, device, passkey,
-+		err = agent_request_confirmation(agent, device, auth->passkey,
- 						confirm_cb, auth, NULL);
- 		break;
--	case AUTH_TYPE_NOTIFY:
--		err = agent_display_passkey(agent, device, passkey);
-+	case AUTH_TYPE_NOTIFY_PASSKEY:
-+		err = agent_display_passkey(agent, device, auth->passkey);
-+		break;
-+	case AUTH_TYPE_NOTIFY_PINCODE:
-+		err = agent_display_pincode(agent, device, (const char *)data);
- 		break;
- 	default:
- 		err = -EINVAL;
-@@ -2637,7 +2642,10 @@ static void cancel_authentication(struct authentication_req *auth)
- 	case AUTH_TYPE_PASSKEY:
- 		((agent_passkey_cb) auth->cb)(agent, &err, 0, device);
- 		break;
--	case AUTH_TYPE_NOTIFY:
-+	case AUTH_TYPE_NOTIFY_PASSKEY:
-+		/* User Notify doesn't require any reply */
-+		break;
-+	case AUTH_TYPE_NOTIFY_PINCODE:
- 		/* User Notify doesn't require any reply */
- 		break;
- 	}
-diff --git a/src/device.h b/src/device.h
-index 13005ae..b355a6e 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -30,7 +30,8 @@ typedef enum {
- 	AUTH_TYPE_PINCODE,
- 	AUTH_TYPE_PASSKEY,
- 	AUTH_TYPE_CONFIRM,
--	AUTH_TYPE_NOTIFY,
-+	AUTH_TYPE_NOTIFY_PASSKEY,
-+	AUTH_TYPE_NOTIFY_PINCODE,
- } auth_type_t;
- 
- struct btd_device *device_create(DBusConnection *conn,
-@@ -82,7 +83,7 @@ gboolean device_is_creating(struct btd_device *device, const char *sender);
- gboolean device_is_bonding(struct btd_device *device, const char *sender);
- void device_cancel_bonding(struct btd_device *device, uint8_t status);
- int device_request_authentication(struct btd_device *device, auth_type_t type,
--				uint32_t passkey, gboolean secure, void *cb);
-+				void *data, gboolean secure, void *cb);
- void device_cancel_authentication(struct btd_device *device, gboolean aborted);
- gboolean device_is_authenticating(struct btd_device *device);
- gboolean device_is_authorizing(struct btd_device *device);
-diff --git a/src/event.c b/src/event.c
-index 0783b47..5aa5ef9 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -130,7 +130,7 @@ int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba, gboolean secure)
- 		return 0;
- 	}
- 
--	return device_request_authentication(device, AUTH_TYPE_PINCODE, 0,
-+	return device_request_authentication(device, AUTH_TYPE_PINCODE, NULL,
- 							secure, pincode_cb);
- }
- 
-@@ -177,7 +177,7 @@ int btd_event_user_confirm(bdaddr_t *sba, bdaddr_t *dba, uint32_t passkey)
- 		return -ENODEV;
- 
- 	return device_request_authentication(device, AUTH_TYPE_CONFIRM,
--						passkey, FALSE, confirm_cb);
-+						&passkey, FALSE, confirm_cb);
- }
- 
- int btd_event_user_passkey(bdaddr_t *sba, bdaddr_t *dba)
-@@ -188,7 +188,7 @@ int btd_event_user_passkey(bdaddr_t *sba, bdaddr_t *dba)
- 	if (!get_adapter_and_device(sba, dba, &adapter, &device, TRUE))
- 		return -ENODEV;
- 
--	return device_request_authentication(device, AUTH_TYPE_PASSKEY, 0,
-+	return device_request_authentication(device, AUTH_TYPE_PASSKEY, NULL,
- 							FALSE, passkey_cb);
- }
- 
-@@ -200,8 +200,8 @@ int btd_event_user_notify(bdaddr_t *sba, bdaddr_t *dba, uint32_t passkey)
- 	if (!get_adapter_and_device(sba, dba, &adapter, &device, TRUE))
- 		return -ENODEV;
- 
--	return device_request_authentication(device, AUTH_TYPE_NOTIFY, passkey,
--								FALSE, NULL);
-+	return device_request_authentication(device, AUTH_TYPE_NOTIFY_PASSKEY,
-+							&passkey, FALSE, NULL);
- }
- 
- void btd_event_simple_pairing_complete(bdaddr_t *local, bdaddr_t *peer,
-diff --git a/test/simple-agent b/test/simple-agent
-index 8d65860..4416adb 100755
---- a/test/simple-agent
-+++ b/test/simple-agent
-@@ -52,6 +52,11 @@ class Agent(dbus.service.Object):
- 		print "DisplayPasskey (%s, %d)" % (device, passkey)
- 
- 	@dbus.service.method("org.bluez.Agent",
-+					in_signature="os", out_signature="")
-+	def DisplayPinCode(self, device, pincode):
-+		print "DisplayPinCode (%s, %s)" % (device, pincode)
++/* Devices in the PHONE major class */
++#define BLUETOOTH_DEVICE_CLASS_PHONE_UNCATEGORIZED    0x0200
++#define BLUETOOTH_DEVICE_CLASS_PHONE_CELLULAR         0x0204
++#define BLUETOOTH_DEVICE_CLASS_PHONE_CORDLESS         0x0208
++#define BLUETOOTH_DEVICE_CLASS_PHONE_SMART            0x020C
++#define BLUETOOTH_DEVICE_CLASS_PHONE_MODEM_OR_GATEWAY 0x0210
++#define BLUETOOTH_DEVICE_CLASS_PHONE_ISDN             0x0214
 +
-+	@dbus.service.method("org.bluez.Agent",
- 					in_signature="ou", out_signature="")
- 	def RequestConfirmation(self, device, passkey):
- 		print "RequestConfirmation (%s, %d)" % (device, passkey)
++/* Devices in the AUDIO_VIDEO major class */
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_UNCATEGORIZED      0x0400
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_WEARABLE_HEADSET   0x0404
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_HANDSFREE          0x0408
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_MICROPHONE         0x0410
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_LOUDSPEAKER        0x0414
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_HEADPHONES         0x0418
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_PORTABLE_AUDIO     0x041C
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_CAR_AUDIO          0x0420
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_SET_TOP_BOX        0x0424
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_HIFI_AUDIO         0x0428
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_VCR                0x042C
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_VIDEO_CAMERA       0x0430
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_CAMCORDER          0x0434
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_VIDEO_MONITOR      0x0438
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_VIDEO_DISPLAY_AND_LOUDSPEAKER 0x043C
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_VIDEO_CONFERENCING 0x0440
++#define BLUETOOTH_DEVICE_CLASS_AUDIO_VIDEO_VIDEO_GAMING_TOY   0x0448
++
++/* Devices in the WEARABLE major class */
++#define BLUETOOTH_DEVICE_CLASS_WEARABLE_UNCATEGORIZED 0x0700
++#define BLUETOOTH_DEVICE_CLASS_WEARABLE_WRIST_WATCH   0x0704
++#define BLUETOOTH_DEVICE_CLASS_WEARABLE_PAGER         0x0708
++#define BLUETOOTH_DEVICE_CLASS_WEARABLE_JACKET        0x070C
++#define BLUETOOTH_DEVICE_CLASS_WEARABLE_HELMET        0x0710
++#define BLUETOOTH_DEVICE_CLASS_WEARABLE_GLASSES       0x0714
++
++/* Devices in the TOY major class */
++#define BLUETOOTH_DEVICE_CLASS_TOY_UNCATEGORIZED      0x0800
++#define BLUETOOTH_DEVICE_CLASS_TOY_ROBOT              0x0804
++#define BLUETOOTH_DEVICE_CLASS_TOY_VEHICLE            0x0808
++#define BLUETOOTH_DEVICE_CLASS_TOY_DOLL_ACTION_FIGURE 0x080C
++#define BLUETOOTH_DEVICE_CLASS_TOY_CONTROLLER         0x0810
++#define BLUETOOTH_DEVICE_CLASS_TOY_GAME               0x0814
++
++/* Devices in the HEALTH major class */
++#define BLUETOOTH_DEVICE_CLASS_HEALTH_UNCATEGORIZED  0x0900
++#define BLUETOOTH_DEVICE_CLASS_HEALTH_BLOOD_PRESSURE 0x0904
++#define BLUETOOTH_DEVICE_CLASS_HEALTH_THERMOMETER    0x0908
++#define BLUETOOTH_DEVICE_CLASS_HEALTH_WEIGHING       0x090C
++#define BLUETOOTH_DEVICE_CLASS_HEALTH_GLUCOSE        0x0910
++#define BLUETOOTH_DEVICE_CLASS_HEALTH_PULSE_OXIMETER 0x0914
++#define BLUETOOTH_DEVICE_CLASS_HEALTH_PULSE_RATE     0x0918
++#define BLUETOOTH_DEVICE_CLASS_HEALTH_DATA_DISPLAY   0x091C
++
++/* Devices in the PERIPHERAL major class */
++#define BLUETOOTH_DEVICE_CLASS_PERIPHERAL_NON_KEYBOARD_NON_POINTING 0x0500
++#define BLUETOOTH_DEVICE_CLASS_PERIPHERAL_KEYBOARD                  0x0540
++#define BLUETOOTH_DEVICE_CLASS_PERIPHERAL_POINTING                  0x0580
++#define BLUETOOTH_DEVICE_CLASS_PERIPHERAL_KEYBOARD_POINTING         0x05C0
++
++#endif /* __BT_IDS_H */
 -- 
 1.7.7.3
 
