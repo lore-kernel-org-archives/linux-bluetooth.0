@@ -1,51 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] Remove dead code from bonding_request_new
-Date: Fri, 20 Jan 2012 16:26:26 +0100
-Message-ID: <1327073187-1009-1-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 20 Jan 2012 17:05:40 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd 1/6] client: fix circular dependency of session and
+ transfer
+Message-ID: <20120120150540.GB18984@fusion.localdomain>
+References: <1327053001-9506-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1327053001-9506-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-agent_create always return valid pointer so there is not need to check
-for NULL as this will never happen.
----
- src/device.c |    9 +--------
- 1 files changed, 1 insertions(+), 8 deletions(-)
+Hi Luiz,
 
-diff --git a/src/device.c b/src/device.c
-index 16855b1..5224984 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2225,7 +2225,6 @@ static struct bonding_req *bonding_request_new(DBusConnection *conn,
- {
- 	struct bonding_req *bonding;
- 	const char *name = dbus_message_get_sender(msg);
--	struct agent *agent;
- 	char addr[18];
- 
- 	ba2str(&device->bdaddr, addr);
-@@ -2234,16 +2233,10 @@ static struct bonding_req *bonding_request_new(DBusConnection *conn,
- 	if (!agent_path)
- 		goto proceed;
- 
--	agent = agent_create(device->adapter, name, agent_path,
-+	device->agent = agent_create(device->adapter, name, agent_path,
- 					capability,
- 					device_agent_removed,
- 					device);
--	if (!agent) {
--		error("Unable to create a new agent");
--		return NULL;
--	}
--
--	device->agent = agent;
- 
- 	DBG("Temporary agent registered for %s at %s:%s",
- 			addr, name, agent_path);
--- 
-on behalf of ST-Ericsson
+On Fri, Jan 20, 2012, Luiz Augusto von Dentz wrote:
+> Currently the code has to to pass session to transfer via user data
+> (void *) only to be casted to session.
+> ---
+>  client/ftp.c      |    7 +--
+>  client/manager.c  |    6 +--
+>  client/map.c      |    9 +---
+>  client/pbap.c     |   42 ++++-------------
+>  client/session.c  |  129 ++++++++++++++++++++++++++++++++++++++++++++---------
+>  client/session.h  |    8 +---
+>  client/sync.c     |    8 +--
+>  client/transfer.c |   68 ++++++++++++++--------------
+>  client/transfer.h |   13 +++---
+>  9 files changed, 168 insertions(+), 122 deletions(-)
 
+All six patches have been applied. Thanks.
+
+Johan
