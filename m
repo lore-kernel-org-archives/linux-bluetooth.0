@@ -1,148 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd v5.1 4/5] map_ap.c: Add implementation for map_ap_decode()
-Date: Fri, 20 Jan 2012 13:25:23 +0100
-Message-Id: <1327062323-26466-1-git-send-email-lkslawek@gmail.com>
-In-Reply-To: <1326992516-2800-5-git-send-email-lkslawek@gmail.com>
-References: <1326992516-2800-5-git-send-email-lkslawek@gmail.com>
+Subject: [PATCHv2] Bluetooth: Add alloc_skb chan operator
+Date: Fri, 20 Jan 2012 14:08:03 +0200
+Message-Id: <1327061283-17323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+
+Add channel-specific skb allocation method
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
 ---
-v5.1:
-Fixed pointer arithmetic
-Fixed format specifier for unsigned integers
+v2: removed unused variable
 
- src/map_ap.c |   98 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 97 insertions(+), 1 deletions(-)
+ include/net/bluetooth/l2cap.h |    3 +++
+ net/bluetooth/l2cap_core.c    |   23 +++++++++++++++--------
+ net/bluetooth/l2cap_sock.c    |    9 +++++++++
+ 3 files changed, 27 insertions(+), 8 deletions(-)
 
-diff --git a/src/map_ap.c b/src/map_ap.c
-index b71cd35..1c6185e 100644
---- a/src/map_ap.c
-+++ b/src/map_ap.c
-@@ -25,6 +25,10 @@
- #include <config.h>
- #endif
- 
-+#include <string.h>
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 34a882b..ed390ad 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -506,6 +506,9 @@ struct l2cap_ops {
+ 	int			(*recv) (void *data, struct sk_buff *skb);
+ 	void			(*close) (void *data);
+ 	void			(*state_change) (void *data, int state);
++	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
++					unsigned long len, int nb, int *err);
 +
-+#include "log.h"
-+
- #include "map_ap.h"
- 
- enum ap_type {
-@@ -76,6 +80,13 @@ struct ap_entry {
- 	} val;
  };
  
-+/* This comes from OBEX specs */
-+struct obex_ap_header {
-+	uint8_t tag;
-+	uint8_t len;
-+	uint8_t val[0];
-+} __attribute__ ((packed));
-+
- static int find_ap_def_offset(uint8_t tag)
+ struct l2cap_conn {
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 598805b..feab2ae 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1515,7 +1515,6 @@ static void l2cap_send_srejtail(struct l2cap_chan *chan)
+ 
+ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan, struct msghdr *msg, int len, int count, struct sk_buff *skb)
  {
- 	if (tag == 0 || tag > G_N_ELEMENTS(ap_defs))
-@@ -111,9 +122,94 @@ void map_ap_free(map_ap_t *ap)
- 	g_hash_table_destroy(ap);
+-	struct sock *sk = chan->sk;
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct sk_buff **frag;
+ 	int err, sent = 0;
+@@ -1531,7 +1530,9 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan, struct msghdr
+ 	while (len) {
+ 		count = min_t(unsigned int, conn->mtu, len);
+ 
+-		*frag = bt_skb_send_alloc(sk, count, msg->msg_flags & MSG_DONTWAIT, &err);
++		*frag = chan->ops->alloc_skb(chan, count,
++					msg->msg_flags & MSG_DONTWAIT, &err);
++
+ 		if (!*frag)
+ 			return err;
+ 		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
+@@ -1561,8 +1562,10 @@ static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
+ 	BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
+ 
+ 	count = min_t(unsigned int, (conn->mtu - hlen), len);
+-	skb = bt_skb_send_alloc(sk, count + hlen,
+-			msg->msg_flags & MSG_DONTWAIT, &err);
++
++	skb = chan->ops->alloc_skb(chan, count + hlen,
++					msg->msg_flags & MSG_DONTWAIT, &err);
++
+ 	if (!skb)
+ 		return ERR_PTR(err);
+ 
+@@ -1595,8 +1598,10 @@ static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
+ 	BT_DBG("sk %p len %d", sk, (int)len);
+ 
+ 	count = min_t(unsigned int, (conn->mtu - hlen), len);
+-	skb = bt_skb_send_alloc(sk, count + hlen,
+-			msg->msg_flags & MSG_DONTWAIT, &err);
++
++	skb = chan->ops->alloc_skb(chan, count + hlen,
++					msg->msg_flags & MSG_DONTWAIT, &err);
++
+ 	if (!skb)
+ 		return ERR_PTR(err);
+ 
+@@ -1642,8 +1647,10 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
+ 		hlen += L2CAP_FCS_SIZE;
+ 
+ 	count = min_t(unsigned int, (conn->mtu - hlen), len);
+-	skb = bt_skb_send_alloc(sk, count + hlen,
+-			msg->msg_flags & MSG_DONTWAIT, &err);
++
++	skb = chan->ops->alloc_skb(chan, count + hlen,
++					msg->msg_flags & MSG_DONTWAIT, &err);
++
+ 	if (!skb)
+ 		return ERR_PTR(err);
+ 
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index c57027f..4640c12 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -897,12 +897,21 @@ static void l2cap_sock_state_change_cb(void *data, int state)
+ 	sk->sk_state = state;
  }
  
-+static void ap_decode_u8(map_ap_t *ap, const struct obex_ap_header *hdr)
++static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
++					unsigned long len, int nb, int *err)
 +{
-+	if (hdr->len != 1) {
-+		DBG("Value of tag %u is %u byte(s) long instead of expected "
-+				"1 byte - skipped!", hdr->tag, hdr->len);
-+		return;
-+	}
++	struct sock *sk = chan->sk;
 +
-+	map_ap_set_u8(ap, hdr->tag, hdr->val[0]);
++	return bt_skb_send_alloc(sk, len, nb, err);
 +}
 +
-+static void ap_decode_u16(map_ap_t *ap, const struct obex_ap_header *hdr)
-+{
-+	uint16_t val;
-+
-+	if (hdr->len != 2) {
-+		DBG("Value of tag %u is %u byte(s) long instead of expected "
-+				"2 bytes - skipped!", hdr->tag, hdr->len);
-+		return;
-+	}
-+
-+	memcpy(&val, hdr->val, sizeof(val));
-+	map_ap_set_u16(ap, hdr->tag, GUINT16_FROM_BE(val));
-+}
-+
-+static void ap_decode_u32(map_ap_t *ap, const struct obex_ap_header *hdr)
-+{
-+	uint32_t val;
-+
-+	if (hdr->len != 4) {
-+		DBG("Value of tag %u is %u byte(s) long instead of expected "
-+				"4 bytes - skipped!", hdr->tag, hdr->len);
-+		return;
-+	}
-+
-+	memcpy(&val, hdr->val, sizeof(val));
-+	map_ap_set_u32(ap, hdr->tag, GUINT32_FROM_BE(val));
-+}
-+
-+static void ap_decode_str(map_ap_t *ap, const struct obex_ap_header *hdr)
-+{
-+	char *val = g_malloc0(hdr->len + 1);
-+
-+	memcpy(val, hdr->val, hdr->len);
-+	map_ap_set_string(ap, hdr->tag, val);
-+
-+	g_free(val);
-+}
-+
- map_ap_t *map_ap_decode(const uint8_t *buffer, size_t length)
- {
--	return NULL;
-+	map_ap_t *ap;
-+	struct obex_ap_header *hdr;
-+	uint32_t done;
-+	int offset;
-+
-+	ap = map_ap_new();
-+	if (!ap)
-+		return NULL;
-+
-+	for (done = 0;  done < length; done += hdr->len + sizeof(*hdr)) {
-+		hdr = (struct obex_ap_header *)(buffer + done);
-+
-+		offset = find_ap_def_offset(hdr->tag);
-+
-+		if (offset < 0) {
-+			DBG("Unknown tag %u (length %u) - skipped.",
-+							hdr->tag, hdr->len);
-+			continue;
-+		}
-+
-+		switch (ap_defs[offset].type) {
-+		case APT_UINT8:
-+			ap_decode_u8(ap, hdr);
-+			break;
-+		case APT_UINT16:
-+			ap_decode_u16(ap, hdr);
-+			break;
-+		case APT_UINT32:
-+			ap_decode_u32(ap, hdr);
-+			break;
-+		case APT_STR:
-+			ap_decode_str(ap, hdr);
-+			break;
-+		}
-+	}
-+
-+	return ap;
- }
+ static struct l2cap_ops l2cap_chan_ops = {
+ 	.name		= "L2CAP Socket Interface",
+ 	.new_connection	= l2cap_sock_new_connection_cb,
+ 	.recv		= l2cap_sock_recv_cb,
+ 	.close		= l2cap_sock_close_cb,
+ 	.state_change	= l2cap_sock_state_change_cb,
++	.alloc_skb	= l2cap_sock_alloc_skb_cb,
+ };
  
- uint8_t *map_ap_encode(map_ap_t *ap, size_t *length)
+ static void l2cap_sock_destruct(struct sock *sk)
 -- 
 1.7.4.1
 
