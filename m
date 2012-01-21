@@ -1,120 +1,143 @@
 Return-Path: <cyrus@holtmann.org>
-From: ilia.kolominsky@gmail.com
+From: Octavian Purdila <tavi.purdila@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ilia Kolomisnky <iliak@ti.com>
-Subject: [PATCH] BlueZ: Added retries for BNEP connection setup.
-Date: Sun, 22 Jan 2012 09:10:33 +0200
-Message-Id: <1327216233-17629-1-git-send-email-iliak@ti.com>
+Cc: kirill.shutemov@linux.intel.com,
+	Octavian Purdila <octavian.purdila@intel.com>
+Subject: [PATCH v4] Bluetooth: silence lockdep warning
+Date: Sun, 22 Jan 2012 00:28:34 +0200
+Message-Id: <1327184914-2902-1-git-send-email-octavian.purdila@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ilia Kolomisnky <iliak@ti.com>
+Since bluetooth uses multiple protocols types, to avoid lockdep
+warnings, we need to use different lockdep classes (one for each
+protocol type).
 
-According to BNEP spec. section 2.6.3 and
-in order to pass TP/BNEP/CTRL/BV-02-C certification test.
+This is already done in bt_sock_create but it misses a couple of cases
+when new connections are created. This patch corrects that to fix the
+following warning:
 
-Signed-off-by: Ilia Kolomisnky <iliak@ti.com>
+<4>[ 1864.732366] =======================================================
+<4>[ 1864.733030] [ INFO: possible circular locking dependency detected ]
+<4>[ 1864.733544] 3.0.16-mid3-00007-gc9a0f62 #3
+<4>[ 1864.733883] -------------------------------------------------------
+<4>[ 1864.734408] t.android.btclc/4204 is trying to acquire lock:
+<4>[ 1864.734869]  (rfcomm_mutex){+.+.+.}, at: [<c14970ea>] rfcomm_dlc_close+0x15/0x30
+<4>[ 1864.735541]
+<4>[ 1864.735549] but task is already holding lock:
+<4>[ 1864.736045]  (sk_lock-AF_BLUETOOTH){+.+.+.}, at: [<c1498bf7>] lock_sock+0xa/0xc
+<4>[ 1864.736732]
+<4>[ 1864.736740] which lock already depends on the new lock.
+<4>[ 1864.736750]
+<4>[ 1864.737428]
+<4>[ 1864.737437] the existing dependency chain (in reverse order) is:
+<4>[ 1864.738016]
+<4>[ 1864.738023] -> #1 (sk_lock-AF_BLUETOOTH){+.+.+.}:
+<4>[ 1864.738549]        [<c1062273>] lock_acquire+0x104/0x140
+<4>[ 1864.738977]        [<c13d35c1>] lock_sock_nested+0x58/0x68
+<4>[ 1864.739411]        [<c1493c33>] l2cap_sock_sendmsg+0x3e/0x76
+<4>[ 1864.739858]        [<c13d06c3>] __sock_sendmsg+0x50/0x59
+<4>[ 1864.740279]        [<c13d0ea2>] sock_sendmsg+0x94/0xa8
+<4>[ 1864.740687]        [<c13d0ede>] kernel_sendmsg+0x28/0x37
+<4>[ 1864.741106]        [<c14969ca>] rfcomm_send_frame+0x30/0x38
+<4>[ 1864.741542]        [<c1496a2a>] rfcomm_send_ua+0x58/0x5a
+<4>[ 1864.741959]        [<c1498447>] rfcomm_run+0x441/0xb52
+<4>[ 1864.742365]        [<c104f095>] kthread+0x63/0x68
+<4>[ 1864.742742]        [<c14d5182>] kernel_thread_helper+0x6/0xd
+<4>[ 1864.743187]
+<4>[ 1864.743193] -> #0 (rfcomm_mutex){+.+.+.}:
+<4>[ 1864.743667]        [<c1061ada>] __lock_acquire+0x988/0xc00
+<4>[ 1864.744100]        [<c1062273>] lock_acquire+0x104/0x140
+<4>[ 1864.744519]        [<c14d2c70>] __mutex_lock_common+0x3b/0x33f
+<4>[ 1864.744975]        [<c14d303e>] mutex_lock_nested+0x2d/0x36
+<4>[ 1864.745412]        [<c14970ea>] rfcomm_dlc_close+0x15/0x30
+<4>[ 1864.745842]        [<c14990d9>] __rfcomm_sock_close+0x5f/0x6b
+<4>[ 1864.746288]        [<c1499114>] rfcomm_sock_shutdown+0x2f/0x62
+<4>[ 1864.746737]        [<c13d275d>] sys_socketcall+0x1db/0x422
+<4>[ 1864.747165]        [<c14d42f0>] syscall_call+0x7/0xb
+
+Signed-off-by: Octavian Purdila <octavian.purdila@intel.com>
 ---
- network/connection.c |   53 ++++++++++++++++++++++++++++++++++++++++---------
- 1 files changed, 43 insertions(+), 10 deletions(-)
+ include/net/bluetooth/bluetooth.h |    2 ++
+ net/bluetooth/af_bluetooth.c      |   12 +++++-------
+ net/bluetooth/l2cap_sock.c        |    2 ++
+ net/bluetooth/rfcomm/sock.c       |    2 ++
+ 4 files changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/network/connection.c b/network/connection.c
-index ca1f4b2..5c3819a 100644
---- a/network/connection.c
-+++ b/network/connection.c
-@@ -49,6 +49,8 @@
- #include "connection.h"
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index abaad6e..4a82ca0 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -256,4 +256,6 @@ void l2cap_exit(void);
+ int sco_init(void);
+ void sco_exit(void);
  
- #define NETWORK_PEER_INTERFACE "org.bluez.Network"
-+#define CON_SETUP_RETRIES      3
-+#define CON_SETUP_TO_MS        9000
- 
- typedef enum {
- 	CONNECTED,
-@@ -73,6 +75,8 @@ struct network_conn {
- 	guint		watch;		/* Disconnect watch */
- 	guint		dc_id;
- 	struct network_peer *peer;
-+	char		con_attempt;
-+	guint 		con_to_src;
++void bt_sock_reclassify_lock(struct sock *sk, int proto);
++
+ #endif /* __BLUETOOTH_H */
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index ef92864..72eb187 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -71,19 +71,16 @@ static const char *const bt_slock_key_strings[BT_MAX_PROTO] = {
+ 	"slock-AF_BLUETOOTH-BTPROTO_AVDTP",
  };
  
- struct __service_16 {
-@@ -218,6 +222,8 @@ static gboolean bnep_setup_cb(GIOChannel *chan, GIOCondition cond,
- 		goto failed;
+-static inline void bt_sock_reclassify_lock(struct socket *sock, int proto)
++void bt_sock_reclassify_lock(struct sock *sk, int proto)
+ {
+-	struct sock *sk = sock->sk;
+-
+-	if (!sk)
+-		return;
+-
++	BUG_ON(!sk);
+ 	BUG_ON(sock_owned_by_user(sk));
+ 
+ 	sock_lock_init_class_and_name(sk,
+ 			bt_slock_key_strings[proto], &bt_slock_key[proto],
+ 				bt_key_strings[proto], &bt_lock_key[proto]);
+ }
++EXPORT_SYMBOL(bt_sock_reclassify_lock);
+ 
+ int bt_sock_register(int proto, const struct net_proto_family *ops)
+ {
+@@ -145,7 +142,8 @@ static int bt_sock_create(struct net *net, struct socket *sock, int proto,
+ 
+ 	if (bt_proto[proto] && try_module_get(bt_proto[proto]->owner)) {
+ 		err = bt_proto[proto]->create(net, sock, proto, kern);
+-		bt_sock_reclassify_lock(sock, proto);
++		if (!err)
++			bt_sock_reclassify_lock(sock->sk, proto);
+ 		module_put(bt_proto[proto]->owner);
  	}
  
-+	g_source_remove(nc->con_to_src);
-+
- 	errno = EPROTO;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index c61d967..46b22d9 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -849,6 +849,8 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(void *data)
+ 	if (!sk)
+ 		return NULL;
  
- 	if ((size_t) r < sizeof(*rsp)) {
-@@ -289,13 +295,11 @@ failed:
- 	return FALSE;
- }
++	bt_sock_reclassify_lock(sk, BTPROTO_L2CAP);
++
+ 	l2cap_sock_init(sk, parent);
  
--static int bnep_connect(struct network_conn *nc)
--{
-+static inline int bnep_send_conn_req(struct network_conn *nc) {
-+
- 	struct bnep_setup_conn_req *req;
- 	struct __service_16 *s;
--	struct timeval timeo;
- 	unsigned char pkt[BNEP_MTU];
--	int fd;
+ 	return l2cap_pi(sk)->chan;
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index f066678..22169c3 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -956,6 +956,8 @@ int rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc *
+ 	if (!sk)
+ 		goto done;
  
- 	/* Send request */
- 	req = (void *) pkt;
-@@ -306,14 +310,43 @@ static int bnep_connect(struct network_conn *nc)
- 	s->dst = htons(nc->id);
- 	s->src = htons(BNEP_SVC_PANU);
- 
--	memset(&timeo, 0, sizeof(timeo));
--	timeo.tv_sec = 30;
-+	if (send(g_io_channel_unix_get_fd(nc->io), pkt, sizeof(*req) + sizeof(*s), 0) < 0) {
-+		error("bnep connection setup send failed");
-+		return -errno;
-+	}
- 
--	fd = g_io_channel_unix_get_fd(nc->io);
--	setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeo, sizeof(timeo));
-+	nc->con_attempt++;
- 
--	if (send(fd, pkt, sizeof(*req) + sizeof(*s), 0) < 0)
--		return -errno;
-+	return 0;
-+}
++	bt_sock_reclassify_lock(sk, BTPROTO_RFCOMM);
 +
-+static gboolean bnep_conn_req_to(gpointer user_data)
-+{
-+	struct network_conn *nc;
-+	int err;
-+
-+	nc = (struct network_conn *) user_data;
-+	if (nc->con_attempt == CON_SETUP_RETRIES) {
-+		error("Too many bnep connection attempts, aborting connection setup");
-+	}
-+	else {
-+		error("bnep connection setup TO, retrying...");
-+
-+		if (!bnep_send_conn_req(nc))
-+			return TRUE;
-+	}
-+
-+	cancel_connection(nc, "bnep setup failed");
-+	return FALSE;
-+}
-+
-+static int bnep_connect(struct network_conn *nc)
-+{
-+	int err;
-+
-+	if (err = bnep_send_conn_req(nc))
-+		return err;
-+	nc->con_to_src = g_timeout_add(CON_SETUP_TO_MS, bnep_conn_req_to, nc);
- 
- 	g_io_add_watch(nc->io, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
- 			(GIOFunc) bnep_setup_cb, nc);
+ 	rfcomm_sock_init(sk, parent);
+ 	bacpy(&bt_sk(sk)->src, &src);
+ 	bacpy(&bt_sk(sk)->dst, &dst);
 -- 
-1.7.4.1
+1.7.1
 
