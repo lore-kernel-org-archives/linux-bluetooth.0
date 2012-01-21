@@ -1,45 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1327164299.1955.53.camel@aeonflux>
-References: <1326993579-14429-1-git-send-email-octavian.purdila@intel.com>
-	<1327164299.1955.53.camel@aeonflux>
-Date: Sat, 21 Jan 2012 19:30:29 +0200
-Message-ID: <CAE1zotJs0gJOQUX_w+A31gw6zedBGnLscyWRKya8KdNKTM4+4A@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: silence lockdep warning
-From: "Purdila, Octavian" <octavian.purdila@intel.com>
+In-Reply-To: <1327163453.1955.43.camel@aeonflux>
+References: <1327100744-28782-1-git-send-email-scott@netsplit.com>
+	<1327100744-28782-2-git-send-email-scott@netsplit.com>
+	<1327163453.1955.43.camel@aeonflux>
+Date: Sat, 21 Jan 2012 09:29:23 -0800
+Message-ID: <CA+bD78hj6X6cegycpL+n0Eo-wN5skNjRV8UOw6u5BEOcrtZyqw@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/3] lib: add header of device class constants
+From: Scott James Remnant <scott@netsplit.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org
+Content-Type: multipart/alternative; boundary=f46d0418262a6b7f4004b70d231c
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Jan 21, 2012 at 6:44 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+--f46d0418262a6b7f4004b70d231c
+Content-Type: text/plain; charset=ISO-8859-1
 
-> Hi Octavian,
+On Sat, Jan 21, 2012 at 8:30 AM, Marcel Holtmann <marcel@holtmann.org>wrote:
 
-Hi Marcel,
 
->> Change-Id: I0e5e395e579c20d29d1fb3aef862c011a9031225
+> I rather not make this part of the library. We are actually trying to
+> shrink the library and not keep extending it. So put this file locally
+> in src/ where you use it.
 >
-> No Change-Id please. This is not some Gerrit review thing.
 >
+Ok, no problem.
 
-Sorry about that, it slipped :) I will resend the patch with the
-change id removed.
+Scott
+-- 
+Have you ever, ever felt like this?
+Had strange things happen?  Are you going round the twist?
 
->> +void bt_sock_reclassify_lock(struct sock *sk, int proto)
->>  {
->> -     struct sock *sk = sock->sk;
->> -
->>       if (!sk)
->>               return;
->
-> Why are we keeping the !sk check here if we already hand in the sk. It
-> is most likely checked by the caller already.
->
+--f46d0418262a6b7f4004b70d231c
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-In rfcomm_sock_create (called from bt_sock_create) sock->sk can be set
-to NULL so I think we should keep the check.
+<div class=3D"gmail_quote">On Sat, Jan 21, 2012 at 8:30 AM, Marcel Holtmann=
+ <span dir=3D"ltr">&lt;<a href=3D"mailto:marcel@holtmann.org">marcel@holtma=
+nn.org</a>&gt;</span> wrote:<br><div>=A0</div><blockquote class=3D"gmail_qu=
+ote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex=
+">
+<div class=3D"im">I rather not make this part of the library. We are actual=
+ly trying to</div>
+shrink the library and not keep extending it. So put this file locally<br>
+in src/ where you use it.<br>
+<div class=3D"im"><br></div></blockquote><div><br></div><div>Ok, no problem=
+.</div><div><br></div><div>Scott</div><div>--=A0</div></div><div>Have you e=
+ver, ever felt like this?</div><div>Had strange things happen? =A0Are you g=
+oing round the twist?</div>
+<div><br></div><br>
 
-Thanks!
-Tavi
+--f46d0418262a6b7f4004b70d231c--
