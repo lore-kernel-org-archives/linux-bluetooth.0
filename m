@@ -1,88 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1327164406.1955.54.camel@aeonflux>
-References: <1326975033-2668-1-git-send-email-ulisses@profusion.mobi>
-	<1327164406.1955.54.camel@aeonflux>
-Date: Sat, 21 Jan 2012 17:35:52 -0200
-Message-ID: <CAA37ikayF2R-y9aUkCr7XqX+MmtDgXUfepdsoOe64uYMtc5tug@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Remove usage of __cancel_delayed_work()
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"padovan@profusion.mobi" <padovan@profusion.mobi>
-Content-Type: multipart/alternative; boundary=e89a8f235581c6741404b70ee72a
+Message-ID: <1327174090.1955.58.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: silence lockdep warning
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Purdila, Octavian" <octavian.purdila@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sat, 21 Jan 2012 20:28:10 +0100
+In-Reply-To: <CAE1zotLwpoq-6kKpsCf_KWY+AbjTa9Pd4m_v_wKX6JdmJ9O8nA@mail.gmail.com>
+References: <1326993579-14429-1-git-send-email-octavian.purdila@intel.com>
+	 <1327164299.1955.53.camel@aeonflux>
+	 <CAE1zotJs0gJOQUX_w+A31gw6zedBGnLscyWRKya8KdNKTM4+4A@mail.gmail.com>
+	 <1327170562.1955.55.camel@aeonflux>
+	 <CAE1zotLwpoq-6kKpsCf_KWY+AbjTa9Pd4m_v_wKX6JdmJ9O8nA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---e89a8f235581c6741404b70ee72a
-Content-Type: text/plain; charset=ISO-8859-1
+Hi Octavian,
 
-Great. But Johan please wait to apply. I'll send a new one with another
-change to prevent a crash.
+> >> >> +void bt_sock_reclassify_lock(struct sock *sk, int proto)
+> >> >>  {
+> >> >> -     struct sock *sk = sock->sk;
+> >> >> -
+> >> >>       if (!sk)
+> >> >>               return;
+> >> >
+> >> > Why are we keeping the !sk check here if we already hand in the sk. It
+> >> > is most likely checked by the caller already.
+> >> >
+> >>
+> >> In rfcomm_sock_create (called from bt_sock_create) sock->sk can be set
+> >> to NULL so I think we should keep the check.
+> >
+> > it has been too long since I looked at this part of the code. You need
+> > to walk me through it why this is still true.
+> >
+> 
+> Hi Marcel,
+> 
+> In bt_sock_create we have:
+> 
+>         if (bt_proto[proto] && try_module_get(bt_proto[proto]->owner)) {
+>         	err = bt_proto[proto]->create(net, sock, proto, kern);
+>                 bt_sock_reclassify_lock(sock->sk, proto);
+> 
+> and create can be rfcomm_sock_create where we have
+> 
+>         sk = rfcomm_sock_alloc(net, sock, protocol, GFP_ATOMIC);
+>         if (!sk)
+>                 return -ENOMEM;
+> 
+> So after calling ->create() sock->sk can be NULL and thus we can call
+> bt_sock_reclassify with a NULL parameter.
 
-On Saturday, January 21, 2012, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Ulisses,
->
->> __cancel_delayed_work() is being used in some paths where we cannot
->> sleep waiting for the delayed work to finish. However, that function
->> might return while the timer is running and the work will be queued
->> again. Replace the calls with safer cancel_delayed_work() version
->> which spins until the timer handler finishes in other CPUs and
->> cancels the delayed work.
->>
->> Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
->> ---
->>
->> v2 - rebased against newer bluetooth-next
->>
->>  include/net/bluetooth/l2cap.h |    4 ++--
->>  net/bluetooth/l2cap_core.c    |   10 +++++-----
->>  2 files changed, 7 insertions(+), 7 deletions(-)
->
-> looks fine to me.
->
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
->
-> Regards
->
-> Marcel
->
->
->
+so instead of keep checking sock->sk multiple times in different places,
+why not actually check the error from bt_proto[]->create() and skip the
+reclassify_lock call.
 
--- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+And if we wanna be really paranoid, then lets add a BUG_ON for sk so we
+get some nice backtraces if we have a wrongful caller.
 
---e89a8f235581c6741404b70ee72a
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Regards
 
-Great. But Johan please wait to apply. I&#39;ll send a new one with another=
- change to prevent a crash.<br><br>On Saturday, January 21, 2012, Marcel Ho=
-ltmann &lt;<a href=3D"mailto:marcel@holtmann.org">marcel@holtmann.org</a>&g=
-t; wrote:<br>
-&gt; Hi Ulisses,<br>&gt;<br>&gt;&gt; __cancel_delayed_work() is being used =
-in some paths where we cannot<br>&gt;&gt; sleep waiting for the delayed wor=
-k to finish. However, that function<br>&gt;&gt; might return while the time=
-r is running and the work will be queued<br>
-&gt;&gt; again. Replace the calls with safer cancel_delayed_work() version<=
-br>&gt;&gt; which spins until the timer handler finishes in other CPUs and<=
-br>&gt;&gt; cancels the delayed work.<br>&gt;&gt;<br>&gt;&gt; Signed-off-by=
-: Ulisses Furquim &lt;<a href=3D"mailto:ulisses@profusion.mobi">ulisses@pro=
-fusion.mobi</a>&gt;<br>
-&gt;&gt; ---<br>&gt;&gt;<br>&gt;&gt; v2 - rebased against newer bluetooth-n=
-ext<br>&gt;&gt;<br>&gt;&gt; =A0include/net/bluetooth/l2cap.h | =A0 =A04 ++-=
--<br>&gt;&gt; =A0net/bluetooth/l2cap_core.c =A0 =A0| =A0 10 +++++-----<br>&=
-gt;&gt; =A02 files changed, 7 insertions(+), 7 deletions(-)<br>
-&gt;<br>&gt; looks fine to me.<br>&gt;<br>&gt; Acked-by: Marcel Holtmann &l=
-t;<a href=3D"mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt;<br>&gt=
-;<br>&gt; Regards<br>&gt;<br>&gt; Marcel<br>&gt;<br>&gt;<br>&gt;<br><br>-- =
-<br>
-Ulisses Furquim<br>ProFUSION embedded systems<br><a href=3D"http://profusio=
-n.mobi">http://profusion.mobi</a><br>Mobile: +55 19 9250 0942<br>Skype: uli=
-ssesffs<br>
+Marcel
 
---e89a8f235581c6741404b70ee72a--
+
