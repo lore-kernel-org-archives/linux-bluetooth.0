@@ -1,37 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1327283783.1955.84.camel@aeonflux>
-Subject: Re: [PATCH COMMITTED] bluetooth: hci: Fix type of "enable_hs" to
- bool.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Miller <davem@davemloft.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Date: Mon, 23 Jan 2012 02:56:23 +0100
-In-Reply-To: <20120122.144654.2252112633629547845.davem@davemloft.net>
-References: <20120122.144654.2252112633629547845.davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: netdev-owner@vger.kernel.org
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH obexd 2/2] gobex: fix automatically including SRM header in CONNECT responses
+Date: Sun, 22 Jan 2012 23:07:33 +0200
+Message-Id: <1327266453-1077-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> net/bluetooth/hci_core.c: In function ‘__check_enable_hs’:
-> net/bluetooth/hci_core.c:2587:1: warning: return from incompatible pointer type [enabled by default]
-> 
-> Signed-off-by: David S. Miller <davem@davemloft.net>
-> ---
-> 
-> I noticed this while validating the build today, committed to 'net'.
+GOEP 2.0 test specification forbids the server to include SRM headers in
+CONNECT response:
 
-and from your subject, I assume you rightfully just applied that patch
-to your tree.
+  "3.16 TP/SRM/BI-03-C Process an OBEX CONNECT request (incorrectly)
+  containing a SRM header:
 
-I remember that I acked such a patch, but it seems it never made it
-anywhere in the end :(
+  • Expected Outcome
+  Pass Verdict:
+  – On receiving the invalid SRM header in the OBEX_CONNECT request, the
+  IUT responds with a SUCCESS without a SRM header.
+  – OBEX/L2CAP channel is established.
+  Fail Verdict:
+  – On receiving the invalid SRM header in the OBEX_CONNECT request, the
+  IUT does not respond with a SUCCESS and/or includes a SRM header in the
+  response.
+  – OBEX/L2CAP channel is not established or OBEX/RFCOMM channel is
+  established."
+---
+ gobex/gobex.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index 03da84f..0853a9b 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -588,6 +588,7 @@ gboolean g_obex_send(GObex *obex, GObexPacket *pkt, GError **err)
+ 	switch (obex->rx_last_op) {
+ 	case G_OBEX_OP_CONNECT:
+ 		prepare_connect_rsp(obex, pkt);
++		break;
+ 	case G_OBEX_OP_GET:
+ 	case G_OBEX_OP_PUT:
+ 		prepare_srm_rsp(obex, pkt);
+-- 
+1.7.7.5
 
