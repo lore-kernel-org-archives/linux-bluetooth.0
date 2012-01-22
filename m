@@ -1,50 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20111215191831.GA19354@samus>
-References: <1323820654-16820-1-git-send-email-vinicius.gomes@openbossa.org>
-	<20111215113720.GB6824@x220>
-	<20111215191831.GA19354@samus>
-Date: Sun, 22 Jan 2012 16:29:06 -0400
-Message-ID: <CAJdJm_Pb+sVtXM4oiknUcJCubFejfKXzonov1qEh2fJhRxtUDw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/5] Add support for getting the Encryption Key Size
- via btio
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sun, 22 Jan 2012 14:46:54 -0500 (EST)
+Message-Id: <20120122.144654.2252112633629547845.davem@davemloft.net>
+To: netdev@vger.kernel.org
+CC: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: [PATCH COMMITTED] bluetooth: hci: Fix type of "enable_hs" to bool.
+From: David Miller <davem@davemloft.net>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=iso-8859-7
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Thu, Dec 15, 2011 at 3:18 PM, Vinicius Costa Gomes
-<vinicius.gomes@openbossa.org> wrote:
-> Hi Johan,
->
-> On 13:37 Thu 15 Dec, Johan Hedberg wrote:
->> Hi Vinicius,
->>
->> On Tue, Dec 13, 2011, Vinicius Costa Gomes wrote:
->> > --- a/lib/bluetooth.h
->> > +++ b/lib/bluetooth.h
->> > @@ -63,6 +63,7 @@ extern "C" {
->> >  #define BT_SECURITY        4
->> >  struct bt_security {
->> >     uint8_t level;
->> > +   uint8_t key_size;
->> >  };
->> >  #define BT_SECURITY_SDP            0
->> >  #define BT_SECURITY_LOW            1
->>
->> This libbluetooth change will need to be in a separate patch since it
->> needs to be backported to hcidump (which now days has a copy of the lib).
->
-> Sure.
-
-I believe this series has not been applied yet due to this pending patch. Right?
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+DQpGaXhlczoNCg0KbmV0L2JsdWV0b290aC9oY2lfY29yZS5jOiBJbiBmdW5jdGlvbiChX19jaGVj
+a19lbmFibGVfaHOiOg0KbmV0L2JsdWV0b290aC9oY2lfY29yZS5jOjI1ODc6MTogd2FybmluZzog
+cmV0dXJuIGZyb20gaW5jb21wYXRpYmxlIHBvaW50ZXIgdHlwZSBbZW5hYmxlZCBieSBkZWZhdWx0
+XQ0KDQpTaWduZWQtb2ZmLWJ5OiBEYXZpZCBTLiBNaWxsZXIgPGRhdmVtQGRhdmVtbG9mdC5uZXQ+
+DQotLS0NCg0KSSBub3RpY2VkIHRoaXMgd2hpbGUgdmFsaWRhdGluZyB0aGUgYnVpbGQgdG9kYXks
+IGNvbW1pdHRlZCB0byAnbmV0Jy4NCg0KIGluY2x1ZGUvbmV0L2JsdWV0b290aC9oY2kuaCB8ICAg
+IDIgKy0NCiBuZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMgICAgfCAgICAyICstDQogMiBmaWxlcyBj
+aGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9p
+bmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmggYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmgN
+CmluZGV4IDViMmZlZDUuLjAwNTk2ZTggMTAwNjQ0DQotLS0gYS9pbmNsdWRlL25ldC9ibHVldG9v
+dGgvaGNpLmgNCisrKyBiL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2kuaA0KQEAgLTEzODgsNiAr
+MTM4OCw2IEBAIHN0cnVjdCBoY2lfaW5xdWlyeV9yZXEgew0KIH07DQogI2RlZmluZSBJUkVRX0NB
+Q0hFX0ZMVVNIIDB4MDAwMQ0KIA0KLWV4dGVybiBpbnQgZW5hYmxlX2hzOw0KK2V4dGVybiBib29s
+IGVuYWJsZV9oczsNCiANCiAjZW5kaWYgLyogX19IQ0lfSCAqLw0KZGlmZiAtLWdpdCBhL25ldC9i
+bHVldG9vdGgvaGNpX2NvcmUuYyBiL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuYw0KaW5kZXggODQ1
+ZGEzZS4uOWRlOTM3MSAxMDA2NDQNCi0tLSBhL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuYw0KKysr
+IGIvbmV0L2JsdWV0b290aC9oY2lfY29yZS5jDQpAQCAtNTUsNyArNTUsNyBAQA0KIA0KICNkZWZp
+bmUgQVVUT19PRkZfVElNRU9VVCAyMDAwDQogDQotaW50IGVuYWJsZV9oczsNCitib29sIGVuYWJs
+ZV9oczsNCiANCiBzdGF0aWMgdm9pZCBoY2lfcnhfd29yayhzdHJ1Y3Qgd29ya19zdHJ1Y3QgKndv
+cmspOw0KIHN0YXRpYyB2b2lkIGhjaV9jbWRfd29yayhzdHJ1Y3Qgd29ya19zdHJ1Y3QgKndvcmsp
+Ow0KLS0gDQoxLjcuNy41DQoNCg==
