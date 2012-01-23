@@ -1,40 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jan 2012 13:20:26 +0200
+Date: Mon, 23 Jan 2012 13:15:28 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: David Miller <davem@davemloft.net>, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH COMMITTED] bluetooth: hci: Fix type of "enable_hs" to
- bool.
-Message-ID: <20120123112026.GA18050@x220>
-References: <20120122.144654.2252112633629547845.davem@davemloft.net>
- <1327283783.1955.84.camel@aeonflux>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/5] Add support for getting the Encryption Key
+ Size via btio
+Message-ID: <20120123111528.GG13100@x220>
+References: <1323820654-16820-1-git-send-email-vinicius.gomes@openbossa.org>
+ <20111215113720.GB6824@x220>
+ <20111215191831.GA19354@samus>
+ <CAJdJm_Pb+sVtXM4oiknUcJCubFejfKXzonov1qEh2fJhRxtUDw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1327283783.1955.84.camel@aeonflux>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CAJdJm_Pb+sVtXM4oiknUcJCubFejfKXzonov1qEh2fJhRxtUDw@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Lizardo,
 
-On Mon, Jan 23, 2012, Marcel Holtmann wrote:
-> Hi Dave,
+On Sun, Jan 22, 2012, Anderson Lizardo wrote:
+> On Thu, Dec 15, 2011 at 3:18 PM, Vinicius Costa Gomes
+> <vinicius.gomes@openbossa.org> wrote:
+> > Hi Johan,
+> >
+> > On 13:37 Thu 15 Dec, Johan Hedberg wrote:
+> >> Hi Vinicius,
+> >>
+> >> On Tue, Dec 13, 2011, Vinicius Costa Gomes wrote:
+> >> > --- a/lib/bluetooth.h
+> >> > +++ b/lib/bluetooth.h
+> >> > @@ -63,6 +63,7 @@ extern "C" {
+> >> >  #define BT_SECURITY        4
+> >> >  struct bt_security {
+> >> >     uint8_t level;
+> >> > +   uint8_t key_size;
+> >> >  };
+> >> >  #define BT_SECURITY_SDP            0
+> >> >  #define BT_SECURITY_LOW            1
+> >>
+> >> This libbluetooth change will need to be in a separate patch since it
+> >> needs to be backported to hcidump (which now days has a copy of the lib).
+> >
+> > Sure.
 > 
-> > net/bluetooth/hci_core.c: In function â€˜__check_enable_hsâ€™:
-> > net/bluetooth/hci_core.c:2587:1: warning: return from incompatible pointer type [enabled by default]
-> > 
-> > Signed-off-by: David S. Miller <davem@davemloft.net>
-> > ---
-> > 
-> > I noticed this while validating the build today, committed to 'net'.
-> 
-> and from your subject, I assume you rightfully just applied that patch
-> to your tree.
-> 
-> I remember that I acked such a patch, but it seems it never made it
-> anywhere in the end :(
+> I believe this series has not been applied yet due to this pending patch. Right?
 
-It's over here:
-
-http://git.kernel.org/?p=linux/kernel/git/jh/bluetooth-next.git;a=commitdiff;h=174b9000541fdffbdc53cf9464efb1c8a1d777db
+Yes, that's correct.
 
 Johan
