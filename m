@@ -1,79 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 23 Jan 2012 10:23:14 -0500 (EST)
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Keith Packard <keithp@keithp.com>
+cc: linux-kernel@vger.kernel.org, <linux-usb@vger.kernel.org>,
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Regression: Revert "Bluetooth: use buffer priority to
+ mark URB_ISO_ASAP flag"
+In-Reply-To: <1327298281-2502-1-git-send-email-keithp@keithp.com>
+Message-ID: <Pine.LNX.4.44L0.1201231019580.1372-100000@iolanthe.rowland.org>
 MIME-Version: 1.0
-In-Reply-To: <1327320873.32646.77.camel@novo.hadess.net>
-References: <1327100744-28782-1-git-send-email-scott@netsplit.com>
-	<1327320873.32646.77.camel@novo.hadess.net>
-Date: Mon, 23 Jan 2012 07:37:14 -0800
-Message-ID: <CA+bD78h+vp5EY+HSvArRSfySr3EWSi3f0qvK+PiKX6OH8Q7w-A@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] Generate PIN for keyboards inside bluetoothd
-From: Scott James Remnant <scott@netsplit.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jan 23, 2012 at 4:14 AM, Bastien Nocera <hadess@hadess.net> wrote:
+On Sun, 22 Jan 2012, Keith Packard wrote:
 
-> On Fri, 2012-01-20 at 15:05 -0800, Scott James Remnant wrote:
-> > Here's a first pass of handling the HID profile recommendation for
-> > pairing keyboards inside bluetoothd, rather than expecting the UI
-> > Agent to deal with it.
-> >
-> > This requires agents implement a new DisplayPinCode method, since
-> > the existing DisplayPasskey method expects a numeric and PIN Codes
-> > are UTF-8 strings.
->
-> When have you seen non-numerical PINs being used?
->
+> Ok, so this is a comedy of errors. The Bluetooth code is trying to use
+> an iso-specific flag (URB_ISO_ASAP) on a bulk endpoint, which is
+> invalid, but normally harmless. Unless the USB code is compiled for
+> debugging, in which case it checks a bunch for incorrect usage and
+> discards URBs which are wrong.
+> 
+> As far as I'm concerned, #ifdef DEBUG code should never ever change
+> the behaviour of the code, and so I'd say the USB code is even more
+> broken than the bluetooth code...
 
-Two devices on my desk right now use a UTF-8 text string as the fixed
-PIN, and three use their Bluetooth address in binary form. That being
-said, none of them are covered by this patch.
+Well, if the DEBUG code never changed any behaviors at all, it would be 
+pretty useless, wouldn't it?
 
-> > As well as general type-stricty-ness, the method allows the UI to
-> > distinguish between a Bluetooth 2.0 keyboard (ie. all of them) and
-> > future Bluetooth 2.1 keyboards implementing SSP (for which there may
-> > be keypress notification). UIs might want to display them slightly
-> > differently (OS X does, and UI developers tend to just copy that).
-> >
-> > That said, the PINs generated here are 6-digit 0-padded numerics
-> > since that's probably less confusing for users and there are
-> > Bluetooth numeric keypads out there that can't do non-numerics.
->
-> Less confusing for users? Unless the UI is broken and doesn't follow the
-> documentation, they should be showing a zero-padded 6 digit number:
+In this case, the change in behavior involves printing out a kernel 
+message announcing a bug.  Causing the submission to fail also helps 
+draw people's attention to the bug.  Under the circumstances, I think 
+this is understandable and not truly broken.
 
-Which is why a zero-padded 6 digit number is generated as the PIN
-here, for consistency with a Bluetooth 2.1 Passkey.
+Alan Stern
 
->                void DisplayPasskey(object device, uint32 passkey, uint8 entered)
->                        [...]
->                        Note that the passkey will always be a 6-digit number,
->                        so the display should be zero-padded at the start if
->                        the value contains less than 6 digits.
->
-> I fail to see what the benefit of those new functions is, apart from
-> hypothetical correctness.
->
-
-Firstly this indicates that a Bluetooth 2.0 keyboard is being paired
-using a PIN, rather than a Bluetooth 2.1 Secure Simple Pairing device
-with a passkey. A major UI difference is that the 2.0 device won't
-have typing notification, and the UI designer might want to respond
-slightly differently to this case.
-
-> From what I can see, the whole operation can be implemented from
-> user-space without a problem.
->
-> Care to explain what benefits this has for user-space?
->
-
-Marcel asked me to implement this in bluetoothd, so everyone can
-benefit equally rather than four different bluetooth agents all
-handling auto-pairing slightly differently.
-
-Scott
---
-Have you ever, ever felt like this?
-Had strange things happen?  Are you going round the twist?
