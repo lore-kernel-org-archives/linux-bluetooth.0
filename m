@@ -1,43 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1327309415.1955.87.camel@aeonflux>
-Subject: Re: [PATCH] Regression: Revert "Bluetooth: use buffer priority to
- mark URB_ISO_ASAP flag"
+Message-ID: <1327309289.1955.85.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Use non locking get_chan and explicit lock
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Keith Packard <keithp@keithp.com>
-Cc: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Date: Mon, 23 Jan 2012 10:03:35 +0100
-In-Reply-To: <1327298281-2502-1-git-send-email-keithp@keithp.com>
-References: <1327298281-2502-1-git-send-email-keithp@keithp.com>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 23 Jan 2012 10:01:29 +0100
+In-Reply-To: <20120123083342.GA6214@aemeltch-MOBL1>
+References: <1327060226-16211-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1327164094.1955.50.camel@aeonflux> <20120123083342.GA6214@aemeltch-MOBL1>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Keith,
+Hi Andrei,
 
-> URB_ISO_ASAP may only be used with iso end points, but this patch was
-> attempting to use it with a bulk endpoint. When DEBUG is defined in
-> the USB stack, it checks for invalid flags and returns -EINVAL instead
-> of actually transmitting the data.
+> > > For receiving ACL packets use __l2cap_get_chan_by_scid which is not
+> > > locking sk and explicitly lock sk after checking that it is exist.
+> > > Code looks nicer since now it is surrounded by lock/release.
+> > > 
+> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > ---
+> > >  net/bluetooth/l2cap_core.c |    7 +++++--
+> > >  1 files changed, 5 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > > index d16ad49..53dbfd3 100644
+> > > --- a/net/bluetooth/l2cap_core.c
+> > > +++ b/net/bluetooth/l2cap_core.c
+> > > @@ -4243,7 +4243,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+> > >  	u16 tx_seq;
+> > >  	int len;
+> > >  
+> > > -	chan = l2cap_get_chan_by_scid(conn, cid);
+> > > +	chan = __l2cap_get_chan_by_scid(conn, cid);
+> > >  	if (!chan) {
+> > >  		if (cid == L2CAP_CID_A2MP) {
+> > >  			chan = a2mp_channel_create(conn, skb);
+> > > @@ -4255,6 +4255,8 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+> > >  	}
+> > >  
+> > >  	sk = chan->sk;
+> > > +	if (sk)
+> > > +		lock_sock(sk);
+> > 
+> > this is the part I clearly do not like. This is pretty nasty conditional
+> > locking. We need to figure out something better.
 > 
-> Signed-off-by: Keith Packard <keithp@keithp.com>
-> ---
-
-a version of this patch should be already upstream or in stable trees.
-If you are sending this again, then it might slipped through. Johan?
-
-> Ok, so this is a comedy of errors. The Bluetooth code is trying to use
-> an iso-specific flag (URB_ISO_ASAP) on a bulk endpoint, which is
-> invalid, but normally harmless. Unless the USB code is compiled for
-> debugging, in which case it checks a bunch for incorrect usage and
-> discards URBs which are wrong.
+> Actually l2cap_data_channel function ends with:
 > 
-> As far as I'm concerned, #ifdef DEBUG code should never ever change
-> the behaviour of the code, and so I'd say the USB code is even more
-> broken than the bluetooth code...
+>         <------8<--------------------
+>         |  if (sk)
+>         |          release_sock(sk);
+>         |
+>         <------8<--------------------
 
-And yes, this one is hilarious.
+that one slipped past me :(
+
+> So in _this_ case it looks consistent. But I agree that generally it does
+> not looks nice. The reason for that is l2cap_chan is locked with socket
+> lock. Maybe we could create mutex l2cap_lock and functions like
+> lock_chan(chan) / unlock_chan(chan) and change socket locks in l2cap_core
+> with these new locks?
+
+I agree. Lets see what happens if we lock l2cap_chan with its own lock.
 
 Regards
 
