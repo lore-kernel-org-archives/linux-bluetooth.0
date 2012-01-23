@@ -1,72 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1327309289.1955.85.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Use non locking get_chan and explicit lock
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Mon, 23 Jan 2012 11:00:46 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 23 Jan 2012 10:01:29 +0100
-In-Reply-To: <20120123083342.GA6214@aemeltch-MOBL1>
-References: <1327060226-16211-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1327164094.1955.50.camel@aeonflux> <20120123083342.GA6214@aemeltch-MOBL1>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: Re: [RFC] Bluetooth: Add alloc_skb chan operator
+Message-ID: <20120123090046.GB8800@x220>
+References: <1326978832-9888-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1326978832-9888-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-> > > For receiving ACL packets use __l2cap_get_chan_by_scid which is not
-> > > locking sk and explicitly lock sk after checking that it is exist.
-> > > Code looks nicer since now it is surrounded by lock/release.
-> > > 
-> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > ---
-> > >  net/bluetooth/l2cap_core.c |    7 +++++--
-> > >  1 files changed, 5 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > > index d16ad49..53dbfd3 100644
-> > > --- a/net/bluetooth/l2cap_core.c
-> > > +++ b/net/bluetooth/l2cap_core.c
-> > > @@ -4243,7 +4243,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
-> > >  	u16 tx_seq;
-> > >  	int len;
-> > >  
-> > > -	chan = l2cap_get_chan_by_scid(conn, cid);
-> > > +	chan = __l2cap_get_chan_by_scid(conn, cid);
-> > >  	if (!chan) {
-> > >  		if (cid == L2CAP_CID_A2MP) {
-> > >  			chan = a2mp_channel_create(conn, skb);
-> > > @@ -4255,6 +4255,8 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
-> > >  	}
-> > >  
-> > >  	sk = chan->sk;
-> > > +	if (sk)
-> > > +		lock_sock(sk);
-> > 
-> > this is the part I clearly do not like. This is pretty nasty conditional
-> > locking. We need to figure out something better.
+On Thu, Jan 19, 2012, Emeltchenko Andrei wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Actually l2cap_data_channel function ends with:
+> Add channel-specific skb allocation method
 > 
->         <------8<--------------------
->         |  if (sk)
->         |          release_sock(sk);
->         |
->         <------8<--------------------
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  include/net/bluetooth/l2cap.h |    3 +++
+>  net/bluetooth/l2cap_core.c    |   22 +++++++++++++++-------
+>  net/bluetooth/l2cap_sock.c    |    9 +++++++++
+>  3 files changed, 27 insertions(+), 7 deletions(-)
 
-that one slipped past me :(
+Applied. Thanks.
 
-> So in _this_ case it looks consistent. But I agree that generally it does
-> not looks nice. The reason for that is l2cap_chan is locked with socket
-> lock. Maybe we could create mutex l2cap_lock and functions like
-> lock_chan(chan) / unlock_chan(chan) and change socket locks in l2cap_core
-> with these new locks?
-
-I agree. Lets see what happens if we lock l2cap_chan with its own lock.
-
-Regards
-
-Marcel
-
-
+Johan
