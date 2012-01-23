@@ -1,25 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jan 2012 12:56:17 +0200
+Date: Mon, 23 Jan 2012 12:54:27 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
-Subject: Re: [PATCH 1/2] Remove dead code from bonding_request_new
-Message-ID: <20120123105617.GC13100@x220>
-References: <1327073187-1009-1-git-send-email-szymon.janc@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd 1/2] gobex: fix not disabling SRM when dealing with
+ GET responses
+Message-ID: <20120123105427.GB13100@x220>
+References: <1327266423-1033-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1327073187-1009-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1327266423-1033-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Luiz,
 
-On Fri, Jan 20, 2012, Szymon Janc wrote:
-> agent_create always return valid pointer so there is not need to check
-> for NULL as this will never happen.
+On Sun, Jan 22, 2012, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> While sending the final bit can be changed during encoding.
 > ---
->  src/device.c |    9 +--------
->  1 files changed, 1 insertions(+), 8 deletions(-)
+>  gobex/gobex.c |  218 ++++++++++++++++++++++++++++++---------------------------
+>  1 files changed, 115 insertions(+), 103 deletions(-)
 
 Both patches have been applied. Thanks.
 
