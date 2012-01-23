@@ -1,61 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jan 2012 13:12:05 +0200
+Date: Mon, 23 Jan 2012 13:00:38 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v2 3/4] Fix memory leak when loading keys
-Message-ID: <20120123111205.GE13100@x220>
-References: <1326928412-25910-1-git-send-email-vinicius.gomes@openbossa.org>
- <1326928412-25910-3-git-send-email-vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH BlueZ 1/2] Add Proximity Reporter API
+Message-ID: <20120123110038.GD13100@x220>
+References: <CAKT1EBfCGV8GjzVdJ-UKRZOuKRZ_ftijCwJ_DRuRssac7+yYiw@mail.gmail.com>
+ <1326998219-2255-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1326928412-25910-3-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1326998219-2255-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Claudio,
 
-On Wed, Jan 18, 2012, Vinicius Costa Gomes wrote:
-> If we need a copy of those keys we should copy them.
+On Thu, Jan 19, 2012, Claudio Takahasi wrote:
+> Adds API for Immediate Alert Service(IAS) abstraction. IAS is used
+> by Proximity Monitors and Find Me Locators to notify the user that
+> reporter/target has been found. This new interface combines Proximity
+> Reporter and Find Me Target in the same API providing the flexibility
+> to implement external applications to control alerts(including per
+> device alerts).
+> 
+> This abstraction allows the development of platform specific
+> applications to control Immediate Alert coming from Proximity Monitor
+> and Find Me Locator. This provides flexibility to define different level
+> and tone for each device. Use case: watch finding a mobile phone.
 > ---
->  plugins/hciops.c |   13 ++++++++++++-
->  1 files changed, 12 insertions(+), 1 deletions(-)
+>  doc/proximity-api.txt |   34 ++++++++++++++++++++++++++++++++--
+>  1 files changed, 32 insertions(+), 2 deletions(-)
 
-The two first patches have been applied but this one had some issues:
-
-> diff --git a/plugins/hciops.c b/plugins/hciops.c
-> index d4d219c..4e0729e 100644
-> --- a/plugins/hciops.c
-> +++ b/plugins/hciops.c
-> @@ -3563,6 +3563,7 @@ static int hciops_restore_powered(int index)
->  static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
->  {
->  	struct dev_info *dev = &devs[index];
-> +	GSList *l, *new;
->  
->  	DBG("hci%d keys %d debug_keys %d", index, g_slist_length(keys),
->  								debug_keys);
-> @@ -3570,7 +3571,17 @@ static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
->  	if (dev->keys != NULL)
->  		return -EEXIST;
->  
-> -	dev->keys = keys;
-> +	for (new = NULL, l = keys; l; l = l->next) {
-> +		struct link_key_info *orig, *dup;
-> +
-> +		orig = l->data;
-> +
-> +		dup = g_memdup(orig, sizeof(*orig));
-> +
-> +		new = g_slist_prepend(new, dup);
-> +	}
-> +
-> +	dev->keys = new;
->  	dev->debug_keys = debug_keys;
-
-
-In general I'm always a bit on guard with usage of C++ keywords like new
-and class, but in this case instead of renaming you could just prepend
-directly to dev->keys, i.e. there's no need for this temporary variable.
+Both patches have been applied. Thanks.
 
 Johan
