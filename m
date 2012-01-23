@@ -1,93 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jan 2012 10:10:14 -0500
-From: "John W. Linville" <linville@tuxdriver.com>
-To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2012-01-03
-Message-ID: <20120123151013.GA9474@tuxdriver.com>
-References: <20120103033320.GG1472@joana>
- <20120123125655.GA20973@x220.ger.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20120123125655.GA20973@x220.ger.corp.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20120118122354.GE6655@x220>
+References: <1326701069-19146-1-git-send-email-hemant.gupta@stericsson.com>
+	<1326701069-19146-2-git-send-email-hemant.gupta@stericsson.com>
+	<20120118122354.GE6655@x220>
+Date: Mon, 23 Jan 2012 20:07:04 +0530
+Message-ID: <CACj007=pmfONthR5zVhN-Un1x7U0pd8C11psuf2f=63zeNRg=w@mail.gmail.com>
+Subject: Re: [PATCH v1 1/1] Bluetooth: Send correct response to IO Capability Request
+From: Hemant Gupta <hemantgupta.ste@gmail.com>
+To: marcel@holtmann.org
+Cc: Hemant Gupta <hemant.gupta@stericsson.com>, linux-bluetooth@vger.kernel.org,
+	Hemant Gupta <hemantgupta.ste@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have a day off today.  I'll get back to merging tomorrow, including
-this request from Gustavo.
+Hi Marcel,
 
-Thanks,
-
-John
-
-On Mon, Jan 23, 2012 at 02:56:55PM +0200, Johan Hedberg wrote:
-> Hi John,
-> 
-> On Tue, Jan 03, 2012, Gustavo Padovan wrote:
-> > A couple of fixes for the 3.3 release. The majority of the fixes are related
-> > to the change from tasklets to workqueue in the Bluetooth Core. The rest are
-> > important fixes over the tree. Exception is "Bluetooth: Rename extfeatures¨,
-> > as the name says it is just a rename and no harm, but it is a preparation for
-> > a following fix.
-> > 
-> > Please pull, or let me know any concerns you have!
-> > 
-> > 	Gustavo
-> > 
-> > --
-> > The following changes since commit dc0d633e35643662f27a0b1c531da3cd6b204b9c:
-> > 
-> >   Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next (2012-01-02 16:43:54 -0500)
-> > 
-> > are available in the git repository at:
-> > 
-> >   git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next master
-> > 
-> > Andre Guedes (5):
-> >       Bluetooth: Rename extfeatures
-> >       Bluetooth: Fix hci_cc_read_local_ext_features()
-> >       Bluetooth: Fix adv_work delay
-> >       Bluetooth: Queue adv_work on system workqueue
-> >       Bluetooth: Fix mgmt_stop_discovery_failed()
-> > 
-> > Andrei Emeltchenko (1):
-> >       Bluetooth: Correct packet len calculation
-> > 
-> > Gustavo F. Padovan (8):
-> >       Bluetooth: Fix bacpy in l2cap_core.c
-> >       Bluetooth: Fix context in rfcomm_sock_lock
-> >       Bluetooth: Fix context in RFCOMM tty
-> >       Bluetooth: Remove *_bh locks from SCO
-> >       Bluetooth: Remove local_bh_disable() from hci_sock.c
-> >       Bluetooth: Remove *_bh from socket list lock.
-> >       Bluetooth: Don't use *_bh locks anymore
-> >       Bluetooth: Keep chan->state and sk->sk_state in sync
-> > 
-> >  include/net/bluetooth/hci_core.h |    4 ++--
-> >  net/bluetooth/af_bluetooth.c     |    8 ++++----
-> >  net/bluetooth/hci_event.c        |   22 +++++++++++++---------
-> >  net/bluetooth/hci_sock.c         |    2 --
-> >  net/bluetooth/l2cap_core.c       |   26 +++++++++++++-------------
-> >  net/bluetooth/l2cap_sock.c       |    2 ++
-> >  net/bluetooth/mgmt.c             |    4 ++--
-> >  net/bluetooth/rfcomm/sock.c      |   12 ++++++------
-> >  net/bluetooth/rfcomm/tty.c       |   22 +++++++++++-----------
-> >  net/bluetooth/sco.c              |    8 ++++----
-> >  10 files changed, 57 insertions(+), 53 deletions(-)
-> > --
-> 
-> Are you planing to pull this? I've been waiting for that before making
-> any new pull requests from my (temporary) bluetooth-next tree[1]. If
-> that's not gonna happen I'll go ahead rebase my tree against latest
-> wireless-next (including these patches and all other ones that Marcel
-> has acked since Gustavo started his break), and make a new pull request
-> to you in the near future.
-> 
+On Wed, Jan 18, 2012 at 5:53 PM, Johan Hedberg <johan.hedberg@gmail.com> wr=
+ote:
+> Hi Hemant,
+>
+> On Mon, Jan 16, 2012, Hemant Gupta wrote:
+>> This patch sends correct IO Capability response to remote device
+>> in case Local Device supports KeyBoardDisplay IO Capability as
+>> this capability is not valid as per BT spec for IO capability
+>> Request Reply Command.
+>> This capability is mapped to DisplayYesNo which is in accordance
+>> with BT spec.
+>>
+>> Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
+>> ---
+>> =A0net/bluetooth/hci_event.c | =A0 =A06 +++++-
+>> =A01 files changed, 5 insertions(+), 1 deletions(-)
+>>
+>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>> index d37f5b2..3590e72 100644
+>> --- a/net/bluetooth/hci_event.c
+>> +++ b/net/bluetooth/hci_event.c
+>> @@ -2782,7 +2782,11 @@ static inline void hci_io_capa_request_evt(struct=
+ hci_dev *hdev, struct sk_buff
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct hci_cp_io_capability_reply cp;
+>>
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 bacpy(&cp.bdaddr, &ev->bdaddr);
+>> - =A0 =A0 =A0 =A0 =A0 =A0 cp.capability =3D conn->io_capability;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 /*
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0* Change the IO capability from KeyboardDis=
+play
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0* to DisplayYesNo as it is not supported by=
+ BT spec.
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
+>> + =A0 =A0 =A0 =A0 =A0 =A0 cp.capability =3D (conn->io_capability =3D=3D =
+0x04) ? 0x01 : conn->io_capability;
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 conn->auth_type =3D hci_get_auth_req(conn);
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 cp.authentication =3D conn->auth_type;
+>
+> Looks good to me but this still needs Marcel's ack before I apply it to
+> my bluetooth-next tree.
+>
 > Johan
-> 
-> [1] http://git.kernel.org/?p=linux/kernel/git/jh/bluetooth-next.git;a=summary
-> 
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Could you please provide comments on this patch, as with the
+application of BlueZ patch, SSP pairing would not work in case local
+device has set the IO Capability to KeyboardDisplay (0x04).
+
+--=20
+Best Regards
+Hemant Gupta
+ST-Ericsson India
