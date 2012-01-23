@@ -1,58 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1327320873.32646.77.camel@novo.hadess.net>
-Subject: Re: [RFC PATCH 0/3] Generate PIN for keyboards inside bluetoothd
+Message-ID: <1327320346.32646.71.camel@novo.hadess.net>
+Subject: Re: 4.98 fails to build with newer gcc
 From: Bastien Nocera <hadess@hadess.net>
-To: Scott James Remnant <scott@netsplit.com>
-Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org
-Date: Mon, 23 Jan 2012 12:14:33 +0000
-In-Reply-To: <1327100744-28782-1-git-send-email-scott@netsplit.com>
-References: <1327100744-28782-1-git-send-email-scott@netsplit.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Siarhei Siamashka <siarhei.siamashka@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Date: Mon, 23 Jan 2012 12:05:46 +0000
+In-Reply-To: <20120123115456.GA19251@x220>
+References: <1326460244.2112.48.camel@novo.hadess.net>
+	 <CACY+gR0GRKzPWiLwfaoY0Gp1hEEpL-nSAV95KSVDjcetzexmdg@mail.gmail.com>
+	 <20120123115456.GA19251@x220>
 Content-Type: text/plain; charset="ISO-8859-1"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2012-01-20 at 15:05 -0800, Scott James Remnant wrote:
-> Here's a first pass of handling the HID profile recommendation for
-> pairing keyboards inside bluetoothd, rather than expecting the UI
-> Agent to deal with it.
+On Mon, 2012-01-23 at 13:54 +0200, Johan Hedberg wrote:
+> Hi,
 > 
-> This requires agents implement a new DisplayPinCode method, since
-> the existing DisplayPasskey method expects a numeric and PIN Codes
-> are UTF-8 strings.
-
-When have you seen non-numerical PINs being used?
-
-> As well as general type-stricty-ness, the method allows the UI to
-> distinguish between a Bluetooth 2.0 keyboard (ie. all of them) and
-> future Bluetooth 2.1 keyboards implementing SSP (for which there may
-> be keypress notification). UIs might want to display them slightly
-> differently (OS X does, and UI developers tend to just copy that).
+> On Fri, Jan 13, 2012, Siarhei Siamashka wrote:
+> > On Fri, Jan 13, 2012 at 3:10 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> > > A few warnings:
+> > >
+> > > sbc/sbc.c:766:34: warning: always_inline function might not be inlinable [-Wattributes]
+> > > sbc/sbc.c:558:34: warning: always_inline function might not be inlinable [-Wattributes]
+> > > sbc/sbc.c:163:31: warning: always_inline function might not be inlinable [-Wattributes]
+> > 
+> > Looks like the new version of gcc requires both "inline" and
+> > "__attribute__((always_inline))" to be used in SBC_ALWAYS_INLINE
+> > according to [1].
+> > 
+> > > and an error
+> > >
+> > > sbc/sbc_primitives_mmx.c: In function 'sbc_calc_scalefactors_mmx':
+> > > sbc/sbc_primitives_mmx.c:294:4: warning: asm operand 2 probably doesn't match constraints [enabled by default]
+> > > sbc/sbc_primitives_mmx.c:294:4: error: impossible constraint in 'asm'
+> > 
+> > Here gcc 4.7 thinks that
+> > 				"i" ((char *) &sb_sample_f[1][0][0] -
+> > 					(char *) &sb_sample_f[0][0][0]),
+> > is an impossible constraint. According to [2], "i" means "An immediate
+> > integer operand (one with constant value) is allowed. This includes
+> > symbolic constants whose values will be known only at assembly time or
+> > later".
+> > Earlier versions of gcc could see that this expression is a compile
+> > time constant, but gcc 4.7 can't. As a workaround, "i" can be changed
+> > to "r" here. The downside is that this needs one more register for
+> > inline assembly and the number of available registers is really
+> > limited for 32-bit x86 systems. As a test, it is possible to try "gcc
+> > -O2 -mmmx -c -m32 -fno-omit-frame-pointer -fPIC sbc_primitives_mmx.c".
+> > Both "-fno-omit-frame-pointer" and "-fPIC" options reduce the number
+> > of available registers.
 > 
-> That said, the PINs generated here are 6-digit 0-padded numerics
-> since that's probably less confusing for users and there are
-> Bluetooth numeric keypads out there that can't do non-numerics.
+> So is someone going to send a patch for this? I think we should try to
+> have it fixed before doing the next BlueZ release.
 
-Less confusing for users? Unless the UI is broken and doesn't follow the
-documentation, they should be showing a zero-padded 6 digit number:
-                void DisplayPasskey(object device, uint32 passkey, uint8 entered)
-                        [...]
-                        Note that the passkey will always be a 6-digit number,
-                        so the display should be zero-padded at the start if
-                        the value contains less than 6 digits.
-
-I fail to see what the benefit of those new functions is, apart from
-hypothetical correctness.
-
-In gnome-bluetooth, we have special-casing for keyboards with a
-different PIN display, and instructions for users to press "Enter" after
-entering the PIN. We use a random 6-digit number for every pairing that
-doesn't use a hard-coded PIN.
-
->From what I can see, the whole operation can be implemented from
-user-space without a problem.
-
-Care to explain what benefits this has for user-space?
-
-Cheers
+I won't be. I'm expecting upstream to come up with one :)
 
