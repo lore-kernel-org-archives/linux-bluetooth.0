@@ -1,56 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Keith Packard <keithp@keithp.com>
-To: Alan Stern <stern@rowland.harvard.edu>
-Cc: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Regression: Revert "Bluetooth: use buffer priority to mark URB_ISO_ASAP flag"
-In-Reply-To: <Pine.LNX.4.44L0.1201231019580.1372-100000@iolanthe.rowland.org>
-References: <Pine.LNX.4.44L0.1201231019580.1372-100000@iolanthe.rowland.org>
-Date: Mon, 23 Jan 2012 09:16:47 -0800
-Message-ID: <864nvmuyo0.fsf@sumi.keithp.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha256; protocol="application/pgp-signature"
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1327335872.32646.103.camel@novo.hadess.net>
+References: <1327100744-28782-1-git-send-email-scott@netsplit.com>
+	<1327320873.32646.77.camel@novo.hadess.net>
+	<CA+bD78h+vp5EY+HSvArRSfySr3EWSi3f0qvK+PiKX6OH8Q7w-A@mail.gmail.com>
+	<1327334612.32646.97.camel@novo.hadess.net>
+	<CAHZ1yCk3twweh031ff1UyLJtr3kkgQDAXiT56M0ANyiNe3uqhw@mail.gmail.com>
+	<1327335872.32646.103.camel@novo.hadess.net>
+Date: Mon, 23 Jan 2012 08:26:35 -0800
+Message-ID: <CAHZ1yC=1gz9PgRtnJoHQCWDdpTZ9r4OR-AY9etam0wXD0qkhzg@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/3] Generate PIN for keyboards inside bluetoothd
+From: Scott James Remnant <keybuk@chromium.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Scott James Remnant <scott@netsplit.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=-=-=
-Content-Transfer-Encoding: quoted-printable
+On Mon, Jan 23, 2012 at 8:24 AM, Bastien Nocera <hadess@hadess.net> wrote:
 
-On Mon, 23 Jan 2012 10:23:14 -0500 (EST), Alan Stern <stern@rowland.harvard=
-.edu> wrote:
+> Are you going to add a mention in the documentation for the new function
+> that it can only be called for 2.0 Bluetooth keyboards, or are there
+> other devices it will handle?
+>
 
-> Well, if the DEBUG code never changed any behaviors at all, it would be=20
-> pretty useless, wouldn't it?
+I will mention; right now it's 2.0 Bluetooth keyboards since that's
+what the HID profile spec says to do for them, and not for anything
+else.
 
-A WARN_ON would have been sufficient to catch attention without breaking
-an otherwise working system.
-
-This is certainly the first time I've ever encountered DEBUG code that
-did anything more than print out information to help developers debug
-stuff...
-
-=2D-=20
-keith.packard@intel.com
-
---=-=-=
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iQIVAwUBTx2V/zYtFsjWk68qAQjT+g/+O+tHlZaPrMe+7iYWk/XlGPnvwwqiRUr1
-6qw/2RXYHb+ngqpARfG+oMy7qEHxwGZKdMJZf9DUUaC7gTY1bAgDyERYCQOIGPOp
-Ms6FlQ2wuS0aQ8ryh2pvNghu3sg1G+/TAsty16ZrYoerBZ0qlLRXRKBjlrriZcnB
-4vg6OsZZmDqqQS8/7yoAsLL6CoJFq2qfO4JRDy01zkdalKaOMUYWw8cXQx9Bj6mt
-Z4GrqrRv764FiQrJiAjFGuNF2eFCn9Jn07RagpT599mJogyxy0vhv8KoIu/PiRnb
-Re3vlcUXknfypuMRAifx+I/epgo3GgFo6iPXevfYUld8pqy/qmvl6vWzyZoc/bTH
-vV7DhkuyRGQ1Y7V0bGubDuh9I/NmoUthlF5+59MJvzT5bqyaVnzyzFNhXoFVPqxG
-GXnfHhDUk0nxtNB6jOJI1M/TJuA57fGpLScy52H/QmdY60hPGtu47pJpTeyKkNOW
-fHO0B7CyBcn6Z2dt1E8mO4CxcSCEvKb6qsJRw/0qQ/rr2rlO49aWUG2H1oo40WCV
-3lmGU8nTrvOm8Jrqt1dNkJm3PUMMRNuGlOB5NG5oVDLdVta2GM4RSHXNmMzrZ0Xj
-jvJPlOL/1YI07JSk5R32BQRV2/ff4dLNwqbYTihYJsWTrXFgFqmABLRCQk57DuXu
-U6FsJnlOnAU=
-=pAj7
------END PGP SIGNATURE-----
---=-=-=--
+Scott
