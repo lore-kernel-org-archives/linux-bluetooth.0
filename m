@@ -1,80 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
+From: Keith Packard <keithp@keithp.com>
+To: Alan Stern <stern@rowland.harvard.edu>
+Cc: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Regression: Revert "Bluetooth: use buffer priority to mark URB_ISO_ASAP flag"
+In-Reply-To: <Pine.LNX.4.44L0.1201231019580.1372-100000@iolanthe.rowland.org>
+References: <Pine.LNX.4.44L0.1201231019580.1372-100000@iolanthe.rowland.org>
+Date: Mon, 23 Jan 2012 09:16:47 -0800
+Message-ID: <864nvmuyo0.fsf@sumi.keithp.com>
 MIME-Version: 1.0
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: padovan@profusion.mobi
-Subject: [PATCHv3 1/2] Bluetooth: Remove usage of __cancel_delayed_work()
-Date: Mon, 23 Jan 2012 18:17:29 -0200
-Message-Id: <1327349850-9750-1-git-send-email-ulisses@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha256; protocol="application/pgp-signature"
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-__cancel_delayed_work() is being used in some paths where we cannot
-sleep waiting for the delayed work to finish. However, that function
-might return while the timer is running and the work will be queued
-again. Replace the calls with safer cancel_delayed_work() version
-which spins until the timer handler finishes on other CPUs and
-cancels the delayed work.
+--=-=-=
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
----
- include/net/bluetooth/l2cap.h |    4 ++--
- net/bluetooth/l2cap_core.c    |    6 +++---
- 2 files changed, 5 insertions(+), 5 deletions(-)
+On Mon, 23 Jan 2012 10:23:14 -0500 (EST), Alan Stern <stern@rowland.harvard=
+.edu> wrote:
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index c163c20..fdec373 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -614,7 +614,7 @@ static inline void l2cap_set_timer(struct l2cap_chan *chan,
- {
- 	BT_DBG("chan %p state %d timeout %ld", chan, chan->state, timeout);
- 
--	if (!__cancel_delayed_work(work))
-+	if (!cancel_delayed_work(work))
- 		l2cap_chan_hold(chan);
- 	schedule_delayed_work(work, timeout);
- }
-@@ -624,7 +624,7 @@ static inline bool l2cap_clear_timer(struct l2cap_chan *chan,
- {
- 	bool ret;
- 
--	ret = __cancel_delayed_work(work);
-+	ret = cancel_delayed_work(work);
- 	if (ret)
- 		l2cap_chan_put(chan);
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 69e8490..e0121fd 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2588,7 +2588,7 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 
- 	if ((conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT) &&
- 					cmd->ident == conn->info_ident) {
--		__cancel_delayed_work(&conn->info_timer);
-+		cancel_delayed_work(&conn->info_timer);
- 
- 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
- 		conn->info_ident = 0;
-@@ -3135,7 +3135,7 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
- 			conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE)
- 		return 0;
- 
--	__cancel_delayed_work(&conn->info_timer);
-+	cancel_delayed_work(&conn->info_timer);
- 
- 	if (result != L2CAP_IR_SUCCESS) {
- 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
-@@ -4509,7 +4509,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 
- 	if (hcon->type == LE_LINK) {
- 		smp_distribute_keys(conn, 0);
--		__cancel_delayed_work(&conn->security_timer);
-+		cancel_delayed_work(&conn->security_timer);
- 	}
- 
- 	rcu_read_lock();
--- 
-1.7.8.rc4
+> Well, if the DEBUG code never changed any behaviors at all, it would be=20
+> pretty useless, wouldn't it?
 
+A WARN_ON would have been sufficient to catch attention without breaking
+an otherwise working system.
+
+This is certainly the first time I've ever encountered DEBUG code that
+did anything more than print out information to help developers debug
+stuff...
+
+=2D-=20
+keith.packard@intel.com
+
+--=-=-=
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIVAwUBTx2V/zYtFsjWk68qAQjT+g/+O+tHlZaPrMe+7iYWk/XlGPnvwwqiRUr1
+6qw/2RXYHb+ngqpARfG+oMy7qEHxwGZKdMJZf9DUUaC7gTY1bAgDyERYCQOIGPOp
+Ms6FlQ2wuS0aQ8ryh2pvNghu3sg1G+/TAsty16ZrYoerBZ0qlLRXRKBjlrriZcnB
+4vg6OsZZmDqqQS8/7yoAsLL6CoJFq2qfO4JRDy01zkdalKaOMUYWw8cXQx9Bj6mt
+Z4GrqrRv764FiQrJiAjFGuNF2eFCn9Jn07RagpT599mJogyxy0vhv8KoIu/PiRnb
+Re3vlcUXknfypuMRAifx+I/epgo3GgFo6iPXevfYUld8pqy/qmvl6vWzyZoc/bTH
+vV7DhkuyRGQ1Y7V0bGubDuh9I/NmoUthlF5+59MJvzT5bqyaVnzyzFNhXoFVPqxG
+GXnfHhDUk0nxtNB6jOJI1M/TJuA57fGpLScy52H/QmdY60hPGtu47pJpTeyKkNOW
+fHO0B7CyBcn6Z2dt1E8mO4CxcSCEvKb6qsJRw/0qQ/rr2rlO49aWUG2H1oo40WCV
+3lmGU8nTrvOm8Jrqt1dNkJm3PUMMRNuGlOB5NG5oVDLdVta2GM4RSHXNmMzrZ0Xj
+jvJPlOL/1YI07JSk5R32BQRV2/ff4dLNwqbYTihYJsWTrXFgFqmABLRCQk57DuXu
+U6FsJnlOnAU=
+=pAj7
+-----END PGP SIGNATURE-----
+--=-=-=--
