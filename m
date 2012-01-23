@@ -1,28 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jan 2012 12:54:27 +0200
+Date: Mon, 23 Jan 2012 12:53:03 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/2] gobex: fix not disabling SRM when dealing with
- GET responses
-Message-ID: <20120123105427.GB13100@x220>
-References: <1327266423-1033-1-git-send-email-luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [PATCH obexd] client-doc: several style fixes
+Message-ID: <20120123105303.GA13100@x220>
+References: <1327304982-4016-1-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1327266423-1033-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1327304982-4016-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Mikel,
 
-On Sun, Jan 22, 2012, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Mon, Jan 23, 2012, Mikel Astiz wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 > 
-> While sending the final bit can be changed during encoding.
+> Adjusts line length to 80 and some other minor style fixes.
 > ---
->  gobex/gobex.c |  218 ++++++++++++++++++++++++++++++---------------------------
->  1 files changed, 115 insertions(+), 103 deletions(-)
+>  doc/client-api.txt |   80 ++++++++++++++++++++++++++++-----------------------
+>  1 files changed, 44 insertions(+), 36 deletions(-)
 
-Both patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
