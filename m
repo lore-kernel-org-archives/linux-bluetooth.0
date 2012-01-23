@@ -1,67 +1,218 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jan 2012 10:33:49 +0200
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Use non locking get_chan and explicit lock
-Message-ID: <20120123083342.GA6214@aemeltch-MOBL1>
-References: <1327060226-16211-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1327164094.1955.50.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1327164094.1955.50.camel@aeonflux>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH obexd] client-doc: several style fixes
+Date: Mon, 23 Jan 2012 08:49:42 +0100
+Message-Id: <1327304982-4016-1-git-send-email-mikel.astiz.oss@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-On Sat, Jan 21, 2012 at 05:41:34PM +0100, Marcel Holtmann wrote:
-> Hi Andrei,
-> 
-> > For receiving ACL packets use __l2cap_get_chan_by_scid which is not
-> > locking sk and explicitly lock sk after checking that it is exist.
-> > Code looks nicer since now it is surrounded by lock/release.
-> > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> >  net/bluetooth/l2cap_core.c |    7 +++++--
-> >  1 files changed, 5 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index d16ad49..53dbfd3 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -4243,7 +4243,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
-> >  	u16 tx_seq;
-> >  	int len;
-> >  
-> > -	chan = l2cap_get_chan_by_scid(conn, cid);
-> > +	chan = __l2cap_get_chan_by_scid(conn, cid);
-> >  	if (!chan) {
-> >  		if (cid == L2CAP_CID_A2MP) {
-> >  			chan = a2mp_channel_create(conn, skb);
-> > @@ -4255,6 +4255,8 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
-> >  	}
-> >  
-> >  	sk = chan->sk;
-> > +	if (sk)
-> > +		lock_sock(sk);
-> 
-> this is the part I clearly do not like. This is pretty nasty conditional
-> locking. We need to figure out something better.
+Adjusts line length to 80 and some other minor style fixes.
+---
+ doc/client-api.txt |   80 ++++++++++++++++++++++++++++-----------------------
+ 1 files changed, 44 insertions(+), 36 deletions(-)
 
-Actually l2cap_data_channel function ends with:
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index fb5a8b2..7dd83d9 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -22,7 +22,8 @@ Methods		void SendFiles(dict device, array{string} files, object agent)
+ 			Request the business card from a remote device and
+ 			store it in the local file.
+ 
+-		void ExchangeBusinessCards(dict device, string clientfile, string file)
++		void ExchangeBusinessCards(dict device, string clientfile,
++								string file)
+ 
+ 			Push the client's business card to the remote device
+ 			and then retrieve the remote business card and store
+@@ -49,7 +50,6 @@ Properties	string Target
+ 
+ 		byte Channel
+ 
+-
+ Session hierarchy
+ =================
+ 
+@@ -70,12 +70,11 @@ Methods		dict GetProperties()
+ 
+ 			Release a previously assigned OBEX agent.
+ 
+-Properties	string Source [read-only]
+-
+-		string Destination [read-only]
++Properties	string Source [readonly]
+ 
+-		byte Channel [read-only]
++		string Destination [readonly]
+ 
++		byte Channel [readonly]
+ 
+ File Transfer hierarchy
+ =======================
+@@ -101,11 +100,13 @@ Methods		void ChangeFolder(string folder)
+ 
+ 				string Name : Object name in UTF-8 format
+ 				string Type : Either "folder" or "file"
+-				uint64 Size : Object size or number of items in folder
+-				string Permission : Group, owner and other permission
+-				guint64 Modified : Last change
+-				guint64 Accessed : Last access
+-				guint64 Created : Creation date
++				uint64 Size : Object size or number of items in
++						folder
++				string Permission : Group, owner and other
++							permission
++				uint64 Modified : Last change
++				uint64 Accessed : Last access
++				uint64 Created : Creation date
+ 
+ 		void GetFile(string targetfile, string sourcefile)
+ 
+@@ -137,7 +138,6 @@ Methods		void ChangeFolder(string folder)
+ 
+ 			Deletes the specified file/folder.
+ 
+-
+ Phonebook Access hierarchy
+ =======================
+ 
+@@ -150,7 +150,8 @@ Methods		void Select(string location, string phonebook)
+ 			Select the phonebook object for other operations. Should
+ 			be call before all the other operations.
+ 
+-			location : Where the phonebook is stored, possible inputs :
++			location : Where the phonebook is stored, possible
++			inputs :
+ 				"INT" ( "INTERNAL" which is default )
+ 				"SIM" ( "SIM1" )
+ 				"SIM2"
+@@ -171,7 +172,8 @@ Methods		void Select(string location, string phonebook)
+ 		array{string vcard, string name} List()
+ 
+ 			Return an array of vcard-listing data which contains the
+-			vcard : name paired string, for example "1.vcf" : "John".
++			vcard : name paired string, for example "1.vcf" :
++				"John".
+ 
+ 		string Pull(string vcard)
+ 
+@@ -190,36 +192,40 @@ Methods		void Select(string location, string phonebook)
+ 
+ 		uint16 GetSize()
+ 
+-			Return the number of the non-null entries in the selected
+-			phonebook object.
++			Return the number of the non-null entries in the
++			selected phonebook object.
+ 
+ 		void SetFormat(string format)
+ 
+-			Indicate the format of the vcard that should be return by
+-			related methods.
++			Indicate the format of the vcard that should be return
++			by related methods.
+ 
+ 			format : { "vcard21" (default) | "vcard30" }
+ 
+ 		void SetOrder(string order)
+ 
+-			Indicate the sorting method of the vcard-listing data returned
+-			by List and Search methods.
++			Indicate the sorting method of the vcard-listing data
++			returned by List and Search methods.
+ 
+-			order : { "indexed" (default) | "alphanumeric" | "phonetic" }
++			order : { "indexed" (default) | "alphanumeric" |
++					"phonetic" }
+ 
+ 		void SetFilter(array{string})
+ 
+-			Indicate fields that should be contained in vcards return by
+-			related methods.
++			Indicate fields that should be contained in vcards
++			return by related methods.
+ 
+-			Give an empty array will clear the filter and return all fields
+-			available in vcards. And this is the default behavior.
++			Give an empty array will clear the filter and return
++			all fields available in vcards. And this is the default
++			behavior.
+ 
+-			Possible filter fields : "VERSION", "FN", ..., "ALL", "bit[0-63]"
++			Possible filter fields : "VERSION", "FN", ..., "ALL",
++			"bit[0-63]"
+ 
+ 		array{string} ListFilterFields()
+ 
+-			Return All Available fields that can be used in SefFilter method.
++			Return All Available fields that can be used in
++			SefFilter method.
+ 
+ 		array{string} GetFilter()
+ 
+@@ -234,10 +240,12 @@ Object path	[variable prefix]/{session0,session1,...}
+ 
+ Methods		void SetLocation(string location)
+ 
+-			Set the phonebook object store location for other operations. Should
+-			be called before all the other operations.
++			Set the phonebook object store location for other
++			operations. Should be called before all the other
++			operations.
+ 
+-			location: Where the phonebook is stored, possible values:
++			location: Where the phonebook is stored, possible
++			values:
+ 				"INT" ( "INTERNAL" which is default )
+ 				"SIM1"
+ 				"SIM2"
+@@ -245,7 +253,8 @@ Methods		void SetLocation(string location)
+ 
+ 		string GetPhonebook()
+ 
+-			Retrieve an entire Phonebook Object store from remote device
++			Retrieve an entire Phonebook Object store from remote
++			device
+ 
+ 		void PutPhonebook(string obj)
+ 
+@@ -279,20 +288,19 @@ Methods		dict GetProperties()
+ 
+ 			Cancels this transfer.
+ 
+-Properties	string Name [read-only]
++Properties	string Name [readonly]
+ 
+ 			Name of the transferred object.
+ 
+-		uint64 Size [read-only]
++		uint64 Size [readonly]
+ 
+ 			Size of the transferred object. If the size is
+ 			unknown, then this property will not be present.
+ 
+-		string Filename [read-only]
++		string Filename [readonly]
+ 
+ 			Complete name of the file being received or sent.
+ 
+-
+ Agent hierarchy
+ ===============
+ 
+@@ -319,7 +327,7 @@ Methods		void Release()
+ 			empty it will be calculated automatically.
+ 
+ 			Possible errors: org.openobex.Error.Rejected
+-			                 org.openobex.Error.Canceled
++					 org.openobex.Error.Canceled
+ 
+ 		void Progress(object transfer, uint64 transferred)
+ 
+-- 
+1.7.6.5
 
-        <------8<--------------------
-        |  if (sk)
-        |          release_sock(sk);
-        |
-        <------8<--------------------
-
-So in _this_ case it looks consistent. But I agree that generally it does
-not looks nice. The reason for that is l2cap_chan is locked with socket
-lock. Maybe we could create mutex l2cap_lock and functions like
-lock_chan(chan) / unlock_chan(chan) and change socket locks in l2cap_core
-with these new locks?
-
-Best regards 
-Andrei Emeltchenko 
