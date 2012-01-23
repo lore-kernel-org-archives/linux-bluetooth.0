@@ -1,37 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jan 2012 10:23:14 -0500 (EST)
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Keith Packard <keithp@keithp.com>
-cc: linux-kernel@vger.kernel.org, <linux-usb@vger.kernel.org>,
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Regression: Revert "Bluetooth: use buffer priority to
- mark URB_ISO_ASAP flag"
-In-Reply-To: <1327298281-2502-1-git-send-email-keithp@keithp.com>
-Message-ID: <Pine.LNX.4.44L0.1201231019580.1372-100000@iolanthe.rowland.org>
+Date: Mon, 23 Jan 2012 10:10:14 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2012-01-03
+Message-ID: <20120123151013.GA9474@tuxdriver.com>
+References: <20120103033320.GG1472@joana>
+ <20120123125655.GA20973@x220.ger.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20120123125655.GA20973@x220.ger.corp.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, 22 Jan 2012, Keith Packard wrote:
+I have a day off today.  I'll get back to merging tomorrow, including
+this request from Gustavo.
 
-> Ok, so this is a comedy of errors. The Bluetooth code is trying to use
-> an iso-specific flag (URB_ISO_ASAP) on a bulk endpoint, which is
-> invalid, but normally harmless. Unless the USB code is compiled for
-> debugging, in which case it checks a bunch for incorrect usage and
-> discards URBs which are wrong.
+Thanks,
+
+John
+
+On Mon, Jan 23, 2012 at 02:56:55PM +0200, Johan Hedberg wrote:
+> Hi John,
 > 
-> As far as I'm concerned, #ifdef DEBUG code should never ever change
-> the behaviour of the code, and so I'd say the USB code is even more
-> broken than the bluetooth code...
+> On Tue, Jan 03, 2012, Gustavo Padovan wrote:
+> > A couple of fixes for the 3.3 release. The majority of the fixes are related
+> > to the change from tasklets to workqueue in the Bluetooth Core. The rest are
+> > important fixes over the tree. Exception is "Bluetooth: Rename extfeatures¨,
+> > as the name says it is just a rename and no harm, but it is a preparation for
+> > a following fix.
+> > 
+> > Please pull, or let me know any concerns you have!
+> > 
+> > 	Gustavo
+> > 
+> > --
+> > The following changes since commit dc0d633e35643662f27a0b1c531da3cd6b204b9c:
+> > 
+> >   Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next (2012-01-02 16:43:54 -0500)
+> > 
+> > are available in the git repository at:
+> > 
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next master
+> > 
+> > Andre Guedes (5):
+> >       Bluetooth: Rename extfeatures
+> >       Bluetooth: Fix hci_cc_read_local_ext_features()
+> >       Bluetooth: Fix adv_work delay
+> >       Bluetooth: Queue adv_work on system workqueue
+> >       Bluetooth: Fix mgmt_stop_discovery_failed()
+> > 
+> > Andrei Emeltchenko (1):
+> >       Bluetooth: Correct packet len calculation
+> > 
+> > Gustavo F. Padovan (8):
+> >       Bluetooth: Fix bacpy in l2cap_core.c
+> >       Bluetooth: Fix context in rfcomm_sock_lock
+> >       Bluetooth: Fix context in RFCOMM tty
+> >       Bluetooth: Remove *_bh locks from SCO
+> >       Bluetooth: Remove local_bh_disable() from hci_sock.c
+> >       Bluetooth: Remove *_bh from socket list lock.
+> >       Bluetooth: Don't use *_bh locks anymore
+> >       Bluetooth: Keep chan->state and sk->sk_state in sync
+> > 
+> >  include/net/bluetooth/hci_core.h |    4 ++--
+> >  net/bluetooth/af_bluetooth.c     |    8 ++++----
+> >  net/bluetooth/hci_event.c        |   22 +++++++++++++---------
+> >  net/bluetooth/hci_sock.c         |    2 --
+> >  net/bluetooth/l2cap_core.c       |   26 +++++++++++++-------------
+> >  net/bluetooth/l2cap_sock.c       |    2 ++
+> >  net/bluetooth/mgmt.c             |    4 ++--
+> >  net/bluetooth/rfcomm/sock.c      |   12 ++++++------
+> >  net/bluetooth/rfcomm/tty.c       |   22 +++++++++++-----------
+> >  net/bluetooth/sco.c              |    8 ++++----
+> >  10 files changed, 57 insertions(+), 53 deletions(-)
+> > --
+> 
+> Are you planing to pull this? I've been waiting for that before making
+> any new pull requests from my (temporary) bluetooth-next tree[1]. If
+> that's not gonna happen I'll go ahead rebase my tree against latest
+> wireless-next (including these patches and all other ones that Marcel
+> has acked since Gustavo started his break), and make a new pull request
+> to you in the near future.
+> 
+> Johan
+> 
+> [1] http://git.kernel.org/?p=linux/kernel/git/jh/bluetooth-next.git;a=summary
+> 
 
-Well, if the DEBUG code never changed any behaviors at all, it would be 
-pretty useless, wouldn't it?
-
-In this case, the change in behavior involves printing out a kernel 
-message announcing a bug.  Causing the submission to fail also helps 
-draw people's attention to the bug.  Under the circumstances, I think 
-this is understandable and not truly broken.
-
-Alan Stern
-
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
