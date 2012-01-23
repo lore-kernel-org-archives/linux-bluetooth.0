@@ -1,41 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jan 2012 11:09:30 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Add alloc_skb chan operator
-Message-ID: <20120123090930.GC8800@x220>
-References: <1326978832-9888-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20120123090046.GB8800@x220>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120123090046.GB8800@x220>
+Message-ID: <1327309630.1955.89.camel@aeonflux>
+Subject: Re: [PATCH v2] Bluetooth: Make l2cap_ertm_data_rcv static
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com,
+	Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Date: Mon, 23 Jan 2012 10:07:10 +0100
+In-Reply-To: <1327309565-17367-1-git-send-email-szymon.janc@tieto.com>
+References: <1327309565-17367-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Szymon,
 
-On Mon, Jan 23, 2012, Johan Hedberg wrote:
-> On Thu, Jan 19, 2012, Emeltchenko Andrei wrote:
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > 
-> > Add channel-specific skb allocation method
-> > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> >  include/net/bluetooth/l2cap.h |    3 +++
-> >  net/bluetooth/l2cap_core.c    |   22 +++++++++++++++-------
-> >  net/bluetooth/l2cap_sock.c    |    9 +++++++++
-> >  3 files changed, 27 insertions(+), 7 deletions(-)
+> It is not used outside of l2cap_core.c. Also l2cap_ertm_data_rcv is
+> only used after it is defined so there is no need for forward declaration.
 > 
-> Applied. Thanks.
+> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> ---
+>  net/bluetooth/l2cap_core.c |    4 +---
+>  1 files changed, 1 insertions(+), 3 deletions(-)
 
-Actually I had to remove this commit (hopefully nobody pulled from my
-tree meanwhile). It introduces the following compiler warning:
+I assume that you and Andrei agreed here. If not, he needs to speak up.
 
-net/bluetooth/l2cap_core.c: In function 'l2cap_skbuff_fromiovec':
-net/bluetooth/l2cap_core.c:1523:15: warning: unused variable 'sk' [-Wunused-variable]
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Please fix and resend (I think you can keep the ack from Marcel).
+Regards
 
-Johan
+Marcel
+
+
