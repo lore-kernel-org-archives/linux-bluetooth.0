@@ -1,35 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jan 2012 11:18:33 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Keith Packard <keithp@keithp.com>, linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Regression: Revert "Bluetooth: use buffer priority to
- mark URB_ISO_ASAP flag"
-Message-ID: <20120123091833.GA9471@x220>
-References: <1327298281-2502-1-git-send-email-keithp@keithp.com>
- <1327309415.1955.87.camel@aeonflux>
+Subject: Re: [PATCH v2] Bluetooth: Make l2cap_ertm_data_rcv static
+Date: Mon, 23 Jan 2012 10:16:29 +0100
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"kanak.gupta@stericsson.com" <kanak.gupta@stericsson.com>, Andrei Emeltchenko
+	<andrei.emeltchenko.news@gmail.com>
+References: <1327309565-17367-1-git-send-email-szymon.janc@tieto.com> <1327309630.1955.89.camel@aeonflux>
+In-Reply-To: <1327309630.1955.89.camel@aeonflux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1327309415.1955.87.camel@aeonflux>
+Content-Type: text/plain; charset="us-ascii"
+Message-ID: <201201231016.30030.szymon.janc@tieto.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+> Hi Szymon,
 
-On Mon, Jan 23, 2012, Marcel Holtmann wrote:
-> > URB_ISO_ASAP may only be used with iso end points, but this patch was
-> > attempting to use it with a bulk endpoint. When DEBUG is defined in
-> > the USB stack, it checks for invalid flags and returns -EINVAL instead
-> > of actually transmitting the data.
+Hi,
+ 
+> > It is not used outside of l2cap_core.c. Also l2cap_ertm_data_rcv is
+> > only used after it is defined so there is no need for forward declaration.
 > > 
-> > Signed-off-by: Keith Packard <keithp@keithp.com>
+> > Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
 > > ---
+> >  net/bluetooth/l2cap_core.c |    4 +---
+> >  1 files changed, 1 insertions(+), 3 deletions(-)
 > 
-> a version of this patch should be already upstream or in stable trees.
-> If you are sending this again, then it might slipped through. Johan?
+> I assume that you and Andrei agreed here. If not, he needs to speak up.
 
-It's here:
+Yeap, Andrei reworked a2mp patches and is fine with that change now:
+http://www.spinics.net/lists/linux-bluetooth/msg20448.html
 
-http://git.kernel.org/?p=linux/kernel/git/jh/bluetooth-next.git;a=commitdiff;h=e2bcdc65928af5f2b509a8c4d8b4469901f6522f
 
-Johan
+-- 
+BR
+Szymon Janc
