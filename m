@@ -1,79 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jan 2012 14:56:55 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linville@tuxdriver.com, linux-wireless@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2012-01-03
-Message-ID: <20120123125655.GA20973@x220.ger.corp.intel.com>
-References: <20120103033320.GG1472@joana>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20120103033320.GG1472@joana>
-Sender: linux-kernel-owner@vger.kernel.org
+Message-ID: <1327320873.32646.77.camel@novo.hadess.net>
+Subject: Re: [RFC PATCH 0/3] Generate PIN for keyboards inside bluetoothd
+From: Bastien Nocera <hadess@hadess.net>
+To: Scott James Remnant <scott@netsplit.com>
+Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org
+Date: Mon, 23 Jan 2012 12:14:33 +0000
+In-Reply-To: <1327100744-28782-1-git-send-email-scott@netsplit.com>
+References: <1327100744-28782-1-git-send-email-scott@netsplit.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+On Fri, 2012-01-20 at 15:05 -0800, Scott James Remnant wrote:
+> Here's a first pass of handling the HID profile recommendation for
+> pairing keyboards inside bluetoothd, rather than expecting the UI
+> Agent to deal with it.
+> 
+> This requires agents implement a new DisplayPinCode method, since
+> the existing DisplayPasskey method expects a numeric and PIN Codes
+> are UTF-8 strings.
 
-On Tue, Jan 03, 2012, Gustavo Padovan wrote:
-> A couple of fixes for the 3.3 release. The majority of the fixes are related
-> to the change from tasklets to workqueue in the Bluetooth Core. The rest are
-> important fixes over the tree. Exception is "Bluetooth: Rename extfeatures¨,
-> as the name says it is just a rename and no harm, but it is a preparation for
-> a following fix.
-> 
-> Please pull, or let me know any concerns you have!
-> 
-> 	Gustavo
-> 
-> --
-> The following changes since commit dc0d633e35643662f27a0b1c531da3cd6b204b9c:
-> 
->   Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next (2012-01-02 16:43:54 -0500)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next master
-> 
-> Andre Guedes (5):
->       Bluetooth: Rename extfeatures
->       Bluetooth: Fix hci_cc_read_local_ext_features()
->       Bluetooth: Fix adv_work delay
->       Bluetooth: Queue adv_work on system workqueue
->       Bluetooth: Fix mgmt_stop_discovery_failed()
-> 
-> Andrei Emeltchenko (1):
->       Bluetooth: Correct packet len calculation
-> 
-> Gustavo F. Padovan (8):
->       Bluetooth: Fix bacpy in l2cap_core.c
->       Bluetooth: Fix context in rfcomm_sock_lock
->       Bluetooth: Fix context in RFCOMM tty
->       Bluetooth: Remove *_bh locks from SCO
->       Bluetooth: Remove local_bh_disable() from hci_sock.c
->       Bluetooth: Remove *_bh from socket list lock.
->       Bluetooth: Don't use *_bh locks anymore
->       Bluetooth: Keep chan->state and sk->sk_state in sync
-> 
->  include/net/bluetooth/hci_core.h |    4 ++--
->  net/bluetooth/af_bluetooth.c     |    8 ++++----
->  net/bluetooth/hci_event.c        |   22 +++++++++++++---------
->  net/bluetooth/hci_sock.c         |    2 --
->  net/bluetooth/l2cap_core.c       |   26 +++++++++++++-------------
->  net/bluetooth/l2cap_sock.c       |    2 ++
->  net/bluetooth/mgmt.c             |    4 ++--
->  net/bluetooth/rfcomm/sock.c      |   12 ++++++------
->  net/bluetooth/rfcomm/tty.c       |   22 +++++++++++-----------
->  net/bluetooth/sco.c              |    8 ++++----
->  10 files changed, 57 insertions(+), 53 deletions(-)
-> --
+When have you seen non-numerical PINs being used?
 
-Are you planing to pull this? I've been waiting for that before making
-any new pull requests from my (temporary) bluetooth-next tree[1]. If
-that's not gonna happen I'll go ahead rebase my tree against latest
-wireless-next (including these patches and all other ones that Marcel
-has acked since Gustavo started his break), and make a new pull request
-to you in the near future.
+> As well as general type-stricty-ness, the method allows the UI to
+> distinguish between a Bluetooth 2.0 keyboard (ie. all of them) and
+> future Bluetooth 2.1 keyboards implementing SSP (for which there may
+> be keypress notification). UIs might want to display them slightly
+> differently (OS X does, and UI developers tend to just copy that).
+> 
+> That said, the PINs generated here are 6-digit 0-padded numerics
+> since that's probably less confusing for users and there are
+> Bluetooth numeric keypads out there that can't do non-numerics.
 
-Johan
+Less confusing for users? Unless the UI is broken and doesn't follow the
+documentation, they should be showing a zero-padded 6 digit number:
+                void DisplayPasskey(object device, uint32 passkey, uint8 entered)
+                        [...]
+                        Note that the passkey will always be a 6-digit number,
+                        so the display should be zero-padded at the start if
+                        the value contains less than 6 digits.
 
-[1] http://git.kernel.org/?p=linux/kernel/git/jh/bluetooth-next.git;a=summary
+I fail to see what the benefit of those new functions is, apart from
+hypothetical correctness.
+
+In gnome-bluetooth, we have special-casing for keyboards with a
+different PIN display, and instructions for users to press "Enter" after
+entering the PIN. We use a random 6-digit number for every pairing that
+doesn't use a hard-coded PIN.
+
+>From what I can see, the whole operation can be implemented from
+user-space without a problem.
+
+Care to explain what benefits this has for user-space?
+
+Cheers
+
