@@ -1,28 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jan 2012 12:53:03 +0200
+Date: Mon, 23 Jan 2012 12:50:19 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [PATCH obexd] client-doc: several style fixes
-Message-ID: <20120123105303.GA13100@x220>
-References: <1327304982-4016-1-git-send-email-mikel.astiz.oss@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com,
+	Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Make l2cap_ertm_data_rcv static
+Message-ID: <20120123105019.GA13058@x220>
+References: <1327309565-17367-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1327304982-4016-1-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1327309565-17367-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Szymon,
 
-On Mon, Jan 23, 2012, Mikel Astiz wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+On Mon, Jan 23, 2012, Szymon Janc wrote:
+> It is not used outside of l2cap_core.c. Also l2cap_ertm_data_rcv is
+> only used after it is defined so there is no need for forward declaration.
 > 
-> Adjusts line length to 80 and some other minor style fixes.
+> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
 > ---
->  doc/client-api.txt |   80 ++++++++++++++++++++++++++++-----------------------
->  1 files changed, 44 insertions(+), 36 deletions(-)
+>  net/bluetooth/l2cap_core.c |    4 +---
+>  1 files changed, 1 insertions(+), 3 deletions(-)
 
-Applied. Thanks.
+Applied to my bluetooth-next tree. Thanks.
 
 Johan
