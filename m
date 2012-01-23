@@ -1,47 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <kanak.gupta@stericsson.com>,
-	Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2] Bluetooth: Make l2cap_ertm_data_rcv static
-Date: Mon, 23 Jan 2012 10:06:05 +0100
-Message-ID: <1327309565-17367-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Message-ID: <1327309415.1955.87.camel@aeonflux>
+Subject: Re: [PATCH] Regression: Revert "Bluetooth: use buffer priority to
+ mark URB_ISO_ASAP flag"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Keith Packard <keithp@keithp.com>
+Cc: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Date: Mon, 23 Jan 2012 10:03:35 +0100
+In-Reply-To: <1327298281-2502-1-git-send-email-keithp@keithp.com>
+References: <1327298281-2502-1-git-send-email-keithp@keithp.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is not used outside of l2cap_core.c. Also l2cap_ertm_data_rcv is
-only used after it is defined so there is no need for forward declaration.
+Hi Keith,
 
-Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
----
- net/bluetooth/l2cap_core.c |    4 +---
- 1 files changed, 1 insertions(+), 3 deletions(-)
+> URB_ISO_ASAP may only be used with iso end points, but this patch was
+> attempting to use it with a bulk endpoint. When DEBUG is defined in
+> the USB stack, it checks for invalid flags and returns -EINVAL instead
+> of actually transmitting the data.
+> 
+> Signed-off-by: Keith Packard <keithp@keithp.com>
+> ---
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e42999c..979d5a5 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -73,8 +73,6 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data);
- static void l2cap_send_disconn_req(struct l2cap_conn *conn,
- 				struct l2cap_chan *chan, int err);
- 
--static int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb);
--
- /* ---- L2CAP channels ---- */
- 
- static struct l2cap_chan *__l2cap_get_chan_by_dcid(struct l2cap_conn *conn, u16 cid)
-@@ -4139,7 +4137,7 @@ static inline int l2cap_data_channel_sframe(struct l2cap_chan *chan, u32 rx_cont
- 	return 0;
- }
- 
--int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
-+static int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
- {
- 	u32 control;
- 	u16 req_seq;
--- 
-on behalf of ST-Ericsson
+a version of this patch should be already upstream or in stable trees.
+If you are sending this again, then it might slipped through. Johan?
+
+> Ok, so this is a comedy of errors. The Bluetooth code is trying to use
+> an iso-specific flag (URB_ISO_ASAP) on a bulk endpoint, which is
+> invalid, but normally harmless. Unless the USB code is compiled for
+> debugging, in which case it checks a bunch for incorrect usage and
+> discards URBs which are wrong.
+> 
+> As far as I'm concerned, #ifdef DEBUG code should never ever change
+> the behaviour of the code, and so I'd say the USB code is even more
+> broken than the bluetooth code...
+
+And yes, this one is hilarious.
+
+Regards
+
+Marcel
+
 
