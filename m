@@ -1,51 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jan 2012 13:15:28 +0200
+Date: Mon, 23 Jan 2012 13:13:10 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/5] Add support for getting the Encryption Key
- Size via btio
-Message-ID: <20120123111528.GG13100@x220>
-References: <1323820654-16820-1-git-send-email-vinicius.gomes@openbossa.org>
- <20111215113720.GB6824@x220>
- <20111215191831.GA19354@samus>
- <CAJdJm_Pb+sVtXM4oiknUcJCubFejfKXzonov1qEh2fJhRxtUDw@mail.gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v2 4/4] Remove the SMP Long Term Key when the
+ device is removed
+Message-ID: <20120123111310.GF13100@x220>
+References: <1326928412-25910-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1326928412-25910-4-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CAJdJm_Pb+sVtXM4oiknUcJCubFejfKXzonov1qEh2fJhRxtUDw@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1326928412-25910-4-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Vinicius,
 
-On Sun, Jan 22, 2012, Anderson Lizardo wrote:
-> On Thu, Dec 15, 2011 at 3:18 PM, Vinicius Costa Gomes
-> <vinicius.gomes@openbossa.org> wrote:
-> > Hi Johan,
-> >
-> > On 13:37 Thu 15 Dec, Johan Hedberg wrote:
-> >> Hi Vinicius,
-> >>
-> >> On Tue, Dec 13, 2011, Vinicius Costa Gomes wrote:
-> >> > --- a/lib/bluetooth.h
-> >> > +++ b/lib/bluetooth.h
-> >> > @@ -63,6 +63,7 @@ extern "C" {
-> >> >  #define BT_SECURITY        4
-> >> >  struct bt_security {
-> >> >     uint8_t level;
-> >> > +   uint8_t key_size;
-> >> >  };
-> >> >  #define BT_SECURITY_SDP            0
-> >> >  #define BT_SECURITY_LOW            1
-> >>
-> >> This libbluetooth change will need to be in a separate patch since it
-> >> needs to be backported to hcidump (which now days has a copy of the lib).
-> >
-> > Sure.
+On Wed, Jan 18, 2012, Vinicius Costa Gomes wrote:
+> ---
+>  src/device.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 > 
-> I believe this series has not been applied yet due to this pending patch. Right?
+> diff --git a/src/device.c b/src/device.c
+> index 16855b1..8d02c2c 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -1088,6 +1088,7 @@ static void device_remove_stored(struct btd_device *device)
+>  	if (device_is_bonded(device)) {
+>  		delete_entry(&src, "linkkeys", addr);
+>  		delete_entry(&src, "aliases", addr);
+> +		delete_entry(&src, "longtermkeys", addr);
+>  		device_set_bonded(device, FALSE);
+>  		device->paired = FALSE;
+>  		btd_adapter_remove_bonding(device->adapter, &device->bdaddr);
 
-Yes, that's correct.
+This patch has also been applied, so you just need to fix and resend the
+third one. Thanks.
 
 Johan
