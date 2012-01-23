@@ -1,51 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jan 2012 11:24:38 +0200
+Date: Mon, 23 Jan 2012 11:23:04 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Add alloc_skb chan operator
-Message-ID: <20120123092438.GC9471@x220>
-References: <1326978832-9888-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20120123090046.GB8800@x220>
- <20120123090930.GC8800@x220>
- <20120123091329.GB6214@aemeltch-MOBL1>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2] Bluetooth: Add alloc_skb chan operator
+Message-ID: <20120123092304.GB9471@x220>
+References: <1327061283-17323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120123091329.GB6214@aemeltch-MOBL1>
+In-Reply-To: <1327061283-17323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-On Mon, Jan 23, 2012, Emeltchenko Andrei wrote:
-> > On Mon, Jan 23, 2012, Johan Hedberg wrote:
-> > > On Thu, Jan 19, 2012, Emeltchenko Andrei wrote:
-> > > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > > 
-> > > > Add channel-specific skb allocation method
-> > > > 
-> > > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > > ---
-> > > >  include/net/bluetooth/l2cap.h |    3 +++
-> > > >  net/bluetooth/l2cap_core.c    |   22 +++++++++++++++-------
-> > > >  net/bluetooth/l2cap_sock.c    |    9 +++++++++
-> > > >  3 files changed, 27 insertions(+), 7 deletions(-)
-> > > 
-> > > Applied. Thanks.
-> > 
-> > Actually I had to remove this commit (hopefully nobody pulled from my
-> > tree meanwhile). It introduces the following compiler warning:
-> > 
-> > net/bluetooth/l2cap_core.c: In function 'l2cap_skbuff_fromiovec':
-> > net/bluetooth/l2cap_core.c:1523:15: warning: unused variable 'sk' [-Wunused-variable]
-> > 
-> > Please fix and resend (I think you can keep the ack from Marcel).
+On Fri, Jan 20, 2012, Emeltchenko Andrei wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Sorry, I've noticed it also and sent last week v2.
+> Add channel-specific skb allocation method
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> 
+> ---
+> v2: removed unused variable
+> 
+>  include/net/bluetooth/l2cap.h |    3 +++
+>  net/bluetooth/l2cap_core.c    |   23 +++++++++++++++--------
+>  net/bluetooth/l2cap_sock.c    |    9 +++++++++
+>  3 files changed, 27 insertions(+), 8 deletions(-)
 
-Yep, found the v2 now and applied it. If you want to avoid this kind of
-confusion in the future please also reply to the original thread in
-addition to sending the new version (especially if the original thread
-has no indication that there's a new patch on the way).
+Applied. Thanks.
 
 Johan
