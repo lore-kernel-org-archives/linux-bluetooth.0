@@ -1,54 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1327328885.32646.82.camel@novo.hadess.net>
-Subject: Re: [RFC PATCH 0/2] auto-pairing plugin
-From: Bastien Nocera <hadess@hadess.net>
-To: Scott James Remnant <scott@netsplit.com>
-Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org
-Date: Mon, 23 Jan 2012 14:28:05 +0000
-In-Reply-To: <1327111197-11446-1-git-send-email-scott@netsplit.com>
-References: <1327111197-11446-1-git-send-email-scott@netsplit.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
+Date: Mon, 23 Jan 2012 10:29:15 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v2 3/4] Fix memory leak when loading keys
+Message-ID: <20120123132915.GA2879@samus>
+References: <1326928412-25910-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1326928412-25910-3-git-send-email-vinicius.gomes@openbossa.org>
+ <20120123111205.GE13100@x220>
+MIME-Version: 1.0
+In-Reply-To: <20120123111205.GE13100@x220>
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2012-01-20 at 17:59 -0800, Scott James Remnant wrote:
-> A few core changes here to support retrying of connections without
-> losing the original connection request, temporary D-Bus device object
-> or Agent information - and plugin callbacks for when bonding is
-> complete and cancelled.
-> 
-> This lets us implement an auto-pair plugin that tries the PIN 0000 for
-> commonly dumb devices, and retries using the Agent when that PIN fails.
-> For added cutesyness we save the blacklist we use to avoid repeatedly
-> sending 0000, so if there really are any devices out there with
-> different default PINs we can learn about them over time.
+Hi Johan,
 
-I'd agree to this if you could make it use the XML database that
-gnome-bluetooth uses:
-http://git.gnome.org/browse/gnome-bluetooth/tree/wizard/pin-code-database.xml
-
-That would mean that we can try the automatic password, and then
-fallback to asking for a PIN if it fails (like it would have for those
-devices without any input that use "1234" as the pairing).
-
-> Net effect - another thing done in the UI Agent moved into bluetoothd
-> where it belongs.
+On 13:12 Mon 23 Jan, Johan Hedberg wrote:
+> Hi Vinicius,
 > 
-> *** BLURB HERE ***
+> On Wed, Jan 18, 2012, Vinicius Costa Gomes wrote:
+> > If we need a copy of those keys we should copy them.
+> > ---
+> >  plugins/hciops.c |   13 ++++++++++++-
+> >  1 files changed, 12 insertions(+), 1 deletions(-)
 > 
-> Scott James Remnant (2):
->   plugin: add bonding complete and cancel callbacks with optional retry
->   autopair: add autopair plugin
+> The two first patches have been applied but this one had some issues:
 > 
->  Makefile.am        |    5 +
->  acinclude.m4       |    6 ++
->  plugins/autopair.c |  209 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  src/adapter.c      |    2 +-
->  src/device.c       |   86 +++++++++++++++++++++
->  src/device.h       |   12 +++
->  6 files changed, 319 insertions(+), 1 deletions(-)
->  create mode 100644 plugins/autopair.c
+> > diff --git a/plugins/hciops.c b/plugins/hciops.c
+> > index d4d219c..4e0729e 100644
+> > --- a/plugins/hciops.c
+> > +++ b/plugins/hciops.c
+> > @@ -3563,6 +3563,7 @@ static int hciops_restore_powered(int index)
+> >  static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
+> >  {
+> >  	struct dev_info *dev = &devs[index];
+> > +	GSList *l, *new;
+> >  
+> >  	DBG("hci%d keys %d debug_keys %d", index, g_slist_length(keys),
+> >  								debug_keys);
+> > @@ -3570,7 +3571,17 @@ static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
+> >  	if (dev->keys != NULL)
+> >  		return -EEXIST;
+> >  
+> > -	dev->keys = keys;
+> > +	for (new = NULL, l = keys; l; l = l->next) {
+> > +		struct link_key_info *orig, *dup;
+> > +
+> > +		orig = l->data;
+> > +
+> > +		dup = g_memdup(orig, sizeof(*orig));
+> > +
+> > +		new = g_slist_prepend(new, dup);
+> > +	}
+> > +
+> > +	dev->keys = new;
+> >  	dev->debug_keys = debug_keys;
 > 
+> 
+> In general I'm always a bit on guard with usage of C++ keywords like new
+> and class, but in this case instead of renaming you could just prepend
+> directly to dev->keys, i.e. there's no need for this temporary variable.
 
+Will fix. Thanks.
 
+> 
+> Johan
+
+Cheers,
+-- 
+Vinicius
