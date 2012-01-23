@@ -1,35 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jan 2012 13:00:38 +0200
+Date: Mon, 23 Jan 2012 12:56:17 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] Add Proximity Reporter API
-Message-ID: <20120123110038.GD13100@x220>
-References: <CAKT1EBfCGV8GjzVdJ-UKRZOuKRZ_ftijCwJ_DRuRssac7+yYiw@mail.gmail.com>
- <1326998219-2255-1-git-send-email-claudio.takahasi@openbossa.org>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
+Subject: Re: [PATCH 1/2] Remove dead code from bonding_request_new
+Message-ID: <20120123105617.GC13100@x220>
+References: <1327073187-1009-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1326998219-2255-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1327073187-1009-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Szymon,
 
-On Thu, Jan 19, 2012, Claudio Takahasi wrote:
-> Adds API for Immediate Alert Service(IAS) abstraction. IAS is used
-> by Proximity Monitors and Find Me Locators to notify the user that
-> reporter/target has been found. This new interface combines Proximity
-> Reporter and Find Me Target in the same API providing the flexibility
-> to implement external applications to control alerts(including per
-> device alerts).
-> 
-> This abstraction allows the development of platform specific
-> applications to control Immediate Alert coming from Proximity Monitor
-> and Find Me Locator. This provides flexibility to define different level
-> and tone for each device. Use case: watch finding a mobile phone.
+On Fri, Jan 20, 2012, Szymon Janc wrote:
+> agent_create always return valid pointer so there is not need to check
+> for NULL as this will never happen.
 > ---
->  doc/proximity-api.txt |   34 ++++++++++++++++++++++++++++++++--
->  1 files changed, 32 insertions(+), 2 deletions(-)
+>  src/device.c |    9 +--------
+>  1 files changed, 1 insertions(+), 8 deletions(-)
 
 Both patches have been applied. Thanks.
 
