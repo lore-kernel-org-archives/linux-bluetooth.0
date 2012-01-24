@@ -3,34 +3,53 @@ MIME-Version: 1.0
 From: Scott James Remnant <scott@netsplit.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: keybuk@chromium.org, Scott James Remnant <scott@netsplit.com>
-Subject: [PATCHv2 8/8] simple-agent: add DisplayPinCode
-Date: Mon, 23 Jan 2012 16:27:52 -0800
-Message-Id: <1327364872-32313-9-git-send-email-scott@netsplit.com>
+Subject: [PATCHv2 7/8] doc: document DisplayPinCode
+Date: Mon, 23 Jan 2012 16:27:51 -0800
+Message-Id: <1327364872-32313-8-git-send-email-scott@netsplit.com>
 In-Reply-To: <1327364872-32313-1-git-send-email-scott@netsplit.com>
 References: <1327364872-32313-1-git-send-email-scott@netsplit.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- test/simple-agent |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+ doc/agent-api.txt |   24 ++++++++++++++++++++++++
+ 1 files changed, 24 insertions(+), 0 deletions(-)
 
-diff --git a/test/simple-agent b/test/simple-agent
-index 8d65860..4416adb 100755
---- a/test/simple-agent
-+++ b/test/simple-agent
-@@ -52,6 +52,11 @@ class Agent(dbus.service.Object):
- 		print "DisplayPasskey (%s, %d)" % (device, passkey)
+diff --git a/doc/agent-api.txt b/doc/agent-api.txt
+index 9ab2063..5c8d4d2 100644
+--- a/doc/agent-api.txt
++++ b/doc/agent-api.txt
+@@ -61,6 +61,30 @@ Methods		void Release()
+ 			so the display should be zero-padded at the start if
+ 			the value contains less than 6 digits.
  
- 	@dbus.service.method("org.bluez.Agent",
-+					in_signature="os", out_signature="")
-+	def DisplayPinCode(self, device, pincode):
-+		print "DisplayPinCode (%s, %s)" % (device, pincode)
++		void DisplayPinCode(object device, string pincode)
 +
-+	@dbus.service.method("org.bluez.Agent",
- 					in_signature="ou", out_signature="")
- 	def RequestConfirmation(self, device, passkey):
- 		print "RequestConfirmation (%s, %d)" % (device, passkey)
++			This method gets called when the service daemon
++			needs to display a pincode for an authentication.
++
++			An empty reply should be returned. When the pincode
++			needs no longer to be displayed, the Cancel method
++			of the agent will be called.
++
++			If this method is not implemented the RequestPinCode
++			method will be used instead.
++
++			This is used during the pairing process of keyboards
++			that don't support Bluetooth 2.1 Secure Simple Pairing,
++			in contrast to DisplayPasskey which is used for those
++			that do.
++
++			This method will only ever be called once since
++			older keyboards do not support typing notification.
++
++			Note that the PIN will always be a 6-digit number,
++			zero-padded to 6 digits. This is for harmony with
++			the later specification.
++
+ 		void RequestConfirmation(object device, uint32 passkey)
+ 
+ 			This method gets called when the service daemon
 -- 
 1.7.7.3
 
