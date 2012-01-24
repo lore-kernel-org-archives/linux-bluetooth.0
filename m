@@ -1,100 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1327403188-21981-2-git-send-email-sancane@gmail.com>
-References: <1327403188-21981-1-git-send-email-sancane@gmail.com>
-	<1327403188-21981-2-git-send-email-sancane@gmail.com>
-Date: Tue, 24 Jan 2012 08:03:17 -0400
-Message-ID: <CAJdJm_Pp5oqkeovTa7rGJGW8VBKQun7mu-0dyN=ika2F_O26QA@mail.gmail.com>
-Subject: Re: [PATCH 1/8] gatt-service: Add support for 128-bit Bluetooth UUIDs
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 24 Jan 2012 12:47:52 +0100
+Message-ID: <CA+i+Aw3_NU7NRwG8PSZfgdt4pz-rSwsY0avO_Vsw-D_a1-sqZw@mail.gmail.com>
+Subject: bluez static analysis: src/sdpd-database.c:sdp_record_remove()
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+In file src/sdpd-database.c, at line 248 in function
+sdp_record_remove(), possible flow:
 
-On Tue, Jan 24, 2012 at 7:06 AM, Santiago Carot-Nemesio
-<sancane@gmail.com> wrote:
-> UUID services in GATT should be either 16-bit or 128-bit. Current
-> GATT interface does not allow to provide 128-bit ones. This patch
-> enables plugins to register services using 128-bit UUIDs.
-> ---
->  attrib/gatt-service.c  |   57 ++++++++++++++++++++++++++++++++++-------------
->  attrib/gatt-service.h  |    2 +-
->  plugins/gatt-example.c |    7 ++++-
->  time/server.c          |    6 ++++-
->  4 files changed, 52 insertions(+), 20 deletions(-)
->
-> diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
-> index bfefdee..eeda366 100644
-> --- a/attrib/gatt-service.c
-> +++ b/attrib/gatt-service.c
-> @@ -116,6 +116,28 @@ static GSList *parse_opts(gatt_option opt1, va_list args)
->        return l;
->  }
->
-> +static struct attribute *add_service_declaration(struct btd_adapter *adapter,
-> +                               uint16_t handle, uint16_t scv, bt_uuid_t *uuid)
+int sdp_record_remove(uint32_t handle)
+{
+	sdp_list_t *p = record_locate(handle);
+	sdp_record_t *r;
+	sdp_access_t *a;
 
-typo: scv -> svc
+	if (!p) {
+		error("Remove : Couldn't find record for : 0x%x", handle);
+		return -1;
+	}
 
-> +{
-> +       bt_uuid_t bt_uuid;
-> +       uint8_t atval[16];
-> +       int len;
-> +
-> +       if (uuid->type == BT_UUID16) {
-> +               att_put_u16(uuid->value.u16, &atval[0]);
-> +               len = 2;
-> +       } else if (uuid->type == BT_UUID128) {
-> +               att_put_u128(uuid->value.u128, &atval[0]);
-> +               len = 16;
-> +       } else
-> +               return NULL;
-> +
-> +       bt_uuid16_create(&bt_uuid, scv);
-> +
-> +       return attrib_db_add(adapter, handle, &bt_uuid, ATT_NONE,
-> +                                               ATT_NOT_PERMITTED, atval, len);
-> +}
-> +
->  static int att_read_reqs(int authorization, int authentication, uint8_t props)
->  {
->        if (authorization == GATT_CHR_VALUE_READ ||
-> @@ -268,15 +290,21 @@ static void service_attr_del(struct btd_adapter *adapter, uint16_t start_handle,
->  }
->
->  gboolean gatt_service_add(struct btd_adapter *adapter, uint16_t uuid,
-> -                               uint16_t svc_uuid, gatt_option opt1, ...)
-> +                               bt_uuid_t svc_uuid, gatt_option opt1, ...)
+	r = p->data;
+### "r" taking false path (r is NULL)
+	if (r)
+		service_db = sdp_list_remove(service_db, r);
 
-I think it is more efficient to pass svc_uuid as pointer (this avoids
-a possible 128-bit copy).
+	p = access_locate(handle);
+### "p == NULL" taking false path, "p->data == NULL" (p->data is no
+longer the same as r because of previous line) taking false path
+	if (p == NULL || p->data == NULL)
+		return 0;
 
->  {
-> +       char uuidstr[MAX_LEN_UUID_STR];
->        uint16_t start_handle, h;
->        unsigned int size;
-> -       bt_uuid_t bt_uuid;
-> -       uint8_t atval[2];
->        va_list args;
->        GSList *chrs, *l;
->
-> +       bt_uuid_to_string(&svc_uuid, uuidstr, MAX_LEN_UUID_STR);
-> +
-> +       if (svc_uuid.type != BT_UUID16 && svc_uuid.type != BT_UUID128) {
-> +               error("Invalid service uuid: %s", uuidstr);
-> +               return FALSE;
-> +       }
-> +
->        va_start(args, opt1);
->        chrs = parse_opts(opt1, args);
->        /* calculate how many attributes are necessary for this service */
+	a = p->data;
 
-Regards,
+### in both paths here, "r" being NULL is going to be passed to
+adapter_service_remove() which dereferences it directly
+	if (bacmp(&a->device, BDADDR_ANY) != 0) {
+		struct btd_adapter *adapter = manager_find_adapter(&a->device);
+		if (adapter)
+			adapter_service_remove(adapter, r);
+	} else
+		manager_foreach_adapter(adapter_service_remove, r);
+
+	access_db = sdp_list_remove(access_db, a);
+	access_free(a);
+
+	return 0;
+}
+
+Is this possible in practice and could it cause a crash?
+
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Slawomir Bochenski
