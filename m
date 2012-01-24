@@ -2,54 +2,51 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH BlueZ 3/4] Add manager_allow_sniff to audio manager
-Date: Tue, 24 Jan 2012 14:58:55 +0200
-Message-Id: <1327409936-6709-4-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH BlueZ 2/4] Add btd_adapter_allow_sniff to adapter
+Date: Tue, 24 Jan 2012 14:58:54 +0200
+Message-Id: <1327409936-6709-3-git-send-email-dmitriy.paliy@nokia.com>
 In-Reply-To: <1327409936-6709-1-git-send-email-dmitriy.paliy@nokia.com>
 References: <1327409936-6709-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch enables controlling permission to enter into sniff mode,
-or to leave it, from audio manager through adapter's API.
+This makes hciops_allow_sniff exposed as adapter's API.
 ---
- audio/manager.c |   15 +++++++++++++++
- audio/manager.h |    2 ++
- 2 files changed, 17 insertions(+), 0 deletions(-)
+ src/adapter.c |   12 ++++++++++++
+ src/adapter.h |    3 +++
+ 2 files changed, 15 insertions(+), 0 deletions(-)
 
-diff --git a/audio/manager.c b/audio/manager.c
-index 0b52520..33137ce 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -1418,3 +1418,18 @@ void manager_set_fast_connectable(gboolean enable)
- 				adapter_get_dev_id(adapter->btd_adapter));
- 	}
+diff --git a/src/adapter.c b/src/adapter.c
+index cf21ab4..7d8a647 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3785,3 +3785,15 @@ int btd_adapter_remove_remote_oob_data(struct btd_adapter *adapter,
+ {
+ 	return adapter_ops->remove_remote_oob_data(adapter->dev_id, bdaddr);
  }
 +
-+void manager_allow_sniff(struct audio_device *dev, gboolean enable)
++int btd_adapter_allow_sniff(struct btd_adapter *adapter, bdaddr_t *bdaddr,
++							gboolean enable)
 +{
-+	struct btd_adapter *adapter;
++	if (!adapter_ops)
++		return -EINVAL;
 +
-+	adapter = manager_find_adapter(&dev->src);
-+	if (!adapter)
-+		return;
++	if (!adapter->up)
++		return -EINVAL;
 +
-+	DBG("change link policy for hci%d", adapter_get_dev_id(adapter));
-+
-+	if (btd_adapter_allow_sniff(adapter, &dev->dst, enable))
-+		error("Changing link policy for hci%d failed",
-+				adapter_get_dev_id(adapter));
++	return adapter_ops->allow_sniff(adapter->dev_id, bdaddr, enable);
 +}
-diff --git a/audio/manager.h b/audio/manager.h
-index 0bf7663..cd1c86d 100644
---- a/audio/manager.h
-+++ b/audio/manager.h
-@@ -54,3 +54,5 @@ gboolean manager_allow_headset_connection(struct audio_device *device);
- /* TRUE to enable fast connectable and FALSE to disable fast connectable for all
-  * audio adapters. */
- void manager_set_fast_connectable(gboolean enable);
+diff --git a/src/adapter.h b/src/adapter.h
+index 6e57d17..066f36e 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -301,3 +301,6 @@ int btd_adapter_add_remote_oob_data(struct btd_adapter *adapter,
+ 
+ int btd_adapter_remove_remote_oob_data(struct btd_adapter *adapter,
+ 							bdaddr_t *bdaddr);
 +
-+void manager_allow_sniff(struct audio_device *dev, gboolean enable);
++int btd_adapter_allow_sniff(struct btd_adapter *adapter, bdaddr_t *bdaddr,
++							gboolean enable);
 -- 
 1.7.5.4
 
