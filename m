@@ -1,35 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 24 Jan 2012 13:29:50 +0100
-Message-ID: <CA+i+Aw1zNAAqucMjN4hZxFqZ6KyY-S-zcOAs5i1DbaMps=OgTQ@mail.gmail.com>
-Subject: bluez static analysis: plugins/hciops.c:init_adapter()
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1327403188-21981-4-git-send-email-sancane@gmail.com>
+References: <1327403188-21981-1-git-send-email-sancane@gmail.com>
+	<1327403188-21981-2-git-send-email-sancane@gmail.com>
+	<1327403188-21981-3-git-send-email-sancane@gmail.com>
+	<1327403188-21981-4-git-send-email-sancane@gmail.com>
+Date: Tue, 24 Jan 2012 08:18:27 -0400
+Message-ID: <CAJdJm_PeBExYR-J73p9AKO=W5n3f=sQvKUHNpmi5OQE-SQOF5w@mail.gmail.com>
+Subject: Re: [PATCH 3/8] gatt-service: Provide service uuid in
+ attrib_db_find_avail function
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In file plugins/hciops.c in function init_adapter(), at line 658,
-there is following fragment:
+Hi Santiago,
 
-	if (!dev->registered) {
-		adapter = btd_manager_register_adapter(index);
-		if (adapter)
-			dev->registered = TRUE;
-	} else {
-		adapter = manager_find_adapter(&dev->bdaddr);
-		/* FIXME: manager_find_adapter should return a new ref */
-		btd_adapter_ref(adapter);
-	}
+On Tue, Jan 24, 2012 at 7:06 AM, Santiago Carot-Nemesio
+<sancane@gmail.com> wrote:
+> We need to provide the service uuid because of GATT server should group
+> 16-bit uuid services together and 128-bit uuid services together,
+> (Bluetooth 4.0, Vol 3, Part G, 3.1).
+> ---
+>  attrib/gatt-service.c  |    2 +-
+>  plugins/gatt-example.c |   16 ++++++++++------
+>  proximity/reporter.c   |    9 ++++++---
+>  src/attrib-server.c    |    3 ++-
+>  src/attrib-server.h    |    3 ++-
+>  5 files changed, 21 insertions(+), 12 deletions(-)
+>
+> diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
+> index d00adb0..b27e525 100644
+> --- a/attrib/gatt-service.c
+> +++ b/attrib/gatt-service.c
+> @@ -436,8 +440,8 @@ static void register_weight_service(struct gatt_example_adapter *adapter,
+>        int len;
+>
+>        btoh128(&char_weight_uuid_btorder, &char_weight_uuid);
+> -
+> -       start_handle = attrib_db_find_avail(adapter->adapter, svc_size);
+> +       bt_uuid128_create(&uuid, char_weight_uuid_btorder);
+> +       start_handle = attrib_db_find_avail(adapter->adapter, &uuid, svc_size);
+>        if (start_handle == 0) {
+>                error("Not enough free handles to register service");
+>                return;
 
-	if (adapter == NULL)
-		return FALSE;
+This is wrong. You are using a *characteristic* UUID as a service
+UUID. This example weight service is 16-bit, but it is has one 128-bit
+characteristic.
 
-btd_adapter_ref() directly dereferences adapter. In all other calls of
-manager_find_adapter() in BlueZ code, returned value is checked for
-NULL before any use.
+BTW, 16-bit vs. 128-bit characteristic grouping is optional as per
+page 1897 (section 3.3.1 "Characteristic Declaration").
 
-Is it guaranteed here that manager_find_adapter() won't return NULL?
-
+Regards,
 -- 
-Slawomir Bochenski
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
