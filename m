@@ -1,53 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Jan 2012 00:14:30 -0600
-From: Jonathan Nieder <jrnieder@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Andres Cimmarusti <acimmarusti@gmail.com>, linux-kernel@vger.kernel.org,
-	info@linuxcertified.com, Paul Fertser <fercerpav@gmail.com>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: firmware loading failure for AR3011 (0cf3:3000 or 0cf3:3005 ?)
-Message-ID: <20120124061430.GB30210@burratino>
-References: <CAH=dYrHhttmRjkVuo9QvJ5_Uqd+BJGCJJkaMw8153RW1SFv9dA@mail.gmail.com>
-MIME-Version: 1.0
+From: Greg Hazel <ghazel@gmail.com>
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAH=dYrHhttmRjkVuo9QvJ5_Uqd+BJGCJJkaMw8153RW1SFv9dA@mail.gmail.com>
+Subject: BT_AMP_POLICY and RFCOMM
+Date: Mon, 23 Jan 2012 20:15:16 -0800
+Message-Id: <D0339DC2-78B0-427D-9FC3-704725A88020@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0 (Apple Message framework v1251.1)
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-Andres Cimmarusti wrote[1]:
+I'm trying to set BT_AMP_POLICY on an RFCOMM socket to BT_AMP_POLICY_PREFER_AMP. In return I'm getting "Operation not supported on transport endpoint" (errno 95). Glancing at the code, it looks like RFCOMM sockets do not handle BT_AMP_POLICY, and the default policy for the underlying L2CAP socket is BT_AMP_POLICY_REQUIRE_BR_EDR. However, the L2CAP socket is L2CAP_MODE_ERTM, so my expectation is that it would work to use AMP.
 
-> This is my device:
->
-> Bus 001 Device 003: ID 0cf3:3000 Atheros Communications, Inc. AR3011 Bluetooth (no firmware)
->
-> It does not turn on and kern.log shows following errors:
->
-> [    9.335184] ath3k_load_firmware: Can't change to loading configuration err
-> [    9.335413] ath3k: probe of 1-1.3:1.0 failed with error -110
+So, why was BT_AMP_POLICY left out for RFCOMM sockets? Was it simply an oversight?
 
-Further investigation revealed that the problem seems to be in
-userspace: various kernels including a 2.6.32.y-based and 3.1.8-based
-one reproducibly exhibit this behavior with a Debian wheezy userspace
-and do _not_ exhibit the problem in Debian squeeze, Ubuntu 11.10, or
-Fedora 16.  More results:
+-Greg
 
- * The problem does not seem to be udev: downgrading udev in wheezy
-   does not make the problem go away, and upgrading udev in squeeze
-   does not provoke trouble.
-
- * The problem does not seem to be firmware-atheros: upgrading the
-   firmware in squeeze does not provoke trouble.
-
- * The problem does not seem to be usb-modeswitch, for similar
-   reasons.  (You can see us grasping at straws here.)
-
-I guess the next natural component to blame is bluez.
-
-Any hints (e.g., debugging switches) for tracking this down?
-
-Thanks,
-Jonathan
-
-[1] http://bugs.debian.org/641749
