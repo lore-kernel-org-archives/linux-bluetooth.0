@@ -3,34 +3,42 @@ MIME-Version: 1.0
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ v2 5/6] Remove the default security level from btio
-Date: Mon, 23 Jan 2012 21:27:04 -0300
-Message-Id: <1327364825-7285-5-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ v2 4/6] Add support for btiotest to returning the key size
+Date: Mon, 23 Jan 2012 21:27:03 -0300
+Message-Id: <1327364825-7285-4-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1327364825-7285-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1327364825-7285-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The default value of sec_level when setting *any* option
-using bt_io_set() was BT_SECURITY_MEDIUM. This was causing
-the security procedure being started in some situations that
-it should not.
 ---
- btio/btio.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
+ test/btiotest.c |   13 +++++++++++++
+ 1 files changed, 13 insertions(+), 0 deletions(-)
 
-diff --git a/btio/btio.c b/btio/btio.c
-index 77ddb1d..825907d 100644
---- a/btio/btio.c
-+++ b/btio/btio.c
-@@ -695,7 +695,6 @@ static gboolean parse_set_opts(struct set_opts *opts, GError **err,
- 	/* Set defaults */
- 	opts->defer = DEFAULT_DEFER_TIMEOUT;
- 	opts->master = -1;
--	opts->sec_level = BT_IO_SEC_MEDIUM;
- 	opts->mode = L2CAP_MODE_BASIC;
- 	opts->flushable = -1;
- 	opts->priority = 0;
+diff --git a/test/btiotest.c b/test/btiotest.c
+index f02711d..03f026d 100644
+--- a/test/btiotest.c
++++ b/test/btiotest.c
+@@ -135,6 +135,19 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 			printf("imtu=%u, omtu=%u\n", imtu, omtu);
+ 	}
+ 
++	if (data->type == BT_IO_L2CAP) {
++		uint8_t key_size;
++
++		if (!bt_io_get(io, data->type, &err,
++					BT_IO_OPT_KEY_SIZE, &key_size,
++					BT_IO_OPT_INVALID)) {
++			printf("Unable to get L2CAP Key size: %s\n",
++								err->message);
++			g_clear_error(&err);
++		} else
++			printf("key_size=%u\n", key_size);
++	}
++
+ 	if (data->disconn == 0) {
+ 		g_io_channel_shutdown(io, TRUE, NULL);
+ 		printf("Disconnected\n");
 -- 
 1.7.8.1
 
