@@ -1,37 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1327409936-6709-1-git-send-email-dmitriy.paliy@nokia.com>
-References: <1327409936-6709-1-git-send-email-dmitriy.paliy@nokia.com>
-Date: Tue, 24 Jan 2012 15:23:13 +0200
-Message-ID: <CABBYNZJ99t68PrYwi57KPuJXrJpu76Rt-6KNwwZuxwy39uA8GA@mail.gmail.com>
-Subject: Re: [RFC BlueZ 0/4] Add hciops_allow_sniff to disable and restore
- LMP_SNIFF bit
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Slawomir Bochenski <lkslawek@gmail.com>
+Subject: [PATCH BlueZ] lib/sdp.c: Prevent passing unitialised argument
+Date: Tue, 24 Jan 2012 14:22:43 +0100
+Message-Id: <1327411363-18773-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+In case of sdp_seq_alloc() failures in loop, unitialised seqDTDs would
+be passed to final sdp_seq_alloc.
+---
+ lib/sdp.c |   12 ++++++++----
+ 1 files changed, 8 insertions(+), 4 deletions(-)
 
-On Tue, Jan 24, 2012 at 2:58 PM, Dmitriy Paliy <dmitriy.paliy@nokia.com> wrote:
-> Hi,
->
-> The following set of patches introduces disabling/enabling sniff bit
-> in link policy settings. Further, the sniff mode is than disallowed
-> while SCO channel is open.
->
-> This helps to avoid problems in instability in some of TI controllers
-> firmware when sniff request comes from remote device during an active
-> call. Real impact is that controller becomes unconnectable eventhough
-> page scan is enabled.
->
-> Any comments, and possibly ideas, would be highly appreciated.
-
-It looks like we would need a new command/operation to support it on
-mgmt which is not addressed by your patches, in the other hand perhaps
-this could be done automatically by the kernel when SCO is active.
-
+diff --git a/lib/sdp.c b/lib/sdp.c
+index a48ee14..f618252 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -2523,11 +2523,15 @@ int sdp_set_profile_descs(sdp_record_t *rec, const sdp_list_t *profiles)
+ 		dtds[1] = &uint16;
+ 		values[1] = &profile->version;
+ 		seq = sdp_seq_alloc(dtds, values, 2);
+-		if (seq) {
+-			seqDTDs[i] = &seq->dtd;
+-			seqs[i] = seq;
+-			sdp_pattern_add_uuid(rec, &profile->uuid);
++
++		if (seq == NULL) {
++			status = -1;
++			break;
+ 		}
++
++		seqDTDs[i] = &seq->dtd;
++		seqs[i] = seq;
++		sdp_pattern_add_uuid(rec, &profile->uuid);
+ 		i++;
+ 	}
+ 	if (status == 0) {
 -- 
-Luiz Augusto von Dentz
+1.7.4.1
+
