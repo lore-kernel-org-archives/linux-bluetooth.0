@@ -1,57 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 24 Jan 2012 12:47:52 +0100
-Message-ID: <CA+i+Aw3_NU7NRwG8PSZfgdt4pz-rSwsY0avO_Vsw-D_a1-sqZw@mail.gmail.com>
-Subject: bluez static analysis: src/sdpd-database.c:sdp_record_remove()
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20120124104623.GA26322@x220>
+References: <20120123132915.GA2879@samus>
+	<1327364511-6348-1-git-send-email-vinicius.gomes@openbossa.org>
+	<CAJdJm_N+FXcJfXm_1eEmjJUp0c4Ek2OL3gJrSnRyfjmoCPNG5A@mail.gmail.com>
+	<20120124104623.GA26322@x220>
+Date: Tue, 24 Jan 2012 07:46:30 -0400
+Message-ID: <CAJdJm_MX9tmqm3gOCcQo9jbD8SGtXMvhq2Kp5eiw-KV=Eo5oHA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Fix memory leak when loading keys
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In file src/sdpd-database.c, at line 248 in function
-sdp_record_remove(), possible flow:
+Hi Johan,
 
-int sdp_record_remove(uint32_t handle)
-{
-	sdp_list_t *p = record_locate(handle);
-	sdp_record_t *r;
-	sdp_access_t *a;
+On Tue, Jan 24, 2012 at 6:46 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Lizardo,
+>
+> On Tue, Jan 24, 2012, Anderson Lizardo wrote:
+>> On Mon, Jan 23, 2012 at 8:21 PM, Vinicius Costa Gomes
+>> <vinicius.gomes@openbossa.org> wrote:
+>> > @@ -3570,7 +3571,16 @@ static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
+>> >        if (dev->keys != NULL)
+>> >                return -EEXIST;
+>> >
+>> > -       dev->keys = keys;
+>> > +       for (l = keys; l; l = l->next) {
+>> > +               struct link_key_info *orig, *dup;
+>> > +
+>> > +               orig = l->data;
+>> > +
+>> > +               dup = g_memdup(orig, sizeof(*orig));
+>> > +
+>> > +               dev->keys = g_slist_prepend(dev->keys, dup);
+>> > +       }
+>> > +
+>>
+>> No need to cleanup dev->keys first?
+>
+> Take a look at the first two lines of context. The function bails out if
+> dev->keys is anything else than NULL.
 
-	if (!p) {
-		error("Remove : Couldn't find record for : 0x%x", handle);
-		return -1;
-	}
+Right. Oops :)
 
-	r = p->data;
-### "r" taking false path (r is NULL)
-	if (r)
-		service_db = sdp_list_remove(service_db, r);
-
-	p = access_locate(handle);
-### "p == NULL" taking false path, "p->data == NULL" (p->data is no
-longer the same as r because of previous line) taking false path
-	if (p == NULL || p->data == NULL)
-		return 0;
-
-	a = p->data;
-
-### in both paths here, "r" being NULL is going to be passed to
-adapter_service_remove() which dereferences it directly
-	if (bacmp(&a->device, BDADDR_ANY) != 0) {
-		struct btd_adapter *adapter = manager_find_adapter(&a->device);
-		if (adapter)
-			adapter_service_remove(adapter, r);
-	} else
-		manager_foreach_adapter(adapter_service_remove, r);
-
-	access_db = sdp_list_remove(access_db, a);
-	access_free(a);
-
-	return 0;
-}
-
-Is this possible in practice and could it cause a crash?
-
+Regards,
 -- 
-Slawomir Bochenski
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
