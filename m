@@ -1,46 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1327403188-21981-5-git-send-email-sancane@gmail.com>
-References: <1327403188-21981-1-git-send-email-sancane@gmail.com>
-	<1327403188-21981-2-git-send-email-sancane@gmail.com>
-	<1327403188-21981-3-git-send-email-sancane@gmail.com>
-	<1327403188-21981-4-git-send-email-sancane@gmail.com>
-	<1327403188-21981-5-git-send-email-sancane@gmail.com>
-Date: Tue, 24 Jan 2012 08:47:32 -0400
-Message-ID: <CAJdJm_NRwJW45_YcJVNS1yisc2axxP3BPR02wAHyExKbpYhOzw@mail.gmail.com>
-Subject: Re: [PATCH 4/8] attrib-server: Allocate 16-bits UUIDS at the begining
- of the list
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH BlueZ] Change page scan interval in fast connectable mode
+Date: Tue, 24 Jan 2012 14:43:17 +0200
+Message-Id: <1327408997-6528-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+Page scan interval in fast connectable mode is changed from 22.5 msec to
+160 msec to perform less aggressive page scanning. This is done
+accordingly to controller vendor recommendation.
 
-On Tue, Jan 24, 2012 at 7:06 AM, Santiago Carot-Nemesio
-<sancane@gmail.com> wrote:
-> ---
->  src/attrib-server.c |   43 ++++++++++++++++++++++++++++++++++++-------
->  1 files changed, 36 insertions(+), 7 deletions(-)
->
-> diff --git a/src/attrib-server.c b/src/attrib-server.c
-> index 93b7216..68a0b1c 100644
-> --- a/src/attrib-server.c
-> +++ b/src/attrib-server.c
-> @@ -350,7 +350,6 @@ static struct attribute *attrib_db_add_new(struct gatt_server *server,
->
->        server->database = g_slist_insert_sorted(server->database, a,
->                                                                attribute_cmp);
-> -
->        return a;
->  }
+Primary concern is that current parameters 22.5 interval, 11.25 window, and
+interleaved scanning occupy whole radio bandwidth. Changing interval to 160
+msec should be sufficient for both speeding up connection establishment and
+leaving space for other activities, like inquiry scan, e.g.
+---
+ plugins/hciops.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-The change above is bogus.
-
-Regards,
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index d42e7de..bc38c9b 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -3141,7 +3141,7 @@ static int hciops_fast_connectable(int index, gboolean enable)
+ 
+ 	if (enable) {
+ 		type = PAGE_SCAN_TYPE_INTERLACED;
+-		cp.interval = 0x0024;	/* 22.5 msec page scan interval */
++		cp.interval = 0x0100;	/* 160 msec page scan interval */
+ 	} else {
+ 		type = PAGE_SCAN_TYPE_STANDARD;	/* default */
+ 		cp.interval = 0x0800;	/* default 1.28 sec page scan */
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.5.4
+
