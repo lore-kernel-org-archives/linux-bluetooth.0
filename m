@@ -2,85 +2,54 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 7/8] attrib-server: Allocate 128-bits UUIDs using highest available handlers
-Date: Tue, 24 Jan 2012 12:06:27 +0100
-Message-Id: <1327403188-21981-8-git-send-email-sancane@gmail.com>
-In-Reply-To: <1327403188-21981-7-git-send-email-sancane@gmail.com>
+Subject: [PATCH 6/8] glib-compat: Add g_list_free_full to deal with issues in old GLib versions
+Date: Tue, 24 Jan 2012 12:06:26 +0100
+Message-Id: <1327403188-21981-7-git-send-email-sancane@gmail.com>
+In-Reply-To: <1327403188-21981-6-git-send-email-sancane@gmail.com>
 References: <1327403188-21981-1-git-send-email-sancane@gmail.com>
  <1327403188-21981-2-git-send-email-sancane@gmail.com>
  <1327403188-21981-3-git-send-email-sancane@gmail.com>
  <1327403188-21981-4-git-send-email-sancane@gmail.com>
  <1327403188-21981-5-git-send-email-sancane@gmail.com>
  <1327403188-21981-6-git-send-email-sancane@gmail.com>
- <1327403188-21981-7-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-128-uuids services are grouped at the end of the handlers database list.
-This group grows up from the highest handlers toward lowers handlers
-until the whole range is used or the last 16 bit-uuid service is reached.
 ---
- src/attrib-server.c |   47 ++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 46 insertions(+), 1 deletions(-)
+ acinclude.m4      |    3 +++
+ src/glib-compat.h |    8 ++++++++
+ 2 files changed, 11 insertions(+), 0 deletions(-)
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index e52571c..f2bf5ef 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -1317,7 +1317,52 @@ static uint16_t find_uuid16_avail(struct btd_adapter *adapter, uint16_t nitems)
- 
- static uint16_t find_uuid128_avail(struct btd_adapter *adapter, uint16_t nitems)
- {
--	/* TODO: Allocate 128 uuids at the end of the list */
-+	struct gatt_server *server;
-+	uint16_t handle = 0, end = 0xffff;
-+	gboolean pick = TRUE;
-+	GList *dl;
-+	GSList *l;
-+
-+	l = g_slist_find_custom(servers, adapter, adapter_cmp);
-+	if (l == NULL)
-+		return 0;
-+
-+	server = l->data;
-+	if (server->database == NULL)
-+		return 0xffff - nitems + 1;
-+
-+	for (dl = g_list_last(server->database); dl; dl = dl->prev) {
-+		struct attribute *a = dl->data;
-+		if (pick) {
-+			handle = a->handle;
-+			pick = FALSE;
-+		}
-+
-+		if (bt_uuid_cmp(&a->uuid, &prim_uuid) != 0 &&
-+				bt_uuid_cmp(&a->uuid, &snd_uuid) != 0)
-+			continue;
-+
-+		if ((bt_uuid_cmp(&a->uuid, &prim_uuid) == 0 ||
-+				bt_uuid_cmp(&a->uuid, &snd_uuid) == 0) &&
-+				end - handle >= nitems)
-+			return end - nitems + 1;
-+
-+		if (a->len == 2 && (bt_uuid_cmp(&a->uuid, &prim_uuid) == 0 ||
-+				bt_uuid_cmp(&a->uuid, &snd_uuid) == 0)) {
-+			/* 16 bit UUID service definition */
-+			return 0;
-+		}
-+
-+		if (a->handle == 0x0001)
-+			return 0;
-+
-+		end = a->handle - 1;
-+		pick = TRUE;
-+	}
-+
-+	if (end - 0x0001 >= nitems)
-+		return end - nitems + 1;
-+
- 	return 0;
+diff --git a/acinclude.m4 b/acinclude.m4
+index 57fc5e0..48a59a2 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -111,6 +111,9 @@ AC_DEFUN([AC_PATH_GLIB], [
+ 	AC_CHECK_LIB(glib-2.0, g_slist_free_full, dummy=yes,
+ 		AC_DEFINE(NEED_G_SLIST_FREE_FULL, 1,
+ 			[Define to 1 if you need g_slist_free_full() function.]))
++	AC_CHECK_LIB(glib-2.0, g_list_free_full, dummy=yes,
++		AC_DEFINE(NEED_G_LIST_FREE_FULL, 1,
++			[Define to 1 if you need g_list_free_full() function.]))
+ 	AC_SUBST(GLIB_CFLAGS)
+ 	AC_SUBST(GLIB_LIBS)
+ ])
+diff --git a/src/glib-compat.h b/src/glib-compat.h
+index d50d5e9..b54d640 100644
+--- a/src/glib-compat.h
++++ b/src/glib-compat.h
+@@ -28,3 +28,11 @@ static inline void g_slist_free_full(GSList *list, GDestroyNotify free_func)
+ 	g_slist_free(list);
  }
- 
+ #endif
++
++#ifdef NEED_G_LIST_FREE_FULL
++static inline void g_list_free_full(GList *list, GDestroyNotify free_func)
++{
++	g_list_foreach(list, (GFunc) free_func, NULL);
++	g_list_free(list);
++}
++#endif
 -- 
 1.7.8.4
 
