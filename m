@@ -3,89 +3,150 @@ MIME-Version: 1.0
 From: Scott James Remnant <scott@netsplit.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: keybuk@chromium.org, Scott James Remnant <scott@netsplit.com>
-Subject: [PATCHv2 2/8] Rename AUTH_TYPE_NOTIFY to AUTH_TYPE_NOTIFY_PASSKEY
-Date: Mon, 23 Jan 2012 16:27:46 -0800
-Message-Id: <1327364872-32313-3-git-send-email-scott@netsplit.com>
+Subject: [PATCHv2 1/8] bt_ids: add header of device class constants
+Date: Mon, 23 Jan 2012 16:27:45 -0800
+Message-Id: <1327364872-32313-2-git-send-email-scott@netsplit.com>
 In-Reply-To: <1327364872-32313-1-git-send-email-scott@netsplit.com>
 References: <1327364872-32313-1-git-send-email-scott@netsplit.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes room for additional notification types to be added.
 ---
- src/device.c |    8 ++++----
- src/device.h |    2 +-
- src/event.c  |    4 ++--
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ src/bt_ids.h |  125 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 125 insertions(+), 0 deletions(-)
+ create mode 100644 src/bt_ids.h
 
-diff --git a/src/device.c b/src/device.c
-index c19acd4..670bfc4 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2320,7 +2320,7 @@ void device_simple_pairing_complete(struct btd_device *device, uint8_t status)
- {
- 	struct authentication_req *auth = device->authr;
- 
--	if (auth && auth->type == AUTH_TYPE_NOTIFY && auth->agent)
-+	if (auth && auth->type == AUTH_TYPE_NOTIFY_PASSKEY && auth->agent)
- 		agent_cancel(auth->agent);
- }
- 
-@@ -2337,7 +2337,7 @@ void device_bonding_complete(struct btd_device *device, uint8_t status)
- 
- 	DBG("bonding %p status 0x%02x", bonding, status);
- 
--	if (auth && auth->type == AUTH_TYPE_NOTIFY && auth->agent)
-+	if (auth && auth->type == AUTH_TYPE_NOTIFY_PASSKEY && auth->agent)
- 		agent_cancel(auth->agent);
- 
- 	if (status) {
-@@ -2587,7 +2587,7 @@ int device_request_authentication(struct btd_device *device, auth_type_t type,
- 		err = agent_request_confirmation(agent, device, passkey,
- 						confirm_cb, auth, NULL);
- 		break;
--	case AUTH_TYPE_NOTIFY:
-+	case AUTH_TYPE_NOTIFY_PASSKEY:
- 		err = agent_display_passkey(agent, device, passkey);
- 		break;
- 	default:
-@@ -2627,7 +2627,7 @@ static void cancel_authentication(struct authentication_req *auth)
- 	case AUTH_TYPE_PASSKEY:
- 		((agent_passkey_cb) auth->cb)(agent, &err, 0, device);
- 		break;
--	case AUTH_TYPE_NOTIFY:
-+	case AUTH_TYPE_NOTIFY_PASSKEY:
- 		/* User Notify doesn't require any reply */
- 		break;
- 	}
-diff --git a/src/device.h b/src/device.h
-index 13005ae..2558e4a 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -30,7 +30,7 @@ typedef enum {
- 	AUTH_TYPE_PINCODE,
- 	AUTH_TYPE_PASSKEY,
- 	AUTH_TYPE_CONFIRM,
--	AUTH_TYPE_NOTIFY,
-+	AUTH_TYPE_NOTIFY_PASSKEY,
- } auth_type_t;
- 
- struct btd_device *device_create(DBusConnection *conn,
-diff --git a/src/event.c b/src/event.c
-index 0783b47..d3de936 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -200,8 +200,8 @@ int btd_event_user_notify(bdaddr_t *sba, bdaddr_t *dba, uint32_t passkey)
- 	if (!get_adapter_and_device(sba, dba, &adapter, &device, TRUE))
- 		return -ENODEV;
- 
--	return device_request_authentication(device, AUTH_TYPE_NOTIFY, passkey,
--								FALSE, NULL);
-+	return device_request_authentication(device, AUTH_TYPE_NOTIFY_PASSKEY,
-+							passkey, FALSE, NULL);
- }
- 
- void btd_event_simple_pairing_complete(bdaddr_t *local, bdaddr_t *peer,
+diff --git a/src/bt_ids.h b/src/bt_ids.h
+new file mode 100644
+index 0000000..da89cf6
+--- /dev/null
++++ b/src/bt_ids.h
+@@ -0,0 +1,125 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012  Google Inc.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++/* Service classes */
++#define BT_SVC_BITMASK                 0xFFE000
++#define BT_SVC_LIMITED_DISCOVERABILITY 0x002000
++#define BT_SVC_POSITIONING             0x010000
++#define BT_SVC_NETWORKING              0x020000
++#define BT_SVC_RENDER                  0x040000
++#define BT_SVC_CAPTURE                 0x080000
++#define BT_SVC_OBJECT_TRANSFER         0x100000
++#define BT_SVC_AUDIO                   0x200000
++#define BT_SVC_TELEPHONE               0x400000
++#define BT_SVC_INFORMATION             0x800000
++
++#define BT_SVC(_class) ((_class) & BT_SVC_BITMASK)
++
++/* Major device classes */
++#define BT_MAJOR_CLASS_BITMASK       0x1F00
++#define BT_MAJOR_CLASS_MISC          0x0000
++#define BT_MAJOR_CLASS_COMPUTER      0x0100
++#define BT_MAJOR_CLASS_PHONE         0x0200
++#define BT_MAJOR_CLASS_NETWORKING    0x0300
++#define BT_MAJOR_CLASS_AUDIO_VIDEO   0x0400
++#define BT_MAJOR_CLASS_PERIPHERAL    0x0500
++#define BT_MAJOR_CLASS_IMAGING       0x0600
++#define BT_MAJOR_CLASS_WEARABLE      0x0700
++#define BT_MAJOR_CLASS_TOY           0x0800
++#define BT_MAJOR_CLASS_HEATLH        0x0900
++#define BT_MAJOR_CLASS_UNCATEGORIZED 0x1F00
++
++#define BT_MAJOR_CLASS(_class) ((_class) & BT_MAJOR_CLASS_BITMASK)
++
++/* Minor device classes (includes major class) */
++#define BT_CLASS_BITMASK 0x1FFC
++
++#define BT_CLASS(_class) ((_class) & BT_CLASS_BITMASK)
++
++/* Devices in the COMPUTER major class */
++#define BT_CLASS_COMPUTER_UNCATEGORIZED    0x0100
++#define BT_CLASS_COMPUTER_DESKTOP          0x0104
++#define BT_CLASS_COMPUTER_SERVER           0x0108
++#define BT_CLASS_COMPUTER_LAPTOP           0x010C
++#define BT_CLASS_COMPUTER_HANDHELD_PC_PDA  0x0110
++#define BT_CLASS_COMPUTER_PALM_SIZE_PC_PDA 0x0114
++#define BT_CLASS_COMPUTER_WEARABLE         0x0118
++
++/* Devices in the PHONE major class */
++#define BT_CLASS_PHONE_UNCATEGORIZED    0x0200
++#define BT_CLASS_PHONE_CELLULAR         0x0204
++#define BT_CLASS_PHONE_CORDLESS         0x0208
++#define BT_CLASS_PHONE_SMART            0x020C
++#define BT_CLASS_PHONE_MODEM_OR_GATEWAY 0x0210
++#define BT_CLASS_PHONE_ISDN             0x0214
++
++/* Devices in the AUDIO_VIDEO major class */
++#define BT_CLASS_AUDIO_VIDEO_UNCATEGORIZED                 0x0400
++#define BT_CLASS_AUDIO_VIDEO_WEARABLE_HEADSET              0x0404
++#define BT_CLASS_AUDIO_VIDEO_HANDSFREE                     0x0408
++#define BT_CLASS_AUDIO_VIDEO_MICROPHONE                    0x0410
++#define BT_CLASS_AUDIO_VIDEO_LOUDSPEAKER                   0x0414
++#define BT_CLASS_AUDIO_VIDEO_HEADPHONES                    0x0418
++#define BT_CLASS_AUDIO_VIDEO_PORTABLE_AUDIO                0x041C
++#define BT_CLASS_AUDIO_VIDEO_CAR_AUDIO                     0x0420
++#define BT_CLASS_AUDIO_VIDEO_SET_TOP_BOX                   0x0424
++#define BT_CLASS_AUDIO_VIDEO_HIFI_AUDIO                    0x0428
++#define BT_CLASS_AUDIO_VIDEO_VCR                           0x042C
++#define BT_CLASS_AUDIO_VIDEO_VIDEO_CAMERA                  0x0430
++#define BT_CLASS_AUDIO_VIDEO_CAMCORDER                     0x0434
++#define BT_CLASS_AUDIO_VIDEO_VIDEO_MONITOR                 0x0438
++#define BT_CLASS_AUDIO_VIDEO_VIDEO_DISPLAY_AND_LOUDSPEAKER 0x043C
++#define BT_CLASS_AUDIO_VIDEO_VIDEO_CONFERENCING            0x0440
++#define BT_CLASS_AUDIO_VIDEO_VIDEO_GAMING_TOY              0x0448
++
++/* Devices in the WEARABLE major class */
++#define BT_CLASS_WEARABLE_UNCATEGORIZED 0x0700
++#define BT_CLASS_WEARABLE_WRIST_WATCH   0x0704
++#define BT_CLASS_WEARABLE_PAGER         0x0708
++#define BT_CLASS_WEARABLE_JACKET        0x070C
++#define BT_CLASS_WEARABLE_HELMET        0x0710
++#define BT_CLASS_WEARABLE_GLASSES       0x0714
++
++/* Devices in the TOY major class */
++#define BT_CLASS_TOY_UNCATEGORIZED      0x0800
++#define BT_CLASS_TOY_ROBOT              0x0804
++#define BT_CLASS_TOY_VEHICLE            0x0808
++#define BT_CLASS_TOY_DOLL_ACTION_FIGURE 0x080C
++#define BT_CLASS_TOY_CONTROLLER         0x0810
++#define BT_CLASS_TOY_GAME               0x0814
++
++/* Devices in the HEALTH major class */
++#define BT_CLASS_HEALTH_UNCATEGORIZED  0x0900
++#define BT_CLASS_HEALTH_BLOOD_PRESSURE 0x0904
++#define BT_CLASS_HEALTH_THERMOMETER    0x0908
++#define BT_CLASS_HEALTH_WEIGHING       0x090C
++#define BT_CLASS_HEALTH_GLUCOSE        0x0910
++#define BT_CLASS_HEALTH_PULSE_OXIMETER 0x0914
++#define BT_CLASS_HEALTH_PULSE_RATE     0x0918
++#define BT_CLASS_HEALTH_DATA_DISPLAY   0x091C
++
++/* Devices in the PERIPHERAL major class */
++#define BT_CLASS_PERIPHERAL_NON_KEYBOARD_NON_POINTING 0x0500
++#define BT_CLASS_PERIPHERAL_KEYBOARD                  0x0540
++#define BT_CLASS_PERIPHERAL_POINTING                  0x0580
++#define BT_CLASS_PERIPHERAL_KEYBOARD_POINTING         0x05C0
 -- 
 1.7.7.3
 
