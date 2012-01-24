@@ -1,43 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH BlueZ] lib/sdp.c: Prevent passing unitialised argument
-Date: Tue, 24 Jan 2012 14:22:43 +0100
-Message-Id: <1327411363-18773-1-git-send-email-lkslawek@gmail.com>
+Date: Tue, 24 Jan 2012 15:02:40 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] Fix memory leak when loading keys
+Message-ID: <20120124130240.GA30801@x220>
+References: <1327364511-6348-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1327364511-6348-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In case of sdp_seq_alloc() failures in loop, unitialised seqDTDs would
-be passed to final sdp_seq_alloc.
----
- lib/sdp.c |   12 ++++++++----
- 1 files changed, 8 insertions(+), 4 deletions(-)
+Hi Vinicius,
 
-diff --git a/lib/sdp.c b/lib/sdp.c
-index a48ee14..f618252 100644
---- a/lib/sdp.c
-+++ b/lib/sdp.c
-@@ -2523,11 +2523,15 @@ int sdp_set_profile_descs(sdp_record_t *rec, const sdp_list_t *profiles)
- 		dtds[1] = &uint16;
- 		values[1] = &profile->version;
- 		seq = sdp_seq_alloc(dtds, values, 2);
--		if (seq) {
--			seqDTDs[i] = &seq->dtd;
--			seqs[i] = seq;
--			sdp_pattern_add_uuid(rec, &profile->uuid);
-+
-+		if (seq == NULL) {
-+			status = -1;
-+			break;
- 		}
-+
-+		seqDTDs[i] = &seq->dtd;
-+		seqs[i] = seq;
-+		sdp_pattern_add_uuid(rec, &profile->uuid);
- 		i++;
- 	}
- 	if (status == 0) {
--- 
-1.7.4.1
+On Mon, Jan 23, 2012, Vinicius Costa Gomes wrote:
+> If we need a copy of those keys we should copy them.
+> ---
+>  plugins/hciops.c |   12 +++++++++++-
+>  1 files changed, 11 insertions(+), 1 deletions(-)
 
+Applied. Thanks.
+
+In the future, could you please try to adopt the commit summary naming
+convention we've started using where there's a short prefix to highlight
+the part of the code the patch relates to. In this this case it should
+have been "hciops: ...".
+
+Johan
