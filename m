@@ -1,35 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Jan 2012 10:27:42 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Greg Hazel <ghazel@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: BT_AMP_POLICY and RFCOMM
-Message-ID: <20120124082739.GA19238@aemeltch-MOBL1>
-References: <D0339DC2-78B0-427D-9FC3-704725A88020@gmail.com>
+Date: Tue, 24 Jan 2012 00:38:02 -0600
+From: Jonathan Nieder <jrnieder@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Andres Cimmarusti <acimmarusti@gmail.com>, linux-kernel@vger.kernel.org,
+	info@linuxcertified.com, Paul Fertser <fercerpav@gmail.com>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: firmware loading failure for AR3011 (0cf3:3000 or 0cf3:3005 ?)
+Message-ID: <20120124063802.GD30210@burratino>
+References: <CAH=dYrHhttmRjkVuo9QvJ5_Uqd+BJGCJJkaMw8153RW1SFv9dA@mail.gmail.com>
+ <20120124061430.GB30210@burratino>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <D0339DC2-78B0-427D-9FC3-704725A88020@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20120124061430.GB30210@burratino>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jan 23, 2012 at 08:15:16PM -0800, Greg Hazel wrote:
-> Hi,
-> 
-> I'm trying to set BT_AMP_POLICY on an RFCOMM socket to
-> BT_AMP_POLICY_PREFER_AMP. In return I'm getting "Operation not supported
+Jonathan Nieder wrote:
+> Andres Cimmarusti wrote:
 
-BTW: Why would you need to set this? Functionality is not supported yet so
-nothing will change.
+>> [    9.335184] ath3k_load_firmware: Can't change to loading configuration err
+>> [    9.335413] ath3k: probe of 1-1.3:1.0 failed with error -110
+>
+> Further investigation revealed that the problem seems to be in
+> userspace: various kernels including a 2.6.32.y-based and 3.1.8-based
+> one reproducibly exhibit this behavior with a Debian wheezy userspace
+> and do _not_ exhibit the problem in Debian squeeze, Ubuntu 11.10, or
+> Fedora 16.  More results:
 
-Best regards 
-Andrei Emeltchenko 
+Erm, I can't read.  Let's try that again:
 
-> on transport endpoint" (errno 95). Glancing at the code, it looks like
-> RFCOMM sockets do not handle BT_AMP_POLICY, and the default policy for
-> the underlying L2CAP socket is BT_AMP_POLICY_REQUIRE_BR_EDR. However,
-> the L2CAP socket is L2CAP_MODE_ERTM, so my expectation is that it would
-> work to use AMP.
-> 
-> So, why was BT_AMP_POLICY left out for RFCOMM sockets? Was it simply an
-> oversight?
+ working userspace:	Debian squeeze, Ubuntu 11.04, Fedora 15
+ broken userspace:	Debian wheezy, Ubuntu 11.10, Fedora 16
 
+Sorry for the confusion.
