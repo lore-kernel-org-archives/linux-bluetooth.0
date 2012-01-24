@@ -1,41 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 24 Jan 2012 14:57:53 +0100
-Message-ID: <CA+i+Aw0fW8qM8SrwM+rszgF-CB6NKG0wk-sqyOR+1_d4O37DLw@mail.gmail.com>
-Subject: bluez static analysis: lib/sdp.c:sdp_gen_pdu()
-From: Slawomir Bochenski <lkslawek@gmail.com>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ v3 4/6] test: Add support for btiotest to returning the key size
+Date: Tue, 24 Jan 2012 10:57:21 -0300
+Message-Id: <1327413443-26375-4-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1327413443-26375-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1327413443-26375-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In file lib/sdp.c, at line 809 function sdp_gen_pdu() is defined as
-follows (omitted parts not related to buf):
+---
+ test/btiotest.c |   13 +++++++++++++
+ 1 files changed, 13 insertions(+), 0 deletions(-)
 
-int sdp_gen_pdu(sdp_buf_t *buf, sdp_data_t *d)
-{
-[...]
-### buf is directly dereferenced
-	uint8_t *seqp = buf->data + buf->data_size;
-[...]
-
-	if (!is_seq && !is_alt) {
-### buf is checked for NULL here
-		if (src && buf && buf->buf_size >= buf->data_size + data_size) {
-			memcpy(buf->data + buf->data_size, src, data_size);
-			buf->data_size += data_size;
-		} else if (dtd != SDP_DATA_NIL) {
-			SDPDBG("Gen PDU : Can't copy from invalid source or dest\n");
-		}
-	}
-
-	pdu_size += data_size;
-
-	return pdu_size;
-}
-
-So the question is whether we are missing buf != NULL check at top, or
-is the one present unnecessary?
-
+diff --git a/test/btiotest.c b/test/btiotest.c
+index f02711d..03f026d 100644
+--- a/test/btiotest.c
++++ b/test/btiotest.c
+@@ -135,6 +135,19 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 			printf("imtu=%u, omtu=%u\n", imtu, omtu);
+ 	}
+ 
++	if (data->type == BT_IO_L2CAP) {
++		uint8_t key_size;
++
++		if (!bt_io_get(io, data->type, &err,
++					BT_IO_OPT_KEY_SIZE, &key_size,
++					BT_IO_OPT_INVALID)) {
++			printf("Unable to get L2CAP Key size: %s\n",
++								err->message);
++			g_clear_error(&err);
++		} else
++			printf("key_size=%u\n", key_size);
++	}
++
+ 	if (data->disconn == 0) {
+ 		g_io_channel_shutdown(io, TRUE, NULL);
+ 		printf("Disconnected\n");
 -- 
-Slawomir Bochenski
+1.7.8.1
+
