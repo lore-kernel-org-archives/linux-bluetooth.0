@@ -1,35 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
+Date: Tue, 24 Jan 2012 10:48:46 -0300
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ v3 1/6] lib: Add Key Size information to the security information
-Date: Tue, 24 Jan 2012 10:57:18 -0300
-Message-Id: <1327413443-26375-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH BlueZ] Fix memory leak when loading keys
+Message-ID: <20120124134846.GB25057@samus>
+References: <1327364511-6348-1-git-send-email-vinicius.gomes@openbossa.org>
+ <20120124130240.GA30801@x220>
+ <20120124133402.GA25057@samus>
+ <20120124133957.GA32584@x220>
+MIME-Version: 1.0
+In-Reply-To: <20120124133957.GA32584@x220>
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since some time the kernel has the capability to return the length of
-the key that was used to encrypt the link.
+Hi Johan,
 
-This patch exposes that field to userspace so more applications can take
-decisions based on this information.
----
- lib/bluetooth.h |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+On 15:39 Tue 24 Jan, Johan Hedberg wrote:
+> Hi Vinicius,
+> 
+> On Tue, Jan 24, 2012, Vinicius Costa Gomes wrote:
+> > > In the future, could you please try to adopt the commit summary naming
+> > > convention we've started using where there's a short prefix to highlight
+> > > the part of the code the patch relates to. In this this case it should
+> > > have been "hciops: ...".
+> > 
+> > Noted. Would you want me to resend my last series?
+> 
+> If you want to. Otherwise I'll fix it with "git commit --amend" myself.
 
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index 5bd4f03..1dee6df 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -63,6 +63,7 @@ extern "C" {
- #define BT_SECURITY	4
- struct bt_security {
- 	uint8_t level;
-+	uint8_t key_size;
- };
- #define BT_SECURITY_SDP		0
- #define BT_SECURITY_LOW		1
+I'll do it. Thanks.
+
+> 
+> Johan
+
+Cheers,
 -- 
-1.7.8.1
-
+Vinicius
