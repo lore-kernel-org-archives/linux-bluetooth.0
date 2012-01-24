@@ -2,51 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH BlueZ 2/4] Add btd_adapter_allow_sniff to adapter
-Date: Tue, 24 Jan 2012 14:58:54 +0200
-Message-Id: <1327409936-6709-3-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH BlueZ 4/4] Fix disallow entering in sniff mode while SCO is open
+Date: Tue, 24 Jan 2012 14:58:56 +0200
+Message-Id: <1327409936-6709-5-git-send-email-dmitriy.paliy@nokia.com>
 In-Reply-To: <1327409936-6709-1-git-send-email-dmitriy.paliy@nokia.com>
 References: <1327409936-6709-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes hciops_allow_sniff exposed as adapter's API.
----
- src/adapter.c |   12 ++++++++++++
- src/adapter.h |    3 +++
- 2 files changed, 15 insertions(+), 0 deletions(-)
+Some Bluetooth controllers do not handle well entering sniff mode
+requests while SCO channel is active, which may result in instability
+in firmware.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index cf21ab4..7d8a647 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3785,3 +3785,15 @@ int btd_adapter_remove_remote_oob_data(struct btd_adapter *adapter,
- {
- 	return adapter_ops->remove_remote_oob_data(adapter->dev_id, bdaddr);
- }
-+
-+int btd_adapter_allow_sniff(struct btd_adapter *adapter, bdaddr_t *bdaddr,
-+							gboolean enable)
-+{
-+	if (!adapter_ops)
-+		return -EINVAL;
-+
-+	if (!adapter->up)
-+		return -EINVAL;
-+
-+	return adapter_ops->allow_sniff(adapter->dev_id, bdaddr, enable);
-+}
-diff --git a/src/adapter.h b/src/adapter.h
-index 6e57d17..066f36e 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -301,3 +301,6 @@ int btd_adapter_add_remote_oob_data(struct btd_adapter *adapter,
+This patch disallows entering sniff mode while SCO channel is open, and
+restores link policy settings back to its default value when SCO is
+closed.
+
+The real problem is in firmware but this workaround helps to avoid
+related to it problems.
+---
+ audio/headset.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
+
+diff --git a/audio/headset.c b/audio/headset.c
+index 819e0f8..2e5193d 100644
+--- a/audio/headset.c
++++ b/audio/headset.c
+@@ -581,6 +581,8 @@ static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
  
- int btd_adapter_remove_remote_oob_data(struct btd_adapter *adapter,
- 							bdaddr_t *bdaddr);
+ 	DBG("SCO socket opened for headset %s", dev->path);
+ 
++	manager_allow_sniff(dev, FALSE);
 +
-+int btd_adapter_allow_sniff(struct btd_adapter *adapter, bdaddr_t *bdaddr,
-+							gboolean enable);
+ 	sk = g_io_channel_unix_get_fd(chan);
+ 
+ 	DBG("SCO fd=%d", sk);
+@@ -1243,6 +1245,8 @@ static void close_sco(struct audio_device *device)
+ 		g_io_channel_shutdown(hs->sco, TRUE, NULL);
+ 		g_io_channel_unref(hs->sco);
+ 		hs->sco = NULL;
++
++		manager_allow_sniff(device, TRUE);
+ 	}
+ 
+ 	if (hs->sco_id) {
 -- 
 1.7.5.4
 
