@@ -2,100 +2,54 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH BlueZ 1/4] Add hciops_allow_sniff to disable and restore LMP_SNIFF bit
-Date: Tue, 24 Jan 2012 14:58:53 +0200
-Message-Id: <1327409936-6709-2-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH BlueZ 3/4] Add manager_allow_sniff to audio manager
+Date: Tue, 24 Jan 2012 14:58:55 +0200
+Message-Id: <1327409936-6709-4-git-send-email-dmitriy.paliy@nokia.com>
 In-Reply-To: <1327409936-6709-1-git-send-email-dmitriy.paliy@nokia.com>
 References: <1327409936-6709-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add hciops_allow_sniff that disables sniff bit mode in link policy
-settings or restores link policy to its default value allowing going
-to sniff mode.
+This patch enables controlling permission to enter into sniff mode,
+or to leave it, from audio manager through adapter's API.
 ---
- plugins/hciops.c |   34 ++++++++++++++++++++++++++++++++++
- src/adapter.h    |    1 +
- 2 files changed, 35 insertions(+), 0 deletions(-)
+ audio/manager.c |   15 +++++++++++++++
+ audio/manager.h |    2 ++
+ 2 files changed, 17 insertions(+), 0 deletions(-)
 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index bc38c9b..d68fe00 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -128,6 +128,9 @@ static struct dev_info {
- 	GSList *keys;
- 	uint8_t pin_length;
- 
-+	/* default link policy */
-+	uint16_t link_policy;
-+
- 	GSList *oob_data;
- 
- 	GSList *uuids;
-@@ -461,6 +464,7 @@ static void start_adapter(int index)
- 	if (!(dev->features[1] & LMP_PARK))
- 		link_policy &= ~HCI_LP_PARK;
- 
-+	dev->link_policy = link_policy;
- 	link_policy = htobs(link_policy);
- 	hci_send_cmd(dev->sk, OGF_LINK_POLICY, OCF_WRITE_DEFAULT_LINK_POLICY,
- 					sizeof(link_policy), &link_policy);
-@@ -3686,6 +3690,35 @@ static int hciops_remove_remote_oob_data(int index, bdaddr_t *bdaddr)
- 	return 0;
+diff --git a/audio/manager.c b/audio/manager.c
+index 0b52520..33137ce 100644
+--- a/audio/manager.c
++++ b/audio/manager.c
+@@ -1418,3 +1418,18 @@ void manager_set_fast_connectable(gboolean enable)
+ 				adapter_get_dev_id(adapter->btd_adapter));
+ 	}
  }
- 
-+static int hciops_allow_sniff(int index, bdaddr_t *bdaddr, gboolean enable)
++
++void manager_allow_sniff(struct audio_device *dev, gboolean enable)
 +{
-+	struct dev_info *dev = &devs[index];
-+	struct bt_conn *conn;
-+	write_link_policy_cp cp;
-+	char addr[18];
++	struct btd_adapter *adapter;
 +
-+	conn = find_connection(dev, bdaddr);
-+	if (conn == NULL)
-+		return -EINVAL;
++	adapter = manager_find_adapter(&dev->src);
++	if (!adapter)
++		return;
 +
-+	if (enable)
-+		cp.policy = dev->link_policy;
-+	else
-+		cp.policy = dev->link_policy & ~HCI_LP_SNIFF;
++	DBG("change link policy for hci%d", adapter_get_dev_id(adapter));
 +
-+	cp.handle = htobs(conn->handle);
-+	cp.policy = htobs(cp.policy);
-+
-+	ba2str(bdaddr, addr);
-+	DBG("hci%d bdaddr %s handle 0x%04x link_policy 0x%04x",
-+					index, addr, cp.handle, cp.policy);
-+	if (hci_send_cmd(dev->sk, OGF_LINK_POLICY, OCF_WRITE_LINK_POLICY,
-+					WRITE_LINK_POLICY_CP_SIZE, &cp) < 0)
-+		return -EINVAL;
-+
-+	return 0;
++	if (btd_adapter_allow_sniff(adapter, &dev->dst, enable))
++		error("Changing link policy for hci%d failed",
++				adapter_get_dev_id(adapter));
 +}
+diff --git a/audio/manager.h b/audio/manager.h
+index 0bf7663..cd1c86d 100644
+--- a/audio/manager.h
++++ b/audio/manager.h
+@@ -54,3 +54,5 @@ gboolean manager_allow_headset_connection(struct audio_device *device);
+ /* TRUE to enable fast connectable and FALSE to disable fast connectable for all
+  * audio adapters. */
+ void manager_set_fast_connectable(gboolean enable);
 +
- static struct btd_adapter_ops hci_ops = {
- 	.setup = hciops_setup,
- 	.cleanup = hciops_cleanup,
-@@ -3728,6 +3761,7 @@ static struct btd_adapter_ops hci_ops = {
- 	.read_local_oob_data = hciops_read_local_oob_data,
- 	.add_remote_oob_data = hciops_add_remote_oob_data,
- 	.remove_remote_oob_data = hciops_remove_remote_oob_data,
-+	.allow_sniff = hciops_allow_sniff,
- };
- 
- static int hciops_init(void)
-diff --git a/src/adapter.h b/src/adapter.h
-index 308af75..6e57d17 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -241,6 +241,7 @@ struct btd_adapter_ops {
- 	int (*add_remote_oob_data) (int index, bdaddr_t *bdaddr, uint8_t *hash,
- 							uint8_t *randomizer);
- 	int (*remove_remote_oob_data) (int index, bdaddr_t *bdaddr);
-+	int (*allow_sniff) (int index, bdaddr_t *bdaddr, gboolean enable);
- };
- 
- int btd_register_adapter_ops(struct btd_adapter_ops *ops, gboolean priority);
++void manager_allow_sniff(struct audio_device *dev, gboolean enable);
 -- 
 1.7.5.4
 
