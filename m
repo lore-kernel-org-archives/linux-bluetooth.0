@@ -1,33 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: GATT service improvements
-Date: Tue, 24 Jan 2012 12:06:20 +0100
-Message-Id: <1327403188-21981-1-git-send-email-sancane@gmail.com>
+Date: Tue, 24 Jan 2012 12:46:23 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] Fix memory leak when loading keys
+Message-ID: <20120124104623.GA26322@x220>
+References: <20120123132915.GA2879@samus>
+ <1327364511-6348-1-git-send-email-vinicius.gomes@openbossa.org>
+ <CAJdJm_N+FXcJfXm_1eEmjJUp0c4Ek2OL3gJrSnRyfjmoCPNG5A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CAJdJm_N+FXcJfXm_1eEmjJUp0c4Ek2OL3gJrSnRyfjmoCPNG5A@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This set of patches enables GATT service definitions using 128-bit
-UUIDs. At the present, only 16 bit UUIDs are allowed in gatt-service.
-Furthermore, these patches fix the problem of having multiple
-service declarations for both 16 and 128 bit by allocating the former
-ones at the beginning of the database, and 128-bit services at the
-end. This feature is required in GATT when multiple services exist,
-service definitions with service declarations using 16-bit UUID should
-be grouped together and 128-bit UUID serviecs should be grouped
-together as well. BT 4.0 [Vol 3] 3.1.
+Hi Lizardo,
 
-These patches also replace the single database list for handlers with
-a double linked list in order to improve allocation operations for
-128-bit service declaration at the end of the list.
+On Tue, Jan 24, 2012, Anderson Lizardo wrote:
+> On Mon, Jan 23, 2012 at 8:21 PM, Vinicius Costa Gomes
+> <vinicius.gomes@openbossa.org> wrote:
+> > @@ -3570,7 +3571,16 @@ static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
+> >        if (dev->keys != NULL)
+> >                return -EEXIST;
+> >
+> > -       dev->keys = keys;
+> > +       for (l = keys; l; l = l->next) {
+> > +               struct link_key_info *orig, *dup;
+> > +
+> > +               orig = l->data;
+> > +
+> > +               dup = g_memdup(orig, sizeof(*orig));
+> > +
+> > +               dev->keys = g_slist_prepend(dev->keys, dup);
+> > +       }
+> > +
+> 
+> No need to cleanup dev->keys first?
 
-Comments are welcome.
+Take a look at the first two lines of context. The function bails out if
+dev->keys is anything else than NULL.
 
-[PATCH 1/8] gatt-service: Add support for 128-bit Bluetooth UUIDs
-[PATCH 2/8] gatt-service: Move va_end just after processing the
-[PATCH 3/8] gatt-service: Provide service uuid in
-[PATCH 4/8] attrib-server: Allocate 16-bits UUIDS at the begining of
-[PATCH 5/8] attrib-server: Set database uuids as a double linked
-[PATCH 6/8] glib-compat: Add g_list_free_full to deal with issues in
-[PATCH 7/8] attrib-server: Allocate 128-bits UUIDs using highest
-[PATCH 8/8] gatt-example: Fix g_assert checks when an uint16_t value
+Johan
