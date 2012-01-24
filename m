@@ -1,31 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: BT_AMP_POLICY and RFCOMM
-Mime-Version: 1.0 (Apple Message framework v1251.1)
-Content-Type: text/plain; charset=us-ascii
-From: Greg Hazel <ghazel@gmail.com>
-In-Reply-To: <20120124082739.GA19238@aemeltch-MOBL1>
-Date: Tue, 24 Jan 2012 00:36:23 -0800
+Date: Tue, 24 Jan 2012 10:27:42 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Greg Hazel <ghazel@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <E07C31FC-9B74-4DBA-98F5-765E95B256B7@gmail.com>
-References: <D0339DC2-78B0-427D-9FC3-704725A88020@gmail.com> <20120124082739.GA19238@aemeltch-MOBL1>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Subject: Re: BT_AMP_POLICY and RFCOMM
+Message-ID: <20120124082739.GA19238@aemeltch-MOBL1>
+References: <D0339DC2-78B0-427D-9FC3-704725A88020@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <D0339DC2-78B0-427D-9FC3-704725A88020@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Jan 24, 2012, at 12:27 AM, Andrei Emeltchenko wrote:
-
-> On Mon, Jan 23, 2012 at 08:15:16PM -0800, Greg Hazel wrote:
->> Hi,
->> 
->> I'm trying to set BT_AMP_POLICY on an RFCOMM socket to
->> BT_AMP_POLICY_PREFER_AMP. In return I'm getting "Operation not supported
+On Mon, Jan 23, 2012 at 08:15:16PM -0800, Greg Hazel wrote:
+> Hi,
 > 
-> BTW: Why would you need to set this? Functionality is not supported yet so
-> nothing will change.
+> I'm trying to set BT_AMP_POLICY on an RFCOMM socket to
+> BT_AMP_POLICY_PREFER_AMP. In return I'm getting "Operation not supported
 
-Oh, I had not made it far enough into bluez to notice it had not been implemented. My question still stands I suppose, but is obviously predicated on support being added eventually.
+BTW: Why would you need to set this? Functionality is not supported yet so
+nothing will change.
 
-Out of curiosity, is there a bluetooth stack which does support AMP yet?
+Best regards 
+Andrei Emeltchenko 
 
--Greg
+> on transport endpoint" (errno 95). Glancing at the code, it looks like
+> RFCOMM sockets do not handle BT_AMP_POLICY, and the default policy for
+> the underlying L2CAP socket is BT_AMP_POLICY_REQUIRE_BR_EDR. However,
+> the L2CAP socket is L2CAP_MODE_ERTM, so my expectation is that it would
+> work to use AMP.
+> 
+> So, why was BT_AMP_POLICY left out for RFCOMM sockets? Was it simply an
+> oversight?
 
