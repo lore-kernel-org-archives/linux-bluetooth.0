@@ -1,42 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Peter Krystad" <pkrystad@codeaurora.org>
+To: "'Greg Hazel'" <ghazel@gmail.com>,
+	"'Andrei Emeltchenko'" <andrei.emeltchenko.news@gmail.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+References: <D0339DC2-78B0-427D-9FC3-704725A88020@gmail.com> <20120124082739.GA19238@aemeltch-MOBL1> <E07C31FC-9B74-4DBA-98F5-765E95B256B7@gmail.com> <20120124085719.GB19238@aemeltch-MOBL1> <8B1F83F9-649A-4B59-A620-774A60E64D2C@gmail.com>
+In-Reply-To: <8B1F83F9-649A-4B59-A620-774A60E64D2C@gmail.com>
+Subject: RE: BT_AMP_POLICY and RFCOMM
+Date: Tue, 24 Jan 2012 09:45:48 -0800
+Message-ID: <003501ccdac0$022a89e0$067f9da0$@org>
 MIME-Version: 1.0
-From: Scott James Remnant <scott@netsplit.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: keybuk@chromium.org, Scott James Remnant <scott@netsplit.com>
-Subject: [PATCHv2 0/4] Add support for bonding callbacks and retrying
-Date: Tue, 24 Jan 2012 10:47:54 -0800
-Message-Id: <1327430878-23913-1-git-send-email-scott@netsplit.com>
+Content-Type: text/plain;
+	charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for the comments on the autopair plugin patches, I'm still
-working on updating that but I wanted to submit the underlying core
-changes necessary while I do so.
+Greg,
 
-This adds plugin support for a callback called when bonding completes,
-either successfully or fails, or is cancelled. In the success or failure
-cases the callback may return TRUE, in which case the bonding is retried
-after a short backoff period.
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org]
+> On Behalf Of Greg Hazel
+> Sent: Tuesday, January 24, 2012 1:57 AM
+> To: Andrei Emeltchenko
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: BT_AMP_POLICY and RFCOMM
+> 
+> On Jan 24, 2012, at 12:57 AM, Andrei Emeltchenko wrote:
+> > On Tue, Jan 24, 2012 at 12:36:23AM -0800, Greg Hazel wrote:
+> >> On Jan 24, 2012, at 12:27 AM, Andrei Emeltchenko wrote:
+> >>> On Mon, Jan 23, 2012 at 08:15:16PM -0800, Greg Hazel wrote:
+> >>>>
+> >>>> I'm trying to set BT_AMP_POLICY on an RFCOMM socket to
+> >>>> BT_AMP_POLICY_PREFER_AMP. In return I'm getting "Operation not supported
+> >>>
 
-The (to be submitted) autopair plugin will use this to retry bonding if
-a fixed PIN it provides fails, and ignore the subsequent attempt so that
-the ordinary PIN handling (user agent, keyboard auto-generation, etc.)
-happens.
+> >>> BTW: Why would you need to set this? Functionality is not supported yet so
+> >>> nothing will change.
+> >>
+> >> Oh, I had not made it far enough into bluez to notice it had not been implemented. My
+> question still stands I suppose, but is obviously predicated on support being added
+> eventually.
 
-The existing wiimote plugin could use this to try both of the possible
-PINs (host address and peer address), etc.
+Since l2cap ertm is required for channels on AMP the rfcomm layer is unnecessary, it makes
+more sense for obex profiles to be modified to use l2cap ertm sockets directly, which do/will
+support AMP.
 
-Scott James Remnant (4):
-  Add support for retrying a bonding
-  plugin: Add bonding callback support for plugins
-  bonding: retry if callback returns TRUE
-  bonding: call plugin callback on cancellation
+> Is this the right mailing list to ask about the AMP bluetooth work contained in msm and
+> android-msm?
 
- src/adapter.c |    2 +-
- src/device.c  |   87 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/device.h  |    9 ++++++
- 3 files changed, 97 insertions(+), 1 deletions(-)
+Probably not :)
 
--- 
-1.7.7.3
+E-mail me or post to https://www.codeaurora.org/forums/viewforum.php?f=4
+
+Peter.
+
+--Peter Krystad
+  Employee of Qualcomm Innovation Center, Inc.
+  Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
 
