@@ -2,39 +2,80 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 2/8] gatt-service: Move va_end just after processing the argument list
-Date: Wed, 25 Jan 2012 14:12:35 +0100
-Message-Id: <1327497161-14764-3-git-send-email-sancane@gmail.com>
-In-Reply-To: <1327497161-14764-2-git-send-email-sancane@gmail.com>
+Subject: [PATCH 7/8] attrib-server: Allocate 128-bits UUIDs using highest available handlers
+Date: Wed, 25 Jan 2012 14:12:40 +0100
+Message-Id: <1327497161-14764-8-git-send-email-sancane@gmail.com>
+In-Reply-To: <1327497161-14764-7-git-send-email-sancane@gmail.com>
 References: <1327497161-14764-1-git-send-email-sancane@gmail.com>
  <1327497161-14764-2-git-send-email-sancane@gmail.com>
+ <1327497161-14764-3-git-send-email-sancane@gmail.com>
+ <1327497161-14764-4-git-send-email-sancane@gmail.com>
+ <1327497161-14764-5-git-send-email-sancane@gmail.com>
+ <1327497161-14764-6-git-send-email-sancane@gmail.com>
+ <1327497161-14764-7-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+128-uuids services are grouped at the end of the handlers database list.
+This group grows from the highest handlers toward lowers handlers
+until the whole range is used or the last 16 bit-uuid service is reached.
 ---
- attrib/gatt-service.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+ src/attrib-server.c |   42 +++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 41 insertions(+), 1 deletions(-)
 
-diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
-index 187ef5a..a5e6dcb 100644
---- a/attrib/gatt-service.c
-+++ b/attrib/gatt-service.c
-@@ -307,12 +307,14 @@ gboolean gatt_service_add(struct btd_adapter *adapter, uint16_t uuid,
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 3f72ff8..46448c0 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -1318,7 +1318,47 @@ static uint16_t find_uuid16_avail(struct btd_adapter *adapter, uint16_t nitems)
  
- 	va_start(args, opt1);
- 	chrs = parse_opts(opt1, args);
-+	va_end(args);
+ static uint16_t find_uuid128_avail(struct btd_adapter *adapter, uint16_t nitems)
+ {
+-	/* TODO: Allocate 128 uuids at the end of the list */
++	uint16_t handle = 0, end = 0xffff;
++	struct gatt_server *server;
++	GList *dl;
++	GSList *l;
 +
- 	/* calculate how many attributes are necessary for this service */
- 	for (l = chrs, size = 1; l != NULL; l = l->next) {
- 		struct gatt_info *info = l->data;
- 		size += info->num_attrs;
- 	}
--	va_end(args);
++	l = g_slist_find_custom(servers, adapter, adapter_cmp);
++	if (l == NULL)
++		return 0;
 +
- 	start_handle = attrib_db_find_avail(adapter, size);
- 	if (start_handle == 0) {
- 		error("Not enough free handles to register service");
++	server = l->data;
++	if (server->database == NULL)
++		return 0xffff - nitems + 1;
++
++	for (dl = g_list_last(server->database); dl; dl = dl->prev) {
++		struct attribute *a = dl->data;
++
++		if (handle == 0)
++			handle = a->handle;
++
++		if (bt_uuid_cmp(&a->uuid, &prim_uuid) != 0 &&
++				bt_uuid_cmp(&a->uuid, &snd_uuid) != 0)
++			continue;
++
++		if (end - handle >= nitems)
++			return end - nitems + 1;
++
++		if (a->len == 2) {
++			/* 16 bit UUID service definition */
++			return 0;
++		}
++
++		if (a->handle == 0x0001)
++			return 0;
++
++		end = a->handle - 1;
++		handle = 0;
++	}
++
++	if (end - 0x0001 >= nitems)
++		return end - nitems + 1;
++
+ 	return 0;
+ }
+ 
 -- 
 1.7.8.4
 
