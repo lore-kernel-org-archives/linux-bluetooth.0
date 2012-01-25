@@ -1,77 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F204BDC.1010007@babioch.de>
-Date: Wed, 25 Jan 2012 19:37:16 +0100
-From: Karol Babioch <karol@babioch.de>
+From: Dave Zielinski <DZielinski@righthandtech.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 25 Jan 2012 11:59:08 -0600
+Subject: RE: AVRCP Use Question
+Message-ID: <69FA8BA3444DD443841AF768F2F6C65A01611E9B3C9D@SERVER2.righthandtech.local>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Changed default configuration in bluez 4.97 and higher?
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig9D0E6C7A47AA607E57D69373"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig9D0E6C7A47AA607E57D69373
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Hi all,
+  I'm trying to set up a system running bluez that will essentially be a "headset" for a device playing audio (cellphone).   So far I've been successful able to get the audio stream aspect (A2DP) of it working and now I'm trying to add some AVRCP 1.0 control (play, pause, fwd, rev).   Looking through some of the git logs, I'm seeing that some of this control was added a long before the version I'm using, which is 4.96, but I'm having a rough time figure out where/what the interface is.  
 
-Hi,
+My best guess at this point is that it can be accessed via the "uinput" driver however the only example that I'm seeing is where evtest is used to listen for events coming from headset for example.  This is actually opposite of what I'm doing.  The device running bluez is the "headset" and I want to sent the commands to the device playing audio.  
 
-I'm wondering whether there has been made any change to the default
-configuration of bluez 4.97 and/or 4.98? I've looked at the changelog,
-but combined with the release notes it looks to me as they were "simple"
-bug fixing releases. At least there is no mention of a change of the
-default configuration or something like that.
+Can anyone confirm this AVRCP 1.0 "uinput" interface from 4.96 is "uni-directional" and will not do what I need?
 
-However I'm experiencing trouble with these releases using my bluetooth
-headset (A2DP). To be honest I'm using gnome-bluetooth and not that
-experienced with the command line tools, but starting with 4.97 it is no
-longer possible to use my headset as an audio output device, although it
-is possible to discover it and to connect to it. But after the
-connection has been established it doesn't even get recognized by
-PulseAudio.
+In digging around I see that there was dbus controls added after the 4.96 tag that implements org.bluez.Control.ChangePlayback.  I would just try this but upgrading is not going to be trivial on my system it seems.
 
-I now got it working again by adding "Enable=3DSocket" in the audio.conf
-file. However I'm not sure whether this was changed intentional, because
-it worked out-of-the-box beforehand and I guess a basic A2DP setup is
-supposed to do so.
+Can anyone tell me if I'm on the right track or provide any hints?  
 
-There are at least two other guys affected by this, see [1]. So before
-filing a bug in the bug tracking system of my distribution and asking
-for inclusion of the above option, I would like to know why this was
-changed and whether this is intentional or not.
-
-[1]
-https://mailman.archlinux.org/pipermail/arch-general/2012-January/024386.=
-html
-
-Best regards,
-Karol Babioch
-
-
---------------enig9D0E6C7A47AA607E57D69373
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.18 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
-
-iQIcBAEBAgAGBQJPIEvdAAoJEHSaZc1HnzIVMkEP/21sSX/bU1pCPozWKLNZ9ln1
-qTLuXcVHwXXBx+7hupC0jcEICz8WMncIBiFMZU3XyCUZkF5beGGG84jIO1wKUpNp
-ggrvNcKPZQwErMmN8BwG/Z4x3uFTMRiuw6a/aeennJjY0xygHhw4Ob2JXaxtC6p1
-ac2KVeEn6MQ+maqyb69lE+Ss4UxGYCgljwj3cVK1AOoFH/iYqoYnO+wNWJ9Mh7iN
-FG1FU+W7i+nnkvTe+YIl2L2mpi0oNcqB+lTLv5pHgTVnQzAW2aR6N1EJ5FsV6oJt
-TjQz1jHMS7IqSh/7UTHAowmyd6fZjyePd6DWWTDZoH+RTfY49ffDBR1k1omPXSVQ
-f5i32sGv8Fdv/cz5Usw2FFTctsyZnchyE3mYxmbRL7TFE7BTHyI90/7VZTq5FL3c
-R8KLS8OyfKp/SRL5RsxLPH8Lk3c47EoYNX4XsoJK2pcM7RAcKDLAKIDGYpnV1uGI
-V7TYIgVjln18fIfWeuFhrlotsKkzS/ITWn1UQqAM/U6tIxEcW6v5bC4UA3peyRVp
-Qwrc7E1jgja50LGnHMr2B0q5kSy0OYy8gDw0j22ZrsOMp1kG94f8IGa1f322GD7J
-LErkctJm2g2hBm4mhpms2SyYG7nf2O9ckrGDt2/z6DTeBm3JuXbk8GA08D+folig
-di9/wq7z+X6bJcRer/S5
-=1Ibp
------END PGP SIGNATURE-----
-
---------------enig9D0E6C7A47AA607E57D69373--
+Thank you!
+Dave Z.
