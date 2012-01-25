@@ -1,43 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 1/2] client: fix not checking session_request return
-Date: Wed, 25 Jan 2012 10:27:37 +0200
-Message-Id: <1327480057-16803-1-git-send-email-luiz.dentz@gmail.com>
+Message-ID: <4F1FB808.8000400@invoxia.com>
+Date: Wed, 25 Jan 2012 09:06:32 +0100
+From: Arnaud Mouiche <arnaud.mouiche@invoxia.com>
+MIME-Version: 1.0
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: Dmitriy Paliy <dmitriy.paliy@nokia.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC BlueZ 0/4] Add hciops_allow_sniff to disable and restore
+ LMP_SNIFF bit
+References: <1327409936-6709-1-git-send-email-dmitriy.paliy@nokia.com> <CABBYNZJ99t68PrYwi57KPuJXrJpu76Rt-6KNwwZuxwy39uA8GA@mail.gmail.com>
+In-Reply-To: <CABBYNZJ99t68PrYwi57KPuJXrJpu76Rt-6KNwwZuxwy39uA8GA@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Indeed, the kernel has already something to manage sniff mode 
+automatically, especially when SCO is part of the question:
+  get a look at:
+     /sys/class/bluetooth/hci0/idle_timeout
+     /sys/class/bluetooth/hci0/sniff_min_interval
+     /sys/class/bluetooth/hci0/sniff_max_interval
 
-In case session_request return an error proceed to the next
----
- client/session.c |   13 ++++++++++---
- 1 files changed, 10 insertions(+), 3 deletions(-)
+arnaud
 
-diff --git a/client/session.c b/client/session.c
-index c127974..c9df832 100644
---- a/client/session.c
-+++ b/client/session.c
-@@ -687,9 +687,16 @@ static void session_terminate_transfer(struct obc_session *session,
- 
- 	obc_session_remove_transfer(session, transfer);
- 
--	if (session->pending)
--		session_request(session, session_prepare_put,
--				session->pending->data);
-+	while (session->pending != NULL) {
-+		struct obc_transfer *transfer = session->pending->data;
-+		int err;
-+
-+		err = session_request(session, session_prepare_put, transfer);
-+		if (err == 0)
-+			break;
-+
-+		obc_session_remove_transfer(session, transfer);
-+	}
- 
- 	obc_session_unref(session);
- }
--- 
-1.7.7.5
+
+On 01/24/2012 02:23 PM, Luiz Augusto von Dentz wrote:
+> Hi Dmitriy,
+>
+> On Tue, Jan 24, 2012 at 2:58 PM, Dmitriy Paliy<dmitriy.paliy@nokia.com>  wrote:
+>> Hi,
+>>
+>> The following set of patches introduces disabling/enabling sniff bit
+>> in link policy settings. Further, the sniff mode is than disallowed
+>> while SCO channel is open.
+>>
+>> This helps to avoid problems in instability in some of TI controllers
+>> firmware when sniff request comes from remote device during an active
+>> call. Real impact is that controller becomes unconnectable eventhough
+>> page scan is enabled.
+>>
+>> Any comments, and possibly ideas, would be highly appreciated.
+> It looks like we would need a new command/operation to support it on
+> mgmt which is not addressed by your patches, in the other hand perhaps
+> this could be done automatically by the kernel when SCO is active.
+>
 
