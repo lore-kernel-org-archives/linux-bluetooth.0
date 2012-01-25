@@ -1,24 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 25 Jan 2012 16:11:12 +0200
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv1 1/2] Bluetooth: Recalculate sched HCI blk/pkt flow ctrl
-Message-ID: <20120125141109.GA2259@aemeltch-MOBL1>
-References: <1326099594-982-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1326099594-982-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] Bluetooth: Change chan_ready param from sk to chan
+Date: Wed, 25 Jan 2012 16:09:31 +0200
+Message-Id: <1327500571-29794-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Mon, Jan 09, 2012 at 10:59:53AM +0200, Emeltchenko Andrei wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Split HCI scheduling for block and packet flow control.
+Change is needed to remove dependency on sk when possible
+before introducing l2cap channel lock.
 
-Any comment on these patches?
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |   12 ++++++------
+ 1 files changed, 6 insertions(+), 6 deletions(-)
 
-Best regards 
-Andrei Emeltchenko 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 69e8490..c330cdc 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -907,9 +907,9 @@ clean:
+ 	release_sock(parent);
+ }
+ 
+-static void l2cap_chan_ready(struct sock *sk)
++static void l2cap_chan_ready(struct l2cap_chan *chan)
+ {
+-	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
++	struct sock *sk = chan->sk;
+ 	struct sock *parent = bt_sk(sk)->parent;
+ 
+ 	BT_DBG("sk %p, parent %p", sk, parent);
+@@ -945,7 +945,7 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+ 
+ 		if (conn->hcon->type == LE_LINK) {
+ 			if (smp_conn_security(conn, chan->sec_level))
+-				l2cap_chan_ready(sk);
++				l2cap_chan_ready(chan);
+ 
+ 		} else if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+ 			__clear_chan_timer(chan);
+@@ -2874,7 +2874,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 		if (chan->mode == L2CAP_MODE_ERTM)
+ 			l2cap_ertm_init(chan);
+ 
+-		l2cap_chan_ready(sk);
++		l2cap_chan_ready(chan);
+ 		goto unlock;
+ 	}
+ 
+@@ -3005,7 +3005,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 		if (chan->mode ==  L2CAP_MODE_ERTM)
+ 			l2cap_ertm_init(chan);
+ 
+-		l2cap_chan_ready(sk);
++		l2cap_chan_ready(chan);
+ 	}
+ 
+ done:
+@@ -4524,7 +4524,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 		if (chan->scid == L2CAP_CID_LE_DATA) {
+ 			if (!status && encrypt) {
+ 				chan->sec_level = hcon->sec_level;
+-				l2cap_chan_ready(sk);
++				l2cap_chan_ready(chan);
+ 			}
+ 
+ 			bh_unlock_sock(sk);
+-- 
+1.7.4.1
+
