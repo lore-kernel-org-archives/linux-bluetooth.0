@@ -1,41 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: Use list _safe when deleting element
-Date: Thu, 26 Jan 2012 15:10:43 +0200
-Message-Id: <1327583443-14081-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CAJdJm_MWBg4rOnmXi5CAO5cC9hJ0Twzih=x2Bd-QvmjNH=WpdA@mail.gmail.com>
+References: <1327531949-29463-1-git-send-email-andre.guedes@openbossa.org>
+	<1327531949-29463-6-git-send-email-andre.guedes@openbossa.org>
+	<CAJdJm_MWBg4rOnmXi5CAO5cC9hJ0Twzih=x2Bd-QvmjNH=WpdA@mail.gmail.com>
+Date: Thu, 26 Jan 2012 10:05:28 -0300
+Message-ID: <CACJA=fVwm3S7SQL0kYLdWYrjzZBPeBQ_HAA=Jmtz-cQyi0FPZg@mail.gmail.com>
+Subject: Re: [PATCH v3 5/6] Bluetooth: MGMT start discovery LE-Only support
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Lizardo,
 
-Fixes possible bug when deleting element from the list in
-function hci_chan_list_flush. list_for_each_entry_rcu is used
-and after deleting element from the list we also free pointer
-and then list_entry_rcu is taken from freed pointer.
+On Thu, Jan 26, 2012 at 9:55 AM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Andre,
+>
+> On Wed, Jan 25, 2012 at 6:52 PM, Andre Guedes
+> <andre.guedes@openbossa.org> wrote:
+>> - =A0 =A0 =A0 err =3D hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
+>> + =A0 =A0 =A0 if (test_bit(MGMT_ADDR_BREDR, &discov_type))
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D hci_do_inquiry(hdev, INQUIRY_LEN_B=
+REDR);
+>> + =A0 =A0 =A0 else if (test_bit(MGMT_ADDR_LE_PUBLIC, &discov_type) &&
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 test_bit(M=
+GMT_ADDR_LE_RANDOM, &discov_type))
+>
+> Should it be "||" in the line above?
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/hci_conn.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+mgmt-api.txt says both bits should be set.
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index cdb6a3f..e74d2a7 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -982,10 +982,10 @@ int hci_chan_del(struct hci_chan *chan)
- 
- void hci_chan_list_flush(struct hci_conn *conn)
- {
--	struct hci_chan *chan;
-+	struct hci_chan *chan, *n;
- 
- 	BT_DBG("conn %p", conn);
- 
--	list_for_each_entry_rcu(chan, &conn->chan_list, list)
-+	list_for_each_entry_safe(chan, n, &conn->chan_list, list)
- 		hci_chan_del(chan);
- }
--- 
-1.7.4.1
-
+>
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D hci_le_scan(hdev, LE_SCAN_TYPE, LE=
+_SCAN_INT,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 LE_SCAN_WIN, LE_SCAN_TIMEOUT_LE_ONLY);
+>> + =A0 =A0 =A0 else
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D -EINVAL;
+>> +
+>> =A0 =A0 =A0 =A0if (err < 0)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mgmt_pending_remove(cmd);
+>> =A0 =A0 =A0 =A0else
+>> --
+>> 1.7.8.4
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetoot=
+h" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
+>
+> Regards,
+> --
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
