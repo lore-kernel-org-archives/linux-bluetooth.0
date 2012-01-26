@@ -1,77 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F2159DC.4090408@babioch.de>
-Date: Thu, 26 Jan 2012 14:49:16 +0100
-From: Karol Babioch <karol@babioch.de>
+Message-ID: <99409C1CA8BB44AA991976C2B7B4BA6C@freqoneremote>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+	"Dave Zielinski" <DZielinski@righthandtech.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+References: <69FA8BA3444DD443841AF768F2F6C65A01611E9B3C9D@SERVER2.righthandtech.local> <CABBYNZJ2wAebT-J7x_i72t3p2iQG5VgmrD_+tVEHYh2O2FN+Uw@mail.gmail.com>
+In-Reply-To: <CABBYNZJ2wAebT-J7x_i72t3p2iQG5VgmrD_+tVEHYh2O2FN+Uw@mail.gmail.com>
+Subject: Re: AVRCP Use Question
+Date: Thu, 26 Jan 2012 07:29:27 -0600
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Changed default configuration in bluez 4.97 and higher?
-References: <4F204BDC.1010007@babioch.de> <CABBYNZJk+n2Rh4K2J_fc8A_WXjyBwck4qhYcfe6wCmK7vK7t-Q@mail.gmail.com> <4F2145AF.4050401@babioch.de>
-In-Reply-To: <4F2145AF.4050401@babioch.de>
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enigEDFEDDB9D0D060C194526136"
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enigEDFEDDB9D0D060C194526136
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Hello "other Dave" and Luiz,
 
-Hi,
++++++
 
-Am 26.01.2012 13:29, schrieb Luiz Augusto von Dentz:
-> do you have any logs when Socket is disabled?
+Hi Dave,
 
-Jan 26 14:28:10 localhost bluetoothd[813]: Discovery session
-0x7f5a22e73c50 with :1.41 activated
-Jan 26 14:28:13 localhost bluetoothd[813]: Stopping discovery
-Jan 26 14:28:24 localhost kernel: [  349.752870] input:
-00:16:94:0B:XX:XX as /devices/virtual/input/input17
-Jan 26 14:28:24 localhost pulseaudio[1072]: [pulseaudio]
-module-bluetooth-device.c: Bluetooth audio service not available
-Jan 26 14:28:24 localhost pulseaudio[1072]: [pulseaudio]
-module-bluetooth-device.c: Service not connected
-Jan 26 14:28:24 localhost pulseaudio[1072]: [pulseaudio] module.c:
-Failed to load module "module-bluetooth-device" (argument:
-"address=3D"00:16:94:0B:XX:XX"
-path=3D"/org/bluez/813/hci0/dev_00_16_94_0B_XX_XX""): initialization fail=
-ed.
+On Wed, Jan 25, 2012 at 7:59 PM, Dave Zielinski
+<DZielinski@righthandtech.com> wrote:
+> Hi all,
+>   I'm trying to set up a system running bluez that will essentially be a 
+> "headset" for a device playing audio (cellphone).   So far I've been 
+> successful able to get the audio stream aspect (A2DP) of it working and 
+> now I'm trying to add some AVRCP 1.0 control (play, pause, fwd, rev). 
+> Looking through some of the git logs, I'm seeing that some of this control 
+> was added a long before the version I'm using, which is 4.96, but I'm 
+> having a rough time figure out where/what the interface is.
+>
+> My best guess at this point is that it can be accessed via the "uinput" 
+> driver however the only example that I'm seeing is where evtest is used to 
+> listen for events coming from headset for example.  This is actually 
+> opposite of what I'm doing.  The device running bluez is the "headset" and 
+> I want to sent the commands to the device playing audio.
+>
+> Can anyone confirm this AVRCP 1.0 "uinput" interface from 4.96 is 
+> "uni-directional" and will not do what I need?
+>
+> In digging around I see that there was dbus controls added after the 4.96 
+> tag that implements org.bluez.Control.ChangePlayback.  I would just try 
+> this but upgrading is not going to be trivial on my system it seems.
+>
+> Can anyone tell me if I'm on the right track or provide any hints?
 
-So you were right, it seems that PulseAudio is the culprit here. However
-it works with bluez-4.96, although sockets are not enabled explicitly?
-So the question stays whether bluez 4.96 uses sockets implicitly, or
-whether PulseAudio doesn't work with bluez-4.98.
+Currently there is no API to send those AVRCP commands, and yes uinput
+does not support sending events, perhaps we can add such API to
+org.bluez.Control, create another interface e.g. RemoteControl, or
+somehow capture events from a input device. Iirc one of the problem of
+doing this over D-Bus is the emulation of press/release events.
 
-Best regards,
-Karol Babioch
++++++
 
+Months ago I submitted code that implemented a signal for remote device 
+commands and passthroughs, but that was rejected in favor of continuing with 
+uinput.
 
+Should we revisit this?
 
+David Stockwell
 
++++++
+-- 
+Luiz Augusto von Dentz
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
+in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html 
 
---------------enigEDFEDDB9D0D060C194526136
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.18 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
-
-iQIcBAEBAgAGBQJPIVncAAoJEHSaZc1HnzIVGOMP/0NCYLvrqwoqraJpZjjSmiXc
-QMpSZ3nJ+V8NN633q0sNOXPQEDDtkFNjXfc/BM0IfuRLMNrO9kf7rjl7FQVm96hy
-Wl96FDXZDcJXgeiBZzLNgCsjaGEUHZLJsr4hLcXw3ellmsdDFwuoUdVlo2kYDQmR
-oYRI7YPk8FcJIKzwLloA0DIgwZYW6bj5IukQWTCnkNH+ov+cT4Te95pGyTTBqR/R
-F15BT5XQFN10+aXQh486wW1yDFXvbqK5OL1dj3iobSBaY9AgcsP2ZqYX4acyMky7
-yRCjmQeFaZOBCINvksySZ5vUkBuc85x96czXegbmA7cyLRohVyOU5nH2sr5nLtoG
-ghj1XJm5hex0YoJA7Dvek9cb/nYggTroH8UBYgm0bS4TihkY7GY2cIQugU+pfRSF
-QxW2xu1Q4nbqSUUGj6AOGpEhTnH9YZmZjeoIvKVKMP2lXltSaSY6cMGO6S+h7TZO
-Ytc9yiONgCNDAdJFZUCN4mqHSaq3HdqiUM1MjPjH2RR5yQLfgSJo1qew0abrdqpV
-2c6KqZhQ3RW3tUzbfxST+94KeJketx5r/ytNXGkHE4YDRzfO62TVc3jiuszK0qrK
-Mb1a5Gp3ZxtrodluJeFr0HOv6QJmFwHhthm74zExtCWDGTOkjtn+bT68BJ+v4nnl
-5Hz7A+SBYYv60vnOxVoM
-=CNJN
------END PGP SIGNATURE-----
-
---------------enigEDFEDDB9D0D060C194526136--
