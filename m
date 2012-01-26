@@ -1,37 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4F2145AF.4050401@babioch.de>
+Date: Thu, 26 Jan 2012 13:23:11 +0100
+From: Karol Babioch <karol@babioch.de>
 MIME-Version: 1.0
-In-Reply-To: <69FA8BA3444DD443841AF768F2F6C65A01611E9B3C9D@SERVER2.righthandtech.local>
-References: <69FA8BA3444DD443841AF768F2F6C65A01611E9B3C9D@SERVER2.righthandtech.local>
-Date: Thu, 26 Jan 2012 14:25:31 +0200
-Message-ID: <CABBYNZJ2wAebT-J7x_i72t3p2iQG5VgmrD_+tVEHYh2O2FN+Uw@mail.gmail.com>
-Subject: Re: AVRCP Use Question
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Dave Zielinski <DZielinski@righthandtech.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Changed default configuration in bluez 4.97 and higher?
+References: <4F204BDC.1010007@babioch.de> <CABBYNZJk+n2Rh4K2J_fc8A_WXjyBwck4qhYcfe6wCmK7vK7t-Q@mail.gmail.com>
+In-Reply-To: <CABBYNZJk+n2Rh4K2J_fc8A_WXjyBwck4qhYcfe6wCmK7vK7t-Q@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enigDF6626DA648D796A99752D01"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigDF6626DA648D796A99752D01
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 25, 2012 at 7:59 PM, Dave Zielinski
-<DZielinski@righthandtech.com> wrote:
-> Hi all,
->   I'm trying to set up a system running bluez that will essentially be a "headset" for a device playing audio (cellphone).   So far I've been successful able to get the audio stream aspect (A2DP) of it working and now I'm trying to add some AVRCP 1.0 control (play, pause, fwd, rev).   Looking through some of the git logs, I'm seeing that some of this control was added a long before the version I'm using, which is 4.96, but I'm having a rough time figure out where/what the interface is.
->
-> My best guess at this point is that it can be accessed via the "uinput" driver however the only example that I'm seeing is where evtest is used to listen for events coming from headset for example.  This is actually opposite of what I'm doing.  The device running bluez is the "headset" and I want to sent the commands to the device playing audio.
->
-> Can anyone confirm this AVRCP 1.0 "uinput" interface from 4.96 is "uni-directional" and will not do what I need?
->
-> In digging around I see that there was dbus controls added after the 4.96 tag that implements org.bluez.Control.ChangePlayback.  I would just try this but upgrading is not going to be trivial on my system it seems.
->
-> Can anyone tell me if I'm on the right track or provide any hints?
+Hi,
 
-Currently there is no API to send those AVRCP commands, and yes uinput
-does not support sending events, perhaps we can add such API to
-org.bluez.Control, create another interface e.g. RemoteControl, or
-somehow capture events from a input device. Iirc one of the problem of
-doing this over D-Bus is the emulation of press/release events.
+Am 26.01.2012 12:52, schrieb Luiz Augusto von Dentz:
+> probably PA should be updated in your system
+Well, I'm running Arch with the latest and greatest PulseAudio (version
+1.1).
 
--- 
-Luiz Augusto von Dentz
+Is there any configuration that can be changed for it to work on side of
+PulseAudio?
+
+Thanks for your reply anyway, as I'm now knowing that it is intentional.
+
+Best regards,
+Karol Babioch
+
+
+
+
+
+--------------enigDF6626DA648D796A99752D01
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.18 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
+
+iQIcBAEBAgAGBQJPIUWvAAoJEHSaZc1HnzIVZeAP/3aiZSvGV8xpvt+mI1t4ndPB
+ZNku0HIo2kHH0iqMgmYf3fp6x4NvyITyJDkbkLOzu9i/bDW7BZsT+FG5N0zBJWYT
+/AjT7MuBplIfHj9ygL+084XtJa4bLGNZUdSO9Usgjy3OcA6tKhxiKetD5ooEhVTw
+NU5b47RRpDE9FR8ZuJgTdEWlgYbgqpFIoCaHMvCn8ScHg8L+FoQqz6odyce4ajh0
+ln/7Jit0/dR8v723rReuGmoIO06BYW0tiQKl6bvRxKHSl4cy/RmR9BLrpYl/pxOu
+nSTtBnRQDwwztHHLHkMD0f0lLEgWm3suAKpX0prvyoqv8oCQhfzuICZiu0a6UK4W
+Sw20fPR4Pd+YzCcEv4fnVtXIKX7lxGZbuVzDGI4BQvc45LAJvC7mC15E7H4zmU6p
+RIKkCFtwBYj43WBn3om/EKLR/V9RBRELbYxkf0yDoeSLTM0/I7YJZ1YGxMeYf8tc
+nlbhctgt54K2kXUVhMBccYGkOnnDYZP/+satszADlSe7UjniOAKrMHAj6B735Wat
+yNuEH9mP1Dwvhb8X6KaGp3EuR07rPBRuREP3rmjIz+YyjMpn8mcZXC/HgG/X8x8d
+mihb0A/9jrSoDwXYTnZkaZC5P7iRZXlVjUNvRcdsSobbkT61ppi3/d8iDxEdvEpV
+cTsNmtgIVCtRr84EUGwD
+=7aYS
+-----END PGP SIGNATURE-----
+
+--------------enigDF6626DA648D796A99752D01--
