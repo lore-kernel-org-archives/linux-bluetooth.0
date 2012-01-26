@@ -1,75 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <99409C1CA8BB44AA991976C2B7B4BA6C@freqoneremote>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
-	"Dave Zielinski" <DZielinski@righthandtech.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-References: <69FA8BA3444DD443841AF768F2F6C65A01611E9B3C9D@SERVER2.righthandtech.local> <CABBYNZJ2wAebT-J7x_i72t3p2iQG5VgmrD_+tVEHYh2O2FN+Uw@mail.gmail.com>
-In-Reply-To: <CABBYNZJ2wAebT-J7x_i72t3p2iQG5VgmrD_+tVEHYh2O2FN+Uw@mail.gmail.com>
-Subject: Re: AVRCP Use Question
-Date: Thu, 26 Jan 2012 07:29:27 -0600
+Date: Thu, 26 Jan 2012 15:20:20 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Subject: Re: [RFC 11/22] Bluetooth: Use RCU to manipulate chan_list
+Message-ID: <20120126132019.GC3300@aemeltch-MOBL1>
+References: <1324157382-1815-3-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-4-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-5-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-6-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-7-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-8-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-9-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-10-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-11-git-send-email-padovan@profusion.mobi>
+ <1324157382-1815-12-git-send-email-padovan@profusion.mobi>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1324157382-1815-12-git-send-email-padovan@profusion.mobi>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello "other Dave" and Luiz,
+Hi Gustavo,
 
-+++++
+On Sat, Dec 17, 2011 at 07:29:31PM -0200, Gustavo F. Padovan wrote:
+> From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+> 
+> Instead of using tasklet_disable() to prevent acess to the channel use, we
+> can use RCU and improve the performance of our code.
+> 
+> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+...
+> @@ -986,10 +984,10 @@ int hci_chan_del(struct hci_chan *chan)
+>  
+>  void hci_chan_list_flush(struct hci_conn *conn)
+>  {
+> -	struct hci_chan *chan, *tmp;
+> +	struct hci_chan *chan;
+>  
+>  	BT_DBG("conn %p", conn);
+>  
+> -	list_for_each_entry_safe(chan, tmp, &conn->chan_list, list)
+> +	list_for_each_entry_rcu(chan, &conn->chan_list, list)
+>  		hci_chan_del(chan);
+>  }
 
-Hi Dave,
+I feel that this code is not exactly correct. hci_chan_del frees chan:
 
-On Wed, Jan 25, 2012 at 7:59 PM, Dave Zielinski
-<DZielinski@righthandtech.com> wrote:
-> Hi all,
->   I'm trying to set up a system running bluez that will essentially be a 
-> "headset" for a device playing audio (cellphone).   So far I've been 
-> successful able to get the audio stream aspect (A2DP) of it working and 
-> now I'm trying to add some AVRCP 1.0 control (play, pause, fwd, rev). 
-> Looking through some of the git logs, I'm seeing that some of this control 
-> was added a long before the version I'm using, which is 4.96, but I'm 
-> having a rough time figure out where/what the interface is.
->
-> My best guess at this point is that it can be accessed via the "uinput" 
-> driver however the only example that I'm seeing is where evtest is used to 
-> listen for events coming from headset for example.  This is actually 
-> opposite of what I'm doing.  The device running bluez is the "headset" and 
-> I want to sent the commands to the device playing audio.
->
-> Can anyone confirm this AVRCP 1.0 "uinput" interface from 4.96 is 
-> "uni-directional" and will not do what I need?
->
-> In digging around I see that there was dbus controls added after the 4.96 
-> tag that implements org.bluez.Control.ChangePlayback.  I would just try 
-> this but upgrading is not going to be trivial on my system it seems.
->
-> Can anyone tell me if I'm on the right track or provide any hints?
+<------8<--------------------------------------------------------
+|  int hci_chan_del(struct hci_chan *chan)
+|  {
+|          struct hci_conn *conn = chan->conn;
+|          struct hci_dev *hdev = conn->hdev;
+|
+|          BT_DBG("%s conn %p chan %p", hdev->name, conn, chan);
+|
+|          list_del_rcu(&chan->list);
+|
+|          synchronize_rcu();
+|
+|          skb_queue_purge(&chan->data_q);
+|          kfree(chan);
+|
+|          return 0;
+|  }
+<------8<--------------------------------------------------------
 
-Currently there is no API to send those AVRCP commands, and yes uinput
-does not support sending events, perhaps we can add such API to
-org.bluez.Control, create another interface e.g. RemoteControl, or
-somehow capture events from a input device. Iirc one of the problem of
-doing this over D-Bus is the emulation of press/release events.
+and then list_for_each_entry_rcu references chan->member.next which is not
+safe ;)
 
-+++++
+I've sent patch reverting this change.
 
-Months ago I submitted code that implemented a signal for remote device 
-commands and passthroughs, but that was rejected in favor of continuing with 
-uinput.
-
-Should we revisit this?
-
-David Stockwell
-
-+++++
--- 
-Luiz Augusto von Dentz
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
-in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html 
-
+Best regards 
+Andrei Emeltchenko 
