@@ -1,53 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1327531949-29463-6-git-send-email-andre.guedes@openbossa.org>
-References: <1327531949-29463-1-git-send-email-andre.guedes@openbossa.org>
-	<1327531949-29463-6-git-send-email-andre.guedes@openbossa.org>
-Date: Thu, 26 Jan 2012 08:55:14 -0400
-Message-ID: <CAJdJm_MWBg4rOnmXi5CAO5cC9hJ0Twzih=x2Bd-QvmjNH=WpdA@mail.gmail.com>
-Subject: Re: [PATCH v3 5/6] Bluetooth: MGMT start discovery LE-Only support
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+In-Reply-To: <69FA8BA3444DD443841AF768F2F6C65A01611E9B3C9D@SERVER2.righthandtech.local>
+References: <69FA8BA3444DD443841AF768F2F6C65A01611E9B3C9D@SERVER2.righthandtech.local>
+Date: Thu, 26 Jan 2012 14:25:31 +0200
+Message-ID: <CABBYNZJ2wAebT-J7x_i72t3p2iQG5VgmrD_+tVEHYh2O2FN+Uw@mail.gmail.com>
+Subject: Re: AVRCP Use Question
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Dave Zielinski <DZielinski@righthandtech.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Dave,
 
-On Wed, Jan 25, 2012 at 6:52 PM, Andre Guedes
-<andre.guedes@openbossa.org> wrote:
-> - =A0 =A0 =A0 err =3D hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
-> + =A0 =A0 =A0 if (test_bit(MGMT_ADDR_BREDR, &discov_type))
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D hci_do_inquiry(hdev, INQUIRY_LEN_BR=
-EDR);
-> + =A0 =A0 =A0 else if (test_bit(MGMT_ADDR_LE_PUBLIC, &discov_type) &&
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 test_bit(MG=
-MT_ADDR_LE_RANDOM, &discov_type))
-
-Should it be "||" in the line above?
-
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D hci_le_scan(hdev, LE_SCAN_TYPE, LE_=
-SCAN_INT,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 LE_SCAN_WIN, LE_SCAN_TIMEOUT_LE_ONLY);
-> + =A0 =A0 =A0 else
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D -EINVAL;
-> +
-> =A0 =A0 =A0 =A0if (err < 0)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mgmt_pending_remove(cmd);
-> =A0 =A0 =A0 =A0else
-> --
-> 1.7.8.4
+On Wed, Jan 25, 2012 at 7:59 PM, Dave Zielinski
+<DZielinski@righthandtech.com> wrote:
+> Hi all,
+>   I'm trying to set up a system running bluez that will essentially be a "headset" for a device playing audio (cellphone).   So far I've been successful able to get the audio stream aspect (A2DP) of it working and now I'm trying to add some AVRCP 1.0 control (play, pause, fwd, rev).   Looking through some of the git logs, I'm seeing that some of this control was added a long before the version I'm using, which is 4.96, but I'm having a rough time figure out where/what the interface is.
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+> My best guess at this point is that it can be accessed via the "uinput" driver however the only example that I'm seeing is where evtest is used to listen for events coming from headset for example.  This is actually opposite of what I'm doing.  The device running bluez is the "headset" and I want to sent the commands to the device playing audio.
+>
+> Can anyone confirm this AVRCP 1.0 "uinput" interface from 4.96 is "uni-directional" and will not do what I need?
+>
+> In digging around I see that there was dbus controls added after the 4.96 tag that implements org.bluez.Control.ChangePlayback.  I would just try this but upgrading is not going to be trivial on my system it seems.
+>
+> Can anyone tell me if I'm on the right track or provide any hints?
 
+Currently there is no API to send those AVRCP commands, and yes uinput
+does not support sending events, perhaps we can add such API to
+org.bluez.Control, create another interface e.g. RemoteControl, or
+somehow capture events from a input device. Iirc one of the problem of
+doing this over D-Bus is the emulation of press/release events.
 
-Regards,
---=20
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+-- 
+Luiz Augusto von Dentz
