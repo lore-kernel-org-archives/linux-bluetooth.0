@@ -1,145 +1,195 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 1/2] Bluetooth: Fix potential deadlock
-Date: Fri, 27 Jan 2012 19:42:02 -0300
-Message-Id: <1327704123-31313-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1327674288-894-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1327674288-894-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 27 Jan 2012 19:30:27 -0200
+Message-ID: <CAA37ikZVzpDoLfJgPQ4MfGtsoPCCp2YWviWLhcA9Wyexgmtq-g@mail.gmail.com>
+Subject: Re: [RFC Draft] Bluetooth: Change socket lock to l2cap_chan lock
+From: Ulisses Furquim <ulisses@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We don't need to use the _sync variant in hci_conn_hold and
-hci_conn_put to cancel conn->disc_work delayed work. This way
-we avoid potential deadlocks like this one reported by lockdep.
+Hi Andrei,
 
-======================================================
-[ INFO: possible circular locking dependency detected ]
-3.2.0+ #1 Not tainted
--------------------------------------------------------
-kworker/u:1/17 is trying to acquire lock:
- (&hdev->lock){+.+.+.}, at: [<ffffffffa0041155>] hci_conn_timeout+0x62/0x158 [bluetooth]
+On Fri, Jan 27, 2012 at 12:24 PM, Emeltchenko Andrei
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> +static void l2cap_state_change(struct l2cap_chan *chan, int state)
+> +{
+> +       lock_sock(chan->sk);
+> +       __l2cap_state_change(chan, state);
+> +       release_sock(chan->sk);
+> +}
 
-but task is already holding lock:
- ((&(&conn->disc_work)->work)){+.+...}, at: [<ffffffff81035751>] process_one_work+0x11a/0x2bf
+Why do we lock sock here instead of l2cap_chan? What do you want to
+chan lock protect?
 
-which lock already depends on the new lock.
+<snip>
 
-the existing dependency chain (in reverse order) is:
+> @@ -737,7 +766,8 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
+>                        L2CAP_DISCONN_REQ, sizeof(req), &req);
+>
+>        l2cap_state_change(chan, BT_DISCONN);
+> -       sk->sk_err = err;
+> +
+> +       l2cap_set_sock_err(chan, err);
+>  }
 
--> #2 ((&(&conn->disc_work)->work)){+.+...}:
-       [<ffffffff81057444>] lock_acquire+0x8a/0xa7
-       [<ffffffff81034ed1>] wait_on_work+0x3d/0xaa
-       [<ffffffff81035b54>] __cancel_work_timer+0xac/0xef
-       [<ffffffff81035ba4>] cancel_delayed_work_sync+0xd/0xf
-       [<ffffffffa00554b0>] smp_chan_create+0xde/0xe6 [bluetooth]
-       [<ffffffffa0056160>] smp_conn_security+0xa3/0x12d [bluetooth]
-       [<ffffffffa0053640>] l2cap_connect_cfm+0x237/0x2e8 [bluetooth]
-       [<ffffffffa004239c>] hci_proto_connect_cfm+0x2d/0x6f [bluetooth]
-       [<ffffffffa0046ea5>] hci_event_packet+0x29d1/0x2d60 [bluetooth]
-       [<ffffffffa003dde3>] hci_rx_work+0xd0/0x2e1 [bluetooth]
-       [<ffffffff810357af>] process_one_work+0x178/0x2bf
-       [<ffffffff81036178>] worker_thread+0xce/0x152
-       [<ffffffff81039a03>] kthread+0x95/0x9d
-       [<ffffffff812e7754>] kernel_thread_helper+0x4/0x10
+Both l2cap_state_change and l2cap_set_sock_err now grab sock lock and
+release. Maybe use the unlocked versions and add explicit lock and
+unlock around them?
 
--> #1 (slock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+...}:
-       [<ffffffff81057444>] lock_acquire+0x8a/0xa7
-       [<ffffffff812e553a>] _raw_spin_lock_bh+0x36/0x6a
-       [<ffffffff81244d56>] lock_sock_nested+0x24/0x7f
-       [<ffffffffa004d96f>] lock_sock+0xb/0xd [bluetooth]
-       [<ffffffffa0052906>] l2cap_chan_connect+0xa9/0x26f [bluetooth]
-       [<ffffffffa00545f8>] l2cap_sock_connect+0xb3/0xff [bluetooth]
-       [<ffffffff81243b48>] sys_connect+0x69/0x8a
-       [<ffffffff812e6579>] system_call_fastpath+0x16/0x1b
+>  /* ---- L2CAP connections ---- */
+> @@ -747,15 +777,13 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+>
+>        BT_DBG("conn %p", conn);
+>
+> -       rcu_read_lock();
+> -
+> -       list_for_each_entry_rcu(chan, &conn->chan_l, list) {
+> +       list_for_each_entry(chan, &conn->chan_l, list) {
+>                struct sock *sk = chan->sk;
+>
+> -               bh_lock_sock(sk);
+> +               l2cap_chan_lock(chan);
+>
+>                if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+> -                       bh_unlock_sock(sk);
+> +                       l2cap_chan_unlock(chan);
+>                        continue;
+>                }
+>
+> @@ -764,7 +792,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+>
+>                        if (!l2cap_chan_check_security(chan) ||
+>                                        !__l2cap_no_conn_pending(chan)) {
+> -                               bh_unlock_sock(sk);
+> +                               l2cap_chan_unlock(chan);
+>                                continue;
+>                        }
+>
+> @@ -774,7 +802,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+>                                /* l2cap_chan_close() calls list_del(chan)
+>                                 * so release the lock */
+>                                l2cap_chan_close(chan, ECONNRESET);
+> -                               bh_unlock_sock(sk);
+> +                               l2cap_chan_unlock(chan);
+>                                continue;
+>                        }
+>
+> @@ -794,6 +822,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+>                        rsp.dcid = cpu_to_le16(chan->scid);
+>
+>                        if (l2cap_chan_check_security(chan)) {
+> +                               lock_sock(sk);
+>                                if (bt_sk(sk)->defer_setup) {
+>                                        struct sock *parent = bt_sk(sk)->parent;
+>                                        rsp.result = cpu_to_le16(L2CAP_CR_PEND);
+> @@ -802,10 +831,11 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+>                                                parent->sk_data_ready(parent, 0);
+>
+>                                } else {
+> -                                       l2cap_state_change(chan, BT_CONFIG);
+> +                                       __l2cap_state_change(chan, BT_CONFIG);
+>                                        rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
+>                                        rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
+>                                }
+> +                               release_sock(sk);
+>                        } else {
+>                                rsp.result = cpu_to_le16(L2CAP_CR_PEND);
+>                                rsp.status = cpu_to_le16(L2CAP_CS_AUTHEN_PEND);
+> @@ -816,7 +846,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+>
+>                        if (test_bit(CONF_REQ_SENT, &chan->conf_state) ||
+>                                        rsp.result != L2CAP_CR_SUCCESS) {
+> -                               bh_unlock_sock(sk);
+> +                               l2cap_chan_unlock(chan);
+>                                continue;
+>                        }
+>
+> @@ -826,10 +856,8 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+>                        chan->num_conf_req++;
+>                }
+>
+> -               bh_unlock_sock(sk);
+> +               l2cap_chan_unlock(chan);
+>        }
+> -
+> -       rcu_read_unlock();
+>  }
 
--> #0 (&hdev->lock){+.+.+.}:
-       [<ffffffff81056d06>] __lock_acquire+0xa80/0xd74
-       [<ffffffff81057444>] lock_acquire+0x8a/0xa7
-       [<ffffffff812e3870>] __mutex_lock_common+0x48/0x38e
-       [<ffffffff812e3c75>] mutex_lock_nested+0x2a/0x31
-       [<ffffffffa0041155>] hci_conn_timeout+0x62/0x158 [bluetooth]
-       [<ffffffff810357af>] process_one_work+0x178/0x2bf
-       [<ffffffff81036178>] worker_thread+0xce/0x152
-       [<ffffffff81039a03>] kthread+0x95/0x9d
-       [<ffffffff812e7754>] kernel_thread_helper+0x4/0x10
+You are removing the RCU usage which was protecting conn->chan_l. What
+are you going to use to protect this list? The RCU usage in the case
+of conn->chan_l is missing a lock in the updaters of the list IMO,
+though.
 
-other info that might help us debug this:
+You are also changing bh_lock_sock which is a spin_lock to chan_lock
+on a mutex and that might lead to issues. IIRC Padovan left
+bh_lock_sock here so we don't sleep inside RCU reader section which
+was causing deadlocks and long delays.
 
-Chain exists of:
-  &hdev->lock --> slock-AF_BLUETOOTH-BTPROTO_L2CAP --> (&(&conn->disc_work)->work)
+<snip>
 
- Possible unsafe locking scenario:
+>                if (conn->hcon->type == LE_LINK) {
+>                        if (smp_conn_security(conn, chan->sec_level))
+>                                l2cap_chan_ready(chan);
+>
+>                } else if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+> +                       struct sock *sk = chan->sk;
+>                        __clear_chan_timer(chan);
+> -                       l2cap_state_change(chan, BT_CONNECTED);
+> +                       lock_sock(sk);
+> +                       __l2cap_state_change(chan, BT_CONNECTED);
+>                        sk->sk_state_change(sk);
+> +                       release_sock(sk);
 
-       CPU0                    CPU1
-       ----                    ----
-  lock((&(&conn->disc_work)->work));
-                               lock(slock-AF_BLUETOOTH-BTPROTO_L2CAP);
-                               lock((&(&conn->disc_work)->work));
-  lock(&hdev->lock);
+So we are grabbing l2cap_chan lock and then sock lock. Is that order
+always the same? We're using mutexes in process context so we need to
+be careful with deadlocks even on UP machines.
 
- *** DEADLOCK ***
+>                } else if (chan->state == BT_CONNECT)
+>                        l2cap_do_start(chan);
+>
+> -               bh_unlock_sock(sk);
+> +               l2cap_chan_unlock(chan);
+>        }
+>
+> -       rcu_read_unlock();
+>  }
 
-2 locks held by kworker/u:1/17:
- #0:  (hdev->name){.+.+.+}, at: [<ffffffff81035751>] process_one_work+0x11a/0x2bf
- #1:  ((&(&conn->disc_work)->work)){+.+...}, at: [<ffffffff81035751>] process_one_work+0x11a/0x2bf
+<snip>
 
-stack backtrace:
-Pid: 17, comm: kworker/u:1 Not tainted 3.2.0+ #1
-Call Trace:
- [<ffffffff812e06c6>] print_circular_bug+0x1f8/0x209
- [<ffffffff81056d06>] __lock_acquire+0xa80/0xd74
- [<ffffffff81021ef2>] ? arch_local_irq_restore+0x6/0xd
- [<ffffffff81022bc7>] ? vprintk+0x3f9/0x41e
- [<ffffffff81057444>] lock_acquire+0x8a/0xa7
- [<ffffffffa0041155>] ? hci_conn_timeout+0x62/0x158 [bluetooth]
- [<ffffffff812e3870>] __mutex_lock_common+0x48/0x38e
- [<ffffffffa0041155>] ? hci_conn_timeout+0x62/0x158 [bluetooth]
- [<ffffffff81190fd6>] ? __dynamic_pr_debug+0x6d/0x6f
- [<ffffffffa0041155>] ? hci_conn_timeout+0x62/0x158 [bluetooth]
- [<ffffffff8105320f>] ? trace_hardirqs_off+0xd/0xf
- [<ffffffff812e3c75>] mutex_lock_nested+0x2a/0x31
- [<ffffffffa0041155>] hci_conn_timeout+0x62/0x158 [bluetooth]
- [<ffffffff810357af>] process_one_work+0x178/0x2bf
- [<ffffffff81035751>] ? process_one_work+0x11a/0x2bf
- [<ffffffff81055af3>] ? lock_acquired+0x1d0/0x1df
- [<ffffffffa00410f3>] ? hci_acl_disconn+0x65/0x65 [bluetooth]
- [<ffffffff81036178>] worker_thread+0xce/0x152
- [<ffffffff810407ed>] ? finish_task_switch+0x45/0xc5
- [<ffffffff810360aa>] ? manage_workers.isra.25+0x16a/0x16a
- [<ffffffff81039a03>] kthread+0x95/0x9d
- [<ffffffff812e7754>] kernel_thread_helper+0x4/0x10
- [<ffffffff812e5db4>] ? retint_restore_args+0x13/0x13
- [<ffffffff8103996e>] ? __init_kthread_worker+0x55/0x55
- [<ffffffff812e7750>] ? gs_change+0x13/0x13
+> @@ -4517,12 +4564,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+>                __cancel_delayed_work(&conn->security_timer);
+>        }
+>
+> -       rcu_read_lock();
+> -
+> -       list_for_each_entry_rcu(chan, &conn->chan_l, list) {
+> -               struct sock *sk = chan->sk;
+> -
+> -               bh_lock_sock(sk);
+> +       list_for_each_entry(chan, &conn->chan_l, list) {
+> +               l2cap_chan_lock(chan);
+>
+>                BT_DBG("chan->scid %d", chan->scid);
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
----
- include/net/bluetooth/hci_core.h |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+Again removing RCU protecting conn->chan_l. There are other places
+where you are removing reader side protection of conn->chan_l, so
+please take a look at what you are going to do.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 25f449f..896d9e4 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -572,7 +572,7 @@ void hci_conn_put_device(struct hci_conn *conn);
- static inline void hci_conn_hold(struct hci_conn *conn)
- {
- 	atomic_inc(&conn->refcnt);
--	cancel_delayed_work_sync(&conn->disc_work);
-+	cancel_delayed_work(&conn->disc_work);
- }
- 
- static inline void hci_conn_put(struct hci_conn *conn)
-@@ -591,7 +591,7 @@ static inline void hci_conn_put(struct hci_conn *conn)
- 		} else {
- 			timeo = msecs_to_jiffies(10);
- 		}
--		cancel_delayed_work_sync(&conn->disc_work);
-+		cancel_delayed_work(&conn->disc_work);
- 		queue_delayed_work(conn->hdev->workqueue,
- 					&conn->disc_work, timeo);
- 	}
+<snip>
+
+Well, I had just a quick look. Have you done some testing with this?
+How was it? Maybe running PTS against it would be good.
+
+Best regards,
+
 -- 
-1.7.8.4
-
+Ulisses Furquim
+ProFUSION embedded systems
+http://profusion.mobi
+Mobile: +55 19 9250 0942
+Skype: ulissesffs
