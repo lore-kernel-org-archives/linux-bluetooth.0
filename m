@@ -1,25 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 27 Jan 2012 12:50:13 +0200
+Date: Fri, 27 Jan 2012 12:31:41 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [PATCH obexd] client: fix possible glib assertion failure
-Message-ID: <20120127105013.GA25201@x220>
-References: <1327592024-1644-1-git-send-email-mikel.astiz.oss@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] audio: fix not disabling local a2dp endpoints when
+ unix socket is disabled
+Message-ID: <20120127103141.GA24338@x220>
+References: <1327613942-23745-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1327592024-1644-1-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1327613942-23745-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Luiz,
 
-On Thu, Jan 26, 2012, Mikel Astiz wrote:
-> In case of error there might be no io channel to shutdown.
+On Thu, Jan 26, 2012, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> Local endpoints can only be used when unix socket API is available
 > ---
->  client/bluetooth.c |    8 +++++---
->  1 files changed, 5 insertions(+), 3 deletions(-)
+>  audio/a2dp.c |   15 +++++++--------
+>  1 files changed, 7 insertions(+), 8 deletions(-)
 
 Applied. Thanks.
 
