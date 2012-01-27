@@ -4,177 +4,47 @@ To: linux-bluetooth@vger.kernel.org
 Cc: johan.hedberg@gmail.com,
 	marcel@holtmann.org,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 1/4] Bluetooth: Introduce to_hci_dev()
-Date: Fri, 27 Jan 2012 16:47:23 +0100
-Message-Id: <1327679246-2667-2-git-send-email-dh.herrmann@googlemail.com>
-In-Reply-To: <1327679246-2667-1-git-send-email-dh.herrmann@googlemail.com>
-References: <1327679246-2667-1-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 0/4] Integrate better device support
+Date: Fri, 27 Jan 2012 16:47:22 +0100
+Message-Id: <1327679246-2667-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We currently use dev_set_drvdata to keep a pointer to ourself. This
-doesn't make sense as we are the bus and not a driver. Therefore,
-introduce to_hci_dev() so we can get a struct hci_dev pointer from a
-struct device pointer.
+Hi
 
-dev_set/get_drvdata() is reserved for drivers that provide a device and
-not for the bus using the device. The bus can use simple pointer
-arithmetic to retrieve its private data.
+"struct device" provides a drvdata-field that we should use properly to save
+_driver-data_. This series makes the hci-core use pointer-arithmetic to avoid
+using this field in the bus-core and instead converts the drivers to use the
+drvdata field.
+This also reduces the hci_dev structure by 4/8 bytes, yeah.
 
-Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
----
- include/net/bluetooth/hci_core.h |    2 ++
- net/bluetooth/hci_sysfs.c        |   33 ++++++++++++++++-----------------
- 2 files changed, 18 insertions(+), 17 deletions(-)
+This behavior is very common and I tried to stick to naming-conventions. See the
+usb-bus or input-bus for other examples.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 25f449f..01fdd2c 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -612,6 +612,8 @@ static inline struct hci_dev *hci_dev_hold(struct hci_dev *d)
- #define hci_dev_lock(d)		mutex_lock(&d->lock)
- #define hci_dev_unlock(d)	mutex_unlock(&d->lock)
- 
-+#define to_hci_dev(d) container_of(d, struct hci_dev, dev)
-+
- struct hci_dev *hci_dev_get(int index);
- struct hci_dev *hci_get_route(bdaddr_t *src, bdaddr_t *dst);
- 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index ec03ee2..2a0243a 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -189,19 +189,19 @@ static inline char *host_typetostr(int type)
- 
- static ssize_t show_bus(struct device *dev, struct device_attribute *attr, char *buf)
- {
--	struct hci_dev *hdev = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = to_hci_dev(dev);
- 	return sprintf(buf, "%s\n", host_bustostr(hdev->bus));
- }
- 
- static ssize_t show_type(struct device *dev, struct device_attribute *attr, char *buf)
- {
--	struct hci_dev *hdev = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = to_hci_dev(dev);
- 	return sprintf(buf, "%s\n", host_typetostr(hdev->dev_type));
- }
- 
- static ssize_t show_name(struct device *dev, struct device_attribute *attr, char *buf)
- {
--	struct hci_dev *hdev = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = to_hci_dev(dev);
- 	char name[HCI_MAX_NAME_LENGTH + 1];
- 	int i;
- 
-@@ -214,20 +214,20 @@ static ssize_t show_name(struct device *dev, struct device_attribute *attr, char
- 
- static ssize_t show_class(struct device *dev, struct device_attribute *attr, char *buf)
- {
--	struct hci_dev *hdev = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = to_hci_dev(dev);
- 	return sprintf(buf, "0x%.2x%.2x%.2x\n",
- 			hdev->dev_class[2], hdev->dev_class[1], hdev->dev_class[0]);
- }
- 
- static ssize_t show_address(struct device *dev, struct device_attribute *attr, char *buf)
- {
--	struct hci_dev *hdev = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = to_hci_dev(dev);
- 	return sprintf(buf, "%s\n", batostr(&hdev->bdaddr));
- }
- 
- static ssize_t show_features(struct device *dev, struct device_attribute *attr, char *buf)
- {
--	struct hci_dev *hdev = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = to_hci_dev(dev);
- 
- 	return sprintf(buf, "0x%02x%02x%02x%02x%02x%02x%02x%02x\n",
- 				hdev->features[0], hdev->features[1],
-@@ -238,31 +238,31 @@ static ssize_t show_features(struct device *dev, struct device_attribute *attr,
- 
- static ssize_t show_manufacturer(struct device *dev, struct device_attribute *attr, char *buf)
- {
--	struct hci_dev *hdev = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = to_hci_dev(dev);
- 	return sprintf(buf, "%d\n", hdev->manufacturer);
- }
- 
- static ssize_t show_hci_version(struct device *dev, struct device_attribute *attr, char *buf)
- {
--	struct hci_dev *hdev = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = to_hci_dev(dev);
- 	return sprintf(buf, "%d\n", hdev->hci_ver);
- }
- 
- static ssize_t show_hci_revision(struct device *dev, struct device_attribute *attr, char *buf)
- {
--	struct hci_dev *hdev = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = to_hci_dev(dev);
- 	return sprintf(buf, "%d\n", hdev->hci_rev);
- }
- 
- static ssize_t show_idle_timeout(struct device *dev, struct device_attribute *attr, char *buf)
- {
--	struct hci_dev *hdev = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = to_hci_dev(dev);
- 	return sprintf(buf, "%d\n", hdev->idle_timeout);
- }
- 
- static ssize_t store_idle_timeout(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
- {
--	struct hci_dev *hdev = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = to_hci_dev(dev);
- 	unsigned int val;
- 	int rv;
- 
-@@ -280,13 +280,13 @@ static ssize_t store_idle_timeout(struct device *dev, struct device_attribute *a
- 
- static ssize_t show_sniff_max_interval(struct device *dev, struct device_attribute *attr, char *buf)
- {
--	struct hci_dev *hdev = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = to_hci_dev(dev);
- 	return sprintf(buf, "%d\n", hdev->sniff_max_interval);
- }
- 
- static ssize_t store_sniff_max_interval(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
- {
--	struct hci_dev *hdev = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = to_hci_dev(dev);
- 	u16 val;
- 	int rv;
- 
-@@ -304,13 +304,13 @@ static ssize_t store_sniff_max_interval(struct device *dev, struct device_attrib
- 
- static ssize_t show_sniff_min_interval(struct device *dev, struct device_attribute *attr, char *buf)
- {
--	struct hci_dev *hdev = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = to_hci_dev(dev);
- 	return sprintf(buf, "%d\n", hdev->sniff_min_interval);
- }
- 
- static ssize_t store_sniff_min_interval(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
- {
--	struct hci_dev *hdev = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = to_hci_dev(dev);
- 	u16 val;
- 	int rv;
- 
-@@ -370,7 +370,7 @@ static const struct attribute_group *bt_host_groups[] = {
- 
- static void bt_host_release(struct device *dev)
- {
--	void *data = dev_get_drvdata(dev);
-+	void *data = to_hci_dev(dev);
- 	kfree(data);
- 	module_put(THIS_MODULE);
- }
-@@ -525,7 +525,6 @@ void hci_init_sysfs(struct hci_dev *hdev)
- 	dev->class = bt_class;
- 
- 	__module_get(THIS_MODULE);
--	dev_set_drvdata(dev, hdev);
- 	device_initialize(dev);
- }
- 
+Regards
+David
+
+David Herrmann (4):
+  Bluetooth: Introduce to_hci_dev()
+  Bluetooth: Remove hci_dev->driver_data
+  Bluetooth: Introduce to_hci_conn
+  Bluetooth: Use proper datatypes in release-callbacks
+
+ drivers/bluetooth/bfusb.c          |   10 ++++----
+ drivers/bluetooth/bluecard_cs.c    |   12 ++++----
+ drivers/bluetooth/bpa10x.c         |   18 +++++++-------
+ drivers/bluetooth/bt3c_cs.c        |    6 ++--
+ drivers/bluetooth/btmrvl_debugfs.c |   26 +++++++++----------
+ drivers/bluetooth/btmrvl_main.c    |   10 ++++----
+ drivers/bluetooth/btsdio.c         |   10 ++++----
+ drivers/bluetooth/btuart_cs.c      |    6 ++--
+ drivers/bluetooth/btusb.c          |   28 ++++++++++----------
+ drivers/bluetooth/btwilink.c       |    8 +++---
+ drivers/bluetooth/dtl1_cs.c        |    6 ++--
+ drivers/bluetooth/hci_ldisc.c      |    6 ++--
+ drivers/bluetooth/hci_vhci.c       |    8 +++---
+ include/net/bluetooth/hci_core.h   |   14 ++++++++++-
+ net/bluetooth/hci_sysfs.c          |   47 ++++++++++++++++-------------------
+ 15 files changed, 111 insertions(+), 104 deletions(-)
+
 -- 
 1.7.8.4
