@@ -1,48 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: "James M. Leddy" <james.leddy@canonical.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	"James M. Leddy" <james.leddy@canonical.com>
-Subject: [PATCH] Bluetooth: Add support for BCM20702A0 [0a5c:21e6]
-Date: Fri, 27 Jan 2012 16:10:06 -0500
-Message-Id: <1327698606-12503-1-git-send-email-james.leddy@canonical.com>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [RFC BlueZ v0 2/2] Add Alert Notification API
+Date: Fri, 27 Jan 2012 18:10:29 -0300
+Message-Id: <1327698629-11104-3-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1327698629-11104-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1327698629-11104-1-git-send-email-claudio.takahasi@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "James M. Leddy" <james.leddy@canonical.com>
-
-Add another vendor specific ID for BCM20702A0. This has 
-been tested and works on hardware with this device.
-
-output of usb-devices:
-T: Bus=01 Lev=02 Prnt=02 Port=03 Cnt=04 Dev#= 6 Spd=12 MxCh= 0
-D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-P: Vendor=0a5c ProdID=21e6 Rev=01.12
-S: Manufacturer=Broadcom Corp
-S: Product=BCM20702A0
-S: SerialNumber=D0DF9AFB227B
-C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-
-Signed-off-by: James M. Leddy <james.leddy@canonical.com>
+Generic API to access platform notifications. Maps one or a group of
+commands defined in the Alert Notification Profile to methods and
+signals implemented by the agent.
 ---
- drivers/bluetooth/btusb.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ doc/alert-api.txt |   54 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 files changed, 51 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f00f596..e618cf1 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -102,6 +102,7 @@ static struct usb_device_id btusb_table[] = {
+diff --git a/doc/alert-api.txt b/doc/alert-api.txt
+index 3fd2487..037141a 100644
+--- a/doc/alert-api.txt
++++ b/doc/alert-api.txt
+@@ -12,10 +12,10 @@ Service		org.bluez
+ Interface	org.bluez.Alert
+ Object path	[variable prefix]/{hci0,hci1,...}
  
- 	/* Broadcom BCM20702A0 */
- 	{ USB_DEVICE(0x0a5c, 0x21e3) },
-+	{ USB_DEVICE(0x0a5c, 0x21e6) },
- 	{ USB_DEVICE(0x413c, 0x8197) },
+-Methods		void RegisterAgent(object agent)
++Methods		void RegisterAgent(object agent, string uuid)
  
- 	{ }	/* Terminating entry */
+-			Register a Phone Alert agent responsible
+-			for interact with the platform's ringer.
++			Register a Phone Alert or Alert Notification agent
++			responsible for interact with the platform's ringer.
+ 
+ 			Possible Errors: org.bluez.Error.AlreadyExists
+ 
+@@ -77,3 +77,51 @@ Properties	uint8 RingerMode [readwrite]
+ 
+ 			Current value of platform's alert status. Exposes
+ 			Ringer, Vibrator and Display current states.
++
++
++Alert Notification Agent hierarchy
++==================================
++
++Service		unique name
++Interface	org.bluez.AlertNotificationAgent
++Object path	freely definable
++
++Generic API to control and expose platform alerts.
++
++Methods 	dict GetProperties()
++
++			Returns all properties for the agent. See the
++			properties section for available properties.
++
++			Possible Errors: org.bluez.Error.DoesNotExist
++					 org.bluez.Error.InvalidArguments
++
++
++Signals		PropertyChanged(string name, variant value)
++
++			This signal indicates a changed value of the given
++			property.
++
++		NewAlert(uint8 category, uint16 count, string last)
++
++			Signal sent from the platform/agent indicating the
++			amount of new alerts not acknowledged by the user.
++			"last" is implementation specific field to represent
++			the subject, sender or any other content related to
++			the alert(s).
++
++		UnreadAlert(uint8 category, uint16 count)
++
++			Signal sent from the platform/agent indicating the
++			amount of unread alerts not acknowledged by the user.
++
++
++Properties	uint16 SupportedNewAlerts[readOnly]
++
++			Represents supported New Alert Category in the
++			platform.
++
++		uint16 SupportedUnreadAlerts[readOnly]
++
++			Represents Alert Category ID Bit Mask for supported
++			unread alert category in the platform.
 -- 
-1.7.5.4
+1.7.8.1
+
