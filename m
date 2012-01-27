@@ -1,21 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F2316C7.9030202@canonical.com>
-Date: Fri, 27 Jan 2012 16:27:35 -0500
 From: "James M. Leddy" <james.leddy@canonical.com>
-MIME-Version: 1.0
-To: Andres Cimmarusti <acimmarusti@gmail.com>
-CC: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jonathan Nieder <jrnieder@gmail.com>, 641749@bugs.debian.org,
-	info@linuxcertified.com
-Subject: Re: firmware loading failure for AR3011 (0cf3:3000 or 0cf3:3005 ?)
-References: <CAH=dYrHhttmRjkVuo9QvJ5_Uqd+BJGCJJkaMw8153RW1SFv9dA@mail.gmail.com>
-In-Reply-To: <CAH=dYrHhttmRjkVuo9QvJ5_Uqd+BJGCJJkaMw8153RW1SFv9dA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-kernel-owner@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	"James M. Leddy" <james.leddy@canonical.com>
+Subject: [PATCH] Bluetooth: Add support for BCM20702A0 [0a5c:21e6]
+Date: Fri, 27 Jan 2012 16:10:06 -0500
+Message-Id: <1327698606-12503-1-git-send-email-james.leddy@canonical.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 12/28/2011 11:50 AM, Andres Cimmarusti wrote:
-> Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=641749
-> Fedora: https://bugzilla.redhat.com/show_bug.cgi?id=702375
+From: "James M. Leddy" <james.leddy@canonical.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=27402 too
+Add another vendor specific ID for BCM20702A0. This has 
+been tested and works on hardware with this device.
+
+output of usb-devices:
+T: Bus=01 Lev=02 Prnt=02 Port=03 Cnt=04 Dev#= 6 Spd=12 MxCh= 0
+D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+P: Vendor=0a5c ProdID=21e6 Rev=01.12
+S: Manufacturer=Broadcom Corp
+S: Product=BCM20702A0
+S: SerialNumber=D0DF9AFB227B
+C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+
+Signed-off-by: James M. Leddy <james.leddy@canonical.com>
+---
+ drivers/bluetooth/btusb.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f00f596..e618cf1 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -102,6 +102,7 @@ static struct usb_device_id btusb_table[] = {
+ 
+ 	/* Broadcom BCM20702A0 */
+ 	{ USB_DEVICE(0x0a5c, 0x21e3) },
++	{ USB_DEVICE(0x0a5c, 0x21e6) },
+ 	{ USB_DEVICE(0x413c, 0x8197) },
+ 
+ 	{ }	/* Terminating entry */
+-- 
+1.7.5.4
