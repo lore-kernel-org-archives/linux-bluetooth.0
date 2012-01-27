@@ -1,24 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 28 Jan 2012 21:12:02 +0100
-From: Tino Keitel <tino.keitel@tikei.de>
+From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: C++ build failure in recent bluez headers
-Message-ID: <20120128201202.GA8510@x61.home>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH 2/2] Bluetooth: Remove unneeded locking
+Date: Fri, 27 Jan 2012 19:42:03 -0300
+Message-Id: <1327704123-31313-2-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1327704123-31313-1-git-send-email-andre.guedes@openbossa.org>
+References: <1327704123-31313-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+We don't need locking hdev in hci_conn_timeout() since it doesn't
+access any hdev's shared resources, it basically queues HCI commands.
 
-is there an accepted patch for the build failure in recent Bluez
-headers with C++ applications? This issue was brought up by Patrick
-Ohly in the thread "bluez 4.97: build failure when used in C++ apps".
-It seems to me that the patch suggested by Patrick did not receive a
-final comment so far.
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ net/bluetooth/hci_conn.c |    5 -----
+ 1 files changed, 0 insertions(+), 5 deletions(-)
 
-Currently I can't fix Syncevolution bugs for Debian because building
-Syncevolution will fail due to broken Bluez headers.
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index eae7a53..8ec6fb6 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -280,7 +280,6 @@ static void hci_conn_timeout(struct work_struct *work)
+ {
+ 	struct hci_conn *conn = container_of(work, struct hci_conn,
+ 							disc_work.work);
+-	struct hci_dev *hdev = conn->hdev;
+ 	__u8 reason;
+ 
+ 	BT_DBG("conn %p state %d", conn, conn->state);
+@@ -288,8 +287,6 @@ static void hci_conn_timeout(struct work_struct *work)
+ 	if (atomic_read(&conn->refcnt))
+ 		return;
+ 
+-	hci_dev_lock(hdev);
+-
+ 	switch (conn->state) {
+ 	case BT_CONNECT:
+ 	case BT_CONNECT2:
+@@ -309,8 +306,6 @@ static void hci_conn_timeout(struct work_struct *work)
+ 		conn->state = BT_CLOSED;
+ 		break;
+ 	}
+-
+-	hci_dev_unlock(hdev);
+ }
+ 
+ /* Enter sniff mode */
+-- 
+1.7.8.4
 
-Regards,
-Tino
