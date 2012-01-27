@@ -1,304 +1,869 @@
 Return-Path: <cyrus@holtmann.org>
-From: Octavian Purdila <octavian.purdila@intel.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Octavian Purdila <octavian.purdila@intel.com>,
-	Gopala Krishna Murala <gopala.krishna.murala@intel.com>,
-	Nick Pelly <npelly@google.com>,
-	=?UTF-8?q?Luk=C3=A1=C5=A1=20Turek?= <8an@praha12.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH v2] Bluetooth: fix RFCOMM session reference counting issue
-Date: Fri, 27 Jan 2012 19:32:39 +0200
-Message-Id: <1327685559-4351-1-git-send-email-octavian.purdila@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: [RFC Draft] Bluetooth: Change socket lock to l2cap_chan lock
+Date: Fri, 27 Jan 2012 16:24:48 +0200
+Message-Id: <1327674288-894-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is an imbalance in the rfcomm_session_hold / rfcomm_session_put
-operations which causes the following crash:
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-[  685.010159] BUG: unable to handle kernel paging request at 6b6b6b6b
-[  685.010169] IP: [<c149d76d>] rfcomm_process_dlcs+0x1b/0x15e
-[  685.010181] *pdpt = 000000002d665001 *pde = 0000000000000000
-[  685.010191] Oops: 0000 [#1] PREEMPT SMP
-[  685.010247]
-[  685.010255] Pid: 947, comm: krfcommd Tainted: G         C  3.0.16-mid8-dirty #44
-[  685.010266] EIP: 0060:[<c149d76d>] EFLAGS: 00010246 CPU: 1
-[  685.010274] EIP is at rfcomm_process_dlcs+0x1b/0x15e
-[  685.010281] EAX: e79f551c EBX: 6b6b6b6b ECX: 00000007 EDX: e79f40b4
-[  685.010288] ESI: e79f4060 EDI: ed4e1f70 EBP: ed4e1f68 ESP: ed4e1f50
-[  685.010295]  DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
-[  685.010303] Process krfcommd (pid: 947, ti=ed4e0000 task=ed43e5e0 task.ti=ed4e0000)
-[  685.010308] Stack:
-[  685.010312]  ed4e1f68 c149eb53 e5925150 e79f4060 ed500000 ed4e1f70 ed4e1f80 c149ec10
-[  685.010331]  00000000 ed43e5e0 00000000 ed4e1f90 ed4e1f9c c149ec87 0000bf54 00000000
-[  685.010348]  00000000 ee03bf54 c149ec37 ed4e1fe4 c104fe01 00000000 00000000 00000000
-[  685.010367] Call Trace:
-[  685.010376]  [<c149eb53>] ? rfcomm_process_rx+0x6e/0x74
-[  685.010387]  [<c149ec10>] rfcomm_process_sessions+0xb7/0xde
-[  685.010398]  [<c149ec87>] rfcomm_run+0x50/0x6d
-[  685.010409]  [<c149ec37>] ? rfcomm_process_sessions+0xde/0xde
-[  685.010419]  [<c104fe01>] kthread+0x63/0x68
-[  685.010431]  [<c104fd9e>] ? __init_kthread_worker+0x42/0x42
-[  685.010442]  [<c14dae82>] kernel_thread_helper+0x6/0xd
+L2CAP operation use socket locks for mutual exclusions since all
+upper layers protocols used to use kernel sockets. When we want
+to remove kernel sockets and use l2cap functions we need to change
+socket locking to l2cap_chan locking.
 
-This issue has been brought up earlier here:
+This is draft proposal for new locking for l2cap channels.
 
-https://lkml.org/lkml/2011/5/21/127
-
-The issue appears to be the rfcomm_session_put in rfcomm_recv_ua. This
-operation doesn't seem be to required as for the non-initiator case we
-have the rfcomm_process_rx doing an explicit put and in the initiator
-case the last dlc_unlink will drive the reference counter to 0.
-
-There have been several attempts to fix these issue:
-
-6c2718d Bluetooth: Do not call rfcomm_session_put() for RFCOMM UA on closed socket
-683d949 Bluetooth: Never deallocate a session when some DLC points to it
-
-but AFAICS they do not fix the issue just make it harder to reproduce.
-
-Signed-off-by: Octavian Purdila <octavian.purdila@intel.com>
-Signed-off-by: Gopala Krishna Murala <gopala.krishna.murala@intel.com>
-
-CC: Nick Pelly <npelly@google.com>
-CC: Lukáš Turek <8an@praha12.net>
-CC: Marcel Holtmann <marcel@holtmann.org>
-CC: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
+ include/net/bluetooth/l2cap.h |   11 ++
+ net/bluetooth/l2cap_core.c    |  245 ++++++++++++++++++++++++-----------------
+ net/bluetooth/l2cap_sock.c    |   13 ++-
+ 3 files changed, 168 insertions(+), 101 deletions(-)
 
-Changes from v1:
-* remove the gerrit Change-Id tag from the commit message
-* rephrase the comment for clarity and fix a few spelling errors
-
-Here is a full log of the hold/put operations which leads to the
-crash, where the x in hold(x) / put(x) is the reference counter value
-for the session before the hold/put operation:
-
-[   75.332972] rfcomm_session_del: bt dump ed3cc580
-[   75.332991] hold(0) 0xc149d3f2 rfcomm_accept_connection+0x65/0x99
-[   75.333042] hold(0) 0xc149eb92 rfcomm_process_sessions+0x91/0xde
-[   75.333074] hold(0) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.333101] hold(0) 0xc104fe01 kthread+0x63/0x68
-[   75.333134] hold(0) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.333166] 
-[   75.333179] hold(1) 0xc149eb9b rfcomm_process_sessions+0x9a/0xde
-[   75.333210] hold(1) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.333238] hold(1) 0xc104fe01 kthread+0x63/0x68
-[   75.333266] hold(1) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.333293] 
-[   75.333306] put(2) 0xc149ebbf rfcomm_process_sessions+0xbe/0xde
-[   75.333336] put(2) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.333363] put(2) 0xc104fe01 kthread+0x63/0x68
-[   75.333392] put(2) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.333419] 
-[   75.333432] hold(1) 0xc149eb9b rfcomm_process_sessions+0x9a/0xde
-[   75.333461] hold(1) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.333489] hold(1) 0xc104fe01 kthread+0x63/0x68
-[   75.333517] hold(1) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.333544] 
-[   75.333558] put(2) 0xc149ebbf rfcomm_process_sessions+0xbe/0xde
-[   75.333587] put(2) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.333615] put(2) 0xc104fe01 kthread+0x63/0x68
-[   75.333643] put(2) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.333671] 
-[   75.333683] hold(1) 0xc149eb9b rfcomm_process_sessions+0x9a/0xde
-[   75.333713] hold(1) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.333741] hold(1) 0xc104fe01 kthread+0x63/0x68
-[   75.333769] hold(1) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.333796] 
-[   75.333808] hold(2) 0xc149dc9f rfcomm_dlc_link+0xe/0x36
-[   75.333837] hold(2) 0xc149e361 rfcomm_recv_mcc+0x279/0x5f7
-[   75.333866] hold(2) 0xc149ea64 rfcomm_recv_frame+0x385/0x3ae
-[   75.333959] hold(2) 0xc149eacc rfcomm_process_rx+0x3f/0x74
-[   75.333988] hold(2) 0xc149ebb1 rfcomm_process_sessions+0xb0/0xde
-[   75.334018] hold(2) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.334045] hold(2) 0xc104fe01 kthread+0x63/0x68
-[   75.334074] hold(2) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.334102] 
-[   75.334115] put(3) 0xc149ebbf rfcomm_process_sessions+0xbe/0xde
-[   75.334145] put(3) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.334173] put(3) 0xc104fe01 kthread+0x63/0x68
-[   75.334201] put(3) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.334228] 
-[   75.334241] hold(2) 0xc149eb9b rfcomm_process_sessions+0x9a/0xde
-[   75.334271] hold(2) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.334299] hold(2) 0xc104fe01 kthread+0x63/0x68
-[   75.334327] hold(2) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.334354] 
-[   75.334367] put(3) 0xc149ebbf rfcomm_process_sessions+0xbe/0xde
-[   75.334397] put(3) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.334424] put(3) 0xc104fe01 kthread+0x63/0x68
-[   75.334453] put(3) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.334480] 
-[   75.334493] hold(2) 0xc149d8e1 rfcomm_security_cfm+0x35/0x10e
-[   75.334523] hold(2) 0xc148dcb3 hci_encrypt_cfm+0x8f/0xaa
-[   75.334556] hold(2) 0xc148f900 hci_event_packet+0x34e/0x10be
-[   75.334584] hold(2) 0xc148aa06 hci_rx_task+0xab/0x205
-[   75.334615] hold(2) 0xc103bbc1 tasklet_action+0x6b/0xab
-[   75.334645] hold(2) 0xc103c2b6 __do_softirq+0xdc/0x1dd
-[   75.334670] 
-[   75.334683] put(3) 0xc149d9ac rfcomm_security_cfm+0x100/0x10e
-[   75.334712] put(3) 0xc148dcb3 hci_encrypt_cfm+0x8f/0xaa
-[   75.334743] put(3) 0xc148f900 hci_event_packet+0x34e/0x10be
-[   75.334772] put(3) 0xc148aa06 hci_rx_task+0xab/0x205
-[   75.334801] put(3) 0xc103bbc1 tasklet_action+0x6b/0xab
-[   75.334830] put(3) 0xc103c2b6 __do_softirq+0xdc/0x1dd
-[   75.334854] 
-[   75.334867] hold(2) 0xc149eb9b rfcomm_process_sessions+0x9a/0xde
-[   75.334984] hold(2) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.335012] hold(2) 0xc104fe01 kthread+0x63/0x68
-[   75.335042] hold(2) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.335070] 
-[   75.335082] put(3) 0xc149ebbf rfcomm_process_sessions+0xbe/0xde
-[   75.335112] put(3) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.335141] put(3) 0xc104fe01 kthread+0x63/0x68
-[   75.335169] put(3) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.335195] 
-[   75.335209] hold(2) 0xc149eb9b rfcomm_process_sessions+0x9a/0xde
-[   75.335239] hold(2) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.335266] hold(2) 0xc104fe01 kthread+0x63/0x68
-[   75.335295] hold(2) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.335322] 
-[   75.335335] put(3) 0xc149ebbf rfcomm_process_sessions+0xbe/0xde
-[   75.335364] put(3) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.335392] put(3) 0xc104fe01 kthread+0x63/0x68
-[   75.335420] put(3) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.335447] 
-[   75.335460] hold(2) 0xc149eb9b rfcomm_process_sessions+0x9a/0xde
-[   75.335490] hold(2) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.335517] hold(2) 0xc104fe01 kthread+0x63/0x68
-[   75.335545] hold(2) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.335573] 
-[   75.335586] put(3) 0xc149ebbf rfcomm_process_sessions+0xbe/0xde
-[   75.335615] put(3) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.335643] put(3) 0xc104fe01 kthread+0x63/0x68
-[   75.335671] put(3) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.335698] 
-[   75.335711] hold(2) 0xc149eb9b rfcomm_process_sessions+0x9a/0xde
-[   75.335741] hold(2) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.335769] hold(2) 0xc104fe01 kthread+0x63/0x68
-[   75.335797] hold(2) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.335825] 
-[   75.335837] put(3) 0xc149ebbf rfcomm_process_sessions+0xbe/0xde
-[   75.335867] put(3) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.335958] put(3) 0xc104fe01 kthread+0x63/0x68
-[   75.335988] put(3) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.336016] 
-[   75.336029] hold(2) 0xc149eb9b rfcomm_process_sessions+0x9a/0xde
-[   75.336058] hold(2) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.336086] hold(2) 0xc104fe01 kthread+0x63/0x68
-[   75.336114] hold(2) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.336141] 
-[   75.336154] hold(3) 0xc149d462 rfcomm_session_set_timer+0x3c/0x5c
-[   75.336184] hold(3) 0xc149d55e rfcomm_dlc_unlink+0x3f/0x4a
-[   75.336213] hold(3) 0xc149d715 __rfcomm_dlc_close+0x1ac/0x1b5
-[   75.336242] hold(3) 0xc149da76 rfcomm_recv_ua+0xbc/0x166
-[   75.336270] hold(3) 0xc149e922 rfcomm_recv_frame+0x243/0x3ae
-[   75.336299] hold(3) 0xc149eacc rfcomm_process_rx+0x3f/0x74
-[   75.336328] hold(3) 0xc149ebb1 rfcomm_process_sessions+0xb0/0xde
-[   75.336358] hold(3) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.336385] hold(3) 0xc104fe01 kthread+0x63/0x68
-[   75.336413] hold(3) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.336441] 
-[   75.336454] put(4) 0xc149d565 rfcomm_dlc_unlink+0x46/0x4a
-[   75.336482] put(4) 0xc149d715 __rfcomm_dlc_close+0x1ac/0x1b5
-[   75.336512] put(4) 0xc149da76 rfcomm_recv_ua+0xbc/0x166
-[   75.336540] put(4) 0xc149e922 rfcomm_recv_frame+0x243/0x3ae
-[   75.336569] put(4) 0xc149eacc rfcomm_process_rx+0x3f/0x74
-[   75.336597] put(4) 0xc149ebb1 rfcomm_process_sessions+0xb0/0xde
-[   75.336628] put(4) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.336655] put(4) 0xc104fe01 kthread+0x63/0x68
-[   75.336684] put(4) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.336711] 
-[   75.336724] put(3) 0xc149ebbf rfcomm_process_sessions+0xbe/0xde
-[   75.336753] put(3) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.336781] put(3) 0xc104fe01 kthread+0x63/0x68
-[   75.336809] put(3) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.336836] 
-[   75.336849] hold(2) 0xc149eb9b rfcomm_process_sessions+0x9a/0xde
-[   75.336939] hold(2) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.336968] hold(2) 0xc104fe01 kthread+0x63/0x68
-[   75.336996] hold(2) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.337024] 
-[   75.337037] put(3) 0xc149db16 rfcomm_recv_ua+0x15c/0x166
-[   75.337067] put(3) 0xc149e922 rfcomm_recv_frame+0x243/0x3ae
-[   75.337095] put(3) 0xc149eacc rfcomm_process_rx+0x3f/0x74
-[   75.337124] put(3) 0xc149ebb1 rfcomm_process_sessions+0xb0/0xde
-[   75.337153] put(3) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.337180] put(3) 0xc104fe01 kthread+0x63/0x68
-[   75.337209] put(3) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.337236] 
-[   75.337249] put(2) 0xc149ebbf rfcomm_process_sessions+0xbe/0xde
-[   75.337278] put(2) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.337306] put(2) 0xc104fe01 kthread+0x63/0x68
-[   75.337334] put(2) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.337361] 
-[   75.337374] hold(1) 0xc149eb9b rfcomm_process_sessions+0x9a/0xde
-[   75.337404] hold(1) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.337432] hold(1) 0xc104fe01 kthread+0x63/0x68
-[   75.337460] hold(1) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.337487] 
-[   75.337500] put(2) 0xc149eaee rfcomm_process_rx+0x61/0x74
-[   75.337528] put(2) 0xc149ebb1 rfcomm_process_sessions+0xb0/0xde
-[   75.337558] put(2) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.337586] put(2) 0xc104fe01 kthread+0x63/0x68
-[   75.337614] put(2) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.337641] 
-[   75.337653] hold(1) 0xc149e000 rfcomm_session_close+0x13/0x5b
-[   75.337683] hold(1) 0xc149eafb rfcomm_process_rx+0x6e/0x74
-[   75.337711] hold(1) 0xc149ebb1 rfcomm_process_sessions+0xb0/0xde
-[   75.337741] hold(1) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.337769] hold(1) 0xc104fe01 kthread+0x63/0x68
-[   75.337796] hold(1) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.337824] 
-[   75.337837] put(2) 0xc149db3f rfcomm_session_clear_timer+0x1f/0x22
-[   75.337867] put(2) 0xc149e03b rfcomm_session_close+0x4e/0x5b
-[   75.337953] put(2) 0xc149eafb rfcomm_process_rx+0x6e/0x74
-[   75.337982] put(2) 0xc149ebb1 rfcomm_process_sessions+0xb0/0xde
-[   75.338012] put(2) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.338040] put(2) 0xc104fe01 kthread+0x63/0x68
-[   75.338068] put(2) 0xc14dae42 kernel_thread_helper+0x6/0xd
-[   75.338096] 
-[   75.338109] put(1) 0xc149e042 rfcomm_session_close+0x55/0x5b
-[   75.338138] put(1) 0xc149eafb rfcomm_process_rx+0x6e/0x74
-[   75.338167] put(1) 0xc149ebb1 rfcomm_process_sessions+0xb0/0xde
-[   75.338197] put(1) 0xc149ec2f rfcomm_run+0x50/0x6d
-[   75.338224] put(1) 0xc104fe01 kthread+0x63/0x68
-[   75.338252] put(1) 0xc14dae42 kernel_thread_helper+0x6/0xd
-
-
- net/bluetooth/rfcomm/core.c |   18 ++++++++++++------
- 1 files changed, 12 insertions(+), 6 deletions(-)
-
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 501649b..8a60238 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -1164,12 +1164,18 @@ static int rfcomm_recv_ua(struct rfcomm_session *s, u8 dlci)
- 			break;
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 4f3ecf7..f404626 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -497,6 +497,7 @@ struct l2cap_chan {
  
- 		case BT_DISCONN:
--			/* When socket is closed and we are not RFCOMM
--			 * initiator rfcomm_process_rx already calls
--			 * rfcomm_session_put() */
--			if (s->sock->sk->sk_state != BT_CLOSED)
--				if (list_empty(&s->dlcs))
--					rfcomm_session_put(s);
-+			/* rfcomm_session_put is called later so don't do
-+			 * anything here otherwise we will mess up the session
-+			 * reference counter:
-+			 *
-+			 * (a) when we are the initiator dlc_unlink will drive
-+			 * the reference counter to 0 (there is no initial put
-+			 * after session_add)
-+			 *
-+			 * (b) when we are not the initiator rfcomm_rx_process
-+			 * will explicitly call put to balance the initial hold
-+			 * done after session add.
-+			 */
- 			break;
- 		}
+ 	void		*data;
+ 	struct l2cap_ops *ops;
++	struct mutex		lock;
+ };
+ 
+ struct l2cap_ops {
+@@ -608,6 +609,16 @@ static inline void l2cap_chan_put(struct l2cap_chan *c)
+ 		kfree(c);
+ }
+ 
++static inline void l2cap_chan_lock(struct l2cap_chan *chan)
++{
++	mutex_lock(&chan->lock);
++}
++
++static inline void l2cap_chan_unlock(struct l2cap_chan *chan)
++{
++	mutex_unlock(&chan->lock);
++}
++
+ static inline void l2cap_set_timer(struct l2cap_chan *chan,
+ 					struct delayed_work *work, long timeout)
+ {
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 6991821..9099721 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -241,7 +241,7 @@ static char *state_to_string(int state)
+ 	return "invalid state";
+ }
+ 
+-static void l2cap_state_change(struct l2cap_chan *chan, int state)
++static void __l2cap_state_change(struct l2cap_chan *chan, int state)
+ {
+ 	BT_DBG("%p %s -> %s", chan, state_to_string(chan->state),
+ 						state_to_string(state));
+@@ -250,16 +250,36 @@ static void l2cap_state_change(struct l2cap_chan *chan, int state)
+ 	chan->ops->state_change(chan->data, state);
+ }
+ 
++static void l2cap_state_change(struct l2cap_chan *chan, int state)
++{
++	lock_sock(chan->sk);
++	__l2cap_state_change(chan, state);
++	release_sock(chan->sk);
++}
++
++static inline void __l2cap_set_sock_err(struct sock *sk, int err)
++{
++	sk->sk_err = err;
++}
++
++static inline void l2cap_set_sock_err(struct l2cap_chan *chan, int err)
++{
++	struct sock *sk = chan->sk;
++
++	lock_sock(sk);
++	__l2cap_set_sock_err(sk, err);
++	release_sock(sk);
++}
++
+ static void l2cap_chan_timeout(struct work_struct *work)
+ {
+ 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
+ 							chan_timer.work);
+-	struct sock *sk = chan->sk;
+ 	int reason;
+ 
+ 	BT_DBG("chan %p state %d", chan, chan->state);
+ 
+-	lock_sock(sk);
++	l2cap_chan_lock(chan);
+ 
+ 	if (chan->state == BT_CONNECTED || chan->state == BT_CONFIG)
+ 		reason = ECONNREFUSED;
+@@ -271,7 +291,7 @@ static void l2cap_chan_timeout(struct work_struct *work)
+ 
+ 	l2cap_chan_close(chan, reason);
+ 
+-	release_sock(sk);
++	l2cap_chan_unlock(chan);
+ 
+ 	chan->ops->close(chan->data);
+ 	l2cap_chan_put(chan);
+@@ -285,6 +305,8 @@ struct l2cap_chan *l2cap_chan_create(struct sock *sk)
+ 	if (!chan)
+ 		return NULL;
+ 
++	mutex_init(&chan->lock);
++
+ 	chan->sk = sk;
+ 
+ 	write_lock(&chan_list_lock);
+@@ -383,11 +405,13 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 		hci_conn_put(conn->hcon);
  	}
+ 
+-	l2cap_state_change(chan, BT_CLOSED);
++	lock_sock(sk);
++
++	__l2cap_state_change(chan, BT_CLOSED);
+ 	sock_set_flag(sk, SOCK_ZAPPED);
+ 
+ 	if (err)
+-		sk->sk_err = err;
++		__l2cap_set_sock_err(sk, err);
+ 
+ 	if (parent) {
+ 		bt_accept_unlink(sk);
+@@ -395,6 +419,8 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 	} else
+ 		sk->sk_state_change(sk);
+ 
++	release_sock(sk);
++
+ 	if (!(test_bit(CONF_OUTPUT_DONE, &chan->conf_state) &&
+ 			test_bit(CONF_INPUT_DONE, &chan->conf_state)))
+ 		return;
+@@ -426,10 +452,12 @@ static void l2cap_chan_cleanup_listen(struct sock *parent)
+ 	/* Close not yet accepted channels */
+ 	while ((sk = bt_accept_dequeue(parent, NULL))) {
+ 		struct l2cap_chan *chan = l2cap_pi(sk)->chan;
++
++		l2cap_chan_lock(chan);
+ 		__clear_chan_timer(chan);
+-		lock_sock(sk);
+ 		l2cap_chan_close(chan, ECONNRESET);
+-		release_sock(sk);
++		l2cap_chan_unlock(chan);
++
+ 		chan->ops->close(chan->data);
+ 	}
+ }
+@@ -443,10 +471,12 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
+ 
+ 	switch (chan->state) {
+ 	case BT_LISTEN:
++		lock_sock(sk);
+ 		l2cap_chan_cleanup_listen(sk);
+ 
+-		l2cap_state_change(chan, BT_CLOSED);
++		__l2cap_state_change(chan, BT_CLOSED);
+ 		sock_set_flag(sk, SOCK_ZAPPED);
++		release_sock(sk);
+ 		break;
+ 
+ 	case BT_CONNECTED:
+@@ -489,7 +519,9 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
+ 		break;
+ 
+ 	default:
++		lock_sock(sk);
+ 		sock_set_flag(sk, SOCK_ZAPPED);
++		release_sock(sk);
+ 		break;
+ 	}
+ }
+@@ -717,14 +749,11 @@ static inline int l2cap_mode_supported(__u8 mode, __u32 feat_mask)
+ 
+ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *chan, int err)
+ {
+-	struct sock *sk;
+ 	struct l2cap_disconn_req req;
+ 
+ 	if (!conn)
+ 		return;
+ 
+-	sk = chan->sk;
+-
+ 	if (chan->mode == L2CAP_MODE_ERTM) {
+ 		__clear_retrans_timer(chan);
+ 		__clear_monitor_timer(chan);
+@@ -737,7 +766,8 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
+ 			L2CAP_DISCONN_REQ, sizeof(req), &req);
+ 
+ 	l2cap_state_change(chan, BT_DISCONN);
+-	sk->sk_err = err;
++
++	l2cap_set_sock_err(chan, err);
+ }
+ 
+ /* ---- L2CAP connections ---- */
+@@ -747,15 +777,13 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 
+ 	BT_DBG("conn %p", conn);
+ 
+-	rcu_read_lock();
+-
+-	list_for_each_entry_rcu(chan, &conn->chan_l, list) {
++	list_for_each_entry(chan, &conn->chan_l, list) {
+ 		struct sock *sk = chan->sk;
+ 
+-		bh_lock_sock(sk);
++		l2cap_chan_lock(chan);
+ 
+ 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+-			bh_unlock_sock(sk);
++			l2cap_chan_unlock(chan);
+ 			continue;
+ 		}
+ 
+@@ -764,7 +792,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 
+ 			if (!l2cap_chan_check_security(chan) ||
+ 					!__l2cap_no_conn_pending(chan)) {
+-				bh_unlock_sock(sk);
++				l2cap_chan_unlock(chan);
+ 				continue;
+ 			}
+ 
+@@ -774,7 +802,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 				/* l2cap_chan_close() calls list_del(chan)
+ 				 * so release the lock */
+ 				l2cap_chan_close(chan, ECONNRESET);
+-				bh_unlock_sock(sk);
++				l2cap_chan_unlock(chan);
+ 				continue;
+ 			}
+ 
+@@ -794,6 +822,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 			rsp.dcid = cpu_to_le16(chan->scid);
+ 
+ 			if (l2cap_chan_check_security(chan)) {
++				lock_sock(sk);
+ 				if (bt_sk(sk)->defer_setup) {
+ 					struct sock *parent = bt_sk(sk)->parent;
+ 					rsp.result = cpu_to_le16(L2CAP_CR_PEND);
+@@ -802,10 +831,11 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 						parent->sk_data_ready(parent, 0);
+ 
+ 				} else {
+-					l2cap_state_change(chan, BT_CONFIG);
++					__l2cap_state_change(chan, BT_CONFIG);
+ 					rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
+ 					rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
+ 				}
++				release_sock(sk);
+ 			} else {
+ 				rsp.result = cpu_to_le16(L2CAP_CR_PEND);
+ 				rsp.status = cpu_to_le16(L2CAP_CS_AUTHEN_PEND);
+@@ -816,7 +846,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 
+ 			if (test_bit(CONF_REQ_SENT, &chan->conf_state) ||
+ 					rsp.result != L2CAP_CR_SUCCESS) {
+-				bh_unlock_sock(sk);
++				l2cap_chan_unlock(chan);
+ 				continue;
+ 			}
+ 
+@@ -826,10 +856,8 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 			chan->num_conf_req++;
+ 		}
+ 
+-		bh_unlock_sock(sk);
++		l2cap_chan_unlock(chan);
+ 	}
+-
+-	rcu_read_unlock();
+ }
+ 
+ /* Find socket with cid and source bdaddr.
+@@ -905,7 +933,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 
+ 	__set_chan_timer(chan, sk->sk_sndtimeo);
+ 
+-	l2cap_state_change(chan, BT_CONNECTED);
++	__l2cap_state_change(chan, BT_CONNECTED);
+ 	parent->sk_data_ready(parent, 0);
+ 
+ clean:
+@@ -915,18 +943,24 @@ clean:
+ static void l2cap_chan_ready(struct l2cap_chan *chan)
+ {
+ 	struct sock *sk = chan->sk;
+-	struct sock *parent = bt_sk(sk)->parent;
++	struct sock *parent;
++
++	lock_sock(sk);
++
++	parent = bt_sk(sk)->parent;
+ 
+ 	BT_DBG("sk %p, parent %p", sk, parent);
+ 
+ 	chan->conf_state = 0;
+ 	__clear_chan_timer(chan);
+ 
+-	l2cap_state_change(chan, BT_CONNECTED);
++	__l2cap_state_change(chan, BT_CONNECTED);
+ 	sk->sk_state_change(sk);
+ 
+ 	if (parent)
+ 		parent->sk_data_ready(parent, 0);
++
++	release_sock(sk);
+ }
+ 
+ static void l2cap_conn_ready(struct l2cap_conn *conn)
+@@ -941,29 +975,28 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+ 	if (conn->hcon->out && conn->hcon->type == LE_LINK)
+ 		smp_conn_security(conn, conn->hcon->pending_sec_level);
+ 
+-	rcu_read_lock();
++	list_for_each_entry(chan, &conn->chan_l, list) {
+ 
+-	list_for_each_entry_rcu(chan, &conn->chan_l, list) {
+-		struct sock *sk = chan->sk;
+-
+-		bh_lock_sock(sk);
++		l2cap_chan_lock(chan);
+ 
+ 		if (conn->hcon->type == LE_LINK) {
+ 			if (smp_conn_security(conn, chan->sec_level))
+ 				l2cap_chan_ready(chan);
+ 
+ 		} else if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
++			struct sock *sk = chan->sk;
+ 			__clear_chan_timer(chan);
+-			l2cap_state_change(chan, BT_CONNECTED);
++			lock_sock(sk);
++			__l2cap_state_change(chan, BT_CONNECTED);
+ 			sk->sk_state_change(sk);
++			release_sock(sk);
+ 
+ 		} else if (chan->state == BT_CONNECT)
+ 			l2cap_do_start(chan);
+ 
+-		bh_unlock_sock(sk);
++		l2cap_chan_unlock(chan);
+ 	}
+ 
+-	rcu_read_unlock();
+ }
+ 
+ /* Notify sockets that we cannot guaranty reliability anymore */
+@@ -978,8 +1011,12 @@ static void l2cap_conn_unreliable(struct l2cap_conn *conn, int err)
+ 	list_for_each_entry_rcu(chan, &conn->chan_l, list) {
+ 		struct sock *sk = chan->sk;
+ 
++		lock_sock(sk);
++
+ 		if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
+-			sk->sk_err = err;
++			__l2cap_set_sock_err(sk, err);
++
++		release_sock(sk);
+ 	}
+ 
+ 	rcu_read_unlock();
+@@ -1000,7 +1037,6 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ {
+ 	struct l2cap_conn *conn = hcon->l2cap_data;
+ 	struct l2cap_chan *chan, *l;
+-	struct sock *sk;
+ 
+ 	if (!conn)
+ 		return;
+@@ -1011,10 +1047,12 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 
+ 	/* Kill channels */
+ 	list_for_each_entry_safe(chan, l, &conn->chan_l, list) {
+-		sk = chan->sk;
+-		lock_sock(sk);
++		l2cap_chan_lock(chan);
++
+ 		l2cap_chan_del(chan, err);
+-		release_sock(sk);
++
++		l2cap_chan_unlock(chan);
++
+ 		chan->ops->close(chan->data);
+ 	}
+ 
+@@ -1223,14 +1261,14 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+ 
+ 	l2cap_chan_add(conn, chan);
+ 
+-	l2cap_state_change(chan, BT_CONNECT);
++	__l2cap_state_change(chan, BT_CONNECT);
+ 	__set_chan_timer(chan, sk->sk_sndtimeo);
+ 
+ 	if (hcon->state == BT_CONNECTED) {
+ 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+ 			__clear_chan_timer(chan);
+ 			if (l2cap_chan_check_security(chan))
+-				l2cap_state_change(chan, BT_CONNECTED);
++				__l2cap_state_change(chan, BT_CONNECTED);
+ 		} else
+ 			l2cap_do_start(chan);
+ 	}
+@@ -1279,40 +1317,39 @@ static void l2cap_monitor_timeout(struct work_struct *work)
+ {
+ 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
+ 							monitor_timer.work);
+-	struct sock *sk = chan->sk;
+-
+ 	BT_DBG("chan %p", chan);
+ 
+-	lock_sock(sk);
++	l2cap_chan_lock(chan);
++
+ 	if (chan->retry_count >= chan->remote_max_tx) {
+ 		l2cap_send_disconn_req(chan->conn, chan, ECONNABORTED);
+-		release_sock(sk);
+-		return;
++		goto done;
+ 	}
+ 
+ 	chan->retry_count++;
+ 	__set_monitor_timer(chan);
+ 
+ 	l2cap_send_rr_or_rnr(chan, L2CAP_CTRL_POLL);
+-	release_sock(sk);
++done:
++	l2cap_chan_unlock(chan);
+ }
+ 
+ static void l2cap_retrans_timeout(struct work_struct *work)
+ {
+ 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
+ 							retrans_timer.work);
+-	struct sock *sk = chan->sk;
+-
+ 	BT_DBG("chan %p", chan);
+ 
+-	lock_sock(sk);
++	l2cap_chan_lock(chan);
++
+ 	chan->retry_count = 1;
+ 	__set_monitor_timer(chan);
+ 
+ 	set_bit(CONN_WAIT_F, &chan->conn_state);
+ 
+ 	l2cap_send_rr_or_rnr(chan, L2CAP_CTRL_POLL);
+-	release_sock(sk);
++
++	l2cap_chan_unlock(chan);
+ }
+ 
+ static void l2cap_drop_acked_frames(struct l2cap_chan *chan)
+@@ -1561,13 +1598,12 @@ static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
+ 						struct msghdr *msg, size_t len,
+ 						u32 priority)
+ {
+-	struct sock *sk = chan->sk;
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct sk_buff *skb;
+ 	int err, count, hlen = L2CAP_HDR_SIZE + L2CAP_PSMLEN_SIZE;
+ 	struct l2cap_hdr *lh;
+ 
+-	BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
++	BT_DBG("chan %p len %d priority %u", chan, (int)len, priority);
+ 
+ 	count = min_t(unsigned int, (conn->mtu - hlen), len);
+ 
+@@ -1597,13 +1633,12 @@ static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
+ 						struct msghdr *msg, size_t len,
+ 						u32 priority)
+ {
+-	struct sock *sk = chan->sk;
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct sk_buff *skb;
+ 	int err, count, hlen = L2CAP_HDR_SIZE;
+ 	struct l2cap_hdr *lh;
+ 
+-	BT_DBG("sk %p len %d", sk, (int)len);
++	BT_DBG("chan %p len %d", chan, (int)len);
+ 
+ 	count = min_t(unsigned int, (conn->mtu - hlen), len);
+ 
+@@ -1632,13 +1667,12 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
+ 						struct msghdr *msg, size_t len,
+ 						u32 control, u16 sdulen)
+ {
+-	struct sock *sk = chan->sk;
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct sk_buff *skb;
+ 	int err, count, hlen;
+ 	struct l2cap_hdr *lh;
+ 
+-	BT_DBG("sk %p len %d", sk, (int)len);
++	BT_DBG("chan %p len %d", chan, (int)len);
+ 
+ 	if (!conn)
+ 		return ERR_PTR(-ENOTCONN);
+@@ -2004,9 +2038,11 @@ static void l2cap_ack_timeout(struct work_struct *work)
+ 
+ 	BT_DBG("chan %p", chan);
+ 
+-	lock_sock(chan->sk);
++	l2cap_chan_lock(chan);
++
+ 	__l2cap_send_ack(chan);
+-	release_sock(chan->sk);
++
++	l2cap_chan_unlock(chan);
+ 
+ 	l2cap_chan_put(chan);
+ }
+@@ -2677,22 +2713,22 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE) {
+ 		if (l2cap_chan_check_security(chan)) {
+ 			if (bt_sk(sk)->defer_setup) {
+-				l2cap_state_change(chan, BT_CONNECT2);
++				__l2cap_state_change(chan, BT_CONNECT2);
+ 				result = L2CAP_CR_PEND;
+ 				status = L2CAP_CS_AUTHOR_PEND;
+ 				parent->sk_data_ready(parent, 0);
+ 			} else {
+-				l2cap_state_change(chan, BT_CONFIG);
++				__l2cap_state_change(chan, BT_CONFIG);
+ 				result = L2CAP_CR_SUCCESS;
+ 				status = L2CAP_CS_NO_INFO;
+ 			}
+ 		} else {
+-			l2cap_state_change(chan, BT_CONNECT2);
++			__l2cap_state_change(chan, BT_CONNECT2);
+ 			result = L2CAP_CR_PEND;
+ 			status = L2CAP_CS_AUTHEN_PEND;
+ 		}
+ 	} else {
+-		l2cap_state_change(chan, BT_CONNECT2);
++		__l2cap_state_change(chan, BT_CONNECT2);
+ 		result = L2CAP_CR_PEND;
+ 		status = L2CAP_CS_NO_INFO;
+ 	}
+@@ -2749,15 +2785,17 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 	BT_DBG("dcid 0x%4.4x scid 0x%4.4x result 0x%2.2x status 0x%2.2x", dcid, scid, result, status);
+ 
+ 	if (scid) {
+-		chan = l2cap_get_chan_by_scid(conn, scid);
++		chan = __l2cap_get_chan_by_scid(conn, scid);
+ 		if (!chan)
+ 			return -EFAULT;
+ 	} else {
+-		chan = l2cap_get_chan_by_ident(conn, cmd->ident);
++		chan = __l2cap_get_chan_by_ident(conn, cmd->ident);
+ 		if (!chan)
+ 			return -EFAULT;
+ 	}
+ 
++	l2cap_chan_lock(chan);
++
+ 	sk = chan->sk;
+ 
+ 	switch (result) {
+@@ -2784,7 +2822,8 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 		break;
+ 	}
+ 
+-	release_sock(sk);
++	l2cap_chan_unlock(chan);
++
+ 	return 0;
+ }
+ 
+@@ -2813,10 +2852,12 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 
+ 	BT_DBG("dcid 0x%4.4x flags 0x%2.2x", dcid, flags);
+ 
+-	chan = l2cap_get_chan_by_scid(conn, dcid);
++	chan = __l2cap_get_chan_by_scid(conn, dcid);
+ 	if (!chan)
+ 		return -ENOENT;
+ 
++	l2cap_chan_lock(chan);
++
+ 	sk = chan->sk;
+ 
+ 	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2) {
+@@ -2906,7 +2947,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	}
+ 
+ unlock:
+-	release_sock(sk);
++	l2cap_chan_unlock(chan);
+ 	return 0;
+ }
+ 
+@@ -2925,10 +2966,12 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	BT_DBG("scid 0x%4.4x flags 0x%2.2x result 0x%2.2x",
+ 			scid, flags, result);
+ 
+-	chan = l2cap_get_chan_by_scid(conn, scid);
++	chan = __l2cap_get_chan_by_scid(conn, scid);
+ 	if (!chan)
+ 		return 0;
+ 
++	l2cap_chan_lock(chan);
++
+ 	sk = chan->sk;
+ 
+ 	switch (result) {
+@@ -2988,7 +3031,8 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 		}
+ 
+ 	default:
+-		sk->sk_err = ECONNRESET;
++		l2cap_set_sock_err(chan, ECONNRESET);
++
+ 		__set_chan_timer(chan,
+ 				msecs_to_jiffies(L2CAP_DISC_REJ_TIMEOUT));
+ 		l2cap_send_disconn_req(conn, chan, ECONNRESET);
+@@ -3014,7 +3058,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	}
+ 
+ done:
+-	release_sock(sk);
++	l2cap_chan_unlock(chan);
+ 	return 0;
+ }
+ 
+@@ -3031,20 +3075,25 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
+ 
+ 	BT_DBG("scid 0x%4.4x dcid 0x%4.4x", scid, dcid);
+ 
+-	chan = l2cap_get_chan_by_scid(conn, dcid);
++	chan = __l2cap_get_chan_by_scid(conn, dcid);
+ 	if (!chan)
+ 		return 0;
+ 
++	l2cap_chan_lock(chan);
++
+ 	sk = chan->sk;
+ 
+ 	rsp.dcid = cpu_to_le16(chan->scid);
+ 	rsp.scid = cpu_to_le16(chan->dcid);
+ 	l2cap_send_cmd(conn, cmd->ident, L2CAP_DISCONN_RSP, sizeof(rsp), &rsp);
+ 
++	lock_sock(sk);
+ 	sk->sk_shutdown = SHUTDOWN_MASK;
++	release_sock(sk);
+ 
+ 	l2cap_chan_del(chan, ECONNRESET);
+-	release_sock(sk);
++
++	l2cap_chan_unlock(chan);
+ 
+ 	chan->ops->close(chan->data);
+ 	return 0;
+@@ -3055,21 +3104,21 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
+ 	struct l2cap_disconn_rsp *rsp = (struct l2cap_disconn_rsp *) data;
+ 	u16 dcid, scid;
+ 	struct l2cap_chan *chan;
+-	struct sock *sk;
+ 
+ 	scid = __le16_to_cpu(rsp->scid);
+ 	dcid = __le16_to_cpu(rsp->dcid);
+ 
+ 	BT_DBG("dcid 0x%4.4x scid 0x%4.4x", dcid, scid);
+ 
+-	chan = l2cap_get_chan_by_scid(conn, scid);
++	chan = __l2cap_get_chan_by_scid(conn, scid);
+ 	if (!chan)
+ 		return 0;
+ 
+-	sk = chan->sk;
++	l2cap_chan_lock(chan);
+ 
+ 	l2cap_chan_del(chan, 0);
+-	release_sock(sk);
++
++	l2cap_chan_unlock(chan);
+ 
+ 	chan->ops->close(chan->data);
+ 	return 0;
+@@ -4218,18 +4267,17 @@ drop:
+ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk_buff *skb)
+ {
+ 	struct l2cap_chan *chan;
+-	struct sock *sk = NULL;
+ 	u32 control;
+ 	u16 tx_seq;
+ 	int len;
+ 
+-	chan = l2cap_get_chan_by_scid(conn, cid);
++	chan = __l2cap_get_chan_by_scid(conn, cid);
+ 	if (!chan) {
+ 		BT_DBG("unknown cid 0x%4.4x", cid);
+ 		goto drop;
+ 	}
+ 
+-	sk = chan->sk;
++	l2cap_chan_lock(chan);
+ 
+ 	BT_DBG("chan %p, len %d", chan, skb->len);
+ 
+@@ -4300,8 +4348,7 @@ drop:
+ 	kfree_skb(skb);
+ 
+ done:
+-	if (sk)
+-		release_sock(sk);
++	l2cap_chan_unlock(chan);
+ 
+ 	return 0;
+ }
+@@ -4517,12 +4564,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 		__cancel_delayed_work(&conn->security_timer);
+ 	}
+ 
+-	rcu_read_lock();
+-
+-	list_for_each_entry_rcu(chan, &conn->chan_l, list) {
+-		struct sock *sk = chan->sk;
+-
+-		bh_lock_sock(sk);
++	list_for_each_entry(chan, &conn->chan_l, list) {
++		l2cap_chan_lock(chan);
+ 
+ 		BT_DBG("chan->scid %d", chan->scid);
+ 
+@@ -4532,19 +4575,19 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 				l2cap_chan_ready(chan);
+ 			}
+ 
+-			bh_unlock_sock(sk);
++			l2cap_chan_unlock(chan);
+ 			continue;
+ 		}
+ 
+ 		if (test_bit(CONF_CONNECT_PEND, &chan->conf_state)) {
+-			bh_unlock_sock(sk);
++			l2cap_chan_unlock(chan);
+ 			continue;
+ 		}
+ 
+ 		if (!status && (chan->state == BT_CONNECTED ||
+ 						chan->state == BT_CONFIG)) {
+ 			l2cap_check_encryption(chan, encrypt);
+-			bh_unlock_sock(sk);
++			l2cap_chan_unlock(chan);
+ 			continue;
+ 		}
+ 
+@@ -4565,9 +4608,12 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 					msecs_to_jiffies(L2CAP_DISC_TIMEOUT));
+ 			}
+ 		} else if (chan->state == BT_CONNECT2) {
++			struct sock *sk = chan->sk;
+ 			struct l2cap_conn_rsp rsp;
+ 			__u16 res, stat;
+ 
++			lock_sock(sk);
++
+ 			if (!status) {
+ 				if (bt_sk(sk)->defer_setup) {
+ 					struct sock *parent = bt_sk(sk)->parent;
+@@ -4576,18 +4622,20 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 					if (parent)
+ 						parent->sk_data_ready(parent, 0);
+ 				} else {
+-					l2cap_state_change(chan, BT_CONFIG);
++					__l2cap_state_change(chan, BT_CONFIG);
+ 					res = L2CAP_CR_SUCCESS;
+ 					stat = L2CAP_CS_NO_INFO;
+ 				}
+ 			} else {
+-				l2cap_state_change(chan, BT_DISCONN);
++				__l2cap_state_change(chan, BT_DISCONN);
+ 				__set_chan_timer(chan,
+ 					msecs_to_jiffies(L2CAP_DISC_TIMEOUT));
+ 				res = L2CAP_CR_SEC_BLOCK;
+ 				stat = L2CAP_CS_NO_INFO;
+ 			}
+ 
++			release_sock(sk);
++
+ 			rsp.scid   = cpu_to_le16(chan->dcid);
+ 			rsp.dcid   = cpu_to_le16(chan->scid);
+ 			rsp.result = cpu_to_le16(res);
+@@ -4596,11 +4644,9 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 							sizeof(rsp), &rsp);
+ 		}
+ 
+-		bh_unlock_sock(sk);
++		l2cap_chan_unlock(chan);
+ 	}
+ 
+-	rcu_read_unlock();
+-
+ 	return 0;
+ }
+ 
+@@ -4656,10 +4702,11 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 			goto drop;
+ 		}
+ 
+-		chan = l2cap_get_chan_by_scid(conn, cid);
++		chan = __l2cap_get_chan_by_scid(conn, cid);
+ 
+ 		if (chan && chan->sk) {
+ 			struct sock *sk = chan->sk;
++			lock_sock(sk);
+ 
+ 			if (chan->imtu < len - L2CAP_HDR_SIZE) {
+ 				BT_ERR("Frame exceeding recv MTU (len %d, "
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 1636029..dea5418 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -809,7 +809,9 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
+ 			err = __l2cap_wait_ack(sk);
+ 
+ 		sk->sk_shutdown = SHUTDOWN_MASK;
++		release_sock(sk);
+ 		l2cap_chan_close(chan, 0);
++		lock_sock(sk);
+ 
+ 		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime)
+ 			err = bt_sock_wait_state(sk, BT_CLOSED,
+@@ -862,8 +864,12 @@ static int l2cap_sock_recv_cb(void *data, struct sk_buff *skb)
+ 	struct sock *sk = data;
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
+ 
+-	if (pi->rx_busy_skb)
+-		return -ENOMEM;
++	lock_sock(sk);
++
++	if (pi->rx_busy_skb) {
++		err = -ENOMEM;
++		goto done;
++	}
+ 
+ 	err = sock_queue_rcv_skb(sk, skb);
+ 
+@@ -882,6 +888,9 @@ static int l2cap_sock_recv_cb(void *data, struct sk_buff *skb)
+ 		err = 0;
+ 	}
+ 
++done:
++	release_sock(sk);
++
+ 	return err;
+ }
+ 
 -- 
 1.7.4.1
+
