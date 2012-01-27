@@ -4,80 +4,177 @@ To: linux-bluetooth@vger.kernel.org
 Cc: johan.hedberg@gmail.com,
 	marcel@holtmann.org,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 3/4] Bluetooth: Introduce to_hci_conn
-Date: Fri, 27 Jan 2012 16:47:25 +0100
-Message-Id: <1327679246-2667-4-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 1/4] Bluetooth: Introduce to_hci_dev()
+Date: Fri, 27 Jan 2012 16:47:23 +0100
+Message-Id: <1327679246-2667-2-git-send-email-dh.herrmann@googlemail.com>
 In-Reply-To: <1327679246-2667-1-git-send-email-dh.herrmann@googlemail.com>
 References: <1327679246-2667-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This avoids using the dev_set/get_drvdata() functions to retrieve a
-pointer to our own structure. We can use simple pointer arithmetic here.
-The drvdata field is actually not needed by any other code-path but this
-makes the code more consistent with hci_dev.
+We currently use dev_set_drvdata to keep a pointer to ourself. This
+doesn't make sense as we are the bus and not a driver. Therefore,
+introduce to_hci_dev() so we can get a struct hci_dev pointer from a
+struct device pointer.
+
+dev_set/get_drvdata() is reserved for drivers that provide a device and
+not for the bus using the device. The bus can use simple pointer
+arithmetic to retrieve its private data.
 
 Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 ---
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_sysfs.c        |   10 ++++------
- 2 files changed, 5 insertions(+), 6 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/hci_sysfs.c        |   33 ++++++++++++++++-----------------
+ 2 files changed, 18 insertions(+), 17 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 9780f42..8784da1 100644
+index 25f449f..01fdd2c 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -612,6 +612,7 @@ static inline struct hci_dev *hci_dev_hold(struct hci_dev *d)
+@@ -612,6 +612,8 @@ static inline struct hci_dev *hci_dev_hold(struct hci_dev *d)
+ #define hci_dev_lock(d)		mutex_lock(&d->lock)
  #define hci_dev_unlock(d)	mutex_unlock(&d->lock)
  
- #define to_hci_dev(d) container_of(d, struct hci_dev, dev)
-+#define to_hci_conn(c) container_of(c, struct hci_conn, dev)
++#define to_hci_dev(d) container_of(d, struct hci_dev, dev)
++
+ struct hci_dev *hci_dev_get(int index);
+ struct hci_dev *hci_get_route(bdaddr_t *src, bdaddr_t *dst);
  
- static inline void *hci_get_drvdata(struct hci_dev *hdev)
- {
 diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 2a0243a..17e6cd4 100644
+index ec03ee2..2a0243a 100644
 --- a/net/bluetooth/hci_sysfs.c
 +++ b/net/bluetooth/hci_sysfs.c
-@@ -33,19 +33,19 @@ static inline char *link_typetostr(int type)
+@@ -189,19 +189,19 @@ static inline char *host_typetostr(int type)
  
- static ssize_t show_link_type(struct device *dev, struct device_attribute *attr, char *buf)
+ static ssize_t show_bus(struct device *dev, struct device_attribute *attr, char *buf)
  {
--	struct hci_conn *conn = dev_get_drvdata(dev);
-+	struct hci_conn *conn = to_hci_conn(dev);
- 	return sprintf(buf, "%s\n", link_typetostr(conn->type));
+-	struct hci_dev *hdev = dev_get_drvdata(dev);
++	struct hci_dev *hdev = to_hci_dev(dev);
+ 	return sprintf(buf, "%s\n", host_bustostr(hdev->bus));
  }
  
- static ssize_t show_link_address(struct device *dev, struct device_attribute *attr, char *buf)
+ static ssize_t show_type(struct device *dev, struct device_attribute *attr, char *buf)
  {
--	struct hci_conn *conn = dev_get_drvdata(dev);
-+	struct hci_conn *conn = to_hci_conn(dev);
- 	return sprintf(buf, "%s\n", batostr(&conn->dst));
+-	struct hci_dev *hdev = dev_get_drvdata(dev);
++	struct hci_dev *hdev = to_hci_dev(dev);
+ 	return sprintf(buf, "%s\n", host_typetostr(hdev->dev_type));
  }
  
- static ssize_t show_link_features(struct device *dev, struct device_attribute *attr, char *buf)
+ static ssize_t show_name(struct device *dev, struct device_attribute *attr, char *buf)
  {
--	struct hci_conn *conn = dev_get_drvdata(dev);
-+	struct hci_conn *conn = to_hci_conn(dev);
+-	struct hci_dev *hdev = dev_get_drvdata(dev);
++	struct hci_dev *hdev = to_hci_dev(dev);
+ 	char name[HCI_MAX_NAME_LENGTH + 1];
+ 	int i;
+ 
+@@ -214,20 +214,20 @@ static ssize_t show_name(struct device *dev, struct device_attribute *attr, char
+ 
+ static ssize_t show_class(struct device *dev, struct device_attribute *attr, char *buf)
+ {
+-	struct hci_dev *hdev = dev_get_drvdata(dev);
++	struct hci_dev *hdev = to_hci_dev(dev);
+ 	return sprintf(buf, "0x%.2x%.2x%.2x\n",
+ 			hdev->dev_class[2], hdev->dev_class[1], hdev->dev_class[0]);
+ }
+ 
+ static ssize_t show_address(struct device *dev, struct device_attribute *attr, char *buf)
+ {
+-	struct hci_dev *hdev = dev_get_drvdata(dev);
++	struct hci_dev *hdev = to_hci_dev(dev);
+ 	return sprintf(buf, "%s\n", batostr(&hdev->bdaddr));
+ }
+ 
+ static ssize_t show_features(struct device *dev, struct device_attribute *attr, char *buf)
+ {
+-	struct hci_dev *hdev = dev_get_drvdata(dev);
++	struct hci_dev *hdev = to_hci_dev(dev);
  
  	return sprintf(buf, "0x%02x%02x%02x%02x%02x%02x%02x%02x\n",
- 				conn->features[0], conn->features[1],
-@@ -79,7 +79,7 @@ static const struct attribute_group *bt_link_groups[] = {
+ 				hdev->features[0], hdev->features[1],
+@@ -238,31 +238,31 @@ static ssize_t show_features(struct device *dev, struct device_attribute *attr,
  
- static void bt_link_release(struct device *dev)
+ static ssize_t show_manufacturer(struct device *dev, struct device_attribute *attr, char *buf)
  {
--	void *data = dev_get_drvdata(dev);
-+	void *data = to_hci_conn(dev);
- 	kfree(data);
+-	struct hci_dev *hdev = dev_get_drvdata(dev);
++	struct hci_dev *hdev = to_hci_dev(dev);
+ 	return sprintf(buf, "%d\n", hdev->manufacturer);
  }
  
-@@ -120,8 +120,6 @@ void hci_conn_add_sysfs(struct hci_conn *conn)
+ static ssize_t show_hci_version(struct device *dev, struct device_attribute *attr, char *buf)
+ {
+-	struct hci_dev *hdev = dev_get_drvdata(dev);
++	struct hci_dev *hdev = to_hci_dev(dev);
+ 	return sprintf(buf, "%d\n", hdev->hci_ver);
+ }
  
- 	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
+ static ssize_t show_hci_revision(struct device *dev, struct device_attribute *attr, char *buf)
+ {
+-	struct hci_dev *hdev = dev_get_drvdata(dev);
++	struct hci_dev *hdev = to_hci_dev(dev);
+ 	return sprintf(buf, "%d\n", hdev->hci_rev);
+ }
  
--	dev_set_drvdata(&conn->dev, conn);
--
- 	if (device_add(&conn->dev) < 0) {
- 		BT_ERR("Failed to register connection device");
- 		return;
+ static ssize_t show_idle_timeout(struct device *dev, struct device_attribute *attr, char *buf)
+ {
+-	struct hci_dev *hdev = dev_get_drvdata(dev);
++	struct hci_dev *hdev = to_hci_dev(dev);
+ 	return sprintf(buf, "%d\n", hdev->idle_timeout);
+ }
+ 
+ static ssize_t store_idle_timeout(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+ {
+-	struct hci_dev *hdev = dev_get_drvdata(dev);
++	struct hci_dev *hdev = to_hci_dev(dev);
+ 	unsigned int val;
+ 	int rv;
+ 
+@@ -280,13 +280,13 @@ static ssize_t store_idle_timeout(struct device *dev, struct device_attribute *a
+ 
+ static ssize_t show_sniff_max_interval(struct device *dev, struct device_attribute *attr, char *buf)
+ {
+-	struct hci_dev *hdev = dev_get_drvdata(dev);
++	struct hci_dev *hdev = to_hci_dev(dev);
+ 	return sprintf(buf, "%d\n", hdev->sniff_max_interval);
+ }
+ 
+ static ssize_t store_sniff_max_interval(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+ {
+-	struct hci_dev *hdev = dev_get_drvdata(dev);
++	struct hci_dev *hdev = to_hci_dev(dev);
+ 	u16 val;
+ 	int rv;
+ 
+@@ -304,13 +304,13 @@ static ssize_t store_sniff_max_interval(struct device *dev, struct device_attrib
+ 
+ static ssize_t show_sniff_min_interval(struct device *dev, struct device_attribute *attr, char *buf)
+ {
+-	struct hci_dev *hdev = dev_get_drvdata(dev);
++	struct hci_dev *hdev = to_hci_dev(dev);
+ 	return sprintf(buf, "%d\n", hdev->sniff_min_interval);
+ }
+ 
+ static ssize_t store_sniff_min_interval(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+ {
+-	struct hci_dev *hdev = dev_get_drvdata(dev);
++	struct hci_dev *hdev = to_hci_dev(dev);
+ 	u16 val;
+ 	int rv;
+ 
+@@ -370,7 +370,7 @@ static const struct attribute_group *bt_host_groups[] = {
+ 
+ static void bt_host_release(struct device *dev)
+ {
+-	void *data = dev_get_drvdata(dev);
++	void *data = to_hci_dev(dev);
+ 	kfree(data);
+ 	module_put(THIS_MODULE);
+ }
+@@ -525,7 +525,6 @@ void hci_init_sysfs(struct hci_dev *hdev)
+ 	dev->class = bt_class;
+ 
+ 	__module_get(THIS_MODULE);
+-	dev_set_drvdata(dev, hdev);
+ 	device_initialize(dev);
+ }
+ 
 -- 
 1.7.8.4
