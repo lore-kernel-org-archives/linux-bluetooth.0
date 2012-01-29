@@ -1,69 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: AceLan Kao <acelan@gmail.com>
-From: AceLan Kao <acelan.kao@canonical.com>
-To: linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH] Bluetooth: Add support for Atheros [0cf3:e004]
-Date: Mon, 30 Jan 2012 11:49:35 +0800
-Message-Id: <1327895375-9162-1-git-send-email-acelan.kao@canonical.com>
+From: Paul Seidler <pl.seidler@googlemail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] build: modifing behavior of systemdunitdir switch
+Date: Sun, 29 Jan 2012 21:54:57 +0100
+Message-Id: <1327870497-4260-1-git-send-email-pl.seidler@googlemail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add another vendor specific ID for Atheros BT device
+Currently it's not possible to disable the installation of the systemd
+service file. If you use --without the file get installed into /no/.
 
-output of usb-devices:
-T:  Bus=02 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  4 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cf3 ProdID=e004 Rev=00.02
-S:  Manufacturer=Atheros Communications
-S:  Product=Bluetooth USB Host Controller
-S:  SerialNumber=Alaska Day 2006
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+Changes with this patch:
+--without-systemdunitdir disables the installation of the service file
+--with-systemdunitdir installs the file in the directory reported by
+pkg-config
+--with-systemdunitdir=/foo installs the file to /foo
 
-BTW, to enable this device correctly, the btusb module should be loaded
-before ath3k. So, user should have this line in /etc/modprobe.d/ath3k.conf
+Without giving the systemdunitdir switch, pkg-config checks for systemd and
+installs the file if available.
 
-   install ath3k modprobe btusb; modprobe --ignore-install ath3k;
-
-Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+Signed-off-by: Paul Seidler <pl.seidler@googlemail.com>
 ---
- drivers/bluetooth/ath3k.c |    2 ++
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 3 insertions(+), 0 deletions(-)
+ configure.ac |   20 ++++++++++++--------
+ 1 files changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 07f14d1..b55fc76 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -71,6 +71,7 @@ static struct usb_device_id ath3k_table[] = {
+diff --git a/configure.ac b/configure.ac
+index 5b81f28..b96dc5d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -62,14 +62,18 @@ if (test "${enable_capng}" = "yes"); then
+ 	AC_DEFINE(HAVE_CAPNG, 1, [Define to 1 if you have capabilities library.])
+ fi
  
- 	/* Atheros AR3012 with sflash firmware*/
- 	{ USB_DEVICE(0x0CF3, 0x3004) },
-+	{ USB_DEVICE(0x0CF3, 0xE004) },
+-AC_ARG_WITH([systemdunitdir], AC_HELP_STRING([--with-systemdunitdir=DIR],
+-	[path to systemd system service directory]), [path_systemdunit=${withval}],
+-		[path_systemdunit="`$PKG_CONFIG --variable=systemdsystemunitdir systemd`"])
+-if (test -n "${path_systemdunit}"); then
+-	SYSTEMD_UNITDIR="${path_systemdunit}"
+-	AC_SUBST(SYSTEMD_UNITDIR)
+-fi
+-AM_CONDITIONAL(SYSTEMD, test -n "${path_systemdunit}")
++AC_ARG_WITH([systemdunitdir],
++	AC_HELP_STRING([--with-systemdunitdir@<:@=DIR@:>@],
++		[Installing systemd service file (auto)
++		@<:@path to systemd system service directory@:>@]),
++	[path_systemdunit="${withval}"],
++	[PKG_CHECK_MODULES(SYSTEMD, systemd,
++		path_systemdunit=yes, path_systemdunit=no)])
++AS_IF([test "${path_systemdunit}" = yes],
++	[path_systemdunit="`$PKG_CONFIG --variable=systemdsystemunitdir systemd`"])
++AS_IF([test "${path_systemdunit}" != no],
++	[AC_SUBST(SYSTEMD_UNITDIR,["${path_systemdunit}"])])
++AM_CONDITIONAL(SYSTEMD, test "${path_systemdunit}" != no)
  
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -87,6 +88,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
- 
- 	/* Atheros AR3012 with sflash firmware*/
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
- 
- 	{ }	/* Terminating entry */
- };
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f00f596..888230a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -126,6 +126,7 @@ static struct usb_device_id blacklist_table[] = {
- 
- 	/* Atheros 3012 with sflash firmware */
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+ AC_OUTPUT(Makefile scripts/bluetooth.rules doc/version.xml
+ 			src/bluetoothd.8 src/bluetooth.service bluez.pc)
 -- 
-1.7.8.3
+1.7.8.1
+
