@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 07/13] client: introduce obc_session_move
-Date: Mon, 30 Jan 2012 07:30:30 -0800
-Message-Id: <1327937436-15480-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 06/13] client: introduce obc_session_copy
+Date: Mon, 30 Jan 2012 07:30:29 -0800
+Message-Id: <1327937436-15480-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1327937436-15480-1-git-send-email-luiz.dentz@gmail.com>
 References: <1327937436-15480-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -17,15 +17,15 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
  2 files changed, 33 insertions(+), 0 deletions(-)
 
 diff --git a/client/session.c b/client/session.c
-index f664372..9f07114 100644
+index 7816a05..f664372 100644
 --- a/client/session.c
 +++ b/client/session.c
-@@ -1340,3 +1340,33 @@ guint obc_session_copy(struct obc_session *session, const char *filename,
+@@ -1310,3 +1310,33 @@ guint obc_session_mkdir(struct obc_session *session, const char *folder,
  	session->p = p;
  	return p->id;
  }
 +
-+guint obc_session_move(struct obc_session *session, const char *filename,
++guint obc_session_copy(struct obc_session *session, const char *filename,
 +				const char *destname, session_callback_t func,
 +				void *user_data, GError **err)
 +{
@@ -44,7 +44,7 @@ index f664372..9f07114 100644
 +
 +	p = pending_request_new(session, NULL, NULL, func, user_data);
 +
-+	p->req_id = g_obex_move(session->obex, filename, destname, async_cb, p,
++	p->req_id = g_obex_copy(session->obex, filename, destname, async_cb, p,
 +									err);
 +	if (*err != NULL) {
 +		pending_request_free(p);
@@ -55,14 +55,14 @@ index f664372..9f07114 100644
 +	return p->id;
 +}
 diff --git a/client/session.h b/client/session.h
-index 57f3fcd..64548e9 100644
+index a424054..57f3fcd 100644
 --- a/client/session.h
 +++ b/client/session.h
-@@ -83,3 +83,6 @@ guint obc_session_mkdir(struct obc_session *session, const char *folder,
- guint obc_session_copy(struct obc_session *session, const char *filename,
- 				const char *destname, session_callback_t func,
- 				void *user_data, GError **err);
-+guint obc_session_move(struct obc_session *session, const char *filename,
+@@ -80,3 +80,6 @@ guint obc_session_setpath(struct obc_session *session, const char *path,
+ guint obc_session_mkdir(struct obc_session *session, const char *folder,
+ 				session_callback_t func, void *user_data,
+ 				GError **err);
++guint obc_session_copy(struct obc_session *session, const char *filename,
 +				const char *destname, session_callback_t func,
 +				void *user_data, GError **err);
 -- 
