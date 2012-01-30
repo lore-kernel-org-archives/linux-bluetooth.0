@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1327936146-13897-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1327936146-13897-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1327936146-13897-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1327936146-13897-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Mon, 30 Jan 2012 15:25:38 -0200
-Message-ID: <CAA37ikYB3DsumfGOyz+SjAtO1mhOJ-kZPaANv7Lf=4JoGGrKjg@mail.gmail.com>
-Subject: Re: [RFCv0 3/5] Bluetooth: Helper functions for locking change
+	<1327936146-13897-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 30 Jan 2012 15:18:02 -0200
+Message-ID: <CAA37ikZLekboRPQdD-8ABPe9N900zxPks7xT8B8OdN++CHH_EA@mail.gmail.com>
+Subject: Re: [RFCv0 2/5] Bluetooth: Add l2cap_chan_lock
 From: Ulisses Furquim <ulisses@profusion.mobi>
 To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -18,65 +18,60 @@ Hi Andrei,
 On Mon, Jan 30, 2012 at 1:09 PM, Emeltchenko Andrei
 <Andrei.Emeltchenko.news@gmail.com> wrote:
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-No commit message? In my opinion all commits should have a commit
-message and even more in this patch set that deals with locking in
-L2CAP core.
-
+>
+> Channel lock will be used to lock L2CAP channels which are locked
+> currently by socket locks.
+>
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  net/bluetooth/l2cap_core.c |   23 ++++++++++++++++++++++-
->  1 files changed, 22 insertions(+), 1 deletions(-)
+>  include/net/bluetooth/l2cap.h |   11 +++++++++++
+>  net/bluetooth/l2cap_core.c    |    2 ++
+>  2 files changed, 13 insertions(+), 0 deletions(-)
 >
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index e7a8cc7..e81f235 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -497,6 +497,7 @@ struct l2cap_chan {
+>
+>        void            *data;
+>        struct l2cap_ops *ops;
+> +       struct mutex            lock;
+>  };
+>
+>  struct l2cap_ops {
+> @@ -609,6 +610,16 @@ static inline void l2cap_chan_put(struct l2cap_chan *c)
+>                kfree(c);
+>  }
+>
+> +static inline void l2cap_chan_lock(struct l2cap_chan *chan)
+> +{
+> +       mutex_lock(&chan->lock);
+> +}
+> +
+> +static inline void l2cap_chan_unlock(struct l2cap_chan *chan)
+> +{
+> +       mutex_unlock(&chan->lock);
+> +}
+> +
+>  static inline void l2cap_set_timer(struct l2cap_chan *chan,
+>                                        struct delayed_work *work, long timeout)
+>  {
 > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 9a23b19..a7e5a55 100644
+> index f54768e..9a23b19 100644
 > --- a/net/bluetooth/l2cap_core.c
 > +++ b/net/bluetooth/l2cap_core.c
-> @@ -241,7 +241,7 @@ static char *state_to_string(int state)
->        return "invalid state";
->  }
+> @@ -285,6 +285,8 @@ struct l2cap_chan *l2cap_chan_create(struct sock *sk)
+>        if (!chan)
+>                return NULL;
 >
-> -static void l2cap_state_change(struct l2cap_chan *chan, int state)
-> +static void __l2cap_state_change(struct l2cap_chan *chan, int state)
->  {
->        BT_DBG("%p %s -> %s", chan, state_to_string(chan->state),
->                                                state_to_string(state));
-> @@ -250,6 +250,27 @@ static void l2cap_state_change(struct l2cap_chan *chan, int state)
->        chan->ops->state_change(chan->data, state);
->  }
+> +       mutex_init(&chan->lock);
+> +
+>        chan->sk = sk;
 >
-> +static void l2cap_state_change(struct l2cap_chan *chan, int state)
-> +{
-> +       lock_sock(chan->sk);
-> +       __l2cap_state_change(chan, state);
-> +       release_sock(chan->sk);
-> +}
+>        write_lock(&chan_list_lock);
 
-Introducing this change now before the others in patch 5 will actually
-change how l2cap_state_change works. Won't that cause any problems?
-
-> +static inline void __l2cap_set_sock_err(struct sock *sk, int err)
-> +{
-> +       sk->sk_err = err;
-> +}
-> +
-> +static inline void l2cap_set_sock_err(struct l2cap_chan *chan, int err)
-> +{
-> +       struct sock *sk = chan->sk;
-> +
-> +       lock_sock(sk);
-> +       __l2cap_set_sock_err(sk, err);
-> +       release_sock(sk);
-> +}
-
-This helper is different because it didn't exist before so I can say
-we shall have no problems with it.
-
->  static void l2cap_chan_timeout(struct work_struct *work)
->  {
->        struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
-> --
-> 1.7.4.1
+This one looks good to me.
 
 Regards,
 
