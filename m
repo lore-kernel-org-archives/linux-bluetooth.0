@@ -1,39 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1327948421.1955.143.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Add support for Atheros [0cf3:e004]
+Message-ID: <1327948323.1955.142.camel@aeonflux>
+Subject: Re: [PATCH 2/2] Bluetooth: Remove unneeded locking
 From: Marcel Holtmann <marcel@holtmann.org>
-To: AceLan Kao <acelan.kao@canonical.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Date: Mon, 30 Jan 2012 10:33:41 -0800
-In-Reply-To: <1327895375-9162-1-git-send-email-acelan.kao@canonical.com>
-References: <1327895375-9162-1-git-send-email-acelan.kao@canonical.com>
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Date: Mon, 30 Jan 2012 10:32:03 -0800
+In-Reply-To: <1327704123-31313-2-git-send-email-andre.guedes@openbossa.org>
+References: <1327704123-31313-1-git-send-email-andre.guedes@openbossa.org>
+	 <1327704123-31313-2-git-send-email-andre.guedes@openbossa.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi AceLan,
+Hi Andre,
 
-> Add another vendor specific ID for Atheros BT device
+> We don't need locking hdev in hci_conn_timeout() since it doesn't
+> access any hdev's shared resources, it basically queues HCI commands.
 > 
-> output of usb-devices:
-> T:  Bus=02 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  4 Spd=12  MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0cf3 ProdID=e004 Rev=00.02
-> S:  Manufacturer=Atheros Communications
-> S:  Product=Bluetooth USB Host Controller
-> S:  SerialNumber=Alaska Day 2006
-> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> 
-> BTW, to enable this device correctly, the btusb module should be loaded
-> before ath3k. So, user should have this line in /etc/modprobe.d/ath3k.conf
-> 
->    install ath3k modprobe btusb; modprobe --ignore-install ath3k;
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> ---
+>  net/bluetooth/hci_conn.c |    5 -----
+>  1 files changed, 0 insertions(+), 5 deletions(-)
 
-NAK. Get this fixed properly then.
+Reviewed-by: Ulisses Furquim <ulisses@profusion.mobi>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
