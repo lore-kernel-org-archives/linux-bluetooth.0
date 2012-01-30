@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 4/5] Bluetooth: Remove unneeded sk variable
-Date: Mon, 30 Jan 2012 17:09:05 +0200
-Message-Id: <1327936146-13897-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv0 1/5] Bluetooth: Use locks in RCU updater code
+Date: Mon, 30 Jan 2012 17:09:02 +0200
+Message-Id: <1327936146-13897-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1327936146-13897-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1327936146-13897-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,62 +11,69 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-In debug use chan %p instead of sk.
+Code which makes changes to RCU list shall be locked.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |    9 +++------
- 1 files changed, 3 insertions(+), 6 deletions(-)
+ net/bluetooth/l2cap_core.c |   13 +++++++++----
+ 1 files changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index a7e5a55..4a22602 100644
+index 6991821..f54768e 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1589,13 +1589,12 @@ static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
- 						struct msghdr *msg, size_t len,
- 						u32 priority)
+@@ -743,13 +743,13 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
+ /* ---- L2CAP connections ---- */
+ static void l2cap_conn_start(struct l2cap_conn *conn)
  {
--	struct sock *sk = chan->sk;
- 	struct l2cap_conn *conn = chan->conn;
- 	struct sk_buff *skb;
- 	int err, count, hlen = L2CAP_HDR_SIZE + L2CAP_PSMLEN_SIZE;
- 	struct l2cap_hdr *lh;
+-	struct l2cap_chan *chan;
++	struct l2cap_chan *chan, *tmp;
  
--	BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
-+	BT_DBG("chan %p len %d priority %u", chan, (int)len, priority);
+ 	BT_DBG("conn %p", conn);
  
- 	count = min_t(unsigned int, (conn->mtu - hlen), len);
+-	rcu_read_lock();
++	mutex_lock(&conn->chan_lock);
  
-@@ -1625,13 +1624,12 @@ static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
- 						struct msghdr *msg, size_t len,
- 						u32 priority)
- {
--	struct sock *sk = chan->sk;
- 	struct l2cap_conn *conn = chan->conn;
- 	struct sk_buff *skb;
- 	int err, count, hlen = L2CAP_HDR_SIZE;
- 	struct l2cap_hdr *lh;
+-	list_for_each_entry_rcu(chan, &conn->chan_l, list) {
++	list_for_each_entry_safe(chan, tmp, &conn->chan_l, list) {
+ 		struct sock *sk = chan->sk;
  
--	BT_DBG("sk %p len %d", sk, (int)len);
-+	BT_DBG("chan %p len %d", chan, (int)len);
+ 		bh_lock_sock(sk);
+@@ -829,7 +829,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 		bh_unlock_sock(sk);
+ 	}
  
- 	count = min_t(unsigned int, (conn->mtu - hlen), len);
+-	rcu_read_unlock();
++	mutex_unlock(&conn->chan_lock);
+ }
  
-@@ -1660,13 +1658,12 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
- 						struct msghdr *msg, size_t len,
- 						u32 control, u16 sdulen)
- {
--	struct sock *sk = chan->sk;
- 	struct l2cap_conn *conn = chan->conn;
- 	struct sk_buff *skb;
- 	int err, count, hlen;
- 	struct l2cap_hdr *lh;
+ /* Find socket with cid and source bdaddr.
+@@ -1009,6 +1009,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
  
--	BT_DBG("sk %p len %d", sk, (int)len);
-+	BT_DBG("chan %p len %d", chan, (int)len);
+ 	kfree_skb(conn->rx_skb);
  
- 	if (!conn)
- 		return ERR_PTR(-ENOTCONN);
++	mutex_lock(&conn->chan_lock);
++
+ 	/* Kill channels */
+ 	list_for_each_entry_safe(chan, l, &conn->chan_l, list) {
+ 		sk = chan->sk;
+@@ -1018,6 +1020,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 		chan->ops->close(chan->data);
+ 	}
+ 
++	mutex_unlock(&conn->chan_lock);
++
+ 	hci_chan_del(conn->hchan);
+ 
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+@@ -1075,6 +1079,7 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+ 	conn->feat_mask = 0;
+ 
+ 	spin_lock_init(&conn->lock);
++	mutex_init(&conn->chan_lock);
+ 
+ 	INIT_LIST_HEAD(&conn->chan_l);
+ 
 -- 
 1.7.4.1
 
