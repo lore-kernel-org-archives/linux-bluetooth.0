@@ -1,33 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Jan 2012 14:27:20 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ulisses Furquim <ulisses@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Subject: Re: [PATCH v4 1/2] Bluetooth: Remove usage of __cancel_delayed_work()
-Message-ID: <20120130222720.GA4971@x220.globalsuite.net>
-References: <1327955189-4604-1-git-send-email-ulisses@profusion.mobi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1327955189-4604-1-git-send-email-ulisses@profusion.mobi>
+Message-ID: <1327961335.1955.188.camel@aeonflux>
+Subject: Re: [PATCHv2 0/4] Add support for bonding callbacks and retrying
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Scott James Remnant <scott@netsplit.com>
+Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org
+Date: Mon, 30 Jan 2012 14:08:55 -0800
+In-Reply-To: <CA+bD78iUaG2Kmjn6k+x=MqUcdQaG=-w4dQTVEmvEA_LW1QRzcQ@mail.gmail.com>
+References: <1327430878-23913-1-git-send-email-scott@netsplit.com>
+	 <1327952480.1955.154.camel@aeonflux>
+	 <CA+bD78it1S40KTRA+F9QX0KCVG3jDQsS=VdvEjuRdyxUPN4qhw@mail.gmail.com>
+	 <1327960292.1955.177.camel@aeonflux>
+	 <CA+bD78iUaG2Kmjn6k+x=MqUcdQaG=-w4dQTVEmvEA_LW1QRzcQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ulisses,
+Hi Scott,
 
-On Mon, Jan 30, 2012, Ulisses Furquim wrote:
-> __cancel_delayed_work() is being used in some paths where we cannot
-> sleep waiting for the delayed work to finish. However, that function
-> might return while the timer is running and the work will be queued
-> again. Replace the calls with safer cancel_delayed_work() version
-> which spins until the timer handler finishes on other CPUs and
-> cancels the delayed work.
+> >> > We have to also ensure that we do not disconnect the ACL in between the
+> >> > retry attempts. Otherwise some car kits might cancel their pairing
+> >> > procedure and you have to have user interaction to get it back into
+> >> > pairing mode. So if the ACL gets disconnect, then we should just fail
+> >> > and cancel the bonding.
+> >> >
+> >> In my testing, OS X/iOS drop the ACL between retry attempts - so we
+> >> wouldn't be any worse than they are. I'm not sure whether it's even
+> >> possible in bluez to avoid dropping the ACL?
+> >
+> > Is Apple doing retried pairing (or auto-pairing) as well?
+> >
+> They are; they send 0000 to the device, and then if it fails, it
+> retries after about 3s.
+
+if possible get us some hcidump traces so we can see which side is
+actually dropping the link. I am curious about the timing.
+
+> Android does the same (from the bluez Agent, ick)
 > 
-> Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
-> ---
->  include/net/bluetooth/l2cap.h |    4 ++--
->  net/bluetooth/l2cap_core.c    |    6 +++---
->  2 files changed, 5 insertions(+), 5 deletions(-)
+> > Strictly speaking the ACL disconnect is host stack triggered. So you
+> > have HCI_Authentication_Requested and you can just execute that again
+> > with the same link. We also do have a ACL disconnect timeout handling of
+> > 2 seconds that will allow sockets to re-use the same ACL link. Can you
+> > provide some hcidump traces from your test cases?
+> >
+> Sure, probably will be a few days though. I may have a play and see if
+> I can get it to avoid dropping the ACL link too.
 
-Both patches have bee applied to my bluetooth-next tree. Thanks.
+If everybody else is fine with dropping the ACL link in between, then so
+should we. We just might need a blacklist for some stupid carkits.
 
-Johan
+Regards
+
+Marcel
+
+
