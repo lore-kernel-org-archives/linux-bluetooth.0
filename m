@@ -1,53 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1327926130-26149-2-git-send-email-andre.guedes@openbossa.org>
-References: <1327926130-26149-1-git-send-email-andre.guedes@openbossa.org>
-	<1327926130-26149-2-git-send-email-andre.guedes@openbossa.org>
-Date: Mon, 30 Jan 2012 14:36:55 -0200
-Message-ID: <CAA37ikaw7_=4CzEm=+-XZSK-asKYprbJ-QagHrLPocJyFqjxjw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Bluetooth: Use GFP_KERNEL in hci_chan_create()
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH obexd 07/13] client: introduce obc_session_move
+Date: Mon, 30 Jan 2012 07:30:30 -0800
+Message-Id: <1327937436-15480-7-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1327937436-15480-1-git-send-email-luiz.dentz@gmail.com>
+References: <1327937436-15480-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Jan 30, 2012 at 10:22 AM, Andre Guedes
-<andre.guedes@openbossa.org> wrote:
-> This function is called in process context only, so it should use
-> GFP_KERNEL to allocate memory.
->
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  net/bluetooth/hci_conn.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 9ec7b8e..7b38a0b 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -945,7 +945,7 @@ struct hci_chan *hci_chan_create(struct hci_conn *conn)
->
->        BT_DBG("%s conn %p", hdev->name, conn);
->
-> -       chan = kzalloc(sizeof(struct hci_chan), GFP_ATOMIC);
-> +       chan = kzalloc(sizeof(struct hci_chan), GFP_KERNEL);
->        if (!chan)
->                return NULL;
->
+---
+ client/session.c |   30 ++++++++++++++++++++++++++++++
+ client/session.h |    3 +++
+ 2 files changed, 33 insertions(+), 0 deletions(-)
 
-The two patches to use GFP_KERNEL seem ok to me and that's the path
-Padovan and Marcel wanted to go, of course, now that we run in process
-context.
-
-Best regards,
-
+diff --git a/client/session.c b/client/session.c
+index f664372..9f07114 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -1340,3 +1340,33 @@ guint obc_session_copy(struct obc_session *session, const char *filename,
+ 	session->p = p;
+ 	return p->id;
+ }
++
++guint obc_session_move(struct obc_session *session, const char *filename,
++				const char *destname, session_callback_t func,
++				void *user_data, GError **err)
++{
++	struct pending_request *p;
++
++	if (session->obex == NULL) {
++		g_set_error(err, OBEX_IO_ERROR, -ENOTCONN,
++							strerror(-ENOTCONN));
++		return 0;
++	}
++
++	if (session->p != NULL) {
++		g_set_error(err, OBEX_IO_ERROR, -EBUSY, strerror(-EBUSY));
++		return 0;
++	}
++
++	p = pending_request_new(session, NULL, NULL, func, user_data);
++
++	p->req_id = g_obex_move(session->obex, filename, destname, async_cb, p,
++									err);
++	if (*err != NULL) {
++		pending_request_free(p);
++		return 0;
++	}
++
++	session->p = p;
++	return p->id;
++}
+diff --git a/client/session.h b/client/session.h
+index 57f3fcd..64548e9 100644
+--- a/client/session.h
++++ b/client/session.h
+@@ -83,3 +83,6 @@ guint obc_session_mkdir(struct obc_session *session, const char *folder,
+ guint obc_session_copy(struct obc_session *session, const char *filename,
+ 				const char *destname, session_callback_t func,
+ 				void *user_data, GError **err);
++guint obc_session_move(struct obc_session *session, const char *filename,
++				const char *destname, session_callback_t func,
++				void *user_data, GError **err);
 -- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+1.7.7.6
+
