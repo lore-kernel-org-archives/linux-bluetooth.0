@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1327936146-13897-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1327936146-13897-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1327936146-13897-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1327936146-13897-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Mon, 30 Jan 2012 15:18:02 -0200
-Message-ID: <CAA37ikZLekboRPQdD-8ABPe9N900zxPks7xT8B8OdN++CHH_EA@mail.gmail.com>
-Subject: Re: [RFCv0 2/5] Bluetooth: Add l2cap_chan_lock
+	<1327936146-13897-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 30 Jan 2012 15:17:15 -0200
+Message-ID: <CAA37ikb0CdLrhsDun70kf7WFFZ46qsOHtFX20HooH-sMWdiuoQ@mail.gmail.com>
+Subject: Re: [RFCv0 1/5] Bluetooth: Use locks in RCU updater code
 From: Ulisses Furquim <ulisses@profusion.mobi>
 To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -19,59 +19,76 @@ On Mon, Jan 30, 2012 at 1:09 PM, Emeltchenko Andrei
 <Andrei.Emeltchenko.news@gmail.com> wrote:
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
-> Channel lock will be used to lock L2CAP channels which are locked
-> currently by socket locks.
+> Code which makes changes to RCU list shall be locked.
 >
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  include/net/bluetooth/l2cap.h |   11 +++++++++++
->  net/bluetooth/l2cap_core.c    |    2 ++
->  2 files changed, 13 insertions(+), 0 deletions(-)
+>  net/bluetooth/l2cap_core.c |   13 +++++++++----
+>  1 files changed, 9 insertions(+), 4 deletions(-)
 >
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index e7a8cc7..e81f235 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -497,6 +497,7 @@ struct l2cap_chan {
->
->        void            *data;
->        struct l2cap_ops *ops;
-> +       struct mutex            lock;
->  };
->
->  struct l2cap_ops {
-> @@ -609,6 +610,16 @@ static inline void l2cap_chan_put(struct l2cap_chan *c)
->                kfree(c);
->  }
->
-> +static inline void l2cap_chan_lock(struct l2cap_chan *chan)
-> +{
-> +       mutex_lock(&chan->lock);
-> +}
-> +
-> +static inline void l2cap_chan_unlock(struct l2cap_chan *chan)
-> +{
-> +       mutex_unlock(&chan->lock);
-> +}
-> +
->  static inline void l2cap_set_timer(struct l2cap_chan *chan,
->                                        struct delayed_work *work, long timeout)
->  {
 > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index f54768e..9a23b19 100644
+> index 6991821..f54768e 100644
 > --- a/net/bluetooth/l2cap_core.c
 > +++ b/net/bluetooth/l2cap_core.c
-> @@ -285,6 +285,8 @@ struct l2cap_chan *l2cap_chan_create(struct sock *sk)
->        if (!chan)
->                return NULL;
+> @@ -743,13 +743,13 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
+>  /* ---- L2CAP connections ---- */
+>  static void l2cap_conn_start(struct l2cap_conn *conn)
+>  {
+> -       struct l2cap_chan *chan;
+> +       struct l2cap_chan *chan, *tmp;
 >
-> +       mutex_init(&chan->lock);
+>        BT_DBG("conn %p", conn);
+>
+> -       rcu_read_lock();
+> +       mutex_lock(&conn->chan_lock);
+>
+> -       list_for_each_entry_rcu(chan, &conn->chan_l, list) {
+> +       list_for_each_entry_safe(chan, tmp, &conn->chan_l, list) {
+>                struct sock *sk = chan->sk;
+>
+>                bh_lock_sock(sk);
+> @@ -829,7 +829,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+>                bh_unlock_sock(sk);
+>        }
+>
+> -       rcu_read_unlock();
+> +       mutex_unlock(&conn->chan_lock);
+>  }
+>
+>  /* Find socket with cid and source bdaddr.
+> @@ -1009,6 +1009,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+>
+>        kfree_skb(conn->rx_skb);
+>
+> +       mutex_lock(&conn->chan_lock);
 > +
->        chan->sk = sk;
+>        /* Kill channels */
+>        list_for_each_entry_safe(chan, l, &conn->chan_l, list) {
+>                sk = chan->sk;
+> @@ -1018,6 +1020,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+>                chan->ops->close(chan->data);
+>        }
 >
->        write_lock(&chan_list_lock);
+> +       mutex_unlock(&conn->chan_lock);
+> +
+>        hci_chan_del(conn->hchan);
+>
+>        if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+> @@ -1075,6 +1079,7 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+>        conn->feat_mask = 0;
+>
+>        spin_lock_init(&conn->lock);
+> +       mutex_init(&conn->chan_lock);
+>
+>        INIT_LIST_HEAD(&conn->chan_l);
+>
 
-This one looks good to me.
+I was under the impression you'd remove RCU for conn->chan_l
+completely. You're adding a lock only in the updaters? If so, please
+take a look at commit 3d57dc680 which shows all changes from mutex to
+RCU. I don't think just adding a lock/unlock in l2cap_conn_start and
+l2cap_conn_del will be enough. l2cap_chan_add seems to be called from
+other contexts and it does a list_add_rcu(). Have you thought of that?
 
 Regards,
 
