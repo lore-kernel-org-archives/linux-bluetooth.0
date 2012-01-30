@@ -1,163 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1327704123-31313-1-git-send-email-andre.guedes@openbossa.org>
-References: <1327704123-31313-1-git-send-email-andre.guedes@openbossa.org>
-Date: Mon, 30 Jan 2012 10:26:04 -0200
-Message-ID: <CAA37ikZhSx3J42A3U-hLuLk37Z=XP-uBiscEHOXZpAoz3=9feA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Bluetooth: Fix potential deadlock
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Use GFP_KERNEL in hci_chan_create()
+Date: Mon, 30 Jan 2012 09:22:10 -0300
+Message-Id: <1327926130-26149-2-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1327926130-26149-1-git-send-email-andre.guedes@openbossa.org>
+References: <1327926130-26149-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+This function is called in process context only, so it should use
+GFP_KERNEL to allocate memory.
 
-On Fri, Jan 27, 2012 at 8:42 PM, Andre Guedes
-<andre.guedes@openbossa.org> wrote:
-> We don't need to use the _sync variant in hci_conn_hold and
-> hci_conn_put to cancel conn->disc_work delayed work. This way
-> we avoid potential deadlocks like this one reported by lockdep.
->
-> ======================================================
-> [ INFO: possible circular locking dependency detected ]
-> 3.2.0+ #1 Not tainted
-> -------------------------------------------------------
-> kworker/u:1/17 is trying to acquire lock:
->  (&hdev->lock){+.+.+.}, at: [<ffffffffa0041155>] hci_conn_timeout+0x62/0x158 [bluetooth]
->
-> but task is already holding lock:
->  ((&(&conn->disc_work)->work)){+.+...}, at: [<ffffffff81035751>] process_one_work+0x11a/0x2bf
->
-> which lock already depends on the new lock.
->
-> the existing dependency chain (in reverse order) is:
->
-> -> #2 ((&(&conn->disc_work)->work)){+.+...}:
->       [<ffffffff81057444>] lock_acquire+0x8a/0xa7
->       [<ffffffff81034ed1>] wait_on_work+0x3d/0xaa
->       [<ffffffff81035b54>] __cancel_work_timer+0xac/0xef
->       [<ffffffff81035ba4>] cancel_delayed_work_sync+0xd/0xf
->       [<ffffffffa00554b0>] smp_chan_create+0xde/0xe6 [bluetooth]
->       [<ffffffffa0056160>] smp_conn_security+0xa3/0x12d [bluetooth]
->       [<ffffffffa0053640>] l2cap_connect_cfm+0x237/0x2e8 [bluetooth]
->       [<ffffffffa004239c>] hci_proto_connect_cfm+0x2d/0x6f [bluetooth]
->       [<ffffffffa0046ea5>] hci_event_packet+0x29d1/0x2d60 [bluetooth]
->       [<ffffffffa003dde3>] hci_rx_work+0xd0/0x2e1 [bluetooth]
->       [<ffffffff810357af>] process_one_work+0x178/0x2bf
->       [<ffffffff81036178>] worker_thread+0xce/0x152
->       [<ffffffff81039a03>] kthread+0x95/0x9d
->       [<ffffffff812e7754>] kernel_thread_helper+0x4/0x10
->
-> -> #1 (slock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+...}:
->       [<ffffffff81057444>] lock_acquire+0x8a/0xa7
->       [<ffffffff812e553a>] _raw_spin_lock_bh+0x36/0x6a
->       [<ffffffff81244d56>] lock_sock_nested+0x24/0x7f
->       [<ffffffffa004d96f>] lock_sock+0xb/0xd [bluetooth]
->       [<ffffffffa0052906>] l2cap_chan_connect+0xa9/0x26f [bluetooth]
->       [<ffffffffa00545f8>] l2cap_sock_connect+0xb3/0xff [bluetooth]
->       [<ffffffff81243b48>] sys_connect+0x69/0x8a
->       [<ffffffff812e6579>] system_call_fastpath+0x16/0x1b
->
-> -> #0 (&hdev->lock){+.+.+.}:
->       [<ffffffff81056d06>] __lock_acquire+0xa80/0xd74
->       [<ffffffff81057444>] lock_acquire+0x8a/0xa7
->       [<ffffffff812e3870>] __mutex_lock_common+0x48/0x38e
->       [<ffffffff812e3c75>] mutex_lock_nested+0x2a/0x31
->       [<ffffffffa0041155>] hci_conn_timeout+0x62/0x158 [bluetooth]
->       [<ffffffff810357af>] process_one_work+0x178/0x2bf
->       [<ffffffff81036178>] worker_thread+0xce/0x152
->       [<ffffffff81039a03>] kthread+0x95/0x9d
->       [<ffffffff812e7754>] kernel_thread_helper+0x4/0x10
->
-> other info that might help us debug this:
->
-> Chain exists of:
->  &hdev->lock --> slock-AF_BLUETOOTH-BTPROTO_L2CAP --> (&(&conn->disc_work)->work)
->
->  Possible unsafe locking scenario:
->
->       CPU0                    CPU1
->       ----                    ----
->  lock((&(&conn->disc_work)->work));
->                               lock(slock-AF_BLUETOOTH-BTPROTO_L2CAP);
->                               lock((&(&conn->disc_work)->work));
->  lock(&hdev->lock);
->
->  *** DEADLOCK ***
->
-> 2 locks held by kworker/u:1/17:
->  #0:  (hdev->name){.+.+.+}, at: [<ffffffff81035751>] process_one_work+0x11a/0x2bf
->  #1:  ((&(&conn->disc_work)->work)){+.+...}, at: [<ffffffff81035751>] process_one_work+0x11a/0x2bf
->
-> stack backtrace:
-> Pid: 17, comm: kworker/u:1 Not tainted 3.2.0+ #1
-> Call Trace:
->  [<ffffffff812e06c6>] print_circular_bug+0x1f8/0x209
->  [<ffffffff81056d06>] __lock_acquire+0xa80/0xd74
->  [<ffffffff81021ef2>] ? arch_local_irq_restore+0x6/0xd
->  [<ffffffff81022bc7>] ? vprintk+0x3f9/0x41e
->  [<ffffffff81057444>] lock_acquire+0x8a/0xa7
->  [<ffffffffa0041155>] ? hci_conn_timeout+0x62/0x158 [bluetooth]
->  [<ffffffff812e3870>] __mutex_lock_common+0x48/0x38e
->  [<ffffffffa0041155>] ? hci_conn_timeout+0x62/0x158 [bluetooth]
->  [<ffffffff81190fd6>] ? __dynamic_pr_debug+0x6d/0x6f
->  [<ffffffffa0041155>] ? hci_conn_timeout+0x62/0x158 [bluetooth]
->  [<ffffffff8105320f>] ? trace_hardirqs_off+0xd/0xf
->  [<ffffffff812e3c75>] mutex_lock_nested+0x2a/0x31
->  [<ffffffffa0041155>] hci_conn_timeout+0x62/0x158 [bluetooth]
->  [<ffffffff810357af>] process_one_work+0x178/0x2bf
->  [<ffffffff81035751>] ? process_one_work+0x11a/0x2bf
->  [<ffffffff81055af3>] ? lock_acquired+0x1d0/0x1df
->  [<ffffffffa00410f3>] ? hci_acl_disconn+0x65/0x65 [bluetooth]
->  [<ffffffff81036178>] worker_thread+0xce/0x152
->  [<ffffffff810407ed>] ? finish_task_switch+0x45/0xc5
->  [<ffffffff810360aa>] ? manage_workers.isra.25+0x16a/0x16a
->  [<ffffffff81039a03>] kthread+0x95/0x9d
->  [<ffffffff812e7754>] kernel_thread_helper+0x4/0x10
->  [<ffffffff812e5db4>] ? retint_restore_args+0x13/0x13
->  [<ffffffff8103996e>] ? __init_kthread_worker+0x55/0x55
->  [<ffffffff812e7750>] ? gs_change+0x13/0x13
->
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> ---
->  include/net/bluetooth/hci_core.h |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 25f449f..896d9e4 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -572,7 +572,7 @@ void hci_conn_put_device(struct hci_conn *conn);
->  static inline void hci_conn_hold(struct hci_conn *conn)
->  {
->        atomic_inc(&conn->refcnt);
-> -       cancel_delayed_work_sync(&conn->disc_work);
-> +       cancel_delayed_work(&conn->disc_work);
->  }
->
->  static inline void hci_conn_put(struct hci_conn *conn)
-> @@ -591,7 +591,7 @@ static inline void hci_conn_put(struct hci_conn *conn)
->                } else {
->                        timeo = msecs_to_jiffies(10);
->                }
-> -               cancel_delayed_work_sync(&conn->disc_work);
-> +               cancel_delayed_work(&conn->disc_work);
->                queue_delayed_work(conn->hdev->workqueue,
->                                        &conn->disc_work, timeo);
->        }
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ net/bluetooth/hci_conn.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Looks correct to me. I hope we're finishing cleaning these deadlocks
-caused by delayed work manipulation. :-/
-
-Best regards,
-
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 9ec7b8e..7b38a0b 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -945,7 +945,7 @@ struct hci_chan *hci_chan_create(struct hci_conn *conn)
+ 
+ 	BT_DBG("%s conn %p", hdev->name, conn);
+ 
+-	chan = kzalloc(sizeof(struct hci_chan), GFP_ATOMIC);
++	chan = kzalloc(sizeof(struct hci_chan), GFP_KERNEL);
+ 	if (!chan)
+ 		return NULL;
+ 
 -- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+1.7.8.4
+
