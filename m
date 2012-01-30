@@ -1,33 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 0/5] Bluetooth: Change socket lock to l2cap_chan lock
-Date: Mon, 30 Jan 2012 17:09:01 +0200
-Message-Id: <1327936146-13897-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv0 2/5] Bluetooth: Add l2cap_chan_lock
+Date: Mon, 30 Jan 2012 17:09:03 +0200
+Message-Id: <1327936146-13897-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1327936146-13897-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1327936146-13897-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This is DRAFT RFC introducing l2cap channel lock. Please make suggestion how to
-make it better.
+Channel lock will be used to lock L2CAP channels which are locked
+currently by socket locks.
 
-Beside changing socket locks to l2cap_chan lock channel list lock is reverted.
-It is now used to protect RCU updaters or RCU lists which might sleep and not
-protected by rcu_read_lock.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/l2cap.h |   11 +++++++++++
+ net/bluetooth/l2cap_core.c    |    2 ++
+ 2 files changed, 13 insertions(+), 0 deletions(-)
 
-Andrei Emeltchenko (5):
-  Bluetooth: Use locks in RCU updater code
-  Bluetooth: Add l2cap_chan_lock
-  Bluetooth: Helper functions for locking change
-  Bluetooth: Remove unneeded sk variable
-  Bluetooth: Change sk lock to l2cap_chan lock
-
- include/net/bluetooth/l2cap.h |   11 ++
- net/bluetooth/l2cap_core.c    |  267 ++++++++++++++++++++++++++---------------
- net/bluetooth/l2cap_sock.c    |   13 ++-
- 3 files changed, 193 insertions(+), 98 deletions(-)
-
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index e7a8cc7..e81f235 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -497,6 +497,7 @@ struct l2cap_chan {
+ 
+ 	void		*data;
+ 	struct l2cap_ops *ops;
++	struct mutex		lock;
+ };
+ 
+ struct l2cap_ops {
+@@ -609,6 +610,16 @@ static inline void l2cap_chan_put(struct l2cap_chan *c)
+ 		kfree(c);
+ }
+ 
++static inline void l2cap_chan_lock(struct l2cap_chan *chan)
++{
++	mutex_lock(&chan->lock);
++}
++
++static inline void l2cap_chan_unlock(struct l2cap_chan *chan)
++{
++	mutex_unlock(&chan->lock);
++}
++
+ static inline void l2cap_set_timer(struct l2cap_chan *chan,
+ 					struct delayed_work *work, long timeout)
+ {
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index f54768e..9a23b19 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -285,6 +285,8 @@ struct l2cap_chan *l2cap_chan_create(struct sock *sk)
+ 	if (!chan)
+ 		return NULL;
+ 
++	mutex_init(&chan->lock);
++
+ 	chan->sk = sk;
+ 
+ 	write_lock(&chan_list_lock);
 -- 
 1.7.4.1
 
