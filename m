@@ -1,28 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Jan 2012 11:08:36 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Use GFP_KERNEL in hci_conn_add()
-Message-ID: <20120130190836.GA31558@x220.globalsuite.net>
-References: <1327926130-26149-1-git-send-email-andre.guedes@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1327926130-26149-1-git-send-email-andre.guedes@openbossa.org>
+Message-ID: <1327948421.1955.143.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Add support for Atheros [0cf3:e004]
+From: Marcel Holtmann <marcel@holtmann.org>
+To: AceLan Kao <acelan.kao@canonical.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Date: Mon, 30 Jan 2012 10:33:41 -0800
+In-Reply-To: <1327895375-9162-1-git-send-email-acelan.kao@canonical.com>
+References: <1327895375-9162-1-git-send-email-acelan.kao@canonical.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi AceLan,
 
-On Mon, Jan 30, 2012, Andre Guedes wrote:
-> This function is called in process context only, so it should use
-> GFP_KERNEL to allocate memory.
+> Add another vendor specific ID for Atheros BT device
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  net/bluetooth/hci_conn.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+> output of usb-devices:
+> T:  Bus=02 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  4 Spd=12  MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0cf3 ProdID=e004 Rev=00.02
+> S:  Manufacturer=Atheros Communications
+> S:  Product=Bluetooth USB Host Controller
+> S:  SerialNumber=Alaska Day 2006
+> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> 
+> BTW, to enable this device correctly, the btusb module should be loaded
+> before ath3k. So, user should have this line in /etc/modprobe.d/ath3k.conf
+> 
+>    install ath3k modprobe btusb; modprobe --ignore-install ath3k;
 
-Both patches have been applied to my bluetooth-next tree. Thanks.
+NAK. Get this fixed properly then.
 
-Johan
+Regards
+
+Marcel
+
+
