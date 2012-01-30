@@ -1,40 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1327963126.1955.189.camel@aeonflux>
-Subject: Re: [PATCH 1/8] Bluetooth: Add structures for the new LTK exchange
- messages
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 30 Jan 2012 14:38:46 -0800
-In-Reply-To: <1327962558-25720-2-git-send-email-vinicius.gomes@openbossa.org>
-References: <1327962558-25720-1-git-send-email-vinicius.gomes@openbossa.org>
-	 <1327962558-25720-2-git-send-email-vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1327962821.2125.4.camel@sirocco.config>
+References: <1327448862-21964-1-git-send-email-scott@netsplit.com>
+	<1327952977.1955.160.camel@aeonflux>
+	<1327953929.2400.80.camel@novo.hadess.net>
+	<CA+bD78jkORzLP-M+bGqFMkp9vHmBXW+LgLnFGhLczn92Rk2XXA@mail.gmail.com>
+	<1327962821.2125.4.camel@sirocco.config>
+Date: Mon, 30 Jan 2012 14:35:35 -0800
+Message-ID: <CA+bD78hQcBm5-94RHNSPXUsM1kAD8pYJ5Yu=-jPv8T=iedr6bA@mail.gmail.com>
+Subject: Re: [RFC PATCHv2] autopair: add autopair plugin
+From: Scott James Remnant <scott@netsplit.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+	keybuk@chromium.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+On Mon, Jan 30, 2012 at 2:33 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> Em Mon, 2012-01-30 =E0s 13:42 -0800, Scott James Remnant escreveu:
+>> > The PIN length hint is also ignored in the current code:
+>> > + =A0 =A0 =A0 <device type=3D"audio" oui=3D"00:1A:80:" name=3D"CMT-DH5=
+BT"
+>> pin=3D"max:4"/>
+>> >
+>> Because that's a UI restriction, no?
+>>
+>> I didn't put any PIN-generation code here, because I'm not entirely
+>> sure what the UI for "generate random PIN' should look like or which
+>> spec you're following.
+>
+> It means that a generated PIN shouldn't have more than 4 digits for it
+> to work with this device.
+>
+What generated PIN? Which spec/profile says you have to generate a PIN
+for this device?
 
-> This defines two new messages, one event that will inform
-> userspace that a new Long Term Key was exchanged and one that
-> will allow userspace to load LTKs into the kernel.
-> 
-> Besides the information necessary for the restablishement of
-> the secure link, we added some extra information: "authenticated"
-> that informs if the key can be used to establish an authenticated
-> link, and "master" that informs the role in that the key should
-> be used.
-> 
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> ---
->  include/net/bluetooth/mgmt.h |   22 ++++++++++++++++++++++
->  1 files changed, 22 insertions(+), 0 deletions(-)
+How does the user know what PIN has been generated?
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Do you display the PIN in the UI in any way?
 
-Regards
+Are they expected to confirm the PIN with a remote display?
 
-Marcel
+Are they expected to type the PIN into the remote device? Or even the
+host, perhaps it's displayed there?
 
+Or do these devices simply just accept any PIN without question? In
+which case, why does it matter whether you send a random PIN or 0000?
 
+Scott
+--=20
+Have you ever, ever felt like this?
+Had strange things happen? =A0Are you going round the twist?
