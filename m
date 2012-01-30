@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1327952977.1955.160.camel@aeonflux>
-Subject: Re: [RFC PATCHv2] autopair: add autopair plugin
+Message-ID: <1327952480.1955.154.camel@aeonflux>
+Subject: Re: [PATCHv2 0/4] Add support for bonding callbacks and retrying
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Scott James Remnant <scott@netsplit.com>
-Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org,
-	hadess@hadess.net
-Date: Mon, 30 Jan 2012 11:49:37 -0800
-In-Reply-To: <1327448862-21964-1-git-send-email-scott@netsplit.com>
-References: <1327448862-21964-1-git-send-email-scott@netsplit.com>
+Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org
+Date: Mon, 30 Jan 2012 11:41:20 -0800
+In-Reply-To: <1327430878-23913-1-git-send-email-scott@netsplit.com>
+References: <1327430878-23913-1-git-send-email-scott@netsplit.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,55 +14,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Scott,
 
-> This plugin handles automatically generating PIN codes for certain
-> device types following rules specified in an XML file derived from
-> that used by the GNOME Bluetooth wizard.
+> Thanks for the comments on the autopair plugin patches, I'm still
+> working on updating that but I wanted to submit the underlying core
+> changes necessary while I do so.
 > 
-> The plugin deliberately ignores unknown elements and attributes so
-> that this file can be extended by the UI, for example adding hints
-> that pairing shouldn't be attempted for certain devices (e.g. mice)
-> or other special pairing considerations.
+> This adds plugin support for a callback called when bonding completes,
+> either successfully or fails, or is cancelled. In the success or failure
+> cases the callback may return TRUE, in which case the bonding is retried
+> after a short backoff period.
 > 
-> Should autopairing fail for a device, it is blacklisted and will
-> be retried using the agent as usual. These blacklist files can be
-> harvested by distributions in order to further improve the database.
-> ---
->  Makefile.am                   |    9 +
->  acinclude.m4                  |    6 +
->  plugins/autopair.c            |  363 +++++++++++++++++++++++++++++++++++++++++
->  plugins/pin-code-database.xml |  174 ++++++++++++++++++++
->  4 files changed, 552 insertions(+), 0 deletions(-)
->  create mode 100644 plugins/autopair.c
->  create mode 100644 plugins/pin-code-database.xml
+> The (to be submitted) autopair plugin will use this to retry bonding if
+> a fixed PIN it provides fails, and ignore the subsequent attempt so that
+> the ordinary PIN handling (user agent, keyboard auto-generation, etc.)
+> happens.
 
-<snip>
+yesterday Johan and talked about this a little bit and I just wanna
+quickly iterate some small comments here.
 
-> +<!--
-> +  The autopair plugin will match devices, following the order of the XML
-> +  file [1], on any combination of type, OUI, or name.
-> +
-> +  [1]: So specific devices should be at the top, and generic ones at the bottom,
-> +  so settings for specific devices are overridden as expected.
-> +-->
-> +
-> +<!DOCTYPE devices [
-> +	<!ELEMENT devices (device)+>
-> +	<!ELEMENT device EMPTY>
-> +	<!ATTLIST device type (any|mouse|tablet|keyboard|headset|headphones|audio|printer|network) "any">
-> +	<!ATTLIST device oui CDATA #IMPLIED>
-> +	<!ATTLIST device name CDATA #IMPLIED>
-> +	<!ATTLIST device pin CDATA #REQUIRED>
-> +]>
+So we should only allow retrying when we initiated the bonding. If the
+other side started the pairing, then retrying should not even be
+considered.
 
-I think we need to have a discussion on this database format first. I
-honestly do not like it at all. It does matching and result handling in
-a single XML element. That seems like a bad idea.
+We have to also ensure that we do not disconnect the ACL in between the
+retry attempts. Otherwise some car kits might cancel their pairing
+procedure and you have to have user interaction to get it back into
+pairing mode. So if the ACL gets disconnect, then we should just fail
+and cancel the bonding.
 
-And in addition making pin attribute required and then trying to disable
-PIN with "NULL" magic is something that I rather not have.
-
-I am also wondering why this has to be XML and not simple key-value INI
-style files.
+For some extra credit we might need to retry the pairing in the kernel
+if we happen to run into an LMP collision due to role switch changes or
+similar issues. And hide that from the user if this happens.
 
 Regards
 
