@@ -1,39 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1327960525.1955.178.camel@aeonflux>
-Subject: Re: [PATCH 1/4] Bluetooth: Introduce to_hci_dev()
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
-Date: Mon, 30 Jan 2012 13:55:25 -0800
-In-Reply-To: <1327679246-2667-2-git-send-email-dh.herrmann@googlemail.com>
-References: <1327679246-2667-1-git-send-email-dh.herrmann@googlemail.com>
-	 <1327679246-2667-2-git-send-email-dh.herrmann@googlemail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1327960292.1955.177.camel@aeonflux>
+References: <1327430878-23913-1-git-send-email-scott@netsplit.com>
+	<1327952480.1955.154.camel@aeonflux>
+	<CA+bD78it1S40KTRA+F9QX0KCVG3jDQsS=VdvEjuRdyxUPN4qhw@mail.gmail.com>
+	<1327960292.1955.177.camel@aeonflux>
+Date: Mon, 30 Jan 2012 13:57:19 -0800
+Message-ID: <CA+bD78iUaG2Kmjn6k+x=MqUcdQaG=-w4dQTVEmvEA_LW1QRzcQ@mail.gmail.com>
+Subject: Re: [PATCHv2 0/4] Add support for bonding callbacks and retrying
+From: Scott James Remnant <scott@netsplit.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+On Mon, Jan 30, 2012 at 1:51 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
 
-> We currently use dev_set_drvdata to keep a pointer to ourself. This
-> doesn't make sense as we are the bus and not a driver. Therefore,
-> introduce to_hci_dev() so we can get a struct hci_dev pointer from a
-> struct device pointer.
-> 
-> dev_set/get_drvdata() is reserved for drivers that provide a device and
-> not for the bus using the device. The bus can use simple pointer
-> arithmetic to retrieve its private data.
-> 
-> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
-> ---
->  include/net/bluetooth/hci_core.h |    2 ++
->  net/bluetooth/hci_sysfs.c        |   33 ++++++++++++++++-----------------
->  2 files changed, 18 insertions(+), 17 deletions(-)
+>> > We have to also ensure that we do not disconnect the ACL in between th=
+e
+>> > retry attempts. Otherwise some car kits might cancel their pairing
+>> > procedure and you have to have user interaction to get it back into
+>> > pairing mode. So if the ACL gets disconnect, then we should just fail
+>> > and cancel the bonding.
+>> >
+>> In my testing, OS X/iOS drop the ACL between retry attempts - so we
+>> wouldn't be any worse than they are. I'm not sure whether it's even
+>> possible in bluez to avoid dropping the ACL?
+>
+> Is Apple doing retried pairing (or auto-pairing) as well?
+>
+They are; they send 0000 to the device, and then if it fails, it
+retries after about 3s.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Android does the same (from the bluez Agent, ick)
 
-Regards
+> Strictly speaking the ACL disconnect is host stack triggered. So you
+> have HCI_Authentication_Requested and you can just execute that again
+> with the same link. We also do have a ACL disconnect timeout handling of
+> 2 seconds that will allow sockets to re-use the same ACL link. Can you
+> provide some hcidump traces from your test cases?
+>
+Sure, probably will be a few days though. I may have a play and see if
+I can get it to avoid dropping the ACL link too.
 
-Marcel
-
-
+Scott
+--=20
+Have you ever, ever felt like this?
+Had strange things happen? =A0Are you going round the twist?
