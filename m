@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1327947847.1955.138.camel@aeonflux>
-Subject: Re: [PATCH 2/2] Bluetooth: Use GFP_KERNEL in hci_chan_create()
+Message-ID: <1327947822.1955.137.camel@aeonflux>
+Subject: Re: [PATCH 1/2] Bluetooth: Use GFP_KERNEL in hci_conn_add()
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 30 Jan 2012 10:24:07 -0800
-In-Reply-To: <1327926130-26149-2-git-send-email-andre.guedes@openbossa.org>
+Date: Mon, 30 Jan 2012 10:23:42 -0800
+In-Reply-To: <1327926130-26149-1-git-send-email-andre.guedes@openbossa.org>
 References: <1327926130-26149-1-git-send-email-andre.guedes@openbossa.org>
-	 <1327926130-26149-2-git-send-email-andre.guedes@openbossa.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
