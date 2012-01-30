@@ -1,90 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Jan 2012 20:24:13 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1327959526.1955.167.camel@aeonflux>
+References: <1327531949-29463-1-git-send-email-andre.guedes@openbossa.org>
+	<1327531949-29463-4-git-send-email-andre.guedes@openbossa.org>
+	<1327959526.1955.167.camel@aeonflux>
+Date: Mon, 30 Jan 2012 20:22:06 -0300
+Message-ID: <CACJA=fW0_fdMq9CHVzMPNtp=HrG=RpraLiRjp-L9f1ES8dUsMw@mail.gmail.com>
+Subject: Re: [PATCH v3 3/6] Bluetooth: Add hci_do_le_scan()
+From: Andre Guedes <andre.guedes@openbossa.org>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/8] Bluetooth: Use the updated key structures for
- handling LTKs
-Message-ID: <20120130232413.GB17656@samus>
-References: <1327962558-25720-1-git-send-email-vinicius.gomes@openbossa.org>
- <1327962558-25720-5-git-send-email-vinicius.gomes@openbossa.org>
- <1327963466.1955.193.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1327963466.1955.193.camel@aeonflux>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On 14:44 Mon 30 Jan, Marcel Holtmann wrote:
-> Hi Vinicius,
-> 
-> > This updates all the users of the older way, that was using the
-> > link_keys list to store the SMP keys, to use the new way.
-> > 
-> > This includes defining new types for the keys, we have a type for each
-> > combination of STK/LTK and Master/Slave.
-> > 
-> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> > ---
-> >  include/net/bluetooth/hci_core.h |   11 +++--
-> >  net/bluetooth/hci_core.c         |   79 ++++++++++++++++++--------------------
-> >  net/bluetooth/hci_event.c        |    9 +++-
-> >  net/bluetooth/smp.c              |   38 +++++++++++-------
-> >  4 files changed, 73 insertions(+), 64 deletions(-)
-> > 
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> > index 06eab3f..ae3f653 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -658,12 +658,13 @@ int hci_link_keys_clear(struct hci_dev *hdev);
-> >  struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
-> >  int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
-> >  			bdaddr_t *bdaddr, u8 *val, u8 type, u8 pin_len);
-> > -struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8]);
-> > -struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
-> > -					bdaddr_t *bdaddr, u8 type);
-> > -int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
-> > -			u8 key_size, __le16 ediv, u8 rand[8], u8 ltk[16]);
-> > +struct smp_ltk *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8]);
-> > +int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type, u8 type,
-> > +				int new_key, u8 authenticated, u8 tk[16],
-> > +				u8 enc_size, u16 ediv, u8 rand[8]);
-> >  int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
-> > +struct smp_ltk *hci_find_ltk_addr(struct hci_dev *hdev, bdaddr_t *bdaddr,
-> > +								u8 addr_type);
-> >  int hci_smp_ltks_clear(struct hci_dev *hdev);
-> >  
-> >  int hci_remote_oob_data_clear(struct hci_dev *hdev);
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index a7b2d6b..d00704e 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -1222,41 +1222,40 @@ static int hci_persistent_key(struct hci_dev *hdev, struct hci_conn *conn,
-> >  	return 0;
-> >  }
-> >  
-> > -struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8])
-> > +/* If the returned key is a STK it should be free'd by the caller */
-> > +struct smp_ltk *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8])
-> >  {
-> 
-> this kind of API seems to be rather random. We need a bit better
-> semantics here.
+On Mon, Jan 30, 2012 at 6:38 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Andre,
+>
+>> This patch adds to hci_core the hci_do_le_scan function which
+>> should be used to scan LE devices.
+>>
+>> In order to enable LE scan, hci_do_le_scan() sends commands (Set
+>> LE Scan Parameters and Set LE Scan Enable) to the controller and
+>> waits for its results. If commands were executed successfully a
+>> delayed work is scheduled to disable the ongoing scanning after
+>> some amount of time. This function blocks.
+>>
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>> =A0include/net/bluetooth/hci_core.h | =A0 =A05 +++
+>> =A0net/bluetooth/hci_core.c =A0 =A0 =A0 =A0 | =A0 57 +++++++++++++++++++=
++++++++++++++++++++
+>> =A0net/bluetooth/hci_event.c =A0 =A0 =A0 =A0| =A0 15 ++++++++--
+>> =A03 files changed, 74 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hc=
+i_core.h
+>> index 4e569d8..d157762 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -263,6 +263,11 @@ struct hci_dev {
+>>
+>> =A0 =A0 =A0 unsigned long =A0 =A0 =A0 =A0 =A0 dev_flags;
+>>
+>> + =A0 =A0 struct delayed_work =A0 =A0 le_scan_disable;
+>> +
+>> + =A0 =A0 wait_queue_head_t =A0 =A0 =A0 le_scan_wait_q;
+>> + =A0 =A0 u8 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0le_scan_result;
+>> +
+>> =A0 =A0 =A0 int (*open)(struct hci_dev *hdev);
+>> =A0 =A0 =A0 int (*close)(struct hci_dev *hdev);
+>> =A0 =A0 =A0 int (*flush)(struct hci_dev *hdev);
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index 4830995..22abc37 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -779,6 +779,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+>> =A0 =A0 =A0 if (test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->dev_flags))
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 cancel_delayed_work(&hdev->service_cache);
+>>
+>> + =A0 =A0 cancel_delayed_work_sync(&hdev->le_scan_disable);
+>> +
+>> =A0 =A0 =A0 hci_dev_lock(hdev);
+>> =A0 =A0 =A0 inquiry_cache_flush(hdev);
+>> =A0 =A0 =A0 hci_conn_hash_flush(hdev);
+>> @@ -1593,6 +1595,57 @@ int hci_add_adv_entry(struct hci_dev *hdev,
+>> =A0 =A0 =A0 return 0;
+>> =A0}
+>>
+>> +static int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 =A0 u16 window, int timeout)
+>> +{
+>> + =A0 =A0 long timeo =3D msecs_to_jiffies(3000);
+>> + =A0 =A0 DECLARE_WAITQUEUE(wait, current);
+>> +
+>> + =A0 =A0 BT_DBG("%s", hdev->name);
+>> +
+>> + =A0 =A0 if (test_bit(HCI_LE_SCAN, &hdev->dev_flags))
+>> + =A0 =A0 =A0 =A0 =A0 =A0 return -EINPROGRESS;
+>> +
+>> + =A0 =A0 add_wait_queue(&hdev->le_scan_wait_q, &wait);
+>> +
+>> + =A0 =A0 /* Send LE Set Scan Parameter command and wait for the result =
+*/
+>> + =A0 =A0 hdev->le_scan_result =3D -ETIMEDOUT;
+>> + =A0 =A0 send_le_scan_param_cmd(hdev, type, interval, window);
+>> +
+>> + =A0 =A0 schedule_timeout_uninterruptible(timeo);
+>> + =A0 =A0 if (hdev->le_scan_result)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 goto failed;
+>> +
+>> + =A0 =A0 /* Send LE Set Scan Enable command and wait for the result */
+>> + =A0 =A0 hdev->le_scan_result =3D -ETIMEDOUT;
+>> + =A0 =A0 send_le_scan_enable_cmd(hdev, 1);
+>> +
+>> + =A0 =A0 schedule_timeout_uninterruptible(timeo);
+>> + =A0 =A0 if (hdev->le_scan_result)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 goto failed;
+>> +
+>> + =A0 =A0 remove_wait_queue(&hdev->le_scan_wait_q, &wait);
+>> +
+>> + =A0 =A0 schedule_delayed_work(&hdev->le_scan_disable,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 =A0 msecs_to_jiffies(timeout));
+>
+> we need to make this generic. I know that Andrei will need the same for
+> A2MP and we already do a similar thing with hci_request. If we start
+> spreading the hand-coded versions, this gets messy really quick.
 
-Ok. I can leave the work of removing the STK from the list to the
-caller. Would that make more sense to you? 
+Yes, I do agree with you about getting messy. So, are you fine with
+we use hci_request here too?
 
-The point is that it doesn't make sense to keep the STK around after
-it was used.
-
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-
-Cheers,
--- 
-Vinicius
+Andre
