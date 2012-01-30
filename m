@@ -1,58 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1327958996.1955.162.camel@aeonflux>
-References: <1327955189-4604-1-git-send-email-ulisses@profusion.mobi>
-	<1327958996.1955.162.camel@aeonflux>
-Date: Mon, 30 Jan 2012 19:42:11 -0200
-Message-ID: <CAA37ika5CN7vRzrWQHR3s7t7R-tT-e3dq3kfLQ6Zvnun8mE+bA@mail.gmail.com>
-Subject: Re: [PATCH v4 1/2] Bluetooth: Remove usage of __cancel_delayed_work()
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1327959526.1955.167.camel@aeonflux>
+Subject: Re: [PATCH v3 3/6] Bluetooth: Add hci_do_le_scan()
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 30 Jan 2012 13:38:46 -0800
+In-Reply-To: <1327531949-29463-4-git-send-email-andre.guedes@openbossa.org>
+References: <1327531949-29463-1-git-send-email-andre.guedes@openbossa.org>
+	 <1327531949-29463-4-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Andre,
 
-On Mon, Jan 30, 2012 at 7:29 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Ulisses,
->
->> __cancel_delayed_work() is being used in some paths where we cannot
->> sleep waiting for the delayed work to finish. However, that function
->> might return while the timer is running and the work will be queued
->> again. Replace the calls with safer cancel_delayed_work() version
->> which spins until the timer handler finishes on other CPUs and
->> cancels the delayed work.
->>
->> Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
->> ---
->
-> I have the feeling that I already looked at this patch before. And given
-> that it is v4, that might be true actually ;)
->
-> Use the space between --- and diffstat to have some small changelog so I
-> know what was different to the previous version.
+> This patch adds to hci_core the hci_do_le_scan function which
+> should be used to scan LE devices.
+> 
+> In order to enable LE scan, hci_do_le_scan() sends commands (Set
+> LE Scan Parameters and Set LE Scan Enable) to the controller and
+> waits for its results. If commands were executed successfully a
+> delayed work is scheduled to disable the ongoing scanning after
+> some amount of time. This function blocks.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  include/net/bluetooth/hci_core.h |    5 +++
+>  net/bluetooth/hci_core.c         |   57 ++++++++++++++++++++++++++++++++++++++
+>  net/bluetooth/hci_event.c        |   15 ++++++++--
+>  3 files changed, 74 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 4e569d8..d157762 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -263,6 +263,11 @@ struct hci_dev {
+>  
+>  	unsigned long		dev_flags;
+>  
+> +	struct delayed_work	le_scan_disable;
+> +
+> +	wait_queue_head_t	le_scan_wait_q;
+> +	u8			le_scan_result;
+> +
+>  	int (*open)(struct hci_dev *hdev);
+>  	int (*close)(struct hci_dev *hdev);
+>  	int (*flush)(struct hci_dev *hdev);
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 4830995..22abc37 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -779,6 +779,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+>  	if (test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->dev_flags))
+>  		cancel_delayed_work(&hdev->service_cache);
+>  
+> +	cancel_delayed_work_sync(&hdev->le_scan_disable);
+> +
+>  	hci_dev_lock(hdev);
+>  	inquiry_cache_flush(hdev);
+>  	hci_conn_hash_flush(hdev);
+> @@ -1593,6 +1595,57 @@ int hci_add_adv_entry(struct hci_dev *hdev,
+>  	return 0;
+>  }
+>  
+> +static int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval,
+> +						u16 window, int timeout)
+> +{
+> +	long timeo = msecs_to_jiffies(3000);
+> +	DECLARE_WAITQUEUE(wait, current);
+> +
+> +	BT_DBG("%s", hdev->name);
+> +
+> +	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags))
+> +		return -EINPROGRESS;
+> +
+> +	add_wait_queue(&hdev->le_scan_wait_q, &wait);
+> +
+> +	/* Send LE Set Scan Parameter command and wait for the result */
+> +	hdev->le_scan_result = -ETIMEDOUT;
+> +	send_le_scan_param_cmd(hdev, type, interval, window);
+> +
+> +	schedule_timeout_uninterruptible(timeo);
+> +	if (hdev->le_scan_result)
+> +		goto failed;
+> +
+> +	/* Send LE Set Scan Enable command and wait for the result */
+> +	hdev->le_scan_result = -ETIMEDOUT;
+> +	send_le_scan_enable_cmd(hdev, 1);
+> +
+> +	schedule_timeout_uninterruptible(timeo);
+> +	if (hdev->le_scan_result)
+> +		goto failed;
+> +
+> +	remove_wait_queue(&hdev->le_scan_wait_q, &wait);
+> +
+> +	schedule_delayed_work(&hdev->le_scan_disable,
+> +						msecs_to_jiffies(timeout));
 
-Yes, you already seen this but I removed part of the patch to fix
-another problem. Sorry, forgot to include a message so you could know
-what has changed.
+we need to make this generic. I know that Andrei will need the same for
+A2MP and we already do a similar thing with hci_request. If we start
+spreading the hand-coded versions, this gets messy really quick.
 
->> =A0include/net/bluetooth/l2cap.h | =A0 =A04 ++--
->> =A0net/bluetooth/l2cap_core.c =A0 =A0| =A0 =A06 +++---
->> =A02 files changed, 5 insertions(+), 5 deletions(-)
->
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
->
-> Regards
->
-> Marcel
+So essentially we need a generic HCI command execution framework that
+will actually sleep. And it needs to be versatile enough to handle all
+our cases.
 
-Regards,
+Regards
 
---=20
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+Marcel
+
+
