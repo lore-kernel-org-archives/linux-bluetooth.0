@@ -1,30 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1327962821.2125.4.camel@sirocco.config>
-Subject: Re: [RFC PATCHv2] autopair: add autopair plugin
-From: Bastien Nocera <hadess@hadess.net>
-To: Scott James Remnant <scott@netsplit.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-	keybuk@chromium.org
-Date: Mon, 30 Jan 2012 22:33:41 +0000
-In-Reply-To: <CA+bD78jkORzLP-M+bGqFMkp9vHmBXW+LgLnFGhLczn92Rk2XXA@mail.gmail.com>
-References: <1327448862-21964-1-git-send-email-scott@netsplit.com>
-	 <1327952977.1955.160.camel@aeonflux>
-	 <1327953929.2400.80.camel@novo.hadess.net>
-	 <CA+bD78jkORzLP-M+bGqFMkp9vHmBXW+LgLnFGhLczn92Rk2XXA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH 8/8] Bluetooth: Add support for notifying userspace of new LTK's
+Date: Mon, 30 Jan 2012 19:29:18 -0300
+Message-Id: <1327962558-25720-9-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1327962558-25720-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1327962558-25720-1-git-send-email-vinicius.gomes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Em Mon, 2012-01-30 =C3=A0s 13:42 -0800, Scott James Remnant escreveu:
-> > The PIN length hint is also ignored in the current code:
-> > +       <device type=3D"audio" oui=3D"00:1A:80:" name=3D"CMT-DH5BT"
-> pin=3D"max:4"/>
-> >
-> Because that's a UI restriction, no?
->=20
-> I didn't put any PIN-generation code here, because I'm not entirely
-> sure what the UI for "generate random PIN' should look like or which
-> spec you're following.=20
+If we want to have proper pairing support over LE we need to
+inform userspace that a new LTK is available, so userspace
+can store that key permanently.
 
-It means that a generated PIN shouldn't have more than 4 digits for it
-to work with this device.
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ net/bluetooth/hci_core.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d00704e..b24cb87 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1343,6 +1343,9 @@ int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type, u8 type,
+ 	if (!new_key)
+ 		return 0;
+ 
++	if (type & HCI_SMP_LTK)
++		mgmt_new_ltk(hdev, key, 1);
++
+ 	return 0;
+ }
+ 
+-- 
+1.7.8.1
+
