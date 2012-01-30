@@ -1,117 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1327959526.1955.167.camel@aeonflux>
-References: <1327531949-29463-1-git-send-email-andre.guedes@openbossa.org>
-	<1327531949-29463-4-git-send-email-andre.guedes@openbossa.org>
-	<1327959526.1955.167.camel@aeonflux>
-Date: Mon, 30 Jan 2012 20:22:06 -0300
-Message-ID: <CACJA=fW0_fdMq9CHVzMPNtp=HrG=RpraLiRjp-L9f1ES8dUsMw@mail.gmail.com>
-Subject: Re: [PATCH v3 3/6] Bluetooth: Add hci_do_le_scan()
-From: Andre Guedes <andre.guedes@openbossa.org>
+Date: Mon, 30 Jan 2012 20:13:22 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 3/8] Bluetooth: Add new structures for handling SMP Long
+ Term Keys
+Message-ID: <20120130231322.GA17656@samus>
+References: <1327962558-25720-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1327962558-25720-4-git-send-email-vinicius.gomes@openbossa.org>
+ <1327963360.1955.192.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1327963360.1955.192.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Mon, Jan 30, 2012 at 6:38 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Andre,
->
->> This patch adds to hci_core the hci_do_le_scan function which
->> should be used to scan LE devices.
->>
->> In order to enable LE scan, hci_do_le_scan() sends commands (Set
->> LE Scan Parameters and Set LE Scan Enable) to the controller and
->> waits for its results. If commands were executed successfully a
->> delayed work is scheduled to disable the ongoing scanning after
->> some amount of time. This function blocks.
->>
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->> =A0include/net/bluetooth/hci_core.h | =A0 =A05 +++
->> =A0net/bluetooth/hci_core.c =A0 =A0 =A0 =A0 | =A0 57 +++++++++++++++++++=
-+++++++++++++++++++
->> =A0net/bluetooth/hci_event.c =A0 =A0 =A0 =A0| =A0 15 ++++++++--
->> =A03 files changed, 74 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hc=
-i_core.h
->> index 4e569d8..d157762 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -263,6 +263,11 @@ struct hci_dev {
->>
->> =A0 =A0 =A0 unsigned long =A0 =A0 =A0 =A0 =A0 dev_flags;
->>
->> + =A0 =A0 struct delayed_work =A0 =A0 le_scan_disable;
->> +
->> + =A0 =A0 wait_queue_head_t =A0 =A0 =A0 le_scan_wait_q;
->> + =A0 =A0 u8 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0le_scan_result;
->> +
->> =A0 =A0 =A0 int (*open)(struct hci_dev *hdev);
->> =A0 =A0 =A0 int (*close)(struct hci_dev *hdev);
->> =A0 =A0 =A0 int (*flush)(struct hci_dev *hdev);
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index 4830995..22abc37 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -779,6 +779,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
->> =A0 =A0 =A0 if (test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->dev_flags))
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 cancel_delayed_work(&hdev->service_cache);
->>
->> + =A0 =A0 cancel_delayed_work_sync(&hdev->le_scan_disable);
->> +
->> =A0 =A0 =A0 hci_dev_lock(hdev);
->> =A0 =A0 =A0 inquiry_cache_flush(hdev);
->> =A0 =A0 =A0 hci_conn_hash_flush(hdev);
->> @@ -1593,6 +1595,57 @@ int hci_add_adv_entry(struct hci_dev *hdev,
->> =A0 =A0 =A0 return 0;
->> =A0}
->>
->> +static int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval,
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0 =A0 =A0 =A0 u16 window, int timeout)
->> +{
->> + =A0 =A0 long timeo =3D msecs_to_jiffies(3000);
->> + =A0 =A0 DECLARE_WAITQUEUE(wait, current);
->> +
->> + =A0 =A0 BT_DBG("%s", hdev->name);
->> +
->> + =A0 =A0 if (test_bit(HCI_LE_SCAN, &hdev->dev_flags))
->> + =A0 =A0 =A0 =A0 =A0 =A0 return -EINPROGRESS;
->> +
->> + =A0 =A0 add_wait_queue(&hdev->le_scan_wait_q, &wait);
->> +
->> + =A0 =A0 /* Send LE Set Scan Parameter command and wait for the result =
-*/
->> + =A0 =A0 hdev->le_scan_result =3D -ETIMEDOUT;
->> + =A0 =A0 send_le_scan_param_cmd(hdev, type, interval, window);
->> +
->> + =A0 =A0 schedule_timeout_uninterruptible(timeo);
->> + =A0 =A0 if (hdev->le_scan_result)
->> + =A0 =A0 =A0 =A0 =A0 =A0 goto failed;
->> +
->> + =A0 =A0 /* Send LE Set Scan Enable command and wait for the result */
->> + =A0 =A0 hdev->le_scan_result =3D -ETIMEDOUT;
->> + =A0 =A0 send_le_scan_enable_cmd(hdev, 1);
->> +
->> + =A0 =A0 schedule_timeout_uninterruptible(timeo);
->> + =A0 =A0 if (hdev->le_scan_result)
->> + =A0 =A0 =A0 =A0 =A0 =A0 goto failed;
->> +
->> + =A0 =A0 remove_wait_queue(&hdev->le_scan_wait_q, &wait);
->> +
->> + =A0 =A0 schedule_delayed_work(&hdev->le_scan_disable,
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0 =A0 =A0 =A0 msecs_to_jiffies(timeout));
->
-> we need to make this generic. I know that Andrei will need the same for
-> A2MP and we already do a similar thing with hci_request. If we start
-> spreading the hand-coded versions, this gets messy really quick.
+On 14:42 Mon 30 Jan, Marcel Holtmann wrote:
+> Hi Vinicius,
+> 
+> > This includes a new list for storing the keys and a new structure used
+> > to represent each key.
+> > 
+> > Some notes: authenticated is used to identify that the key may be used
+> > to setup a HIGH security link. As the same list is used to store both
+> > the STK's and the LTK's the type field is used so we can separate
+> > between those two types of keys and if the key should be used when
+> > in the master or slave role.
+> > 
+> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> > ---
+> >  include/net/bluetooth/hci.h      |    5 +++++
+> >  include/net/bluetooth/hci_core.h |   15 +++++++++++++++
+> >  net/bluetooth/hci_core.c         |   31 +++++++++++++++++++++++++++++++
+> >  3 files changed, 51 insertions(+), 0 deletions(-)
+> > 
+> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > index cb9097a..83f045a 100644
+> > --- a/include/net/bluetooth/hci.h
+> > +++ b/include/net/bluetooth/hci.h
+> > @@ -274,6 +274,11 @@ enum {
+> >  #define HCI_LK_SMP_LTK			0x81
+> >  #define HCI_LK_SMP_IRK			0x82
+> >  #define HCI_LK_SMP_CSRK			0x83
+> > +/* The spec doesn't define types for SMP keys, the _MASTER suffix is implied */
+> > +#define HCI_SMP_STK			0x80
+> > +#define HCI_SMP_STK_SLAVE		0x81
+> > +#define HCI_SMP_LTK			0x82
+> > +#define HCI_SMP_LTK_SLAVE		0x83
+> >  
+> >  /* ---- HCI Error Codes ---- */
+> >  #define HCI_ERROR_AUTH_FAILURE		0x05
+> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> > index 896d9e4..06eab3f 100644
+> > --- a/include/net/bluetooth/hci_core.h
+> > +++ b/include/net/bluetooth/hci_core.h
+> > @@ -88,6 +88,18 @@ struct bt_uuid {
+> >  	u8 svc_hint;
+> >  };
+> >  
+> > +struct smp_ltk {
+> > +	struct list_head list;
+> > +	bdaddr_t bdaddr;
+> > +	u8 bdaddr_type;
+> > +	u8 authenticated;
+> > +	u8 type;
+> > +	u8 enc_size;
+> > +	__le16 ediv;
+> > +	u8 rand[8];
+> > +	u8 val[16];
+> > +} __packed;
+> > +
+> >  struct key_master_id {
+> >  	__le16 ediv;
+> >  	u8 rand[8];
+> > @@ -239,6 +251,8 @@ struct hci_dev {
+> >  
+> >  	struct list_head	link_keys;
+> >  
+> > +	struct list_head	ltks;
+> > +
+> 
+> I am fine with this as well, but just to discuss this, don't you think
+> calling this long_term_keys would be better? It makes it easier to read
+> and makes it similar to link_keys.
 
-Yes, I do agree with you about getting messy. So, are you fine with
-we use hci_request here too?
+Yeah, it looks more consistent with the longer name. Will change it.
 
-Andre
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+
+Cheers,
+-- 
+Vinicius
