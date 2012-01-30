@@ -1,113 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1327959526.1955.167.camel@aeonflux>
-Subject: Re: [PATCH v3 3/6] Bluetooth: Add hci_do_le_scan()
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 30 Jan 2012 13:38:46 -0800
-In-Reply-To: <1327531949-29463-4-git-send-email-andre.guedes@openbossa.org>
-References: <1327531949-29463-1-git-send-email-andre.guedes@openbossa.org>
-	 <1327531949-29463-4-git-send-email-andre.guedes@openbossa.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1327952977.1955.160.camel@aeonflux>
+References: <1327448862-21964-1-git-send-email-scott@netsplit.com>
+	<1327952977.1955.160.camel@aeonflux>
+Date: Mon, 30 Jan 2012 13:40:04 -0800
+Message-ID: <CA+bD78giy6nJG_iLg_MazNYo4Tgqc+Mpe9aTtSRc1aDYgs6JJw@mail.gmail.com>
+Subject: Re: [RFC PATCHv2] autopair: add autopair plugin
+From: Scott James Remnant <scott@netsplit.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org, hadess@hadess.net
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+On Mon, Jan 30, 2012 at 11:49 AM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
 
-> This patch adds to hci_core the hci_do_le_scan function which
-> should be used to scan LE devices.
-> 
-> In order to enable LE scan, hci_do_le_scan() sends commands (Set
-> LE Scan Parameters and Set LE Scan Enable) to the controller and
-> waits for its results. If commands were executed successfully a
-> delayed work is scheduled to disable the ongoing scanning after
-> some amount of time. This function blocks.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  include/net/bluetooth/hci_core.h |    5 +++
->  net/bluetooth/hci_core.c         |   57 ++++++++++++++++++++++++++++++++++++++
->  net/bluetooth/hci_event.c        |   15 ++++++++--
->  3 files changed, 74 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 4e569d8..d157762 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -263,6 +263,11 @@ struct hci_dev {
->  
->  	unsigned long		dev_flags;
->  
-> +	struct delayed_work	le_scan_disable;
-> +
-> +	wait_queue_head_t	le_scan_wait_q;
-> +	u8			le_scan_result;
-> +
->  	int (*open)(struct hci_dev *hdev);
->  	int (*close)(struct hci_dev *hdev);
->  	int (*flush)(struct hci_dev *hdev);
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 4830995..22abc37 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -779,6 +779,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
->  	if (test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->dev_flags))
->  		cancel_delayed_work(&hdev->service_cache);
->  
-> +	cancel_delayed_work_sync(&hdev->le_scan_disable);
-> +
->  	hci_dev_lock(hdev);
->  	inquiry_cache_flush(hdev);
->  	hci_conn_hash_flush(hdev);
-> @@ -1593,6 +1595,57 @@ int hci_add_adv_entry(struct hci_dev *hdev,
->  	return 0;
->  }
->  
-> +static int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval,
-> +						u16 window, int timeout)
-> +{
-> +	long timeo = msecs_to_jiffies(3000);
-> +	DECLARE_WAITQUEUE(wait, current);
-> +
-> +	BT_DBG("%s", hdev->name);
-> +
-> +	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-> +		return -EINPROGRESS;
-> +
-> +	add_wait_queue(&hdev->le_scan_wait_q, &wait);
-> +
-> +	/* Send LE Set Scan Parameter command and wait for the result */
-> +	hdev->le_scan_result = -ETIMEDOUT;
-> +	send_le_scan_param_cmd(hdev, type, interval, window);
-> +
-> +	schedule_timeout_uninterruptible(timeo);
-> +	if (hdev->le_scan_result)
-> +		goto failed;
-> +
-> +	/* Send LE Set Scan Enable command and wait for the result */
-> +	hdev->le_scan_result = -ETIMEDOUT;
-> +	send_le_scan_enable_cmd(hdev, 1);
-> +
-> +	schedule_timeout_uninterruptible(timeo);
-> +	if (hdev->le_scan_result)
-> +		goto failed;
-> +
-> +	remove_wait_queue(&hdev->le_scan_wait_q, &wait);
-> +
-> +	schedule_delayed_work(&hdev->le_scan_disable,
-> +						msecs_to_jiffies(timeout));
+>> +<!--
+>> + =A0The autopair plugin will match devices, following the order of the =
+XML
+>> + =A0file [1], on any combination of type, OUI, or name.
+>> +
+>> + =A0[1]: So specific devices should be at the top, and generic ones at =
+the bottom,
+>> + =A0so settings for specific devices are overridden as expected.
+>> +-->
+>> +
+>> +<!DOCTYPE devices [
+>> + =A0 =A0 <!ELEMENT devices (device)+>
+>> + =A0 =A0 <!ELEMENT device EMPTY>
+>> + =A0 =A0 <!ATTLIST device type (any|mouse|tablet|keyboard|headset|headp=
+hones|audio|printer|network) "any">
+>> + =A0 =A0 <!ATTLIST device oui CDATA #IMPLIED>
+>> + =A0 =A0 <!ATTLIST device name CDATA #IMPLIED>
+>> + =A0 =A0 <!ATTLIST device pin CDATA #REQUIRED>
+>> +]>
+>
+> I think we need to have a discussion on this database format first. I
+> honestly do not like it at all. It does matching and result handling in
+> a single XML element. That seems like a bad idea.
+>
+> And in addition making pin attribute required and then trying to disable
+> PIN with "NULL" magic is something that I rather not have.
+>
+> I am also wondering why this has to be XML and not simple key-value INI
+> style files.
+>
+I tend to agree ;-)
 
-we need to make this generic. I know that Andrei will need the same for
-A2MP and we already do a similar thing with hci_request. If we start
-spreading the hand-coded versions, this gets messy really quick.
+The reason it couldn't be pure INI-style (at least, parseable by glib)
+though is because you then need unique group names for each match,
+which is equally urgh to write.
 
-So essentially we need a generic HCI command execution framework that
-will actually sleep. And it needs to be versatile enough to handle all
-our cases.
-
-Regards
-
-Marcel
-
-
+Scott
+--=20
+Have you ever, ever felt like this?
+Had strange things happen? =A0Are you going round the twist?
