@@ -1,57 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 0/8] [Resend] New MGMT messages for SMP Long Term Keys
-Date: Mon, 30 Jan 2012 19:29:10 -0300
-Message-Id: <1327962558-25720-1-git-send-email-vinicius.gomes@openbossa.org>
+Date: Mon, 30 Jan 2012 14:27:20 -0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Ulisses Furquim <ulisses@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
+Subject: Re: [PATCH v4 1/2] Bluetooth: Remove usage of __cancel_delayed_work()
+Message-ID: <20120130222720.GA4971@x220.globalsuite.net>
+References: <1327955189-4604-1-git-send-email-ulisses@profusion.mobi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1327955189-4604-1-git-send-email-ulisses@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Ulisses,
 
-This is the last version of the code that will allow the permanent
-storage of SMP Long Term Keys.
+On Mon, Jan 30, 2012, Ulisses Furquim wrote:
+> __cancel_delayed_work() is being used in some paths where we cannot
+> sleep waiting for the delayed work to finish. However, that function
+> might return while the timer is running and the work will be queued
+> again. Replace the calls with safer cancel_delayed_work() version
+> which spins until the timer handler finishes on other CPUs and
+> cancels the delayed work.
+> 
+> Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
+> ---
+>  include/net/bluetooth/l2cap.h |    4 ++--
+>  net/bluetooth/l2cap_core.c    |    6 +++---
+>  2 files changed, 5 insertions(+), 5 deletions(-)
 
-The main changes from the last version are:
-* In the structure that represents a LTK the field pin_length was
-  replaced by the information whether or not that key is
-  authenticated;
+Both patches have bee applied to my bluetooth-next tree. Thanks.
 
-* Still on that structure, it was added information about the role in
-  which the key should be used, e.g. a key marked as master should
-  only be used when the host is in the master role;
-
-* More specific types for each type and role of key, previously it was
-  used the address field of the key to indentify the role of the key.
-
-* The address type of the remote is sent with the LTK, this information
-  will be useful for userspace when recreating the device from storage.
-
-Marcel, as I changed the key format in the patch "Bluetooth: Add
-structures for the new LTK exchange messages" I removed your Ack
-from it.
-
-Vinicius Costa Gomes (8):
-  Bluetooth: Add structures for the new LTK exchange messages
-  Bluetooth: Rename smp_key_size to enc_key_size
-  Bluetooth: Add new structures for handling SMP Long Term Keys
-  Bluetooth: Use the updated key structures for handling LTKs
-  Bluetooth: Add MGMT handlers for dealing with SMP LTK's
-  Bluetooth: Add support for removing LTK's when pairing is removed
-  Bluetooth: Clean up structures left unused
-  Bluetooth: Add support for notifying userspace of new LTK's
-
- include/net/bluetooth/hci.h      |    9 ++--
- include/net/bluetooth/hci_core.h |   35 +++++++------
- include/net/bluetooth/mgmt.h     |   22 ++++++++
- include/net/bluetooth/smp.h      |    2 +-
- net/bluetooth/hci_core.c         |  111 ++++++++++++++++++++++++--------------
- net/bluetooth/hci_event.c        |    9 +++-
- net/bluetooth/mgmt.c             |   88 ++++++++++++++++++++++++++++++
- net/bluetooth/smp.c              |   50 ++++++++++-------
- 8 files changed, 241 insertions(+), 85 deletions(-)
-
---
-1.7.8.1
-
+Johan
