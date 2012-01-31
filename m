@@ -2,56 +2,34 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 5/6] device: Fix not using the "bonded" property for new bondings
-Date: Tue, 31 Jan 2012 14:10:52 -0300
-Message-Id: <1328029853-21134-5-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ 2/6] device: Fix not setting the device as bonded when restoring it from the LTK
+Date: Tue, 31 Jan 2012 14:10:49 -0300
+Message-Id: <1328029853-21134-2-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1328029853-21134-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1328029853-21134-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When checking if a device was already bonded, we should
-use the paired property instead of reading the link key
-from storage. This method will work for LE links, also.
 ---
- src/device.c |   16 +---------------
- 1 files changed, 1 insertions(+), 15 deletions(-)
+ src/device.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
 diff --git a/src/device.c b/src/device.c
-index 88cd4cc..0133e07 100644
+index d39ca53..596ec0b 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -2287,29 +2287,15 @@ DBusMessage *device_create_bonding(struct btd_device *device,
- 					const char *agent_path,
- 					uint8_t capability)
- {
--	char filename[PATH_MAX + 1];
--	char *str, srcaddr[18], dstaddr[18];
- 	struct btd_adapter *adapter = device->adapter;
- 	struct bonding_req *bonding;
--	bdaddr_t src;
- 	int err;
+@@ -1025,6 +1025,11 @@ struct btd_device *device_create(DBusConnection *conn,
+ 		device_set_bonded(device, TRUE);
+ 	}
  
--	adapter_get_address(adapter, &src);
--	ba2str(&src, srcaddr);
--	ba2str(&device->bdaddr, dstaddr);
--
- 	if (device->bonding)
- 		return btd_error_in_progress(msg);
- 
--	/* check if a link key already exists */
--	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr,
--			"linkkeys");
--
--	str = textfile_caseget(filename, dstaddr);
--	if (str) {
--		free(str);
-+	if (device_is_bonded(device))
- 		return btd_error_already_exists(msg);
--	}
- 
- 	err = adapter_create_bonding(adapter, &device->bdaddr, capability);
- 	if (err < 0)
++	if (device_is_le(device) && has_longtermkeys(&src, &device->bdaddr)) {
++		device_set_paired(device, TRUE);
++		device_set_bonded(device, TRUE);
++	}
++
+ 	if (read_device_id(srcaddr, address, NULL, &vendor, &product, &version)
+ 									== 0) {
+ 		device_set_vendor(device, vendor);
 -- 
 1.7.8.1
 
