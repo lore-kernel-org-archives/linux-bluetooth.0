@@ -1,34 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <aguedespe@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: andre.guedes@openbossa.org, Andre Guedes <aguedespe@gmail.com>
-Subject: [PATCH] Bluetooth: Use GFP_KERNEL in hci_add_adv_entry()
-Date: Mon, 30 Jan 2012 23:31:28 -0300
-Message-Id: <1327977088-32223-1-git-send-email-aguedespe@gmail.com>
+Date: Mon, 30 Jan 2012 18:04:40 -0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/8] Bluetooth: Rename smp_key_size to enc_key_size
+Message-ID: <20120131020440.GA4517@x220.globalsuite.net>
+References: <1327962558-25720-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1327962558-25720-3-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1327962558-25720-3-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function is not called in interrupt context anymore, so it
-should use GFP_KERNEL to allocate memory.
+Hi Vinicius,
 
-Signed-off-by: Andre Guedes <aguedespe@gmail.com>
----
- net/bluetooth/hci_core.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Mon, Jan 30, 2012, Vinicius Costa Gomes wrote:
+> This makes clear that this is the size of the key used to
+> encrypt the link.
+> 
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> ---
+>  include/net/bluetooth/smp.h |    2 +-
+>  net/bluetooth/smp.c         |   18 +++++++++---------
+>  2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 91166db..45e2d2a 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1553,7 +1553,7 @@ int hci_add_adv_entry(struct hci_dev *hdev,
- 	if (hci_find_adv_entry(hdev, &ev->bdaddr))
- 		return 0;
- 
--	entry = kzalloc(sizeof(*entry), GFP_ATOMIC);
-+	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
- 	if (!entry)
- 		return -ENOMEM;
- 
--- 
-1.7.9
+Patches 1 and 2 have been applied to my bluetooth-next tree (with
+Marcel's acks), so no need to resend them.
 
+Johan
