@@ -1,65 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1328022757.1955.218.camel@aeonflux>
-Subject: Re: [PATCH v3 1/6] Bluetooth: LE scan should send Discovering events
+Message-ID: <1328022697.1955.217.camel@aeonflux>
+Subject: Re: [RESEND 1/3] Bluetooth: Use cancel_work instead of
+ cancel_work_sync
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 31 Jan 2012 07:12:37 -0800
-In-Reply-To: <CACJA=fWWnFA27QGGvoZKU1TrXWWS5jB0e62EaPyjH6DA0G1-xA@mail.gmail.com>
-References: <1327531949-29463-1-git-send-email-andre.guedes@openbossa.org>
-	 <1327531949-29463-2-git-send-email-andre.guedes@openbossa.org>
-	 <1327959331.1955.165.camel@aeonflux>
-	 <CACJA=fWWnFA27QGGvoZKU1TrXWWS5jB0e62EaPyjH6DA0G1-xA@mail.gmail.com>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Date: Tue, 31 Jan 2012 07:11:37 -0800
+In-Reply-To: <20120131130242.GB7660@aemeltch-MOBL1>
+References: <1327999384-16094-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1327999384-16094-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <CACJA=fWD6wOnNT4jFvGQAP3hRo0AKWAoiZTHZsfmGvp+6JdxOg@mail.gmail.com>
+	 <20120131130242.GB7660@aemeltch-MOBL1>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Andrei,
 
-> >> Send MGMT Discovering events once LE scan starts/stops so the
-> >> userspace can track when local adapters are discovering LE devices.
-> >>
-> >> This way, we also keep the same behavior of inquiry which sends MGMT
-> >> Discovering events once inquiry starts/stops even if it is triggered
-> >> by an external tool (e.g. hcitool).
-> >>
-> >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> >> ---
-> >>  include/net/bluetooth/hci_core.h |    1 +
-> >>  net/bluetooth/hci_core.c         |    2 ++
-> >>  net/bluetooth/hci_event.c        |    5 +++++
-> >>  3 files changed, 8 insertions(+), 0 deletions(-)
-> >>
-> >> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> >> index 25f449f..4e569d8 100644
-> >> --- a/include/net/bluetooth/hci_core.h
-> >> +++ b/include/net/bluetooth/hci_core.h
-> >> @@ -61,6 +61,7 @@ struct discovery_state {
-> >>               DISCOVERY_STOPPED,
-> >>               DISCOVERY_STARTING,
-> >>               DISCOVERY_INQUIRY,
-> >> +             DISCOVERY_LE_SCAN,
-> >>               DISCOVERY_RESOLVING,
-> >>               DISCOVERY_STOPPING,
-> >>       } state;
-> >> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> >> index 91166db..fd22035 100644
-> >> --- a/net/bluetooth/hci_core.c
-> >> +++ b/net/bluetooth/hci_core.c
-> >> @@ -361,6 +361,7 @@ bool hci_discovery_active(struct hci_dev *hdev)
-> >>       struct discovery_state *discov = &hdev->discovery;
-> >>
-> >>       if (discov->state == DISCOVERY_INQUIRY ||
-> >> +                                     discov->state == DISCOVERY_LE_SCAN ||
-> >>                                       discov->state == DISCOVERY_RESOLVING)
-> >>               return true;
-> >
-> > I think we need to start using a switch statement here.
+> > > -       cancel_delayed_work_sync(&conn->disc_work);
+> > > +       cancel_delayed_work(&conn->disc_work);
+> > 
+> > I'm afraid we must use _sync variant here. disc_work is not supposed to
+> > be running after hci_conn is deleted.
+> > 
+> > BTW, I believe we already addressed this issue in patches [PATCH 1/2]
+> > Bluetooth: Fix potential deadlock and [PATCH 2/2] Bluetooth: Remove
+> > unneeded locking. These patches are now pushed upstream. Could you
 > 
-> Ok, then I'll have a code refactoring patch to handle this separately.
+> I will check those patches from upstream and let you know.
 
-that is fine with me.
+crap, I just acked these.
+
+Johan, forget about my acks and just ignore them. Lets wait until we get
+a clean new series.
 
 Regards
 
