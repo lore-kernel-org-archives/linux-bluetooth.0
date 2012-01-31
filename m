@@ -1,35 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 2/6] device: Fix not setting the device as bonded when restoring it from the LTK
-Date: Tue, 31 Jan 2012 14:10:49 -0300
-Message-Id: <1328029853-21134-2-git-send-email-vinicius.gomes@openbossa.org>
-In-Reply-To: <1328029853-21134-1-git-send-email-vinicius.gomes@openbossa.org>
-References: <1328029853-21134-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <4F27EC83.3020502@bmw-carit.de>
+References: <1327937436-15480-1-git-send-email-luiz.dentz@gmail.com>
+	<1327937436-15480-3-git-send-email-luiz.dentz@gmail.com>
+	<4F27EC83.3020502@bmw-carit.de>
+Date: Tue, 31 Jan 2012 08:39:56 -0800
+Message-ID: <CABBYNZJgNc_Dz5Z8hdBcYq0gJY4Ar3Wt+hRbvrCiUkRWUHo_aA@mail.gmail.com>
+Subject: Re: [PATCH obexd 03/13] client: fix not queuing requests properly
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/device.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+Hi Mikel,
 
-diff --git a/src/device.c b/src/device.c
-index d39ca53..596ec0b 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1025,6 +1025,11 @@ struct btd_device *device_create(DBusConnection *conn,
- 		device_set_bonded(device, TRUE);
- 	}
- 
-+	if (device_is_le(device) && has_longtermkeys(&src, &device->bdaddr)) {
-+		device_set_paired(device, TRUE);
-+		device_set_bonded(device, TRUE);
-+	}
-+
- 	if (read_device_id(srcaddr, address, NULL, &vendor, &product, &version)
- 									== 0) {
- 		device_set_vendor(device, vendor);
+On Tue, Jan 31, 2012 at 5:28 AM, Mikel Astiz <mikel.astiz@bmw-carit.de> wrote:
+>> -struct pending_data {
+>> -       session_callback_t cb;
+>> +struct pending_request {
+>>         struct obc_session *session;
+>>         struct obc_transfer *transfer;
+>> +       session_callback_t auth_complete;
+>
+>
+> I don't see the need to have a GError* as a parameter to the auth_complete
+> ballback. It looks like a type reuse, but I'd suggest replacing the callback
+> type with another specific one.
+
+Yep, we can use GCallback or something similar, gonna fix that.
+
+>>         /* Unregister any pending transfer */
+>> -       while (l) {
+>> -               struct obc_transfer *transfer = l->data;
+>> -
+>> -               l = l->next;
+>> -
+>> -               obc_session_remove_transfer(session, transfer);
+>> -       }
+>> +       while ((p = g_queue_pop_head(session->queue)))
+>> +               pending_request_free(p);
+>
+>
+> Would it simpler to use g_queue_foreach just like in session_free?
+
+Yep gonna fix this too.
+
+>>
+>> -       pending->cb(pending->session, NULL, transfer);
+>> -       g_free(pending);
+>> +       p->auth_complete(p->session, NULL, transfer);
+>
+>
+> It seems like (auth_complete != NULL) should be checked here, or otherwise
+> the check in session_request_reply should be removed.
+
+Yep
+
 -- 
-1.7.8.1
-
+Luiz Augusto von Dentz
