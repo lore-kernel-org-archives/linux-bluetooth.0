@@ -1,60 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1327961101.1955.186.camel@aeonflux>
-References: <1327504207-18275-1-git-send-email-octavian.purdila@intel.com>
-	<1327961101.1955.186.camel@aeonflux>
-Date: Tue, 31 Jan 2012 12:12:04 +0200
-Message-ID: <CAE1zotLmJ8DNX5x5=XwYbR3mEJL_G8GtY56YzeGf6dY=bc+gsQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: fix RFCOMM session reference counting issue
-From: "Purdila, Octavian" <octavian.purdila@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gopala Krishna Murala <gopala.krishna.murala@intel.com>, Nick Pelly <npelly@google.com>,
-	=?UTF-8?B?THVrw6HFoSBUdXJlaw==?= <8an@praha12.net>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: multipart/alternative; boundary=0015175cb2c8d8288e04b7d031b3
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RESEND 2/3] Bluetooth: Use list _safe deleting from conn_hash_list
+Date: Tue, 31 Jan 2012 10:43:03 +0200
+Message-Id: <1327999384-16094-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1327999384-16094-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1327999384-16094-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0015175cb2c8d8288e04b7d031b3
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, Jan 31, 2012 at 12:05 AM, Marcel Holtmann <marcel@holtmann.org>wrote:
+Use list_for_each_entry_safe which is safe version against removal
+of list entry. Otherwise we remove hci_conn element and reference
+next element which result in accessing LIST_POISON.
 
-I can follow your argumentation and seems reasonable to me.
->
-> Have we run this against the BITE tester just to double check that not
-> by some stupid coincident it breaks qualification?
->
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
->
->
-Hi Marcel,
+[   95.571834] Bluetooth: unknown link type 127
+[   95.578349] BUG: unable to handle kernel paging request at 20002000
+[   95.580236] IP: [<20002000>] 0x20001fff
+[   95.580763] *pde = 00000000
+[   95.581196] Oops: 0000 [#1] SMP
+...
+[   95.582298] Pid: 3355, comm: hciconfig Tainted: G           O 3.2.0-rc2niko+ #62 innotek GmbH VirtualBox
+[   95.582298] EIP: 0060:[<20002000>] EFLAGS: 00210206 CPU: 0
+[   95.582298] EIP is at 0x20002000
+[   95.582298] EAX: ea4bc000 EBX: ea4bc000 ECX: 20002000 EDX: 00000016
+[   95.582298] ESI: f49516f8 EDI: f4951008 EBP: ea4f1e6c ESP: ea4f1e50
+[   95.582298]  DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
+[   95.582298] Process hciconfig (pid: 3355, ti=ea4f0000 task=ea4a8000 task.ti=ea4f0000)
+[   95.582298] Stack:
+[   95.582298]  f8231ab6 f825518d f8255178 0000007f ea4bc000 f4951000 f495163c ea4f1e98
+[   95.582298]  f822bcb1 f4951000 ea4f1e98 f822d679 0000000c f4951068 ea4a8000 f4951000
+[   95.582298]  ffffffed 00000000 ea4f1ea8 f822e1da 400448ca ea4f6800 ea4f1ee4 f824102f
+[   95.582298] Call Trace:
+[   95.582298]  [<f8231ab6>] ? hci_conn_hash_flush+0x76/0xf0 [bluetooth]
+[   95.582298]  [<f822bcb1>] hci_dev_do_close+0xc1/0x2e0 [bluetooth]
+[   95.582298]  [<f822d679>] ? hci_dev_get+0x69/0xb0 [bluetooth]
+[   95.582298]  [<f822e1da>] hci_dev_close+0x2a/0x50 [bluetooth]
+[   95.582298]  [<f824102f>] hci_sock_ioctl+0x1af/0x3f0 [bluetooth]
+[   95.582298]  [<c11153ea>] ? handle_pte_fault+0x8a/0x8f0
+[   95.582298]  [<c146becf>] sock_ioctl+0x5f/0x260
+[   95.582298]  [<c146be70>] ? sock_fasync+0x90/0x90
+[   95.582298]  [<c1152b33>] do_vfs_ioctl+0x83/0x5b0
+[   95.582298]  [<c1563f87>] ? do_page_fault+0x297/0x500
+[   95.582298]  [<c1563cf0>] ? spurious_fault+0xd0/0xd0
+[   95.582298]  [<c107165b>] ? up_read+0x1b/0x30
+[   95.582298]  [<c1563f87>] ? do_page_fault+0x297/0x500
+[   95.582298]  [<c100aa9f>] ? init_fpu+0xef/0x160
+[   95.582298]  [<c15617c0>] ? do_debug+0x180/0x180
+[   95.582298]  [<c100a958>] ? fpu_finit+0x28/0x80
+[   95.582298]  [<c11530e7>] sys_ioctl+0x87/0x90
+[   95.582298]  [<c156795f>] sysenter_do_call+0x12/0x38
+...
 
-Thanks for the review.  I have ask around but we don't have a BITE tester
-available at our site. Is there any software tool we can use instead?
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/hci_conn.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-Thanks!
-Tavi
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 7ec6e54..91a83fb 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -791,11 +791,11 @@ timer:
+ void hci_conn_hash_flush(struct hci_dev *hdev)
+ {
+ 	struct hci_conn_hash *h = &hdev->conn_hash;
+-	struct hci_conn *c;
++	struct hci_conn *c, *n;
+ 
+ 	BT_DBG("hdev %s", hdev->name);
+ 
+-	list_for_each_entry_rcu(c, &h->list, list) {
++	list_for_each_entry_safe(c, n, &h->list, list) {
+ 		c->state = BT_CLOSED;
+ 
+ 		hci_proto_disconn_cfm(c, HCI_ERROR_LOCAL_HOST_TERM);
+-- 
+1.7.4.1
 
---0015175cb2c8d8288e04b7d031b3
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Jan 31, 2012 at 12:05 AM, Marcel Holtmann <span dir=3D"ltr">&lt;<a =
-href=3D"mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt;</span> wrot=
-e:<br><br><div class=3D"gmail_quote"><blockquote class=3D"gmail_quote" styl=
-e=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-I can follow your argumentation and seems reasonable to me.<br>
-<br>
-Have we run this against the BITE tester just to double check that not<br>
-by some stupid coincident it breaks qualification?<br>
-<br>
-Acked-by: Marcel Holtmann &lt;<a href=3D"mailto:marcel@holtmann.org">marcel=
-@holtmann.org</a>&gt;<br>
-<br>
-</blockquote><div><br>Hi Marcel,<br><br>Thanks for the review.=A0 I have as=
-k around but we don&#39;t have a BITE tester available at our site. Is ther=
-e any software tool we can use instead?<br><br>Thanks!<br>Tavi<br></div>
-</div>
-
---0015175cb2c8d8288e04b7d031b3--
