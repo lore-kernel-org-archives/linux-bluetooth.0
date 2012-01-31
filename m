@@ -1,49 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH] device: Fix segmentation fault removing devices
-Date: Tue, 31 Jan 2012 16:59:05 +0100
-Message-Id: <1328025545-14320-1-git-send-email-sancane@gmail.com>
+Message-ID: <1328025524.1955.219.camel@aeonflux>
+Subject: Re: [RESEND 1/3] Bluetooth: Use cancel_work instead of
+ cancel_work_sync
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ulisses Furquim <ulisses@profusion.mobi>
+Cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+	Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Date: Tue, 31 Jan 2012 07:58:44 -0800
+In-Reply-To: <CAA37ikaOnZEZNFatN4ncHkVB=H7y3DZy1E_7LWBtcmJdJTF6Zg@mail.gmail.com>
+References: <1327999384-16094-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1327999384-16094-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <CACJA=fWD6wOnNT4jFvGQAP3hRo0AKWAoiZTHZsfmGvp+6JdxOg@mail.gmail.com>
+	 <20120131130242.GB7660@aemeltch-MOBL1> <1328022697.1955.217.camel@aeonflux>
+	 <CAA37ikaOnZEZNFatN4ncHkVB=H7y3DZy1E_7LWBtcmJdJTF6Zg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is an unbalanced control regarding to the GATT channel and its
-attachid, we have to to update the attach id value by setting it to
-zero whenever we detach a GATT channel.
----
- src/device.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+Hi Ulisses,
 
-diff --git a/src/device.c b/src/device.c
-index c19acd4..9f749b7 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1734,6 +1734,7 @@ static void attrib_disconnected(gpointer user_data)
- 	attrib_channel_detach(device->attrib, device->attachid);
- 	g_attrib_unref(device->attrib);
- 	device->attrib = NULL;
-+	device->attachid = 0;
- 
- 	if (device->auto_connect == FALSE)
- 		return;
-@@ -1781,6 +1782,7 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
- 
- 	if (device->attios == NULL && device->attios_offline == NULL) {
- 		attrib_channel_detach(device->attrib, device->attachid);
-+		device->attachid = 0;
- 		g_attrib_unref(device->attrib);
- 		device->attrib = NULL;
- 	} else
-@@ -2854,7 +2856,7 @@ gboolean btd_device_remove_attio_callback(struct btd_device *device, guint id)
- 	if (device->attios != NULL || device->attios_offline != NULL)
- 		return TRUE;
- 
--	if (device->attachid) {
-+	if (device->attachid > 0) {
- 		attrib_channel_detach(device->attrib, device->attachid);
- 		device->attachid = 0;
- 	}
--- 
-1.7.9
+> >> > > -       cancel_delayed_work_sync(&conn->disc_work);
+> >> > > +       cancel_delayed_work(&conn->disc_work);
+> >> >
+> >> > I'm afraid we must use _sync variant here. disc_work is not supposed to
+> >> > be running after hci_conn is deleted.
+> >> >
+> >> > BTW, I believe we already addressed this issue in patches [PATCH 1/2]
+> >> > Bluetooth: Fix potential deadlock and [PATCH 2/2] Bluetooth: Remove
+> >> > unneeded locking. These patches are now pushed upstream. Could you
+> >>
+> >> I will check those patches from upstream and let you know.
+> >
+> > crap, I just acked these.
+> >
+> > Johan, forget about my acks and just ignore them. Lets wait until we get
+> > a clean new series.
+> >
+> This change is really wrong because we're on the delete path and Andre
+> sent other patches which I'm almost sure will address this problem.
+
+lets do it this way, I only look at final patches that you and Andrei
+signed off / acked.
+
+Regards
+
+Marcel
+
 
