@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1328022462.1955.213.camel@aeonflux>
-Subject: Re: [RESEND 2/3] Bluetooth: Use list _safe deleting from
- conn_hash_list
+Message-ID: <1328022424.1955.212.camel@aeonflux>
+Subject: Re: [RESEND 1/3] Bluetooth: Use cancel_work instead of
+ cancel_work_sync
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 31 Jan 2012 07:07:42 -0800
-In-Reply-To: <1327999384-16094-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 31 Jan 2012 07:07:04 -0800
+In-Reply-To: <1327999384-16094-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1327999384-16094-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1327999384-16094-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1327999384-16094-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,53 +16,72 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-> Use list_for_each_entry_safe which is safe version against removal
-> of list entry. Otherwise we remove hci_conn element and reference
-> next element which result in accessing LIST_POISON.
+> Fix deadlock when cancelling delayed work.
 > 
-> [   95.571834] Bluetooth: unknown link type 127
-> [   95.578349] BUG: unable to handle kernel paging request at 20002000
-> [   95.580236] IP: [<20002000>] 0x20001fff
-> [   95.580763] *pde = 00000000
-> [   95.581196] Oops: 0000 [#1] SMP
-> ...
-> [   95.582298] Pid: 3355, comm: hciconfig Tainted: G           O 3.2.0-rc2niko+ #62 innotek GmbH VirtualBox
-> [   95.582298] EIP: 0060:[<20002000>] EFLAGS: 00210206 CPU: 0
-> [   95.582298] EIP is at 0x20002000
-> [   95.582298] EAX: ea4bc000 EBX: ea4bc000 ECX: 20002000 EDX: 00000016
-> [   95.582298] ESI: f49516f8 EDI: f4951008 EBP: ea4f1e6c ESP: ea4f1e50
-> [   95.582298]  DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
-> [   95.582298] Process hciconfig (pid: 3355, ti=ea4f0000 task=ea4a8000 task.ti=ea4f0000)
-> [   95.582298] Stack:
-> [   95.582298]  f8231ab6 f825518d f8255178 0000007f ea4bc000 f4951000 f495163c ea4f1e98
-> [   95.582298]  f822bcb1 f4951000 ea4f1e98 f822d679 0000000c f4951068 ea4a8000 f4951000
-> [   95.582298]  ffffffed 00000000 ea4f1ea8 f822e1da 400448ca ea4f6800 ea4f1ee4 f824102f
-> [   95.582298] Call Trace:
-> [   95.582298]  [<f8231ab6>] ? hci_conn_hash_flush+0x76/0xf0 [bluetooth]
-> [   95.582298]  [<f822bcb1>] hci_dev_do_close+0xc1/0x2e0 [bluetooth]
-> [   95.582298]  [<f822d679>] ? hci_dev_get+0x69/0xb0 [bluetooth]
-> [   95.582298]  [<f822e1da>] hci_dev_close+0x2a/0x50 [bluetooth]
-> [   95.582298]  [<f824102f>] hci_sock_ioctl+0x1af/0x3f0 [bluetooth]
-> [   95.582298]  [<c11153ea>] ? handle_pte_fault+0x8a/0x8f0
-> [   95.582298]  [<c146becf>] sock_ioctl+0x5f/0x260
-> [   95.582298]  [<c146be70>] ? sock_fasync+0x90/0x90
-> [   95.582298]  [<c1152b33>] do_vfs_ioctl+0x83/0x5b0
-> [   95.582298]  [<c1563f87>] ? do_page_fault+0x297/0x500
-> [   95.582298]  [<c1563cf0>] ? spurious_fault+0xd0/0xd0
-> [   95.582298]  [<c107165b>] ? up_read+0x1b/0x30
-> [   95.582298]  [<c1563f87>] ? do_page_fault+0x297/0x500
-> [   95.582298]  [<c100aa9f>] ? init_fpu+0xef/0x160
-> [   95.582298]  [<c15617c0>] ? do_debug+0x180/0x180
-> [   95.582298]  [<c100a958>] ? fpu_finit+0x28/0x80
-> [   95.582298]  [<c11530e7>] sys_ioctl+0x87/0x90
-> [   95.582298]  [<c156795f>] sysenter_do_call+0x12/0x38
-> ...
+> [  584.676126] ======================================================
+> [  584.676126] [ INFO: possible circular locking dependency detected ]
+> [  584.676126] 3.2.0-rc2niko+ #44
+> [  584.676126] -------------------------------------------------------
+> [  584.676126] kworker/u:1/30 is trying to acquire lock:
+> [  584.676126]  (&hdev->lock){+.+.+.}, at: [<f81f001c>] hci_conn_timeout+0x6c/0x190 [bluetooth]
+> [  584.676126]
+> [  584.676126] but task is already holding lock:
+> [  584.676126]  ((&(&conn->disc_work)->work)){+.+...}, at: [<c1065a78>] process_one_work+0x108/0x460
+> [  584.676126]
+> [  584.676126] which lock already depends on the new lock.
+> [  584.676126]
+> [  584.676126]
+> [  584.676126] the existing dependency chain (in reverse order) is:
+> [  584.676126]
+> [  584.676126] -> #1 ((&(&conn->disc_work)->work)){+.+...}:
+> [  584.676126]        [<c1086748>] lock_acquire+0x88/0x110
+> [  584.676126]        [<c1066041>] wait_on_work+0x61/0x210
+> [  584.676126]        [<c106630a>] __cancel_work_timer+0x6a/0x110
+> [  584.676126]        [<c10663c0>] cancel_delayed_work_sync+0x10/0x20
+> [  584.676126]        [<f81f935b>] hci_event_packet+0x3b2b/0x4610 [bluetooth]
+> [  584.676126]        [<f81ea78e>] hci_rx_work+0x20e/0x4c0 [bluetooth]
+> [  584.676126]        [<c1065aec>] process_one_work+0x17c/0x460
+> [  584.676126]        [<c10672e4>] worker_thread+0x124/0x2c0
+> [  584.676126]        [<c106be44>] kthread+0x84/0x90
+> [  584.676126]        [<c1567f42>] kernel_thread_helper+0x6/0x10
+> [  584.676126]
+> [  584.676126] -> #0 (&hdev->lock){+.+.+.}:
+> [  584.676126]        [<c10852cd>] __lock_acquire+0xc0d/0x1ab0
+> [  584.676126]        [<c1086748>] lock_acquire+0x88/0x110
+> [  584.676126]        [<c155de50>] mutex_lock_nested+0x70/0x320
+> [  584.676126]        [<f81f001c>] hci_conn_timeout+0x6c/0x190 [bluetooth]
+> [  584.676126]        [<c1065aec>] process_one_work+0x17c/0x460
+> [  584.676126]        [<c10672e4>] worker_thread+0x124/0x2c0
+> [  584.676126]        [<c106be44>] kthread+0x84/0x90
+> [  584.676126]        [<c1567f42>] kernel_thread_helper+0x6/0x10
+> [  584.676126]
+> [  584.676126] other info that might help us debug this:
+> [  584.676126]
+> [  584.676126]  Possible unsafe locking scenario:
+> [  584.676126]
+> [  584.676126]        CPU0                    CPU1
+> [  584.676126]        ----                    ----
+> [  584.676126]   lock((&(&conn->disc_work)->work));
+> [  584.676126]                                lock(&hdev->lock);
+> [  584.676126]                                lock((&(&conn->disc_work)->work));
+> [  584.676126]   lock(&hdev->lock);
+> [  584.676126]
+> [  584.676126]  *** DEADLOCK ***
+> [  584.676126]
+> [  584.676126] 2 locks held by kworker/u:1/30:
+> [  584.676126]  #0:  (hdev->name){.+.+.+}, at: [<c1065a78>] process_one_work+0x108/0x460
+> [  584.676126]  #1:  ((&(&conn->disc_work)->work)){+.+...}, at: [<c1065a78>] process_one_work+0x108/0x460
 > 
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
 > ---
->  net/bluetooth/hci_conn.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
+> v2 - use cancel_delayed_work instead of cancel_delayed_work_sync following
+> recommendation from Ulisses Furquim
+> ---
+>  net/bluetooth/hci_conn.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
+Reviewed-by: Ulisses Furquim <ulisses@profusion.mobi>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
