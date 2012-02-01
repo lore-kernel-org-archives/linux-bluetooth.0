@@ -1,60 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20111130172428.GA9425@samus>
-References: <1320241924-2300-1-git-send-email-luiz.dentz@gmail.com>
-	<1320241924-2300-4-git-send-email-luiz.dentz@gmail.com>
-	<20111130172428.GA9425@samus>
-Date: Thu, 1 Dec 2011 09:23:09 +0200
-Message-ID: <CABBYNZKod-HNwzuFhoLRUQc66uJkEQL-u7NCknPAjbtvOMorgw@mail.gmail.com>
-Subject: Re: [PATCH 4/4] Bluetooth: use buffer priority to mark URB_ISO_ASAP flag
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Message-ID: <1328080755.1955.237.camel@aeonflux>
+Subject: Re: Contribute: HFP: A new telephony interface component exporting
+ all events over DBus
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Debanjan Biswas (debiswas)" <debiswas@cisco.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Tue, 31 Jan 2012 23:19:15 -0800
+In-Reply-To: <35DD4A1E71A66646BF42B14F8A62B7AC060CD6FB@XMB-BGL-419.cisco.com>
+References: <35DD4A1E71A66646BF42B14F8A62B7AC060CD6FB@XMB-BGL-419.cisco.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Debanjan,
 
-On Wed, Nov 30, 2011 at 7:24 PM, Vinicius Costa Gomes
-<vinicius.gomes@openbossa.org> wrote:
-> Hi,
->
-> On 15:52 Wed 02 Nov, Luiz Augusto von Dentz wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->> ---
->>  drivers/bluetooth/btusb.c |    3 +++
->>  1 files changed, 3 insertions(+), 0 deletions(-)
->>
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index abfc4ee..9db2476 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -727,6 +727,9 @@ static int btusb_send_frame(struct sk_buff *skb)
->>               usb_fill_bulk_urb(urb, data->udev, pipe,
->>                               skb->data, skb->len, btusb_tx_complete, skb);
->>
->> +             if (skb->priority >= HCI_PRIO_MAX - 1)
->> +                     urb->transfer_flags  = URB_ISO_ASAP;
->> +
->
-> In case someone is having problems:
->
-> With CONFIG_USB_DEBUG enabled the check that the URB_ISO_ASAP flag is
-> not valid for bulk endpoints is enabled, and that urb is rejected.
+>                 I am working on a new telephony interface component of HFP & the primary purpose of the component is to export all the HFP profile events over Dbus so that any system process can retrieve the event. Further, the component will expose Remote Dbus methods that could be invoked by any process running in the system.
+>                 Please, let me know the process to contribute this to the community. 
 
-Hmm, you are right URB_ISO_ASAP is not meant for bulk so usb_submit_urb drop it:
+the easiest way is to send patches here and explain what you are doing
+and why. It is really hard to guess from the above what your use case or
+design is in detail.
 
- 	/* fail if submitter gave bogus flags */
-	if (urb->transfer_flags != orig_flags) {
-		dev_err(&dev->dev, "BOGUS urb flags, %x --> %x\n",
-			orig_flags, urb->transfer_flags);
-		return -EINVAL;
-	}
+Regards
 
-So we better remove asap.
+Marcel
 
--- 
-Luiz Augusto von Dentz
+
