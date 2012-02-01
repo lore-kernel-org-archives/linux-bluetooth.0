@@ -1,32 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1328131832.1955.239.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Fix invalid memory access when there's no
- SMP channel
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 01 Feb 2012 13:30:32 -0800
-In-Reply-To: <1328131676-29171-1-git-send-email-vinicius.gomes@openbossa.org>
-References: <1328131676-29171-1-git-send-email-vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH] Bluetooth: Fix invalid memory access when there's no SMP channel
+Date: Wed,  1 Feb 2012 18:27:56 -0300
+Message-Id: <1328131676-29171-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+We only should try to free the SMP channel that was created if there
+is a pending SMP session.
 
-> We only should try to free the SMP channel that was created if there
-> is a pending SMP session.
-> 
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> ---
->  net/bluetooth/smp.c |    9 ++++++---
->  1 files changed, 6 insertions(+), 3 deletions(-)
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ net/bluetooth/smp.c |    9 ++++++---
+ 1 files changed, 6 insertions(+), 3 deletions(-)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 5818334..9ff56e1 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -263,8 +263,11 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason, u8 send)
+ 
+ 	clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->hcon->flags);
+ 	mgmt_auth_failed(conn->hcon->hdev, conn->dst, reason);
+-	cancel_delayed_work_sync(&conn->security_timer);
+-	smp_chan_destroy(conn);
++
++	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
++		cancel_delayed_work_sync(&conn->security_timer);
++		smp_chan_destroy(conn);
++	}
+ }
+ 
+ #define JUST_WORKS	0x00
+@@ -506,7 +509,7 @@ void smp_chan_destroy(struct l2cap_conn *conn)
+ {
+ 	struct smp_chan *smp = conn->smp_chan;
+ 
+-	clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags);
++	BUG_ON(!smp);
+ 
+ 	if (smp->tfm)
+ 		crypto_free_blkcipher(smp->tfm);
+-- 
+1.7.8.1
 
