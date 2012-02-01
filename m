@@ -1,29 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1328080755.1955.237.camel@aeonflux>
-Subject: Re: Contribute: HFP: A new telephony interface component exporting
- all events over DBus
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Debanjan Biswas (debiswas)" <debiswas@cisco.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 31 Jan 2012 23:19:15 -0800
-In-Reply-To: <35DD4A1E71A66646BF42B14F8A62B7AC060CD6FB@XMB-BGL-419.cisco.com>
-References: <35DD4A1E71A66646BF42B14F8A62B7AC060CD6FB@XMB-BGL-419.cisco.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Tue, 31 Jan 2012 19:16:10 -0800
+From: Johan Hedberg <johan.hedberg@intel.com>
+To: Octavian Purdila <octavian.purdila@intel.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Gopala Krishna Murala <gopala.krishna.murala@intel.com>,
+	Nick Pelly <npelly@google.com>,
+	=?iso-8859-15?B?THVr4ag=?= Turek <8an@praha12.net>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCH v2] Bluetooth: fix RFCOMM session reference counting issue
+Message-ID: <20120201031610.GA19894@x220.globalsuite.net>
+References: <1327685559-4351-1-git-send-email-octavian.purdila@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1327685559-4351-1-git-send-email-octavian.purdila@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Debanjan,
+Hi Octavian,
 
->                 I am working on a new telephony interface component of HFP & the primary purpose of the component is to export all the HFP profile events over Dbus so that any system process can retrieve the event. Further, the component will expose Remote Dbus methods that could be invoked by any process running in the system.
->                 Please, let me know the process to contribute this to the community. 
+On Fri, Jan 27, 2012, Octavian Purdila wrote:
+> There is an imbalance in the rfcomm_session_hold / rfcomm_session_put
+> operations which causes the following crash:
+> 
+> [  685.010159] BUG: unable to handle kernel paging request at 6b6b6b6b
+> [  685.010169] IP: [<c149d76d>] rfcomm_process_dlcs+0x1b/0x15e
+> [  685.010181] *pdpt = 000000002d665001 *pde = 0000000000000000
+> [  685.010191] Oops: 0000 [#1] PREEMPT SMP
+> [  685.010247]
+> [  685.010255] Pid: 947, comm: krfcommd Tainted: G         C  3.0.16-mid8-dirty #44
+> [  685.010266] EIP: 0060:[<c149d76d>] EFLAGS: 00010246 CPU: 1
+> [  685.010274] EIP is at rfcomm_process_dlcs+0x1b/0x15e
+> [  685.010281] EAX: e79f551c EBX: 6b6b6b6b ECX: 00000007 EDX: e79f40b4
+> [  685.010288] ESI: e79f4060 EDI: ed4e1f70 EBP: ed4e1f68 ESP: ed4e1f50
+> [  685.010295]  DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
+> [  685.010303] Process krfcommd (pid: 947, ti=ed4e0000 task=ed43e5e0 task.ti=ed4e0000)
+> [  685.010308] Stack:
+> [  685.010312]  ed4e1f68 c149eb53 e5925150 e79f4060 ed500000 ed4e1f70 ed4e1f80 c149ec10
+> [  685.010331]  00000000 ed43e5e0 00000000 ed4e1f90 ed4e1f9c c149ec87 0000bf54 00000000
+> [  685.010348]  00000000 ee03bf54 c149ec37 ed4e1fe4 c104fe01 00000000 00000000 00000000
+> [  685.010367] Call Trace:
+> [  685.010376]  [<c149eb53>] ? rfcomm_process_rx+0x6e/0x74
+> [  685.010387]  [<c149ec10>] rfcomm_process_sessions+0xb7/0xde
+> [  685.010398]  [<c149ec87>] rfcomm_run+0x50/0x6d
+> [  685.010409]  [<c149ec37>] ? rfcomm_process_sessions+0xde/0xde
+> [  685.010419]  [<c104fe01>] kthread+0x63/0x68
+> [  685.010431]  [<c104fd9e>] ? __init_kthread_worker+0x42/0x42
+> [  685.010442]  [<c14dae82>] kernel_thread_helper+0x6/0xd
+> 
+> This issue has been brought up earlier here:
+> 
+> https://lkml.org/lkml/2011/5/21/127
+> 
+> The issue appears to be the rfcomm_session_put in rfcomm_recv_ua. This
+> operation doesn't seem be to required as for the non-initiator case we
+> have the rfcomm_process_rx doing an explicit put and in the initiator
+> case the last dlc_unlink will drive the reference counter to 0.
+> 
+> There have been several attempts to fix these issue:
+> 
+> 6c2718d Bluetooth: Do not call rfcomm_session_put() for RFCOMM UA on closed socket
+> 683d949 Bluetooth: Never deallocate a session when some DLC points to it
+> 
+> but AFAICS they do not fix the issue just make it harder to reproduce.
+> 
+> Signed-off-by: Octavian Purdila <octavian.purdila@intel.com>
+> Signed-off-by: Gopala Krishna Murala <gopala.krishna.murala@intel.com>
 
-the easiest way is to send patches here and explain what you are doing
-and why. It is really hard to guess from the above what your use case or
-design is in detail.
+The patch has been applied to my bluetooth-next tree. Thanks.
 
-Regards
-
-Marcel
-
-
+Johan
