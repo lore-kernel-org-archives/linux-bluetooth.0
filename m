@@ -1,40 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 0/6] MGMT Start Discovery command LE-Only Support
-Date: Wed,  1 Feb 2012 19:34:46 -0300
-Message-Id: <1328135692-24255-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1326803673.4432.2.camel@thor>
+References: <1312921615.2261.1.camel@THOR>
+	<4F04285E.1070500@monom.org>
+	<4F0AA5A2.4070903@monom.org>
+	<20120111112646.GB23277@x220>
+	<1326742631.32064.21.camel@thor>
+	<20120117082725.GA14943@x220.P-661HNU-F1>
+	<1326803673.4432.2.camel@thor>
+Date: Wed, 1 Feb 2012 14:22:46 -0800
+Message-ID: <CABBYNZ+kASV4s-eHh6r8DZo15ivVc_LmZcGiSq7SJf_D4QP3PA@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	Daniel Wagner <wagi@monom.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Peter, Johan,
 
-The changes in this version are based on Marcel's comments about previous
-patch series.
+On Tue, Jan 17, 2012 at 4:34 AM, Peter Hurley <peter@hurleysoftware.com> wrote:
+>> I think it'd be important to continue with this work. Even for
+>> controllers that don't allow a "security upgrade" you can still detect
+>> the situation when you get an auth_complete without any preceding
+>> link_key or PIN request and just drop the connection in such a case. For
+>> legacy pairing this would only happen when going from MEDIUM to HIGH
+>> since LOW means that you don't have a link key yet.
 
-Here they are:
-	* Add Marcel's acks
-	* Minor code refactoring in hci_discovery_active
-	* Use hci_request framework in hci_do_le_scan
-
-BR,
-
-Andre
-
-Andre Guedes (6):
-  Bluetooth: LE scan should send Discovering events
-  Bluetooth: Minor code refactoring
-  Bluetooth: Add hci_do_le_scan()
-  Bluetooth: Add hci_le_scan()
-  Bluetooth: MGMT start discovery LE-Only support
-  Bluetooth: Fix indentation
-
- include/net/bluetooth/hci_core.h |   15 +++++
- net/bluetooth/hci_core.c         |  125 +++++++++++++++++++++++++++++++++++++-
- net/bluetooth/hci_event.c        |   29 ++++++++-
- net/bluetooth/mgmt.c             |   22 ++++++-
- 4 files changed, 183 insertions(+), 8 deletions(-)
+Perhaps we should apply this patch so at least we are able to connect
+anything that requires service discovery before connect attempt e.g.
+OBEX which IMO its a very serious issue, we can fix properly the
+overload latter but leaving it as it is worst, iirc is this has been
+reproducible since 3.0.
 
 -- 
-1.7.9
-
+Luiz Augusto von Dentz
