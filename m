@@ -1,100 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 5/6] Bluetooth: MGMT start discovery LE-Only support
-Date: Wed,  1 Feb 2012 19:34:51 -0300
-Message-Id: <1328135692-24255-6-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v4 4/6] Bluetooth: Add hci_le_scan()
+Date: Wed,  1 Feb 2012 19:34:50 -0300
+Message-Id: <1328135692-24255-5-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1328135692-24255-1-git-send-email-andre.guedes@openbossa.org>
 References: <1328135692-24255-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds LE-Only discovery procedure support to MGMT Start
-Discovery command.
+We are not supposed to block in start_discovery() because
+start_discovery code is running in write() syscall context
+and this would block the write operation on the mgmt socket.
+This way, we cannot directly call hci_do_le_scan() to scan
+LE devices in start_discovery(). To overcome this issue a
+derefered work (hdev->le_scan) was created so we can properly
+call hci_do_le_scan().
+
+The helper function hci_le_scan() simply set LE scan parameters
+and queue hdev->le_scan work. The work is queued on system_long_wq
+since it can sleep for a few seconds in the worst case (timeout).
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c |   13 ++++++++++++-
- net/bluetooth/mgmt.c      |   20 +++++++++++++++++++-
- 2 files changed, 31 insertions(+), 2 deletions(-)
+ include/net/bluetooth/hci_core.h |    6 ++++++
+ net/bluetooth/hci_core.c         |   35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 0bcfeca..448c7af 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1032,6 +1032,13 @@ static void hci_cc_le_set_scan_param(struct hci_dev *hdev, struct sk_buff *skb)
- 	BT_DBG("%s status 0x%x", hdev->name, status);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 47111df..0cffb25 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -130,6 +130,7 @@ struct le_scan_params {
+ 	u8 type;
+ 	u16 interval;
+ 	u16 window;
++	int timeout;
+ };
  
- 	hci_req_complete(hdev, HCI_OP_LE_SET_SCAN_PARAM, status);
+ #define NUM_REASSEMBLY 4
+@@ -271,6 +272,9 @@ struct hci_dev {
+ 
+ 	struct delayed_work	le_scan_disable;
+ 
++	struct work_struct	le_scan;
++	struct le_scan_params	le_scan_params;
 +
-+	if (status) {
-+		hci_dev_lock(hdev);
-+		mgmt_start_discovery_failed(hdev, status);
-+		hci_dev_unlock(hdev);
-+		return;
-+	}
+ 	int (*open)(struct hci_dev *hdev);
+ 	int (*close)(struct hci_dev *hdev);
+ 	int (*flush)(struct hci_dev *hdev);
+@@ -1030,5 +1034,7 @@ void hci_le_ltk_neg_reply(struct hci_conn *conn);
+ 
+ int hci_do_inquiry(struct hci_dev *hdev, u8 length);
+ int hci_cancel_inquiry(struct hci_dev *hdev);
++int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
++								int timeout);
+ 
+ #endif /* __HCI_CORE_H */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 2f5d1ae..046add5 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -735,6 +735,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ {
+ 	BT_DBG("%s %p", hdev->name, hdev);
+ 
++	cancel_work_sync(&hdev->le_scan);
++
+ 	hci_req_cancel(hdev, ENODEV);
+ 	hci_req_lock(hdev);
+ 
+@@ -1650,6 +1652,37 @@ static void le_scan_disable_work(struct work_struct *work)
+ 	hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
  }
  
- static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
-@@ -1050,8 +1057,12 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 	case LE_SCANNING_ENABLED:
- 		hci_req_complete(hdev, HCI_OP_LE_SET_SCAN_ENABLE, status);
- 
--		if (status)
-+		if (status) {
-+			hci_dev_lock(hdev);
-+			mgmt_start_discovery_failed(hdev, status);
-+			hci_dev_unlock(hdev);
- 			return;
-+		}
- 
- 		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 8970799..0a1fa4c 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -35,6 +35,15 @@
- #define MGMT_VERSION	0
- #define MGMT_REVISION	1
- 
-+/*
-+ * These LE scan and inquiry parameters were chosen according to LE General
-+ * Discovery Procedure specification.
-+ */
-+#define LE_SCAN_TYPE			0x01
-+#define LE_SCAN_WIN			0x12
-+#define LE_SCAN_INT			0x12
-+#define LE_SCAN_TIMEOUT_LE_ONLY		10240	/* TGAP(gen_disc_scan_min) */
++static void le_scan_work(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev, le_scan);
++	struct le_scan_params *param = &hdev->le_scan_params;
 +
- #define INQUIRY_LEN_BREDR 0x08 /* TGAP(100) */
- 
- #define SERVICE_CACHE_TIMEOUT (5 * 1000)
-@@ -1897,6 +1906,7 @@ static int start_discovery(struct sock *sk, u16 index,
- 						unsigned char *data, u16 len)
++	BT_DBG("%s", hdev->name);
++
++	hci_do_le_scan(hdev, param->type, param->interval,
++					param->window, param->timeout);
++}
++
++int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
++								int timeout)
++{
++	struct le_scan_params *param = &hdev->le_scan_params;
++
++	BT_DBG("%s", hdev->name);
++
++	if (work_busy(&hdev->le_scan))
++		return -EINPROGRESS;
++
++	param->type = type;
++	param->interval = interval;
++	param->window = window;
++	param->timeout = timeout;
++
++	queue_work(system_long_wq, &hdev->le_scan);
++
++	return 0;
++}
++
+ /* Register HCI device */
+ int hci_register_dev(struct hci_dev *hdev)
  {
- 	struct mgmt_cp_start_discovery *cp = (void *) data;
-+	unsigned long discov_type = cp->type;
- 	struct pending_cmd *cmd;
- 	struct hci_dev *hdev;
- 	int err;
-@@ -1932,7 +1942,15 @@ static int start_discovery(struct sock *sk, u16 index,
- 		goto failed;
- 	}
+@@ -1735,6 +1768,8 @@ int hci_register_dev(struct hci_dev *hdev)
  
--	err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
-+	if (test_bit(MGMT_ADDR_BREDR, &discov_type))
-+		err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
-+	else if (test_bit(MGMT_ADDR_LE_PUBLIC, &discov_type) &&
-+				test_bit(MGMT_ADDR_LE_RANDOM, &discov_type))
-+		err = hci_le_scan(hdev, LE_SCAN_TYPE, LE_SCAN_INT,
-+					LE_SCAN_WIN, LE_SCAN_TIMEOUT_LE_ONLY);
-+	else
-+		err = -EINVAL;
+ 	atomic_set(&hdev->promisc, 0);
+ 
++	INIT_WORK(&hdev->le_scan, le_scan_work);
 +
- 	if (err < 0)
- 		mgmt_pending_remove(cmd);
- 	else
+ 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
+ 
+ 	write_unlock(&hci_dev_list_lock);
 -- 
 1.7.9
 
