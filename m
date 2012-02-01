@@ -1,40 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 1 Feb 2012 13:35:18 -0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix invalid memory access when there's no SMP
+ channel
+Message-ID: <20120201213518.GA30165@x220.globalsuite.net>
+References: <1328131676-29171-1-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <1326803673.4432.2.camel@thor>
-References: <1312921615.2261.1.camel@THOR>
-	<4F04285E.1070500@monom.org>
-	<4F0AA5A2.4070903@monom.org>
-	<20120111112646.GB23277@x220>
-	<1326742631.32064.21.camel@thor>
-	<20120117082725.GA14943@x220.P-661HNU-F1>
-	<1326803673.4432.2.camel@thor>
-Date: Wed, 1 Feb 2012 14:22:46 -0800
-Message-ID: <CABBYNZ+kASV4s-eHh6r8DZo15ivVc_LmZcGiSq7SJf_D4QP3PA@mail.gmail.com>
-Subject: Re: [PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	Daniel Wagner <wagi@monom.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1328131676-29171-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter, Johan,
+Hi Vinicius,
 
-On Tue, Jan 17, 2012 at 4:34 AM, Peter Hurley <peter@hurleysoftware.com> wrote:
->> I think it'd be important to continue with this work. Even for
->> controllers that don't allow a "security upgrade" you can still detect
->> the situation when you get an auth_complete without any preceding
->> link_key or PIN request and just drop the connection in such a case. For
->> legacy pairing this would only happen when going from MEDIUM to HIGH
->> since LOW means that you don't have a link key yet.
+On Wed, Feb 01, 2012, Vinicius Costa Gomes wrote:
+> We only should try to free the SMP channel that was created if there
+> is a pending SMP session.
+> 
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> ---
+>  net/bluetooth/smp.c |    9 ++++++---
+>  1 files changed, 6 insertions(+), 3 deletions(-)
 
-Perhaps we should apply this patch so at least we are able to connect
-anything that requires service discovery before connect attempt e.g.
-OBEX which IMO its a very serious issue, we can fix properly the
-overload latter but leaving it as it is worst, iirc is this has been
-reproducible since 3.0.
+Applied to my bluetooth-next tree. Thanks.
 
--- 
-Luiz Augusto von Dentz
+Johan
