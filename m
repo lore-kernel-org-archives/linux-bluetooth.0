@@ -1,65 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 2 Feb 2012 10:34:23 +0200
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Ulisses Furquim <ulisses@profusion.mobi>,
-	Andre Guedes <andre.guedes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RESEND 1/3] Bluetooth: Use cancel_work instead of
- cancel_work_sync
-Message-ID: <20120202083417.GA13814@aemeltch-MOBL1>
-References: <1327999384-16094-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1327999384-16094-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <CACJA=fWD6wOnNT4jFvGQAP3hRo0AKWAoiZTHZsfmGvp+6JdxOg@mail.gmail.com>
- <20120131130242.GB7660@aemeltch-MOBL1>
- <1328022697.1955.217.camel@aeonflux>
- <CAA37ikaOnZEZNFatN4ncHkVB=H7y3DZy1E_7LWBtcmJdJTF6Zg@mail.gmail.com>
- <1328025524.1955.219.camel@aeonflux>
- <CAA37ikbbTy95vY7otkYKHNcMcUboYj4XQc5+MjiwSZLedtE33Q@mail.gmail.com>
- <20120201133254.GA3388@aemeltch-MOBL1>
- <1328111610.1955.238.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328111610.1955.238.camel@aeonflux>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 0/2] Fixes kernel crashes and warnings
+Date: Thu,  2 Feb 2012 10:32:16 +0200
+Message-Id: <1328171538-16020-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Wed, Feb 01, 2012 at 07:53:30AM -0800, Marcel Holtmann wrote:
-> > > >> >> > > -       cancel_delayed_work_sync(&conn->disc_work);
-> > > >> >> > > +       cancel_delayed_work(&conn->disc_work);
-> > > >> >> >
-> > > >> >> > I'm afraid we must use _sync variant here. disc_work is not supposed to
-> > > >> >> > be running after hci_conn is deleted.
-> > > >> >> >
-> > > >> >> > BTW, I believe we already addressed this issue in patches [PATCH 1/2]
-> > > >> >> > Bluetooth: Fix potential deadlock and [PATCH 2/2] Bluetooth: Remove
-> > > >> >> > unneeded locking. These patches are now pushed upstream. Could you
-> > > >> >>
-> > > >> >> I will check those patches from upstream and let you know.
-> > > >> >
-> > > >> > crap, I just acked these.
-> > > >> >
-> > > >> > Johan, forget about my acks and just ignore them. Lets wait until we get
-> > > >> > a clean new series.
-> > > >> >
-> > > >> This change is really wrong because we're on the delete path and Andre
-> > > >> sent other patches which I'm almost sure will address this problem.
-> > > >
-> > > > lets do it this way, I only look at final patches that you and Andrei
-> > > > signed off / acked.
-> > > 
-> > > Sure, we can do that this way.
-> > 
-> > I've checked recent upstream code and it works fine so far, please forget
-> > about this particular patch.
-> > 
-> > The other 2 patches are still valid.
-> 
-> create a new patch series for it.
+Set of patches fixes issues with traversing RCU lists.
 
-Done. Johan, please check the patches in new series. 
+Changes:
+	v2: removed patch fixing delayed work warnings since
+	the issue was proper fixed already.
 
-Best regards 
-Andrei Emeltchenko 
+Andrei Emeltchenko (2):
+  Bluetooth: Use list _safe deleting from conn_hash_list
+  Bluetooth: Use list _safe deleting from conn chan_list
+
+ net/bluetooth/hci_conn.c |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
+
+-- 
+1.7.8.3
+
