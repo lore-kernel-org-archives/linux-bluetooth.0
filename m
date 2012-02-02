@@ -1,41 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 2 Feb 2012 09:18:20 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Manoj Iyer <manoj.iyer@canonical.com>
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: Re: [PATCH] Add vendor specific ID (0a5c 21f3) for BCM20702A0.
-Message-ID: <20120202171820.GB22585@x220.globalsuite.net>
-References: <1328196756-3087-1-git-send-email-manoj.iyer@canonical.com>
- <1328196756-3087-2-git-send-email-manoj.iyer@canonical.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328196756-3087-2-git-send-email-manoj.iyer@canonical.com>
+In-Reply-To: <1328182415-14860-1-git-send-email-jaganath.k@samsung.com>
+References: <1328182415-14860-1-git-send-email-jaganath.k@samsung.com>
+Date: Thu, 2 Feb 2012 09:16:41 -0800
+Message-ID: <CABBYNZLT1ynsVJ3U6bujAn_CgKVCGSfF7ffmw=iP4W90UV6kUw@mail.gmail.com>
+Subject: Re: [PATCH obexd 2/4] gobex: Fix ABORT request not processing
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Jaganath,
 
-On Thu, Feb 02, 2012, Manoj Iyer wrote:
-> T: Bus=01 Lev=02 Prnt=02 Port=03 Cnt=03 Dev#= 5 Spd=12 MxCh= 0
-> D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-> P: Vendor=0a5c ProdID=21f3 Rev=01.12
-> S: Manufacturer=Broadcom Corp
-> S: Product=BCM20702A0
-> S: SerialNumber=74DE2B344A7B
-> C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-> I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-> 
-> Signed-off-by: Manoj Iyer <manoj.iyer@canonical.com>
-> Tested-by: Dennis Chua <dennis.chua@canonical.com>
+On Thu, Feb 2, 2012 at 3:33 AM, Jaganath Kanakkassery
+<jaganath.k@samsung.com> wrote:
+> G_OBEX_OP_ABORT is defined as 0x7f but error checking of opcode is
+> done for greater than 0x1f. So abort request is simply ignored.
 > ---
->  drivers/bluetooth/btusb.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
+>  gobex/gobex.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/gobex/gobex.c b/gobex/gobex.c
+> index 0853a9b..c1e7dc4 100644
+> --- a/gobex/gobex.c
+> +++ b/gobex/gobex.c
+> @@ -1163,7 +1163,7 @@ static gboolean incoming_data(GIOChannel *io, GIOCondition cond,
+>        } else {
+>                opcode = obex->rx_last_op;
+>                /* Unexpected response -- fail silently */
+> -               if (opcode > 0x1f && opcode < 0xff) {
+> +               if (opcode > 0x1f && opcode != G_OBEX_OP_ABORT) {
+>                        obex->rx_data = 0;
+>                        return TRUE;
+>                }
+> --
+> 1.7.1
 
-Applied to my bluetooth-next tree (after adding the missing Bluetooth:
-prefix to the summary line). Thanks.
+Ack
 
-Johan
+-- 
+Luiz Augusto von Dentz
