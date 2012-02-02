@@ -1,52 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CACLukzKLNC_bMtYeeParbgr8i1zgTR4XrZgytWjx0LCMhbkGjw@mail.gmail.com>
-References: <1328025545-14320-1-git-send-email-sancane@gmail.com>
-	<CAJdJm_NADwgGb-ZitDQNipgWoDQuRa1M+aQOMdzWmU81JpuNew@mail.gmail.com>
-	<CACLukzKLNC_bMtYeeParbgr8i1zgTR4XrZgytWjx0LCMhbkGjw@mail.gmail.com>
-Date: Thu, 2 Feb 2012 16:26:47 -0300
-Message-ID: <CAKT1EBeLEmTi9GOSyNBAHt+ZZ_wfUoFGgoKy1k=Bk6sCvZyL8w@mail.gmail.com>
-Subject: Re: [PATCH] device: Fix segmentation fault removing devices
+In-Reply-To: <1327060466-17978-2-git-send-email-smriti.gupta@stericsson.com>
+References: <1327060466-17978-1-git-send-email-smriti.gupta@stericsson.com>
+	<1327060466-17978-2-git-send-email-smriti.gupta@stericsson.com>
+Date: Thu, 2 Feb 2012 16:22:24 -0300
+Message-ID: <CAKT1EBfkE3R3rmMfPovUxgLp8mEO64NYa6_oAvGmosA2W6urrA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 1/1] Add provision for terminating an ATT connection
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Santiago Carot <sancane@gmail.com>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
+To: Smriti Gupta <smriti.gupta@stericsson.com>
+Cc: linux-bluetooth@vger.kernel.org, naresh.gupta@stericsson.com,
+	smritigupta2008@gmail.com
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+Hi Smriti Gupta,
 
-On Tue, Jan 31, 2012 at 1:33 PM, Santiago Carot <sancane@gmail.com> wrote:
-> Hi Anderson,
+On Fri, Jan 20, 2012 at 8:54 AM, Smriti Gupta
+<smriti.gupta@stericsson.com> wrote:
+> In order to terminate any existing ATT connection from the client side
+> existing function device_request_disconnect has been updated.
+> ---
+>  src/device.c |    9 +++++++++
+>  1 files changed, 9 insertions(+), 0 deletions(-)
 >
-> 2012/1/31 Anderson Lizardo <anderson.lizardo@openbossa.org>:
->> Hi Santiago,
->>
->> On Tue, Jan 31, 2012 at 11:59 AM, Santiago Carot-Nemesio
->> <sancane@gmail.com> wrote:
->>> There is an unbalanced control regarding to the GATT channel and its
->>> attachid, we have to to update the attach id value by setting it to
->>> zero whenever we detach a GATT channel.
->>
->> Can you detail how to reproduce the segfault? I want to test on my own setup.
->>
+> diff --git a/src/device.c b/src/device.c
+> index 16855b1..7b5107b 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -781,6 +781,7 @@ static void bonding_request_cancel(struct bonding_req *bonding)
+>  void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
+>  {
+>        DBusConnection *conn = get_dbus_connection();
+> +       GIOChannel *io;
 >
-> I simply remove a device with a GATT profile, I used thermometer and I
-> saw that whenever the plugin called to
-> btd_device_remove_attio_callback, inside this function it was using a
-> NULL pointer in device->attrib to detach the channel, so I checked it
-> and I saw that it only is paying attention to the device->attachid
-> wich was unupdated because it isn't being set to 0 whenever the
-> channel is detached.
+>        if (device->bonding)
+>                bonding_request_cancel(device->bonding);
+> @@ -790,6 +791,14 @@ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
+>                browse_request_cancel(device->browse);
+>        }
 >
->> Thanks
->>
+> +       if (device->attrib) {
+> +               io = g_attrib_get_channel(device->attrib);
+> +               if (io) {
+> +                       g_io_channel_shutdown(io, FALSE, NULL);
+> +                       g_io_channel_unref(io);
+> +               }
+> +       }
+> +
+>        if (msg)
+>                device->disconnects = g_slist_append(device->disconnects,
+>                                                dbus_message_ref(msg));
+> --
+> 1.7.0.4
+>
 
 Ack.
 
-This bug is also easily reproducible after a local initiated disconnection.
-For BLE keep the link up an call test-device disconnect "address"
-followed by test-device remove "address"
+Tested with simple-agent and test-device over BLE.
 
-Claudio.
+BR,
+Claudio
