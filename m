@@ -1,54 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJdJm_MXwG0vicPL1zPDBYKj-GXRgacvyg9wqpe5OAhey5q4VA@mail.gmail.com>
-References: <1322850850-18019-1-git-send-email-anderson.lizardo@openbossa.org>
- <CA+XVXffynitA+JYzRnqiRJPQyyrTh+HMNUWQgb0LzD4iowoxpg@mail.gmail.com> <CAJdJm_MXwG0vicPL1zPDBYKj-GXRgacvyg9wqpe5OAhey5q4VA@mail.gmail.com>
-From: Arik Nemtsov <arik@wizery.com>
-Date: Thu, 2 Feb 2012 14:19:37 +0200
-Message-ID: <CA+XVXfeMqXxAxb1sP7Bp=iQRsEVaF6E39k-wDTbVZQADOswvAQ@mail.gmail.com>
-Subject: Re: [PATCH RFC BlueZ 0/5] Time Profile (server) improvements
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: [PATCH obexd 4/4] obex: Fix file not getting deleted when a push is
+ aborted
+Date: Thu, 02 Feb 2012 17:04:17 +0530
+Message-id: <1328182457-14924-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Feb 2, 2012 at 01:12, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Arik,
->> This series looks good overall. Are you planning to go ahead with it
->> (with a non-RFC series)?
->
-> Sure. This will happen in the very near future (at most next week).
-> But for now we will drop the "providers" patches, because we are about
-> to also send D-Bus API that implements the functionality externally.
+Problem: Even if transfer is aborted file will be saved with partial content.
 
-Does this mean the server-application operating over D-Bus would be
-able to register read/write callbacks on specific attributes?
+Fix: In os_reset_session() os->cmd is checked for PUT before calling
+driver->remove(), but os->cmd is never assigned.This fix sets os->cmd
+wit respective opcode
+---
+ src/obex.c |   12 ++++++++++++
+ 1 files changed, 12 insertions(+), 0 deletions(-)
 
-It would be nice to get a sense of the API soon. We're planning on
-implementing several GATT servers. Namely - ANS, PASS, IAS, LLS and
-TPS. This can obviously effect the design.
+diff --git a/src/obex.c b/src/obex.c
+index 5b580d3..b14e0e0 100644
+--- a/src/obex.c
++++ b/src/obex.c
+@@ -457,6 +457,8 @@ static void cmd_connect(GObex *obex, GObexPacket *req, void *user_data)
+ 		return;
+ 	}
+ 
++	os->cmd = G_OBEX_OP_CONNECT;
++
+ 	rsp = g_obex_packet_new(G_OBEX_RSP_SUCCESS, TRUE, G_OBEX_HDR_INVALID);
+ 
+ 	parse_authchal(os, req, rsp);
+@@ -481,6 +483,8 @@ static void cmd_disconnect(GObex *obex, GObexPacket *req, void *user_data)
+ 
+ 	print_event(G_OBEX_OP_DISCONNECT, -1);
+ 
++	os->cmd = G_OBEX_OP_DISCONNECT;
++
+ 	os_set_response(os, 0);
+ }
+ 
+@@ -806,6 +810,8 @@ static void cmd_get(GObex *obex, GObexPacket *req, gpointer user_data)
+ 		return;
+ 	}
+ 
++	os->cmd = G_OBEX_OP_GET;
++
+ 	parse_name(os, req);
+ 
+ 	parse_apparam(os, req);
+@@ -836,6 +842,8 @@ static void cmd_setpath(GObex *obex, GObexPacket *req, gpointer user_data)
+ 		goto done;
+ 	}
+ 
++	os->cmd = G_OBEX_OP_SETPATH;
++
+ 	parse_name(os, req);
+ 
+ 	os->nonhdr = g_obex_packet_get_data(req, &os->nonhdr_len);
+@@ -975,6 +983,8 @@ static void cmd_put(GObex *obex, GObexPacket *req, gpointer user_data)
+ 		return;
+ 	}
+ 
++	os->cmd = G_OBEX_OP_PUT;
++
+ 	parse_name(os, req);
+ 	parse_length(os, req);
+ 	parse_time(os, req);
+@@ -1054,6 +1064,8 @@ static void cmd_action(GObex *obex, GObexPacket *req, gpointer user_data)
+ 		goto done;
+ 	}
+ 
++	os->cmd = G_OBEX_OP_ACTION;
++
+ 	parse_name(os, req);
+ 	parse_destname(os, req);
+ 	parse_action(os, req);
+-- 
+1.7.1
 
->
-> But even with the initial implementation, most Time clients will be
-> supported just fine. They will just not be able to update the phone's
-> own time or be notified of manual changes to the phone time (this will
-> be supported with the D-Bus API).
-
-Ok.
-
-> We plan to have everything which was in "providers" implemented on
-> external a Agent which communicates over D-Bus. This is necessary to
-> avoid introducing extra dependency on BlueZ for each platform we may
-> support.
->
-> We will send a RFC for this Time Agent API real soon. Please comment :)
-
-Will do. I am interested in adding an implementation of an NDCS server
-to the BlueZ time server. It would be nice if you take this into
-account in the Time Agent API (updating the DST offset from D-Bus).
-The same is also required for the Local Time Information characteristic in CTS.
-
-Regards,
-Arik
