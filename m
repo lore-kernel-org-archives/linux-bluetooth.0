@@ -1,47 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: szymon.janc@tieto.com
-Subject: [PATCH] Fix GLib assertion failure in media.c get_setting()
-Date: Thu,  2 Feb 2012 23:21:19 +0100
-Message-Id: <1328221279-26319-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH obexd 3/3] tools: Fix test-server to use ERTM while on packet mode
+Date: Thu,  2 Feb 2012 13:57:07 -0800
+Message-Id: <1328219827-2611-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1328219827-2611-1-git-send-email-luiz.dentz@gmail.com>
+References: <1328219827-2611-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If get_setting is called before set_setting, mp->settings would be
-NULL resulting in GLib assertion. Hashmap is now allocated in
-media_player_create instead of on-demand allocation in set_setting.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-external/bluetooth/bluez/audio/media.c:get_setting() Equalizer
-CRITICAL **: g_hash_table_lookup: assertion `hash_table != NULL' failed
+OBEX should only be used with ERTM over L2CAP and set MTU properly
 ---
- audio/media.c |    5 ++---
- 1 files changed, 2 insertions(+), 3 deletions(-)
+ tools/test-server.c |   17 ++++++++++++++---
+ 1 files changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/audio/media.c b/audio/media.c
-index a363b8e..c0fd0c3 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -1371,9 +1371,6 @@ static gboolean set_property(struct media_player *mp, const char *key,
- 
- 	DBG("%s=%s", key, value);
- 
--	if (!mp->settings)
--		mp->settings = g_hash_table_new(g_direct_hash, g_direct_equal);
--
- 	g_hash_table_replace(mp->settings, GUINT_TO_POINTER(attr),
- 						GUINT_TO_POINTER(val));
- 
-@@ -1595,6 +1592,8 @@ static struct media_player *media_player_create(struct media_adapter *adapter,
- 		return NULL;
+diff --git a/tools/test-server.c b/tools/test-server.c
+index 07d1328..74d553a 100644
+--- a/tools/test-server.c
++++ b/tools/test-server.c
+@@ -331,9 +331,20 @@ static guint bluetooth_listen(void)
+ 		option = BT_IO_OPT_CHANNEL;
  	}
  
-+	mp->settings = g_hash_table_new(g_direct_hash, g_direct_equal);
+-	io = bt_io_listen(type, bluetooth_accept, NULL, NULL, NULL, &err,
+-				option, option_channel,
+-				BT_IO_OPT_INVALID);
++	if (type == BT_IO_L2CAP)
++		io = bt_io_listen(type, bluetooth_accept, NULL, NULL,
++					NULL, &err,
++					option, option_channel,
++					BT_IO_OPT_MODE, BT_IO_MODE_ERTM,
++					BT_IO_OPT_OMTU, option_omtu,
++					BT_IO_OPT_IMTU, option_imtu,
++					BT_IO_OPT_INVALID);
++	else
++		io = bt_io_listen(type, bluetooth_accept, NULL, NULL,
++					NULL, &err,
++					option, option_channel,
++					BT_IO_OPT_INVALID);
 +
- 	adapter->players = g_slist_append(adapter->players, mp);
- 
- 	info("Player registered: sender=%s path=%s", sender, path);
+ 	if (io == NULL) {
+ 		g_printerr("%s\n", err->message);
+ 		g_error_free(err);
 -- 
-on behalf of ST-Ericsson
-
+1.7.7.6
 
