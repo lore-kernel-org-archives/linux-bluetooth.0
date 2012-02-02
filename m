@@ -1,279 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 2 Feb 2012 09:36:26 -0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd 4/4] obex: Fix file not getting deleted when a push
+ is aborted
+Message-ID: <20120202173626.GA24733@x220.globalsuite.net>
+References: <1328182457-14924-1-git-send-email-jaganath.k@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <1328203716-24299-1-git-send-email-arik@wizery.com>
-References: <1328203716-24299-1-git-send-email-arik@wizery.com>
-Date: Thu, 2 Feb 2012 14:30:51 -0400
-Message-ID: <CAJdJm_NsUGrZdfwBv4CmNNjwFCvvrF02+FRJ+GJQTpCpJzfp9g@mail.gmail.com>
-Subject: Re: [PATCH] proximity: make reporter work per-adapter
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Arik Nemtsov <arik@wizery.com>
-Cc: linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1328182457-14924-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arik,
+Hi Jaganath,
 
-Minor comments below.
-
-On Thu, Feb 2, 2012 at 1:28 PM, Arik Nemtsov <arik@wizery.com> wrote:
-> Register an adapter driver for reporter and add the adapter argument in
-> appropriate places.
->
-> Signed-off-by: Arik Nemtsov <arik@wizery.com>
+On Thu, Feb 02, 2012, Jaganath Kanakkassery wrote:
+> Problem: Even if transfer is aborted file will be saved with partial
+> content.
+> 
+> Fix: In os_reset_session() os->cmd is checked for PUT before calling
+> driver->remove(), but os->cmd is never assigned.This fix sets os->cmd
+> wit respective opcode
 > ---
->  proximity/manager.c  |   19 ++++++++++++----
->  proximity/reporter.c |   57 +++++++++++++++++++------------------------------
->  proximity/reporter.h |    4 +-
->  3 files changed, 38 insertions(+), 42 deletions(-)
->
-> diff --git a/proximity/manager.c b/proximity/manager.c
-> index a767554..dfb5d6d 100644
-> --- a/proximity/manager.c
-> +++ b/proximity/manager.c
-> @@ -84,12 +84,17 @@ static void attio_device_remove(struct btd_device *device)
->  }
->
->  static struct btd_device_driver monitor_driver = {
-> -       .name = "Proximity GATT Driver",
-> +       .name = "Proximity GATT Monitor Driver",
->        .uuids = BTD_UUIDS(IMMEDIATE_ALERT_UUID, LINK_LOSS_UUID, TX_POWER_UUID),
->        .probe = attio_device_probe,
->        .remove = attio_device_remove,
->  };
->
-> +static struct btd_adapter_driver reporter_server_driver = {
+>  src/obex.c |   12 ++++++++++++
+>  1 files changed, 12 insertions(+), 0 deletions(-)
 
-You can drop "_server_" here, because "reporter_driver" is already
-enough to differentiate from the monitor_driver IMHO.
+Patches 1 2 and 4 have been applied. Waiting for comments on Luiz's
+feedback on patch 3.
 
-> +       .name = "gatt-proximity-reporter",
-
-Either use "Proximity GATT Reporter Driver" here or
-"gatt-proximity-monitor" for the monitor driver. Either is fine , just
-keep consistency :)
-
-> +       .probe = reporter_init,
-> +       .remove = reporter_exit,
-> +};
->  static void load_config_file(GKeyFile *config)
->  {
->        char **list;
-> @@ -118,19 +123,23 @@ int proximity_manager_init(DBusConnection *conn, GKeyFile *config)
->
->        load_config_file(config);
->
-> -       /* TODO: Register Proximity Monitor/Reporter drivers */
->        ret = btd_register_device_driver(&monitor_driver);
->        if (ret < 0)
->                return ret;
->
-> -       connection = dbus_connection_ref(conn);
-> +       ret = btd_register_adapter_driver(&reporter_server_driver);
-> +       if (ret < 0) {
-> +               btd_unregister_device_driver(&monitor_driver);
-> +               return ret;
-> +       }
->
-> -       return reporter_init();
-> +       connection = dbus_connection_ref(conn);
-
-I think it is better to initialize "connection" before registering the
-drivers, given the connection is used on the probe() function.
-
-> +       return 0;
->  }
->
->  void proximity_manager_exit(void)
->  {
-> -       reporter_exit();
->        btd_unregister_device_driver(&monitor_driver);
-> +       btd_unregister_adapter_driver(&reporter_server_driver);
->        dbus_connection_unref(connection);
->  }
-> diff --git a/proximity/reporter.c b/proximity/reporter.c
-> index a139c7c..5107fd8 100644
-> --- a/proximity/reporter.c
-> +++ b/proximity/reporter.c
-> @@ -52,15 +52,14 @@ enum {
->
->  static uint16_t tx_power_handle;
->
-> -static void register_link_loss(void)
-> +static void register_link_loss(struct btd_adapter *adapter)
->  {
->        uint16_t start_handle, h;
->        const int svc_size = 3;
->        uint8_t atval[256];
->        bt_uuid_t uuid;
->
-> -       /* FIXME: Provide the adapter in next function */
-> -       start_handle = attrib_db_find_avail(NULL, svc_size);
-> +       start_handle = attrib_db_find_avail(adapter, svc_size);
->        if (start_handle == 0) {
->                error("Not enough free handles to register service");
->                return;
-> @@ -73,35 +72,31 @@ static void register_link_loss(void)
->        /* Primary service definition */
->        bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
->        att_put_u16(LINK_LOSS_SVC_UUID, &atval[0]);
-> -       /* FIXME: Provide the adapter in next function */
-> -       attrib_db_add(NULL, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
-> +       attrib_db_add(adapter, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
->
->        /* Alert level characteristic */
->        bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
->        atval[0] = ATT_CHAR_PROPER_READ | ATT_CHAR_PROPER_WRITE;
->        att_put_u16(h + 1, &atval[1]);
->        att_put_u16(ALERT_LEVEL_CHR_UUID, &atval[3]);
-> -       /* FIXME: Provide the adapter in next function */
-> -       attrib_db_add(NULL, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
-> +       attrib_db_add(adapter, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
->
->        /* Alert level value */
->        bt_uuid16_create(&uuid, ALERT_LEVEL_CHR_UUID);
->        att_put_u8(NO_ALERT, &atval[0]);
-> -       /* FIXME: Provide the adapter in next function */
-> -       attrib_db_add(NULL, h++, &uuid, ATT_NONE, ATT_NONE, atval, 1);
-> +       attrib_db_add(adapter, h++, &uuid, ATT_NONE, ATT_NONE, atval, 1);
->
->        g_assert(h - start_handle == svc_size);
->  }
->
-> -static void register_tx_power(void)
-> +static void register_tx_power(struct btd_adapter *adapter)
->  {
->        uint16_t start_handle, h;
->        const int svc_size = 4;
->        uint8_t atval[256];
->        bt_uuid_t uuid;
->
-> -       /* FIXME: Provide the adapter in next function */
-> -       start_handle = attrib_db_find_avail(NULL, svc_size);
-> +       start_handle = attrib_db_find_avail(adapter, svc_size);
->        if (start_handle == 0) {
->                error("Not enough free handles to register service");
->                return;
-> @@ -114,43 +109,38 @@ static void register_tx_power(void)
->        /* Primary service definition */
->        bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
->        att_put_u16(TX_POWER_SVC_UUID, &atval[0]);
-> -       /* FIXME: Provide the adapter in next function */
-> -       attrib_db_add(NULL, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
-> +       attrib_db_add(adapter, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
->
->        /* Power level characteristic */
->        bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
->        atval[0] = ATT_CHAR_PROPER_READ | ATT_CHAR_PROPER_NOTIFY;
->        att_put_u16(h + 1, &atval[1]);
->        att_put_u16(POWER_LEVEL_CHR_UUID, &atval[3]);
-> -       /* FIXME: Provide the adapter in next function */
-> -       attrib_db_add(NULL, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
-> +       attrib_db_add(adapter, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
->
->        /* Power level value */
->        bt_uuid16_create(&uuid, POWER_LEVEL_CHR_UUID);
->        att_put_u8(0x00, &atval[0]);
->        tx_power_handle = h;
-> -       /* FIXME: Provide the adapter in next function */
-> -       attrib_db_add(NULL, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 1);
-> +       attrib_db_add(adapter, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 1);
->
->        /* Client characteristic configuration */
->        bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
->        atval[0] = 0x00;
->        atval[1] = 0x00;
-> -       /* FIXME: Provide the adapter in next function */
-> -       attrib_db_add(NULL, h++, &uuid, ATT_NONE, ATT_NONE, atval, 2);
-> +       attrib_db_add(adapter, h++, &uuid, ATT_NONE, ATT_NONE, atval, 2);
->
->        g_assert(h - start_handle == svc_size);
->  }
->
-> -static void register_immediate_alert(void)
-> +static void register_immediate_alert(struct btd_adapter *adapter)
->  {
->        uint16_t start_handle, h;
->        const int svc_size = 3;
->        uint8_t atval[256];
->        bt_uuid_t uuid;
->
-> -       /* FIXME: Provide the adapter in next function */
-> -       start_handle = attrib_db_find_avail(NULL, svc_size);
-> +       start_handle = attrib_db_find_avail(adapter, svc_size);
->        if (start_handle == 0) {
->                error("Not enough free handles to register service");
->                return;
-> @@ -163,42 +153,39 @@ static void register_immediate_alert(void)
->        /* Primary service definition */
->        bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
->        att_put_u16(IMMEDIATE_ALERT_SVC_UUID, &atval[0]);
-> -       /* FIXME: Provide the adapter in next function */
-> -       attrib_db_add(NULL, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
-> +       attrib_db_add(adapter, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
->
->        /* Alert level characteristic */
->        bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
->        atval[0] = ATT_CHAR_PROPER_WRITE_WITHOUT_RESP;
->        att_put_u16(h + 1, &atval[1]);
->        att_put_u16(ALERT_LEVEL_CHR_UUID, &atval[3]);
-> -       /* FIXME: Provide the adapter in next function */
-> -       attrib_db_add(NULL, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
-> +       attrib_db_add(adapter, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
->
->        /* Alert level value */
->        bt_uuid16_create(&uuid, ALERT_LEVEL_CHR_UUID);
->        att_put_u8(NO_ALERT, &atval[0]);
-> -       /* FIXME: Provide the adapter in next function */
-> -       attrib_db_add(NULL, h++, &uuid, ATT_NONE, ATT_NONE, atval, 1);
-> +       attrib_db_add(adapter, h++, &uuid, ATT_NONE, ATT_NONE, atval, 1);
->
->        g_assert(h - start_handle == svc_size);
->  }
->
-> -int reporter_init(void)
-> +int reporter_init(struct btd_adapter *adapter)
->  {
->        if (!main_opts.attrib_server) {
->                DBG("Attribute server is disabled");
->                return -1;
->        }
->
-> -       DBG("Proximity Reporter");
-> +       DBG("Proximity Reporter for adapter %p", adapter);
->
-> -       register_link_loss();
-> -       register_tx_power();
-> -       register_immediate_alert();
-> +       register_link_loss(adapter);
-> +       register_tx_power(adapter);
-> +       register_immediate_alert(adapter);
->
->        return 0;
->  }
->
-> -void reporter_exit(void)
-> +void reporter_exit(struct btd_adapter *adapter)
->  {
->  }
-> diff --git a/proximity/reporter.h b/proximity/reporter.h
-> index ea6b83d..2b18446 100644
-> --- a/proximity/reporter.h
-> +++ b/proximity/reporter.h
-> @@ -22,5 +22,5 @@
->  *
->  */
->
-> -int reporter_init(void);
-> -void reporter_exit(void);
-> +int reporter_init(struct btd_adapter *adapter);
-> +void reporter_exit(struct btd_adapter *adapter);
-> --
-> 1.7.5.4
->
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
