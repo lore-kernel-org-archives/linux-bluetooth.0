@@ -1,33 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1328199079.2062.16.camel@aeonflux>
-Subject: Re: [PATCHv2 0/2] Fixes kernel crashes and warnings
+Message-ID: <1328199043.2062.15.camel@aeonflux>
+Subject: Re: [PATCH] Add vendor specific ID (0a5c 21f3) for BCM20702A0.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 02 Feb 2012 08:11:19 -0800
-In-Reply-To: <1328171538-16020-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1328171538-16020-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Manoj Iyer <manoj.iyer@canonical.com>
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Date: Thu, 02 Feb 2012 08:10:43 -0800
+In-Reply-To: <1328196756-3087-2-git-send-email-manoj.iyer@canonical.com>
+References: <1328196756-3087-1-git-send-email-manoj.iyer@canonical.com>
+	 <1328196756-3087-2-git-send-email-manoj.iyer@canonical.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Manoj,
 
-> Set of patches fixes issues with traversing RCU lists.
+> T: Bus=01 Lev=02 Prnt=02 Port=03 Cnt=03 Dev#= 5 Spd=12 MxCh= 0
+> D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+> P: Vendor=0a5c ProdID=21f3 Rev=01.12
+> S: Manufacturer=Broadcom Corp
+> S: Product=BCM20702A0
+> S: SerialNumber=74DE2B344A7B
+> C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+> I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 > 
-> Changes:
-> 	v2: removed patch fixing delayed work warnings since
-> 	the issue was proper fixed already.
-> 
-> Andrei Emeltchenko (2):
->   Bluetooth: Use list _safe deleting from conn_hash_list
->   Bluetooth: Use list _safe deleting from conn chan_list
-> 
->  net/bluetooth/hci_conn.c |    8 ++++----
->  1 files changed, 4 insertions(+), 4 deletions(-)
+> Signed-off-by: Manoj Iyer <manoj.iyer@canonical.com>
+> Tested-by: Dennis Chua <dennis.chua@canonical.com>
+> ---
+>  drivers/bluetooth/btusb.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 
-if nobody else objects, then these two patches should be applied.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
