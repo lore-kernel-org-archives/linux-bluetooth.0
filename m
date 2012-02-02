@@ -1,30 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 2 Feb 2012 15:58:19 -0800
+Date: Thu, 2 Feb 2012 15:58:03 -0800
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix GLib assertion failure in media.c get_setting()
-Message-ID: <20120202235819.GB8153@x220>
-References: <1328221279-26319-1-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCH obexd 1/3] btio: Add BtIOMode enum to be used with
+ BT_IO_OPT_MODE
+Message-ID: <20120202235803.GA8153@x220>
+References: <1328219827-2611-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328221279-26319-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1328219827-2611-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Luiz,
 
-On Thu, Feb 02, 2012, Szymon Janc wrote:
-> If get_setting is called before set_setting, mp->settings would be
-> NULL resulting in GLib assertion. Hashmap is now allocated in
-> media_player_create instead of on-demand allocation in set_setting.
+On Thu, Feb 02, 2012, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> external/bluetooth/bluez/audio/media.c:get_setting() Equalizer
-> CRITICAL **: g_hash_table_lookup: assertion `hash_table != NULL' failed
 > ---
->  audio/media.c |    5 ++---
->  1 files changed, 2 insertions(+), 3 deletions(-)
+>  btio/btio.h |    8 ++++++++
+>  1 files changed, 8 insertions(+), 0 deletions(-)
 
-Applied. Thanks.
+All three patches have been applied (with the first one also back ported
+to the bluez tree). Thanks.
 
 Johan
