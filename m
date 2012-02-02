@@ -1,209 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vani-dineshbhai PATEL X <vani.patel@stericsson.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 2 Feb 2012 11:10:18 +0100
-Subject: RE: [RFC]: AVRCP 1.4 Media API
-Message-ID: <747C1E83C744F44E9ACFB89FAEEC2C7B20FDC25774@EXDCVYMBSTM005.EQ1STM.local>
-References: <747C1E83C744F44E9ACFB89FAEEC2C7B20FD87385C@EXDCVYMBSTM005.EQ1STM.local>
- <CABBYNZJveRUW-BkfX6H2B+06rHG=6ur1U=Z9vbGCQtOJNRm9FQ@mail.gmail.com>
-In-Reply-To: <CABBYNZJveRUW-BkfX6H2B+06rHG=6ur1U=Z9vbGCQtOJNRm9FQ@mail.gmail.com>
-Content-Type: text/plain; charset="iso-8859-1"
+Message-ID: <4F2A592F.60008@monom.org>
+Date: Thu, 02 Feb 2012 10:36:47 +0100
+From: Daniel Wagner <wagi@monom.org>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ Peter Hurley <peter@hurleysoftware.com>,
+ linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
+References: <1312921615.2261.1.camel@THOR> <1328141557.2054.0.camel@aeonflux> <20120202002614.GA11905@x220.globalsuite.net>
+In-Reply-To: <20120202002614.GA11905@x220.globalsuite.net>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan
 
------Original Message-----
-From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com] 
-Sent: Thursday, February 02, 2012 12:31 AM
-To: Vani-dineshbhai PATEL X
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC]: AVRCP 1.4 Media API
+On 02.02.2012 01:26, Johan Hedberg wrote:
+> Hi,
+> 
+> On Wed, Feb 01, 2012, Marcel Holtmann wrote:
+>>> Commit 330605423c fixed l2cap conn establishment for non-ssp remote
+>>> devices by not setting HCI_CONN_ENCRYPT_PEND every time conn security
+>>> is tested (which was always returning failure on any subsequent
+>>> security checks).
+>>>
+>>> However, this broke l2cap conn establishment for ssp remote devices
+>>> when an ACL link was already established at SDP-level security. This
+>>> fix ensures that encryption must be pending whenever authentication
+>>> is also pending.
+>>>
+>>> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+>>> ---
+>>>
+>>> v2: Avoids possible race condition between hci_conn_security and
+>>> hci_conn_complete_evt
+>>> v3: Actually compiles :)
+>>>
+>>>  net/bluetooth/hci_conn.c |    4 ++++
+>>>  1 files changed, 4 insertions(+), 0 deletions(-)
+>>
+>> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> 
+> The patch is now in my bluetooth-next tree after manually fixing
+> conn->pend to conn->flags (otherwise the patch wouldn't apply).
 
-Hi,
+You might consider to send this one to stable as well. At least 3.0
+could really need this patch, since it is long time stable tree, IIRC.
 
-On Tue, Jan 31, 2012 at 11:28 PM, Vani-dineshbhai PATEL X
-<vani.patel@stericsson.com> wrote:
-> Hi All,
->
-> I have seen quite a few post in community about AVRCP 1.4 and there were few discussion which have happened in past for this. I plan to resume the work for developing following features of AVRCP 1.4
->
->            As per spec section 6.9.1     SetAddressedPlayer
->            As per spec section 6.9.2     Addressed Player Changed Notification
->            As per spec section 6.9.3     SetBrowsedPlayer
->            As per spec section 6.9.4     Available Players Changed Notification
->            As per spec section 6.10.3.3    UIDs Changed Notification
->            As per spec section 6.10.4.1    ChangePath
->            As per spec section 6.10.4.2    GetFolderItems
->            As per spec section 6.10.4.3    GetItemAttributes
->            As per spec section 6.12.1      PlayItem
->            As per spec section 6.13.1      Absolute Volume
->            As per spec section 6.13.3      Notify volume change
->
-
-> IMO we should address this separately, first with absolute volume
-> control and then add media browsing.
-
-
->
-> From a8fbf052e5ad409d767fa54343ac8ce462ee80da Mon Sep 17 00:00:00 2001
-> From: Vani Patel <vani.patel@stericsson.com>
-> Date: Tue, 24 Jan 2012 16:05:05 +0530
-> Subject: [PATCH] AVRCP: Media API for AVRCP 1.4
->
-> ---
-> doc/media-api.txt |  321 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
-> 1 files changed, 316 insertions(+), 5 deletions(-)
->
-> diff --git a/doc/media-api.txt b/doc/media-api.txt index c53ab7b..b6f557e 100644
-> --- a/doc/media-api.txt
-> +++ b/doc/media-api.txt
-> @@ -2,7 +2,7 @@ BlueZ D-Bus Media API description
-> *********************************
->
->  Media hierarchy
-> -===============
-> +=================================
->
->  Service          org.bluez
-> Interface  org.bluez.Media
-> @@ -85,6 +85,113 @@ Methods         void RegisterEndpoint(object endpoint, dict properties)
->                       uint32 Position
->
->                              Playback position in milliseconds
-> +
-> +                       string Name
-> +
-> +                             Unique name of media player
-
-> Probably not necessary since the sender + object path should give us a
-> unique name we can use to identify different players.
-
-Yes, you are correct, This we can remove from here.
-
-> +                       array{string} Type
-> +
-> +                             Possible values:
-> +                                   "Audio",
-> +                                   "Video",
-> +                                   "Broadcast Audio",
-> +                                   "Broadcast Video"
-> +
-> +                       array{string} SubType
-> +
-> +                             Possible values:
-> +                                   "Audiobook",
-> +                                   "Podcast"
-> +
-> +                       uint16 UidCounter
-> +
-> +                             Changes of this field signal changes in media player
-> +                             filesystem
-
-> No idea why you need this, but I guess this is for media browsing so I
-> would have in separate.
-
-UIDCounter is required firstly to know whether the player is Database aware/unaware. Also, This shall be used while setting Addressed player. So While we register the media player, media player shall send its UID counter and if that is later changed, it can be managed by AddressedPlayerChanged notification. This avoids one dbus call while setting a new addressed player (setAddressedPlayer)
-
-> +                       array{string} Features
-> +
-> +                             Possible values:
-> +                                   "PASSTHROUGH Select",
-> +                                   "PASSTHROUGH Up",
-> +                                   "PASSTHROUGH Down",
-> +                                   "PASSTHROUGH Left",
-> +                                   "PASSTHROUGH Right",
-> +                                   "PASSTHROUGH Right-Up",
-> +                                   "PASSTHROUGH Right-Down",
-> +                                   "PASSTHROUGH Left-Up",
-> +                                   "PASSTHROUGH Left-Down",
-> +                                   "PASSTHROUGH Root Menu",
-> +                                   "PASSTHROUGH Setup Menu",
-> +                                   "PASSTHROUGH Contents Menu",
-> +                                   "PASSTHROUGH Favourite Manu",
-> +                                   "PASSTHROUGH Exit",
-> +                                   "PASSTHROUGH 0",
-> +                                   "PASSTHROUGH 1",
-> +                                   "PASSTHROUGH 2",
-> +                                   "PASSTHROUGH 3",
-> +                                   "PASSTHROUGH 4",
-> +                                   "PASSTHROUGH 5",
-> +                                   "PASSTHROUGH 6",
-> +                                   "PASSTHROUGH 7",
-> +                                   "PASSTHROUGH 8",
-> +                                   "PASSTHROUGH 9",
-> +                                   "PASSTHROUGH Dot",
-> +                                   "PASSTHROUGH Enter",
-> +                                   "PASSTHROUGH Clear",
-> +                                   "PASSTHROUGH Channel Up",
-> +                                   "PASSTHROUGH Channel Down",
-> +                                   "PASSTHROUGH Previous Channel",
-> +                                   "PASSTHROUGH Sound Select",
-> +                                   "PASSTHROUGH Input Select",
-> +                                   "PASSTHROUGH Display Information",
-> +                                   "PASSTHROUGH Help",
-> +                                   "PASSTHROUGH Page Up",
-> +                                   "PASSTHROUGH Page Down",
-> +                                   "PASSTHROUGH Power",
-> +                                   "PASSTHROUGH Volume Up",
-> +                                   "PASSTHROUGH Volume Down",
-> +                                   "PASSTHROUGH Mute",
-> +                                   "PASSTHROUGH Play",
-> +                                   "PASSTHROUGH Stop",
-> +                                   "PASSTHROUGH Pause",
-> +                                   "PASSTHROUGH Record",
-> +                                   "PASSTHROUGH Rewind",
-> +                                   "PASSTHROUGH Fast Forward",
-> +                                   "PASSTHROUGH Eject",
-> +                                   "PASSTHROUGH Forward",
-> +                                   "PASSTHROUGH Backward",
-> +                                   "PASSTHROUGH Angle",
-> +                                   "PASSTHROUGH SubPicture",
-> +                                   "PASSTHROUGH F1",
-> +                                   "PASSTHROUGH F2",
-> +                                   "PASSTHROUGH F3",
-> +                                   "PASSTHROUGH F4",
-> +                                   "PASSTHROUGH F4",
-> +                                   "PASSTHROUGH F5",
-> +                                   "Vendor Unique",
-> +                                   "Basic Group Navigation",
-> +                                   "Advanced Control Player",
-> +                                   "Browsing",
-> +                                   "Searching",
-> +                                   "AddToNowPlaying",
-> +                                   "UID Unique",
-> +                                   "Only Browseable When Addresed",
-> +                                   "Only Searchable When Addresed",
-> +                                   "NowPlaying",
-> +                                   "UID Persistancy"
-
-> This is way too big, I guess we can group the passthrough in a single
-> one since if the player doesn't support some it can just ignore, also
-> for browsing we might have a different interface since the database
-> may not be directly handled by the player. Actually I strong believe
-> browsing would fit better as an OBEX based profile because of the
-> operations and the relation with a database is very similar to other
-> OBEX based profiles such as PBAP and MAP, but I guess it is too late
-> to do something about it.
-
-We plan to change the type of features to Uint16 and plan to set the features bitwise through media player. 
-Hence it shall be "uint16 Features" instead of "array{string} Features"
-
-> +                       byte Volume
-> +
-> +                             Current Volume in percent range: 0 - 100
-
-> Im afraid Volume belong to MediaTransport not to MediaPlayer,
-> otherwise we are just able to change the volume of the addressed
-> player not the master volume of the headset itself which the playback
-> can be mixed with different audio source.
-
-Here Volume belongs to "org.bluez.Media" and not "org.bluez.MediaPlayer".
-Let me know if this is correct.
-
-> -- 
->Luiz Augusto von Dentz
-
-Vani
+cheers,
+daniel
