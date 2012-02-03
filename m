@@ -1,76 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 01/10] Bluetooth: Change chan_ready param from sk to chan
-Date: Fri,  3 Feb 2012 16:36:20 +0200
-Message-Id: <1328279789-10870-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1328279789-10870-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1328279789-10870-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 2/2] Bluetooth: Helper removes duplicated code
+Date: Fri,  3 Feb 2012 16:27:55 +0200
+Message-Id: <1328279275-10303-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1328279275-10303-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1328279275-10303-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Change is needed to remove dependency on sk when possible
-before introducing l2cap channel lock.
+Use __check_timout helper to remove duplicated code
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |   12 ++++++------
- 1 files changed, 6 insertions(+), 6 deletions(-)
+ net/bluetooth/hci_core.c |   31 +++++++++++++------------------
+ 1 files changed, 13 insertions(+), 18 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 09cd860..80fbfcf 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -907,9 +907,9 @@ clean:
- 	release_sock(parent);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 9a56a40..95eeae5 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2390,22 +2390,25 @@ static inline int __get_blocks(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return DIV_ROUND_UP(skb->len - HCI_ACL_HDR_SIZE, hdev->block_len);
  }
  
--static void l2cap_chan_ready(struct sock *sk)
-+static void l2cap_chan_ready(struct l2cap_chan *chan)
+-static inline void hci_sched_acl_pkt(struct hci_dev *hdev)
++static inline void __check_timeout(struct hci_dev *hdev, unsigned int cnt)
  {
--	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-+	struct sock *sk = chan->sk;
- 	struct sock *parent = bt_sk(sk)->parent;
- 
- 	BT_DBG("sk %p, parent %p", sk, parent);
-@@ -945,7 +945,7 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 
- 		if (conn->hcon->type == LE_LINK) {
- 			if (smp_conn_security(conn, chan->sec_level))
--				l2cap_chan_ready(sk);
-+				l2cap_chan_ready(chan);
- 
- 		} else if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
- 			__clear_chan_timer(chan);
-@@ -2874,7 +2874,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		if (chan->mode == L2CAP_MODE_ERTM)
- 			l2cap_ertm_init(chan);
- 
--		l2cap_chan_ready(sk);
-+		l2cap_chan_ready(chan);
- 		goto unlock;
+-	struct hci_chan *chan;
+-	struct sk_buff *skb;
+-	int quote;
+-	unsigned int cnt;
+-
+ 	if (!test_bit(HCI_RAW, &hdev->flags)) {
+ 		/* ACL tx timeout must be longer than maximum
+ 		 * link supervision timeout (40.9 seconds) */
+-		if (!hdev->acl_cnt && time_after(jiffies, hdev->acl_last_tx +
++		if (!cnt && time_after(jiffies, hdev->acl_last_tx +
+ 					msecs_to_jiffies(HCI_ACL_TX_TIMEOUT)))
+ 			hci_link_tx_to(hdev, ACL_LINK);
  	}
++}
  
-@@ -3005,7 +3005,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		if (chan->mode ==  L2CAP_MODE_ERTM)
- 			l2cap_ertm_init(chan);
+-	cnt = hdev->acl_cnt;
++static inline void hci_sched_acl_pkt(struct hci_dev *hdev)
++{
++	unsigned int cnt = hdev->acl_cnt;
++	struct hci_chan *chan;
++	struct sk_buff *skb;
++	int quote;
++
++	__check_timeout(hdev, cnt);
  
--		l2cap_chan_ready(sk);
-+		l2cap_chan_ready(chan);
- 	}
+ 	while (hdev->acl_cnt &&
+ 			(chan = hci_chan_sent(hdev, ACL_LINK, &quote))) {
+@@ -2438,20 +2441,12 @@ static inline void hci_sched_acl_pkt(struct hci_dev *hdev)
  
- done:
-@@ -4524,7 +4524,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 		if (chan->scid == L2CAP_CID_LE_DATA) {
- 			if (!status && encrypt) {
- 				chan->sec_level = hcon->sec_level;
--				l2cap_chan_ready(sk);
-+				l2cap_chan_ready(chan);
- 			}
+ static inline void hci_sched_acl_blk(struct hci_dev *hdev)
+ {
++	unsigned int cnt = hdev->block_cnt;
+ 	struct hci_chan *chan;
+ 	struct sk_buff *skb;
+ 	int quote;
+-	unsigned int cnt;
+-
+-	if (!test_bit(HCI_RAW, &hdev->flags)) {
+-		/* ACL tx timeout must be longer than maximum
+-		 * link supervision timeout (40.9 seconds) */
+-		if (!hdev->block_cnt && time_after(jiffies, hdev->acl_last_tx +
+-					msecs_to_jiffies(HCI_ACL_TX_TIMEOUT)))
+-			hci_link_tx_to(hdev, ACL_LINK);
+-	}
  
- 			bh_unlock_sock(sk);
+-	cnt = hdev->block_cnt;
++	__check_timeout(hdev, cnt);
+ 
+ 	while (hdev->block_cnt > 0 &&
+ 			(chan = hci_chan_sent(hdev, ACL_LINK, &quote))) {
 -- 
 1.7.8.3
 
