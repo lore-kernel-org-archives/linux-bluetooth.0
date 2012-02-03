@@ -1,49 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1328311628.2062.49.camel@aeonflux>
-Subject: Re: [PATCH 1/2] Bluetooth: Move debug macros
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+Date: Fri, 3 Feb 2012 15:17:12 -0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 03 Feb 2012 15:27:08 -0800
-In-Reply-To: <1321992859-12473-2-git-send-email-andre.guedes@openbossa.org>
-References: <1321992859-12473-1-git-send-email-andre.guedes@openbossa.org>
-	 <1321992859-12473-2-git-send-email-andre.guedes@openbossa.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: Re: [PATCH BlueZ] device: Fix doing sdp discovery for LE devices
+Message-ID: <20120203231712.GA4095@x220.globalsuite.net>
+References: <1328310405-16329-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1328310405-16329-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Vinicius,
 
-> Move debug macros so they provide us more meaningful information
-> during debugging analysis.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+On Fri, Feb 03, 2012, Vinicius Costa Gomes wrote:
+> If ReverseServiceDiscovery is enabled and we are connected to a LE
+> device, we should do a Primary Service Discovery, not a SDP discovery
+> (which doesn't even make sense).
 > ---
->  net/bluetooth/hci_core.c |    8 ++++----
->  1 files changed, 4 insertions(+), 4 deletions(-)
 > 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index ef0423e..8487483 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -2594,11 +2594,11 @@ int hci_do_inquiry(struct hci_dev *hdev, u8 length)
->  	u8 lap[3] = { 0x33, 0x8b, 0x9e };
->  	struct hci_cp_inquiry cp;
->  
-> -	BT_DBG("%s", hdev->name);
-> -
->  	if (test_bit(HCI_INQUIRY, &hdev->flags))
->  		return -EINPROGRESS;
->  
-> +	BT_DBG("%s", hdev->name);
-> +
+> This patch assumes that it makes sense to reuse the ReverseServiceDiscovery
+> functionality for LE devices.
+> 
+> 
+>  src/device.c |    9 +++++++--
+>  1 files changed, 7 insertions(+), 2 deletions(-)
 
-I actually do not like this change much. Can we just add the flags into
-the debug print instead.
+Applied. Thanks. (and yes, I do think it should be fine to "reverse
+discover" LE services).
 
-Regards
-
-Marcel
-
-
+Johan
