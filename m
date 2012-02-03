@@ -1,41 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 3 Feb 2012 13:22:14 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
+Message-ID: <1328303718.2062.48.camel@aeonflux>
+Subject: Re: [PATCH v5 3/6] Bluetooth: Add hci_do_le_scan()
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd] src/obex.h: Include stdint.h
-Message-ID: <20120203212214.GA31587@x220.globalsuite.net>
-References: <1328266762-23552-1-git-send-email-lkslawek@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328266762-23552-1-git-send-email-lkslawek@gmail.com>
+Date: Fri, 03 Feb 2012 13:15:18 -0800
+In-Reply-To: <1328302082-17405-3-git-send-email-andre.guedes@openbossa.org>
+References: <1328302082-17405-1-git-send-email-andre.guedes@openbossa.org>
+	 <1328302082-17405-3-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Slawek,
+Hi Andre,
 
-On Fri, Feb 03, 2012, Slawomir Bochenski wrote:
-> ---
->  src/obex.h |    2 ++
->  1 files changed, 2 insertions(+), 0 deletions(-)
+> This patch adds to hci_core the hci_do_le_scan function which
+> should be used to scan LE devices.
 > 
-> diff --git a/src/obex.h b/src/obex.h
-> index 7f07fd2..95e9c4e 100644
-> --- a/src/obex.h
-> +++ b/src/obex.h
-> @@ -22,6 +22,8 @@
->   *
->   */
->  
-> +#include <stdint.h>
-> +
->  #define OBJECT_SIZE_UNKNOWN -1
->  #define OBJECT_SIZE_DELETE -2
+> In order to enable LE scan, hci_do_le_scan() sends commands (Set
+> LE Scan Parameters and Set LE Scan Enable) to the controller and
+> waits for its results. If commands were executed successfully a
+> delayed work is scheduled to disable the ongoing scanning after
+> some amount of time. This function blocks.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  include/net/bluetooth/hci_core.h |    8 ++++
+>  net/bluetooth/hci_core.c         |   74 ++++++++++++++++++++++++++++++++++++++
+>  net/bluetooth/hci_event.c        |   13 +++++--
+>  3 files changed, 92 insertions(+), 3 deletions(-)
 
-This file also contains GLib usage but there's no GLib include there.
-Either *all* includes should be there or *none* should be there (i.e.
-expect the .c files to include the dependencies). In this case I'd just
-add the stdint include to whatever file had it missing (which one was it
-btw?).
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Johan
+Regards
+
+Marcel
+
+
