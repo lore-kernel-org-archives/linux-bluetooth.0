@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 06/10] Bluetooth: Add locked and unlocked state_change
-Date: Fri,  3 Feb 2012 16:36:25 +0200
-Message-Id: <1328279789-10870-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 02/10] Bluetooth: Clean up l2cap_chan_add
+Date: Fri,  3 Feb 2012 16:36:21 +0200
+Message-Id: <1328279789-10870-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1328279789-10870-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1328279789-10870-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,164 +11,47 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Split to locked and unlocked versions of l2cap_state_change helping
-to remove socket locks from l2cap code.
+Change elseif to switch. This make sense even more with following
+patches which otherwise have to add elseifs statements.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |   39 +++++++++++++++++++++++----------------
- 1 files changed, 23 insertions(+), 16 deletions(-)
+ net/bluetooth/l2cap_core.c |   11 ++++++++---
+ 1 files changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index bb828ca..cdc9d0c 100644
+index 80fbfcf..48fc01e 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -227,7 +227,7 @@ static char *state_to_string(int state)
- 	return "invalid state";
- }
+@@ -320,7 +320,8 @@ static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
  
--static void l2cap_state_change(struct l2cap_chan *chan, int state)
-+static void __l2cap_state_change(struct l2cap_chan *chan, int state)
- {
- 	BT_DBG("%p %s -> %s", chan, state_to_string(chan->state),
- 						state_to_string(state));
-@@ -236,6 +236,13 @@ static void l2cap_state_change(struct l2cap_chan *chan, int state)
- 	chan->ops->state_change(chan->data, state);
- }
+ 	chan->conn = conn;
  
-+static void l2cap_state_change(struct l2cap_chan *chan, int state)
-+{
-+	lock_sock(chan->sk);
-+	__l2cap_state_change(chan, state);
-+	release_sock(chan->sk);
-+}
-+
- static void l2cap_chan_timeout(struct work_struct *work)
- {
- 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
-@@ -374,7 +381,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 		hci_conn_put(conn->hcon);
- 	}
- 
--	l2cap_state_change(chan, BT_CLOSED);
-+	__l2cap_state_change(chan, BT_CLOSED);
- 	sock_set_flag(sk, SOCK_ZAPPED);
- 
- 	if (err)
-@@ -440,7 +447,7 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
- 	case BT_LISTEN:
- 		l2cap_chan_cleanup_listen(sk);
- 
--		l2cap_state_change(chan, BT_CLOSED);
-+		__l2cap_state_change(chan, BT_CLOSED);
- 		sock_set_flag(sk, SOCK_ZAPPED);
- 		break;
- 
-@@ -731,8 +738,8 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
- 	l2cap_send_cmd(conn, l2cap_get_ident(conn),
- 			L2CAP_DISCONN_REQ, sizeof(req), &req);
- 
--	l2cap_state_change(chan, BT_DISCONN);
- 	sk->sk_err = err;
-+	__l2cap_state_change(chan, BT_DISCONN);
- }
- 
- /* ---- L2CAP connections ---- */
-@@ -797,7 +804,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 						parent->sk_data_ready(parent, 0);
- 
- 				} else {
--					l2cap_state_change(chan, BT_CONFIG);
-+					__l2cap_state_change(chan, BT_CONFIG);
- 					rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
- 					rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
- 				}
-@@ -900,7 +907,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
- 
- 	__set_chan_timer(chan, sk->sk_sndtimeo);
- 
--	l2cap_state_change(chan, BT_CONNECTED);
-+	__l2cap_state_change(chan, BT_CONNECTED);
- 	parent->sk_data_ready(parent, 0);
- 
- clean:
-@@ -917,7 +924,7 @@ static void l2cap_chan_ready(struct l2cap_chan *chan)
- 	chan->conf_state = 0;
- 	__clear_chan_timer(chan);
- 
--	l2cap_state_change(chan, BT_CONNECTED);
-+	__l2cap_state_change(chan, BT_CONNECTED);
- 	sk->sk_state_change(sk);
- 
- 	if (parent)
-@@ -949,7 +956,7 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 
- 		} else if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
- 			__clear_chan_timer(chan);
--			l2cap_state_change(chan, BT_CONNECTED);
-+			__l2cap_state_change(chan, BT_CONNECTED);
- 			sk->sk_state_change(sk);
- 
- 		} else if (chan->state == BT_CONNECT)
-@@ -1223,14 +1230,14 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
- 
- 	l2cap_chan_add(conn, chan);
- 
--	l2cap_state_change(chan, BT_CONNECT);
-+	__l2cap_state_change(chan, BT_CONNECT);
- 	__set_chan_timer(chan, sk->sk_sndtimeo);
- 
- 	if (hcon->state == BT_CONNECTED) {
- 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
- 			__clear_chan_timer(chan);
- 			if (l2cap_chan_check_security(chan))
--				l2cap_state_change(chan, BT_CONNECTED);
-+				__l2cap_state_change(chan, BT_CONNECTED);
- 		} else
- 			l2cap_do_start(chan);
- 	}
-@@ -2674,22 +2681,22 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE) {
- 		if (l2cap_chan_check_security(chan)) {
- 			if (bt_sk(sk)->defer_setup) {
--				l2cap_state_change(chan, BT_CONNECT2);
-+				__l2cap_state_change(chan, BT_CONNECT2);
- 				result = L2CAP_CR_PEND;
- 				status = L2CAP_CS_AUTHOR_PEND;
- 				parent->sk_data_ready(parent, 0);
- 			} else {
--				l2cap_state_change(chan, BT_CONFIG);
-+				__l2cap_state_change(chan, BT_CONFIG);
- 				result = L2CAP_CR_SUCCESS;
- 				status = L2CAP_CS_NO_INFO;
- 			}
- 		} else {
--			l2cap_state_change(chan, BT_CONNECT2);
-+			__l2cap_state_change(chan, BT_CONNECT2);
- 			result = L2CAP_CR_PEND;
- 			status = L2CAP_CS_AUTHEN_PEND;
+-	if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED) {
++	switch (chan->chan_type) {
++	case L2CAP_CHAN_CONN_ORIENTED:
+ 		if (conn->hcon->type == LE_LINK) {
+ 			/* LE connection */
+ 			chan->omtu = L2CAP_LE_DEFAULT_MTU;
+@@ -331,12 +332,16 @@ static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ 			chan->scid = l2cap_alloc_cid(conn);
+ 			chan->omtu = L2CAP_DEFAULT_MTU;
  		}
- 	} else {
--		l2cap_state_change(chan, BT_CONNECT2);
-+		__l2cap_state_change(chan, BT_CONNECT2);
- 		result = L2CAP_CR_PEND;
- 		status = L2CAP_CS_NO_INFO;
- 	}
-@@ -4577,12 +4584,12 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 					if (parent)
- 						parent->sk_data_ready(parent, 0);
- 				} else {
--					l2cap_state_change(chan, BT_CONFIG);
-+					__l2cap_state_change(chan, BT_CONFIG);
- 					res = L2CAP_CR_SUCCESS;
- 					stat = L2CAP_CS_NO_INFO;
- 				}
- 			} else {
--				l2cap_state_change(chan, BT_DISCONN);
-+				__l2cap_state_change(chan, BT_DISCONN);
- 				__set_chan_timer(chan,
- 					msecs_to_jiffies(L2CAP_DISC_TIMEOUT));
- 				res = L2CAP_CR_SEC_BLOCK;
+-	} else if (chan->chan_type == L2CAP_CHAN_CONN_LESS) {
++		break;
++
++	case L2CAP_CHAN_CONN_LESS:
+ 		/* Connectionless socket */
+ 		chan->scid = L2CAP_CID_CONN_LESS;
+ 		chan->dcid = L2CAP_CID_CONN_LESS;
+ 		chan->omtu = L2CAP_DEFAULT_MTU;
+-	} else {
++		break;
++
++	default:
+ 		/* Raw socket can send/recv signalling messages only */
+ 		chan->scid = L2CAP_CID_SIGNALING;
+ 		chan->dcid = L2CAP_CID_SIGNALING;
 -- 
 1.7.8.3
 
