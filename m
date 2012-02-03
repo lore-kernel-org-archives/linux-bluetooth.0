@@ -1,39 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1328284418-4989-1-git-send-email-arik@wizery.com>
-References: <1328284418-4989-1-git-send-email-arik@wizery.com>
-Date: Fri, 3 Feb 2012 13:25:42 -0400
-Message-ID: <CAJdJm_M6kc_ZLsTMsxvZAs1H5DB8Zmyby51cN4cipe9BfYeSmQ@mail.gmail.com>
-Subject: Re: [PATCH v2] proximity: make reporter work per-adapter
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Arik Nemtsov <arik@wizery.com>
-Cc: linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1328288529.2062.43.camel@aeonflux>
+Subject: Re: [PATCHv1 2/2] Bluetooth: Helper removes duplicated code
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 03 Feb 2012 09:02:09 -0800
+In-Reply-To: <1328279275-10303-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1328279275-10303-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1328279275-10303-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arik,
+Hi Andrei,
 
-On Fri, Feb 3, 2012 at 11:53 AM, Arik Nemtsov <arik@wizery.com> wrote:
-> Register an adapter driver for reporter and add the adapter argument in
-> appropriate places.
-
-Looks ok.
-
->
-> Signed-off-by: Arik Nemtsov <arik@wizery.com>
+> Use __check_timout helper to remove duplicated code
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
-> v1->2: minor rename of reporter driver, squashed a bug where
-> the D-Bus connection was referenced only after the monitor driver
-> was registered (Thanks Anderson)
->
->  proximity/manager.c  |   28 +++++++++++++++++++-----
->  proximity/reporter.c |   57 +++++++++++++++++++------------------------------
->  proximity/reporter.h |    4 +-
->  3 files changed, 46 insertions(+), 43 deletions(-)
+>  net/bluetooth/hci_core.c |   31 +++++++++++++------------------
+>  1 files changed, 13 insertions(+), 18 deletions(-)
 
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Reviewed-by: Ulisses Furquim <ulisses@profusion.mobi>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
+
+
