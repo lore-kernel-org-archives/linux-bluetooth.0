@@ -1,35 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 3 Feb 2012 13:45:03 -0800
+Date: Fri, 3 Feb 2012 13:37:48 -0800
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v5 1/6] Bluetooth: LE scan should send Discovering events
-Message-ID: <20120203214503.GA32258@x220.globalsuite.net>
-References: <1328302082-17405-1-git-send-email-andre.guedes@openbossa.org>
+To: Arik Nemtsov <arik@wizery.com>
+Cc: linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org,
+	anderson.lizardo@openbossa.org
+Subject: Re: [PATCH v3] proximity: make reporter work per-adapter
+Message-ID: <20120203213748.GA32352@x220.globalsuite.net>
+References: <1328304844-21149-1-git-send-email-arik@wizery.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328302082-17405-1-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1328304844-21149-1-git-send-email-arik@wizery.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Arik,
 
-On Fri, Feb 03, 2012, Andre Guedes wrote:
-> Send MGMT Discovering events once LE scan starts/stops so the
-> userspace can track when local adapters are discovering LE devices.
-> 
-> This way, we also keep the same behavior of inquiry which sends MGMT
-> Discovering events once inquiry starts/stops even if it is triggered
-> by an external tool (e.g. hcitool).
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+On Fri, Feb 03, 2012, Arik Nemtsov wrote:
+> Register an adapter driver for reporter and add the adapter argument in
+> appropriate places.
 > ---
->  include/net/bluetooth/hci_core.h |    1 +
->  net/bluetooth/hci_core.c         |    2 ++
->  net/bluetooth/hci_event.c        |    5 +++++
->  3 files changed, 8 insertions(+), 0 deletions(-)
+> v2->3: rebased, removed signed-off-by
+> 
+>  proximity/manager.c  |   28 +++++++++++++++++++-----
+>  proximity/reporter.c |   57 +++++++++++++++++++------------------------------
+>  proximity/reporter.h |    4 +-
+>  3 files changed, 46 insertions(+), 43 deletions(-)
 
-All six patches have been applied to my bluetooth-next tree. Thanks.
+Applied. Thanks.
 
 Johan
