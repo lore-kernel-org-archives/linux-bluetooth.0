@@ -1,42 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1321992859-12473-3-git-send-email-andre.guedes@openbossa.org>
-References: <1321992859-12473-1-git-send-email-andre.guedes@openbossa.org>
-	<1321992859-12473-3-git-send-email-andre.guedes@openbossa.org>
-Date: Fri, 3 Feb 2012 20:17:10 -0300
-Message-ID: <CACJA=fXG1pfJc1EwTzXRdzF+5gUQUE+=5kaP5o7nm=Jnk1d4Xg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Bluetooth: Add BT_DBG to mgmt_discovering()
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ] device: Fix doing sdp discovery for LE devices
+Date: Fri,  3 Feb 2012 20:06:45 -0300
+Message-Id: <1328310405-16329-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Please consider applying this patch. It is really helpful during
-discovery debugging.
+If ReverseServiceDiscovery is enabled and we are connected to a LE
+device, we should do a Primary Service Discovery, not a SDP discovery
+(which doesn't even make sense).
+---
 
-On Tue, Nov 22, 2011 at 5:14 PM, Andre Guedes
-<andre.guedes@openbossa.org> wrote:
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  net/bluetooth/mgmt.c |    2 ++
->  1 files changed, 2 insertions(+), 0 deletions(-)
->
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index f615a5a..19503f9 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -2680,6 +2680,8 @@ int mgmt_discovering(struct hci_dev *hdev, u8 discovering)
->  {
->        struct pending_cmd *cmd;
->
-> +       BT_DBG("%s discovering %u", hdev->name, discovering);
-> +
->        if (discovering)
->                cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
->        else
-> --
-> 1.7.7.1
->
+This patch assumes that it makes sense to reuse the ReverseServiceDiscovery
+functionality for LE devices.
 
-Andre
+
+ src/device.c |    9 +++++++--
+ 1 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/device.c b/src/device.c
+index 46f26d1..c7c741c 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1933,7 +1933,9 @@ int device_browse_primary(struct btd_device *device, DBusConnection *conn,
+ 		return -EIO;
+ 	}
+
+-	req->conn = dbus_connection_ref(conn);
++	if (conn)
++		req->conn = dbus_connection_ref(conn);
++
+ 	device->browse = req;
+
+ 	if (msg) {
+@@ -2118,7 +2120,10 @@ static gboolean start_discovery(gpointer user_data)
+ {
+ 	struct btd_device *device = user_data;
+
+-	device_browse_sdp(device, NULL, NULL, NULL, TRUE);
++	if (device_is_bredr(device))
++		device_browse_sdp(device, NULL, NULL, NULL, FALSE);
++	else
++		device_browse_primary(device, NULL, NULL, FALSE);
+
+ 	device->discov_timer = 0;
+
+--
+1.7.8.1
+
