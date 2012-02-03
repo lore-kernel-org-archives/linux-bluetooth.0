@@ -1,29 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 3 Feb 2012 15:33:59 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Andre Guedes <andre.guedes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
+Message-ID: <1328311657.2062.50.camel@aeonflux>
 Subject: Re: [PATCH 2/2] Bluetooth: Add BT_DBG to mgmt_discovering()
-Message-ID: <20120203233359.GA5125@x220.globalsuite.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 03 Feb 2012 15:27:37 -0800
+In-Reply-To: <1321992859-12473-3-git-send-email-andre.guedes@openbossa.org>
 References: <1321992859-12473-1-git-send-email-andre.guedes@openbossa.org>
- <1321992859-12473-3-git-send-email-andre.guedes@openbossa.org>
- <1328311657.2062.50.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328311657.2062.50.camel@aeonflux>
+	 <1321992859-12473-3-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andre,
 
-On Fri, Feb 03, 2012, Marcel Holtmann wrote:
-> > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> > ---
-> >  net/bluetooth/mgmt.c |    2 ++
-> >  1 files changed, 2 insertions(+), 0 deletions(-)
-> 
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  net/bluetooth/mgmt.c |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
 
-Applied to my bluetooth-next tree.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Johan
+Regards
+
+Marcel
+
+
