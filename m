@@ -1,44 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 3 Feb 2012 13:25:50 -0800
+Date: Fri, 3 Feb 2012 13:22:14 -0800
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Slawomir Bochenski <lkslawek@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: bluez static analysis: plugins/hciops.c:init_adapter()
-Message-ID: <20120203212550.GA31898@x220.globalsuite.net>
-References: <CA+i+Aw1zNAAqucMjN4hZxFqZ6KyY-S-zcOAs5i1DbaMps=OgTQ@mail.gmail.com>
+Subject: Re: [PATCH obexd] src/obex.h: Include stdint.h
+Message-ID: <20120203212214.GA31587@x220.globalsuite.net>
+References: <1328266762-23552-1-git-send-email-lkslawek@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CA+i+Aw1zNAAqucMjN4hZxFqZ6KyY-S-zcOAs5i1DbaMps=OgTQ@mail.gmail.com>
+In-Reply-To: <1328266762-23552-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Slawek,
 
-On Tue, Jan 24, 2012, Slawomir Bochenski wrote:
-> In file plugins/hciops.c in function init_adapter(), at line 658,
-> there is following fragment:
+On Fri, Feb 03, 2012, Slawomir Bochenski wrote:
+> ---
+>  src/obex.h |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
 > 
-> 	if (!dev->registered) {
-> 		adapter = btd_manager_register_adapter(index);
-> 		if (adapter)
-> 			dev->registered = TRUE;
-> 	} else {
-> 		adapter = manager_find_adapter(&dev->bdaddr);
-> 		/* FIXME: manager_find_adapter should return a new ref */
-> 		btd_adapter_ref(adapter);
-> 	}
-> 
-> 	if (adapter == NULL)
-> 		return FALSE;
-> 
-> btd_adapter_ref() directly dereferences adapter. In all other calls of
-> manager_find_adapter() in BlueZ code, returned value is checked for
-> NULL before any use.
-> 
-> Is it guaranteed here that manager_find_adapter() won't return NULL?
+> diff --git a/src/obex.h b/src/obex.h
+> index 7f07fd2..95e9c4e 100644
+> --- a/src/obex.h
+> +++ b/src/obex.h
+> @@ -22,6 +22,8 @@
+>   *
+>   */
+>  
+> +#include <stdint.h>
+> +
+>  #define OBJECT_SIZE_UNKNOWN -1
+>  #define OBJECT_SIZE_DELETE -2
 
-In general a function called "find" can obviously return NULL even
-though in this case it should be in practice impossible. For consistency
-the check should be there though. Please send a patch.
+This file also contains GLib usage but there's no GLib include there.
+Either *all* includes should be there or *none* should be there (i.e.
+expect the .c files to include the dependencies). In this case I'd just
+add the stdint include to whatever file had it missing (which one was it
+btw?).
 
 Johan
