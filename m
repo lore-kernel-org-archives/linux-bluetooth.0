@@ -1,33 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 3 Feb 2012 15:17:12 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] device: Fix doing sdp discovery for LE devices
-Message-ID: <20120203231712.GA4095@x220.globalsuite.net>
-References: <1328310405-16329-1-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328310405-16329-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1321992859-12473-3-git-send-email-andre.guedes@openbossa.org>
+References: <1321992859-12473-1-git-send-email-andre.guedes@openbossa.org>
+	<1321992859-12473-3-git-send-email-andre.guedes@openbossa.org>
+Date: Fri, 3 Feb 2012 20:17:10 -0300
+Message-ID: <CACJA=fXG1pfJc1EwTzXRdzF+5gUQUE+=5kaP5o7nm=Jnk1d4Xg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Bluetooth: Add BT_DBG to mgmt_discovering()
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Please consider applying this patch. It is really helpful during
+discovery debugging.
 
-On Fri, Feb 03, 2012, Vinicius Costa Gomes wrote:
-> If ReverseServiceDiscovery is enabled and we are connected to a LE
-> device, we should do a Primary Service Discovery, not a SDP discovery
-> (which doesn't even make sense).
+On Tue, Nov 22, 2011 at 5:14 PM, Andre Guedes
+<andre.guedes@openbossa.org> wrote:
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
-> 
-> This patch assumes that it makes sense to reuse the ReverseServiceDiscovery
-> functionality for LE devices.
-> 
-> 
->  src/device.c |    9 +++++++--
->  1 files changed, 7 insertions(+), 2 deletions(-)
+>  net/bluetooth/mgmt.c |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
+>
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index f615a5a..19503f9 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -2680,6 +2680,8 @@ int mgmt_discovering(struct hci_dev *hdev, u8 discovering)
+>  {
+>        struct pending_cmd *cmd;
+>
+> +       BT_DBG("%s discovering %u", hdev->name, discovering);
+> +
+>        if (discovering)
+>                cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
+>        else
+> --
+> 1.7.7.1
+>
 
-Applied. Thanks. (and yes, I do think it should be fine to "reverse
-discover" LE services).
-
-Johan
+Andre
