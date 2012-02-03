@@ -1,52 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ] device: Fix doing sdp discovery for LE devices
-Date: Fri,  3 Feb 2012 20:06:45 -0300
-Message-Id: <1328310405-16329-1-git-send-email-vinicius.gomes@openbossa.org>
+Date: Fri, 3 Feb 2012 13:45:03 -0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v5 1/6] Bluetooth: LE scan should send Discovering events
+Message-ID: <20120203214503.GA32258@x220.globalsuite.net>
+References: <1328302082-17405-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1328302082-17405-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If ReverseServiceDiscovery is enabled and we are connected to a LE
-device, we should do a Primary Service Discovery, not a SDP discovery
-(which doesn't even make sense).
----
+Hi Andre,
 
-This patch assumes that it makes sense to reuse the ReverseServiceDiscovery
-functionality for LE devices.
+On Fri, Feb 03, 2012, Andre Guedes wrote:
+> Send MGMT Discovering events once LE scan starts/stops so the
+> userspace can track when local adapters are discovering LE devices.
+> 
+> This way, we also keep the same behavior of inquiry which sends MGMT
+> Discovering events once inquiry starts/stops even if it is triggered
+> by an external tool (e.g. hcitool).
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  include/net/bluetooth/hci_core.h |    1 +
+>  net/bluetooth/hci_core.c         |    2 ++
+>  net/bluetooth/hci_event.c        |    5 +++++
+>  3 files changed, 8 insertions(+), 0 deletions(-)
 
+All six patches have been applied to my bluetooth-next tree. Thanks.
 
- src/device.c |    9 +++++++--
- 1 files changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/src/device.c b/src/device.c
-index 46f26d1..c7c741c 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1933,7 +1933,9 @@ int device_browse_primary(struct btd_device *device, DBusConnection *conn,
- 		return -EIO;
- 	}
-
--	req->conn = dbus_connection_ref(conn);
-+	if (conn)
-+		req->conn = dbus_connection_ref(conn);
-+
- 	device->browse = req;
-
- 	if (msg) {
-@@ -2118,7 +2120,10 @@ static gboolean start_discovery(gpointer user_data)
- {
- 	struct btd_device *device = user_data;
-
--	device_browse_sdp(device, NULL, NULL, NULL, TRUE);
-+	if (device_is_bredr(device))
-+		device_browse_sdp(device, NULL, NULL, NULL, FALSE);
-+	else
-+		device_browse_primary(device, NULL, NULL, FALSE);
-
- 	device->discov_timer = 0;
-
---
-1.7.8.1
-
+Johan
