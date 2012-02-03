@@ -2,74 +2,40 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH v2 6/7] Bluetooth: Clean up structures left unused
-Date: Thu,  2 Feb 2012 21:08:04 -0300
-Message-Id: <1328227685-27245-7-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH v2 5/7] Bluetooth: Add support for removing LTK's when pairing is removed
+Date: Thu,  2 Feb 2012 21:08:03 -0300
+Message-Id: <1328227685-27245-6-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1328227685-27245-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1328227685-27245-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With the use of the new structures and lists for the SMP LTK's
-we may remove some code that is now unused. No need to have extra
-fields of information inside link_key now that it is only used
-for Link Keys.
+Instead of having a separated command for removing SMP keys, we use the
+Remove Keys command to remove *all* keys.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h      |    4 ----
- include/net/bluetooth/hci_core.h |   16 ----------------
- 2 files changed, 0 insertions(+), 20 deletions(-)
+ net/bluetooth/mgmt.c |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 83f045a..1b634e1 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -270,10 +270,6 @@ enum {
- #define HCI_LK_UNAUTH_COMBINATION	0x04
- #define HCI_LK_AUTH_COMBINATION		0x05
- #define HCI_LK_CHANGED_COMBINATION	0x06
--/* The spec doesn't define types for SMP keys */
--#define HCI_LK_SMP_LTK			0x81
--#define HCI_LK_SMP_IRK			0x82
--#define HCI_LK_SMP_CSRK			0x83
- /* The spec doesn't define types for SMP keys, the _MASTER suffix is implied */
- #define HCI_SMP_STK			0x80
- #define HCI_SMP_STK_SLAVE		0x81
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 6cf39d7..9ced7dc 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -100,28 +100,12 @@ struct smp_ltk {
- 	u8 val[16];
- } __packed;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d1433de..4d9c8ce 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1089,6 +1089,12 @@ static int remove_keys(struct sock *sk, u16 index, void *cp_data, u16 len)
+ 	bacpy(&rp.bdaddr, &cp->bdaddr);
+ 	rp.status = MGMT_STATUS_FAILED;
  
--struct key_master_id {
--	__le16 ediv;
--	u8 rand[8];
--} __packed;
--
--struct link_key_data {
--	bdaddr_t bdaddr;
--	u8 type;
--	u8 val[16];
--	u8 pin_len;
--	u8 dlen;
--	u8 data[0];
--} __packed;
--
- struct link_key {
- 	struct list_head list;
- 	bdaddr_t bdaddr;
- 	u8 type;
- 	u8 val[16];
- 	u8 pin_len;
--	u8 dlen;
--	u8 data[0];
- };
- 
- struct oob_data {
++	err = hci_remove_ltk(hdev, &cp->bdaddr);
++	if (err < 0) {
++		err = cmd_status(sk, index, MGMT_OP_REMOVE_KEYS, -err);
++		goto unlock;
++	}
++
+ 	err = hci_remove_link_key(hdev, &cp->bdaddr);
+ 	if (err < 0) {
+ 		rp.status = MGMT_STATUS_NOT_PAIRED;
 -- 
 1.7.8.1
 
