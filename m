@@ -1,31 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 3 Feb 2012 10:48:31 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
+Message-ID: <1328290855.2062.47.camel@aeonflux>
+Subject: Re: [PATCH v4 5/6] Bluetooth: MGMT start discovery LE-Only support
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: GATT improvements v3
-Message-ID: <20120203184831.GA19240@x220.globalsuite.net>
-References: <1327497161-14764-1-git-send-email-sancane@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1327497161-14764-1-git-send-email-sancane@gmail.com>
+Date: Fri, 03 Feb 2012 09:40:55 -0800
+In-Reply-To: <1328135692-24255-6-git-send-email-andre.guedes@openbossa.org>
+References: <1328135692-24255-1-git-send-email-andre.guedes@openbossa.org>
+	 <1328135692-24255-6-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+Hi Andre,
 
-On Wed, Jan 25, 2012, Santiago Carot-Nemesio wrote:
-> The same set of patches but including all changes suggested.
+> This patch adds LE-Only discovery procedure support to MGMT Start
+> Discovery command.
 > 
-> [PATCH 1/8] gatt-service: Add support for 128-bit Bluetooth UUIDs
-> [PATCH 2/8] gatt-service: Move va_end just after processing the
-> [PATCH 3/8] gatt-service: Provide service uuid in
-> [PATCH 4/8] attrib-server: Allocate 16-bits UUIDS at the begining of
-> [PATCH 5/8] attrib-server: Set database uuids as a double linked
-> [PATCH 6/8] glib-compat: Add g_list_free_full to deal with issues in
-> [PATCH 7/8] attrib-server: Allocate 128-bits UUIDs using highest
-> [PATCH 8/8] gatt-example: Fix g_assert checks when an uint16_t value
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  net/bluetooth/hci_event.c |   13 ++++++++++++-
+>  net/bluetooth/mgmt.c      |   20 +++++++++++++++++++-
+>  2 files changed, 31 insertions(+), 2 deletions(-)
 
-All of these patches have been pushed upstream. Thanks.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Johan
+Regards
+
+Marcel
+
+
