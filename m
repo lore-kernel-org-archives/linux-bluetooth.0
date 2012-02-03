@@ -1,51 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] proximity: Fix Proximity API to match documentation
-Date: Fri,  3 Feb 2012 09:42:56 -0400
-Message-Id: <1328276576-2996-1-git-send-email-anderson.lizardo@openbossa.org>
+Message-id: <F077852F86D84892A3B10767242C50BC@sisodomain.com>
+From: Jaganath <jaganath.k@samsung.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <1328182441-14892-1-git-send-email-jaganath.k@samsung.com>
+ <CABBYNZJYyqtD+0c6YYALx8bON3A_S3bXH29K07OFJcq=ZrJCOw@mail.gmail.com>
+In-reply-to: <CABBYNZJYyqtD+0c6YYALx8bON3A_S3bXH29K07OFJcq=ZrJCOw@mail.gmail.com>
+Subject: Re: [PATCH obexd 3/4] irmc: Fix length parameter of strncpy
+Date: Fri, 03 Feb 2012 17:52:46 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Recently, the documented D-Bus interface for Proximity was changed to
-prepare for the upcoming Proximity Reporter API.
----
- proximity/monitor.c |    2 +-
- test/test-proximity |    4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+Hi Luiz,
 
-diff --git a/proximity/monitor.c b/proximity/monitor.c
-index 76020ee..7bf95a1 100644
---- a/proximity/monitor.c
-+++ b/proximity/monitor.c
-@@ -49,7 +49,7 @@
- #include "monitor.h"
- #include "textfile.h"
- 
--#define PROXIMITY_INTERFACE "org.bluez.Proximity"
-+#define PROXIMITY_INTERFACE "org.bluez.ProximityMonitor"
- 
- #define ALERT_LEVEL_CHR_UUID 0x2A06
- #define POWER_LEVEL_CHR_UUID 0x2A07
-diff --git a/test/test-proximity b/test/test-proximity
-index 289908e..130590c 100755
---- a/test/test-proximity
-+++ b/test/test-proximity
-@@ -53,11 +53,11 @@ if __name__ == "__main__":
- 	device_path = adapter.FindDevice(options.address)
- 
- 	bus.add_signal_receiver(property_changed, bus_name="org.bluez",
--				dbus_interface="org.bluez.Proximity",
-+				dbus_interface="org.bluez.ProximityMonitor",
- 				signal_name="PropertyChanged")
- 
- 	proximity = dbus.Interface(bus.get_object("org.bluez",
--					device_path), "org.bluez.Proximity")
-+					device_path), "org.bluez.ProximityMonitor")
- 
- 	print "Proximity SetProperty('%s', '%s')" % (args[0], args[1])
- 	proximity.SetProperty(args[0], args[1])
--- 
-1.7.5.4
+--------------------------------------------------
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Sent: Thursday, February 02, 2012 10:59 PM
+To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH obexd 3/4] irmc: Fix length parameter of strncpy
+
+> Hi Jaganath,
+>
+> On Thu, Feb 2, 2012 at 3:34 AM, Jaganath Kanakkassery
+> <jaganath.k@samsung.com> wrote:
+>> ---
+>>  plugins/irmc.c |    6 +++---
+>>  1 files changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/plugins/irmc.c b/plugins/irmc.c
+>> index 6f28e51..8344a47 100644
+>> --- a/plugins/irmc.c
+>> +++ b/plugins/irmc.c
+>> @@ -215,9 +215,9 @@ static void *irmc_connect(struct obex_session *os, 
+>> int *err)
+>>         * For now lets used hostname and some 'random' value
+>>         */
+>>        gethostname(irmc->did, DID_LEN);
+>> -       strncpy(irmc->sn, "12345", DID_LEN);
+>> -       strncpy(irmc->manu, "obex", DID_LEN);
+>> -       strncpy(irmc->model, "mymodel", DID_LEN);
+>> +       strncpy(irmc->sn, "12345", sizeof(irmc->sn) - 1);
+>> +       strncpy(irmc->manu, "obex", sizeof(irmc->manu) - 1);
+>> +       strncpy(irmc->model, "mymodel", sizeof(irmc->model) - 1);
+>
+> Not sure what is the point to use a fixed size array here? Does the
+> spec require it to be 18 bytes long?
+
+I checked IRMC spec and could not find any length restriction.
+For "sn" spec says "The format of the field is manufacturer dependent."
+and for "manu" and "model" the acceptable value is string.
+
+>
+> -- 
+> Luiz Augusto von Dentz
+
+Regards
+Jaganath 
 
