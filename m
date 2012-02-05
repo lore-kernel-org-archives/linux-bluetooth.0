@@ -1,139 +1,141 @@
 Return-Path: <cyrus@holtmann.org>
-From: ilia.kolominsky@gmail.com
-To: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
-Cc: Ilia Kolomisnky <iliak@ti.com>
-Subject: [PATCH Bluez v2] Add retries for BNEP connection setup.
-Date: Sun,  5 Feb 2012 16:58:58 +0200
-Message-Id: <1328453938-18458-1-git-send-email-iliak@ti.com>
+From: "Ilia, Kolominsky" <iliak@ti.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>,
+	"ilia.kolominsky@gmail.com" <ilia.kolominsky@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] BlueZ: Added retries for BNEP connection setup.
+Date: Sun, 5 Feb 2012 17:00:32 +0000
+Message-ID: <A7CD2DBA66569F478A0C1ECFC39E1C5218DF60C7@DNCE03.ent.ti.com>
+References: <1327216233-17629-1-git-send-email-iliak@ti.com>
+ <20120202185534.GA28700@x220.globalsuite.net>
+In-Reply-To: <20120202185534.GA28700@x220.globalsuite.net>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ilia Kolomisnky <iliak@ti.com>
+Hi Johan,
+Thanks for the review, I will send patch v2 shortly.
 
-According to BNEP spec. v1.0, section 2.6.3, the
-BNEP_SETUP_CONNECTION_REQUEST_MSG should be retransmited if the
-response is not recieved for a period between 1 to 30 sec.
-Current implementation uses SO_RCVTIMEO socket option to sense
-reply time-out, which is incorrect because it does not have effect
-on g_io_add_watch monitored descriptors. This patch allows
-passing of TP/BNEP/CTRL/BV-02-C certification test.
----
- network/connection.c |   59 ++++++++++++++++++++++++++++++++++++++++++-------
- 1 files changed, 50 insertions(+), 9 deletions(-)
+> -----Original Message-----
+> From: Johan Hedberg [mailto:johan.hedberg@gmail.com]
+> Sent: Thursday, February 02, 2012 8:56 PM
+> To: ilia.kolominsky@gmail.com
+> Cc: linux-bluetooth@vger.kernel.org; Ilia, Kolominsky
+> Subject: Re: [PATCH] BlueZ: Added retries for BNEP connection setup.
+> 
+> Hi Ilia,
+> 
+> On Sun, Jan 22, 2012, ilia.kolominsky@gmail.com wrote:
+> > According to BNEP spec. section 2.6.3 and
+> > in order to pass TP/BNEP/CTRL/BV-02-C certification test.
+> 
+> Please add a much more detailed commit message explaining the
+> background
+> to this, what the test case does and why your fix is the right one, why
+> using SO_RCVTIMEO wasn't good enough, etc. Also fix the summary line
+> not
+> to have a "BlueZ" prefix (that should be within the initial []) and the
+> form of the first word should be "Add" and not "Added" (actually since
+> this entire patch seems to be a fix it should be "Fix ...").
+> 
+> > Signed-off-by: Ilia Kolomisnky <iliak@ti.com>
+> 
+> We don't use this for user space patches.
+> 
+> > +#define CON_SETUP_TO_MS        9000
+> 
+> Please use the _seconds variant of the GLib timeout functions.
+> 
+> >  typedef enum {
+> >  	CONNECTED,
+> > @@ -73,6 +75,8 @@ struct network_conn {
+> >  	guint		watch;		/* Disconnect watch */
+> >  	guint		dc_id;
+> >  	struct network_peer *peer;
+> > +	char		con_attempt;
+> 
+> Don't use char for integer variables. int, guint etc. would be more
+> appropriate here.
+> 
+> > +	guint 		con_to_src;
+> 
+> I'd call this timeout_source (it's already within a struct called
+> network_conn so you don't need a conn prefix).
+> 
+> > +	g_source_remove(nc->con_to_src);
+> 
+> I suppose this should also set the source back to 0?
+> 
+> > +static inline int bnep_send_conn_req(struct network_conn *nc) {
+> 
+> Does this really need to be inline? Have you done some profiling to
+> determine that it's really needed and has a huge impact? If not just
+> leave the "inline" bit out.
+> 
+> > -	int fd;
+> 
+> Please keep this variable.
+> 
+> > @@ -306,14 +310,43 @@ static int bnep_connect(struct network_conn
+> *nc)
+> >  	s->dst = htons(nc->id);
+> >  	s->src = htons(BNEP_SVC_PANU);
+> >
+> > -	memset(&timeo, 0, sizeof(timeo));
+> > -	timeo.tv_sec = 30;
+> > +	if (send(g_io_channel_unix_get_fd(nc->io), pkt, sizeof(*req) +
+> sizeof(*s), 0) < 0) {
+> 
+> ..and don't do the get_fd() call within the parameters of another
+> function call. Also, why not use write() since you're anyway passing 0
+> as the flags (I know the original code was using send so this is a
+> minor
+> issue). Also the above line looks like it's breaking the 80 character
+> rule.
+> 
+> > +static gboolean bnep_conn_req_to(gpointer user_data)
+> > +{
+> > +	struct network_conn *nc;
+> > +	int err;
+> > +
+> > +	nc = (struct network_conn *) user_data;
+> 
+> No explicit type casts for void pointer please.
+> 
+> > +	if (nc->con_attempt == CON_SETUP_RETRIES) {
+> > +		error("Too many bnep connection attempts, aborting
+> connection setup");
+> > +	}
+> > +	else {
+> > +		error("bnep connection setup TO, retrying...");
+> > +
+> > +		if (!bnep_send_conn_req(nc))
+> > +			return TRUE;
+> > +	}
+> 
+> Looks like you're breaking the 80 character rule for the first error
+> call. Also, the coding style should be "} else {" on one line.
+> 
+> > +static int bnep_connect(struct network_conn *nc)
+> > +{
+> > +	int err;
+> > +
+> > +	if (err = bnep_send_conn_req(nc))
+> > +		return err;
+> 
+> Split this up:
+> 
+> 	err = foo();
+> 	if (err < 0)
+> 		return err;
+> 
+> > +	nc->con_to_src = g_timeout_add(CON_SETUP_TO_MS, bnep_conn_req_to,
+> nc);
+> 
+> And this one (like I mentioned previously) should use the _seconds
+> variant.
+> 
+> Johan
 
-diff --git a/network/connection.c b/network/connection.c
-index f864972..0a606d5 100644
---- a/network/connection.c
-+++ b/network/connection.c
-@@ -49,6 +49,8 @@
- #include "connection.h"
- 
- #define NETWORK_PEER_INTERFACE "org.bluez.Network"
-+#define CON_SETUP_RETRIES      3
-+#define CON_SETUP_TO           9
- 
- typedef enum {
- 	CONNECTED,
-@@ -73,6 +75,8 @@ struct network_conn {
- 	guint		watch;		/* Disconnect watch */
- 	guint		dc_id;
- 	struct network_peer *peer;
-+	guint		attempt_cnt;
-+	guint 		timeout_source;
- };
- 
- struct __service_16 {
-@@ -146,6 +150,11 @@ static void cancel_connection(struct network_conn *nc, const char *err_msg)
- {
- 	DBusMessage *reply;
- 
-+	if (nc->timeout_source) {
-+		g_source_remove(nc->timeout_source);
-+		nc->timeout_source = 0;
-+	}
-+
- 	if (nc->watch) {
- 		g_dbus_remove_watch(connection, nc->watch);
- 		nc->watch = 0;
-@@ -199,6 +208,9 @@ static gboolean bnep_setup_cb(GIOChannel *chan, GIOCondition cond,
- 	if (cond & G_IO_NVAL)
- 		return FALSE;
- 
-+	g_source_remove(nc->timeout_source);
-+	nc->timeout_source = 0;
-+
- 	if (cond & (G_IO_HUP | G_IO_ERR)) {
- 		error("Hangup or error on l2cap server socket");
- 		goto failed;
-@@ -289,11 +301,10 @@ failed:
- 	return FALSE;
- }
- 
--static int bnep_connect(struct network_conn *nc)
-+static int bnep_send_conn_req(struct network_conn *nc)
- {
- 	struct bnep_setup_conn_req *req;
- 	struct __service_16 *s;
--	struct timeval timeo;
- 	unsigned char pkt[BNEP_MTU];
- 	int fd;
- 
-@@ -306,18 +317,48 @@ static int bnep_connect(struct network_conn *nc)
- 	s->dst = htons(nc->id);
- 	s->src = htons(BNEP_SVC_PANU);
- 
--	memset(&timeo, 0, sizeof(timeo));
--	timeo.tv_sec = 30;
--
- 	fd = g_io_channel_unix_get_fd(nc->io);
--	setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeo, sizeof(timeo));
--
--	if (send(fd, pkt, sizeof(*req) + sizeof(*s), 0) < 0)
-+	if (write(fd, pkt, sizeof(*req) + sizeof(*s)) < 0) {
-+		error("bnep connection setup send failed");
- 		return -errno;
-+	}
-+
-+	nc->attempt_cnt++;
-+
-+	return 0;
-+}
-+
-+static gboolean bnep_conn_req_to(gpointer user_data)
-+{
-+	struct network_conn *nc;
-+
-+	nc = user_data;
-+	if (nc->attempt_cnt == CON_SETUP_RETRIES) {
-+		error("Too many bnep connection attempts");
-+	} else {
-+		error("bnep connection setup TO, retrying...");
-+		if (!bnep_send_conn_req(nc))
-+			return TRUE;
-+	}
-+
-+	cancel_connection(nc, "bnep setup failed");
-+
-+	return FALSE;
-+}
-+
-+static int bnep_connect(struct network_conn *nc)
-+{
-+	int err;
-+
-+	nc->attempt_cnt = 0;
-+	if ((err = bnep_send_conn_req(nc)))
-+		return err;
-+
-+	nc->timeout_source = g_timeout_add_seconds(CON_SETUP_TO,
-+		bnep_conn_req_to, nc);
- 
- 	g_io_add_watch(nc->io, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
- 			(GIOFunc) bnep_setup_cb, nc);
--
- 	return 0;
- }
- 
--- 
-1.7.4.1
-
+Ilia
