@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
 Sender: rohan16garg@gmail.com
-In-Reply-To: <1328439464.32199.22.camel@pohly-mobl1.fritz.box>
+In-Reply-To: <1328439363.32199.20.camel@pohly-mobl1.fritz.box>
 References: <1326702341.3360.107.camel@pohly-mobl1.fritz.box>
  <1326705845.6454.274.camel@aeonflux> <1326708597.3360.133.camel@pohly-mobl1.fritz.box>
- <1328439363.32199.20.camel@pohly-mobl1.fritz.box> <1328439464.32199.22.camel@pohly-mobl1.fritz.box>
+ <1328439363.32199.20.camel@pohly-mobl1.fritz.box>
 From: Rohan Garg <rohangarg@ubuntu.com>
-Date: Sun, 5 Feb 2012 16:37:59 +0530
-Message-ID: <CAEb1ZdjO3W5xUkU3t+CSpVn1u=OCGwBLLeUyvfG-_WMR5AXWxQ@mail.gmail.com>
-Subject: Re: [PATCH] bluetooth.h: fix compile issue in C++ with ifdef
+Date: Sun, 5 Feb 2012 16:29:31 +0530
+Message-ID: <CAEb1ZdjiDFTngKg+zTMHgDQ7hNd6h+VAgbjeNJXQUyF+=d6a9Q@mail.gmail.com>
+Subject: Re: bluez 4.97: build failure when used in C++ apps
 To: Patrick Ohly <patrick.ohly@intel.com>
 Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
 	Milan Crha <mcrha@redhat.com>, ying.an.deng@intel.com, ulf.hofemeier@intel.com,
@@ -16,112 +16,51 @@ Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I've not gone through the entire patch, but if the problem is merely
-the fact that one cannot convert a void* to anything in C++, why not
-use a static_cast in syncevolution wherever the struct is used?
+I can file a bug for tracking purposes and get the patched package in
+the archives, as long as upstream is willing to accept the patch ( or
+a modified version of the patch ) in the near future. I don't speak
+for the rest of the Ubuntu developers, but I consider the best
+approach to getting issues fixed in distros.
 
 Best
 Rohan Garg
 
-
-
-On Sun, Feb 5, 2012 at 4:27 PM, Patrick Ohly <patrick.ohly@intel.com> wrote=
-:
-> The compiler error is:
-> =C2=A0/usr/include/bluetooth/bluetooth.h::131:9:=E2=80=82error:=E2=80=82i=
-nvalid=E2=80=82conversion from=E2=80=82'void*'=E2=80=82to=E2=80=82'bt_get_l=
-e64(void*)::<anonymous=E2=80=82struct>*'
-> =C2=A0...
+On Sun, Feb 5, 2012 at 4:26 PM, Patrick Ohly <patrick.ohly@intel.com> wrote:
+> On Mon, 2012-01-16 at 11:09 +0100, Patrick Ohly wrote:
+>> On Mo, 2012-01-16 at 10:24 +0100, Marcel Holtmann wrote:
+>> > Also this topic
+>> > has been raised before and I need confirmation for a GCC guru to confirm
+>> > that this does exactly the same all all platforms.
+>>
+>> Now that you mentioned it I found the previous patch:
+>> http://article.gmane.org/gmane.linux.bluez.kernel/20276/match=invalid
+>> +conversion+void+bt_get_le64+anonymous+struct
+>>
+>> Note that my patch is different. It keeps the "struct
+>> __attribute__((packed))" magic and merely changes the (void *) typecast
+>> to something that works in C++ and C.
 >
-> The reason is that C++, in contrast to C, does not allow conversion of
-> void * to anything, and this code gets compiled as C++ when the app is
-> written in C++. The macro with the assignment itself is older, but only
-> recent Bluez starts to use it in inline functions, thus triggering the
-> problem.
+> How do we move forward with this? More and more distros are picking up
+> the broken header file.
 >
-> This patch keeps the "struct __attribute__((packed))" magic and merely
-> changes the typecast so that it works in C and C++. Like the existing
-> macro this patch relies on support for typeof.
+> In MeeGo and Tizen we applied the patch that I had suggested.
 >
-> The new variant of the code is in an ifdef and only used for C++
-> to avoid unexpected regressions in C applications.
+> Milan, do you know what Fedora is doing? Tino, what about Debian? Roran,
+> you had it in Ubuntu Precise Pangolin. Care to file a bug there, if
+> there isn't one already?
 >
-> Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
-> ---
-> =C2=A0lib/bluetooth.h | =C2=A0 30 ++++++++++++++++++++++++++++++
-> =C2=A01 files changed, 30 insertions(+), 0 deletions(-)
+> Would it be more acceptable for upstream to put the modified macros into
+> an ifdef so that they are really only used in C++, keeping the code for
+> C as it is now?
 >
-> diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-> index 5bd4f03..3293915 100644
-> --- a/lib/bluetooth.h
-> +++ b/lib/bluetooth.h
-> @@ -109,6 +109,11 @@ enum {
-> =C2=A0#endif
+> I'll send such a patch immediately.
 >
-> =C2=A0/* Bluetooth unaligned access */
-> +#ifndef __cplusplus
-> +/*
-> + * traditional code, doesn't work in C++ because
-> + * of the void * to struct pointer assignment
-> + */
-> =C2=A0#define bt_get_unaligned(ptr) =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0\
-> =C2=A0({ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 \
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0struct __attribute__((packed)) { =C2=A0 =C2=A0=
- =C2=A0 =C2=A0\
-> @@ -125,6 +130,31 @@ do { =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0__p->__v =3D (val); =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \
-> =C2=A0} while(0)
->
-> +#else /* __cplusplus */
-> +
-> +/*
-> + * modified code with typeof typecast, for C++;
-> + * the traditional code continues to be used for
-> + * C to avoid unexpected regressions with this
-> + * code here (it should work in C and C++, though)
-> + */
-> +#define bt_get_unaligned(ptr) =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0\
-> +({ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 \
-> + =C2=A0 =C2=A0 =C2=A0 struct __attribute__((packed)) { =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0\
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 typeof(*(ptr)) __v; =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \
-> + =C2=A0 =C2=A0 =C2=A0 } *__p =3D (typeof(__p)) (ptr); =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 \
-> + =C2=A0 =C2=A0 =C2=A0 __p->__v; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \
-> +})
-> +
-> +#define bt_put_unaligned(val, ptr) =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 \
-> +do { =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 \
-> + =C2=A0 =C2=A0 =C2=A0 struct __attribute__((packed)) { =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0\
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 typeof(*(ptr)) __v; =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \
-> + =C2=A0 =C2=A0 =C2=A0 } *__p =3D (typeof(__p)) (ptr); =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 \
-> + =C2=A0 =C2=A0 =C2=A0 __p->__v =3D (val); =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \
-> +} while(0)
-> +#endif /* __cplusplus */
-> +
-> =C2=A0#if __BYTE_ORDER =3D=3D __LITTLE_ENDIAN
-> =C2=A0static inline uint64_t bt_get_le64(void *ptr)
-> =C2=A0{
 > --
-> 1.7.8.3
+> Best Regards, Patrick Ohly
 >
+> The content of this message is my personal opinion only and although
+> I am an employee of Intel, the statements I make here in no way
+> represent Intel's position on the issue, nor am I authorized to speak
+> on behalf of Intel on this matter.
 >
 >
