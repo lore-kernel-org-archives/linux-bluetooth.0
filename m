@@ -1,54 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1328439363.32199.20.camel@pohly-mobl1.fritz.box>
-Subject: Re: bluez 4.97: build failure when used in C++ apps
-From: Patrick Ohly <patrick.ohly@intel.com>
+Date: Sun, 5 Feb 2012 06:21:05 +0000
+From: Al Viro <viro@ZenIV.linux.org.uk>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, Milan Crha <mcrha@redhat.com>,
- ying.an.deng@intel.com, ulf.hofemeier@intel.com, ning.w.wang@intel.com,
- Tino Keitel <tino.keitel+syncevolution@tikei.de>, Rohan Garg
- <rohan16garg@gmail.com>
-Date: Sun, 05 Feb 2012 11:56:03 +0100
-In-Reply-To: <1326708597.3360.133.camel@pohly-mobl1.fritz.box>
-References: <1326702341.3360.107.camel@pohly-mobl1.fritz.box>
-	 <1326705845.6454.274.camel@aeonflux>
-	 <1326708597.3360.133.camel@pohly-mobl1.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	David Miller <davem@davemloft.net>
+Subject: [PATCH] l2cap_chan_connect() shouldn't be inlined
+Message-ID: <20120205062105.GZ23916@ZenIV.linux.org.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: Al Viro <viro@ftp.linux.org.uk>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2012-01-16 at 11:09 +0100, Patrick Ohly wrote:
-> On Mo, 2012-01-16 at 10:24 +0100, Marcel Holtmann wrote:
-> > Also this topic
-> > has been raised before and I need confirmation for a GCC guru to confirm
-> > that this does exactly the same all all platforms.
-> 
-> Now that you mentioned it I found the previous patch:
-> http://article.gmane.org/gmane.linux.bluez.kernel/20276/match=invalid
-> +conversion+void+bt_get_le64+anonymous+struct
-> 
-> Note that my patch is different. It keeps the "struct
-> __attribute__((packed))" magic and merely changes the (void *) typecast
-> to something that works in C++ and C.
+For one thing, it's big.  For another, the only caller is in a different
+file anyway...
 
-How do we move forward with this? More and more distros are picking up
-the broken header file.
+Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 
-In MeeGo and Tizen we applied the patch that I had suggested.
-
-Milan, do you know what Fedora is doing? Tino, what about Debian? Roran,
-you had it in Ubuntu Precise Pangolin. Care to file a bug there, if
-there isn't one already?
-
-Would it be more acceptable for upstream to put the modified macros into
-an ifdef so that they are really only used in C++, keeping the code for
-C as it is now?
-
-I'll send such a patch immediately.
-
--- 
-Best Regards, Patrick Ohly
-
-The content of this message is my personal opinion only and although
-I am an employee of Intel, the statements I make here in no way
-represent Intel's position on the issue, nor am I authorized to speak
-on behalf of Intel on this matter.
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 68f5891..124f7cf 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -834,7 +834,7 @@ int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
+ struct l2cap_chan *l2cap_chan_create(struct sock *sk);
+ void l2cap_chan_close(struct l2cap_chan *chan, int reason);
+ void l2cap_chan_destroy(struct l2cap_chan *chan);
+-inline int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
++int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 								bdaddr_t *dst);
+ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 								u32 priority);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index faf0b11..980abdb 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1120,7 +1120,7 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr
+ 	return c1;
+ }
+ 
+-inline int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *dst)
++int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *dst)
+ {
+ 	struct sock *sk = chan->sk;
+ 	bdaddr_t *src = &bt_sk(sk)->src;
