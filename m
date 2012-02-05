@@ -1,66 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: rohan16garg@gmail.com
+Message-ID: <1328439464.32199.22.camel@pohly-mobl1.fritz.box>
+Subject: [PATCH] bluetooth.h: fix compile issue in C++ with ifdef
+From: Patrick Ohly <patrick.ohly@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, Milan Crha <mcrha@redhat.com>,
+ ying.an.deng@intel.com, ulf.hofemeier@intel.com, ning.w.wang@intel.com,
+ Tino Keitel <tino.keitel+syncevolution@tikei.de>, Rohan Garg
+ <rohan16garg@gmail.com>
+Date: Sun, 05 Feb 2012 11:57:44 +0100
 In-Reply-To: <1328439363.32199.20.camel@pohly-mobl1.fritz.box>
 References: <1326702341.3360.107.camel@pohly-mobl1.fritz.box>
- <1326705845.6454.274.camel@aeonflux> <1326708597.3360.133.camel@pohly-mobl1.fritz.box>
- <1328439363.32199.20.camel@pohly-mobl1.fritz.box>
-From: Rohan Garg <rohangarg@ubuntu.com>
-Date: Sun, 5 Feb 2012 16:29:31 +0530
-Message-ID: <CAEb1ZdjiDFTngKg+zTMHgDQ7hNd6h+VAgbjeNJXQUyF+=d6a9Q@mail.gmail.com>
-Subject: Re: bluez 4.97: build failure when used in C++ apps
-To: Patrick Ohly <patrick.ohly@intel.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-	Milan Crha <mcrha@redhat.com>, ying.an.deng@intel.com, ulf.hofemeier@intel.com,
-	ning.w.wang@intel.com, Tino Keitel <tino.keitel+syncevolution@tikei.de>
-Content-Type: text/plain; charset=UTF-8
+	 <1326705845.6454.274.camel@aeonflux>
+	 <1326708597.3360.133.camel@pohly-mobl1.fritz.box>
+	 <1328439363.32199.20.camel@pohly-mobl1.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I can file a bug for tracking purposes and get the patched package in
-the archives, as long as upstream is willing to accept the patch ( or
-a modified version of the patch ) in the near future. I don't speak
-for the rest of the Ubuntu developers, but I consider the best
-approach to getting issues fixed in distros.
+The compiler error is:
+ /usr/include/bluetooth/bluetooth.h::131:9: error: invalid conversion from 'void*' to 'bt_get_le64(void*)::<anonymous struct>*'
+ ...
 
-Best
-Rohan Garg
+The reason is that C++, in contrast to C, does not allow conversion of
+void * to anything, and this code gets compiled as C++ when the app is
+written in C++. The macro with the assignment itself is older, but only
+recent Bluez starts to use it in inline functions, thus triggering the
+problem.
 
-On Sun, Feb 5, 2012 at 4:26 PM, Patrick Ohly <patrick.ohly@intel.com> wrote:
-> On Mon, 2012-01-16 at 11:09 +0100, Patrick Ohly wrote:
->> On Mo, 2012-01-16 at 10:24 +0100, Marcel Holtmann wrote:
->> > Also this topic
->> > has been raised before and I need confirmation for a GCC guru to confirm
->> > that this does exactly the same all all platforms.
->>
->> Now that you mentioned it I found the previous patch:
->> http://article.gmane.org/gmane.linux.bluez.kernel/20276/match=invalid
->> +conversion+void+bt_get_le64+anonymous+struct
->>
->> Note that my patch is different. It keeps the "struct
->> __attribute__((packed))" magic and merely changes the (void *) typecast
->> to something that works in C++ and C.
->
-> How do we move forward with this? More and more distros are picking up
-> the broken header file.
->
-> In MeeGo and Tizen we applied the patch that I had suggested.
->
-> Milan, do you know what Fedora is doing? Tino, what about Debian? Roran,
-> you had it in Ubuntu Precise Pangolin. Care to file a bug there, if
-> there isn't one already?
->
-> Would it be more acceptable for upstream to put the modified macros into
-> an ifdef so that they are really only used in C++, keeping the code for
-> C as it is now?
->
-> I'll send such a patch immediately.
->
-> --
-> Best Regards, Patrick Ohly
->
-> The content of this message is my personal opinion only and although
-> I am an employee of Intel, the statements I make here in no way
-> represent Intel's position on the issue, nor am I authorized to speak
-> on behalf of Intel on this matter.
->
->
+This patch keeps the "struct __attribute__((packed))" magic and merely
+changes the typecast so that it works in C and C++. Like the existing
+macro this patch relies on support for typeof.
+
+The new variant of the code is in an ifdef and only used for C++
+to avoid unexpected regressions in C applications.
+
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+---
+ lib/bluetooth.h |   30 ++++++++++++++++++++++++++++++
+ 1 files changed, 30 insertions(+), 0 deletions(-)
+
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index 5bd4f03..3293915 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -109,6 +109,11 @@ enum {
+ #endif
+ 
+ /* Bluetooth unaligned access */
++#ifndef __cplusplus
++/*
++ * traditional code, doesn't work in C++ because
++ * of the void * to struct pointer assignment
++ */
+ #define bt_get_unaligned(ptr)			\
+ ({						\
+ 	struct __attribute__((packed)) {	\
+@@ -125,6 +130,31 @@ do {						\
+ 	__p->__v = (val);			\
+ } while(0)
+ 
++#else /* __cplusplus */
++
++/*
++ * modified code with typeof typecast, for C++;
++ * the traditional code continues to be used for
++ * C to avoid unexpected regressions with this
++ * code here (it should work in C and C++, though)
++ */
++#define bt_get_unaligned(ptr)			\
++({						\
++	struct __attribute__((packed)) {	\
++		typeof(*(ptr)) __v;		\
++	} *__p = (typeof(__p)) (ptr);		\
++	__p->__v;				\
++})
++
++#define bt_put_unaligned(val, ptr)		\
++do {						\
++	struct __attribute__((packed)) {	\
++		typeof(*(ptr)) __v;		\
++	} *__p = (typeof(__p)) (ptr);		\
++	__p->__v = (val);			\
++} while(0)
++#endif /* __cplusplus */
++
+ #if __BYTE_ORDER == __LITTLE_ENDIAN
+ static inline uint64_t bt_get_le64(void *ptr)
+ {
+-- 
+1.7.8.3
