@@ -1,68 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: geert.uytterhoeven@gmail.com
-In-Reply-To: <CAMuHMdVim5VjEYCABXmaw8JQQQtAJk_hLGs+vys2Vr49AFOxCw@mail.gmail.com>
-References: <1326622076-957-1-git-send-email-geert@linux-m68k.org>
-	<20120115105203.GA12584@x220.P-661HNU-F1>
-	<CAMuHMdVim5VjEYCABXmaw8JQQQtAJk_hLGs+vys2Vr49AFOxCw@mail.gmail.com>
-Date: Mon, 6 Feb 2012 11:41:51 +0100
-Message-ID: <CAMuHMdUgyDgOttd+VFJviKw=WCNpt7rjEHC_FCNLfujcr-4m4A@mail.gmail.com>
-Subject: Re: [PATCH] blutetooth: Remove bogus inline for l2cap_chan_connect()
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>, "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Marcel Holtmann <marcel@holtmann.org>, "David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <1328521862.2036.14.camel@localhost>
+Subject: Re: bluez 4.97: build failure when used in C++ apps
+From: Milan Crha <mcrha@redhat.com>
+To: Patrick Ohly <patrick.ohly@intel.com>
+Cc: Rohan Garg <rohangarg@ubuntu.com>, Marcel Holtmann
+ <marcel@holtmann.org>,
+        linux-bluetooth@vger.kernel.org, ying.an.deng@intel.com,
+        ulf.hofemeier@intel.com, ning.w.wang@intel.com,
+        Tino Keitel <tino.keitel+syncevolution@tikei.de>
+Date: Mon, 06 Feb 2012 10:51:02 +0100
+In-Reply-To: <1328520596.321.9.camel@pohly-mobl1.fritz.box>
+References: <1326702341.3360.107.camel@pohly-mobl1.fritz.box>
+	 <1326705845.6454.274.camel@aeonflux>
+	 <1326708597.3360.133.camel@pohly-mobl1.fritz.box>
+	 <1328439363.32199.20.camel@pohly-mobl1.fritz.box>
+	 <CAEb1ZdjiDFTngKg+zTMHgDQ7hNd6h+VAgbjeNJXQUyF+=d6a9Q@mail.gmail.com>
+	 <1328517973.2036.8.camel@localhost>
+	 <1328520596.321.9.camel@pohly-mobl1.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+On Mon, 2012-02-06 at 10:29 +0100, Patrick Ohly wrote:
+> On Mon, 2012-02-06 at 09:46 +0100, Milan Crha wrote:
+> > On Sun, 2012-02-05 at 16:29 +0530, Rohan Garg wrote:
+> > > I can file a bug for tracking purposes and get the patched package in
+> > > the archives, as long as upstream is willing to accept the patch ( or
+> > > a modified version of the patch ) in the near future. I don't speak
+> > > for the rest of the Ubuntu developers, but I consider the best
+> > > approach to getting issues fixed in distros.
+> > 
+> > I do not package bluez for Fedora, thus I've no idea about it, but we
+> > found this issue while building on Fedora.
+> 
+> And is it still broken or was bluez patched? I don't remember.
 
-On Sun, Jan 15, 2012 at 12:25, Geert Uytterhoeven <geert@linux-m68k.org> wr=
-ote:
-> On Sun, Jan 15, 2012 at 11:52, Johan Hedberg <johan.hedberg@gmail.com> wr=
-ote:
->>> =C2=A0 =C2=A0 net/bluetooth/l2cap_sock.c: In function =E2=80=98l2cap_so=
-ck_connect=E2=80=99:
->>> =C2=A0 =C2=A0 include/net/bluetooth/l2cap.h:838: sorry, unimplemented: =
-inlining failed in call to =E2=80=98l2cap_chan_connect=E2=80=99: function b=
-ody not available
->>> =C2=A0 =C2=A0 net/bluetooth/l2cap_sock.c:126: sorry, unimplemented: cal=
-led from here
->>> =C2=A0 =C2=A0 make[1]: *** [net/bluetooth/l2cap_sock.o] Error 1
->
->> This was already reported[1] earlier this month and a patch[2] was also
->
-> Ah, it was reported as a sparse warning. I guess that's why I didn't find=
- it.
-> But a build error is worse.
->
->> created for it which right now resides in my bluetooth-next tree[3].
->> [3] http://git.kernel.org/?p=3Dlinux/kernel/git/jh/bluetooth-next.git;a=
-=3Dcommitdiff;h=3Dcd555072d0b0738c8a107776fe91902da686f94d
+Not patched (yet).
+http://koji.fedoraproject.org/koji/packageinfo?packageID=6777
 
-This doesn't seem to be in linux-next, as -next pulls
-git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next.git
-instead?
-
-Can we please get the fix in mainline ASAP, as it breaks the build with som=
-e
-versions of gcc?
-
-Thanks!
-
-Gr{oetje,eeting}s,
-
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0=C2=A0 -- Linus Torvalds
+	Milan
