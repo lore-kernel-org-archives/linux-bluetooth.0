@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH trivial 1/3] Bluetooth: Change chan_ready param from sk to chan
-Date: Mon,  6 Feb 2012 15:03:59 +0200
-Message-Id: <1328533441-29539-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH trivial 2/3] Bluetooth: Clean up l2cap_chan_add
+Date: Mon,  6 Feb 2012 15:04:00 +0200
+Message-Id: <1328533441-29539-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1328533441-29539-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1328533441-29539-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,67 +11,48 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Change is needed to remove dependency on sk when possible
-before introducing l2cap channel lock.
+Change elseif to switch. This make sense even more with following
+patches which otherwise have to add more elseifs statements.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c |   12 ++++++------
- 1 files changed, 6 insertions(+), 6 deletions(-)
+ net/bluetooth/l2cap_core.c |   11 ++++++++---
+ 1 files changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 09cd860..80fbfcf 100644
+index 80fbfcf..48fc01e 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -907,9 +907,9 @@ clean:
- 	release_sock(parent);
- }
+@@ -320,7 +320,8 @@ static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
  
--static void l2cap_chan_ready(struct sock *sk)
-+static void l2cap_chan_ready(struct l2cap_chan *chan)
- {
--	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-+	struct sock *sk = chan->sk;
- 	struct sock *parent = bt_sk(sk)->parent;
+ 	chan->conn = conn;
  
- 	BT_DBG("sk %p, parent %p", sk, parent);
-@@ -945,7 +945,7 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 
+-	if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED) {
++	switch (chan->chan_type) {
++	case L2CAP_CHAN_CONN_ORIENTED:
  		if (conn->hcon->type == LE_LINK) {
- 			if (smp_conn_security(conn, chan->sec_level))
--				l2cap_chan_ready(sk);
-+				l2cap_chan_ready(chan);
- 
- 		} else if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
- 			__clear_chan_timer(chan);
-@@ -2874,7 +2874,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		if (chan->mode == L2CAP_MODE_ERTM)
- 			l2cap_ertm_init(chan);
- 
--		l2cap_chan_ready(sk);
-+		l2cap_chan_ready(chan);
- 		goto unlock;
- 	}
- 
-@@ -3005,7 +3005,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		if (chan->mode ==  L2CAP_MODE_ERTM)
- 			l2cap_ertm_init(chan);
- 
--		l2cap_chan_ready(sk);
-+		l2cap_chan_ready(chan);
- 	}
- 
- done:
-@@ -4524,7 +4524,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 		if (chan->scid == L2CAP_CID_LE_DATA) {
- 			if (!status && encrypt) {
- 				chan->sec_level = hcon->sec_level;
--				l2cap_chan_ready(sk);
-+				l2cap_chan_ready(chan);
- 			}
- 
- 			bh_unlock_sock(sk);
+ 			/* LE connection */
+ 			chan->omtu = L2CAP_LE_DEFAULT_MTU;
+@@ -331,12 +332,16 @@ static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ 			chan->scid = l2cap_alloc_cid(conn);
+ 			chan->omtu = L2CAP_DEFAULT_MTU;
+ 		}
+-	} else if (chan->chan_type == L2CAP_CHAN_CONN_LESS) {
++		break;
++
++	case L2CAP_CHAN_CONN_LESS:
+ 		/* Connectionless socket */
+ 		chan->scid = L2CAP_CID_CONN_LESS;
+ 		chan->dcid = L2CAP_CID_CONN_LESS;
+ 		chan->omtu = L2CAP_DEFAULT_MTU;
+-	} else {
++		break;
++
++	default:
+ 		/* Raw socket can send/recv signalling messages only */
+ 		chan->scid = L2CAP_CID_SIGNALING;
+ 		chan->dcid = L2CAP_CID_SIGNALING;
 -- 
 1.7.8.3
 
