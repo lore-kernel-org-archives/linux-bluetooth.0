@@ -1,89 +1,269 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 6 Feb 2012 14:34:24 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com,
-	marcel@holtmann.org
-Subject: Re: [PATCH 0/4] Integrate better device support
-Message-ID: <20120206123418.GE17650@aemeltch-MOBL1>
-References: <1327679246-2667-1-git-send-email-dh.herrmann@googlemail.com>
+Date: Mon, 6 Feb 2012 12:44:52 +0200
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: Ulisses Furquim <ulisses@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv2 04/10] Bluetooth: Revert to mutexes from RCU list
+Message-ID: <20120206104446.GD12455@aemeltch-MOBL1>
+References: <1328279789-10870-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1328279789-10870-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CAA37ikYTzV=At6H3xgh33pWTL8aV==CYMa_N+-0exENG=9y3zg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1327679246-2667-1-git-send-email-dh.herrmann@googlemail.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CAA37ikYTzV=At6H3xgh33pWTL8aV==CYMa_N+-0exENG=9y3zg@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Ulisses,
 
-On Fri, Jan 27, 2012 at 04:47:22PM +0100, David Herrmann wrote:
-> Hi
+Thanks for the review, please see my comment below:
+
+On Fri, Feb 03, 2012 at 07:14:24PM -0200, Ulisses Furquim wrote:
+> On Fri, Feb 3, 2012 at 12:36 PM, Emeltchenko Andrei
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> >
+> > Usage of RCU list looks not reasonalbe for a number of reasons:
+> > our code sleep and we have to use socket spinlocks, some parts
+> > of code are updaters thus we need to use mutexes anyway.
 > 
-> "struct device" provides a drvdata-field that we should use properly to save
-> _driver-data_. This series makes the hci-core use pointer-arithmetic to avoid
-> using this field in the bus-core and instead converts the drivers to use the
-> drvdata field.
-> This also reduces the hci_dev structure by 4/8 bytes, yeah.
+> Just a comment. RCU updater side should be locked in most cases so
+> that's not really a big reason for removing RCU usage here.
 
-I do not know does it related to those changes but recently I got several
-dumps like shown below:
+Yes, the main reason was sleeping inside RCU.
 
-[  276.028121] Bluetooth: Virtual HCI driver ver 1.3
-[  277.028692] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[  277.054874] Bluetooth: BNEP filters: protocol multicast
+...
+> >  static struct l2cap_chan *__l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 cid)
+> >  {
+> > -       struct l2cap_chan *c, *r = NULL;
+> > -
+> > -       rcu_read_lock();
+> > +       struct l2cap_chan *c;
+> >
+> > -       list_for_each_entry_rcu(c, &conn->chan_l, list) {
+> > -               if (c->scid == cid) {
+> > -                       r = c;
+> > -                       break;
+> > -               }
+> > +       list_for_each_entry(c, &conn->chan_l, list) {
+> > +               if (c->scid == cid)
+> > +                       return c;
+> >        }
+> > -
+> > -       rcu_read_unlock();
+> > -       return r;
+> > +       return NULL;
+> >  }
+> >
+> >  /* Find channel with given SCID.
+> > @@ -115,36 +103,34 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 ci
+> >  {
+> >        struct l2cap_chan *c;
+> >
+> > +       mutex_lock(&conn->chan_lock);
+> >        c = __l2cap_get_chan_by_scid(conn, cid);
+> >        if (c)
+> >                lock_sock(c->sk);
+> > +       mutex_unlock(&conn->chan_lock);
+> >        return c;
+> >  }
+> 
+> Ok. We have now chan_lock around the unlocked versions and we still
+> return a locked sock. However, we do have to be careful not to open
+> windows where we can deadlock. See my other comments below about that.
 
-< here comes module unloading>
+The function above is not used anywhere and should be removed. I think I
+need to put chan_lock to __* versions of get channel.
 
-[  302.632063] usbcore: deregistering interface driver btusb
-[  302.664760] BUG: unable to handle kernel paging request at c16bef8f
-[  302.668371] IP: [<c12a9011>] kobject_get+0x11/0x30
-[  302.668371] *pde = 36785063 *pte = 016be161 
-[  302.668371] Oops: 0003 [#1] SMP 
-[  302.668371] Modules linked in: hci_vhci(O) btusb(-) bluetooth(O)
-snd_intel8x0 joydev snd_ac97_codec ac97_bus snd_pcm ppdev snd_seq
-snd_timer snd_seq_device parport_pc snd binfmt_misc psmouse serio_raw
-soundcore snd_page_alloc i2c_piix4 lp parport usbhid hid ahci libahci
-e1000 [last unloaded: bnep]
-[  302.668371] 
-[  302.668371] Pid: 4310, comm: rmmod Tainted: G           O 3.2.0niko+
-#74 innotek GmbH VirtualBox
-[  302.668371] EIP: 0060:[<c12a9011>] EFLAGS: 00010206 CPU: 0
-[  302.668371] EIP is at kobject_get+0x11/0x30
-[  302.668371] EAX: 6f6c2e71 EBX: c16bef73 ECX: 00000006 EDX: 00000000
-[  302.668371] ESI: c16be46b EDI: f5655c00 EBP: e9415e5c ESP: e9415e58
-[  302.668371]  DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
-[  302.668371] Process rmmod (pid: 4310, ti=e9414000 task=e982bea0
-task.ti=e9414000)
-[  302.668371] Stack:
-[  302.668371]  f45c6400 e9415e64 c1366a16 e9415e90 f81589d8 00000002
-f67e1d88 f67a6000
-[  302.668371]  e9415e90 c16bef6b 00000000 f5655c1c f5655c00 f815c1d8
-e9415eac c13e7bef
-[  302.668371]  00000000 f67a6000 f5655c1c f815c1d8 f5655c50 e9415ebc
-c136aaaa f5655c1c
-[  302.668371] Call Trace:
-[  302.668371]  [<c1366a16>] get_device+0x16/0x20
-[  302.668371]  [<f81589d8>] btusb_disconnect+0x48/0xe0 [btusb]
-[  302.668371]  [<c13e7bef>] usb_unbind_interface+0x3f/0x150
-[  302.668371]  [<c136aaaa>] __device_release_driver+0x6a/0xc0
-[  302.668371]  [<c136b2e7>] driver_detach+0x97/0xa0
-[  302.668371]  [<c136a944>] bus_remove_driver+0x74/0xe0
-[  302.668371]  [<c136b988>] driver_unregister+0x48/0x80
-[  302.668371]  [<c13e701c>] usb_deregister+0xac/0xc0
-[  302.668371]  [<f815a0ed>] btusb_driver_exit+0xd/0xf20 [btusb]
-[  302.668371]  [<c108f455>] sys_delete_module+0x135/0x250
-[  302.668371]  [<c113f0bd>] ? vfs_write+0xed/0x160
-[  302.668371]  [<c113e4a0>] ? wait_on_retry_sync_kiocb+0x50/0x50
-[  302.668371]  [<c15668ad>] ? restore_all+0xf/0xf
-[  302.668371]  [<c156d71f>] sysenter_do_call+0x12/0x38
-[  302.668371] Code: 24 08 c7 04 24 28 7a 7e c1 e8 1c 5c 01 00 8b 4c 24 18
-e9 d0 fe ff ff 8d 76 00 55 85 c0 89 e5 53 89 c3 74 0b 8b 40 1c 85 c0 74 09
-<3e> ff 43 1c 89 d8 5b 5d c3 ba 28 00 00 00 b8 9d 7b 6b c1 e8 17 
-[  302.668371] EIP: [<c12a9011>] kobject_get+0x11/0x30 SS:ESP
-0068:e9415e58
-[  302.668371] CR2: 00000000c16bef8f
-[  302.668371] ---[ end trace de038ac80f57694f ]---
+> >  static struct l2cap_chan *__l2cap_get_chan_by_ident(struct l2cap_conn *conn, u8 ident)
+> >  {
+> > -       struct l2cap_chan *c, *r = NULL;
+> > -
+> > -       rcu_read_lock();
+> > +       struct l2cap_chan *c;
+> >
+> > -       list_for_each_entry_rcu(c, &conn->chan_l, list) {
+> > -               if (c->ident == ident) {
+> > -                       r = c;
+> > -                       break;
+> > -               }
+> > +       list_for_each_entry(c, &conn->chan_l, list) {
+> > +               if (c->ident == ident)
+> > +                       return c;
+> >        }
+> > -
+> > -       rcu_read_unlock();
+> > -       return r;
+> > +       return NULL;
+> >  }
+> >
+> >  static inline struct l2cap_chan *l2cap_get_chan_by_ident(struct l2cap_conn *conn, u8 ident)
+> >  {
+> >        struct l2cap_chan *c;
+> >
+> > +       mutex_lock(&conn->chan_lock);
+> >        c = __l2cap_get_chan_by_ident(conn, ident);
+> >        if (c)
+> >                lock_sock(c->sk);
+> > +       mutex_unlock(&conn->chan_lock);
+> >        return c;
+> >  }
+> >
+> > @@ -259,6 +245,7 @@ static void l2cap_chan_timeout(struct work_struct *work)
+> >
+> >        BT_DBG("chan %p state %d", chan, chan->state);
+> >
+> > +       mutex_lock(&chan->conn->chan_lock);
+> >        lock_sock(sk);
+> >
+> >        if (chan->state == BT_CONNECTED || chan->state == BT_CONFIG)
+> > @@ -272,6 +259,7 @@ static void l2cap_chan_timeout(struct work_struct *work)
+> >        l2cap_chan_close(chan, reason);
+> >
+> >        release_sock(sk);
+> > +       mutex_unlock(&chan->conn->chan_lock);
+> >
+> >        chan->ops->close(chan->data);
+> >        l2cap_chan_put(chan);
+> > @@ -357,7 +345,9 @@ static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+> >
+> >        l2cap_chan_hold(chan);
+> >
+> > -       list_add_rcu(&chan->list, &conn->chan_l);
+> > +       mutex_lock(&conn->chan_lock);
+> > +       list_add(&chan->list, &conn->chan_l);
+> > +       mutex_unlock(&conn->chan_lock);
+> >  }
+> 
+> Hmm, I'm not sure this is correct. Have you seen l2cap_connect_req()
+> calls __l2cap_get_chan_by_dcid() without the chan_lock? It's like that
+> because it was relying on RCU but now we do need to lock chan_lock
+> there as well. I'd recommend we turn l2cap_chan_add() into
+> __l2cap_chan_add() and lock chan_lock in the callers. Do you agree?
 
-I have to say that usually I recompile only bluetooth modules and reload
-them, IMO this should not trigger it.
+Yes, this sounds reasonable. We can lock with chan_lock l2cap_connect_req
+so that socket lock remains inside chan_lock and lockdep is happy.
+
+> >  /* Delete channel.
+> > @@ -374,8 +364,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+> >
+> >        if (conn) {
+> >                /* Delete from channel list */
+> > -               list_del_rcu(&chan->list);
+> > -               synchronize_rcu();
+> > +               list_del(&chan->list);
+> >
+> >                l2cap_chan_put(chan);
+> >
+> > @@ -426,10 +415,14 @@ static void l2cap_chan_cleanup_listen(struct sock *parent)
+> >        /* Close not yet accepted channels */
+> >        while ((sk = bt_accept_dequeue(parent, NULL))) {
+> >                struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+> > +
+> > +               mutex_lock(&chan->conn->chan_lock);
+> >                __clear_chan_timer(chan);
+> >                lock_sock(sk);
+> >                l2cap_chan_close(chan, ECONNRESET);
+> >                release_sock(sk);
+> > +               mutex_unlock(&chan->conn->chan_lock);
+> > +
+> >                chan->ops->close(chan->data);
+> >        }
+> >  }
+> 
+> I see you're adding locks around l2cap_chan_close() instead of just
+> locking list_del() which might be a good approach. Is that what you
+> want? Before we had to drop the lock to call l2cap_chan_close()
+
+Yes, the idea is to minimize locks/unlocks count.
+
+> because it would be locked again to change the list (which I thought
+> wasn't good). And could you please remove the leftover comment in
+> l2cap_conn_start() about releasing the lock before calling
+> l2cap_chan_close()?
+
+Yes.
+
+> Have you seen l2cap_sock_shutdown() in l2cap_sock.c also calls
+> l2cap_chan_close()? Why don't we need to lock chan_lock there?
+
+I think chan_lock is missing there.
+
+> If that's what you wanted then please describe this kind of change in
+> the commit message (at least). This way we can refer to it if anything
+> happens or if we need to understand the change. I do think you write
+> short commit messages so please be more verbose.
+
+OK, I 'll try to write longer commit messages and split this commit to
+several chunks so that it would be easier to understand them.
+
+> 
+> >  /* ---- L2CAP signalling commands ---- */
+> > @@ -2755,6 +2753,7 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+> >                        return -EFAULT;
+> >        }
+> >
+> > +       mutex_lock(&conn->chan_lock);
+> >        sk = chan->sk;
+> >
+> >        switch (result) {
+> > @@ -2782,6 +2781,8 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+> >        }
+> >
+> >        release_sock(sk);
+> > +       mutex_unlock(&conn->chan_lock);
+> > +
+> >        return 0;
+> >  }
+> > @@ -3032,6 +3033,7 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
+> >        if (!chan)
+> >                return 0;
+> >
+> > +       mutex_lock(&conn->chan_lock);
+> >        sk = chan->sk;
+> >
+> >        rsp.dcid = cpu_to_le16(chan->scid);
+> > @@ -3042,6 +3044,7 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
+> >
+> >        l2cap_chan_del(chan, ECONNRESET);
+> >        release_sock(sk);
+> > +       mutex_unlock(&conn->chan_lock);
+> >
+> >        chan->ops->close(chan->data);
+> >        return 0;
+> 
+> Here in l2cap_connect_rsp() and l2cap_disconnect_req() it seems we
+> have a window where we can deadlock chan_lock and sock lock. Have you
+> seen that? It can be that it may never happen but it'd be good to
+> avoid that IMO. We receive a locked sock from either
+> l2cap_get_chan_by_scid() or l2cap_get_chan_by_ident() and then we try
+> to lock chan_lock. That's a different order you've been locking them.
+> Maybe we can lock chan_lock then use the unlocked versions and
+> explicitly lock sock after receiving chan?
+
+Actually I am using unlocked versions of get_chan functions. But I will
+move chan_lock before those functions since them have to be locked.
+
+> > @@ -3063,6 +3066,7 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
+> >        if (!chan)
+> >                return 0;
+> >
+> > +       mutex_lock(&conn->chan_lock);
+> >        sk = chan->sk;
+> >
+> >        l2cap_chan_del(chan, 0);
+> 
+> The last comment also applies here. Besides, aren't we missing an unlock?
+
+Yes, apparently. See comment above.
+
+> How much have you been testing these changes? I'd like to avoid
+> introducing more bugs with changes are supposed to fix things so
+> please do test this as much as you can.
+
+I was testing it with my test scripts and I am going to test with PTS. But
+still some bugs may be introduced since this is quite sensitive area.
 
 Best regards 
 Andrei Emeltchenko 
+
