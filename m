@@ -1,98 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Ulisses Furquim <ulisses@profusion.mobi>,
+	<kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 1/2] Bluetooth: Fix possible missing I-Frame acknowledgement
+Date: Tue, 7 Feb 2012 15:43:01 +0100
+Message-ID: <1328625782-19624-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <CAA37ikYZjOXUQfYAEZh2fYPWWwTCoNZh201tFCAqcZ4_oiwUWQ@mail.gmail.com>
-References: <1328588997-25029-1-git-send-email-aguedespe@gmail.com>
-	<1328588997-25029-4-git-send-email-aguedespe@gmail.com>
-	<CAJdJm_OdPCzJaBSkPx8E0ZS+TqVJV943+t8Npj+x=U8B4XRZ5w@mail.gmail.com>
-	<CACJA=fUdhynSn=YkRnL4Xc3HVnh0fo_NeBxp5SzCizv0bivohA@mail.gmail.com>
-	<CAA37ikYZjOXUQfYAEZh2fYPWWwTCoNZh201tFCAqcZ4_oiwUWQ@mail.gmail.com>
-Date: Tue, 7 Feb 2012 11:46:55 -0300
-Message-ID: <CACJA=fURLb2RrD_P+gbFG=KXfniSpmB7a4xWmE43dAUgycQWHA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Bluetooth: Use advertising cache thread-safe functions
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Ulisses Furquim <ulisses@profusion.mobi>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	Andre Guedes <aguedespe@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ulisses,
+Make l2cap_ertm_send return number of pending I-Frames transmitted
+instead of all (pending + retransmitted) I-Frames transmitted.
 
-On Tue, Feb 7, 2012 at 10:26 AM, Ulisses Furquim <ulisses@profusion.mobi> wrote:
-> Hi Andre,
->
-> On Tue, Feb 7, 2012 at 10:20 AM, Andre Guedes
-> <andre.guedes@openbossa.org> wrote:
->> Hi Lizardo,
->>
->> On Tue, Feb 7, 2012 at 7:48 AM, Anderson Lizardo
->> <anderson.lizardo@openbossa.org> wrote:
->>> Hi Andre,
->>>
->>> On Tue, Feb 7, 2012 at 12:29 AM, Andre Guedes <aguedespe@gmail.com> wrote:
->>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->>>> index 6808069..3933ccd 100644
->>>> --- a/net/bluetooth/hci_event.c
->>>> +++ b/net/bluetooth/hci_event.c
->>>> @@ -3255,12 +3255,10 @@ static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
->>>>        void *ptr = &skb->data[1];
->>>>        s8 rssi;
->>>>
->>>> -       hci_dev_lock(hdev);
->>>> -
->>>
->>> So there is no need to lock hdev between the hci_add_adv_entry() and
->>> mgmt_device_found() calls? This looks different from what is done for
->>> BR/EDR for the inquiry cache.
->>
->> Yes, mgmt_device_found() does not require locking hdev->lock.
->
-> We could then move the lock and unlock calls to inside the loop. But
-> as we might have more than one call to hci_add_adv_entry() it'd be
-> good to lock and unlock only once, no? Any problems I don't see?
+As only pending I-Frames are considered as acknowledgement, this could
+lead to situation when no ACK was sent in __l2cap_send_ack (if only
+already transmitted I-Frames were retransmitted).
 
-Yes, that's right. For this particular case, it may be better to lock
-hdev outside while() and call the thread-unsafe version here.
+Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+---
+ net/bluetooth/l2cap_core.c |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
-This way, it may be better we just drop patches 02/03 and 03/03.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 09cd860..5bb298d 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1448,8 +1448,10 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
+ 
+ 		chan->next_tx_seq = __next_seq(chan, chan->next_tx_seq);
+ 
+-		if (bt_cb(skb)->retries == 1)
++		if (bt_cb(skb)->retries == 1) {
+ 			chan->unacked_frames++;
++			nsent++;
++		}
+ 
+ 		chan->frames_sent++;
+ 
+@@ -1457,8 +1459,6 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
+ 			chan->tx_send_head = NULL;
+ 		else
+ 			chan->tx_send_head = skb_queue_next(&chan->tx_q, skb);
+-
+-		nsent++;
+ 	}
+ 
+ 	return nsent;
+-- 
+on behalf of ST-Ericsson
 
->>>>        while (num_reports--) {
->>>>                struct hci_ev_le_advertising_info *ev = ptr;
->>>>
->>>> -               __hci_add_adv_entry(hdev, ev);
->>>> +               hci_add_adv_entry(hdev, ev);
->>>>
->>>>                rssi = ev->data[ev->length];
->>>>                mgmt_device_found(hdev, &ev->bdaddr, LE_LINK, ev->bdaddr_type,
->>>> @@ -3268,8 +3266,6 @@ static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
->>>>
->>>>                ptr += sizeof(*ev) + ev->length + 1;
->>>>        }
->>>> -
->>>> -       hci_dev_unlock(hdev);
->>>>  }
->>>>
->>>>  static inline void hci_le_ltk_request_evt(struct hci_dev *hdev,
->>>> --
->>>> 1.7.9
->
-> While I don't see anything wrong with your changes I don't think we
-> really need it. All the other functions that need to be called with
-> hdev->lock held don't have "__" prefix so it'll be different than the
-> others. And you added 3 new locked functions but your last patch only
-> uses 2 of them and only in 2 places. Unless I'm missing something here
-> we don't really need this refactoring at all. Do you have any other
-> reason to do that? Are you gonna use those functions in other
-> patchset?
-
-Yes, some other functions don't have the prefix "__" and that fact
-makes a bit painful and error-prone since we always have to dig in
-the "call chain" to know if we need to hold hdev->lock or not.
-Prefixing a function with "__" is just a standard way to indicate
-that.
-
-BR,
-
-Andre
