@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1328607191-9550-2-git-send-email-sancane@gmail.com>
+In-Reply-To: <1328607191-9550-1-git-send-email-sancane@gmail.com>
 References: <1328607191-9550-1-git-send-email-sancane@gmail.com>
-	<1328607191-9550-2-git-send-email-sancane@gmail.com>
-Date: Tue, 7 Feb 2012 06:54:17 -0400
-Message-ID: <CAJdJm_PRhYf5FKYn3O7FM0qYNA2Tdt28bcMtq_WUCbN3moDDYQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] attrib-server: Fix bad error message
+Date: Tue, 7 Feb 2012 06:53:12 -0400
+Message-ID: <CAJdJm_PjNBaSP=nK1QitX8z0v0TtTqkBusMHRCN1DmUiFXbsKA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] attrib-server: Fix memory leak attaching attribute channels
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: Santiago Carot-Nemesio <sancane@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -17,25 +16,34 @@ Hi Santiago,
 
 On Tue, Feb 7, 2012 at 5:33 AM, Santiago Carot-Nemesio
 <sancane@gmail.com> wrote:
+> Channel is not being released when the channel is attached over
+> an uninitialized GATT server.
 > ---
->  src/attrib-server.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  src/attrib-server.c |    8 +++++++-
+>  1 files changed, 7 insertions(+), 1 deletions(-)
 >
 > diff --git a/src/attrib-server.c b/src/attrib-server.c
-> index a23d5d2..3d4634f 100644
+> index 2995167..a23d5d2 100644
 > --- a/src/attrib-server.c
 > +++ b/src/attrib-server.c
-> @@ -171,7 +171,7 @@ static struct gatt_server *find_gatt_server(const bdaddr_t *bdaddr)
->                char addr[18];
->
->                ba2str(bdaddr, addr);
-> -               error("Not GATT adapter found for address %s", addr);
-> +               error("Not GATT server found in %s", addr);
-
-You can also fix: Not -> No
-
->                return NULL;
+> @@ -1020,8 +1020,14 @@ guint attrib_channel_attach(GAttrib *attrib, gboolean out)
 >        }
+>
+>        server = find_gatt_server(&channel->src);
+> -       if (server == NULL)
+> +       if (server == NULL) {
+> +               char src[18];
+> +
+> +               ba2str(&channel->src, src);
+> +               error("Not GATT server found in %s", src);
+
+Looks ok, except for the typo: Not -> No
+
+> +               g_free(channel);
+>                return 0;
+> +       }
+>
+>        channel->server = server;
 >
 > --
 > 1.7.9
