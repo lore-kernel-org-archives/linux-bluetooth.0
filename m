@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 12/13 v2] client: remove use of gobex in ftp module
-Date: Tue,  7 Feb 2012 16:25:51 +0200
-Message-Id: <1328624752-26061-12-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 11/13 v2] client: remove use of gobex in map module
+Date: Tue,  7 Feb 2012 16:25:50 +0200
+Message-Id: <1328624752-26061-11-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1328624752-26061-1-git-send-email-luiz.dentz@gmail.com>
 References: <1328624752-26061-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,107 +14,57 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 gobex should not be use directly as it can interfere with ongoing
 requests of the session.
 ---
- client/ftp.c |   17 ++++++-----------
- 1 files changed, 6 insertions(+), 11 deletions(-)
+ client/map.c |   14 ++------------
+ 1 files changed, 2 insertions(+), 12 deletions(-)
 
-diff --git a/client/ftp.c b/client/ftp.c
-index fdadf43..92fcaad 100644
---- a/client/ftp.c
-+++ b/client/ftp.c
-@@ -52,7 +52,7 @@ struct ftp_data {
- 	DBusMessage *msg;
- };
+diff --git a/client/map.c b/client/map.c
+index 9a76919..68b1fbc 100644
+--- a/client/map.c
++++ b/client/map.c
+@@ -48,23 +48,16 @@ struct map_data {
  
--static void async_cb(GObex *obex, GError *err, GObexPacket *rsp,
-+static void async_cb(struct obc_session *session, GError *err,
+ static DBusConnection *conn = NULL;
+ 
+-static void simple_cb(GObex *obex, GError *err, GObexPacket *rsp,
++static void simple_cb(struct obc_session *session, GError *err,
  							gpointer user_data)
  {
- 	DBusMessage *reply, *msg = user_data;
-@@ -72,7 +72,6 @@ static DBusMessage *change_folder(DBusConnection *connection,
+ 	DBusMessage *reply;
+ 	struct map_data *map = user_data;
+-	guint8 err_code = g_obex_packet_get_operation(rsp, NULL);
+ 
+ 	if (err != NULL)
+ 		reply = g_dbus_create_error(map->msg,
+ 						"org.openobex.Error.Failed",
+ 						"%s", err->message);
+-	else if (err_code != G_OBEX_RSP_SUCCESS)
+-		reply = g_dbus_create_error(map->msg,
+-						"org.openobex.Error.Failed",
+-						"%s (0x%02x)",
+-						g_obex_strerror(err_code),
+-						err_code);
+ 	else
+ 		reply = dbus_message_new_method_return(map->msg);
+ 
+@@ -77,7 +70,6 @@ static DBusMessage *map_setpath(DBusConnection *connection,
  {
- 	struct ftp_data *ftp = user_data;
- 	struct obc_session *session = ftp->session;
--	GObex *obex = obc_session_get_obex(session);
+ 	struct map_data *map = user_data;
  	const char *folder;
+-	GObex *obex;
  	GError *err = NULL;
  
-@@ -82,7 +81,7 @@ static DBusMessage *change_folder(DBusConnection *connection,
- 		return g_dbus_create_error(message,
- 				"org.openobex.Error.InvalidArguments", NULL);
+ 	if (dbus_message_get_args(message, NULL, DBUS_TYPE_STRING, &folder,
+@@ -86,9 +78,7 @@ static DBusMessage *map_setpath(DBusConnection *connection,
+ 					"org.openobex.Error.InvalidArguments",
+ 					NULL);
  
--	g_obex_setpath(obex, folder, async_cb, message, &err);
-+	obc_session_setpath(session, folder, async_cb, message, &err);
+-	obex = obc_session_get_obex(map->session);
+-
+-	g_obex_setpath(obex, folder, simple_cb, map, &err);
++	obc_session_setpath(map->session, folder, simple_cb, map, &err);
  	if (err != NULL) {
  		DBusMessage *reply;
  		reply =  g_dbus_create_error(message,
-@@ -235,7 +234,6 @@ static DBusMessage *create_folder(DBusConnection *connection,
- {
- 	struct ftp_data *ftp = user_data;
- 	struct obc_session *session = ftp->session;
--	GObex *obex = obc_session_get_obex(session);
- 	const char *folder;
- 	GError *err = NULL;
- 
-@@ -245,7 +243,7 @@ static DBusMessage *create_folder(DBusConnection *connection,
- 		return g_dbus_create_error(message,
- 				"org.openobex.Error.InvalidArguments", NULL);
- 
--	g_obex_mkdir(obex, folder, async_cb, message, &err);
-+	obc_session_mkdir(session, folder, async_cb, message, &err);
- 	if (err != NULL) {
- 		DBusMessage *reply;
- 		reply = g_dbus_create_error(message,
-@@ -340,7 +338,6 @@ static DBusMessage *copy_file(DBusConnection *connection,
- {
- 	struct ftp_data *ftp = user_data;
- 	struct obc_session *session = ftp->session;
--	GObex *obex = obc_session_get_obex(session);
- 	const char *filename, *destname;
- 	GError *err = NULL;
- 
-@@ -351,7 +348,7 @@ static DBusMessage *copy_file(DBusConnection *connection,
- 		return g_dbus_create_error(message,
- 				"org.openobex.Error.InvalidArguments", NULL);
- 
--	g_obex_copy(obex, filename, destname, async_cb, message, &err);
-+	obc_session_copy(session, filename, destname, async_cb, message, &err);
- 	if (err != NULL) {
- 		DBusMessage *reply;
- 		reply = g_dbus_create_error(message,
-@@ -371,7 +368,6 @@ static DBusMessage *move_file(DBusConnection *connection,
- {
- 	struct ftp_data *ftp = user_data;
- 	struct obc_session *session = ftp->session;
--	GObex *obex = obc_session_get_obex(session);
- 	const char *filename, *destname;
- 	GError *err = NULL;
- 
-@@ -382,7 +378,7 @@ static DBusMessage *move_file(DBusConnection *connection,
- 		return g_dbus_create_error(message,
- 				"org.openobex.Error.InvalidArguments", NULL);
- 
--	g_obex_move(obex, filename, destname, async_cb, message, &err);
-+	obc_session_move(session, filename, destname, async_cb, message, &err);
- 	if (err != NULL) {
- 		DBusMessage *reply;
- 		reply = g_dbus_create_error(message,
-@@ -402,7 +398,6 @@ static DBusMessage *delete(DBusConnection *connection,
- {
- 	struct ftp_data *ftp = user_data;
- 	struct obc_session *session = ftp->session;
--	GObex *obex = obc_session_get_obex(session);
- 	const char *file;
- 	GError *err = NULL;
- 
-@@ -412,7 +407,7 @@ static DBusMessage *delete(DBusConnection *connection,
- 		return g_dbus_create_error(message,
- 				"org.openobex.Error.InvalidArguments", NULL);
- 
--	g_obex_delete(obex, file, async_cb, message, &err);
-+	obc_session_delete(session, file, async_cb, message, &err);
- 	if (err != NULL) {
- 		DBusMessage *reply;
- 		reply = g_dbus_create_error(message,
 -- 
 1.7.7.6
 
