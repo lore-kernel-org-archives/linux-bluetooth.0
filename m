@@ -1,73 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <201202071302.59506.szymon.janc@tieto.com>
-References: <1328539133-26410-1-git-send-email-luiz.dentz@gmail.com>
-	<201202071221.51920.szymon.janc@tieto.com>
-	<CAA37ikZSaELhgHmU53jYA==B-11PPiAxVnKxuEjHQMaQiddZCw@mail.gmail.com>
-	<201202071302.59506.szymon.janc@tieto.com>
-Date: Tue, 7 Feb 2012 09:37:23 -0300
-Message-ID: <CAA37ika1p7nHs97Nu3kmS5ARK7qjGA0RtHSVeq9+FJ8pF745bw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix not clearing ack timer when sending an i-frame
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CAJdJm_OdPCzJaBSkPx8E0ZS+TqVJV943+t8Npj+x=U8B4XRZ5w@mail.gmail.com>
+References: <1328588997-25029-1-git-send-email-aguedespe@gmail.com>
+	<1328588997-25029-4-git-send-email-aguedespe@gmail.com>
+	<CAJdJm_OdPCzJaBSkPx8E0ZS+TqVJV943+t8Npj+x=U8B4XRZ5w@mail.gmail.com>
+Date: Tue, 7 Feb 2012 09:20:21 -0300
+Message-ID: <CACJA=fUdhynSn=YkRnL4Xc3HVnh0fo_NeBxp5SzCizv0bivohA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Bluetooth: Use advertising cache thread-safe functions
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Andre Guedes <aguedespe@gmail.com>, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lizardo,
 
-On Tue, Feb 7, 2012 at 9:02 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Hi,
+On Tue, Feb 7, 2012 at 7:48 AM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Andre,
 >
->> >> But that means we would be clearing ack timer even for retransmit
->> >> frames which Im not sure can be account as an ack?
->> >
->> > Right, only pending I-frame(s) is an acknowledgement. But that means
->> > __l2cap_send_ack() is broken.
+> On Tue, Feb 7, 2012 at 12:29 AM, Andre Guedes <aguedespe@gmail.com> wrote:
+>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>> index 6808069..3933ccd 100644
+>> --- a/net/bluetooth/hci_event.c
+>> +++ b/net/bluetooth/hci_event.c
+>> @@ -3255,12 +3255,10 @@ static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
+>>        void *ptr = &skb->data[1];
+>>        s8 rssi;
 >>
->> Yes, it is broken because it was relying on l2cap_ertm_send()
->> returning if it sent any i-frame with an ack. And that wasn't
->> documented anywhere AFAIK and it's very easy for someone else to add a
->> change that breaks this assumption.
+>> -       hci_dev_lock(hdev);
+>> -
 >
-> We can add comment for that. Yet, this is what I assumed when looked at that
-> code in first place, that it returns number of pending frames sent..
->
->>
->> > To fix that, I think l2cap_ertm_send should return number of pending I-frames
->> > transmitted, not a total number of I-frames sent.
->>
->> Why? Have you checked if other part of the code relies on
->> l2cap_ertm_send() returning number of I-frames sent?
->
-> Yes, it looks like only __l2cap_send_ack() is interested if any frames were sent.
-> l2cap_chan_send is only interested if error occurred or not. Others just ignore
-> return value.
->
->>
->> > I've quickly looked over the code and that change should be OK.
->> >
->> > What do you think?
->>
->> I've already answered in my other e-mail. I'd like to see us tracking
->> what we already acked and then easily check if we need to send an ack
->> or not.
->
-> Well, if ack timer is running we have sth to ack. Isn't that enough?
+> So there is no need to lock hdev between the hci_add_adv_entry() and
+> mgmt_device_found() calls? This looks different from what is done for
+> BR/EDR for the inquiry cache.
 
-That should be the case. When ack timer is running we have something
-to ack. The point is answering if we still have pending acks to send.
-And that's being answered by the return of calling l2cap_ertm_send()
-which was wrong until now and I don't think it's a good idea. Marcel,
-any opinions on that? Luiz?
+Yes, mgmt_device_found() does not require locking hdev->lock.
 
-Best regards,
+>>        while (num_reports--) {
+>>                struct hci_ev_le_advertising_info *ev = ptr;
+>>
+>> -               __hci_add_adv_entry(hdev, ev);
+>> +               hci_add_adv_entry(hdev, ev);
+>>
+>>                rssi = ev->data[ev->length];
+>>                mgmt_device_found(hdev, &ev->bdaddr, LE_LINK, ev->bdaddr_type,
+>> @@ -3268,8 +3266,6 @@ static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
+>>
+>>                ptr += sizeof(*ev) + ev->length + 1;
+>>        }
+>> -
+>> -       hci_dev_unlock(hdev);
+>>  }
+>>
+>>  static inline void hci_le_ltk_request_evt(struct hci_dev *hdev,
+>> --
+>> 1.7.9
 
--- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+BR,
+
+Andre
