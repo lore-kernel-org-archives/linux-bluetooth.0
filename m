@@ -1,63 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_OdPCzJaBSkPx8E0ZS+TqVJV943+t8Npj+x=U8B4XRZ5w@mail.gmail.com>
-References: <1328588997-25029-1-git-send-email-aguedespe@gmail.com>
-	<1328588997-25029-4-git-send-email-aguedespe@gmail.com>
-	<CAJdJm_OdPCzJaBSkPx8E0ZS+TqVJV943+t8Npj+x=U8B4XRZ5w@mail.gmail.com>
-Date: Tue, 7 Feb 2012 09:20:21 -0300
-Message-ID: <CACJA=fUdhynSn=YkRnL4Xc3HVnh0fo_NeBxp5SzCizv0bivohA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Bluetooth: Use advertising cache thread-safe functions
-From: Andre Guedes <andre.guedes@openbossa.org>
+In-Reply-To: <CAJdJm_PRhYf5FKYn3O7FM0qYNA2Tdt28bcMtq_WUCbN3moDDYQ@mail.gmail.com>
+References: <1328607191-9550-1-git-send-email-sancane@gmail.com>
+	<1328607191-9550-2-git-send-email-sancane@gmail.com>
+	<CAJdJm_PRhYf5FKYn3O7FM0qYNA2Tdt28bcMtq_WUCbN3moDDYQ@mail.gmail.com>
+Date: Tue, 7 Feb 2012 13:13:05 +0100
+Message-ID: <CACLukzLv1pi5WoPdzbCYFA+wGQhLdwBQ7nf6htd546xRRSyQSw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] attrib-server: Fix bad error message
+From: Santiago Carot <sancane@gmail.com>
 To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Andre Guedes <aguedespe@gmail.com>, linux-bluetooth@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi,
 
-On Tue, Feb 7, 2012 at 7:48 AM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Andre,
+2012/2/7 Anderson Lizardo <anderson.lizardo@openbossa.org>:
+> Hi Santiago,
 >
-> On Tue, Feb 7, 2012 at 12:29 AM, Andre Guedes <aguedespe@gmail.com> wrote:
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index 6808069..3933ccd 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -3255,12 +3255,10 @@ static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
->>        void *ptr = &skb->data[1];
->>        s8 rssi;
+> On Tue, Feb 7, 2012 at 5:33 AM, Santiago Carot-Nemesio
+> <sancane@gmail.com> wrote:
+>> ---
+>>  src/attrib-server.c |    2 +-
+>>  1 files changed, 1 insertions(+), 1 deletions(-)
 >>
->> -       hci_dev_lock(hdev);
->> -
+>> diff --git a/src/attrib-server.c b/src/attrib-server.c
+>> index a23d5d2..3d4634f 100644
+>> --- a/src/attrib-server.c
+>> +++ b/src/attrib-server.c
+>> @@ -171,7 +171,7 @@ static struct gatt_server *find_gatt_server(const bdaddr_t *bdaddr)
+>>                char addr[18];
+>>
+>>                ba2str(bdaddr, addr);
+>> -               error("Not GATT adapter found for address %s", addr);
+>> +               error("Not GATT server found in %s", addr);
 >
-> So there is no need to lock hdev between the hci_add_adv_entry() and
-> mgmt_device_found() calls? This looks different from what is done for
-> BR/EDR for the inquiry cache.
-
-Yes, mgmt_device_found() does not require locking hdev->lock.
-
->>        while (num_reports--) {
->>                struct hci_ev_le_advertising_info *ev = ptr;
->>
->> -               __hci_add_adv_entry(hdev, ev);
->> +               hci_add_adv_entry(hdev, ev);
->>
->>                rssi = ev->data[ev->length];
->>                mgmt_device_found(hdev, &ev->bdaddr, LE_LINK, ev->bdaddr_type,
->> @@ -3268,8 +3266,6 @@ static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
->>
->>                ptr += sizeof(*ev) + ev->length + 1;
+> You can also fix: Not -> No
+>
+>>                return NULL;
 >>        }
->> -
->> -       hci_dev_unlock(hdev);
->>  }
 >>
->>  static inline void hci_le_ltk_request_evt(struct hci_dev *hdev,
 >> --
 >> 1.7.9
-
-BR,
-
-Andre
+>
+ Ok, ignore these two patches, I'll send another ones ASAP
