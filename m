@@ -1,50 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH] gateway: Fix crash if SCO connection fails
-Date: Tue,  7 Feb 2012 18:04:24 +0100
-Message-Id: <1328634264-9931-1-git-send-email-frederic.dalleau@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+In-Reply-To: <CAA37ikbyvL-_=SJQVaWH8ASE0_xzmTw1fgbxZCdA8qUE5qMW5w@mail.gmail.com>
+References: <1328625782-19624-1-git-send-email-szymon.janc@tieto.com>
+	<1328625782-19624-2-git-send-email-szymon.janc@tieto.com>
+	<CAA37ikbyvL-_=SJQVaWH8ASE0_xzmTw1fgbxZCdA8qUE5qMW5w@mail.gmail.com>
+Date: Tue, 7 Feb 2012 17:50:03 +0200
+Message-ID: <CABBYNZ+7Lmc1j57nQLdtCnLjZHz8bON-7Q7hatNAAyiAxRp1NA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Bluetooth: Fix double acking I-Frames when sending
+ pending I-Frames
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ulisses Furquim <ulisses@profusion.mobi>
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In some situations, a connect callback is created, but
-this callback is not added to media_owner. Thus when the owner
-is destroyed and at rfcomm disconnect, the callback is executed
-with an invalid pointer.
----
- audio/gateway.c |    5 +----
- 1 files changed, 1 insertions(+), 4 deletions(-)
+Hi Szymon,
 
-diff --git a/audio/gateway.c b/audio/gateway.c
-index bde3e02..fc453dd 100644
---- a/audio/gateway.c
-+++ b/audio/gateway.c
-@@ -836,12 +836,9 @@ unsigned int gateway_request_stream(struct audio_device *dev,
- 				gateway_stream_cb_t cb, void *user_data)
- {
- 	struct gateway *gw = dev->gateway;
--	unsigned int id;
- 	GError *err = NULL;
- 	GIOChannel *io;
- 
--	id = connect_cb_new(gw, cb, user_data);
--
- 	if (!gw->rfcomm)
- 		get_records(dev);
- 	else if (!gw->sco) {
-@@ -858,7 +855,7 @@ unsigned int gateway_request_stream(struct audio_device *dev,
- 	} else
- 		g_idle_add(request_stream_cb, dev);
- 
--	return id;
-+	return connect_cb_new(gw, cb, user_data);
- }
- 
- int gateway_config_stream(struct audio_device *dev, gateway_stream_cb_t cb,
+On Tue, Feb 7, 2012 at 5:26 PM, Ulisses Furquim <ulisses@profusion.mobi> wrote:
+> Hi Szymon,
+>
+> On Tue, Feb 7, 2012 at 12:43 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+>> Pending I-Frame(s) are considered as acknowledgement. To void double
+>> acking (via I-Frame and later via RR) clear ack timer when sending
+>> first pending I-Frame.
+>>
+>> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+>> ---
+>>  net/bluetooth/l2cap_core.c |    4 +++-
+>>  1 files changed, 3 insertions(+), 1 deletions(-)
+>>
+>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>> index 5bb298d..8dece4e 100644
+>> --- a/net/bluetooth/l2cap_core.c
+>> +++ b/net/bluetooth/l2cap_core.c
+>> @@ -1450,7 +1450,9 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
+>>
+>>                if (bt_cb(skb)->retries == 1) {
+>>                        chan->unacked_frames++;
+>> -                       nsent++;
+>> +
+>> +                       if (!nsent++)
+>> +                               __clear_ack_timer(chan);
+>>                }
+>>
+>>                chan->frames_sent++;
+>
+> If Luiz confirms the patches solve the problem I'm ok with them for now. Thanks.
+>
+> Best regards,
+>
+> --
+> Ulisses Furquim
+> ProFUSION embedded systems
+> http://profusion.mobi
+> Mobile: +55 19 9250 0942
+> Skype: ulissesffs
+
+Tested with test-server and test-client, both GET and PUT works.
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
 -- 
-1.7.5.4
-
+Luiz Augusto von Dentz
