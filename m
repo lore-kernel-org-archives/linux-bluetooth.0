@@ -1,73 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 Feb 2012 11:23:43 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix device reset
-Message-ID: <20120207092337.GA5683@aemeltch-MOBL1>
-References: <1328536743-8343-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20120206152113.GA12729@x220>
- <1328554926.2062.84.camel@aeonflux>
- <CAMXE1-rSmSVvYyRjLo2pZWLfFF+QWh-1pTz--+uNstLHR367aQ@mail.gmail.com>
- <1328557131.2062.85.camel@aeonflux>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Ulisses Furquim <ulisses@profusion.mobi>
+Subject: Re: [PATCH] Bluetooth: Fix not clearing ack timer when sending an i-frame
+Date: Tue, 7 Feb 2012 09:08:45 +0100
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <1328539133-26410-1-git-send-email-luiz.dentz@gmail.com>  <CAA37ikb_RZixK2dYZa2YED=Z942Uu6=W92_xivNEjPAq+w7cqA@mail.gmail.com>
+In-Reply-To: <CAA37ikb_RZixK2dYZa2YED=Z942Uu6=W92_xivNEjPAq+w7cqA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328557131.2062.85.camel@aeonflux>
+Content-Type: text/plain; charset="us-ascii"
+Message-ID: <201202070908.45952.szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
 
-On Mon, Feb 06, 2012 at 11:38:51AM -0800, Marcel Holtmann wrote:
-> Hi Andrei,
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > ---
+> >  net/bluetooth/l2cap_core.c |    8 +++++++-
+> >  1 files changed, 7 insertions(+), 1 deletions(-)
+> >
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index 09cd860..e969677 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -1448,8 +1448,10 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
+> >
+> >                chan->next_tx_seq = __next_seq(chan, chan->next_tx_seq);
+> >
+> > -               if (bt_cb(skb)->retries == 1)
+> > +               if (bt_cb(skb)->retries == 1) {
+> >                        chan->unacked_frames++;
+> > +                       __clear_ack_timer(chan);
+> > +               }
+> >
+> >                chan->frames_sent++;
 > 
-> > > > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > > >
-> > > > >
-> > > > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > > > ---
-> > > > >  net/bluetooth/hci_core.c |    2 +-
-> > > > >  1 files changed, 1 insertions(+), 1 deletions(-)
-> > > > >
-> > > > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > > > > index e77cc79..3f30714 100644
-> > > > > --- a/net/bluetooth/hci_core.c
-> > > > > +++ b/net/bluetooth/hci_core.c
-> > > > > @@ -822,7 +822,7 @@ static int hci_dev_do_close(struct hci_dev
-> > *hdev)
-> > > > >     skb_queue_purge(&hdev->cmd_q);
-> > > > >     atomic_set(&hdev->cmd_cnt, 1);
-> > > > >     if (!test_bit(HCI_RAW, &hdev->flags) &&
-> > > > > -                           test_bit(HCI_QUIRK_NO_RESET,
-> > &hdev->quirks)) {
-> > > > > +                   !test_bit(HCI_QUIRK_NO_RESET,
-> > &hdev->quirks)) {
-> > > > >             set_bit(HCI_INIT, &hdev->flags);
-> > > > >             __hci_request(hdev, hci_reset_req, 0,
-> > > > >                                     msecs_to_jiffies(250));
-> > > >
-> > > > Nack. The NO_RESET quirk is supposed to prevent reset during the
-> > device
-> > > > init sequence. The purpose of the test in hci_dev_do_close() is to
-> > let
-> > > > the reset be done there instead.
-> > >
-> > > we might wanna rename this into HCI_QUIRK_RESET_ON_CLOSE. Otherwise
-> > > people keep in getting confused.
-> > >
-> > 
-> > Moreover without my patch my USB dongle gets stuck after reset.
-> 
-> please send hcidump traces for this. And you mean hciconfig hci0 reset?
+> Hmm, maybe we can clear ack timer only once if we check nsent in the
+> end of l2cap_ertm_send() instead of potentially call it several times?
+> Not sure if it's worth it or not, though.
 
-In the trace there is only one line:
+This is what __l2cap_send_ack is doing  i.e. sends RR frame only if
+l2cap_ertm_send() returned 0 (or error). Would be good to have this consistent.
 
-< HCI Command: Reset (0x03|0x0003) plen 0
+So maybe just clear ack timer when incrementing nsent for the 1st time?
 
-Then chip stuck (I am testing this inside virtual machine).
+if (!nsent++)
+	__clear_ack_timer(chan);
 
-I have A-Link BCM USB dongle.
 
-Best regards 
-Andrei Emeltchenko 
-> 
+-- 
+BR
+Szymon Janc
