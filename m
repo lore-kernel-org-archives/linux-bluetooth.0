@@ -1,28 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 Feb 2012 12:42:23 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 01/13 v3] client: fix not checking session_request
- return
-Message-ID: <20120208104223.GA31021@x220.ger.corp.intel.com>
-References: <1328694249-22225-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328694249-22225-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1328660010-14247-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1328660010-14247-1-git-send-email-vinicius.gomes@openbossa.org>
+Date: Wed, 8 Feb 2012 06:36:49 -0400
+Message-ID: <CAJdJm_N=VLApJpSfKYj6wTvAviMe2j0F3MU2icESfnWLgu=CTw@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Add support for reusing the same hci_conn
+ for LE links
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-On Wed, Feb 08, 2012, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> In case session_request return an error proceed to the next
+On Tue, Feb 7, 2012 at 8:13 PM, Vinicius Costa Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> As most LE devices leave advertising mode when they enter the connected
+> state, we may want to "pass" that connection to other users.
+>
+> The first user will be the pairing procedure, the connection is
+> established without an associated socket, after the pairing is
+> complete, userspace may want to discover via GATT what services the
+> newly bonded device has.
+>
+> If userspace establishes the connection while the timeout still
+> hasn't expired, the connection will be re-used.
+>
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 > ---
->  client/session.c |   13 ++++++++++---
->  1 files changed, 10 insertions(+), 3 deletions(-)
+>
+> Changes: Rebased against current bluetooth-next.
+>
+>
+>  net/bluetooth/hci_conn.c   |   32 +++++++++++++++------------
+>  net/bluetooth/l2cap_core.c |   51 +++++++++++++++++++++++++++++--------------
+>  2 files changed, 52 insertions(+), 31 deletions(-)
 
-All patches in this set have been applied. Thanks.
+Just to complement, this also fixes an apparently recent regression
+where MGMT_OP_PAIR_DEVICE was not triggering SMP pairing for LE.
+Applying this patch made "simple-agent hci0 <bdaddr>" trigger SMP
+pairing as before.
 
-Johan
+Best regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
