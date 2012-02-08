@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Fix l2cap_tx_window_full
-Date: Wed,  8 Feb 2012 15:47:35 +0200
-Message-Id: <1328708855-3010-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH] Bluetooth: Fix l2cap_tx_window_full
+Date: Wed,  8 Feb 2012 14:12:26 +0200
+Message-Id: <1328703146-13835-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -18,23 +18,19 @@ tx window which is much simpler.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Add debug
-
- include/net/bluetooth/l2cap.h |   10 +++-------
- 1 files changed, 3 insertions(+), 7 deletions(-)
+ include/net/bluetooth/l2cap.h |    9 +--------
+ 1 files changed, 1 insertions(+), 8 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 42fdbb8..bcfddb2 100644
+index 42fdbb8..3778c0c 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -661,14 +661,10 @@ static inline __u16 __next_seq(struct l2cap_chan *chan, __u16 seq)
+@@ -661,14 +661,7 @@ static inline __u16 __next_seq(struct l2cap_chan *chan, __u16 seq)
  
  static inline int l2cap_tx_window_full(struct l2cap_chan *ch)
  {
 -	int sub;
-+	BT_DBG("chan %p unacked %d tx_win %d", ch, ch->unacked_frames,
-+							ch->remote_tx_win);
- 
+-
 -	sub = (ch->next_tx_seq - ch->expected_ack_seq) % 64;
 -
 -	if (sub < 0)
