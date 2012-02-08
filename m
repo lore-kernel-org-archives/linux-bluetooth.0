@@ -1,48 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1328660010-14247-1-git-send-email-vinicius.gomes@openbossa.org>
-References: <1328660010-14247-1-git-send-email-vinicius.gomes@openbossa.org>
-Date: Wed, 8 Feb 2012 06:36:49 -0400
-Message-ID: <CAJdJm_N=VLApJpSfKYj6wTvAviMe2j0F3MU2icESfnWLgu=CTw@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Add support for reusing the same hci_conn
- for LE links
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH obexd 13/13 v3] client: remove gobex dependency of session
+Date: Wed,  8 Feb 2012 11:44:09 +0200
+Message-Id: <1328694249-22225-13-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1328694249-22225-1-git-send-email-luiz.dentz@gmail.com>
+References: <1328694249-22225-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Feb 7, 2012 at 8:13 PM, Vinicius Costa Gomes
-<vinicius.gomes@openbossa.org> wrote:
-> As most LE devices leave advertising mode when they enter the connected
-> state, we may want to "pass" that connection to other users.
->
-> The first user will be the pairing procedure, the connection is
-> established without an associated socket, after the pairing is
-> complete, userspace may want to discover via GATT what services the
-> newly bonded device has.
->
-> If userspace establishes the connection while the timeout still
-> hasn't expired, the connection will be re-used.
->
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> ---
->
-> Changes: Rebased against current bluetooth-next.
->
->
->  net/bluetooth/hci_conn.c   |   32 +++++++++++++++------------
->  net/bluetooth/l2cap_core.c |   51 +++++++++++++++++++++++++++++--------------
->  2 files changed, 52 insertions(+), 31 deletions(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Just to complement, this also fixes an apparently recent regression
-where MGMT_OP_PAIR_DEVICE was not triggering SMP pairing for LE.
-Applying this patch made "simple-agent hci0 <bdaddr>" trigger SMP
-pairing as before.
+Modules should no longer need to access gobex directly
+---
+ client/ftp.c     |    1 -
+ client/session.c |    5 -----
+ client/session.h |    2 --
+ 3 files changed, 0 insertions(+), 8 deletions(-)
 
-Best regards,
+diff --git a/client/ftp.c b/client/ftp.c
+index 92fcaad..9e3f6b3 100644
+--- a/client/ftp.c
++++ b/client/ftp.c
+@@ -33,7 +33,6 @@
+ #include "log.h"
+ 
+ #include "session.h"
+-#include "transfer.h"
+ #include "driver.h"
+ #include "ftp.h"
+ 
+diff --git a/client/session.c b/client/session.c
+index a1a528a..585e402 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -1086,11 +1086,6 @@ const char *obc_session_get_target(struct obc_session *session)
+ 	return session->driver->target;
+ }
+ 
+-GObex *obc_session_get_obex(struct obc_session *session)
+-{
+-	return session->obex;
+-}
+-
+ static struct obc_transfer *obc_session_get_transfer(
+ 						struct obc_session *session)
+ {
+diff --git a/client/session.h b/client/session.h
+index 008b466..f082510 100644
+--- a/client/session.h
++++ b/client/session.h
+@@ -24,7 +24,6 @@
+ #include <stdint.h>
+ #include <glib.h>
+ #include <gdbus.h>
+-#include <gobex.h>
+ 
+ struct obc_session;
+ 
+@@ -56,7 +55,6 @@ const char *obc_session_get_agent(struct obc_session *session);
+ 
+ const char *obc_session_get_path(struct obc_session *session);
+ const char *obc_session_get_target(struct obc_session *session);
+-GObex *obc_session_get_obex(struct obc_session *session);
+ const char *obc_session_get_buffer(struct obc_session *session, size_t *size);
+ void *obc_session_get_params(struct obc_session *session, size_t *size);
+ 
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.7.6
+
