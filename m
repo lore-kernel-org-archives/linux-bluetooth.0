@@ -1,43 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 Feb 2012 10:21:25 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] attrib-server: Fix memory leak attaching attribute
- channels
-Message-ID: <20120208082123.GA5917@aemeltch-MOBL1>
-References: <1328621205-14440-1-git-send-email-sancane@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328621205-14440-1-git-send-email-sancane@gmail.com>
+Message-ID: <1328678855.28848.6.camel@aeonflux>
+Subject: Getting L2CAP ERTM support into better upstream state
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Date: Wed, 08 Feb 2012 06:27:35 +0100
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+Hello everyone,
 
-On Tue, Feb 07, 2012 at 02:26:44PM +0100, Santiago Carot-Nemesio wrote:
-> Channel is not being released when the channel is attached over
-> an uninitialized GATT server.
-> ---
->  src/attrib-server.c |    8 +++++++-
->  1 files changed, 7 insertions(+), 1 deletions(-)
-> 
-> diff --git a/src/attrib-server.c b/src/attrib-server.c
-> index 2995167..e51f695 100644
-> --- a/src/attrib-server.c
-> +++ b/src/attrib-server.c
-> @@ -1020,8 +1020,14 @@ guint attrib_channel_attach(GAttrib *attrib, gboolean out)
->  	}
->  
->  	server = find_gatt_server(&channel->src);
-> -	if (server == NULL)
-> +	if (server == NULL) {
-> +		char src[18];
+we currently have the problem on our hand that our upstream L2CAP
+support is not as good as it should be. And many Android products start
+deviating from it to fix issues with. That is of course something we can
+not have. Fragmentation on this level is not useful for anyone. It will
+hurt everybody in the longterm. So I asked Mat to port over the QUIC
+code to the latest upstream so we can start a discussion here.
 
-Don't we have a good define for this magic number? I saw it in several
-places.
+https://www.codeaurora.org/gitweb/quic/bluetooth/?p=bluetooth-next.git;a=commit;h=d02ef660d1ec9e9312798561fd688a4c717d339e
 
-Best regards 
-Andrei Emeltchenko 
+To make one thing perfectly clear here. I want that our upstream code
+reflects the state machine transition from the L2CAP specification. I
+know that historically this was not the case and that was for a reason.
+All early specification where pretty unclear in this area, but with the
+introduction of ERTM the Bluetooth SIG got this fixed and now it is our
+time to get this clearly into our code as well.
+
+With the separation of L2CAP channels from L2CAP sockets this should
+make it even more easier to use since we do not need and should not to
+use socket states anymore anyway.
+
+Regards
+
+Marcel
 
 
