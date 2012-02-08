@@ -1,30 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] mgmtops: Fix memory leak when parsing EIR
-Date: Wed,  8 Feb 2012 16:04:17 -0400
-Message-Id: <1328731457-3047-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH] device: Shutdown connection if ATTIO list is empty
+Date: Wed,  8 Feb 2012 16:05:10 -0300
+Message-Id: <1328727910-20179-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Shutdown the ongoing connection attempt if the last ATTIO callback
+is removed from the list.
 ---
- plugins/mgmtops.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+ src/device.c |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
 
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 5c6ff29..4424ec9 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -447,6 +447,8 @@ static void mgmt_device_connected(int sk, uint16_t index, void *buf, size_t len)
- 	btd_event_conn_complete(&info->bdaddr, &ev->addr.bdaddr,
- 					mgmt_addr_type(ev->addr.type),
- 					eir_data.name, eir_data.dev_class);
-+
-+	eir_data_free(&eir_data);
- }
+diff --git a/src/device.c b/src/device.c
+index c7c741c..b0e6adc 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2883,5 +2883,11 @@ gboolean btd_device_remove_attio_callback(struct btd_device *device, guint id)
+ 		device->attrib = NULL;
+ 	}
  
- static void mgmt_device_disconnected(int sk, uint16_t index, void *buf,
++	if (device->att_io) {
++		g_io_channel_shutdown(device->att_io, FALSE, NULL);
++		g_io_channel_unref(device->att_io);
++		device->att_io = NULL;
++	}
++
+ 	return TRUE;
+ }
 -- 
-1.7.5.4
+1.7.9
 
