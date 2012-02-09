@@ -1,37 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1328276576-2996-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1328276576-2996-1-git-send-email-anderson.lizardo@openbossa.org>
+Date: Thu, 9 Feb 2012 08:59:33 -0400
+Message-ID: <CAJdJm_N9fNYW-wDEhh-LpYkCTc_W7fK6gSFH5+emW7Y+-M_M8g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] proximity: Fix Proximity API to match documentation
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0] Bluetooth: Remove extra chan_put
-Date: Thu,  9 Feb 2012 15:06:17 +0200
-Message-Id: <1328792777-25914-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+ping
 
-Removing l2cap_chan_put since in this function we use l2cap_chan_close
-and ops->close which use l2cap_chan_put.
+On Fri, Feb 3, 2012 at 9:42 AM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Recently, the documented D-Bus interface for Proximity was changed to
+> prepare for the upcoming Proximity Reporter API.
+> ---
+>  proximity/monitor.c |    2 +-
+>  test/test-proximity |    4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/proximity/monitor.c b/proximity/monitor.c
+> index 76020ee..7bf95a1 100644
+> --- a/proximity/monitor.c
+> +++ b/proximity/monitor.c
+> @@ -49,7 +49,7 @@
+>  #include "monitor.h"
+>  #include "textfile.h"
+>
+> -#define PROXIMITY_INTERFACE "org.bluez.Proximity"
+> +#define PROXIMITY_INTERFACE "org.bluez.ProximityMonitor"
+>
+>  #define ALERT_LEVEL_CHR_UUID 0x2A06
+>  #define POWER_LEVEL_CHR_UUID 0x2A07
+> diff --git a/test/test-proximity b/test/test-proximity
+> index 289908e..130590c 100755
+> --- a/test/test-proximity
+> +++ b/test/test-proximity
+> @@ -53,11 +53,11 @@ if __name__ == "__main__":
+>        device_path = adapter.FindDevice(options.address)
+>
+>        bus.add_signal_receiver(property_changed, bus_name="org.bluez",
+> -                               dbus_interface="org.bluez.Proximity",
+> +                               dbus_interface="org.bluez.ProximityMonitor",
+>                                signal_name="PropertyChanged")
+>
+>        proximity = dbus.Interface(bus.get_object("org.bluez",
+> -                                       device_path), "org.bluez.Proximity")
+> +                                       device_path), "org.bluez.ProximityMonitor")
+>
+>        print "Proximity SetProperty('%s', '%s')" % (args[0], args[1])
+>        proximity.SetProperty(args[0], args[1])
+> --
+> 1.7.5.4
+>
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
-I am not sure that I have checked all possible cases, so I am sending
-this as RFC.
 
- net/bluetooth/l2cap_core.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f1a6b3c..7db6d7f 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -274,7 +274,6 @@ static void l2cap_chan_timeout(struct work_struct *work)
- 	release_sock(sk);
- 
- 	chan->ops->close(chan->data);
--	l2cap_chan_put(chan);
- }
- 
- struct l2cap_chan *l2cap_chan_create(struct sock *sk)
 -- 
-1.7.8.3
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
