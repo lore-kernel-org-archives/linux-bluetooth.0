@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 01/16] Bluetooth: trivial: Fix long line
-Date: Thu,  9 Feb 2012 16:17:22 +0200
-Message-Id: <1328797057-26331-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 16/16] Bluetooth: Remove socket lock check
+Date: Thu,  9 Feb 2012 16:17:37 +0200
+Message-Id: <1328797057-26331-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1328797057-26331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1328797057-26331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,26 +11,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Simplify code so that we do not need to check whether socket is locked.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+ net/bluetooth/l2cap_sock.c |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f1a6b3c..8dfccb3 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2743,7 +2743,8 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 	result = __le16_to_cpu(rsp->result);
- 	status = __le16_to_cpu(rsp->status);
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index ddac4cb..358975a 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -125,15 +125,15 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
  
--	BT_DBG("dcid 0x%4.4x scid 0x%4.4x result 0x%2.2x status 0x%2.2x", dcid, scid, result, status);
-+	BT_DBG("dcid 0x%4.4x scid 0x%4.4x result 0x%2.2x status 0x%2.2x",
-+						dcid, scid, result, status);
+ 	err = l2cap_chan_connect(chan, la.l2_psm, la.l2_cid, &la.l2_bdaddr);
+ 	if (err)
+-		goto done;
++		return err;
  
- 	if (scid) {
- 		chan = l2cap_get_chan_by_scid(conn, scid);
+ 	lock_sock(sk);
+ 
+ 	err = bt_sock_wait_state(sk, BT_CONNECTED,
+ 			sock_sndtimeo(sk, flags & O_NONBLOCK));
+-done:
+-	if (sock_owned_by_user(sk))
+-		release_sock(sk);
++
++	release_sock(sk);
++
+ 	return err;
+ }
+ 
 -- 
 1.7.8.3
 
