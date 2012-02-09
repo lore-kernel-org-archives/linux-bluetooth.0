@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 13/16] Bluetooth: Change locking logic for conn/chan ready
-Date: Thu,  9 Feb 2012 16:17:34 +0200
-Message-Id: <1328797057-26331-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 15/16] Bluetooth: Use l2cap chan lock in socket connect
+Date: Thu,  9 Feb 2012 16:17:36 +0200
+Message-Id: <1328797057-26331-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1328797057-26331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1328797057-26331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,69 +11,111 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-In l2cap_conn_ready and l2cap_chan_ready change locking logic and
-use explicit socket when needed.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |   16 ++++++++++++----
- 1 files changed, 12 insertions(+), 4 deletions(-)
+ net/bluetooth/l2cap_core.c |   24 ++++++++++++++++++------
+ net/bluetooth/l2cap_sock.c |    2 ++
+ 2 files changed, 20 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e03c5df..284c5c9 100644
+index 2b97cf7..bb390ec 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -943,7 +943,11 @@ clean:
- static void l2cap_chan_ready(struct l2cap_chan *chan)
- {
- 	struct sock *sk = chan->sk;
--	struct sock *parent = bt_sk(sk)->parent;
-+	struct sock *parent;
-+
-+	lock_sock(sk);
-+
-+	parent = bt_sk(sk)->parent;
+@@ -1182,7 +1182,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
  
- 	BT_DBG("sk %p, parent %p", sk, parent);
+ 	hci_dev_lock(hdev);
  
-@@ -955,6 +959,8 @@ static void l2cap_chan_ready(struct l2cap_chan *chan)
+-	lock_sock(sk);
++	l2cap_chan_lock(chan);
  
- 	if (parent)
- 		parent->sk_data_ready(parent, 0);
-+
-+	release_sock(sk);
- }
- 
- static void l2cap_conn_ready(struct l2cap_conn *conn)
-@@ -972,23 +978,25 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 	mutex_lock(&conn->chan_lock);
- 
- 	list_for_each_entry(chan, &conn->chan_l, list) {
--		struct sock *sk = chan->sk;
- 
--		bh_lock_sock(sk);
-+		l2cap_chan_lock(chan);
- 
- 		if (conn->hcon->type == LE_LINK) {
- 			if (smp_conn_security(conn, chan->sec_level))
- 				l2cap_chan_ready(chan);
- 
- 		} else if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
-+			struct sock *sk = chan->sk;
- 			__clear_chan_timer(chan);
-+			lock_sock(sk);
- 			__l2cap_state_change(chan, BT_CONNECTED);
- 			sk->sk_state_change(sk);
-+			release_sock(sk);
- 
- 		} else if (chan->state == BT_CONNECT)
- 			l2cap_do_start(chan);
- 
--		bh_unlock_sock(sk);
-+		l2cap_chan_unlock(chan);
+ 	/* PSM must be odd and lsb of upper byte must be 0 */
+ 	if ((__le16_to_cpu(psm) & 0x0101) != 0x0001 && !cid &&
+@@ -1209,18 +1209,20 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+ 		goto done;
  	}
  
- 	mutex_unlock(&conn->chan_lock);
++	lock_sock(sk);
++
+ 	switch (sk->sk_state) {
+ 	case BT_CONNECT:
+ 	case BT_CONNECT2:
+ 	case BT_CONFIG:
+ 		/* Already connecting */
+ 		err = 0;
+-		goto done;
++		goto sock_release;
+ 
+ 	case BT_CONNECTED:
+ 		/* Already connected */
+ 		err = -EISCONN;
+-		goto done;
++		goto sock_release;
+ 
+ 	case BT_OPEN:
+ 	case BT_BOUND:
+@@ -1229,11 +1231,14 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+ 
+ 	default:
+ 		err = -EBADFD;
+-		goto done;
++		goto sock_release;
+ 	}
+ 
+ 	/* Set destination address and psm */
+ 	bacpy(&bt_sk(sk)->dst, dst);
++
++	release_sock(sk);
++
+ 	chan->psm = psm;
+ 	chan->dcid = cid;
+ 
+@@ -1261,23 +1266,30 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+ 	/* Update source addr of the socket */
+ 	bacpy(src, conn->src);
+ 
++	l2cap_chan_unlock(chan);
+ 	l2cap_chan_add(conn, chan);
++	l2cap_chan_lock(chan);
+ 
+-	__l2cap_state_change(chan, BT_CONNECT);
++	l2cap_state_change(chan, BT_CONNECT);
+ 	__set_chan_timer(chan, sk->sk_sndtimeo);
+ 
+ 	if (hcon->state == BT_CONNECTED) {
+ 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+ 			__clear_chan_timer(chan);
+ 			if (l2cap_chan_check_security(chan))
+-				__l2cap_state_change(chan, BT_CONNECTED);
++				l2cap_state_change(chan, BT_CONNECTED);
+ 		} else
+ 			l2cap_do_start(chan);
+ 	}
+ 
+ 	err = 0;
++	goto done;
++
++sock_release:
++	release_sock(sk);
+ 
+ done:
++	l2cap_chan_unlock(chan);
+ 	hci_dev_unlock(hdev);
+ 	hci_dev_put(hdev);
+ 	return err;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index dea5418..ddac4cb 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -127,6 +127,8 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+ 	if (err)
+ 		goto done;
+ 
++	lock_sock(sk);
++
+ 	err = bt_sock_wait_state(sk, BT_CONNECTED,
+ 			sock_sndtimeo(sk, flags & O_NONBLOCK));
+ done:
 -- 
 1.7.8.3
 
