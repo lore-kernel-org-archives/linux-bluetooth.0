@@ -3,90 +3,152 @@ MIME-Version: 1.0
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 7/7] GAttrib: Remove unused function
-Date: Thu,  9 Feb 2012 12:56:09 -0300
-Message-Id: <1328802969-20244-8-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 6/7] device: Add common ATT connection cleanup function
+Date: Thu,  9 Feb 2012 12:56:08 -0300
+Message-Id: <1328802969-20244-7-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1328802969-20244-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1328802969-20244-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-GAttrib disconnection tracking is being moved to device.c
 ---
- attrib/gattrib.c |   22 +---------------------
- attrib/gattrib.h |    3 ---
- 2 files changed, 1 insertions(+), 24 deletions(-)
+ src/device.c |   81 +++++++++++++++++++++------------------------------------
+ 1 files changed, 30 insertions(+), 51 deletions(-)
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 12a9fcf..8a1e97b 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -51,9 +51,7 @@ struct _GAttrib {
- 	guint next_cmd_id;
- 	guint next_evt_id;
- 	GDestroyNotify destroy;
--	GAttribDisconnectFunc disconnect;
- 	gpointer destroy_user_data;
--	gpointer disc_user_data;
- };
- 
- struct command {
-@@ -232,18 +230,6 @@ GIOChannel *g_attrib_get_channel(GAttrib *attrib)
- 	return attrib->io;
+diff --git a/src/device.c b/src/device.c
+index f588e3c..558c4c0 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -198,6 +198,30 @@ static void browse_request_free(struct browse_req *req)
+ 	g_free(req);
  }
  
--gboolean g_attrib_set_disconnect_function(GAttrib *attrib,
--		GAttribDisconnectFunc disconnect, gpointer user_data)
--{
--	if (attrib == NULL)
--		return FALSE;
--
--	attrib->disconnect = disconnect;
--	attrib->disc_user_data = user_data;
--
--	return TRUE;
--}
--
- gboolean g_attrib_set_destroy_function(GAttrib *attrib,
- 		GDestroyNotify destroy, gpointer user_data)
++static void att_cleanup(struct btd_device *device)
++{
++	if (device->attachid) {
++		attrib_channel_detach(device->attrib, device->attachid);
++		device->attachid = 0;
++	}
++
++	if (device->cleanup_id) {
++		g_source_remove(device->cleanup_id);
++		device->cleanup_id = 0;
++	}
++
++	if (device->att_io) {
++		g_io_channel_shutdown(device->att_io, FALSE, NULL);
++		g_io_channel_unref(device->att_io);
++		device->att_io = NULL;
++	}
++
++	if (device->attrib) {
++		g_attrib_unref(device->attrib);
++		device->attrib = NULL;
++	}
++}
++
+ static void browse_request_cancel(struct browse_req *req)
  {
-@@ -274,12 +260,8 @@ static gboolean can_write_data(GIOChannel *io, GIOCondition cond,
- 	gsize len;
- 	GIOStatus iostat;
+ 	struct btd_device *device = req->device;
+@@ -211,16 +235,7 @@ static void browse_request_cancel(struct browse_req *req)
  
--	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
--		if (attrib->disconnect)
--			attrib->disconnect(attrib->disc_user_data);
--
-+	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
- 		return FALSE;
+ 	bt_cancel_discovery(&src, &device->bdaddr);
+ 
+-	if (device->cleanup_id) {
+-		g_source_remove(device->cleanup_id);
+-		device->cleanup_id = 0;
 -	}
- 
- 	cmd = g_queue_peek_head(attrib->queue);
- 	if (cmd == NULL)
-@@ -338,8 +320,6 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
- 
- 	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
- 		attrib->read_watch = 0;
--		if (attrib->disconnect)
--			attrib->disconnect(attrib->disc_user_data);
- 		return FALSE;
- 	}
- 
-diff --git a/attrib/gattrib.h b/attrib/gattrib.h
-index 47c0d60..f73b741 100644
---- a/attrib/gattrib.h
-+++ b/attrib/gattrib.h
-@@ -47,9 +47,6 @@ void g_attrib_unref(GAttrib *attrib);
- 
- GIOChannel *g_attrib_get_channel(GAttrib *attrib);
- 
--gboolean g_attrib_set_disconnect_function(GAttrib *attrib,
--		GAttribDisconnectFunc disconnect, gpointer user_data);
 -
- gboolean g_attrib_set_destroy_function(GAttrib *attrib,
- 		GDestroyNotify destroy, gpointer user_data);
+-	if (device->att_io) {
+-		g_io_channel_shutdown(device->att_io, FALSE, NULL);
+-		g_io_channel_unref(device->att_io);
+-		device->att_io = NULL;
+-	}
++	att_cleanup(device);
  
+ 	device->browse = NULL;
+ 	browse_request_free(req);
+@@ -245,10 +260,7 @@ static void device_free(gpointer user_data)
+ 	g_slist_free_full(device->attios, g_free);
+ 	g_slist_free_full(device->attios_offline, g_free);
+ 
+-	if (device->cleanup_id)
+-		g_source_remove(device->cleanup_id);
+-
+-	g_attrib_unref(device->attrib);
++	att_cleanup(device);
+ 
+ 	if (device->tmp_records)
+ 		sdp_list_free(device->tmp_records,
+@@ -263,11 +275,6 @@ static void device_free(gpointer user_data)
+ 	if (device->auto_id)
+ 		g_source_remove(device->auto_id);
+ 
+-	if (device->att_io) {
+-		g_io_channel_shutdown(device->att_io, FALSE, NULL);
+-		g_io_channel_unref(device->att_io);
+-	}
+-
+ 	DBG("%p", device);
+ 
+ 	g_free(device->authr);
+@@ -1776,12 +1783,7 @@ static gboolean attrib_disconnected_cb(GIOChannel *io, GIOCondition cond,
+ 						att_connect_dispatched);
+ 
+ done:
+-	attrib_channel_detach(device->attrib, device->attachid);
+-	device->attachid = 0;
+-	g_attrib_unref(device->attrib);
+-	device->attrib = NULL;
+-
+-	device->cleanup_id = 0;
++	att_cleanup(device);
+ 
+ 	return FALSE;
+ }
+@@ -1809,14 +1811,8 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
+ 	device_register_services(req->conn, device, g_slist_copy(services), -1);
+ 	device_probe_drivers(device, uuids);
+ 
+-	if (device->attios == NULL && device->attios_offline == NULL) {
+-		attrib_channel_detach(device->attrib, device->attachid);
+-		g_source_remove(device->cleanup_id);
+-		device->cleanup_id = 0;
+-		device->attachid = 0;
+-		g_attrib_unref(device->attrib);
+-		device->attrib = NULL;
+-	}
++	if (device->attios == NULL && device->attios_offline == NULL)
++		att_cleanup(device);
+ 
+ 	g_slist_free(uuids);
+ 
+@@ -2975,24 +2971,7 @@ gboolean btd_device_remove_attio_callback(struct btd_device *device, guint id)
+ 	if (device->attios != NULL || device->attios_offline != NULL)
+ 		return TRUE;
+ 
+-	if (device->attachid > 0) {
+-		attrib_channel_detach(device->attrib, device->attachid);
+-		device->attachid = 0;
+-	}
+-
+-	g_source_remove(device->cleanup_id);
+-	device->cleanup_id = 0;
+-
+-	if (device->attrib) {
+-		g_attrib_unref(device->attrib);
+-		device->attrib = NULL;
+-	}
+-
+-	if (device->att_io) {
+-		g_io_channel_shutdown(device->att_io, FALSE, NULL);
+-		g_io_channel_unref(device->att_io);
+-		device->att_io = NULL;
+-	}
++	att_cleanup(device);
+ 
+ 	return TRUE;
+ }
 -- 
 1.7.8.4
 
