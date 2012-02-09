@@ -1,35 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 9 Feb 2012 17:55:23 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] device: Remove unused variable
+Message-ID: <20120209155523.GC25011@x220.ger.corp.intel.com>
+References: <1328802098-26789-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1328802098-26789-3-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 0/7] ATT connection management improvements
-Date: Thu,  9 Feb 2012 12:56:02 -0300
-Message-Id: <1328802969-20244-1-git-send-email-claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1328802098-26789-3-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The following patches are cleaning and consolidating ATT connection
-management in device.c
+Hi Claudio,
 
-Claudio Takahasi (6):
-  device: Consolidate ATT connection management
-  device: Fix notifying ATTIO drivers when browsing
-  attrib-server: Remove GAttrib disconnect callback
-  device: Remove GAttrib disconnect callback
-  device: Add common ATT connection cleanup function
-  GAttrib: Remove unused function
+On Thu, Feb 09, 2012, Claudio Takahasi wrote:
+> ---
+>  src/device.c |    4 ----
+>  1 files changed, 0 insertions(+), 4 deletions(-)
 
-Vinicius Costa Gomes (1):
-  device: Fix trying to connect if already connected
+Applied. Thanks.
 
- attrib/gattrib.c    |   22 +----
- attrib/gattrib.h    |    3 -
- src/attrib-server.c |   30 ++++--
- src/attrib-server.h |    2 +-
- src/device.c        |  253 ++++++++++++++++++++++++++++-----------------------
- 5 files changed, 160 insertions(+), 150 deletions(-)
-
--- 
-1.7.8.4
-
+Johan
