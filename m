@@ -3,119 +3,137 @@ MIME-Version: 1.0
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 5/7] device: Remove GAttrib disconnect callback
-Date: Thu,  9 Feb 2012 12:56:07 -0300
-Message-Id: <1328802969-20244-6-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 4/7] attrib-server: Remove GAttrib disconnect callback
+Date: Thu,  9 Feb 2012 12:56:06 -0300
+Message-Id: <1328802969-20244-5-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1328802969-20244-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1328802969-20244-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This patch replaces the usage of GAttrib disconnection callback by
-GIOChannel watch to track ATT channel disconnection. Connection
-management is being centralized in device to allow multi-profile
-implementations.
+GIOChannel watch to track ATTIO channel disconnection aiming to achieve
+less dependencies between attrib server, device and GAttrib.
 ---
- src/device.c |   29 +++++++++++++++++++++++------
- 1 files changed, 23 insertions(+), 6 deletions(-)
+ src/attrib-server.c |   30 +++++++++++++++++++-----------
+ src/attrib-server.h |    2 +-
+ src/device.c        |    2 +-
+ 3 files changed, 21 insertions(+), 13 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 288d327..f588e3c 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -168,6 +168,7 @@ struct btd_device {
- 	gint		ref;
- 
- 	GIOChannel      *att_io;
-+	guint		cleanup_id;
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 93a7b4f..5137bdc 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -75,6 +75,7 @@ struct gatt_channel {
+ 	guint id;
+ 	gboolean encrypted;
+ 	struct gatt_server *server;
++	guint cleanup_id;
  };
  
- static uint16_t uuid_list[] = {
-@@ -210,7 +211,12 @@ static void browse_request_cancel(struct browse_req *req)
+ struct group_elem {
+@@ -107,8 +108,11 @@ static void attrib_free(void *data)
  
- 	bt_cancel_discovery(&src, &device->bdaddr);
- 
--	if (device->att_io != NULL) {
-+	if (device->cleanup_id) {
-+		g_source_remove(device->cleanup_id);
-+		device->cleanup_id = 0;
-+	}
-+
-+	if (device->att_io) {
- 		g_io_channel_shutdown(device->att_io, FALSE, NULL);
- 		g_io_channel_unref(device->att_io);
- 		device->att_io = NULL;
-@@ -239,6 +245,9 @@ static void device_free(gpointer user_data)
- 	g_slist_free_full(device->attios, g_free);
- 	g_slist_free_full(device->attios_offline, g_free);
- 
-+	if (device->cleanup_id)
-+		g_source_remove(device->cleanup_id);
-+
- 	g_attrib_unref(device->attrib);
- 
- 	if (device->tmp_records)
-@@ -1742,17 +1751,16 @@ static void att_connect_dispatched(gpointer user_data)
- 
- static gboolean att_connect(gpointer user_data);
- 
--static void attrib_disconnected(gpointer user_data)
-+static gboolean attrib_disconnected_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
+ static void channel_free(struct gatt_channel *channel)
  {
- 	struct btd_device *device = user_data;
--	GIOChannel *io;
- 	int sock, err = 0;
- 	socklen_t len;
+-	g_attrib_unref(channel->attrib);
  
- 	if (device->browse)
- 		goto done;
- 
--	io = g_attrib_get_channel(device->attrib);
- 	sock = g_io_channel_unix_get_fd(io);
- 	len = sizeof(err);
- 	getsockopt(sock, SOL_SOCKET, SO_ERROR, &err, &len);
-@@ -1772,6 +1780,10 @@ done:
- 	device->attachid = 0;
- 	g_attrib_unref(device->attrib);
- 	device->attrib = NULL;
++	if (channel->cleanup_id)
++		g_source_remove(channel->cleanup_id);
 +
-+	device->cleanup_id = 0;
-+
-+	return FALSE;
++	g_attrib_unref(channel->attrib);
+ 	g_free(channel);
  }
  
- static void primary_cb(GSList *services, guint8 status, gpointer user_data)
-@@ -1799,6 +1811,8 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
+@@ -859,15 +863,21 @@ static uint16_t mtu_exchange(struct gatt_channel *channel, uint16_t mtu,
+ 	return enc_mtu_resp(old_mtu, pdu, len);
+ }
  
- 	if (device->attios == NULL && device->attios_offline == NULL) {
- 		attrib_channel_detach(device->attrib, device->attachid);
-+		g_source_remove(device->cleanup_id);
-+		device->cleanup_id = 0;
- 		device->attachid = 0;
- 		g_attrib_unref(device->attrib);
- 		device->attrib = NULL;
-@@ -1840,8 +1854,8 @@ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 		error("Attribute server attach failure!");
+-static void channel_disconnect(void *user_data)
++static void channel_remove(struct gatt_channel *channel)
+ {
+-	struct gatt_channel *channel = user_data;
+-
+ 	channel->server->clients = g_slist_remove(channel->server->clients,
+ 								channel);
+ 	channel_free(channel);
+ }
  
- 	device->attrib = attrib;
--	g_attrib_set_disconnect_function(device->attrib,
--					attrib_disconnected, device);
-+	device->cleanup_id = g_io_add_watch(io, G_IO_HUP,
-+					attrib_disconnected_cb, device);
++static gboolean channel_watch_cb(GIOChannel *io, GIOCondition cond,
++						gpointer user_data)
++{
++	channel_remove(user_data);
++
++	return FALSE;
++}
++
+ static void channel_handler(const uint8_t *ipdu, uint16_t len,
+ 							gpointer user_data)
+ {
+@@ -992,7 +1002,7 @@ done:
+ 							NULL, NULL, NULL);
+ }
  
- 	if (attcb->success)
- 		attcb->success(user_data);
-@@ -2966,6 +2980,9 @@ gboolean btd_device_remove_attio_callback(struct btd_device *device, guint id)
- 		device->attachid = 0;
+-guint attrib_channel_attach(GAttrib *attrib, gboolean out)
++guint attrib_channel_attach(GAttrib *attrib)
+ {
+ 	struct gatt_server *server;
+ 	struct btd_device *device;
+@@ -1050,9 +1060,8 @@ guint attrib_channel_attach(GAttrib *attrib, gboolean out)
+ 	channel->id = g_attrib_register(channel->attrib, GATTRIB_ALL_REQS,
+ 					channel_handler, channel, NULL);
+ 
+-	if (out == FALSE)
+-		g_attrib_set_disconnect_function(channel->attrib,
+-						channel_disconnect, channel);
++	channel->cleanup_id = g_io_add_watch(io, G_IO_HUP, channel_watch_cb,
++								channel);
+ 
+ 	server->clients = g_slist_append(server->clients, channel);
+ 
+@@ -1099,8 +1108,7 @@ gboolean attrib_channel_detach(GAttrib *attrib, guint id)
+ 	channel = l->data;
+ 
+ 	g_attrib_unregister(channel->attrib, channel->id);
+-
+-	channel_disconnect(channel);
++	channel_remove(channel);
+ 
+ 	return TRUE;
+ }
+@@ -1115,7 +1123,7 @@ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
  	}
  
-+	g_source_remove(device->cleanup_id);
-+	device->cleanup_id = 0;
-+
- 	if (device->attrib) {
- 		g_attrib_unref(device->attrib);
- 		device->attrib = NULL;
+ 	attrib = g_attrib_new(io);
+-	attrib_channel_attach(attrib, FALSE);
++	attrib_channel_attach(attrib);
+ 	g_io_channel_unref(io);
+ 	g_attrib_unref(attrib);
+ }
+diff --git a/src/attrib-server.h b/src/attrib-server.h
+index fb4637c..7af0cfa 100644
+--- a/src/attrib-server.h
++++ b/src/attrib-server.h
+@@ -36,5 +36,5 @@ int attrib_gap_set(struct btd_adapter *adapter, uint16_t uuid,
+ uint32_t attrib_create_sdp(struct btd_adapter *adapter, uint16_t handle,
+ 							const char *name);
+ void attrib_free_sdp(uint32_t sdp_handle);
+-guint attrib_channel_attach(GAttrib *attrib, gboolean out);
++guint attrib_channel_attach(GAttrib *attrib);
+ gboolean attrib_channel_detach(GAttrib *attrib, guint id);
+diff --git a/src/device.c b/src/device.c
+index 2502906..288d327 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1835,7 +1835,7 @@ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 	}
+ 
+ 	attrib = g_attrib_new(io);
+-	device->attachid = attrib_channel_attach(attrib, TRUE);
++	device->attachid = attrib_channel_attach(attrib);
+ 	if (device->attachid == 0)
+ 		error("Attribute server attach failure!");
+ 
 -- 
 1.7.8.4
 
