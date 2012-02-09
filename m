@@ -1,86 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1328797057-26331-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Thu, 9 Feb 2012 16:13:31 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv3 06/16] Bluetooth: Add socket error function
+Message-ID: <20120209181331.GB3174@joana>
 References: <1328797057-26331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1328797057-26331-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Thu, 9 Feb 2012 16:25:11 -0200
-Message-ID: <CAA37ikaPnRheNYxZoNRYA6Qg+ndiW887k3ZqH51htEphCK8uBA@mail.gmail.com>
-Subject: Re: [RFCv3 15/16] Bluetooth: Use l2cap chan lock in socket connect
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+ <1328797057-26331-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1328797859.28848.23.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1328797859.28848.23.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Marcel,
 
-On Thu, Feb 9, 2012 at 12:17 PM, Emeltchenko Andrei
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> @@ -1261,23 +1266,30 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
->        /* Update source addr of the socket */
->        bacpy(src, conn->src);
->
-> +       l2cap_chan_unlock(chan);
->        l2cap_chan_add(conn, chan);
-> +       l2cap_chan_lock(chan);
+* Marcel Holtmann <marcel@holtmann.org> [2012-02-09 15:30:59 +0100]:
 
-Hum, do we really need to do this? Maybe l2cap_chan_add() can receive
-chan already locked?
+> Hi Andrei,
+> 
+> > Use locked and unlocked versions to help removing socket
+> > locks from l2cap.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  net/bluetooth/l2cap_core.c |   30 +++++++++++++++++++++---------
+> >  1 files changed, 21 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index a23c306..e6515b3 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -243,6 +243,22 @@ static void l2cap_state_change(struct l2cap_chan *chan, int state)
+> >  	release_sock(sk);
+> >  }
+> >  
+> > +static inline void __l2cap_set_sock_err(struct l2cap_chan *chan, int err)
+> > +{
+> > +	struct sock *sk = chan->sk;
+> > +
+> > +	sk->sk_err = err;
+> > +}
+> > +
+> > +static inline void l2cap_set_sock_err(struct l2cap_chan *chan, int err)
+> > +{
+> > +	struct sock *sk = chan->sk;
+> > +
+> > +	lock_sock(sk);
+> > +	__l2cap_set_sock_err(chan, err);
+> > +	release_sock(sk);
+> > +}
+> 
+> I think we better call this l2cap_chan_set_sock_err(). Sounds kinda
+> long, but makes it a bit more clearer what it does.
 
-> -       __l2cap_state_change(chan, BT_CONNECT);
-> +       l2cap_state_change(chan, BT_CONNECT);
+Or l2cap_chan_set_err() since this will be made generic once the separation
+between core and sock is done.
 
-Why? Is there a problem moving the release_sock() call to we don't
-call the locked function here?
-
->        __set_chan_timer(chan, sk->sk_sndtimeo);
->
->        if (hcon->state == BT_CONNECTED) {
->                if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
->                        __clear_chan_timer(chan);
->                        if (l2cap_chan_check_security(chan))
-> -                               __l2cap_state_change(chan, BT_CONNECTED);
-> +                               l2cap_state_change(chan, BT_CONNECTED);
-
-And here as well.
-
->                } else
->                        l2cap_do_start(chan);
->        }
->
->        err = 0;
-> +       goto done;
-> +
-> +sock_release:
-> +       release_sock(sk);
->
->  done:
-> +       l2cap_chan_unlock(chan);
->        hci_dev_unlock(hdev);
->        hci_dev_put(hdev);
->        return err;
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index dea5418..ddac4cb 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -127,6 +127,8 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
->        if (err)
->                goto done;
->
-> +       lock_sock(sk);
-> +
->        err = bt_sock_wait_state(sk, BT_CONNECTED,
->                        sock_sndtimeo(sk, flags & O_NONBLOCK));
->  done:
-> --
-> 1.7.8.3
-
-Regards,
-
--- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+	Gustavo
