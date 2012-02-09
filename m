@@ -1,28 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 9 Feb 2012 12:50:38 +0200
+Date: Thu, 9 Feb 2012 12:46:44 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] device: Split att_connect_cb
-Message-ID: <20120209105038.GC5330@x220.ger.corp.intel.com>
-References: <1328723708-21731-1-git-send-email-andre.guedes@openbossa.org>
+Subject: Re: [PATCH BlueZ] proximity: Remove unused variable
+Message-ID: <20120209104644.GB5330@x220.ger.corp.intel.com>
+References: <1328717570-19343-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328723708-21731-1-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1328717570-19343-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Lizardo,
 
-On Wed, Feb 08, 2012, Andre Guedes wrote:
-> In order to reduce code complexity, all code related to
-> device_browse_primary was moved to a new function called
-> browse_primary_connect_cb. This way att_connect_cb has
-> only code related to att_connect.
+On Wed, Feb 08, 2012, Anderson Lizardo wrote:
 > ---
->  src/device.c |   48 +++++++++++++++++++++++++++++++++---------------
->  1 files changed, 33 insertions(+), 15 deletions(-)
+>  proximity/reporter.c |    3 ---
+>  1 files changed, 0 insertions(+), 3 deletions(-)
 
-All three patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
