@@ -2,54 +2,75 @@ Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 3/7] device: Fix trying to connect if already connected
-Date: Thu,  9 Feb 2012 12:56:05 -0300
-Message-Id: <1328802969-20244-4-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 2/7] device: Fix notifying ATTIO drivers when browsing
+Date: Thu,  9 Feb 2012 12:56:04 -0300
+Message-Id: <1328802969-20244-3-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1328802969-20244-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1328802969-20244-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-
+If disconnection happens during the primary service discovery ATTIO
+drivers should not be notified.
 ---
- src/device.c |   11 ++++++++---
- 1 files changed, 8 insertions(+), 3 deletions(-)
+ src/device.c |   25 ++++++++++++-------------
+ 1 files changed, 12 insertions(+), 13 deletions(-)
 
 diff --git a/src/device.c b/src/device.c
-index 9c851ea..2502906 100644
+index f57f090..9c851ea 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -1966,9 +1966,15 @@ int device_browse_primary(struct btd_device *device, DBusConnection *conn,
+@@ -1749,6 +1749,9 @@ static void attrib_disconnected(gpointer user_data)
+ 	int sock, err = 0;
+ 	socklen_t len;
  
- 	req = g_new0(struct browse_req, 1);
- 	req->device = btd_device_ref(device);
--
- 	adapter_get_address(adapter, &src);
- 
-+	device->browse = req;
-+
-+	if (device->attrib) {
-+		gatt_discover_primary(device->attrib, NULL, primary_cb, req);
++	if (device->browse)
 +		goto done;
-+	}
 +
- 	sec_level = secure ? BT_IO_SEC_HIGH : BT_IO_SEC_LOW;
+ 	io = g_attrib_get_channel(device->attrib);
+ 	sock = g_io_channel_unix_get_fd(io);
+ 	len = sizeof(err);
+@@ -1756,21 +1759,19 @@ static void attrib_disconnected(gpointer user_data)
  
- 	attcb = g_new0(struct att_callbacks, 1);
-@@ -1990,11 +1996,10 @@ int device_browse_primary(struct btd_device *device, DBusConnection *conn,
- 		return -EIO;
- 	}
+ 	g_slist_foreach(device->attios, attio_disconnected, NULL);
  
-+done:
- 	if (conn)
- 		req->conn = dbus_connection_ref(conn);
- 
--	device->browse = req;
+-	attrib_channel_detach(device->attrib, device->attachid);
+-	g_attrib_unref(device->attrib);
+-	device->attrib = NULL;
+-	device->attachid = 0;
 -
- 	if (msg) {
- 		const char *sender = dbus_message_get_sender(msg);
+-	if (device->auto_connect == FALSE)
+-		return;
+-
+-	if (err != ETIMEDOUT)
+-		return;
++	if (device->auto_connect == FALSE || err != ETIMEDOUT)
++		goto done;
+ 
+ 	device->auto_id = g_timeout_add_seconds_full(G_PRIORITY_DEFAULT_IDLE,
+ 						AUTO_CONNECTION_INTERVAL,
+ 						att_connect, device,
+ 						att_connect_dispatched);
++
++done:
++	attrib_channel_detach(device->attrib, device->attachid);
++	device->attachid = 0;
++	g_attrib_unref(device->attrib);
++	device->attrib = NULL;
+ }
+ 
+ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
+@@ -1801,9 +1802,7 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
+ 		device->attachid = 0;
+ 		g_attrib_unref(device->attrib);
+ 		device->attrib = NULL;
+-	} else
+-		g_attrib_set_disconnect_function(device->attrib,
+-						attrib_disconnected, device);
++	}
+ 
+ 	g_slist_free(uuids);
  
 -- 
 1.7.8.4
