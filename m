@@ -1,40 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 9 Feb 2012 23:24:37 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
-	marcel@holtmann.org
-Subject: Re: [RESEND PATCH 1/4] Bluetooth: Introduce to_hci_dev()
-Message-ID: <20120209212437.GA453@x220.P-661HNU-F1>
-References: <1328821115-12514-1-git-send-email-dh.herrmann@googlemail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328821115-12514-1-git-send-email-dh.herrmann@googlemail.com>
+In-Reply-To: <20120206123418.GE17650@aemeltch-MOBL1>
+References: <1327679246-2667-1-git-send-email-dh.herrmann@googlemail.com>
+	<20120206123418.GE17650@aemeltch-MOBL1>
+Date: Thu, 9 Feb 2012 22:12:11 +0100
+Message-ID: <CANq1E4TKacV=Bsb_W7Z1T0zZPvPiRPPCfncYsBmQxfAaBCF=Mw@mail.gmail.com>
+Subject: Re: [PATCH 0/4] Integrate better device support
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	David Herrmann <dh.herrmann@googlemail.com>, linux-bluetooth@vger.kernel.org,
+	johan.hedberg@gmail.com, marcel@holtmann.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Andrei
 
-On Thu, Feb 09, 2012, David Herrmann wrote:
-> We currently use dev_set_drvdata to keep a pointer to ourself. This
-> doesn't make sense as we are the bus and not a driver. Therefore,
-> introduce to_hci_dev() so we can get a struct hci_dev pointer from a
-> struct device pointer.
-> 
-> dev_set/get_drvdata() is reserved for drivers that provide a device and
-> not for the bus using the device. The bus can use simple pointer
-> arithmetic to retrieve its private data.
-> 
-> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
-> Acked in: Message-ID: <1327960525.1955.178.camel@aeonflux>
-> 
->  include/net/bluetooth/hci_core.h |    2 ++
->  net/bluetooth/hci_sysfs.c        |   33 ++++++++++++++++-----------------
->  2 files changed, 18 insertions(+), 17 deletions(-)
+On Mon, Feb 6, 2012 at 1:34 PM, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+> Hi David,
+>
+> On Fri, Jan 27, 2012 at 04:47:22PM +0100, David Herrmann wrote:
+>> Hi
+>>
+>> "struct device" provides a drvdata-field that we should use properly to =
+save
+>> _driver-data_. This series makes the hci-core use pointer-arithmetic to =
+avoid
+>> using this field in the bus-core and instead converts the drivers to use=
+ the
+>> drvdata field.
+>> This also reduces the hci_dev structure by 4/8 bytes, yeah.
+>
+> I do not know does it related to those changes but recently I got several
+> dumps like shown below:
+>
+> [ =A0276.028121] Bluetooth: Virtual HCI driver ver 1.3
+> [ =A0277.028692] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+> [ =A0277.054874] Bluetooth: BNEP filters: protocol multicast
+>
+> < here comes module unloading>
+>
+> [ =A0302.632063] usbcore: deregistering interface driver btusb
+> [ =A0302.664760] BUG: unable to handle kernel paging request at c16bef8f
+> [ =A0302.668371] IP: [<c12a9011>] kobject_get+0x11/0x30
+> [ =A0302.668371] *pde =3D 36785063 *pte =3D 016be161
+> [ =A0302.668371] Oops: 0003 [#1] SMP
+> [ =A0302.668371] Modules linked in: hci_vhci(O) btusb(-) bluetooth(O)
+> snd_intel8x0 joydev snd_ac97_codec ac97_bus snd_pcm ppdev snd_seq
+> snd_timer snd_seq_device parport_pc snd binfmt_misc psmouse serio_raw
+> soundcore snd_page_alloc i2c_piix4 lp parport usbhid hid ahci libahci
+> e1000 [last unloaded: bnep]
+> [ =A0302.668371]
+> [ =A0302.668371] Pid: 4310, comm: rmmod Tainted: G =A0 =A0 =A0 =A0 =A0 O =
+3.2.0niko+
+> #74 innotek GmbH VirtualBox
+> [ =A0302.668371] EIP: 0060:[<c12a9011>] EFLAGS: 00010206 CPU: 0
+> [ =A0302.668371] EIP is at kobject_get+0x11/0x30
+> [ =A0302.668371] EAX: 6f6c2e71 EBX: c16bef73 ECX: 00000006 EDX: 00000000
+> [ =A0302.668371] ESI: c16be46b EDI: f5655c00 EBP: e9415e5c ESP: e9415e58
+> [ =A0302.668371] =A0DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
+> [ =A0302.668371] Process rmmod (pid: 4310, ti=3De9414000 task=3De982bea0
+> task.ti=3De9414000)
+> [ =A0302.668371] Stack:
+> [ =A0302.668371] =A0f45c6400 e9415e64 c1366a16 e9415e90 f81589d8 00000002
+> f67e1d88 f67a6000
+> [ =A0302.668371] =A0e9415e90 c16bef6b 00000000 f5655c1c f5655c00 f815c1d8
+> e9415eac c13e7bef
+> [ =A0302.668371] =A000000000 f67a6000 f5655c1c f815c1d8 f5655c50 e9415ebc
+> c136aaaa f5655c1c
+> [ =A0302.668371] Call Trace:
+> [ =A0302.668371] =A0[<c1366a16>] get_device+0x16/0x20
+> [ =A0302.668371] =A0[<f81589d8>] btusb_disconnect+0x48/0xe0 [btusb]
+> [ =A0302.668371] =A0[<c13e7bef>] usb_unbind_interface+0x3f/0x150
+> [ =A0302.668371] =A0[<c136aaaa>] __device_release_driver+0x6a/0xc0
+> [ =A0302.668371] =A0[<c136b2e7>] driver_detach+0x97/0xa0
 
-Sorry about missing these initially. Last week had plenty of
-distractions to offer thanks to the UPF. Anyway, all four patches have
-been applied to my bluetooth-next tree now.
+Do you know which "get_device" call that is? I can assume its
+triggered by hci_dev_hold() in btusb_disconnect which only calls
+get_device, but if this call fails, the following call to
+hci_unregister_dev() must fail, too. I still cannot trigger this so
+can you provide some more information here?
+If "hdev" really is invalid here, we have a serious problem but if
+this get_device() is not at all related to the bt-core but rather in
+the usb-core I would have to search at a totally different place. If
+you can reliably trigger this BUG could you try to compile with
+frame-pointers/no-inline or sth. like that so we can get a better
+stack-trace?
+Anyway, its definitely not related to this series as they have not
+been applied yet but another patch I sent to the list "btusb: Remove
+device lock on release" touches this so could you try that one and see
+what hci_unregister_dev() does?
 
-Johan
+> [ =A0302.668371] =A0[<c136a944>] bus_remove_driver+0x74/0xe0
+> [ =A0302.668371] =A0[<c136b988>] driver_unregister+0x48/0x80
+> [ =A0302.668371] =A0[<c13e701c>] usb_deregister+0xac/0xc0
+> [ =A0302.668371] =A0[<f815a0ed>] btusb_driver_exit+0xd/0xf20 [btusb]
+> [ =A0302.668371] =A0[<c108f455>] sys_delete_module+0x135/0x250
+> [ =A0302.668371] =A0[<c113f0bd>] ? vfs_write+0xed/0x160
+> [ =A0302.668371] =A0[<c113e4a0>] ? wait_on_retry_sync_kiocb+0x50/0x50
+> [ =A0302.668371] =A0[<c15668ad>] ? restore_all+0xf/0xf
+> [ =A0302.668371] =A0[<c156d71f>] sysenter_do_call+0x12/0x38
+> [ =A0302.668371] Code: 24 08 c7 04 24 28 7a 7e c1 e8 1c 5c 01 00 8b 4c 24=
+ 18
+> e9 d0 fe ff ff 8d 76 00 55 85 c0 89 e5 53 89 c3 74 0b 8b 40 1c 85 c0 74 0=
+9
+> <3e> ff 43 1c 89 d8 5b 5d c3 ba 28 00 00 00 b8 9d 7b 6b c1 e8 17
+> [ =A0302.668371] EIP: [<c12a9011>] kobject_get+0x11/0x30 SS:ESP
+> 0068:e9415e58
+> [ =A0302.668371] CR2: 00000000c16bef8f
+> [ =A0302.668371] ---[ end trace de038ac80f57694f ]---
+>
+> I have to say that usually I recompile only bluetooth modules and reload
+> them, IMO this should not trigger it.
+>
+> Best regards
+> Andrei Emeltchenko
+
+Cheers
+David
