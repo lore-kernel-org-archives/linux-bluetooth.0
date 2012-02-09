@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 14/16] Bluetooth: Change locking logic in security_cfm
-Date: Thu,  9 Feb 2012 16:17:35 +0200
-Message-Id: <1328797057-26331-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 07/16] Bluetooth: Add unlocked __l2cap_chan_add function
+Date: Thu,  9 Feb 2012 16:17:28 +0200
+Message-Id: <1328797057-26331-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1328797057-26331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1328797057-26331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,80 +11,40 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Change bh_ locking functions to mutex_locks since we can now sleep.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |   15 ++++++++++-----
- 1 files changed, 10 insertions(+), 5 deletions(-)
+ net/bluetooth/l2cap_core.c |    9 +++++++--
+ 1 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 284c5c9..2b97cf7 100644
+index e6515b3..21f9f5d 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -4593,7 +4593,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 	mutex_lock(&conn->chan_lock);
+@@ -324,7 +324,7 @@ void l2cap_chan_destroy(struct l2cap_chan *chan)
+ 	l2cap_chan_put(chan);
+ }
  
- 	list_for_each_entry(chan, &conn->chan_l, list) {
--		bh_lock_sock(sk);
-+		l2cap_chan_lock(chan);
+-static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
++void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ {
+ 	BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
+ 			chan->psm, chan->dcid);
+@@ -370,8 +370,13 @@ static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
  
- 		BT_DBG("chan->scid %d", chan->scid);
+ 	l2cap_chan_hold(chan);
  
-@@ -4603,19 +4603,19 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 				l2cap_chan_ready(chan);
- 			}
- 
--			bh_unlock_sock(sk);
-+			l2cap_chan_unlock(chan);
- 			continue;
- 		}
- 
- 		if (test_bit(CONF_CONNECT_PEND, &chan->conf_state)) {
--			bh_unlock_sock(sk);
-+			l2cap_chan_unlock(chan);
- 			continue;
- 		}
- 
- 		if (!status && (chan->state == BT_CONNECTED ||
- 						chan->state == BT_CONFIG)) {
- 			l2cap_check_encryption(chan, encrypt);
--			bh_unlock_sock(sk);
-+			l2cap_chan_unlock(chan);
- 			continue;
- 		}
- 
-@@ -4636,9 +4636,12 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 					msecs_to_jiffies(L2CAP_DISC_TIMEOUT));
- 			}
- 		} else if (chan->state == BT_CONNECT2) {
-+			struct sock *sk = chan->sk;
- 			struct l2cap_conn_rsp rsp;
- 			__u16 res, stat;
- 
-+			lock_sock(sk);
+-	mutex_lock(&conn->chan_lock);
+ 	list_add(&chan->list, &conn->chan_l);
++}
 +
- 			if (!status) {
- 				if (bt_sk(sk)->defer_setup) {
- 					struct sock *parent = bt_sk(sk)->parent;
-@@ -4659,6 +4662,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 				stat = L2CAP_CS_NO_INFO;
- 			}
- 
-+			release_sock(sk);
-+
- 			rsp.scid   = cpu_to_le16(chan->dcid);
- 			rsp.dcid   = cpu_to_le16(chan->scid);
- 			rsp.result = cpu_to_le16(res);
-@@ -4667,7 +4672,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 							sizeof(rsp), &rsp);
- 		}
- 
--		bh_unlock_sock(sk);
-+		l2cap_chan_unlock(chan);
- 	}
- 
++void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
++{
++	mutex_lock(&conn->chan_lock);
++	__l2cap_chan_add(conn, chan);
  	mutex_unlock(&conn->chan_lock);
+ }
+ 
 -- 
 1.7.8.3
 
