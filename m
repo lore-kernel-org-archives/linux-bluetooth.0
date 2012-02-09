@@ -1,62 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Thu, 9 Feb 2012 16:13:31 -0200
+Date: Thu, 9 Feb 2012 16:08:41 -0200
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
 	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv3 06/16] Bluetooth: Add socket error function
-Message-ID: <20120209181331.GB3174@joana>
+Subject: Re: [RFCv3 03/16] Bluetooth: Do not use sk lock in get_chan functions
+Message-ID: <20120209180841.GA3174@joana>
 References: <1328797057-26331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1328797057-26331-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1328797859.28848.23.camel@aeonflux>
+ <1328797057-26331-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1328797725.28848.22.camel@aeonflux>
+ <20120209144038.GC22374@aemeltch-MOBL1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328797859.28848.23.camel@aeonflux>
+In-Reply-To: <20120209144038.GC22374@aemeltch-MOBL1>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Andrei,
 
-* Marcel Holtmann <marcel@holtmann.org> [2012-02-09 15:30:59 +0100]:
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2012-02-09 16:40:39 +0200]:
 
-> Hi Andrei,
+> Hi Marcel,
 > 
-> > Use locked and unlocked versions to help removing socket
-> > locks from l2cap.
+> On Thu, Feb 09, 2012 at 03:28:45PM +0100, Marcel Holtmann wrote:
+> > Hi Andrei,
 > > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> >  net/bluetooth/l2cap_core.c |   30 +++++++++++++++++++++---------
-> >  1 files changed, 21 insertions(+), 9 deletions(-)
+> > > When needed we take explicit lock.
+> > > 
+> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > ---
+> > >  net/bluetooth/l2cap_core.c |    6 ++----
+> > >  1 files changed, 2 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > > index ae08944..dcf4792 100644
+> > > --- a/net/bluetooth/l2cap_core.c
+> > > +++ b/net/bluetooth/l2cap_core.c
+> > > @@ -105,9 +105,8 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 ci
+> > >  
+> > >  	mutex_lock(&conn->chan_lock);
+> > >  	c = __l2cap_get_chan_by_scid(conn, cid);
+> > > -	if (c)
+> > > -		lock_sock(c->sk);
+> > >  	mutex_unlock(&conn->chan_lock);
+> > > +
+> > >  	return c;
+> > >  }
 > > 
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index a23c306..e6515b3 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -243,6 +243,22 @@ static void l2cap_state_change(struct l2cap_chan *chan, int state)
-> >  	release_sock(sk);
-> >  }
-> >  
-> > +static inline void __l2cap_set_sock_err(struct l2cap_chan *chan, int err)
-> > +{
-> > +	struct sock *sk = chan->sk;
-> > +
-> > +	sk->sk_err = err;
-> > +}
-> > +
-> > +static inline void l2cap_set_sock_err(struct l2cap_chan *chan, int err)
-> > +{
-> > +	struct sock *sk = chan->sk;
-> > +
-> > +	lock_sock(sk);
-> > +	__l2cap_set_sock_err(chan, err);
-> > +	release_sock(sk);
-> > +}
+> > so this is dangerous since now we are creating an imbalance with the
+> > socket locks. Are we fixing that one later on?
 > 
-> I think we better call this l2cap_chan_set_sock_err(). Sounds kinda
-> long, but makes it a bit more clearer what it does.
+> Yes, that will be fixed later on. Do you think that needs to be merged
+> with the other code?
 
-Or l2cap_chan_set_err() since this will be made generic once the separation
-between core and sock is done.
+Please merge such changes, I don't merge a code that put us in a bad state.
 
 	Gustavo
