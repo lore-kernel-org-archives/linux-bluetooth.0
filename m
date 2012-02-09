@@ -1,73 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1328795471.28848.19.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Fix device reset
+Message-ID: <1328795351.28848.17.camel@aeonflux>
+Subject: Re: [PATCH 0/3] Advertising cache locking code refactoring
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Date: Thu, 09 Feb 2012 14:51:11 +0100
-In-Reply-To: <20120207092337.GA5683@aemeltch-MOBL1>
-References: <1328536743-8343-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <20120206152113.GA12729@x220> <1328554926.2062.84.camel@aeonflux>
-	 <CAMXE1-rSmSVvYyRjLo2pZWLfFF+QWh-1pTz--+uNstLHR367aQ@mail.gmail.com>
-	 <1328557131.2062.85.camel@aeonflux> <20120207092337.GA5683@aemeltch-MOBL1>
+To: Andre Guedes <aguedespe@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, andre.guedes@openbossa.org
+Date: Thu, 09 Feb 2012 14:49:11 +0100
+In-Reply-To: <1328588997-25029-1-git-send-email-aguedespe@gmail.com>
+References: <1328588997-25029-1-git-send-email-aguedespe@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Andre,
 
-> > > > > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > > > >
-> > > > > >
-> > > > > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > > > > ---
-> > > > > >  net/bluetooth/hci_core.c |    2 +-
-> > > > > >  1 files changed, 1 insertions(+), 1 deletions(-)
-> > > > > >
-> > > > > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > > > > > index e77cc79..3f30714 100644
-> > > > > > --- a/net/bluetooth/hci_core.c
-> > > > > > +++ b/net/bluetooth/hci_core.c
-> > > > > > @@ -822,7 +822,7 @@ static int hci_dev_do_close(struct hci_dev
-> > > *hdev)
-> > > > > >     skb_queue_purge(&hdev->cmd_q);
-> > > > > >     atomic_set(&hdev->cmd_cnt, 1);
-> > > > > >     if (!test_bit(HCI_RAW, &hdev->flags) &&
-> > > > > > -                           test_bit(HCI_QUIRK_NO_RESET,
-> > > &hdev->quirks)) {
-> > > > > > +                   !test_bit(HCI_QUIRK_NO_RESET,
-> > > &hdev->quirks)) {
-> > > > > >             set_bit(HCI_INIT, &hdev->flags);
-> > > > > >             __hci_request(hdev, hci_reset_req, 0,
-> > > > > >                                     msecs_to_jiffies(250));
-> > > > >
-> > > > > Nack. The NO_RESET quirk is supposed to prevent reset during the
-> > > device
-> > > > > init sequence. The purpose of the test in hci_dev_do_close() is to
-> > > let
-> > > > > the reset be done there instead.
-> > > >
-> > > > we might wanna rename this into HCI_QUIRK_RESET_ON_CLOSE. Otherwise
-> > > > people keep in getting confused.
-> > > >
-> > > 
-> > > Moreover without my patch my USB dongle gets stuck after reset.
-> > 
-> > please send hcidump traces for this. And you mean hciconfig hci0 reset?
+> This patch series does some code refactoring in advertising cache locking
+> related code. This work is a small effort to improve locking usage in
+> Bluetooth subsystem.
 > 
-> In the trace there is only one line:
+> BR,
 > 
-> < HCI Command: Reset (0x03|0x0003) plen 0
+> Andre
 > 
-> Then chip stuck (I am testing this inside virtual machine).
+> Andre Guedes (3):
+>   Bluetooth: Add prefix "__" to advertising cache functions
+>   Bluetooth: Create thread-safe advertising cache functions
+>   Bluetooth: Use advertising cache thread-safe functions
 > 
-> I have A-Link BCM USB dongle.
+>  include/net/bluetooth/hci_core.h |    4 +++
+>  net/bluetooth/hci_conn.c         |    2 +-
+>  net/bluetooth/hci_core.c         |   51 +++++++++++++++++++++++++++++++------
+>  net/bluetooth/hci_event.c        |    6 +---
+>  4 files changed, 48 insertions(+), 15 deletions(-)
 
-the patch in general is correct, but it seems that it has some side
-effects on some dongles. Can you try doing hciconfig hci0 reset versus a
-hciconfig hci0 down + hciconfig hci0 up and if it makes any difference.
+so I looked through this patch series and the only useful patch is 1/3
+and even that one is kinda questionable. However if people in general
+find this a bit clearer that we prefix unlocked hdev functions with __,
+then I would be fine is it. Opinions anybody?
 
 Regards
 
