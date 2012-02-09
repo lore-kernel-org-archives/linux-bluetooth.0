@@ -1,33 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1328798361.28848.30.camel@aeonflux>
-Subject: Re: [RFCv3 13/16] Bluetooth: Change locking logic for conn/chan
- ready
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 9 Feb 2012 16:40:39 +0200
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 09 Feb 2012 15:39:21 +0100
-In-Reply-To: <1328797057-26331-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [RFCv3 03/16] Bluetooth: Do not use sk lock in get_chan functions
+Message-ID: <20120209144038.GC22374@aemeltch-MOBL1>
 References: <1328797057-26331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1328797057-26331-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <1328797057-26331-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1328797725.28848.22.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1328797725.28848.22.camel@aeonflux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Marcel,
 
-> In l2cap_conn_ready and l2cap_chan_ready change locking logic and
-> use explicit socket when needed.
+On Thu, Feb 09, 2012 at 03:28:45PM +0100, Marcel Holtmann wrote:
+> Hi Andrei,
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c |   16 ++++++++++++----
->  1 files changed, 12 insertions(+), 4 deletions(-)
+> > When needed we take explicit lock.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  net/bluetooth/l2cap_core.c |    6 ++----
+> >  1 files changed, 2 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index ae08944..dcf4792 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -105,9 +105,8 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 ci
+> >  
+> >  	mutex_lock(&conn->chan_lock);
+> >  	c = __l2cap_get_chan_by_scid(conn, cid);
+> > -	if (c)
+> > -		lock_sock(c->sk);
+> >  	mutex_unlock(&conn->chan_lock);
+> > +
+> >  	return c;
+> >  }
+> 
+> so this is dangerous since now we are creating an imbalance with the
+> socket locks. Are we fixing that one later on?
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Yes, that will be fixed later on. Do you think that needs to be merged
+with the other code?
 
-Regards
-
-Marcel
-
+Best regards 
+Andrei Emeltchenko 
 
