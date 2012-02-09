@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1328797057-26331-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1328797057-26331-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1328797057-26331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1328797057-26331-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Thu, 9 Feb 2012 16:33:58 -0200
-Message-ID: <CAA37ikYz2gBS+ZO7cRbin4NmdWFHNNZCV6zizxUNREHJC8vNdA@mail.gmail.com>
-Subject: Re: [RFCv3 03/16] Bluetooth: Do not use sk lock in get_chan functions
+	<1328797057-26331-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 9 Feb 2012 16:25:11 -0200
+Message-ID: <CAA37ikaPnRheNYxZoNRYA6Qg+ndiW887k3ZqH51htEphCK8uBA@mail.gmail.com>
+Subject: Re: [RFCv3 15/16] Bluetooth: Use l2cap chan lock in socket connect
 From: Ulisses Furquim <ulisses@profusion.mobi>
 To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -17,50 +17,64 @@ Hi Andrei,
 
 On Thu, Feb 9, 2012 at 12:17 PM, Emeltchenko Andrei
 <Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> @@ -1261,23 +1266,30 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+>        /* Update source addr of the socket */
+>        bacpy(src, conn->src);
 >
-> When needed we take explicit lock.
+> +       l2cap_chan_unlock(chan);
+>        l2cap_chan_add(conn, chan);
+> +       l2cap_chan_lock(chan);
+
+Hum, do we really need to do this? Maybe l2cap_chan_add() can receive
+chan already locked?
+
+> -       __l2cap_state_change(chan, BT_CONNECT);
+> +       l2cap_state_change(chan, BT_CONNECT);
+
+Why? Is there a problem moving the release_sock() call to we don't
+call the locked function here?
+
+>        __set_chan_timer(chan, sk->sk_sndtimeo);
 >
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c |    6 ++----
->  1 files changed, 2 insertions(+), 4 deletions(-)
+>        if (hcon->state == BT_CONNECTED) {
+>                if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+>                        __clear_chan_timer(chan);
+>                        if (l2cap_chan_check_security(chan))
+> -                               __l2cap_state_change(chan, BT_CONNECTED);
+> +                               l2cap_state_change(chan, BT_CONNECTED);
+
+And here as well.
+
+>                } else
+>                        l2cap_do_start(chan);
+>        }
 >
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index ae08944..dcf4792 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -105,9 +105,8 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 ci
->
->        mutex_lock(&conn->chan_lock);
->        c = __l2cap_get_chan_by_scid(conn, cid);
-> -       if (c)
-> -               lock_sock(c->sk);
->        mutex_unlock(&conn->chan_lock);
+>        err = 0;
+> +       goto done;
 > +
->        return c;
->  }
+> +sock_release:
+> +       release_sock(sk);
 >
-> @@ -128,9 +127,8 @@ static inline struct l2cap_chan *l2cap_get_chan_by_ident(struct l2cap_conn *conn
+>  done:
+> +       l2cap_chan_unlock(chan);
+>        hci_dev_unlock(hdev);
+>        hci_dev_put(hdev);
+>        return err;
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index dea5418..ddac4cb 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -127,6 +127,8 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+>        if (err)
+>                goto done;
 >
->        mutex_lock(&conn->chan_lock);
->        c = __l2cap_get_chan_by_ident(conn, ident);
-> -       if (c)
-> -               lock_sock(c->sk);
->        mutex_unlock(&conn->chan_lock);
+> +       lock_sock(sk);
 > +
->        return c;
->  }
->
+>        err = bt_sock_wait_state(sk, BT_CONNECTED,
+>                        sock_sndtimeo(sk, flags & O_NONBLOCK));
+>  done:
 > --
 > 1.7.8.3
-
-This isn't what I said, maybe I wasn't clear enough, sorry. I said to
-change the usage from the locked versions to unlocked ones and in the
-same patch add the explicit locking of chan_lock. This will be better
-to read and maintain specially since we're adding more locks in all
-these paths now. Then later if we don't use the locked versions
-anymore we can just remove them. Ok?
 
 Regards,
 
