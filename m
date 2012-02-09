@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/8] Bluetooth: Add address type to mgmt blacklist messages
-Date: Thu,  9 Feb 2012 17:23:47 +0200
-Message-Id: <1328801030-24274-6-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/8] Bluetooth: Update mgmt_disconnect to match latest API
+Date: Thu,  9 Feb 2012 17:23:44 +0200
+Message-Id: <1328801030-24274-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1328801030-24274-1-git-send-email-johan.hedberg@gmail.com>
 References: <1328801030-24274-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,190 +11,164 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch updates the implmentation for mgmt_block_device and
-mgmt_unblock_device and their corresponding events to match the latest
-API specification.
+This patch adds an address type parameter to the disconnect command and
+response in order to match the latest mgmt API specification.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    8 ++++----
- include/net/bluetooth/mgmt.h     |    8 ++++----
- net/bluetooth/hci_core.c         |    8 ++++----
- net/bluetooth/hci_sock.c         |    4 ++--
- net/bluetooth/mgmt.c             |   14 ++++++++------
- 5 files changed, 22 insertions(+), 20 deletions(-)
+ include/net/bluetooth/hci_core.h |    3 ++-
+ include/net/bluetooth/mgmt.h     |    4 ++--
+ net/bluetooth/hci_event.c        |   28 +++++++++++++++++++++++++---
+ net/bluetooth/mgmt.c             |   28 +++++++++++++---------------
+ 4 files changed, 42 insertions(+), 21 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 5f27694..14a655f 100644
+index 7107790..634a0cd 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -646,8 +646,8 @@ int hci_inquiry(void __user *arg);
- 
- struct bdaddr_list *hci_blacklist_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr);
- int hci_blacklist_clear(struct hci_dev *hdev);
--int hci_blacklist_add(struct hci_dev *hdev, bdaddr_t *bdaddr);
--int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr);
-+int hci_blacklist_add(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
-+int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
- 
- int hci_uuids_clear(struct hci_dev *hdev);
- 
-@@ -992,8 +992,8 @@ int mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status);
- int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status);
- int mgmt_discovering(struct hci_dev *hdev, u8 discovering);
--int mgmt_device_blocked(struct hci_dev *hdev, bdaddr_t *bdaddr);
--int mgmt_device_unblocked(struct hci_dev *hdev, bdaddr_t *bdaddr);
-+int mgmt_device_blocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
-+int mgmt_device_unblocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
- 
- int mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, u8 persistent);
- 
+@@ -958,7 +958,8 @@ int mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 					u8 *dev_class);
+ int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 						u8 link_type, u8 addr_type);
+-int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 status);
++int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
++					u8 link_type, u8 addr_type, u8 status);
+ int mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 						u8 addr_type, u8 status);
+ int mgmt_pin_code_request(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 secure);
 diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index f284499..92f85c8 100644
+index 4c18cd5..735e547 100644
 --- a/include/net/bluetooth/mgmt.h
 +++ b/include/net/bluetooth/mgmt.h
-@@ -299,12 +299,12 @@ struct mgmt_rp_confirm_name {
+@@ -177,10 +177,10 @@ struct mgmt_cp_load_long_term_keys {
  
- #define MGMT_OP_BLOCK_DEVICE		0x0026
- struct mgmt_cp_block_device {
+ #define MGMT_OP_DISCONNECT		0x0014
+ struct mgmt_cp_disconnect {
 -	bdaddr_t bdaddr;
 +	struct mgmt_addr_info addr;
  } __packed;
- 
- #define MGMT_OP_UNBLOCK_DEVICE		0x0027
- struct mgmt_cp_unblock_device {
+ struct mgmt_rp_disconnect {
 -	bdaddr_t bdaddr;
 +	struct mgmt_addr_info addr;
+ 	__u8 status;
  } __packed;
  
- #define MGMT_EV_CMD_COMPLETE		0x0001
-@@ -405,10 +405,10 @@ struct mgmt_ev_device_found {
- 
- #define MGMT_EV_DEVICE_BLOCKED		0x0014
- struct mgmt_ev_device_blocked {
--	bdaddr_t bdaddr;
-+	struct mgmt_addr_info addr;
- } __packed;
- 
- #define MGMT_EV_DEVICE_UNBLOCKED	0x0015
- struct mgmt_ev_device_unblocked {
--	bdaddr_t bdaddr;
-+	struct mgmt_addr_info addr;
- } __packed;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 3d09f4b4..9ada164 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1489,7 +1489,7 @@ int hci_blacklist_clear(struct hci_dev *hdev)
- 	return 0;
- }
- 
--int hci_blacklist_add(struct hci_dev *hdev, bdaddr_t *bdaddr)
-+int hci_blacklist_add(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
- {
- 	struct bdaddr_list *entry;
- 
-@@ -1507,10 +1507,10 @@ int hci_blacklist_add(struct hci_dev *hdev, bdaddr_t *bdaddr)
- 
- 	list_add(&entry->list, &hdev->blacklist);
- 
--	return mgmt_device_blocked(hdev, bdaddr);
-+	return mgmt_device_blocked(hdev, bdaddr, type);
- }
- 
--int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr)
-+int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
- {
- 	struct bdaddr_list *entry;
- 
-@@ -1524,7 +1524,7 @@ int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr)
- 	list_del(&entry->list);
- 	kfree(entry);
- 
--	return mgmt_device_unblocked(hdev, bdaddr);
-+	return mgmt_device_unblocked(hdev, bdaddr, type);
- }
- 
- static void hci_clear_adv_cache(struct work_struct *work)
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 0dcc962..9e854d9 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -190,7 +190,7 @@ static int hci_sock_blacklist_add(struct hci_dev *hdev, void __user *arg)
- 
- 	hci_dev_lock(hdev);
- 
--	err = hci_blacklist_add(hdev, &bdaddr);
-+	err = hci_blacklist_add(hdev, &bdaddr, 0);
- 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index ad5f37b..f0c822d 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1550,6 +1550,28 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
  	hci_dev_unlock(hdev);
+ }
  
-@@ -207,7 +207,7 @@ static int hci_sock_blacklist_del(struct hci_dev *hdev, void __user *arg)
++static void hci_cs_disconnect(struct hci_dev *hdev, u8 status)
++{
++	struct hci_cp_disconnect *cp;
++	struct hci_conn *conn;
++
++	if (!status)
++		return;
++
++	cp = hci_sent_cmd_data(hdev, HCI_OP_DISCONNECT);
++	if (!cp)
++		return;
++
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
++	if (conn)
++		mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
++						conn->dst_type, status);
++
++	hci_dev_unlock(hdev);
++}
++
+ static void hci_cs_le_create_conn(struct hci_dev *hdev, __u8 status)
+ {
+ 	struct hci_cp_le_create_conn *cp;
+@@ -1839,7 +1861,8 @@ static inline void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
+ 			(conn->type == ACL_LINK || conn->type == LE_LINK)) {
+ 		if (ev->status != 0)
+-			mgmt_disconnect_failed(hdev, &conn->dst, ev->status);
++			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
++						conn->dst_type, ev->status);
+ 		else
+ 			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
+ 							conn->dst_type);
+@@ -2350,8 +2373,7 @@ static inline void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		break;
  
- 	hci_dev_lock(hdev);
+ 	case HCI_OP_DISCONNECT:
+-		if (ev->status != 0)
+-			mgmt_disconnect_failed(hdev, NULL, ev->status);
++		hci_cs_disconnect(hdev, ev->status);
+ 		break;
  
--	err = hci_blacklist_del(hdev, &bdaddr);
-+	err = hci_blacklist_del(hdev, &bdaddr, 0);
- 
- 	hci_dev_unlock(hdev);
- 
+ 	case HCI_OP_LE_CREATE_CONN:
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 763a447..413a0b9 100644
+index c64e5db..f1257ee 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -2114,7 +2114,7 @@ static int block_device(struct sock *sk, u16 index, void *data, u16 len)
+@@ -1185,9 +1185,10 @@ static int disconnect(struct sock *sk, u16 index, void *data, u16 len)
+ 		goto failed;
+ 	}
  
- 	hci_dev_lock(hdev);
+-	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
+-	if (!conn)
+-		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->bdaddr);
++	if (cp->addr.type == MGMT_ADDR_BREDR)
++		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->addr.bdaddr);
++	else
++		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->addr.bdaddr);
  
--	err = hci_blacklist_add(hdev, &cp->bdaddr);
-+	err = hci_blacklist_add(hdev, &cp->addr.bdaddr, cp->addr.type);
- 	if (err < 0)
- 		err = cmd_status(sk, index, MGMT_OP_BLOCK_DEVICE,
- 							MGMT_STATUS_FAILED);
-@@ -2147,7 +2147,7 @@ static int unblock_device(struct sock *sk, u16 index, void *data, u16 len)
+ 	if (!conn) {
+ 		err = cmd_status(sk, index, MGMT_OP_DISCONNECT,
+@@ -2619,7 +2620,8 @@ static void disconnect_rsp(struct pending_cmd *cmd, void *data)
+ 	struct sock **sk = data;
+ 	struct mgmt_rp_disconnect rp;
  
- 	hci_dev_lock(hdev);
+-	bacpy(&rp.bdaddr, &cp->bdaddr);
++	bacpy(&rp.addr.bdaddr, &cp->addr.bdaddr);
++	rp.addr.type = cp->addr.type;
+ 	rp.status = 0;
  
--	err = hci_blacklist_del(hdev, &cp->bdaddr);
-+	err = hci_blacklist_del(hdev, &cp->addr.bdaddr, cp->addr.type);
- 
- 	if (err < 0)
- 		err = cmd_status(sk, index, MGMT_OP_UNBLOCK_DEVICE,
-@@ -3026,27 +3026,29 @@ int mgmt_discovering(struct hci_dev *hdev, u8 discovering)
- 						sizeof(discovering), NULL);
+ 	cmd_complete(cmd->sk, cmd->index, MGMT_OP_DISCONNECT, &rp, sizeof(rp));
+@@ -2672,27 +2674,23 @@ int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	return err;
  }
  
--int mgmt_device_blocked(struct hci_dev *hdev, bdaddr_t *bdaddr)
-+int mgmt_device_blocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
+-int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 status)
++int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
++					u8 link_type, u8 addr_type, u8 status)
  {
++	struct mgmt_rp_disconnect rp;
  	struct pending_cmd *cmd;
- 	struct mgmt_ev_device_blocked ev;
+-	u8 mgmt_err = mgmt_status(status);
+ 	int err;
  
- 	cmd = mgmt_pending_find(MGMT_OP_BLOCK_DEVICE, hdev);
+ 	cmd = mgmt_pending_find(MGMT_OP_DISCONNECT, hdev);
+ 	if (!cmd)
+ 		return -ENOENT;
  
--	bacpy(&ev.bdaddr, bdaddr);
-+	bacpy(&ev.addr.bdaddr, bdaddr);
-+	ev.addr.type = type;
+-	if (bdaddr) {
+-		struct mgmt_rp_disconnect rp;
+-
+-		bacpy(&rp.bdaddr, bdaddr);
+-		rp.status = status;
++	bacpy(&rp.addr.bdaddr, bdaddr);
++	rp.addr.type = link_to_mgmt(link_type, addr_type);
++	rp.status = mgmt_status(status);
  
- 	return mgmt_event(MGMT_EV_DEVICE_BLOCKED, hdev, &ev, sizeof(ev),
- 							cmd ? cmd->sk : NULL);
- }
+-		err = cmd_complete(cmd->sk, cmd->index, MGMT_OP_DISCONNECT,
++	err = cmd_complete(cmd->sk, cmd->index, MGMT_OP_DISCONNECT,
+ 							&rp, sizeof(rp));
+-	} else
+-		err = cmd_status(cmd->sk, hdev->id, MGMT_OP_DISCONNECT,
+-								mgmt_err);
  
--int mgmt_device_unblocked(struct hci_dev *hdev, bdaddr_t *bdaddr)
-+int mgmt_device_unblocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
- {
- 	struct pending_cmd *cmd;
- 	struct mgmt_ev_device_unblocked ev;
+ 	mgmt_pending_remove(cmd);
  
- 	cmd = mgmt_pending_find(MGMT_OP_UNBLOCK_DEVICE, hdev);
- 
--	bacpy(&ev.bdaddr, bdaddr);
-+	bacpy(&ev.addr.bdaddr, bdaddr);
-+	ev.addr.type = type;
- 
- 	return mgmt_event(MGMT_EV_DEVICE_UNBLOCKED, hdev, &ev, sizeof(ev),
- 							cmd ? cmd->sk : NULL);
 -- 
 1.7.9
 
