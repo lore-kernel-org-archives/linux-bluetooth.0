@@ -1,33 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 9 Feb 2012 23:25:02 +0200
+Date: Thu, 9 Feb 2012 23:24:37 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: David Herrmann <dh.herrmann@googlemail.com>
 Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
 	marcel@holtmann.org
-Subject: Re: [RESEND PATCH] Bluetooth: btusb: Remove device lock on release
-Message-ID: <20120209212501.GB453@x220.P-661HNU-F1>
+Subject: Re: [RESEND PATCH 1/4] Bluetooth: Introduce to_hci_dev()
+Message-ID: <20120209212437.GA453@x220.P-661HNU-F1>
 References: <1328821115-12514-1-git-send-email-dh.herrmann@googlemail.com>
- <1328821115-12514-2-git-send-email-dh.herrmann@googlemail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328821115-12514-2-git-send-email-dh.herrmann@googlemail.com>
+In-Reply-To: <1328821115-12514-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi David,
 
 On Thu, Feb 09, 2012, David Herrmann wrote:
-> Recently we changed the way how we release driver-data. A driver is now
-> responsible of destroying the data so we no longer need the device lock
-> on deinitialization in btusb driver.
+> We currently use dev_set_drvdata to keep a pointer to ourself. This
+> doesn't make sense as we are the bus and not a driver. Therefore,
+> introduce to_hci_dev() so we can get a struct hci_dev pointer from a
+> struct device pointer.
+> 
+> dev_set/get_drvdata() is reserved for drivers that provide a device and
+> not for the bus using the device. The bus can use simple pointer
+> arithmetic to retrieve its private data.
 > 
 > Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 > Acked-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
-> Acked in: Message-ID: <1327960875.1955.183.camel@aeonflux>
+> Acked in: Message-ID: <1327960525.1955.178.camel@aeonflux>
 > 
->  drivers/bluetooth/btusb.c |    5 -----
->  1 files changed, 0 insertions(+), 5 deletions(-)
+>  include/net/bluetooth/hci_core.h |    2 ++
+>  net/bluetooth/hci_sysfs.c        |   33 ++++++++++++++++-----------------
+>  2 files changed, 18 insertions(+), 17 deletions(-)
 
-Applied to my bluetooth-next tree. Thanks.
+Sorry about missing these initially. Last week had plenty of
+distractions to offer thanks to the UPF. Anyway, all four patches have
+been applied to my bluetooth-next tree now.
 
 Johan
