@@ -1,66 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1328276576-2996-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1328276576-2996-1-git-send-email-anderson.lizardo@openbossa.org>
-Date: Thu, 9 Feb 2012 08:59:33 -0400
-Message-ID: <CAJdJm_N9fNYW-wDEhh-LpYkCTc_W7fK6gSFH5+emW7Y+-M_M8g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] proximity: Fix Proximity API to match documentation
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Message-id: <ECBBD030DA3E48CFA22F05E0E75896A2@sisodomain.com>
+From: Jaganath <jaganath.k@samsung.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <1328182441-14892-1-git-send-email-jaganath.k@samsung.com>
+ <CABBYNZJYyqtD+0c6YYALx8bON3A_S3bXH29K07OFJcq=ZrJCOw@mail.gmail.com>
+ <F077852F86D84892A3B10767242C50BC@sisodomain.com>
+ <CABBYNZLVFFP2v0hXEwrxONGr-t-1i5g6rPxVe_G-wrKM2P=8HQ@mail.gmail.com>
+In-reply-to: <CABBYNZLVFFP2v0hXEwrxONGr-t-1i5g6rPxVe_G-wrKM2P=8HQ@mail.gmail.com>
+Subject: Re: [PATCH obexd 3/4] irmc: Fix length parameter of strncpy
+Date: Thu, 09 Feb 2012 16:46:43 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping
+Hi Luiz,
 
-On Fri, Feb 3, 2012 at 9:42 AM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Recently, the documented D-Bus interface for Proximity was changed to
-> prepare for the upcoming Proximity Reporter API.
-> ---
->  proximity/monitor.c |    2 +-
->  test/test-proximity |    4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/proximity/monitor.c b/proximity/monitor.c
-> index 76020ee..7bf95a1 100644
-> --- a/proximity/monitor.c
-> +++ b/proximity/monitor.c
-> @@ -49,7 +49,7 @@
->  #include "monitor.h"
->  #include "textfile.h"
->
-> -#define PROXIMITY_INTERFACE "org.bluez.Proximity"
-> +#define PROXIMITY_INTERFACE "org.bluez.ProximityMonitor"
->
->  #define ALERT_LEVEL_CHR_UUID 0x2A06
->  #define POWER_LEVEL_CHR_UUID 0x2A07
-> diff --git a/test/test-proximity b/test/test-proximity
-> index 289908e..130590c 100755
-> --- a/test/test-proximity
-> +++ b/test/test-proximity
-> @@ -53,11 +53,11 @@ if __name__ == "__main__":
->        device_path = adapter.FindDevice(options.address)
->
->        bus.add_signal_receiver(property_changed, bus_name="org.bluez",
-> -                               dbus_interface="org.bluez.Proximity",
-> +                               dbus_interface="org.bluez.ProximityMonitor",
->                                signal_name="PropertyChanged")
->
->        proximity = dbus.Interface(bus.get_object("org.bluez",
-> -                                       device_path), "org.bluez.Proximity")
-> +                                       device_path), "org.bluez.ProximityMonitor")
->
->        print "Proximity SetProperty('%s', '%s')" % (args[0], args[1])
->        proximity.SetProperty(args[0], args[1])
-> --
-> 1.7.5.4
->
+--------------------------------------------------
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Sent: Thursday, February 09, 2012 4:37 PM
+To: "Jaganath" <jaganath.k@samsung.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH obexd 3/4] irmc: Fix length parameter of strncpy
 
+> Hi Jaganath,
+>
+> On Fri, Feb 3, 2012 at 2:22 PM, Jaganath <jaganath.k@samsung.com> wrote:
+>> I checked IRMC spec and could not find any length restriction.
+>> For "sn" spec says "The format of the field is manufacturer dependent."
+>> and for "manu" and "model" the acceptable value is string.
+>
+> The patch is not exactly wrong, but I fear that if we really start
+> reading this information from somewhere, which I guess it is whole
+> point here, then this fixed length may need some change.
 
+Correct. This patch is just a fix to a static tool reported issue
 
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Regards
+Jaganath
+
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html 
+
