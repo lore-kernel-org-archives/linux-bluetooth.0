@@ -1,42 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1328795351.28848.17.camel@aeonflux>
-Subject: Re: [PATCH 0/3] Advertising cache locking code refactoring
+Message-ID: <1328795138.28848.15.camel@aeonflux>
+Subject: Re: [PATCH 2/2] Bluetooth: Fix double acking I-Frames when sending
+ pending I-Frames
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Andre Guedes <aguedespe@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, andre.guedes@openbossa.org
-Date: Thu, 09 Feb 2012 14:49:11 +0100
-In-Reply-To: <1328588997-25029-1-git-send-email-aguedespe@gmail.com>
-References: <1328588997-25029-1-git-send-email-aguedespe@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Ulisses Furquim <ulisses@profusion.mobi>,
+	kanak.gupta@stericsson.com
+Date: Thu, 09 Feb 2012 14:45:38 +0100
+In-Reply-To: <1328625782-19624-2-git-send-email-szymon.janc@tieto.com>
+References: <1328625782-19624-1-git-send-email-szymon.janc@tieto.com>
+	 <1328625782-19624-2-git-send-email-szymon.janc@tieto.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Szymon,
 
-> This patch series does some code refactoring in advertising cache locking
-> related code. This work is a small effort to improve locking usage in
-> Bluetooth subsystem.
+> Pending I-Frame(s) are considered as acknowledgement. To void double
+> acking (via I-Frame and later via RR) clear ack timer when sending
+> first pending I-Frame.
 > 
-> BR,
-> 
-> Andre
-> 
-> Andre Guedes (3):
->   Bluetooth: Add prefix "__" to advertising cache functions
->   Bluetooth: Create thread-safe advertising cache functions
->   Bluetooth: Use advertising cache thread-safe functions
-> 
->  include/net/bluetooth/hci_core.h |    4 +++
->  net/bluetooth/hci_conn.c         |    2 +-
->  net/bluetooth/hci_core.c         |   51 +++++++++++++++++++++++++++++++------
->  net/bluetooth/hci_event.c        |    6 +---
->  4 files changed, 48 insertions(+), 15 deletions(-)
+> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> ---
+>  net/bluetooth/l2cap_core.c |    4 +++-
+>  1 files changed, 3 insertions(+), 1 deletions(-)
 
-so I looked through this patch series and the only useful patch is 1/3
-and even that one is kinda questionable. However if people in general
-find this a bit clearer that we prefix unlocked hdev functions with __,
-then I would be fine is it. Opinions anybody?
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
