@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv4 07/16] Bluetooth: Add unlocked __l2cap_chan_add function
-Date: Fri, 10 Feb 2012 15:55:04 +0200
-Message-Id: <1328882113-19810-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv4 04/16] Bluetooth: Add l2cap_chan_lock
+Date: Fri, 10 Feb 2012 15:55:01 +0200
+Message-Id: <1328882113-19810-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1328882113-19810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1328882113-19810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,40 +11,58 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Channel lock will be used to lock L2CAP channels which are locked
+currently by socket locks.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c |    9 +++++++--
- 1 files changed, 7 insertions(+), 2 deletions(-)
+ include/net/bluetooth/l2cap.h |   11 +++++++++++
+ net/bluetooth/l2cap_core.c    |    2 ++
+ 2 files changed, 13 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e0e4cc8..632cb2d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -322,7 +322,7 @@ void l2cap_chan_destroy(struct l2cap_chan *chan)
- 	l2cap_chan_put(chan);
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 42fdbb8..f9fe348 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -497,6 +497,7 @@ struct l2cap_chan {
+ 
+ 	void		*data;
+ 	struct l2cap_ops *ops;
++	struct mutex		lock;
+ };
+ 
+ struct l2cap_ops {
+@@ -609,6 +610,16 @@ static inline void l2cap_chan_put(struct l2cap_chan *c)
+ 		kfree(c);
  }
  
--static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
-+void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- {
- 	BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
- 			chan->psm, chan->dcid);
-@@ -368,8 +368,13 @@ static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 
- 	l2cap_chan_hold(chan);
- 
--	mutex_lock(&conn->chan_lock);
- 	list_add(&chan->list, &conn->chan_l);
++static inline void l2cap_chan_lock(struct l2cap_chan *chan)
++{
++	mutex_lock(&chan->lock);
 +}
 +
-+void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
++static inline void l2cap_chan_unlock(struct l2cap_chan *chan)
 +{
-+	mutex_lock(&conn->chan_lock);
-+	__l2cap_chan_add(conn, chan);
- 	mutex_unlock(&conn->chan_lock);
- }
++	mutex_unlock(&chan->lock);
++}
++
+ static inline void l2cap_set_timer(struct l2cap_chan *chan,
+ 					struct delayed_work *work, long timeout)
+ {
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 7aa6e7f..9cb8f48 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -269,6 +269,8 @@ struct l2cap_chan *l2cap_chan_create(struct sock *sk)
+ 	if (!chan)
+ 		return NULL;
  
++	mutex_init(&chan->lock);
++
+ 	chan->sk = sk;
+ 
+ 	write_lock(&chan_list_lock);
 -- 
 1.7.8.3
 
