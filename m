@@ -1,92 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [RFC BlueZ 00/22] Using clang for compiling BlueZ
-Date: Fri, 10 Feb 2012 18:39:45 -0300
-Message-Id: <1328910007-25604-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1328792777-25914-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1328792777-25914-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 10 Feb 2012 16:33:51 -0200
+Message-ID: <CAA37ikbgSAYWuft+Yu=+PfBirsnHWidkqQemWTCJ3Y8hoz92Jg@mail.gmail.com>
+Subject: Re: [RFCv0] Bluetooth: Remove extra chan_put
+From: Ulisses Furquim <ulisses@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrei,
 
-After hearing so much about LLVM/Clang[1][2], I decided to give it a
-try on a project that I care about and see how would it go. The first
-step was cleaning all the warnings that it could find. This is the
-result.
+On Thu, Feb 9, 2012 at 11:06 AM, Emeltchenko Andrei
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Removing l2cap_chan_put since in this function we use l2cap_chan_close
+> and ops->close which use l2cap_chan_put.
+>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+> I am not sure that I have checked all possible cases, so I am sending
+> this as RFC.
+>
+>  net/bluetooth/l2cap_core.c |    1 -
+>  1 files changed, 0 insertions(+), 1 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index f1a6b3c..7db6d7f 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -274,7 +274,6 @@ static void l2cap_chan_timeout(struct work_struct *work)
+>        release_sock(sk);
+>
+>        chan->ops->close(chan->data);
+> -       l2cap_chan_put(chan);
+>  }
+>
+>  struct l2cap_chan *l2cap_chan_create(struct sock *sk)
+> --
+> 1.7.8.3
 
-One thing that I really liked was that the warnings are useful, making
-it very easy to make these changes. In my opinion, Clang is worth
-trying for this feature alone.
+While I think you maybe right, please add BT_DBG() to l2cap_chan_hold
+and l2cap_chan_put and check that. If so, put that information also in
+your patch, please.
 
-As a bonus point, we can now use Clang static analyzer on our code
-base, if someone wants to take a look at what it looks like, here's an
-example[3]. The analyzer still doesn't catch everything that paid
-alternatives do but it is improving.
+Regards,
 
---
-[1] http://llvm.org/
-
-[2] http://clang.llvm.org/
-
-[3] http://littlechina.org/~vcgomes/bluez-static-analysis/2012-02-10-1/
-
-
-Vinicius Costa Gomes (22):
-  lib: Add functions to deal with unaligned access without conversion
-  lib: Add functions to storing values in unaligned places
-  lib: Fix the unaligned memory "getters" not receiving a const pointer
-  tools: Fix using old-style initializers
-  sap: Fix clang compiler warnings related to unaligned memory access
-  lib: Fix using old-style initializers
-  sdp: Fix clang compiler warnings related to unaligned memory access
-  l2test: Fix clang compiler warning related to unaligned memory access
-  rctest: Fix clang compiler warnings related to unaligned memory
-    access
-  dun: Fix using old-style initializers
-  scotest: Fix clang compiler warnings related to unaligned memory
-    access
-  ipctest: Fix using the format specifier "as"
-  audio: Fix clang compiler warnings related to unaligned memory access
-  audio: Fix clang compiler warnings regarding implicit enum conversion
-  sap: Fix compiler warnings related to unaligned memory access
-  network: Fix clang compiler warnings related to unaligned memory
-    access
-  mgmtops: Fix doing a useless memset()
-  adaptername: Fix clang warning related to unaligned memory access
-  sdp: Fix clang compiler warnings related to unaligned memory access
-  hciconfig: Fix using old-style initializers
-  hciconfig: Fix compiler warnings related to unaligned memory access
-  hciemu: Fix clang compiler warnings related to unaligned memory
-    access
-
- audio/avrcp.c         |    8 ++--
- audio/sink.c          |    4 +-
- audio/sink.h          |    2 +-
- audio/source.c        |    4 +-
- audio/source.h        |    2 +-
- compat/dun.c          |    4 +-
- lib/bluetooth.h       |  124 ++++++++++++++++++++++++++++++++++++++++++++-----
- lib/hci.c             |    4 +-
- lib/sdp.c             |   66 +++++++++++++-------------
- network/server.c      |    8 ++--
- plugins/adaptername.c |    2 +-
- plugins/mgmtops.c     |    4 --
- sap/sap-u8500.c       |   10 ++--
- sap/server.c          |   10 +---
- src/sdpd-request.c    |   42 ++++++++--------
- src/sdpd-service.c    |   21 ++++----
- test/hciemu.c         |    9 ++-
- test/ipctest.c        |   12 ++--
- test/l2test.c         |    8 ++--
- test/rctest.c         |    4 +-
- test/scotest.c        |    4 +-
- tools/hciconfig.c     |    6 +-
- tools/hcitool.c       |    2 +-
- tools/rfcomm.c        |    2 +-
- 24 files changed, 229 insertions(+), 133 deletions(-)
-
---
-1.7.8.1
-
+-- 
+Ulisses Furquim
+ProFUSION embedded systems
+http://profusion.mobi
+Mobile: +55 19 9250 0942
+Skype: ulissesffs
