@@ -3,45 +3,159 @@ MIME-Version: 1.0
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [RFC BlueZ 04/22] tools: Fix using old-style initializers
-Date: Fri, 10 Feb 2012 18:39:49 -0300
-Message-Id: <1328910007-25604-5-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [RFC BlueZ 03/22] lib: Fix the unaligned memory "getters" not receiving a const pointer
+Date: Fri, 10 Feb 2012 18:39:48 -0300
+Message-Id: <1328910007-25604-4-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1328910007-25604-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1328910007-25604-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+It should be clear that those functions doesn't change the value of the
+pointer passed to them.
 ---
- tools/hcitool.c |    2 +-
- tools/rfcomm.c  |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ lib/bluetooth.h |   32 ++++++++++++++++----------------
+ 1 files changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/tools/hcitool.c b/tools/hcitool.c
-index 5189d8d..66e5c20 100644
---- a/tools/hcitool.c
-+++ b/tools/hcitool.c
-@@ -74,7 +74,7 @@ static void usage(void);
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index ba241a1..c70bcf9 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -126,22 +126,22 @@ do {						\
+ 	__p->__v = (val);			\
+ } while(0)
  
- static int dev_info(int s, int dev_id, long arg)
+-static inline uint64_t bt_get_h64(void *ptr)
++static inline uint64_t bt_get_h64(const void *ptr)
  {
--	struct hci_dev_info di = { dev_id: dev_id };
-+	struct hci_dev_info di = { .dev_id = dev_id };
- 	char addr[18];
+ 	return bt_get_unaligned((uint64_t *) ptr);
+ }
  
- 	if (ioctl(s, HCIGETDEVINFO, (void *) &di))
-diff --git a/tools/rfcomm.c b/tools/rfcomm.c
-index 6800445..e73b0ba 100644
---- a/tools/rfcomm.c
-+++ b/tools/rfcomm.c
-@@ -673,7 +673,7 @@ static void cmd_show(int ctl, int dev, bdaddr_t *bdaddr, int argc, char **argv)
- 	if (strcmp(argv[0], "all") == 0)
- 		print_dev_list(ctl, 0);
- 	else {
--		struct rfcomm_dev_info di = { id: atoi(argv[0]) };
-+		struct rfcomm_dev_info di = { .id = atoi(argv[0]) };
- 		if (ioctl(ctl, RFCOMMGETDEVINFO, &di) < 0) {
- 			perror("Get info failed");
- 			exit(1);
+-static inline uint32_t bt_get_h32(void *ptr)
++static inline uint32_t bt_get_h32(const void *ptr)
+ {
+ 	return bt_get_unaligned((uint32_t *) ptr);
+ }
+ 
+-static inline uint8_t bt_get_h16(void *ptr)
++static inline uint16_t bt_get_h16(const void *ptr)
+ {
+ 	return bt_get_unaligned((uint16_t *) ptr);
+ }
+ 
+-static inline uint8_t bt_get_h8(void *ptr)
++static inline uint8_t bt_get_h8(const void *ptr)
+ {
+ 	return bt_get_unaligned((uint8_t *) ptr);
+ }
+@@ -167,7 +167,7 @@ static inline void bt_put_h8(uint8_t val, void *ptr)
+ }
+ 
+ #if __BYTE_ORDER == __LITTLE_ENDIAN
+-static inline uint64_t bt_get_le64(void *ptr)
++static inline uint64_t bt_get_le64(const void *ptr)
+ {
+ 	return bt_get_unaligned((uint64_t *) ptr);
+ }
+@@ -177,7 +177,7 @@ static inline void bt_put_le64(uint64_t val, void *ptr)
+ 	bt_put_unaligned(val, (uint64_t *) ptr);
+ }
+ 
+-static inline uint64_t bt_get_be64(void *ptr)
++static inline uint64_t bt_get_be64(const void *ptr)
+ {
+ 	return bswap_64(bt_get_unaligned((uint64_t *) ptr));
+ }
+@@ -187,7 +187,7 @@ static inline void bt_put_be64(uint64_t val, void *ptr)
+ 	bt_put_unaligned(bswap_64(val), (uint64_t *) ptr);
+ }
+ 
+-static inline uint32_t bt_get_le32(void *ptr)
++static inline uint32_t bt_get_le32(const void *ptr)
+ {
+ 	return bt_get_unaligned((uint32_t *) ptr);
+ }
+@@ -197,7 +197,7 @@ static inline void bt_put_le32(uint32_t val, void *ptr)
+ 	bt_put_unaligned(val, (uint32_t *) ptr);
+ }
+ 
+-static inline uint32_t bt_get_be32(void *ptr)
++static inline uint32_t bt_get_be32(const void *ptr)
+ {
+ 	return bswap_32(bt_get_unaligned((uint32_t *) ptr));
+ }
+@@ -207,7 +207,7 @@ static inline void bt_put_be32(uint32_t val, void *ptr)
+ 	bt_put_unaligned(bswap_32(val), (uint32_t *) ptr);
+ }
+ 
+-static inline uint16_t bt_get_le16(void *ptr)
++static inline uint16_t bt_get_le16(const void *ptr)
+ {
+ 	return bt_get_unaligned((uint16_t *) ptr);
+ }
+@@ -217,7 +217,7 @@ static inline void bt_put_le16(uint16_t val, void *ptr)
+ 	bt_put_unaligned(val, (uint16_t *) ptr);
+ }
+ 
+-static inline uint16_t bt_get_be16(void *ptr)
++static inline uint16_t bt_get_be16(const void *ptr)
+ {
+ 	return bswap_16(bt_get_unaligned((uint16_t *) ptr));
+ }
+@@ -227,7 +227,7 @@ static inline void bt_put_be16(uint16_t val, void *ptr)
+ 	bt_put_unaligned(bswap_16(val), (uint16_t *) ptr);
+ }
+ #elif __BYTE_ORDER == __BIG_ENDIAN
+-static inline uint64_t bt_get_le64(void *ptr)
++static inline uint64_t bt_get_le64(const void *ptr)
+ {
+ 	return bswap_64(bt_get_unaligned((uint64_t *) ptr));
+ }
+@@ -237,7 +237,7 @@ static inline void bt_put_le64(uint64_t val, void *ptr)
+ 	bt_put_unaligned(bswap_64(val), (uint64_t *) ptr);
+ }
+ 
+-static inline uint64_t bt_get_be64(void *ptr)
++static inline uint64_t bt_get_be64(const void *ptr)
+ {
+ 	return bt_get_unaligned((uint64_t *) ptr);
+ }
+@@ -247,7 +247,7 @@ static inline void bt_put_be64(uint64_t val, void *ptr)
+ 	bt_put_unaligned(val, (uint64_t *) ptr);
+ }
+ 
+-static inline uint32_t bt_get_le32(void *ptr)
++static inline uint32_t bt_get_le32(const void *ptr)
+ {
+ 	return bswap_32(bt_get_unaligned((uint32_t *) ptr));
+ }
+@@ -257,7 +257,7 @@ static inline void bt_put_le32(uint32_t val, void *ptr)
+ 	bt_put_unaligned(bswap_32(val), (uint32_t *) ptr);
+ }
+ 
+-static inline uint32_t bt_get_be32(void *ptr)
++static inline uint32_t bt_get_be32(const void *ptr)
+ {
+ 	return bt_get_unaligned((uint32_t *) ptr);
+ }
+@@ -267,7 +267,7 @@ static inline void bt_put_be32(uint32_t val, void *ptr)
+ 	bt_put_unaligned(val, (uint32_t *) ptr);
+ }
+ 
+-static inline uint16_t bt_get_le16(void *ptr)
++static inline uint16_t bt_get_le16(const void *ptr)
+ {
+ 	return bswap_16(bt_get_unaligned((uint16_t *) ptr));
+ }
+@@ -277,7 +277,7 @@ static inline void bt_put_le16(uint16_t val, void *ptr)
+ 	bt_put_unaligned(bswap_16(val), (uint16_t *) ptr);
+ }
+ 
+-static inline uint16_t bt_get_be16(void *ptr)
++static inline uint16_t bt_get_be16(const void *ptr)
+ {
+ 	return bt_get_unaligned((uint16_t *) ptr);
+ }
 -- 
 1.7.8.1
 
