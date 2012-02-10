@@ -3,31 +3,41 @@ MIME-Version: 1.0
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [RFC BlueZ 18/22] adaptername: Fix clang warning related to unaligned memory access
-Date: Fri, 10 Feb 2012 18:40:03 -0300
-Message-Id: <1328910007-25604-19-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [RFC BlueZ 17/22] mgmtops: Fix doing a useless memset()
+Date: Fri, 10 Feb 2012 18:40:02 -0300
+Message-Id: <1328910007-25604-18-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1328910007-25604-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1328910007-25604-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+The buffers were already allocated using g_try_malloc0().
 ---
- plugins/adaptername.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ plugins/mgmtops.c |    4 ----
+ 1 files changed, 0 insertions(+), 4 deletions(-)
 
-diff --git a/plugins/adaptername.c b/plugins/adaptername.c
-index e154e92..a2f9c8f 100644
---- a/plugins/adaptername.c
-+++ b/plugins/adaptername.c
-@@ -241,7 +241,7 @@ static gboolean handle_inotify_cb(GIOChannel *channel, GIOCondition cond,
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index 7e47386..d354bc6 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -1958,8 +1958,6 @@ static int mgmt_load_link_keys(int index, GSList *keys, gboolean debug_keys)
+ 	if (buf == NULL)
+ 		return -ENOMEM;
  
- 	i = 0;
- 	while (i < len) {
--		struct inotify_event *pevent = (struct inotify_event *) &buf[i];
-+		struct inotify_event *pevent = (void *) &buf[i];
+-	memset(buf, 0, sizeof(buf));
+-
+ 	hdr = (void *) buf;
+ 	hdr->opcode = htobs(MGMT_OP_LOAD_LINK_KEYS);
+ 	hdr->len = htobs(cp_size);
+@@ -2169,8 +2167,6 @@ static int mgmtops_load_ltks(int index, GSList *keys)
+ 	if (buf == NULL)
+ 		return -ENOMEM;
  
- 		/* check that it's ours */
- 		if (pevent->len && pevent->name != NULL &&
+-	memset(buf, 0, sizeof(buf));
+-
+ 	hdr = (void *) buf;
+ 	hdr->opcode = htobs(MGMT_OP_LOAD_LONG_TERM_KEYS);
+ 	hdr->len = htobs(cp_size);
 -- 
 1.7.8.1
 
