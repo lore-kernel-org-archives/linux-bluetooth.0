@@ -1,52 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1328792777-25914-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1328792777-25914-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Fri, 10 Feb 2012 16:33:51 -0200
-Message-ID: <CAA37ikbgSAYWuft+Yu=+PfBirsnHWidkqQemWTCJ3Y8hoz92Jg@mail.gmail.com>
-Subject: Re: [RFCv0] Bluetooth: Remove extra chan_put
+In-Reply-To: <20120210091816.GF28197@aemeltch-MOBL1>
+References: <1328797057-26331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1328797057-26331-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<CAA37ikaPnRheNYxZoNRYA6Qg+ndiW887k3ZqH51htEphCK8uBA@mail.gmail.com>
+	<20120210091816.GF28197@aemeltch-MOBL1>
+Date: Fri, 10 Feb 2012 16:31:26 -0200
+Message-ID: <CAA37ikZKJgtRoF-aK60W0AZr93u6zJ9T6=oB+6bzNLv80R=KbQ@mail.gmail.com>
+Subject: Re: [RFCv3 15/16] Bluetooth: Use l2cap chan lock in socket connect
 From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+	Ulisses Furquim <ulisses@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-On Thu, Feb 9, 2012 at 11:06 AM, Emeltchenko Andrei
+On Fri, Feb 10, 2012 at 7:18 AM, Emeltchenko Andrei
 <Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Hi Ulisses,
 >
-> Removing l2cap_chan_put since in this function we use l2cap_chan_close
-> and ops->close which use l2cap_chan_put.
+> On Thu, Feb 09, 2012 at 04:25:11PM -0200, Ulisses Furquim wrote:
+>> >        bacpy(src, conn->src);
+>> >
+>> > +       l2cap_chan_unlock(chan);
+>> >        l2cap_chan_add(conn, chan);
+>> > +       l2cap_chan_lock(chan);
+>>
+>> Hum, do we really need to do this? Maybe l2cap_chan_add() can receive
+>> chan already locked?
 >
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
-> I am not sure that I have checked all possible cases, so I am sending
-> this as RFC.
+> Then we have here order of locking changed and I have lockdep warnings.
 >
->  net/bluetooth/l2cap_core.c |    1 -
->  1 files changed, 0 insertions(+), 1 deletions(-)
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index f1a6b3c..7db6d7f 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -274,7 +274,6 @@ static void l2cap_chan_timeout(struct work_struct *work)
->        release_sock(sk);
->
->        chan->ops->close(chan->data);
-> -       l2cap_chan_put(chan);
->  }
->
->  struct l2cap_chan *l2cap_chan_create(struct sock *sk)
-> --
-> 1.7.8.3
+> And here l2cap_chan_add used locked.
 
-While I think you maybe right, please add BT_DBG() to l2cap_chan_hold
-and l2cap_chan_put and check that. If so, put that information also in
-your patch, please.
+Why the locked version and not __l2cap_chan_add()?
+
+>>
+>> > -       __l2cap_state_change(chan, BT_CONNECT);
+>> > +       l2cap_state_change(chan, BT_CONNECT);
+>>
+>> Why? Is there a problem moving the release_sock() call to we don't
+>> call the locked function here?
+>>
+>> >        __set_chan_timer(chan, sk->sk_sndtimeo);
+>> >
+>> >        if (hcon->state == BT_CONNECTED) {
+>> >                if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+>> >                        __clear_chan_timer(chan);
+>> >                        if (l2cap_chan_check_security(chan))
+>> > -                               __l2cap_state_change(chan, BT_CONNECTED);
+>> > +                               l2cap_state_change(chan, BT_CONNECTED);
+>>
+>> And here as well.
+>
+> Then we would need to release lock before l2cap_do_start.
+
+Sure.
+
+>>
+>> >                } else
+>> >                        l2cap_do_start(chan);
+>
+>
+> Best regards
+> Andrei Emeltchenko
 
 Regards,
 
