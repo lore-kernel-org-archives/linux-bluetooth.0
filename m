@@ -3,36 +3,45 @@ MIME-Version: 1.0
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ] adapter: Fix possible invalid memory access
-Date: Fri, 10 Feb 2012 18:47:52 -0300
-Message-Id: <1328910472-26550-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [RFC BlueZ 22/22] hciemu: Fix clang compiler warnings related to unaligned memory access
+Date: Fri, 10 Feb 2012 18:40:07 -0300
+Message-Id: <1328910007-25604-23-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1328910007-25604-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1328910007-25604-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
+ test/hciemu.c |    9 ++++++---
+ 1 files changed, 6 insertions(+), 3 deletions(-)
 
-This possible crash was detected by the clang static analysis tool.
-
- src/adapter.c |    6 ++++--
- 1 files changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/src/adapter.c b/src/adapter.c
-index 60477bb..36073ff 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1906,8 +1906,10 @@ static void create_stored_device_from_ltks(char *key, char *value,
- 	bdaddr_t src;
-
- 	info = get_ltk_info(key, value);
--	if (info)
--		keys->keys = g_slist_append(keys->keys, info);
-+	if (info == NULL)
-+		return;
+diff --git a/test/hciemu.c b/test/hciemu.c
+index 7eb8814..ac44aa8 100644
+--- a/test/hciemu.c
++++ b/test/hciemu.c
+@@ -388,8 +388,11 @@ static void num_completed_pkts(struct vhci_conn *conn)
+ 	np = (void *) ptr; ptr += EVT_NUM_COMP_PKTS_SIZE;
+ 	np->num_hndl = 1;
+ 
+-	*((uint16_t *) ptr) = htobs(conn->handle); ptr += 2;
+-	*((uint16_t *) ptr) = htobs(vdev.acl_cnt); ptr += 2;
++	bt_put_le16(conn->handle, ptr);
++	ptr += 2;
 +
-+	keys->keys = g_slist_append(keys->keys, info);
-
- 	if (g_slist_find_custom(adapter->devices, key,
- 					(GCompareFunc) device_address_cmp))
---
++	bt_put_le16(vdev.acl_cnt, ptr);
++	ptr += 2;
+ 
+ 	write_snoop(vdev.dd, HCI_EVENT_PKT, 1, buf, ptr - buf);
+ 
+@@ -1009,7 +1012,7 @@ static int getbdaddrbyname(char *str, bdaddr_t *ba)
+ 		bdaddr_t b;
+ 
+ 		memcpy(&b, &addr, 4);
+-		*(uint16_t *) (&b.b[4]) = htons(atoi(str));
++		bt_put_be16(atoi(str), &b.b[4]);
+ 		baswap(ba, &b);
+ 
+ 		return 0;
+-- 
 1.7.8.1
 
