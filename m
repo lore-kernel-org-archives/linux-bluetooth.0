@@ -1,129 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] btio: Adjust socket buffers to be at least as big as MTU
-Date: Fri, 10 Feb 2012 16:32:41 +0200
-Message-Id: <1328884361-3909-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFCv4 06/16] Bluetooth: Add socket error function
+Date: Fri, 10 Feb 2012 15:55:03 +0200
+Message-Id: <1328882113-19810-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1328882113-19810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1328882113-19810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Maybe could be done in kernel automatically as it could be considered
-broken in case of SOCK_SEQPACKET if socket buffer cannot hold a
-write/read of MTU size.
+Use locked and unlocked versions to help removing socket
+locks from l2cap.
 
-This is not actually a new problem as there exist a workaround in
-avdtp.c to adjust the socket buffer too, but it became more evident
-with introduction of gobex which can use SOCK_SEQPACKET with a
-considerable big MTU (up to 64k) which will fail if there is not
-enough space to stuff full packets.
-
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
-This adds checks for socket type and only adjust in case of SOCK_SEQPACKET
+ net/bluetooth/l2cap_core.c |   30 +++++++++++++++++++++---------
+ 1 files changed, 21 insertions(+), 9 deletions(-)
 
- btio/btio.c |   57 +++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 files changed, 53 insertions(+), 4 deletions(-)
-
-diff --git a/btio/btio.c b/btio/btio.c
-index 9781ec4..656b7e0 100644
---- a/btio/btio.c
-+++ b/btio/btio.c
-@@ -119,6 +119,41 @@ static gboolean check_nval(GIOChannel *io)
- 	return FALSE;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 5120a1c..e0e4cc8 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -243,6 +243,22 @@ static void l2cap_state_change(struct l2cap_chan *chan, int state)
+ 	release_sock(sk);
  }
  
-+static void adjust_buffers(GIOChannel *io)
++static inline void __l2cap_chan_set_err(struct l2cap_chan *chan, int err)
 +{
-+	int sk = g_io_channel_unix_get_fd(io);
-+	int type, omtu = 0, imtu = 0, sndbuf = 0, rcvbuf = 0;
-+	socklen_t len = sizeof(int);
++	struct sock *sk = chan->sk;
 +
-+	if (getsockopt(sk, SOL_SOCKET, SO_TYPE, &type, &len) < 0)
-+		return;
-+
-+	if (type != SOCK_SEQPACKET)
-+		return;
-+
-+	/* Checks if it is L2CAP socket otherwise ignores */
-+	if (!bt_io_get(io, BT_IO_L2CAP, NULL, BT_IO_OPT_OMTU, &omtu,
-+						BT_IO_OPT_IMTU, &imtu,
-+						BT_IO_OPT_INVALID))
-+		return;
-+
-+	if (getsockopt(sk, SOL_SOCKET, SO_SNDBUF, &sndbuf, &len) < 0)
-+		return;
-+
-+	if (sndbuf < omtu) {
-+		sndbuf = omtu;
-+		setsockopt(sk, SOL_SOCKET, SO_SNDBUF, &sndbuf, len);
-+	}
-+
-+	if (getsockopt(sk, SOL_SOCKET, SO_RCVBUF, &rcvbuf, &len) < 0)
-+		return;
-+
-+	if (rcvbuf < imtu) {
-+		rcvbuf = imtu;
-+		setsockopt(sk, SOL_SOCKET, SO_RCVBUF, &rcvbuf, len);
-+	}
++	sk->sk_err = err;
 +}
 +
- static gboolean accept_cb(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
++static inline void l2cap_chan_set_err(struct l2cap_chan *chan, int err)
++{
++	struct sock *sk = chan->sk;
++
++	lock_sock(sk);
++	__l2cap_chan_set_err(chan, err);
++	release_sock(sk);
++}
++
+ static void l2cap_chan_timeout(struct work_struct *work)
  {
-@@ -129,10 +164,15 @@ static gboolean accept_cb(GIOChannel *io, GIOCondition cond,
- 	if ((cond & G_IO_NVAL) || check_nval(io))
- 		return FALSE;
+ 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
+@@ -383,7 +399,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 	sock_set_flag(sk, SOCK_ZAPPED);
  
--	if (cond & (G_IO_HUP | G_IO_ERR))
-+	if (cond & (G_IO_HUP | G_IO_ERR)) {
- 		g_set_error(&err, BT_IO_ERROR, BT_IO_ERROR_DISCONNECTED,
- 				"HUP or ERR on socket");
-+		goto done;
-+	}
+ 	if (err)
+-		sk->sk_err = err;
++		__l2cap_chan_set_err(chan, err);
  
-+	adjust_buffers(io);
+ 	if (parent) {
+ 		bt_accept_unlink(sk);
+@@ -715,14 +731,11 @@ static inline int l2cap_mode_supported(__u8 mode, __u32 feat_mask)
+ 
+ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *chan, int err)
+ {
+-	struct sock *sk;
+ 	struct l2cap_disconn_req req;
+ 
+ 	if (!conn)
+ 		return;
+ 
+-	sk = chan->sk;
+-
+ 	if (chan->mode == L2CAP_MODE_ERTM) {
+ 		__clear_retrans_timer(chan);
+ 		__clear_monitor_timer(chan);
+@@ -735,7 +748,7 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
+ 			L2CAP_DISCONN_REQ, sizeof(req), &req);
+ 
+ 	__l2cap_state_change(chan, BT_DISCONN);
+-	sk->sk_err = err;
++	__l2cap_chan_set_err(chan, err);
+ }
+ 
+ /* ---- L2CAP connections ---- */
+@@ -974,10 +987,8 @@ static void l2cap_conn_unreliable(struct l2cap_conn *conn, int err)
+ 	mutex_lock(&conn->chan_lock);
+ 
+ 	list_for_each_entry(chan, &conn->chan_l, list) {
+-		struct sock *sk = chan->sk;
+-
+ 		if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
+-			sk->sk_err = err;
++			l2cap_chan_set_err(chan, err);
+ 	}
+ 
+ 	mutex_unlock(&conn->chan_lock);
+@@ -2992,7 +3003,8 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 		}
+ 
+ 	default:
+-		sk->sk_err = ECONNRESET;
++		__l2cap_chan_set_err(chan, ECONNRESET);
 +
-+done:
- 	accept->connect(io, err, accept->user_data);
- 
- 	g_clear_error(&err);
-@@ -159,14 +199,21 @@ static gboolean connect_cb(GIOChannel *io, GIOCondition cond,
- 		else
- 			err = -sk_err;
- 
--		if (err < 0)
-+		if (err < 0) {
- 			g_set_error(&gerr, BT_IO_ERROR,
- 					BT_IO_ERROR_CONNECT_FAILED, "%s (%d)",
- 					strerror(-err), -err);
--	} else if (cond & (G_IO_HUP | G_IO_ERR))
-+			goto done;
-+		}
-+	} else if (cond & (G_IO_HUP | G_IO_ERR)) {
- 		g_set_error(&gerr, BT_IO_ERROR, BT_IO_ERROR_CONNECT_FAILED,
- 				"HUP or ERR on socket");
-+		goto done;
-+	}
-+
-+	adjust_buffers(io);
- 
-+done:
- 	conn->connect(io, gerr, conn->user_data);
- 
- 	if (gerr)
-@@ -199,8 +246,10 @@ static gboolean server_cb(GIOChannel *io, GIOCondition cond,
- 
- 	if (server->confirm)
- 		server->confirm(cli_io, server->user_data);
--	else
-+	else {
-+		adjust_buffers(cli_io);
- 		server->connect(cli_io, NULL, server->user_data);
-+	}
- 
- 	g_io_channel_unref(cli_io);
- 
+ 		__set_chan_timer(chan,
+ 				msecs_to_jiffies(L2CAP_DISC_REJ_TIMEOUT));
+ 		l2cap_send_disconn_req(conn, chan, ECONNRESET);
 -- 
-1.7.7.6
+1.7.8.3
 
