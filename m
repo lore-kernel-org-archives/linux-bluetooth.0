@@ -1,313 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Fri, 10 Feb 2012 16:24:56 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: Fwd: Linux 3.3-rc3
+Message-ID: <20120210182456.GD5022@joana>
+References: <CA+55aFyDE+chjpt9N5yNG=+A_LL5qhZjPYfOjFGuZcXUPGEoOQ@mail.gmail.com>
+ <20120210100809.GB28736@pcnci.linuxbox.cz>
+ <CA+55aFw9wOUbJKm7vVZYzFfKucanX43T2RwKoEfvNiVeEJP-2A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1328882113-19810-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1328882113-19810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1328882113-19810-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Fri, 10 Feb 2012 16:24:57 -0200
-Message-ID: <CAA37ikZ7Ph3D_fBMLFQ_rh2JDJY2LXPzKWkLcQEsXutcj1idxA@mail.gmail.com>
-Subject: Re: [RFCv4 02/16] Bluetooth: Revert to mutexes from RCU list
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CA+55aFw9wOUbJKm7vVZYzFfKucanX43T2RwKoEfvNiVeEJP-2A@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Linus,
 
-On Fri, Feb 10, 2012 at 11:54 AM, Emeltchenko Andrei
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Usage of RCU list looks not reasonalbe for a number of reasons:
-> our code sleep and we have to use socket spinlocks, some parts
-> of code are updaters thus we need to use mutexes anyway.
->
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c |   98 ++++++++++++++++++++-----------------------
->  1 files changed, 46 insertions(+), 52 deletions(-)
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 8dfccb3..ffc4179 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -77,36 +77,24 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
->
->  static struct l2cap_chan *__l2cap_get_chan_by_dcid(struct l2cap_conn *conn, u16 cid)
->  {
-> -       struct l2cap_chan *c, *r = NULL;
-> -
-> -       rcu_read_lock();
-> +       struct l2cap_chan *c;
->
-> -       list_for_each_entry_rcu(c, &conn->chan_l, list) {
-> -               if (c->dcid == cid) {
-> -                       r = c;
-> -                       break;
-> -               }
-> +       list_for_each_entry(c, &conn->chan_l, list) {
-> +               if (c->dcid == cid)
-> +                       return c;
->        }
-> -
-> -       rcu_read_unlock();
-> -       return r;
-> +       return NULL;
->  }
->
->  static struct l2cap_chan *__l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 cid)
->  {
-> -       struct l2cap_chan *c, *r = NULL;
-> -
-> -       rcu_read_lock();
-> +       struct l2cap_chan *c;
->
-> -       list_for_each_entry_rcu(c, &conn->chan_l, list) {
-> -               if (c->scid == cid) {
-> -                       r = c;
-> -                       break;
-> -               }
-> +       list_for_each_entry(c, &conn->chan_l, list) {
-> +               if (c->scid == cid)
-> +                       return c;
->        }
-> -
-> -       rcu_read_unlock();
-> -       return r;
-> +       return NULL;
->  }
->
->  /* Find channel with given SCID.
-> @@ -115,36 +103,34 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 ci
->  {
->        struct l2cap_chan *c;
->
-> +       mutex_lock(&conn->chan_lock);
->        c = __l2cap_get_chan_by_scid(conn, cid);
->        if (c)
->                lock_sock(c->sk);
-> +       mutex_unlock(&conn->chan_lock);
->        return c;
->  }
->
->  static struct l2cap_chan *__l2cap_get_chan_by_ident(struct l2cap_conn *conn, u8 ident)
->  {
-> -       struct l2cap_chan *c, *r = NULL;
-> -
-> -       rcu_read_lock();
-> +       struct l2cap_chan *c;
->
-> -       list_for_each_entry_rcu(c, &conn->chan_l, list) {
-> -               if (c->ident == ident) {
-> -                       r = c;
-> -                       break;
-> -               }
-> +       list_for_each_entry(c, &conn->chan_l, list) {
-> +               if (c->ident == ident)
-> +                       return c;
->        }
-> -
-> -       rcu_read_unlock();
-> -       return r;
-> +       return NULL;
->  }
->
->  static inline struct l2cap_chan *l2cap_get_chan_by_ident(struct l2cap_conn *conn, u8 ident)
->  {
->        struct l2cap_chan *c;
->
-> +       mutex_lock(&conn->chan_lock);
->        c = __l2cap_get_chan_by_ident(conn, ident);
->        if (c)
->                lock_sock(c->sk);
-> +       mutex_unlock(&conn->chan_lock);
->        return c;
->  }
->
-> @@ -357,7 +343,9 @@ static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
->
->        l2cap_chan_hold(chan);
->
-> -       list_add_rcu(&chan->list, &conn->chan_l);
-> +       mutex_lock(&conn->chan_lock);
-> +       list_add(&chan->list, &conn->chan_l);
-> +       mutex_unlock(&conn->chan_lock);
->  }
->
->  /* Delete channel.
-> @@ -374,8 +362,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
->
->        if (conn) {
->                /* Delete from channel list */
-> -               list_del_rcu(&chan->list);
-> -               synchronize_rcu();
-> +               list_del(&chan->list);
->
->                l2cap_chan_put(chan);
->
-> @@ -426,10 +413,12 @@ static void l2cap_chan_cleanup_listen(struct sock *parent)
->        /* Close not yet accepted channels */
->        while ((sk = bt_accept_dequeue(parent, NULL))) {
->                struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-> +
->                __clear_chan_timer(chan);
->                lock_sock(sk);
->                l2cap_chan_close(chan, ECONNRESET);
->                release_sock(sk);
-> +
->                chan->ops->close(chan->data);
->        }
->  }
-> @@ -743,13 +732,13 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
->  /* ---- L2CAP connections ---- */
->  static void l2cap_conn_start(struct l2cap_conn *conn)
->  {
-> -       struct l2cap_chan *chan;
-> +       struct l2cap_chan *chan, *tmp;
->
->        BT_DBG("conn %p", conn);
->
-> -       rcu_read_lock();
-> +       mutex_lock(&conn->chan_lock);
->
-> -       list_for_each_entry_rcu(chan, &conn->chan_l, list) {
-> +       list_for_each_entry_safe(chan, tmp, &conn->chan_l, list) {
->                struct sock *sk = chan->sk;
->
->                bh_lock_sock(sk);
-> @@ -829,7 +818,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
->                bh_unlock_sock(sk);
->        }
->
-> -       rcu_read_unlock();
-> +       mutex_unlock(&conn->chan_lock);
->  }
->
->  /* Find socket with cid and source bdaddr.
-> @@ -941,9 +930,9 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
->        if (conn->hcon->out && conn->hcon->type == LE_LINK)
->                smp_conn_security(conn, conn->hcon->pending_sec_level);
->
-> -       rcu_read_lock();
-> +       mutex_lock(&conn->chan_lock);
->
-> -       list_for_each_entry_rcu(chan, &conn->chan_l, list) {
-> +       list_for_each_entry(chan, &conn->chan_l, list) {
->                struct sock *sk = chan->sk;
->
->                bh_lock_sock(sk);
-> @@ -963,7 +952,7 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
->                bh_unlock_sock(sk);
->        }
->
-> -       rcu_read_unlock();
-> +       mutex_unlock(&conn->chan_lock);
->  }
->
->  /* Notify sockets that we cannot guaranty reliability anymore */
-> @@ -973,16 +962,16 @@ static void l2cap_conn_unreliable(struct l2cap_conn *conn, int err)
->
->        BT_DBG("conn %p", conn);
->
-> -       rcu_read_lock();
-> +       mutex_lock(&conn->chan_lock);
->
-> -       list_for_each_entry_rcu(chan, &conn->chan_l, list) {
-> +       list_for_each_entry(chan, &conn->chan_l, list) {
->                struct sock *sk = chan->sk;
->
->                if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
->                        sk->sk_err = err;
->        }
->
-> -       rcu_read_unlock();
-> +       mutex_unlock(&conn->chan_lock);
->  }
->
->  static void l2cap_info_timeout(struct work_struct *work)
-> @@ -1009,6 +998,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
->
->        kfree_skb(conn->rx_skb);
->
-> +       mutex_lock(&conn->chan_lock);
-> +
->        /* Kill channels */
->        list_for_each_entry_safe(chan, l, &conn->chan_l, list) {
->                sk = chan->sk;
-> @@ -1018,6 +1009,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
->                chan->ops->close(chan->data);
->        }
->
-> +       mutex_unlock(&conn->chan_lock);
-> +
->        hci_chan_del(conn->hchan);
->
->        if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
-> @@ -1075,6 +1068,7 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
->        conn->feat_mask = 0;
->
->        spin_lock_init(&conn->lock);
-> +       mutex_init(&conn->chan_lock);
->
->        INIT_LIST_HEAD(&conn->chan_l);
->
-> @@ -1815,9 +1809,9 @@ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
->
->        BT_DBG("conn %p", conn);
->
-> -       rcu_read_lock();
-> +       mutex_lock(&conn->chan_lock);
->
-> -       list_for_each_entry_rcu(chan, &conn->chan_l, list) {
-> +       list_for_each_entry(chan, &conn->chan_l, list) {
->                struct sock *sk = chan->sk;
->                if (chan->chan_type != L2CAP_CHAN_RAW)
->                        continue;
-> @@ -1833,7 +1827,7 @@ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
->                        kfree_skb(nskb);
->        }
->
-> -       rcu_read_unlock();
-> +       mutex_unlock(&conn->chan_lock);
->  }
->
->  /* ---- L2CAP signalling commands ---- */
-> @@ -4515,9 +4509,9 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
->                cancel_delayed_work(&conn->security_timer);
->        }
->
-> -       rcu_read_lock();
-> +       mutex_lock(&conn->chan_lock);
->
-> -       list_for_each_entry_rcu(chan, &conn->chan_l, list) {
-> +       list_for_each_entry(chan, &conn->chan_l, list) {
->                struct sock *sk = chan->sk;
->
->                bh_lock_sock(sk);
-> @@ -4597,7 +4591,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
->                bh_unlock_sock(sk);
->        }
->
-> -       rcu_read_unlock();
-> +       mutex_unlock(&conn->chan_lock);
->
->        return 0;
->  }
+* Linus Torvalds <torvalds@linux-foundation.org> [2012-02-10 08:56:29 -0800=
+]:
+
+> This seems to have gotten lost somewhere - the lkml post was from the
+> middle of January.
+
+Actually not, the fix is in another tree and should be sent mainline soon. I
+was away from development during January and the pull requests stopped duri=
+ng
+that time. Things should be back to normal now.
+
+If you wanna go ahead and apply this patch directly you have my ack:
+
+Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
+
+	Gustavo
+
+>=20
+>                     Linus
+>=20
+> ---------- Forwarded message ----------
+> From: Nikola Ciprich <nikola.ciprich@linuxbox.cz>
+> Date: Fri, Feb 10, 2012 at 2:08 AM
+> Subject: Re: Linux 3.3-rc3
+> To: Linus Torvalds <torvalds@linux-foundation.org>
+> Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+> geert@linux-m68k.org
+>=20
+>=20
+> On Wed, Feb 08, 2012 at 07:36:37PM -0800, Linus Torvalds wrote:
+> > Another week, another -rc.
+> >
+> > No big surprises, which is just how I like it. About a third of the
+> > patches are in ARM, but the bulk of that is due to the removal of the
+> > unused DMA map code form the bcmring support. So no complaints.
+> >
+> > The rest is fairly flat in the diffstat (=3D=3D random small changes all
+> > over), although mostly drivers. More sound/hda (and asoc) updates,
+> > some target and IB updates, etc etc.
+> >
+> > Shortlog appended for your perusal, you can see the kind of largely
+> > "fix small details" almost all of it is,
+>=20
+> Hi,
+>=20
+> just wanted to let You know, that following fix didn't make it into
+> Your tree yet:
+> https://lkml.org/lkml/2012/1/15/23
+>=20
+> the bug is causing build failures with some GCC versions:
+>=20
+> =C2=A0CC [M] =C2=A0net/bluetooth/l2cap_sock.o
+> net/bluetooth/l2cap_sock.c: In function =E2=80=98l2cap_sock_connect=E2=80=
+=99:
+> include/net/bluetooth/l2cap.h:838: sorry, unimplemented: inlining
+> failed in call to =E2=80=98l2cap_chan_connect=E2=80=99: function body not=
+ available
+> net/bluetooth/l2cap_sock.c:126: sorry, unimplemented: called from here
+> make[2]: *** [net/bluetooth/l2cap_sock.o] Error 1
+> make[1]: *** [net/bluetooth] Error 2
+> make: *** [net] Error 2
+>=20
+> BR
+> nik
+>=20
+>=20
 > --
-> 1.7.8.3
-
-No need to lock and unlock conn->chan_lock in l2cap_disconnect_rsp()?
-This change from RCU to mutexes really should be just one commit IMO.
-This series is starting to get all confused. The change to RCU was
-only one commit so it should be possible to do the "revert" without
-breaking anything.
-
-Regards,
-
--- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+> -------------------------------------
+> Ing. Nikola CIPRICH
+> LinuxBox.cz, s.r.o.
+> 28. rijna 168, 709 01 Ostrava
+>=20
+> tel.: =C2=A0 +420 596 603 142
+> fax: =C2=A0 =C2=A0+420 596 621 273
+> mobil: =C2=A0+420 777 093 799
+> www.linuxbox.cz
+>=20
+> mobil servis: +420 737 238 656
+> email servis: servis@linuxbox.cz
+> -------------------------------------
