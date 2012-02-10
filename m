@@ -1,47 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1328959509.28848.42.camel@aeonflux>
-Subject: Re: [RFC BlueZ 01/22] lib: Add functions to deal with unaligned
- access without conversion
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Sat, 11 Feb 2012 12:25:09 +0100
-In-Reply-To: <1328910007-25604-2-git-send-email-vinicius.gomes@openbossa.org>
-References: <1328910007-25604-1-git-send-email-vinicius.gomes@openbossa.org>
-	 <1328910007-25604-2-git-send-email-vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ] adapter: Fix possible invalid memory access
+Date: Fri, 10 Feb 2012 18:47:52 -0300
+Message-Id: <1328910472-26550-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+---
 
-> In various places we need to do access unaligned memory, but we don't
-> want to do any type of conversions, i.e. the values are already in the
-> host order.
-> ---
->  lib/bluetooth.h |   40 ++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 40 insertions(+), 0 deletions(-)
-> 
-> diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-> index 1dee6df..e9ced19 100644
-> --- a/lib/bluetooth.h
-> +++ b/lib/bluetooth.h
-> @@ -126,6 +126,46 @@ do {						\
->  	__p->__v = (val);			\
->  } while(0)
->  
-> +static inline uint64_t bt_get_h64(void *ptr)
-> +{
-> +	return bt_get_unaligned((uint64_t *) ptr);
-> +}
+This possible crash was detected by the clang static analysis tool.
 
-this is a bad idea. Rather change the code to always clearly use the le
-vs be versions. There is no need for a host copy. You only do this on
-wire protocols and you know the endian.
+ src/adapter.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
-Regards
+diff --git a/src/adapter.c b/src/adapter.c
+index 60477bb..36073ff 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1906,8 +1906,10 @@ static void create_stored_device_from_ltks(char *key, char *value,
+ 	bdaddr_t src;
 
-Marcel
+ 	info = get_ltk_info(key, value);
+-	if (info)
+-		keys->keys = g_slist_append(keys->keys, info);
++	if (info == NULL)
++		return;
++
++	keys->keys = g_slist_append(keys->keys, info);
 
+ 	if (g_slist_find_custom(adapter->devices, key,
+ 					(GCompareFunc) device_address_cmp))
+--
+1.7.8.1
 
