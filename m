@@ -1,53 +1,245 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 10 Feb 2012 10:09:43 +0200
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: Ulisses Furquim <ulisses@profusion.mobi>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv3 02/16] Bluetooth: Revert to mutexes from RCU list
-Message-ID: <20120210080941.GA28197@aemeltch-MOBL1>
-References: <1328797057-26331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1328797057-26331-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1328797634.28848.21.camel@aeonflux>
- <CAA37ikYriwfbS9SQKwqnPn+X6z6OoU1AGvqVnqa1vvsUWptmkg@mail.gmail.com>
+From: "Mohanan, Rajmohan" <rajmohan.mohanan@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: FW: LMP transaction collision at Set encryption
+Date: Fri, 10 Feb 2012 06:11:55 +0000
+Message-ID: <E74476E55D15D942BA0FF3CDAD73606F0417C7@FMSMSX102.amr.corp.intel.com>
+Content-Type: multipart/mixed;
+	boundary="_003_E74476E55D15D942BA0FF3CDAD73606F0417C7FMSMSX102amrcorpi_"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CAA37ikYriwfbS9SQKwqnPn+X6z6OoU1AGvqVnqa1vvsUWptmkg@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ulisses,
+--_003_E74476E55D15D942BA0FF3CDAD73606F0417C7FMSMSX102amrcorpi_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 09, 2012 at 03:54:44PM -0200, Ulisses Furquim wrote:
-> Hi Andrei,
-> 
-> On Thu, Feb 9, 2012 at 12:27 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > Hi Andrei,
-> >
-> >> Usage of RCU list looks not reasonalbe for a number of reasons:
-> >> our code sleep and we have to use socket spinlocks, some parts
-> >> of code are updaters thus we need to use mutexes anyway.
-> >>
-> >> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> >> ---
-> >>  net/bluetooth/l2cap_core.c |  108 ++++++++++++++++++++++----------------------
-> >>  1 files changed, 54 insertions(+), 54 deletions(-)
-> >
-> > I am fine with this, but I wanna get an ack from Ulisses as well.
-> 
-> Please, refer to my previous review because it seems you haven't
-> changed anything at all. For instance, l2cap_disconnect_rsp() is still
+Hi,
+             I got an interesting issue in bluez stack .
 
-those changes are in other patch:
-[RFCv3 09/16] Bluetooth: Use chan lock in L2CAP sig commands
+1.       I started pairing from my device(DUT) to a remote device (Lenovo T=
+500). After successful bonding bluez send device discovery in    the same A=
+CL connection created prior to BONDING
+2.       I'm changed to my role as slave.
+3.       From my LMP ,sending Set Connection Encryption, I'm getting LMP Er=
+ror Transaction Collision as status of my encryption command
+           (Remote guy who is a master has also initiated Set encryption).
+4.       In between bluez has initiated SDP search after bonding process co=
+mplete(device_bonding_complete()) so l2cap connect req has initiated and th=
+e BT state is BT_CONFIG
+5.       From the encryption change event (event status is )x23(LMP transac=
+tion collision),l2cap_connect_cfm will call and in that we are disconnectin=
+g l2cap and then acl link.
 
-I was thinking that this patch change RCU to mutex chan list locks
-and the changes which change socket lock to chan lock are different.
+ If we are getting Lmp transaction collision and we are slave . do we need =
+to Disconnect ACL link ? .
 
-> missing an unlock of chan_lock and I see no changes to l2cap_sock.c
-> which are needed. Moreover, you need to use the unlocked versions of
-> the chan lookup functions and check if we still need the locked ones.
+We are not able Find the services of remote device because application writ=
+ten in spite of service discovery has initiated after bonding process.
 
-I will check need for locking function but at least compiler did not warn
-me about unused function.
 
-Best regards 
-Andrei Emeltchenko 
+I'm attaching  Hci dump and Air trace
+>From  hci dump You can find that Slave(DUT) is sending Set encryption comma=
+nd and From Air trace you can see Encryption mod request from Master.
+=20
+I took air trace with Link key which is generated previously. So initial LM=
+P transaction I got in air trace.=20
+I could not able to put new link key which is generated in current transact=
+ion, so after encryption the air trace has some missing packets You can see=
+ after  frame 3288 in air trace.
+
+
+/*code changes*/
+                      I have  made changes in hci_event.c  for solving LMP =
+Transaction collision.
+When we gets Encrypt change event with error code as LMP  transaction colli=
+sion , I'm ignoring the change event because From Master Encrypt change eve=
+nt will process and will get encrypt change event with success second time.=
+ If we are not getting Encrypt change event from master we are sending agai=
+n Set encryption from slave( because we already sent a set encryption which=
+ result in to a collision) after 1 second delay. If we getting a encrypt ch=
+ange event from master after collision event then we delete timer and proce=
+ss it normally.
+
+I got another issue also  with Lenovo T500laptop where , when ever after bo=
+nding Lenovo T500 is initiating a SDP search Request which collides our SDP=
+ request(from Bluez we are initiator we are starting SDP query immediately =
+and if we are responder we are delaying for 2 seconds for starting SDP quer=
+y).
+
+=20
+For solving this IOP issue I have made a change that if we are initiator al=
+so we will delay for 1 second and starting SDP query after bonding.
+
+
+I'm attaching patch for above two issues.
+
+Please review it and  let me know the feedback.
+
+Regards
+Rajmohan
+
+
+
+
+--_003_E74476E55D15D942BA0FF3CDAD73606F0417C7FMSMSX102amrcorpi_
+Content-Type: application/octet-stream;
+	name="0001-Service-discovery-collision-after-bonding-handling.patch"
+Content-Description: 0001-Service-discovery-collision-after-bonding-handling.patch
+Content-Disposition: attachment;
+	filename="0001-Service-discovery-collision-after-bonding-handling.patch";
+	size=1288; creation-date="Fri, 10 Feb 2012 05:17:12 GMT";
+	modification-date="Fri, 10 Feb 2012 04:48:19 GMT"
+Content-Transfer-Encoding: base64
+
+RnJvbSBhYTNlYjNiMWFkNzY4N2UxNmI2NWJjN2QxYmU2OGIwNmUxNGU2ZTlkIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBtb2hhbmFuIDxyYWptb2hhbi5tb2hhbmFuQGludGVsLmNvbT4K
+RGF0ZTogRnJpLCAxMCBGZWIgMjAxMiAxMDoxNjoyMSArMDUzMApTdWJqZWN0OiBbUEFUQ0hdIFNl
+cnZpY2UgZGlzY292ZXJ5IGNvbGxpc2lvbiBhZnRlciBib25kaW5nIGhhbmRsaW5nCgpDaGFuZ2Ut
+SWQ6IEkwODE4NDUxZWIzY2JjZjY0YjUzMzVlMmFlNjI0ZTZhODcyZDg2ZDM0Ci0tLQogc3JjL2Rl
+dmljZS5jIHwgICAgOSArKysrKysrKy0KIDEgZmlsZXMgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCsp
+LCAxIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3NyYy9kZXZpY2UuYyBiL3NyYy9kZXZpY2Uu
+YwppbmRleCA1MzI4ZGI5Li4zNzkzY2IxIDEwMDY0NAotLS0gYS9zcmMvZGV2aWNlLmMKKysrIGIv
+c3JjL2RldmljZS5jCkBAIC0yMDIwLDYgKzIwMjAsNyBAQCB2b2lkIGRldmljZV9ib25kaW5nX2Nv
+bXBsZXRlKHN0cnVjdCBidGRfZGV2aWNlICpkZXZpY2UsIHVpbnQ4X3Qgc3RhdHVzKQogCSAqIGJl
+Zm9yZSBTRFAuIFRoaXMgaXMgZHVlIHRvIHBvdGVudGlhbCBJT1AgaXNzdWVzIGlmIHRoZSBvdGhl
+cgogCSAqIGVuZCBzdGFydHMgZG9pbmcgU0RQIGF0IHRoZSBzYW1lIHRpbWUgYXMgdXMgKi8KIAlp
+ZiAoYm9uZGluZykgeworCSNpZiAwCiAJCS8qIElmIHdlIGFyZSBpbml0aWF0b3JzIHJlbW92ZSBh
+bnkgZGlzY292ZXJ5IHRpbWVyIGFuZCBqdXN0CiAJCSAqIHN0YXJ0IGRpc2NvdmVyaW5nIHNlcnZp
+Y2VzIGRpcmVjdGx5ICovCiAJCWlmIChkZXZpY2UtPmRpc2Nvdl90aW1lcikgewpAQCAtMjAyOSw3
+ICsyMDMwLDEzIEBAIHZvaWQgZGV2aWNlX2JvbmRpbmdfY29tcGxldGUoc3RydWN0IGJ0ZF9kZXZp
+Y2UgKmRldmljZSwgdWludDhfdCBzdGF0dXMpCiAKIAkJZGV2aWNlX2Jyb3dzZShkZXZpY2UsIGJv
+bmRpbmctPmNvbm4sIGJvbmRpbmctPm1zZywKIAkJCQlOVUxMLCBGQUxTRSk7Ci0KKyAgICAgI2Vs
+c2UKKwkgICAgZGVidWcoIlNlcnZpY2UgZGlzY292ZXJ5IHN0YXJ0ZWQiKTsKKwkJCWRldmljZS0+
+ZGlzY292X3RpbWVyID0gZ190aW1lb3V0X2FkZCgKKwkJCQkJCQkxMDAwLAorCQkJCQkJCXN0YXJ0
+X2Rpc2NvdmVyeSwKKwkJCQkJCQlkZXZpY2UpOworCSAjZW5kaWYKIAkJYm9uZGluZ19yZXF1ZXN0
+X2ZyZWUoYm9uZGluZyk7CiAJfSBlbHNlIHsKIAkJaWYgKCFkZXZpY2UtPmJyb3dzZSAmJiAhZGV2
+aWNlLT5kaXNjb3ZfdGltZXIgJiYKLS0gCjEuNy4wLjQKCg==
+
+--_003_E74476E55D15D942BA0FF3CDAD73606F0417C7FMSMSX102amrcorpi_
+Content-Type: application/octet-stream;
+	name="0001-LMP-Transaction-Collision-handling-set-encryption.patch"
+Content-Description: 0001-LMP-Transaction-Collision-handling-set-encryption.patch
+Content-Disposition: attachment;
+	filename="0001-LMP-Transaction-Collision-handling-set-encryption.patch";
+	size=6503; creation-date="Fri, 10 Feb 2012 05:17:24 GMT";
+	modification-date="Fri, 10 Feb 2012 04:30:43 GMT"
+Content-Transfer-Encoding: base64
+
+RnJvbSA5NTdjZTlhYjk3YTU1YjI1MjJhYmM1YjVhYjlkZmJlZWQ5NDMyZGMxIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBtb2hhbmFuIDxyYWptb2hhbi5tb2hhbmFuQGludGVsLmNvbT4K
+RGF0ZTogRnJpLCAxMCBGZWIgMjAxMiAwOTo1NjoyMyArMDUzMApTdWJqZWN0OiBbUEFUQ0hdIExN
+UCBUcmFuc2FjdGlvbiBDb2xsaXNpb24gaGFuZGxpbmdbc2V0IGVuY3J5cHRpb25dCgpDaGFuZ2Ut
+SWQ6IEliYWE1MzYxZmE3ODJlZmIyN2FjYWZmMGM0NDMzYWQyOTAxZmFlY2ExCi0tLQogaW5jbHVk
+ZS9saW51eC9rZXJuZWwuaCAgICAgICAgICAgfCAgICA1ICsrKy0tCiBpbmNsdWRlL25ldC9ibHVl
+dG9vdGgvaGNpLmggICAgICB8ICAgIDEgKwogaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3Jl
+LmggfCAgIDIxICsrKysrKysrKysrLS0tLS0tLS0tLQogbmV0L2JsdWV0b290aC9oY2lfY29ubi5j
+ICAgICAgICAgfCAgIDIyICsrKysrKysrKysrKysrKysrKysrKy0KIG5ldC9ibHVldG9vdGgvaGNp
+X2V2ZW50LmMgICAgICAgIHwgICAxNiArKysrKysrKysrKystLS0tCiA1IGZpbGVzIGNoYW5nZWQs
+IDQ4IGluc2VydGlvbnMoKyksIDE3IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2luY2x1ZGUv
+bGludXgva2VybmVsLmggYi9pbmNsdWRlL2xpbnV4L2tlcm5lbC5oCmluZGV4IGY0ZTMxODQuLjc1
+ZTdmODkgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbGludXgva2VybmVsLmgKKysrIGIvaW5jbHVkZS9s
+aW51eC9rZXJuZWwuaApAQCAtMjAsNiArMjAsNyBAQAogI2luY2x1ZGUgPGFzbS9ieXRlb3JkZXIu
+aD4KICNpbmNsdWRlIDxhc20vYnVnLmg+CiAKKwogZXh0ZXJuIGNvbnN0IGNoYXIgbGludXhfYmFu
+bmVyW107CiBleHRlcm4gY29uc3QgY2hhciBsaW51eF9wcm9jX2Jhbm5lcltdOwogCkBAIC0zODYs
+NyArMzg3LDcgQEAgc3RhdGljIGlubGluZSBjaGFyICpwYWNrX2hleF9ieXRlKGNoYXIgKmJ1Ziwg
+dTggYnl0ZSkKIC8qIHByX2RldmVsKCkgc2hvdWxkIHByb2R1Y2UgemVybyBjb2RlIHVubGVzcyBE
+RUJVRyBpcyBkZWZpbmVkICovCiAjaWZkZWYgREVCVUcKICNkZWZpbmUgcHJfZGV2ZWwoZm10LCAu
+Li4pIFwKLQlwcmludGsoS0VSTl9ERUJVRyBwcl9mbXQoZm10KSwgIyNfX1ZBX0FSR1NfXykKKwlw
+cmludGsoS0VSTl9JTkZPIHByX2ZtdChmbXQpLCAjI19fVkFfQVJHU19fKQogI2Vsc2UKICNkZWZp
+bmUgcHJfZGV2ZWwoZm10LCAuLi4pIFwKIAkoeyBpZiAoMCkgcHJpbnRrKEtFUk5fREVCVUcgcHJf
+Zm10KGZtdCksICMjX19WQV9BUkdTX18pOyAwOyB9KQpAQCAtMzk1LDcgKzM5Niw3IEBAIHN0YXRp
+YyBpbmxpbmUgY2hhciAqcGFja19oZXhfYnl0ZShjaGFyICpidWYsIHU4IGJ5dGUpCiAvKiBJZiB5
+b3UgYXJlIHdyaXRpbmcgYSBkcml2ZXIsIHBsZWFzZSB1c2UgZGV2X2RiZyBpbnN0ZWFkICovCiAj
+aWYgZGVmaW5lZChERUJVRykKICNkZWZpbmUgcHJfZGVidWcoZm10LCAuLi4pIFwKLQlwcmludGso
+S0VSTl9ERUJVRyBwcl9mbXQoZm10KSwgIyNfX1ZBX0FSR1NfXykKKwlwcmludGsoS0VSTl9JTkZP
+IHByX2ZtdChmbXQpLCAjI19fVkFfQVJHU19fKQogI2VsaWYgZGVmaW5lZChDT05GSUdfRFlOQU1J
+Q19ERUJVRykKIC8qIGR5bmFtaWNfcHJfZGVidWcoKSB1c2VzIHByX2ZtdCgpIGludGVybmFsbHkg
+c28gd2UgZG9uJ3QgbmVlZCBpdCBoZXJlICovCiAjZGVmaW5lIHByX2RlYnVnKGZtdCwgLi4uKSBk
+byB7IFwKZGlmZiAtLWdpdCBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2kuaCBiL2luY2x1ZGUv
+bmV0L2JsdWV0b290aC9oY2kuaAppbmRleCBhNjBiNjk0Li40ZjIwNjEyIDEwMDY0NAotLS0gYS9p
+bmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmgKKysrIGIvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hj
+aS5oCkBAIC0xMDQsNiArMTA0LDcgQEAgZW51bSB7CiAjZGVmaW5lIEhDSV9QQUlSSU5HX1RJTUVP
+VVQJKDYwMDAwKQkvKiA2MCBzZWNvbmRzICovCiAjZGVmaW5lIEhDSV9JRExFX1RJTUVPVVQJKDYw
+MDApCS8qIDYgc2Vjb25kcyAqLwogI2RlZmluZSBIQ0lfSU5JVF9USU1FT1VUCSgxMDAwMCkJLyog
+MTAgc2Vjb25kcyAqLworI2RlZmluZSBIQ0lfRU5DUllQVElPTl9USU1FT1VUICgxMDAwKSAvKiAx
+IFNlY29uZHMgICovCiAKIC8qIEhDSSBkYXRhIHR5cGVzICovCiAjZGVmaW5lIEhDSV9DT01NQU5E
+X1BLVAkJMHgwMQpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmgg
+Yi9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaAppbmRleCBkOWIyMGJjLi43YmVmMmNl
+IDEwMDY0NAotLS0gYS9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaAorKysgYi9pbmNs
+dWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaApAQCAtMTg3LDE2ICsxODcsMTcgQEAgc3RydWN0
+IGhjaV9jb25uIHsKIAlfX3U4CQkgb3V0OwogCV9fdTgJCSBhdHRlbXB0OwogCV9fdTgJCSBkZXZf
+Y2xhc3NbM107Ci0JX191OCAgICAgICAgICAgICBmZWF0dXJlc1s4XTsKLQlfX3U4ICAgICAgICAg
+ICAgIHNzcF9tb2RlOwotCV9fdTE2ICAgICAgICAgICAgaW50ZXJ2YWw7Ci0JX191MTYgICAgICAg
+ICAgICBwa3RfdHlwZTsKLQlfX3UxNiAgICAgICAgICAgIGxpbmtfcG9saWN5OworCV9fdTggICAg
+ICAgICBmZWF0dXJlc1s4XTsKKwlfX3U4ICAgICAgICAgc3NwX21vZGU7CisJX191MTYgICAgICAg
+IGludGVydmFsOworCV9fdTE2ICAgICAgICBwa3RfdHlwZTsKKwlfX3UxNiAgICAgICAgbGlua19w
+b2xpY3k7CiAJX191MzIJCSBsaW5rX21vZGU7Ci0JX191OCAgICAgICAgICAgICBhdXRoX3R5cGU7
+Ci0JX191OCAgICAgICAgICAgICBzZWNfbGV2ZWw7Ci0JX191OCAgICAgICAgICAgICBwb3dlcl9z
+YXZlOwotCV9fdTE2ICAgICAgICAgICAgZGlzY190aW1lb3V0OworCV9fdTggICAgICAgICBhdXRo
+X3R5cGU7CisJX191OCAgICAgICAgIHNlY19sZXZlbDsKKwlfX3U4ICAgICAgICAgcG93ZXJfc2F2
+ZTsKKwlfX3UxNiAgICAgICAgZGlzY190aW1lb3V0OworCV9fdTE2ICAgICAgICBlbmNyeXB0X3Rp
+bWVvdXQ7ICAgCiAJdW5zaWduZWQgbG9uZwkgcGVuZDsKIAogCXVuc2lnbmVkIGludAkgc2VudDsK
+QEAgLTIwNSw3ICsyMDYsNyBAQCBzdHJ1Y3QgaGNpX2Nvbm4gewogCiAJc3RydWN0IHRpbWVyX2xp
+c3QgZGlzY190aW1lcjsKIAlzdHJ1Y3QgdGltZXJfbGlzdCBpZGxlX3RpbWVyOwotCisgICAgc3Ry
+dWN0IHRpbWVyX2xpc3QgZW5jcnlwdF90aW1lcjsKIAlzdHJ1Y3Qgd29ya19zdHJ1Y3Qgd29ya19h
+ZGQ7CiAJc3RydWN0IHdvcmtfc3RydWN0IHdvcmtfZGVsOwogCmRpZmYgLS1naXQgYS9uZXQvYmx1
+ZXRvb3RoL2hjaV9jb25uLmMgYi9uZXQvYmx1ZXRvb3RoL2hjaV9jb25uLmMKaW5kZXggMmY0ZDMw
+Zi4uMjJhNmRmMCAxMDA2NDQKLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfY29ubi5jCisrKyBiL25l
+dC9ibHVldG9vdGgvaGNpX2Nvbm4uYwpAQCAtMTk1LDcgKzE5NSwyMyBAQCBzdGF0aWMgdm9pZCBo
+Y2lfY29ubl9pZGxlKHVuc2lnbmVkIGxvbmcgYXJnKQogCiAJaGNpX2Nvbm5fZW50ZXJfc25pZmZf
+bW9kZShjb25uKTsKIH0KK3N0YXRpYyB2b2lkIGhjaV9jb25uX2VuY3J5cHRpb24odW5zaWduZWQg
+bG9uZyBhcmcpCit7CisJc3RydWN0IGhjaV9jb25uICpjb25uID0gKHZvaWQgKikgYXJnOworICAg
+IAorCUJUX0RCRygiRW5jcnlwdGlvbiBzdGF0dXMgY2hlY2siKTsKIAorCWlmKChjb25uKSAmJiAo
+dGVzdF9hbmRfY2xlYXJfYml0KEhDSV9DT05OX0VOQ1JZUFRfUEVORCwmY29ubi0+cGVuZCkpKQor
+CXsKKwkJc3RydWN0IGhjaV9kZXYgKmhkZXYgPSBjb25uLT5oZGV2OworCQlkZWxfdGltZXIoJmNv
+bm4tPmVuY3J5cHRfdGltZXIpOworCQlzdHJ1Y3QgaGNpX2NwX3NldF9jb25uX2VuY3J5cHQgY3A7
+CisJCWNwLmhhbmRsZSAgPSBjb25uLT5oYW5kbGU7CisJCWNwLmVuY3J5cHQgPSAweDAxOworCQlo
+Y2lfc2VuZF9jbWQoaGRldiwgSENJX09QX1NFVF9DT05OX0VOQ1JZUFQsCisJCQkJCXNpemVvZihj
+cCksICZjcCk7CisJfQorfQogc3RydWN0IGhjaV9jb25uICpoY2lfY29ubl9hZGQoc3RydWN0IGhj
+aV9kZXYgKmhkZXYsIGludCB0eXBlLAogCQkJCQlfX3UxNiBwa3RfdHlwZSwgYmRhZGRyX3QgKmRz
+dCkKIHsKQEAgLTIxNiw2ICsyMzIsNyBAQCBzdHJ1Y3QgaGNpX2Nvbm4gKmhjaV9jb25uX2FkZChz
+dHJ1Y3QgaGNpX2RldiAqaGRldiwgaW50IHR5cGUsCiAKIAljb25uLT5wb3dlcl9zYXZlID0gMTsK
+IAljb25uLT5kaXNjX3RpbWVvdXQgPSBIQ0lfRElTQ09OTl9USU1FT1VUOworCWNvbm4tPmVuY3J5
+cHRfdGltZW91dCA9IEhDSV9FTkNSWVBUSU9OX1RJTUVPVVQ7CiAKIAlzd2l0Y2ggKHR5cGUpIHsK
+IAljYXNlIEFDTF9MSU5LOgpAQCAtMjQ1LDYgKzI2Miw3IEBAIHN0cnVjdCBoY2lfY29ubiAqaGNp
+X2Nvbm5fYWRkKHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBpbnQgdHlwZSwKIAogCXNldHVwX3RpbWVy
+KCZjb25uLT5kaXNjX3RpbWVyLCBoY2lfY29ubl90aW1lb3V0LCAodW5zaWduZWQgbG9uZyljb25u
+KTsKIAlzZXR1cF90aW1lcigmY29ubi0+aWRsZV90aW1lciwgaGNpX2Nvbm5faWRsZSwgKHVuc2ln
+bmVkIGxvbmcpY29ubik7CisJc2V0dXBfdGltZXIoJmNvbm4tPmVuY3J5cHRfdGltZXIsIGhjaV9j
+b25uX2VuY3J5cHRpb24sICh1bnNpZ25lZCBsb25nKWNvbm4pOwogCiAJYXRvbWljX3NldCgmY29u
+bi0+cmVmY250LCAwKTsKIApAQCAtMjc1LDYgKzI5Myw4IEBAIGludCBoY2lfY29ubl9kZWwoc3Ry
+dWN0IGhjaV9jb25uICpjb25uKQogCiAJZGVsX3RpbWVyKCZjb25uLT5kaXNjX3RpbWVyKTsKIAor
+CWRlbF90aW1lcigmY29ubi0+ZW5jcnlwdF90aW1lcik7CisKIAlpZiAoY29ubi0+dHlwZSA9PSBB
+Q0xfTElOSykgewogCQlzdHJ1Y3QgaGNpX2Nvbm4gKnNjbyA9IGNvbm4tPmxpbms7CiAJCWlmIChz
+Y28pCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jIGIvbmV0L2JsdWV0b290
+aC9oY2lfZXZlbnQuYwppbmRleCA5MjY1NGEzLi4xYTZjNjY4IDEwMDY0NAotLS0gYS9uZXQvYmx1
+ZXRvb3RoL2hjaV9ldmVudC5jCisrKyBiL25ldC9ibHVldG9vdGgvaGNpX2V2ZW50LmMKQEAgLTY1
+OSw3ICs2NTksNyBAQCBzdGF0aWMgdm9pZCBoY2lfY3Nfc2V0X2Nvbm5fZW5jcnlwdChzdHJ1Y3Qg
+aGNpX2RldiAqaGRldiwgX191OCBzdGF0dXMpCiAKIAlpZiAoIXN0YXR1cykKIAkJcmV0dXJuOwot
+CisgICAgICAgCiAJY3AgPSBoY2lfc2VudF9jbWRfZGF0YShoZGV2LCBIQ0lfT1BfU0VUX0NPTk5f
+RU5DUllQVCk7CiAJaWYgKCFjcCkKIAkJcmV0dXJuOwpAQCAtMTEwMywxNCArMTEwMywxNSBAQCBz
+dGF0aWMgaW5saW5lIHZvaWQgaGNpX2VuY3J5cHRfY2hhbmdlX2V2dChzdHJ1Y3QgaGNpX2RldiAq
+aGRldiwgc3RydWN0IHNrX2J1ZmYgKgogewogCXN0cnVjdCBoY2lfZXZfZW5jcnlwdF9jaGFuZ2Ug
+KmV2ID0gKHZvaWQgKikgc2tiLT5kYXRhOwogCXN0cnVjdCBoY2lfY29ubiAqY29ubjsKLQorICAg
+IHVuc2lnbmVkIGxvbmcgdGltZW87CiAJQlRfREJHKCIlcyBzdGF0dXMgJWQiLCBoZGV2LT5uYW1l
+LCBldi0+c3RhdHVzKTsKIAogCWhjaV9kZXZfbG9jayhoZGV2KTsKLQorICAgIAogCWNvbm4gPSBo
+Y2lfY29ubl9oYXNoX2xvb2t1cF9oYW5kbGUoaGRldiwgX19sZTE2X3RvX2NwdShldi0+aGFuZGxl
+KSk7CiAJaWYgKGNvbm4pIHsKIAkJaWYgKCFldi0+c3RhdHVzKSB7CisJCQlkZWxfdGltZXIoJmNv
+bm4tPmVuY3J5cHRfdGltZXIpOwogCQkJaWYgKGV2LT5lbmNyeXB0KSB7CiAJCQkJLyogRW5jcnlw
+dGlvbiBpbXBsaWVzIGF1dGhlbnRpY2F0aW9uICovCiAJCQkJY29ubi0+bGlua19tb2RlIHw9IEhD
+SV9MTV9BVVRIOwpAQCAtMTExOCw2ICsxMTE5LDEzIEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBoY2lf
+ZW5jcnlwdF9jaGFuZ2VfZXZ0KHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBzdHJ1Y3Qgc2tfYnVmZiAq
+CiAJCQl9IGVsc2UKIAkJCQljb25uLT5saW5rX21vZGUgJj0gfkhDSV9MTV9FTkNSWVBUOwogCQl9
+CisJICAgZWxzZSBpZihldi0+c3RhdHVzID09IDB4MjMpCisJICAgeworCSAgIAkJQlRfREJHKCJM
+TVAgdHJhbnNhY3Rpb29uIGNvbGxpc2lvbiBoYXBwZW5lZCwgd2UgbmVlZCB0byB3YWl0Iik7CisJ
+CQl0aW1lbyA9IG1zZWNzX3RvX2ppZmZpZXMoY29ubi0+ZW5jcnlwdF90aW1lb3V0KTsKKwkJICAg
+IG1vZF90aW1lcigmY29ubi0+ZW5jcnlwdF90aW1lciwgamlmZmllcyArIHRpbWVvKTsKKwkJCWdv
+dG8gZG9uZTsKKwkgICB9CiAKIAkJY2xlYXJfYml0KEhDSV9DT05OX0VOQ1JZUFRfUEVORCwgJmNv
+bm4tPnBlbmQpOwogCkBAIC0xMTMwLDcgKzExMzgsNyBAQCBzdGF0aWMgaW5saW5lIHZvaWQgaGNp
+X2VuY3J5cHRfY2hhbmdlX2V2dChzdHJ1Y3QgaGNpX2RldiAqaGRldiwgc3RydWN0IHNrX2J1ZmYg
+KgogCQl9IGVsc2UKIAkJCWhjaV9lbmNyeXB0X2NmbShjb25uLCBldi0+c3RhdHVzLCBldi0+ZW5j
+cnlwdCk7CiAJfQotCitkb25lOgogCWhjaV9kZXZfdW5sb2NrKGhkZXYpOwogfQogCi0tIAoxLjcu
+MC40Cgo=
+
+--_003_E74476E55D15D942BA0FF3CDAD73606F0417C7FMSMSX102amrcorpi_--
