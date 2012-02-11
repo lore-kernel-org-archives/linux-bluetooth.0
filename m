@@ -1,13 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1328959918.28848.46.camel@aeonflux>
-Subject: Re: [RFC BlueZ 12/22] ipctest: Fix using the format specifier "as"
+Message-ID: <1328959677.28848.44.camel@aeonflux>
+Subject: Re: [RFC BlueZ 02/22] lib: Add functions to storing values in
+ unaligned places
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Sat, 11 Feb 2012 12:31:58 +0100
-In-Reply-To: <1328910007-25604-13-git-send-email-vinicius.gomes@openbossa.org>
+Date: Sat, 11 Feb 2012 12:27:57 +0100
+In-Reply-To: <1328910007-25604-3-git-send-email-vinicius.gomes@openbossa.org>
 References: <1328910007-25604-1-git-send-email-vinicius.gomes@openbossa.org>
-	 <1328910007-25604-13-git-send-email-vinicius.gomes@openbossa.org>
+	 <1328910007-25604-3-git-send-email-vinicius.gomes@openbossa.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,33 +16,24 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Vinicius,
 
-> This format specifier is GNU specific.
-> ---
->  test/ipctest.c |   12 ++++++------
->  1 files changed, 6 insertions(+), 6 deletions(-)
+>  lib/bluetooth.h |   60 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 60 insertions(+), 0 deletions(-)
 > 
-> diff --git a/test/ipctest.c b/test/ipctest.c
-> index cbfd78d..012de0a 100644
-> --- a/test/ipctest.c
-> +++ b/test/ipctest.c
-> @@ -987,10 +987,10 @@ static gboolean input_cb(GIOChannel *gin, GIOCondition condition, gpointer data)
->  	}
+> diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+> index e9ced19..ba241a1 100644
+> --- a/lib/bluetooth.h
+> +++ b/lib/bluetooth.h
+> @@ -172,60 +172,120 @@ static inline uint64_t bt_get_le64(void *ptr)
+>  	return bt_get_unaligned((uint64_t *) ptr);
+>  }
 >  
->  	IF_CMD(debug) {
-> -		char *what = NULL;
-> +		char what[15];
->  		int enable;
->  
-> -		if (sscanf(line, "%*s %as %d", &what, &enable) != 1)
-> +		if (sscanf(line, "%*s %s %d", what, &enable) != 1)
->  			DBG("debug [stream_read|stream_write] [0|1]");
+> +static inline void bt_put_le64(uint64_t val, void *ptr)
+> +{
+> +	bt_put_unaligned(val, (uint64_t *) ptr);
+> +}
+> +
 
-"Matches a  sequence  of  non-white-space  characters;  the  next
-pointer must be a pointer to character array that is long enough
-to hold the input sequence and the  terminating  null  character
-('\0'), which is added automatically."
-
-At least use alloca. And it is still pointer of pointer.
+and how does this work on a big endian machine?
 
 Regards
 
