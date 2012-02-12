@@ -1,56 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Sun, 12 Feb 2012 18:15:14 +0100
+From: =?utf-8?B?VG9tw6HFoSBKYW5vdcWhZWs=?= <tomi@nomi.cz>
+To: Szymon Janc <szymon@janc.net.pl>
+Cc: Gustavo Padovan <padovan@profusion.mobi>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Linux PM mailing list <linux-pm@vger.kernel.org>,
+	"Srivatsa S. Bhat" <srivatsa.bhat@linux.vnet.ibm.com>
+Subject: Re: [REGRESSION] resume takes 10s longer due to e1b6eb3
+	(Bluetooth: Increase HCI reset timeout ...)
+Message-ID: <20120212171514.GA22073@nomi.cz>
+References: <20111118184017.GA5052@nomi.cz> <201112282021.04658.szymon@janc.net.pl> <20120212113743.GA14271@notes.lisk.in> <201202121749.31792.szymon@janc.net.pl>
 MIME-Version: 1.0
-In-Reply-To: <CAH=dYrE9EOudkk0mYwFpjgMM-kJ9bwFoDDJFrcWPwRG9NJM-uA@mail.gmail.com>
-References: <CAH=dYrHhttmRjkVuo9QvJ5_Uqd+BJGCJJkaMw8153RW1SFv9dA@mail.gmail.com>
-	<4F2316C7.9030202@canonical.com>
-	<CAH=dYrF-71hTkxS1qpohT_Ja_XKEVwMyVT5ZXg2FZjK4c2Fyig@mail.gmail.com>
-	<CAH=dYrE9EOudkk0mYwFpjgMM-kJ9bwFoDDJFrcWPwRG9NJM-uA@mail.gmail.com>
-Date: Sun, 12 Feb 2012 12:44:50 -0500
-Message-ID: <CAH=dYrFs+Ty2XxWvv6y-OMi6stT-tYR7nL20+2fyQLV3RgseKQ@mail.gmail.com>
-Subject: Re: firmware loading failure for AR3011 (0cf3:3000 or 0cf3:3005 ?)
-From: Andres Cimmarusti <acimmarusti@gmail.com>
-To: "James M. Leddy" <james.leddy@canonical.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jonathan Nieder <jrnieder@gmail.com>, 641749@bugs.debian.org,
-	info@linuxcertified.com
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <201202121749.31792.szymon@janc.net.pl>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I believe I have finally narrowed down the problem. It lies in the
-'libmtp-runtime' package with the command 'mtp-probe' (only present in
-wheezy or newer).
+Hi,
 
-I'm not sure what this is doing to my system, but when the package
-mentioned is installed, it "messes" up my atheros bluetooth device so
-that the kernel/udev cannot load the firmware into it.
+On Sun, Feb 12, 2012 at 05:49:31PM +0100, Szymon Janc wrote:
+> Can you try with this patch applied: 
+> http://git.kernel.org/?p=linux/kernel/git/jh/bluetooth-
+> next.git;a=commit;h=30a824d82726f4d10105e5f8c1afa7ebcda17523
+> ?
 
-As soon as I uninstalled this package and thus caused the boot process
-to throw some errors about missing mtp-probe command, my bluetooth
-module was correctly loaded and the led turned on.
+Yes. It no longer waits 10 seconds. Bluetooth works fine both before and after
+suspend/resume (just so you don't have to ask). Thanks.
 
->> Inexplicably yesterday's (and the day before) Debian testing snapshot
->> seems to have the problem fixed!
-
-I guess this snapshot that I tested earlier didn't have that package installed
-
-I found out about this completely by chance. For whatever reason, on
-my second upgrade to wheezy 'apt-get dist-upgrade' didn't pull
-'libmtp-runtime' and my bluetooth module just worked.
-
-I tried to get the bootlog messages so I can send this info, but even
-with bootlogd enabled these messages happen too early on the boot
-process to be logged in /var/log/boot.
-
-I feel this is not necessarily a kernel bug anymore (all kernels
-tested work fine 3.0.x, 3.1.x, 3.2.x and even 3.3.0-rc3). But the
-experts will know better.
-
-This is definitely progress!
-
-Cheers
-
-Andres
-
-PS: please forward the info to other bug reports I don't have access
-to, like Red Hat / Fedora and Ubuntu. Additional testing is needed.
+-- 
+Tomáš Janoušek, a.k.a. Liskni_si, http://work.lisk.in/
