@@ -1,66 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Joe Perches <joe@perches.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH 0/2] bluetooth: logging cleanups and trivial object shrinking
-Date: Sun, 12 Feb 2012 19:15:52 -0800
-Message-Id: <cover.1329102581.git.joe@perches.com>
+MIME-Version: 1.0
+In-Reply-To: <CAH=dYrE9EOudkk0mYwFpjgMM-kJ9bwFoDDJFrcWPwRG9NJM-uA@mail.gmail.com>
+References: <CAH=dYrHhttmRjkVuo9QvJ5_Uqd+BJGCJJkaMw8153RW1SFv9dA@mail.gmail.com>
+	<4F2316C7.9030202@canonical.com>
+	<CAH=dYrF-71hTkxS1qpohT_Ja_XKEVwMyVT5ZXg2FZjK4c2Fyig@mail.gmail.com>
+	<CAH=dYrE9EOudkk0mYwFpjgMM-kJ9bwFoDDJFrcWPwRG9NJM-uA@mail.gmail.com>
+Date: Sun, 12 Feb 2012 12:44:50 -0500
+Message-ID: <CAH=dYrFs+Ty2XxWvv6y-OMi6stT-tYR7nL20+2fyQLV3RgseKQ@mail.gmail.com>
+Subject: Re: firmware loading failure for AR3011 (0cf3:3000 or 0cf3:3005 ?)
+From: Andres Cimmarusti <acimmarusti@gmail.com>
+To: "James M. Leddy" <james.leddy@canonical.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jonathan Nieder <jrnieder@gmail.com>, 641749@bugs.debian.org,
+	info@linuxcertified.com
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Joe Perches (2):
-  bluetooth: Use more current logging styles
-  bluetooth: Convert BT_DBG to pr_debug
+I believe I have finally narrowed down the problem. It lies in the
+'libmtp-runtime' package with the command 'mtp-probe' (only present in
+wheezy or newer).
 
- drivers/bluetooth/ath3k.c          |   56 ++++----
- drivers/bluetooth/bcm203x.c        |   34 ++--
- drivers/bluetooth/bfusb.c          |  102 +++++++------
- drivers/bluetooth/bluecard_cs.c    |   17 +-
- drivers/bluetooth/bpa10x.c         |   48 +++---
- drivers/bluetooth/bt3c_cs.c        |   36 +++--
- drivers/bluetooth/btmrvl_debugfs.c |    2 +-
- drivers/bluetooth/btmrvl_main.c    |  102 +++++++------
- drivers/bluetooth/btmrvl_sdio.c    |  149 +++++++++---------
- drivers/bluetooth/btsdio.c         |   26 ++--
- drivers/bluetooth/btuart_cs.c      |   23 ++--
- drivers/bluetooth/btusb.c          |   86 +++++-----
- drivers/bluetooth/btwilink.c       |   46 +++---
- drivers/bluetooth/dtl1_cs.c        |   19 ++-
- drivers/bluetooth/hci_ath.c        |   14 +-
- drivers/bluetooth/hci_bcsp.c       |   78 +++++-----
- drivers/bluetooth/hci_h4.c         |   18 +-
- drivers/bluetooth/hci_ldisc.c      |   37 +++---
- drivers/bluetooth/hci_ll.c         |   83 ++++++-----
- drivers/bluetooth/hci_vhci.c       |    6 +-
- include/net/bluetooth/bluetooth.h  |   10 +-
- include/net/bluetooth/hci_core.h   |    6 +-
- include/net/bluetooth/l2cap.h      |    2 +-
- net/bluetooth/af_bluetooth.c       |   20 ++--
- net/bluetooth/bnep/core.c          |   30 ++--
- net/bluetooth/bnep/netdev.c        |   14 +-
- net/bluetooth/bnep/sock.c          |   10 +-
- net/bluetooth/cmtp/capi.c          |   50 +++---
- net/bluetooth/cmtp/core.c          |   31 ++--
- net/bluetooth/cmtp/sock.c          |   10 +-
- net/bluetooth/hci_conn.c           |   58 ++++----
- net/bluetooth/hci_core.c           |  175 +++++++++++----------
- net/bluetooth/hci_event.c          |  298 ++++++++++++++++++------------------
- net/bluetooth/hci_sock.c           |   26 ++--
- net/bluetooth/hci_sysfs.c          |   10 +-
- net/bluetooth/hidp/core.c          |   58 ++++---
- net/bluetooth/hidp/sock.c          |   10 +-
- net/bluetooth/l2cap_core.c         |  221 ++++++++++++++-------------
- net/bluetooth/l2cap_sock.c         |   40 +++---
- net/bluetooth/lib.c                |   25 +++-
- net/bluetooth/mgmt.c               |   95 ++++++------
- net/bluetooth/rfcomm/core.c        |  180 +++++++++++-----------
- net/bluetooth/rfcomm/sock.c        |   57 ++++----
- net/bluetooth/rfcomm/tty.c         |  106 +++++++-------
- net/bluetooth/sco.c                |   77 +++++-----
- net/bluetooth/smp.c                |   47 +++---
- 46 files changed, 1360 insertions(+), 1288 deletions(-)
+I'm not sure what this is doing to my system, but when the package
+mentioned is installed, it "messes" up my atheros bluetooth device so
+that the kernel/udev cannot load the firmware into it.
 
--- 
-1.7.8.111.gad25c.dirty
+As soon as I uninstalled this package and thus caused the boot process
+to throw some errors about missing mtp-probe command, my bluetooth
+module was correctly loaded and the led turned on.
+
+>> Inexplicably yesterday's (and the day before) Debian testing snapshot
+>> seems to have the problem fixed!
+
+I guess this snapshot that I tested earlier didn't have that package installed
+
+I found out about this completely by chance. For whatever reason, on
+my second upgrade to wheezy 'apt-get dist-upgrade' didn't pull
+'libmtp-runtime' and my bluetooth module just worked.
+
+I tried to get the bootlog messages so I can send this info, but even
+with bootlogd enabled these messages happen too early on the boot
+process to be logged in /var/log/boot.
+
+I feel this is not necessarily a kernel bug anymore (all kernels
+tested work fine 3.0.x, 3.1.x, 3.2.x and even 3.3.0-rc3). But the
+experts will know better.
+
+This is definitely progress!
+
+Cheers
+
+Andres
+
+PS: please forward the info to other bug reports I don't have access
+to, like Red Hat / Fedora and Ubuntu. Additional testing is needed.
