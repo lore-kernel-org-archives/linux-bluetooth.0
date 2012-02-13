@@ -5,61 +5,65 @@ Cc: Antonio Ospite <ospite@studenti.unina.it>,
 	Bastien Nocera <hadess@hadess.net>,
 	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH BlueZ 2/3] storage: add a btd_store_record_string() call
-Date: Mon, 13 Feb 2012 15:42:47 +0100
-Message-Id: <1329144168-19263-3-git-send-email-ospite@studenti.unina.it>
+Subject: [PATCH BlueZ 1/3] manager: add a btd_manager_get_default_adapter_str() call
+Date: Mon, 13 Feb 2012 15:42:46 +0100
+Message-Id: <1329144168-19263-2-git-send-email-ospite@studenti.unina.it>
 In-Reply-To: <1329144168-19263-1-git-send-email-ospite@studenti.unina.it>
 References: <1329144168-19263-1-git-send-email-ospite@studenti.unina.it>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add a new btd_* call to store an SDP record passed as a string, meant to
-be used by _external_ plugins.
+Add a new btd_* call to get the default adapter address as a string,
+meant to be used by _external_ plugins.
 ---
- src/storage.c |   17 +++++++++++++++++
- src/storage.h |    1 +
- 2 files changed, 18 insertions(+), 0 deletions(-)
+ src/manager.c |   21 +++++++++++++++++++++
+ src/manager.h |    1 +
+ 2 files changed, 22 insertions(+), 0 deletions(-)
 
-diff --git a/src/storage.c b/src/storage.c
-index a65cee4..e15705c 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -785,6 +785,23 @@ int store_record(const gchar *src, const gchar *dst, sdp_record_t *rec)
- 	return err;
+diff --git a/src/manager.c b/src/manager.c
+index 1d44c66..64f7f2c 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -270,6 +270,27 @@ struct btd_adapter *manager_get_default_adapter(void)
+ 	return manager_find_adapter_by_id(default_adapter_id);
  }
  
-+int btd_store_record_string(const gchar *src,
-+			    const gchar *dst,
-+			    const gchar *record_str)
++char *btd_manager_get_default_adapter_str(void)
 +{
-+	sdp_record_t *record;
-+	int ret = 0;
++	struct btd_adapter *adapter;
++	bdaddr_t adapter_bdaddr;
++	char *str;
 +
-+	record = record_from_string(record_str);
-+	if (record == NULL) {
-+		return -ENOMEM;
++	adapter = manager_get_default_adapter();
++	if (adapter == NULL) {
++		return NULL;
 +	}
-+	ret = store_record(src, dst, record);
-+	sdp_record_free(record);
 +
-+	return ret;
++	adapter_get_address(adapter, &adapter_bdaddr);
++
++	str = bt_malloc(18);
++	if (str == NULL)
++		return NULL;
++
++	ba2str(&adapter_bdaddr, str);
++	return str;
 +}
 +
- sdp_record_t *record_from_string(const gchar *str)
+ static void manager_remove_adapter(struct btd_adapter *adapter)
  {
- 	sdp_record_t *rec;
-diff --git a/src/storage.h b/src/storage.h
-index 2f145d0..eb61e47 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -56,6 +56,7 @@ int write_trust(const char *src, const char *addr, const char *service, gboolean
- int write_device_profiles(bdaddr_t *src, bdaddr_t *dst, const char *profiles);
- int delete_entry(bdaddr_t *src, const char *storage, const char *key);
- int store_record(const gchar *src, const gchar *dst, sdp_record_t *rec);
-+int btd_store_record_string(const gchar *src, const gchar *dst, const gchar *record_str);
- sdp_record_t *record_from_string(const gchar *str);
- sdp_record_t *fetch_record(const gchar *src, const gchar *dst, const uint32_t handle);
- int delete_record(const gchar *src, const gchar *dst, const uint32_t handle);
+ 	uint16_t dev_id = adapter_get_dev_id(adapter);
+diff --git a/src/manager.h b/src/manager.h
+index 4f92d2f..91d9894 100644
+--- a/src/manager.h
++++ b/src/manager.h
+@@ -36,6 +36,7 @@ const char *manager_get_base_path(void);
+ struct btd_adapter *manager_find_adapter(const bdaddr_t *sba);
+ struct btd_adapter *manager_find_adapter_by_id(int id);
+ struct btd_adapter *manager_get_default_adapter(void);
++char *btd_manager_get_default_adapter_str(void);
+ void manager_foreach_adapter(adapter_cb func, gpointer user_data);
+ GSList *manager_get_adapters(void);
+ struct btd_adapter *btd_manager_register_adapter(int id);
 -- 
 1.7.9
 
