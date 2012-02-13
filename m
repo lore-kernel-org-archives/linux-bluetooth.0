@@ -1,39 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd] client: Fix sending GET while SRM is active
-Date: Mon, 13 Feb 2012 12:15:42 +0200
-Message-Id: <1329128142-26867-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 13 Feb 2012 11:21:01 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Joe Perches <joe@perches.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 2/2] bluetooth: Convert BT_DBG to pr_debug
+Message-ID: <20120213092059.GC21179@aemeltch-MOBL1>
+References: <cover.1329102581.git.joe@perches.com>
+ <90fbd8a0b800c83f5ad1df7889dc9b11d7d9c588.1329102581.git.joe@perches.com>
+ <1329115057.28848.52.camel@aeonflux>
+ <1329115904.30878.7.camel@joe2Laptop>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1329115904.30878.7.camel@joe2Laptop>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Joe,
 
-If SRM is active remote will be generating responses automatically
----
- client/transfer.c |    7 +++++--
- 1 files changed, 5 insertions(+), 2 deletions(-)
+On Sun, Feb 12, 2012 at 10:51:44PM -0800, Joe Perches wrote:
+> On Mon, 2012-02-13 at 07:37 +0100, Marcel Holtmann wrote:
+> > > No need to obfuscate, just use the normal debugging macro.
+> > > Add "\n" to uses, align arguments, coalesce formats.
+> > > Fix a typo and fix a bad format extended by a line continuation.
+> > what is this patch buying us.
+> 
+> Easier greps of pr_debug.
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 8677b07..157811d 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -383,10 +383,13 @@ static void get_buf_xfer_progress(GObex *obex, GError *err, GObexPacket *rsp,
- 		return;
- 	}
- 
--	req = g_obex_packet_new(G_OBEX_OP_GET, TRUE, G_OBEX_HDR_INVALID);
-+	if (!g_obex_srm_active(obex)) {
-+		req = g_obex_packet_new(G_OBEX_OP_GET, TRUE, G_OBEX_HDR_INVALID);
- 
--	transfer->xfer = g_obex_send_req(obex, req, -1, get_buf_xfer_progress,
-+		transfer->xfer = g_obex_send_req(obex, req, -1,
-+							get_buf_xfer_progress,
- 							transfer, &err);
-+	}
- 
- 	if (callback)
- 		callback->func(transfer, transfer->transferred, err,
--- 
-1.7.7.6
+This depends what are you grepping for: for all usage of pr_debug or only
+for bluetooth related debugs ;)
 
+> BT_DBG is just an unnecessary useless wrapper.
+
+I think at some point we need to remove the wrapper and switch to common 
+debug function like dev_dbg but what is the point just renaming it?
+
+Best regards 
+Andrei Emeltchenko 
+
+> 
+> > The only useful change would be to move to dev_printk, but we are not
+> > there yet.
+> 
+> Maybe dev_dbg, but there isn't always an
+> appropriate device * available.
+> 
+> There are many uses of:
+> 	pr_debug("%s ...", (some struct hci_dev *)->name, ...)
+> 
+> that could be something like
+> 
+> hci_dev_dbg((some struct hci_dev *), fmt, ...)
+> 
