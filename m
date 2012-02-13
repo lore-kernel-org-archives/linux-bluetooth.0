@@ -1,36 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: Paul Seidler <pl.seidler@googlemail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Fix discovery state machine
-Date: Mon, 13 Feb 2012 15:41:01 -0300
-Message-Id: <1329158462-28914-1-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH] build: modifing behavior of systemdunitdir switch
+Date: Mon, 13 Feb 2012 17:50:24 +0100
+Message-Id: <1329151824-15856-1-git-send-email-pl.seidler@googlemail.com>
+In-Reply-To: <20120203202837.GB29936@samus>
+References: <20120203202837.GB29936@samus>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In case of Start Discovery command failure, we should set the
-discovery state to DISCOVERY_STOPPED. Otherwise, we stuck at
-DISCOVERY_STARTING state and subsequent Start Discovery commands
-will simply fail.
+Currently it's not possible to disable the installation of the systemd
+service file. If you use --without the file get installed into /no/.
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+Changes with this patch:
+--without-systemdunitdir disables the installation of the service file
+--with-systemdunitdir installs the file in the directory reported by
+pkg-config
+--with-systemdunitdir=/foo installs the file to /foo
+
+Without giving the systemdunitdir switch, pkg-config checks for systemd and
+installs the file if available.
 ---
- net/bluetooth/mgmt.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+ configure.ac |   20 ++++++++++++--------
+ 1 files changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a2c2e12..a01d0af 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2997,6 +2997,8 @@ int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
- 	struct pending_cmd *cmd;
- 	int err;
+diff --git a/configure.ac b/configure.ac
+index 5b81f28..b96dc5d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -62,14 +62,18 @@ if (test "${enable_capng}" = "yes"); then
+ 	AC_DEFINE(HAVE_CAPNG, 1, [Define to 1 if you have capabilities library.])
+ fi
  
-+	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+
- 	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
- 	if (!cmd)
- 		return -ENOENT;
+-AC_ARG_WITH([systemdunitdir], AC_HELP_STRING([--with-systemdunitdir=DIR],
+-	[path to systemd system service directory]), [path_systemdunit=${withval}],
+-		[path_systemdunit="`$PKG_CONFIG --variable=systemdsystemunitdir systemd`"])
+-if (test -n "${path_systemdunit}"); then
+-	SYSTEMD_UNITDIR="${path_systemdunit}"
+-	AC_SUBST(SYSTEMD_UNITDIR)
+-fi
+-AM_CONDITIONAL(SYSTEMD, test -n "${path_systemdunit}")
++AC_ARG_WITH([systemdunitdir],
++	AC_HELP_STRING([--with-systemdunitdir@<:@=DIR@:>@],
++		[Installing systemd service file (auto)
++		@<:@path to systemd system service directory@:>@]),
++	[path_systemdunit="${withval}"],
++	[PKG_CHECK_MODULES(SYSTEMD, systemd,
++		path_systemdunit=yes, path_systemdunit=no)])
++AS_IF([test "${path_systemdunit}" = yes],
++	[path_systemdunit="`$PKG_CONFIG --variable=systemdsystemunitdir systemd`"])
++AS_IF([test "${path_systemdunit}" != no],
++	[AC_SUBST(SYSTEMD_UNITDIR,["${path_systemdunit}"])])
++AM_CONDITIONAL(SYSTEMD, test "${path_systemdunit}" != no)
+ 
+ AC_OUTPUT(Makefile scripts/bluetooth.rules doc/version.xml
+ 			src/bluetoothd.8 src/bluetooth.service bluez.pc)
 -- 
-1.7.9
+1.7.8.1
 
