@@ -1,60 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] mgmtops: Improve event size mismatch messages
-Date: Mon, 13 Feb 2012 09:12:25 -0400
-Message-Id: <1329138745-15423-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <E74476E55D15D942BA0FF3CDAD73606F041FEA@FMSMSX102.amr.corp.intel.com>
+References: <E74476E55D15D942BA0FF3CDAD73606F041FEA@FMSMSX102.amr.corp.intel.com>
+Date: Mon, 13 Feb 2012 14:35:31 +0200
+Message-ID: <CABBYNZ++wSC8b=HOygi1adpAHCjSDnLbx9ED6DqKVFG8tcNXQg@mail.gmail.com>
+Subject: Re: SDP Discovery collsion with Som Laptops
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Mohanan, Rajmohan" <rajmohan.mohanan@intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"padovan@profusion.mobi" <padovan@profusion.mobi>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes them consistent, and updates the function names.
----
- plugins/mgmtops.c |    9 +++++----
- 1 files changed, 5 insertions(+), 4 deletions(-)
+Hi,
 
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 7e47386..952ccf3 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -367,7 +367,7 @@ static void mgmt_new_link_key(int sk, uint16_t index, void *buf, size_t len)
- 	struct controller_info *info;
- 
- 	if (len != sizeof(*ev)) {
--		error("new_key event size mismatch (%zu != %zu)",
-+		error("mgmt_new_link_key event size mismatch (%zu != %zu)",
- 							len, sizeof(*ev));
- 		return;
- 	}
-@@ -1071,7 +1071,8 @@ static void read_local_oob_data_complete(int sk, uint16_t index, void *buf,
- 	struct btd_adapter *adapter;
- 
- 	if (len != sizeof(*rp)) {
--		error("Wrong read_local_oob_data_complete event size");
-+		error("read_local_oob_data_complete event size mismatch "
-+					"(%zu != %zu)", len, sizeof(*rp));
- 		return;
- 	}
- 
-@@ -1313,7 +1314,7 @@ static void mgmt_device_found(int sk, uint16_t index, void *buf, size_t len)
- 
- 	eir_len = bt_get_le16(&ev->eir_len);
- 	if (len != sizeof(*ev) + eir_len) {
--		error("mgmt_device_found length %zu instead of expected %zu",
-+		error("mgmt_device_found event size mismatch (%zu != %zu)",
- 						len, sizeof(*ev) + eir_len);
- 		return;
- 	}
-@@ -1445,7 +1446,7 @@ static void mgmt_new_ltk(int sk, uint16_t index, void *buf, size_t len)
- 	struct controller_info *info;
- 
- 	if (len != sizeof(*ev)) {
--		error("new_smp_key event size mismatch (%zu != %zu)",
-+		error("mgmt_new_ltk event size mismatch (%zu != %zu)",
- 							len, sizeof(*ev));
- 		return;
- 	}
+On Mon, Feb 13, 2012 at 12:38 PM, Mohanan, Rajmohan
+<rajmohan.mohanan@intel.com> wrote:
+> Hi
+> With Lenovo T500laptop,
+>  whenever after bonding Lenovo T500 is initiating a SDP search Request which collides our SDP request(from Bluez we are initiator we are starting SDP query immediately and if we are responder we are delaying for 2 seconds for starting SDP query).
+>
+>
+> For solving this IOP issue I have made a change that if we are initiator also we will delay for 1 second and starting SDP query after bonding.
+
+Why not check whether we are master or not? So the master has priority
+to do the sdp right away and if we found we are slave then we fallback
+to reverse service discover. This should avoid an extra 1 sec when
+pairing normally, since this is not exactly an usual case where both
+sides init an sdp simultaneously.
+
+It is not clear what stack are you running in T500? Is it pairing
+being triggered simultaneously in both sides?
+
+Btw, I sugegst you to take a look at git format-patch + git send-email
+for sending patches, just google it in doubt this is the preferable
+format since we can review your patches inline.
+
 -- 
-1.7.5.4
-
+Luiz Augusto von Dentz
