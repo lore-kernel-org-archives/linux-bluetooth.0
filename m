@@ -1,37 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 1/5] core: Add port to service driver
-Date: Mon, 13 Feb 2012 13:37:46 +0200
-Message-Id: <1329133070-30003-1-git-send-email-luiz.dentz@gmail.com>
+Message-ID: <1329129670.28848.64.camel@aeonflux>
+Subject: RE: LMP transaction collision at Set encryption
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Mohanan, Rajmohan" <rajmohan.mohanan@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"padovan@profusion.mobi" <padovan@profusion.mobi>
+Date: Mon, 13 Feb 2012 11:41:10 +0100
+In-Reply-To: <E74476E55D15D942BA0FF3CDAD73606F041FB8@FMSMSX102.amr.corp.intel.com>
+References: <E74476E55D15D942BA0FF3CDAD73606F041AE2@FMSMSX102.amr.corp.intel.com>
+	 <1329118089.28848.60.camel@aeonflux>
+	 <E74476E55D15D942BA0FF3CDAD73606F041FB8@FMSMSX102.amr.corp.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Rajmohan,
 
-This add possibility to optional port in addition to channel.
----
- src/service.h |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+>                       I'm attaching Patch for LMP transaction collision.
+> I could not Create patch according to Latest Bluez Tree because due to Project Constraints. Please review the patch . I have added Hcidump  aslo.
 
-diff --git a/src/service.h b/src/service.h
-index 3dee7d7..5d9d325 100644
---- a/src/service.h
-+++ b/src/service.h
-@@ -21,10 +21,13 @@
-  *
-  */
- 
-+#define OBEX_PORT_RANDOM UINT16_MAX
-+
- struct obex_service_driver {
- 	const char *name;
- 	uint16_t service;
- 	uint8_t channel;
-+	uint16_t port;
- 	gboolean secure;
- 	const uint8_t *target;
- 	unsigned int target_size;
--- 
-1.7.7.6
+please use git format-patch and then git send-email. If you have
+problems with Exchange, then just point it to linux.intel.com and it
+will work smoothly.
+
+Reviewing attached patches is not something we do here. All patches need
+to be inline.
+
+Regards
+
+Marcel
+
 
