@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1329143945-4934-4-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1329143945-4934-3-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1329143945-4934-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1329143945-4934-4-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Tue, 14 Feb 2012 11:17:13 +0200
-Message-ID: <CABBYNZ+W0iRpq5VUtSCSsFjLfiqcE7tdDzxkpDZtd8CiTwer2w@mail.gmail.com>
-Subject: Re: [PATCH obexd 4/6] client: fix pbap select when same path given twice
+	<1329143945-4934-3-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Tue, 14 Feb 2012 11:16:06 +0200
+Message-ID: <CABBYNZK+AD+62MRVwaRqSxEuu81DO7KETkPzX8dP=R6WUHpDFg@mail.gmail.com>
+Subject: Re: [PATCH obexd 3/6] client: fix incorrect error check
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Mikel Astiz <mikel.astiz.oss@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
@@ -19,119 +19,28 @@ Hi Mikel,
 On Mon, Feb 13, 2012 at 4:39 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
 > From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 >
-> If the same path is selected twice, the operation can be skipped but the
-> D-Bus response should still be sent.
+> Previous statement always returned success.
 > ---
->  client/pbap.c |   57 ++++++++++++++++-----------------------------------------
->  1 files changed, 16 insertions(+), 41 deletions(-)
+>  client/pbap.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 >
 > diff --git a/client/pbap.c b/client/pbap.c
-> index c58557d..c4b14a2 100644
+> index 4910536..c58557d 100644
 > --- a/client/pbap.c
 > +++ b/client/pbap.c
-> @@ -124,12 +124,6 @@ static const char *filter_list[] = {
->  #define PBAP_INTERFACE  "org.openobex.PhonebookAccess"
->  #define PBAP_UUID "0000112f-0000-1000-8000-00805f9b34fb"
->
-> -#define PBAP_ERROR pbap_error_quark()
-> -
-> -enum {
-> -       PBAP_INVALID_PATH,
-> -};
-> -
->  struct pbap_data {
->        struct obc_session *session;
->        char *path;
-> @@ -173,11 +167,6 @@ struct apparam_hdr {
->
->  static DBusConnection *conn = NULL;
->
-> -static GQuark pbap_error_quark(void)
-> -{
-> -       return g_quark_from_static_string("pbap-error-quark");
-> -}
-> -
->  static void listing_element(GMarkupParseContext *ctxt,
->                                const gchar *element,
->                                const gchar **names,
-> @@ -283,35 +272,6 @@ static void pbap_setpath_cb(struct obc_session *session, GError *err,
->        pbap->msg = NULL;
->  }
->
-> -static gboolean pbap_setpath(struct pbap_data *pbap, const char *location,
-> -                                       const char *item, GError **err)
-> -{
-> -       char *path;
-> -
-> -       path = build_phonebook_path(location, item);
-> -       if (path == NULL) {
-> -               g_set_error(err, PBAP_ERROR, PBAP_INVALID_PATH,
-> -                                                       "Invalid path");
-> -               return FALSE;
-> -       }
-> -
-> -       if (pbap->path != NULL && g_str_equal(pbap->path, path)) {
-> -               g_free(path);
-> -               return TRUE;
-> -       }
-> -
-> -       obc_session_setpath(pbap->session, path, pbap_setpath_cb, pbap, err);
-> -       if (*err == NULL) {
-> -               g_free(pbap->path);
-> -               pbap->path = path;
-> -               return TRUE;
-> -       }
-> -
-> -       g_free(path);
-> -
-> -       return FALSE;
-> -}
-> -
->  static void read_return_apparam(struct obc_session *session,
->                                guint16 *phone_book_size, guint8 *new_missed_calls)
->  {
-> @@ -702,6 +662,7 @@ static DBusMessage *pbap_select(DBusConnection *connection,
->  {
->        struct pbap_data *pbap = user_data;
->        const char *item, *location;
-> +       char *path;
->        GError *err = NULL;
->
->        if (dbus_message_get_args(message, NULL,
-> @@ -711,14 +672,28 @@ static DBusMessage *pbap_select(DBusConnection *connection,
->                return g_dbus_create_error(message,
->                                ERROR_INF ".InvalidArguments", NULL);
->
-> -       if (!pbap_setpath(pbap, location, item, &err)) {
-> +       path = build_phonebook_path(location, item);
-> +       if (path == NULL)
-> +               return g_dbus_create_error(message,
-> +                               ERROR_INF ".InvalidArguments", "Invalid path");
-> +
-> +       if (pbap->path != NULL && g_str_equal(pbap->path, path)) {
-> +               g_free(path);
-> +               return dbus_message_new_method_return(message);
-> +       }
-> +
-> +       obc_session_setpath(pbap->session, path, pbap_setpath_cb, pbap, &err);
-> +       if (err != NULL) {
->                DBusMessage *reply;
->                reply =  g_dbus_create_error(message, ERROR_INF ".Failed",
->                                                        "%s", err->message);
->                g_error_free(err);
-> +               g_free(path);
->                return reply;
+> @@ -301,7 +301,7 @@ static gboolean pbap_setpath(struct pbap_data *pbap, const char *location,
 >        }
 >
-> +       g_free(pbap->path);
-> +       pbap->path = path;
->        pbap->msg = dbus_message_ref(message);
->
->        return NULL;
+>        obc_session_setpath(pbap->session, path, pbap_setpath_cb, pbap, err);
+> -       if (err != NULL) {
+> +       if (*err == NULL) {
+>                g_free(pbap->path);
+>                pbap->path = path;
+>                return TRUE;
 > --
 > 1.7.6.5
 
-Looks good, ack
+Nice catch, ack.
 
 -- 
 Luiz Augusto von Dentz
