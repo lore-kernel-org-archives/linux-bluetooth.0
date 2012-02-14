@@ -1,66 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20120214154141.GA14503@joana>
-References: <1329227796-22609-1-git-send-email-szymon.janc@tieto.com>
-	<20120214154141.GA14503@joana>
-Date: Tue, 14 Feb 2012 15:26:37 -0200
-Message-ID: <CAA37ika=K8jSmApcTscm2ay+A95SgkJ3Lj4TQ-qErLduK2jU_g@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Drop frames without F-bit set when in WAIT_F state
+In-Reply-To: <20120214132117.GB3145@aemeltch-MOBL1>
+References: <1328882113-19810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1328882113-19810-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<CAA37ikZ7Ph3D_fBMLFQ_rh2JDJY2LXPzKWkLcQEsXutcj1idxA@mail.gmail.com>
+	<20120213085841.GB21179@aemeltch-MOBL1>
+	<20120213144911.GC19288@aemeltch-MOBL1>
+	<CAA37ikZPa2bNyw+zcUkr3VFAaA8nz_o+5dhxFHYwOvqg1R8TEw@mail.gmail.com>
+	<20120214132117.GB3145@aemeltch-MOBL1>
+Date: Tue, 14 Feb 2012 15:23:54 -0200
+Message-ID: <CAA37ikY1=K0E+zXtsHO+FRWRK=VEfR99btVBENw_cJEhonfJvw@mail.gmail.com>
+Subject: Re: [RFCv4 02/16] Bluetooth: Revert to mutexes from RCU list
 From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Szymon Janc <szymon.janc@tieto.com>,
-	linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+	Ulisses Furquim <ulisses@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi everybody,
+Hi Andrei,
 
-On Tue, Feb 14, 2012 at 1:41 PM, Gustavo Padovan <padovan@profusion.mobi> wrote:
-> Hi Szymon,
+On Tue, Feb 14, 2012 at 11:21 AM, Emeltchenko Andrei
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> Hi Ulisses,
 >
-> * Szymon Janc <szymon.janc@tieto.com> [2012-02-14 14:56:36 +0100]:
+> On Mon, Feb 13, 2012 at 10:06:10PM -0300, Ulisses Furquim wrote:
+> ...
+>> Yes, I do think they belong together. And please, check l2cap_sock.c
+>> where l2cap_chan_close() seems to be called without locking
+>> conn->chan_lock in l2cap_sock_shutdown().
 >
->> When transmitter is in WAIT_F state any frames received without F-bit=1
->> should not be processed (With-Valid-F-bit condition is not true).
->>
->> This was affecting TP/ERM/BI-05-C PTS test.
->>
->> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
->> ---
->>  net/bluetooth/l2cap_core.c |    5 +++++
->>  1 files changed, 5 insertions(+), 0 deletions(-)
->>
->> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->> index 8efac78..1a724c6 100644
->> --- a/net/bluetooth/l2cap_core.c
->> +++ b/net/bluetooth/l2cap_core.c
->> @@ -4190,6 +4190,11 @@ static int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
->>               goto drop;
->>       }
->>
->> +     /* drop frame without F-bit set when in WAIT_F state */
->> +     if (test_bit(CONN_WAIT_F, &chan->conn_state) &&
->> +                     !__is_ctrl_final(chan, control))
->> +             goto drop;
->> +
->
-> I think this is wrong, you are completely dropping frames here while you
-> should at least process the reqseq received. Check the spec, the WAIT_F table.
-> Another point is that the WAIT_F state belongs belongs to the transmit side,
-> and you are checking for it in the receive side. This also seems wrong to me.
->
-> Also I never find problem to pass this test in PTS with the following l2test
-> line:
->
-> l2test -P 17 -X 3 -b 48 -w -D 1 -N 2
->
-> Please tell the problem you have in PTS so we can try to find a better
-> solution for this.
+> In that context we do not always have l2cap_conn so maybe we return
+> chan list lock to chan_del or invent unlocked chan_del / chan_close?
 
-That reminds me of one thing. I'd very much like to have these l2test
-lines somewhere in a repository and with reference for which PTS test
-it's meant. This way we stop testing things differently and even
-improve these little "scripts".
+We don't have l2cap_conn? So are we already on conn->chan_l list or
+not? Maybe it's better to check that instead of changing everything
+now.
+
+> So far the easiest way would be first solution.
+>
+>> And please remove the bogus
+>> comment below from l2cap_conn_start, ok?
+>
+> I believe this is removed in later patches.
+
+If so, then ok, thanks.
 
 Regards,
 
