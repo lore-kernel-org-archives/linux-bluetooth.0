@@ -1,56 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Feb 2012 23:47:14 +0100
-From: Fabrice DELENTE <delentef@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Entering the PIN of a device?
-Message-ID: <20120214224714.GA5586@smtp.free.fr>
-References: <20120214164518.GA11881@smtp.free.fr>
- <CANq1E4QEeoFr4HC+DajcsPt_BNNgzsp8-_7tRFVOOVin1atTEA@mail.gmail.com>
- <20120214175813.GA16393@smtp.free.fr>
- <CANq1E4Q7UQjQNKPy0c-w4DX8dimuRNYB_mOsetMBNPaY44Ae5A@mail.gmail.com>
- <20120214180937.GA17364@smtp.free.fr>
- <CANq1E4R0xkzJF8CebBFkc5R=idO=cEPciK2XQW9Yv9nWuWGnGw@mail.gmail.com>
+Date: Tue, 14 Feb 2012 16:39:55 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv4 06/16] Bluetooth: Add socket error function
+Message-ID: <20120214183955.GB14503@joana>
+References: <1328882113-19810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1328882113-19810-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CANq1E4R0xkzJF8CebBFkc5R=idO=cEPciK2XQW9Yv9nWuWGnGw@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1328882113-19810-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Did the device show up in /sys/bus/hid/devices ? Did you check
-> dmesg? I think you got the device connected successfully, it just
-> doesn't do anything useful without configuration ;)
+Hi Andrei,
 
-My tests have been disappointing, I have the wiimote plugin in
-bluetoothd (the grep for wiimote in bluetoothd shows a match), but
-there is no auto-pairing...
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2012-02-10 15:55:03 +0200]:
 
-If I have bluetoothd running, and I press 1+2 (or the red button),
-nothing shows in dmesg, nor in /sys/bus/hid/devices...
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Use locked and unlocked versions to help removing socket
+> locks from l2cap.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/l2cap_core.c |   30 +++++++++++++++++++++---------
+>  1 files changed, 21 insertions(+), 9 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 5120a1c..e0e4cc8 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -243,6 +243,22 @@ static void l2cap_state_change(struct l2cap_chan *chan, int state)
+>  	release_sock(sk);
+>  }
+>  
+> +static inline void __l2cap_chan_set_err(struct l2cap_chan *chan, int err)
+> +{
+> +	struct sock *sk = chan->sk;
+> +
+> +	sk->sk_err = err;
+> +}
+> +
+> +static inline void l2cap_chan_set_err(struct l2cap_chan *chan, int err)
+> +{
+> +	struct sock *sk = chan->sk;
+> +
+> +	lock_sock(sk);
+> +	__l2cap_chan_set_err(chan, err);
+> +	release_sock(sk);
+> +}
+> +
+>  static void l2cap_chan_timeout(struct work_struct *work)
+>  {
+>  	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
+> @@ -383,7 +399,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+>  	sock_set_flag(sk, SOCK_ZAPPED);
+>  
+>  	if (err)
+> -		sk->sk_err = err;
+> +		__l2cap_chan_set_err(chan, err);
+>  
+>  	if (parent) {
+>  		bt_accept_unlink(sk);
+> @@ -715,14 +731,11 @@ static inline int l2cap_mode_supported(__u8 mode, __u32 feat_mask)
+>  
+>  static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *chan, int err)
+>  {
+> -	struct sock *sk;
+>  	struct l2cap_disconn_req req;
+>  
+>  	if (!conn)
+>  		return;
+>  
+> -	sk = chan->sk;
+> -
+>  	if (chan->mode == L2CAP_MODE_ERTM) {
+>  		__clear_retrans_timer(chan);
+>  		__clear_monitor_timer(chan);
+> @@ -735,7 +748,7 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
+>  			L2CAP_DISCONN_REQ, sizeof(req), &req);
+>  
+>  	__l2cap_state_change(chan, BT_DISCONN);
+> -	sk->sk_err = err;
+> +	__l2cap_chan_set_err(chan, err);
+>  }
+>  
+>  /* ---- L2CAP connections ---- */
+> @@ -974,10 +987,8 @@ static void l2cap_conn_unreliable(struct l2cap_conn *conn, int err)
+>  	mutex_lock(&conn->chan_lock);
+>  
+>  	list_for_each_entry(chan, &conn->chan_l, list) {
+> -		struct sock *sk = chan->sk;
+> -
+>  		if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
+> -			sk->sk_err = err;
+> +			l2cap_chan_set_err(chan, err);
 
-If I press 1+2 and start simple-agent hci0 $WIIMOTE, I get a message
-asking for the PIN, but I can't type it (I must type in the wiimote BT
-addr in string form, right?)
+Why is this l2cap_chan_set_err()? This function wasn't holding the lock.
+Please justify this change.
 
-I modified simple-agent with a bit of python to return the address in
-UTF-8 form:
-
-def RequestPinCode(self, device):
-    print "RequestPinCode (%s)" % (device)
-    wiimote_address_bytes = os.environ["WIIMOTE"].split(":")
-    n = ""
-    for i in range(len(wiimote_address_bytes)-1, -1, -1):
-    	if int(wiimote_address_bytes[i], 16) == 0:
-           break
-	n += chr(int(wiimote_address_bytes[i], 16))
-    return unicode(n, "utf-8")
-
-but I still have an error:
-
-# ./wiimote-agent hci0 $WIIMOTE
-RequestPinCode (/org/bluez/5122/hci0/dev_00_1F_C5_1B_3A_B1)
-Creating device failed: org.bluez.Error.AuthenticationRejected: Authentication Rejected
-
-Well... I'll try again after a good night sleep :^)
-
--- 
-F. Delente
+	Gustavo
