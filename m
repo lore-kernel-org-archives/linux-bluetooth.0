@@ -1,103 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Feb 2012 16:39:55 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv4 06/16] Bluetooth: Add socket error function
-Message-ID: <20120214183955.GB14503@joana>
-References: <1328882113-19810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1328882113-19810-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 14 Feb 2012 19:23:14 +0100
+From: Fabrice DELENTE <delentef@gmail.com>
+To: David Herrmann <dh.herrmann@googlemail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: Entering the PIN of a device?
+Message-ID: <20120214182314.GA18195@smtp.free.fr>
+References: <20120214164518.GA11881@smtp.free.fr>
+ <CANq1E4QEeoFr4HC+DajcsPt_BNNgzsp8-_7tRFVOOVin1atTEA@mail.gmail.com>
+ <20120214175813.GA16393@smtp.free.fr>
+ <CANq1E4Q7UQjQNKPy0c-w4DX8dimuRNYB_mOsetMBNPaY44Ae5A@mail.gmail.com>
+ <20120214180937.GA17364@smtp.free.fr>
+ <CANq1E4R0xkzJF8CebBFkc5R=idO=cEPciK2XQW9Yv9nWuWGnGw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328882113-19810-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CANq1E4R0xkzJF8CebBFkc5R=idO=cEPciK2XQW9Yv9nWuWGnGw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+> There was no CC ;) CC is enough of course.
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2012-02-10 15:55:03 +0200]:
+Strange, mutt showed me a CC though...
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Use locked and unlocked versions to help removing socket
-> locks from l2cap.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c |   30 +++++++++++++++++++++---------
->  1 files changed, 21 insertions(+), 9 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 5120a1c..e0e4cc8 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -243,6 +243,22 @@ static void l2cap_state_change(struct l2cap_chan *chan, int state)
->  	release_sock(sk);
->  }
->  
-> +static inline void __l2cap_chan_set_err(struct l2cap_chan *chan, int err)
-> +{
-> +	struct sock *sk = chan->sk;
-> +
-> +	sk->sk_err = err;
-> +}
-> +
-> +static inline void l2cap_chan_set_err(struct l2cap_chan *chan, int err)
-> +{
-> +	struct sock *sk = chan->sk;
-> +
-> +	lock_sock(sk);
-> +	__l2cap_chan_set_err(chan, err);
-> +	release_sock(sk);
-> +}
-> +
->  static void l2cap_chan_timeout(struct work_struct *work)
->  {
->  	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
-> @@ -383,7 +399,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
->  	sock_set_flag(sk, SOCK_ZAPPED);
->  
->  	if (err)
-> -		sk->sk_err = err;
-> +		__l2cap_chan_set_err(chan, err);
->  
->  	if (parent) {
->  		bt_accept_unlink(sk);
-> @@ -715,14 +731,11 @@ static inline int l2cap_mode_supported(__u8 mode, __u32 feat_mask)
->  
->  static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *chan, int err)
->  {
-> -	struct sock *sk;
->  	struct l2cap_disconn_req req;
->  
->  	if (!conn)
->  		return;
->  
-> -	sk = chan->sk;
-> -
->  	if (chan->mode == L2CAP_MODE_ERTM) {
->  		__clear_retrans_timer(chan);
->  		__clear_monitor_timer(chan);
-> @@ -735,7 +748,7 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
->  			L2CAP_DISCONN_REQ, sizeof(req), &req);
->  
->  	__l2cap_state_change(chan, BT_DISCONN);
-> -	sk->sk_err = err;
-> +	__l2cap_chan_set_err(chan, err);
->  }
->  
->  /* ---- L2CAP connections ---- */
-> @@ -974,10 +987,8 @@ static void l2cap_conn_unreliable(struct l2cap_conn *conn, int err)
->  	mutex_lock(&conn->chan_lock);
->  
->  	list_for_each_entry(chan, &conn->chan_l, list) {
-> -		struct sock *sk = chan->sk;
-> -
->  		if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
-> -			sk->sk_err = err;
-> +			l2cap_chan_set_err(chan, err);
+> No, don't! The user shouldn't care what protocols are used. I just
+> wanted to notify you that using rfcomm won't work here.
 
-Why is this l2cap_chan_set_err()? This function wasn't holding the lock.
-Please justify this change.
+Ok, ok, won't do :^)
 
-	Gustavo
+> This is exactly what should happen, yes. No PIN as BlueZ generates
+> it for you.
+
+I guess it hasn't, because when I try simple-agent hci0 $WIIMOTE, it
+asks for a PIN?
+
+> Did the device show up in /sys/bus/hid/devices ? Did you check
+> dmesg? I think you got the device connected successfully, it just
+> doesn't do anything useful without configuration ;)
+
+Well nothing showed in /sys/bus/hid/devices, nor in dmesg. The only
+thing I had was in /var/log/messages, after trying the simple-agent
+hci0 $WIIMOTE thing:
+
+Feb 14 19:11:11 slick dbus-daemon: [system] Rejected send message, 0 matched rules; type="method_return", sender=":1.65" (uid=0 pid=17775 comm="/usr/bin/python) interface="(unset)" member="(unset)" error name="(unset)" requested_reply=0 destination=":1.9" (uid=0 pid=1930 comm="/usr/sbin/bluetoothd))
+
+> You may also want to have a look at
+> https://wiki.archlinux.org/index.php/XWiimote This is a short
+> summary of the current state of the xwiimote drivers.  The
+> user-space part is still under development so you might want to look
+> at cwiid instead.
+
+Will do. I thought cwiid was abandonned, and replaced by the kernel
+driver?
+
+Thanks again!
+
+-- 
+F. Delente
