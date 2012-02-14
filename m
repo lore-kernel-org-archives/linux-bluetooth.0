@@ -1,57 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Feb 2012 19:23:14 +0100
-From: Fabrice DELENTE <delentef@gmail.com>
-To: David Herrmann <dh.herrmann@googlemail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: Entering the PIN of a device?
-Message-ID: <20120214182314.GA18195@smtp.free.fr>
-References: <20120214164518.GA11881@smtp.free.fr>
- <CANq1E4QEeoFr4HC+DajcsPt_BNNgzsp8-_7tRFVOOVin1atTEA@mail.gmail.com>
- <20120214175813.GA16393@smtp.free.fr>
- <CANq1E4Q7UQjQNKPy0c-w4DX8dimuRNYB_mOsetMBNPaY44Ae5A@mail.gmail.com>
- <20120214180937.GA17364@smtp.free.fr>
- <CANq1E4R0xkzJF8CebBFkc5R=idO=cEPciK2XQW9Yv9nWuWGnGw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CANq1E4R0xkzJF8CebBFkc5R=idO=cEPciK2XQW9Yv9nWuWGnGw@mail.gmail.com>
+In-Reply-To: <20120214180937.GA17364@smtp.free.fr>
+References: <20120214164518.GA11881@smtp.free.fr>
+	<CANq1E4QEeoFr4HC+DajcsPt_BNNgzsp8-_7tRFVOOVin1atTEA@mail.gmail.com>
+	<20120214175813.GA16393@smtp.free.fr>
+	<CANq1E4Q7UQjQNKPy0c-w4DX8dimuRNYB_mOsetMBNPaY44Ae5A@mail.gmail.com>
+	<20120214180937.GA17364@smtp.free.fr>
+Date: Tue, 14 Feb 2012 19:15:56 +0100
+Message-ID: <CANq1E4R0xkzJF8CebBFkc5R=idO=cEPciK2XQW9Yv9nWuWGnGw@mail.gmail.com>
+Subject: Re: Entering the PIN of a device?
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: Fabrice DELENTE <delentef@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> There was no CC ;) CC is enough of course.
+Hi Fabrice
 
-Strange, mutt showed me a CC though...
+On Tue, Feb 14, 2012 at 7:09 PM, Fabrice DELENTE <delentef@gmail.com> wrote:
+>> Please answer directly to the mailing-list instead of directly to me
+>> ("Reply to All") if you want others to read your messages, too.
+>
+> Sorry, I thought the CC to linux-bluetooth was enough!
 
-> No, don't! The user shouldn't care what protocols are used. I just
-> wanted to notify you that using rfcomm won't work here.
+There was no CC ;) CC is enough of course.
 
-Ok, ok, won't do :^)
+>> Then you need to use the kernel driver. The Wii Remote uses 2 L2CAP
+>> channels so don't try rfcomm.
+>
+> Ok, I'll look into docs about L2CAP.
 
-> This is exactly what should happen, yes. No PIN as BlueZ generates
-> it for you.
+No, don't! The user shouldn't care what protocols are used. I just wanted to
+notify you that using rfcomm won't work here.
 
-I guess it hasn't, because when I try simple-agent hci0 $WIIMOTE, it
-asks for a PIN?
+>> The driver is located in ./drivers/hid/hid-wiimote* in the kernel
+>> sources. The user-space utilities are currently under
+>> development. See http://github.com/dvdhrm/xwiimote for more
+>> information.  To use the Wii Remote you need to connect to the Wii
+>> Remote with a tool like simple-agent, gnome-bluetooth, blueman or
+>> similar. The kernel driver and BlueZ stack will directly detect the
+>> Wii Remote. See "dmesg" for information whether the device was
+>> detected. It should also show up as new directory in
+>> /sys/bus/hid/devices/<did>
+>
+> Thanks for the info.
+>
+> My trouble is that when I start simple-agent and then push 1+2 to pair
+> the wiimote with my laptop, simple-agent doesn't ask for the
+> PIN... should it happens automagically?
 
-> Did the device show up in /sys/bus/hid/devices ? Did you check
-> dmesg? I think you got the device connected successfully, it just
-> doesn't do anything useful without configuration ;)
+This is exactly what should happen, yes. No PIN as BlueZ generates it for you.
 
-Well nothing showed in /sys/bus/hid/devices, nor in dmesg. The only
-thing I had was in /var/log/messages, after trying the simple-agent
-hci0 $WIIMOTE thing:
+> I have grepped the files in /var/lib/bluetooth, I have found my mote
+> BT address in the files but nothing clearly linked to the PIN key. I
+> read on wiimote-brew that it was the mote BT address in binary form?
 
-Feb 14 19:11:11 slick dbus-daemon: [system] Rejected send message, 0 matched rules; type="method_return", sender=":1.65" (uid=0 pid=17775 comm="/usr/bin/python) interface="(unset)" member="(unset)" error name="(unset)" requested_reply=0 destination=":1.9" (uid=0 pid=1930 comm="/usr/sbin/bluetoothd))
+Did the device show up in /sys/bus/hid/devices ? Did you check dmesg? I think
+you got the device connected successfully, it just doesn't do anything useful
+without configuration ;)
 
-> You may also want to have a look at
-> https://wiki.archlinux.org/index.php/XWiimote This is a short
-> summary of the current state of the xwiimote drivers.  The
-> user-space part is still under development so you might want to look
-> at cwiid instead.
+> Thanks again! :^)
 
-Will do. I thought cwiid was abandonned, and replaced by the kernel
-driver?
+You may also want to have a look at
+https://wiki.archlinux.org/index.php/XWiimote
+This is a short summary of the current state of the xwiimote drivers.
+The user-space
+part is still under development so you might want to look at cwiid instead.
 
-Thanks again!
-
--- 
-F. Delente
+Cheers
+David
