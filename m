@@ -1,25 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Feb 2012 14:51:59 +0200
+Date: Tue, 14 Feb 2012 14:51:16 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] mgmtops: Improve event size mismatch messages
-Message-ID: <20120214125159.GD19427@x220.ger.corp.intel.com>
-References: <1329138745-15423-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: Re: [PATCH obexd 1/5] core: Add port to service driver
+Message-ID: <20120214125116.GC19427@x220.ger.corp.intel.com>
+References: <1329133070-30003-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329138745-15423-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1329133070-30003-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Luiz,
 
-On Mon, Feb 13, 2012, Anderson Lizardo wrote:
-> This makes them consistent, and updates the function names.
+On Mon, Feb 13, 2012, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This add possibility to optional port in addition to channel.
 > ---
->  plugins/mgmtops.c |    9 +++++----
->  1 files changed, 5 insertions(+), 4 deletions(-)
+>  src/service.h |    3 +++
+>  1 files changed, 3 insertions(+), 0 deletions(-)
 
-Applied. Thanks.
+All five patches have been applied. Thanks.
 
 Johan
