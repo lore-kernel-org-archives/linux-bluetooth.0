@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Feb 2012 14:51:16 +0200
+Date: Tue, 14 Feb 2012 14:47:33 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/5] core: Add port to service driver
-Message-ID: <20120214125116.GC19427@x220.ger.corp.intel.com>
-References: <1329133070-30003-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH obexd] client: Fix sending GET while SRM is active
+Message-ID: <20120214124733.GB19427@x220.ger.corp.intel.com>
+References: <1329128142-26867-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329133070-30003-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1329128142-26867-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -17,11 +17,11 @@ Hi Luiz,
 On Mon, Feb 13, 2012, Luiz Augusto von Dentz wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> This add possibility to optional port in addition to channel.
+> If SRM is active remote will be generating responses automatically
 > ---
->  src/service.h |    3 +++
->  1 files changed, 3 insertions(+), 0 deletions(-)
+>  client/transfer.c |    7 +++++--
+>  1 files changed, 5 insertions(+), 2 deletions(-)
 
-All five patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
