@@ -1,53 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Feb 2012 12:49:15 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1329210394-31405-4-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1329210394-31405-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1329210394-31405-4-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Tue, 14 Feb 2012 11:29:31 +0200
+Message-ID: <CABBYNZKQ_4uqU4HqbFk118Ng6g-xPh_SQu_a-Df0sM6=RWO0Jw@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] audio: do not disconnect on gateway SCO failure
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Mikel Astiz <mikel.astiz.oss@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [PATCH v2 0/3] Minor audio-related fixes
-Message-ID: <20120214104915.GA2846@x220>
-References: <1329210394-31405-1-git-send-email-mikel.astiz.oss@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329210394-31405-1-git-send-email-mikel.astiz.oss@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mikel,
 
-On Tue, Feb 14, 2012, Mikel Astiz wrote:
+On Tue, Feb 14, 2012 at 11:06 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
 > From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-> 
-> This patch series includes minor modifications that have been useful
-> while testing the Media API for HFP use-cases.
-> 
-> These three patches were acked by Luiz Augusto von Dentz the 15-12-2011.
-> 
-> The first patch has been removed from the previous proposal, given
-> that it doesn't really solve the underlying problem. According to Luiz
-> (15-12-2011):
-> 
-> "gateway_suspend_stream as it is useless, but I think we should fix it
-> to work similarly to headset_suspend_stream so we properly wait until
-> the socket is closed before we unlock and reply, this is necessary in
-> order to properly synchronize switching profiles otherwise
-> gateway_suspend_complete maybe called without SCO being completely
-> disconnected. Also when a fd is passed over to another process calling
-> close/g_io_channel_shutdown is not enough since this only release our
-> reference, in this case shutdown must be called."
-> 
-> This issue is not tackled here.
-> 
-> Mikel Astiz (3):
->   audio: gateway_unlock together with in_use = FALSE
->   a2dp: return NotSupported error if no server found
->   audio: do not disconnect on gateway SCO failure
-> 
->  audio/a2dp.c      |    2 +-
->  audio/gateway.c   |    2 +-
->  audio/transport.c |    3 ++-
->  3 files changed, 4 insertions(+), 3 deletions(-)
+>
+> Failure on BlueZ-initiated SCO requests should not drop the RFCOMM
+> connection to the gateway. Instead, considering the stream as suspended
+> should be enough.
+> ---
+>  audio/gateway.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/audio/gateway.c b/audio/gateway.c
+> index bde3e02..163f7b5 100644
+> --- a/audio/gateway.c
+> +++ b/audio/gateway.c
+> @@ -255,7 +255,7 @@ static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+>
+>        if (err) {
+>                error("sco_connect_cb(): %s", err->message);
+> -               gateway_close(dev);
+> +               gateway_suspend_stream(dev);
+>                return;
+>        }
+>
+> --
+> 1.7.6.5
 
-All three patches have been applied. Thanks.
+Ack
 
-Johan
+-- 
+Luiz Augusto von Dentz
