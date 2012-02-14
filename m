@@ -3,43 +3,55 @@ MIME-Version: 1.0
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 4/4] device: Fix memory leak during GATT service update
-Date: Tue, 14 Feb 2012 12:06:04 -0400
-Message-Id: <1329235564-12471-5-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 3/4] device: Fix invalid D-Bus calls during Reverse GATT Discovery
+Date: Tue, 14 Feb 2012 12:06:03 -0400
+Message-Id: <1329235564-12471-4-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1329235564-12471-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1329235564-12471-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-GATT service updates are not supported yet. This patch avoids a memory
-leak and GATT service storage corruption due to trying to register GATT
-services twice.
+There is no D-Bus client active during Reverse GATT Discovery, therefore
+BlueZ should not send any D-Bus replies. This fixes errors reported by
+D-Bus internal checks:
 
-After adding support for Services Changed characteristic notification
-(which is mandatory for GATT clients), this check can be removed.
+process 453: arguments to dbus_message_new_method_return() were
+incorrect, assertion "method_call != NULL" failed in file dbus-message.c
+line 1111.
 ---
- src/device.c |    8 ++++++++
- 1 files changed, 8 insertions(+), 0 deletions(-)
+ src/device.c |   12 ++++++++----
+ 1 files changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/src/device.c b/src/device.c
-index b410a63..dfc8e59 100644
+index b581564..b410a63 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -1982,6 +1982,14 @@ int device_browse_primary(struct btd_device *device, DBusConnection *conn,
- 	if (device->browse)
- 		return -EBUSY;
+@@ -1799,9 +1799,12 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
+ 	GSList *l, *uuids = NULL;
  
-+	/* FIXME: GATT service updates (implemented in update_services() for
-+	 * SDP) are not supported yet. It will be supported once client side
-+	 * "Services Changed" characteristic handling is implemented. */
-+	if (device->primaries) {
-+		error("Could not update GATT services");
-+		return -ENOSYS;
-+	}
-+
- 	req = g_new0(struct browse_req, 1);
- 	req->device = btd_device_ref(device);
- 	adapter_get_address(adapter, &src);
+ 	if (status) {
+-		DBusMessage *reply;
+-		reply = btd_error_failed(req->msg, att_ecode2str(status));
+-		g_dbus_send_message(req->conn, reply);
++		if (req->msg) {
++			DBusMessage *reply;
++			reply = btd_error_failed(req->msg,
++							att_ecode2str(status));
++			g_dbus_send_message(req->conn, reply);
++		}
+ 		goto done;
+ 	}
+ 
+@@ -1821,7 +1824,8 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
+ 	g_slist_free(uuids);
+ 
+ 	services_changed(device);
+-	create_device_reply(device, req);
++	if (req->msg)
++		create_device_reply(device, req);
+ 
+ 	store_services(device);
+ 
 -- 
 1.7.5.4
 
