@@ -1,41 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Feb 2012 14:39:00 +0200
+Date: Tue, 14 Feb 2012 14:24:42 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC BlueZ 18/22] adaptername: Fix clang warning related to
- unaligned memory access
-Message-ID: <20120214123900.GB12437@x220.ger.corp.intel.com>
-References: <1328910007-25604-1-git-send-email-vinicius.gomes@openbossa.org>
- <1328910007-25604-19-git-send-email-vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH] Bluetooth: Remove needless HCI_MGMT flag check
+Message-ID: <20120214122442.GA12437@x220.ger.corp.intel.com>
+References: <1328881778-23527-1-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1328910007-25604-19-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1328881778-23527-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Andre,
 
-On Fri, Feb 10, 2012, Vinicius Costa Gomes wrote:
-> ---
->  plugins/adaptername.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+On Fri, Feb 10, 2012, Andre Guedes wrote:
+> This patch removes HCI_MGMT flag check in hci_cs_inquiry. There is
+> no need to check this flag before calling mgmt_start_discovery_failed
+> since if the hdev is not managed by mgmt interface this function does
+> nothing.
 > 
-> diff --git a/plugins/adaptername.c b/plugins/adaptername.c
-> index e154e92..a2f9c8f 100644
-> --- a/plugins/adaptername.c
-> +++ b/plugins/adaptername.c
-> @@ -241,7 +241,7 @@ static gboolean handle_inotify_cb(GIOChannel *channel, GIOCondition cond,
->  
->  	i = 0;
->  	while (i < len) {
-> -		struct inotify_event *pevent = (struct inotify_event *) &buf[i];
-> +		struct inotify_event *pevent = (void *) &buf[i];
->  
->  		/* check that it's ours */
->  		if (pevent->len && pevent->name != NULL &&
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  net/bluetooth/hci_event.c |    3 +--
+>  1 files changed, 1 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index b0784ee..5f93fdd 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1143,8 +1143,7 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+>  		hci_req_complete(hdev, HCI_OP_INQUIRY, status);
+>  		hci_conn_check_pending(hdev);
+>  		hci_dev_lock(hdev);
+> -		if (test_bit(HCI_MGMT, &hdev->dev_flags))
+> -			mgmt_start_discovery_failed(hdev, status);
+> +		mgmt_start_discovery_failed(hdev, status);
+>  		hci_dev_unlock(hdev);
+>  		return;
+>  	}
 
-I see how this might remove the warning but not how it removes potential
-unaligned access of pevent->len and pevent->name.
+There are lots of checks like this in hci_event.c. If there's going to
+be a patch for them I'd remove all of them in one go instead of
+addressing individual ones like this.
+
+There is some benefit of keeping them though: the code doesn't need to
+check for pending mgmt commands, encode event messages and iterate
+through all HCI sockets just to figure out that that that nothing needs
+to be done.
 
 Johan
