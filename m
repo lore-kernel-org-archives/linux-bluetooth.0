@@ -2,55 +2,41 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v2 1/3] audio: gateway_unlock together with in_use = FALSE
-Date: Tue, 14 Feb 2012 10:06:32 +0100
-Message-Id: <1329210394-31405-2-git-send-email-mikel.astiz.oss@gmail.com>
-In-Reply-To: <1329210394-31405-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1329210394-31405-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH v2 0/3] Minor audio-related fixes
+Date: Tue, 14 Feb 2012 10:06:31 +0100
+Message-Id: <1329210394-31405-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Calling gateway_unlock seems safer in gateway_suspend_complete, in
-combination with the update of transport->in_use. This avoids the
-transitional state of having the gateway unlocked but the transport
-still in use.
+This patch series includes minor modifications that have been useful while testing the Media API for HFP use-cases.
 
-This approach is also more consistent with the way headset and a2dp
-handle it.
----
+These three patches were acked by Luiz Augusto von Dentz the 15-12-2011.
+
+The first patch has been removed from the previous proposal, given that it doesn't really solve the underlying problem. According to Luiz (15-12-2011):
+
+"gateway_suspend_stream as it is useless, but I think we should fix it
+to work similarly to headset_suspend_stream so we properly wait until
+the socket is closed before we unlock and reply, this is necessary in
+order to properly synchronize switching profiles otherwise
+gateway_suspend_complete maybe called without SCO being completely
+disconnected. Also when a fd is passed over to another process calling
+close/g_io_channel_shutdown is not enough since this only release our
+reference, in this case shutdown must be called."
+
+This issue is not tackled here.
+
+Mikel Astiz (3):
+  audio: gateway_unlock together with in_use = FALSE
+  a2dp: return NotSupported error if no server found
+  audio: do not disconnect on gateway SCO failure
+
+ audio/a2dp.c      |    2 +-
+ audio/gateway.c   |    2 +-
  audio/transport.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+ 3 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/audio/transport.c b/audio/transport.c
-index 7bde32d..2092644 100644
---- a/audio/transport.c
-+++ b/audio/transport.c
-@@ -510,6 +510,7 @@ static gboolean gateway_suspend_complete(gpointer user_data)
- {
- 	struct media_owner *owner = user_data;
- 	struct media_transport *transport = owner->transport;
-+	struct audio_device *device = transport->device;
- 
- 	/* Release always succeeds */
- 	if (owner->pending) {
-@@ -518,6 +519,7 @@ static gboolean gateway_suspend_complete(gpointer user_data)
- 		media_owner_remove(owner);
- 	}
- 
-+	gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
- 	transport->in_use = FALSE;
- 	media_transport_remove(transport, owner);
- 	return FALSE;
-@@ -536,7 +538,6 @@ static guint suspend_gateway(struct media_transport *transport,
- 	}
- 
- 	gateway_suspend_stream(device);
--	gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
- 	g_idle_add(gateway_suspend_complete, owner);
- 	return id++;
- }
 -- 
 1.7.6.5
 
