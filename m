@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1329210394-31405-3-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1329210394-31405-2-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1329210394-31405-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1329210394-31405-3-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Tue, 14 Feb 2012 11:29:06 +0200
-Message-ID: <CABBYNZ+V_V29eEzSHK-p+s=3MHGdPqGUMGgZwFb96tNboDzKrw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] a2dp: return NotSupported error if no server found
+	<1329210394-31405-2-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Tue, 14 Feb 2012 11:28:12 +0200
+Message-ID: <CABBYNZ+Qs8=9fA=NrZxu=9MURsiKQ-O6at6uF8_mERDG5PmA6w@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] audio: gateway_unlock together with in_use = FALSE
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Mikel Astiz <mikel.astiz.oss@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
@@ -19,27 +19,45 @@ Hi Mikel,
 On Tue, Feb 14, 2012 at 11:06 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
 > From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 >
-> With both sink and sources disabled, the A2DP server is not even
-> registered in audio_manager_init. When trying to register the endpoint,
-> this should result in the same error as if the server existed but the
-> profile was disabled.
-> ---
->  audio/a2dp.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+> Calling gateway_unlock seems safer in gateway_suspend_complete, in
+> combination with the update of transport->in_use. This avoids the
+> transitional state of having the gateway unlocked but the transport
+> still in use.
 >
-> diff --git a/audio/a2dp.c b/audio/a2dp.c
-> index bbb91ce..623a0bc 100644
-> --- a/audio/a2dp.c
-> +++ b/audio/a2dp.c
-> @@ -1589,7 +1589,7 @@ struct a2dp_sep *a2dp_add_sep(const bdaddr_t *src, uint8_t type,
->        server = find_server(servers, src);
->        if (server == NULL) {
->                if (err)
-> -                       *err = -EINVAL;
-> +                       *err = -EPROTONOSUPPORT;
->                return NULL;
+> This approach is also more consistent with the way headset and a2dp
+> handle it.
+> ---
+>  audio/transport.c |    3 ++-
+>  1 files changed, 2 insertions(+), 1 deletions(-)
+>
+> diff --git a/audio/transport.c b/audio/transport.c
+> index 7bde32d..2092644 100644
+> --- a/audio/transport.c
+> +++ b/audio/transport.c
+> @@ -510,6 +510,7 @@ static gboolean gateway_suspend_complete(gpointer user_data)
+>  {
+>        struct media_owner *owner = user_data;
+>        struct media_transport *transport = owner->transport;
+> +       struct audio_device *device = transport->device;
+>
+>        /* Release always succeeds */
+>        if (owner->pending) {
+> @@ -518,6 +519,7 @@ static gboolean gateway_suspend_complete(gpointer user_data)
+>                media_owner_remove(owner);
 >        }
 >
+> +       gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
+>        transport->in_use = FALSE;
+>        media_transport_remove(transport, owner);
+>        return FALSE;
+> @@ -536,7 +538,6 @@ static guint suspend_gateway(struct media_transport *transport,
+>        }
+>
+>        gateway_suspend_stream(device);
+> -       gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
+>        g_idle_add(gateway_suspend_complete, owner);
+>        return id++;
+>  }
 > --
 > 1.7.6.5
 
