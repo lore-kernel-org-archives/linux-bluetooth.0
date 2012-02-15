@@ -1,55 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CACLukz+nFbUn141XYsN91asx=BT=O1sK3s=__tEr7W+JVK6dyg@mail.gmail.com>
-References: <1329241945-32414-1-git-send-email-anderson.lizardo@openbossa.org>
-	<1329241945-32414-2-git-send-email-anderson.lizardo@openbossa.org>
-	<CACLukz+nFbUn141XYsN91asx=BT=O1sK3s=__tEr7W+JVK6dyg@mail.gmail.com>
-Date: Wed, 15 Feb 2012 06:41:19 -0400
-Message-ID: <CAJdJm_PP+WJ=er2vwDLwJSF4bsS0EjF7S=Wtx20+MQt+xJHa5w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/3] thermometer: Fix handling of missing
- Temperature Type
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Santiago Carot <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Use symbolic name for state in debug
+Date: Wed, 15 Feb 2012 11:50:26 +0200
+Message-Id: <1329299426-8458-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1329299426-8458-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1329299426-8458-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Wed, Feb 15, 2012 at 4:50 AM, Santiago Carot <sancane@gmail.com> wrote:
-> Hi Anderson,
->
-> 2012/2/14 Anderson Lizardo <anderson.lizardo@openbossa.org>:
->> According to HTS 1.0, it is not mandatory to have Temperature Type
->> information (the Characteristic and the indication field are both
->> unconditionally optional).
->>
->
-> I'm afraid there is an slight conceptual error in this patch.
-> According to HTS 1.0, there are two *exclusive* methods to provide the
-> temperature type to a Colector: either by using a characteristic type
-> or providing it as a field within the measurement. This doesn't mean
-> that the temperature characteristic or field type are both
-> unconditionally optional because one of them *MUST* be used, but not
-> both of them at the same time. So there will always be a method to get
-> the temperature type either if it's a static value (characteristic
-> type) or a non-static value (temperature field). Health Thermometer
-> Service[3.2] ,[3.1] &  Health Thermometer Profile [4.7]
+Use state_to_string function in debug
 
-I've seen these sections. And they are exclusive, but none of them are
-mandatory. The reason for this patch is that we have seen an LE
-thermometer without any method to get its type (and the current
-upstream code simply ignores its measurements). Looking at both
-HTS/HTP and developer.bluetooth.org does not mention them as
-"conditionally optional" (usually shown by a C<n>  note on the service
-table on service specification).
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/l2cap.h |    3 ++-
+ net/bluetooth/hci_conn.c      |    2 +-
+ net/bluetooth/l2cap_core.c    |    5 +++--
+ net/bluetooth/l2cap_sock.c    |    2 +-
+ 4 files changed, 7 insertions(+), 5 deletions(-)
 
-Please feel free to refer to where this "must" (usually a sentence
-using "shall" word) condition is described.
-
-Regards,
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 42fdbb8..bbb0e21 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -612,7 +612,8 @@ static inline void l2cap_chan_put(struct l2cap_chan *c)
+ static inline void l2cap_set_timer(struct l2cap_chan *chan,
+ 					struct delayed_work *work, long timeout)
+ {
+-	BT_DBG("chan %p state %d timeout %ld", chan, chan->state, timeout);
++	BT_DBG("chan %p state %s timeout %ld", chan,
++					state_to_string(chan->state), timeout);
+ 
+ 	if (!cancel_delayed_work(work))
+ 		l2cap_chan_hold(chan);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 6d15cba..f7a090c 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -282,7 +282,7 @@ static void hci_conn_timeout(struct work_struct *work)
+ 							disc_work.work);
+ 	__u8 reason;
+ 
+-	BT_DBG("conn %p state %d", conn, conn->state);
++	BT_DBG("conn %p state %s", conn, state_to_string(conn->state));
+ 
+ 	if (atomic_read(&conn->refcnt))
+ 		return;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 252a96e..88968e7 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -231,7 +231,7 @@ static void l2cap_chan_timeout(struct work_struct *work)
+ 	struct sock *sk = chan->sk;
+ 	int reason;
+ 
+-	BT_DBG("chan %p state %d", chan, chan->state);
++	BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
+ 
+ 	lock_sock(sk);
+ 
+@@ -413,7 +413,8 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct sock *sk = chan->sk;
+ 
+-	BT_DBG("chan %p state %d socket %p", chan, chan->state, sk->sk_socket);
++	BT_DBG("chan %p state %s sk %p", chan,
++					state_to_string(chan->state), sk);
+ 
+ 	switch (chan->state) {
+ 	case BT_LISTEN:
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 138fe34..b48d6c1 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -783,7 +783,7 @@ static void l2cap_sock_kill(struct sock *sk)
+ 	if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
+ 		return;
+ 
+-	BT_DBG("sk %p state %d", sk, sk->sk_state);
++	BT_DBG("sk %p state %s", sk, state_to_string(sk->sk_state));
+ 
+ 	/* Kill poor orphan */
+ 
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.9
+
