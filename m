@@ -1,94 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Feb 2012 10:47:13 -0800 (PST)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-cc: Gustavo Padovan <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"kanak.gupta@stericsson.com" <kanak.gupta@stericsson.com>
-Subject: Re: [PATCH] Bluetooth: Drop frames without F-bit set when in WAIT_F
- state
-In-Reply-To: <201202151034.53555.szymon.janc@tieto.com>
-Message-ID: <alpine.DEB.2.02.1202151037510.432@mathewm-linux>
-References: <1329227796-22609-1-git-send-email-szymon.janc@tieto.com> <20120214154141.GA14503@joana> <201202151034.53555.szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CA+bD78hTvaf92zy0t2xSMO2uoM+xL73XopxrvGbR5uW+6Uc3pw@mail.gmail.com>
+References: <1327448862-21964-1-git-send-email-scott@netsplit.com>
+	<1327952977.1955.160.camel@aeonflux>
+	<1327953929.2400.80.camel@novo.hadess.net>
+	<CA+bD78jkORzLP-M+bGqFMkp9vHmBXW+LgLnFGhLczn92Rk2XXA@mail.gmail.com>
+	<1327962821.2125.4.camel@sirocco.config>
+	<CA+bD78hQcBm5-94RHNSPXUsM1kAD8pYJ5Yu=-jPv8T=iedr6bA@mail.gmail.com>
+	<1327964619.2125.14.camel@sirocco.config>
+	<CA+bD78hTvaf92zy0t2xSMO2uoM+xL73XopxrvGbR5uW+6Uc3pw@mail.gmail.com>
+Date: Wed, 15 Feb 2012 18:57:11 +0100
+Message-ID: <CANq1E4ReR544EGPGVV++dH4eWsEL1Hu0rS3v2QDmZHv_fqnJ1w@mail.gmail.com>
+Subject: Re: [RFC PATCHv2] autopair: add autopair plugin
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: Scott James Remnant <scott@netsplit.com>
+Cc: Bastien Nocera <hadess@hadess.net>, Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org, keybuk@chromium.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Scott
 
-Szymon -
-
-On Wed, 15 Feb 2012, Szymon Janc wrote:
-
->> Hi Szymon,
->
-> Hi Gustavo,
->
-> I was pretty sure this patch will trigger some comments :-)
->
->>> +	/* drop frame without F-bit set when in WAIT_F state */
->>> +	if (test_bit(CONN_WAIT_F, &chan->conn_state) &&
->>> +			!__is_ctrl_final(chan, control))
->>> +		goto drop;
->>> +
+On Tue, Jan 31, 2012 at 12:10 AM, Scott James Remnant
+<scott@netsplit.com> wrote:
+> On Mon, Jan 30, 2012 at 3:03 PM, Bastien Nocera <hadess@hadess.net> wrote=
+:
+>> Em Mon, 2012-01-30 =E0s 14:35 -0800, Scott James Remnant escreveu:
+>>> On Mon, Jan 30, 2012 at 2:33 PM, Bastien Nocera <hadess@hadess.net> wro=
+te:
+>>> > Em Mon, 2012-01-30 =E0s 13:42 -0800, Scott James Remnant escreveu:
+>>> >> > The PIN length hint is also ignored in the current code:
+>>> >> > + =A0 =A0 =A0 <device type=3D"audio" oui=3D"00:1A:80:" name=3D"CMT=
+-DH5BT"
+>>> >> pin=3D"max:4"/>
+>>> >> >
+>>> >> Because that's a UI restriction, no?
+>>> >>
+>>> >> I didn't put any PIN-generation code here, because I'm not entirely
+>>> >> sure what the UI for "generate random PIN' should look like or which
+>>> >> spec you're following.
+>>> >
+>>> > It means that a generated PIN shouldn't have more than 4 digits for i=
+t
+>>> > to work with this device.
+>>> >
+>>> What generated PIN? Which spec/profile says you have to generate a PIN
+>>> for this device?
 >>
->> I think this is wrong, you are completely dropping frames here while you
->> should at least process the reqseq received. Check the spec, the WAIT_F table.
->> Another point is that the WAIT_F state belongs belongs to the transmit side,
->> and you are checking for it in the receive side. This also seems wrong to me.
->
-> Spec is a bit unclear here for me, so this is how I understand it:
-> Transmitter state machine is triggered by events from receiver state machine.
-> For receiver to take action (and sent event to tx machine eventually) condition
-> must be fulfilled. Every event in receiver state machine which can possibly
-> trigger tx machine has 'With-Valid-F-bit' condition (so my understanding is that
-> if Fbit has invalid value action should not be triggered, and next matching
-> event should be check, here last one - 'Recv frame' which has action 'Ignore').
-> So if transmitter is in WAIT_F state any frame received without Fbit=1 doesn't
-> fulfill 'With-Valid-F-bit' condition and should be dropped.
->
-> My opinion is that spec is redundant here since if 'With-Valid-F-bit' is not
-> valid rx machine will never emit 'Recv ReqSeqAndFbit' with F=0 when tx is in
-> WAIT_F and that condition will never happen (yet, it is described in WAIT_F
-> state table).
-
-I agree with Gustavo, this code is incorrect.
-
-"With-Valid-F-bit" only means that both the P-bit and F-bit are *not* 
-set.  The packet should be dropped when P=1 and F=1, but your check 
-only looks at the TX state and F-bit.
-
-Frames without the F-bit need to be processed, because the remote 
-device may have sent a frame with the F-bit that did not reach us.
-
->> Also I never find problem to pass this test in PTS with the following l2test
->> line:
+>> It's recommended that the UIs try to generate PINs for the users, rather
+>> than relying on them entering random numbers.
 >>
->> l2test -P 17 -X 3 -b 48 -w -D 1 -N 2
->>
->> Please tell the problem you have in PTS so we can try to find a better
->> solution for this.
+> Recommended where? Can you point at least at the correct document?
 >
-> We tried with l2test -x -X ertm -P 33 -N 2 (I guess -x vs -w is not relevant here).
-> I'm bit surprise how you pass that test if receiving of REJ (P=0, F=0) triggers
-> retransmission I-Frames before I-Frame with F=1 was sent by PTS (and this is
-> what PTS didn't like saying it received unexpected I-Frame). So now we have test
-> failed although we did retransmitted I-Frame only once (but before frame with
-> Fbit=1 was received).
->
-> Some discussion about that can be found here as well:
-> https://www.bluetooth.org/pts/issues/view_issue.cfm?id=8413
-> https://www.bluetooth.org/tse/errata_view.cfm?errata_id=4512
+> The only recommendation I'm aware of is in the HID profile, which
+> would not apply here, and strangely you don't use this max: form for
+> keyboards which would be the only devices they applied to.
 >
 >
-> BTW, we use following PTS version:
-> PTS  v. 4.4.2.8
-> L2CAP  v. 7.4.0.1
+> The description matches the HID profile behavior I've sumitted as a
+> separate set of CLs.
+>
 
-Regards,
+Any update on this plugin? It would make the wiimote plugin obsolete
+and allow us to select PINs based on device-names.
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+If you do not intend to continue your work here I will try fixing the
+stuff and resubmit it.
 
+Regards
+David
