@@ -1,97 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Move scope of state_to_string
-Date: Wed, 15 Feb 2012 11:50:25 +0200
-Message-Id: <1329299426-8458-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Cho, Yu-Chen" <acho@suse.com>
+To: marcel@holtmann.org,
+	padovan@profusion.mobi,
+	linux-bluetooth@vger.kernel.org
+Cc: oneukum@suse.com,
+	acho@suse.com,
+	jlee@suse.com
+Subject: Add Atheros maryann PIDVID support.
+Date: Wed, 15 Feb 2012 17:44:21 +0800
+Message-Id: <ef5cb1fa66b3deee2c51b0a85b681c0ecfafebe2.1329298278.git.acho@suse.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: "Cho, Yu-Chen" <acho@suse.com>
 
-Function state_to_string will be used in other files.
+Add Atheros maryann 0cf3:311D PIDVID support.
+This module is AR3012 Series.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Signed-off-by: Cho, Yu-Chen <acho@suse.com>
 ---
- include/net/bluetooth/bluetooth.h |   27 +++++++++++++++++++++++++++
- net/bluetooth/l2cap_core.c        |   26 --------------------------
- 2 files changed, 27 insertions(+), 26 deletions(-)
+ drivers/bluetooth/ath3k.c |    2 ++
+ drivers/bluetooth/btusb.c |    1 +
+ 2 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 4a82ca0..0a47c20 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -129,6 +129,33 @@ enum {
- 	BT_CLOSED
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 07f14d1..be21d47 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -71,6 +71,7 @@ static struct usb_device_id ath3k_table[] = {
+ 
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0CF3, 0x3004) },
++	{ USB_DEVICE(0x0CF3, 0x311D) },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -87,6 +88,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0x311D), .driver_info = BTUSB_ATH3012 },
+ 
+ 	{ }	/* Terminating entry */
  };
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f00f596..226b157 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -126,6 +126,7 @@ static struct usb_device_id blacklist_table[] = {
  
-+/* If unused will be removed by compiler */
-+static inline char *state_to_string(int state)
-+{
-+	switch (state) {
-+	case BT_CONNECTED:
-+		return "BT_CONNECTED";
-+	case BT_OPEN:
-+		return "BT_OPEN";
-+	case BT_BOUND:
-+		return "BT_BOUND";
-+	case BT_LISTEN:
-+		return "BT_LISTEN";
-+	case BT_CONNECT:
-+		return "BT_CONNECT";
-+	case BT_CONNECT2:
-+		return "BT_CONNECT2";
-+	case BT_CONFIG:
-+		return "BT_CONFIG";
-+	case BT_DISCONN:
-+		return "BT_DISCONN";
-+	case BT_CLOSED:
-+		return "BT_CLOSED";
-+	}
-+
-+	return "invalid state";
-+}
-+
- /* BD Address */
- typedef struct {
- 	__u8 b[6];
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 8efac78..252a96e 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -215,32 +215,6 @@ static u16 l2cap_alloc_cid(struct l2cap_conn *conn)
- 	return 0;
- }
+ 	/* Atheros 3012 with sflash firmware */
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
  
--static char *state_to_string(int state)
--{
--	switch(state) {
--	case BT_CONNECTED:
--		return "BT_CONNECTED";
--	case BT_OPEN:
--		return "BT_OPEN";
--	case BT_BOUND:
--		return "BT_BOUND";
--	case BT_LISTEN:
--		return "BT_LISTEN";
--	case BT_CONNECT:
--		return "BT_CONNECT";
--	case BT_CONNECT2:
--		return "BT_CONNECT2";
--	case BT_CONFIG:
--		return "BT_CONFIG";
--	case BT_DISCONN:
--		return "BT_DISCONN";
--	case BT_CLOSED:
--		return "BT_CLOSED";
--	}
--
--	return "invalid state";
--}
--
- static void l2cap_state_change(struct l2cap_chan *chan, int state)
- {
- 	BT_DBG("%p %s -> %s", chan, state_to_string(chan->state),
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
 -- 
-1.7.9
-
+1.7.7
