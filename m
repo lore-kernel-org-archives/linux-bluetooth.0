@@ -1,38 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CACLukz+yRAj-zd6vmYewozNs9=SJsjxujUXXVoT+P_6scDu8uA@mail.gmail.com>
-References: <1329241945-32414-1-git-send-email-anderson.lizardo@openbossa.org>
-	<1329241945-32414-2-git-send-email-anderson.lizardo@openbossa.org>
-	<CACLukz+nFbUn141XYsN91asx=BT=O1sK3s=__tEr7W+JVK6dyg@mail.gmail.com>
-	<CAJdJm_PP+WJ=er2vwDLwJSF4bsS0EjF7S=Wtx20+MQt+xJHa5w@mail.gmail.com>
-	<CACLukz+yRAj-zd6vmYewozNs9=SJsjxujUXXVoT+P_6scDu8uA@mail.gmail.com>
-Date: Wed, 15 Feb 2012 08:49:50 -0400
-Message-ID: <CAJdJm_OHmZC+7=QqY-64_rPN=P=81njwRE=5xzFCjYX57XBCeA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/3] thermometer: Fix handling of missing
- Temperature Type
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Santiago Carot <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH v2 BlueZ 1/3] thermometer: Fix device driver probe
+Date: Wed, 15 Feb 2012 08:38:17 -0400
+Message-Id: <1329309499-14454-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1329241945-32414-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1329241945-32414-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 
-On Wed, Feb 15, 2012 at 7:06 AM, Santiago Carot <sancane@gmail.com> wrote:
-> In any case, I don't think the best solution is to provide a value for
-> Type for wich we don't have enough information to determine what it
-> is, I think that in the case in wich Type is really optional, the
-> value provided in the measurement should be optional too. Under this
-> case it would be better not to provide anything in the
-> MeasurementReceived callback instead of providing a invented (Body)
-> value.
+The probe() function for GATT profiles should be transport agnostic.
+There is a btd_device_get_primaries() method which can be used to return
+a list of discovered GATT Primary Services, and it works for BR/EDR and
+LE. It is already used for Proximity, for instance.
 
-I just sent new patches. Only this one was modified, and I added more
-details to the commit message so I hope it is clear now.
+device_services_from_record() is BR/EDR specific and should not be used
+by GATT profile code.
 
-Best Regards,
+It also fixes a memory leak, given device_services_from_record() returns
+a heap allocated GSList.
+---
+ thermometer/manager.c |   19 +++++++++++++++----
+ 1 files changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/thermometer/manager.c b/thermometer/manager.c
+index 6b98bca..9dfbbe8 100644
+--- a/thermometer/manager.c
++++ b/thermometer/manager.c
+@@ -34,16 +34,27 @@
+ 
+ static DBusConnection *connection = NULL;
+ 
++static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
++{
++	const struct att_primary *prim = a;
++	const char *uuid = b;
++
++	return g_strcmp0(prim->uuid, uuid);
++}
++
+ static int thermometer_driver_probe(struct btd_device *device, GSList *uuids)
+ {
+ 	struct att_primary *tattr;
+-	GSList *list;
++	GSList *primaries, *l;
++
++	primaries = btd_device_get_primaries(device);
+ 
+-	list = device_services_from_record(device, uuids);
+-	if (list == NULL)
++	l = g_slist_find_custom(primaries, HEALTH_THERMOMETER_UUID,
++							primary_uuid_cmp);
++	if (l == NULL)
+ 		return -EINVAL;
+ 
+-	tattr = list->data;
++	tattr = l->data;
+ 
+ 	return thermometer_register(connection, device, tattr);
+ }
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.5.4
+
