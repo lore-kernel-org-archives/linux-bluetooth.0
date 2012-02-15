@@ -1,61 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Feb 2012 09:17:11 +0100
-From: Fabrice DELENTE <delentef@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Wireless bluetooth headset
-Message-ID: <20120215081711.GA4385@smtp.free.fr>
+Date: Wed, 15 Feb 2012 10:16:53 +0200
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: Ulisses Furquim <ulisses@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv4 02/16] Bluetooth: Revert to mutexes from RCU list
+Message-ID: <20120215081650.GA920@aemeltch-MOBL1>
+References: <1328882113-19810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1328882113-19810-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CAA37ikZ7Ph3D_fBMLFQ_rh2JDJY2LXPzKWkLcQEsXutcj1idxA@mail.gmail.com>
+ <20120213085841.GB21179@aemeltch-MOBL1>
+ <20120213144911.GC19288@aemeltch-MOBL1>
+ <CAA37ikZPa2bNyw+zcUkr3VFAaA8nz_o+5dhxFHYwOvqg1R8TEw@mail.gmail.com>
+ <20120214132117.GB3145@aemeltch-MOBL1>
+ <CAA37ikY1=K0E+zXtsHO+FRWRK=VEfR99btVBENw_cJEhonfJvw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAA37ikY1=K0E+zXtsHO+FRWRK=VEfR99btVBENw_cJEhonfJvw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+Hi Ulisses,
 
-I'd like to use my bluetooth headset in linux; I have successfully
-paired and used it with my cell phone and an android tablet. But I
-can't get mplayer in linux to output its sound there.
+On Tue, Feb 14, 2012 at 03:23:54PM -0200, Ulisses Furquim wrote:
+> On Tue, Feb 14, 2012 at 11:21 AM, Emeltchenko Andrei
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > Hi Ulisses,
+> >
+> > On Mon, Feb 13, 2012 at 10:06:10PM -0300, Ulisses Furquim wrote:
+> > ...
+> >> Yes, I do think they belong together. And please, check l2cap_sock.c
+> >> where l2cap_chan_close() seems to be called without locking
+> >> conn->chan_lock in l2cap_sock_shutdown().
+> >
+> > In that context we do not always have l2cap_conn so maybe we return
+> > chan list lock to chan_del or invent unlocked chan_del / chan_close?
+> 
+> We don't have l2cap_conn? So are we already on conn->chan_l list or
+> not? Maybe it's better to check that instead of changing everything
+> now.
 
-I have tried the test-audio script (in bluez-49.8/test) to
-successfully establish a connection to the headset, but when I try
-with mplayer, I get
+I am afraid that the logic in l2cap_chan_close is a bit complicated, for
+listening socket is recursively invokes itself for every sk in accept
+queue. conn is created when connection is established, before that chan is
+added only to global chan list. So if there is no connection we cannot get
+lock in conn->chan_lock.
 
-# mplayer -ao alsa:device=btheadset file.mp3
-...snip...
-bt_audio_service_open: connect() failed: Connection refused (111)
-[AO_ALSA] Playback open error: Connection refused
-Failed to initialize audio driver 'alsa:device=btheadset'
-Could not open/initialize audio device -> no sound.
-Audio: no sound
-Video: no video
+I believe that it is better to keep locking inside of chan_del.
 
+Best regards 
+Andrei Emeltchenko 
 
-Exiting... (End of file)
-
-so there seems to be a connection problem (I have configured the
-"btheadset" pcm in my .asoundrc:
-
-pcm.btheadset {
-type bluetooth
-device "00:18:91:D0:7A:24"
-profile "auto"
-}
-ctl.btheadset {
-type bluetooth
-}
-)
-
-When I tried simple-agent to register the PIN of the set, I get
-
-# ./simple-agent hci0 $HEAR01
-Creating device failed: org.bluez.Error.AlreadyExists: Already Exists
-
-so the PIN must already be registered.
-
-What must I do next? This is under Slackware linux, so I can't use
-gnome or KDE tools; I have successfully used the set in Ubuntu by the
-way).
-
-Thanks!
-
--- 
-F. Delente
