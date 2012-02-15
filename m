@@ -1,71 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Feb 2012 11:24:16 +0200
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: Ulisses Furquim <ulisses@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv4 02/16] Bluetooth: Revert to mutexes from RCU list
-Message-ID: <20120215092411.GC920@aemeltch-MOBL1>
-References: <1328882113-19810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1328882113-19810-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <CAA37ikZ7Ph3D_fBMLFQ_rh2JDJY2LXPzKWkLcQEsXutcj1idxA@mail.gmail.com>
- <20120213085841.GB21179@aemeltch-MOBL1>
- <20120213144911.GC19288@aemeltch-MOBL1>
- <CAA37ikZPa2bNyw+zcUkr3VFAaA8nz_o+5dhxFHYwOvqg1R8TEw@mail.gmail.com>
- <20120214132117.GB3145@aemeltch-MOBL1>
- <CAA37ikY1=K0E+zXtsHO+FRWRK=VEfR99btVBENw_cJEhonfJvw@mail.gmail.com>
- <20120215081650.GA920@aemeltch-MOBL1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120215081650.GA920@aemeltch-MOBL1>
+In-Reply-To: <1329241945-32414-3-git-send-email-anderson.lizardo@openbossa.org>
+References: <1329241945-32414-1-git-send-email-anderson.lizardo@openbossa.org>
+	<1329241945-32414-3-git-send-email-anderson.lizardo@openbossa.org>
+Date: Wed, 15 Feb 2012 10:03:40 +0100
+Message-ID: <CACLukzLJc7GO3TP9mU5MrY2SmPLG7c9figWNxJP5KuK286DD8g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/3] thermometer: Fix re-enabling
+ notification/indication on reconnection
+From: Santiago Carot <sancane@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ulisses,
+Hi Anderson,
 
-On Wed, Feb 15, 2012 at 10:16:53AM +0200, Emeltchenko Andrei wrote:
-> On Tue, Feb 14, 2012 at 03:23:54PM -0200, Ulisses Furquim wrote:
-> > On Tue, Feb 14, 2012 at 11:21 AM, Emeltchenko Andrei
-> > <Andrei.Emeltchenko.news@gmail.com> wrote:
-> > > Hi Ulisses,
-> > >
-> > > On Mon, Feb 13, 2012 at 10:06:10PM -0300, Ulisses Furquim wrote:
-> > > ...
-> > >> Yes, I do think they belong together. And please, check l2cap_sock.c
-> > >> where l2cap_chan_close() seems to be called without locking
-> > >> conn->chan_lock in l2cap_sock_shutdown().
-> > >
-> > > In that context we do not always have l2cap_conn so maybe we return
-> > > chan list lock to chan_del or invent unlocked chan_del / chan_close?
-> > 
-> > We don't have l2cap_conn? So are we already on conn->chan_l list or
-> > not? Maybe it's better to check that instead of changing everything
-> > now.
+2012/2/14 Anderson Lizardo <anderson.lizardo@openbossa.org>:
+> If a result callback is not specified for gatt_write_char() it is
+> assumed that Write Command will be used. This is not valid for
+> Characteristic Descriptors, which only support Write Request.
 
-Maybe this check?
+I'm not against this patch but from my point of view, I think this is
+a little obscure behaviour wich would deserve an advice coment in
+gatt.h due it isn't clear for anybody developping over GATT to guess
+it. On the other hand, _I remember another functions in gatt.h wich
+have similar double behaviour depending on the parameters provided in
+there, suach as gatt_discovery_primary, in wich a discover ALL primary
+service is done if the uuid is equal to NULL or disvovery service by
+UUID is done if uuid is provided, I think gatt_discover_char works in
+the same way. Maybe that having a good comments here could help to
+avoid this kind of errors in the future.
 
- 	if (!sk->sk_shutdown) {
-+		struct l2cap_conn *conn = chan->conn;
-+
- 		if (chan->mode == L2CAP_MODE_ERTM)
- 			err = __l2cap_wait_ack(sk);
- 
- 		sk->sk_shutdown = SHUTDOWN_MASK;
- 		release_sock(sk);
-+
-+		if (conn)
-+			mutex_lock(&conn->chan_lock);
- 		l2cap_chan_close(chan, 0);
-+		if (conn)
-+			mutex_unlock(&conn->chan_lock);
-+
- 		lock_sock(sk);
- 
- 		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime)
- 			err = bt_sock_wait_state(sk, BT_CLOSED,
- 							sk->sk_lingertime);
-
-If it does not look too hackish...
-
-Best regards 
-Andrei Emeltchenko 
-
+Regards.
+Santiago
