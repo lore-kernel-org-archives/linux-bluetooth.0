@@ -1,74 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Gustavo Padovan <padovan@profusion.mobi>
-Subject: Re: [PATCH] Bluetooth: Drop frames without F-bit set when in WAIT_F state
-Date: Wed, 15 Feb 2012 10:34:53 +0100
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"kanak.gupta@stericsson.com" <kanak.gupta@stericsson.com>
-References: <1329227796-22609-1-git-send-email-szymon.janc@tieto.com> <20120214154141.GA14503@joana>
-In-Reply-To: <20120214154141.GA14503@joana>
+Date: Wed, 15 Feb 2012 11:24:16 +0200
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: Ulisses Furquim <ulisses@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv4 02/16] Bluetooth: Revert to mutexes from RCU list
+Message-ID: <20120215092411.GC920@aemeltch-MOBL1>
+References: <1328882113-19810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1328882113-19810-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CAA37ikZ7Ph3D_fBMLFQ_rh2JDJY2LXPzKWkLcQEsXutcj1idxA@mail.gmail.com>
+ <20120213085841.GB21179@aemeltch-MOBL1>
+ <20120213144911.GC19288@aemeltch-MOBL1>
+ <CAA37ikZPa2bNyw+zcUkr3VFAaA8nz_o+5dhxFHYwOvqg1R8TEw@mail.gmail.com>
+ <20120214132117.GB3145@aemeltch-MOBL1>
+ <CAA37ikY1=K0E+zXtsHO+FRWRK=VEfR99btVBENw_cJEhonfJvw@mail.gmail.com>
+ <20120215081650.GA920@aemeltch-MOBL1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Message-ID: <201202151034.53555.szymon.janc@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120215081650.GA920@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Hi Szymon,
+Hi Ulisses,
 
-Hi Gustavo,
+On Wed, Feb 15, 2012 at 10:16:53AM +0200, Emeltchenko Andrei wrote:
+> On Tue, Feb 14, 2012 at 03:23:54PM -0200, Ulisses Furquim wrote:
+> > On Tue, Feb 14, 2012 at 11:21 AM, Emeltchenko Andrei
+> > <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > > Hi Ulisses,
+> > >
+> > > On Mon, Feb 13, 2012 at 10:06:10PM -0300, Ulisses Furquim wrote:
+> > > ...
+> > >> Yes, I do think they belong together. And please, check l2cap_sock.c
+> > >> where l2cap_chan_close() seems to be called without locking
+> > >> conn->chan_lock in l2cap_sock_shutdown().
+> > >
+> > > In that context we do not always have l2cap_conn so maybe we return
+> > > chan list lock to chan_del or invent unlocked chan_del / chan_close?
+> > 
+> > We don't have l2cap_conn? So are we already on conn->chan_l list or
+> > not? Maybe it's better to check that instead of changing everything
+> > now.
 
-I was pretty sure this patch will trigger some comments :-)
+Maybe this check?
 
-> > +	/* drop frame without F-bit set when in WAIT_F state */
-> > +	if (test_bit(CONN_WAIT_F, &chan->conn_state) &&
-> > +			!__is_ctrl_final(chan, control))
-> > +		goto drop;
-> > +
-> 
-> I think this is wrong, you are completely dropping frames here while you
-> should at least process the reqseq received. Check the spec, the WAIT_F table.
-> Another point is that the WAIT_F state belongs belongs to the transmit side,
-> and you are checking for it in the receive side. This also seems wrong to me.
+ 	if (!sk->sk_shutdown) {
++		struct l2cap_conn *conn = chan->conn;
++
+ 		if (chan->mode == L2CAP_MODE_ERTM)
+ 			err = __l2cap_wait_ack(sk);
+ 
+ 		sk->sk_shutdown = SHUTDOWN_MASK;
+ 		release_sock(sk);
++
++		if (conn)
++			mutex_lock(&conn->chan_lock);
+ 		l2cap_chan_close(chan, 0);
++		if (conn)
++			mutex_unlock(&conn->chan_lock);
++
+ 		lock_sock(sk);
+ 
+ 		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime)
+ 			err = bt_sock_wait_state(sk, BT_CLOSED,
+ 							sk->sk_lingertime);
 
-Spec is a bit unclear here for me, so this is how I understand it:
-Transmitter state machine is triggered by events from receiver state machine.
-For receiver to take action (and sent event to tx machine eventually) condition
-must be fulfilled. Every event in receiver state machine which can possibly
-trigger tx machine has 'With-Valid-F-bit' condition (so my understanding is that
-if Fbit has invalid value action should not be triggered, and next matching 
-event should be check, here last one - 'Recv frame' which has action 'Ignore').
-So if transmitter is in WAIT_F state any frame received without Fbit=1 doesn't
-fulfill 'With-Valid-F-bit' condition and should be dropped.
+If it does not look too hackish...
 
-My opinion is that spec is redundant here since if 'With-Valid-F-bit' is not
-valid rx machine will never emit 'Recv ReqSeqAndFbit' with F=0 when tx is in
-WAIT_F and that condition will never happen (yet, it is described in WAIT_F
-state table).
+Best regards 
+Andrei Emeltchenko 
 
-> Also I never find problem to pass this test in PTS with the following l2test
-> line:
-> 
-> l2test -P 17 -X 3 -b 48 -w -D 1 -N 2
-> 
-> Please tell the problem you have in PTS so we can try to find a better
-> solution for this.
-
-We tried with l2test -x -X ertm -P 33 -N 2 (I guess -x vs -w is not relevant here).
-I'm bit surprise how you pass that test if receiving of REJ (P=0, F=0) triggers
-retransmission I-Frames before I-Frame with F=1 was sent by PTS (and this is
-what PTS didn't like saying it received unexpected I-Frame). So now we have test
-failed although we did retransmitted I-Frame only once (but before frame with
-Fbit=1 was received).
-
-Some discussion about that can be found here as well:
-https://www.bluetooth.org/pts/issues/view_issue.cfm?id=8413
-https://www.bluetooth.org/tse/errata_view.cfm?errata_id=4512
-
-
-BTW, we use following PTS version:
-PTS  v. 4.4.2.8
-L2CAP  v. 7.4.0.1
-
--- 
-BR
-Szymon Janc
