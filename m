@@ -1,51 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 16 Feb 2012 15:17:45 +0200
+Date: Thu, 16 Feb 2012 15:13:21 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Do not dereference zero sk
-Message-ID: <20120216131745.GD16080@x220.ger.corp.intel.com>
-References: <1329225177-31940-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1329225150.28848.74.camel@aeonflux>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: Re: [PATCH v2 BlueZ 1/3] thermometer: Fix device driver probe
+Message-ID: <20120216131321.GC16080@x220.ger.corp.intel.com>
+References: <1329241945-32414-1-git-send-email-anderson.lizardo@openbossa.org>
+ <1329309499-14454-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329225150.28848.74.camel@aeonflux>
+In-Reply-To: <1329309499-14454-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lizardo,
 
-On Tue, Feb 14, 2012, Marcel Holtmann wrote:
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> >  net/bluetooth/l2cap_sock.c |    4 +++-
-> >  1 files changed, 3 insertions(+), 1 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> > index 1636029..138fe34 100644
-> > --- a/net/bluetooth/l2cap_sock.c
-> > +++ b/net/bluetooth/l2cap_sock.c
-> > @@ -795,7 +795,7 @@ static void l2cap_sock_kill(struct sock *sk)
-> >  static int l2cap_sock_shutdown(struct socket *sock, int how)
-> >  {
-> >  	struct sock *sk = sock->sk;
-> > -	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-> > +	struct l2cap_chan *chan;
-> >  	int err = 0;
-> >  
-> >  	BT_DBG("sock %p, sk %p", sock, sk);
-> > @@ -803,6 +803,8 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
-> >  	if (!sk)
-> >  		return 0;
-> >  
-> > +	chan = l2cap_pi(sk)->chan;
-> > +
+On Wed, Feb 15, 2012, Anderson Lizardo wrote:
+> The probe() function for GATT profiles should be transport agnostic.
+> There is a btd_device_get_primaries() method which can be used to return
+> a list of discovered GATT Primary Services, and it works for BR/EDR and
+> LE. It is already used for Proximity, for instance.
 > 
-> funny that this never caused any problems so far.
+> device_services_from_record() is BR/EDR specific and should not be used
+> by GATT profile code.
 > 
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> It also fixes a memory leak, given device_services_from_record() returns
+> a heap allocated GSList.
+> ---
+>  thermometer/manager.c |   19 +++++++++++++++----
+>  1 files changed, 15 insertions(+), 4 deletions(-)
 
-Applied to my bluetooth-next tree. Thanks.
+All three patches have been applied. Thanks.
 
 Johan
