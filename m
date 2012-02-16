@@ -1,45 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Thu, 16 Feb 2012 16:05:07 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Joe Perches <joe@perches.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
+Message-ID: <1329410631.10890.3.camel@joe2Laptop>
 Subject: Re: [PATCH 1/2] bluetooth: Use more current logging styles
-Message-ID: <20120216180507.GA5280@joana>
+From: Joe Perches <joe@perches.com>
+To: Gustavo Padovan <padovan@profusion.mobi>
+Cc: Marcel Holtmann <marcel@holtmann.org>, "David S. Miller"
+	 <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Date: Thu, 16 Feb 2012 08:43:51 -0800
+In-Reply-To: <1329184963.8143.2.camel@joe2Laptop>
 References: <cover.1329102581.git.joe@perches.com>
- <44b8744770a55924c68f8ad0ca274816d2d6148f.1329102581.git.joe@perches.com>
- <1329114913.28848.50.camel@aeonflux>
- <20120213215603.GA27753@joana>
- <1329184963.8143.2.camel@joe2Laptop>
- <1329410631.10890.3.camel@joe2Laptop>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329410631.10890.3.camel@joe2Laptop>
+	 <44b8744770a55924c68f8ad0ca274816d2d6148f.1329102581.git.joe@perches.com>
+	 <1329114913.28848.50.camel@aeonflux> <20120213215603.GA27753@joana>
+	 <1329184963.8143.2.camel@joe2Laptop>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joe,
+On Mon, 2012-02-13 at 18:02 -0800, Joe Perches wrote:
+> On Mon, 2012-02-13 at 19:56 -0200, Gustavo Padovan wrote:
+> > it is not really a good idea to change BT_INFO to
+> > bt_info and BT_ERR to bt_err. I understand that capital letters are not the
+> > standard here but such a change is painful for all Bluetooth developers and I
+> > don't wanna give more trouble to them.
+[]
+> Standardization of use and style is a good thing.
+> What kind of trouble is a case conversion?
+> Out of tree modules?
 
-* Joe Perches <joe@perches.com> [2012-02-16 08:43:51 -0800]:
+I'm truly curious as to why you think a
+case conversion is painful and trouble.
 
-> On Mon, 2012-02-13 at 18:02 -0800, Joe Perches wrote:
-> > On Mon, 2012-02-13 at 19:56 -0200, Gustavo Padovan wrote:
-> > > it is not really a good idea to change BT_INFO to
-> > > bt_info and BT_ERR to bt_err. I understand that capital letters are not the
-> > > standard here but such a change is painful for all Bluetooth developers and I
-> > > don't wanna give more trouble to them.
-> []
-> > Standardization of use and style is a good thing.
-> > What kind of trouble is a case conversion?
-> > Out of tree modules?
-> 
-> I'm truly curious as to why you think a
-> case conversion is painful and trouble.
+Backward compatibility could be added via:
 
-Such a change will require rebase from all our developers and we already have
-enough issues to solve, I don't wanna add one more here. Change what BT_*
-stands for is ok, but there is no need to change the macros names. 
-
-	Gustavo
+#define BT_ERR(fmt, ...)	bt_err(fmt "\n", ##__VA_ARGS__)
+#define BT_INFO(fmt, ...)	bt_info(fmt "\n", ##__VA_ARGS__)
