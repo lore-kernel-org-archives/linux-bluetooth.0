@@ -1,32 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v3 0/6] Several minor fixes
-Date: Thu, 16 Feb 2012 15:00:28 +0100
-Message-Id: <1329400834-8400-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Thu, 16 Feb 2012 15:17:45 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Do not dereference zero sk
+Message-ID: <20120216131745.GD16080@x220.ger.corp.intel.com>
+References: <1329225177-31940-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1329225150.28848.74.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1329225150.28848.74.camel@aeonflux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi,
 
-This third version fixes a mistake in the previous proposal, as pointed out by Johan.
+On Tue, Feb 14, 2012, Marcel Holtmann wrote:
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  net/bluetooth/l2cap_sock.c |    4 +++-
+> >  1 files changed, 3 insertions(+), 1 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> > index 1636029..138fe34 100644
+> > --- a/net/bluetooth/l2cap_sock.c
+> > +++ b/net/bluetooth/l2cap_sock.c
+> > @@ -795,7 +795,7 @@ static void l2cap_sock_kill(struct sock *sk)
+> >  static int l2cap_sock_shutdown(struct socket *sock, int how)
+> >  {
+> >  	struct sock *sk = sock->sk;
+> > -	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+> > +	struct l2cap_chan *chan;
+> >  	int err = 0;
+> >  
+> >  	BT_DBG("sock %p, sk %p", sock, sk);
+> > @@ -803,6 +803,8 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
+> >  	if (!sk)
+> >  		return 0;
+> >  
+> > +	chan = l2cap_pi(sk)->chan;
+> > +
+> 
+> funny that this never caused any problems so far.
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-The rest remains the same and has been acked by Luiz.
+Applied to my bluetooth-next tree. Thanks.
 
-Mikel Astiz (6):
-  client: fix memory leak in obc_session_put
-  client: fix unreported error case
-  client: fix incorrect error check
-  client: fix pbap select when same path given twice
-  client: queue transfers in ftp sessions
-  client: queue transfers in pbap sessions
-
- client/ftp.c     |   39 ++++---------
- client/pbap.c    |  176 ++++++++++++++++++++++++------------------------------
- client/session.c |   22 ++++++-
- 3 files changed, 109 insertions(+), 128 deletions(-)
-
--- 
-1.7.6.5
-
+Johan
