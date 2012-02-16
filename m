@@ -1,55 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 17 Feb 2012 01:39:04 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/4] Bluetooth: mgmt: Add support for Set Link Security
- command
-Message-ID: <20120216233904.GA6607@x220.ger.corp.intel.com>
-References: <1329434578-5928-1-git-send-email-johan.hedberg@gmail.com>
- <1329434578-5928-2-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329434578-5928-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <20120216221213.GA3889@x220.ger.corp.intel.com>
+References: <1329429041-30715-1-git-send-email-andre.guedes@openbossa.org>
+	<1329429041-30715-5-git-send-email-andre.guedes@openbossa.org>
+	<20120216221213.GA3889@x220.ger.corp.intel.com>
+Date: Thu, 16 Feb 2012 20:30:41 -0300
+Message-ID: <CACJA=fV3-GvzLd3WKGDRwO7q06rQ8j+3ts9Vo8GTiE_0T42XwA@mail.gmail.com>
+Subject: Re: [RFC 4/4] Bluetooth: Interleaved discovery support
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
 
-On Fri, Feb 17, 2012, johan.hedberg@gmail.com wrote:
-> +	hdev = hci_dev_get(index);
-> +	if (!hdev)
-> +		return cmd_status(sk, index, MGMT_OP_SET_LINK_SECURITY,
-> +						MGMT_STATUS_INVALID_PARAMS);
-> +
-> +	hci_dev_lock(hdev);
-> +
-> +	if (mgmt_pending_find(MGMT_OP_SET_LINK_SECURITY, hdev)) {
-> +		err = cmd_status(sk, index, MGMT_OP_SET_LINK_SECURITY,
-> +							MGMT_STATUS_BUSY);
-> +		goto failed;
-> +	}
-> +
-> +	val = !!cp->val;
-> +
-> +	if (test_bit(HCI_AUTH, &hdev->flags) == val) {
-> +		err = send_settings_rsp(sk, MGMT_OP_SET_LINK_SECURITY, hdev);
-> +		goto failed;
-> +	}
-> +
-> +	cmd = mgmt_pending_add(sk, MGMT_OP_SET_LINK_SECURITY, hdev, data, len);
-> +	if (!cmd) {
-> +		err = -ENOMEM;
-> +		goto failed;
-> +	}
-> +
-> +	err = hci_send_cmd(hdev, HCI_OP_WRITE_AUTH_ENABLE, sizeof(val), &val);
-> +	if (err < 0) {
-> +		mgmt_pending_remove(cmd);
-> +		goto failed;
-> +	}
+On Thu, Feb 16, 2012 at 7:12 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Andre,
+>
+> On Thu, Feb 16, 2012, Andre Guedes wrote:
+>>  #define INQUIRY_LEN_BREDR            0x08    /* TGAP(100) */
+>> +#define INQUIRY_LEN_BREDR_LE         0x04    /* TGAP(100)/2 */
+>> +
+>>
+>>  #define SERVICE_CACHE_TIMEOUT (5 * 1000)
+>
+> One unnecessary empty line added above.
 
-There's a missing check for HCI_UP here as well as in the corresponding
-place of patch 3/4. I'll send v2's of 2/4 and 3/4 as a new patch-set
-(1/4 and 4/4 are quite trivial so I wont bother resending them).
+Thanks, I'll fix it.
 
-Johan
+>> +int mgmt_interleaved_discovery(struct hci_dev *hdev)
+>> +{
+>> +     int err;
+>> +
+>> +     BT_DBG("%s", hdev->name);
+>> +
+>> +     err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR_LE);
+>> +     if (err < 0) {
+>> +             hci_dev_lock(hdev);
+>> +             hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+>> +             hci_dev_unlock(hdev);
+>> +     }
+>> +
+>> +     return err;
+>> +}
+>
+> The locking doesn't look right to me above. hci_do_inquiry should be
+> called with the lock held. I think it might be simpler if you make
+> mgmt_interleaved_discovery() require the caller to hold the lock.
+
+Yes, you're right. I just realized hci_do_inquiry now calls inquiry_
+cache_flush which requires hdev->lock held. I'll fix this too. Thanks.
+
+BR,
+
+Andre
