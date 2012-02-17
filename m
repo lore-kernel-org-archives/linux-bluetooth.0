@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv5 16/16] Bluetooth: Remove socket lock check
-Date: Fri, 17 Feb 2012 15:44:12 +0200
-Message-Id: <1329486252-25252-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv5 12/16] Bluetooth: Use chan lock in receiving data
+Date: Fri, 17 Feb 2012 15:44:08 +0200
+Message-Id: <1329486252-25252-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1329486252-25252-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1329486252-25252-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,32 +11,76 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Simplify code so that we do not need to check whether socket is locked.
+Change locking logic when receiving ACL and L2CAP data.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_sock.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ net/bluetooth/l2cap_core.c |   11 +++++------
+ net/bluetooth/l2cap_sock.c |   11 +++++++++--
+ 2 files changed, 14 insertions(+), 8 deletions(-)
 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 71c7a08..31810d3 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4261,7 +4261,6 @@ drop:
+ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk_buff *skb)
+ {
+ 	struct l2cap_chan *chan;
+-	struct sock *sk = NULL;
+ 	u32 control;
+ 	u16 tx_seq;
+ 	int len;
+@@ -4269,11 +4268,12 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 	chan = l2cap_get_chan_by_scid(conn, cid);
+ 	if (!chan) {
+ 		BT_DBG("unknown cid 0x%4.4x", cid);
+-		goto drop;
++		/* Drop packet and return */
++		kfree(skb);
++		return 0;
+ 	}
+ 
+-	sk = chan->sk;
+-	lock_sock(sk);
++	l2cap_chan_lock(chan);
+ 
+ 	BT_DBG("chan %p, len %d", chan, skb->len);
+ 
+@@ -4344,8 +4344,7 @@ drop:
+ 	kfree_skb(skb);
+ 
+ done:
+-	if (sk)
+-		release_sock(sk);
++	l2cap_chan_unlock(chan);
+ 
+ 	return 0;
+ }
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index bbc1747..e2fc24b 100644
+index db38fae..a278858 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -125,15 +125,15 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+@@ -877,8 +877,12 @@ static int l2cap_sock_recv_cb(void *data, struct sk_buff *skb)
+ 	struct sock *sk = data;
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
  
- 	err = l2cap_chan_connect(chan, la.l2_psm, la.l2_cid, &la.l2_bdaddr);
- 	if (err)
--		goto done;
-+		return err;
- 
- 	lock_sock(sk);
- 
- 	err = bt_sock_wait_state(sk, BT_CONNECTED,
- 			sock_sndtimeo(sk, flags & O_NONBLOCK));
--done:
--	if (sock_owned_by_user(sk))
--		release_sock(sk);
+-	if (pi->rx_busy_skb)
+-		return -ENOMEM;
++	lock_sock(sk);
 +
++	if (pi->rx_busy_skb) {
++		err = -ENOMEM;
++		goto done;
++	}
+ 
+ 	err = sock_queue_rcv_skb(sk, skb);
+ 
+@@ -897,6 +901,9 @@ static int l2cap_sock_recv_cb(void *data, struct sk_buff *skb)
+ 		err = 0;
+ 	}
+ 
++done:
 +	release_sock(sk);
 +
  	return err;
