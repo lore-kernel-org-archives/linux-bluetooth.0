@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v4 3/6] client: fix incorrect error check
-Date: Fri, 17 Feb 2012 13:55:33 +0100
-Message-Id: <1329483336-25853-4-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v4 5/6] client: queue transfers in ftp sessions
+Date: Fri, 17 Feb 2012 13:55:35 +0100
+Message-Id: <1329483336-25853-6-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1329483336-25853-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1329483336-25853-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,35 +12,125 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Previous statement always returned success.
+Previous implementation reported busy when trying to queue several
+transfers in the same session.
 ---
- client/pbap.c |    6 ++++--
- 1 files changed, 4 insertions(+), 2 deletions(-)
+ client/ftp.c |   39 +++++++++++----------------------------
+ 1 files changed, 11 insertions(+), 28 deletions(-)
 
-diff --git a/client/pbap.c b/client/pbap.c
-index 4910536..dd5642d 100644
---- a/client/pbap.c
-+++ b/client/pbap.c
-@@ -287,6 +287,7 @@ static gboolean pbap_setpath(struct pbap_data *pbap, const char *location,
- 					const char *item, GError **err)
+diff --git a/client/ftp.c b/client/ftp.c
+index 9e3f6b3..9be5d69 100644
+--- a/client/ftp.c
++++ b/client/ftp.c
+@@ -48,7 +48,6 @@ static DBusConnection *conn = NULL;
+ 
+ struct ftp_data {
+ 	struct obc_session *session;
+-	DBusMessage *msg;
+ };
+ 
+ static void async_cb(struct obc_session *session, GError *err,
+@@ -176,36 +175,31 @@ static const GMarkupParser parser = {
+ static void get_file_callback(struct obc_session *session, GError *err,
+ 							void *user_data)
  {
- 	char *path;
-+	guint id;
+-	struct ftp_data *ftp = user_data;
++	DBusMessage *msg = user_data;
+ 	DBusMessage *reply;
  
- 	path = build_phonebook_path(location, item);
- 	if (path == NULL) {
-@@ -300,8 +301,9 @@ static gboolean pbap_setpath(struct pbap_data *pbap, const char *location,
- 		return TRUE;
- 	}
+-	if (!ftp->msg)
+-		return;
+-
+ 	if (err)
+-		reply = g_dbus_create_error(ftp->msg,
++		reply = g_dbus_create_error(msg,
+ 					"org.openobex.Error.Failed",
+ 					"%s", err->message);
+ 	else
+-		reply = dbus_message_new_method_return(ftp->msg);
++		reply = dbus_message_new_method_return(msg);
  
--	obc_session_setpath(pbap->session, path, pbap_setpath_cb, pbap, err);
--	if (err != NULL) {
-+	id = obc_session_setpath(pbap->session, path, pbap_setpath_cb, pbap,
-+									err);
-+	if (id > 0) {
- 		g_free(pbap->path);
- 		pbap->path = path;
- 		return TRUE;
+ 	g_dbus_send_message(conn, reply);
+-
+-	dbus_message_unref(ftp->msg);
+-	ftp->msg = NULL;
++	dbus_message_unref(msg);
+ }
+ 
+ static void list_folder_callback(struct obc_session *session,
+ 					GError *err, void *user_data)
+ {
+-	struct ftp_data *ftp = user_data;
++	DBusMessage *msg = user_data;
+ 	GMarkupParseContext *ctxt;
+ 	DBusMessage *reply;
+ 	DBusMessageIter iter, array;
+ 	const char *buf;
+ 	size_t size;
+ 
+-	reply = dbus_message_new_method_return(ftp->msg);
++	reply = dbus_message_new_method_return(msg);
+ 
+ 	buf = obc_session_get_buffer(session, &size);
+ 	if (size == 0)
+@@ -224,8 +218,7 @@ static void list_folder_callback(struct obc_session *session,
+ 
+ done:
+ 	g_dbus_send_message(conn, reply);
+-	dbus_message_unref(ftp->msg);
+-	ftp->msg = NULL;
++	dbus_message_unref(msg);
+ }
+ 
+ static DBusMessage *create_folder(DBusConnection *connection,
+@@ -263,18 +256,13 @@ static DBusMessage *list_folder(DBusConnection *connection,
+ 	struct ftp_data *ftp = user_data;
+ 	struct obc_session *session = ftp->session;
+ 
+-	if (ftp->msg)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.InProgress",
+-				"Transfer in progress");
+-
+ 	if (obc_session_get(session, "x-obex/folder-listing",
+-			NULL, NULL, NULL, 0, list_folder_callback, ftp) < 0)
++			NULL, NULL, NULL, 0, list_folder_callback, message) < 0)
+ 		return g_dbus_create_error(message,
+ 				"org.openobex.Error.Failed",
+ 				"Failed");
+ 
+-	ftp->msg = dbus_message_ref(message);
++	dbus_message_ref(message);
+ 
+ 	return NULL;
+ }
+@@ -286,11 +274,6 @@ static DBusMessage *get_file(DBusConnection *connection,
+ 	struct obc_session *session = ftp->session;
+ 	const char *target_file, *source_file;
+ 
+-	if (ftp->msg)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.InProgress",
+-				"Transfer in progress");
+-
+ 	if (dbus_message_get_args(message, NULL,
+ 				DBUS_TYPE_STRING, &target_file,
+ 				DBUS_TYPE_STRING, &source_file,
+@@ -299,12 +282,12 @@ static DBusMessage *get_file(DBusConnection *connection,
+ 				"org.openobex.Error.InvalidArguments", NULL);
+ 
+ 	if (obc_session_get(session, NULL, source_file,
+-			target_file, NULL, 0, get_file_callback, ftp) < 0)
++			target_file, NULL, 0, get_file_callback, message) < 0)
+ 		return g_dbus_create_error(message,
+ 				"org.openobex.Error.Failed",
+ 				"Failed");
+ 
+-	ftp->msg = dbus_message_ref(message);
++	dbus_message_ref(message);
+ 
+ 	return NULL;
+ }
 -- 
 1.7.6.5
 
