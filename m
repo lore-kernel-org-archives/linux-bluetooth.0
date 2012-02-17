@@ -1,55 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1329467859.28848.130.camel@aeonflux>
-Subject: Re: [PATCH V2 1/3] bluetooth: Add logging functions bt_info and
- bt_err
+Message-ID: <1329467683.28848.128.camel@aeonflux>
+Subject: Re: ath3k: asus bluetooth dongle won't work
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Joe Perches <joe@perches.com>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Date: Fri, 17 Feb 2012 09:37:39 +0100
-In-Reply-To: <5c5e8180081e57e6098139fadd9275073048f448.1329461203.git.joe@perches.com>
-References: <cover.1329461202.git.joe@perches.com>
-	 <5c5e8180081e57e6098139fadd9275073048f448.1329461203.git.joe@perches.com>
+To: Stephen Hemminger <shemminger@vyatta.com>
+Cc: Vikram Kandukuri <vkandukuri@atheros.com>,
+	"Luis R. Rodriguez" <mcgrof@qca.qualcomm.com>,
+	linux-bluetooth@vger.kernel.org
+Date: Fri, 17 Feb 2012 09:34:43 +0100
+In-Reply-To: <20120216173504.2571de22@s6510.linuxnetplumber.net>
+References: <20120216173504.2571de22@s6510.linuxnetplumber.net>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joe,
+Hi Stephen,
 
-> Use specific logging functions instead of a generic
-> bt_printk function can save some text.
+> Running on Debian Wheezy (3.2.0-1-amd64), my new Asus bluetooth
+> dongle didn't work. Made sure and get the correct firmware, but
+> the driver does not load it correctly.
 > 
-> Remove now unused bt_printk function.
-> Add compatibility BT_INFO and BT_ERR macros.
+> [    8.364186] Bluetooth: Can't change to loading configuration err
+> [    8.364263] ath3k: probe of 2-4.3:1.0 failed with error -110
+> [    8.364300] usbcore: registered new interface driver ath3k
 > 
-> (compiled x86 and defconfig with bluetooth and all bluetooth drivers)
 > 
-> $ size net/bluetooth/built-in.o*
->    text	   data	    bss	    dec	    hex	filename
->  381662	  20072	 100416	 502150	  7a986	net/bluetooth/built-in.o.allyesconfig.new
->  382463	  20072	 100400	 502935	  7ac97	net/bluetooth/built-in.o.allyesconfig.old
->  126635	   1388	    132	 128155	  1f49b	net/bluetooth/built-in.o.defconfig.new
->  127175	   1388	    132	 128695	  1f6b7	net/bluetooth/built-in.o.defconfig.old
+> This is from a cold (power off) boot, but it happens repeatedly.
 > 
-> $ size drivers/bluetooth/built-in.o*
->  127575	   8976	  29476	 166027	  2888b	drivers/bluetooth/built-in.o.allyesconfig.new
->  129512	   8976	  29516	 168004	  29044	drivers/bluetooth/built-in.o.allyesconfig.old
->   52998	   3292	    156	  56446	   dc7e	drivers/bluetooth/built-in.o.defconfig.new
->   54358	   3292	    156	  57806	   e1ce	drivers/bluetooth/built-in.o.defconfig.old
+> Any idea what could be wrong?
 > 
-> Signed-off-by: Joe Perches <joe@perches.com>
-> ---
->  include/net/bluetooth/bluetooth.h |   14 ++++++++------
->  net/bluetooth/lib.c               |   27 ++++++++++++++++++++++++---
->  2 files changed, 32 insertions(+), 9 deletions(-)
+> lsusb
+> Bus 002 Device 005: ID 0cf3:3000 Atheros Communications, Inc. AR3011 Bluetooth (no firmware)
 
-lets try to get at least this patch merged. I hope we don't have too
-many conflicts.
-
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+you need to ask Atheros for details, but maybe just the firmware file is
+missing.
 
 Regards
 
