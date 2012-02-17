@@ -1,72 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC obexd 1/3] core: Fix queueing packet containing error while suspended
-Date: Fri, 17 Feb 2012 15:11:46 +0200
-Message-Id: <1329484308-8417-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH obexd v4 3/6] client: fix incorrect error check
+Date: Fri, 17 Feb 2012 13:55:33 +0100
+Message-Id: <1329483336-25853-4-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1329483336-25853-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1329483336-25853-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Queueing the error won't remove the original packet created by transfer
-from the queue so upon resume gobex will attempt to send it again.
-
-To fix this we no longer create a error packet instead the session is
-market as aborted and the error stored so when gobex finally resumes the
-error is forward properly.
+Previous statement always returned success.
 ---
- src/obex-priv.h |    1 +
- src/obex.c      |   10 ++++++----
- 2 files changed, 7 insertions(+), 4 deletions(-)
+ client/pbap.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/src/obex-priv.h b/src/obex-priv.h
-index 5b72942..41854bc 100644
---- a/src/obex-priv.h
-+++ b/src/obex-priv.h
-@@ -43,6 +43,7 @@ struct obex_session {
- 	int64_t size;
- 	void *object;
- 	gboolean aborted;
-+	int err;
- 	struct obex_service_driver *service;
- 	void *service_data;
- 	struct obex_server *server;
-diff --git a/src/obex.c b/src/obex.c
-index 05cc068..a028156 100644
---- a/src/obex.c
-+++ b/src/obex.c
-@@ -554,7 +554,7 @@ static gssize send_data(void *buf, gsize size, gpointer user_data)
- 									size);
+diff --git a/client/pbap.c b/client/pbap.c
+index 4910536..dd5642d 100644
+--- a/client/pbap.c
++++ b/client/pbap.c
+@@ -287,6 +287,7 @@ static gboolean pbap_setpath(struct pbap_data *pbap, const char *location,
+ 					const char *item, GError **err)
+ {
+ 	char *path;
++	guint id;
  
- 	if (os->aborted)
--		return -EPERM;
-+		return os->err < 0 ? os->err : -EPERM;
- 
- 	return driver_read(os, buf, size);
- }
-@@ -594,7 +594,7 @@ static int driver_get_headers(struct obex_session *os)
- 	DBG("name=%s type=%s object=%p", os->name, os->type, os->object);
- 
- 	if (os->aborted)
--		return -EPERM;
-+		return os->err < 0 ? os->err : -EPERM;
- 
- 	if (os->object == NULL)
- 		return -EIO;
-@@ -661,8 +661,10 @@ static gboolean handle_async_io(void *object, int flags, int err,
+ 	path = build_phonebook_path(location, item);
+ 	if (path == NULL) {
+@@ -300,8 +301,9 @@ static gboolean pbap_setpath(struct pbap_data *pbap, const char *location,
  		return TRUE;
+ 	}
  
- done:
--	if (err < 0)
--		os_set_response(os, err);
-+	if (err < 0) {
-+		os->err = err;
-+		os->aborted = TRUE;
-+	}
- 
- 	g_obex_resume(os->obex);
- 
+-	obc_session_setpath(pbap->session, path, pbap_setpath_cb, pbap, err);
+-	if (err != NULL) {
++	id = obc_session_setpath(pbap->session, path, pbap_setpath_cb, pbap,
++									err);
++	if (id > 0) {
+ 		g_free(pbap->path);
+ 		pbap->path = path;
+ 		return TRUE;
 -- 
-1.7.7.6
+1.7.6.5
 
