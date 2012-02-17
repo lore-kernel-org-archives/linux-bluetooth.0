@@ -2,155 +2,117 @@ Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v2 4/4] Bluetooth: Interleaved discovery support
-Date: Fri, 17 Feb 2012 20:39:38 -0300
-Message-Id: <1329521978-8537-5-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v2 3/4] Bluetooth: Merge INQUIRY and LE_SCAN discovery states
+Date: Fri, 17 Feb 2012 20:39:37 -0300
+Message-Id: <1329521978-8537-4-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1329521978-8537-1-git-send-email-andre.guedes@openbossa.org>
 References: <1329521978-8537-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds interleaved discovery support to MGMT Start
-Discovery command.
+This patch merges DISCOVERY_INQUIRY and DISCOVERY_LE_SCAN states
+into a new state called DISCOVERY_FINDING.
 
-In case interleaved discovery is not supported (not a dual mode
-device), we perform BR/EDR or LE-only discovery according to the
-device capabilities.
+>From the discovery perspective, we are pretty much worried about
+to know just if we are finding devices than what exactly phase of
+"finding devices" (inquiry or LE scan) we are currently running.
+Besides, to know if the controller is performing inquiry or LE scan
+we should check HCI_INQUIRY or HCI_LE_SCAN bits in hdev flags.
+
+Moreover, merging this two states will simplify the discovery state
+machine and will keep interleaved discovery implementation simpler.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |    2 +
- net/bluetooth/hci_event.c        |   13 +++++++---
- net/bluetooth/mgmt.c             |   47 +++++++++++++++++++++++++++++++++++++-
- 3 files changed, 57 insertions(+), 5 deletions(-)
+ include/net/bluetooth/hci_core.h |    3 +--
+ net/bluetooth/hci_core.c         |    6 ++----
+ net/bluetooth/hci_event.c        |    6 +++---
+ net/bluetooth/mgmt.c             |    2 +-
+ 4 files changed, 7 insertions(+), 10 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 942de77..2aafeb3 100644
+index d7c79b5..942de77 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -716,6 +716,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define lmp_ssp_capable(dev)       ((dev)->features[6] & LMP_SIMPLE_PAIR)
- #define lmp_no_flush_capable(dev)  ((dev)->features[6] & LMP_NO_FLUSH)
- #define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
-+#define lmp_bredr_capable(dev)     (!((dev)->features[4] & LMP_NO_BREDR))
+@@ -61,8 +61,7 @@ struct discovery_state {
+ 	enum {
+ 		DISCOVERY_STOPPED,
+ 		DISCOVERY_STARTING,
+-		DISCOVERY_INQUIRY,
+-		DISCOVERY_LE_SCAN,
++		DISCOVERY_FINDING,
+ 		DISCOVERY_RESOLVING,
+ 		DISCOVERY_STOPPING,
+ 	} state;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 29a9b01..fabca08 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -361,8 +361,7 @@ bool hci_discovery_active(struct hci_dev *hdev)
+ 	struct discovery_state *discov = &hdev->discovery;
  
- /* ----- Extended LMP capabilities ----- */
- #define lmp_host_le_capable(dev)   ((dev)->host_features[0] & LMP_HOST_LE)
-@@ -1019,6 +1020,7 @@ int mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status);
- int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status);
- int mgmt_discovering(struct hci_dev *hdev, u8 discovering);
-+int mgmt_interleaved_discovery(struct hci_dev *hdev);
- int mgmt_device_blocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
- int mgmt_device_unblocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
+ 	switch (discov->state) {
+-	case DISCOVERY_INQUIRY:
+-	case DISCOVERY_LE_SCAN:
++	case DISCOVERY_FINDING:
+ 	case DISCOVERY_RESOLVING:
+ 		return true;
  
+@@ -387,8 +386,7 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
+ 		break;
+ 	case DISCOVERY_STARTING:
+ 		break;
+-	case DISCOVERY_INQUIRY:
+-	case DISCOVERY_LE_SCAN:
++	case DISCOVERY_FINDING:
+ 		mgmt_discovering(hdev, 1);
+ 		break;
+ 	case DISCOVERY_RESOLVING:
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 9aea7b8..04fb1f0 100644
+index 179d127..9aea7b8 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -1090,11 +1090,16 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+@@ -1080,7 +1080,7 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
  
- 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 
--		hci_dev_lock(hdev);
--		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
--		hci_dev_unlock(hdev);
--
- 		schedule_delayed_work(&hdev->adv_work, ADV_CLEAR_TIMEOUT);
-+
-+		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED) {
-+			mgmt_interleaved_discovery(hdev);
-+		} else {
-+			hci_dev_lock(hdev);
-+			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+			hci_dev_unlock(hdev);
-+		}
-+
+ 		hci_dev_lock(hdev);
+ 		hci_adv_entries_clear(hdev);
+-		hci_discovery_set_state(hdev, DISCOVERY_LE_SCAN);
++		hci_discovery_set_state(hdev, DISCOVERY_FINDING);
+ 		hci_dev_unlock(hdev);
  		break;
  
- 	default:
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a9cd38d..89754bb 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -108,8 +108,10 @@ static const u16 mgmt_events[] = {
- #define LE_SCAN_WIN			0x12
- #define LE_SCAN_INT			0x12
- #define LE_SCAN_TIMEOUT_LE_ONLY		10240	/* TGAP(gen_disc_scan_min) */
-+#define LE_SCAN_TIMEOUT_BREDR_LE	5120	/* TGAP(100)/2 */
+@@ -1159,7 +1159,7 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ 	set_bit(HCI_INQUIRY, &hdev->flags);
  
- #define INQUIRY_LEN_BREDR		0x08	/* TGAP(100) */
-+#define INQUIRY_LEN_BREDR_LE		0x04	/* TGAP(100)/2 */
- 
- #define SERVICE_CACHE_TIMEOUT (5 * 1000)
- 
-@@ -2153,6 +2155,46 @@ static int remove_remote_oob_data(struct sock *sk, u16 index,
- 	return err;
+ 	hci_dev_lock(hdev);
+-	hci_discovery_set_state(hdev, DISCOVERY_INQUIRY);
++	hci_discovery_set_state(hdev, DISCOVERY_FINDING);
+ 	hci_dev_unlock(hdev);
  }
  
-+static int discovery(struct hci_dev *hdev)
-+{
-+	int err;
-+
-+	if (lmp_host_le_capable(hdev)) {
-+		if (lmp_bredr_capable(hdev)) {
-+			err = hci_le_scan(hdev, LE_SCAN_TYPE,
-+						LE_SCAN_INT, LE_SCAN_WIN,
-+						LE_SCAN_TIMEOUT_BREDR_LE);
-+		} else {
-+			hdev->discovery.type = DISCOV_TYPE_LE;
-+			err = hci_le_scan(hdev, LE_SCAN_TYPE,
-+						LE_SCAN_INT, LE_SCAN_WIN,
-+						LE_SCAN_TIMEOUT_LE_ONLY);
-+		}
-+	} else {
-+		hdev->discovery.type = DISCOV_TYPE_BREDR;
-+		err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
-+	}
-+
-+	return err;
-+}
-+
-+int mgmt_interleaved_discovery(struct hci_dev *hdev)
-+{
-+	int err;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	hci_dev_lock(hdev);
-+
-+	err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR_LE);
-+	if (err < 0)
-+		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+
-+	hci_dev_unlock(hdev);
-+
-+	return err;
-+}
-+
- static int start_discovery(struct sock *sk, u16 index,
- 						void *data, u16 len)
- {
-@@ -2196,7 +2238,6 @@ static int start_discovery(struct sock *sk, u16 index,
+@@ -1645,7 +1645,7 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
  
- 	switch (hdev->discovery.type) {
- 	case DISCOV_TYPE_BREDR:
--	case DISCOV_TYPE_INTERLEAVED:
- 		err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
- 		break;
+ 	hci_dev_lock(hdev);
  
-@@ -2205,6 +2246,10 @@ static int start_discovery(struct sock *sk, u16 index,
- 					LE_SCAN_WIN, LE_SCAN_TIMEOUT_LE_ONLY);
- 		break;
+-	if (discov->state != DISCOVERY_INQUIRY)
++	if (discov->state != DISCOVERY_FINDING)
+ 		goto unlock;
  
-+	case DISCOV_TYPE_INTERLEAVED:
-+		err = discovery(hdev);
-+		break;
-+
- 	default:
- 		err = -EINVAL;
+ 	if (list_empty(&discov->resolve)) {
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 9d98382..a9cd38d 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2250,7 +2250,7 @@ static int stop_discovery(struct sock *sk, u16 index)
+ 		goto unlock;
  	}
+ 
+-	if (hdev->discovery.state == DISCOVERY_INQUIRY) {
++	if (hdev->discovery.state == DISCOVERY_FINDING) {
+ 		err = hci_cancel_inquiry(hdev);
+ 		if (err < 0)
+ 			mgmt_pending_remove(cmd);
 -- 
 1.7.9.1
 
