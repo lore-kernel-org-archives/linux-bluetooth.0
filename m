@@ -1,43 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 17 Feb 2012 13:06:27 +0200
+Date: Fri, 17 Feb 2012 13:03:50 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH hcidump 1/2] L2CAP: add OBEX support
-Message-ID: <20120217110627.GB16018@x220>
-References: <1329472135-14123-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCHv2 0/3] Ease debugging patches
+Message-ID: <20120217110350.GA16018@x220>
+References: <1329471657-18278-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329472135-14123-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1329471657-18278-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Andrei,
 
-On Fri, Feb 17, 2012, Luiz Augusto von Dentz wrote:
-> ---
->  parser/l2cap.c |    8 ++++++++
->  1 files changed, 8 insertions(+), 0 deletions(-)
+On Fri, Feb 17, 2012, Emeltchenko Andrei wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> diff --git a/parser/l2cap.c b/parser/l2cap.c
-> index 696456a..fba530a 100644
-> --- a/parser/l2cap.c
-> +++ b/parser/l2cap.c
-> @@ -1090,6 +1090,14 @@ static void l2cap_parse(int level, struct frame *frm)
->  					raw_dump(level + 1, frm);
->  				break;
->  
-> +			case SDP_UUID_OBEX:
-> +				if (!p_filter(FILT_OBEX))
-> +					obex_dump(level, frm);
-> +				else
-> +					raw_dump(level + 1, frm);
-> +				break;
-> +
-> +
->  			default:
+> Increase isage of state_to_string and prefix hex numbers
+> with object names.
+> 
+> Changes:
+> 	v2: added 3rd patch, prefixing couple of hex with obj name
+> 
+> Andrei Emeltchenko (3):
+>   Bluetooth: Move scope of state_to_string
+>   Bluetooth: Use symbolic names for state in debug
+>   Bluetooth: Prefix hex numbers with object name
+> 
+>  include/net/bluetooth/bluetooth.h |   27 +++++++++++++++++++++++++++
+>  include/net/bluetooth/l2cap.h     |    3 ++-
+>  net/bluetooth/hci_conn.c          |    4 ++--
+>  net/bluetooth/l2cap_core.c        |   33 ++++-----------------------------
+>  net/bluetooth/l2cap_sock.c        |    2 +-
+>  5 files changed, 36 insertions(+), 33 deletions(-)
 
-One unnecessary empty line above. Other than that the patches looked
-fine so they're now (with the above fix) pushed upstream.
+All three patches have been applied to my bluetooth-next tree. Thanks.
 
 Johan
