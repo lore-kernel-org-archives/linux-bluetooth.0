@@ -1,61 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: mgmt: Add address type to link key messages
-Date: Fri, 17 Feb 2012 14:32:25 +0200
-Message-Id: <1329481947-19108-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1329475050-2710-2-git-send-email-sancane@gmail.com>
+References: <1329475050-2710-1-git-send-email-sancane@gmail.com>
+	<1329475050-2710-2-git-send-email-sancane@gmail.com>
+Date: Fri, 17 Feb 2012 08:00:05 -0400
+Message-ID: <CAJdJm_N6gd6A5_4-y-P39-6-feY9aOcrRQR7aQ0EhRo0ScyaAw@mail.gmail.com>
+Subject: Re: [PATCH] Heart Rate Profile API
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Santiago,
 
-The latest mgmt API includes an address type wherever there's an address
-present. This patch updates the link key messages to match it.
+I think this API covers the HR spec well enough. There is the "Reset
+Energy Expended" operation which is not being exposed here (I suppose
+it could be a method).
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/mgmt.h |    2 +-
- net/bluetooth/mgmt.c         |    7 ++++---
- 2 files changed, 5 insertions(+), 4 deletions(-)
+A few textual comments below.
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 255a996..5aafe92 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -153,7 +153,7 @@ struct mgmt_cp_remove_uuid {
- } __packed;
- 
- struct mgmt_link_key_info {
--	bdaddr_t bdaddr;
-+	struct mgmt_addr_info addr;
- 	u8 type;
- 	u8 val[16];
- 	u8 pin_len;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 36c4ff6..b0de719 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1274,8 +1274,8 @@ static int load_link_keys(struct sock *sk, u16 index, void *data, u16 len)
- 	for (i = 0; i < key_count; i++) {
- 		struct mgmt_link_key_info *key = &cp->keys[i];
- 
--		hci_add_link_key(hdev, NULL, 0, &key->bdaddr, key->val, key->type,
--								key->pin_len);
-+		hci_add_link_key(hdev, NULL, 0, &key->addr.bdaddr, key->val,
-+						key->type, key->pin_len);
- 	}
- 
- 	cmd_complete(sk, index, MGMT_OP_LOAD_LINK_KEYS, NULL, 0);
-@@ -2788,7 +2788,8 @@ int mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key,
- 	memset(&ev, 0, sizeof(ev));
- 
- 	ev.store_hint = persistent;
--	bacpy(&ev.key.bdaddr, &key->bdaddr);
-+	bacpy(&ev.key.addr.bdaddr, &key->bdaddr);
-+	ev.key.addr.type = MGMT_ADDR_BREDR;
- 	ev.key.type = key->type;
- 	memcpy(ev.key.val, key->val, 16);
- 	ev.key.pin_len = key->pin_len;
+On Fri, Feb 17, 2012 at 6:37 AM, Santiago Carot-Nemesio
+<sancane@gmail.com> wrote:
+> +Heart Rate Profile hierarchy
+> +============================
+> +
+> +Service                org.bluez
+> +Interface      org.bluez.HeartRate
+> +Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+> +
+> +Methods                RegisterWatcher(object agent)
+> +
+> +                       Registers a heart reat watcher to monitor scanned
+> +                       measurements.
+
+typo: reat -> rate
+
+I would rather not use "scanned" word here as it is not used on the
+spec. What about:
+
+"Registers a watcher to monitor heart rate measurements."
+
+> +
+> +                       Possible Errors: org.bluez.Error.InvalidArguments
+> +
+> +               UnregisterWatcher(object agent)
+> +
+> +                       Unregisters a watcher.
+> +
+> +                       Possible Errors: org.bluez.Error.InvalidArguments
+> +                                       org.bluez.Error.NotFound
+> +
+> +Heart Rate Watcher hierarchy
+> +============================
+> +Service                unique name
+> +Interface      org.bluez.HeartRateWatcher
+> +Object path    freely definable
+> +
+> +Methods                void MeasurementReceived(dict measure)
+> +
+> +                       This callback gets called whenever a measure is scanned
+> +                       from the heart rate device. The units for the Value is
+
+Suggestion: "This callback is called whenever a heart rate measurement
+is received"
+
+typo: units -> unit
+
+> +                       expressed in beats per minute (bpm). The energy field is
+> +                       optional and it represents the accumulated energy
+> +                       expended in kilo Joules since last time it was reset.
+> +                       Furthermore, the device will be automatically reset when
+> +                       it is needed.
+
+>From the spec I see this "automatic reset" could happen if this value
+becomes 0xFFFF. But the user may want to reset this manually using a
+UI button (e.g. when switching exercises).
+
+> +                       The Contact field, when it's present, indicates that the
+
+suggestion: "when it's present"  -> "if present"
+
+> +                       device support contact sensor, besides it will be true
+
+typo: support -> supports
+
+> +                       if skin contact is detected. The interval field is also
+> +                       optional, it's an array containing RR-Interval values
+> +                       wich represents the time between two R-Wave detections,
+> +                       where the RR-Interval Value 0 is older than the Value 1
+> +                       and so on.
+
+typo: wich -> which
+
+Suggestion for the beginning of this sentence: "The interval field,
+which is also optional, is an array containing RR-Interval values..."
+
+> +
+> +                       Dict is defined as below:
+> +                       {
+> +                               "Value" : uint16,
+> +                               "Energy" : uint16,
+> +                               "Contact" : boolean,
+> +                               "Location" : ("Other", "Chest", "Wrist","Finger",
+> +                                       "Hand", "Ear Lobe", "Foot"),
+> +                               "Interval" : array{uint16}
+> +                       }
+> \ No newline at end of file
+
+Be sure to add a new line here, so it does not generate unnecessary
+diff when someone edits this file later.
+
+Best Regards,
 -- 
-1.7.9
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
