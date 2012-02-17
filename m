@@ -1,30 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v4 0/6] Several minor fixes
-Date: Fri, 17 Feb 2012 13:55:30 +0100
-Message-Id: <1329483336-25853-1-git-send-email-mikel.astiz.oss@gmail.com>
+Message-ID: <1329482109.28848.171.camel@aeonflux>
+Subject: Re: [PATCH 3/3] Bluetooth: mgmt: Add address type to confirm name
+ command
+From: Marcel Holtmann <marcel@holtmann.org>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 17 Feb 2012 13:35:09 +0100
+In-Reply-To: <1329481947-19108-3-git-send-email-johan.hedberg@gmail.com>
+References: <1329481947-19108-1-git-send-email-johan.hedberg@gmail.com>
+	 <1329481947-19108-3-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Johan,
 
-This fourth version fixes some style-issues (patches 2 and 3) and removes a potential warning due to a missing 'static' keyword.
+> The latest mgmt API includes an address type for all messages containing
+> an address. This patch updates the confirm name command to match this.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  include/net/bluetooth/mgmt.h |    4 ++--
+>  net/bluetooth/mgmt.c         |    2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 
-Mikel Astiz (6):
-  client: fix memory leak in obc_session_put
-  client: fix unreported error case
-  client: fix incorrect error check
-  client: fix pbap select when same path given twice
-  client: queue transfers in ftp sessions
-  client: queue transfers in pbap sessions
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
- client/ftp.c     |   39 ++++---------
- client/pbap.c    |  176 ++++++++++++++++++++++++------------------------------
- client/session.c |   23 ++++++-
- 3 files changed, 109 insertions(+), 129 deletions(-)
+Regards
 
--- 
-1.7.6.5
+Marcel
+
 
