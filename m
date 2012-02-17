@@ -1,60 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 17 Feb 2012 11:38:47 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Joe Perches <joe@perches.com>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2 1/3] bluetooth: Add logging functions bt_info and
- bt_err
-Message-ID: <20120217093847.GA12814@x220>
-References: <cover.1329461202.git.joe@perches.com>
- <5c5e8180081e57e6098139fadd9275073048f448.1329461203.git.joe@perches.com>
- <1329467859.28848.130.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329467859.28848.130.camel@aeonflux>
+Message-ID: <1329471021.28848.157.camel@aeonflux>
+Subject: Re: [PATCH 1/2] Bluetooth: Move scope of state_to_string
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 17 Feb 2012 10:30:21 +0100
+In-Reply-To: <20120217091812.GB19421@aemeltch-MOBL1>
+References: <1329299426-8458-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1329308414.28848.80.camel@aeonflux>
+	 <20120217091003.GA19421@aemeltch-MOBL1>
+	 <1329469930.28848.156.camel@aeonflux>
+	 <20120217091812.GB19421@aemeltch-MOBL1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrei,
 
-On Fri, Feb 17, 2012, Marcel Holtmann wrote:
-> Hi Joe,
+> > > > > Function state_to_string will be used in other files.
+> > > > > 
+> > > > so long term, we need to keep socket states inside l2cap_sock.c and
+> > > > L2CAP states inside l2cap_core.c. Since L2CAP core engine should use the
+> > > > states from the specification and not try to fit into socket states.
+> > > > 
+> > > > I see a little bit of value here in having them in the debug log, but
+> > > > making them public like this seems a big overhead. Did you measure the
+> > > > size difference. 
+> > > 
+> > > size show exactly the same size after applying this patch with my config.
+> > > (dynamic debug enabled)
+> > > 
+> > > size net/bluetooth/bluetooth.ko 
+> > >    text	   data	    bss	    dec	    hex	filename
+> > >  196404	  12912	    644	 209960	  33428	net/bluetooth/bluetooth.ko
+> > 
+> > then I am fine with this. Just send an updated patch against the latest
+> > tree.
 > 
-> > Use specific logging functions instead of a generic
-> > bt_printk function can save some text.
-> > 
-> > Remove now unused bt_printk function.
-> > Add compatibility BT_INFO and BT_ERR macros.
-> > 
-> > (compiled x86 and defconfig with bluetooth and all bluetooth drivers)
-> > 
-> > $ size net/bluetooth/built-in.o*
-> >    text	   data	    bss	    dec	    hex	filename
-> >  381662	  20072	 100416	 502150	  7a986	net/bluetooth/built-in.o.allyesconfig.new
-> >  382463	  20072	 100400	 502935	  7ac97	net/bluetooth/built-in.o.allyesconfig.old
-> >  126635	   1388	    132	 128155	  1f49b	net/bluetooth/built-in.o.defconfig.new
-> >  127175	   1388	    132	 128695	  1f6b7	net/bluetooth/built-in.o.defconfig.old
-> > 
-> > $ size drivers/bluetooth/built-in.o*
-> >  127575	   8976	  29476	 166027	  2888b	drivers/bluetooth/built-in.o.allyesconfig.new
-> >  129512	   8976	  29516	 168004	  29044	drivers/bluetooth/built-in.o.allyesconfig.old
-> >   52998	   3292	    156	  56446	   dc7e	drivers/bluetooth/built-in.o.defconfig.new
-> >   54358	   3292	    156	  57806	   e1ce	drivers/bluetooth/built-in.o.defconfig.old
-> > 
-> > Signed-off-by: Joe Perches <joe@perches.com>
-> > ---
-> >  include/net/bluetooth/bluetooth.h |   14 ++++++++------
-> >  net/bluetooth/lib.c               |   27 ++++++++++++++++++++++++---
-> >  2 files changed, 32 insertions(+), 9 deletions(-)
-> 
-> lets try to get at least this patch merged. I hope we don't have too
-> many conflicts.
-> 
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> If we don't want it to be in bluetooth.h I can export only function
+> declaration or put it in l2cap.h. What is better?
 
-Applied to my bluetooth-next tree. Thanks.
+if the size is the same, then put it in bluetooth.h.
 
-Johan
+Regards
+
+Marcel
+
+
