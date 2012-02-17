@@ -1,29 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 17 Feb 2012 13:06:27 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH hcidump 1/2] L2CAP: add OBEX support
+Message-ID: <20120217110627.GB16018@x220>
+References: <1329472135-14123-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-From: Aditya Bhargava <heuristicist@gmail.com>
-Date: Fri, 17 Feb 2012 06:15:33 -0500
-Message-ID: <CAFq8apnaY3gnLmX+XAkDZkTPJTY9Vrf=je+CtvL+JFiZmGHEow@mail.gmail.com>
-Subject: Handsfree Agent not registered
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1329472135-14123-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello all,
+Hi Luiz,
 
-I'm mucking around trying to get my desktop computer (Ubuntu 11.10,
-BlueZ 4.96, ASUS USB-BT211 USB Bluetooth adapter, no microphone hooked
-up at the moment) to act as a a hands-free device for my phone (Nexus
-S). It was relatively simple getting it set up for A2DP, and I was
-able to play music that is on my phone through my desktop's speakers
-(using PulseAudio loopback). But when I try to tell PulseAudio to use
-the Handsfree profile instead (so that this would work for phone calls
-too) I get an error. Checking the syslog shows that, when the phone
-connects to the computer, bluetoothd issues the message "Handsfree
-Agent not registered". I skimmed the source code that generates this
-error and, not having any clue about anything related to BlueZ,
-couldn't find any further information about what is going wrong. Does
-anyone have any ideas? I realize I haven't provided much information
-here so please let me know what else I can provide to help track down
-this problem. My phone's speaker can be rather soft so I want to get
-it hooked up to some proper speakers! Many thanks in advance :)
+On Fri, Feb 17, 2012, Luiz Augusto von Dentz wrote:
+> ---
+>  parser/l2cap.c |    8 ++++++++
+>  1 files changed, 8 insertions(+), 0 deletions(-)
+> 
+> diff --git a/parser/l2cap.c b/parser/l2cap.c
+> index 696456a..fba530a 100644
+> --- a/parser/l2cap.c
+> +++ b/parser/l2cap.c
+> @@ -1090,6 +1090,14 @@ static void l2cap_parse(int level, struct frame *frm)
+>  					raw_dump(level + 1, frm);
+>  				break;
+>  
+> +			case SDP_UUID_OBEX:
+> +				if (!p_filter(FILT_OBEX))
+> +					obex_dump(level, frm);
+> +				else
+> +					raw_dump(level + 1, frm);
+> +				break;
+> +
+> +
+>  			default:
+
+One unnecessary empty line above. Other than that the patches looked
+fine so they're now (with the above fix) pushed upstream.
+
+Johan
