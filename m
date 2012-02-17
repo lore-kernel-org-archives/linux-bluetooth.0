@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v4 2/6] client: fix unreported error case
-Date: Fri, 17 Feb 2012 13:55:32 +0100
-Message-Id: <1329483336-25853-3-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v4 1/6] client: fix memory leak in obc_session_put
+Date: Fri, 17 Feb 2012 13:55:31 +0100
+Message-Id: <1329483336-25853-2-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1329483336-25853-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1329483336-25853-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,49 +12,40 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The authorization request of a queued transfer could fail, and this
-needs to be reported to the transfer initiator. Otherwise it would
-likely result in D-Bus timeouts.
+obc_session_put takes ownership of the given buffer, but did not free
+the memory in case of error.
 ---
- client/session.c |   15 ++++++++++++++-
- 1 files changed, 14 insertions(+), 1 deletions(-)
+ client/session.c |    8 ++++++--
+ 1 files changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/client/session.c b/client/session.c
-index 28516b2..85f466a 100644
+index 0fa8efc..28516b2 100644
 --- a/client/session.c
 +++ b/client/session.c
-@@ -735,17 +735,30 @@ static void session_process_queue(struct obc_session *session)
- 	if (session->queue == NULL || g_queue_is_empty(session->queue))
- 		return;
+@@ -1017,8 +1017,10 @@ int obc_session_put(struct obc_session *session, char *buf, const char *targetna
+ 	struct obc_transfer *transfer;
+ 	const char *agent;
  
-+	obc_session_ref(session);
-+
- 	while ((p = g_queue_pop_head(session->queue))) {
- 		int err;
+-	if (session->obex == NULL)
++	if (session->obex == NULL) {
++		g_free(buf);
+ 		return -ENOTCONN;
++	}
  
- 		err = pending_request_auth(p);
- 		if (err == 0) {
- 			session->p = p;
--			return;
-+			break;
-+		}
-+
-+		if (p->func) {
-+			GError *gerr = NULL;
-+
-+			g_set_error(&gerr, OBEX_IO_ERROR, err,
-+							"Authorization failed");
-+			p->func(session, gerr, p->data);
-+			g_error_free(gerr);
- 		}
+ 	agent = obc_agent_get_name(session->agent);
  
- 		pending_request_free(p);
- 	}
-+
-+	obc_session_unref(session);
- }
+@@ -1026,8 +1028,10 @@ int obc_session_put(struct obc_session *session, char *buf, const char *targetna
+ 							agent, NULL,
+ 							targetname, NULL,
+ 							NULL);
+-	if (transfer == NULL)
++	if (transfer == NULL) {
++		g_free(buf);
+ 		return -EIO;
++	}
  
- static void session_terminate_transfer(struct obc_session *session,
+ 	obc_transfer_set_buffer(transfer, buf);
+ 
 -- 
 1.7.6.5
 
