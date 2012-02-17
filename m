@@ -1,86 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 17 Feb 2012 11:10:07 +0200
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Move scope of state_to_string
-Message-ID: <20120217091003.GA19421@aemeltch-MOBL1>
-References: <1329299426-8458-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1329308414.28848.80.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329308414.28848.80.camel@aeonflux>
+Message-ID: <1329469728.28848.154.camel@aeonflux>
+Subject: Re: Add Atheros maryann PIDVID support.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Al Cho <acho@suse.com>
+Cc: padovan@profusion.mobi, linux-bluetooth@vger.kernel.org,
+	oneukum@suse.com, jlee@suse.com
+Date: Fri, 17 Feb 2012 10:08:48 +0100
+In-Reply-To: <CAKzePar6843RL1TbBeuQyWovr3biFT4W4GyKUD8MZj4GZoW6tg@mail.gmail.com>
+References: <ef5cb1fa66b3deee2c51b0a85b681c0ecfafebe2.1329298278.git.acho@suse.com>
+	 <1329308526.28848.82.camel@aeonflux>
+	 <CAKzePar6843RL1TbBeuQyWovr3biFT4W4GyKUD8MZj4GZoW6tg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Al,
 
-On Wed, Feb 15, 2012 at 01:20:14PM +0100, Marcel Holtmann wrote:
-> Hi Andrei,
+> >> From: "Cho, Yu-Chen" <acho@suse.com>
+> >
+> > can you fix your Outlook mail client to have this first name last name.
+> > Unless you really want it this way.
 > 
-> > Function state_to_string will be used in other files.
-> > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> >  include/net/bluetooth/bluetooth.h |   27 +++++++++++++++++++++++++++
-> >  net/bluetooth/l2cap_core.c        |   26 --------------------------
-> >  2 files changed, 27 insertions(+), 26 deletions(-)
-> > 
-> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> > index 4a82ca0..0a47c20 100644
-> > --- a/include/net/bluetooth/bluetooth.h
-> > +++ b/include/net/bluetooth/bluetooth.h
-> > @@ -129,6 +129,33 @@ enum {
-> >  	BT_CLOSED
-> >  };
-> >  
-> > +/* If unused will be removed by compiler */
-> > +static inline char *state_to_string(int state)
-> > +{
-> > +	switch (state) {
-> > +	case BT_CONNECTED:
-> > +		return "BT_CONNECTED";
-> > +	case BT_OPEN:
-> > +		return "BT_OPEN";
-> > +	case BT_BOUND:
-> > +		return "BT_BOUND";
-> > +	case BT_LISTEN:
-> > +		return "BT_LISTEN";
-> > +	case BT_CONNECT:
-> > +		return "BT_CONNECT";
-> > +	case BT_CONNECT2:
-> > +		return "BT_CONNECT2";
-> > +	case BT_CONFIG:
-> > +		return "BT_CONFIG";
-> > +	case BT_DISCONN:
-> > +		return "BT_DISCONN";
-> > +	case BT_CLOSED:
-> > +		return "BT_CLOSED";
-> > +	}
-> > +
-> > +	return "invalid state";
-> > +}
-> > +
+> Sorry ,
 > 
-> so long term, we need to keep socket states inside l2cap_sock.c and
-> L2CAP states inside l2cap_core.c. Since L2CAP core engine should use the
-> states from the specification and not try to fit into socket states.
+> Would you please kindly tell me what style should i fix?
 > 
-> I see a little bit of value here in having them in the debug log, but
-> making them public like this seems a big overhead. Did you measure the
-> size difference. 
+>  From: Cho, Yu-Chen <acho@suse.com>
+> or
+>  From: "Cho Yu-Chen" <acho@suse.com>
+> or
+>  From: Cho Yu-Chen <acho@suse.com>
+> or
+>  From : acho@suse.com
 
-size show exactly the same size after applying this patch with my config.
-(dynamic debug enabled)
+this is essentially up to you how you wanna have it.
 
-size net/bluetooth/bluetooth.ko 
-   text	   data	    bss	    dec	    hex	filename
- 196404	  12912	    644	 209960	  33428	net/bluetooth/bluetooth.ko
+Author: Cho, Yu-Chen <acho@novell.com>
+Author: Al Cho <acho@novell.com>
+
+Seems you have used it in this form before, then just leave it as
+
+	Cho, Yu-Chen <acho@suse.com>
+
+Normally that is a style that got forced on the world by Microsoft
+Exchange.
+
+> 
+> >
+> >>
+> >> Add Atheros maryann 0cf3:311D PIDVID support.
+> >> This module is AR3012 Series.
+> >
+> > Please include /sys/kernel/debug/usb/devices output here for reference.
+> > Preferable one before the firmware load and one after.
+> >
+> before:
+> T:  Bus=04 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0cf3 ProdID=311d Rev= 0.01
+> S:  Manufacturer=Atheros Communications
+> S:  Product=Bluetooth USB Host Controller
+> S:  SerialNumber=Alaska Day 2006
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> 
+> after:
+> T:  Bus=04 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0cf3 ProdID=311d Rev= 0.02
+> S:  Manufacturer=Atheros Communications
+> S:  Product=Bluetooth USB Host Controller
+> S:  SerialNumber=Alaska Day 2006
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+
+Include both in your commit message.
+
+Regards
+
+Marcel
 
 
-> And most likely some state lookup table is better.
-
-This can be done, BTW: unused functions will be removed by compiler, what
-about lookup table? I assume the same.
-
-Best regards 
-Andrei Emeltchenko 
