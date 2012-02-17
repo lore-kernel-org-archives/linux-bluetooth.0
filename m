@@ -1,40 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 17 Feb 2012 11:51:38 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [PATCH obexd v3 2/6] client: fix unreported error case
-Message-ID: <20120217095138.GA13492@x220>
-References: <1329400834-8400-1-git-send-email-mikel.astiz.oss@gmail.com>
- <1329400834-8400-3-git-send-email-mikel.astiz.oss@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329400834-8400-3-git-send-email-mikel.astiz.oss@gmail.com>
+Message-ID: <1329472209.28848.168.camel@aeonflux>
+Subject: Re: [PATCHv2 2/3] Bluetooth: Use symbolic names for state in debug
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 17 Feb 2012 10:50:09 +0100
+In-Reply-To: <1329471657-18278-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1329471657-18278-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1329471657-18278-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Andrei,
 
-On Thu, Feb 16, 2012, Mikel Astiz wrote:
-> @@ -735,17 +735,31 @@ static void session_process_queue(struct obc_session *session)
->  	if (session->queue == NULL || g_queue_is_empty(session->queue))
->  		return;
->  
-> +	obc_session_ref(session);
-> +
->  	while ((p = g_queue_pop_head(session->queue))) {
->  		int err;
->  
->  		err = pending_request_auth(p);
->  		if (err == 0) {
->  			session->p = p;
-> +			obc_session_unref(session);
->  			return;
->  		}
+> Use state_to_string function in debug statements.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  include/net/bluetooth/l2cap.h |    3 ++-
+>  net/bluetooth/hci_conn.c      |    2 +-
+>  net/bluetooth/l2cap_core.c    |    5 +++--
+>  net/bluetooth/l2cap_sock.c    |    2 +-
+>  4 files changed, 7 insertions(+), 5 deletions(-)
 
-Instead of adding the unref to any place you return in the loop, it'd be
-simpler to just do a break; since you've already got the necessary unref
-and end of the function right after the loop.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Johan
+Regards
+
+Marcel
+
+
