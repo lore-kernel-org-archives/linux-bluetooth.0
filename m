@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 3/8] core: Make use of g_obex_errno_to_rsp to translate posix errors
-Date: Sat, 18 Feb 2012 17:18:58 +0200
-Message-Id: <1329578343-31663-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 2/8] gobex: Translate posix error code to proper OBEX response opcode
+Date: Sat, 18 Feb 2012 17:18:57 +0200
+Message-Id: <1329578343-31663-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1329578343-31663-1-git-send-email-luiz.dentz@gmail.com>
 References: <1329578343-31663-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,49 +11,82 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This patch create a map between posix errors code and OBEX response
+opcode and use it to generate a proper response in case a transfer
+failed instead of always responding with internal error.
 ---
- src/obex.c |   28 +---------------------------
- 1 files changed, 1 insertions(+), 27 deletions(-)
+ gobex/gobex-transfer.c |    6 ++++--
+ gobex/gobex.c          |   24 ++++++++++++++++++++++++
+ gobex/gobex.h          |    1 +
+ 3 files changed, 29 insertions(+), 2 deletions(-)
 
-diff --git a/src/obex.c b/src/obex.c
-index a028156..2b10103 100644
---- a/src/obex.c
-+++ b/src/obex.c
-@@ -174,33 +174,7 @@ static void os_set_response(struct obex_session *os, int err)
- {
- 	uint8_t rsp;
+diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+index a779e4f..c62a91e 100644
+--- a/gobex/gobex-transfer.c
++++ b/gobex/gobex-transfer.c
+@@ -501,6 +501,7 @@ static gssize get_get_data(void *buf, gsize len, gpointer user_data)
+ 	GObexPacket *req, *rsp;
+ 	GError *err = NULL;
+ 	gssize ret;
++	guint8 op;
  
--	switch (err) {
--	case 0:
--		rsp = G_OBEX_RSP_SUCCESS;
--		break;
--	case -EPERM:
--	case -EACCES:
--		rsp = G_OBEX_RSP_FORBIDDEN;
--		break;
--	case -ENOENT:
--		rsp = G_OBEX_RSP_NOT_FOUND;
--		break;
--	case -EBADR:
--		rsp = G_OBEX_RSP_BAD_REQUEST;
--		break;
--	case -EFAULT:
--		rsp = G_OBEX_RSP_SERVICE_UNAVAILABLE;
--		break;
--	case -EINVAL:
--		rsp = G_OBEX_RSP_NOT_IMPLEMENTED;
--		break;
--	case -ENOTEMPTY:
--	case -EEXIST:
--		rsp = G_OBEX_RSP_PRECONDITION_FAILED;
--		break;
--	default:
--		rsp = G_OBEX_RSP_INTERNAL_SERVER_ERROR;
--	}
-+	rsp = g_obex_errno_to_rsp(err);
+ 	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
  
- 	print_event(-1, rsp);
+@@ -530,8 +531,9 @@ static gssize get_get_data(void *buf, gsize len, gpointer user_data)
+ 		return ret;
+ 	}
  
+-	req = g_obex_packet_new(G_OBEX_RSP_INTERNAL_SERVER_ERROR, TRUE,
+-							G_OBEX_HDR_INVALID);
++	op = g_obex_errno_to_rsp(ret);
++
++	req = g_obex_packet_new(op, TRUE, G_OBEX_HDR_INVALID);
+ 	g_obex_send(transfer->obex, req, NULL);
+ 
+ 	err = g_error_new(G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED,
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index c1e7dc4..0ced782 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -1471,3 +1471,27 @@ guint g_obex_move(GObex *obex, const char *name, const char *dest,
+ 
+ 	return g_obex_send_req(obex, req, -1, func, user_data, err);
+ }
++
++guint8 g_obex_errno_to_rsp(int err)
++{
++	switch (err) {
++	case 0:
++		return G_OBEX_RSP_SUCCESS;
++	case -EPERM:
++	case -EACCES:
++		return G_OBEX_RSP_FORBIDDEN;
++	case -ENOENT:
++		return G_OBEX_RSP_NOT_FOUND;
++	case -EBADR:
++		return G_OBEX_RSP_BAD_REQUEST;
++	case -EFAULT:
++		return G_OBEX_RSP_SERVICE_UNAVAILABLE;
++	case -EINVAL:
++		return G_OBEX_RSP_NOT_IMPLEMENTED;
++	case -ENOTEMPTY:
++	case -EEXIST:
++		return G_OBEX_RSP_PRECONDITION_FAILED;
++	default:
++		return G_OBEX_RSP_INTERNAL_SERVER_ERROR;
++	}
++}
+diff --git a/gobex/gobex.h b/gobex/gobex.h
+index 1c47c68..aacdb53 100644
+--- a/gobex/gobex.h
++++ b/gobex/gobex.h
+@@ -125,5 +125,6 @@ guint g_obex_get_rsp_pkt(GObex *obex, GObexPacket *rsp,
+ gboolean g_obex_cancel_transfer(guint id);
+ 
+ const char *g_obex_strerror(guint8 err_code);
++guint8 g_obex_errno_to_rsp(int err);
+ 
+ #endif /* __GOBEX_H */
 -- 
 1.7.7.6
 
