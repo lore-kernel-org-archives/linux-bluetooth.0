@@ -1,72 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 1/8] core: Fix queueing packet containing error while suspended
-Date: Sat, 18 Feb 2012 17:18:56 +0200
-Message-Id: <1329578343-31663-1-git-send-email-luiz.dentz@gmail.com>
+Message-ID: <1329547182.28848.194.camel@aeonflux>
+Subject: Re: [RFC v2 1/4] Bluetooth: Prepare start_discovery
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sat, 18 Feb 2012 07:39:42 +0100
+In-Reply-To: <1329521978-8537-2-git-send-email-andre.guedes@openbossa.org>
+References: <1329521978-8537-1-git-send-email-andre.guedes@openbossa.org>
+	 <1329521978-8537-2-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Andre,
 
-Queueing the error won't remove the original packet created by transfer
-from the queue so upon resume gobex will attempt to send it again.
+> This patch does some code refactoring in start_discovery function
+> in order to prepare it for interleaved discovery support.
+> 
+> MGMT_ADDR_* macros were moved to hci_core.h since they are now used
+> to define discovery type macros.
+> 
+> Discovery type macros were defined according to mgmt-api.txt
+> specification:
+> 
+> Possible values for the Type parameter are a bit-wise or of the
+> following bits:
+> 
+> 	1	BR/EDR
+> 	2	LE Public
+> 	3	LE Random
+> 
+> By combining these e.g. the following values are possible:
+> 
+> 	1	BR/EDR
+> 	6	LE (public & random)
+> 	7	BR/EDR/LE (interleaved discovery)
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  include/net/bluetooth/hci_core.h |   12 ++++++++++++
+>  include/net/bluetooth/mgmt.h     |    5 -----
+>  net/bluetooth/mgmt.c             |   15 ++++++++++-----
+>  3 files changed, 22 insertions(+), 10 deletions(-)
 
-To fix this we no longer create a error packet instead the session is
-market as aborted and the error stored so when gobex finally resumes the
-error is forward properly.
----
- src/obex-priv.h |    1 +
- src/obex.c      |   10 ++++++----
- 2 files changed, 7 insertions(+), 4 deletions(-)
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-diff --git a/src/obex-priv.h b/src/obex-priv.h
-index 5b72942..41854bc 100644
---- a/src/obex-priv.h
-+++ b/src/obex-priv.h
-@@ -43,6 +43,7 @@ struct obex_session {
- 	int64_t size;
- 	void *object;
- 	gboolean aborted;
-+	int err;
- 	struct obex_service_driver *service;
- 	void *service_data;
- 	struct obex_server *server;
-diff --git a/src/obex.c b/src/obex.c
-index 05cc068..a028156 100644
---- a/src/obex.c
-+++ b/src/obex.c
-@@ -554,7 +554,7 @@ static gssize send_data(void *buf, gsize size, gpointer user_data)
- 									size);
- 
- 	if (os->aborted)
--		return -EPERM;
-+		return os->err < 0 ? os->err : -EPERM;
- 
- 	return driver_read(os, buf, size);
- }
-@@ -594,7 +594,7 @@ static int driver_get_headers(struct obex_session *os)
- 	DBG("name=%s type=%s object=%p", os->name, os->type, os->object);
- 
- 	if (os->aborted)
--		return -EPERM;
-+		return os->err < 0 ? os->err : -EPERM;
- 
- 	if (os->object == NULL)
- 		return -EIO;
-@@ -661,8 +661,10 @@ static gboolean handle_async_io(void *object, int flags, int err,
- 		return TRUE;
- 
- done:
--	if (err < 0)
--		os_set_response(os, err);
-+	if (err < 0) {
-+		os->err = err;
-+		os->aborted = TRUE;
-+	}
- 
- 	g_obex_resume(os->obex);
- 
--- 
-1.7.7.6
+Regards
+
+Marcel
+
 
