@@ -1,92 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 2/8] gobex: Translate posix error code to proper OBEX response opcode
-Date: Sat, 18 Feb 2012 17:18:57 +0200
-Message-Id: <1329578343-31663-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1329578343-31663-1-git-send-email-luiz.dentz@gmail.com>
-References: <1329578343-31663-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 1/8] core: Fix queueing packet containing error while suspended
+Date: Sat, 18 Feb 2012 17:18:56 +0200
+Message-Id: <1329578343-31663-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This patch create a map between posix errors code and OBEX response
-opcode and use it to generate a proper response in case a transfer
-failed instead of always responding with internal error.
----
- gobex/gobex-transfer.c |    6 ++++--
- gobex/gobex.c          |   24 ++++++++++++++++++++++++
- gobex/gobex.h          |    1 +
- 3 files changed, 29 insertions(+), 2 deletions(-)
+Queueing the error won't remove the original packet created by transfer
+from the queue so upon resume gobex will attempt to send it again.
 
-diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-index a779e4f..c62a91e 100644
---- a/gobex/gobex-transfer.c
-+++ b/gobex/gobex-transfer.c
-@@ -501,6 +501,7 @@ static gssize get_get_data(void *buf, gsize len, gpointer user_data)
- 	GObexPacket *req, *rsp;
- 	GError *err = NULL;
- 	gssize ret;
-+	guint8 op;
+To fix this we no longer create a error packet instead the session is
+market as aborted and the error stored so when gobex finally resumes the
+error is forward properly.
+---
+ src/obex-priv.h |    1 +
+ src/obex.c      |   10 ++++++----
+ 2 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/src/obex-priv.h b/src/obex-priv.h
+index 5b72942..41854bc 100644
+--- a/src/obex-priv.h
++++ b/src/obex-priv.h
+@@ -43,6 +43,7 @@ struct obex_session {
+ 	int64_t size;
+ 	void *object;
+ 	gboolean aborted;
++	int err;
+ 	struct obex_service_driver *service;
+ 	void *service_data;
+ 	struct obex_server *server;
+diff --git a/src/obex.c b/src/obex.c
+index 05cc068..a028156 100644
+--- a/src/obex.c
++++ b/src/obex.c
+@@ -554,7 +554,7 @@ static gssize send_data(void *buf, gsize size, gpointer user_data)
+ 									size);
  
- 	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
+ 	if (os->aborted)
+-		return -EPERM;
++		return os->err < 0 ? os->err : -EPERM;
  
-@@ -530,8 +531,9 @@ static gssize get_get_data(void *buf, gsize len, gpointer user_data)
- 		return ret;
- 	}
- 
--	req = g_obex_packet_new(G_OBEX_RSP_INTERNAL_SERVER_ERROR, TRUE,
--							G_OBEX_HDR_INVALID);
-+	op = g_obex_errno_to_rsp(ret);
-+
-+	req = g_obex_packet_new(op, TRUE, G_OBEX_HDR_INVALID);
- 	g_obex_send(transfer->obex, req, NULL);
- 
- 	err = g_error_new(G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED,
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index c1e7dc4..0ced782 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -1471,3 +1471,27 @@ guint g_obex_move(GObex *obex, const char *name, const char *dest,
- 
- 	return g_obex_send_req(obex, req, -1, func, user_data, err);
+ 	return driver_read(os, buf, size);
  }
-+
-+guint8 g_obex_errno_to_rsp(int err)
-+{
-+	switch (err) {
-+	case 0:
-+		return G_OBEX_RSP_SUCCESS;
-+	case -EPERM:
-+	case -EACCES:
-+		return G_OBEX_RSP_FORBIDDEN;
-+	case -ENOENT:
-+		return G_OBEX_RSP_NOT_FOUND;
-+	case -EBADR:
-+		return G_OBEX_RSP_BAD_REQUEST;
-+	case -EFAULT:
-+		return G_OBEX_RSP_SERVICE_UNAVAILABLE;
-+	case -EINVAL:
-+		return G_OBEX_RSP_NOT_IMPLEMENTED;
-+	case -ENOTEMPTY:
-+	case -EEXIST:
-+		return G_OBEX_RSP_PRECONDITION_FAILED;
-+	default:
-+		return G_OBEX_RSP_INTERNAL_SERVER_ERROR;
+@@ -594,7 +594,7 @@ static int driver_get_headers(struct obex_session *os)
+ 	DBG("name=%s type=%s object=%p", os->name, os->type, os->object);
+ 
+ 	if (os->aborted)
+-		return -EPERM;
++		return os->err < 0 ? os->err : -EPERM;
+ 
+ 	if (os->object == NULL)
+ 		return -EIO;
+@@ -661,8 +661,10 @@ static gboolean handle_async_io(void *object, int flags, int err,
+ 		return TRUE;
+ 
+ done:
+-	if (err < 0)
+-		os_set_response(os, err);
++	if (err < 0) {
++		os->err = err;
++		os->aborted = TRUE;
 +	}
-+}
-diff --git a/gobex/gobex.h b/gobex/gobex.h
-index 1c47c68..aacdb53 100644
---- a/gobex/gobex.h
-+++ b/gobex/gobex.h
-@@ -125,5 +125,6 @@ guint g_obex_get_rsp_pkt(GObex *obex, GObexPacket *rsp,
- gboolean g_obex_cancel_transfer(guint id);
  
- const char *g_obex_strerror(guint8 err_code);
-+guint8 g_obex_errno_to_rsp(int err);
+ 	g_obex_resume(os->obex);
  
- #endif /* __GOBEX_H */
 -- 
 1.7.7.6
 
