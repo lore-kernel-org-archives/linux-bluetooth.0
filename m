@@ -1,36 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/6] Bluetooth: mgmt: Change ordering of cmd_status paramters
-Date: Sun, 19 Feb 2012 13:54:24 +0200
-Message-Id: <1329652469-28973-1-git-send-email-johan.hedberg@gmail.com>
+Date: Sun, 19 Feb 2012 12:51:26 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v2 0/4] MGMT Start Discovery interleaved support
+Message-ID: <20120219105126.GA27110@x220.P-661HNU-F1>
+References: <1329521978-8537-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1329521978-8537-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Andre,
 
-In accordance to the latest mgmt API specification the opcode comes
-first and then the status.
+On Fri, Feb 17, 2012, Andre Guedes wrote:
+> This RFCv2 series implements Marcel's and Johan's comments from previous
+> version. The changes are:
+> 1. Use MGMT_ADDR_* macros instead of hard-coded values to define discovery
+> type macros;
+> 2. Fix locking in mgmt_interleaved_discovery
+> 
+> Marcel, I removed your ack from patch 1/4 because I changed it a little
+> bit. MGMT_ADDR_* macros were moved to hci_core.h since they are needed to
+> define discovery type macros.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/mgmt.h |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+All four patches have been applied to my bluetooth-next tree. Thanks.
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index ad54b5f..36e68b4 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -318,8 +318,8 @@ struct mgmt_ev_cmd_complete {
- 
- #define MGMT_EV_CMD_STATUS		0x0002
- struct mgmt_ev_cmd_status {
--	__u8 status;
- 	__le16 opcode;
-+	__u8 status;
- } __packed;
- 
- #define MGMT_EV_CONTROLLER_ERROR	0x0003
--- 
-1.7.9
+I'd still like to have consistency in the locking since now your
+function is the only one handling the hdev lock by itself and that's
+something that can easily cause bugs in the long run. I.e. probably all
+mgmt_* functions should be converted to take hdev unlocked and handle
+the locking by themselves.
 
+Johan
