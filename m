@@ -1,32 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 Feb 2012 00:19:49 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/8] core: Fix queueing packet containing error
- while suspended
-Message-ID: <20120219221949.GA6928@x220.P-661HNU-F1>
-References: <1329578343-31663-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329578343-31663-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <CAA37ikbgxQxySgBUxKOjakxCrG1rAKk=aPfEW+JYL7g8PJLueA@mail.gmail.com>
+References: <1329486252-25252-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1329486252-25252-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<CAA37ikbgxQxySgBUxKOjakxCrG1rAKk=aPfEW+JYL7g8PJLueA@mail.gmail.com>
+Date: Sun, 19 Feb 2012 21:49:08 +0200
+Message-ID: <CAMXE1-oiPJEF7WAc14ekR99Y6=FNPs0iSqwWA_miLit=AesP=g@mail.gmail.com>
+Subject: Re: [RFCv5 02/16] Bluetooth: Revert to mutexes from RCU list
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Ulisses Furquim <ulisses@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Ulisses,
 
-On Sat, Feb 18, 2012, Luiz Augusto von Dentz wrote:
-> Queueing the error won't remove the original packet created by transfer
-> from the queue so upon resume gobex will attempt to send it again.
-> 
-> To fix this we no longer create a error packet instead the session is
-> market as aborted and the error stored so when gobex finally resumes the
-> error is forward properly.
-> ---
->  src/obex-priv.h |    1 +
->  src/obex.c      |   10 ++++++----
->  2 files changed, 7 insertions(+), 4 deletions(-)
+On Fri, Feb 17, 2012 at 11:22 PM, Ulisses Furquim
+<ulisses@profusion.mobi> wrote:
+> Why don't you squash together patches 2, 3 and 4? Is there a reason?
 
-All patches in this set have been applied. Thanks.
+The price of squashing is zero and if there are no other comments I
+can do it right away.
 
-Johan
+> Only with patch 2 the change becomes incomplete and prone to errors.
+
+However I do not think that this makes much difference to the existing code.
+
+> With patch 3 you add some needed changes but then adds an imbalance of
+> lock/release sock locks which is only solved in patch 4. Why?
+
+How does patch 4 solves locking? If I did not miss something it shall
+not change anything.
+
+Regards,
+Andrei
