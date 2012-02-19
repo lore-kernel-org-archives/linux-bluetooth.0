@@ -1,50 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120219105126.GA27110@x220.P-661HNU-F1>
-References: <1329521978-8537-1-git-send-email-andre.guedes@openbossa.org>
-	<20120219105126.GA27110@x220.P-661HNU-F1>
-Date: Sun, 19 Feb 2012 10:13:09 -0300
-Message-ID: <CAA37ikbuWrH96UzspMz10QiumfuD+wyJ1BozJ0=HGWFN_8ayNg@mail.gmail.com>
-Subject: Re: [RFC v2 0/4] MGMT Start Discovery interleaved support
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Andre Guedes <andre.guedes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1329653590.2246.6.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Fix hci_connect error return values
+From: Marcel Holtmann <marcel@holtmann.org>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sun, 19 Feb 2012 13:13:10 +0100
+In-Reply-To: <1329653463-29799-1-git-send-email-johan.hedberg@gmail.com>
+References: <1329653463-29799-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-On Sun, Feb 19, 2012 at 7:51 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Andre,
->
-> On Fri, Feb 17, 2012, Andre Guedes wrote:
->> This RFCv2 series implements Marcel's and Johan's comments from previous
->> version. The changes are:
->> 1. Use MGMT_ADDR_* macros instead of hard-coded values to define discovery
->> type macros;
->> 2. Fix locking in mgmt_interleaved_discovery
->>
->> Marcel, I removed your ack from patch 1/4 because I changed it a little
->> bit. MGMT_ADDR_* macros were moved to hci_core.h since they are needed to
->> define discovery type macros.
->
-> All four patches have been applied to my bluetooth-next tree. Thanks.
->
-> I'd still like to have consistency in the locking since now your
-> function is the only one handling the hdev lock by itself and that's
-> something that can easily cause bugs in the long run. I.e. probably all
-> mgmt_* functions should be converted to take hdev unlocked and handle
-> the locking by themselves.
+> The hci_connect function should either return a valid hci_conn pointer
+> or a ERR_PTR() but never NULL. This patch fixes the two places where
+> hci_conn_add failures would have caused a NULL return. The only reason
+> for failure with hci_conn_add is memory allocation so ENOMEM seems to be
+> a good choice here.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/hci_conn.c |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
 
-Do you think such a change is worth? I'm not sure if we have just one
-function that deals with locking on its own.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Regards,
+Regards
 
--- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+Marcel
+
+
