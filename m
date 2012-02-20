@@ -1,55 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4F4248B9.6090700@bmw-carit.de>
+Date: Mon, 20 Feb 2012 14:20:57 +0100
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 MIME-Version: 1.0
-In-Reply-To: <1329742172-12124-1-git-send-email-jaganath.k@samsung.com>
-References: <1329742172-12124-1-git-send-email-jaganath.k@samsung.com>
-Date: Mon, 20 Feb 2012 15:23:56 +0200
-Message-ID: <CABBYNZLNPeRkTbyoJ7a82SmVehmvTosTDqX0zjy_-eZRMS=ALA@mail.gmail.com>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Subject: Re: [PATCH obexd] client: Fix ABORT command not sending when user
  cancels the transfer
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+References: <1329742172-12124-1-git-send-email-jaganath.k@samsung.com>
+In-Reply-To: <1329742172-12124-1-git-send-email-jaganath.k@samsung.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Jaganath,
 
-On Mon, Feb 20, 2012 at 2:49 PM, Jaganath Kanakkassery
-<jaganath.k@samsung.com> wrote:
 > Issue: When user cancels the tranfer, after queuing the ABORT command
 > transfer->callback() with error will be called. In that session_unref
 > is called which disconnects the transport.
-
-I don't get the issue, you don't want to disconnect immediately if the
-transfer aborts and the last reference is released? IMO that is fine
-in most of the cases, btw by disconnecting it also serves as an ABORT.
-The only cases where we would not do it is if the session object is
-created, e.g. ftp, but if that happens than the module is responsible
-to hold a reference to the session preventing it to disconnect.
-
-> diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-> index c62a91e..706952f 100644
-> --- a/gobex/gobex-transfer.c
-> +++ b/gobex/gobex-transfer.c
-> @@ -635,6 +635,10 @@ gboolean g_obex_cancel_transfer(guint id)
->        if (transfer == NULL)
->                return FALSE;
 >
-> -       transfer_free(transfer);
-> +       if (transfer->req_id > 0)
-> +               g_obex_cancel_req(transfer->obex, transfer->req_id, FALSE);
-> +       else
-> +               transfer_free(transfer);
-> +
->        return TRUE;
->  }
+> Fix: Just send ABORT command during abort and transfer->callback()
+> will be called after getting response of ABORT command.
+> ---
+>   client/transfer.c      |   12 ------------
+>   gobex/gobex-transfer.c |    6 +++++-
+>   2 files changed, 5 insertions(+), 13 deletions(-)
+>
+> diff --git a/client/transfer.c b/client/transfer.c
+> index 157811d..88e8ef7 100644
+> --- a/client/transfer.c
+> +++ b/client/transfer.c
+> @@ -141,23 +141,11 @@ static DBusMessage *obc_transfer_get_properties(DBusConnection *connection,
+>
+>   static void obc_transfer_abort(struct obc_transfer *transfer)
+>   {
+> -	struct transfer_callback *callback = transfer->callback;
+> -
+>   	if (transfer->xfer == 0)
+>   		return;
+>
+>   	g_obex_cancel_transfer(transfer->xfer);
+>   	transfer->xfer = 0;
+> -
+> -	if (callback) {
+> -		GError *err;
+> -
+> -		err = g_error_new(OBC_TRANSFER_ERROR, -ECANCELED, "%s",
+> -							strerror(ECANCELED));
+> -		callback->func(transfer, transfer->transferred, err,
+> -							callback->data);
+> -		g_error_free(err);
+> -	}
+>   }
+>
 
-Btw, when you changing gobex please send its changes separately
-starting with gobex:, so not that after g_obex_cancel_transfer the id
-and callback should no longer be accessible so the application should
-be able to free its resources, so if we call the callback latter it
-will very likely cause a crash.
+I think this callback is needed here, particularly for transfers that 
+are queued but have not been started yet. This does not work right now 
+but I was planning to propose a patch series to fix it soon. Also, IMO 
+it seems fair to report the abortion as soon as possible to the upper 
+layers, no matter what the response will be.
 
--- 
-Luiz Augusto von Dentz
+Having said that, I agree that transfer canceling is broken right now.
+
+Cheers,
+Mikel
+
