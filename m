@@ -1,32 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <1329778713.2049.4.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: mgmt: Clear EIR data when disabling SSP
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix parameter list for setting local name
-Date: Tue, 21 Feb 2012 08:14:26 +0100
-Message-Id: <1329808466-30669-1-git-send-email-marcel@holtmann.org>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 20 Feb 2012 23:58:33 +0100
+In-Reply-To: <1329778752-23846-1-git-send-email-johan.hedberg@gmail.com>
+References: <1329778752-23846-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The parameter list for setting the local name via management interface
-was missing the short name parameter.
+Hi Johan,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/mgmt.h |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+> EIR shouldn't be enabled if SSP isn't enabled. This patch adds the
+> clearing of EIR data when disabling SSP and restores the data when SSP
+> is re-enabled.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/mgmt.c |   20 +++++++++++++++++++-
+>  1 files changed, 19 insertions(+), 1 deletions(-)
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 1dbadbe..ac59cdd 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -135,6 +135,7 @@ struct mgmt_cp_set_dev_class {
- #define MGMT_OP_SET_LOCAL_NAME		0x000F
- struct mgmt_cp_set_local_name {
- 	__u8 name[MGMT_MAX_NAME_LENGTH];
-+	__u8 short_name[MGMT_MAX_SHORT_NAME_LENGTH];
- } __packed;
- 
- #define MGMT_OP_ADD_UUID		0x0010
--- 
-1.7.7.6
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
+
 
