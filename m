@@ -1,33 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 Feb 2012 14:48:27 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Date: Mon, 20 Feb 2012 14:17:29 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Ulisses Furquim <ulisses@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Remove HCI notifier handling
-Message-ID: <20120220124827.GA9178@x220.ger.corp.intel.com>
-References: <1329739805-16235-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [RFCv5 02/16] Bluetooth: Revert to mutexes from RCU list
+Message-ID: <20120220121725.GA27197@aemeltch-MOBL1>
+References: <1329486252-25252-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1329486252-25252-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CAA37ikbgxQxySgBUxKOjakxCrG1rAKk=aPfEW+JYL7g8PJLueA@mail.gmail.com>
+ <CAMXE1-oiPJEF7WAc14ekR99Y6=FNPs0iSqwWA_miLit=AesP=g@mail.gmail.com>
+ <CAA37ikb_7PfxQwTCBHn0GHWUh-PVg9aJ1tj3S7cCZJsNb8DMZQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329739805-16235-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <CAA37ikb_7PfxQwTCBHn0GHWUh-PVg9aJ1tj3S7cCZJsNb8DMZQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Ulisses,
 
-On Mon, Feb 20, 2012, Marcel Holtmann wrote:
-> The HCI notifier handling was never used outside of Bluetooth core layer
-> and thus remove it and replace it with direct function calls. Also move
-> the stack internal event generation into the HCI socket layer.
+On Mon, Feb 20, 2012 at 09:55:35AM -0200, Ulisses Furquim wrote:
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci_core.h |    7 +--
->  net/bluetooth/hci_conn.c         |    1 -
->  net/bluetooth/hci_core.c         |   16 +-----
->  net/bluetooth/hci_event.c        |   29 ----------
->  net/bluetooth/hci_sock.c         |  105 ++++++++++++++++++++++----------------
->  5 files changed, 64 insertions(+), 94 deletions(-)
+> >> With patch 3 you add some needed changes but then adds an imbalance of
+> >> lock/release sock locks which is only solved in patch 4. Why?
+> >
+> > How does patch 4 solves locking? If I did not miss something it shall
+> > not change anything.
+> 
+> For instance, in patch 3 you replace l2cap_get_chan_by_scid() with __
+> l2cap_get_chan_by_scid() in l2cap_connect_rsp(). However,  __
+> l2cap_get_chan_by_scid() doesn't lock_sock() as the other one did and
+> only in patch 4 you add an explicit lock_sock() to
+> l2cap_connect_rsp(). Got it? A commit should be self contained as much
+> as possible so we keep the code bisectable.
 
-Applied to my bluetooth-next tree. Thanks.
+You are right here, I will squash those mentioned patches since this is
+easy way.
 
-Johan
+Best regards 
+Andrei Emeltchenko 
+
