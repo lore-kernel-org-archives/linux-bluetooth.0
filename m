@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv6 06/14] Bluetooth: Add unlocked __l2cap_chan_add function
-Date: Mon, 20 Feb 2012 16:21:17 +0200
-Message-Id: <1329747685-4163-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv6 05/14] Bluetooth: Add socket error function
+Date: Mon, 20 Feb 2012 16:21:16 +0200
+Message-Id: <1329747685-4163-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1329747685-4163-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1329747685-4163-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,40 +11,96 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Use locked and unlocked versions to help removing socket
+locks from l2cap core functions.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |    9 +++++++--
- 1 files changed, 7 insertions(+), 2 deletions(-)
+ net/bluetooth/l2cap_core.c |   30 +++++++++++++++++++++---------
+ 1 files changed, 21 insertions(+), 9 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 1e3ebc5..db1640c 100644
+index a206a24..1e3ebc5 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -300,7 +300,7 @@ void l2cap_chan_destroy(struct l2cap_chan *chan)
- 	l2cap_chan_put(chan);
+@@ -217,6 +217,22 @@ static void l2cap_state_change(struct l2cap_chan *chan, int state)
+ 	release_sock(sk);
  }
  
--static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
-+void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- {
- 	BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
- 			chan->psm, chan->dcid);
-@@ -346,8 +346,13 @@ static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 
- 	l2cap_chan_hold(chan);
- 
--	mutex_lock(&conn->chan_lock);
- 	list_add(&chan->list, &conn->chan_l);
++static inline void __l2cap_chan_set_err(struct l2cap_chan *chan, int err)
++{
++	struct sock *sk = chan->sk;
++
++	sk->sk_err = err;
 +}
 +
-+void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
++static inline void l2cap_chan_set_err(struct l2cap_chan *chan, int err)
 +{
-+	mutex_lock(&conn->chan_lock);
-+	__l2cap_chan_add(conn, chan);
- 	mutex_unlock(&conn->chan_lock);
++	struct sock *sk = chan->sk;
++
++	lock_sock(sk);
++	__l2cap_chan_set_err(chan, err);
++	release_sock(sk);
++}
++
+ static void l2cap_chan_timeout(struct work_struct *work)
+ {
+ 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
+@@ -361,7 +377,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 	sock_set_flag(sk, SOCK_ZAPPED);
+ 
+ 	if (err)
+-		sk->sk_err = err;
++		__l2cap_chan_set_err(chan, err);
+ 
+ 	if (parent) {
+ 		bt_accept_unlink(sk);
+@@ -694,14 +710,11 @@ static inline int l2cap_mode_supported(__u8 mode, __u32 feat_mask)
+ 
+ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *chan, int err)
+ {
+-	struct sock *sk;
+ 	struct l2cap_disconn_req req;
+ 
+ 	if (!conn)
+ 		return;
+ 
+-	sk = chan->sk;
+-
+ 	if (chan->mode == L2CAP_MODE_ERTM) {
+ 		__clear_retrans_timer(chan);
+ 		__clear_monitor_timer(chan);
+@@ -714,7 +727,7 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
+ 			L2CAP_DISCONN_REQ, sizeof(req), &req);
+ 
+ 	__l2cap_state_change(chan, BT_DISCONN);
+-	sk->sk_err = err;
++	__l2cap_chan_set_err(chan, err);
  }
  
+ /* ---- L2CAP connections ---- */
+@@ -953,10 +966,8 @@ static void l2cap_conn_unreliable(struct l2cap_conn *conn, int err)
+ 	mutex_lock(&conn->chan_lock);
+ 
+ 	list_for_each_entry(chan, &conn->chan_l, list) {
+-		struct sock *sk = chan->sk;
+-
+ 		if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
+-			sk->sk_err = err;
++			__l2cap_chan_set_err(chan, err);
+ 	}
+ 
+ 	mutex_unlock(&conn->chan_lock);
+@@ -2987,7 +2998,8 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 		}
+ 
+ 	default:
+-		sk->sk_err = ECONNRESET;
++		__l2cap_chan_set_err(chan, ECONNRESET);
++
+ 		__set_chan_timer(chan,
+ 				msecs_to_jiffies(L2CAP_DISC_REJ_TIMEOUT));
+ 		l2cap_send_disconn_req(conn, chan, ECONNRESET);
 -- 
 1.7.9
 
