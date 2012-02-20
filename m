@@ -1,404 +1,176 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v2] Bluetooth: Add support for HCI monitor channel
-Date: Mon, 20 Feb 2012 15:26:22 +0100
-Message-Id: <1329747982-23757-1-git-send-email-marcel@holtmann.org>
+Subject: [RFCv6 04/14] Bluetooth: Add locked and unlocked state_change
+Date: Mon, 20 Feb 2012 16:21:15 +0200
+Message-Id: <1329747685-4163-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1329747685-4163-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1329747685-4163-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The HCI monitor channel can be used to monitor all packets and events
-from the Bluetooth subsystem. The monitor is not bound to any specific
-HCI device and allows even capturing multiple devices at the same time.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Split to locked and unlocked versions of l2cap_state_change helping
+to remove socket locks from l2cap code.
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
-v2: Add the CAP_NET_RAW check
+ net/bluetooth/l2cap_core.c |   41 +++++++++++++++++++++++++----------------
+ 1 files changed, 25 insertions(+), 16 deletions(-)
 
- include/net/bluetooth/hci.h      |    1 +
- include/net/bluetooth/hci_core.h |    1 +
- include/net/bluetooth/hci_mon.h  |   51 +++++++++
- net/bluetooth/hci_core.c         |   13 ++-
- net/bluetooth/hci_sock.c         |  207 ++++++++++++++++++++++++++++++++++++++
- 5 files changed, 270 insertions(+), 3 deletions(-)
- create mode 100644 include/net/bluetooth/hci_mon.h
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 1b634e1..60a4727 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1320,6 +1320,7 @@ struct sockaddr_hci {
- 
- #define HCI_CHANNEL_RAW		0
- #define HCI_CHANNEL_CONTROL	1
-+#define HCI_CHANNEL_MONITOR	2
- 
- struct hci_filter {
- 	unsigned long type_mask;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 41adae5..094b5db 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -950,6 +950,7 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
- /* ----- HCI Sockets ----- */
- void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb);
- void hci_send_to_control(struct sk_buff *skb, struct sock *skip_sk);
-+void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb);
- 
- void hci_sock_dev_event(struct hci_dev *hdev, int event);
- 
-diff --git a/include/net/bluetooth/hci_mon.h b/include/net/bluetooth/hci_mon.h
-new file mode 100644
-index 0000000..07a25c9
---- /dev/null
-+++ b/include/net/bluetooth/hci_mon.h
-@@ -0,0 +1,51 @@
-+/*
-+   BlueZ - Bluetooth protocol stack for Linux
-+
-+   Copyright (C) 2011-2012  Intel Corporation
-+
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License version 2 as
-+   published by the Free Software Foundation;
-+
-+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
-+   IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
-+   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
-+   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-+   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-+   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-+
-+   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
-+   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
-+   SOFTWARE IS DISCLAIMED.
-+*/
-+
-+#ifndef __HCI_MON_H
-+#define __HCI_MON_H
-+
-+struct hci_mon_hdr {
-+	__le16	opcode;
-+	__le16	index;
-+	__le16	len;
-+} __packed;
-+#define HCI_MON_HDR_SIZE 6
-+
-+#define HCI_MON_NEW_INDEX	0
-+#define HCI_MON_DEL_INDEX	1
-+#define HCI_MON_COMMAND_PKT	2
-+#define HCI_MON_EVENT_PKT	3
-+#define HCI_MON_ACL_TX_PKT	4
-+#define HCI_MON_ACL_RX_PKT	5
-+#define HCI_MON_SCO_TX_PKT	6
-+#define HCI_MON_SCO_RX_PKT	7
-+
-+struct hci_mon_new_index {
-+	__u8	type;
-+	__u8	bus;
-+	bdaddr_t bdaddr;
-+	char	name[8];
-+} __packed;
-+#define HCI_MON_NEW_INDEX_SIZE 16
-+
-+#endif /* __HCI_MON_H */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 4721728..87ff7ff 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2113,10 +2113,14 @@ static int hci_send_frame(struct sk_buff *skb)
- 
- 	BT_DBG("%s type %d len %d", hdev->name, bt_cb(skb)->pkt_type, skb->len);
- 
--	if (atomic_read(&hdev->promisc)) {
--		/* Time stamp */
--		__net_timestamp(skb);
-+	/* Time stamp */
-+	__net_timestamp(skb);
- 
-+	/* Send copy to monitor */
-+	hci_send_to_monitor(hdev, skb);
-+
-+	if (atomic_read(&hdev->promisc)) {
-+		/* Send copy to the sockets */
- 		hci_send_to_sock(hdev, skb);
- 	}
- 
-@@ -2802,6 +2806,9 @@ static void hci_rx_work(struct work_struct *work)
- 	BT_DBG("%s", hdev->name);
- 
- 	while ((skb = skb_dequeue(&hdev->rx_q))) {
-+		/* Send copy to monitor */
-+		hci_send_to_monitor(hdev, skb);
-+
- 		if (atomic_read(&hdev->promisc)) {
- 			/* Send copy to the sockets */
- 			hci_send_to_sock(hdev, skb);
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 14727cb..971a482 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -48,9 +48,12 @@
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/hci_mon.h>
- 
- static bool enable_mgmt;
- 
-+static atomic_t monitor_promisc = ATOMIC_INIT(0);
-+
- /* ----- HCI socket interface ----- */
- 
- static inline int hci_test_bit(int nr, void *addr)
-@@ -189,6 +192,174 @@ void hci_send_to_control(struct sk_buff *skb, struct sock *skip_sk)
- 	read_unlock(&hci_sk_list.lock);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 98e116b..a206a24 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -199,7 +199,7 @@ static u16 l2cap_alloc_cid(struct l2cap_conn *conn)
+ 	return 0;
  }
  
-+/* Send frame to monitor socket */
-+void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct sock *sk;
-+	struct hlist_node *node;
-+	struct sk_buff *skb_copy = NULL;
-+	__le16 opcode;
-+
-+	if (!atomic_read(&monitor_promisc))
-+		return;
-+
-+	BT_DBG("hdev %p len %d", hdev, skb->len);
-+
-+	switch (bt_cb(skb)->pkt_type) {
-+	case HCI_COMMAND_PKT:
-+		opcode = __constant_cpu_to_le16(HCI_MON_COMMAND_PKT);
-+		break;
-+	case HCI_EVENT_PKT:
-+		opcode = __constant_cpu_to_le16(HCI_MON_EVENT_PKT);
-+		break;
-+	case HCI_ACLDATA_PKT:
-+		if (bt_cb(skb)->incoming)
-+			opcode = __constant_cpu_to_le16(HCI_MON_ACL_RX_PKT);
-+		else
-+			opcode = __constant_cpu_to_le16(HCI_MON_ACL_TX_PKT);
-+		break;
-+	case HCI_SCODATA_PKT:
-+		if (bt_cb(skb)->incoming)
-+			opcode = __constant_cpu_to_le16(HCI_MON_SCO_RX_PKT);
-+		else
-+			opcode = __constant_cpu_to_le16(HCI_MON_SCO_TX_PKT);
-+		break;
-+	default:
-+		return;
-+	}
-+
-+	read_lock(&hci_sk_list.lock);
-+
-+	sk_for_each(sk, node, &hci_sk_list.head) {
-+		struct sk_buff *nskb;
-+
-+		if (sk->sk_state != BT_BOUND)
-+			continue;
-+
-+		if (hci_pi(sk)->channel != HCI_CHANNEL_MONITOR)
-+			continue;
-+
-+		if (!skb_copy) {
-+			struct hci_mon_hdr *hdr;
-+
-+			/* Create a private copy with headroom */
-+			skb_copy = __pskb_copy(skb, HCI_MON_HDR_SIZE, GFP_ATOMIC);
-+			if (!skb_copy)
-+				continue;
-+
-+			/* Put header before the data */
-+			hdr = (void *) skb_push(skb_copy, HCI_MON_HDR_SIZE);
-+			hdr->opcode = opcode;
-+			hdr->index = cpu_to_le16(hdev->id);
-+			hdr->len = cpu_to_le16(skb->len);
-+		}
-+
-+		nskb = skb_clone(skb_copy, GFP_ATOMIC);
-+		if (!nskb)
-+			continue;
-+
-+		if (sock_queue_rcv_skb(sk, nskb))
-+			kfree_skb(nskb);
-+	}
-+
-+	read_unlock(&hci_sk_list.lock);
-+
-+	kfree_skb(skb_copy);
-+}
-+
-+static void send_monitor_event(struct sk_buff *skb)
-+{
-+	struct sock *sk;
-+	struct hlist_node *node;
-+
-+	BT_DBG("len %d", skb->len);
-+
-+	read_lock(&hci_sk_list.lock);
-+
-+	sk_for_each(sk, node, &hci_sk_list.head) {
-+		struct sk_buff *nskb;
-+
-+		if (sk->sk_state != BT_BOUND)
-+			continue;
-+
-+		if (hci_pi(sk)->channel != HCI_CHANNEL_MONITOR)
-+			continue;
-+
-+		nskb = skb_clone(skb, GFP_ATOMIC);
-+		if (!nskb)
-+			continue;
-+
-+		if (sock_queue_rcv_skb(sk, nskb))
-+			kfree_skb(nskb);
-+	}
-+
-+	read_unlock(&hci_sk_list.lock);
-+}
-+
-+static struct sk_buff *create_monitor_event(struct hci_dev *hdev, int event)
-+{
-+	struct hci_mon_hdr *hdr;
-+	struct hci_mon_new_index *ni;
-+	struct sk_buff *skb;
-+	__le16 opcode;
-+
-+	switch (event) {
-+	case HCI_DEV_REG:
-+		skb = bt_skb_alloc(HCI_MON_NEW_INDEX_SIZE, GFP_ATOMIC);
-+		if (!skb)
-+			return NULL;
-+
-+		ni = (void *) skb_put(skb, HCI_MON_NEW_INDEX_SIZE);
-+		ni->type = hdev->dev_type;
-+		ni->bus = hdev->bus;
-+		bacpy(&ni->bdaddr, &hdev->bdaddr);
-+		memcpy(ni->name, hdev->name, 8);
-+
-+		opcode = __constant_cpu_to_le16(HCI_MON_NEW_INDEX);
-+		break;
-+
-+	case HCI_DEV_UNREG:
-+		skb = bt_skb_alloc(0, GFP_ATOMIC);
-+		if (!skb)
-+			return NULL;
-+
-+		opcode = __constant_cpu_to_le16(HCI_MON_DEL_INDEX);
-+		break;
-+
-+	default:
-+		return NULL;
-+	}
-+
-+	__net_timestamp(skb);
-+
-+	hdr = (void *) skb_push(skb, HCI_MON_HDR_SIZE);
-+	hdr->opcode = opcode;
-+	hdr->index = cpu_to_le16(hdev->id);
-+	hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
-+
-+	return skb;
-+}
-+
-+static void send_monitor_replay(struct sock *sk)
-+{
-+	struct hci_dev *hdev;
-+
-+	read_lock(&hci_dev_list_lock);
-+
-+	list_for_each_entry(hdev, &hci_dev_list, list) {
-+		struct sk_buff *skb;
-+
-+		skb = create_monitor_event(hdev, HCI_DEV_REG);
-+		if (!skb)
-+			continue;
-+
-+		if (sock_queue_rcv_skb(sk, skb))
-+			kfree_skb(skb);
-+	}
-+
-+	read_unlock(&hci_dev_list_lock);
-+}
-+
- /* Generate internal stack event */
- static void hci_si_event(struct hci_dev *hdev, int type, int dlen, void *data)
+-static void l2cap_state_change(struct l2cap_chan *chan, int state)
++static void __l2cap_state_change(struct l2cap_chan *chan, int state)
  {
-@@ -223,6 +394,17 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+ 	BT_DBG("chan %p %s -> %s", chan, state_to_string(chan->state),
+ 						state_to_string(state));
+@@ -208,6 +208,15 @@ static void l2cap_state_change(struct l2cap_chan *chan, int state)
+ 	chan->ops->state_change(chan->data, state);
+ }
  
- 	BT_DBG("hdev %s event %d", hdev->name, event);
- 
-+	/* Send event to monitor */
-+	if (atomic_read(&monitor_promisc)) {
-+		struct sk_buff *skb;
++static void l2cap_state_change(struct l2cap_chan *chan, int state)
++{
++	struct sock *sk = chan->sk;
 +
-+		skb = create_monitor_event(hdev, event);
-+		if (skb) {
-+			send_monitor_event(skb);
-+			kfree_skb(skb);
-+		}
-+	}
++	lock_sock(sk);
++	__l2cap_state_change(chan, state);
++	release_sock(sk);
++}
 +
- 	/* Send event to sockets */
- 	ev.event  = event;
- 	ev.dev_id = hdev->id;
-@@ -262,6 +444,9 @@ static int hci_sock_release(struct socket *sock)
- 
- 	hdev = hci_pi(sk)->hdev;
- 
-+	if (hci_pi(sk)->channel == HCI_CHANNEL_MONITOR)
-+		atomic_dec(&monitor_promisc);
-+
- 	bt_sock_unlink(&hci_sk_list, sk);
- 
- 	if (hdev) {
-@@ -474,6 +659,22 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
- 		set_bit(HCI_PI_MGMT_INIT, &hci_pi(sk)->flags);
- 		break;
- 
-+	case HCI_CHANNEL_MONITOR:
-+		if (haddr.hci_dev != HCI_DEV_NONE) {
-+			err = -EINVAL;
-+			goto done;
-+		}
-+
-+		if (capable(CAP_NET_RAW)) {
-+			err = -EPERM;
-+			goto done;
-+		}
-+
-+		send_monitor_replay(sk);
-+
-+		atomic_inc(&monitor_promisc);
-+		break;
-+
- 	default:
- 		err = -EINVAL;
- 		goto done;
-@@ -578,6 +779,9 @@ static int hci_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
- 	case HCI_CHANNEL_RAW:
- 		hci_sock_cmsg(sk, msg, skb);
- 		break;
-+	case HCI_CHANNEL_MONITOR:
-+		sock_recv_timestamp(msg, sk, skb);
-+		break;
+ static void l2cap_chan_timeout(struct work_struct *work)
+ {
+ 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
+@@ -348,7 +357,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 		hci_conn_put(conn->hcon);
  	}
  
- 	skb_free_datagram(sk, skb);
-@@ -612,6 +816,9 @@ static int hci_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
- 	case HCI_CHANNEL_CONTROL:
- 		err = mgmt_control(sk, msg, len);
- 		goto done;
-+	case HCI_CHANNEL_MONITOR:
-+		err = -EOPNOTSUPP;
-+		goto done;
- 	default:
- 		err = -EINVAL;
- 		goto done;
+-	l2cap_state_change(chan, BT_CLOSED);
++	__l2cap_state_change(chan, BT_CLOSED);
+ 	sock_set_flag(sk, SOCK_ZAPPED);
+ 
+ 	if (err)
+@@ -413,7 +422,7 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
+ 	case BT_LISTEN:
+ 		l2cap_chan_cleanup_listen(sk);
+ 
+-		l2cap_state_change(chan, BT_CLOSED);
++		__l2cap_state_change(chan, BT_CLOSED);
+ 		sock_set_flag(sk, SOCK_ZAPPED);
+ 		break;
+ 
+@@ -704,7 +713,7 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
+ 	l2cap_send_cmd(conn, l2cap_get_ident(conn),
+ 			L2CAP_DISCONN_REQ, sizeof(req), &req);
+ 
+-	l2cap_state_change(chan, BT_DISCONN);
++	__l2cap_state_change(chan, BT_DISCONN);
+ 	sk->sk_err = err;
+ }
+ 
+@@ -770,7 +779,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 						parent->sk_data_ready(parent, 0);
+ 
+ 				} else {
+-					l2cap_state_change(chan, BT_CONFIG);
++					__l2cap_state_change(chan, BT_CONFIG);
+ 					rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
+ 					rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
+ 				}
+@@ -873,7 +882,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 
+ 	__set_chan_timer(chan, sk->sk_sndtimeo);
+ 
+-	l2cap_state_change(chan, BT_CONNECTED);
++	__l2cap_state_change(chan, BT_CONNECTED);
+ 	parent->sk_data_ready(parent, 0);
+ 
+ clean:
+@@ -890,7 +899,7 @@ static void l2cap_chan_ready(struct l2cap_chan *chan)
+ 	chan->conf_state = 0;
+ 	__clear_chan_timer(chan);
+ 
+-	l2cap_state_change(chan, BT_CONNECTED);
++	__l2cap_state_change(chan, BT_CONNECTED);
+ 	sk->sk_state_change(sk);
+ 
+ 	if (parent)
+@@ -922,7 +931,7 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+ 
+ 		} else if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+ 			__clear_chan_timer(chan);
+-			l2cap_state_change(chan, BT_CONNECTED);
++			__l2cap_state_change(chan, BT_CONNECTED);
+ 			sk->sk_state_change(sk);
+ 
+ 		} else if (chan->state == BT_CONNECT)
+@@ -1196,14 +1205,14 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+ 
+ 	l2cap_chan_add(conn, chan);
+ 
+-	l2cap_state_change(chan, BT_CONNECT);
++	__l2cap_state_change(chan, BT_CONNECT);
+ 	__set_chan_timer(chan, sk->sk_sndtimeo);
+ 
+ 	if (hcon->state == BT_CONNECTED) {
+ 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+ 			__clear_chan_timer(chan);
+ 			if (l2cap_chan_check_security(chan))
+-				l2cap_state_change(chan, BT_CONNECTED);
++				__l2cap_state_change(chan, BT_CONNECTED);
+ 		} else
+ 			l2cap_do_start(chan);
+ 	}
+@@ -2650,22 +2659,22 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE) {
+ 		if (l2cap_chan_check_security(chan)) {
+ 			if (bt_sk(sk)->defer_setup) {
+-				l2cap_state_change(chan, BT_CONNECT2);
++				__l2cap_state_change(chan, BT_CONNECT2);
+ 				result = L2CAP_CR_PEND;
+ 				status = L2CAP_CS_AUTHOR_PEND;
+ 				parent->sk_data_ready(parent, 0);
+ 			} else {
+-				l2cap_state_change(chan, BT_CONFIG);
++				__l2cap_state_change(chan, BT_CONFIG);
+ 				result = L2CAP_CR_SUCCESS;
+ 				status = L2CAP_CS_NO_INFO;
+ 			}
+ 		} else {
+-			l2cap_state_change(chan, BT_CONNECT2);
++			__l2cap_state_change(chan, BT_CONNECT2);
+ 			result = L2CAP_CR_PEND;
+ 			status = L2CAP_CS_AUTHEN_PEND;
+ 		}
+ 	} else {
+-		l2cap_state_change(chan, BT_CONNECT2);
++		__l2cap_state_change(chan, BT_CONNECT2);
+ 		result = L2CAP_CR_PEND;
+ 		status = L2CAP_CS_NO_INFO;
+ 	}
+@@ -4583,12 +4592,12 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 					if (parent)
+ 						parent->sk_data_ready(parent, 0);
+ 				} else {
+-					l2cap_state_change(chan, BT_CONFIG);
++					__l2cap_state_change(chan, BT_CONFIG);
+ 					res = L2CAP_CR_SUCCESS;
+ 					stat = L2CAP_CS_NO_INFO;
+ 				}
+ 			} else {
+-				l2cap_state_change(chan, BT_DISCONN);
++				__l2cap_state_change(chan, BT_DISCONN);
+ 				__set_chan_timer(chan,
+ 					msecs_to_jiffies(L2CAP_DISC_TIMEOUT));
+ 				res = L2CAP_CR_SEC_BLOCK;
 -- 
-1.7.7.6
+1.7.9
 
