@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv6 13/14] Bluetooth: Use l2cap chan lock in socket connect
-Date: Mon, 20 Feb 2012 16:21:24 +0200
-Message-Id: <1329747685-4163-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv6 12/14] Bluetooth: Change locking logic in security_cfm
+Date: Mon, 20 Feb 2012 16:21:23 +0200
+Message-Id: <1329747685-4163-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1329747685-4163-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1329747685-4163-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,108 +11,82 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Function l2cap_chan_connect does not return with locked socket
-anymore. So we take explicit lock in l2cap_sock_connect.
+Change bh_ locking functions to mutex_locks since we can now sleep.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |   18 ++++++++++++++----
- net/bluetooth/l2cap_sock.c |    2 ++
- 2 files changed, 16 insertions(+), 4 deletions(-)
+ net/bluetooth/l2cap_core.c |   17 ++++++++++-------
+ 1 files changed, 10 insertions(+), 7 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b117014..ae4df24 100644
+index 6f28cf5..b117014 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1159,7 +1159,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+@@ -4571,9 +4571,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 	mutex_lock(&conn->chan_lock);
  
- 	hci_dev_lock(hdev);
- 
--	lock_sock(sk);
-+	l2cap_chan_lock(chan);
- 
- 	/* PSM must be odd and lsb of upper byte must be 0 */
- 	if ((__le16_to_cpu(psm) & 0x0101) != 0x0001 && !cid &&
-@@ -1186,17 +1186,21 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
- 		goto done;
- 	}
- 
-+	lock_sock(sk);
-+
- 	switch (sk->sk_state) {
- 	case BT_CONNECT:
- 	case BT_CONNECT2:
- 	case BT_CONFIG:
- 		/* Already connecting */
- 		err = 0;
-+		release_sock(sk);
- 		goto done;
- 
- 	case BT_CONNECTED:
- 		/* Already connected */
- 		err = -EISCONN;
-+		release_sock(sk);
- 		goto done;
- 
- 	case BT_OPEN:
-@@ -1206,11 +1210,15 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
- 
- 	default:
- 		err = -EBADFD;
-+		release_sock(sk);
- 		goto done;
- 	}
- 
- 	/* Set destination address and psm */
- 	bacpy(&bt_sk(sk)->dst, dst);
-+
-+	release_sock(sk);
-+
- 	chan->psm = psm;
- 	chan->dcid = cid;
- 
-@@ -1238,23 +1246,25 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
- 	/* Update source addr of the socket */
- 	bacpy(src, conn->src);
- 
-+	l2cap_chan_unlock(chan);
- 	l2cap_chan_add(conn, chan);
-+	l2cap_chan_lock(chan);
- 
--	__l2cap_state_change(chan, BT_CONNECT);
-+	l2cap_state_change(chan, BT_CONNECT);
- 	__set_chan_timer(chan, sk->sk_sndtimeo);
- 
- 	if (hcon->state == BT_CONNECTED) {
- 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
- 			__clear_chan_timer(chan);
- 			if (l2cap_chan_check_security(chan))
--				__l2cap_state_change(chan, BT_CONNECTED);
-+				l2cap_state_change(chan, BT_CONNECTED);
- 		} else
- 			l2cap_do_start(chan);
- 	}
- 
- 	err = 0;
+ 	list_for_each_entry(chan, &conn->chan_l, list) {
+-		struct sock *sk = chan->sk;
 -
- done:
-+	l2cap_chan_unlock(chan);
- 	hci_dev_unlock(hdev);
- 	hci_dev_put(hdev);
- 	return err;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index a278858..bbc1747 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -127,6 +127,8 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
- 	if (err)
- 		goto done;
+-		bh_lock_sock(sk);
++		l2cap_chan_lock(chan);
  
-+	lock_sock(sk);
+ 		BT_DBG("chan->scid %d", chan->scid);
+ 
+@@ -4583,19 +4581,19 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 				l2cap_chan_ready(chan);
+ 			}
+ 
+-			bh_unlock_sock(sk);
++			l2cap_chan_unlock(chan);
+ 			continue;
+ 		}
+ 
+ 		if (test_bit(CONF_CONNECT_PEND, &chan->conf_state)) {
+-			bh_unlock_sock(sk);
++			l2cap_chan_unlock(chan);
+ 			continue;
+ 		}
+ 
+ 		if (!status && (chan->state == BT_CONNECTED ||
+ 						chan->state == BT_CONFIG)) {
+ 			l2cap_check_encryption(chan, encrypt);
+-			bh_unlock_sock(sk);
++			l2cap_chan_unlock(chan);
+ 			continue;
+ 		}
+ 
+@@ -4616,9 +4614,12 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 					msecs_to_jiffies(L2CAP_DISC_TIMEOUT));
+ 			}
+ 		} else if (chan->state == BT_CONNECT2) {
++			struct sock *sk = chan->sk;
+ 			struct l2cap_conn_rsp rsp;
+ 			__u16 res, stat;
+ 
++			lock_sock(sk);
 +
- 	err = bt_sock_wait_state(sk, BT_CONNECTED,
- 			sock_sndtimeo(sk, flags & O_NONBLOCK));
- done:
+ 			if (!status) {
+ 				if (bt_sk(sk)->defer_setup) {
+ 					struct sock *parent = bt_sk(sk)->parent;
+@@ -4639,6 +4640,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 				stat = L2CAP_CS_NO_INFO;
+ 			}
+ 
++			release_sock(sk);
++
+ 			rsp.scid   = cpu_to_le16(chan->dcid);
+ 			rsp.dcid   = cpu_to_le16(chan->scid);
+ 			rsp.result = cpu_to_le16(res);
+@@ -4647,7 +4650,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 							sizeof(rsp), &rsp);
+ 		}
+ 
+-		bh_unlock_sock(sk);
++		l2cap_chan_unlock(chan);
+ 	}
+ 
+ 	mutex_unlock(&conn->chan_lock);
 -- 
 1.7.9
 
