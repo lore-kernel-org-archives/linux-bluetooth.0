@@ -1,516 +1,397 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv6 02/14] Bluetooth: Revert to mutexes from RCU list
-Date: Mon, 20 Feb 2012 16:21:13 +0200
-Message-Id: <1329747685-4163-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1329747685-4163-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1329747685-4163-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC] Bluetooth: Add support for HCI monitor channel
+Date: Mon, 20 Feb 2012 15:15:18 +0100
+Message-Id: <1329747318-21874-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+The HCI monitor channel can be used to monitor all packets and events
+from the Bluetooth subsystem. The monitor is not bound to any specific
+HCI device and allows even capturing multiple devices at the same time.
 
-Usage of RCU list looks not reasonalbe for a number of reasons:
-our code sleep and we have to use socket spinlocks, some parts
-of code are updaters thus we need to use mutexes anyway.
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c |  165 ++++++++++++++++++++++++++------------------
- net/bluetooth/l2cap_sock.c |   10 +++
- 2 files changed, 108 insertions(+), 67 deletions(-)
+ include/net/bluetooth/hci.h      |    1 +
+ include/net/bluetooth/hci_core.h |    1 +
+ include/net/bluetooth/hci_mon.h  |   51 ++++++++++
+ net/bluetooth/hci_core.c         |   13 ++-
+ net/bluetooth/hci_sock.c         |  202 ++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 265 insertions(+), 3 deletions(-)
+ create mode 100644 include/net/bluetooth/hci_mon.h
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 63539f9..90e29ac 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -77,36 +77,24 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 1b634e1..60a4727 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1320,6 +1320,7 @@ struct sockaddr_hci {
  
- static struct l2cap_chan *__l2cap_get_chan_by_dcid(struct l2cap_conn *conn, u16 cid)
- {
--	struct l2cap_chan *c, *r = NULL;
--
--	rcu_read_lock();
-+	struct l2cap_chan *c;
+ #define HCI_CHANNEL_RAW		0
+ #define HCI_CHANNEL_CONTROL	1
++#define HCI_CHANNEL_MONITOR	2
  
--	list_for_each_entry_rcu(c, &conn->chan_l, list) {
--		if (c->dcid == cid) {
--			r = c;
--			break;
--		}
-+	list_for_each_entry(c, &conn->chan_l, list) {
-+		if (c->dcid == cid)
-+			return c;
- 	}
--
--	rcu_read_unlock();
--	return r;
-+	return NULL;
- }
+ struct hci_filter {
+ 	unsigned long type_mask;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 41adae5..094b5db 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -950,6 +950,7 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
+ /* ----- HCI Sockets ----- */
+ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb);
+ void hci_send_to_control(struct sk_buff *skb, struct sock *skip_sk);
++void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb);
  
- static struct l2cap_chan *__l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 cid)
- {
--	struct l2cap_chan *c, *r = NULL;
--
--	rcu_read_lock();
-+	struct l2cap_chan *c;
+ void hci_sock_dev_event(struct hci_dev *hdev, int event);
  
--	list_for_each_entry_rcu(c, &conn->chan_l, list) {
--		if (c->scid == cid) {
--			r = c;
--			break;
--		}
-+	list_for_each_entry(c, &conn->chan_l, list) {
-+		if (c->scid == cid)
-+			return c;
- 	}
--
--	rcu_read_unlock();
--	return r;
-+	return NULL;
- }
- 
- /* Find channel with given SCID.
-@@ -115,36 +103,32 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 ci
- {
- 	struct l2cap_chan *c;
- 
-+	mutex_lock(&conn->chan_lock);
- 	c = __l2cap_get_chan_by_scid(conn, cid);
--	if (c)
--		lock_sock(c->sk);
-+	mutex_unlock(&conn->chan_lock);
+diff --git a/include/net/bluetooth/hci_mon.h b/include/net/bluetooth/hci_mon.h
+new file mode 100644
+index 0000000..07a25c9
+--- /dev/null
++++ b/include/net/bluetooth/hci_mon.h
+@@ -0,0 +1,51 @@
++/*
++   BlueZ - Bluetooth protocol stack for Linux
 +
- 	return c;
- }
- 
- static struct l2cap_chan *__l2cap_get_chan_by_ident(struct l2cap_conn *conn, u8 ident)
- {
--	struct l2cap_chan *c, *r = NULL;
--
--	rcu_read_lock();
-+	struct l2cap_chan *c;
- 
--	list_for_each_entry_rcu(c, &conn->chan_l, list) {
--		if (c->ident == ident) {
--			r = c;
--			break;
--		}
-+	list_for_each_entry(c, &conn->chan_l, list) {
-+		if (c->ident == ident)
-+			return c;
- 	}
--
--	rcu_read_unlock();
--	return r;
-+	return NULL;
- }
- 
- static inline struct l2cap_chan *l2cap_get_chan_by_ident(struct l2cap_conn *conn, u8 ident)
- {
- 	struct l2cap_chan *c;
- 
-+	mutex_lock(&conn->chan_lock);
- 	c = __l2cap_get_chan_by_ident(conn, ident);
--	if (c)
--		lock_sock(c->sk);
-+	mutex_unlock(&conn->chan_lock);
++   Copyright (C) 2011-2012  Intel Corporation
 +
- 	return c;
- }
- 
-@@ -228,11 +212,13 @@ static void l2cap_chan_timeout(struct work_struct *work)
- {
- 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
- 							chan_timer.work);
-+	struct l2cap_conn *conn = chan->conn;
- 	struct sock *sk = chan->sk;
- 	int reason;
- 
- 	BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
- 
-+	mutex_lock(&conn->chan_lock);
- 	lock_sock(sk);
- 
- 	if (chan->state == BT_CONNECTED || chan->state == BT_CONFIG)
-@@ -248,6 +234,8 @@ static void l2cap_chan_timeout(struct work_struct *work)
- 	release_sock(sk);
- 
- 	chan->ops->close(chan->data);
-+	mutex_unlock(&conn->chan_lock);
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License version 2 as
++   published by the Free Software Foundation;
 +
- 	l2cap_chan_put(chan);
- }
- 
-@@ -331,7 +319,9 @@ static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 
- 	l2cap_chan_hold(chan);
- 
--	list_add_rcu(&chan->list, &conn->chan_l);
-+	mutex_lock(&conn->chan_lock);
-+	list_add(&chan->list, &conn->chan_l);
-+	mutex_unlock(&conn->chan_lock);
- }
- 
- /* Delete channel.
-@@ -348,8 +338,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 
- 	if (conn) {
- 		/* Delete from channel list */
--		list_del_rcu(&chan->list);
--		synchronize_rcu();
-+		list_del(&chan->list);
- 
- 		l2cap_chan_put(chan);
- 
-@@ -400,10 +389,12 @@ static void l2cap_chan_cleanup_listen(struct sock *parent)
- 	/* Close not yet accepted channels */
- 	while ((sk = bt_accept_dequeue(parent, NULL))) {
- 		struct l2cap_chan *chan = l2cap_pi(sk)->chan;
++   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
++   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
++   IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
++   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
++   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
++   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 +
- 		__clear_chan_timer(chan);
- 		lock_sock(sk);
- 		l2cap_chan_close(chan, ECONNRESET);
- 		release_sock(sk);
++   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
++   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
++   SOFTWARE IS DISCLAIMED.
++*/
 +
- 		chan->ops->close(chan->data);
- 	}
- }
-@@ -718,13 +709,13 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
- /* ---- L2CAP connections ---- */
- static void l2cap_conn_start(struct l2cap_conn *conn)
- {
--	struct l2cap_chan *chan;
-+	struct l2cap_chan *chan, *tmp;
++#ifndef __HCI_MON_H
++#define __HCI_MON_H
++
++struct hci_mon_hdr {
++	__le16	opcode;
++	__le16	index;
++	__le16	len;
++} __packed;
++#define HCI_MON_HDR_SIZE 6
++
++#define HCI_MON_NEW_INDEX	0
++#define HCI_MON_DEL_INDEX	1
++#define HCI_MON_COMMAND_PKT	2
++#define HCI_MON_EVENT_PKT	3
++#define HCI_MON_ACL_TX_PKT	4
++#define HCI_MON_ACL_RX_PKT	5
++#define HCI_MON_SCO_TX_PKT	6
++#define HCI_MON_SCO_RX_PKT	7
++
++struct hci_mon_new_index {
++	__u8	type;
++	__u8	bus;
++	bdaddr_t bdaddr;
++	char	name[8];
++} __packed;
++#define HCI_MON_NEW_INDEX_SIZE 16
++
++#endif /* __HCI_MON_H */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 4721728..87ff7ff 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2113,10 +2113,14 @@ static int hci_send_frame(struct sk_buff *skb)
  
- 	BT_DBG("conn %p", conn);
+ 	BT_DBG("%s type %d len %d", hdev->name, bt_cb(skb)->pkt_type, skb->len);
  
--	rcu_read_lock();
-+	mutex_lock(&conn->chan_lock);
+-	if (atomic_read(&hdev->promisc)) {
+-		/* Time stamp */
+-		__net_timestamp(skb);
++	/* Time stamp */
++	__net_timestamp(skb);
  
--	list_for_each_entry_rcu(chan, &conn->chan_l, list) {
-+	list_for_each_entry_safe(chan, tmp, &conn->chan_l, list) {
- 		struct sock *sk = chan->sk;
- 
- 		bh_lock_sock(sk);
-@@ -804,7 +795,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 		bh_unlock_sock(sk);
++	/* Send copy to monitor */
++	hci_send_to_monitor(hdev, skb);
++
++	if (atomic_read(&hdev->promisc)) {
++		/* Send copy to the sockets */
+ 		hci_send_to_sock(hdev, skb);
  	}
  
--	rcu_read_unlock();
-+	mutex_unlock(&conn->chan_lock);
+@@ -2802,6 +2806,9 @@ static void hci_rx_work(struct work_struct *work)
+ 	BT_DBG("%s", hdev->name);
+ 
+ 	while ((skb = skb_dequeue(&hdev->rx_q))) {
++		/* Send copy to monitor */
++		hci_send_to_monitor(hdev, skb);
++
+ 		if (atomic_read(&hdev->promisc)) {
+ 			/* Send copy to the sockets */
+ 			hci_send_to_sock(hdev, skb);
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 14727cb..82e73b0 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -48,9 +48,12 @@
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/hci_mon.h>
+ 
+ static bool enable_mgmt;
+ 
++static atomic_t monitor_promisc = ATOMIC_INIT(0);
++
+ /* ----- HCI socket interface ----- */
+ 
+ static inline int hci_test_bit(int nr, void *addr)
+@@ -189,6 +192,174 @@ void hci_send_to_control(struct sk_buff *skb, struct sock *skip_sk)
+ 	read_unlock(&hci_sk_list.lock);
  }
  
- /* Find socket with cid and source bdaddr.
-@@ -916,9 +907,9 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 	if (conn->hcon->out && conn->hcon->type == LE_LINK)
- 		smp_conn_security(conn, conn->hcon->pending_sec_level);
- 
--	rcu_read_lock();
-+	mutex_lock(&conn->chan_lock);
- 
--	list_for_each_entry_rcu(chan, &conn->chan_l, list) {
-+	list_for_each_entry(chan, &conn->chan_l, list) {
- 		struct sock *sk = chan->sk;
- 
- 		bh_lock_sock(sk);
-@@ -938,7 +929,7 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 		bh_unlock_sock(sk);
- 	}
- 
--	rcu_read_unlock();
-+	mutex_unlock(&conn->chan_lock);
- }
- 
- /* Notify sockets that we cannot guaranty reliability anymore */
-@@ -948,16 +939,16 @@ static void l2cap_conn_unreliable(struct l2cap_conn *conn, int err)
- 
- 	BT_DBG("conn %p", conn);
- 
--	rcu_read_lock();
-+	mutex_lock(&conn->chan_lock);
- 
--	list_for_each_entry_rcu(chan, &conn->chan_l, list) {
-+	list_for_each_entry(chan, &conn->chan_l, list) {
- 		struct sock *sk = chan->sk;
- 
- 		if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
- 			sk->sk_err = err;
- 	}
- 
--	rcu_read_unlock();
-+	mutex_unlock(&conn->chan_lock);
- }
- 
- static void l2cap_info_timeout(struct work_struct *work)
-@@ -984,6 +975,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 
- 	kfree_skb(conn->rx_skb);
- 
-+	mutex_lock(&conn->chan_lock);
++/* Send frame to monitor socket */
++void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct sock *sk;
++	struct hlist_node *node;
++	struct sk_buff *skb_copy = NULL;
++	__le16 opcode;
 +
- 	/* Kill channels */
- 	list_for_each_entry_safe(chan, l, &conn->chan_l, list) {
- 		sk = chan->sk;
-@@ -993,6 +986,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 		chan->ops->close(chan->data);
- 	}
- 
-+	mutex_unlock(&conn->chan_lock);
++	if (!atomic_read(&monitor_promisc))
++		return;
 +
- 	hci_chan_del(conn->hchan);
- 
- 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
-@@ -1050,6 +1045,7 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
- 	conn->feat_mask = 0;
- 
- 	spin_lock_init(&conn->lock);
-+	mutex_init(&conn->chan_lock);
- 
- 	INIT_LIST_HEAD(&conn->chan_l);
- 
-@@ -1792,9 +1788,9 @@ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
- 
- 	BT_DBG("conn %p", conn);
- 
--	rcu_read_lock();
-+	mutex_lock(&conn->chan_lock);
- 
--	list_for_each_entry_rcu(chan, &conn->chan_l, list) {
-+	list_for_each_entry(chan, &conn->chan_l, list) {
- 		struct sock *sk = chan->sk;
- 		if (chan->chan_type != L2CAP_CHAN_RAW)
- 			continue;
-@@ -1810,7 +1806,7 @@ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
- 			kfree_skb(nskb);
- 	}
- 
--	rcu_read_unlock();
-+	mutex_unlock(&conn->chan_lock);
- }
- 
- /* ---- L2CAP signalling commands ---- */
-@@ -2600,6 +2596,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 
- 	parent = pchan->sk;
- 
-+	mutex_lock(&conn->chan_lock);
- 	lock_sock(parent);
- 
- 	/* Check if the ACL is secure enough (if not SDP) */
-@@ -2673,6 +2670,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 
- response:
- 	release_sock(parent);
-+	mutex_unlock(&conn->chan_lock);
- 
- sendresp:
- 	rsp.scid   = cpu_to_le16(scid);
-@@ -2714,6 +2712,7 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 	struct l2cap_chan *chan;
- 	struct sock *sk;
- 	u8 req[128];
-+	int err;
- 
- 	scid   = __le16_to_cpu(rsp->scid);
- 	dcid   = __le16_to_cpu(rsp->dcid);
-@@ -2723,17 +2722,26 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 	BT_DBG("dcid 0x%4.4x scid 0x%4.4x result 0x%2.2x status 0x%2.2x",
- 						dcid, scid, result, status);
- 
-+	mutex_lock(&conn->chan_lock);
++	BT_DBG("hdev %p len %d", hdev, skb->len);
 +
- 	if (scid) {
--		chan = l2cap_get_chan_by_scid(conn, scid);
--		if (!chan)
--			return -EFAULT;
-+		chan = __l2cap_get_chan_by_scid(conn, scid);
-+		if (!chan) {
-+			err = -EFAULT;
-+			goto unlock;
-+		}
- 	} else {
--		chan = l2cap_get_chan_by_ident(conn, cmd->ident);
--		if (!chan)
--			return -EFAULT;
-+		chan = __l2cap_get_chan_by_ident(conn, cmd->ident);
-+		if (!chan) {
-+			err = -EFAULT;
-+			goto unlock;
-+		}
- 	}
- 
-+	err = 0;
-+
- 	sk = chan->sk;
-+	lock_sock(sk);
- 
- 	switch (result) {
- 	case L2CAP_CR_SUCCESS:
-@@ -2760,7 +2768,10 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 	}
- 
- 	release_sock(sk);
--	return 0;
-+unlock:
-+	mutex_unlock(&conn->chan_lock);
-+
-+	return err;
- }
- 
- static inline void set_default_fcs(struct l2cap_chan *chan)
-@@ -2793,6 +2804,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		return -ENOENT;
- 
- 	sk = chan->sk;
-+	lock_sock(sk);
- 
- 	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2) {
- 		struct l2cap_cmd_rej_cid rej;
-@@ -2905,6 +2917,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		return 0;
- 
- 	sk = chan->sk;
-+	lock_sock(sk);
- 
- 	switch (result) {
- 	case L2CAP_CONF_SUCCESS:
-@@ -3006,11 +3019,16 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
- 
- 	BT_DBG("scid 0x%4.4x dcid 0x%4.4x", scid, dcid);
- 
--	chan = l2cap_get_chan_by_scid(conn, dcid);
--	if (!chan)
-+	mutex_lock(&conn->chan_lock);
-+
-+	chan = __l2cap_get_chan_by_scid(conn, dcid);
-+	if (!chan) {
-+		mutex_unlock(&conn->chan_lock);
- 		return 0;
++	switch (bt_cb(skb)->pkt_type) {
++	case HCI_COMMAND_PKT:
++		opcode = __constant_cpu_to_le16(HCI_MON_COMMAND_PKT);
++		break;
++	case HCI_EVENT_PKT:
++		opcode = __constant_cpu_to_le16(HCI_MON_EVENT_PKT);
++		break;
++	case HCI_ACLDATA_PKT:
++		if (bt_cb(skb)->incoming)
++			opcode = __constant_cpu_to_le16(HCI_MON_ACL_RX_PKT);
++		else
++			opcode = __constant_cpu_to_le16(HCI_MON_ACL_TX_PKT);
++		break;
++	case HCI_SCODATA_PKT:
++		if (bt_cb(skb)->incoming)
++			opcode = __constant_cpu_to_le16(HCI_MON_SCO_RX_PKT);
++		else
++			opcode = __constant_cpu_to_le16(HCI_MON_SCO_TX_PKT);
++		break;
++	default:
++		return;
 +	}
- 
- 	sk = chan->sk;
-+	lock_sock(sk);
- 
- 	rsp.dcid = cpu_to_le16(chan->scid);
- 	rsp.scid = cpu_to_le16(chan->dcid);
-@@ -3022,6 +3040,9 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
- 	release_sock(sk);
- 
- 	chan->ops->close(chan->data);
 +
-+	mutex_unlock(&conn->chan_lock);
++	read_lock(&hci_sk_list.lock);
 +
- 	return 0;
- }
- 
-@@ -3037,16 +3058,24 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
- 
- 	BT_DBG("dcid 0x%4.4x scid 0x%4.4x", dcid, scid);
- 
--	chan = l2cap_get_chan_by_scid(conn, scid);
--	if (!chan)
-+	mutex_lock(&conn->chan_lock);
++	sk_for_each(sk, node, &hci_sk_list.head) {
++		struct sk_buff *nskb;
 +
-+	chan = __l2cap_get_chan_by_scid(conn, scid);
-+	if (!chan) {
-+		mutex_unlock(&conn->chan_lock);
- 		return 0;
++		if (sk->sk_state != BT_BOUND)
++			continue;
++
++		if (hci_pi(sk)->channel != HCI_CHANNEL_MONITOR)
++			continue;
++
++		if (!skb_copy) {
++			struct hci_mon_hdr *hdr;
++
++			/* Create a private copy with headroom */
++			skb_copy = __pskb_copy(skb, HCI_MON_HDR_SIZE, GFP_ATOMIC);
++			if (!skb_copy)
++				continue;
++
++			/* Put header before the data */
++			hdr = (void *) skb_push(skb_copy, HCI_MON_HDR_SIZE);
++			hdr->opcode = opcode;
++			hdr->index = cpu_to_le16(hdev->id);
++			hdr->len = cpu_to_le16(skb->len);
++		}
++
++		nskb = skb_clone(skb_copy, GFP_ATOMIC);
++		if (!nskb)
++			continue;
++
++		if (sock_queue_rcv_skb(sk, nskb))
++			kfree_skb(nskb);
 +	}
- 
- 	sk = chan->sk;
-+	lock_sock(sk);
- 
- 	l2cap_chan_del(chan, 0);
- 	release_sock(sk);
- 
- 	chan->ops->close(chan->data);
 +
-+	mutex_unlock(&conn->chan_lock);
++	read_unlock(&hci_sk_list.lock);
 +
- 	return 0;
- }
- 
-@@ -4205,6 +4234,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
- 	}
- 
- 	sk = chan->sk;
-+	lock_sock(sk);
- 
- 	BT_DBG("chan %p, len %d", chan, skb->len);
- 
-@@ -4492,9 +4522,9 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 		cancel_delayed_work(&conn->security_timer);
- 	}
- 
--	rcu_read_lock();
-+	mutex_lock(&conn->chan_lock);
- 
--	list_for_each_entry_rcu(chan, &conn->chan_l, list) {
-+	list_for_each_entry(chan, &conn->chan_l, list) {
- 		struct sock *sk = chan->sk;
- 
- 		bh_lock_sock(sk);
-@@ -4574,7 +4604,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 		bh_unlock_sock(sk);
- 	}
- 
--	rcu_read_unlock();
-+	mutex_unlock(&conn->chan_lock);
- 
- 	return 0;
- }
-@@ -4635,6 +4665,7 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 
- 		if (chan && chan->sk) {
- 			struct sock *sk = chan->sk;
-+			lock_sock(sk);
- 
- 			if (chan->imtu < len - L2CAP_HDR_SIZE) {
- 				BT_ERR("Frame exceeding recv MTU (len %d, "
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index b48d6c1..1273fcb 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -796,6 +796,7 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
++	kfree_skb(skb_copy);
++}
++
++static void send_monitor_event(struct sk_buff *skb)
++{
++	struct sock *sk;
++	struct hlist_node *node;
++
++	BT_DBG("len %d", skb->len);
++
++	read_lock(&hci_sk_list.lock);
++
++	sk_for_each(sk, node, &hci_sk_list.head) {
++		struct sk_buff *nskb;
++
++		if (sk->sk_state != BT_BOUND)
++			continue;
++
++		if (hci_pi(sk)->channel != HCI_CHANNEL_MONITOR)
++			continue;
++
++		nskb = skb_clone(skb, GFP_ATOMIC);
++		if (!nskb)
++			continue;
++
++		if (sock_queue_rcv_skb(sk, nskb))
++			kfree_skb(nskb);
++	}
++
++	read_unlock(&hci_sk_list.lock);
++}
++
++static struct sk_buff *create_monitor_event(struct hci_dev *hdev, int event)
++{
++	struct hci_mon_hdr *hdr;
++	struct hci_mon_new_index *ni;
++	struct sk_buff *skb;
++	__le16 opcode;
++
++	switch (event) {
++	case HCI_DEV_REG:
++		skb = bt_skb_alloc(HCI_MON_NEW_INDEX_SIZE, GFP_ATOMIC);
++		if (!skb)
++			return NULL;
++
++		ni = (void *) skb_put(skb, HCI_MON_NEW_INDEX_SIZE);
++		ni->type = hdev->dev_type;
++		ni->bus = hdev->bus;
++		bacpy(&ni->bdaddr, &hdev->bdaddr);
++		memcpy(ni->name, hdev->name, 8);
++
++		opcode = __constant_cpu_to_le16(HCI_MON_NEW_INDEX);
++		break;
++
++	case HCI_DEV_UNREG:
++		skb = bt_skb_alloc(0, GFP_ATOMIC);
++		if (!skb)
++			return NULL;
++
++		opcode = __constant_cpu_to_le16(HCI_MON_DEL_INDEX);
++		break;
++
++	default:
++		return NULL;
++	}
++
++	__net_timestamp(skb);
++
++	hdr = (void *) skb_push(skb, HCI_MON_HDR_SIZE);
++	hdr->opcode = opcode;
++	hdr->index = cpu_to_le16(hdev->id);
++	hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
++
++	return skb;
++}
++
++static void send_monitor_replay(struct sock *sk)
++{
++	struct hci_dev *hdev;
++
++	read_lock(&hci_dev_list_lock);
++
++	list_for_each_entry(hdev, &hci_dev_list, list) {
++		struct sk_buff *skb;
++
++		skb = create_monitor_event(hdev, HCI_DEV_REG);
++		if (!skb)
++			continue;
++
++		if (sock_queue_rcv_skb(sk, skb))
++			kfree_skb(skb);
++	}
++
++	read_unlock(&hci_dev_list_lock);
++}
++
+ /* Generate internal stack event */
+ static void hci_si_event(struct hci_dev *hdev, int type, int dlen, void *data)
  {
- 	struct sock *sk = sock->sk;
- 	struct l2cap_chan *chan;
-+	struct l2cap_conn *conn;
- 	int err = 0;
+@@ -223,6 +394,17 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
  
- 	BT_DBG("sock %p, sk %p", sock, sk);
-@@ -804,6 +805,10 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
- 		return 0;
+ 	BT_DBG("hdev %s event %d", hdev->name, event);
  
- 	chan = l2cap_pi(sk)->chan;
-+	conn = chan->conn;
++	/* Send event to monitor */
++	if (atomic_read(&monitor_promisc)) {
++		struct sk_buff *skb;
 +
-+	if (conn)
-+		mutex_lock(&conn->chan_lock);
- 
- 	lock_sock(sk);
- 	if (!sk->sk_shutdown) {
-@@ -811,6 +816,7 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
- 			err = __l2cap_wait_ack(sk);
- 
- 		sk->sk_shutdown = SHUTDOWN_MASK;
++		skb = create_monitor_event(hdev, event);
++		if (skb) {
++			send_monitor_event(skb);
++			kfree_skb(skb);
++		}
++	}
 +
- 		l2cap_chan_close(chan, 0);
+ 	/* Send event to sockets */
+ 	ev.event  = event;
+ 	ev.dev_id = hdev->id;
+@@ -262,6 +444,9 @@ static int hci_sock_release(struct socket *sock)
  
- 		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime)
-@@ -822,6 +828,10 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
- 		err = -sk->sk_err;
+ 	hdev = hci_pi(sk)->hdev;
  
- 	release_sock(sk);
++	if (hci_pi(sk)->channel == HCI_CHANNEL_MONITOR)
++		atomic_dec(&monitor_promisc);
 +
-+	if (conn)
-+		mutex_unlock(&conn->chan_lock);
-+
- 	return err;
- }
+ 	bt_sock_unlink(&hci_sk_list, sk);
  
+ 	if (hdev) {
+@@ -474,6 +659,17 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
+ 		set_bit(HCI_PI_MGMT_INIT, &hci_pi(sk)->flags);
+ 		break;
+ 
++	case HCI_CHANNEL_MONITOR:
++		if (haddr.hci_dev != HCI_DEV_NONE) {
++			err = -EINVAL;
++			goto done;
++		}
++
++		send_monitor_replay(sk);
++
++		atomic_inc(&monitor_promisc);
++		break;
++
+ 	default:
+ 		err = -EINVAL;
+ 		goto done;
+@@ -578,6 +774,9 @@ static int hci_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
+ 	case HCI_CHANNEL_RAW:
+ 		hci_sock_cmsg(sk, msg, skb);
+ 		break;
++	case HCI_CHANNEL_MONITOR:
++		sock_recv_timestamp(msg, sk, skb);
++		break;
+ 	}
+ 
+ 	skb_free_datagram(sk, skb);
+@@ -612,6 +811,9 @@ static int hci_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+ 	case HCI_CHANNEL_CONTROL:
+ 		err = mgmt_control(sk, msg, len);
+ 		goto done;
++	case HCI_CHANNEL_MONITOR:
++		err = -EOPNOTSUPP;
++		goto done;
+ 	default:
+ 		err = -EINVAL;
+ 		goto done;
 -- 
-1.7.9
+1.7.7.6
 
