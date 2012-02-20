@@ -1,26 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 Feb 2012 23:11:30 +0200
+Date: Mon, 20 Feb 2012 23:11:12 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Restrict access to management interface
-Message-ID: <20120220211130.GB20660@x220.ger.corp.intel.com>
-References: <1329767650-6355-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: Add support for HCI monitor channel
+Message-ID: <20120220211112.GA20660@x220.ger.corp.intel.com>
+References: <1329766478-2834-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329767650-6355-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1329766478-2834-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
 On Mon, Feb 20, 2012, Marcel Holtmann wrote:
-> The management interface on the HCI control channel should be restricted
-> to applications with CAP_NET_ADMIN permission.
+> The HCI monitor channel can be used to monitor all packets and events
+> from the Bluetooth subsystem. The monitor is not bound to any specific
+> HCI device and allows even capturing multiple devices at the same time.
 > 
 > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/hci_sock.c |    5 +++++
->  1 files changed, 5 insertions(+), 0 deletions(-)
+>  include/net/bluetooth/hci.h      |    1 +
+>  include/net/bluetooth/hci_core.h |    1 +
+>  include/net/bluetooth/hci_mon.h  |   51 +++++++++
+>  net/bluetooth/hci_core.c         |   13 ++-
+>  net/bluetooth/hci_sock.c         |  207 ++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 270 insertions(+), 3 deletions(-)
+>  create mode 100644 include/net/bluetooth/hci_mon.h
 
 Applied to my bluetooth-next tree. Thanks.
 
