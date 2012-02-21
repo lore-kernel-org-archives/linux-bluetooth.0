@@ -1,49 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Feb 2012 10:00:21 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Ulisses Furquim <ulisses@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Add set_err to state_change callback
-Message-ID: <20120222080014.GB24328@aemeltch-MOBL1>
-References: <1329834858-22816-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <CAA37ikZvUdCgPqjDS=DjCzOn0Bz6MGpiiMmg_YuFBNLoQLvCeA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CAA37ikZvUdCgPqjDS=DjCzOn0Bz6MGpiiMmg_YuFBNLoQLvCeA@mail.gmail.com>
+In-Reply-To: <CAMXE1-onX6Dwhes4xqZ3HPEr=Y5U2mUF8sc0ERAKnMOD_1sMaQ@mail.gmail.com>
+References: <1329821707-11817-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1329821707-11817-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<20120221175602.GC22229@joana>
+	<CAMXE1-onX6Dwhes4xqZ3HPEr=Y5U2mUF8sc0ERAKnMOD_1sMaQ@mail.gmail.com>
+Date: Tue, 21 Feb 2012 19:18:08 -0200
+Message-ID: <CAA37ika66gbfwESCKo5iNAxjmoEhptRM=mrWiUe0dFsZb-peNQ@mail.gmail.com>
+Subject: Re: [PATCHv1 12/14] Bluetooth: Change locking logic in security_cfm
+From: Ulisses Furquim <ulisses@profusion.mobi>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ulisses,
+Hi Andrei,
 
-On Tue, Feb 21, 2012 at 03:42:33PM -0200, Ulisses Furquim wrote:
-> Hi Andrei,
-> 
-> On Tue, Feb 21, 2012 at 12:34 PM, Andrei Emeltchenko
-> <Andrei.Emeltchenko.news@gmail.com> wrote:
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> >
-> > There are several places in the code where l2cap_state_change and
-> > l2cap_chan_set_err used together. With combining them we remove
-> > socket lock in l2cap_send_disconn_req and simplify code in couple
-> > of other places with a price of adding extra parameter err to
-> > state_change.
-> >
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> >  include/net/bluetooth/l2cap.h |    3 +-
-> >  net/bluetooth/l2cap_core.c    |   58 ++++++++++++++++++----------------------
-> >  net/bluetooth/l2cap_sock.c    |    9 +++++-
-> >  3 files changed, 36 insertions(+), 34 deletions(-)
-> 
-> While I see the benefit of removing function calls and also some code
-> I'm not sure about this change now. We need to think of moving sock
-> handling to l2cap_sock.c and for that we may have to work more on
-> l2cap_ops indeed. However, we need to change ERTM state machine
-> handling first, I'd say.
+On Tue, Feb 21, 2012 at 6:44 PM, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+> Hi Gustavo,
+>
+> On Tue, Feb 21, 2012 at 7:56 PM, Gustavo Padovan <padovan@profusion.mobi> wrote:
+>> * Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-02-21 12:55:05 +0200]:
+>>
+>>> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>>>
+>>> Change bh_ locking functions to mutex_locks since we can now sleep.
+>>>
+>>> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+>> I don't like the idea of this locking change in multiple separate patches, it
+>> could put the stack in a broken and racy state if we stop in the middle of
+>> these patches.
+>> I would say to merge all these patches into one, they were a lot reviewed
+>> alone, there is no problem in create a big one with all the changes together.
+>
+> I saw the same comments from Ulisses. I will merge all those patches
+> together and send new patch series.
 
-Yes, the main idea is to remove those socket operations to l2cap_ops so
-that other socket-less protocols would override it.
+Well, yes, but Marcel wasn't really worried about it, though. It's
+good if we merge this soon and move on with other patches touching
+L2CAP code.
 
-Best regards 
-Andrei Emeltchenko 
+Best regards,
 
+-- 
+Ulisses Furquim
+ProFUSION embedded systems
+http://profusion.mobi
+Mobile: +55 19 9250 0942
+Skype: ulissesffs
