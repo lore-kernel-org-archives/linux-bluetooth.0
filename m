@@ -1,82 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Only keep controller up after init if powered on
-Date: Tue, 21 Feb 2012 12:14:25 +0100
-Message-Id: <1329822865-12312-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZKSLy6KYfKd8aBfb5DzG_ofihzVHcm6OBPuBcBne0j88g@mail.gmail.com>
+References: <1329813983-26707-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1329813983-26707-2-git-send-email-mikel.astiz.oss@gmail.com>
+	<CABBYNZKSLy6KYfKd8aBfb5DzG_ofihzVHcm6OBPuBcBne0j88g@mail.gmail.com>
+Date: Tue, 21 Feb 2012 13:16:04 +0200
+Message-ID: <CABBYNZ+kP5f1hxZiDhmZiqEVtWGc7myZVD-hN5EpX23E0TP0_w@mail.gmail.com>
+Subject: Re: [PATCH obexd 1/9] gobex: fix callback remove when canceling transfer
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When a new controller gets added to the system, it needs to be brought
-up briefly to read basic information like features, BD_ADDR etc. and
-after a timeout it will be brought back down.
+Hi Mikel,
 
-The only command that should overwrite this timeout is the set power
-command from the management interface. Just reading the controller
-list or information is not a good reason to keep the controller up.
+On Tue, Feb 21, 2012 at 1:02 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Mikel,
+>
+> On Tue, Feb 21, 2012 at 10:46 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>>
+>> This code path could lead to situations where the callback is later
+>> used, making the daemon crash.
+>> ---
+>>  gobex/gobex.c |    3 +++
+>>  1 files changed, 3 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/gobex/gobex.c b/gobex/gobex.c
+>> index 0665749..bc76e57 100644
+>> --- a/gobex/gobex.c
+>> +++ b/gobex/gobex.c
+>> @@ -735,6 +735,9 @@ gboolean g_obex_cancel_req(GObex *obex, guint req_id, gboolean remove_callback)
+>>                        goto immediate_completion;
+>>                }
+>>
+>> +               if (remove_callback)
+>> +                       obex->pending_req->rsp_func = NULL;
+>> +
+>
+> I see the problem, so we are keeping the pending request because of
+> the abort response, Im just not sure why we need to report an error if
+> cancelled is set on handle_response. So perhaps the right place to fix
+> this is in handle_response as soon as it checks for cancelled it
+> should skip to the point it frees the pending call, in other words we
+> should never need to report G_OBEX_ERROR_CANCELLED for requests since
+> we are the ones cancelling them.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/mgmt.c |   23 ++++++++++++++---------
- 1 files changed, 14 insertions(+), 9 deletions(-)
+Actually this is correct, since when remove_callback is FALSE we still
+call the callback so G_OBEX_ERROR_CANCELLED makes sense.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a5a2a68..c25cb64 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -339,9 +339,6 @@ static int read_index_list(struct sock *sk)
- 
- 	i = 0;
- 	list_for_each_entry(d, &hci_dev_list, list) {
--		if (test_and_clear_bit(HCI_AUTO_OFF, &d->dev_flags))
--			cancel_delayed_work(&d->power_off);
--
- 		if (test_bit(HCI_SETUP, &d->dev_flags))
- 			continue;
- 
-@@ -392,11 +389,12 @@ static u32 get_current_settings(struct hci_dev *hdev)
- {
- 	u32 settings = 0;
- 
--	if (test_bit(HCI_UP, &hdev->flags))
--		settings |= MGMT_SETTING_POWERED;
--	else
-+	if (!test_bit(HCI_UP, &hdev->flags))
- 		return settings;
- 
-+	if (!test_bit(HCI_AUTO_OFF, &hdev->dev_flags))
-+		settings |= MGMT_SETTING_POWERED;
-+
- 	if (test_bit(HCI_PSCAN, &hdev->flags))
- 		settings |= MGMT_SETTING_CONNECTABLE;
- 
-@@ -623,9 +621,6 @@ static int read_controller_info(struct sock *sk, u16 index)
- 		return cmd_status(sk, index, MGMT_OP_READ_INFO,
- 						MGMT_STATUS_INVALID_PARAMS);
- 
--	if (test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags))
--		cancel_delayed_work_sync(&hdev->power_off);
--
- 	hci_dev_lock(hdev);
- 
- 	if (test_and_clear_bit(HCI_PI_MGMT_INIT, &hci_pi(sk)->flags))
-@@ -753,6 +748,16 @@ static int set_powered(struct sock *sk, u16 index, void *data, u16 len)
- 
- 	hci_dev_lock(hdev);
- 
-+	if (test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags)) {
-+		cancel_delayed_work(&hdev->power_off);
-+
-+		if (cp->val) {
-+			err = send_settings_rsp(sk, MGMT_OP_SET_POWERED, hdev);
-+			mgmt_powered(hdev, 1);
-+			goto failed;
-+		}
-+	}
-+
- 	up = test_bit(HCI_UP, &hdev->flags);
- 	if ((cp->val && up) || (!cp->val && !up)) {
- 		err = send_settings_rsp(sk, MGMT_OP_SET_POWERED, hdev);
+Ack.
+
 -- 
-1.7.7.6
-
+Luiz Augusto von Dentz
