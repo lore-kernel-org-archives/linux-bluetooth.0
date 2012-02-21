@@ -4,49 +4,35 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v2 1/2] gateway: Fix crash if SCO connection fails
-Date: Tue, 21 Feb 2012 17:46:49 +0100
-Message-Id: <1329842810-13449-2-git-send-email-frederic.dalleau@linux.intel.com>
-In-Reply-To: <1329842810-13449-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1329842810-13449-1-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v2 0/2] gateway: Fix crash if SCO connection fails
+Date: Tue, 21 Feb 2012 17:46:48 +0100
+Message-Id: <1329842810-13449-1-git-send-email-frederic.dalleau@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In some situations, a connect callback is created, but
-this callback is not added to media_owner. Thus when the owner
-is destroyed and at rfcomm disconnect, the callback is executed
-with an invalid pointer.
----
- audio/gateway.c |    5 +----
- 1 files changed, 1 insertions(+), 4 deletions(-)
+Hi
 
-diff --git a/audio/gateway.c b/audio/gateway.c
-index 163f7b5..131f93f 100644
---- a/audio/gateway.c
-+++ b/audio/gateway.c
-@@ -836,12 +836,9 @@ unsigned int gateway_request_stream(struct audio_device *dev,
- 				gateway_stream_cb_t cb, void *user_data)
- {
- 	struct gateway *gw = dev->gateway;
--	unsigned int id;
- 	GError *err = NULL;
- 	GIOChannel *io;
- 
--	id = connect_cb_new(gw, cb, user_data);
--
- 	if (!gw->rfcomm)
- 		get_records(dev);
- 	else if (!gw->sco) {
-@@ -858,7 +855,7 @@ unsigned int gateway_request_stream(struct audio_device *dev,
- 	} else
- 		g_idle_add(request_stream_cb, dev);
- 
--	return id;
-+	return connect_cb_new(gw, cb, user_data);
- }
- 
- int gateway_config_stream(struct audio_device *dev, gateway_stream_cb_t cb,
+The first patch is a resend of a previous patch with same name.
+The second one happens after the sco connection has failed : the disconnect
+watch is not removed when the media owner is freed upon error in acquire.
+
+Let me know what you think.
+
+Regards,
+Frédéric
+
+
+Frédéric Dalleau (2):
+  gateway: Fix crash if SCO connection fails
+  media: register disconnect watch at transport add
+
+ audio/gateway.c   |    5 +----
+ audio/transport.c |    6 +++---
+ 2 files changed, 4 insertions(+), 7 deletions(-)
+
 -- 
 1.7.5.4
 
