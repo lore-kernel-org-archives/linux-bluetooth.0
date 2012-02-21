@@ -2,36 +2,36 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 1/8] gobex: fix callback remove when canceling transfer
-Date: Tue, 21 Feb 2012 14:57:05 +0100
-Message-Id: <1329832632-3681-2-git-send-email-mikel.astiz.oss@gmail.com>
-In-Reply-To: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 0/8] Transfer cancelation
+Date: Tue, 21 Feb 2012 14:57:04 +0100
+Message-Id: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-This code path could lead to situations where the callback is later
-used, making the daemon crash.
----
- gobex/gobex.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+This patch series proposes several fixes regarding the cancelation of transfers.
 
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index 0665749..bc76e57 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -735,6 +735,9 @@ gboolean g_obex_cancel_req(GObex *obex, guint req_id, gboolean remove_callback)
- 			goto immediate_completion;
- 		}
- 
-+		if (remove_callback)
-+			obex->pending_req->rsp_func = NULL;
-+
- 		return TRUE;
- 	}
- 
+The goal is that the Cancel method defined in the transfer's D-Bus API should work for any registered transfer, be it in progress or queued. Currently none of them seem to work properly.
+
+This second version is mostly a refacting of the previous proposal, according to the review from Luiz. The exceptions are patch 4/9 which has now been dropped, and patch 7/9, which now prevents from setting the callback twice.
+
+Mikel Astiz (8):
+  gobex: fix callback remove when canceling transfer
+  client: fix obc_session_get_buffer
+  client: fix cancel when no agent present
+  client: process transfer queue only if none active
+  client: terminate queued transfers properly
+  client: expose obc_transfer_set_callback
+  client: fix canceling queued transfers
+  client: make sure callback does not match size
+
+ client/session.c  |   45 ++++++++++++++++++++++++++++++++++++++-------
+ client/transfer.c |   37 ++++++++++++++++++-------------------
+ client/transfer.h |   10 ++++++----
+ gobex/gobex.c     |    3 +++
+ 4 files changed, 65 insertions(+), 30 deletions(-)
+
 -- 
 1.7.6.5
 
