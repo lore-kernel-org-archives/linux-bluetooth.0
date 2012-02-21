@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd 4/9] client: remove unnecessary code
-Date: Tue, 21 Feb 2012 09:46:18 +0100
-Message-Id: <1329813983-26707-5-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd 1/9] gobex: fix callback remove when canceling transfer
+Date: Tue, 21 Feb 2012 09:46:15 +0100
+Message-Id: <1329813983-26707-2-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1329813983-26707-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1329813983-26707-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,39 +12,26 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-No pending requests will exist when session_free is reached, given that
-pending transfes always hold a reference to the session.
+This code path could lead to situations where the callback is later
+used, making the daemon crash.
 ---
- client/session.c |    8 +-------
- 1 files changed, 1 insertions(+), 7 deletions(-)
+ gobex/gobex.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/client/session.c b/client/session.c
-index e113d1f..160e015 100644
---- a/client/session.c
-+++ b/client/session.c
-@@ -179,11 +179,8 @@ static void session_free(struct obc_session *session)
- 		obc_agent_free(session->agent);
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index 0665749..bc76e57 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -735,6 +735,9 @@ gboolean g_obex_cancel_req(GObex *obex, guint req_id, gboolean remove_callback)
+ 			goto immediate_completion;
+ 		}
+ 
++		if (remove_callback)
++			obex->pending_req->rsp_func = NULL;
++
+ 		return TRUE;
  	}
  
--	if (session->queue) {
--		g_queue_foreach(session->queue, (GFunc) pending_request_free,
--									NULL);
-+	if (session->queue)
- 		g_queue_free(session->queue);
--	}
- 
- 	if (session->watch)
- 		g_dbus_remove_watch(session->conn, session->watch);
-@@ -200,9 +197,6 @@ static void session_free(struct obc_session *session)
- 	if (session->conn)
- 		dbus_connection_unref(session->conn);
- 
--	if (session->p)
--		pending_request_free(session->p);
--
- 	sessions = g_slist_remove(sessions, session);
- 
- 	g_free(session->path);
 -- 
 1.7.6.5
 
