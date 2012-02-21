@@ -1,33 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 21 Feb 2012 14:21:36 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Only keep controller up after init if
- powered on
-Message-ID: <20120221122136.GA31177@x220>
-References: <1329822865-12312-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329822865-12312-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1329813983-26707-9-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1329813983-26707-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1329813983-26707-9-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Tue, 21 Feb 2012 13:56:07 +0200
+Message-ID: <CABBYNZ+HCBZQr1OMOWu_g7neMC6Tk58k_rRLWoFgCiXmO7=q3w@mail.gmail.com>
+Subject: Re: [PATCH obexd 8/9] client: allow cancelling queued transfers
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Mikel,
 
-On Tue, Feb 21, 2012, Marcel Holtmann wrote:
-> When a new controller gets added to the system, it needs to be brought
-> up briefly to read basic information like features, BD_ADDR etc. and
-> after a timeout it will be brought back down.
-> 
-> The only command that should overwrite this timeout is the set power
-> command from the management interface. Just reading the controller
-> list or information is not a good reason to keep the controller up.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+On Tue, Feb 21, 2012 at 10:46 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>
+> The Cancel() method in the D-Bus api should also abort queued transfers,
+> which should just be removed from the queue.
 > ---
->  net/bluetooth/mgmt.c |   23 ++++++++++++++---------
->  1 files changed, 14 insertions(+), 9 deletions(-)
+>  client/transfer.c |   12 ++++++++----
+>  1 files changed, 8 insertions(+), 4 deletions(-)
+>
+> diff --git a/client/transfer.c b/client/transfer.c
+> index 2cf5786..f380cb7 100644
+> --- a/client/transfer.c
+> +++ b/client/transfer.c
+> @@ -143,11 +143,15 @@ static void obc_transfer_abort(struct obc_transfer *transfer)
+>  {
+>        struct transfer_callback *callback = transfer->callback;
+>
+> -       if (transfer->xfer == 0)
+> -               return;
+> +       if (transfer->xfer != 0) {
+> +               g_obex_cancel_transfer(transfer->xfer);
+> +               transfer->xfer = 0;
+> +       }
+>
+> -       g_obex_cancel_transfer(transfer->xfer);
+> -       transfer->xfer = 0;
+> +       if (transfer->obex != NULL) {
+> +               g_obex_unref(transfer->obex);
+> +               transfer->obex = NULL;
+> +       }
+>
+>        if (callback) {
+>                GError *err;
+> --
+> 1.7.6.5
 
-Applied to my bluetooth-next tree. Thanks.
+Looks, but this is a fix please update the commit message to make it clear.
 
-Johan
+-- 
+Luiz Augusto von Dentz
