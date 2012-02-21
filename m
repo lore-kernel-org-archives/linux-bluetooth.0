@@ -1,37 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 0/8] Transfer cancelation
-Date: Tue, 21 Feb 2012 14:57:04 +0100
-Message-Id: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 21 Feb 2012 14:21:52 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Don't send New Settings event during setup
+ power down
+Message-ID: <20120221122152.GB31177@x220>
+References: <1329824028-15497-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1329824028-15497-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Marcel,
 
-This patch series proposes several fixes regarding the cancelation of transfers.
+On Tue, Feb 21, 2012, Marcel Holtmann wrote:
+> When the controller gets brought up for initial setup, it will be brought
+> back down after a timeout. In that case, don't send a New Settings event.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_core.c |   20 +++++++++++---------
+>  1 files changed, 11 insertions(+), 9 deletions(-)
 
-The goal is that the Cancel method defined in the transfer's D-Bus API should work for any registered transfer, be it in progress or queued. Currently none of them seem to work properly.
+Applied to my bluetooth-next tree. Thanks.
 
-This second version is mostly a refacting of the previous proposal, according to the review from Luiz. The exceptions are patch 4/9 which has now been dropped, and patch 7/9, which now prevents from setting the callback twice.
-
-Mikel Astiz (8):
-  gobex: fix callback remove when canceling transfer
-  client: fix obc_session_get_buffer
-  client: fix cancel when no agent present
-  client: process transfer queue only if none active
-  client: terminate queued transfers properly
-  client: expose obc_transfer_set_callback
-  client: fix canceling queued transfers
-  client: make sure callback does not match size
-
- client/session.c  |   45 ++++++++++++++++++++++++++++++++++++++-------
- client/transfer.c |   37 ++++++++++++++++++-------------------
- client/transfer.h |   10 ++++++----
- gobex/gobex.c     |    3 +++
- 4 files changed, 65 insertions(+), 30 deletions(-)
-
--- 
-1.7.6.5
-
+Johan
