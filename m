@@ -1,82 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1329813983-26707-7-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1329813983-26707-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1329813983-26707-7-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Tue, 21 Feb 2012 13:40:16 +0200
-Message-ID: <CABBYNZLm2gFw8GjDvXf41iL88FuBY7+MpLw6LgSgbUH=jE-ZCg@mail.gmail.com>
-Subject: Re: [PATCH obexd 6/9] client: terminate queued transfers properly
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Don't send New Settings event during setup power down
+Date: Tue, 21 Feb 2012 12:33:48 +0100
+Message-Id: <1329824028-15497-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+When the controller gets brought up for initial setup, it will be brought
+back down after a timeout. In that case, don't send a New Settings event.
 
-On Tue, Feb 21, 2012 at 10:46 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> Previous implementation of session_terminate_transfer assumed that the
-> transfer being terminated would always be the active one. However, it
-> should be possible to cancel any queued transfer using the D-Bus api.
-> ---
->  client/session.c |   32 ++++++++++++++++++++++++--------
->  1 files changed, 24 insertions(+), 8 deletions(-)
->
-> diff --git a/client/session.c b/client/session.c
-> index eaabcf9..50a6a5d 100644
-> --- a/client/session.c
-> +++ b/client/session.c
-> @@ -762,18 +762,34 @@ static void session_terminate_transfer(struct obc_session *session,
->  {
->        struct pending_request *p = session->p;
->
-> -       if (p == NULL || p->transfer != transfer)
-> -               return;
-> -
->        obc_session_ref(session);
->
-> -       if (p->func)
-> -               p->func(session, gerr, p->data);
-> +       if (p != NULL && p->transfer == transfer) {
-> +               if (p->func)
-> +                       p->func(session, gerr, p->data);
->
-> -       pending_request_free(p);
-> -       session->p = NULL;
-> +               pending_request_free(p);
-> +               session->p = NULL;
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c |   20 +++++++++++---------
+ 1 files changed, 11 insertions(+), 9 deletions(-)
 
-Maybe a goto would be better here, since calling to callback and
-freeing the pending request should common.
-
-> -       session_process_queue(session);
-> +               session_process_queue(session);
-> +       } else {
-> +               GList *l;
-> +
-> +               for (l = session->queue->head; l; l = l->next) {
-> +                       p = l->data;
-> +
-> +                       if (p->transfer != transfer)
-> +                               continue;
-> +
-> +                       g_queue_delete_link(session->queue, l);
-> +
-> +                       if (p->func)
-> +                               p->func(session, gerr, p->data);
-> +
-> +                       pending_request_free(p);
-> +                       break;
-> +               }
-> +       }
-
-And here you can make use of g_queue_find_custom like we do in
-g_obex_cancel_req.
-
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index a7439ae..a787c9c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -739,9 +739,6 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 		hdev->discov_timeout = 0;
+ 	}
+ 
+-	if (test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags))
+-		cancel_delayed_work(&hdev->power_off);
+-
+ 	if (test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->dev_flags))
+ 		cancel_delayed_work(&hdev->service_cache);
+ 
+@@ -787,9 +784,11 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 	 * and no tasks are scheduled. */
+ 	hdev->close(hdev);
+ 
+-	hci_dev_lock(hdev);
+-	mgmt_powered(hdev, 0);
+-	hci_dev_unlock(hdev);
++	if (!test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags)) {
++		hci_dev_lock(hdev);
++		mgmt_powered(hdev, 0);
++		hci_dev_unlock(hdev);
++	}
+ 
+ 	/* Clear flags */
+ 	hdev->flags = 0;
+@@ -808,7 +807,12 @@ int hci_dev_close(__u16 dev)
+ 	hdev = hci_dev_get(dev);
+ 	if (!hdev)
+ 		return -ENODEV;
++
++	if (test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags))
++		cancel_delayed_work(&hdev->power_off);
++
+ 	err = hci_dev_do_close(hdev);
++
+ 	hci_dev_put(hdev);
+ 	return err;
+ }
+@@ -1102,9 +1106,7 @@ static void hci_power_off(struct work_struct *work)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+-	clear_bit(HCI_AUTO_OFF, &hdev->dev_flags);
+-
+-	hci_dev_close(hdev->id);
++	hci_dev_do_close(hdev);
+ }
+ 
+ static void hci_discov_off(struct work_struct *work)
 -- 
-Luiz Augusto von Dentz
+1.7.7.6
+
