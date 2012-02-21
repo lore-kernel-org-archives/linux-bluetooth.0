@@ -1,233 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/6] Bluetooth: mgmt: Allow connectable/discoverable changes in off state
-Date: Tue, 21 Feb 2012 19:43:44 +0200
-Message-Id: <1329846229-7919-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1329834858-22816-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1329834858-22816-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 21 Feb 2012 15:42:33 -0200
+Message-ID: <CAA37ikZvUdCgPqjDS=DjCzOn0Bz6MGpiiMmg_YuFBNLoQLvCeA@mail.gmail.com>
+Subject: Re: [RFC] Bluetooth: Add set_err to state_change callback
+From: Ulisses Furquim <ulisses@profusion.mobi>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Andrei,
 
-This patch makes it possible to toggle the connectable & discoverable
-settings when powered off. Two new hdev->dev_flags flags are added to
-track what the scan mode should be when the device is finally powered
-on.
+On Tue, Feb 21, 2012 at 12:34 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> There are several places in the code where l2cap_state_change and
+> l2cap_chan_set_err used together. With combining them we remove
+> socket lock in l2cap_send_disconn_req and simplify code in couple
+> of other places with a price of adding extra parameter err to
+> state_change.
+>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  include/net/bluetooth/l2cap.h |    3 +-
+>  net/bluetooth/l2cap_core.c    |   58 ++++++++++++++++++----------------------
+>  net/bluetooth/l2cap_sock.c    |    9 +++++-
+>  3 files changed, 36 insertions(+), 34 deletions(-)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci.h |    2 +
- net/bluetooth/hci_core.c    |    1 +
- net/bluetooth/mgmt.c        |   91 ++++++++++++++++++++++++++++++++++--------
- 3 files changed, 76 insertions(+), 18 deletions(-)
+While I see the benefit of removing function calls and also some code
+I'm not sure about this change now. We need to think of moving sock
+handling to l2cap_sock.c and for that we may have to work more on
+l2cap_ops indeed. However, we need to change ERTM state machine
+handling first, I'd say.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ec37049..169d2f8 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -96,6 +96,8 @@ enum {
- 	HCI_LE_SCAN,
- 	HCI_SSP_ENABLED,
- 	HCI_HS_ENABLED,
-+	HCI_CONNECTABLE,
-+	HCI_DISCOVERABLE,
- };
- 
- /* HCI ioctl defines */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a787c9c..9d19949 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -737,6 +737,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	if (hdev->discov_timeout > 0) {
- 		cancel_delayed_work(&hdev->discov_off);
- 		hdev->discov_timeout = 0;
-+		clear_bit(HCI_DISCOVERABLE, &hdev->dev_flags);
- 	}
- 
- 	if (test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->dev_flags))
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 0f87030..6311be7 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -398,10 +398,10 @@ static u32 get_current_settings(struct hci_dev *hdev)
- 	if (!test_bit(HCI_AUTO_OFF, &hdev->dev_flags))
- 		settings |= MGMT_SETTING_POWERED;
- 
--	if (test_bit(HCI_PSCAN, &hdev->flags))
-+	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
- 		settings |= MGMT_SETTING_CONNECTABLE;
- 
--	if (test_bit(HCI_ISCAN, &hdev->flags))
-+	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
- 		settings |= MGMT_SETTING_DISCOVERABLE;
- 
- 	if (test_bit(HCI_PAIRABLE, &hdev->dev_flags))
-@@ -804,6 +804,7 @@ static int set_discoverable(struct sock *sk, u16 index, void *data, u16 len)
- 	struct mgmt_cp_set_discoverable *cp = data;
- 	struct hci_dev *hdev;
- 	struct pending_cmd *cmd;
-+	u16 timeout;
- 	u8 scan;
- 	int err;
- 
-@@ -818,9 +819,11 @@ static int set_discoverable(struct sock *sk, u16 index, void *data, u16 len)
- 		return cmd_status(sk, index, MGMT_OP_SET_DISCOVERABLE,
- 						MGMT_STATUS_INVALID_PARAMS);
- 
-+	timeout = get_unaligned_le16(&cp->timeout);
-+
- 	hci_dev_lock(hdev);
- 
--	if (!hdev_is_powered(hdev)) {
-+	if (!hdev_is_powered(hdev) && timeout > 0) {
- 		err = cmd_status(sk, index, MGMT_OP_SET_DISCOVERABLE,
- 						MGMT_STATUS_NOT_POWERED);
- 		goto failed;
-@@ -833,8 +836,22 @@ static int set_discoverable(struct sock *sk, u16 index, void *data, u16 len)
- 		goto failed;
- 	}
- 
--	if (cp->val == test_bit(HCI_ISCAN, &hdev->flags) &&
--					test_bit(HCI_PSCAN, &hdev->flags)) {
-+	if (!test_bit(HCI_CONNECTABLE, &hdev->dev_flags)) {
-+		err = cmd_status(sk, index, MGMT_OP_SET_DISCOVERABLE,
-+							MGMT_STATUS_REJECTED);
-+		goto failed;
-+	}
-+
-+	if (!hdev_is_powered(hdev)) {
-+		if (cp->val)
-+			set_bit(HCI_DISCOVERABLE, &hdev->dev_flags);
-+		else
-+			clear_bit(HCI_DISCOVERABLE, &hdev->dev_flags);
-+		err = send_settings_rsp(sk, MGMT_OP_SET_DISCOVERABLE, hdev);
-+		goto failed;
-+	}
-+
-+	if (!!cp->val == test_bit(HCI_DISCOVERABLE, &hdev->dev_flags)) {
- 		err = send_settings_rsp(sk, MGMT_OP_SET_DISCOVERABLE, hdev);
- 		goto failed;
- 	}
-@@ -857,7 +874,7 @@ static int set_discoverable(struct sock *sk, u16 index, void *data, u16 len)
- 		mgmt_pending_remove(cmd);
- 
- 	if (cp->val)
--		hdev->discov_timeout = get_unaligned_le16(&cp->timeout);
-+		hdev->discov_timeout = timeout;
- 
- failed:
- 	hci_dev_unlock(hdev);
-@@ -888,8 +905,13 @@ static int set_connectable(struct sock *sk, u16 index, void *data, u16 len)
- 	hci_dev_lock(hdev);
- 
- 	if (!hdev_is_powered(hdev)) {
--		err = cmd_status(sk, index, MGMT_OP_SET_CONNECTABLE,
--						MGMT_STATUS_NOT_POWERED);
-+		if (cp->val)
-+			set_bit(HCI_CONNECTABLE, &hdev->dev_flags);
-+		else {
-+			clear_bit(HCI_CONNECTABLE, &hdev->dev_flags);
-+			clear_bit(HCI_DISCOVERABLE, &hdev->dev_flags);
-+		}
-+		err = send_settings_rsp(sk, MGMT_OP_SET_CONNECTABLE, hdev);
- 		goto failed;
- 	}
- 
-@@ -900,7 +922,7 @@ static int set_connectable(struct sock *sk, u16 index, void *data, u16 len)
- 		goto failed;
- 	}
- 
--	if (cp->val == test_bit(HCI_PSCAN, &hdev->flags)) {
-+	if (!!cp->val == test_bit(HCI_PSCAN, &hdev->flags)) {
- 		err = send_settings_rsp(sk, MGMT_OP_SET_CONNECTABLE, hdev);
- 		goto failed;
- 	}
-@@ -2881,9 +2903,22 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
- 	__le32 ev;
- 	int err;
- 
-+	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
-+		return 0;
-+
- 	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
- 
--	if (!powered) {
-+	if (powered) {
-+		u8 scan = 0;
-+
-+		if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
-+			scan |= SCAN_PAGE;
-+		if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
-+			scan |= SCAN_INQUIRY;
-+
-+		if (scan)
-+			hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
-+	} else {
- 		u8 status = ENETDOWN;
- 		mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
- 	}
-@@ -2902,15 +2937,25 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
- int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable)
- {
- 	struct cmd_lookup match = { NULL, hdev };
--	__le32 ev;
--	int err;
-+	bool changed = false;
-+	int err = 0;
- 
- 	mgmt_pending_foreach(MGMT_OP_SET_DISCOVERABLE, hdev, settings_rsp, &match);
- 
--	ev = cpu_to_le32(get_current_settings(hdev));
-+	if (discoverable) {
-+		if (!test_and_set_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
-+			changed = true;
-+	} else {
-+		if (test_and_clear_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
-+			changed = true;
-+	}
- 
--	err = mgmt_event(MGMT_EV_NEW_SETTINGS, hdev, &ev, sizeof(ev),
-+	if (changed) {
-+		__le32 ev = cpu_to_le32(get_current_settings(hdev));
-+		err = mgmt_event(MGMT_EV_NEW_SETTINGS, hdev, &ev, sizeof(ev),
- 								match.sk);
-+	}
-+
- 	if (match.sk)
- 		sock_put(match.sk);
- 
-@@ -2919,16 +2964,26 @@ int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable)
- 
- int mgmt_connectable(struct hci_dev *hdev, u8 connectable)
- {
--	__le32 ev;
- 	struct cmd_lookup match = { NULL, hdev };
--	int err;
-+	bool changed = false;
-+	int err = 0;
- 
- 	mgmt_pending_foreach(MGMT_OP_SET_CONNECTABLE, hdev, settings_rsp,
- 								&match);
- 
--	ev = cpu_to_le32(get_current_settings(hdev));
-+	if (connectable) {
-+		if (!test_and_set_bit(HCI_CONNECTABLE, &hdev->dev_flags))
-+			changed = true;
-+	} else {
-+		if (test_and_clear_bit(HCI_CONNECTABLE, &hdev->dev_flags))
-+			changed = true;
-+	}
- 
--	err = mgmt_event(MGMT_EV_NEW_SETTINGS, hdev, &ev, sizeof(ev), match.sk);
-+	if (changed) {
-+		__le32 ev = cpu_to_le32(get_current_settings(hdev));
-+		err = mgmt_event(MGMT_EV_NEW_SETTINGS, hdev, &ev, sizeof(ev),
-+								match.sk);
-+	}
- 
- 	if (match.sk)
- 		sock_put(match.sk);
+Regards,
+
 -- 
-1.7.9
-
+Ulisses Furquim
+ProFUSION embedded systems
+http://profusion.mobi
+Mobile: +55 19 9250 0942
+Skype: ulissesffs
