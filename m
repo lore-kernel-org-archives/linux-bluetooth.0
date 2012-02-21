@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 08/14] Bluetooth: Use chan lock in L2CAP sig commands
-Date: Tue, 21 Feb 2012 12:55:01 +0200
-Message-Id: <1329821707-11817-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 10/14] Bluetooth: Use chan lock in receiving data
+Date: Tue, 21 Feb 2012 12:55:03 +0200
+Message-Id: <1329821707-11817-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1329821707-11817-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1329821707-11817-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,293 +11,80 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Convert sk lock to chan lock for L2CAP signalling commands.
+Change locking logic when receiving ACL and L2CAP data.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |   61 +++++++++++++++++++++++++------------------
- net/bluetooth/l2cap_sock.c |    7 +++-
- 2 files changed, 40 insertions(+), 28 deletions(-)
+ net/bluetooth/l2cap_core.c |   11 +++++------
+ net/bluetooth/l2cap_sock.c |   11 +++++++++--
+ 2 files changed, 14 insertions(+), 8 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index c008608..ab6bede 100644
+index d5380ce..24c7729 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -377,6 +377,8 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 		hci_conn_put(conn->hcon);
- 	}
- 
-+	lock_sock(sk);
-+
- 	__l2cap_state_change(chan, BT_CLOSED);
- 	sock_set_flag(sk, SOCK_ZAPPED);
- 
-@@ -389,6 +391,8 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 	} else
- 		sk->sk_state_change(sk);
- 
-+	release_sock(sk);
-+
- 	if (!(test_bit(CONF_OUTPUT_DONE, &chan->conf_state) &&
- 			test_bit(CONF_INPUT_DONE, &chan->conf_state)))
- 		return;
-@@ -421,10 +425,10 @@ static void l2cap_chan_cleanup_listen(struct sock *parent)
- 	while ((sk = bt_accept_dequeue(parent, NULL))) {
- 		struct l2cap_chan *chan = l2cap_pi(sk)->chan;
- 
-+		l2cap_chan_lock(chan);
- 		__clear_chan_timer(chan);
--		lock_sock(sk);
- 		l2cap_chan_close(chan, ECONNRESET);
--		release_sock(sk);
-+		l2cap_chan_unlock(chan);
- 
- 		chan->ops->close(chan->data);
- 	}
-@@ -440,10 +444,12 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
- 
- 	switch (chan->state) {
- 	case BT_LISTEN:
-+		lock_sock(sk);
- 		l2cap_chan_cleanup_listen(sk);
- 
- 		__l2cap_state_change(chan, BT_CLOSED);
- 		sock_set_flag(sk, SOCK_ZAPPED);
-+		release_sock(sk);
- 		break;
- 
- 	case BT_CONNECTED:
-@@ -486,7 +492,9 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
- 		break;
- 
- 	default:
-+		lock_sock(sk);
- 		sock_set_flag(sk, SOCK_ZAPPED);
-+		release_sock(sk);
- 		break;
- 	}
- }
-@@ -714,6 +722,7 @@ static inline int l2cap_mode_supported(__u8 mode, __u32 feat_mask)
- 
- static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *chan, int err)
+@@ -4262,7 +4262,6 @@ drop:
+ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk_buff *skb)
  {
-+	struct sock *sk = chan->sk;
- 	struct l2cap_disconn_req req;
- 
- 	if (!conn)
-@@ -730,8 +739,10 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
- 	l2cap_send_cmd(conn, l2cap_get_ident(conn),
- 			L2CAP_DISCONN_REQ, sizeof(req), &req);
- 
-+	lock_sock(sk);
- 	__l2cap_state_change(chan, BT_DISCONN);
- 	__l2cap_chan_set_err(chan, err);
-+	release_sock(sk);
- }
- 
- /* ---- L2CAP connections ---- */
-@@ -992,7 +1003,6 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- {
- 	struct l2cap_conn *conn = hcon->l2cap_data;
- 	struct l2cap_chan *chan, *l;
--	struct sock *sk;
- 
- 	if (!conn)
- 		return;
-@@ -1005,10 +1015,12 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 
- 	/* Kill channels */
- 	list_for_each_entry_safe(chan, l, &conn->chan_l, list) {
--		sk = chan->sk;
--		lock_sock(sk);
-+		l2cap_chan_lock(chan);
-+
- 		l2cap_chan_del(chan, err);
--		release_sock(sk);
-+
-+		l2cap_chan_unlock(chan);
-+
- 		chan->ops->close(chan->data);
- 	}
- 
-@@ -2666,7 +2678,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 
- 	bt_accept_enqueue(parent, sk);
- 
--	l2cap_chan_add(conn, chan);
-+	__l2cap_chan_add(conn, chan);
- 
- 	dcid = chan->scid;
- 
-@@ -2739,7 +2751,6 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 	struct l2cap_conn_rsp *rsp = (struct l2cap_conn_rsp *) data;
- 	u16 scid, dcid, result, status;
  	struct l2cap_chan *chan;
--	struct sock *sk;
- 	u8 req[128];
- 	int err;
- 
-@@ -2769,8 +2780,7 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 
- 	err = 0;
- 
--	sk = chan->sk;
--	lock_sock(sk);
-+	l2cap_chan_lock(chan);
- 
- 	switch (result) {
- 	case L2CAP_CR_SUCCESS:
-@@ -2796,7 +2806,7 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 		break;
- 	}
- 
--	release_sock(sk);
-+	l2cap_chan_unlock(chan);
- 
- unlock:
- 	mutex_unlock(&conn->chan_lock);
-@@ -2821,7 +2831,6 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	u16 dcid, flags;
- 	u8 rsp[64];
- 	struct l2cap_chan *chan;
--	struct sock *sk;
+-	struct sock *sk = NULL;
+ 	u32 control;
+ 	u16 tx_seq;
  	int len;
- 
- 	dcid  = __le16_to_cpu(req->dcid);
-@@ -2833,8 +2842,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	if (!chan)
- 		return -ENOENT;
+@@ -4270,11 +4269,12 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 	chan = l2cap_get_chan_by_scid(conn, cid);
+ 	if (!chan) {
+ 		BT_DBG("unknown cid 0x%4.4x", cid);
+-		goto drop;
++		/* Drop packet and return */
++		kfree(skb);
++		return 0;
+ 	}
  
 -	sk = chan->sk;
 -	lock_sock(sk);
 +	l2cap_chan_lock(chan);
  
- 	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2) {
- 		struct l2cap_cmd_rej_cid rej;
-@@ -2923,7 +2931,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	}
+ 	BT_DBG("chan %p, len %d", chan, skb->len);
  
- unlock:
--	release_sock(sk);
-+	l2cap_chan_unlock(chan);
- 	return 0;
- }
- 
-@@ -2932,7 +2940,6 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	struct l2cap_conf_rsp *rsp = (struct l2cap_conf_rsp *)data;
- 	u16 scid, flags, result;
- 	struct l2cap_chan *chan;
--	struct sock *sk;
- 	int len = cmd->len - sizeof(*rsp);
- 
- 	scid   = __le16_to_cpu(rsp->scid);
-@@ -2946,8 +2953,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	if (!chan)
- 		return 0;
- 
--	sk = chan->sk;
--	lock_sock(sk);
-+	l2cap_chan_lock(chan);
- 
- 	switch (result) {
- 	case L2CAP_CONF_SUCCESS:
-@@ -3006,7 +3012,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		}
- 
- 	default:
--		__l2cap_chan_set_err(chan, ECONNRESET);
-+		l2cap_chan_set_err(chan, ECONNRESET);
- 
- 		__set_chan_timer(chan,
- 				msecs_to_jiffies(L2CAP_DISC_REJ_TIMEOUT));
-@@ -3033,7 +3039,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	}
+@@ -4345,8 +4345,7 @@ drop:
+ 	kfree_skb(skb);
  
  done:
--	release_sock(sk);
+-	if (sk)
+-		release_sock(sk);
 +	l2cap_chan_unlock(chan);
+ 
  	return 0;
  }
- 
-@@ -3058,17 +3064,21 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
- 		return 0;
- 	}
- 
-+	l2cap_chan_lock(chan);
-+
- 	sk = chan->sk;
--	lock_sock(sk);
- 
- 	rsp.dcid = cpu_to_le16(chan->scid);
- 	rsp.scid = cpu_to_le16(chan->dcid);
- 	l2cap_send_cmd(conn, cmd->ident, L2CAP_DISCONN_RSP, sizeof(rsp), &rsp);
- 
-+	lock_sock(sk);
- 	sk->sk_shutdown = SHUTDOWN_MASK;
-+	release_sock(sk);
- 
- 	l2cap_chan_del(chan, ECONNRESET);
--	release_sock(sk);
-+
-+	l2cap_chan_unlock(chan);
- 
- 	chan->ops->close(chan->data);
- 
-@@ -3082,7 +3092,6 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
- 	struct l2cap_disconn_rsp *rsp = (struct l2cap_disconn_rsp *) data;
- 	u16 dcid, scid;
- 	struct l2cap_chan *chan;
--	struct sock *sk;
- 
- 	scid = __le16_to_cpu(rsp->scid);
- 	dcid = __le16_to_cpu(rsp->dcid);
-@@ -3097,11 +3106,11 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
- 		return 0;
- 	}
- 
--	sk = chan->sk;
--	lock_sock(sk);
-+	l2cap_chan_lock(chan);
- 
- 	l2cap_chan_del(chan, 0);
--	release_sock(sk);
-+
-+	l2cap_chan_unlock(chan);
- 
- 	chan->ops->close(chan->data);
- 
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 1273fcb..db38fae 100644
+index db38fae..a278858 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -809,15 +809,18 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
+@@ -877,8 +877,12 @@ static int l2cap_sock_recv_cb(void *data, struct sk_buff *skb)
+ 	struct sock *sk = data;
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
  
- 	if (conn)
- 		mutex_lock(&conn->chan_lock);
--
-+	l2cap_chan_lock(chan);
- 	lock_sock(sk);
+-	if (pi->rx_busy_skb)
+-		return -ENOMEM;
++	lock_sock(sk);
 +
- 	if (!sk->sk_shutdown) {
- 		if (chan->mode == L2CAP_MODE_ERTM)
- 			err = __l2cap_wait_ack(sk);
++	if (pi->rx_busy_skb) {
++		err = -ENOMEM;
++		goto done;
++	}
  
- 		sk->sk_shutdown = SHUTDOWN_MASK;
+ 	err = sock_queue_rcv_skb(sk, skb);
  
-+		release_sock(sk);
- 		l2cap_chan_close(chan, 0);
-+		lock_sock(sk);
+@@ -897,6 +901,9 @@ static int l2cap_sock_recv_cb(void *data, struct sk_buff *skb)
+ 		err = 0;
+ 	}
  
- 		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime)
- 			err = bt_sock_wait_state(sk, BT_CLOSED,
-@@ -828,7 +831,7 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
- 		err = -sk->sk_err;
- 
- 	release_sock(sk);
--
-+	l2cap_chan_unlock(chan);
- 	if (conn)
- 		mutex_unlock(&conn->chan_lock);
++done:
++	release_sock(sk);
++
+ 	return err;
+ }
  
 -- 
 1.7.9
