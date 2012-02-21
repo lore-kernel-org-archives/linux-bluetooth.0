@@ -1,36 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd 0/9] Transfer cancelation
-Date: Tue, 21 Feb 2012 09:46:14 +0100
-Message-Id: <1329813983-26707-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH] Bluetooth: Fix parameter list for setting local name
+Date: Tue, 21 Feb 2012 08:14:26 +0100
+Message-Id: <1329808466-30669-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+The parameter list for setting the local name via management interface
+was missing the short name parameter.
 
-This patch series proposes several fixes regarding the cancelation of transfers.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/mgmt.h |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-The goal is that the Cancel method defined in the transfer's D-Bus API should work for any registered transfer, be it in progress or queued. Currently none of them seem to work properly.
-
-Mikel Astiz (9):
-  gobex: fix callback remove when canceling transfer
-  client: fix obc_session_get_buffer
-  client: deny cancel when no agent present
-  client: remove unnecessary code
-  client: process transfer queue only if none active
-  client: terminate queued transfers properly
-  client: expose obc_transfer_set_callback
-  client: allow cancelling queued transfers
-  client: make sure callback does not match size
-
- client/session.c  |   58 +++++++++++++++++++++++++++++++++++-----------------
- client/transfer.c |   32 ++++++++++++----------------
- client/transfer.h |   10 +++++---
- gobex/gobex.c     |    3 ++
- 4 files changed, 62 insertions(+), 41 deletions(-)
-
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 1dbadbe..ac59cdd 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -135,6 +135,7 @@ struct mgmt_cp_set_dev_class {
+ #define MGMT_OP_SET_LOCAL_NAME		0x000F
+ struct mgmt_cp_set_local_name {
+ 	__u8 name[MGMT_MAX_NAME_LENGTH];
++	__u8 short_name[MGMT_MAX_SHORT_NAME_LENGTH];
+ } __packed;
+ 
+ #define MGMT_OP_ADD_UUID		0x0010
 -- 
-1.7.6.5
+1.7.7.6
 
