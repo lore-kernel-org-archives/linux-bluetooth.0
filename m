@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZKSLy6KYfKd8aBfb5DzG_ofihzVHcm6OBPuBcBne0j88g@mail.gmail.com>
+In-Reply-To: <1329813983-26707-4-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1329813983-26707-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1329813983-26707-2-git-send-email-mikel.astiz.oss@gmail.com>
-	<CABBYNZKSLy6KYfKd8aBfb5DzG_ofihzVHcm6OBPuBcBne0j88g@mail.gmail.com>
-Date: Tue, 21 Feb 2012 13:16:04 +0200
-Message-ID: <CABBYNZ+kP5f1hxZiDhmZiqEVtWGc7myZVD-hN5EpX23E0TP0_w@mail.gmail.com>
-Subject: Re: [PATCH obexd 1/9] gobex: fix callback remove when canceling transfer
+	<1329813983-26707-4-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Tue, 21 Feb 2012 13:12:28 +0200
+Message-ID: <CABBYNZJp7iQ5N4df0h4pfCW8szV5xkvAs9Xm_ahv5Z26w8nY0w@mail.gmail.com>
+Subject: Re: [PATCH obexd 3/9] client: deny cancel when no agent present
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Mikel Astiz <mikel.astiz.oss@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
@@ -17,43 +16,33 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mikel,
 
-On Tue, Feb 21, 2012 at 1:02 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Mikel,
+On Tue, Feb 21, 2012 at 10:46 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 >
-> On Tue, Feb 21, 2012 at 10:46 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
->> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->>
->> This code path could lead to situations where the callback is later
->> used, making the daemon crash.
->> ---
->>  gobex/gobex.c |    3 +++
->>  1 files changed, 3 insertions(+), 0 deletions(-)
->>
->> diff --git a/gobex/gobex.c b/gobex/gobex.c
->> index 0665749..bc76e57 100644
->> --- a/gobex/gobex.c
->> +++ b/gobex/gobex.c
->> @@ -735,6 +735,9 @@ gboolean g_obex_cancel_req(GObex *obex, guint req_id, gboolean remove_callback)
->>                        goto immediate_completion;
->>                }
->>
->> +               if (remove_callback)
->> +                       obex->pending_req->rsp_func = NULL;
->> +
+> The authorization check should consider the scenario of no agent being
+> assigned to the transfer.
+> ---
+>  client/transfer.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 >
-> I see the problem, so we are keeping the pending request because of
-> the abort response, Im just not sure why we need to report an error if
-> cancelled is set on handle_response. So perhaps the right place to fix
-> this is in handle_response as soon as it checks for cancelled it
-> should skip to the point it frees the pending call, in other words we
-> should never need to report G_OBEX_ERROR_CANCELLED for requests since
-> we are the ones cancelling them.
+> diff --git a/client/transfer.c b/client/transfer.c
+> index 157811d..4054799 100644
+> --- a/client/transfer.c
+> +++ b/client/transfer.c
+> @@ -168,7 +168,7 @@ static DBusMessage *obc_transfer_cancel(DBusConnection *connection,
+>        DBusMessage *reply;
+>
+>        sender = dbus_message_get_sender(message);
+> -       if (g_str_equal(transfer->agent, sender) == FALSE)
+> +       if (g_strcmp0(transfer->agent, sender) != 0)
+>                return g_dbus_create_error(message,
+>                                "org.openobex.Error.NotAuthorized",
+>                                "Not Authorized");
+> --
+> 1.7.6.5
 
-Actually this is correct, since when remove_callback is FALSE we still
-call the callback so G_OBEX_ERROR_CANCELLED makes sense.
-
-Ack.
+This is actually a fix, g_str_equal does not do NULL-safe comparisons,
+could you please make this clear in your commit message.
 
 -- 
 Luiz Augusto von Dentz
