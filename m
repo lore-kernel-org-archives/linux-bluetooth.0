@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 3/8] client: fix cancel when no agent present
-Date: Tue, 21 Feb 2012 14:57:07 +0100
-Message-Id: <1329832632-3681-4-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 1/8] gobex: fix callback remove when canceling transfer
+Date: Tue, 21 Feb 2012 14:57:05 +0100
+Message-Id: <1329832632-3681-2-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,25 +12,26 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The authorization check should consider the scenario of no agent being
-assigned to the transfer.
+This code path could lead to situations where the callback is later
+used, making the daemon crash.
 ---
- client/transfer.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ gobex/gobex.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 157811d..4054799 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -168,7 +168,7 @@ static DBusMessage *obc_transfer_cancel(DBusConnection *connection,
- 	DBusMessage *reply;
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index 0665749..bc76e57 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -735,6 +735,9 @@ gboolean g_obex_cancel_req(GObex *obex, guint req_id, gboolean remove_callback)
+ 			goto immediate_completion;
+ 		}
  
- 	sender = dbus_message_get_sender(message);
--	if (g_str_equal(transfer->agent, sender) == FALSE)
-+	if (g_strcmp0(transfer->agent, sender) != 0)
- 		return g_dbus_create_error(message,
- 				"org.openobex.Error.NotAuthorized",
- 				"Not Authorized");
++		if (remove_callback)
++			obex->pending_req->rsp_func = NULL;
++
+ 		return TRUE;
+ 	}
+ 
 -- 
 1.7.6.5
 
