@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 8/8] client: make sure callback does not match size
-Date: Tue, 21 Feb 2012 14:57:12 +0100
-Message-Id: <1329832632-3681-9-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 5/8] client: terminate queued transfers properly
+Date: Tue, 21 Feb 2012 14:57:09 +0100
+Message-Id: <1329832632-3681-6-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,34 +12,65 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Otherwise it can be interpreted as successfully finished, which has its
-own code path.
+Previous implementation of session_terminate_transfer assumed that the
+transfer being terminated would always be the active one. However, it
+should be possible to cancel any queued transfer using the D-Bus api.
 ---
- client/transfer.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ client/session.c |   27 +++++++++++++++++++++++----
+ 1 files changed, 23 insertions(+), 4 deletions(-)
 
-diff --git a/client/transfer.c b/client/transfer.c
-index dea9a2a..e749465 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -395,7 +395,7 @@ static void get_buf_xfer_progress(GObex *obex, GError *err, GObexPacket *rsp,
- 							transfer, &err);
- 	}
- 
--	if (callback)
-+	if (callback && transfer->transferred != transfer->size)
- 		callback->func(transfer, transfer->transferred, err,
- 							callback->data);
+diff --git a/client/session.c b/client/session.c
+index 7f387d4..3429f0a 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -764,14 +764,31 @@ static void session_process_queue(struct obc_session *session)
+ 	obc_session_unref(session);
  }
-@@ -439,7 +439,7 @@ static gboolean get_xfer_progress(const void *buf, gsize len,
- 		transfer->filled -= w;
- 	}
  
--	if (callback)
-+	if (callback && transfer->transferred != transfer->size)
- 		callback->func(transfer, transfer->transferred, NULL,
- 							callback->data);
++static gint pending_transfer_cmptransfer(gconstpointer a, gconstpointer b)
++{
++	const struct pending_request *p = a;
++	const struct obc_transfer *transfer = b;
++
++	return p->transfer < transfer ? -1 : (p->transfer > transfer ? 1 : 0);
++}
++
+ static void session_terminate_transfer(struct obc_session *session,
+ 					struct obc_transfer *transfer,
+ 					GError *gerr)
+ {
+ 	struct pending_request *p = session->p;
  
+-	if (p == NULL || p->transfer != transfer)
+-		return;
++	if (p == NULL || p->transfer != transfer) {
++		GList *match;
++
++		match = g_list_find_custom(session->queue->head, transfer,
++						pending_transfer_cmptransfer);
++		if (match == NULL)
++			return;
++
++		p = match->data;
++		g_queue_delete_link(session->queue, match);
++	}
+ 
+ 	obc_session_ref(session);
+ 
+@@ -779,9 +796,11 @@ static void session_terminate_transfer(struct obc_session *session,
+ 		p->func(session, gerr, p->data);
+ 
+ 	pending_request_free(p);
+-	session->p = NULL;
+ 
+-	session_process_queue(session);
++	if (p == session->p) {
++		session->p = NULL;
++		session_process_queue(session);
++	}
+ 
+ 	obc_session_unref(session);
+ }
 -- 
 1.7.6.5
 
