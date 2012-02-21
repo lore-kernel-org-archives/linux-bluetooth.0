@@ -1,76 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <921769CBC00A43F9A939E3FA39843F27@sisodomain.com>
-From: Jaganath <jaganath.k@samsung.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-References: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
- <1329832632-3681-8-git-send-email-mikel.astiz.oss@gmail.com>
-In-reply-to: <1329832632-3681-8-git-send-email-mikel.astiz.oss@gmail.com>
-Subject: Re: [PATCH obexd v2 7/8] client: fix canceling queued transfers
-Date: Wed, 22 Feb 2012 17:11:39 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
+Date: Tue, 21 Feb 2012 21:24:32 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv1 00/14] Bluetooth: Change socket lock to l2cap_chan lock
+Message-ID: <20120221192432.GA9980@x220.P-661HNU-F1>
+References: <1329821707-11817-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1329821707-11817-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Andrei,
 
---------------------------------------------------
-From: "Mikel Astiz" <mikel.astiz.oss@gmail.com>
-Sent: Tuesday, February 21, 2012 7:27 PM
-To: <linux-bluetooth@vger.kernel.org>
-Cc: "Mikel Astiz" <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 7/8] client: fix canceling queued transfers
+On Tue, Feb 21, 2012, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Changing socket lock to L2CAP chan lock in L2CAP code. Needed for implementing
+> protocol above L2CAP without creating sockets.
+> 
+> Changes:
+> 	* PATCHv1: Added extra line (per Gustavo comment)
+> 	* RFCv6: Same code but patches 2,3 and 4 from RFCv5 are merged together
+> 	following recommendations from review.
+> 	* RFCv5: Fixed locking bug in l2cap_data_channel, added locks in 
+> 	l2cap_sock_shutdown function, fixed several styles issues.
+> 	* RFCv4: Better split patches so they looks more clear and obvious,
+> 	taking coments about naming change and delete unused vars. See diff change
+> 	from the previous version below:
+> 	* RFCv3: Split the big patch to several small (I believe logical) chunks,
+> 	remove unneded locks from cleanup_listen, use the same arguments for
+> 	locked/unlocked socket error functions.
+> 	* RFCv2: Convert l2cap channel list back to mutex from RCU list.
+> 
+> Andrei Emeltchenko (14):
+>   Bluetooth: trivial: Fix long line
+>   Bluetooth: Revert to mutexes from RCU list
+>   Bluetooth: Add l2cap_chan_lock
+>   Bluetooth: Add locked and unlocked state_change
+>   Bluetooth: Add socket error function
+>   Bluetooth: Add unlocked __l2cap_chan_add function
+>   Bluetooth: Use chan lock in timers
+>   Bluetooth: Use chan lock in L2CAP sig commands
+>   Bluetooth: Use chan lock in L2CAP conn start
+>   Bluetooth: Use chan lock in receiving data
+>   Bluetooth: Change locking logic for conn/chan ready
+>   Bluetooth: Change locking logic in security_cfm
+>   Bluetooth: Use l2cap chan lock in socket connect
+>   Bluetooth: Remove socket lock check
+> 
+>  include/net/bluetooth/l2cap.h |   11 ++
+>  net/bluetooth/l2cap_core.c    |  392 +++++++++++++++++++++++++----------------
+>  net/bluetooth/l2cap_sock.c    |   34 +++-
+>  3 files changed, 281 insertions(+), 156 deletions(-)
 
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> The Cancel() method in the D-Bus api should also abort queued transfers,
-> which should just be removed from the queue.
-> ---
-> client/transfer.c |   12 ++++++++----
-> 1 files changed, 8 insertions(+), 4 deletions(-)
->
-> diff --git a/client/transfer.c b/client/transfer.c
-> index b470a3a..dea9a2a 100644
-> --- a/client/transfer.c
-> +++ b/client/transfer.c
-> @@ -143,11 +143,15 @@ static void obc_transfer_abort(struct obc_transfer 
-> *transfer)
-> {
->  struct transfer_callback *callback = transfer->callback;
->
-> - if (transfer->xfer == 0)
-> - return;
-> + if (transfer->xfer != 0) {
-> + g_obex_cancel_transfer(transfer->xfer);
-> + transfer->xfer = 0;
-> + }
->
-> - g_obex_cancel_transfer(transfer->xfer);
-> - transfer->xfer = 0;
-> + if (transfer->obex != NULL) {
-> + g_obex_unref(transfer->obex);
-> + transfer->obex = NULL;
-> + }
+Patches 1-5 have been applied to my bluetooth-next tree, so no need to
+resend them. Thanks.
 
-If transfer->obex is unrefed here then the queued ABORT packet will not be 
-sent.
-This will create problem with PTS which requires ABORT command before 
-transport disconnection
-
->
->  if (callback) {
->  GError *err;
-> -- 
-> 1.7.6.5
->
-> --
-
-Regards
-Jaganath
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html 
-
+Johan
