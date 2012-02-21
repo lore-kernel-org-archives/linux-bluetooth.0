@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd 1/9] gobex: fix callback remove when canceling transfer
-Date: Tue, 21 Feb 2012 09:46:15 +0100
-Message-Id: <1329813983-26707-2-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd 2/9] client: fix obc_session_get_buffer
+Date: Tue, 21 Feb 2012 09:46:16 +0100
+Message-Id: <1329813983-26707-3-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1329813983-26707-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1329813983-26707-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,25 +12,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-This code path could lead to situations where the callback is later
-used, making the daemon crash.
+Size 0 should be reported if no transfer exists. Some existing code
+relies on this behavior.
 ---
- gobex/gobex.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ client/session.c |    6 +++++-
+ 1 files changed, 5 insertions(+), 1 deletions(-)
 
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index 0665749..bc76e57 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -735,6 +735,9 @@ gboolean g_obex_cancel_req(GObex *obex, guint req_id, gboolean remove_callback)
- 			goto immediate_completion;
- 		}
+diff --git a/client/session.c b/client/session.c
+index 85f466a..e113d1f 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -1128,8 +1128,12 @@ const char *obc_session_get_buffer(struct obc_session *session, size_t *size)
+ 	const char *buf;
  
-+		if (remove_callback)
-+			obex->pending_req->rsp_func = NULL;
+ 	transfer = obc_session_get_transfer(session);
+-	if (transfer == NULL)
++	if (transfer == NULL) {
++		if (size != NULL)
++			*size = 0;
 +
- 		return TRUE;
- 	}
+ 		return NULL;
++	}
+ 
+ 	buf = obc_transfer_get_buffer(transfer, size);
  
 -- 
 1.7.6.5
