@@ -1,49 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 21 Feb 2012 12:57:37 +0200
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Ulisses Furquim <ulisses@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv6 00/14] Bluetooth: Change socket lock to l2cap_chan lock
+Message-ID: <20120221105735.GC6118@aemeltch-MOBL1>
+References: <1329747685-4163-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1329748173.2172.0.camel@aeonflux>
+ <20120220144453.GE27197@aemeltch-MOBL1>
+ <CAA37ikaRSnvSYXgDDh7mviFwSC2Ex=XoDLQ8JfBfNwEgwTxBaQ@mail.gmail.com>
+ <1329749594.2172.2.camel@aeonflux>
 MIME-Version: 1.0
-In-Reply-To: <1329813983-26707-2-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1329813983-26707-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1329813983-26707-2-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Tue, 21 Feb 2012 13:02:45 +0200
-Message-ID: <CABBYNZKSLy6KYfKd8aBfb5DzG_ofihzVHcm6OBPuBcBne0j88g@mail.gmail.com>
-Subject: Re: [PATCH obexd 1/9] gobex: fix callback remove when canceling transfer
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1329749594.2172.2.camel@aeonflux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi all,
 
-On Tue, Feb 21, 2012 at 10:46 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> This code path could lead to situations where the callback is later
-> used, making the daemon crash.
-> ---
->  gobex/gobex.c |    3 +++
->  1 files changed, 3 insertions(+), 0 deletions(-)
->
-> diff --git a/gobex/gobex.c b/gobex/gobex.c
-> index 0665749..bc76e57 100644
-> --- a/gobex/gobex.c
-> +++ b/gobex/gobex.c
-> @@ -735,6 +735,9 @@ gboolean g_obex_cancel_req(GObex *obex, guint req_id, gboolean remove_callback)
->                        goto immediate_completion;
->                }
->
-> +               if (remove_callback)
-> +                       obex->pending_req->rsp_func = NULL;
-> +
+On Mon, Feb 20, 2012 at 03:53:14PM +0100, Marcel Holtmann wrote:
+> > >> so what is the general status of this patch series. Are there still
+> > >> concerns or opens? Or should it be go for final review and be merged?
+> > >
+> > > The code looks now good enough for final review.
+> > 
+> > Marcel, the code looks good for final review and merge. The only thing
+> > concerns me is the change to chan->lock instead of sock lock seems to
+> > be split too much. I mean that we have this change done in a series of
+> > patches while it might be better to change everything at once. Not
+> > sure if worrying about intermediate states here is something you care
+> > or not, though, because I'm almost sure they'll be broken doing it in
+> > small pieces.
+> 
+> I am fine either way at this point.
 
-I see the problem, so we are keeping the pending request because of
-the abort response, Im just not sure why we need to report an error if
-cancelled is set on handle_response. So perhaps the right place to fix
-this is in handle_response as soon as it checks for cancelled it
-should skip to the point it frees the pending call, in other words we
-should never need to report G_OBEX_ERROR_CANCELLED for requests since
-we are the ones cancelling them.
+Then I send patches as is, if there is need to merge some patches this can
+be easily done.
 
--- 
-Luiz Augusto von Dentz
+Best regards 
+Andrei Emeltchenko 
+
