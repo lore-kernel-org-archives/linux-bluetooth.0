@@ -1,289 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: Add set_err to state_change callback
-Date: Tue, 21 Feb 2012 16:34:18 +0200
-Message-Id: <1329834858-22816-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH obexd v2 7/8] client: fix canceling queued transfers
+Date: Tue, 21 Feb 2012 14:57:11 +0100
+Message-Id: <1329832632-3681-8-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-There are several places in the code where l2cap_state_change and
-l2cap_chan_set_err used together. With combining them we remove
-socket lock in l2cap_send_disconn_req and simplify code in couple
-of other places with a price of adding extra parameter err to
-state_change.
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+The Cancel() method in the D-Bus api should also abort queued transfers,
+which should just be removed from the queue.
 ---
- include/net/bluetooth/l2cap.h |    3 +-
- net/bluetooth/l2cap_core.c    |   58 ++++++++++++++++++----------------------
- net/bluetooth/l2cap_sock.c    |    9 +++++-
- 3 files changed, 36 insertions(+), 34 deletions(-)
+ client/transfer.c |   12 ++++++++----
+ 1 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index ff56daf..2450b7c 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -511,7 +511,8 @@ struct l2cap_ops {
- 	int			(*send) (struct l2cap_chan *chan,
- 				struct msghdr *msg, size_t len, u32 priority);
- 	void			(*close) (void *data);
--	void			(*state_change) (void *data, int state);
-+	void			(*state_change) (void *data, int state,
-+								int err);
- 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
- 					unsigned long len, int nb, int *err);
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9870134..f84ee02 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -200,32 +200,32 @@ static u16 l2cap_alloc_cid(struct l2cap_conn *conn)
- 	return 0;
- }
- 
--static void __l2cap_state_change(struct l2cap_chan *chan, int state)
-+static void __l2cap_state_change(struct l2cap_chan *chan, int state, int err)
+diff --git a/client/transfer.c b/client/transfer.c
+index b470a3a..dea9a2a 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -143,11 +143,15 @@ static void obc_transfer_abort(struct obc_transfer *transfer)
  {
- 	BT_DBG("chan %p %s -> %s", chan, state_to_string(chan->state),
- 						state_to_string(state));
+ 	struct transfer_callback *callback = transfer->callback;
  
- 	chan->state = state;
--	chan->ops->state_change(chan->data, state);
-+	chan->ops->state_change(chan->data, state, err);
- }
- 
--static void l2cap_state_change(struct l2cap_chan *chan, int state)
-+static void l2cap_state_change(struct l2cap_chan *chan, int state, int err)
- {
- 	struct sock *sk = chan->sk;
- 
- 	lock_sock(sk);
--	__l2cap_state_change(chan, state);
-+	__l2cap_state_change(chan, state, err);
- 	release_sock(sk);
- }
- 
--static inline void __l2cap_chan_set_err(struct l2cap_chan *chan, int err)
-+void __l2cap_chan_set_err(struct l2cap_chan *chan, int err)
- {
- 	struct sock *sk = chan->sk;
- 
- 	sk->sk_err = err;
- }
- 
--static inline void l2cap_chan_set_err(struct l2cap_chan *chan, int err)
-+static void l2cap_chan_set_err(struct l2cap_chan *chan, int err)
- {
- 	struct sock *sk = chan->sk;
- 
-@@ -392,11 +392,9 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 
- 	parent = bt_sk(sk)->parent;
- 
--	__l2cap_state_change(chan, BT_CLOSED);
--	sock_set_flag(sk, SOCK_ZAPPED);
-+	__l2cap_state_change(chan, BT_CLOSED, err);
- 
--	if (err)
--		__l2cap_chan_set_err(chan, err);
-+	sock_set_flag(sk, SOCK_ZAPPED);
- 
- 	if (parent) {
- 		bt_accept_unlink(sk);
-@@ -461,7 +459,7 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
- 		lock_sock(sk);
- 		l2cap_chan_cleanup_listen(sk);
- 
--		__l2cap_state_change(chan, BT_CLOSED);
-+		__l2cap_state_change(chan, BT_CLOSED, 0);
- 		sock_set_flag(sk, SOCK_ZAPPED);
- 		release_sock(sk);
- 		break;
-@@ -487,7 +485,7 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
- 				result = L2CAP_CR_SEC_BLOCK;
- 			else
- 				result = L2CAP_CR_BAD_PSM;
--			l2cap_state_change(chan, BT_DISCONN);
-+			l2cap_state_change(chan, BT_DISCONN, 0);
- 
- 			rsp.scid   = cpu_to_le16(chan->dcid);
- 			rsp.dcid   = cpu_to_le16(chan->scid);
-@@ -736,7 +734,6 @@ static inline int l2cap_mode_supported(__u8 mode, __u32 feat_mask)
- 
- static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *chan, int err)
- {
--	struct sock *sk = chan->sk;
- 	struct l2cap_disconn_req req;
- 
- 	if (!conn)
-@@ -753,10 +750,7 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
- 	l2cap_send_cmd(conn, l2cap_get_ident(conn),
- 			L2CAP_DISCONN_REQ, sizeof(req), &req);
- 
--	lock_sock(sk);
--	__l2cap_state_change(chan, BT_DISCONN);
--	__l2cap_chan_set_err(chan, err);
--	release_sock(sk);
-+	l2cap_state_change(chan, BT_DISCONN, err);
- }
- 
- /* ---- L2CAP connections ---- */
-@@ -820,7 +814,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 						parent->sk_data_ready(parent, 0);
- 
- 				} else {
--					__l2cap_state_change(chan, BT_CONFIG);
-+					__l2cap_state_change(chan, BT_CONFIG, 0);
- 					rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
- 					rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
- 				}
-@@ -924,7 +918,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
- 
- 	__set_chan_timer(chan, sk->sk_sndtimeo);
- 
--	__l2cap_state_change(chan, BT_CONNECTED);
-+	__l2cap_state_change(chan, BT_CONNECTED, 0);
- 	parent->sk_data_ready(parent, 0);
- 
- clean:
-@@ -945,7 +939,7 @@ static void l2cap_chan_ready(struct l2cap_chan *chan)
- 	chan->conf_state = 0;
- 	__clear_chan_timer(chan);
- 
--	__l2cap_state_change(chan, BT_CONNECTED);
-+	__l2cap_state_change(chan, BT_CONNECTED, 0);
- 	sk->sk_state_change(sk);
- 
- 	if (parent)
-@@ -980,7 +974,7 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 			struct sock *sk = chan->sk;
- 			__clear_chan_timer(chan);
- 			lock_sock(sk);
--			__l2cap_state_change(chan, BT_CONNECTED);
-+			__l2cap_state_change(chan, BT_CONNECTED, 0);
- 			sk->sk_state_change(sk);
- 			release_sock(sk);
- 
-@@ -1264,14 +1258,14 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
- 	l2cap_chan_add(conn, chan);
- 	l2cap_chan_lock(chan);
- 
--	l2cap_state_change(chan, BT_CONNECT);
-+	l2cap_state_change(chan, BT_CONNECT, 0);
- 	__set_chan_timer(chan, sk->sk_sndtimeo);
- 
- 	if (hcon->state == BT_CONNECTED) {
- 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
- 			__clear_chan_timer(chan);
- 			if (l2cap_chan_check_security(chan))
--				l2cap_state_change(chan, BT_CONNECTED);
-+				l2cap_state_change(chan, BT_CONNECTED, 0);
- 		} else
- 			l2cap_do_start(chan);
- 	}
-@@ -2721,22 +2715,22 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE) {
- 		if (l2cap_chan_check_security(chan)) {
- 			if (bt_sk(sk)->defer_setup) {
--				__l2cap_state_change(chan, BT_CONNECT2);
-+				__l2cap_state_change(chan, BT_CONNECT2, 0);
- 				result = L2CAP_CR_PEND;
- 				status = L2CAP_CS_AUTHOR_PEND;
- 				parent->sk_data_ready(parent, 0);
- 			} else {
--				__l2cap_state_change(chan, BT_CONFIG);
-+				__l2cap_state_change(chan, BT_CONFIG, 0);
- 				result = L2CAP_CR_SUCCESS;
- 				status = L2CAP_CS_NO_INFO;
- 			}
- 		} else {
--			__l2cap_state_change(chan, BT_CONNECT2);
-+			__l2cap_state_change(chan, BT_CONNECT2, 0);
- 			result = L2CAP_CR_PEND;
- 			status = L2CAP_CS_AUTHEN_PEND;
- 		}
- 	} else {
--		__l2cap_state_change(chan, BT_CONNECT2);
-+		__l2cap_state_change(chan, BT_CONNECT2, 0);
- 		result = L2CAP_CR_PEND;
- 		status = L2CAP_CS_NO_INFO;
- 	}
-@@ -2816,7 +2810,7 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 
- 	switch (result) {
- 	case L2CAP_CR_SUCCESS:
--		l2cap_state_change(chan, BT_CONFIG);
-+		l2cap_state_change(chan, BT_CONFIG, 0);
- 		chan->ident = 0;
- 		chan->dcid = dcid;
- 		clear_bit(CONF_CONNECT_PEND, &chan->conf_state);
-@@ -2928,7 +2922,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	if (test_bit(CONF_INPUT_DONE, &chan->conf_state)) {
- 		set_default_fcs(chan);
- 
--		l2cap_state_change(chan, BT_CONNECTED);
-+		l2cap_state_change(chan, BT_CONNECTED, 0);
- 
- 		chan->next_tx_seq = 0;
- 		chan->expected_tx_seq = 0;
-@@ -3060,7 +3054,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	if (test_bit(CONF_OUTPUT_DONE, &chan->conf_state)) {
- 		set_default_fcs(chan);
- 
--		l2cap_state_change(chan, BT_CONNECTED);
-+		l2cap_state_change(chan, BT_CONNECTED, 0);
- 		chan->next_tx_seq = 0;
- 		chan->expected_tx_seq = 0;
- 		skb_queue_head_init(&chan->tx_q);
-@@ -4657,12 +4651,12 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 					if (parent)
- 						parent->sk_data_ready(parent, 0);
- 				} else {
--					__l2cap_state_change(chan, BT_CONFIG);
-+					__l2cap_state_change(chan, BT_CONFIG, 0);
- 					res = L2CAP_CR_SUCCESS;
- 					stat = L2CAP_CS_NO_INFO;
- 				}
- 			} else {
--				__l2cap_state_change(chan, BT_DISCONN);
-+				__l2cap_state_change(chan, BT_DISCONN, 0);
- 				__set_chan_timer(chan,
- 					msecs_to_jiffies(L2CAP_DISC_TIMEOUT));
- 				res = L2CAP_CR_SEC_BLOCK;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index e2fc24b..ae15d7a 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -38,6 +38,7 @@
- static const struct proto_ops l2cap_sock_ops;
- static void l2cap_sock_init(struct sock *sk, struct sock *parent);
- static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock, int proto, gfp_t prio);
-+void __l2cap_chan_set_err(struct l2cap_chan *chan, int err);
- 
- static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- {
-@@ -916,11 +917,17 @@ static void l2cap_sock_close_cb(void *data)
- 	l2cap_sock_kill(sk);
- }
- 
--static void l2cap_sock_state_change_cb(void *data, int state)
-+static void l2cap_sock_state_change_cb(void *data, int state, int err)
- {
- 	struct sock *sk = data;
- 
- 	sk->sk_state = state;
-+
-+	if (err) {
-+		struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-+
-+		__l2cap_chan_set_err(chan, err);
+-	if (transfer->xfer == 0)
+-		return;
++	if (transfer->xfer != 0) {
++		g_obex_cancel_transfer(transfer->xfer);
++		transfer->xfer = 0;
 +	}
- }
  
- static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
+-	g_obex_cancel_transfer(transfer->xfer);
+-	transfer->xfer = 0;
++	if (transfer->obex != NULL) {
++		g_obex_unref(transfer->obex);
++		transfer->obex = NULL;
++	}
+ 
+ 	if (callback) {
+ 		GError *err;
 -- 
-1.7.9
+1.7.6.5
 
