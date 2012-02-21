@@ -1,97 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1329822991.2049.15.camel@aeonflux>
-Subject: Re: [PATCH] Add Atheros maryann PIDVID support
 From: Marcel Holtmann <marcel@holtmann.org>
-To: acho@suse.com
-Cc: padovan@profusion.mobi, linux-bluetooth@vger.kernel.org,
-	oneukum@suse.com, jlee@suse.com
-Date: Tue, 21 Feb 2012 12:16:31 +0100
-In-Reply-To: <00c20c839b7ac6f027ab935f8cf0992c93c5f2fd.1329809368.git.acho@suse.com>
-References: <00c20c839b7ac6f027ab935f8cf0992c93c5f2fd.1329809368.git.acho@suse.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Only keep controller up after init if powered on
+Date: Tue, 21 Feb 2012 12:14:25 +0100
+Message-Id: <1329822865-12312-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yu-Chen,
+When a new controller gets added to the system, it needs to be brought
+up briefly to read basic information like features, BD_ADDR etc. and
+after a timeout it will be brought back down.
 
-> Add Atheros maryann 0cf3:311d PIDVID support
-> This module is AR3012 Series.
-> 
-> Include /sys/kernel/debug/usb/devices output here for reference
-> 
-> before:
-> T:  Bus=04 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0cf3 ProdID=311d Rev= 0.01
-> S:  Manufacturer=Atheros Communications
-> S:  Product=Bluetooth USB Host Controller
-> S:  SerialNumber=Alaska Day 2006
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> 
-> after:
-> T:  Bus=04 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0cf3 ProdID=311d Rev= 0.02
-> S:  Manufacturer=Atheros Communications
-> S:  Product=Bluetooth USB Host Controller
-> S:  SerialNumber=Alaska Day 2006
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> 
-> Signed-off-by: Cho, Yu-Chen <acho@suse.com>
-> ---
->  drivers/bluetooth/ath3k.c |    2 ++
->  drivers/bluetooth/btusb.c |    1 +
->  2 files changed, 3 insertions(+), 0 deletions(-)
+The only command that should overwrite this timeout is the set power
+command from the management interface. Just reading the controller
+list or information is not a good reason to keep the controller up.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c |   23 ++++++++++++++---------
+ 1 files changed, 14 insertions(+), 9 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index a5a2a68..c25cb64 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -339,9 +339,6 @@ static int read_index_list(struct sock *sk)
+ 
+ 	i = 0;
+ 	list_for_each_entry(d, &hci_dev_list, list) {
+-		if (test_and_clear_bit(HCI_AUTO_OFF, &d->dev_flags))
+-			cancel_delayed_work(&d->power_off);
+-
+ 		if (test_bit(HCI_SETUP, &d->dev_flags))
+ 			continue;
+ 
+@@ -392,11 +389,12 @@ static u32 get_current_settings(struct hci_dev *hdev)
+ {
+ 	u32 settings = 0;
+ 
+-	if (test_bit(HCI_UP, &hdev->flags))
+-		settings |= MGMT_SETTING_POWERED;
+-	else
++	if (!test_bit(HCI_UP, &hdev->flags))
+ 		return settings;
+ 
++	if (!test_bit(HCI_AUTO_OFF, &hdev->dev_flags))
++		settings |= MGMT_SETTING_POWERED;
++
+ 	if (test_bit(HCI_PSCAN, &hdev->flags))
+ 		settings |= MGMT_SETTING_CONNECTABLE;
+ 
+@@ -623,9 +621,6 @@ static int read_controller_info(struct sock *sk, u16 index)
+ 		return cmd_status(sk, index, MGMT_OP_READ_INFO,
+ 						MGMT_STATUS_INVALID_PARAMS);
+ 
+-	if (test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags))
+-		cancel_delayed_work_sync(&hdev->power_off);
+-
+ 	hci_dev_lock(hdev);
+ 
+ 	if (test_and_clear_bit(HCI_PI_MGMT_INIT, &hci_pi(sk)->flags))
+@@ -753,6 +748,16 @@ static int set_powered(struct sock *sk, u16 index, void *data, u16 len)
+ 
+ 	hci_dev_lock(hdev);
+ 
++	if (test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags)) {
++		cancel_delayed_work(&hdev->power_off);
++
++		if (cp->val) {
++			err = send_settings_rsp(sk, MGMT_OP_SET_POWERED, hdev);
++			mgmt_powered(hdev, 1);
++			goto failed;
++		}
++	}
++
+ 	up = test_bit(HCI_UP, &hdev->flags);
+ 	if ((cp->val && up) || (!cp->val && !up)) {
+ 		err = send_settings_rsp(sk, MGMT_OP_SET_POWERED, hdev);
+-- 
+1.7.7.6
 
