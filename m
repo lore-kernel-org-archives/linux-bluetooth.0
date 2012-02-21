@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 4/8] client: process transfer queue only if none active
-Date: Tue, 21 Feb 2012 14:57:08 +0100
-Message-Id: <1329832632-3681-5-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 2/8] client: fix obc_session_get_buffer
+Date: Tue, 21 Feb 2012 14:57:06 +0100
+Message-Id: <1329832632-3681-3-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,25 +12,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-session_process_queue should make sure there is no active operation, to
-avoid starting a second one at the same time.
+Size 0 should be reported if no transfer exists. Some existing code
+relies on this behavior.
 ---
- client/session.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ client/session.c |    6 +++++-
+ 1 files changed, 5 insertions(+), 1 deletions(-)
 
 diff --git a/client/session.c b/client/session.c
-index e113d1f..7f387d4 100644
+index 85f466a..e113d1f 100644
 --- a/client/session.c
 +++ b/client/session.c
-@@ -732,6 +732,9 @@ static void session_process_queue(struct obc_session *session)
- {
- 	struct pending_request *p;
+@@ -1128,8 +1128,12 @@ const char *obc_session_get_buffer(struct obc_session *session, size_t *size)
+ 	const char *buf;
  
-+	if (session->p != NULL)
-+		return;
+ 	transfer = obc_session_get_transfer(session);
+-	if (transfer == NULL)
++	if (transfer == NULL) {
++		if (size != NULL)
++			*size = 0;
 +
- 	if (session->queue == NULL || g_queue_is_empty(session->queue))
- 		return;
+ 		return NULL;
++	}
+ 
+ 	buf = obc_transfer_get_buffer(transfer, size);
  
 -- 
 1.7.6.5
