@@ -1,59 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: chanyeol.park@samsung.com
-To: linux-bluetooth@vger.kernel.org
-Cc: chanyeol.park@samsung.com
-Subject: [PATCH] Remove leftover code of main_opts operation
-Date: Wed, 22 Feb 2012 23:15:26 +0900
-Message-id: <1329920126-28003-1-git-send-email-chanyeol.park@samsung.com>
+Date: Wed, 22 Feb 2012 16:13:15 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: Enable timestamps for control channel
+Message-ID: <20120222141315.GA24181@x220.ger.corp.intel.com>
+References: <1329914968-7643-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1329914968-7643-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chan-yeol Park <chanyeol.park@samsung.com>
+Hi Marcel,
 
+On Wed, Feb 22, 2012, Marcel Holtmann wrote:
+> The control channel can be also monitored, so include timestamps here
+> as well. And make sure management events get their timestamp when they
+> are created.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_sock.c |    1 +
+>  net/bluetooth/mgmt.c     |    3 +++
+>  2 files changed, 4 insertions(+), 0 deletions(-)
 
-diff --git a/src/hcid.h b/src/hcid.h
-index 1987b7d..e2eaf86 100644
---- a/src/hcid.h
-+++ b/src/hcid.h
-@@ -46,10 +46,7 @@ struct main_opts {
- };
- 
- enum {
--	HCID_SET_NAME,
--	HCID_SET_CLASS,
- 	HCID_SET_PAGETO,
--	HCID_SET_DISCOVTO,
- };
- 
- extern struct main_opts main_opts;
-diff --git a/src/main.c b/src/main.c
-index 74ec3fa..60a0816 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -107,7 +107,6 @@ static void parse_config(GKeyFile *config)
- 	} else {
- 		DBG("discovto=%d", val);
- 		main_opts.discovto = val;
--		main_opts.flags |= 1 << HCID_SET_DISCOVTO;
- 	}
- 
- 	val = g_key_file_get_integer(config, "General",
-@@ -148,7 +147,6 @@ static void parse_config(GKeyFile *config)
- 		DBG("name=%s", str);
- 		g_free(main_opts.name);
- 		main_opts.name = g_strdup(str);
--		main_opts.flags |= 1 << HCID_SET_NAME;
- 		g_free(str);
- 	}
- 
-@@ -159,7 +157,6 @@ static void parse_config(GKeyFile *config)
- 	} else {
- 		DBG("class=%s", str);
- 		main_opts.class = strtol(str, NULL, 16);
--		main_opts.flags |= 1 << HCID_SET_CLASS;
- 		g_free(str);
- 	}
- 
--- 
-1.7.5.4
+Applied. Thanks.
 
+Johan
