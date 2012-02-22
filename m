@@ -1,60 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1329907389-31173-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1329907389-31173-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Wed, 22 Feb 2012 10:30:40 -0200
-Message-ID: <CAA37ikarEd1wVZZoxH_Cy=jJfQ9is-cY+9y0U7eMWZH+1qxQsg@mail.gmail.com>
-Subject: Re: [PATCHv2 0/3] Bluetooth: Change socket lock to l2cap_chan lock
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-id: <919F33058BA546BA91090A7991629B24@sisodomain.com>
+From: Jaganath <jaganath.k@samsung.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Mikel Astiz <mikel.astiz.oss@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+References: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
+ <1329832632-3681-8-git-send-email-mikel.astiz.oss@gmail.com>
+ <921769CBC00A43F9A939E3FA39843F27@sisodomain.com>
+ <236C00190BB34FF5B78832896F9E9947@sisodomain.com>
+ <CABBYNZ+uxo6Sze7EG6Q-e+A-MK4AGFBJvC3YMW86fThRg0dSeA@mail.gmail.com>
+In-reply-to: <CABBYNZ+uxo6Sze7EG6Q-e+A-MK4AGFBJvC3YMW86fThRg0dSeA@mail.gmail.com>
+Subject: Re: [PATCH obexd v2 7/8] client: fix canceling queued transfers
+Date: Wed, 22 Feb 2012 17:54:09 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Luiz,
 
-On Wed, Feb 22, 2012 at 8:43 AM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Changing socket lock to L2CAP chan lock in L2CAP code. Needed for implementing
-> protocols above L2CAP without creating sockets.
->
-> Changes:
->        * PATCHv2: Rebase remaining parts against latest tree and merge all
->        patches dealing with converting sk lock to chan lock together following
->        recommendation from Ulisses and Gustavo.
->        * PATCHv1: Added extra line (per Gustavo comment)
->        * RFCv6: Same code but patches 2,3 and 4 from RFCv5 are merged together
->        following recommendations from review.
->        * RFCv5: Fixed locking bug in l2cap_data_channel, added locks in
->        l2cap_sock_shutdown function, fixed several styles issues.
->        * RFCv4: Better split patches so they looks more clear and obvious,
->        taking coments about naming change and delete unused vars. See diff change
->        from the previous version below:
->        * RFCv3: Split the big patch to several small (I believe logical) chunks,
->        remove unneded locks from cleanup_listen, use the same arguments for
->        locked/unlocked socket error functions.
->        * RFCv2: Convert l2cap channel list back to mutex from RCU list.
->
-> Andrei Emeltchenko (3):
->  Bluetooth: Add unlocked __l2cap_chan_add function
->  Bluetooth: Change sk lock to chan lock in L2CAP core
->  Bluetooth: Remove socket lock check
->
->  net/bluetooth/l2cap_core.c |  173 +++++++++++++++++++++++++++-----------------
->  net/bluetooth/l2cap_sock.c |   28 +++++--
->  2 files changed, 125 insertions(+), 76 deletions(-)
+--------------------------------------------------
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Sent: Wednesday, February 22, 2012 5:45 PM
+To: "Jaganath" <jaganath.k@samsung.com>
+Cc: "Mikel Astiz" <mikel.astiz.oss@gmail.com>; 
+<linux-bluetooth@vger.kernel.org>; "Mikel Astiz" <mikel.astiz@bmw-carit.de>
+Subject: Re: [PATCH obexd v2 7/8] client: fix canceling queued transfers
 
-I'm mostly ok with the patches. However, have you seen my questions on
-reply to PATCHv1 08/14? Please, check that. Thanks.
+> Hi Jaganath,
+>
+> On Wed, Feb 22, 2012 at 1:59 PM, Jaganath <jaganath.k@samsung.com> wrote:
+>>> If transfer->obex is unrefed here then the queued ABORT packet will not 
+>>> be
+>>> sent.
+>>> This will create problem with PTS which requires ABORT command before
+>>> transport disconnection
+>>
+>>
+>> Sorry. I think my comment is invalid since refcount will not be zero in 
+>> this
+>> case.
+>
+> Yep, this is the transfer reference, btw what test are you referring
+> to? I don't remember having problem with PTS in case of OpenOBEX and
+> we didn't wait any abort to be sent, but perhaps that is because
+> OpenOBEX had the blocking write logic while gobex wait for POLL_OUT,
 
-Regards,
+Correct. Because of POLL_OUT logic only it is not working. It was working 
+earlier
+with OpenOBEX.
 
--- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+> perhaps we should flush when disconnecting. Anyway PTS is pretty lame
+> since the abort request is useless if it is followed by a disconnect.
+
+I agree. But I think we should pass PTS test of qualification.
+
+>
+> -- 
+> Luiz Augusto von Dentz
+> --
+
+Regards
+Jaganath
+
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html 
+
