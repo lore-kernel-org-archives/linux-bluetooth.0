@@ -1,119 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Feb 2012 11:53:46 +0200
+Date: Wed, 22 Feb 2012 11:25:18 +0200
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1 13/14] Bluetooth: Use l2cap chan lock in socket connect
-Message-ID: <20120222095344.GF24328@aemeltch-MOBL1>
+To: Ulisses Furquim <ulisses@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv1 06/14] Bluetooth: Add unlocked __l2cap_chan_add function
+Message-ID: <20120222092516.GE24328@aemeltch-MOBL1>
 References: <1329821707-11817-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1329821707-11817-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20120221174507.GA22229@joana>
+ <1329821707-11817-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CAA37ikZ6tnfQpqmc8kEXygDbPByC4DmTuQKGw8z+ki=A-83Vow@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120221174507.GA22229@joana>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CAA37ikZ6tnfQpqmc8kEXygDbPByC4DmTuQKGw8z+ki=A-83Vow@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Ulisses,
 
-On Tue, Feb 21, 2012 at 03:46:57PM -0200, Gustavo Padovan wrote:
+On Tue, Feb 21, 2012 at 03:01:55PM -0200, Ulisses Furquim wrote:
 > Hi Andrei,
 > 
-> * Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-02-21 12:55:06 +0200]:
-> 
+> On Tue, Feb 21, 2012 at 8:54 AM, Andrei Emeltchenko
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
 > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > 
-> > Function l2cap_chan_connect does not return with locked socket
-> > anymore. So we take explicit lock in l2cap_sock_connect.
-> > 
+> >
+> >
 > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > > ---
-> >  net/bluetooth/l2cap_core.c |   18 ++++++++++++++----
-> >  net/bluetooth/l2cap_sock.c |    2 ++
-> >  2 files changed, 16 insertions(+), 4 deletions(-)
-> > 
+> >  net/bluetooth/l2cap_core.c |    9 +++++++--
+> >  1 files changed, 7 insertions(+), 2 deletions(-)
+> >
 > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index 49aa226..9e0af6e 100644
+> > index c0640b7..0e4f4cb 100644
 > > --- a/net/bluetooth/l2cap_core.c
 > > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -1159,7 +1159,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
-> >  
-> >  	hci_dev_lock(hdev);
-> >  
-> > -	lock_sock(sk);
-> > +	l2cap_chan_lock(chan);
-> >  
-> >  	/* PSM must be odd and lsb of upper byte must be 0 */
-> >  	if ((__le16_to_cpu(psm) & 0x0101) != 0x0001 && !cid &&
-> > @@ -1186,17 +1186,21 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
-> >  		goto done;
-> >  	}
-> >  
-> > +	lock_sock(sk);
+> > @@ -300,7 +300,7 @@ void l2cap_chan_destroy(struct l2cap_chan *chan)
+> >        l2cap_chan_put(chan);
+> >  }
+> >
+> > -static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+> > +void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+> >  {
+> >        BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
+> >                        chan->psm, chan->dcid);
+> > @@ -346,8 +346,13 @@ static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+> >
+> >        l2cap_chan_hold(chan);
+> >
+> > -       mutex_lock(&conn->chan_lock);
+> >        list_add(&chan->list, &conn->chan_l);
+> > +}
 > > +
-> >  	switch (sk->sk_state) {
-> >  	case BT_CONNECT:
-> >  	case BT_CONNECT2:
-> >  	case BT_CONFIG:
-> >  		/* Already connecting */
-> >  		err = 0;
-> > +		release_sock(sk);
-> >  		goto done;
-> >  
-> >  	case BT_CONNECTED:
-> >  		/* Already connected */
-> >  		err = -EISCONN;
-> > +		release_sock(sk);
-> >  		goto done;
-> >  
-> >  	case BT_OPEN:
-> > @@ -1206,11 +1210,15 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
-> >  
-> >  	default:
-> >  		err = -EBADFD;
-> > +		release_sock(sk);
-> >  		goto done;
-> >  	}
-> >  
-> >  	/* Set destination address and psm */
-> >  	bacpy(&bt_sk(sk)->dst, dst);
-> > +
-> > +	release_sock(sk);
-> > +
-> >  	chan->psm = psm;
-> >  	chan->dcid = cid;
-> >  
-> > @@ -1238,23 +1246,25 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
-> >  	/* Update source addr of the socket */
-> >  	bacpy(src, conn->src);
-> >  
-> > +	l2cap_chan_unlock(chan);
-> >  	l2cap_chan_add(conn, chan);
-> > +	l2cap_chan_lock(chan);
+> > +void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+> > +{
+> > +       mutex_lock(&conn->chan_lock);
+> > +       __l2cap_chan_add(conn, chan);
+> >        mutex_unlock(&conn->chan_lock);
+> >  }
 > 
-> What are you trying to do here?
+> Same comment applies here. If we don't use the locked version, don't
+> bother adding it.
 
-I am following the same locking sequence, otherwise lockdep warns.
+It is used for example in the code below:
 
-> > -	__l2cap_state_change(chan, BT_CONNECT);
-> > +	l2cap_state_change(chan, BT_CONNECT);
-> >  	__set_chan_timer(chan, sk->sk_sndtimeo);
-> >  
-> >  	if (hcon->state == BT_CONNECTED) {
-> >  		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
-> >  			__clear_chan_timer(chan);
-> >  			if (l2cap_chan_check_security(chan))
-> > -				__l2cap_state_change(chan, BT_CONNECTED);
-> > +				l2cap_state_change(chan, BT_CONNECTED);
-> >  		} else
-> >  			l2cap_do_start(chan);
-> >  	}
-> >  
-> >  	err = 0;
-> > -
-> 
-> Do not remove this line, please.
-
-OK.
+   1    470  net/bluetooth/a2mp.c <<open_a2mp_chan>>
+             l2cap_chan_add(conn, chan);
+   2    917  net/bluetooth/l2cap_core.c <<l2cap_le_conn_ready>>
+             l2cap_chan_add(conn, chan);
+   3   1258  net/bluetooth/l2cap_core.c <<l2cap_chan_connect>>
+             l2cap_chan_add(conn, chan);
 
 Best regards 
 Andrei Emeltchenko 
