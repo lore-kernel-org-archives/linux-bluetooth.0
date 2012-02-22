@@ -1,30 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Feb 2012 16:13:15 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <1329919525.2049.36.camel@aeonflux>
+Subject: Re: [PATCH 3/3] Bluetooth: Explicitly clear EIR data upon hci_dev
+ setup
+From: Marcel Holtmann <marcel@holtmann.org>
+To: johan.hedberg@gmail.com
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Enable timestamps for control channel
-Message-ID: <20120222141315.GA24181@x220.ger.corp.intel.com>
-References: <1329914968-7643-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329914968-7643-1-git-send-email-marcel@holtmann.org>
+Date: Wed, 22 Feb 2012 15:05:25 +0100
+In-Reply-To: <1329919363-23660-3-git-send-email-johan.hedberg@gmail.com>
+References: <1329919363-23660-1-git-send-email-johan.hedberg@gmail.com>
+	 <1329919363-23660-3-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Wed, Feb 22, 2012, Marcel Holtmann wrote:
-> The control channel can be also monitored, so include timestamps here
-> as well. And make sure management events get their timestamp when they
-> are created.
+> Some controllers preserve their EIR data even after a reset so we need
+> to explicitly clear this during the device setup procedure.
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  net/bluetooth/hci_sock.c |    1 +
->  net/bluetooth/mgmt.c     |    3 +++
->  2 files changed, 4 insertions(+), 0 deletions(-)
+>  net/bluetooth/hci_event.c |   17 +++++++++++++----
+>  1 files changed, 13 insertions(+), 4 deletions(-)
 
-Applied. Thanks.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Johan
+Regards
+
+Marcel
+
+
