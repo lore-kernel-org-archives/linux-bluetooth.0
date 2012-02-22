@@ -1,27 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Feb 2012 19:31:27 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Disabling discoverable with timeout is invalid
-Message-ID: <20120222173127.GA27919@x220.ger.corp.intel.com>
-References: <1329930394-6213-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329930394-6213-1-git-send-email-marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix handling of discoverable setting with timeout
+Date: Wed, 22 Feb 2012 18:21:00 +0100
+Message-Id: <1329931260-9460-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+The current handling of the discoverable timeout was missing the proper
+handling of the timeout when the mode was already set. Now the command
+can be used to expire or retrigger the timeout.
 
-On Wed, Feb 22, 2012, Marcel Holtmann wrote:
-> Add one extra sanity check to ensure that the supplied timeout value is
-> actually valid in this context.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/mgmt.c |    7 +++++--
->  1 files changed, 5 insertions(+), 2 deletions(-)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c |   11 +++++++++++
+ 1 files changed, 11 insertions(+), 0 deletions(-)
 
-Applied. Thanks.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 6df4af6..f7e111f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -900,6 +900,17 @@ static int set_discoverable(struct sock *sk, u16 index, void *data, u16 len)
+ 	}
+ 
+ 	if (!!cp->val == test_bit(HCI_DISCOVERABLE, &hdev->dev_flags)) {
++		if (hdev->discov_timeout > 0) {
++			cancel_delayed_work(&hdev->discov_off);
++			hdev->discov_timeout = 0;
++		}
++
++		if (cp->val && timeout > 0) {
++			hdev->discov_timeout = timeout;
++			queue_delayed_work(hdev->workqueue, &hdev->discov_off,
++				msecs_to_jiffies(hdev->discov_timeout * 1000));
++		}
++
+ 		err = send_settings_rsp(sk, MGMT_OP_SET_DISCOVERABLE, hdev);
+ 		goto failed;
+ 	}
+-- 
+1.7.7.6
 
-Johan
