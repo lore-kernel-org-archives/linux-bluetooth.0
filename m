@@ -1,34 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAPHSBCni_-kAXyr-qY+oXetq1R6A_fcdAjiYYEJRQtss3DEbRw@mail.gmail.com>
-References: <CAPHSBCni_-kAXyr-qY+oXetq1R6A_fcdAjiYYEJRQtss3DEbRw@mail.gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Wed, 22 Feb 2012 17:59:30 -0200
-Message-ID: <CAMOw1v6_p-EUnhGj_M1hpH59x_poQ7cAc1NxywXiW_Jzz57RrA@mail.gmail.com>
-Subject: Re: AVRCP Controller Role
-To: Rohit Sharma <rohitsharmaddun@gmail.com>
+Message-ID: <1329938761.2049.42.camel@aeonflux>
+Subject: Re: [PATCH 3/3] Bluetooth: mgmt: Allow local name changes while
+ powered off
+From: Marcel Holtmann <marcel@holtmann.org>
+To: johan.hedberg@gmail.com
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Wed, 22 Feb 2012 20:26:01 +0100
+In-Reply-To: <1329937615-29893-3-git-send-email-johan.hedberg@gmail.com>
+References: <1329937615-29893-1-git-send-email-johan.hedberg@gmail.com>
+	 <1329937615-29893-3-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rohit,
+Hi Johan,
 
-On Wed, Feb 22, 2012 at 8:02 AM, Rohit Sharma <rohitsharmaddun@gmail.com> wrote:
-> Hi All,
->
-> I am testing the AVRCP support on bluez. For target role looks the
-> support is there and i am trying to test this using amarok player.
-> Thanks.
-> For Controller role i cannot get the information how can sending
-> VENDERDEPENDENT or PASSTHROUGH command is supported, please let me
-> know how can i test sending these commands.
+> This patch makes it possible to set the local name before powering on
+> the device. The name will be applied using the hci_write_local_name
+> command once the device gets powered on.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/hci_event.c |   13 ++++++++++---
+>  net/bluetooth/mgmt.c      |   38 ++++++++++++++++++++++++++------------
+>  2 files changed, 36 insertions(+), 15 deletions(-)
 
-They are currently not supported. BlueZ in CT role has a very limited
-set of functionality (afair it's just volume up and down).
-Theoretically, CT role could share some bits with TG (see
-audio/avctp.c and audio/avrcp.c) but it's currently not done.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
 
 
-Regards,
-Lucas De Marchi
