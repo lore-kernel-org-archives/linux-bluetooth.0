@@ -1,74 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Add hdev->short_name for EIR generation
-Date: Wed, 22 Feb 2012 21:06:53 +0200
-Message-Id: <1329937615-29893-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 22 Feb 2012 16:41:46 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3 2/3] Bluetooth: Change sk lock to chan lock in L2CAP
+ core
+Message-ID: <20120222184146.GA23348@joana>
+References: <1329923517-5425-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1329923517-5425-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1329923517-5425-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Andrei,
 
-It's possible to provide a short name through the mgmt interface and
-this name can be used for EIR generation when the full name doesn't fit
-there. This patch adds the preliminary tracking of the provided short
-name.
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-02-22 17:11:56 +0200]:
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h |    3 +++
- include/net/bluetooth/mgmt.h     |    2 +-
- net/bluetooth/mgmt.c             |    3 +++
- 3 files changed, 7 insertions(+), 1 deletions(-)
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Change sk lock to chan lock in l2cap core and move sk locks
+> to l2cap sock code. bh_locks were used because of being RCU
+> critical section. When needed use explicit socket locks.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Reviewed-by: Ulisses Furquim <ulisses@profusion.mobi>
+> ---
+>  net/bluetooth/l2cap_core.c |  166 ++++++++++++++++++++++++++------------------
+>  net/bluetooth/l2cap_sock.c |   18 ++++-
+>  2 files changed, 114 insertions(+), 70 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 24dd770..3fcc7f0 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -129,6 +129,8 @@ struct le_scan_params {
- 	int timeout;
- };
- 
-+#define HCI_MAX_SHORT_NAME_LENGTH	10
-+
- #define NUM_REASSEMBLY 4
- struct hci_dev {
- 	struct list_head list;
-@@ -141,6 +143,7 @@ struct hci_dev {
- 	__u8		dev_type;
- 	bdaddr_t	bdaddr;
- 	__u8		dev_name[HCI_MAX_NAME_LENGTH];
-+	__u8		short_name[HCI_MAX_SHORT_NAME_LENGTH];
- 	__u8		eir[HCI_MAX_EIR_LENGTH];
- 	__u8		dev_class[3];
- 	__u8		major_class;
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index ac59cdd..495668c 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -75,7 +75,7 @@ struct mgmt_rp_read_index_list {
- /* Reserve one extra byte for names in management messages so that they
-  * are always guaranteed to be nul-terminated */
- #define MGMT_MAX_NAME_LENGTH		(HCI_MAX_NAME_LENGTH + 1)
--#define MGMT_MAX_SHORT_NAME_LENGTH	(10 + 1)
-+#define MGMT_MAX_SHORT_NAME_LENGTH	(HCI_MAX_SHORT_NAME_LENGTH + 1)
- 
- #define MGMT_SETTING_POWERED		0x00000001
- #define MGMT_SETTING_CONNECTABLE	0x00000002
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 16bddd2..3f6a2df 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2273,6 +2273,9 @@ static int set_local_name(struct sock *sk, u16 index, void *data,
- 		goto failed;
- 	}
- 
-+	memcpy(hdev->short_name, mgmt_cp->short_name,
-+						sizeof(hdev->short_name));
-+
- 	memcpy(hci_cp.name, mgmt_cp->name, sizeof(hci_cp.name));
- 	err = hci_send_cmd(hdev, HCI_OP_WRITE_LOCAL_NAME, sizeof(hci_cp),
- 								&hci_cp);
--- 
-1.7.9
+Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
 
+Now lets go to the next steps in the removal of socket usage inside L2CAP
+core.
+
+	Gustavo
