@@ -1,155 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Feb 2012 15:21:55 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Ulisses Furquim <ulisses@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 0/3] Bluetooth: Change socket lock to l2cap_chan lock
-Message-ID: <20120222132153.GH24328@aemeltch-MOBL1>
-References: <1329907389-31173-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <CAA37ikarEd1wVZZoxH_Cy=jJfQ9is-cY+9y0U7eMWZH+1qxQsg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CAA37ikarEd1wVZZoxH_Cy=jJfQ9is-cY+9y0U7eMWZH+1qxQsg@mail.gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Enable timestamps for control channel
+Date: Wed, 22 Feb 2012 13:49:28 +0100
+Message-Id: <1329914968-7643-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ulisses,
+The control channel can be also monitored, so include timestamps here
+as well. And make sure management events get their timestamp when they
+are created.
 
-On Wed, Feb 22, 2012 at 10:30:40AM -0200, Ulisses Furquim wrote:
-> Hi Andrei,
-> 
-> On Wed, Feb 22, 2012 at 8:43 AM, Andrei Emeltchenko
-> <Andrei.Emeltchenko.news@gmail.com> wrote:
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> >
-> > Changing socket lock to L2CAP chan lock in L2CAP code. Needed for implementing
-> > protocols above L2CAP without creating sockets.
-> >
-> > Changes:
-> >        * PATCHv2: Rebase remaining parts against latest tree and merge all
-> >        patches dealing with converting sk lock to chan lock together following
-> >        recommendation from Ulisses and Gustavo.
-> >        * PATCHv1: Added extra line (per Gustavo comment)
-> >        * RFCv6: Same code but patches 2,3 and 4 from RFCv5 are merged together
-> >        following recommendations from review.
-> >        * RFCv5: Fixed locking bug in l2cap_data_channel, added locks in
-> >        l2cap_sock_shutdown function, fixed several styles issues.
-> >        * RFCv4: Better split patches so they looks more clear and obvious,
-> >        taking coments about naming change and delete unused vars. See diff change
-> >        from the previous version below:
-> >        * RFCv3: Split the big patch to several small (I believe logical) chunks,
-> >        remove unneded locks from cleanup_listen, use the same arguments for
-> >        locked/unlocked socket error functions.
-> >        * RFCv2: Convert l2cap channel list back to mutex from RCU list.
-> >
-> > Andrei Emeltchenko (3):
-> >  Bluetooth: Add unlocked __l2cap_chan_add function
-> >  Bluetooth: Change sk lock to chan lock in L2CAP core
-> >  Bluetooth: Remove socket lock check
-> >
-> >  net/bluetooth/l2cap_core.c |  173 +++++++++++++++++++++++++++-----------------
-> >  net/bluetooth/l2cap_sock.c |   28 +++++--
-> >  2 files changed, 125 insertions(+), 76 deletions(-)
-> 
-> I'm mostly ok with the patches. However, have you seen my questions on
-> reply to PATCHv1 08/14? Please, check that. Thanks.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_sock.c |    1 +
+ net/bluetooth/mgmt.c     |    3 +++
+ 2 files changed, 4 insertions(+), 0 deletions(-)
 
-Sorry missed those comments.
-
-In a case of:
-<------8<---------------------------------------------------------------------
-|  > @@ -440,10 +444,12 @@ void l2cap_chan_close(struct l2cap_chan *chan, int
-|  > reason)
-|  >
-|  >        switch (chan->state) {
-|  >        case BT_LISTEN:
-|  > +               lock_sock(sk);
-|  >                l2cap_chan_cleanup_listen(sk);
-|  >
-|  >                __l2cap_state_change(chan, BT_CLOSED);
-|  >                sock_set_flag(sk, SOCK_ZAPPED);
-|  > +               release_sock(sk);
-|  >                break;
-|  >
-|  >        case BT_CONNECTED:
-|
-|  Do we need to lock sock around l2cap_chan_cleanup_listen() as well?
-|  l2cap_chan_close() will call l2cap_chan_del() which now does
-|  lock_sock/release_sock, right?
-<------8<---------------------------------------------------------------------
-
-Those are different socks. We take parent sk lock here.
-
-concerning:
-
-<------8<------------------------------------------------------------------
-|  > @@ -714,6 +722,7 @@ static inline int l2cap_mode_supported(__u8 mode,
-|  > __u32 feat_mask)
-|  >
-|  >  static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct
-|  >  l2cap_chan *chan, int err)
-|  >  {
-|  > +       struct sock *sk = chan->sk;
-|  >        struct l2cap_disconn_req req;
-|  >
-|  >        if (!conn)
-|  > @@ -730,8 +739,10 @@ static void l2cap_send_disconn_req(struct
-|  > l2cap_conn *conn, struct l2cap_chan *c
-|  >        l2cap_send_cmd(conn, l2cap_get_ident(conn),
-|  >                        L2CAP_DISCONN_REQ, sizeof(req), &req);
-|  >
-|  > +       lock_sock(sk);
-|  >        __l2cap_state_change(chan, BT_DISCONN);
-|  >        __l2cap_chan_set_err(chan, err);
-|  > +       release_sock(sk);
-|  >  }
-|  >
-|  >  /* ---- L2CAP connections ---- */
-|
-|  It seems we didn't have any locking around these before. Why? Do we
-|  really need it now?
-<------8<------------------------------------------------------------------
-
-The locks were in the functions invoking l2cap_send_disconn_req.
-
-Otherwise would following changes be OK?
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 60d3276..56a85c0 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -363,8 +363,6 @@ void l2cap_chan_add(struct l2cap_conn *conn, struct
-l2cap_chan *chan)
-        mutex_unlock(&conn->chan_lock);
- }
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index b768393..f0912d8 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -783,6 +783,7 @@ static int hci_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
+ 	case HCI_CHANNEL_RAW:
+ 		hci_sock_cmsg(sk, msg, skb);
+ 		break;
++	case HCI_CHANNEL_CONTROL:
+ 	case HCI_CHANNEL_MONITOR:
+ 		sock_recv_timestamp(msg, sk, skb);
+ 		break;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 9fb4490..d650c02 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -817,6 +817,9 @@ static int mgmt_event(u16 event, struct hci_dev *hdev, void *data,
+ 	if (data)
+ 		memcpy(skb_put(skb, data_len), data, data_len);
  
--/* Delete channel.
-- * Must be called on the locked socket. */
- static void l2cap_chan_del(struct l2cap_chan *chan, int err)
- {
-        struct sock *sk = chan->sk;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index ae15d7a..efe391e 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -812,6 +812,7 @@ static int l2cap_sock_shutdown(struct socket *sock,
-int how)
- 
-        if (conn)
-                mutex_lock(&conn->chan_lock);
++	/* Time stamp */
++	__net_timestamp(skb);
 +
-        l2cap_chan_lock(chan);
-        lock_sock(sk);
+ 	hci_send_to_control(skb, skip_sk);
+ 	kfree_skb(skb);
  
-@@ -835,6 +836,7 @@ static int l2cap_sock_shutdown(struct socket *sock,
-int how)
- 
-        release_sock(sk);
-        l2cap_chan_unlock(chan);
-+
-        if (conn)
-                mutex_unlock(&conn->chan_lock);
- 
+-- 
+1.7.7.6
 
-Best regards 
-Andrei Emeltchenko 
