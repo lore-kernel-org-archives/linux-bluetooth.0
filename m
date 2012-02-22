@@ -1,48 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Enable timestamps for control channel
-Date: Wed, 22 Feb 2012 13:49:28 +0100
-Message-Id: <1329914968-7643-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <919F33058BA546BA91090A7991629B24@sisodomain.com>
+References: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1329832632-3681-8-git-send-email-mikel.astiz.oss@gmail.com>
+	<921769CBC00A43F9A939E3FA39843F27@sisodomain.com>
+	<236C00190BB34FF5B78832896F9E9947@sisodomain.com>
+	<CABBYNZ+uxo6Sze7EG6Q-e+A-MK4AGFBJvC3YMW86fThRg0dSeA@mail.gmail.com>
+	<919F33058BA546BA91090A7991629B24@sisodomain.com>
+Date: Wed, 22 Feb 2012 14:39:32 +0200
+Message-ID: <CABBYNZKTuFpk-bWHJfrj-iFqRmNU24+4O2Afpw95DagqeJ6gRA@mail.gmail.com>
+Subject: Re: [PATCH obexd v2 7/8] client: fix canceling queued transfers
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jaganath <jaganath.k@samsung.com>
+Cc: Mikel Astiz <mikel.astiz.oss@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The control channel can be also monitored, so include timestamps here
-as well. And make sure management events get their timestamp when they
-are created.
+Hi Jaganath,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_sock.c |    1 +
- net/bluetooth/mgmt.c     |    3 +++
- 2 files changed, 4 insertions(+), 0 deletions(-)
+On Wed, Feb 22, 2012 at 2:24 PM, Jaganath <jaganath.k@samsung.com> wrote:
+>> Yep, this is the transfer reference, btw what test are you referring
+>> to? I don't remember having problem with PTS in case of OpenOBEX and
+>> we didn't wait any abort to be sent, but perhaps that is because
+>> OpenOBEX had the blocking write logic while gobex wait for POLL_OUT,
+>
+>
+> Correct. Because of POLL_OUT logic only it is not working. It was working
+> earlier
+> with OpenOBEX.
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index b768393..f0912d8 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -783,6 +783,7 @@ static int hci_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
- 	case HCI_CHANNEL_RAW:
- 		hci_sock_cmsg(sk, msg, skb);
- 		break;
-+	case HCI_CHANNEL_CONTROL:
- 	case HCI_CHANNEL_MONITOR:
- 		sock_recv_timestamp(msg, sk, skb);
- 		break;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9fb4490..d650c02 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -817,6 +817,9 @@ static int mgmt_event(u16 event, struct hci_dev *hdev, void *data,
- 	if (data)
- 		memcpy(skb_put(skb, data_len), data, data_len);
- 
-+	/* Time stamp */
-+	__net_timestamp(skb);
-+
- 	hci_send_to_control(skb, skip_sk);
- 	kfree_skb(skb);
- 
+Ok, we should be able to fix it somehow, if we have something on
+tx_queue we should perhaps just send it before disconnecting. But this
+has nothing to do with this patch so lets avoid confusion here.
+
+>> perhaps we should flush when disconnecting. Anyway PTS is pretty lame
+>> since the abort request is useless if it is followed by a disconnect.
+>
+>
+> I agree. But I think we should pass PTS test of qualification.
+
+Yes, no questions about it.
+
 -- 
-1.7.7.6
-
+Luiz Augusto von Dentz
