@@ -1,32 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1329923669.2049.37.camel@aeonflux>
-Subject: Re: [PATCH 1/2] Bluetooth: mgmt: Fix Set SSP supported check
-From: Marcel Holtmann <marcel@holtmann.org>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 22 Feb 2012 16:14:29 +0100
-In-Reply-To: <1329922392-25089-1-git-send-email-johan.hedberg@gmail.com>
-References: <1329922392-25089-1-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv3 3/3] Bluetooth: Remove socket lock check
+Date: Wed, 22 Feb 2012 17:11:57 +0200
+Message-Id: <1329923517-5425-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1329923517-5425-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1329923517-5425-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> The test for SSP support needs to be earlier in the set_ssp function so
-> that we return an error when SSP is not supported even when the device
-> is powered off.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  net/bluetooth/mgmt.c |   12 ++++++------
->  1 files changed, 6 insertions(+), 6 deletions(-)
+Simplify code so that we do not need to check whether socket is locked.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
+---
+ net/bluetooth/l2cap_sock.c |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 73a06c1..52c94c7 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -125,15 +125,15 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+ 
+ 	err = l2cap_chan_connect(chan, la.l2_psm, la.l2_cid, &la.l2_bdaddr);
+ 	if (err)
+-		goto done;
++		return err;
+ 
+ 	lock_sock(sk);
+ 
+ 	err = bt_sock_wait_state(sk, BT_CONNECTED,
+ 			sock_sndtimeo(sk, flags & O_NONBLOCK));
+-done:
+-	if (sock_owned_by_user(sk))
+-		release_sock(sk);
++
++	release_sock(sk);
++
+ 	return err;
+ }
+ 
+-- 
+1.7.9
 
