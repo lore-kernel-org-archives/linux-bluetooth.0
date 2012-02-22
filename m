@@ -1,39 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Feb 2012 16:41:46 -0200
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 22 Feb 2012 19:56:45 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 2/3] Bluetooth: Change sk lock to chan lock in L2CAP
- core
-Message-ID: <20120222184146.GA23348@joana>
-References: <1329923517-5425-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1329923517-5425-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Send management event for class of device
+ changes
+Message-ID: <20120222175645.GA28313@x220.ger.corp.intel.com>
+References: <1329932281-15409-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329923517-5425-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1329932281-15409-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Marcel,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-02-22 17:11:56 +0200]:
-
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Wed, Feb 22, 2012, Marcel Holtmann wrote:
+> Currently there are no events to other management sockets if the class of
+> device got changed. So make sure they are sent.
 > 
-> Change sk lock to chan lock in l2cap core and move sk locks
-> to l2cap sock code. bh_locks were used because of being RCU
-> critical section. When needed use explicit socket locks.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> Reviewed-by: Ulisses Furquim <ulisses@profusion.mobi>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/l2cap_core.c |  166 ++++++++++++++++++++++++++------------------
->  net/bluetooth/l2cap_sock.c |   18 ++++-
->  2 files changed, 114 insertions(+), 70 deletions(-)
+>  include/net/bluetooth/hci_core.h |    1 +
+>  net/bluetooth/hci_event.c        |   13 +++++++++----
+>  net/bluetooth/mgmt.c             |    9 +++++++++
+>  3 files changed, 19 insertions(+), 4 deletions(-)
 
-Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
+Applied (after fixing a couple of 82-character lines). Thanks.
 
-Now lets go to the next steps in the removal of socket usage inside L2CAP
-core.
-
-	Gustavo
+Johan
