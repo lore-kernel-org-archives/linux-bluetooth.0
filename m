@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1329842810-13449-2-git-send-email-frederic.dalleau@linux.intel.com>
+In-Reply-To: <1329842810-13449-3-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1329842810-13449-1-git-send-email-frederic.dalleau@linux.intel.com>
-	<1329842810-13449-2-git-send-email-frederic.dalleau@linux.intel.com>
-Date: Wed, 22 Feb 2012 10:43:08 +0200
-Message-ID: <CABBYNZLwHsRwAMEGqZg-RQF5iW77OJXsKWhvG2gjZr+qVh+v0g@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] gateway: Fix crash if SCO connection fails
+	<1329842810-13449-3-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Wed, 22 Feb 2012 10:42:20 +0200
+Message-ID: <CABBYNZJxzK2Xz=iy7TjyTGtZJ_DQsxMOvjK0z4S64VWRJ_uXYw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] media: register disconnect watch at transport add
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
 	<frederic.dalleau@linux.intel.com>
@@ -17,40 +17,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi Frederic,
 
 2012/2/21 Frédéric Dalleau <frederic.dalleau@linux.intel.com>:
-> In some situations, a connect callback is created, but
-> this callback is not added to media_owner. Thus when the owner
-> is destroyed and at rfcomm disconnect, the callback is executed
-> with an invalid pointer.
+> disconnect watch is not removed when the media owner is freed if
+> an error occurs while resuming in acquire (id == 0).
 > ---
->  audio/gateway.c |    5 +----
->  1 files changed, 1 insertions(+), 4 deletions(-)
+>  audio/transport.c |    6 +++---
+>  1 files changed, 3 insertions(+), 3 deletions(-)
 >
-> diff --git a/audio/gateway.c b/audio/gateway.c
-> index 163f7b5..131f93f 100644
-> --- a/audio/gateway.c
-> +++ b/audio/gateway.c
-> @@ -836,12 +836,9 @@ unsigned int gateway_request_stream(struct audio_device *dev,
->                                gateway_stream_cb_t cb, void *user_data)
->  {
->        struct gateway *gw = dev->gateway;
-> -       unsigned int id;
->        GError *err = NULL;
->        GIOChannel *io;
->
-> -       id = connect_cb_new(gw, cb, user_data);
-> -
->        if (!gw->rfcomm)
->                get_records(dev);
->        else if (!gw->sco) {
-> @@ -858,7 +855,7 @@ unsigned int gateway_request_stream(struct audio_device *dev,
->        } else
->                g_idle_add(request_stream_cb, dev);
->
-> -       return id;
-> +       return connect_cb_new(gw, cb, user_data);
+> diff --git a/audio/transport.c b/audio/transport.c
+> index b319e0e..7bf7309 100644
+> --- a/audio/transport.c
+> +++ b/audio/transport.c
+> @@ -599,6 +599,9 @@ static void media_transport_add(struct media_transport *transport,
+>        DBG("Transport %s Owner %s", transport->path, owner->name);
+>        transport->owners = g_slist_append(transport->owners, owner);
+>        owner->transport = transport;
+> +       owner->watch = g_dbus_add_disconnect_watch(transport->conn, owner->name,
+> +                                                       media_owner_exit,
+> +                                                       owner, NULL);
 >  }
 >
->  int gateway_config_stream(struct audio_device *dev, gateway_stream_cb_t cb,
+>  static struct media_owner *media_owner_create(DBusConnection *conn,
+> @@ -610,9 +613,6 @@ static struct media_owner *media_owner_create(DBusConnection *conn,
+>        owner = g_new0(struct media_owner, 1);
+>        owner->name = g_strdup(dbus_message_get_sender(msg));
+>        owner->accesstype = g_strdup(accesstype);
+> -       owner->watch = g_dbus_add_disconnect_watch(conn, owner->name,
+> -                                                       media_owner_exit,
+> -                                                       owner, NULL);
+>
+>        DBG("Owner created: sender=%s accesstype=%s", owner->name,
+>                        accesstype);
 > --
 > 1.7.5.4
 
