@@ -1,44 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 0/3] Bluetooth: Change socket lock to l2cap_chan lock
-Date: Wed, 22 Feb 2012 17:11:54 +0200
-Message-Id: <1329923517-5425-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: mgmt: Fix Set SSP supported check
+Date: Wed, 22 Feb 2012 16:53:11 +0200
+Message-Id: <1329922392-25089-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Changing socket lock to L2CAP chan lock in L2CAP code. Needed for implementing
-protocols above L2CAP without creating sockets.
+The test for SSP support needs to be earlier in the set_ssp function so
+that we return an error when SSP is not supported even when the device
+is powered off.
 
-Changes:
-	* PATCHv3: Do not remove couple of empty lines and remove old comments.
-	* PATCHv2: Rebase remaining parts against latest tree and merge all
-	patches dealing with converting sk lock to chan lock together following
-	recommendation from Ulisses and Gustavo.
-	* PATCHv1: Added extra line (per Gustavo comment)
-	* RFCv6: Same code but patches 2,3 and 4 from RFCv5 are merged together
-	following recommendations from review.
-	* RFCv5: Fixed locking bug in l2cap_data_channel, added locks in 
-	l2cap_sock_shutdown function, fixed several styles issues.
-	* RFCv4: Better split patches so they looks more clear and obvious,
-	taking coments about naming change and delete unused vars. See diff change
-	from the previous version below:
-	* RFCv3: Split the big patch to several small (I believe logical) chunks,
-	remove unneded locks from cleanup_listen, use the same arguments for
-	locked/unlocked socket error functions.
-	* RFCv2: Convert l2cap channel list back to mutex from RCU list.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c |   12 ++++++------
+ 1 files changed, 6 insertions(+), 6 deletions(-)
 
-Andrei Emeltchenko (3):
-  Bluetooth: Add unlocked __l2cap_chan_add function
-  Bluetooth: Change sk lock to chan lock in L2CAP core
-  Bluetooth: Remove socket lock check
-
- net/bluetooth/l2cap_core.c |  175 ++++++++++++++++++++++++++------------------
- net/bluetooth/l2cap_sock.c |   26 +++++--
- 2 files changed, 125 insertions(+), 76 deletions(-)
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 8b4df04..ac8ba83 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1141,6 +1141,12 @@ static int set_ssp(struct sock *sk, u16 index, void *data, u16 len)
+ 
+ 	hci_dev_lock(hdev);
+ 
++	if (!(hdev->features[6] & LMP_SIMPLE_PAIR)) {
++		err = cmd_status(sk, index, MGMT_OP_SET_SSP,
++						MGMT_STATUS_NOT_SUPPORTED);
++		goto failed;
++	}
++
+ 	val = !!cp->val;
+ 
+ 	if (!hdev_is_powered(hdev)) {
+@@ -1161,12 +1167,6 @@ static int set_ssp(struct sock *sk, u16 index, void *data, u16 len)
+ 		goto failed;
+ 	}
+ 
+-	if (!(hdev->features[6] & LMP_SIMPLE_PAIR)) {
+-		err = cmd_status(sk, index, MGMT_OP_SET_SSP,
+-						MGMT_STATUS_NOT_SUPPORTED);
+-		goto failed;
+-	}
+-
+ 	if (mgmt_pending_find(MGMT_OP_SET_SSP, hdev)) {
+ 		err = cmd_status(sk, index, MGMT_OP_SET_SSP, MGMT_STATUS_BUSY);
+ 		goto failed;
 -- 
 1.7.9
 
