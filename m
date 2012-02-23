@@ -1,47 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: mgmt: Fix return value of add/remove_uuid
-Date: Thu, 23 Feb 2012 16:03:01 +0200
-Message-Id: <1330005781-8185-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1330005781-8185-1-git-send-email-johan.hedberg@gmail.com>
-References: <1330005781-8185-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: mgmt: Fix update_eir/class with HCI_AUTO_OFF flag set
+Date: Thu, 23 Feb 2012 16:03:00 +0200
+Message-Id: <1330005781-8185-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The Add/Remove UUID commands should return the device class instead of
-an empty parameter list.
+If we're powered but still have the HCI_AUTO_OFF flag set the
+update_eir and update_class functions should not do anything.
+Additionally these functions need to be called when the flag is finally
+cleared through set_powered or when powering on for real.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+ net/bluetooth/mgmt.c |    7 +++++--
+ 1 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 4e48894..000abc0 100644
+index 7fdba8f..4e48894 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1367,7 +1367,7 @@ static int add_uuid(struct sock *sk, u16 index, void *data, u16 len)
- 	if (err < 0)
- 		goto failed;
+@@ -532,7 +532,7 @@ static int update_eir(struct hci_dev *hdev)
+ {
+ 	struct hci_cp_write_eir cp;
  
--	err = cmd_complete(sk, index, MGMT_OP_ADD_UUID, 0, NULL, 0);
-+	err = cmd_complete(sk, index, MGMT_OP_ADD_UUID, 0, hdev->dev_class, 3);
+-	if (!test_bit(HCI_UP, &hdev->flags))
++	if (!hdev_is_powered(hdev))
+ 		return 0;
  
- failed:
- 	hci_dev_unlock(hdev);
-@@ -1428,7 +1428,8 @@ static int remove_uuid(struct sock *sk, u16 index, void *data, u16 len)
- 	if (err < 0)
- 		goto unlock;
+ 	if (!(hdev->features[6] & LMP_EXT_INQ))
+@@ -573,7 +573,7 @@ static int update_class(struct hci_dev *hdev)
  
--	err = cmd_complete(sk, index, MGMT_OP_REMOVE_UUID, 0, NULL, 0);
-+	err = cmd_complete(sk, index, MGMT_OP_REMOVE_UUID, 0,
-+							hdev->dev_class, 3);
+ 	BT_DBG("%s", hdev->name);
  
- unlock:
- 	hci_dev_unlock(hdev);
+-	if (!test_bit(HCI_UP, &hdev->flags))
++	if (!hdev_is_powered(hdev))
+ 		return 0;
+ 
+ 	if (test_bit(HCI_SERVICE_CACHE, &hdev->dev_flags))
+@@ -3121,6 +3121,9 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+ 
+ 		if (scan)
+ 			hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
++
++		update_class(hdev);
++		update_eir(hdev);
+ 	} else {
+ 		u8 status = ENETDOWN;
+ 		mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
 -- 
 1.7.9
 
