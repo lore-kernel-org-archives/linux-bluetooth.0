@@ -1,34 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1330008817.3392.0.camel@aeonflux>
-Subject: Re: [PATCH 1/2] Bluetooth: mgmt: Fix update_eir/class with
- HCI_AUTO_OFF flag set
-From: Marcel Holtmann <marcel@holtmann.org>
-To: johan.hedberg@gmail.com
+Date: Thu, 23 Feb 2012 16:54:49 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 23 Feb 2012 15:53:37 +0100
-In-Reply-To: <1330005781-8185-1-git-send-email-johan.hedberg@gmail.com>
-References: <1330005781-8185-1-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: Re: [PATCH] Bluetooth: Set DISCOVERY_STOPPED if controller resets
+Message-ID: <20120223145449.GA8783@x220>
+References: <1329520360-16874-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1329520360-16874-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Andre,
 
-> If we're powered but still have the HCI_AUTO_OFF flag set the
-> update_eir and update_class functions should not do anything.
-> Additionally these functions need to be called when the flag is finally
-> cleared through set_powered or when powering on for real.
+On Fri, Feb 17, 2012, Andre Guedes wrote:
+> If controller is reset during the discovery procedure, Start
+> Discovery command stops working. This can be easily reproduced
+> by running "hciconfig hci0 reset" while discovering devices,
+> for instance.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> We should force discovery state to DISCOVERY_STOPPED in case we
+> receive a reset command complete event. Otherwise we may stuck
+> in one of the active discovery states (DISCOVERY_INQUIRY,
+> DISCOVERY_LE_SCAN and DISCOVERY_RESOLVING) and subsequent Start
+> Discovery commands will simply fail.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
->  net/bluetooth/mgmt.c |    7 +++++--
->  1 files changed, 5 insertions(+), 2 deletions(-)
+>  net/bluetooth/hci_event.c |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Applied (after manual fixes to match the latest tree). Thanks.
 
-Regards
-
-Marcel
-
-
+Johan
