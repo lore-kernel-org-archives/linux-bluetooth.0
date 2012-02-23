@@ -1,35 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michal Labedzki <michal.labedzki@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <kanak.gupta@stericsson.com>, <vani.patel@stericsson.com>,
-	Michal Labedzki <michal.labedzki@tieto.com>
-Subject: [PATCH] avrcp: Fix response ctype of AbortContinuingResponse
-Date: Thu, 23 Feb 2012 16:22:42 +0100
-Message-ID: <1330010562-27277-1-git-send-email-michal.labedzki@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] l2test: Add BT Channel Policy option
+Date: Thu, 23 Feb 2012 17:20:18 +0200
+Message-Id: <1330010418-2613-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1330010418-2613-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1330010418-2613-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Request ctype of "AbortContinuingResponse" is CONTROL, so response should be
-ACCEPTED instead of STABLE. This affect PTS Test Case for TP/RCR/BV-04-C.
----
- audio/avrcp.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index c9ec314..4573133 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -986,7 +986,7 @@ static uint8_t avrcp_handle_abort_continuing(struct avrcp_player *player,
- 	player_abort_pending_pdu(player);
- 	pdu->params_len = 0;
+Make l2test able to set channel policy socket option.
+---
+ test/l2test.c |   28 +++++++++++++++++++++++++++-
+ 1 files changed, 27 insertions(+), 1 deletions(-)
+
+diff --git a/test/l2test.c b/test/l2test.c
+index ce20bb3..7f97774 100644
+--- a/test/l2test.c
++++ b/test/l2test.c
+@@ -116,6 +116,7 @@ static int timestamp = 0;
+ static int defer_setup = 0;
+ static int priority = -1;
+ static int rcvbuf = 0;
++static int chan_policy = 0;
  
--	return AVC_CTYPE_STABLE;
-+	return AVC_CTYPE_ACCEPTED;
+ struct lookup_table {
+ 	char	*name;
+@@ -133,6 +134,13 @@ static struct lookup_table l2cap_modes[] = {
+ 	{ 0 }
+ };
  
- err:
- 	pdu->params_len = htons(1);
++static struct lookup_table chan_policies[] = {
++	{ "bredr",	BT_CHANNEL_POLICY_BREDR_ONLY		},
++	{ "bredr_pref",	BT_CHANNEL_POLICY_BREDR_PREFERRED	},
++	{ "amp_pref",	BT_CHANNEL_POLICY_AMP_PREFERRED		},
++	{ NULL,		0					},
++};
++
+ static int get_lookup_flag(struct lookup_table *table, char *name)
+ {
+ 	int i;
+@@ -296,6 +304,15 @@ static int do_connect(char *svr)
+ 	}
+ #endif
+ 
++	if (chan_policy != -1) {
++		if (setsockopt(sk, SOL_BLUETOOTH, BT_CHANNEL_POLICY,
++				&chan_policy, sizeof(chan_policy)) < 0) {
++			syslog(LOG_ERR, "Can't enable chan policy : %s (%d)",
++							strerror(errno), errno);
++			goto error;
++		}
++	}
++
+ 	/* Enable SO_LINGER */
+ 	if (linger) {
+ 		struct linger l = { .l_onoff = 1, .l_linger = linger };
+@@ -1216,7 +1233,7 @@ int main(int argc, char *argv[])
+ 
+ 	bacpy(&bdaddr, BDADDR_ANY);
+ 
+-	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:J:B:N:L:W:C:D:X:F:Q:Z:Y:H:K:RUGAESMT")) != EOF) {
++	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:J:B:N:L:W:C:D:X:F:Q:Z:Y:H:K:RUGAESMTa:")) != EOF) {
+ 		switch(opt) {
+ 		case 'r':
+ 			mode = RECV;
+@@ -1339,8 +1356,17 @@ int main(int argc, char *argv[])
+ 			if (rfcmode == -1) {
+ 				print_lookup_values(l2cap_modes,
+ 						"List L2CAP modes:");
++				exit(1);
++			}
++
++			break;
+ 
++		case 'a':
++			chan_policy = get_lookup_flag(chan_policies, optarg);
+ 
++			if (chan_policy == -1) {
++				print_lookup_values(chan_policies,
++						"List L2CAP chan policies:");
+ 				exit(1);
+ 			}
+ 
 -- 
-on behalf of ST-Ericsson
+1.7.9
 
