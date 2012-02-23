@@ -1,44 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mat Martineau <mathewm@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: padovan@profusion.mobi, pkrystad@codeaurora.org,
-	marcel@holtmann.org, luiz.dentz@gmail.com, ulisses@profusion.mobi,
-	andrei.emeltchenko.news@gmail.com,
-	Mat Martineau <mathewm@codeaurora.org>
-Subject: [RFC 0/2] New L2CAP ERTM state machine
-Date: Thu, 23 Feb 2012 12:37:47 -0800
-Message-Id: <1330029469-8565-1-git-send-email-mathewm@codeaurora.org>
+Date: Thu, 23 Feb 2012 18:11:31 +0100 (CET)
+From: Pierre Frenkiel <pierre.frenkiel@gmail.com>
+To: Brad Midgley <bmidgley@gmail.com>
+cc: Pierre Frenkiel <pierre.frenkiel@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: plugz configure error
+In-Reply-To: <CAKLsOOPwqzdRuUvZRLVd0ntcykvhNHznbusFRD7J=JRg04wVUA@mail.gmail.com>
+Message-ID: <alpine.DEB.2.00.1202231805150.30420@pfr2.frenkiel-hure.net>
+References: <alpine.DEB.2.00.1202231625350.12405@pfr2.frenkiel-hure.net> <alpine.DEB.2.00.1202231740310.18083@pfr2.frenkiel-hure.net> <CAKLsOOPwqzdRuUvZRLVd0ntcykvhNHznbusFRD7J=JRg04wVUA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: MULTIPART/MIXED; BOUNDARY="-1463809023-1702769310-1330017095=:30420"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Here's an update for the ERTM state machine patch. I've made the
-changes that were suggested earlier this month, and separated the
-header changes and l2cap_core changes.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-The first patch is a reasonable size for mailing list discussion, but
-the second is too large.  In place of the second patch I'm providing a
-link to the change.  Let me know if I should just try to send the
-large patch anyway.
+---1463809023-1702769310-1330017095=:30420
+Content-Type: TEXT/PLAIN; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 
-You can pull these changes from:
-git://codeaurora.org/quic/bluetooth/bluetooth-next.git
+On Thu, 23 Feb 2012, Brad Midgley wrote:
 
-Tag name: mathewm-2012-02-23-ertm
+>> following the tutorial at
+>>  http://bluetooth-alsa.sourceforge.net/build.html
+>
+> the sourceforge project is only for historical interest. You should
+> use built-in bluez support for audio. I see the link to the wiki is
+> broken... that was supposed to get you on the right track.
 
-
-Mat Martineau (2):
-  Bluetooth: Header changes for ERTM state machine replacement
-  Bluetooth: L2CAP ERTM state machine replacement
-
- include/net/bluetooth/bluetooth.h |   14 +-
- include/net/bluetooth/l2cap.h     |  260 +---
- net/bluetooth/l2cap_core.c        | 2771 +++++++++++++++++++++++++------------
- 3 files changed, 1954 insertions(+), 1091 deletions(-)
+   at least, this link gave me the way to use kaffeine, mplayer and gxine.
+   Googling always sends me back to the same obsolete link...
 
 -- 
-1.7.9
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Pierre Frenkiel
+---1463809023-1702769310-1330017095=:30420--
