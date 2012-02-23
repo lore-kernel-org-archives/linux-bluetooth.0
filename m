@@ -1,50 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <20C1BE82EE3A42A0A4F6D83D523BCC33@sisodomain.com>
-From: "chethan.tn" <chethan.tn@samsung.com>
-To: Vani-dineshbhai PATEL X <vani.patel@stericsson.com>,
-	linux-bluetooth@vger.kernel.org
-References: <14973674.138841330000186563.JavaMail.weblogic@epml06>
- <747C1E83C744F44E9ACFB89FAEEC2C7B21A747E8EB@EXDCVYMBSTM005.EQ1STM.local>
-In-reply-to: <747C1E83C744F44E9ACFB89FAEEC2C7B21A747E8EB@EXDCVYMBSTM005.EQ1STM.local>
-Subject: Re: AVRCP 1.4 Target Role
-Date: Fri, 24 Feb 2012 10:08:02 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=utf-8; reply-type=original
+Message-ID: <1330034716.3392.10.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Check capabilities in BR/EDR and LE-Only
+ discovery
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 23 Feb 2012 23:05:16 +0100
+In-Reply-To: <1330031367-10614-1-git-send-email-andre.guedes@openbossa.org>
+References: <1330031367-10614-1-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vani,
+Hi Andre,
 
---------------------------------------------------
-From: "Vani-dineshbhai PATEL X" <vani.patel@stericsson.com>
-Sent: Thursday, February 23, 2012 6:40 PM
-To: <chethan.tn@samsung.com>; <linux-bluetooth@vger.kernel.org>
-Subject: RE: AVRCP 1.4 Target Role
+> This patch add an extra check for BR/EDR and LE-Only discovery.
+> This way, we are able to return error immediately if the discovery
+> type requested is not supported by the device.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  net/bluetooth/mgmt.c |   10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
 
->
->
->> -----Original Message-----
->> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
->> owner@vger.kernel.org] On Behalf Of CHETHAN TN
->> Sent: Thursday, February 23, 2012 6:00 PM
->> To: linux-bluetooth@vger.kernel.org
->> Subject: AVRCP 1.4 Target Role
->>
->> Hi,
->>
->> I would like to contibute to AVRCP1.4 Target role.
->> Anyone, please share the current status of the AVRCP1.4 implemenation.
->
-> Hi, I have published an RFC and am working on incorporating the comments. 
-> I plan to publish the APIs soon.
->
->> Thanks and Regards
->> Chethan
->
-> Vani
+so besides my other comment, this patch can go in as is and we have to
+add an extra patch to handle interleaved once we talked through what's
+the best approach.
 
-By when are you planning to publish the complete AVRCP1.4 Target role. ?
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Thanks and Regards
-Chethan 
+Regards
+
+Marcel
+
 
