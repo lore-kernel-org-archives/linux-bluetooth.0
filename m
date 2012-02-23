@@ -1,34 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1330034307.3392.5.camel@aeonflux>
-Subject: Re: [PATCH 1/3] Bluetooth: mgmt: Track pending class changes
-From: Marcel Holtmann <marcel@holtmann.org>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 23 Feb 2012 22:58:27 +0100
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] Bluetooth: mgmt: Fix clear_uuids response
+Date: Thu, 23 Feb 2012 23:32:54 +0200
+Message-Id: <1330032774-16206-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1330032774-16206-1-git-send-email-johan.hedberg@gmail.com>
 References: <1330032774-16206-1-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> This patch adds a flag to track pending changes to the class of device.
-> This is needed since we cannot cleanly handle multiple simultaneous
-> commands and need to return a "busy" error status in the mgmt commands
-> that might trigger a class change.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  include/net/bluetooth/hci.h |    1 +
->  net/bluetooth/mgmt.c        |   29 +++++++++++++++++++++++++++--
->  2 files changed, 28 insertions(+), 2 deletions(-)
+Since the clear_uuids operation doesn't send an immediate HCI command
+but just sets off a timer to wait for subsequent add_uuid calls it
+doesn't make sense to wait until the timer fires off to send the
+response. Instead send the response immediately.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c |   23 +++++++++++++++++++----
+ 1 files changed, 19 insertions(+), 4 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 7a906d6..07e31f7 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1394,6 +1394,20 @@ failed:
+ 	return err;
+ }
+ 
++static bool enable_service_cache(struct hci_dev *hdev)
++{
++	if (!hdev_is_powered(hdev))
++		return false;
++
++	if (!test_and_set_bit(HCI_SERVICE_CACHE, &hdev->dev_flags)) {
++		schedule_delayed_work(&hdev->service_cache,
++				msecs_to_jiffies(SERVICE_CACHE_TIMEOUT));
++		return true;
++	}
++
++	return false;
++}
++
+ static int remove_uuid(struct sock *sk, u16 index, void *data, u16 len)
+ {
+ 	struct mgmt_cp_remove_uuid *cp = data;
+@@ -1425,10 +1439,11 @@ static int remove_uuid(struct sock *sk, u16 index, void *data, u16 len)
+ 	if (memcmp(cp->uuid, bt_uuid_any, 16) == 0) {
+ 		err = hci_uuids_clear(hdev);
+ 
+-		if (hdev_is_powered(hdev) &&
+-				!test_and_set_bit(HCI_SERVICE_CACHE, &hdev->dev_flags))
+-			schedule_delayed_work(&hdev->service_cache,
+-					msecs_to_jiffies(SERVICE_CACHE_TIMEOUT));
++		if (enable_service_cache(hdev)) {
++			err = cmd_complete(sk, index, MGMT_OP_REMOVE_UUID, 0,
++							hdev->dev_class, 3);
++			goto unlock;
++		}
+ 
+ 		goto update_class;
+ 	}
+-- 
+1.7.9
 
