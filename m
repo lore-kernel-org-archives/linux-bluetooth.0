@@ -1,165 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: mgmt: Fix dev_class related command response timing
-Date: Thu, 23 Feb 2012 23:32:53 +0200
-Message-Id: <1330032774-16206-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1330032774-16206-1-git-send-email-johan.hedberg@gmail.com>
-References: <1330032774-16206-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/3] Bluetooth: mgmt: Track pending class changes
+Date: Thu, 23 Feb 2012 23:32:52 +0200
+Message-Id: <1330032774-16206-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-All mgmt commands that may fire off a hci_write_class_of_device command
-should wait for the completion of the HCI command before sending a
-response to user space.
+This patch adds a flag to track pending changes to the class of device.
+This is needed since we cannot cleanly handle multiple simultaneous
+commands and need to return a "busy" error status in the mgmt commands
+that might trigger a class change.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |   70 ++++++++++++++++++++++++++++++++++++++++++++++---
- 1 files changed, 65 insertions(+), 5 deletions(-)
+ include/net/bluetooth/hci.h |    1 +
+ net/bluetooth/mgmt.c        |   29 +++++++++++++++++++++++++++--
+ 2 files changed, 28 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9f912dc..7a906d6 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1332,6 +1332,7 @@ failed:
- static int add_uuid(struct sock *sk, u16 index, void *data, u16 len)
- {
- 	struct mgmt_cp_add_uuid *cp = data;
-+	struct pending_cmd *cmd;
- 	struct hci_dev *hdev;
- 	struct bt_uuid *uuid;
- 	int err;
-@@ -1374,7 +1375,17 @@ static int add_uuid(struct sock *sk, u16 index, void *data, u16 len)
- 	if (err < 0)
- 		goto failed;
- 
--	err = cmd_complete(sk, index, MGMT_OP_ADD_UUID, 0, hdev->dev_class, 3);
-+	if (!test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
-+		err = cmd_complete(sk, index, MGMT_OP_ADD_UUID, 0,
-+							hdev->dev_class, 3);
-+		goto failed;
-+	}
-+
-+	cmd = mgmt_pending_add(sk, MGMT_OP_ADD_UUID, hdev, data, len);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto failed;
-+	}
- 
- failed:
- 	hci_dev_unlock(hdev);
-@@ -1386,6 +1397,7 @@ failed:
- static int remove_uuid(struct sock *sk, u16 index, void *data, u16 len)
- {
- 	struct mgmt_cp_remove_uuid *cp = data;
-+	struct pending_cmd *cmd;
- 	struct list_head *p, *n;
- 	struct hci_dev *hdev;
- 	u8 bt_uuid_any[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-@@ -1448,8 +1460,17 @@ update_class:
- 	if (err < 0)
- 		goto unlock;
- 
--	err = cmd_complete(sk, index, MGMT_OP_REMOVE_UUID, 0,
-+	if (!test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
-+		err = cmd_complete(sk, index, MGMT_OP_REMOVE_UUID, 0,
- 							hdev->dev_class, 3);
-+		goto unlock;
-+	}
-+
-+	cmd = mgmt_pending_add(sk, MGMT_OP_REMOVE_UUID, hdev, data, len);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto unlock;
-+	}
- 
- unlock:
- 	hci_dev_unlock(hdev);
-@@ -1462,6 +1483,7 @@ static int set_dev_class(struct sock *sk, u16 index, void *data, u16 len)
- {
- 	struct hci_dev *hdev;
- 	struct mgmt_cp_set_dev_class *cp = data;
-+	struct pending_cmd *cmd;
- 	int err;
- 
- 	BT_DBG("request for hci%u", index);
-@@ -1500,10 +1522,20 @@ static int set_dev_class(struct sock *sk, u16 index, void *data, u16 len)
- 	}
- 
- 	err = update_class(hdev);
-+	if (err < 0)
-+		goto unlock;
- 
--	if (err == 0)
-+	if (!test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
- 		err = cmd_complete(sk, index, MGMT_OP_SET_DEV_CLASS, 0,
- 							hdev->dev_class, 3);
-+		goto unlock;
-+	}
-+
-+	cmd = mgmt_pending_add(sk, MGMT_OP_SET_DEV_CLASS, hdev, data, len);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto unlock;
-+	}
- 
- unlock:
- 	hci_dev_unlock(hdev);
-@@ -3110,6 +3142,7 @@ int mgmt_index_removed(struct hci_dev *hdev)
- struct cmd_lookup {
- 	struct sock *sk;
- 	struct hci_dev *hdev;
-+	u8 mgmt_status;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index c97cf08..05bd9ac 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -100,6 +100,7 @@ enum {
+ 	HCI_CONNECTABLE,
+ 	HCI_DISCOVERABLE,
+ 	HCI_LINK_SECURITY,
++	HCI_PENDING_CLASS,
  };
  
- static void settings_rsp(struct pending_cmd *cmd, void *data)
-@@ -3632,14 +3665,41 @@ int mgmt_ssp_enable_complete(struct hci_dev *hdev, u8 enable, u8 status)
- 	return err;
+ /* HCI ioctl defines */
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 79fe575..9f912dc 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -570,6 +570,7 @@ static u8 get_service_classes(struct hci_dev *hdev)
+ static int update_class(struct hci_dev *hdev)
+ {
+ 	u8 cod[3];
++	int err;
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+@@ -586,7 +587,11 @@ static int update_class(struct hci_dev *hdev)
+ 	if (memcmp(cod, hdev->dev_class, 3) == 0)
+ 		return 0;
+ 
+-	return hci_send_cmd(hdev, HCI_OP_WRITE_CLASS_OF_DEV, sizeof(cod), cod);
++	err = hci_send_cmd(hdev, HCI_OP_WRITE_CLASS_OF_DEV, sizeof(cod), cod);
++	if (err == 0)
++		set_bit(HCI_PENDING_CLASS, &hdev->dev_flags);
++
++	return err;
  }
  
-+static void class_rsp(struct pending_cmd *cmd, void *data)
-+{
-+	struct cmd_lookup *match = data;
-+
-+	cmd_complete(cmd->sk, cmd->index, cmd->opcode, match->mgmt_status,
-+						match->hdev->dev_class, 3);
-+
-+	list_del(&cmd->list);
-+
-+	if (match->sk == NULL) {
-+		match->sk = cmd->sk;
-+		sock_hold(match->sk);
+ static void service_cache_off(struct work_struct *work)
+@@ -1344,6 +1349,12 @@ static int add_uuid(struct sock *sk, u16 index, void *data, u16 len)
+ 
+ 	hci_dev_lock(hdev);
+ 
++	if (test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
++		err = cmd_status(sk, index, MGMT_OP_ADD_UUID,
++							MGMT_STATUS_BUSY);
++		goto failed;
 +	}
 +
-+	mgmt_pending_free(cmd);
-+}
+ 	uuid = kmalloc(sizeof(*uuid), GFP_ATOMIC);
+ 	if (!uuid) {
+ 		err = -ENOMEM;
+@@ -1393,6 +1404,12 @@ static int remove_uuid(struct sock *sk, u16 index, void *data, u16 len)
+ 
+ 	hci_dev_lock(hdev);
+ 
++	if (test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
++		err = cmd_status(sk, index, MGMT_OP_REMOVE_UUID,
++							MGMT_STATUS_BUSY);
++		goto unlock;
++	}
 +
- int mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
- 								u8 status)
+ 	if (memcmp(cp->uuid, bt_uuid_any, 16) == 0) {
+ 		err = hci_uuids_clear(hdev);
+ 
+@@ -1460,6 +1477,12 @@ static int set_dev_class(struct sock *sk, u16 index, void *data, u16 len)
+ 
+ 	hci_dev_lock(hdev);
+ 
++	if (test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
++		err = cmd_status(sk, index, MGMT_OP_SET_DEV_CLASS,
++							MGMT_STATUS_BUSY);
++		goto unlock;
++	}
++
+ 	hdev->major_class = cp->major;
+ 	hdev->minor_class = cp->minor;
+ 
+@@ -3259,7 +3282,7 @@ int mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	bacpy(&ev->addr.bdaddr, bdaddr);
+ 	ev->addr.type = link_to_mgmt(link_type, addr_type);
+ 
+-	put_unaligned_le32(flags, &ev->flags);
++	ev->flags = __cpu_to_le32(flags);
+ 
+ 	if (name_len > 0)
+ 		eir_len = eir_append_data(ev->eir, 0, EIR_NAME_COMPLETE,
+@@ -3614,6 +3637,8 @@ int mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
  {
--	int err;
-+	struct cmd_lookup match = { NULL, hdev, mgmt_status(status) };
-+	int err = 0;
+ 	int err;
  
- 	clear_bit(HCI_PENDING_CLASS, &hdev->dev_flags);
- 
--	err = mgmt_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev, dev_class, 3, NULL);
-+	mgmt_pending_foreach(MGMT_OP_SET_DEV_CLASS, hdev, class_rsp, &match);
-+	mgmt_pending_foreach(MGMT_OP_ADD_UUID, hdev, class_rsp, &match);
-+	mgmt_pending_foreach(MGMT_OP_REMOVE_UUID, hdev, class_rsp, &match);
++	clear_bit(HCI_PENDING_CLASS, &hdev->dev_flags);
 +
-+	if (!status)
-+		err = mgmt_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev,
-+							dev_class, 3, NULL);
-+
-+	if (match.sk)
-+		sock_put(match.sk);
+ 	err = mgmt_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev, dev_class, 3, NULL);
  
  	return err;
- }
 -- 
 1.7.9
 
