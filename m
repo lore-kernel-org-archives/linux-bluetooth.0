@@ -1,23 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 23 Feb 2012 16:39:10 +0100 (CET)
-From: Pierre Frenkiel <pierre.frenkiel@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <alpine.DEB.2.00.1202231625350.12405@pfr2.frenkiel-hure.net>
+From: Michal Labedzki <michal.labedzki@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <kanak.gupta@stericsson.com>, <vani.patel@stericsson.com>,
+	Michal Labedzki <michal.labedzki@tieto.com>
+Subject: [PATCH] avrcp: Fix response ctype of AbortContinuingResponse
+Date: Thu, 23 Feb 2012 16:22:42 +0100
+Message-ID: <1330010562-27277-1-git-send-email-michal.labedzki@tieto.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-following the tutorial at
-    http://bluetooth-alsa.sourceforge.net/build.html
+Request ctype of "AbortContinuingResponse" is CONTROL, so response should be
+ACCEPTED instead of STABLE. This affect PTS Test Case for TP/RCR/BV-04-C.
+---
+ audio/avrcp.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-I was able to use my bluetooth head with some programs like gxine,
-kaffeine, mplayer, but I had a problem trying to install plugz
-./configure fails with the message:
-    configure: error: Package requirements \
-        (dbus-1 >= 0.36, dbus-glib-1 >= 0.36) were not met
-The installed package is libdbus-glib-1-2, and I suppose that the 
-problem is just in naming, but I don't kown how to overcome it.
-
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index c9ec314..4573133 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -986,7 +986,7 @@ static uint8_t avrcp_handle_abort_continuing(struct avrcp_player *player,
+ 	player_abort_pending_pdu(player);
+ 	pdu->params_len = 0;
+ 
+-	return AVC_CTYPE_STABLE;
++	return AVC_CTYPE_ACCEPTED;
+ 
+ err:
+ 	pdu->params_len = htons(1);
 -- 
-Pierre Frenkiel
+on behalf of ST-Ericsson
+
