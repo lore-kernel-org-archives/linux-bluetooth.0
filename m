@@ -1,36 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 23 Feb 2012 16:54:49 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
+Date: Thu, 23 Feb 2012 12:53:06 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: johan.hedberg@gmail.com
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Set DISCOVERY_STOPPED if controller resets
-Message-ID: <20120223145449.GA8783@x220>
-References: <1329520360-16874-1-git-send-email-andre.guedes@openbossa.org>
+Subject: Re: [PATCH 2/2] Bluetooth: mgmt: Fix return value of add/remove_uuid
+Message-ID: <20120223145306.GB2972@joana>
+References: <1330005781-8185-1-git-send-email-johan.hedberg@gmail.com>
+ <1330005781-8185-2-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1329520360-16874-1-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1330005781-8185-2-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Johan,
 
-On Fri, Feb 17, 2012, Andre Guedes wrote:
-> If controller is reset during the discovery procedure, Start
-> Discovery command stops working. This can be easily reproduced
-> by running "hciconfig hci0 reset" while discovering devices,
-> for instance.
+* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2012-02-23 16:03:01 +0200]:
+
+> From: Johan Hedberg <johan.hedberg@intel.com>
 > 
-> We should force discovery state to DISCOVERY_STOPPED in case we
-> receive a reset command complete event. Otherwise we may stuck
-> in one of the active discovery states (DISCOVERY_INQUIRY,
-> DISCOVERY_LE_SCAN and DISCOVERY_RESOLVING) and subsequent Start
-> Discovery commands will simply fail.
+> The Add/Remove UUID commands should return the device class instead of
+> an empty parameter list.
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  net/bluetooth/hci_event.c |    2 ++
->  1 files changed, 2 insertions(+), 0 deletions(-)
+>  net/bluetooth/mgmt.c |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
 
-Applied (after manual fixes to match the latest tree). Thanks.
+Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
 
-Johan
+	Gustavo
