@@ -1,69 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Change interleaved discovery behavior
-Date: Fri, 24 Feb 2012 11:41:04 -0300
-Message-Id: <1330094465-4625-1-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH] Bluetooth: Fix double locking in LE and conless chan
+Date: Fri, 24 Feb 2012 16:35:32 +0200
+Message-Id: <1330094132-11762-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to last discussion on IRC, if an interleaved discovery is
-issued, but the device is not dual mode, we should return error
-instead of performing a regular BR/EDR or LE-only discovery.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+Remove socket lock since chan->ops->recv locks socket itself.
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/mgmt.c |   29 +++++------------------------
- 1 file changed, 5 insertions(+), 24 deletions(-)
+ net/bluetooth/l2cap_core.c |   24 ++++--------------------
+ 1 files changed, 4 insertions(+), 20 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 07e31f7..8a36e68 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2539,29 +2539,6 @@ unlock:
- 	return err;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b2f1565..ed50e4a 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4382,18 +4382,13 @@ done:
+ 
+ static inline int l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm, struct sk_buff *skb)
+ {
+-	struct sock *sk = NULL;
+ 	struct l2cap_chan *chan;
+ 
+ 	chan = l2cap_global_chan_by_psm(0, psm, conn->src);
+ 	if (!chan)
+ 		goto drop;
+ 
+-	sk = chan->sk;
+-
+-	lock_sock(sk);
+-
+-	BT_DBG("sk %p, len %d", sk, skb->len);
++	BT_DBG("chan %p, len %d", chan, skb->len);
+ 
+ 	if (chan->state != BT_BOUND && chan->state != BT_CONNECTED)
+ 		goto drop;
+@@ -4402,31 +4397,23 @@ static inline int l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm, str
+ 		goto drop;
+ 
+ 	if (!chan->ops->recv(chan->data, skb))
+-		goto done;
++		return 0;
+ 
+ drop:
+ 	kfree_skb(skb);
+ 
+-done:
+-	if (sk)
+-		release_sock(sk);
+ 	return 0;
  }
  
--static int discovery(struct hci_dev *hdev)
--{
--	int err;
--
--	if (lmp_host_le_capable(hdev)) {
--		if (lmp_bredr_capable(hdev)) {
--			err = hci_le_scan(hdev, LE_SCAN_TYPE,
--						LE_SCAN_INT, LE_SCAN_WIN,
--						LE_SCAN_TIMEOUT_BREDR_LE);
--		} else {
--			hdev->discovery.type = DISCOV_TYPE_LE;
--			err = hci_le_scan(hdev, LE_SCAN_TYPE,
--						LE_SCAN_INT, LE_SCAN_WIN,
--						LE_SCAN_TIMEOUT_LE_ONLY);
--		}
--	} else {
--		hdev->discovery.type = DISCOV_TYPE_BREDR;
--		err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
--	}
--
--	return err;
--}
--
- int mgmt_interleaved_discovery(struct hci_dev *hdev)
+ static inline int l2cap_att_channel(struct l2cap_conn *conn, __le16 cid, struct sk_buff *skb)
  {
- 	int err;
-@@ -2631,7 +2608,11 @@ static int start_discovery(struct sock *sk, u16 index,
- 		break;
+-	struct sock *sk = NULL;
+ 	struct l2cap_chan *chan;
  
- 	case DISCOV_TYPE_INTERLEAVED:
--		err = discovery(hdev);
-+		if (lmp_host_le_capable(hdev) && lmp_bredr_capable(hdev))
-+			err = hci_le_scan(hdev, LE_SCAN_TYPE, LE_SCAN_INT,
-+					LE_SCAN_WIN, LE_SCAN_TIMEOUT_BREDR_LE);
-+		else
-+			err = -ENOTSUPP;
- 		break;
+ 	chan = l2cap_global_chan_by_scid(0, cid, conn->src);
+ 	if (!chan)
+ 		goto drop;
  
- 	default:
+-	sk = chan->sk;
+-
+-	lock_sock(sk);
+-
+-	BT_DBG("sk %p, len %d", sk, skb->len);
++	BT_DBG("chan %p, len %d", chan, skb->len);
+ 
+ 	if (chan->state != BT_BOUND && chan->state != BT_CONNECTED)
+ 		goto drop;
+@@ -4435,14 +4422,11 @@ static inline int l2cap_att_channel(struct l2cap_conn *conn, __le16 cid, struct
+ 		goto drop;
+ 
+ 	if (!chan->ops->recv(chan->data, skb))
+-		goto done;
++		return 0;
+ 
+ drop:
+ 	kfree_skb(skb);
+ 
+-done:
+-	if (sk)
+-		release_sock(sk);
+ 	return 0;
+ }
+ 
 -- 
-1.7.9.2
+1.7.9
 
