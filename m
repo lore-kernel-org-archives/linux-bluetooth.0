@@ -1,29 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 24 Feb 2012 14:43:20 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Complete Read Local Version HCI cmd
-Message-ID: <20120224124320.GA10358@x220>
-References: <1330080344-23739-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 24 Feb 2012 14:41:50 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 3/3] l2test: Add BT Channel Policy option
+Message-ID: <20120224124144.GB4013@aemeltch-MOBL1>
+References: <1330073065-8188-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1330073065-8188-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1330080344-23739-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1330073065-8188-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi,
 
-On Fri, Feb 24, 2012, Andrei Emeltchenko wrote:
-> Mark request status as done for Read Local Version HCI command.
-> In AMP initialization this HCI command is the last and needs
-> to be completed.
+On Fri, Feb 24, 2012 at 10:44:25AM +0200, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Make l2test able to set channel policy socket option.
 > ---
->  net/bluetooth/hci_event.c |    5 ++++-
->  1 files changed, 4 insertions(+), 1 deletions(-)
+>  test/l2test.c |   32 ++++++++++++++++++++++++++++++--
+>  1 files changed, 30 insertions(+), 2 deletions(-)
+> 
+> diff --git a/test/l2test.c b/test/l2test.c
+> index 3705fdc..9f615a2 100644
+> --- a/test/l2test.c
+> +++ b/test/l2test.c
+> @@ -116,6 +116,7 @@ static int timestamp = 0;
+>  static int defer_setup = 0;
+>  static int priority = -1;
+>  static int rcvbuf = 0;
+> +static int chan_policy;
 
-Applied. Thanks.
+Sorry shall be:
 
-Johan
+-static int chan_policy;
++static int chan_policy = -1;
+
+Best regards 
+Andrei Emeltchenko 
+
