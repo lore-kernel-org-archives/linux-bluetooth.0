@@ -1,95 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix double locking in LE and conless chan
-Date: Fri, 24 Feb 2012 16:35:32 +0200
-Message-Id: <1330094132-11762-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC] Bluetooth: Remove duplicated code in l2cap conn req
+Date: Fri, 24 Feb 2012 16:00:00 +0200
+Message-Id: <1330092000-9420-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Remove socket lock since chan->ops->recv locks socket itself.
+The same sequence sending L2CAP Connection Request was
+used in several places. Using subroutine makes those
+places easy to read.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |   24 ++++--------------------
- 1 files changed, 4 insertions(+), 20 deletions(-)
+ net/bluetooth/l2cap_core.c |   49 +++++++++++++++++--------------------------
+ 1 files changed, 19 insertions(+), 30 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b2f1565..ed50e4a 100644
+index 5f4cfea..e9fadce 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -4382,18 +4382,13 @@ done:
- 
- static inline int l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm, struct sk_buff *skb)
- {
--	struct sock *sk = NULL;
- 	struct l2cap_chan *chan;
- 
- 	chan = l2cap_global_chan_by_psm(0, psm, conn->src);
- 	if (!chan)
- 		goto drop;
- 
--	sk = chan->sk;
--
--	lock_sock(sk);
--
--	BT_DBG("sk %p, len %d", sk, skb->len);
-+	BT_DBG("chan %p, len %d", chan, skb->len);
- 
- 	if (chan->state != BT_BOUND && chan->state != BT_CONNECTED)
- 		goto drop;
-@@ -4402,31 +4397,23 @@ static inline int l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm, str
- 		goto drop;
- 
- 	if (!chan->ops->recv(chan->data, skb))
--		goto done;
-+		return 0;
- 
- drop:
- 	kfree_skb(skb);
- 
--done:
--	if (sk)
--		release_sock(sk);
- 	return 0;
+@@ -667,6 +667,21 @@ static inline int __l2cap_no_conn_pending(struct l2cap_chan *chan)
+ 	return !test_bit(CONF_CONNECT_PEND, &chan->conf_state);
  }
  
- static inline int l2cap_att_channel(struct l2cap_conn *conn, __le16 cid, struct sk_buff *skb)
++static void l2cap_send_conn_req(struct l2cap_chan *chan)
++{
++	struct l2cap_conn *conn = chan->conn;
++	struct l2cap_conn_req req;
++
++	req.scid = cpu_to_le16(chan->scid);
++	req.psm  = chan->psm;
++
++	chan->ident = l2cap_get_ident(conn);
++
++	set_bit(CONF_CONNECT_PEND, &chan->conf_state);
++
++	l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_REQ, sizeof(req), &req);
++}
++
+ static void l2cap_do_start(struct l2cap_chan *chan)
  {
--	struct sock *sk = NULL;
- 	struct l2cap_chan *chan;
+ 	struct l2cap_conn *conn = chan->conn;
+@@ -676,17 +691,8 @@ static void l2cap_do_start(struct l2cap_chan *chan)
+ 			return;
  
- 	chan = l2cap_global_chan_by_scid(0, cid, conn->src);
- 	if (!chan)
- 		goto drop;
- 
--	sk = chan->sk;
+ 		if (l2cap_chan_check_security(chan) &&
+-				__l2cap_no_conn_pending(chan)) {
+-			struct l2cap_conn_req req;
+-			req.scid = cpu_to_le16(chan->scid);
+-			req.psm  = chan->psm;
 -
--	lock_sock(sk);
+-			chan->ident = l2cap_get_ident(conn);
+-			set_bit(CONF_CONNECT_PEND, &chan->conf_state);
 -
--	BT_DBG("sk %p, len %d", sk, skb->len);
-+	BT_DBG("chan %p, len %d", chan, skb->len);
+-			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_REQ,
+-							sizeof(req), &req);
+-		}
++				__l2cap_no_conn_pending(chan))
++			l2cap_send_conn_req(chan);
+ 	} else {
+ 		struct l2cap_info_req req;
+ 		req.type = cpu_to_le16(L2CAP_IT_FEAT_MASK);
+@@ -763,8 +769,6 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 		}
  
- 	if (chan->state != BT_BOUND && chan->state != BT_CONNECTED)
- 		goto drop;
-@@ -4435,14 +4422,11 @@ static inline int l2cap_att_channel(struct l2cap_conn *conn, __le16 cid, struct
- 		goto drop;
+ 		if (chan->state == BT_CONNECT) {
+-			struct l2cap_conn_req req;
+-
+ 			if (!l2cap_chan_check_security(chan) ||
+ 					!__l2cap_no_conn_pending(chan)) {
+ 				l2cap_chan_unlock(chan);
+@@ -779,14 +783,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 				continue;
+ 			}
  
- 	if (!chan->ops->recv(chan->data, skb))
--		goto done;
-+		return 0;
+-			req.scid = cpu_to_le16(chan->scid);
+-			req.psm  = chan->psm;
+-
+-			chan->ident = l2cap_get_ident(conn);
+-			set_bit(CONF_CONNECT_PEND, &chan->conf_state);
+-
+-			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_REQ,
+-							sizeof(req), &req);
++			l2cap_send_conn_req(chan);
  
- drop:
- 	kfree_skb(skb);
+ 		} else if (chan->state == BT_CONNECT2) {
+ 			struct l2cap_conn_rsp rsp;
+@@ -4609,15 +4606,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
  
--done:
--	if (sk)
--		release_sock(sk);
- 	return 0;
- }
- 
+ 		if (chan->state == BT_CONNECT) {
+ 			if (!status) {
+-				struct l2cap_conn_req req;
+-				req.scid = cpu_to_le16(chan->scid);
+-				req.psm  = chan->psm;
+-
+-				chan->ident = l2cap_get_ident(conn);
+-				set_bit(CONF_CONNECT_PEND, &chan->conf_state);
+-
+-				l2cap_send_cmd(conn, chan->ident,
+-					L2CAP_CONN_REQ, sizeof(req), &req);
++				l2cap_send_conn_req(chan);
+ 			} else {
+ 				__clear_chan_timer(chan);
+ 				__set_chan_timer(chan,
 -- 
 1.7.9
 
