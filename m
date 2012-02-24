@@ -1,33 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-Subject: [PATCH] sbc: fix "always_inline function might not be inlinable" warning
-Date: Fri, 24 Feb 2012 14:13:16 +0200
-Message-Id: <1330085596-3645-1-git-send-email-siarhei.siamashka@gmail.com>
+Subject: [PATCH] Bluetooth: Complete Read Local Version HCI cmd
+Date: Fri, 24 Feb 2012 12:45:44 +0200
+Message-Id: <1330080344-23739-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-"__attribute__((always_inline))" does not replace "inline" and they
-still need to be used together. This fixes "always_inline function
-might not be inlinable [-Wattributes]" warning in gcc 4.7
----
- sbc/sbc_primitives.h |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/sbc/sbc_primitives.h b/sbc/sbc_primitives.h
-index 3fec8d5..17ad4f7 100644
---- a/sbc/sbc_primitives.h
-+++ b/sbc/sbc_primitives.h
-@@ -31,7 +31,7 @@
- #define SBC_X_BUFFER_SIZE 328
+Mark request status as done for Read Local Version HCI command.
+In AMP initialization this HCI command is the last and needs
+to be completed.
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/hci_event.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index fb6543b..143de9b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -618,7 +618,7 @@ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
+ 	BT_DBG("%s status 0x%x", hdev->name, rp->status);
  
- #ifdef __GNUC__
--#define SBC_ALWAYS_INLINE __attribute__((always_inline))
-+#define SBC_ALWAYS_INLINE inline __attribute__((always_inline))
- #else
- #define SBC_ALWAYS_INLINE inline
- #endif
+ 	if (rp->status)
+-		return;
++		goto done;
+ 
+ 	hdev->hci_ver = rp->hci_ver;
+ 	hdev->hci_rev = __le16_to_cpu(rp->hci_rev);
+@@ -632,6 +632,9 @@ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	if (test_bit(HCI_INIT, &hdev->flags))
+ 		hci_setup(hdev);
++
++done:
++	hci_req_complete(hdev, HCI_OP_READ_LOCAL_VERSION, rp->status);
+ }
+ 
+ static void hci_setup_link_policy(struct hci_dev *hdev)
 -- 
-1.7.3.4
+1.7.9
 
