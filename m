@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/3] bluez: Copy L2CAP chan policy defines from kernel
-Date: Fri, 24 Feb 2012 10:44:23 +0200
-Message-Id: <1330073065-8188-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 2/3] l2test: Clean up lookup table code
+Date: Fri, 24 Feb 2012 10:44:24 +0200
+Message-Id: <1330073065-8188-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1330073065-8188-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1330073065-8188-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,49 +11,91 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Those defines will be used by user space.
+Make lookup table code available for others and create
+common functions.
 ---
- lib/bluetooth.h |   27 +++++++++++++++++++++++++++
- 1 files changed, 27 insertions(+), 0 deletions(-)
+ test/l2test.c |   40 ++++++++++++++++++++++++++--------------
+ 1 files changed, 26 insertions(+), 14 deletions(-)
 
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index 1dee6df..52606e6 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -77,6 +77,33 @@ struct bt_security {
- #define BT_FLUSHABLE_OFF	0
- #define BT_FLUSHABLE_ON		1
+diff --git a/test/l2test.c b/test/l2test.c
+index c5bc3d3..3705fdc 100644
+--- a/test/l2test.c
++++ b/test/l2test.c
+@@ -117,10 +117,12 @@ static int defer_setup = 0;
+ static int priority = -1;
+ static int rcvbuf = 0;
  
-+#define BT_CHANNEL_POLICY	10
+-static struct {
++struct lookup_table {
+ 	char	*name;
+ 	int	flag;
+-} l2cap_modes[] = {
++};
 +
-+/* BR/EDR only (default policy)
-+ *   AMP controllers cannot be used.
-+ *   Channel move requests from the remote device are denied.
-+ *   If the L2CAP channel is currently using AMP, move the channel to BR/EDR.
-+ */
-+#define BT_CHANNEL_POLICY_BREDR_ONLY		0
++static struct lookup_table l2cap_modes[] = {
+ 	{ "basic",	L2CAP_MODE_BASIC	},
+ 	/* Not implemented
+ 	{ "flowctl",	L2CAP_MODE_FLOWCTL	},
+@@ -131,14 +133,25 @@ static struct {
+ 	{ 0 }
+ };
+ 
+-static void list_l2cap_modes(void)
++static int get_lookup_flag(struct lookup_table *table, char *name)
+ {
+ 	int i;
+ 
+-	printf("l2test - L2CAP testing\n"
+-		"List L2CAP modes:\n");
+-	for (i=0; l2cap_modes[i].name; i++)
+-		printf("\t%s\n", l2cap_modes[i].name);
++	for (i = 0; table[i].name; i++)
++		if (!strcasecmp(table[i].name, name))
++			return table[i].flag;
 +
-+/* BR/EDR Preferred
-+ *   Allow use of AMP controllers.
-+ *   If the L2CAP channel is currently on AMP, move it to BR/EDR.
-+ *   Channel move requests from the remote device are allowed.
-+ */
-+#define BT_CHANNEL_POLICY_BREDR_PREFERRED	1
++	return -1;
++}
 +
-+/* AMP Preferred
-+ *   Allow use of AMP controllers
-+ *   If the L2CAP channel is currently on BR/EDR and AMP controller
-+ *     resources are available, initiate a channel move to AMP.
-+ *   Channel move requests from the remote device are allowed.
-+ *   If the L2CAP socket has not been connected yet, try to create
-+ *     and configure the channel directly on an AMP controller rather
-+ *     than BR/EDR.
-+ */
-+#define BT_CHANNEL_POLICY_AMP_PREFERRED		2
++static void print_lookup_values(struct lookup_table *table, char *header)
++{
++	int i;
 +
- /* Connection and socket states */
- enum {
- 	BT_CONNECTED = 1, /* Equal to TCP_ESTABLISHED to make net code happy */
++	printf("%s\n", header);
++
++	for (i = 0; table[i].name; i++)
++		printf("\t%s\n", table[i].name);
+ }
+ 
+ static float tv2fl(struct timeval tv)
+@@ -1199,7 +1212,7 @@ static void usage(void)
+ int main(int argc, char *argv[])
+ {
+ 	struct sigaction sa;
+-	int opt, sk, i, mode = RECV, need_addr = 0;
++	int opt, sk, mode = RECV, need_addr = 0;
+ 
+ 	bacpy(&bdaddr, BDADDR_ANY);
+ 
+@@ -1321,14 +1334,13 @@ int main(int argc, char *argv[])
+ 			break;
+ 
+ 		case 'X':
+-			rfcmode = -1;
++			rfcmode = get_lookup_flag(l2cap_modes, optarg);
++
++			if (rfcmode == -1) {
++				print_lookup_values(l2cap_modes,
++						"List L2CAP modes:");
+ 
+-			for (i = 0; l2cap_modes[i].name; i++)
+-				if (!strcasecmp(l2cap_modes[i].name, optarg))
+-					rfcmode = l2cap_modes[i].flag;
+ 
+-			if (!strcasecmp(optarg, "help") || rfcmode == -1) {
+-				list_l2cap_modes();
+ 				exit(1);
+ 			}
+ 
 -- 
 1.7.9
 
