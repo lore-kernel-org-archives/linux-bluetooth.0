@@ -1,88 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <4F482993.4030104@codeaurora.org>
+In-Reply-To: <4F482C0F.8000305@codeaurora.org>
 References: <1330029469-8565-1-git-send-email-mathewm@codeaurora.org>
 	<1330029469-8565-2-git-send-email-mathewm@codeaurora.org>
-	<20120224094842.GA4013@aemeltch-MOBL1>
-	<CAA37ikYYGoYcOg5PD98QZt04NjzUWhi6AQVgh2eGYy94vWPQ=g@mail.gmail.com>
-	<4F482993.4030104@codeaurora.org>
-Date: Sat, 25 Feb 2012 12:37:02 -0300
-Message-ID: <CAA37ikZmmS_WbWMYAnhfD_Tap-vTU55t3qc-oUvZ0D=r+-BPeg@mail.gmail.com>
+	<CAA37ikZRndo-Sk5r5Dfv64rB9ehdCJLVzYGuGfOCy+VmLX4c7Q@mail.gmail.com>
+	<4F482C0F.8000305@codeaurora.org>
+Date: Sat, 25 Feb 2012 12:32:56 -0300
+Message-ID: <CAA37ikYDRk5Bp4Gk39GVMenzmCk-=SGQtSL2H1dmaqWS451C-w@mail.gmail.com>
 Subject: Re: [RFC 1/2] Bluetooth: Header changes for ERTM state machine replacement
 From: Ulisses Furquim <ulisses@profusion.mobi>
 To: Mat Martineau <mathewm@codeaurora.org>
-Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>, linux-bluetooth@vger.kernel.org,
-	padovan@profusion.mobi, pkrystad@codeaurora.org, marcel@holtmann.org,
-	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	pkrystad@codeaurora.org, marcel@holtmann.org, luiz.dentz@gmail.com,
+	andrei.emeltchenko.news@gmail.com
 Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mat,
 
-On Fri, Feb 24, 2012 at 9:21 PM, Mat Martineau <mathewm@codeaurora.org> wro=
+On Fri, Feb 24, 2012 at 9:32 PM, Mat Martineau <mathewm@codeaurora.org> wro=
 te:
-> Andrei and Ulisses -
+> Ulisses -
 >
 >
-> On 2/24/2012 9:42 AM, Ulisses Furquim wrote:
+> On 2/24/2012 9:39 AM, Ulisses Furquim wrote:
 >>
->> Hi Andrei,
+>> Hi Mat,
 >>
->> On Fri, Feb 24, 2012 at 7:48 AM, Andrei Emeltchenko
->> <andrei.emeltchenko.news@gmail.com> =A0wrote:
+>> On Thu, Feb 23, 2012 at 6:37 PM, Mat Martineau<mathewm@codeaurora.org>
+>> =A0wrote:
 >>>
->>> Hi Mat,
-
-<snip>
-
->>> and for example here:
+>>> This change affects data structures storing ERTM state and control
+>>> fields, and adds new definitions for states and events. =A0An
+>>> l2cap_seq_list structure is added for tracking ERTM sequence numbers
+>>> without repeated memory allocations. =A0Control fields are carried in
+>>> the bt_skb_cb struct rather than constantly doing shift and mask
+>>> operations.
 >>>
->>> - =A0 =A0 =A0 __put_control(chan, control, skb_put(skb, __ctrl_size(cha=
-n)));
->>> + =A0 =A0 =A0 /* Control header is populated later */
->>> + =A0 =A0 =A0 if (test_bit(FLAG_EXT_CTRL,&chan->flags))
->>>
->>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 put_unaligned_le32(0, skb_put(skb, 4));
->>> + =A0 =A0 =A0 else
->>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 put_unaligned_le16(0, skb_put(skb, 2));
->
->
-> This is the only place the macro would drop in cleanly - but it seems lik=
-e a
-> macro should be used in more than one place unless it's hiding some reall=
-y
-> distracting syntax. =A0In this case, I think it's clearer to see what's g=
-oing
-> on.
-
-If we don't have a lot of places then I'd rather see what's going on as wel=
-l.
-
-> And - I forgot to fix some magic numbers in those skb_puts.
-
-This would be good to fix.
-
->>>> -
->>>> -static inline __u8 __ctrl_size(struct l2cap_chan *chan)
->>>> -{
->>>> - =A0 =A0 if (test_bit(FLAG_EXT_CTRL,&chan->flags))
->>>>
->>>> - =A0 =A0 =A0 =A0 =A0 =A0 return L2CAP_EXT_HDR_SIZE - L2CAP_HDR_SIZE;
->>>> - =A0 =A0 else
->>>> - =A0 =A0 =A0 =A0 =A0 =A0 return L2CAP_ENH_HDR_SIZE - L2CAP_HDR_SIZE;
->>>> -}
+>>> Signed-off-by: Mat Martineau<mathewm@codeaurora.org>
+>>> ---
+>>> =A0include/net/bluetooth/bluetooth.h | =A0 14 ++-
+>>> =A0include/net/bluetooth/l2cap.h =A0 =A0 | =A0260
+>>> +++++++++----------------------------
+>>> =A02 files changed, 73 insertions(+), 201 deletions(-)
 >>
->> Do we have that many places with this test in Mat's code? If not, then
->> we might not need to bother having all of these helpers, I think. And
->> if we add them, I do think it makes sense to add them to l2cap_core.c
->> than in l2cap.h, right?
+>>
+>> <snip>
+>>
+>>> diff --git a/include/net/bluetooth/l2cap.h
+>>> b/include/net/bluetooth/l2cap.h
+>>> index d6d8ec8..a499b60 100644
+>>> --- a/include/net/bluetooth/l2cap.h
+>>> +++ b/include/net/bluetooth/l2cap.h
+>>
+>>
+>> <snip>
+>>
+>>> @@ -645,200 +664,43 @@ static inline bool l2cap_clear_timer(struct
+>>> l2cap_chan *chan,
+>>>
+>>> =A0#define __set_chan_timer(c, t) l2cap_set_timer(c,&c->chan_timer, (t)=
+)
+>>> =A0#define __clear_chan_timer(c) l2cap_clear_timer(c,&c->chan_timer)
+>>
+>>
+>> Are these two still needed? I saw you moved others to l2cap_core.c
+>> which is fine but what about these?
 >
-> Not too many places with the FLAG_EXT_CTRL test, with use of struct
-> bt_control in most of the code. =A0I would rather have helpers in l2cap_c=
-ore.c
-> if they're needed.
+>
+> Since these macros are unrelated to ERTM, that would be a separate patch.
 
-Agreed.
+You're right, sorry.
+
+> I think all the macros traditionally land in the header files because the=
+re
+> are no #defines in the l2cap*.c files. =A0However, I see that many other =
+.c
+> files in net/bluetooth do have #defines.
+>
+> It's not that I "moved" the other macros, as much as my ported code had
+> static functions instead. =A0I tried to minimize changes to the ported co=
+de
+> rather than minimize changes to the upstream code.
+
+Yes, I saw the static functions there and I like it better there than
+in l2cap.h, really.
 
 Regards,
 
