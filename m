@@ -1,72 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH RESEND] bluetooth: Remove bogus inline for l2cap_chan_connect()
-Date: Sun, 26 Feb 2012 20:31:59 +0100
-Message-Id: <1330284719-22348-1-git-send-email-geert@linux-m68k.org>
+Date: Sun, 26 Feb 2012 19:26:03 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [PATCH obexd v2 7/8] client: fix canceling queued transfers
+Message-ID: <20120226172603.GD29000@x220.P-661HNU-F1>
+References: <1329832632-3681-1-git-send-email-mikel.astiz.oss@gmail.com>
+ <1329832632-3681-8-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1329832632-3681-8-git-send-email-mikel.astiz.oss@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-commit 03a001948166d966d0d580cddb8ae3a23f8b795b ("Bluetooth: invert locking
-order in connect path") marked l2cap_chan_connect() inline for both the
-prototype in include/net/bluetooth/l2cap.h and the implementation in
-net/bluetooth/l2cap_core.c.
+Hi Mikel,
 
-As the former doesn't contain an implementation, net/bluetooth/l2cap_sock.c
-now fails to build with gcc version 4.1.2 20061115 (prerelease) (Ubuntu
-4.1.1-21), e.g. for m68k allmodconfig:
+On Tue, Feb 21, 2012, Mikel Astiz wrote:
+> -	if (transfer->xfer == 0)
+> -		return;
+> +	if (transfer->xfer != 0) {
+> +		g_obex_cancel_transfer(transfer->xfer);
+> +		transfer->xfer = 0;
+> +	}
 
-    net/bluetooth/l2cap_sock.c: In function ‘l2cap_sock_connect’:
-    include/net/bluetooth/l2cap.h:838: sorry, unimplemented: inlining failed in call to ‘l2cap_chan_connect’: function body not available
-    net/bluetooth/l2cap_sock.c:126: sorry, unimplemented: called from here
-    make[1]: *** [net/bluetooth/l2cap_sock.o] Error 1
+Could you make the tests for a valid source ID > 0 instead of != 0. I
+know it doesn't make much difference but it'd be consistent with that
+we've tried to use elsewhere in obexd and bluez.
 
-As l2cap_chan_connect() is not that small and also called from
-net/bluetooth/l2cap_sock.c, I removed both inline keywords.
+Btw, other than patches 5 and 7 where I had something to point out the
+other ones have already been pushed upstream, so no need to resend them.
 
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
----
-Linus, this has been breaking my builds for 6 weeks with no imminent action
-from the maintainer, so I'm sending it to you directly.
-
- include/net/bluetooth/l2cap.h |    2 +-
- net/bluetooth/l2cap_core.c    |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 68f5891..124f7cf 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -834,7 +834,7 @@ int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
- struct l2cap_chan *l2cap_chan_create(struct sock *sk);
- void l2cap_chan_close(struct l2cap_chan *chan, int reason);
- void l2cap_chan_destroy(struct l2cap_chan *chan);
--inline int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
-+int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 								bdaddr_t *dst);
- int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
- 								u32 priority);
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index faf0b11..980abdb 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1120,7 +1120,7 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr
- 	return c1;
- }
- 
--inline int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *dst)
-+int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *dst)
- {
- 	struct sock *sk = chan->sk;
- 	bdaddr_t *src = &bt_sk(sk)->src;
--- 
-1.7.0.4
+Johan
