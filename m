@@ -1,30 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 28 Feb 2012 09:52:46 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-        Andrei Emeltchenko <andrei.emeltchenko@intel.com>,
-        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [patch] Bluetooth: use kfree_skb() instead of kfree()
-Message-ID: <20120228065246.GC20506@elgon.mountain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Message-ID: <1330386185.3392.72.camel@aeonflux>
+Subject: Re: [PATCH 1/2] Bluetooth: Don't send unnecessary write_le_enable
+ command
+From: Marcel Holtmann <marcel@holtmann.org>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 27 Feb 2012 15:43:05 -0800
+In-Reply-To: <1330386094-19501-1-git-send-email-johan.hedberg@gmail.com>
+References: <1330386094-19501-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-sk_buffs should be freed using kfree_skb().
+Hi Johan,
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> If the local host features indicate that LE is already in the state that
+> is desired there's no point in sending the HCI command to try to change
+> the setting.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/mgmt.c |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index bdcfbf0..df3be69 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4284,7 +4284,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
- 	if (!chan) {
- 		BT_DBG("unknown cid 0x%4.4x", cid);
- 		/* Drop packet and return */
--		kfree(skb);
-+		kfree_skb(skb);
- 		return 0;
- 	}
- 
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
+
+
