@@ -1,25 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anurag GUPTA-1 <anurag.gupta@stericsson.com>
-To: Vani-dineshbhai PATEL X <vani.patel@stericsson.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 27 Feb 2012 11:10:12 +0100
-Subject: RE: [RFC : PATCH] - AVRCP 1.4 AbsoluteVolume
-Message-ID: <4E253D605AF50140A55CF6396EC99A2421C3751F67@EXDCVYMBSTM005.EQ1STM.local>
-References: <747C1E83C744F44E9ACFB89FAEEC2C7B21A747F38A@EXDCVYMBSTM005.EQ1STM.local>
-In-Reply-To: <747C1E83C744F44E9ACFB89FAEEC2C7B21A747F38A@EXDCVYMBSTM005.EQ1STM.local>
+From: Vani-dineshbhai PATEL X <vani.patel@stericsson.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Anurag GUPTA-1 <anurag.gupta@stericsson.com>
+Date: Mon, 27 Feb 2012 11:01:43 +0100
+Subject: [RFC : PATCH] - AVRCP 1.4 AbsoluteVolume
+Message-ID: <747C1E83C744F44E9ACFB89FAEEC2C7B21A747F38A@EXDCVYMBSTM005.EQ1STM.local>
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-Hi Vani,
-
------Original Message-----
-From: Vani-dineshbhai PATEL X 
-Sent: Monday, February 27, 2012 3:32 PM
-To: linux-bluetooth@vger.kernel.org
-Cc: Anurag GUPTA-1
-Subject: [RFC : PATCH] - AVRCP 1.4 AbsoluteVolume
 
 Hi All,
 
@@ -39,7 +28,8 @@ Subject: [PATCH] Absolute Volume Functions Implemented.
  audio/media.c |   56 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
  3 files changed, 108 insertions(+), 1 deletions(-)
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c index c9ec314..70ebf8e 100644
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index c9ec314..70ebf8e 100644
 --- a/audio/avrcp.c
 +++ b/audio/avrcp.c
 @@ -63,6 +63,8 @@
@@ -75,13 +65,15 @@ diff --git a/audio/avrcp.c b/audio/avrcp.c index c9ec314..70ebf8e 100644
  	default:
  		error("Unknown event %u", id);
  		return -EINVAL;
-@@ -884,6 +892,7 @@ static uint8_t avrcp_handle_register_notification(struct avrcp_player *player,  {
+@@ -884,6 +892,7 @@ static uint8_t avrcp_handle_register_notification(struct avrcp_player *player,
+ {
  	uint16_t len = ntohs(pdu->params_len);
  	uint64_t uid;
 +	uint8_t volume=0;
  
  	/*
- 	 * 1 byte for EventID, 4 bytes for Playback interval but the latest @@ -909,6 +918,11 @@ static uint8_t avrcp_handle_register_notification(struct avrcp_player *player,
+ 	 * 1 byte for EventID, 4 bytes for Playback interval but the latest
+@@ -909,6 +918,11 @@ static uint8_t avrcp_handle_register_notification(struct avrcp_player *player,
  	case AVRCP_EVENT_TRACK_REACHED_START:
  		len = 1;
  		break;
@@ -113,7 +105,6 @@ diff --git a/audio/avrcp.c b/audio/avrcp.c index c9ec314..70ebf8e 100644
 + 		goto err;
 + 	}
 + */  /*This shall be addressed once AddressedPlayer is implemented */
-You should remove unused code before pushing it, moreover do you have some variable named "addressed_player"
 + 
 + 	abs_volume = pdu->params[0];
 + 	if (abs_volume > MAX_ABSOLUTE_VOLUME){
@@ -127,7 +118,6 @@ You should remove unused code before pushing it, moreover do you have some varia
 + 	return AVC_CTYPE_ACCEPTED;
 + 
 + 	err:
-Label should start from the beginning of line.
 + 	pdu->params_len = htons(1);
 + 	return AVC_CTYPE_REJECTED;
 + 
@@ -144,7 +134,8 @@ Label should start from the beginning of line.
  		{ },
  };
  
-diff --git a/audio/avrcp.h b/audio/avrcp.h index fb64f3b..1df6103 100644
+diff --git a/audio/avrcp.h b/audio/avrcp.h
+index fb64f3b..1df6103 100644
 --- a/audio/avrcp.h
 +++ b/audio/avrcp.h
 @@ -73,6 +73,7 @@
@@ -153,8 +144,6 @@ diff --git a/audio/avrcp.h b/audio/avrcp.h index fb64f3b..1df6103 100644
  #define AVRCP_EVENT_TRACK_REACHED_START	0x04
 +#define AVRCP_EVENT_VOLUME_CHANGED	0x0d
  #define AVRCP_EVENT_LAST		AVRCP_EVENT_TRACK_REACHED_START
-
-AVRCP_EVEN_LAST should be updated to AVRCP_EVENT_VOLUME_CHANGED
  
  struct avrcp_player_cb {
 @@ -83,6 +84,8 @@ struct avrcp_player_cb {
@@ -165,7 +154,9 @@ AVRCP_EVEN_LAST should be updated to AVRCP_EVENT_VOLUME_CHANGED
 + 	uint8_t (*get_volume)(void *user_data);
  };
  
- int avrcp_register(DBusConnection *conn, const bdaddr_t *src, GKeyFile *config); diff --git a/audio/media.c b/audio/media.c index c0fd0c3..738adbf 100644
+ int avrcp_register(DBusConnection *conn, const bdaddr_t *src, GKeyFile *config);
+diff --git a/audio/media.c b/audio/media.c
+index c0fd0c3..738adbf 100644
 --- a/audio/media.c
 +++ b/audio/media.c
 @@ -102,6 +102,7 @@ struct media_player {
@@ -177,14 +168,17 @@ AVRCP_EVEN_LAST should be updated to AVRCP_EVENT_VOLUME_CHANGED
  };
  
 @@ -1255,6 +1256,36 @@ static uint32_t get_position(void *user_data)
- 	return mp->position + sec * 1000 + msec;  }
+ 	return mp->position + sec * 1000 + msec;
+ }
  
-+static uint8_t get_volume(void *user_data) {
++static uint8_t get_volume(void *user_data)
++{
 + 	struct media_player *mp = user_data;
 + 	return mp->volume;
 +}
 +
-+static void set_volume(uint16_t volume, void *user_data) {
++static void set_volume(uint16_t volume, void *user_data)
++{
 + 	struct media_player *mp = user_data;
 + 	DBusMessage *msg; 
 + 	DBusMessageIter iter, var;
@@ -220,15 +214,13 @@ AVRCP_EVEN_LAST should be updated to AVRCP_EVENT_VOLUME_CHANGED
 + 	.get_volume = get_volume
  };
  
- static void media_player_exit(DBusConnection *connection, void *user_data) @@ -1338,6 +1371,24 @@ static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
+ static void media_player_exit(DBusConnection *connection, void *user_data)
+@@ -1338,6 +1371,24 @@ static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
  	return TRUE;
  }
  
-+static gboolean set_media_volume(struct media_player *mp, 
-+DBusMessageIter *iter) {
-
-Correct Minor indentation problem
-
++static gboolean set_media_volume(struct media_player *mp, DBusMessageIter *iter)
++{
 + 	uint8_t *value;
 + 	int val;
 + 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BYTE)
@@ -258,9 +250,7 @@ Correct Minor indentation problem
  
  	attr = attr_to_val(key);
  	if (attr < 0)
---
+-- 
 1.7.5.4
 
 Vani
-
-Anurag
