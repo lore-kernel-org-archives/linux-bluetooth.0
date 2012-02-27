@@ -1,47 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Don't send unnecessary write_le_enable command
-Date: Tue, 28 Feb 2012 01:41:33 +0200
-Message-Id: <1330386094-19501-1-git-send-email-johan.hedberg@gmail.com>
+Message-ID: <1330363233.3392.50.camel@aeonflux>
+Subject: Re: [PATCH] hciemu: Always initialize status in hci_host_control
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
+Date: Mon, 27 Feb 2012 09:20:33 -0800
+In-Reply-To: <1330344231-22823-1-git-send-email-szymon.janc@tieto.com>
+References: <1330344231-22823-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Szymon,
 
-If the local host features indicate that LE is already in the state that
-is desired there's no point in sending the HCI command to try to change
-the setting.
+> Assign 0x00 to status on intialization instead of assigning it in each
+> switch case. This helps to avoid errors when one forget to proper
+> intialize status in new case.
+> 
+> This fix following compilation error:
+> 
+>   CC     test/hciemu.o
+> cc1: warnings being treated as errors
+> test/hciemu.c: In function ‘hci_host_control’:
+> test/hciemu.c:786: error: ‘status’ may be used uninitialized in this function
+> make[1]: *** [test/hciemu.o] Error 1
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+actually gcc warns here rightfully, but the fix is actually a different
+one:
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 27830f4..5373bc1 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1260,7 +1260,7 @@ static int set_le(struct sock *sk, u16 index, void *data, u16 len)
- 	struct pending_cmd *cmd;
- 	struct hci_dev *hdev;
- 	int err;
--	u8 val;
-+	u8 val, enabled;
+@@ -783,7 +783,7 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t
+                break;
  
- 	BT_DBG("request for hci%u", index);
- 
-@@ -1280,8 +1280,9 @@ static int set_le(struct sock *sk, u16 index, void *data, u16 len)
- 	}
- 
- 	val = !!cp->val;
-+	enabled = !!(hdev->host_features[0] & 0x02);
- 
--	if (!hdev_is_powered(hdev)) {
-+	if (!hdev_is_powered(hdev) || val == enabled) {
- 		bool changed = false;
- 
- 		if (val != test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
--- 
-1.7.9.1
+        default:
+-               command_status(ogf, ocf, status);
++               command_status(ogf, ocf, 0x01);
+                break;
+        }
+
+Pushed that one upstream.
+
+I am always suspicious if the fix to a compiler warning like this is
+just to initialize the variable. We prefer not to do that since then it
+starts hiding real bugs. This is a good example.
+
+Regards
+
+Marcel
+
 
