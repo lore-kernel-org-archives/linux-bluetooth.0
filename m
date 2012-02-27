@@ -1,90 +1,127 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd] client: fix unreported canceled transfers
-Date: Mon, 27 Feb 2012 15:14:37 +0100
-Message-Id: <1330352077-1196-1-git-send-email-mikel.astiz.oss@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] hciemu: Always initialize status in hci_host_control
+Date: Mon, 27 Feb 2012 13:03:51 +0100
+Message-ID: <1330344231-22823-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Assign 0x00 to status on intialization instead of assigning it in each
+switch case. This helps to avoid errors when one forget to proper
+intialize status in new case.
 
-A session can be shutted down from D-Bus, and therefore the pending
-transfer callbacks must be reported.
+This fix following compilation error:
+
+  CC     test/hciemu.o
+cc1: warnings being treated as errors
+test/hciemu.c: In function ‘hci_host_control’:
+test/hciemu.c:786: error: ‘status’ may be used uninitialized in this function
+make[1]: *** [test/hciemu.o] Error 1
 ---
- client/session.c  |   15 ++++++++++++++-
- client/transfer.c |    4 +---
- client/transfer.h |    3 +++
- 3 files changed, 18 insertions(+), 4 deletions(-)
+ test/hciemu.c |   14 +-------------
+ 1 files changed, 1 insertions(+), 13 deletions(-)
 
-diff --git a/client/session.c b/client/session.c
-index 417295e..f5740ce 100644
---- a/client/session.c
-+++ b/client/session.c
-@@ -485,12 +485,25 @@ proceed:
+diff --git a/test/hciemu.c b/test/hciemu.c
+index ffe04f8..69e21f5 100644
+--- a/test/hciemu.c
++++ b/test/hciemu.c
+@@ -662,24 +662,21 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
+ 	read_ext_inquiry_response_rp ir;
+ 	read_simple_pairing_mode_rp pm;
+ 	read_le_host_supported_rp hs;
+-	uint8_t status;
++	uint8_t status = 0x00;
  
- void obc_session_shutdown(struct obc_session *session)
- {
-+	struct pending_request *p;
-+	GError *err;
-+
- 	DBG("%p", session);
+ 	const uint16_t ogf = OGF_HOST_CTL;
  
- 	obc_session_ref(session);
+ 	switch (ocf) {
+ 	case OCF_RESET:
+-		status = 0x00;
+ 		reset_vdev();
+ 		command_complete(ogf, ocf, 1, &status);
+ 		break;
  
- 	/* Unregister any pending transfer */
--	g_queue_foreach(session->queue, (GFunc) pending_request_free, NULL);
-+	err = g_error_new(OBC_TRANSFER_ERROR, -ECANCELED, "%s",
-+							strerror(ECANCELED));
-+
-+	while ((p = g_queue_pop_head(session->queue))) {
-+		if (p->func)
-+			p->func(session, err, p->data);
-+
-+		pending_request_free(p);
-+	}
-+
-+	g_error_free(err);
+ 	case OCF_SET_EVENT_FLT:
+-		status = 0x00;
+ 		command_complete(ogf, ocf, 1, &status);
+ 		break;
  
- 	/* Unregister interfaces */
- 	if (session->path)
-diff --git a/client/transfer.c b/client/transfer.c
-index d1edef2..4735c17 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -44,8 +44,6 @@
+ 	case OCF_CHANGE_LOCAL_NAME:
+-		status = 0x00;
+ 		memcpy(vdev.name, data, sizeof(vdev.name));
+ 		command_complete(ogf, ocf, 1, &status);
+ 		break;
+@@ -692,7 +689,6 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
  
- #define DEFAULT_BUFFER_SIZE 4096
+ 	case OCF_WRITE_CONN_ACCEPT_TIMEOUT:
+ 	case OCF_WRITE_PAGE_TIMEOUT:
+-		status = 0x00;
+ 		command_complete(ogf, ocf, 1, &status);
+ 		break;
  
--#define OBC_TRANSFER_ERROR obc_transfer_error_quark()
--
- static guint64 counter = 0;
+@@ -703,18 +699,15 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
+ 		break;
  
- struct transfer_callback {
-@@ -73,7 +71,7 @@ struct obc_transfer {
- 	int err;
- };
+ 	case OCF_WRITE_SCAN_ENABLE:
+-		status = 0x00;
+ 		vdev.scan_enable = scan_enable(data);
+ 		command_complete(ogf, ocf, 1, &status);
+ 		break;
  
--static GQuark obc_transfer_error_quark(void)
-+GQuark obc_transfer_error_quark(void)
- {
- 	return g_quark_from_static_string("obc-transfer-error-quark");
- }
-diff --git a/client/transfer.h b/client/transfer.h
-index e7e1000..c05e51b 100644
---- a/client/transfer.h
-+++ b/client/transfer.h
-@@ -21,6 +21,9 @@
-  *
-  */
+ 	case OCF_WRITE_AUTH_ENABLE:
+-		status = 0x00;
+ 		command_complete(ogf, ocf, 1, &status);
+ 		break;
  
-+#define OBC_TRANSFER_ERROR obc_transfer_error_quark()
-+GQuark obc_transfer_error_quark(void);
-+
- struct obc_transfer_params {
- 	guint8 *data;
- 	size_t size;
+ 	case OCF_WRITE_ENCRYPT_MODE:
+-		status = 0x00;
+ 		command_complete(ogf, ocf, 1, &status);
+ 		break;
+ 
+@@ -725,7 +718,6 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
+ 		break;
+ 
+ 	case OCF_WRITE_CLASS_OF_DEV:
+-		status = 0x00;
+ 		memcpy(vdev.dev_class, data, 3);
+ 		command_complete(ogf, ocf, 1, &status);
+ 		break;
+@@ -737,7 +729,6 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
+ 		break;
+ 
+ 	case OCF_WRITE_INQUIRY_MODE:
+-		status = 0x00;
+ 		vdev.inq_mode = data[0];
+ 		command_complete(ogf, ocf, 1, &status);
+ 		break;
+@@ -750,7 +741,6 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
+ 		break;
+ 
+ 	case OCF_WRITE_EXT_INQUIRY_RESPONSE:
+-		status = 0x00;
+ 		vdev.eir_fec = data[0];
+ 		memcpy(vdev.eir_data, data + 1, HCI_MAX_EIR_LENGTH);
+ 		command_complete(ogf, ocf, 1, &status);
+@@ -763,7 +753,6 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
+ 		break;
+ 
+ 	case OCF_WRITE_SIMPLE_PAIRING_MODE:
+-		status = 0x00;
+ 		vdev.ssp_mode = data[0];
+ 		command_complete(ogf, ocf, 1, &status);
+ 		break;
+@@ -776,7 +765,6 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
+ 		break;
+ 
+ 	case OCF_WRITE_LE_HOST_SUPPORTED:
+-		status = 0x00;
+ 		vdev.le_mode = data[0];
+ 		vdev.le_simul = data[1];
+ 		command_complete(ogf, ocf, 1, &status);
 -- 
-1.7.6.5
+on behalf of ST-Ericsson
 
