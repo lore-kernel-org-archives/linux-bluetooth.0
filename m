@@ -1,127 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] hciemu: Always initialize status in hci_host_control
-Date: Mon, 27 Feb 2012 13:03:51 +0100
-Message-ID: <1330344231-22823-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <747C1E83C744F44E9ACFB89FAEEC2C7B21A747F38A@EXDCVYMBSTM005.EQ1STM.local>
+References: <747C1E83C744F44E9ACFB89FAEEC2C7B21A747F38A@EXDCVYMBSTM005.EQ1STM.local>
+Date: Mon, 27 Feb 2012 13:00:54 +0200
+Message-ID: <CABBYNZ+jxW7zt3+37cx9MyjatDZYyGn00ZsF4dYybDtm1YOG1A@mail.gmail.com>
+Subject: Re: [RFC : PATCH] - AVRCP 1.4 AbsoluteVolume
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vani-dineshbhai PATEL X <vani.patel@stericsson.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Anurag GUPTA-1 <anurag.gupta@stericsson.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Assign 0x00 to status on intialization instead of assigning it in each
-switch case. This helps to avoid errors when one forget to proper
-intialize status in new case.
+Hi,
 
-This fix following compilation error:
+On Mon, Feb 27, 2012 at 12:01 PM, Vani-dineshbhai PATEL X
+<vani.patel@stericsson.com> wrote:
+> Hi All,
+>
+> I would like to propose this patch for the implementation of Absolute Volume functionality.
+> When CT sends SetAbsoluteVolume request, a DBus call is made to the player to change the value of its property - volume.
+> This value is saved in the media_player instance so that it can be sent for Interim response for VolumeChanged Notification.
+> Your comments shall be appreciated.
 
-  CC     test/hciemu.o
-cc1: warnings being treated as errors
-test/hciemu.c: In function ‘hci_host_control’:
-test/hciemu.c:786: error: ‘status’ may be used uninitialized in this function
-make[1]: *** [test/hciemu.o] Error 1
----
- test/hciemu.c |   14 +-------------
- 1 files changed, 1 insertions(+), 13 deletions(-)
+Please split the patch, if possible first introduce the handling on
+avrcp.c and make it check if cb->set_volume != NULL then in a separate
+patch you can add the changes to media.c. When sending patches to
+userspace BlueZ please use the subject prefix e.g. PATCH BlueZ, you
+can also make it permanent by editing .git/config in your local tree.
 
-diff --git a/test/hciemu.c b/test/hciemu.c
-index ffe04f8..69e21f5 100644
---- a/test/hciemu.c
-+++ b/test/hciemu.c
-@@ -662,24 +662,21 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
- 	read_ext_inquiry_response_rp ir;
- 	read_simple_pairing_mode_rp pm;
- 	read_le_host_supported_rp hs;
--	uint8_t status;
-+	uint8_t status = 0x00;
- 
- 	const uint16_t ogf = OGF_HOST_CTL;
- 
- 	switch (ocf) {
- 	case OCF_RESET:
--		status = 0x00;
- 		reset_vdev();
- 		command_complete(ogf, ocf, 1, &status);
- 		break;
- 
- 	case OCF_SET_EVENT_FLT:
--		status = 0x00;
- 		command_complete(ogf, ocf, 1, &status);
- 		break;
- 
- 	case OCF_CHANGE_LOCAL_NAME:
--		status = 0x00;
- 		memcpy(vdev.name, data, sizeof(vdev.name));
- 		command_complete(ogf, ocf, 1, &status);
- 		break;
-@@ -692,7 +689,6 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
- 
- 	case OCF_WRITE_CONN_ACCEPT_TIMEOUT:
- 	case OCF_WRITE_PAGE_TIMEOUT:
--		status = 0x00;
- 		command_complete(ogf, ocf, 1, &status);
- 		break;
- 
-@@ -703,18 +699,15 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
- 		break;
- 
- 	case OCF_WRITE_SCAN_ENABLE:
--		status = 0x00;
- 		vdev.scan_enable = scan_enable(data);
- 		command_complete(ogf, ocf, 1, &status);
- 		break;
- 
- 	case OCF_WRITE_AUTH_ENABLE:
--		status = 0x00;
- 		command_complete(ogf, ocf, 1, &status);
- 		break;
- 
- 	case OCF_WRITE_ENCRYPT_MODE:
--		status = 0x00;
- 		command_complete(ogf, ocf, 1, &status);
- 		break;
- 
-@@ -725,7 +718,6 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
- 		break;
- 
- 	case OCF_WRITE_CLASS_OF_DEV:
--		status = 0x00;
- 		memcpy(vdev.dev_class, data, 3);
- 		command_complete(ogf, ocf, 1, &status);
- 		break;
-@@ -737,7 +729,6 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
- 		break;
- 
- 	case OCF_WRITE_INQUIRY_MODE:
--		status = 0x00;
- 		vdev.inq_mode = data[0];
- 		command_complete(ogf, ocf, 1, &status);
- 		break;
-@@ -750,7 +741,6 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
- 		break;
- 
- 	case OCF_WRITE_EXT_INQUIRY_RESPONSE:
--		status = 0x00;
- 		vdev.eir_fec = data[0];
- 		memcpy(vdev.eir_data, data + 1, HCI_MAX_EIR_LENGTH);
- 		command_complete(ogf, ocf, 1, &status);
-@@ -763,7 +753,6 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
- 		break;
- 
- 	case OCF_WRITE_SIMPLE_PAIRING_MODE:
--		status = 0x00;
- 		vdev.ssp_mode = data[0];
- 		command_complete(ogf, ocf, 1, &status);
- 		break;
-@@ -776,7 +765,6 @@ static void hci_host_control(uint16_t ocf, int plen, uint8_t *data)
- 		break;
- 
- 	case OCF_WRITE_LE_HOST_SUPPORTED:
--		status = 0x00;
- 		vdev.le_mode = data[0];
- 		vdev.le_simul = data[1];
- 		command_complete(ogf, ocf, 1, &status);
+IMO the volume handling should be in MediaTransport not in
+MediaPlayer, otherwise it is quite possible that the player will
+change the stream volume and not just indicate which is what is
+recommended, in that case you would have to find what transport(s)
+matches the device and emit PropertyChanged on them.
+
+Our architecture is a bit different than what AVRCP suggests, because
+the A2DP stream may not be directly controlled by the player, it is
+controlled by the MediaTransport, so in case of PulseAudio multiple
+processes may be streaming and naturally the volume gain applies to
+everyone of them not just the MediaPlayer owner.
+
 -- 
-on behalf of ST-Ericsson
-
+Luiz Augusto von Dentz
