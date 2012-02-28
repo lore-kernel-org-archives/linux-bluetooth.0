@@ -1,30 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 28 Feb 2012 10:53:53 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: Remove redundant read_host_features
+ commands
+Message-ID: <20120228085353.GA22809@x220.P-661HNU-F1>
+References: <1330386094-19501-1-git-send-email-johan.hedberg@gmail.com>
+ <1330386094-19501-2-git-send-email-johan.hedberg@gmail.com>
+ <20120228080141.GB4381@aemeltch-MOBL1>
 MIME-Version: 1.0
-In-Reply-To: <6351528.417141330337551344.JavaMail.weblogic@epml02>
-References: <6351528.417141330337551344.JavaMail.weblogic@epml02>
-Date: Tue, 28 Feb 2012 10:20:38 +0100
-Message-ID: <CA+i+Aw0WyT_udOmyObkG8-p3gLF=r5qmTZJDHHJTgaxR-wX_Xw@mail.gmail.com>
-Subject: Re: MAP: BMessage parser support
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: divya.yadav@samsung.com
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120228080141.GB4381@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Feb 27, 2012 at 11:12 AM, DIVYA YADAV <divya.yadav@samsung.com> wrote:
-> Hello,
->
-> We are planning to implement BMessage parser for Message Upload feature in MAP Profile.
->
-> Please let us know, if anyone is working on BMessage parser development ?
->
-> Thanks and Regards
-> Divya Yadav
+Hi Andrei,
 
-Well, there is one, not yet in upstream:
+On Tue, Feb 28, 2012, Andrei Emeltchenko wrote:
+> > +	if (enable_le && test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
+> > +		cp.le = 1;
+> 
+> Do you mean here "true"?
 
-https://gitorious.org/obexd-map/obexd-map/blobs/pushmessage-with-bartek-patches-rebased-on-maemo12/plugins/bmsg_parser.c
+No, cp.le is a u8 and not a bool.
 
-BR,
-Slawomir Bochenski
+> > -	cp.page = 0x01;
+> > -	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES, sizeof(cp), &cp);
+> > +	if (!status) {
+> > +		if (sent->le)
+> > +			hdev->host_features[0] |= 0x02;
+> > +		else
+> > +			hdev->host_features[0] &= !0x02;
+> 
+> BTW: what is 0x02? I saw it also in the second patch.
+
+It's LMP_HOST_LE (i.e. the host features bit indicating that LE support
+is enabled for the host). I fixed this to use the proper define before
+applying the patch.
+
+Johan
