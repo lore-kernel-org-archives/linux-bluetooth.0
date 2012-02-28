@@ -1,67 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Save remote L2CAP fixed channel mask
-Date: Tue, 28 Feb 2012 15:29:34 +0200
-Message-Id: <1330435774-25961-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1330433782-23492-2-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1330433782-23492-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1330433782-23492-2-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Tue, 28 Feb 2012 15:06:41 +0200
+Message-ID: <CABBYNZ+gzH9MJVRvwABZQip89WP3zLX8jXm4+44P5HbrLj7p3Q@mail.gmail.com>
+Subject: Re: [PATCH obexd v2 2/2] client: free active transfer on session shutdown
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Mikel,
 
-Fixed channel mask needs to be stored to decide whether to
-use A2MP for example. So far save only one relevant byte which
-keeps all information we need.
+On Tue, Feb 28, 2012 at 2:56 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>
+> The currently active request should be canceled just like any other
+> queued transfer. Otherwise obex timeout is reported.
+> ---
+>  client/session.c |    8 ++++++++
+>  1 files changed, 8 insertions(+), 0 deletions(-)
+>
+> diff --git a/client/session.c b/client/session.c
+> index c4645fb..42eba10 100644
+> --- a/client/session.c
+> +++ b/client/session.c
+> @@ -496,6 +496,14 @@ void obc_session_shutdown(struct obc_session *session)
+>        err = g_error_new(OBEX_IO_ERROR, OBEX_IO_DISCONNECTED,
+>                                                "Session closed by user");
+>
+> +       if (session->p != NULL) {
+> +               if (session->p->func)
+> +                       session->p->func(session, err, session->p->data);
+> +
+> +               pending_request_free(session->p);
+> +               session->p = NULL;
+> +       }
+> +
+>        while ((p = g_queue_pop_head(session->queue))) {
+>                if (p->func)
+>                        p->func(session, err, p->data);
+> --
+> 1.7.6.5
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/l2cap_core.c    |    9 +++++++--
- 2 files changed, 8 insertions(+), 2 deletions(-)
+Ack.
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index d6d8ec8..a7fd1e1 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -522,6 +522,7 @@ struct l2cap_conn {
- 	unsigned int	mtu;
- 
- 	__u32		feat_mask;
-+	__u8		fc_mask;
- 
- 	__u8		info_state;
- 	__u8		info_ident;
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index bdcfbf0..0b86a34 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3209,7 +3209,8 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
- 		return 0;
- 	}
- 
--	if (type == L2CAP_IT_FEAT_MASK) {
-+	switch (type) {
-+	case L2CAP_IT_FEAT_MASK:
- 		conn->feat_mask = get_unaligned_le32(rsp->data);
- 
- 		if (conn->feat_mask & L2CAP_FEAT_FIXED_CHAN) {
-@@ -3226,11 +3227,15 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
- 
- 			l2cap_conn_start(conn);
- 		}
--	} else if (type == L2CAP_IT_FIXED_CHAN) {
-+		break;
-+
-+	case L2CAP_IT_FIXED_CHAN:
-+		conn->fc_mask = rsp->data[0];
- 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
- 		conn->info_ident = 0;
- 
- 		l2cap_conn_start(conn);
-+		break;
- 	}
- 
- 	return 0;
 -- 
-1.7.9
-
+Luiz Augusto von Dentz
