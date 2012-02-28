@@ -1,56 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <7693696B6BF147E1AAC3B092336532B2@sisodomain.com>
-References: <6351528.417141330337551344.JavaMail.weblogic@epml02>
-	<CA+i+Aw0WyT_udOmyObkG8-p3gLF=r5qmTZJDHHJTgaxR-wX_Xw@mail.gmail.com>
-	<7693696B6BF147E1AAC3B092336532B2@sisodomain.com>
-Date: Tue, 28 Feb 2012 14:51:14 +0100
-Message-ID: <CA+i+Aw1OiWvx79fE23Z4vhWDvY0HzzRw-N2COy52U4Fd4pd4Pw@mail.gmail.com>
-Subject: Re: MAP: BMessage parser support
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: Divya Yadav <divya.yadav@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Save remote L2CAP fixed channel mask
+Date: Tue, 28 Feb 2012 15:29:34 +0200
+Message-Id: <1330435774-25961-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Feb 28, 2012 at 1:06 PM, Divya Yadav <divya.yadav@samsung.com> wrote:
-> Hello Mr. Slawomir ,
->
->
->> On Mon, Feb 27, 2012 at 11:12 AM, DIVYA YADAV <divya.yadav@samsung.com>
->> wrote:
->>>
->>> Hello,
->>>
->>> We are planning to implement BMessage parser for Message Upload feature
->>> in MAP Profile.
->>>
->>> Please let us know, if anyone is working on BMessage parser development ?
->>>
->>> Thanks and Regards
->>> Divya Yadav
->>
->>
->> Well, there is one, not yet in upstream:
->>
->>
->> https://gitorious.org/obexd-map/obexd-map/blobs/pushmessage-with-bartek-patches-rebased-on-maemo12/plugins/bmsg_parser.c
->>
->
-> Are you planning to submit this code to upstream in the near future?
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Yes, in some future in general, yes. There is browsing functionality
-to be upstreamed first, before PushMessage code, and recently I'm
-having a hard time finding time for this. But I hope I'll manage to
-send something new this week.
+Fixed channel mask needs to be stored to decide whether to
+use A2MP for example. So far save only one relevant byte which
+keeps all information we need.
 
->
-> Regards
-> Divya Yadav
->>
->> BR,
->> Slawomir Bochenski
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/l2cap_core.c    |    9 +++++++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-BR,
-Slawomir Bochenski
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index d6d8ec8..a7fd1e1 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -522,6 +522,7 @@ struct l2cap_conn {
+ 	unsigned int	mtu;
+ 
+ 	__u32		feat_mask;
++	__u8		fc_mask;
+ 
+ 	__u8		info_state;
+ 	__u8		info_ident;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index bdcfbf0..0b86a34 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3209,7 +3209,8 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
+ 		return 0;
+ 	}
+ 
+-	if (type == L2CAP_IT_FEAT_MASK) {
++	switch (type) {
++	case L2CAP_IT_FEAT_MASK:
+ 		conn->feat_mask = get_unaligned_le32(rsp->data);
+ 
+ 		if (conn->feat_mask & L2CAP_FEAT_FIXED_CHAN) {
+@@ -3226,11 +3227,15 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
+ 
+ 			l2cap_conn_start(conn);
+ 		}
+-	} else if (type == L2CAP_IT_FIXED_CHAN) {
++		break;
++
++	case L2CAP_IT_FIXED_CHAN:
++		conn->fc_mask = rsp->data[0];
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+ 		conn->info_ident = 0;
+ 
+ 		l2cap_conn_start(conn);
++		break;
+ 	}
+ 
+ 	return 0;
+-- 
+1.7.9
+
