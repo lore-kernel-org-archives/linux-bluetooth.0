@@ -1,47 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd] client: Remove unused public function
-Date: Tue, 28 Feb 2012 14:57:10 +0200
-Message-Id: <1330433830-20017-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH obexd v2 2/2] client: free active transfer on session shutdown
+Date: Tue, 28 Feb 2012 13:56:22 +0100
+Message-Id: <1330433782-23492-2-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1330433782-23492-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1330433782-23492-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-obex_io_error_quark is only used in session.c so can be static
+The currently active request should be canceled just like any other
+queued transfer. Otherwise obex timeout is reported.
 ---
- client/session.c |    2 +-
- client/session.h |    3 ---
- 2 files changed, 1 insertions(+), 4 deletions(-)
+ client/session.c |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
 
 diff --git a/client/session.c b/client/session.c
-index 417295e..14bb3b9 100644
+index c4645fb..42eba10 100644
 --- a/client/session.c
 +++ b/client/session.c
-@@ -111,7 +111,7 @@ static void transfer_progress(struct obc_transfer *transfer,
- 					gint64 transferred, GError *err,
- 					void *user_data);
+@@ -496,6 +496,14 @@ void obc_session_shutdown(struct obc_session *session)
+ 	err = g_error_new(OBEX_IO_ERROR, OBEX_IO_DISCONNECTED,
+ 						"Session closed by user");
  
--GQuark obex_io_error_quark(void)
-+static GQuark obex_io_error_quark(void)
- {
- 	return g_quark_from_static_string("obex-io-error-quark");
- }
-diff --git a/client/session.h b/client/session.h
-index f082510..a19b31f 100644
---- a/client/session.h
-+++ b/client/session.h
-@@ -27,9 +27,6 @@
- 
- struct obc_session;
- 
--#define OBEX_IO_ERROR obex_io_error_quark()
--GQuark obex_io_error_quark(void);
--
- typedef void (*session_callback_t) (struct obc_session *session,
- 					GError *err, void *user_data);
- 
++	if (session->p != NULL) {
++		if (session->p->func)
++			session->p->func(session, err, session->p->data);
++
++		pending_request_free(session->p);
++		session->p = NULL;
++	}
++
+ 	while ((p = g_queue_pop_head(session->queue))) {
+ 		if (p->func)
+ 			p->func(session, err, p->data);
 -- 
-1.7.7.6
+1.7.6.5
 
