@@ -1,36 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-Subject: [PATCH] Bluetooth: btusb: Add USB device ID "0a5c 21e8"
-Date: Wed, 29 Feb 2012 20:13:21 -0300
-Message-Id: <1330557201-13762-1-git-send-email-jprvita@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <1330550837.3392.102.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Fix Kconfig help description
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 29 Feb 2012 13:27:17 -0800
+In-Reply-To: <1330544293-17831-1-git-send-email-andre.guedes@openbossa.org>
+References: <1330544293-17831-1-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-One more vendor-specific ID for BCM20702A0.
+Hi Andre,
 
-Signed-off-by: João Paulo Rechi Vita <jprvita@openbossa.org>
----
- drivers/bluetooth/btusb.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+> SMP is not a kernel module, it is part of Bluetooth Core (as already
+> described in lines above).
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  net/bluetooth/Kconfig |    1 -
+>  1 file changed, 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index c5606ef..b4d9d2f 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -102,6 +102,7 @@ static struct usb_device_id btusb_table[] = {
- 
- 	/* Broadcom BCM20702A0 */
- 	{ USB_DEVICE(0x0a5c, 0x21e3) },
-+	{ USB_DEVICE(0x0a5c, 0x21e8) },
- 	{ USB_DEVICE(0x0a5c, 0x21f3) },
- 	{ USB_DEVICE(0x413c, 0x8197) },
- 
--- 
-1.7.7.6
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
+
 
