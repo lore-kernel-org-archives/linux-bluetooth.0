@@ -1,63 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 29 Feb 2012 22:16:06 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: santosh nayak <santoshprasadnayak@gmail.com>
-Cc: marcel@holtmann.org, padovan@profusion.mobi, davem@davemloft.net,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Silence static checker warning.
-Message-ID: <20120229191605.GB22598@mwanda>
-References: <1330535217-26785-1-git-send-email-santoshprasadnayak@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="QTprm0S8XgL7H0Dt"
-In-Reply-To: <1330535217-26785-1-git-send-email-santoshprasadnayak@gmail.com>
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [PATCH BlueZ] gatttool: Add command completion for interactive mode
+Date: Wed, 29 Feb 2012 16:17:31 -0400
+Message-Id: <1330546651-6695-1-git-send-email-jefferson.delfes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+---
+ attrib/interactive.c |   28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
---QTprm0S8XgL7H0Dt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index a772362..be81424 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -800,6 +800,33 @@ static gboolean prompt_read(GIOChannel *chan, GIOCondition cond,
+ 	return TRUE;
+ }
+ 
++static char *completion_generator(const char *text, int state)
++{
++	static int index = 0, len = 0;
++	const char *cmd = NULL;
++
++	if (state == 0) {
++		index = 0;
++		len = strlen(text);
++	}
++
++	while ((cmd = commands[index].cmd) != NULL) {
++		index++;
++		if (strncmp(cmd, text, len) == 0)
++			return strdup(cmd);
++	}
++
++	return NULL;
++}
++
++static char **commands_completion(const char *text, int start, int end)
++{
++	if (start == 0)
++		return rl_completion_matches(text, &completion_generator);
++	else
++		return NULL;
++}
++
+ int interactive(const gchar *src, const gchar *dst, int psm)
+ {
+ 	GIOChannel *pchan;
+@@ -820,6 +847,7 @@ int interactive(const gchar *src, const gchar *dst, int psm)
+ 	events = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
+ 	g_io_add_watch(pchan, events, prompt_read, NULL);
+ 
++	rl_attempted_completion_function = commands_completion;
+ 	rl_callback_handler_install(get_prompt(), parse_line);
+ 
+ 	g_main_loop_run(event_loop);
+-- 
+1.7.9.2
 
-On Wed, Feb 29, 2012 at 10:36:57PM +0530, santosh nayak wrote:
-> From: Santosh Nayak <santoshprasadnayak@gmail.com>
->=20
-> Silencing Static checker warning.
-> 1. Endian warning
-
-It's not an endian warning, it's an endian bug.  This code won't
-work on big endian systems.  Don't mix bugfixes and other changes.
-
-Probably at some point someone will be updating their kernel for
-an embedded platform and they'll do a "git log --pretty=3Doneline" and
-they'll notice your endian fix and decide it's super important to
-them.  Right now it's hard to find.
-
-regards,
-dan carpenter
-
-
---QTprm0S8XgL7H0Dt
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iQIcBAEBAgAGBQJPTnl1AAoJEOnZkXI/YHqRVnUQAJNniV+rYnA0u4/Q15rKd8NG
-NE9qhnPl8J5SX7T/AtsZzAhK2I9ApwM4f15EXMYYTFFanFzlO8uD+yzn9gTLqRGH
-vPyplTVRZ1clBURAB5jnfge3KTsVgYL3k7rMA54Fu6EozjTYTn+mBMP4HyDrk8WE
-GqFCsoZU+cKrENJjfOLw6KX+cZRpLlKXixnlHfvo0iz7kO4S6/3ffX65ykcvm63C
-1+Wvdy+q629XHcUILWXnwQtLVgdwnyY9/pZvtBFHCArwajxxWecbRQXWjILO6afO
-cXyE2SR1I/8uWMEHwz3pTQfttt4X32kXJv63K77ptVunn3i/138X2S6NG9wVJxIO
-SqawQjZbhpBTpxvPShUxWeOgiT8XN8Ermu0CqbayJC5AcwSvZRKfPpESaXyuSD2d
-RIjycqRvAbDul38Pxepc/eTLYF5hZ6fjTzwg3UhS9kjEf0h+juNNX1y0Exm87jbP
-UQLGsywIWSvAF0zwUzlzeiO030KBsuUU8y2cqXjLQDikyK7t67Y1mbo3PI5Ayk1k
-Ag51jSb/3/t+Tf6wy4kHqE+rjFH87+eMeYsBEBc+58P8Grz3KRry66hXIwjTX4gp
-mqCDJ+niqjIDrF+jsVmaQ66XmUAUouoVMAyQKMyt6bpShOwjD4qIedDScSnVNJ8c
-MxOx69QozgPh4XyER386
-=4C6b
------END PGP SIGNATURE-----
-
---QTprm0S8XgL7H0Dt--
