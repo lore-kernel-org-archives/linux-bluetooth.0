@@ -1,83 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1330535217-26785-1-git-send-email-santoshprasadnayak@gmail.com>
-References: <1330535217-26785-1-git-send-email-santoshprasadnayak@gmail.com>
-Date: Wed, 29 Feb 2012 22:45:49 +0200
-Message-ID: <CAMXE1-oXtheVHDuU3w52mXqmuY8AK4kk+tuvJpVRDq2=+qEnsQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Silence static checker warning.
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Date: Wed, 29 Feb 2012 22:16:06 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
 To: santosh nayak <santoshprasadnayak@gmail.com>
 Cc: marcel@holtmann.org, padovan@profusion.mobi, davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Silence static checker warning.
+Message-ID: <20120229191605.GB22598@mwanda>
+References: <1330535217-26785-1-git-send-email-santoshprasadnayak@gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="QTprm0S8XgL7H0Dt"
+In-Reply-To: <1330535217-26785-1-git-send-email-santoshprasadnayak@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santosh,
 
-On Wed, Feb 29, 2012 at 7:06 PM, santosh nayak
-<santoshprasadnayak@gmail.com> wrote:
+--QTprm0S8XgL7H0Dt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Feb 29, 2012 at 10:36:57PM +0530, santosh nayak wrote:
 > From: Santosh Nayak <santoshprasadnayak@gmail.com>
->
+>=20
 > Silencing Static checker warning.
 > 1. Endian warning
-> 2. variable dereferenced before check 'sk' .
->
-> Signed-off-by: Santosh Nayak <santoshprasadnayak@gmail.com>
-> ---
-> =A0net/bluetooth/l2cap_sock.c | =A0 =A09 ++++++---
-> =A01 files changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 401d942..d206321 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -82,7 +82,7 @@ static int l2cap_sock_bind(struct socket *sock, struct =
-sockaddr *addr, int alen)
-> =A0 =A0 =A0 =A0}
->
-> =A0 =A0 =A0 =A0if (la.l2_cid)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D l2cap_add_scid(chan, la.l2_cid);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D l2cap_add_scid(chan, __le16_to_cpu(=
-la.l2_cid));
-> =A0 =A0 =A0 =A0else
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0err =3D l2cap_add_psm(chan, &la.l2_bdaddr,=
- la.l2_psm);
->
-> @@ -123,7 +123,8 @@ static int l2cap_sock_connect(struct socket *sock, st=
-ruct sockaddr *addr, int al
-> =A0 =A0 =A0 =A0if (la.l2_cid && la.l2_psm)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return -EINVAL;
->
-> - =A0 =A0 =A0 err =3D l2cap_chan_connect(chan, la.l2_psm, la.l2_cid, &la.=
-l2_bdaddr);
-> + =A0 =A0 =A0 err =3D l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(l=
-a.l2_cid),
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 &la.l2_bdad=
-dr);
-> =A0 =A0 =A0 =A0if (err)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto done;
->
-> @@ -795,7 +796,7 @@ static void l2cap_sock_kill(struct sock *sk)
-> =A0static int l2cap_sock_shutdown(struct socket *sock, int how)
-> =A0{
-> =A0 =A0 =A0 =A0struct sock *sk =3D sock->sk;
-> - =A0 =A0 =A0 struct l2cap_chan *chan =3D l2cap_pi(sk)->chan;
-> + =A0 =A0 =A0 struct l2cap_chan *chan;
-> =A0 =A0 =A0 =A0int err =3D 0;
->
-> =A0 =A0 =A0 =A0BT_DBG("sock %p, sk %p", sock, sk);
-> @@ -803,6 +804,8 @@ static int l2cap_sock_shutdown(struct socket *sock, i=
-nt how)
-> =A0 =A0 =A0 =A0if (!sk)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return 0;
->
-> + =A0 =A0 =A0 chan =3D l2cap_pi(sk)->chan;
-> +
 
-Didn't I fix this bug already?
+It's not an endian warning, it's an endian bug.  This code won't
+work on big endian systems.  Don't mix bugfixes and other changes.
 
-http://permalink.gmane.org/gmane.linux.bluez.kernel/21537
+Probably at some point someone will be updating their kernel for
+an embedded platform and they'll do a "git log --pretty=3Doneline" and
+they'll notice your endian fix and decide it's super important to
+them.  Right now it's hard to find.
 
-Regards,
-Andrei
+regards,
+dan carpenter
+
+
+--QTprm0S8XgL7H0Dt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJPTnl1AAoJEOnZkXI/YHqRVnUQAJNniV+rYnA0u4/Q15rKd8NG
+NE9qhnPl8J5SX7T/AtsZzAhK2I9ApwM4f15EXMYYTFFanFzlO8uD+yzn9gTLqRGH
+vPyplTVRZ1clBURAB5jnfge3KTsVgYL3k7rMA54Fu6EozjTYTn+mBMP4HyDrk8WE
+GqFCsoZU+cKrENJjfOLw6KX+cZRpLlKXixnlHfvo0iz7kO4S6/3ffX65ykcvm63C
+1+Wvdy+q629XHcUILWXnwQtLVgdwnyY9/pZvtBFHCArwajxxWecbRQXWjILO6afO
+cXyE2SR1I/8uWMEHwz3pTQfttt4X32kXJv63K77ptVunn3i/138X2S6NG9wVJxIO
+SqawQjZbhpBTpxvPShUxWeOgiT8XN8Ermu0CqbayJC5AcwSvZRKfPpESaXyuSD2d
+RIjycqRvAbDul38Pxepc/eTLYF5hZ6fjTzwg3UhS9kjEf0h+juNNX1y0Exm87jbP
+UQLGsywIWSvAF0zwUzlzeiO030KBsuUU8y2cqXjLQDikyK7t67Y1mbo3PI5Ayk1k
+Ag51jSb/3/t+Tf6wy4kHqE+rjFH87+eMeYsBEBc+58P8Grz3KRry66hXIwjTX4gp
+mqCDJ+niqjIDrF+jsVmaQ66XmUAUouoVMAyQKMyt6bpShOwjD4qIedDScSnVNJ8c
+MxOx69QozgPh4XyER386
+=4C6b
+-----END PGP SIGNATURE-----
+
+--QTprm0S8XgL7H0Dt--
