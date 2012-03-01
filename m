@@ -1,220 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1325457984.19462.3.camel@milan>
-Subject: Disabling Bluetooth also kills WiFi
-From: Milan Bouchet-Valat <nalimilan@club.fr>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Date: Sun, 01 Jan 2012 23:46:24 +0100
-Content-Type: multipart/mixed; boundary="=-+6ER9tLQNNec38WP+T5T"
-Mime-Version: 1.0
+Subject: [PATCH 1/5] Bluetooth: mgmt: Add missing hci_dev locking to set_le()
+Date: Wed, 29 Feb 2012 19:55:35 -0800
+Message-Id: <1330574135-5889-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=-+6ER9tLQNNec38WP+T5T
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Hi!
+The set_le() function was missing hci_dev locking which is e.g. critical
+for the mgmt pending command adding/removing.
 
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c |   17 ++++++++++-------
+ 1 files changed, 10 insertions(+), 7 deletions(-)
 
-With kernels 3.1 and 3.2, disabling Bluetooth via rfkill also disables
-my wireless card on my HP Pavilion dm4. This didn't happen with 2.6.41
-(I upgraded from Fedora 15 to 16).
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b0c43fe..1f9558b 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1273,10 +1273,12 @@ static int set_le(struct sock *sk, u16 index, void *data, u16 len)
+ 		return cmd_status(sk, index, MGMT_OP_SET_LE,
+ 						MGMT_STATUS_INVALID_PARAMS);
+ 
++	hci_dev_lock(hdev);
++
+ 	if (!enable_le || !(hdev->features[4] & LMP_LE)) {
+ 		err = cmd_status(sk, index, MGMT_OP_SET_LE,
+ 						MGMT_STATUS_NOT_SUPPORTED);
+-		goto failed;
++		goto unlock;
+ 	}
+ 
+ 	val = !!cp->val;
+@@ -1292,23 +1294,23 @@ static int set_le(struct sock *sk, u16 index, void *data, u16 len)
+ 
+ 		err = send_settings_rsp(sk, MGMT_OP_SET_LE, hdev);
+ 		if (err < 0)
+-			goto failed;
++			goto unlock;
+ 
+ 		if (changed)
+ 			err = new_settings(hdev, sk);
+ 
+-		goto failed;
++		goto unlock;
+ 	}
+ 
+ 	if (mgmt_pending_find(MGMT_OP_SET_LE, hdev)) {
+ 		err = cmd_status(sk, index, MGMT_OP_SET_LE, MGMT_STATUS_BUSY);
+-		goto failed;
++		goto unlock;
+ 	}
+ 
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_SET_LE, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+-		goto failed;
++		goto unlock;
+ 	}
+ 
+ 	memset(&hci_cp, 0, sizeof(hci_cp));
+@@ -1322,10 +1324,11 @@ static int set_le(struct sock *sk, u16 index, void *data, u16 len)
+ 						sizeof(hci_cp), &hci_cp);
+ 	if (err < 0) {
+ 		mgmt_pending_remove(cmd);
+-		goto failed;
++		goto unlock;
+ 	}
+ 
+-failed:
++unlock:
++	hci_dev_unlock(hdev);
+ 	hci_dev_put(hdev);
+ 	return err;
+ }
+-- 
+1.7.9.1
 
-My devices are set up as this (see attached output of lspci -vnn for
-details about devices):
-# rfkill list
-0: phy0: Wireless LAN
-	Soft blocked: no
-	Hard blocked: no
-2: hp-wifi: Wireless LAN
-	Soft blocked: no
-	Hard blocked: no
-3: hp-bluetooth: Bluetooth
-	Soft blocked: no
-	Hard blocked: no
-11: hci0: Bluetooth
-	Soft blocked: no
-	Hard blocked: no
-
-The problem is, these commands also stop the WiFi:
-rfkill block bluetooth
-and
-rfkill block 3 [for hp-bluetooth]
-
-But this one only kills the Bluetooth:
-rfkill block 11
-
-
-Running
-rfkill block wifi
-does kill the WiFi, but leaves the Bluetooth up.
-
-
-So it looks like the hp-bluetooth device is the culprit. Sadly, it's
-what bluetoothd uses by default (if I judge by what gnome-bluetooth
-does).
-
-
-(If it matters, running 'rfkill block bluetooth' makes hci0 disappear,
-and after unblocking bluetooth, it reappears with the ID increased by 1.
-This doesn't happen with the WiFi.)
-
-
-Please ask if I can provide more information/testing.
-
-
-Thanks for your help.
-
---=-+6ER9tLQNNec38WP+T5T
-Content-Disposition: attachment; filename="lspci.log"
-Content-Type: text/x-log; name="lspci.log"; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-
-00:00.0 Host bridge [0600]: Intel Corporation Core Processor DRAM Controller [8086:0044] (rev 02)
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, fast devsel, latency 0
-	Capabilities: <access denied>
-	Kernel driver in use: agpgart-intel
-
-00:02.0 VGA compatible controller [0300]: Intel Corporation Core Processor Integrated Graphics Controller [8086:0046] (rev 02) (prog-if 00 [VGA controller])
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, fast devsel, latency 0, IRQ 41
-	Memory at b0000000 (64-bit, non-prefetchable) [size=4M]
-	Memory at a0000000 (64-bit, prefetchable) [size=256M]
-	I/O ports at 3050 [size=8]
-	Expansion ROM at <unassigned> [disabled]
-	Capabilities: <access denied>
-	Kernel driver in use: i915
-	Kernel modules: i915
-
-00:16.0 Communication controller [0780]: Intel Corporation 5 Series/3400 Series Chipset HECI Controller [8086:3b64] (rev 06)
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, fast devsel, latency 0, IRQ 5
-	Memory at b4406100 (64-bit, non-prefetchable) [size=16]
-	Capabilities: <access denied>
-
-00:1a.0 USB Controller [0c03]: Intel Corporation 5 Series/3400 Series Chipset USB2 Enhanced Host Controller [8086:3b3c] (rev 05) (prog-if 20 [EHCI])
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, medium devsel, latency 0, IRQ 16
-	Memory at b4405c00 (32-bit, non-prefetchable) [size=1K]
-	Capabilities: <access denied>
-	Kernel driver in use: ehci_hcd
-
-00:1b.0 Audio device [0403]: Intel Corporation 5 Series/3400 Series Chipset High Definition Audio [8086:3b56] (rev 05)
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, fast devsel, latency 0, IRQ 43
-	Memory at b4400000 (64-bit, non-prefetchable) [size=16K]
-	Capabilities: <access denied>
-	Kernel driver in use: snd_hda_intel
-	Kernel modules: snd-hda-intel
-
-00:1c.0 PCI bridge [0604]: Intel Corporation 5 Series/3400 Series Chipset PCI Express Root Port 1 [8086:3b42] (rev 05) (prog-if 00 [Normal decode])
-	Flags: bus master, fast devsel, latency 0
-	Bus: primary=00, secondary=01, subordinate=01, sec-latency=0
-	I/O behind bridge: 00002000-00002fff
-	Memory behind bridge: b3400000-b43fffff
-	Prefetchable memory behind bridge: 00000000b0400000-00000000b13fffff
-	Capabilities: <access denied>
-	Kernel driver in use: pcieport
-	Kernel modules: shpchp
-
-00:1c.1 PCI bridge [0604]: Intel Corporation 5 Series/3400 Series Chipset PCI Express Root Port 2 [8086:3b44] (rev 05) (prog-if 00 [Normal decode])
-	Flags: bus master, fast devsel, latency 0
-	Bus: primary=00, secondary=02, subordinate=02, sec-latency=0
-	I/O behind bridge: 00001000-00001fff
-	Memory behind bridge: b2400000-b33fffff
-	Prefetchable memory behind bridge: 00000000b1400000-00000000b23fffff
-	Capabilities: <access denied>
-	Kernel driver in use: pcieport
-	Kernel modules: shpchp
-
-00:1d.0 USB Controller [0c03]: Intel Corporation 5 Series/3400 Series Chipset USB2 Enhanced Host Controller [8086:3b34] (rev 05) (prog-if 20 [EHCI])
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, medium devsel, latency 0, IRQ 20
-	Memory at b4405800 (32-bit, non-prefetchable) [size=1K]
-	Capabilities: <access denied>
-	Kernel driver in use: ehci_hcd
-
-00:1e.0 PCI bridge [0604]: Intel Corporation 82801 Mobile PCI Bridge [8086:2448] (rev a5) (prog-if 01 [Subtractive decode])
-	Flags: bus master, fast devsel, latency 0
-	Bus: primary=00, secondary=03, subordinate=03, sec-latency=32
-	Capabilities: <access denied>
-
-00:1f.0 ISA bridge [0601]: Intel Corporation Mobile 5 Series Chipset LPC Interface Controller [8086:3b09] (rev 05)
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, medium devsel, latency 0
-	Capabilities: <access denied>
-	Kernel modules: iTCO_wdt
-
-00:1f.2 SATA controller [0106]: Intel Corporation 5 Series/3400 Series Chipset 4 port SATA AHCI Controller [8086:3b29] (rev 05) (prog-if 01 [AHCI 1.0])
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, 66MHz, medium devsel, latency 0, IRQ 40
-	I/O ports at 3048 [size=8]
-	I/O ports at 305c [size=4]
-	I/O ports at 3040 [size=8]
-	I/O ports at 3058 [size=4]
-	I/O ports at 3020 [size=32]
-	Memory at b4405000 (32-bit, non-prefetchable) [size=2K]
-	Capabilities: <access denied>
-	Kernel driver in use: ahci
-
-00:1f.3 SMBus [0c05]: Intel Corporation 5 Series/3400 Series Chipset SMBus Controller [8086:3b30] (rev 05)
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: medium devsel, IRQ 19
-	Memory at b4406000 (64-bit, non-prefetchable) [size=256]
-	I/O ports at 3000 [size=32]
-	Kernel driver in use: i801_smbus
-	Kernel modules: i2c-i801
-
-00:1f.6 Signal processing controller [1180]: Intel Corporation 5 Series/3400 Series Chipset Thermal Subsystem [8086:3b32] (rev 05)
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, fast devsel, latency 0, IRQ 21
-	Memory at b4404000 (64-bit, non-prefetchable) [size=4K]
-	Capabilities: <access denied>
-	Kernel driver in use: intel ips
-	Kernel modules: intel_ips
-
-01:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. RTL8111/8168B PCI Express Gigabit Ethernet controller [10ec:8168] (rev 03)
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, fast devsel, latency 0, IRQ 42
-	I/O ports at 2000 [size=256]
-	Memory at b0404000 (64-bit, prefetchable) [size=4K]
-	Memory at b0400000 (64-bit, prefetchable) [size=16K]
-	Capabilities: <access denied>
-	Kernel driver in use: r8169
-	Kernel modules: r8169
-
-02:00.0 Network controller [0280]: Broadcom Corporation BCM4313 802.11b/g/n Wireless LAN Controller [14e4:4727] (rev 01)
-	Subsystem: Hewlett-Packard Company Device [103c:1483]
-	Flags: bus master, fast devsel, latency 0, IRQ 17
-	Memory at b2400000 (64-bit, non-prefetchable) [size=16K]
-	Capabilities: <access denied>
-	Kernel driver in use: brcmsmac
-	Kernel modules: brcmsmac
-
-ff:00.0 Host bridge [0600]: Intel Corporation Core Processor QuickPath Architecture Generic Non-core Registers [8086:2c62] (rev 05)
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, fast devsel, latency 0
-
-ff:00.1 Host bridge [0600]: Intel Corporation Core Processor QuickPath Architecture System Address Decoder [8086:2d01] (rev 05)
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, fast devsel, latency 0
-
-ff:02.0 Host bridge [0600]: Intel Corporation Core Processor QPI Link 0 [8086:2d10] (rev 05)
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, fast devsel, latency 0
-
-ff:02.1 Host bridge [0600]: Intel Corporation Core Processor QPI Physical 0 [8086:2d11] (rev 05)
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, fast devsel, latency 0
-
-ff:02.2 Host bridge [0600]: Intel Corporation Core Processor Reserved [8086:2d12] (rev 05)
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, fast devsel, latency 0
-
-ff:02.3 Host bridge [0600]: Intel Corporation Core Processor Reserved [8086:2d13] (rev 05)
-	Subsystem: Hewlett-Packard Company Device [103c:146a]
-	Flags: bus master, fast devsel, latency 0
-
-
---=-+6ER9tLQNNec38WP+T5T--
