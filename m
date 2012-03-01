@@ -1,15 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1330613135-16552-1-git-send-email-michal.labedzki@tieto.com>
+In-Reply-To: <1330613135-16552-3-git-send-email-michal.labedzki@tieto.com>
 References: <1330613135-16552-1-git-send-email-michal.labedzki@tieto.com>
-Date: Thu, 1 Mar 2012 17:50:09 +0200
-Message-ID: <CABBYNZJw1QNhpa3PinPQaugZRr0QcLcamdgvUvTuOEUoeJXTvg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] avrcp: Fix response ctype of AbortContinuingResponse
+	<1330613135-16552-3-git-send-email-michal.labedzki@tieto.com>
+Date: Thu, 1 Mar 2012 17:43:47 +0200
+Message-ID: <CABBYNZJJJ69YNrS6VU7ak_qBZJ6THgBm3VpkFNAC3KS-tyoBHg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] avrcp: Treat position as unknown when duration is unavailable
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Michal Labedzki <michal.labedzki@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com,
-	vani.patel@stericsson.com, joohi.rastogi@stericsson.com,
-	Lucas De Marchi <lucas.demarchi@profusion.mobi>
+	vani.patel@stericsson.com, joohi.rastogi@stericsson.com
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -18,32 +18,40 @@ Hi Michal,
 
 On Thu, Mar 1, 2012 at 4:45 PM, Michal Labedzki
 <michal.labedzki@tieto.com> wrote:
-> Request ctype of "AbortContinuingResponse" is CONTROL, so response should be
-> ACCEPTED instead of STABLE. This affect PTS Test Case for TP/RCR/BV-04-C.
+> According to the specification when duration and position are not
+> supported then 0xFFFFFFFF should be returned. This patch avoid random
+> position on stream where duration is not available.
+
+Again you should quote the spec. Btw is really random or 0?
+
 > ---
->  audio/avrcp.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  audio/avrcp.c |   10 ++++++----
+>  audio/media.c |    3 ++-
+>  2 files changed, 8 insertions(+), 5 deletions(-)
 >
 > diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index c9ec314..4573133 100644
+> index 2d29d56..e141030 100644
 > --- a/audio/avrcp.c
 > +++ b/audio/avrcp.c
-> @@ -986,7 +986,7 @@ static uint8_t avrcp_handle_abort_continuing(struct avrcp_player *player,
->        player_abort_pending_pdu(player);
->        pdu->params_len = 0;
+> @@ -859,16 +859,18 @@ static uint8_t avrcp_handle_get_play_status(struct avrcp_player *player,
+>                return AVC_CTYPE_REJECTED;
+>        }
 >
-> -       return AVC_CTYPE_STABLE;
-> +       return AVC_CTYPE_ACCEPTED;
+> -       position = player->cb->get_position(player->user_data);
+>        pduration = player->cb->get_metadata(AVRCP_MEDIA_ATTRIBUTE_DURATION,
+>                                                        player->user_data);
 >
->  err:
->        pdu->params_len = htons(1);
-> --
-> on behalf of ST-Ericsson
->
-> --
+> -       if (pduration != NULL)
+> +       if (pduration != NULL) {
+>                duration = htonl(GPOINTER_TO_UINT(pduration));
+> -       else
+> +               position = htonl(player->cb->get_position(player->user_data));
+> +       } else {
+>                duration = htonl(UINT32_MAX);
+> +               position = htonl(UINT32_MAX);
+> +       }
 
-Lucas can you take a look and ack this, it should be very straight forward.
-
+So the position cannot be known without the duration? What about live streams?
 
 -- 
 Luiz Augusto von Dentz
