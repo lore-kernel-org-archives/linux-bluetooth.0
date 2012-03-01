@@ -1,35 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 29 Feb 2012 19:38:56 -0600
+Date: Wed, 29 Feb 2012 19:34:37 -0600
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Peter Krystad <pkrystad@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2] Bluetooth: Save remote L2CAP fixed channel mask
-Message-ID: <20120301013856.GA26492@x220>
-References: <1330504901-28428-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH v4 1/5] Add L2CAP Create/Move Channel definitions
+Message-ID: <20120301013437.GA26097@x220>
+References: <1329332655-27394-1-git-send-email-pkrystad@codeaurora.org>
+ <1329332655-27394-2-git-send-email-pkrystad@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1330504901-28428-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1329332655-27394-2-git-send-email-pkrystad@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Peter,
 
-On Wed, Feb 29, 2012, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Fixed channel mask needs to be stored to decide whether to
-> use A2MP for example. So far save only one relevant byte which
-> keeps all information we need.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+On Wed, Feb 15, 2012, Peter Krystad wrote:
 > ---
-> 	*v2: changed fc_mask -> fixed_chan_mask.
-> 
->  include/net/bluetooth/l2cap.h |    1 +
->  net/bluetooth/l2cap_core.c    |    9 +++++++--
->  2 files changed, 8 insertions(+), 2 deletions(-)
+>  lib/l2cap.h |   45 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 45 insertions(+), 0 deletions(-)
 
-Applied. Thanks.
+I've applied this one to both bluez-hcidump.git as well as bluez.git
+(after adding a lib: prefix that should be used for all lib patches).
+
+Since any patches to lib/* should be appliable to both hcidump and bluez
+please don't mix Makefile.am changes into them. Once you've split those
+into separate patches I can apply them as well as the rest of this set.
+Thanks.
 
 Johan
