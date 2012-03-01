@@ -1,49 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
-From: santosh nayak <santoshprasadnayak@gmail.com>
-To: marcel@holtmann.org
-Cc: padovan@profusion.mobi,
-	davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Santosh Nayak <santoshprasadnayak@gmail.com>
-Subject: Resend: [PATCH] Bluetooth: Fix Endian Bug.
-Date: Thu,  1 Mar 2012 22:46:36 +0530
-Message-Id: <1330622196-12967-1-git-send-email-santoshprasadnayak@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1328884361-3909-1-git-send-email-luiz.dentz@gmail.com>
+References: <1328884361-3909-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 1 Mar 2012 18:25:45 +0200
+Message-ID: <CABBYNZJkC=-nOU-Np5OksrWyOL13sieq8ykhvQW15Z9pM9UJvQ@mail.gmail.com>
+Subject: Re: [RFC] btio: Adjust socket buffers to be at least as big as MTU
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Santosh Nayak <santoshprasadnayak@gmail.com>
+Any comments on this?
 
-Fix network to host endian conversion for L2CAP chan id.
+On Fri, Feb 10, 2012 at 4:32 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Maybe could be done in kernel automatically as it could be considered
+> broken in case of SOCK_SEQPACKET if socket buffer cannot hold a
+> write/read of MTU size.
+>
+> This is not actually a new problem as there exist a workaround in
+> avdtp.c to adjust the socket buffer too, but it became more evident
+> with introduction of gobex which can use SOCK_SEQPACKET with a
+> considerable big MTU (up to 64k) which will fail if there is not
+> enough space to stuff full packets.
+>
+> ---
+> This adds checks for socket type and only adjust in case of SOCK_SEQPACKET
+>
+>  btio/btio.c |   57 +++++++++++++++++++++++++++++++++++++++++++++++++++++----
+>  1 files changed, 53 insertions(+), 4 deletions(-)
+>
+> diff --git a/btio/btio.c b/btio/btio.c
+> index 9781ec4..656b7e0 100644
+> --- a/btio/btio.c
+> +++ b/btio/btio.c
+> @@ -119,6 +119,41 @@ static gboolean check_nval(GIOChannel *io)
+>        return FALSE;
+>  }
+>
+> +static void adjust_buffers(GIOChannel *io)
+> +{
+> +       int sk = g_io_channel_unix_get_fd(io);
+> +       int type, omtu = 0, imtu = 0, sndbuf = 0, rcvbuf = 0;
+> +       socklen_t len = sizeof(int);
+> +
+> +       if (getsockopt(sk, SOL_SOCKET, SO_TYPE, &type, &len) < 0)
+> +               return;
+> +
+> +       if (type != SOCK_SEQPACKET)
+> +               return;
+> +
+> +       /* Checks if it is L2CAP socket otherwise ignores */
+> +       if (!bt_io_get(io, BT_IO_L2CAP, NULL, BT_IO_OPT_OMTU, &omtu,
+> +                                               BT_IO_OPT_IMTU, &imtu,
+> +                                               BT_IO_OPT_INVALID))
+> +               return;
+> +
+> +       if (getsockopt(sk, SOL_SOCKET, SO_SNDBUF, &sndbuf, &len) < 0)
+> +               return;
+> +
+> +       if (sndbuf < omtu) {
+> +               sndbuf = omtu;
+> +               setsockopt(sk, SOL_SOCKET, SO_SNDBUF, &sndbuf, len);
+> +       }
+> +
+> +       if (getsockopt(sk, SOL_SOCKET, SO_RCVBUF, &rcvbuf, &len) < 0)
+> +               return;
+> +
+> +       if (rcvbuf < imtu) {
+> +               rcvbuf = imtu;
+> +               setsockopt(sk, SOL_SOCKET, SO_RCVBUF, &rcvbuf, len);
+> +       }
+> +}
+> +
+>  static gboolean accept_cb(GIOChannel *io, GIOCondition cond,
+>                                                        gpointer user_data)
+>  {
+> @@ -129,10 +164,15 @@ static gboolean accept_cb(GIOChannel *io, GIOCondition cond,
+>        if ((cond & G_IO_NVAL) || check_nval(io))
+>                return FALSE;
+>
+> -       if (cond & (G_IO_HUP | G_IO_ERR))
+> +       if (cond & (G_IO_HUP | G_IO_ERR)) {
+>                g_set_error(&err, BT_IO_ERROR, BT_IO_ERROR_DISCONNECTED,
+>                                "HUP or ERR on socket");
+> +               goto done;
+> +       }
+>
+> +       adjust_buffers(io);
+> +
+> +done:
+>        accept->connect(io, err, accept->user_data);
+>
+>        g_clear_error(&err);
+> @@ -159,14 +199,21 @@ static gboolean connect_cb(GIOChannel *io, GIOCondition cond,
+>                else
+>                        err = -sk_err;
+>
+> -               if (err < 0)
+> +               if (err < 0) {
+>                        g_set_error(&gerr, BT_IO_ERROR,
+>                                        BT_IO_ERROR_CONNECT_FAILED, "%s (%d)",
+>                                        strerror(-err), -err);
+> -       } else if (cond & (G_IO_HUP | G_IO_ERR))
+> +                       goto done;
+> +               }
+> +       } else if (cond & (G_IO_HUP | G_IO_ERR)) {
+>                g_set_error(&gerr, BT_IO_ERROR, BT_IO_ERROR_CONNECT_FAILED,
+>                                "HUP or ERR on socket");
+> +               goto done;
+> +       }
+> +
+> +       adjust_buffers(io);
+>
+> +done:
+>        conn->connect(io, gerr, conn->user_data);
+>
+>        if (gerr)
+> @@ -199,8 +246,10 @@ static gboolean server_cb(GIOChannel *io, GIOCondition cond,
+>
+>        if (server->confirm)
+>                server->confirm(cli_io, server->user_data);
+> -       else
+> +       else {
+> +               adjust_buffers(cli_io);
+>                server->connect(cli_io, NULL, server->user_data);
+> +       }
+>
+>        g_io_channel_unref(cli_io);
+>
+> --
+> 1.7.7.6
+>
 
-Signed-off-by: Santosh Nayak <santoshprasadnayak@gmail.com>
----
- net/bluetooth/l2cap_sock.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 401d942..86d5067 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -82,7 +82,7 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 	}
- 
- 	if (la.l2_cid)
--		err = l2cap_add_scid(chan, la.l2_cid);
-+		err = l2cap_add_scid(chan, __le16_to_cpu(la.l2_cid));
- 	else
- 		err = l2cap_add_psm(chan, &la.l2_bdaddr, la.l2_psm);
- 
-@@ -123,7 +123,8 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
- 	if (la.l2_cid && la.l2_psm)
- 		return -EINVAL;
- 
--	err = l2cap_chan_connect(chan, la.l2_psm, la.l2_cid, &la.l2_bdaddr);
-+	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
-+				&la.l2_bdaddr);
- 	if (err)
- 		goto done;
- 
+
 -- 
-1.7.4.4
+Luiz Augusto von Dentz
