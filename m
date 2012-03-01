@@ -1,105 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20120301123540.GE25627@aemeltch-MOBL1>
-References: <1330599561-20392-1-git-send-email-santoshprasadnayak@gmail.com>
-	<20120301123540.GE25627@aemeltch-MOBL1>
-Date: Thu, 1 Mar 2012 19:34:58 +0530
-Message-ID: <CAOD=uF4LSS8nuKMNHGEH2JsVZHU0rntSxZjvNaa4oZrey1macw@mail.gmail.com>
-Subject: Re: Resend: [PATCH] Bluetooth: Fix Endian Bug.
-From: santosh prasad nayak <santoshprasadnayak@gmail.com>
+In-Reply-To: <20120301091024.GC25627@aemeltch-MOBL1>
+References: <1327955189-4604-1-git-send-email-ulisses@profusion.mobi>
+	<20120301091024.GC25627@aemeltch-MOBL1>
+Date: Thu, 1 Mar 2012 10:34:41 -0300
+Message-ID: <CAA37ikafkZf1O-R+-G=oqbuwH4-Au8DDaeoCpemk9YUOUfM_pg@mail.gmail.com>
+Subject: Re: [PATCH v4 1/2] Bluetooth: Remove usage of __cancel_delayed_work()
+From: Ulisses Furquim <ulisses@profusion.mobi>
 To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	santosh nayak <santoshprasadnayak@gmail.com>, marcel@holtmann.org, padovan@profusion.mobi,
-	davem@davemloft.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+	Ulisses Furquim <ulisses@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Andrei,
+Hi Andrei,
 
-I could not get you.
-
-Do you want me to resend the patch with subject,
-  "[PATCH] Bluetooth: Fix network to host endian conversion for L2CAP
-chan id."  ?
-
-
-
-regards
-santosh
-
-
-
-
-On Thu, Mar 1, 2012 at 6:05 PM, Andrei Emeltchenko
+On Thu, Mar 1, 2012 at 6:10 AM, Andrei Emeltchenko
 <andrei.emeltchenko.news@gmail.com> wrote:
-> Hi Santosh,
+> Hi All,
 >
-> On Thu, Mar 01, 2012 at 04:29:21PM +0530, santosh nayak wrote:
->> From: Santosh Nayak <santoshprasadnayak@gmail.com>
+> On Mon, Jan 30, 2012 at 06:26:28PM -0200, Ulisses Furquim wrote:
+>> __cancel_delayed_work() is being used in some paths where we cannot
+>> sleep waiting for the delayed work to finish. However, that function
+>> might return while the timer is running and the work will be queued
+>> again. Replace the calls with safer cancel_delayed_work() version
+>> which spins until the timer handler finishes on other CPUs and
+>> cancels the delayed work.
 >>
->> Fix for endian bug.
->>
->> Fix for null dereferenced removed as it is already
->> submitted by Andrei.
->>
->> Signed-off-by: Santosh Nayak <santoshprasadnayak@gmail.com>
->> ---
->> =A0net/bluetooth/l2cap_sock.c | =A0 =A05 +++--
->> =A01 files changed, 3 insertions(+), 2 deletions(-)
+>> Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
+
+Well, these comments are not really related to this specific patch.
+This change was just a replace of functions to cancel delayed work.
+
+> I have some questions about delayed_work usage:
 >
-> We prefer following commit log (this is the example)
+> When setting timer with l2cap_set_timer() we hold_chan if work may be
+> running. So if previous work is cancelled OK we do not hold chan.
 >
-> <------8<----------------------------------------------------------
-> | =A0From: Santosh Nayak <santoshprasadnayak@gmail.com>
-> |
-> | =A0Fix network to host endian conversion for L2CAP chan id.
-> |
-> | =A0Signed-off-by: Santosh Nayak <santoshprasadnayak@gmail.com>
-> |
-> | =A0---
-> | =A0 =A0 =A0 =A0 =A0* v2 Fix for null dereferenced removed as it is alre=
-ady
-> | =A0 =A0 =A0 =A0 =A0submitted by Andrei.
-> |
-> | =A0 =A0net/bluetooth/l2cap_sock.c | =A0 =A05 +++--
-> | =A0 =A01 files changed, 3 insertions(+), 2 deletions(-)
-> |
-> <------8<----------------------------------------------------------
+> Didn't we miss hold_chan here?
 >
+> Then in l2cap_clear_chan we put_chan if work cancelled OK, otherwise
+> put_chan is done in delayed_work so we always put_chan.
 >
->>
->> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
->> index 401d942..86d5067 100644
->> --- a/net/bluetooth/l2cap_sock.c
->> +++ b/net/bluetooth/l2cap_sock.c
->> @@ -82,7 +82,7 @@ static int l2cap_sock_bind(struct socket *sock, struct=
- sockaddr *addr, int alen)
->> =A0 =A0 =A0 }
->>
->> =A0 =A0 =A0 if (la.l2_cid)
->> - =A0 =A0 =A0 =A0 =A0 =A0 err =3D l2cap_add_scid(chan, la.l2_cid);
->> + =A0 =A0 =A0 =A0 =A0 =A0 err =3D l2cap_add_scid(chan, __le16_to_cpu(la.=
-l2_cid));
->> =A0 =A0 =A0 else
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D l2cap_add_psm(chan, &la.l2_bdaddr, l=
-a.l2_psm);
->>
->> @@ -123,7 +123,8 @@ static int l2cap_sock_connect(struct socket *sock, s=
-truct sockaddr *addr, int al
->> =A0 =A0 =A0 if (la.l2_cid && la.l2_psm)
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
->>
->> - =A0 =A0 err =3D l2cap_chan_connect(chan, la.l2_psm, la.l2_cid, &la.l2_=
-bdaddr);
->> + =A0 =A0 err =3D l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l=
-2_cid),
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 &la.l2_bdaddr)=
-;
->
-> I live this to Marcel to decide should we reindent our code otherwise thi=
-s
-> one looks odd.
->
-> Best regards
-> Andrei Emeltchenko
->
+> I am actually seeing some crashes in rare cases related to delayed work.
+
+Do you have a log or something? Have you added the debug info to check
+hold/put usage? It'd be good to really understand the problem and fix
+it. It might be we're trying to be overly smart here and left some
+races. This code is very similar (if not equal) to the one we had
+before with timers.
+
+Regards,
+
+-- 
+Ulisses Furquim
+ProFUSION embedded systems
+http://profusion.mobi
+Mobile: +55 19 9250 0942
+Skype: ulissesffs
