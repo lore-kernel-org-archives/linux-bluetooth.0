@@ -1,61 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
+From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+Subject: [PATCH] Bluetooth: btusb: Add USB device ID "0a5c 21e8"
+Date: Thu,  1 Mar 2012 10:23:47 -0300
+Message-Id: <1330608227-14636-1-git-send-email-jprvita@openbossa.org>
+In-Reply-To: <20120229234414.GA19829@joana>
+References: <20120229234414.GA19829@joana>
 MIME-Version: 1.0
-In-Reply-To: <20120301091024.GC25627@aemeltch-MOBL1>
-References: <1327955189-4604-1-git-send-email-ulisses@profusion.mobi>
-	<20120301091024.GC25627@aemeltch-MOBL1>
-Date: Thu, 1 Mar 2012 10:34:41 -0300
-Message-ID: <CAA37ikafkZf1O-R+-G=oqbuwH4-Au8DDaeoCpemk9YUOUfM_pg@mail.gmail.com>
-Subject: Re: [PATCH v4 1/2] Bluetooth: Remove usage of __cancel_delayed_work()
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Ulisses Furquim <ulisses@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+One more vendor-specific ID for BCM20702A0.
 
-On Thu, Mar 1, 2012 at 6:10 AM, Andrei Emeltchenko
-<andrei.emeltchenko.news@gmail.com> wrote:
-> Hi All,
->
-> On Mon, Jan 30, 2012 at 06:26:28PM -0200, Ulisses Furquim wrote:
->> __cancel_delayed_work() is being used in some paths where we cannot
->> sleep waiting for the delayed work to finish. However, that function
->> might return while the timer is running and the work will be queued
->> again. Replace the calls with safer cancel_delayed_work() version
->> which spins until the timer handler finishes on other CPUs and
->> cancels the delayed work.
->>
->> Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
+T:  Bus=01 Lev=03 Prnt=05 Port=02 Cnt=01 Dev#=  9 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0a5c ProdID=21e8 Rev=01.12
+S:  Manufacturer=Broadcom Corp
+S:  Product=BCM20702A0
+S:  SerialNumber=00027221F4E2
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
-Well, these comments are not really related to this specific patch.
-This change was just a replace of functions to cancel delayed work.
+Signed-off-by: João Paulo Rechi Vita <jprvita@openbossa.org>
+---
+ drivers/bluetooth/btusb.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-> I have some questions about delayed_work usage:
->
-> When setting timer with l2cap_set_timer() we hold_chan if work may be
-> running. So if previous work is cancelled OK we do not hold chan.
->
-> Didn't we miss hold_chan here?
->
-> Then in l2cap_clear_chan we put_chan if work cancelled OK, otherwise
-> put_chan is done in delayed_work so we always put_chan.
->
-> I am actually seeing some crashes in rare cases related to delayed work.
-
-Do you have a log or something? Have you added the debug info to check
-hold/put usage? It'd be good to really understand the problem and fix
-it. It might be we're trying to be overly smart here and left some
-races. This code is very similar (if not equal) to the one we had
-before with timers.
-
-Regards,
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index c5606ef..b4d9d2f 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -102,6 +102,7 @@ static struct usb_device_id btusb_table[] = {
+ 
+ 	/* Broadcom BCM20702A0 */
+ 	{ USB_DEVICE(0x0a5c, 0x21e3) },
++	{ USB_DEVICE(0x0a5c, 0x21e8) },
+ 	{ USB_DEVICE(0x0a5c, 0x21f3) },
+ 	{ USB_DEVICE(0x413c, 0x8197) },
+ 
 -- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+1.7.7.6
+
