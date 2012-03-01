@@ -1,71 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 1 Mar 2012 09:25:56 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: santosh prasad nayak <santoshprasadnayak@gmail.com>
-Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-        marcel@holtmann.org, padovan@profusion.mobi, davem@davemloft.net,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Silence static checker warning.
-Message-ID: <20120301062556.GC22598@mwanda>
-References: <1330535217-26785-1-git-send-email-santoshprasadnayak@gmail.com>
- <CAMXE1-oXtheVHDuU3w52mXqmuY8AK4kk+tuvJpVRDq2=+qEnsQ@mail.gmail.com>
- <CAOD=uF5Ux0w=EPbX0V3qOy1VnZQr6Q35uUxrF9Qv1hZ4MjYJOA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="oTHb8nViIGeoXxdp"
-In-Reply-To: <CAOD=uF5Ux0w=EPbX0V3qOy1VnZQr6Q35uUxrF9Qv1hZ4MjYJOA@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2 v2] core: remove set_limited_discoverable from adapter_ops driver
+Date: Thu,  1 Mar 2012 11:15:04 +0200
+Message-Id: <1330593304-7309-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1330593304-7309-1-git-send-email-luiz.dentz@gmail.com>
+References: <1330593304-7309-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
---oTHb8nViIGeoXxdp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Core should not longer need to take care of details of discoverable bits
+---
+v2: Merge changes in hciops and mgmtops
 
-On Thu, Mar 01, 2012 at 11:07:14AM +0530, santosh prasad nayak wrote:
-> @Dan,
->            In future patches I will take care of it. Is it ok ? If
-> required I can resend the patch with required changes on subject line.
->=20
+ plugins/hciops.c  |    1 -
+ plugins/mgmtops.c |    7 -------
+ src/adapter.c     |    8 --------
+ src/adapter.h     |    1 -
+ 4 files changed, 0 insertions(+), 17 deletions(-)
 
-Nope.  Andrei's patch is already in linux-next so you'll have to
-redo this.
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 61fb718..c166027 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -3877,7 +3877,6 @@ static struct btd_adapter_ops hci_ops = {
+ 	.cleanup = hciops_cleanup,
+ 	.set_powered = hciops_set_powered,
+ 	.set_discoverable = hciops_set_discoverable,
+-	.set_limited_discoverable = hciops_set_limited_discoverable,
+ 	.set_pairable = hciops_set_pairable,
+ 	.start_discovery = hciops_start_discovery,
+ 	.stop_discovery = hciops_stop_discovery,
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index 3cc2c90..07dc8ac 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -1841,12 +1841,6 @@ static void mgmt_cleanup(void)
+ 	}
+ }
+ 
+-static int mgmt_set_limited_discoverable(int index, gboolean limited)
+-{
+-	DBG("index %d limited %d", index, limited);
+-	return -ENOSYS;
+-}
+-
+ static int mgmt_start_discovery(int index)
+ {
+ 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_start_discovery)];
+@@ -2392,7 +2386,6 @@ static struct btd_adapter_ops mgmt_ops = {
+ 	.set_powered = mgmt_set_powered,
+ 	.set_discoverable = mgmt_set_discoverable,
+ 	.set_pairable = mgmt_set_pairable,
+-	.set_limited_discoverable = mgmt_set_limited_discoverable,
+ 	.start_discovery = mgmt_start_discovery,
+ 	.stop_discovery = mgmt_stop_discovery,
+ 	.set_name = mgmt_set_name,
+diff --git a/src/adapter.c b/src/adapter.c
+index 208f4c8..c5f4d0d 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -206,14 +206,6 @@ static uint8_t get_mode(const bdaddr_t *bdaddr, const char *mode)
+ 		return MODE_UNKNOWN;
+ }
+ 
+-static void adapter_set_limited_discoverable(struct btd_adapter *adapter,
+-							gboolean limited)
+-{
+-	DBG("%s", limited ? "TRUE" : "FALSE");
+-
+-	adapter_ops->set_limited_discoverable(adapter->dev_id, limited);
+-}
+-
+ static struct session_req *session_ref(struct session_req *req)
+ {
+ 	req->refcount++;
+diff --git a/src/adapter.h b/src/adapter.h
+index 611e86f..345e308 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -186,7 +186,6 @@ struct btd_adapter_ops {
+ 	int (*set_discoverable) (int index, gboolean discoverable,
+ 							uint16_t timeout);
+ 	int (*set_pairable) (int index, gboolean pairable);
+-	int (*set_limited_discoverable) (int index, gboolean limited);
+ 	int (*start_discovery) (int index);
+ 	int (*stop_discovery) (int index);
+ 
+-- 
+1.7.7.6
 
-> @Andrei
->=20
-> In my local clone your changes are  not visible.
->=20
-> What is the schedule of linux-next ?
-> Is it updated every week or bi-weekly or monthly ?
->=20
-
-It's updated every day.  http://linux.f-seidel.de/linux-next/pmwiki/
-
-regards,
-dan carpenter
-
-
---oTHb8nViIGeoXxdp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iQIcBAEBAgAGBQJPTxZ0AAoJEOnZkXI/YHqRsPkP/2SaIlMRfItCbXWhE4pYJunX
-oehGJxK5ODbQH/QBuRz1nLPhnx1yGPonRpA3IeiGsoV9MOTqaSGeFT1GG0Y6p7fL
-Tz8dS0pnUPepzlIdnPJK6DT5Ll+t2curEO1Yk5uWXVocNcuGA10+5zVqqY6QIlKx
-aYtUxUaUJ8NJT9ogJfI2zdQG1KsA+Zk5zYSGqTKbyw6OVPtRnW0fqxcWhFGVUNj6
-i4S/CtxIV+qvovf5E/F2xuVZTfclJkeqUA5Ztm6kuTcS+ZUmKrweNQobe75XLNqW
-pVY4u35l8TYNncIVLoQa+fKnRPHY0RDbO+jUhMcsxfLGEu3uQQMRpHzzAfxtkRqk
-jl79ncEPh1R5RuckVzOFDtGzG088ZWpx4n4ySskXAsz9558M3s+DM4RrSCL5/Jp5
-aa7JjdNNg41W5/FS3H2djzf8S4ijZjSLKJsghFI6scSjHKQY9y3xVL33tT3blPMW
-UHZ9Auk9J00MD6pvYkQD54ZgriuBQ8VZV9nu6lEwJ7dMFgdP4/YwHQhU9aJO5QLM
-aH6DPs173Zd8FCM55/LF5qHAR2kExLE5dQdVzV0sKWDzn1PFjW/O1JeP3/MY4HkW
-I4+hIsSA6WO3U956s08vpytXqziPR0Pnu3Gv8Nd83zpCHlwWuYoFGM3I4A69Gh6n
-2v/hYMzVJdRNoJrW6cHr
-=UTfK
------END PGP SIGNATURE-----
-
---oTHb8nViIGeoXxdp--
