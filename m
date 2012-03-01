@@ -1,50 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-Subject: [PATCH] Bluetooth: btusb: Add USB device ID "0a5c 21e8"
-Date: Thu,  1 Mar 2012 10:23:47 -0300
-Message-Id: <1330608227-14636-1-git-send-email-jprvita@openbossa.org>
-In-Reply-To: <20120229234414.GA19829@joana>
-References: <20120229234414.GA19829@joana>
+Date: Thu, 1 Mar 2012 14:35:42 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: santosh nayak <santoshprasadnayak@gmail.com>
+Cc: marcel@holtmann.org, padovan@profusion.mobi, davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: Resend: [PATCH] Bluetooth: Fix Endian Bug.
+Message-ID: <20120301123540.GE25627@aemeltch-MOBL1>
+References: <1330599561-20392-1-git-send-email-santoshprasadnayak@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1330599561-20392-1-git-send-email-santoshprasadnayak@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-One more vendor-specific ID for BCM20702A0.
+Hi Santosh,
 
-T:  Bus=01 Lev=03 Prnt=05 Port=02 Cnt=01 Dev#=  9 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0a5c ProdID=21e8 Rev=01.12
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM20702A0
-S:  SerialNumber=00027221F4E2
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+On Thu, Mar 01, 2012 at 04:29:21PM +0530, santosh nayak wrote:
+> From: Santosh Nayak <santoshprasadnayak@gmail.com>
+> 
+> Fix for endian bug.
+> 
+> Fix for null dereferenced removed as it is already
+> submitted by Andrei.
+> 
+> Signed-off-by: Santosh Nayak <santoshprasadnayak@gmail.com>
+> ---
+>  net/bluetooth/l2cap_sock.c |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
 
-Signed-off-by: João Paulo Rechi Vita <jprvita@openbossa.org>
----
- drivers/bluetooth/btusb.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+We prefer following commit log (this is the example)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index c5606ef..b4d9d2f 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -102,6 +102,7 @@ static struct usb_device_id btusb_table[] = {
- 
- 	/* Broadcom BCM20702A0 */
- 	{ USB_DEVICE(0x0a5c, 0x21e3) },
-+	{ USB_DEVICE(0x0a5c, 0x21e8) },
- 	{ USB_DEVICE(0x0a5c, 0x21f3) },
- 	{ USB_DEVICE(0x413c, 0x8197) },
- 
--- 
-1.7.7.6
+<------8<----------------------------------------------------------
+|  From: Santosh Nayak <santoshprasadnayak@gmail.com>
+|
+|  Fix network to host endian conversion for L2CAP chan id.
+|
+|  Signed-off-by: Santosh Nayak <santoshprasadnayak@gmail.com>
+|
+|  ---
+|          * v2 Fix for null dereferenced removed as it is already
+|          submitted by Andrei.
+|
+|    net/bluetooth/l2cap_sock.c |    5 +++--
+|    1 files changed, 3 insertions(+), 2 deletions(-)
+|
+<------8<----------------------------------------------------------
 
+
+> 
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 401d942..86d5067 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -82,7 +82,7 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+>  	}
+>  
+>  	if (la.l2_cid)
+> -		err = l2cap_add_scid(chan, la.l2_cid);
+> +		err = l2cap_add_scid(chan, __le16_to_cpu(la.l2_cid));
+>  	else
+>  		err = l2cap_add_psm(chan, &la.l2_bdaddr, la.l2_psm);
+>  
+> @@ -123,7 +123,8 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+>  	if (la.l2_cid && la.l2_psm)
+>  		return -EINVAL;
+>  
+> -	err = l2cap_chan_connect(chan, la.l2_psm, la.l2_cid, &la.l2_bdaddr);
+> +	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
+> +				&la.l2_bdaddr);
+
+I live this to Marcel to decide should we reindent our code otherwise this
+one looks odd.
+
+Best regards 
+Andrei Emeltchenko 
