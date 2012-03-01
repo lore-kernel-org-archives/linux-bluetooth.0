@@ -1,29 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 1 Mar 2012 07:05:35 -0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Check capabilities in BR/EDR and LE-Only
+ discovery
+Message-ID: <20120301150535.GA19616@x220>
+References: <1330031367-10614-1-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <1330613135-16552-2-git-send-email-michal.labedzki@tieto.com>
-References: <1330613135-16552-1-git-send-email-michal.labedzki@tieto.com>
-	<1330613135-16552-2-git-send-email-michal.labedzki@tieto.com>
-Date: Thu, 1 Mar 2012 17:34:19 +0200
-Message-ID: <CABBYNZL5go4LSXbzx5qyEDg2quMqNJ+n+A+qsL+ybSv99FzPyg@mail.gmail.com>
-Subject: Re: [PATCH 2/3] avrcp: Add error code for rejected vendor command
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michal Labedzki <michal.labedzki@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com,
-	vani.patel@stericsson.com, joohi.rastogi@stericsson.com
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1330031367-10614-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Hi Andre,
 
-On Thu, Mar 1, 2012 at 4:45 PM, Michal Labedzki
-<michal.labedzki@tieto.com> wrote:
-> Make correct response for any vendor commands when there are not any
-> registered player. According to the specification responses should be
-> REJECTED with error code.
+On Thu, Feb 23, 2012, Andre Guedes wrote:
+> This patch add an extra check for BR/EDR and LE-Only discovery.
+> This way, we are able to return error immediately if the discovery
+> type requested is not supported by the device.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  net/bluetooth/mgmt.c |   10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
 
-Please quote the spec whenever possible, actually what spec does this come from?
+Applied. Thanks.
 
-
--- 
-Luiz Augusto von Dentz
+Johan
