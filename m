@@ -1,40 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Don't force DISCOVERY_STOPPED state in inquiry_cache_flush
-Date: Thu,  1 Mar 2012 18:19:57 -0300
-Message-Id: <1330636797-16171-1-git-send-email-andre.guedes@openbossa.org>
+Message-ID: <1330634908.3392.109.camel@aeonflux>
+Subject: Re: [PATCH 5/5] Bluetooth: mgmt: Centralize message length checks
+From: Marcel Holtmann <marcel@holtmann.org>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 01 Mar 2012 12:48:28 -0800
+In-Reply-To: <1330634012-4502-5-git-send-email-johan.hedberg@gmail.com>
+References: <1330634012-4502-1-git-send-email-johan.hedberg@gmail.com>
+	 <1330634012-4502-5-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We are not supposed to force DISCOVERY_STOPPED in inquiry_cache_flush
-because we may break the discovery state machine. For instance,
-during interleaved discovery, when we are about to start inquiry,
-the state machine forcibly goes to DISCOVERY_STOPPED while it
-should stay in DISCOVERY_FINDING state.
+Hi Johan,
 
-This problem results in unexpected behaviors such as sending two
-mgmt_discovering events to userspace (when only one event is
-expected) and Stop Discovery failures.
+> This patch moves the command length information into the command handler
+> table allowing the removal of length checks from the handler functions
+> and doing the check in a single place before calling the handler
+> function.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/mgmt.c |  220 ++++++++++++--------------------------------------
+>  1 files changed, 52 insertions(+), 168 deletions(-)
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
----
- net/bluetooth/hci_core.c |    1 -
- 1 file changed, 1 deletion(-)
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d3ddc0b..661d65f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -413,7 +413,6 @@ static void inquiry_cache_flush(struct hci_dev *hdev)
- 
- 	INIT_LIST_HEAD(&cache->unknown);
- 	INIT_LIST_HEAD(&cache->resolve);
--	cache->state = DISCOVERY_STOPPED;
- }
- 
- struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr)
--- 
-1.7.9.2
+Regards
+
+Marcel
+
 
