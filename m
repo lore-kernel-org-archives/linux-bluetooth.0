@@ -1,72 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Kumar, Sunil A" <sunil.a.kumar@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Lucas De Marchi <lucas.demarchi@profusion.mobi>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Nair, Rashmi G" <rashmi.g.nair@intel.com>,
-	"Khanzode, Prashant" <prashant.khanzode@intel.com>,
-	"Von Dentz, Luiz" <luiz.von.dentz@intel.com>
-Subject: RE: Response to AVRCP Passthrough Commands.
-Date: Thu, 1 Mar 2012 09:53:37 +0000
-Message-ID: <8948CE8A2D1716449B389D5F68D4A30E020969@FMSMSX108.amr.corp.intel.com>
-References: <8948CE8A2D1716449B389D5F68D4A30E02048F@FMSMSX108.amr.corp.intel.com>
-	<20120228130505.GA4170@vader>
-	<CABBYNZL32nUYXTXTM1gCmRhGms5qGpW2uibyT5j5gDBow8Akiw@mail.gmail.com>
-	<8948CE8A2D1716449B389D5F68D4A30E02072B@FMSMSX108.amr.corp.intel.com>
- <CABBYNZJvgqDhknP-4OWDYP3MZD5nrn3oPq9cO313cJfY7BEV2Q@mail.gmail.com>
-In-Reply-To: <CABBYNZJvgqDhknP-4OWDYP3MZD5nrn3oPq9cO313cJfY7BEV2Q@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Thu, 1 Mar 2012 09:25:56 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: santosh prasad nayak <santoshprasadnayak@gmail.com>
+Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+        marcel@holtmann.org, padovan@profusion.mobi, davem@davemloft.net,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Silence static checker warning.
+Message-ID: <20120301062556.GC22598@mwanda>
+References: <1330535217-26785-1-git-send-email-santoshprasadnayak@gmail.com>
+ <CAMXE1-oXtheVHDuU3w52mXqmuY8AK4kk+tuvJpVRDq2=+qEnsQ@mail.gmail.com>
+ <CAOD=uF5Ux0w=EPbX0V3qOy1VnZQr6Q35uUxrF9Qv1hZ4MjYJOA@mail.gmail.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="oTHb8nViIGeoXxdp"
+In-Reply-To: <CAOD=uF5Ux0w=EPbX0V3qOy1VnZQr6Q35uUxrF9Qv1hZ4MjYJOA@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
 
-Thanks for the details. It clarifies the questions. And agree with you that there is no use to make any change here when we are already moving to AVRCP1.3/1.4.
+--oTHb8nViIGeoXxdp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hi Lucas,
+On Thu, Mar 01, 2012 at 11:07:14AM +0530, santosh prasad nayak wrote:
+> @Dan,
+>            In future patches I will take care of it. Is it ok ? If
+> required I can resend the patch with required changes on subject line.
+>=20
 
-I was not able to test your patch on latest Bluez version as Android version we are using still makes use of Bluez4.47. But, I made similar changes over 4.47 and I didn't see any error from PTS. So, your patch shall be good to go.
-Thanks.
+Nope.  Andrei's patch is already in linux-next so you'll have to
+redo this.
 
-Best Regards
-Sunil Kumar
------Original Message-----
-From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com] 
-Sent: Wednesday, February 29, 2012 6:53 PM
-To: Kumar, Sunil A
-Cc: Lucas De Marchi; linux-bluetooth@vger.kernel.org; Nair, Rashmi G; Khanzode, Prashant; Von Dentz, Luiz
-Subject: Re: Response to AVRCP Passthrough Commands.
+> @Andrei
+>=20
+> In my local clone your changes are  not visible.
+>=20
+> What is the schedule of linux-next ?
+> Is it updated every week or bi-weekly or monthly ?
+>=20
 
-Hi Sunil,
+It's updated every day.  http://linux.f-seidel.de/linux-next/pmwiki/
 
-On Wed, Feb 29, 2012 at 2:20 PM, Kumar, Sunil A <sunil.a.kumar@intel.com> wrote:
-> Hi Luiz/Lucas,
->
-> Thanks for your inputs.
->
-> I agree that situation can be workaround to a great extent using metadata in devices supporting the same. Though, the error codes hold importance in some cases:
->
-> - Purely from specification perspective, we are not doing right thing 
-> here. But, we can ignore this until we have strong reasons for not 
-> doing so :-)
+regards,
+dan carpenter
 
-AV/C spec targets completely different system than AVRCP, that why ipod like devices uses MTP.
 
-> - Consider a Carkit which supports Media Player with TOUCH BUTTONS and still operating with AVRCP 1.0. User presses the Play button to start the music playback but TG could not really start it because of an internal error. In this case, if TG responds with ACCEPTED then I expect Carkit to change Play button to Pause button even though playback has not started (many of the Carkits really will not look at A2DP state to change the play button to pause button) whereas if TG responds with REJECTED then Play button will still stay as Play which is right as well so that user can try again.
+--oTHb8nViIGeoXxdp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
-The carkit implementations really got this wrong, first there are several recommendation not do toggling for PLAY/PAUSE, the second and to me more important is that TG should not be treated as single purpose player application so using the PLAY to try to start a specific application just doesn't work, it is the same as hitting play button on keyboard even Windows doesn't react to that because it doesn't know what application to open or what to play.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
 
-AVRCP 1.4 attempt to fix this with media browsing, although Im not sure why this is not done using OBEX as it fits much better when possible dealing with files and browsing directories, so you can actually select what you want to play.
+iQIcBAEBAgAGBQJPTxZ0AAoJEOnZkXI/YHqRsPkP/2SaIlMRfItCbXWhE4pYJunX
+oehGJxK5ODbQH/QBuRz1nLPhnx1yGPonRpA3IeiGsoV9MOTqaSGeFT1GG0Y6p7fL
+Tz8dS0pnUPepzlIdnPJK6DT5Ll+t2curEO1Yk5uWXVocNcuGA10+5zVqqY6QIlKx
+aYtUxUaUJ8NJT9ogJfI2zdQG1KsA+Zk5zYSGqTKbyw6OVPtRnW0fqxcWhFGVUNj6
+i4S/CtxIV+qvovf5E/F2xuVZTfclJkeqUA5Ztm6kuTcS+ZUmKrweNQobe75XLNqW
+pVY4u35l8TYNncIVLoQa+fKnRPHY0RDbO+jUhMcsxfLGEu3uQQMRpHzzAfxtkRqk
+jl79ncEPh1R5RuckVzOFDtGzG088ZWpx4n4ySskXAsz9558M3s+DM4RrSCL5/Jp5
+aa7JjdNNg41W5/FS3H2djzf8S4ijZjSLKJsghFI6scSjHKQY9y3xVL33tT3blPMW
+UHZ9Auk9J00MD6pvYkQD54ZgriuBQ8VZV9nu6lEwJ7dMFgdP4/YwHQhU9aJO5QLM
+aH6DPs173Zd8FCM55/LF5qHAR2kExLE5dQdVzV0sKWDzn1PFjW/O1JeP3/MY4HkW
+I4+hIsSA6WO3U956s08vpytXqziPR0Pnu3Gv8Nd83zpCHlwWuYoFGM3I4A69Gh6n
+2v/hYMzVJdRNoJrW6cHr
+=UTfK
+-----END PGP SIGNATURE-----
 
-> - Assumption in Bluez that application supports all commands supported by Bluez is not right as some of these commands are optional and hence, application can choose to not support. And hence, it might be better option to leave the final decision on user (application in this case) but of course, we have complexities in place mentioned by Luiz.
-
-We are assuming that if we are able to translate the command into Linux input system it will be considered accepted, it is the remote stack that is trying to be smart and triggering special handling depending on the response. It also doesn't work given the application the possibility to tell what commands it supports, because this is done in runtime depending on what application is in focus, it can even be a browser accessing youtube.
-
-> Again, as Luiz said effort is really high to change the design. So, not sure if gains are really proportional and hence, please see if we really need to do something here.
-
-I really think this doesn't worth the effort, BlueZ already supports
-1.3 and there is plans to support 1.4, Android and others will follow and carkits will have to catch up as well, so trying to do something about this for AVRCP 1.0 sounds pretty useless to me.
-
---
-Luiz Augusto von Dentz
+--oTHb8nViIGeoXxdp--
