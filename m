@@ -1,39 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1330697618.20578.16.camel@novo.hadess.net>
-Subject: Re: obexd 0.45 compilation problem
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Date: Fri, 02 Mar 2012 14:13:38 +0000
-In-Reply-To: <CABBYNZKQWvNmTrqjKrkVKxeWGzVN9eV1KwkNXZChgUS6nSwydQ@mail.gmail.com>
-References: <1330692190.20578.15.camel@novo.hadess.net>
-	 <CABBYNZKQWvNmTrqjKrkVKxeWGzVN9eV1KwkNXZChgUS6nSwydQ@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <20120301223226.GA7133@x220.amr.corp.intel.com>
+References: <1330636797-16171-1-git-send-email-andre.guedes@openbossa.org>
+	<20120301223226.GA7133@x220.amr.corp.intel.com>
+Date: Fri, 2 Mar 2012 10:48:06 -0300
+Message-ID: <CACJA=fVFmGJFnkA1erCS+56DR+WSo1h2vBSNhpqnth3=pgmVRQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Don't force DISCOVERY_STOPPED state in inquiry_cache_flush
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2012-03-02 at 14:57 +0200, Luiz Augusto von Dentz wrote:
-> Hi Bastien,
-> 
-> On Fri, Mar 2, 2012 at 2:43 PM, Bastien Nocera <hadess@hadess.net> wrote:
-> > Heya,
-> >
-> > Trying to compile obexd 0.45 with bluez-4.98, I get:
-> > btio/btio.c: In function 'get_key_size':
-> > btio/btio.c:522:14: error: 'struct bt_security' has no member named 'key_size'
-> >
-> > Do you need to either up the bluez dependency, or is obexd lagging?
-> >
-> > Install log:
-> > http://koji.fedoraproject.org/koji/getfile?taskID=3846402&name=root.log
-> > Compile log:
-> > http://koji.fedoraproject.org/koji/getfile?taskID=3846402&name=build.log
-> 
-> It is a known problem, until we are depending on a new release of
-> bluez (4.99) then we can add the build dependency properly, after that
-> we will probably have a new release for obexd as well.
+Hi Johan,
 
-I don't understand. Are you telling me that obexd relies on an
-unreleased version of bluez?
+On Thu, Mar 1, 2012 at 7:32 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Andre,
+>
+> On Thu, Mar 01, 2012, Andre Guedes wrote:
+>> We are not supposed to force DISCOVERY_STOPPED in inquiry_cache_flush
+>> because we may break the discovery state machine. For instance,
+>> during interleaved discovery, when we are about to start inquiry,
+>> the state machine forcibly goes to DISCOVERY_STOPPED while it
+>> should stay in DISCOVERY_FINDING state.
+>>
+>> This problem results in unexpected behaviors such as sending two
+>> mgmt_discovering events to userspace (when only one event is
+>> expected) and Stop Discovery failures.
+>>
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>>  net/bluetooth/hci_core.c |    1 -
+>>  1 file changed, 1 deletion(-)
+>>
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index d3ddc0b..661d65f 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -413,7 +413,6 @@ static void inquiry_cache_flush(struct hci_dev *hdev)
+>>
+>>       INIT_LIST_HEAD(&cache->unknown);
+>>       INIT_LIST_HEAD(&cache->resolve);
+>> -     cache->state = DISCOVERY_STOPPED;
+>>  }
+>
+> Nack.
+>
+> The reason why this was there is hci_dev_do_close() and hci_dev_reset()
+> which call inquiry_cache_flush(). If the discovery state is not set
+> correctly through these code paths you might get into a situation where
+> you can't start discovery again after doing "hciconfig hci0 reset" or
+> "hciconfig hci0 down" while discovery was active. So I agree that some
+> fix is needed but you need to ensure that you don't break these use
+> cases.
 
+This issue is already address by upstream patch "Bluetooth: Set
+DISCOVERY_STOPPED if controller resets". So, the discovery state machine
+will be right even if we run "hciconfig hci0 reset" or "hciconfig hci0
+down" while discovery is active.
+
+BR,
+
+Andre
