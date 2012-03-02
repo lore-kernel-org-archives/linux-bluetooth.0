@@ -1,32 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Mar 2012 15:57:31 -0800
+Date: Fri, 2 Mar 2012 15:44:03 -0800
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Heart Rate Profile API
-Message-ID: <20120302235731.GA32181@x220.ice.intel.com>
-References: <1330070908-2361-1-git-send-email-sancane@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Don't force DISCOVERY_STOPPED state in
+ inquiry_cache_flush
+Message-ID: <20120302234403.GB31665@x220.ice.intel.com>
+References: <1330636797-16171-1-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1330070908-2361-1-git-send-email-sancane@gmail.com>
+In-Reply-To: <1330636797-16171-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+Hi Andre,
 
-On Fri, Feb 24, 2012, Santiago Carot-Nemesio wrote:
-> +		Reset()
-> +
-> +			Restart the accumulation of energy expended from zero.
-> +
-> +			Possible Errors: org.bluez.Error.NotSupported
-> +
-> +Properties	boolean Reset [readonly]
-> +
-> +			True if energy expended is supportted.
+On Thu, Mar 01, 2012, Andre Guedes wrote:
+> We are not supposed to force DISCOVERY_STOPPED in inquiry_cache_flush
+> because we may break the discovery state machine. For instance,
+> during interleaved discovery, when we are about to start inquiry,
+> the state machine forcibly goes to DISCOVERY_STOPPED while it
+> should stay in DISCOVERY_FINDING state.
+> 
+> This problem results in unexpected behaviors such as sending two
+> mgmt_discovering events to userspace (when only one event is
+> expected) and Stop Discovery failures.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  net/bluetooth/hci_core.c |    1 -
+>  1 file changed, 1 deletion(-)
 
-The API looks good to me, but I think ResetSupported would make more
-sense for this property name. Also, I'd have expected someone from INdT
-to either give an ack or nack for this.
+The patch has been applied to my tree now. Thanks.
 
 Johan
