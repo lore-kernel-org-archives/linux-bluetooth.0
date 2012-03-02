@@ -1,33 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1330711749.20578.23.camel@novo.hadess.net>
-Subject: Re: obexd 0.45 compilation problem
-From: Bastien Nocera <hadess@hadess.net>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Date: Fri, 02 Mar 2012 18:09:09 +0000
-In-Reply-To: <1330710799.3392.123.camel@aeonflux>
-References: <1330692190.20578.15.camel@novo.hadess.net>
-	 <1330710799.3392.123.camel@aeonflux>
-Content-Type: text/plain; charset="ISO-8859-1"
+Message-ID: <1330711026.3392.126.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Silence static checker warning.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: David Laight <David.Laight@ACULAB.COM>,
+	santosh nayak <santoshprasadnayak@gmail.com>,
+	padovan@profusion.mobi, davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	Ville Tervo <ville.tervo@nokia.com>
+Date: Fri, 02 Mar 2012 09:57:06 -0800
+In-Reply-To: <20120302110420.GH22598@mwanda>
+References: <1330537602.3392.101.camel@aeonflux>
+	 <AE90C24D6B3A694183C094C60CF0A2F6026B6E88@saturn3.aculab.com>
+	 <20120302110420.GH22598@mwanda>
+Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2012-03-02 at 09:53 -0800, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > Trying to compile obexd 0.45 with bluez-4.98, I get:
-> > btio/btio.c: In function 'get_key_size':
-> > btio/btio.c:522:14: error: 'struct bt_security' has no member named 'key_size'
-> > 
-> > Do you need to either up the bluez dependency, or is obexd lagging?
-> 
-> I screwed this one up. Hand me over the brown-paper-bag please.
-> 
-> Seems I ended up installing non-released headers on my build/test
-> system. That should not have happened, but it did.
-> 
-> Either we do an obexd 0.46 with this change reversed or BlueZ 4.99. I
-> going to check up on that and let everybody now.
+Hi Dan,
 
-Either is fine by me, and not in much of a hurry. It's just that I got
-the impression from Luiz that it was done on purpose.
+> > How long has this code been in tree?
+> > It isn't obvious to me that this change won't break code on BE systems
+> > where the application code is already fixing the endianness.
+> > 
+> 
+> It looks like we've had an endian bug since last February.
+> 
+> b62f328b8f20a "Bluetooth: Add server socket support for LE
+> connection"
+> 
+> +               l2cap_pi(sk)->scid = la.l2_cid;
+> 
+> ->scid was cpu endian.
+
+this is a bug. No questions asked.
+
+However you can only exercise this code if you work with Bluetooth Low
+Energy and that is not enabled by default since it is not fully finished
+yet. CID is only used by Low Energy.
+
+Bluetooth BR/EDR only uses PSM part of the socket address and that has
+been endian safe.
+
+Regards
+
+Marcel
+
+
