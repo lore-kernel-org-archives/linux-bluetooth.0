@@ -1,42 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Mar 2012 10:39:17 +0100
-From: Michal Labedzki <michal.labedzki@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH 2/3] avrcp: Add error code for rejected vendor command
-Message-ID: <20120302093917.GB27242@uw000554.eu.tieto.com>
-References: <1330613135-16552-1-git-send-email-michal.labedzki@tieto.com>
- <1330613135-16552-2-git-send-email-michal.labedzki@tieto.com>
- <CABBYNZL5go4LSXbzx5qyEDg2quMqNJ+n+A+qsL+ybSv99FzPyg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <CABBYNZL5go4LSXbzx5qyEDg2quMqNJ+n+A+qsL+ybSv99FzPyg@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain;
+	charset="us-ascii"
+Subject: RE: [PATCH] Bluetooth: Silence static checker warning.
+Date: Fri, 2 Mar 2012 09:15:37 -0000
+Message-ID: <AE90C24D6B3A694183C094C60CF0A2F6026B6E88@saturn3.aculab.com>
+In-Reply-To: <1330537602.3392.101.camel@aeonflux>
+From: "David Laight" <David.Laight@ACULAB.COM>
+To: "Marcel Holtmann" <marcel@holtmann.org>,
+	"santosh nayak" <santoshprasadnayak@gmail.com>
+Cc: <padovan@profusion.mobi>,
+	<davem@davemloft.net>,
+	<linux-bluetooth@vger.kernel.org>,
+	<netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>,
+	<kernel-janitors@vger.kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Mar 01, 2012 at 05:34:19PM +0200, Luiz Augusto von Dentz wrote:
-> Hi Michal,
-> 
-> On Thu, Mar 1, 2012 at 4:45 PM, Michal Labedzki
-> <michal.labedzki@tieto.com> wrote:
-> > Make correct response for any vendor commands when there are not any
-> > registered player. According to the specification responses should be
-> > REJECTED with error code.
-> 
-> Please quote the spec whenever possible, actually what spec does this come from?
-> 
-> 
-> -- 
-> Luiz Augusto von Dentz
+=20
+> > > diff --git a/net/bluetooth/l2cap_sock.c
+b/net/bluetooth/l2cap_sock.c
+> > > index 401d942..d206321 100644
+> > > --- a/net/bluetooth/l2cap_sock.c
+> > > +++ b/net/bluetooth/l2cap_sock.c
+> > > @@ -82,7 +82,7 @@ static int l2cap_sock_bind(struct socket *sock,
+struct sockaddr *addr, int alen)
+> > >  	}
+> > > =20
+> > >  	if (la.l2_cid)
+> > > -		err =3D l2cap_add_scid(chan, la.l2_cid);
+> > > +		err =3D l2cap_add_scid(chan, __le16_to_cpu(la.l2_cid));
+> > >  	else
+> > >  		err =3D l2cap_add_psm(chan, &la.l2_bdaddr, la.l2_psm);
+> > > =20
+> > > @@ -123,7 +123,8 @@ static int l2cap_sock_connect(struct socket
+*sock, struct sockaddr *addr, int al
+> > >  	if (la.l2_cid && la.l2_psm)
+> > >  		return -EINVAL;
+> > > =20
+> > > -	err =3D l2cap_chan_connect(chan, la.l2_psm, la.l2_cid,
+&la.l2_bdaddr);
+> > > +	err =3D l2cap_chan_connect(chan, la.l2_psm,
+__le16_to_cpu(la.l2_cid),
+> > > +				&la.l2_bdaddr);
+> > >  	if (err)
+> > >  		goto done;
+> >=20
+> > I am not sure about this one. Need to go back and read through the
+> > source code. The value provided from userspace is already in the
+right
+> > host endian. Could be that we mess up our internal classification.
+And
+> > instead of adding __le16_to_cpu we should fix its classification.
+>=20
+> I confused myself here, so the provided PSM and CID values coming from
+> userspace are little endian. Patch is correct.
 
-Hi Luiz,                                                                                                                                             
-                                                                                                                                                     
-Here you are:                                                                                                                                        
-"For error response PDU the response parameter is always the error code independent                                                                  
-of the response format defined for ACCEPTED PDU response for the corresponding                                                                       
-PDU command."                                                                                                                                        
-(source: AVRCP 1.3 specification, pages 34,56 or AVRCP 1.4 specification, pages 33,93)                                                               
-                                                                                                                                                     
-All other error responses already have error code in parameter list.
+How long has this code been in tree?
+It isn't obvious to me that this change won't break code on BE systems
+where the application code is already fixing the endianness.
 
-
+	David
