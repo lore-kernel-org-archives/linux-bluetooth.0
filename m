@@ -1,66 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Mar 2012 14:04:20 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: David Laight <David.Laight@ACULAB.COM>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-        santosh nayak <santoshprasadnayak@gmail.com>, padovan@profusion.mobi,
-        davem@davemloft.net, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, Ville Tervo <ville.tervo@nokia.com>
-Subject: Re: [PATCH] Bluetooth: Silence static checker warning.
-Message-ID: <20120302110420.GH22598@mwanda>
-References: <1330537602.3392.101.camel@aeonflux>
- <AE90C24D6B3A694183C094C60CF0A2F6026B6E88@saturn3.aculab.com>
+Date: Fri, 2 Mar 2012 10:39:17 +0100
+From: Michal Labedzki <michal.labedzki@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH 2/3] avrcp: Add error code for rejected vendor command
+Message-ID: <20120302093917.GB27242@uw000554.eu.tieto.com>
+References: <1330613135-16552-1-git-send-email-michal.labedzki@tieto.com>
+ <1330613135-16552-2-git-send-email-michal.labedzki@tieto.com>
+ <CABBYNZL5go4LSXbzx5qyEDg2quMqNJ+n+A+qsL+ybSv99FzPyg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="cfJ13FhsvNR/yOpm"
-In-Reply-To: <AE90C24D6B3A694183C094C60CF0A2F6026B6E88@saturn3.aculab.com>
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <CABBYNZL5go4LSXbzx5qyEDg2quMqNJ+n+A+qsL+ybSv99FzPyg@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Thu, Mar 01, 2012 at 05:34:19PM +0200, Luiz Augusto von Dentz wrote:
+> Hi Michal,
+> 
+> On Thu, Mar 1, 2012 at 4:45 PM, Michal Labedzki
+> <michal.labedzki@tieto.com> wrote:
+> > Make correct response for any vendor commands when there are not any
+> > registered player. According to the specification responses should be
+> > REJECTED with error code.
+> 
+> Please quote the spec whenever possible, actually what spec does this come from?
+> 
+> 
+> -- 
+> Luiz Augusto von Dentz
 
---cfJ13FhsvNR/yOpm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Luiz,                                                                                                                                             
+                                                                                                                                                     
+Here you are:                                                                                                                                        
+"For error response PDU the response parameter is always the error code independent                                                                  
+of the response format defined for ACCEPTED PDU response for the corresponding                                                                       
+PDU command."                                                                                                                                        
+(source: AVRCP 1.3 specification, pages 34,56 or AVRCP 1.4 specification, pages 33,93)                                                               
+                                                                                                                                                     
+All other error responses already have error code in parameter list.
 
-On Fri, Mar 02, 2012 at 09:15:37AM -0000, David Laight wrote:
-> How long has this code been in tree?
-> It isn't obvious to me that this change won't break code on BE systems
-> where the application code is already fixing the endianness.
->=20
 
-It looks like we've had an endian bug since last February.
-
-b62f328b8f20a "Bluetooth: Add server socket support for LE
-connection"
-
-+               l2cap_pi(sk)->scid =3D la.l2_cid;
-
-->scid was cpu endian.
-
-regards,
-dan carpenter
-
---cfJ13FhsvNR/yOpm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iQIcBAEBAgAGBQJPUKkzAAoJEOnZkXI/YHqRADkP/217s0ztGrn66LSv/c5F1A4k
-6cBasjmCmLkN/AE/BMwu6lQoSh/U+flf2SIgxT1ULuyni/FpJ+bVwn6flrOPaRzB
-D+JPi5T3vEMnM6s8P2C6gVrwvCEPvzUhvgaCXgh6rmQO/OKq5H49RjyRuhWUb/jG
-puXy4pFxr4AfLYuSS4I5xNfSPAec9dSX2q8a1PZnvlOkc/zj2uLeJh5dyFwDQWIc
-RA31sMNUF6x1nLJ91HYfXuu9kJynQQeX8HCtxBU1Vn7Inc1EQ4HrqPkOgTaFBbo9
-tL0i9uGcWGbzZYbZp5K6yPZyaY4M+fxjQNGMO+P14AKIZwJWNKkIiusNEasC18ea
-gnm/SO+VNl8xLsAjJDcgyFmudGvFMgqkxY+vDK8Q2MP2qymJLigLzNkEUTq1c4Wx
-X47Pob9mFSLZARCKE+FEIOInLcJjTnJzTNBYcS1s35wWJ7a8IZ94JheT6gEL+0xP
-tmz3jdvOBHPzG+wkID31/JyTjRqERb749i9aiGF1Wy2pXSvwa8uKE47nDDw7zt4r
-hjbsft9ubm+W0lt3ofw0TkL97A1wBLebTV/ZT/FDtBflyNYFmjXq/oEyqyF+vH1i
-USciqxB3mp9znqp13k9ADR4OKzqJ15uk9LgT/jjHmXFgnOC7/3iALpSXfTHCqupA
-woGcH+1N1MOFEKlxdzPP
-=nrfy
------END PGP SIGNATURE-----
-
---cfJ13FhsvNR/yOpm--
