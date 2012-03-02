@@ -1,36 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1330730728.3392.129.camel@aeonflux>
-Subject: Re: [PATCH 1/2] Bluetooth: Remove HCI_PI_MGMT_INIT flag for sockets
-From: Marcel Holtmann <marcel@holtmann.org>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 02 Mar 2012 15:25:28 -0800
-In-Reply-To: <1330727590-27120-1-git-send-email-johan.hedberg@gmail.com>
-References: <1330727590-27120-1-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Fri, 2 Mar 2012 15:11:11 -0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
+Subject: Re: [PATCH] SAP: Make PADDING4 macro a bit more robust
+Message-ID: <20120302231111.GA27253@x220.ice.intel.com>
+References: <1330700316-5810-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1330700316-5810-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Szymon,
 
-> This flag is of no use right now and is in fact harmful in that it
-> prevents the HCI_MGMT flag to be set for any controllers that may need
-> it after the first one that bluetoothd takes into use (the flag is
-> cleared for the first controller so any subsequent ones through the same
-> bluetoothd mgmt socket never get the HCI_MGMT flag set).
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+On Fri, Mar 02, 2012, Szymon Janc wrote:
+> Bitwise operations are done before arithmetic operations and this might
+> cause undesired results if macro is called with parameter of form x+y.
 > ---
->  include/net/bluetooth/hci_core.h |    4 ----
->  net/bluetooth/hci_sock.c         |    1 -
->  net/bluetooth/mgmt.c             |   18 ++++++++----------
->  3 files changed, 8 insertions(+), 15 deletions(-)
+>  sap/server.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Applied. Thanks.
 
-Regards
-
-Marcel
-
-
+Johan
