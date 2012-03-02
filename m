@@ -1,64 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Mar 2012 14:32:15 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: santosh prasad nayak <santoshprasadnayak@gmail.com>
-Cc: marcel@holtmann.org, padovan@profusion.mobi, davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: Resend: [PATCH] Bluetooth: Fix Endian Bug.
-Message-ID: <20120302123210.GA4741@aemeltch-MOBL1>
-References: <1330599561-20392-1-git-send-email-santoshprasadnayak@gmail.com>
- <20120301123540.GE25627@aemeltch-MOBL1>
- <CAOD=uF4LSS8nuKMNHGEH2JsVZHU0rntSxZjvNaa4oZrey1macw@mail.gmail.com>
+Date: Fri, 2 Mar 2012 14:04:20 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: David Laight <David.Laight@ACULAB.COM>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+        santosh nayak <santoshprasadnayak@gmail.com>, padovan@profusion.mobi,
+        davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, Ville Tervo <ville.tervo@nokia.com>
+Subject: Re: [PATCH] Bluetooth: Silence static checker warning.
+Message-ID: <20120302110420.GH22598@mwanda>
+References: <1330537602.3392.101.camel@aeonflux>
+ <AE90C24D6B3A694183C094C60CF0A2F6026B6E88@saturn3.aculab.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CAOD=uF4LSS8nuKMNHGEH2JsVZHU0rntSxZjvNaa4oZrey1macw@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="cfJ13FhsvNR/yOpm"
+In-Reply-To: <AE90C24D6B3A694183C094C60CF0A2F6026B6E88@saturn3.aculab.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santosh,
 
-On Thu, Mar 01, 2012 at 07:34:58PM +0530, santosh prasad nayak wrote:
-> Andrei,
-> 
-> I could not get you.
-> 
-> Do you want me to resend the patch with subject,
->   "[PATCH] Bluetooth: Fix network to host endian conversion for L2CAP
-> chan id."  ?
+--cfJ13FhsvNR/yOpm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-No, the main concern was your commit message which is changelog and should
-come after "---" as it is shown in the example below.
+On Fri, Mar 02, 2012 at 09:15:37AM -0000, David Laight wrote:
+> How long has this code been in tree?
+> It isn't obvious to me that this change won't break code on BE systems
+> where the application code is already fixing the endianness.
+>=20
 
-> > On Thu, Mar 01, 2012 at 04:29:21PM +0530, santosh nayak wrote:
-> >> From: Santosh Nayak <santoshprasadnayak@gmail.com>
-> >>
-> >> Fix for endian bug.
-> >>
-> >> Fix for null dereferenced removed as it is already
-> >> submitted by Andrei.
-> >>
-> >> Signed-off-by: Santosh Nayak <santoshprasadnayak@gmail.com>
-> >> ---
-> >>  net/bluetooth/l2cap_sock.c |    5 +++--
-> >>  1 files changed, 3 insertions(+), 2 deletions(-)
-> >
-> > We prefer following commit log (this is the example)
-> >
-> > <------8<----------------------------------------------------------
-> > |  From: Santosh Nayak <santoshprasadnayak@gmail.com>
-> > |
-> > |  Fix network to host endian conversion for L2CAP chan id.
-> > |
-> > |  Signed-off-by: Santosh Nayak <santoshprasadnayak@gmail.com>
-> > |
-> > |  ---
-> > |          * v2 Fix for null dereferenced removed as it is already
-> > |          submitted by Andrei.
-> > |
-> > |    net/bluetooth/l2cap_sock.c |    5 +++--
-> > |    1 files changed, 3 insertions(+), 2 deletions(-)
-> > |
-> > <------8<----------------------------------------------------------
+It looks like we've had an endian bug since last February.
 
-Best regards 
-Andrei Emeltchenko 
+b62f328b8f20a "Bluetooth: Add server socket support for LE
+connection"
+
++               l2cap_pi(sk)->scid =3D la.l2_cid;
+
+->scid was cpu endian.
+
+regards,
+dan carpenter
+
+--cfJ13FhsvNR/yOpm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJPUKkzAAoJEOnZkXI/YHqRADkP/217s0ztGrn66LSv/c5F1A4k
+6cBasjmCmLkN/AE/BMwu6lQoSh/U+flf2SIgxT1ULuyni/FpJ+bVwn6flrOPaRzB
+D+JPi5T3vEMnM6s8P2C6gVrwvCEPvzUhvgaCXgh6rmQO/OKq5H49RjyRuhWUb/jG
+puXy4pFxr4AfLYuSS4I5xNfSPAec9dSX2q8a1PZnvlOkc/zj2uLeJh5dyFwDQWIc
+RA31sMNUF6x1nLJ91HYfXuu9kJynQQeX8HCtxBU1Vn7Inc1EQ4HrqPkOgTaFBbo9
+tL0i9uGcWGbzZYbZp5K6yPZyaY4M+fxjQNGMO+P14AKIZwJWNKkIiusNEasC18ea
+gnm/SO+VNl8xLsAjJDcgyFmudGvFMgqkxY+vDK8Q2MP2qymJLigLzNkEUTq1c4Wx
+X47Pob9mFSLZARCKE+FEIOInLcJjTnJzTNBYcS1s35wWJ7a8IZ94JheT6gEL+0xP
+tmz3jdvOBHPzG+wkID31/JyTjRqERb749i9aiGF1Wy2pXSvwa8uKE47nDDw7zt4r
+hjbsft9ubm+W0lt3ofw0TkL97A1wBLebTV/ZT/FDtBflyNYFmjXq/oEyqyF+vH1i
+USciqxB3mp9znqp13k9ADR4OKzqJ15uk9LgT/jjHmXFgnOC7/3iALpSXfTHCqupA
+woGcH+1N1MOFEKlxdzPP
+=nrfy
+-----END PGP SIGNATURE-----
+
+--cfJ13FhsvNR/yOpm--
