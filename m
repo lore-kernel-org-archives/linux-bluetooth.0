@@ -1,27 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Mar 2012 15:29:08 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/5] Bluetooth: mgmt: Add defines for command sizes
-Message-ID: <20120302132906.GA6674@aemeltch-MOBL1>
-References: <1330634012-4502-1-git-send-email-johan.hedberg@gmail.com>
- <1330634012-4502-4-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1330634012-4502-4-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1330692190.20578.15.camel@novo.hadess.net>
+References: <1330692190.20578.15.camel@novo.hadess.net>
+Date: Fri, 2 Mar 2012 14:57:38 +0200
+Message-ID: <CABBYNZKQWvNmTrqjKrkVKxeWGzVN9eV1KwkNXZChgUS6nSwydQ@mail.gmail.com>
+Subject: Re: obexd 0.45 compilation problem
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Bastien,
 
-On Thu, Mar 01, 2012 at 12:33:31PM -0800, johan.hedberg@gmail.com wrote:
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> These defines are shorter than "sizeof(struct mgmt_cp_foo_bar...)" and
+On Fri, Mar 2, 2012 at 2:43 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> Heya,
+>
+> Trying to compile obexd 0.45 with bluez-4.98, I get:
+> btio/btio.c: In function 'get_key_size':
+> btio/btio.c:522:14: error: 'struct bt_security' has no member named 'key_size'
+>
+> Do you need to either up the bluez dependency, or is obexd lagging?
+>
+> Install log:
+> http://koji.fedoraproject.org/koji/getfile?taskID=3846402&name=root.log
+> Compile log:
+> http://koji.fedoraproject.org/koji/getfile?taskID=3846402&name=build.log
 
-Maybe matter of taste but I would leave sizeof.
+It is a known problem, until we are depending on a new release of
+bluez (4.99) then we can add the build dependency properly, after that
+we will probably have a new release for obexd as well.
 
-Best regards 
-Andrei Emeltchenko 
-
+-- 
+Luiz Augusto von Dentz
