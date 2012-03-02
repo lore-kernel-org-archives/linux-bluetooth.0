@@ -1,47 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 2 Mar 2012 08:02:58 -0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: obexd 0.45 compilation problem
+Message-ID: <20120302160258.GA18401@x220>
+References: <1330692190.20578.15.camel@novo.hadess.net>
+ <CABBYNZKQWvNmTrqjKrkVKxeWGzVN9eV1KwkNXZChgUS6nSwydQ@mail.gmail.com>
+ <1330697618.20578.16.camel@novo.hadess.net>
+ <CABBYNZKx9GS8WGMa=5K+zX5EqOT-qJPhxYLfg_nfsR2J29kEnQ@mail.gmail.com>
+ <1330701462.20578.21.camel@novo.hadess.net>
 MIME-Version: 1.0
-In-Reply-To: <20120302093917.GB27242@uw000554.eu.tieto.com>
-References: <1330613135-16552-1-git-send-email-michal.labedzki@tieto.com>
- <1330613135-16552-2-git-send-email-michal.labedzki@tieto.com>
- <CABBYNZL5go4LSXbzx5qyEDg2quMqNJ+n+A+qsL+ybSv99FzPyg@mail.gmail.com> <20120302093917.GB27242@uw000554.eu.tieto.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Fri, 2 Mar 2012 13:59:34 -0300
-Message-ID: <CAMOw1v6pNC7eebGEAMLEWKNJ8NaR2aUweigMCEzbG5_0wgkUTA@mail.gmail.com>
-Subject: Re: [PATCH 2/3] avrcp: Add error code for rejected vendor command
-To: Michal Labedzki <michal.labedzki@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1330701462.20578.21.camel@novo.hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Mar 2, 2012 at 6:39 AM, Michal Labedzki
-<michal.labedzki@tieto.com> wrote:
-> On Thu, Mar 01, 2012 at 05:34:19PM +0200, Luiz Augusto von Dentz wrote:
->> Hi Michal,
->>
->> On Thu, Mar 1, 2012 at 4:45 PM, Michal Labedzki
->> <michal.labedzki@tieto.com> wrote:
->> > Make correct response for any vendor commands when there are not any
->> > registered player. According to the specification responses should be
->> > REJECTED with error code.
->>
->> Please quote the spec whenever possible, actually what spec does this come from?
->>
->>
->> --
->> Luiz Augusto von Dentz
->
-> Hi Luiz,
->
-> Here you are:
-> "For error response PDU the response parameter is always the error code independent
-> of the response format defined for ACCEPTED PDU response for the corresponding
-> PDU command."
-> (source: AVRCP 1.3 specification, pages 34,56 or AVRCP 1.4 specification, pages 33,93)
+Hi Bastien,
 
-Ack.
+On Fri, Mar 02, 2012, Bastien Nocera wrote:
+> > >> > Trying to compile obexd 0.45 with bluez-4.98, I get:
+> > >> > btio/btio.c: In function 'get_key_size':
+> > >> > btio/btio.c:522:14: error: 'struct bt_security' has no member named 'key_size'
+> > >> >
+> > >> > Do you need to either up the bluez dependency, or is obexd lagging?
+> > >> >
+> > >> > Install log:
+> > >> > http://koji.fedoraproject.org/koji/getfile?taskID=3846402&name=root.log
+> > >> > Compile log:
+> > >> > http://koji.fedoraproject.org/koji/getfile?taskID=3846402&name=build.log
+> > >>
+> > >> It is a known problem, until we are depending on a new release of
+> > >> bluez (4.99) then we can add the build dependency properly, after that
+> > >> we will probably have a new release for obexd as well.
+> > >
+> > > I don't understand. Are you telling me that obexd relies on an
+> > > unreleased version of bluez?
+> > 
+> > Not exactly obexd, but btio yes
+> 
+> Given that btio is copy/pasted into obexd, it's obexd relying on an
+> unreleased version of bluez.
+> 
+> I could understand the idea if bluez hadn't had releases in ages, and
+> you didn't have any control over it. But that's hardly helpful to the
+> people downstream distributing your code.
 
-Could you put this in the commit message?
+This was obviously a mistake from our side. We didn't realize this
+dependency was there. The right thing to do would have been to wait for
+BlueZ 4.99 before pushing a new obexd release out.
 
-Lucas De Marchi
+Johan
