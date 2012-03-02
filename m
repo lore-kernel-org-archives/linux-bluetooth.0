@@ -1,52 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1330613135-16552-3-git-send-email-michal.labedzki@tieto.com>
-References: <1330613135-16552-1-git-send-email-michal.labedzki@tieto.com> <1330613135-16552-3-git-send-email-michal.labedzki@tieto.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Fri, 2 Mar 2012 18:31:23 -0300
-Message-ID: <CAMOw1v4A7rm_QaeLSVHxtTeWen7J_zT2WcQa9dD0zpZOh3ot5A@mail.gmail.com>
-Subject: Re: [PATCH 3/3] avrcp: Treat position as unknown when duration is unavailable
-To: Michal Labedzki <michal.labedzki@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com,
-	vani.patel@stericsson.com, joohi.rastogi@stericsson.com
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1330711879.3392.128.camel@aeonflux>
+Subject: Re: obexd 0.45 compilation problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Fri, 02 Mar 2012 10:11:19 -0800
+In-Reply-To: <1330711749.20578.23.camel@novo.hadess.net>
+References: <1330692190.20578.15.camel@novo.hadess.net>
+	 <1330710799.3392.123.camel@aeonflux>
+	 <1330711749.20578.23.camel@novo.hadess.net>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal
+Hi Bastien,
 
-On Thu, Mar 1, 2012 at 11:45 AM, Michal Labedzki
-<michal.labedzki@tieto.com> wrote:
-> According to the specification when duration and position are not
-> supported then 0xFFFFFFFF should be returned. This patch avoid random
-> position on stream where duration is not available.
-> ---
->  audio/avrcp.c |   10 ++++++----
->  audio/media.c |    3 ++-
->  2 files changed, 8 insertions(+), 5 deletions(-)
->
-> diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index 2d29d56..e141030 100644
-> --- a/audio/avrcp.c
-> +++ b/audio/avrcp.c
-> @@ -859,16 +859,18 @@ static uint8_t avrcp_handle_get_play_status(struct avrcp_player *player,
->                return AVC_CTYPE_REJECTED;
->        }
->
-> -       position = player->cb->get_position(player->user_data);
->        pduration = player->cb->get_metadata(AVRCP_MEDIA_ATTRIBUTE_DURATION,
->                                                        player->user_data);
->
-> -       if (pduration != NULL)
-> +       if (pduration != NULL) {
->                duration = htonl(GPOINTER_TO_UINT(pduration));
-> -       else
-> +               position = htonl(player->cb->get_position(player->user_data));
+> > > Trying to compile obexd 0.45 with bluez-4.98, I get:
+> > > btio/btio.c: In function 'get_key_size':
+> > > btio/btio.c:522:14: error: 'struct bt_security' has no member named 'key_size'
+> > > 
+> > > Do you need to either up the bluez dependency, or is obexd lagging?
+> > 
+> > I screwed this one up. Hand me over the brown-paper-bag please.
+> > 
+> > Seems I ended up installing non-released headers on my build/test
+> > system. That should not have happened, but it did.
+> > 
+> > Either we do an obexd 0.46 with this change reversed or BlueZ 4.99. I
+> > going to check up on that and let everybody now.
+> 
+> Either is fine by me, and not in much of a hurry. It's just that I got
+> the impression from Luiz that it was done on purpose.
 
-Duration and position are independent. Only duration accepts
-UINT32_MAX when it's not available. Position is always available
-because we handle it inside bluetoothd.
+nope, just a big screw up on my part :(
+
+Regards
+
+Marcel
 
 
-Regards,
-Lucas De Marchi
