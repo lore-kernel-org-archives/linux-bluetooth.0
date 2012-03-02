@@ -1,92 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Remove HCI_PI_MGMT_INIT flag for sockets
-Date: Fri,  2 Mar 2012 14:33:09 -0800
-Message-Id: <1330727590-27120-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/2] Bluetooth: mgmt: Fix updating local name when powering on
+Date: Fri,  2 Mar 2012 14:33:10 -0800
+Message-Id: <1330727590-27120-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1330727590-27120-1-git-send-email-johan.hedberg@gmail.com>
+References: <1330727590-27120-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This flag is of no use right now and is in fact harmful in that it
-prevents the HCI_MGMT flag to be set for any controllers that may need
-it after the first one that bluetoothd takes into use (the flag is
-cleared for the first controller so any subsequent ones through the same
-bluetoothd mgmt socket never get the HCI_MGMT flag set).
+When powering on we need to apply whatever name has been set through
+mgmt_set_local_name. The appropriate place for this is mgmt_powered()
+and not hci_setup() since this needs to be applied also if the HCI init
+sequence was already completed but the adapter was still "powered off"
+from a mgmt perspective due the the HCI_AUTO_OFF still being set.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    4 ----
- net/bluetooth/hci_sock.c         |    1 -
- net/bluetooth/mgmt.c             |   18 ++++++++----------
- 3 files changed, 8 insertions(+), 15 deletions(-)
+ net/bluetooth/hci_event.c |    8 --------
+ net/bluetooth/mgmt.c      |   22 ++++++++++++++--------
+ 2 files changed, 14 insertions(+), 16 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index facd7ed..25cb0a1 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1034,16 +1034,12 @@ int mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, u8 persistent);
- /* HCI info for socket */
- #define hci_pi(sk) ((struct hci_pinfo *) sk)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index d6c41bb..6a817da 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -552,14 +552,6 @@ static void hci_setup(struct hci_dev *hdev)
+ 	if (hdev->hci_ver > BLUETOOTH_VER_1_1)
+ 		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_COMMANDS, 0, NULL);
  
--/* HCI socket flags */
--#define HCI_PI_MGMT_INIT	0
+-	if (!test_bit(HCI_SETUP, &hdev->dev_flags) &&
+-					test_bit(HCI_MGMT, &hdev->dev_flags)) {
+-		struct hci_cp_write_local_name cp;
 -
- struct hci_pinfo {
- 	struct bt_sock    bt;
- 	struct hci_dev    *hdev;
- 	struct hci_filter filter;
- 	__u32             cmsg_mask;
- 	unsigned short   channel;
--	unsigned long     flags;
- };
- 
- /* HCI security filter */
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 8a814bc..63afd23 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -659,7 +659,6 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
- 			goto done;
- 		}
- 
--		set_bit(HCI_PI_MGMT_INIT, &hci_pi(sk)->flags);
- 		break;
- 
- 	case HCI_CHANNEL_MONITOR:
+-		memcpy(cp.name, hdev->dev_name, sizeof(cp.name));
+-		hci_send_cmd(hdev, HCI_OP_WRITE_LOCAL_NAME, sizeof(cp), &cp);
+-	}
+-
+ 	if (hdev->features[6] & LMP_SIMPLE_PAIR) {
+ 		if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags)) {
+ 			u8 mode = 0x01;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index fa9a589..4b1efed 100644
+index 4b1efed..4ca0092 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -615,19 +615,17 @@ static void service_cache_off(struct work_struct *work)
- 
- static void mgmt_init_hdev(struct sock *sk, struct hci_dev *hdev)
- {
--	if (!test_and_clear_bit(HCI_PI_MGMT_INIT, &hci_pi(sk)->flags))
-+	if (test_and_set_bit(HCI_MGMT, &hdev->dev_flags))
- 		return;
- 
--	if (!test_and_set_bit(HCI_MGMT, &hdev->dev_flags)) {
--		INIT_DELAYED_WORK(&hdev->service_cache, service_cache_off);
-+	INIT_DELAYED_WORK(&hdev->service_cache, service_cache_off);
- 
--		/* Non-mgmt controlled devices get this bit set
--		 * implicitly so that pairing works for them, however
--		 * for mgmt we require user-space to explicitly enable
--		 * it
--		 */
--		clear_bit(HCI_PAIRABLE, &hdev->dev_flags);
--	}
-+	/* Non-mgmt controlled devices get this bit set
-+	 * implicitly so that pairing works for them, however
-+	 * for mgmt we require user-space to explicitly enable
-+	 * it
-+	 */
-+	clear_bit(HCI_PAIRABLE, &hdev->dev_flags);
+@@ -2104,11 +2104,19 @@ static int user_passkey_neg_reply(struct sock *sk, struct hci_dev *hdev,
+ 					HCI_OP_USER_PASSKEY_NEG_REPLY, 0);
  }
  
- static int read_controller_info(struct sock *sk, struct hci_dev *hdev,
++static int update_name(struct hci_dev *hdev, const char *name)
++{
++	struct hci_cp_write_local_name cp;
++
++	memcpy(cp.name, name, sizeof(cp.name));
++
++	return hci_send_cmd(hdev, HCI_OP_WRITE_LOCAL_NAME, sizeof(cp), &cp);
++}
++
+ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
+ 								u16 len)
+ {
+-	struct mgmt_cp_set_local_name *mgmt_cp = data;
+-	struct hci_cp_write_local_name hci_cp;
++	struct mgmt_cp_set_local_name *cp = data;
+ 	struct pending_cmd *cmd;
+ 	int err;
+ 
+@@ -2116,11 +2124,10 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	memcpy(hdev->short_name, mgmt_cp->short_name,
+-						sizeof(hdev->short_name));
++	memcpy(hdev->short_name, cp->short_name, sizeof(hdev->short_name));
+ 
+ 	if (!hdev_is_powered(hdev)) {
+-		memcpy(hdev->dev_name, mgmt_cp->name, sizeof(hdev->dev_name));
++		memcpy(hdev->dev_name, cp->name, sizeof(hdev->dev_name));
+ 
+ 		err = cmd_complete(sk, hdev->id, MGMT_OP_SET_LOCAL_NAME, 0,
+ 								data, len);
+@@ -2139,9 +2146,7 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto failed;
+ 	}
+ 
+-	memcpy(hci_cp.name, mgmt_cp->name, sizeof(hci_cp.name));
+-	err = hci_send_cmd(hdev, HCI_OP_WRITE_LOCAL_NAME, sizeof(hci_cp),
+-								&hci_cp);
++	err = update_name(hdev, cp->name);
+ 	if (err < 0)
+ 		mgmt_pending_remove(cmd);
+ 
+@@ -2794,6 +2799,7 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+ 			hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
+ 
+ 		update_class(hdev);
++		update_name(hdev, hdev->dev_name);
+ 		update_eir(hdev);
+ 	} else {
+ 		u8 status = MGMT_STATUS_NOT_POWERED;
 -- 
 1.7.9.1
 
