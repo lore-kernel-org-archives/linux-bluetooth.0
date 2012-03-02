@@ -1,26 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1330692190.20578.15.camel@novo.hadess.net>
-Subject: obexd 0.45 compilation problem
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Date: Fri, 02 Mar 2012 12:43:10 +0000
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH obexd 3/3] client: simplify obc_session_pull
+Date: Fri,  2 Mar 2012 13:41:27 +0100
+Message-Id: <1330692087-13021-4-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1330692087-13021-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1330692087-13021-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Heya,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Trying to compile obexd 0.45 with bluez-4.98, I get:
-btio/btio.c: In function 'get_key_size':
-btio/btio.c:522:14: error: 'struct bt_security' has no member named 'key_size'
+Functions obc_session_get and obc_session_pull nearly share the same
+code, so the later can be achieved by just calling the first one.
 
-Do you need to either up the bluez dependency, or is obexd lagging?
+The session api is not modified in this patch.
+---
+ client/session.c |   22 +---------------------
+ 1 files changed, 1 insertions(+), 21 deletions(-)
 
-Install log:
-http://koji.fedoraproject.org/koji/getfile?taskID=3846402&name=root.log
-Compile log:
-http://koji.fedoraproject.org/koji/getfile?taskID=3846402&name=build.log
-
-Cheers
+diff --git a/client/session.c b/client/session.c
+index 6497d70..595f684 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -1001,27 +1001,7 @@ int obc_session_pull(struct obc_session *session,
+ 				const char *type, const char *targetfile,
+ 				session_callback_t function, void *user_data)
+ {
+-	struct obc_transfer *transfer;
+-	const char *agent;
+-
+-	if (session->obex == NULL)
+-		return -ENOTCONN;
+-
+-	if (session->agent != NULL)
+-		agent = obc_agent_get_name(session->agent);
+-	else
+-		agent = NULL;
+-
+-	transfer = obc_transfer_register(session->conn, session->obex,
+-								agent,
+-								targetfile,
+-								NULL, type,
+-								NULL);
+-	if (transfer == NULL) {
+-		return -EIO;
+-	}
+-
+-	return session_request(session, transfer, session_prepare_get,
++	return obc_session_get(session, type, NULL, targetfile, NULL, 0,
+ 							function, user_data);
+ }
+ 
+-- 
+1.7.6.5
 
