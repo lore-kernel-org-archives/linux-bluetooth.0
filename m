@@ -1,26 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Sat, 3 Mar 2012 18:15:51 +0100
-Message-ID: <CAOcK=CNO-rLWCrNEyz+qU0YN-ZGX6KydUTN4djAc-dsP17QtGg@mail.gmail.com>
-Subject: Re: [PATCH] bluetooth.h: fix compile issue when using in C++
-From: Markus Rathgeb <maggu2810@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1330770910-7992-1-git-send-email-sancane@gmail.com>
+References: <1330770910-7992-1-git-send-email-sancane@gmail.com>
+Date: Sat, 3 Mar 2012 07:48:16 -0400
+Message-ID: <CAJdJm_NA9Y2YPhDaKcmxM52KO8Vu+vGsD3OZHAxVqhDvFw4V6w@mail.gmail.com>
+Subject: Re: [PATCH] Heart Rate Profile API
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello!
+Hi Santiago.
 
-The patch "http://www.spinics.net/lists/linux-bluetooth/msg20220.html"
-is using the typeof keyword.
-I also found the statement:
-"I was uncomfortable to depend on "typeof" for that initially, but the
-macro already uses that for the struct member."
+On Sat, Mar 3, 2012 at 6:35 AM, Santiago Carot-Nemesio
+<sancane@gmail.com> wrote:
+> ---
+>  doc/heartrate-api.txt |   72 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 72 insertions(+)
+>  create mode 100644 doc/heartrate-api.txt
 
-IMHO typeof is not part of the C++ standard, and isn't available when
-we use -std=c++0x.
-g++ should support __typeof__ even with -std=c++0x.
+ack.
 
-So perhaps we could change the C++ "workaround" to use __typeof__
-instead of typeof to support also programs that are using c++0x
-standard.
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
