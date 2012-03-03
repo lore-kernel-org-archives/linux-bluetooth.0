@@ -1,46 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1330903638.3392.141.camel@aeonflux>
-Subject: Re: [PATCH] bluetooth.h: fix compile issue when using in C++
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Patrick Ohly <patrick.ohly@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Sun, 04 Mar 2012 15:27:18 -0800
-In-Reply-To: <1326708715.3360.135.camel@pohly-mobl1.fritz.box>
-References: <1326708715.3360.135.camel@pohly-mobl1.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Message-ID: <4F52570A.1090300@bluewin.ch>
+Date: Sat, 03 Mar 2012 18:38:18 +0100
+From: Simon Bachmann <simonbachmann@bluewin.ch>
+MIME-Version: 1.0
+To: bluetooth mailing list <linux-bluetooth@vger.kernel.org>
+Subject: can't get bluetooth to work: Can't init device hci0: Connection timed
+ out (110)
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Patrick,
+Hi there,
 
-> The compiler error is:
->  /usr/include/bluetooth/bluetooth.h::131:9: error: invalid conversion from 'void*' to 'bt_get_le64(void*)::<anonymous struct>*'
->  ...
-> 
-> The reason is that C++, in contrast to C, does not allow conversion of
-> void * to anything, and this code gets compiled as C++ when the app is
-> written in C++. The macro with the assignment itself is older, but only
-> recent Bluez starts to use it in inline functions, thus triggering the
-> problem.
-> 
-> This patch keeps the "struct __attribute__((packed))" magic and merely
-> changes the typecast so that it works in C and C++. Like the existing
-> macro this patch relies on support for typeof.
+I'm having trouble getting bluetooth to work on my laptop.
 
-so I am applying this patch now, but I still have no idea what kind of
-stupid C++ compiler you are using. The section of this include is
-clearly marked as C code:
+First things firt, some info about the system:
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+Asus A93S Notebook
+Built-in Bluetooth, vendor Lite-On Technology Corp. ID 04ca:3002
+Arch Linux
+Kernel 3.2.8
+bluez 4.98
 
-Has anybody actually tested this on ARM where we do need the unaligned
-access?
+- The hardware seems to be recognised correctly:
 
-Regards
+# dmesg |grep tooth
+[    7.355917] Bluetooth: Core ver 2.16
+[    7.355935] Bluetooth: HCI device and connection manager initialized
+[    7.355938] Bluetooth: HCI socket layer initialized
+[    7.355940] Bluetooth: L2CAP socket layer initialized
+[    7.355947] Bluetooth: SCO socket layer initialized
+[    7.372899] Bluetooth: Generic Bluetooth USB driver ver 0.6
+[   27.352796] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[   73.128762] Bluetooth: RFCOMM TTY layer initialized
+[   73.128775] Bluetooth: RFCOMM socket layer initialized
+[   73.128777] Bluetooth: RFCOMM ver 1.11
 
-Marcel
+- According to rfkill the device is not blocked
+
+- The Problem: the device  hci0 is down and I cannot get it up:
+
+# hciconfig hci0 up
+Can't init device hci0: Connection timed out (110)
+
+hciconfig reset gives the same error...
+
+Searching the net I found out that I'm not the only one with this 
+problem (see for example 
+https://bbs.archlinux.org/viewtopic.php?id=126603), but a solution was 
+nowhere to be found.
+
+Any ideas what's wrong?
+
+thanks
+
+Simon
 
 
