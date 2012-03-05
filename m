@@ -1,53 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1330932819.4028.59.camel@pohly-mobl1.fritz.box>
-Subject: Re: [PATCH] bluetooth.h: fix compile issue when using in C++
-From: Patrick Ohly <patrick.ohly@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 05 Mar 2012 08:33:39 +0100
-In-Reply-To: <1330903638.3392.141.camel@aeonflux>
-References: <1326708715.3360.135.camel@pohly-mobl1.fritz.box>
-	 <1330903638.3392.141.camel@aeonflux>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Sun, 4 Mar 2012 21:11:00 -0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jeff Hansen <x@jeffhansen.com>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH] [input] Set up uinput device again, if it was previously
+ closed.
+Message-ID: <20120305051100.GA3721@x220>
+References: <1330919059-5493-1-git-send-email-x@jeffhansen.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1330919059-5493-1-git-send-email-x@jeffhansen.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, 2012-03-04 at 15:27 -0800, Marcel Holtmann wrote:
-> Hi Patrick,
+Hi Jeff,
+
+On Sun, Mar 04, 2012, Jeff Hansen wrote:
+> If you connect a PS3 controller to bluetoothd as an input device, then
+> take the batteries out of a PS3 controller, then put them back in and
+> push a few buttons, it will eventually cause an error which causes the
+> uinput socket to be closed. It will then re-connect to bluetoothd, but
+> the uinput socket fd will be -1, so it needs to be set up again after
+> the re-connect.
 > 
-> > The compiler error is:
-> >  /usr/include/bluetooth/bluetooth.h::131:9: error: invalid conversion from 'void*' to 'bt_get_le64(void*)::<anonymous struct>*'
-> >  ...
-> > 
-> > The reason is that C++, in contrast to C, does not allow conversion of
-> > void * to anything, and this code gets compiled as C++ when the app is
-> > written in C++. The macro with the assignment itself is older, but only
-> > recent Bluez starts to use it in inline functions, thus triggering the
-> > problem.
-> > 
-> > This patch keeps the "struct __attribute__((packed))" magic and merely
-> > changes the typecast so that it works in C and C++. Like the existing
-> > macro this patch relies on support for typeof.
-> 
-> so I am applying this patch now, but I still have no idea what kind of
-> stupid C++ compiler you are using.
+> Signed-off-by: Jeff Hansen <x@jeffhansen.com>
+> ---
+>  input/fakehid.c |    5 ++++-
+>  1 files changed, 4 insertions(+), 1 deletions(-)
 
-The default g++ as used by affected distros.
+Thanks, the patch has been pushed upstream but there were a few minor
+fixes I had to do before that. Firstly, we don't use signed-off-by for
+user space patches. Then, a few stylistic issues with the code:
 
->  The section of this include is
-> clearly marked as C code:
-> 
-> #ifdef __cplusplus
-> extern "C" {
-> #endif
+> +	if (old == NULL || old->uinput == -1) {
 
-That doesn't mean that the C++ compiler falls back to C mode. It merely
-uses C names for the symbols in that section.
+We usually use < 0 for testing for an invalid fd.
 
--- 
-Best Regards, Patrick Ohly
+> +	if (old == NULL) {
+>  		fake_hid->devices = g_list_append(fake_hid->devices, fake);
+>  	}
 
-The content of this message is my personal opinion only and although
-I am an employee of Intel, the statements I make here in no way
-represent Intel's position on the issue, nor am I authorized to speak
-on behalf of Intel on this matter.
+Single-line branches do not need { }
+
+Johan
