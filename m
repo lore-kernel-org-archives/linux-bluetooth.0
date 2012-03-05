@@ -1,25 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 5 Mar 2012 11:35:45 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon@janc.net.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Remove not needed total variable in get_ltk_info
-Message-ID: <20120305193545.GA16481@x220.ice.intel.com>
-References: <1330973919-3704-1-git-send-email-szymon@janc.net.pl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1330973919-3704-1-git-send-email-szymon@janc.net.pl>
+From: Szymon Janc <szymon@janc.net.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon@janc.net.pl>
+Subject: [PATCH 2/3] mgmtops: Add debug print to update_settings
+Date: Mon,  5 Mar 2012 20:05:24 +0100
+Message-Id: <1330974325-4071-2-git-send-email-szymon@janc.net.pl>
+In-Reply-To: <1330974325-4071-1-git-send-email-szymon@janc.net.pl>
+References: <1330974325-4071-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Print settings for easier tracking what has changed.
+---
+ plugins/mgmtops.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-On Mon, Mar 05, 2012, Szymon Janc wrote:
-> This variable is not really needed and was mostly dead assigned.
-> ---
->  src/adapter.c |    7 ++-----
->  1 files changed, 2 insertions(+), 5 deletions(-)
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index afed165..4970b7c 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -310,6 +310,8 @@ static void update_settings(struct btd_adapter *adapter, uint32_t settings)
+ 	uint8_t on_mode;
+ 	uint16_t index, discoverable_timeout;
+ 
++	DBG("new settings %x", settings);
++
+ 	btd_adapter_get_mode(adapter, NULL, &on_mode, &discoverable_timeout,
+ 								&pairable);
+ 
+-- 
+1.7.9.1
 
-Applied. Thanks.
 
-Johan
