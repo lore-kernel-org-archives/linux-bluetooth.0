@@ -1,52 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon@janc.net.pl>
+MIME-Version: 1.0
+From: Ido Yariv <ido@wizery.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon@janc.net.pl>
-Subject: [PATCH] Remove not needed total variable in get_ltk_info
-Date: Mon,  5 Mar 2012 19:58:39 +0100
-Message-Id: <1330973919-3704-1-git-send-email-szymon@janc.net.pl>
+Cc: Ido Yariv <ido@wizery.com>
+Subject: [PATCH] Storage: Fix a buffer overflow in write_link_key
+Date: Mon,  5 Mar 2012 20:12:31 +0200
+Message-Id: <1330971151-11075-1-git-send-email-ido@wizery.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This variable is not really needed and was mostly dead assigned.
+The temporary string allocated on the stack is not large enough in worst
+case. To be on the safe side, increase it to 64 bytes.
+
+Signed-off-by: Ido Yariv <ido@wizery.com>
 ---
- src/adapter.c |    7 ++-----
- 1 files changed, 2 insertions(+), 5 deletions(-)
+ src/storage.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 3c23971..acb845e 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1776,10 +1776,9 @@ static struct smp_ltk_info *get_ltk_info(const char *addr, const char *value)
+diff --git a/src/storage.c b/src/storage.c
+index a65cee4..7e7f081 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -533,7 +533,7 @@ int write_lastused_info(bdaddr_t *local, bdaddr_t *peer, struct tm *tm)
+ 
+ int write_link_key(bdaddr_t *local, bdaddr_t *peer, unsigned char *key, uint8_t type, int length)
  {
- 	struct smp_ltk_info *ltk;
- 	char *ptr;
--	int i, ret, total;
-+	int i, ret;
+-	char filename[PATH_MAX + 1], addr[18], str[38];
++	char filename[PATH_MAX + 1], addr[18], str[64];
+ 	int i;
  
--	total = strlen(value);
--	if (total < 60) {
-+	if (strlen(value) < 60) {
- 		error("Unexpectedly short (%zu) LTK", strlen(value));
- 		return NULL;
- 	}
-@@ -1791,7 +1790,6 @@ static struct smp_ltk_info *get_ltk_info(const char *addr, const char *value)
- 	str2buf(value, ltk->val, sizeof(ltk->val));
- 
- 	ptr = (char *) value + 2 * sizeof(ltk->val) + 1;
--	total -= 2 * sizeof(ltk->val) + 1;
- 
- 	ret = sscanf(ptr, " %hhd %hhd %hhd %hhd %hd %n",
- 					(uint8_t *) &ltk->addr_type,
-@@ -1802,7 +1800,6 @@ static struct smp_ltk_info *get_ltk_info(const char *addr, const char *value)
- 		return NULL;
- 	}
- 	ptr += i;
--	total -= i;
- 
- 	str2buf(ptr, ltk->rand, sizeof(ltk->rand));
- 
+ 	memset(str, 0, sizeof(str));
 -- 
-1.7.9.1
-
+1.7.7.6
 
