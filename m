@@ -1,37 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-From: Ido Yariv <ido@wizery.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ido Yariv <ido@wizery.com>, Brian Gix <bgix@codeaurora.org>
-Subject: [PATCH] Bluetooth: Fix access to the STK generation methods matrix
-Date: Mon,  5 Mar 2012 20:07:08 +0200
-Message-Id: <1330970828-10905-1-git-send-email-ido@wizery.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1330953167.3457.13.camel@pohly-mobl1.fritz.box>
+References: <1326708715.3360.135.camel@pohly-mobl1.fritz.box>
+	<1330903638.3392.141.camel@aeonflux>
+	<1330932819.4028.59.camel@pohly-mobl1.fritz.box>
+	<CAOcK=CNZofxZtUp4Zh5eiGMM_TYrbGOwseA3tcwAnAFDvLEFxg@mail.gmail.com>
+	<1330953167.3457.13.camel@pohly-mobl1.fritz.box>
+Date: Mon, 5 Mar 2012 15:53:19 +0100
+Message-ID: <CAOcK=CPM4Kyy6+Fs10ADs7dJdyqF35co_b1bX-VJeKGjGUjcVQ@mail.gmail.com>
+Subject: Re: [PATCH] bluetooth.h: fix compile issue when using in C++
+From: Markus Rathgeb <maggu2810@googlemail.com>
+To: Patrick Ohly <patrick.ohly@intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The major index of the table is actually the remote I/O capabilities, not
-the local ones. As a result, devices with different I/O capabilities
-could have used wrong or even unsupported generation methods.
+2012/3/5 Patrick Ohly <patrick.ohly@intel.com>:
+> I'm fine with using __typeof__ instead of typeof. I verified that g++
+> 4.6.2 and clang++ 3.0 grok __typeof__, with and without -std=c++0x. I
+> also checked that gcc accepts it without -std, with -std=gnu89, and with
+> -std=c99. It rejects the header file with -std=c89 because of the inline
+> keyword.
 
-Signed-off-by: Ido Yariv <ido@wizery.com>
-CC: Brian Gix <bgix@codeaurora.org>
----
- net/bluetooth/smp.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+The gcc documentation states also this for the typeof C extension:
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 75937d7..ebf50065 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -310,7 +310,7 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
- 			remote_io > SMP_IO_KEYBOARD_DISPLAY)
- 		method = JUST_WORKS;
- 	else
--		method = gen_method[local_io][remote_io];
-+		method = gen_method[remote_io][local_io];
- 
- 	/* If not bonding, don't ask user to confirm a Zero TK */
- 	if (!(auth & SMP_AUTH_BONDING) && method == JUST_CFM)
--- 
-1.7.7.6
+"If you are writing a header file that must work when included in ISO
+C programs, write __typeof__ instead of typeof."
 
+Source: http://gcc.gnu.org/onlinedocs/gcc/Typeof.html
