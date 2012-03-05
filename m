@@ -2,32 +2,32 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon@janc.net.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon@janc.net.pl>
-Subject: [PATCH 2/3] mgmtops: Add debug print to update_settings
-Date: Mon,  5 Mar 2012 20:05:24 +0100
-Message-Id: <1330974325-4071-2-git-send-email-szymon@janc.net.pl>
+Subject: [PATCH 3/3] mgmtops: Use DBG not error for printing name in read_info_complete
+Date: Mon,  5 Mar 2012 20:05:25 +0100
+Message-Id: <1330974325-4071-3-git-send-email-szymon@janc.net.pl>
 In-Reply-To: <1330974325-4071-1-git-send-email-szymon@janc.net.pl>
 References: <1330974325-4071-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Print settings for easier tracking what has changed.
+This is debug not an error message.
 ---
- plugins/mgmtops.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+ plugins/mgmtops.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
 diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index afed165..4970b7c 100644
+index 4970b7c..4aa38fe 100644
 --- a/plugins/mgmtops.c
 +++ b/plugins/mgmtops.c
-@@ -310,6 +310,8 @@ static void update_settings(struct btd_adapter *adapter, uint32_t settings)
- 	uint8_t on_mode;
- 	uint16_t index, discoverable_timeout;
+@@ -1083,7 +1083,7 @@ static void read_info_complete(int sk, uint16_t index, void *buf, size_t len)
  
-+	DBG("new settings %x", settings);
-+
- 	btd_adapter_get_mode(adapter, NULL, &on_mode, &discoverable_timeout,
- 								&pairable);
+ 	name = btd_adapter_get_name(adapter);
  
+-	error("mgmtops setting name %s", name);
++	DBG("mgmtops setting name %s", name);
+ 
+ 	if (name)
+ 		mgmt_set_name(index, name);
 -- 
 1.7.9.1
 
