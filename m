@@ -2,32 +2,41 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon@janc.net.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon@janc.net.pl>
-Subject: [PATCH 3/3] mgmtops: Use DBG not error for printing name in read_info_complete
-Date: Mon,  5 Mar 2012 20:05:25 +0100
-Message-Id: <1330974325-4071-3-git-send-email-szymon@janc.net.pl>
-In-Reply-To: <1330974325-4071-1-git-send-email-szymon@janc.net.pl>
-References: <1330974325-4071-1-git-send-email-szymon@janc.net.pl>
+Subject: [PATCH 1/3] mgmtops: When settings discoverable also set connectable if not set yet
+Date: Mon,  5 Mar 2012 20:05:23 +0100
+Message-Id: <1330974325-4071-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is debug not an error message.
+Otherwise command would be rejected e.g. when setting discoverable at
+bluetoothd startup.
 ---
- plugins/mgmtops.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ plugins/mgmtops.c |    9 ++++++---
+ 1 files changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 4970b7c..4aa38fe 100644
+index 89355ad..afed165 100644
 --- a/plugins/mgmtops.c
 +++ b/plugins/mgmtops.c
-@@ -1083,7 +1083,7 @@ static void read_info_complete(int sk, uint16_t index, void *buf, size_t len)
+@@ -317,12 +317,15 @@ static void update_settings(struct btd_adapter *adapter, uint32_t settings)
  
- 	name = btd_adapter_get_name(adapter);
+ 	info = &controllers[index];
  
--	error("mgmtops setting name %s", name);
-+	DBG("mgmtops setting name %s", name);
+-	if (on_mode == MODE_DISCOVERABLE && !mgmt_discoverable(settings))
++	if (on_mode == MODE_DISCOVERABLE && !mgmt_discoverable(settings)) {
++		if(!mgmt_connectable(settings))
++			mgmt_set_connectable(index, TRUE);
+ 		mgmt_set_discoverable(index, TRUE, discoverable_timeout);
+-	else if (on_mode == MODE_CONNECTABLE && !mgmt_connectable(settings))
++	} else if (on_mode == MODE_CONNECTABLE && !mgmt_connectable(settings)) {
+ 		mgmt_set_connectable(index, TRUE);
+-	else if (mgmt_powered(settings))
++	} else if (mgmt_powered(settings)) {
+ 		adapter_mode_changed(adapter, create_mode(settings));
++	}
  
- 	if (name)
- 		mgmt_set_name(index, name);
+ 	if (mgmt_pairable(settings) != pairable)
+ 		mgmt_set_pairable(index, pairable);
 -- 
 1.7.9.1
 
