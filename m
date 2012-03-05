@@ -2,41 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon@janc.net.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon@janc.net.pl>
-Subject: [PATCH 1/3] mgmtops: When settings discoverable also set connectable if not set yet
-Date: Mon,  5 Mar 2012 20:05:23 +0100
-Message-Id: <1330974325-4071-1-git-send-email-szymon@janc.net.pl>
+Subject: [PATCH] Remove not needed total variable in get_ltk_info
+Date: Mon,  5 Mar 2012 19:58:39 +0100
+Message-Id: <1330973919-3704-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Otherwise command would be rejected e.g. when setting discoverable at
-bluetoothd startup.
+This variable is not really needed and was mostly dead assigned.
 ---
- plugins/mgmtops.c |    9 ++++++---
- 1 files changed, 6 insertions(+), 3 deletions(-)
+ src/adapter.c |    7 ++-----
+ 1 files changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 89355ad..afed165 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -317,12 +317,15 @@ static void update_settings(struct btd_adapter *adapter, uint32_t settings)
+diff --git a/src/adapter.c b/src/adapter.c
+index 3c23971..acb845e 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1776,10 +1776,9 @@ static struct smp_ltk_info *get_ltk_info(const char *addr, const char *value)
+ {
+ 	struct smp_ltk_info *ltk;
+ 	char *ptr;
+-	int i, ret, total;
++	int i, ret;
  
- 	info = &controllers[index];
+-	total = strlen(value);
+-	if (total < 60) {
++	if (strlen(value) < 60) {
+ 		error("Unexpectedly short (%zu) LTK", strlen(value));
+ 		return NULL;
+ 	}
+@@ -1791,7 +1790,6 @@ static struct smp_ltk_info *get_ltk_info(const char *addr, const char *value)
+ 	str2buf(value, ltk->val, sizeof(ltk->val));
  
--	if (on_mode == MODE_DISCOVERABLE && !mgmt_discoverable(settings))
-+	if (on_mode == MODE_DISCOVERABLE && !mgmt_discoverable(settings)) {
-+		if(!mgmt_connectable(settings))
-+			mgmt_set_connectable(index, TRUE);
- 		mgmt_set_discoverable(index, TRUE, discoverable_timeout);
--	else if (on_mode == MODE_CONNECTABLE && !mgmt_connectable(settings))
-+	} else if (on_mode == MODE_CONNECTABLE && !mgmt_connectable(settings)) {
- 		mgmt_set_connectable(index, TRUE);
--	else if (mgmt_powered(settings))
-+	} else if (mgmt_powered(settings)) {
- 		adapter_mode_changed(adapter, create_mode(settings));
-+	}
+ 	ptr = (char *) value + 2 * sizeof(ltk->val) + 1;
+-	total -= 2 * sizeof(ltk->val) + 1;
  
- 	if (mgmt_pairable(settings) != pairable)
- 		mgmt_set_pairable(index, pairable);
+ 	ret = sscanf(ptr, " %hhd %hhd %hhd %hhd %hd %n",
+ 					(uint8_t *) &ltk->addr_type,
+@@ -1802,7 +1800,6 @@ static struct smp_ltk_info *get_ltk_info(const char *addr, const char *value)
+ 		return NULL;
+ 	}
+ 	ptr += i;
+-	total -= i;
+ 
+ 	str2buf(ptr, ltk->rand, sizeof(ltk->rand));
+ 
 -- 
 1.7.9.1
 
