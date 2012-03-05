@@ -1,37 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1330692087-13021-2-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1330692087-13021-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1330692087-13021-2-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Mon, 5 Mar 2012 12:14:49 +0200
-Message-ID: <CABBYNZ+Crjj=B-f6VWBArRJE7M5zQSJ+65EjkesKFSxcL7xHMw@mail.gmail.com>
-Subject: Re: [PATCH obexd 1/3] client: fix naming convention in transfer api
+In-Reply-To: <1330734830.3392.132.camel@aeonflux>
+References: <1328884361-3909-1-git-send-email-luiz.dentz@gmail.com>
+	<1330734830.3392.132.camel@aeonflux>
+Date: Mon, 5 Mar 2012 10:57:09 +0200
+Message-ID: <CABBYNZJ1TJZEXnOdMs1vuqWW7oN98ecgQ5g35U6Ve+5tNLCuuQ@mail.gmail.com>
+Subject: Re: [RFC] btio: Adjust socket buffers to be at least as big as MTU
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Marcel,
 
-On Fri, Mar 2, 2012 at 2:41 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+On Sat, Mar 3, 2012 at 2:33 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
 >
-> The terms can be quite misleading, so this patch proposes to follow the
-> terminology in the D-Bus api:
->       - Name: the remote name of the object being transferred
->       - Filename: the name of the file in local the filesystem
+>> Maybe could be done in kernel automatically as it could be considered
+>> broken in case of SOCK_SEQPACKET if socket buffer cannot hold a
+>> write/read of MTU size.
 >
-> Both values can be NULL independently.
+> I have actually no idea what the right approach here is, but we should
+> handle this inside the kernel.
 >
-> This also fixes the problem of using the terms differently in get and
-> put operations. The result was that the properties "Name" and "Filename"
-> were swapped in D-Bus in the case of get.
+> So should setting a too large MTU fail if the socket buffers are too
+> small? Or just we just adjust the socket buffers when a large MTU is
+> set? Any comments?
 
-Please split this, have the fix to swapped parameters and then the
-name modification in separated patch.
+I guess we should attempt to adjust the socket buffers if the MTU is
+too large to fit, if that fail than MTU changes should also fail and
+then client decide if it wants to disconnect or not. We should
+probably check for capabilities if the process has CAP_NET_ADMIN we
+can probably force the buffers to be bigger than wmem_max otherwise it
+should be limited by wmem_max.
 
 -- 
 Luiz Augusto von Dentz
