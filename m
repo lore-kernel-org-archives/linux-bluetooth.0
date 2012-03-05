@@ -1,42 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 5 Mar 2012 12:01:29 -0800
+Date: Mon, 5 Mar 2012 11:36:04 -0800
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ido Yariv <ido@wizery.com>
+To: Szymon Janc <szymon@janc.net.pl>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Storage: Fix a buffer overflow in write_link_key
-Message-ID: <20120305200129.GA17773@x220.ice.intel.com>
-References: <1330971151-11075-1-git-send-email-ido@wizery.com>
+Subject: Re: [PATCH 1/3] mgmtops: When settings discoverable also set
+ connectable if not set yet
+Message-ID: <20120305193604.GB16481@x220.ice.intel.com>
+References: <1330974325-4071-1-git-send-email-szymon@janc.net.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1330971151-11075-1-git-send-email-ido@wizery.com>
+In-Reply-To: <1330974325-4071-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ido,
+Hi Szymon,
 
-On Mon, Mar 05, 2012, Ido Yariv wrote:
-> The temporary string allocated on the stack is not large enough in worst
-> case. To be on the safe side, increase it to 64 bytes.
-> 
-> Signed-off-by: Ido Yariv <ido@wizery.com>
+On Mon, Mar 05, 2012, Szymon Janc wrote:
+> Otherwise command would be rejected e.g. when setting discoverable at
+> bluetoothd startup.
 > ---
->  src/storage.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/src/storage.c b/src/storage.c
-> index a65cee4..7e7f081 100644
-> --- a/src/storage.c
-> +++ b/src/storage.c
-> @@ -533,7 +533,7 @@ int write_lastused_info(bdaddr_t *local, bdaddr_t *peer, struct tm *tm)
->  
->  int write_link_key(bdaddr_t *local, bdaddr_t *peer, unsigned char *key, uint8_t type, int length)
->  {
-> -	char filename[PATH_MAX + 1], addr[18], str[38];
-> +	char filename[PATH_MAX + 1], addr[18], str[64];
->  	int i;
+>  plugins/mgmtops.c |    9 ++++++---
+>  1 files changed, 6 insertions(+), 3 deletions(-)
 
-I don't really see how the worst case you mention could ever happen in
-practice. The key type requires one byte and 16 is the maximum for the
-PIN length. Is there something I'm missing?
+All three patches have been applied. Thanks.
 
 Johan
