@@ -1,27 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 5 Mar 2012 11:36:04 -0800
+Date: Mon, 5 Mar 2012 11:35:45 -0800
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Szymon Janc <szymon@janc.net.pl>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] mgmtops: When settings discoverable also set
- connectable if not set yet
-Message-ID: <20120305193604.GB16481@x220.ice.intel.com>
-References: <1330974325-4071-1-git-send-email-szymon@janc.net.pl>
+Subject: Re: [PATCH] Remove not needed total variable in get_ltk_info
+Message-ID: <20120305193545.GA16481@x220.ice.intel.com>
+References: <1330973919-3704-1-git-send-email-szymon@janc.net.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1330974325-4071-1-git-send-email-szymon@janc.net.pl>
+In-Reply-To: <1330973919-3704-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Szymon,
 
 On Mon, Mar 05, 2012, Szymon Janc wrote:
-> Otherwise command would be rejected e.g. when setting discoverable at
-> bluetoothd startup.
+> This variable is not really needed and was mostly dead assigned.
 > ---
->  plugins/mgmtops.c |    9 ++++++---
->  1 files changed, 6 insertions(+), 3 deletions(-)
+>  src/adapter.c |    7 ++-----
+>  1 files changed, 2 insertions(+), 5 deletions(-)
 
-All three patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
