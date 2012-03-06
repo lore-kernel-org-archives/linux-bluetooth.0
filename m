@@ -1,55 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 6 Mar 2012 01:27:10 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Ido Yariv <ido@wizery.com>
-Cc: linux-bluetooth@vger.kernel.org, Brian Gix <bgix@codeaurora.org>
-Subject: Re: [PATCH] Bluetooth: Fix access to the STK generation methods
- matrix
-Message-ID: <20120306042710.GC3869@tori.lan>
-References: <1330970828-10905-1-git-send-email-ido@wizery.com>
+Date: Tue, 6 Mar 2012 03:34:15 +0200
+From: Ido Yariv <ido@wizery.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Storage: Fix a buffer overflow in write_link_key
+Message-ID: <20120306013415.GA14021@WorkStation>
+References: <1330971151-11075-1-git-send-email-ido@wizery.com>
+ <20120305200129.GA17773@x220.ice.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1330970828-10905-1-git-send-email-ido@wizery.com>
+In-Reply-To: <20120305200129.GA17773@x220.ice.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ido,
+Hi Johan,
 
-On 20:07 Mon 05 Mar, Ido Yariv wrote:
-> The major index of the table is actually the remote I/O capabilities, not
-> the local ones. As a result, devices with different I/O capabilities
-> could have used wrong or even unsupported generation methods.
+On Mon, Mar 05, 2012 at 12:01:29PM -0800, Johan Hedberg wrote:
+> Hi Ido,
 > 
-> Signed-off-by: Ido Yariv <ido@wizery.com>
-> CC: Brian Gix <bgix@codeaurora.org>
-> ---
->  net/bluetooth/smp.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-
-Acked-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-
+> On Mon, Mar 05, 2012, Ido Yariv wrote:
+> > The temporary string allocated on the stack is not large enough in worst
+> > case. To be on the safe side, increase it to 64 bytes.
+> > 
+> > Signed-off-by: Ido Yariv <ido@wizery.com>
+> > ---
+> >  src/storage.c |    2 +-
+> >  1 files changed, 1 insertions(+), 1 deletions(-)
+> > 
+> > diff --git a/src/storage.c b/src/storage.c
+> > index a65cee4..7e7f081 100644
+> > --- a/src/storage.c
+> > +++ b/src/storage.c
+> > @@ -533,7 +533,7 @@ int write_lastused_info(bdaddr_t *local, bdaddr_t *peer, struct tm *tm)
+> >  
+> >  int write_link_key(bdaddr_t *local, bdaddr_t *peer, unsigned char *key, uint8_t type, int length)
+> >  {
+> > -	char filename[PATH_MAX + 1], addr[18], str[38];
+> > +	char filename[PATH_MAX + 1], addr[18], str[64];
+> >  	int i;
 > 
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index 75937d7..ebf50065 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -310,7 +310,7 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
->  			remote_io > SMP_IO_KEYBOARD_DISPLAY)
->  		method = JUST_WORKS;
->  	else
-> -		method = gen_method[local_io][remote_io];
-> +		method = gen_method[remote_io][local_io];
->  
->  	/* If not bonding, don't ask user to confirm a Zero TK */
->  	if (!(auth & SMP_AUTH_BONDING) && method == JUST_CFM)
-> -- 
-> 1.7.7.6
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> I don't really see how the worst case you mention could ever happen in
+> practice. The key type requires one byte and 16 is the maximum for the
+> PIN length. Is there something I'm missing?
 
-Cheers,
---
-Vinicius
+Thanks for looking into this.
+
+I might have used an old/modified version when I first encountered this.
+When I did, the type was actually above 128 (SMP), which ended up taking
+3 bytes. As a result, the buffer was overflown.
+
+I'm not sure this can actually happen with the current code, with LTKs
+being stored in a separate file. It's probably still safer to allocate
+enough space just in case, but it's not essential.
+
+Thanks,
+Ido.
