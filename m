@@ -2,68 +2,99 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd 5/5] MAP/dummy: Add sorting of folder listing
-Date: Tue,  6 Mar 2012 18:42:28 +0100
-Message-Id: <1331055748-14212-5-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH obexd 3/5] MAP/dummy: Actual code for folder listing retrieval
+Date: Tue,  6 Mar 2012 18:42:26 +0100
+Message-Id: <1331055748-14212-3-git-send-email-lkslawek@gmail.com>
 In-Reply-To: <1331055748-14212-1-git-send-email-lkslawek@gmail.com>
 References: <1331055748-14212-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- plugins/messages-dummy.c |   32 ++++++++++++++++++++++++++++++++
- 1 files changed, 32 insertions(+), 0 deletions(-)
+ plugins/messages-dummy.c |   61 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 60 insertions(+), 1 deletions(-)
 
 diff --git a/plugins/messages-dummy.c b/plugins/messages-dummy.c
-index b98bedc..2a4cdbc 100644
+index db15a75..daa7ae4 100644
 --- a/plugins/messages-dummy.c
 +++ b/plugins/messages-dummy.c
-@@ -52,6 +52,36 @@ struct folder_listing_data {
+@@ -31,6 +31,8 @@
+ #include <stdlib.h>
+ #include <string.h>
+ 
++#include "log.h"
++
+ #include "messages.h"
+ 
+ static char *root_folder = NULL;
+@@ -50,9 +52,66 @@ struct folder_listing_data {
  	void *user_data;
  };
  
-+/* NOTE: Neither IrOBEX nor MAP specs says that folder listing needs to
-+ * be sorted (in IrOBEX examples it is not). However existing implementations
-+ * seem to follow the fig. 3-2 from MAP specification v1.0, and I've seen a
-+ * test suite requiring folder listing to be in that order.
-+ */
-+static gint folder_names_cmp(gconstpointer a, gconstpointer b,
-+						gpointer user_data)
++static char *get_next_subdir(DIR *dp, char *path)
 +{
-+	static const char *order[] = {
-+		"inbox", "outbox", "sent", "deleted", "draft", NULL
-+	};
-+	struct session *session = user_data;
-+	int ia, ib;
++	struct dirent *ep;
++	char *abs, *name;
 +
-+	if (g_strcmp0(session->cwd, "telecom/msg") == 0) {
-+		for (ia = 0; order[ia]; ++ia) {
-+			if (g_strcmp0(a, order[ia]) == 0)
-+				break;
++	for (;;) {
++		if ((ep = readdir(dp)) == NULL)
++			return NULL;
++
++		if (strcmp(ep->d_name, ".") == 0 || strcmp(ep->d_name, "..") == 0)
++			continue;
++
++		abs = g_build_filename(path, ep->d_name, NULL);
++
++		if (g_file_test(abs, G_FILE_TEST_IS_DIR)) {
++			g_free(abs);
++			break;
 +		}
-+		for (ib = 0; order[ib]; ++ib) {
-+			if (g_strcmp0(b, order[ib]) == 0)
-+				break;
-+		}
-+		if (ia != ib)
-+			return ia - ib;
++
++		g_free(abs);
 +	}
 +
-+	return g_strcmp0(a, b);
++	name = g_filename_to_utf8(ep->d_name, -1, NULL, NULL, NULL);
++
++	if (name == NULL) {
++		DBG("g_filename_to_utf8(): invalid filename");
++		return NULL;
++	}
++
++	return name;
 +}
 +
- static char *get_next_subdir(DIR *dp, char *path)
+ static ssize_t get_subdirs(struct folder_listing_data *fld, GSList **list)
  {
- 	struct dirent *ep;
-@@ -111,6 +141,8 @@ static ssize_t get_subdirs(struct folder_listing_data *fld, GSList **list)
- 	closedir(dp);
- 	g_free(path);
- 
-+	*list = g_slist_sort_with_data(*list, folder_names_cmp, fld->session);
+-	return 0;
++	DIR *dp;
++	char *path, *name;
++	size_t n = 0;
 +
- 	return n;
++	path = g_build_filename(fld->session->cwd_absolute, fld->name, NULL);
++	dp = opendir(path);
++
++	if (dp == NULL) {
++		int err = errno;
++
++		DBG("opendir(): %d, %s", err, strerror(err));
++		g_free(path);
++
++		return -err;
++	}
++
++	while ((name = get_next_subdir(dp, path)) != NULL) {
++		++n;
++		if (fld->max != 0)
++			*list = g_slist_prepend(*list, name);
++	}
++
++	closedir(dp);
++	g_free(path);
++
++	return n;
  }
  
+ static void return_folder_listing(struct folder_listing_data *fld, GSList *list)
 -- 
 1.7.5.1
 
