@@ -1,59 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1331044542.3392.168.camel@aeonflux>
-Subject: Re: [RFC BlueZ 3/3] core: Add Interfaces property to
- org.bluez.Device
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Date: Tue, 06 Mar 2012 06:35:42 -0800
-In-Reply-To: <CABBYNZL3tUpmqEHPx+6LJkJjZMDf7ajc0d-x_n51=i6HX03nng@mail.gmail.com>
-References: <1331035658-10000-1-git-send-email-luiz.dentz@gmail.com>
-	 <1331035658-10000-3-git-send-email-luiz.dentz@gmail.com>
-	 <CAJdJm_OmpNXq-hhqAQTXn-rvOk1eJhfQzuGdt2pQLRaa4+F1og@mail.gmail.com>
-	 <CABBYNZL3tUpmqEHPx+6LJkJjZMDf7ajc0d-x_n51=i6HX03nng@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Message-ID: <4F5610D0.2000304@linux.intel.com>
+Date: Tue, 06 Mar 2012 14:27:44 +0100
+From: Frederic Danis <frederic.danis@linux.intel.com>
+MIME-Version: 1.0
+To: Mike <puffy.taco@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v7 0/8] Add org.bluez.Telephony interface
+References: <1325862475-11607-1-git-send-email-frederic.danis@linux.intel.com> <CAB7rCTiysL9geG266x4U5xaz7ssF8iQbMZ_izAX2CrR8LndeVQ@mail.gmail.com>
+In-Reply-To: <CAB7rCTiysL9geG266x4U5xaz7ssF8iQbMZ_izAX2CrR8LndeVQ@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hello Mike,
 
-> > On Tue, Mar 6, 2012 at 8:07 AM, Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> >> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >>
-> >> This enables applications to be able to detect when an interface is
-> >> enabled/disabled without depending on UUIDs.
-> >> ---
-> >>  doc/device-api.txt |    4 ++++
-> >>  src/device.c       |   27 ++++++++++++++++++++++-----
-> >>  2 files changed, 26 insertions(+), 5 deletions(-)
-> >
-> > I thought it was possible to achieve this by using D-Bus listeners?
-> > E.g. similar to g_dbus_add_service_watch()
-> 
-> Afaik there is no such thing as introspection data changed or anything
-> like that, we could in theory have local listeners, but at least in
-> BlueZ there is no much use for them since it is not really dynamic
-> after drivers are loaded, but perhaps for oFono and others it could be
-> useful to have some way to watch when interfaces changes.
-> 
-> In case of oFono it does that by having e.g.
-> ofono_modem_add_interface/ofono_modem_remove_interface.
-> 
-> > What happens when the interface is unregistered with
-> > g_dbus_unregister_interface() ?
-> 
-> This should only be the case when removing the object so the driver
-> .remove is called which then calls g_dbus_unregister_interface.
+Le 01/03/2012 22:39, Mike a écrit :
+> Hello Frédéric,
+>
+> 2012/1/6 Frédéric Danis<frederic.danis@linux.intel.com>:
+>> Hello,
+>>
+>> This set of patches replaces telephony drivers for HeadSet/HandsFree
+>> Profiles by a new DBus interface (org.bluez.Telephony).
+>
+> What is the status of these patches?  There hasn't been much mailing
+> list discussion, so I assume there has been some chatter on IRC?  Do
+> these patches simply need testing?
+>
+> Thanks,
+> Mike
 
-I was not planning to add this to our gdbus code and focus on getting
-this right for ELL. However look into the D-Bus ObjectManager
-specification since that is what you want actually.
+This set of patches has been reviewed and seems to be OK.
+AFAIK, this change should be integrated in next major release of BlueZ 
+(5.0).
+
+I also send RFCs to oFono mailing list, implementing the telephony agent.
+This allows me to pass PTS tests. Currently most of tests pass (51), but 
+some tests (9) related to audio need some changes in Pulse Audio.
+
+Any comments or tests are welcome.
 
 Regards
 
-Marcel
+Fred
 
+-- 
+Frederic Danis                            Open Source Technology Center
+frederic.danis@intel.com                              Intel Corporation
 
