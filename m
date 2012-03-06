@@ -1,53 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJdJm_OmpNXq-hhqAQTXn-rvOk1eJhfQzuGdt2pQLRaa4+F1og@mail.gmail.com>
-References: <1331035658-10000-1-git-send-email-luiz.dentz@gmail.com>
-	<1331035658-10000-3-git-send-email-luiz.dentz@gmail.com>
-	<CAJdJm_OmpNXq-hhqAQTXn-rvOk1eJhfQzuGdt2pQLRaa4+F1og@mail.gmail.com>
-Date: Tue, 6 Mar 2012 15:26:32 +0200
-Message-ID: <CABBYNZL3tUpmqEHPx+6LJkJjZMDf7ajc0d-x_n51=i6HX03nng@mail.gmail.com>
-Subject: Re: [RFC BlueZ 3/3] core: Add Interfaces property to org.bluez.Device
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC 2/2] Bluetooth: Process HCI callbacks in a workqueue
+Date: Tue,  6 Mar 2012 15:16:29 +0200
+Message-Id: <1331039789-31519-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1331039789-31519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1331039789-31519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, Mar 6, 2012 at 2:57 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Luiz,
->
-> On Tue, Mar 6, 2012 at 8:07 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> This enables applications to be able to detect when an interface is
->> enabled/disabled without depending on UUIDs.
->> ---
->>  doc/device-api.txt |    4 ++++
->>  src/device.c       |   27 ++++++++++++++++++++++-----
->>  2 files changed, 26 insertions(+), 5 deletions(-)
->
-> I thought it was possible to achieve this by using D-Bus listeners?
-> E.g. similar to g_dbus_add_service_watch()
 
-Afaik there is no such thing as introspection data changed or anything
-like that, we could in theory have local listeners, but at least in
-BlueZ there is no much use for them since it is not really dynamic
-after drivers are loaded, but perhaps for oFono and others it could be
-useful to have some way to watch when interfaces changes.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/hci_core.h |    2 +
+ net/bluetooth/hci_core.c         |   42 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+), 0 deletions(-)
 
-In case of oFono it does that by having e.g.
-ofono_modem_add_interface/ofono_modem_remove_interface.
-
-> What happens when the interface is unregistered with
-> g_dbus_unregister_interface() ?
-
-This should only be the case when removing the object so the driver
-.remove is called which then calls g_dbus_unregister_interface.
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 2ef515e..47f1631 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1103,5 +1103,7 @@ int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
+ 	void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd), void *opt,
+ 				void (*destructor)(struct cb_cmd *cmd));
+ void hci_remove_cb(struct cb_cmd *cmd);
++void hci_queue_cb(struct hci_dev *hdev, struct cb_cmd *cmd,
++					struct workqueue_struct *workqueue);
+ 
+ #endif /* __HCI_CORE_H */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index cdc0220..2bd97b4 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2273,6 +2273,48 @@ struct cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
+ 	return NULL;
+ }
+ 
++struct cb_work {
++	struct work_struct work;
++	struct hci_dev *hdev;
++	struct cb_cmd *cmd;
++};
++
++static void hci_cb_work(struct work_struct *w)
++{
++	struct cb_work *work = (struct cb_work *) w;
++	struct cb_cmd *cmd = work->cmd;
++	struct hci_dev *hdev = work->hdev;
++
++	cmd->cb(hdev, cmd);
++
++	hci_dev_put(hdev);
++
++	hci_remove_cb(cmd);
++	kfree(w);
++}
++
++void hci_queue_cb(struct hci_dev *hdev, struct cb_cmd *cmd,
++					struct workqueue_struct *workqueue)
++{
++	struct cb_work *work;
++
++	BT_ERR("Queue cmd %p opt %p", cmd, cmd->opt);
++
++	work = kmalloc(sizeof(*work), GFP_ATOMIC);
++	if (!work)
++		return;
++
++	INIT_WORK(&work->work, hci_cb_work);
++	work->hdev = hdev;
++	work->cmd = cmd;
++	hci_dev_hold(hdev);
++
++	if (!queue_work(workqueue, &work->work)) {
++		kfree(work);
++		hci_dev_put(hdev);
++	}
++}
++
+ void hci_remove_cb(struct cb_cmd *cmd)
+ {
+ 	list_del(&cmd->list);
 -- 
-Luiz Augusto von Dentz
+1.7.9
+
