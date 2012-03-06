@@ -1,162 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Subject: Re: [RFC 1/2] Bluetooth: General HCI callback implementation
-Date: Tue, 6 Mar 2012 16:02:17 +0100
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <1331039789-31519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1331039789-31519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Message-ID: <201203061602.17443.szymon.janc@tieto.com>
+In-Reply-To: <1331039789-31519-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1331039789-31519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1331039789-31519-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 6 Mar 2012 12:02:11 -0300
+Message-ID: <CAA37ikYKJqpOj0JQ9x2DUQ2pYGos66WD4oodFchTDKA2UKFY0A@mail.gmail.com>
+Subject: Re: [RFC 2/2] Bluetooth: Process HCI callbacks in a workqueue
+From: Ulisses Furquim <ulisses@profusion.mobi>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
 Hi Andrei,
 
-> Add general HCI callback implementation. Can be used for executing
-> HCI commands from A2MP protocol.
-
+On Tue, Mar 6, 2012 at 10:16 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+>
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  include/net/bluetooth/hci_core.h |   18 ++++++++++++
->  net/bluetooth/hci_core.c         |   57 ++++++++++++++++++++++++++++++++++++++
->  2 files changed, 75 insertions(+), 0 deletions(-)
-> 
+>  include/net/bluetooth/hci_core.h |    2 +
+>  net/bluetooth/hci_core.c         |   42 ++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 44 insertions(+), 0 deletions(-)
+>
 > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index d12e353..2ef515e 100644
+> index 2ef515e..47f1631 100644
 > --- a/include/net/bluetooth/hci_core.h
 > +++ b/include/net/bluetooth/hci_core.h
-> @@ -131,6 +131,17 @@ struct le_scan_params {
->  
->  #define HCI_MAX_SHORT_NAME_LENGTH	10
->  
-> +struct hci_dev;
-> +
-> +struct cb_cmd {
-
-This name seems a bit too more generic to me, maybe prefix it with hci_?
-
-> +	struct list_head list;
-> +	u16 opcode;
-> +	u8 status;
-> +	void *opt;
-> +	void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd);
-> +	void (*destructor)(struct cb_cmd *cmd);
-> +};
-> +
->  #define NUM_REASSEMBLY 4
->  struct hci_dev {
->  	struct list_head list;
-> @@ -237,6 +248,7 @@ struct hci_dev {
->  	__u16			init_last_cmd;
->  
->  	struct list_head	mgmt_pending;
-> +	struct list_head	cb_list;
->  
->  	struct discovery_state	discovery;
->  	struct hci_conn_hash	conn_hash;
-> @@ -1086,4 +1098,10 @@ int hci_cancel_inquiry(struct hci_dev *hdev);
->  int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
->  								int timeout);
->  
-> +struct cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode);
-> +int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
-> +	void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd), void *opt,
-> +				void (*destructor)(struct cb_cmd *cmd));
-> +void hci_remove_cb(struct cb_cmd *cmd);
-> +
->  #endif /* __HCI_CORE_H */
+> @@ -1103,5 +1103,7 @@ int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
+>        void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd), void *opt,
+>                                void (*destructor)(struct cb_cmd *cmd));
+>  void hci_remove_cb(struct cb_cmd *cmd);
+> +void hci_queue_cb(struct hci_dev *hdev, struct cb_cmd *cmd,
+> +                                       struct workqueue_struct *workqueue);
+>
+>  #endif /* __HCI_CORE_H */
 > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 5b1ddab..cdc0220 100644
+> index cdc0220..2bd97b4 100644
 > --- a/net/bluetooth/hci_core.c
 > +++ b/net/bluetooth/hci_core.c
-> @@ -1826,6 +1826,8 @@ int hci_register_dev(struct hci_dev *hdev)
->  
->  	INIT_LIST_HEAD(&hdev->mgmt_pending);
->  
-> +	INIT_LIST_HEAD(&hdev->cb_list);
+> @@ -2273,6 +2273,48 @@ struct cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
+>        return NULL;
+>  }
+>
+> +struct cb_work {
+
+Again, maybe hci_cb_work?
+
+> +       struct work_struct work;
+> +       struct hci_dev *hdev;
+> +       struct cb_cmd *cmd;
+> +};
 > +
->  	INIT_LIST_HEAD(&hdev->blacklist);
->  
->  	INIT_LIST_HEAD(&hdev->uuids);
-> @@ -2239,6 +2241,61 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
->  	return 0;
->  }
->  
+> +static void hci_cb_work(struct work_struct *w)
 
-hci_add_cb could return error on failure and that could be used in hci_cmd_cb().
+And here hci_cb_worker?
 
-> +void hci_add_cb(struct hci_dev *hdev, __u16 opcode,
-> +			void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd),
-> +			void *opt, void (*destructor)(struct cb_cmd *cmd))
 > +{
-> +	struct cb_cmd *cmd;
+> +       struct cb_work *work = (struct cb_work *) w;
+> +       struct cb_cmd *cmd = work->cmd;
+> +       struct hci_dev *hdev = work->hdev;
 > +
-> +	cmd = kmalloc(sizeof(*cmd), GFP_ATOMIC);
-
-Why atomic? Maybe allow to pass custom gfp mask?
-
-> +	if (!cmd)
-> +		return;
+> +       cmd->cb(hdev, cmd);
 > +
-> +	cmd->cb = cb;
-> +	cmd->opcode = opcode;
-> +	cmd->opt = opt;
-> +	cmd->status = 0;
+> +       hci_dev_put(hdev);
 > +
-> +	if (destructor)
-> +		cmd->destructor = destructor;
-
-That could leave cmd->destructor uninitialized (cmd is allocated with kmalloc).
-I would assign destructor unconditionally.
-
-> +
-> +	list_add(&cmd->list, &hdev->cb_list);
+> +       hci_remove_cb(cmd);
+> +       kfree(w);
 > +}
 > +
-> +struct cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
+> +void hci_queue_cb(struct hci_dev *hdev, struct cb_cmd *cmd,
+> +                                       struct workqueue_struct *workqueue)
 > +{
-> +	struct cb_cmd *cmd;
+> +       struct cb_work *work;
 > +
-> +	list_for_each_entry(cmd, &hdev->cb_list, list)
-> +		if (cmd->opcode == opcode)
-> +			return cmd;
+> +       BT_ERR("Queue cmd %p opt %p", cmd, cmd->opt);
 > +
-> +	return NULL;
-> +}
-> +
-> +void hci_remove_cb(struct cb_cmd *cmd)
-> +{
-> +	list_del(&cmd->list);
-> +
-> +	if (cmd->destructor) {
-> +		cmd->destructor(cmd);
-> +	} else {
-> +		kfree(cmd->opt);
-> +		kfree(cmd);
-> +	}
-> +}
-> +
-> +/* Send HCI command with callback */
-> +int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
-> +			void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd),
-> +			void *opt, void (*destructor)(struct cb_cmd *cmd))
-> +{
-> +	if (cb)
-> +		hci_add_cb(hdev, opcode, cb, opt, destructor);
+> +       work = kmalloc(sizeof(*work), GFP_ATOMIC);
 
-Is this if really needed? If one would like to send cmd without cb he can just
-call hci_send_cmd directly. And I would also check if hci_add_cb failed before
-sending command.
+Why not GFP_KERNEL?
 
+> +       if (!work)
+> +               return;
 > +
-> +	return hci_send_cmd(hdev, opcode, plen, param);
+> +       INIT_WORK(&work->work, hci_cb_work);
+> +       work->hdev = hdev;
+> +       work->cmd = cmd;
+> +       hci_dev_hold(hdev);
+> +
+> +       if (!queue_work(workqueue, &work->work)) {
+> +               kfree(work);
+> +               hci_dev_put(hdev);
+> +       }
 > +}
 > +
->  /* Get data from the previously sent command */
->  void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
->  {
-> 
+>  void hci_remove_cb(struct cb_cmd *cmd)
+>  {
+>        list_del(&cmd->list);
+
+And again, no callers of hci_queue_cb so I'm assuming you'll only use
+in for AMP, is that it?
+
+Regards,
+
+-- 
+Ulisses Furquim
+ProFUSION embedded systems
+http://profusion.mobi
+Mobile: +55 19 9250 0942
+Skype: ulissesffs
