@@ -1,35 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Check FINDING state in interleaved discovery
-Date: Tue,  6 Mar 2012 19:37:06 -0300
-Message-Id: <1331073426-11427-1-git-send-email-andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: johan.hedberg@gmail.com
+To: akpm@linux-foundation.org
+Cc: marcel@holtmann.org,
+	padovan@profusion.mobi,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] MAINTAINERS: Fix link to Gustavo Padovans tree
+Date: Tue,  6 Mar 2012 13:37:09 -0800
+Message-Id: <1331069829-12767-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1331069829-12767-1-git-send-email-johan.hedberg@gmail.com>
+References: <1331069829-12767-1-git-send-email-johan.hedberg@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In order to do interleaved discovery we should be in DISCOVERY_
-FINDING state. Otherwise, discovery should be stopped.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+Gustavos tree is called just bluetooth.git and not bluetooth-2.6.git
+anymore.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_event.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ MAINTAINERS |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 6a817da..c995c79 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1101,7 +1101,8 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 
- 		schedule_delayed_work(&hdev->adv_work, ADV_CLEAR_TIMEOUT);
- 
--		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED) {
-+		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
-+				hdev->discovery.state == DISCOVERY_FINDING) {
- 			mgmt_interleaved_discovery(hdev);
- 		} else {
- 			hci_dev_lock(hdev);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 0bd0846..4f7ded1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1517,7 +1517,7 @@ M:	"Gustavo F. Padovan" <padovan@profusion.mobi>
+ M:	Johan Hedberg <johan.hedberg@gmail.com>
+ L:	linux-bluetooth@vger.kernel.org
+ W:	http://www.bluez.org/
+-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git
++T:	git git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth.git
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/jh/bluetooth.git
+ S:	Maintained
+ F:	drivers/bluetooth/
+@@ -1528,7 +1528,7 @@ M:	"Gustavo F. Padovan" <padovan@profusion.mobi>
+ M:	Johan Hedberg <johan.hedberg@gmail.com>
+ L:	linux-bluetooth@vger.kernel.org
+ W:	http://www.bluez.org/
+-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git
++T:	git git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth.git
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/jh/bluetooth.git
+ S:	Maintained
+ F:	net/bluetooth/
 -- 
-1.7.9.2
-
+1.7.7.6
