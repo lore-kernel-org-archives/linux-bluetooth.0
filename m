@@ -2,132 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Peter Krystad <pkrystad@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: johan.hedberg@gmail.com, Peter Krystad <pkrystad@codeaurora.org>
-Subject: [PATCH v5 3/5] Add parsing of L2CAP Create/Move Channel signals
-Date: Mon,  5 Mar 2012 16:35:49 -0800
-Message-Id: <1330994151-488-4-git-send-email-pkrystad@codeaurora.org>
+Subject: [PATCH v5 2/5] Add a2mp.h to library_sources
+Date: Mon,  5 Mar 2012 16:35:48 -0800
+Message-Id: <1330994151-488-3-git-send-email-pkrystad@codeaurora.org>
 In-Reply-To: <1330994151-488-1-git-send-email-pkrystad@codeaurora.org>
 References: <1330994151-488-1-git-send-email-pkrystad@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- parser/l2cap.c |   96 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 96 insertions(+), 0 deletions(-)
+ Makefile.am |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/parser/l2cap.c b/parser/l2cap.c
-index 03aa9f6..39e29a0 100644
---- a/parser/l2cap.c
-+++ b/parser/l2cap.c
-@@ -868,6 +868,78 @@ static void l2cap_ctrl_parse(int level, struct frame *frm, uint32_t ctrl)
- 		printf(" F-bit");
- }
+diff --git a/Makefile.am b/Makefile.am
+index c0e362b..b0aaf79 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -2,7 +2,7 @@
+ AM_MAKEFLAGS = --no-print-directory
  
-+static inline void create_req(int level, l2cap_cmd_hdr *cmd, struct frame *frm)
-+{
-+	l2cap_create_req *h = frm->ptr;
-+	uint16_t psm = btohs(h->psm);
-+	uint16_t scid = btohs(h->scid);
-+
-+	if (p_filter(FILT_L2CAP))
-+		return;
-+
-+	printf("Create req: psm %d scid 0x%4.4x id %d\n", psm, scid, h->id);
-+}
-+
-+static inline void create_rsp(int level, l2cap_cmd_hdr *cmd, struct frame *frm)
-+{
-+	l2cap_create_rsp *h = frm->ptr;
-+	uint16_t scid = btohs(h->scid);
-+	uint16_t dcid = btohs(h->dcid);
-+	uint16_t result = btohs(h->result);
-+	uint16_t status = btohs(h->status);
-+
-+	if (p_filter(FILT_L2CAP))
-+		return;
-+
-+	printf("Create rsp: dcid 0x%4.4x scid 0x%4.4x result %d status %d\n", dcid, scid, result, status);
-+}
-+
-+static inline void move_req(int level, l2cap_cmd_hdr *cmd, struct frame *frm)
-+{
-+	l2cap_move_req *h = frm->ptr;
-+	uint16_t icid = btohs(h->icid);
-+
-+	if (p_filter(FILT_L2CAP))
-+		return;
-+
-+	printf("Move req: icid 0x%4.4x id %d\n", icid, h->id);
-+}
-+
-+static inline void move_rsp(int level, l2cap_cmd_hdr *cmd, struct frame *frm)
-+{
-+	l2cap_move_rsp *h = frm->ptr;
-+	uint16_t icid = btohs(h->icid);
-+	uint16_t result = btohs(h->result);
-+
-+	if (p_filter(FILT_L2CAP))
-+		return;
-+
-+	printf("Move rsp: icid 0x%4.4x result %d\n", icid, result);
-+}
-+
-+static inline void move_cfm(int level, l2cap_cmd_hdr *cmd, struct frame *frm)
-+{
-+	l2cap_move_cfm *h = frm->ptr;
-+	uint16_t icid = btohs(h->icid);
-+	uint16_t result = btohs(h->result);
-+
-+	if (p_filter(FILT_L2CAP))
-+		return;
-+
-+	printf("Move cfm: icid 0x%4.4x result %d\n", icid, result);
-+}
-+
-+static inline void move_cfm_rsp(int level, l2cap_cmd_hdr *cmd, struct frame *frm)
-+{
-+	l2cap_move_cfm_rsp *h = frm->ptr;
-+	uint16_t icid = btohs(h->icid);
-+
-+	if (p_filter(FILT_L2CAP))
-+		return;
-+
-+	printf("Move cfm rsp: icid 0x%4.4x\n", icid);
-+}
-+
- static void l2cap_parse(int level, struct frame *frm)
- {
- 	l2cap_hdr *hdr = (void *)frm->ptr;
-@@ -937,6 +1009,30 @@ static void l2cap_parse(int level, struct frame *frm)
- 				info_rsp(level, hdr, frm);
- 				break;
+ library_sources = lib/bluetooth.h lib/bluetooth.c \
+-			lib/hci_lib.h lib/hci.h lib/hci.c lib/l2cap.h
++			lib/hci_lib.h lib/hci.h lib/hci.c lib/l2cap.h lib/a2mp.h
  
-+			case L2CAP_CREATE_REQ:
-+				create_req(level, hdr, frm);
-+				break;
-+
-+			case L2CAP_CREATE_RSP:
-+				create_rsp(level, hdr, frm);
-+				break;
-+
-+			case L2CAP_MOVE_REQ:
-+				move_req(level, hdr, frm);
-+				break;
-+
-+			case L2CAP_MOVE_RSP:
-+				move_rsp(level, hdr, frm);
-+				break;
-+
-+			case L2CAP_MOVE_CFM:
-+				move_cfm(level, hdr, frm);
-+				break;
-+
-+			case L2CAP_MOVE_CFM_RSP:
-+				move_cfm_rsp(level, hdr, frm);
-+				break;
-+
- 			default:
- 				if (p_filter(FILT_L2CAP))
- 					break;
+ parser_sources =  parser/parser.h parser/parser.c \
+ 					parser/lmp.c \
 -- 
 1.7.4.1
 
