@@ -1,97 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michal Labedzki <michal.labedzki@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>, <luiz.dentz@gmail.com>,
-	<lucas.demarchi@profusion.mobi>
-CC: Michal Labedzki <michal.labedzki@tieto.com>
-Subject: [PATCH v2 2/2] avrcp: Add error code for rejected vendor command
-Date: Tue, 6 Mar 2012 15:56:05 +0100
-Message-ID: <1331045765-24790-1-git-send-email-michal.labedzki@tieto.com>
-In-Reply-To: <CAMOw1v6pNC7eebGEAMLEWKNJ8NaR2aUweigMCEzbG5_0wgkUTA%40mail.gmail.com>
-References: <CAMOw1v6pNC7eebGEAMLEWKNJ8NaR2aUweigMCEzbG5_0wgkUTA%40mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Message-ID: <1331044542.3392.168.camel@aeonflux>
+Subject: Re: [RFC BlueZ 3/3] core: Add Interfaces property to
+ org.bluez.Device
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Date: Tue, 06 Mar 2012 06:35:42 -0800
+In-Reply-To: <CABBYNZL3tUpmqEHPx+6LJkJjZMDf7ajc0d-x_n51=i6HX03nng@mail.gmail.com>
+References: <1331035658-10000-1-git-send-email-luiz.dentz@gmail.com>
+	 <1331035658-10000-3-git-send-email-luiz.dentz@gmail.com>
+	 <CAJdJm_OmpNXq-hhqAQTXn-rvOk1eJhfQzuGdt2pQLRaa4+F1og@mail.gmail.com>
+	 <CABBYNZL3tUpmqEHPx+6LJkJjZMDf7ajc0d-x_n51=i6HX03nng@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Make correct response for any vendor commands when there are not any
-registered player. According to the specification responses should be
-REJECTED with error code.
+Hi Luiz,
 
-"For error response PDU the response parameter is always the
-error code independent of the response format defined for
-ACCEPTED PDU response for the corresponding PDU command."                                                                                            (source: AVRCP 1.3 specification, pages 34,56 or AVRCP 1.4
-specification, pages 33,93)
----
- audio/avctp.c |    3 +++
- audio/avctp.h |    5 +++++
- audio/avrcp.c |   19 +++++++++++++++++++
- 3 files changed, 27 insertions(+), 0 deletions(-)
+> > On Tue, Mar 6, 2012 at 8:07 AM, Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> >> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >>
+> >> This enables applications to be able to detect when an interface is
+> >> enabled/disabled without depending on UUIDs.
+> >> ---
+> >>  doc/device-api.txt |    4 ++++
+> >>  src/device.c       |   27 ++++++++++++++++++++++-----
+> >>  2 files changed, 26 insertions(+), 5 deletions(-)
+> >
+> > I thought it was possible to achieve this by using D-Bus listeners?
+> > E.g. similar to g_dbus_add_service_watch()
+> 
+> Afaik there is no such thing as introspection data changed or anything
+> like that, we could in theory have local listeners, but at least in
+> BlueZ there is no much use for them since it is not really dynamic
+> after drivers are loaded, but perhaps for oFono and others it could be
+> useful to have some way to watch when interfaces changes.
+> 
+> In case of oFono it does that by having e.g.
+> ofono_modem_add_interface/ofono_modem_remove_interface.
+> 
+> > What happens when the interface is unregistered with
+> > g_dbus_unregister_interface() ?
+> 
+> This should only be the case when removing the object so the driver
+> .remove is called which then calls g_dbus_unregister_interface.
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index 5bd5db1..38a2d20 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -465,6 +465,9 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
- 	if (!handler) {
- 		DBG("handler not found for 0x%02x", avc->opcode);
- 		avc->code = AVC_CTYPE_REJECTED;
-+
-+		packet_size += handle_vendor_reject(session, avctp->transaction, &code,
-+					&subunit, operands, operand_count, NULL);
- 		goto done;
- 	}
- 
-diff --git a/audio/avctp.h b/audio/avctp.h
-index 9727485..a1109a9 100644
---- a/audio/avctp.h
-+++ b/audio/avctp.h
-@@ -97,3 +97,8 @@ int avctp_send_passthrough(struct avctp *session, uint8_t op);
- int avctp_send_vendordep(struct avctp *session, uint8_t transaction,
- 				uint8_t code, uint8_t subunit,
- 				uint8_t *operands, size_t operand_count);
-+
-+size_t handle_vendor_reject(struct avctp *session, uint8_t transaction,
-+					uint8_t *code, uint8_t *subunit,
-+					uint8_t *operands, size_t operand_count,
-+					void *user_data);
-\ No newline at end of file
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 4573133..2d29d56 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -862,6 +862,7 @@ static uint8_t avrcp_handle_get_play_status(struct avrcp_player *player,
- 	position = player->cb->get_position(player->user_data);
- 	pduration = player->cb->get_metadata(AVRCP_MEDIA_ATTRIBUTE_DURATION,
- 							player->user_data);
-+
- 	if (pduration != NULL)
- 		duration = htonl(GPOINTER_TO_UINT(pduration));
- 	else
-@@ -1092,6 +1093,24 @@ err_metadata:
- 	return AVRCP_HEADER_LENGTH + 1;
- }
- 
-+size_t handle_vendor_reject(struct avctp *session, uint8_t transaction,
-+					uint8_t *code, uint8_t *subunit,
-+					uint8_t *operands, size_t operand_count,
-+					void *user_data)
-+{
-+    struct avrcp_header *pdu = (void *) operands;
-+    uint32_t company_id = get_company_id(pdu->company_id);
-+
-+    *code = AVC_CTYPE_REJECTED;
-+    pdu->params_len = htons(1);
-+    pdu->params[0] = E_INTERNAL;
-+
-+    DBG("rejecting AVRCP PDU 0x%02X, company 0x%06X len 0x%04X",
-+            pdu->pdu_id, company_id, pdu->params_len);
-+
-+    return AVRCP_HEADER_LENGTH + 1;
-+}
-+
- static struct avrcp_server *find_server(GSList *list, const bdaddr_t *src)
- {
- 	for (; list; list = list->next) {
--- 
-on behalf of ST-Ericsson
+I was not planning to add this to our gdbus code and focus on getting
+this right for ELL. However look into the D-Bus ObjectManager
+specification since that is what you want actually.
+
+Regards
+
+Marcel
+
 
