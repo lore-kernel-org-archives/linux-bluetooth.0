@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 3/3] core: Add Interfaces property to org.bluez.Device
-Date: Tue,  6 Mar 2012 14:07:38 +0200
-Message-Id: <1331035658-10000-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC BlueZ 2/3] core: Add Interfaces property to org.bluez.Adapter
+Date: Tue,  6 Mar 2012 14:07:37 +0200
+Message-Id: <1331035658-10000-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1331035658-10000-1-git-send-email-luiz.dentz@gmail.com>
 References: <1331035658-10000-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,77 +11,79 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enables applications to be able to detect when an interface is
-enabled/disabled without depending on UUIDs.
+This enables applications to be able to detect when some specific
+such as org.bluez.Media is available so they don't have to guess based
+on UUIDs.
 ---
- doc/device-api.txt |    4 ++++
- src/device.c       |   27 ++++++++++++++++++++++-----
- 2 files changed, 26 insertions(+), 5 deletions(-)
+ doc/adapter-api.txt |    4 ++++
+ src/adapter.c       |   21 +++++++++++++++++++--
+ 2 files changed, 23 insertions(+), 2 deletions(-)
 
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index e8fc314..2531d05 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -209,3 +209,7 @@ Properties	string Address [readonly]
- 			Note that this property can exhibit false-positives
- 			in the case of Bluetooth 2.1 (or newer) devices that
- 			have disabled Extended Inquiry Response support.
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 20cef03..89688de 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -284,3 +284,7 @@ Properties	string Address [readonly]
+ 
+ 			List of 128-bit UUIDs that represents the available
+ 			local services.
 +
 +		array{string} Interfaces [readonly]
 +
 +			List of supported interface by the object.
-diff --git a/src/device.c b/src/device.c
-index dfc8e59..32527da 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -410,6 +410,14 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 	dict_append_array(&dict, "UUIDs", DBUS_TYPE_STRING, &str, i);
- 	g_free(str);
+diff --git a/src/adapter.c b/src/adapter.c
+index c5f4d0d..b6424a1 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1077,7 +1077,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 	DBusMessageIter dict;
+ 	char srcaddr[18];
+ 	gboolean value;
+-	char **devices, **uuids;
++	char **devices, **uuids, **ifaces;
+ 	int i;
+ 	GSList *l;
+ 	sdp_list_t *list;
+@@ -1162,6 +1162,14 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 
+ 	g_strfreev(uuids);
  
 +	/* Interfaces */
-+	str = g_dbus_list_interfaces(conn, device->path, &i);
-+	if (str != NULL) {
-+		dict_append_array(&dict, "Interfaces", DBUS_TYPE_STRING, &str,
-+									i);
-+		g_strfreev(str);
++	ifaces = g_dbus_list_interfaces(connection, adapter->path, &i);
++	if (ifaces != NULL) {
++		dict_append_array(&dict, "Interfaces", DBUS_TYPE_STRING,
++								&ifaces, i);
++		g_strfreev(ifaces);
 +	}
 +
- 	/* Services */
- 	str = g_new0(char *, g_slist_length(device->services) + 1);
- 	for (i = 0, l = device->services; l; l = l->next, i++)
-@@ -1379,18 +1387,27 @@ static void device_remove_drivers(struct btd_device *device, GSList *uuids)
- static void services_changed(struct btd_device *device)
+ 	dbus_message_iter_close_container(&iter, &dict);
+ 
+ 	return reply;
+@@ -2023,7 +2031,8 @@ static void clear_blocked(struct btd_adapter *adapter)
+ static void probe_driver(struct btd_adapter *adapter, gpointer user_data)
  {
- 	DBusConnection *conn = get_dbus_connection();
--	char **uuids;
-+	char **array;
- 	GSList *l;
- 	int i;
+ 	struct btd_adapter_driver *driver = user_data;
+-	int err;
++	int err, count;
++	char **ifaces;
  
--	uuids = g_new0(char *, g_slist_length(device->uuids) + 1);
-+	array = g_new0(char *, g_slist_length(device->uuids) + 1);
- 	for (i = 0, l = device->uuids; l; l = l->next, i++)
--		uuids[i] = l->data;
-+		array[i] = l->data;
+ 	if (!adapter->up)
+ 		return;
+@@ -2039,6 +2048,14 @@ static void probe_driver(struct btd_adapter *adapter, gpointer user_data)
  
- 	emit_array_property_changed(conn, device->path, DEVICE_INTERFACE,
--					"UUIDs", DBUS_TYPE_STRING, &uuids, i);
-+					"UUIDs", DBUS_TYPE_STRING, &array, i);
+ 	adapter->loaded_drivers = g_slist_prepend(adapter->loaded_drivers,
+ 									driver);
 +
-+	g_free(array);
-+
-+	array = g_dbus_list_interfaces(conn, device->path, &i);
-+	if (array == NULL)
-+		return;
- 
--	g_free(uuids);
-+	emit_array_property_changed(conn, device->path,
-+					DEVICE_INTERFACE, "Interfaces",
-+					DBUS_TYPE_STRING, &array, i);
-+	g_strfreev(array);
++	ifaces = g_dbus_list_interfaces(connection, adapter->path, &count);
++	if (ifaces != NULL) {
++		emit_array_property_changed(connection, adapter->path,
++					ADAPTER_INTERFACE, "Interfaces",
++					DBUS_TYPE_STRING, &ifaces, count);
++		g_strfreev(ifaces);
++	}
  }
  
- static int rec_cmp(const void *a, const void *b)
+ static void load_drivers(struct btd_adapter *adapter)
 -- 
 1.7.7.6
 
