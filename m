@@ -1,29 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 5 Mar 2012 16:44:34 -0800
+Date: Mon, 5 Mar 2012 16:44:20 -0800
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Peter Krystad <pkrystad@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 0/2] Add BT 3.0+HS definitions
-Message-ID: <20120306004434.GB949@x220>
-References: <1330994071-443-1-git-send-email-pkrystad@codeaurora.org>
+Subject: Re: [PATCH v5 0/5] Add parsing of BT 3.0+HS signals
+Message-ID: <20120306004420.GA949@x220>
+References: <1330994151-488-1-git-send-email-pkrystad@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1330994071-443-1-git-send-email-pkrystad@codeaurora.org>
+In-Reply-To: <1330994151-488-1-git-send-email-pkrystad@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Peter,
 
 On Mon, Mar 05, 2012, Peter Krystad wrote:
-> v4 - put Makefile.am change into separate commit
+> v5 - put Makefile.am change into separate commit
 > 
-> Peter Krystad (2):
+> Peter Krystad (5):
 >   lib: Add A2MP definitions
 >   Add a2mp.h to library_sources
+>   Add parsing of L2CAP Create/Move Channel signals
+>   Add parsing of A2MP signals
+>   Minor indentation cleanup and fix display of physical link key
 > 
->  Makefile.am |    4 +-
->  lib/a2mp.h  |  115 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 117 insertions(+), 2 deletions(-)
+>  Makefile.am     |    2 +-
+>  lib/a2mp.h      |  115 ++++++++++++++
+>  parser/hci.c    |   15 ++-
+>  parser/l2cap.c  |  450 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  parser/parser.h |    1 +
+>  src/hcidump.c   |    1 +
+>  6 files changed, 578 insertions(+), 6 deletions(-)
 
 Applied. Thanks.
 
