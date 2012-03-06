@@ -1,57 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 6 Mar 2012 03:34:15 +0200
-From: Ido Yariv <ido@wizery.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Mon, 5 Mar 2012 16:44:34 -0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Peter Krystad <pkrystad@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Storage: Fix a buffer overflow in write_link_key
-Message-ID: <20120306013415.GA14021@WorkStation>
-References: <1330971151-11075-1-git-send-email-ido@wizery.com>
- <20120305200129.GA17773@x220.ice.intel.com>
+Subject: Re: [PATCH v4 0/2] Add BT 3.0+HS definitions
+Message-ID: <20120306004434.GB949@x220>
+References: <1330994071-443-1-git-send-email-pkrystad@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120305200129.GA17773@x220.ice.intel.com>
+In-Reply-To: <1330994071-443-1-git-send-email-pkrystad@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Peter,
 
-On Mon, Mar 05, 2012 at 12:01:29PM -0800, Johan Hedberg wrote:
-> Hi Ido,
+On Mon, Mar 05, 2012, Peter Krystad wrote:
+> v4 - put Makefile.am change into separate commit
 > 
-> On Mon, Mar 05, 2012, Ido Yariv wrote:
-> > The temporary string allocated on the stack is not large enough in worst
-> > case. To be on the safe side, increase it to 64 bytes.
-> > 
-> > Signed-off-by: Ido Yariv <ido@wizery.com>
-> > ---
-> >  src/storage.c |    2 +-
-> >  1 files changed, 1 insertions(+), 1 deletions(-)
-> > 
-> > diff --git a/src/storage.c b/src/storage.c
-> > index a65cee4..7e7f081 100644
-> > --- a/src/storage.c
-> > +++ b/src/storage.c
-> > @@ -533,7 +533,7 @@ int write_lastused_info(bdaddr_t *local, bdaddr_t *peer, struct tm *tm)
-> >  
-> >  int write_link_key(bdaddr_t *local, bdaddr_t *peer, unsigned char *key, uint8_t type, int length)
-> >  {
-> > -	char filename[PATH_MAX + 1], addr[18], str[38];
-> > +	char filename[PATH_MAX + 1], addr[18], str[64];
-> >  	int i;
+> Peter Krystad (2):
+>   lib: Add A2MP definitions
+>   Add a2mp.h to library_sources
 > 
-> I don't really see how the worst case you mention could ever happen in
-> practice. The key type requires one byte and 16 is the maximum for the
-> PIN length. Is there something I'm missing?
+>  Makefile.am |    4 +-
+>  lib/a2mp.h  |  115 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 117 insertions(+), 2 deletions(-)
 
-Thanks for looking into this.
+Applied. Thanks.
 
-I might have used an old/modified version when I first encountered this.
-When I did, the type was actually above 128 (SMP), which ended up taking
-3 bytes. As a result, the buffer was overflown.
-
-I'm not sure this can actually happen with the current code, with LTKs
-being stored in a separate file. It's probably still safer to allocate
-enough space just in case, but it's not essential.
-
-Thanks,
-Ido.
+Johan
