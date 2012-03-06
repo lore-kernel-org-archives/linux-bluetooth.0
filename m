@@ -2,99 +2,71 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd 3/5] MAP/dummy: Actual code for folder listing retrieval
-Date: Tue,  6 Mar 2012 18:42:26 +0100
-Message-Id: <1331055748-14212-3-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH obexd 2/5] MAP/dummy: Add basic logic for folder listing
+Date: Tue,  6 Mar 2012 18:42:25 +0100
+Message-Id: <1331055748-14212-2-git-send-email-lkslawek@gmail.com>
 In-Reply-To: <1331055748-14212-1-git-send-email-lkslawek@gmail.com>
 References: <1331055748-14212-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- plugins/messages-dummy.c |   61 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 60 insertions(+), 1 deletions(-)
+ plugins/messages-dummy.c |   33 +++++++++++++++++++++++++++++++++
+ 1 files changed, 33 insertions(+), 0 deletions(-)
 
 diff --git a/plugins/messages-dummy.c b/plugins/messages-dummy.c
-index db15a75..daa7ae4 100644
+index 3ba333c..db15a75 100644
 --- a/plugins/messages-dummy.c
 +++ b/plugins/messages-dummy.c
-@@ -31,6 +31,8 @@
+@@ -25,6 +25,8 @@
+ #include <config.h>
+ #endif
+ 
++#include <sys/types.h>
++#include <dirent.h>
+ #include <errno.h>
  #include <stdlib.h>
  #include <string.h>
- 
-+#include "log.h"
-+
- #include "messages.h"
- 
- static char *root_folder = NULL;
-@@ -50,9 +52,66 @@ struct folder_listing_data {
+@@ -48,8 +50,39 @@ struct folder_listing_data {
  	void *user_data;
  };
  
-+static char *get_next_subdir(DIR *dp, char *path)
++static ssize_t get_subdirs(struct folder_listing_data *fld, GSList **list)
 +{
-+	struct dirent *ep;
-+	char *abs, *name;
-+
-+	for (;;) {
-+		if ((ep = readdir(dp)) == NULL)
-+			return NULL;
-+
-+		if (strcmp(ep->d_name, ".") == 0 || strcmp(ep->d_name, "..") == 0)
-+			continue;
-+
-+		abs = g_build_filename(path, ep->d_name, NULL);
-+
-+		if (g_file_test(abs, G_FILE_TEST_IS_DIR)) {
-+			g_free(abs);
-+			break;
-+		}
-+
-+		g_free(abs);
-+	}
-+
-+	name = g_filename_to_utf8(ep->d_name, -1, NULL, NULL, NULL);
-+
-+	if (name == NULL) {
-+		DBG("g_filename_to_utf8(): invalid filename");
-+		return NULL;
-+	}
-+
-+	return name;
++	return 0;
 +}
 +
- static ssize_t get_subdirs(struct folder_listing_data *fld, GSList **list)
++static void return_folder_listing(struct folder_listing_data *fld, GSList *list)
++{
++	struct session *session = fld->session;
++
++	fld->callback(session, 0, 0, NULL, fld->user_data);
++}
++
+ static gboolean get_folder_listing(void *d)
  {
--	return 0;
-+	DIR *dp;
-+	char *path, *name;
-+	size_t n = 0;
++	struct folder_listing_data *fld = d;
++	ssize_t n;
++	GSList *list = NULL;
 +
-+	path = g_build_filename(fld->session->cwd_absolute, fld->name, NULL);
-+	dp = opendir(path);
++	n = get_subdirs(fld, &list);
 +
-+	if (dp == NULL) {
-+		int err = errno;
-+
-+		DBG("opendir(): %d, %s", err, strerror(err));
-+		g_free(path);
-+
-+		return -err;
++	if (n < 0) {
++		fld->callback(fld->session, n, 0, NULL, fld->user_data);
++		return FALSE;
 +	}
 +
-+	while ((name = get_next_subdir(dp, path)) != NULL) {
-+		++n;
-+		if (fld->max != 0)
-+			*list = g_slist_prepend(*list, name);
++	if (fld->max == 0) {
++		fld->callback(fld->session, 0, n, NULL, fld->user_data);
++		return FALSE;
 +	}
 +
-+	closedir(dp);
-+	g_free(path);
++	return_folder_listing(fld, list);
++	g_slist_free_full(list, g_free);
 +
-+	return n;
+ 	return FALSE;
  }
  
- static void return_folder_listing(struct folder_listing_data *fld, GSList *list)
 -- 
 1.7.5.1
 
