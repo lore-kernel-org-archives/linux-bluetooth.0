@@ -1,172 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
+From: Michal Labedzki <michal.labedzki@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>, <luiz.dentz@gmail.com>,
+	<lucas.demarchi@profusion.mobi>
+CC: Michal Labedzki <michal.labedzki@tieto.com>
+Subject: [PATCH v2 2/2] avrcp: Add error code for rejected vendor command
+Date: Tue, 6 Mar 2012 15:56:05 +0100
+Message-ID: <1331045765-24790-1-git-send-email-michal.labedzki@tieto.com>
+In-Reply-To: <CAMOw1v6pNC7eebGEAMLEWKNJ8NaR2aUweigMCEzbG5_0wgkUTA%40mail.gmail.com>
+References: <CAMOw1v6pNC7eebGEAMLEWKNJ8NaR2aUweigMCEzbG5_0wgkUTA%40mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1331039789-31519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1331039789-31519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Tue, 6 Mar 2012 11:57:59 -0300
-Message-ID: <CAA37ikbqQAb-qrgACxg28aUR3rMQ2=C810X+kLyeOSqYUbUfEw@mail.gmail.com>
-Subject: Re: [RFC 1/2] Bluetooth: General HCI callback implementation
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Make correct response for any vendor commands when there are not any
+registered player. According to the specification responses should be
+REJECTED with error code.
 
-On Tue, Mar 6, 2012 at 10:16 AM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Add general HCI callback implementation. Can be used for executing
-> HCI commands from A2MP protocol.
->
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  include/net/bluetooth/hci_core.h |   18 ++++++++++++
->  net/bluetooth/hci_core.c         |   57 ++++++++++++++++++++++++++++++++++++++
->  2 files changed, 75 insertions(+), 0 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index d12e353..2ef515e 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -131,6 +131,17 @@ struct le_scan_params {
->
->  #define HCI_MAX_SHORT_NAME_LENGTH      10
->
-> +struct hci_dev;
-> +
-> +struct cb_cmd {
+"For error response PDU the response parameter is always the
+error code independent of the response format defined for
+ACCEPTED PDU response for the corresponding PDU command."                                                                                            (source: AVRCP 1.3 specification, pages 34,56 or AVRCP 1.4
+specification, pages 33,93)
+---
+ audio/avctp.c |    3 +++
+ audio/avctp.h |    5 +++++
+ audio/avrcp.c |   19 +++++++++++++++++++
+ 3 files changed, 27 insertions(+), 0 deletions(-)
 
-Maybe a better name here with a prefix? hci_cb_cmd?
-
-> +       struct list_head list;
-> +       u16 opcode;
-> +       u8 status;
-> +       void *opt;
-> +       void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd);
-> +       void (*destructor)(struct cb_cmd *cmd);
-> +};
-> +
->  #define NUM_REASSEMBLY 4
->  struct hci_dev {
->        struct list_head list;
-> @@ -237,6 +248,7 @@ struct hci_dev {
->        __u16                   init_last_cmd;
->
->        struct list_head        mgmt_pending;
-> +       struct list_head        cb_list;
->
->        struct discovery_state  discovery;
->        struct hci_conn_hash    conn_hash;
-> @@ -1086,4 +1098,10 @@ int hci_cancel_inquiry(struct hci_dev *hdev);
->  int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
->                                                                int timeout);
->
-> +struct cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode);
-> +int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
-> +       void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd), void *opt,
-> +                               void (*destructor)(struct cb_cmd *cmd));
-
-This line is very ugly and hard to read. Maybe have a longer line like
-other parts of the kernel seem to be accepting now?
-
-> +void hci_remove_cb(struct cb_cmd *cmd);
-> +
->  #endif /* __HCI_CORE_H */
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 5b1ddab..cdc0220 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1826,6 +1826,8 @@ int hci_register_dev(struct hci_dev *hdev)
->
->        INIT_LIST_HEAD(&hdev->mgmt_pending);
->
-> +       INIT_LIST_HEAD(&hdev->cb_list);
-> +
->        INIT_LIST_HEAD(&hdev->blacklist);
->
->        INIT_LIST_HEAD(&hdev->uuids);
-> @@ -2239,6 +2241,61 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
->        return 0;
->  }
->
-> +void hci_add_cb(struct hci_dev *hdev, __u16 opcode,
-> +                       void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd),
-> +                       void *opt, void (*destructor)(struct cb_cmd *cmd))
-> +{
-> +       struct cb_cmd *cmd;
-> +
-> +       cmd = kmalloc(sizeof(*cmd), GFP_ATOMIC);
-> +       if (!cmd)
-> +               return;
-> +
-> +       cmd->cb = cb;
-> +       cmd->opcode = opcode;
-> +       cmd->opt = opt;
-> +       cmd->status = 0;
-> +
-> +       if (destructor)
-> +               cmd->destructor = destructor;
-> +
-> +       list_add(&cmd->list, &hdev->cb_list);
-
-Don't we need some protection here? We probably can use hdev lock.
-
-> +}
-> +
-> +struct cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
-> +{
-> +       struct cb_cmd *cmd;
-> +
-> +       list_for_each_entry(cmd, &hdev->cb_list, list)
-> +               if (cmd->opcode == opcode)
-> +                       return cmd;
-
-Here as well, we might need to protect the critical section.
-
-> +
-> +       return NULL;
-> +}
-> +
-> +void hci_remove_cb(struct cb_cmd *cmd)
-> +{
-> +       list_del(&cmd->list);
-> +
-> +       if (cmd->destructor) {
-> +               cmd->destructor(cmd);
-> +       } else {
-> +               kfree(cmd->opt);
-> +               kfree(cmd);
-> +       }
-
-And here too. Right?
-
-> +}
-> +
-> +/* Send HCI command with callback */
-> +int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
-> +                       void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd),
-> +                       void *opt, void (*destructor)(struct cb_cmd *cmd))
-> +{
-> +       if (cb)
-> +               hci_add_cb(hdev, opcode, cb, opt, destructor);
-> +
-> +       return hci_send_cmd(hdev, opcode, plen, param);
-> +}
-> +
->  /* Get data from the previously sent command */
->  void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
->  {
-
-We don't have any callers of find and remove functions?
-
-Best regards,
-
+diff --git a/audio/avctp.c b/audio/avctp.c
+index 5bd5db1..38a2d20 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -465,6 +465,9 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 	if (!handler) {
+ 		DBG("handler not found for 0x%02x", avc->opcode);
+ 		avc->code = AVC_CTYPE_REJECTED;
++
++		packet_size += handle_vendor_reject(session, avctp->transaction, &code,
++					&subunit, operands, operand_count, NULL);
+ 		goto done;
+ 	}
+ 
+diff --git a/audio/avctp.h b/audio/avctp.h
+index 9727485..a1109a9 100644
+--- a/audio/avctp.h
++++ b/audio/avctp.h
+@@ -97,3 +97,8 @@ int avctp_send_passthrough(struct avctp *session, uint8_t op);
+ int avctp_send_vendordep(struct avctp *session, uint8_t transaction,
+ 				uint8_t code, uint8_t subunit,
+ 				uint8_t *operands, size_t operand_count);
++
++size_t handle_vendor_reject(struct avctp *session, uint8_t transaction,
++					uint8_t *code, uint8_t *subunit,
++					uint8_t *operands, size_t operand_count,
++					void *user_data);
+\ No newline at end of file
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index 4573133..2d29d56 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -862,6 +862,7 @@ static uint8_t avrcp_handle_get_play_status(struct avrcp_player *player,
+ 	position = player->cb->get_position(player->user_data);
+ 	pduration = player->cb->get_metadata(AVRCP_MEDIA_ATTRIBUTE_DURATION,
+ 							player->user_data);
++
+ 	if (pduration != NULL)
+ 		duration = htonl(GPOINTER_TO_UINT(pduration));
+ 	else
+@@ -1092,6 +1093,24 @@ err_metadata:
+ 	return AVRCP_HEADER_LENGTH + 1;
+ }
+ 
++size_t handle_vendor_reject(struct avctp *session, uint8_t transaction,
++					uint8_t *code, uint8_t *subunit,
++					uint8_t *operands, size_t operand_count,
++					void *user_data)
++{
++    struct avrcp_header *pdu = (void *) operands;
++    uint32_t company_id = get_company_id(pdu->company_id);
++
++    *code = AVC_CTYPE_REJECTED;
++    pdu->params_len = htons(1);
++    pdu->params[0] = E_INTERNAL;
++
++    DBG("rejecting AVRCP PDU 0x%02X, company 0x%06X len 0x%04X",
++            pdu->pdu_id, company_id, pdu->params_len);
++
++    return AVRCP_HEADER_LENGTH + 1;
++}
++
+ static struct avrcp_server *find_server(GSList *list, const bdaddr_t *src)
+ {
+ 	for (; list; list = list->next) {
 -- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+on behalf of ST-Ericsson
+
