@@ -1,58 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 6 Mar 2012 14:54:56 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Michal Labedzki <michal.labedzki@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-	lucas.demarchi@profusion.mobi
-Subject: Re: [PATCH v2 2/2] avrcp: Add error code for rejected vendor command
-Message-ID: <20120306225456.GA14144@x220.amr.corp.intel.com>
-References: <CAMOw1v6pNC7eebGEAMLEWKNJ8NaR2aUweigMCEzbG5_0wgkUTA%40mail.gmail.com>
- <1331045765-24790-1-git-send-email-michal.labedzki@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1331045765-24790-1-git-send-email-michal.labedzki@tieto.com>
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] Bluetooth: Add hci_cancel_le_scan() to hci_core
+Date: Tue,  6 Mar 2012 19:54:33 -0300
+Message-Id: <1331074474-12868-2-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1331074474-12868-1-git-send-email-andre.guedes@openbossa.org>
+References: <1331074474-12868-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+This patch adds to hci_core the hci_cancel_le_scan function which
+should be used to cancel an ongoing LE scan.
 
-On Tue, Mar 06, 2012, Michal Labedzki wrote:
-> diff --git a/audio/avctp.h b/audio/avctp.h
-> index 9727485..a1109a9 100644
-> --- a/audio/avctp.h
-> +++ b/audio/avctp.h
-> @@ -97,3 +97,8 @@ int avctp_send_passthrough(struct avctp *session, uint8_t op);
->  int avctp_send_vendordep(struct avctp *session, uint8_t transaction,
->  				uint8_t code, uint8_t subunit,
->  				uint8_t *operands, size_t operand_count);
-> +
-> +size_t handle_vendor_reject(struct avctp *session, uint8_t transaction,
-> +					uint8_t *code, uint8_t *subunit,
-> +					uint8_t *operands, size_t operand_count,
-> +					void *user_data);
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_core.c         |   21 +++++++++++++++++++++
+ 2 files changed, 22 insertions(+)
 
-You should follow the existing name-spacing of the .h file. Actually
-this shouldn't be in avctp.h at all since the implementation is in
-avrcp.c. So move to avrcp.h and add the appropriate prefix.
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 25cb0a1..0db2934 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1072,5 +1072,6 @@ int hci_do_inquiry(struct hci_dev *hdev, u8 length);
+ int hci_cancel_inquiry(struct hci_dev *hdev);
+ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
+ 								int timeout);
++int hci_cancel_le_scan(struct hci_dev *hdev);
+ 
+ #endif /* __HCI_CORE_H */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 661d65f..0c2ceaa 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1672,6 +1672,27 @@ static int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval,
+ 	return 0;
+ }
+ 
++int hci_cancel_le_scan(struct hci_dev *hdev)
++{
++	bool canceled;
++
++	BT_DBG("%s", hdev->name);
++
++	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
++		return -EPERM;
++
++	canceled = cancel_delayed_work(&hdev->le_scan_disable);
++	if (canceled) {
++		struct hci_cp_le_set_scan_enable cp;
++
++		/* Send HCI command to disable LE Scan */
++		memset(&cp, 0, sizeof(cp));
++		hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
++	}
++
++	return 0;
++}
++
+ static void le_scan_disable_work(struct work_struct *work)
+ {
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev,
+-- 
+1.7.9.2
 
-> \ No newline at end of file
-
-Please fix the above.
-
-> diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index 4573133..2d29d56 100644
-> --- a/audio/avrcp.c
-> +++ b/audio/avrcp.c
-> @@ -862,6 +862,7 @@ static uint8_t avrcp_handle_get_play_status(struct avrcp_player *player,
->  	position = player->cb->get_position(player->user_data);
->  	pduration = player->cb->get_metadata(AVRCP_MEDIA_ATTRIBUTE_DURATION,
->  							player->user_data);
-> +
->  	if (pduration != NULL)
->  		duration = htonl(GPOINTER_TO_UINT(pduration));
->  	else
-
-The above addition seems completely unrelated to the rest of the patch.
-Please remove it.
-
-Johan
