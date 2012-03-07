@@ -1,56 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix incorrect uninitialized assignment
-Date: Wed,  7 Mar 2012 14:51:45 +0200
-Message-Id: <1331124705-11023-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 7 Mar 2012 14:44:37 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: vinicius.gomes@openbossa.org
+Cc: linux-bluetooth@vger.kernel.org
+Subject: re: Bluetooth: Use the updated key structures for handling LTKs
+Message-ID: <20120307114437.GA13172@elgon.mountain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hello Vinicius Costa Gomes,
 
-Revert part of commit 8035ded4 which has introduced bug by
-assigning uninitialized value.
+The patch c9839a11c0e4: "Bluetooth: Use the updated key structures 
+for handling LTKs" from Feb 2, 2012, leads to the following Sparse
+warning: net/bluetooth/mgmt.c:2590:59: warning: incorrect type in
+argument 9 (different base types)
 
-...
-+ src/net/bluetooth/rfcomm/tty.c: warning: 'p' is used uninitialized in this
-	function:  => 218
-+ src/net/bluetooth/rfcomm/tty.c: warning: 'p' may be used uninitialized in
-	this function:  => 218
-...
++int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type, u8 type,
++                               int new_key, u8 authenticated, u8 tk[16],
++                               u8 enc_size, u16 ediv, u8 rand[8]);
+                                             ^^^^^^^^
++struct smp_ltk *hci_find_ltk_by_addr(struct hci_dev *hdev, bdaddr_t *bdaddr,
++                                                               u8 addr_type);
+ int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr);
+-int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
+-                       u8 key_size, __le16 ediv, u8 rand[8], u8 ltk[16]);
+                                     ^^^^^^^^^^^
+ int hci_smp_ltks_clear(struct hci_dev *hdev);
 
-Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/rfcomm/tty.c |    8 +++++---
- 1 files changed, 5 insertions(+), 3 deletions(-)
+We removed the endian notation from ediv, but it seems from a quick read
+that the __le16 was correct.  Btw, here is an article on how to use
+Sparse to find endian bugs:  http://lwn.net/Articles/205624/
 
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index a2d4f51..ca6c8a6 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -210,8 +210,8 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
- 	if (req->dev_id < 0) {
- 		dev->id = 0;
- 
--		list_for_each_entry(entry, &rfcomm_dev_list, list) {
--			if (entry->id != dev->id)
-+		list_for_each(p, &rfcomm_dev_list) {
-+			if (list_entry(p, struct rfcomm_dev, list)->id != dev->id)
- 				break;
- 
- 			dev->id++;
-@@ -220,7 +220,9 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
- 	} else {
- 		dev->id = req->dev_id;
- 
--		list_for_each_entry(entry, &rfcomm_dev_list, list) {
-+		list_for_each(p, &rfcomm_dev_list) {
-+			struct rfcomm_dev *entry = list_entry(p, struct rfcomm_dev, list);
-+
- 			if (entry->id == dev->id) {
- 				err = -EADDRINUSE;
- 				goto out;
--- 
-1.7.9
+regards,
+dan carpenter
 
