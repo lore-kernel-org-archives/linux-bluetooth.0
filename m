@@ -1,38 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 7 Mar 2012 14:44:37 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: vinicius.gomes@openbossa.org
-Cc: linux-bluetooth@vger.kernel.org
-Subject: re: Bluetooth: Use the updated key structures for handling LTKs
-Message-ID: <20120307114437.GA13172@elgon.mountain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH obexd] build: Fix libbluetooth dependency
+Date: Wed,  7 Mar 2012 13:11:39 +0200
+Message-Id: <1331118699-10591-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Vinicius Costa Gomes,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The patch c9839a11c0e4: "Bluetooth: Use the updated key structures 
-for handling LTKs" from Feb 2, 2012, leads to the following Sparse
-warning: net/bluetooth/mgmt.c:2590:59: warning: incorrect type in
-argument 9 (different base types)
+Building with libbluetooth prior to 4.99 cause an error:
 
-+int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type, u8 type,
-+                               int new_key, u8 authenticated, u8 tk[16],
-+                               u8 enc_size, u16 ediv, u8 rand[8]);
-                                             ^^^^^^^^
-+struct smp_ltk *hci_find_ltk_by_addr(struct hci_dev *hdev, bdaddr_t *bdaddr,
-+                                                               u8 addr_type);
- int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr);
--int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
--                       u8 key_size, __le16 ediv, u8 rand[8], u8 ltk[16]);
-                                     ^^^^^^^^^^^
- int hci_smp_ltks_clear(struct hci_dev *hdev);
+btio/btio.c: In function 'get_key_size':
+btio/btio.c:522:14: error: 'struct bt_security' has no member named 'key_size
 
-We removed the endian notation from ediv, but it seems from a quick read
-that the __le16 was correct.  Btw, here is an article on how to use
-Sparse to find endian bugs:  http://lwn.net/Articles/205624/
+Thanks to Bastien Nocera for reporting it.
+---
+ configure.ac |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-regards,
-dan carpenter
+diff --git a/configure.ac b/configure.ac
+index 10c561b..f54cce7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -89,8 +89,8 @@ AC_CHECK_LIB(dbus-1, dbus_connection_can_send_type, dummy=yes,
+ AC_SUBST(DBUS_CFLAGS)
+ AC_SUBST(DBUS_LIBS)
+ 
+-PKG_CHECK_MODULES(BLUEZ, bluez, dummy=yes,
+-				AC_MSG_ERROR(libbluetooth is required))
++PKG_CHECK_MODULES(BLUEZ, bluez >= 4.99, dummy=yes,
++				AC_MSG_ERROR(libbluetooth 4.99 or latter is required))
+ AC_SUBST(BLUEZ_CFLAGS)
+ AC_SUBST(BLUEZ_LIBS)
+ 
+-- 
+1.7.7.6
 
