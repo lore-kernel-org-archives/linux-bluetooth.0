@@ -1,162 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ido Yariv <ido@wizery.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ido Yariv <ido@wizery.com>, Arik Nemtsov <arik@wizery.com>
-Subject: [RFC v2] Bluetooth: Search global l2cap channels by src/dst addresses
-Date: Wed,  7 Mar 2012 21:04:24 +0200
-Message-Id: <1331147064-14057-1-git-send-email-ido@wizery.com>
-In-Reply-To: <20120307103520.GF3647@aemeltch-MOBL1>
-References: <20120307103520.GF3647@aemeltch-MOBL1>
+Subject: [PATCH] Bluetooth: Fix using uninitialized variable
+Date: Wed,  7 Mar 2012 20:20:14 +0200
+Message-Id: <1331144414-28513-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The cid or psm and the source address might not be enough to uniquely
-identify a global channel, especially when the source address is our
-own.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-For instance, when trying to communicate with two LE devices in master
-mode, data received from the both devices is sent to the same socket.
++ src/net/bluetooth/rfcomm/tty.c: warning: 'p' is used uninitialized in this
+       function:  => 218
++ src/net/bluetooth/rfcomm/tty.c: warning: 'p' may be used uninitialized in
+       this function:  => 218
 
-Fix this by taking the destination address into account when choosing
-the socket.
-
-Signed-off-by: Ido Yariv <ido@wizery.com>
-Signed-off-by: Arik Nemtsov <arik@wizery.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Note: Only the change done to l2cap_global_chan_by_scid was tested.
+ net/bluetooth/rfcomm/tty.c |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
- net/bluetooth/l2cap_core.c |   54 ++++++++++++++++++++++++++++++++++---------
- 1 files changed, 42 insertions(+), 12 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 0b1aabf..8510ab4 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -831,10 +831,12 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 	mutex_unlock(&conn->chan_lock);
- }
- 
--/* Find socket with cid and source bdaddr.
-+/* Find socket with cid and source/destination bdaddrs.
-  * Returns closest match, locked.
-  */
--static struct l2cap_chan *l2cap_global_chan_by_scid(int state, __le16 cid, bdaddr_t *src)
-+static struct l2cap_chan *l2cap_global_chan_by_scid(int state, __le16 cid,
-+						    bdaddr_t *src,
-+						    bdaddr_t *dst)
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index a2d4f51..c179734 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -196,7 +196,7 @@ static DEVICE_ATTR(channel, S_IRUGO, show_channel, NULL);
+ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
  {
- 	struct l2cap_chan *c, *c1 = NULL;
+ 	struct rfcomm_dev *dev, *entry;
+-	struct list_head *head = &rfcomm_dev_list, *p;
++	struct list_head *head = &rfcomm_dev_list;
+ 	int err = 0;
  
-@@ -847,14 +849,27 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, __le16 cid, bdadd
- 			continue;
+ 	BT_DBG("id %d channel %d", req->dev_id, req->channel);
+@@ -215,7 +215,7 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
+ 				break;
  
- 		if (c->scid == cid) {
-+			int src_match, dst_match;
-+			int src_any, dst_any;
-+
- 			/* Exact match. */
--			if (!bacmp(&bt_sk(sk)->src, src)) {
-+			src_match = !bacmp(&bt_sk(sk)->src, src);
-+			dst_match = !bacmp(&bt_sk(sk)->dst, dst);
-+			if (src_match && dst_match) {
- 				read_unlock(&chan_list_lock);
- 				return c;
- 			}
+ 			dev->id++;
+-			head = p;
++			head = &entry->list;
+ 		}
+ 	} else {
+ 		dev->id = req->dev_id;
+@@ -229,7 +229,7 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
+ 			if (entry->id > dev->id - 1)
+ 				break;
  
- 			/* Closest match */
--			if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY))
-+			dst_any = !bacmp(&bt_sk(sk)->dst, BDADDR_ANY);
-+			if (src_match && dst_any) {
-+				c1 = c;
-+				continue;
-+			}
-+
-+			src_any = !bacmp(&bt_sk(sk)->src, BDADDR_ANY);
-+			if ((src_any && dst_match) ||
-+			    (src_any && dst_any))
- 				c1 = c;
+-			head = p;
++			head = &entry->list;
  		}
  	}
-@@ -873,7 +888,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
- 
- 	/* Check if we have socket listening on cid */
- 	pchan = l2cap_global_chan_by_scid(BT_LISTEN, L2CAP_CID_LE_DATA,
--							conn->src);
-+					     conn->src, conn->dst);
- 	if (!pchan)
- 		return;
- 
-@@ -1101,10 +1116,12 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
- 
- /* ---- Socket interface ---- */
- 
--/* Find socket with psm and source bdaddr.
-+/* Find socket with psm and source/destination bdaddrs.
-  * Returns closest match.
-  */
--static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr_t *src)
-+static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
-+						   bdaddr_t *src,
-+						   bdaddr_t *dst)
- {
- 	struct l2cap_chan *c, *c1 = NULL;
- 
-@@ -1117,14 +1134,27 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr
- 			continue;
- 
- 		if (c->psm == psm) {
-+			int src_match, dst_match;
-+			int src_any, dst_any;
-+
- 			/* Exact match. */
--			if (!bacmp(&bt_sk(sk)->src, src)) {
-+			src_match = !bacmp(&bt_sk(sk)->src, src);
-+			dst_match = !bacmp(&bt_sk(sk)->dst, dst);
-+			if (src_match && dst_match) {
- 				read_unlock(&chan_list_lock);
- 				return c;
- 			}
- 
- 			/* Closest match */
--			if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY))
-+			dst_any = !bacmp(&bt_sk(sk)->dst, BDADDR_ANY);
-+			if (src_match && dst_any) {
-+				c1 = c;
-+				continue;
-+			}
-+
-+			src_any = !bacmp(&bt_sk(sk)->src, BDADDR_ANY);
-+			if ((src_any && dst_match) ||
-+			    (src_any && dst_any))
- 				c1 = c;
- 		}
- 	}
-@@ -2642,7 +2672,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 	BT_DBG("psm 0x%2.2x scid 0x%4.4x", psm, scid);
- 
- 	/* Check if we have socket listening on psm */
--	pchan = l2cap_global_chan_by_psm(BT_LISTEN, psm, conn->src);
-+	pchan = l2cap_global_chan_by_psm(BT_LISTEN, psm, conn->src, conn->dst);
- 	if (!pchan) {
- 		result = L2CAP_CR_BAD_PSM;
- 		goto sendresp;
-@@ -4370,7 +4400,7 @@ static inline int l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm, str
- {
- 	struct l2cap_chan *chan;
- 
--	chan = l2cap_global_chan_by_psm(0, psm, conn->src);
-+	chan = l2cap_global_chan_by_psm(0, psm, conn->src, conn->dst);
- 	if (!chan)
- 		goto drop;
- 
-@@ -4395,7 +4425,7 @@ static inline int l2cap_att_channel(struct l2cap_conn *conn, __le16 cid, struct
- {
- 	struct l2cap_chan *chan;
- 
--	chan = l2cap_global_chan_by_scid(0, cid, conn->src);
-+	chan = l2cap_global_chan_by_scid(0, cid, conn->src, conn->dst);
- 	if (!chan)
- 		goto drop;
  
 -- 
 1.7.7.6
