@@ -1,92 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 7 Mar 2012 11:22:15 +0200
+Date: Wed, 7 Mar 2012 11:19:31 +0200
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Ulisses Furquim <ulisses@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 2/2] Bluetooth: Process HCI callbacks in a workqueue
-Message-ID: <20120307092214.GD3647@aemeltch-MOBL1>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC 1/2] Bluetooth: General HCI callback implementation
+Message-ID: <20120307091929.GC3647@aemeltch-MOBL1>
 References: <1331039789-31519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1331039789-31519-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <CAA37ikYKJqpOj0JQ9x2DUQ2pYGos66WD4oodFchTDKA2UKFY0A@mail.gmail.com>
+ <201203061602.17443.szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CAA37ikYKJqpOj0JQ9x2DUQ2pYGos66WD4oodFchTDKA2UKFY0A@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <201203061602.17443.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ulisses,
+Hi Janc,
 
-On Tue, Mar 06, 2012 at 12:02:11PM -0300, Ulisses Furquim wrote:
-> >
-> > +struct cb_work {
+On Tue, Mar 06, 2012 at 04:02:17PM +0100, Szymon Janc wrote:
+> > +
+> > +struct cb_cmd {
 > 
-> Again, maybe hci_cb_work?
+> This name seems a bit too more generic to me, maybe prefix it with hci_?
 
 OK.
 
-> > +       struct work_struct work;
-> > +       struct hci_dev *hdev;
-> > +       struct cb_cmd *cmd;
+> 
+> > +	struct list_head list;
+> > +	u16 opcode;
+> > +	u8 status;
+> > +	void *opt;
+> > +	void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd);
+> > +	void (*destructor)(struct cb_cmd *cmd);
 > > +};
 > > +
-> > +static void hci_cb_work(struct work_struct *w)
+> >  #define NUM_REASSEMBLY 4
+> >  struct hci_dev {
+> >  	struct list_head list;
+> > @@ -237,6 +248,7 @@ struct hci_dev {
+> >  	__u16			init_last_cmd;
+> >  
+> >  	struct list_head	mgmt_pending;
+> > +	struct list_head	cb_list;
+> >  
+> >  	struct discovery_state	discovery;
+> >  	struct hci_conn_hash	conn_hash;
+> > @@ -1086,4 +1098,10 @@ int hci_cancel_inquiry(struct hci_dev *hdev);
+> >  int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
+> >  								int timeout);
+> >  
+> > +struct cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode);
+> > +int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
+> > +	void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd), void *opt,
+> > +				void (*destructor)(struct cb_cmd *cmd));
+> > +void hci_remove_cb(struct cb_cmd *cmd);
+> > +
+> >  #endif /* __HCI_CORE_H */
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index 5b1ddab..cdc0220 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -1826,6 +1826,8 @@ int hci_register_dev(struct hci_dev *hdev)
+> >  
+> >  	INIT_LIST_HEAD(&hdev->mgmt_pending);
+> >  
+> > +	INIT_LIST_HEAD(&hdev->cb_list);
+> > +
+> >  	INIT_LIST_HEAD(&hdev->blacklist);
+> >  
+> >  	INIT_LIST_HEAD(&hdev->uuids);
+> > @@ -2239,6 +2241,61 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+> >  	return 0;
+> >  }
+> >  
 > 
-> And here hci_cb_worker?
-
-Sounds good.
-
+> hci_add_cb could return error on failure and that could be used in hci_cmd_cb().
+> 
+> > +void hci_add_cb(struct hci_dev *hdev, __u16 opcode,
+> > +			void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd),
+> > +			void *opt, void (*destructor)(struct cb_cmd *cmd))
 > > +{
-> > +       struct cb_work *work = (struct cb_work *) w;
-> > +       struct cb_cmd *cmd = work->cmd;
-> > +       struct hci_dev *hdev = work->hdev;
+> > +	struct cb_cmd *cmd;
 > > +
-> > +       cmd->cb(hdev, cmd);
+> > +	cmd = kmalloc(sizeof(*cmd), GFP_ATOMIC);
+> 
+> Why atomic? Maybe allow to pass custom gfp mask?
+
+I think I will use GFP_KERNEL as Ulisses suggested. I have used the code
+when we had tasklets.
+
+> 
+> > +	if (!cmd)
+> > +		return;
 > > +
-> > +       hci_dev_put(hdev);
+> > +	cmd->cb = cb;
+> > +	cmd->opcode = opcode;
+> > +	cmd->opt = opt;
+> > +	cmd->status = 0;
 > > +
-> > +       hci_remove_cb(cmd);
-> > +       kfree(w);
+> > +	if (destructor)
+> > +		cmd->destructor = destructor;
+> 
+> That could leave cmd->destructor uninitialized (cmd is allocated with kmalloc).
+> I would assign destructor unconditionally.
+
+This makes sense.
+
+> > +
+> > +	list_add(&cmd->list, &hdev->cb_list);
 > > +}
 > > +
-> > +void hci_queue_cb(struct hci_dev *hdev, struct cb_cmd *cmd,
-> > +                                       struct workqueue_struct *workqueue)
+> > +struct cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
 > > +{
-> > +       struct cb_work *work;
+> > +	struct cb_cmd *cmd;
 > > +
-> > +       BT_ERR("Queue cmd %p opt %p", cmd, cmd->opt);
+> > +	list_for_each_entry(cmd, &hdev->cb_list, list)
+> > +		if (cmd->opcode == opcode)
+> > +			return cmd;
 > > +
-> > +       work = kmalloc(sizeof(*work), GFP_ATOMIC);
-> 
-> Why not GFP_KERNEL?
-
-Sure.
-
-> 
-> > +       if (!work)
-> > +               return;
-> > +
-> > +       INIT_WORK(&work->work, hci_cb_work);
-> > +       work->hdev = hdev;
-> > +       work->cmd = cmd;
-> > +       hci_dev_hold(hdev);
-> > +
-> > +       if (!queue_work(workqueue, &work->work)) {
-> > +               kfree(work);
-> > +               hci_dev_put(hdev);
-> > +       }
+> > +	return NULL;
 > > +}
 > > +
-> >  void hci_remove_cb(struct cb_cmd *cmd)
-> >  {
-> >        list_del(&cmd->list);
+> > +void hci_remove_cb(struct cb_cmd *cmd)
+> > +{
+> > +	list_del(&cmd->list);
+> > +
+> > +	if (cmd->destructor) {
+> > +		cmd->destructor(cmd);
+> > +	} else {
+> > +		kfree(cmd->opt);
+> > +		kfree(cmd);
+> > +	}
+> > +}
+> > +
+> > +/* Send HCI command with callback */
+> > +int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
+> > +			void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd),
+> > +			void *opt, void (*destructor)(struct cb_cmd *cmd))
+> > +{
+> > +	if (cb)
+> > +		hci_add_cb(hdev, opcode, cb, opt, destructor);
 > 
-> And again, no callers of hci_queue_cb so I'm assuming you'll only use
-> in for AMP, is that it?
+> Is this if really needed? If one would like to send cmd without cb he can just
+> call hci_send_cmd directly. And I would also check if hci_add_cb failed before
+> sending command.
 
-Yes, so far.
-
-Thanks for the review.
+OK I will change the code this way.
 
 Best regards 
 Andrei Emeltchenko 
-
