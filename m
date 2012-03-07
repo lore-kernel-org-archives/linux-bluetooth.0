@@ -1,91 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michal Labedzki <michal.labedzki@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <luiz.dentz@gmail.com>, <lucas.demarchi@profusion.mobi>,
-	<johan.hedberg@gmail.com>,
-	Michal Labedzki <michal.labedzki@tieto.com>
-Subject: [PATCH v3] avrcp: Add error code for rejected vendor command
-Date: Wed, 7 Mar 2012 17:23:14 +0100
-Message-ID: <1331137394-27292-1-git-send-email-michal.labedzki@tieto.com>
-In-Reply-To: <CAMOw1v6pNC7eebGEAMLEWKNJ8NaR2aUweigMCEzbG5_0wgkUTA@mail.gmail.com>
-References: <CAMOw1v6pNC7eebGEAMLEWKNJ8NaR2aUweigMCEzbG5_0wgkUTA@mail.gmail.com>
+Date: Wed, 7 Mar 2012 18:17:14 +0200
+From: Ido Yariv <ido@wizery.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Arik Nemtsov <arik@wizery.com>
+Subject: Re: [RFC] Bluetooth: Search global l2cap channels by src/dst
+ addresses
+Message-ID: <20120307161714.GA6802@WorkStation>
+References: <1330971024-11010-1-git-send-email-ido@wizery.com>
+ <20120307103520.GF3647@aemeltch-MOBL1>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120307103520.GF3647@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix response for any vendor commands when there are no players
-registered. According to the specification responses should be
-REJECTED with error code.
+Hi Andrei,
 
-"For error response PDU the response parameter is always the
-error code independent of the response format defined for
-ACCEPTED PDU response for the corresponding PDU command."
-(source: section 4.7.9 of AVRCP 1.3 specification)
----
- audio/avctp.c |    4 +++-
- audio/avrcp.c |   15 +++++++++++++++
- audio/avrcp.h |    2 ++
- 3 files changed, 20 insertions(+), 1 deletions(-)
+On Wed, Mar 07, 2012 at 12:35:22PM +0200, Andrei Emeltchenko wrote:
+> Hi Ido,
+> 
+> On Mon, Mar 05, 2012 at 08:10:24PM +0200, Ido Yariv wrote:
+> > The cid or psm and the source address might not be enough to uniquely
+> > identify a global channel, especially when the source address is our
+> > own.
+> > 
+> > For instance, when trying to communicate with two LE devices in master
+> > mode, data received from the both devices is sent to the same socket.
+> > 
+> > Fix this by taking the destination address into account when choosing
+> > the socket.
+> > 
+> > Signed-off-by: Ido Yariv <ido@wizery.com>
+> > Signed-off-by: Arik Nemtsov <arik@wizery.com>
+> > ---
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index 5bd5db1..dfad9fd 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -53,6 +53,7 @@
- #include "manager.h"
- #include "device.h"
- #include "avctp.h"
-+#include "avrcp.h"
- 
- #define QUIRK_NO_RELEASE 1 << 0
- 
-@@ -464,7 +465,8 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
- 	handler = find_handler(handlers, avc->opcode);
- 	if (!handler) {
- 		DBG("handler not found for 0x%02x", avc->opcode);
--		avc->code = AVC_CTYPE_REJECTED;
-+		packet_size += avrcp_handle_vendor_reject(&code, operands);
-+		avc->code = code;
- 		goto done;
- 	}
- 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 4573133..8eba046 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -1092,6 +1092,21 @@ err_metadata:
- 	return AVRCP_HEADER_LENGTH + 1;
- }
- 
-+size_t avrcp_handle_vendor_reject(uint8_t *code, uint8_t *operands)
-+{
-+    struct avrcp_header *pdu = (void *) operands;
-+    uint32_t company_id = get_company_id(pdu->company_id);
-+
-+    *code = AVC_CTYPE_REJECTED;
-+    pdu->params_len = htons(1);
-+    pdu->params[0] = E_INTERNAL;
-+
-+    DBG("rejecting AVRCP PDU 0x%02X, company 0x%06X len 0x%04X",
-+            pdu->pdu_id, company_id, pdu->params_len);
-+
-+    return AVRCP_HEADER_LENGTH + 1;
-+}
-+
- static struct avrcp_server *find_server(GSList *list, const bdaddr_t *src)
- {
- 	for (; list; list = list->next) {
-diff --git a/audio/avrcp.h b/audio/avrcp.h
-index fb64f3b..8a09546 100644
---- a/audio/avrcp.h
-+++ b/audio/avrcp.h
-@@ -98,3 +98,5 @@ struct avrcp_player *avrcp_register_player(const bdaddr_t *src,
- void avrcp_unregister_player(struct avrcp_player *player);
- 
- int avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data);
-+
-+size_t avrcp_handle_vendor_reject(uint8_t *code, uint8_t *operands);
--- 
-on behalf of ST-Ericsson
+...
 
+> > @@ -847,14 +849,24 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, __le16 cid, bdadd
+> >  			continue;
+> >  
+> >  		if (c->scid == cid) {
+> > +			int src_match, dst_match;
+> > +			int src_any, dst_any;
+> > +
+> > +			src_match = !bacmp(&bt_sk(sk)->src, src);
+> > +			dst_match = !bacmp(&bt_sk(sk)->dst, dst);
+> > +			src_any = !bacmp(&bt_sk(sk)->src, BDADDR_ANY);
+> > +			dst_any = !bacmp(&bt_sk(sk)->dst, BDADDR_ANY);
+> 
+> This may be not efficient to use extensive memcmp operations every time
+> before they can be actually used.
+> 
+> > +
+> >  			/* Exact match. */
+> > -			if (!bacmp(&bt_sk(sk)->src, src)) {
+> > +			if (src_match && dst_match) {
+> >  				read_unlock(&chan_list_lock);
+> >  				return c;
+> >  			}
+> 
+> at least src_any and dst_any may be put here. Maybe you could improve it
+> even more.
+
+Sure, I'll send an updated version.
+
+Thanks for the review,
+Ido.
