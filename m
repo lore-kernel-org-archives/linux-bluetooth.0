@@ -1,73 +1,163 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1331147689.3392.181.camel@aeonflux>
-Subject: Re: [RFC BlueZ 3/3] core: Add Interfaces property to
- org.bluez.Device
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Date: Wed, 07 Mar 2012 11:14:49 -0800
-In-Reply-To: <CABBYNZK+Te2_dXweZ9xMPv8+ha9V9W_bLC2SuEpu7EQiinrFPw@mail.gmail.com>
-References: <1331035658-10000-1-git-send-email-luiz.dentz@gmail.com>
-	 <1331035658-10000-3-git-send-email-luiz.dentz@gmail.com>
-	 <CAJdJm_OmpNXq-hhqAQTXn-rvOk1eJhfQzuGdt2pQLRaa4+F1og@mail.gmail.com>
-	 <CABBYNZL3tUpmqEHPx+6LJkJjZMDf7ajc0d-x_n51=i6HX03nng@mail.gmail.com>
-	 <1331044542.3392.168.camel@aeonflux>
-	 <CABBYNZK+Te2_dXweZ9xMPv8+ha9V9W_bLC2SuEpu7EQiinrFPw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Ido Yariv <ido@wizery.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ido Yariv <ido@wizery.com>, Arik Nemtsov <arik@wizery.com>
+Subject: [RFC v2] Bluetooth: Search global l2cap channels by src/dst addresses
+Date: Wed,  7 Mar 2012 21:04:24 +0200
+Message-Id: <1331147064-14057-1-git-send-email-ido@wizery.com>
+In-Reply-To: <20120307103520.GF3647@aemeltch-MOBL1>
+References: <20120307103520.GF3647@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+The cid or psm and the source address might not be enough to uniquely
+identify a global channel, especially when the source address is our
+own.
 
-> >> > On Tue, Mar 6, 2012 at 8:07 AM, Luiz Augusto von Dentz
-> >> > <luiz.dentz@gmail.com> wrote:
-> >> >> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >> >>
-> >> >> This enables applications to be able to detect when an interface is
-> >> >> enabled/disabled without depending on UUIDs.
-> >> >> ---
-> >> >>  doc/device-api.txt |    4 ++++
-> >> >>  src/device.c       |   27 ++++++++++++++++++++++-----
-> >> >>  2 files changed, 26 insertions(+), 5 deletions(-)
-> >> >
-> >> > I thought it was possible to achieve this by using D-Bus listeners?
-> >> > E.g. similar to g_dbus_add_service_watch()
-> >>
-> >> Afaik there is no such thing as introspection data changed or anything
-> >> like that, we could in theory have local listeners, but at least in
-> >> BlueZ there is no much use for them since it is not really dynamic
-> >> after drivers are loaded, but perhaps for oFono and others it could be
-> >> useful to have some way to watch when interfaces changes.
-> >>
-> >> In case of oFono it does that by having e.g.
-> >> ofono_modem_add_interface/ofono_modem_remove_interface.
-> >>
-> >> > What happens when the interface is unregistered with
-> >> > g_dbus_unregister_interface() ?
-> >>
-> >> This should only be the case when removing the object so the driver
-> >> .remove is called which then calls g_dbus_unregister_interface.
-> >
-> > I was not planning to add this to our gdbus code and focus on getting
-> > this right for ELL. However look into the D-Bus ObjectManager
-> > specification since that is what you want actually.
-> 
-> So the way forward is to implement ObjectManager? We could have that
-> without breaking any API, but I guess it would make sense to change
-> API such as the manager to take advantage of the ObjectManager.
+For instance, when trying to communicate with two LE devices in master
+mode, data received from the both devices is sent to the same socket.
 
-have a look at ObjectManager and how much it takes for us to use it. I
-know that the properties will be a bit of problem, but maybe still worth
-it to start supporting it.
+Fix this by taking the destination address into account when choosing
+the socket.
 
-> Btw what is ELL?
+Signed-off-by: Ido Yariv <ido@wizery.com>
+Signed-off-by: Arik Nemtsov <arik@wizery.com>
+---
+Note: Only the change done to l2cap_global_chan_by_scid was tested.
 
-http://git.kernel.org/?p=libs/ell/ell.git
+ net/bluetooth/l2cap_core.c |   54 ++++++++++++++++++++++++++++++++++---------
+ 1 files changed, 42 insertions(+), 12 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 0b1aabf..8510ab4 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -831,10 +831,12 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 	mutex_unlock(&conn->chan_lock);
+ }
+ 
+-/* Find socket with cid and source bdaddr.
++/* Find socket with cid and source/destination bdaddrs.
+  * Returns closest match, locked.
+  */
+-static struct l2cap_chan *l2cap_global_chan_by_scid(int state, __le16 cid, bdaddr_t *src)
++static struct l2cap_chan *l2cap_global_chan_by_scid(int state, __le16 cid,
++						    bdaddr_t *src,
++						    bdaddr_t *dst)
+ {
+ 	struct l2cap_chan *c, *c1 = NULL;
+ 
+@@ -847,14 +849,27 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, __le16 cid, bdadd
+ 			continue;
+ 
+ 		if (c->scid == cid) {
++			int src_match, dst_match;
++			int src_any, dst_any;
++
+ 			/* Exact match. */
+-			if (!bacmp(&bt_sk(sk)->src, src)) {
++			src_match = !bacmp(&bt_sk(sk)->src, src);
++			dst_match = !bacmp(&bt_sk(sk)->dst, dst);
++			if (src_match && dst_match) {
+ 				read_unlock(&chan_list_lock);
+ 				return c;
+ 			}
+ 
+ 			/* Closest match */
+-			if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY))
++			dst_any = !bacmp(&bt_sk(sk)->dst, BDADDR_ANY);
++			if (src_match && dst_any) {
++				c1 = c;
++				continue;
++			}
++
++			src_any = !bacmp(&bt_sk(sk)->src, BDADDR_ANY);
++			if ((src_any && dst_match) ||
++			    (src_any && dst_any))
+ 				c1 = c;
+ 		}
+ 	}
+@@ -873,7 +888,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 
+ 	/* Check if we have socket listening on cid */
+ 	pchan = l2cap_global_chan_by_scid(BT_LISTEN, L2CAP_CID_LE_DATA,
+-							conn->src);
++					     conn->src, conn->dst);
+ 	if (!pchan)
+ 		return;
+ 
+@@ -1101,10 +1116,12 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+ 
+ /* ---- Socket interface ---- */
+ 
+-/* Find socket with psm and source bdaddr.
++/* Find socket with psm and source/destination bdaddrs.
+  * Returns closest match.
+  */
+-static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr_t *src)
++static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
++						   bdaddr_t *src,
++						   bdaddr_t *dst)
+ {
+ 	struct l2cap_chan *c, *c1 = NULL;
+ 
+@@ -1117,14 +1134,27 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr
+ 			continue;
+ 
+ 		if (c->psm == psm) {
++			int src_match, dst_match;
++			int src_any, dst_any;
++
+ 			/* Exact match. */
+-			if (!bacmp(&bt_sk(sk)->src, src)) {
++			src_match = !bacmp(&bt_sk(sk)->src, src);
++			dst_match = !bacmp(&bt_sk(sk)->dst, dst);
++			if (src_match && dst_match) {
+ 				read_unlock(&chan_list_lock);
+ 				return c;
+ 			}
+ 
+ 			/* Closest match */
+-			if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY))
++			dst_any = !bacmp(&bt_sk(sk)->dst, BDADDR_ANY);
++			if (src_match && dst_any) {
++				c1 = c;
++				continue;
++			}
++
++			src_any = !bacmp(&bt_sk(sk)->src, BDADDR_ANY);
++			if ((src_any && dst_match) ||
++			    (src_any && dst_any))
+ 				c1 = c;
+ 		}
+ 	}
+@@ -2642,7 +2672,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 	BT_DBG("psm 0x%2.2x scid 0x%4.4x", psm, scid);
+ 
+ 	/* Check if we have socket listening on psm */
+-	pchan = l2cap_global_chan_by_psm(BT_LISTEN, psm, conn->src);
++	pchan = l2cap_global_chan_by_psm(BT_LISTEN, psm, conn->src, conn->dst);
+ 	if (!pchan) {
+ 		result = L2CAP_CR_BAD_PSM;
+ 		goto sendresp;
+@@ -4370,7 +4400,7 @@ static inline int l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm, str
+ {
+ 	struct l2cap_chan *chan;
+ 
+-	chan = l2cap_global_chan_by_psm(0, psm, conn->src);
++	chan = l2cap_global_chan_by_psm(0, psm, conn->src, conn->dst);
+ 	if (!chan)
+ 		goto drop;
+ 
+@@ -4395,7 +4425,7 @@ static inline int l2cap_att_channel(struct l2cap_conn *conn, __le16 cid, struct
+ {
+ 	struct l2cap_chan *chan;
+ 
+-	chan = l2cap_global_chan_by_scid(0, cid, conn->src);
++	chan = l2cap_global_chan_by_scid(0, cid, conn->src, conn->dst);
+ 	if (!chan)
+ 		goto drop;
+ 
+-- 
+1.7.7.6
 
