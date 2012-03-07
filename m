@@ -1,55 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix using uninitialized variable
-Date: Wed,  7 Mar 2012 20:20:14 +0200
-Message-Id: <1331144414-28513-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 7 Mar 2012 15:02:38 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Bluetooth: Use the updated key structures for handling LTKs
+Message-ID: <20120307180237.GA5107@samus>
+References: <20120307114437.GA13172@elgon.mountain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120307114437.GA13172@elgon.mountain>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Dan,
 
-+ src/net/bluetooth/rfcomm/tty.c: warning: 'p' is used uninitialized in this
-       function:  => 218
-+ src/net/bluetooth/rfcomm/tty.c: warning: 'p' may be used uninitialized in
-       this function:  => 218
+On 14:44 Wed 07 Mar, Dan Carpenter wrote:
+> Hello Vinicius Costa Gomes,
+> 
+> The patch c9839a11c0e4: "Bluetooth: Use the updated key structures 
+> for handling LTKs" from Feb 2, 2012, leads to the following Sparse
+> warning: net/bluetooth/mgmt.c:2590:59: warning: incorrect type in
+> argument 9 (different base types)
+> 
+> +int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type, u8 type,
+> +                               int new_key, u8 authenticated, u8 tk[16],
+> +                               u8 enc_size, u16 ediv, u8 rand[8]);
+>                                              ^^^^^^^^
+> +struct smp_ltk *hci_find_ltk_by_addr(struct hci_dev *hdev, bdaddr_t *bdaddr,
+> +                                                               u8 addr_type);
+>  int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr);
+> -int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
+> -                       u8 key_size, __le16 ediv, u8 rand[8], u8 ltk[16]);
+>                                      ^^^^^^^^^^^
+>  int hci_smp_ltks_clear(struct hci_dev *hdev);
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/rfcomm/tty.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+Thanks for the heads up, will fix it.
 
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index a2d4f51..c179734 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -196,7 +196,7 @@ static DEVICE_ATTR(channel, S_IRUGO, show_channel, NULL);
- static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
- {
- 	struct rfcomm_dev *dev, *entry;
--	struct list_head *head = &rfcomm_dev_list, *p;
-+	struct list_head *head = &rfcomm_dev_list;
- 	int err = 0;
- 
- 	BT_DBG("id %d channel %d", req->dev_id, req->channel);
-@@ -215,7 +215,7 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
- 				break;
- 
- 			dev->id++;
--			head = p;
-+			head = &entry->list;
- 		}
- 	} else {
- 		dev->id = req->dev_id;
-@@ -229,7 +229,7 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
- 			if (entry->id > dev->id - 1)
- 				break;
- 
--			head = p;
-+			head = &entry->list;
- 		}
- 	}
- 
+> 
+> We removed the endian notation from ediv, but it seems from a quick read
+> that the __le16 was correct.  Btw, here is an article on how to use
+> Sparse to find endian bugs:  http://lwn.net/Articles/205624/
+> 
+> regards,
+> dan carpenter
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Cheers,
 -- 
-1.7.7.6
-
+Vinicius
