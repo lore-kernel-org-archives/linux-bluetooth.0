@@ -1,12 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1331147816.3392.182.camel@aeonflux>
-Subject: Re: [PATCH obexd] build: Fix libbluetooth dependency
+Message-ID: <1331147689.3392.181.camel@aeonflux>
+Subject: Re: [RFC BlueZ 3/3] core: Add Interfaces property to
+ org.bluez.Device
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 07 Mar 2012 11:16:56 -0800
-In-Reply-To: <1331118699-10591-1-git-send-email-luiz.dentz@gmail.com>
-References: <1331118699-10591-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Date: Wed, 07 Mar 2012 11:14:49 -0800
+In-Reply-To: <CABBYNZK+Te2_dXweZ9xMPv8+ha9V9W_bLC2SuEpu7EQiinrFPw@mail.gmail.com>
+References: <1331035658-10000-1-git-send-email-luiz.dentz@gmail.com>
+	 <1331035658-10000-3-git-send-email-luiz.dentz@gmail.com>
+	 <CAJdJm_OmpNXq-hhqAQTXn-rvOk1eJhfQzuGdt2pQLRaa4+F1og@mail.gmail.com>
+	 <CABBYNZL3tUpmqEHPx+6LJkJjZMDf7ajc0d-x_n51=i6HX03nng@mail.gmail.com>
+	 <1331044542.3392.168.camel@aeonflux>
+	 <CABBYNZK+Te2_dXweZ9xMPv8+ha9V9W_bLC2SuEpu7EQiinrFPw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,19 +21,50 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-> Building with libbluetooth prior to 4.99 cause an error:
+> >> > On Tue, Mar 6, 2012 at 8:07 AM, Luiz Augusto von Dentz
+> >> > <luiz.dentz@gmail.com> wrote:
+> >> >> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >> >>
+> >> >> This enables applications to be able to detect when an interface is
+> >> >> enabled/disabled without depending on UUIDs.
+> >> >> ---
+> >> >>  doc/device-api.txt |    4 ++++
+> >> >>  src/device.c       |   27 ++++++++++++++++++++++-----
+> >> >>  2 files changed, 26 insertions(+), 5 deletions(-)
+> >> >
+> >> > I thought it was possible to achieve this by using D-Bus listeners?
+> >> > E.g. similar to g_dbus_add_service_watch()
+> >>
+> >> Afaik there is no such thing as introspection data changed or anything
+> >> like that, we could in theory have local listeners, but at least in
+> >> BlueZ there is no much use for them since it is not really dynamic
+> >> after drivers are loaded, but perhaps for oFono and others it could be
+> >> useful to have some way to watch when interfaces changes.
+> >>
+> >> In case of oFono it does that by having e.g.
+> >> ofono_modem_add_interface/ofono_modem_remove_interface.
+> >>
+> >> > What happens when the interface is unregistered with
+> >> > g_dbus_unregister_interface() ?
+> >>
+> >> This should only be the case when removing the object so the driver
+> >> .remove is called which then calls g_dbus_unregister_interface.
+> >
+> > I was not planning to add this to our gdbus code and focus on getting
+> > this right for ELL. However look into the D-Bus ObjectManager
+> > specification since that is what you want actually.
 > 
-> btio/btio.c: In function 'get_key_size':
-> btio/btio.c:522:14: error: 'struct bt_security' has no member named 'key_size
-> 
-> Thanks to Bastien Nocera for reporting it.
-> ---
->  configure.ac |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
+> So the way forward is to implement ObjectManager? We could have that
+> without breaking any API, but I guess it would make sense to change
+> API such as the manager to take advantage of the ObjectManager.
 
-I rather not have this patch included since it makes things complicated
-for people to build this. Copying over just the header is good enough to
-fix this.
+have a look at ObjectManager and how much it takes for us to use it. I
+know that the properties will be a bit of problem, but maybe still worth
+it to start supporting it.
+
+> Btw what is ELL?
+
+http://git.kernel.org/?p=libs/ell/ell.git
 
 Regards
 
