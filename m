@@ -1,177 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 7 Mar 2012 11:13:27 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Ulisses Furquim <ulisses@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 1/2] Bluetooth: General HCI callback implementation
-Message-ID: <20120307091325.GB3647@aemeltch-MOBL1>
-References: <1331039789-31519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <CAA37ikbqQAb-qrgACxg28aUR3rMQ2=C810X+kLyeOSqYUbUfEw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CAA37ikbqQAb-qrgACxg28aUR3rMQ2=C810X+kLyeOSqYUbUfEw@mail.gmail.com>
+In-Reply-To: <1331044542.3392.168.camel@aeonflux>
+References: <1331035658-10000-1-git-send-email-luiz.dentz@gmail.com>
+	<1331035658-10000-3-git-send-email-luiz.dentz@gmail.com>
+	<CAJdJm_OmpNXq-hhqAQTXn-rvOk1eJhfQzuGdt2pQLRaa4+F1og@mail.gmail.com>
+	<CABBYNZL3tUpmqEHPx+6LJkJjZMDf7ajc0d-x_n51=i6HX03nng@mail.gmail.com>
+	<1331044542.3392.168.camel@aeonflux>
+Date: Wed, 7 Mar 2012 10:14:18 +0200
+Message-ID: <CABBYNZK+Te2_dXweZ9xMPv8+ha9V9W_bLC2SuEpu7EQiinrFPw@mail.gmail.com>
+Subject: Re: [RFC BlueZ 3/3] core: Add Interfaces property to org.bluez.Device
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ulisses,
+Hi Marcel,
 
-On Tue, Mar 06, 2012 at 11:57:59AM -0300, Ulisses Furquim wrote:
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> > index d12e353..2ef515e 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -131,6 +131,17 @@ struct le_scan_params {
-> >
-> >  #define HCI_MAX_SHORT_NAME_LENGTH      10
-> >
-> > +struct hci_dev;
-> > +
-> > +struct cb_cmd {
-> 
-> Maybe a better name here with a prefix? hci_cb_cmd?
+On Tue, Mar 6, 2012 at 4:35 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
+>
+>> > On Tue, Mar 6, 2012 at 8:07 AM, Luiz Augusto von Dentz
+>> > <luiz.dentz@gmail.com> wrote:
+>> >> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> >>
+>> >> This enables applications to be able to detect when an interface is
+>> >> enabled/disabled without depending on UUIDs.
+>> >> ---
+>> >>  doc/device-api.txt |    4 ++++
+>> >>  src/device.c       |   27 ++++++++++++++++++++++-----
+>> >>  2 files changed, 26 insertions(+), 5 deletions(-)
+>> >
+>> > I thought it was possible to achieve this by using D-Bus listeners?
+>> > E.g. similar to g_dbus_add_service_watch()
+>>
+>> Afaik there is no such thing as introspection data changed or anything
+>> like that, we could in theory have local listeners, but at least in
+>> BlueZ there is no much use for them since it is not really dynamic
+>> after drivers are loaded, but perhaps for oFono and others it could be
+>> useful to have some way to watch when interfaces changes.
+>>
+>> In case of oFono it does that by having e.g.
+>> ofono_modem_add_interface/ofono_modem_remove_interface.
+>>
+>> > What happens when the interface is unregistered with
+>> > g_dbus_unregister_interface() ?
+>>
+>> This should only be the case when removing the object so the driver
+>> .remove is called which then calls g_dbus_unregister_interface.
+>
+> I was not planning to add this to our gdbus code and focus on getting
+> this right for ELL. However look into the D-Bus ObjectManager
+> specification since that is what you want actually.
 
-Yes agree, I will change it to hci_cb_cmd.
+So the way forward is to implement ObjectManager? We could have that
+without breaking any API, but I guess it would make sense to change
+API such as the manager to take advantage of the ObjectManager.
 
-> 
-> > +       struct list_head list;
-> > +       u16 opcode;
-> > +       u8 status;
-> > +       void *opt;
-> > +       void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd);
-> > +       void (*destructor)(struct cb_cmd *cmd);
-> > +};
-> > +
-> >  #define NUM_REASSEMBLY 4
-> >  struct hci_dev {
-> >        struct list_head list;
-> > @@ -237,6 +248,7 @@ struct hci_dev {
-> >        __u16                   init_last_cmd;
-> >
-> >        struct list_head        mgmt_pending;
-> > +       struct list_head        cb_list;
-> >
-> >        struct discovery_state  discovery;
-> >        struct hci_conn_hash    conn_hash;
-> > @@ -1086,4 +1098,10 @@ int hci_cancel_inquiry(struct hci_dev *hdev);
-> >  int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
-> >                                                                int timeout);
-> >
-> > +struct cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode);
-> > +int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
-> > +       void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd), void *opt,
-> > +                               void (*destructor)(struct cb_cmd *cmd));
-> 
-> This line is very ugly and hard to read. Maybe have a longer line like
-> other parts of the kernel seem to be accepting now?
+Btw what is ELL?
 
-Do you mean line over 80 characters? I think checkpatch do not like that.
 
-> 
-> > +void hci_remove_cb(struct cb_cmd *cmd);
-> > +
-> >  #endif /* __HCI_CORE_H */
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index 5b1ddab..cdc0220 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -1826,6 +1826,8 @@ int hci_register_dev(struct hci_dev *hdev)
-> >
-> >        INIT_LIST_HEAD(&hdev->mgmt_pending);
-> >
-> > +       INIT_LIST_HEAD(&hdev->cb_list);
-> > +
-> >        INIT_LIST_HEAD(&hdev->blacklist);
-> >
-> >        INIT_LIST_HEAD(&hdev->uuids);
-> > @@ -2239,6 +2241,61 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
-> >        return 0;
-> >  }
-> >
-> > +void hci_add_cb(struct hci_dev *hdev, __u16 opcode,
-> > +                       void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd),
-> > +                       void *opt, void (*destructor)(struct cb_cmd *cmd))
-> > +{
-> > +       struct cb_cmd *cmd;
-> > +
-> > +       cmd = kmalloc(sizeof(*cmd), GFP_ATOMIC);
-> > +       if (!cmd)
-> > +               return;
-> > +
-> > +       cmd->cb = cb;
-> > +       cmd->opcode = opcode;
-> > +       cmd->opt = opt;
-> > +       cmd->status = 0;
-> > +
-> > +       if (destructor)
-> > +               cmd->destructor = destructor;
-> > +
-> > +       list_add(&cmd->list, &hdev->cb_list);
-> 
-> Don't we need some protection here? We probably can use hdev lock.
-
-This function is used currently locked, maybe I name it as __hci_add_cb.
-> 
-> > +}
-> > +
-> > +struct cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
-> > +{
-> > +       struct cb_cmd *cmd;
-> > +
-> > +       list_for_each_entry(cmd, &hdev->cb_list, list)
-> > +               if (cmd->opcode == opcode)
-> > +                       return cmd;
-> 
-> Here as well, we might need to protect the critical section.
-
-Here looks like we do not need unlocked version so I will add locks.
-
-> > +
-> > +       return NULL;
-> > +}
-> > +
-> > +void hci_remove_cb(struct cb_cmd *cmd)
-> > +{
-> > +       list_del(&cmd->list);
-> > +
-> > +       if (cmd->destructor) {
-> > +               cmd->destructor(cmd);
-> > +       } else {
-> > +               kfree(cmd->opt);
-> > +               kfree(cmd);
-> > +       }
-> 
-> And here too. Right?
-
-Same as last comment.
-
-> 
-> > +}
-> > +
-> > +/* Send HCI command with callback */
-> > +int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
-> > +                       void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd),
-> > +                       void *opt, void (*destructor)(struct cb_cmd *cmd))
-> > +{
-> > +       if (cb)
-> > +               hci_add_cb(hdev, opcode, cb, opt, destructor);
-> > +
-> > +       return hci_send_cmd(hdev, opcode, plen, param);
-> > +}
-> > +
-> >  /* Get data from the previously sent command */
-> >  void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
-> >  {
-> 
-> We don't have any callers of find and remove functions?
-
-Those will be used in functions handling HCI complete event handlers like:
-
-cmd = hci_find_cb(hdev, HCI_OP_READ_LOCAL_AMP_INFO);
-if (cmd) {
-	cmd->status = rp->status;
-	hci_queue_cb(hdev, cmd, hdev->workqueue);
-}
-
-Best regards 
-Andrei Emeltchenko 
-
+-- 
+Luiz Augusto von Dentz
