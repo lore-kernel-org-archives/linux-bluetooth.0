@@ -1,35 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 7 Mar 2012 17:50:24 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC 1/2] Bluetooth: General HCI callback implementation
-Message-ID: <20120307155021.GG3647@aemeltch-MOBL1>
-References: <1331039789-31519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <201203061602.17443.szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <201203061602.17443.szymon.janc@tieto.com>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH obexd v2 4/4] client: simplify obc_session_pull
+Date: Wed,  7 Mar 2012 15:50:29 +0100
+Message-Id: <1331131829-28509-5-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1331131829-28509-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1331131829-28509-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Janc,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-On Tue, Mar 06, 2012 at 04:02:17PM +0100, Szymon Janc wrote:
-> hci_add_cb could return error on failure and that could be used in hci_cmd_cb().
-> 
-> > +void hci_add_cb(struct hci_dev *hdev, __u16 opcode,
-> > +			void (*cb)(struct hci_dev *hdev, struct cb_cmd *cmd),
-> > +			void *opt, void (*destructor)(struct cb_cmd *cmd))
-> > +{
-> > +	struct cb_cmd *cmd;
-> > +
-> > +	cmd = kmalloc(sizeof(*cmd), GFP_ATOMIC);
-> 
-> Why atomic? Maybe allow to pass custom gfp mask?
+Functions obc_session_get and obc_session_pull nearly share the same
+code, so the later can be achieved by just calling the first one.
 
-I think I will use gfp mask since I use it also with spinlocks held.
+The session api is not modified in this patch.
+---
+ client/session.c |   22 +---------------------
+ 1 files changed, 1 insertions(+), 21 deletions(-)
 
-Best regards 
-Andrei Emeltchenko 
+diff --git a/client/session.c b/client/session.c
+index e130427..a9883c7 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -1005,27 +1005,7 @@ int obc_session_pull(struct obc_session *session,
+ 				const char *type, const char *targetfile,
+ 				session_callback_t function, void *user_data)
+ {
+-	struct obc_transfer *transfer;
+-	const char *agent;
+-
+-	if (session->obex == NULL)
+-		return -ENOTCONN;
+-
+-	if (session->agent != NULL)
+-		agent = obc_agent_get_name(session->agent);
+-	else
+-		agent = NULL;
+-
+-	transfer = obc_transfer_register(session->conn, session->obex,
+-								agent,
+-								targetfile,
+-								NULL, type,
+-								NULL);
+-	if (transfer == NULL) {
+-		return -EIO;
+-	}
+-
+-	return session_request(session, transfer, session_prepare_get,
++	return obc_session_get(session, type, NULL, targetfile, NULL, 0,
+ 							function, user_data);
+ }
+ 
+-- 
+1.7.6.5
 
