@@ -1,93 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1331228606.14217.5.camel@aeonflux>
-Subject: Re: [PATCH 2/2] bluetooth: hci_core: fix NULL-pointer dereference
- at unregister
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hovold <jhovold@gmail.com>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, stable <stable@vger.kernel.org>
-Date: Thu, 08 Mar 2012 09:43:26 -0800
-In-Reply-To: <20120308115647.GA4497@localhost>
-References: <1331136120-27075-1-git-send-email-jhovold@gmail.com>
-	 <1331136120-27075-3-git-send-email-jhovold@gmail.com>
-	 <1331148560.3392.189.camel@aeonflux> <20120308115647.GA4497@localhost>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+Date: Thu, 8 Mar 2012 09:38:08 -0800 (PST)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: marcel@holtmann.org, Gustavo Padovan <padovan@profusion.mobi>,
+	johan.hedberg@gmail.com
+cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: Current bluetooth tree: Was: pull request 2012-03-08
+In-Reply-To: <20120308082242.GB26562@aemeltch-MOBL1>
+Message-ID: <alpine.DEB.2.02.1203080927240.13102@mathewm-linux>
+References: <20120308054431.GE3998@joana> <20120308082242.GB26562@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
 
-> > > Make sure hci_dev_open returns immediately if hci_dev_unregister has
-> > > been called.
-> > > 
-> > > This fixes a race between hci_dev_open and hci_dev_unregister which can
-> > > lead to a NULL-pointer dereference.
-> 
-> [...]
-> 
-> > what version of the kernel is this patch against? Since we cleaned up
-> > the flags in bluetooth-next tree. Also in addition you can not just add
-> > flags here.
-> 
-> As this to be fixed in 3.3 it is against 3.3-rc6.
-> 
-> > >  /*
-> > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > > index 5aeb624..3937ce3 100644
-> > > --- a/net/bluetooth/hci_core.c
-> > > +++ b/net/bluetooth/hci_core.c
-> > > @@ -525,6 +525,11 @@ int hci_dev_open(__u16 dev)
-> > >  
-> > >  	hci_req_lock(hdev);
-> > >  
-> > > +	if (test_bit(HCI_UNREGISTER, &hdev->flags)) {
-> > > +		ret = -ENODEV;
-> > > +		goto done;
-> > > +	}
-> > > +
-> > >  	if (hdev->rfkill && rfkill_blocked(hdev->rfkill)) {
-> > >  		ret = -ERFKILL;
-> > >  		goto done;
-> > > @@ -1577,6 +1582,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
-> > >  
-> > >  	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
-> > >  
-> > > +	set_bit(HCI_UNREGISTER, &hdev->flags);
-> > > +
-> > >  	write_lock(&hci_dev_list_lock);
-> > >  	list_del(&hdev->list);
-> > >  	write_unlock(&hci_dev_list_lock);
-> > 
-> > Is this really enough to protect this race condition?
-> 
-> 1. first hci_dev_open grabs req lock
-> 2. second hci_dev_open sleeps on req lock
-> 3. hci_dev_unregister sleep on req lock (in do_close)
-> 4. first hci_dev_open times out and releases req lock
-> 
-> Now either a) the second open grabs the lock or b) close does. 
-> 
-> a) The second open will time out eventually as well and setting a flag
->    at unregister will only speed things up (at least when the first
->    patch in my series is applied -- otherwise this leads to a
->    NULL-pointer exception as well).
-> 
-> b) If close grabs the lock while we have open sleeping on it things go
->    really bad and this is the case this patch intends to fix.
-> 
-> As far as I can see, a flag set at unregister (before acquiring the lock)
-> will suffice to fix this race, but perhaps I'm missing something?
-> 
-> Where should such an internal flag be added as hdev->flags can not be
-> used? hdev->dev_flags?
+On Thu, 8 Mar 2012, Andrei Emeltchenko wrote:
 
-please add them to hdev->dev_flags as internal flag.
+> Hi,
+>
+> On Thu, Mar 08, 2012 at 02:44:31AM -0300, Gustavo Padovan wrote:
+>> are available in the git repository at:
+>>   git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next master
+>
+> Is this current bluetooth-next tree?
 
-Regards
+So I'm not the only one confused by the current setup with two 
+bluetooth-nexts!
 
-Marcel
+Marcel, Gustavo, and Johan, can you please let the list know exactly 
+what is going on with the kernel trees?  The last official word we had 
+was that Johan's temporary tree was in use while Gustavo was taking a 
+break -- but Gustavo is back, Johan is still accepting patches, and 
+David Miller is pulling from Gustavo's tree...
 
+Right now Gustavo's tree is more up to date because it includes David 
+Miller's merge to net-next.  Are we switching back to 
+git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next 
+now?
 
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
