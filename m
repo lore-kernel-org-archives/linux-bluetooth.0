@@ -1,39 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 7 Mar 2012 23:01:30 -0800
-Message-ID: <CAPHSBCnoTp_YAJayhRB4xt7ZdZOuTD9MdqkWrDN_MYAvCOVFEw@mail.gmail.com>
-Subject: AVRCP 1.3 support
-From: Rohit Sharma <rohitsharmaddun@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 07 Mar 2012 22:57:52 -0800 (PST)
+Message-Id: <20120307.225752.1535997011608677011.davem@davemloft.net>
+To: padovan@profusion.mobi
+Cc: gustavo@padovan.org, johan.hedberg@gmail.com, marcel@holtmann.org,
+        linville@tuxdriver.com, netdev@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2012-03-08
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20120308054431.GE3998@joana>
+References: <20120308054431.GE3998@joana>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+From: Gustavo Padovan <padovan@profusion.mobi>
+Date: Thu, 8 Mar 2012 02:44:31 -0300
 
-For AVRCP 1.3 support in current bluez, this is supported using
-org.bluez.Media Interface in which a player registers with bluez using
-RegisterPlayer DBus methods.
-Have a query how the bluez will be identifying the player and respond
-the correct metadata or attributes.
+> Hi Dave,
+> 
+> Here goes another try to merge the bluetooth-next changes. I looked to the
+> whole diff of the last pull request and fixed all the style issues you
+> reported in last pull request attempt. The diff is very big, so I may have
+> missed some places, but we are, from your coding style point of view, in a
+> much better state than before.
+> 
+> Please take a look on it and pull if you find the code suitable, otherwise
+> tell me what's wrong and how we should fix it since your coding style rules
+> are not written in CodingStyle.
+> 
+> About the patches:
+>  - almost half of the patches is in the new Bluetooth Management interface, it
+>  finally reached a stable state regarding its API and we now enable it by
+>  default.
+>  - lots of Bluetooth LE patches. This implementation is still unstable but
+>    disabled by default.
+>  - some L2CAP layer refactoring to make our core code more generic and
+>    reusable.
+>  - New HCI monitor interface to monitor Bluetooth flow.
+>  - Lot of fixes and clean ups all over the Bluetooth subsystem.
 
-Based on the following blog, Is this supported in pulseAudio currently
-which version of player or pulseAudio i should be using for handling
-this.
-http://jprvita.wordpress.com/
-
-The proposed approach to implement this project is to have PulseAudio
-intermediating data exchange between media players and bluetoothd. For
-each audio stream going to a bluetooth audio sink it would listen to
-TrackChange and StatusChange signals coming from the application
-generating the stream going to that device and send this information
-to the remote peer through AVRCP calling a method exposed on
-bluetoothd’s org.bluez.Control interface. This integration could
-latter be extended for basic player controls, having PulseAudio to
-listen to bluetoothd signals and call methods on media players MPRIS
-interfaces to trigger the matching action. Also, a similar approach
-could be modeled for adding content browsing capability, as defined by
-AVRCP 1.4 specification.
-
-Thanks & Regards
-Rohit Sharma
+Pulled, thanks a lot.
