@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Jaganath Kanakkassery <jaganath.k@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH obexd 2/2] gobex: call g_obex_unref() before io channel unref
-Date: Thu, 08 Mar 2012 12:19:51 +0530
-Message-id: <1331189391-6807-1-git-send-email-jaganath.k@samsung.com>
+Subject: [PATCH obexd] gobex: call g_obex_unref() before io channel unref
+Date: Thu, 08 Mar 2012 12:18:43 +0530
+Message-id: <1331189323-6773-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
