@@ -1,45 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 8 Mar 2012 18:01:53 -0600
+Date: Thu, 8 Mar 2012 17:58:59 -0600
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [PATCH obexd v2 0/4] client: parameter naming convention
-Message-ID: <20120309000153.GC19895@x220.amr.corp.intel.com>
-References: <1331131829-28509-1-git-send-email-mikel.astiz.oss@gmail.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
+	<frederic.dalleau@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 0/2] gateway: Fix crash if SCO connection fails
+Message-ID: <20120308235859.GB19895@x220.amr.corp.intel.com>
+References: <1329842810-13449-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1331131829-28509-1-git-send-email-mikel.astiz.oss@gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1329842810-13449-1-git-send-email-frederic.dalleau@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Frédéric,
 
-On Wed, Mar 07, 2012, Mikel Astiz wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+On Tue, Feb 21, 2012, Frédéric Dalleau wrote:
+> The first patch is a resend of a previous patch with same name.
+> The second one happens after the sco connection has failed : the disconnect
+> watch is not removed when the media owner is freed upon error in acquire.
 > 
-> These patches review the naming convention in transfer.h and
-> session.h, in order to avoid misleading use of the terms "name",
-> "filename" and "targetname".
+> Let me know what you think.
 > 
-> This second proposal splits the first patch into two patches, and
-> avoids a bug that would have been introduced: the reply of the agent
-> needs to be handled with care, since depending on the operation type
-> (put or get) the reply of the agent should overwrite one field or the
-> other.
+> Regards,
+> Frédéric
 > 
-> Mikel Astiz (4):
->   client: add obc_transfer_set_filename
->   client: fix naming convention in transfer api
->   client: refactor naming convention in session api
->   client: simplify obc_session_pull
+> Frédéric Dalleau (2):
+>   gateway: Fix crash if SCO connection fails
+>   media: register disconnect watch at transport add
 > 
->  client/session.c  |   55 ++++++++++++++++++----------------------------------
->  client/session.h  |   12 +++++-----
->  client/transfer.c |   14 +++++++++---
->  client/transfer.h |    2 +
->  4 files changed, 37 insertions(+), 46 deletions(-)
+>  audio/gateway.c   |    5 +----
+>  audio/transport.c |    6 +++---
+>  2 files changed, 4 insertions(+), 7 deletions(-)
 
-All patches in this set have been applied. Thanks.
+Both patches have been applied. Thanks.
 
 Johan
