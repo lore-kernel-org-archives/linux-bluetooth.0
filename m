@@ -1,90 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 8 Mar 2012 12:56:47 +0100
-From: Johan Hovold <jhovold@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, stable <stable@vger.kernel.org>
-Subject: Re: [PATCH 2/2] bluetooth: hci_core: fix NULL-pointer dereference at
- unregister
-Message-ID: <20120308115647.GA4497@localhost>
-References: <1331136120-27075-1-git-send-email-jhovold@gmail.com>
- <1331136120-27075-3-git-send-email-jhovold@gmail.com>
- <1331148560.3392.189.camel@aeonflux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1331148560.3392.189.camel@aeonflux>
+In-Reply-To: <CAPHSBCnoTp_YAJayhRB4xt7ZdZOuTD9MdqkWrDN_MYAvCOVFEw@mail.gmail.com>
+References: <CAPHSBCnoTp_YAJayhRB4xt7ZdZOuTD9MdqkWrDN_MYAvCOVFEw@mail.gmail.com>
+Date: Thu, 8 Mar 2012 12:39:20 +0200
+Message-ID: <CABBYNZKu2uk46yxhcfMWFAmpHh1oa=5OiEjqJnjor_N7cHGmjw@mail.gmail.com>
+Subject: Re: AVRCP 1.3 support
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Rohit Sharma <rohitsharmaddun@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
 
-On Wed, Mar 07, 2012 at 11:29:20AM -0800, Marcel Holtmann wrote:
-> Hi Johan,
-> 
-> > Make sure hci_dev_open returns immediately if hci_dev_unregister has
-> > been called.
-> > 
-> > This fixes a race between hci_dev_open and hci_dev_unregister which can
-> > lead to a NULL-pointer dereference.
+On Thu, Mar 8, 2012 at 9:01 AM, Rohit Sharma <rohitsharmaddun@gmail.com> wrote:
+> Based on the following blog, Is this supported in pulseAudio currently
+> which version of player or pulseAudio i should be using for handling
+> this.
+> http://jprvita.wordpress.com/
 
-[...]
+Not exactly, it is preferable to implement MediaPlayer interface
+directly in the player if possible so the latency is better since
+round trips in D-Bus can be quite expensive.
 
-> what version of the kernel is this patch against? Since we cleaned up
-> the flags in bluetooth-next tree. Also in addition you can not just add
-> flags here.
+> The proposed approach to implement this project is to have PulseAudio
+> intermediating data exchange between media players and bluetoothd. For
+> each audio stream going to a bluetooth audio sink it would listen to
+> TrackChange and StatusChange signals coming from the application
+> generating the stream going to that device and send this information
+> to the remote peer through AVRCP calling a method exposed on
+> bluetoothd’s org.bluez.Control interface. This integration could
+> latter be extended for basic player controls, having PulseAudio to
+> listen to bluetoothd signals and call methods on media players MPRIS
+> interfaces to trigger the matching action. Also, a similar approach
+> could be modeled for adding content browsing capability, as defined by
+> AVRCP 1.4 specification.
 
-As this to be fixed in 3.3 it is against 3.3-rc6.
+Some things like absolute volume control might need to be integrated
+directly with PulseAudio, but the media browsing really don't belong
+to audio server, in fact it may not even belong to the player itself
+since it could be just a filesystem or a generic database that could
+be accessed directly but since the spec map it per player he are going
+to probably have this inside the MediaPlayer.
 
-> >  /*
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index 5aeb624..3937ce3 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -525,6 +525,11 @@ int hci_dev_open(__u16 dev)
-> >  
-> >  	hci_req_lock(hdev);
-> >  
-> > +	if (test_bit(HCI_UNREGISTER, &hdev->flags)) {
-> > +		ret = -ENODEV;
-> > +		goto done;
-> > +	}
-> > +
-> >  	if (hdev->rfkill && rfkill_blocked(hdev->rfkill)) {
-> >  		ret = -ERFKILL;
-> >  		goto done;
-> > @@ -1577,6 +1582,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
-> >  
-> >  	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
-> >  
-> > +	set_bit(HCI_UNREGISTER, &hdev->flags);
-> > +
-> >  	write_lock(&hci_dev_list_lock);
-> >  	list_del(&hdev->list);
-> >  	write_unlock(&hci_dev_list_lock);
-> 
-> Is this really enough to protect this race condition?
-
-1. first hci_dev_open grabs req lock
-2. second hci_dev_open sleeps on req lock
-3. hci_dev_unregister sleep on req lock (in do_close)
-4. first hci_dev_open times out and releases req lock
-
-Now either a) the second open grabs the lock or b) close does. 
-
-a) The second open will time out eventually as well and setting a flag
-   at unregister will only speed things up (at least when the first
-   patch in my series is applied -- otherwise this leads to a
-   NULL-pointer exception as well).
-
-b) If close grabs the lock while we have open sleeping on it things go
-   really bad and this is the case this patch intends to fix.
-
-As far as I can see, a flag set at unregister (before acquiring the lock)
-will suffice to fix this race, but perhaps I'm missing something?
-
-Where should such an internal flag be added as hdev->flags can not be
-used? hdev->dev_flags?
-
-Thanks,
-Johan
+-- 
+Luiz Augusto von Dentz
