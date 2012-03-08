@@ -1,58 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1331229077.14217.9.camel@aeonflux>
-Subject: Re: [PATCH] bluetooth.h: fix compile issue when using in C++
+Message-ID: <1331228722.14217.7.camel@aeonflux>
+Subject: Re: [PATCH 1/2] bluetooth: hci_ldisc: fix NULL-pointer dereference
+ on tty_close
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Markus Rathgeb <maggu2810@googlemail.com>
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
-	Patrick Ohly <patrick.ohly@intel.com>,
-	linux-bluetooth@vger.kernel.org
-Date: Thu, 08 Mar 2012 09:51:17 -0800
-In-Reply-To: <CAOcK=CO9au1DnBCw-9bik+nnuOdptNVBpStRVWjdOUaj55xHHg@mail.gmail.com>
-References: <1326708715.3360.135.camel@pohly-mobl1.fritz.box>
-	 <1330903638.3392.141.camel@aeonflux>
-	 <CAMOw1v5mcoDbBo_yotfci6o+zak+9OjhTKUm134zj2YGHGVssQ@mail.gmail.com>
-	 <CAOcK=CO9au1DnBCw-9bik+nnuOdptNVBpStRVWjdOUaj55xHHg@mail.gmail.com>
+To: Johan Hovold <jhovold@gmail.com>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, stable <stable@vger.kernel.org>
+Date: Thu, 08 Mar 2012 09:45:22 -0800
+In-Reply-To: <20120308115721.GB4497@localhost>
+References: <1331136120-27075-1-git-send-email-jhovold@gmail.com>
+	 <1331136120-27075-2-git-send-email-jhovold@gmail.com>
+	 <1331148797.3392.191.camel@aeonflux> <20120308115721.GB4497@localhost>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Markus,
+Hi Johan,
 
-please do not top post on this mailing list.
+> > > Do not close protocol driver until device has been unregistered.
+> > > 
+> > > This fixes a race between tty_close and hci_dev_open which can result in
+> > > a NULL-pointer dereference.
+> > > 
+> > > The line discipline closes the protocol driver while we may still have
+> > > hci_dev_open sleeping on the req_lock mutex resulting in a NULL-pointer
+> > > dereference when lock is acquired and hci_init_req called.
+> 
+> [...]
+> 
+> > what kernel version is this against? Our changes in bluetooth-next fixed
+> > some of the destruct handling.
+> 
+> This is against the latest rc as it needs to be fixed in 3.3, but I
+> missed a dependency to bluetooth-next as you point out below.
+> 
+> > Also hci_unregister_dev should be calling the destruct handler and thus
+> > your change is now accessing hu but it got freed already.
+> 
+> You're right, my patch depends on 010666a126fc ("Bluetooth: Make
+> hci-destruct callback optional") and 797fe796c4 ("Bluetooth: uart-ldisc:
+> Fix memory leak and remove destruct cb") from bluetooth-next. 
+> 
+> But since the latter one fixes a memory leak it should have been marked
+> for stable as well as pushed to Linus for 3.3, right?
 
-> Why can't we get rid off the "typeof" keyword completely and using a
-> template similar approach:
-> 
-> ===
-> 
-> #define bt_get_unaligned_tmpl(type, ptr)         \
-> ({                                               \
->        struct __p_s  {                           \
->                type __v;                         \
->        } __attribute__((packed));                \
->        struct __p_s *__p = (struct __p_s*)(ptr); \
->        __p->__v;                                 \
-> })
-> 
-> static inline uint64_t bt_get_le64(void *ptr)
-> {
-> 	return bt_get_unaligned_tmpl(uint64_t, ptr);
-> }
-> 
-> static inline uint64_t bt_get_be64(void *ptr)
-> {
-> 	return bswap_64(bt_get_unaligned_tmpl(uint64_t, ptr));
-> }
-> 
-> ===
-> 
-> Okay, the macro parameter type is not encapsulated by parenthesis, but
-> it seems okay and working.
-> So it seems to be a very more portable solution (IMHO).
-
-what does seems okay and working actually mean? Have you actually
-verified on platform that require correct unaligned access to data?
+we need to look into this and propose patches for -stable. Is your
+problem still present with bluetooth-next or not?
 
 Regards
 
