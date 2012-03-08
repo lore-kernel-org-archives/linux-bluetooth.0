@@ -1,98 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Divya Yadav <divya.yadav@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Divya Yadav <divya.yadav@samsung.com>
-Subject: [PATCH obexd 1/3] map_ap.c: Add implementation for map_ap_get*
-Date: Thu, 08 Mar 2012 14:14:17 +0530
-Message-id: <1331196259-16010-1-git-send-email-divya.yadav@samsung.com>
+Date: Thu, 8 Mar 2012 10:22:49 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Gustavo Padovan <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+Subject: Current bluetooth tree: Was: pull request 2012-03-08
+Message-ID: <20120308082242.GB26562@aemeltch-MOBL1>
+References: <20120308054431.GE3998@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120308054431.GE3998@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/map_ap.c |   58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 files changed, 54 insertions(+), 4 deletions(-)
+Hi,
 
-diff --git a/src/map_ap.c b/src/map_ap.c
-index 54e3bcf..dd3ed6b 100644
---- a/src/map_ap.c
-+++ b/src/map_ap.c
-@@ -246,22 +246,72 @@ uint8_t *map_ap_encode(map_ap_t *ap, size_t *length)
- 
- gboolean map_ap_get_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t *val)
- {
--	return FALSE;
-+	struct ap_entry *entry;
-+	int offset = find_ap_def_offset(tag);
-+
-+	if (offset < 0 || ap_defs[offset].type != APT_UINT8)
-+		return FALSE;
-+
-+	entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
-+
-+	if (!entry)
-+		return FALSE;
-+
-+	*val = entry->val.u8;
-+
-+	return TRUE;
- }
- 
- gboolean map_ap_get_u16(map_ap_t *ap, enum map_ap_tag tag, uint16_t *val)
- {
--	return FALSE;
-+	struct ap_entry *entry;
-+	int offset = find_ap_def_offset(tag);
-+
-+	if (offset < 0 || ap_defs[offset].type != APT_UINT16)
-+		return FALSE;
-+
-+	entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
-+
-+	if (!entry)
-+		return FALSE;
-+
-+	*val = entry->val.u16;
-+
-+	return TRUE;
- }
- 
- gboolean map_ap_get_u32(map_ap_t *ap, enum map_ap_tag tag, uint32_t *val)
- {
--	return FALSE;
-+	struct ap_entry *entry;
-+	int offset = find_ap_def_offset(tag);
-+
-+	if (offset < 0 || ap_defs[offset].type != APT_UINT32)
-+		return FALSE;
-+
-+	entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
-+
-+	if (!entry)
-+		return FALSE;
-+
-+	*val = entry->val.u32;
-+
-+	return TRUE;
- }
- 
- const char *map_ap_get_string(map_ap_t *ap, enum map_ap_tag tag)
- {
--	return NULL;
-+	struct ap_entry *entry;
-+	int offset = find_ap_def_offset(tag);
-+
-+	if (offset < 0 || ap_defs[offset].type != APT_STR)
-+		return NULL;
-+
-+	entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
-+
-+	if (!entry)
-+		return NULL;
-+
-+	return g_strdup(entry->val.str);
- }
- 
- gboolean map_ap_set_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t val)
--- 
-1.7.0.4
+On Thu, Mar 08, 2012 at 02:44:31AM -0300, Gustavo Padovan wrote:
+> are available in the git repository at:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next master
+
+Is this current bluetooth-next tree?
+
+Best regards 
+Andrei Emeltchenko 
 
