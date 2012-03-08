@@ -1,38 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 8 Mar 2012 17:58:59 -0600
+Date: Thu, 8 Mar 2012 17:53:32 -0600
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
-	<frederic.dalleau@linux.intel.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] gateway: Fix crash if SCO connection fails
-Message-ID: <20120308235859.GB19895@x220.amr.corp.intel.com>
-References: <1329842810-13449-1-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: Re: [PATCH BlueZ] attrib: Fix memory leak on watcher exit
+Message-ID: <20120308235332.GA19895@x220.amr.corp.intel.com>
+References: <1331236916-27596-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1329842810-13449-1-git-send-email-frederic.dalleau@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1331236916-27596-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Hi Lizardo,
 
-On Tue, Feb 21, 2012, Frédéric Dalleau wrote:
-> The first patch is a resend of a previous patch with same name.
-> The second one happens after the sco connection has failed : the disconnect
-> watch is not removed when the media owner is freed upon error in acquire.
-> 
-> Let me know what you think.
-> 
-> Regards,
-> Frédéric
-> 
-> Frédéric Dalleau (2):
->   gateway: Fix crash if SCO connection fails
->   media: register disconnect watch at transport add
-> 
->  audio/gateway.c   |    5 +----
->  audio/transport.c |    6 +++---
->  2 files changed, 4 insertions(+), 7 deletions(-)
+On Thu, Mar 08, 2012, Anderson Lizardo wrote:
+> The "destroy" callback of g_dbus_add_disconnect_watch() is actually
+> never called, therefore the watcher data should be freed on
+> watcher_exit().
 
-Both patches have been applied. Thanks.
+Wouldn't it make more sense to fix GDBus so that the destroy callback
+*is* called than to work around it like this?
 
 Johan
