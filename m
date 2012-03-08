@@ -1,44 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Thu, 8 Mar 2012 02:33:21 -0300
+Date: Thu, 8 Mar 2012 02:23:51 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: santosh nayak <santoshprasadnayak@gmail.com>
-Cc: marcel@holtmann.org, davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: Resend: [PATCH] Bluetooth: Fix Endian Bug.
-Message-ID: <20120308053320.GD3998@joana>
-References: <1330622196-12967-1-git-send-email-santoshprasadnayak@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix incorrect uninitialized assignment
+Message-ID: <20120308052351.GC3998@joana>
+References: <1331124705-11023-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1330622196-12967-1-git-send-email-santoshprasadnayak@gmail.com>
+In-Reply-To: <1331124705-11023-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santosh,
+Hi Andrei,
 
-* santosh nayak <santoshprasadnayak@gmail.com> [2012-03-01 22:46:36 +0530]:
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-03-07 14:51:45 +0200]:
 
-> From: Santosh Nayak <santoshprasadnayak@gmail.com>
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Fix network to host endian conversion for L2CAP chan id.
+> Revert part of commit 8035ded4 which has introduced bug by
+> assigning uninitialized value.
 > 
-> Signed-off-by: Santosh Nayak <santoshprasadnayak@gmail.com>
+> ...
+> + src/net/bluetooth/rfcomm/tty.c: warning: 'p' is used uninitialized in this
+> 	function:  => 218
+> + src/net/bluetooth/rfcomm/tty.c: warning: 'p' may be used uninitialized in
+> 	this function:  => 218
+> ...
+> 
+> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  net/bluetooth/l2cap_sock.c |    5 +++--
->  1 files changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 401d942..86d5067 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -82,7 +82,7 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
->  	}
->  
->  	if (la.l2_cid)
-> -		err = l2cap_add_scid(chan, la.l2_cid);
-> +		err = l2cap_add_scid(chan, __le16_to_cpu(la.l2_cid));
+>  net/bluetooth/rfcomm/tty.c |    8 +++++---
+>  1 files changed, 5 insertions(+), 3 deletions(-)
 
-This is kind weird, la.l2_cid comes from the user, so it is already in host
-endian. No need for convertions here.
+I saw Luiz' fix for this before and I already applied it.
+Also I prefer to keep the list_for_each_entry() call.
 
 	Gustavo
