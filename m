@@ -2,48 +2,42 @@ Return-Path: <cyrus@holtmann.org>
 From: Arik Nemtsov <arik@wizery.com>
 To: <linux-bluetooth@vger.kernel.org>
 Cc: Arik Nemtsov <arik@wizery.com>
-Subject: [PATCH 2/2] Revert "core: Add provision for terminating an ATT connection"
-Date: Thu,  8 Mar 2012 15:44:39 +0200
-Message-Id: <1331214279-27521-2-git-send-email-arik@wizery.com>
-In-Reply-To: <1331214279-27521-1-git-send-email-arik@wizery.com>
-References: <1331214279-27521-1-git-send-email-arik@wizery.com>
+Subject: [PATCH 1/2] device: don't auto-connect on disc-cb attio callback registration
+Date: Thu,  8 Mar 2012 15:44:38 +0200
+Message-Id: <1331214279-27521-1-git-send-email-arik@wizery.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This reverts commit f89a77478af78d41c80ab7605662382b9e4e1c36.
-
-This is not needed and actually introduces a bug. When the "Disconnect"
-API of device is called device->attrib is unref-ed via a watch set on
-G_IO_HUP. The channel is shutdown when the last reference is removed.
-
-The code introduced here shuts down the channel and prevents the watch
-from getting called. This means we leak a reference to device->attrib.
-This can cause a number of bad things. For example, if the device is
-temporary, it will never be freed, and we won't be able to pair to it
-again.
+If a device is already connected, don't auto-connect if we register
+a disconnect-only attio callback. This will obviously fail.
 ---
- src/device.c |    8 --------
- 1 files changed, 0 insertions(+), 8 deletions(-)
+ src/device.c |   13 +++++++++----
+ 1 files changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/src/device.c b/src/device.c
-index b339ac1..0a1de7c 100644
+index dfc8e59..b339ac1 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -821,14 +821,6 @@ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
- 		browse_request_cancel(device->browse);
- 	}
+@@ -2942,10 +2942,15 @@ guint btd_device_add_attio_callback(struct btd_device *device,
+ 	attio->dcfunc = dcfunc;
+ 	attio->user_data = user_data;
  
--	if (device->attrib) {
--		GIOChannel *io = g_attrib_get_channel(device->attrib);
--		if (io) {
--			g_io_channel_shutdown(io, FALSE, NULL);
--			g_io_channel_unref(io);
--		}
--	}
--
- 	if (msg)
- 		device->disconnects = g_slist_append(device->disconnects,
- 						dbus_message_ref(msg));
+-	if (device->attrib && cfunc) {
+-		device->attios_offline = g_slist_append(device->attios_offline,
+-									attio);
+-		g_idle_add(notify_attios, device);
++	if (device->attrib) {
++		if (cfunc) {
++			device->attios_offline =
++				g_slist_append(device->attios_offline, attio);
++
++			g_idle_add(notify_attios, device);
++		} else {
++			device->attios = g_slist_append(device->attios, attio);
++		}
+ 	} else {
+ 		device->auto_id = g_idle_add_full(G_PRIORITY_DEFAULT_IDLE,
+ 						att_connect, device,
 -- 
 1.7.5.4
 
