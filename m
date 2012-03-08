@@ -1,39 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 8 Mar 2012 12:57:21 +0100
+From: Johan Hovold <jhovold@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, stable <stable@vger.kernel.org>
+Subject: Re: [PATCH 1/2] bluetooth: hci_ldisc: fix NULL-pointer dereference
+ on tty_close
+Message-ID: <20120308115721.GB4497@localhost>
+References: <1331136120-27075-1-git-send-email-jhovold@gmail.com>
+ <1331136120-27075-2-git-send-email-jhovold@gmail.com>
+ <1331148797.3392.191.camel@aeonflux>
 MIME-Version: 1.0
-In-Reply-To: <4963980.578001331189664043.JavaMail.weblogic@epml07>
-References: <4963980.578001331189664043.JavaMail.weblogic@epml07>
-Date: Thu, 8 Mar 2012 14:28:32 +0200
-Message-ID: <CABBYNZJut6tNv6Eq66sM1xToD=tT63Q6qT+Bcg1aFcwmc=Dc0Q@mail.gmail.com>
-Subject: Re: [PATCH obexd] gobex: call g_obex_unref() before io channel unref
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: jaganath.k@samsung.com
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1331148797.3392.191.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi Marcel,
 
-On Thu, Mar 8, 2012 at 8:54 AM, JAGANATH KANAKKASSERY
-<jaganath.k@samsung.com> wrote:
+On Wed, Mar 07, 2012 at 11:33:17AM -0800, Marcel Holtmann wrote:
+> Hi Johan,
 >
-> Hi
->
-> ------- Original Message -------
-> Sender : JAGANATH KANAKKASSERY<jaganath.k@samsung.com>  Lead Engineer/SISO-Linux Platform Lab/Samsung Electronics
-> Date   : Mar 08, 2012 15:48 (GMT+09:00)
-> Title  : [PATCH obexd] gobex: call g_obex_unref() before io channel unref
->
-> In g_obex_unref, tx_queue will be flushed which results in SIGPIPE
-> in g_io_channel_write_chars() since socket is already closed in
-> io channel unref.
->
-> Please ignore this patch
+> > Do not close protocol driver until device has been unregistered.
+> > 
+> > This fixes a race between tty_close and hci_dev_open which can result in
+> > a NULL-pointer dereference.
+> > 
+> > The line discipline closes the protocol driver while we may still have
+> > hci_dev_open sleeping on the req_lock mutex resulting in a NULL-pointer
+> > dereference when lock is acquired and hci_init_req called.
 
-I guess if the io is closed you don't need to flush anything, in the
-other hand it would be good to add a test that does what PTS expect
-with abort being sent.
+[...]
 
+> what kernel version is this against? Our changes in bluetooth-next fixed
+> some of the destruct handling.
 
--- 
-Luiz Augusto von Dentz
+This is against the latest rc as it needs to be fixed in 3.3, but I
+missed a dependency to bluetooth-next as you point out below.
+
+> Also hci_unregister_dev should be calling the destruct handler and thus
+> your change is now accessing hu but it got freed already.
+
+You're right, my patch depends on 010666a126fc ("Bluetooth: Make
+hci-destruct callback optional") and 797fe796c4 ("Bluetooth: uart-ldisc:
+Fix memory leak and remove destruct cb") from bluetooth-next. 
+
+But since the latter one fixes a memory leak it should have been marked
+for stable as well as pushed to Linus for 3.3, right?
+
+Thanks,
+Johan
