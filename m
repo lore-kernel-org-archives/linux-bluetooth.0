@@ -1,24 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1329842810-13449-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1329842810-13449-1-git-send-email-frederic.dalleau@linux.intel.com>
-Date: Thu, 8 Mar 2012 11:14:38 +0100
-Message-ID: <CA+QXtDu+pM6-oPv+JJ3g65tYz1kjBmY1pOTNZqUEGSO=Nj8nZQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] gateway: Fix crash if SCO connection fails
+In-Reply-To: <1329771478-3935-1-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1329771478-3935-1-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Thu, 8 Mar 2012 11:11:50 +0100
+Message-ID: <CA+QXtDsbV_Xzr3pjY4SO5ey-boptHwMMbf-9cFLu7jRhgT=34g@mail.gmail.com>
+Subject: Re: [PATCH 0/2] Fix crash in profile descriptor list parsing
 From: "Dalleau, Frederic" <frederic.dalleau@intel.com>
-To: linux-bluetooth@vger.kernel.org
+To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-2012/2/21 Frédéric Dalleau <frederic.dalleau@linux.intel.com>:
-> The first patch is a resend of a previous patch with same name.
-> The second one happens after the sco connection has failed : the disconnect
-> watch is not removed when the media owner is freed upon error in acquire.
+> I've tried to connect the HFP audio gateway on a Mac running Lion.
+> bluetoothd crashed. So did sdptool browse.
 
-Luiz acked, any updates please?
+Any updates please?
 
 Thanks,
 Frédéric
