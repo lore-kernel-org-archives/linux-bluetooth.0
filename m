@@ -1,44 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1331229183.14217.10.camel@aeonflux>
-Subject: Re: Resend: [PATCH] Bluetooth: Fix Endian Bug.
+Message-ID: <1331229077.14217.9.camel@aeonflux>
+Subject: Re: [PATCH] bluetooth.h: fix compile issue when using in C++
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Gustavo Padovan <padovan@profusion.mobi>
-Cc: santosh nayak <santoshprasadnayak@gmail.com>, davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Date: Thu, 08 Mar 2012 09:53:03 -0800
-In-Reply-To: <20120308053320.GD3998@joana>
-References: <1330622196-12967-1-git-send-email-santoshprasadnayak@gmail.com>
-	 <20120308053320.GD3998@joana>
+To: Markus Rathgeb <maggu2810@googlemail.com>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
+	Patrick Ohly <patrick.ohly@intel.com>,
+	linux-bluetooth@vger.kernel.org
+Date: Thu, 08 Mar 2012 09:51:17 -0800
+In-Reply-To: <CAOcK=CO9au1DnBCw-9bik+nnuOdptNVBpStRVWjdOUaj55xHHg@mail.gmail.com>
+References: <1326708715.3360.135.camel@pohly-mobl1.fritz.box>
+	 <1330903638.3392.141.camel@aeonflux>
+	 <CAMOw1v5mcoDbBo_yotfci6o+zak+9OjhTKUm134zj2YGHGVssQ@mail.gmail.com>
+	 <CAOcK=CO9au1DnBCw-9bik+nnuOdptNVBpStRVWjdOUaj55xHHg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Markus,
 
-> > Fix network to host endian conversion for L2CAP chan id.
-> > 
-> > Signed-off-by: Santosh Nayak <santoshprasadnayak@gmail.com>
-> > ---
-> >  net/bluetooth/l2cap_sock.c |    5 +++--
-> >  1 files changed, 3 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> > index 401d942..86d5067 100644
-> > --- a/net/bluetooth/l2cap_sock.c
-> > +++ b/net/bluetooth/l2cap_sock.c
-> > @@ -82,7 +82,7 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
-> >  	}
-> >  
-> >  	if (la.l2_cid)
-> > -		err = l2cap_add_scid(chan, la.l2_cid);
-> > +		err = l2cap_add_scid(chan, __le16_to_cpu(la.l2_cid));
+please do not top post on this mailing list.
+
+> Why can't we get rid off the "typeof" keyword completely and using a
+> template similar approach:
 > 
-> This is kind weird, la.l2_cid comes from the user, so it is already in host
-> endian. No need for convertions here.
+> ===
+> 
+> #define bt_get_unaligned_tmpl(type, ptr)         \
+> ({                                               \
+>        struct __p_s  {                           \
+>                type __v;                         \
+>        } __attribute__((packed));                \
+>        struct __p_s *__p = (struct __p_s*)(ptr); \
+>        __p->__v;                                 \
+> })
+> 
+> static inline uint64_t bt_get_le64(void *ptr)
+> {
+> 	return bt_get_unaligned_tmpl(uint64_t, ptr);
+> }
+> 
+> static inline uint64_t bt_get_be64(void *ptr)
+> {
+> 	return bswap_64(bt_get_unaligned_tmpl(uint64_t, ptr));
+> }
+> 
+> ===
+> 
+> Okay, the macro parameter type is not encapsulated by parenthesis, but
+> it seems okay and working.
+> So it seems to be a very more portable solution (IMHO).
 
-CID and PSM are provided in little endian by user space.
+what does seems okay and working actually mean? Have you actually
+verified on platform that require correct unaligned access to data?
 
 Regards
 
