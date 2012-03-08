@@ -2,159 +2,107 @@ Return-Path: <cyrus@holtmann.org>
 From: Divya Yadav <divya.yadav@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Divya Yadav <divya.yadav@samsung.com>
-Subject: [PATCH obexd 3/3] MAP: Add SetMessageStatus function
-Date: Thu, 08 Mar 2012 14:14:19 +0530
-Message-id: <1331196259-16010-3-git-send-email-divya.yadav@samsung.com>
+Subject: [PATCH obexd 2/3] MAP: Implement application parameter parsing in
+ get/put requests
+Date: Thu, 08 Mar 2012 14:14:18 +0530
+Message-id: <1331196259-16010-2-git-send-email-divya.yadav@samsung.com>
 In-reply-to: <1331196259-16010-1-git-send-email-divya.yadav@samsung.com>
 References: <1331196259-16010-1-git-send-email-divya.yadav@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- plugins/mas.c              |   44 +++++++++++++++++++++++++++++++++++++++++++-
- plugins/messages-dummy.c   |    8 ++++++++
- plugins/messages-tracker.c |    8 ++++++++
- plugins/messages.h         |   20 ++++++++++++++++++++
- 4 files changed, 79 insertions(+), 1 deletions(-)
+ plugins/mas.c |   36 ++++++++++++++++++++++++++++++++++++
+ 1 files changed, 36 insertions(+), 0 deletions(-)
 
 diff --git a/plugins/mas.c b/plugins/mas.c
-index ade28c5..6e30abb 100644
+index 23b1823..ade28c5 100644
 --- a/plugins/mas.c
 +++ b/plugins/mas.c
-@@ -456,6 +456,20 @@ static void update_inbox_cb(void *session, int err, void *user_data)
- 		obex_object_set_io_flags(mas, G_IO_OUT, 0);
- }
+@@ -40,6 +40,7 @@
+ #include "manager.h"
  
-+static void message_status_cb(void *session, int err, void *user_data)
-+{
-+	struct mas_session *mas = user_data;
-+
-+	DBG("");
-+
-+	mas->finished = TRUE;
-+
-+	if (err < 0)
-+		obex_object_set_io_flags(mas, G_IO_ERR, err);
-+	else
-+		obex_object_set_io_flags(mas, G_IO_OUT, 0);
-+}
-+
- static int mas_setpath(struct obex_session *os, void *user_data)
- {
- 	const char *name;
-@@ -573,6 +587,34 @@ static void *message_update_open(const char *name, int oflag, mode_t mode,
- 		return mas;
- }
+ #include "messages.h"
++#include "map_ap.h"
  
-+static void *message_status_open(const char *name, int oflag, mode_t mode,
-+					void *driver_data, size_t *size,
-+					int *err)
-+
-+{
-+	struct mas_session *mas = driver_data;
-+	uint8_t indicator;
-+	uint8_t value;
-+
-+	 if (!(oflag & O_WRONLY)) {
-+		*err = -EBADR;
-+		return NULL;
-+	 }
-+
-+	map_ap_get_u8(mas->ap, MAP_AP_STATUSINDICATOR, &indicator);
-+	map_ap_get_u8(mas->ap, MAP_AP_STATUSVALUE, &value);
-+
-+	DBG("Indicator = %d \n value = %d\n", indicator, value);
-+
-+	*err = messages_set_message_status(mas->backend_data, name, indicator,
-+						value, message_status_cb, mas);
-+
-+	if (*err < 0)
-+		return NULL;
-+	else
-+		return mas;
-+}
-+
- static void *any_open(const char *name, int oflag, mode_t mode,
- 				void *driver_data, size_t *size, int *err)
- {
-@@ -688,7 +730,7 @@ static struct obex_mime_type_driver mime_message_status = {
- 	.target = MAS_TARGET,
- 	.target_size = TARGET_SIZE,
- 	.mimetype = "x-bt/messageStatus",
--	.open = any_open,
-+	.open = message_status_open,
- 	.close = any_close,
- 	.read = any_read,
- 	.write = any_write,
-diff --git a/plugins/messages-dummy.c b/plugins/messages-dummy.c
-index 511857e..67e335d 100644
---- a/plugins/messages-dummy.c
-+++ b/plugins/messages-dummy.c
-@@ -173,6 +173,14 @@ int messages_update_inbox(void *session, messages_update_inbox_cb callback,
- 	return -ENOSYS;
- }
+ /* Channel number according to bluez doc/assigned-numbers.txt */
+ #define MAS_CHANNEL	16
+@@ -108,6 +109,7 @@ struct mas_session {
+ 	gboolean finished;
+ 	gboolean nth_call;
+ 	GString *buffer;
++	map_ap_t *ap;
+ };
  
-+int messages_set_message_status(void *session, const char *handle,
-+					int indicator, int value,
-+					messages_set_message_status_cb callback,
-+					void *user_data)
-+{
-+	return -ENOSYS;
-+}
-+
- void messages_abort(void *session)
- {
- }
-diff --git a/plugins/messages-tracker.c b/plugins/messages-tracker.c
-index fb45210..f77b332 100644
---- a/plugins/messages-tracker.c
-+++ b/plugins/messages-tracker.c
-@@ -327,6 +327,14 @@ int messages_update_inbox(void *session, messages_update_inbox_cb callback,
- 	return -ENOSYS;
- }
+ static const uint8_t MAS_TARGET[TARGET_SIZE] = {
+@@ -120,6 +122,8 @@ static void reset_request(struct mas_session *mas)
+ 		g_string_free(mas->buffer, TRUE);
+ 		mas->buffer = NULL;
+ 	}
++	map_ap_free(mas->ap);
++	mas->ap = NULL;
  
-+int messages_set_message_status(void *session, const char *handle,
-+					int indicator, int value,
-+					messages_set_message_status_cb callback,
-+					void *user_data)
-+{
-+	return -ENOSYS;
-+}
-+
- void messages_abort(void *session)
- {
- }
-diff --git a/plugins/messages.h b/plugins/messages.h
-index 00a040c..9cdc377 100644
---- a/plugins/messages.h
-+++ b/plugins/messages.h
-@@ -277,6 +277,26 @@ typedef void (*messages_update_inbox_cb)(void *session, int err,
- int messages_update_inbox(void *session, messages_update_inbox_cb callback,
- 							void *user_data);
+ 	mas->nth_call = FALSE;
+ 	mas->finished = FALSE;
+@@ -171,6 +175,8 @@ static int mas_get(struct obex_session *os, void *user_data)
+ 	const char *type = obex_get_type(os);
+ 	const char *name = obex_get_name(os);
+ 	int ret;
++	const uint8_t *buffer = NULL;
++	ssize_t rsize = 0;
  
-+/* Informs Message Server to modify status of the message.
-+ *
-+ * session: Backend session.
-+ * handle: Unique identifier to the message.
-+ * indicator: To indicate which status information is to be modified,
-+ *	"readStatus" or "deleteStatus".
-+ * value: To indicate the value of the indicator
-+ *	read/unread for "readstatus" and deleted/undeleted for "deleteStatus".
-+ * Callback shall be called for every message status update request
-+ *	recieved from MCE.
-+ * user_data: User data if any to be sent.
-+ */
-+typedef void (*messages_set_message_status_cb)(void *session, int err,
-+		void *user_data);
+ 	DBG("GET: name %s type %s mas %p",
+ 			name, type, mas);
+@@ -178,6 +184,20 @@ static int mas_get(struct obex_session *os, void *user_data)
+ 	if (type == NULL)
+ 		return -EBADR;
+ 
++	rsize = obex_get_apparam(os, &buffer);
 +
-+int messages_set_message_status(void *session, const char *handle,
-+					int indicator, int value,
-+					messages_set_message_status_cb callback,
-+					void *user_data);
-+
- /* Aborts currently pending request.
-  *
-  * session: Backend session.
++	if (rsize < 0) {
++		if (g_ascii_strcasecmp(type, "x-bt/message") == 0) {
++			ret = -EBADR;
++			goto failed;
++		}
++	} else {
++		mas->ap = map_ap_decode(buffer, rsize);
++		if (mas->ap == NULL) {
++			ret = -EBADR;
++			goto failed;
++		}
++	}
+ 	ret = obex_get_stream_start(os, name);
+ 	if (ret < 0)
+ 		goto failed;
+@@ -196,12 +216,28 @@ static int mas_put(struct obex_session *os, void *user_data)
+ 	const char *type = obex_get_type(os);
+ 	const char *name = obex_get_name(os);
+ 	int ret;
++	const uint8_t *buffer = NULL;
++	ssize_t rsize = 0;
+ 
+ 	DBG("PUT: name %s type %s mas %p", name, type, mas);
+ 
+ 	if (type == NULL)
+ 		return -EBADR;
+ 
++	rsize = obex_get_apparam(os, &buffer);
++	if (rsize < 0) {
++		if (g_ascii_strcasecmp(type, "x-bt/messageStatus") == 0 ||
++			g_ascii_strcasecmp(type, "x-bt/message") == 0) {
++			ret = -EBADR;
++			goto failed;
++		}
++	} else {
++		mas->ap = map_ap_decode(buffer, rsize);
++		if (mas->ap == NULL) {
++			ret = -EBADR;
++			goto failed;
++		}
++	}
+ 	ret = obex_put_stream_start(os, name);
+ 	if (ret < 0)
+ 		goto failed;
 -- 
 1.7.0.4
 
