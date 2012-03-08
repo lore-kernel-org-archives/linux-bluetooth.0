@@ -1,227 +1,551 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 08 Mar 2012 06:54:24 +0000 (GMT)
-From: JAGANATH KANAKKASSERY <jaganath.k@samsung.com>
-Subject: Re: [PATCH obexd] gobex: call g_obex_unref() before io channel unref
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Reply-to: jaganath.k@samsung.com
-MIME-version: 1.0
-Content-type: text/plain; charset=windows-1252
-MIME-version: 1.0
-Message-id: <4963980.578001331189664043.JavaMail.weblogic@epml07>
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: [PATCH obexd 2/2] gobex: call g_obex_unref() before io channel unref
+Date: Thu, 08 Mar 2012 12:19:51 +0530
+Message-id: <1331189391-6807-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQpIaQ0KDQotLS0tLS0tIE9yaWdpbmFsIE1lc3NhZ2UgLS0tLS0tLQ0KU2VuZGVyIDogSkFHQU5B
-VEggS0FOQUtLQVNTRVJZPGphZ2FuYXRoLmtAc2Ftc3VuZy5jb20+ICBMZWFkIEVuZ2luZWVyL1NJ
-U08tTGludXggUGxhdGZvcm0gTGFiL1NhbXN1bmcgRWxlY3Ryb25pY3MNCkRhdGUgICA6IE1hciAw
-OCwgMjAxMiAxNTo0OCAoR01UKzA5OjAwKQ0KVGl0bGUgIDogW1BBVENIIG9iZXhkXSBnb2JleDog
-Y2FsbCBnX29iZXhfdW5yZWYoKSBiZWZvcmUgaW8gY2hhbm5lbCB1bnJlZg0KDQpJbiBnX29iZXhf
-dW5yZWYsIHR4X3F1ZXVlIHdpbGwgYmUgZmx1c2hlZCB3aGljaCByZXN1bHRzIGluIFNJR1BJUEUN
-CmluIGdfaW9fY2hhbm5lbF93cml0ZV9jaGFycygpIHNpbmNlIHNvY2tldCBpcyBhbHJlYWR5IGNs
-b3NlZCBpbg0KaW8gY2hhbm5lbCB1bnJlZi4NCi0tLQ0KIHVuaXQvdGVzdC1nb2JleC10cmFuc2Zl
-ci5jIHwgIDEwNSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLQ0K
-IDEgZmlsZXMgY2hhbmdlZCwgNzAgaW5zZXJ0aW9ucygrKSwgMzUgZGVsZXRpb25zKC0pDQoNCmRp
-ZmYgLS1naXQgYS91bml0L3Rlc3QtZ29iZXgtdHJhbnNmZXIuYyBiL3VuaXQvdGVzdC1nb2JleC10
-cmFuc2Zlci5jDQppbmRleCBjNzEyMzgyLi4yMTk1MDkwIDEwMDY0NA0KLS0tIGEvdW5pdC90ZXN0
-LWdvYmV4LXRyYW5zZmVyLmMNCisrKyBiL3VuaXQvdGVzdC1nb2JleC10cmFuc2Zlci5jDQpAQCAt
-Mjk3LDEyICsyOTcsMTMgQEAgc3RhdGljIHZvaWQgdGVzdF9wdXRfcmVxKHZvaWQpDQogDQogCWdf
-YXNzZXJ0X2NtcHVpbnQoZC5jb3VudCwgPT0sIDIpOw0KIA0KKwlnX29iZXhfdW5yZWYob2JleCk7
-DQorDQogCWdfbWFpbl9sb29wX3VucmVmKGQubWFpbmxvb3ApOw0KIA0KIAlnX3NvdXJjZV9yZW1v
-dmUodGltZXJfaWQpOw0KIAlnX2lvX2NoYW5uZWxfdW5yZWYoaW8pOw0KIAlnX3NvdXJjZV9yZW1v
-dmUoaW9faWQpOw0KLQlnX29iZXhfdW5yZWYob2JleCk7DQogDQogCWdfYXNzZXJ0X25vX2Vycm9y
-KGQuZXJyKTsNCiB9DQpAQCAtMzc0LDEyICszNzUsMTMgQEAgc3RhdGljIHZvaWQgdGVzdF9wdXRf
-cnNwKHZvaWQpDQogDQogCWdfYXNzZXJ0X2NtcHVpbnQoZC5jb3VudCwgPT0sIDEpOw0KIA0KKwln
-X29iZXhfdW5yZWYob2JleCk7DQorDQogCWdfbWFpbl9sb29wX3VucmVmKGQubWFpbmxvb3ApOw0K
-IA0KIAlnX3NvdXJjZV9yZW1vdmUodGltZXJfaWQpOw0KIAlnX2lvX2NoYW5uZWxfdW5yZWYoaW8p
-Ow0KIAlnX3NvdXJjZV9yZW1vdmUoaW9faWQpOw0KLQlnX29iZXhfdW5yZWYob2JleCk7DQogDQog
-CWdfYXNzZXJ0X25vX2Vycm9yKGQuZXJyKTsNCiB9DQpAQCAtNDQ1LDEyICs0NDcsMTMgQEAgc3Rh
-dGljIHZvaWQgdGVzdF9zdHJlYW1fcHV0X3JzcCh2b2lkKQ0KIA0KIAlnX2Fzc2VydF9jbXB1aW50
-KGQuY291bnQsID09LCBSQU5ET01fUEFDS0VUUyAtIDEpOw0KIA0KKwlnX29iZXhfdW5yZWYob2Jl
-eCk7DQorDQogCWdfbWFpbl9sb29wX3VucmVmKGQubWFpbmxvb3ApOw0KIA0KIAlnX3NvdXJjZV9y
-ZW1vdmUodGltZXJfaWQpOw0KIAlnX2lvX2NoYW5uZWxfdW5yZWYoaW8pOw0KIAlnX3NvdXJjZV9y
-ZW1vdmUoaW9faWQpOw0KLQlnX29iZXhfdW5yZWYob2JleCk7DQogDQogCWdfYXNzZXJ0X25vX2Vy
-cm9yKGQuZXJyKTsNCiB9DQpAQCAtNDkwLDEyICs0OTMsMTMgQEAgc3RhdGljIHZvaWQgdGVzdF9z
-dHJlYW1fcHV0X3JlcV9hYm9ydCh2b2lkKQ0KIA0KIAlnX2Fzc2VydF9jbXB1aW50KGQuY291bnQs
-ID09LCBSQU5ET01fUEFDS0VUUyAtIDIpOw0KIA0KKwlnX29iZXhfdW5yZWYob2JleCk7DQorDQog
-CWdfbWFpbl9sb29wX3VucmVmKGQubWFpbmxvb3ApOw0KIA0KIAlnX3NvdXJjZV9yZW1vdmUodGlt
-ZXJfaWQpOw0KIAlnX2lvX2NoYW5uZWxfdW5yZWYoaW8pOw0KIAlnX3NvdXJjZV9yZW1vdmUoaW9f
-aWQpOw0KLQlnX29iZXhfdW5yZWYob2JleCk7DQogDQogCWdfYXNzZXJ0X2Vycm9yKGQuZXJyLCBH
-X09CRVhfRVJST1IsIEdfT0JFWF9FUlJPUl9DQU5DRUxMRUQpOw0KIH0NCkBAIC01NTksMTIgKzU2
-MywxMyBAQCBzdGF0aWMgdm9pZCB0ZXN0X3BhY2tldF9wdXRfcnNwX3dhaXQodm9pZCkNCiANCiAJ
-Z19hc3NlcnRfY21wdWludChkLmNvdW50LCA9PSwgUkFORE9NX1BBQ0tFVFMpOw0KIA0KKwlnX29i
-ZXhfdW5yZWYob2JleCk7DQorDQogCWdfbWFpbl9sb29wX3VucmVmKGQubWFpbmxvb3ApOw0KIA0K
-IAlnX3NvdXJjZV9yZW1vdmUodGltZXJfaWQpOw0KIAlnX2lvX2NoYW5uZWxfdW5yZWYoaW8pOw0K
-IAlnX3NvdXJjZV9yZW1vdmUoaW9faWQpOw0KLQlnX29iZXhfdW5yZWYob2JleCk7DQogDQogCWdf
-YXNzZXJ0X25vX2Vycm9yKGQuZXJyKTsNCiB9DQpAQCAtNjA1LDEyICs2MTAsMTMgQEAgc3RhdGlj
-IHZvaWQgdGVzdF9wYWNrZXRfcHV0X3JzcCh2b2lkKQ0KIA0KIAlnX2Fzc2VydF9jbXB1aW50KGQu
-Y291bnQsID09LCBSQU5ET01fUEFDS0VUUyk7DQogDQorCWdfb2JleF91bnJlZihvYmV4KTsNCisN
-CiAJZ19tYWluX2xvb3BfdW5yZWYoZC5tYWlubG9vcCk7DQogDQogCWdfc291cmNlX3JlbW92ZSh0
-aW1lcl9pZCk7DQogCWdfaW9fY2hhbm5lbF91bnJlZihpbyk7DQogCWdfc291cmNlX3JlbW92ZShp
-b19pZCk7DQotCWdfb2JleF91bnJlZihvYmV4KTsNCiANCiAJZ19hc3NlcnRfbm9fZXJyb3IoZC5l
-cnIpOw0KIH0NCkBAIC02NDYsMTIgKzY1MiwxMyBAQCBzdGF0aWMgdm9pZCB0ZXN0X2dldF9yZXEo
-dm9pZCkNCiANCiAJZ19hc3NlcnRfY21wdWludChkLmNvdW50LCA9PSwgMik7DQogDQorCWdfb2Jl
-eF91bnJlZihvYmV4KTsNCisNCiAJZ19tYWluX2xvb3BfdW5yZWYoZC5tYWlubG9vcCk7DQogDQog
-CWdfc291cmNlX3JlbW92ZSh0aW1lcl9pZCk7DQogCWdfaW9fY2hhbm5lbF91bnJlZihpbyk7DQog
-CWdfc291cmNlX3JlbW92ZShpb19pZCk7DQotCWdfb2JleF91bnJlZihvYmV4KTsNCiANCiAJZ19h
-c3NlcnRfbm9fZXJyb3IoZC5lcnIpOw0KIH0NCkBAIC02OTEsMTIgKzY5OCwxMyBAQCBzdGF0aWMg
-dm9pZCB0ZXN0X3N0cmVhbV9nZXRfcmVxKHZvaWQpDQogDQogCWdfYXNzZXJ0X2NtcHVpbnQoZC5j
-b3VudCwgPT0sIFJBTkRPTV9QQUNLRVRTKTsNCiANCisJZ19vYmV4X3VucmVmKG9iZXgpOw0KKw0K
-IAlnX21haW5fbG9vcF91bnJlZihkLm1haW5sb29wKTsNCiANCiAJZ19zb3VyY2VfcmVtb3ZlKHRp
-bWVyX2lkKTsNCiAJZ19pb19jaGFubmVsX3VucmVmKGlvKTsNCiAJZ19zb3VyY2VfcmVtb3ZlKGlv
-X2lkKTsNCi0JZ19vYmV4X3VucmVmKG9iZXgpOw0KIA0KIAlnX2Fzc2VydF9ub19lcnJvcihkLmVy
-cik7DQogfQ0KQEAgLTczNiwxMiArNzQ0LDEzIEBAIHN0YXRpYyB2b2lkIHRlc3RfcGFja2V0X2dl
-dF9yZXEodm9pZCkNCiANCiAJZ19hc3NlcnRfY21wdWludChkLmNvdW50LCA9PSwgUkFORE9NX1BB
-Q0tFVFMpOw0KIA0KKwlnX29iZXhfdW5yZWYob2JleCk7DQorDQogCWdfbWFpbl9sb29wX3VucmVm
-KGQubWFpbmxvb3ApOw0KIA0KIAlnX3NvdXJjZV9yZW1vdmUodGltZXJfaWQpOw0KIAlnX2lvX2No
-YW5uZWxfdW5yZWYoaW8pOw0KIAlnX3NvdXJjZV9yZW1vdmUoaW9faWQpOw0KLQlnX29iZXhfdW5y
-ZWYob2JleCk7DQogDQogCWdfYXNzZXJ0X25vX2Vycm9yKGQuZXJyKTsNCiB9DQpAQCAtNzgyLDEy
-ICs3OTEsMTMgQEAgc3RhdGljIHZvaWQgdGVzdF9wYWNrZXRfZ2V0X3JlcV93YWl0KHZvaWQpDQog
-DQogCWdfYXNzZXJ0X2NtcHVpbnQoZC5jb3VudCwgPT0sIFJBTkRPTV9QQUNLRVRTKTsNCiANCisJ
-Z19vYmV4X3VucmVmKG9iZXgpOw0KKw0KIAlnX21haW5fbG9vcF91bnJlZihkLm1haW5sb29wKTsN
-CiANCiAJZ19zb3VyY2VfcmVtb3ZlKHRpbWVyX2lkKTsNCiAJZ19pb19jaGFubmVsX3VucmVmKGlv
-KTsNCiAJZ19zb3VyY2VfcmVtb3ZlKGlvX2lkKTsNCi0JZ19vYmV4X3VucmVmKG9iZXgpOw0KIA0K
-IAlnX2Fzc2VydF9ub19lcnJvcihkLmVycik7DQogfQ0KQEAgLTgyOCwxMiArODM4LDEzIEBAIHN0
-YXRpYyB2b2lkIHRlc3RfcGFja2V0X2dldF9yZXFfd2FpdF9uZXh0KHZvaWQpDQogDQogCWdfYXNz
-ZXJ0X2NtcHVpbnQoZC5jb3VudCwgPT0sIFJBTkRPTV9QQUNLRVRTKTsNCiANCisJZ19vYmV4X3Vu
-cmVmKG9iZXgpOw0KKw0KIAlnX21haW5fbG9vcF91bnJlZihkLm1haW5sb29wKTsNCiANCiAJZ19z
-b3VyY2VfcmVtb3ZlKHRpbWVyX2lkKTsNCiAJZ19pb19jaGFubmVsX3VucmVmKGlvKTsNCiAJZ19z
-b3VyY2VfcmVtb3ZlKGlvX2lkKTsNCi0JZ19vYmV4X3VucmVmKG9iZXgpOw0KIA0KIAlnX2Fzc2Vy
-dF9ub19lcnJvcihkLmVycik7DQogfQ0KQEAgLTg3MiwxMiArODgzLDEzIEBAIHN0YXRpYyB2b2lk
-IHRlc3RfZ2V0X3JlcV9hcHAodm9pZCkNCiANCiAJZ19hc3NlcnRfY21wdWludChkLmNvdW50LCA9
-PSwgMyk7DQogDQorCWdfb2JleF91bnJlZihvYmV4KTsNCisNCiAJZ19tYWluX2xvb3BfdW5yZWYo
-ZC5tYWlubG9vcCk7DQogDQogCWdfc291cmNlX3JlbW92ZSh0aW1lcl9pZCk7DQogCWdfaW9fY2hh
-bm5lbF91bnJlZihpbyk7DQogCWdfc291cmNlX3JlbW92ZShpb19pZCk7DQotCWdfb2JleF91bnJl
-ZihvYmV4KTsNCiANCiAJZ19hc3NlcnRfbm9fZXJyb3IoZC5lcnIpOw0KIH0NCkBAIC05NTcsMTIg
-Kzk2OSwxMyBAQCBzdGF0aWMgdm9pZCB0ZXN0X3N0cmVhbV9wdXRfcmVxKHZvaWQpDQogDQogCWdf
-YXNzZXJ0X2NtcHVpbnQoZC5jb3VudCwgPT0sIFJBTkRPTV9QQUNLRVRTKTsNCiANCisJZ19vYmV4
-X3VucmVmKG9iZXgpOw0KKw0KIAlnX21haW5fbG9vcF91bnJlZihkLm1haW5sb29wKTsNCiANCiAJ
-Z19zb3VyY2VfcmVtb3ZlKHRpbWVyX2lkKTsNCiAJZ19pb19jaGFubmVsX3VucmVmKGlvKTsNCiAJ
-Z19zb3VyY2VfcmVtb3ZlKGlvX2lkKTsNCi0JZ19vYmV4X3VucmVmKG9iZXgpOw0KIA0KIAlnX2Fz
-c2VydF9ub19lcnJvcihkLmVycik7DQogfQ0KQEAgLTEwMDMsMTIgKzEwMTYsMTMgQEAgc3RhdGlj
-IHZvaWQgdGVzdF9wYWNrZXRfcHV0X3JlcV93YWl0KHZvaWQpDQogDQogCWdfYXNzZXJ0X2NtcHVp
-bnQoZC5jb3VudCwgPT0sIFJBTkRPTV9QQUNLRVRTKTsNCiANCisJZ19vYmV4X3VucmVmKG9iZXgp
-Ow0KKw0KIAlnX21haW5fbG9vcF91bnJlZihkLm1haW5sb29wKTsNCiANCiAJZ19zb3VyY2VfcmVt
-b3ZlKHRpbWVyX2lkKTsNCiAJZ19pb19jaGFubmVsX3VucmVmKGlvKTsNCiAJZ19zb3VyY2VfcmVt
-b3ZlKGlvX2lkKTsNCi0JZ19vYmV4X3VucmVmKG9iZXgpOw0KIA0KIAlnX2Fzc2VydF9ub19lcnJv
-cihkLmVycik7DQogfQ0KQEAgLTEwNDksMTIgKzEwNjMsMTMgQEAgc3RhdGljIHZvaWQgdGVzdF9w
-YWNrZXRfcHV0X3JlcSh2b2lkKQ0KIA0KIAlnX2Fzc2VydF9jbXB1aW50KGQuY291bnQsID09LCBS
-QU5ET01fUEFDS0VUUyk7DQogDQorCWdfb2JleF91bnJlZihvYmV4KTsNCisNCiAJZ19tYWluX2xv
-b3BfdW5yZWYoZC5tYWlubG9vcCk7DQogDQogCWdfc291cmNlX3JlbW92ZSh0aW1lcl9pZCk7DQog
-CWdfaW9fY2hhbm5lbF91bnJlZihpbyk7DQogCWdfc291cmNlX3JlbW92ZShpb19pZCk7DQotCWdf
-b2JleF91bnJlZihvYmV4KTsNCiANCiAJZ19hc3NlcnRfbm9fZXJyb3IoZC5lcnIpOw0KIH0NCkBA
-IC0xMDg4LDYgKzExMDMsOCBAQCBzdGF0aWMgdm9pZCB0ZXN0X3B1dF9yZXFfZWFnYWluKHZvaWQp
-DQogCQkJCQlHX09CRVhfSERSX0lOVkFMSUQpOw0KIAlnX2Fzc2VydF9ub19lcnJvcihkLmVycik7
-DQogDQorCWdfb2JleF91bnJlZihvYmV4KTsNCisNCiAJZ19tYWluX2xvb3BfcnVuKGQubWFpbmxv
-b3ApOw0KIA0KIAlnX2Fzc2VydF9jbXB1aW50KGQuY291bnQsID09LCAyKTsNCkBAIC0xMDk3LDcg
-KzExMTQsNiBAQCBzdGF0aWMgdm9pZCB0ZXN0X3B1dF9yZXFfZWFnYWluKHZvaWQpDQogCWdfc291
-cmNlX3JlbW92ZSh0aW1lcl9pZCk7DQogCWdfaW9fY2hhbm5lbF91bnJlZihpbyk7DQogCWdfc291
-cmNlX3JlbW92ZShpb19pZCk7DQotCWdfb2JleF91bnJlZihvYmV4KTsNCiANCiAJZ19hc3NlcnRf
-bm9fZXJyb3IoZC5lcnIpOw0KIH0NCkBAIC0xMTMzLDEyICsxMTQ5LDEzIEBAIHN0YXRpYyB2b2lk
-IHRlc3RfZ2V0X3JzcCh2b2lkKQ0KIA0KIAlnX2Fzc2VydF9jbXB1aW50KGQuY291bnQsID09LCAx
-KTsNCiANCisJZ19vYmV4X3VucmVmKG9iZXgpOw0KKw0KIAlnX21haW5fbG9vcF91bnJlZihkLm1h
-aW5sb29wKTsNCiANCiAJZ19zb3VyY2VfcmVtb3ZlKHRpbWVyX2lkKTsNCiAJZ19pb19jaGFubmVs
-X3VucmVmKGlvKTsNCiAJZ19zb3VyY2VfcmVtb3ZlKGlvX2lkKTsNCi0JZ19vYmV4X3VucmVmKG9i
-ZXgpOw0KIA0KIAlnX2Fzc2VydF9ub19lcnJvcihkLmVycik7DQogfQ0KQEAgLTExOTcsMTIgKzEy
-MTQsMTMgQEAgc3RhdGljIHZvaWQgdGVzdF9zdHJlYW1fZ2V0X3JzcCh2b2lkKQ0KIA0KIAlnX2Fz
-c2VydF9jbXB1aW50KGQuY291bnQsID09LCBSQU5ET01fUEFDS0VUUyAtIDEpOw0KIA0KKwlnX29i
-ZXhfdW5yZWYob2JleCk7DQorDQogCWdfbWFpbl9sb29wX3VucmVmKGQubWFpbmxvb3ApOw0KIA0K
-IAlnX3NvdXJjZV9yZW1vdmUodGltZXJfaWQpOw0KIAlnX2lvX2NoYW5uZWxfdW5yZWYoaW8pOw0K
-IAlnX3NvdXJjZV9yZW1vdmUoaW9faWQpOw0KLQlnX29iZXhfdW5yZWYob2JleCk7DQogDQogCWdf
-YXNzZXJ0X25vX2Vycm9yKGQuZXJyKTsNCiB9DQpAQCAtMTI0MiwxMiArMTI2MCwxMyBAQCBzdGF0
-aWMgdm9pZCB0ZXN0X3BhY2tldF9nZXRfcnNwKHZvaWQpDQogDQogCWdfYXNzZXJ0X2NtcHVpbnQo
-ZC5jb3VudCwgPT0sIFJBTkRPTV9QQUNLRVRTIC0gMSk7DQogDQorCWdfb2JleF91bnJlZihvYmV4
-KTsNCisNCiAJZ19tYWluX2xvb3BfdW5yZWYoZC5tYWlubG9vcCk7DQogDQogCWdfc291cmNlX3Jl
-bW92ZSh0aW1lcl9pZCk7DQogCWdfaW9fY2hhbm5lbF91bnJlZihpbyk7DQogCWdfc291cmNlX3Jl
-bW92ZShpb19pZCk7DQotCWdfb2JleF91bnJlZihvYmV4KTsNCiANCiAJZ19hc3NlcnRfbm9fZXJy
-b3IoZC5lcnIpOw0KIH0NCkBAIC0xMzEwLDEyICsxMzI5LDEzIEBAIHN0YXRpYyB2b2lkIHRlc3Rf
-cGFja2V0X2dldF9yc3Bfd2FpdCh2b2lkKQ0KIA0KIAlnX2Fzc2VydF9jbXB1aW50KGQuY291bnQs
-ID09LCBSQU5ET01fUEFDS0VUUyAtIDEpOw0KIA0KKwlnX29iZXhfdW5yZWYob2JleCk7DQorDQog
-CWdfbWFpbl9sb29wX3VucmVmKGQubWFpbmxvb3ApOw0KIA0KIAlnX3NvdXJjZV9yZW1vdmUodGlt
-ZXJfaWQpOw0KIAlnX2lvX2NoYW5uZWxfdW5yZWYoaW8pOw0KIAlnX3NvdXJjZV9yZW1vdmUoaW9f
-aWQpOw0KLQlnX29iZXhfdW5yZWYob2JleCk7DQogDQogCWdfYXNzZXJ0X25vX2Vycm9yKGQuZXJy
-KTsNCiB9DQpAQCAtMTM3NywxMiArMTM5NywxMyBAQCBzdGF0aWMgdm9pZCB0ZXN0X2dldF9yc3Bf
-YXBwKHZvaWQpDQogDQogCWdfYXNzZXJ0X2NtcHVpbnQoZC5jb3VudCwgPT0sIDIpOw0KIA0KKwln
-X29iZXhfdW5yZWYob2JleCk7DQorDQogCWdfbWFpbl9sb29wX3VucmVmKGQubWFpbmxvb3ApOw0K
-IA0KIAlnX3NvdXJjZV9yZW1vdmUodGltZXJfaWQpOw0KIAlnX2lvX2NoYW5uZWxfdW5yZWYoaW8p
-Ow0KIAlnX3NvdXJjZV9yZW1vdmUoaW9faWQpOw0KLQlnX29iZXhfdW5yZWYob2JleCk7DQogDQog
-CWdfYXNzZXJ0X25vX2Vycm9yKGQuZXJyKTsNCiB9DQpAQCAtMTQyMCwxMiArMTQ0MSwxMyBAQCBz
-dGF0aWMgdm9pZCB0ZXN0X3B1dF9yZXFfZGVsYXkodm9pZCkNCiANCiAJZ19hc3NlcnRfY21wdWlu
-dChkLmNvdW50LCA9PSwgMik7DQogDQorCWdfb2JleF91bnJlZihvYmV4KTsNCisNCiAJZ19tYWlu
-X2xvb3BfdW5yZWYoZC5tYWlubG9vcCk7DQogDQogCWdfc291cmNlX3JlbW92ZSh0aW1lcl9pZCk7
-DQogCWdfaW9fY2hhbm5lbF91bnJlZihpbyk7DQogCWdfc291cmNlX3JlbW92ZShpb19pZCk7DQot
-CWdfb2JleF91bnJlZihvYmV4KTsNCiANCiAJZ19hc3NlcnRfbm9fZXJyb3IoZC5lcnIpOw0KIH0N
-CkBAIC0xNDYzLDEyICsxNDg1LDEzIEBAIHN0YXRpYyB2b2lkIHRlc3RfZ2V0X3JzcF9kZWxheSh2
-b2lkKQ0KIA0KIAlnX2Fzc2VydF9jbXB1aW50KGQuY291bnQsID09LCAxKTsNCiANCisJZ19vYmV4
-X3VucmVmKG9iZXgpOw0KKw0KIAlnX21haW5fbG9vcF91bnJlZihkLm1haW5sb29wKTsNCiANCiAJ
-Z19zb3VyY2VfcmVtb3ZlKHRpbWVyX2lkKTsNCiAJZ19pb19jaGFubmVsX3VucmVmKGlvKTsNCiAJ
-Z19zb3VyY2VfcmVtb3ZlKGlvX2lkKTsNCi0JZ19vYmV4X3VucmVmKG9iZXgpOw0KIA0KIAlnX2Fz
-c2VydF9ub19lcnJvcihkLmVycik7DQogfQ0KQEAgLTE1NDcsMTIgKzE1NzAsMTMgQEAgc3RhdGlj
-IHZvaWQgdGVzdF9wdXRfcnNwX2RlbGF5KHZvaWQpDQogDQogCWdfYXNzZXJ0X2NtcHVpbnQoZC5j
-b3VudCwgPT0sIDEpOw0KIA0KKwlnX29iZXhfdW5yZWYob2JleCk7DQorDQogCWdfbWFpbl9sb29w
-X3VucmVmKGQubWFpbmxvb3ApOw0KIA0KIAlnX3NvdXJjZV9yZW1vdmUodGltZXJfaWQpOw0KIAln
-X2lvX2NoYW5uZWxfdW5yZWYoaW8pOw0KIAlnX3NvdXJjZV9yZW1vdmUoaW9faWQpOw0KLQlnX29i
-ZXhfdW5yZWYob2JleCk7DQogDQogCWdfYXNzZXJ0X25vX2Vycm9yKGQuZXJyKTsNCiB9DQpAQCAt
-MTU5MCwxMiArMTYxNCwxMyBAQCBzdGF0aWMgdm9pZCB0ZXN0X2dldF9yZXFfZGVsYXkodm9pZCkN
-CiANCiAJZ19hc3NlcnRfY21wdWludChkLmNvdW50LCA9PSwgMik7DQogDQorCWdfb2JleF91bnJl
-ZihvYmV4KTsNCisNCiAJZ19tYWluX2xvb3BfdW5yZWYoZC5tYWlubG9vcCk7DQogDQogCWdfc291
-cmNlX3JlbW92ZSh0aW1lcl9pZCk7DQogCWdfaW9fY2hhbm5lbF91bnJlZihpbyk7DQogCWdfc291
-cmNlX3JlbW92ZShpb19pZCk7DQotCWdfb2JleF91bnJlZihvYmV4KTsNCiANCiAJZ19hc3NlcnRf
-bm9fZXJyb3IoZC5lcnIpOw0KIH0NCkBAIC0xNjM0LDEyICsxNjU5LDEzIEBAIHN0YXRpYyB2b2lk
-IHRlc3RfZ2V0X3JzcF9lYWdhaW4odm9pZCkNCiANCiAJZ19hc3NlcnRfY21wdWludChkLmNvdW50
-LCA9PSwgMSk7DQogDQorCWdfb2JleF91bnJlZihvYmV4KTsNCisNCiAJZ19tYWluX2xvb3BfdW5y
-ZWYoZC5tYWlubG9vcCk7DQogDQogCWdfc291cmNlX3JlbW92ZSh0aW1lcl9pZCk7DQogCWdfaW9f
-Y2hhbm5lbF91bnJlZihpbyk7DQogCWdfc291cmNlX3JlbW92ZShpb19pZCk7DQotCWdfb2JleF91
-bnJlZihvYmV4KTsNCiANCiAJZ19hc3NlcnRfbm9fZXJyb3IoZC5lcnIpOw0KIH0NCkBAIC0xNjgy
-LDEyICsxNzA4LDEzIEBAIHN0YXRpYyB2b2lkIHRlc3RfY29ubl9yZXEodm9pZCkNCiANCiAJZ19h
-c3NlcnRfY21wdWludChkLmNvdW50LCA9PSwgMSk7DQogDQorCWdfb2JleF91bnJlZihvYmV4KTsN
-CisNCiAJZ19tYWluX2xvb3BfdW5yZWYoZC5tYWlubG9vcCk7DQogDQogCWdfc291cmNlX3JlbW92
-ZSh0aW1lcl9pZCk7DQogCWdfaW9fY2hhbm5lbF91bnJlZihpbyk7DQogCWdfc291cmNlX3JlbW92
-ZShpb19pZCk7DQotCWdfb2JleF91bnJlZihvYmV4KTsNCiANCiAJZ19hc3NlcnRfbm9fZXJyb3Io
-ZC5lcnIpOw0KIH0NCkBAIC0xNzQzLDEyICsxNzcwLDEzIEBAIHN0YXRpYyB2b2lkIHRlc3RfY29u
-bl9yc3Aodm9pZCkNCiANCiAJZ19hc3NlcnRfY21wdWludChkLmNvdW50LCA9PSwgMSk7DQogDQor
-CWdfb2JleF91bnJlZihvYmV4KTsNCisNCiAJZ19tYWluX2xvb3BfdW5yZWYoZC5tYWlubG9vcCk7
-DQogDQogCWdfc291cmNlX3JlbW92ZSh0aW1lcl9pZCk7DQogCWdfaW9fY2hhbm5lbF91bnJlZihp
-byk7DQogCWdfc291cmNlX3JlbW92ZShpb19pZCk7DQotCWdfb2JleF91bnJlZihvYmV4KTsNCiAN
-CiAJZ19hc3NlcnRfbm9fZXJyb3IoZC5lcnIpOw0KIH0NCkBAIC0xODAxLDEyICsxODI5LDEzIEBA
-IHN0YXRpYyB2b2lkIHRlc3RfY29ubl9nZXRfcmVxKHZvaWQpDQogDQogCWdfYXNzZXJ0X2NtcHVp
-bnQoZC5jb3VudCwgPT0sIDMpOw0KIA0KKwlnX29iZXhfdW5yZWYob2JleCk7DQorDQogCWdfbWFp
-bl9sb29wX3VucmVmKGQubWFpbmxvb3ApOw0KIA0KIAlnX3NvdXJjZV9yZW1vdmUodGltZXJfaWQp
-Ow0KIAlnX2lvX2NoYW5uZWxfdW5yZWYoaW8pOw0KIAlnX3NvdXJjZV9yZW1vdmUoaW9faWQpOw0K
-LQlnX29iZXhfdW5yZWYob2JleCk7DQogDQogCWdfYXNzZXJ0X25vX2Vycm9yKGQuZXJyKTsNCiB9
-DQpAQCAtMTg0OSwxMiArMTg3OCwxMyBAQCBzdGF0aWMgdm9pZCB0ZXN0X2Nvbm5fZ2V0X3JzcCh2
-b2lkKQ0KIA0KIAlnX2Fzc2VydF9jbXB1aW50KGQuY291bnQsID09LCAyKTsNCiANCisJZ19vYmV4
-X3VucmVmKG9iZXgpOw0KKw0KIAlnX21haW5fbG9vcF91bnJlZihkLm1haW5sb29wKTsNCiANCiAJ
-Z19zb3VyY2VfcmVtb3ZlKHRpbWVyX2lkKTsNCiAJZ19pb19jaGFubmVsX3VucmVmKGlvKTsNCiAJ
-Z19zb3VyY2VfcmVtb3ZlKGlvX2lkKTsNCi0JZ19vYmV4X3VucmVmKG9iZXgpOw0KIA0KIAlnX2Fz
-c2VydF9ub19lcnJvcihkLmVycik7DQogfQ0KQEAgLTE5MDcsMTIgKzE5MzcsMTMgQEAgc3RhdGlj
-IHZvaWQgdGVzdF9jb25uX3B1dF9yZXEodm9pZCkNCiANCiAJZ19hc3NlcnRfY21wdWludChkLmNv
-dW50LCA9PSwgMyk7DQogDQorCWdfb2JleF91bnJlZihvYmV4KTsNCisNCiAJZ19tYWluX2xvb3Bf
-dW5yZWYoZC5tYWlubG9vcCk7DQogDQogCWdfc291cmNlX3JlbW92ZSh0aW1lcl9pZCk7DQogCWdf
-aW9fY2hhbm5lbF91bnJlZihpbyk7DQogCWdfc291cmNlX3JlbW92ZShpb19pZCk7DQotCWdfb2Jl
-eF91bnJlZihvYmV4KTsNCiANCiAJZ19hc3NlcnRfbm9fZXJyb3IoZC5lcnIpOw0KIH0NCkBAIC0x
-OTU1LDEyICsxOTg2LDEzIEBAIHN0YXRpYyB2b2lkIHRlc3RfY29ubl9wdXRfcnNwKHZvaWQpDQog
-DQogCWdfYXNzZXJ0X2NtcHVpbnQoZC5jb3VudCwgPT0sIDIpOw0KIA0KKwlnX29iZXhfdW5yZWYo
-b2JleCk7DQorDQogCWdfbWFpbl9sb29wX3VucmVmKGQubWFpbmxvb3ApOw0KIA0KIAlnX3NvdXJj
-ZV9yZW1vdmUodGltZXJfaWQpOw0KIAlnX2lvX2NoYW5uZWxfdW5yZWYoaW8pOw0KIAlnX3NvdXJj
-ZV9yZW1vdmUoaW9faWQpOw0KLQlnX29iZXhfdW5yZWYob2JleCk7DQogDQogCWdfYXNzZXJ0X25v
-X2Vycm9yKGQuZXJyKTsNCiB9DQpAQCAtMTk5OCwxMiArMjAzMCwxMyBAQCBzdGF0aWMgdm9pZCB0
-ZXN0X2Nvbm5fZ2V0X3dyZ19yc3Aodm9pZCkNCiANCiAJZ19hc3NlcnRfY21wdWludChkLmNvdW50
-LCA9PSwgMik7DQogDQorCWdfb2JleF91bnJlZihvYmV4KTsNCisNCiAJZ19tYWluX2xvb3BfdW5y
-ZWYoZC5tYWlubG9vcCk7DQogDQogCWdfc291cmNlX3JlbW92ZSh0aW1lcl9pZCk7DQogCWdfaW9f
-Y2hhbm5lbF91bnJlZihpbyk7DQogCWdfc291cmNlX3JlbW92ZShpb19pZCk7DQotCWdfb2JleF91
-bnJlZihvYmV4KTsNCiANCiAJZ19hc3NlcnRfbm9fZXJyb3IoZC5lcnIpOw0KIH0NCkBAIC0yMDU4
-LDEyICsyMDkxLDEzIEBAIHN0YXRpYyB2b2lkIHRlc3RfY29ubl9wdXRfcmVxX3NlcSh2b2lkKQ0K
-IA0KIAlnX2Fzc2VydF9jbXB1aW50KGQuY291bnQsID09LCBSQU5ET01fUEFDS0VUUyk7DQogDQor
-CWdfb2JleF91bnJlZihvYmV4KTsNCisNCiAJZ19tYWluX2xvb3BfdW5yZWYoZC5tYWlubG9vcCk7
-DQogDQogCWdfc291cmNlX3JlbW92ZSh0aW1lcl9pZCk7DQogCWdfaW9fY2hhbm5lbF91bnJlZihp
-byk7DQogCWdfc291cmNlX3JlbW92ZShpb19pZCk7DQotCWdfb2JleF91bnJlZihvYmV4KTsNCiAN
-CiAJZ19hc3NlcnRfbm9fZXJyb3IoZC5lcnIpOw0KIH0NCkBAIC0yMTE5LDEyICsyMTUzLDEzIEBA
-IHN0YXRpYyB2b2lkIHRlc3RfY29ubl9wdXRfcmVxX3NlcV9zcm0odm9pZCkNCiANCiAJZ19hc3Nl
-cnRfY21wdWludChkLmNvdW50LCA9PSwgUkFORE9NX1BBQ0tFVFMpOw0KIA0KKwlnX29iZXhfdW5y
-ZWYob2JleCk7DQorDQogCWdfbWFpbl9sb29wX3VucmVmKGQubWFpbmxvb3ApOw0KIA0KIAlnX3Nv
-dXJjZV9yZW1vdmUodGltZXJfaWQpOw0KIAlnX2lvX2NoYW5uZWxfdW5yZWYoaW8pOw0KIAlnX3Nv
-dXJjZV9yZW1vdmUoaW9faWQpOw0KLQlnX29iZXhfdW5yZWYob2JleCk7DQogDQogCWdfYXNzZXJ0
-X25vX2Vycm9yKGQuZXJyKTsNCiB9DQotLSANCjEuNy4xDQoNClBsZWFzZSBpZ25vcmUgdGhpcyBw
-YXRjaA0KDQpSZWdhcmRzDQpKYWdhbmF0aA0K
+In g_obex_unref, tx_queue will be flushed which results in SIGPIPE
+in g_io_channel_write_chars() since socket is already closed in
+io channel unref.
+---
+ unit/test-gobex-transfer.c |  105 +++++++++++++++++++++++++++++---------------
+ 1 files changed, 70 insertions(+), 35 deletions(-)
 
+diff --git a/unit/test-gobex-transfer.c b/unit/test-gobex-transfer.c
+index c712382..2195090 100644
+--- a/unit/test-gobex-transfer.c
++++ b/unit/test-gobex-transfer.c
+@@ -297,12 +297,13 @@ static void test_put_req(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 2);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -374,12 +375,13 @@ static void test_put_rsp(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 1);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -445,12 +447,13 @@ static void test_stream_put_rsp(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS - 1);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -490,12 +493,13 @@ static void test_stream_put_req_abort(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS - 2);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_error(d.err, G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED);
+ }
+@@ -559,12 +563,13 @@ static void test_packet_put_rsp_wait(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -605,12 +610,13 @@ static void test_packet_put_rsp(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -646,12 +652,13 @@ static void test_get_req(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 2);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -691,12 +698,13 @@ static void test_stream_get_req(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -736,12 +744,13 @@ static void test_packet_get_req(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -782,12 +791,13 @@ static void test_packet_get_req_wait(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -828,12 +838,13 @@ static void test_packet_get_req_wait_next(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -872,12 +883,13 @@ static void test_get_req_app(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 3);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -957,12 +969,13 @@ static void test_stream_put_req(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1003,12 +1016,13 @@ static void test_packet_put_req_wait(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1049,12 +1063,13 @@ static void test_packet_put_req(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1088,6 +1103,8 @@ static void test_put_req_eagain(void)
+ 					G_OBEX_HDR_INVALID);
+ 	g_assert_no_error(d.err);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_run(d.mainloop);
+ 
+ 	g_assert_cmpuint(d.count, ==, 2);
+@@ -1097,7 +1114,6 @@ static void test_put_req_eagain(void)
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1133,12 +1149,13 @@ static void test_get_rsp(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 1);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1197,12 +1214,13 @@ static void test_stream_get_rsp(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS - 1);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1242,12 +1260,13 @@ static void test_packet_get_rsp(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS - 1);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1310,12 +1329,13 @@ static void test_packet_get_rsp_wait(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS - 1);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1377,12 +1397,13 @@ static void test_get_rsp_app(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 2);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1420,12 +1441,13 @@ static void test_put_req_delay(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 2);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1463,12 +1485,13 @@ static void test_get_rsp_delay(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 1);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1547,12 +1570,13 @@ static void test_put_rsp_delay(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 1);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1590,12 +1614,13 @@ static void test_get_req_delay(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 2);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1634,12 +1659,13 @@ static void test_get_rsp_eagain(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 1);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1682,12 +1708,13 @@ static void test_conn_req(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 1);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1743,12 +1770,13 @@ static void test_conn_rsp(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 1);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1801,12 +1829,13 @@ static void test_conn_get_req(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 3);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1849,12 +1878,13 @@ static void test_conn_get_rsp(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 2);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1907,12 +1937,13 @@ static void test_conn_put_req(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 3);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1955,12 +1986,13 @@ static void test_conn_put_rsp(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 2);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -1998,12 +2030,13 @@ static void test_conn_get_wrg_rsp(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, 2);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -2058,12 +2091,13 @@ static void test_conn_put_req_seq(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+@@ -2119,12 +2153,13 @@ static void test_conn_put_req_seq_srm(void)
+ 
+ 	g_assert_cmpuint(d.count, ==, RANDOM_PACKETS);
+ 
++	g_obex_unref(obex);
++
+ 	g_main_loop_unref(d.mainloop);
+ 
+ 	g_source_remove(timer_id);
+ 	g_io_channel_unref(io);
+ 	g_source_remove(io_id);
+-	g_obex_unref(obex);
+ 
+ 	g_assert_no_error(d.err);
+ }
+-- 
+1.7.1
 
