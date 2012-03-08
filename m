@@ -1,78 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABMQnV+pQqS97OLcBnUNK4xu735Gqikirdr0o0CbcGG_j+2sHw@mail.gmail.com>
-References: <CABMQnV+pQqS97OLcBnUNK4xu735Gqikirdr0o0CbcGG_j+2sHw@mail.gmail.com>
-Date: Thu, 8 Mar 2012 11:04:06 +0100
-Message-ID: <CAOcK=CPHnZPxgSNmxfcfmFJBTxn61FrV6DcSZmJfCfzTiSveUw@mail.gmail.com>
-Subject: Re: bluez: Build fail with -std=c99 on using bluez application
-From: Markus Rathgeb <maggu2810@googlemail.com>
-To: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+In-Reply-To: <1331147816.3392.182.camel@aeonflux>
+References: <1331118699-10591-1-git-send-email-luiz.dentz@gmail.com>
+	<1331147816.3392.182.camel@aeonflux>
+Date: Thu, 8 Mar 2012 11:28:34 +0200
+Message-ID: <CABBYNZKvv-+FLNHoOr7M6by9MS+aChsDigZEjoL2x=5pGskhiQ@mail.gmail.com>
+Subject: Re: [PATCH obexd] build: Fix libbluetooth dependency
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I think, it is the same problem I reported here:
-http://permalink.gmane.org/gmane.linux.bluez.kernel/22294
+Hi Marcel,
 
-2012/3/8 Nobuhiro Iwamatsu <iwamatsu@nigauri.org>:
-> Hi,
+On Wed, Mar 7, 2012 at 9:16 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+> Hi Luiz,
 >
-> When I built application using bluez with -std=c99 option, build failed.
-> It can build, when not checking c99. I tested with bluez 4.99.
-> Do you recommend not to checking c99?
+>> Building with libbluetooth prior to 4.99 cause an error:
+>>
+>> btio/btio.c: In function 'get_key_size':
+>> btio/btio.c:522:14: error: 'struct bt_security' has no member named 'key=
+_size
+>>
+>> Thanks to Bastien Nocera for reporting it.
+>> ---
+>> =A0configure.ac | =A0 =A04 ++--
+>> =A01 files changed, 2 insertions(+), 2 deletions(-)
 >
-> Best regards,
->  Nobuhiro
-> -----
-> $ cat t.c
-> #include <bluetooth/bluetooth.h>
-> $ gcc -std=c99 -c t.c
-> In file included from t.c:1:0:
-> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_le64’:
-> /usr/include/bluetooth/bluetooth.h:159:9: error: expected
-> specifier-qualifier-list before ‘typeof’
-> /usr/include/bluetooth/bluetooth.h:159:9: error: called object
-> ‘typeof(__p)’ is not a function
-> /usr/include/bluetooth/bluetooth.h:159:9: error: ‘struct <anonymous>’
-> has no member named ‘__v’
-> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_be64’:
-> /usr/include/bluetooth/bluetooth.h:164:9: error: expected
-> specifier-qualifier-list before ‘typeof’
-> /usr/include/bluetooth/bluetooth.h:164:9: error: called object
-> ‘typeof(__p)’ is not a function
-> /usr/include/bluetooth/bluetooth.h:164:9: error: ‘struct <anonymous>’
-> has no member named ‘__v’
-> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_le32’:
-> /usr/include/bluetooth/bluetooth.h:169:9: error: expected
-> specifier-qualifier-list before ‘typeof’
-> /usr/include/bluetooth/bluetooth.h:169:9: error: called object
-> ‘typeof(__p)’ is not a function
-> /usr/include/bluetooth/bluetooth.h:169:9: error: ‘struct <anonymous>’
-> has no member named ‘__v’
-> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_be32’:
-> /usr/include/bluetooth/bluetooth.h:174:9: error: expected
-> specifier-qualifier-list before ‘typeof’
-> /usr/include/bluetooth/bluetooth.h:174:9: error: called object
-> ‘typeof(__p)’ is not a function
-> /usr/include/bluetooth/bluetooth.h:174:9: error: ‘struct <anonymous>’
-> has no member named ‘__v’
-> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_le16’:
-> /usr/include/bluetooth/bluetooth.h:179:9: error: expected
-> specifier-qualifier-list before ‘typeof’
-> /usr/include/bluetooth/bluetooth.h:179:9: error: called object
-> ‘typeof(__p)’ is not a function
-> /usr/include/bluetooth/bluetooth.h:179:9: error: ‘struct <anonymous>’
-> has no member named ‘__v’
-> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_be16’:
-> /usr/include/bluetooth/bluetooth.h:184:9: error: expected
-> specifier-qualifier-list before ‘typeof’
-> /usr/include/bluetooth/bluetooth.h:184:9: error: called object
-> ‘typeof(__p)’ is not a function
-> /usr/include/bluetooth/bluetooth.h:184:9: error: ‘struct <anonymous>’
-> has no member named ‘__v’
-> -----
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> I rather not have this patch included since it makes things complicated
+> for people to build this. Copying over just the header is good enough to
+> fix this.
+
+I would agree if we do static linking the whole libbluetooth, but just
+a header IMO that is asking for trouble e.g. it could still cause
+linking problems due to missing implementation or even crashes.
+
+Maybe we should think more seriously about moving obexd inside BlueZ.
+
+
+--=20
+Luiz Augusto von Dentz
