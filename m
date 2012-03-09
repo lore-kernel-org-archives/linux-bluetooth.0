@@ -1,66 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 9 Mar 2012 13:08:04 +0000
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jaganath <jaganath.k@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/2] gobex: flush tx_queue before disconnection
-Message-ID: <20120309130804.GA31252@x220.spectrum.wifi>
-References: <1331189303-6734-1-git-send-email-jaganath.k@samsung.com>
- <20120308234250.GB15265@x220.amr.corp.intel.com>
- <22D13068A6CE4724BFD60D3D46B5FD11@sisodomain.com>
+Date: Fri, 9 Mar 2012 14:04:13 +0100
+From: Johan Hovold <jhovold@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, stable <stable@vger.kernel.org>
+Subject: Re: [PATCH 1/2] bluetooth: hci_ldisc: fix NULL-pointer dereference
+ on tty_close
+Message-ID: <20120309130413.GC4497@localhost>
+References: <1331136120-27075-1-git-send-email-jhovold@gmail.com>
+ <1331136120-27075-2-git-send-email-jhovold@gmail.com>
+ <1331148797.3392.191.camel@aeonflux>
+ <20120308115721.GB4497@localhost>
+ <1331228722.14217.7.camel@aeonflux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <22D13068A6CE4724BFD60D3D46B5FD11@sisodomain.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1331228722.14217.7.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
-
-On Fri, Mar 09, 2012, Jaganath wrote:
-> >On Thu, Mar 08, 2012, Jaganath Kanakkassery wrote:
-> >>@@ -1335,6 +1335,12 @@ void g_obex_unref(GObex *obex)
-> >>
-> >> g_slist_free_full(obex->req_handlers, g_free);
-> >>
-> >>+ do {
-> >>+ ret = write_data(obex->io, G_IO_OUT, obex);
-> >>+ if (obex->pending_req && obex->pending_req->cancelled)
-> >>+ break;
-> >>+ } while(ret);
-> >
-> >This is not ok since we should only attempt writing to the transport if
-> >G_IO_OUT is *really* set and not just fake it. Otherwise the call might
-> >block which is not acceptable for the way gobex is designed (to be used
-> >with a single async mainloop).
+On Thu, Mar 08, 2012 at 09:45:22AM -0800, Marcel Holtmann wrote:
+> Hi Johan,
 > 
-> This actually fixes the issue abort req not sending if user cancels the
-> transfer because in user cancel scenario, ABORT req will be queued
-> but before G_IO_OUT happens the transport will be disconnected.
-> This is actually required to pass a pts test case because pts requires
-> ABORT before disconnection.
-
-I fully understand that this needs to be fixed, it's just that the way
-you're proposing is not a good way to do it.
-
-> So I have two solutions after considering your and Luiz's opinion. '
+> > > > Do not close protocol driver until device has been unregistered.
+> > > > 
+> > > > This fixes a race between tty_close and hci_dev_open which can result in
+> > > > a NULL-pointer dereference.
+> > > > 
+> > > > The line discipline closes the protocol driver while we may still have
+> > > > hci_dev_open sleeping on the req_lock mutex resulting in a NULL-pointer
+> > > > dereference when lock is acquired and hci_init_req called.
+> > 
+> > [...]
+> > 
+> > > what kernel version is this against? Our changes in bluetooth-next fixed
+> > > some of the destruct handling.
+> > 
+> > This is against the latest rc as it needs to be fixed in 3.3, but I
+> > missed a dependency to bluetooth-next as you point out below.
+> > 
+> > > Also hci_unregister_dev should be calling the destruct handler and thus
+> > > your change is now accessing hu but it got freed already.
+> > 
+> > You're right, my patch depends on 010666a126fc ("Bluetooth: Make
+> > hci-destruct callback optional") and 797fe796c4 ("Bluetooth: uart-ldisc:
+> > Fix memory leak and remove destruct cb") from bluetooth-next. 
+> > 
+> > But since the latter one fixes a memory leak it should have been marked
+> > for stable as well as pushed to Linus for 3.3, right?
 > 
-> 1. In g_obex_send_internal() if the packet is ABORT we should send it
-> immediately using write_data(). Since ABORT packet size is small I think
-> it is ok to block the write.
+> we need to look into this and propose patches for -stable. Is your
+> problem still present with bluetooth-next or not?
 
-Nope, it's never ok to block on write.
+Yes, both races are present in bluetooth-next of today (b8622cbd58f34)
+and only takes an additional manual step to trigger (as the core no
+longer tries to open the device twice automatically).
 
-> 2.  If user cancels transfer just send ABORT and disconnect transport only
-> after getting the response. But waiting for ABORT response is not
-> good I feel.
+My two patches on top of either the two patches by David Herrmann
+mentioned above or the following minimal fix of the same memory leak
+would be sufficient to fix both races in 3.3:
 
-I think it *is* good to wait for the response. I've seen devices which
-break if you disconnect the transport without waiting for OBEX
-Disconnect command response and there could also be devices which
-exhibit similar behavior for Abort.
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 0711448..97c5faa 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -237,7 +237,6 @@ static void hci_uart_destruct(struct hci_dev *hdev)
+                return;
+ 
+        BT_DBG("%s", hdev->name);
+-       kfree(hdev->driver_data);
+ }
+ 
+ /* ------ LDISC part ------ */
+@@ -316,6 +315,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
+                                hci_free_dev(hdev);
+                        }
+                }
++               kfree(hu);
+        }
+ }
 
-I think this needs to be fixed on a higher layer than gobex as gobex
-already provides a mechanism for waiting for the completion (or
-cancellation) of a command.
 
+Thanks,
 Johan
