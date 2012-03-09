@@ -1,43 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1331312796.14217.14.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Fix extra conversion to __le32
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 09 Mar 2012 09:06:36 -0800
-In-Reply-To: <1331290850-30092-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1331290850-30092-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 9 Mar 2012 16:50:07 +0100
+From: Johan Hovold <jhovold@gmail.com>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>,
+	stable <stable@vger.kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: Re: [PATCH 2/3] bluetooth: hci_ldisc: fix NULL-pointer dereference
+ on tty_close
+Message-ID: <20120309155007.GI4497@localhost>
+References: <1331307806-21761-1-git-send-email-jhovold@gmail.com>
+ <1331307806-21761-3-git-send-email-jhovold@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1331307806-21761-3-git-send-email-jhovold@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
-
-> Value to be converted is already in __le32 format.
+On Fri, Mar 09, 2012 at 04:43:25PM +0100, Johan Hovold wrote:
+> Do not close protocol driver until device has been unregistered.
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> This fixes a race between tty_close and hci_dev_open which can result in
+> a NULL-pointer dereference.
+> 
+> The line discipline closes the protocol driver while we may still have
+> hci_dev_open sleeping on the req_lock mutex resulting in a NULL-pointer
+> dereference when lock is acquired and hci_init_req called.
+
+[...]
+
+> Cc: stable <stable@vger.kernel.org>
+> Signed-off-by: Johan Hovold <jhovold@gmail.com>
+
+David (Herrmann), I forgot to add your Reviewed-by on this one. Feel
+free to add it again if you want to.
+
+Thanks,
+Johan
+
 > ---
->  net/bluetooth/mgmt.c |    2 +-
+>  drivers/bluetooth/hci_ldisc.c |    2 +-
 >  1 files changed, 1 insertions(+), 1 deletions(-)
 > 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 7fcff88..97b5b6c 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -3107,7 +3107,7 @@ int mgmt_user_confirm_request(struct hci_dev *hdev, bdaddr_t *bdaddr,
->  	bacpy(&ev.addr.bdaddr, bdaddr);
->  	ev.addr.type = link_to_mgmt(link_type, addr_type);
->  	ev.confirm_hint = confirm_hint;
-> -	put_unaligned_le32(value, &ev.value);
-> +	ev.value = value;
-
-actually we do not need put_unaligned_le32 anyway here since the struct
-itself is already __packed. So you might wanna go through the code and
-fix these up as well.
-
-Regards
-
-Marcel
-
-
+> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> index 97c5faa..5119c4b 100644
+> --- a/drivers/bluetooth/hci_ldisc.c
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -309,11 +309,11 @@ static void hci_uart_tty_close(struct tty_struct *tty)
+>  			hci_uart_close(hdev);
+>  
+>  		if (test_and_clear_bit(HCI_UART_PROTO_SET, &hu->flags)) {
+> -			hu->proto->close(hu);
+>  			if (hdev) {
+>  				hci_unregister_dev(hdev);
+>  				hci_free_dev(hdev);
+>  			}
+> +			hu->proto->close(hu);
+>  		}
+>  		kfree(hu);
+>  	}
