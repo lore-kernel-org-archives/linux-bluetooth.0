@@ -1,42 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 8 Mar 2012 18:01:53 -0600
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [PATCH obexd v2 0/4] client: parameter naming convention
+Message-ID: <20120309000153.GC19895@x220.amr.corp.intel.com>
+References: <1331131829-28509-1-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
-Date: Thu, 8 Mar 2012 18:09:38 -0600
-Message-ID: <CAB7rCThRVZmGensz_bv6rFFS5Pf_BvOiVW4dFjmC6KkoVLgvXQ@mail.gmail.com>
-Subject: obtain HFP disconnection event reason code
-From: Mike <puffy.taco@gmail.com>
-To: linux-bluetooth@vger.kernel.org, ofono@ofono.org
-Reply-To: ofono@ofono.org
-List-Unsubscribe: <http://lists.ofono.org/options/ofono>,
-	<mailto:ofono-request@ofono.org?subject=unsubscribe>
-List-Archive: <http://lists.ofono.org/pipermail/ofono>
-List-Post: <mailto:ofono@ofono.org>
-List-Help: <mailto:ofono-request@ofono.org?subject=help>
-List-Subscribe: <http://lists.ofono.org/listinfo/ofono>,
-	<mailto:ofono-request@ofono.org?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: ofono-bounces@ofono.org
-Errors-To: ofono-bounces@ofono.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1331131829-28509-1-git-send-email-mikel.astiz.oss@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In order to act like a better headset in the HFP HF role, I am in need
-of the reason code from the disconnection event.  This is so that I
-can detect when a disconnect occurs as a result of the units moving
-out of range of each other, rather than an intentional disconnect.  In
-the event of a disconnection based on connection loss, I can then
-periodically re-attempt the connection.  I have not seen any D-Bus
-messages that would indicate such an event.
+Hi Mikel,
 
-Any ideas on how to obtain this?  I can see that in the hciops version
-of bluez, the reason code makes it into bluetoothd just because the
-entire disconnect event is transferred.  This is not the case in the
-mgmtops version.  It looks like the reason code also hops along the
-L2CAP path, but I haven't yet tracked down where it ends up.  I think
-ideally it would end up somewhere that Ofono would be able to obtain
-it.
+On Wed, Mar 07, 2012, Mikel Astiz wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+> 
+> These patches review the naming convention in transfer.h and
+> session.h, in order to avoid misleading use of the terms "name",
+> "filename" and "targetname".
+> 
+> This second proposal splits the first patch into two patches, and
+> avoids a bug that would have been introduced: the reply of the agent
+> needs to be handled with care, since depending on the operation type
+> (put or get) the reply of the agent should overwrite one field or the
+> other.
+> 
+> Mikel Astiz (4):
+>   client: add obc_transfer_set_filename
+>   client: fix naming convention in transfer api
+>   client: refactor naming convention in session api
+>   client: simplify obc_session_pull
+> 
+>  client/session.c  |   55 ++++++++++++++++++----------------------------------
+>  client/session.h  |   12 +++++-----
+>  client/transfer.c |   14 +++++++++---
+>  client/transfer.h |    2 +
+>  4 files changed, 37 insertions(+), 46 deletions(-)
 
-Thanks,
-Mike
-_______________________________________________
-ofono mailing list
-ofono@ofono.org
-http://lists.ofono.org/listinfo/ofono
+All patches in this set have been applied. Thanks.
+
+Johan
