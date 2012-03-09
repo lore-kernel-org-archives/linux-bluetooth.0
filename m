@@ -1,5 +1,5 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 9 Mar 2012 15:48:04 +0100
+Date: Fri, 9 Mar 2012 15:40:13 +0100
 From: Johan Hovold <jhovold@gmail.com>
 To: David Herrmann <dh.herrmann@googlemail.com>
 Cc: Marcel Holtmann <marcel@holtmann.org>,
@@ -7,83 +7,115 @@ Cc: Marcel Holtmann <marcel@holtmann.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org, stable <stable@vger.kernel.org>
-Subject: Re: [PATCH 2/2 v2] bluetooth: hci_core: fix NULL-pointer dereference
- at unregister
-Message-ID: <20120309144804.GF4497@localhost>
-References: <1331228606.14217.5.camel@aeonflux>
- <1331297594-13332-1-git-send-email-jhovold@gmail.com>
- <CANq1E4Rt0ctZ5cpXipJE--YmkR4OjKBXLBQkeTKWP3+Q-q37Yw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] bluetooth: hci_ldisc: fix NULL-pointer dereference
+ on tty_close
+Message-ID: <20120309144013.GE4497@localhost>
+References: <1331136120-27075-1-git-send-email-jhovold@gmail.com>
+ <1331136120-27075-2-git-send-email-jhovold@gmail.com>
+ <1331148797.3392.191.camel@aeonflux>
+ <20120308115721.GB4497@localhost>
+ <1331228722.14217.7.camel@aeonflux>
+ <20120309130413.GC4497@localhost>
+ <CANq1E4RjnCdUfZuKawHs2te9wX30H-boC5tUPFarBCVbtn2n5Q@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CANq1E4Rt0ctZ5cpXipJE--YmkR4OjKBXLBQkeTKWP3+Q-q37Yw@mail.gmail.com>
+In-Reply-To: <CANq1E4RjnCdUfZuKawHs2te9wX30H-boC5tUPFarBCVbtn2n5Q@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
-
-On Fri, Mar 09, 2012 at 03:04:11PM +0100, David Herrmann wrote:
-> On Fri, Mar 9, 2012 at 1:53 PM, Johan Hovold <jhovold@gmail.com> wrote:
-> > Make sure hci_dev_open returns immediately if hci_dev_unregister has
-> > been called.
+On Fri, Mar 09, 2012 at 02:52:00PM +0100, David Herrmann wrote:
+> On Fri, Mar 9, 2012 at 2:04 PM, Johan Hovold <jhovold@gmail.com> wrote:
+> > On Thu, Mar 08, 2012 at 09:45:22AM -0800, Marcel Holtmann wrote:
+> >> > > > Do not close protocol driver until device has been unregistered.
+> >> > > >
+> >> > > > This fixes a race between tty_close and hci_dev_open which can result in
+> >> > > > a NULL-pointer dereference.
+> >> > > >
+> >> > > > The line discipline closes the protocol driver while we may still have
+> >> > > > hci_dev_open sleeping on the req_lock mutex resulting in a NULL-pointer
+> >> > > > dereference when lock is acquired and hci_init_req called.
+> >> >
+> >> > [...]
+> >> >
+> >> > > what kernel version is this against? Our changes in bluetooth-next fixed
+> >> > > some of the destruct handling.
+> >> >
+> >> > This is against the latest rc as it needs to be fixed in 3.3, but I
+> >> > missed a dependency to bluetooth-next as you point out below.
+> >> >
+> >> > > Also hci_unregister_dev should be calling the destruct handler and thus
+> >> > > your change is now accessing hu but it got freed already.
+> >> >
+> >> > You're right, my patch depends on 010666a126fc ("Bluetooth: Make
+> >> > hci-destruct callback optional") and 797fe796c4 ("Bluetooth: uart-ldisc:
+> >> > Fix memory leak and remove destruct cb") from bluetooth-next.
+> >> >
+> >> > But since the latter one fixes a memory leak it should have been marked
+> >> > for stable as well as pushed to Linus for 3.3, right?
+> >>
+> >> we need to look into this and propose patches for -stable. Is your
+> >> problem still present with bluetooth-next or not?
 > >
-> > This fixes a race between hci_dev_open and hci_dev_unregister which can
-> > lead to a NULL-pointer dereference.
+> > Yes, both races are present in bluetooth-next of today (b8622cbd58f34)
+> > and only takes an additional manual step to trigger (as the core no
+> > longer tries to open the device twice automatically).
 > >
-> > Bug is 100% reproducible using hciattach and a disconnected serial port:
+> > My two patches on top of either the two patches by David Herrmann
+> > mentioned above or the following minimal fix of the same memory leak
+> > would be sufficient to fix both races in 3.3:
 > >
-> > 0. # hciattach -n /dev/ttyO1 any noflow
+> > diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> > index 0711448..97c5faa 100644
+> > --- a/drivers/bluetooth/hci_ldisc.c
+> > +++ b/drivers/bluetooth/hci_ldisc.c
+> > @@ -237,7 +237,6 @@ static void hci_uart_destruct(struct hci_dev *hdev)
+> >                return;
 > >
-> > 1. hci_dev_open called from hci_power_on grabs req lock
-> > 2. hci_init_req executes but device fails to initialise (times out
-> >   eventually)
-> > 3. hci_dev_open is called from hci_sock_ioctl and sleeps on req lock
-> > 4. hci_uart_tty_close calls hci_dev_unregister and sleeps on req lock in
-> >   hci_dev_do_close
-> > 5. hci_dev_open (1) releases req lock
-> > 6. hci_dev_do_close grabs req lock and returns as device is not up
-> > 7. hci_dev_unregister sleeps in destroy_workqueue
-> > 8. hci_dev_open (3) grabs req lock, calls hci_init_req and eventually sleeps
-> > 9. hci_dev_unregister finishes, while hci_dev_open is still running...
-
-[...]
-
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index 00596e8..e8879b9 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -93,6 +93,8 @@ enum {
-> >  * states from the controller.
-> >  */
-> >  enum {
-> > +       HCI_UNREGISTER,
-> > +
-> >        HCI_LE_SCAN,
-> >  };
+> >        BT_DBG("%s", hdev->name);
+> > -       kfree(hdev->driver_data);
+> >  }
 > >
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index d6448f0..22b6781 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -525,6 +525,11 @@ int hci_dev_open(__u16 dev)
-> >
-> >        hci_req_lock(hdev);
-> >
-> > +       if (test_bit(HCI_UNREGISTER, &hdev->dev_flags)) {
-> > +               ret = -ENODEV;
-> > +               goto done;
-> > +       }
-> > +
+> >  /* ------ LDISC part ------ */
+> > @@ -316,6 +315,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
+> >                                hci_free_dev(hdev);
+> >                        }
+> >                }
+> > +               kfree(hu);
+> >        }
+> >  }
 > 
-> Isn't it enough to check for HCI_RUNNING here? We obviously have a
-> race here as we take the device with hci_dev_get(), then sleep and
-> then we do not check whether the device is still alive. However,
-> drivers are required to reset HCI_RUNNING before calling
-> hci_unregister_dev() (which is bogus anyway, but its the way we
-> handled it in the past) therefore it should be enough for us to check
-> for HCI_RUNNING.
+> The "destruct"-callback was broken in many ways but working around it
+> without removing it seems wrong.
 
-I'm afraid this won't work as hci_dev_open is responsible for setting
-HCI_RUNNING in the first place (set in hdev->open(hdev) called from
-hci_dev_open).
+The reason for not doing so would be to keep the fixes minimal and thus
+more appropriate for the stable trees.
+
+Furthermore, according to you patch own description "Several drivers
+already provide an empty callback" so I didn't consider it to be
+a problem.
+
+> This memory-leak occurs only if a
+> tty-device uses the uart-ldisc without a protocol bound to it.
+> Therefore, I didn't consider it important enough for stable.
+
+See my answer to you previous mail regarding this.
+
+> However,
+> if you want to fix this, leave the kfree() inside the destruct
+> callback but add another kfree() into the hci_uart_close() in an
+> "else"-clause like this:
+> 
+> if (test_and_clear_bit(...)) {
+> } else {
+> +   kfree(...);
+> }
+
+You really don't want to free the hci_uart in it's own close method...
+
+The hci_uart is allocated in tty_open and should be freed in tty_close.
+
+> This will still keep the bogus ref-counts inside hci_dev with the
+> destruct() callback but will also free the ldisc if no protocol is
+> set.
 
 Thanks,
 Johan
