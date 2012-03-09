@@ -1,32 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Fri, 9 Mar 2012 09:45:19 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: santosh nayak <santoshprasadnayak@gmail.com>
-Cc: marcel@holtmann.org, davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: Resend: [PATCH] Bluetooth: Fix Endian Bug.
-Message-ID: <20120309124512.GF16366@joana>
-References: <1330622196-12967-1-git-send-email-santoshprasadnayak@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1330622196-12967-1-git-send-email-santoshprasadnayak@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC] Bluetooth: Correct ediv in SMP
+Date: Fri,  9 Mar 2012 14:43:27 +0200
+Message-Id: <1331297007-7119-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-* santosh nayak <santoshprasadnayak@gmail.com> [2012-03-01 22:46:36 +0530]:
 
-> From: Santosh Nayak <santoshprasadnayak@gmail.com>
-> 
-> Fix network to host endian conversion for L2CAP chan id.
-> 
-> Signed-off-by: Santosh Nayak <santoshprasadnayak@gmail.com>
-> ---
->  net/bluetooth/l2cap_sock.c |    5 +++--
->  1 files changed, 3 insertions(+), 2 deletions(-)
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
 
-Applied, thanks.
+ Send this as RFC as I am not 100% sure that it is correct
 
-	Gustavo
+ include/net/bluetooth/smp.h |    2 +-
+ net/bluetooth/smp.c         |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/net/bluetooth/smp.h b/include/net/bluetooth/smp.h
+index 7b3acdd..ca356a7 100644
+--- a/include/net/bluetooth/smp.h
++++ b/include/net/bluetooth/smp.h
+@@ -77,7 +77,7 @@ struct smp_cmd_encrypt_info {
+ 
+ #define SMP_CMD_MASTER_IDENT	0x07
+ struct smp_cmd_master_ident {
+-	__u16	ediv;
++	__le16	ediv;
+ 	__u8	rand[8];
+ } __packed;
+ 
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index deb1198..6fc7c47 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -956,7 +956,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
+ 			    HCI_SMP_LTK_SLAVE, 1, authenticated,
+ 			    enc.ltk, smp->enc_key_size, ediv, ident.rand);
+ 
+-		ident.ediv = cpu_to_le16(ediv);
++		ident.ediv = ediv;
+ 
+ 		smp_send_cmd(conn, SMP_CMD_MASTER_IDENT, sizeof(ident), &ident);
+ 
+-- 
+1.7.9
+
