@@ -8,51 +8,35 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	netdev@vger.kernel.org,
 	David Herrmann <dh.herrmann@googlemail.com>,
 	Greg KH <gregkh@linuxfoundation.org>,
-	Johan Hovold <jhovold@gmail.com>,
-	stable <stable@vger.kernel.org>
-Subject: [PATCH 1/3] bluetooth: hci_ldisc: fix memory leak on tty_close
-Date: Fri,  9 Mar 2012 16:43:24 +0100
-Message-Id: <1331307806-21761-2-git-send-email-jhovold@gmail.com>
-In-Reply-To: <1331307806-21761-1-git-send-email-jhovold@gmail.com>
-References: <1331307806-21761-1-git-send-email-jhovold@gmail.com>
+	Johan Hovold <jhovold@gmail.com>
+Subject: [PATCH 0/3] bluetooth: bug fixes for 3.3
+Date: Fri,  9 Mar 2012 16:43:23 +0100
+Message-Id: <1331307806-21761-1-git-send-email-jhovold@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The hci_uart is never freed when tty is closed if the protocol has not
-been set.
+Hi, 
 
-This was discovered by David Hermann and fixed in bluetooth-next. Those
-patches are more intrusive as they remove the mandatory destructor
-completely.
+This is a revised series which also contains a minimal fix to the memory leak
+discovered by David Hermann upon which the first NULL-pointer-dereference fix
+also depends.
 
-This is the minimal fix, which leaves the destructor as an empty dummy
-call for now.
+These patches need to get to Linus ASAP as the problems are present in 3.3-rc6
+as well as earlier kernels and thus should be backported to the stable trees as
+well.
 
-Cc: David Herrmann <dh.herrmann@googlemail.com>
-Cc: stable <stable@vger.kernel.org>
-Signed-off-by: Johan Hovold <jhovold@gmail.com>
----
- drivers/bluetooth/hci_ldisc.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Thanks,
+Johan
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 0711448..97c5faa 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -237,7 +237,6 @@ static void hci_uart_destruct(struct hci_dev *hdev)
- 		return;
- 
- 	BT_DBG("%s", hdev->name);
--	kfree(hdev->driver_data);
- }
- 
- /* ------ LDISC part ------ */
-@@ -316,6 +315,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 				hci_free_dev(hdev);
- 			}
- 		}
-+		kfree(hu);
- 	}
- }
- 
+
+Johan Hovold (3):
+  bluetooth: hci_ldisc: fix memory leak on tty_close
+  bluetooth: hci_ldisc: fix NULL-pointer dereference on tty_close
+  bluetooth: hci_core: fix NULL-pointer dereference at unregister
+
+ drivers/bluetooth/hci_ldisc.c |    4 ++--
+ include/net/bluetooth/hci.h   |    2 ++
+ net/bluetooth/hci_core.c      |    7 +++++++
+ 3 files changed, 11 insertions(+), 2 deletions(-)
+
 -- 
 1.7.8.4
