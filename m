@@ -1,34 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Brian Gix <bgix@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Brian Gix <bgix@codeaurora.org>
-Subject: [PATCH 1/1] Bluetooth: Fix corruption of device_connected pkt
-Date: Fri,  9 Mar 2012 14:07:03 -0800
-Message-Id: <1331330823-11496-1-git-send-email-bgix@codeaurora.org>
+From: Rafal Garbat <rafal.garbat@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <rafal.garbat@tieto.com>
+Subject: [PATCH] Bluetooth: Finalize discovery after discover message was rejected.
+Date: Fri, 9 Mar 2012 18:27:35 +0100
+Message-ID: <1331314055-18669-1-git-send-email-rafal.garbat@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Incorrect pointer passed to eir_append_data made mgmt_device_connected
-event unparsable by mgmt user space entity.
-
-Signed-off-by: Brian Gix <bgix@codeaurora.org>
+Finalize discovery and disconnect l2cap after discover
+message was rejected.
 ---
- net/bluetooth/mgmt.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ audio/avdtp.c |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 97b5b6c..bcd632d 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2936,7 +2936,7 @@ int mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 					  name, name_len);
- 
- 	if (dev_class && memcmp(dev_class, "\0\0\0", 3) != 0)
--		eir_len = eir_append_data(&ev->eir[eir_len], eir_len,
-+		eir_len = eir_append_data(ev->eir, eir_len,
- 					  EIR_CLASS_OF_DEV, dev_class, 3);
- 
- 	put_unaligned_le16(eir_len, &ev->eir_len);
+diff --git a/audio/avdtp.c b/audio/avdtp.c
+index cd66fd4..64e5800 100644
+--- a/audio/avdtp.c
++++ b/audio/avdtp.c
+@@ -3064,6 +3064,12 @@ static gboolean avdtp_parse_rej(struct avdtp *session,
+ 			return FALSE;
+ 		error("DISCOVER request rejected: %s (%d)",
+ 				avdtp_strerror(&err), err.err.error_code);
++		if (session->discov_cb) {
++			session->discov_cb(session, session->seps,
++						&err, session->user_data);
++			session->discov_cb = NULL;
++			session->used_data = NULL;
++		}
+ 		return TRUE;
+ 	case AVDTP_GET_CAPABILITIES:
+ 	case AVDTP_GET_ALL_CAPABILITIES:
 -- 
-1.7.8.3
+on behalf of ST-Ericsson
 
