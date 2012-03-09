@@ -1,31 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 0/2] LE support for MGMT Stop Discovery
-Date: Fri,  9 Mar 2012 09:57:40 -0300
-Message-Id: <1331297862-28875-1-git-send-email-andre.guedes@openbossa.org>
+Date: Fri, 9 Mar 2012 09:57:10 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Check FINDING state in interleaved discovery
+Message-ID: <20120309125710.GG16366@joana>
+References: <1331073426-11427-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1331073426-11427-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From the previous cover letter:
+Hi Andre,
 
-This small patch series adds LE support for Stop Discovery MGMT command.
-Now, we are able to stop LE discovery procedues (LE-only and interleaved).
+* Andre Guedes <andre.guedes@openbossa.org> [2012-03-06 19:37:06 -0300]:
 
-A brief word about patch 1/2: due to discovery state machine, we don't need
-to worry about canceling hdev->le_scan work since it is never pending or
-running when hci_cancel_le_scan is called.
+> In order to do interleaved discovery we should be in DISCOVERY_
+> FINDING state. Otherwise, discovery should be stopped.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  net/bluetooth/hci_event.c |    3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Andre Guedes (2):
-  Bluetooth: Add hci_cancel_le_scan() to hci_core
-  Bluetooth: LE support for MGMT stop discovery
+Applied, thanks.
 
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_core.c         |   21 +++++++++++++++++++++
- net/bluetooth/hci_event.c        |    6 +++++-
- net/bluetooth/mgmt.c             |    6 +++++-
- 4 files changed, 32 insertions(+), 2 deletions(-)
-
--- 
-1.7.9.3
-
+	Gustavo
