@@ -1,51 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1331313201.14217.18.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: mgmt: Add missing endian conversion
+Message-ID: <1331313161.14217.17.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Remove redundant hdev->parent field
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 09 Mar 2012 09:13:21 -0800
-In-Reply-To: <1331305549-3066-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1331305549-3066-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
+Date: Fri, 09 Mar 2012 09:12:41 -0800
+In-Reply-To: <1331304822-426-1-git-send-email-dh.herrmann@googlemail.com>
+References: <1331304822-426-1-git-send-email-dh.herrmann@googlemail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi David,
 
-> Add missing endian conversion for page scan interval and window.
+> We initialize the "struct device" in hci_alloc_dev() for a long time now
+> so we can access hdev->dev.parent directly. Hence, we can drop the
+> temporary field hdev->parent which is used in no other place than
+> hci_add_sysfs().
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> SET_HCIDEV_DEV() is never called after registering a device by the drivers
+> so we do not overwrite internal device-state. Furthermore, hdev->dev is
+> initialized to 0 by kzalloc() inside hci_alloc_dev() so the default
+> behavior with dev.parent = NULL is kept.
+> 
+> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 > ---
->  net/bluetooth/mgmt.c |   11 ++++++++---
->  1 files changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 97b5b6c..06d2eaf 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -2523,13 +2523,18 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
->  
->  	if (cp->val) {
->  		type = PAGE_SCAN_TYPE_INTERLACED;
-> -		acp.interval = 0x0024;	/* 22.5 msec page scan interval */
-> +
-> +		/* 22.5 msec page scan interval */
-> +		acp.interval = cpu_to_le16(0x0024);
->  	} else {
->  		type = PAGE_SCAN_TYPE_STANDARD;	/* default */
-> -		acp.interval = 0x0800;	/* default 1.28 sec page scan */
-> +
-> +		/* default 1.28 sec page scan */
-> +		acp.interval = cpu_to_le16(0x0800);
->  	}
->  
-> -	acp.window = 0x0012;	/* default 11.25 msec page scan window */
-> +	/* default 11.25 msec page scan window */
-> +	acp.window = cpu_to_le16(0x0012);
+>  drivers/bluetooth/hci_ldisc.c    |    2 +-
+>  include/net/bluetooth/hci_core.h |    3 +--
+>  net/bluetooth/hci_sysfs.c        |    1 -
+>  3 files changed, 2 insertions(+), 4 deletions(-)
 
-please use __constant_cpu_to_le16.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
