@@ -1,31 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arek Lichwa <Arkadiusz.Lichwa@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Arek Lichwa <Arkadiusz.Lichwa@tieto.com>
-Subject: [PATCH BlueZ] lib: Populate response status field with rigth error code value taken from command status event.
-Date: Fri, 9 Mar 2012 12:12:46 +0100
-Message-ID: <1331291566-8997-1-git-send-email-Arkadiusz.Lichwa@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix extra conversion to __le32
+Date: Fri,  9 Mar 2012 13:00:50 +0200
+Message-Id: <1331290850-30092-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- lib/hci.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/lib/hci.c b/lib/hci.c
-index 269c021..186d408 100644
---- a/lib/hci.c
-+++ b/lib/hci.c
-@@ -1156,6 +1156,7 @@ int hci_send_req(int dd, struct hci_request *r, int to)
+Value to be converted is already in __le32 format.
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/mgmt.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 7fcff88..97b5b6c 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3107,7 +3107,7 @@ int mgmt_user_confirm_request(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	bacpy(&ev.addr.bdaddr, bdaddr);
+ 	ev.addr.type = link_to_mgmt(link_type, addr_type);
+ 	ev.confirm_hint = confirm_hint;
+-	put_unaligned_le32(value, &ev.value);
++	ev.value = value;
  
- 			if (r->event != EVT_CMD_STATUS) {
- 				if (cs->status) {
-+					memcpy(r->rparam, &cs->status, 1);
- 					errno = EIO;
- 					goto failed;
- 				}
+ 	return mgmt_event(MGMT_EV_USER_CONFIRM_REQUEST, hdev, &ev, sizeof(ev),
+ 			  NULL);
 -- 
-1.7.0.4
+1.7.9
 
