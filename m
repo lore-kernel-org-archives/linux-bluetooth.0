@@ -1,38 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rafal Garbat <rafal.garbat@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <rafal.garbat@tieto.com>
-Subject: [PATCH] Bluetooth: Finalize discovery after discover message was rejected.
-Date: Fri, 9 Mar 2012 18:27:35 +0100
-Message-ID: <1331314055-18669-1-git-send-email-rafal.garbat@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Message-ID: <1331313514.14217.20.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Add support for Atheros [0cf3:e004]
+From: Marcel Holtmann <marcel@holtmann.org>
+To: AceLan Kao <acelan.kao@canonical.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Date: Fri, 09 Mar 2012 09:18:34 -0800
+In-Reply-To: <CAMz9Wg-XvEELt-MhBUvenVdEjff+5Tx9h=1bBQUUmNBc4CbaiA@mail.gmail.com>
+References: <1327895375-9162-1-git-send-email-acelan.kao@canonical.com>
+	 <1327948421.1955.143.camel@aeonflux>
+	 <CAMz9Wg--F=f4eOKpjc0aC4ZR7vcCv7Rj-XGewF1zkA7O4CFY2w@mail.gmail.com>
+	 <CAMz9Wg-XvEELt-MhBUvenVdEjff+5Tx9h=1bBQUUmNBc4CbaiA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Finalize discovery and disconnect l2cap after discover
-message was rejected.
----
- audio/avdtp.c |    6 ++++++
- 1 files changed, 6 insertions(+), 0 deletions(-)
+Hi AceLan,
 
-diff --git a/audio/avdtp.c b/audio/avdtp.c
-index cd66fd4..64e5800 100644
---- a/audio/avdtp.c
-+++ b/audio/avdtp.c
-@@ -3064,6 +3064,12 @@ static gboolean avdtp_parse_rej(struct avdtp *session,
- 			return FALSE;
- 		error("DISCOVER request rejected: %s (%d)",
- 				avdtp_strerror(&err), err.err.error_code);
-+		if (session->discov_cb) {
-+			session->discov_cb(session, session->seps,
-+						&err, session->user_data);
-+			session->discov_cb = NULL;
-+			session->used_data = NULL;
-+		}
- 		return TRUE;
- 	case AVDTP_GET_CAPABILITIES:
- 	case AVDTP_GET_ALL_CAPABILITIES:
--- 
-on behalf of ST-Ericsson
+please do not top posting. Your email might be ignored in the future.
+
+> Sorry, I didn't get notice about this patch,
+> is there any update for this patch?
+> 
+> There is no issue for 3.2 kernel and I think we should have the
+> PID:VID listed in the kernel first.
+> We could contact Atheros and request they update the firmware if there
+> is any problem happened in the future.
+
+And patches should be send inline and not as an attachment. Otherwise
+nobody will look at it.
+
+Regards
+
+Marcel
+
 
