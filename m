@@ -1,60 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 9 Mar 2012 14:21:58 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: santosh nayak <santoshprasadnayak@gmail.com>
-Cc: marcel@holtmann.org, padovan@profusion.mobi, davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: Resend: [PATCH] Bluetooth: Fix Endian Bug.
-Message-ID: <20120309122154.GA17167@aemeltch-MOBL1>
-References: <1330622196-12967-1-git-send-email-santoshprasadnayak@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1330622196-12967-1-git-send-email-santoshprasadnayak@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Correct chan->psm endian conversions
+Date: Fri,  9 Mar 2012 14:16:17 +0200
+Message-Id: <1331295377-6097-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Mar 01, 2012 at 10:46:36PM +0530, santosh nayak wrote:
-> From: Santosh Nayak <santoshprasadnayak@gmail.com>
-> 
-> Fix network to host endian conversion for L2CAP chan id.
-> 
-> Signed-off-by: Santosh Nayak <santoshprasadnayak@gmail.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+chan->psm is kept in __le16 format which was not always taken
+into account. Fix several bugs related to extra conversion.
 
-> ---
->  net/bluetooth/l2cap_sock.c |    5 +++--
->  1 files changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 401d942..86d5067 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -82,7 +82,7 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
->  	}
->  
->  	if (la.l2_cid)
-> -		err = l2cap_add_scid(chan, la.l2_cid);
-> +		err = l2cap_add_scid(chan, __le16_to_cpu(la.l2_cid));
->  	else
->  		err = l2cap_add_psm(chan, &la.l2_bdaddr, la.l2_psm);
->  
-> @@ -123,7 +123,8 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
->  	if (la.l2_cid && la.l2_psm)
->  		return -EINVAL;
->  
-> -	err = l2cap_chan_connect(chan, la.l2_psm, la.l2_cid, &la.l2_bdaddr);
-> +	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
-> +				&la.l2_bdaddr);
->  	if (err)
->  		goto done;
->  
-> -- 
-> 1.7.4.4
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |   10 +++++-----
+ 1 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 0d00a6d..6679167 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -307,7 +307,7 @@ void l2cap_chan_destroy(struct l2cap_chan *chan)
+ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ {
+ 	BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
+-			chan->psm, chan->dcid);
++			__le16_to_cpu(chan->psm), chan->dcid);
+ 
+ 	conn->disc_reason = HCI_ERROR_REMOTE_USER_TERM;
+ 
+@@ -1182,7 +1182,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+ 	int err;
+ 
+ 	BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
+-							chan->psm);
++						__le16_to_cpu(chan->psm));
+ 
+ 	hdev = hci_get_route(dst, src);
+ 	if (!hdev)
+@@ -1647,7 +1647,7 @@ static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
+ 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+ 	lh->cid = cpu_to_le16(chan->dcid);
+ 	lh->len = cpu_to_le16(len + (hlen - L2CAP_HDR_SIZE));
+-	put_unaligned_le16(chan->psm, skb_put(skb, 2));
++	put_unaligned(chan->psm, skb_put(skb, 2));
+ 
+ 	err = l2cap_skbuff_fromiovec(chan, msg, len, count, skb);
+ 	if (unlikely(err < 0)) {
+@@ -2679,7 +2679,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 	u16 dcid = 0, scid = __le16_to_cpu(req->scid);
+ 	__le16 psm = req->psm;
+ 
+-	BT_DBG("psm 0x%2.2x scid 0x%4.4x", psm, scid);
++	BT_DBG("psm 0x%2.2x scid 0x%4.4x", __le16_to_cpu(psm), scid);
+ 
+ 	/* Check if we have socket listening on psm */
+ 	pchan = l2cap_global_chan_by_psm(BT_LISTEN, psm, conn->src);
+@@ -4484,7 +4484,7 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		break;
+ 
+ 	case L2CAP_CID_CONN_LESS:
+-		psm = get_unaligned_le16(skb->data);
++		psm = get_unaligned((__le16 *) skb->data);
+ 		skb_pull(skb, 2);
+ 		l2cap_conless_channel(conn, psm, skb);
+ 		break;
+-- 
+1.7.9
+
