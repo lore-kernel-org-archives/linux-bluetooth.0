@@ -1,16 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: trivial: Fix endian conversion mode
-Date: Fri,  9 Mar 2012 16:18:30 +0200
-Message-Id: <1331302710-29225-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] Bluetooth: Convert error codes to le16
+Date: Fri,  9 Mar 2012 16:07:17 +0200
+Message-Id: <1331302037-29095-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-In L2CAP we use le16 format so change direction of conversion
-from le16_to_cpu to cpu_to_le16.
+Create Chan Rsp shall put result and status in le format.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
@@ -18,21 +17,20 @@ Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
  1 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index cf0b166..eb72f5a 100644
+index 428e0b0..cf0b166 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -2413,9 +2413,9 @@ done:
- 			chan->remote_mps = size;
+@@ -3300,8 +3300,8 @@ static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
+ 	/* Placeholder: Always reject */
+ 	rsp.dcid = 0;
+ 	rsp.scid = cpu_to_le16(scid);
+-	rsp.result = L2CAP_CR_NO_MEM;
+-	rsp.status = L2CAP_CS_NO_INFO;
++	rsp.result = cpu_to_le16(L2CAP_CR_NO_MEM);
++	rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
  
- 			rfc.retrans_timeout =
--				le16_to_cpu(L2CAP_DEFAULT_RETRANS_TO);
-+				cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
- 			rfc.monitor_timeout =
--				le16_to_cpu(L2CAP_DEFAULT_MONITOR_TO);
-+				cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
- 
- 			set_bit(CONF_MODE_DONE, &chan->conf_state);
- 
+ 	l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
+ 		       sizeof(rsp), &rsp);
 -- 
 1.7.9
 
