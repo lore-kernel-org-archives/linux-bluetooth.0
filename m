@@ -1,76 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	padovan@profusion.mobi,
-	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH] Bluetooth: Remove redundant hdev->parent field
-Date: Fri,  9 Mar 2012 15:53:42 +0100
-Message-Id: <1331304822-426-1-git-send-email-dh.herrmann@googlemail.com>
+Date: Fri, 9 Mar 2012 15:48:04 +0100
+From: Johan Hovold <jhovold@gmail.com>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, stable <stable@vger.kernel.org>
+Subject: Re: [PATCH 2/2 v2] bluetooth: hci_core: fix NULL-pointer dereference
+ at unregister
+Message-ID: <20120309144804.GF4497@localhost>
+References: <1331228606.14217.5.camel@aeonflux>
+ <1331297594-13332-1-git-send-email-jhovold@gmail.com>
+ <CANq1E4Rt0ctZ5cpXipJE--YmkR4OjKBXLBQkeTKWP3+Q-q37Yw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CANq1E4Rt0ctZ5cpXipJE--YmkR4OjKBXLBQkeTKWP3+Q-q37Yw@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We initialize the "struct device" in hci_alloc_dev() for a long time now
-so we can access hdev->dev.parent directly. Hence, we can drop the
-temporary field hdev->parent which is used in no other place than
-hci_add_sysfs().
+Hi David,
 
-SET_HCIDEV_DEV() is never called after registering a device by the drivers
-so we do not overwrite internal device-state. Furthermore, hdev->dev is
-initialized to 0 by kzalloc() inside hci_alloc_dev() so the default
-behavior with dev.parent = NULL is kept.
+On Fri, Mar 09, 2012 at 03:04:11PM +0100, David Herrmann wrote:
+> On Fri, Mar 9, 2012 at 1:53 PM, Johan Hovold <jhovold@gmail.com> wrote:
+> > Make sure hci_dev_open returns immediately if hci_dev_unregister has
+> > been called.
+> >
+> > This fixes a race between hci_dev_open and hci_dev_unregister which can
+> > lead to a NULL-pointer dereference.
+> >
+> > Bug is 100% reproducible using hciattach and a disconnected serial port:
+> >
+> > 0. # hciattach -n /dev/ttyO1 any noflow
+> >
+> > 1. hci_dev_open called from hci_power_on grabs req lock
+> > 2. hci_init_req executes but device fails to initialise (times out
+> >   eventually)
+> > 3. hci_dev_open is called from hci_sock_ioctl and sleeps on req lock
+> > 4. hci_uart_tty_close calls hci_dev_unregister and sleeps on req lock in
+> >   hci_dev_do_close
+> > 5. hci_dev_open (1) releases req lock
+> > 6. hci_dev_do_close grabs req lock and returns as device is not up
+> > 7. hci_dev_unregister sleeps in destroy_workqueue
+> > 8. hci_dev_open (3) grabs req lock, calls hci_init_req and eventually sleeps
+> > 9. hci_dev_unregister finishes, while hci_dev_open is still running...
 
-Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
----
- drivers/bluetooth/hci_ldisc.c    |    2 +-
- include/net/bluetooth/hci_core.h |    3 +--
- net/bluetooth/hci_sysfs.c        |    1 -
- 3 files changed, 2 insertions(+), 4 deletions(-)
+[...]
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index fd5adb4..2f57b05 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -388,7 +388,7 @@ static int hci_uart_register_dev(struct hci_uart *hu)
- 	hdev->close = hci_uart_close;
- 	hdev->flush = hci_uart_flush;
- 	hdev->send  = hci_uart_send_frame;
--	hdev->parent = hu->tty->dev;
-+	SET_HCIDEV_DEV(hdev, hu->tty->dev);
- 
- 	if (test_bit(HCI_UART_RAW_DEVICE, &hu->hdev_flags))
- 		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index daefaac..edf2fd7 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -263,7 +263,6 @@ struct hci_dev {
- 
- 	struct dentry		*debugfs;
- 
--	struct device		*parent;
- 	struct device		dev;
- 
- 	struct rfkill		*rfkill;
-@@ -708,7 +707,7 @@ void hci_conn_init_sysfs(struct hci_conn *conn);
- void hci_conn_add_sysfs(struct hci_conn *conn);
- void hci_conn_del_sysfs(struct hci_conn *conn);
- 
--#define SET_HCIDEV_DEV(hdev, pdev) ((hdev)->parent = (pdev))
-+#define SET_HCIDEV_DEV(hdev, pdev) ((hdev)->dev.parent = (pdev))
- 
- /* ----- LMP capabilities ----- */
- #define lmp_rswitch_capable(dev)   ((dev)->features[0] & LMP_RSWITCH)
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index bc15429..60b93d8 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -533,7 +533,6 @@ int hci_add_sysfs(struct hci_dev *hdev)
- 
- 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
- 
--	dev->parent = hdev->parent;
- 	dev_set_name(dev, "%s", hdev->name);
- 
- 	err = device_add(dev);
--- 
-1.7.9.3
+> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > index 00596e8..e8879b9 100644
+> > --- a/include/net/bluetooth/hci.h
+> > +++ b/include/net/bluetooth/hci.h
+> > @@ -93,6 +93,8 @@ enum {
+> >  * states from the controller.
+> >  */
+> >  enum {
+> > +       HCI_UNREGISTER,
+> > +
+> >        HCI_LE_SCAN,
+> >  };
+> >
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index d6448f0..22b6781 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -525,6 +525,11 @@ int hci_dev_open(__u16 dev)
+> >
+> >        hci_req_lock(hdev);
+> >
+> > +       if (test_bit(HCI_UNREGISTER, &hdev->dev_flags)) {
+> > +               ret = -ENODEV;
+> > +               goto done;
+> > +       }
+> > +
+> 
+> Isn't it enough to check for HCI_RUNNING here? We obviously have a
+> race here as we take the device with hci_dev_get(), then sleep and
+> then we do not check whether the device is still alive. However,
+> drivers are required to reset HCI_RUNNING before calling
+> hci_unregister_dev() (which is bogus anyway, but its the way we
+> handled it in the past) therefore it should be enough for us to check
+> for HCI_RUNNING.
+
+I'm afraid this won't work as hci_dev_open is responsible for setting
+HCI_RUNNING in the first place (set in hdev->open(hdev) called from
+hci_dev_open).
+
+Thanks,
+Johan
