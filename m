@@ -1,35 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1331313514.14217.20.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Add support for Atheros [0cf3:e004]
+Message-ID: <1331313201.14217.18.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: mgmt: Add missing endian conversion
 From: Marcel Holtmann <marcel@holtmann.org>
-To: AceLan Kao <acelan.kao@canonical.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Date: Fri, 09 Mar 2012 09:18:34 -0800
-In-Reply-To: <CAMz9Wg-XvEELt-MhBUvenVdEjff+5Tx9h=1bBQUUmNBc4CbaiA@mail.gmail.com>
-References: <1327895375-9162-1-git-send-email-acelan.kao@canonical.com>
-	 <1327948421.1955.143.camel@aeonflux>
-	 <CAMz9Wg--F=f4eOKpjc0aC4ZR7vcCv7Rj-XGewF1zkA7O4CFY2w@mail.gmail.com>
-	 <CAMz9Wg-XvEELt-MhBUvenVdEjff+5Tx9h=1bBQUUmNBc4CbaiA@mail.gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 09 Mar 2012 09:13:21 -0800
+In-Reply-To: <1331305549-3066-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1331305549-3066-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi AceLan,
+Hi Andrei,
 
-please do not top posting. Your email might be ignored in the future.
-
-> Sorry, I didn't get notice about this patch,
-> is there any update for this patch?
+> Add missing endian conversion for page scan interval and window.
 > 
-> There is no issue for 3.2 kernel and I think we should have the
-> PID:VID listed in the kernel first.
-> We could contact Atheros and request they update the firmware if there
-> is any problem happened in the future.
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/mgmt.c |   11 ++++++++---
+>  1 files changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 97b5b6c..06d2eaf 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -2523,13 +2523,18 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
+>  
+>  	if (cp->val) {
+>  		type = PAGE_SCAN_TYPE_INTERLACED;
+> -		acp.interval = 0x0024;	/* 22.5 msec page scan interval */
+> +
+> +		/* 22.5 msec page scan interval */
+> +		acp.interval = cpu_to_le16(0x0024);
+>  	} else {
+>  		type = PAGE_SCAN_TYPE_STANDARD;	/* default */
+> -		acp.interval = 0x0800;	/* default 1.28 sec page scan */
+> +
+> +		/* default 1.28 sec page scan */
+> +		acp.interval = cpu_to_le16(0x0800);
+>  	}
+>  
+> -	acp.window = 0x0012;	/* default 11.25 msec page scan window */
+> +	/* default 11.25 msec page scan window */
+> +	acp.window = cpu_to_le16(0x0012);
 
-And patches should be send inline and not as an attachment. Otherwise
-nobody will look at it.
+please use __constant_cpu_to_le16.
 
 Regards
 
