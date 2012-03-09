@@ -1,85 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 9 Mar 2012 14:04:13 +0100
-From: Johan Hovold <jhovold@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, stable <stable@vger.kernel.org>
-Subject: Re: [PATCH 1/2] bluetooth: hci_ldisc: fix NULL-pointer dereference
- on tty_close
-Message-ID: <20120309130413.GC4497@localhost>
-References: <1331136120-27075-1-git-send-email-jhovold@gmail.com>
- <1331136120-27075-2-git-send-email-jhovold@gmail.com>
- <1331148797.3392.191.camel@aeonflux>
- <20120308115721.GB4497@localhost>
- <1331228722.14217.7.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1331228722.14217.7.camel@aeonflux>
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 1/2] Bluetooth: Add hci_cancel_le_scan() to hci_core
+Date: Fri,  9 Mar 2012 09:57:41 -0300
+Message-Id: <1331297862-28875-2-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1331297862-28875-1-git-send-email-andre.guedes@openbossa.org>
+References: <1331297862-28875-1-git-send-email-andre.guedes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Mar 08, 2012 at 09:45:22AM -0800, Marcel Holtmann wrote:
-> Hi Johan,
-> 
-> > > > Do not close protocol driver until device has been unregistered.
-> > > > 
-> > > > This fixes a race between tty_close and hci_dev_open which can result in
-> > > > a NULL-pointer dereference.
-> > > > 
-> > > > The line discipline closes the protocol driver while we may still have
-> > > > hci_dev_open sleeping on the req_lock mutex resulting in a NULL-pointer
-> > > > dereference when lock is acquired and hci_init_req called.
-> > 
-> > [...]
-> > 
-> > > what kernel version is this against? Our changes in bluetooth-next fixed
-> > > some of the destruct handling.
-> > 
-> > This is against the latest rc as it needs to be fixed in 3.3, but I
-> > missed a dependency to bluetooth-next as you point out below.
-> > 
-> > > Also hci_unregister_dev should be calling the destruct handler and thus
-> > > your change is now accessing hu but it got freed already.
-> > 
-> > You're right, my patch depends on 010666a126fc ("Bluetooth: Make
-> > hci-destruct callback optional") and 797fe796c4 ("Bluetooth: uart-ldisc:
-> > Fix memory leak and remove destruct cb") from bluetooth-next. 
-> > 
-> > But since the latter one fixes a memory leak it should have been marked
-> > for stable as well as pushed to Linus for 3.3, right?
-> 
-> we need to look into this and propose patches for -stable. Is your
-> problem still present with bluetooth-next or not?
+This patch adds to hci_core the hci_cancel_le_scan function which
+should be used to cancel an ongoing LE scan.
 
-Yes, both races are present in bluetooth-next of today (b8622cbd58f34)
-and only takes an additional manual step to trigger (as the core no
-longer tries to open the device twice automatically).
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_core.c         |   21 +++++++++++++++++++++
+ 2 files changed, 22 insertions(+)
 
-My two patches on top of either the two patches by David Herrmann
-mentioned above or the following minimal fix of the same memory leak
-would be sufficient to fix both races in 3.3:
-
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 0711448..97c5faa 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -237,7 +237,6 @@ static void hci_uart_destruct(struct hci_dev *hdev)
-                return;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index daefaac..87bca3e 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1071,5 +1071,6 @@ int hci_do_inquiry(struct hci_dev *hdev, u8 length);
+ int hci_cancel_inquiry(struct hci_dev *hdev);
+ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
+ 		int timeout);
++int hci_cancel_le_scan(struct hci_dev *hdev);
  
-        BT_DBG("%s", hdev->name);
--       kfree(hdev->driver_data);
+ #endif /* __HCI_CORE_H */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 59ec99e..0320a02 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1667,6 +1667,27 @@ static int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval,
+ 	return 0;
  }
  
- /* ------ LDISC part ------ */
-@@ -316,6 +315,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
-                                hci_free_dev(hdev);
-                        }
-                }
-+               kfree(hu);
-        }
- }
++int hci_cancel_le_scan(struct hci_dev *hdev)
++{
++	bool canceled;
++
++	BT_DBG("%s", hdev->name);
++
++	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
++		return -EALREADY;
++
++	canceled = cancel_delayed_work(&hdev->le_scan_disable);
++	if (canceled) {
++		struct hci_cp_le_set_scan_enable cp;
++
++		/* Send HCI command to disable LE Scan */
++		memset(&cp, 0, sizeof(cp));
++		hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
++	}
++
++	return 0;
++}
++
+ static void le_scan_disable_work(struct work_struct *work)
+ {
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev,
+-- 
+1.7.9.3
 
-
-Thanks,
-Johan
