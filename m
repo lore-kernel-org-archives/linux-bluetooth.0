@@ -1,79 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 9 Mar 2012 15:29:39 +0100
-From: Johan Hovold <jhovold@gmail.com>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, stable <stable@vger.kernel.org>
-Subject: Re: [PATCH 1/2] bluetooth: hci_ldisc: fix NULL-pointer dereference
- on tty_close
-Message-ID: <20120309142939.GD4497@localhost>
-References: <1331136120-27075-1-git-send-email-jhovold@gmail.com>
- <1331136120-27075-2-git-send-email-jhovold@gmail.com>
- <CANq1E4Sd45FtZN6NXs7TZ1k6VrFkbcAZug-1UQwW-XPB0e5Aag@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CANq1E4Sd45FtZN6NXs7TZ1k6VrFkbcAZug-1UQwW-XPB0e5Aag@mail.gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: trivial: Fix endian conversion mode
+Date: Fri,  9 Mar 2012 16:18:30 +0200
+Message-Id: <1331302710-29225-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Fri, Mar 09, 2012 at 02:44:30PM +0100, David Herrmann wrote:
-> On Wed, Mar 7, 2012 at 5:01 PM, Johan Hovold <jhovold@gmail.com> wrote:
-> > Do not close protocol driver until device has been unregistered.
-> >
-> > This fixes a race between tty_close and hci_dev_open which can result in
-> > a NULL-pointer dereference.
-> >
-> > The line discipline closes the protocol driver while we may still have
-> > hci_dev_open sleeping on the req_lock mutex resulting in a NULL-pointer
-> > dereference when lock is acquired and hci_init_req called.
+In L2CAP we use le16 format so change direction of conversion
+from le16_to_cpu to cpu_to_le16.
 
-[...]
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-> > diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> > index 0711448..6946081 100644
-> > --- a/drivers/bluetooth/hci_ldisc.c
-> > +++ b/drivers/bluetooth/hci_ldisc.c
-> > @@ -310,11 +310,11 @@ static void hci_uart_tty_close(struct tty_struct *tty)
-> >                        hci_uart_close(hdev);
-> >
-> >                if (test_and_clear_bit(HCI_UART_PROTO_SET, &hu->flags)) {
-> > -                       hu->proto->close(hu);
-> >                        if (hdev) {
-> >                                hci_unregister_dev(hdev);
-> >                                hci_free_dev(hdev);
-> >                        }
-> > +                       hu->proto->close(hu);
-> >                }
-> >        }
-> >  }
-> 
-> I can confirm this. hci_uart_set_proto() opens the proto before it
-> registers the hci device. Hence, we should also unregister the hci
-> device before closing the proto. I also looked whether this introduces
-> other race conditions but no proto-callback can be called here as they
-> are all protected by the tty-layer which synchronizes all
-> tty-callbacks. Therefore, I think this is the correct fix.
-> 
-> We can apply this to stable even without the "destruct"-fixes from me
-> as hu->proto->$cb$() doesn't care whether hdev is valid or not. I
-> don't think the destruct-fixes are important enough to send them to
-> stable.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index cf0b166..eb72f5a 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2413,9 +2413,9 @@ done:
+ 			chan->remote_mps = size;
+ 
+ 			rfc.retrans_timeout =
+-				le16_to_cpu(L2CAP_DEFAULT_RETRANS_TO);
++				cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
+ 			rfc.monitor_timeout =
+-				le16_to_cpu(L2CAP_DEFAULT_MONITOR_TO);
++				cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
+ 
+ 			set_bit(CONF_MODE_DONE, &chan->conf_state);
+ 
+-- 
+1.7.9
 
-Unfortunately hu is is not valid once hci_unregister returns as it will
-call the destruct callback. So my patch depends on changing this
-behaviour first. (I could also store a pointer to the protocol before
-calling unregister in my patch.)
-
-Secondly, I must disagree with you regarding whether the memory leak you
-found is critical enough to be added to the stable trees. We're leaking
-kernel memory in a deterministic and easily triggered way which could be
-exploited by a malicious user.
-
-> Reviewed-by: David Herrmann <dh.herrmann@googlemail.com>
-
-Thanks,
-Johan
