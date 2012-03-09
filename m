@@ -1,102 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: johan.hedberg@gmail.com, Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd v2 1/3] MAP/dummy: Actual code for folder listing retrieval
-Date: Fri,  9 Mar 2012 07:53:23 +0100
-Message-Id: <1331276005-4434-1-git-send-email-lkslawek@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAOcK=CPAHp-zBuWOPa3yB0ZcAmPWQgujzQcp+KtpJrX6tKDLag@mail.gmail.com>
+References: <CABMQnV+pQqS97OLcBnUNK4xu735Gqikirdr0o0CbcGG_j+2sHw@mail.gmail.com>
+ <CAOcK=CPHnZPxgSNmxfcfmFJBTxn61FrV6DcSZmJfCfzTiSveUw@mail.gmail.com> <CAOcK=CPAHp-zBuWOPa3yB0ZcAmPWQgujzQcp+KtpJrX6tKDLag@mail.gmail.com>
+From: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+Date: Fri, 9 Mar 2012 11:57:34 +0900
+Message-ID: <CABMQnV+FmUwbDbnZ1WJXyUzQJjO3z6QrBQfLpkfAQP-EbYG3nw@mail.gmail.com>
+Subject: Re: bluez: Build fail with -std=c99 on using bluez application
+To: Markus Rathgeb <maggu2810@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
-v2: Changes as suggested on the ML
+Hi,
 
- plugins/messages-dummy.c |   63 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 62 insertions(+), 1 deletions(-)
+Thanks. When I applied this patch, the problem was settled.
+I hope that this patch is committed  to git repository.
 
-diff --git a/plugins/messages-dummy.c b/plugins/messages-dummy.c
-index db15a75..8727951 100644
---- a/plugins/messages-dummy.c
-+++ b/plugins/messages-dummy.c
-@@ -31,6 +31,8 @@
- #include <stdlib.h>
- #include <string.h>
- 
-+#include "log.h"
-+
- #include "messages.h"
- 
- static char *root_folder = NULL;
-@@ -50,9 +52,68 @@ struct folder_listing_data {
- 	void *user_data;
- };
- 
-+static char *get_next_subdir(DIR *dp, char *path)
-+{
-+	struct dirent *ep;
-+	char *abs, *name;
-+
-+	for (;;) {
-+		if ((ep = readdir(dp)) == NULL)
-+			return NULL;
-+
-+		if (strcmp(ep->d_name, ".") == 0 || strcmp(ep->d_name, "..") == 0)
-+			continue;
-+
-+		abs = g_build_filename(path, ep->d_name, NULL);
-+
-+		if (g_file_test(abs, G_FILE_TEST_IS_DIR)) {
-+			g_free(abs);
-+			break;
-+		}
-+
-+		g_free(abs);
-+	}
-+
-+	name = g_filename_to_utf8(ep->d_name, -1, NULL, NULL, NULL);
-+
-+	if (name == NULL) {
-+		DBG("g_filename_to_utf8(): invalid filename");
-+		return NULL;
-+	}
-+
-+	return name;
-+}
-+
- static ssize_t get_subdirs(struct folder_listing_data *fld, GSList **list)
- {
--	return 0;
-+	DIR *dp;
-+	char *path, *name;
-+	size_t n;
-+
-+	path = g_build_filename(fld->session->cwd_absolute, fld->name, NULL);
-+	dp = opendir(path);
-+
-+	if (dp == NULL) {
-+		int err = -errno;
-+
-+		DBG("opendir(): %d, %s", err, strerror(err));
-+		g_free(path);
-+
-+		return err;
-+	}
-+
-+	n = 0;
-+
-+	while ((name = get_next_subdir(dp, path)) != NULL) {
-+		n++;
-+		if (fld->max > 0)
-+			*list = g_slist_prepend(*list, name);
-+	}
-+
-+	closedir(dp);
-+	g_free(path);
-+
-+	return n;
- }
- 
- static void return_folder_listing(struct folder_listing_data *fld, GSList *list)
--- 
-1.7.4.1
+Best regards,
+  Nobuhiro
 
+2012/3/8 Markus Rathgeb <maggu2810@googlemail.com>:
+> See also: http://comments.gmane.org/gmane.linux.bluez.kernel/22306
+>
+>
+> 2012/3/8 Markus Rathgeb <maggu2810@googlemail.com>:
+>> I think, it is the same problem I reported here:
+>> http://permalink.gmane.org/gmane.linux.bluez.kernel/22294
+>>
+>> 2012/3/8 Nobuhiro Iwamatsu <iwamatsu@nigauri.org>:
+>>> Hi,
+>>>
+>>> When I built application using bluez with -std=c99 option, build failed.
+>>> It can build, when not checking c99. I tested with bluez 4.99.
+>>> Do you recommend not to checking c99?
+>>>
+>>> Best regards,
+>>>  Nobuhiro
+>>> -----
+>>> $ cat t.c
+>>> #include <bluetooth/bluetooth.h>
+>>> $ gcc -std=c99 -c t.c
+>>> In file included from t.c:1:0:
+>>> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_le64’:
+>>> /usr/include/bluetooth/bluetooth.h:159:9: error: expected
+>>> specifier-qualifier-list before ‘typeof’
+>>> /usr/include/bluetooth/bluetooth.h:159:9: error: called object
+>>> ‘typeof(__p)’ is not a function
+>>> /usr/include/bluetooth/bluetooth.h:159:9: error: ‘struct <anonymous>’
+>>> has no member named ‘__v’
+>>> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_be64’:
+>>> /usr/include/bluetooth/bluetooth.h:164:9: error: expected
+>>> specifier-qualifier-list before ‘typeof’
+>>> /usr/include/bluetooth/bluetooth.h:164:9: error: called object
+>>> ‘typeof(__p)’ is not a function
+>>> /usr/include/bluetooth/bluetooth.h:164:9: error: ‘struct <anonymous>’
+>>> has no member named ‘__v’
+>>> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_le32’:
+>>> /usr/include/bluetooth/bluetooth.h:169:9: error: expected
+>>> specifier-qualifier-list before ‘typeof’
+>>> /usr/include/bluetooth/bluetooth.h:169:9: error: called object
+>>> ‘typeof(__p)’ is not a function
+>>> /usr/include/bluetooth/bluetooth.h:169:9: error: ‘struct <anonymous>’
+>>> has no member named ‘__v’
+>>> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_be32’:
+>>> /usr/include/bluetooth/bluetooth.h:174:9: error: expected
+>>> specifier-qualifier-list before ‘typeof’
+>>> /usr/include/bluetooth/bluetooth.h:174:9: error: called object
+>>> ‘typeof(__p)’ is not a function
+>>> /usr/include/bluetooth/bluetooth.h:174:9: error: ‘struct <anonymous>’
+>>> has no member named ‘__v’
+>>> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_le16’:
+>>> /usr/include/bluetooth/bluetooth.h:179:9: error: expected
+>>> specifier-qualifier-list before ‘typeof’
+>>> /usr/include/bluetooth/bluetooth.h:179:9: error: called object
+>>> ‘typeof(__p)’ is not a function
+>>> /usr/include/bluetooth/bluetooth.h:179:9: error: ‘struct <anonymous>’
+>>> has no member named ‘__v’
+>>> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_be16’:
+>>> /usr/include/bluetooth/bluetooth.h:184:9: error: expected
+>>> specifier-qualifier-list before ‘typeof’
+>>> /usr/include/bluetooth/bluetooth.h:184:9: error: called object
+>>> ‘typeof(__p)’ is not a function
+>>> /usr/include/bluetooth/bluetooth.h:184:9: error: ‘struct <anonymous>’
+>>> has no member named ‘__v’
+>>> -----
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
