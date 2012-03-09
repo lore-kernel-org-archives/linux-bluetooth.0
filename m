@@ -1,41 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAB7rCThRVZmGensz_bv6rFFS5Pf_BvOiVW4dFjmC6KkoVLgvXQ@mail.gmail.com>
-References: <CAB7rCThRVZmGensz_bv6rFFS5Pf_BvOiVW4dFjmC6KkoVLgvXQ@mail.gmail.com>
-Date: Fri, 9 Mar 2012 17:30:57 -0600
-Message-ID: <CAB7rCTimXWKSzpZCGaex=DKywnM6HKYZXC+GNHXNgAC-XzQ91A@mail.gmail.com>
-Subject: Re: obtain HFP disconnection event reason code
-From: Mike <puffy.taco@gmail.com>
-To: linux-bluetooth@vger.kernel.org, ofono@ofono.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Brian Gix <bgix@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Brian Gix <bgix@codeaurora.org>
+Subject: [PATCH 1/1] Bluetooth: Fix corruption of device_connected pkt
+Date: Fri,  9 Mar 2012 14:07:03 -0800
+Message-Id: <1331330823-11496-1-git-send-email-bgix@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Mar 8, 2012 at 6:09 PM, Mike <puffy.taco@gmail.com> wrote:
-> In order to act like a better headset in the HFP HF role, I am in need
-> of the reason code from the disconnection event.  This is so that I
-> can detect when a disconnect occurs as a result of the units moving
-> out of range of each other, rather than an intentional disconnect.  In
-> the event of a disconnection based on connection loss, I can then
-> periodically re-attempt the connection.  I have not seen any D-Bus
-> messages that would indicate such an event.
->
-> Any ideas on how to obtain this?  I can see that in the hciops version
-> of bluez, the reason code makes it into bluetoothd just because the
-> entire disconnect event is transferred.  This is not the case in the
-> mgmtops version.  It looks like the reason code also hops along the
-> L2CAP path, but I haven't yet tracked down where it ends up.  I think
-> ideally it would end up somewhere that Ofono would be able to obtain
-> it.
->
-> Thanks,
-> Mike
+Incorrect pointer passed to eir_append_data made mgmt_device_connected
+event unparsable by mgmt user space entity.
 
-Alright, looks like the value shows up if I query SO_ERROR in Ofono
-when I get POLLERR/POLLHUP in the RFCOMM socket's poll routine.  That
-leaves it as an Ofono implementation task then; the bluez side is good
-to go.
+Signed-off-by: Brian Gix <bgix@codeaurora.org>
+---
+ net/bluetooth/mgmt.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-I'll keep playing with it.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 97b5b6c..bcd632d 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2936,7 +2936,7 @@ int mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 					  name, name_len);
+ 
+ 	if (dev_class && memcmp(dev_class, "\0\0\0", 3) != 0)
+-		eir_len = eir_append_data(&ev->eir[eir_len], eir_len,
++		eir_len = eir_append_data(ev->eir, eir_len,
+ 					  EIR_CLASS_OF_DEV, dev_class, 3);
+ 
+ 	put_unaligned_le16(eir_len, &ev->eir_len);
+-- 
+1.7.8.3
 
-Mike
