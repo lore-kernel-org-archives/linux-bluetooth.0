@@ -1,50 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: Correct ediv in SMP
-Date: Fri,  9 Mar 2012 14:43:27 +0200
-Message-Id: <1331297007-7119-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 9 Mar 2012 09:42:32 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Correct chan->psm endian conversions
+Message-ID: <20120309124231.GE16366@joana>
+References: <1331295377-6097-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1331295377-6097-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andrei,
 
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-03-09 14:16:17 +0200]:
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> chan->psm is kept in __le16 format which was not always taken
+> into account. Fix several bugs related to extra conversion.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/l2cap_core.c |   10 +++++-----
+>  1 files changed, 5 insertions(+), 5 deletions(-)
 
- Send this as RFC as I am not 100% sure that it is correct
+Applied, thanks.
 
- include/net/bluetooth/smp.h |    2 +-
- net/bluetooth/smp.c         |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/bluetooth/smp.h b/include/net/bluetooth/smp.h
-index 7b3acdd..ca356a7 100644
---- a/include/net/bluetooth/smp.h
-+++ b/include/net/bluetooth/smp.h
-@@ -77,7 +77,7 @@ struct smp_cmd_encrypt_info {
- 
- #define SMP_CMD_MASTER_IDENT	0x07
- struct smp_cmd_master_ident {
--	__u16	ediv;
-+	__le16	ediv;
- 	__u8	rand[8];
- } __packed;
- 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index deb1198..6fc7c47 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -956,7 +956,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
- 			    HCI_SMP_LTK_SLAVE, 1, authenticated,
- 			    enc.ltk, smp->enc_key_size, ediv, ident.rand);
- 
--		ident.ediv = cpu_to_le16(ediv);
-+		ident.ediv = ediv;
- 
- 		smp_send_cmd(conn, SMP_CMD_MASTER_IDENT, sizeof(ident), &ident);
- 
--- 
-1.7.9
-
+	Gustavo
