@@ -1,63 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <22D13068A6CE4724BFD60D3D46B5FD11@sisodomain.com>
-From: Jaganath <jaganath.k@samsung.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-References: <1331189303-6734-1-git-send-email-jaganath.k@samsung.com>
- <20120308234250.GB15265@x220.amr.corp.intel.com>
-In-reply-to: <20120308234250.GB15265@x220.amr.corp.intel.com>
-Subject: Re: [PATCH obexd 1/2] gobex: flush tx_queue before disconnection
-Date: Fri, 09 Mar 2012 18:03:42 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 9 Mar 2012 14:21:58 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: santosh nayak <santoshprasadnayak@gmail.com>
+Cc: marcel@holtmann.org, padovan@profusion.mobi, davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: Resend: [PATCH] Bluetooth: Fix Endian Bug.
+Message-ID: <20120309122154.GA17167@aemeltch-MOBL1>
+References: <1330622196-12967-1-git-send-email-santoshprasadnayak@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1330622196-12967-1-git-send-email-santoshprasadnayak@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+On Thu, Mar 01, 2012 at 10:46:36PM +0530, santosh nayak wrote:
+> From: Santosh Nayak <santoshprasadnayak@gmail.com>
+> 
+> Fix network to host endian conversion for L2CAP chan id.
+> 
+> Signed-off-by: Santosh Nayak <santoshprasadnayak@gmail.com>
 
---------------------------------------------------
-From: "Johan Hedberg" <johan.hedberg@gmail.com>
-Sent: Friday, March 09, 2012 5:12 AM
-To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH obexd 1/2] gobex: flush tx_queue before disconnection
+Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> Hi Jaganath,
->
-> On Thu, Mar 08, 2012, Jaganath Kanakkassery wrote:
->> @@ -1335,6 +1335,12 @@ void g_obex_unref(GObex *obex)
->>
->>  g_slist_free_full(obex->req_handlers, g_free);
->>
->> + do {
->> + ret = write_data(obex->io, G_IO_OUT, obex);
->> + if (obex->pending_req && obex->pending_req->cancelled)
->> + break;
->> + } while(ret);
->
-> This is not ok since we should only attempt writing to the transport if
-> G_IO_OUT is *really* set and not just fake it. Otherwise the call might
-> block which is not acceptable for the way gobex is designed (to be used
-> with a single async mainloop).
-
-This actually fixes the issue abort req not sending if user cancels the
-transfer because in user cancel scenario, ABORT req will be queued
-but before G_IO_OUT happens the transport will be disconnected.
-This is actually required to pass a pts test case because pts requires
-ABORT before disconnection.
-
-So I have two solutions after considering your and Luiz's opinion. '
-
-1. In g_obex_send_internal() if the packet is ABORT we should send it
-immediately using write_data(). Since ABORT packet size is small I think
-it is ok to block the write.
-
-2.  If user cancels transfer just send ABORT and disconnect transport only
-after getting the response. But waiting for ABORT response is not good I 
-feel.
-
-Please let me know if you have better method.
-
-Thanks,
-Jaganath 
-
+> ---
+>  net/bluetooth/l2cap_sock.c |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 401d942..86d5067 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -82,7 +82,7 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+>  	}
+>  
+>  	if (la.l2_cid)
+> -		err = l2cap_add_scid(chan, la.l2_cid);
+> +		err = l2cap_add_scid(chan, __le16_to_cpu(la.l2_cid));
+>  	else
+>  		err = l2cap_add_psm(chan, &la.l2_bdaddr, la.l2_psm);
+>  
+> @@ -123,7 +123,8 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+>  	if (la.l2_cid && la.l2_psm)
+>  		return -EINVAL;
+>  
+> -	err = l2cap_chan_connect(chan, la.l2_psm, la.l2_cid, &la.l2_bdaddr);
+> +	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
+> +				&la.l2_bdaddr);
+>  	if (err)
+>  		goto done;
+>  
+> -- 
+> 1.7.4.4
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
