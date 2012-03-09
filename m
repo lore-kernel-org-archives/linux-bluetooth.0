@@ -1,92 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAOcK=CPAHp-zBuWOPa3yB0ZcAmPWQgujzQcp+KtpJrX6tKDLag@mail.gmail.com>
-References: <CABMQnV+pQqS97OLcBnUNK4xu735Gqikirdr0o0CbcGG_j+2sHw@mail.gmail.com>
- <CAOcK=CPHnZPxgSNmxfcfmFJBTxn61FrV6DcSZmJfCfzTiSveUw@mail.gmail.com> <CAOcK=CPAHp-zBuWOPa3yB0ZcAmPWQgujzQcp+KtpJrX6tKDLag@mail.gmail.com>
-From: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
-Date: Fri, 9 Mar 2012 11:57:34 +0900
-Message-ID: <CABMQnV+FmUwbDbnZ1WJXyUzQJjO3z6QrBQfLpkfAQP-EbYG3nw@mail.gmail.com>
-Subject: Re: bluez: Build fail with -std=c99 on using bluez application
-To: Markus Rathgeb <maggu2810@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20120308235332.GA19895@x220.amr.corp.intel.com>
+References: <1331236916-27596-1-git-send-email-anderson.lizardo@openbossa.org>
+	<20120308235332.GA19895@x220.amr.corp.intel.com>
+Date: Thu, 8 Mar 2012 22:32:07 -0400
+Message-ID: <CAJdJm_MCdLnnmK1y7HrGSfWn2fUwxnMsovtrkCKYnsv-3nmnAw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] attrib: Fix memory leak on watcher exit
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
 
-Thanks. When I applied this patch, the problem was settled.
-I hope that this patch is committed  to git repository.
-
-Best regards,
-  Nobuhiro
-
-2012/3/8 Markus Rathgeb <maggu2810@googlemail.com>:
-> See also: http://comments.gmane.org/gmane.linux.bluez.kernel/22306
+On Thu, Mar 8, 2012 at 7:53 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Lizardo,
 >
+> On Thu, Mar 08, 2012, Anderson Lizardo wrote:
+>> The "destroy" callback of g_dbus_add_disconnect_watch() is actually
+>> never called, therefore the watcher data should be freed on
+>> watcher_exit().
 >
-> 2012/3/8 Markus Rathgeb <maggu2810@googlemail.com>:
->> I think, it is the same problem I reported here:
->> http://permalink.gmane.org/gmane.linux.bluez.kernel/22294
->>
->> 2012/3/8 Nobuhiro Iwamatsu <iwamatsu@nigauri.org>:
->>> Hi,
->>>
->>> When I built application using bluez with -std=c99 option, build failed.
->>> It can build, when not checking c99. I tested with bluez 4.99.
->>> Do you recommend not to checking c99?
->>>
->>> Best regards,
->>>  Nobuhiro
->>> -----
->>> $ cat t.c
->>> #include <bluetooth/bluetooth.h>
->>> $ gcc -std=c99 -c t.c
->>> In file included from t.c:1:0:
->>> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_le64’:
->>> /usr/include/bluetooth/bluetooth.h:159:9: error: expected
->>> specifier-qualifier-list before ‘typeof’
->>> /usr/include/bluetooth/bluetooth.h:159:9: error: called object
->>> ‘typeof(__p)’ is not a function
->>> /usr/include/bluetooth/bluetooth.h:159:9: error: ‘struct <anonymous>’
->>> has no member named ‘__v’
->>> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_be64’:
->>> /usr/include/bluetooth/bluetooth.h:164:9: error: expected
->>> specifier-qualifier-list before ‘typeof’
->>> /usr/include/bluetooth/bluetooth.h:164:9: error: called object
->>> ‘typeof(__p)’ is not a function
->>> /usr/include/bluetooth/bluetooth.h:164:9: error: ‘struct <anonymous>’
->>> has no member named ‘__v’
->>> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_le32’:
->>> /usr/include/bluetooth/bluetooth.h:169:9: error: expected
->>> specifier-qualifier-list before ‘typeof’
->>> /usr/include/bluetooth/bluetooth.h:169:9: error: called object
->>> ‘typeof(__p)’ is not a function
->>> /usr/include/bluetooth/bluetooth.h:169:9: error: ‘struct <anonymous>’
->>> has no member named ‘__v’
->>> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_be32’:
->>> /usr/include/bluetooth/bluetooth.h:174:9: error: expected
->>> specifier-qualifier-list before ‘typeof’
->>> /usr/include/bluetooth/bluetooth.h:174:9: error: called object
->>> ‘typeof(__p)’ is not a function
->>> /usr/include/bluetooth/bluetooth.h:174:9: error: ‘struct <anonymous>’
->>> has no member named ‘__v’
->>> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_le16’:
->>> /usr/include/bluetooth/bluetooth.h:179:9: error: expected
->>> specifier-qualifier-list before ‘typeof’
->>> /usr/include/bluetooth/bluetooth.h:179:9: error: called object
->>> ‘typeof(__p)’ is not a function
->>> /usr/include/bluetooth/bluetooth.h:179:9: error: ‘struct <anonymous>’
->>> has no member named ‘__v’
->>> /usr/include/bluetooth/bluetooth.h: In function ‘bt_get_be16’:
->>> /usr/include/bluetooth/bluetooth.h:184:9: error: expected
->>> specifier-qualifier-list before ‘typeof’
->>> /usr/include/bluetooth/bluetooth.h:184:9: error: called object
->>> ‘typeof(__p)’ is not a function
->>> /usr/include/bluetooth/bluetooth.h:184:9: error: ‘struct <anonymous>’
->>> has no member named ‘__v’
->>> -----
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Wouldn't it make more sense to fix GDBus so that the destroy callback
+> *is* called than to work around it like this?
+
+No other g_dbus_add_disconnect_watch() callers (besides this and LE
+thermometer code which is also leaking and for which I have a patch as
+well) use destroy callback. To me it seemed it was a known fact that
+this parameter is not implemented in gdbus code, so that's why I went
+this route.
+
+If you prefer that I implement this destroy functionality, when do you
+think it should be called? Only when the watch is removed?
+
+Personally, I think it is better to simply remove this argument from
+g_dbus_add_disconnect_watch(), if that is allowed. The caller usually
+knows better when to "destroy" its own allocated resources (which may
+explain why most users did not try to use this parameter?). What do
+you think?
+
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
