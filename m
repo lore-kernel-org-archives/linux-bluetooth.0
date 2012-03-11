@@ -1,57 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+Sender: anamtsov@gmail.com
+In-Reply-To: <1331488929.14217.62.camel@aeonflux>
+References: <1331455196-26441-1-git-send-email-arik@wizery.com> <1331488929.14217.62.camel@aeonflux>
 From: Arik Nemtsov <arik@wizery.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: Arik Nemtsov <arik@wizery.com>
-Subject: [PATCH] mgmt-api: add read Tx power level command
-Date: Mon, 12 Mar 2012 00:10:37 +0200
-Message-Id: <1331503837-19015-1-git-send-email-arik@wizery.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sun, 11 Mar 2012 23:49:05 +0200
+Message-ID: <CA+XVXfdmhLZX0Ms8Bqqp7hMzuxfC=mmQekniLX-XgSZK4751UA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Implement Read Transmit Power Level command
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Bruna Moreira <bruna.moreira@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This command reads the Tx power level for a given connected device
----
- doc/mgmt-api.txt |   28 ++++++++++++++++++++++++++++
- 1 files changed, 28 insertions(+), 0 deletions(-)
+On Sun, Mar 11, 2012 at 20:02, Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> please lead with a patch to doc/mgmt-api.txt first. I like to see the
+> proposed API first and not the implementation.
+>
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 4ede43d..8dae2b4 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -815,6 +815,34 @@ Unblock Device Command
- 	or failure.
- 
- 
-+Read Tx Power Level Command
-+======================
-+
-+	Command Code:		0x0028
-+	Controller Index:	<controller id>
-+	Command Parameters:	Address (6 Octets)
-+				Address_Type (1 Octet)
-+				Type (1 Octet)
-+	Return Parameters:	Address (6 Octets)
-+				Address_Type (1 Octet)
-+				Status (1 Octet)
-+				Level (1 Octet)
-+
-+	Possible values for the Address_Type parameter:
-+		0	BR/EDR
-+		1	LE Public
-+		2	LE Random
-+
-+	Possible values for the Type parameter:
-+		0	Current Transmit Power Level
-+		1	Maximum Transmit Power Level
-+
-+	This command can only be used when the controller is powered.
-+
-+	This command generates a Command Complete event on success
-+	or failure.
-+
-+
- Set Device ID Command
- =====================
- 
--- 
-1.7.5.4
+Sure. I'll write something up.
 
+Arik
