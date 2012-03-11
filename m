@@ -1,24 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: anamtsov@gmail.com
-In-Reply-To: <1331488929.14217.62.camel@aeonflux>
-References: <1331455196-26441-1-git-send-email-arik@wizery.com> <1331488929.14217.62.camel@aeonflux>
-From: Arik Nemtsov <arik@wizery.com>
-Date: Sun, 11 Mar 2012 23:49:05 +0200
-Message-ID: <CA+XVXfdmhLZX0Ms8Bqqp7hMzuxfC=mmQekniLX-XgSZK4751UA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Implement Read Transmit Power Level command
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Bruna Moreira <bruna.moreira@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1331489824.14217.69.camel@aeonflux>
+Subject: Re: [PATCH 0/2] DeviceInfo and BatteryService Clients
+From: Marcel Holtmann <marcel@holtmann.org>
+To: chen.ganir@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, Chen Ganir <chen.ganir@ti.com>
+Date: Sun, 11 Mar 2012 11:17:04 -0700
+In-Reply-To: <1331470642-23924-1-git-send-email-chen.ganir@ti.com>
+References: <1331470642-23924-1-git-send-email-chen.ganir@ti.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Mar 11, 2012 at 20:02, Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> please lead with a patch to doc/mgmt-api.txt first. I like to see the
-> proposed API first and not the implementation.
->
+Hi Chen,
 
-Sure. I'll write something up.
+> Adding Battery Service client and Device Information Service Client stubs.
+> More logic will be added to these service as development continues.
+> To enable the new features you will need to use:
+> --enable-batterystate
+> --enable-deviceinfo
 
-Arik
+I rather have us reducing the number of configure options. Do we really
+need these? I would just enable them all by default.
+
+Regards
+
+Marcel
+
+
