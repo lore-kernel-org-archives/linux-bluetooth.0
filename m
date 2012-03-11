@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: chen.ganir@gmail.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH 2/2] Added Battery Service GATT Client
-Date: Sun, 11 Mar 2012 14:57:22 +0200
-Message-Id: <1331470642-23924-3-git-send-email-chen.ganir@ti.com>
+Subject: [PATCH 1/2] Added DeviceInformation GATT Client
+Date: Sun, 11 Mar 2012 14:57:21 +0200
+Message-Id: <1331470642-23924-2-git-send-email-chen.ganir@ti.com>
 In-Reply-To: <1331470642-23924-1-git-send-email-chen.ganir@ti.com>
 References: <1331470642-23924-1-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,74 +12,74 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chen Ganir <chen.ganir@ti.com>
 
-Added support for the Battery Service Gatt Client side.
+Added the DeviceInformation GATT Client plugin skeleton.
 ---
- Makefile.am                 |    7 +++
- acinclude.m4                |    6 +++
- batterystate/batterystate.c |   89 +++++++++++++++++++++++++++++++++++++++++
- batterystate/batterystate.h |   26 ++++++++++++
- batterystate/main.c         |   60 ++++++++++++++++++++++++++++
- batterystate/manager.c      |   92 +++++++++++++++++++++++++++++++++++++++++++
- batterystate/manager.h      |   25 ++++++++++++
+ Makefile.am             |    7 ++++
+ acinclude.m4            |    6 +++
+ deviceinfo/deviceinfo.c |   89 +++++++++++++++++++++++++++++++++++++++++++++
+ deviceinfo/deviceinfo.h |   26 +++++++++++++
+ deviceinfo/main.c       |   60 ++++++++++++++++++++++++++++++
+ deviceinfo/manager.c    |   92 +++++++++++++++++++++++++++++++++++++++++++++++
+ deviceinfo/manager.h    |   25 +++++++++++++
  7 files changed, 305 insertions(+), 0 deletions(-)
- create mode 100644 batterystate/batterystate.c
- create mode 100644 batterystate/batterystate.h
- create mode 100644 batterystate/main.c
- create mode 100644 batterystate/manager.c
- create mode 100644 batterystate/manager.h
+ create mode 100644 deviceinfo/deviceinfo.c
+ create mode 100644 deviceinfo/deviceinfo.h
+ create mode 100644 deviceinfo/main.c
+ create mode 100644 deviceinfo/manager.c
+ create mode 100644 deviceinfo/manager.h
 
 diff --git a/Makefile.am b/Makefile.am
-index c2c61d6..10fd078 100644
+index bd587eb..c2c61d6 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -251,6 +251,13 @@ builtin_sources += deviceinfo/main.c \
- 			deviceinfo/deviceinfo.h deviceinfo/deviceinfo.c
+@@ -244,6 +244,13 @@ builtin_sources += thermometer/main.c \
+ 			thermometer/thermometer.h thermometer/thermometer.c
  endif
  
-+if BATTERYSTATEPLUGIN
-+builtin_modules += batterystate
-+builtin_sources += batterystate/main.c \
-+			batterystate/manager.h batterystate/manager.c \
-+			batterystate/batterystate.h batterystate/batterystate.c
++if DEVICEINFOPLUGIN
++builtin_modules += deviceinfo
++builtin_sources += deviceinfo/main.c \
++			deviceinfo/manager.h deviceinfo/manager.c \
++			deviceinfo/deviceinfo.h deviceinfo/deviceinfo.c
 +endif
 +
  builtin_modules += hciops mgmtops
  builtin_sources += plugins/hciops.c plugins/mgmtops.c
  
 diff --git a/acinclude.m4 b/acinclude.m4
-index 14b7a4c..b33b4bf 100644
+index b0f790c..14b7a4c 100644
 --- a/acinclude.m4
 +++ b/acinclude.m4
-@@ -221,6 +221,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+@@ -220,6 +220,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	dbusoob_enable=no
  	wiimote_enable=no
  	thermometer_enable=no
- 	deviceinfo_enable=no
-+	batterystate_enable=no
++	deviceinfo_enable=no
  
  	AC_ARG_ENABLE(optimization, AC_HELP_STRING([--disable-optimization], [disable code optimization]), [
  		optimization_enable=${enableval}
-@@ -377,6 +378,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 		deviceinfo_enable=${enableval}
+@@ -372,6 +373,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 		thermometer_enable=${enableval}
  	])
  
-+	AC_ARG_ENABLE(batterystate, AC_HELP_STRING([--enable-batterystate], [enable batterystate plugin]), [
-+		batterystate_enable=${enableval}
++	AC_ARG_ENABLE(deviceinfo, AC_HELP_STRING([--enable-deviceinfo], [enable deviceinfo plugin]), [
++		deviceinfo_enable=${enableval}
 +	])
 +
  	if (test "${fortify_enable}" = "yes"); then
  		CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
  	fi
-@@ -435,4 +440,5 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+@@ -429,4 +434,5 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	AM_CONDITIONAL(DBUSOOBPLUGIN, test "${dbusoob_enable}" = "yes")
  	AM_CONDITIONAL(WIIMOTEPLUGIN, test "${wiimote_enable}" = "yes")
  	AM_CONDITIONAL(THERMOMETERPLUGIN, test "${thermometer_enable}" = "yes")
- 	AM_CONDITIONAL(DEVICEINFOPLUGIN, test "${deviceinfo_enable}" = "yes")
-+	AM_CONDITIONAL(BATTERYSTATEPLUGIN, test "${batterystate_enable}" = "yes")
++	AM_CONDITIONAL(DEVICEINFOPLUGIN, test "${deviceinfo_enable}" = "yes")
  ])
-diff --git a/batterystate/batterystate.c b/batterystate/batterystate.c
+diff --git a/deviceinfo/deviceinfo.c b/deviceinfo/deviceinfo.c
 new file mode 100644
-index 0000000..54e47fb
+index 0000000..30920e3
 --- /dev/null
-+++ b/batterystate/batterystate.c
++++ b/deviceinfo/deviceinfo.c
 @@ -0,0 +1,89 @@
 +/*
 + *
@@ -121,60 +121,60 @@ index 0000000..54e47fb
 +#include "attio.h"
 +#include "att.h"
 +#include "gatt.h"
-+#include "batterystate.h"
++#include "deviceinfo.h"
 +#include "glib-compat.h"
 +
-+struct batterystate {
++struct deviceinfo {
 +	DBusConnection		*conn;		/* The connection to the bus */
 +	struct btd_device	*dev;		/* Device reference */
 +	GAttrib			*attrib;		/* GATT connection */
 +};
 +
-+static GSList *batteryservices = NULL;
++static GSList *deviceinfoservers = NULL;
 +
 +static gint cmp_device(gconstpointer a, gconstpointer b)
 +{
-+	const struct batterystate *bs = a;
++	const struct deviceinfo *d = a;
 +	const struct btd_device *dev = b;
 +
-+	if (dev == bs->dev)
++	if (dev == d->dev)
 +		return 0;
 +
 +	return -1;
 +}
 +
-+int batterystate_register(DBusConnection *connection, struct btd_device *device,
++int deviceinfo_register(DBusConnection *connection, struct btd_device *device,
 +						struct att_primary *dattr)
 +{
 +	const gchar *path = device_get_path(device);
-+	struct batterystate *bs;
++	struct deviceinfo *d;
 +
-+	bs = g_new0(struct batterystate, 1);
-+	bs->conn = dbus_connection_ref(connection);
-+	bs->dev = btd_device_ref(device);
++	d = g_new0(struct deviceinfo, 1);
++	d->conn = dbus_connection_ref(connection);
++	d->dev = btd_device_ref(device);
 +
-+	batteryservices = g_slist_prepend(batteryservices, bs);
++	deviceinfoservers = g_slist_prepend(deviceinfoservers, d);
 +
 +	return 0;
 +}
 +
-+void batterystate_unregister(struct btd_device *device)
++void deviceinfo_unregister(struct btd_device *device)
 +{
-+	struct batterystate *bs;
++	struct deviceinfo *d;
 +	GSList *l;
 +
-+	l = g_slist_find_custom(batteryservices, device, cmp_device);
++	l = g_slist_find_custom(deviceinfoservers, device, cmp_device);
 +	if (l == NULL)
 +		return;
 +
-+	bs = l->data;
-+	batteryservices = g_slist_remove(batteryservices, bs);
++	d = l->data;
++	deviceinfoservers = g_slist_remove(deviceinfoservers, d);
 +}
-diff --git a/batterystate/batterystate.h b/batterystate/batterystate.h
+diff --git a/deviceinfo/deviceinfo.h b/deviceinfo/deviceinfo.h
 new file mode 100644
-index 0000000..eac8c2d
+index 0000000..eedcf8f
 --- /dev/null
-+++ b/batterystate/batterystate.h
++++ b/deviceinfo/deviceinfo.h
 @@ -0,0 +1,26 @@
 +/*
 + *
@@ -199,14 +199,14 @@ index 0000000..eac8c2d
 + *
 + */
 +
-+int batterystate_register(DBusConnection *connection, struct btd_device *device,
++int deviceinfo_register(DBusConnection *connection, struct btd_device *device,
 +						struct att_primary *tattr);
-+void batterystate_unregister(struct btd_device *device);
-diff --git a/batterystate/main.c b/batterystate/main.c
++void deviceinfo_unregister(struct btd_device *device);
+diff --git a/deviceinfo/main.c b/deviceinfo/main.c
 new file mode 100644
-index 0000000..165f6ea
+index 0000000..3bf0e9c
 --- /dev/null
-+++ b/batterystate/main.c
++++ b/deviceinfo/main.c
 @@ -0,0 +1,60 @@
 +/*
 + *
@@ -244,13 +244,13 @@ index 0000000..165f6ea
 +
 +static DBusConnection *connection = NULL;
 +
-+static int batterystate_init(void)
++static int deviceinfo_init(void)
 +{
 +	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
 +	if (connection == NULL)
 +		return -EIO;
 +
-+	if (batterystate_manager_init(connection) < 0) {
++	if (deviceinfo_manager_init(connection) < 0) {
 +		dbus_connection_unref(connection);
 +		return -EIO;
 +	}
@@ -258,21 +258,21 @@ index 0000000..165f6ea
 +	return 0;
 +}
 +
-+static void batterystate_exit(void)
++static void deviceinfo_exit(void)
 +{
-+	batterystate_manager_exit();
++	deviceinfo_manager_exit();
 +
 +	dbus_connection_unref(connection);
 +	connection = NULL;
 +}
 +
-+BLUETOOTH_PLUGIN_DEFINE(batterystate, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-+					batterystate_init, batterystate_exit)
-diff --git a/batterystate/manager.c b/batterystate/manager.c
++BLUETOOTH_PLUGIN_DEFINE(deviceinfo, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++					deviceinfo_init, deviceinfo_exit)
+diff --git a/deviceinfo/manager.c b/deviceinfo/manager.c
 new file mode 100644
-index 0000000..8f63717
+index 0000000..334ef1e
 --- /dev/null
-+++ b/batterystate/manager.c
++++ b/deviceinfo/manager.c
 @@ -0,0 +1,92 @@
 +/*
 + *
@@ -304,10 +304,10 @@ index 0000000..8f63717
 +#include "adapter.h"
 +#include "device.h"
 +#include "att.h"
-+#include "batterystate.h"
++#include "deviceinfo.h"
 +#include "manager.h"
 +
-+#define BATTERY_SERVICE_UUID		"0000180f-0000-1000-8000-00805f9b34fb"
++#define DEVICE_INFORMATION_UUID		"0000180a-0000-1000-8000-00805f9b34fb"
 +
 +static DBusConnection *connection = NULL;
 +
@@ -319,39 +319,39 @@ index 0000000..8f63717
 +	return g_strcmp0(prim->uuid, uuid);
 +}
 +
-+static int batterystate_driver_probe(struct btd_device *device, GSList *uuids)
++static int deviceinfo_driver_probe(struct btd_device *device, GSList *uuids)
 +{
 +	struct att_primary *tattr;
 +	GSList *primaries, *l;
 +
 +	primaries = btd_device_get_primaries(device);
 +
-+	l = g_slist_find_custom(primaries, BATTERY_SERVICE_UUID,
++	l = g_slist_find_custom(primaries, DEVICE_INFORMATION_UUID,
 +							primary_uuid_cmp);
 +	if (l == NULL)
 +		return -EINVAL;
 +
 +	tattr = l->data;
 +
-+	return batterystate_register(connection, device, tattr);
++	return deviceinfo_register(connection, device, tattr);
 +}
 +
-+static void batterystate_driver_remove(struct btd_device *device)
++static void deviceinfo_driver_remove(struct btd_device *device)
 +{
-+	batterystate_unregister(device);
++	deviceinfo_unregister(device);
 +}
 +
-+static struct btd_device_driver batterystate_device_driver = {
-+	.name	= "batterystate-device-driver",
-+	.uuids	= BTD_UUIDS(BATTERY_SERVICE_UUID),
-+	.probe	= batterystate_driver_probe,
-+	.remove	= batterystate_driver_remove
++static struct btd_device_driver deviceinfo_device_driver = {
++	.name	= "deviceinformation-device-driver",
++	.uuids	= BTD_UUIDS(DEVICE_INFORMATION_UUID),
++	.probe	= deviceinfo_driver_probe,
++	.remove	= deviceinfo_driver_remove
 +};
 +
-+int batterystate_manager_init(DBusConnection *conn)
++int deviceinfo_manager_init(DBusConnection *conn)
 +{
 +	int ret;
-+	ret = btd_register_device_driver(&batterystate_device_driver);
++	ret = btd_register_device_driver(&deviceinfo_device_driver);
 +	if (ret < 0)
 +                return ret;
 +
@@ -359,18 +359,18 @@ index 0000000..8f63717
 +	return 0;
 +}
 +
-+void batterystate_manager_exit(void)
++void deviceinfo_manager_exit(void)
 +{
-+	btd_unregister_device_driver(&batterystate_device_driver);
++	btd_unregister_device_driver(&deviceinfo_device_driver);
 +
 +	dbus_connection_unref(connection);
 +	connection = NULL;
 +}
-diff --git a/batterystate/manager.h b/batterystate/manager.h
+diff --git a/deviceinfo/manager.h b/deviceinfo/manager.h
 new file mode 100644
-index 0000000..91b9799
+index 0000000..d0062fc
 --- /dev/null
-+++ b/batterystate/manager.h
++++ b/deviceinfo/manager.h
 @@ -0,0 +1,25 @@
 +/*
 + *
@@ -395,8 +395,8 @@ index 0000000..91b9799
 + *
 + */
 +
-+int batterystate_manager_init(DBusConnection *conn);
-+void batterystate_manager_exit(void);
++int deviceinfo_manager_init(DBusConnection *conn);
++void deviceinfo_manager_exit(void);
 -- 
 1.7.4.1
 
