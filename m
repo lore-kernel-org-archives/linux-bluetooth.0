@@ -1,69 +1,273 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1331512937.14217.74.camel@aeonflux>
-Subject: Re: [PATCH] mgmt-api: add read Tx power level command
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Arik Nemtsov <arik@wizery.com>
+MIME-Version: 1.0
+In-Reply-To: <1331470642-23924-2-git-send-email-chen.ganir@ti.com>
+References: <1331470642-23924-1-git-send-email-chen.ganir@ti.com>
+	<1331470642-23924-2-git-send-email-chen.ganir@ti.com>
+Date: Sun, 11 Mar 2012 21:29:09 -0300
+Message-ID: <CAKT1EBdh5JGHg0rVjTGXOjSg+f0DtJkpeW3HLjCeagfQ=5JZDg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Added DeviceInformation GATT Client
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: chen.ganir@gmail.com
 Cc: linux-bluetooth@vger.kernel.org
-Date: Sun, 11 Mar 2012 17:42:17 -0700
-In-Reply-To: <1331503837-19015-1-git-send-email-arik@wizery.com>
-References: <1331503837-19015-1-git-send-email-arik@wizery.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arik,
+Hi Chen Ganir:
 
-> This command reads the Tx power level for a given connected device
+On Sun, Mar 11, 2012 at 9:57 AM,  <chen.ganir@gmail.com> wrote:
+> From: Chen Ganir <chen.ganir@ti.com>
+>
+> Added the DeviceInformation GATT Client plugin skeleton.
 > ---
->  doc/mgmt-api.txt |   28 ++++++++++++++++++++++++++++
->  1 files changed, 28 insertions(+), 0 deletions(-)
-> 
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index 4ede43d..8dae2b4 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -815,6 +815,34 @@ Unblock Device Command
->  	or failure.
->  
-> 
-> +Read Tx Power Level Command
-> +======================
+>  Makefile.am             |    7 ++++
+>  acinclude.m4            |    6 +++
+>  deviceinfo/deviceinfo.c |   89 +++++++++++++++++++++++++++++++++++++++++++++
+>  deviceinfo/deviceinfo.h |   26 +++++++++++++
+>  deviceinfo/main.c       |   60 ++++++++++++++++++++++++++++++
+>  deviceinfo/manager.c    |   92 +++++++++++++++++++++++++++++++++++++++++++++++
+>  deviceinfo/manager.h    |   25 +++++++++++++
+>  7 files changed, 305 insertions(+), 0 deletions(-)
+>  create mode 100644 deviceinfo/deviceinfo.c
+>  create mode 100644 deviceinfo/deviceinfo.h
+>  create mode 100644 deviceinfo/main.c
+>  create mode 100644 deviceinfo/manager.c
+>  create mode 100644 deviceinfo/manager.h
+>
+> diff --git a/Makefile.am b/Makefile.am
+> index bd587eb..c2c61d6 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -244,6 +244,13 @@ builtin_sources += thermometer/main.c \
+>                        thermometer/thermometer.h thermometer/thermometer.c
+>  endif
+>
+> +if DEVICEINFOPLUGIN
+> +builtin_modules += deviceinfo
+> +builtin_sources += deviceinfo/main.c \
+> +                       deviceinfo/manager.h deviceinfo/manager.c \
+> +                       deviceinfo/deviceinfo.h deviceinfo/deviceinfo.c
+> +endif
 > +
-> +	Command Code:		0x0028
-
-how is this suppose to work. This command and Set Device ID are suppose
-to have the same command code?
-
-> +	Controller Index:	<controller id>
-> +	Command Parameters:	Address (6 Octets)
-> +				Address_Type (1 Octet)
-> +				Type (1 Octet)
-> +	Return Parameters:	Address (6 Octets)
-> +				Address_Type (1 Octet)
-> +				Status (1 Octet)
-> +				Level (1 Octet)
+>  builtin_modules += hciops mgmtops
+>  builtin_sources += plugins/hciops.c plugins/mgmtops.c
+>
+> diff --git a/acinclude.m4 b/acinclude.m4
+> index b0f790c..14b7a4c 100644
+> --- a/acinclude.m4
+> +++ b/acinclude.m4
+> @@ -220,6 +220,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+>        dbusoob_enable=no
+>        wiimote_enable=no
+>        thermometer_enable=no
+> +       deviceinfo_enable=no
+>
+>        AC_ARG_ENABLE(optimization, AC_HELP_STRING([--disable-optimization], [disable code optimization]), [
+>                optimization_enable=${enableval}
+> @@ -372,6 +373,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+>                thermometer_enable=${enableval}
+>        ])
+>
+> +       AC_ARG_ENABLE(deviceinfo, AC_HELP_STRING([--enable-deviceinfo], [enable deviceinfo plugin]), [
+> +               deviceinfo_enable=${enableval}
+> +       ])
 > +
-> +	Possible values for the Address_Type parameter:
-> +		0	BR/EDR
-> +		1	LE Public
-> +		2	LE Random
+>        if (test "${fortify_enable}" = "yes"); then
+>                CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
+>        fi
+> @@ -429,4 +434,5 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+>        AM_CONDITIONAL(DBUSOOBPLUGIN, test "${dbusoob_enable}" = "yes")
+>        AM_CONDITIONAL(WIIMOTEPLUGIN, test "${wiimote_enable}" = "yes")
+>        AM_CONDITIONAL(THERMOMETERPLUGIN, test "${thermometer_enable}" = "yes")
+> +       AM_CONDITIONAL(DEVICEINFOPLUGIN, test "${deviceinfo_enable}" = "yes")
+>  ])
+> diff --git a/deviceinfo/deviceinfo.c b/deviceinfo/deviceinfo.c
+> new file mode 100644
+> index 0000000..30920e3
+> --- /dev/null
+> +++ b/deviceinfo/deviceinfo.c
+> @@ -0,0 +1,89 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+> + *  Copyright (C) 2012 Texas Instruments, Inc.
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
 > +
-> +	Possible values for the Type parameter:
-> +		0	Current Transmit Power Level
-> +		1	Maximum Transmit Power Level
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <gdbus.h>
+> +#include <errno.h>
+> +#include <bluetooth/uuid.h>
+> +
+> +#include "dbus-common.h"
+> +#include "adapter.h"
+> +#include "device.h"
+> +#include "error.h"
+> +#include "log.h"
+> +#include "gattrib.h"
+> +#include "attio.h"
+> +#include "att.h"
+> +#include "gatt.h"
+> +#include "deviceinfo.h"
+> +#include "glib-compat.h"
 
-Which ones do you care about? And why not just read both and return both
-at the same time.
+It seems that you are including some unnecessary headers.
 
-I think that I made this pretty clear multiple times already. The mgmt
-API is not for stuffing random HCI commands into it. Please explain your
-usage pattern of the results clearly.
+> +
+> +struct deviceinfo {
+> +       DBusConnection          *conn;          /* The connection to the bus */
+> +       struct btd_device       *dev;           /* Device reference */
+> +       GAttrib                 *attrib;                /* GATT connection */
 
-Who is triggering this command and who is consuming the results?
+attrib is not being used.
 
-Regards
+> +};
+> +
+> +static GSList *deviceinfoservers = NULL;
+> +
+> +static gint cmp_device(gconstpointer a, gconstpointer b)
+> +{
+> +       const struct deviceinfo *d = a;
+> +       const struct btd_device *dev = b;
+> +
+> +       if (dev == d->dev)
+> +               return 0;
+> +
+> +       return -1;
+> +}
+> +
+> +int deviceinfo_register(DBusConnection *connection, struct btd_device *device,
+> +                                               struct att_primary *dattr)
+> +{
+> +       const gchar *path = device_get_path(device);
 
-Marcel
+path is not used
 
+> +       struct deviceinfo *d;
+> +
+> +       d = g_new0(struct deviceinfo, 1);
+> +       d->conn = dbus_connection_ref(connection);
+> +       d->dev = btd_device_ref(device);
+> +
+> +       deviceinfoservers = g_slist_prepend(deviceinfoservers, d);
+> +
+> +       return 0;
+> +}
+> +
+> +void deviceinfo_unregister(struct btd_device *device)
+> +{
+> +       struct deviceinfo *d;
+> +       GSList *l;
+> +
+> +       l = g_slist_find_custom(deviceinfoservers, device, cmp_device);
+> +       if (l == NULL)
+> +               return;
+> +
+> +       d = l->data;
+> +       deviceinfoservers = g_slist_remove(deviceinfoservers, d);
 
+memory leak(deviceinfo)
+
+> +}
+> diff --git a/deviceinfo/deviceinfo.h b/deviceinfo/deviceinfo.h
+> new file mode 100644
+> index 0000000..eedcf8f
+> --- /dev/null
+> +++ b/deviceinfo/deviceinfo.h
+> @@ -0,0 +1,26 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+> + *  Copyright (C) 2012 Texas Instruments, Inc.
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +int deviceinfo_register(DBusConnection *connection, struct btd_device *device,
+> +                                               struct att_primary *tattr);
+> +void deviceinfo_unregister(struct btd_device *device);
+> diff --git a/deviceinfo/main.c b/deviceinfo/main.c
+> new file mode 100644
+> index 0000000..3bf0e9c
+> --- /dev/null
+> +++ b/deviceinfo/main.c
+> @@ -0,0 +1,60 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+> + *  Copyright (C) 2012 Texas Instruments, Inc.
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <glib.h>
+> +#include <errno.h>
+> +#include <gdbus.h>
+> +
+> +#include "plugin.h"
+> +#include "manager.h"
+> +
+> +static DBusConnection *connection = NULL;
+> +
+> +static int deviceinfo_init(void)
+> +{
+> +       connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
+
+DBusConnection reference is not being used. IMO, DIS doesn't need to
+expose D-Bus properties or methods.
+
+BR,
+Claudio
