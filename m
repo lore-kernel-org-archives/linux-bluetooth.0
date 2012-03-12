@@ -1,28 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1331574238.14217.87.camel@aeonflux>
-Subject: Re: [PATCHv2 2/6] Bluetooth: Correct length calc in L2CAP conf rsp
+Message-ID: <1331574151.14217.86.camel@aeonflux>
+Subject: Re: [PATCH 4/5] HID: autoload hid-multitouch as needed
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 12 Mar 2012 10:43:58 -0700
-In-Reply-To: <1331547191-15307-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1331547191-15307-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1331547191-15307-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Jiri Kosina <jkosina@suse.cz>
+Cc: =?ISO-8859-1?Q?St=E9phane?= Chatty <chatty@enac.fr>,
+	Henrik Rydberg <rydberg@euromail.se>,
+	"benjamin.tissoires" <benjamin.tissoires@gmail.com>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Date: Mon, 12 Mar 2012 10:42:31 -0700
+In-Reply-To: <alpine.LNX.2.00.1203121650500.18356@pobox.suse.cz>
+References: <1331053026-21272-1-git-send-email-benjamin.tissoires@gmail.com>
+	 <1331053026-21272-5-git-send-email-benjamin.tissoires@gmail.com>
+	  <alpine.LNX.2.00.1203072234550.29034@pobox.suse.cz>
+	 <20120308105737.GA11201@polaris.bitmath.org>
+	 <6E17845C-6F9F-4CB6-AA5D-DEEDCD2089E8@enac.fr>
+	 <alpine.LNX.2.00.1203121650500.18356@pobox.suse.cz>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Jiri,
 
-> cmd->len is in le format so convert it to host format before use.
+> > > What if we were to change the definition of a HID device on the
+> > > modalias level?
+> > > 
+> > > In practise, a HID device can be either an usb device, a hid device,
+> > 
+> > Just to be sure: do you mean "bluetooth device"? or is there such a 
+> > thing as a hid device per se? I'm asking because I've always been 
+> > surprised at seeing usbhid/ in hid/, which kind of breaks the potential 
+> > symmetry between USB and Bluetooth wrt hid.
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c |    6 +++---
->  1 files changed, 3 insertions(+), 3 deletions(-)
+> Please don't get confused by the directory layout ... this has mostly 
+> non-technical reasons -- Marcel wanted to keep bluetooth/hidp under his 
+> wings, and I didn't have reasons to object strongly.
+> 
+> I am adding Marcel and Gustavo to CC just in case they have changed their 
+> mind, but it's definitely a side-topic in this discussion.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+I have not changed my mind. HIDP is Bluetooth specific and should stay
+there. Especially since we are currently discussing changes to make
+things also work over Bluetooth Low Energy (LE), but that is a complete
+different topic and it just started.
+
+> Marcel, Gustavo -- if you are interested in the whole discussion regarding 
+> potential extension of HID core infrastructure to better suit multitouch, 
+> please see the whole thread at http://marc.info/?t=133105322800006&r=1&w=4
+
+HIDP is just a transport driver in the end. And I heard that the Apple
+Magic Trackpad actually does work nicely. Never tried it by myself.
 
 Regards
 
