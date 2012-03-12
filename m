@@ -1,60 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 12 Mar 2012 23:21:57 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
+To: =?ISO-8859-15?Q?St=E9phane_Chatty?= <chatty@enac.fr>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Henrik Rydberg <rydberg@euromail.se>,
+	"benjamin.tissoires" <benjamin.tissoires@gmail.com>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 4/5] HID: autoload hid-multitouch as needed
+In-Reply-To: <4B25AD62-B1C9-4C57-AE64-34EB7F47DC9B@enac.fr>
+Message-ID: <alpine.LNX.2.00.1203122316420.18356@pobox.suse.cz>
+References: <1331053026-21272-1-git-send-email-benjamin.tissoires@gmail.com> <1331053026-21272-5-git-send-email-benjamin.tissoires@gmail.com>   <alpine.LNX.2.00.1203072234550.29034@pobox.suse.cz>  <20120308105737.GA11201@polaris.bitmath.org>
+ <6E17845C-6F9F-4CB6-AA5D-DEEDCD2089E8@enac.fr>  <alpine.LNX.2.00.1203121650500.18356@pobox.suse.cz> <1331574151.14217.86.camel@aeonflux> <4B25AD62-B1C9-4C57-AE64-34EB7F47DC9B@enac.fr>
 MIME-Version: 1.0
-In-Reply-To: <CACY+gR2DeQE2UaYwD8AQonNxtZ+=uZm7qY+BaqgjBQKoZSZHYA@mail.gmail.com>
-References: <CABax29VLUHg_jePnhHz_6WHYCZBHoir5TBLuauK+Ktfg9-8Xjw@mail.gmail.com>
-	<CACY+gR3t4RXuhUEi9486qsP+p0GCYArHW+PO5QfBfEUfnd=xEg@mail.gmail.com>
-	<CABax29X1tFt8Am_i7y5nZsjs_D2QY9pbv19316Wn6RVq7ksEDA@mail.gmail.com>
-	<CACY+gR2DeQE2UaYwD8AQonNxtZ+=uZm7qY+BaqgjBQKoZSZHYA@mail.gmail.com>
-Date: Tue, 13 Mar 2012 02:48:50 +0100
-Message-ID: <CABax29U8N2nOge34tr=G2f-fZvowCHPf3V=N2an-vC+x=UBdiQ@mail.gmail.com>
-Subject: Re: A2DP quality (bluetooth-alsa)
-From: qduaty <qduaty@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=ISO-8859-15
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2011/10/18 Siarhei Siamashka <siarhei.siamashka@gmail.com>:
-> Still I would suggest you to try the attached patch just for a test.
-> It reduces audio volume as part of the sbc encoding process and should
-> eliminate most of the possible clipping cases on the decoding side.
+On Mon, 12 Mar 2012, Stéphane Chatty wrote:
 
-Sorry for responding after a half year :) but I finally tested your
-encoder patch applied to libbluetooth version 4.96, using AIMP3 and
-pulseaudio. Unpatched encoder produces a "digital" distortion (which
-is rather annoying) and sounds much like BlueSoleil on Windows. After
-patching, music is slightly quieter (which can be expected if you
-decreased its volume) and has an "analog overdrive" like through a
-cheap FM radio. Anyway, the annoying "digital" distortion that was
-present in unpatched encoder, is now gone.
+> Just in case it makes a difference, I knew nothing about HIDP when I 
+> wrote the message above. My point was rather that hid looks like a bus 
+> to which several transport layers can connect (USB, Bluetooth, ZigBee, 
+> etc), and that having USB-specific code in hid/ (as opposed to having it 
+> in usb/) seems biased towards USB. I was (and am still) wondering how 
+> much it limits future uses of the hid core by making it USB-dependent.
+> 
+> In other words: is the hid core generic enough or are there steps to 
+> take to make it more generic wrt transport layers? If we are talking 
+> about restructuring parts of it, this seems like the right time to ask 
+> :-)
 
-Some fluctuations can be heard in higher bands in classical music, and
-(as expected) instruments are indistinguishable, but it's acceptable
-given the low bitpool.
+Let me answer by a bit of history here. Originally, there have been two 
+copies of HID code in the kernel -- one for USB HID devices, one for 
+Bluetooth HID devices.
+The parsers were not kept in sync, and there was a lot of code 
+duplication, creating quite some mess.
 
-For the "analog overdrive" I hear, it may also come from the device
-itself (its proper name is Nokia BH-503). Considering its glue sealed
-case, it might have been designed as a budget solution and its price
-was "adjusted" due to no competition.
+What I did back then in 2006 was that I have extracted the abstract HID 
+parts into HID core, and made it transport-independent in principle, so 
+that both USB HID and Bluetooth HID shared the common infrastructure, 
+while implementing different transport protocols.
 
-> Using bitpool 128 is kind of weird for SBC codec, because the encoded
-> data stream has about the same size as the the original data and this
-> defeats the whole purpose of having any lossy compression at all.
+Then we extended it a little bit further, making HID core a proper bus, to 
+which individual drivers (independently on underlying transport protocol 
+used) can register.
 
-Yes, but who needs a lossy compression in an endpoint? SBC and MP3
-were introduced to overcome the low throughput problem of the
-bluetooth link, which is no longer the case since 2.0+EDR has plenty
-of unused bits.
+Currently there are just Bluetooth (hidp) and USB (usbhid) transport 
+implementations, with HID core being transport independent.
 
-> I still recommend you to try sbcenc/sbcdec tools for the experiments with audio quality.
+Hope this helps,
 
-I tried them some time ago, but I believe ALSA backend may serve for
-the same purpose (and is much easier to use). 8 blocks seems to sound
-slightly better than 16 for classical music, full stereo eliminates
-the floating of virtual sound sources, 48 kHz also seems to increase
-quality a bit when compared to 44.1.
-
-Regards
-
---
-Sebastian Olter
+-- 
+Jiri Kosina
+SUSE Labs
