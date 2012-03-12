@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Add TX power tag to EIR data
-Date: Sun, 11 Mar 2012 19:27:21 -0700
-Message-Id: <1331519241-24778-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Add TX power tag to EIR data
+Date: Sun, 11 Mar 2012 19:15:15 -0700
+Message-Id: <1331518515-24388-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -76,7 +76,7 @@ index 97b5b6c..32f6e29 100644
  	}
  
 +	if (hdev->inq_tx_power) {
-+		ptr[0] = 2;
++		ptr[0] = 1;
 +		ptr[1] = EIR_TX_POWER;
 +		ptr[2] = (u8) hdev->inq_tx_power;
 +
