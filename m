@@ -1,29 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: chen.ganir@ti.com
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH 0/3] DeviceInfo: Add main logic
-Date: Mon, 12 Mar 2012 16:54:25 +0200
-Message-Id: <1331564068-2658-1-git-send-email-chen.ganir@ti.com>
+Subject: [PATCH 1/4] Bluetooth: trivial: Correct types
+Date: Mon, 12 Mar 2012 15:59:31 +0200
+Message-Id: <1331560774-10748-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Ganir <chen.ganir@ti.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add more logic to the Device Info Service Gatt client.
+Fix sparse warnigns below:
+...
+net/bluetooth/hci_sysfs.c:458:33: warning: cast to restricted __be32
+net/bluetooth/hci_sysfs.c:458:47: warning: cast to restricted __be16
+...
 
-This patch set is based on my previous patch set, sent earlyer today.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/hci_sysfs.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-Chen Ganir (3):
-  DeviceInfo: Add connection logic
-  DeviceInfo: Discover Characteristics
-  DeviceInfo: Read PNP ID
-
- deviceinfo/deviceinfo.c |  129 +++++++++++++++++++++++++++++++++++++++++++++++
- src/device.c            |   23 ++++++++
- src/device.h            |    3 +
- 3 files changed, 155 insertions(+), 0 deletions(-)
-
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index bc15429..0a4e7ab 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -444,8 +444,8 @@ static const struct file_operations blacklist_fops = {
+ 
+ static void print_bt_uuid(struct seq_file *f, u8 *uuid)
+ {
+-	u32 data0, data4;
+-	u16 data1, data2, data3, data5;
++	__be32 data0, data4;
++	__be16 data1, data2, data3, data5;
+ 
+ 	memcpy(&data0, &uuid[0], 4);
+ 	memcpy(&data1, &uuid[4], 2);
 -- 
-1.7.4.1
+1.7.9.1
 
