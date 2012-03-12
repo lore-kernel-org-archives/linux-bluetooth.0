@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v0 3/3] audio: add partial unloading to audio driver
-Date: Mon, 12 Mar 2012 16:56:39 +0100
-Message-Id: <1331567799-1247-4-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH v0 2/3] Add device driver support for partial unloading
+Date: Mon, 12 Mar 2012 16:56:38 +0100
+Message-Id: <1331567799-1247-3-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1331567799-1247-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1331567799-1247-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,86 +12,61 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-This solves the issue fully unloading the driver when one of the
-supported profiles is not found in the reverse discovery process.
+A driver that supports several profiles (uuid) should not necessarily be
+completely unloaded just because one of its profiles has been removed.
 
-This can be easily reproduced when both Headset and Gateway are enabled.
-When a new phone is paired, the incoming connection can be handled by
-the gateway server, which assumes the remote device is a HFP headset,
-and installs the HFP_HS_UUID. Once the reverse discovery information is
-available, this uuid must be removed, but not the whole driver.
+This patch adds a new callback that a driver can implement, where
+partial removals are handled. The return value of this callback will
+tell the core if the driver should be entirely removed (in that case, 0
+is returned).
 ---
- audio/manager.c |   45 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 44 insertions(+), 1 deletions(-)
+ src/device.c |   15 ++++++++++++---
+ src/device.h |    1 +
+ 2 files changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/audio/manager.c b/audio/manager.c
-index ab97314..ad32446 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -799,6 +799,49 @@ static int audio_probe(struct btd_device *device, GSList *uuids)
- 	return 0;
+diff --git a/src/device.c b/src/device.c
+index dfc8e59..a38dbe7 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -497,6 +497,17 @@ static void driver_remove(struct btd_device_driver *driver,
+ 	device->drivers = g_slist_remove(device->drivers, driver);
  }
  
-+static int device_part_count(struct audio_device *dev)
++static void driver_partial_remove(struct btd_device_driver *driver,
++						struct btd_device *device,
++						const char *uuid)
 +{
-+	int count = 0;
++	if (driver->partial_remove != NULL)
++		if (driver->partial_remove(device, uuid) > 0)
++			return;
 +
-+	count += dev->headset ? 1 : 0;
-+	count += dev->gateway ? 1 : 0;
-+	count += dev->sink ? 1 : 0;
-+	count += dev->source ? 1 : 0;
-+	count += dev->control ? 1 : 0;
-+	count += dev->target ? 1 : 0;
-+
-+	return count;
++	driver_remove(driver, device);
 +}
 +
-+static int audio_partial_remove(struct btd_device *device, const char *uuid)
-+{
-+	struct audio_device *dev;
-+	const char *path;
-+	int part_count;
-+
-+	path = device_get_path(device);
-+
-+	DBG("%s: remove uuid %s", path, uuid);
-+
-+	dev = manager_find_device(path, NULL, NULL, NULL, FALSE);
-+	if (!dev)
-+		return 0;
-+
-+	part_count = device_part_count(dev);
-+
-+	if ((dev->headset != NULL) && !g_strcmp0(uuid, HSP_HS_UUID)) {
-+		headset_unregister(dev);
-+		return part_count - 1;
-+	}
-+
-+	if ((dev->gateway != NULL) && !g_strcmp0(uuid, HFP_AG_UUID)) {
-+		gateway_unregister(dev);
-+		return part_count - 1;
-+	}
-+
-+	return part_count;
-+}
-+
- static void audio_remove(struct btd_device *device)
+ static gboolean do_disconnect(gpointer user_data)
  {
- 	struct audio_device *dev;
-@@ -813,7 +856,6 @@ static void audio_remove(struct btd_device *device)
- 	devices = g_slist_remove(devices, dev);
+ 	struct btd_device *device = user_data;
+@@ -1349,9 +1360,7 @@ static void device_remove_drivers(struct btd_device *device, GSList *uuids)
+ 			DBG("UUID %s was removed from device %s",
+ 							*uuid, dstaddr);
  
- 	audio_device_unregister(dev);
--
- }
- 
- static struct audio_adapter *audio_adapter_ref(struct audio_adapter *adp)
-@@ -1115,6 +1157,7 @@ static struct btd_device_driver audio_driver = {
- 			ADVANCED_AUDIO_UUID, A2DP_SOURCE_UUID, A2DP_SINK_UUID,
- 			AVRCP_TARGET_UUID, AVRCP_REMOTE_UUID),
- 	.probe	= audio_probe,
-+	.partial_remove	= audio_partial_remove,
- 	.remove	= audio_remove,
+-			driver->remove(device);
+-			device->drivers = g_slist_remove(device->drivers,
+-								driver);
++			driver_partial_remove(driver, device, *uuid);
+ 			break;
+ 		}
+ 	}
+diff --git a/src/device.h b/src/device.h
+index 7cb9bb2..ef4909b 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -107,6 +107,7 @@ struct btd_device_driver {
+ 	const char *name;
+ 	const char **uuids;
+ 	int (*probe) (struct btd_device *device, GSList *uuids);
++	int (*partial_remove) (struct btd_device *device, const char *uuid);
+ 	void (*remove) (struct btd_device *device);
  };
  
 -- 
