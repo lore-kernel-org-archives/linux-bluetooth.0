@@ -1,65 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: HID Over GATT implementation
-Date: Mon, 12 Mar 2012 06:01:52 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B44D4A1@DNCE02.ent.ti.com>
-References: <F0070FBC0FB3174D8D11444EB2D5B0260B44D1AB@DNCE02.ent.ti.com>
- <CAKT1EBcVv1ya0ArmgwNh968O9QSsQD6oNy1poJDeNgg_V=iuog@mail.gmail.com>
-In-Reply-To: <CAKT1EBcVv1ya0ArmgwNh968O9QSsQD6oNy1poJDeNgg_V=iuog@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Message-id: <89B53B23AEC845998BA7BD97586A5556@sisodomain.com>
+From: Jaganath <jaganath.k@samsung.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <1331189303-6734-1-git-send-email-jaganath.k@samsung.com>
+ <20120308234250.GB15265@x220.amr.corp.intel.com>
+ <22D13068A6CE4724BFD60D3D46B5FD11@sisodomain.com>
+ <20120309130804.GA31252@x220.spectrum.wifi>
+In-reply-to: <20120309130804.GA31252@x220.spectrum.wifi>
+Subject: Re: [PATCH obexd 1/2] gobex: flush tx_queue before disconnection
+Date: Mon, 12 Mar 2012 11:12:05 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Q2xhdWRpbywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBDbGF1ZGlv
-IFRha2FoYXNpIFttYWlsdG86Y2xhdWRpby50YWthaGFzaUBvcGVuYm9zc2Eub3JnXQ0KPiBTZW50
-OiBNb25kYXksIE1hcmNoIDEyLCAyMDEyIDI6MTIgQU0NCj4gVG86IEdhbmlyLCBDaGVuDQo+IENj
-OiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBISUQgT3Zl
-ciBHQVRUIGltcGxlbWVudGF0aW9uDQo+IA0KPiBIaSBDaGVuIEdhbmlyLA0KPiANCj4gT24gU3Vu
-LCBNYXIgMTEsIDIwMTIgYXQgOTo1NCBBTSwgR2FuaXIsIENoZW4gPGNoZW4uZ2FuaXJAdGkuY29t
-PiB3cm90ZToNCj4gPiBIaS4NCj4gPg0KPiA+IEkgaGF2ZSBzdGFydGVkIHRoZSBkZXZlbG9wbWVu
-dCBvZiB0aGUgSE9HUCAoSElEIE92ZXIgR0FUVCBQcm90b2NvbCkNCj4gZm9yIHRoZSBCbHVlWiBT
-dGFjay4gVGhlIG1haW4gaWRlYSBvZiB0aGlzIGFkb3B0ZWQgcHJvZmlsZSBpcyB0byBhbGxvdw0K
-PiBISUQgZGV2aWNlcyB0byBvcGVyYXRlIG92ZXIgdGhlIGxvdyBlbmVyZ3kgdGVjaG5vbG9neS4N
-Cj4gPg0KPiA+IFRoZSBISUQgT3ZlciBHQVRUIFByb2ZpbGUgaW5jbHVkZXMgdGhlIGZvbGxvd2lu
-ZyBzZXJ2aWNlcyA6DQo+ID4gMS4gQmF0dGVyeSBTZXJ2aWNlIC0gYWxsb3dzIHRoZSBob3N0IHRv
-IGdhdGhlciBhbmQgZGlzcGxheQ0KPiBpbmZvcm1hdGlvbiByZWdhcmRpbmcgdGhlIHBlZXIgZGV2
-aWNlIGJhdHRlcnkvYmF0dGVyaWVzIHN0YXRlLg0KPiA+IDIuIERldmljZSBJbmZvcm1hdGlvbiBT
-ZXJ2aWNlIC0gVGhpcyBzZXJ2aWNlIGNvbnRhaW5zIG1pc2MNCj4gaWRlbnRpZmljYXRpb24gZGF0
-YSBvZiBhIGRldmljZS4gVGhlIEhPR1Agd2lsbCB1c2UgdGhlIFBOUCBJRCBmaWVsZC4NCj4gDQo+
-IENvdWxkIHlvdSBwbGVhc2UgZXhwbGFpbiBob3cgYXJlIHlvdSBwbGFubmluZyB0byBzaGFyZSBi
-YXR0ZXJ5IGxldmVsDQo+IGFuZCBQTlAgSUQgdG8gSG9HIHNlcnZpY2U/DQo+IA0KPiBkZXZpY2Uu
-YyBjYW4gaGF2ZSBmdW5jdGlvbiB0byBnZXQvc2V0IEJhdHRlcnkgTGV2ZWwgYW5kIFBOUCBJRC4g
-SU1PLA0KPiBvbmx5IEJhdHRlcnkgTGV2ZWwgY291bGQgYmUgZXhwb3J0ZWQgaW4gdGhlIERldmlj
-ZSBpbnRlcmZhY2UoaW5zdGVhZA0KPiBvZiBjcmVhdGluZyBhIG5ldyBpbnRlcmZhY2UgZm9yIEJh
-dHRlcnkpLg0KPg0KUE5QIElEIChvciBhbnkgb3RoZXIgRGV2aWNlSW5mb3JtYXRpb24gZGF0YSkg
-YW5kIEJhdHRlcnkgbGV2ZWwgd2lsbCBiZSBwYXJ0IG9mIHRoZSBidGRfZGV2aWNlIChsYXRlciBw
-YXRjaCkuIERldmljZSB3aWxsIGhhdmUgZnVuY3Rpb25hbGl0eSB0byBnZXQvc2V0IHRoZSBpbmZv
-cm1hdGlvbiAoZ2V0IHdpbGwgYmUgZXhwb3NlZCBleHRlcm5hbGx5LCBzZXQgd2lsbCBiZSBmb3Ig
-dXNlIGJ5IHRoZSBwbHVnaW5zKS4gTm8gc3BlY2lmaWMgZGJ1cyBBUEkgd2lsbCBiZSBjcmVhdGVk
-IGZvciBhbnkgb2YgdGhvc2UgcGx1Z2lucyAobm8gbmVlZCB0byBjcmVhdGUgYW4gYWRkaXRpb25h
-bCBpbnRlcmZhY2UpLiBEZXZpY2UgSW5mb3JtYXRpb24gaXMgcmVhZCBvbmNlIG9uIGNvbm5lY3Rp
-b24sIGFuZCB3aGVuIGl0IGlzIHJlYWQsIHRoZSBwbHVnaW4gdXBkYXRlcyB0aGUgYnRkX2Rldmlj
-ZSB3aXRoIHRoaXMgaW5mb3JtYXRpb24uIEFsbCBhdmFpbGFibGUgaW5mb3JtYXRpb24gd2lsbCBi
-ZSByZWFkLiBUaGVyZSBpcyBubyBuZWVkIHRvIHJlLXJlYWQgdGhpcyBkdXJpbmcgYW4gb25nb2lu
-ZyBjb25uZWN0aW9uLiBJZiB3ZSBkbyBzZWUgYSByZWFzb24gdG8gZG8gdGhhdCwgd2UgY2FuIGFk
-ZCBhIGRidXMgaW50ZXJmYWNlIGZvciBpdCBsYXRlci4NCg0KUE5QIElEIGlzIGEgY29tcGxleCBk
-YXRhIHR5cGUuIEl0IGNvbnRhaW5zIDQgZGlmZmVyZW50IGVsZW1lbnRzLCB3aGljaCB3aWxsIGJl
-IGV4cG9zZWQgdXNpbmcgYSB1bmlxdWUgc3RydWN0dXJlIGNvbnRhaW5pbmcgYWxsIHRob3NlIHZh
-bHVlcy4NCg0KQmF0dGVyeSBpbmZvcm1hdGlvbiB3aWxsIGJlIHJlYWQgb25jZSwgYW5kIGNvbmZp
-Z3VyZWQgZm9yIG5vdGlmaWNhdGlvbnMgaWYgcG9zc2libGUgKGFsbCBkb25lIGF1dG9tYXRpY2Fs
-bHkgdXBvbiBjb25uZWN0aW9uKS4gQmF0dGVyeSBsZXZlbCBjaGFuZ2VzIHdpbGwgYmUgZXhwb3Nl
-ZCB1c2luZyBELUJVUyBldmVudCAoUHJvcGVydHlDaGFuZ2VkIDogQmF0dGVyeUxldmVsKS4NCg0K
-QmF0dGVyeSBsZXZlbCBpcyBhbiBpbnRlZ2VyIG51bWJlciwgaW4gdGhlIHJhbmdlIG9mIDAtMTAw
-LiBUaGUgYmF0dGVyeSBsZXZlbCBhbHNvIGhhcyBhIGZvcm1hdCBjaGFyYWN0ZXJpc3RpYyBkZXNj
-cmlwdG9yLCB3aGljaCBjb250YWlucyBhIHVuaXF1ZSBuYW1lc3BhY2UvZGVzY3JpcHRpb24gdmFs
-dWUgd2hpY2ggd2lsbCBiZSB1c2VkIHRvIGlkZW50aWZ5IGEgc3BlY2lmaWMgYmF0dGVyeSwgd2hl
-biB0aGVyZSBpcyBtb3JlIHRoYW4gb25lIHNlcnZpY2UgYXZhaWxhYmxlLiBUaGlzIHZhbHVlIHdp
-bGwgYmUgcGFydCBvZiB0aGUgYmF0dGVyeSBsZXZlbCBzdHJ1Y3R1cmUgbGlzdCBvbiB0aGUgZGV2
-aWNlLCBhbmQgSSBzdGlsbCBuZWVkIHRvIGZpZ3VyZSBvdXQgaG93IHRvIGFkZCBpdCB0byB0aGUg
-YmF0dGVyeWxldmVsIGRidXMgcHJvcGVydHkgKG1heWJlIGFwcGVuZCBpdCB0byB0aGUgcHJvcGVy
-dHkgbmFtZSwgc3VjaCBhcyBCYXR0ZXJ5TGV2ZWwoMSkgb3Igc29tZXRoaW5nIGxpa2UgdGhpcyA/
-DQogDQo+IEJSLA0KPiBDbGF1ZGlvDQoNCkNoZW4gR2FuaXIsDQpUZXhhcyBJbnN0cnVtZW50cy4N
-Cg==
+Hi Johan,
+
+--------------------------------------------------
+From: "Johan Hedberg" <johan.hedberg@gmail.com>
+Sent: Friday, March 09, 2012 6:38 PM
+To: "Jaganath" <jaganath.k@samsung.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH obexd 1/2] gobex: flush tx_queue before disconnection
+
+> Hi Jaganath,
+>
+> On Fri, Mar 09, 2012, Jaganath wrote:
+>> >On Thu, Mar 08, 2012, Jaganath Kanakkassery wrote:
+>> >>@@ -1335,6 +1335,12 @@ void g_obex_unref(GObex *obex)
+>> >>
+>> >> g_slist_free_full(obex->req_handlers, g_free);
+>> >>
+>> >>+ do {
+>> >>+ ret = write_data(obex->io, G_IO_OUT, obex);
+>> >>+ if (obex->pending_req && obex->pending_req->cancelled)
+>> >>+ break;
+>> >>+ } while(ret);
+>> >
+>> >This is not ok since we should only attempt writing to the transport if
+>> >G_IO_OUT is *really* set and not just fake it. Otherwise the call might
+>> >block which is not acceptable for the way gobex is designed (to be used
+>> >with a single async mainloop).
+>>
+>> This actually fixes the issue abort req not sending if user cancels the
+>> transfer because in user cancel scenario, ABORT req will be queued
+>> but before G_IO_OUT happens the transport will be disconnected.
+>> This is actually required to pass a pts test case because pts requires
+>> ABORT before disconnection.
+>
+> I fully understand that this needs to be fixed, it's just that the way
+> you're proposing is not a good way to do it.
+>
+>> So I have two solutions after considering your and Luiz's opinion. '
+>>
+>> 1. In g_obex_send_internal() if the packet is ABORT we should send it
+>> immediately using write_data(). Since ABORT packet size is small I think
+>> it is ok to block the write.
+>
+> Nope, it's never ok to block on write.
+>
+>> 2.  If user cancels transfer just send ABORT and disconnect transport 
+>> only
+>> after getting the response. But waiting for ABORT response is not
+>> good I feel.
+>
+> I think it *is* good to wait for the response. I've seen devices which
+> break if you disconnect the transport without waiting for OBEX
+> Disconnect command response and there could also be devices which
+> exhibit similar behavior for Abort.
+
+I have already sent a patch which wait for abort response before 
+disconnection.
+Subject:  [PATCH obexd] client: Fix ABORT command not sending when user
+cancels the transfer.
+Please review it and let me know your comments
+
+> I think this needs to be fixed on a higher layer than gobex as gobex
+> already provides a mechanism for waiting for the completion (or
+> cancellation) of a command.
+
+Thanks,
+Jaganath
+
+ 
+
