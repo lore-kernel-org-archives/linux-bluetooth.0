@@ -1,87 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <89B53B23AEC845998BA7BD97586A5556@sisodomain.com>
-From: Jaganath <jaganath.k@samsung.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-References: <1331189303-6734-1-git-send-email-jaganath.k@samsung.com>
- <20120308234250.GB15265@x220.amr.corp.intel.com>
- <22D13068A6CE4724BFD60D3D46B5FD11@sisodomain.com>
- <20120309130804.GA31252@x220.spectrum.wifi>
-In-reply-to: <20120309130804.GA31252@x220.spectrum.wifi>
-Subject: Re: [PATCH obexd 1/2] gobex: flush tx_queue before disconnection
-Date: Mon, 12 Mar 2012 11:12:05 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Add management command for setting Device ID
+Date: Sun, 11 Mar 2012 20:00:29 -0700
+Message-Id: <1331521229-497-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+The Device ID details need to be programmed into the kernel for every
+controller at least once. So provide management command for this.
 
---------------------------------------------------
-From: "Johan Hedberg" <johan.hedberg@gmail.com>
-Sent: Friday, March 09, 2012 6:38 PM
-To: "Jaganath" <jaganath.k@samsung.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH obexd 1/2] gobex: flush tx_queue before disconnection
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/mgmt.h |    9 +++++++++
+ net/bluetooth/mgmt.c         |   26 ++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+), 0 deletions(-)
 
-> Hi Jaganath,
->
-> On Fri, Mar 09, 2012, Jaganath wrote:
->> >On Thu, Mar 08, 2012, Jaganath Kanakkassery wrote:
->> >>@@ -1335,6 +1335,12 @@ void g_obex_unref(GObex *obex)
->> >>
->> >> g_slist_free_full(obex->req_handlers, g_free);
->> >>
->> >>+ do {
->> >>+ ret = write_data(obex->io, G_IO_OUT, obex);
->> >>+ if (obex->pending_req && obex->pending_req->cancelled)
->> >>+ break;
->> >>+ } while(ret);
->> >
->> >This is not ok since we should only attempt writing to the transport if
->> >G_IO_OUT is *really* set and not just fake it. Otherwise the call might
->> >block which is not acceptable for the way gobex is designed (to be used
->> >with a single async mainloop).
->>
->> This actually fixes the issue abort req not sending if user cancels the
->> transfer because in user cancel scenario, ABORT req will be queued
->> but before G_IO_OUT happens the transport will be disconnected.
->> This is actually required to pass a pts test case because pts requires
->> ABORT before disconnection.
->
-> I fully understand that this needs to be fixed, it's just that the way
-> you're proposing is not a good way to do it.
->
->> So I have two solutions after considering your and Luiz's opinion. '
->>
->> 1. In g_obex_send_internal() if the packet is ABORT we should send it
->> immediately using write_data(). Since ABORT packet size is small I think
->> it is ok to block the write.
->
-> Nope, it's never ok to block on write.
->
->> 2.  If user cancels transfer just send ABORT and disconnect transport 
->> only
->> after getting the response. But waiting for ABORT response is not
->> good I feel.
->
-> I think it *is* good to wait for the response. I've seen devices which
-> break if you disconnect the transport without waiting for OBEX
-> Disconnect command response and there could also be devices which
-> exhibit similar behavior for Abort.
-
-I have already sent a patch which wait for abort response before 
-disconnection.
-Subject:  [PATCH obexd] client: Fix ABORT command not sending when user
-cancels the transfer.
-Please review it and let me know your comments
-
-> I think this needs to be fixed on a higher layer than gobex as gobex
-> already provides a mechanism for waiting for the completion (or
-> cancellation) of a command.
-
-Thanks,
-Jaganath
-
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index ffc1377..53b8a32 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -341,6 +341,15 @@ struct mgmt_cp_unblock_device {
+ } __packed;
+ #define MGMT_UNBLOCK_DEVICE_SIZE	MGMT_ADDR_INFO_SIZE
  
++#define MGMT_OP_SET_DEVICE_ID		0x0028
++struct mgmt_cp_set_device_id {
++	__le16	source;
++	__le16	vendor;
++	__le16	product;
++	__le16	version;
++} __packed;
++#define MGMT_SET_DEVICE_ID_SIZE		8
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 2c09f0a..5aa2c9e 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -78,6 +78,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_CONFIRM_NAME,
+ 	MGMT_OP_BLOCK_DEVICE,
+ 	MGMT_OP_UNBLOCK_DEVICE,
++	MGMT_OP_SET_DEVICE_ID,
+ };
+ 
+ static const u16 mgmt_events[] = {
+@@ -2522,6 +2523,30 @@ static int unblock_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	return err;
+ }
+ 
++static int set_device_id(struct sock *sk, struct hci_dev *hdev, void *data,
++			 u16 len)
++{
++	struct mgmt_cp_set_device_id *cp = data;
++	int err;
++
++	BT_DBG("%s", hdev->name);
++
++	hci_dev_lock(hdev);
++
++	hdev->devid_source = __le16_to_cpu(cp->source);
++	hdev->devid_vendor = __le16_to_cpu(cp->vendor);
++	hdev->devid_product = __le16_to_cpu(cp->product);
++	hdev->devid_version = __le16_to_cpu(cp->version);
++
++	err = cmd_complete(sk, hdev->id, MGMT_OP_SET_DEVICE_ID, 0, NULL, 0);
++
++	update_eir(hdev);
++
++	hci_dev_unlock(hdev);
++
++	return err;
++}
++
+ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
+ 				void *data, u16 len)
+ {
+@@ -2663,6 +2688,7 @@ struct mgmt_handler {
+ 	{ confirm_name,           false, MGMT_CONFIRM_NAME_SIZE },
+ 	{ block_device,           false, MGMT_BLOCK_DEVICE_SIZE },
+ 	{ unblock_device,         false, MGMT_UNBLOCK_DEVICE_SIZE },
++	{ set_device_id,          false, MGMT_SET_DEVICE_ID_SIZE },
+ };
+ 
+ 
+-- 
+1.7.7.6
 
