@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: chen.ganir@ti.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH 3/3] DeviceInfo: Read PNP ID
-Date: Mon, 12 Mar 2012 16:54:28 +0200
-Message-Id: <1331564068-2658-4-git-send-email-chen.ganir@ti.com>
+Subject: [PATCH 2/3] DeviceInfo: Discover Characteristics
+Date: Mon, 12 Mar 2012 16:54:27 +0200
+Message-Id: <1331564068-2658-3-git-send-email-chen.ganir@ti.com>
 In-Reply-To: <1331564068-2658-1-git-send-email-chen.ganir@ti.com>
 References: <1331564068-2658-1-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,126 +12,126 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chen Ganir <chen.ganir@ti.com>
 
-Read the PNP ID characteristic of the DeviceInfo Service, and
-store it inside the btd_device, for use by other profiles.
+Add logic to discover all characteristics and build a
+characteristic list.
 ---
- deviceinfo/deviceinfo.c |   38 ++++++++++++++++++++++++++++++++++++++
- src/device.c            |   23 +++++++++++++++++++++++
- src/device.h            |    3 +++
- 3 files changed, 64 insertions(+), 0 deletions(-)
+ deviceinfo/deviceinfo.c |   65 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 65 insertions(+), 0 deletions(-)
 
 diff --git a/deviceinfo/deviceinfo.c b/deviceinfo/deviceinfo.c
-index ab2e468..59e41b1 100644
+index 852878b..ab2e468 100644
 --- a/deviceinfo/deviceinfo.c
 +++ b/deviceinfo/deviceinfo.c
-@@ -90,6 +90,42 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
+@@ -34,17 +34,33 @@
+ #include "attio.h"
+ #include "att.h"
+ #include "gatt.h"
++#include "log.h"
+ #include "deviceinfo.h"
+ 
++#define PNPID_UUID		                "00002a50-0000-1000-8000-00805f9b34fb"
+ 
+ struct deviceinfo {
+ 	struct btd_device	*dev;		/* Device reference */
+ 	GAttrib			*attrib;		/* GATT connection */
++	struct att_range	*svc_range;	/* DeviceInfo range */
+ 	guint			attioid;		/* Att watcher id */
++	GSList			*chars;		/* Characteristics */
+ };
+ 
+ static GSList *deviceinfoservers = NULL;
+ 
++struct characteristic {
++	struct att_char		attr;	/* Characteristic */
++	struct deviceinfo	*d;	/* deviceinfo where the char belongs */
++};
++
++static void destroy_char(gpointer user_data)
++{
++	struct characteristic *c = user_data;
++
++	g_free(c);
++}
++
+ static void destroy_deviceinfo(gpointer user_data)
+ {
+ 	struct deviceinfo *d = user_data;
+@@ -55,7 +71,11 @@ static void destroy_deviceinfo(gpointer user_data)
+ 	if (d->attrib != NULL)
+ 		g_attrib_unref(d->attrib);
+ 
++	if (d->chars != NULL)
++		g_slist_free_full(d->chars, destroy_char);
++
+ 	btd_device_unref(d->dev);
++	g_free(d->svc_range);
+ 	g_free(d);
+ }
+ 
+@@ -70,11 +90,53 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
  	return -1;
  }
  
-+static void read_pnpid_cb(guint8 status, const guint8 *pdu, guint16 len,
++static void configure_deviceinfo_cb(GSList *characteristics, guint8 status,
 +							gpointer user_data)
 +{
-+	struct characteristic *ch = user_data;
-+	uint8_t value[ATT_MAX_MTU];
-+	int vlen;
++	struct deviceinfo *d = user_data;
++	GSList *l;
 +
 +	if (status != 0) {
-+		DBG("value read failed: %s",
++		error("Discover deviceinfo characteristics: %s",
 +							att_ecode2str(status));
 +		return;
 +	}
 +
-+	if (!dec_read_resp(pdu, len, value, &vlen)) {
-+		DBG("Protocol error\n");
-+		return;
-+	}
++	for (l = characteristics; l; l = l->next) {
++		struct att_char *c = l->data;
++		struct characteristic *ch;
++		uint16_t start, end;
 +
-+	if (vlen < 7) {
-+		DBG("Invalid deviceinfo received");
-+		return;
-+	}
++		ch = g_new0(struct characteristic, 1);
++		ch->attr.handle = c->handle;
++		ch->attr.properties = c->properties;
++		ch->attr.value_handle = c->value_handle;
++		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
++		ch->d = d;
 +
-+	device_set_deviceinfo_pnpid(ch->d->dev,value[0],att_get_u16(&value[1]), att_get_u16(&value[3]),
-+				att_get_u16(&value[5]));
++		d->chars = g_slist_append(d->chars, ch);
++
++		start = c->value_handle + 1;
++
++		if (l->next != NULL) {
++			struct att_char *c = l->next->data;
++			if (start == c->handle)
++				continue;
++			end = c->handle - 1;
++		} else if (c->value_handle != d->svc_range->end)
++			end = d->svc_range->end;
++		else
++			continue;
++	}
 +}
-+
-+static void process_deviceinfo_char(struct characteristic *ch)
-+{
-+	if (g_strcmp0(ch->attr.uuid, PNPID_UUID) == 0) {
-+		gatt_read_char(ch->d->attrib, ch->attr.value_handle, 0,
-+							read_pnpid_cb, ch);
-+		return;
-+	}
-+}
-+
- static void configure_deviceinfo_cb(GSList *characteristics, guint8 status,
- 							gpointer user_data)
+ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
  {
-@@ -116,6 +152,8 @@ static void configure_deviceinfo_cb(GSList *characteristics, guint8 status,
+ 	struct deviceinfo *d = user_data;
  
- 		d->chars = g_slist_append(d->chars, ch);
- 
-+		process_deviceinfo_char(ch);
+ 	d->attrib = g_attrib_ref(attrib);
 +
- 		start = c->value_handle + 1;
- 
- 		if (l->next != NULL) {
-diff --git a/src/device.c b/src/device.c
-index dfc8e59..0e8a04d 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -125,6 +125,17 @@ struct att_callbacks {
- 	gpointer user_data;
- };
- 
-+#define DEVICEINFO_PNPID	0x01
-+
-+struct btd_deviceinfo_data{
-+	uint8_t		vendor_id_src;
-+	uint16_t	vendor_id;
-+	uint16_t	product_id;
-+	uint16_t	product_ver;
-+	uint16_t    deviceinfo_mask;
-+
-+};
-+
- struct btd_device {
- 	bdaddr_t	bdaddr;
- 	addr_type_t	type;
-@@ -169,6 +180,8 @@ struct btd_device {
- 
- 	GIOChannel      *att_io;
- 	guint		cleanup_id;
-+
-+	struct btd_deviceinfo_data deviceinfo;
- };
- 
- static uint16_t uuid_list[] = {
-@@ -2995,3 +3008,13 @@ gboolean btd_device_remove_attio_callback(struct btd_device *device, guint id)
- 
- 	return TRUE;
++	gatt_discover_char(d->attrib, d->svc_range->start, d->svc_range->end,
++					NULL, configure_deviceinfo_cb, d);
  }
-+
-+void device_set_deviceinfo_pnpid(struct btd_device *device, uint8_t vendor_id_src,
-+					uint16_t vendor_id, uint16_t product_id, uint16_t product_ver)
-+{
-+	device->deviceinfo.vendor_id_src = vendor_id_src;
-+	device->deviceinfo.vendor_id = vendor_id;
-+	device->deviceinfo.product_id = product_id;
-+	device->deviceinfo.product_ver = product_ver;
-+	device->deviceinfo.deviceinfo_mask |= DEVICEINFO_PNPID;
-+}
-diff --git a/src/device.h b/src/device.h
-index 7cb9bb2..0c7f619 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -120,3 +120,6 @@ int device_block(DBusConnection *conn, struct btd_device *device,
- 						gboolean update_only);
- int device_unblock(DBusConnection *conn, struct btd_device *device,
- 					gboolean silent, gboolean update_only);
-+
-+void device_set_deviceinfo_pnpid(struct btd_device *device, uint8_t vendor_id_src,
-+					uint16_t vendor_id, uint16_t product_id, uint16_t product_ver);
+ 
+ static void attio_disconnected_cb(gpointer user_data)
+@@ -91,6 +153,9 @@ int deviceinfo_register(struct btd_device *device, struct att_primary *dattr)
+ 
+ 	d = g_new0(struct deviceinfo, 1);
+ 	d->dev = btd_device_ref(device);
++	d->svc_range = g_new0(struct att_range, 1);
++	d->svc_range->start = dattr->start;
++	d->svc_range->end = dattr->end;
+ 
+ 	deviceinfoservers = g_slist_prepend(deviceinfoservers, d);
+ 
 -- 
 1.7.4.1
 
