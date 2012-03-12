@@ -2,85 +2,110 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 1/2] HoG: Register HID over GATT device driver
-Date: Mon, 12 Mar 2012 17:20:56 -0300
-Message-Id: <1331583657-1485-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 2/2] input: Remove unneeded alias
+Date: Mon, 12 Mar 2012 17:05:27 -0300
+Message-Id: <1331582727-924-2-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1331582727-924-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1331582727-924-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- input/device.h  |    1 +
- input/manager.c |   24 ++++++++++++++++++++++++
- 2 files changed, 25 insertions(+), 0 deletions(-)
+ input/device.c |   19 ++++++-------------
+ 1 files changed, 6 insertions(+), 13 deletions(-)
 
-diff --git a/input/device.h b/input/device.h
-index 356d9ed..cb59363 100644
---- a/input/device.h
-+++ b/input/device.h
-@@ -23,6 +23,7 @@
+diff --git a/input/device.c b/input/device.c
+index e4e0b21..743699f 100644
+--- a/input/device.c
++++ b/input/device.c
+@@ -68,7 +68,6 @@ struct input_conn {
+ 	struct fake_input	*fake;
+ 	DBusMessage		*pending_connect;
+ 	char			*uuid;
+-	char			*alias;
+ 	GIOChannel		*ctrl_io;
+ 	GIOChannel		*intr_io;
+ 	guint			ctrl_watch;
+@@ -110,9 +109,6 @@ static struct input_conn *find_connection(GSList *list, const char *pattern)
  
- #define HSP_HS_UUID		"00001108-0000-1000-8000-00805F9B34FB"
- #define HID_UUID		"00001124-0000-1000-8000-00805f9b34fb"
-+#define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
+ 		if (!strcasecmp(iconn->uuid, pattern))
+ 			return iconn;
+-
+-		if (!strcasecmp(iconn->alias, pattern))
+-			return iconn;
+ 	}
  
- #define L2CAP_PSM_HIDP_CTRL	0x11
- #define L2CAP_PSM_HIDP_INTR	0x13
-diff --git a/input/manager.c b/input/manager.c
-index 9bcab10..69b544c 100644
---- a/input/manager.c
-+++ b/input/manager.c
-@@ -75,6 +75,21 @@ static void hid_device_remove(struct btd_device *device)
- 	input_remove(device, HID_UUID);
+ 	return NULL;
+@@ -136,7 +132,6 @@ static void input_conn_free(struct input_conn *iconn)
+ 		g_io_channel_unref(iconn->ctrl_io);
+ 
+ 	g_free(iconn->uuid);
+-	g_free(iconn->alias);
+ 	g_free(iconn->fake);
+ 	g_free(iconn);
+ }
+@@ -915,7 +910,7 @@ static DBusMessage *input_device_connect(DBusConnection *conn,
+ 	DBusMessage *reply;
+ 	GError *err = NULL;
+ 
+-	iconn = find_connection(idev->connections, "HID");
++	iconn = find_connection(idev->connections, HID_UUID);
+ 	if (!iconn)
+ 		return btd_error_not_supported(msg);
+ 
+@@ -1068,15 +1063,13 @@ static struct input_device *input_device_new(DBusConnection *conn,
  }
  
-+static int hog_device_probe(struct btd_device *device, GSList *uuids)
-+{
-+	const gchar *path = device_get_path(device);
-+
-+	DBG("path %s", path);
-+
-+	return input_device_register(connection, device, path, HOG_UUID, 0,
-+							idle_timeout * 60);
-+}
-+
-+static void hog_device_remove(struct btd_device *device)
-+{
-+	input_remove(device, HOG_UUID);
-+}
-+
- static int headset_probe(struct btd_device *device, GSList *uuids)
+ static struct input_conn *input_conn_new(struct input_device *idev,
+-					const char *uuid, const char *alias,
+-					int timeout)
++					const char *uuid, int timeout)
  {
- 	const gchar *path = device_get_path(device);
-@@ -147,6 +162,13 @@ static struct btd_device_driver input_hid_driver = {
- 	.remove	= hid_device_remove,
- };
+ 	struct input_conn *iconn;
  
-+static struct btd_device_driver input_hog_driver = {
-+	.name	= "input-hog",
-+	.uuids	= BTD_UUIDS(HOG_UUID),
-+	.probe	= hog_device_probe,
-+	.remove	= hog_device_remove,
-+};
-+
- static struct btd_device_driver input_headset_driver = {
- 	.name	= "input-headset",
- 	.uuids	= BTD_UUIDS(HSP_HS_UUID),
-@@ -178,6 +200,7 @@ int input_manager_init(DBusConnection *conn, GKeyFile *config)
- 	btd_register_adapter_driver(&input_server_driver);
+ 	iconn = g_new0(struct input_conn, 1);
+ 	iconn->timeout = timeout;
+ 	iconn->uuid = g_strdup(uuid);
+-	iconn->alias = g_strdup(alias);
+ 	iconn->idev = idev;
  
- 	btd_register_device_driver(&input_hid_driver);
-+	btd_register_device_driver(&input_hog_driver);
- 	btd_register_device_driver(&input_headset_driver);
+ 	return iconn;
+@@ -1097,7 +1090,7 @@ int input_device_register(DBusConnection *conn, struct btd_device *device,
+ 		devices = g_slist_append(devices, idev);
+ 	}
  
- 	return 0;
-@@ -186,6 +209,7 @@ int input_manager_init(DBusConnection *conn, GKeyFile *config)
- void input_manager_exit(void)
- {
- 	btd_unregister_device_driver(&input_hid_driver);
-+	btd_unregister_device_driver(&input_hog_driver);
- 	btd_unregister_device_driver(&input_headset_driver);
+-	iconn = input_conn_new(idev, uuid, "hid", timeout);
++	iconn = input_conn_new(idev, uuid, timeout);
+ 	if (!iconn)
+ 		return -EINVAL;
  
- 	btd_unregister_adapter_driver(&input_server_driver);
+@@ -1120,7 +1113,7 @@ int fake_input_register(DBusConnection *conn, struct btd_device *device,
+ 		devices = g_slist_append(devices, idev);
+ 	}
+ 
+-	iconn = input_conn_new(idev, uuid, "hsp", 0);
++	iconn = input_conn_new(idev, uuid, 0);
+ 	if (!iconn)
+ 		return -EINVAL;
+ 
+@@ -1212,7 +1205,7 @@ int input_device_set_channel(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+ 	if (!idev)
+ 		return -ENOENT;
+ 
+-	iconn = find_connection(idev->connections, "hid");
++	iconn = find_connection(idev->connections, HID_UUID);
+ 	if (!iconn)
+ 		return -ENOENT;
+ 
+@@ -1243,7 +1236,7 @@ int input_device_close_channels(const bdaddr_t *src, const bdaddr_t *dst)
+ 	if (!idev)
+ 		return -ENOENT;
+ 
+-	iconn = find_connection(idev->connections, "hid");
++	iconn = find_connection(idev->connections, HID_UUID);
+ 	if (!iconn)
+ 		return -ENOENT;
+ 
 -- 
 1.7.8.5
 
