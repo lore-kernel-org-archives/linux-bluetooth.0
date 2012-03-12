@@ -1,37 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1331520186-30184-1-git-send-email-marcel@holtmann.org>
-References: <1331520186-30184-1-git-send-email-marcel@holtmann.org>
-Date: Mon, 12 Mar 2012 06:34:01 -0400
-Message-ID: <CAJdJm_PVtxF3qQY0+UWFr-6cXQFxXwXt4Qt4K6hZ5-FBNJ=0bw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix broken usage of put_unaligned_le16
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 4/6] Bluetooth: Convert error codes to le16
+Date: Mon, 12 Mar 2012 12:13:09 +0200
+Message-Id: <1331547191-15307-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1331547191-15307-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1331547191-15307-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Sun, Mar 11, 2012 at 10:43 PM, Marcel Holtmann <marcel@holtmann.org> wro=
-te:
-> @@ -275,7 +275,7 @@ static int read_version(struct sock *sk, struct hci_d=
-ev *hdev, void *data,
-> =A0 =A0 =A0 =A0BT_DBG("sock %p", sk);
->
-> =A0 =A0 =A0 =A0rp.version =3D MGMT_VERSION;
-> - =A0 =A0 =A0 put_unaligned_le16(MGMT_REVISION, &rp.revision);
-> + =A0 =A0 =A0 rp.revision =3D __constant_cpu_to_le16(MGMT_VERSION);
+Create Chan Rsp shall put result and status in le format.
 
-Looks like a typo here: MGMT_VERSION -> MGMT_REVISION
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
->
-> =A0 =A0 =A0 =A0return cmd_complete(sk, MGMT_INDEX_NONE, MGMT_OP_READ_VERS=
-ION, 0, &rp,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0sizeof(rp));
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index c778585..57c8507 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3263,8 +3263,8 @@ static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
+ 	/* Placeholder: Always reject */
+ 	rsp.dcid = 0;
+ 	rsp.scid = cpu_to_le16(scid);
+-	rsp.result = L2CAP_CR_NO_MEM;
+-	rsp.status = L2CAP_CS_NO_INFO;
++	rsp.result = __constant_cpu_to_le16(L2CAP_CR_NO_MEM);
++	rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
+ 
+ 	l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
+ 		       sizeof(rsp), &rsp);
+-- 
+1.7.9
 
-Regards,
---=20
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
