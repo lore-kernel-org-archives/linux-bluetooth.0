@@ -1,45 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1331552237.5372.10.camel@localhost>
-Subject: bluetoothd OOM
-From: Alberto =?ISO-8859-1?Q?Jos=E9_Rodr=EDguez_?=
-	 =?ISO-8859-1?Q?Rodr=EDguez?= <ajrodriguez@blulabs.es>
-To: linux-bluetooth@vger.kernel.org
-Date: Mon, 12 Mar 2012 12:37:17 +0100
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 12 Mar 2012 16:57:49 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
+To: =?ISO-8859-15?Q?St=E9phane_Chatty?= <chatty@enac.fr>
+Cc: Henrik Rydberg <rydberg@euromail.se>,
+	"benjamin.tissoires" <benjamin.tissoires@gmail.com>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 4/5] HID: autoload hid-multitouch as needed
+In-Reply-To: <6E17845C-6F9F-4CB6-AA5D-DEEDCD2089E8@enac.fr>
+Message-ID: <alpine.LNX.2.00.1203121650500.18356@pobox.suse.cz>
+References: <1331053026-21272-1-git-send-email-benjamin.tissoires@gmail.com> <1331053026-21272-5-git-send-email-benjamin.tissoires@gmail.com>  <alpine.LNX.2.00.1203072234550.29034@pobox.suse.cz> <20120308105737.GA11201@polaris.bitmath.org>
+ <6E17845C-6F9F-4CB6-AA5D-DEEDCD2089E8@enac.fr>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=iso-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have one machine that send files to the devices that it detects
-(pairing when requested by the target device). But recently it goes out
-of memory, and if a launch bluetoothd by hand I see thousands of lines
-like this:
+On Thu, 8 Mar 2012, Stéphane Chatty wrote:
 
-..................
-bluetoothd[3341]: src/device.c:device_create() Creating
-device /org/bluez/3341/hci1/dev_E4_EC_10_CD_56_C2
-bluetoothd[3341]: src/device.c:btd_device_ref() 0x234e5988: ref=1
-bluetoothd[3341]: src/device.c:device_set_temporary() temporary 0
-bluetoothd[3341]: src/device.c:device_probe_drivers() Probing drivers
-for E4:EC:10:CD:56:C2
-bluetoothd[3341]: src/device.c:device_create() Creating
-device /org/bluez/3341/hci1/dev_FC_A1_3E_11_6D_81
-bluetoothd[3341]: src/device.c:btd_device_ref() 0x234eb4c8: ref=1
-bluetoothd[3341]: src/device.c:device_set_temporary() temporary 0
-bluetoothd[3341]: src/device.c:device_probe_drivers() Probing drivers
-for FC:A1:3E:11:6D:81
-bluetoothd[3341]: src/device.c:device_create() Creating
-device /org/bluez/3341/hci1/dev_E0_A6_70_49_6E_6A
-bluetoothd[3341]: src/device.c:btd_device_ref() 0x234ee6d8: ref=1
-bluetoothd[3341]: src/device.c:device_set_temporary() temporary 0
-bluetoothd[3341]: src/device.c:device_probe_drivers() Probing drivers
-for E0:A6:70:49:6E:6A
-bluetoothd[3341]: src/device.c:device_create() Creating
-device /org/bluez/3341/hci1/dev_00_26_CC_6B_F8_0A
-....................
+> > What if we were to change the definition of a HID device on the
+> > modalias level?
+> > 
+> > In practise, a HID device can be either an usb device, a hid device,
+> 
+> Just to be sure: do you mean "bluetooth device"? or is there such a 
+> thing as a hid device per se? I'm asking because I've always been 
+> surprised at seeing usbhid/ in hid/, which kind of breaks the potential 
+> symmetry between USB and Bluetooth wrt hid.
 
-It seems to remember all the devices that are paired once. How I can
-make him clean them?
+Please don't get confused by the directory layout ... this has mostly 
+non-technical reasons -- Marcel wanted to keep bluetooth/hidp under his 
+wings, and I didn't have reasons to object strongly.
 
-Thanks in advance
+I am adding Marcel and Gustavo to CC just in case they have changed their 
+mind, but it's definitely a side-topic in this discussion.
+Marcel, Gustavo -- if you are interested in the whole discussion regarding 
+potential extension of HID core infrastructure to better suit multitouch, 
+please see the whole thread at http://marc.info/?t=133105322800006&r=1&w=4
 
+-- 
+Jiri Kosina
+SUSE Labs
