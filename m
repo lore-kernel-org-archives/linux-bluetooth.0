@@ -2,85 +2,85 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 2/2] HoG: Register ATTIO callback to keep the link UP
-Date: Mon, 12 Mar 2012 17:20:57 -0300
-Message-Id: <1331583657-1485-2-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1331583657-1485-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1331583657-1485-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 1/2] HoG: Register HID over GATT device driver
+Date: Mon, 12 Mar 2012 17:20:56 -0300
+Message-Id: <1331583657-1485-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- input/device.c |   28 ++++++++++++++++++++++++++++
- 1 files changed, 28 insertions(+), 0 deletions(-)
+ input/device.h  |    1 +
+ input/manager.c |   24 ++++++++++++++++++++++++
+ 2 files changed, 25 insertions(+), 0 deletions(-)
 
-diff --git a/input/device.c b/input/device.c
-index 743699f..4c94cd8 100644
---- a/input/device.c
-+++ b/input/device.c
-@@ -51,6 +51,8 @@
- #include "../src/manager.h"
- #include "../src/dbus-common.h"
+diff --git a/input/device.h b/input/device.h
+index 356d9ed..cb59363 100644
+--- a/input/device.h
++++ b/input/device.h
+@@ -23,6 +23,7 @@
  
-+#include "gattrib.h"
-+#include "attio.h"
- #include "device.h"
- #include "error.h"
- #include "fakehid.h"
-@@ -86,6 +88,8 @@ struct input_device {
- 	char			*name;
- 	struct btd_device	*device;
- 	GSList			*connections;
-+	GAttrib			*attrib;
-+	guint			attioid;
- };
+ #define HSP_HS_UUID		"00001108-0000-1000-8000-00805F9B34FB"
+ #define HID_UUID		"00001124-0000-1000-8000-00805f9b34fb"
++#define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
  
- static GSList *devices = NULL;
-@@ -136,6 +140,21 @@ static void input_conn_free(struct input_conn *iconn)
- 	g_free(iconn);
+ #define L2CAP_PSM_HIDP_CTRL	0x11
+ #define L2CAP_PSM_HIDP_INTR	0x13
+diff --git a/input/manager.c b/input/manager.c
+index 9bcab10..69b544c 100644
+--- a/input/manager.c
++++ b/input/manager.c
+@@ -75,6 +75,21 @@ static void hid_device_remove(struct btd_device *device)
+ 	input_remove(device, HID_UUID);
  }
  
-+static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
++static int hog_device_probe(struct btd_device *device, GSList *uuids)
 +{
-+	struct input_device *idev = user_data;
++	const gchar *path = device_get_path(device);
 +
-+	idev->attrib = g_attrib_ref(attrib);
++	DBG("path %s", path);
++
++	return input_device_register(connection, device, path, HOG_UUID, 0,
++							idle_timeout * 60);
 +}
 +
-+static void attio_disconnected_cb(gpointer user_data)
++static void hog_device_remove(struct btd_device *device)
 +{
-+	struct input_device *idev = user_data;
-+
-+	g_attrib_unref(idev->attrib);
-+	idev->attrib = NULL;
++	input_remove(device, HOG_UUID);
 +}
 +
- static void input_device_free(struct input_device *idev)
+ static int headset_probe(struct btd_device *device, GSList *uuids)
  {
- 	if (idev->dc_id)
-@@ -1094,6 +1113,12 @@ int input_device_register(DBusConnection *conn, struct btd_device *device,
- 	if (!iconn)
- 		return -EINVAL;
+ 	const gchar *path = device_get_path(device);
+@@ -147,6 +162,13 @@ static struct btd_device_driver input_hid_driver = {
+ 	.remove	= hid_device_remove,
+ };
  
-+	if (strcmp(uuid, HOG_UUID) == 0)
-+		idev->attioid = btd_device_add_attio_callback(device,
-+							attio_connected_cb,
-+							attio_disconnected_cb,
-+							idev);
++static struct btd_device_driver input_hog_driver = {
++	.name	= "input-hog",
++	.uuids	= BTD_UUIDS(HOG_UUID),
++	.probe	= hog_device_probe,
++	.remove	= hog_device_remove,
++};
 +
- 	idev->connections = g_slist_append(idev->connections, iconn);
+ static struct btd_device_driver input_headset_driver = {
+ 	.name	= "input-headset",
+ 	.uuids	= BTD_UUIDS(HSP_HS_UUID),
+@@ -178,6 +200,7 @@ int input_manager_init(DBusConnection *conn, GKeyFile *config)
+ 	btd_register_adapter_driver(&input_server_driver);
+ 
+ 	btd_register_device_driver(&input_hid_driver);
++	btd_register_device_driver(&input_hog_driver);
+ 	btd_register_device_driver(&input_headset_driver);
  
  	return 0;
-@@ -1160,6 +1185,9 @@ int input_device_unregister(const char *path, const char *uuid)
- 		return -EBUSY;
- 	}
+@@ -186,6 +209,7 @@ int input_manager_init(DBusConnection *conn, GKeyFile *config)
+ void input_manager_exit(void)
+ {
+ 	btd_unregister_device_driver(&input_hid_driver);
++	btd_unregister_device_driver(&input_hog_driver);
+ 	btd_unregister_device_driver(&input_headset_driver);
  
-+	if (idev->attioid)
-+		btd_device_remove_attio_callback(idev->device, idev->attioid);
-+
- 	idev->connections = g_slist_remove(idev->connections, iconn);
- 	input_conn_free(iconn);
- 	if (idev->connections)
+ 	btd_unregister_adapter_driver(&input_server_driver);
 -- 
 1.7.8.5
 
