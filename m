@@ -1,53 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: chen.ganir@ti.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH v3 0/2] DeviceInfo and BatteryService Clients
-Date: Mon, 12 Mar 2012 15:12:17 +0200
-Message-Id: <1331557939-26191-1-git-send-email-chen.ganir@ti.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1331520186-30184-1-git-send-email-marcel@holtmann.org>
+References: <1331520186-30184-1-git-send-email-marcel@holtmann.org>
+Date: Mon, 12 Mar 2012 06:34:01 -0400
+Message-ID: <CAJdJm_PVtxF3qQY0+UWFr-6cXQFxXwXt4Qt4K6hZ5-FBNJ=0bw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix broken usage of put_unaligned_le16
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Ganir <chen.ganir@ti.com>
+Hi Marcel,
 
-Adding Battery Service client and Device Information Service Client stubs.
-More logic will be added to these service as development continues.
-To enable the new features you will need to use:
---enable-batterystate
---enable-deviceinfo
+On Sun, Mar 11, 2012 at 10:43 PM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> @@ -275,7 +275,7 @@ static int read_version(struct sock *sk, struct hci_d=
+ev *hdev, void *data,
+> =A0 =A0 =A0 =A0BT_DBG("sock %p", sk);
+>
+> =A0 =A0 =A0 =A0rp.version =3D MGMT_VERSION;
+> - =A0 =A0 =A0 put_unaligned_le16(MGMT_REVISION, &rp.revision);
+> + =A0 =A0 =A0 rp.revision =3D __constant_cpu_to_le16(MGMT_VERSION);
 
-This is version 3 of the patch set, after fixing some problems which were
-reported in the mailing list + copyright mistakes.
+Looks like a typo here: MGMT_VERSION -> MGMT_REVISION
 
+>
+> =A0 =A0 =A0 =A0return cmd_complete(sk, MGMT_INDEX_NONE, MGMT_OP_READ_VERS=
+ION, 0, &rp,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0sizeof(rp));
 
-Chen Ganir (2):
-  Added DeviceInformation GATT Client
-  Added Battery Service GATT Client
-
- Makefile.am                 |   14 +++++++
- acinclude.m4                |   12 ++++++
- batterystate/batterystate.c |   90 +++++++++++++++++++++++++++++++++++++++++++
- batterystate/batterystate.h |   24 +++++++++++
- batterystate/main.c         |   49 +++++++++++++++++++++++
- batterystate/manager.c      |   85 ++++++++++++++++++++++++++++++++++++++++
- batterystate/manager.h      |   24 +++++++++++
- deviceinfo/deviceinfo.c     |   88 ++++++++++++++++++++++++++++++++++++++++++
- deviceinfo/deviceinfo.h     |   24 +++++++++++
- deviceinfo/main.c           |   48 +++++++++++++++++++++++
- deviceinfo/manager.c        |   85 ++++++++++++++++++++++++++++++++++++++++
- deviceinfo/manager.h        |   24 +++++++++++
- 12 files changed, 567 insertions(+), 0 deletions(-)
- create mode 100644 batterystate/batterystate.c
- create mode 100644 batterystate/batterystate.h
- create mode 100644 batterystate/main.c
- create mode 100644 batterystate/manager.c
- create mode 100644 batterystate/manager.h
- create mode 100644 deviceinfo/deviceinfo.c
- create mode 100644 deviceinfo/deviceinfo.h
- create mode 100644 deviceinfo/main.c
- create mode 100644 deviceinfo/manager.c
- create mode 100644 deviceinfo/manager.h
-
--- 
-1.7.4.1
-
+Regards,
+--=20
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
