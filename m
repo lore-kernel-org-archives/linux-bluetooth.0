@@ -1,88 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: HID Over GATT implementation
+Date: Mon, 12 Mar 2012 06:01:52 +0000
+Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B44D4A1@DNCE02.ent.ti.com>
+References: <F0070FBC0FB3174D8D11444EB2D5B0260B44D1AB@DNCE02.ent.ti.com>
+ <CAKT1EBcVv1ya0ArmgwNh968O9QSsQD6oNy1poJDeNgg_V=iuog@mail.gmail.com>
+In-Reply-To: <CAKT1EBcVv1ya0ArmgwNh968O9QSsQD6oNy1poJDeNgg_V=iuog@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Sender: anamtsov@gmail.com
-In-Reply-To: <1331512937.14217.74.camel@aeonflux>
-References: <1331503837-19015-1-git-send-email-arik@wizery.com> <1331512937.14217.74.camel@aeonflux>
-From: Arik Nemtsov <arik@wizery.com>
-Date: Mon, 12 Mar 2012 09:39:52 +0200
-Message-ID: <CA+XVXfeSUaXiRWNO68VaL7ZkRuJ3g-MxzBvVsViLVPfsNQqM6g@mail.gmail.com>
-Subject: Re: [PATCH] mgmt-api: add read Tx power level command
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Mar 12, 2012 at 02:42, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Arik,
->
->> This command reads the Tx power level for a given connected device
->> ---
->> =A0doc/mgmt-api.txt | =A0 28 ++++++++++++++++++++++++++++
->> =A01 files changed, 28 insertions(+), 0 deletions(-)
->>
->> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
->> index 4ede43d..8dae2b4 100644
->> --- a/doc/mgmt-api.txt
->> +++ b/doc/mgmt-api.txt
->> @@ -815,6 +815,34 @@ Unblock Device Command
->> =A0 =A0 =A0 or failure.
->>
->>
->> +Read Tx Power Level Command
->> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> +
->> + =A0 =A0 Command Code: =A0 =A0 =A0 =A0 =A0 0x0028
->
-> how is this suppose to work. This command and Set Device ID are suppose
-> to have the same command code?
-
-Ah you're right I missed that. I'll put 0x29 then.
-
->
->> + =A0 =A0 Controller Index: =A0 =A0 =A0 <controller id>
->> + =A0 =A0 Command Parameters: =A0 =A0 Address (6 Octets)
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Address_Type (=
-1 Octet)
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Type (1 Octet)
->> + =A0 =A0 Return Parameters: =A0 =A0 =A0Address (6 Octets)
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Address_Type (=
-1 Octet)
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Status (1 Octe=
-t)
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Level (1 Octet=
-)
->> +
->> + =A0 =A0 Possible values for the Address_Type parameter:
->> + =A0 =A0 =A0 =A0 =A0 =A0 0 =A0 =A0 =A0 BR/EDR
->> + =A0 =A0 =A0 =A0 =A0 =A0 1 =A0 =A0 =A0 LE Public
->> + =A0 =A0 =A0 =A0 =A0 =A0 2 =A0 =A0 =A0 LE Random
->> +
->> + =A0 =A0 Possible values for the Type parameter:
->> + =A0 =A0 =A0 =A0 =A0 =A0 0 =A0 =A0 =A0 Current Transmit Power Level
->> + =A0 =A0 =A0 =A0 =A0 =A0 1 =A0 =A0 =A0 Maximum Transmit Power Level
->
-> Which ones do you care about? And why not just read both and return both
-> at the same time.
->
-> I think that I made this pretty clear multiple times already. The mgmt
-> API is not for stuffing random HCI commands into it. Please explain your
-> usage pattern of the results clearly.
->
-> Who is triggering this command and who is consuming the results?
-
-Well the proximity reporter and proximity monitor profiles are the
-ones using this (with LE connections only). The proximity monitor can
-query the reporter for the Tx power level. The spec claims there's no
-point in polling for this, as the value doesn't change during an LE
-connection.
-
-Both profiles only care about the current Tx power level. I added the
-type for flexibility. It can be removed of course.
-
-In the proposed implementation the reporter reads this value when a
-device connects and caches it. When a remote device asks for this
-value (via an ATT read as part of the TPS profile), we return the
-cached value.
-
-Regards,
-Arik
+Q2xhdWRpbywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBDbGF1ZGlv
+IFRha2FoYXNpIFttYWlsdG86Y2xhdWRpby50YWthaGFzaUBvcGVuYm9zc2Eub3JnXQ0KPiBTZW50
+OiBNb25kYXksIE1hcmNoIDEyLCAyMDEyIDI6MTIgQU0NCj4gVG86IEdhbmlyLCBDaGVuDQo+IENj
+OiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBISUQgT3Zl
+ciBHQVRUIGltcGxlbWVudGF0aW9uDQo+IA0KPiBIaSBDaGVuIEdhbmlyLA0KPiANCj4gT24gU3Vu
+LCBNYXIgMTEsIDIwMTIgYXQgOTo1NCBBTSwgR2FuaXIsIENoZW4gPGNoZW4uZ2FuaXJAdGkuY29t
+PiB3cm90ZToNCj4gPiBIaS4NCj4gPg0KPiA+IEkgaGF2ZSBzdGFydGVkIHRoZSBkZXZlbG9wbWVu
+dCBvZiB0aGUgSE9HUCAoSElEIE92ZXIgR0FUVCBQcm90b2NvbCkNCj4gZm9yIHRoZSBCbHVlWiBT
+dGFjay4gVGhlIG1haW4gaWRlYSBvZiB0aGlzIGFkb3B0ZWQgcHJvZmlsZSBpcyB0byBhbGxvdw0K
+PiBISUQgZGV2aWNlcyB0byBvcGVyYXRlIG92ZXIgdGhlIGxvdyBlbmVyZ3kgdGVjaG5vbG9neS4N
+Cj4gPg0KPiA+IFRoZSBISUQgT3ZlciBHQVRUIFByb2ZpbGUgaW5jbHVkZXMgdGhlIGZvbGxvd2lu
+ZyBzZXJ2aWNlcyA6DQo+ID4gMS4gQmF0dGVyeSBTZXJ2aWNlIC0gYWxsb3dzIHRoZSBob3N0IHRv
+IGdhdGhlciBhbmQgZGlzcGxheQ0KPiBpbmZvcm1hdGlvbiByZWdhcmRpbmcgdGhlIHBlZXIgZGV2
+aWNlIGJhdHRlcnkvYmF0dGVyaWVzIHN0YXRlLg0KPiA+IDIuIERldmljZSBJbmZvcm1hdGlvbiBT
+ZXJ2aWNlIC0gVGhpcyBzZXJ2aWNlIGNvbnRhaW5zIG1pc2MNCj4gaWRlbnRpZmljYXRpb24gZGF0
+YSBvZiBhIGRldmljZS4gVGhlIEhPR1Agd2lsbCB1c2UgdGhlIFBOUCBJRCBmaWVsZC4NCj4gDQo+
+IENvdWxkIHlvdSBwbGVhc2UgZXhwbGFpbiBob3cgYXJlIHlvdSBwbGFubmluZyB0byBzaGFyZSBi
+YXR0ZXJ5IGxldmVsDQo+IGFuZCBQTlAgSUQgdG8gSG9HIHNlcnZpY2U/DQo+IA0KPiBkZXZpY2Uu
+YyBjYW4gaGF2ZSBmdW5jdGlvbiB0byBnZXQvc2V0IEJhdHRlcnkgTGV2ZWwgYW5kIFBOUCBJRC4g
+SU1PLA0KPiBvbmx5IEJhdHRlcnkgTGV2ZWwgY291bGQgYmUgZXhwb3J0ZWQgaW4gdGhlIERldmlj
+ZSBpbnRlcmZhY2UoaW5zdGVhZA0KPiBvZiBjcmVhdGluZyBhIG5ldyBpbnRlcmZhY2UgZm9yIEJh
+dHRlcnkpLg0KPg0KUE5QIElEIChvciBhbnkgb3RoZXIgRGV2aWNlSW5mb3JtYXRpb24gZGF0YSkg
+YW5kIEJhdHRlcnkgbGV2ZWwgd2lsbCBiZSBwYXJ0IG9mIHRoZSBidGRfZGV2aWNlIChsYXRlciBw
+YXRjaCkuIERldmljZSB3aWxsIGhhdmUgZnVuY3Rpb25hbGl0eSB0byBnZXQvc2V0IHRoZSBpbmZv
+cm1hdGlvbiAoZ2V0IHdpbGwgYmUgZXhwb3NlZCBleHRlcm5hbGx5LCBzZXQgd2lsbCBiZSBmb3Ig
+dXNlIGJ5IHRoZSBwbHVnaW5zKS4gTm8gc3BlY2lmaWMgZGJ1cyBBUEkgd2lsbCBiZSBjcmVhdGVk
+IGZvciBhbnkgb2YgdGhvc2UgcGx1Z2lucyAobm8gbmVlZCB0byBjcmVhdGUgYW4gYWRkaXRpb25h
+bCBpbnRlcmZhY2UpLiBEZXZpY2UgSW5mb3JtYXRpb24gaXMgcmVhZCBvbmNlIG9uIGNvbm5lY3Rp
+b24sIGFuZCB3aGVuIGl0IGlzIHJlYWQsIHRoZSBwbHVnaW4gdXBkYXRlcyB0aGUgYnRkX2Rldmlj
+ZSB3aXRoIHRoaXMgaW5mb3JtYXRpb24uIEFsbCBhdmFpbGFibGUgaW5mb3JtYXRpb24gd2lsbCBi
+ZSByZWFkLiBUaGVyZSBpcyBubyBuZWVkIHRvIHJlLXJlYWQgdGhpcyBkdXJpbmcgYW4gb25nb2lu
+ZyBjb25uZWN0aW9uLiBJZiB3ZSBkbyBzZWUgYSByZWFzb24gdG8gZG8gdGhhdCwgd2UgY2FuIGFk
+ZCBhIGRidXMgaW50ZXJmYWNlIGZvciBpdCBsYXRlci4NCg0KUE5QIElEIGlzIGEgY29tcGxleCBk
+YXRhIHR5cGUuIEl0IGNvbnRhaW5zIDQgZGlmZmVyZW50IGVsZW1lbnRzLCB3aGljaCB3aWxsIGJl
+IGV4cG9zZWQgdXNpbmcgYSB1bmlxdWUgc3RydWN0dXJlIGNvbnRhaW5pbmcgYWxsIHRob3NlIHZh
+bHVlcy4NCg0KQmF0dGVyeSBpbmZvcm1hdGlvbiB3aWxsIGJlIHJlYWQgb25jZSwgYW5kIGNvbmZp
+Z3VyZWQgZm9yIG5vdGlmaWNhdGlvbnMgaWYgcG9zc2libGUgKGFsbCBkb25lIGF1dG9tYXRpY2Fs
+bHkgdXBvbiBjb25uZWN0aW9uKS4gQmF0dGVyeSBsZXZlbCBjaGFuZ2VzIHdpbGwgYmUgZXhwb3Nl
+ZCB1c2luZyBELUJVUyBldmVudCAoUHJvcGVydHlDaGFuZ2VkIDogQmF0dGVyeUxldmVsKS4NCg0K
+QmF0dGVyeSBsZXZlbCBpcyBhbiBpbnRlZ2VyIG51bWJlciwgaW4gdGhlIHJhbmdlIG9mIDAtMTAw
+LiBUaGUgYmF0dGVyeSBsZXZlbCBhbHNvIGhhcyBhIGZvcm1hdCBjaGFyYWN0ZXJpc3RpYyBkZXNj
+cmlwdG9yLCB3aGljaCBjb250YWlucyBhIHVuaXF1ZSBuYW1lc3BhY2UvZGVzY3JpcHRpb24gdmFs
+dWUgd2hpY2ggd2lsbCBiZSB1c2VkIHRvIGlkZW50aWZ5IGEgc3BlY2lmaWMgYmF0dGVyeSwgd2hl
+biB0aGVyZSBpcyBtb3JlIHRoYW4gb25lIHNlcnZpY2UgYXZhaWxhYmxlLiBUaGlzIHZhbHVlIHdp
+bGwgYmUgcGFydCBvZiB0aGUgYmF0dGVyeSBsZXZlbCBzdHJ1Y3R1cmUgbGlzdCBvbiB0aGUgZGV2
+aWNlLCBhbmQgSSBzdGlsbCBuZWVkIHRvIGZpZ3VyZSBvdXQgaG93IHRvIGFkZCBpdCB0byB0aGUg
+YmF0dGVyeWxldmVsIGRidXMgcHJvcGVydHkgKG1heWJlIGFwcGVuZCBpdCB0byB0aGUgcHJvcGVy
+dHkgbmFtZSwgc3VjaCBhcyBCYXR0ZXJ5TGV2ZWwoMSkgb3Igc29tZXRoaW5nIGxpa2UgdGhpcyA/
+DQogDQo+IEJSLA0KPiBDbGF1ZGlvDQoNCkNoZW4gR2FuaXIsDQpUZXhhcyBJbnN0cnVtZW50cy4N
+Cg==
