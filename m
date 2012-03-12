@@ -1,57 +1,371 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 12 Mar 2012 23:21:57 +0100 (CET)
-From: Jiri Kosina <jkosina@suse.cz>
-To: =?ISO-8859-15?Q?St=E9phane_Chatty?= <chatty@enac.fr>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Henrik Rydberg <rydberg@euromail.se>,
-	"benjamin.tissoires" <benjamin.tissoires@gmail.com>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/5] HID: autoload hid-multitouch as needed
-In-Reply-To: <4B25AD62-B1C9-4C57-AE64-34EB7F47DC9B@enac.fr>
-Message-ID: <alpine.LNX.2.00.1203122316420.18356@pobox.suse.cz>
-References: <1331053026-21272-1-git-send-email-benjamin.tissoires@gmail.com> <1331053026-21272-5-git-send-email-benjamin.tissoires@gmail.com>   <alpine.LNX.2.00.1203072234550.29034@pobox.suse.cz>  <20120308105737.GA11201@polaris.bitmath.org>
- <6E17845C-6F9F-4CB6-AA5D-DEEDCD2089E8@enac.fr>  <alpine.LNX.2.00.1203121650500.18356@pobox.suse.cz> <1331574151.14217.86.camel@aeonflux> <4B25AD62-B1C9-4C57-AE64-34EB7F47DC9B@enac.fr>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=ISO-8859-15
+In-Reply-To: <1331557939-26191-2-git-send-email-chen.ganir@ti.com>
+References: <1331557939-26191-1-git-send-email-chen.ganir@ti.com>
+	<1331557939-26191-2-git-send-email-chen.ganir@ti.com>
+Date: Mon, 12 Mar 2012 18:20:32 -0300
+Message-ID: <CAKT1EBd+Q8iy3o9eoY-vrtivBXkN-7vJK1oXi9SV=FDevJBTCQ@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] Added DeviceInformation GATT Client
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: chen.ganir@ti.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 12 Mar 2012, St�phane Chatty wrote:
+Hi Chen Ganir:
 
-> Just in case it makes a difference, I knew nothing about HIDP when I 
-> wrote the message above. My point was rather that hid looks like a bus 
-> to which several transport layers can connect (USB, Bluetooth, ZigBee, 
-> etc), and that having USB-specific code in hid/ (as opposed to having it 
-> in usb/) seems biased towards USB. I was (and am still) wondering how 
-> much it limits future uses of the hid core by making it USB-dependent.
-> 
-> In other words: is the hid core generic enough or are there steps to 
-> take to make it more generic wrt transport layers? If we are talking 
-> about restructuring parts of it, this seems like the right time to ask 
-> :-)
+s/Added/Add in the first line of commit message.
+Use imperative/present tense in the commit message to follow the convention.
 
-Let me answer by a bit of history here. Originally, there have been two 
-copies of HID code in the kernel -- one for USB HID devices, one for 
-Bluetooth HID devices.
-The parsers were not kept in sync, and there was a lot of code 
-duplication, creating quite some mess.
+On Mon, Mar 12, 2012 at 10:12 AM,  <chen.ganir@ti.com> wrote:
+> From: Chen Ganir <chen.ganir@ti.com>
+>
+> Added the DeviceInformation GATT Client plugin skeleton.
+> ---
+>  Makefile.am             |    7 ++++
+>  acinclude.m4            |    6 +++
+>  deviceinfo/deviceinfo.c |   88 +++++++++++++++++++++++++++++++++++++++++++++++
+>  deviceinfo/deviceinfo.h |   24 +++++++++++++
+>  deviceinfo/main.c       |   48 +++++++++++++++++++++++++
+>  deviceinfo/manager.c    |   85 +++++++++++++++++++++++++++++++++++++++++++++
+>  deviceinfo/manager.h    |   24 +++++++++++++
+>  7 files changed, 282 insertions(+), 0 deletions(-)
+>  create mode 100644 deviceinfo/deviceinfo.c
+>  create mode 100644 deviceinfo/deviceinfo.h
+>  create mode 100644 deviceinfo/main.c
+>  create mode 100644 deviceinfo/manager.c
+>  create mode 100644 deviceinfo/manager.h
+>
+> diff --git a/Makefile.am b/Makefile.am
+> index bd587eb..c2c61d6 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -244,6 +244,13 @@ builtin_sources += thermometer/main.c \
+>                        thermometer/thermometer.h thermometer/thermometer.c
+>  endif
+>
+> +if DEVICEINFOPLUGIN
+> +builtin_modules += deviceinfo
+> +builtin_sources += deviceinfo/main.c \
+> +                       deviceinfo/manager.h deviceinfo/manager.c \
+> +                       deviceinfo/deviceinfo.h deviceinfo/deviceinfo.c
+> +endif
+> +
+>  builtin_modules += hciops mgmtops
+>  builtin_sources += plugins/hciops.c plugins/mgmtops.c
+>
+> diff --git a/acinclude.m4 b/acinclude.m4
+> index b0f790c..14b7a4c 100644
+> --- a/acinclude.m4
+> +++ b/acinclude.m4
+> @@ -220,6 +220,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+>        dbusoob_enable=no
+>        wiimote_enable=no
+>        thermometer_enable=no
+> +       deviceinfo_enable=no
 
-What I did back then in 2006 was that I have extracted the abstract HID 
-parts into HID core, and made it transport-independent in principle, so 
-that both USB HID and Bluetooth HID shared the common infrastructure, 
-while implementing different transport protocols.
+You will need Marcel's blessing to add a new configure option.
 
-Then we extended it a little bit further, making HID core a proper bus, to 
-which individual drivers (independently on underlying transport protocol 
-used) can register.
+>
+>        AC_ARG_ENABLE(optimization, AC_HELP_STRING([--disable-optimization], [disable code optimization]), [
+>                optimization_enable=${enableval}
+> @@ -372,6 +373,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+>                thermometer_enable=${enableval}
+>        ])
+>
+> +       AC_ARG_ENABLE(deviceinfo, AC_HELP_STRING([--enable-deviceinfo], [enable deviceinfo plugin]), [
+> +               deviceinfo_enable=${enableval}
+> +       ])
+> +
+>        if (test "${fortify_enable}" = "yes"); then
+>                CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
+>        fi
+> @@ -429,4 +434,5 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+>        AM_CONDITIONAL(DBUSOOBPLUGIN, test "${dbusoob_enable}" = "yes")
+>        AM_CONDITIONAL(WIIMOTEPLUGIN, test "${wiimote_enable}" = "yes")
+>        AM_CONDITIONAL(THERMOMETERPLUGIN, test "${thermometer_enable}" = "yes")
+> +       AM_CONDITIONAL(DEVICEINFOPLUGIN, test "${deviceinfo_enable}" = "yes")
+>  ])
+> diff --git a/deviceinfo/deviceinfo.c b/deviceinfo/deviceinfo.c
+> new file mode 100644
+> index 0000000..6d1834b
+> --- /dev/null
+> +++ b/deviceinfo/deviceinfo.c
+> @@ -0,0 +1,88 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2012 Texas Instruments, Inc.
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +
+> +#include <glib.h>
+> +#include <bluetooth/uuid.h>
+> +#include "adapter.h"
+> +#include "device.h"
+> +#include "gattrib.h"
+> +#include "attio.h"
+> +#include "att.h"
+> +#include "gatt.h"
+> +#include "deviceinfo.h"
+> +
+> +struct deviceinfo {
+> +       struct btd_device       *dev;           /* Device reference */
+> +};
+> +
+> +static GSList *deviceinfoservers = NULL;
+> +
+> +static void destroy_deviceinfo(gpointer user_data)
 
-Currently there are just Bluetooth (hidp) and USB (usbhid) transport 
-implementations, with HID core being transport independent.
+deviceinfo_free sounds better.
 
-Hope this helps,
+> +{
+> +       struct deviceinfo *d = user_data;
+> +
+> +       btd_device_unref(d->dev);
+> +       g_free(d);
+> +}
+> +
+> +static gint cmp_device(gconstpointer a, gconstpointer b)
+> +{
+> +       const struct deviceinfo *d = a;
+> +       const struct btd_device *dev = b;
+> +
+> +       if (dev == d->dev)
+> +               return 0;
+> +
+> +       return -1;
+> +}
+> +
+> +int deviceinfo_register(struct btd_device *device, struct att_primary *dattr)
+> +{
+> +       struct deviceinfo *d;
+> +
+> +       d = g_new0(struct deviceinfo, 1);
+> +       d->dev = btd_device_ref(device);
+> +
+> +       deviceinfoservers = g_slist_prepend(deviceinfoservers, d);
+> +
+> +       return 0;
+> +}
+> +
+> +void deviceinfo_unregister(struct btd_device *device)
+> +{
+> +       struct deviceinfo *d;
+> +       GSList *l;
+> +
+> +       l = g_slist_find_custom(deviceinfoservers, device, cmp_device);
+> +       if (l == NULL)
+> +               return;
+> +
+> +       d = l->data;
+> +       deviceinfoservers = g_slist_remove(deviceinfoservers, d);
+> +
+> +       destroy_deviceinfo(d);
+> +}
+> diff --git a/deviceinfo/deviceinfo.h b/deviceinfo/deviceinfo.h
+> new file mode 100644
+> index 0000000..1859821
+> --- /dev/null
+> +++ b/deviceinfo/deviceinfo.h
+> @@ -0,0 +1,24 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2012 Texas Instruments, Inc.
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +int deviceinfo_register(struct btd_device *device,struct att_primary *tattr);
+> +void deviceinfo_unregister(struct btd_device *device);
+> diff --git a/deviceinfo/main.c b/deviceinfo/main.c
+> new file mode 100644
+> index 0000000..ec5f103
+> --- /dev/null
+> +++ b/deviceinfo/main.c
+> @@ -0,0 +1,48 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2012 Texas Instruments, Inc.
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <glib.h>
+> +#include <errno.h>
+> +
+> +#include "plugin.h"
+> +#include "manager.h"
+> +
+> +static int deviceinfo_init(void)
+> +{
+> +       if (deviceinfo_manager_init() < 0) {
+> +               return -EIO;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static void deviceinfo_exit(void)
+> +{
+> +       deviceinfo_manager_exit();
+> +}
+> +
+> +BLUETOOTH_PLUGIN_DEFINE(deviceinfo, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
+> +                                       deviceinfo_init, deviceinfo_exit)
+> diff --git a/deviceinfo/manager.c b/deviceinfo/manager.c
+> new file mode 100644
+> index 0000000..7bfca49
+> --- /dev/null
+> +++ b/deviceinfo/manager.c
+> @@ -0,0 +1,85 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2012 Texas Instruments, Inc.
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +#include <glib.h>
+> +#include <errno.h>
+> +#include <bluetooth/uuid.h>
+> +
+> +#include "adapter.h"
+> +#include "device.h"
+> +#include "att.h"
+> +#include "deviceinfo.h"
+> +#include "manager.h"
+> +
+> +#define DEVICE_INFORMATION_UUID                "0000180a-0000-1000-8000-00805f9b34fb"
+> +
+> +static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
+> +{
+> +       const struct att_primary *prim = a;
+> +       const char *uuid = b;
+> +
+> +       return g_strcmp0(prim->uuid, uuid);
+> +}
+> +
+> +static int deviceinfo_driver_probe(struct btd_device *device, GSList *uuids)
+> +{
+> +       struct att_primary *tattr;
 
--- 
-Jiri Kosina
-SUSE Labs
+Use "prim" instead of tattr to follow the standard.
+
+> +       GSList *primaries, *l;
+> +
+> +       primaries = btd_device_get_primaries(device);
+> +
+> +       l = g_slist_find_custom(primaries, DEVICE_INFORMATION_UUID,
+> +                                                       primary_uuid_cmp);
+> +       if (l == NULL)
+> +               return -EINVAL;
+> +
+> +       tattr = l->data;
+> +
+> +       return deviceinfo_register(device, tattr);
+> +}
+> +
+> +static void deviceinfo_driver_remove(struct btd_device *device)
+> +{
+> +       deviceinfo_unregister(device);
+> +}
+> +
+> +static struct btd_device_driver deviceinfo_device_driver = {
+> +       .name   = "deviceinformation-device-driver",
+
+deviceinfo_driver is enough and it will follow the same pattern of the
+other "device drivers"
+
+> +       .uuids  = BTD_UUIDS(DEVICE_INFORMATION_UUID),
+> +       .probe  = deviceinfo_driver_probe,
+> +       .remove = deviceinfo_driver_remove
+> +};
+> +
+> +int deviceinfo_manager_init(void)
+> +{
+> +       int ret;
+
+Missing empty line here or use "return btd_register_device_driver..." directly
+
+> +       ret = btd_register_device_driver(&deviceinfo_device_driver);
+> +       if (ret < 0)
+> +                return ret;
+> +
+> +       return 0;
+> +}
+
+The same comments are applied to Battery State files.
+
+BR,
+Claudio
