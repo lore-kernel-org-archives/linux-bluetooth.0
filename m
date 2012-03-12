@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] Bluetooth: Fix opcode access in hci_complete
-Date: Mon, 12 Mar 2012 15:59:33 +0200
-Message-Id: <1331560774-10748-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 4/4] Bluetooth: trivial: Remove sparse warnings
+Date: Mon, 12 Mar 2012 15:59:34 +0200
+Message-Id: <1331560774-10748-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1331560774-10748-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1331560774-10748-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,35 +11,34 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-opcode to be accessed is in le16 format so convert it
-first to cpu byte order.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/hci_core.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+ net/bluetooth/mgmt.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2f3e1bb..149d749 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -84,6 +84,7 @@ void hci_req_complete(struct hci_dev *hdev, __u16 cmd, int result)
- 	 */
- 	if (test_bit(HCI_INIT, &hdev->flags) && hdev->init_last_cmd != cmd) {
- 		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
-+		u16 opcode = __le16_to_cpu(sent->opcode);
- 		struct sk_buff *skb;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 06b5df3..5efca93 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -287,7 +287,7 @@ static int read_commands(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	struct mgmt_rp_read_commands *rp;
+ 	u16 num_commands = ARRAY_SIZE(mgmt_commands);
+ 	u16 num_events = ARRAY_SIZE(mgmt_events);
+-	u16 *opcode;
++	__le16 *opcode;
+ 	size_t rp_size;
+ 	int i, err;
  
- 		/* Some CSR based controllers generate a spontaneous
-@@ -93,7 +94,7 @@ void hci_req_complete(struct hci_dev *hdev, __u16 cmd, int result)
- 		 * command.
- 		 */
+@@ -2601,7 +2601,7 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 	return 0;
+ }
  
--		if (cmd != HCI_OP_RESET || sent->opcode == HCI_OP_RESET)
-+		if (cmd != HCI_OP_RESET || opcode == HCI_OP_RESET)
- 			return;
- 
- 		skb = skb_clone(hdev->sent_cmd, GFP_ATOMIC);
+-struct mgmt_handler {
++static struct mgmt_handler {
+ 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
+ 		     u16 data_len);
+ 	bool var_len;
 -- 
 1.7.9.1
 
