@@ -1,52 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: chen.ganir@ti.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH v5 0/2] DeviceInfo and BatteryService Clients
-Date: Tue, 13 Mar 2012 15:20:15 +0200
-Message-Id: <1331644817-12749-1-git-send-email-chen.ganir@ti.com>
+From: Mikel Astiz <Mikel.Astiz@bmw-carit.de>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Mikel Astiz <mikel.astiz.oss@gmail.com>
+Date: Tue, 13 Mar 2012 14:13:16 +0100
+Subject: RE: [PATCH v0 1/2] audio: fix missing unref in case of error
+Message-ID: <66BD268F973E3544A665E5F503FB38B71AE959AC4C@DC01.bmw-carit.intra>
+References: <1331630772-11438-1-git-send-email-mikel.astiz.oss@gmail.com>
+ <20120313115515.GB30313@x220.ger.corp.intel.com>
+In-Reply-To: <20120313115515.GB30313@x220.ger.corp.intel.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Ganir <chen.ganir@ti.com>
-
-Add Battery Service client and Device Information Service Client stubs.
-More logic will be added to these service as development continues.
-To enable the new features you will need to use:
---enable-batterystate
---enable-deviceinfo
-
-This is version 5 of the patch set
-
-
-Chen Ganir (2):
-  Add DeviceInformation GATT Client
-  Add Battery Service GATT Client
-
- Makefile.am                 |   14 +++++++
- acinclude.m4                |   12 ++++++
- batterystate/batterystate.c |   90 +++++++++++++++++++++++++++++++++++++++++++
- batterystate/batterystate.h |   24 +++++++++++
- batterystate/main.c         |   45 +++++++++++++++++++++
- batterystate/manager.c      |   80 ++++++++++++++++++++++++++++++++++++++
- batterystate/manager.h      |   24 +++++++++++
- deviceinfo/deviceinfo.c     |   88 ++++++++++++++++++++++++++++++++++++++++++
- deviceinfo/deviceinfo.h     |   24 +++++++++++
- deviceinfo/main.c           |   44 +++++++++++++++++++++
- deviceinfo/manager.c        |   80 ++++++++++++++++++++++++++++++++++++++
- deviceinfo/manager.h        |   24 +++++++++++
- 12 files changed, 549 insertions(+), 0 deletions(-)
- create mode 100644 batterystate/batterystate.c
- create mode 100644 batterystate/batterystate.h
- create mode 100644 batterystate/main.c
- create mode 100644 batterystate/manager.c
- create mode 100644 batterystate/manager.h
- create mode 100644 deviceinfo/deviceinfo.c
- create mode 100644 deviceinfo/deviceinfo.h
- create mode 100644 deviceinfo/main.c
- create mode 100644 deviceinfo/manager.c
- create mode 100644 deviceinfo/manager.h
-
--- 
-1.7.4.1
-
+SGkgSm9oYW4sDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSm9oYW4g
+SGVkYmVyZyBbbWFpbHRvOmpvaGFuLmhlZGJlcmdAZ21haWwuY29tXQ0KPiBTZW50OiBEaWVuc3Rh
+ZywgMTMuIE3DpHJ6IDIwMTIgMTI6NTUNCj4gVG86IE1pa2VsIEFzdGl6DQo+IENjOiBsaW51eC1i
+bHVldG9vdGhAdmdlci5rZXJuZWwub3JnOyBNaWtlbCBBc3Rpeg0KPiBTdWJqZWN0OiBSZTogW1BB
+VENIIHYwIDEvMl0gYXVkaW86IGZpeCBtaXNzaW5nIHVucmVmIGluIGNhc2Ugb2YgZXJyb3INCj4g
+DQo+IEhpIE1pa2VsLA0KPiANCj4gT24gVHVlLCBNYXIgMTMsIDIwMTIsIE1pa2VsIEFzdGl6IHdy
+b3RlOg0KPiA+IEZyb206IE1pa2VsIEFzdGl6IDxtaWtlbC5hc3RpekBibXctY2FyaXQuZGU+DQo+
+ID4NCj4gPiBhdWRpb19hZGFwdGVyX2dldCgpIGluY3JlYXNlcyB0aGUgcmVmZXJlbmNlIGNvdW50
+ZXIgb2YgdGhlIGFkYXB0ZXIsDQo+IHNvDQo+ID4gaXQncyBuZWNlc3NhcnkgdG8gZGVjcmVtZW50
+IGl0IGluIGNhc2Ugb2YgZXJyb3IuDQo+ID4gLS0tDQo+ID4gIGF1ZGlvL21hbmFnZXIuYyB8ICAg
+MjIgKysrKysrKysrKysrKysrKysrKy0tLQ0KPiA+ICAxIGZpbGVzIGNoYW5nZWQsIDE5IGluc2Vy
+dGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQo+IA0KPiBQbGVhc2UgdGVzdCBhdCBsZWFzdCB0aGF0
+IHlvdXIgcGF0Y2hlcyBjb21waWxlIGJlZm9yZSBzdWJtaXR0aW5nIHRoZW06DQo+IA0KDQpUaGUg
+cGF0Y2hlcyBkaWQgbm90IGFwcGx5IHByb3Blcmx5IHRvIHRoZSBtYXN0ZXIgYnJhbmNoLCB3aGlj
+aCAoZm9ydHVuYXRlbHkpIGxlZCB0byBjb21waWxhdGlvbiBlcnJvcnMuIFNvcnJ5IGZvciB0aGUg
+bWVzcy4NCg0KSSdsbCBzZW5kIGFuIHVwZGF0ZWQgdmVyc2lvbiBzb29uLg0KDQpDaGVlcnMsDQpN
+aWtlbA0KDQo=
