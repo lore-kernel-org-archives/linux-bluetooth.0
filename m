@@ -1,72 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABax29U8N2nOge34tr=G2f-fZvowCHPf3V=N2an-vC+x=UBdiQ@mail.gmail.com>
-References: <CABax29VLUHg_jePnhHz_6WHYCZBHoir5TBLuauK+Ktfg9-8Xjw@mail.gmail.com>
-	<CACY+gR3t4RXuhUEi9486qsP+p0GCYArHW+PO5QfBfEUfnd=xEg@mail.gmail.com>
-	<CABax29X1tFt8Am_i7y5nZsjs_D2QY9pbv19316Wn6RVq7ksEDA@mail.gmail.com>
-	<CACY+gR2DeQE2UaYwD8AQonNxtZ+=uZm7qY+BaqgjBQKoZSZHYA@mail.gmail.com>
-	<CABax29U8N2nOge34tr=G2f-fZvowCHPf3V=N2an-vC+x=UBdiQ@mail.gmail.com>
-Date: Tue, 13 Mar 2012 10:25:01 +0200
-Message-ID: <CACY+gR2PkP76J2Dw9xobpeGsU2HKhsOYvU6Wcx8WCcq1opihiA@mail.gmail.com>
-Subject: Re: A2DP quality (bluetooth-alsa)
-From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-To: qduaty <qduaty@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: trivial: Remove sparse warnings
+Date: Tue, 13 Mar 2012 10:18:35 +0200
+Message-Id: <1331626715-23685-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Mar 13, 2012 at 3:48 AM, qduaty <qduaty@gmail.com> wrote:
-> 2011/10/18 Siarhei Siamashka <siarhei.siamashka@gmail.com>:
->> Still I would suggest you to try the attached patch just for a test.
->> It reduces audio volume as part of the sbc encoding process and should
->> eliminate most of the possible clipping cases on the decoding side.
->
-> Sorry for responding after a half year :) but I finally tested your
-> encoder patch applied to libbluetooth version 4.96, using AIMP3 and
-> pulseaudio. Unpatched encoder produces a "digital" distortion (which
-> is rather annoying) and sounds much like BlueSoleil on Windows. After
-> patching, music is slightly quieter (which can be expected if you
-> decreased its volume) and has an "analog overdrive" like through a
-> cheap FM radio. Anyway, the annoying "digital" distortion that was
-> present in unpatched encoder, is now gone.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Thanks for testing! One more experiment would be very much welcome. I
-wonder if just defining SBC_HIGH_PRECISION without doing anything else
-would have any noticeable effect on audio quality in listening tests.
+Fix sparse warnings related to incorrect type in assignment and static symbol.
+Also use const keyword. Warnings are shown below:
 
-> Some fluctuations can be heard in higher bands in classical music, and
-> (as expected) instruments are indistinguishable, but it's acceptable
-> given the low bitpool.
->
-> For the "analog overdrive" I hear, it may also come from the device
-> itself (its proper name is Nokia BH-503). Considering its glue sealed
-> case, it might have been designed as a budget solution and its price
-> was "adjusted" due to no competition.
->
->> Using bitpool 128 is kind of weird for SBC codec, because the encoded
->> data stream has about the same size as the the original data and this
->> defeats the whole purpose of having any lossy compression at all.
->
-> Yes, but who needs a lossy compression in an endpoint? SBC and MP3
-> were introduced to overcome the low throughput problem of the
-> bluetooth link, which is no longer the case since 2.0+EDR has plenty
-> of unused bits.
->
->> I still recommend you to try sbcenc/sbcdec tools for the experiments with audio quality.
->
-> I tried them some time ago, but I believe ALSA backend may serve for
-> the same purpose (and is much easier to use). 8 blocks seems to sound
-> slightly better than 16 for classical music, full stereo eliminates
-> the floating of virtual sound sources, 48 kHz also seems to increase
-> quality a bit when compared to 44.1.
+...
+net/bluetooth/mgmt.c:305:28: warning: incorrect type in assignment
+(different base types)
+net/bluetooth/mgmt.c:305:28:    expected unsigned short [usertype] *opcode
+net/bluetooth/mgmt.c:305:28:    got restricted __le16 *<noident>
+...
+net/bluetooth/mgmt.c:2609:3: warning: symbol 'mgmt_handlers' was not declared.
+Should it be static?
+...
 
-sbcenc/sbcdec tools can do file-to-file encoding/decoding and
-eliminate the need to use any bluetooth device (which could
-potentially be the source of some audio quality issues). However, as I
-mentioned before, audio quality in the current bluez sbc decoder is
-far from perfect and the synthesis filter needs to be replaced first.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/mgmt.c |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 06b5df3..23f20ec 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -287,7 +287,7 @@ static int read_commands(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	struct mgmt_rp_read_commands *rp;
+ 	u16 num_commands = ARRAY_SIZE(mgmt_commands);
+ 	u16 num_events = ARRAY_SIZE(mgmt_events);
+-	u16 *opcode;
++	__le16 *opcode;
+ 	size_t rp_size;
+ 	int i, err;
+ 
+@@ -2601,7 +2601,7 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 	return 0;
+ }
+ 
+-struct mgmt_handler {
++static const struct mgmt_handler {
+ 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
+ 		     u16 data_len);
+ 	bool var_len;
+@@ -2657,7 +2657,7 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 	struct mgmt_hdr *hdr;
+ 	u16 opcode, index, len;
+ 	struct hci_dev *hdev = NULL;
+-	struct mgmt_handler *handler;
++	const struct mgmt_handler *handler;
+ 	int err;
+ 
+ 	BT_DBG("got %zu bytes", msglen);
 -- 
-Best regards,
-Siarhei Siamashka
+1.7.9.1
+
