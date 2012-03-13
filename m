@@ -1,83 +1,383 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 13 Mar 2012 09:29:40 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix broken usage of get_unaligned_le16
-Message-ID: <20120313072933.GA15895@aemeltch-MOBL1>
-References: <1331609468-22906-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1331609468-22906-1-git-send-email-marcel@holtmann.org>
+From: chen.ganir@ti.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Chen Ganir <chen.ganir@ti.com>
+Subject: [PATCH v4 2/2] Add Battery Service GATT Client
+Date: Tue, 13 Mar 2012 08:24:20 +0200
+Message-Id: <1331619860-10973-3-git-send-email-chen.ganir@ti.com>
+In-Reply-To: <1331619860-10973-1-git-send-email-chen.ganir@ti.com>
+References: <1331619860-10973-1-git-send-email-chen.ganir@ti.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Chen Ganir <chen.ganir@ti.com>
 
-On Mon, Mar 12, 2012 at 08:31:08PM -0700, Marcel Holtmann wrote:
-> In case the struct is already __packed, there is no need to use unaligned
-> access to the data. So just use __le16_to_cpu in these cases.
+Add support for the Battery Service Gatt Client side.
+---
+ Makefile.am                 |    7 +++
+ acinclude.m4                |    6 +++
+ batterystate/batterystate.c |   90 +++++++++++++++++++++++++++++++++++++++++++
+ batterystate/batterystate.h |   24 +++++++++++
+ batterystate/main.c         |   49 +++++++++++++++++++++++
+ batterystate/manager.c      |   86 +++++++++++++++++++++++++++++++++++++++++
+ batterystate/manager.h      |   24 +++++++++++
+ 7 files changed, 286 insertions(+), 0 deletions(-)
+ create mode 100644 batterystate/batterystate.c
+ create mode 100644 batterystate/batterystate.h
+ create mode 100644 batterystate/main.c
+ create mode 100644 batterystate/manager.c
+ create mode 100644 batterystate/manager.h
 
-One minor comment related to use of __xxx versions. What is the general
-rule when to use __le16_to_cpu and when le16_to_cpu? In mgmt.c looks that
-mostly in use version without underscore.
+diff --git a/Makefile.am b/Makefile.am
+index c2c61d6..10fd078 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -251,6 +251,13 @@ builtin_sources += deviceinfo/main.c \
+ 			deviceinfo/deviceinfo.h deviceinfo/deviceinfo.c
+ endif
+ 
++if BATTERYSTATEPLUGIN
++builtin_modules += batterystate
++builtin_sources += batterystate/main.c \
++			batterystate/manager.h batterystate/manager.c \
++			batterystate/batterystate.h batterystate/batterystate.c
++endif
++
+ builtin_modules += hciops mgmtops
+ builtin_sources += plugins/hciops.c plugins/mgmtops.c
+ 
+diff --git a/acinclude.m4 b/acinclude.m4
+index 14b7a4c..b33b4bf 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -221,6 +221,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	wiimote_enable=no
+ 	thermometer_enable=no
+ 	deviceinfo_enable=no
++	batterystate_enable=no
+ 
+ 	AC_ARG_ENABLE(optimization, AC_HELP_STRING([--disable-optimization], [disable code optimization]), [
+ 		optimization_enable=${enableval}
+@@ -377,6 +378,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 		deviceinfo_enable=${enableval}
+ 	])
+ 
++	AC_ARG_ENABLE(batterystate, AC_HELP_STRING([--enable-batterystate], [enable batterystate plugin]), [
++		batterystate_enable=${enableval}
++	])
++
+ 	if (test "${fortify_enable}" = "yes"); then
+ 		CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
+ 	fi
+@@ -435,4 +440,5 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	AM_CONDITIONAL(WIIMOTEPLUGIN, test "${wiimote_enable}" = "yes")
+ 	AM_CONDITIONAL(THERMOMETERPLUGIN, test "${thermometer_enable}" = "yes")
+ 	AM_CONDITIONAL(DEVICEINFOPLUGIN, test "${deviceinfo_enable}" = "yes")
++	AM_CONDITIONAL(BATTERYSTATEPLUGIN, test "${batterystate_enable}" = "yes")
+ ])
+diff --git a/batterystate/batterystate.c b/batterystate/batterystate.c
+new file mode 100644
+index 0000000..3f79978
+--- /dev/null
++++ b/batterystate/batterystate.c
+@@ -0,0 +1,90 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <glib.h>
++#include <errno.h>
++#include <bluetooth/uuid.h>
++
++#include "adapter.h"
++#include "device.h"
++#include "gattrib.h"
++#include "attio.h"
++#include "att.h"
++#include "gatt.h"
++#include "batterystate.h"
++
++struct batterystate {
++	struct btd_device	*dev;		/* Device reference */
++};
++
++static GSList *batteryservices = NULL;
++
++static gint cmp_device(gconstpointer a, gconstpointer b)
++{
++	const struct batterystate *bs = a;
++	const struct btd_device *dev = b;
++
++	if (dev == bs->dev)
++		return 0;
++
++	return -1;
++}
++
++static void batterystate_free(gpointer user_data)
++{
++	struct batterystate *bs = user_data;
++
++	btd_device_unref(bs->dev);
++	g_free(bs);
++}
++
++
++int batterystate_register(struct btd_device *device, struct att_primary *dattr)
++{
++	struct batterystate *bs;
++
++	bs = g_new0(struct batterystate, 1);
++	bs->dev = btd_device_ref(device);
++
++	batteryservices = g_slist_prepend(batteryservices, bs);
++
++	return 0;
++}
++
++void batterystate_unregister(struct btd_device *device)
++{
++	struct batterystate *bs;
++	GSList *l;
++
++	l = g_slist_find_custom(batteryservices, device, cmp_device);
++	if (l == NULL)
++		return;
++
++	bs = l->data;
++	batteryservices = g_slist_remove(batteryservices, bs);
++
++	batterystate_free(bs);
++}
+diff --git a/batterystate/batterystate.h b/batterystate/batterystate.h
+new file mode 100644
+index 0000000..b8b22f1
+--- /dev/null
++++ b/batterystate/batterystate.h
+@@ -0,0 +1,24 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++int batterystate_register(struct btd_device *device, struct att_primary *tattr);
++void batterystate_unregister(struct btd_device *device);
+diff --git a/batterystate/main.c b/batterystate/main.c
+new file mode 100644
+index 0000000..bdde9bb
+--- /dev/null
++++ b/batterystate/main.c
+@@ -0,0 +1,49 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <glib.h>
++#include <errno.h>
++#include <gdbus.h>
++
++#include "plugin.h"
++#include "manager.h"
++
++static int batterystate_init(void)
++{
++	if (batterystate_manager_init() < 0) {
++		return -EIO;
++	}
++
++	return 0;
++}
++
++static void batterystate_exit(void)
++{
++	batterystate_manager_exit();
++}
++
++BLUETOOTH_PLUGIN_DEFINE(batterystate, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++					batterystate_init, batterystate_exit)
+diff --git a/batterystate/manager.c b/batterystate/manager.c
+new file mode 100644
+index 0000000..fccd9b6
+--- /dev/null
++++ b/batterystate/manager.c
+@@ -0,0 +1,86 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include <glib.h>
++#include <errno.h>
++#include <bluetooth/uuid.h>
++
++#include "adapter.h"
++#include "device.h"
++#include "att.h"
++#include "batterystate.h"
++#include "manager.h"
++
++#define BATTERY_SERVICE_UUID		"0000180f-0000-1000-8000-00805f9b34fb"
++
++static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
++{
++	const struct att_primary *prim = a;
++	const char *uuid = b;
++
++	return g_strcmp0(prim->uuid, uuid);
++}
++
++static int batterystate_driver_probe(struct btd_device *device, GSList *uuids)
++{
++	struct att_primary *prim;
++	GSList *primaries, *l;
++
++	primaries = btd_device_get_primaries(device);
++
++	l = g_slist_find_custom(primaries, BATTERY_SERVICE_UUID,
++							primary_uuid_cmp);
++	if (l == NULL)
++		return -EINVAL;
++
++	prim = l->data;
++
++	return batterystate_register(device, prim);
++}
++
++static void batterystate_driver_remove(struct btd_device *device)
++{
++	batterystate_unregister(device);
++}
++
++static struct btd_device_driver batterystate_device_driver = {
++	.name	= "batterystate-driver",
++	.uuids	= BTD_UUIDS(BATTERY_SERVICE_UUID),
++	.probe	= batterystate_driver_probe,
++	.remove	= batterystate_driver_remove
++};
++
++int batterystate_manager_init(void)
++{
++	int ret;
++
++	ret = btd_register_device_driver(&batterystate_device_driver);
++	if (ret < 0)
++                return ret;
++
++	return 0;
++}
++
++void batterystate_manager_exit(void)
++{
++	btd_unregister_device_driver(&batterystate_device_driver);
++}
+diff --git a/batterystate/manager.h b/batterystate/manager.h
+new file mode 100644
+index 0000000..7f0bf15
+--- /dev/null
++++ b/batterystate/manager.h
+@@ -0,0 +1,24 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++int batterystate_manager_init(void);
++void batterystate_manager_exit(void);
+-- 
+1.7.4.1
 
-Best regards 
-Andrei Emeltchenko 
-
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/mgmt.c |   12 ++++++------
->  1 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 5aa2c9e..ea2677d 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -862,7 +862,7 @@ static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
->  
->  	BT_DBG("request for %s", hdev->name);
->  
-> -	timeout = get_unaligned_le16(&cp->timeout);
-> +	timeout = __le16_to_cpu(cp->timeout);
->  	if (!cp->val && timeout > 0)
->  		return cmd_status(sk, hdev->id, MGMT_OP_SET_DISCOVERABLE,
->  				  MGMT_STATUS_INVALID_PARAMS);
-> @@ -1461,7 +1461,7 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
->  	u16 key_count, expected_len;
->  	int i;
->  
-> -	key_count = get_unaligned_le16(&cp->key_count);
-> +	key_count = __le16_to_cpu(cp->key_count);
->  
->  	expected_len = sizeof(*cp) + key_count *
->  					sizeof(struct mgmt_link_key_info);
-> @@ -2606,7 +2606,7 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
->  	u16 key_count, expected_len;
->  	int i;
->  
-> -	key_count = get_unaligned_le16(&cp->key_count);
-> +	key_count = __le16_to_cpu(cp->key_count);
->  
->  	expected_len = sizeof(*cp) + key_count *
->  					sizeof(struct mgmt_ltk_info);
-> @@ -2717,9 +2717,9 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
->  	}
->  
->  	hdr = buf;
-> -	opcode = get_unaligned_le16(&hdr->opcode);
-> -	index = get_unaligned_le16(&hdr->index);
-> -	len = get_unaligned_le16(&hdr->len);
-> +	opcode = __le16_to_cpu(hdr->opcode);
-> +	index = __le16_to_cpu(hdr->index);
-> +	len = __le16_to_cpu(hdr->len);
->  
->  	if (len != msglen - sizeof(*hdr)) {
->  		err = -EINVAL;
-> -- 
-> 1.7.7.6
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
