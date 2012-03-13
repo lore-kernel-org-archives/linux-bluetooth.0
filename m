@@ -1,33 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <Mikel.Astiz@bmw-carit.de>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Mikel Astiz <mikel.astiz.oss@gmail.com>
-Date: Tue, 13 Mar 2012 14:13:16 +0100
-Subject: RE: [PATCH v0 1/2] audio: fix missing unref in case of error
-Message-ID: <66BD268F973E3544A665E5F503FB38B71AE959AC4C@DC01.bmw-carit.intra>
-References: <1331630772-11438-1-git-send-email-mikel.astiz.oss@gmail.com>
- <20120313115515.GB30313@x220.ger.corp.intel.com>
-In-Reply-To: <20120313115515.GB30313@x220.ger.corp.intel.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <CACY+gR2PkP76J2Dw9xobpeGsU2HKhsOYvU6Wcx8WCcq1opihiA@mail.gmail.com>
+References: <CABax29VLUHg_jePnhHz_6WHYCZBHoir5TBLuauK+Ktfg9-8Xjw@mail.gmail.com>
+	<CACY+gR3t4RXuhUEi9486qsP+p0GCYArHW+PO5QfBfEUfnd=xEg@mail.gmail.com>
+	<CABax29X1tFt8Am_i7y5nZsjs_D2QY9pbv19316Wn6RVq7ksEDA@mail.gmail.com>
+	<CACY+gR2DeQE2UaYwD8AQonNxtZ+=uZm7qY+BaqgjBQKoZSZHYA@mail.gmail.com>
+	<CABax29U8N2nOge34tr=G2f-fZvowCHPf3V=N2an-vC+x=UBdiQ@mail.gmail.com>
+	<CACY+gR2PkP76J2Dw9xobpeGsU2HKhsOYvU6Wcx8WCcq1opihiA@mail.gmail.com>
+Date: Tue, 13 Mar 2012 13:45:36 +0100
+Message-ID: <CABax29VadeA+6WZWRDiZZUhpRqk2Nk35__b0Cjfz8HO12Tq4vQ@mail.gmail.com>
+Subject: Re: A2DP quality (bluetooth-alsa)
+From: qduaty <qduaty@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgSm9oYW4sDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSm9oYW4g
-SGVkYmVyZyBbbWFpbHRvOmpvaGFuLmhlZGJlcmdAZ21haWwuY29tXQ0KPiBTZW50OiBEaWVuc3Rh
-ZywgMTMuIE3DpHJ6IDIwMTIgMTI6NTUNCj4gVG86IE1pa2VsIEFzdGl6DQo+IENjOiBsaW51eC1i
-bHVldG9vdGhAdmdlci5rZXJuZWwub3JnOyBNaWtlbCBBc3Rpeg0KPiBTdWJqZWN0OiBSZTogW1BB
-VENIIHYwIDEvMl0gYXVkaW86IGZpeCBtaXNzaW5nIHVucmVmIGluIGNhc2Ugb2YgZXJyb3INCj4g
-DQo+IEhpIE1pa2VsLA0KPiANCj4gT24gVHVlLCBNYXIgMTMsIDIwMTIsIE1pa2VsIEFzdGl6IHdy
-b3RlOg0KPiA+IEZyb206IE1pa2VsIEFzdGl6IDxtaWtlbC5hc3RpekBibXctY2FyaXQuZGU+DQo+
-ID4NCj4gPiBhdWRpb19hZGFwdGVyX2dldCgpIGluY3JlYXNlcyB0aGUgcmVmZXJlbmNlIGNvdW50
-ZXIgb2YgdGhlIGFkYXB0ZXIsDQo+IHNvDQo+ID4gaXQncyBuZWNlc3NhcnkgdG8gZGVjcmVtZW50
-IGl0IGluIGNhc2Ugb2YgZXJyb3IuDQo+ID4gLS0tDQo+ID4gIGF1ZGlvL21hbmFnZXIuYyB8ICAg
-MjIgKysrKysrKysrKysrKysrKysrKy0tLQ0KPiA+ICAxIGZpbGVzIGNoYW5nZWQsIDE5IGluc2Vy
-dGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQo+IA0KPiBQbGVhc2UgdGVzdCBhdCBsZWFzdCB0aGF0
-IHlvdXIgcGF0Y2hlcyBjb21waWxlIGJlZm9yZSBzdWJtaXR0aW5nIHRoZW06DQo+IA0KDQpUaGUg
-cGF0Y2hlcyBkaWQgbm90IGFwcGx5IHByb3Blcmx5IHRvIHRoZSBtYXN0ZXIgYnJhbmNoLCB3aGlj
-aCAoZm9ydHVuYXRlbHkpIGxlZCB0byBjb21waWxhdGlvbiBlcnJvcnMuIFNvcnJ5IGZvciB0aGUg
-bWVzcy4NCg0KSSdsbCBzZW5kIGFuIHVwZGF0ZWQgdmVyc2lvbiBzb29uLg0KDQpDaGVlcnMsDQpN
-aWtlbA0KDQo=
+2012/3/13 Siarhei Siamashka <siarhei.siamashka@gmail.com>:
+> On Tue, Mar 13, 2012 at 3:48 AM, qduaty <qduaty@gmail.com> wrote:
+>> 2011/10/18 Siarhei Siamashka <siarhei.siamashka@gmail.com>:
+> Thanks for testing! One more experiment would be very much welcome. I
+> wonder if just defining SBC_HIGH_PRECISION without doing anything else
+> would have any noticeable effect on audio quality in listening tests.
+
+Well, before I move on, there is one thing that makes me sad:
+
+< ACL data: handle 1 flags 0x02 dlen 7
+    L2CAP(d): cid 0x006d len 3 [psm 25]
+      AVDTP(s): Capabilities cmd: transaction 10 nsp 0x00
+        ACP SEID 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(d): cid 0x0040 len 12 [psm 25]
+      AVDTP(s): Capabilities rsp: transaction 10 nsp 0x00
+        Media Transport
+        Media Codec - SBC
+          44.1kHz
+          Stereo
+          16 Blocks
+          8 Subbands
+          Loudness
+          Bitpool Range 112-128
+< ACL data: handle 1 flags 0x02 dlen 18
+    L2CAP(d): cid 0x006d len 14 [psm 25]
+      AVDTP(s): Set config cmd: transaction 11 nsp 0x00
+        ACP SEID 1 - INT SEID 2
+        Media Transport
+        Media Codec - SBC
+          44.1kHz
+          Stereo
+          16 Blocks
+          8 Subbands
+          Loudness
+          Bitpool Range 112-53
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 25]
+      AVDTP(s): Set config rej: transaction 11 nsp 0x00
+        Media Codec
+        Error code 204
+
+The other device that tries to communicate at bitpool=112 and gives
+up, is my phone. Now I'm listening to it with the headset and the
+sound is perfectly clear, with no sign of that "analog" distortion I
+mentioned earlier.
+
+Bluez has MAX_BITPOOL=53 or 64 stored everywhere and who knows, maybe
+it's even able to recover these magic numbers from bitrate. Should I
+look for bitrate constant, like 320 or so?
+
+> audio quality in the current bluez sbc decoder is
+> far from perfect and the synthesis filter needs to be replaced first.
+
+I'm not sure what you expect from sbcenc-sbcdec tests. Even if they
+prove the encoding/decoding within Bluez has a reasonably good
+quality, what then? Will it propagate among different devices,
+bluetooth stacks?
+
+
+Regards
+
+--
+Sebastian Olter
