@@ -1,32 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1314266945-6149-1-git-send-email-arnaud.mouiche@invoxia.com>
-References: <1314266945-6149-1-git-send-email-arnaud.mouiche@invoxia.com>
-Date: Tue, 13 Mar 2012 10:17:50 -0500
-Message-ID: <CAB7rCTjkNfB58E1OrOpS4AKzEF=5HZqd3-6fj2SCzkx7vgKjXA@mail.gmail.com>
-Subject: Re: [Patch Bluez] HFP gateway: fix failure on very first GSM connection
-From: Mike <puffy.taco@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arnaud Mouiche <arnaud.mouiche@invoxia.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1331651751.14217.93.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Fix broken usage of get_unaligned_le16
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 13 Mar 2012 08:15:51 -0700
+In-Reply-To: <20120313072933.GA15895@aemeltch-MOBL1>
+References: <1331609468-22906-1-git-send-email-marcel@holtmann.org>
+	 <20120313072933.GA15895@aemeltch-MOBL1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrei,
 
-On Thu, Aug 25, 2011 at 5:09 AM, Arnaud Mouiche
-<arnaud.mouiche@invoxia.com> wrote:
-> This patch fix the very first incoming connection from a GSM device
-> (playing the gateway role), when 'device->gateway' is NULL (when we didn't
-> perform a SDP browse request yet)
->
-> we add the service with 'btd_device_add_uuid(device->btd_dev, remote_uuid)'
-> but we provide HFP_HS_UUID as remote_uuid. Consequently, the HFP headset
-> service is activated instead the gateway service.
->
-> Note: I failed to know which UUID is the good one to provide for
-> audio_device_request_authorization()
+> > In case the struct is already __packed, there is no need to use unaligned
+> > access to the data. So just use __le16_to_cpu in these cases.
+> 
+> One minor comment related to use of __xxx versions. What is the general
+> rule when to use __le16_to_cpu and when le16_to_cpu? In mgmt.c looks that
+> mostly in use version without underscore.
 
-Any reason this patch was not picked up?
+honestly I do not know. We have been using __le16_to_cpu and cpu_to_le16
+as long as I can remember.
 
-Mike
+Regards
+
+Marcel
+
+
