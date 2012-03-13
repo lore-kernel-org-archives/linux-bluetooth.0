@@ -1,36 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 13 Mar 2012 13:51:18 +0200
+Date: Tue, 13 Mar 2012 12:30:02 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Michal Labedzki <michal.labedzki@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-	lucas.demarchi@profusion.mobi
-Subject: Re: [PATCH v3] avrcp: Add error code for rejected vendor command
-Message-ID: <20120313115118.GA30313@x220.ger.corp.intel.com>
-References: <CAMOw1v6pNC7eebGEAMLEWKNJ8NaR2aUweigMCEzbG5_0wgkUTA@mail.gmail.com>
- <1331137394-27292-1-git-send-email-michal.labedzki@tieto.com>
+To: chen.ganir@ti.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v4 1/2] Add DeviceInformation GATT Client
+Message-ID: <20120313103002.GA28153@x220>
+References: <1331619860-10973-1-git-send-email-chen.ganir@ti.com>
+ <1331619860-10973-2-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1331137394-27292-1-git-send-email-michal.labedzki@tieto.com>
+In-Reply-To: <1331619860-10973-2-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Hi Chen,
 
-On Wed, Mar 07, 2012, Michal Labedzki wrote:
-> Fix response for any vendor commands when there are no players
-> registered. According to the specification responses should be
-> REJECTED with error code.
-> 
-> "For error response PDU the response parameter is always the
-> error code independent of the response format defined for
-> ACCEPTED PDU response for the corresponding PDU command."
-> (source: section 4.7.9 of AVRCP 1.3 specification)
-> ---
->  audio/avctp.c |    4 +++-
->  audio/avrcp.c |   15 +++++++++++++++
->  audio/avrcp.h |    2 ++
->  3 files changed, 20 insertions(+), 1 deletions(-)
+On Tue, Mar 13, 2012, chen.ganir@ti.com wrote:
+> +static int deviceinfo_init(void)
+> +{
+> +	if (deviceinfo_manager_init() < 0) {
+> +		return -EIO;
+> +	}
+> +
+> +	return 0;
+> +}
 
-Patch 1/3 as well as this one have been applied. Thanks.
+Why not simply:
+
+	return deviceinfo_manager_init();
+
+> +int deviceinfo_manager_init(void)
+> +{
+> +	int ret;
+> +
+> +	ret = btd_register_device_driver(&deviceinfo_device_driver);
+> +	if (ret < 0)
+> +                return ret;
+> +
+> +	return 0;
+> +}
+
+Why not simply:
+
+	return btd_register_device_driver(&deviceinfo_device_driver);
 
 Johan
