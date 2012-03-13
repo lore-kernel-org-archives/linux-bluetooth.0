@@ -1,36 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        "chen.ganir@gmail.com"
-	<chen.ganir@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH 0/2] DeviceInfo and BatteryService Clients
-Date: Tue, 13 Mar 2012 12:08:42 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B44E0FA@DNCE02.ent.ti.com>
-References: <1331470642-23924-1-git-send-email-chen.ganir@ti.com>
- <1331489824.14217.69.camel@aeonflux>
-In-Reply-To: <1331489824.14217.69.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
+Date: Tue, 13 Mar 2012 13:55:15 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [PATCH v0 1/2] audio: fix missing unref in case of error
+Message-ID: <20120313115515.GB30313@x220.ger.corp.intel.com>
+References: <1331630772-11438-1-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1331630772-11438-1-git-send-email-mikel.astiz.oss@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-TWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hcmNlbCBI
-b2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddDQo+IFNlbnQ6IFN1bmRheSwgTWFy
-Y2ggMTEsIDIwMTIgODoxNyBQTQ0KPiBUbzogY2hlbi5nYW5pckBnbWFpbC5jb20NCj4gQ2M6IGxp
-bnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc7IEdhbmlyLCBDaGVuDQo+IFN1YmplY3Q6IFJl
-OiBbUEFUQ0ggMC8yXSBEZXZpY2VJbmZvIGFuZCBCYXR0ZXJ5U2VydmljZSBDbGllbnRzDQo+IA0K
-PiBIaSBDaGVuLA0KPiANCj4gPiBBZGRpbmcgQmF0dGVyeSBTZXJ2aWNlIGNsaWVudCBhbmQgRGV2
-aWNlIEluZm9ybWF0aW9uIFNlcnZpY2UgQ2xpZW50DQo+IHN0dWJzLg0KPiA+IE1vcmUgbG9naWMg
-d2lsbCBiZSBhZGRlZCB0byB0aGVzZSBzZXJ2aWNlIGFzIGRldmVsb3BtZW50IGNvbnRpbnVlcy4N
-Cj4gPiBUbyBlbmFibGUgdGhlIG5ldyBmZWF0dXJlcyB5b3Ugd2lsbCBuZWVkIHRvIHVzZToNCj4g
-PiAtLWVuYWJsZS1iYXR0ZXJ5c3RhdGUNCj4gPiAtLWVuYWJsZS1kZXZpY2VpbmZvDQo+IA0KPiBJ
-IHJhdGhlciBoYXZlIHVzIHJlZHVjaW5nIHRoZSBudW1iZXIgb2YgY29uZmlndXJlIG9wdGlvbnMu
-IERvIHdlIHJlYWxseQ0KPiBuZWVkIHRoZXNlPyBJIHdvdWxkIGp1c3QgZW5hYmxlIHRoZW0gYWxs
-IGJ5IGRlZmF1bHQuDQo+IA0KVGhvc2Ugc2VydmljZXMgYXJlIHN0YW5kLWFsb25lIHNlcnZpY2Vz
-LCB3aGljaCBhcmUgcmVxdWlyZWQgYnkgbXVsdGlwbGUgcHJvZmlsZXMuIFNldHRpbmcgdGhlbSBp
-biBhIHNpbmdsZSBjb25maWd1cmF0aW9uIHBhcmFtZXRlciwgc2VlbXMgd3JvbmcsIHNpbmNlIHdl
-IG1heSBuZWVkIHRvIGNoYW5nZSB0aGF0IHNvb24gd2hlbiBhbm90aGVyIHByb2ZpbGUgdXNpbmcg
-dGhlbSB3aWxsIGJlIGltcGxlbWVudGVkLiBGb3Igbm93LCB0aGV5IGFyZSB1c2VkIGluIHRoZSBI
-T0dQLCBidXQgbWF5IGJlIHVzZWQNCmluIG90aGVyIHByb2ZpbGVzIGFzIHdlbGwuIEkgYmVsaWV2
-ZSB0aG9zZSBzaG91bGQgYmUgbGVmdCBhcyBzZXBhcmF0ZSBwbHVnaW5zLiANCg0KPiBSZWdhcmRz
-DQo+IA0KPiBNYXJjZWwNCj4gDQoNClRoYW5rcywNCkNoZW4gR2FuaXIuDQoNCg==
+Hi Mikel,
+
+On Tue, Mar 13, 2012, Mikel Astiz wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+> 
+> audio_adapter_get() increases the reference counter of the adapter, so
+> it's necessary to decrement it in case of error.
+> ---
+>  audio/manager.c |   22 +++++++++++++++++++---
+>  1 files changed, 19 insertions(+), 3 deletions(-)
+
+Please test at least that your patches compile before submitting them:
+
+  CC     audio/bluetoothd-manager.o
+audio/manager.c: In function ‘avrcp_server_probe’:
+audio/manager.c:1058:2: error: ‘err’ undeclared (first use in this function)
+audio/manager.c:1058:2: note: each undeclared identifier is reported only once for each function it appears in
+audio/manager.c: In function ‘avrcp_server_remove’:
+audio/manager.c:1070:6: error: unused variable ‘err’ [-Werror=unused-variable]
+audio/manager.c: In function ‘avrcp_server_probe’:
+audio/manager.c:1063:1: error: control reaches end of non-void function [-Werror=return-type]
+
+Also:
+
+> --- a/audio/manager.c
+> +++ b/audio/manager.c
+> @@ -877,6 +877,7 @@ static void audio_adapter_unref(struct audio_adapter *adp)
+>  		return;
+>  
+>  	adapters = g_slist_remove(adapters, adp);
+> +
+>  	btd_adapter_unref(adp->btd_adapter);
+>  	g_free(adp);
+>  }
+
+This added line seems completely unrelated to the patch.
+
+Johan
