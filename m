@@ -1,86 +1,168 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CACY+gR2PkP76J2Dw9xobpeGsU2HKhsOYvU6Wcx8WCcq1opihiA@mail.gmail.com>
-References: <CABax29VLUHg_jePnhHz_6WHYCZBHoir5TBLuauK+Ktfg9-8Xjw@mail.gmail.com>
-	<CACY+gR3t4RXuhUEi9486qsP+p0GCYArHW+PO5QfBfEUfnd=xEg@mail.gmail.com>
-	<CABax29X1tFt8Am_i7y5nZsjs_D2QY9pbv19316Wn6RVq7ksEDA@mail.gmail.com>
-	<CACY+gR2DeQE2UaYwD8AQonNxtZ+=uZm7qY+BaqgjBQKoZSZHYA@mail.gmail.com>
-	<CABax29U8N2nOge34tr=G2f-fZvowCHPf3V=N2an-vC+x=UBdiQ@mail.gmail.com>
-	<CACY+gR2PkP76J2Dw9xobpeGsU2HKhsOYvU6Wcx8WCcq1opihiA@mail.gmail.com>
-Date: Tue, 13 Mar 2012 13:45:36 +0100
-Message-ID: <CABax29VadeA+6WZWRDiZZUhpRqk2Nk35__b0Cjfz8HO12Tq4vQ@mail.gmail.com>
-Subject: Re: A2DP quality (bluetooth-alsa)
-From: qduaty <qduaty@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-id: <3B83FE6BA5CC48B3B639BF5D10A6FAA0@sisodomain.com>
+From: girish.joshi@samsung.com
+To: Slawomir Bochenski <lkslawek@gmail.com>,
+	Divya Yadav <divya.yadav@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <1331196259-16010-1-git-send-email-divya.yadav@samsung.com>
+ <CA+i+Aw1K6xnd0pVssFSsGWy1=AaQYJ=MRvmV-py0NdVGzXS6-A@mail.gmail.com>
+In-reply-to: <CA+i+Aw1K6xnd0pVssFSsGWy1=AaQYJ=MRvmV-py0NdVGzXS6-A@mail.gmail.com>
+Subject: Re: [PATCH obexd 1/3] map_ap.c: Add implementation for map_ap_get*
+Date: Tue, 13 Mar 2012 18:12:19 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2012/3/13 Siarhei Siamashka <siarhei.siamashka@gmail.com>:
-> On Tue, Mar 13, 2012 at 3:48 AM, qduaty <qduaty@gmail.com> wrote:
->> 2011/10/18 Siarhei Siamashka <siarhei.siamashka@gmail.com>:
-> Thanks for testing! One more experiment would be very much welcome. I
-> wonder if just defining SBC_HIGH_PRECISION without doing anything else
-> would have any noticeable effect on audio quality in listening tests.
+Hello,
 
-Well, before I move on, there is one thing that makes me sad:
+--------------------------------------------------
+From: "Slawomir Bochenski" <lkslawek@gmail.com>
+Sent: Thursday, March 08, 2012 2:57 PM
+To: "Divya Yadav" <divya.yadav@samsung.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH obexd 1/3] map_ap.c: Add implementation for map_ap_get*
 
-< ACL data: handle 1 flags 0x02 dlen 7
-    L2CAP(d): cid 0x006d len 3 [psm 25]
-      AVDTP(s): Capabilities cmd: transaction 10 nsp 0x00
-        ACP SEID 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 1 packets 1
-> ACL data: handle 1 flags 0x02 dlen 16
-    L2CAP(d): cid 0x0040 len 12 [psm 25]
-      AVDTP(s): Capabilities rsp: transaction 10 nsp 0x00
-        Media Transport
-        Media Codec - SBC
-          44.1kHz
-          Stereo
-          16 Blocks
-          8 Subbands
-          Loudness
-          Bitpool Range 112-128
-< ACL data: handle 1 flags 0x02 dlen 18
-    L2CAP(d): cid 0x006d len 14 [psm 25]
-      AVDTP(s): Set config cmd: transaction 11 nsp 0x00
-        ACP SEID 1 - INT SEID 2
-        Media Transport
-        Media Codec - SBC
-          44.1kHz
-          Stereo
-          16 Blocks
-          8 Subbands
-          Loudness
-          Bitpool Range 112-53
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 1 packets 1
-> ACL data: handle 1 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 25]
-      AVDTP(s): Set config rej: transaction 11 nsp 0x00
-        Media Codec
-        Error code 204
+> Hi!
+>
+> On Thu, Mar 8, 2012 at 9:44 AM, Divya Yadav <divya.yadav@samsung.com> 
+> wrote:
+>> ---
+>>  src/map_ap.c |   58 
+>> ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+>>  1 files changed, 54 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/src/map_ap.c b/src/map_ap.c
+>> index 54e3bcf..dd3ed6b 100644
+>> --- a/src/map_ap.c
+>> +++ b/src/map_ap.c
+>> @@ -246,22 +246,72 @@ uint8_t *map_ap_encode(map_ap_t *ap, size_t 
+>> *length)
+>>
+>>  gboolean map_ap_get_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t *val)
+>>  {
+>> -       return FALSE;
+>> +       struct ap_entry *entry;
+>> +       int offset = find_ap_def_offset(tag);
+>> +
+>> +       if (offset < 0 || ap_defs[offset].type != APT_UINT8)
+>> +               return FALSE;
+>> +
+>> +       entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
+>> +
+>> +       if (!entry)
+>> +               return FALSE;
+>> +
+>> +       *val = entry->val.u8;
+>> +
+>> +       return TRUE;
+>>  }
+>>
+>>  gboolean map_ap_get_u16(map_ap_t *ap, enum map_ap_tag tag, uint16_t 
+>> *val)
+>>  {
+>> -       return FALSE;
+>> +       struct ap_entry *entry;
+>> +       int offset = find_ap_def_offset(tag);
+>> +
+>> +       if (offset < 0 || ap_defs[offset].type != APT_UINT16)
+>> +               return FALSE;
+>> +
+>> +       entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
+>> +
+>> +       if (!entry)
+>> +               return FALSE;
+>> +
+>> +       *val = entry->val.u16;
+>> +
+>> +       return TRUE;
+>>  }
+>>
+>>  gboolean map_ap_get_u32(map_ap_t *ap, enum map_ap_tag tag, uint32_t 
+>> *val)
+>>  {
+>> -       return FALSE;
+>> +       struct ap_entry *entry;
+>> +       int offset = find_ap_def_offset(tag);
+>> +
+>> +       if (offset < 0 || ap_defs[offset].type != APT_UINT32)
+>> +               return FALSE;
+>> +
+>> +       entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
+>> +
+>> +       if (!entry)
+>> +               return FALSE;
+>> +
+>> +       *val = entry->val.u32;
+>> +
+>> +       return TRUE;
+>>  }
+>>
+>>  const char *map_ap_get_string(map_ap_t *ap, enum map_ap_tag tag)
+>>  {
+>> -       return NULL;
+>> +       struct ap_entry *entry;
+>> +       int offset = find_ap_def_offset(tag);
+>> +
+>> +       if (offset < 0 || ap_defs[offset].type != APT_STR)
+>> +               return NULL;
+>> +
+>> +       entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
+>> +
+>> +       if (!entry)
+>> +               return NULL;
+>> +
+>> +       return g_strdup(entry->val.str);
+>>  }
+>>
+>>  gboolean map_ap_set_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t val)
+>
+> Well, those are obviously quite right, as those are copies of
+> appropriate map_ap_set_* functions made by me, with the logic reversed
+> for reading. So almost exactly identical to what I have done already
+> and what I would send is some next series of patches (but now another
+> series are waiting to accepted). The only difference is that I do not
+> strdup string value in map_ap_get_string(), because there's no point
+> in it.
+>
+> Patch no 2 is not how I did this and how I like it to be done.
+> Especially ugly are the checks for parameters presence performed
+> inside get and puts functions by string comparing MIME types. Those
+> comparison is already done for selecting mime driver so parameter
+> verification can be done in appropriate functions for those drivers.
+> So in this case e.g. in your message_status_open().
+>
+> I don't know how this could work. I told you already that I also have
+> a code for setting message statuses or message parsing and uploading
+> and this will come next when browsing is fully accepted upstream. So
+> what is the point of reinventing the wheel, i.e. rewriting what is
+> already written and waiting to be upstreamed?
+>
+>>
+As per the discussion with you, we will wait for the code from you in the
+obexd branch for some more time I hope your code will be applied soon.
+As we discussed, we do understand that the code has to be reviewed
+before applying it to the main branch, and as we discussed, we can try to
+share code with some other way to avoid the duplicate work among the
+developers.
 
-The other device that tries to communicate at bitpool=112 and gives
-up, is my phone. Now I'm listening to it with the headset and the
-sound is perfectly clear, with no sign of that "analog" distortion I
-mentioned earlier.
+Thanks,
+Girish A J
+>> 1.7.0.4
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe 
+>> linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> -- 
+> Slawomir Bochenski
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html 
 
-Bluez has MAX_BITPOOL=53 or 64 stored everywhere and who knows, maybe
-it's even able to recover these magic numbers from bitrate. Should I
-look for bitrate constant, like 320 or so?
-
-> audio quality in the current bluez sbc decoder is
-> far from perfect and the synthesis filter needs to be replaced first.
-
-I'm not sure what you expect from sbcenc-sbcdec tests. Even if they
-prove the encoding/decoding within Bluez has a reasonably good
-quality, what then? Will it propagate among different devices,
-bluetooth stacks?
-
-
-Regards
-
---
-Sebastian Olter
