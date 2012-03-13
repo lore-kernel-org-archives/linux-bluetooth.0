@@ -1,62 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 13 Mar 2012 17:13:29 +0100 (CET)
-From: Jiri Kosina <jkosina@suse.cz>
-To: =?ISO-8859-15?Q?St=E9phane_Chatty?= <chatty@enac.fr>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Henrik Rydberg <rydberg@euromail.se>,
-	"benjamin.tissoires" <benjamin.tissoires@gmail.com>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/5] HID: autoload hid-multitouch as needed
-In-Reply-To: <0EB7B0B6-EE4F-4E42-A1E6-0414D39AEAE6@enac.fr>
-Message-ID: <alpine.LNX.2.00.1203131710120.18356@pobox.suse.cz>
-References: <1331053026-21272-1-git-send-email-benjamin.tissoires@gmail.com> <1331053026-21272-5-git-send-email-benjamin.tissoires@gmail.com>    <alpine.LNX.2.00.1203072234550.29034@pobox.suse.cz>   <20120308105737.GA11201@polaris.bitmath.org>  
- <6E17845C-6F9F-4CB6-AA5D-DEEDCD2089E8@enac.fr>   <alpine.LNX.2.00.1203121650500.18356@pobox.suse.cz>  <1331574151.14217.86.camel@aeonflux>  <4B25AD62-B1C9-4C57-AE64-34EB7F47DC9B@enac.fr> <alpine.LNX.2.00.1203122316420.18356@pobox.suse.cz>
- <0EB7B0B6-EE4F-4E42-A1E6-0414D39AEAE6@enac.fr>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=iso-8859-1
+Message-ID: <1331651858.14217.94.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: trivial: Remove sparse warnings
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 13 Mar 2012 08:17:38 -0700
+In-Reply-To: <1331626715-23685-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1331626715-23685-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 13 Mar 2012, Stéphane Chatty wrote:
+Hi Andrei,
 
-> > Let me answer by a bit of history here. Originally, there have been 
-> > two copies of HID code in the kernel -- one for USB HID devices, one 
-> > for Bluetooth HID devices. The parsers were not kept in sync, and 
-> > there was a lot of code duplication, creating quite some mess.
-> > 
-> > What I did back then in 2006 was that I have extracted the abstract HID 
-> > parts into HID core, and made it transport-independent in principle, so 
-> > that both USB HID and Bluetooth HID shared the common infrastructure, 
-> > while implementing different transport protocols.
-> > 
-> > Then we extended it a little bit further, making HID core a proper bus, to 
-> > which individual drivers (independently on underlying transport protocol 
-> > used) can register.
-> > 
-> > Currently there are just Bluetooth (hidp) and USB (usbhid) transport 
-> > implementations, with HID core being transport independent.
-> > 
-> > Hope this helps,
+> Fix sparse warnings related to incorrect type in assignment and static symbol.
+> Also use const keyword. Warnings are shown below:
 > 
-> Very useful clarification, thanks. Now, I guess I understand why Marcel 
-> wants to keep hidp in bluetooth/. And, to be honest, things would have 
-> been clearer to me when I explored the handling of the USB/HID class if 
-> I had found a hid (or usbhid) directory in usb/ rather than a usbhid 
-> subdirectory in hid/: it did not make the above situation very obvious 
-> to me. Don't you think we could go along with Marcel and move usbhid to 
-> usb/?
+> ...
+> net/bluetooth/mgmt.c:305:28: warning: incorrect type in assignment
+> (different base types)
+> net/bluetooth/mgmt.c:305:28:    expected unsigned short [usertype] *opcode
+> net/bluetooth/mgmt.c:305:28:    got restricted __le16 *<noident>
+> ...
+> net/bluetooth/mgmt.c:2609:3: warning: symbol 'mgmt_handlers' was not declared.
+> Should it be static?
+> ...
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/mgmt.c |    6 +++---
+>  1 files changed, 3 insertions(+), 3 deletions(-)
 
-It seemed to be convenient back then, and it's still convenient for me in 
-some sense, as I am maintaining both HID core and USB HID, but bluetooth 
-guys are maintaining the bluetooth transport.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-But I don't have strong opinion either way, I can as well move usbhid to 
-drivers/usb and maintain it there (will need to talk to Greg about it 
-first of course). But frankly, I don't see it making things magically 
-clear for everyone :)
+Regards
 
--- 
-Jiri Kosina
-SUSE Labs
+Marcel
+
+
