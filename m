@@ -1,47 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 13 Mar 2012 12:30:02 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: chen.ganir@ti.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 1/2] Add DeviceInformation GATT Client
-Message-ID: <20120313103002.GA28153@x220>
-References: <1331619860-10973-1-git-send-email-chen.ganir@ti.com>
- <1331619860-10973-2-git-send-email-chen.ganir@ti.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1331619860-10973-2-git-send-email-chen.ganir@ti.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH 4/5] HID: autoload hid-multitouch as needed
+Mime-Version: 1.0 (Apple Message framework v1084)
+Content-Type: text/plain; charset=iso-8859-1
+From: =?iso-8859-1?Q?St=E9phane_Chatty?= <chatty@enac.fr>
+In-Reply-To: <alpine.LNX.2.00.1203122316420.18356@pobox.suse.cz>
+Date: Tue, 13 Mar 2012 11:17:38 +0100
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Henrik Rydberg <rydberg@euromail.se>,
+ "benjamin.tissoires" <benjamin.tissoires@gmail.com>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+ linux-input@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ "Gustavo F. Padovan" <padovan@profusion.mobi>,
+ linux-bluetooth@vger.kernel.org
+Message-Id: <0EB7B0B6-EE4F-4E42-A1E6-0414D39AEAE6@enac.fr>
+References: <1331053026-21272-1-git-send-email-benjamin.tissoires@gmail.com> <1331053026-21272-5-git-send-email-benjamin.tissoires@gmail.com>    <alpine.LNX.2.00.1203072234550.29034@pobox.suse.cz>   <20120308105737.GA11201@polaris.bitmath.org>   <6E17845C-6F9F-4CB6-AA5D-DEEDCD2089E8@enac.fr>   <alpine.LNX.2.00.1203121650500.18356@pobox.suse.cz>  <1331574151.14217.86.camel@aeonflux>  <4B25AD62-B1C9-4C57-AE64-34EB7F47DC9B@enac.fr> <alpine.LNX.2.00.1203122316420.18356@pobox.suse.cz>
+To: Jiri Kosina <jkosina@suse.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
 
-On Tue, Mar 13, 2012, chen.ganir@ti.com wrote:
-> +static int deviceinfo_init(void)
-> +{
-> +	if (deviceinfo_manager_init() < 0) {
-> +		return -EIO;
-> +	}
-> +
-> +	return 0;
-> +}
+Le 12 mars 2012 =E0 23:21, Jiri Kosina a =E9crit :
 
-Why not simply:
+> On Mon, 12 Mar 2012, St=E9phane Chatty wrote:
+>=20
+>> Just in case it makes a difference, I knew nothing about HIDP when I=20=
 
-	return deviceinfo_manager_init();
+>> wrote the message above. My point was rather that hid looks like a =
+bus=20
+>> to which several transport layers can connect (USB, Bluetooth, =
+ZigBee,=20
+>> etc), and that having USB-specific code in hid/ (as opposed to having =
+it=20
+>> in usb/) seems biased towards USB. I was (and am still) wondering how=20=
 
-> +int deviceinfo_manager_init(void)
-> +{
-> +	int ret;
-> +
-> +	ret = btd_register_device_driver(&deviceinfo_device_driver);
-> +	if (ret < 0)
-> +                return ret;
-> +
-> +	return 0;
-> +}
+>> much it limits future uses of the hid core by making it =
+USB-dependent.
+>>=20
+>> In other words: is the hid core generic enough or are there steps to=20=
 
-Why not simply:
+>> take to make it more generic wrt transport layers? If we are talking=20=
 
-	return btd_register_device_driver(&deviceinfo_device_driver);
+>> about restructuring parts of it, this seems like the right time to =
+ask=20
+>> :-)
+>=20
+> Let me answer by a bit of history here. Originally, there have been =
+two=20
+> copies of HID code in the kernel -- one for USB HID devices, one for=20=
 
-Johan
+> Bluetooth HID devices.
+> The parsers were not kept in sync, and there was a lot of code=20
+> duplication, creating quite some mess.
+>=20
+> What I did back then in 2006 was that I have extracted the abstract =
+HID=20
+> parts into HID core, and made it transport-independent in principle, =
+so=20
+> that both USB HID and Bluetooth HID shared the common infrastructure,=20=
+
+> while implementing different transport protocols.
+>=20
+> Then we extended it a little bit further, making HID core a proper =
+bus, to=20
+> which individual drivers (independently on underlying transport =
+protocol=20
+> used) can register.
+>=20
+> Currently there are just Bluetooth (hidp) and USB (usbhid) transport=20=
+
+> implementations, with HID core being transport independent.
+>=20
+> Hope this helps,
+
+Very useful clarification, thanks. Now, I guess I understand why Marcel =
+wants to keep hidp in bluetooth/. And, to be honest, things would have =
+been clearer to me when I explored the handling of the USB/HID class if =
+I had found a hid (or usbhid) directory in usb/ rather than a usbhid =
+subdirectory in hid/: it did not make the above situation very obvious =
+to me. Don't you think we could go along with Marcel and move usbhid to =
+usb/?
+
+St.
