@@ -1,93 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F60B259.5040800@tu-ilmenau.de>
-Date: Wed, 14 Mar 2012 15:59:37 +0100
-From: Steffen Becker <steffen.becker@tu-ilmenau.de>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Encrypting problem while sending data via bluetooth
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+In-Reply-To: <CAJdJm_MCdLnnmK1y7HrGSfWn2fUwxnMsovtrkCKYnsv-3nmnAw@mail.gmail.com>
+References: <1331236916-27596-1-git-send-email-anderson.lizardo@openbossa.org>
+	<20120308235332.GA19895@x220.amr.corp.intel.com>
+	<CAJdJm_MCdLnnmK1y7HrGSfWn2fUwxnMsovtrkCKYnsv-3nmnAw@mail.gmail.com>
+Date: Wed, 14 Mar 2012 10:45:38 -0400
+Message-ID: <CAJdJm_MHwo74PjT4XZovAignTxrEkR_USZqcQBRqTCa3bYYCkA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] attrib: Fix memory leak on watcher exit
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
 
-At first: Sorry for my bad english, it's not my native language. So i 
-wrote my problem in german and english.
+On Thu, Mar 8, 2012 at 10:32 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Johan,
+>
+> On Thu, Mar 8, 2012 at 7:53 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> Hi Lizardo,
+>>
+>> On Thu, Mar 08, 2012, Anderson Lizardo wrote:
+>>> The "destroy" callback of g_dbus_add_disconnect_watch() is actually
+>>> never called, therefore the watcher data should be freed on
+>>> watcher_exit().
+>>
+>> Wouldn't it make more sense to fix GDBus so that the destroy callback
+>> *is* called than to work around it like this?
+>
+> No other g_dbus_add_disconnect_watch() callers (besides this and LE
+> thermometer code which is also leaking and for which I have a patch as
+> well) use destroy callback. To me it seemed it was a known fact that
+> this parameter is not implemented in gdbus code, so that's why I went
+> this route.
+>
+> If you prefer that I implement this destroy functionality, when do you
+> think it should be called? Only when the watch is removed?
+>
+> Personally, I think it is better to simply remove this argument from
+> g_dbus_add_disconnect_watch(), if that is allowed. The caller usually
+> knows better when to "destroy" its own allocated resources (which may
+> explain why most users did not try to use this parameter?). What do
+> you think?
 
-My problem refers to bluez. I didn't got useful hits on Google, IRC 
-didnt help and the only answer i got in a forum was: "there are not many 
-people who are familiar with that". So i hope you can help me.
+Any comments?
 
-My problem:
-After installing the latest bluez, i connected two gentoo-PC's (v2.1.6) 
-via two bluetooth-dongles (BT3.0).
-PC2:# rfcomm listen 0 1
-PC1:# rfcomm connect 0 <bluetooth-adress> 1
-This works fine.
+Maybe we can fix the memory leaks now and solve the gdbus API issue later?
 
-But now, when i try to send some data:
-PC2:# cat /dev/rfcomm0
-PC1:# echo "test" > /dev/rfcomm0
-it looks like this on the screen of PC2:
-"^J^J^J^J^^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^test^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J" 
-
-[and many more rows]
-
-So i think it's an encrypting problem, but i really don't know how to 
-solve it!
-i opened /etc/bluetooth/network.conf and uncommented
-DisableSecurity=true
-but that didn't changed my problem.
-I also tried
-# hciconfig hci0 nosecmgr
-but this command didn't work.
-
-So how can i disable the Security for not getting those cryptic symbols 
-(^J^J^J^J^...) ? I really hope you can help me.
-
-Best regards,
-Steffen Becker
-
-----------------------------------------------------------------------------
-
-Hallo,
-
-ich habe ein Problem beim Umgang mit bluez. Ich habe bereits Google 
-benutzt, IRC aufgesucht und in Foren gepostet, aber ich habe keine 
-hilfreichen Informationen bekommen. Lediglich die Antwort: "Es gibt 
-nicht viele Leute die sich damit auskennen".
-
-Zu meinem Problem:
-Ich habe zwei baugleiche Gentoo-Rechner(v2.1.6) mit je einem 
-Bluetooth-Dongle(BT3.0) und das neueste bleuz installiert. Diese 
-funktionieren soweit wunderbar. Die Verbindungsherstellung klappt ohne 
-Probleme:
-PC2:# rfcomm listen 0 1
-PC1:# rfcomm connect 0 <bluetooth-adress> 1
-
-Wenn ich aber nun über ">" Daten senden will passiert folgendes:
-PC2:# cat /dev/rfcomm0
-PC1:# echo "test" > /dev/rfcomm0
-dann erscheint auf dem Bildschirm von PC2 dieses:
-"^J^J^J^J^^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^test^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J" 
-
-[und viele weitere solcher Zeilen]
-
-Ich vermute, dass es sich um ein Verschlüsselungsproblem handelt.
-Dazu habe ich die /etc/bluetooth/network.conf geöffnet und folgende 
-Zeile gesetzt (welche standardmäßig auskommentiert war):
-DisableSecurity=true
-Das hat leider nichts geändert.
-Ich habe auch versucht mit dem Befehl
-# hciconfig hci0 nosecmgr
-die Sicherheit zu deaktivieren, aber bei diesem Befehl ist gar nichts 
-passiert, da ich hier auch nicht herausgefunden habe wie die genaue 
-Syntax lautet.
-
-Ich hoffe, Sie können mir hierbei helfen. Ist das Erscheinen der 
-kryptischen Zeichen (^J^J^J^J^...) wirklich auf eine 
-Verschlüsselungseinstellung zurückzuführen? Und wenn ja, wie kanndagegen 
-vorgehen?
-
-Mit freundlichen Grüßen,
-Steffen Becker
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
