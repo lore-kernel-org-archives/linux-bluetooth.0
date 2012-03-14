@@ -1,38 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 14 Mar 2012 12:25:43 +0100
+From: Johan Hovold <jhovold@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, David Herrmann <dh.herrmann@googlemail.com>,
+	Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 0/3] bluetooth: bug fixes for 3.3
+Message-ID: <20120314112543.GA5136@localhost>
+References: <1331307806-21761-1-git-send-email-jhovold@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1331723767-21436-1-git-send-email-chen.ganir@ti.com>
-References: <1331723767-21436-1-git-send-email-chen.ganir@ti.com>
-Date: Wed, 14 Mar 2012 07:31:18 -0400
-Message-ID: <CAJdJm_N854Z05+jDhvS-xjgiJhZEpRBjqqfRe8Z-+o38=X56AA@mail.gmail.com>
-Subject: Re: [PATCH v3 0/3] GATT: Change the way GATT Plugins are enabled/disabled
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: chen.ganir@ti.com
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1331307806-21761-1-git-send-email-jhovold@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+Hi Marcel and Gustavo,
 
-On Wed, Mar 14, 2012 at 7:16 AM,  <chen.ganir@ti.com> wrote:
-> From: Chen Ganir <chen.ganir@ti.com>
->
-> This patch set is a result of the discussion on the #bluez channel.
->
-> Consolidate the --enable_<profile> for gatt profiles into a single
-> switch, called --enable_gatt.
->
-> In addition, modify the AttributeServer propery in the main.conf to
-> EnableGatt option (default=false) and make sure all GATT plugins query
-> this option before trying to load (in the _init function of the
-> plugin)
->
-> This is v3 of the patch set - fixed as suggested on the mailing list.
+On Fri, Mar 09, 2012 at 04:43:23PM +0100, Johan Hovold wrote:
+> This is a revised series which also contains a minimal fix to the memory leak
+> discovered by David Hermann upon which the first NULL-pointer-dereference fix
+> also depends.
+> 
+> These patches need to get to Linus ASAP as the problems are present in 3.3-rc6
+> as well as earlier kernels and thus should be backported to the stable trees as
+> well.
 
-Looks good to me.
+Any chance to get these into 3.3? Otherwise, is it possible to rebase
+bluetooth-next on top of these so that Greg can get them into 3.3.1 (and
+the other stable trees) once bluetooth-next is merged?
 
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+All three bugs can be used to crash any kernel with HCI-UART support and
+can probably be used for exploits as they are extremely easy to trigger
+reliably.
+
+Thanks,
+Johan
