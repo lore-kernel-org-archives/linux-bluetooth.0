@@ -1,44 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJdJm_MA24vaSzBeT6YS5-htYMjfszNmULrAtvPQgC=1LQLj-A@mail.gmail.com>
-References: <1331215032-27695-1-git-send-email-arik@wizery.com>
- <1331215032-27695-7-git-send-email-arik@wizery.com> <CAJdJm_MA24vaSzBeT6YS5-htYMjfszNmULrAtvPQgC=1LQLj-A@mail.gmail.com>
-From: Arik Nemtsov <arik@wizery.com>
-Date: Wed, 14 Mar 2012 22:54:40 +0200
-Message-ID: <CA+XVXfe+63UzYnutGFK7ARBOR6Zmu+Qcz=O=hrjThTYYU4=jDQ@mail.gmail.com>
-Subject: Re: [PATCH 6/8] proximity: link loss: implement link loss server
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1331749014.14217.112.camel@aeonflux>
+Subject: Re: [PATCH 0/3] bluetooth: bug fixes for 3.3
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hovold <jhovold@gmail.com>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	David Herrmann <dh.herrmann@googlemail.com>,
+	Greg KH <gregkh@linuxfoundation.org>
+Date: Wed, 14 Mar 2012 11:16:54 -0700
+In-Reply-To: <20120314112543.GA5136@localhost>
+References: <1331307806-21761-1-git-send-email-jhovold@gmail.com>
+	 <20120314112543.GA5136@localhost>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey Anderson,
+Hi Johan,
 
-On Wed, Mar 14, 2012 at 15:09, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
->> +       lladapter->watch = g_dbus_add_signal_watch(lladapter->conn,
->> +                               BLUEZ_SERVICE, NULL, DEVICE_INTERFACE,
->> +                               "DisconnectRequested", handle_local_disconnect,
->> +                               lladapter, NULL);
->
-> Does this also work if the device is removed locally with:
->
-> * test-device remove ?
-> * when bluez is shutting down?
-> * user disables the adapter locally?
+> > This is a revised series which also contains a minimal fix to the memory leak
+> > discovered by David Hermann upon which the first NULL-pointer-dereference fix
+> > also depends.
+> > 
+> > These patches need to get to Linus ASAP as the problems are present in 3.3-rc6
+> > as well as earlier kernels and thus should be backported to the stable trees as
+> > well.
+> 
+> Any chance to get these into 3.3? Otherwise, is it possible to rebase
+> bluetooth-next on top of these so that Greg can get them into 3.3.1 (and
+> the other stable trees) once bluetooth-next is merged?
+> 
+> All three bugs can be used to crash any kernel with HCI-UART support and
+> can probably be used for exploits as they are extremely easy to trigger
+> reliably.
 
-test-device should work - it uses Device.Disconnect(), which is
-precisely the function that emits this signal.
-When bluez or the adapter is shutdown the unregister_link_loss()
-function is called, where we clear everything anyway.
+only if you have access to the TTY device node in the first place. If
+you do not have access to that device node, you can not crash the
+kernel.
 
->
-> Also, listening to a d-bus signal of the process itself looks strange.
-> Did you try the device_add_disconnect_watch() call instead?
+Can you resend a clean set of patches for bluetooth-next and once we
+have that merged, we can talk on how to backport this to 3.3 and also
+-stable.
 
-Actually I wasn't aware of device_add_disconnect_watch() at the time.
-It does look cleaner. I'll rewrite this part.
+Regards
 
-Thanks,
-Arik
+Marcel
+
+
