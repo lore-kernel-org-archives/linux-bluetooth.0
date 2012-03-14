@@ -1,38 +1,204 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 14 Mar 2012 12:25:43 +0100
-From: Johan Hovold <jhovold@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, David Herrmann <dh.herrmann@googlemail.com>,
-	Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 0/3] bluetooth: bug fixes for 3.3
-Message-ID: <20120314112543.GA5136@localhost>
-References: <1331307806-21761-1-git-send-email-jhovold@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1331307806-21761-1-git-send-email-jhovold@gmail.com>
+From: chen.ganir@ti.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Chen Ganir <chen.ganir@ti.com>
+Subject: [PATCH v3 3/3] GATT: Profile support for EnableGatt
+Date: Wed, 14 Mar 2012 13:16:07 +0200
+Message-Id: <1331723767-21436-4-git-send-email-chen.ganir@ti.com>
+In-Reply-To: <1331723767-21436-1-git-send-email-chen.ganir@ti.com>
+References: <1331723767-21436-1-git-send-email-chen.ganir@ti.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel and Gustavo,
+From: Chen Ganir <chen.ganir@ti.com>
 
-On Fri, Mar 09, 2012 at 04:43:23PM +0100, Johan Hovold wrote:
-> This is a revised series which also contains a minimal fix to the memory leak
-> discovered by David Hermann upon which the first NULL-pointer-dereference fix
-> also depends.
-> 
-> These patches need to get to Linus ASAP as the problems are present in 3.3-rc6
-> as well as earlier kernels and thus should be backported to the stable trees as
-> well.
+Added support for the EnableGatt for all GATT profiles.
+---
+ alert/main.c           |    5 +++--
+ plugins/gatt-example.c |    2 +-
+ proximity/main.c       |   10 +++++++++-
+ proximity/reporter.c   |    5 +++--
+ src/main.conf          |    5 ++---
+ thermometer/main.c     |   11 +++++++++++
+ time/main.c            |    5 +++--
+ 7 files changed, 32 insertions(+), 11 deletions(-)
 
-Any chance to get these into 3.3? Otherwise, is it possible to rebase
-bluetooth-next on top of these so that Greg can get them into 3.3.1 (and
-the other stable trees) once bluetooth-next is merged?
+diff --git a/alert/main.c b/alert/main.c
+index 6e2e058..ec4ab6d 100644
+--- a/alert/main.c
++++ b/alert/main.c
+@@ -28,6 +28,7 @@
+ 
+ #include <stdint.h>
+ #include <glib.h>
++#include <errno.h>
+ 
+ #include "plugin.h"
+ #include "hcid.h"
+@@ -37,8 +38,8 @@
+ static int alert_init(void)
+ {
+ 	if (!main_opts.gatt_enabled) {
+-		DBG("Attribute server is disabled");
+-		return -1;
++		DBG("GATT is disabled");
++		return -ENOTSUP;
+ 	}
+ 
+ 	return alert_server_init();
+diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
+index 165d218..58b222c 100644
+--- a/plugins/gatt-example.c
++++ b/plugins/gatt-example.c
+@@ -561,7 +561,7 @@ static struct btd_adapter_driver gatt_example_adapter_driver = {
+ static int gatt_example_init(void)
+ {
+ 	if (!main_opts.gatt_enabled) {
+-		DBG("Attribute server is disabled");
++		DBG("GATT is disabled");
+ 		return -ENOTSUP;
+ 	}
+ 
+diff --git a/proximity/main.c b/proximity/main.c
+index 5f0fc12..3d5d9b2 100644
+--- a/proximity/main.c
++++ b/proximity/main.c
+@@ -27,13 +27,14 @@
+ #endif
+ 
+ #include <errno.h>
+-
++#include <stdint.h>
+ #include <glib.h>
+ #include <gdbus.h>
+ 
+ #include "log.h"
+ #include "plugin.h"
+ #include "manager.h"
++#include "hcid.h"
+ 
+ static DBusConnection *connection = NULL;
+ static GKeyFile *config = NULL;
+@@ -59,6 +60,10 @@ static GKeyFile *open_config_file(const char *file)
+ 
+ static int proximity_init(void)
+ {
++	if (!main_opts.gatt_enabled) {
++		DBG("GATT is disabled");
++		return -ENOTSUP;
++	}
+ 
+ 	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
+ 	if (connection == NULL)
+@@ -76,6 +81,9 @@ static int proximity_init(void)
+ 
+ static void proximity_exit(void)
+ {
++	if (!main_opts.gatt_enabled)
++		return;
++
+ 	if (config)
+ 		g_key_file_free(config);
+ 
+diff --git a/proximity/reporter.c b/proximity/reporter.c
+index d4a4c96..74e6297 100644
+--- a/proximity/reporter.c
++++ b/proximity/reporter.c
+@@ -29,6 +29,7 @@
+ #include <glib.h>
+ #include <bluetooth/uuid.h>
+ #include <adapter.h>
++#include <errno.h>
+ 
+ #include "log.h"
+ 
+@@ -173,8 +174,8 @@ static void register_immediate_alert(struct btd_adapter *adapter)
+ int reporter_init(struct btd_adapter *adapter)
+ {
+ 	if (!main_opts.gatt_enabled) {
+-		DBG("Attribute server is disabled");
+-		return -1;
++		DBG("GATT is disabled");
++		return -ENOTSUP;
+ 	}
+ 
+ 	DBG("Proximity Reporter for adapter %p", adapter);
+diff --git a/src/main.conf b/src/main.conf
+index 321f622..469c077 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -62,6 +62,5 @@ NameResolving = true
+ # that they were created for.
+ DebugKeys = false
+ 
+-# Enable the GATT Attribute Server. Default is false, because it is only
+-# useful for testing.
+-AttributeServer = false
++# Enable the GATT functionality. Default is false
++EnableGatt = false
+diff --git a/thermometer/main.c b/thermometer/main.c
+index 471764e..4447b52 100644
+--- a/thermometer/main.c
++++ b/thermometer/main.c
+@@ -24,17 +24,25 @@
+ #include <config.h>
+ #endif
+ 
++#include <stdint.h>
+ #include <glib.h>
+ #include <errno.h>
+ #include <gdbus.h>
+ 
+ #include "plugin.h"
+ #include "manager.h"
++#include "hcid.h"
++#include "log.h"
+ 
+ static DBusConnection *connection = NULL;
+ 
+ static int thermometer_init(void)
+ {
++	if (!main_opts.gatt_enabled) {
++		DBG("GATT is disabled");
++		return -ENOTSUP;
++	}
++
+ 	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
+ 	if (connection == NULL)
+ 		return -EIO;
+@@ -49,6 +57,9 @@ static int thermometer_init(void)
+ 
+ static void thermometer_exit(void)
+ {
++	if (!main_opts.gatt_enabled)
++		return;
++
+ 	thermometer_manager_exit();
+ 
+ 	dbus_connection_unref(connection);
+diff --git a/time/main.c b/time/main.c
+index cbcdb0d..d876725 100644
+--- a/time/main.c
++++ b/time/main.c
+@@ -28,6 +28,7 @@
+ 
+ #include <stdint.h>
+ #include <glib.h>
++#include <errno.h>
+ 
+ #include "plugin.h"
+ #include "hcid.h"
+@@ -37,8 +38,8 @@
+ static int time_init(void)
+ {
+ 	if (!main_opts.gatt_enabled) {
+-		DBG("Attribute server is disabled");
+-		return -1;
++		DBG("GATT is disabled");
++		return -ENOTSUP;
+ 	}
+ 
+ 	return time_server_init();
+-- 
+1.7.4.1
 
-All three bugs can be used to crash any kernel with HCI-UART support and
-can probably be used for exploits as they are extremely easy to trigger
-reliably.
-
-Thanks,
-Johan
