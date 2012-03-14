@@ -1,48 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1331749014.14217.112.camel@aeonflux>
-Subject: Re: [PATCH 0/3] bluetooth: bug fixes for 3.3
+Message-ID: <1331747344.14217.105.camel@aeonflux>
+Subject: Re: Encrypting problem while sending data via bluetooth
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hovold <jhovold@gmail.com>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	David Herrmann <dh.herrmann@googlemail.com>,
-	Greg KH <gregkh@linuxfoundation.org>
-Date: Wed, 14 Mar 2012 11:16:54 -0700
-In-Reply-To: <20120314112543.GA5136@localhost>
-References: <1331307806-21761-1-git-send-email-jhovold@gmail.com>
-	 <20120314112543.GA5136@localhost>
+To: Steffen Becker <steffen.becker@tu-ilmenau.de>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 14 Mar 2012 10:49:04 -0700
+In-Reply-To: <4F60B259.5040800@tu-ilmenau.de>
+References: <4F60B259.5040800@tu-ilmenau.de>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Steffan,
 
-> > This is a revised series which also contains a minimal fix to the memory leak
-> > discovered by David Hermann upon which the first NULL-pointer-dereference fix
-> > also depends.
-> > 
-> > These patches need to get to Linus ASAP as the problems are present in 3.3-rc6
-> > as well as earlier kernels and thus should be backported to the stable trees as
-> > well.
+> At first: Sorry for my bad english, it's not my native language. So i 
+> wrote my problem in german and english.
 > 
-> Any chance to get these into 3.3? Otherwise, is it possible to rebase
-> bluetooth-next on top of these so that Greg can get them into 3.3.1 (and
-> the other stable trees) once bluetooth-next is merged?
+> My problem refers to bluez. I didn't got useful hits on Google, IRC 
+> didnt help and the only answer i got in a forum was: "there are not many 
+> people who are familiar with that". So i hope you can help me.
 > 
-> All three bugs can be used to crash any kernel with HCI-UART support and
-> can probably be used for exploits as they are extremely easy to trigger
-> reliably.
+> My problem:
+> After installing the latest bluez, i connected two gentoo-PC's (v2.1.6) 
+> via two bluetooth-dongles (BT3.0).
+> PC2:# rfcomm listen 0 1
+> PC1:# rfcomm connect 0 <bluetooth-adress> 1
+> This works fine.
+> 
+> But now, when i try to send some data:
+> PC2:# cat /dev/rfcomm0
+> PC1:# echo "test" > /dev/rfcomm0
+> it looks like this on the screen of PC2:
+> "^J^J^J^J^^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^test^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J" 
 
-only if you have access to the TTY device node in the first place. If
-you do not have access to that device node, you can not crash the
-kernel.
-
-Can you resend a clean set of patches for bluetooth-next and once we
-have that merged, we can talk on how to backport this to 3.3 and also
--stable.
+it has nothing to do with encryption. These are TTY terminal settings.
+That is why rfcomm tool has a -r (raw TTY mode) switch. And that switch
+is documented in manpage.
 
 Regards
 
