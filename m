@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: chen.ganir@ti.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH 3/3] GATT: Profile support for EnableGatt
-Date: Wed, 14 Mar 2012 10:07:13 +0200
-Message-Id: <1331712433-27930-4-git-send-email-chen.ganir@ti.com>
+Subject: [PATCH 2/3] GATT: Rename Attribute Server switch
+Date: Wed, 14 Mar 2012 10:07:12 +0200
+Message-Id: <1331712433-27930-3-git-send-email-chen.ganir@ti.com>
 In-Reply-To: <1331712433-27930-1-git-send-email-chen.ganir@ti.com>
 References: <1331712433-27930-1-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,169 +12,168 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chen Ganir <chen.ganir@ti.com>
 
-Added support for the EnableGatt for all GATT profiles.
+Rename the AttribteServer main.conf option to EnableGatt, and
+change it's purpose to enable/disable all GATT related activity.
 ---
  alert/main.c           |    4 ++--
- plugins/gatt-example.c |    2 +-
- proximity/main.c       |   10 +++++++++-
- proximity/reporter.c   |    4 ++--
- src/main.conf          |    5 ++---
- thermometer/main.c     |   11 +++++++++++
+ plugins/gatt-example.c |    4 ++--
+ proximity/reporter.c   |    2 +-
+ src/adapter.c          |    8 ++++----
+ src/hcid.h             |    2 +-
+ src/main.c             |    4 ++--
  time/main.c            |    4 ++--
- 7 files changed, 29 insertions(+), 11 deletions(-)
+ 7 files changed, 14 insertions(+), 14 deletions(-)
 
 diff --git a/alert/main.c b/alert/main.c
-index 6e2e058..fe6fe8b 100644
+index 25100e9..6e2e058 100644
 --- a/alert/main.c
 +++ b/alert/main.c
-@@ -37,8 +37,8 @@
+@@ -36,7 +36,7 @@
+ 
  static int alert_init(void)
  {
- 	if (!main_opts.gatt_enabled) {
--		DBG("Attribute server is disabled");
--		return -1;
-+		DBG("GATT is disabled !");
-+		return -ENOTSUP;
+-	if (!main_opts.attrib_server) {
++	if (!main_opts.gatt_enabled) {
+ 		DBG("Attribute server is disabled");
+ 		return -1;
  	}
+@@ -46,7 +46,7 @@ static int alert_init(void)
  
- 	return alert_server_init();
+ static void alert_exit(void)
+ {
+-	if (!main_opts.attrib_server)
++	if (!main_opts.gatt_enabled)
+ 		return;
+ 
+ 	alert_server_exit();
 diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
-index 165d218..e4e2c6a 100644
+index f026761..165d218 100644
 --- a/plugins/gatt-example.c
 +++ b/plugins/gatt-example.c
-@@ -561,7 +561,7 @@ static struct btd_adapter_driver gatt_example_adapter_driver = {
+@@ -560,7 +560,7 @@ static struct btd_adapter_driver gatt_example_adapter_driver = {
+ 
  static int gatt_example_init(void)
  {
- 	if (!main_opts.gatt_enabled) {
--		DBG("Attribute server is disabled");
-+		DBG("GATT is disabled !");
+-	if (!main_opts.attrib_server) {
++	if (!main_opts.gatt_enabled) {
+ 		DBG("Attribute server is disabled");
  		return -ENOTSUP;
  	}
+@@ -570,7 +570,7 @@ static int gatt_example_init(void)
  
-diff --git a/proximity/main.c b/proximity/main.c
-index 5f0fc12..daca0bd 100644
---- a/proximity/main.c
-+++ b/proximity/main.c
-@@ -27,13 +27,14 @@
- #endif
- 
- #include <errno.h>
--
-+#include <stdint.h>
- #include <glib.h>
- #include <gdbus.h>
- 
- #include "log.h"
- #include "plugin.h"
- #include "manager.h"
-+#include "hcid.h"
- 
- static DBusConnection *connection = NULL;
- static GKeyFile *config = NULL;
-@@ -59,6 +60,10 @@ static GKeyFile *open_config_file(const char *file)
- 
- static int proximity_init(void)
+ static void gatt_example_exit(void)
  {
-+	if (!main_opts.gatt_enabled) {
-+		DBG("GATT is disabled !");
-+		return -ENOTSUP;
-+	}
- 
- 	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
- 	if (connection == NULL)
-@@ -76,6 +81,9 @@ static int proximity_init(void)
- 
- static void proximity_exit(void)
- {
+-	if (!main_opts.attrib_server)
 +	if (!main_opts.gatt_enabled)
-+		return;
-+
- 	if (config)
- 		g_key_file_free(config);
+ 		return;
  
+ 	btd_unregister_adapter_driver(&gatt_example_adapter_driver);
 diff --git a/proximity/reporter.c b/proximity/reporter.c
-index d4a4c96..d458327 100644
+index 9777574..d4a4c96 100644
 --- a/proximity/reporter.c
 +++ b/proximity/reporter.c
-@@ -173,8 +173,8 @@ static void register_immediate_alert(struct btd_adapter *adapter)
+@@ -172,7 +172,7 @@ static void register_immediate_alert(struct btd_adapter *adapter)
+ 
  int reporter_init(struct btd_adapter *adapter)
  {
- 	if (!main_opts.gatt_enabled) {
--		DBG("Attribute server is disabled");
--		return -1;
-+		DBG("GATT is disabled !");
-+		return -ENOTSUP;
- 	}
- 
- 	DBG("Proximity Reporter for adapter %p", adapter);
-diff --git a/src/main.conf b/src/main.conf
-index 321f622..469c077 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -62,6 +62,5 @@ NameResolving = true
- # that they were created for.
- DebugKeys = false
- 
--# Enable the GATT Attribute Server. Default is false, because it is only
--# useful for testing.
--AttributeServer = false
-+# Enable the GATT functionality. Default is false
-+EnableGatt = false
-diff --git a/thermometer/main.c b/thermometer/main.c
-index 471764e..db9aae7 100644
---- a/thermometer/main.c
-+++ b/thermometer/main.c
-@@ -24,17 +24,25 @@
- #include <config.h>
- #endif
- 
-+#include <stdint.h>
- #include <glib.h>
- #include <errno.h>
- #include <gdbus.h>
- 
- #include "plugin.h"
- #include "manager.h"
-+#include "hcid.h"
-+#include "log.h"
- 
- static DBusConnection *connection = NULL;
- 
- static int thermometer_init(void)
- {
+-	if (!main_opts.attrib_server) {
 +	if (!main_opts.gatt_enabled) {
-+		DBG("GATT is disabled !");
-+		return -ENOTSUP;
-+	}
-+
- 	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
- 	if (connection == NULL)
- 		return -EIO;
-@@ -49,6 +57,9 @@ static int thermometer_init(void)
+ 		DBG("Attribute server is disabled");
+ 		return -1;
+ 	}
+diff --git a/src/adapter.c b/src/adapter.c
+index acb845e..13f3683 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -698,7 +698,7 @@ void btd_adapter_class_changed(struct btd_adapter *adapter, uint32_t new_class)
  
- static void thermometer_exit(void)
- {
-+	if (!main_opts.gatt_enabled)
-+		return;
-+
- 	thermometer_manager_exit();
+ 	adapter->dev_class = new_class;
  
- 	dbus_connection_unref(connection);
+-	if (main_opts.attrib_server) {
++	if (main_opts.gatt_enabled) {
+ 		/* Removes service class */
+ 		class[1] = class[1] & 0x1f;
+ 		attrib_gap_set(adapter, GATT_CHARAC_APPEARANCE, class, 2);
+@@ -722,7 +722,7 @@ void adapter_name_changed(struct btd_adapter *adapter, const char *name)
+ 					ADAPTER_INTERFACE, "Name",
+ 					DBUS_TYPE_STRING, &name);
+ 
+-	if (main_opts.attrib_server)
++	if (main_opts.gatt_enabled)
+ 		attrib_gap_set(adapter, GATT_CHARAC_DEVICE_NAME,
+ 				(const uint8_t *) name, strlen(name));
+ }
+@@ -2407,7 +2407,7 @@ gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
+ 
+ 	sdp_init_services_list(&adapter->bdaddr);
+ 
+-	if (main_opts.attrib_server)
++	if (main_opts.gatt_enabled)
+ 		btd_adapter_gatt_server_start(adapter);
+ 
+ 	load_drivers(adapter);
+@@ -2469,7 +2469,7 @@ void adapter_remove(struct btd_adapter *adapter)
+ 	g_slist_free(adapter->devices);
+ 
+ 	unload_drivers(adapter);
+-	if (main_opts.attrib_server)
++	if (main_opts.gatt_enabled)
+ 		btd_adapter_gatt_server_stop(adapter);
+ 
+ 	g_slist_free(adapter->pin_callbacks);
+diff --git a/src/hcid.h b/src/hcid.h
+index 1987b7d..16a8ded 100644
+--- a/src/hcid.h
++++ b/src/hcid.h
+@@ -38,7 +38,7 @@ struct main_opts {
+ 	gboolean	reverse_sdp;
+ 	gboolean	name_resolv;
+ 	gboolean	debug_keys;
+-	gboolean	attrib_server;
++	gboolean	gatt_enabled;
+ 
+ 	uint8_t		mode;
+ 	uint8_t		discov_interval;
+diff --git a/src/main.c b/src/main.c
+index 74ec3fa..a3e8c84 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -223,11 +223,11 @@ static void parse_config(GKeyFile *config)
+ 		main_opts.debug_keys = boolean;
+ 
+ 	boolean = g_key_file_get_boolean(config, "General",
+-						"AttributeServer", &err);
++						"EnableGatt", &err);
+ 	if (err)
+ 		g_clear_error(&err);
+ 	else
+-		main_opts.attrib_server = boolean;
++		main_opts.gatt_enabled = boolean;
+ 
+ 	main_opts.link_mode = HCI_LM_ACCEPT;
+ 
 diff --git a/time/main.c b/time/main.c
-index cbcdb0d..5222251 100644
+index a4de0fe..cbcdb0d 100644
 --- a/time/main.c
 +++ b/time/main.c
-@@ -37,8 +37,8 @@
+@@ -36,7 +36,7 @@
+ 
  static int time_init(void)
  {
- 	if (!main_opts.gatt_enabled) {
--		DBG("Attribute server is disabled");
--		return -1;
-+		DBG("GATT is disabled !");
-+		return -ENOTSUP;
+-	if (!main_opts.attrib_server) {
++	if (!main_opts.gatt_enabled) {
+ 		DBG("Attribute server is disabled");
+ 		return -1;
  	}
+@@ -46,7 +46,7 @@ static int time_init(void)
  
- 	return time_server_init();
+ static void time_exit(void)
+ {
+-	if (!main_opts.attrib_server)
++	if (!main_opts.gatt_enabled)
+ 		return;
+ 
+ 	time_server_exit();
 -- 
 1.7.4.1
 
