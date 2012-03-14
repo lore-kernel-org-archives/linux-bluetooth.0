@@ -2,48 +2,123 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd 5/6] MAP: Initial outgoing parameters support
-Date: Wed, 14 Mar 2012 23:54:32 +0100
-Message-Id: <1331765673-12860-5-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH obexd 4/6] MAP: Add implementation of map_ap_encode()
+Date: Wed, 14 Mar 2012 23:54:31 +0100
+Message-Id: <1331765673-12860-4-git-send-email-lkslawek@gmail.com>
 In-Reply-To: <1331765673-12860-1-git-send-email-lkslawek@gmail.com>
 References: <1331765673-12860-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- plugins/mas.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+ src/map_ap.c |   91 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 89 insertions(+), 2 deletions(-)
 
-diff --git a/plugins/mas.c b/plugins/mas.c
-index f6d4799..ea2b4b2 100644
---- a/plugins/mas.c
-+++ b/plugins/mas.c
-@@ -110,6 +110,7 @@ struct mas_session {
- 	gboolean nth_call;
- 	GString *buffer;
- 	map_ap_t *inparams;
-+	map_ap_t *outparams;
- };
- 
- static const uint8_t MAS_TARGET[TARGET_SIZE] = {
-@@ -131,6 +132,8 @@ static int get_params(struct obex_session *os, struct mas_session *mas)
- 		return -EBADR;
- 	}
- 
-+	mas->outparams = map_ap_new();
-+
- 	return 0;
+diff --git a/src/map_ap.c b/src/map_ap.c
+index 1f56748..c852184 100644
+--- a/src/map_ap.c
++++ b/src/map_ap.c
+@@ -237,11 +237,98 @@ map_ap_t *map_ap_decode(const uint8_t *buffer, size_t length)
+ 	return ap;
  }
  
-@@ -143,6 +146,8 @@ static void reset_request(struct mas_session *mas)
++static void ap_encode_u8(GString *buf, struct ap_entry *entry)
++{
++	struct obex_ap_header *hdr;
++
++	hdr = (struct obex_ap_header *)buf->str + buf->len;
++	g_string_set_size(buf, buf->len + sizeof(*hdr) + 1);
++
++	hdr->tag = entry->tag;
++	hdr->len = 1;
++	hdr->val[0] = entry->val.u8;
++}
++
++static void ap_encode_u16(GString *buf, struct ap_entry *entry)
++{
++	struct obex_ap_header *hdr;
++	uint16_t val;
++
++	hdr = (struct obex_ap_header *)buf->str + buf->len;
++
++	g_string_set_size(buf, buf->len + sizeof(*hdr) + 2);
++
++	hdr->tag = entry->tag;
++	hdr->len = 2;
++
++	val = GUINT16_TO_BE(entry->val.u16);
++	memcpy(hdr->val, &val, sizeof(val));
++}
++
++static void ap_encode_u32(GString *buf, struct ap_entry *entry)
++{
++	uint32_t val;
++	struct obex_ap_header *hdr;
++
++	hdr = (struct obex_ap_header *)buf->str + buf->len;
++	g_string_set_size(buf, buf->len + sizeof(*hdr) + 4);
++
++	hdr->tag = entry->tag;
++	hdr->len = 4;
++
++	val = GUINT32_TO_BE(entry->val.u16);
++	memcpy(hdr->val, &val, sizeof(val));
++}
++
++static void ap_encode_str(GString *buf, struct ap_entry *entry)
++{
++	size_t len;
++	struct obex_ap_header *hdr;
++
++	hdr = (struct obex_ap_header *)buf->str + buf->len;
++	len = strlen(entry->val.str);
++	g_string_set_size(buf, buf->len + sizeof(*hdr) + len);
++
++	hdr->tag = entry->tag;
++	hdr->len = len;
++
++	memcpy(hdr->val, entry->val.str, len);
++}
++
+ uint8_t *map_ap_encode(map_ap_t *ap, size_t *length)
+ {
+-	*length = 0;
++	GString *buf;
++	GHashTableIter iter;
++	gpointer key, value;
++	struct ap_entry *entry;
++	int offset;
++
++	buf = g_string_new("");
++	g_hash_table_iter_init(&iter, ap);
++
++	while (g_hash_table_iter_next(&iter, &key, &value)) {
++		entry = (struct ap_entry *)value;
++		offset = find_ap_def_offset(entry->tag);
++
++		switch (ap_defs[offset].type) {
++		case APT_UINT8:
++			ap_encode_u8(buf, entry);
++			break;
++		case APT_UINT16:
++			ap_encode_u16(buf, entry);
++			break;
++		case APT_UINT32:
++			ap_encode_u32(buf, entry);
++			break;
++		case APT_STR:
++			ap_encode_str(buf, entry);
++			break;
++		}
++	}
++
++	*length = buf->len;
  
- 	map_ap_free(mas->inparams);
- 	mas->inparams = NULL;
-+	map_ap_free(mas->outparams);
-+	mas->outparams = NULL;
+-	return NULL;
++	return (uint8_t *)g_string_free(buf, FALSE);
+ }
  
- 	mas->nth_call = FALSE;
- 	mas->finished = FALSE;
+ gboolean map_ap_get_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t *val)
 -- 
 1.7.5.1
 
