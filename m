@@ -1,57 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 14 Mar 2012 15:58:41 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd v4 1/3] MAP/dummy: Actual code for folder listing
+ retrieval
+Message-ID: <20120314135841.GA25780@x220>
+References: <1331731791-26685-1-git-send-email-lkslawek@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_MCdLnnmK1y7HrGSfWn2fUwxnMsovtrkCKYnsv-3nmnAw@mail.gmail.com>
-References: <1331236916-27596-1-git-send-email-anderson.lizardo@openbossa.org>
-	<20120308235332.GA19895@x220.amr.corp.intel.com>
-	<CAJdJm_MCdLnnmK1y7HrGSfWn2fUwxnMsovtrkCKYnsv-3nmnAw@mail.gmail.com>
-Date: Wed, 14 Mar 2012 10:45:38 -0400
-Message-ID: <CAJdJm_MHwo74PjT4XZovAignTxrEkR_USZqcQBRqTCa3bYYCkA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] attrib: Fix memory leak on watcher exit
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1331731791-26685-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Slawek,
 
-On Thu, Mar 8, 2012 at 10:32 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Johan,
->
-> On Thu, Mar 8, 2012 at 7:53 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->> Hi Lizardo,
->>
->> On Thu, Mar 08, 2012, Anderson Lizardo wrote:
->>> The "destroy" callback of g_dbus_add_disconnect_watch() is actually
->>> never called, therefore the watcher data should be freed on
->>> watcher_exit().
->>
->> Wouldn't it make more sense to fix GDBus so that the destroy callback
->> *is* called than to work around it like this?
->
-> No other g_dbus_add_disconnect_watch() callers (besides this and LE
-> thermometer code which is also leaking and for which I have a patch as
-> well) use destroy callback. To me it seemed it was a known fact that
-> this parameter is not implemented in gdbus code, so that's why I went
-> this route.
->
-> If you prefer that I implement this destroy functionality, when do you
-> think it should be called? Only when the watch is removed?
->
-> Personally, I think it is better to simply remove this argument from
-> g_dbus_add_disconnect_watch(), if that is allowed. The caller usually
-> knows better when to "destroy" its own allocated resources (which may
-> explain why most users did not try to use this parameter?). What do
-> you think?
+On Wed, Mar 14, 2012, Slawomir Bochenski wrote:
+> ---
+>  plugins/messages-dummy.c |   63 +++++++++++++++++++++++++++++++++++++++++++++-
+>  1 files changed, 62 insertions(+), 1 deletions(-)
 
-Any comments?
+All three patches have been applied. Thanks.
 
-Maybe we can fix the memory leaks now and solve the gdbus API issue later?
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
