@@ -2,99 +2,92 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd 2/6] map_ap.c: Add implementation for map_ap_get_*
-Date: Wed, 14 Mar 2012 23:54:29 +0100
-Message-Id: <1331765673-12860-2-git-send-email-lkslawek@gmail.com>
-In-Reply-To: <1331765673-12860-1-git-send-email-lkslawek@gmail.com>
-References: <1331765673-12860-1-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH obexd 1/6] MAP: Process incoming parameters in GET/PUT
+Date: Wed, 14 Mar 2012 23:54:28 +0100
+Message-Id: <1331765673-12860-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/map_ap.c |   58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 files changed, 54 insertions(+), 4 deletions(-)
+ plugins/mas.c |   31 +++++++++++++++++++++++++++++++
+ 1 files changed, 31 insertions(+), 0 deletions(-)
 
-diff --git a/src/map_ap.c b/src/map_ap.c
-index 54e3bcf..1f56748 100644
---- a/src/map_ap.c
-+++ b/src/map_ap.c
-@@ -246,22 +246,72 @@ uint8_t *map_ap_encode(map_ap_t *ap, size_t *length)
+diff --git a/plugins/mas.c b/plugins/mas.c
+index 23b1823..8eefe5f 100644
+--- a/plugins/mas.c
++++ b/plugins/mas.c
+@@ -38,6 +38,7 @@
+ #include "mimetype.h"
+ #include "filesystem.h"
+ #include "manager.h"
++#include "map_ap.h"
  
- gboolean map_ap_get_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t *val)
+ #include "messages.h"
+ 
+@@ -108,12 +109,31 @@ struct mas_session {
+ 	gboolean finished;
+ 	gboolean nth_call;
+ 	GString *buffer;
++	map_ap_t *inparams;
+ };
+ 
+ static const uint8_t MAS_TARGET[TARGET_SIZE] = {
+ 			0xbb, 0x58, 0x2b, 0x40, 0x42, 0x0c, 0x11, 0xdb,
+ 			0xb0, 0xde, 0x08, 0x00, 0x20, 0x0c, 0x9a, 0x66  };
+ 
++static int get_params(struct obex_session *os, struct mas_session *mas)
++{
++	const uint8_t *buffer;
++	ssize_t size;
++
++	size = obex_get_apparam(os, &buffer);
++	if (size < 0)
++		size = 0;
++
++	mas->inparams = map_ap_decode(buffer, size);
++	if (mas->inparams == NULL) {
++		DBG("Error when parsing parameters!");
++		return -EBADR;
++	}
++
++	return 0;
++}
++
+ static void reset_request(struct mas_session *mas)
  {
--	return FALSE;
-+	struct ap_entry *entry;
-+	int offset = find_ap_def_offset(tag);
-+
-+	if (offset < 0 || ap_defs[offset].type != APT_UINT8)
-+		return FALSE;
-+
-+
-+	entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
-+	if (entry == NULL)
-+		return FALSE;
-+
-+	*val = entry->val.u8;
-+
-+	return TRUE;
- }
+ 	if (mas->buffer) {
+@@ -121,6 +141,9 @@ static void reset_request(struct mas_session *mas)
+ 		mas->buffer = NULL;
+ 	}
  
- gboolean map_ap_get_u16(map_ap_t *ap, enum map_ap_tag tag, uint16_t *val)
- {
--	return FALSE;
-+	struct ap_entry *entry;
-+	int offset = find_ap_def_offset(tag);
++	map_ap_free(mas->inparams);
++	mas->inparams = NULL;
 +
-+	if (offset < 0 || ap_defs[offset].type != APT_UINT16)
-+		return FALSE;
-+
-+
-+	entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
-+	if (entry == NULL)
-+		return FALSE;
-+
-+	*val = entry->val.u16;
-+
-+	return TRUE;
+ 	mas->nth_call = FALSE;
+ 	mas->finished = FALSE;
  }
+@@ -178,6 +201,10 @@ static int mas_get(struct obex_session *os, void *user_data)
+ 	if (type == NULL)
+ 		return -EBADR;
  
- gboolean map_ap_get_u32(map_ap_t *ap, enum map_ap_tag tag, uint32_t *val)
- {
--	return FALSE;
-+	struct ap_entry *entry;
-+	int offset = find_ap_def_offset(tag);
++	ret = get_params(os, mas);
++	if (ret < 0)
++		goto failed;
 +
-+	if (offset < 0 || ap_defs[offset].type != APT_UINT32)
-+		return FALSE;
-+
-+
-+	entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
-+	if (entry == NULL)
-+		return FALSE;
-+
-+	*val = entry->val.u32;
-+
-+	return TRUE;
- }
+ 	ret = obex_get_stream_start(os, name);
+ 	if (ret < 0)
+ 		goto failed;
+@@ -202,6 +229,10 @@ static int mas_put(struct obex_session *os, void *user_data)
+ 	if (type == NULL)
+ 		return -EBADR;
  
- const char *map_ap_get_string(map_ap_t *ap, enum map_ap_tag tag)
- {
--	return NULL;
-+	struct ap_entry *entry;
-+	int offset = find_ap_def_offset(tag);
++	ret = get_params(os, mas);
++	if (ret < 0)
++		goto failed;
 +
-+	if (offset < 0 || ap_defs[offset].type != APT_STR)
-+		return NULL;
-+
-+
-+	entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
-+	if (entry == NULL)
-+		return NULL;
-+
-+	return entry->val.str;
- }
- 
- gboolean map_ap_set_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t val)
+ 	ret = obex_put_stream_start(os, name);
+ 	if (ret < 0)
+ 		goto failed;
 -- 
 1.7.5.1
 
