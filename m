@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1331215032-27695-9-git-send-email-arik@wizery.com>
+In-Reply-To: <1331215032-27695-7-git-send-email-arik@wizery.com>
 References: <1331215032-27695-1-git-send-email-arik@wizery.com>
-	<1331215032-27695-9-git-send-email-arik@wizery.com>
-Date: Wed, 14 Mar 2012 09:19:34 -0400
-Message-ID: <CAJdJm_PKA2eCSHDin6WLj4xTCONuURYfMkyBAeu=T1Sd74vBwQ@mail.gmail.com>
-Subject: Re: [PATCH 8/8] proximity: reporter: implement D-Bus API
+	<1331215032-27695-7-git-send-email-arik@wizery.com>
+Date: Wed, 14 Mar 2012 09:09:39 -0400
+Message-ID: <CAJdJm_MA24vaSzBeT6YS5-htYMjfszNmULrAtvPQgC=1LQLj-A@mail.gmail.com>
+Subject: Re: [PATCH 6/8] proximity: link loss: implement link loss server
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: Arik Nemtsov <arik@wizery.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -16,62 +16,51 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi Arik,
 
 On Thu, Mar 8, 2012 at 9:57 AM, Arik Nemtsov <arik@wizery.com> wrote:
->  int reporter_init(struct btd_adapter *adapter)
->  {
-> +       struct reporter_adapter *radapter;
-> +       DBusConnection *conn;
+> +void register_link_loss(struct btd_adapter *adapter, DBusConnection *conn)
+> +{
+> +       gboolean svc_added;
+> +       bt_uuid_t uuid;
+> +       struct link_loss_adapter *lladapter;
 > +
->        if (!main_opts.attrib_server) {
->                DBG("Attribute server is disabled");
->                return -1;
->        }
->
-> -       connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
-> -       if (connection == NULL)
-> -               return -EIO;
-> -       DBG("Proximity Reporter for adapter %p", adapter);
-> +       conn = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
-> +       if (!conn)
-> +               return -1;
->
-> -       register_link_loss(adapter, connection);
-> +       radapter = g_new0(struct reporter_adapter, 1);
-> +       radapter->adapter = adapter;
-> +       radapter->conn = conn;
+> +       bt_uuid16_create(&uuid, LINK_LOSS_SVC_UUID);
 > +
-> +       register_link_loss(adapter, radapter->conn);
->        register_tx_power(adapter);
-> -       register_imm_alert(adapter, connection);
-> +       register_imm_alert(adapter, radapter->conn);
+> +       lladapter = g_new0(struct link_loss_adapter, 1);
+> +       lladapter->adapter = adapter;
+> +       lladapter->conn = dbus_connection_ref(conn);
 > +
-> +       /*
-> +        * Register watches for getting device change events. We watch
-> +        * for existing, new and removed devices.
-> +        */
-> +       radapter->watch_added = g_dbus_add_signal_watch(radapter->conn,
-> +                                       BLUEZ_SERVICE, NULL, ADAPTER_INTERFACE,
-> +                                       "DeviceAdded", handle_device_change,
-> +                                       radapter, NULL);
+> +       link_loss_adapters = g_slist_append(link_loss_adapters, lladapter);
 > +
-> +       radapter->watch_created = g_dbus_add_signal_watch(radapter->conn,
-> +                                       BLUEZ_SERVICE, NULL, ADAPTER_INTERFACE,
-> +                                       "DeviceCreated", handle_device_change,
-> +                                       radapter, NULL);
+> +       /* Link Loss Service */
+> +       svc_added = gatt_service_add(adapter,
+> +               GATT_PRIM_SVC_UUID, &uuid,
+> +               /* Alert level characteristic */
+> +               GATT_OPT_CHR_UUID, ALERT_LEVEL_CHR_UUID,
+> +               GATT_OPT_CHR_PROPS,
+> +                       ATT_CHAR_PROPER_READ | ATT_CHAR_PROPER_WRITE,
+> +               GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
+> +                       link_loss_alert_lvl_read, lladapter,
+> +               GATT_OPT_CHR_VALUE_CB, ATTRIB_WRITE,
+> +                       link_loss_alert_lvl_write, lladapter,
+> +               GATT_OPT_CHR_VALUE_GET_HANDLE,
+> +                       &lladapter->alert_lvl_value_handle,
+> +               GATT_OPT_INVALID);
 > +
-> +       radapter->watch_removed = g_dbus_add_signal_watch(radapter->conn,
-> +                                       BLUEZ_SERVICE, NULL, ADAPTER_INTERFACE,
-> +                                       "DeviceRemoved", handle_device_change,
-> +                                       radapter, NULL);
+> +       if (!svc_added)
+> +               goto err;
+> +
+> +       lladapter->watch = g_dbus_add_signal_watch(lladapter->conn,
+> +                               BLUEZ_SERVICE, NULL, DEVICE_INTERFACE,
+> +                               "DisconnectRequested", handle_local_disconnect,
+> +                               lladapter, NULL);
 
-Again, setting a watcher for BlueZ own signals is strange. Why can't
-you use a device driver like other plugins?
+Does this also work if the device is removed locally with:
 
-> +
-> +       reporter_adapters = g_slist_prepend(reporter_adapters, radapter);
-> +       DBG("Proximity Reporter for adapter %p", adapter);
->
->        return 0;
->  }
+* test-device remove ?
+* when bluez is shutting down?
+* user disables the adapter locally?
+
+Also, listening to a d-bus signal of the process itself looks strange.
+Did you try the device_add_disconnect_watch() call instead?
 
 Regards,
 -- 
