@@ -1,64 +1,137 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1331214279-27521-1-git-send-email-arik@wizery.com>
-References: <1331214279-27521-1-git-send-email-arik@wizery.com>
-Date: Wed, 14 Mar 2012 08:03:19 -0400
-Message-ID: <CAJdJm_Ph1Ax_BJUVz3UsLvzLQnA1uH5n8p=ihNc-KHuxoCVoHw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] device: don't auto-connect on disc-cb attio callback registration
+In-Reply-To: <1331725078-27485-3-git-send-email-chen.ganir@ti.com>
+References: <1331725078-27485-1-git-send-email-chen.ganir@ti.com>
+	<1331725078-27485-3-git-send-email-chen.ganir@ti.com>
+Date: Wed, 14 Mar 2012 07:55:27 -0400
+Message-ID: <CAJdJm_Nye9fDtz1QMjg+mzGYqoqKQ=ZJADgDCVEyBAf7g43yuA@mail.gmail.com>
+Subject: Re: [PATCH v6 2/2] Add Battery Service GATT Client
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Arik Nemtsov <arik@wizery.com>
+To: chen.ganir@ti.com
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arik,
+Hi Chen,
 
-On Thu, Mar 8, 2012 at 9:44 AM, Arik Nemtsov <arik@wizery.com> wrote:
-> If a device is already connected, don't auto-connect if we register
-> a disconnect-only attio callback. This will obviously fail.
-> ---
->  src/device.c |   13 +++++++++----
->  1 files changed, 9 insertions(+), 4 deletions(-)
-
-I can't see why this patch is necessary. attio_connected() seems to
-properly check that device->cfunc is set before calling it.
-
-Can you explain why you need it?
-
->
-> diff --git a/src/device.c b/src/device.c
-> index dfc8e59..b339ac1 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -2942,10 +2942,15 @@ guint btd_device_add_attio_callback(struct btd_device *device,
->        attio->dcfunc = dcfunc;
->        attio->user_data = user_data;
->
-> -       if (device->attrib && cfunc) {
-> -               device->attios_offline = g_slist_append(device->attios_offline,
-> -                                                                       attio);
-> -               g_idle_add(notify_attios, device);
-> +       if (device->attrib) {
-> +               if (cfunc) {
-> +                       device->attios_offline =
-> +                               g_slist_append(device->attios_offline, attio);
+On Wed, Mar 14, 2012 at 7:37 AM,  <chen.ganir@ti.com> wrote:
+> diff --git a/batterystate/batterystate.c b/batterystate/batterystate.c
+> new file mode 100644
+> index 0000000..3f79978
+> --- /dev/null
+> +++ b/batterystate/batterystate.c
+> @@ -0,0 +1,90 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2012 Texas Instruments, Inc.
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
 > +
-> +                       g_idle_add(notify_attios, device);
-> +               } else {
-> +                       device->attios = g_slist_append(device->attios, attio);
-> +               }
->        } else {
->                device->auto_id = g_idle_add_full(G_PRIORITY_DEFAULT_IDLE,
->                                                att_connect, device,
-> --
-> 1.7.5.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <glib.h>
+> +#include <errno.h>
+> +#include <bluetooth/uuid.h>
+> +
+> +#include "adapter.h"
+> +#include "device.h"
+> +#include "gattrib.h"
+> +#include "attio.h"
+> +#include "att.h"
+> +#include "gatt.h"
+> +#include "batterystate.h"
 
+Please add only the headers you currently need for building the
+current code. Then include other headers as necessary on future
+patches (unless they are dependencies for other necessary headers).
+
+E.g. I don't think attio.h. gatt.h and gattrib.h are needed here (but
+check that compilation is ok).
+
+> diff --git a/batterystate/main.c b/batterystate/main.c
+> new file mode 100644
+> index 0000000..5dc5d18
+> --- /dev/null
+> +++ b/batterystate/main.c
+> @@ -0,0 +1,56 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2012 Texas Instruments, Inc.
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <stdint.h>
+> +#include <glib.h>
+> +#include <errno.h>
+> +#include <gdbus.h>
+
+Is gdbus.h needed here?
+
+> +
+> +#include "hcid.h"
+> +#include "plugin.h"
+> +#include "manager.h"
+> +#include "log.h"
+> +
+> +static int batterystate_init(void)
+> +{
+> +       if (!main_opts.gatt_enabled) {
+> +               DBG("GATT is disabled");
+> +               return -ENOTSUP;
+> +       }
+> +
+> +       return batterystate_manager_init();
+> +}
+> +
+> +static void batterystate_exit(void)
+> +{
+> +       if (!main_opts.gatt_enabled)
+> +               return;
+> +
+> +       batterystate_manager_exit();
+> +}
+> +
+> +BLUETOOTH_PLUGIN_DEFINE(batterystate, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
+> +                                       batterystate_init, batterystate_exit)
 
 Regards,
 -- 
