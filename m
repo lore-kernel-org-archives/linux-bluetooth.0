@@ -1,66 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: AceLan Kao <acelan@gmail.com>
-From: AceLan Kao <acelan.kao@canonical.com>
-To: linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH] Bluetooth: Add support for AR3012 [0cf3:e004]
-Date: Thu, 15 Mar 2012 16:23:08 +0800
-Message-Id: <1331799788-20129-1-git-send-email-acelan.kao@canonical.com>
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Slawomir Bochenski <lkslawek@gmail.com>
+Subject: [PATCH obexd 6/6] MAP: Output parameters in folder listing reply
+Date: Wed, 14 Mar 2012 23:54:33 +0100
+Message-Id: <1331765673-12860-6-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <1331765673-12860-1-git-send-email-lkslawek@gmail.com>
+References: <1331765673-12860-1-git-send-email-lkslawek@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add another vendor specific ID for Atheros AR3012
-
-output of usb-devices:
-T:  Bus=02 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  4 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cf3 ProdID=e004 Rev=00.02
-S:  Manufacturer=Atheros Communications
-S:  Product=Bluetooth USB Host Controller
-S:  SerialNumber=Alaska Day 2006
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-
-BugLink: https://bugs.launchpad.net/bugs/922715
-
-Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+This also introduces reusable any_get_next_header() that will be further
+utilised in other requests returning application parameters header.
 ---
- drivers/bluetooth/ath3k.c |    2 ++
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 3 insertions(+), 0 deletions(-)
+ plugins/mas.c |   51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 51 insertions(+), 0 deletions(-)
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 07f14d1..b55fc76 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -71,6 +71,7 @@ static struct usb_device_id ath3k_table[] = {
+diff --git a/plugins/mas.c b/plugins/mas.c
+index ea2b4b2..5d00ed1 100644
+--- a/plugins/mas.c
++++ b/plugins/mas.c
+@@ -25,11 +25,14 @@
+ #include <config.h>
+ #endif
  
- 	/* Atheros AR3012 with sflash firmware*/
- 	{ USB_DEVICE(0x0CF3, 0x3004) },
-+	{ USB_DEVICE(0x0CF3, 0xE004) },
++#include <string.h>
+ #include <errno.h>
+ #include <glib.h>
+ #include <fcntl.h>
+ #include <inttypes.h>
  
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -87,6 +88,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
- 
- 	/* Atheros AR3012 with sflash firmware*/
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
- 
- 	{ }	/* Terminating entry */
++#include <gobex/gobex.h>
++
+ #include "obexd.h"
+ #include "plugin.h"
+ #include "log.h"
+@@ -111,6 +114,7 @@ struct mas_session {
+ 	GString *buffer;
+ 	map_ap_t *inparams;
+ 	map_ap_t *outparams;
++	gboolean ap_sent;
  };
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 789c9b5..2b7d2d1 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -127,6 +127,7 @@ static struct usb_device_id blacklist_table[] = {
  
- 	/* Atheros 3012 with sflash firmware */
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ static const uint8_t MAS_TARGET[TARGET_SIZE] = {
+@@ -407,12 +411,26 @@ static void get_folder_listing_cb(void *session, int err, uint16_t size,
+ 					const char *name, void *user_data)
+ {
+ 	struct mas_session *mas = user_data;
++	uint16_t max = 1024;
  
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+ 	if (err < 0 && err != -EAGAIN) {
+ 		obex_object_set_io_flags(mas, G_IO_ERR, err);
+ 		return;
+ 	}
+ 
++	map_ap_get_u16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
++
++	if (max == 0) {
++		if (!err != -EAGAIN)
++			map_ap_set_u16(mas->outparams,
++					MAP_AP_FOLDERLISTINGSIZE, size);
++
++		if (!name)
++			mas->finished = TRUE;
++
++		goto proceed;
++	}
++
+ 	if (!mas->nth_call) {
+ 		g_string_append(mas->buffer, XML_DECL);
+ 		g_string_append(mas->buffer, FL_DTD);
+@@ -578,6 +596,38 @@ static void *message_update_open(const char *name, int oflag, mode_t mode,
+ 		return mas;
+ }
+ 
++static ssize_t any_get_next_header(void *object, void *buf, size_t mtu,
++								uint8_t *hi)
++{
++	struct mas_session *mas = object;
++	size_t len;
++	uint8_t *apbuf;
++
++	DBG("");
++
++	if (mas->buffer->len == 0 && !mas->finished)
++		return -EAGAIN;
++
++	*hi = G_OBEX_HDR_APPARAM;
++
++	if (mas->ap_sent)
++		return 0;
++
++	mas->ap_sent = TRUE;
++	apbuf = map_ap_encode(mas->outparams, &len);
++
++	if (len > mtu) {
++		DBG("MTU is to small to fit application parameters header!");
++		g_free(apbuf);
++
++		return -EIO;
++	}
++
++	memcpy(buf, apbuf, len);
++
++	return len;
++}
++
+ static void *any_open(const char *name, int oflag, mode_t mode,
+ 				void *driver_data, size_t *size, int *err)
+ {
+@@ -663,6 +713,7 @@ static struct obex_mime_type_driver mime_folder_listing = {
+ 	.target = MAS_TARGET,
+ 	.target_size = TARGET_SIZE,
+ 	.mimetype = "x-obex/folder-listing",
++	.get_next_header = any_get_next_header,
+ 	.open = folder_listing_open,
+ 	.close = any_close,
+ 	.read = any_read,
 -- 
-1.7.9.1
+1.7.5.1
+
