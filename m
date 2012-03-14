@@ -1,100 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd v4 1/3] MAP/dummy: Actual code for folder listing retrieval
-Date: Wed, 14 Mar 2012 14:29:49 +0100
-Message-Id: <1331731791-26685-1-git-send-email-lkslawek@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1331457799-26506-1-git-send-email-arik@wizery.com>
+References: <1331457799-26506-1-git-send-email-arik@wizery.com>
+Date: Wed, 14 Mar 2012 09:23:44 -0400
+Message-ID: <CAJdJm_Or=Df-bDhVFtteiV8CEop8tEtxAMPBWxmmENeq3nfTWA@mail.gmail.com>
+Subject: Re: [PATCH 0/3] Implement TPS profile
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Arik Nemtsov <arik@wizery.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- plugins/messages-dummy.c |   63 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 62 insertions(+), 1 deletions(-)
+Hi Arik,
 
-diff --git a/plugins/messages-dummy.c b/plugins/messages-dummy.c
-index db15a75..cfb24e2 100644
---- a/plugins/messages-dummy.c
-+++ b/plugins/messages-dummy.c
-@@ -31,6 +31,8 @@
- #include <stdlib.h>
- #include <string.h>
- 
-+#include "log.h"
-+
- #include "messages.h"
- 
- static char *root_folder = NULL;
-@@ -50,9 +52,68 @@ struct folder_listing_data {
- 	void *user_data;
- };
- 
-+static char *get_next_subdir(DIR *dp, char *path)
-+{
-+	struct dirent *ep;
-+	char *abs, *name;
-+
-+	for (;;) {
-+		if ((ep = readdir(dp)) == NULL)
-+			return NULL;
-+
-+		if (strcmp(ep->d_name, ".") == 0 || strcmp(ep->d_name, "..") == 0)
-+			continue;
-+
-+		abs = g_build_filename(path, ep->d_name, NULL);
-+
-+		if (g_file_test(abs, G_FILE_TEST_IS_DIR)) {
-+			g_free(abs);
-+			break;
-+		}
-+
-+		g_free(abs);
-+	}
-+
-+	name = g_filename_to_utf8(ep->d_name, -1, NULL, NULL, NULL);
-+
-+	if (name == NULL) {
-+		DBG("g_filename_to_utf8(): invalid filename");
-+		return NULL;
-+	}
-+
-+	return name;
-+}
-+
- static ssize_t get_subdirs(struct folder_listing_data *fld, GSList **list)
- {
--	return 0;
-+	DIR *dp;
-+	char *path, *name;
-+	size_t n;
-+
-+	path = g_build_filename(fld->session->cwd_absolute, fld->name, NULL);
-+	dp = opendir(path);
-+
-+	if (dp == NULL) {
-+		int err = -errno;
-+
-+		DBG("opendir(): %d, %s", -err, strerror(-err));
-+		g_free(path);
-+
-+		return err;
-+	}
-+
-+	n = 0;
-+
-+	while ((name = get_next_subdir(dp, path)) != NULL) {
-+		n++;
-+		if (fld->max > 0)
-+			*list = g_slist_prepend(*list, name);
-+	}
-+
-+	closedir(dp);
-+	g_free(path);
-+
-+	return n;
- }
- 
- static void return_folder_listing(struct folder_listing_data *fld, GSList *list)
+On Sun, Mar 11, 2012 at 5:23 AM, Arik Nemtsov <arik@wizery.com> wrote:
+> We replace the TPS stub in reporter.c with a fully functional
+> implementation. The Tx power level for each LE device is read on
+> connection and cached (as it cannot change). When a remote device
+> requests it the cached value is returned.
+>
+> This series depends on the kernel patch:
+> "Bluetooth: Implement Read Transmit Power Level command"
+>
+> It also depends the bluez series "Implement ProximityReporter profiles",
+> mostly for the ATT patch adding the remote-device to each ATT read/write
+> callback.
+>
+> Arik Nemtsov (3):
+>  mgmt: implement read tx power
+>  adapter: implement API to read Tx power
+>  proximity: tx power: implement tx power server
+>
+>  Makefile.am          |    3 +-
+>  lib/mgmt.h           |   11 ++
+>  plugins/mgmtops.c    |   64 +++++++++++
+>  proximity/reporter.c |   48 +--------
+>  proximity/txpower.c  |  292 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  proximity/txpower.h  |   24 ++++
+>  src/adapter.c        |   75 +++++++++++++
+>  src/adapter.h        |   17 +++
+>  8 files changed, 488 insertions(+), 46 deletions(-)
+>  create mode 100644 proximity/txpower.c
+>  create mode 100644 proximity/txpower.h
+
+I believe we need to hold this TPS series until some kernel support
+for TX power reading (either automatically on every connection and
+sent along the Device Connected event, or through a new mgmt command,
+depending on what you agreed on IRC regarding what's the best
+approach) is upstream.
+
+Regards,
 -- 
-1.7.4.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
