@@ -1,58 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4F60B259.5040800@tu-ilmenau.de>
+Date: Wed, 14 Mar 2012 15:59:37 +0100
+From: Steffen Becker <steffen.becker@tu-ilmenau.de>
 MIME-Version: 1.0
-In-Reply-To: <20120313142024.GA3157@x220.P-661HNU-F1>
-References: <1329771478-3935-1-git-send-email-frederic.dalleau@linux.intel.com>
-	<1329771478-3935-3-git-send-email-frederic.dalleau@linux.intel.com>
-	<20120313142024.GA3157@x220.P-661HNU-F1>
-Date: Wed, 14 Mar 2012 16:11:55 +0100
-Message-ID: <CA+QXtDvfVDKQRXMKx73+_S4LN3YE1GoKKEbFxE8VJP4Z5FeRFw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] sdp: Fix sdp_get_profile_descs for Mac Os X Lion
-From: "Dalleau, Frederic" <frederic.dalleau@intel.com>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
-	<frederic.dalleau@linux.intel.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Subject: Encrypting problem while sending data via bluetooth
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi,
 
-> I've applied the first patch since that's quite straight forward but I'm
-> struggling a bit with this second one. Firstly you should include the
-> hcidump into the commit message as well as a proper explanation. An
-> empty commit message (just summary line) is only acceptable for extremely
-> trivial patches (and this is far from it).
->
-> I *think* I get the main part of the patch, but one thing that's unclear
-> is why do you assign next to seq instead of letting the for-loop do it.
-> The second branch of the if-statement doesn't do it either so why does
-> the first need it? Again, you could have avoided these questions from me
-> if you had included an appropriate code comment. Whenever there's
-> something counterintuitive in the code it's a good idea to have such a
-> comment.
->
+At first: Sorry for my bad english, it's not my native language. So i 
+wrote my problem in german and english.
 
-This patch just makes sure the correct profile version number is retrieved and
-is specific to Mac Os X Lion HFP AG record. SDP is a very sensible piece of
-code, and this needs double checking. I'm not even sure that the record itself
-is valid so I would surely understand that in order to enforce the standard this
-one is not applied.
+My problem refers to bluez. I didn't got useful hits on Google, IRC 
+didnt help and the only answer i got in a forum was: "there are not many 
+people who are familiar with that". So i hope you can help me.
 
->From my understanding, the SDP profile descriptor is a list. The for loop
-iterates that list. It is unclear in the HFP specification what is contained.
-Until now, bluez expected a collection of either uuid or lists with a uuid and a
-version number. For example list=(uuid, uuid, (uuid, version), (uuid, version))
+My problem:
+After installing the latest bluez, i connected two gentoo-PC's (v2.1.6) 
+via two bluetooth-dongles (BT3.0).
+PC2:# rfcomm listen 0 1
+PC1:# rfcomm connect 0 <bluetooth-adress> 1
+This works fine.
 
-The patch fixes the situation where the profile descriptor list contains a uuid
-AND a version number both on the root level and not enclosed in a sublist. If
-the next item after uuid is uint16, then this is likely to be the
-version number of the profile which uuid is given.
-list=(uuid, uuid, version, uuid, (uuid, version))
+But now, when i try to send some data:
+PC2:# cat /dev/rfcomm0
+PC1:# echo "test" > /dev/rfcomm0
+it looks like this on the screen of PC2:
+"^J^J^J^J^^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^test^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J" 
 
-Very easy to reproduce : just run sdptool browse and check the version number of
-HFP AG is not 0x105.
+[and many more rows]
 
-However, I'll provide you an updated version with hcidump and a more intuitive
- commit message as soon as I can put my hands on one of these machines again.
+So i think it's an encrypting problem, but i really don't know how to 
+solve it!
+i opened /etc/bluetooth/network.conf and uncommented
+DisableSecurity=true
+but that didn't changed my problem.
+I also tried
+# hciconfig hci0 nosecmgr
+but this command didn't work.
 
-Regards,
-Frédéric
+So how can i disable the Security for not getting those cryptic symbols 
+(^J^J^J^J^...) ? I really hope you can help me.
+
+Best regards,
+Steffen Becker
+
+----------------------------------------------------------------------------
+
+Hallo,
+
+ich habe ein Problem beim Umgang mit bluez. Ich habe bereits Google 
+benutzt, IRC aufgesucht und in Foren gepostet, aber ich habe keine 
+hilfreichen Informationen bekommen. Lediglich die Antwort: "Es gibt 
+nicht viele Leute die sich damit auskennen".
+
+Zu meinem Problem:
+Ich habe zwei baugleiche Gentoo-Rechner(v2.1.6) mit je einem 
+Bluetooth-Dongle(BT3.0) und das neueste bleuz installiert. Diese 
+funktionieren soweit wunderbar. Die Verbindungsherstellung klappt ohne 
+Probleme:
+PC2:# rfcomm listen 0 1
+PC1:# rfcomm connect 0 <bluetooth-adress> 1
+
+Wenn ich aber nun über ">" Daten senden will passiert folgendes:
+PC2:# cat /dev/rfcomm0
+PC1:# echo "test" > /dev/rfcomm0
+dann erscheint auf dem Bildschirm von PC2 dieses:
+"^J^J^J^J^^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^test^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J" 
+
+[und viele weitere solcher Zeilen]
+
+Ich vermute, dass es sich um ein Verschlüsselungsproblem handelt.
+Dazu habe ich die /etc/bluetooth/network.conf geöffnet und folgende 
+Zeile gesetzt (welche standardmäßig auskommentiert war):
+DisableSecurity=true
+Das hat leider nichts geändert.
+Ich habe auch versucht mit dem Befehl
+# hciconfig hci0 nosecmgr
+die Sicherheit zu deaktivieren, aber bei diesem Befehl ist gar nichts 
+passiert, da ich hier auch nicht herausgefunden habe wie die genaue 
+Syntax lautet.
+
+Ich hoffe, Sie können mir hierbei helfen. Ist das Erscheinen der 
+kryptischen Zeichen (^J^J^J^J^...) wirklich auf eine 
+Verschlüsselungseinstellung zurückzuführen? Und wenn ja, wie kanndagegen 
+vorgehen?
+
+Mit freundlichen Grüßen,
+Steffen Becker
