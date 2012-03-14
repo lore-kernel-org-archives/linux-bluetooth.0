@@ -1,49 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: chen.ganir@ti.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH v6 0/2] DeviceInfoService and BatteryService Clients
-Date: Wed, 14 Mar 2012 13:37:56 +0200
-Message-Id: <1331725078-27485-1-git-send-email-chen.ganir@ti.com>
+MIME-Version: 1.0
+In-Reply-To: <1331723767-21436-1-git-send-email-chen.ganir@ti.com>
+References: <1331723767-21436-1-git-send-email-chen.ganir@ti.com>
+Date: Wed, 14 Mar 2012 07:31:18 -0400
+Message-ID: <CAJdJm_N854Z05+jDhvS-xjgiJhZEpRBjqqfRe8Z-+o38=X56AA@mail.gmail.com>
+Subject: Re: [PATCH v3 0/3] GATT: Change the way GATT Plugins are enabled/disabled
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: chen.ganir@ti.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Ganir <chen.ganir@ti.com>
+Hi Chen,
 
-Add Battery Service client and Device Information Service Client stubs.
-More logic will be added to these service as development continues.
+On Wed, Mar 14, 2012 at 7:16 AM,  <chen.ganir@ti.com> wrote:
+> From: Chen Ganir <chen.ganir@ti.com>
+>
+> This patch set is a result of the discussion on the #bluez channel.
+>
+> Consolidate the --enable_<profile> for gatt profiles into a single
+> switch, called --enable_gatt.
+>
+> In addition, modify the AttributeServer propery in the main.conf to
+> EnableGatt option (default=false) and make sure all GATT plugins query
+> this option before trying to load (in the _init function of the
+> plugin)
+>
+> This is v3 of the patch set - fixed as suggested on the mailing list.
 
-This is version 6 of the patch set, rebased on the latest modifications
-to the GATT switches.
+Looks good to me.
 
-
-Chen Ganir (2):
-  Add DeviceInformation GATT Client
-  Add Battery Service GATT Client
-
- Makefile.am                 |   12 ++++-
- batterystate/batterystate.c |   90 +++++++++++++++++++++++++++++++++++++++++++
- batterystate/batterystate.h |   24 +++++++++++
- batterystate/main.c         |   56 ++++++++++++++++++++++++++
- batterystate/manager.c      |   80 ++++++++++++++++++++++++++++++++++++++
- batterystate/manager.h      |   24 +++++++++++
- deviceinfo/deviceinfo.c     |   88 ++++++++++++++++++++++++++++++++++++++++++
- deviceinfo/deviceinfo.h     |   24 +++++++++++
- deviceinfo/main.c           |   55 ++++++++++++++++++++++++++
- deviceinfo/manager.c        |   80 ++++++++++++++++++++++++++++++++++++++
- deviceinfo/manager.h        |   24 +++++++++++
- 11 files changed, 554 insertions(+), 3 deletions(-)
- create mode 100644 batterystate/batterystate.c
- create mode 100644 batterystate/batterystate.h
- create mode 100644 batterystate/main.c
- create mode 100644 batterystate/manager.c
- create mode 100644 batterystate/manager.h
- create mode 100644 deviceinfo/deviceinfo.c
- create mode 100644 deviceinfo/deviceinfo.h
- create mode 100644 deviceinfo/main.c
- create mode 100644 deviceinfo/manager.c
- create mode 100644 deviceinfo/manager.h
-
+Regards,
 -- 
-1.7.4.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
