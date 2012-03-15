@@ -1,70 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F61AF8B.3020300@tu-ilmenau.de>
-Date: Thu, 15 Mar 2012 09:59:55 +0100
-From: Steffen Becker <steffen.becker@tu-ilmenau.de>
-MIME-Version: 1.0
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Encrypting problem while sending data via bluetooth
-References: <4F60B259.5040800@tu-ilmenau.de> <1331747344.14217.105.camel@aeonflux>
-In-Reply-To: <1331747344.14217.105.camel@aeonflux>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-To: unlisted-recipients:; (no To-header on input)
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: AceLan Kao <acelan@gmail.com>
+From: AceLan Kao <acelan.kao@canonical.com>
+To: linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Add support for AR3012 [0cf3:e004]
+Date: Thu, 15 Mar 2012 16:23:08 +0800
+Message-Id: <1331799788-20129-1-git-send-email-acelan.kao@canonical.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thank you very much, this helped me!
-Now everything looks fine on the screen of the "PC2".
+Add another vendor specific ID for Atheros AR3012
 
-But now i got another problem regarding to this:
-I use a third PC with the "BPA500" (it's for bluetooth sniffing).
-When i use again the command
+output of usb-devices:
+T:  Bus=02 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  4 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=e004 Rev=00.02
+S:  Manufacturer=Atheros Communications
+S:  Product=Bluetooth USB Host Controller
+S:  SerialNumber=Alaska Day 2006
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-PC1: # echo "test" > /dev/rfcomm0
+BugLink: https://bugs.launchpad.net/bugs/922715
 
-then the BPA500 software says:
-"100% Payload/CRC Errors"
-and it can't go after "start_encrypt_req" (that's the last Opcode in the 
-Link Management Protocol).
+Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+---
+ drivers/bluetooth/ath3k.c |    2 ++
+ drivers/bluetooth/btusb.c |    1 +
+ 2 files changed, 3 insertions(+), 0 deletions(-)
 
-That's why i still think i have an encryption problem.
-But the manpage only shows me how to ENable the encryption.
-
-So i hope somebody can help me a second time.
-
-Regards,
-Steffen
-
-
-Am 14.03.2012 18:49, schrieb Marcel Holtmann:
-> Hi Steffan,
->
->> At first: Sorry for my bad english, it's not my native language. So i
->> wrote my problem in german and english.
->>
->> My problem refers to bluez. I didn't got useful hits on Google, IRC
->> didnt help and the only answer i got in a forum was: "there are not many
->> people who are familiar with that". So i hope you can help me.
->>
->> My problem:
->> After installing the latest bluez, i connected two gentoo-PC's (v2.1.6)
->> via two bluetooth-dongles (BT3.0).
->> PC2:# rfcomm listen 0 1
->> PC1:# rfcomm connect 0<bluetooth-adress>  1
->> This works fine.
->>
->> But now, when i try to send some data:
->> PC2:# cat /dev/rfcomm0
->> PC1:# echo "test">  /dev/rfcomm0
->> it looks like this on the screen of PC2:
->> "^J^J^J^J^^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^test^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J"
-> it has nothing to do with encryption. These are TTY terminal settings.
-> That is why rfcomm tool has a -r (raw TTY mode) switch. And that switch
-> is documented in manpage.
->
-> Regards
->
-> Marcel
->
->
-
-
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 07f14d1..b55fc76 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -71,6 +71,7 @@ static struct usb_device_id ath3k_table[] = {
+ 
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0CF3, 0x3004) },
++	{ USB_DEVICE(0x0CF3, 0xE004) },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -87,6 +88,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 
+ 	{ }	/* Terminating entry */
+ };
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 789c9b5..2b7d2d1 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -127,6 +127,7 @@ static struct usb_device_id blacklist_table[] = {
+ 
+ 	/* Atheros 3012 with sflash firmware */
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+-- 
+1.7.9.1
