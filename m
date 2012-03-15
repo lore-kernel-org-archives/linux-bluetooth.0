@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv4 09/30] Bluetooth: A2MP: Add channel close callback
-Date: Thu, 15 Mar 2012 14:30:00 +0200
-Message-Id: <1331814621-13905-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv4 05/30] Bluetooth: Lock sk only if exist
+Date: Thu, 15 Mar 2012 14:29:56 +0200
+Message-Id: <1331814621-13905-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1331814621-13905-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1331814621-13905-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,30 +14,29 @@ From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |    8 ++++++++
- 1 files changed, 8 insertions(+), 0 deletions(-)
+ net/bluetooth/l2cap_core.c |    8 ++++++--
+ 1 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 66edcfa..5945788 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -16,8 +16,16 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/a2mp.h>
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 779f819..e8855cc 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -212,9 +212,13 @@ static inline void l2cap_state_change(struct l2cap_chan *chan, int state, int er
+ {
+ 	struct sock *sk = chan->sk;
  
-+static void a2mp_chan_close_cb(void *data)
-+{
-+	struct amp_mgr *mgr = data;
+-	lock_sock(sk);
++	if (sk)
++		lock_sock(sk);
 +
-+	l2cap_chan_destroy(mgr->a2mp_chan);
-+}
+ 	__l2cap_state_change(chan, state, err);
+-	release_sock(sk);
 +
- static struct l2cap_ops a2mp_chan_ops = {
- 	.name		= "L2CAP A2MP channel",
-+	.close		= a2mp_chan_close_cb,
- };
++	if (sk)
++		release_sock(sk);
+ }
  
- static struct l2cap_chan *open_a2mp_chan(struct l2cap_conn *conn)
+ void __l2cap_chan_set_err(struct l2cap_chan *chan, int err)
 -- 
 1.7.9.1
 
