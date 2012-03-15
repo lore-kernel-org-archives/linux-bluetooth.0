@@ -1,136 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
-To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-CC: "'Ganir, Chen'" <chen.ganir@ti.com>,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: RE: HID Over GATT implementation
-Date: Thu, 15 Mar 2012 09:47:08 +0000
-Message-ID: <F82830D409D80E4881C83250E051B74B4A079CA2@banasiexm01.ASIA.ROOT.PRI>
-References: <F0070FBC0FB3174D8D11444EB2D5B0260B44D1AB@DNCE02.ent.ti.com>
- <CAKT1EBcVv1ya0ArmgwNh968O9QSsQD6oNy1poJDeNgg_V=iuog@mail.gmail.com>
- <F0070FBC0FB3174D8D11444EB2D5B0260B44D4A1@DNCE02.ent.ti.com>
- <F82830D409D80E4881C83250E051B74B4A079B44@banasiexm01.ASIA.ROOT.PRI>
- <F82830D409D80E4881C83250E051B74B4A079C84@banasiexm01.ASIA.ROOT.PRI>
-In-Reply-To: <F82830D409D80E4881C83250E051B74B4A079C84@banasiexm01.ASIA.ROOT.PRI>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <4F61AF8B.3020300@tu-ilmenau.de>
+Date: Thu, 15 Mar 2012 09:59:55 +0100
+From: Steffen Becker <steffen.becker@tu-ilmenau.de>
 MIME-Version: 1.0
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Encrypting problem while sending data via bluetooth
+References: <4F60B259.5040800@tu-ilmenau.de> <1331747344.14217.105.camel@aeonflux>
+In-Reply-To: <1331747344.14217.105.camel@aeonflux>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQpIaSwgDQoNCj4+IDMuIEhJRCBTZXJ2aWNlIC0gVGhpcyBzZXJ2aWNlIGNv
-bnRhaW5zIHRoZSBtYWluIGxvZ2ljIGZvciB0aGUgSE9HUCwgYW5kIGFjdHMg
-YXMgYSBwcm94eSBiZXR3ZWVuIHRoZSByZW1vdGUgZGV2aWNlIGFuZCB0aGUg
-Pj4gbG9jYWwgSElEIHN1YnN5c3RlbXMuDQoNCkkgaGFkIHRoZSBIT0cgRGV2
-aWNlIGltcGxlbWVudGVkL3Rlc3RlZCB3aXRoIHRoZSBiZWxvdyBkZXNpZ24u
-IENvdWxkIHlvdSBwbGVhc2UgbGV0IG1lIGtub3cgeW91ciBvcGluaW9uIGFi
-b3V0IHRoZSBkZXNpZ24/DQoNCg0KZ25vbWUgQlQgbWdyDQp8DQp8DQp8DQp2
-DQpEQlVTCQkJICAgICBEQlVTDQp8ICAgICAgICAgICAgICAgICAgICAgICBe
-CQ0KfCAgICAgICAgICAgICAgICAgICAgICAgfA0KfCAgICAgICAgICAgICAg
-ICAgICAgICAgfChnX2RidXNfcmVnX2ludGYpDQp2ICAgICAgIChhdHRpb19j
-YikgICAgICB8DQpkZXZpY2UgPC0tLS0tLS0tLS0+IEhJRG92ZXJHQVRUcGx1
-Z2luDQpeKHNvY2spICAgICAgICAgICAgIF4gIF4gICAgIF4gICB8DQp8ICAg
-ICAgICAgICAgICAgICAgIHwgIHwgICAgIHwgICB8ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICANCnwgICAgICAobm90aWZ5X2J1ZmYpfCAgfCAgICAgfCAgIHwgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICANCnwtLS0t
-LS0tLS0tLS0tLS0tPiBHQVRUUklCICAgfCAgIHwNCnwgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgfCAgIHwoaW9jdGwoSElEUENPTk5BREQsIEhJRFBf
-U0NBTktFWSkpICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIA0KfCAgICAgICAgICAgICg/P291dHB1dHJl
-cG9ydCB8ICAgfA0KfCAgICAgICAgICAgIE5vdGltcGxlbWVudGVkKSB8ICAg
-fCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgVVMNCi0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCnwgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgfCAgIHwgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIEtTDQp8ICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IHwgICB8DQp8ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICBWDQp2
-KHNvY2spICAgICAgICAgICAgICAgICAgICAgKHNvY2spICANCkwyQ0FQICAg
-ICAgICAgICAgICAgICAgICAgICAgSElEUDwtLS0tLS0tLS0tLS0tLS0+SW5w
-dXQgU3Vic3lzdGVtDQoNCg0KVGhhbmtzLA0KVmlqYXkNCg0KLS0tLS1Pcmln
-aW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IGxpbnV4LWJsdWV0b290aC1vd25l
-ckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgtb3du
-ZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgR2FuaXIsIENoZW4N
-ClNlbnQ6IE1vbmRheSwgTWFyY2ggMTIsIDIwMTIgMTE6MzIgQU0NClRvOiBD
-bGF1ZGlvIFRha2FoYXNpDQpDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2Vy
-bmVsLm9yZw0KU3ViamVjdDogUkU6IEhJRCBPdmVyIEdBVFQgaW1wbGVtZW50
-YXRpb24NCg0KQ2xhdWRpbywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2Ut
-LS0tLQ0KPiBGcm9tOiBDbGF1ZGlvIFRha2FoYXNpIFttYWlsdG86Y2xhdWRp
-by50YWthaGFzaUBvcGVuYm9zc2Eub3JnXQ0KPiBTZW50OiBNb25kYXksIE1h
-cmNoIDEyLCAyMDEyIDI6MTIgQU0NCj4gVG86IEdhbmlyLCBDaGVuDQo+IENj
-OiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6
-IFJlOiBISUQgT3ZlciBHQVRUIGltcGxlbWVudGF0aW9uDQo+IA0KPiBIaSBD
-aGVuIEdhbmlyLA0KPiANCj4gT24gU3VuLCBNYXIgMTEsIDIwMTIgYXQgOTo1
-NCBBTSwgR2FuaXIsIENoZW4gPGNoZW4uZ2FuaXJAdGkuY29tPiB3cm90ZToN
-Cj4gPiBIaS4NCj4gPg0KPiA+IEkgaGF2ZSBzdGFydGVkIHRoZSBkZXZlbG9w
-bWVudCBvZiB0aGUgSE9HUCAoSElEIE92ZXIgR0FUVCBQcm90b2NvbCkNCj4g
-Zm9yIHRoZSBCbHVlWiBTdGFjay4gVGhlIG1haW4gaWRlYSBvZiB0aGlzIGFk
-b3B0ZWQgcHJvZmlsZSBpcyB0byBhbGxvdw0KPiBISUQgZGV2aWNlcyB0byBv
-cGVyYXRlIG92ZXIgdGhlIGxvdyBlbmVyZ3kgdGVjaG5vbG9neS4NCj4gPg0K
-PiA+IFRoZSBISUQgT3ZlciBHQVRUIFByb2ZpbGUgaW5jbHVkZXMgdGhlIGZv
-bGxvd2luZyBzZXJ2aWNlcyA6DQo+ID4gMS4gQmF0dGVyeSBTZXJ2aWNlIC0g
-YWxsb3dzIHRoZSBob3N0IHRvIGdhdGhlciBhbmQgZGlzcGxheQ0KPiBpbmZv
-cm1hdGlvbiByZWdhcmRpbmcgdGhlIHBlZXIgZGV2aWNlIGJhdHRlcnkvYmF0
-dGVyaWVzIHN0YXRlLg0KPiA+IDIuIERldmljZSBJbmZvcm1hdGlvbiBTZXJ2
-aWNlIC0gVGhpcyBzZXJ2aWNlIGNvbnRhaW5zIG1pc2MNCj4gaWRlbnRpZmlj
-YXRpb24gZGF0YSBvZiBhIGRldmljZS4gVGhlIEhPR1Agd2lsbCB1c2UgdGhl
-IFBOUCBJRCBmaWVsZC4NCj4gDQo+IENvdWxkIHlvdSBwbGVhc2UgZXhwbGFp
-biBob3cgYXJlIHlvdSBwbGFubmluZyB0byBzaGFyZSBiYXR0ZXJ5IGxldmVs
-DQo+IGFuZCBQTlAgSUQgdG8gSG9HIHNlcnZpY2U/DQo+IA0KPiBkZXZpY2Uu
-YyBjYW4gaGF2ZSBmdW5jdGlvbiB0byBnZXQvc2V0IEJhdHRlcnkgTGV2ZWwg
-YW5kIFBOUCBJRC4gSU1PLA0KPiBvbmx5IEJhdHRlcnkgTGV2ZWwgY291bGQg
-YmUgZXhwb3J0ZWQgaW4gdGhlIERldmljZSBpbnRlcmZhY2UoaW5zdGVhZA0K
-PiBvZiBjcmVhdGluZyBhIG5ldyBpbnRlcmZhY2UgZm9yIEJhdHRlcnkpLg0K
-Pg0KUE5QIElEIChvciBhbnkgb3RoZXIgRGV2aWNlSW5mb3JtYXRpb24gZGF0
-YSkgYW5kIEJhdHRlcnkgbGV2ZWwgd2lsbCBiZSBwYXJ0IG9mIHRoZSBidGRf
-ZGV2aWNlIChsYXRlciBwYXRjaCkuIERldmljZSB3aWxsIGhhdmUgZnVuY3Rp
-b25hbGl0eSB0byBnZXQvc2V0IHRoZSBpbmZvcm1hdGlvbiAoZ2V0IHdpbGwg
-YmUgZXhwb3NlZCBleHRlcm5hbGx5LCBzZXQgd2lsbCBiZSBmb3IgdXNlIGJ5
-IHRoZSBwbHVnaW5zKS4gTm8gc3BlY2lmaWMgZGJ1cyBBUEkgd2lsbCBiZSBj
-cmVhdGVkIGZvciBhbnkgb2YgdGhvc2UgcGx1Z2lucyAobm8gbmVlZCB0byBj
-cmVhdGUgYW4gYWRkaXRpb25hbCBpbnRlcmZhY2UpLiBEZXZpY2UgSW5mb3Jt
-YXRpb24gaXMgcmVhZCBvbmNlIG9uIGNvbm5lY3Rpb24sIGFuZCB3aGVuIGl0
-IGlzIHJlYWQsIHRoZSBwbHVnaW4gdXBkYXRlcyB0aGUgYnRkX2RldmljZSB3
-aXRoIHRoaXMgaW5mb3JtYXRpb24uIEFsbCBhdmFpbGFibGUgaW5mb3JtYXRp
-b24gd2lsbCBiZSByZWFkLiBUaGVyZSBpcyBubyBuZWVkIHRvIHJlLXJlYWQg
-dGhpcyBkdXJpbmcgYW4gb25nb2luZyBjb25uZWN0aW9uLiBJZiB3ZSBkbyBz
-ZWUgYSByZWFzb24gdG8gZG8gdGhhdCwgd2UgY2FuIGFkZCBhIGRidXMgaW50
-ZXJmYWNlIGZvciBpdCBsYXRlci4NCg0KUE5QIElEIGlzIGEgY29tcGxleCBk
-YXRhIHR5cGUuIEl0IGNvbnRhaW5zIDQgZGlmZmVyZW50IGVsZW1lbnRzLCB3
-aGljaCB3aWxsIGJlIGV4cG9zZWQgdXNpbmcgYSB1bmlxdWUgc3RydWN0dXJl
-IGNvbnRhaW5pbmcgYWxsIHRob3NlIHZhbHVlcy4NCg0KQmF0dGVyeSBpbmZv
-cm1hdGlvbiB3aWxsIGJlIHJlYWQgb25jZSwgYW5kIGNvbmZpZ3VyZWQgZm9y
-IG5vdGlmaWNhdGlvbnMgaWYgcG9zc2libGUgKGFsbCBkb25lIGF1dG9tYXRp
-Y2FsbHkgdXBvbiBjb25uZWN0aW9uKS4gQmF0dGVyeSBsZXZlbCBjaGFuZ2Vz
-IHdpbGwgYmUgZXhwb3NlZCB1c2luZyBELUJVUyBldmVudCAoUHJvcGVydHlD
-aGFuZ2VkIDogQmF0dGVyeUxldmVsKS4NCg0KQmF0dGVyeSBsZXZlbCBpcyBh
-biBpbnRlZ2VyIG51bWJlciwgaW4gdGhlIHJhbmdlIG9mIDAtMTAwLiBUaGUg
-YmF0dGVyeSBsZXZlbCBhbHNvIGhhcyBhIGZvcm1hdCBjaGFyYWN0ZXJpc3Rp
-YyBkZXNjcmlwdG9yLCB3aGljaCBjb250YWlucyBhIHVuaXF1ZSBuYW1lc3Bh
-Y2UvZGVzY3JpcHRpb24gdmFsdWUgd2hpY2ggd2lsbCBiZSB1c2VkIHRvIGlk
-ZW50aWZ5IGEgc3BlY2lmaWMgYmF0dGVyeSwgd2hlbiB0aGVyZSBpcyBtb3Jl
-IHRoYW4gb25lIHNlcnZpY2UgYXZhaWxhYmxlLiBUaGlzIHZhbHVlIHdpbGwg
-YmUgcGFydCBvZiB0aGUgYmF0dGVyeSBsZXZlbCBzdHJ1Y3R1cmUgbGlzdCBv
-biB0aGUgZGV2aWNlLCBhbmQgSSBzdGlsbCBuZWVkIHRvIGZpZ3VyZSBvdXQg
-aG93IHRvIGFkZCBpdCB0byB0aGUgYmF0dGVyeWxldmVsIGRidXMgcHJvcGVy
-dHkgKG1heWJlIGFwcGVuZCBpdCB0byB0aGUgcHJvcGVydHkgbmFtZSwgc3Vj
-aCBhcyBCYXR0ZXJ5TGV2ZWwoMSkgb3Igc29tZXRoaW5nIGxpa2UgdGhpcyA/
-DQrCoA0KPiBCUiwNCj4gQ2xhdWRpbw0KDQpDaGVuIEdhbmlyLA0KVGV4YXMg
-SW5zdHJ1bWVudHMuDQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fDQrvv717Lm7vv70r77+977+977+977+977+977+977+9KyXv
-v73vv71sendt77+977+9Yu+/veunsu+/ve+/vXLvv73vv716WO+/ve+/ve+/
-ve+/vWjvv73vv71i77+977+9Xm7vv71y77+977+977+9eu+/ve+/ve+/vWjv
-v73vv73vv73vv70m77+977+9Hu+/vUfvv73vv73vv71o77+9IA0KX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KKO+/vemaju+/
-vd2iaiLvv73vv73vv71t77+977+977+977+977+9eu+/vd6W77+977+977+9
-Zu+/ve+/ve+/vWjvv73vv73vv71+77+9be+/vQ0KDQrCoFRvIHJlcG9ydCB0
-aGlzIGVtYWlsIGFzIHNwYW0gY2xpY2sgaHR0cHM6Ly93d3cubWFpbGNvbnRy
-b2wuY29tL3NyL3dRdzB6bWpQb0hkSlRaR3lPQ3JyaGc9PSAuDQoKCk1lbWJl
-ciBvZiB0aGUgQ1NSIHBsYyBncm91cCBvZiBjb21wYW5pZXMuIENTUiBwbGMg
-cmVnaXN0ZXJlZCBpbiBFbmdsYW5kIGFuZCBXYWxlcywgcmVnaXN0ZXJlZCBu
-dW1iZXIgNDE4NzM0NiwgcmVnaXN0ZXJlZCBvZmZpY2UgQ2h1cmNoaWxsIEhv
-dXNlLCBDYW1icmlkZ2UgQnVzaW5lc3MgUGFyaywgQ293bGV5IFJvYWQsIENh
-bWJyaWRnZSwgQ0I0IDBXWiwgVW5pdGVkIEtpbmdkb20KTW9yZSBpbmZvcm1h
-dGlvbiBjYW4gYmUgZm91bmQgYXQgd3d3LmNzci5jb20uIEZvbGxvdyBDU1Ig
-b24gVHdpdHRlciBhdCBodHRwOi8vdHdpdHRlci5jb20vQ1NSX1BMQyBhbmQg
-cmVhZCBvdXIgYmxvZyBhdCB3d3cuY3NyLmNvbS9ibG9nCg==
+Thank you very much, this helped me!
+Now everything looks fine on the screen of the "PC2".
+
+But now i got another problem regarding to this:
+I use a third PC with the "BPA500" (it's for bluetooth sniffing).
+When i use again the command
+
+PC1: # echo "test" > /dev/rfcomm0
+
+then the BPA500 software says:
+"100% Payload/CRC Errors"
+and it can't go after "start_encrypt_req" (that's the last Opcode in the 
+Link Management Protocol).
+
+That's why i still think i have an encryption problem.
+But the manpage only shows me how to ENable the encryption.
+
+So i hope somebody can help me a second time.
+
+Regards,
+Steffen
+
+
+Am 14.03.2012 18:49, schrieb Marcel Holtmann:
+> Hi Steffan,
+>
+>> At first: Sorry for my bad english, it's not my native language. So i
+>> wrote my problem in german and english.
+>>
+>> My problem refers to bluez. I didn't got useful hits on Google, IRC
+>> didnt help and the only answer i got in a forum was: "there are not many
+>> people who are familiar with that". So i hope you can help me.
+>>
+>> My problem:
+>> After installing the latest bluez, i connected two gentoo-PC's (v2.1.6)
+>> via two bluetooth-dongles (BT3.0).
+>> PC2:# rfcomm listen 0 1
+>> PC1:# rfcomm connect 0<bluetooth-adress>  1
+>> This works fine.
+>>
+>> But now, when i try to send some data:
+>> PC2:# cat /dev/rfcomm0
+>> PC1:# echo "test">  /dev/rfcomm0
+>> it looks like this on the screen of PC2:
+>> "^J^J^J^J^^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^test^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J^J"
+> it has nothing to do with encryption. These are TTY terminal settings.
+> That is why rfcomm tool has a -r (raw TTY mode) switch. And that switch
+> is documented in manpage.
+>
+> Regards
+>
+> Marcel
+>
+>
+
+
