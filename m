@@ -1,52 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 15 Mar 2012 13:46:56 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: james.steele@accenture.com
-Cc: steffen.becker@tu-ilmenau.de, linux-bluetooth@vger.kernel.org
-Subject: Re: Encrypting problem while sending data via bluetooth
-Message-ID: <20120315114653.GA28905@aemeltch-MOBL1>
+From: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
+To: "'Steffen Becker'" <steffen.becker@tu-ilmenau.de>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: Encrypting problem while sending data via bluetooth
+Date: Thu, 15 Mar 2012 11:27:35 +0000
+Message-ID: <F82830D409D80E4881C83250E051B74B4A07AA5A@banasiexm01.ASIA.ROOT.PRI>
 References: <4F60B259.5040800@tu-ilmenau.de>
- <1331747344.14217.105.camel@aeonflux>
- <4F61AF8B.3020300@tu-ilmenau.de>
- <CAHBqpz8=MoK9LFMJp1N8K7iv98hCwG3nU47vh9eyNN+AbunLmA@mail.gmail.com>
- <81C9FA9C1C2E9E45A9AC3EDD1858BC4323DFFD72@048-CH1MPN1-101.048d.mgd.msft.net>
+ <1331747344.14217.105.camel@aeonflux> <4F61AF8B.3020300@tu-ilmenau.de>
+In-Reply-To: <4F61AF8B.3020300@tu-ilmenau.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <81C9FA9C1C2E9E45A9AC3EDD1858BC4323DFFD72@048-CH1MPN1-101.048d.mgd.msft.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi James,
-
-On Thu, Mar 15, 2012 at 11:08:35AM +0000, james.steele@accenture.com wrote:
-> Hi Steffen
-> 
-> > But now i got another problem regarding to this:
-> > I use a third PC with the "BPA500" (it's for bluetooth sniffing).
-> > When i use again the command
-> >
-> >
-> > PC1: # echo "test" > /dev/rfcomm0
-> >
-> > then the BPA500 software says:
-> > "100% Payload/CRC Errors"
-> > and it can't go after "start_encrypt_req" (that's the last Opcode in the Link
-> > Management Protocol).
-> >
-> > That's why i still think i have an encryption problem.
-> > But the manpage only shows me how to ENable the encryption.
-> >
-> > So i hope somebody can help me a second time.
-> 
-> From what you've said it appears that there is no problem with encryption - after the start_encrypt_req LMP message if the decoder is failing to decode the sniffed data then that is a good sign that encryption is working correctly.
-> 
-> If you want to decode the encrypted sniffed data then you have to configure your sniffing set-up appropriately.  Normally this requires observing the pairing process so that the sniffer can also compute the link key (and therefore encryption key).  If using Bluetooth v2.0 and earlier you may be able to enter the PIN code you are going to use in the sniffing tool prior to performing pairing.  If using Bluetooth v2.1 and later you will need to configure one of the Bluetooth devices to enter "SSP debug mode".
-> 
-> For the latter (Bluetooth v2.1 and later) case, we have a patch that adds the ability to enable/disable SSP debug mode using the hciconfig tool - I'll push it out to the mailing list as soon as possible, as it appears it would be useful for others.
-
-You can just issue HCI command like:
-
-hcitool cmd 0x06 0x0004 0x01
-
-Best regards 
-Andrei Emeltchenko 
+SGkgU3RlZmZlbiwNCg0KPj4gdGhlbiB0aGUgQlBBNTAwIHNvZnR3YXJlIHNh
+eXM6DQo+PiAiMTAwJSBQYXlsb2FkL0NSQyBFcnJvcnMiDQo+PiBhbmQgaXQg
+Y2FuJ3QgZ28gYWZ0ZXIgInN0YXJ0X2VuY3J5cHRfcmVxIiAodGhhdCdzIHRo
+ZSBsYXN0IE9wY29kZSBpbiB0aGUgDQo+PiBMaW5rIE1hbmFnZW1lbnQgUHJv
+dG9jb2wpLg0KDQoNCkkgYW0gdXNpbmcgQlBBNTAwIHRvIHNuaWZmIHRoZSBM
+RSBkYXRhLCBJIGhhdmUgc2VlbiBmZXcgdGltZXMgYmVsb3cgcHJvYmxlbSwg
+dGhlIGRldmljZXMgd2hpY2ggeW91IGFyZSBzbmlmZmluZyBoYXZlIHRvIGJl
+IHZlcnkgY2xvc2UgdG8gdGhlIEJQQTUwMCB0byB3b3JrIHdlbGwhIA0KDQpU
+aGFua3MsDQpWaWpheQ0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0K
+RnJvbTogbGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2VybmVsLm9yZyBb
+bWFpbHRvOmxpbnV4LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmdd
+IE9uIEJlaGFsZiBPZiBTdGVmZmVuIEJlY2tlcg0KU2VudDogVGh1cnNkYXks
+IE1hcmNoIDE1LCAyMDEyIDI6MzAgUE0NCkNjOiBsaW51eC1ibHVldG9vdGhA
+dmdlci5rZXJuZWwub3JnDQpTdWJqZWN0OiBSZTogRW5jcnlwdGluZyBwcm9i
+bGVtIHdoaWxlIHNlbmRpbmcgZGF0YSB2aWEgYmx1ZXRvb3RoDQoNClRoYW5r
+IHlvdSB2ZXJ5IG11Y2gsIHRoaXMgaGVscGVkIG1lIQ0KTm93IGV2ZXJ5dGhp
+bmcgbG9va3MgZmluZSBvbiB0aGUgc2NyZWVuIG9mIHRoZSAiUEMyIi4NCg0K
+QnV0IG5vdyBpIGdvdCBhbm90aGVyIHByb2JsZW0gcmVnYXJkaW5nIHRvIHRo
+aXM6DQpJIHVzZSBhIHRoaXJkIFBDIHdpdGggdGhlICJCUEE1MDAiIChpdCdz
+IGZvciBibHVldG9vdGggc25pZmZpbmcpLg0KV2hlbiBpIHVzZSBhZ2FpbiB0
+aGUgY29tbWFuZA0KDQpQQzE6ICMgZWNobyAidGVzdCIgPiAvZGV2L3JmY29t
+bTANCg0KdGhlbiB0aGUgQlBBNTAwIHNvZnR3YXJlIHNheXM6DQoiMTAwJSBQ
+YXlsb2FkL0NSQyBFcnJvcnMiDQphbmQgaXQgY2FuJ3QgZ28gYWZ0ZXIgInN0
+YXJ0X2VuY3J5cHRfcmVxIiAodGhhdCdzIHRoZSBsYXN0IE9wY29kZSBpbiB0
+aGUgDQpMaW5rIE1hbmFnZW1lbnQgUHJvdG9jb2wpLg0KDQpUaGF0J3Mgd2h5
+IGkgc3RpbGwgdGhpbmsgaSBoYXZlIGFuIGVuY3J5cHRpb24gcHJvYmxlbS4N
+CkJ1dCB0aGUgbWFucGFnZSBvbmx5IHNob3dzIG1lIGhvdyB0byBFTmFibGUg
+dGhlIGVuY3J5cHRpb24uDQoNClNvIGkgaG9wZSBzb21lYm9keSBjYW4gaGVs
+cCBtZSBhIHNlY29uZCB0aW1lLg0KDQpSZWdhcmRzLA0KU3RlZmZlbg0KDQoN
+CkFtIDE0LjAzLjIwMTIgMTg6NDksIHNjaHJpZWIgTWFyY2VsIEhvbHRtYW5u
+Og0KPiBIaSBTdGVmZmFuLA0KPg0KPj4gQXQgZmlyc3Q6IFNvcnJ5IGZvciBt
+eSBiYWQgZW5nbGlzaCwgaXQncyBub3QgbXkgbmF0aXZlIGxhbmd1YWdlLiBT
+byBpDQo+PiB3cm90ZSBteSBwcm9ibGVtIGluIGdlcm1hbiBhbmQgZW5nbGlz
+aC4NCj4+DQo+PiBNeSBwcm9ibGVtIHJlZmVycyB0byBibHVlei4gSSBkaWRu
+J3QgZ290IHVzZWZ1bCBoaXRzIG9uIEdvb2dsZSwgSVJDDQo+PiBkaWRudCBo
+ZWxwIGFuZCB0aGUgb25seSBhbnN3ZXIgaSBnb3QgaW4gYSBmb3J1bSB3YXM6
+ICJ0aGVyZSBhcmUgbm90IG1hbnkNCj4+IHBlb3BsZSB3aG8gYXJlIGZhbWls
+aWFyIHdpdGggdGhhdCIuIFNvIGkgaG9wZSB5b3UgY2FuIGhlbHAgbWUuDQo+
+Pg0KPj4gTXkgcHJvYmxlbToNCj4+IEFmdGVyIGluc3RhbGxpbmcgdGhlIGxh
+dGVzdCBibHVleiwgaSBjb25uZWN0ZWQgdHdvIGdlbnRvby1QQydzICh2Mi4x
+LjYpDQo+PiB2aWEgdHdvIGJsdWV0b290aC1kb25nbGVzIChCVDMuMCkuDQo+
+PiBQQzI6IyByZmNvbW0gbGlzdGVuIDAgMQ0KPj4gUEMxOiMgcmZjb21tIGNv
+bm5lY3QgMDxibHVldG9vdGgtYWRyZXNzPiAgMQ0KPj4gVGhpcyB3b3JrcyBm
+aW5lLg0KPj4NCj4+IEJ1dCBub3csIHdoZW4gaSB0cnkgdG8gc2VuZCBzb21l
+IGRhdGE6DQo+PiBQQzI6IyBjYXQgL2Rldi9yZmNvbW0wDQo+PiBQQzE6IyBl
+Y2hvICJ0ZXN0Ij4gIC9kZXYvcmZjb21tMA0KPj4gaXQgbG9va3MgbGlrZSB0
+aGlzIG9uIHRoZSBzY3JlZW4gb2YgUEMyOg0KPj4gIl5KXkpeSl5KXl5KXkpe
+Sl5KXkpeSl5KXkpeSl5KXkpeSl5KXkpeSl5KXkpeSl5KXkpeSl50ZXN0Xkpe
+Sl5KXkpeSl5KXkpeSl5KXkpeSl5KXkpeSl5KXkpeSiINCj4gaXQgaGFzIG5v
+dGhpbmcgdG8gZG8gd2l0aCBlbmNyeXB0aW9uLiBUaGVzZSBhcmUgVFRZIHRl
+cm1pbmFsIHNldHRpbmdzLg0KPiBUaGF0IGlzIHdoeSByZmNvbW0gdG9vbCBo
+YXMgYSAtciAocmF3IFRUWSBtb2RlKSBzd2l0Y2guIEFuZCB0aGF0IHN3aXRj
+aA0KPiBpcyBkb2N1bWVudGVkIGluIG1hbnBhZ2UuDQo+DQo+IFJlZ2FyZHMN
+Cj4NCj4gTWFyY2VsDQo+DQo+DQoNCg0KLS0NClRvIHVuc3Vic2NyaWJlIGZy
+b20gdGhpcyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1bnN1YnNjcmliZSBsaW51
+eC1ibHVldG9vdGgiIGluDQp0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFq
+b3Jkb21vQHZnZXIua2VybmVsLm9yZw0KTW9yZSBtYWpvcmRvbW8gaW5mbyBh
+dCAgaHR0cDovL3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8taW5mby5odG1s
+DQoNCg0KIFRvIHJlcG9ydCB0aGlzIGVtYWlsIGFzIHNwYW0gY2xpY2sgaHR0
+cHM6Ly93d3cubWFpbGNvbnRyb2wuY29tL3NyL3dRdzB6bWpQb0hkSlRaR3lP
+Q3JyaGc9PSAuDQoKCk1lbWJlciBvZiB0aGUgQ1NSIHBsYyBncm91cCBvZiBj
+b21wYW5pZXMuIENTUiBwbGMgcmVnaXN0ZXJlZCBpbiBFbmdsYW5kIGFuZCBX
+YWxlcywgcmVnaXN0ZXJlZCBudW1iZXIgNDE4NzM0NiwgcmVnaXN0ZXJlZCBv
+ZmZpY2UgQ2h1cmNoaWxsIEhvdXNlLCBDYW1icmlkZ2UgQnVzaW5lc3MgUGFy
+aywgQ293bGV5IFJvYWQsIENhbWJyaWRnZSwgQ0I0IDBXWiwgVW5pdGVkIEtp
+bmdkb20KTW9yZSBpbmZvcm1hdGlvbiBjYW4gYmUgZm91bmQgYXQgd3d3LmNz
+ci5jb20uIEZvbGxvdyBDU1Igb24gVHdpdHRlciBhdCBodHRwOi8vdHdpdHRl
+ci5jb20vQ1NSX1BMQyBhbmQgcmVhZCBvdXIgYmxvZyBhdCB3d3cuY3NyLmNv
+bS9ibG9nCg==
