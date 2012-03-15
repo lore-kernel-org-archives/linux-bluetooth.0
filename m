@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv4 03/30] Bluetooth: Make l2cap_chan_add available
-Date: Thu, 15 Mar 2012 14:29:54 +0200
-Message-Id: <1331814621-13905-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv4 28/30] Bluetooth: Define AMP controller statuses
+Date: Thu, 15 Mar 2012 14:30:19 +0200
+Message-Id: <1331814621-13905-29-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1331814621-13905-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1331814621-13905-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,24 +11,34 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Function will be used when creating fixed channels
+AMP status codes copied from Bluez patch sent by Peter Krystad
+<pkrystad@codeaurora.org>.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci.h |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 260f93e..f089162 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -865,4 +865,6 @@ void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
- int l2cap_chan_check_security(struct l2cap_chan *chan);
- void l2cap_ertm_init(struct l2cap_chan *chan);
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 2096898..b642038 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -60,6 +60,15 @@
  
-+void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ #define HCI_BREDR_ID	0
+ 
++/* AMP controller status */
++#define AMP_CTRL_POWERED_DOWN			0x00
++#define AMP_CTRL_BLUETOOTH_ONLY			0x01
++#define AMP_CTRL_NO_CAPACITY			0x02
++#define AMP_CTRL_LOW_CAPACITY			0x03
++#define AMP_CTRL_MEDIUM_CAPACITY		0x04
++#define AMP_CTRL_HIGH_CAPACITY			0x05
++#define AMP_CTRL_FULL_CAPACITY			0x06
 +
- #endif /* __L2CAP_H */
+ /* HCI device quirks */
+ enum {
+ 	HCI_QUIRK_NO_RESET,
 -- 
 1.7.9.1
 
