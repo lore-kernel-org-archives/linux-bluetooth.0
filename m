@@ -1,49 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 15 Mar 2012 13:46:56 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: james.steele@accenture.com
+Cc: steffen.becker@tu-ilmenau.de, linux-bluetooth@vger.kernel.org
+Subject: Re: Encrypting problem while sending data via bluetooth
+Message-ID: <20120315114653.GA28905@aemeltch-MOBL1>
+References: <4F60B259.5040800@tu-ilmenau.de>
+ <1331747344.14217.105.camel@aeonflux>
+ <4F61AF8B.3020300@tu-ilmenau.de>
+ <CAHBqpz8=MoK9LFMJp1N8K7iv98hCwG3nU47vh9eyNN+AbunLmA@mail.gmail.com>
+ <81C9FA9C1C2E9E45A9AC3EDD1858BC4323DFFD72@048-CH1MPN1-101.048d.mgd.msft.net>
 MIME-Version: 1.0
-In-Reply-To: <1331808559-12880-7-git-send-email-arik@wizery.com>
-References: <1331808559-12880-1-git-send-email-arik@wizery.com>
-	<1331808559-12880-7-git-send-email-arik@wizery.com>
-Date: Thu, 15 Mar 2012 08:08:56 -0400
-Message-ID: <CAJdJm_N-BfUN3FUjDx0kv3+-uQ=L+uhXGzXM9ec+qH-frQMk_Q@mail.gmail.com>
-Subject: Re: [PATCH v2 6/6] proximity: reporter: implement D-Bus API
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Arik Nemtsov <arik@wizery.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <81C9FA9C1C2E9E45A9AC3EDD1858BC4323DFFD72@048-CH1MPN1-101.048d.mgd.msft.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arik,
+Hi James,
 
-On Thu, Mar 15, 2012 at 6:49 AM, Arik Nemtsov <arik@wizery.com> wrote:
-> Register a D-Bus interface per remote device. Set a watch on the
-> "DeviceAdded" signal to add all existing devices. Likewise set watches
-> on "DeviceCreated" and "DeviceRemoved" to handle dynamic addition and
-> removal of devices.
+On Thu, Mar 15, 2012 at 11:08:35AM +0000, james.steele@accenture.com wrote:
+> Hi Steffen
+> 
+> > But now i got another problem regarding to this:
+> > I use a third PC with the "BPA500" (it's for bluetooth sniffing).
+> > When i use again the command
+> >
+> >
+> > PC1: # echo "test" > /dev/rfcomm0
+> >
+> > then the BPA500 software says:
+> > "100% Payload/CRC Errors"
+> > and it can't go after "start_encrypt_req" (that's the last Opcode in the Link
+> > Management Protocol).
+> >
+> > That's why i still think i have an encryption problem.
+> > But the manpage only shows me how to ENable the encryption.
+> >
+> > So i hope somebody can help me a second time.
+> 
+> From what you've said it appears that there is no problem with encryption - after the start_encrypt_req LMP message if the decoder is failing to decode the sniffed data then that is a good sign that encryption is working correctly.
+> 
+> If you want to decode the encrypted sniffed data then you have to configure your sniffing set-up appropriately.  Normally this requires observing the pairing process so that the sniffer can also compute the link key (and therefore encryption key).  If using Bluetooth v2.0 and earlier you may be able to enter the PIN code you are going to use in the sniffing tool prior to performing pairing.  If using Bluetooth v2.1 and later you will need to configure one of the Bluetooth devices to enter "SSP debug mode".
+> 
+> For the latter (Bluetooth v2.1 and later) case, we have a patch that adds the ability to enable/disable SSP debug mode using the hciconfig tool - I'll push it out to the mailing list as soon as possible, as it appears it would be useful for others.
 
-The paragraph above does not apply anymore. You need to update to
-refer to the device driver.
+You can just issue HCI command like:
 
-> +/* device driver for tracking remote GATT client devices */
-> +static struct btd_device_driver reporter_dev_tracker_driver = {
+hcitool cmd 0x06 0x0004 0x01
 
-What about using "reporter_device_driver"
-
-> +       .name = "Proximity GATT Reporter Device Tracker Driver",
-
-And "Proximity GATT Reporter Device Driver"
-
-> +       .uuids = BTD_UUIDS(GATT_UUID),
-> +       .probe = gatt_device_probe,
-> +       .remove = gatt_device_remove,
-
-And using reporter_probe() / reporter_remove()
-
-> +};
-> +
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Best regards 
+Andrei Emeltchenko 
