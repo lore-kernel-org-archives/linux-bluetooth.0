@@ -1,35 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv4 02/30] Bluetooth: Add send function to chan ops
-Date: Thu, 15 Mar 2012 14:29:53 +0200
-Message-Id: <1331814621-13905-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1331814621-13905-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1331814621-13905-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAJdJm_PAe8PR-Urt3kF+QhhgK-=WZEQQt6upwP_A=dBCT_yTJg@mail.gmail.com>
+References: <1331808559-12880-1-git-send-email-arik@wizery.com>
+ <1331808559-12880-6-git-send-email-arik@wizery.com> <CAJdJm_PAe8PR-Urt3kF+QhhgK-=WZEQQt6upwP_A=dBCT_yTJg@mail.gmail.com>
+From: Arik Nemtsov <arik@wizery.com>
+Date: Thu, 15 Mar 2012 14:18:02 +0200
+Message-ID: <CA+XVXfeo6xmp8aGnsxRaY5bYnX0uj=WQ_RrP=XTGfqHHKU-18w@mail.gmail.com>
+Subject: Re: [PATCH v2 5/6] proximity: immediate alert: implement immediate
+ alert server
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Thu, Mar 15, 2012 at 14:09, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Arik,
+>
+> On Thu, Mar 15, 2012 at 6:49 AM, Arik Nemtsov <arik@wizery.com> wrote:
+>> +void register_imm_alert(struct btd_adapter *adapter, DBusConnection *conn);
+>> +void unregister_imm_alert(struct btd_adapter *adapter);
+>> +const char *imm_get_alert_level(struct btd_device *device);
+>
+> Same suggestion applies here:
+>
+> imm_alert_register()
+> imm_alert_unregister()
+> imm_alert_get_level()
+>
 
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/l2cap.h |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
-
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index c107944..260f93e 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -505,6 +505,8 @@ struct l2cap_ops {
- 
- 	struct l2cap_chan	*(*new_connection) (void *data);
- 	int			(*recv) (void *data, struct sk_buff *skb);
-+	int			(*send) (struct l2cap_chan *chan,
-+				struct msghdr *msg, size_t len, u32 priority);
- 	void			(*close) (void *data);
- 	void			(*state_change) (void *data, int state);
- 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
--- 
-1.7.9.1
-
+Sure.
