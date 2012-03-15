@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv4 17/30] Bluetooth: A2MP: Helper functions to count HCI devs
-Date: Thu, 15 Mar 2012 14:30:08 +0200
-Message-Id: <1331814621-13905-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv4 25/30] Bluetooth: A2MP: Handling fixed channels
+Date: Thu, 15 Mar 2012 14:30:16 +0200
+Message-Id: <1331814621-13905-26-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1331814621-13905-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1331814621-13905-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,102 +11,95 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Helper functions used to cound HCI devices (AMP controllers) and
-build controller list packet.
+A2MP fixed channel do not have sk
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h      |    2 ++
- include/net/bluetooth/hci_core.h |   13 +++++++++++++
- net/bluetooth/a2mp.c             |   31 +++++++++++++++++++++++++++++++
- 3 files changed, 46 insertions(+), 0 deletions(-)
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/a2mp.c          |    4 ++--
+ net/bluetooth/l2cap_core.c    |   15 +++++++++++++--
+ 3 files changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 344b0f9..852e9e2 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -56,6 +56,8 @@
- #define HCI_BREDR	0x00
- #define HCI_AMP		0x01
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index b3f9854..15c0f03 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -557,6 +557,7 @@ struct l2cap_conn {
+ #define L2CAP_CHAN_RAW			1
+ #define L2CAP_CHAN_CONN_LESS		2
+ #define L2CAP_CHAN_CONN_ORIENTED	3
++#define L2CAP_CHAN_CONN_FIX_A2MP	4
  
-+#define HCI_BREDR_ID	0
-+
- /* HCI device quirks */
- enum {
- 	HCI_QUIRK_NO_RESET,
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 828fc7b..18433d0 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -639,6 +639,19 @@ static inline void hci_set_drvdata(struct hci_dev *hdev, void *data)
- 	dev_set_drvdata(&hdev->dev, data);
- }
- 
-+/* hci_dev_list shall be locked */
-+static inline uint8_t __hci_num_ctrl(void)
-+{
-+	uint8_t count = 0;
-+	struct list_head *p;
-+
-+	list_for_each(p, &hci_dev_list) {
-+		count++;
-+	}
-+
-+	return count;
-+}
-+
- struct hci_dev *hci_dev_get(int index);
- struct hci_dev *hci_get_route(bdaddr_t *src, bdaddr_t *dst);
- 
+ /* ----- L2CAP socket info ----- */
+ #define l2cap_pi(sk) ((struct l2cap_pinfo *) sk)
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 19c3422..ac5084c 100644
+index 0ef69de..7709fcd 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -13,6 +13,7 @@
- */
+@@ -433,9 +433,9 @@ static struct l2cap_chan *open_a2mp_chan(struct l2cap_conn *conn)
  
- #include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/a2mp.h>
+ 	BT_DBG("chan %p", chan);
  
-@@ -64,6 +65,36 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
- 	kfree(cmd);
- }
++	chan->chan_type = L2CAP_CHAN_CONN_FIX_A2MP;
++
+ 	chan->sec_level = BT_SECURITY_LOW;
+-	chan->omtu = L2CAP_A2MP_DEFAULT_MTU;
+-	chan->imtu = L2CAP_A2MP_DEFAULT_MTU;
+ 	chan->flush_to = L2CAP_DEFAULT_FLUSH_TO;
+ 	chan->fcs = L2CAP_FCS_CRC16;
  
-+static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
-+{
-+	cl->id = 0;
-+	cl->type = 0;
-+	cl->status = 1;
-+}
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index e8855cc..d840aae 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -333,6 +333,13 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ 		chan->omtu = L2CAP_DEFAULT_MTU;
+ 		break;
+ 
++	case L2CAP_CHAN_CONN_FIX_A2MP:
++		chan->scid = L2CAP_CID_A2MP;
++		chan->dcid = L2CAP_CID_A2MP;
++		chan->omtu = L2CAP_A2MP_DEFAULT_MTU;
++		chan->imtu = L2CAP_A2MP_DEFAULT_MTU;
++		break;
 +
-+/* hci_dev_list shall be locked */
-+static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl, u8 num_ctrl)
-+{
-+	int i = 0;
-+	struct hci_dev *hdev;
+ 	default:
+ 		/* Raw socket can send/recv signalling messages only */
+ 		chan->scid = L2CAP_CID_SIGNALING;
+@@ -363,7 +370,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ {
+ 	struct sock *sk = chan->sk;
+ 	struct l2cap_conn *conn = chan->conn;
+-	struct sock *parent = bt_sk(sk)->parent;
++	struct sock *parent;
+ 
+ 	__clear_chan_timer(chan);
+ 
+@@ -379,12 +386,15 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 		hci_conn_put(conn->hcon);
+ 	}
+ 
++	if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
++		goto clean;
 +
-+	__a2mp_cl_bredr(cl);
-+
-+	list_for_each_entry(hdev, &hci_dev_list, list) {
-+		/* Iterate through AMP controllers */
-+		if (hdev->id == HCI_BREDR_ID)
-+			continue;
-+
-+		/* Starting from second entry */
-+		if (++i >= num_ctrl)
-+			return;
-+
-+		cl[i].id = hdev->id;
-+		cl[i].type = hdev->amp_type;
-+		cl[i].status = hdev->amp_status;
-+	}
-+}
-+
- /* Processing A2MP messages */
- static inline int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
- 							struct a2mp_cmd *hdr)
+ 	lock_sock(sk);
+ 
+ 	__l2cap_state_change(chan, BT_CLOSED, err);
+-
+ 	sock_set_flag(sk, SOCK_ZAPPED);
+ 
++	parent = bt_sk(sk)->parent;
+ 	if (parent) {
+ 		bt_accept_unlink(sk);
+ 		parent->sk_data_ready(parent, 0);
+@@ -397,6 +407,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 			test_bit(CONF_INPUT_DONE, &chan->conf_state)))
+ 		return;
+ 
++clean:
+ 	skb_queue_purge(&chan->tx_q);
+ 
+ 	if (chan->mode == L2CAP_MODE_ERTM) {
 -- 
 1.7.9.1
 
