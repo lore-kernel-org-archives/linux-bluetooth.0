@@ -1,46 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <89B53B23AEC845998BA7BD97586A5556@sisodomain.com>
-References: <1331189303-6734-1-git-send-email-jaganath.k@samsung.com>
-	<20120308234250.GB15265@x220.amr.corp.intel.com>
-	<22D13068A6CE4724BFD60D3D46B5FD11@sisodomain.com>
-	<20120309130804.GA31252@x220.spectrum.wifi>
-	<89B53B23AEC845998BA7BD97586A5556@sisodomain.com>
-Date: Fri, 16 Mar 2012 16:31:58 +0200
-Message-ID: <CABBYNZLibp5+LE3ESgrn4Woj+eOx=f0y-FvZq0Xw-F7T8sSE5g@mail.gmail.com>
-Subject: Re: [PATCH obexd 1/2] gobex: flush tx_queue before disconnection
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jaganath <jaganath.k@samsung.com>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <F82830D409D80E4881C83250E051B74B4A07AD30@banasiexm01.ASIA.ROOT.PRI>
+References: <F0070FBC0FB3174D8D11444EB2D5B0260B44D1AB@DNCE02.ent.ti.com>
+	<CAKT1EBcVv1ya0ArmgwNh968O9QSsQD6oNy1poJDeNgg_V=iuog@mail.gmail.com>
+	<F0070FBC0FB3174D8D11444EB2D5B0260B44D4A1@DNCE02.ent.ti.com>
+	<F82830D409D80E4881C83250E051B74B4A079B44@banasiexm01.ASIA.ROOT.PRI>
+	<F82830D409D80E4881C83250E051B74B4A079C84@banasiexm01.ASIA.ROOT.PRI>
+	<F82830D409D80E4881C83250E051B74B4A079CA2@banasiexm01.ASIA.ROOT.PRI>
+	<CACJA=fWYJrSaqq4b5CmuRT2gX6kH9spxE7kBn0uzPdpHmQHDiQ@mail.gmail.com>
+	<F82830D409D80E4881C83250E051B74B4A07AB92@banasiexm01.ASIA.ROOT.PRI>
+	<CAAngNMbbMN9nY2+c2m-Ad-ORkDQkrCEuB_+VQvDBEkKb0ga3VQ@mail.gmail.com>
+	<F82830D409D80E4881C83250E051B74B4A07AD30@banasiexm01.ASIA.ROOT.PRI>
+Date: Fri, 16 Mar 2012 11:03:23 -0300
+Message-ID: <CAAngNMYz5XLEJdxSwFdTMCcicJ7-i7PGr4qgwAXCEsSEpRWiEg@mail.gmail.com>
+Subject: Re: HID Over GATT implementation
+From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
+To: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
+Cc: Andre Guedes <andre.guedes@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Ganir, Chen" <chen.ganir@ti.com>,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hello Vijaykumar,
 
-On Mon, Mar 12, 2012 at 7:42 AM, Jaganath <jaganath.k@samsung.com> wrote:
-> I have already sent a patch which wait for abort response before
-> disconnection.
-> Subject: †[PATCH obexd] client: Fix ABORT command not sending when user
-> cancels the transfer.
-> Please review it and let me know your comments
+On Fri, Mar 16, 2012 at 3:44 AM, Vijaykumar Dadmode
+<Vijaykumar.Dadmode@csr.com> wrote:
+> Hi,
+>
+>>>>> <Vijaykumar.Dadmode@csr.com> wrote:
+>>> > Hi Andre,
+>>> >
+>>> >>> Hi Vijay,
+>>
+>>>> Is this implementation public anywhere?
+>>>
+>>> No its not!
+>>>
+>
+>>> Are you planning to make it public, or is it just an internal
+>>> prototype or something like this?
+>
+> It was a internal prototype, yes I can submit the code if the design is approved.
+>
 
-Afaik it didn't invalidate the transfer id thus the callback and
-user_data are still reachable so you might need to check again, also
-it should no longer be possible to cancel using the same id too.
+If I understood correctly your design explanation, you are re-using
+the HIDP module to pass the HID reports from the userspace to the
+kernel. This is not the architecture we were discussing initially
+(where we = indt and ti guys, with the bluetooth and input community),
+because HIDP expect to deal with 2 dedicated L2CAP sockets, one for
+control and the other for interruptions.
 
-My proposal was actually to add g_obex_flush/g_obex_shutdown which can
-be used similarly to g_io_channel_shutdown, although for this specific
-problem it may not be the best solution due to stacks breaking if the
-transport is disconnected while responding, in case of SRM there maybe
-no response to wait and several packet are queued waiting POLL_OUT
-while the application wants to disconnect.
+Could you explain better how do you extract HoG traffic from the LE
+L2CAP socket and make it available to the HIDP module (supposing I've
+understood your architecture correctly)?
 
-Btw I don't think calling write_data will block since the io channel
-should be non-blocking so we could have the same behavior as
-g_io_channel_shutdown and return G_IO_STATUS_AGAIN if the packets
-could not be flushed.
 
 -- 
-Luiz Augusto von Dentz
+Jo√£o Paulo Rechi Vita
+Openbossa Labs - INdT
