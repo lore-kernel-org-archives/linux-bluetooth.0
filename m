@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1331891164-24588-6-git-send-email-arik@wizery.com>
+In-Reply-To: <1331891164-24588-5-git-send-email-arik@wizery.com>
 References: <1331891164-24588-1-git-send-email-arik@wizery.com>
-	<1331891164-24588-6-git-send-email-arik@wizery.com>
-Date: Fri, 16 Mar 2012 07:54:41 -0400
-Message-ID: <CAJdJm_PevgTAKTzTGQEWUeAWYLA3pv5JNDE1NgLHXSe-mvefyg@mail.gmail.com>
-Subject: Re: [PATCH v3 5/6] proximity: immediate alert: implement immediate
- alert server
+	<1331891164-24588-5-git-send-email-arik@wizery.com>
+Date: Fri, 16 Mar 2012 07:49:30 -0400
+Message-ID: <CAJdJm_OD7D=tfjF534nRmLegfYDK3PGRC9hPP8gt2VQdEcrWgQ@mail.gmail.com>
+Subject: Re: [PATCH v3 4/6] proximity: link loss: implement link loss server
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: Arik Nemtsov <arik@wizery.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -17,13 +16,13 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi Arik,
 
 On Fri, Mar 16, 2012 at 5:46 AM, Arik Nemtsov <arik@wizery.com> wrote:
-> +void imm_alert_register(struct btd_adapter *adapter, DBusConnection *conn);
-> +void imm_alert_unregister(struct btd_adapter *adapter);
-> +const char *imm_get_alert_level(struct btd_device *device);
+> +static void link_Loss_local_disc(struct btd_device *device, gboolean removal,
+> +                                void *user_data)
 
-You may also fix this (to keep same prefix for non-local functions):
+Not sure if this was already on the original series (sorry if I missed
+it), but there is a typo here:
 
-imm_get_alert_level -> imm_alert_get_level
+link_Loss_local_disc -> link_loss_local_disc
 
 Regards,
 -- 
