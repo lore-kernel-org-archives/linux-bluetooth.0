@@ -1,36 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 Mar 2012 12:26:59 -0300
+Date: Fri, 16 Mar 2012 12:25:56 -0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	padovan@profusion.mobi
-Subject: Re: [PATCH] Bluetooth: Remove redundant hdev->parent field
-Message-ID: <20120316152659.GG20650@x220>
-References: <1331304822-426-1-git-send-email-dh.herrmann@googlemail.com>
+To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: btusb: Add USB device ID "0a5c 21e8"
+Message-ID: <20120316152556.GF20650@x220>
+References: <20120229234414.GA19829@joana>
+ <1330608227-14636-1-git-send-email-jprvita@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1331304822-426-1-git-send-email-dh.herrmann@googlemail.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1330608227-14636-1-git-send-email-jprvita@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi João Paulo,
 
-On Fri, Mar 09, 2012, David Herrmann wrote:
-> We initialize the "struct device" in hci_alloc_dev() for a long time now
-> so we can access hdev->dev.parent directly. Hence, we can drop the
-> temporary field hdev->parent which is used in no other place than
-> hci_add_sysfs().
+On Thu, Mar 01, 2012, João Paulo Rechi Vita wrote:
+> One more vendor-specific ID for BCM20702A0.
 > 
-> SET_HCIDEV_DEV() is never called after registering a device by the drivers
-> so we do not overwrite internal device-state. Furthermore, hdev->dev is
-> initialized to 0 by kzalloc() inside hci_alloc_dev() so the default
-> behavior with dev.parent = NULL is kept.
+> T:  Bus=01 Lev=03 Prnt=05 Port=02 Cnt=01 Dev#=  9 Spd=12  MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0a5c ProdID=21e8 Rev=01.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM20702A0
+> S:  SerialNumber=00027221F4E2
+> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 > 
-> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
+> Signed-off-by: João Paulo Rechi Vita <jprvita@openbossa.org>
 > ---
->  drivers/bluetooth/hci_ldisc.c    |    2 +-
->  include/net/bluetooth/hci_core.h |    3 +--
->  net/bluetooth/hci_sysfs.c        |    1 -
->  3 files changed, 2 insertions(+), 4 deletions(-)
+>  drivers/bluetooth/btusb.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 
 Applied to my bluetooth-next tree. Thanks.
 
