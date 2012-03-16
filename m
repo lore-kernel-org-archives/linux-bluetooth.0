@@ -1,28 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 Mar 2012 12:31:33 -0300
+Date: Fri, 16 Mar 2012 12:59:39 -0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Handle EIR tags for Device ID
-Message-ID: <20120316153133.GA21196@x220>
-References: <1331519532-26505-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH v3 0/2] LE support for MGMT Stop Discovery
+Message-ID: <20120316155939.GA22160@x220>
+References: <1331841128-1396-1-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1331519532-26505-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1331841128-1396-1-git-send-email-andre.guedes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Andre,
 
-On Sun, Mar 11, 2012, Marcel Holtmann wrote:
-> The Device ID information can be provided via Extended Inquiry Data
-> as well. If a valid source is present, then include it.
+On Thu, Mar 15, 2012, Andre Guedes wrote:
+> From the previous cover letter:
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci_core.h |    4 ++++
->  net/bluetooth/mgmt.c             |   13 +++++++++++++
->  2 files changed, 17 insertions(+), 0 deletions(-)
+> This small patch series adds LE support for Stop Discovery MGMT command.
+> Now, we are able to stop LE discovery procedues (LE-only and interleaved).
+> 
+> A brief word about patch 1/2: due to discovery state machine, we don't need
+> to worry about canceling hdev->le_scan work since it is never pending or
+> running when hci_cancel_le_scan is called.
+> 
+> Andre Guedes (2):
+>   Bluetooth: Add hci_cancel_le_scan() to hci_core
+>   Bluetooth: LE support for MGMT stop discovery
+> 
+>  include/net/bluetooth/hci_core.h |    1 +
+>  net/bluetooth/hci_core.c         |   18 ++++++++++++++++++
+>  net/bluetooth/hci_event.c        |    6 +++++-
+>  net/bluetooth/mgmt.c             |    6 +++++-
+>  4 files changed, 29 insertions(+), 2 deletions(-)
 
-Applied to my bluetooth-next tree. Thanks.
+Both patches have been applied to my bluetooth-next tree. Thanks.
 
 Johan
