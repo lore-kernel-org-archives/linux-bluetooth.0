@@ -1,27 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 Mar 2012 12:29:31 -0300
+Date: Fri, 16 Mar 2012 12:26:59 -0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/1] Bluetooth: Fix corruption of device_connected pkt
-Message-ID: <20120316152931.GH20650@x220>
-References: <1331330823-11496-1-git-send-email-bgix@codeaurora.org>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	padovan@profusion.mobi
+Subject: Re: [PATCH] Bluetooth: Remove redundant hdev->parent field
+Message-ID: <20120316152659.GG20650@x220>
+References: <1331304822-426-1-git-send-email-dh.herrmann@googlemail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1331330823-11496-1-git-send-email-bgix@codeaurora.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1331304822-426-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+Hi David,
 
-On Fri, Mar 09, 2012, Brian Gix wrote:
-> Incorrect pointer passed to eir_append_data made mgmt_device_connected
-> event unparsable by mgmt user space entity.
+On Fri, Mar 09, 2012, David Herrmann wrote:
+> We initialize the "struct device" in hci_alloc_dev() for a long time now
+> so we can access hdev->dev.parent directly. Hence, we can drop the
+> temporary field hdev->parent which is used in no other place than
+> hci_add_sysfs().
 > 
-> Signed-off-by: Brian Gix <bgix@codeaurora.org>
+> SET_HCIDEV_DEV() is never called after registering a device by the drivers
+> so we do not overwrite internal device-state. Furthermore, hdev->dev is
+> initialized to 0 by kzalloc() inside hci_alloc_dev() so the default
+> behavior with dev.parent = NULL is kept.
+> 
+> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 > ---
->  net/bluetooth/mgmt.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  drivers/bluetooth/hci_ldisc.c    |    2 +-
+>  include/net/bluetooth/hci_core.h |    3 +--
+>  net/bluetooth/hci_sysfs.c        |    1 -
+>  3 files changed, 2 insertions(+), 4 deletions(-)
 
 Applied to my bluetooth-next tree. Thanks.
 
