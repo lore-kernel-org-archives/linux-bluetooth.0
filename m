@@ -1,30 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 Mar 2012 12:30:51 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Add TX power tag to EIR data
-Message-ID: <20120316153051.GI20650@x220>
-References: <1331519241-24778-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1331519241-24778-1-git-send-email-marcel@holtmann.org>
+Message-ID: <1331913063.14217.148.camel@aeonflux>
+Subject: Re: [PATCH 1/7] Parse config DeviceID string on bluetoothd startup
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
+Date: Fri, 16 Mar 2012 08:51:03 -0700
+In-Reply-To: <1331908913-10330-1-git-send-email-szymon.janc@tieto.com>
+References: <1331908913-10330-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Szymon,
 
-On Sun, Mar 11, 2012, Marcel Holtmann wrote:
-> The Inquiry Response TX power tag should be added to the Extended
-> Inquiry Data (EIR) as well.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> Instead of parsing config DeviceID string on sdp server startup, parse
+> it in main while reading config file. This allow to store logical DID
+> values in main_opts (instead of raw config string) and make use of them
+> in bluetoothd code.
 > ---
->  include/net/bluetooth/hci.h      |    4 ++++
->  include/net/bluetooth/hci_core.h |    1 +
->  net/bluetooth/hci_event.c        |    9 ++++++---
->  net/bluetooth/mgmt.c             |    9 +++++++++
->  4 files changed, 20 insertions(+), 3 deletions(-)
+>  src/hcid.h         |    6 +++++-
+>  src/main.c         |   20 +++++++++++++++++---
+>  src/sdpd-server.c  |   19 ++++---------------
+>  src/sdpd-service.c |   16 +++++++++-------
+>  src/sdpd.h         |    5 ++---
+>  5 files changed, 37 insertions(+), 29 deletions(-)
+> 
+> diff --git a/src/hcid.h b/src/hcid.h
+> index e2eaf86..53b098a 100644
+> --- a/src/hcid.h
+> +++ b/src/hcid.h
+> @@ -42,7 +42,11 @@ struct main_opts {
+>  
+>  	uint8_t		mode;
+>  	uint8_t		discov_interval;
+> -	char		deviceid[15]; /* FIXME: */
+> +
+> +	gboolean	did;
 
-Applied to my bluetooth-next tree. Thanks.
+store the uint16_t did_source here. 0x0000 means off like it does for
+the kernel.
 
-Johan
+> +	uint16_t	did_vendor;
+> +	uint16_t	did_product;
+> +	uint16_t	did_version;
+>  };
+
+Regards
+
+Marcel
+
+
