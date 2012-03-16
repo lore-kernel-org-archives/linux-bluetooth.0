@@ -1,27 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 Mar 2012 12:05:03 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
-Subject: Re: [PATCH 1/2] Bluetooth: mgmt: Fix some code style and indentation
- issues
-Message-ID: <20120316150503.GA19444@joana>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 2/2] Bluetooth: mgmt: Don't allow to set invalid value to DeviceID source
+Date: Fri, 16 Mar 2012 16:02:57 +0100
+Message-ID: <1331910177-11513-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1331910177-11513-1-git-send-email-szymon.janc@tieto.com>
 References: <1331910177-11513-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1331910177-11513-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Reply with MGMT_STATUS_INVALID_PARAMS when userspace is trying to set
+source with out-of-scope value.
 
-* Szymon Janc <szymon.janc@tieto.com> [2012-03-16 16:02:56 +0100]:
+Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+---
+ net/bluetooth/mgmt.c |    9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
-> ---
->  net/bluetooth/mgmt.c |   12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 70eee11..a5ec832 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2528,12 +2528,19 @@ static int set_device_id(struct sock *sk, struct hci_dev *hdev, void *data,
+ {
+ 	struct mgmt_cp_set_device_id *cp = data;
+ 	int err;
++	__u16 source;
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
++	source = __le16_to_cpu(cp->source);
++
++	if (source > 0x0002)
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_DEVICE_ID,
++				  MGMT_STATUS_INVALID_PARAMS);
++
+ 	hci_dev_lock(hdev);
+ 
+-	hdev->devid_source = __le16_to_cpu(cp->source);
++	hdev->devid_source = source;
+ 	hdev->devid_vendor = __le16_to_cpu(cp->vendor);
+ 	hdev->devid_product = __le16_to_cpu(cp->product);
+ 	hdev->devid_version = __le16_to_cpu(cp->version);
+-- 
+on behalf of ST-Ericsson
 
-Acked-by: Gustavo Padovan <gustavo@padovan.org>
-
-	Gustavo
