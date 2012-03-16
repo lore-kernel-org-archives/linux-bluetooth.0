@@ -1,33 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 Mar 2012 12:36:10 -0300
+Date: Fri, 16 Mar 2012 12:30:51 -0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] Bluetooth: trivial: Correct types
-Message-ID: <20120316153610.GA21335@x220>
-References: <1331560774-10748-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Add TX power tag to EIR data
+Message-ID: <20120316153051.GI20650@x220>
+References: <1331519241-24778-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1331560774-10748-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1331519241-24778-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Marcel,
 
-On Mon, Mar 12, 2012, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Sun, Mar 11, 2012, Marcel Holtmann wrote:
+> The Inquiry Response TX power tag should be added to the Extended
+> Inquiry Data (EIR) as well.
 > 
-> Fix sparse warnigns below:
-> ...
-> net/bluetooth/hci_sysfs.c:458:33: warning: cast to restricted __be32
-> net/bluetooth/hci_sysfs.c:458:47: warning: cast to restricted __be16
-> ...
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/hci_sysfs.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
+>  include/net/bluetooth/hci.h      |    4 ++++
+>  include/net/bluetooth/hci_core.h |    1 +
+>  net/bluetooth/hci_event.c        |    9 ++++++---
+>  net/bluetooth/mgmt.c             |    9 +++++++++
+>  4 files changed, 20 insertions(+), 3 deletions(-)
 
-Patches 1-3 have been applied. Thanks.
+Applied to my bluetooth-next tree. Thanks.
 
 Johan
