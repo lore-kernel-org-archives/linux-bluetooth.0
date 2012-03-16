@@ -1,53 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1331913063.14217.148.camel@aeonflux>
-Subject: Re: [PATCH 1/7] Parse config DeviceID string on bluetoothd startup
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
-Date: Fri, 16 Mar 2012 08:51:03 -0700
-In-Reply-To: <1331908913-10330-1-git-send-email-szymon.janc@tieto.com>
-References: <1331908913-10330-1-git-send-email-szymon.janc@tieto.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Fri, 16 Mar 2012 12:29:31 -0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Brian Gix <bgix@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/1] Bluetooth: Fix corruption of device_connected pkt
+Message-ID: <20120316152931.GH20650@x220>
+References: <1331330823-11496-1-git-send-email-bgix@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1331330823-11496-1-git-send-email-bgix@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Brian,
 
-> Instead of parsing config DeviceID string on sdp server startup, parse
-> it in main while reading config file. This allow to store logical DID
-> values in main_opts (instead of raw config string) and make use of them
-> in bluetoothd code.
-> ---
->  src/hcid.h         |    6 +++++-
->  src/main.c         |   20 +++++++++++++++++---
->  src/sdpd-server.c  |   19 ++++---------------
->  src/sdpd-service.c |   16 +++++++++-------
->  src/sdpd.h         |    5 ++---
->  5 files changed, 37 insertions(+), 29 deletions(-)
+On Fri, Mar 09, 2012, Brian Gix wrote:
+> Incorrect pointer passed to eir_append_data made mgmt_device_connected
+> event unparsable by mgmt user space entity.
 > 
-> diff --git a/src/hcid.h b/src/hcid.h
-> index e2eaf86..53b098a 100644
-> --- a/src/hcid.h
-> +++ b/src/hcid.h
-> @@ -42,7 +42,11 @@ struct main_opts {
->  
->  	uint8_t		mode;
->  	uint8_t		discov_interval;
-> -	char		deviceid[15]; /* FIXME: */
-> +
-> +	gboolean	did;
+> Signed-off-by: Brian Gix <bgix@codeaurora.org>
+> ---
+>  net/bluetooth/mgmt.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-store the uint16_t did_source here. 0x0000 means off like it does for
-the kernel.
+Applied to my bluetooth-next tree. Thanks.
 
-> +	uint16_t	did_vendor;
-> +	uint16_t	did_product;
-> +	uint16_t	did_version;
->  };
-
-Regards
-
-Marcel
-
-
+Johan
