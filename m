@@ -1,54 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F660390.3050702@s2004.tu-chemnitz.de>
-Date: Sun, 18 Mar 2012 16:47:28 +0100
-From: Holger Langenau <holger.langenau@s2004.tu-chemnitz.de>
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg
+	<johan.hedberg@gmail.com>
+CC: "Ganir, Chen" <chen.ganir@ti.com>,
+        "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH v3 0/3] GATT: Change the way GATT Plugins are
+ enabled/disabled
+Date: Sun, 18 Mar 2012 06:47:50 +0000
+Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B451054@DNCE02.ent.ti.com>
+References: <1331723767-21436-1-git-send-email-chen.ganir@ti.com>
+In-Reply-To: <1331723767-21436-1-git-send-email-chen.ganir@ti.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Problems connecting via BCM2035
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Johan, Marcell,
 
-For some time I have been using a Sitecom Bluetooth USB Adapter 
-(Art.code CN-500V2) to send files to or save contacts from my mobile 
-(Nokia 2700c). lsusb reports it as Broadcom Corp. BCM2035 Bluetooth 
-dongle (ID 0a5c:200a). This worked fine on a Debian Squeeze (bluez 4.66) 
-and Ubuntu 10.04 (bluez 4.60). However using more recent systems on my 
-main machine (Debian wheezy & Arch Linux (both bluez 4.99), Fedora FC16, 
-Ubuntu 11.10) I did not get it to work for a long time.
-It took me some time to find a reason to this. From a fresh install of 
-Debian squeeze I built multiple versions of bluez from source and found 
-that the problem is between commits 9d7109c and bca43a4 (version 
-4.84..4.85; 5b1a2a3 breaks it completely for me).
+What about this patch set ?
 
-Setting event[2] |= 0x04 in set_event_mask in plugins/hcipos.c fixes the 
-problem for me. Sending files or retrieving contacts etc. from the phone 
-works without problems. But having no deep knowledge of the 
-communication between hardware and the kernel I don't know if this is 
-really a fix for the problem or just the symptom.
+Thanks,
+Chen Ganir
 
-The testing was done with l2ping. In my setting the working version gets 
-50 responses until I get a "Connection reset by peer" message. The 
-non-working version gives me 10 respones (the last with a longer time), 
-4 messages "no response from ..." and after that a "Recv failed: 
-Connection reset by peer".
 
-Here is some more data of the stick:
-
-Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
-Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-Link policy:
-Link mode: SLAVE ACCEPT
-Class: 0x420100
-Service Classes: Networking, Telephony
-Device Class: Computer, Uncategorized
-HCI Version: 1.2 (0x2)  Revision: 0x3
-LMP Version: 1.2 (0x2)  Subversion: 0x6963
-Manufacturer: Broadcom Corporation (15)
-
-Please let me know if I can provide some more information.
-
-Best regards,
-Holger
+> -----Original Message-----
+> From: Chen Ganir [mailto:chen.ganir@gmail.com] On Behalf Of Ganir, Chen
+> Sent: Wednesday, March 14, 2012 1:16 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: Ganir, Chen
+> Subject: [PATCH v3 0/3] GATT: Change the way GATT Plugins are
+> enabled/disabled
+>=20
+> From: Chen Ganir <chen.ganir@ti.com>
+>=20
+> This patch set is a result of the discussion on the #bluez channel.
+>=20
+> Consolidate the --enable_<profile> for gatt profiles into a single
+> switch, called --enable_gatt.
+>=20
+> In addition, modify the AttributeServer propery in the main.conf to
+> EnableGatt option (default=3Dfalse) and make sure all GATT plugins query
+> this option before trying to load (in the _init function of the
+> plugin)
+>=20
+> This is v3 of the patch set - fixed as suggested on the mailing list.
+>=20
+> Chen Ganir (3):
+>   GATT: Remove individual config switches
+>   GATT: Rename Attribute Server switch
+>   GATT: Profile support for EnableGatt
+>=20
+>  Makefile.am            |   38 ++++++++++----------------------------
+>  Makefile.tools         |    8 +++++---
+>  acinclude.m4           |   32 ++++----------------------------
+>  alert/main.c           |    9 +++++----
+>  bootstrap-configure    |    6 +-----
+>  plugins/gatt-example.c |    6 +++---
+>  proximity/main.c       |   10 +++++++++-
+>  proximity/reporter.c   |    7 ++++---
+>  src/adapter.c          |    8 ++++----
+>  src/hcid.h             |    2 +-
+>  src/main.c             |    4 ++--
+>  src/main.conf          |    5 ++---
+>  thermometer/main.c     |   11 +++++++++++
+>  time/main.c            |    9 +++++----
+>  14 files changed, 66 insertions(+), 89 deletions(-)
+>=20
+> --
+> 1.7.4.1
