@@ -1,71 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg
-	<johan.hedberg@gmail.com>
-CC: "Ganir, Chen" <chen.ganir@ti.com>,
-        "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Anderson Lizardo <anderson.lizardo@openbossa.org>
 Subject: RE: [PATCH v3 0/3] GATT: Change the way GATT Plugins are
  enabled/disabled
-Date: Sun, 18 Mar 2012 06:47:50 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B451054@DNCE02.ent.ti.com>
+Date: Sun, 18 Mar 2012 06:13:41 +0000
+Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B450AF5@DNCE02.ent.ti.com>
 References: <1331723767-21436-1-git-send-email-chen.ganir@ti.com>
-In-Reply-To: <1331723767-21436-1-git-send-email-chen.ganir@ti.com>
-Content-Type: text/plain; charset="us-ascii"
+	<CAJdJm_N854Z05+jDhvS-xjgiJhZEpRBjqqfRe8Z-+o38=X56AA@mail.gmail.com>
+ <CAKT1EBfPNciHd3ykxzhb70-obG4Lqixcpj4-6-UOQEBt8reMiA@mail.gmail.com>
+In-Reply-To: <CAKT1EBfPNciHd3ykxzhb70-obG4Lqixcpj4-6-UOQEBt8reMiA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Johan, Marcell,
-
-What about this patch set ?
-
-Thanks,
-Chen Ganir
-
-
-> -----Original Message-----
-> From: Chen Ganir [mailto:chen.ganir@gmail.com] On Behalf Of Ganir, Chen
-> Sent: Wednesday, March 14, 2012 1:16 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: Ganir, Chen
-> Subject: [PATCH v3 0/3] GATT: Change the way GATT Plugins are
-> enabled/disabled
->=20
-> From: Chen Ganir <chen.ganir@ti.com>
->=20
-> This patch set is a result of the discussion on the #bluez channel.
->=20
-> Consolidate the --enable_<profile> for gatt profiles into a single
-> switch, called --enable_gatt.
->=20
-> In addition, modify the AttributeServer propery in the main.conf to
-> EnableGatt option (default=3Dfalse) and make sure all GATT plugins query
-> this option before trying to load (in the _init function of the
-> plugin)
->=20
-> This is v3 of the patch set - fixed as suggested on the mailing list.
->=20
-> Chen Ganir (3):
->   GATT: Remove individual config switches
->   GATT: Rename Attribute Server switch
->   GATT: Profile support for EnableGatt
->=20
->  Makefile.am            |   38 ++++++++++----------------------------
->  Makefile.tools         |    8 +++++---
->  acinclude.m4           |   32 ++++----------------------------
->  alert/main.c           |    9 +++++----
->  bootstrap-configure    |    6 +-----
->  plugins/gatt-example.c |    6 +++---
->  proximity/main.c       |   10 +++++++++-
->  proximity/reporter.c   |    7 ++++---
->  src/adapter.c          |    8 ++++----
->  src/hcid.h             |    2 +-
->  src/main.c             |    4 ++--
->  src/main.conf          |    5 ++---
->  thermometer/main.c     |   11 +++++++++++
->  time/main.c            |    9 +++++----
->  14 files changed, 66 insertions(+), 89 deletions(-)
->=20
-> --
-> 1.7.4.1
+Q2xhdWRpbywNCg0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IENsYXVk
+aW8gVGFrYWhhc2kgW21haWx0bzpjbGF1ZGlvLnRha2FoYXNpQG9wZW5ib3NzYS5vcmddDQo+IFNl
+bnQ6IEZyaWRheSwgTWFyY2ggMTYsIDIwMTIgOTo0NCBQTQ0KPiBUbzogR2FuaXIsIENoZW4NCj4g
+Q2M6IEJsdWVaIGRldmVsb3BtZW50OyBBbmRlcnNvbiBMaXphcmRvDQo+IFN1YmplY3Q6IFJlOiBb
+UEFUQ0ggdjMgMC8zXSBHQVRUOiBDaGFuZ2UgdGhlIHdheSBHQVRUIFBsdWdpbnMgYXJlDQo+IGVu
+YWJsZWQvZGlzYWJsZWQNCj4gDQo+IEhpIENoZW4gR2FuaXIsDQo+IA0KPiBPbiBXZWQsIE1hciAx
+NCwgMjAxMiBhdCA4OjMxIEFNLCBBbmRlcnNvbiBMaXphcmRvDQo+IDxhbmRlcnNvbi5saXphcmRv
+QG9wZW5ib3NzYS5vcmc+IHdyb3RlOg0KPiA+IEhpIENoZW4sDQo+ID4NCj4gPiBPbiBXZWQsIE1h
+ciAxNCwgMjAxMiBhdCA3OjE2IEFNLCDCoDxjaGVuLmdhbmlyQHRpLmNvbT4gd3JvdGU6DQo+ID4+
+IEZyb206IENoZW4gR2FuaXIgPGNoZW4uZ2FuaXJAdGkuY29tPg0KPiA+Pg0KPiA+PiBUaGlzIHBh
+dGNoIHNldCBpcyBhIHJlc3VsdCBvZiB0aGUgZGlzY3Vzc2lvbiBvbiB0aGUgI2JsdWV6IGNoYW5u
+ZWwuDQo+ID4+DQo+ID4+IENvbnNvbGlkYXRlIHRoZSAtLWVuYWJsZV88cHJvZmlsZT4gZm9yIGdh
+dHQgcHJvZmlsZXMgaW50byBhIHNpbmdsZQ0KPiA+PiBzd2l0Y2gsIGNhbGxlZCAtLWVuYWJsZV9n
+YXR0Lg0KPiA+Pg0KPiA+PiBJbiBhZGRpdGlvbiwgbW9kaWZ5IHRoZSBBdHRyaWJ1dGVTZXJ2ZXIg
+cHJvcGVyeSBpbiB0aGUgbWFpbi5jb25mIHRvDQo+ID4+IEVuYWJsZUdhdHQgb3B0aW9uIChkZWZh
+dWx0PWZhbHNlKSBhbmQgbWFrZSBzdXJlIGFsbCBHQVRUIHBsdWdpbnMNCj4gcXVlcnkNCj4gPj4g
+dGhpcyBvcHRpb24gYmVmb3JlIHRyeWluZyB0byBsb2FkIChpbiB0aGUgX2luaXQgZnVuY3Rpb24g
+b2YgdGhlDQo+ID4+IHBsdWdpbikNCj4gPj4NCj4gPj4gVGhpcyBpcyB2MyBvZiB0aGUgcGF0Y2gg
+c2V0IC0gZml4ZWQgYXMgc3VnZ2VzdGVkIG9uIHRoZSBtYWlsaW5nDQo+IGxpc3QuDQo+ID4NCj4g
+PiBMb29rcyBnb29kIHRvIG1lLg0KPiA+DQo+ID4gUmVnYXJkcywNCj4gPiAtLQ0KPiA+IEFuZGVy
+c29uIExpemFyZG8NCj4gPiBJbnN0aXR1dG8gTm9raWEgZGUgVGVjbm9sb2dpYSAtIElOZFQNCj4g
+PiBNYW5hdXMgLSBCcmF6aWwNCj4gDQo+IEhvdyBhcmUgeW91IHBsYW5uaW5nIHRvIGVuYWJsZS9k
+aXNhYmxlIEhvRz8NCj4gSU1PLCB0aGUgaW5wdXQgRC1CdXMgQVBJIG5lZWRzIHRvIGJlIGFsaWdu
+ZWQsIGl0IHNob3VsZCBiZSB0aGUgc2FtZQ0KPiBmb3IgSElEIG92ZXIgQlIvRURSIGFuZCBISUQg
+b3ZlciBHQVRULg0KPiANCj4gVGhlIHBvaW50IGlzOiBzaG91bGQgIi0tZGlzYWJsZS1pbnB1dCIg
+ZGlzYWJsZSBIb0cgYWxzbz8NCj4gDQpIT0cgU2hvdWxkIGJlIGRlcGVuZGVudCBvbiBib3RoIC0t
+ZW5hYmxlLWdhdHQgYW5kIC0tZGlzYWJsZS1pbnB1dC4gWW91IGNhbiBub3QgaGF2ZSBIT0cgaWYg
+aW5wdXQgaXMgZGlzYWJsZWQsIG9yIGlmIGdhdHQgaXMgZGlzYWJsZWQuIA0KDQoNCj4gQlIsDQo+
+IENsYXVkaW8uDQoNCg0KDQoNClRoYW5rcywNCkNoZW4gR2FuaXINCg==
