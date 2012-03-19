@@ -1,188 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1331559165-28367-2-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1331559165-28367-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1331559165-28367-2-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Mon, 19 Mar 2012 09:43:17 -0300
-Message-ID: <CABBYNZKfYAHNEnBv-vkOur9wnNPCVs+yz3UHPFAW+FKr6yPYrw@mail.gmail.com>
-Subject: Re: [PATCH obexd v0 01/11] client: minor buffer access api changes
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
+In-Reply-To: <1316521416.1937.70.camel@aeonflux>
+References: <1316468136-12472-1-git-send-email-andre.guedes@openbossa.org>
+	<1316468136-12472-2-git-send-email-andre.guedes@openbossa.org>
+	<1316521416.1937.70.camel@aeonflux>
+Date: Mon, 19 Mar 2012 09:40:58 -0300
+Message-ID: <CACJA=fWtPbLGqDot1vzSKkt5fpunWViuqQ6-Y1QiC_Uw_fkgiw@mail.gmail.com>
+Subject: Re: [PATCH v4 01/14] Bluetooth: Periodic Inquiry and mgmt discovering event
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Marcel,
 
-On Mon, Mar 12, 2012 at 10:32 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+On Tue, Sep 20, 2011 at 9:23 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Andre,
 >
-> Trivial changes in buffer getters in both session and transfer:
->        - const qualifiers added, to avoid unwanted frees
->        - Buffers are now returned as void* instead of guint8*
+>> By using periodic inquiry command we're not able to detect correctly
+>> when the controller has started inquiry.
+>>
+>> Today we have this workaround in inquiry result event handler to set
+>> the HCI_INQUIRY flag when it sees the first inquiry result event.
+>> This workaround isn't enough because the device may be performing
+>> an inquiry but the HCI_INQUIRY flag is not set. For instance, if
+>> there is no device in range, no inquiry result event is generated,
+>> consequently, the HCI_INQUIRY flags isn't set when it should so.
+>>
+>> We rely on HCI_INQUIRY flag to implement the discovery procedure
+>> properly. So, as we aren't able to clear/set the HCI_INQUIRY flag in
+>> a reliable manner, periodic inquiry events shouldn't change the
+>> HCI_INQUIRY flag. In future, if needed, we might add a new flag (e.g.
+>> HCI_PINQUIRY) to know if the controller is performing periodic
+>> inquiry.
+>>
+>> Thus, due to that issue and in order to keep compatibility with
+>> userspace, periodic inquiry events shouldn't send mgmt discovering
+>> events.
 >
-> Also, obc_session_get_buffer does not clear the internal buffer any
-> more. This doesn't have any impact in the current code though, since
-> transfers are unregistered immediately after.
-> ---Hi
->  client/pbap.c     |    2 +-
->  client/session.c  |   22 +++++-----------------
->  client/session.h  |    4 ++--
->  client/transfer.c |   17 +++++++----------
->  client/transfer.h |   10 +++++-----
->  5 files changed, 20 insertions(+), 35 deletions(-)
+> I spend some time thinking about this and yes, we need to clean this
+> mess up right now.
 >
-> diff --git a/client/pbap.c b/client/pbap.c
-> index 53a608e..2e1cc10 100644
-> --- a/client/pbap.c
-> +++ b/client/pbap.c
-> @@ -294,7 +294,7 @@ static void pbap_setpath_cb(struct obc_session *session, GError *err,
->  static void read_return_apparam(struct obc_session *session,
->                                guint16 *phone_book_size, guint8 *new_missed_calls)
->  {
-> -       struct apparam_hdr *hdr;
-> +       const struct apparam_hdr *hdr;
->        size_t size;
+> So intermixing inquiry with periodic inquiry was a bad idea and we
+> should split this. So I think internally hci_dev needs a variable to
+> track if we have enabled periodic inquiry or not. So it should express
+> if periodic inquiry is on or off. Nothing else since we should not
+> bother with trying to match periodic inquiry result to inquiry results.
+> I would actually go this far that we should ignore inquiry result events
+> from periodic inquiry.
 >
->        *phone_book_size = 0;
-> diff --git a/client/session.c b/client/session.c
-> index a9883c7..c597bac 100644
-> --- a/client/session.c
-> +++ b/client/session.c
-> @@ -1156,10 +1156,9 @@ static struct obc_transfer *obc_session_get_transfer(
->        return session->p->transfer;
->  }
+> Lets start creating some hci_dev internal state flags variable to track
+> certain states/modes of the controller. As I said earlier, overloading a
+> public API/ABI is not a good idea at all.
 >
-> -const char *obc_session_get_buffer(struct obc_session *session, size_t *size)
-> +const void *obc_session_get_buffer(struct obc_session *session, size_t *size)
->  {
->        struct obc_transfer *transfer;
-> -       const char *buf;
+> For tracking periodic inquiry state/mode we just need to be careful and
+> take an inquiry result outside of start inquiry and inquiry complete as
+> indication that periodic inquiry is active. There is still a potential
+> false positive as you mentioned, but that also should not matter since
+> periodic inquiry is suspending itself anyway. Important is just that we
+> track inquiry and periodic inquiry states separately.
 >
->        transfer = obc_session_get_transfer(session);
->        if (transfer == NULL) {
-> @@ -1169,29 +1168,18 @@ const char *obc_session_get_buffer(struct obc_session *session, size_t *size)
->                return NULL;
->        }
+> Another assumption is that periodic inquiry is only used by special
+> applications and it is essentially triggered by 3rd party daemons doing
+> something special for their needs. If periodic inquiry is enabled, I am
+> even fine failing the mgmt_start_discovery command with an error.
 >
-> -       buf = obc_transfer_get_buffer(transfer, size);
-> -
-> -       obc_transfer_clear_buffer(transfer);
-> -
-> -       return buf;
-> +       return obc_transfer_get_buffer(transfer, size);
->  }
->
-> -void *obc_session_get_params(struct obc_session *session, size_t *size)
-> +const void *obc_session_get_params(struct obc_session *session, size_t *size)
->  {
->        struct obc_transfer *transfer;
-> -       struct obc_transfer_params params;
->
-> -       transfer= obc_session_get_transfer(session);
-> +       transfer = obc_session_get_transfer(session);
->        if (transfer == NULL)
->                return NULL;
->
-> -       if (obc_transfer_get_params(transfer, &params) < 0)
-> -               return NULL;
-> -
-> -       if (size)
-> -               *size = params.size;
-> -
-> -       return params.data;
-> +       return obc_transfer_get_params(transfer, size);
->  }
->
->  static void setpath_complete(struct obc_session *session, GError *err,
-> diff --git a/client/session.h b/client/session.h
-> index 4bfb41d..40be9ca 100644
-> --- a/client/session.h
-> +++ b/client/session.h
-> @@ -52,8 +52,8 @@ const char *obc_session_get_agent(struct obc_session *session);
->
->  const char *obc_session_get_path(struct obc_session *session);
->  const char *obc_session_get_target(struct obc_session *session);
-> -const char *obc_session_get_buffer(struct obc_session *session, size_t *size);
-> -void *obc_session_get_params(struct obc_session *session, size_t *size);
-> +const void *obc_session_get_buffer(struct obc_session *session, size_t *size);
-> +const void *obc_session_get_params(struct obc_session *session, size_t *size);
->
->  int obc_session_send(struct obc_session *session, const char *filename,
->                                const char *name);
-> diff --git a/client/transfer.c b/client/transfer.c
-> index 60c2e4f..988ec10 100644
-> --- a/client/transfer.c
-> +++ b/client/transfer.c
-> @@ -610,21 +610,18 @@ done:
->        return 0;
->  }
->
-> -int obc_transfer_get_params(struct obc_transfer *transfer,
-> -                                       struct obc_transfer_params *params)
-> +const void *obc_transfer_get_params(struct obc_transfer *transfer, size_t *size)
->  {
-> -       params->data = transfer->params->data;
-> -       params->size = transfer->params->size;
-> +       if (transfer->params == NULL)
-> +               return NULL;
->
-> -       return 0;
-> -}
-> +       if (size != NULL)
-> +               *size = transfer->params->size;
->
-> -void obc_transfer_clear_buffer(struct obc_transfer *transfer)
-> -{
-> -       transfer->filled = 0;
-> +       return transfer->params->data;
->  }
->
-> -const char *obc_transfer_get_buffer(struct obc_transfer *transfer, size_t *size)
-> +const void *obc_transfer_get_buffer(struct obc_transfer *transfer, size_t *size)
->  {
->        if (size)
->                *size = transfer->filled;
-> diff --git a/client/transfer.h b/client/transfer.h
-> index da7d151..c399129 100644
-> --- a/client/transfer.h
-> +++ b/client/transfer.h
-> @@ -22,7 +22,7 @@
->  */
->
->  struct obc_transfer_params {
-> -       guint8 *data;
-> +       void *data;
->        size_t size;
->  };
->
-> @@ -49,11 +49,11 @@ gboolean obc_transfer_set_callback(struct obc_transfer *transfer,
->  int obc_transfer_get(struct obc_transfer *transfer);
->  int obc_transfer_put(struct obc_transfer *transfer);
->
-> -int obc_transfer_get_params(struct obc_transfer *transfer,
-> -                                       struct obc_transfer_params *params);
-> -const char *obc_transfer_get_buffer(struct obc_transfer *transfer, size_t *size);
-> +const void *obc_transfer_get_params(struct obc_transfer *transfer,
-> +                                                               size_t *size);
-> +const void *obc_transfer_get_buffer(struct obc_transfer *transfer,
-> +                                                               size_t *size);
->  void obc_transfer_set_buffer(struct obc_transfer *transfer, char *buffer);
-> -void obc_transfer_clear_buffer(struct obc_transfer *transfer);
->
->  void obc_transfer_set_name(struct obc_transfer *transfer, const char *name);
->  void obc_transfer_set_filename(struct obc_transfer *transfer,
-> --
-> 1.7.7.6
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> So in conclusion, I wanna have us tracking if the controller is
+> currently doing periodic inquiry. And if you wanna export that state,
+> then lets do it via debugfs.
 
-Ack.
+Since main discovery patches are now pushed upstream, I'll work on
+this and send patches soon.
 
--- 
-Luiz Augusto von Dentz
+BR,
+
+Andre
