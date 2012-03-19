@@ -1,56 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH hcidump 1/2] AVRCP: Add parsing for SetAbsoluteVolume PDU
-Date: Mon, 19 Mar 2012 14:41:31 -0300
-Message-Id: <1332178892-8987-1-git-send-email-luiz.dentz@gmail.com>
+Message-ID: <1332178760.14217.213.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Silence sparse warning
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 19 Mar 2012 10:39:20 -0700
+In-Reply-To: <1332156398-25953-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1332156398-25953-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Andrei,
 
----
- parser/avrcp.c |   20 ++++++++++++++++++++
- 1 files changed, 20 insertions(+), 0 deletions(-)
+> Silence sparse warning by introducing tmp __le variable. Despite being
+> short constructions like "val = le32_to_cpu(val)" are sources of
+> unneeded warnings (shown below)
+> ...
+> net/bluetooth/mgmt.c:448:15: warning: cast to restricted __le32
+> ...
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/mgmt.c |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index b8f9016..eb8cb66 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -435,6 +435,7 @@ static u8 bluetooth_base_uuid[] = {
+>  
+>  static u16 get_uuid16(u8 *uuid128)
+>  {
+> +	__le32 tmp;
+>  	u32 val;
+>  	int i;
+>  
+> @@ -443,9 +444,9 @@ static u16 get_uuid16(u8 *uuid128)
+>  			return 0;
+>  	}
+>  
+> -	memcpy(&val, &uuid128[12], 4);
+> +	memcpy(&tmp, &uuid128[12], 4);
+>  
+> -	val = le32_to_cpu(val);
+> +	val = le32_to_cpu(tmp);
 
-diff --git a/parser/avrcp.c b/parser/avrcp.c
-index 643e494..d746937 100644
---- a/parser/avrcp.c
-+++ b/parser/avrcp.c
-@@ -1201,6 +1201,23 @@ response:
- 	}
- }
- 
-+static void avrcp_set_absolut_volume_dump(int level, struct frame *frm,
-+						uint8_t ctype, uint16_t len)
-+{
-+	uint8_t value;
-+
-+	p_indent(level, frm);
-+
-+	if (len < 1) {
-+		printf("PDU Malformed\n");
-+		raw_dump(level, frm);
-+		return;
-+	}
-+
-+	value = get_u8(frm);
-+	printf("Value: 0x%02x\n", value);
-+}
-+
- static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
- {
- 	uint8_t pduid, pt;
-@@ -1267,6 +1284,9 @@ static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
- 	case AVRCP_REGISTER_NOTIFICATION:
- 		avrcp_register_notification_dump(level + 1, frm, ctype, len);
- 		break;
-+	case AVRCP_SET_ABSOLUTE_VOLUME:
-+		avrcp_set_absolut_volume_dump(level + 1, frm, ctype, len);
-+		break;
- 	default:
- 		raw_dump(level, frm);
- 	}
--- 
-1.7.7.6
+why aren't we using get_unaligned_le32?
+
+Regards
+
+Marcel
+
 
