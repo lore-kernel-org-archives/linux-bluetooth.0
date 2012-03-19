@@ -1,38 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 19 Mar 2012 20:04:36 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mike <puffy.taco@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: reverse SDP issue
-Message-ID: <20120319230436.GA27304@x220>
-References: <CAB7rCTg4YLsE7uNbR8mRH_cubtMmBnTZUnJ3U4vL_AsyjA7xzA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <CAB7rCTg4YLsE7uNbR8mRH_cubtMmBnTZUnJ3U4vL_AsyjA7xzA@mail.gmail.com>
+References: <CAB7rCTg4YLsE7uNbR8mRH_cubtMmBnTZUnJ3U4vL_AsyjA7xzA@mail.gmail.com>
+Date: Mon, 19 Mar 2012 17:36:06 -0500
+Message-ID: <CAB7rCTgRrgv-FXVU2xcxwi-aQjMT5KmkbLahVTYKSrHhcAkGpQ@mail.gmail.com>
+Subject: Re: reverse SDP issue
+From: Mike <puffy.taco@gmail.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mike,
+On Mon, Mar 19, 2012 at 5:19 PM, Mike <puffy.taco@gmail.com> wrote:
+>
+> There may be another subtle bug that is the real culprit here (e.g.,
+> why does removing 0x110d knock out the other profiles), but I thought
+> I'd check on this first.
+>
 
-On Mon, Mar 19, 2012, Mike wrote:
-> I notice a change in commit d2920be715974795b51f9cc3279947104da3647b
-> [1] that changes the "reverse" variable for an SDP query:
-> 
->  -       device_browse_sdp(device, NULL, NULL, NULL, TRUE);
-> +       if (device_is_bredr(device))
-> +               device_browse_sdp(device, NULL, NULL, NULL, FALSE);
-> +       else
-> +               device_browse_primary(device, NULL, NULL, FALSE);
-> 
-> You can see the original had reverse as TRUE, but the patch may have
-> inadvertently changed it to FALSE..kernel.org/majordomo-info.html
+Ah, I can see that Mikel Astiz's patches (from inspection) should
+solve this part of the problem:
 
-That looks like a definitive bug. Good that you caught it. Vinicius
-(author of the commit) care to comment?
+[PATCH v0 2/3] Add device driver support for partial unloading
+http://www.spinics.net/lists/linux-bluetooth/msg22427.html
 
-As for the partial service removal changes to the device driver API, it
-looks pretty messy to me. Is there any reason why we couldn't just
-restrict calling remove() for when removing the entire device object
-(and never call it when doing subsequent service discoveries)?
-
-Johan
+[PATCH v0 3/3] audio: add partial unloading to audio driver
+http://www.spinics.net/lists/linux-bluetooth/msg22428.html
