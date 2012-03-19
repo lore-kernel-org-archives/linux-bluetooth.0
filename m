@@ -1,42 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1332178663.14217.211.camel@aeonflux>
-Subject: Re: [PATCH] Add udev rule for Ralink WiFi+BT module w/ bccmd
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Eric Miao <eric.miao@canonical.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 19 Mar 2012 10:37:43 -0700
-In-Reply-To: <1332132103-23374-1-git-send-email-eric.miao@canonical.com>
-References: <1332132103-23374-1-git-send-email-eric.miao@canonical.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <66BD268F973E3544A665E5F503FB38B71AE959AEBF@DC01.bmw-carit.intra>
+References: <1331559165-28367-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1331559165-28367-4-git-send-email-mikel.astiz.oss@gmail.com>
+	<CABBYNZLaMoMuCQ9vY6oiUMa5P0dW-WZLvhWQ19AtmgyZezms1Q@mail.gmail.com>
+	<66BD268F973E3544A665E5F503FB38B71AE959AEBF@DC01.bmw-carit.intra>
+Date: Mon, 19 Mar 2012 14:27:13 -0300
+Message-ID: <CABBYNZ+Jfbipf=Ji2rWyZFBGx34h+KmPW+L2=oS3CpA1aLtO=g@mail.gmail.com>
+Subject: Re: [PATCH obexd v0 03/11] client: refactor transfer callback use
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <Mikel.Astiz@bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eric,
+Hi Mikel,
 
-> Some Ralink WiFi + CSR BT module needs bluetooth radio to be
-> turned on explicitly with bccmd by the following command:
-> 
->   bccmd psset -r 0x028c 0x0001
-> 
-> The HCI will be probed successfully, but due to the default
-> OFF state of the radio, no scan or connection can be made.
-> This patch adds the udev rule so that once the HCI is up,
-> udev will invoke bccmd with warm reset to turn on the radio.
-> 
-> [1] https://bugs.launchpad.net/bugs/781556
-> [2] https://bugs.meego.com/show_bug.cgi?id=3498
-> [3] http://ubuntuforums.org/showthread.php?t=1776108
-> [4] http://ubuntuforums.org/showthread.php?t=1703941
+On Mon, Mar 19, 2012 at 11:40 AM, Mikel Astiz <Mikel.Astiz@bmw-carit.de> wrote:
+> Hi Luiz,
+>
+>> >
+>> > -static void obc_transfer_abort(struct obc_transfer *transfer)
+>> > +static void transfer_notify_progress(struct obc_transfer *transfer)
+>> {
+>> > +       struct transfer_callback *callback = transfer->callback;
+>> > +
+>> > +       DBG("%p", transfer);
+>> > +
+>> > +       if ((callback != NULL) && (transfer->transferred !=
+>> > +transfer->size))
+>> > +               callback->func(transfer, transfer->transferred, NULL,
+>> > +
+>> > +callback->data); }
+>>
+>> Usually we use early returns and simple statements to be more readable,
+>> so if (callback == NULL) return would have been better. Also I guess we
+>> don't really need this check for transferred != size since gobex has a
+>> complete callback and latter you set it to NULL.
+>>
+>
+> This patch was refactoring code so the size check has been kept there, exactly as it was.
+>
+> We can try to drop it if you want, but I guess it would be in another patch. However I think it's actually necessary.
 
-why are we doing this in userspace? The btusb.c driver has the option
-for pre-execution HCI commands queue. Why not use that one.
+I guess that was to prevent sending the same progress twice, once in
+progress and another one in complete, so maybe it is fine to keep it
+for now, but perhaps when we are changing the API we should have a
+separated signal when the transfer is complete to match gobex.
 
-Also why -r. Meaning why do we need a warmreset? And where is the magic
-0x028c PS key coming from? Does anybody actually know what it is doing?
-
-Regards
-
-Marcel
-
-
+-- 
+Luiz Augusto von Dentz
