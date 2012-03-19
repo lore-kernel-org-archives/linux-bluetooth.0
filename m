@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: chen.ganir@ti.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH v4 2/3] GATT: Rename AttributeServer switch
-Date: Mon, 19 Mar 2012 16:57:52 +0200
-Message-Id: <1332169073-15885-3-git-send-email-chen.ganir@ti.com>
+Subject: [PATCH v4 1/3] GATT: Remove individual config switches
+Date: Mon, 19 Mar 2012 16:57:51 +0200
+Message-Id: <1332169073-15885-2-git-send-email-chen.ganir@ti.com>
 In-Reply-To: <1332169073-15885-1-git-send-email-chen.ganir@ti.com>
 References: <1332169073-15885-1-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,168 +12,218 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chen Ganir <chen.ganir@ti.com>
 
-Rename the AttributeServer main.conf option to EnableGatt and
-change its purpose to enable/disable all GATT related activity.
+Remove individual GATT plugin configuration switches and add a
+new master gatt switch called --enable-gatt to enable/disable all 
+GATT related plugins at once.
 ---
- alert/main.c           |    4 ++--
- plugins/gatt-example.c |    4 ++--
- proximity/reporter.c   |    2 +-
- src/adapter.c          |    8 ++++----
- src/hcid.h             |    2 +-
- src/main.c             |    4 ++--
- time/main.c            |    4 ++--
- 7 files changed, 14 insertions(+), 14 deletions(-)
+ Makefile.am         |   38 ++++++++++----------------------------
+ Makefile.tools      |    8 +++++---
+ acinclude.m4        |   32 ++++----------------------------
+ bootstrap-configure |    6 +-----
+ 4 files changed, 20 insertions(+), 64 deletions(-)
 
-diff --git a/alert/main.c b/alert/main.c
-index 25100e9..6e2e058 100644
---- a/alert/main.c
-+++ b/alert/main.c
-@@ -36,7 +36,7 @@
+diff --git a/Makefile.am b/Makefile.am
+index bd587eb..ddc28d2 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -199,36 +199,11 @@ builtin_sources += network/main.c \
+ 			network/connection.h network/connection.c
+ endif
  
- static int alert_init(void)
- {
--	if (!main_opts.attrib_server) {
-+	if (!main_opts.gatt_enabled) {
- 		DBG("Attribute server is disabled");
- 		return -1;
- 	}
-@@ -46,7 +46,7 @@ static int alert_init(void)
+-if PROXIMITYPLUGIN
+-builtin_modules += proximity
+-builtin_sources += proximity/main.c \
+-			proximity/manager.h proximity/manager.c \
+-			proximity/monitor.h proximity/monitor.c \
+-			proximity/reporter.h proximity/reporter.c
+-endif
+-
+ if SERVICEPLUGIN
+ builtin_modules += service
+ builtin_sources += plugins/service.c
+ endif
  
- static void alert_exit(void)
- {
--	if (!main_opts.attrib_server)
-+	if (!main_opts.gatt_enabled)
- 		return;
+-if GATT_EXAMPLE_PLUGIN
+-builtin_modules += gatt_example
+-builtin_sources += plugins/gatt-example.c
+-endif
+-
+-if TIMEPLUGIN
+-builtin_modules += time
+-builtin_sources += time/main.c \
+-		   time/server.h time/server.c
+-endif
+-
+-if ALERTPLUGIN
+-builtin_modules += alert
+-builtin_sources += alert/main.c \
+-		   alert/server.h alert/server.c
+-endif
+-
+ if HEALTHPLUGIN
+ builtin_modules += health
+ builtin_sources += health/hdp_main.c health/hdp_types.h \
+@@ -237,13 +212,20 @@ builtin_sources += health/hdp_main.c health/hdp_types.h \
+ 			health/hdp_util.h health/hdp_util.c
+ endif
  
- 	alert_server_exit();
-diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
-index f026761..165d218 100644
---- a/plugins/gatt-example.c
-+++ b/plugins/gatt-example.c
-@@ -560,7 +560,7 @@ static struct btd_adapter_driver gatt_example_adapter_driver = {
+-if THERMOMETERPLUGIN
+-builtin_modules += thermometer
++if GATTMODULES
++builtin_modules += thermometer alert time gatt_example proximity
+ builtin_sources += thermometer/main.c \
+ 			thermometer/manager.h thermometer/manager.c \
+-			thermometer/thermometer.h thermometer/thermometer.c
++			thermometer/thermometer.h thermometer/thermometer.c \
++			alert/main.c alert/server.h alert/server.c \
++			time/main.c time/server.h time/server.c \
++            plugins/gatt-example.c \
++            proximity/main.c proximity/manager.h proximity/manager.c \
++			proximity/monitor.h proximity/monitor.c \
++			proximity/reporter.h proximity/reporter.c
+ endif
  
- static int gatt_example_init(void)
- {
--	if (!main_opts.attrib_server) {
-+	if (!main_opts.gatt_enabled) {
- 		DBG("Attribute server is disabled");
- 		return -ENOTSUP;
- 	}
-@@ -570,7 +570,7 @@ static int gatt_example_init(void)
++
+ builtin_modules += hciops mgmtops
+ builtin_sources += plugins/hciops.c plugins/mgmtops.c
  
- static void gatt_example_exit(void)
- {
--	if (!main_opts.attrib_server)
-+	if (!main_opts.gatt_enabled)
- 		return;
+diff --git a/Makefile.tools b/Makefile.tools
+index f997a3f..7b7a43f 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -218,12 +218,14 @@ EXTRA_DIST += test/apitest test/sap-client test/hsplay test/hsmicro \
+ 		test/test-device test/test-service test/test-serial \
+ 		test/test-telephony test/test-network test/simple-agent \
+ 		test/simple-service test/simple-endpoint test/test-audio \
+-		test/test-input test/test-attrib test/test-proximity \
+-		test/test-sap-server test/test-oob test/test-serial-proxy \
+-		test/test-thermometer test/test-health test/test-health-sink \
++		test/test-input test/test-sap-server test/test-oob \
++		test/test-serial-proxy test/test-health test/test-health-sink \
+ 		test/service-record.dtd test/service-did.xml \
+ 		test/service-spp.xml test/service-opp.xml test/service-ftp.xml
  
- 	btd_unregister_adapter_driver(&gatt_example_adapter_driver);
-diff --git a/proximity/reporter.c b/proximity/reporter.c
-index 9777574..d4a4c96 100644
---- a/proximity/reporter.c
-+++ b/proximity/reporter.c
-@@ -172,7 +172,7 @@ static void register_immediate_alert(struct btd_adapter *adapter)
++if GATTMODULES
++EXTRA_DIST += test/test-attrib test/test-proximity test/test-thermometer
++endif
  
- int reporter_init(struct btd_adapter *adapter)
- {
--	if (!main_opts.attrib_server) {
-+	if (!main_opts.gatt_enabled) {
- 		DBG("Attribute server is disabled");
- 		return -1;
- 	}
-diff --git a/src/adapter.c b/src/adapter.c
-index acb845e..13f3683 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -698,7 +698,7 @@ void btd_adapter_class_changed(struct btd_adapter *adapter, uint32_t new_class)
+ if HIDD
+ bin_PROGRAMS += compat/hidd
+diff --git a/acinclude.m4 b/acinclude.m4
+index b0f790c..429e466 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -196,13 +196,9 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	serial_enable=yes
+ 	network_enable=yes
+ 	sap_enable=no
+-	proximity_enable=no
+-	time_enable=no
+-	alert_enable=no
+ 	service_enable=yes
+ 	health_enable=no
+ 	pnat_enable=no
+-	gatt_example_enable=no
+ 	tools_enable=yes
+ 	hidd_enable=no
+ 	pand_enable=no
+@@ -219,7 +215,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	sap_driver=dummy
+ 	dbusoob_enable=no
+ 	wiimote_enable=no
+-	thermometer_enable=no
++	gatt_enable=no
  
- 	adapter->dev_class = new_class;
+ 	AC_ARG_ENABLE(optimization, AC_HELP_STRING([--disable-optimization], [disable code optimization]), [
+ 		optimization_enable=${enableval}
+@@ -246,18 +242,6 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	])
+ 	AC_SUBST([SAP_DRIVER], [sap-${sap_driver}.c])
  
--	if (main_opts.attrib_server) {
-+	if (main_opts.gatt_enabled) {
- 		/* Removes service class */
- 		class[1] = class[1] & 0x1f;
- 		attrib_gap_set(adapter, GATT_CHARAC_APPEARANCE, class, 2);
-@@ -722,7 +722,7 @@ void adapter_name_changed(struct btd_adapter *adapter, const char *name)
- 					ADAPTER_INTERFACE, "Name",
- 					DBUS_TYPE_STRING, &name);
+-	AC_ARG_ENABLE(proximity, AC_HELP_STRING([--enable-proximity], [enable proximity plugin]), [
+-		proximity_enable=${enableval}
+-	])
+-
+-	AC_ARG_ENABLE(time, AC_HELP_STRING([--enable-time], [enable Time Profile plugin]), [
+-		time_enable=${enableval}
+-	])
+-
+-	AC_ARG_ENABLE(alert, AC_HELP_STRING([--enable-alert], [enable Phone Alert Profile plugin]), [
+-		alert_enable=${enableval}
+-	])
+-
+ 	AC_ARG_ENABLE(serial, AC_HELP_STRING([--disable-serial], [disable serial plugin]), [
+ 		serial_enable=${enableval}
+ 	])
+@@ -282,10 +266,6 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 		pnat_enable=${enableval}
+ 	])
  
--	if (main_opts.attrib_server)
-+	if (main_opts.gatt_enabled)
- 		attrib_gap_set(adapter, GATT_CHARAC_DEVICE_NAME,
- 				(const uint8_t *) name, strlen(name));
- }
-@@ -2407,7 +2407,7 @@ gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
+-	AC_ARG_ENABLE(gatt-example, AC_HELP_STRING([--enable-gatt-example], [enable GATT example plugin]), [
+-		gatt_example_enable=${enableval}
+-	])
+-
+ 	AC_ARG_ENABLE(gstreamer, AC_HELP_STRING([--enable-gstreamer], [enable GStreamer support]), [
+ 		gstreamer_enable=${enableval}
+ 	])
+@@ -368,8 +348,8 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 		hal_enable=${enableval}
+ 	])
  
- 	sdp_init_services_list(&adapter->bdaddr);
+-	AC_ARG_ENABLE(thermometer, AC_HELP_STRING([--enable-thermometer], [enable thermometer plugin]), [
+-		thermometer_enable=${enableval}
++	AC_ARG_ENABLE(gatt, AC_HELP_STRING([--enable-gatt], [enable gatt module]), [
++		gatt_enable=${enableval}
+ 	])
  
--	if (main_opts.attrib_server)
-+	if (main_opts.gatt_enabled)
- 		btd_adapter_gatt_server_start(adapter);
- 
- 	load_drivers(adapter);
-@@ -2469,7 +2469,7 @@ void adapter_remove(struct btd_adapter *adapter)
- 	g_slist_free(adapter->devices);
- 
- 	unload_drivers(adapter);
--	if (main_opts.attrib_server)
-+	if (main_opts.gatt_enabled)
- 		btd_adapter_gatt_server_stop(adapter);
- 
- 	g_slist_free(adapter->pin_callbacks);
-diff --git a/src/hcid.h b/src/hcid.h
-index 1987b7d..16a8ded 100644
---- a/src/hcid.h
-+++ b/src/hcid.h
-@@ -38,7 +38,7 @@ struct main_opts {
- 	gboolean	reverse_sdp;
- 	gboolean	name_resolv;
- 	gboolean	debug_keys;
--	gboolean	attrib_server;
-+	gboolean	gatt_enabled;
- 
- 	uint8_t		mode;
- 	uint8_t		discov_interval;
-diff --git a/src/main.c b/src/main.c
-index 74ec3fa..a3e8c84 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -223,11 +223,11 @@ static void parse_config(GKeyFile *config)
- 		main_opts.debug_keys = boolean;
- 
- 	boolean = g_key_file_get_boolean(config, "General",
--						"AttributeServer", &err);
-+						"EnableGatt", &err);
- 	if (err)
- 		g_clear_error(&err);
- 	else
--		main_opts.attrib_server = boolean;
-+		main_opts.gatt_enabled = boolean;
- 
- 	main_opts.link_mode = HCI_LM_ACCEPT;
- 
-diff --git a/time/main.c b/time/main.c
-index a4de0fe..cbcdb0d 100644
---- a/time/main.c
-+++ b/time/main.c
-@@ -36,7 +36,7 @@
- 
- static int time_init(void)
- {
--	if (!main_opts.attrib_server) {
-+	if (!main_opts.gatt_enabled) {
- 		DBG("Attribute server is disabled");
- 		return -1;
- 	}
-@@ -46,7 +46,7 @@ static int time_init(void)
- 
- static void time_exit(void)
- {
--	if (!main_opts.attrib_server)
-+	if (!main_opts.gatt_enabled)
- 		return;
- 
- 	time_server_exit();
+ 	if (test "${fortify_enable}" = "yes"); then
+@@ -404,15 +384,11 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	AM_CONDITIONAL(SERIALPLUGIN, test "${serial_enable}" = "yes")
+ 	AM_CONDITIONAL(NETWORKPLUGIN, test "${network_enable}" = "yes")
+ 	AM_CONDITIONAL(SAPPLUGIN, test "${sap_enable}" = "yes")
+-	AM_CONDITIONAL(PROXIMITYPLUGIN, test "${proximity_enable}" = "yes")
+-	AM_CONDITIONAL(TIMEPLUGIN, test "${time_enable}" = "yes")
+-	AM_CONDITIONAL(ALERTPLUGIN, test "${alert_enable}" = "yes")
+ 	AM_CONDITIONAL(SERVICEPLUGIN, test "${service_enable}" = "yes")
+ 	AM_CONDITIONAL(HEALTHPLUGIN, test "${health_enable}" = "yes")
+ 	AM_CONDITIONAL(MCAP, test "${health_enable}" = "yes")
+ 	AM_CONDITIONAL(HAL, test "${hal_enable}" = "yes")
+ 	AM_CONDITIONAL(READLINE, test "${readline_found}" = "yes")
+-	AM_CONDITIONAL(GATT_EXAMPLE_PLUGIN, test "${gatt_example_enable}" = "yes")
+ 	AM_CONDITIONAL(PNATPLUGIN, test "${pnat_enable}" = "yes")
+ 	AM_CONDITIONAL(HIDD, test "${hidd_enable}" = "yes")
+ 	AM_CONDITIONAL(PAND, test "${pand_enable}" = "yes")
+@@ -428,5 +404,5 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	AM_CONDITIONAL(MAEMO6PLUGIN, test "${maemo6_enable}" = "yes")
+ 	AM_CONDITIONAL(DBUSOOBPLUGIN, test "${dbusoob_enable}" = "yes")
+ 	AM_CONDITIONAL(WIIMOTEPLUGIN, test "${wiimote_enable}" = "yes")
+-	AM_CONDITIONAL(THERMOMETERPLUGIN, test "${thermometer_enable}" = "yes")
++	AM_CONDITIONAL(GATTMODULES, test "${gatt_enable}" = "yes")
+ ])
+diff --git a/bootstrap-configure b/bootstrap-configure
+index c38045b..e5f9daa 100755
+--- a/bootstrap-configure
++++ b/bootstrap-configure
+@@ -17,10 +17,6 @@ fi
+ 		--localstatedir=/var \
+ 		--libexecdir=/lib \
+ 		--enable-capng \
+-		--enable-gatt-example \
+-		--enable-proximity \
+-		--enable-time \
+-		--enable-alert \
+ 		--enable-health \
+ 		--enable-tools \
+ 		--enable-bccmd \
+@@ -35,7 +31,7 @@ fi
+ 		--enable-maemo6 \
+ 		--enable-pnat \
+ 		--enable-sap \
+-		--enable-thermometer \
+ 		--enable-wiimote \
+ 		--disable-pcmcia \
++		--enable-gatt \
+ 		--disable-datafiles $*
 -- 
 1.7.4.1
 
