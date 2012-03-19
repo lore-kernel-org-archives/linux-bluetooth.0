@@ -1,47 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <Mikel.Astiz@bmw-carit.de>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 19 Mar 2012 15:40:20 +0100
-Subject: RE: [PATCH obexd v0 03/11] client: refactor transfer callback use
-Message-ID: <66BD268F973E3544A665E5F503FB38B71AE959AEBF@DC01.bmw-carit.intra>
-References: <1331559165-28367-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1331559165-28367-4-git-send-email-mikel.astiz.oss@gmail.com>
- <CABBYNZLaMoMuCQ9vY6oiUMa5P0dW-WZLvhWQ19AtmgyZezms1Q@mail.gmail.com>
-In-Reply-To: <CABBYNZLaMoMuCQ9vY6oiUMa5P0dW-WZLvhWQ19AtmgyZezms1Q@mail.gmail.com>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Subject: [PATCH] sdp: Fix sdp_get_profile_descs for Mac Os X Lion
+Date: Mon, 19 Mar 2012 15:04:07 +0100
+Message-Id: <1332165847-12703-1-git-send-email-frederic.dalleau@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Mac OS X 10.7.3 publishes the following SDP record for HFP Gateway.
+      record #2
+          aid 0x0000 (SrvRecHndl)
+             uint 0x10003
+          aid 0x0001 (SrvClassIDList)
+             < uuid-16 0x111f (Handsfree AG) uuid-16 0x1203 (Audio) >
+          aid 0x0004 (ProtocolDescList)
+             < < uuid-16 0x0100 (L2CAP) > <
+             uuid-16 0x0003 (RFCOMM) uint 0x2 > >
+          aid 0x0005 (BrwGrpList)
+             < uuid-16 0x1002 (PubBrwsGrp) >
+          aid 0x0006 (LangBaseAttrIDList)
+             < uint 0x656e uint 0x6a uint 0x100 >
+          aid 0x0009 (BTProfileDescList)
+             < uuid-16 0x111e (Handsfree) uint 0x105 >
+          aid 0x0100 (SrvName)
+             str "Hands Free Audio Gateway"
+          aid 0x0301 (SuppDataStoresList)
+             uint 0x0
+          aid 0x0311 (SuppFeatures)
+             uint 0x0
 
-> >
-> > -static void obc_transfer_abort(struct obc_transfer *transfer)
-> > +static void transfer_notify_progress(struct obc_transfer *transfer)
-> {
-> > +       struct transfer_callback *callback = transfer->callback;
-> > +
-> > +       DBG("%p", transfer);
-> > +
-> > +       if ((callback != NULL) && (transfer->transferred !=
-> > +transfer->size))
-> > +               callback->func(transfer, transfer->transferred, NULL,
-> > +
-> > +callback->data); }
-> 
-> Usually we use early returns and simple statements to be more readable,
-> so if (callback == NULL) return would have been better. Also I guess we
-> don't really need this check for transferred != size since gobex has a
-> complete callback and latter you set it to NULL.
-> 
+BlueZ do not read correctly the version number of the profile.
+The patch fixes this.
 
-This patch was refactoring code so the size check has been kept there, exactly as it was.
+>From my understanding, the SDP profile descriptor is a list. The for
+loop in sdp_get_profile_desc iterates that list.  Until now, bluez
+expected a collection of either uuid or lists with a uuid and a
+version number. This can be represented as follow:
+list=(uuid, uuid, (uuid, version))
 
-We can try to drop it if you want, but I guess it would be in another patch. However I think it's actually necessary.
+The patch fixes the situation where the profile descriptor list
+contains a uuid AND a version number both on the root level and not
+enclosed in a sublist. If the next item after uuid is uint16, then
+this is the version number. This can be represented as follow:
+list=(uuid, uuid, version, uuid, (uuid, version))
 
-Regarding the early return, I will integrate the change in the next proposal.
+Note that core v4.0 spec. states that the Profile Descriptor
+list is a data sequence of profile descriptors. Each profile descriptor
+is a data sequence whose first element is a UUID and second element is
+a version number. This can be represented as follow:
+list=((uuid, version), (uuid, version))
+---
+ lib/sdp.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-Cheers,
-Mikel
+diff --git a/lib/sdp.c b/lib/sdp.c
+index 57f630a..97c0a08 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -2064,7 +2064,12 @@ int sdp_get_profile_descs(const sdp_record_t *rec, sdp_list_t **profDescSeq)
+ 		uint16_t version = 0x100;
+ 
+ 		if (SDP_IS_UUID(seq->dtd)) {
++			sdp_data_t *next = seq->next;
+ 			uuid = &seq->val.uuid;
++			if (next && next->dtd == SDP_UINT16) {
++				version = next->val.uint16;
++				seq = next;
++			}
+ 		} else if (SDP_IS_SEQ(seq->dtd)) {
+ 			sdp_data_t *puuid = seq->val.dataseq;
+ 			sdp_data_t *pVnum = seq->val.dataseq->next;
+-- 
+1.7.5.4
 
