@@ -1,31 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F66F307.8080800@tu-ilmenau.de>
-Date: Mon, 19 Mar 2012 09:49:11 +0100
-From: Steffen Becker <steffen.becker@tu-ilmenau.de>
-MIME-Version: 1.0
-To: james.steele@accenture.com
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Encrypting problem while sending data via bluetooth
-References: <4F60B259.5040800@tu-ilmenau.de> <1331747344.14217.105.camel@aeonflux>	<4F61AF8B.3020300@tu-ilmenau.de> <CAHBqpz8=MoK9LFMJp1N8K7iv98hCwG3nU47vh9eyNN+AbunLmA@mail.gmail.com> <81C9FA9C1C2E9E45A9AC3EDD1858BC4323DFFD72@048-CH1MPN1-101.048d.mgd.msft.net>
-In-Reply-To: <81C9FA9C1C2E9E45A9AC3EDD1858BC4323DFFD72@048-CH1MPN1-101.048d.mgd.msft.net>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: mgmt: Fix timeout type
+Date: Mon, 19 Mar 2012 09:42:31 +0200
+Message-Id: <1332142951-20703-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi James,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Am 15.03.2012 12:08, schrieb james.steele@accenture.com:
-> Hi Steffen
->   If using Bluetooth v2.1 and later you will need to configure one of the Bluetooth devices to enter "SSP debug mode".
->
-> For the latter (Bluetooth v2.1 and later) case, we have a patch that adds the ability to enable/disable SSP debug mode using the hciconfig tool - I'll push it out to the mailing list as soon as possible, as it appears it would be useful for others.
->
-> Regards,
-> James
->
->
-Do you know when you will push out that patch to the mailing list? It 
-would be nice if it appears within this week.
+Silence sparse warnings:
+net/bluetooth/mgmt.c:865:19: warning: cast to restricted __le16
 
-Regards,
-Steffen
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/mgmt.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 53b8a32..23fd054 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -117,7 +117,7 @@ struct mgmt_mode {
+ #define MGMT_OP_SET_DISCOVERABLE	0x0006
+ struct mgmt_cp_set_discoverable {
+ 	__u8	val;
+-	__u16	timeout;
++	__le16	timeout;
+ } __packed;
+ #define MGMT_SET_DISCOVERABLE_SIZE	3
+ 
+-- 
+1.7.9.1
+
