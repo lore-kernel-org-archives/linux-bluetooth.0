@@ -1,43 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1332200404.3362.0.camel@maxim-laptop>
-Subject: Re: bluez doesn't handle hotplug well
-From: Maxim Levitsky <maximlevitsky@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Date: Tue, 20 Mar 2012 01:40:04 +0200
-In-Reply-To: <1332044343.2998.8.camel@maxim-laptop>
-References: <1332044343.2998.8.camel@maxim-laptop>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Mon, 19 Mar 2012 20:04:36 -0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mike <puffy.taco@gmail.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: reverse SDP issue
+Message-ID: <20120319230436.GA27304@x220>
+References: <CAB7rCTg4YLsE7uNbR8mRH_cubtMmBnTZUnJ3U4vL_AsyjA7xzA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAB7rCTg4YLsE7uNbR8mRH_cubtMmBnTZUnJ3U4vL_AsyjA7xzA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, 2012-03-18 at 06:19 +0200, Maxim Levitsky wrote: 
-> Recently I began using Bluetooth, and I noticed that it sometimes
-> doesn't work after suspend to ram.
-> 
-> It turns out to be 100% reproduciable and not related to ether bluetooth
-> dongle (tested 2 of them) nor related to KDE/Gnome - happens in both,
-> and nether its related to actual suspend.
-> 
-> To reproduce, I just start bluetoothd, then:
-> 1. I plug the dongle, its recognized (or start bluetoothd after I plug
-> it, doesn't matter)
-> 
-> 2. I unplug it.
-> 3. I plug it again, and it is recognized again
-> 4. I unplug it.
-> 5. I plug it, and it doesn't work.
-> 
-> Reproducible, always, tested many times.
-> restarting bluetoothd fixes the problem until, I repeat the above.
-> 
-> bluetoothd log attached.
-> I am (still) using ubuntu 12.04.
-> 
-> Best regards,
-> Maxim Levitsky
-Any update?
+Hi Mike,
 
-Best regards,
-Maxim Levitsky
+On Mon, Mar 19, 2012, Mike wrote:
+> I notice a change in commit d2920be715974795b51f9cc3279947104da3647b
+> [1] that changes the "reverse" variable for an SDP query:
+> 
+>  -       device_browse_sdp(device, NULL, NULL, NULL, TRUE);
+> +       if (device_is_bredr(device))
+> +               device_browse_sdp(device, NULL, NULL, NULL, FALSE);
+> +       else
+> +               device_browse_primary(device, NULL, NULL, FALSE);
+> 
+> You can see the original had reverse as TRUE, but the patch may have
+> inadvertently changed it to FALSE..kernel.org/majordomo-info.html
 
+That looks like a definitive bug. Good that you caught it. Vinicius
+(author of the commit) care to comment?
+
+As for the partial service removal changes to the device driver API, it
+looks pretty messy to me. Is there any reason why we couldn't just
+restrict calling remove() for when removing the entire device object
+(and never call it when doing subsequent service discoveries)?
+
+Johan
