@@ -1,71 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Battery Service exposing device battery properties
-Date: Mon, 19 Mar 2012 12:51:46 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B45215B@DNCE02.ent.ti.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <1331559165-28367-3-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1331559165-28367-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1331559165-28367-3-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Mon, 19 Mar 2012 09:44:06 -0300
+Message-ID: <CABBYNZJMVyhqQ9fH2t7qufCVnfcbPHrOmKCkJ_-WzkXa48YwYA@mail.gmail.com>
+Subject: Re: [PATCH obexd v0 02/11] client: remove unused field
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi.
+Hi Mikel,
 
-Adding the battery service into the bluez, requires exposing the battery array (may be more than one) to the users. The internal implementation can be fairly easy, adding a GSList of btd_battery_info structures to the btd_device. This btd_battery_info may look like this :
+On Mon, Mar 12, 2012 at 10:32 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>
+> The errorcode field is set but never used, so it can safely be removed.
+> In addition there is no need for such a field, because errors can be
+> propagated using the available callback.
+> ---
+>  client/transfer.c |   22 +++++-----------------
+>  1 files changed, 5 insertions(+), 17 deletions(-)
+>
+> diff --git a/client/transfer.c b/client/transfer.c
+> index 988ec10..a609aa9 100644
+> --- a/client/transfer.c
+> +++ b/client/transfer.c
+> @@ -70,7 +70,6 @@ struct obc_transfer {
+>        int filled;
+>        gint64 size;
+>        gint64 transferred;
+> -       int err;
+>  };
+>
+>  static GQuark obc_transfer_error_quark(void)
+> @@ -310,10 +309,8 @@ static void get_buf_xfer_complete(GObex *obex, GError *err, gpointer user_data)
+>
+>        transfer->xfer = 0;
+>
+> -       if (err) {
+> -               transfer->err = err->code;
+> +       if (err)
+>                goto done;
+> -       }
+>
+>        if (transfer->filled > 0 &&
+>                        transfer->buffer[transfer->filled - 1] == '\0')
+> @@ -407,14 +404,9 @@ static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
+>
+>        transfer->xfer = 0;
+>
+> -       if (err) {
+> -               transfer->err = err->code;
+> -               goto done;
+> -       }
+> -
+> -       transfer->size = transfer->transferred;
+> +       if (err == NULL)
+> +               transfer->size = transfer->transferred;
+>
+> -done:
+>        if (callback)
+>                callback->func(transfer, transfer->size, err, callback->data);
+>  }
+> @@ -431,10 +423,8 @@ static gboolean get_xfer_progress(const void *buf, gsize len,
+>                gint w;
+>
+>                w = write(transfer->fd, transfer->buffer, transfer->filled);
+> -               if (w < 0) {
+> -                       transfer->err = -errno;
+> +               if (w < 0)
+>                        return FALSE;
+> -               }
+>
+>                transfer->filled -= w;
+>        }
+> @@ -478,10 +468,8 @@ static gssize put_xfer_progress(void *buf, gsize len, gpointer user_data)
+>        gssize size;
+>
+>        size = read(transfer->fd, buf, len);
+> -       if (size <= 0) {
+> -               transfer->err = -errno;
+> +       if (size <= 0)
+>                return size;
+> -       }
+>
+>        if (callback)
+>                callback->func(transfer, transfer->transferred, NULL,
+> --
+> 1.7.7.6
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-struct btd_battery_info {
-	uint8_t		namespace;
-	uint16_t	description;
-	uint8_t		level;
-};
+Ack
 
-The batteries information should also be exposed using D-BUS interface. As this is a device property, which needs to be read when using the GetProperties D-BUS method, as well as be notified using the PropertyChanged signal from a device.
-
-One logic way to display this information, is to add an array of object paths to the GetProperties dictionary, which will look like this :
-
-    dict entry(
-        string "Batteries"
-        variant             array [
-              object path "/org/bluez/14503/hci0/dev_3C_2D_B7_85_EC_C2/BATT01"
-              object path "/org/bluez/14503/hci0/dev_3C_2D_B7_85_EC_C2/BATT02"
-              object path "/org/bluez/14503/hci0/dev_3C_2D_B7_85_EC_C2/BATT03"
-           ]
-     )
-
-This array represents the batteries in the system. A org.bluez.Battery interface will be added, including the function GetProperties. When you execute the GetProperties on a battery object path, you will get this :
-
-   array [
-      dict entry(
-         string "NameSpace"
-         variant             byte 1
-      dict entry(
-         string "Description"
-         variant             uint16 44
-      )
-      dict entry(
-         string "Level"
-         variant             byte 94
-      )
-   ]
-
-This will represent a single battery information element.
-
-The problem here is with the PropertyChanged, which needs to include a String and a value. For that, we can do something like this :
-
-signal sender=:1.558 -> dest=(null destination) serial=200 path=/org/bluez/14503/hci0/dev_3C_2D_B7_85_EC_C2/BATT02; interface=org.bluez.Battery; member=PropertyChanged
-   array [
-      dict entry(
-         string "Level"
-         variant byte 93
-      )
-   ]
-
-However, having interfaces for each battery makes things complex, since you need to parse events on a new interface (org.bluez.Battery) and parse new object paths, and will need to figure out how to translate BATT01 into Battery with namespace/description. In addition, the PropertyChanged needs to be sent over org.bluez.Battery interface or org.bluez.Device interface.
-
-What do you think ? How can I try and simplify this ?
-
-Thanks,
-
-
-Chen Ganir
-Texas Instruments
+-- 
+Luiz Augusto von Dentz
