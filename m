@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1332178760.14217.213.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Silence sparse warning
+Message-ID: <1332178697.14217.212.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: mgmt: Fix timeout type
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 19 Mar 2012 10:39:20 -0700
-In-Reply-To: <1332156398-25953-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1332156398-25953-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 19 Mar 2012 10:38:17 -0700
+In-Reply-To: <1332142951-20703-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1332142951-20703-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,41 +14,15 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-> Silence sparse warning by introducing tmp __le variable. Despite being
-> short constructions like "val = le32_to_cpu(val)" are sources of
-> unneeded warnings (shown below)
-> ...
-> net/bluetooth/mgmt.c:448:15: warning: cast to restricted __le32
-> ...
+> Silence sparse warnings:
+> net/bluetooth/mgmt.c:865:19: warning: cast to restricted __le16
 > 
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  net/bluetooth/mgmt.c |    5 +++--
->  1 files changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index b8f9016..eb8cb66 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -435,6 +435,7 @@ static u8 bluetooth_base_uuid[] = {
->  
->  static u16 get_uuid16(u8 *uuid128)
->  {
-> +	__le32 tmp;
->  	u32 val;
->  	int i;
->  
-> @@ -443,9 +444,9 @@ static u16 get_uuid16(u8 *uuid128)
->  			return 0;
->  	}
->  
-> -	memcpy(&val, &uuid128[12], 4);
-> +	memcpy(&tmp, &uuid128[12], 4);
->  
-> -	val = le32_to_cpu(val);
-> +	val = le32_to_cpu(tmp);
+>  include/net/bluetooth/mgmt.h |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-why aren't we using get_unaligned_le32?
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
