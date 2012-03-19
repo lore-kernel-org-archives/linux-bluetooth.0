@@ -1,79 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH] sdp: Fix sdp_get_profile_descs for Mac Os X Lion
-Date: Mon, 19 Mar 2012 15:04:07 +0100
-Message-Id: <1332165847-12703-1-git-send-email-frederic.dalleau@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: LE/BR/EDR interleaved scanning
+Date: Mon, 19 Mar 2012 13:58:10 +0000
+Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B4521BD@DNCE02.ent.ti.com>
+References: <F0070FBC0FB3174D8D11444EB2D5B0260B452173@DNCE02.ent.ti.com>
+ <CACJA=fW5vX008p7w8fcgLS=nHLkq91EaYpskpf6TkJxBA_+bPw@mail.gmail.com>
+In-Reply-To: <CACJA=fW5vX008p7w8fcgLS=nHLkq91EaYpskpf6TkJxBA_+bPw@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Mac OS X 10.7.3 publishes the following SDP record for HFP Gateway.
-      record #2
-          aid 0x0000 (SrvRecHndl)
-             uint 0x10003
-          aid 0x0001 (SrvClassIDList)
-             < uuid-16 0x111f (Handsfree AG) uuid-16 0x1203 (Audio) >
-          aid 0x0004 (ProtocolDescList)
-             < < uuid-16 0x0100 (L2CAP) > <
-             uuid-16 0x0003 (RFCOMM) uint 0x2 > >
-          aid 0x0005 (BrwGrpList)
-             < uuid-16 0x1002 (PubBrwsGrp) >
-          aid 0x0006 (LangBaseAttrIDList)
-             < uint 0x656e uint 0x6a uint 0x100 >
-          aid 0x0009 (BTProfileDescList)
-             < uuid-16 0x111e (Handsfree) uint 0x105 >
-          aid 0x0100 (SrvName)
-             str "Hands Free Audio Gateway"
-          aid 0x0301 (SuppDataStoresList)
-             uint 0x0
-          aid 0x0311 (SuppFeatures)
-             uint 0x0
+Andre,
 
-BlueZ do not read correctly the version number of the profile.
-The patch fixes this.
+> -----Original Message-----
+> From: Andre Guedes [mailto:andre.guedes@openbossa.org]
+> Sent: Monday, March 19, 2012 3:55 PM
+> To: Ganir, Chen
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: LE/BR/EDR interleaved scanning
+> 
+> Hi Chen Ganir,
+> 
+> On Mon, Mar 19, 2012 at 9:55 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
+> > Hi.
+> >
+> > The current implementation of the Bluetooth-next interleaved scan
+> will currently do LE scan , and then BR/EDR scan, although the specs
+> clearly defines that BR/EDR device search should be performed first,
+> and only when done, LE device scan should start. Is there a specific
+> reason why the spec was not followed here ?
+> 
+> Implementing LE scan first had some advantages:
+> 1. From the implementation point of view, we don't need to change
+> anything in BR/EDR discovery neither name resolution code. All logic
+> in inquiry_complete_event keeps the same.
+> 2. Doing BR/EDR + LE + name resolution we have a 5.12 sec gap between
+> finding BR/EDR devices and resolving its names. During LE discovery,
+> BR/EDR devices may be out of range and we'll waste time trying to
+> resolve its names. By doing LE scan first, we don't have this problem.
+> 
+> Besides, we didn't find any constrain in GAP TS spec about that. Also,
+> the Core spec clearly says performing BR/EDR + LE is just a
+> recommendation about how to implement interleaving (see Vol 3, page
+> 386).
 
->From my understanding, the SDP profile descriptor is a list. The for
-loop in sdp_get_profile_desc iterates that list.  Until now, bluez
-expected a collection of either uuid or lists with a uuid and a
-version number. This can be represented as follow:
-list=(uuid, uuid, (uuid, version))
+Thanks for clearing that out.
 
-The patch fixes the situation where the profile descriptor list
-contains a uuid AND a version number both on the root level and not
-enclosed in a sublist. If the next item after uuid is uint16, then
-this is the version number. This can be represented as follow:
-list=(uuid, uuid, version, uuid, (uuid, version))
+> 
+> BR,
+> 
+> Andre
 
-Note that core v4.0 spec. states that the Profile Descriptor
-list is a data sequence of profile descriptors. Each profile descriptor
-is a data sequence whose first element is a UUID and second element is
-a version number. This can be represented as follow:
-list=((uuid, version), (uuid, version))
----
- lib/sdp.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
-
-diff --git a/lib/sdp.c b/lib/sdp.c
-index 57f630a..97c0a08 100644
---- a/lib/sdp.c
-+++ b/lib/sdp.c
-@@ -2064,7 +2064,12 @@ int sdp_get_profile_descs(const sdp_record_t *rec, sdp_list_t **profDescSeq)
- 		uint16_t version = 0x100;
- 
- 		if (SDP_IS_UUID(seq->dtd)) {
-+			sdp_data_t *next = seq->next;
- 			uuid = &seq->val.uuid;
-+			if (next && next->dtd == SDP_UINT16) {
-+				version = next->val.uint16;
-+				seq = next;
-+			}
- 		} else if (SDP_IS_SEQ(seq->dtd)) {
- 			sdp_data_t *puuid = seq->val.dataseq;
- 			sdp_data_t *pVnum = seq->val.dataseq->next;
--- 
-1.7.5.4
-
+Chen Ganir
+Texas Instruments.
