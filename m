@@ -1,33 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4F66F307.8080800@tu-ilmenau.de>
+Date: Mon, 19 Mar 2012 09:49:11 +0100
+From: Steffen Becker <steffen.becker@tu-ilmenau.de>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_OD7D=tfjF534nRmLegfYDK3PGRC9hPP8gt2VQdEcrWgQ@mail.gmail.com>
-References: <1331891164-24588-1-git-send-email-arik@wizery.com>
- <1331891164-24588-5-git-send-email-arik@wizery.com> <CAJdJm_OD7D=tfjF534nRmLegfYDK3PGRC9hPP8gt2VQdEcrWgQ@mail.gmail.com>
-From: Arik Nemtsov <arik@wizery.com>
-Date: Mon, 19 Mar 2012 10:53:38 +0200
-Message-ID: <CA+XVXffWrE1tNdw=f1fH7a+0Hf0V-63=xVDOrUWKbug5pMk=jA@mail.gmail.com>
-Subject: Re: [PATCH v3 4/6] proximity: link loss: implement link loss server
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: james.steele@accenture.com
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Encrypting problem while sending data via bluetooth
+References: <4F60B259.5040800@tu-ilmenau.de> <1331747344.14217.105.camel@aeonflux>	<4F61AF8B.3020300@tu-ilmenau.de> <CAHBqpz8=MoK9LFMJp1N8K7iv98hCwG3nU47vh9eyNN+AbunLmA@mail.gmail.com> <81C9FA9C1C2E9E45A9AC3EDD1858BC4323DFFD72@048-CH1MPN1-101.048d.mgd.msft.net>
+In-Reply-To: <81C9FA9C1C2E9E45A9AC3EDD1858BC4323DFFD72@048-CH1MPN1-101.048d.mgd.msft.net>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Mar 16, 2012 at 13:49, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Arik,
->
-> On Fri, Mar 16, 2012 at 5:46 AM, Arik Nemtsov <arik@wizery.com> wrote:
->> +static void link_Loss_local_disc(struct btd_device *device, gboolean removal,
->> +                                void *user_data)
->
-> Not sure if this was already on the original series (sorry if I missed
-> it), but there is a typo here:
->
-> link_Loss_local_disc -> link_loss_local_disc
->
+Hi James,
 
-Sure i'll change it (and the other comment as well), but let's make
-other wording related changes on top of upstream (it's easier).
+Am 15.03.2012 12:08, schrieb james.steele@accenture.com:
+> Hi Steffen
+>   If using Bluetooth v2.1 and later you will need to configure one of the Bluetooth devices to enter "SSP debug mode".
+>
+> For the latter (Bluetooth v2.1 and later) case, we have a patch that adds the ability to enable/disable SSP debug mode using the hciconfig tool - I'll push it out to the mailing list as soon as possible, as it appears it would be useful for others.
+>
+> Regards,
+> James
+>
+>
+Do you know when you will push out that patch to the mailing list? It 
+would be nice if it appears within this week.
 
-Arik
+Regards,
+Steffen
