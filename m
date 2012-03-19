@@ -1,48 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: chen.ganir@ti.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH v4 0/3] GATT: Change the way GATT Plugins are enabled/disabled
-Date: Mon, 19 Mar 2012 16:57:50 +0200
-Message-Id: <1332169073-15885-1-git-send-email-chen.ganir@ti.com>
+From: Mikel Astiz <Mikel.Astiz@bmw-carit.de>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 19 Mar 2012 15:55:45 +0100
+Subject: RE: [PATCH obexd v0 05/11] client: transfer api merges put and get
+Message-ID: <66BD268F973E3544A665E5F503FB38B71AE959AEC1@DC01.bmw-carit.intra>
+References: <1331559165-28367-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1331559165-28367-6-git-send-email-mikel.astiz.oss@gmail.com>
+ <CABBYNZKKWhEXvULPUpTp6bRPfUV+QeX2nVZbdNJVPFFL6mSPvw@mail.gmail.com>
+In-Reply-To: <CABBYNZKKWhEXvULPUpTp6bRPfUV+QeX2nVZbdNJVPFFL6mSPvw@mail.gmail.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Ganir <chen.ganir@ti.com>
+Hi Luiz,
 
-This patch set is a result of the discussion on the #bluez channel.
+> >
+> > A new enum type is used to distinguish put and get transfers.
+> >
+> > This is more convenient since it is done when registering the
+> > transfer, and not when it is actually started. The main benefits
+> would be:
+> >    - Some actions can be taken during creation, such as opening
+> files.
+> >    - session.c gets simplified.
+> >    - The size of a put transfer can be exposed in D-Bus, while
+> queued.
+> >    - The type of transfer (put or get) can be exposed in D-Bus.
+> >
+> > None of these D-Bus changes are included in this patch.
+> 
+> In this case I would prefer register_put/register_get instead of yet
+> another parameter and a enum with 2 values.
+> 
 
-Consolidate the --enable_<profile> for gatt profiles into a single
-switch, called --enable_gatt.
+The main problem with this is that, when you want both file-based and memory-based transfers (see patch v0 07/11), you would have 4 possible combinations.
 
-In addition, modify the AttributeServer property in the main.conf to
-EnableGatt option (default=false) and make sure all GATT plugins query 
-this option before trying to load (in the _init function of the 
-plugin)
+Another (less relevant) reason is that some client code could be interested in checking this field. For example the agent needs to know that currently.
 
-This is v4 of the patch set - fixed as suggested on the mailing list.
+I would even propose we make this field public in D-Bus in the future, so it would be weird that you have less information in the internal api.
 
-Chen Ganir (3):
-  GATT: Remove individual config switches
-  GATT: Rename Attribute Server switch
-  GATT: Profile support for EnableGatt
-
- Makefile.am            |   38 ++++++++++----------------------------
- Makefile.tools         |    8 +++++---
- acinclude.m4           |   32 ++++----------------------------
- alert/main.c           |    9 +++++----
- bootstrap-configure    |    6 +-----
- plugins/gatt-example.c |    6 +++---
- proximity/main.c       |   10 +++++++++-
- proximity/reporter.c   |    7 ++++---
- src/adapter.c          |    8 ++++----
- src/hcid.h             |    2 +-
- src/main.c             |    4 ++--
- src/main.conf          |    5 ++---
- thermometer/main.c     |   11 +++++++++++
- time/main.c            |    9 +++++----
- 14 files changed, 66 insertions(+), 89 deletions(-)
-
--- 
-1.7.4.1
+Cheers,
+Mikel
 
