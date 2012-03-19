@@ -1,39 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
+Message-ID: <1332200404.3362.0.camel@maxim-laptop>
+Subject: Re: bluez doesn't handle hotplug well
+From: Maxim Levitsky <maximlevitsky@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: epx@signove.com
-Subject: [PATCH] Fix crash when HDP first reliable channel is nil
-Date: Fri, 16 Mar 2012 19:53:09 -0300
-Message-Id: <1331938389-4856-1-git-send-email-epx@signove.com>
+Date: Tue, 20 Mar 2012 01:40:04 +0200
+In-Reply-To: <1332044343.2998.8.camel@maxim-laptop>
+References: <1332044343.2998.8.camel@maxim-laptop>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Congruent to health_channel_destroy(), the "/" path is returned by MainChannel
-property of HealthDevice when the first reliable channel is nil.
+On Sun, 2012-03-18 at 06:19 +0200, Maxim Levitsky wrote: 
+> Recently I began using Bluetooth, and I noticed that it sometimes
+> doesn't work after suspend to ram.
+> 
+> It turns out to be 100% reproduciable and not related to ether bluetooth
+> dongle (tested 2 of them) nor related to KDE/Gnome - happens in both,
+> and nether its related to actual suspend.
+> 
+> To reproduce, I just start bluetoothd, then:
+> 1. I plug the dongle, its recognized (or start bluetoothd after I plug
+> it, doesn't matter)
+> 
+> 2. I unplug it.
+> 3. I plug it again, and it is recognized again
+> 4. I unplug it.
+> 5. I plug it, and it doesn't work.
+> 
+> Reproducible, always, tested many times.
+> restarting bluetoothd fixes the problem until, I repeat the above.
+> 
+> bluetoothd log attached.
+> I am (still) using ubuntu 12.04.
+> 
+> Best regards,
+> Maxim Levitsky
+Any update?
 
-An empty path provokes the following error:
-
-process xxxs: arguments to dbus_message_iter_append_basic() were incorrect,
-assertion "_dbus_check_is_valid_path (*string_p)" failed in file
-../../dbus/dbus-message.c line 2539.  This is normally a bug in some
-application using the D-Bus library.
----
- health/hdp.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/health/hdp.c b/health/hdp.c
-index 812352f..eba438a 100644
---- a/health/hdp.c
-+++ b/health/hdp.c
-@@ -2077,7 +2077,7 @@ static DBusMessage *device_get_properties(DBusConnection *conn,
- 	if (device->fr != NULL)
- 		path = g_strdup(device->fr->path);
- 	else
--		path = g_strdup("");
-+		path = g_strdup("/");
- 	dict_append_entry(&dict, "MainChannel", DBUS_TYPE_OBJECT_PATH, &path);
- 	g_free(path);
- 	dbus_message_iter_close_container(&iter, &dict);
--- 
-1.7.5.4
+Best regards,
+Maxim Levitsky
 
