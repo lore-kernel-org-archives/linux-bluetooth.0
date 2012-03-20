@@ -1,29 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 20 Mar 2012 10:34:10 +0200
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Silence sparse warning
-Message-ID: <20120320083407.GC27063@aemeltch-MOBL1>
-References: <1332156398-25953-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1332178760.14217.213.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332178760.14217.213.camel@aeonflux>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Silence sparse warning
+Date: Tue, 20 Mar 2012 10:32:25 +0200
+Message-Id: <1332232345-30828-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Mon, Mar 19, 2012 at 10:39:20AM -0700, Marcel Holtmann wrote:
-> > -	memcpy(&val, &uuid128[12], 4);
-> > +	memcpy(&tmp, &uuid128[12], 4);
-> >  
-> > -	val = le32_to_cpu(val);
-> > +	val = le32_to_cpu(tmp);
-> 
-> why aren't we using get_unaligned_le32?
+Silence sparse warning shown below:
+...
+net/bluetooth/mgmt.c:448:15: warning: cast to restricted __le32
+...
 
-You are right here, just sent new version.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/mgmt.c |    4 +---
+ 1 files changed, 1 insertions(+), 3 deletions(-)
 
-Best regards 
-Andrei Emeltchenko 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b8f9016..d93f2bf 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -443,9 +443,7 @@ static u16 get_uuid16(u8 *uuid128)
+ 			return 0;
+ 	}
+ 
+-	memcpy(&val, &uuid128[12], 4);
+-
+-	val = le32_to_cpu(val);
++	val = get_unaligned_le32(&uuid128[12]);
+ 	if (val > 0xffff)
+ 		return 0;
+ 
+-- 
+1.7.9.1
+
