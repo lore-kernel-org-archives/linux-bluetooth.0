@@ -1,85 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 20 Mar 2012 11:39:00 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	padovan@profusion.mobi
+cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Simplify L2CAP timer logic
+In-Reply-To: <1332247868-32396-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <alpine.DEB.2.02.1203201119440.19427@mathewm-linux>
+References: <1332247868-32396-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAB7rCTgRzuBS49XNLfLN03POO3W0hZm3QjGwBCNkOXN2wKZ7Ag@mail.gmail.com>
-References: <CAB7rCTg4YLsE7uNbR8mRH_cubtMmBnTZUnJ3U4vL_AsyjA7xzA@mail.gmail.com>
-	<20120319230436.GA27304@x220>
-	<20120320173546.GA6307@samus>
-	<CAB7rCTgRzuBS49XNLfLN03POO3W0hZm3QjGwBCNkOXN2wKZ7Ag@mail.gmail.com>
-Date: Tue, 20 Mar 2012 13:39:43 -0500
-Message-ID: <CAB7rCTh+qs=dPFmJGq=MeG8qLarkcUu6UWrXb-a1sbAqMt3Dkw@mail.gmail.com>
-Subject: Re: reverse SDP issue
-From: Mike <puffy.taco@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Mar 20, 2012 at 1:27 PM, Mike <puffy.taco@gmail.com> wrote:
-> On Tue, Mar 20, 2012 at 12:35 PM, Vinicius Costa Gomes
-> <vinicius.gomes@openbossa.org> wrote:
->> Hi,
->>
->> On 20:04 Mon 19 Mar, Johan Hedberg wrote:
->>> Hi Mike,
->>>
->>> On Mon, Mar 19, 2012, Mike wrote:
->>> > I notice a change in commit d2920be715974795b51f9cc3279947104da3647b
->>> > [1] that changes the "reverse" variable for an SDP query:
->>> >
->>> >  -       device_browse_sdp(device, NULL, NULL, NULL, TRUE);
->>> > +       if (device_is_bredr(device))
->>> > +               device_browse_sdp(device, NULL, NULL, NULL, FALSE);
->>> > +       else
->>> > +               device_browse_primary(device, NULL, NULL, FALSE);
->>> >
->>> > You can see the original had reverse as TRUE, but the patch may have
->>> > inadvertently changed it to FALSE..kernel.org/majordomo-info.html
->>>
->>> That looks like a definitive bug. Good that you caught it. Vinicius
->>> (author of the commit) care to comment?
->>
->> It was changed to false by mistake, a patch to fix it should be arriving
->> on the mailing list in a few moments.
->>
->> The comment on src/device.c around line 1683 gives some hints on what
->> my mistake may have caused: it could be that the device while connected
->> "hides" some items from its service record. So with reverse set to
->> false, some records that are present are being removed by mistake.
->
-> I'm not sure that's the case here.  I added some code to print out the
-> contents of "device->uuids" at the beginning of update_services
-> (src/device.c), and here is what I got:
->
-> UUID 0000110d-0000-1000-8000-00805f9b34fb
-> UUID 0000111f-0000-1000-8000-00805f9b34fb
-> UUID 0000110d-0000-1000-8000-00805f9b34fb
-> UUID 0000111f-0000-1000-8000-00805f9b34fb
->
-> A little curious why the UUIDs are duplicated, but besides that, we
-> can see that my phone already attempted to connect _before_ it was
-> paired, because it thought it was paired already (pairing deleted on
-> the BlueZ side only).  The UUIDs were added then before SDP could be
-> done.
->
-> This has me suspecting these lines of code in update_services:
->
->                l = g_slist_find_custom(device->uuids, profile_uuid,
->                                                        (GCompareFunc) strcmp);
->                if (!l)
->                        req->profiles_added =
->                                        g_slist_append(req->profiles_added,
->                                                        profile_uuid);
->                else {
->                        req->profiles_removed =
->                                        g_slist_remove(req->profiles_removed,
->                                                        l->data);
->                        g_free(profile_uuid);
->                }
->
-> It appears that if a UUID already existed when you did the SDP browse,
-> it is removed?  Why would that be?
 
-Ah, I read that wrong.  The UUID is removed from the list of profiles
-to be removed!  So that's sane, but I guess the problem is that
-somehow we have the UUIDs in there twice, which makes this code fail.
+
+On Tue, 20 Mar 2012, Andrei Emeltchenko wrote:
+
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Simplify L2CAP timers logic. Previous logic was hard to understand.
+> Now we always hold(chan) when setting up timer and put(chan) only
+> if work pending and we successfully cancel delayed work.
+>
+> If delayed work is executing it will put(chan) itself.
+>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+> include/net/bluetooth/l2cap.h |   27 ++++++++++++++-------------
+> 1 files changed, 14 insertions(+), 13 deletions(-)
+>
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 9b242c6..e4b2fe7 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -621,29 +621,30 @@ static inline void l2cap_chan_unlock(struct l2cap_chan *chan)
+> 	mutex_unlock(&chan->lock);
+> }
+>
+> -static inline void l2cap_set_timer(struct l2cap_chan *chan,
+> -					struct delayed_work *work, long timeout)
+> -{
+> -	BT_DBG("chan %p state %s timeout %ld", chan,
+> -					state_to_string(chan->state), timeout);
+> -
+> -	if (!cancel_delayed_work(work))
+> -		l2cap_chan_hold(chan);
+> -	schedule_delayed_work(work, timeout);
+> -}
+> -
+> static inline bool l2cap_clear_timer(struct l2cap_chan *chan,
+> -					struct delayed_work *work)
+> +				     struct delayed_work *work)
+> {
+> 	bool ret;
+>
+> -	ret = cancel_delayed_work(work);
+> +	ret = (delayed_work_pending(work) && cancel_delayed_work(work));
+
+Why change this?  cancel_delayed_work() can handle a delayed_work that 
+is not pending, and has the proper locking to guard against race 
+conditions.
+
+> 	if (ret)
+> 		l2cap_chan_put(chan);
+>
+> 	return ret;
+> }
+>
+> +static inline void l2cap_set_timer(struct l2cap_chan *chan,
+> +				   struct delayed_work *work, long timeout)
+> +{
+> +	BT_DBG("chan %p state %s timeout %ld", chan,
+> +	       state_to_string(chan->state), timeout);
+> +
+> +	l2cap_clear_timer(chan, work);
+> +
+> +	l2cap_chan_hold(chan);
+> +	schedule_delayed_work(work, timeout);
+> +}
+> +
+> #define __set_chan_timer(c, t) l2cap_set_timer(c, &c->chan_timer, (t))
+> #define __clear_chan_timer(c) l2cap_clear_timer(c, &c->chan_timer)
+> #define __set_retrans_timer(c) l2cap_set_timer(c, &c->retrans_timer, \
+
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
