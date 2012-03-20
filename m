@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1331814621-13905-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1331814621-13905-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1331814621-13905-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1331814621-13905-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Tue, 20 Mar 2012 09:22:46 -0300
-Message-ID: <CAA37ikb7ayXRER=JRZqA+gyj56-L1SA1g8FoOsdSEuLHcykcbg@mail.gmail.com>
-Subject: Re: [RFCv4 05/30] Bluetooth: Lock sk only if exist
+	<1331814621-13905-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 20 Mar 2012 09:21:56 -0300
+Message-ID: <CAA37ikYrU460dm9qD+2hYMrdqNO6J=i++EgR8gX9-Rux+SwMhw@mail.gmail.com>
+Subject: Re: [RFCv4 06/30] Bluetooth: Timers fixes
 From: Ulisses Furquim <ulisses@profusion.mobi>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -17,46 +17,77 @@ Hi Andrei,
 
 On Thu, Mar 15, 2012 at 9:29 AM, Andrei Emeltchenko
 <Andrei.Emeltchenko.news@gmail.com> wrote:
+>
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
 >
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  net/bluetooth/l2cap_core.c |    8 ++++++--
->  1 files changed, 6 insertions(+), 2 deletions(-)
+>  include/net/bluetooth/l2cap.h |   25 +++++++++++++------------
+>  1 files changed, 13 insertions(+), 12 deletions(-)
 >
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 779f819..e8855cc 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -212,9 +212,13 @@ static inline void l2cap_state_change(struct l2cap_chan *chan, int state, int er
->  {
->        struct sock *sk = chan->sk;
->
-> -       lock_sock(sk);
-> +       if (sk)
-> +               lock_sock(sk);
-> +
->        __l2cap_state_change(chan, state, err);
-> -       release_sock(sk);
-> +
-> +       if (sk)
-> +               release_sock(sk);
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index d9c668c..1a5c9e6 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -624,29 +624,30 @@ static inline void l2cap_chan_unlock(struct
+> l2cap_chan *chan)
+>        mutex_unlock(&chan->lock);
 >  }
 >
->  void __l2cap_chan_set_err(struct l2cap_chan *chan, int err)
+> -static inline void l2cap_set_timer(struct l2cap_chan *chan,
+> -                                       struct delayed_work *work, long
+> timeout)
+> -{
+> -       BT_DBG("chan %p state %s timeout %ld", chan,
+> -                                       state_to_string(chan->state),
+> timeout);
+> -
+> -       if (!cancel_delayed_work(work))
+> -               l2cap_chan_hold(chan);
+> -       schedule_delayed_work(work, timeout);
+> -}
+> -
+>  static inline bool l2cap_clear_timer(struct l2cap_chan *chan,
+>                                        struct delayed_work *work)
+>  {
+>        bool ret;
+>
+> -       ret = cancel_delayed_work(work);
+> +       ret = (delayed_work_pending(work) && cancel_delayed_work(work));
+>        if (ret)
+>                l2cap_chan_put(chan);
+>
+>        return ret;
+>  }
+>
+> +static inline void l2cap_set_timer(struct l2cap_chan *chan,
+> +                                       struct delayed_work *work, long
+> timeout)
+> +{
+> +       BT_DBG("chan %p state %s timeout %ld", chan,
+> +                                       state_to_string(chan->state),
+> timeout);
+> +
+> +       l2cap_clear_timer(chan, work);
+> +
+> +       l2cap_chan_hold(chan);
+> +       schedule_delayed_work(work, timeout);
+> +}
+> +
+>  #define __set_chan_timer(c, t) l2cap_set_timer(c, &c->chan_timer, (t))
+>  #define __clear_chan_timer(c) l2cap_clear_timer(c, &c->chan_timer)
+>  #define __set_retrans_timer(c) l2cap_set_timer(c, &c->retrans_timer, \
 > --
 > 1.7.9.1
 
-Well, this doesn't look good, does it? Wouldn't make sense to call
-__l2cap_state_change() where we know sk doesn't exist and
-l2cap_state_change() in the others? After all the separation between
-chan and sk is something we need to have as much clear as possible
-from now on, right?
+What are you fixing here? Care to explain and send an example? This
+needs to be clear in the commit message so we don't have more
+confusion with timer handling as we had this code for quite some time.
 
 Regards,
 
--- 
+--
 Ulisses Furquim
 ProFUSION embedded systems
 http://profusion.mobi
