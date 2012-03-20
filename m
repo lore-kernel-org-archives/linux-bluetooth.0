@@ -1,58 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 20 Mar 2012 10:26:32 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Simplify L2CAP timer logic
+Message-ID: <20120320132632.GB20925@joana>
+References: <1332247868-32396-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DF3EC27@nasanexd02b.na.qualcomm.com>
-References: <Acz7Xq9MjsyGPasdTvauqG8msmvJ7AAGDXAg> <07BBB2AAB1A10A488A2AD166C7CB8B0DF3EC27@nasanexd02b.na.qualcomm.com>
-From: Eric Miao <eric.miao@canonical.com>
-Date: Tue, 20 Mar 2012 22:24:59 +0800
-Message-ID: <CAMPhdO8c1FvnfCUxUODE7U_tmydfd235JXhq=KOx=x5urX84eA@mail.gmail.com>
-Subject: Re: [patch] ath3k-1.fw: Fix firmware issue
-To: "Yao, Costa" <cqyao@qca.qualcomm.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1332247868-32396-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> From 5b3d3920ab3991b6450e6cc106666c1e10547824 Mon Sep 17 00:00:00 2001
-> From: Costa Yao <cqyao@qca.qualcomm.com>
-> Date: Tue, 6 Mar 2012 13:56:24 +0800
-> Subject: [PATCH] [patch]ath3k-1.fw: Fix firmware issue.
->
-> Force the dangle to change the PID value after the downloading of ath3k-1.fw.
->
-> Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
+Hi Andrei,
 
-Tested-by: Eric Miao <eric.miao@canonical.com>
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-03-20 14:51:08 +0200]:
 
-With DW1702, AR3011 Bluetooth module. After using this firmware
-blob, the AR3011 BT module changes its PID to 3005, and then
-btusb.ko can be working all right.
-
-Please refer to http://bugs.launchpad.net/bugs/714862 for details.
-
-
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Simplify L2CAP timers logic. Previous logic was hard to understand.
+> Now we always hold(chan) when setting up timer and put(chan) only
+> if work pending and we successfully cancel delayed work.
+> 
+> If delayed work is executing it will put(chan) itself.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  WHENCE     |    2 +-
->  ath3k-1.fw |  Bin 246804 -> 246804 bytes
->  2 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/WHENCE b/WHENCE
-> index 01fa5ca..4cc9cbd 100644
-> --- a/WHENCE
-> +++ b/WHENCE
-> @@ -1209,7 +1209,7 @@ Driver: ath3k - DFU Driver for Atheros bluetooth chipset AR3011
->  File: ath3k-1.fw
->  Info: v1.0
->
-> -Fix EEPROM radio table issue and change PID to 3005
-> +Fix firmware issue and force to change PID after downloading of ath3k-1.fw
->
->  Licence: Redistributable. See LICENCE.atheros_firmware for details
->
-> diff --git a/ath3k-1.fw b/ath3k-1.fw
-> index 63aa9b9ad87d3d918e441d921ada9cad08687ae5..0f6335030a8541db35894a00ea607ae945f31947 100644
-> GIT binary patch
-> delta 101591
-> zcma%jd03Oj_VCP`g)A?Su!Jp05(xViP+Y2&AR;2Rpp~j!6f{(=tzvCmYOf@=ib`)u
+>  include/net/bluetooth/l2cap.h |   27 ++++++++++++++-------------
+>  1 files changed, 14 insertions(+), 13 deletions(-)
 
-..... [snipped]
+Applied, thanks.
+
+	Gustavo
