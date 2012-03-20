@@ -1,39 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 20 Mar 2012 10:03:43 +0200
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Silence sparse warning
-Date: Tue, 20 Mar 2012 10:32:25 +0200
-Message-Id: <1332232345-30828-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv4 01/30] Bluetooth: Make ertm_init available
+Message-ID: <20120320080336.GB27063@aemeltch-MOBL1>
+References: <1331814621-13905-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1331814621-13905-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20120320030449.GB9142@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120320030449.GB9142@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Gustavo,
 
-Silence sparse warning shown below:
-...
-net/bluetooth/mgmt.c:448:15: warning: cast to restricted __le32
-...
+On Tue, Mar 20, 2012 at 12:04:49AM -0300, Gustavo Padovan wrote:
+> Hi Andrei,
+> 
+> > -static inline void l2cap_ertm_init(struct l2cap_chan *chan)
+> > +void l2cap_ertm_init(struct l2cap_chan *chan)
+> 
+> I prefer to see this kind of change with the actual code that uses it.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/mgmt.c |    4 +---
- 1 files changed, 1 insertions(+), 3 deletions(-)
+I will merge it.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b8f9016..d93f2bf 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -443,9 +443,7 @@ static u16 get_uuid16(u8 *uuid128)
- 			return 0;
- 	}
- 
--	memcpy(&val, &uuid128[12], 4);
--
--	val = le32_to_cpu(val);
-+	val = get_unaligned_le32(&uuid128[12]);
- 	if (val > 0xffff)
- 		return 0;
- 
--- 
-1.7.9.1
-
+Best regards 
+Andrei Emeltchenko 
