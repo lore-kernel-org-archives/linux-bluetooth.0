@@ -1,31 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 20 Mar 2012 00:03:47 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv4 05/30] Bluetooth: Lock sk only if exist
-Message-ID: <20120320030347.GA9142@joana>
-References: <1331814621-13905-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1331814621-13905-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1331814621-13905-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Andre Guedes <aguedespe@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: andre.guedes@openbossa.org
+Subject: [PATCH] Bluetooth: Replace EPERM by EALREADY in hci_cancel_inquiry
+Date: Tue, 20 Mar 2012 00:13:38 -0300
+Message-Id: <1332213218-21420-1-git-send-email-aguedespe@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+We should return -EALREADY in hci_cancel_inquiry since it is more
+suitable than -EPERM error code.
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-03-15 14:29:56 +0200]:
+Signed-off-by: Andre Guedes <aguedespe@gmail.com>
+---
+ net/bluetooth/hci_core.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c |    8 ++++++--
->  1 files changed, 6 insertions(+), 2 deletions(-)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 68b58af..286f3fc 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2958,7 +2958,7 @@ int hci_cancel_inquiry(struct hci_dev *hdev)
+ 	BT_DBG("%s", hdev->name);
+ 
+ 	if (!test_bit(HCI_INQUIRY, &hdev->flags))
+-		return -EPERM;
++		return -EALREADY;
+ 
+ 	return hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
+ }
+-- 
+1.7.9.4
 
-We told about this several times, please include a commit message description
-in all patches.
-
-	Gustavo
