@@ -1,34 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 20 Mar 2012 18:24:01 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
+Message-ID: <1332260307.1870.21.camel@aeonflux>
 Subject: Re: [PATCH] Bluetooth: Silence sparse warning
-Message-ID: <20120320162400.GJ27063@aemeltch-MOBL1>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 20 Mar 2012 09:18:27 -0700
+In-Reply-To: <1332259694-9199-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332259694-9199-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1332260307.1870.21.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332260307.1870.21.camel@aeonflux>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Andrei,
 
-On Tue, Mar 20, 2012 at 09:18:27AM -0700, Marcel Holtmann wrote:
-> >  
-> > -	memcpy(&val, &uuid128[12], 4);
-> > -
-> > -	val = le32_to_cpu(val);
-> > +	val = get_unaligned_le32(uuid128 + 12);
-> >  	if (val > 0xffff)
-> >  		return 0;
-> >  
+> Silence sparse warning shown below:
+> ...
+> net/bluetooth/mgmt.c:448:15: warning: cast to restricted __le32
+> ...
 > 
-> since Gustavo already applied this patch, don't bother ;)
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/mgmt.c |    4 +---
+>  1 files changed, 1 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index b8f9016..913c6d2 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -443,9 +443,7 @@ static u16 get_uuid16(u8 *uuid128)
+>  			return 0;
+>  	}
+>  
+> -	memcpy(&val, &uuid128[12], 4);
+> -
+> -	val = le32_to_cpu(val);
+> +	val = get_unaligned_le32(uuid128 + 12);
+>  	if (val > 0xffff)
+>  		return 0;
+>  
 
-It was not pushed when I sent updated version.
+since Gustavo already applied this patch, don't bother ;)
 
-Best regards 
-Andrei Emeltchenko 
+Regards
+
+Marcel
+
 
