@@ -1,46 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1332258576.1870.13.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Silence sparse warning
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 20 Mar 2012 18:06:11 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 20 Mar 2012 08:49:36 -0700
-In-Reply-To: <1332232345-30828-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1332232345-30828-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: [RFC] Bluetooth: don't increment twice in eir_has_data_type()
+Message-ID: <20120320150611.GA24873@elgon.mountain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+I don't have this hardware, and I'm not familiar with this code.  It
+just looked suspicious that we move the parsed counter forward faster
+than the data pointer.  We do it once in middle the loop and again as
+the for loop incrementer.  The effect is that we only search half the
+data_len before returning false.
 
-> Silence sparse warning shown below:
-> ...
-> net/bluetooth/mgmt.c:448:15: warning: cast to restricted __le32
-> ...
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/mgmt.c |    4 +---
->  1 files changed, 1 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index b8f9016..d93f2bf 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -443,9 +443,7 @@ static u16 get_uuid16(u8 *uuid128)
->  			return 0;
->  	}
->  
-> -	memcpy(&val, &uuid128[12], 4);
-> -
-> -	val = le32_to_cpu(val);
-> +	val = get_unaligned_le32(&uuid128[12]);
+Also I've changed the breaks to just return false directly because it
+made the code easier to follow.
 
-I actually prefer get_unaligned_le32(uuid128 + 12) in these cases.
+I wrote this patch based on a guess of what the data might look like so
+it's very likely wrong.  Could you maybe treat it as a bug report and
+give me a Reported-by?
 
-Regards
-
-Marcel
-
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 8dc07fa..ff79f41 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -912,22 +912,17 @@ static inline void hci_role_switch_cfm(struct hci_conn *conn, __u8 status,
+ static inline bool eir_has_data_type(u8 *data, size_t data_len, u8 type)
+ {
+ 	u8 field_len;
+-	size_t parsed;
++	size_t parsed = 0;
+ 
+-	for (parsed = 0; parsed < data_len - 1; parsed += field_len) {
++	while (parsed < data_len - 1) {
+ 		field_len = data[0];
+ 
+ 		if (field_len == 0)
+-			break;
+-
+-		parsed += field_len + 1;
+-
+-		if (parsed > data_len)
+-			break;
+-
++			return false;
+ 		if (data[1] == type)
+ 			return true;
+ 
++		parsed += field_len + 1;
+ 		data += field_len + 1;
+ 	}
+ 
