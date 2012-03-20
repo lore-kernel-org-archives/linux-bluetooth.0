@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH V2 4/7] mgmtops: Add support for setting Device ID
-Date: Tue, 20 Mar 2012 17:27:24 +0100
-Message-ID: <1332260847-20079-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH V2 7/7] Move common code to sdp to avoid duplication
+Date: Tue, 20 Mar 2012 17:27:27 +0100
+Message-ID: <1332260847-20079-7-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1332260847-20079-1-git-send-email-szymon.janc@tieto.com>
 References: <1332260847-20079-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,83 +12,206 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+LanguageBaseAttributeIDList is set from few places and each time static
+function was copied and used for that. Move this funtion to sdp code
+and use that instead of copying code.
 ---
- lib/mgmt.h        |    9 +++++++++
- plugins/mgmtops.c |   27 ++++++++++++++++++++++++---
- 2 files changed, 33 insertions(+), 3 deletions(-)
+ compat/sdp.c     |   16 +---------------
+ lib/sdp.c        |   13 +++++++++++++
+ lib/sdp_lib.h    |    2 ++
+ network/server.c |   16 +---------------
+ serial/proxy.c   |   16 +---------------
+ tools/sdptool.c  |   20 +++-----------------
+ 6 files changed, 21 insertions(+), 62 deletions(-)
 
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index f3bc6da..c9b0f1a 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -311,6 +311,14 @@ struct mgmt_cp_unblock_device {
- 	struct mgmt_addr_info addr;
- } __packed;
+diff --git a/compat/sdp.c b/compat/sdp.c
+index f384844..9ad8333 100644
+--- a/compat/sdp.c
++++ b/compat/sdp.c
+@@ -47,20 +47,6 @@
+ static sdp_record_t *record = NULL;
+ static sdp_session_t *session = NULL;
  
-+#define MGMT_OP_SET_DEVICE_ID		0x0028
-+struct mgmt_cp_set_device_id {
-+	uint16_t source;
-+	uint16_t vendor;
-+	uint16_t product;
-+	uint16_t version;
-+} __packed;
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	uint16_t opcode;
-@@ -475,6 +483,7 @@ static const char *mgmt_op[] = {
- 	"Confirm Name",
- 	"Block Device",
- 	"Unblock Device",
-+	"Set Device ID",
- };
- 
- static const char *mgmt_ev[] = {
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index c24757c..c08117f 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -1426,6 +1426,9 @@ static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
- 	case MGMT_OP_STOP_DISCOVERY:
- 		DBG("stop_discovery complete");
- 		break;
-+	case MGMT_OP_SET_DEVICE_ID:
-+		DBG("set_did complete");
-+		break;
- 	default:
- 		error("Unknown command complete for opcode %u", opcode);
- 		break;
-@@ -2118,9 +2121,27 @@ static int mgmt_encrypt_link(int index, bdaddr_t *dst, bt_hci_result_t cb,
- static int mgmt_set_did(int index, uint16_t vendor, uint16_t product,
- 					uint16_t version, uint16_t source)
+-static void add_lang_attr(sdp_record_t *r)
+-{
+-	sdp_lang_attr_t base_lang;
+-	sdp_list_t *langs = 0;
+-
+-	/* UTF-8 MIBenum (http://www.iana.org/assignments/character-sets) */
+-	base_lang.code_ISO639 = (0x65 << 8) | 0x6e;
+-	base_lang.encoding = 106;
+-	base_lang.base_offset = SDP_PRIMARY_LANG_BASE;
+-	langs = sdp_list_append(0, &base_lang);
+-	sdp_set_lang_attr(r, langs);
+-	sdp_list_free(langs, 0);
+-}
+-
+ static void epox_endian_quirk(unsigned char *data, int size)
  {
--	DBG("index %d vendor %u product %u version %u source %u",
--				index, vendor, product, version, source);
--	return -ENOSYS;
-+	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_set_device_id)];
-+	struct mgmt_hdr *hdr = (void *) buf;
-+	struct mgmt_cp_set_device_id *cp = (void *) &buf[sizeof(*hdr)];
-+
-+	DBG("index %d source %x vendor %x product %x version %x",
-+				index, source, vendor, product, version);
-+
-+	memset(buf, 0, sizeof(buf));
-+	hdr->opcode = htobs(MGMT_OP_SET_DEVICE_ID);
-+	hdr->len = htobs(sizeof(*cp));
-+	hdr->index = htobs(index);
-+
-+	cp->source = htobs(source);
-+	cp->vendor = htobs(vendor);
-+	cp->product = htobs(product);
-+	cp->version = htobs(version);
-+
-+	if (write(mgmt_sock, buf, sizeof(buf)) < 0)
-+		return -errno;
-+
-+	return 0;
+ 	/* USAGE_PAGE (Keyboard)	05 07
+@@ -448,7 +434,7 @@ int bnep_sdp_register(bdaddr_t *device, uint16_t role)
+ 	aproto = sdp_list_append(NULL, apseq);
+ 	sdp_set_access_protos(record, aproto);
+ 
+-	add_lang_attr(record);
++	sdp_add_lang_attr(record);
+ 
+ 	sdp_list_free(proto[0], NULL);
+ 	sdp_list_free(proto[1], NULL);
+diff --git a/lib/sdp.c b/lib/sdp.c
+index 57f630a..87fe5be 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -4789,3 +4789,16 @@ fail:
+ 	return -1;
  }
  
- static int mgmt_disable_cod_cache(int index)
++void sdp_add_lang_attr(sdp_record_t *rec)
++{
++	sdp_lang_attr_t base_lang;
++	sdp_list_t *langs;
++
++	base_lang.code_ISO639 = (0x65 << 8) | 0x6e;
++	base_lang.encoding = 106;
++	base_lang.base_offset = SDP_PRIMARY_LANG_BASE;
++
++	langs = sdp_list_append(0, &base_lang);
++	sdp_set_lang_attr(rec, langs);
++	sdp_list_free(langs, NULL);
++}
+diff --git a/lib/sdp_lib.h b/lib/sdp_lib.h
+index 433e9ef..6e1eb91 100644
+--- a/lib/sdp_lib.h
++++ b/lib/sdp_lib.h
+@@ -624,6 +624,8 @@ void sdp_pattern_add_uuidseq(sdp_record_t *rec, sdp_list_t *seq);
+ 
+ int sdp_send_req_w4_rsp(sdp_session_t *session, uint8_t *req, uint8_t *rsp, uint32_t reqsize, uint32_t *rspsize);
+ 
++void sdp_add_lang_attr(sdp_record_t *rec);
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/network/server.c b/network/server.c
+index 67d81e3..987cfca 100644
+--- a/network/server.c
++++ b/network/server.c
+@@ -110,20 +110,6 @@ static struct network_server *find_server(GSList *list, uint16_t id)
+ 	return NULL;
+ }
+ 
+-static void add_lang_attr(sdp_record_t *r)
+-{
+-	sdp_lang_attr_t base_lang;
+-	sdp_list_t *langs = 0;
+-
+-	/* UTF-8 MIBenum (http://www.iana.org/assignments/character-sets) */
+-	base_lang.code_ISO639 = (0x65 << 8) | 0x6e;
+-	base_lang.encoding = 106;
+-	base_lang.base_offset = SDP_PRIMARY_LANG_BASE;
+-	langs = sdp_list_append(0, &base_lang);
+-	sdp_set_lang_attr(r, langs);
+-	sdp_list_free(langs, 0);
+-}
+-
+ static sdp_record_t *server_record_new(const char *name, uint16_t id)
+ {
+ 	sdp_list_t *svclass, *pfseq, *apseq, *root, *aproto;
+@@ -232,7 +218,7 @@ static sdp_record_t *server_record_new(const char *name, uint16_t id)
+ 	aproto = sdp_list_append(NULL, apseq);
+ 	sdp_set_access_protos(record, aproto);
+ 
+-	add_lang_attr(record);
++	sdp_add_lang_attr(record);
+ 
+ 	sdp_attr_add_new(record, SDP_ATTR_SECURITY_DESC,
+ 				SDP_UINT16, &security_desc);
+diff --git a/serial/proxy.c b/serial/proxy.c
+index 736f690..ea5c29f 100644
+--- a/serial/proxy.c
++++ b/serial/proxy.c
+@@ -130,20 +130,6 @@ static void proxy_free(struct serial_proxy *prx)
+ 	g_free(prx);
+ }
+ 
+-static void add_lang_attr(sdp_record_t *r)
+-{
+-	sdp_lang_attr_t base_lang;
+-	sdp_list_t *langs = 0;
+-
+-	/* UTF-8 MIBenum (http://www.iana.org/assignments/character-sets) */
+-	base_lang.code_ISO639 = (0x65 << 8) | 0x6e;
+-	base_lang.encoding = 106;
+-	base_lang.base_offset = SDP_PRIMARY_LANG_BASE;
+-	langs = sdp_list_append(0, &base_lang);
+-	sdp_set_lang_attr(r, langs);
+-	sdp_list_free(langs, 0);
+-}
+-
+ static sdp_record_t *proxy_record_new(const char *uuid128, uint8_t channel)
+ {
+ 	sdp_list_t *apseq, *aproto, *profiles, *proto[2], *root, *svclass_id;
+@@ -186,7 +172,7 @@ static sdp_record_t *proxy_record_new(const char *uuid128, uint8_t channel)
+ 	aproto = sdp_list_append(NULL, apseq);
+ 	sdp_set_access_protos(record, aproto);
+ 
+-	add_lang_attr(record);
++	sdp_add_lang_attr(record);
+ 
+ 	sdp_set_info_attr(record, "Serial Proxy", NULL, "Serial Proxy");
+ 
+diff --git a/tools/sdptool.c b/tools/sdptool.c
+index 1a89245..db9ac0d 100644
+--- a/tools/sdptool.c
++++ b/tools/sdptool.c
+@@ -1148,20 +1148,6 @@ typedef struct {
+ 	uint8_t network;
+ } svc_info_t;
+ 
+-static void add_lang_attr(sdp_record_t *r)
+-{
+-	sdp_lang_attr_t base_lang;
+-	sdp_list_t *langs = 0;
+-
+-	/* UTF-8 MIBenum (http://www.iana.org/assignments/character-sets) */
+-	base_lang.code_ISO639 = (0x65 << 8) | 0x6e;
+-	base_lang.encoding = 106;
+-	base_lang.base_offset = SDP_PRIMARY_LANG_BASE;
+-	langs = sdp_list_append(0, &base_lang);
+-	sdp_set_lang_attr(r, langs);
+-	sdp_list_free(langs, 0);
+-}
+-
+ static int add_sp(sdp_session_t *session, svc_info_t *si)
+ {
+ 	sdp_list_t *svclass_id, *apseq, *proto[2], *profiles, *root, *aproto;
+@@ -1203,7 +1189,7 @@ static int add_sp(sdp_session_t *session, svc_info_t *si)
+ 	aproto = sdp_list_append(0, apseq);
+ 	sdp_set_access_protos(&record, aproto);
+ 
+-	add_lang_attr(&record);
++	sdp_add_lang_attr(&record);
+ 
+ 	sdp_set_info_attr(&record, "Serial Port", "BlueZ", "COM Port");
+ 
+@@ -2312,7 +2298,7 @@ static int add_hid_keyb(sdp_session_t *session, svc_info_t *si)
+ 	root = sdp_list_append(0, &root_uuid);
+ 	sdp_set_browse_groups(&record, root);
+ 
+-	add_lang_attr(&record);
++	sdp_add_lang_attr(&record);
+ 
+ 	sdp_uuid16_create(&hidkb_uuid, HID_SVCLASS_ID);
+ 	svclass_id = sdp_list_append(0, &hidkb_uuid);
+@@ -2490,7 +2476,7 @@ static int add_hid_wiimote(sdp_session_t *session, svc_info_t *si)
+ 	aproto = sdp_list_append(0, apseq);
+ 	sdp_set_add_access_protos(&record, aproto);
+ 
+-	add_lang_attr(&record);
++	sdp_add_lang_attr(&record);
+ 
+ 	sdp_set_info_attr(&record, "Nintendo RVL-CNT-01",
+ 					"Nintendo", "Nintendo RVL-CNT-01");
 -- 
 on behalf of ST-Ericsson
 
