@@ -1,68 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 20 Mar 2012 14:35:46 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Mike <puffy.taco@gmail.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: reverse SDP issue
-Message-ID: <20120320173546.GA6307@samus>
-References: <CAB7rCTg4YLsE7uNbR8mRH_cubtMmBnTZUnJ3U4vL_AsyjA7xzA@mail.gmail.com>
- <20120319230436.GA27304@x220>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH V2 6/7] Bump Device ID service version to 1.3
+Date: Tue, 20 Mar 2012 17:27:26 +0100
+Message-ID: <1332260847-20079-6-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1332260847-20079-1-git-send-email-szymon.janc@tieto.com>
+References: <1332260847-20079-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120319230436.GA27304@x220>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Device ID information in EIR are specified in DID 1.3 and this is
+supported by BlueZ.
+---
+ src/sdpd-service.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 20:04 Mon 19 Mar, Johan Hedberg wrote:
-> Hi Mike,
-> 
-> On Mon, Mar 19, 2012, Mike wrote:
-> > I notice a change in commit d2920be715974795b51f9cc3279947104da3647b
-> > [1] that changes the "reverse" variable for an SDP query:
-> > 
-> >  -       device_browse_sdp(device, NULL, NULL, NULL, TRUE);
-> > +       if (device_is_bredr(device))
-> > +               device_browse_sdp(device, NULL, NULL, NULL, FALSE);
-> > +       else
-> > +               device_browse_primary(device, NULL, NULL, FALSE);
-> > 
-> > You can see the original had reverse as TRUE, but the patch may have
-> > inadvertently changed it to FALSE..kernel.org/majordomo-info.html
-> 
-> That looks like a definitive bug. Good that you caught it. Vinicius
-> (author of the commit) care to comment?
-
-It was changed to false by mistake, a patch to fix it should be arriving
-on the mailing list in a few moments.
-
-The comment on src/device.c around line 1683 gives some hints on what
-my mistake may have caused: it could be that the device while connected
-"hides" some items from its service record. So with reverse set to
-false, some records that are present are being removed by mistake.
-
-> 
-> As for the partial service removal changes to the device driver API, it
-> looks pretty messy to me. Is there any reason why we couldn't just
-> restrict calling remove() for when removing the entire device object
-> (and never call it when doing subsequent service discoveries)?
-
-I agree that the logic is quite messy. Just some comments:
-
-That assumes that the service list that a device implements is very much
-static, which only breaks for development (in which the services of an 
-device are always changing) and you will need to remove that device and 
-create it again.
-
-> 
-> Johan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
+diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+index a6ed90e..c33e1da 100644
+--- a/src/sdpd-service.c
++++ b/src/sdpd-service.c
+@@ -175,7 +175,7 @@ void register_server_service(void)
+ 
+ void register_device_id(void)
+ {
+-	const uint16_t spec = 0x0102;
++	const uint16_t spec = 0x0103;
+ 	const uint8_t primary = 1;
+ 	sdp_list_t *class_list, *group_list, *profile_list;
+ 	uuid_t class_uuid, group_uuid;
 -- 
-Vinicius
+on behalf of ST-Ericsson
+
