@@ -1,48 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Sender: eric.y.miao@gmail.com
-In-Reply-To: <CAMPhdO8nv3ziFVAo_N56Gwd7ZtqsgA-79pLJ6gsuwGqMYWrZ1w@mail.gmail.com>
-References: <1332132103-23374-1-git-send-email-eric.miao@canonical.com>
- <1332178663.14217.211.camel@aeonflux> <CAMPhdO8nv3ziFVAo_N56Gwd7ZtqsgA-79pLJ6gsuwGqMYWrZ1w@mail.gmail.com>
+In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DF3EC27@nasanexd02b.na.qualcomm.com>
+References: <Acz7Xq9MjsyGPasdTvauqG8msmvJ7AAGDXAg> <07BBB2AAB1A10A488A2AD166C7CB8B0DF3EC27@nasanexd02b.na.qualcomm.com>
 From: Eric Miao <eric.miao@canonical.com>
-Date: Tue, 20 Mar 2012 22:36:40 +0800
-Message-ID: <CAMPhdO9NxqKAFymdnHq1HNchvzvggUyGbUdX1be0MP_KHnYq5w@mail.gmail.com>
-Subject: Re: [PATCH] Add udev rule for Ralink WiFi+BT module w/ bccmd
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 20 Mar 2012 22:24:59 +0800
+Message-ID: <CAMPhdO8c1FvnfCUxUODE7U_tmydfd235JXhq=KOx=x5urX84eA@mail.gmail.com>
+Subject: Re: [patch] ath3k-1.fw: Fix firmware issue
+To: "Yao, Costa" <cqyao@qca.qualcomm.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Mar 20, 2012 at 9:55 AM, Eric Miao <eric.miao@canonical.com> wrote:
-> On Tue, Mar 20, 2012 at 1:37 AM, Marcel Holtmann <marcel@holtmann.org> wr=
-ote:
->> Hi Eric,
->>
->>> Some Ralink WiFi + CSR BT module needs bluetooth radio to be
->>> turned on explicitly with bccmd by the following command:
->>>
->>> =C2=A0 bccmd psset -r 0x028c 0x0001
->>>
->>> The HCI will be probed successfully, but due to the default
->>> OFF state of the radio, no scan or connection can be made.
->>> This patch adds the udev rule so that once the HCI is up,
->>> udev will invoke bccmd with warm reset to turn on the radio.
->>>
->>> [1] https://bugs.launchpad.net/bugs/781556
->>> [2] https://bugs.meego.com/show_bug.cgi?id=3D3498
->>> [3] http://ubuntuforums.org/showthread.php?t=3D1776108
->>> [4] http://ubuntuforums.org/showthread.php?t=3D1703941
->>
->> why are we doing this in userspace? The btusb.c driver has the option
->> for pre-execution HCI commands queue. Why not use that one.
+> From 5b3d3920ab3991b6450e6cc106666c1e10547824 Mon Sep 17 00:00:00 2001
+> From: Costa Yao <cqyao@qca.qualcomm.com>
+> Date: Tue, 6 Mar 2012 13:56:24 +0800
+> Subject: [PATCH] [patch]ath3k-1.fw: Fix firmware issue.
 >
-> That sounds like a better one, I'll take a look and see if it's possible
-> to give a revised version. Thanks Marcel.
+> Force the dangle to change the PID value after the downloading of ath3k-1.fw.
+>
+> Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
 
-Hmm... have thought about this twice, and I still prefer the bccmd
-command in user space. Converting this very straight-forward setting
-w/ bccmd into HCI commands would make it rather awkward.
+Tested-by: Eric Miao <eric.miao@canonical.com>
 
-And so the further question would be the bluetooth-hid2hcd.rules,
-will this file gradually disappear and the necessary operations be
-made into the kernel code eventually?
+With DW1702, AR3011 Bluetooth module. After using this firmware
+blob, the AR3011 BT module changes its PID to 3005, and then
+btusb.ko can be working all right.
+
+Please refer to http://bugs.launchpad.net/bugs/714862 for details.
+
+
+> ---
+>  WHENCE     |    2 +-
+>  ath3k-1.fw |  Bin 246804 -> 246804 bytes
+>  2 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/WHENCE b/WHENCE
+> index 01fa5ca..4cc9cbd 100644
+> --- a/WHENCE
+> +++ b/WHENCE
+> @@ -1209,7 +1209,7 @@ Driver: ath3k - DFU Driver for Atheros bluetooth chipset AR3011
+>  File: ath3k-1.fw
+>  Info: v1.0
+>
+> -Fix EEPROM radio table issue and change PID to 3005
+> +Fix firmware issue and force to change PID after downloading of ath3k-1.fw
+>
+>  Licence: Redistributable. See LICENCE.atheros_firmware for details
+>
+> diff --git a/ath3k-1.fw b/ath3k-1.fw
+> index 63aa9b9ad87d3d918e441d921ada9cad08687ae5..0f6335030a8541db35894a00ea607ae945f31947 100644
+> GIT binary patch
+> delta 101591
+> zcma%jd03Oj_VCP`g)A?Su!Jp05(xViP+Y2&AR;2Rpp~j!6f{(=tzvCmYOf@=ib`)u
+
+..... [snipped]
