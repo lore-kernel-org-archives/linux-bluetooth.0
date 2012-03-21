@@ -1,70 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 21 Mar 2012 19:06:32 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: don't increment twice in eir_has_data_type()
-Message-ID: <20120321220632.GA14964@x220.amr.corp.intel.com>
-References: <20120320150611.GA24873@elgon.mountain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120320150611.GA24873@elgon.mountain>
+In-Reply-To: <20120321124334.GA8888@x220>
+References: <1332147523-9984-1-git-send-email-arik@wizery.com>
+ <1332147523-9984-2-git-send-email-arik@wizery.com> <20120320173640.GA16092@x220.amr.corp.intel.com>
+ <CA+XVXffkOx_m11LouHnxqJp4AWNS9jLuUM-JcjgnEi68XWRs2w@mail.gmail.com> <20120321124334.GA8888@x220>
+From: Arik Nemtsov <arik@wizery.com>
+Date: Wed, 21 Mar 2012 23:01:11 +0200
+Message-ID: <CA+XVXfcOy6e_wJPFuwLxweUNwKWkRSv6i9B_qqy1zYRaqjfCcQ@mail.gmail.com>
+Subject: Re: [PATCH v4 1/6] att: add remote btd_device to ATT read/write callbacks
+To: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dan,
+Hey Johan,
 
-On Tue, Mar 20, 2012, Dan Carpenter wrote:
-> I don't have this hardware, and I'm not familiar with this code.  It
-> just looked suspicious that we move the parsed counter forward faster
-> than the data pointer.  We do it once in middle the loop and again as
-> the for loop incrementer.  The effect is that we only search half the
-> data_len before returning false.
-> 
-> Also I've changed the breaks to just return false directly because it
-> made the code easier to follow.
-> 
-> I wrote this patch based on a guess of what the data might look like so
-> it's very likely wrong.  Could you maybe treat it as a bug report and
-> give me a Reported-by?
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 8dc07fa..ff79f41 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -912,22 +912,17 @@ static inline void hci_role_switch_cfm(struct hci_conn *conn, __u8 status,
->  static inline bool eir_has_data_type(u8 *data, size_t data_len, u8 type)
->  {
->  	u8 field_len;
-> -	size_t parsed;
-> +	size_t parsed = 0;
->  
-> -	for (parsed = 0; parsed < data_len - 1; parsed += field_len) {
-> +	while (parsed < data_len - 1) {
->  		field_len = data[0];
->  
->  		if (field_len == 0)
-> -			break;
-> -
-> -		parsed += field_len + 1;
-> -
-> -		if (parsed > data_len)
-> -			break;
-> -
-> +			return false;
->  		if (data[1] == type)
->  			return true;
->  
-> +		parsed += field_len + 1;
->  		data += field_len + 1;
->  	}
->  
+On Wed, Mar 21, 2012 at 14:43, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> > On Mon, Mar 19, 2012, Arik Nemtsov wrote:
+>> >> -     uint8_t (*read_cb)(struct attribute *a, gpointer user_data);
+>> >> -     uint8_t (*write_cb)(struct attribute *a, gpointer user_data);
+>> >> +     uint8_t (*read_cb)(struct attribute *a, gpointer user_data,
+>> >> +                             gpointer device);
+>> >> +     uint8_t (*write_cb)(struct attribute *a, gpointer user_data,
+>> >> +                             gpointer device);
+>> >
+>> > Why is device a gpointer and not a struct btd_device *?
+>>
+>> Well att.h is a self contained include file (also used in gatttool for
+>> example).
+>
+> How then could any of these callbacks receive a pointer to btd_device
+> when used in gatttool? And if they're not used in gatttool it seems like
+> some refactoring may be in place here (i.e. there should be be a
+> library-like .h file and then something else for stuff which is bound to
+> bluetoothd-internal constructs (like btd_device).
 
-Looks like the original code is indeed buggy, no idea how I didn't
-notice something that obvious. Your patch does however seem to change
-the behavior a bit, a valid tag would be detected even though its length
-would be invalid (pointing outside of the supplied data). Not sure if
-that's so critical though since the important thing is to keep the code
-from doing anything nasty when supplied invalid data.
+They are not used in gatttool. I guess you're right - we can move the
+"struct attribute" definition to some other file, which will include
+device.h. Any comments on naming?
+How about attrib/att-bluez.h ?
 
-Johan
+>
+>> That means there would have to be at least a forward declaration for
+>> btd_device.  If we go down that road, it gets tricky, since we depend
+>> on the include order of att.h and device.h. This can maybe be solved
+>> with ifdef tricks, but I thinking leaving att.h self contained is the
+>> better option here.
+>
+> In general we try to avoid double-include protections in internal .h
+> files. The convention is that .c files just have to include the
+> dependencies.
+
+Ok.
+
+Regards,
+Arik
