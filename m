@@ -1,130 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Chethan T N <chethan.tn@samsung.com>
+From: Andre Guedes <aguedespe@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Chethan T N <chethan.tn@samsung.com>
-Subject: [PATCH] avrcp: Handle of GetPlayerApplicationSettingAttributeText pdu
-Date: Wed, 21 Mar 2012 11:34:09 +0530
-Message-id: <1332309849-4303-1-git-send-email-chethan.tn@samsung.com>
+Cc: andre.guedes@openbossa.org
+Subject: [PATCH 4/4] Bluetooth: Ignore inquiry results from periodic inquiry
+Date: Wed, 21 Mar 2012 00:03:38 -0300
+Message-Id: <1332299018-15933-5-git-send-email-aguedespe@gmail.com>
+In-Reply-To: <1332299018-15933-1-git-send-email-aguedespe@gmail.com>
+References: <1332299018-15933-1-git-send-email-aguedespe@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Support for TG role GetPlayerApplicationSettingAttributeText added
-to pass PTS test case TP/PAS/BV-04-C
----
- audio/avrcp.c |   93 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 92 insertions(+), 1 deletions(-)
+This patch changes inquiry result function handlers so they ignore
+inquiry result events if periodic inquiry is enabled.
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index c9ec314..b09a777 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -800,6 +800,97 @@ err:
- 	return AVC_CTYPE_REJECTED;
- }
+Signed-off-by: Andre Guedes <aguedespe@gmail.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_event.c |    9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index bffb0c3..7325300 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1723,6 +1723,9 @@ static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *
+ 	if (!num_rsp)
+ 		return;
  
-+static const char *attr_to_str(uint8_t attr)
-+{
-+	switch (attr) {
-+	case AVRCP_ATTRIBUTE_EQUALIZER:
-+		return "Equalizer";
-+	case AVRCP_ATTRIBUTE_REPEAT_MODE:
-+		return "Repeat";
-+	case AVRCP_ATTRIBUTE_SHUFFLE:
-+		return "Shuffle";
-+	case AVRCP_ATTRIBUTE_SCAN:
-+		return "Scan";
-+	}
++	if (test_bit(HCI_PERIODIC_INQ, &hdev->dev_flags))
++		return;
 +
-+	return NULL;
-+}
+ 	hci_dev_lock(hdev);
+ 
+ 	for (; num_rsp; num_rsp--, info++) {
+@@ -2824,6 +2827,9 @@ static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct
+ 	if (!num_rsp)
+ 		return;
+ 
++	if (test_bit(HCI_PERIODIC_INQ, &hdev->dev_flags))
++		return;
 +
-+static uint8_t avrcp_handle_get_player_attribute_text(struct avrcp_player *player,
-+						struct avrcp_header *pdu,
-+						uint8_t transaction)
-+{
-+	uint16_t len = ntohs(pdu->params_len);
-+	uint8_t *settings = NULL;
-+	unsigned int i = 0;
-+	uint8_t no_of_attr = 0;
-+	const char *attstr = NULL;
+ 	hci_dev_lock(hdev);
+ 
+ 	if ((skb->len - 1) / num_rsp != sizeof(struct inquiry_info_with_rssi)) {
+@@ -2995,6 +3001,9 @@ static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct
+ 	if (!num_rsp)
+ 		return;
+ 
++	if (test_bit(HCI_PERIODIC_INQ, &hdev->dev_flags))
++		return;
 +
-+	if (player == NULL || len <= 1 || pdu->params[0] != len - 1)
-+		goto err;
-+
-+	/*
-+	 * Save a copy of requested settings because we can override them
-+	 * while responding
-+	 */
-+	settings = g_memdup(&pdu->params[1], pdu->params[0]);
-+	len = 0;
-+
-+	/*
-+	 * From sec. 5.7 of AVRCP 1.3 spec, we should ignore non-existent IDs
-+	 * and send a response with the existent ones.
-+	 */
-+	for (i = 0; i < pdu->params[0]; i++) {
-+
-+		if (settings[i] < AVRCP_ATTRIBUTE_EQUALIZER ||
-+					settings[i] > AVRCP_ATTRIBUTE_SCAN) {
-+			DBG("Ignoring %u", settings[i]);
-+			continue;
-+		}
-+
-+		if (player_get_attribute(player, settings[i]) < 0)
-+			continue;
-+
-+		/*
-+		 * No of attributes that are supported by the player
-+		 */
-+		no_of_attr++;
-+		pdu->params[++len] = settings[i];
-+
-+		/*
-+		 * As per the MIBenum defined in IANA character set
-+		 * document the value of displayable UTF-8 charater set
-+		 * value is 0x006A
-+		 */
-+		pdu->params[++len] = 0x00;
-+		pdu->params[++len] = 0x6A;
-+		attstr = attr_to_str(settings[i]);
-+
-+		if (NULL != attstr) {
-+			pdu->params[++len] = strlen(attstr);
-+			len = len + 1;
-+			strncpy((char *) (pdu->params + len), attstr, strlen(attstr));
-+			len = len + strlen(attstr);
-+		}
-+	}
-+
-+	g_free(settings);
-+
-+	if (len) {
-+		pdu->params[0] = no_of_attr;
-+		pdu->params_len = htons(len + 1);
-+
-+		return AVC_CTYPE_STABLE;
-+	}
-+
-+	error("No valid attributes in request");
-+
-+err:
-+	pdu->params_len = htons(1);
-+	pdu->params[0] = E_INVALID_PARAM;
-+	return AVC_CTYPE_REJECTED;
-+}
-+
- static uint8_t avrcp_handle_displayable_charset(struct avrcp_player *player,
- 						struct avrcp_header *pdu,
- 						uint8_t transaction)
-@@ -1015,7 +1106,7 @@ static struct pdu_handler {
- 		{ AVRCP_SET_PLAYER_VALUE, AVC_CTYPE_CONTROL,
- 					avrcp_handle_set_player_value },
- 		{ AVRCP_GET_PLAYER_ATTRIBUTE_TEXT, AVC_CTYPE_STATUS,
--					NULL },
-+					avrcp_handle_get_player_attribute_text },
- 		{ AVRCP_GET_PLAYER_VALUE_TEXT, AVC_CTYPE_STATUS,
- 					NULL },
- 		{ AVRCP_DISPLAYABLE_CHARSET, AVC_CTYPE_STATUS,
+ 	hci_dev_lock(hdev);
+ 
+ 	for (; num_rsp; num_rsp--, info++) {
 -- 
-1.7.5.4
+1.7.9.4
 
