@@ -1,38 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 21 Mar 2012 09:45:17 -0300
+Date: Wed, 21 Mar 2012 09:43:34 -0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: Mike <puffy.taco@gmail.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: reverse SDP issue
-Message-ID: <20120321124517.GB8888@x220>
-References: <CAB7rCTg4YLsE7uNbR8mRH_cubtMmBnTZUnJ3U4vL_AsyjA7xzA@mail.gmail.com>
- <20120319230436.GA27304@x220>
- <20120320173546.GA6307@samus>
+To: Arik Nemtsov <arik@wizery.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v4 1/6] att: add remote btd_device to ATT read/write
+ callbacks
+Message-ID: <20120321124334.GA8888@x220>
+References: <1332147523-9984-1-git-send-email-arik@wizery.com>
+ <1332147523-9984-2-git-send-email-arik@wizery.com>
+ <20120320173640.GA16092@x220.amr.corp.intel.com>
+ <CA+XVXffkOx_m11LouHnxqJp4AWNS9jLuUM-JcjgnEi68XWRs2w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120320173546.GA6307@samus>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CA+XVXffkOx_m11LouHnxqJp4AWNS9jLuUM-JcjgnEi68XWRs2w@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Arik,
 
-On Tue, Mar 20, 2012, Vinicius Costa Gomes wrote:
-> > As for the partial service removal changes to the device driver API, it
-> > looks pretty messy to me. Is there any reason why we couldn't just
-> > restrict calling remove() for when removing the entire device object
-> > (and never call it when doing subsequent service discoveries)?
+On Tue, Mar 20, 2012, Arik Nemtsov wrote:
+> On Tue, Mar 20, 2012 at 19:36, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> > Hi Arik,
+> >
+> > On Mon, Mar 19, 2012, Arik Nemtsov wrote:
+> >> -     uint8_t (*read_cb)(struct attribute *a, gpointer user_data);
+> >> -     uint8_t (*write_cb)(struct attribute *a, gpointer user_data);
+> >> +     uint8_t (*read_cb)(struct attribute *a, gpointer user_data,
+> >> +                             gpointer device);
+> >> +     uint8_t (*write_cb)(struct attribute *a, gpointer user_data,
+> >> +                             gpointer device);
+> >
+> > Why is device a gpointer and not a struct btd_device *?
 > 
-> I agree that the logic is quite messy. Just some comments:
-> 
-> That assumes that the service list that a device implements is very much
-> static, which only breaks for development (in which the services of an 
-> device are always changing) and you will need to remove that device and 
-> create it again.
+> Well att.h is a self contained include file (also used in gatttool for
+> example).
 
-We would still be able to handle added UUIDs just fine. The only issue
-is with removed services in which case you'd just wouldn't be able to
-connect to the remote device through the corresponding D-Bus interface
-(something which can already now happen and which I think is ok).
+How then could any of these callbacks receive a pointer to btd_device
+when used in gatttool? And if they're not used in gatttool it seems like
+some refactoring may be in place here (i.e. there should be be a
+library-like .h file and then something else for stuff which is bound to
+bluetoothd-internal constructs (like btd_device).
+
+> That means there would have to be at least a forward declaration for
+> btd_device.  If we go down that road, it gets tricky, since we depend
+> on the include order of att.h and device.h. This can maybe be solved
+> with ifdef tricks, but I thinking leaving att.h self contained is the
+> better option here.
+
+In general we try to avoid double-include protections in internal .h
+files. The convention is that .c files just have to include the
+dependencies.
 
 Johan
