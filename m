@@ -1,83 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 21 Mar 2012 05:56:30 +0000 (GMT)
-From: CHETHAN TN <chethan.tn@samsung.com>
-Subject: Re: [PATCH] avrcp: Handle of GetPlayerApplicationSettingAttributeText
- pdu
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Reply-to: chethan.tn@samsung.com
-MIME-version: 1.0
-Content-type: text/plain; charset=windows-1252
-MIME-version: 1.0
-Message-id: <12002429.87611332309390515.JavaMail.weblogic@epml17>
+From: Chethan T N <chethan.tn@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Chethan T N <chethan.tn@samsung.com>
+Subject: [PATCH] avrcp: Handle of GetPlayerApplicationSettingAttributeText pdu
+Date: Wed, 21 Mar 2012 11:34:09 +0530
+Message-id: <1332309849-4303-1-git-send-email-chethan.tn@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksDQoNCi0tLS0tLS0gT3JpZ2luYWwgTWVzc2FnZSAtLS0tLS0tDQpTZW5kZXIgOiBDSEVUSEFO
-IFROPGNoZXRoYW4udG5Ac2Ftc3VuZy5jb20+IExlYWQgRW5naW5lZXIvU0lTTy1TTFAvU2Ftc3Vu
-ZyBFbGVjdHJvbmljcw0KRGF0ZSA6IE1hciAyMSwgMjAxMiAxMTozNCAoR01UKzA1OjMwKQ0KVGl0
-bGUgOiBbUEFUQ0hdIGF2cmNwOiBIYW5kbGUgb2YgR2V0UGxheWVyQXBwbGljYXRpb25TZXR0aW5n
-QXR0cmlidXRlVGV4dCBwZHUNCg0KU3VwcG9ydCBmb3IgVEcgcm9sZSBHZXRQbGF5ZXJBcHBsaWNh
-dGlvblNldHRpbmdBdHRyaWJ1dGVUZXh0IGFkZGVkDQp0byBwYXNzIFBUUyB0ZXN0IGNhc2UgVFAv
-UEFTL0JWLTA0LUMNCi0tLQ0KYXVkaW8vYXZyY3AuYyB8ICAgOTMgKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystDQoxIGZpbGVzIGNoYW5nZWQs
-IDkyIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9hdWRpby9h
-dnJjcC5jIGIvYXVkaW8vYXZyY3AuYw0KaW5kZXggYzllYzMxNC4uYjA5YTc3NyAxMDA2NDQNCi0t
-LSBhL2F1ZGlvL2F2cmNwLmMNCisrKyBiL2F1ZGlvL2F2cmNwLmMNCkBAIC04MDAsNiArODAwLDk3
-IEBAIGVycjoNCnJldHVybiBBVkNfQ1RZUEVfUkVKRUNURUQ7DQp9DQoNCitzdGF0aWMgY29uc3Qg
-Y2hhciAqYXR0cl90b19zdHIodWludDhfdCBhdHRyKQ0KK3sNCisgc3dpdGNoIChhdHRyKSB7DQor
-IGNhc2UgQVZSQ1BfQVRUUklCVVRFX0VRVUFMSVpFUjoNCisgcmV0dXJuICJFcXVhbGl6ZXIiOw0K
-KyBjYXNlIEFWUkNQX0FUVFJJQlVURV9SRVBFQVRfTU9ERToNCisgcmV0dXJuICJSZXBlYXQiOw0K
-KyBjYXNlIEFWUkNQX0FUVFJJQlVURV9TSFVGRkxFOg0KKyByZXR1cm4gIlNodWZmbGUiOw0KKyBj
-YXNlIEFWUkNQX0FUVFJJQlVURV9TQ0FOOg0KKyByZXR1cm4gIlNjYW4iOw0KKyB9DQorDQorIHJl
-dHVybiBOVUxMOw0KK30NCisNCitzdGF0aWMgdWludDhfdCBhdnJjcF9oYW5kbGVfZ2V0X3BsYXll
-cl9hdHRyaWJ1dGVfdGV4dChzdHJ1Y3QgYXZyY3BfcGxheWVyICpwbGF5ZXIsDQorIHN0cnVjdCBh
-dnJjcF9oZWFkZXIgKnBkdSwNCisgdWludDhfdCB0cmFuc2FjdGlvbikNCit7DQorIHVpbnQxNl90
-IGxlbiA9IG50b2hzKHBkdS0+cGFyYW1zX2xlbik7DQorIHVpbnQ4X3QgKnNldHRpbmdzID0gTlVM
-TDsNCisgdW5zaWduZWQgaW50IGkgPSAwOw0KKyB1aW50OF90IG5vX29mX2F0dHIgPSAwOw0KKyBj
-b25zdCBjaGFyICphdHRzdHIgPSBOVUxMOw0KKw0KKyBpZiAocGxheWVyID09IE5VTEwgfHwgbGVu
-IDw9IDEgfHwgcGR1LT5wYXJhbXNbMF0gIT0gbGVuIC0gMSkNCisgZ290byBlcnI7DQorDQorIC8q
-DQorICogU2F2ZSBhIGNvcHkgb2YgcmVxdWVzdGVkIHNldHRpbmdzIGJlY2F1c2Ugd2UgY2FuIG92
-ZXJyaWRlIHRoZW0NCisgKiB3aGlsZSByZXNwb25kaW5nDQorICovDQorIHNldHRpbmdzID0gZ19t
-ZW1kdXAoJnBkdS0+cGFyYW1zWzFdLCBwZHUtPnBhcmFtc1swXSk7DQorIGxlbiA9IDA7DQorDQor
-IC8qDQorICogRnJvbSBzZWMuIDUuNyBvZiBBVlJDUCAxLjMgc3BlYywgd2Ugc2hvdWxkIGlnbm9y
-ZSBub24tZXhpc3RlbnQgSURzDQorICogYW5kIHNlbmQgYSByZXNwb25zZSB3aXRoIHRoZSBleGlz
-dGVudCBvbmVzLg0KKyAqLw0KKyBmb3IgKGkgPSAwOyBpIDwgcGR1LT5wYXJhbXNbMF07IGkrKykg
-ew0KKw0KKyBpZiAoc2V0dGluZ3NbaV0gPCBBVlJDUF9BVFRSSUJVVEVfRVFVQUxJWkVSIHx8DQor
-IHNldHRpbmdzW2ldID4gQVZSQ1BfQVRUUklCVVRFX1NDQU4pIHsNCisgREJHKCJJZ25vcmluZyAl
-dSIsIHNldHRpbmdzW2ldKTsNCisgY29udGludWU7DQorIH0NCisNCisgaWYgKHBsYXllcl9nZXRf
-YXR0cmlidXRlKHBsYXllciwgc2V0dGluZ3NbaV0pIDwgMCkNCisgY29udGludWU7DQorDQorIC8q
-DQorICogTm8gb2YgYXR0cmlidXRlcyB0aGF0IGFyZSBzdXBwb3J0ZWQgYnkgdGhlIHBsYXllcg0K
-KyAqLw0KKyBub19vZl9hdHRyKys7DQorIHBkdS0+cGFyYW1zWysrbGVuXSA9IHNldHRpbmdzW2ld
-Ow0KKw0KKyAvKg0KKyAqIEFzIHBlciB0aGUgTUlCZW51bSBkZWZpbmVkIGluIElBTkEgY2hhcmFj
-dGVyIHNldA0KKyAqIGRvY3VtZW50IHRoZSB2YWx1ZSBvZiBkaXNwbGF5YWJsZSBVVEYtOCBjaGFy
-YXRlciBzZXQNCisgKiB2YWx1ZSBpcyAweDAwNkENCisgKi8NCisgcGR1LT5wYXJhbXNbKytsZW5d
-ID0gMHgwMDsNCisgcGR1LT5wYXJhbXNbKytsZW5dID0gMHg2QTsNCisgYXR0c3RyID0gYXR0cl90
-b19zdHIoc2V0dGluZ3NbaV0pOw0KKw0KKyBpZiAoTlVMTCAhPSBhdHRzdHIpIHsNCisgcGR1LT5w
-YXJhbXNbKytsZW5dID0gc3RybGVuKGF0dHN0cik7DQorIGxlbiA9IGxlbiArIDE7DQorIHN0cm5j
-cHkoKGNoYXIgKikgKHBkdS0+cGFyYW1zICsgbGVuKSwgYXR0c3RyLCBzdHJsZW4oYXR0c3RyKSk7
-DQorIGxlbiA9IGxlbiArIHN0cmxlbihhdHRzdHIpOw0KKyB9DQorIH0NCisNCisgZ19mcmVlKHNl
-dHRpbmdzKTsNCisNCisgaWYgKGxlbikgew0KKyBwZHUtPnBhcmFtc1swXSA9IG5vX29mX2F0dHI7
-DQorIHBkdS0+cGFyYW1zX2xlbiA9IGh0b25zKGxlbiArIDEpOw0KKw0KKyByZXR1cm4gQVZDX0NU
-WVBFX1NUQUJMRTsNCisgfQ0KKw0KKyBlcnJvcigiTm8gdmFsaWQgYXR0cmlidXRlcyBpbiByZXF1
-ZXN0Iik7DQorDQorZXJyOg0KKyBwZHUtPnBhcmFtc19sZW4gPSBodG9ucygxKTsNCisgcGR1LT5w
-YXJhbXNbMF0gPSBFX0lOVkFMSURfUEFSQU07DQorIHJldHVybiBBVkNfQ1RZUEVfUkVKRUNURUQ7
-DQorfQ0KKw0Kc3RhdGljIHVpbnQ4X3QgYXZyY3BfaGFuZGxlX2Rpc3BsYXlhYmxlX2NoYXJzZXQo
-c3RydWN0IGF2cmNwX3BsYXllciAqcGxheWVyLA0Kc3RydWN0IGF2cmNwX2hlYWRlciAqcGR1LA0K
-dWludDhfdCB0cmFuc2FjdGlvbikNCkBAIC0xMDE1LDcgKzExMDYsNyBAQCBzdGF0aWMgc3RydWN0
-IHBkdV9oYW5kbGVyIHsNCnsgQVZSQ1BfU0VUX1BMQVlFUl9WQUxVRSwgQVZDX0NUWVBFX0NPTlRS
-T0wsDQphdnJjcF9oYW5kbGVfc2V0X3BsYXllcl92YWx1ZSB9LA0KeyBBVlJDUF9HRVRfUExBWUVS
-X0FUVFJJQlVURV9URVhULCBBVkNfQ1RZUEVfU1RBVFVTLA0KLSBOVUxMIH0sDQorIGF2cmNwX2hh
-bmRsZV9nZXRfcGxheWVyX2F0dHJpYnV0ZV90ZXh0IH0sDQp7IEFWUkNQX0dFVF9QTEFZRVJfVkFM
-VUVfVEVYVCwgQVZDX0NUWVBFX1NUQVRVUywNCk5VTEwgfSwNCnsgQVZSQ1BfRElTUExBWUFCTEVf
-Q0hBUlNFVCwgQVZDX0NUWVBFX1NUQVRVUywNCi0tIA0KMS43LjUuNA0KDQpJbiB0aGUgYWJvdmUg
-cGF0Y2ggdGhlIGZ1bmN0aW9uICJhdHRyX3RvX3N0ciIgaGF2ZSBiZWVuIHRha2VuIGZyb20gYXVk
-aW8vbWVkaWEuYyBmaWxlLiANClNpbmNlIHRoZXJlIG1pZ3RoIGJlIGZldyBmdW5jdGlvbnMgdGhh
-dCB3aWxsIGJlIHVzZWQgY29tbW9ubHkgaW4gYXVkaW8vYXZyY3AuYyBhbmQgYXVkaW8vbWVkaWEu
-YyB3aHkgY2FuJ3QgDQpzdWNoIGZ1bnRpb25zIG1vdmVkIHRvIGEgY29tbW9uIGZpbGU/Lg0KDQpU
-aGFua3MgYW5kIFJlZ2FyZHMNCkNoZXRoYW4NCi0tDQpUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMg
-bGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgtYmx1ZXRvb3RoIiBpbg0KdGhl
-IGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcNCk1vcmUgbWFq
-b3Jkb21vIGluZm8gYXQgIGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRt
-bA==
+Support for TG role GetPlayerApplicationSettingAttributeText added
+to pass PTS test case TP/PAS/BV-04-C
+---
+ audio/avrcp.c |   93 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 92 insertions(+), 1 deletions(-)
 
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index c9ec314..b09a777 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -800,6 +800,97 @@ err:
+ 	return AVC_CTYPE_REJECTED;
+ }
+ 
++static const char *attr_to_str(uint8_t attr)
++{
++	switch (attr) {
++	case AVRCP_ATTRIBUTE_EQUALIZER:
++		return "Equalizer";
++	case AVRCP_ATTRIBUTE_REPEAT_MODE:
++		return "Repeat";
++	case AVRCP_ATTRIBUTE_SHUFFLE:
++		return "Shuffle";
++	case AVRCP_ATTRIBUTE_SCAN:
++		return "Scan";
++	}
++
++	return NULL;
++}
++
++static uint8_t avrcp_handle_get_player_attribute_text(struct avrcp_player *player,
++						struct avrcp_header *pdu,
++						uint8_t transaction)
++{
++	uint16_t len = ntohs(pdu->params_len);
++	uint8_t *settings = NULL;
++	unsigned int i = 0;
++	uint8_t no_of_attr = 0;
++	const char *attstr = NULL;
++
++	if (player == NULL || len <= 1 || pdu->params[0] != len - 1)
++		goto err;
++
++	/*
++	 * Save a copy of requested settings because we can override them
++	 * while responding
++	 */
++	settings = g_memdup(&pdu->params[1], pdu->params[0]);
++	len = 0;
++
++	/*
++	 * From sec. 5.7 of AVRCP 1.3 spec, we should ignore non-existent IDs
++	 * and send a response with the existent ones.
++	 */
++	for (i = 0; i < pdu->params[0]; i++) {
++
++		if (settings[i] < AVRCP_ATTRIBUTE_EQUALIZER ||
++					settings[i] > AVRCP_ATTRIBUTE_SCAN) {
++			DBG("Ignoring %u", settings[i]);
++			continue;
++		}
++
++		if (player_get_attribute(player, settings[i]) < 0)
++			continue;
++
++		/*
++		 * No of attributes that are supported by the player
++		 */
++		no_of_attr++;
++		pdu->params[++len] = settings[i];
++
++		/*
++		 * As per the MIBenum defined in IANA character set
++		 * document the value of displayable UTF-8 charater set
++		 * value is 0x006A
++		 */
++		pdu->params[++len] = 0x00;
++		pdu->params[++len] = 0x6A;
++		attstr = attr_to_str(settings[i]);
++
++		if (NULL != attstr) {
++			pdu->params[++len] = strlen(attstr);
++			len = len + 1;
++			strncpy((char *) (pdu->params + len), attstr, strlen(attstr));
++			len = len + strlen(attstr);
++		}
++	}
++
++	g_free(settings);
++
++	if (len) {
++		pdu->params[0] = no_of_attr;
++		pdu->params_len = htons(len + 1);
++
++		return AVC_CTYPE_STABLE;
++	}
++
++	error("No valid attributes in request");
++
++err:
++	pdu->params_len = htons(1);
++	pdu->params[0] = E_INVALID_PARAM;
++	return AVC_CTYPE_REJECTED;
++}
++
+ static uint8_t avrcp_handle_displayable_charset(struct avrcp_player *player,
+ 						struct avrcp_header *pdu,
+ 						uint8_t transaction)
+@@ -1015,7 +1106,7 @@ static struct pdu_handler {
+ 		{ AVRCP_SET_PLAYER_VALUE, AVC_CTYPE_CONTROL,
+ 					avrcp_handle_set_player_value },
+ 		{ AVRCP_GET_PLAYER_ATTRIBUTE_TEXT, AVC_CTYPE_STATUS,
+-					NULL },
++					avrcp_handle_get_player_attribute_text },
+ 		{ AVRCP_GET_PLAYER_VALUE_TEXT, AVC_CTYPE_STATUS,
+ 					NULL },
+ 		{ AVRCP_DISPLAYABLE_CHARSET, AVC_CTYPE_STATUS,
+-- 
+1.7.5.4
 
