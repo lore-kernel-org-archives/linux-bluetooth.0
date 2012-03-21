@@ -1,30 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <12002429.87611332309390515.JavaMail.weblogic@epml17>
-References: <12002429.87611332309390515.JavaMail.weblogic@epml17>
-Date: Wed, 21 Mar 2012 14:23:58 -0300
-Message-ID: <CABBYNZKbykUbpaci7KAcbkxdth0cZJNDGM2hC5TPsyDZg5skQA@mail.gmail.com>
-Subject: Re: [PATCH] avrcp: Handle of GetPlayerApplicationSettingAttributeText pdu
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: chethan.tn@samsung.com
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 8/8] gattrib: Protect GAttrib when there is a pending write
+Date: Wed, 21 Mar 2012 13:00:55 -0400
+Message-Id: <1332349255-15764-9-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1332349255-15764-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1332349255-15764-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
-On Wed, Mar 21, 2012 at 2:56 AM, CHETHAN TN <chethan.tn@samsung.com> wrote:
->
-> In the above patch the function "attr_to_str" have been taken from audio/media.c file.
-> Since there migth be few functions that will be used commonly in audio/avrcp.c and audio/media.c why can't
-> such funtions moved to a common file?.
+---
+ attrib/gattrib.c |   12 ++++++++----
+ 1 files changed, 8 insertions(+), 4 deletions(-)
 
-Actually we might want to handle this in media.c, so perhaps we can
-reuse the callback to gets an attribute or create a new one to fetch
-the text in case of this being dynamically, otherwise just have it
-inline in avrcp.h might be fine.
-
-
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index 8a1e97b..c3a70b9 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -293,14 +293,18 @@ static void destroy_sender(gpointer data)
+ 	struct _GAttrib *attrib = data;
+ 
+ 	attrib->write_watch = 0;
++	g_attrib_unref(attrib);
+ }
+ 
+ static void wake_up_sender(struct _GAttrib *attrib)
+ {
+-	if (attrib->write_watch == 0)
+-		attrib->write_watch = g_io_add_watch_full(attrib->io,
+-			G_PRIORITY_DEFAULT, G_IO_OUT, can_write_data,
+-			attrib, destroy_sender);
++	if (attrib->write_watch != 0)
++		return;
++
++	attrib = g_attrib_ref(attrib);
++	attrib->write_watch = g_io_add_watch_full(attrib->io,
++				G_PRIORITY_DEFAULT, G_IO_OUT,
++				can_write_data, attrib, destroy_sender);
+ }
+ 
+ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
 -- 
-Luiz Augusto von Dentz
+1.7.5.4
+
