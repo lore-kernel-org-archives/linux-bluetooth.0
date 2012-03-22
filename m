@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [RFC 3/7] doc: document MediaTransport.Reconfigure
-Date: Thu, 22 Mar 2012 17:37:51 +0100
-Message-Id: <1332434275-25394-4-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [RFC 2/7] doc: document MediaTransport.Codecs property
+Date: Thu, 22 Mar 2012 17:37:50 +0100
+Message-Id: <1332434275-25394-3-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1332434275-25394-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1332434275-25394-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -18,22 +18,22 @@ List-ID: <linux-bluetooth.vger.kernel.org>
  1 files changed, 6 insertions(+), 0 deletions(-)
 
 diff --git a/doc/media-api.txt b/doc/media-api.txt
-index b32636b..cd3363d 100644
+index c53ab7b..b32636b 100644
 --- a/doc/media-api.txt
 +++ b/doc/media-api.txt
-@@ -286,6 +286,12 @@ Methods		dict GetProperties()
+@@ -312,6 +312,12 @@ Properties	object Device [readonly]
+ 			The values should match the profile specification which
+ 			is indicated by the UUID.
  
- 			Releases file descriptor.
- 
-+		void Reconfigure(object endpoint)  [experimental]
++		array{byte} Codecs [readonly, experimental]
 +
-+			Reconfigure the transport to use the specified endpoint.
-+			The stream will be reconfigured and the transport
-+			recreated.
++			Codecs list, contains assigned numbers for all codecs
++			that the transport support. The values should match the
++			profile specification which is indicated by the UUID.
 +
- 		void SetProperty(string name, variant value)
+ 		array{byte} Configuration [readonly]
  
- 			Changes the value of the specified property. Only
+ 			Configuration blob, it is used as it is so the size and
 -- 
 1.7.5.4
 
