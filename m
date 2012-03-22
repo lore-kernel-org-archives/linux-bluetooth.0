@@ -1,53 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [RFC 0/7] A2DP MP3 support with media API
-Date: Thu, 22 Mar 2012 17:37:48 +0100
-Message-Id: <1332434275-25394-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAJdJm_MG39-DDvuEpr89u-Ew+K9hFxnZUt5959a2aqYOkph9xA@mail.gmail.com>
+References: <1332422680-20162-1-git-send-email-chen.ganir@ti.com>
+	<CAJdJm_MG39-DDvuEpr89u-Ew+K9hFxnZUt5959a2aqYOkph9xA@mail.gmail.com>
+Date: Thu, 22 Mar 2012 11:10:22 -0400
+Message-ID: <CAJdJm_NUb8VJwVT-Jgcm=GNVaRW00_WMWTVTEw1ozZwoaCkw6A@mail.gmail.com>
+Subject: Re: [PATCH 0/2] GATT/ATT Cleanup
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: chen.ganir@ti.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Chen,
 
-I'm trying to make A2DP MP3 work in pulseaudio using media API.
-In contrast to Unix API, media API lacks the possibility to reconfigure the
-transport BT_SET_CONFIGURATION. So I've defined a dbus API that offers a
-similar functionnality.
-First there is a MediaTransport.Codecs property to list supported codecs on a
-transport.
-Then there is a Reconfigure method that tries to reconfigure the transport
-to use a specified endpoint.
+On Thu, Mar 22, 2012 at 9:37 AM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Chen,
+>
+> On Thu, Mar 22, 2012 at 9:24 AM, †<chen.ganir@ti.com> wrote:
+>> From: Chen Ganir <chen.ganir@ti.com>
+>>
+>> Move gatt related primary and characteristic definitions
+>> from the att.h to gatt.h (ATT does not define services and)
+>> characteristics - those are GATT terms.
+>>
+>> Chen Ganir (2):
+>> †GATT: Rename service and char structs
+>> †GATT: replace start/end with att_range
+>>
+>> †attrib/att.h † † † † | † 13 -------------
+>> †attrib/client.c † † †| † 22 +++++++++++-----------
+>> †attrib/gatt.c † † † †| † 12 ++++++------
+>> †attrib/gatt.h † † † †| † 12 ++++++++++++
+>> †attrib/gatttool.c † †| † †6 +++---
+>> †attrib/interactive.c | † †6 +++---
+>> †src/adapter.c † † † †| † 11 ++++++-----
+>> †src/device.c † † † † | † 14 +++++++-------
+>> †8 files changed, 48 insertions(+), 48 deletions(-)
+>
+> Patches look good to me.
 
-I'm sending a patch on pulseaudio list for using this new APIs at same time.
+Your patches do not compile with bootstrap-configure:
 
-This is an RFC so feel free to comment, especially on the way a configuration
-could be specified.
+In file included from proximity/manager.c:36:0:
+proximity/monitor.h:33:41: error: ëstruct att_primaryí declared inside
+parameter list [-Werror]
+proximity/manager.c: In function ëprimary_uuid_cmpí:
+proximity/manager.c:57:23: error: dereferencing pointer to incomplete type
+proximity/manager.c: In function ëattio_device_probeí:
+proximity/manager.c:78:8: error: passing argument 3 of
+ëmonitor_registerí from incompatible pointer type [-Werror]
+proximity/monitor.h:31:5: note: expected ëstruct att_primary *í but
+argument is of type ëstruct att_primary *í
+proximity/manager.c:78:8: error: passing argument 4 of
+ëmonitor_registerí from incompatible pointer type [-Werror]
+proximity/monitor.h:31:5: note: expected ëstruct att_primary *í but
+argument is of type ëstruct att_primary *í
+proximity/manager.c:78:8: error: passing argument 5 of
+ëmonitor_registerí from incompatible pointer type [-Werror]
+proximity/monitor.h:31:5: note: expected ëstruct att_primary *í but
+argument is of type ëstruct att_primary *í
+proximity/manager.c: In function ëprimary_uuid_cmpí:
+proximity/manager.c:58:1: error: control reaches end of non-void
+function [-Werror=return-type]
+cc1: all warnings being treated as errors
 
-Regards,
-Fr√©d√©ric
 
-
-Fr√©d√©ric Dalleau (7):
-  media: Remove unimplemented declaration
-  doc: document MediaTransport.Codecs property
-  doc: document MediaTransport.Reconfigure
-  media: Add Codecs property to MediaTransport
-  media: add dbus method MediaTransport.Reconfigure
-  media: implement media_endpoint_find function
-  media: implement a2dp reconfiguration
-
- audio/media.c     |   16 +++++
- audio/media.h     |    3 +-
- audio/transport.c |  164 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- doc/media-api.txt |   12 ++++
- 4 files changed, 193 insertions(+), 2 deletions(-)
-
+Please fix this and send a new version. Regards,
 -- 
-1.7.5.4
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
