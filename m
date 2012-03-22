@@ -1,57 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
+From: Bing Zhao <bzhao@marvell.com>
+To: Gustavo Padovan <gustavo@padovan.org>, Oliver Neukum <oneukum@suse.de>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+Date: Thu, 22 Mar 2012 11:46:06 -0700
+Subject: RE: fa0fb93f2ac308a76fa64eb57c18511dadf97089 for stable?
+Message-ID: <477F20668A386D41ADCC57781B1F70430839D7B57C@SC-VEXCH1.marvell.com>
+References: <201203221205.25135.oneukum@suse.de>
+ <20120322131649.GA6260@joana>
+In-Reply-To: <20120322131649.GA6260@joana>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <20120321081523.GC11911@aemeltch-MOBL1>
-References: <1332247868-32396-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<CAA37ikb1wi8F8EZ8FU3wYyq_DDgcWMbePp0tkkkXD=hgpmU5mw@mail.gmail.com>
-	<20120321081523.GC11911@aemeltch-MOBL1>
-Date: Thu, 22 Mar 2012 16:00:38 -0300
-Message-ID: <CAA37ikZzBg2W=YeOgwD8xfTHmpTPff-k0=P91NcwjLP9TjHmjQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Simplify L2CAP timer logic
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
-	Ulisses Furquim <ulisses@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+> Subject: Re: fa0fb93f2ac308a76fa64eb57c18511dadf97089 for stable?
+>=20
+> Hi Oliver,
+>=20
+> * Oliver Neukum <oneukum@suse.de> [2012-03-22 12:05:25 +0100]:
+>=20
+> > Hi,
+> >
+> > should this patch be taken into the stable series? The behavior of
+> > devices if the iterval is not kept is unknown.
+>=20
+> Sure, this patch can go stable. Care to send it to stable?
 
-On Wed, Mar 21, 2012 at 5:15 AM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> Hi Ulisses,
->
-> On Tue, Mar 20, 2012 at 04:56:11PM -0300, Ulisses Furquim wrote:
->> Hi Andrei,
->>
->> On Tue, Mar 20, 2012 at 9:51 AM, Andrei Emeltchenko
->> <Andrei.Emeltchenko.news@gmail.com> wrote:
->> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->> >
->> > Simplify L2CAP timers logic. Previous logic was hard to understand.
->> > Now we always hold(chan) when setting up timer and put(chan) only
->> > if work pending and we successfully cancel delayed work.
->> >
->> > If delayed work is executing it will put(chan) itself.
->>
->> The description is a lot better, thanks. However, I don't see why this
->> change is an improvement. The old code could be hard to read but then
->> we need probably some comments to clarify it, just that IMHO.
->
-> Agree with you here.
->
-> After further investigation I think that current code is OK, Gustavo could
-> you revert the patch.
+Hi Gustavo,
 
-Thank you for checking this. What about a patch from you documenting
-this? I already saw your commit with the missing _put(chan) in the
-workers, which was great, thanks.
+Do you have any suggestion on which stable versions should include this pat=
+ch?
 
-Regards,
 
--- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+Hi Oliver,
+
+If you know how to submit the patch to stable, feel free to send it over.
+
+Thanks,
+Bing
