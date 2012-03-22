@@ -1,56 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 22 Mar 2012 15:24:06 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: RFC/CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit 2012
- (Barcelona?)
-Message-ID: <20120322192406.GB2432@tuxdriver.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-wireless-owner@vger.kernel.org
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH hcidump 2/2 v1] AVRCP: Add parsing support for Volume Change notification
+Date: Thu, 22 Mar 2012 16:04:43 -0300
+Message-Id: <1332443083-9652-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1332443083-9652-1-git-send-email-luiz.dentz@gmail.com>
+References: <1332443083-9652-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Greetings!
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-For the past several years, Linux wireless LAN developers have held
-"mini-summit" events to bring us together face-to-face.  This has
-helped us to develop better working relationships with one and another
-and to resolve certain issues that would have been much more difficult
-to resolve strictly over email and IRC.
+---
+v1: Print volume in percentage
 
-For some time we have discussed combining these events with similar
-gatherings of Bluetooth developers.  Now that NFC has an in-kernel
-Linux presence, it makes sense to include them as well.  So, we
-are hoping to have a joint mini-summit event along the lines of the
-KVM Forum or the Linux File System, Storage, and Memory Management
-Summit events.
+ parser/avrcp.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
-A number of wireless developers reside in Europe, but our last few
-meetings have been held in North America.  So, there is a strong desire
-to have a European location for this event.  Initial contact with the
-Linux Foundation suggests that we can co-locate this event with the
-LinuxCon Europe event in Barcelona this November.  Other suggestions
-are welcome as well, of course.
-
-If we join the LinuxCon Europe event, we would need to decide how to
-fund the event.  One option would be to charge a separate entry fee for
-the mini-summit event, seperate from the LinuxCon EU fee.  Those that
-do not wish to attend LinuxCon EU may find that attractive.  OTOH,
-in the past we have simply said that all the mini-summit attendees
-had to register for the sponsoring event.  That has worked reasonably
-well, especially since event speakers would be eligible to attend
-the mini-summit for no fee.  I would lean toward keeping that approach.
-
-Given the potential to expand this into a larger event, we would
-likely need to be somewhat more formal about having proposals for
-speaking slots.  In that case, we might require a program committee
-for reviewing proposals, etc.  Anyone interested in participating in
-speaking at the mini-summit or in reviewing speaking proposals should
-contact me or reply in this thread.
-
-Well, that's about it -- let's kick this off!
-
-John
+diff --git a/parser/avrcp.c b/parser/avrcp.c
+index a6d09c9..850741b 100644
+--- a/parser/avrcp.c
++++ b/parser/avrcp.c
+@@ -1198,6 +1198,10 @@ response:
+ 						value2str(attr, value));
+ 		}
+ 		break;
++	case AVRCP_EVENT_VOLUME_CHANGED:
++		status = get_u8(frm) & 0x7F;
++		printf("Volume: %.2f%% (%d/127)\n", status/1.27, status);
++		break;
+ 	}
+ }
+ 
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+1.7.7.6
+
