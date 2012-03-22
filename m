@@ -1,62 +1,176 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAB7rCTiQiaFRqDOj6OGZPfTtBWSnR60ADAZimEZJ=F0Tf0-R4Q@mail.gmail.com>
-References: <CAB7rCTiQiaFRqDOj6OGZPfTtBWSnR60ADAZimEZJ=F0Tf0-R4Q@mail.gmail.com>
-Date: Thu, 22 Mar 2012 14:18:37 -0300
-Message-ID: <CABBYNZLp3U9sHqiaW9xcH1f8qfrkM7t181y8NVK5L+Rwxet5jw@mail.gmail.com>
-Subject: Re: media transport -- when is acquire ok to call?
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mike <puffy.taco@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Subject: [RFC 7/7] media: implement a2dp reconfiguration
+Date: Thu, 22 Mar 2012 17:37:55 +0100
+Message-Id: <1332434275-25394-8-git-send-email-frederic.dalleau@linux.intel.com>
+In-Reply-To: <1332434275-25394-1-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1332434275-25394-1-git-send-email-frederic.dalleau@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mike,
+---
+ audio/transport.c |  117 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 117 insertions(+), 0 deletions(-)
 
-On Wed, Mar 21, 2012 at 4:02 PM, Mike <puffy.taco@gmail.com> wrote:
-> I'm having some trouble with MediaEndpoint/MediaTransport and A2DP.
-> When I get the "SetConfiguration" call, I wait 2 seconds and then call
-> "Acquire", generally giving BlueZ enough time get the D-Bus interface
-> ready to go.  However, the delay isn't always long enough.  Shown
-> below is a time when my phone is attempting to pair with BlueZ.  The
-> error "org.bluez.Error.NotAuthorized" is output from my application.
-> In this case, the problem is that the audio source is still in the
-> CONFIGURED state, not in the OPEN state.  Is there a recommended
-> method of how long to wait before calling acquire?  Or should I rely
-> on the AudioSource "State" property to become connected (or playing)?
-> Is there any reason I can't get the transport when in the Configured
-> state (does the fd not exist yet?)?  Or why is "a2dp_resume" being
-> called on open (which is what is rejecting my acquire call)?
-
-In case of PA we do wait for Audio.Connected property before loading
-the module which does call MediaTransport.Acquire, but 2 seconds is
-too much there might be something else holding the setup, do you reply
-right away the SetConfiguration, if you do try to Acquire while
-bluetoothd is waiting you to reply it might fail.
-
-> bluetoothd[751]: audio/avdtp.c:avdtp_parse_cmd() Received OPEN_CMD
-> bluetoothd[751]: audio/a2dp.c:open_ind() Sink 0x2a0d40a8: Open_Ind
-> bluetoothd[751]: audio/transport.c:media_transport_acquire() Transport
-> /org/bluez/751/hci0/dev_00_17_E3_3B_4F_DD/fd1: read lock acquired
-> bluetoothd[751]: audio/transport.c:media_transport_acquire() Transport
-> /org/bluez/751/hci0/dev_00_17_E3_3B_4F_DD/fd1: write lock acquired
-> bluetoothd[751]: audio/transport.c:media_owner_create() Owner created:
-> sender=:1.40 accesstype=rw
-> bluetoothd[751]: audio/avdtp.c:avdtp_ref() 0x2a0d2a00: ref=3
-> bluetoothd[751]: audio/transport.c:media_transport_release() Transport
-> /org/bluez/751/hci0/dev_00_17_E3_3B_4F_DD/fd1: read lock released
-> bluetoothd[751]: audio/transport.c:media_transport_release() Transport
-> /org/bluez/751/hci0/dev_00_17_E3_3B_4F_DD/fd1: write lock released
-> bluetoothd[751]: audio/transport.c:media_owner_free() Owner :1.40
-> getting the reply from the cb failed
-> GDBus.Error:org.bluez.Error.NotAuthorized: Operation Not Authorized
-
-Strange, if what you said is true why there is no "SEP in bad state
-for resume" error? Anyway I think we can fix this by checking the
-current state of the SEP and waiting it to go OPEN to resume, so the
-client don't have to keep tracking of Audio.Connected.
-
-
+diff --git a/audio/transport.c b/audio/transport.c
+index f9b924a..6dd3c58 100644
+--- a/audio/transport.c
++++ b/audio/transport.c
+@@ -43,6 +43,7 @@
+ #include "a2dp.h"
+ #include "headset.h"
+ #include "gateway.h"
++#include "ipc.h"
+ 
+ #ifndef DBUS_TYPE_UNIX_FD
+ #define DBUS_TYPE_UNIX_FD -1
+@@ -53,6 +54,7 @@
+ struct media_request {
+ 	DBusMessage		*msg;
+ 	guint			id;
++	DBusConnection		*conn;
+ };
+ 
+ struct media_owner {
+@@ -837,11 +839,123 @@ static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
+ 
++static GSList *handle_a2dp_transport(uint8_t codec)
++{
++	struct avdtp_service_capability *media_transport, *media_codec;
++	struct sbc_codec_cap sbc_cap;
++	struct mpeg_codec_cap mpg_cap;
++	GSList *caps = NULL;
++
++	if (codec == A2DP_CODEC_MPEG12) {
++		memset(&mpg_cap, 0, sizeof(mpg_cap));
++
++		/* FIXME: this code says MP3 and hope the receiver accept */
++		mpg_cap.cap.media_type = AVDTP_MEDIA_TYPE_AUDIO;
++		mpg_cap.cap.media_codec_type = A2DP_CODEC_MPEG12;
++		mpg_cap.channel_mode = BT_A2DP_CHANNEL_MODE_JOINT_STEREO;
++		mpg_cap.crc = 0;
++		mpg_cap.layer = BT_MPEG_LAYER_3;
++		mpg_cap.frequency = MPEG_SAMPLING_FREQ_44100;
++		mpg_cap.mpf = 0;
++		mpg_cap.bitrate = 0x80;
++
++		media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, &mpg_cap,
++							sizeof(mpg_cap));
++
++		DBG("Handling switch to MPEG transport");
++	} else if (codec == A2DP_CODEC_SBC) {
++		memset(&sbc_cap, 0, sizeof(sbc_cap));
++
++		/* FIXME: this is the mandatory SBC params for a source */
++		sbc_cap.cap.media_type = AVDTP_MEDIA_TYPE_AUDIO;
++		sbc_cap.cap.media_codec_type = A2DP_CODEC_SBC;
++		sbc_cap.channel_mode = BT_A2DP_CHANNEL_MODE_JOINT_STEREO;
++		sbc_cap.frequency = BT_SBC_SAMPLING_FREQ_44100;
++		sbc_cap.allocation_method = BT_A2DP_ALLOCATION_LOUDNESS;
++		sbc_cap.subbands = BT_A2DP_SUBBANDS_8;
++		sbc_cap.block_length = BT_A2DP_BLOCK_LENGTH_16;
++		sbc_cap.min_bitpool = 53;
++		sbc_cap.max_bitpool = 53;
++
++		media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, &sbc_cap,
++							sizeof(sbc_cap));
++
++		DBG("Handling switch to SBC transport");
++	} else
++		return NULL;
++
++	media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
++						NULL, 0);
++
++	caps = g_slist_append(caps, media_transport);
++	caps = g_slist_append(caps, media_codec);
++
++	return caps;
++}
++
++static void a2dp_config_complete(struct avdtp *session, struct a2dp_sep *sep,
++					struct avdtp_stream *stream,
++					struct avdtp_error *err,
++					void *user_data)
++{
++	struct media_request *req = user_data;
++
++	media_request_reply(req, req->conn, err ? -ENOTSUP : 0);
++
++	dbus_connection_unref(req->conn);
++
++	g_free(req);
++}
++
++static void media_transport_reconfigure(struct avdtp *session, const char *path,
++						struct media_request *req)
++{
++	int err;
++	GSList *caps;
++	uint8_t codec;
++	struct media_endpoint *endpoint;
++	struct a2dp_sep *sep;
++
++	endpoint = media_endpoint_find(path);
++	if (endpoint == NULL) {
++		err = -EEXIST;
++		goto failed;
++	}
++	sep = media_endpoint_get_sep(endpoint);
++	codec = media_endpoint_get_codec(endpoint);
++
++	DBG(" sep %p creating caps list for codec %d", sep, codec);
++
++	/* FIXME prevent usage on SCO transport */
++	caps = handle_a2dp_transport(codec);
++	if (caps == NULL) {
++		err = -EINVAL;
++		goto failed;
++	}
++
++	err = a2dp_config(session, sep, a2dp_config_complete,
++					caps, req);
++	if (err < 0)
++		goto failed;
++
++	req->id = err;
++	return;
++
++failed:
++	media_request_reply(req, req->conn, -err);
++
++	dbus_connection_unref(req->conn);
++
++	g_free(req);
++}
++
+ static DBusMessage *reconfigure(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
++	struct media_transport *transport = data;
+ 	DBusMessageIter iter;
+ 	const char *endpoint;
++	struct media_request *req;
+ 
+ 	if (!dbus_message_iter_init(msg, &iter))
+ 		return btd_error_invalid_args(msg);
+@@ -849,6 +963,9 @@ static DBusMessage *reconfigure(DBusConnection *conn, DBusMessage *msg,
+ 		return btd_error_invalid_args(msg);
+ 	dbus_message_iter_get_basic(&iter, &endpoint);
+ 
++	req = media_request_create(msg, 0);
++	req->conn = dbus_connection_ref(conn);
++	media_transport_reconfigure(transport->session, endpoint, req);
+ 
+ 	return NULL;
+ }
 -- 
-Luiz Augusto von Dentz
+1.7.5.4
+
