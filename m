@@ -1,58 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH hcidump 1/2 v1] AVRCP: Add parsing for SetAbsoluteVolume PDU
-Date: Thu, 22 Mar 2012 16:04:42 -0300
-Message-Id: <1332443083-9652-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20120321081523.GC11911@aemeltch-MOBL1>
+References: <1332247868-32396-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<CAA37ikb1wi8F8EZ8FU3wYyq_DDgcWMbePp0tkkkXD=hgpmU5mw@mail.gmail.com>
+	<20120321081523.GC11911@aemeltch-MOBL1>
+Date: Thu, 22 Mar 2012 16:00:38 -0300
+Message-ID: <CAA37ikZzBg2W=YeOgwD8xfTHmpTPff-k0=P91NcwjLP9TjHmjQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Simplify L2CAP timer logic
+From: Ulisses Furquim <ulisses@profusion.mobi>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	Ulisses Furquim <ulisses@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Andrei,
 
----
-v1: Fix 'absolut' typo, ignore reserved bit and print volume in percentage
+On Wed, Mar 21, 2012 at 5:15 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> Hi Ulisses,
+>
+> On Tue, Mar 20, 2012 at 04:56:11PM -0300, Ulisses Furquim wrote:
+>> Hi Andrei,
+>>
+>> On Tue, Mar 20, 2012 at 9:51 AM, Andrei Emeltchenko
+>> <Andrei.Emeltchenko.news@gmail.com> wrote:
+>> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>> >
+>> > Simplify L2CAP timers logic. Previous logic was hard to understand.
+>> > Now we always hold(chan) when setting up timer and put(chan) only
+>> > if work pending and we successfully cancel delayed work.
+>> >
+>> > If delayed work is executing it will put(chan) itself.
+>>
+>> The description is a lot better, thanks. However, I don't see why this
+>> change is an improvement. The old code could be hard to read but then
+>> we need probably some comments to clarify it, just that IMHO.
+>
+> Agree with you here.
+>
+> After further investigation I think that current code is OK, Gustavo could
+> you revert the patch.
 
- parser/avrcp.c |   20 ++++++++++++++++++++
- 1 files changed, 20 insertions(+), 0 deletions(-)
+Thank you for checking this. What about a patch from you documenting
+this? I already saw your commit with the missing _put(chan) in the
+workers, which was great, thanks.
 
-diff --git a/parser/avrcp.c b/parser/avrcp.c
-index 643e494..a6d09c9 100644
---- a/parser/avrcp.c
-+++ b/parser/avrcp.c
-@@ -1201,6 +1201,23 @@ response:
- 	}
- }
- 
-+static void avrcp_set_absolute_volume_dump(int level, struct frame *frm,
-+						uint8_t ctype, uint16_t len)
-+{
-+	uint8_t value;
-+
-+	p_indent(level, frm);
-+
-+	if (len < 1) {
-+		printf("PDU Malformed\n");
-+		raw_dump(level, frm);
-+		return;
-+	}
-+
-+	value = get_u8(frm) & 0x7F;
-+	printf("Volume: %.2f%% (%d/127)\n", value/1.27, value);
-+}
-+
- static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
- {
- 	uint8_t pduid, pt;
-@@ -1267,6 +1284,9 @@ static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
- 	case AVRCP_REGISTER_NOTIFICATION:
- 		avrcp_register_notification_dump(level + 1, frm, ctype, len);
- 		break;
-+	case AVRCP_SET_ABSOLUTE_VOLUME:
-+		avrcp_set_absolute_volume_dump(level + 1, frm, ctype, len);
-+		break;
- 	default:
- 		raw_dump(level, frm);
- 	}
+Regards,
+
 -- 
-1.7.7.6
-
+Ulisses Furquim
+ProFUSION embedded systems
+http://profusion.mobi
+Mobile: +55 19 9250 0942
+Skype: ulissesffs
