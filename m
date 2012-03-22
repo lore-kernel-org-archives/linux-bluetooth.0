@@ -1,30 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 22 Mar 2012 10:42:39 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Refactor stop_discovery
-Message-ID: <20120322134239.GD6260@joana>
-References: <1332267336-15967-1-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332267336-15967-1-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1332422680-20162-1-git-send-email-chen.ganir@ti.com>
+References: <1332422680-20162-1-git-send-email-chen.ganir@ti.com>
+Date: Thu, 22 Mar 2012 09:37:09 -0400
+Message-ID: <CAJdJm_MG39-DDvuEpr89u-Ew+K9hFxnZUt5959a2aqYOkph9xA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] GATT/ATT Cleanup
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: chen.ganir@ti.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Chen,
 
-* Andre Guedes <andre.guedes@openbossa.org> [2012-03-20 15:15:36 -0300]:
+On Thu, Mar 22, 2012 at 9:24 AM,  <chen.ganir@ti.com> wrote:
+> From: Chen Ganir <chen.ganir@ti.com>
+>
+> Move gatt related primary and characteristic definitions
+> from the att.h to gatt.h (ATT does not define services and)
+> characteristics - those are GATT terms.
+>
+> Chen Ganir (2):
+>  GATT: Rename service and char structs
+>  GATT: replace start/end with att_range
+>
+>  attrib/att.h         |   13 -------------
+>  attrib/client.c      |   22 +++++++++++-----------
+>  attrib/gatt.c        |   12 ++++++------
+>  attrib/gatt.h        |   12 ++++++++++++
+>  attrib/gatttool.c    |    6 +++---
+>  attrib/interactive.c |    6 +++---
+>  src/adapter.c        |   11 ++++++-----
+>  src/device.c         |   14 +++++++-------
+>  8 files changed, 48 insertions(+), 48 deletions(-)
 
-> This patch does a trivial code refactoring in stop_discovery
-> function by using a switch statement instead of an if-return-else
-> approach.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  net/bluetooth/mgmt.c |   40 ++++++++++++++++++++++++----------------
->  1 file changed, 24 insertions(+), 16 deletions(-)
+Patches look good to me.
 
-Applied, thanks.
-
-	Gustavo
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
