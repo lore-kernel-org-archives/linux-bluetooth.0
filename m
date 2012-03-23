@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv5 14/26] Bluetooth: A2MP: Process A2MP Get Info Request
-Date: Fri, 23 Mar 2012 18:13:54 +0200
-Message-Id: <1332519246-16656-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv5 09/26] Bluetooth: A2MP: Process A2MP messages
+Date: Fri, 23 Mar 2012 18:13:49 +0200
+Message-Id: <1332519246-16656-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,77 +11,100 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Process A2MP Get Info Request.
-Example of trace log for invalid controller id is shown below:
+Implement basic processing for AMP Manager Protocol (A2MP).
 
+Example below shows processing unrecognized command.
 ...
-> ACL data: handle 11 flags 0x02 dlen 13
-    A2MP: Get Info req: id 238
-< ACL data: handle 11 flags 0x00 dlen 30
-    A2MP: Get Info rsp: id 238 status (1) Invalid Controller ID
+> ACL data: handle 11 flags 0x02 dlen 12
+    A2MP: code 0x00 ident 3 len 0
+< ACL data: handle 11 flags 0x00 dlen 14
+    A2MP: Command Reject: reason (0) - Command not recognized
 ...
-
-Note that If the Status field is set to Invalid Controller ID all subsequent
-fields in the AMP Get Info Response shall be ignored by the receiver.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   35 +++++++++++++++++++++++++++++++++++
- 1 files changed, 35 insertions(+), 0 deletions(-)
+ net/bluetooth/a2mp.c |   61 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 61 insertions(+), 0 deletions(-)
 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 5781ef5..ae60301 100644
+index 894c6c96..d2063af 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -178,6 +178,38 @@ static inline int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
- 	return 0;
+@@ -65,6 +65,66 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
+ 	kfree(cmd);
  }
  
-+static inline int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
-+				   struct a2mp_cmd *hdr)
++/* Handle A2MP signalling */
++static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
 +{
-+	struct a2mp_info_req *req  = (struct a2mp_info_req *) skb->data;
-+	struct hci_dev *hdev;
-+	struct a2mp_info_rsp rsp;
++	struct a2mp_cmd *hdr = (struct a2mp_cmd *) skb->data;
++	struct amp_mgr *mgr = data;
++	int err = 0;
 +
-+	if (le16_to_cpu(hdr->len) < sizeof(*req))
-+		return -EINVAL;
++	amp_mgr_get(mgr);
 +
-+	rsp.id = req->id;
-+	rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
++	while (skb->len >= sizeof(*hdr)) {
++		struct a2mp_cmd *hdr = (struct a2mp_cmd *) skb->data;
++		u16 len = le16_to_cpu(hdr->len);
 +
-+	hdev = hci_dev_get(req->id);
-+	if (hdev && hdev->amp_type != HCI_BREDR) {
-+		rsp.status = 0;
-+		rsp.total_bw = cpu_to_le32(hdev->amp_total_bw);
-+		rsp.max_bw = cpu_to_le32(hdev->amp_max_bw);
-+		rsp.min_latency = cpu_to_le32(hdev->amp_min_latency);
-+		rsp.pal_cap = cpu_to_le16(hdev->amp_pal_cap);
-+		rsp.assoc_size = cpu_to_le16(hdev->amp_assoc_size);
++		BT_DBG("code 0x%02x id %d len %d", hdr->code, hdr->ident, len);
++
++		skb_pull(skb, sizeof(*hdr));
++
++		if (len > skb->len || !hdr->ident) {
++			err = -EINVAL;
++			break;
++		}
++
++		mgr->ident = hdr->ident;
++
++		switch (hdr->code) {
++		case A2MP_COMMAND_REJ:
++		case A2MP_DISCOVER_REQ:
++		case A2MP_CHANGE_NOTIFY:
++		case A2MP_GETINFO_REQ:
++		case A2MP_GETAMPASSOC_REQ:
++		case A2MP_CREATEPHYSLINK_REQ:
++		case A2MP_DISCONNPHYSLINK_REQ:
++		case A2MP_CHANGE_RSP:
++		case A2MP_DISCOVER_RSP:
++		case A2MP_GETINFO_RSP:
++		case A2MP_GETAMPASSOC_RSP:
++		case A2MP_CREATEPHYSLINK_RSP:
++		case A2MP_DISCONNPHYSLINK_RSP:
++		default:
++			BT_ERR("Unknown A2MP sig cmd 0x%2.2x", hdr->code);
++			err = -EINVAL;
++			break;
++		}
 +	}
 +
-+	if (hdev)
-+		hci_dev_put(hdev);
++	if (err) {
++		struct a2mp_cmd_rej rej;
++		rej.reason = cpu_to_le16(0);
 +
-+	a2mp_send(mgr, A2MP_GETINFO_RSP, hdr->ident, sizeof(rsp), &rsp);
++		a2mp_send(mgr, A2MP_COMMAND_REJ, hdr->ident, sizeof(rej), &rej);
++	} else {
++		/* Free if success, otherwise skb will be freed by invoker */
++		kfree_skb(skb);
++	}
 +
-+	skb_pull(skb, sizeof(*req));
-+	return 0;
++	amp_mgr_put(mgr);
++
++	return err;
 +}
 +
- /* Handle A2MP signalling */
- static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ static void a2mp_chan_state_change_cb(void *data, int state, int err)
  {
-@@ -216,6 +248,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
- 			break;
+ 	struct l2cap_chan *chan = data;
+@@ -98,6 +158,7 @@ static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
  
- 		case A2MP_GETINFO_REQ:
-+			err = a2mp_getinfo_req(mgr, skb, hdr);
-+			break;
-+
- 		case A2MP_GETAMPASSOC_REQ:
- 		case A2MP_CREATEPHYSLINK_REQ:
- 		case A2MP_DISCONNPHYSLINK_REQ:
+ static struct l2cap_ops a2mp_chan_ops = {
+ 	.name = "L2CAP A2MP channel",
++	.recv = a2mp_chan_recv_cb,
+ 	.state_change = a2mp_chan_state_change_cb,
+ 	.close = a2mp_chan_close_cb,
+ 	.alloc_skb = a2mp_chan_alloc_skb_cb,
 -- 
 1.7.9.1
 
