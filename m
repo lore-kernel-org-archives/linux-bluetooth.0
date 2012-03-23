@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv5 24/26] Bluetooth: Process HCI callbacks in a workqueue
-Date: Fri, 23 Mar 2012 18:14:04 +0200
-Message-Id: <1332519246-16656-25-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv5 10/26] Bluetooth: A2MP: Process A2MP Command Reject
+Date: Fri, 23 Mar 2012 18:13:50 +0200
+Message-Id: <1332519246-16656-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,78 +11,50 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Use workqueue to process HCI callbacks.
+Placeholder for future A2MP Command Reject handler.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    2 +
- net/bluetooth/hci_core.c         |   41 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+), 0 deletions(-)
+ net/bluetooth/a2mp.c |   19 +++++++++++++++++++
+ 1 files changed, 19 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c76e7c5..b0fa634 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1110,5 +1110,7 @@ int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
- 	void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd), void *opt,
- 		void (*destructor)(struct hci_cb_cmd *cmd), gfp_t flags);
- void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
-+void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
-+					struct workqueue_struct *workqueue);
- 
- #endif /* __HCI_CORE_H */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 999c438..625a138 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2303,6 +2303,47 @@ struct hci_cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
- 	return NULL;
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index d2063af..a2677d6 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -65,6 +65,22 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
+ 	kfree(cmd);
  }
  
-+struct hci_cb_work {
-+	struct work_struct work;
-+	struct hci_dev *hdev;
-+	struct hci_cb_cmd *cmd;
-+};
-+
-+static void hci_cb_worker(struct work_struct *w)
++/* Processing A2MP messages */
++static inline int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
++				   struct a2mp_cmd *hdr)
 +{
-+	struct hci_cb_work *work = (struct hci_cb_work *) w;
-+	struct hci_cb_cmd *cmd = work->cmd;
-+	struct hci_dev *hdev = work->hdev;
++	struct a2mp_cmd_rej *rej = (struct a2mp_cmd_rej *) skb->data;
 +
-+	cmd->cb(hdev, cmd);
++	if (le16_to_cpu(hdr->len) < sizeof(*rej))
++		return -EINVAL;
 +
-+	hci_remove_cb(hdev, cmd);
-+	kfree(w);
-+	hci_dev_put(hdev);
++	BT_DBG("ident %d reason %d", hdr->ident, le16_to_cpu(rej->reason));
++
++	skb_pull(skb, sizeof(*rej));
++
++	return 0;
 +}
 +
-+void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
-+					struct workqueue_struct *workqueue)
-+{
-+	struct hci_cb_work *work;
-+
-+	BT_DBG("Queue cmd %p opt %p", cmd, cmd->opt);
-+
-+	work = kmalloc(sizeof(*work), GFP_KERNEL);
-+	if (!work)
-+		return;
-+
-+	INIT_WORK(&work->work, hci_cb_worker);
-+	work->hdev = hdev;
-+	work->cmd = cmd;
-+	hci_dev_hold(hdev);
-+
-+	if (!queue_work(workqueue, &work->work)) {
-+		kfree(work);
-+		hci_dev_put(hdev);
-+	}
-+}
-+
- void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd)
+ /* Handle A2MP signalling */
+ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
  {
- 	mutex_lock(&hdev->cb_list_lock);
+@@ -91,6 +107,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 
+ 		switch (hdr->code) {
+ 		case A2MP_COMMAND_REJ:
++			a2mp_command_rej(mgr, skb, hdr);
++			break;
++
+ 		case A2MP_DISCOVER_REQ:
+ 		case A2MP_CHANGE_NOTIFY:
+ 		case A2MP_GETINFO_REQ:
 -- 
 1.7.9.1
 
