@@ -5,159 +5,123 @@ Cc: padovan@profusion.mobi,
 	pkrystad@codeaurora.org,
 	marcel@holtmann.org,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH 4/4] Bluetooth: Functions parsing or generating ERTM control fields
-Date: Fri, 23 Mar 2012 16:56:58 -0700
-Message-Id: <1332547018-19468-5-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 1/4] Bluetooth: Add definitions and struct members for new ERTM state machine
+Date: Fri, 23 Mar 2012 16:56:55 -0700
+Message-Id: <1332547018-19468-2-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1332547018-19468-1-git-send-email-mathewm@codeaurora.org>
 References: <1332547018-19468-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These functions encode or decode ERTM control fields (extended or
-enhanced) to or from the new l2cap_control structure.
+Adds some missing values for control field parsing, additional data
+for the new state machine, and enumerations for states, incoming
+packet classification, and state machine events.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |  120 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 120 insertions(+)
+ include/net/bluetooth/l2cap.h |   49 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ad73696..890cfb9 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -787,6 +787,118 @@ static inline void l2cap_send_rr_or_rnr(struct l2cap_chan *chan, u32 control)
- 	l2cap_send_sframe(chan, control);
- }
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 9b242c6..ed36f00 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -139,6 +139,8 @@ struct l2cap_conninfo {
  
-+static u16 __pack_enhanced_control(struct l2cap_ctrl *control)
-+{
-+	u16 packed;
+ #define L2CAP_CTRL_TXSEQ_SHIFT		1
+ #define L2CAP_CTRL_SUPER_SHIFT		2
++#define L2CAP_CTRL_POLL_SHIFT		4
++#define L2CAP_CTRL_FINAL_SHIFT		7
+ #define L2CAP_CTRL_REQSEQ_SHIFT		8
+ #define L2CAP_CTRL_SAR_SHIFT		14
+ 
+@@ -152,9 +154,11 @@ struct l2cap_conninfo {
+ #define L2CAP_EXT_CTRL_FINAL		0x00000002
+ #define L2CAP_EXT_CTRL_FRAME_TYPE	0x00000001 /* I- or S-Frame */
+ 
++#define L2CAP_EXT_CTRL_FINAL_SHIFT	1
+ #define L2CAP_EXT_CTRL_REQSEQ_SHIFT	2
+ #define L2CAP_EXT_CTRL_SAR_SHIFT	16
+ #define L2CAP_EXT_CTRL_SUPER_SHIFT	16
++#define L2CAP_EXT_CTRL_POLL_SHIFT	18
+ #define L2CAP_EXT_CTRL_TXSEQ_SHIFT	18
+ 
+ /* L2CAP Supervisory Function */
+@@ -186,6 +190,8 @@ struct l2cap_hdr {
+ #define L2CAP_FCS_SIZE		2
+ #define L2CAP_SDULEN_SIZE	2
+ #define L2CAP_PSMLEN_SIZE	2
++#define L2CAP_ENH_CTRL_SIZE	2
++#define L2CAP_EXT_CTRL_SIZE	4
+ 
+ struct l2cap_cmd_hdr {
+ 	__u8       code;
+@@ -446,6 +452,9 @@ struct l2cap_chan {
+ 	__u16		monitor_timeout;
+ 	__u16		mps;
+ 
++	__u8		tx_state;
++	__u8		rx_state;
 +
-+	packed = (control->reqseq << L2CAP_CTRL_REQSEQ_SHIFT) &
-+		L2CAP_CTRL_REQSEQ;
-+	packed |= (control->final << L2CAP_CTRL_FINAL_SHIFT) &
-+		L2CAP_CTRL_FINAL;
+ 	unsigned long	conf_state;
+ 	unsigned long	conn_state;
+ 	unsigned long	flags;
+@@ -456,9 +465,11 @@ struct l2cap_chan {
+ 	__u16		buffer_seq;
+ 	__u16		buffer_seq_srej;
+ 	__u16		srej_save_reqseq;
++	__u16		last_acked_seq;
+ 	__u16		frames_sent;
+ 	__u16		unacked_frames;
+ 	__u8		retry_count;
++	__u16		srej_queue_next;
+ 	__u8		num_acked;
+ 	__u16		sdu_len;
+ 	struct sk_buff	*sdu;
+@@ -600,6 +611,44 @@ enum {
+ 	FLAG_EFS_ENABLE,
+ };
+ 
++enum {
++	L2CAP_TX_STATE_XMIT,
++	L2CAP_TX_STATE_WAIT_F,
++};
 +
-+	if (control->sframe) {
-+		packed |= (control->poll << L2CAP_CTRL_POLL_SHIFT) &
-+			L2CAP_CTRL_POLL;
-+		packed |= (control->super << L2CAP_CTRL_SUPER_SHIFT) &
-+			L2CAP_CTRL_SUPERVISE;
-+		packed |= L2CAP_CTRL_FRAME_TYPE;
-+	} else {
-+		packed |= (control->sar << L2CAP_CTRL_SAR_SHIFT) &
-+			L2CAP_CTRL_SAR;
-+		packed |= (control->txseq << L2CAP_CTRL_TXSEQ_SHIFT) &
-+			L2CAP_CTRL_TXSEQ;
-+	}
++enum {
++	L2CAP_RX_STATE_RECV,
++	L2CAP_RX_STATE_SREJ_SENT,
++};
 +
-+	return packed;
-+}
++enum {
++	L2CAP_TXSEQ_EXPECTED,
++	L2CAP_TXSEQ_EXPECTED_SREJ,
++	L2CAP_TXSEQ_UNEXPECTED,
++	L2CAP_TXSEQ_UNEXPECTED_SREJ,
++	L2CAP_TXSEQ_DUPLICATE,
++	L2CAP_TXSEQ_DUPLICATE_SREJ,
++	L2CAP_TXSEQ_INVALID,
++	L2CAP_TXSEQ_INVALID_IGNORE,
++};
 +
-+static void __get_enhanced_control(u16 enhanced,
-+					struct l2cap_ctrl *control)
-+{
-+	control->reqseq = (enhanced & L2CAP_CTRL_REQSEQ) >>
-+		L2CAP_CTRL_REQSEQ_SHIFT;
-+	control->final = (enhanced & L2CAP_CTRL_FINAL) >>
-+		L2CAP_CTRL_FINAL_SHIFT;
++enum {
++	L2CAP_EV_DATA_REQUEST,
++	L2CAP_EV_LOCAL_BUSY_DETECTED,
++	L2CAP_EV_LOCAL_BUSY_CLEAR,
++	L2CAP_EV_RECV_REQSEQ_AND_FBIT,
++	L2CAP_EV_RECV_FBIT,
++	L2CAP_EV_RETRANS_TO,
++	L2CAP_EV_MONITOR_TO,
++	L2CAP_EV_EXPLICIT_POLL,
++	L2CAP_EV_RECV_IFRAME,
++	L2CAP_EV_RECV_RR,
++	L2CAP_EV_RECV_REJ,
++	L2CAP_EV_RECV_RNR,
++	L2CAP_EV_RECV_SREJ,
++	L2CAP_EV_RECV_FRAME,
++};
 +
-+	if (enhanced & L2CAP_CTRL_FRAME_TYPE) {
-+		/* S-Frame */
-+		control->sframe = 1;
-+		control->poll = (enhanced & L2CAP_CTRL_POLL) >>
-+			L2CAP_CTRL_POLL_SHIFT;
-+		control->super = (enhanced & L2CAP_CTRL_SUPERVISE) >>
-+			L2CAP_CTRL_SUPER_SHIFT;
-+
-+		control->sar = 0;
-+		control->txseq = 0;
-+	} else {
-+		/* I-Frame */
-+		control->sframe = 0;
-+		control->sar = (enhanced & L2CAP_CTRL_SAR) >>
-+			L2CAP_CTRL_SAR_SHIFT;
-+		control->txseq = (enhanced & L2CAP_CTRL_TXSEQ) >>
-+			L2CAP_CTRL_TXSEQ_SHIFT;
-+
-+		control->poll = 0;
-+		control->super = 0;
-+	}
-+}
-+
-+static u32 __pack_extended_control(struct l2cap_ctrl *control)
-+{
-+	u32 packed;
-+
-+	packed = (control->reqseq << L2CAP_EXT_CTRL_REQSEQ_SHIFT) &
-+		L2CAP_EXT_CTRL_REQSEQ;
-+	packed |= (control->final << L2CAP_EXT_CTRL_FINAL_SHIFT) &
-+		L2CAP_EXT_CTRL_FINAL;
-+
-+	if (control->sframe) {
-+		packed |= (control->poll << L2CAP_EXT_CTRL_POLL_SHIFT) &
-+			L2CAP_EXT_CTRL_POLL;
-+		packed |= (control->super << L2CAP_EXT_CTRL_SUPER_SHIFT) &
-+			L2CAP_EXT_CTRL_SUPERVISE;
-+		packed |= L2CAP_EXT_CTRL_FRAME_TYPE;
-+	} else {
-+		packed |= (control->sar << L2CAP_EXT_CTRL_SAR_SHIFT) &
-+			L2CAP_EXT_CTRL_SAR;
-+		packed |= (control->txseq << L2CAP_EXT_CTRL_TXSEQ_SHIFT) &
-+			L2CAP_EXT_CTRL_TXSEQ;
-+	}
-+
-+	return packed;
-+}
-+
-+static void __get_extended_control(u32 extended,
-+				struct l2cap_ctrl *control)
-+{
-+	control->reqseq = (extended & L2CAP_EXT_CTRL_REQSEQ) >>
-+		L2CAP_EXT_CTRL_REQSEQ_SHIFT;
-+	control->final = (extended & L2CAP_EXT_CTRL_FINAL) >>
-+		L2CAP_EXT_CTRL_FINAL_SHIFT;
-+
-+	if (extended & L2CAP_EXT_CTRL_FRAME_TYPE) {
-+		/* S-Frame */
-+		control->sframe = 1;
-+		control->poll = (extended & L2CAP_EXT_CTRL_POLL) >>
-+			L2CAP_EXT_CTRL_POLL_SHIFT;
-+		control->super = (extended & L2CAP_EXT_CTRL_SUPERVISE) >>
-+			L2CAP_EXT_CTRL_SUPER_SHIFT;
-+
-+		control->sar = 0;
-+		control->txseq = 0;
-+	} else {
-+		/* I-Frame */
-+		control->sframe = 0;
-+		control->sar = (extended & L2CAP_EXT_CTRL_SAR) >>
-+			L2CAP_EXT_CTRL_SAR_SHIFT;
-+		control->txseq = (extended & L2CAP_EXT_CTRL_TXSEQ) >>
-+			L2CAP_EXT_CTRL_TXSEQ_SHIFT;
-+
-+		control->poll = 0;
-+		control->super = 0;
-+	}
-+}
-+
- static inline int __l2cap_no_conn_pending(struct l2cap_chan *chan)
+ static inline void l2cap_chan_hold(struct l2cap_chan *c)
  {
- 	return !test_bit(CONF_CONNECT_PEND, &chan->conf_state);
-@@ -4345,6 +4457,14 @@ static int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
- 	u16 req_seq;
- 	int len, next_tx_seq_offset, req_seq_offset;
- 
-+	if (test_bit(FLAG_EXT_CTRL, &chan->flags)) {
-+		__get_extended_control(get_unaligned_le32(skb->data),
-+				       &bt_cb(skb)->control);
-+	} else {
-+		__get_enhanced_control(get_unaligned_le16(skb->data),
-+				       &bt_cb(skb)->control);
-+	}
-+
- 	control = __get_control(chan, skb->data);
- 	skb_pull(skb, __ctrl_size(chan));
- 	len = skb->len;
+ 	atomic_inc(&c->refcnt);
 -- 
 1.7.9.4
 
