@@ -1,31 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Zheng, Wu" <wu.zheng@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+Subject: obexd have not conf file for systemd.
+Date: Fri, 23 Mar 2012 07:46:41 +0000
+Message-ID: <2CF57A644018A745B8FE029C7223E16E0FCDFAE2@SHSMSX102.ccr.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <CAB7rCTjUL2_Kae186QgXa2csf-p-cuGH2US38a7S436uBY93Pw@mail.gmail.com>
-References: <CAB7rCTiQiaFRqDOj6OGZPfTtBWSnR60ADAZimEZJ=F0Tf0-R4Q@mail.gmail.com>
-	<CABBYNZLp3U9sHqiaW9xcH1f8qfrkM7t181y8NVK5L+Rwxet5jw@mail.gmail.com>
-	<CAB7rCThwZxQQoKHfEszX3sZPpE_cp5+XS_fEBYiAmnR1n0d9Sg@mail.gmail.com>
-	<CAB7rCTjUL2_Kae186QgXa2csf-p-cuGH2US38a7S436uBY93Pw@mail.gmail.com>
-Date: Fri, 23 Mar 2012 14:49:51 +0100
-Message-ID: <CA+QXtDvhJ401c9FfkPhqMT4SbwTcCF0wzNLFKzCYkxpdbQodog@mail.gmail.com>
-Subject: Re: media transport -- when is acquire ok to call?
-From: "Dalleau, Frederic" <frederic.dalleau@intel.com>
-To: Mike <puffy.taco@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mike, Luiz,
+Hi,
 
-> I think I've figured out why I didn't see the SEP error print out.
-> The function resume_a2dp calls a2dp_sep_lock.  The only place this
-> ever gets unlocked is in a suspend call.  If a2dp_resume returns an
-> error code, the sep remains forever locked.  And it seems, the SEP
-> will no longer let acquire happen on future A2DP connections,
-> requiring bluetoothd to be restarted for this to work.
+I find that Bluez provides configure file (Bluetooth.conf) for systemd. For obexd, I do not find any configure file for systemd .
 
-I'm experimenting similar issues right now on hfgw.
-Could it be because the endpoint is crashing after acquiring?
+For upstream, do obexd need to provide a conf file (like Bluetooth.conf) for setting policy to systemd?
 
-Frédéric
+Best regards
+Zheng wu
+
+
+
+
