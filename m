@@ -1,46 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1332434275-25394-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1332434275-25394-1-git-send-email-frederic.dalleau@linux.intel.com>
-Date: Fri, 23 Mar 2012 11:14:55 -0300
-Message-ID: <CABBYNZKLCzWb-SD7-g+J0thtg8-016_QtC9FOD+Xqv+hVXwhRg@mail.gmail.com>
-Subject: Re: [RFC 0/7] A2DP MP3 support with media API
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CAB7rCTjUL2_Kae186QgXa2csf-p-cuGH2US38a7S436uBY93Pw@mail.gmail.com>
+References: <CAB7rCTiQiaFRqDOj6OGZPfTtBWSnR60ADAZimEZJ=F0Tf0-R4Q@mail.gmail.com>
+	<CABBYNZLp3U9sHqiaW9xcH1f8qfrkM7t181y8NVK5L+Rwxet5jw@mail.gmail.com>
+	<CAB7rCThwZxQQoKHfEszX3sZPpE_cp5+XS_fEBYiAmnR1n0d9Sg@mail.gmail.com>
+	<CAB7rCTjUL2_Kae186QgXa2csf-p-cuGH2US38a7S436uBY93Pw@mail.gmail.com>
+Date: Fri, 23 Mar 2012 14:49:51 +0100
+Message-ID: <CA+QXtDvhJ401c9FfkPhqMT4SbwTcCF0wzNLFKzCYkxpdbQodog@mail.gmail.com>
+Subject: Re: media transport -- when is acquire ok to call?
+From: "Dalleau, Frederic" <frederic.dalleau@intel.com>
+To: Mike <puffy.taco@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Hi Mike, Luiz,
 
-2012/3/22 Frédéric Dalleau <frederic.dalleau@linux.intel.com>:
-> Hi,
->
-> I'm trying to make A2DP MP3 work in pulseaudio using media API.
-> In contrast to Unix API, media API lacks the possibility to reconfigure the
-> transport BT_SET_CONFIGURATION. So I've defined a dbus API that offers a
-> similar functionnality.
-> First there is a MediaTransport.Codecs property to list supported codecs on a
-> transport.
-> Then there is a Reconfigure method that tries to reconfigure the transport
-> to use a specified endpoint.
->
-> I'm sending a patch on pulseaudio list for using this new APIs at same time.
->
-> This is an RFC so feel free to comment, especially on the way a configuration
-> could be specified.
+> I think I've figured out why I didn't see the SEP error print out.
+> The function resume_a2dp calls a2dp_sep_lock.  The only place this
+> ever gets unlocked is in a suspend call.  If a2dp_resume returns an
+> error code, the sep remains forever locked.  And it seems, the SEP
+> will no longer let acquire happen on future A2DP connections,
+> requiring bluetoothd to be restarted for this to work.
 
-I don't think reusing the same transport object is the best approach
-here, I would prefer to create a new one and reconfigure transparently
-when switching instead of trying to use the same transport. Btw with
-A2DP we could in theory have multiple streams configured
-simultaneously, so we could have multiple transports configured,
-actually even active as AVDTP Start can take a list of seid, now we
-could face some iop problems with such approach but we could rely on
-AVDTP Close.
+I'm experimenting similar issues right now on hfgw.
+Could it be because the endpoint is crashing after acquiring?
 
-
--- 
-Luiz Augusto von Dentz
+Frédéric
