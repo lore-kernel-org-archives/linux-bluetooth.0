@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv5 17/26] Bluetooth: A2MP: Process A2MP Disc Physlink Request
-Date: Fri, 23 Mar 2012 18:13:57 +0200
-Message-Id: <1332519246-16656-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv5 24/26] Bluetooth: Process HCI callbacks in a workqueue
+Date: Fri, 23 Mar 2012 18:14:04 +0200
+Message-Id: <1332519246-16656-25-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,68 +11,78 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Placeholder for A2MP Disconnect Physlink Request.
+Use workqueue to process HCI callbacks.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   37 +++++++++++++++++++++++++++++++++++++
- 1 files changed, 37 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 +
+ net/bluetooth/hci_core.c         |   41 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index d2d292a..b2d0153 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -254,6 +254,40 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	return 0;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index c76e7c5..b0fa634 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1110,5 +1110,7 @@ int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
+ 	void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd), void *opt,
+ 		void (*destructor)(struct hci_cb_cmd *cmd), gfp_t flags);
+ void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
++void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
++					struct workqueue_struct *workqueue);
+ 
+ #endif /* __HCI_CORE_H */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 999c438..625a138 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2303,6 +2303,47 @@ struct hci_cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
+ 	return NULL;
  }
  
-+static int a2mp_discphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
-+				 struct a2mp_cmd *hdr)
-+{
-+	struct a2mp_physlink_req *req = (struct a2mp_physlink_req *) skb->data;
-+	struct a2mp_physlink_rsp rsp;
++struct hci_cb_work {
++	struct work_struct work;
 +	struct hci_dev *hdev;
++	struct hci_cb_cmd *cmd;
++};
 +
-+	if (le16_to_cpu(hdr->len) < sizeof(*req))
-+		return -EINVAL;
++static void hci_cb_worker(struct work_struct *w)
++{
++	struct hci_cb_work *work = (struct hci_cb_work *) w;
++	struct hci_cb_cmd *cmd = work->cmd;
++	struct hci_dev *hdev = work->hdev;
 +
-+	rsp.local_id = req->remote_id;
-+	rsp.remote_id = req->local_id;
-+	rsp.status = A2MP_STATUS_SUCCESS;
++	cmd->cb(hdev, cmd);
 +
-+	BT_DBG("local_id %d remote_id %d", rsp.local_id, rsp.remote_id);
-+
-+	hdev = hci_dev_get(req->local_id);
-+	if (!hdev) {
-+		rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
-+		goto send_rsp;
-+	}
-+
-+	/* TODO Disconnect Phys Link here */
-+
-+send_rsp:
-+	a2mp_send(mgr, A2MP_DISCONNPHYSLINK_RSP, hdr->ident, sizeof(rsp), &rsp);
-+
-+	if (hdev)
-+		hci_dev_put(hdev);
-+
-+	skb_pull(skb, sizeof(*req));
-+	return 0;
++	hci_remove_cb(hdev, cmd);
++	kfree(w);
++	hci_dev_put(hdev);
 +}
 +
- /* Handle A2MP signalling */
- static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
- {
-@@ -304,6 +338,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
- 			break;
- 
- 		case A2MP_DISCONNPHYSLINK_REQ:
-+			err = a2mp_discphyslink_req(mgr, skb, hdr);
-+			break;
++void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
++					struct workqueue_struct *workqueue)
++{
++	struct hci_cb_work *work;
 +
- 		case A2MP_CHANGE_RSP:
- 		case A2MP_DISCOVER_RSP:
- 		case A2MP_GETINFO_RSP:
++	BT_DBG("Queue cmd %p opt %p", cmd, cmd->opt);
++
++	work = kmalloc(sizeof(*work), GFP_KERNEL);
++	if (!work)
++		return;
++
++	INIT_WORK(&work->work, hci_cb_worker);
++	work->hdev = hdev;
++	work->cmd = cmd;
++	hci_dev_hold(hdev);
++
++	if (!queue_work(workqueue, &work->work)) {
++		kfree(work);
++		hci_dev_put(hdev);
++	}
++}
++
+ void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd)
+ {
+ 	mutex_lock(&hdev->cb_list_lock);
 -- 
 1.7.9.1
 
