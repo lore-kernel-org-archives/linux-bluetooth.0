@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv5 11/26] Bluetooth: A2MP: Helper functions to count HCI devs
-Date: Fri, 23 Mar 2012 18:13:51 +0200
-Message-Id: <1332519246-16656-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv5 20/26] Bluetooth: A2MP: Manage incoming connections
+Date: Fri, 23 Mar 2012 18:14:00 +0200
+Message-Id: <1332519246-16656-21-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,94 +11,88 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Helper functions used to cound HCI devices (AMP controllers) and
-build controller list packet.
+Handle incoming A2MP connection by creating AMP manager and
+processing A2MP messages.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h      |    2 ++
- include/net/bluetooth/hci_core.h |   13 +++++++++++++
- net/bluetooth/a2mp.c             |   30 ++++++++++++++++++++++++++++++
- 3 files changed, 45 insertions(+), 0 deletions(-)
+ include/net/bluetooth/a2mp.h |    4 ++++
+ net/bluetooth/a2mp.c         |   12 ++++++++++++
+ net/bluetooth/l2cap_core.c   |   13 +++++++++----
+ 3 files changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 38ac0e6..3a7bd76 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -56,6 +56,8 @@
- #define HCI_BREDR	0x00
- #define HCI_AMP		0x01
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index a748ab0..0558088 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -15,6 +15,8 @@
+ #ifndef __A2MP_H
+ #define __A2MP_H
  
-+#define HCI_BREDR_ID	0
++#include <net/bluetooth/l2cap.h>
 +
- /* HCI device quirks */
- enum {
- 	HCI_QUIRK_NO_RESET,
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 259d4a1..6a2fe3f 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -643,6 +643,19 @@ static inline void hci_set_drvdata(struct hci_dev *hdev, void *data)
- 	dev_set_drvdata(&hdev->dev, data);
- }
+ #define A2MP_FEAT_EXT	0x8000
  
-+/* hci_dev_list shall be locked */
-+static inline uint8_t __hci_num_ctrl(void)
-+{
-+	uint8_t count = 0;
-+	struct list_head *p;
-+
-+	list_for_each(p, &hci_dev_list) {
-+		count++;
-+	}
-+
-+	return count;
-+}
-+
- struct hci_dev *hci_dev_get(int index);
- struct hci_dev *hci_get_route(bdaddr_t *src, bdaddr_t *dst);
+ struct amp_mgr {
+@@ -117,5 +119,7 @@ struct a2mp_physlink_rsp {
  
+ void amp_mgr_get(struct amp_mgr *mgr);
+ int amp_mgr_put(struct amp_mgr *mgr);
++struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
++				       struct sk_buff *skb);
+ 
+ #endif /* __A2MP_H */
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index a2677d6..17659f7 100644
+index 2f7c461..105e755 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -65,6 +65,36 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
- 	kfree(cmd);
- }
+@@ -515,3 +515,15 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
  
-+static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
+ 	return mgr;
+ }
++
++struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
++				       struct sk_buff *skb)
 +{
-+	cl->id = 0;
-+	cl->type = 0;
-+	cl->status = 1;
++	struct amp_mgr *mgr;
++
++	mgr = amp_mgr_create(conn);
++
++	BT_DBG("mgr: %p chan %p", mgr, mgr->a2mp_chan);
++
++	return mgr->a2mp_chan;
 +}
-+
-+/* hci_dev_list shall be locked */
-+static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl, u8 num_ctrl)
-+{
-+	int i = 0;
-+	struct hci_dev *hdev;
-+
-+	__a2mp_cl_bredr(cl);
-+
-+	list_for_each_entry(hdev, &hci_dev_list, list) {
-+		/* Iterate through AMP controllers */
-+		if (hdev->id == HCI_BREDR_ID)
-+			continue;
-+
-+		/* Starting from second entry */
-+		if (++i >= num_ctrl)
-+			return;
-+
-+		cl[i].id = hdev->id;
-+		cl[i].type = hdev->amp_type;
-+		cl[i].status = hdev->amp_status;
-+	}
-+}
-+
- /* Processing A2MP messages */
- static inline int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
- 				   struct a2mp_cmd *hdr)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 7583eef..8d10e81 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -56,6 +56,7 @@
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/l2cap.h>
+ #include <net/bluetooth/smp.h>
++#include <net/bluetooth/a2mp.h>
+ 
+ bool disable_ertm;
+ 
+@@ -4298,10 +4299,14 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 
+ 	chan = l2cap_get_chan_by_scid(conn, cid);
+ 	if (!chan) {
+-		BT_DBG("unknown cid 0x%4.4x", cid);
+-		/* Drop packet and return */
+-		kfree_skb(skb);
+-		return 0;
++		if (cid == L2CAP_CID_A2MP) {
++			chan = a2mp_channel_create(conn, skb);
++		} else {
++			BT_DBG("unknown cid 0x%4.4x", cid);
++			/* Drop packet and return */
++			kfree_skb(skb);
++			return 0;
++		}
+ 	}
+ 
+ 	l2cap_chan_lock(chan);
 -- 
 1.7.9.1
 
