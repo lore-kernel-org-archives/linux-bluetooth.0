@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv5 05/26] Bluetooth: A2MP: Build and Send msg helpers
-Date: Fri, 23 Mar 2012 18:13:45 +0200
-Message-Id: <1332519246-16656-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv5 16/26] Bluetooth: A2MP: Process A2MP Create Physlink Request
+Date: Fri, 23 Mar 2012 18:13:56 +0200
+Message-Id: <1332519246-16656-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,91 +11,50 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Helper function to build and send A2MP messages.
+Placeholder for A2MP Create Physlink Request.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |    7 ++++++
- net/bluetooth/a2mp.c         |   48 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 55 insertions(+), 0 deletions(-)
+ net/bluetooth/a2mp.c |   19 +++++++++++++++++++
+ 1 files changed, 19 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 0fe8ddd..995f1c0 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -24,6 +24,13 @@ struct amp_mgr {
- 	unsigned long		flags;
- };
- 
-+struct a2mp_cmd {
-+	__u8	code;
-+	__u8	ident;
-+	__le16	len;
-+	__u8	data[0];
-+} __packed;
-+
- void amp_mgr_get(struct amp_mgr *mgr);
- int amp_mgr_put(struct amp_mgr *mgr);
- 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index b1a1e14..84275e8 100644
+index 5d974c5..d2d292a 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -17,6 +17,54 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/a2mp.h>
+@@ -238,6 +238,22 @@ static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
+ }
  
-+/* A2MP build & send command helper functions */
-+static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
++static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
++				   struct a2mp_cmd *hdr)
 +{
-+	struct a2mp_cmd *cmd;
-+	int plen;
++	struct a2mp_physlink_req *req = (struct a2mp_physlink_req *) skb->data;
 +
-+	plen = sizeof(*cmd) + len;
-+	cmd = kzalloc(plen, GFP_KERNEL);
-+	if (!cmd)
-+		return NULL;
++	if (le16_to_cpu(hdr->len) < sizeof(*req))
++		return -EINVAL;
 +
-+	cmd->code = code;
-+	cmd->ident = ident;
-+	cmd->len = cpu_to_le16(len);
++	BT_DBG("local_id %d, remote_id %d", req->local_id, req->remote_id);
 +
-+	memcpy(cmd->data, data, len);
++	/* TODO process physlink create */
 +
-+	return cmd;
++	skb_pull(skb, le16_to_cpu(hdr->len));
++	return 0;
 +}
 +
-+static inline int __a2mp_send(struct amp_mgr *mgr, u8 *data, int len)
-+{
-+	struct l2cap_chan *chan = mgr->a2mp_chan;
-+	struct kvec iv = { data, len };
-+	struct msghdr msg;
+ /* Handle A2MP signalling */
+ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ {
+@@ -284,6 +300,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 			break;
+ 
+ 		case A2MP_CREATEPHYSLINK_REQ:
++			err = a2mp_createphyslink_req(mgr, skb, hdr);
++			break;
 +
-+	memset(&msg, 0, sizeof(msg));
-+
-+	msg.msg_iov = (struct iovec *) &iv;
-+	msg.msg_iovlen = 1;
-+
-+	return l2cap_chan_send(chan, &msg, len, 0);
-+}
-+
-+static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
-+		      void *data)
-+{
-+	struct a2mp_cmd *cmd;
-+
-+	cmd = __a2mp_build(code, ident, len, data);
-+	if (!cmd)
-+		return;
-+
-+	__a2mp_send(mgr, (u8 *)cmd, len + sizeof(*cmd));
-+
-+	kfree(cmd);
-+}
-+
- static struct l2cap_ops a2mp_chan_ops = {
- 	.name = "L2CAP A2MP channel",
- };
+ 		case A2MP_DISCONNPHYSLINK_REQ:
+ 		case A2MP_CHANGE_RSP:
+ 		case A2MP_DISCOVER_RSP:
 -- 
 1.7.9.1
 
