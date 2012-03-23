@@ -1,54 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1332516578.5884.7.camel@sortiz-mobl>
-Subject: Re: RFC/CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
- 2012 (Barcelona?)
-From: Samuel Ortiz <samuel@sortiz.org>
-Reply-To: Samuel Ortiz <samuel@sortiz.org>
-To: "John W. Linville" <linville@tuxdriver.com>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Date: Fri, 23 Mar 2012 16:29:38 +0100
-In-Reply-To: <20120322192406.GB2432@tuxdriver.com>
-References: <20120322192406.GB2432@tuxdriver.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [PATCH BlueZ] gatttool: Update interactive prompt if connection is lost
+Date: Fri, 23 Mar 2012 11:22:06 -0400
+Message-Id: <1332516126-6665-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+In interactive mode, when connection is lost, the prompt used to remain
+in "connected" state. This patch fixes that case, by always showing the
+actual connection state.
+---
+ attrib/interactive.c |   11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-On Thu, 2012-03-22 at 15:24 -0400, John W. Linville wrote:
-> A number of wireless developers reside in Europe, but our last few
-> meetings have been held in North America.  So, there is a strong desire
-> to have a European location for this event.  Initial contact with the
-> Linux Foundation suggests that we can co-locate this event with the
-> LinuxCon Europe event in Barcelona this November.  Other suggestions
-> are welcome as well, of course.
-Barcelona sounds really good to me.
-
-
-> If we join the LinuxCon Europe event, we would need to decide how to
-> fund the event.  One option would be to charge a separate entry fee for
-> the mini-summit event, seperate from the LinuxCon EU fee.  Those that
-> do not wish to attend LinuxCon EU may find that attractive.  OTOH,
-> in the past we have simply said that all the mini-summit attendees
-> had to register for the sponsoring event.  That has worked reasonably
-> well, especially since event speakers would be eligible to attend
-> the mini-summit for no fee.  I would lean toward keeping that approach.
-I agree here as well.
-
-
-> Given the potential to expand this into a larger event, we would
-> likely need to be somewhat more formal about having proposals for
-> speaking slots.  In that case, we might require a program committee
-> for reviewing proposals, etc.  Anyone interested in participating in
-> speaking at the mini-summit or in reviewing speaking proposals should
-> contact me or reply in this thread.
-I can do an NFC talk. It would probably make sense to do a generic
-presentation about the NFC kernel and userspace architecture, since this
-is the first wireless summit where we have a kernel supporting NFC.
-
-Cheers,
-Samuel.
-
-
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index be81424..47ddcf6 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -56,6 +56,7 @@ struct characteristic_data {
+ };
+ 
+ static void cmd_help(int argcp, char **argvp);
++static void cmd_disconnect(int argcp, char **argvp);
+ 
+ enum state {
+ 	STATE_DISCONNECTED,
+@@ -327,6 +328,14 @@ static void cmd_exit(int argcp, char **argvp)
+ 	g_main_loop_quit(event_loop);
+ }
+ 
++static gboolean channel_watcher(GIOChannel *chan, GIOCondition cond,
++				gpointer user_data)
++{
++	cmd_disconnect(0, NULL);
++
++	return TRUE;
++}
++
+ static void cmd_connect(int argcp, char **argvp)
+ {
+ 	if (conn_state != STATE_DISCONNECTED)
+@@ -347,6 +356,8 @@ static void cmd_connect(int argcp, char **argvp)
+ 						opt_mtu, connect_cb);
+ 	if (iochannel == NULL)
+ 		set_state(STATE_DISCONNECTED);
++	else
++		g_io_add_watch(iochannel, G_IO_HUP, channel_watcher, NULL);
+ }
+ 
+ static void cmd_disconnect(int argcp, char **argvp)
+-- 
+1.7.9.4
 
