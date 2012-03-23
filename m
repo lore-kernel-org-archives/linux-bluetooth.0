@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv5 13/26] Bluetooth: A2MP: Process A2MP Change Notify
-Date: Fri, 23 Mar 2012 18:13:53 +0200
-Message-Id: <1332519246-16656-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv5 18/26] Bluetooth: A2MP: Process A2MP Command Responses
+Date: Fri, 23 Mar 2012 18:13:58 +0200
+Message-Id: <1332519246-16656-19-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,50 +11,43 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Placeholder for A2MP Change Notify handler.
+Process A2MP responses, print cmd code and ident for now.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   19 +++++++++++++++++++
- 1 files changed, 19 insertions(+), 0 deletions(-)
+ net/bluetooth/a2mp.c |   12 ++++++++++++
+ 1 files changed, 12 insertions(+), 0 deletions(-)
 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 6ae20ca..5781ef5 100644
+index b2d0153..178832e 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -162,6 +162,22 @@ static inline int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
+@@ -288,6 +288,15 @@ send_rsp:
  	return 0;
  }
  
-+static inline int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
-+				     struct a2mp_cmd *hdr)
++static inline int a2mp_cmd_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
++			       struct a2mp_cmd *hdr)
 +{
-+	struct a2mp_cl *cl = (struct a2mp_cl *) skb->data;
++	BT_DBG("ident %d code %d", hdr->ident, hdr->code);
 +
-+	while (skb->len >= sizeof(*cl)) {
-+		BT_DBG("Controller id %d type %d status %d", cl->id, cl->type,
-+		       cl->status);
-+		cl = (struct a2mp_cl *) skb_pull(skb, sizeof(*cl));
-+	}
-+
-+	/* TODO send A2MP_CHANGE_RSP */
-+
++	skb_pull(skb, le16_to_cpu(hdr->len));
 +	return 0;
 +}
 +
  /* Handle A2MP signalling */
  static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
  {
-@@ -196,6 +212,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
- 			break;
- 
- 		case A2MP_CHANGE_NOTIFY:
-+			err = a2mp_change_notify(mgr, skb, hdr);
+@@ -347,6 +356,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 		case A2MP_GETAMPASSOC_RSP:
+ 		case A2MP_CREATEPHYSLINK_RSP:
+ 		case A2MP_DISCONNPHYSLINK_RSP:
++			err = a2mp_cmd_rsp(mgr, skb, hdr);
 +			break;
 +
- 		case A2MP_GETINFO_REQ:
- 		case A2MP_GETAMPASSOC_REQ:
- 		case A2MP_CREATEPHYSLINK_REQ:
+ 		default:
+ 			BT_ERR("Unknown A2MP sig cmd 0x%2.2x", hdr->code);
+ 			err = -EINVAL;
 -- 
 1.7.9.1
 
