@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv5 22/26] Bluetooth: Define AMP controller statuses
-Date: Fri, 23 Mar 2012 18:14:02 +0200
-Message-Id: <1332519246-16656-23-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv5 14/26] Bluetooth: A2MP: Process A2MP Get Info Request
+Date: Fri, 23 Mar 2012 18:13:54 +0200
+Message-Id: <1332519246-16656-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,34 +11,77 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-AMP status codes copied from Bluez patch sent by Peter Krystad
-<pkrystad@codeaurora.org>.
+Process A2MP Get Info Request.
+Example of trace log for invalid controller id is shown below:
+
+...
+> ACL data: handle 11 flags 0x02 dlen 13
+    A2MP: Get Info req: id 238
+< ACL data: handle 11 flags 0x00 dlen 30
+    A2MP: Get Info rsp: id 238 status (1) Invalid Controller ID
+...
+
+Note that If the Status field is set to Invalid Controller ID all subsequent
+fields in the AMP Get Info Response shall be ignored by the receiver.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h |    9 +++++++++
- 1 files changed, 9 insertions(+), 0 deletions(-)
+ net/bluetooth/a2mp.c |   35 +++++++++++++++++++++++++++++++++++
+ 1 files changed, 35 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 3577b85..1fefe2f 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -60,6 +60,15 @@
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 5781ef5..ae60301 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -178,6 +178,38 @@ static inline int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
+ }
  
- #define HCI_BREDR_ID	0
- 
-+/* AMP controller status */
-+#define AMP_CTRL_POWERED_DOWN			0x00
-+#define AMP_CTRL_BLUETOOTH_ONLY			0x01
-+#define AMP_CTRL_NO_CAPACITY			0x02
-+#define AMP_CTRL_LOW_CAPACITY			0x03
-+#define AMP_CTRL_MEDIUM_CAPACITY		0x04
-+#define AMP_CTRL_HIGH_CAPACITY			0x05
-+#define AMP_CTRL_FULL_CAPACITY			0x06
++static inline int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
++				   struct a2mp_cmd *hdr)
++{
++	struct a2mp_info_req *req  = (struct a2mp_info_req *) skb->data;
++	struct hci_dev *hdev;
++	struct a2mp_info_rsp rsp;
 +
- /* HCI device quirks */
- enum {
- 	HCI_QUIRK_NO_RESET,
++	if (le16_to_cpu(hdr->len) < sizeof(*req))
++		return -EINVAL;
++
++	rsp.id = req->id;
++	rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
++
++	hdev = hci_dev_get(req->id);
++	if (hdev && hdev->amp_type != HCI_BREDR) {
++		rsp.status = 0;
++		rsp.total_bw = cpu_to_le32(hdev->amp_total_bw);
++		rsp.max_bw = cpu_to_le32(hdev->amp_max_bw);
++		rsp.min_latency = cpu_to_le32(hdev->amp_min_latency);
++		rsp.pal_cap = cpu_to_le16(hdev->amp_pal_cap);
++		rsp.assoc_size = cpu_to_le16(hdev->amp_assoc_size);
++	}
++
++	if (hdev)
++		hci_dev_put(hdev);
++
++	a2mp_send(mgr, A2MP_GETINFO_RSP, hdr->ident, sizeof(rsp), &rsp);
++
++	skb_pull(skb, sizeof(*req));
++	return 0;
++}
++
+ /* Handle A2MP signalling */
+ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ {
+@@ -216,6 +248,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 			break;
+ 
+ 		case A2MP_GETINFO_REQ:
++			err = a2mp_getinfo_req(mgr, skb, hdr);
++			break;
++
+ 		case A2MP_GETAMPASSOC_REQ:
+ 		case A2MP_CREATEPHYSLINK_REQ:
+ 		case A2MP_DISCONNPHYSLINK_REQ:
 -- 
 1.7.9.1
 
