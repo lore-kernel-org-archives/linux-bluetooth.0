@@ -1,44 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv5 02/26] Bluetooth: Lock sk only if exist in state_change
-Date: Fri, 23 Mar 2012 18:13:42 +0200
-Message-Id: <1332519246-16656-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv5 00/26] RFC Bluetooth A2MP implementation
+Date: Fri, 23 Mar 2012 18:13:40 +0200
+Message-Id: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-In L2CAP state_change lock sk only when we are dealing with
-sockets. In A2MP we do not have sk so this will crash.
+Changes:
+	* RFCv5: Fix memory leaks, sparse warnings and taking comments from upstream.
+	* RFCv4: redesign code to use l2cap channel lock instead of socket lock
+	and general modifications. Basic implementation of HCI callback interface.
+	* RFCv3: redesign code to use l2cap functions instead of kernel sockets
+	L2CAP functions modified to work with channels without sk.
+	* RFCv2: rebased against "workqueue" patches.
+	* RFCv1: added refcnt to amp_mgr, fixed sleeping in atomic
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/l2cap_core.c |    8 ++++++--
- 1 files changed, 6 insertions(+), 2 deletions(-)
+Initially code was based of reference implementations below:
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 5b9a667..6e801bb 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -212,9 +212,13 @@ static inline void l2cap_state_change(struct l2cap_chan *chan, int state, int er
- {
- 	struct sock *sk = chan->sk;
- 
--	lock_sock(sk);
-+	if (sk)
-+		lock_sock(sk);
-+
- 	__l2cap_state_change(chan, state, err);
--	release_sock(sk);
-+
-+	if (sk)
-+		release_sock(sk);
- }
- 
- void __l2cap_chan_set_err(struct l2cap_chan *chan, int err)
+References: Code Aurora (git://codeaurora.org/kernel/msm.git) and Atheros
+(search for: [PATCH 2/3] Add a2mp protocol/AMP manager, by Atheros Linux BT3)
+implementations.
+
+Andrei Emeltchenko (26):
+  Bluetooth: Add set_err to state_change callback
+  Bluetooth: Lock sk only if exist in state_change
+  Bluetooth: A2MP: Create A2MP channel
+  Bluetooth: A2MP: AMP Manager basic functions
+  Bluetooth: A2MP: Build and Send msg helpers
+  Bluetooth: A2MP: Add chan callbacks
+  Bluetooth: A2MP: Definitions for A2MP commands
+  Bluetooth: A2MP: Define A2MP status codes
+  Bluetooth: A2MP: Process A2MP messages
+  Bluetooth: A2MP: Process A2MP Command Reject
+  Bluetooth: A2MP: Helper functions to count HCI devs
+  Bluetooth: A2MP: Process A2MP Discover Request
+  Bluetooth: A2MP: Process A2MP Change Notify
+  Bluetooth: A2MP: Process A2MP Get Info Request
+  Bluetooth: A2MP: Process A2MP Get AMP Assoc Request
+  Bluetooth: A2MP: Process A2MP Create Physlink Request
+  Bluetooth: A2MP: Process A2MP Disc Physlink Request
+  Bluetooth: A2MP: Process A2MP Command Responses
+  Bluetooth: A2MP: Handling fixed channels
+  Bluetooth: A2MP: Manage incoming connections
+  Bluetooth: physical link HCI interface to AMP
+  Bluetooth: Define AMP controller statuses
+  Bluetooth: General HCI callback implementation
+  Bluetooth: Process HCI callbacks in a workqueue
+  Bluetooth: AMP: Use HCI callback for Read AMP Info
+  Bluetooth: AMP: Read Local Assoc support
+
+ include/net/bluetooth/a2mp.h     |  128 +++++++++
+ include/net/bluetooth/amp.h      |   21 ++
+ include/net/bluetooth/hci.h      |   50 ++++
+ include/net/bluetooth/hci_core.h |   44 +++
+ include/net/bluetooth/l2cap.h    |   10 +-
+ net/bluetooth/Makefile           |    3 +-
+ net/bluetooth/a2mp.c             |  537 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/amp.c              |  108 ++++++++
+ net/bluetooth/hci_conn.c         |   15 +
+ net/bluetooth/hci_core.c         |  168 ++++++++++++
+ net/bluetooth/hci_event.c        |   57 ++++-
+ net/bluetooth/l2cap_core.c       |   94 ++++---
+ net/bluetooth/l2cap_sock.c       |    8 +-
+ 13 files changed, 1198 insertions(+), 45 deletions(-)
+ create mode 100644 include/net/bluetooth/a2mp.h
+ create mode 100644 include/net/bluetooth/amp.h
+ create mode 100644 net/bluetooth/a2mp.c
+ create mode 100644 net/bluetooth/amp.c
+
 -- 
 1.7.9.1
 
