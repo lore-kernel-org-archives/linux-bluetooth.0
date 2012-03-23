@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv5 07/26] Bluetooth: A2MP: Definitions for A2MP commands
-Date: Fri, 23 Mar 2012 18:13:47 +0200
-Message-Id: <1332519246-16656-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv5 15/26] Bluetooth: A2MP: Process A2MP Get AMP Assoc Request
+Date: Fri, 23 Mar 2012 18:13:55 +0200
+Message-Id: <1332519246-16656-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,96 +11,69 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Define A2MP command id and packet structures.
+Example trace when receiving AMP Assoc Request with wrong AMP id.
+...
+> ACL data: handle 11 flags 0x02 dlen 13
+    A2MP: Get AMP Assoc req: id 238
+< ACL data: handle 11 flags 0x00 dlen 14
+    A2MP: Get AMP Assoc rsp: id 238 status (1) Invalid Controller ID
+      assoc data:
+...
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |   72 ++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 72 insertions(+), 0 deletions(-)
+ net/bluetooth/a2mp.c |   31 +++++++++++++++++++++++++++++++
+ 1 files changed, 31 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 995f1c0..6e6202a 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -31,6 +31,78 @@ struct a2mp_cmd {
- 	__u8	data[0];
- } __packed;
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index ae60301..5d974c5 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -210,6 +210,34 @@ static inline int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
+ }
  
-+/* A2MP command codes */
-+#define A2MP_COMMAND_REJ         0x01
-+struct a2mp_cmd_rej {
-+	__le16	reason;
-+} __packed;
++static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
++				struct a2mp_cmd *hdr)
++{
++	struct a2mp_amp_assoc_req *req =
++				(struct a2mp_amp_assoc_req *) skb->data;
++	struct hci_dev *hdev;
 +
-+#define A2MP_DISCOVER_REQ        0x02
-+struct a2mp_discov_req {
-+	__le16	mtu;
-+	__le16	ext_feat;
-+} __packed;
++	if (le16_to_cpu(hdr->len) < sizeof(*req))
++		return -EINVAL;
 +
-+struct a2mp_cl {
-+	__u8	id;
-+	__u8	type;
-+	__u8	status;
-+} __packed;
++	BT_DBG("id %d", req->id);
 +
-+#define A2MP_DISCOVER_RSP        0x03
-+struct a2mp_discov_rsp {
-+	__le16     mtu;
-+	__le16     ext_feat;
-+	struct a2mp_cl cl[0];
-+} __packed;
++	hdev = hci_dev_get(req->id);
++	if (!hdev || hdev->amp_type == HCI_BREDR) {
++		struct a2mp_amp_assoc_rsp rsp;
++		rsp.id = req->id;
++		rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
 +
-+#define A2MP_CHANGE_NOTIFY       0x04
-+#define A2MP_CHANGE_RSP          0x05
++		a2mp_send(mgr, A2MP_GETAMPASSOC_RSP, hdr->ident, sizeof(rsp), &rsp);
++	}
 +
-+#define A2MP_GETINFO_REQ         0x06
-+struct a2mp_info_req {
-+	__u8       id;
-+} __packed;
++	if (hdev)
++		hci_dev_put(hdev);
 +
-+#define A2MP_GETINFO_RSP         0x07
-+struct a2mp_info_rsp {
-+	__u8	id;
-+	__u8	status;
-+	__le32	total_bw;
-+	__le32	max_bw;
-+	__le32	min_latency;
-+	__le16	pal_cap;
-+	__le16	assoc_size;
-+} __packed;
++	skb_pull(skb, sizeof(*req));
++	return 0;
++}
 +
-+#define A2MP_GETAMPASSOC_REQ     0x08
-+struct a2mp_amp_assoc_req {
-+	__u8	id;
-+} __packed;
-+
-+#define A2MP_GETAMPASSOC_RSP     0x09
-+struct a2mp_amp_assoc_rsp {
-+	__u8	id;
-+	__u8	status;
-+	__u8	amp_assoc[0];
-+} __packed;
-+
-+#define A2MP_CREATEPHYSLINK_REQ  0x0A
-+#define A2MP_DISCONNPHYSLINK_REQ 0x0C
-+struct a2mp_physlink_req {
-+	__u8	local_id;
-+	__u8	remote_id;
-+	__u8	amp_assoc[0];
-+} __packed;
-+
-+#define A2MP_CREATEPHYSLINK_RSP  0x0B
-+#define A2MP_DISCONNPHYSLINK_RSP 0x0D
-+struct a2mp_physlink_rsp {
-+	__u8	local_id;
-+	__u8	remote_id;
-+	__u8	status;
-+} __packed;
-+
- void amp_mgr_get(struct amp_mgr *mgr);
- int amp_mgr_put(struct amp_mgr *mgr);
+ /* Handle A2MP signalling */
+ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ {
+@@ -252,6 +280,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 			break;
  
+ 		case A2MP_GETAMPASSOC_REQ:
++			err = a2mp_getampassoc_req(mgr, skb, hdr);
++			break;
++
+ 		case A2MP_CREATEPHYSLINK_REQ:
+ 		case A2MP_DISCONNPHYSLINK_REQ:
+ 		case A2MP_CHANGE_RSP:
 -- 
 1.7.9.1
 
