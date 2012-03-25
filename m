@@ -1,83 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
 From: Arik Nemtsov <arik@wizery.com>
 To: <linux-bluetooth@vger.kernel.org>
 Cc: Arik Nemtsov <arik@wizery.com>
-Subject: [PATCH v5 3/6] proximity: reporter: move definitions to .h and add util function
-Date: Sun, 25 Mar 2012 23:38:16 +0200
-Message-Id: <1332711499-5928-4-git-send-email-arik@wizery.com>
-In-Reply-To: <1332711499-5928-1-git-send-email-arik@wizery.com>
-References: <1332711499-5928-1-git-send-email-arik@wizery.com>
+Subject: [PATCH v5 0/6] Implement ProximityReporter profiles
+Date: Sun, 25 Mar 2012 23:38:13 +0200
+Message-Id: <1332711499-5928-1-git-send-email-arik@wizery.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows us to re-use these definitions in GATT sub-profiles.
----
- proximity/reporter.c |   25 ++++++++++++++-----------
- proximity/reporter.h |   16 ++++++++++++++++
- 2 files changed, 30 insertions(+), 11 deletions(-)
+This patch-set implements the Link loss and Immediate Alert GATT
+server profiles.
 
-diff --git a/proximity/reporter.c b/proximity/reporter.c
-index a4b4ab3..d1b070e 100644
---- a/proximity/reporter.c
-+++ b/proximity/reporter.c
-@@ -41,17 +41,20 @@
- #include "reporter.h"
- 
- static DBusConnection *connection;
--#define IMMEDIATE_ALERT_SVC_UUID	0x1802
--#define LINK_LOSS_SVC_UUID		0x1803
--#define TX_POWER_SVC_UUID		0x1804
--#define ALERT_LEVEL_CHR_UUID		0x2A06
--#define POWER_LEVEL_CHR_UUID		0x2A07
--
--enum {
--	NO_ALERT = 0x00,
--	MILD_ALERT = 0x01,
--	HIGH_ALERT = 0x02,
--};
-+
-+const char *get_alert_level_string(uint8_t level)
-+{
-+	switch (level) {
-+	case NO_ALERT:
-+		return "none";
-+	case MILD_ALERT:
-+		return "mild";
-+	case HIGH_ALERT:
-+		return "high";
-+	}
-+
-+	return "unknown";
-+}
- 
- static void register_link_loss(struct btd_adapter *adapter)
- {
-diff --git a/proximity/reporter.h b/proximity/reporter.h
-index 2b18446..5ae0eb2 100644
---- a/proximity/reporter.h
-+++ b/proximity/reporter.h
-@@ -22,5 +22,21 @@
-  *
-  */
- 
-+#define PROXIMITY_REPORTER_INTERFACE "org.bluez.ProximityReporter"
-+
-+#define IMMEDIATE_ALERT_SVC_UUID	0x1802
-+#define LINK_LOSS_SVC_UUID		0x1803
-+#define TX_POWER_SVC_UUID		0x1804
-+#define ALERT_LEVEL_CHR_UUID		0x2A06
-+#define POWER_LEVEL_CHR_UUID		0x2A07
-+
-+enum {
-+	NO_ALERT = 0x00,
-+	MILD_ALERT = 0x01,
-+	HIGH_ALERT = 0x02,
-+};
-+
- int reporter_init(struct btd_adapter *adapter);
- void reporter_exit(struct btd_adapter *adapter);
-+
-+const char *get_alert_level_string(uint8_t level);
+A few API calls are added/changed in preparation, the most notable of
+which is the addition of the remote-device to each GATT read/write callback.
+
+The new profiles are separated into their own files for clarity.
+
+A ProximityReporter D-Bus interface is registered for each remote device.
+Property queries and PropertyChanged notifications are implemented, in
+accordance to doc/proximity-api.txt.
+
+v4->5: Add remote device to ATT callback function in a saner way.
+Move bluez-dependent defintions from att.h to att-bluez.h and add
+a btd_device argument to the function there. (Thanks Johan)
+
+Arik Nemtsov (6):
+  att: add remote btd_device to ATT read/write callbacks
+  proximity: reporter: save global D-Bus connection
+  proximity: reporter: move definitions to .h and add util function
+  proximity: link loss: implement link loss server
+  proximity: immediate alert: implement immediate alert server
+  proximity: reporter: implement D-Bus API
+
+ Makefile.am            |    4 +-
+ attrib/att-bluez.h     |   44 +++++++
+ attrib/att.h           |   20 ---
+ attrib/gatt-service.c  |    1 +
+ plugins/gatt-example.c |    4 +-
+ proximity/immalert.c   |  289 +++++++++++++++++++++++++++++++++++++++++
+ proximity/immalert.h   |   26 ++++
+ proximity/linkloss.c   |  337 ++++++++++++++++++++++++++++++++++++++++++++++++
+ proximity/linkloss.h   |   26 ++++
+ proximity/reporter.c   |  251 ++++++++++++++++++++++++++----------
+ proximity/reporter.h   |   16 +++
+ src/attrib-server.c    |   20 ++-
+ time/server.c          |    7 +-
+ 13 files changed, 947 insertions(+), 98 deletions(-)
+ create mode 100644 attrib/att-bluez.h
+ create mode 100644 proximity/immalert.c
+ create mode 100644 proximity/immalert.h
+ create mode 100644 proximity/linkloss.c
+ create mode 100644 proximity/linkloss.h
+
 -- 
 1.7.5.4
 
