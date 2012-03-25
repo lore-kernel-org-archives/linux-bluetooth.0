@@ -1,80 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1332698585.1870.88.camel@aeonflux>
-Subject: Re: RFC/CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
- 2012 (Barcelona?)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "John W. Linville" <linville@tuxdriver.com>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Date: Sun, 25 Mar 2012 11:03:05 -0700
-In-Reply-To: <20120322192406.GB2432@tuxdriver.com>
-References: <20120322192406.GB2432@tuxdriver.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Sun, 25 Mar 2012 14:16:12 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv5 06/26] Bluetooth: A2MP: Add chan callbacks
+Message-ID: <20120325171612.GH3106@joana>
+References: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1332519246-16656-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1332519246-16656-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-03-23 18:13:46 +0200]:
 
-> For the past several years, Linux wireless LAN developers have held
-> "mini-summit" events to bring us together face-to-face.  This has
-> helped us to develop better working relationships with one and another
-> and to resolve certain issues that would have been much more difficult
-> to resolve strictly over email and IRC.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> For some time we have discussed combining these events with similar
-> gatherings of Bluetooth developers.  Now that NFC has an in-kernel
-> Linux presence, it makes sense to include them as well.  So, we
-> are hoping to have a joint mini-summit event along the lines of the
-> KVM Forum or the Linux File System, Storage, and Memory Management
-> Summit events.
+> Add state change, close and skb allocation callbacks.
 > 
-> A number of wireless developers reside in Europe, but our last few
-> meetings have been held in North America.  So, there is a strong desire
-> to have a European location for this event.  Initial contact with the
-> Linux Foundation suggests that we can co-locate this event with the
-> LinuxCon Europe event in Barcelona this November.  Other suggestions
-> are welcome as well, of course.
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/a2mp.c |   36 ++++++++++++++++++++++++++++++++++++
+>  1 files changed, 36 insertions(+), 0 deletions(-)
+> 
+> diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+> index 84275e8..894c6c96 100644
+> --- a/net/bluetooth/a2mp.c
+> +++ b/net/bluetooth/a2mp.c
+> @@ -65,8 +65,42 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
+>  	kfree(cmd);
+>  }
+>  
+> +static void a2mp_chan_state_change_cb(void *data, int state, int err)
+> +{
+> +	struct l2cap_chan *chan = data;
+> +	struct amp_mgr *mgr;
+> +
+> +	BT_DBG("chan %p state %s", chan, state_to_string(state));
+> +
+> +	chan->state = state;
+> +
+> +	switch (state) {
+> +	case BT_CLOSED:
+> +		mgr = chan->data;
+> +		if (mgr)
+> +			amp_mgr_put(mgr);
+> +		break;
+> +	}
+> +}
+> +
+> +static void a2mp_chan_close_cb(void *data)
+> +{
+> +	struct amp_mgr *mgr = data;
+> +
+> +	l2cap_chan_destroy(mgr->a2mp_chan);
+> +}
+> +
+> +static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
+> +					unsigned long len, int nb, int *err)
 
-my vote clearly goes for Barcelona.
+Wrong coding style here. As we just changed our coding style check the rest of
+this patchset for errors like this
 
-> If we join the LinuxCon Europe event, we would need to decide how to
-> fund the event.  One option would be to charge a separate entry fee for
-> the mini-summit event, seperate from the LinuxCon EU fee.  Those that
-> do not wish to attend LinuxCon EU may find that attractive.  OTOH,
-> in the past we have simply said that all the mini-summit attendees
-> had to register for the sponsoring event.  That has worked reasonably
-> well, especially since event speakers would be eligible to attend
-> the mini-summit for no fee.  I would lean toward keeping that approach.
+> +{
+> +	return bt_skb_alloc(len, GFP_KERNEL);
+> +}
+> +
+>  static struct l2cap_ops a2mp_chan_ops = {
+>  	.name = "L2CAP A2MP channel",
+> +	.state_change = a2mp_chan_state_change_cb,
+> +	.close = a2mp_chan_close_cb,
+> +	.alloc_skb = a2mp_chan_alloc_skb_cb,
+>  };
+>  
+>  static struct l2cap_chan *open_a2mp_chan(struct l2cap_conn *conn)
+> @@ -108,6 +142,8 @@ static struct l2cap_chan *open_a2mp_chan(struct l2cap_conn *conn)
+>  	chan->remote_mps = chan->omtu;
+>  	chan->mps = chan->omtu;
+>  
+> +	chan->ops->state_change(chan, BT_CONNECTED, 0);
 
-I am in favor of requiring attendees to register with the LinuxCon
-event. That has always worked out nicely for everybody. Especially if we
-want to have extra rooms for breakout sessions. Otherwise we have to
-figure out the room costs.
+This is the same of calling a2mp_chan_alloc_skb_cb() directly. ops is intended
+to be used outside of this file, not inside it.
 
-Unless some company wants to step up and sponsor. Or sponsor a dinner
-event and get free attendance. I think we can figure something out to
-make this work if anybody is interested ;)
-
-> Given the potential to expand this into a larger event, we would
-> likely need to be somewhat more formal about having proposals for
-> speaking slots.  In that case, we might require a program committee
-> for reviewing proposals, etc.  Anyone interested in participating in
-> speaking at the mini-summit or in reviewing speaking proposals should
-> contact me or reply in this thread.
-
-When you and I talked originally about this, we discussed the format a
-little bit. In theory we have a bunch of options here. One of the
-original thoughts was 1-2 day mini-conference and 1 day break-out
-sessions. I assume 6 presentation per day is maximum. Is it enough to
-just do 1 day?
-
-Any other thoughts?
-
-And while we are at it I am volunteering myself (or someone from our
-team) to give the "Bluetooth: State of the Union" talk.
-
-Regards
-
-Marcel
-
-
+	Gustavo
