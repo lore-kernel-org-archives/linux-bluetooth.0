@@ -1,51 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 25 Mar 2012 13:41:25 -0300
+Date: Sun, 25 Mar 2012 13:34:20 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Samuel Ortiz <samuel@sortiz.org>
-Cc: "John W. Linville" <linville@tuxdriver.com>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: RFC/CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
- 2012 (Barcelona?)
-Message-ID: <20120325164125.GE3106@joana>
-References: <20120322192406.GB2432@tuxdriver.com>
- <1332516578.5884.7.camel@sortiz-mobl>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH 4/4] Bluetooth: Functions parsing or generating ERTM
+ control fields
+Message-ID: <20120325163420.GD3106@joana>
+References: <1332547018-19468-1-git-send-email-mathewm@codeaurora.org>
+ <1332547018-19468-5-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332516578.5884.7.camel@sortiz-mobl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1332547018-19468-5-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Mat,
 
-* Samuel Ortiz <samuel@sortiz.org> [2012-03-23 16:29:38 +0100]:
+* Mat Martineau <mathewm@codeaurora.org> [2012-03-23 16:56:58 -0700]:
 
-> Hi John,
+> These functions encode or decode ERTM control fields (extended or
+> enhanced) to or from the new l2cap_control structure.
 > 
-> On Thu, 2012-03-22 at 15:24 -0400, John W. Linville wrote:
-> > A number of wireless developers reside in Europe, but our last few
-> > meetings have been held in North America.  So, there is a strong desire
-> > to have a European location for this event.  Initial contact with the
-> > Linux Foundation suggests that we can co-locate this event with the
-> > LinuxCon Europe event in Barcelona this November.  Other suggestions
-> > are welcome as well, of course.
-> Barcelona sounds really good to me.
-
-I agree with Barcelona too. If you wanna help to coordinate this with Linux
-Foundation count on me. :)
-
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/l2cap_core.c |  120 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 120 insertions(+)
 > 
-> 
-> > If we join the LinuxCon Europe event, we would need to decide how to
-> > fund the event.  One option would be to charge a separate entry fee for
-> > the mini-summit event, seperate from the LinuxCon EU fee.  Those that
-> > do not wish to attend LinuxCon EU may find that attractive.  OTOH,
-> > in the past we have simply said that all the mini-summit attendees
-> > had to register for the sponsoring event.  That has worked reasonably
-> > well, especially since event speakers would be eligible to attend
-> > the mini-summit for no fee.  I would lean toward keeping that approach.
-> I agree here as well.
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index ad73696..890cfb9 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -787,6 +787,118 @@ static inline void l2cap_send_rr_or_rnr(struct l2cap_chan *chan, u32 control)
+>  	l2cap_send_sframe(chan, control);
+>  }
+>  
+> +static u16 __pack_enhanced_control(struct l2cap_ctrl *control)
+> +{
+> +	u16 packed;
+> +
+> +	packed = (control->reqseq << L2CAP_CTRL_REQSEQ_SHIFT) &
+> +		L2CAP_CTRL_REQSEQ;
+> +	packed |= (control->final << L2CAP_CTRL_FINAL_SHIFT) &
+> +		L2CAP_CTRL_FINAL;
+> +
+> +	if (control->sframe) {
+> +		packed |= (control->poll << L2CAP_CTRL_POLL_SHIFT) &
+> +			L2CAP_CTRL_POLL;
+> +		packed |= (control->super << L2CAP_CTRL_SUPER_SHIFT) &
+> +			L2CAP_CTRL_SUPERVISE;
+> +		packed |= L2CAP_CTRL_FRAME_TYPE;
+> +	} else {
+> +		packed |= (control->sar << L2CAP_CTRL_SAR_SHIFT) &
+> +			L2CAP_CTRL_SAR;
+> +		packed |= (control->txseq << L2CAP_CTRL_TXSEQ_SHIFT) &
+> +			L2CAP_CTRL_TXSEQ;
+> +	}
+> +
+> +	return packed;
+> +}
+> +
+> +static void __get_enhanced_control(u16 enhanced,
+> +					struct l2cap_ctrl *control)
 
-+1 to keep that approach, if this summit becomes bigger in the future we can
-change it.
+wrong style here.
+
+> +{
+> +	control->reqseq = (enhanced & L2CAP_CTRL_REQSEQ) >>
+> +		L2CAP_CTRL_REQSEQ_SHIFT;
+> +	control->final = (enhanced & L2CAP_CTRL_FINAL) >>
+> +		L2CAP_CTRL_FINAL_SHIFT;
+> +
+> +	if (enhanced & L2CAP_CTRL_FRAME_TYPE) {
+> +		/* S-Frame */
+> +		control->sframe = 1;
+> +		control->poll = (enhanced & L2CAP_CTRL_POLL) >>
+> +			L2CAP_CTRL_POLL_SHIFT;
+> +		control->super = (enhanced & L2CAP_CTRL_SUPERVISE) >>
+> +			L2CAP_CTRL_SUPER_SHIFT;
+> +
+> +		control->sar = 0;
+> +		control->txseq = 0;
+> +	} else {
+> +		/* I-Frame */
+> +		control->sframe = 0;
+> +		control->sar = (enhanced & L2CAP_CTRL_SAR) >>
+> +			L2CAP_CTRL_SAR_SHIFT;
+> +		control->txseq = (enhanced & L2CAP_CTRL_TXSEQ) >>
+> +			L2CAP_CTRL_TXSEQ_SHIFT;
+> +
+> +		control->poll = 0;
+> +		control->super = 0;
+> +	}
+> +}
+> +
+> +static u32 __pack_extended_control(struct l2cap_ctrl *control)
+> +{
+> +	u32 packed;
+> +
+> +	packed = (control->reqseq << L2CAP_EXT_CTRL_REQSEQ_SHIFT) &
+> +		L2CAP_EXT_CTRL_REQSEQ;
+> +	packed |= (control->final << L2CAP_EXT_CTRL_FINAL_SHIFT) &
+> +		L2CAP_EXT_CTRL_FINAL;
+> +
+> +	if (control->sframe) {
+> +		packed |= (control->poll << L2CAP_EXT_CTRL_POLL_SHIFT) &
+> +			L2CAP_EXT_CTRL_POLL;
+> +		packed |= (control->super << L2CAP_EXT_CTRL_SUPER_SHIFT) &
+> +			L2CAP_EXT_CTRL_SUPERVISE;
+> +		packed |= L2CAP_EXT_CTRL_FRAME_TYPE;
+> +	} else {
+> +		packed |= (control->sar << L2CAP_EXT_CTRL_SAR_SHIFT) &
+> +			L2CAP_EXT_CTRL_SAR;
+> +		packed |= (control->txseq << L2CAP_EXT_CTRL_TXSEQ_SHIFT) &
+> +			L2CAP_EXT_CTRL_TXSEQ;
+> +	}
+> +
+> +	return packed;
+> +}
+> +
+> +static void __get_extended_control(u32 extended,
+> +				struct l2cap_ctrl *control)
+
+wrong style here
 
 	Gustavo
