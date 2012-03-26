@@ -1,51 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 26 Mar 2012 14:30:54 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: don't increment twice in eir_has_data_type()
-Message-ID: <20120326113054.GA15616@x220>
-References: <20120320150611.GA24873@elgon.mountain>
- <20120321220632.GA14964@x220.amr.corp.intel.com>
- <20120322062801.GA3232@mwanda>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120322062801.GA3232@mwanda>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Check for minimum data length in eir_has_data_type()
+Date: Mon, 26 Mar 2012 14:21:42 +0300
+Message-Id: <1332760902-16071-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1332760902-16071-1-git-send-email-johan.hedberg@gmail.com>
+References: <1332760902-16071-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Thu, Mar 22, 2012, Dan Carpenter wrote:
-> On Wed, Mar 21, 2012 at 07:06:32PM -0300, Johan Hedberg wrote:
-> > Looks like the original code is indeed buggy, no idea how I didn't
-> > notice something that obvious. Your patch does however seem to change
-> > the behavior a bit, a valid tag would be detected even though its length
-> > would be invalid (pointing outside of the supplied data). Not sure if
-> > that's so critical though since the important thing is to keep the code
-> > from doing anything nasty when supplied invalid data.
-> > 
-> 
-> We should check the length.  It will just cause headaches if we
-> don't.
-> 
-> It would be simple enough for me to put back the check I removed
-> from the middle of the loop.  But the thing is I wasn't sure how all
-> the + 1 and - 1 things fit together so I didn't feel good about
-> signing off on this.  Could you send a patch?  That way I get a
-> reported-by tag but if there are any problems you get blamed while I
-> deny knowing anything about it.  ;)
+If passed 0 as data_length the (parsed < data_length - 1) test will be
+true and cause a buffer overflow. In practice we need at least two bytes
+for the element length and type so add a test for it to the very
+beginning of the function.
 
-Done. I also sent a second patch for another issue with the function.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-In case you're interested the EIR data format is quite simple,
-consisting of a sequence of data structures with a format of:
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 83cd301..fa2c778 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -913,6 +913,9 @@ static inline bool eir_has_data_type(u8 *data, size_t data_len, u8 type)
+ {
+ 	size_t parsed = 0;
+ 
++	if (data_len < 2)
++		return false;
++
+ 	while (parsed < data_len - 1) {
+ 		u8 field_len = data[0];
+ 
+-- 
+1.7.9.1
 
-	| data_len (1 byte) | data (data_len bytes) |
-
-The first byte of "data" is the type of data structure in question. EIR
-data buffers do not need to be completely filled up, i.e. they can
-contain a non-significant part at the end, the beginning of which can be
-detected by a data_len field with the value of 0.
-
-Johan
