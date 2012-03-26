@@ -1,104 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH V3 5/7] btmgmt: Add support for setting Device ID
-Date: Mon, 26 Mar 2012 16:45:41 +0200
-Message-ID: <1332773141-25524-1-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1332260847-20079-5-git-send-email-szymon.janc@tieto.com>
-References: <1332260847-20079-5-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CAB7rCTid2cRwetSyNpaT3vGGT_GrSGxzjqR6BJt-J-g4wJuM0w@mail.gmail.com>
+References: <CAB7rCTiQiaFRqDOj6OGZPfTtBWSnR60ADAZimEZJ=F0Tf0-R4Q@mail.gmail.com>
+	<CABBYNZLp3U9sHqiaW9xcH1f8qfrkM7t181y8NVK5L+Rwxet5jw@mail.gmail.com>
+	<CAB7rCTid2cRwetSyNpaT3vGGT_GrSGxzjqR6BJt-J-g4wJuM0w@mail.gmail.com>
+Date: Mon, 26 Mar 2012 11:41:34 -0300
+Message-ID: <CABBYNZJw+7Jat-NUuiMgSr+zcRSoEm1JhmwSUea60hOhpROWmA@mail.gmail.com>
+Subject: Re: media transport -- when is acquire ok to call?
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mike <puffy.taco@gmail.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- mgmt/main.c |   65 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+Hi Mike,
 
-diff --git a/mgmt/main.c b/mgmt/main.c
-index 4f10e08..90d43e3 100644
---- a/mgmt/main.c
-+++ b/mgmt/main.c
-@@ -1730,6 +1730,70 @@ static void cmd_clr_uuids(int mgmt_sk, uint16_t index, int argc, char **argv)
- 	cmd_remove_uuid(mgmt_sk, index, 2, rm_argv);
- }
- 
-+static void did_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
-+				void *rsp, uint16_t len, void *user_data)
-+{
-+	if (status != 0) {
-+		fprintf(stderr, "Set Device ID failed with status 0x%02x (%s)\n",
-+						status, mgmt_errstr(status));
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	printf("Device ID succesfully set\n");
-+
-+	exit(EXIT_SUCCESS);
-+}
-+
-+static void did_usage(void)
-+{
-+	printf("Usage: btmgmt did <source>:<vendor>:<product>:<version>\n");
-+	printf("       possible source values: bluetooth, usb\n");
-+}
-+
-+static void cmd_did(int mgmt_sk, uint16_t index, int argc, char **argv)
-+{
-+	struct mgmt_cp_set_device_id cp;
-+	uint16_t vendor, product, version , source;
-+	int result;
-+
-+	if (argc < 2) {
-+		did_usage();
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	result = sscanf(argv[1], "bluetooth:%4hx:%4hx:%4hx", &vendor, &product,
-+								&version);
-+	if (result == 3) {
-+		source = 0x0001;
-+		goto done;
-+	}
-+
-+	result = sscanf(argv[1], "usb:%4hx:%4hx:%4hx", &vendor, &product,
-+								&version);
-+	if (result == 3) {
-+		source = 0x0002;
-+		goto done;
-+	}
-+
-+	did_usage();
-+	exit(EXIT_FAILURE);
-+
-+done:
-+	if (index == MGMT_INDEX_NONE)
-+		index = 0;
-+
-+	cp.source = htobs(source);
-+	cp.vendor = htobs(vendor);
-+	cp.product = htobs(product);
-+	cp.version = htobs(version);
-+
-+	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_DEVICE_ID, index,
-+				&cp, sizeof(cp), did_rsp, NULL) < 0) {
-+		fprintf(stderr, "Unable to send set_dev_class cmd\n");
-+		exit(EXIT_FAILURE);
-+	}
-+}
-+
- static struct {
- 	char *cmd;
- 	void (*func)(int mgmt_sk, uint16_t index, int argc, char **argv);
-@@ -1760,6 +1824,7 @@ static struct {
- 	{ "add-uuid",	cmd_add_uuid,	"Add UUID"			},
- 	{ "rm-uuid",	cmd_add_uuid,	"Remove UUID"			},
- 	{ "clr-uuids",	cmd_clr_uuids,	"Clear UUIDs",			},
-+	{ "did",	cmd_did,	"Set Device ID",		},
- 	{ NULL, NULL, 0 }
- };
- 
+On Fri, Mar 23, 2012 at 2:51 PM, Mike <puffy.taco@gmail.com> wrote:
+>
+> Going back to this idea, it seems like MediaTransport should be
+> redesigned to push the file descriptor to the endpoint, rather than
+> the endpoint having to request it from the transport.  this would
+> solve this issue.  The main problem is that acquiring the endpoint
+> forces a call to resume.  In the case of HFP, this is bad.  I'm
+> currently needing to implement HFP "Audio Connection Transfer Towards
+> the AG".  Since I am the HS, all I need to do is drop the SCO
+> connection -- however, there is no interface to do this well.  I tried
+> implementing an SCO endpoint, since at least then the acquire and
+> release calls would bring up an SCO connection and then allow me to
+> drop it.  The issue here is that a phone that is connected via HFP
+> will have a MediaTransport even though the SCO connection will not yet
+> exist.  So, I get the SetConfiguration call which means I should be
+> good to go on calling acquire.  But, if I call acquire now, it will
+> create a useless SCO connection to my phone that then is dropped.
+> There's no reason at this point to open the SCO connection.  I would
+> rather be notified when the SCO connection exists, and have two
+> additional methods called suspend and resume.  In the case of HFP,
+> calling resume would eventually result in a new FD being pushed to me.
+
+Pushing maybe a good idea in case of not being the initiator the
+connection as you mentioned, in the other hand the endpoint may not be
+ready, or willing to use the fd, at that point so I would only signal
+that it is now available, otherwise the concept of using it on-demand
+in broken. Btw, this already is possible if you listen to
+Headset.State, also the interface was designed to have the connection
+on-demand, so you should only call Acquire when you gonna use the fd,
+anyway even in the case of audio transfer you maybe the initiator and
+should be able to directly control the connection via Acquire/Release
+to be able to do that so Resume/Suspend would not be that great even
+for IVI/carkit systems.
+
+
+
 -- 
-on behalf of ST-Ericsson
-
+Luiz Augusto von Dentz
