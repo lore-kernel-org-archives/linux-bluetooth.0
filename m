@@ -1,129 +1,217 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABax29X+ke_PO9obAxbEJjdx68g8JW4ZZn7vS7mYpE7+00iYng@mail.gmail.com>
-References: <CABax29VLUHg_jePnhHz_6WHYCZBHoir5TBLuauK+Ktfg9-8Xjw@mail.gmail.com>
-	<CACY+gR3t4RXuhUEi9486qsP+p0GCYArHW+PO5QfBfEUfnd=xEg@mail.gmail.com>
-	<CABax29X1tFt8Am_i7y5nZsjs_D2QY9pbv19316Wn6RVq7ksEDA@mail.gmail.com>
-	<CACY+gR2DeQE2UaYwD8AQonNxtZ+=uZm7qY+BaqgjBQKoZSZHYA@mail.gmail.com>
-	<CABax29U8N2nOge34tr=G2f-fZvowCHPf3V=N2an-vC+x=UBdiQ@mail.gmail.com>
-	<CACY+gR2PkP76J2Dw9xobpeGsU2HKhsOYvU6Wcx8WCcq1opihiA@mail.gmail.com>
-	<CABax29VadeA+6WZWRDiZZUhpRqk2Nk35__b0Cjfz8HO12Tq4vQ@mail.gmail.com>
-	<CACY+gR0DJfbOgfSGHrsAj5vk00v4-_+KYwR+SF+0BRRs2oYBkw@mail.gmail.com>
-	<CABax29X+ke_PO9obAxbEJjdx68g8JW4ZZn7vS7mYpE7+00iYng@mail.gmail.com>
-Date: Mon, 26 Mar 2012 10:43:35 +0300
-Message-ID: <CACY+gR0SW1giRr3AVA6BhaOf-N+bq5RtdRW609zGwCB3zJ57cw@mail.gmail.com>
-Subject: Re: A2DP quality (bluetooth-alsa)
-From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-To: qduaty <qduaty@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: chen.ganir@ti.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Chen Ganir <chen.ganir@ti.com>
+Subject: [PATCH v2 2/2] GATT: replace start/end with att_range
+Date: Mon, 26 Mar 2012 09:35:59 +0200
+Message-Id: <1332747359-15647-3-git-send-email-chen.ganir@ti.com>
+In-Reply-To: <1332747359-15647-1-git-send-email-chen.ganir@ti.com>
+References: <1332747359-15647-1-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Mar 14, 2012 at 2:53 PM, qduaty <qduaty@gmail.com> wrote:
-> 2012/3/13 Siarhei Siamashka <siarhei.siamashka@gmail.com>:
->> Are you now comparing streaming of A2DP audio from your phone to your
->> PC (using bluez A2DP sink) and to your bluetooth headset?
->
-> I assume that the phone streams data to the headset (whose session is
-> hard to dump on Windows mobile) with bitpool = 112, ie. the same it
-> fails to set in Bluez and I'm saying it gives good results in terms of
-> perceiveable quality, from which Bluez cannot take advantage due to
-> its inherent bitpool=53 limitation.
->
-> Anyway, I did some additional listening tests (by listening to Bluez
-> SBC on an A2DP headset). SBC_HIGH_PRECISION alone (without your hack)
-> only slightly improves quality. Also I finally managed to force higher
-> bitpool in ALSA (patch attached). This makes further improvement in
-> quality, at least on headsets that do not choke on higher bitpools.
+From: Chen Ganir <chen.ganir@ti.com>
 
-Do you have a hcidump log before and after patching bluez for the part
-where A2DP settings are negotiated? For normal bluez 4.99, this is
-what I get with Logitech FreePulse headset:
+Use att_range struct instead of individual start/end handles in
+gatt_primary structure
+---
+ attrib/client.c           |   10 +++++-----
+ attrib/gatt.c             |    4 ++--
+ attrib/gatt.h             |    3 +--
+ attrib/gatttool.c         |    2 +-
+ attrib/interactive.c      |    2 +-
+ proximity/monitor.c       |   12 ++++++------
+ src/adapter.c             |    4 ++--
+ src/device.c              |    6 +++---
+ thermometer/thermometer.c |    4 ++--
+ 9 files changed, 23 insertions(+), 24 deletions(-)
 
-> ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0040 len 8 [psm 25]
-      AVDTP(s): Discover rsp: transaction 11 nsp 0x00
-        ACP SEID 1 - Audio Sink
-        ACP SEID 2 - Audio Sink
-        ACP SEID 3 - Audio Sink
-< ACL data: handle 11 flags 0x00 dlen 7
-    L2CAP(d): cid 0x0200 len 3 [psm 25]
-      AVDTP(s): Capabilities cmd: transaction 12 nsp 0x00
-        ACP SEID 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 11 packets 1
-> ACL data: handle 11 flags 0x02 dlen 20
-    L2CAP(d): cid 0x0040 len 16 [psm 25]
-      AVDTP(s): Capabilities rsp: transaction 12 nsp 0x00
-        Media Transport
-        Media Codec - SBC
-          16kHz 32kHz 44.1kHz 48kHz
-          Mono DualChannel Stereo JointStereo
-          8 12 16 Blocks
-          4 8 Subbands
-          SNR Loudness
-          Bitpool Range 2-64
-        Content Protection
-          02 00
-< ACL data: handle 11 flags 0x00 dlen 7
-    L2CAP(d): cid 0x0200 len 3 [psm 25]
-      AVDTP(s): Capabilities cmd: transaction 13 nsp 0x00
-        ACP SEID 2
-> ACL data: handle 11 flags 0x02 dlen 20
-    L2CAP(d): cid 0x0040 len 16 [psm 25]
-      AVDTP(s): Capabilities rsp: transaction 13 nsp 0x00
-        Media Transport
-        Media Codec - SBC
-          16kHz 32kHz 44.1kHz 48kHz
-          Mono DualChannel Stereo JointStereo
-          4 Blocks
-          4 8 Subbands
-          SNR Loudness
-          Bitpool Range 2-32
-        Content Protection
-          02 00
-< ACL data: handle 11 flags 0x00 dlen 7
-    L2CAP(d): cid 0x0200 len 3 [psm 25]
-      AVDTP(s): Capabilities cmd: transaction 14 nsp 0x00
-        ACP SEID 3
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 11 packets 2
-> ACL data: handle 11 flags 0x02 dlen 24
-    L2CAP(d): cid 0x0040 len 20 [psm 25]
-      AVDTP(s): Capabilities rsp: transaction 14 nsp 0x00
-        Media Transport
-        Media Codec - non-A2DP
-          27 00 00 00 01 00 F7 77 02 56 00 FA
-< ACL data: handle 11 flags 0x00 dlen 18
-    L2CAP(d): cid 0x0200 len 14 [psm 25]
-      AVDTP(s): Set config cmd: transaction 15 nsp 0x00
-        ACP SEID 1 - INT SEID 1
-        Media Transport
-        Media Codec - SBC
-          44.1kHz
-          JointStereo
-          16 Blocks
-          8 Subbands
-          Loudness
-          Bitpool Range 2-53
-
-The headset reports 2-64 bitpool capabilities, but bluez sets bitpool
-to 53 because it does not use anything higher than suggested by
-'default_bitpool' function (actually in two places):
-    "max_bitpool = MIN(default_bitpool(cap->frequency,
-cap->channel_mode), supported->max_bitpool);"
-If I change this code, bitpool 64 can be used, however my ears are not
-trained enough to hear any differences between 53 and 64. By the way,
-high bitpool settings are causing problems for some users, so not
-everything is so clear:
-    https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/424215
-
-Would it be a good idea if you come up with a clean patch, making
-bitpool selection strategy tunable via a configuration file? Or
-implement some kind of heuristics based on whether EDR is supported or
-not?
-
+diff --git a/attrib/client.c b/attrib/client.c
+index 7c01514..c0e00c1 100644
+--- a/attrib/client.c
++++ b/attrib/client.c
+@@ -860,10 +860,10 @@ static void char_discovered_cb(GSList *characteristics, guint8 status,
+ 	}
+ 
+ 	if (previous_end)
+-		*previous_end = prim->end;
++		*previous_end = prim->range.end;
+ 
+ 	gatt_get_address(gatt, &sba, &dba);
+-	store_characteristics(&sba, &dba, prim->start, gatt->chars);
++	store_characteristics(&sba, &dba, prim->range.start, gatt->chars);
+ 
+ 	g_slist_foreach(gatt->chars, register_characteristic, gatt->path);
+ 
+@@ -899,7 +899,7 @@ static void send_discover(GAttrib *attrib, gpointer user_data)
+ 
+ 	gatt->attrib = g_attrib_ref(attrib);
+ 
+-	gatt_discover_char(gatt->attrib, prim->start, prim->end, NULL,
++	gatt_discover_char(gatt->attrib, prim->range.start, prim->range.end, NULL,
+ 						char_discovered_cb, qchr);
+ }
+ 
+@@ -1009,12 +1009,12 @@ static struct gatt_service *primary_register(DBusConnection *conn,
+ 	gatt->psm = psm;
+ 	gatt->conn = dbus_connection_ref(conn);
+ 	gatt->path = g_strdup_printf("%s/service%04x", device_path,
+-								prim->start);
++								prim->range.start);
+ 
+ 	g_dbus_register_interface(gatt->conn, gatt->path,
+ 					CHAR_INTERFACE, prim_methods,
+ 					NULL, NULL, gatt, NULL);
+-	gatt->chars = load_characteristics(gatt, prim->start);
++	gatt->chars = load_characteristics(gatt, prim->range.start);
+ 	g_slist_foreach(gatt->chars, register_characteristic, gatt->path);
+ 
+ 	return gatt;
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index 7cf718d..1c3ff78 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -193,8 +193,8 @@ static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ 			err = ATT_ECODE_INSUFF_RESOURCES;
+ 			goto done;
+ 		}
+-		primary->start = start;
+-		primary->end = end;
++		primary->range.start = start;
++		primary->range.end = end;
+ 		bt_uuid_to_string(&uuid, primary->uuid, sizeof(primary->uuid));
+ 		dp->primaries = g_slist_append(dp->primaries, primary);
+ 	}
+diff --git a/attrib/gatt.h b/attrib/gatt.h
+index cf37914..1732270 100644
+--- a/attrib/gatt.h
++++ b/attrib/gatt.h
+@@ -27,8 +27,7 @@ typedef void (*gatt_cb_t) (GSList *l, guint8 status, gpointer user_data);
+ 
+ struct gatt_primary {
+ 	char uuid[MAX_LEN_UUID_STR + 1];
+-	uint16_t start;
+-	uint16_t end;
++	struct att_range range;
+ };
+ 
+ struct gatt_char {
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index 24a85a4..21514af 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -148,7 +148,7 @@ static void primary_all_cb(GSList *services, guint8 status, gpointer user_data)
+ 	for (l = services; l; l = l->next) {
+ 		struct gatt_primary *prim = l->data;
+ 		g_print("attr handle = 0x%04x, end grp handle = 0x%04x "
+-			"uuid: %s\n", prim->start, prim->end, prim->uuid);
++			"uuid: %s\n", prim->range.start, prim->range.end, prim->uuid);
+ 	}
+ 
+ done:
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 2d650d6..5941811 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -163,7 +163,7 @@ static void primary_all_cb(GSList *services, guint8 status, gpointer user_data)
+ 	for (l = services; l; l = l->next) {
+ 		struct gatt_primary *prim = l->data;
+ 		printf("attr handle: 0x%04x, end grp handle: 0x%04x "
+-			"uuid: %s\n", prim->start, prim->end, prim->uuid);
++			"uuid: %s\n", prim->range.start, prim->range.end, prim->uuid);
+ 	}
+ 
+ 	rl_forced_update_display();
+diff --git a/proximity/monitor.c b/proximity/monitor.c
+index f3d5b2d..687b41c 100644
+--- a/proximity/monitor.c
++++ b/proximity/monitor.c
+@@ -617,8 +617,8 @@ int monitor_register(DBusConnection *conn, struct btd_device *device,
+ 
+ 	if (linkloss && enabled->linkloss) {
+ 		monitor->linkloss = g_new0(struct att_range, 1);
+-		monitor->linkloss->start = linkloss->start;
+-		monitor->linkloss->end = linkloss->end;
++		monitor->linkloss->start = linkloss->range.start;
++		monitor->linkloss->end = linkloss->range.end;
+ 
+ 		monitor->enabled.linkloss = TRUE;
+ 	}
+@@ -626,16 +626,16 @@ int monitor_register(DBusConnection *conn, struct btd_device *device,
+ 	if (immediate) {
+ 		if (txpower && enabled->pathloss) {
+ 			monitor->txpower = g_new0(struct att_range, 1);
+-			monitor->txpower->start = txpower->start;
+-			monitor->txpower->end = txpower->end;
++			monitor->txpower->start = txpower->range.start;
++			monitor->txpower->end = txpower->range.end;
+ 
+ 			monitor->enabled.pathloss = TRUE;
+ 		}
+ 
+ 		if (enabled->pathloss || enabled->findme) {
+ 			monitor->immediate = g_new0(struct att_range, 1);
+-			monitor->immediate->start = immediate->start;
+-			monitor->immediate->end = immediate->end;
++			monitor->immediate->start = immediate->range.start;
++			monitor->immediate->end = immediate->range.end;
+ 		}
+ 
+ 		monitor->enabled.findme = enabled->findme;
+diff --git a/src/adapter.c b/src/adapter.c
+index c66968d..fa879af 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1899,8 +1899,8 @@ static GSList *string_to_primary_list(char *str)
+ 
+ 		prim = g_new0(struct gatt_primary, 1);
+ 
+-		ret = sscanf(services[i], "%04hX#%04hX#%s", &prim->start,
+-							&prim->end, prim->uuid);
++		ret = sscanf(services[i], "%04hX#%04hX#%s", &prim->range.start,
++							&prim->range.end, prim->uuid);
+ 
+ 		if (ret < 3) {
+ 			g_free(prim);
+diff --git a/src/device.c b/src/device.c
+index c470ab1..eab7e4c 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1546,8 +1546,8 @@ GSList *device_services_from_record(struct btd_device *device, GSList *profiles)
+ 			continue;
+ 
+ 		prim = g_new0(struct gatt_primary, 1);
+-		prim->start = start;
+-		prim->end = end;
++		prim->range.start = start;
++		prim->range.end = end;
+ 		sdp_uuid2strn(&prim_uuid, prim->uuid, sizeof(prim->uuid));
+ 
+ 		prim_list = g_slist_append(prim_list, prim);
+@@ -1706,7 +1706,7 @@ static char *primary_list_to_string(GSList *primary_list)
+ 		memset(service, 0, sizeof(service));
+ 
+ 		snprintf(service, sizeof(service), "%04X#%04X#%s ",
+-				primary->start, primary->end, primary->uuid);
++				primary->range.start, primary->range.end, primary->uuid);
+ 
+ 		services = g_string_append(services, service);
+ 	}
+diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
+index de4e647..a64ed54 100644
+--- a/thermometer/thermometer.c
++++ b/thermometer/thermometer.c
+@@ -1220,8 +1220,8 @@ int thermometer_register(DBusConnection *connection, struct btd_device *device,
+ 	t->conn = dbus_connection_ref(connection);
+ 	t->dev = btd_device_ref(device);
+ 	t->svc_range = g_new0(struct att_range, 1);
+-	t->svc_range->start = tattr->start;
+-	t->svc_range->end = tattr->end;
++	t->svc_range->start = tattr->range.start;
++	t->svc_range->end = tattr->range.end;
+ 
+ 	if (!g_dbus_register_interface(t->conn, path, THERMOMETER_INTERFACE,
+ 				thermometer_methods, thermometer_signals,
 -- 
-Best regards,
-Siarhei Siamashka
+1.7.4.1
+
