@@ -1,31 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 26 Mar 2012 00:45:47 -0300
-Message-ID: <CAMBjcSuF_CvWAOvMdS53aR8vm3tRam8+qeEhjcaaoCygn0U=Fw@mail.gmail.com>
-Subject: GSoC Projects
-From: "Thiago S. A." <thiago.xth1@gmail.com>
+Date: Sun, 25 Mar 2012 23:43:30 -0300
+From: Ivan Sichmann Freitas <ivansichfreitas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [GSoC 2012] BlueZ: Basic Printing Profile
+Message-ID: <20120326024330.GD13076@shungokusatsu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-I am a master student in computer science at Unicamp, Brazil.
-I program in C / C + + for four years and have experience with STL,
-OpenGL, SDL  and I am studying glib.
+Hello,
 
-I was interested mainly by the projects "Implement AVRCP 1.3
-Controller Role"and "Visualization of Bluetooth traffic" for the BlueZ
-GSoC.
-To better understand the projects I researched the repository and I am
-studying the source code.
+My name is Ivan, and I'm a computer engineering student at Unicamp,
+Brazil. I'm interested in implementing the BPP on bluez. I have
+moderated C and C++ knowledge, and I'm already reading the BPP specs and
+bluez's code.
 
-For the first project I'm reading the specification of AVRCP 1.3
-(available in bluetooth dot org) and analyzing the code files
-controller.c, media.c and avrcp.c of the audio folder.
+Any feedback would be welcome.
 
-For the second project I researched about the bustle for the D-Bus and
-so I could see how the tool should be, I also discovered that the
-bustle uses GTK for the graphical interface.
-
-I appreciate any hint.
+-- 
+Ivan Sichmann Freitas
+GNU/Linux user #509059
