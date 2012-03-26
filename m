@@ -1,299 +1,381 @@
 Return-Path: <cyrus@holtmann.org>
 From: Vani-dineshbhai PATEL X <vani.patel@stericsson.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 26 Mar 2012 15:31:21 +0200
-Subject: RFC:[PATCH Bluez 3/3] Support for handling Browsing commands added
-Message-ID: <747C1E83C744F44E9ACFB89FAEEC2C7B21A7973F2B@EXDCVYMBSTM005.EQ1STM.local>
+Date: Mon, 26 Mar 2012 15:31:07 +0200
+Subject: RFC:[PATCH Bluez 2/3] Browsing Channel creation for AVRCP 1.4
+Message-ID: <747C1E83C744F44E9ACFB89FAEEC2C7B21A7973F2A@EXDCVYMBSTM005.EQ1STM.local>
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for Handling Browsing commands from CT.
+This patch is for creation of browsing server socket and browsing session creation. 
 
->From 78ed0bc53d99ba68a25f3a0ddb0f273f6e57e3b3 Mon Sep 17 00:00:00 2001
+>From 0a8c2327a90c7ea5ec8658b99a240f3ecbd2aecd Mon Sep 17 00:00:00 2001
 From: Vani Patel <vani.patel@stericsson.com>
-Date: Mon, 26 Mar 2012 18:45:42 +0530
-Subject: [PATCH Bluez 3/3] Support for handling Browsing commands added
+Date: Mon, 26 Mar 2012 14:44:23 +0530
+Subject: [PATCH Bluez 2/3] Browsing Channel creation for AVRCP 1.4
 
 ---
- audio/avctp.c |   89 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- audio/avctp.h |    7 ++++
- audio/avrcp.c |   58 +++++++++++++++++++++++++++++++++++++
- audio/avrcp.h |    2 +
- 4 files changed, 156 insertions(+), 0 deletions(-)
+ audio/avctp.c |  217 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ audio/avctp.h |    3 +
+ audio/avrcp.h |    4 +
+ 3 files changed, 224 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 audio/avctp.c
+ mode change 100644 => 100755 audio/avctp.h
+ mode change 100644 => 100755 audio/avrcp.h
 
 diff --git a/audio/avctp.c b/audio/avctp.c
-index ff4aa30..03b3020 100755
+old mode 100644
+new mode 100755
+index dfad9fd..ff4aa30
 --- a/audio/avctp.c
 +++ b/audio/avctp.c
-@@ -68,6 +68,8 @@
- #define AVCTP_PACKET_CONTINUE	2
- #define AVCTP_PACKET_END	3
+@@ -40,6 +40,7 @@
  
-+#define E_INVALID_COMMAND	0x00
-+
- #if __BYTE_ORDER == __LITTLE_ENDIAN
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/sdp.h>
++#include <bluetooth/l2cap.h>
  
- struct avctp_header {
-@@ -155,6 +157,28 @@ struct avctp_browsing_pdu_handler {
+ #include <glib.h>
+ 
+@@ -118,6 +119,7 @@ struct avctp_state_callback {
+ struct avctp_server {
+ 	bdaddr_t src;
+ 	GIOChannel *io;
++	GIOChannel *b_io;
+ 	GSList *sessions;
+ };
+ 
+@@ -130,9 +132,12 @@ struct avctp {
+ 	int uinput;
+ 
+ 	GIOChannel *io;
++	GIOChannel *b_io;
+ 	guint io_id;
++	guint b_io_id;
+ 
+ 	uint16_t mtu;
++	uint16_t b_mtu;
+ 
+ 	uint8_t key_quirks[256];
+ };
+@@ -144,6 +149,12 @@ struct avctp_pdu_handler {
  	unsigned int id;
  };
  
-+struct browsed_player_param {
-+        uint8_t status;
-+        uint16_t uid_counter;
-+        uint32_t no_of_items;
-+        uint16_t cs_id;
-+        uint8_t folder_depth;
-+        uint8_t folders[];
-+} __attribute__ ((packed));
-+
-+struct avrcp_browsing_frame {
-+        struct {
-+                struct avctp_header avctp_hdr;
-+                struct avrcp_browsing_header avrcp_pdu;
-+        } __attribute__ ((packed)) hdr;
-+        union {
-+                uint8_t status;
-+                struct browsed_player_param brws_player_param;
-+                uint8_t *param;
-+        } pdu;
-+} __attribute__ ((packed));
-+
++struct avctp_browsing_pdu_handler {
++	avctp_browsing_pdu_cb cb;
++	void *user_data;
++	unsigned int id;
++};
 +
  static struct {
  	const char *name;
  	uint8_t avc;
-@@ -1196,6 +1220,25 @@ unsigned int avctp_register_pdu_handler(uint8_t opcode, avctp_pdu_cb cb,
- 	return handler->id;
+@@ -162,6 +173,7 @@ static struct {
+ static GSList *callbacks = NULL;
+ static GSList *servers = NULL;
+ static GSList *handlers = NULL;
++static GSList *browsing_handlers = NULL;
+ 
+ static void auth_cb(DBusError *derr, void *user_data);
+ 
+@@ -307,6 +319,16 @@ static struct avctp_pdu_handler *find_handler(GSList *list, uint8_t opcode)
+ 	return NULL;
  }
  
-+unsigned int avctp_register_browsing_pdu_handler(avctp_browsing_pdu_cb cb,
-+							void *user_data)
++static struct avctp_browsing_pdu_handler *find_browsing_handler(GSList *list)
 +{
++	for (; list; list = list->next) {
++		struct avctp_browsing_pdu_handler *handler = list->data;
++			return handler;
++	}
++
++	return NULL;
++}
++
+ static void avctp_disconnected(struct avctp *session)
+ {
+ 	struct avctp_server *server = session->server;
+@@ -392,6 +414,47 @@ static void avctp_set_state(struct avctp *session, avctp_state_t new_state)
+ 		return;
+ 	}
+ }
++static gboolean session_browsing_cb(GIOChannel *chan, GIOCondition cond,
++				gpointer data)
++{
++	struct avctp *session = data;
++	uint8_t buf[1024], *operands;
++	struct avctp_header *avctp;
++	int ret = 0, packet_size = 0, operand_count = 0, sock;
 +	struct avctp_browsing_pdu_handler *b_handler;
-+	static unsigned int id = 0;
++
++	if (!(cond & G_IO_IN))
++		return FALSE;
++
++	sock = g_io_channel_unix_get_fd(session->b_io);
++	ret = read(sock, buf, sizeof(buf));
++
++	if (ret <= 0)
++		return FALSE;
++
++	if ((unsigned int) ret < sizeof(struct avctp_header)) {
++		error("session_browsing_cb Too small AVCTP packet");
++		return FALSE;
++	}
++
++	avctp = (struct avctp_header *) buf;
++	operands = buf + sizeof(struct avctp_header);
++	ret -= sizeof(struct avctp_header);
++	ret -= sizeof(struct avrcp_browsing_header);
++	operand_count = ret;
 +
 +	b_handler = find_browsing_handler(browsing_handlers);
-+	if (b_handler)
-+		return 0;
++	if (b_handler->cb)
++		packet_size = b_handler->cb(session, avctp->transaction, operands, operand_count, b_handler->user_data);
 +
-+	b_handler = g_new(struct avctp_browsing_pdu_handler, 1);
-+	b_handler->cb = cb;
-+	b_handler->user_data = user_data;
-+	b_handler->id = ++id;
-+
-+	browsing_handlers = g_slist_append(browsing_handlers, b_handler);
-+
-+	return b_handler->id;
++	if (packet_size != 0) {
++		ret = write(sock, buf, packet_size);
++		if (ret != packet_size)
++			return FALSE;
++	}
++	return TRUE;
 +}
- gboolean avctp_unregister_pdu_handler(unsigned int id)
- {
- 	GSList *l;
-@@ -1213,6 +1256,23 @@ gboolean avctp_unregister_pdu_handler(unsigned int id)
- 	return FALSE;
++
+ 
+ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 				gpointer data)
+@@ -572,6 +635,46 @@ static void init_uinput(struct avctp *session)
+ 		DBG("AVRCP: uinput initialized for %s", address);
  }
  
-+gboolean avctp_unregister_browsing_pdu_handler(unsigned int id)
++static void avctp_connect_browsing_cb(GIOChannel *chan,
++					GError *err,
++					gpointer data)
 +{
-+	GSList *l;
++	struct avctp *session = data;
++	char address[18];
++	uint16_t imtu;
++	GError *gerr = NULL;
 +
-+	for (l = browsing_handlers; l != NULL; l = l->next) {
-+		struct avctp_browsing_pdu_handler *b_handler = l->data;
++	if (err) {
++		error("%s", err->message);
++		g_io_channel_shutdown(chan, TRUE, NULL);
++		g_io_channel_unref(chan);
++		session->b_io = NULL;
++		return;
++	}
 +
-+		if (b_handler->id == id) {
-+			browsing_handlers = g_slist_remove(browsing_handlers, b_handler);
-+			g_free(b_handler);
-+			return TRUE;
++	bt_io_get(chan, BT_IO_L2CAP, &gerr,
++			BT_IO_OPT_DEST, &address,
++			BT_IO_OPT_IMTU, &imtu,
++			BT_IO_OPT_INVALID);
++	if (gerr) {
++		error("%s", err->message);
++		g_io_channel_shutdown(chan, TRUE, NULL);
++		g_io_channel_unref(chan);
++		session->b_io = NULL;
++		error("%s", gerr->message);
++		g_error_free(gerr);
++
++		return;
++	}
++	if (!session->b_io)
++		session->b_io = g_io_channel_ref(chan);
++
++	session->b_mtu = imtu;
++
++	session->b_io_id = g_io_add_watch(chan,
++				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++				(GIOFunc) session_browsing_cb, session);
++}
+ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ {
+ 	struct avctp *session = data;
+@@ -610,6 +713,27 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ 				(GIOFunc) session_cb, session);
+ }
+ 
++static void auth_browsing_cb(DBusError *derr, void *user_data)
++{
++	struct avctp *session = user_data;
++	GError *err = NULL;
++
++	if (session->b_io_id) {
++		g_source_remove(session->io_id);
++		session->b_io_id = 0;
++	}
++
++	if (derr && dbus_error_is_set(derr)) {
++		error("Access denied: %s", derr->message);
++		return;
++	}
++	if (!bt_io_accept(session->b_io, avctp_connect_browsing_cb, session,
++								NULL, &err)) {
++		error("bt_io_accept: %s", err->message);
++		g_error_free(err);
++	}
++}
++
+ static void auth_cb(DBusError *derr, void *user_data)
+ {
+ 	struct avctp *session = user_data;
+@@ -688,6 +812,70 @@ static struct avctp *avctp_get_internal(const bdaddr_t *src,
+ 	return session;
+ }
+ 
++static void avctp_confirm_browsing_cb(GIOChannel *chan, gpointer data)
++{
++	struct avctp *session;
++	struct audio_device *dev;
++	char address[18];
++	bdaddr_t src, dst;
++	GError *err = NULL;
++
++	bt_io_get(chan, BT_IO_L2CAP, &err,
++			BT_IO_OPT_SOURCE_BDADDR, &src,
++			BT_IO_OPT_DEST_BDADDR, &dst,
++			BT_IO_OPT_DEST, address,
++			BT_IO_OPT_INVALID);
++	if (err) {
++		g_error_free(err);
++		g_io_channel_shutdown(chan, TRUE, NULL);
++		return;
++	}
++
++	session = avctp_get_internal(&src, &dst);
++	if (!session)
++		goto drop;
++
++	dev = manager_get_device(&src, &dst, FALSE);
++	if (!dev) {
++		dev = manager_get_device(&src, &dst, TRUE);
++		if (!dev) {
++			error("Unable to get audio device object for %s",
++					address);
++			goto drop;
 +		}
 +	}
 +
-+	return FALSE;
++	if (dev->control == NULL) {
++		btd_device_add_uuid(dev->btd_dev, AVRCP_REMOTE_UUID);
++		if (dev->control == NULL)
++			goto drop;
++	}
++
++	if (!session->io) {
++		error("Refusing unexpected connect from %s", address);
++		goto drop;
++	}
++
++	if (session->b_io) {
++		error("%s: Refusing unexpected browsing connect from "
++			"Browsing channel already exist %s", __func__, address);
++		goto drop;
++	}
++
++	session->b_io = g_io_channel_ref(chan);
++
++	if (audio_device_request_authorization(dev, AVRCP_TARGET_UUID,
++						auth_browsing_cb, session) < 0)
++		goto drop;
++	return;
++
++drop:
++	if (!session || !session->io || !session->b_io)
++		g_io_channel_shutdown(chan, TRUE, NULL);
++	if (session && session->b_io)
++		g_io_channel_unref(session->b_io);
 +}
 +
- struct avctp *avctp_connect(const bdaddr_t *src, const bdaddr_t *dst)
+ static void avctp_confirm_cb(GIOChannel *chan, gpointer data)
  {
  	struct avctp *session;
-@@ -1257,3 +1317,32 @@ struct avctp *avctp_get(const bdaddr_t *src, const bdaddr_t *dst)
- {
- 	return avctp_get_internal(src, dst);
+@@ -773,6 +961,27 @@ static GIOChannel *avctp_server_socket(const bdaddr_t *src, gboolean master)
+ 	return io;
  }
-+
-+void avctp_browsing_rej_rsp(struct avctp *session, uint8_t transaction,
-+                                uint8_t pdu_id, uint8_t status_code)
+ 
++static GIOChannel *avctp_server_browsing_socket(const bdaddr_t *src, gboolean master)
 +{
-+	struct avrcp_browsing_frame resp;
-+	uint8_t length=0;
-+	int sock;
++	GError *err = NULL;
++	GIOChannel *b_io;
 +
-+	resp.hdr.avctp_hdr.cr = AVCTP_RESPONSE;
-+	resp.hdr.avctp_hdr.ipid = FALSE;
-+	resp.hdr.avctp_hdr.packet_type = AVCTP_PACKET_SINGLE;
-+	resp.hdr.avctp_hdr.pid = htons(AV_REMOTE_PROFILE_ID);
-+	resp.hdr.avctp_hdr.transaction = transaction;
-+	resp.hdr.avrcp_pdu.pdu_id = pdu_id;
-+	resp.pdu.status = status_code;
++	b_io = bt_io_listen(BT_IO_L2CAP, NULL, avctp_confirm_browsing_cb, NULL,
++				NULL, &err,
++				BT_IO_OPT_SOURCE_BDADDR, src,
++				BT_IO_OPT_PSM, AVCTP_BROWSING_PSM,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
++				BT_IO_OPT_MASTER, master,
++				BT_IO_OPT_MODE, L2CAP_MODE_ERTM,
++				BT_IO_OPT_INVALID);
++	if (!b_io) {
++		error("%s", err->message);
++		g_error_free(err);
++	}
 +
-+	length = sizeof(resp.pdu.status);
-+	resp.hdr.avrcp_pdu.param_len = htons(length);
-+	resp.pdu.status = status_code;
-+
-+	length += sizeof(resp.hdr);
-+	
-+	sock = g_io_channel_unix_get_fd(session->b_io);
-+	int ret = write(sock, &resp, length);
-+	if (ret < 0)
-+		DBG ("Write failed \n");
-+
++	return b_io;
 +}
 +
+ static unsigned int passthrough_id = 0;
+ static unsigned int unit_id = 0;
+ static unsigned int subunit_id = 0;
+@@ -790,6 +999,11 @@ int avctp_register(const bdaddr_t *src, gboolean master)
+ 		g_free(server);
+ 		return -1;
+ 	}
++	server->b_io = avctp_server_browsing_socket(src, master);
++	if (!server->b_io) {
++		g_free(server);
++		return -1;
++	}
+ 
+ 	bacpy(&server->src, src);
+ 
+@@ -822,6 +1036,9 @@ void avctp_unregister(const bdaddr_t *src)
+ 		avctp_disconnected(server->sessions->data);
+ 
+ 	servers = g_slist_remove(servers, server);
++	g_io_channel_shutdown(server->b_io, TRUE, NULL);
++	g_io_channel_unref(server->b_io);
++	server->b_io = NULL;
+ 
+ 	g_io_channel_shutdown(server->io, TRUE, NULL);
+ 	g_io_channel_unref(server->io);
 diff --git a/audio/avctp.h b/audio/avctp.h
-index a97fec5..dd586f7 100755
+old mode 100644
+new mode 100755
+index fb6be2f..a97fec5
 --- a/audio/avctp.h
 +++ b/audio/avctp.h
-@@ -63,6 +63,7 @@
- #define BACKWARD_OP			0x4c
- 
- struct avctp;
-+struct avrcp_browsing_frame;
- 
- typedef enum {
- 	AVCTP_STATE_DISCONNECTED = 0,
-@@ -97,7 +98,13 @@ unsigned int avctp_register_pdu_handler(uint8_t opcode, avctp_pdu_cb cb,
- 							void *user_data);
- gboolean avctp_unregister_pdu_handler(unsigned int id);
- 
-+unsigned int avctp_register_browsing_pdu_handler(avctp_browsing_pdu_cb cb,
-+							void *user_data);
-+
-+gboolean avctp_unregister_browsing_pdu_handler(unsigned int id);
- int avctp_send_passthrough(struct avctp *session, uint8_t op);
- int avctp_send_vendordep(struct avctp *session, uint8_t transaction,
- 				uint8_t code, uint8_t subunit,
- 				uint8_t *operands, size_t operand_count);
-+void avctp_rej_response(struct avctp *session, uint8_t transaction,
-+				uint8_t pdu_id, uint8_t status_code);
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 4219572..ede25c5 100755
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -63,6 +63,7 @@
- #define E_INVALID_PARAM		0x01
- #define E_PARAM_NOT_FOUND	0x02
- #define E_INTERNAL		0x03
-+#define E_NO_ERR		0x04
- 
- /* Packet types */
- #define AVRCP_PACKET_TYPE_SINGLE	0x00
-@@ -149,6 +150,7 @@ struct avrcp_player {
- 	struct audio_device *dev;
- 
- 	unsigned int handler;
-+	unsigned int browsing_handler;
- 	uint16_t registered_events;
- 	uint8_t transaction_events[AVRCP_EVENT_LAST + 1];
- 	struct pending_pdu *pending_pdu;
-@@ -1052,6 +1054,14 @@ static struct pdu_handler {
- 		{ },
- };
- 
-+static struct pdu_browsing_handler {
-+	uint8_t pdu_id;
-+	uint8_t (*func) (struct avrcp_player *player,
-+					struct avrcp_browsing_header *pdu);
-+	} browsing_handlers[] = {
-+		{},
-+};
-+
- /* handle vendordep pdu inside an avctp packet */
- static size_t handle_vendordep_pdu(struct avctp *session, uint8_t transaction,
+@@ -79,6 +79,9 @@ typedef size_t (*avctp_pdu_cb) (struct avctp *session, uint8_t transaction,
  					uint8_t *code, uint8_t *subunit,
-@@ -1111,6 +1121,44 @@ err_metadata:
- 	return AVRCP_HEADER_LENGTH + 1;
- }
- 
-+static size_t handle_browsing_pdu(struct avctp *session, uint8_t transaction,
+ 					uint8_t *operands, size_t operand_count,
+ 					void *user_data);
++typedef size_t (*avctp_browsing_pdu_cb) (struct avctp *session, uint8_t transaction,
 +					uint8_t *operands, size_t operand_count,
-+					void *user_data)
-+{
-+	struct avrcp_player *player = user_data;
-+	struct pdu_browsing_handler *b_handler;
-+	struct avrcp_browsing_header *avrcp_browsing = (void *) operands;
-+	int status = E_NO_ERR;
-+	
-+	player->session = session;
-+	
-+	for (b_handler = browsing_handlers; b_handler; b_handler++) {
-+		if (b_handler->pdu_id == avrcp_browsing->pdu_id)
-+			break;
-+	}
-+
-+	if (!b_handler) {
-+		status = E_INVALID_COMMAND;
-+		goto err;
-+	}
-+
-+	if (!b_handler->func) {
-+		status = E_INVALID_PARAM;
-+		goto err;
-+	}
-+	
-+	player->transaction_events[0] = transaction;
-+
-+	if(!b_handler->func(player, avrcp_browsing)) 
-+		return 0;
-+	else 
-+		return AVRCP_BROWSING_HEADER_LENGTH + ntohs(avrcp_browsing->param_len);
-+	
-+err:
-+	avctp_browsing_rej_rsp(session, player->transaction_events[0], b_handler->pdu_id, status);
-+	return 0;
-+}
-+
- size_t avrcp_handle_vendor_reject(uint8_t *code, uint8_t *operands)
- {
-     struct avrcp_header *pdu = (void *) operands;
-@@ -1161,16 +1209,26 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
- 			avctp_unregister_pdu_handler(player->handler);
- 			player->handler = 0;
- 		}
-+		if (player->browsing_handler) {
-+			avctp_unregister_browsing_pdu_handler(player->browsing_handler);
-+			player->browsing_handler = 0;
-+		}
++					void *user_data);
  
- 		break;
- 	case AVCTP_STATE_CONNECTING:
- 		player->session = avctp_connect(&dev->src, &dev->dst);
-+		if (!player->dev) 
-+			player->dev = dev;
- 
- 		if (!player->handler)
- 			player->handler = avctp_register_pdu_handler(
- 							AVC_OP_VENDORDEP,
- 							handle_vendordep_pdu,
- 							player);
-+		if(!player->browsing_handler)
-+			player->browsing_handler = avctp_register_browsing_pdu_handler(
-+							handle_browsing_pdu,
-+							player);
- 		break;
- 	default:
- 		return;
+ unsigned int avctp_add_state_cb(avctp_state_cb cb, void *user_data);
+ gboolean avctp_remove_state_cb(unsigned int id);
 diff --git a/audio/avrcp.h b/audio/avrcp.h
-index 2aeec7d..db49ff9 100755
+old mode 100644
+new mode 100755
+index 8a09546..2aeec7d
 --- a/audio/avrcp.h
 +++ b/audio/avrcp.h
-@@ -79,6 +79,8 @@ struct avrcp_browsing_header {
- 	uint8_t pdu_id;
- 	uint16_t param_len;
- } __attribute__ ((packed));
-+#define AVRCP_BROWSING_HEADER_LENGTH 3
-+
+@@ -75,6 +75,10 @@
+ #define AVRCP_EVENT_TRACK_REACHED_START	0x04
+ #define AVRCP_EVENT_LAST		AVRCP_EVENT_TRACK_REACHED_START
+ 
++struct avrcp_browsing_header {
++	uint8_t pdu_id;
++	uint16_t param_len;
++} __attribute__ ((packed));
  struct avrcp_player_cb {
  	int (*get_setting) (uint8_t attr, void *user_data);
  	int (*set_setting) (uint8_t attr, uint8_t value, void *user_data);
 -- 
 1.7.5.4
 
+- Vani Patel
