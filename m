@@ -1,50 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1332774906.1870.98.camel@aeonflux>
-Subject: Re: RFC/CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
- 2012 (Barcelona?)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "John W. Linville" <linville@tuxdriver.com>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Date: Mon, 26 Mar 2012 17:15:06 +0200
-In-Reply-To: <20120326145433.GE13806@tuxdriver.com>
-References: <20120322192406.GB2432@tuxdriver.com>
-	 <1332698585.1870.88.camel@aeonflux> <20120326145433.GE13806@tuxdriver.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1332765928-6251-1-git-send-email-chen.ganir@ti.com>
+References: <1332765928-6251-1-git-send-email-chen.ganir@ti.com>
+Date: Mon, 26 Mar 2012 11:09:56 -0400
+Message-ID: <CAJdJm_O1yiniHrn3kZNSPCdY=SMuX_FNuf66QJCCYqv9wLjHAg@mail.gmail.com>
+Subject: Re: [PATCH 0/5] Add DeviceInformationService plugin
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: chen.ganir@ti.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Chen,
 
-> > > Given the potential to expand this into a larger event, we would
-> > > likely need to be somewhat more formal about having proposals for
-> > > speaking slots.  In that case, we might require a program committee
-> > > for reviewing proposals, etc.  Anyone interested in participating in
-> > > speaking at the mini-summit or in reviewing speaking proposals should
-> > > contact me or reply in this thread.
-> > 
-> > When you and I talked originally about this, we discussed the format a
-> > little bit. In theory we have a bunch of options here. One of the
-> > original thoughts was 1-2 day mini-conference and 1 day break-out
-> > sessions. I assume 6 presentation per day is maximum. Is it enough to
-> > just do 1 day?
-> 
-> I don't think that 1 day is enough.  2 might not be enough, depending
-> on how we stage it.  Do you think that we would have more than one
-> "track" (e.g. separate Blueooth/802.11/NFC sessions)?  A single
-> "plenary" session?  Or some mix?
+On Mon, Mar 26, 2012 at 8:45 AM,  <chen.ganir@ti.com> wrote:
+> From: Chen Ganir <chen.ganir@ti.com>
+>
+> Add Device Information Service GATT Client for reading peer
+> device PNP_ID and store it.
+>
+> Chen Ganir (5):
+>  Add DeviceInformation GATT Client
+>  DeviceInfo: Add connection logic
+>  DeviceInfo: Discover Characteristics
+>  Fix device version in GetProperties
+>  DeviceInfo: Read PNP ID
+>
+>  Makefile.am             |    9 ++-
+>  deviceinfo/deviceinfo.c |  218 +++++++++++++++++++++++++++++++++++++++++++++++
+>  deviceinfo/deviceinfo.h |   24 +++++
+>  deviceinfo/main.c       |   55 ++++++++++++
+>  deviceinfo/manager.c    |   82 ++++++++++++++++++
+>  deviceinfo/manager.h    |   24 +++++
+>  src/device.c            |   35 +++++++-
+>  src/device.h            |    3 +
+>  8 files changed, 446 insertions(+), 4 deletions(-)
+>  create mode 100644 deviceinfo/deviceinfo.c
+>  create mode 100644 deviceinfo/deviceinfo.h
+>  create mode 100644 deviceinfo/main.c
+>  create mode 100644 deviceinfo/manager.c
+>  create mode 100644 deviceinfo/manager.h
 
-so what about 2 days single track and 1 day with breakout sessions. So
-we could do 12 talks with morning and afternoon sessions on the 3rd day
-as needed.
+Except for the build error, I see no other issues on the GATT part of
+these patches. Someone else needs to review/comment on the part
+touching src/device.c though (maybe Johan himself?)
 
-If we have many proposals for presentations, we can always go switch to
-2 tracks. If we require LinuxCon registration, then it should be no
-problem to get a second room. If not, I have to negotiate with Angela
-next week ;)
-
-Regards
-
-Marcel
-
-
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
