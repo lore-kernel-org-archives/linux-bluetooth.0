@@ -1,48 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 26 Mar 2012 18:20:42 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
-	pkrystad@codeaurora.org, marcel@holtmann.org
-Subject: Re: [PATCH 4/4] Bluetooth: Functions parsing or generating ERTM
- control fields
-Message-ID: <20120326152040.GE18219@aemeltch-MOBL1>
-References: <1332547018-19468-1-git-send-email-mathewm@codeaurora.org>
- <1332547018-19468-5-git-send-email-mathewm@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332547018-19468-5-git-send-email-mathewm@codeaurora.org>
+Message-ID: <1332774906.1870.98.camel@aeonflux>
+Subject: Re: RFC/CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
+ 2012 (Barcelona?)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "John W. Linville" <linville@tuxdriver.com>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Date: Mon, 26 Mar 2012 17:15:06 +0200
+In-Reply-To: <20120326145433.GE13806@tuxdriver.com>
+References: <20120322192406.GB2432@tuxdriver.com>
+	 <1332698585.1870.88.camel@aeonflux> <20120326145433.GE13806@tuxdriver.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi John,
 
-On Fri, Mar 23, 2012 at 04:56:58PM -0700, Mat Martineau wrote:
-> These functions encode or decode ERTM control fields (extended or
-> enhanced) to or from the new l2cap_control structure.
+> > > Given the potential to expand this into a larger event, we would
+> > > likely need to be somewhat more formal about having proposals for
+> > > speaking slots.  In that case, we might require a program committee
+> > > for reviewing proposals, etc.  Anyone interested in participating in
+> > > speaking at the mini-summit or in reviewing speaking proposals should
+> > > contact me or reply in this thread.
+> > 
+> > When you and I talked originally about this, we discussed the format a
+> > little bit. In theory we have a bunch of options here. One of the
+> > original thoughts was 1-2 day mini-conference and 1 day break-out
+> > sessions. I assume 6 presentation per day is maximum. Is it enough to
+> > just do 1 day?
 > 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  net/bluetooth/l2cap_core.c |  120 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 120 insertions(+)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index ad73696..890cfb9 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -787,6 +787,118 @@ static inline void l2cap_send_rr_or_rnr(struct l2cap_chan *chan, u32 control)
->  	l2cap_send_sframe(chan, control);
->  }
->  
-> +static u16 __pack_enhanced_control(struct l2cap_ctrl *control)
-> +{
-> +	u16 packed;
-> +
-> +	packed = (control->reqseq << L2CAP_CTRL_REQSEQ_SHIFT) &
-> +		L2CAP_CTRL_REQSEQ;
-> +	packed |= (control->final << L2CAP_CTRL_FINAL_SHIFT) &
-> +		L2CAP_CTRL_FINAL;
+> I don't think that 1 day is enough.  2 might not be enough, depending
+> on how we stage it.  Do you think that we would have more than one
+> "track" (e.g. separate Blueooth/802.11/NFC sessions)?  A single
+> "plenary" session?  Or some mix?
 
-Is "& L2CAP_CTRL_FINAL" needed here and for other similar values?
+so what about 2 days single track and 1 day with breakout sessions. So
+we could do 12 talks with morning and afternoon sessions on the 3rd day
+as needed.
 
-Best regards 
-Andrei Emeltchenko 
+If we have many proposals for presentations, we can always go switch to
+2 tracks. If we require LinuxCon registration, then it should be no
+problem to get a second room. If not, I have to negotiate with Angela
+next week ;)
+
+Regards
+
+Marcel
+
+
