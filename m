@@ -1,53 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 26 Mar 2012 10:54:34 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: RFC/CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
+ 2012 (Barcelona?)
+Message-ID: <20120326145433.GE13806@tuxdriver.com>
+References: <20120322192406.GB2432@tuxdriver.com>
+ <1332698585.1870.88.camel@aeonflux>
 MIME-Version: 1.0
-In-Reply-To: <1332765928-6251-1-git-send-email-chen.ganir@ti.com>
-References: <1332765928-6251-1-git-send-email-chen.ganir@ti.com>
-Date: Mon, 26 Mar 2012 11:09:56 -0400
-Message-ID: <CAJdJm_O1yiniHrn3kZNSPCdY=SMuX_FNuf66QJCCYqv9wLjHAg@mail.gmail.com>
-Subject: Re: [PATCH 0/5] Add DeviceInformationService plugin
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: chen.ganir@ti.com
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1332698585.1870.88.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+On Sun, Mar 25, 2012 at 11:03:05AM -0700, Marcel Holtmann wrote:
 
-On Mon, Mar 26, 2012 at 8:45 AM,  <chen.ganir@ti.com> wrote:
-> From: Chen Ganir <chen.ganir@ti.com>
->
-> Add Device Information Service GATT Client for reading peer
-> device PNP_ID and store it.
->
-> Chen Ganir (5):
->  Add DeviceInformation GATT Client
->  DeviceInfo: Add connection logic
->  DeviceInfo: Discover Characteristics
->  Fix device version in GetProperties
->  DeviceInfo: Read PNP ID
->
->  Makefile.am             |    9 ++-
->  deviceinfo/deviceinfo.c |  218 +++++++++++++++++++++++++++++++++++++++++++++++
->  deviceinfo/deviceinfo.h |   24 +++++
->  deviceinfo/main.c       |   55 ++++++++++++
->  deviceinfo/manager.c    |   82 ++++++++++++++++++
->  deviceinfo/manager.h    |   24 +++++
->  src/device.c            |   35 +++++++-
->  src/device.h            |    3 +
->  8 files changed, 446 insertions(+), 4 deletions(-)
->  create mode 100644 deviceinfo/deviceinfo.c
->  create mode 100644 deviceinfo/deviceinfo.h
->  create mode 100644 deviceinfo/main.c
->  create mode 100644 deviceinfo/manager.c
->  create mode 100644 deviceinfo/manager.h
+> I am in favor of requiring attendees to register with the LinuxCon
+> event. That has always worked out nicely for everybody. Especially if we
+> want to have extra rooms for breakout sessions. Otherwise we have to
+> figure out the room costs.
+> 
+> Unless some company wants to step up and sponsor. Or sponsor a dinner
+> event and get free attendance. I think we can figure something out to
+> make this work if anybody is interested ;)
 
-Except for the build error, I see no other issues on the GATT part of
-these patches. Someone else needs to review/comment on the part
-touching src/device.c though (maybe Johan himself?)
+Sponsorship is always welcome, of course. :-)
 
-Regards,
+> > Given the potential to expand this into a larger event, we would
+> > likely need to be somewhat more formal about having proposals for
+> > speaking slots.  In that case, we might require a program committee
+> > for reviewing proposals, etc.  Anyone interested in participating in
+> > speaking at the mini-summit or in reviewing speaking proposals should
+> > contact me or reply in this thread.
+> 
+> When you and I talked originally about this, we discussed the format a
+> little bit. In theory we have a bunch of options here. One of the
+> original thoughts was 1-2 day mini-conference and 1 day break-out
+> sessions. I assume 6 presentation per day is maximum. Is it enough to
+> just do 1 day?
+
+I don't think that 1 day is enough.  2 might not be enough, depending
+on how we stage it.  Do you think that we would have more than one
+"track" (e.g. separate Blueooth/802.11/NFC sessions)?  A single
+"plenary" session?  Or some mix?
+
+> Any other thoughts?
+> 
+> And while we are at it I am volunteering myself (or someone from our
+> team) to give the "Bluetooth: State of the Union" talk.
+
+Cool.
+
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
