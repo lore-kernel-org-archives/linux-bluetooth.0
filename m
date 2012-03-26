@@ -1,75 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJw+7Jat-NUuiMgSr+zcRSoEm1JhmwSUea60hOhpROWmA@mail.gmail.com>
-References: <CAB7rCTiQiaFRqDOj6OGZPfTtBWSnR60ADAZimEZJ=F0Tf0-R4Q@mail.gmail.com>
-	<CABBYNZLp3U9sHqiaW9xcH1f8qfrkM7t181y8NVK5L+Rwxet5jw@mail.gmail.com>
-	<CAB7rCTid2cRwetSyNpaT3vGGT_GrSGxzjqR6BJt-J-g4wJuM0w@mail.gmail.com>
-	<CABBYNZJw+7Jat-NUuiMgSr+zcRSoEm1JhmwSUea60hOhpROWmA@mail.gmail.com>
-Date: Mon, 26 Mar 2012 11:10:19 -0500
-Message-ID: <CAB7rCTjdCTiOP+XWjk5GcF=37tRi4_uHYYOFX2j1Kj5xBSsqhA@mail.gmail.com>
-Subject: Re: media transport -- when is acquire ok to call?
-From: Mike <puffy.taco@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1332775508-32693-6-git-send-email-chen.ganir@ti.com>
+References: <1332775508-32693-1-git-send-email-chen.ganir@ti.com>
+	<1332775508-32693-6-git-send-email-chen.ganir@ti.com>
+Date: Mon, 26 Mar 2012 11:54:49 -0400
+Message-ID: <CAJdJm_NWjT=nfHc=rK=U2HMVg0cac4oDfnf2dTLF6h-=vYDmgg@mail.gmail.com>
+Subject: Re: [PATCH v2 5/5] DeviceInfo: Read PNP ID
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: chen.ganir@ti.com
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Chen,
 
-On Mon, Mar 26, 2012 at 9:41 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Mike,
+On Mon, Mar 26, 2012 at 11:25 AM,  <chen.ganir@ti.com> wrote:
+> diff --git a/src/device.c b/src/device.c
+> index 3b772ee..dad8c26 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -131,6 +131,7 @@ struct btd_device {
+>        gchar           *path;
+>        char            name[MAX_NAME_LENGTH + 1];
+>        char            *alias;
+> +       uint16_t        vendor_src;
+>        uint16_t        vendor;
+>        uint16_t        product;
+>        uint16_t        version;
+> @@ -377,6 +378,11 @@ static DBusMessage *get_properties(DBusConnection *conn,
+>                dict_append_entry(&dict, "Vendor", DBUS_TYPE_UINT16,
+>                                                        &device->vendor);
 >
-> On Fri, Mar 23, 2012 at 2:51 PM, Mike <puffy.taco@gmail.com> wrote:
->>
->> Going back to this idea, it seems like MediaTransport should be
->> redesigned to push the file descriptor to the endpoint, rather than
->> the endpoint having to request it from the transport.  this would
->> solve this issue.  The main problem is that acquiring the endpoint
->> forces a call to resume.  In the case of HFP, this is bad.  I'm
->> currently needing to implement HFP "Audio Connection Transfer Towards
->> the AG".  Since I am the HS, all I need to do is drop the SCO
->> connection -- however, there is no interface to do this well.  I tried
->> implementing an SCO endpoint, since at least then the acquire and
->> release calls would bring up an SCO connection and then allow me to
->> drop it.  The issue here is that a phone that is connected via HFP
->> will have a MediaTransport even though the SCO connection will not yet
->> exist.  So, I get the SetConfiguration call which means I should be
->> good to go on calling acquire.  But, if I call acquire now, it will
->> create a useless SCO connection to my phone that then is dropped.
->> There's no reason at this point to open the SCO connection.  I would
->> rather be notified when the SCO connection exists, and have two
->> additional methods called suspend and resume.  In the case of HFP,
->> calling resume would eventually result in a new FD being pushed to me.
->
-> Pushing maybe a good idea in case of not being the initiator the
-> connection as you mentioned, in the other hand the endpoint may not be
-> ready, or willing to use the fd, at that point so I would only signal
-> that it is now available, otherwise the concept of using it on-demand
-> in broken.
+> +       /* Vendor Source*/
+> +       if (device->vendor_src)
+> +               dict_append_entry(&dict, "VendorSource", DBUS_TYPE_UINT16,
+> +                                                       &device->vendor_src);
+> +
 
-Isn't that the point of registering an endpoint?  If you have
-registered, you are declaring you will accept data.
+* How does this work for BR/EDR devices (without GATT)? Is zero a
+valid value for these devices?
 
-> Btw, this already is possible if you listen to
-> Headset.State, also the interface was designed to have the connection
-> on-demand, so you should only call Acquire when you gonna use the fd,
-> anyway even in the case of audio transfer you maybe the initiator and
-> should be able to directly control the connection via Acquire/Release
-> to be able to do that so Resume/Suspend would not be that great even
-> for IVI/carkit systems.
+* You need to update doc/device-api.txt
 
-So that has me confused.  If the MediaTransport interface is somewhat
-generic, why would I want to listen to another interface to know if I
-should call Acquire?  In my case, I would need to listen to
-HeadsetGateway.  As it is, the audio from my SCO connection is sent
-over a PCM bus, so I currently do not even register an SCO endpoint,
-because it was not needed.  I agree that if you are the initiator,
-Acquire/Release is sufficient.  In my case, as the non-initiator, it
-is not sufficient because I do not want to open an audio link by
-calling acquire unless it already exists.
+* Vendor Source looks like uint8, but you save it as uint16. Yes, I
+know there is no "uint8" for d-bus, but just wondering why "byte"
+cannot be used here.
 
-My perception is that the interface is written from the point of view
-of the audio source (A2DP Audio Source or HFP AG), but this does not
-translate as well to the audio sinks (A2DP Audio Sink or HFP HF).
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
