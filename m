@@ -1,41 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_MWyCVp6k+s2nmSkBMbVj0mtobjKUs7Y5t1kPz9veXduw@mail.gmail.com>
+In-Reply-To: <1332711499-5928-1-git-send-email-arik@wizery.com>
 References: <1332711499-5928-1-git-send-email-arik@wizery.com>
- <1332711499-5928-6-git-send-email-arik@wizery.com> <CAJdJm_MWyCVp6k+s2nmSkBMbVj0mtobjKUs7Y5t1kPz9veXduw@mail.gmail.com>
-From: Arik Nemtsov <arik@wizery.com>
-Date: Mon, 26 Mar 2012 15:37:40 +0200
-Message-ID: <CA+XVXfcU2NGc7=6nntfDaSRQ5R8TfeAkKFQBsT+VwgtGQ29dRw@mail.gmail.com>
-Subject: Re: [PATCH v5 5/6] proximity: immediate alert: implement immediate
- alert server
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
+Date: Mon, 26 Mar 2012 09:35:54 -0400
+Message-ID: <CAJdJm_Pd=iUz6iavWn-_g=bDZTDd86FSqRNB=nKSLxRgq_+=KA@mail.gmail.com>
+Subject: Re: [PATCH v5 0/6] Implement ProximityReporter profiles
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Arik Nemtsov <arik@wizery.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey Anderson,
+Hi Arik,
 
-On Mon, Mar 26, 2012 at 15:26, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Arik,
+On Sun, Mar 25, 2012 at 5:38 PM, Arik Nemtsov <arik@wizery.com> wrote:
+> This patch-set implements the Link loss and Immediate Alert GATT
+> server profiles.
 >
-> On Sun, Mar 25, 2012 at 5:38 PM, Arik Nemtsov <arik@wizery.com> wrote:
->> +void imm_alert_unregister(struct btd_adapter *adapter)
->> +{
->> +       struct imm_alert_adapter *imadapter;
->> +
->> +       imadapter = find_imm_alert_adapter(adapter);
->> +       if (!adapter)
->> +               return;
+> A few API calls are added/changed in preparation, the most notable of
+> which is the addition of the remote-device to each GATT read/write callback.
 >
-> The check above looks strange. Maybe you meant "if (!imadapter)"?
+> The new profiles are separated into their own files for clarity.
+>
+> A ProximityReporter D-Bus interface is registered for each remote device.
+> Property queries and PropertyChanged notifications are implemented, in
+> accordance to doc/proximity-api.txt.
+>
+> v4->5: Add remote device to ATT callback function in a saner way.
+> Move bluez-dependent defintions from att.h to att-bluez.h and add
+> a btd_device argument to the function there. (Thanks Johan)
+>
+> Arik Nemtsov (6):
+>  att: add remote btd_device to ATT read/write callbacks
+>  proximity: reporter: save global D-Bus connection
+>  proximity: reporter: move definitions to .h and add util function
+>  proximity: link loss: implement link loss server
+>  proximity: immediate alert: implement immediate alert server
+>  proximity: reporter: implement D-Bus API
+>
+>  Makefile.am            |    4 +-
+>  attrib/att-bluez.h     |   44 +++++++
+>  attrib/att.h           |   20 ---
+>  attrib/gatt-service.c  |    1 +
+>  plugins/gatt-example.c |    4 +-
+>  proximity/immalert.c   |  289 +++++++++++++++++++++++++++++++++++++++++
+>  proximity/immalert.h   |   26 ++++
+>  proximity/linkloss.c   |  337 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  proximity/linkloss.h   |   26 ++++
+>  proximity/reporter.c   |  251 ++++++++++++++++++++++++++----------
+>  proximity/reporter.h   |   16 +++
+>  src/attrib-server.c    |   20 ++-
+>  time/server.c          |    7 +-
+>  13 files changed, 947 insertions(+), 98 deletions(-)
+>  create mode 100644 attrib/att-bluez.h
+>  create mode 100644 proximity/immalert.c
+>  create mode 100644 proximity/immalert.h
+>  create mode 100644 proximity/linkloss.c
+>  create mode 100644 proximity/linkloss.h
 
-Yea that's a typo. Thanks.
+This patch set looks good to me, except for the comment I made on one patch.
 
-Before fixing I'd be glad to get an ack on the patch series, to make
-sure no other changes need to be made.
+Other notes:
+* make sure it is rebased against current master (and at least build
+tested after this), specially because Johan applied some Chen commits
+that may conflict with your patches.
+* I'm not sure "att-bluez.h" is a good name. What about
+"att-helper.h", "att-item.h", "att-database.h" ? "bluez" seems
+redundant to me :)
 
-Regards,
-Arik
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
