@@ -1,80 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 26 Mar 2012 12:27:39 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv5 03/26] Bluetooth: A2MP: Create A2MP channel
-Message-ID: <20120326092737.GA18219@aemeltch-MOBL1>
-References: <1332519246-16656-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1332519246-16656-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20120325171225.GG3106@joana>
+Date: Mon, 26 Mar 2012 12:21:50 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: chen.ganir@ti.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 0/2] GATT/ATT Cleanup
+Message-ID: <20120326092150.GB322@x220>
+References: <1332747359-15647-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120325171225.GG3106@joana>
+In-Reply-To: <1332747359-15647-1-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Chen,
 
-On Sun, Mar 25, 2012 at 02:12:25PM -0300, Gustavo Padovan wrote:
-> > +static struct l2cap_chan *open_a2mp_chan(struct l2cap_conn *conn)
+On Mon, Mar 26, 2012, chen.ganir@ti.com wrote:
+> Move gatt related primary and characteristic definitions
+> from the att.h to gatt.h (ATT does not define services and
+> characteristics - those are GATT terms).
 > 
-> a2mp_chan_open() is a better name here. Who is calling this btw?
-
-Agree, will change it; it is called by amp_mgr_create in the following
-patch.
-
-> > +{
-> > +	struct l2cap_chan *chan;
-> > +
-> > +	chan = l2cap_chan_create(NULL);
+> This is v2 of the patch set, fixing compilation errors.
 > 
-> I just pushed a patch that remove the sk parameter from l2cap_chan_create(),
-> so you don't need to pass NULL here anymore.
-
-Good! I did not know about this. BTW: Shall all patches go through mailing list
-first?
-
-> You failing to check l2cap_chan_create() for NULL return btw.
-
-Will fix.
-
-> > +
-> > +	hci_conn_hold(conn->hcon);
-> > +
-> > +	BT_DBG("chan %p", chan);
-> > +
-> > +	chan->sec_level = BT_SECURITY_LOW;
-> > +	chan->omtu = L2CAP_A2MP_DEFAULT_MTU;
-> > +	chan->imtu = L2CAP_A2MP_DEFAULT_MTU;
-> > +	chan->flush_to = L2CAP_DEFAULT_FLUSH_TO;
-> > +	chan->fcs = L2CAP_FCS_CRC16;
-> > +
-> > +	chan->ops = &a2mp_chan_ops;
-> > +
-> > +	set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
-> > +
-> > +	chan->max_tx = L2CAP_DEFAULT_MAX_TX;
-> > +	chan->remote_max_tx = chan->max_tx;
-> > +
-> > +	chan->tx_win = L2CAP_DEFAULT_TX_WINDOW;
-> > +	chan->tx_win_max = L2CAP_DEFAULT_TX_WINDOW;
-> > +	chan->remote_tx_win = chan->tx_win;
-> > +
-> > +	chan->retrans_timeout = L2CAP_DEFAULT_RETRANS_TO;
-> > +	chan->monitor_timeout = L2CAP_DEFAULT_MONITOR_TO;
-> > +
-> > +	skb_queue_head_init(&chan->tx_q);
+> Chen Ganir (2):
+>   GATT: Rename service and char structs
+>   GATT: replace start/end with att_range
 > 
-> I think we should move all ERTM related settings here inside
-> l2cap_ertm_init(), it will make this code much more cleaner.
+>  attrib/att.h              |   13 -------------
+>  attrib/client.c           |   22 +++++++++++-----------
+>  attrib/gatt.c             |   12 ++++++------
+>  attrib/gatt.h             |   12 ++++++++++++
+>  attrib/gatttool.c         |    6 +++---
+>  attrib/interactive.c      |    6 +++---
+>  proximity/manager.c       |    6 ++++--
+>  proximity/monitor.c       |   22 +++++++++++-----------
+>  proximity/monitor.h       |    4 ++--
+>  src/adapter.c             |   11 ++++++-----
+>  src/device.c              |   14 +++++++-------
+>  thermometer/manager.c     |    6 ++++--
+>  thermometer/thermometer.c |   12 ++++++------
+>  thermometer/thermometer.h |    2 +-
+>  14 files changed, 76 insertions(+), 72 deletions(-)
 
-which settings? retrans_timeout and monitor_timeout are set in
-configuration phase before l2cap_ertm_init and putting them
-to l2cap_ertm_init would override them.
+Both patches have been applied. Thanks.
 
-I can make a function assigning basic L2CAP settings for A2MP and for
-general L2CAP channels (those in the beginning).
-
-Best regards 
-Andrei Emeltchenko 
+Johan
