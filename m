@@ -1,54 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1332775508-32693-6-git-send-email-chen.ganir@ti.com>
-References: <1332775508-32693-1-git-send-email-chen.ganir@ti.com>
-	<1332775508-32693-6-git-send-email-chen.ganir@ti.com>
-Date: Mon, 26 Mar 2012 11:54:49 -0400
-Message-ID: <CAJdJm_NWjT=nfHc=rK=U2HMVg0cac4oDfnf2dTLF6h-=vYDmgg@mail.gmail.com>
-Subject: Re: [PATCH v2 5/5] DeviceInfo: Read PNP ID
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: chen.ganir@ti.com
+In-Reply-To: <CABBYNZJNFCBdOzLHX2LMTeULkyhCEHsGv+_41wUsvTrhCL48YQ@mail.gmail.com>
+References: <CAB7rCTiQiaFRqDOj6OGZPfTtBWSnR60ADAZimEZJ=F0Tf0-R4Q@mail.gmail.com>
+	<CABBYNZLp3U9sHqiaW9xcH1f8qfrkM7t181y8NVK5L+Rwxet5jw@mail.gmail.com>
+	<CAB7rCThwZxQQoKHfEszX3sZPpE_cp5+XS_fEBYiAmnR1n0d9Sg@mail.gmail.com>
+	<CAB7rCTjUL2_Kae186QgXa2csf-p-cuGH2US38a7S436uBY93Pw@mail.gmail.com>
+	<CABBYNZK5yFoR9nGjU8=U4g+VkLc281Hh9QhYT5m9hTxoZLFoaw@mail.gmail.com>
+	<CAB7rCTiJZqPCYGZo+rJ+dnxmR6y6hnksRrzqnbyPv8i72=qq8g@mail.gmail.com>
+	<CABBYNZJNFCBdOzLHX2LMTeULkyhCEHsGv+_41wUsvTrhCL48YQ@mail.gmail.com>
+Date: Mon, 26 Mar 2012 10:44:39 -0500
+Message-ID: <CAB7rCTgJrxKZurWVq7ixt7NGJ6D6d-urtYe3UDKR+9bxQdgdEQ@mail.gmail.com>
+Subject: Re: media transport -- when is acquire ok to call?
+From: Mike <puffy.taco@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+Hi Luiz,
 
-On Mon, Mar 26, 2012 at 11:25 AM,  <chen.ganir@ti.com> wrote:
-> diff --git a/src/device.c b/src/device.c
-> index 3b772ee..dad8c26 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -131,6 +131,7 @@ struct btd_device {
->        gchar           *path;
->        char            name[MAX_NAME_LENGTH + 1];
->        char            *alias;
-> +       uint16_t        vendor_src;
->        uint16_t        vendor;
->        uint16_t        product;
->        uint16_t        version;
-> @@ -377,6 +378,11 @@ static DBusMessage *get_properties(DBusConnection *conn,
->                dict_append_entry(&dict, "Vendor", DBUS_TYPE_UINT16,
->                                                        &device->vendor);
+On Mon, Mar 26, 2012 at 10:01 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Mike,
 >
-> +       /* Vendor Source*/
-> +       if (device->vendor_src)
-> +               dict_append_entry(&dict, "VendorSource", DBUS_TYPE_UINT16,
-> +                                                       &device->vendor_src);
-> +
+> On Fri, Mar 23, 2012 at 12:30 PM, Mike <puffy.taco@gmail.com> wrote:
+>> It does appear to trigger based on the signalling channel, however it
+>> appears that the connection process continues on regardless.  I pasted
+>> below a log, everything in the log occurs while my phone is still
+>> asking me if I want to pair with the BlueZ device.  We don't get
+>> beyond the OPEN_CMD into an actual OPEN state until the pairing
+>> process completes.
+>
+> Why don't you pair it before hand, actually this should happen only
+> once in the first time you pair and then it should be stored
+> persistently so the next time you wont see this problem.
 
-* How does this work for BR/EDR devices (without GATT)? Is zero a
-valid value for these devices?
+True, but I'm testing all the possible user experiences and that's not
+an acceptable solution.  The particular case I'm testing is that the
+user deleted the pairing on one end but not the other.  I can't
+control what the software on my phone does; I'm only reporting how it
+interacts with BlueZ running on my device.  It's true that the next
+time the connection occurs (provided we eventually figure out a SEP
+lock fix), everything will work just fine.  I'm just trying to figure
+out what goes wrong the first time.  So any pointers you have would be
+great.
 
-* You need to update doc/device-api.txt
+>>> 60 seconds is way too long, it should be at least smaller than D-Bus
+>>> default timeout which is 25 sec.
+>>
+>> What exactly is this timeout waiting for?  I haven't figured that out
+>> yet.  I assume it's waiting on something from my phone (the a2dp
+>> source) and not D-Bus?
+>
+> The client is would be waiting the reply of Acquire, so if you setup
+> something over D-Bus timeout there is a chance the device respond
+> correctly but the client will ignored because the method call already
+> timed out.
 
-* Vendor Source looks like uint8, but you save it as uint16. Yes, I
-know there is no "uint8" for d-bus, but just wondering why "byte"
-cannot be used here.
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Well, this case helps out in a time where I didn't call Acquire (the
+phone initiated the connection).  So it seems like there should be a
+check for pairing before initiating the timer.  I'm not sure how that
+would work or what would be needed to make that foolproof.  For my
+situation, a much higher timeout was sufficient (I'm not saying that
+it should be set to 60 in bluez.git -- just that for me it works).
