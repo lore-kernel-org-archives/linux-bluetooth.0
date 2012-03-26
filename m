@@ -1,41 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Joohi RASTOGI <joohi.rastogi@stericsson.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 26 Mar 2012 08:44:55 +0200
-Subject: [PATCH Bluez] avcrp: Fix response length for unit info command.
-Message-ID: <3176460F0F455A44B2E93431E34FC86C1F884413AE@EXDCVYMBSTM005.EQ1STM.local>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+Date: Mon, 26 Mar 2012 00:45:47 -0300
+Message-ID: <CAMBjcSuF_CvWAOvMdS53aR8vm3tRam8+qeEhjcaaoCygn0U=Fw@mail.gmail.com>
+Subject: GSoC Projects
+From: "Thiago S. A." <thiago.xth1@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
+I am a master student in computer science at Unicamp, Brazil.
+I program in C / C + + for four years and have experience with STL,
+OpenGL, SDL  and I am studying glib.
 
-Fixed response length for Unit Info command. This affect PTS Test Case for TC_TG_ICC_BV_01_I.
+I was interested mainly by the projects "Implement AVRCP 1.3
+Controller Role"and "Visualization of Bluetooth traffic" for the BlueZ
+GSoC.
+To better understand the projects I researched the repository and I am
+studying the source code.
 
->From f03c6037836bf8ef5253f8d87edb8ec2db0742af Mon Sep 17 00:00:00 2001
-From: Joohi Rastogi <joohi.rastogi@stericsson.com>
-Date: Mon, 26 Mar 2012 11:53:19 +0530
-Subject: [PATCH Bluez] avcrp: Fix response length for unit info command.
+For the first project I'm reading the specification of AVRCP 1.3
+(available in bluetooth dot org) and analyzing the code files
+controller.c, media.c and avrcp.c of the audio folder.
 
----
- audio/avctp.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+For the second project I researched about the bustle for the D-Bus and
+so I could see how the tool should be, I also discovered that the
+bustle uses GTK for the graphical interface.
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index dfad9fd..5b84977 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -268,7 +268,7 @@ static size_t handle_unit_info(struct avctp *session,
- 
- 	DBG("reply to AVC_OP_UNITINFO");
- 
--	return 0;
-+	return operand_count;
- }
- 
- static size_t handle_subunit_info(struct avctp *session,
--- 
-1.7.5.4
-
--Joohi Rastogi
+I appreciate any hint.
