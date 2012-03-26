@@ -1,93 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <lukasz.rymanowski@tieto.com>,
-	Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH hcidump 0/3] SAP PDU parsing
-Date: Mon, 26 Mar 2012 12:02:08 +0200
-Message-ID: <1332756131-16439-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CABax29WFvAXH9g8CnOtEDAqfmKmURnt4eYY58fi+P9zBa5Ji1A@mail.gmail.com>
+References: <CABax29VLUHg_jePnhHz_6WHYCZBHoir5TBLuauK+Ktfg9-8Xjw@mail.gmail.com>
+	<CACY+gR3t4RXuhUEi9486qsP+p0GCYArHW+PO5QfBfEUfnd=xEg@mail.gmail.com>
+	<CABax29X1tFt8Am_i7y5nZsjs_D2QY9pbv19316Wn6RVq7ksEDA@mail.gmail.com>
+	<CACY+gR2DeQE2UaYwD8AQonNxtZ+=uZm7qY+BaqgjBQKoZSZHYA@mail.gmail.com>
+	<CABax29U8N2nOge34tr=G2f-fZvowCHPf3V=N2an-vC+x=UBdiQ@mail.gmail.com>
+	<CACY+gR2PkP76J2Dw9xobpeGsU2HKhsOYvU6Wcx8WCcq1opihiA@mail.gmail.com>
+	<CABax29VadeA+6WZWRDiZZUhpRqk2Nk35__b0Cjfz8HO12Tq4vQ@mail.gmail.com>
+	<CACY+gR0DJfbOgfSGHrsAj5vk00v4-_+KYwR+SF+0BRRs2oYBkw@mail.gmail.com>
+	<CABax29X+ke_PO9obAxbEJjdx68g8JW4ZZn7vS7mYpE7+00iYng@mail.gmail.com>
+	<CABax29WFvAXH9g8CnOtEDAqfmKmURnt4eYY58fi+P9zBa5Ji1A@mail.gmail.com>
+Date: Mon, 26 Mar 2012 12:44:17 +0300
+Message-ID: <CACY+gR3pqj6xoJ-G-pt5QTY6BjuyUNXTZRzsQmmutcSNBzY3qQ@mail.gmail.com>
+Subject: Re: [PATCH] Re: A2DP quality (bluetooth-alsa)
+From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+To: qduaty <qduaty@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Sun, Mar 25, 2012 at 5:51 AM, qduaty <qduaty@gmail.com> wrote:
+> Hello,
+>
+> I found that floating point processing eliminates all the quality
+> issues that were mentioned here. So I added a floating point mode to
+> SBC, which can be enabled with an #ifdef in sbc_tables.h, along with a
+> code for minimizing quantization errors. It reduces noise by several
+> dB and greatly improves the reproduction of higher bands.
 
-Following patches add support for parsing SAP PDU. Below is sample output from
-'hcidump -X -S 8' for reference.
+Out of curiosity, how do you measure noise reduction?
 
-> ACL data: handle 1 flags 0x02 dlen 20
-    L2CAP(d): cid 0x0040 len 16 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 16 pf 0 ilen 12 fcs 0x24 
-        SAP: Connect Req: params 1
-        MaxMsgSize (0x00) len 2 = 2048
-< ACL data: handle 1 flags 0x00 dlen 28
-    L2CAP(d): cid 0x0040 len 24 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 16 pf 0 ilen 20 fcs 0xfe 
-        SAP: Connect Resp: params 2
-        ConnectionStatus (0x01) len 1 = 0x02 (Error, Server does not support maximum message size)
-        MaxMsgSize (0x00) len 2 = 512
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 1 packets 1
-> ACL data: handle 1 flags 0x02 dlen 21
-    L2CAP(d): cid 0x0040 len 17 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 16 pf 1 ilen 12 fcs 0x38 credits 1
-        SAP: Connect Req: params 1
-        MaxMsgSize (0x00) len 2 = 512
-< ACL data: handle 1 flags 0x00 dlen 20
-    L2CAP(d): cid 0x0040 len 16 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 16 pf 0 ilen 12 fcs 0xfe 
-        SAP: Connect Resp: params 1
-        ConnectionStatus (0x01) len 1 = 0x00 (OK, Server can fulfill requirements)
-< ACL data: handle 1 flags 0x00 dlen 20
-    L2CAP(d): cid 0x0040 len 16 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 16 pf 0 ilen 12 fcs 0xfe 
-        SAP: Status Ind: params 1
-        StatusChange (0x08) len 1 = 0x01 (Card reset)
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 1 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 1 packets 1
-> ACL data: handle 1 flags 0x02 dlen 13
-    L2CAP(d): cid 0x0040 len 9 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 16 pf 1 ilen 4 fcs 0x38 credits 2
-        SAP: Transfer ATR Req: params 0
-< ACL data: handle 1 flags 0x00 dlen 36
-    L2CAP(d): cid 0x0040 len 32 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 16 pf 0 ilen 28 fcs 0xfe 
-        SAP: Transfer ATR Resp: params 2
-        ResultCode (0x02) len 1 = 0x00 (OK, request processed correctly)
-        ATR (0x06) len 12 = 
-          0000: 3b 98 95 00 93 94 03 05  0e 02 02 02              ;...........
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 1 packets 1
-> ACL data: handle 1 flags 0x02 dlen 25
-    L2CAP(d): cid 0x0040 len 21 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 16 pf 1 ilen 16 fcs 0x38 credits 1
-        SAP: Transfer APDU Req: params 1
-        CommandAPDU (0x04) len 7 = 
-          0000: 00 a4 08 0c 02 2f e2                              ...../.
-< ACL data: handle 1 flags 0x00 dlen 28
-    L2CAP(d): cid 0x0040 len 24 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 16 pf 0 ilen 20 fcs 0xfe 
-        SAP: Transfer APDU Resp: params 2
-        ResultCode (0x02) len 1 = 0x00 (OK, request processed correctly)
-        ResponseAPDU (0x05) len 2 = 
-          0000: 6e 00                                             n.
+Regarding your changes:
 
-Andrzej Kaczmarek (3):
-  Add basic SAP parsing
-  Add parameters parsing support for SAP PDU
-  core: Add support for passing RFCOMM channel for SAP
+! #ifdef SBC_FLOAT
+! #define SBC_PROTO_SCALE_FIXED4(x) x;
+! 	/* rounding coefficient */
+! 	t1[0] = t1[1] = t1[2] = t1[3] = 1;
 
- Makefile.am     |    1 +
- parser/parser.h |    2 +
- parser/rfcomm.c |    7 ++
- parser/sap.c    |  335 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/hcidump.c   |   11 +-
- 5 files changed, 355 insertions(+), 1 deletion(-)
- create mode 100644 parser/sap.c
+This does not look right. For the fixed point code, rounding
+coefficient is needed because we are shifting results after the first
+multiplication pass. Simply right shifting the data would discard the
+lowest bits, effectively doing rounding down. Introducing rounding
+coefficient allows rounding to nearest: "(x + (1 <<
+(SBC_PROTO_FIXED4_SCALE - 1))) >> SBC_PROTO_FIXED4_SCALE"
+Floating point code does not need any rounding coefficient.
+
+! #ifdef SBC_FLOAT
+! 	/* Tries to redistribute quantization errors so that exactly half of them
+! 	 * is positive. This reduces overall distortion, especially in high bands
+! 	 * and increases chances for clipping, hence the ANTICLIP coefficient. */
+! 	double accumError = 0;
+! 	for (i = 0; i < 4; i++){
+! 		t1[i] *= (1 << SCALE_OUT_BITS) * ANTICLIP;
+! 		accumError += t1[i] - (int32_t)t1[i];
+! 	}
+! 	for (i = 0; i < 4; i++)
+! 		out[i] = t1[i] + accumError / 4;
+
+I find it hard to believe that this accumError would make any
+noticeable difference on the output (neither good nor bad).
+
+The analysis filter produces fixed point values with SCALE_OUT_BITS
+fractional bits (selected to be 15 currently). So the output is in
+17.15 fixed point format. 15 extra bits have been selected just
+because we can, and this allows to use full range of 32-bit variables.
+If we further divide it by 2 as needed on quantization step later,
+then we actually have 16.16 format. These extra bits are needed to
+avoid precision loss on normalization. If quantized value is for
+example in [-127, 127] range, then it needs to be stored as 8 bits or
+[0, 255] range in the bitstream, which gives a rather nasty 255/256
+scale ratio and this is a potential source of rounding errors unless
+we preserve as many bits as possible. From A2DP spec:
+    "levels[ch][sb] = pow(2.0, bits[ch][sb]) - 1"
+    "scalefactor[ch][ sb] = pow(2.0, (scale_factor[ch][sb] + 1))"
+    "quantized_sb_sample[blk][ch][sb] = ((sb_sample[blk][ch][sb] /
+scalefactor[ch][sb] + 1.0) * levels[ch][sb]) / 2.0"
+"quantized_sb_sample" is rounded towards minus infinity, "levels" are
+powers of two minus one and scalefactor is a power of two.
+
+But even less than 15 extra bits for SCALE_OUT_BITS seems to be also
+fine in practice (you can do some experiments with reducing it),
+assuming that the values are quantized even a little bit. With your
+change, you are only messing around the lowest bit in the extra
+fractional part.
+
+Scaling down the input with ANTICLIP should get rid of clipping (on
+the decoder side) with heavily compressed audio sources as expected,
+but this is not anything new.
+
+> There is room for further improvements, such as adaptive clipping
+> prevention and high resolution input format, but with current code
+> base, they are somewhat hard to implement.
+
+If you have any questions about the current code, just ask.
+
+> The attached patch may cause some trouble because of one part being
+> rejected. I hope this will not prevent those who are interested, from
+> applying it and testing.
+
+Could you please at least use unified diff (-u option)? And the best
+would be to use "git commit" and then "git format-patch".
+
+In any case, the ability to reduce the audio volume as part of SBC
+encoding process looks like a useful improvement to me (and maybe it's
+a good idea to even have it used by default). This should help to
+workaround the audio quality problems with some A2DP headsets.
 
 -- 
-1.7.9.4
-
+Best regards,
+Siarhei Siamashka
