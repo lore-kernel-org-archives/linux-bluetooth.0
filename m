@@ -1,43 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: chen.ganir@ti.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH v2 0/5] Add DeviceInformationService plugin
-Date: Mon, 26 Mar 2012 17:25:03 +0200
-Message-Id: <1332775508-32693-1-git-send-email-chen.ganir@ti.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 26 Mar 2012 18:20:42 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	pkrystad@codeaurora.org, marcel@holtmann.org
+Subject: Re: [PATCH 4/4] Bluetooth: Functions parsing or generating ERTM
+ control fields
+Message-ID: <20120326152040.GE18219@aemeltch-MOBL1>
+References: <1332547018-19468-1-git-send-email-mathewm@codeaurora.org>
+ <1332547018-19468-5-git-send-email-mathewm@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1332547018-19468-5-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Ganir <chen.ganir@ti.com>
+Hi Mat,
 
-Add Device Information Service GATT Client for reading peer
-device PNP_ID and store it.
+On Fri, Mar 23, 2012 at 04:56:58PM -0700, Mat Martineau wrote:
+> These functions encode or decode ERTM control fields (extended or
+> enhanced) to or from the new l2cap_control structure.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/l2cap_core.c |  120 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 120 insertions(+)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index ad73696..890cfb9 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -787,6 +787,118 @@ static inline void l2cap_send_rr_or_rnr(struct l2cap_chan *chan, u32 control)
+>  	l2cap_send_sframe(chan, control);
+>  }
+>  
+> +static u16 __pack_enhanced_control(struct l2cap_ctrl *control)
+> +{
+> +	u16 packed;
+> +
+> +	packed = (control->reqseq << L2CAP_CTRL_REQSEQ_SHIFT) &
+> +		L2CAP_CTRL_REQSEQ;
+> +	packed |= (control->final << L2CAP_CTRL_FINAL_SHIFT) &
+> +		L2CAP_CTRL_FINAL;
 
-This is v2 of the patch set, removing some unused code to
-eliminate compilation warnings.
+Is "& L2CAP_CTRL_FINAL" needed here and for other similar values?
 
-Chen Ganir (5):
-  Add DeviceInformation GATT Client
-  DeviceInfo: Add connection logic
-  DeviceInfo: Discover Characteristics
-  Fix device version in GetProperties
-  DeviceInfo: Read PNP ID
-
- Makefile.am             |    9 ++-
- deviceinfo/deviceinfo.c |  205 +++++++++++++++++++++++++++++++++++++++++++++++
- deviceinfo/deviceinfo.h |   24 ++++++
- deviceinfo/main.c       |   55 +++++++++++++
- deviceinfo/manager.c    |   82 +++++++++++++++++++
- deviceinfo/manager.h    |   24 ++++++
- src/device.c            |   35 ++++++++-
- src/device.h            |    3 +
- 8 files changed, 433 insertions(+), 4 deletions(-)
- create mode 100644 deviceinfo/deviceinfo.c
- create mode 100644 deviceinfo/deviceinfo.h
- create mode 100644 deviceinfo/main.c
- create mode 100644 deviceinfo/manager.c
- create mode 100644 deviceinfo/manager.h
-
--- 
-1.7.4.1
-
+Best regards 
+Andrei Emeltchenko 
