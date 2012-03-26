@@ -1,64 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAB7rCTgJrxKZurWVq7ixt7NGJ6D6d-urtYe3UDKR+9bxQdgdEQ@mail.gmail.com>
-References: <CAB7rCTiQiaFRqDOj6OGZPfTtBWSnR60ADAZimEZJ=F0Tf0-R4Q@mail.gmail.com>
-	<CABBYNZLp3U9sHqiaW9xcH1f8qfrkM7t181y8NVK5L+Rwxet5jw@mail.gmail.com>
-	<CAB7rCThwZxQQoKHfEszX3sZPpE_cp5+XS_fEBYiAmnR1n0d9Sg@mail.gmail.com>
-	<CAB7rCTjUL2_Kae186QgXa2csf-p-cuGH2US38a7S436uBY93Pw@mail.gmail.com>
-	<CABBYNZK5yFoR9nGjU8=U4g+VkLc281Hh9QhYT5m9hTxoZLFoaw@mail.gmail.com>
-	<CAB7rCTiJZqPCYGZo+rJ+dnxmR6y6hnksRrzqnbyPv8i72=qq8g@mail.gmail.com>
-	<CABBYNZJNFCBdOzLHX2LMTeULkyhCEHsGv+_41wUsvTrhCL48YQ@mail.gmail.com>
-	<CAB7rCTgJrxKZurWVq7ixt7NGJ6D6d-urtYe3UDKR+9bxQdgdEQ@mail.gmail.com>
-Date: Mon, 26 Mar 2012 13:40:19 -0300
-Message-ID: <CABBYNZLnC5a0zBv3V2dCJ-M9Tq=XtVXVBt12zRGFFbN0FOTWEQ@mail.gmail.com>
-Subject: Re: media transport -- when is acquire ok to call?
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mike <puffy.taco@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [RFC PATCH BlueZ] doc: Revert "Small API update"
+Date: Mon, 26 Mar 2012 12:12:54 -0400
+Message-Id: <1332778374-15320-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mike,
+This reverts commit fd1ac97806d4531cb54523b3d694899afce281e7. It seems
+the "entered" param is not used anymore.
+---
+ doc/agent-api.txt |    8 +-------
+ 1 files changed, 1 insertions(+), 7 deletions(-)
 
-On Mon, Mar 26, 2012 at 12:44 PM, Mike <puffy.taco@gmail.com> wrote:
-> True, but I'm testing all the possible user experiences and that's not
-> an acceptable solution.  The particular case I'm testing is that the
-> user deleted the pairing on one end but not the other.  I can't
-> control what the software on my phone does; I'm only reporting how it
-> interacts with BlueZ running on my device.  It's true that the next
-> time the connection occurs (provided we eventually figure out a SEP
-> lock fix), everything will work just fine.  I'm just trying to figure
-> out what goes wrong the first time.  So any pointers you have would be
-> great.
-
-So you are deleting the link key on your phone and still initiating
-the connection from it, that doesn't sound like a practical case since
-by removing the key the phone should no longer remember your device.
-Anyway, that seems that something else is broke because the connection
-should be authenticated before accepted by userspace, in other words
-the signalling channel connection should not be established before the
-pairing completes.
-
->>> What exactly is this timeout waiting for?  I haven't figured that out
->>> yet.  I assume it's waiting on something from my phone (the a2dp
->>> source) and not D-Bus?
->>
->> The client is would be waiting the reply of Acquire, so if you setup
->> something over D-Bus timeout there is a chance the device respond
->> correctly but the client will ignored because the method call already
->> timed out.
->
-> Well, this case helps out in a time where I didn't call Acquire (the
-> phone initiated the connection).  So it seems like there should be a
-> check for pairing before initiating the timer.  I'm not sure how that
-> would work or what would be needed to make that foolproof.  For my
-> situation, a much higher timeout was sufficient (I'm not saying that
-> it should be set to 60 in bluez.git -- just that for me it works).
-
-As I said the use case you are trying does not seem very practical,
-and in any case to pass a file descriptor you will need a method call
-which inevitably will have a timeout associated.
-
+diff --git a/doc/agent-api.txt b/doc/agent-api.txt
+index 9ab2063..193a2d1 100644
+--- a/doc/agent-api.txt
++++ b/doc/agent-api.txt
+@@ -42,21 +42,15 @@ Methods		void Release()
+ 			Possible errors: org.bluez.Error.Rejected
+ 			                 org.bluez.Error.Canceled
+ 
+-		void DisplayPasskey(object device, uint32 passkey, uint8 entered)
++		void DisplayPasskey(object device, uint32 passkey)
+ 
+ 			This method gets called when the service daemon
+ 			needs to display a passkey for an authentication.
+ 
+-			The entered parameter indicates the number of already
+-			typed keys on the remote side.
+-
+ 			An empty reply should be returned. When the passkey
+ 			needs no longer to be displayed, the Cancel method
+ 			of the agent will be called.
+ 
+-			During the pairing process this method might be
+-			called multiple times to update the entered value.
+-
+ 			Note that the passkey will always be a 6-digit number,
+ 			so the display should be zero-padded at the start if
+ 			the value contains less than 6 digits.
 -- 
-Luiz Augusto von Dentz
+1.7.5.4
+
