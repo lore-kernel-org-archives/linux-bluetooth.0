@@ -1,47 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH V3 5/7] btmgmt: Add support for setting Device ID
+Date: Mon, 26 Mar 2012 16:45:41 +0200
+Message-ID: <1332773141-25524-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1332260847-20079-5-git-send-email-szymon.janc@tieto.com>
+References: <1332260847-20079-5-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <CAB7rCTiJZqPCYGZo+rJ+dnxmR6y6hnksRrzqnbyPv8i72=qq8g@mail.gmail.com>
-References: <CAB7rCTiQiaFRqDOj6OGZPfTtBWSnR60ADAZimEZJ=F0Tf0-R4Q@mail.gmail.com>
-	<CABBYNZLp3U9sHqiaW9xcH1f8qfrkM7t181y8NVK5L+Rwxet5jw@mail.gmail.com>
-	<CAB7rCThwZxQQoKHfEszX3sZPpE_cp5+XS_fEBYiAmnR1n0d9Sg@mail.gmail.com>
-	<CAB7rCTjUL2_Kae186QgXa2csf-p-cuGH2US38a7S436uBY93Pw@mail.gmail.com>
-	<CABBYNZK5yFoR9nGjU8=U4g+VkLc281Hh9QhYT5m9hTxoZLFoaw@mail.gmail.com>
-	<CAB7rCTiJZqPCYGZo+rJ+dnxmR6y6hnksRrzqnbyPv8i72=qq8g@mail.gmail.com>
-Date: Mon, 26 Mar 2012 12:01:12 -0300
-Message-ID: <CABBYNZJNFCBdOzLHX2LMTeULkyhCEHsGv+_41wUsvTrhCL48YQ@mail.gmail.com>
-Subject: Re: media transport -- when is acquire ok to call?
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mike <puffy.taco@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mike,
+---
+ mgmt/main.c |   65 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
 
-On Fri, Mar 23, 2012 at 12:30 PM, Mike <puffy.taco@gmail.com> wrote:
-> It does appear to trigger based on the signalling channel, however it
-> appears that the connection process continues on regardless.  I pasted
-> below a log, everything in the log occurs while my phone is still
-> asking me if I want to pair with the BlueZ device.  We don't get
-> beyond the OPEN_CMD into an actual OPEN state until the pairing
-> process completes.
-
-Why don't you pair it before hand, actually this should happen only
-once in the first time you pair and then it should be stored
-persistently so the next time you wont see this problem.
-
->> 60 seconds is way too long, it should be at least smaller than D-Bus
->> default timeout which is 25 sec.
->
-> What exactly is this timeout waiting for?  I haven't figured that out
-> yet.  I assume it's waiting on something from my phone (the a2dp
-> source) and not D-Bus?
-
-The client is would be waiting the reply of Acquire, so if you setup
-something over D-Bus timeout there is a chance the device respond
-correctly but the client will ignored because the method call already
-timed out.
-
+diff --git a/mgmt/main.c b/mgmt/main.c
+index 4f10e08..90d43e3 100644
+--- a/mgmt/main.c
++++ b/mgmt/main.c
+@@ -1730,6 +1730,70 @@ static void cmd_clr_uuids(int mgmt_sk, uint16_t index, int argc, char **argv)
+ 	cmd_remove_uuid(mgmt_sk, index, 2, rm_argv);
+ }
+ 
++static void did_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	if (status != 0) {
++		fprintf(stderr, "Set Device ID failed with status 0x%02x (%s)\n",
++						status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	printf("Device ID succesfully set\n");
++
++	exit(EXIT_SUCCESS);
++}
++
++static void did_usage(void)
++{
++	printf("Usage: btmgmt did <source>:<vendor>:<product>:<version>\n");
++	printf("       possible source values: bluetooth, usb\n");
++}
++
++static void cmd_did(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_set_device_id cp;
++	uint16_t vendor, product, version , source;
++	int result;
++
++	if (argc < 2) {
++		did_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	result = sscanf(argv[1], "bluetooth:%4hx:%4hx:%4hx", &vendor, &product,
++								&version);
++	if (result == 3) {
++		source = 0x0001;
++		goto done;
++	}
++
++	result = sscanf(argv[1], "usb:%4hx:%4hx:%4hx", &vendor, &product,
++								&version);
++	if (result == 3) {
++		source = 0x0002;
++		goto done;
++	}
++
++	did_usage();
++	exit(EXIT_FAILURE);
++
++done:
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	cp.source = htobs(source);
++	cp.vendor = htobs(vendor);
++	cp.product = htobs(product);
++	cp.version = htobs(version);
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_DEVICE_ID, index,
++				&cp, sizeof(cp), did_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send set_dev_class cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
+ static struct {
+ 	char *cmd;
+ 	void (*func)(int mgmt_sk, uint16_t index, int argc, char **argv);
+@@ -1760,6 +1824,7 @@ static struct {
+ 	{ "add-uuid",	cmd_add_uuid,	"Add UUID"			},
+ 	{ "rm-uuid",	cmd_add_uuid,	"Remove UUID"			},
+ 	{ "clr-uuids",	cmd_clr_uuids,	"Clear UUIDs",			},
++	{ "did",	cmd_did,	"Set Device ID",		},
+ 	{ NULL, NULL, 0 }
+ };
+ 
 -- 
-Luiz Augusto von Dentz
+on behalf of ST-Ericsson
+
