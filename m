@@ -1,46 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 26 Mar 2012 12:21:50 +0300
+Date: Mon, 26 Mar 2012 12:21:20 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: chen.ganir@ti.com
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] GATT/ATT Cleanup
-Message-ID: <20120326092150.GB322@x220>
-References: <1332747359-15647-1-git-send-email-chen.ganir@ti.com>
+Subject: Re: [PATCH v4 3/3] GATT: Profile support for EnableGatt
+Message-ID: <20120326092120.GA322@x220>
+References: <1332169073-15885-1-git-send-email-chen.ganir@ti.com>
+ <1332169073-15885-4-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332747359-15647-1-git-send-email-chen.ganir@ti.com>
+In-Reply-To: <1332169073-15885-4-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Chen,
 
-On Mon, Mar 26, 2012, chen.ganir@ti.com wrote:
-> Move gatt related primary and characteristic definitions
-> from the att.h to gatt.h (ATT does not define services and
-> characteristics - those are GATT terms).
-> 
-> This is v2 of the patch set, fixing compilation errors.
-> 
-> Chen Ganir (2):
->   GATT: Rename service and char structs
->   GATT: replace start/end with att_range
-> 
->  attrib/att.h              |   13 -------------
->  attrib/client.c           |   22 +++++++++++-----------
->  attrib/gatt.c             |   12 ++++++------
->  attrib/gatt.h             |   12 ++++++++++++
->  attrib/gatttool.c         |    6 +++---
->  attrib/interactive.c      |    6 +++---
->  proximity/manager.c       |    6 ++++--
->  proximity/monitor.c       |   22 +++++++++++-----------
->  proximity/monitor.h       |    4 ++--
->  src/adapter.c             |   11 ++++++-----
->  src/device.c              |   14 +++++++-------
->  thermometer/manager.c     |    6 ++++--
->  thermometer/thermometer.c |   12 ++++++------
->  thermometer/thermometer.h |    2 +-
->  14 files changed, 76 insertions(+), 72 deletions(-)
+On Mon, Mar 19, 2012, chen.ganir@ti.com wrote:
+> --- a/alert/main.c
+> +++ b/alert/main.c
+> @@ -28,6 +28,7 @@
+>  
+>  #include <stdint.h>
+>  #include <glib.h>
+> +#include <errno.h>
+>  
+>  #include "plugin.h"
+>  #include "hcid.h"
+> @@ -37,8 +38,8 @@
+>  static int alert_init(void)
+>  {
+>  	if (!main_opts.gatt_enabled) {
+> -		DBG("Attribute server is disabled");
+> -		return -1;
+> +		DBG("GATT is disabled");
+> +		return -ENOTSUP;
+>  	}
 
-Both patches have been applied. Thanks.
+I've applied all three patches, but I think it'd be cleaner to have the
+check for main_opts.gatt_enabled in a single central place instead of
+each plugin having to do it by themselves (in general any access to
+main_opts from plugins should imo be avoided).
+
+The first idea that comes to mind is that gatt_service_add() should be
+the one checking for this conf-option and plugins should check for
+failure of that function.
 
 Johan
