@@ -1,49 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <66BD268F973E3544A665E5F503FB38B71AE959B22A@DC01.bmw-carit.intra>
-References: <CAB7rCTiQiaFRqDOj6OGZPfTtBWSnR60ADAZimEZJ=F0Tf0-R4Q@mail.gmail.com>
-	<CABBYNZLp3U9sHqiaW9xcH1f8qfrkM7t181y8NVK5L+Rwxet5jw@mail.gmail.com>
-	<CAB7rCTid2cRwetSyNpaT3vGGT_GrSGxzjqR6BJt-J-g4wJuM0w@mail.gmail.com>
-	<CABBYNZJw+7Jat-NUuiMgSr+zcRSoEm1JhmwSUea60hOhpROWmA@mail.gmail.com>
-	<CAB7rCTjdCTiOP+XWjk5GcF=37tRi4_uHYYOFX2j1Kj5xBSsqhA@mail.gmail.com>
-	<66BD268F973E3544A665E5F503FB38B71AE959B22A@DC01.bmw-carit.intra>
-Date: Tue, 27 Mar 2012 09:22:27 -0500
-Message-ID: <CAB7rCTgUQsygR4sBWp5oVwi647OfEncgCTZeQivgj4oZg9qt0A@mail.gmail.com>
-Subject: Re: media transport -- when is acquire ok to call?
-From: Mike <puffy.taco@gmail.com>
-To: Mikel Astiz <Mikel.Astiz@bmw-carit.de>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [RFC BlueZ 2/2] gatttool: Add "included" command
+Date: Tue, 27 Mar 2012 10:06:06 -0400
+Message-Id: <1332857166-25002-3-git-send-email-jefferson.delfes@openbossa.org>
+In-Reply-To: <1332857166-25002-1-git-send-email-jefferson.delfes@openbossa.org>
+References: <1332857166-25002-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+New command to find included services in interactive mode.
+---
+ attrib/interactive.c |   54 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
 
-On Tue, Mar 27, 2012 at 1:31 AM, Mikel Astiz <Mikel.Astiz@bmw-carit.de> wrote:
-> Hi Mike,
->
->> So that has me confused.  If the MediaTransport interface is somewhat
->> generic, why would I want to listen to another interface to know if I
->> should call Acquire?  In my case, I would need to listen to
->> HeadsetGateway.  As it is, the audio from my SCO connection is sent
->> over a PCM bus, so I currently do not even register an SCO endpoint,
->> because it was not needed.  I agree that if you are the initiator,
->> Acquire/Release is sufficient.  In my case, as the non-initiator, it is
->> not sufficient because I do not want to open an audio link by calling
->> acquire unless it already exists.
->
-> I'm not sure if this solves your specific problem(s) but I would propose that the MediaTransport API is extended with a method such as TryAcquire (or alternatively Acquire can be extended with either one more parameter, or some specific flag in accesstype). In that case the transport would not be acquired unless the audio link already exists.
->
-> The current approach of listening to a state property and then calling Acquire is racy, no matter if the property is in the same interface or not.
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 5941811..67fb7cb 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -190,6 +190,28 @@ static void primary_by_uuid_cb(GSList *ranges, guint8 status,
+ 	rl_forced_update_display();
+ }
+ 
++static void included_cb(GSList *includes, guint8 status, gpointer user_data)
++{
++	GSList *l;
++
++	if (status) {
++		printf("Find included services failed: %s\n",
++						att_ecode2str(status));
++		return;
++	}
++
++	printf("\n");
++	for (l = includes; l; l = l->next) {
++		struct gatt_included *incl = l->data;
++		printf("handle: 0x%04x, start handle: 0x%04x, "
++				"end handle: 0x%04x uuid: %s\n",
++				incl->handle, incl->range.start,
++				incl->range.end, incl->uuid);
++	}
++
++	rl_forced_update_display();
++}
++
+ static void char_cb(GSList *characteristics, guint8 status, gpointer user_data)
+ {
+ 	GSList *l;
+@@ -400,6 +422,36 @@ static int strtohandle(const char *src)
+ 	return dst;
+ }
+ 
++static void cmd_included(int argcp, char **argvp)
++{
++	int start = 0x0001;
++	int end = 0xffff;
++
++	if (conn_state != STATE_CONNECTED) {
++		printf("Command failed: disconnected\n");
++		return;
++	}
++
++	if (argcp > 1) {
++		start = strtohandle(argvp[1]);
++		if (start < 0) {
++			printf("Invalid start handle: %s\n", argvp[1]);
++			return;
++		}
++		end = start;
++	}
++
++	if (argcp > 2) {
++		end = strtohandle(argvp[2]);
++		if (end < 0) {
++			printf("Invalid end handle: %s\n", argvp[2]);
++			return;
++		}
++	}
++
++	gatt_find_included(attrib, start, end, included_cb, NULL);
++}
++
+ static void cmd_char(int argcp, char **argvp)
+ {
+ 	int start = 0x0001;
+@@ -726,6 +778,8 @@ static struct {
+ 		"Disconnect from a remote device" },
+ 	{ "primary",		cmd_primary,	"[UUID]",
+ 		"Primary Service Discovery" },
++	{ "included",		cmd_included,	"[start hnd [end hnd]]",
++		"Find Included Services" },
+ 	{ "characteristics",	cmd_char,	"[start hnd [end hnd [UUID]]]",
+ 		"Characteristics Discovery" },
+ 	{ "char-desc",		cmd_char_desc,	"[start hnd] [end hnd]",
+-- 
+1.7.9.4
 
-I think your proposal would fix this race in a way that doesn't
-fundamentally change the current design, so I'm in favor of it.
-
-> Regarding your comment on the need to listen to a different interface, I don't think this should be a big problem. Having said that, the Playing state in HeadsetGateway (and equivalents) could be replaced by a state in MediaTransport. That actually seems more appropriate to me.
-
-Agreed. The reason I don't like the current approach is that there is
-no explicit connection between the MediaTransport object and the other
-object that has the state property.
-
-Mike
