@@ -2,106 +2,151 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH BlueZ 4/4] eir: Read GAP appearance from advertising data
-Date: Tue, 27 Mar 2012 09:29:38 -0400
-Message-Id: <1332854978-26072-5-git-send-email-bruna.moreira@openbossa.org>
+Subject: [PATCH BlueZ 3/4] device: Appearance characteristic from GAP service
+Date: Tue, 27 Mar 2012 09:29:37 -0400
+Message-Id: <1332854978-26072-4-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1332854978-26072-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1332854978-26072-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This was introduced on Core Specification Supplement (CSS) v1.
+After searching for primary services, the appearance characteristic is
+read from GAP service and saved in "appearance" file. Running
+GetProperty in device interface, will show the Class equals to zero
+(meaning the device is discovered over GATT and has an Appearance
+characteristic) and the respective icon.
 ---
- src/adapter.c |   11 +++++++++++
- src/eir.c     |    9 +++++++++
- src/eir.h     |    2 ++
- 3 files changed, 22 insertions(+), 0 deletions(-)
+ src/device.c |   72 +++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 files changed, 66 insertions(+), 6 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 7a2214a..3c7c6d8 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2698,6 +2698,7 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+diff --git a/src/device.c b/src/device.c
+index eab7e4c..4243263 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -73,6 +73,9 @@
+ /* When all services should trust a remote device */
+ #define GLOBAL_TRUST "[all]"
  
- 	if (dev->type != ADDR_TYPE_BREDR) {
- 		gboolean broadcaster;
-+		uint16_t app;
- 
- 		if (dev->flags & (EIR_LIM_DISC | EIR_GEN_DISC))
- 			broadcaster = FALSE;
-@@ -2706,8 +2707,14 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
- 
- 		dev->legacy = FALSE;
- 
-+		if (read_remote_appearance(&adapter->bdaddr, &dev->bdaddr,
-+								&app) == 0)
-+			icon = gap_appearance_to_icon(app);
++#define GAP_SVC_UUID "00001800-0000-1000-8000-00805f9b34fb"
++#define APPEARANCE_CHR_UUID 0x2a01
 +
- 		emit_device_found(adapter->path, paddr,
- 				"Address", DBUS_TYPE_STRING, &paddr,
-+				"Class", DBUS_TYPE_UINT32, &dev->class,
-+				"Icon", DBUS_TYPE_STRING, &icon,
- 				"RSSI", DBUS_TYPE_INT16, &rssi,
- 				"Name", DBUS_TYPE_STRING, &dev->name,
- 				"Alias", DBUS_TYPE_STRING, &alias,
-@@ -2837,6 +2844,10 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 	if (dev_class != 0)
- 		write_remote_class(&adapter->bdaddr, bdaddr, dev_class);
+ struct btd_disconnect_data {
+ 	guint id;
+ 	disconnect_watch watch;
+@@ -319,9 +322,10 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 	bdaddr_t src;
+ 	char name[MAX_NAME_LENGTH + 1], srcaddr[18], dstaddr[18];
+ 	char **str;
+-	const char *ptr;
++	const char *ptr, *icon = NULL;
+ 	dbus_bool_t boolean;
+ 	uint32_t class;
++	uint16_t app;
+ 	int i;
+ 	GSList *l;
  
-+	if (eir_data.appearance != 0)
-+		write_remote_appearance(&adapter->bdaddr, bdaddr,
-+							eir_data.appearance);
+@@ -363,15 +367,19 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 
+ 	/* Class */
+ 	if (read_remote_class(&src, &device->bdaddr, &class) == 0) {
+-		const char *icon = class_to_icon(class);
++		icon = class_to_icon(class);
+ 
+ 		dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32, &class);
++	} else if (read_remote_appearance(&src, &device->bdaddr, &app) == 0) {
++		/* Appearance */
++		icon = gap_appearance_to_icon(app);
++		class = 0;
+ 
+-		if (icon)
+-			dict_append_entry(&dict, "Icon",
+-						DBUS_TYPE_STRING, &icon);
++		dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32, &class);
+ 	}
+ 
++	dict_append_entry(&dict, "Icon", DBUS_TYPE_STRING, &icon);
 +
- 	if (eir_data.name != NULL && eir_data.name_complete)
- 		write_device_name(&adapter->bdaddr, bdaddr, eir_data.name);
+ 	/* Vendor */
+ 	if (device->vendor)
+ 		dict_append_entry(&dict, "Vendor", DBUS_TYPE_UINT16,
+@@ -1784,10 +1792,50 @@ done:
+ 	return FALSE;
+ }
  
-diff --git a/src/eir.c b/src/eir.c
-index 419f444..b9ecf31 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -108,6 +108,7 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
- 	while (len < eir_len - 1) {
- 		uint8_t field_len = eir_data[0];
- 		uint8_t data_len, *data = &eir_data[2];
-+		uint16_t *u16;
- 
- 		/* Check for the end of EIR */
- 		if (field_len == 0)
-@@ -164,6 +165,14 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
- 			if (data_len < 3)
- 				break;
- 			memcpy(eir->dev_class, data, 3);
-+			break;
++static void appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
++							gpointer user_data)
++{
++	struct btd_device *device = user_data;
++	struct btd_adapter *adapter = device->adapter;
++	struct att_data_list *list =  NULL;
++	uint16_t app;
++	bdaddr_t src;
++	uint8_t *atval;
 +
-+		case EIR_GAP_APPEARANCE:
-+			if (data_len < 2)
-+				break;
-+			u16 = (uint16_t *) data;
-+			eir->appearance = btohs(bt_get_unaligned(u16));
-+			break;
- 		}
++	if (status != 0) {
++		DBG("Read characteristics by UUID failed: %s\n",
++							att_ecode2str(status));
++		goto done;
++	}
++
++	list = dec_read_by_type_resp(pdu, plen);
++	if (list == NULL)
++		goto done;
++
++	if (list->len != 4) {
++		DBG("Appearance value: invalid data");
++		goto done;
++	}
++
++	/* A device shall have only one instance of the
++	Appearance characteristic. */
++	atval = list->data[0] + 2; /* skip handle value */
++	app = att_get_u16(atval);
++
++	adapter_get_address(adapter, &src);
++	write_remote_appearance(&src, &device->bdaddr, app);
++
++done:
++	att_data_list_free(list);
++	if (device->attios == NULL && device->attios_offline == NULL)
++		att_cleanup(device);
++}
++
+ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
+ {
+ 	struct browse_req *req = user_data;
+ 	struct btd_device *device = req->device;
++	struct gatt_primary *gap_prim = NULL;
+ 	GSList *l, *uuids = NULL;
  
- 		eir_data += field_len + 1;
-diff --git a/src/eir.h b/src/eir.h
-index 13311ef..f712be5 100644
---- a/src/eir.h
-+++ b/src/eir.h
-@@ -34,6 +34,7 @@
- #define EIR_TX_POWER                0x0A  /* transmit power level */
- #define EIR_CLASS_OF_DEV            0x0D  /* Class of Device */
- #define EIR_DEVICE_ID               0x10  /* device ID */
-+#define EIR_GAP_APPEARANCE          0x19  /* GAP appearance */
+ 	if (status) {
+@@ -1804,13 +1852,25 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
  
- struct uuid_info {
- 	uuid_t uuid;
-@@ -45,6 +46,7 @@ struct eir_data {
- 	int flags;
- 	char *name;
- 	uint8_t dev_class[3];
-+	uint16_t appearance;
- 	gboolean name_complete;
- };
+ 	for (l = services; l; l = l->next) {
+ 		struct gatt_primary *prim = l->data;
++
++		if (strcmp(prim->uuid, GAP_SVC_UUID) == 0)
++			gap_prim = prim;
++
+ 		uuids = g_slist_append(uuids, prim->uuid);
+ 	}
  
+ 	device_register_services(req->conn, device, g_slist_copy(services), -1);
+ 	device_probe_drivers(device, uuids);
+ 
+-	if (device->attios == NULL && device->attios_offline == NULL)
++	if (gap_prim) {
++		/* Read appearance characteristic */
++		bt_uuid_t uuid;
++
++		bt_uuid16_create(&uuid, APPEARANCE_CHR_UUID);
++
++		gatt_read_char_by_uuid(device->attrib, gap_prim->range.start,
++			gap_prim->range.end, &uuid, appearance_cb, device);
++	} else if (device->attios == NULL && device->attios_offline == NULL)
+ 		att_cleanup(device);
+ 
+ 	g_slist_free(uuids);
 -- 
 1.7.5.4
 
