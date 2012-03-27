@@ -1,184 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH v2 0/5] Add DeviceInformationService plugin
+Date: Tue, 27 Mar 2012 07:30:01 +0000
+Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B46371A@DNCE02.ent.ti.com>
+References: <1332775508-32693-1-git-send-email-chen.ganir@ti.com>
+ <CAKT1EBd1U84xBox39_eTyccWwiBd1X8UttiHsYB1fAyNQ1LTnQ@mail.gmail.com>
+In-Reply-To: <CAKT1EBd1U84xBox39_eTyccWwiBd1X8UttiHsYB1fAyNQ1LTnQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <CABax29XWLWcBT6hHgSQud6qzhQ-Y-WAMjQ8ytCT7Px09H1iQtg@mail.gmail.com>
-References: <CABax29VLUHg_jePnhHz_6WHYCZBHoir5TBLuauK+Ktfg9-8Xjw@mail.gmail.com>
-	<CACY+gR3t4RXuhUEi9486qsP+p0GCYArHW+PO5QfBfEUfnd=xEg@mail.gmail.com>
-	<CABax29X1tFt8Am_i7y5nZsjs_D2QY9pbv19316Wn6RVq7ksEDA@mail.gmail.com>
-	<CACY+gR2DeQE2UaYwD8AQonNxtZ+=uZm7qY+BaqgjBQKoZSZHYA@mail.gmail.com>
-	<CABax29U8N2nOge34tr=G2f-fZvowCHPf3V=N2an-vC+x=UBdiQ@mail.gmail.com>
-	<CACY+gR2PkP76J2Dw9xobpeGsU2HKhsOYvU6Wcx8WCcq1opihiA@mail.gmail.com>
-	<CABax29VadeA+6WZWRDiZZUhpRqk2Nk35__b0Cjfz8HO12Tq4vQ@mail.gmail.com>
-	<CACY+gR0DJfbOgfSGHrsAj5vk00v4-_+KYwR+SF+0BRRs2oYBkw@mail.gmail.com>
-	<CABax29X+ke_PO9obAxbEJjdx68g8JW4ZZn7vS7mYpE7+00iYng@mail.gmail.com>
-	<CABax29WFvAXH9g8CnOtEDAqfmKmURnt4eYY58fi+P9zBa5Ji1A@mail.gmail.com>
-	<CACY+gR3pqj6xoJ-G-pt5QTY6BjuyUNXTZRzsQmmutcSNBzY3qQ@mail.gmail.com>
-	<CABax29Unh0AOhExp_FJwUr=edmPSDXy=_YJAXN81M5tp5+yUxw@mail.gmail.com>
-	<CABax29XWLWcBT6hHgSQud6qzhQ-Y-WAMjQ8ytCT7Px09H1iQtg@mail.gmail.com>
-Date: Tue, 27 Mar 2012 10:57:58 +0300
-Message-ID: <CACY+gR3aPvvMRvNW+c3QdF8UkGR4ZGPChWt4MAoa+5fK=HSBNQ@mail.gmail.com>
-Subject: Re: [PATCH] Re: A2DP quality (bluetooth-alsa)
-From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=f46d042f9db66624f004bc34d982
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---f46d042f9db66624f004bc34d982
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Mar 27, 2012 at 4:29 AM, qduaty <qduaty@gmail.com> wrote:
->> 2012/3/26 Siarhei Siamashka <siarhei.siamashka@gmail.com>:
->>> Floating point code does not need any rounding coefficient.
->
-> I'm very likely to agreed that I was wrong with initializing t1
-> elements to 1, but seemingly it helps with quality, especially in
-> conjunction with accumError. So either I discovered something new, or
-> I repeatedly "hear" my changes in C code instead of actual difference.
-
-I think Double Blind listening Test is necessary, otherwise everything
-is very subjective:
-    http://www.hydrogenaudio.org/forums/index.php?showtopic=3D16295
-
-> Maybe I should look at sbcdec output.
-
-You could also look at fixing sbc decoder, it still does have some
-real audio quality problems :)
-
-> Regarding the bitpool:
->
->>> Do you have a hcidump log before and after patching bluez for the part
->>> where A2DP settings are negotiated?
->
-> Actually I just forced bluez to use higher bitpool for SBC than
-> negotiated. This is the hcidump after the change, but it does not
-> differ from what has been before.
->
->> ACL data: handle 1 flags 0x02 dlen 20
-> =C2=A0 =C2=A0L2CAP(d): cid 0x0040 len 16 [psm 25]
-> =C2=A0 =C2=A0 =C2=A0AVDTP(s): Capabilities rsp: transaction 4 nsp 0x00
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0Media Transport
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0Media Codec - SBC
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A016kHz 32kHz 44.1kHz 48kHz
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Mono DualChannel Stereo JointStereo
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04 8 12 16 Blocks
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04 8 Subbands
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0SNR Loudness
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Bitpool Range 2-53
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0Content Protection
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A002 00
-> < ACL data: handle 1 flags 0x02 dlen 18
-> =C2=A0 =C2=A0L2CAP(d): cid 0x0060 len 14 [psm 25]
-> =C2=A0 =C2=A0 =C2=A0AVDTP(s): Set config cmd: transaction 5 nsp 0x00
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0ACP SEID 1 - INT SEID 1
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0Media Transport
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0Media Codec - SBC
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A044.1kHz
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Stereo
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A016 Blocks
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A08 Subbands
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Loudness
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Bitpool Range 46-46
->
-> The headset reports bltpool range of 2-53 and bluez reports 46-46, but
-> according to Blueman, it streams at 99 KB/s
-
-This is getting really confusing. If I run blueman, it reports ~40
-KB/s for bitpool 53, ~48 KB/s for bitpool 64 and ~36 KB/s for bitpool
-46 (if I add 'bitpool "46"' line to my .asoundrc).
-
-> Also, I removed calls to
-> default_bitpool(), which is now reported as unused function, and
-> increased MAX_BITPOOL everywhere. It does not change anything.
-
-I have attached two test patches.
-
-The first patch adds debug prints to syslog from sbc encoder, just to
-clearly confirm the real bitpool used by the encoder. If the encoder
-is encoding data with some certain bitpool settings and you hear
-something from your headset, then there is no way for the bitpool to
-be magically different from that.
-
-The second patch removes default_bitpool() limitation, and this boosts
-bitpool from 53 to 64 for me. Confirmed by sbc encoder debug prints
-from my first patch, hcidump log and blueman streaming rate
-statistics.
-
-> When bitpool is not set in ./asoundrc, Bluez responds with the same
-> values it received from the device. There is a difference between
-> Bluez and WinMo, which first sends its own capabilities and then asks
-> the device (see my previous hcidump). I don't know what BH-503
-> answers, but it's possible that it adapts to higher limits of the
-> phone and reports higher bitpools than 53, or the phone overrides
-> negotiated settings and streams at any bitpool it likes. I tested it
-> with bitpools up to 250 and it always worked. Contrary to that, Bluez
-> copies the (fake or backward-compatible) value of 53 that was received
-> from the device and limits itself instead of reporting its real
-> capabilities.
-
---=20
-Best regards,
-Siarhei Siamashka
-
---f46d042f9db66624f004bc34d982
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-HACK-report-bitpool-to-syslog-from-sbc-encoder.patch"
-Content-Disposition: attachment;
-	filename="0001-HACK-report-bitpool-to-syslog-from-sbc-encoder.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_h0amv6e20
-
-RnJvbSA5NGE3NDk0ZjA2M2IzZTIyYzhlMmMzNTU2YTAyMWM1MzE1NTk4ZTg2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTaWFyaGVpIFNpYW1hc2hrYSA8c2lhcmhlaS5zaWFtYXNoa2FA
-Z21haWwuY29tPgpEYXRlOiBUdWUsIDI3IE1hciAyMDEyIDEwOjAzOjAwICswMzAwClN1YmplY3Q6
-IFtQQVRDSCAxLzJdIEhBQ0s6IHJlcG9ydCBiaXRwb29sIHRvIHN5c2xvZyBmcm9tIHNiYyBlbmNv
-ZGVyCgotLS0KIHNiYy9zYmMuYyB8ICAgIDMgKysrCiAxIGZpbGVzIGNoYW5nZWQsIDMgaW5zZXJ0
-aW9ucygrKSwgMCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9zYmMvc2JjLmMgYi9zYmMvc2Jj
-LmMKaW5kZXggYzUwMTVhYi4uMDI3MzAzNSAxMDA2NDQKLS0tIGEvc2JjL3NiYy5jCisrKyBiL3Ni
-Yy9zYmMuYwpAQCAtNDIsNiArNDIsNyBAQAogI2luY2x1ZGUgPHN0ZGxpYi5oPgogI2luY2x1ZGUg
-PHN5cy90eXBlcy5oPgogI2luY2x1ZGUgPGxpbWl0cy5oPgorI2luY2x1ZGUgPHN5c2xvZy5oPgog
-CiAjaW5jbHVkZSAic2JjX21hdGguaCIKICNpbmNsdWRlICJzYmNfdGFibGVzLmgiCkBAIC0xMDYw
-LDkgKzEwNjEsMTEgQEAgc3NpemVfdCBzYmNfZW5jb2RlKHNiY190ICpzYmMsIGNvbnN0IHZvaWQg
-KmlucHV0LCBzaXplX3QgaW5wdXRfbGVuLAogCiAJCXNiY19lbmNvZGVyX2luaXQoJnByaXYtPmVu
-Y19zdGF0ZSwgJnByaXYtPmZyYW1lKTsKIAkJcHJpdi0+aW5pdCA9IDE7CisJCXN5c2xvZyhMT0df
-VVNFUiB8IExPR19JTkZPLCAic2JjX2VuY29kZTogYml0cG9vbCBzZXQgdG8gJWRcbiIsIHNiYy0+
-Yml0cG9vbCk7CiAJfSBlbHNlIGlmIChwcml2LT5mcmFtZS5iaXRwb29sICE9IHNiYy0+Yml0cG9v
-bCkgewogCQlwcml2LT5mcmFtZS5sZW5ndGggPSBzYmNfZ2V0X2ZyYW1lX2xlbmd0aChzYmMpOwog
-CQlwcml2LT5mcmFtZS5iaXRwb29sID0gc2JjLT5iaXRwb29sOworCQlzeXNsb2coTE9HX1VTRVIg
-fCBMT0dfSU5GTywgInNiY19lbmNvZGU6IGJpdHBvb2wgY2hhbmdlZCB0byAlZFxuIiwgc2JjLT5i
-aXRwb29sKTsKIAl9CiAKIAkvKiBpbnB1dCBtdXN0IGJlIGxhcmdlIGVub3VnaCB0byBlbmNvZGUg
-YSBjb21wbGV0ZSBmcmFtZSAqLwotLSAKMS43LjMuNAoK
---f46d042f9db66624f004bc34d982
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0002-HACK-remove-default_bitpool-limitation.patch"
-Content-Disposition: attachment;
-	filename="0002-HACK-remove-default_bitpool-limitation.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_h0amvktn1
-
-RnJvbSBiYmQ1MTAyYTE4NWQ4YzgwYjM2Njg4NjQ2MThmMzQzNTljMmQyMTM5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTaWFyaGVpIFNpYW1hc2hrYSA8c2lhcmhlaS5zaWFtYXNoa2FA
-Z21haWwuY29tPgpEYXRlOiBUdWUsIDI3IE1hciAyMDEyIDEwOjEwOjI3ICswMzAwClN1YmplY3Q6
-IFtQQVRDSCAyLzJdIEhBQ0s6IHJlbW92ZSBkZWZhdWx0X2JpdHBvb2wgbGltaXRhdGlvbgoKLS0t
-CiBhdWRpby9hMmRwLmMgICAgICAgICAgfCAgICAzICstLQogYXVkaW8vcGNtX2JsdWV0b290aC5j
-IHwgICAgNCArLS0tCiAyIGZpbGVzIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgNSBkZWxldGlv
-bnMoLSkKCmRpZmYgLS1naXQgYS9hdWRpby9hMmRwLmMgYi9hdWRpby9hMmRwLmMKaW5kZXggNjIz
-YTBiYy4uODE1MzgxOSAxMDA2NDQKLS0tIGEvYXVkaW8vYTJkcC5jCisrKyBiL2F1ZGlvL2EyZHAu
-YwpAQCAtMTgzOSw4ICsxODM5LDcgQEAgc3RhdGljIGdib29sZWFuIHNlbGVjdF9zYmNfcGFyYW1z
-KHN0cnVjdCBzYmNfY29kZWNfY2FwICpjYXAsCiAJCWNhcC0+YWxsb2NhdGlvbl9tZXRob2QgPSBT
-QkNfQUxMT0NBVElPTl9TTlI7CiAKIAltaW5fYml0cG9vbCA9IE1BWChNSU5fQklUUE9PTCwgc3Vw
-cG9ydGVkLT5taW5fYml0cG9vbCk7Ci0JbWF4X2JpdHBvb2wgPSBNSU4oZGVmYXVsdF9iaXRwb29s
-KGNhcC0+ZnJlcXVlbmN5LCBjYXAtPmNoYW5uZWxfbW9kZSksCi0JCQkJCQkJc3VwcG9ydGVkLT5t
-YXhfYml0cG9vbCk7CisJbWF4X2JpdHBvb2wgPSBNQVgobWluX2JpdHBvb2wsIHN1cHBvcnRlZC0+
-bWF4X2JpdHBvb2wpOwogCiAJY2FwLT5taW5fYml0cG9vbCA9IG1pbl9iaXRwb29sOwogCWNhcC0+
-bWF4X2JpdHBvb2wgPSBtYXhfYml0cG9vbDsKZGlmZiAtLWdpdCBhL2F1ZGlvL3BjbV9ibHVldG9v
-dGguYyBiL2F1ZGlvL3BjbV9ibHVldG9vdGguYwppbmRleCA4NTU2NmEzLi45MTMwZTM1IDEwMDY0
-NAotLS0gYS9hdWRpby9wY21fYmx1ZXRvb3RoLmMKKysrIGIvYXVkaW8vcGNtX2JsdWV0b290aC5j
-CkBAIC02MDksOSArNjA5LDcgQEAgc3RhdGljIGludCBibHVldG9vdGhfYTJkcF9pbml0KHN0cnVj
-dCBibHVldG9vdGhfZGF0YSAqZGF0YSwKIAkJbWluX2JpdHBvb2wgPSBtYXhfYml0cG9vbCA9IGNm
-Zy0+Yml0cG9vbDsKIAllbHNlIHsKIAkJbWluX2JpdHBvb2wgPSBNQVgoTUlOX0JJVFBPT0wsIGNh
-cC0+bWluX2JpdHBvb2wpOwotCQltYXhfYml0cG9vbCA9IE1JTihkZWZhdWx0X2JpdHBvb2woY2Fw
-LT5mcmVxdWVuY3ksCi0JCQkJCWNhcC0+Y2hhbm5lbF9tb2RlKSwKLQkJCQkJY2FwLT5tYXhfYml0
-cG9vbCk7CisJCW1heF9iaXRwb29sID0gTUFYKG1pbl9iaXRwb29sLCBjYXAtPm1heF9iaXRwb29s
-KTsKIAl9CiAKIAljYXAtPm1pbl9iaXRwb29sID0gbWluX2JpdHBvb2w7Ci0tIAoxLjcuMy40Cgo=
---f46d042f9db66624f004bc34d982--
+Q2xhdWRpbw0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IENsYXVkaW8g
+VGFrYWhhc2kgW21haWx0bzpjbGF1ZGlvLnRha2FoYXNpQG9wZW5ib3NzYS5vcmddDQo+IFNlbnQ6
+IE1vbmRheSwgTWFyY2ggMjYsIDIwMTIgMTA6MzEgUE0NCj4gVG86IEdhbmlyLCBDaGVuDQo+IENj
+OiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0gg
+djIgMC81XSBBZGQgRGV2aWNlSW5mb3JtYXRpb25TZXJ2aWNlIHBsdWdpbg0KPiANCj4gSGkgQ2hl
+biBHYW5pcjoNCj4gDQo+IE9uIE1vbiwgTWFyIDI2LCAyMDEyIGF0IDEyOjI1IFBNLCAgPGNoZW4u
+Z2FuaXJAdGkuY29tPiB3cm90ZToNCj4gPiBGcm9tOiBDaGVuIEdhbmlyIDxjaGVuLmdhbmlyQHRp
+LmNvbT4NCj4gPg0KPiA+IEFkZCBEZXZpY2UgSW5mb3JtYXRpb24gU2VydmljZSBHQVRUIENsaWVu
+dCBmb3IgcmVhZGluZyBwZWVyDQo+ID4gZGV2aWNlIFBOUF9JRCBhbmQgc3RvcmUgaXQuDQo+ID4N
+Cj4gPiBUaGlzIGlzIHYyIG9mIHRoZSBwYXRjaCBzZXQsIHJlbW92aW5nIHNvbWUgdW51c2VkIGNv
+ZGUgdG8NCj4gPiBlbGltaW5hdGUgY29tcGlsYXRpb24gd2FybmluZ3MuDQo+IA0KPiBJIGFtIGFm
+cmFpZCBvZiByYWNlIGNvbmRpdGlvbnMgYmV0d2VlbiBIb0cgYW5kIERJUyBzZXJ2aWNlcy4NCj4g
+DQo+IEFUVCBpcyBhICJzZXJpYWwiIHByb3RvY29sLCBob3dldmVyIHRoZXJlIGlzIG5vIGd1YXJh
+bnRlZSB0aGF0IFBOUCBJRA0KPiBjaGFyYWN0ZXJpc3RpYyB2YWx1ZSB3aWxsIGJlIGF2YWlsYWJs
+ZSBiZWZvcmUgY3JlYXRpbmcgdWhpZCBkZXZpY2UuIEl0DQo+IGRlcGVuZHMgb24gdGhlIHByb2Jp
+bmcgb3JkZXIgQU5EIHdoZW4gdGhlIGNvbW1hbmRzIGFyZSBhZGRlZCBpbiB0aGUNCj4gR0F0dHJp
+YiBxdWV1ZS4NCj4gDQoNCkN1cnJlbnRseSwgRElEIGlzIHJlYWQgZHVyaW5nIHRoZSBDcmVhdGVE
+ZXZpY2UgKEJSL0VEUiBvdmVyIFNEUCB3aGVuIGRldmljZSBpcyBjcmVhdGVkKS4gSW4gYWRkaXRp
+b24sIHdoZW4gd2UgY3JlYXRlIGEgZGV2aWNlLCB3ZSBpbW1lZGlhdGVseSBwcm9iZSB0aGUgRElT
+IHBsdWctaW4gd2hpY2ggaW1tZWRpYXRlbHkgc3RhcnRzIGV4cGxvcmluZyB0aGUgcmVtb3RlIERJ
+UyBzZXJ2ZXIsIGV2ZW4gYmVmb3JlIHVoaWQgaXMgY3JlYXRlZC4gQSAvZGV2L3VoaWQgZGV2aWNl
+IHdpbGwgYmUgb3BlbmVkIG9ubHkgYWZ0ZXIgYSBkZXZpY2UgaGFzIGJlZW4gY3JlYXRlZCwgYW5k
+IGEgdXNlciBhY3Rpb24gd2FzIHBlcmZvcm1lZCB0byBjb25uZWN0IHRoZSBpbnB1dCBkZXZpY2Ug
+KG9yZy5ibHVlei5JbnB1dC5Db25uZWN0IHdpbGwgYmUgY2FsbGVkIG9ubHkgYWZ0ZXIgeW91IGdl
+dCB0aGUgRGV2aWNlQ3JlYXRlZCBldmVudCwgd2hpY2ggbWVhbnMgdGhhdCBhbGwgZGF0YSBoYXMg
+YmVlbiByZWFkKSAsIHNvIHdlIGRvIG5vdCBuZWVkIHRvIHdvcnJ5IGFib3V0IHN1Y2ggYSBzY2Vu
+YXJpbyBhdCB0aGlzIHN0YWdlLg0KDQpIb3dldmVyLCBJIGRvIHRoaW5rIHdlIG5lZWQgdG8gZGVz
+aWduIGEgbWVjaGFuaXNtIGZvciBzeW5jaHJvbml6aW5nIGJldHdlZW4gcGx1Zy1pbnMsIGJ1dCBJ
+J20gbm90IHN1cmUgaXQgc2hvdWxkIGJlIGEgZ2VuZXJpYyBwbHVnLWluIHN5bmMgbWVjaGFuaXNt
+LCBzaW5jZSBub3QgYWxsIHBsdWctaW5zIHJlcXVpcmUgdGhpcy4gDQoNCj4gSU1PLCB0aGUgYWx0
+ZXJuYXRpdmVzIGFyZToNCj4gMS4gbW92ZSB0aGUgRElTL1BuUCBkaXNjb3ZlcnkgdG8gdGhlIGNy
+ZWF0ZSBkZXZpY2UgInByb2NlZHVyZSINCkl0IGlzIGFscmVhZHkgZG9uZSB0aGlzIHdheS4gQ3Jl
+YXRlRGV2aWNlIGZvciBMRSBkZXZpY2UgY2FsbHMgdGhlIGRpc2NvdmVyX3ByaW1hcmllcywgYW5k
+IHRoZW4gcHJvYmVzIGFsbCBkcml2ZXJzLiBUaGUgRElTIHBsdWctaW4gd2lsbCBiZSBpbml0aWFs
+aXplZCwgYW5kIHJlYWQgdGhlIHZhbHVlcyBmcm9tIHRoZSBwZWVyIGRldmljZSwgYW5kIHN0b3Jl
+IHRoZW0gaW4gcGVyc2lzdGVudCBzdG9yYWdlLg0KDQo+IDIuIGNyZWF0ZSBwbHVnaW4gc3RhdGVz
+IGFuZCBkZXBlbmRlbmN5IGJlZm9yZSBwcm9iaW5nDQpXZSBkbyBub3QgaGF2ZSB0byBwcm90ZWN0
+IHRoZSBwcm9iaW5nIGhlcmUuIFdlIGRvIG5lZWQgdG8gcHJvdGVjdCB0aGUgL2Rldi91aGlkIGNy
+ZWF0aW9uIGFuZCBjb25maWd1cmF0aW9uLiBBIC9kZXYvdWhpZCB3aWxsIGJlIGNyZWF0ZWQgb24g
+cHJvYmluZyBvbmx5IGFmdGVyIHRoZSB1c2VyIGhhcyBwcmV2aW91c2x5IHNlbGVjdGVkIHRoZSBy
+ZW1vdGUgZGV2aWNlIGZvciBjb25uZWN0aW9uLCBhbmQgdGhpcyB3aWxsIGhhcHBlbiBvbmx5IGFm
+dGVyIHdlIGhhdmUgYSB2YWxpZCBQTlAgaWQgYWxyZWFkeSBzdG9yZWQuDQoNCj4gMy4gdXVpZCAi
+bm90aWZpY2F0aW9uIiBtZWNoYW5pc20iOiBjYWxsYmFjayBnZXRzIGNhbGxlZCB3aGVuIGEgbmV3
+DQo+IHZhbHVlIGlzIGF2YWlsYWJsZSBmb3IgYSBnaXZlbiBjaGFyYWN0ZXJpc3RpYw0KQSBjYWxs
+YmFjayBpcyBwYXJ0IG9mIHRoZSBzb2x1dGlvbiwgYW5kIG5lZWRzIHRvIGJlIGFjY29tcGFuaWVk
+IGJ5IGEgd2F5IHRvIHF1ZXJ5IHRoZSBwbHVnaW4gZm9yIHRoZSB2YWx1ZSBvZiBhIHNwZWNpZmlj
+IGNoYXJhY3RlcmlzdGljIGJ5IHV1aWQuIEhvd2V2ZXIsIHRoaXMgbWF5IG5vdCBiZSBlYXN5LiBG
+b3IgZXhhbXBsZSwgeW91IG1heSBoYXZlIG1vcmUgdGhhbiBvbmUgYmF0dGVyeSBzZXJ2aWNlcywg
+d2l0aCBiYXR0ZXJ5IGxldmVsIGNoYXJhY3RlcmlzdGljcyAod2l0aCB0aGUgc2FtZSBVVUlEKS4g
+SG93IGRvIHlvdSBsaW5rIGJldHdlZW4gYSBzcGVjaWZpYyBiYXR0ZXJ5IGFuZCBpdHMgdmFsdWU/
+IA0KDQpJIGRvIG5vdCB0aGluayBhIGdlbmVyaWMgc29sdXRpb24gaXMgdGhlIGJlc3Qgc29sdXRp
+b24gaGVyZS4gUGVyaGFwcyB3ZSBuZWVkIHRvIGNvbWJpbmUgdGhpcyB3aXRoIHRoZSBidGRfZGV2
+aWNlLCBhbmQgbWFrZSBzdXJlIGJ0ZF9kZXZpY2UgaXMgdGhlIGNlbnRyYWwgbG9jYXRpb24gZm9y
+IGdldHRpbmcgdmFsdWVzIGFuZCBub3RpZmljYXRpb25zLiBDdXJyZW50bHkgd2UgaGF2ZSB0aGUg
+YnRkX2RldmljZV9nZXRfdmVuZG9yX3NyYywgYnRkX2RldmljZV9nZXRfdmVuZG9yIGFuZCBvdGhl
+cnMgd2hpY2ggY2FuIGJlIHVzZWQgdG8gY2hlY2sgaWYgYSB2YWx1ZSBpcyBwcmVzZW50LiBPciBu
+b3QuIFRoZSBzaW1wbGVzdCBzb2x1dGlvbiB3b3VsZCBiZSBjaGVja2luZyB0aGlzIGluZm9ybWF0
+aW9uIHBlcmlvZGljYWxseSBmcm9tIHRoZSBISUQgc2VydmljZSBwbHVnaW4sIG9yIGFkZCBhIHBy
+b3BlcnR5X2NoYW5nZWQgY2FsbGJhY2sgc2ltaWxhciB0byB0aGUgRC1CVVMgbWVjaGFuaXNtIHRo
+YXQgd291bGQgaGF2ZSBhIHZhcmlhYmxlIHNpemVkIGRhdGEgcGF5bG9hZCwgZGVwZW5kaW5nIG9u
+IHRoZSBwcm9wZXJ0eSBpZCB3ZSB1c2UuIEFuIGV4YW1wbGUgd291bGQgYmUgOg0KDQp0eXBlZGVm
+IHZvaWQgKCpwcm9wZXJ0eV9jaGFuZ2VkX2NiKSAodWludDE2X3QgcHJvcGVydHlfaWQsIHVpbnQ4
+X3QgKnByb3BlcnR5X2RhdGEsIHVpbnQxNl90IGRhdGFfbGVuZ3RoKQ0KDQojZGVmaW5lIFBST1BF
+UlRZX0NIQU5HRURfVkVORE9SX0lEIDB4MTANCnR5cGVkZWYgc3RydWN0IHZpZF9jaGFuZ2VkIHsN
+Cgl1aW50MTZfdCB2aWQ7DQp9DQoNCiNkZWZpbmUgUFJPUEVSVFlfQ0hBTkdFRF9WRU5ET1JfSURf
+U1JDIDB4MTENCnR5cGVkZWYgc3RydWN0IHZpZF9zcmNfY2hhbmdlZCB7DQoJdWludDE2X3Qgdmlk
+X3NyYzsNCn0NCg0KI2RlZmluZSBQUk9QRVJUWV9DSEFOR0VEX0JBVFRFUllfTEVWRUwgMHgxMg0K
+dHlwZWRlZiBzdHJ1Y3QgYmF0dF9sZXZlbF9jaGFuZ2VkIHsNCgl1aW50OF90ICBuYW1lc3BhY2U7
+DQoJdWludDE2X3QgZGVzY3JpcHRpb247DQoJdWludDhfdCAgdmFsdWU7DQp9DQoNCnRoaXMgd2ls
+bCBiZSBjYWxsZWQgaW4gY29uanVuY3Rpb24gd2l0aCB0aGUgRC1CVVMgUHJvcGVydHlDaGFuZ2Vk
+IGV2ZW50IGZvciBlYWNoIGNoYW5nZWQgcHJvcGVydHksIGZvciBhbGwgcmVnaXN0ZXJlZCBwcm9w
+ZXJ0eV9jaGFuZ2VkIGNhbGxiYWNrcyByZWdpc3RlcmVkLiANCg0KV2hhdCBkbyB5b3UgdGhpbmsg
+Pw0KDQo+IA0KPiBPcGluaW9ucz8NCj4gDQoNCj4gQlIsDQo+IENsYXVkaW8NCg0KDQoNClRoYW5r
+cywNCkNoZW4gR2FuaXINCg0K
