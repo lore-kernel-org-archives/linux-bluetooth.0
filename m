@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v2 BlueZ 8/8] gattrib: Protect GAttrib when there is a pending write
-Date: Tue, 27 Mar 2012 16:43:49 -0400
-Message-Id: <1332881029-1732-9-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH v2 BlueZ 6/8] attrib: Fix missing D-Bus message unref on DiscoverCharacteristics
+Date: Tue, 27 Mar 2012 16:43:47 -0400
+Message-Id: <1332881029-1732-7-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1332881029-1732-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1332349255-15764-1-git-send-email-anderson.lizardo@openbossa.org>
  <1332881029-1732-1-git-send-email-anderson.lizardo@openbossa.org>
@@ -13,37 +13,26 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
+This patch fixes a missing message unref when DiscoverCharacteristics on
+Generic Attribute finishes.
 ---
- attrib/gattrib.c |   12 ++++++++----
- 1 files changed, 8 insertions(+), 4 deletions(-)
+ attrib/client.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 8a1e97b..c3a70b9 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -293,14 +293,18 @@ static void destroy_sender(gpointer data)
- 	struct _GAttrib *attrib = data;
+diff --git a/attrib/client.c b/attrib/client.c
+index 57cd028..609f8b9 100644
+--- a/attrib/client.c
++++ b/attrib/client.c
+@@ -930,6 +930,9 @@ static void char_discovered_cb(GSList *characteristics, guint8 status,
+ 	reply = create_discover_char_reply(gatt->query->msg, gatt->chars);
  
- 	attrib->write_watch = 0;
-+	g_attrib_unref(attrib);
- }
- 
- static void wake_up_sender(struct _GAttrib *attrib)
- {
--	if (attrib->write_watch == 0)
--		attrib->write_watch = g_io_add_watch_full(attrib->io,
--			G_PRIORITY_DEFAULT, G_IO_OUT, can_write_data,
--			attrib, destroy_sender);
-+	if (attrib->write_watch != 0)
-+		return;
+ fail:
++	dbus_message_unref(gatt->query->msg);
++	gatt->query->msg = NULL;
 +
-+	attrib = g_attrib_ref(attrib);
-+	attrib->write_watch = g_io_add_watch_full(attrib->io,
-+				G_PRIORITY_DEFAULT, G_IO_OUT,
-+				can_write_data, attrib, destroy_sender);
- }
- 
- static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
+ 	g_dbus_send_message(gatt->conn, reply);
+ 	query_list_remove(gatt, current);
+ 	g_free(current);
 -- 
 1.7.5.4
 
