@@ -1,42 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] event: Store Class of Device after connection
-Date: Tue, 27 Mar 2012 09:06:14 -0400
-Message-Id: <1332853574-26832-1-git-send-email-anderson.lizardo@openbossa.org>
+Cc: epx@signove.com
+Subject: [PATCH v2] Omit MainChannel when HDP first reliable channel is nil
+Date: Tue, 27 Mar 2012 10:03:25 -0300
+Message-Id: <1332853405-16495-1-git-send-email-epx@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Class of Device is usually sent on the EIR returned by the Device
-Connected mgmt event. For hciops, the Class of Device is always NULL on
-the connection complete event.
+Do not add MainChannel to property list when HDP first reliable channel
+does not exist. Upon channel destruction, ChannelDeleted signal is already
+emitted.
 
-The stored Class of Device is used later for Class/Icon device
-properties.
+This also fixes a crash where MainChannel was filled with invalid path ""
+when first reliable channel did not exist.
 ---
- src/event.c |    8 ++++++++
- 1 files changed, 8 insertions(+), 0 deletions(-)
+ health/hdp.c |   15 +++------------
+ 1 files changed, 3 insertions(+), 12 deletions(-)
 
-diff --git a/src/event.c b/src/event.c
-index 113a2b6..78d2757 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -455,6 +455,14 @@ void btd_event_conn_complete(bdaddr_t *local, bdaddr_t *peer, addr_type_t type,
+diff --git a/health/hdp.c b/health/hdp.c
+index 812352f..455240c 100644
+--- a/health/hdp.c
++++ b/health/hdp.c
+@@ -723,14 +723,8 @@ static void health_channel_destroy(void *data)
+ 					DBUS_TYPE_INVALID);
  
- 	update_lastused(local, peer);
+ 	if (hdp_chan == dev->fr) {
+-		char *empty_path;
+-
+ 		hdp_channel_unref(dev->fr);
+ 		dev->fr = NULL;
+-		empty_path = "/";
+-		emit_property_changed(dev->conn, device_get_path(dev->dev),
+-					HEALTH_DEVICE, "MainChannel",
+-					DBUS_TYPE_OBJECT_PATH, &empty_path);
+ 	}
  
-+	if (dev_class != NULL) {
-+		uint32_t class = dev_class[0] | (dev_class[1] << 8) |
-+							(dev_class[2] << 16);
+ end:
+@@ -2061,7 +2055,6 @@ static DBusMessage *device_get_properties(DBusConnection *conn,
+ 	struct hdp_device *device = user_data;
+ 	DBusMessageIter iter, dict;
+ 	DBusMessage *reply;
+-	char *path;
+ 
+ 	reply = dbus_message_new_method_return(msg);
+ 	if (reply == NULL)
+@@ -2075,11 +2068,9 @@ static DBusMessage *device_get_properties(DBusConnection *conn,
+ 			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+ 
+ 	if (device->fr != NULL)
+-		path = g_strdup(device->fr->path);
+-	else
+-		path = g_strdup("");
+-	dict_append_entry(&dict, "MainChannel", DBUS_TYPE_OBJECT_PATH, &path);
+-	g_free(path);
++		dict_append_entry(&dict, "MainChannel", DBUS_TYPE_OBJECT_PATH,
++							&device->fr->path);
 +
-+		if (class != 0)
-+			write_remote_class(local, peer, class);
-+	}
-+
- 	device_set_addr_type(device, type);
+ 	dbus_message_iter_close_container(&iter, &dict);
  
- 	adapter_add_connection(adapter, device);
+ 	return reply;
 -- 
 1.7.5.4
 
