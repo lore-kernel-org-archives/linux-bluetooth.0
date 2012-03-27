@@ -1,28 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Mar 2012 14:07:41 -0300
+Date: Tue, 27 Mar 2012 14:04:04 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] MAINTAINERS: update Bluetooth tree locations
-Message-ID: <20120327170741.GF9856@joana>
-References: <1332865260-3779-1-git-send-email-marcel@holtmann.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Mew location of the bluetooth kernel trees
+Message-ID: <20120327170404.GE9856@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332865260-3779-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Everyone,
 
-* Marcel Holtmann <marcel@holtmann.org> [2012-03-27 18:21:00 +0200]:
+Many of you noticed the issues we had in the bluetooth maintenance lately and
+to prevent such thing to happen again we decided to drop maintainers
+individuals trees in favor of new shared tree that any Bluetooth maintainer
+can commit to, so please update you gitconfig, the new address is as follow:
 
-> Make use of a shared tree setup to limit the confusions on which
-> tree is current.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  MAINTAINERS |    8 ++++----
->  1 files changed, 4 insertions(+), 4 deletions(-)
+The new bluetooth-next:
 
-Applied to the new bluetooth tree. :)
+git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
+
+and the new bluetooth-current tree:
+
+git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git
+
+
+Also all maintainers individuals trees(Johan's and mine) are being deleted and
+will not exist anymore. 
+
+Regards,
 
 	Gustavo
