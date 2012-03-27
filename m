@@ -1,77 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bruna Moreira <bruna.moreira@openbossa.org>
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH BlueZ 1/4] dbus-common: Map GAP Appearance characteristic to icon
-Date: Tue, 27 Mar 2012 09:29:35 -0400
-Message-Id: <1332854978-26072-2-git-send-email-bruna.moreira@openbossa.org>
-In-Reply-To: <1332854978-26072-1-git-send-email-bruna.moreira@openbossa.org>
-References: <1332854978-26072-1-git-send-email-bruna.moreira@openbossa.org>
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [PATCHv2 BlueZ] gatttool: Update interactive prompt if connection is lost
+Date: Tue, 27 Mar 2012 09:21:55 -0400
+Message-Id: <1332854515-22080-1-git-send-email-jefferson.delfes@openbossa.org>
+In-Reply-To: <1332516126-6665-1-git-send-email-jefferson.delfes@openbossa.org>
+References: <1332516126-6665-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add function appearance_to_icon() to map values from Appearance
-Characteristic to icon available.
-
-Note: The Appearance Characteristic is composed of a category (10-bits)
-and sub-categories (6-bits). These categories are defined at:
-http://developer.bluetooth.org/gatt/characteristics/Pages/
-CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.appearance.xml
+In interactive mode, when connection is lost, the prompt used to remain
+in "connected" state. This patch fixes that case, by always showing the
+actual connection state.
 ---
- src/dbus-common.c |   33 +++++++++++++++++++++++++++++++++
- src/dbus-common.h |    1 +
- 2 files changed, 34 insertions(+), 0 deletions(-)
+ attrib/interactive.c |   39 +++++++++++++++++++++++++++------------
+ 1 file changed, 27 insertions(+), 12 deletions(-)
 
-diff --git a/src/dbus-common.c b/src/dbus-common.c
-index ef3b375..7e1bc94 100644
---- a/src/dbus-common.c
-+++ b/src/dbus-common.c
-@@ -243,3 +243,36 @@ const char *class_to_icon(uint32_t class)
- 
- 	return NULL;
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 5941811..0064ba2 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -149,6 +149,22 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 	set_state(STATE_CONNECTED);
  }
-+
-+const char *gap_appearance_to_icon(uint16_t appearance)
-+{
-+	switch ((appearance & 0xffc0) >> 6) {
-+	case 0x01:
-+		return "phone";
-+	case 0x02:
-+		return "computer";
-+	case 0x05:
-+		return "video-display";
-+	case 0x0a:
-+		return "multimedia-player";
-+	case 0x0b:
-+		return "scanner";
-+	case 0x0f: /* HID Generic */
-+		switch (appearance & 0x3f) {
-+		case 0x01:
-+			return "input-keyboard";
-+		case 0x02:
-+			return "input-mouse";
-+		case 0x03:
-+		case 0x04:
-+			return "input-gaming";
-+		case 0x05:
-+			return "input-tablet";
-+		case 0x08:
-+			return "scanner";
-+		}
-+		break;
-+	}
-+
-+	return NULL;
-+}
-diff --git a/src/dbus-common.h b/src/dbus-common.h
-index b196a1b..b9531f2 100644
---- a/src/dbus-common.h
-+++ b/src/dbus-common.h
-@@ -45,3 +45,4 @@ void set_dbus_connection(DBusConnection *conn);
- DBusConnection *get_dbus_connection(void);
  
- const char *class_to_icon(uint32_t class);
-+const char *gap_appearance_to_icon(uint16_t appearance);
++static void disconnect_io()
++{
++	if (conn_state == STATE_DISCONNECTED)
++		return;
++
++	g_attrib_unref(attrib);
++	attrib = NULL;
++	opt_mtu = 0;
++
++	g_io_channel_shutdown(iochannel, FALSE, NULL);
++	g_io_channel_unref(iochannel);
++	iochannel = NULL;
++
++	set_state(STATE_DISCONNECTED);
++}
++
+ static void primary_all_cb(GSList *services, guint8 status, gpointer user_data)
+ {
+ 	GSList *l;
+@@ -327,6 +343,14 @@ static void cmd_exit(int argcp, char **argvp)
+ 	g_main_loop_quit(event_loop);
+ }
+ 
++static gboolean channel_watcher(GIOChannel *chan, GIOCondition cond,
++				gpointer user_data)
++{
++	disconnect_io();
++
++	return FALSE;
++}
++
+ static void cmd_connect(int argcp, char **argvp)
+ {
+ 	if (conn_state != STATE_DISCONNECTED)
+@@ -347,22 +371,13 @@ static void cmd_connect(int argcp, char **argvp)
+ 						opt_mtu, connect_cb);
+ 	if (iochannel == NULL)
+ 		set_state(STATE_DISCONNECTED);
++	else
++		g_io_add_watch(iochannel, G_IO_HUP, channel_watcher, NULL);
+ }
+ 
+ static void cmd_disconnect(int argcp, char **argvp)
+ {
+-	if (conn_state == STATE_DISCONNECTED)
+-		return;
+-
+-	g_attrib_unref(attrib);
+-	attrib = NULL;
+-	opt_mtu = 0;
+-
+-	g_io_channel_shutdown(iochannel, FALSE, NULL);
+-	g_io_channel_unref(iochannel);
+-	iochannel = NULL;
+-
+-	set_state(STATE_DISCONNECTED);
++	disconnect_io();
+ }
+ 
+ static void cmd_primary(int argcp, char **argvp)
 -- 
-1.7.5.4
+1.7.9.4
 
