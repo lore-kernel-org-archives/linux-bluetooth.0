@@ -1,90 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCHv2 BlueZ] gatttool: Update interactive prompt if connection is lost
-Date: Tue, 27 Mar 2012 09:21:55 -0400
-Message-Id: <1332854515-22080-1-git-send-email-jefferson.delfes@openbossa.org>
-In-Reply-To: <1332516126-6665-1-git-send-email-jefferson.delfes@openbossa.org>
-References: <1332516126-6665-1-git-send-email-jefferson.delfes@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ] event: Store Class of Device after connection
+Date: Tue, 27 Mar 2012 09:06:14 -0400
+Message-Id: <1332853574-26832-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In interactive mode, when connection is lost, the prompt used to remain
-in "connected" state. This patch fixes that case, by always showing the
-actual connection state.
----
- attrib/interactive.c |   39 +++++++++++++++++++++++++++------------
- 1 file changed, 27 insertions(+), 12 deletions(-)
+The Class of Device is usually sent on the EIR returned by the Device
+Connected mgmt event. For hciops, the Class of Device is always NULL on
+the connection complete event.
 
-diff --git a/attrib/interactive.c b/attrib/interactive.c
-index 5941811..0064ba2 100644
---- a/attrib/interactive.c
-+++ b/attrib/interactive.c
-@@ -149,6 +149,22 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
- 	set_state(STATE_CONNECTED);
- }
+The stored Class of Device is used later for Class/Icon device
+properties.
+---
+ src/event.c |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
+
+diff --git a/src/event.c b/src/event.c
+index 113a2b6..78d2757 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -455,6 +455,14 @@ void btd_event_conn_complete(bdaddr_t *local, bdaddr_t *peer, addr_type_t type,
  
-+static void disconnect_io()
-+{
-+	if (conn_state == STATE_DISCONNECTED)
-+		return;
-+
-+	g_attrib_unref(attrib);
-+	attrib = NULL;
-+	opt_mtu = 0;
-+
-+	g_io_channel_shutdown(iochannel, FALSE, NULL);
-+	g_io_channel_unref(iochannel);
-+	iochannel = NULL;
-+
-+	set_state(STATE_DISCONNECTED);
-+}
-+
- static void primary_all_cb(GSList *services, guint8 status, gpointer user_data)
- {
- 	GSList *l;
-@@ -327,6 +343,14 @@ static void cmd_exit(int argcp, char **argvp)
- 	g_main_loop_quit(event_loop);
- }
+ 	update_lastused(local, peer);
  
-+static gboolean channel_watcher(GIOChannel *chan, GIOCondition cond,
-+				gpointer user_data)
-+{
-+	disconnect_io();
++	if (dev_class != NULL) {
++		uint32_t class = dev_class[0] | (dev_class[1] << 8) |
++							(dev_class[2] << 16);
 +
-+	return FALSE;
-+}
++		if (class != 0)
++			write_remote_class(local, peer, class);
++	}
 +
- static void cmd_connect(int argcp, char **argvp)
- {
- 	if (conn_state != STATE_DISCONNECTED)
-@@ -347,22 +371,13 @@ static void cmd_connect(int argcp, char **argvp)
- 						opt_mtu, connect_cb);
- 	if (iochannel == NULL)
- 		set_state(STATE_DISCONNECTED);
-+	else
-+		g_io_add_watch(iochannel, G_IO_HUP, channel_watcher, NULL);
- }
+ 	device_set_addr_type(device, type);
  
- static void cmd_disconnect(int argcp, char **argvp)
- {
--	if (conn_state == STATE_DISCONNECTED)
--		return;
--
--	g_attrib_unref(attrib);
--	attrib = NULL;
--	opt_mtu = 0;
--
--	g_io_channel_shutdown(iochannel, FALSE, NULL);
--	g_io_channel_unref(iochannel);
--	iochannel = NULL;
--
--	set_state(STATE_DISCONNECTED);
-+	disconnect_io();
- }
- 
- static void cmd_primary(int argcp, char **argvp)
+ 	adapter_add_connection(adapter, device);
 -- 
-1.7.9.4
+1.7.5.4
 
