@@ -1,124 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd v2 1/3] MAP: Add implementation of map_ap_encode()
-Date: Tue, 27 Mar 2012 13:56:17 +0200
-Message-Id: <1332849379-12766-1-git-send-email-lkslawek@gmail.com>
+Date: Tue, 27 Mar 2012 14:55:30 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC PATCH BlueZ] event: Remove unused dev_class parameter from
+ btd_event_conn_complete()
+Message-ID: <20120327115530.GJ14481@x220>
+References: <1332782979-27081-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1332782979-27081-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
-v2: Replaced GString in map_ap_encode() with a more natural GByteArray
+Hi Lizardo,
 
- src/map_ap.c |   91 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 89 insertions(+), 2 deletions(-)
+On Mon, Mar 26, 2012, Anderson Lizardo wrote:
+> This parameter is not being used by hciops nor mgmtops.
+> ---
+>  plugins/hciops.c  |    5 ++---
+>  plugins/mgmtops.c |    3 +--
+>  src/event.c       |    2 +-
+>  src/event.h       |    2 +-
+>  4 files changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/src/map_ap.c b/src/map_ap.c
-index b6a039a..bf2b004 100644
---- a/src/map_ap.c
-+++ b/src/map_ap.c
-@@ -237,11 +237,98 @@ map_ap_t *map_ap_decode(const uint8_t *buffer, size_t length)
- 	return ap;
- }
- 
-+static void ap_encode_u8(GByteArray *buf, struct ap_entry *entry)
-+{
-+	struct obex_ap_header *hdr;
-+
-+	hdr = (struct obex_ap_header *)buf->data + buf->len;
-+	g_byte_array_set_size(buf, buf->len + sizeof(*hdr) + 1);
-+
-+	hdr->tag = entry->tag;
-+	hdr->len = 1;
-+	hdr->val[0] = entry->val.u8;
-+}
-+
-+static void ap_encode_u16(GByteArray *buf, struct ap_entry *entry)
-+{
-+	struct obex_ap_header *hdr;
-+	uint16_t val;
-+
-+	hdr = (struct obex_ap_header *)buf->data + buf->len;
-+
-+	g_byte_array_set_size(buf, buf->len + sizeof(*hdr) + 2);
-+
-+	hdr->tag = entry->tag;
-+	hdr->len = 2;
-+
-+	val = GUINT16_TO_BE(entry->val.u16);
-+	memcpy(hdr->val, &val, sizeof(val));
-+}
-+
-+static void ap_encode_u32(GByteArray *buf, struct ap_entry *entry)
-+{
-+	uint32_t val;
-+	struct obex_ap_header *hdr;
-+
-+	hdr = (struct obex_ap_header *)buf->data + buf->len;
-+	g_byte_array_set_size(buf, buf->len + sizeof(*hdr) + 4);
-+
-+	hdr->tag = entry->tag;
-+	hdr->len = 4;
-+
-+	val = GUINT32_TO_BE(entry->val.u16);
-+	memcpy(hdr->val, &val, sizeof(val));
-+}
-+
-+static void ap_encode_str(GByteArray *buf, struct ap_entry *entry)
-+{
-+	size_t len;
-+	struct obex_ap_header *hdr;
-+
-+	hdr = (struct obex_ap_header *)buf->data + buf->len;
-+	len = strlen(entry->val.str);
-+	g_byte_array_set_size(buf, buf->len + sizeof(*hdr) + len);
-+
-+	hdr->tag = entry->tag;
-+	hdr->len = len;
-+
-+	memcpy(hdr->val, entry->val.str, len);
-+}
-+
- uint8_t *map_ap_encode(map_ap_t *ap, size_t *length)
- {
--	*length = 0;
-+	GByteArray *buf;
-+	GHashTableIter iter;
-+	gpointer key, value;
-+	struct ap_entry *entry;
-+	int offset;
-+
-+	buf = g_byte_array_new();
-+	g_hash_table_iter_init(&iter, ap);
-+
-+	while (g_hash_table_iter_next(&iter, &key, &value)) {
-+		entry = (struct ap_entry *)value;
-+		offset = find_ap_def_offset(entry->tag);
-+
-+		switch (ap_defs[offset].type) {
-+		case APT_UINT8:
-+			ap_encode_u8(buf, entry);
-+			break;
-+		case APT_UINT16:
-+			ap_encode_u16(buf, entry);
-+			break;
-+		case APT_UINT32:
-+			ap_encode_u32(buf, entry);
-+			break;
-+		case APT_STR:
-+			ap_encode_str(buf, entry);
-+			break;
-+		}
-+	}
-+
-+	*length = buf->len;
- 
--	return NULL;
-+	return g_byte_array_free(buf, FALSE);
- }
- 
- gboolean map_ap_get_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t *val)
--- 
-1.7.4.1
+The right fix is to make use of this parameter instead of removing it.
+If btd_device has a variable for it, it should be updated and we should
+also write it to storage.
 
+Johan
