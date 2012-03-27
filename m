@@ -1,140 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1332793209-2950-1-git-send-email-dh.herrmann@googlemail.com>
-References: <1332793209-2950-1-git-send-email-dh.herrmann@googlemail.com>
-Date: Tue, 27 Mar 2012 15:43:07 -0300
-Message-ID: <CAAngNMa0npQwBv+y_giRTOeLUMYiEnwWw4-cA+xMiRRsK732Mw@mail.gmail.com>
-Subject: Re: [RFC v2 0/1] User-space HID I/O Driver
-From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-input@vger.kernel.org, jkosina@suse.cz, chen.ganir@ti.com,
-	claudio.takahasi@openbossa.org, linux-bluetooth@vger.kernel.org,
-	anderson.lizardo@openbossa.org, marcel@holtmann.org
-Content-Type: text/plain; charset=UTF-8
+From: Bruna Moreira <bruna.moreira@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH v2 BlueZ] eir: Read GAP appearance from advertising data
+Date: Tue, 27 Mar 2012 14:06:47 -0400
+Message-Id: <1332871607-4843-1-git-send-email-bruna.moreira@openbossa.org>
+In-Reply-To: <1332854978-26072-5-git-send-email-bruna.moreira@openbossa.org>
+References: <1332854978-26072-5-git-send-email-bruna.moreira@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello all,
+This was introduced on Core Specification Supplement (CSS) v1.
+---
+ src/adapter.c |   11 +++++++++++
+ src/eir.c     |    7 +++++++
+ src/eir.h     |    2 ++
+ 3 files changed, 20 insertions(+), 0 deletions(-)
 
-On Mon, Mar 26, 2012 at 5:20 PM, David Herrmann
-<dh.herrmann@googlemail.com> wrote:
-> Hi
->
-> This is the second revision of the UHID driver. It basically allows to re=
-gister
-> hid_ll_drivers in user-space. This is needed to implement Bluetooth HoG (=
-HID
-> over GATT) as discussed earlier.
->
-
-We have a first prototype implementation of the HoG plugin working
-with the uhid driver \o/
-
-I'll send a RFC to the linux-bluetooth mailing list later, but I think
-it's nice to give some feedback on the uhid module here as well.
-
-The only problem I've encountered while testing it was that it doesn't
-seem to work if I set the 'bus' field on the struct uhid_create_req to
-BUS_BLUETOOTH. Initially I thought this was just metadata, but
-changing it to BUS_USB makes it work.
-
-Additionally, I don't know if you forgot or did it on purpose, but you
-didn't add the uhid example to samples/Kconfig and sample/Makefile.
-
-> Changes:
-> =C2=A0- Improved documentation
-> =C2=A0- Added example which emulates a 3-button mouse with wheel in user-=
-space
-
-I've (partially) tested the example, on a X-less virtual machine. I'll
-try it on a box with X so I can attach the virtual mouse to a pointer
-in X and see the cursor moving.
-
-> =C2=A0- Fixed some remaining bugs
->
-> I didn't change any major parts. I checked that writev/readv work correct=
-ly and
-> I documented how to use it in ./Documentation/hid/uhid.txt.
->
-> For a full example please see ./samples/uhid/uhid-example.c.
->
-> While developing it I also considered moving HIDP to user-space. If we do=
- BT-HoG
-> in user-space, it should be easier to also move HIDP to user-space. The c=
-urrent
-> in-kernel HIDP is buggy, anyway.
->
-> Still open points:
-> =C2=A0- How do I get a proper "parent" pointer for uhid->hid->dev.parent?=
- I could use
-> =C2=A0 the uhid misc device as parent or is there some device-struct insi=
-de "struct
-> =C2=A0 file"?
-> =C2=A0- Should user-space be able to provide "uniq" and "phys" names for =
-HID-devices?
-> =C2=A0- uhid_event is quite big (>4KB) which makes uhid_device really big=
- (~70KB).
-> =C2=A0 Should I allocate the ring-buffer dynamically to avoid this?
-> =C2=A0- Should I provide the quirks field to user-space? Probably as part=
- of
-> =C2=A0 UHID_START?
-> =C2=A0- Could someone review x32 COMPAT stuff? I tried to align all the p=
-ublic
-> =C2=A0 structures correctly so I could even remove the __packed attribute=
-. Anyway, I
-> =C2=A0 thought keeping it is probably better for future extensions.
->
-> I spent some time on the locks and they seem all fine. I couldn't find an=
-y
-> races.
->
-> Jiri, Marcel, could you review the design and tell me what you think?
->
-> A short notice about the protocol:
-> User-space is allowed to send only as much data as is needed for the even=
-t. That
-> is, when sending the UHID_DESTROY event (which has no payload) it would b=
-e
-> actually enough to only send a __u32 field (ev->type) with write().
-> This is not to speed up the write()s or read()s but rather to allow exten=
-ding
-> the uhid_event structure in the future. We can actually add arbitrary ext=
-ra
-> event-types and still keep ABI compatibility. Therefore, I thought of add=
-ing an
-> "uhid_version" field to UHID_CREATE so user-space can define what UHID pr=
-otocol
-> it is using.
->
-> Regards
-> David
->
-> David Herrmann (1):
-> =C2=A0HID: User-space I/O driver support for HID subsystem
->
-> =C2=A0Documentation/hid/uhid.txt =C2=A0| =C2=A0152 ++++++++++++++
-> =C2=A0drivers/hid/Kconfig =C2=A0 =C2=A0 =C2=A0 =C2=A0 | =C2=A0 21 ++
-> =C2=A0drivers/hid/Makefile =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 =C2=A02 +-
-> =C2=A0drivers/hid/uhid.c =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0473 ++=
-+++++++++++++++++++++++++++++++++++++++++
-> =C2=A0include/linux/Kbuild =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 =C2=A01 +
-> =C2=A0include/linux/uhid.h =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 84 +++++++=
+diff --git a/src/adapter.c b/src/adapter.c
+index 7a2214a..3c7c6d8 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2698,6 +2698,7 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 
+ 	if (dev->type != ADDR_TYPE_BREDR) {
+ 		gboolean broadcaster;
++		uint16_t app;
+ 
+ 		if (dev->flags & (EIR_LIM_DISC | EIR_GEN_DISC))
+ 			broadcaster = FALSE;
+@@ -2706,8 +2707,14 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 
+ 		dev->legacy = FALSE;
+ 
++		if (read_remote_appearance(&adapter->bdaddr, &dev->bdaddr,
++								&app) == 0)
++			icon = gap_appearance_to_icon(app);
 +
-> =C2=A0samples/uhid/Makefile =C2=A0 =C2=A0 =C2=A0 | =C2=A0 10 +
-> =C2=A0samples/uhid/uhid-example.c | =C2=A0381 +++++++++++++++++++++++++++=
-+++++++
-> =C2=A08 files changed, 1123 insertions(+), 1 deletion(-)
-> =C2=A0create mode 100644 Documentation/hid/uhid.txt
-> =C2=A0create mode 100644 drivers/hid/uhid.c
-> =C2=A0create mode 100644 include/linux/uhid.h
-> =C2=A0create mode 100644 samples/uhid/Makefile
-> =C2=A0create mode 100644 samples/uhid/uhid-example.c
->
-> --
-> 1.7.9.4
->
+ 		emit_device_found(adapter->path, paddr,
+ 				"Address", DBUS_TYPE_STRING, &paddr,
++				"Class", DBUS_TYPE_UINT32, &dev->class,
++				"Icon", DBUS_TYPE_STRING, &icon,
+ 				"RSSI", DBUS_TYPE_INT16, &rssi,
+ 				"Name", DBUS_TYPE_STRING, &dev->name,
+ 				"Alias", DBUS_TYPE_STRING, &alias,
+@@ -2837,6 +2844,10 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
+ 	if (dev_class != 0)
+ 		write_remote_class(&adapter->bdaddr, bdaddr, dev_class);
+ 
++	if (eir_data.appearance != 0)
++		write_remote_appearance(&adapter->bdaddr, bdaddr,
++							eir_data.appearance);
++
+ 	if (eir_data.name != NULL && eir_data.name_complete)
+ 		write_device_name(&adapter->bdaddr, bdaddr, eir_data.name);
+ 
+diff --git a/src/eir.c b/src/eir.c
+index 419f444..a8b3ae0 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -164,6 +164,13 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
+ 			if (data_len < 3)
+ 				break;
+ 			memcpy(eir->dev_class, data, 3);
++			break;
++
++		case EIR_GAP_APPEARANCE:
++			if (data_len < 2)
++				break;
++			eir->appearance = bt_get_le16(data);
++			break;
+ 		}
+ 
+ 		eir_data += field_len + 1;
+diff --git a/src/eir.h b/src/eir.h
+index 13311ef..f712be5 100644
+--- a/src/eir.h
++++ b/src/eir.h
+@@ -34,6 +34,7 @@
+ #define EIR_TX_POWER                0x0A  /* transmit power level */
+ #define EIR_CLASS_OF_DEV            0x0D  /* Class of Device */
+ #define EIR_DEVICE_ID               0x10  /* device ID */
++#define EIR_GAP_APPEARANCE          0x19  /* GAP appearance */
+ 
+ struct uuid_info {
+ 	uuid_t uuid;
+@@ -45,6 +46,7 @@ struct eir_data {
+ 	int flags;
+ 	char *name;
+ 	uint8_t dev_class[3];
++	uint16_t appearance;
+ 	gboolean name_complete;
+ };
+ 
+-- 
+1.7.5.4
 
-
-
---=20
-Jo=C3=A3o Paulo Rechi Vita
-Openbossa Labs - INdT
