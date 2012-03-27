@@ -1,38 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Update management interface revision
-Date: Tue, 27 Mar 2012 18:49:02 +0200
-Message-Id: <1332866942-6632-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] MAINTAINERS: update Bluetooth tree locations
+Date: Tue, 27 Mar 2012 18:21:00 +0200
+Message-Id: <1332865260-3779-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For each kernel release where commands or events are added to the
-management interface, the revision field should be increment by one.
-
-The increment should only happen once per kernel release and not
-for every command/event that gets added. The revision value is for
-informational purposes only, but this simple policy would make any
-future debugging a lot simple.
+Make use of a shared tree setup to limit the confusions on which
+tree is current.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ MAINTAINERS |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 79b0ae2..5a56e0c 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -38,7 +38,7 @@ bool enable_hs;
- bool enable_le;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f47091a..bcd2ff0 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1520,8 +1520,8 @@ M:	Gustavo Padovan <gustavo@padovan.org>
+ M:	Johan Hedberg <johan.hedberg@gmail.com>
+ L:	linux-bluetooth@vger.kernel.org
+ W:	http://www.bluez.org/
+-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth.git
+-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/jh/bluetooth.git
++T:	git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git
++T:	git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
+ S:	Maintained
+ F:	drivers/bluetooth/
  
- #define MGMT_VERSION	1
--#define MGMT_REVISION	0
-+#define MGMT_REVISION	1
- 
- static const u16 mgmt_commands[] = {
- 	MGMT_OP_READ_INDEX_LIST,
+@@ -1531,8 +1531,8 @@ M:	Gustavo Padovan <gustavo@padovan.org>
+ M:	Johan Hedberg <johan.hedberg@gmail.com>
+ L:	linux-bluetooth@vger.kernel.org
+ W:	http://www.bluez.org/
+-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth.git
+-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/jh/bluetooth.git
++T:	git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git
++T:	git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
+ S:	Maintained
+ F:	net/bluetooth/
+ F:	include/net/bluetooth/
 -- 
 1.7.7.6
 
