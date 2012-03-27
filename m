@@ -2,122 +2,122 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd v3 3/3] MAP: Output parameters in folder listing reply
-Date: Tue, 27 Mar 2012 14:59:27 +0200
-Message-Id: <1332853167-13676-3-git-send-email-lkslawek@gmail.com>
-In-Reply-To: <1332853167-13676-1-git-send-email-lkslawek@gmail.com>
-References: <1332853167-13676-1-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH obexd v3 1/3] MAP: Add implementation of map_ap_encode()
+Date: Tue, 27 Mar 2012 14:59:25 +0200
+Message-Id: <1332853167-13676-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This also introduces reusable any_get_next_header() that will be further
-utilised in other requests returning application parameters header.
 ---
-v3: Remove superflous negation in condition
- plugins/mas.c |   51 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 51 insertions(+), 0 deletions(-)
+v3: Add spaces after cast
+ src/map_ap.c |   91 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 89 insertions(+), 2 deletions(-)
 
-diff --git a/plugins/mas.c b/plugins/mas.c
-index ea2b4b2..97a37e4 100644
---- a/plugins/mas.c
-+++ b/plugins/mas.c
-@@ -25,11 +25,14 @@
- #include <config.h>
- #endif
- 
-+#include <string.h>
- #include <errno.h>
- #include <glib.h>
- #include <fcntl.h>
- #include <inttypes.h>
- 
-+#include <gobex/gobex.h>
-+
- #include "obexd.h"
- #include "plugin.h"
- #include "log.h"
-@@ -111,6 +114,7 @@ struct mas_session {
- 	GString *buffer;
- 	map_ap_t *inparams;
- 	map_ap_t *outparams;
-+	gboolean ap_sent;
- };
- 
- static const uint8_t MAS_TARGET[TARGET_SIZE] = {
-@@ -407,12 +411,26 @@ static void get_folder_listing_cb(void *session, int err, uint16_t size,
- 					const char *name, void *user_data)
- {
- 	struct mas_session *mas = user_data;
-+	uint16_t max = 1024;
- 
- 	if (err < 0 && err != -EAGAIN) {
- 		obex_object_set_io_flags(mas, G_IO_ERR, err);
- 		return;
- 	}
- 
-+	map_ap_get_u16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
-+
-+	if (max == 0) {
-+		if (err != -EAGAIN)
-+			map_ap_set_u16(mas->outparams,
-+					MAP_AP_FOLDERLISTINGSIZE, size);
-+
-+		if (!name)
-+			mas->finished = TRUE;
-+
-+		goto proceed;
-+	}
-+
- 	if (!mas->nth_call) {
- 		g_string_append(mas->buffer, XML_DECL);
- 		g_string_append(mas->buffer, FL_DTD);
-@@ -578,6 +596,38 @@ static void *message_update_open(const char *name, int oflag, mode_t mode,
- 		return mas;
+diff --git a/src/map_ap.c b/src/map_ap.c
+index b6a039a..6efc484 100644
+--- a/src/map_ap.c
++++ b/src/map_ap.c
+@@ -237,11 +237,98 @@ map_ap_t *map_ap_decode(const uint8_t *buffer, size_t length)
+ 	return ap;
  }
  
-+static ssize_t any_get_next_header(void *object, void *buf, size_t mtu,
-+								uint8_t *hi)
++static void ap_encode_u8(GByteArray *buf, struct ap_entry *entry)
 +{
-+	struct mas_session *mas = object;
-+	size_t len;
-+	uint8_t *apbuf;
++	struct obex_ap_header *hdr;
 +
-+	DBG("");
++	hdr = (struct obex_ap_header *) buf->data + buf->len;
++	g_byte_array_set_size(buf, buf->len + sizeof(*hdr) + 1);
 +
-+	if (mas->buffer->len == 0 && !mas->finished)
-+		return -EAGAIN;
-+
-+	*hi = G_OBEX_HDR_APPARAM;
-+
-+	if (mas->ap_sent)
-+		return 0;
-+
-+	mas->ap_sent = TRUE;
-+	apbuf = map_ap_encode(mas->outparams, &len);
-+
-+	if (len > mtu) {
-+		DBG("MTU is to small to fit application parameters header!");
-+		g_free(apbuf);
-+
-+		return -EIO;
-+	}
-+
-+	memcpy(buf, apbuf, len);
-+
-+	return len;
++	hdr->tag = entry->tag;
++	hdr->len = 1;
++	hdr->val[0] = entry->val.u8;
 +}
 +
- static void *any_open(const char *name, int oflag, mode_t mode,
- 				void *driver_data, size_t *size, int *err)
++static void ap_encode_u16(GByteArray *buf, struct ap_entry *entry)
++{
++	struct obex_ap_header *hdr;
++	uint16_t val;
++
++	hdr = (struct obex_ap_header *) buf->data + buf->len;
++
++	g_byte_array_set_size(buf, buf->len + sizeof(*hdr) + 2);
++
++	hdr->tag = entry->tag;
++	hdr->len = 2;
++
++	val = GUINT16_TO_BE(entry->val.u16);
++	memcpy(hdr->val, &val, sizeof(val));
++}
++
++static void ap_encode_u32(GByteArray *buf, struct ap_entry *entry)
++{
++	uint32_t val;
++	struct obex_ap_header *hdr;
++
++	hdr = (struct obex_ap_header *) buf->data + buf->len;
++	g_byte_array_set_size(buf, buf->len + sizeof(*hdr) + 4);
++
++	hdr->tag = entry->tag;
++	hdr->len = 4;
++
++	val = GUINT32_TO_BE(entry->val.u16);
++	memcpy(hdr->val, &val, sizeof(val));
++}
++
++static void ap_encode_str(GByteArray *buf, struct ap_entry *entry)
++{
++	size_t len;
++	struct obex_ap_header *hdr;
++
++	hdr = (struct obex_ap_header *) buf->data + buf->len;
++	len = strlen(entry->val.str);
++	g_byte_array_set_size(buf, buf->len + sizeof(*hdr) + len);
++
++	hdr->tag = entry->tag;
++	hdr->len = len;
++
++	memcpy(hdr->val, entry->val.str, len);
++}
++
+ uint8_t *map_ap_encode(map_ap_t *ap, size_t *length)
  {
-@@ -663,6 +713,7 @@ static struct obex_mime_type_driver mime_folder_listing = {
- 	.target = MAS_TARGET,
- 	.target_size = TARGET_SIZE,
- 	.mimetype = "x-obex/folder-listing",
-+	.get_next_header = any_get_next_header,
- 	.open = folder_listing_open,
- 	.close = any_close,
- 	.read = any_read,
+-	*length = 0;
++	GByteArray *buf;
++	GHashTableIter iter;
++	gpointer key, value;
++	struct ap_entry *entry;
++	int offset;
++
++	buf = g_byte_array_new();
++	g_hash_table_iter_init(&iter, ap);
++
++	while (g_hash_table_iter_next(&iter, &key, &value)) {
++		entry = (struct ap_entry *) value;
++		offset = find_ap_def_offset(entry->tag);
++
++		switch (ap_defs[offset].type) {
++		case APT_UINT8:
++			ap_encode_u8(buf, entry);
++			break;
++		case APT_UINT16:
++			ap_encode_u16(buf, entry);
++			break;
++		case APT_UINT32:
++			ap_encode_u32(buf, entry);
++			break;
++		case APT_STR:
++			ap_encode_str(buf, entry);
++			break;
++		}
++	}
++
++	*length = buf->len;
+ 
+-	return NULL;
++	return g_byte_array_free(buf, FALSE);
+ }
+ 
+ gboolean map_ap_get_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t *val)
 -- 
 1.7.4.1
 
