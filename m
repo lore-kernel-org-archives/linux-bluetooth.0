@@ -1,103 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH obexd 1/2] gobex: Introduce g_obex_abort_transfer()
-Date: Tue, 27 Mar 2012 16:02:31 +0530
-Message-id: <1332844351-13732-1-git-send-email-jaganath.k@samsung.com>
+From: Michal Labedzki <michal.labedzki@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Michal Labedzki <michal.labedzki@tieto.com>
+Subject: [PATCH] AVRCP: Add support for changing active player
+Date: Tue, 27 Mar 2012 12:28:13 +0200
+Message-ID: <1332844093-1818-1-git-send-email-michal.labedzki@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function sends the abort request and wait for response before
-disconnection. This patch fixes the issue ABORT packet not sending
-when user cancels the transfer.
+There is possibility to register more then one player, so this patch
+allow to change active player to the freely chosen previously
+registered player.
 ---
- gobex/gobex-transfer.c |   22 +++++++++++++++++++++-
- gobex/gobex.c          |    4 ++--
- gobex/gobex.h          |    4 ++++
- 3 files changed, 27 insertions(+), 3 deletions(-)
+ audio/avrcp.c     |    7 ++++++
+ audio/avrcp.h     |    1 +
+ audio/media.c     |   62 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ doc/media-api.txt |    5 ++++
+ 4 files changed, 75 insertions(+), 0 deletions(-)
 
-diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-index c62a91e..1033b08 100644
---- a/gobex/gobex-transfer.c
-+++ b/gobex/gobex-transfer.c
-@@ -99,7 +99,8 @@ static void transfer_complete(struct transfer *transfer, GError *err)
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index 8eba046..aba453a 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -1327,3 +1327,10 @@ void avrcp_unregister_player(struct avrcp_player *player)
  
- 	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", id);
- 
--	transfer->complete_func(transfer->obex, err, transfer->user_data);
-+	if (transfer->complete_func)
-+		transfer->complete_func(transfer->obex, err, transfer->user_data);
- 	/* Check if the complete_func removed the transfer */
- 	if (find_transfer(id) == NULL)
- 		return;
-@@ -638,3 +639,22 @@ gboolean g_obex_cancel_transfer(guint id)
- 	transfer_free(transfer);
- 	return TRUE;
+ 	player_destroy(player);
  }
 +
-+gboolean g_obex_abort_transfer(guint id)
++void avrcp_set_active_player(struct avrcp_player *player)
 +{
-+	struct transfer *transfer = NULL;
++	struct avrcp_server *server = player->server;
 +
-+	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", id);
-+
-+	transfer = find_transfer(id);
-+
-+	if (transfer == NULL)
-+		return FALSE;
-+
-+	if (!g_obex_pending_req_abort(transfer->obex, NULL))
-+		transfer_free(transfer);
-+	else
-+		transfer->complete_func = NULL;
-+
-+	return TRUE;
++	server->active_player = player;
 +}
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index bc76e57..bbdac9f 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -685,7 +685,7 @@ static gint pending_pkt_cmp(gconstpointer a, gconstpointer b)
- 	return (p->id - id);
+diff --git a/audio/avrcp.h b/audio/avrcp.h
+index 8a09546..f2041a7 100644
+--- a/audio/avrcp.h
++++ b/audio/avrcp.h
+@@ -96,6 +96,7 @@ struct avrcp_player *avrcp_register_player(const bdaddr_t *src,
+ 						void *user_data,
+ 						GDestroyNotify destroy);
+ void avrcp_unregister_player(struct avrcp_player *player);
++void avrcp_set_active_player(struct avrcp_player *player);
+ 
+ int avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data);
+ 
+diff --git a/audio/media.c b/audio/media.c
+index c0fd0c3..00b35ef 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -1705,11 +1705,73 @@ static DBusMessage *unregister_player(DBusConnection *conn, DBusMessage *msg,
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
  }
  
--static gboolean pending_req_abort(GObex *obex, GError **err)
-+gboolean g_obex_pending_req_abort(GObex *obex, GError **err)
- {
- 	struct pending_pkt *p = obex->pending_req;
- 	GObexPacket *req;
-@@ -729,7 +729,7 @@ gboolean g_obex_cancel_req(GObex *obex, guint req_id, gboolean remove_callback)
- 	struct pending_pkt *p;
- 
- 	if (obex->pending_req && obex->pending_req->id == req_id) {
--		if (!pending_req_abort(obex, NULL)) {
-+		if (!g_obex_pending_req_abort(obex, NULL)) {
- 			p = obex->pending_req;
- 			obex->pending_req = NULL;
- 			goto immediate_completion;
-diff --git a/gobex/gobex.h b/gobex/gobex.h
-index aacdb53..72964e2 100644
---- a/gobex/gobex.h
-+++ b/gobex/gobex.h
-@@ -49,6 +49,8 @@ guint g_obex_send_req(GObex *obex, GObexPacket *req, gint timeout,
- gboolean g_obex_cancel_req(GObex *obex, guint req_id,
- 						gboolean remove_callback);
- 
-+gboolean g_obex_pending_req_abort(GObex *obex, GError **err);
++static DBusMessage *set_active_player(DBusConnection *conn, DBusMessage *msg,
++					void *data)
++{
++	struct media_adapter *adapter = data;
++	struct media_player *player;
++	const char *sender, *path;
++	DBusMessage *signal_msg;
++	GSList *l;
 +
- gboolean g_obex_send_rsp(GObex *obex, guint8 rspcode, GError **err,
- 						guint8 first_hdr_type, ...);
- 
-@@ -124,6 +126,8 @@ guint g_obex_get_rsp_pkt(GObex *obex, GObexPacket *rsp,
- 
- gboolean g_obex_cancel_transfer(guint id);
- 
-+gboolean g_obex_abort_transfer(guint id);
++	if (!dbus_message_get_args(msg, NULL,
++				DBUS_TYPE_OBJECT_PATH, &path,
++				DBUS_TYPE_INVALID))
++		return NULL;
 +
- const char *g_obex_strerror(guint8 err_code);
- guint8 g_obex_errno_to_rsp(int err);
++	sender = dbus_message_get_sender(msg);
++
++	player = media_adapter_find_player(adapter, sender, path);
++	if (player == NULL)
++		return btd_error_does_not_exist(msg);
++
++	avrcp_set_active_player(player->player);
++
++	for (l = adapter->players; l; l = l->next) {
++		struct media_player *mp = l->data;
++
++		if (sender && g_strcmp0(mp->sender, sender) != 0)
++			continue;
++
++		if (path && g_strcmp0(mp->path, path) == 0) {
++			DBG("activate player <%s>", mp->path);
++			signal_msg = dbus_message_new_signal(mp->path,
++					MEDIA_PLAYER_INTERFACE,
++					"Activated");
++			if (signal_msg == NULL) {
++				DBG("Message Null");
++				return NULL;
++			}
++			if (!dbus_connection_send(conn, signal_msg, NULL)) {
++				DBG("Out Of Memory");
++				return NULL;
++			}
++			dbus_message_unref(signal_msg);
++		} else {
++			signal_msg = dbus_message_new_signal(mp->path,
++					MEDIA_PLAYER_INTERFACE,
++					"Deactivated");
++			if (signal_msg == NULL) {
++				DBG("Message Null");
++				return NULL;
++			}
++			if (!dbus_connection_send(conn, signal_msg, NULL)) {
++				DBG("Out Of Memory");
++				return NULL;
++			}
++			dbus_message_unref(signal_msg);
++		}
++	}
++
++	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++}
++
+ static GDBusMethodTable media_methods[] = {
+ 	{ "RegisterEndpoint",	"oa{sv}",	"",	register_endpoint },
+ 	{ "UnregisterEndpoint",	"o",		"",	unregister_endpoint },
+ 	{ "RegisterPlayer",	"oa{sv}a{sv}","",	register_player },
+ 	{ "UnregisterPlayer",	"o",		"",	unregister_player },
++	{ "SetActivePlayer",	"o",		"",	set_active_player },
+ 	{ },
+ };
+ 
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index c53ab7b..d2c6f2e 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -123,6 +123,11 @@ Methods		void RegisterEndpoint(object endpoint, dict properties)
+ 
+ 			Unregister sender media player.
+ 
++		void SetActivePlayer(object player)
++
++			Set active media player. Only active player may be used
++			by remote controller.
++
+ MediaPlayer hierarchy
+ =====================
  
 -- 
-1.7.1
+on behalf of ST-Ericsson
 
