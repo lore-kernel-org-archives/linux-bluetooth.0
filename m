@@ -1,65 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
+From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: epx@signove.com
-Subject: [PATCH v2] Omit MainChannel when HDP first reliable channel is nil
-Date: Tue, 27 Mar 2012 10:03:25 -0300
-Message-Id: <1332853405-16495-1-git-send-email-epx@signove.com>
+Cc: Slawomir Bochenski <lkslawek@gmail.com>
+Subject: [PATCH obexd v3 3/3] MAP: Output parameters in folder listing reply
+Date: Tue, 27 Mar 2012 14:59:27 +0200
+Message-Id: <1332853167-13676-3-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <1332853167-13676-1-git-send-email-lkslawek@gmail.com>
+References: <1332853167-13676-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Do not add MainChannel to property list when HDP first reliable channel
-does not exist. Upon channel destruction, ChannelDeleted signal is already
-emitted.
-
-This also fixes a crash where MainChannel was filled with invalid path ""
-when first reliable channel did not exist.
+This also introduces reusable any_get_next_header() that will be further
+utilised in other requests returning application parameters header.
 ---
- health/hdp.c |   15 +++------------
- 1 files changed, 3 insertions(+), 12 deletions(-)
+v3: Remove superflous negation in condition
+ plugins/mas.c |   51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 51 insertions(+), 0 deletions(-)
 
-diff --git a/health/hdp.c b/health/hdp.c
-index 812352f..455240c 100644
---- a/health/hdp.c
-+++ b/health/hdp.c
-@@ -723,14 +723,8 @@ static void health_channel_destroy(void *data)
- 					DBUS_TYPE_INVALID);
+diff --git a/plugins/mas.c b/plugins/mas.c
+index ea2b4b2..97a37e4 100644
+--- a/plugins/mas.c
++++ b/plugins/mas.c
+@@ -25,11 +25,14 @@
+ #include <config.h>
+ #endif
  
- 	if (hdp_chan == dev->fr) {
--		char *empty_path;
--
- 		hdp_channel_unref(dev->fr);
- 		dev->fr = NULL;
--		empty_path = "/";
--		emit_property_changed(dev->conn, device_get_path(dev->dev),
--					HEALTH_DEVICE, "MainChannel",
--					DBUS_TYPE_OBJECT_PATH, &empty_path);
++#include <string.h>
+ #include <errno.h>
+ #include <glib.h>
+ #include <fcntl.h>
+ #include <inttypes.h>
+ 
++#include <gobex/gobex.h>
++
+ #include "obexd.h"
+ #include "plugin.h"
+ #include "log.h"
+@@ -111,6 +114,7 @@ struct mas_session {
+ 	GString *buffer;
+ 	map_ap_t *inparams;
+ 	map_ap_t *outparams;
++	gboolean ap_sent;
+ };
+ 
+ static const uint8_t MAS_TARGET[TARGET_SIZE] = {
+@@ -407,12 +411,26 @@ static void get_folder_listing_cb(void *session, int err, uint16_t size,
+ 					const char *name, void *user_data)
+ {
+ 	struct mas_session *mas = user_data;
++	uint16_t max = 1024;
+ 
+ 	if (err < 0 && err != -EAGAIN) {
+ 		obex_object_set_io_flags(mas, G_IO_ERR, err);
+ 		return;
  	}
  
- end:
-@@ -2061,7 +2055,6 @@ static DBusMessage *device_get_properties(DBusConnection *conn,
- 	struct hdp_device *device = user_data;
- 	DBusMessageIter iter, dict;
- 	DBusMessage *reply;
--	char *path;
- 
- 	reply = dbus_message_new_method_return(msg);
- 	if (reply == NULL)
-@@ -2075,11 +2068,9 @@ static DBusMessage *device_get_properties(DBusConnection *conn,
- 			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
- 
- 	if (device->fr != NULL)
--		path = g_strdup(device->fr->path);
--	else
--		path = g_strdup("");
--	dict_append_entry(&dict, "MainChannel", DBUS_TYPE_OBJECT_PATH, &path);
--	g_free(path);
-+		dict_append_entry(&dict, "MainChannel", DBUS_TYPE_OBJECT_PATH,
-+							&device->fr->path);
++	map_ap_get_u16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
 +
- 	dbus_message_iter_close_container(&iter, &dict);
++	if (max == 0) {
++		if (err != -EAGAIN)
++			map_ap_set_u16(mas->outparams,
++					MAP_AP_FOLDERLISTINGSIZE, size);
++
++		if (!name)
++			mas->finished = TRUE;
++
++		goto proceed;
++	}
++
+ 	if (!mas->nth_call) {
+ 		g_string_append(mas->buffer, XML_DECL);
+ 		g_string_append(mas->buffer, FL_DTD);
+@@ -578,6 +596,38 @@ static void *message_update_open(const char *name, int oflag, mode_t mode,
+ 		return mas;
+ }
  
- 	return reply;
++static ssize_t any_get_next_header(void *object, void *buf, size_t mtu,
++								uint8_t *hi)
++{
++	struct mas_session *mas = object;
++	size_t len;
++	uint8_t *apbuf;
++
++	DBG("");
++
++	if (mas->buffer->len == 0 && !mas->finished)
++		return -EAGAIN;
++
++	*hi = G_OBEX_HDR_APPARAM;
++
++	if (mas->ap_sent)
++		return 0;
++
++	mas->ap_sent = TRUE;
++	apbuf = map_ap_encode(mas->outparams, &len);
++
++	if (len > mtu) {
++		DBG("MTU is to small to fit application parameters header!");
++		g_free(apbuf);
++
++		return -EIO;
++	}
++
++	memcpy(buf, apbuf, len);
++
++	return len;
++}
++
+ static void *any_open(const char *name, int oflag, mode_t mode,
+ 				void *driver_data, size_t *size, int *err)
+ {
+@@ -663,6 +713,7 @@ static struct obex_mime_type_driver mime_folder_listing = {
+ 	.target = MAS_TARGET,
+ 	.target_size = TARGET_SIZE,
+ 	.mimetype = "x-obex/folder-listing",
++	.get_next_header = any_get_next_header,
+ 	.open = folder_listing_open,
+ 	.close = any_close,
+ 	.read = any_read,
 -- 
-1.7.5.4
+1.7.4.1
 
