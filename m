@@ -1,89 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH v2 0/5] Add DeviceInformationService plugin
-Date: Tue, 27 Mar 2012 07:30:01 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B46371A@DNCE02.ent.ti.com>
+Subject: RE: [PATCH v2 5/5] DeviceInfo: Read PNP ID
+Date: Tue, 27 Mar 2012 06:36:21 +0000
+Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B4636CE@DNCE02.ent.ti.com>
 References: <1332775508-32693-1-git-send-email-chen.ganir@ti.com>
- <CAKT1EBd1U84xBox39_eTyccWwiBd1X8UttiHsYB1fAyNQ1LTnQ@mail.gmail.com>
-In-Reply-To: <CAKT1EBd1U84xBox39_eTyccWwiBd1X8UttiHsYB1fAyNQ1LTnQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+	<1332775508-32693-6-git-send-email-chen.ganir@ti.com>
+ <CAJdJm_NWjT=nfHc=rK=U2HMVg0cac4oDfnf2dTLF6h-=vYDmgg@mail.gmail.com>
+In-Reply-To: <CAJdJm_NWjT=nfHc=rK=U2HMVg0cac4oDfnf2dTLF6h-=vYDmgg@mail.gmail.com>
+Content-Type: text/plain; charset="windows-1255"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Q2xhdWRpbw0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IENsYXVkaW8g
-VGFrYWhhc2kgW21haWx0bzpjbGF1ZGlvLnRha2FoYXNpQG9wZW5ib3NzYS5vcmddDQo+IFNlbnQ6
-IE1vbmRheSwgTWFyY2ggMjYsIDIwMTIgMTA6MzEgUE0NCj4gVG86IEdhbmlyLCBDaGVuDQo+IENj
-OiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0gg
-djIgMC81XSBBZGQgRGV2aWNlSW5mb3JtYXRpb25TZXJ2aWNlIHBsdWdpbg0KPiANCj4gSGkgQ2hl
-biBHYW5pcjoNCj4gDQo+IE9uIE1vbiwgTWFyIDI2LCAyMDEyIGF0IDEyOjI1IFBNLCAgPGNoZW4u
-Z2FuaXJAdGkuY29tPiB3cm90ZToNCj4gPiBGcm9tOiBDaGVuIEdhbmlyIDxjaGVuLmdhbmlyQHRp
-LmNvbT4NCj4gPg0KPiA+IEFkZCBEZXZpY2UgSW5mb3JtYXRpb24gU2VydmljZSBHQVRUIENsaWVu
-dCBmb3IgcmVhZGluZyBwZWVyDQo+ID4gZGV2aWNlIFBOUF9JRCBhbmQgc3RvcmUgaXQuDQo+ID4N
-Cj4gPiBUaGlzIGlzIHYyIG9mIHRoZSBwYXRjaCBzZXQsIHJlbW92aW5nIHNvbWUgdW51c2VkIGNv
-ZGUgdG8NCj4gPiBlbGltaW5hdGUgY29tcGlsYXRpb24gd2FybmluZ3MuDQo+IA0KPiBJIGFtIGFm
-cmFpZCBvZiByYWNlIGNvbmRpdGlvbnMgYmV0d2VlbiBIb0cgYW5kIERJUyBzZXJ2aWNlcy4NCj4g
-DQo+IEFUVCBpcyBhICJzZXJpYWwiIHByb3RvY29sLCBob3dldmVyIHRoZXJlIGlzIG5vIGd1YXJh
-bnRlZSB0aGF0IFBOUCBJRA0KPiBjaGFyYWN0ZXJpc3RpYyB2YWx1ZSB3aWxsIGJlIGF2YWlsYWJs
-ZSBiZWZvcmUgY3JlYXRpbmcgdWhpZCBkZXZpY2UuIEl0DQo+IGRlcGVuZHMgb24gdGhlIHByb2Jp
-bmcgb3JkZXIgQU5EIHdoZW4gdGhlIGNvbW1hbmRzIGFyZSBhZGRlZCBpbiB0aGUNCj4gR0F0dHJp
-YiBxdWV1ZS4NCj4gDQoNCkN1cnJlbnRseSwgRElEIGlzIHJlYWQgZHVyaW5nIHRoZSBDcmVhdGVE
-ZXZpY2UgKEJSL0VEUiBvdmVyIFNEUCB3aGVuIGRldmljZSBpcyBjcmVhdGVkKS4gSW4gYWRkaXRp
-b24sIHdoZW4gd2UgY3JlYXRlIGEgZGV2aWNlLCB3ZSBpbW1lZGlhdGVseSBwcm9iZSB0aGUgRElT
-IHBsdWctaW4gd2hpY2ggaW1tZWRpYXRlbHkgc3RhcnRzIGV4cGxvcmluZyB0aGUgcmVtb3RlIERJ
-UyBzZXJ2ZXIsIGV2ZW4gYmVmb3JlIHVoaWQgaXMgY3JlYXRlZC4gQSAvZGV2L3VoaWQgZGV2aWNl
-IHdpbGwgYmUgb3BlbmVkIG9ubHkgYWZ0ZXIgYSBkZXZpY2UgaGFzIGJlZW4gY3JlYXRlZCwgYW5k
-IGEgdXNlciBhY3Rpb24gd2FzIHBlcmZvcm1lZCB0byBjb25uZWN0IHRoZSBpbnB1dCBkZXZpY2Ug
-KG9yZy5ibHVlei5JbnB1dC5Db25uZWN0IHdpbGwgYmUgY2FsbGVkIG9ubHkgYWZ0ZXIgeW91IGdl
-dCB0aGUgRGV2aWNlQ3JlYXRlZCBldmVudCwgd2hpY2ggbWVhbnMgdGhhdCBhbGwgZGF0YSBoYXMg
-YmVlbiByZWFkKSAsIHNvIHdlIGRvIG5vdCBuZWVkIHRvIHdvcnJ5IGFib3V0IHN1Y2ggYSBzY2Vu
-YXJpbyBhdCB0aGlzIHN0YWdlLg0KDQpIb3dldmVyLCBJIGRvIHRoaW5rIHdlIG5lZWQgdG8gZGVz
-aWduIGEgbWVjaGFuaXNtIGZvciBzeW5jaHJvbml6aW5nIGJldHdlZW4gcGx1Zy1pbnMsIGJ1dCBJ
-J20gbm90IHN1cmUgaXQgc2hvdWxkIGJlIGEgZ2VuZXJpYyBwbHVnLWluIHN5bmMgbWVjaGFuaXNt
-LCBzaW5jZSBub3QgYWxsIHBsdWctaW5zIHJlcXVpcmUgdGhpcy4gDQoNCj4gSU1PLCB0aGUgYWx0
-ZXJuYXRpdmVzIGFyZToNCj4gMS4gbW92ZSB0aGUgRElTL1BuUCBkaXNjb3ZlcnkgdG8gdGhlIGNy
-ZWF0ZSBkZXZpY2UgInByb2NlZHVyZSINCkl0IGlzIGFscmVhZHkgZG9uZSB0aGlzIHdheS4gQ3Jl
-YXRlRGV2aWNlIGZvciBMRSBkZXZpY2UgY2FsbHMgdGhlIGRpc2NvdmVyX3ByaW1hcmllcywgYW5k
-IHRoZW4gcHJvYmVzIGFsbCBkcml2ZXJzLiBUaGUgRElTIHBsdWctaW4gd2lsbCBiZSBpbml0aWFs
-aXplZCwgYW5kIHJlYWQgdGhlIHZhbHVlcyBmcm9tIHRoZSBwZWVyIGRldmljZSwgYW5kIHN0b3Jl
-IHRoZW0gaW4gcGVyc2lzdGVudCBzdG9yYWdlLg0KDQo+IDIuIGNyZWF0ZSBwbHVnaW4gc3RhdGVz
-IGFuZCBkZXBlbmRlbmN5IGJlZm9yZSBwcm9iaW5nDQpXZSBkbyBub3QgaGF2ZSB0byBwcm90ZWN0
-IHRoZSBwcm9iaW5nIGhlcmUuIFdlIGRvIG5lZWQgdG8gcHJvdGVjdCB0aGUgL2Rldi91aGlkIGNy
-ZWF0aW9uIGFuZCBjb25maWd1cmF0aW9uLiBBIC9kZXYvdWhpZCB3aWxsIGJlIGNyZWF0ZWQgb24g
-cHJvYmluZyBvbmx5IGFmdGVyIHRoZSB1c2VyIGhhcyBwcmV2aW91c2x5IHNlbGVjdGVkIHRoZSBy
-ZW1vdGUgZGV2aWNlIGZvciBjb25uZWN0aW9uLCBhbmQgdGhpcyB3aWxsIGhhcHBlbiBvbmx5IGFm
-dGVyIHdlIGhhdmUgYSB2YWxpZCBQTlAgaWQgYWxyZWFkeSBzdG9yZWQuDQoNCj4gMy4gdXVpZCAi
-bm90aWZpY2F0aW9uIiBtZWNoYW5pc20iOiBjYWxsYmFjayBnZXRzIGNhbGxlZCB3aGVuIGEgbmV3
-DQo+IHZhbHVlIGlzIGF2YWlsYWJsZSBmb3IgYSBnaXZlbiBjaGFyYWN0ZXJpc3RpYw0KQSBjYWxs
-YmFjayBpcyBwYXJ0IG9mIHRoZSBzb2x1dGlvbiwgYW5kIG5lZWRzIHRvIGJlIGFjY29tcGFuaWVk
-IGJ5IGEgd2F5IHRvIHF1ZXJ5IHRoZSBwbHVnaW4gZm9yIHRoZSB2YWx1ZSBvZiBhIHNwZWNpZmlj
-IGNoYXJhY3RlcmlzdGljIGJ5IHV1aWQuIEhvd2V2ZXIsIHRoaXMgbWF5IG5vdCBiZSBlYXN5LiBG
-b3IgZXhhbXBsZSwgeW91IG1heSBoYXZlIG1vcmUgdGhhbiBvbmUgYmF0dGVyeSBzZXJ2aWNlcywg
-d2l0aCBiYXR0ZXJ5IGxldmVsIGNoYXJhY3RlcmlzdGljcyAod2l0aCB0aGUgc2FtZSBVVUlEKS4g
-SG93IGRvIHlvdSBsaW5rIGJldHdlZW4gYSBzcGVjaWZpYyBiYXR0ZXJ5IGFuZCBpdHMgdmFsdWU/
-IA0KDQpJIGRvIG5vdCB0aGluayBhIGdlbmVyaWMgc29sdXRpb24gaXMgdGhlIGJlc3Qgc29sdXRp
-b24gaGVyZS4gUGVyaGFwcyB3ZSBuZWVkIHRvIGNvbWJpbmUgdGhpcyB3aXRoIHRoZSBidGRfZGV2
-aWNlLCBhbmQgbWFrZSBzdXJlIGJ0ZF9kZXZpY2UgaXMgdGhlIGNlbnRyYWwgbG9jYXRpb24gZm9y
-IGdldHRpbmcgdmFsdWVzIGFuZCBub3RpZmljYXRpb25zLiBDdXJyZW50bHkgd2UgaGF2ZSB0aGUg
-YnRkX2RldmljZV9nZXRfdmVuZG9yX3NyYywgYnRkX2RldmljZV9nZXRfdmVuZG9yIGFuZCBvdGhl
-cnMgd2hpY2ggY2FuIGJlIHVzZWQgdG8gY2hlY2sgaWYgYSB2YWx1ZSBpcyBwcmVzZW50LiBPciBu
-b3QuIFRoZSBzaW1wbGVzdCBzb2x1dGlvbiB3b3VsZCBiZSBjaGVja2luZyB0aGlzIGluZm9ybWF0
-aW9uIHBlcmlvZGljYWxseSBmcm9tIHRoZSBISUQgc2VydmljZSBwbHVnaW4sIG9yIGFkZCBhIHBy
-b3BlcnR5X2NoYW5nZWQgY2FsbGJhY2sgc2ltaWxhciB0byB0aGUgRC1CVVMgbWVjaGFuaXNtIHRo
-YXQgd291bGQgaGF2ZSBhIHZhcmlhYmxlIHNpemVkIGRhdGEgcGF5bG9hZCwgZGVwZW5kaW5nIG9u
-IHRoZSBwcm9wZXJ0eSBpZCB3ZSB1c2UuIEFuIGV4YW1wbGUgd291bGQgYmUgOg0KDQp0eXBlZGVm
-IHZvaWQgKCpwcm9wZXJ0eV9jaGFuZ2VkX2NiKSAodWludDE2X3QgcHJvcGVydHlfaWQsIHVpbnQ4
-X3QgKnByb3BlcnR5X2RhdGEsIHVpbnQxNl90IGRhdGFfbGVuZ3RoKQ0KDQojZGVmaW5lIFBST1BF
-UlRZX0NIQU5HRURfVkVORE9SX0lEIDB4MTANCnR5cGVkZWYgc3RydWN0IHZpZF9jaGFuZ2VkIHsN
-Cgl1aW50MTZfdCB2aWQ7DQp9DQoNCiNkZWZpbmUgUFJPUEVSVFlfQ0hBTkdFRF9WRU5ET1JfSURf
-U1JDIDB4MTENCnR5cGVkZWYgc3RydWN0IHZpZF9zcmNfY2hhbmdlZCB7DQoJdWludDE2X3Qgdmlk
-X3NyYzsNCn0NCg0KI2RlZmluZSBQUk9QRVJUWV9DSEFOR0VEX0JBVFRFUllfTEVWRUwgMHgxMg0K
-dHlwZWRlZiBzdHJ1Y3QgYmF0dF9sZXZlbF9jaGFuZ2VkIHsNCgl1aW50OF90ICBuYW1lc3BhY2U7
-DQoJdWludDE2X3QgZGVzY3JpcHRpb247DQoJdWludDhfdCAgdmFsdWU7DQp9DQoNCnRoaXMgd2ls
-bCBiZSBjYWxsZWQgaW4gY29uanVuY3Rpb24gd2l0aCB0aGUgRC1CVVMgUHJvcGVydHlDaGFuZ2Vk
-IGV2ZW50IGZvciBlYWNoIGNoYW5nZWQgcHJvcGVydHksIGZvciBhbGwgcmVnaXN0ZXJlZCBwcm9w
-ZXJ0eV9jaGFuZ2VkIGNhbGxiYWNrcyByZWdpc3RlcmVkLiANCg0KV2hhdCBkbyB5b3UgdGhpbmsg
-Pw0KDQo+IA0KPiBPcGluaW9ucz8NCj4gDQoNCj4gQlIsDQo+IENsYXVkaW8NCg0KDQoNClRoYW5r
-cywNCkNoZW4gR2FuaXINCg0K
+Lizardo,
+
+> -----Original Message-----
+> From: Anderson Lizardo [mailto:anderson.lizardo@openbossa.org]
+> Sent: Monday, March 26, 2012 5:55 PM
+> To: Ganir, Chen
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCH v2 5/5] DeviceInfo: Read PNP ID
+> 
+> Hi Chen,
+> 
+> On Mon, Mar 26, 2012 at 11:25 AM,  <chen.ganir@ti.com> wrote:
+> > diff --git a/src/device.c b/src/device.c
+> > index 3b772ee..dad8c26 100644
+> > --- a/src/device.c
+> > +++ b/src/device.c
+> > @@ -131,6 +131,7 @@ struct btd_device {
+> >        gchar           *path;
+> >        char            name[MAX_NAME_LENGTH + 1];
+> >        char            *alias;
+> > +       uint16_t        vendor_src;
+> >        uint16_t        vendor;
+> >        uint16_t        product;
+> >        uint16_t        version;
+> > @@ -377,6 +378,11 @@ static DBusMessage
+> *get_properties(DBusConnection *conn,
+> >                dict_append_entry(&dict, "Vendor", DBUS_TYPE_UINT16,
+> >                                                        &device-
+> >vendor);
+> >
+> > +       /* Vendor Source*/
+> > +       if (device->vendor_src)
+> > +               dict_append_entry(&dict, "VendorSource",
+> DBUS_TYPE_UINT16,
+> > +                                                       &device-
+> >vendor_src);
+> > +
+> 
+> * How does this work for BR/EDR devices (without GATT)? Is zero a
+> valid value for these devices?
+
+For BR/EDR, you may have either DID or DIS. None of the specs define what is the relationship between those on BR/EDR (since in theory you may have both at the same time), so no special code was added to handle such a situation. As far as I can see, in a GATT capable device, the DIS should replace the DID since it extends its capabilities, but this is totally vendor dependant.
+
+Regarding default values, the spec does not specify valid range for product id and product version. Both for DID in BR/EDR and DIS in LE, those values are totally dependent on vendor implementation and have no limits.
+
+For the Vendor ID Source, 0x0000 is a reserved for future use, and currently should not be used. 
+A default value for nonexistent VID according to the DID spec is 0xFFF (the DIS spec does not define such a value).
+
+The current device.c implementation was not changed, meaning that for the D-BUS interface, having a 0 value will remove the property from the dbus dictionary.
+
+Do we want to change this behavior ? Maybe add a short bitmask field for existing fields ? What do you think ?
+> 
+> * You need to update doc/device-api.txt
+> 
+The only addition to the doc/device-api.txt is the addition of Vendroid ID Source. I'll add that and send a revised patch set.
+
+> * Vendor Source looks like uint8, but you save it as uint16. Yes, I
+> know there is no "uint8" for d-bus, but just wondering why "byte"
+> cannot be used here.
+> 
+This is a difference between DID and DIS. DID defines the VID Source as 2 bytes, and DIS defines it as 1 byte. Anyway, I'll need to change the propery VendorID Source from byte to uint16 to allow both to be sent to the user. The btd_device_get_vendor_src already returns a uint16_t.
+
+> Regards,
+> --
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
