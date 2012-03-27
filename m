@@ -1,51 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 27 Mar 2012 15:04:24 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Joohi RASTOGI <joohi.rastogi@stericsson.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH Bluez V2] avcrp: Fix response length for unit info
+ command.
+Message-ID: <20120327120424.GL14481@x220>
+References: <3176460F0F455A44B2E93431E34FC86C1F884413AE@EXDCVYMBSTM005.EQ1STM.local>
+ <3176460F0F455A44B2E93431E34FC86C1F884A643D@EXDCVYMBSTM005.EQ1STM.local>
 MIME-Version: 1.0
-In-Reply-To: <20120327115931.GK14481@x220>
-References: <1332778374-15320-1-git-send-email-anderson.lizardo@openbossa.org>
-	<20120327115931.GK14481@x220>
-Date: Tue, 27 Mar 2012 08:13:20 -0400
-Message-ID: <CAJdJm_PA3n3A5g1_KObMcPTvOixuzZMZeMc8AGtuKCce7ig6VA@mail.gmail.com>
-Subject: Re: [RFC PATCH BlueZ] doc: Revert "Small API update"
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <3176460F0F455A44B2E93431E34FC86C1F884A643D@EXDCVYMBSTM005.EQ1STM.local>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi,
 
-On Tue, Mar 27, 2012 at 7:59 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Lizardo,
->
-> On Mon, Mar 26, 2012, Anderson Lizardo wrote:
->> This reverts commit fd1ac97806d4531cb54523b3d694899afce281e7. It seems
->> the "entered" param is not used anymore.
->> ---
->>  doc/agent-api.txt |    8 +-------
->>  1 files changed, 1 insertions(+), 7 deletions(-)
->
-> Why do you want to remove this? How else can we relay key press
-> notifications to the user? Like with your other patch the fact that some
-> code is not used doesn't necessarily mean that it should be removed but
-> that something needs to be added to make it useful.
+On Tue, Mar 27, 2012, Joohi RASTOGI wrote:
+> Hi,
+> 
+> Fixed response length for Unit Info command. This affect PTS Test Case TC_TG_ICC_BV_01_I.
+> Changed the acronym AVRCP to uppercase.
+> 
+> From c4b1ac44ca4b608c550e8cb0b12c3b04d65aa05d Mon Sep 17 00:00:00 2001
+> From: Joohi Rastogi <joohi.rastogi@stericsson.com>
+> Date: Mon, 26 Mar 2012 11:53:19 +0530
+> Subject: [PATCH] AVRCP: Fix response length for unit info command.
+> 
+> ---
+>  audio/avctp.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/audio/avctp.c b/audio/avctp.c
+> index dfad9fd..5b84977 100644
+> --- a/audio/avctp.c
+> +++ b/audio/avctp.c
+> @@ -268,7 +268,7 @@ static size_t handle_unit_info(struct avctp *session,
+> 
+>         DBG("reply to AVC_OP_UNITINFO");
+> 
+> -       return 0;
+> +       return operand_count;
+>  }
+> 
+>  static size_t handle_subunit_info(struct avctp *session,
 
-That's the reason I sent as RFC. I needed input like this :) Usually
-patches are more visible here than abstract questions. It also shows
-specifically where the "dangling part" is.
+Could you please resend both of your patches with git send-email (or if
+you really are unable to use git send-email send them as attachments).
+As they are right now I'm failing to pass them to "git am" from your
+emails. Also, please include the references to the PTS test cases in the
+commit message instead of having that somewhere external.
 
-Also note that these two places lacked some sort of TODO/FIXME
-comment. I could simply ask, but just sending this RFC patch seemed
-more effective.
-
-> Also, it seems we've forgotten this part from the mgmt API as there's no
-> event specified for it at the moment.
-
-Will you take care of this for mgmtops? If so, I can just fix the
-dev_class patch, which I think has the kernel side in place already.
-
-Best Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
