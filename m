@@ -1,65 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: AceLan Kao <acelan@gmail.com>
-From: AceLan Kao <acelan.kao@canonical.com>
-To: linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH] Bluetooth: Add support for Atheros [04ca:3005]
-Date: Wed, 28 Mar 2012 10:25:36 +0800
-Message-Id: <1332901536-32729-1-git-send-email-acelan.kao@canonical.com>
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC 3/3] Bluetooth: Use address type info from User-space
+Date: Tue, 27 Mar 2012 20:59:36 -0300
+Message-Id: <1332892776-12060-4-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1332892776-12060-1-git-send-email-andre.guedes@openbossa.org>
+References: <1332892776-12060-1-git-send-email-andre.guedes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add another vendor specific ID for Atheros AR3012 device.
-This chip is wrapped by Lite-On Technology Corp.
+In order to establish a LE connection we need the address type
+information. User-space already pass this information to kernel
+through struct sockaddr_l2.
 
-output of usb-devices:
-T:  Bus=04 Lev=01 Prnt=01 Port=03 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=04ca ProdID=3005 Rev=00.02
-S:  Manufacturer=Atheros Communications
-S:  Product=Bluetooth USB Host Controller
-S:  SerialNumber=Alaska Day 2006
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+This patch adds the dst_type parameter to l2cap_chan_connect so we
+are able to pass the address type info from user-space down to
+hci_conn layer.
 
-Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- drivers/bluetooth/ath3k.c |    2 ++
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 3 insertions(+), 0 deletions(-)
+ include/net/bluetooth/l2cap.h |    2 +-
+ net/bluetooth/l2cap_core.c    |   11 ++++++-----
+ net/bluetooth/l2cap_sock.c    |    2 +-
+ 3 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index fa65913..ae9edca 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -74,6 +74,7 @@ static struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x0CF3, 0x3004) },
- 	{ USB_DEVICE(0x0CF3, 0x311D) },
- 	{ USB_DEVICE(0x13d3, 0x3375) },
-+	{ USB_DEVICE(0x04CA, 0x3005) },
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index d14967e..262628c 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -911,7 +911,7 @@ struct l2cap_chan *l2cap_chan_create(void);
+ void l2cap_chan_close(struct l2cap_chan *chan, int reason);
+ void l2cap_chan_destroy(struct l2cap_chan *chan);
+ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+-								bdaddr_t *dst);
++						bdaddr_t *dst, u8 dst_type);
+ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 								u32 priority);
+ void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 91b02de..e0dc4ca 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1131,7 +1131,8 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr
+ 	return c1;
+ }
  
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -92,6 +93,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0x311D), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+-int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *dst)
++int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
++			bdaddr_t *dst, u8 dst_type)
+ {
+ 	struct sock *sk = chan->sk;
+ 	bdaddr_t *src = &bt_sk(sk)->src;
+@@ -1141,8 +1142,8 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+ 	__u8 auth_type;
+ 	int err;
  
- 	{ }	/* Terminating entry */
- };
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 9a5d811..ba89cd0 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -132,6 +132,7 @@ static struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+-	BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
+-						__le16_to_cpu(chan->psm));
++	BT_DBG("%s -> %s (type %u) psm 0x%2.2x", batostr(src), batostr(dst),
++					dst_type, __le16_to_cpu(chan->psm));
  
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+ 	hdev = hci_get_route(dst, src);
+ 	if (!hdev)
+@@ -1216,10 +1217,10 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+ 	auth_type = l2cap_get_auth_type(chan);
+ 
+ 	if (chan->dcid == L2CAP_CID_LE_DATA)
+-		hcon = hci_connect(hdev, LE_LINK, dst, MGMT_ADDR_LE_RANDOM,
++		hcon = hci_connect(hdev, LE_LINK, dst, dst_type,
+ 					chan->sec_level, auth_type);
+ 	else
+-		hcon = hci_connect(hdev, ACL_LINK, dst, MGMT_ADDR_BREDR,
++		hcon = hci_connect(hdev, ACL_LINK, dst, dst_type,
+ 					chan->sec_level, auth_type);
+ 
+ 	if (IS_ERR(hcon)) {
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 53e563f..4b38cf8 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -124,7 +124,7 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+ 		return -EINVAL;
+ 
+ 	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
+-				&la.l2_bdaddr);
++				&la.l2_bdaddr, la.l2_bdaddr_type);
+ 	if (err)
+ 		return err;
+ 
 -- 
-1.7.9.1
+1.7.9.4
+
