@@ -1,47 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Mar 2012 18:11:02 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bruna Moreira <bruna.moreira@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 4/4] eir: Read GAP appearance from advertising data
-Message-ID: <20120327151102.GA444@x220.P-661HNU-F1>
-References: <1332854978-26072-1-git-send-email-bruna.moreira@openbossa.org>
- <1332854978-26072-5-git-send-email-bruna.moreira@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332854978-26072-5-git-send-email-bruna.moreira@openbossa.org>
+In-Reply-To: <66BD268F973E3544A665E5F503FB38B71AE959B22A@DC01.bmw-carit.intra>
+References: <CAB7rCTiQiaFRqDOj6OGZPfTtBWSnR60ADAZimEZJ=F0Tf0-R4Q@mail.gmail.com>
+	<CABBYNZLp3U9sHqiaW9xcH1f8qfrkM7t181y8NVK5L+Rwxet5jw@mail.gmail.com>
+	<CAB7rCTid2cRwetSyNpaT3vGGT_GrSGxzjqR6BJt-J-g4wJuM0w@mail.gmail.com>
+	<CABBYNZJw+7Jat-NUuiMgSr+zcRSoEm1JhmwSUea60hOhpROWmA@mail.gmail.com>
+	<CAB7rCTjdCTiOP+XWjk5GcF=37tRi4_uHYYOFX2j1Kj5xBSsqhA@mail.gmail.com>
+	<66BD268F973E3544A665E5F503FB38B71AE959B22A@DC01.bmw-carit.intra>
+Date: Tue, 27 Mar 2012 09:22:27 -0500
+Message-ID: <CAB7rCTgUQsygR4sBWp5oVwi647OfEncgCTZeQivgj4oZg9qt0A@mail.gmail.com>
+Subject: Re: media transport -- when is acquire ok to call?
+From: Mike <puffy.taco@gmail.com>
+To: Mikel Astiz <Mikel.Astiz@bmw-carit.de>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bruna,
+Hi Mikel,
 
-On Tue, Mar 27, 2012, Bruna Moreira wrote:
-> --- a/src/eir.c
-> +++ b/src/eir.c
-> @@ -108,6 +108,7 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
->  	while (len < eir_len - 1) {
->  		uint8_t field_len = eir_data[0];
->  		uint8_t data_len, *data = &eir_data[2];
-> +		uint16_t *u16;
->  
->  		/* Check for the end of EIR */
->  		if (field_len == 0)
-> @@ -164,6 +165,14 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
->  			if (data_len < 3)
->  				break;
->  			memcpy(eir->dev_class, data, 3);
-> +			break;
-> +
-> +		case EIR_GAP_APPEARANCE:
-> +			if (data_len < 2)
-> +				break;
-> +			u16 = (uint16_t *) data;
-> +			eir->appearance = btohs(bt_get_unaligned(u16));
-> +			break;
->  		}
+On Tue, Mar 27, 2012 at 1:31 AM, Mikel Astiz <Mikel.Astiz@bmw-carit.de> wrote:
+> Hi Mike,
+>
+>> So that has me confused.  If the MediaTransport interface is somewhat
+>> generic, why would I want to listen to another interface to know if I
+>> should call Acquire?  In my case, I would need to listen to
+>> HeadsetGateway.  As it is, the audio from my SCO connection is sent
+>> over a PCM bus, so I currently do not even register an SCO endpoint,
+>> because it was not needed.  I agree that if you are the initiator,
+>> Acquire/Release is sufficient.  In my case, as the non-initiator, it is
+>> not sufficient because I do not want to open an audio link by calling
+>> acquire unless it already exists.
+>
+> I'm not sure if this solves your specific problem(s) but I would propose that the MediaTransport API is extended with a method such as TryAcquire (or alternatively Acquire can be extended with either one more parameter, or some specific flag in accesstype). In that case the transport would not be acquired unless the audio link already exists.
+>
+> The current approach of listening to a state property and then calling Acquire is racy, no matter if the property is in the same interface or not.
 
-I don't think you need the u16 variable at all. Just do:
+I think your proposal would fix this race in a way that doesn't
+fundamentally change the current design, so I'm in favor of it.
 
-	eir->appearance = bt_get_le16(data);
+> Regarding your comment on the need to listen to a different interface, I don't think this should be a big problem. Having said that, the Playing state in HeadsetGateway (and equivalents) could be replaced by a state in MediaTransport. That actually seems more appropriate to me.
 
-Johan
+Agreed. The reason I don't like the current approach is that there is
+no explicit connection between the MediaTransport object and the other
+object that has the state property.
+
+Mike
