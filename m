@@ -1,64 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Mar 2012 15:18:21 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Elvis Pfutzenreuter <epx@signove.com>
-Cc: sancane@gmail.com, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix crash when HDP first reliable channel is nil
-Message-ID: <20120327121821.GA19125@x220>
-References: <1331938389-4856-1-git-send-email-epx@signove.com>
- <20120327113651.GF14481@x220>
- <3F2966DC-88F7-4852-930F-4FC312BC0087@signove.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <3F2966DC-88F7-4852-930F-4FC312BC0087@signove.com>
+In-Reply-To: <20120327115530.GJ14481@x220>
+References: <1332782979-27081-1-git-send-email-anderson.lizardo@openbossa.org>
+	<20120327115530.GJ14481@x220>
+Date: Tue, 27 Mar 2012 08:17:56 -0400
+Message-ID: <CAJdJm_NtQftxpNer08aHw-5F4et+URNMe-UULakrQYvRL_ECgA@mail.gmail.com>
+Subject: Re: [RFC PATCH BlueZ] event: Remove unused dev_class parameter from btd_event_conn_complete()
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Elvis,
+Hi Johan,
 
-On Tue, Mar 27, 2012, Elvis Pfutzenreuter wrote:
-> On Mar 27, 2012, at 8:36 AM, Johan Hedberg wrote:
-> 
-> > Hi Elvis,
-> > 
-> > On Fri, Mar 16, 2012, Elvis Pfützenreuter wrote:
-> >> Congruent to health_channel_destroy(), the "/" path is returned by MainChannel
-> >> property of HealthDevice when the first reliable channel is nil.
-> >> 
-> >> An empty path provokes the following error:
-> >> 
-> >> process xxxs: arguments to dbus_message_iter_append_basic() were incorrect,
-> >> assertion "_dbus_check_is_valid_path (*string_p)" failed in file
-> >> ../../dbus/dbus-message.c line 2539.  This is normally a bug in some
-> >> application using the D-Bus library.
-> >> ---
-> >> health/hdp.c |    2 +-
-> >> 1 files changed, 1 insertions(+), 1 deletions(-)
-> >> 
-> >> diff --git a/health/hdp.c b/health/hdp.c
-> >> index 812352f..eba438a 100644
-> >> --- a/health/hdp.c
-> >> +++ b/health/hdp.c
-> >> @@ -2077,7 +2077,7 @@ static DBusMessage *device_get_properties(DBusConnection *conn,
-> >> 	if (device->fr != NULL)
-> >> 		path = g_strdup(device->fr->path);
-> >> 	else
-> >> -		path = g_strdup("");
-> >> +		path = g_strdup("/");
-> >> 	dict_append_entry(&dict, "MainChannel", DBUS_TYPE_OBJECT_PATH, &path);
-> >> 	g_free(path);
-> >> 	dbus_message_iter_close_container(&iter, &dict);
-> > 
-> > Would it maybe make more sense to simply not include this property in
-> > the property list if device->fr is NULL? (after all, there's nothing
-> > interesting to be found at "/" from a HDP perspective)
-> > 
-> 
-> Could be, but when fr is deleted, a PropertyChanged signal is emitted for
-> MainChannel. Is there some way to signal that a property has been removed?
+On Tue, Mar 27, 2012 at 7:55 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Lizardo,
+>
+> On Mon, Mar 26, 2012, Anderson Lizardo wrote:
+>> This parameter is not being used by hciops nor mgmtops.
+>> ---
+>>  plugins/hciops.c  |    5 ++---
+>>  plugins/mgmtops.c |    3 +--
+>>  src/event.c       |    2 +-
+>>  src/event.h       |    2 +-
+>>  4 files changed, 5 insertions(+), 7 deletions(-)
+>
+> The right fix is to make use of this parameter instead of removing it.
+> If btd_device has a variable for it, it should be updated and we should
+> also write it to storage.
 
-Instead of sending a PropertyChanged wouldn't the ChannelDeleted signal
-be good enough? (the client then just needs to compare it with the
-currently known MainChannel value.
+Ok, I'll follow this approach and send another patch. You can discard this one.
 
-Johan
+>
+> Johan
+
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
