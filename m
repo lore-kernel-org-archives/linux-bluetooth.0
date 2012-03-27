@@ -1,38 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v2 BlueZ 6/8] attrib: Fix missing D-Bus message unref on DiscoverCharacteristics
-Date: Tue, 27 Mar 2012 16:43:47 -0400
-Message-Id: <1332881029-1732-7-git-send-email-anderson.lizardo@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH v2 BlueZ 7/8] attrib: Attempt to remove attio callback on watcher exit
+Date: Tue, 27 Mar 2012 16:43:48 -0400
+Message-Id: <1332881029-1732-8-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1332881029-1732-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1332349255-15764-1-git-send-email-anderson.lizardo@openbossa.org>
  <1332881029-1732-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+When registering a watcher, it is attempted to add an attio callback.
+Therefore, when the watcher is unregistered or exits, this attio should
+be removed if there are no other users.
 
-This patch fixes a missing message unref when DiscoverCharacteristics on
-Generic Attribute finishes.
+This is already done when unregistering a watcher, it just missed when
+it exits without unregistering.
 ---
- attrib/client.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ attrib/client.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
 diff --git a/attrib/client.c b/attrib/client.c
-index 57cd028..609f8b9 100644
+index 609f8b9..d5b2bc9 100644
 --- a/attrib/client.c
 +++ b/attrib/client.c
-@@ -930,6 +930,9 @@ static void char_discovered_cb(GSList *characteristics, guint8 status,
- 	reply = create_discover_char_reply(gatt->query->msg, gatt->chars);
+@@ -227,6 +227,7 @@ static void watcher_exit(DBusConnection *conn, void *user_data)
+ 	DBG("%s watcher %s exited", gatt->path, watcher->name);
  
- fail:
-+	dbus_message_unref(gatt->query->msg);
-+	gatt->query->msg = NULL;
-+
- 	g_dbus_send_message(gatt->conn, reply);
- 	query_list_remove(gatt, current);
- 	g_free(current);
+ 	gatt->watchers = g_slist_remove(gatt->watchers, watcher);
++	remove_attio(gatt);
+ }
+ 
+ static int characteristic_set_value(struct characteristic *chr,
 -- 
 1.7.5.4
 
