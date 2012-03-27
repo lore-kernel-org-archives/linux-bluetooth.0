@@ -1,40 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <Mikel.Astiz@bmw-carit.de>
-To: Mike <puffy.taco@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Tue, 27 Mar 2012 08:31:09 +0200
-Subject: RE: media transport -- when is acquire ok to call?
-Message-ID: <66BD268F973E3544A665E5F503FB38B71AE959B22A@DC01.bmw-carit.intra>
-References: <CAB7rCTiQiaFRqDOj6OGZPfTtBWSnR60ADAZimEZJ=F0Tf0-R4Q@mail.gmail.com>
-	<CABBYNZLp3U9sHqiaW9xcH1f8qfrkM7t181y8NVK5L+Rwxet5jw@mail.gmail.com>
-	<CAB7rCTid2cRwetSyNpaT3vGGT_GrSGxzjqR6BJt-J-g4wJuM0w@mail.gmail.com>
-	<CABBYNZJw+7Jat-NUuiMgSr+zcRSoEm1JhmwSUea60hOhpROWmA@mail.gmail.com>
- <CAB7rCTjdCTiOP+XWjk5GcF=37tRi4_uHYYOFX2j1Kj5xBSsqhA@mail.gmail.com>
-In-Reply-To: <CAB7rCTjdCTiOP+XWjk5GcF=37tRi4_uHYYOFX2j1Kj5xBSsqhA@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: AceLan Kao <acelan@gmail.com>
+From: AceLan Kao <acelan.kao@canonical.com>
+To: linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Add support for Atheros [04ca:3005]
+Date: Tue, 27 Mar 2012 10:32:55 +0800
+Message-Id: <1332815576-27800-1-git-send-email-acelan.kao@canonical.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mike,
+Add another vendor specific ID for Atheros AR3012 device.
+This chip is wrapped by Lite-On Technology Corp.
+
+output of usb-devices:
+T:  Bus=04 Lev=01 Prnt=01 Port=03 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=04ca ProdID=3005 Rev=00.02
+S:  Manufacturer=Atheros Communications
+S:  Product=Bluetooth USB Host Controller
+S:  SerialNumber=Alaska Day 2006
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+
+Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+---
+ drivers/bluetooth/ath3k.c |    2 ++
+ drivers/bluetooth/btusb.c |    1 +
+ 2 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 07f14d1..2364644 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -71,6 +71,7 @@ static struct usb_device_id ath3k_table[] = {
  
-> So that has me confused.  If the MediaTransport interface is somewhat
-> generic, why would I want to listen to another interface to know if I
-> should call Acquire?  In my case, I would need to listen to
-> HeadsetGateway.  As it is, the audio from my SCO connection is sent
-> over a PCM bus, so I currently do not even register an SCO endpoint,
-> because it was not needed.  I agree that if you are the initiator,
-> Acquire/Release is sufficient.  In my case, as the non-initiator, it is
-> not sufficient because I do not want to open an audio link by calling
-> acquire unless it already exists.
-
-I'm not sure if this solves your specific problem(s) but I would propose that the MediaTransport API is extended with a method such as TryAcquire (or alternatively Acquire can be extended with either one more parameter, or some specific flag in accesstype). In that case the transport would not be acquired unless the audio link already exists.
-
-The current approach of listening to a state property and then calling Acquire is racy, no matter if the property is in the same interface or not.
-
-Regarding your comment on the need to listen to a different interface, I don't think this should be a big problem. Having said that, the Playing state in HeadsetGateway (and equivalents) could be replaced by a state in MediaTransport. That actually seems more appropriate to me.
-
-Cheers,
-Mikel
-
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0CF3, 0x3004) },
++	{ USB_DEVICE(0x04CA, 0x3005) },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -87,6 +88,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+ 
+ 	{ }	/* Terminating entry */
+ };
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 789c9b5..1908ba8 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -127,6 +127,7 @@ static struct usb_device_id blacklist_table[] = {
+ 
+ 	/* Atheros 3012 with sflash firmware */
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+-- 
+1.7.9.1
