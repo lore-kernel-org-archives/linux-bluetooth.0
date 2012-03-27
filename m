@@ -1,32 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Mar 2012 20:18:10 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Tue, 27 Mar 2012 14:07:41 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Update management interface revision
-Message-ID: <20120327171810.GA4398@x220.P-661HNU-F1>
-References: <1332866942-6632-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH] MAINTAINERS: update Bluetooth tree locations
+Message-ID: <20120327170741.GF9856@joana>
+References: <1332865260-3779-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332866942-6632-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1332865260-3779-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Tue, Mar 27, 2012, Marcel Holtmann wrote:
-> For each kernel release where commands or events are added to the
-> management interface, the revision field should be increment by one.
-> 
-> The increment should only happen once per kernel release and not
-> for every command/event that gets added. The revision value is for
-> informational purposes only, but this simple policy would make any
-> future debugging a lot simple.
+* Marcel Holtmann <marcel@holtmann.org> [2012-03-27 18:21:00 +0200]:
+
+> Make use of a shared tree setup to limit the confusions on which
+> tree is current.
 > 
 > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/mgmt.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  MAINTAINERS |    8 ++++----
+>  1 files changed, 4 insertions(+), 4 deletions(-)
 
-Applied to the new bluetooth-next tree. Thanks.
+Applied to the new bluetooth tree. :)
 
-Johan
+	Gustavo
