@@ -1,43 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: <james.steele@accenture.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <james.steele@accenture.com>
-Subject: [PATCH v3 1/3] lib: Correct the HCI Testing OGF value
-Date: Wed, 28 Mar 2012 14:31:26 +0000
-Message-ID: <81C9FA9C1C2E9E45A9AC3EDD1858BC4323E11458@048-CH1MPN1-101.048d.mgd.msft.net>
-Content-Type: text/plain; charset="us-ascii"
+Date: Wed, 28 Mar 2012 17:26:03 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 3/3] Bluetooth: Use address type info from User-space
+Message-ID: <20120328142601.GB31354@aemeltch-MOBL1>
+References: <1332892776-12060-1-git-send-email-andre.guedes@openbossa.org>
+ <1332892776-12060-4-git-send-email-andre.guedes@openbossa.org>
+ <20120328085638.GC21905@aemeltch-MOBL1>
+ <CACJA=fX9WSAqKZfLxp_iY2WiNoUXrGc=ch0DWdFXZvitOXPiZA@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CACJA=fX9WSAqKZfLxp_iY2WiNoUXrGc=ch0DWdFXZvitOXPiZA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch corrects the Testing OGF to match the value in the Bluetooth
-specification, bringing it in line with the other defined OGF values.
----
- lib/hci.h |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Hi Andre,
 
-diff --git a/lib/hci.h b/lib/hci.h
-index 887a860..5fab92d 100644
---- a/lib/hci.h
-+++ b/lib/hci.h
-@@ -1428,7 +1428,7 @@ typedef struct {
- #define WRITE_REMOTE_AMP_ASSOC_RP_SIZE 2
+On Wed, Mar 28, 2012 at 11:05:47AM -0300, Andre Guedes wrote:
+> >> -int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *dst)
+> >> +int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+> >> +                     bdaddr_t *dst, u8 dst_type)
+> >>  {
+> >>       struct sock *sk = chan->sk;
+> >>       bdaddr_t *src = &bt_sk(sk)->src;
+> >> @@ -1141,8 +1142,8 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+> >>       __u8 auth_type;
+> >>       int err;
+> >>
+> >> -     BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
+> >> -                                             __le16_to_cpu(chan->psm));
+> >> +     BT_DBG("%s -> %s (type %u) psm 0x%2.2x", batostr(src), batostr(dst),
+> >> +                                     dst_type, __le16_to_cpu(chan->psm));
+> >
+> > If you change style for other functions you might change it here as well.
+> 
+> Sorry, didn't follow you here.
 
- /* Testing commands */
--#define OGF_TESTING_CMD                0x3e
-+#define OGF_TESTING_CMD                0x06
+In l2cap_chan_connect you seems align second line at "(". Maybe we need
+then align the same for debug statement?
 
- #define OCF_READ_LOOPBACK_MODE                 0x0001
-
---
-1.7.0.4
-
-
-
-
-________________________________
-Subject to local law, communications with Accenture and its affiliates including telephone calls and emails (including content), may be monitored by our systems for the purposes of security and the assessment of internal compliance with Accenture policy.
-______________________________________________________________________________________
-
-www.accenture.com
+Best regards 
+Andrei Emeltchenko 
 
