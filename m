@@ -1,83 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Mar 2012 12:50:16 +0200 (CEST)
-From: Jiri Kosina <jkosina@suse.cz>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-input@vger.kernel.org, chen.ganir@ti.com,
-	claudio.takahasi@openbossa.org, jprvita@openbossa.org,
-	linux-bluetooth@vger.kernel.org, anderson.lizardo@openbossa.org,
-	marcel@holtmann.org
-Subject: Re: [RFC v2 0/1] User-space HID I/O Driver
-In-Reply-To: <1332793209-2950-1-git-send-email-dh.herrmann@googlemail.com>
-Message-ID: <alpine.LNX.2.00.1203281243180.25526@pobox.suse.cz>
-References: <1332793209-2950-1-git-send-email-dh.herrmann@googlemail.com>
+From: <james.steele@accenture.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <james.steele@accenture.com>
+Subject: [PATCH hcidump v2 1/2] lib: Add HCI write SSP debug mode library
+ function
+Date: Wed, 28 Mar 2012 10:44:43 +0000
+Message-ID: <81C9FA9C1C2E9E45A9AC3EDD1858BC4323E1133F@048-CH1MPN1-101.048d.mgd.msft.net>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 26 Mar 2012, David Herrmann wrote:
+Adds a hci_write_simple_pairing_debug_mode function.
+Also corrects the Testing OGF value to match the specification.
+---
+ lib/hci.c     |   28 ++++++++++++++++++++++++++++
+ lib/hci.h     |    2 +-
+ lib/hci_lib.h |    2 ++
+ 3 files changed, 31 insertions(+), 1 deletions(-)
 
-> This is the second revision of the UHID driver. It basically allows to register
-> hid_ll_drivers in user-space. This is needed to implement Bluetooth HoG (HID
-> over GATT) as discussed earlier.
-> 
-> Changes:
->  - Improved documentation
->  - Added example which emulates a 3-button mouse with wheel in user-space
->  - Fixed some remaining bugs
-> 
-> I didn't change any major parts. I checked that writev/readv work correctly and
-> I documented how to use it in ./Documentation/hid/uhid.txt.
-> 
-> For a full example please see ./samples/uhid/uhid-example.c.
-> 
-> While developing it I also considered moving HIDP to user-space. If we do BT-HoG
-> in user-space, it should be easier to also move HIDP to user-space. The current
-> in-kernel HIDP is buggy, anyway.
-> 
-> Still open points:
->  - How do I get a proper "parent" pointer for uhid->hid->dev.parent? I could use
->    the uhid misc device as parent or is there some device-struct inside "struct
->    file"?
+diff --git a/lib/hci.c b/lib/hci.c
+index 269c021..52f9b33 100644
+--- a/lib/hci.c
++++ b/lib/hci.c
+@@ -2735,6 +2735,34 @@ int hci_read_clock(int dd, uint16_t handle, uint8_t which, uint32_t *clock,
+        return 0;
+ }
 
-Misc device sounds like the best we could get. You can't really use 
-anything else from struct file than private_data and pointer to dentry 
-(but that's likely not something you'd like to be using here).
++int hci_write_simple_pairing_debug_mode(int dd, uint8_t mode, int to)
++{
++       write_simple_pairing_debug_mode_cp cp;
++       write_simple_pairing_debug_mode_rp rp;
++       struct hci_request rq;
++
++       memset(&cp, 0, sizeof(cp));
++       cp.mode = mode;
++
++       memset(&rq, 0, sizeof(rq));
++       rq.ogf    = OGF_TESTING_CMD;
++       rq.ocf    = OCF_WRITE_SIMPLE_PAIRING_DEBUG_MODE;
++       rq.cparam = &cp;
++       rq.clen   = WRITE_SIMPLE_PAIRING_DEBUG_MODE_CP_SIZE;
++       rq.rparam = &rp;
++       rq.rlen   = WRITE_SIMPLE_PAIRING_DEBUG_MODE_RP_SIZE;
++
++       if (hci_send_req(dd, &rq, to) < 0)
++               return -1;
++
++       if (rp.status) {
++               errno = EIO;
++               return -1;
++       }
++
++       return 0;
++}
++
+ int hci_le_set_scan_enable(int dd, uint8_t enable, uint8_t filter_dup, int to)
+ {
+        struct hci_request rq;
+diff --git a/lib/hci.h b/lib/hci.h
+index b68dbc2..1765655 100644
+--- a/lib/hci.h
++++ b/lib/hci.h
+@@ -1419,7 +1419,7 @@ typedef struct {
+ #define WRITE_REMOTE_AMP_ASSOC_RP_SIZE 2
 
->  - Should user-space be able to provide "uniq" and "phys" names for HID-devices?
+ /* Testing commands */
+-#define OGF_TESTING_CMD                0x3e
++#define OGF_TESTING_CMD                0x06
 
-I think so ... it would corelate with the in-kernel implementation, where 
-those are derived from real devices in the in-kernel driver.
+ #define OCF_READ_LOOPBACK_MODE                 0x0001
 
->  - uhid_event is quite big (>4KB) which makes uhid_device really big (~70KB).
->    Should I allocate the ring-buffer dynamically to avoid this?
+diff --git a/lib/hci_lib.h b/lib/hci_lib.h
+index 725eb05..9555b5f 100644
+--- a/lib/hci_lib.h
++++ b/lib/hci_lib.h
+@@ -115,6 +115,8 @@ int hci_read_rssi(int dd, uint16_t handle, int8_t *rssi, int to);
+ int hci_read_afh_map(int dd, uint16_t handle, uint8_t *mode, uint8_t *map, int to);
+ int hci_read_clock(int dd, uint16_t handle, uint8_t which, uint32_t *clock, uint16_t *accuracy, int to);
 
-Yes, please.
++int hci_write_simple_pairing_debug_mode(int dd, uint8_t mode, int to);
++
+ int hci_le_set_scan_enable(int dev_id, uint8_t enable, uint8_t filter_dup, int to);
+ int hci_le_set_scan_parameters(int dev_id, uint8_t type, uint16_t interval,
+                                        uint16_t window, uint8_t own_type,
+--
+1.7.0.4
 
->  - Should I provide the quirks field to user-space? Probably as part of
->    UHID_START?
 
-In order to have the situation mirroring what we already have, it might 
-make sense. On the other hand -- how about adding the propagation only 
-when it turns out that it's actually needed? (i.e. by finding out the 
-first device, for which we need that).
+________________________________
+Subject to local law, communications with Accenture and its affiliates including telephone calls and emails (including content), may be monitored by our systems for the purposes of security and the assessment of internal compliance with Accenture policy.
+______________________________________________________________________________________
 
->  - Could someone review x32 COMPAT stuff? I tried to align all the public
->    structures correctly so I could even remove the __packed attribute. Anyway, I
->    thought keeping it is probably better for future extensions.
+www.accenture.com
 
-Will look into it.
-
-> I spent some time on the locks and they seem all fine. I couldn't find any
-> races.
-> 
-> Jiri, Marcel, could you review the design and tell me what you think?
-
-Generally, I like it. Thanks a lot for the effort. I will be going 
-through the code in a more detailed way hopefully by the end of this week 
-and will send you some comments (if any).
-
-Thanks,
-
--- 
-Jiri Kosina
-SUSE Labs
