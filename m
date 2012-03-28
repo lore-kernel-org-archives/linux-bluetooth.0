@@ -1,38 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Mar 2012 16:36:23 -0500
-From: Jonathan Nieder <jrnieder@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: "Cho, Yu-Chen" <acho@novell.com>, Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org, Oliver Neukum <oliver@neukum.name>,
-	"Lee, Chun-Yi" <jlee@suse.com>,
-	Henry-Nicolas Tourneur <henry.nicolas@tourneur.be>
-Subject: Re: [PATCH] Add Atheros maryann PIDVID support
-Message-ID: <20120328213623.GA11197@burratino>
-References: <00c20c839b7ac6f027ab935f8cf0992c93c5f2fd.1329809368.git.acho@suse.com>
- <20120316152451.GE20650@x220>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120316152451.GE20650@x220>
+From: Don Zickus <dzickus@redhat.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, Don Zickus <dzickus@redhat.com>,
+        Oliver Neukum <oliver@neukum.org>
+Subject: [PATCH] btusb: typo in Broadcom SoftSailing id
+Date: Wed, 28 Mar 2012 16:41:11 -0400
+Message-Id: <1332967271-1743-1-git-send-email-dzickus@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+I was trying to backport the following commit to RHEL-6
 
-Johan Hedberg wrote:
-> On Tue, Feb 21, 2012, Cho, Yu-Chen wrote:
+    From 0cea73465cd22373c5cd43a3edd25fbd4bb532ef Mon Sep 17 00:00:00 2001
+    From: Oliver Neukum <oliver@neukum.org>
+    Date: Wed, 21 Sep 2011 11:37:15 +0200
+    Subject: [PATCH] btusb: add device entry for Broadcom SoftSailing
 
->> Add Atheros maryann 0cf3:311d PIDVID support
->> This module is AR3012 Series.
-[...]
-> Applied to my bluetooth-next tree. Thanks.
+and noticed it wasn't working on an HP Elitebook.  Looking into the patch I
+noticed a very subtle typo in the ids.  The patch has '0x05ac' instead of
+'0x0a5c'.  A snippet of the lsusb -v output also shows this:
 
-Thanks.
+Bus 002 Device 003: ID 0a5c:21e1 Broadcom Corp.
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               2.00
+  bDeviceClass          255 Vendor Specific Class
+  bDeviceSubClass         1
+  bDeviceProtocol         1
+  bMaxPacketSize0        64
+  idVendor           0x0a5c Broadcom Corp.
+  idProduct          0x21e1
+  bcdDevice            1.12
+  iManufacturer           1 Broadcom Corp
+  iProduct                2 BCM20702A0
+  iSerial                 3 60D819F0338C
+  bNumConfigurations      1
 
- Tested-by: Henry-Nicolas Tourneur <henry.nicolas@tourneur.be> # 3.0.y
+Looking at other Broadcom ids, the fix matches them whereas the original patch
+matches Apple's ids.
 
-[1] has details.  Is this targetted at 3.4 or some later kernel?
+Tested on an HP Elitebook 8760w.  The btusb binds and the userspace stuff loads
+correctly.
 
-Ciao,
-Jonathan
+Cc: Oliver Neukum <oliver@neukum.org>
+Signed-off-by: Don Zickus <dzickus@redhat.com>
+---
+ drivers/bluetooth/btusb.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-[1] http://bugs.debian.org/664726
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 789c9b5..86d9712 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -61,7 +61,7 @@ static struct usb_device_id btusb_table[] = {
+ 	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
+ 
+ 	/* Broadcom SoftSailing reporting vendor specific */
+-	{ USB_DEVICE(0x05ac, 0x21e1) },
++	{ USB_DEVICE(0x0a5c, 0x21e1) },
+ 
+ 	/* Apple MacBookPro 7,1 */
+ 	{ USB_DEVICE(0x05ac, 0x8213) },
+-- 
+1.7.7.6
