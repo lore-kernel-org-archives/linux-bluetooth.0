@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv6 06/26] Bluetooth: A2MP: Add chan callbacks
-Date: Wed, 28 Mar 2012 16:31:29 +0300
-Message-Id: <1332941509-21345-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv6 05/26] Bluetooth: A2MP: Build and Send msg helpers
+Date: Wed, 28 Mar 2012 16:31:28 +0300
+Message-Id: <1332941509-21345-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,70 +12,91 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add state change, close and skb allocation callbacks.
+Helper function to build and send A2MP messages.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   37 +++++++++++++++++++++++++++++++++++++
- 1 files changed, 37 insertions(+), 0 deletions(-)
+ include/net/bluetooth/a2mp.h |    7 ++++++
+ net/bluetooth/a2mp.c         |   48 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 55 insertions(+), 0 deletions(-)
 
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index 0fe8ddd..995f1c0 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -24,6 +24,13 @@ struct amp_mgr {
+ 	unsigned long		flags;
+ };
+ 
++struct a2mp_cmd {
++	__u8	code;
++	__u8	ident;
++	__le16	len;
++	__u8	data[0];
++} __packed;
++
+ void amp_mgr_get(struct amp_mgr *mgr);
+ int amp_mgr_put(struct amp_mgr *mgr);
+ 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index b572f9f..980382b 100644
+index 7e707ce..b572f9f 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -65,8 +65,43 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
- 	kfree(cmd);
- }
+@@ -17,6 +17,54 @@
+ #include <net/bluetooth/l2cap.h>
+ #include <net/bluetooth/a2mp.h>
  
-+static void a2mp_chan_state_change_cb(void *data, int state)
++/* A2MP build & send command helper functions */
++static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
 +{
-+	struct l2cap_chan *chan = data;
-+	struct amp_mgr *mgr;
++	struct a2mp_cmd *cmd;
++	int plen;
 +
-+	BT_DBG("chan %p state %s", chan, state_to_string(state));
++	plen = sizeof(*cmd) + len;
++	cmd = kzalloc(plen, GFP_KERNEL);
++	if (!cmd)
++		return NULL;
 +
-+	chan->state = state;
++	cmd->code = code;
++	cmd->ident = ident;
++	cmd->len = cpu_to_le16(len);
 +
-+	switch (state) {
-+	case BT_CLOSED:
-+		mgr = chan->data;
-+		if (mgr)
-+			amp_mgr_put(mgr);
-+		break;
-+	}
++	memcpy(cmd->data, data, len);
++
++	return cmd;
 +}
 +
-+static void a2mp_chan_close_cb(void *data)
++static inline int __a2mp_send(struct amp_mgr *mgr, u8 *data, int len)
 +{
-+	struct amp_mgr *mgr = data;
++	struct l2cap_chan *chan = mgr->a2mp_chan;
++	struct kvec iv = { data, len };
++	struct msghdr msg;
 +
-+	l2cap_chan_destroy(mgr->a2mp_chan);
++	memset(&msg, 0, sizeof(msg));
++
++	msg.msg_iov = (struct iovec *) &iv;
++	msg.msg_iovlen = 1;
++
++	return l2cap_chan_send(chan, &msg, len, 0);
 +}
 +
-+static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
-+					      unsigned long len, int nb,
-+					      int *err)
++static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
++		      void *data)
 +{
-+	return bt_skb_alloc(len, GFP_KERNEL);
++	struct a2mp_cmd *cmd;
++
++	cmd = __a2mp_build(code, ident, len, data);
++	if (!cmd)
++		return;
++
++	__a2mp_send(mgr, (u8 *)cmd, len + sizeof(*cmd));
++
++	kfree(cmd);
 +}
 +
  static struct l2cap_ops a2mp_chan_ops = {
  	.name = "L2CAP A2MP channel",
-+	.state_change = a2mp_chan_state_change_cb,
-+	.close = a2mp_chan_close_cb,
-+	.alloc_skb = a2mp_chan_alloc_skb_cb,
  };
- 
- static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
-@@ -104,6 +139,8 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
- 	chan->remote_mps = chan->omtu;
- 	chan->mps = chan->omtu;
- 
-+	a2mp_chan_state_change_cb(chan, BT_CONNECTED);
-+
- 	return chan;
- }
- 
 -- 
 1.7.9.1
 
