@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv6 13/26] Bluetooth: A2MP: Process A2MP Change Notify
-Date: Wed, 28 Mar 2012 16:31:36 +0300
-Message-Id: <1332941509-21345-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv6 22/26] Bluetooth: Define AMP controller statuses
+Date: Wed, 28 Mar 2012 16:31:45 +0300
+Message-Id: <1332941509-21345-23-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,50 +12,34 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Placeholder for A2MP Change Notify handler.
+AMP status codes copied from Bluez patch sent by Peter Krystad
+<pkrystad@codeaurora.org>.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   19 +++++++++++++++++++
- 1 files changed, 19 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci.h |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 1ec2fc8..d8a74a8 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -162,6 +162,22 @@ static inline int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	return 0;
- }
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 3577b85..1fefe2f 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -60,6 +60,15 @@
  
-+static inline int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
-+				     struct a2mp_cmd *hdr)
-+{
-+	struct a2mp_cl *cl = (struct a2mp_cl *) skb->data;
-+
-+	while (skb->len >= sizeof(*cl)) {
-+		BT_DBG("Controller id %d type %d status %d", cl->id, cl->type,
-+		       cl->status);
-+		cl = (struct a2mp_cl *) skb_pull(skb, sizeof(*cl));
-+	}
-+
-+	/* TODO send A2MP_CHANGE_RSP */
-+
-+	return 0;
-+}
-+
- /* Handle A2MP signalling */
- static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
- {
-@@ -196,6 +212,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
- 			break;
+ #define HCI_BREDR_ID	0
  
- 		case A2MP_CHANGE_NOTIFY:
-+			err = a2mp_change_notify(mgr, skb, hdr);
-+			break;
++/* AMP controller status */
++#define AMP_CTRL_POWERED_DOWN			0x00
++#define AMP_CTRL_BLUETOOTH_ONLY			0x01
++#define AMP_CTRL_NO_CAPACITY			0x02
++#define AMP_CTRL_LOW_CAPACITY			0x03
++#define AMP_CTRL_MEDIUM_CAPACITY		0x04
++#define AMP_CTRL_HIGH_CAPACITY			0x05
++#define AMP_CTRL_FULL_CAPACITY			0x06
 +
- 		case A2MP_GETINFO_REQ:
- 		case A2MP_GETAMPASSOC_REQ:
- 		case A2MP_CREATEPHYSLINK_REQ:
+ /* HCI device quirks */
+ enum {
+ 	HCI_QUIRK_NO_RESET,
 -- 
 1.7.9.1
 
