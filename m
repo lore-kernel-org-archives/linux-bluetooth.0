@@ -1,98 +1,193 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Kris, Chen" <bluefrog2012@gmail.com>
-To: "'AceLan Kao'" <acelan.kao@canonical.com>,
-	<linux-bluetooth@vger.kernel.org>,
-	"'Gustavo F. Padovan'" <padovan@profusion.mobi>,
-	"'Marcel Holtmann'" <marcel@holtmann.org>
-References: <1331799788-20129-1-git-send-email-acelan.kao@canonical.com>
-In-Reply-To: <1331799788-20129-1-git-send-email-acelan.kao@canonical.com>
-Subject: RE: [PATCH] Bluetooth: Add support for AR3012 [0cf3:e004]
-Date: Wed, 28 Mar 2012 21:44:00 +0800
-Message-ID: <000601cd0ce8$ddf02020$99d06060$@com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="gb2312"
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFCv6 04/26] Bluetooth: A2MP: AMP Manager basic functions
+Date: Wed, 28 Mar 2012 16:31:27 +0300
+Message-Id: <1332941509-21345-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Acelan
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-I want to know, compared with { USB_DEVICE(0x0CF3, 0x3004) }, is {
-USB_DEVICE(0x0CF3, 0xE004) } a new product of Atheros, or for a specific
-customer of Atheros?
+Define AMP Manager and some basic functions.
 
-Thanks!
-
-Kris
-
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org
-[mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of AceLan Kao
-Sent: 2012=C4=EA3=D4=C215=C8=D5 16:23
-To: linux-bluetooth@vger.kernel.org; Gustavo F. Padovan; Marcel Holtmann
-Subject: [PATCH] Bluetooth: Add support for AR3012 [0cf3:e004]
-
-Add another vendor specific ID for Atheros AR3012
-
-output of usb-devices:
-T:  Bus=3D02 Lev=3D02 Prnt=3D02 Port=3D04 Cnt=3D01 Dev#=3D  4 Spd=3D12  =
-MxCh=3D 0
-D:  Ver=3D 1.10 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
-P:  Vendor=3D0cf3 ProdID=3De004 Rev=3D00.02
-S:  Manufacturer=3DAtheros Communications
-S:  Product=3DBluetooth USB Host Controller
-S:  SerialNumber=3DAlaska Day 2006
-C:  #Ifs=3D 2 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
-I:  If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 =
-Driver=3Dbtusb
-I:  If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 =
-Driver=3Dbtusb
-
-BugLink: https://bugs.launchpad.net/bugs/922715
-
-Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- drivers/bluetooth/ath3k.c |    2 ++
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 3 insertions(+), 0 deletions(-)
+ include/net/bluetooth/a2mp.h     |   30 ++++++++++++++++++++
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/a2mp.c             |   55 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_conn.c         |   15 ++++++++++
+ 4 files changed, 101 insertions(+), 0 deletions(-)
+ create mode 100644 include/net/bluetooth/a2mp.h
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 07f14d1..b55fc76 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -71,6 +71,7 @@ static struct usb_device_id ath3k_table[] =3D {
-=20
- 	/* Atheros AR3012 with sflash firmware*/
- 	{ USB_DEVICE(0x0CF3, 0x3004) },
-+	{ USB_DEVICE(0x0CF3, 0xE004) },
-=20
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -87,6 +88,7 @@ static struct usb_device_id ath3k_blist_tbl[] =3D {
-=20
- 	/* Atheros AR3012 with sflash firmware*/
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info =3D BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info =3D BTUSB_ATH3012 },
-=20
- 	{ }	/* Terminating entry */
- };
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 789c9b5..2b7d2d1 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -127,6 +127,7 @@ static struct usb_device_id blacklist_table[] =3D {
-=20
- 	/* Atheros 3012 with sflash firmware */
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info =3D BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info =3D BTUSB_ATH3012 },
-=20
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info =3D BTUSB_IGNORE },
---=20
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+new file mode 100644
+index 0000000..0fe8ddd
+--- /dev/null
++++ b/include/net/bluetooth/a2mp.h
+@@ -0,0 +1,30 @@
++/*
++   Copyright (c) 2010,2011 Code Aurora Forum.  All rights reserved.
++   Copyright (c) 2011,2012 Intel Corp.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License version 2 and
++   only version 2 as published by the Free Software Foundation.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++*/
++
++#ifndef __A2MP_H
++#define __A2MP_H
++
++struct amp_mgr {
++	struct list_head	list;
++	struct l2cap_conn	*l2cap_conn;
++	struct l2cap_chan	*a2mp_chan;
++	struct kref		kref;
++	__u8			ident;
++	unsigned long		flags;
++};
++
++void amp_mgr_get(struct amp_mgr *mgr);
++int amp_mgr_put(struct amp_mgr *mgr);
++
++#endif /* __A2MP_H */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index c8d5beb..e411d4e 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -323,6 +323,7 @@ struct hci_conn {
+ 
+ 	struct sk_buff_head data_q;
+ 	struct list_head chan_list;
++	struct list_head mgr_list;
+ 
+ 	struct delayed_work disc_work;
+ 	struct timer_list idle_timer;
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 1f733b5..7e707ce 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -15,6 +15,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/l2cap.h>
++#include <net/bluetooth/a2mp.h>
+ 
+ static struct l2cap_ops a2mp_chan_ops = {
+ 	.name = "L2CAP A2MP channel",
+@@ -57,3 +58,57 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
+ 
+ 	return chan;
+ }
++
++/* AMP Manager functions */
++void amp_mgr_get(struct amp_mgr *mgr)
++{
++	BT_DBG("mgr %p", mgr);
++
++	kref_get(&mgr->kref);
++}
++
++static void amp_mgr_destroy(struct kref *kref)
++{
++	struct amp_mgr *mgr;
++	mgr = container_of(kref, struct amp_mgr, kref);
++
++	BT_DBG("mgr %p", mgr);
++
++	kfree(mgr);
++}
++
++int amp_mgr_put(struct amp_mgr *mgr)
++{
++	BT_DBG("mgr %p", mgr);
++
++	return kref_put(&mgr->kref, &amp_mgr_destroy);
++}
++
++static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
++{
++	struct amp_mgr *mgr;
++	struct l2cap_chan *chan;
++
++	mgr = kzalloc(sizeof(*mgr), GFP_KERNEL);
++	if (!mgr)
++		return NULL;
++
++	BT_DBG("conn %p mgr %p", conn, mgr);
++
++	mgr->l2cap_conn = conn;
++
++	chan = a2mp_chan_open(conn);
++	if (!chan) {
++		kfree(mgr);
++		return NULL;
++	}
++
++	mgr->a2mp_chan = chan;
++	chan->data = mgr;
++
++	list_add(&mgr->list, &conn->hcon->mgr_list);
++
++	kref_init(&mgr->kref);
++
++	return mgr;
++}
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 947172b..2de2773 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -43,6 +43,7 @@
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/a2mp.h>
+ 
+ static void hci_le_connect(struct hci_conn *conn)
+ {
+@@ -404,6 +405,8 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
+ 
+ 	INIT_LIST_HEAD(&conn->chan_list);
+ 
++	INIT_LIST_HEAD(&conn->mgr_list);
++
+ 	INIT_DELAYED_WORK(&conn->disc_work, hci_conn_timeout);
+ 	setup_timer(&conn->idle_timer, hci_conn_idle, (unsigned long)conn);
+ 	setup_timer(&conn->auto_accept_timer, hci_conn_auto_accept,
+@@ -424,6 +427,16 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
+ 	return conn;
+ }
+ 
++static void hci_amp_mgr_list_flush(struct hci_conn *conn)
++{
++	struct amp_mgr *mgr, *n;
++
++	BT_DBG("conn %p", conn);
++
++	list_for_each_entry_safe(mgr, n, &conn->mgr_list, list)
++		amp_mgr_put(mgr);
++}
++
+ int hci_conn_del(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+@@ -459,6 +472,8 @@ int hci_conn_del(struct hci_conn *conn)
+ 
+ 	hci_chan_list_flush(conn);
+ 
++	hci_amp_mgr_list_flush(conn);
++
+ 	hci_conn_hash_del(hdev, conn);
+ 	if (hdev->notify)
+ 		hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
+-- 
 1.7.9.1
 
---
-To unsubscribe from this list: send the line "unsubscribe =
-linux-bluetooth"
-in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
