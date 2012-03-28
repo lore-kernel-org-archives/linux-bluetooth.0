@@ -1,32 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1332943518.1870.167.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Remove unneeded zero initialization
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 28 Mar 2012 16:05:18 +0200
-In-Reply-To: <1332940001-20336-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1332935794-15319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1332940001-20336-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <20120328085638.GC21905@aemeltch-MOBL1>
+References: <1332892776-12060-1-git-send-email-andre.guedes@openbossa.org>
+	<1332892776-12060-4-git-send-email-andre.guedes@openbossa.org>
+	<20120328085638.GC21905@aemeltch-MOBL1>
+Date: Wed, 28 Mar 2012 11:05:47 -0300
+Message-ID: <CACJA=fX9WSAqKZfLxp_iY2WiNoUXrGc=ch0DWdFXZvitOXPiZA@mail.gmail.com>
+Subject: Re: [RFC 3/3] Bluetooth: Use address type info from User-space
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-> Remove zero initialization since channel is allocated with kzalloc
-> in l2cap_chan_create.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/l2cap_sock.c |    1 -
->  1 files changed, 0 insertions(+), 1 deletions(-)
+On Wed, Mar 28, 2012 at 5:56 AM, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+> Hi Andre,
+>
+> On Tue, Mar 27, 2012 at 08:59:36PM -0300, Andre Guedes wrote:
+>> In order to establish a LE connection we need the address type
+>> information. User-space already pass this information to kernel
+>> through struct sockaddr_l2.
+>>
+>> This patch adds the dst_type parameter to l2cap_chan_connect so we
+>> are able to pass the address type info from user-space down to
+>> hci_conn layer.
+>>
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>>  include/net/bluetooth/l2cap.h |    2 +-
+>>  net/bluetooth/l2cap_core.c    |   11 ++++++-----
+>>  net/bluetooth/l2cap_sock.c    |    2 +-
+>>  3 files changed, 8 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+>> index d14967e..262628c 100644
+>> --- a/include/net/bluetooth/l2cap.h
+>> +++ b/include/net/bluetooth/l2cap.h
+>> @@ -911,7 +911,7 @@ struct l2cap_chan *l2cap_chan_create(void);
+>>  void l2cap_chan_close(struct l2cap_chan *chan, int reason);
+>>  void l2cap_chan_destroy(struct l2cap_chan *chan);
+>>  int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+>> -                                                             bdaddr_t *dst);
+>> +                                             bdaddr_t *dst, u8 dst_type);
+>>  int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+>>                                                               u32 priority);
+>>  void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>> index 91b02de..e0dc4ca 100644
+>> --- a/net/bluetooth/l2cap_core.c
+>> +++ b/net/bluetooth/l2cap_core.c
+>> @@ -1131,7 +1131,8 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr
+>>       return c1;
+>>  }
+>>
+>> -int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *dst)
+>> +int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+>> +                     bdaddr_t *dst, u8 dst_type)
+>>  {
+>>       struct sock *sk = chan->sk;
+>>       bdaddr_t *src = &bt_sk(sk)->src;
+>> @@ -1141,8 +1142,8 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+>>       __u8 auth_type;
+>>       int err;
+>>
+>> -     BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
+>> -                                             __le16_to_cpu(chan->psm));
+>> +     BT_DBG("%s -> %s (type %u) psm 0x%2.2x", batostr(src), batostr(dst),
+>> +                                     dst_type, __le16_to_cpu(chan->psm));
+>
+> If you change style for other functions you might change it here as well.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Sorry, didn't follow you here.
 
-Regards
+>>
+>>       hdev = hci_get_route(dst, src);
+>>       if (!hdev)
+>> @@ -1216,10 +1217,10 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+>>       auth_type = l2cap_get_auth_type(chan);
+>>
+>>       if (chan->dcid == L2CAP_CID_LE_DATA)
+>> -             hcon = hci_connect(hdev, LE_LINK, dst, MGMT_ADDR_LE_RANDOM,
+>> +             hcon = hci_connect(hdev, LE_LINK, dst, dst_type,
+>>                                       chan->sec_level, auth_type);
+>>       else
+>> -             hcon = hci_connect(hdev, ACL_LINK, dst, MGMT_ADDR_BREDR,
+>> +             hcon = hci_connect(hdev, ACL_LINK, dst, dst_type,
+>>                                       chan->sec_level, auth_type);
+>>
+>>       if (IS_ERR(hcon)) {
+>> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+>> index 53e563f..4b38cf8 100644
+>> --- a/net/bluetooth/l2cap_sock.c
+>> +++ b/net/bluetooth/l2cap_sock.c
+>> @@ -124,7 +124,7 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+>>               return -EINVAL;
+>>
+>>       err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
+>> -                             &la.l2_bdaddr);
+>> +                             &la.l2_bdaddr, la.l2_bdaddr_type);
+>
+> Would it make sense to pass la as a parameter?
 
-Marcel
+I guess so. If we all agree this is a valid refactoring, I take care
+of it in a separated patch.
 
+Thanks,
 
+Andre
