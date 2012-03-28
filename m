@@ -1,45 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	padovan@profusion.mobi,
-	johan.hedberg@gmail.com,
-	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH] Bluetooth: vhci: Ignore return code of nonseekable_open()
-Date: Wed, 28 Mar 2012 11:48:42 +0200
-Message-Id: <1332928122-10919-1-git-send-email-dh.herrmann@googlemail.com>
+Date: Wed, 28 Mar 2012 12:41:03 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 BlueZ] gatttool: Update interactive prompt if
+ connection is lost
+Message-ID: <20120328094103.GD28310@x220>
+References: <1332516126-6665-1-git-send-email-jefferson.delfes@openbossa.org>
+ <1332854515-22080-1-git-send-email-jefferson.delfes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1332854515-22080-1-git-send-email-jefferson.delfes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The comment in ./fs/open.c clearly states that nonseekable_open() will
-never fail. Therefore, we can safely ignore the return code. This is the
-recommended way to deal with nonseekable_open().
-Our current code looks like nonseekable_open() is checked for the return
-code. However, if we check the return code, we must also kfree() our
-private data if the open fails. To avoid this overhead and to avoid
-confusion, we simply drop the return code and return 0.
+Hi Jefferson,
 
-Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
----
-See the UHID discussion for more information. Marcel suggested to also fix vhci
-so here is the patch ;)
+On Tue, Mar 27, 2012, Jefferson Delfes wrote:
+> In interactive mode, when connection is lost, the prompt used to remain
+> in "connected" state. This patch fixes that case, by always showing the
+> actual connection state.
+> ---
+>  attrib/interactive.c |   39 +++++++++++++++++++++++++++------------
+>  1 file changed, 27 insertions(+), 12 deletions(-)
 
- drivers/bluetooth/hci_vhci.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Applied. Thanks.
 
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index 2ed6ab1..d8a2a4f 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -260,8 +260,9 @@ static int vhci_open(struct inode *inode, struct file *file)
- 	}
- 
- 	file->private_data = data;
-+	nonseekable_open(inode, file);
- 
--	return nonseekable_open(inode, file);
-+	return 0;
- }
- 
- static int vhci_release(struct inode *inode, struct file *file)
--- 
-1.7.9.4
+Johan
