@@ -1,35 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Mar 2012 15:00:39 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Hemant Gupta <hemant.gupta@stericsson.com>,
-	linux-bluetooth@vger.kernel.org,
-	Naresh Gupta <naresh.gupta@stericsson.com>,
-	Hemant Gupta <hemantgupta.ste@gmail.com>
-Subject: Re: [PATCH] Use correct flags for checking HCI_SSP_ENABLED bit
-Message-ID: <20120328120039.GA8590@x220>
-References: <1332934749-12765-1-git-send-email-hemant.gupta@stericsson.com>
- <1332935216.1870.165.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332935216.1870.165.camel@aeonflux>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Remove unneeded zero initialization
+Date: Wed, 28 Mar 2012 14:56:34 +0300
+Message-Id: <1332935794-15319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Wed, Mar 28, 2012, Marcel Holtmann wrote:
-> Hi Hemant,
-> 
-> > This patch uses the correct flags for checking the HCI_SSP_ENABLED bit.
-> > Without this authentication request was not being initiated.
-> > 
-> > Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
-> > ---
-> >  include/net/bluetooth/hci_core.h |    2 +-
-> >  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Remove zero initialization since channel is allocated with kzalloc
+in l2cap_chan_create.
 
-Applied to both bluetooth and bluetooth-next. Thanks.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_sock.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
-Johan
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 53e563f..4e73b41 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -999,7 +999,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		}
+ 
+ 		chan->imtu = L2CAP_DEFAULT_MTU;
+-		chan->omtu = 0;
++
+ 		if (!disable_ertm && sk->sk_type == SOCK_STREAM) {
+ 			chan->mode = L2CAP_MODE_ERTM;
+ 			set_bit(CONF_STATE2_DEVICE, &chan->conf_state);
+@@ -1011,7 +1011,6 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		chan->tx_win = L2CAP_DEFAULT_TX_WINDOW;
+ 		chan->tx_win_max = L2CAP_DEFAULT_TX_WINDOW;
+ 		chan->sec_level = BT_SECURITY_LOW;
+-		chan->flags = 0;
+ 		set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
+ 	}
+ 
+-- 
+1.7.9.1
+
