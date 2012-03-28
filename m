@@ -1,44 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Mar 2012 17:26:03 +0300
+Date: Wed, 28 Mar 2012 17:14:05 +0300
 From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 3/3] Bluetooth: Use address type info from User-space
-Message-ID: <20120328142601.GB31354@aemeltch-MOBL1>
-References: <1332892776-12060-1-git-send-email-andre.guedes@openbossa.org>
- <1332892776-12060-4-git-send-email-andre.guedes@openbossa.org>
- <20120328085638.GC21905@aemeltch-MOBL1>
- <CACJA=fX9WSAqKZfLxp_iY2WiNoUXrGc=ch0DWdFXZvitOXPiZA@mail.gmail.com>
+To: Joao Paulo Rechi Vita <jprvita@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org, dh.herrmann@googlemail.com,
+	chen.ganir@ti.com
+Subject: Re: [RFC 2/8] HoG: register ATTIO callbacks
+Message-ID: <20120328141402.GA31354@aemeltch-MOBL1>
+References: <1332887487-13601-1-git-send-email-jprvita@openbossa.org>
+ <1332887487-13601-3-git-send-email-jprvita@openbossa.org>
+ <20120328082641.GA21905@aemeltch-MOBL1>
+ <CAAngNMYY=8Vpoh4izC-NXw0fnpUcS3fawu3ZGCCA5CVtzVypew@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CACJA=fX9WSAqKZfLxp_iY2WiNoUXrGc=ch0DWdFXZvitOXPiZA@mail.gmail.com>
+In-Reply-To: <CAAngNMYY=8Vpoh4izC-NXw0fnpUcS3fawu3ZGCCA5CVtzVypew@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi João,
 
-On Wed, Mar 28, 2012 at 11:05:47AM -0300, Andre Guedes wrote:
-> >> -int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *dst)
-> >> +int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
-> >> +                     bdaddr_t *dst, u8 dst_type)
-> >>  {
-> >>       struct sock *sk = chan->sk;
-> >>       bdaddr_t *src = &bt_sk(sk)->src;
-> >> @@ -1141,8 +1142,8 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
-> >>       __u8 auth_type;
-> >>       int err;
-> >>
-> >> -     BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
-> >> -                                             __le16_to_cpu(chan->psm));
-> >> +     BT_DBG("%s -> %s (type %u) psm 0x%2.2x", batostr(src), batostr(dst),
-> >> +                                     dst_type, __le16_to_cpu(chan->psm));
-> >
-> > If you change style for other functions you might change it here as well.
+On Wed, Mar 28, 2012 at 10:55:18AM -0300, Joao Paulo Rechi Vita wrote:
+> Hello Andrei,
 > 
-> Sorry, didn't follow you here.
+> 2012/3/28 Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>:
+> > Hi João,
+> >
+> > Minor comments:
+> >
+> > On Tue, Mar 27, 2012 at 07:31:21PM -0300, João Paulo Rechi Vita wrote:
+> > ...
+> >> +static struct hog_device *hog_device_new(struct btd_device *device,
+> >> +                                                     const char *path)
+> >> +{
+> > ...
+> >> +
+> >> +     hogdev->attioid = btd_device_add_attio_callback(device,
+> >> +                                                     attio_connected_cb,
+> >> +                                                     attio_disconnected_cb,
+> >> +                                                     hogdev);
+> >
+> > What is the coding style for the userspace? Shall it be at least the same?
+> >
+> 
+> Unless something has changed lately we use the kernel coding style. I
+> don't see where I didn't follow it here, but I may be missing
+> something. Can you please point me what I'm missing if that is the
+> case?
 
-In l2cap_chan_connect you seems align second line at "(". Maybe we need
-then align the same for debug statement?
+I mean are those parameters aligned to the right or at "(".
 
 Best regards 
 Andrei Emeltchenko 
