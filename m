@@ -1,88 +1,209 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Jefferson Delfes <jefferson.delfes@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [RFC BlueZ 0/2] Add support for find included services
-Date: Wed, 28 Mar 2012 07:30:11 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B466EAD@DNCE02.ent.ti.com>
-References: <1332857166-25002-1-git-send-email-jefferson.delfes@openbossa.org>
-In-Reply-To: <1332857166-25002-1-git-send-email-jefferson.delfes@openbossa.org>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Message-id: <3812CD379FC54325B4581BDDAA0A97D4@sisodomain.com>
+From: "chethan.tn" <chethan.tn@samsung.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+References: <1332309849-4303-1-git-send-email-chethan.tn@samsung.com>
+ <CAMOw1v5ESJsFm0oyvU6gAL735J+Eq7ft6OO1cANn4meawrfeww@mail.gmail.com>
+In-reply-to: <CAMOw1v5ESJsFm0oyvU6gAL735J+Eq7ft6OO1cANn4meawrfeww@mail.gmail.com>
+Subject: Re: [PATCH] avrcp: Handle of GetPlayerApplicationSettingAttributeText
+ pdu
+Date: Wed, 28 Mar 2012 08:17:33 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Jefferson,
+Hi,
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Jefferson Delfes
-> Sent: Tuesday, March 27, 2012 4:06 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: Jefferson Delfes
-> Subject: [RFC BlueZ 0/2] Add support for find included services
-> 
-> This patch series introduces support for find included services.
-> The interactive mode of gatttool receives a new command "included" that
-> uses gatt_find_included to find these services in given range.
-> 
-> We don't have any way to test find included services with 128-bit
-> UUID128. Yet in PTS, there is only a 16-bit UUID test case. So if
-> anyone can test this, would be great.
-> We can also extend plugins/gatt-example.c to test 128-bit UUID
-> includes.
-> 
-This patch set looks like it is working properly with 16 bit uuids. I tested it with included services as primaries and as secondaries, and I even looked for included services inside other included services (secondary services which have includes). Take a look at this :
-[CON][64:9c:8e:e5:a0:e9][LE]> primary
-attr handle: 0x0001, end grp handle: 0x000b uuid: 00001800-0000-1000-8000-00805f9b34fb
-attr handle: 0x000c, end grp handle: 0x0016 uuid: 00001800-0000-1000-8000-00805f9b34fb
-attr handle: 0x0017, end grp handle: 0x0019 uuid: 00001801-0000-1000-8000-00805f9b34fb
-attr handle: 0x001a, end grp handle: 0x0043 uuid: 00009000-0000-1000-8000-00805f9b34fb
-attr handle: 0x0044, end grp handle: 0x0046 uuid: 0000a000-0000-1000-8000-00805f9b34fb
-attr handle: 0x0050, end grp handle: 0x0055 uuid: 0000a002-0000-1000-8000-00805f9b34fb
-attr handle: 0x0056, end grp handle: 0x005a uuid: 0000a003-0000-1000-8000-00805f9b34fb
-attr handle: 0x005b, end grp handle: 0x005d uuid: 0000a004-0000-1000-8000-00805f9b34fb
-attr handle: 0x0064, end grp handle: 0x0069 uuid: 0000a001-0000-1000-8000-00805f9b34fb
-attr handle: 0x006a, end grp handle: 0x006c uuid: 0000a008-0000-0000-0123-456789abcdef
-attr handle: 0x0070, end grp handle: 0x0078 uuid: 0000a007-0000-0000-0123-456789abcdef
-attr handle: 0x0079, end grp handle: 0x007d uuid: 00001802-0000-1000-8000-00805f9b34fb
-attr handle: 0x007e, end grp handle: 0x0080 uuid: 00001804-0000-1000-8000-00805f9b34fb
-attr handle: 0x0081, end grp handle: 0x0083 uuid: 00001803-0000-1000-8000-00805f9b34fb
-[CON][64:9c:8e:e5:a0:e9][LE]> included 0x01 0x6c
-[CON][64:9c:8e:e5:a0:e9][LE]> 
+--------------------------------------------------
+From: "Lucas De Marchi" <lucas.demarchi@profusion.mobi>
+Sent: Thursday, March 22, 2012 6:41 AM
+To: "Chethan T N" <chethan.tn@samsung.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] avrcp: Handle of 
+GetPlayerApplicationSettingAttributeText pdu
 
-This is a secondary service, including another secondary service, both do not show up in the primaries list above, as they should:
-handle: 0x004b, start handle: 0x0047, end handle: 0x0049 uuid: 0000a006-0000-1000-8000-00805f9b34fb 
+> Hi Chethan,
+>
+> On Wed, Mar 21, 2012 at 3:04 AM, Chethan T N <chethan.tn@samsung.com> 
+> wrote:
+>> Support for TG role GetPlayerApplicationSettingAttributeText added
+>> to pass PTS test case TP/PAS/BV-04-C
+>> ---
+>>  audio/avrcp.c |   93 
+>> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>  1 files changed, 92 insertions(+), 1 deletions(-)
+>
+> I started reviewing this and it looked very familiar to me, including
+> the comments... It turned out that this implementation is very similar
+> to avrcp_handle_get_current_player_value() and then it made me wonder
+> why I didn't implement it last year. See comment below.
+>
+>
+>>
+>> diff --git a/audio/avrcp.c b/audio/avrcp.c
+>> index c9ec314..b09a777 100644
+>> --- a/audio/avrcp.c
+>> +++ b/audio/avrcp.c
+>> @@ -800,6 +800,97 @@ err:
+>>        return AVC_CTYPE_REJECTED;
+>>  }
+>>
+>> +static const char *attr_to_str(uint8_t attr)
+>> +{
+>> +       switch (attr) {
+>> +       case AVRCP_ATTRIBUTE_EQUALIZER:
+>> +               return "Equalizer";
+>> +       case AVRCP_ATTRIBUTE_REPEAT_MODE:
+>> +               return "Repeat";
+>> +       case AVRCP_ATTRIBUTE_SHUFFLE:
+>> +               return "Shuffle";
+>> +       case AVRCP_ATTRIBUTE_SCAN:
+>> +               return "Scan";
+>> +       }
+>> +
+>> +       return NULL;
+>> +}
+>
+> We can't have these values hardcoded here. CT is asking the TG: "what
+> should I display in my pane?" - it's meaningless to answer this since
+> CT already knows that for the settings from the spec.
+>
 
-handle: 0x0051, start handle: 0x004a, end handle: 0x004f uuid: 0000a005-0000-1000-8000-00805f9b34fb
-handle: 0x005f, start handle: 0x0047, end handle: 0x0049 uuid: 0000a006-0000-1000-8000-00805f9b34fb
-handle: 0x0065, start handle: 0x005e, end handle: 0x0063 uuid: 0000a005-0000-1000-8000-00805f9b34fb
+ok. I agree for the default settings like Equalizer, Shuffle, Repeat and 
+Scan values TG need
+not to send to CT.
 
-[CON][64:9c:8e:e5:a0:e9][LE]> included 0x01 0x78
-However, when I tried to search for included services inside a 128bit service, which includes another 128bit secondary service, the gatttool first did not return any result, and then I got a segmentation fault. 
+> See section 5.2.5 of AVRCP 1.3 spec:
+>
+> "NOTE: This command is expected to be used only for extended attributes 
+> for menu
+> navigation. It is assumed that all <attribute, value> pairs used for
+> menu extensions are
+> statically defined by TG."
+>
+
+ok, But the <attribute, value> pair for extended attributes may vary for 
+different TG's.
+So TG application register their extended attributes to bluez, and when CT 
+requests for
+these values TG shall send the <attribute, value> based on the attribute ID.
+
+> Therefore we should only implement that for settings that extend the
+> "default ones". If you want that, take a look in the comments below
+> (besides having to extend the current API for getting values, etc).
+>
+>
+>> +
+>> +static uint8_t avrcp_handle_get_player_attribute_text(struct 
+>> avrcp_player *player,
+>> +                                               struct avrcp_header *pdu,
+>> +                                               uint8_t transaction)
+>> +{
+>> +       uint16_t len = ntohs(pdu->params_len);
+>> +       uint8_t *settings = NULL;
+>> +       unsigned int i = 0;
+>> +       uint8_t no_of_attr = 0;
+>> +       const char *attstr = NULL;
+>
+> Review useless initialization...
+
+I will modify the initializations.
+>
+>
+>> +
+>> +       if (player == NULL || len <= 1 || pdu->params[0] != len - 1)
+>> +               goto err;
+>> +
+>> +       /*
+>> +        * Save a copy of requested settings because we can override them
+>> +        * while responding
+>> +        */
+>> +       settings = g_memdup(&pdu->params[1], pdu->params[0]);
+>> +       len = 0;
+>> +
+>> +       /*
+>> +        * From sec. 5.7 of AVRCP 1.3 spec, we should ignore non-existent 
+>> IDs
+>> +        * and send a response with the existent ones.
+>> +        */
+>> +       for (i = 0; i < pdu->params[0]; i++) {
+>> +
+>> +               if (settings[i] < AVRCP_ATTRIBUTE_EQUALIZER ||
+>> +                                       settings[i] > 
+>> AVRCP_ATTRIBUTE_SCAN) {
+>> +                       DBG("Ignoring %u", settings[i]);
+>> +                       continue;
+>> +               }
+>
+> We would change this loop and pass the setting to player.
+
+ok.
+
+>
+>> +
+>> +               if (player_get_attribute(player, settings[i]) < 0)
+>> +                       continue;
+>
+> You are asking the value of that setting to the player only to know if
+> player supports that setting. But you actually have to respond with
+> the _name_ of the key. Pretty confusing here. We should ask the _name_
+> of the key, not its value.
+
+ok, I will modify based on the _name_.
+>
+>> +
+>> +               /*
+>> +                * No of attributes that are supported by the player
+>> +                */
+>> +               no_of_attr++;
+>> +               pdu->params[++len] = settings[i];
+>> +
+>> +               /*
+>> +                * As per the MIBenum defined in IANA character set
+>> +                * document the value of displayable UTF-8 charater set
+>> +                * value is 0x006A
+>> +                */
+>> +               pdu->params[++len] = 0x00;
+>> +               pdu->params[++len] = 0x6A;
+>> +               attstr = attr_to_str(settings[i]);
+>> +
+>> +               if (NULL != attstr) {
+> reverse order...
+>
+> and you already incremented no_of_attr, CT will be very confused
+
+ok, I will modify the increment of no_of_attr after copying the _name_.
+
+>
+>> +                       pdu->params[++len] = strlen(attstr);
+>
+> 1
+>
+>> +                       len = len + 1;
+>> +                       strncpy((char *) (pdu->params + len), attstr, 
+>> strlen(attstr));
+>
+> 2
+>
+>> +                       len = len + strlen(attstr);
+>
+> 3
+>
+> 3 calls to strlen() ( + 1 inside strncpy()).... not good - cache it in
+> variable and use that instead (in this case it could even be hardcoded
+> in attr_to_str(), but this can't be as is because of the first comment
+> above..
+>
+
+ok. I will modify.
+
+>
+> Regards,
+> Lucas De Marchi
 
 
-
-> Jefferson Delfes (2):
->   GATT: Add support for find included services
->   gatttool: Add "included" command
-> 
->  attrib/gatt.c        |  173
-> ++++++++++++++++++++++++++++++++++++++++++++++++++
->  attrib/gatt.h        |    9 +++
->  attrib/interactive.c |   54 ++++++++++++++++
->  3 files changed, 236 insertions(+)
-> 
-> --
-> 1.7.9.4
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-
-> bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Thanks,
-Chen Ganir
+Thanks and Regards
+Chethan 
 
