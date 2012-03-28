@@ -1,98 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20120328084837.GB21905@aemeltch-MOBL1>
-References: <1332892776-12060-1-git-send-email-andre.guedes@openbossa.org>
-	<1332892776-12060-3-git-send-email-andre.guedes@openbossa.org>
-	<20120328084837.GB21905@aemeltch-MOBL1>
-Date: Wed, 28 Mar 2012 11:05:20 -0300
-Message-ID: <CACJA=fUPzWaoTVL3Onzit8Wuk4vAcuw4rgpdctxJF8rg37giPg@mail.gmail.com>
-Subject: Re: [RFC 2/3] Bluetooth: Add dst_type parameter to hci_connect
-From: Andre Guedes <andre.guedes@openbossa.org>
+In-Reply-To: <20120328082641.GA21905@aemeltch-MOBL1>
+References: <1332887487-13601-1-git-send-email-jprvita@openbossa.org>
+	<1332887487-13601-3-git-send-email-jprvita@openbossa.org>
+	<20120328082641.GA21905@aemeltch-MOBL1>
+Date: Wed, 28 Mar 2012 10:55:18 -0300
+Message-ID: <CAAngNMYY=8Vpoh4izC-NXw0fnpUcS3fawu3ZGCCA5CVtzVypew@mail.gmail.com>
+Subject: Re: [RFC 2/8] HoG: register ATTIO callbacks
+From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
 To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Andre Guedes <andre.guedes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+	=?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>,
+	linux-bluetooth@vger.kernel.org, dh.herrmann@googlemail.com,
+	chen.ganir@ti.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
-
-On Wed, Mar 28, 2012 at 5:48 AM, Andrei Emeltchenko
-<andrei.emeltchenko.news@gmail.com> wrote:
-> Hi Andre,
->
-> On Tue, Mar 27, 2012 at 08:59:35PM -0300, Andre Guedes wrote:
->> This patch adds the dst_type parameter to hci_connect. This way, we
->> use the address type information from upper layer instead of searching
->> it on the advertising cache.
->>
->> The dst_type parameter is ignored for BR/EDR connection establishment.
->>
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->>  include/net/bluetooth/hci_core.h |    2 +-
->>  net/bluetooth/hci_conn.c         |   12 ++++--------
->>  net/bluetooth/l2cap_core.c       |    4 ++--
->>  net/bluetooth/mgmt.c             |    8 ++++----
->>  net/bluetooth/sco.c              |    3 ++-
->>  5 files changed, 13 insertions(+), 16 deletions(-)
->>
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->> index fa2c778..178eaa1 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -574,7 +574,7 @@ int hci_chan_del(struct hci_chan *chan);
->>  void hci_chan_list_flush(struct hci_conn *conn);
->>
->>  struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
->> -                                             __u8 sec_level, __u8 auth_type);
->> +                             __u8 dst_type, __u8 sec_level, __u8 auth_type);
->>  int hci_conn_check_link_mode(struct hci_conn *conn);
->>  int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
->>  int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
->> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->> index 947172b..4f24d3f 100644
->> --- a/net/bluetooth/hci_conn.c
->> +++ b/net/bluetooth/hci_conn.c
->> @@ -514,7 +514,8 @@ EXPORT_SYMBOL(hci_get_route);
->>
->>  /* Create SCO, ACL or LE connection.
->>   * Device _must_ be locked */
->> -struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8 sec_level, __u8 auth_type)
->> +struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
->> +                             __u8 dst_type, __u8 sec_level, __u8 auth_type)
->>  {
->>       struct hci_conn *acl;
->>       struct hci_conn *sco;
->> @@ -523,21 +524,16 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
->>       BT_DBG("%s dst %s", hdev->name, batostr(dst));
->>
->>       if (type == LE_LINK) {
->> -             struct adv_entry *entry;
->> -
->>               le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
->>               if (le)
->>                       return ERR_PTR(-EBUSY);
->>
->> -             entry = hci_find_adv_entry(hdev, dst);
->> -             if (!entry)
->> -                     return ERR_PTR(-EHOSTUNREACH);
->> -
->>               le = hci_conn_add(hdev, LE_LINK, dst);
->>               if (!le)
->>                       return ERR_PTR(-ENOMEM);
->>
->> -             le->dst_type = entry->bdaddr_type;
->> +             le->dst_type = (dst_type == MGMT_ADDR_LE_RANDOM) ?
->> +                             ADDR_LE_DEV_RANDOM : ADDR_LE_DEV_PUBLIC;
->
-> Is this checking validity of dst_type? Just split to check and then
-> assign.
-
-It is not a validity check. dst_type parameter is in MGMT address type
-format and we need to translate it to HCI address type format before
-the assignment.
-
-Thanks,
-
-Andre
+SGVsbG8gQW5kcmVpLAoKMjAxMi8zLzI4IEFuZHJlaSBFbWVsdGNoZW5rbyA8YW5kcmVpLmVtZWx0
+Y2hlbmtvLm5ld3NAZ21haWwuY29tPjoKPiBIaSBKb8OjbywKPgo+IE1pbm9yIGNvbW1lbnRzOgo+
+Cj4gT24gVHVlLCBNYXIgMjcsIDIwMTIgYXQgMDc6MzE6MjFQTSAtMDMwMCwgSm/Do28gUGF1bG8g
+UmVjaGkgVml0YSB3cm90ZToKPiAuLi4KPj4gK3N0YXRpYyBzdHJ1Y3QgaG9nX2RldmljZSAqaG9n
+X2RldmljZV9uZXcoc3RydWN0IGJ0ZF9kZXZpY2UgKmRldmljZSwKPj4gKyDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCBjb25zdCBjaGFyICpwYXRoKQo+PiArewo+IC4uLgo+PiArCj4+ICsgwqAgwqAgaG9n
+ZGV2LT5hdHRpb2lkID0gYnRkX2RldmljZV9hZGRfYXR0aW9fY2FsbGJhY2soZGV2aWNlLAo+PiAr
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIGF0dGlvX2Nvbm5lY3RlZF9jYiwKPj4gKyDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCBhdHRpb19kaXNjb25uZWN0ZWRfY2IsCj4+ICsgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgaG9nZGV2KTsKPgo+IFdoYXQgaXMgdGhlIGNvZGluZyBzdHlsZSBmb3IgdGhlIHVzZXJzcGFj
+ZT8gU2hhbGwgaXQgYmUgYXQgbGVhc3QgdGhlIHNhbWU/Cj4KClVubGVzcyBzb21ldGhpbmcgaGFz
+IGNoYW5nZWQgbGF0ZWx5IHdlIHVzZSB0aGUga2VybmVsIGNvZGluZyBzdHlsZS4gSQpkb24ndCBz
+ZWUgd2hlcmUgSSBkaWRuJ3QgZm9sbG93IGl0IGhlcmUsIGJ1dCBJIG1heSBiZSBtaXNzaW5nCnNv
+bWV0aGluZy4gQ2FuIHlvdSBwbGVhc2UgcG9pbnQgbWUgd2hhdCBJJ20gbWlzc2luZyBpZiB0aGF0
+IGlzIHRoZQpjYXNlPwoKLS0gCkpvw6NvIFBhdWxvIFJlY2hpIFZpdGEKT3BlbmJvc3NhIExhYnMg
+LSBJTmRUCg==
