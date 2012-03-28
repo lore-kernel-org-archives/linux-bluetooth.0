@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv6 21/26] Bluetooth: physical link HCI interface to AMP
-Date: Wed, 28 Mar 2012 16:31:44 +0300
-Message-Id: <1332941509-21345-22-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv6 06/26] Bluetooth: A2MP: Add chan callbacks
+Date: Wed, 28 Mar 2012 16:31:29 +0300
+Message-Id: <1332941509-21345-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,114 +12,70 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Adds support for physical link create/acceppt/disconnect AMP HCI
-commands. To be used by the upper layer.
-Backport from CodeAurora & Atheros
+Add state change, close and skb allocation callbacks.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h |   24 ++++++++++++++++++++++
- net/bluetooth/hci_core.c    |   45 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 69 insertions(+), 0 deletions(-)
+ net/bluetooth/a2mp.c |   37 +++++++++++++++++++++++++++++++++++++
+ 1 files changed, 37 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 3a7bd76..3577b85 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -30,6 +30,8 @@
- #define HCI_MAX_EVENT_SIZE	260
- #define HCI_MAX_FRAME_SIZE	(HCI_MAX_ACL_SIZE + 4)
- 
-+#define HCI_MAX_AMP_KEY_SIZE	32
-+
- /* HCI dev events */
- #define HCI_DEV_REG			1
- #define HCI_DEV_UNREG			2
-@@ -525,6 +527,28 @@ struct hci_cp_io_capability_neg_reply {
- 	__u8     reason;
- } __packed;
- 
-+#define HCI_OP_CREATE_PHY_LINK		0x0435
-+struct hci_cp_create_phy_link {
-+	__u8     handle;
-+	__u8     key_len;
-+	__u8     key_type;
-+	__u8     key[HCI_MAX_AMP_KEY_SIZE];
-+} __packed;
-+
-+#define HCI_OP_ACCEPT_PHY_LINK		0x0436
-+struct hci_cp_accept_phy_link {
-+	__u8	handle;
-+	__u8	key_len;
-+	__u8	key_type;
-+	__u8	key[HCI_MAX_AMP_KEY_SIZE];
-+} __packed;
-+
-+#define HCI_OP_DISC_PHY_LINK		0x0437
-+struct hci_cp_disc_phy_link {
-+	__u8     handle;
-+	__u8     reason;
-+} __packed;
-+
- #define HCI_OP_SNIFF_MODE		0x0803
- struct hci_cp_sniff_mode {
- 	__le16   handle;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index f807146..f27e3e8 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -340,6 +340,51 @@ static void hci_linkpol_req(struct hci_dev *hdev, unsigned long opt)
- 	hci_send_cmd(hdev, HCI_OP_WRITE_DEF_LINK_POLICY, 2, &policy);
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index b572f9f..980382b 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -65,8 +65,43 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
+ 	kfree(cmd);
  }
  
-+/* AMP HCI interface */
-+void hci_phylink_create_req(struct hci_dev *hdev, __u8 handle, __u8 key_len,
-+						__u8 key_type, __u8 *key)
++static void a2mp_chan_state_change_cb(void *data, int state)
 +{
-+	struct hci_cp_create_phy_link cp;
++	struct l2cap_chan *chan = data;
++	struct amp_mgr *mgr;
 +
-+	cp.handle	= handle;
-+	cp.key_type	= key_type;
-+	cp.key_len	= min_t(__u8, key_len, HCI_MAX_AMP_KEY_SIZE);
++	BT_DBG("chan %p state %s", chan, state_to_string(state));
 +
-+	BT_DBG("key len %d, phy handle %d", cp.key_len, cp.handle);
++	chan->state = state;
 +
-+	memcpy(cp.key, key, cp.key_len);
-+	hci_send_cmd(hdev, HCI_OP_CREATE_PHY_LINK, sizeof(cp), &cp);
++	switch (state) {
++	case BT_CLOSED:
++		mgr = chan->data;
++		if (mgr)
++			amp_mgr_put(mgr);
++		break;
++	}
 +}
-+EXPORT_SYMBOL(hci_phylink_create_req);
 +
-+void hci_phylink_accept_req(struct hci_dev *hdev, __u8 handle, __u8 key_len,
-+						__u8 key_type, __u8 *key)
++static void a2mp_chan_close_cb(void *data)
 +{
-+	struct hci_cp_accept_phy_link cp;
++	struct amp_mgr *mgr = data;
 +
-+	cp.handle	= handle;
-+	cp.key_type	= key_type;
-+	cp.key_len	= min_t(__u8, key_len, HCI_MAX_AMP_KEY_SIZE);
-+
-+	BT_DBG("key len %d, phy handle %d", cp.key_len, cp.handle);
-+
-+	memcpy(cp.key, key, cp.key_len);
-+	hci_send_cmd(hdev, HCI_OP_ACCEPT_PHY_LINK, sizeof(cp), &cp);
++	l2cap_chan_destroy(mgr->a2mp_chan);
 +}
-+EXPORT_SYMBOL(hci_phylink_accept_req);
 +
-+void hci_phylink_disc_req(struct hci_dev *hdev, __u8 handle, __u8 reason)
++static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
++					      unsigned long len, int nb,
++					      int *err)
 +{
-+	struct hci_cp_disc_phy_link cp;
-+
-+	BT_DBG("handle %d reason %d", handle, reason);
-+
-+	cp.handle = handle;
-+	cp.reason = reason;
-+	hci_send_cmd(hdev, HCI_OP_DISC_PHY_LINK, sizeof(cp), &cp);
++	return bt_skb_alloc(len, GFP_KERNEL);
 +}
-+EXPORT_SYMBOL(hci_phylink_disc_req);
 +
- /* Get HCI device by index.
-  * Device is held on return. */
- struct hci_dev *hci_dev_get(int index)
+ static struct l2cap_ops a2mp_chan_ops = {
+ 	.name = "L2CAP A2MP channel",
++	.state_change = a2mp_chan_state_change_cb,
++	.close = a2mp_chan_close_cb,
++	.alloc_skb = a2mp_chan_alloc_skb_cb,
+ };
+ 
+ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
+@@ -104,6 +139,8 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
+ 	chan->remote_mps = chan->omtu;
+ 	chan->mps = chan->omtu;
+ 
++	a2mp_chan_state_change_cb(chan, BT_CONNECTED);
++
+ 	return chan;
+ }
+ 
 -- 
 1.7.9.1
 
