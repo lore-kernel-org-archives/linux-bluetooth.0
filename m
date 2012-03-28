@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv6 18/26] Bluetooth: A2MP: Process A2MP Command Responses
-Date: Wed, 28 Mar 2012 16:31:41 +0300
-Message-Id: <1332941509-21345-19-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv6 17/26] Bluetooth: A2MP: Process A2MP Disc Physlink Request
+Date: Wed, 28 Mar 2012 16:31:40 +0300
+Message-Id: <1332941509-21345-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,43 +12,67 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Process A2MP responses, print cmd code and ident for now.
+Placeholder for A2MP Disconnect Physlink Request.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   12 ++++++++++++
- 1 files changed, 12 insertions(+), 0 deletions(-)
+ net/bluetooth/a2mp.c |   36 ++++++++++++++++++++++++++++++++++++
+ 1 files changed, 36 insertions(+), 0 deletions(-)
 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 177a066..0453372 100644
+index a5f831b..177a066 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -314,6 +314,15 @@ send_rsp:
+@@ -281,6 +281,39 @@ send_rsp:
  	return 0;
  }
  
-+static inline int a2mp_cmd_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
-+			       struct a2mp_cmd *hdr)
++static int a2mp_discphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
++				 struct a2mp_cmd *hdr)
 +{
-+	BT_DBG("ident %d code %d", hdr->ident, hdr->code);
++	struct a2mp_physlink_req *req = (struct a2mp_physlink_req *) skb->data;
++	struct a2mp_physlink_rsp rsp;
++	struct hci_dev *hdev;
 +
-+	skb_pull(skb, le16_to_cpu(hdr->len));
++	if (le16_to_cpu(hdr->len) < sizeof(*req))
++		return -EINVAL;
++
++	BT_DBG("local_id %d remote_id %d", req->local_id, req->remote_id);
++
++	rsp.local_id = req->remote_id;
++	rsp.remote_id = req->local_id;
++	rsp.status = A2MP_STATUS_SUCCESS;
++
++	hdev = hci_dev_get(req->local_id);
++	if (!hdev) {
++		rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
++		goto send_rsp;
++	}
++
++	/* TODO Disconnect Phys Link here */
++
++	hci_dev_put(hdev);
++
++send_rsp:
++	a2mp_send(mgr, A2MP_DISCONNPHYSLINK_RSP, hdr->ident, sizeof(rsp), &rsp);
++
++	skb_pull(skb, sizeof(*req));
 +	return 0;
 +}
 +
  /* Handle A2MP signalling */
  static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
  {
-@@ -373,6 +382,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
- 		case A2MP_GETAMPASSOC_RSP:
- 		case A2MP_CREATEPHYSLINK_RSP:
- 		case A2MP_DISCONNPHYSLINK_RSP:
-+			err = a2mp_cmd_rsp(mgr, skb, hdr);
+@@ -331,6 +364,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 			break;
+ 
+ 		case A2MP_DISCONNPHYSLINK_REQ:
++			err = a2mp_discphyslink_req(mgr, skb, hdr);
 +			break;
 +
- 		default:
- 			BT_ERR("Unknown A2MP sig cmd 0x%2.2x", hdr->code);
- 			err = -EINVAL;
+ 		case A2MP_CHANGE_RSP:
+ 		case A2MP_DISCOVER_RSP:
+ 		case A2MP_GETINFO_RSP:
 -- 
 1.7.9.1
 
