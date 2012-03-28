@@ -1,52 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Mar 2012 14:25:47 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: james.steele@accenture.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] lib: Add HCI write SSP debug mode library function
-Message-ID: <20120328112547.GA28908@x220>
-References: <81C9FA9C1C2E9E45A9AC3EDD1858BC4323E1131D@048-CH1MPN1-101.048d.mgd.msft.net>
+Date: Wed, 28 Mar 2012 13:15:29 +0200 (CEST)
+From: Nicolas Pouillon <npouillon@freebox.fr>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: linux-input@vger.kernel.org, jkosina@suse.cz, chen ganir <chen.ganir@ti.com>,
+	claudio takahasi <claudio.takahasi@openbossa.org>,
+	jprvita@openbossa.org, linux-bluetooth@vger.kernel.org,
+	anderson lizardo <anderson.lizardo@openbossa.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <2052749237.3448849.1332933329806.JavaMail.root@zmc>
+In-Reply-To: <CANq1E4TnjzNG4sT_qt5qmrYMHp39HAJUcG1D4w=kcWoBkrThqA@mail.gmail.com>
+Subject: Re: [RFC v2 1/1] HID: User-space I/O driver support for HID
+ subsystem
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <81C9FA9C1C2E9E45A9AC3EDD1858BC4323E1131D@048-CH1MPN1-101.048d.mgd.msft.net>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi James,
+David,
 
-On Wed, Mar 28, 2012, james.steele@accenture.com wrote:
-> Adds a hci_write_simple_pairing_debug_mode function.
-> Also corrects the Testing OGF value to match the specification.
-> ---
->  lib/hci.c     |   28 ++++++++++++++++++++++++++++
->  lib/hci.h     |    2 +-
->  lib/hci_lib.h |    2 ++
->  3 files changed, 31 insertions(+), 1 deletions(-)
+----- Original Message -----
 
-<snip>
+> >> + =C2=A0 =C2=A0 strncpy(hid->name, ev->u.create.name, 128);
+> >> + =C2=A0 =C2=A0 hid->name[127] =3D 0;
+> >> + =C2=A0 =C2=A0 hid->ll_driver =3D &uhid_hid_driver;
+> >> + =C2=A0 =C2=A0 hid->hid_get_raw_report =3D uhid_hid_get_raw;
+> >> + =C2=A0 =C2=A0 hid->hid_output_raw_report =3D uhid_hid_output_raw;
+> >> + =C2=A0 =C2=A0 hid->bus =3D ev->u.create.bus;
+> >> + =C2=A0 =C2=A0 hid->vendor =3D ev->u.create.vendor;
+> >> + =C2=A0 =C2=A0 hid->product =3D ev->u.create.product;
+> >> + =C2=A0 =C2=A0 hid->version =3D ev->u.create.version;
+> >> + =C2=A0 =C2=A0 hid->country =3D ev->u.create.country;
+> >> + =C2=A0 =C2=A0 hid->phys[0] =3D 0;
+> >> + =C2=A0 =C2=A0 hid->uniq[0] =3D 0;
+> >> + =C2=A0 =C2=A0 hid->driver_data =3D uhid;
+> >> + =C2=A0 =C2=A0 hid->dev.parent =3D uhid->parent;
+> >
+> > Here we have to make sure that we have all required information provide=
+d
+> > by userspace. Anything else that HID might require to work better. Or
+> > that BR/EDR or LE provides additionally over USB.
+>=20
+> Beside phys and uniq I have copied all information that HIDP and
+> USBHID use. I haven't found any other field that could be of interest
+> here. We can also always add UHID_CREATE2 with additional fields to
+> allow further additions (or use a "size" field as you suggested
+> below).
 
-> --- a/lib/hci.h
-> +++ b/lib/hci.h
-> @@ -1428,7 +1428,7 @@ typedef struct {
->  #define WRITE_REMOTE_AMP_ASSOC_RP_SIZE 2
-> 
->  /* Testing commands */
-> -#define OGF_TESTING_CMD                0x3e
-> +#define OGF_TESTING_CMD                0x06
-> 
->  #define OCF_READ_LOOPBACK_MODE                 0x0001
-> 
+HID report descriptor may reference Physical Descriptor (HID 6.2.3) and
+String Descriptor entries (USB 9.6.8, HID E.11).  Physical Descriptor
+blob could be another __user buffer + size in uhid_create_req.  String
+descriptor should probably be an event for querying strings.
 
-I should have mentioned this already in my previous feedback (sorry for
-failing to do that) but this is quite clearly an independent change and
-therefore belongs in a separate patch. Whenever you've got words like
-"also.." or "additionally.." in your commit message warning bells should
-go off in your head and you should ask yourself if the patch needs
-splitting into smaller logical chunks.
+hidraw interface also offers access to Feature Reports, adding events
+to send/receive and query (kernel querying uhid client) feature reports
+could be of some interest.
 
-Please also be consistent with the commit message format: use "Add ..."
-instead of "Adding ..." and don't put a dot at the end of the summary
-line. Also use proper English in the commit message ("This patch adds.."
-instead of "Adds...") and don't be afraid to be too verbose.
-
-Johan
+Cheers,
+--=20
+Nicolas Pouillon
