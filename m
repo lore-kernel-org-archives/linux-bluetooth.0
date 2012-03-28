@@ -1,31 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Mar 2012 12:39:28 +0300
+Date: Wed, 28 Mar 2012 12:38:11 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Omit MainChannel when HDP first reliable channel is
- nil
-Message-ID: <20120328093928.GB28310@x220>
-References: <1332853405-16495-1-git-send-email-epx@signove.com>
+Subject: Re: [PATCH obexd v3 1/3] MAP: Add implementation of map_ap_encode()
+Message-ID: <20120328093811.GA28310@x220>
+References: <1332853167-13676-1-git-send-email-lkslawek@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1332853405-16495-1-git-send-email-epx@signove.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1332853167-13676-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Elvis,
+Hi Slawek,
 
-On Tue, Mar 27, 2012, Elvis Pfützenreuter wrote:
-> Do not add MainChannel to property list when HDP first reliable channel
-> does not exist. Upon channel destruction, ChannelDeleted signal is already
-> emitted.
-> 
-> This also fixes a crash where MainChannel was filled with invalid path ""
-> when first reliable channel did not exist.
+On Tue, Mar 27, 2012, Slawomir Bochenski wrote:
 > ---
->  health/hdp.c |   15 +++------------
->  1 files changed, 3 insertions(+), 12 deletions(-)
+> v3: Add spaces after cast
+>  src/map_ap.c |   91 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 files changed, 89 insertions(+), 2 deletions(-)
 
-Applied. Thanks.
+All three patches have been applied. Thanks.
 
 Johan
