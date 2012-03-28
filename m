@@ -1,60 +1,201 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20120328141402.GA31354@aemeltch-MOBL1>
+In-Reply-To: <CANq1E4S4bftzTH3u+NR0k2CUVnayPTz0zo0zHG7gCVkKx=fQ7A@mail.gmail.com>
 References: <1332887487-13601-1-git-send-email-jprvita@openbossa.org>
-	<1332887487-13601-3-git-send-email-jprvita@openbossa.org>
-	<20120328082641.GA21905@aemeltch-MOBL1>
-	<CAAngNMYY=8Vpoh4izC-NXw0fnpUcS3fawu3ZGCCA5CVtzVypew@mail.gmail.com>
-	<20120328141402.GA31354@aemeltch-MOBL1>
-Date: Wed, 28 Mar 2012 15:42:40 -0300
-Message-ID: <CAAngNMYXytk875yROH5FQCZ4LGMNc06OUBG4Sx2ZO--LLADt1g@mail.gmail.com>
-Subject: Re: [RFC 2/8] HoG: register ATTIO callbacks
+	<1332887487-13601-9-git-send-email-jprvita@openbossa.org>
+	<CANq1E4S4bftzTH3u+NR0k2CUVnayPTz0zo0zHG7gCVkKx=fQ7A@mail.gmail.com>
+Date: Wed, 28 Mar 2012 15:40:41 -0300
+Message-ID: <CAAngNMZ8PqxA2w6OjNmXOmonPpmN-2KBec6N30e=WCzF0BiR7A@mail.gmail.com>
+Subject: Re: [RFC 8/8] HoG: HID I/O driver
 From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Joao Paulo Rechi Vita <jprvita@openbossa.org>,
-	linux-bluetooth@vger.kernel.org, dh.herrmann@googlemail.com,
-	chen.ganir@ti.com
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org, chen.ganir@ti.com
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Mar 28, 2012 at 11:14 AM, Andrei Emeltchenko
-<andrei.emeltchenko.news@gmail.com> wrote:
-> Hi João,
+Hello David,
+
+2012/3/28 David Herrmann <dh.herrmann@googlemail.com>:
+> Hi Joao
 >
-> On Wed, Mar 28, 2012 at 10:55:18AM -0300, Joao Paulo Rechi Vita wrote:
->> Hello Andrei,
+> On Wed, Mar 28, 2012 at 12:31 AM, João Paulo Rechi Vita
+> <jprvita@openbossa.org> wrote:
+>> UHID is HID I/O driver that makes possible to implement HID I/O drivers in
+>> user-space. It works similar to the uinput but it is initialized with a HID
+>> descriptor and deals with raw HID reports.
 >>
->> 2012/3/28 Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>:
->> > Hi João,
->> >
->> > Minor comments:
->> >
->> > On Tue, Mar 27, 2012 at 07:31:21PM -0300, João Paulo Rechi Vita wrote:
->> > ...
->> >> +static struct hog_device *hog_device_new(struct btd_device *device,
->> >> +                                                     const char *path)
->> >> +{
->> > ...
->> >> +
->> >> +     hogdev->attioid = btd_device_add_attio_callback(device,
->> >> +                                                     attio_connected_cb,
->> >> +                                                     attio_disconnected_cb,
->> >> +                                                     hogdev);
->> >
->> > What is the coding style for the userspace? Shall it be at least the same?
->> >
+>> This commit uses UHID to create a HID device for the remote HoG device and
+>> to tranfers HID reports to HID subsystem.
+>> ---
+>>  input/hog_device.c |   51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 files changed, 51 insertions(+), 0 deletions(-)
 >>
->> Unless something has changed lately we use the kernel coding style. I
->> don't see where I didn't follow it here, but I may be missing
->> something. Can you please point me what I'm missing if that is the
->> case?
+>> diff --git a/input/hog_device.c b/input/hog_device.c
+>> index 7a757f4..183da22 100644
+>> --- a/input/hog_device.c
+>> +++ b/input/hog_device.c
+>> @@ -29,6 +29,10 @@
+>>  #include <stdlib.h>
+>>  #include <errno.h>
+>>  #include <unistd.h>
+>> +#include <sys/types.h>
+>> +#include <sys/stat.h>
+>> +#include <fcntl.h>
+>> +#include <linux/uhid.h>
+>>
+>>  #include <bluetooth/bluetooth.h>
+>>  #include <bluetooth/uuid.h>
+>> @@ -48,6 +52,7 @@
+>>  #include "gatt.h"
+>>
+>>  #define HOG_REPORT_UUID                0x2A4D
+>> +#define UHID_DEVICE_FILE       "/dev/uhid"
+>>
+>>  struct hog_device {
+>>        char                    *path;
+>> @@ -56,13 +61,17 @@ struct hog_device {
+>>        guint                   attioid;
+>>        struct gatt_primary     *hog_primary;
+>>        struct gatt_char        *report;
+>> +       int                     uhid_fd;
+>>  };
+>>
+>>  static GSList *devices = NULL;
+>>
+>>  static void report_value_cb(const uint8_t *pdu, uint16_t len, gpointer user_data)
+>>  {
+>> +       struct hog_device *hogdev = user_data;
+>> +       struct uhid_event ev;
+>>        uint16_t handle;
+>> +       uint16_t report_size = len - 2;
+>>
+>>        if (len < 3) {
+>>                error("Malformed ATT notification");
+>> @@ -74,6 +83,14 @@ static void report_value_cb(const uint8_t *pdu, uint16_t len, gpointer user_data
+>>        DBG("Report(0x%04x): 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x "
+>>                                "0x%02x", handle, pdu[2], pdu[3], pdu[4],
+>>                                pdu[5], pdu[6], pdu[7], pdu[8], pdu[9]);
+>> +
+>> +       memset(&ev, 0, sizeof(ev));
+>> +       ev.type = UHID_INPUT;
+>> +       ev.u.input.size = report_size;
+>> +       memcpy(ev.u.input.data, &pdu[2], report_size);
 >
-> I mean are those parameters aligned to the right or at "(".
+> Please use min(report_size, UHID_DATA_MAX) here.
 >
 
-The parameters are aligned to the right and after the opening brace.
-Isn't that right?
+Ok.
+
+>> +
+>> +       if (write(hogdev->uhid_fd, &ev, sizeof(ev)) < 0)
+>> +               error("UHID write failed: %s", strerror(errno));
+>>  }
+>>
+>>  static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+>> @@ -96,6 +113,8 @@ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+>>  static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>>                                                        gpointer user_data)
+>>  {
+>> +       struct hog_device *hogdev = user_data;
+>> +       struct uhid_event ev;
+>>        uint8_t value[ATT_MAX_MTU];
+>>        int vlen, i;
+>>
+>> @@ -116,6 +135,22 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>>                else
+>>                        DBG("\t %02x %02x", value[i], value[i + 1]);
+>>        }
+>> +
+>> +       /* create UHID device */
+>> +       memset(&ev, 0, sizeof(ev));
+>> +       ev.type = UHID_CREATE;
+>> +       /* TODO: get info from DIS */
+>> +       strcpy((char*)ev.u.create.name, "bluez-hog-device");
+>> +       ev.u.create.vendor = 0xBEBA;
+>> +       ev.u.create.product = 0xCAFE;
+>> +       ev.u.create.version = 0;
+>> +       ev.u.create.country = 0;
+>> +       ev.u.create.bus = BUS_USB; /* BUS_BLUETOOTH doesn't work here */
+>
+> I've seen the other mail. I will have a look at this. It's probably
+> because generic-bluetooth doesn't get loaded for uhid devices but only
+> generic-usb.
+>
+
+All right, I'll leave it like this and wait for any updates.
+
+>> +       ev.u.create.rd_data = value;
+>> +       ev.u.create.rd_size = vlen;
+>> +
+>> +       if (write(hogdev->uhid_fd, &ev, sizeof(ev)) < 0)
+>> +               error("Failed to create UHID device: %s", strerror(errno));
+>>  }
+>>
+>>  static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+>> @@ -162,11 +197,27 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+>>
+>>        gatt_discover_char(hogdev->attrib, prim->range.start, prim->range.end,
+>>                                        NULL, char_discovered_cb, hogdev);
+>> +
+>> +       if (hogdev->uhid_fd > 0)
+>> +               return;
+>> +
+>> +       hogdev->uhid_fd = open(UHID_DEVICE_FILE, O_RDWR, 0666);
+>
+> You probably want O_RDWR | O_CLOEXEC here. And please remove the third
+> parameter 0666. It doesn't make sense if you do not use O_CREATE.
+>
+
+What's is the point of using CLOEXEC here? AFAIK it only makes any
+difference for programs that calls any syscall from the exec family,
+and bluetoothd doesn't do so.
+
+>> +       if (hogdev->uhid_fd < 0)
+>> +               error("Failed to open UHID device: %s", strerror(errno));
+>
+> I don't know what side-effects the "error()" call has, but I think we
+> need better cleanup at all the error() calls in this file. But I
+> haven't checked it thoroughly, yet.
+>
+
+error() here is not from error.h, but from bluez own log.h. It doesn't
+have any side effects, just prints the strings to stderr. I don't
+think there are cleanups missing from them, tho.
+
+> Also this is a good place to add uhid_fd to the event-loop and wait
+> for READABLE events. The callback should then simply read from uhid_fd
+> and write the raw data prefix with the att header. There is no need to
+> validate the data you read from uhid_fd.
+>
+
+Support for readable events will come in a separate patch.
+
+>>  }
+>>
+>>  static void attio_disconnected_cb(gpointer user_data)
+>>  {
+>>        struct hog_device *hogdev = user_data;
+>> +       struct uhid_event ev;
+>> +
+>> +       memset(&ev, 0, sizeof(ev));
+>> +       ev.type = UHID_DESTROY;
+>> +       if (write(hogdev->uhid_fd, &ev, sizeof(ev)) < 0)
+>> +               error("Failed to destroy UHID device: %s", strerror(errno));
+>> +
+>> +       close(hogdev->uhid_fd);
+>> +       hogdev->uhid_fd = -1;
+>>
+>>        g_attrib_unref(hogdev->attrib);
+>>        hogdev->attrib = NULL;
+>> --
+>> 1.7.7.6
+>>
+>
+> Looks good overall, regards
+> David
+
+Thanks for the comments.
 
 -- 
 João Paulo Rechi Vita
