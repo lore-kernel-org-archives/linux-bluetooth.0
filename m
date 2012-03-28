@@ -1,38 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv6 01/26] Bluetooth: Add Read Local AMP Info to init
-Date: Wed, 28 Mar 2012 16:31:24 +0300
-Message-Id: <1332941509-21345-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] Bluetooth: Remove unneeded zero initialization
+Date: Wed, 28 Mar 2012 16:06:41 +0300
+Message-Id: <1332940001-20336-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1332935794-15319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1332935794-15319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-AMP Info will be used in Discovery Response.
+Remove zero initialization since channel is allocated with kzalloc
+in l2cap_chan_create.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/hci_core.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ net/bluetooth/l2cap_sock.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 4e9a164..f807146 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -253,6 +253,9 @@ static void amp_init(struct hci_dev *hdev)
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 53e563f..1d3e9c3 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1011,7 +1011,6 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		chan->tx_win = L2CAP_DEFAULT_TX_WINDOW;
+ 		chan->tx_win_max = L2CAP_DEFAULT_TX_WINDOW;
+ 		chan->sec_level = BT_SECURITY_LOW;
+-		chan->flags = 0;
+ 		set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
+ 	}
  
- 	/* Read Local Version */
- 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
-+
-+	/* Read Local AMP Info */
-+	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
- }
- 
- static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
 -- 
 1.7.9.1
 
