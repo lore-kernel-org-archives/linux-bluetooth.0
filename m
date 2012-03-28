@@ -1,41 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1332930313.1870.164.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: vhci: Ignore return code of
- nonseekable_open()
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
-	johan.hedberg@gmail.com
-Date: Wed, 28 Mar 2012 12:25:13 +0200
-In-Reply-To: <1332928122-10919-1-git-send-email-dh.herrmann@googlemail.com>
-References: <1332928122-10919-1-git-send-email-dh.herrmann@googlemail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Wed, 28 Mar 2012 13:18:47 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
+Subject: Re: [PATCH V4 1/7] Parse config DeviceID string on bluetoothd startup
+Message-ID: <20120328101847.GA471@x220>
+References: <1332928999-14224-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1332928999-14224-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Szymon,
 
-> The comment in ./fs/open.c clearly states that nonseekable_open() will
-> never fail. Therefore, we can safely ignore the return code. This is the
-> recommended way to deal with nonseekable_open().
-> Our current code looks like nonseekable_open() is checked for the return
-> code. However, if we check the return code, we must also kfree() our
-> private data if the open fails. To avoid this overhead and to avoid
-> confusion, we simply drop the return code and return 0.
-> 
-> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
+On Wed, Mar 28, 2012, Szymon Janc wrote:
+> Instead of parsing config DeviceID string on sdp server startup, parse
+> it in main while reading config file. This allow to store logical DID
+> values in main_opts (instead of raw config string) and make use of them
+> in bluetoothd code.
 > ---
-> See the UHID discussion for more information. Marcel suggested to also fix vhci
-> so here is the patch ;)
-> 
->  drivers/bluetooth/hci_vhci.c |    3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  src/hcid.h         |    6 +++++-
+>  src/main.c         |   20 +++++++++++++++++---
+>  src/sdpd-server.c  |   19 ++++---------------
+>  src/sdpd-service.c |   20 +++++++++++---------
+>  src/sdpd.h         |    5 ++---
+>  5 files changed, 39 insertions(+), 31 deletions(-)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+All seven patches have been applied. Thanks.
 
-Regards
-
-Marcel
-
-
+Johan
