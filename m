@@ -1,202 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4F7349EC.8080706@tu-ilmenau.de>
+Date: Wed, 28 Mar 2012 19:27:08 +0200
+From: Steffen Becker <steffen.becker@tu-ilmenau.de>
 MIME-Version: 1.0
-In-Reply-To: <CANq1E4S4bftzTH3u+NR0k2CUVnayPTz0zo0zHG7gCVkKx=fQ7A@mail.gmail.com>
-References: <1332887487-13601-1-git-send-email-jprvita@openbossa.org>
-	<1332887487-13601-9-git-send-email-jprvita@openbossa.org>
-	<CANq1E4S4bftzTH3u+NR0k2CUVnayPTz0zo0zHG7gCVkKx=fQ7A@mail.gmail.com>
-Date: Wed, 28 Mar 2012 15:40:41 -0300
-Message-ID: <CAAngNMZ8PqxA2w6OjNmXOmonPpmN-2KBec6N30e=WCzF0BiR7A@mail.gmail.com>
-Subject: Re: [RFC 8/8] HoG: HID I/O driver
-From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org, chen.ganir@ti.com
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: problem with using BPA500
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello David,
+Hello,
 
-2012/3/28 David Herrmann <dh.herrmann@googlemail.com>:
-> Hi Joao
->
-> On Wed, Mar 28, 2012 at 12:31 AM, João Paulo Rechi Vita
-> <jprvita@openbossa.org> wrote:
->> UHID is HID I/O driver that makes possible to implement HID I/O drivers in
->> user-space. It works similar to the uinput but it is initialized with a HID
->> descriptor and deals with raw HID reports.
->>
->> This commit uses UHID to create a HID device for the remote HoG device and
->> to tranfers HID reports to HID subsystem.
->> ---
->>  input/hog_device.c |   51 +++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 files changed, 51 insertions(+), 0 deletions(-)
->>
->> diff --git a/input/hog_device.c b/input/hog_device.c
->> index 7a757f4..183da22 100644
->> --- a/input/hog_device.c
->> +++ b/input/hog_device.c
->> @@ -29,6 +29,10 @@
->>  #include <stdlib.h>
->>  #include <errno.h>
->>  #include <unistd.h>
->> +#include <sys/types.h>
->> +#include <sys/stat.h>
->> +#include <fcntl.h>
->> +#include <linux/uhid.h>
->>
->>  #include <bluetooth/bluetooth.h>
->>  #include <bluetooth/uuid.h>
->> @@ -48,6 +52,7 @@
->>  #include "gatt.h"
->>
->>  #define HOG_REPORT_UUID                0x2A4D
->> +#define UHID_DEVICE_FILE       "/dev/uhid"
->>
->>  struct hog_device {
->>        char                    *path;
->> @@ -56,13 +61,17 @@ struct hog_device {
->>        guint                   attioid;
->>        struct gatt_primary     *hog_primary;
->>        struct gatt_char        *report;
->> +       int                     uhid_fd;
->>  };
->>
->>  static GSList *devices = NULL;
->>
->>  static void report_value_cb(const uint8_t *pdu, uint16_t len, gpointer user_data)
->>  {
->> +       struct hog_device *hogdev = user_data;
->> +       struct uhid_event ev;
->>        uint16_t handle;
->> +       uint16_t report_size = len - 2;
->>
->>        if (len < 3) {
->>                error("Malformed ATT notification");
->> @@ -74,6 +83,14 @@ static void report_value_cb(const uint8_t *pdu, uint16_t len, gpointer user_data
->>        DBG("Report(0x%04x): 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x "
->>                                "0x%02x", handle, pdu[2], pdu[3], pdu[4],
->>                                pdu[5], pdu[6], pdu[7], pdu[8], pdu[9]);
->> +
->> +       memset(&ev, 0, sizeof(ev));
->> +       ev.type = UHID_INPUT;
->> +       ev.u.input.size = report_size;
->> +       memcpy(ev.u.input.data, &pdu[2], report_size);
->
-> Please use min(report_size, UHID_DATA_MAX) here.
->
+i have a problem with sniffing my 2 bluetooth devices. Google & forums 
+didn't helped me.
+I use the BPA500 for sniffing two BT3.0 devices; maybe someone of you 
+also use this. This is my problem:
+The frontline technical support told me, that i have to put my devices 
+in discovery mode & at least one device in ssp debug mode. And it is 
+important that the devices get paired AFTER i click on "Start Sniffing". 
+I did so, but in my LMP there is some Opcode missing. There is only:
+...
+au_rand
+sres
+encrypt_mode_req
 
-Ok.
+But there SHOULD be something like that:
+...
+comb_key
+au_rand
+sres
+au_rand
+sres
+setup_complete
+encrypt_mode_req
 
->> +
->> +       if (write(hogdev->uhid_fd, &ev, sizeof(ev)) < 0)
->> +               error("UHID write failed: %s", strerror(errno));
->>  }
->>
->>  static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
->> @@ -96,6 +113,8 @@ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
->>  static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
->>                                                        gpointer user_data)
->>  {
->> +       struct hog_device *hogdev = user_data;
->> +       struct uhid_event ev;
->>        uint8_t value[ATT_MAX_MTU];
->>        int vlen, i;
->>
->> @@ -116,6 +135,22 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
->>                else
->>                        DBG("\t %02x %02x", value[i], value[i + 1]);
->>        }
->> +
->> +       /* create UHID device */
->> +       memset(&ev, 0, sizeof(ev));
->> +       ev.type = UHID_CREATE;
->> +       /* TODO: get info from DIS */
->> +       strcpy((char*)ev.u.create.name, "bluez-hog-device");
->> +       ev.u.create.vendor = 0xBEBA;
->> +       ev.u.create.product = 0xCAFE;
->> +       ev.u.create.version = 0;
->> +       ev.u.create.country = 0;
->> +       ev.u.create.bus = BUS_USB; /* BUS_BLUETOOTH doesn't work here */
->
-> I've seen the other mail. I will have a look at this. It's probably
-> because generic-bluetooth doesn't get loaded for uhid devices but only
-> generic-usb.
->
+I think there is no problem with the BPA software, because when i sniff 
+BT2.0 devices, everything works fine (because i don't have to use a ssp 
+debug mode). And the BPA-support says, there are two possible misstakes: 
+either the devices are paired before sniffing, or no device is in 
+sspdebug mode. But i think i did this right.
 
-All right, I'll leave it like this and wait for any updates.
+Maybe you find out what i did wrong:
 
->> +       ev.u.create.rd_data = value;
->> +       ev.u.create.rd_size = vlen;
->> +
->> +       if (write(hogdev->uhid_fd, &ev, sizeof(ev)) < 0)
->> +               error("Failed to create UHID device: %s", strerror(errno));
->>  }
->>
->>  static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
->> @@ -162,11 +197,27 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
->>
->>        gatt_discover_char(hogdev->attrib, prim->range.start, prim->range.end,
->>                                        NULL, char_discovered_cb, hogdev);
->> +
->> +       if (hogdev->uhid_fd > 0)
->> +               return;
->> +
->> +       hogdev->uhid_fd = open(UHID_DEVICE_FILE, O_RDWR, 0666);
->
-> You probably want O_RDWR | O_CLOEXEC here. And please remove the third
-> parameter 0666. It doesn't make sense if you do not use O_CREATE.
->
+- two gentoo-PCs with two BT3.0 Dongles and i installed the latest bluez 
+& the patch "Adding SSP debug mode configuration to hciconfig" on both PCs
+PC2 # hciconfig hci0 piscan
+PC1 # hciconfig hci0 piscan
+PC1 # hciconfig hci0 sspdebug 1
+(in a 2nd try also: PC2 # hciconfig hci0 sspdebug 1)
+click on "start sniffing" at the software
+PC2 # rfcomm listen 0 1
+PC1 # rfcomm -r connect 0 <bluetooth-adress> 1
 
-What's is the point of using CLOEXEC here? AFAIK it only makes any
-difference for programs that calls any syscall from the exec family,
-and bluetoothd doesn't do so.
+The connection worked (as seen on the two conncted PCs) but the sniffing 
+software didn't really captured it. The Icon is blue indeed (so it's 
+synchronized), but somehow there is missing something, because it 
+doesn't sniff correctly.
 
->> +       if (hogdev->uhid_fd < 0)
->> +               error("Failed to open UHID device: %s", strerror(errno));
->
-> I don't know what side-effects the "error()" call has, but I think we
-> need better cleanup at all the error() calls in this file. But I
-> haven't checked it thoroughly, yet.
->
+Hope someone of you can help me.
 
-error() here is not from error.h, but from bluez own log.h. It doesn't
-have any side effects, just prints the strings to stderr. I don't
-think there are cleanups missing from them, tho.
-
-> Also this is a good place to add uhid_fd to the event-loop and wait
-> for READABLE events. The callback should then simply read from uhid_fd
-> and write the raw data prefix with the att header. There is no need to
-> validate the data you read from uhid_fd.
->
-
-Support for readable events will come in a separate patch.
-
->>  }
->>
->>  static void attio_disconnected_cb(gpointer user_data)
->>  {
->>        struct hog_device *hogdev = user_data;
->> +       struct uhid_event ev;
->> +
->> +       memset(&ev, 0, sizeof(ev));
->> +       ev.type = UHID_DESTROY;
->> +       if (write(hogdev->uhid_fd, &ev, sizeof(ev)) < 0)
->> +               error("Failed to destroy UHID device: %s", strerror(errno));
->> +
->> +       close(hogdev->uhid_fd);
->> +       hogdev->uhid_fd = -1;
->>
->>        g_attrib_unref(hogdev->attrib);
->>        hogdev->attrib = NULL;
->> --
->> 1.7.7.6
->>
->
-> Looks good overall, regards
-> David
-
-Thanks for the comments.
-
--- 
-João Paulo Rechi Vita
-Openbossa Labs - INdT
+Regards,
+Steffen
