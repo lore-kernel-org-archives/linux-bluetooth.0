@@ -1,43 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Mar 2012 12:58:41 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bruna Moreira <bruna.moreira@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 3/4] device: Appearance characteristic from GAP
- service
-Message-ID: <20120328095841.GA30867@x220>
-References: <1332854978-26072-1-git-send-email-bruna.moreira@openbossa.org>
- <1332854978-26072-4-git-send-email-bruna.moreira@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332854978-26072-4-git-send-email-bruna.moreira@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	padovan@profusion.mobi,
+	johan.hedberg@gmail.com,
+	David Herrmann <dh.herrmann@googlemail.com>
+Subject: [PATCH] Bluetooth: vhci: Ignore return code of nonseekable_open()
+Date: Wed, 28 Mar 2012 11:48:42 +0200
+Message-Id: <1332928122-10919-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bruna,
+The comment in ./fs/open.c clearly states that nonseekable_open() will
+never fail. Therefore, we can safely ignore the return code. This is the
+recommended way to deal with nonseekable_open().
+Our current code looks like nonseekable_open() is checked for the return
+code. However, if we check the return code, we must also kfree() our
+private data if the open fails. To avoid this overhead and to avoid
+confusion, we simply drop the return code and return 0.
 
-On Tue, Mar 27, 2012, Bruna Moreira wrote:
-> @@ -363,15 +367,19 @@ static DBusMessage *get_properties(DBusConnection *conn,
->  
->  	/* Class */
->  	if (read_remote_class(&src, &device->bdaddr, &class) == 0) {
-> -		const char *icon = class_to_icon(class);
-> +		icon = class_to_icon(class);
->  
->  		dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32, &class);
-> +	} else if (read_remote_appearance(&src, &device->bdaddr, &app) == 0) {
-> +		/* Appearance */
-> +		icon = gap_appearance_to_icon(app);
-> +		class = 0;
->  
-> -		if (icon)
-> -			dict_append_entry(&dict, "Icon",
-> -						DBUS_TYPE_STRING, &icon);
-> +		dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32, &class);
->  	}
+Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
+---
+See the UHID discussion for more information. Marcel suggested to also fix vhci
+so here is the patch ;)
 
-If we don't have a proper remote class value wouldn't it be simpler to
-just leave it out from the properties list instead of including a 0
-value?
+ drivers/bluetooth/hci_vhci.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Johan
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index 2ed6ab1..d8a2a4f 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -260,8 +260,9 @@ static int vhci_open(struct inode *inode, struct file *file)
+ 	}
+ 
+ 	file->private_data = data;
++	nonseekable_open(inode, file);
+ 
+-	return nonseekable_open(inode, file);
++	return 0;
+ }
+ 
+ static int vhci_release(struct inode *inode, struct file *file)
+-- 
+1.7.9.4
