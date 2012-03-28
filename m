@@ -1,61 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv6 10/26] Bluetooth: A2MP: Process A2MP Command Reject
-Date: Wed, 28 Mar 2012 16:31:33 +0300
-Message-Id: <1332941509-21345-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv6 00/26] RFC Bluetooth A2MP implementation
+Date: Wed, 28 Mar 2012 16:31:23 +0300
+Message-Id: <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Placeholder for future A2MP Command Reject handler.
+Basic A2MP implementation, callback interface to HCI and several usages of the interface.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/a2mp.c |   19 +++++++++++++++++++
- 1 files changed, 19 insertions(+), 0 deletions(-)
+Changes:
+	* RFCv6: Remove some unneded check for sk since they are in different path
+	(A2MP decoded as a data channel wrt L2CAP signalling channel). Style fixes.
+	* RFCv5: Fix memory leaks, sparse warnings and taking comments from upstream.
+	* RFCv4: redesign code to use l2cap channel lock instead of socket lock
+	and general modifications. Basic implementation of HCI callback interface.
+	* RFCv3: redesign code to use l2cap functions instead of kernel sockets
+	L2CAP functions modified to work with channels without sk.
+	* RFCv2: rebased against "workqueue" patches.
+	* RFCv1: added refcnt to amp_mgr, fixed sleeping in atomic
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 25d505e..745ab0c 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -65,6 +65,22 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
- 	kfree(cmd);
- }
- 
-+/* Processing A2MP messages */
-+static inline int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
-+				   struct a2mp_cmd *hdr)
-+{
-+	struct a2mp_cmd_rej *rej = (struct a2mp_cmd_rej *) skb->data;
-+
-+	if (le16_to_cpu(hdr->len) < sizeof(*rej))
-+		return -EINVAL;
-+
-+	BT_DBG("ident %d reason %d", hdr->ident, le16_to_cpu(rej->reason));
-+
-+	skb_pull(skb, sizeof(*rej));
-+
-+	return 0;
-+}
-+
- /* Handle A2MP signalling */
- static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
- {
-@@ -91,6 +107,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
- 
- 		switch (hdr->code) {
- 		case A2MP_COMMAND_REJ:
-+			a2mp_command_rej(mgr, skb, hdr);
-+			break;
-+
- 		case A2MP_DISCOVER_REQ:
- 		case A2MP_CHANGE_NOTIFY:
- 		case A2MP_GETINFO_REQ:
+Initially code was based of reference implementations below:
+
+References: Code Aurora (git://codeaurora.org/kernel/msm.git) and Atheros
+(search for: [PATCH 2/3] Add a2mp protocol/AMP manager, by Atheros Linux BT3)
+implementations.
+
+Andrei Emeltchenko (26):
+  Bluetooth: Add Read Local AMP Info to init
+  Bluetooth: Adds set_default function in L2CAP setup
+  Bluetooth: A2MP: Create A2MP channel
+  Bluetooth: A2MP: AMP Manager basic functions
+  Bluetooth: A2MP: Build and Send msg helpers
+  Bluetooth: A2MP: Add chan callbacks
+  Bluetooth: A2MP: Definitions for A2MP commands
+  Bluetooth: A2MP: Define A2MP status codes
+  Bluetooth: A2MP: Process A2MP messages
+  Bluetooth: A2MP: Process A2MP Command Reject
+  Bluetooth: A2MP: Helper functions to count HCI devs
+  Bluetooth: A2MP: Process A2MP Discover Request
+  Bluetooth: A2MP: Process A2MP Change Notify
+  Bluetooth: A2MP: Process A2MP Get Info Request
+  Bluetooth: A2MP: Process A2MP Get AMP Assoc Request
+  Bluetooth: A2MP: Process A2MP Create Physlink Request
+  Bluetooth: A2MP: Process A2MP Disc Physlink Request
+  Bluetooth: A2MP: Process A2MP Command Responses
+  Bluetooth: A2MP: Handling fixed channels
+  Bluetooth: A2MP: Manage incoming connections
+  Bluetooth: physical link HCI interface to AMP
+  Bluetooth: Define AMP controller statuses
+  Bluetooth: General HCI callback implementation
+  Bluetooth: Process HCI callbacks in a workqueue
+  Bluetooth: AMP: Use HCI callback for Read AMP Info
+  Bluetooth: AMP: Read Local Assoc support
+
+ include/net/bluetooth/a2mp.h     |  128 +++++++++
+ include/net/bluetooth/amp.h      |   21 ++
+ include/net/bluetooth/hci.h      |   50 ++++
+ include/net/bluetooth/hci_core.h |   44 +++
+ include/net/bluetooth/l2cap.h    |    7 +
+ net/bluetooth/Makefile           |    3 +-
+ net/bluetooth/a2mp.c             |  558 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/amp.c              |  108 ++++++++
+ net/bluetooth/hci_conn.c         |   15 +
+ net/bluetooth/hci_core.c         |  171 ++++++++++++
+ net/bluetooth/hci_event.c        |   57 ++++-
+ net/bluetooth/l2cap_core.c       |   45 +++-
+ net/bluetooth/l2cap_sock.c       |    8 +-
+ 13 files changed, 1198 insertions(+), 17 deletions(-)
+ create mode 100644 include/net/bluetooth/a2mp.h
+ create mode 100644 include/net/bluetooth/amp.h
+ create mode 100644 net/bluetooth/a2mp.c
+ create mode 100644 net/bluetooth/amp.c
+
 -- 
 1.7.9.1
 
