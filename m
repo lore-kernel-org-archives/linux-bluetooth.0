@@ -1,135 +1,222 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: Jefferson Delfes <jefferson.delfes@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [RFC BlueZ 0/2] Add support for find included services
-Date: Wed, 28 Mar 2012 15:02:24 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B467253@DNCE02.ent.ti.com>
-References: <1332857166-25002-1-git-send-email-jefferson.delfes@openbossa.org>
-	<F0070FBC0FB3174D8D11444EB2D5B0260B466EAD@DNCE02.ent.ti.com>
- <CAJdJm_P-+3Ew3rXQzOb=EaN1afK-6tLj54cpY-9NnW0ccXOM+w@mail.gmail.com>
-In-Reply-To: <CAJdJm_P-+3Ew3rXQzOb=EaN1afK-6tLj54cpY-9NnW0ccXOM+w@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: chen.ganir@ti.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Chen Ganir <chen.ganir@ti.com>
+Subject: [PATCH 4/4] Call registered callbacks
+Date: Wed, 28 Mar 2012 16:46:29 +0200
+Message-Id: <1332945989-375-5-git-send-email-chen.ganir@ti.com>
+In-Reply-To: <1332945989-375-1-git-send-email-chen.ganir@ti.com>
+References: <1332945989-375-1-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Lizardo,
+From: Chen Ganir <chen.ganir@ti.com>
+
+On Property Changed, call the registered callbacks, with the event
+data payload.
+---
+ src/device.c |   59 +++++++++++++++++++++++++++++++++++++++++++++++
+ src/device.h |   72 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 130 insertions(+), 1 deletions(-)
+
+diff --git a/src/device.c b/src/device.c
+index dbabd87..4e7685e 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -128,6 +128,13 @@ struct att_callbacks {
+ struct prop_changed_cb {
+ 	guint id;
+ 	dev_property_changed_cb cb;
++	struct btd_device *device;
++};
++
++struct prop_changed_cb_data {
++	uint16_t property;
++	uint16_t len;
++	void *data;
+ };
  
-> -----Original Message-----
-> From: Anderson Lizardo [mailto:anderson.lizardo@openbossa.org]
-> Sent: Wednesday, March 28, 2012 1:55 PM
-> To: Ganir, Chen
-> Cc: Jefferson Delfes; linux-bluetooth@vger.kernel.org
-> Subject: Re: [RFC BlueZ 0/2] Add support for find included services
-> 
-> Hi Chen,
-> 
-> On Wed, Mar 28, 2012 at 3:30 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
-> > This patch set looks like it is working properly with 16 bit uuids. I
-> tested it with included services as primaries and as secondaries, and I
-> even looked for included services inside other included services
-> (secondary services which have includes). Take a look at this :
-> > [CON][64:9c:8e:e5:a0:e9][LE]> primary
-> > attr handle: 0x0001, end grp handle: 0x000b uuid: 00001800-0000-1000-
-> 8000-00805f9b34fb
-> > attr handle: 0x000c, end grp handle: 0x0016 uuid: 00001800-0000-1000-
-> 8000-00805f9b34fb
-> > attr handle: 0x0017, end grp handle: 0x0019 uuid: 00001801-0000-1000-
-> 8000-00805f9b34fb
-> > attr handle: 0x001a, end grp handle: 0x0043 uuid: 00009000-0000-1000-
-> 8000-00805f9b34fb
-> > attr handle: 0x0044, end grp handle: 0x0046 uuid: 0000a000-0000-1000-
-> 8000-00805f9b34fb
-> > attr handle: 0x0050, end grp handle: 0x0055 uuid: 0000a002-0000-1000-
-> 8000-00805f9b34fb
-> > attr handle: 0x0056, end grp handle: 0x005a uuid: 0000a003-0000-1000-
-> 8000-00805f9b34fb
-> > attr handle: 0x005b, end grp handle: 0x005d uuid: 0000a004-0000-1000-
-> 8000-00805f9b34fb
-> > attr handle: 0x0064, end grp handle: 0x0069 uuid: 0000a001-0000-1000-
-> 8000-00805f9b34fb
-> > attr handle: 0x006a, end grp handle: 0x006c uuid: 0000a008-0000-0000-
-> 0123-456789abcdef
-> > attr handle: 0x0070, end grp handle: 0x0078 uuid: 0000a007-0000-0000-
-> 0123-456789abcdef
-> > attr handle: 0x0079, end grp handle: 0x007d uuid: 00001802-0000-1000-
-> 8000-00805f9b34fb
-> > attr handle: 0x007e, end grp handle: 0x0080 uuid: 00001804-0000-1000-
-> 8000-00805f9b34fb
-> > attr handle: 0x0081, end grp handle: 0x0083 uuid: 00001803-0000-1000-
-> 8000-00805f9b34fb
-> > [CON][64:9c:8e:e5:a0:e9][LE]> included 0x01 0x6c
-> 
-> Just a note, you usually give the start-end ranges of a service. In
-> your example database:
-> 
-> 0x0001 0x000b
-> 0x000c 0x0016
-> ...
-> 
-> But I think it should work with any pair of start-end handles.
-> 
-Lizardo, I know that. I just wanted to get all the included services in the entire range.
-
-> > [CON][64:9c:8e:e5:a0:e9][LE]>
-> >
-> > This is a secondary service, including another secondary service,
-> both do not show up in the primaries list above, as they should:
-> > handle: 0x004b, start handle: 0x0047, end handle: 0x0049 uuid:
-> 0000a006-0000-1000-8000-00805f9b34fb
-> >
-> > handle: 0x0051, start handle: 0x004a, end handle: 0x004f uuid:
-> 0000a005-0000-1000-8000-00805f9b34fb
-> 
-> The one above should have been returned by: "included 0x0050 0x0055"
-> 
-> > handle: 0x005f, start handle: 0x0047, end handle: 0x0049 uuid:
-> 0000a006-0000-1000-8000-00805f9b34fb
-> 
-> This one seems to be inside a secondary service. Given that the "Find
-> Included Services" GATT procedure is not recursive, we need to do this
-> manually, first obtaining the range for the secondary service that
-> contains the 0x005f handle:
-> 
-> included 0x0064 0x0069
-> 
-> It should return the line below:
-> 
-> > handle: 0x0065, start handle: 0x005e, end handle: 0x0063 uuid:
-> 0000a005-0000-1000-8000-00805f9b34fb
-> 
-> Next, run:
-> 
-> included 0x005e 0x0063
-> 
-> Which should finally return the previous "handle: 0x005f..." line.
-> 
-> Chen: for Generic Attribute API, I suppose you will follow this
-> recursive method. Also remember to check for cycles, and follow the
-> requirements on the Core spec.
-> 
-> > [CON][64:9c:8e:e5:a0:e9][LE]> included 0x01 0x78
-> > However, when I tried to search for included services inside a 128bit
-> service, which includes another 128bit secondary service, the gatttool
-> first did not return any result, and then I got a segmentation fault.
-> 
-> Can you send the valgrind output for this case? It should help
-> Jefferson fixing the segfault.
-> 
-I'll try and do that today or tomorrow and send it.
-
-> Thanks for the tests!
-> 
-> Best Regards,
-> --
-> Anderson Lizardo
-> Instituto Nokia de Tecnologia - INdT
-> Manaus - Brazil
-
-
-
-Thanks,
-Chen Ganir
+ struct btd_device {
+@@ -205,6 +212,13 @@ const char *property_name[] = { "Address",
+ 								"Adapter",
+ 								"LegacyPairing"};
+ 
++static void property_changed_update_cb(struct prop_changed_cb *cb,
++						struct prop_changed_cb_data *data)
++{
++	if (cb->cb != NULL)
++		(cb->cb)(data->property, data->data, data->len,cb->device);
++}
++
+ static void notify_property_changed(struct btd_device *device,
+ 					DBusConnection *conn,
+ 					const char *path,
+@@ -213,12 +227,56 @@ static void notify_property_changed(struct btd_device *device,
+ {
+ 	const char *interface = DEVICE_INTERFACE;
+ 	const char *name = "";
++	struct prop_changed_cb_data *cb_data = NULL;
+ 
+ 	if (property > 0 && property <= DEVICE_PROPERTY_CHANGED_LEGACYPAIRING)
+ 		name = property_name[property-1];
+ 	else
+ 		name = "UNKNOWN";
+ 
++	cb_data = g_new0(struct prop_changed_cb_data, 1);
++
++	if (cb_data != NULL) {
++		cb_data->property = property;
++
++		switch (property) {
++		case DEVICE_PROPERTY_CHANGED_CONNECTED:
++		{
++			struct property_changed_connected *p = g_new0(struct property_changed_connected,1);
++			p->connected = *(gboolean*)value;
++			cb_data->data = p;
++			cb_data->len = sizeof(struct property_changed_connected);
++			break;
++		}
++		case DEVICE_PROPERTY_CHANGED_ADDRESS:
++		case DEVICE_PROPERTY_CHANGED_NAME:
++		case DEVICE_PROPERTY_CHANGED_VENDOR:
++		case DEVICE_PROPERTY_CHANGED_PRODUCT:
++		case DEVICE_PROPERTY_CHANGED_VERSION:
++		case DEVICE_PROPERTY_CHANGED_ICON:
++		case DEVICE_PROPERTY_CHANGED_CLASS:
++		case DEVICE_PROPERTY_CHANGED_UUIDS:
++		case DEVICE_PROPERTY_CHANGED_SERVICES:
++		case DEVICE_PROPERTY_CHANGED_PAIRED:
++		case DEVICE_PROPERTY_CHANGED_TRUSTED:
++		case DEVICE_PROPERTY_CHANGED_BLOCKED:
++		case DEVICE_PROPERTY_CHANGED_ALIAS:
++		case DEVICE_PROPERTY_CHANGED_NODES:
++		case DEVICE_PROPERTY_CHANGED_ADAPTER:
++		case DEVICE_PROPERTY_CHANGED_LEGACYPAIRING:
++		default:
++			break;
++		}
++
++		if (cb_data != NULL && cb_data->len > 0 && cb_data->data != NULL) {
++			g_slist_foreach(device->cb_list, (GFunc) property_changed_update_cb, cb_data);
++		}
++
++		g_free(cb_data->data);
++		g_free(cb_data);
++	}
++
++
+ 	if (num == 0)
+ 		emit_property_changed(conn, path,
+ 					interface, name,
+@@ -3067,6 +3125,7 @@ guint btd_device_add_prop_changed_cb(struct btd_device *device, dev_property_cha
+ 	cb = g_new0(struct prop_changed_cb, 1);
+ 	cb->id = ++cb_id;
+ 	cb->cb = cbfunc;
++	cb->device = device;
+ 
+ 	device->cb_list = g_slist_append(device->cb_list, cb);
+ 
+diff --git a/src/device.h b/src/device.h
+index ce0a83a..3c54255 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -26,25 +26,95 @@
+ 
+ struct btd_device;
+ 
+-typedef void (*dev_property_changed_cb)(uint16_t property, uint8_t *value, uint16_t len);
++typedef void (*dev_property_changed_cb)(uint16_t property, uint8_t *value, uint16_t len,struct btd_device *device);
+ 
+ #define DEVICE_PROPERTY_CHANGED_ADDRESS			0x01
++struct property_changed_address {
++	char *address;
++};
++
+ #define DEVICE_PROPERTY_CHANGED_NAME			0x02
++struct property_changed_name {
++	char *name;
++};
++
+ #define DEVICE_PROPERTY_CHANGED_VENDOR			0x03
++struct propery_changed_vendor {
++	uint16_t vendor;
++};
++
+ #define DEVICE_PROPERTY_CHANGED_PRODUCT			0x04
++struct propery_changed_product {
++	uint16_t product;
++};
++
+ #define DEVICE_PROPERTY_CHANGED_VERSION			0x05
++struct propery_changed_version {
++	uint16_t version;
++};
++
+ #define DEVICE_PROPERTY_CHANGED_ICON			0x06
++struct property_changed_icon {
++	char *icon;
++};
++
+ #define DEVICE_PROPERTY_CHANGED_CLASS			0x07
++struct propery_changed_class {
++	uint32_t class;
++};
++
+ #define DEVICE_PROPERTY_CHANGED_UUIDS			0x08
++struct propery_changed_uuid {
++	uint16_t count;
++	char *uuid[];
++};
++
+ #define DEVICE_PROPERTY_CHANGED_SERVICES		0x09
++struct propery_changed_services {
++	uint16_t count;
++	char *services[];
++};
++
+ #define DEVICE_PROPERTY_CHANGED_PAIRED			0x0A
++struct propery_changed_paired {
++	gboolean paired;
++};
++
+ #define DEVICE_PROPERTY_CHANGED_CONNECTED       0x0B
++struct property_changed_connected {
++	gboolean connected;
++};
++
+ #define DEVICE_PROPERTY_CHANGED_TRUSTED			0x0C
++struct propery_changed_trusted {
++	gboolean trusted;
++};
++
+ #define DEVICE_PROPERTY_CHANGED_BLOCKED			0x0D
++struct propery_changed_blocked {
++	gboolean blocked;
++};
++
+ #define DEVICE_PROPERTY_CHANGED_ALIAS			0x0E
++struct property_changed_alias {
++	char *alias;
++};
++
+ #define DEVICE_PROPERTY_CHANGED_NODES			0x0F
++struct propery_changed_nodes {
++	uint16_t count;
++	char *nodes[];
++};
++
+ #define DEVICE_PROPERTY_CHANGED_ADAPTER			0x10
++struct propery_changed_adapter {
++	char adapter;
++};
++
+ #define DEVICE_PROPERTY_CHANGED_LEGACYPAIRING	0x11
++struct propery_changed_legacy_pairing {
++	gboolean legacy_pairing;
++};
+ 
+ typedef enum {
+ 	AUTH_TYPE_PINCODE,
+-- 
+1.7.4.1
 
