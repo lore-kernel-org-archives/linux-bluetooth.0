@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20120328085638.GC21905@aemeltch-MOBL1>
+In-Reply-To: <20120328084837.GB21905@aemeltch-MOBL1>
 References: <1332892776-12060-1-git-send-email-andre.guedes@openbossa.org>
-	<1332892776-12060-4-git-send-email-andre.guedes@openbossa.org>
-	<20120328085638.GC21905@aemeltch-MOBL1>
-Date: Wed, 28 Mar 2012 11:05:47 -0300
-Message-ID: <CACJA=fX9WSAqKZfLxp_iY2WiNoUXrGc=ch0DWdFXZvitOXPiZA@mail.gmail.com>
-Subject: Re: [RFC 3/3] Bluetooth: Use address type info from User-space
+	<1332892776-12060-3-git-send-email-andre.guedes@openbossa.org>
+	<20120328084837.GB21905@aemeltch-MOBL1>
+Date: Wed, 28 Mar 2012 11:05:20 -0300
+Message-ID: <CACJA=fUPzWaoTVL3Onzit8Wuk4vAcuw4rgpdctxJF8rg37giPg@mail.gmail.com>
+Subject: Re: [RFC 2/3] Bluetooth: Add dst_type parameter to hci_connect
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
 	Andre Guedes <andre.guedes@openbossa.org>,
@@ -17,97 +17,81 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-On Wed, Mar 28, 2012 at 5:56 AM, Andrei Emeltchenko
+On Wed, Mar 28, 2012 at 5:48 AM, Andrei Emeltchenko
 <andrei.emeltchenko.news@gmail.com> wrote:
 > Hi Andre,
 >
-> On Tue, Mar 27, 2012 at 08:59:36PM -0300, Andre Guedes wrote:
->> In order to establish a LE connection we need the address type
->> information. User-space already pass this information to kernel
->> through struct sockaddr_l2.
+> On Tue, Mar 27, 2012 at 08:59:35PM -0300, Andre Guedes wrote:
+>> This patch adds the dst_type parameter to hci_connect. This way, we
+>> use the address type information from upper layer instead of searching
+>> it on the advertising cache.
 >>
->> This patch adds the dst_type parameter to l2cap_chan_connect so we
->> are able to pass the address type info from user-space down to
->> hci_conn layer.
+>> The dst_type parameter is ignored for BR/EDR connection establishment.
 >>
 >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 >> ---
->>  include/net/bluetooth/l2cap.h |    2 +-
->>  net/bluetooth/l2cap_core.c    |   11 ++++++-----
->>  net/bluetooth/l2cap_sock.c    |    2 +-
->>  3 files changed, 8 insertions(+), 7 deletions(-)
+>>  include/net/bluetooth/hci_core.h |    2 +-
+>>  net/bluetooth/hci_conn.c         |   12 ++++--------
+>>  net/bluetooth/l2cap_core.c       |    4 ++--
+>>  net/bluetooth/mgmt.c             |    8 ++++----
+>>  net/bluetooth/sco.c              |    3 ++-
+>>  5 files changed, 13 insertions(+), 16 deletions(-)
 >>
->> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
->> index d14967e..262628c 100644
->> --- a/include/net/bluetooth/l2cap.h
->> +++ b/include/net/bluetooth/l2cap.h
->> @@ -911,7 +911,7 @@ struct l2cap_chan *l2cap_chan_create(void);
->>  void l2cap_chan_close(struct l2cap_chan *chan, int reason);
->>  void l2cap_chan_destroy(struct l2cap_chan *chan);
->>  int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
->> -                                                             bdaddr_t *dst);
->> +                                             bdaddr_t *dst, u8 dst_type);
->>  int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
->>                                                               u32 priority);
->>  void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
->> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->> index 91b02de..e0dc4ca 100644
->> --- a/net/bluetooth/l2cap_core.c
->> +++ b/net/bluetooth/l2cap_core.c
->> @@ -1131,7 +1131,8 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr
->>       return c1;
->>  }
+>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>> index fa2c778..178eaa1 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -574,7 +574,7 @@ int hci_chan_del(struct hci_chan *chan);
+>>  void hci_chan_list_flush(struct hci_conn *conn);
 >>
->> -int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *dst)
->> +int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
->> +                     bdaddr_t *dst, u8 dst_type)
+>>  struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+>> -                                             __u8 sec_level, __u8 auth_type);
+>> +                             __u8 dst_type, __u8 sec_level, __u8 auth_type);
+>>  int hci_conn_check_link_mode(struct hci_conn *conn);
+>>  int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
+>>  int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
+>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+>> index 947172b..4f24d3f 100644
+>> --- a/net/bluetooth/hci_conn.c
+>> +++ b/net/bluetooth/hci_conn.c
+>> @@ -514,7 +514,8 @@ EXPORT_SYMBOL(hci_get_route);
+>>
+>>  /* Create SCO, ACL or LE connection.
+>>   * Device _must_ be locked */
+>> -struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8 sec_level, __u8 auth_type)
+>> +struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+>> +                             __u8 dst_type, __u8 sec_level, __u8 auth_type)
 >>  {
->>       struct sock *sk = chan->sk;
->>       bdaddr_t *src = &bt_sk(sk)->src;
->> @@ -1141,8 +1142,8 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
->>       __u8 auth_type;
->>       int err;
+>>       struct hci_conn *acl;
+>>       struct hci_conn *sco;
+>> @@ -523,21 +524,16 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
+>>       BT_DBG("%s dst %s", hdev->name, batostr(dst));
 >>
->> -     BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
->> -                                             __le16_to_cpu(chan->psm));
->> +     BT_DBG("%s -> %s (type %u) psm 0x%2.2x", batostr(src), batostr(dst),
->> +                                     dst_type, __le16_to_cpu(chan->psm));
+>>       if (type == LE_LINK) {
+>> -             struct adv_entry *entry;
+>> -
+>>               le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
+>>               if (le)
+>>                       return ERR_PTR(-EBUSY);
+>>
+>> -             entry = hci_find_adv_entry(hdev, dst);
+>> -             if (!entry)
+>> -                     return ERR_PTR(-EHOSTUNREACH);
+>> -
+>>               le = hci_conn_add(hdev, LE_LINK, dst);
+>>               if (!le)
+>>                       return ERR_PTR(-ENOMEM);
+>>
+>> -             le->dst_type = entry->bdaddr_type;
+>> +             le->dst_type = (dst_type == MGMT_ADDR_LE_RANDOM) ?
+>> +                             ADDR_LE_DEV_RANDOM : ADDR_LE_DEV_PUBLIC;
 >
-> If you change style for other functions you might change it here as well.
+> Is this checking validity of dst_type? Just split to check and then
+> assign.
 
-Sorry, didn't follow you here.
-
->>
->>       hdev = hci_get_route(dst, src);
->>       if (!hdev)
->> @@ -1216,10 +1217,10 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
->>       auth_type = l2cap_get_auth_type(chan);
->>
->>       if (chan->dcid == L2CAP_CID_LE_DATA)
->> -             hcon = hci_connect(hdev, LE_LINK, dst, MGMT_ADDR_LE_RANDOM,
->> +             hcon = hci_connect(hdev, LE_LINK, dst, dst_type,
->>                                       chan->sec_level, auth_type);
->>       else
->> -             hcon = hci_connect(hdev, ACL_LINK, dst, MGMT_ADDR_BREDR,
->> +             hcon = hci_connect(hdev, ACL_LINK, dst, dst_type,
->>                                       chan->sec_level, auth_type);
->>
->>       if (IS_ERR(hcon)) {
->> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
->> index 53e563f..4b38cf8 100644
->> --- a/net/bluetooth/l2cap_sock.c
->> +++ b/net/bluetooth/l2cap_sock.c
->> @@ -124,7 +124,7 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
->>               return -EINVAL;
->>
->>       err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
->> -                             &la.l2_bdaddr);
->> +                             &la.l2_bdaddr, la.l2_bdaddr_type);
->
-> Would it make sense to pass la as a parameter?
-
-I guess so. If we all agree this is a valid refactoring, I take care
-of it in a separated patch.
+It is not a validity check. dst_type parameter is in MGMT address type
+format and we need to translate it to HCI address type format before
+the assignment.
 
 Thanks,
 
