@@ -1,87 +1,173 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Mar 2012 11:48:39 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 2/3] Bluetooth: Add dst_type parameter to hci_connect
-Message-ID: <20120328084837.GB21905@aemeltch-MOBL1>
-References: <1332892776-12060-1-git-send-email-andre.guedes@openbossa.org>
- <1332892776-12060-3-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332892776-12060-3-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1332887487-13601-9-git-send-email-jprvita@openbossa.org>
+References: <1332887487-13601-1-git-send-email-jprvita@openbossa.org>
+	<1332887487-13601-9-git-send-email-jprvita@openbossa.org>
+Date: Wed, 28 Mar 2012 10:41:22 +0200
+Message-ID: <CANq1E4S4bftzTH3u+NR0k2CUVnayPTz0zo0zHG7gCVkKx=fQ7A@mail.gmail.com>
+Subject: Re: [RFC 8/8] HoG: HID I/O driver
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: =?ISO-8859-1?Q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org, chen.ganir@ti.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Joao
 
-On Tue, Mar 27, 2012 at 08:59:35PM -0300, Andre Guedes wrote:
-> This patch adds the dst_type parameter to hci_connect. This way, we
-> use the address type information from upper layer instead of searching
-> it on the advertising cache.
-> 
-> The dst_type parameter is ignored for BR/EDR connection establishment.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+On Wed, Mar 28, 2012 at 12:31 AM, João Paulo Rechi Vita
+<jprvita@openbossa.org> wrote:
+> UHID is HID I/O driver that makes possible to implement HID I/O drivers in
+> user-space. It works similar to the uinput but it is initialized with a HID
+> descriptor and deals with raw HID reports.
+>
+> This commit uses UHID to create a HID device for the remote HoG device and
+> to tranfers HID reports to HID subsystem.
 > ---
->  include/net/bluetooth/hci_core.h |    2 +-
->  net/bluetooth/hci_conn.c         |   12 ++++--------
->  net/bluetooth/l2cap_core.c       |    4 ++--
->  net/bluetooth/mgmt.c             |    8 ++++----
->  net/bluetooth/sco.c              |    3 ++-
->  5 files changed, 13 insertions(+), 16 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index fa2c778..178eaa1 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -574,7 +574,7 @@ int hci_chan_del(struct hci_chan *chan);
->  void hci_chan_list_flush(struct hci_conn *conn);
->  
->  struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
-> -						__u8 sec_level, __u8 auth_type);
-> +				__u8 dst_type, __u8 sec_level, __u8 auth_type);
->  int hci_conn_check_link_mode(struct hci_conn *conn);
->  int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
->  int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 947172b..4f24d3f 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -514,7 +514,8 @@ EXPORT_SYMBOL(hci_get_route);
->  
->  /* Create SCO, ACL or LE connection.
->   * Device _must_ be locked */
-> -struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8 sec_level, __u8 auth_type)
-> +struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
-> +				__u8 dst_type, __u8 sec_level, __u8 auth_type)
->  {
->  	struct hci_conn *acl;
->  	struct hci_conn *sco;
-> @@ -523,21 +524,16 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
->  	BT_DBG("%s dst %s", hdev->name, batostr(dst));
->  
->  	if (type == LE_LINK) {
-> -		struct adv_entry *entry;
-> -
->  		le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
->  		if (le)
->  			return ERR_PTR(-EBUSY);
->  
-> -		entry = hci_find_adv_entry(hdev, dst);
-> -		if (!entry)
-> -			return ERR_PTR(-EHOSTUNREACH);
-> -
->  		le = hci_conn_add(hdev, LE_LINK, dst);
->  		if (!le)
->  			return ERR_PTR(-ENOMEM);
->  
-> -		le->dst_type = entry->bdaddr_type;
-> +		le->dst_type = (dst_type == MGMT_ADDR_LE_RANDOM) ?
-> +				ADDR_LE_DEV_RANDOM : ADDR_LE_DEV_PUBLIC;
+>  input/hog_device.c |   51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 51 insertions(+), 0 deletions(-)
+>
+> diff --git a/input/hog_device.c b/input/hog_device.c
+> index 7a757f4..183da22 100644
+> --- a/input/hog_device.c
+> +++ b/input/hog_device.c
+> @@ -29,6 +29,10 @@
+>  #include <stdlib.h>
+>  #include <errno.h>
+>  #include <unistd.h>
+> +#include <sys/types.h>
+> +#include <sys/stat.h>
+> +#include <fcntl.h>
+> +#include <linux/uhid.h>
+>
+>  #include <bluetooth/bluetooth.h>
+>  #include <bluetooth/uuid.h>
+> @@ -48,6 +52,7 @@
+>  #include "gatt.h"
+>
+>  #define HOG_REPORT_UUID                0x2A4D
+> +#define UHID_DEVICE_FILE       "/dev/uhid"
+>
+>  struct hog_device {
+>        char                    *path;
+> @@ -56,13 +61,17 @@ struct hog_device {
+>        guint                   attioid;
+>        struct gatt_primary     *hog_primary;
+>        struct gatt_char        *report;
+> +       int                     uhid_fd;
+>  };
+>
+>  static GSList *devices = NULL;
+>
+>  static void report_value_cb(const uint8_t *pdu, uint16_t len, gpointer user_data)
+>  {
+> +       struct hog_device *hogdev = user_data;
+> +       struct uhid_event ev;
+>        uint16_t handle;
+> +       uint16_t report_size = len - 2;
+>
+>        if (len < 3) {
+>                error("Malformed ATT notification");
+> @@ -74,6 +83,14 @@ static void report_value_cb(const uint8_t *pdu, uint16_t len, gpointer user_data
+>        DBG("Report(0x%04x): 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x "
+>                                "0x%02x", handle, pdu[2], pdu[3], pdu[4],
+>                                pdu[5], pdu[6], pdu[7], pdu[8], pdu[9]);
+> +
+> +       memset(&ev, 0, sizeof(ev));
+> +       ev.type = UHID_INPUT;
+> +       ev.u.input.size = report_size;
+> +       memcpy(ev.u.input.data, &pdu[2], report_size);
 
-Is this checking validity of dst_type? Just split to check and then
-assign.
+Please use min(report_size, UHID_DATA_MAX) here.
 
-Best regards 
-Andrei Emeltchenko 
+> +
+> +       if (write(hogdev->uhid_fd, &ev, sizeof(ev)) < 0)
+> +               error("UHID write failed: %s", strerror(errno));
+>  }
+>
+>  static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+> @@ -96,6 +113,8 @@ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+>  static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>                                                        gpointer user_data)
+>  {
+> +       struct hog_device *hogdev = user_data;
+> +       struct uhid_event ev;
+>        uint8_t value[ATT_MAX_MTU];
+>        int vlen, i;
+>
+> @@ -116,6 +135,22 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>                else
+>                        DBG("\t %02x %02x", value[i], value[i + 1]);
+>        }
+> +
+> +       /* create UHID device */
+> +       memset(&ev, 0, sizeof(ev));
+> +       ev.type = UHID_CREATE;
+> +       /* TODO: get info from DIS */
+> +       strcpy((char*)ev.u.create.name, "bluez-hog-device");
+> +       ev.u.create.vendor = 0xBEBA;
+> +       ev.u.create.product = 0xCAFE;
+> +       ev.u.create.version = 0;
+> +       ev.u.create.country = 0;
+> +       ev.u.create.bus = BUS_USB; /* BUS_BLUETOOTH doesn't work here */
+
+I've seen the other mail. I will have a look at this. It's probably
+because generic-bluetooth doesn't get loaded for uhid devices but only
+generic-usb.
+
+> +       ev.u.create.rd_data = value;
+> +       ev.u.create.rd_size = vlen;
+> +
+> +       if (write(hogdev->uhid_fd, &ev, sizeof(ev)) < 0)
+> +               error("Failed to create UHID device: %s", strerror(errno));
+>  }
+>
+>  static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+> @@ -162,11 +197,27 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+>
+>        gatt_discover_char(hogdev->attrib, prim->range.start, prim->range.end,
+>                                        NULL, char_discovered_cb, hogdev);
+> +
+> +       if (hogdev->uhid_fd > 0)
+> +               return;
+> +
+> +       hogdev->uhid_fd = open(UHID_DEVICE_FILE, O_RDWR, 0666);
+
+You probably want O_RDWR | O_CLOEXEC here. And please remove the third
+parameter 0666. It doesn't make sense if you do not use O_CREATE.
+
+> +       if (hogdev->uhid_fd < 0)
+> +               error("Failed to open UHID device: %s", strerror(errno));
+
+I don't know what side-effects the "error()" call has, but I think we
+need better cleanup at all the error() calls in this file. But I
+haven't checked it thoroughly, yet.
+
+Also this is a good place to add uhid_fd to the event-loop and wait
+for READABLE events. The callback should then simply read from uhid_fd
+and write the raw data prefix with the att header. There is no need to
+validate the data you read from uhid_fd.
+
+>  }
+>
+>  static void attio_disconnected_cb(gpointer user_data)
+>  {
+>        struct hog_device *hogdev = user_data;
+> +       struct uhid_event ev;
+> +
+> +       memset(&ev, 0, sizeof(ev));
+> +       ev.type = UHID_DESTROY;
+> +       if (write(hogdev->uhid_fd, &ev, sizeof(ev)) < 0)
+> +               error("Failed to destroy UHID device: %s", strerror(errno));
+> +
+> +       close(hogdev->uhid_fd);
+> +       hogdev->uhid_fd = -1;
+>
+>        g_attrib_unref(hogdev->attrib);
+>        hogdev->attrib = NULL;
+> --
+> 1.7.7.6
+>
+
+Looks good overall, regards
+David
