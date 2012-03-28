@@ -1,25 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Mar 2012 13:05:53 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] input: fix coding style
-Message-ID: <20120328100553.GA32147@x220>
-References: <1332882872-11889-1-git-send-email-jprvita@openbossa.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH V4 5/7] btmgmt: Add support for setting Device ID
+Date: Wed, 28 Mar 2012 12:03:17 +0200
+Message-ID: <1332928999-14224-5-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1332928999-14224-1-git-send-email-szymon.janc@tieto.com>
+References: <1332928999-14224-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1332882872-11889-1-git-send-email-jprvita@openbossa.org>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi João Paulo,
+---
+ mgmt/main.c |   65 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
 
-On Tue, Mar 27, 2012, João Paulo Rechi Vita wrote:
-> Fix line going over 80 columns.
-> ---
->  input/main.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
+diff --git a/mgmt/main.c b/mgmt/main.c
+index 4f10e08..90d43e3 100644
+--- a/mgmt/main.c
++++ b/mgmt/main.c
+@@ -1730,6 +1730,70 @@ static void cmd_clr_uuids(int mgmt_sk, uint16_t index, int argc, char **argv)
+ 	cmd_remove_uuid(mgmt_sk, index, 2, rm_argv);
+ }
+ 
++static void did_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	if (status != 0) {
++		fprintf(stderr, "Set Device ID failed with status 0x%02x (%s)\n",
++						status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	printf("Device ID succesfully set\n");
++
++	exit(EXIT_SUCCESS);
++}
++
++static void did_usage(void)
++{
++	printf("Usage: btmgmt did <source>:<vendor>:<product>:<version>\n");
++	printf("       possible source values: bluetooth, usb\n");
++}
++
++static void cmd_did(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_set_device_id cp;
++	uint16_t vendor, product, version , source;
++	int result;
++
++	if (argc < 2) {
++		did_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	result = sscanf(argv[1], "bluetooth:%4hx:%4hx:%4hx", &vendor, &product,
++								&version);
++	if (result == 3) {
++		source = 0x0001;
++		goto done;
++	}
++
++	result = sscanf(argv[1], "usb:%4hx:%4hx:%4hx", &vendor, &product,
++								&version);
++	if (result == 3) {
++		source = 0x0002;
++		goto done;
++	}
++
++	did_usage();
++	exit(EXIT_FAILURE);
++
++done:
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	cp.source = htobs(source);
++	cp.vendor = htobs(vendor);
++	cp.product = htobs(product);
++	cp.version = htobs(version);
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_DEVICE_ID, index,
++				&cp, sizeof(cp), did_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send set_dev_class cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
+ static struct {
+ 	char *cmd;
+ 	void (*func)(int mgmt_sk, uint16_t index, int argc, char **argv);
+@@ -1760,6 +1824,7 @@ static struct {
+ 	{ "add-uuid",	cmd_add_uuid,	"Add UUID"			},
+ 	{ "rm-uuid",	cmd_add_uuid,	"Remove UUID"			},
+ 	{ "clr-uuids",	cmd_clr_uuids,	"Clear UUIDs",			},
++	{ "did",	cmd_did,	"Set Device ID",		},
+ 	{ NULL, NULL, 0 }
+ };
+ 
+-- 
+on behalf of ST-Ericsson
 
-Applied. Thanks.
-
-Johan
