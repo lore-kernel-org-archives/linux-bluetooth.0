@@ -1,41 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Mar 2012 11:37:49 -0300
+Date: Wed, 28 Mar 2012 11:33:36 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: AceLan Kao <acelan.kao@canonical.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Add support for Atheros [04ca:3005]
-Message-ID: <20120328143749.GB3962@joana>
-References: <1332901536-32729-1-git-send-email-acelan.kao@canonical.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Remove unneeded zero initialization
+Message-ID: <20120328143336.GA3962@joana>
+References: <1332935794-15319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1332940001-20336-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332901536-32729-1-git-send-email-acelan.kao@canonical.com>
+In-Reply-To: <1332940001-20336-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi AceLan,
+Hi Andrei,
 
-* AceLan Kao <acelan.kao@canonical.com> [2012-03-28 10:25:36 +0800]:
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-03-28 16:06:41 +0300]:
 
-> Add another vendor specific ID for Atheros AR3012 device.
-> This chip is wrapped by Lite-On Technology Corp.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> output of usb-devices:
-> T:  Bus=04 Lev=01 Prnt=01 Port=03 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=04ca ProdID=3005 Rev=00.02
-> S:  Manufacturer=Atheros Communications
-> S:  Product=Bluetooth USB Host Controller
-> S:  SerialNumber=Alaska Day 2006
-> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> Remove zero initialization since channel is allocated with kzalloc
+> in l2cap_chan_create.
 > 
-> Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  drivers/bluetooth/ath3k.c |    2 ++
->  drivers/bluetooth/btusb.c |    1 +
->  2 files changed, 3 insertions(+), 0 deletions(-)
+>  net/bluetooth/l2cap_sock.c |    1 -
+>  1 files changed, 0 insertions(+), 1 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 53e563f..1d3e9c3 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -1011,7 +1011,6 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+>  		chan->tx_win = L2CAP_DEFAULT_TX_WINDOW;
+>  		chan->tx_win_max = L2CAP_DEFAULT_TX_WINDOW;
+>  		chan->sec_level = BT_SECURITY_LOW;
+> -		chan->flags = 0;
+>  		set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
+>  	}
 
 Patch has been applied to bluetooth-next. Thanks.
 
