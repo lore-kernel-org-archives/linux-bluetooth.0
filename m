@@ -1,32 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Mar 2012 13:18:47 +0300
+Date: Wed, 28 Mar 2012 13:05:53 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
-Subject: Re: [PATCH V4 1/7] Parse config DeviceID string on bluetoothd startup
-Message-ID: <20120328101847.GA471@x220>
-References: <1332928999-14224-1-git-send-email-szymon.janc@tieto.com>
+To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] input: fix coding style
+Message-ID: <20120328100553.GA32147@x220>
+References: <1332882872-11889-1-git-send-email-jprvita@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332928999-14224-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1332882872-11889-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi João Paulo,
 
-On Wed, Mar 28, 2012, Szymon Janc wrote:
-> Instead of parsing config DeviceID string on sdp server startup, parse
-> it in main while reading config file. This allow to store logical DID
-> values in main_opts (instead of raw config string) and make use of them
-> in bluetoothd code.
+On Tue, Mar 27, 2012, João Paulo Rechi Vita wrote:
+> Fix line going over 80 columns.
 > ---
->  src/hcid.h         |    6 +++++-
->  src/main.c         |   20 +++++++++++++++++---
->  src/sdpd-server.c  |   19 ++++---------------
->  src/sdpd-service.c |   20 +++++++++++---------
->  src/sdpd.h         |    5 ++---
->  5 files changed, 39 insertions(+), 31 deletions(-)
+>  input/main.c |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
 
-All seven patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
