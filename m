@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv6 17/26] Bluetooth: A2MP: Process A2MP Disc Physlink Request
-Date: Wed, 28 Mar 2012 16:31:40 +0300
-Message-Id: <1332941509-21345-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv6 19/26] Bluetooth: A2MP: Handling fixed channels
+Date: Wed, 28 Mar 2012 16:31:42 +0300
+Message-Id: <1332941509-21345-20-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,67 +12,104 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Placeholder for A2MP Disconnect Physlink Request.
+A2MP fixed channel do not have sk
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   36 ++++++++++++++++++++++++++++++++++++
- 1 files changed, 36 insertions(+), 0 deletions(-)
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/a2mp.c          |    3 +--
+ net/bluetooth/l2cap_core.c    |   17 +++++++++++++++--
+ 3 files changed, 17 insertions(+), 4 deletions(-)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 09cbd33..13ed508 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -565,6 +565,7 @@ struct l2cap_conn {
+ #define L2CAP_CHAN_RAW			1
+ #define L2CAP_CHAN_CONN_LESS		2
+ #define L2CAP_CHAN_CONN_ORIENTED	3
++#define L2CAP_CHAN_CONN_FIX_A2MP	4
+ 
+ /* ----- L2CAP socket info ----- */
+ #define l2cap_pi(sk) ((struct l2cap_pinfo *) sk)
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index a5f831b..177a066 100644
+index 0453372..dcb86c5 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -281,6 +281,39 @@ send_rsp:
- 	return 0;
- }
+@@ -460,8 +460,7 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
  
-+static int a2mp_discphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
-+				 struct a2mp_cmd *hdr)
-+{
-+	struct a2mp_physlink_req *req = (struct a2mp_physlink_req *) skb->data;
-+	struct a2mp_physlink_rsp rsp;
-+	struct hci_dev *hdev;
+ 	hci_conn_hold(conn->hcon);
+ 
+-	chan->omtu = L2CAP_A2MP_DEFAULT_MTU;
+-	chan->imtu = L2CAP_A2MP_DEFAULT_MTU;
++	chan->chan_type = L2CAP_CHAN_CONN_FIX_A2MP;
+ 	chan->flush_to = L2CAP_DEFAULT_FLUSH_TO;
+ 
+ 	chan->ops = &a2mp_chan_ops;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index a080b00..483ec9f 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -338,6 +338,13 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ 		chan->omtu = L2CAP_DEFAULT_MTU;
+ 		break;
+ 
++	case L2CAP_CHAN_CONN_FIX_A2MP:
++		chan->scid = L2CAP_CID_A2MP;
++		chan->dcid = L2CAP_CID_A2MP;
++		chan->omtu = L2CAP_A2MP_DEFAULT_MTU;
++		chan->imtu = L2CAP_A2MP_DEFAULT_MTU;
++		break;
 +
-+	if (le16_to_cpu(hdr->len) < sizeof(*req))
-+		return -EINVAL;
-+
-+	BT_DBG("local_id %d remote_id %d", req->local_id, req->remote_id);
-+
-+	rsp.local_id = req->remote_id;
-+	rsp.remote_id = req->local_id;
-+	rsp.status = A2MP_STATUS_SUCCESS;
-+
-+	hdev = hci_dev_get(req->local_id);
-+	if (!hdev) {
-+		rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
-+		goto send_rsp;
-+	}
-+
-+	/* TODO Disconnect Phys Link here */
-+
-+	hci_dev_put(hdev);
-+
-+send_rsp:
-+	a2mp_send(mgr, A2MP_DISCONNPHYSLINK_RSP, hdr->ident, sizeof(rsp), &rsp);
-+
-+	skb_pull(skb, sizeof(*req));
-+	return 0;
-+}
-+
- /* Handle A2MP signalling */
- static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 	default:
+ 		/* Raw socket can send/recv signalling messages only */
+ 		chan->scid = L2CAP_CID_SIGNALING;
+@@ -368,7 +375,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
  {
-@@ -331,6 +364,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
- 			break;
+ 	struct sock *sk = chan->sk;
+ 	struct l2cap_conn *conn = chan->conn;
+-	struct sock *parent = bt_sk(sk)->parent;
++	struct sock *parent;
  
- 		case A2MP_DISCONNPHYSLINK_REQ:
-+			err = a2mp_discphyslink_req(mgr, skb, hdr);
-+			break;
+ 	__clear_chan_timer(chan);
+ 
+@@ -384,6 +391,9 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 		hci_conn_put(conn->hcon);
+ 	}
+ 
++	if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
++		goto clean;
 +
- 		case A2MP_CHANGE_RSP:
- 		case A2MP_DISCOVER_RSP:
- 		case A2MP_GETINFO_RSP:
+ 	lock_sock(sk);
+ 
+ 	__l2cap_state_change(chan, BT_CLOSED);
+@@ -392,6 +402,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 	if (err)
+ 		__l2cap_chan_set_err(chan, err);
+ 
++	parent = bt_sk(sk)->parent;
+ 	if (parent) {
+ 		bt_accept_unlink(sk);
+ 		parent->sk_data_ready(parent, 0);
+@@ -404,6 +415,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 			test_bit(CONF_INPUT_DONE, &chan->conf_state)))
+ 		return;
+ 
++clean:
+ 	skb_queue_purge(&chan->tx_q);
+ 
+ 	if (chan->mode == L2CAP_MODE_ERTM) {
+@@ -1315,7 +1327,8 @@ static void l2cap_monitor_timeout(struct work_struct *work)
+ 	l2cap_chan_lock(chan);
+ 
+ 	if (chan->retry_count >= chan->remote_max_tx) {
+-		l2cap_send_disconn_req(chan->conn, chan, ECONNABORTED);
++		if (chan->chan_type != L2CAP_CHAN_CONN_FIX_A2MP)
++			l2cap_send_disconn_req(chan->conn, chan, ECONNABORTED);
+ 		l2cap_chan_unlock(chan);
+ 		l2cap_chan_put(chan);
+ 		return;
 -- 
 1.7.9.1
 
