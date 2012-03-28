@@ -1,44 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Mar 2012 11:33:36 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Remove unneeded zero initialization
-Message-ID: <20120328143336.GA3962@joana>
-References: <1332935794-15319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1332940001-20336-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: <james.steele@accenture.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <james.steele@accenture.com>
+Subject: [PATCH hcidump v3] Fix parsing of SSP debug mode HCI commands
+Date: Wed, 28 Mar 2012 14:31:57 +0000
+Message-ID: <81C9FA9C1C2E9E45A9AC3EDD1858BC4323E12489@048-CH1MPN1-101.048d.mgd.msft.net>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332940001-20336-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+---
+ parser/hci.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-03-28 16:06:41 +0300]:
+diff --git a/parser/hci.c b/parser/hci.c
+index e459e9e..7b7682a 100644
+--- a/parser/hci.c
++++ b/parser/hci.c
+@@ -373,7 +373,7 @@ static char *cmd_testing_str[CMD_TESTING_NUM + 1] = {
+        "Read Loopback Mode",
+        "Write Loopback Mode",
+        "Enable Device Under Test mode",
+-       "Unknown",
++       "Write Simple Pairing Debug Mode",
+ };
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Remove zero initialization since channel is allocated with kzalloc
-> in l2cap_chan_create.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/l2cap_sock.c |    1 -
->  1 files changed, 0 insertions(+), 1 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 53e563f..1d3e9c3 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -1011,7 +1011,6 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
->  		chan->tx_win = L2CAP_DEFAULT_TX_WINDOW;
->  		chan->tx_win_max = L2CAP_DEFAULT_TX_WINDOW;
->  		chan->sec_level = BT_SECURITY_LOW;
-> -		chan->flags = 0;
->  		set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
->  	}
+ #define CMD_LE_NUM 31
+--
+1.7.0.4
 
-Patch has been applied to bluetooth-next. Thanks.
 
-	Gustavo
+
+
+
+________________________________
+Subject to local law, communications with Accenture and its affiliates including telephone calls and emails (including content), may be monitored by our systems for the purposes of security and the assessment of internal compliance with Accenture policy.
+______________________________________________________________________________________
+
+www.accenture.com
+
