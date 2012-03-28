@@ -1,59 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Mar 2012 13:15:29 +0200 (CEST)
-From: Nicolas Pouillon <npouillon@freebox.fr>
+Date: Wed, 28 Mar 2012 12:50:16 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
 To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-input@vger.kernel.org, jkosina@suse.cz, chen ganir <chen.ganir@ti.com>,
-	claudio takahasi <claudio.takahasi@openbossa.org>,
-	jprvita@openbossa.org, linux-bluetooth@vger.kernel.org,
-	anderson lizardo <anderson.lizardo@openbossa.org>,
-	Marcel Holtmann <marcel@holtmann.org>
-Message-ID: <2052749237.3448849.1332933329806.JavaMail.root@zmc>
-In-Reply-To: <CANq1E4TnjzNG4sT_qt5qmrYMHp39HAJUcG1D4w=kcWoBkrThqA@mail.gmail.com>
-Subject: Re: [RFC v2 1/1] HID: User-space I/O driver support for HID
- subsystem
+Cc: linux-input@vger.kernel.org, chen.ganir@ti.com,
+	claudio.takahasi@openbossa.org, jprvita@openbossa.org,
+	linux-bluetooth@vger.kernel.org, anderson.lizardo@openbossa.org,
+	marcel@holtmann.org
+Subject: Re: [RFC v2 0/1] User-space HID I/O Driver
+In-Reply-To: <1332793209-2950-1-git-send-email-dh.herrmann@googlemail.com>
+Message-ID: <alpine.LNX.2.00.1203281243180.25526@pobox.suse.cz>
+References: <1332793209-2950-1-git-send-email-dh.herrmann@googlemail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-David,
+On Mon, 26 Mar 2012, David Herrmann wrote:
 
------ Original Message -----
+> This is the second revision of the UHID driver. It basically allows to register
+> hid_ll_drivers in user-space. This is needed to implement Bluetooth HoG (HID
+> over GATT) as discussed earlier.
+> 
+> Changes:
+>  - Improved documentation
+>  - Added example which emulates a 3-button mouse with wheel in user-space
+>  - Fixed some remaining bugs
+> 
+> I didn't change any major parts. I checked that writev/readv work correctly and
+> I documented how to use it in ./Documentation/hid/uhid.txt.
+> 
+> For a full example please see ./samples/uhid/uhid-example.c.
+> 
+> While developing it I also considered moving HIDP to user-space. If we do BT-HoG
+> in user-space, it should be easier to also move HIDP to user-space. The current
+> in-kernel HIDP is buggy, anyway.
+> 
+> Still open points:
+>  - How do I get a proper "parent" pointer for uhid->hid->dev.parent? I could use
+>    the uhid misc device as parent or is there some device-struct inside "struct
+>    file"?
 
-> >> + =C2=A0 =C2=A0 strncpy(hid->name, ev->u.create.name, 128);
-> >> + =C2=A0 =C2=A0 hid->name[127] =3D 0;
-> >> + =C2=A0 =C2=A0 hid->ll_driver =3D &uhid_hid_driver;
-> >> + =C2=A0 =C2=A0 hid->hid_get_raw_report =3D uhid_hid_get_raw;
-> >> + =C2=A0 =C2=A0 hid->hid_output_raw_report =3D uhid_hid_output_raw;
-> >> + =C2=A0 =C2=A0 hid->bus =3D ev->u.create.bus;
-> >> + =C2=A0 =C2=A0 hid->vendor =3D ev->u.create.vendor;
-> >> + =C2=A0 =C2=A0 hid->product =3D ev->u.create.product;
-> >> + =C2=A0 =C2=A0 hid->version =3D ev->u.create.version;
-> >> + =C2=A0 =C2=A0 hid->country =3D ev->u.create.country;
-> >> + =C2=A0 =C2=A0 hid->phys[0] =3D 0;
-> >> + =C2=A0 =C2=A0 hid->uniq[0] =3D 0;
-> >> + =C2=A0 =C2=A0 hid->driver_data =3D uhid;
-> >> + =C2=A0 =C2=A0 hid->dev.parent =3D uhid->parent;
-> >
-> > Here we have to make sure that we have all required information provide=
-d
-> > by userspace. Anything else that HID might require to work better. Or
-> > that BR/EDR or LE provides additionally over USB.
->=20
-> Beside phys and uniq I have copied all information that HIDP and
-> USBHID use. I haven't found any other field that could be of interest
-> here. We can also always add UHID_CREATE2 with additional fields to
-> allow further additions (or use a "size" field as you suggested
-> below).
+Misc device sounds like the best we could get. You can't really use 
+anything else from struct file than private_data and pointer to dentry 
+(but that's likely not something you'd like to be using here).
 
-HID report descriptor may reference Physical Descriptor (HID 6.2.3) and
-String Descriptor entries (USB 9.6.8, HID E.11).  Physical Descriptor
-blob could be another __user buffer + size in uhid_create_req.  String
-descriptor should probably be an event for querying strings.
+>  - Should user-space be able to provide "uniq" and "phys" names for HID-devices?
 
-hidraw interface also offers access to Feature Reports, adding events
-to send/receive and query (kernel querying uhid client) feature reports
-could be of some interest.
+I think so ... it would corelate with the in-kernel implementation, where 
+those are derived from real devices in the in-kernel driver.
 
-Cheers,
---=20
-Nicolas Pouillon
+>  - uhid_event is quite big (>4KB) which makes uhid_device really big (~70KB).
+>    Should I allocate the ring-buffer dynamically to avoid this?
+
+Yes, please.
+
+>  - Should I provide the quirks field to user-space? Probably as part of
+>    UHID_START?
+
+In order to have the situation mirroring what we already have, it might 
+make sense. On the other hand -- how about adding the propagation only 
+when it turns out that it's actually needed? (i.e. by finding out the 
+first device, for which we need that).
+
+>  - Could someone review x32 COMPAT stuff? I tried to align all the public
+>    structures correctly so I could even remove the __packed attribute. Anyway, I
+>    thought keeping it is probably better for future extensions.
+
+Will look into it.
+
+> I spent some time on the locks and they seem all fine. I couldn't find any
+> races.
+> 
+> Jiri, Marcel, could you review the design and tell me what you think?
+
+Generally, I like it. Thanks a lot for the effort. I will be going 
+through the code in a more detailed way hopefully by the end of this week 
+and will send you some comments (if any).
+
+Thanks,
+
+-- 
+Jiri Kosina
+SUSE Labs
