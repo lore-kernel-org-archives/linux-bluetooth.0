@@ -1,36 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Mar 2012 12:29:24 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
-Subject: Re: [PATCH V2 2/7] Set DeviceID when registering adapter not when
- sdp server is starting
-Message-ID: <20120328092924.GA23691@x220>
-References: <1332260847-20079-1-git-send-email-szymon.janc@tieto.com>
- <1332260847-20079-2-git-send-email-szymon.janc@tieto.com>
+Date: Wed, 28 Mar 2012 11:56:40 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 3/3] Bluetooth: Use address type info from User-space
+Message-ID: <20120328085638.GC21905@aemeltch-MOBL1>
+References: <1332892776-12060-1-git-send-email-andre.guedes@openbossa.org>
+ <1332892776-12060-4-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1332260847-20079-2-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1332892776-12060-4-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI Szymon,
+Hi Andre,
 
-On Tue, Mar 20, 2012, Szymon Janc wrote:
-> Adapter ops are registered after sdp server is started. Thus no
-> adapters were registered yet when setting DID on sdp startup and DID
-> was never set.
+On Tue, Mar 27, 2012 at 08:59:36PM -0300, Andre Guedes wrote:
+> In order to establish a LE connection we need the address type
+> information. User-space already pass this information to kernel
+> through struct sockaddr_l2.
+> 
+> This patch adds the dst_type parameter to l2cap_chan_connect so we
+> are able to pass the address type info from user-space down to
+> hci_conn layer.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
->  src/manager.c      |   15 ++++-----------
->  src/manager.h      |    1 -
->  src/sdpd-service.c |    3 ---
->  3 files changed, 4 insertions(+), 15 deletions(-)
+>  include/net/bluetooth/l2cap.h |    2 +-
+>  net/bluetooth/l2cap_core.c    |   11 ++++++-----
+>  net/bluetooth/l2cap_sock.c    |    2 +-
+>  3 files changed, 8 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index d14967e..262628c 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -911,7 +911,7 @@ struct l2cap_chan *l2cap_chan_create(void);
+>  void l2cap_chan_close(struct l2cap_chan *chan, int reason);
+>  void l2cap_chan_destroy(struct l2cap_chan *chan);
+>  int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+> -								bdaddr_t *dst);
+> +						bdaddr_t *dst, u8 dst_type);
+>  int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+>  								u32 priority);
+>  void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 91b02de..e0dc4ca 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1131,7 +1131,8 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr
+>  	return c1;
+>  }
+>  
+> -int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *dst)
+> +int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+> +			bdaddr_t *dst, u8 dst_type)
+>  {
+>  	struct sock *sk = chan->sk;
+>  	bdaddr_t *src = &bt_sk(sk)->src;
+> @@ -1141,8 +1142,8 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+>  	__u8 auth_type;
+>  	int err;
+>  
+> -	BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
+> -						__le16_to_cpu(chan->psm));
+> +	BT_DBG("%s -> %s (type %u) psm 0x%2.2x", batostr(src), batostr(dst),
+> +					dst_type, __le16_to_cpu(chan->psm));
 
-Compilation fails with this patch:
+If you change style for other functions you might change it here as well.
 
-src/manager.c: In function ‘btd_manager_register_adapter’:
-src/manager.c:416:15: error: ‘struct main_opts’ has no member named ‘did’
+>  
+>  	hdev = hci_get_route(dst, src);
+>  	if (!hdev)
+> @@ -1216,10 +1217,10 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+>  	auth_type = l2cap_get_auth_type(chan);
+>  
+>  	if (chan->dcid == L2CAP_CID_LE_DATA)
+> -		hcon = hci_connect(hdev, LE_LINK, dst, MGMT_ADDR_LE_RANDOM,
+> +		hcon = hci_connect(hdev, LE_LINK, dst, dst_type,
+>  					chan->sec_level, auth_type);
+>  	else
+> -		hcon = hci_connect(hdev, ACL_LINK, dst, MGMT_ADDR_BREDR,
+> +		hcon = hci_connect(hdev, ACL_LINK, dst, dst_type,
+>  					chan->sec_level, auth_type);
+>  
+>  	if (IS_ERR(hcon)) {
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 53e563f..4b38cf8 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -124,7 +124,7 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+>  		return -EINVAL;
+>  
+>  	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
+> -				&la.l2_bdaddr);
+> +				&la.l2_bdaddr, la.l2_bdaddr_type);
 
-Please fix and resend.
+Would it make sense to pass la as a parameter?
 
-Johan
+Best regards 
+Andrei Emeltchenko 
+
+
