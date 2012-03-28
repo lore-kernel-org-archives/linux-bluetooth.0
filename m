@@ -1,38 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Kris, Chen" <bluefrog2012@gmail.com>
+To: "'AceLan Kao'" <acelan.kao@canonical.com>,
+	<linux-bluetooth@vger.kernel.org>,
+	"'Gustavo F. Padovan'" <padovan@profusion.mobi>,
+	"'Marcel Holtmann'" <marcel@holtmann.org>
+References: <1331799788-20129-1-git-send-email-acelan.kao@canonical.com>
+In-Reply-To: <1331799788-20129-1-git-send-email-acelan.kao@canonical.com>
+Subject: RE: [PATCH] Bluetooth: Add support for AR3012 [0cf3:e004]
+Date: Wed, 28 Mar 2012 21:44:00 +0800
+Message-ID: <000601cd0ce8$ddf02020$99d06060$@com>
 MIME-Version: 1.0
-In-Reply-To: <20120328082641.GA21905@aemeltch-MOBL1>
-References: <1332887487-13601-1-git-send-email-jprvita@openbossa.org>
-	<1332887487-13601-3-git-send-email-jprvita@openbossa.org>
-	<20120328082641.GA21905@aemeltch-MOBL1>
-Date: Wed, 28 Mar 2012 10:55:18 -0300
-Message-ID: <CAAngNMYY=8Vpoh4izC-NXw0fnpUcS3fawu3ZGCCA5CVtzVypew@mail.gmail.com>
-Subject: Re: [RFC 2/8] HoG: register ATTIO callbacks
-From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	=?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>,
-	linux-bluetooth@vger.kernel.org, dh.herrmann@googlemail.com,
-	chen.ganir@ti.com
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain;
+	charset="gb2312"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGVsbG8gQW5kcmVpLAoKMjAxMi8zLzI4IEFuZHJlaSBFbWVsdGNoZW5rbyA8YW5kcmVpLmVtZWx0
-Y2hlbmtvLm5ld3NAZ21haWwuY29tPjoKPiBIaSBKb8OjbywKPgo+IE1pbm9yIGNvbW1lbnRzOgo+
-Cj4gT24gVHVlLCBNYXIgMjcsIDIwMTIgYXQgMDc6MzE6MjFQTSAtMDMwMCwgSm/Do28gUGF1bG8g
-UmVjaGkgVml0YSB3cm90ZToKPiAuLi4KPj4gK3N0YXRpYyBzdHJ1Y3QgaG9nX2RldmljZSAqaG9n
-X2RldmljZV9uZXcoc3RydWN0IGJ0ZF9kZXZpY2UgKmRldmljZSwKPj4gKyDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCBjb25zdCBjaGFyICpwYXRoKQo+PiArewo+IC4uLgo+PiArCj4+ICsgwqAgwqAgaG9n
-ZGV2LT5hdHRpb2lkID0gYnRkX2RldmljZV9hZGRfYXR0aW9fY2FsbGJhY2soZGV2aWNlLAo+PiAr
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIGF0dGlvX2Nvbm5lY3RlZF9jYiwKPj4gKyDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCBhdHRpb19kaXNjb25uZWN0ZWRfY2IsCj4+ICsgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgaG9nZGV2KTsKPgo+IFdoYXQgaXMgdGhlIGNvZGluZyBzdHlsZSBmb3IgdGhlIHVzZXJzcGFj
-ZT8gU2hhbGwgaXQgYmUgYXQgbGVhc3QgdGhlIHNhbWU/Cj4KClVubGVzcyBzb21ldGhpbmcgaGFz
-IGNoYW5nZWQgbGF0ZWx5IHdlIHVzZSB0aGUga2VybmVsIGNvZGluZyBzdHlsZS4gSQpkb24ndCBz
-ZWUgd2hlcmUgSSBkaWRuJ3QgZm9sbG93IGl0IGhlcmUsIGJ1dCBJIG1heSBiZSBtaXNzaW5nCnNv
-bWV0aGluZy4gQ2FuIHlvdSBwbGVhc2UgcG9pbnQgbWUgd2hhdCBJJ20gbWlzc2luZyBpZiB0aGF0
-IGlzIHRoZQpjYXNlPwoKLS0gCkpvw6NvIFBhdWxvIFJlY2hpIFZpdGEKT3BlbmJvc3NhIExhYnMg
-LSBJTmRUCg==
+Hi, Acelan
+
+I want to know, compared with { USB_DEVICE(0x0CF3, 0x3004) }, is {
+USB_DEVICE(0x0CF3, 0xE004) } a new product of Atheros, or for a specific
+customer of Atheros?
+
+Thanks!
+
+Kris
+
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org
+[mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of AceLan Kao
+Sent: 2012=C4=EA3=D4=C215=C8=D5 16:23
+To: linux-bluetooth@vger.kernel.org; Gustavo F. Padovan; Marcel Holtmann
+Subject: [PATCH] Bluetooth: Add support for AR3012 [0cf3:e004]
+
+Add another vendor specific ID for Atheros AR3012
+
+output of usb-devices:
+T:  Bus=3D02 Lev=3D02 Prnt=3D02 Port=3D04 Cnt=3D01 Dev#=3D  4 Spd=3D12  =
+MxCh=3D 0
+D:  Ver=3D 1.10 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
+P:  Vendor=3D0cf3 ProdID=3De004 Rev=3D00.02
+S:  Manufacturer=3DAtheros Communications
+S:  Product=3DBluetooth USB Host Controller
+S:  SerialNumber=3DAlaska Day 2006
+C:  #Ifs=3D 2 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
+I:  If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 =
+Driver=3Dbtusb
+I:  If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 =
+Driver=3Dbtusb
+
+BugLink: https://bugs.launchpad.net/bugs/922715
+
+Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+---
+ drivers/bluetooth/ath3k.c |    2 ++
+ drivers/bluetooth/btusb.c |    1 +
+ 2 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 07f14d1..b55fc76 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -71,6 +71,7 @@ static struct usb_device_id ath3k_table[] =3D {
+=20
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0CF3, 0x3004) },
++	{ USB_DEVICE(0x0CF3, 0xE004) },
+=20
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -87,6 +88,7 @@ static struct usb_device_id ath3k_blist_tbl[] =3D {
+=20
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info =3D BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info =3D BTUSB_ATH3012 },
+=20
+ 	{ }	/* Terminating entry */
+ };
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 789c9b5..2b7d2d1 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -127,6 +127,7 @@ static struct usb_device_id blacklist_table[] =3D {
+=20
+ 	/* Atheros 3012 with sflash firmware */
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info =3D BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info =3D BTUSB_ATH3012 },
+=20
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info =3D BTUSB_IGNORE },
+--=20
+1.7.9.1
+
+--
+To unsubscribe from this list: send the line "unsubscribe =
+linux-bluetooth"
+in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
