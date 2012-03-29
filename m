@@ -1,50 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 29 Mar 2012 13:45:21 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Don Zickus <dzickus@redhat.com>, linux-bluetooth@vger.kernel.org,
+	Oliver Neukum <oliver@neukum.org>
+Subject: Re: [PATCH] btusb: typo in Broadcom SoftSailing id
+Message-ID: <20120329104521.GA26489@x220>
+References: <1332967271-1743-1-git-send-email-dzickus@redhat.com>
+ <1332987446.1870.169.camel@aeonflux>
 MIME-Version: 1.0
-In-Reply-To: <20120329102232.GD23176@x220>
-References: <1332948405-1104-1-git-send-email-chen.ganir@ti.com>
-	<1332948405-1104-6-git-send-email-chen.ganir@ti.com>
-	<20120329102232.GD23176@x220>
-Date: Thu, 29 Mar 2012 06:45:30 -0400
-Message-ID: <CAJdJm_PEh9FZBMojKujrdvTy4pGUZ3YVa39WrjecqOXY67Y-_g@mail.gmail.com>
-Subject: Re: [PATCH v3 5/5] DeviceInfo: Read PNP ID
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: chen.ganir@ti.com, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1332987446.1870.169.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen/Johan,
+Hi,
 
-On Thu, Mar 29, 2012 at 6:22 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Chen,
->
-> On Wed, Mar 28, 2012, chen.ganir@ti.com wrote:
->> +     if (status != 0) {
->> +             DBG("value read failed: %s",
->> +                                                     att_ecode2str(status));
->
-> Why is this split into two lines. The call can easily fit within 80
-> chars with all of its parameters. Also, this should be error() and not
-> DBG().
->
->> +     if (!dec_read_resp(pdu, len, value, &vlen)) {
->> +             DBG("Protocol error\n");
->
-> This should be error() and the \n at the end should be removed.
+On Thu, Mar 29, 2012, Marcel Holtmann wrote:
+> > I was trying to backport the following commit to RHEL-6
+> > 
+> >     From 0cea73465cd22373c5cd43a3edd25fbd4bb532ef Mon Sep 17 00:00:00 2001
+> >     From: Oliver Neukum <oliver@neukum.org>
+> >     Date: Wed, 21 Sep 2011 11:37:15 +0200
+> >     Subject: [PATCH] btusb: add device entry for Broadcom SoftSailing
+> > 
+> > and noticed it wasn't working on an HP Elitebook.  Looking into the patch I
+> > noticed a very subtle typo in the ids.  The patch has '0x05ac' instead of
+> > '0x0a5c'.  A snippet of the lsusb -v output also shows this:
+> > 
+> > Bus 002 Device 003: ID 0a5c:21e1 Broadcom Corp.
+> > Device Descriptor:
+> >   bLength                18
+> >   bDescriptorType         1
+> >   bcdUSB               2.00
+> >   bDeviceClass          255 Vendor Specific Class
+> >   bDeviceSubClass         1
+> >   bDeviceProtocol         1
+> >   bMaxPacketSize0        64
+> >   idVendor           0x0a5c Broadcom Corp.
+> >   idProduct          0x21e1
+> >   bcdDevice            1.12
+> >   iManufacturer           1 Broadcom Corp
+> >   iProduct                2 BCM20702A0
+> >   iSerial                 3 60D819F0338C
+> >   bNumConfigurations      1
+> > 
+> > Looking at other Broadcom ids, the fix matches them whereas the original patch
+> > matches Apple's ids.
+> > 
+> > Tested on an HP Elitebook 8760w.  The btusb binds and the userspace stuff loads
+> > correctly.
+> > 
+> > Cc: Oliver Neukum <oliver@neukum.org>
+> > Signed-off-by: Don Zickus <dzickus@redhat.com>
+> > ---
+> >  drivers/bluetooth/btusb.c |    2 +-
+> >  1 files changed, 1 insertions(+), 1 deletions(-)
+> > 
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index 789c9b5..86d9712 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -61,7 +61,7 @@ static struct usb_device_id btusb_table[] = {
+> >  	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
+> >  
+> >  	/* Broadcom SoftSailing reporting vendor specific */
+> > -	{ USB_DEVICE(0x05ac, 0x21e1) },
+> > +	{ USB_DEVICE(0x0a5c, 0x21e1) },
+> 
+> good catch. And this also should go into -stable as well.
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Just to complement: if using error(), be sure to use a more meaningful
-error message, because the source file and function name will not
-appear on the log in this case.
+Applied to both bluetooth and bluetooth-next. Thanks.
 
-E.g.
-"Could not read PNP ID value: %s"
-"ATT protocol error while reading PNP ID"
-
-Also, there is no need to add "\n" to DBG() or error(), they are added
-automatically.
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
