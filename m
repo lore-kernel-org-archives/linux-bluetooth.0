@@ -1,24 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Mar 2012 21:25:24 -0400 (EDT)
-Message-Id: <20120328.212524.1423286973836820167.davem@davemloft.net>
-To: keithp@keithp.com
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        marcel@holtmann.org, johan.hedberg@intel.com
-Subject: Re: [PATCH] Revert "Bluetooth: Always enable management interface"
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <1332983958-2734-1-git-send-email-keithp@keithp.com>
-References: <1332983958-2734-1-git-send-email-keithp@keithp.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+From: Keith Packard <keithp@keithp.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@intel.com>,
+	Keith Packard <keithp@keithp.com>
+Subject: [PATCH] Revert "Bluetooth: Always enable management interface"
+Date: Wed, 28 Mar 2012 18:19:18 -0700
+Message-Id: <1332983958-2734-1-git-send-email-keithp@keithp.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Keith Packard <keithp@keithp.com>
-Date: Wed, 28 Mar 2012 18:19:18 -0700
+This reverts commit 4b95a24ce12c4545fd7d2e3075841dc3119d1d71.
 
-> This reverts commit 4b95a24ce12c4545fd7d2e3075841dc3119d1d71.
-> 
-> My USB bluetooth device does not show up with this patch in place.
-> 
-> Signed-off-by: Keith Packard <keithp@keithp.com>
+My USB bluetooth device does not show up with this patch in place.
 
-Bluetooth folks please look over this, thanks.
+Signed-off-by: Keith Packard <keithp@keithp.com>
+---
+
+This patch seems so innocuous, but when added to the kernel, it keeps
+my USB bluetooth device from appearing to user mode at all. With the
+mgmt interface enabled:
+
+	$ hcitool dev
+	Devices:
+
+With this patch reverted:
+
+	$ hcitool dev
+	Devices:
+		hci0	04:0C:CE:DF:7B:C9
+
+I bisected to this revision, and then reverted it on top of version
+
+	v3.3-6972-ge22057c	e22057c8599373e5caef0bc42bdb95d2a361ab0d
+
+(which is where I'm trying to move drm-intel-fixes to)
+
+I think this is the third consecutive merge window that has broken my
+bluetooth interface in some way? At least I know enough to check
+now...
+
+ net/bluetooth/hci_sock.c |    7 ++++++-
+ 1 files changed, 6 insertions(+), 1 deletions(-)
+
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 63afd23..d8b16cf 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -50,6 +50,8 @@
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/hci_mon.h>
+ 
++static bool enable_mgmt;
++
+ static atomic_t monitor_promisc = ATOMIC_INIT(0);
+ 
+ /* ----- HCI socket interface ----- */
+@@ -649,7 +651,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
+ 		break;
+ 
+ 	case HCI_CHANNEL_CONTROL:
+-		if (haddr.hci_dev != HCI_DEV_NONE) {
++		if (haddr.hci_dev != HCI_DEV_NONE || !enable_mgmt) {
+ 			err = -EINVAL;
+ 			goto done;
+ 		}
+@@ -1127,3 +1129,6 @@ void hci_sock_cleanup(void)
+ 
+ 	proto_unregister(&hci_sk_proto);
+ }
++
++module_param(enable_mgmt, bool, 0644);
++MODULE_PARM_DESC(enable_mgmt, "Enable Management interface");
+-- 
+1.7.9
