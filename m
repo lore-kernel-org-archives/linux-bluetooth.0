@@ -1,43 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 29 Mar 2012 13:19:14 +0300
+Date: Thu, 29 Mar 2012 13:18:03 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: chen.ganir@ti.com
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 4/5] Fix device version in GetProperties
-Message-ID: <20120329101914.GC23176@x220>
+Subject: Re: [PATCH v3 3/5] DeviceInfo: Discover Characteristics
+Message-ID: <20120329101803.GB23176@x220>
 References: <1332948405-1104-1-git-send-email-chen.ganir@ti.com>
- <1332948405-1104-5-git-send-email-chen.ganir@ti.com>
+ <1332948405-1104-4-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332948405-1104-5-git-send-email-chen.ganir@ti.com>
+In-Reply-To: <1332948405-1104-4-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Chen,
 
 On Wed, Mar 28, 2012, chen.ganir@ti.com wrote:
-> From: Chen Ganir <chen.ganir@ti.com>
-> 
-> Fix how device version is added to the property dictionay.
-> ---
->  src/device.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/src/device.c b/src/device.c
-> index eab7e4c..3b772ee 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -383,7 +383,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
->  							&device->product);
+> +static void char_free(gpointer user_data)
+> +{
+> +	struct characteristic *c = user_data;
+> +
+> +	g_free(c);
+> +}
+> +
+>  static void deviceinfo_free(gpointer user_data)
+>  {
+>  	struct deviceinfo *d = user_data;
+> @@ -55,7 +71,11 @@ static void deviceinfo_free(gpointer user_data)
+>  	if (d->attrib != NULL)
+>  		g_attrib_unref(d->attrib);
 >  
->  	/* Version */
-> -	if (device->product)
-> +	if (device->version)
->  		dict_append_entry(&dict, "Version", DBUS_TYPE_UINT16,
->  							&device->version);
->  
+> +	if (d->chars != NULL)
+> +		g_slist_free_full(d->chars, char_free);
 
-This one has been pushed upstream so no need to resend it for v4 of this
-set.
+You don't need to check for NULL before calling g_slist_free_full since
+NULL is a valid GSList (signifying an empty list). You also don't really
+need the char_free function but could simply do:
+
+	g_slist_free_full(d->chars, g_free);
 
 Johan
