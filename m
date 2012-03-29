@@ -1,76 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <2052749237.3448849.1332933329806.JavaMail.root@zmc>
-References: <CANq1E4TnjzNG4sT_qt5qmrYMHp39HAJUcG1D4w=kcWoBkrThqA@mail.gmail.com>
-	<2052749237.3448849.1332933329806.JavaMail.root@zmc>
-Date: Thu, 29 Mar 2012 14:28:01 +0200
-Message-ID: <CANq1E4Qy4aF1PJdyF2wWVH7bDGypy1roHvVmyhRUV8CNd4_NrA@mail.gmail.com>
-Subject: Re: [RFC v2 1/1] HID: User-space I/O driver support for HID subsystem
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: Nicolas Pouillon <npouillon@freebox.fr>
-Cc: linux-input@vger.kernel.org, jkosina@suse.cz,
-	chen ganir <chen.ganir@ti.com>, claudio takahasi <claudio.takahasi@openbossa.org>,
-	jprvita@openbossa.org, linux-bluetooth@vger.kernel.org,
-	anderson lizardo <anderson.lizardo@openbossa.org>, Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20120329102232.GD23176@x220>
+References: <1332948405-1104-1-git-send-email-chen.ganir@ti.com>
+	<1332948405-1104-6-git-send-email-chen.ganir@ti.com>
+	<20120329102232.GD23176@x220>
+Date: Thu, 29 Mar 2012 06:45:30 -0400
+Message-ID: <CAJdJm_PEh9FZBMojKujrdvTy4pGUZ3YVa39WrjecqOXY67Y-_g@mail.gmail.com>
+Subject: Re: [PATCH v3 5/5] DeviceInfo: Read PNP ID
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: chen.ganir@ti.com, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nicolas
+Hi Chen/Johan,
 
-On Wed, Mar 28, 2012 at 1:15 PM, Nicolas Pouillon <npouillon@freebox.fr> wr=
-ote:
-> David,
+On Thu, Mar 29, 2012 at 6:22 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Chen,
 >
-> ----- Original Message -----
+> On Wed, Mar 28, 2012, chen.ganir@ti.com wrote:
+>> +     if (status != 0) {
+>> +             DBG("value read failed: %s",
+>> +                                                     att_ecode2str(status));
 >
->> >> + =A0 =A0 strncpy(hid->name, ev->u.create.name, 128);
->> >> + =A0 =A0 hid->name[127] =3D 0;
->> >> + =A0 =A0 hid->ll_driver =3D &uhid_hid_driver;
->> >> + =A0 =A0 hid->hid_get_raw_report =3D uhid_hid_get_raw;
->> >> + =A0 =A0 hid->hid_output_raw_report =3D uhid_hid_output_raw;
->> >> + =A0 =A0 hid->bus =3D ev->u.create.bus;
->> >> + =A0 =A0 hid->vendor =3D ev->u.create.vendor;
->> >> + =A0 =A0 hid->product =3D ev->u.create.product;
->> >> + =A0 =A0 hid->version =3D ev->u.create.version;
->> >> + =A0 =A0 hid->country =3D ev->u.create.country;
->> >> + =A0 =A0 hid->phys[0] =3D 0;
->> >> + =A0 =A0 hid->uniq[0] =3D 0;
->> >> + =A0 =A0 hid->driver_data =3D uhid;
->> >> + =A0 =A0 hid->dev.parent =3D uhid->parent;
->> >
->> > Here we have to make sure that we have all required information provid=
-ed
->> > by userspace. Anything else that HID might require to work better. Or
->> > that BR/EDR or LE provides additionally over USB.
->>
->> Beside phys and uniq I have copied all information that HIDP and
->> USBHID use. I haven't found any other field that could be of interest
->> here. We can also always add UHID_CREATE2 with additional fields to
->> allow further additions (or use a "size" field as you suggested
->> below).
+> Why is this split into two lines. The call can easily fit within 80
+> chars with all of its parameters. Also, this should be error() and not
+> DBG().
 >
-> HID report descriptor may reference Physical Descriptor (HID 6.2.3) and
-> String Descriptor entries (USB 9.6.8, HID E.11). =A0Physical Descriptor
-> blob could be another __user buffer + size in uhid_create_req. =A0String
-> descriptor should probably be an event for querying strings.
+>> +     if (!dec_read_resp(pdu, len, value, &vlen)) {
+>> +             DBG("Protocol error\n");
+>
+> This should be error() and the \n at the end should be removed.
 
-I haven't seen that hid-core uses them? I pass the report-descriptor
-to hid_parse_report() and I don't see a way to pass in the phys-desc
-or string-descriptors. Neither USBHID nor HIDP uses them or am I
-missing something here?
-Anyway, we can always add them with a UHID_CREATE_EXT or similar
-command later if hid-core adds support for them.
+Just to complement: if using error(), be sure to use a more meaningful
+error message, because the source file and function name will not
+appear on the log in this case.
 
-> hidraw interface also offers access to Feature Reports, adding events
-> to send/receive and query (kernel querying uhid client) feature reports
-> could be of some interest.
+E.g.
+"Could not read PNP ID value: %s"
+"ATT protocol error while reading PNP ID"
 
-Yeah, I haven't implemented this (yet) and I return -EOPNOTSUPP.
-However, it's on my TODO list. Thanks!
+Also, there is no need to add "\n" to DBG() or error(), they are added
+automatically.
 
-> Cheers,
-> --
-> Nicolas Pouillon
-
-Thanks
-David
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
