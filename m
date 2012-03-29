@@ -1,42 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: chen.ganir@ti.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH v4 0/4] Add DeviceInformationService plugin
-Date: Thu, 29 Mar 2012 15:52:53 +0200
-Message-Id: <1333029177-15204-1-git-send-email-chen.ganir@ti.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <2052749237.3448849.1332933329806.JavaMail.root@zmc>
+References: <CANq1E4TnjzNG4sT_qt5qmrYMHp39HAJUcG1D4w=kcWoBkrThqA@mail.gmail.com>
+	<2052749237.3448849.1332933329806.JavaMail.root@zmc>
+Date: Thu, 29 Mar 2012 14:28:01 +0200
+Message-ID: <CANq1E4Qy4aF1PJdyF2wWVH7bDGypy1roHvVmyhRUV8CNd4_NrA@mail.gmail.com>
+Subject: Re: [RFC v2 1/1] HID: User-space I/O driver support for HID subsystem
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: Nicolas Pouillon <npouillon@freebox.fr>
+Cc: linux-input@vger.kernel.org, jkosina@suse.cz,
+	chen ganir <chen.ganir@ti.com>, claudio takahasi <claudio.takahasi@openbossa.org>,
+	jprvita@openbossa.org, linux-bluetooth@vger.kernel.org,
+	anderson lizardo <anderson.lizardo@openbossa.org>, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Ganir <chen.ganir@ti.com>
+Hi Nicolas
 
-Add Device Information Service GATT Client for reading peer
-device PNP_ID and store it.
+On Wed, Mar 28, 2012 at 1:15 PM, Nicolas Pouillon <npouillon@freebox.fr> wr=
+ote:
+> David,
+>
+> ----- Original Message -----
+>
+>> >> + =A0 =A0 strncpy(hid->name, ev->u.create.name, 128);
+>> >> + =A0 =A0 hid->name[127] =3D 0;
+>> >> + =A0 =A0 hid->ll_driver =3D &uhid_hid_driver;
+>> >> + =A0 =A0 hid->hid_get_raw_report =3D uhid_hid_get_raw;
+>> >> + =A0 =A0 hid->hid_output_raw_report =3D uhid_hid_output_raw;
+>> >> + =A0 =A0 hid->bus =3D ev->u.create.bus;
+>> >> + =A0 =A0 hid->vendor =3D ev->u.create.vendor;
+>> >> + =A0 =A0 hid->product =3D ev->u.create.product;
+>> >> + =A0 =A0 hid->version =3D ev->u.create.version;
+>> >> + =A0 =A0 hid->country =3D ev->u.create.country;
+>> >> + =A0 =A0 hid->phys[0] =3D 0;
+>> >> + =A0 =A0 hid->uniq[0] =3D 0;
+>> >> + =A0 =A0 hid->driver_data =3D uhid;
+>> >> + =A0 =A0 hid->dev.parent =3D uhid->parent;
+>> >
+>> > Here we have to make sure that we have all required information provid=
+ed
+>> > by userspace. Anything else that HID might require to work better. Or
+>> > that BR/EDR or LE provides additionally over USB.
+>>
+>> Beside phys and uniq I have copied all information that HIDP and
+>> USBHID use. I haven't found any other field that could be of interest
+>> here. We can also always add UHID_CREATE2 with additional fields to
+>> allow further additions (or use a "size" field as you suggested
+>> below).
+>
+> HID report descriptor may reference Physical Descriptor (HID 6.2.3) and
+> String Descriptor entries (USB 9.6.8, HID E.11). =A0Physical Descriptor
+> blob could be another __user buffer + size in uhid_create_req. =A0String
+> descriptor should probably be an event for querying strings.
 
-This is v4 of the patch set, fixing issues raised in the mailing list
+I haven't seen that hid-core uses them? I pass the report-descriptor
+to hid_parse_report() and I don't see a way to pass in the phys-desc
+or string-descriptors. Neither USBHID nor HIDP uses them or am I
+missing something here?
+Anyway, we can always add them with a UHID_CREATE_EXT or similar
+command later if hid-core adds support for them.
 
-Chen Ganir (4):
-  Add DeviceInformation GATT Client
-  DeviceInfo: Add connection logic
-  DeviceInfo: Discover Characteristics
-  DeviceInfo: Read PNP ID
+> hidraw interface also offers access to Feature Reports, adding events
+> to send/receive and query (kernel querying uhid client) feature reports
+> could be of some interest.
 
- Makefile.am             |    9 ++-
- deviceinfo/deviceinfo.c |  194 +++++++++++++++++++++++++++++++++++++++++++++++
- deviceinfo/deviceinfo.h |   24 ++++++
- deviceinfo/main.c       |   52 +++++++++++++
- deviceinfo/manager.c    |   82 ++++++++++++++++++++
- deviceinfo/manager.h    |   24 ++++++
- doc/device-api.txt      |    4 +
- src/device.c            |   33 ++++++++
- src/device.h            |    3 +
- 9 files changed, 422 insertions(+), 3 deletions(-)
- create mode 100644 deviceinfo/deviceinfo.c
- create mode 100644 deviceinfo/deviceinfo.h
- create mode 100644 deviceinfo/main.c
- create mode 100644 deviceinfo/manager.c
- create mode 100644 deviceinfo/manager.h
+Yeah, I haven't implemented this (yet) and I return -EOPNOTSUPP.
+However, it's on my TODO list. Thanks!
 
--- 
-1.7.4.1
+> Cheers,
+> --
+> Nicolas Pouillon
 
+Thanks
+David
