@@ -1,76 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 29 Mar 2012 13:45:21 +0300
+Date: Thu, 29 Mar 2012 13:29:13 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Don Zickus <dzickus@redhat.com>, linux-bluetooth@vger.kernel.org,
-	Oliver Neukum <oliver@neukum.org>
-Subject: Re: [PATCH] btusb: typo in Broadcom SoftSailing id
-Message-ID: <20120329104521.GA26489@x220>
-References: <1332967271-1743-1-git-send-email-dzickus@redhat.com>
- <1332987446.1870.169.camel@aeonflux>
+To: chen.ganir@ti.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/4] Add Property Changed callbacks to btd_device
+Message-ID: <20120329102913.GA24543@x220>
+References: <1332945989-375-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332987446.1870.169.camel@aeonflux>
+In-Reply-To: <1332945989-375-1-git-send-email-chen.ganir@ti.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Chen,
 
-On Thu, Mar 29, 2012, Marcel Holtmann wrote:
-> > I was trying to backport the following commit to RHEL-6
-> > 
-> >     From 0cea73465cd22373c5cd43a3edd25fbd4bb532ef Mon Sep 17 00:00:00 2001
-> >     From: Oliver Neukum <oliver@neukum.org>
-> >     Date: Wed, 21 Sep 2011 11:37:15 +0200
-> >     Subject: [PATCH] btusb: add device entry for Broadcom SoftSailing
-> > 
-> > and noticed it wasn't working on an HP Elitebook.  Looking into the patch I
-> > noticed a very subtle typo in the ids.  The patch has '0x05ac' instead of
-> > '0x0a5c'.  A snippet of the lsusb -v output also shows this:
-> > 
-> > Bus 002 Device 003: ID 0a5c:21e1 Broadcom Corp.
-> > Device Descriptor:
-> >   bLength                18
-> >   bDescriptorType         1
-> >   bcdUSB               2.00
-> >   bDeviceClass          255 Vendor Specific Class
-> >   bDeviceSubClass         1
-> >   bDeviceProtocol         1
-> >   bMaxPacketSize0        64
-> >   idVendor           0x0a5c Broadcom Corp.
-> >   idProduct          0x21e1
-> >   bcdDevice            1.12
-> >   iManufacturer           1 Broadcom Corp
-> >   iProduct                2 BCM20702A0
-> >   iSerial                 3 60D819F0338C
-> >   bNumConfigurations      1
-> > 
-> > Looking at other Broadcom ids, the fix matches them whereas the original patch
-> > matches Apple's ids.
-> > 
-> > Tested on an HP Elitebook 8760w.  The btusb binds and the userspace stuff loads
-> > correctly.
-> > 
-> > Cc: Oliver Neukum <oliver@neukum.org>
-> > Signed-off-by: Don Zickus <dzickus@redhat.com>
-> > ---
-> >  drivers/bluetooth/btusb.c |    2 +-
-> >  1 files changed, 1 insertions(+), 1 deletions(-)
-> > 
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 789c9b5..86d9712 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -61,7 +61,7 @@ static struct usb_device_id btusb_table[] = {
-> >  	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
-> >  
-> >  	/* Broadcom SoftSailing reporting vendor specific */
-> > -	{ USB_DEVICE(0x05ac, 0x21e1) },
-> > +	{ USB_DEVICE(0x0a5c, 0x21e1) },
+On Wed, Mar 28, 2012, chen.ganir@ti.com wrote:
+> Add a callback mechanism for the btd_device, allowing other parts of
+> the bluez stack to receive notifications for device properties which
+> are changed. This mechanism is based on the D-BUS API for Device
+> PropertyChanged.
 > 
-> good catch. And this also should go into -stable as well.
+> Chen Ganir (4):
+>   Add property changed callback
+>   Centralize property changed events
+>   Use macros instead of strings
+>   Call registered callbacks
 > 
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+>  src/device.c |  223 +++++++++++++++++++++++++++++++++++++++++++++++++---------
+>  src/device.h |   93 ++++++++++++++++++++++++
+>  2 files changed, 281 insertions(+), 35 deletions(-)
 
-Applied to both bluetooth and bluetooth-next. Thanks.
+I don't think all this extra code is necessary for exposing a single
+device parameter like you described in the use case that you need this
+for.  Instead we could consider introducing a callback specific to this
+very information.
+
+If some time in the future the amount of similar callbacks grows for
+various device parameters we could consider creating something more
+generic for them however even then that wouldn't be based on top of
+D-Bus properties (the inverse might be possible though: handling the
+D-Bus property signals using this generic framework).
 
 Johan
