@@ -1,76 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1332987446.1870.169.camel@aeonflux>
-Subject: Re: [PATCH] btusb: typo in Broadcom SoftSailing id
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Don Zickus <dzickus@redhat.com>
-Cc: linux-bluetooth@vger.kernel.org, Oliver Neukum <oliver@neukum.org>
-Date: Thu, 29 Mar 2012 04:17:26 +0200
-In-Reply-To: <1332967271-1743-1-git-send-email-dzickus@redhat.com>
-References: <1332967271-1743-1-git-send-email-dzickus@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: AceLan Kao <acelan@gmail.com>
+From: AceLan Kao <acelan.kao@canonical.com>
+To: linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Add support for AR3012 [0cf3:e004]
+Date: Thu, 29 Mar 2012 10:14:15 +0800
+Message-Id: <1332987256-7618-1-git-send-email-acelan.kao@canonical.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Don,
+Add another vendor specific ID for Atheros AR3012
 
-> I was trying to backport the following commit to RHEL-6
-> 
->     From 0cea73465cd22373c5cd43a3edd25fbd4bb532ef Mon Sep 17 00:00:00 2001
->     From: Oliver Neukum <oliver@neukum.org>
->     Date: Wed, 21 Sep 2011 11:37:15 +0200
->     Subject: [PATCH] btusb: add device entry for Broadcom SoftSailing
-> 
-> and noticed it wasn't working on an HP Elitebook.  Looking into the patch I
-> noticed a very subtle typo in the ids.  The patch has '0x05ac' instead of
-> '0x0a5c'.  A snippet of the lsusb -v output also shows this:
-> 
-> Bus 002 Device 003: ID 0a5c:21e1 Broadcom Corp.
-> Device Descriptor:
->   bLength                18
->   bDescriptorType         1
->   bcdUSB               2.00
->   bDeviceClass          255 Vendor Specific Class
->   bDeviceSubClass         1
->   bDeviceProtocol         1
->   bMaxPacketSize0        64
->   idVendor           0x0a5c Broadcom Corp.
->   idProduct          0x21e1
->   bcdDevice            1.12
->   iManufacturer           1 Broadcom Corp
->   iProduct                2 BCM20702A0
->   iSerial                 3 60D819F0338C
->   bNumConfigurations      1
-> 
-> Looking at other Broadcom ids, the fix matches them whereas the original patch
-> matches Apple's ids.
-> 
-> Tested on an HP Elitebook 8760w.  The btusb binds and the userspace stuff loads
-> correctly.
-> 
-> Cc: Oliver Neukum <oliver@neukum.org>
-> Signed-off-by: Don Zickus <dzickus@redhat.com>
-> ---
->  drivers/bluetooth/btusb.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 789c9b5..86d9712 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -61,7 +61,7 @@ static struct usb_device_id btusb_table[] = {
->  	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
->  
->  	/* Broadcom SoftSailing reporting vendor specific */
-> -	{ USB_DEVICE(0x05ac, 0x21e1) },
-> +	{ USB_DEVICE(0x0a5c, 0x21e1) },
+output of usb-devices:
+T:  Bus=02 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  4 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=e004 Rev=00.02
+S:  Manufacturer=Atheros Communications
+S:  Product=Bluetooth USB Host Controller
+S:  SerialNumber=Alaska Day 2006
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-good catch. And this also should go into -stable as well.
+BugLink: https://bugs.launchpad.net/bugs/922715
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+---
+ drivers/bluetooth/ath3k.c |    2 ++
+ drivers/bluetooth/btusb.c |    1 +
+ 2 files changed, 3 insertions(+), 0 deletions(-)
 
-Regards
-
-Marcel
-
-
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index ae9edca..e35a9c8 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -75,6 +75,7 @@ static struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x0CF3, 0x311D) },
+ 	{ USB_DEVICE(0x13d3, 0x3375) },
+ 	{ USB_DEVICE(0x04CA, 0x3005) },
++	{ USB_DEVICE(0x0CF3, 0xE004) },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -94,6 +95,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x0cf3, 0x311D), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 
+ 	{ }	/* Terminating entry */
+ };
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index ba89cd0..74f1ee4 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -133,6 +133,7 @@ static struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+-- 
+1.7.9.1
