@@ -1,89 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1332987941.1870.176.camel@aeonflux>
-Subject: Re: [PATCH] Revert "Bluetooth: Always enable management interface"
+Message-ID: <1332987446.1870.169.camel@aeonflux>
+Subject: Re: [PATCH] btusb: typo in Broadcom SoftSailing id
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Keith Packard <keithp@keithp.com>
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@intel.com>
-Date: Thu, 29 Mar 2012 04:25:41 +0200
-In-Reply-To: <1332983958-2734-1-git-send-email-keithp@keithp.com>
-References: <1332983958-2734-1-git-send-email-keithp@keithp.com>
+To: Don Zickus <dzickus@redhat.com>
+Cc: linux-bluetooth@vger.kernel.org, Oliver Neukum <oliver@neukum.org>
+Date: Thu, 29 Mar 2012 04:17:26 +0200
+In-Reply-To: <1332967271-1743-1-git-send-email-dzickus@redhat.com>
+References: <1332967271-1743-1-git-send-email-dzickus@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Keith,
+Hi Don,
 
-> This reverts commit 4b95a24ce12c4545fd7d2e3075841dc3119d1d71.
+> I was trying to backport the following commit to RHEL-6
 > 
-> My USB bluetooth device does not show up with this patch in place.
+>     From 0cea73465cd22373c5cd43a3edd25fbd4bb532ef Mon Sep 17 00:00:00 2001
+>     From: Oliver Neukum <oliver@neukum.org>
+>     Date: Wed, 21 Sep 2011 11:37:15 +0200
+>     Subject: [PATCH] btusb: add device entry for Broadcom SoftSailing
 > 
-> Signed-off-by: Keith Packard <keithp@keithp.com>
+> and noticed it wasn't working on an HP Elitebook.  Looking into the patch I
+> noticed a very subtle typo in the ids.  The patch has '0x05ac' instead of
+> '0x0a5c'.  A snippet of the lsusb -v output also shows this:
+> 
+> Bus 002 Device 003: ID 0a5c:21e1 Broadcom Corp.
+> Device Descriptor:
+>   bLength                18
+>   bDescriptorType         1
+>   bcdUSB               2.00
+>   bDeviceClass          255 Vendor Specific Class
+>   bDeviceSubClass         1
+>   bDeviceProtocol         1
+>   bMaxPacketSize0        64
+>   idVendor           0x0a5c Broadcom Corp.
+>   idProduct          0x21e1
+>   bcdDevice            1.12
+>   iManufacturer           1 Broadcom Corp
+>   iProduct                2 BCM20702A0
+>   iSerial                 3 60D819F0338C
+>   bNumConfigurations      1
+> 
+> Looking at other Broadcom ids, the fix matches them whereas the original patch
+> matches Apple's ids.
+> 
+> Tested on an HP Elitebook 8760w.  The btusb binds and the userspace stuff loads
+> correctly.
+> 
+> Cc: Oliver Neukum <oliver@neukum.org>
+> Signed-off-by: Don Zickus <dzickus@redhat.com>
 > ---
+>  drivers/bluetooth/btusb.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 > 
-> This patch seems so innocuous, but when added to the kernel, it keeps
-> my USB bluetooth device from appearing to user mode at all. With the
-> mgmt interface enabled:
-> 
-> 	$ hcitool dev
-> 	Devices:
-> 
-> With this patch reverted:
-> 
-> 	$ hcitool dev
-> 	Devices:
-> 		hci0	04:0C:CE:DF:7B:C9
-
-so this is seriously strange and I don't have an explanation for it
-right now. Something breaking on this level means that Bluetooth devices
-are not even registered. And that would be an obvious bug to detect.
-
-Can you check with hciconfig -a if the device is actually there, but
-might have some weird flags set.
-
-> I bisected to this revision, and then reverted it on top of version
-> 
-> 	v3.3-6972-ge22057c	e22057c8599373e5caef0bc42bdb95d2a361ab0d
-> 
-> (which is where I'm trying to move drm-intel-fixes to)
-> 
-> I think this is the third consecutive merge window that has broken my
-> bluetooth interface in some way? At least I know enough to check
-> now...
-> 
->  net/bluetooth/hci_sock.c |    7 ++++++-
->  1 files changed, 6 insertions(+), 1 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> index 63afd23..d8b16cf 100644
-> --- a/net/bluetooth/hci_sock.c
-> +++ b/net/bluetooth/hci_sock.c
-> @@ -50,6 +50,8 @@
->  #include <net/bluetooth/hci_core.h>
->  #include <net/bluetooth/hci_mon.h>
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 789c9b5..86d9712 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -61,7 +61,7 @@ static struct usb_device_id btusb_table[] = {
+>  	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
 >  
-> +static bool enable_mgmt;
-> +
->  static atomic_t monitor_promisc = ATOMIC_INIT(0);
->  
->  /* ----- HCI socket interface ----- */
-> @@ -649,7 +651,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
->  		break;
->  
->  	case HCI_CHANNEL_CONTROL:
-> -		if (haddr.hci_dev != HCI_DEV_NONE) {
-> +		if (haddr.hci_dev != HCI_DEV_NONE || !enable_mgmt) {
->  			err = -EINVAL;
->  			goto done;
->  		}
+>  	/* Broadcom SoftSailing reporting vendor specific */
+> -	{ USB_DEVICE(0x05ac, 0x21e1) },
+> +	{ USB_DEVICE(0x0a5c, 0x21e1) },
 
-I have no idea on how this can break anything for you. Since tools like
-hcitool and hciconfig use HCI_CHANNEL_RAW. This must be a nasty side
-effect somewhere if this is really fix it for you.
+good catch. And this also should go into -stable as well.
 
-Can you start your bluetoothd with -P mgmtops to check if this might be
-causing some side effects.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
