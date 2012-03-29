@@ -1,57 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1333042298.1870.220.camel@aeonflux>
-Subject: Re: [RFC 2/3] Bluetooth: Add dst_type parameter to hci_connect
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 29 Mar 2012 19:31:38 +0200
-In-Reply-To: <CACJA=fWJ_u7CMW0+8XMjbV5kxZ7y8PrsEFh7p2dEBsOTSnBLXg@mail.gmail.com>
-References: <1332892776-12060-1-git-send-email-andre.guedes@openbossa.org>
-	 <1332892776-12060-3-git-send-email-andre.guedes@openbossa.org>
-	 <20120329091236.GA22600@x220>
-	 <CACJA=fWJ_u7CMW0+8XMjbV5kxZ7y8PrsEFh7p2dEBsOTSnBLXg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+Date: Thu, 29 Mar 2012 20:17:18 +0300
+Message-ID: <CAPCnQJnPC3Abgg7r_HL_27V-0DZ8EZ7ufopySFiZ4nL1wREzYw@mail.gmail.com>
+Subject: [PATCH] hciattach_tialt: Implement texas_change_speed function.
+From: Urja Rannikko <urjaman@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=0015174c3d0867b5ef04bc64e56d
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+--0015174c3d0867b5ef04bc64e56d
+Content-Type: text/plain; charset=UTF-8
 
-> > On Tue, Mar 27, 2012, Andre Guedes wrote:
-> >> +             le->dst_type = (dst_type == MGMT_ADDR_LE_RANDOM) ?
-> >> +                             ADDR_LE_DEV_RANDOM : ADDR_LE_DEV_PUBLIC;
-> >
-> > You might want to make a simple helper function for the type conversion.
-> >
-> > Also, I'm not so sure it's a good idea to directly reuse mgmt API
-> > defines for the L2CAP socket interface. The values may in the end be the
-> > same but probably there should be separate defines in l2cap.h.
-> 
-> I'm not sure too.
-> 
-> I think it would be better we define address type macros in
-> bluetooth.h and replace its prefix by BDADDR_TYPE_. So we would have
-> something like this in bluetooth.h:
-> 
-> +/* BD Address type */
-> +#define BDADDR_TYPE_BREDR      0x00
-> +#define BDADDR_TYPE_LE_PUBLIC  0x01
-> +#define BDADDR_TYPE_LE_RANDOM  0x02
-> +#define BDADDR_TYPE_INVALID    0xff
+Hi,
 
-what is INVALID for? That seems like a pointless value to have.
+I'm working on bluetooth on the pandora handheld console, and this
+functionality was missing.
+This is my first mail on this list, and I'm not 100% sure on all the
+customs here, but I think this is sufficient:
 
-> What do you think?
+Signed-off-by: Urja Rannikko <urjaman@gmail.com>
 
-I also get the feeling that these are a bit long. What is the benefit of
-using BDADDR_TYPE_ namespace. Would not something like this be better:
+I also have a second trivial patch to change the hciattach_tialt
+firmware loading directory
+from /etc/firmware to /lib/firmware, but I thought that it might be
+controversial. Comments?
 
-	BDADDR_BREDR     0x00
-	BDADDR_LE_PUBLIC 0x01
-	BDADDR_LE_RANDOM 0x02
+--
+Urja Rannikko
 
-Regards
+--0015174c3d0867b5ef04bc64e56d
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-hciattach_tialt-Implement-texas_change_speed-functio.patch"
+Content-Disposition: attachment;
+	filename="0001-hciattach_tialt-Implement-texas_change_speed-functio.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_h0e2fe3x0
 
-Marcel
-
-
+RnJvbSA4ZDVhOTFkNWUwN2JmMTZjZTU2MzkxMjdkMTdjMjFkZTk0ZmZkYjAwIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBVcmphIFJhbm5pa2tvIDx1cmphbWFuQGdtYWlsLmNvbT4KRGF0
+ZTogVGh1LCAyOSBNYXIgMjAxMiAxOToyMzo1OSArMDMwMApTdWJqZWN0OiBbUEFUQ0ggMS8yXSBo
+Y2lhdHRhY2hfdGlhbHQ6IEltcGxlbWVudCB0ZXhhc19jaGFuZ2Vfc3BlZWQgZnVuY3Rpb24uCgot
+LS0KIHRvb2xzL2hjaWF0dGFjaF90aWFsdC5jIHwgICAzOCArKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrLS0tLQogMSBmaWxlcyBjaGFuZ2VkLCAzNCBpbnNlcnRpb25zKCspLCA0IGRl
+bGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3Rvb2xzL2hjaWF0dGFjaF90aWFsdC5jIGIvdG9vbHMv
+aGNpYXR0YWNoX3RpYWx0LmMKaW5kZXggYzNjYWE0OS4uOWI4NzZlNCAxMDA2NDQKLS0tIGEvdG9v
+bHMvaGNpYXR0YWNoX3RpYWx0LmMKKysrIGIvdG9vbHMvaGNpYXR0YWNoX3RpYWx0LmMKQEAgLTg4
+LDE1ICs4OCw0NSBAQCBzdGF0aWMgaW50IHJlYWRfY29tbWFuZF9jb21wbGV0ZShpbnQgZmQsIHVu
+c2lnbmVkIHNob3J0IG9wY29kZSwgdW5zaWduZWQgY2hhciBsZQogCXJldHVybiByZXNwLnN0YXR1
+cyA9PSAwID8gMCA6IC0xOwogfQogCitzdGF0aWMgaW50IHBvbGxfd2FpdF9yZXBseShpbnQgZmQs
+IGludCBtcykgeworCXN0cnVjdCBwb2xsZmQgcGZkOworCXBmZC5mZCA9IGZkOworCXBmZC5ldmVu
+dHMgPSBQT0xMSU47CisJcGZkLnJldmVudHMgPSAwOworCXJldHVybiBwb2xsKCZwZmQsIDEsIG1z
+KTsKK30KKwogdHlwZWRlZiBzdHJ1Y3QgewogCXVpbnQ4X3QgdWFydF9wcmVmaXg7CiAJaGNpX2Nv
+bW1hbmRfaGRyIGhjaV9oZHI7CiAJdWludDMyX3Qgc3BlZWQ7CiB9IF9fYXR0cmlidXRlX18oKHBh
+Y2tlZCkpIHRleGFzX3NwZWVkX2NoYW5nZV9jbWRfdDsKIAotc3RhdGljIGludCB0ZXhhc19jaGFu
+Z2Vfc3BlZWQoaW50IGZkLCB1aW50MzJfdCBzcGVlZCkKLXsKLQlyZXR1cm4gMDsKK3N0YXRpYyBp
+bnQgdGV4YXNfY2hhbmdlX3NwZWVkKGludCBmZCwgdWludDMyX3Qgc3BlZWQpIHsKKwlpbnQgaTsK
+Kwl0ZXhhc19zcGVlZF9jaGFuZ2VfY21kX3QgY21kOworCWZwcmludGYoc3Rkb3V0LCJTZW5kaW5n
+IHNwZWVkIGNoYW5nZSBjb21tYW5kLi5cbiIpOworCisJY21kLnVhcnRfcHJlZml4ID0gSENJX0NP
+TU1BTkRfUEtUOworCWNtZC5oY2lfaGRyLm9wY29kZSA9IDB4ZmYzNjsKKwljbWQuaGNpX2hkci5w
+bGVuID0gc2l6ZW9mKGNtZC5zcGVlZCk7CisJY21kLnNwZWVkID0gc3BlZWQ7CisKKwlmb3IgKGk9
+MDtpPDM7aSsrKSB7CisJCWludCBuID0gd3JpdGUoZmQsJmNtZCxzaXplb2YoY21kKSk7CisJCWlm
+IChuIDwgMCkgeworCQkJcGVycm9yKCJGYWlsZWQgdG8gd3JpdGUgc3BlZWQgY2hhbmdlIGNvbW1h
+bmQiKTsKKwkJCXJldHVybiAtMTsKKwkJfQorCQlpZiAobiA8IHNpemVvZihjbWQpKSB7CisJCQlm
+cHJpbnRmKHN0ZGVyciwgIldhbnRlZCB0byB3cml0ZSAlbHUgYnl0ZXMsIGNvdWxkIG9ubHkgd3Jp
+dGUgJWQuIFN0b3BcbiIsIHNpemVvZihjbWQpLCBuKTsKKwkJCXJldHVybiAtMTsKKwkJfQorCQlp
+ZiAocG9sbF93YWl0X3JlcGx5KGZkLDEwMCkhPTEpIGNvbnRpbnVlOworCQlyZXR1cm4gcmVhZF9j
+b21tYW5kX2NvbXBsZXRlKGZkLGNtZC5oY2lfaGRyLm9wY29kZSxjbWQuaGNpX2hkci5wbGVuKTsK
+Kwl9CisJZnByaW50ZihzdGRlcnIsIlNwZWVkIGNoYW5nZSBjb21tYW5kIHRpbWVvdXQuXG4iKTsK
+KwlyZXR1cm4gLTE7CiB9CiAKIHN0YXRpYyBpbnQgdGV4YXNfbG9hZF9maXJtd2FyZShpbnQgZmQs
+IGNvbnN0IGNoYXIgKmZpcm13YXJlKSB7CkBAIC0yMzUsNyArMjY1LDcgQEAgaW50IHRleGFzYWx0
+X2luaXQoaW50IGZkLCBpbnQgc3BlZWQsIHN0cnVjdCB0ZXJtaW9zICp0aSkKIAkJc3ByaW50Zihm
+dywgIi9ldGMvZmlybXdhcmUvJXMuYmluIiwgY19icmZfY2hpcFticmZfY2hpcF0pOwogCQl0ZXhh
+c19sb2FkX2Zpcm13YXJlKGZkLCBmdyk7CiAKLQkJdGV4YXNfY2hhbmdlX3NwZWVkKGZkLCBzcGVl
+ZCk7CisJCWlmICh0ZXhhc19jaGFuZ2Vfc3BlZWQoZmQsIHNwZWVkKSkgcmV0dXJuIC0xOwogCX0K
+IAluYW5vc2xlZXAoJnRtLCBOVUxMKTsKIAlyZXR1cm4gMDsKLS0gCjEuNy44LjEKCg==
+--0015174c3d0867b5ef04bc64e56d--
