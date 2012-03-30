@@ -1,42 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 Mar 2012 13:09:36 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jonathan Nieder <jrnieder@gmail.com>
-Cc: "Cho, Yu-Chen" <acho@novell.com>, Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org, Oliver Neukum <oliver@neukum.name>,
-	"Lee, Chun-Yi" <jlee@suse.com>,
-	Henry-Nicolas Tourneur <henry.nicolas@tourneur.be>
-Subject: Re: [PATCH] Add Atheros maryann PIDVID support
-Message-ID: <20120330100936.GA8972@x220>
-References: <00c20c839b7ac6f027ab935f8cf0992c93c5f2fd.1329809368.git.acho@suse.com>
- <20120316152451.GE20650@x220>
- <20120328213623.GA11197@burratino>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120328213623.GA11197@burratino>
+Message-ID: <1333097689.1870.249.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Clean up l2cap_chan_connect
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 30 Mar 2012 10:54:49 +0200
+In-Reply-To: <1333094228-31591-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1333094228-31591-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jonathan,
+Hi Andrei,
 
-On Wed, Mar 28, 2012, Jonathan Nieder wrote:
-> Hi,
-> 
-> Johan Hedberg wrote:
-> > On Tue, Feb 21, 2012, Cho, Yu-Chen wrote:
-> 
-> >> Add Atheros maryann 0cf3:311d PIDVID support
-> >> This module is AR3012 Series.
-> [...]
-> > Applied to my bluetooth-next tree. Thanks.
-> 
-> Thanks.
-> 
->  Tested-by: Henry-Nicolas Tourneur <henry.nicolas@tourneur.be> # 3.0.y
-> 
-> [1] has details.  Is this targetted at 3.4 or some later kernel?
+> Reduce number of arguments by two and in future by another one. All
+> those parameters are passed inside L2CAP sockaddr_l2 pointer.
 
-Gustavo seems to have applied it to bluetooth.git too so it's on its way
-to 3.4.
+I am not sure that using sockaddr_l2 is a good idea. Are these socket
+address structs used directly in other parts of the networking
+subsystems anywhere?
 
-Johan
+Regards
+
+Marcel
+
+
