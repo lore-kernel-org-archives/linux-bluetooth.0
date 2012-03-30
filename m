@@ -1,41 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hemant Gupta <hemant.gupta@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: Naresh Gupta <naresh.gupta@stericsson.com>,
-	Hemant Gupta <hemantgupta.ste@gmail.com>,
-	Hemant Gupta <hemant.gupta@stericsson.com>
-Subject: [PATCH] Adapter: Fix Discovering state while Powering Off
-Date: Fri, 30 Mar 2012 19:44:52 +0530
-Message-ID: <1333116892-31344-1-git-send-email-hemant.gupta@stericsson.com>
+Date: Fri, 30 Mar 2012 15:46:33 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Daniel Wagner <wagi@monom.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Daniel Wagner <daniel.wagner@bmw-carit.de>
+Subject: Re: [PATCH v1] Makefile: Add simple-player and test-nap
+Message-ID: <20120330124633.GA5340@x220>
+References: <1333110156-15523-1-git-send-email-wagi@monom.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1333110156-15523-1-git-send-email-wagi@monom.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes the adater discovering state while powering off.
-Without this fix, BlueZ sends incorrect discovering state to upper
-layers while switching off.
----
- src/adapter.c |    6 ++++++
- 1 files changed, 6 insertions(+), 0 deletions(-)
+Hi Daniel,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index f8f46f8..76fbe31 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -289,6 +289,12 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode,
- 			return err;
- 
- 		adapter->off_requested = TRUE;
-+                /*
-+                 * Change the discovering state to FALSE, otherwise
-+                 * inquiry fails to start if BT is switched off and then on
-+                 * while inquiry is already active.
-+                 */
-+                adapter->discovering = FALSE;
- 
- 		goto done;
- 	}
--- 
-1.7.0.4
+On Fri, Mar 30, 2012, Daniel Wagner wrote:
+> From: Daniel Wagner <daniel.wagner@bmw-carit.de>
+> 
+> Add simple-palyer and test-nap to the EXTRA_DIST target.
+> ---
+>  Makefile.tools |    3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
+Applied after I made a few more minor fixes to the commit message (e.g.
+s/palyer/player/). Thanks.
+
+Johan
