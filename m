@@ -1,71 +1,162 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Clean up l2cap_chan_connect
-Date: Fri, 30 Mar 2012 10:57:08 +0300
-Message-Id: <1333094228-31591-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 30 Mar 2012 10:26:49 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	pkrystad@codeaurora.org, marcel@holtmann.org
+Subject: Re: [PATCHv2 2/2] Bluetooth: Functions parsing or generating ERTM
+ control fields
+Message-ID: <20120330072646.GB12694@aemeltch-MOBL1>
+References: <1333067569-19247-1-git-send-email-mathewm@codeaurora.org>
+ <1333067569-19247-3-git-send-email-mathewm@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1333067569-19247-3-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Mat,
 
-Reduce number of arguments by two and in future by another one. All
-those parameters are passed inside L2CAP sockaddr_l2 pointer.
+On Thu, Mar 29, 2012 at 05:32:49PM -0700, Mat Martineau wrote:
+> These functions encode or decode ERTM control fields (extended or
+> enhanced) to or from the new l2cap_control structure.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/l2cap_core.c |  108 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 108 insertions(+)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 2414ddd..8905386 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -789,6 +789,106 @@ static inline void l2cap_send_rr_or_rnr(struct l2cap_chan *chan, u32 control)
+>  	l2cap_send_sframe(chan, control);
+>  }
+>  
+> +static u16 __pack_enhanced_control(struct l2cap_ctrl *control)
+> +{
+> +	u16 packed;
+> +
+> +	packed = control->reqseq << L2CAP_CTRL_REQSEQ_SHIFT;
+> +	packed |= control->final << L2CAP_CTRL_FINAL_SHIFT;
+> +
+> +	if (control->sframe) {
+> +		packed |= control->poll << L2CAP_CTRL_POLL_SHIFT;
+> +		packed |= control->super << L2CAP_CTRL_SUPER_SHIFT;
+> +		packed |= L2CAP_CTRL_FRAME_TYPE;
+> +	} else {
+> +		packed |= control->sar << L2CAP_CTRL_SAR_SHIFT;
+> +		packed |= control->txseq << L2CAP_CTRL_TXSEQ_SHIFT;
+> +	}
+> +
+> +	return packed;
+> +}
+> +
+> +static void __get_enhanced_control(u16 enhanced,
+> +				   struct l2cap_ctrl *control)
+> +{
+> +	control->reqseq = (enhanced & L2CAP_CTRL_REQSEQ) >>
+> +		L2CAP_CTRL_REQSEQ_SHIFT;
+> +	control->final = (enhanced & L2CAP_CTRL_FINAL) >>
+> +		L2CAP_CTRL_FINAL_SHIFT;
+> +
+> +	if (enhanced & L2CAP_CTRL_FRAME_TYPE) {
+> +		/* S-Frame */
+> +		control->sframe = 1;
+> +		control->poll = (enhanced & L2CAP_CTRL_POLL) >>
+> +			L2CAP_CTRL_POLL_SHIFT;
+> +		control->super = (enhanced & L2CAP_CTRL_SUPERVISE) >>
+> +			L2CAP_CTRL_SUPER_SHIFT;
+> +
+> +		control->sar = 0;
+> +		control->txseq = 0;
+> +	} else {
+> +		/* I-Frame */
+> +		control->sframe = 0;
+> +		control->sar = (enhanced & L2CAP_CTRL_SAR) >>
+> +			L2CAP_CTRL_SAR_SHIFT;
+> +		control->txseq = (enhanced & L2CAP_CTRL_TXSEQ) >>
+> +			L2CAP_CTRL_TXSEQ_SHIFT;
+> +
+> +		control->poll = 0;
+> +		control->super = 0;
+> +	}
+> +}
+> +
+> +static u32 __pack_extended_control(struct l2cap_ctrl *control)
+> +{
+> +	u32 packed;
+> +
+> +	packed = control->reqseq << L2CAP_EXT_CTRL_REQSEQ_SHIFT;
+> +	packed |= control->final << L2CAP_EXT_CTRL_FINAL_SHIFT;
+> +
+> +	if (control->sframe) {
+> +		packed |= control->poll << L2CAP_EXT_CTRL_POLL_SHIFT;
+> +		packed |= control->super << L2CAP_EXT_CTRL_SUPER_SHIFT;
+> +		packed |= L2CAP_EXT_CTRL_FRAME_TYPE;
+> +	} else {
+> +		packed |= control->sar << L2CAP_EXT_CTRL_SAR_SHIFT;
+> +		packed |= control->txseq << L2CAP_EXT_CTRL_TXSEQ_SHIFT;
+> +	}
+> +
+> +	return packed;
+> +}
+> +
+> +static void __get_extended_control(u32 extended,
+> +				   struct l2cap_ctrl *control)
+> +{
+> +	control->reqseq = (extended & L2CAP_EXT_CTRL_REQSEQ) >>
+> +		L2CAP_EXT_CTRL_REQSEQ_SHIFT;
+> +	control->final = (extended & L2CAP_EXT_CTRL_FINAL) >>
+> +		L2CAP_EXT_CTRL_FINAL_SHIFT;
+> +
+> +	if (extended & L2CAP_EXT_CTRL_FRAME_TYPE) {
+> +		/* S-Frame */
+> +		control->sframe = 1;
+> +		control->poll = (extended & L2CAP_EXT_CTRL_POLL) >>
+> +			L2CAP_EXT_CTRL_POLL_SHIFT;
+> +		control->super = (extended & L2CAP_EXT_CTRL_SUPERVISE) >>
+> +			L2CAP_EXT_CTRL_SUPER_SHIFT;
+> +
+> +		control->sar = 0;
+> +		control->txseq = 0;
+> +	} else {
+> +		/* I-Frame */
+> +		control->sframe = 0;
+> +		control->sar = (extended & L2CAP_EXT_CTRL_SAR) >>
+> +			L2CAP_EXT_CTRL_SAR_SHIFT;
+> +		control->txseq = (extended & L2CAP_EXT_CTRL_TXSEQ) >>
+> +			L2CAP_EXT_CTRL_TXSEQ_SHIFT;
+> +
+> +		control->poll = 0;
+> +		control->super = 0;
+> +	}
+> +}
+> +
+>  static inline int __l2cap_no_conn_pending(struct l2cap_chan *chan)
+>  {
+>  	return !test_bit(CONF_CONNECT_PEND, &chan->conf_state);
+> @@ -4350,6 +4450,14 @@ static int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
+>  	u16 req_seq;
+>  	int len, next_tx_seq_offset, req_seq_offset;
+>  
+> +	if (test_bit(FLAG_EXT_CTRL, &chan->flags)) {
+> +		__get_extended_control(get_unaligned_le32(skb->data),
+> +				       &bt_cb(skb)->control);
+> +	} else {
+> +		__get_enhanced_control(get_unaligned_le16(skb->data),
+> +				       &bt_cb(skb)->control);
+> +	}
+> +
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/l2cap.h |    3 +--
- net/bluetooth/l2cap_core.c    |    5 ++++-
- net/bluetooth/l2cap_sock.c    |    3 +--
- 3 files changed, 6 insertions(+), 5 deletions(-)
+Here I would change it to function, something like: __set_control(chan, skb);
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index f6f0500..c0f0b6d 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -909,8 +909,7 @@ int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
- struct l2cap_chan *l2cap_chan_create(void);
- void l2cap_chan_close(struct l2cap_chan *chan, int reason);
- void l2cap_chan_destroy(struct l2cap_chan *chan);
--int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
--								bdaddr_t *dst);
-+int l2cap_chan_connect(struct l2cap_chan *chan, struct sockaddr_l2 *la);
- int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
- 								u32 priority);
- void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 3caff27..75bf88a 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1131,10 +1131,13 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr
- 	return c1;
- }
- 
--int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *dst)
-+int l2cap_chan_connect(struct l2cap_chan *chan, struct sockaddr_l2 *la)
- {
- 	struct sock *sk = chan->sk;
- 	bdaddr_t *src = &bt_sk(sk)->src;
-+	__le16 psm = la->l2_psm;
-+	u16 cid = le16_to_cpu(la->l2_cid);
-+	bdaddr_t *dst = &la->l2_bdaddr;
- 	struct l2cap_conn *conn;
- 	struct hci_conn *hcon;
- 	struct hci_dev *hdev;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 1d3e9c3..085b4d3 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -123,8 +123,7 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
- 	if (la.l2_cid && la.l2_psm)
- 		return -EINVAL;
- 
--	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
--				&la.l2_bdaddr);
-+	err = l2cap_chan_connect(chan, &la);
- 	if (err)
- 		return err;
- 
--- 
-1.7.9.1
+Otherwise looks good.
 
+Best regards 
+Andrei Emeltchenko 
+
+>  	control = __get_control(chan, skb->data);
+>  	skb_pull(skb, __ctrl_size(chan));
+>  	len = skb->len;
+> -- 
