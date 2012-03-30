@@ -1,65 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 Mar 2012 03:54:56 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Keith Packard <keithp@keithp.com>
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@intel.com>
-Subject: Re: [PATCH] Revert "Bluetooth: Always enable management interface"
-Message-ID: <20120330065456.GA9173@joana>
-References: <1332983958-2734-1-git-send-email-keithp@keithp.com>
- <20120329022839.GA26111@joana>
- <86r4wct9q7.fsf@sumi.keithp.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <86r4wct9q7.fsf@sumi.keithp.com>
+Message-ID: <1333083098.1870.235.camel@aeonflux>
+Subject: Re: [PATCHv2 2/2] Bluetooth: Functions parsing or generating ERTM
+ control fields
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	pkrystad@codeaurora.org
+Date: Fri, 30 Mar 2012 06:51:38 +0200
+In-Reply-To: <1333067569-19247-3-git-send-email-mathewm@codeaurora.org>
+References: <1333067569-19247-1-git-send-email-mathewm@codeaurora.org>
+	 <1333067569-19247-3-git-send-email-mathewm@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Keith,
+Hi Mat,
 
-* Keith Packard <keithp@keithp.com> [2012-03-28 19:35:44 -0700]:
-
-> <#part sign=pgpmime>
-> On Wed, 28 Mar 2012 23:28:39 -0300, Gustavo Padovan <gustavo@padovan.org> wrote:
+> These functions encode or decode ERTM control fields (extended or
+> enhanced) to or from the new l2cap_control structure.
 > 
-> > A consequence is that you'll need to use newer version of bluez, at least 4.99.
-> > Or call the bluetooth daemon (from a pre 4.99 version) with a parameter to
-> > disable the new interface:
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/l2cap_core.c |  108 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 108 insertions(+)
 > 
-> That's not OK -- you're breaking user space with this kernel change. I
-> know I get bashed every time I suggest that we 'fix' the kernel and
-> require new user space X bits...
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 2414ddd..8905386 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -789,6 +789,106 @@ static inline void l2cap_send_rr_or_rnr(struct l2cap_chan *chan, u32 control)
+>  	l2cap_send_sframe(chan, control);
+>  }
+>  
+> +static u16 __pack_enhanced_control(struct l2cap_ctrl *control)
+> +{
+> +	u16 packed;
+> +
+> +	packed = control->reqseq << L2CAP_CTRL_REQSEQ_SHIFT;
+> +	packed |= control->final << L2CAP_CTRL_FINAL_SHIFT;
+> +
+> +	if (control->sframe) {
+> +		packed |= control->poll << L2CAP_CTRL_POLL_SHIFT;
+> +		packed |= control->super << L2CAP_CTRL_SUPER_SHIFT;
+> +		packed |= L2CAP_CTRL_FRAME_TYPE;
+> +	} else {
+> +		packed |= control->sar << L2CAP_CTRL_SAR_SHIFT;
+> +		packed |= control->txseq << L2CAP_CTRL_TXSEQ_SHIFT;
+> +	}
+> +
+> +	return packed;
+> +}
+> +
+> +static void __get_enhanced_control(u16 enhanced,
+> +				   struct l2cap_ctrl *control)
+> +{
+> +	control->reqseq = (enhanced & L2CAP_CTRL_REQSEQ) >>
+> +		L2CAP_CTRL_REQSEQ_SHIFT;
+> +	control->final = (enhanced & L2CAP_CTRL_FINAL) >>
+> +		L2CAP_CTRL_FINAL_SHIFT;
+> +
+> +	if (enhanced & L2CAP_CTRL_FRAME_TYPE) {
+> +		/* S-Frame */
+> +		control->sframe = 1;
+> +		control->poll = (enhanced & L2CAP_CTRL_POLL) >>
+> +			L2CAP_CTRL_POLL_SHIFT;
+> +		control->super = (enhanced & L2CAP_CTRL_SUPERVISE) >>
+> +			L2CAP_CTRL_SUPER_SHIFT;
 
-Can you try the following patch? It should fix the compatibility problem you had.
+these look wrong to me from a coding style point of view. I think we
+either ignore the 80 character rule here. Or we use a define that does
+this for us. Something like this:
 
-	Gustavo
---
+#define __get_poll(e) (((e) & L2CAP_CTRL_POLL) >> L2CAP_CTRL_POLL_SHIFT)
 
-commit d21c1177b9cf067809ccee2746633cfea3a8b062
-Author: Gustavo Padovan <gustavo@padovan.org>
-Date:   Thu Mar 29 09:47:53 2012 -0300
+> +
+> +		control->sar = 0;
+> +		control->txseq = 0;
+> +	} else {
+> +		/* I-Frame */
+> +		control->sframe = 0;
+> +		control->sar = (enhanced & L2CAP_CTRL_SAR) >>
+> +			L2CAP_CTRL_SAR_SHIFT;
+> +		control->txseq = (enhanced & L2CAP_CTRL_TXSEQ) >>
+> +			L2CAP_CTRL_TXSEQ_SHIFT;
 
-    Bluetooth: Fix userspace compatibility issue with mgmt interface
-    
-    To ensure that old user space versions do not accidentally pick up and
-    try to use the management channel, use a different channel number.
-    
-    Reported-by: Keith Packard <keithp@keithp.com>
-    Acked-by: Johan Hedberg <johan.hedberg@intel.com>
-    Acked-by: Marcel Holtmann <marcel@holtmann.org>
-    Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
+Or maybe even something funky like this:
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 344b0f9..ba7f148 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1327,8 +1327,8 @@ struct sockaddr_hci {
- #define HCI_DEV_NONE   0xffff
- 
- #define HCI_CHANNEL_RAW                0
--#define HCI_CHANNEL_CONTROL    1
- #define HCI_CHANNEL_MONITOR    2
-+#define HCI_CHANNEL_CONTROL    3
- 
- struct hci_filter {
-        unsigned long type_mask;
+#define __get_ctrl(e, f) (((e) & f) >> (f ## _SHIFT))
+
+And then you could just use it like this:
+
+	control->sar = __get_ctrl(enhanced, L2CAP_CTRL_SAR);
+
+Or something similar. I am just throwing ideas into the room.
+
+Regards
+
+Marcel
+
+
