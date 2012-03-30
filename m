@@ -1,233 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1333082611.1870.227.camel@aeonflux>
-Subject: Re: [PATCHv2 1/2] Bluetooth: Add the l2cap_seq_list structure for
- tracking frames
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
-	pkrystad@codeaurora.org
-Date: Fri, 30 Mar 2012 06:43:31 +0200
-In-Reply-To: <1333067569-19247-2-git-send-email-mathewm@codeaurora.org>
-References: <1333067569-19247-1-git-send-email-mathewm@codeaurora.org>
-	 <1333067569-19247-2-git-send-email-mathewm@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+Date: Fri, 30 Mar 2012 02:55:30 +0200
+Message-ID: <CAKZqhqfupD+b9FjKRhOjFzZ1kH_17SGPK7n+9hkb8JyiP9Qr=g@mail.gmail.com>
+Subject: GSoC: Obexd Ideas
+From: dmp <dmp0x7c5@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hello BlueZ Community,
 
-> A sequence list is a data structure used to track frames that need to
-> be retransmitted, and frames that have been requested for
-> retransmission by the remote device.  It can compactly represent a
-> list of sequence numbers within the ERTM transmit window.  Memory for
-> the list is allocated once at connection time, and common operations
-> in ERTM are O(1).
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  include/net/bluetooth/l2cap.h |   12 ++++
->  net/bluetooth/l2cap_core.c    |  132 +++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 144 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index f6f0500..5d65b3d 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -407,6 +407,16 @@ struct l2cap_conn_param_update_rsp {
->  #define L2CAP_CONN_PARAM_REJECTED	0x0001
->  
->  /* ----- L2CAP channels and connections ----- */
-> +struct l2cap_seq_list {
-> +	__u16	head;
-> +	__u16	tail;
-> +	__u16	mask;
-> +	__u16	*list;
-> +};
-> +
-> +#define L2CAP_SEQ_LIST_CLEAR	0xFFFF
-> +#define L2CAP_SEQ_LIST_TAIL	0x8000
-> +
->  struct srej_list {
->  	__u16	tx_seq;
->  	struct list_head list;
-> @@ -501,6 +511,8 @@ struct l2cap_chan {
->  	struct sk_buff		*tx_send_head;
->  	struct sk_buff_head	tx_q;
->  	struct sk_buff_head	srej_q;
-> +	struct l2cap_seq_list	srej_list;
-> +	struct l2cap_seq_list	retrans_list;
->  	struct list_head	srej_l;
->  
->  	struct list_head	list;
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 3caff27..2414ddd 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -233,6 +233,134 @@ static inline void l2cap_chan_set_err(struct l2cap_chan *chan, int err)
->  	release_sock(sk);
->  }
->  
-> +/* ---- L2CAP sequence number lists ---- */
-> +
-> +/* For ERTM, ordered lists of sequence numbers must be tracked for
-> + * SREJ requests that are received and for frames that are to be
-> + * retransmitted. These seq_list functions implement a singly-linked
-> + * list in an array, where membership in the list can also be checked
-> + * in constant time. Items can also be added to the tail of the list
-> + * and removed from the head in constant time, without further memory
-> + * allocs or frees.
-> + */
-> +
-> +static int l2cap_seq_list_init(struct l2cap_seq_list *seq_list, u16 size)
-> +{
-> +	u16 alloc_size = 1;
-> +	int err = 0;
-> +	int i;
-> +
-> +	/* Allocated size is a power of 2 to map sequence numbers
-> +	 * (which may be up to 14 bits) in to a smaller array that is
-> +	 * sized for the negotiated ERTM transmit windows.
-> +	 */
-> +	while (alloc_size && alloc_size <= size)
-> +		alloc_size <<= 1;
-> +	if (!alloc_size)
-> +		return -ENOMEM;
-> +
-> +	seq_list->list = kzalloc(sizeof(u16) * alloc_size, GFP_KERNEL);
-> +	if (!seq_list->list)
-> +		return -ENOMEM;
-> +
-> +	seq_list->mask = alloc_size - 1;
-> +	seq_list->head = L2CAP_SEQ_LIST_CLEAR;
-> +	seq_list->tail = L2CAP_SEQ_LIST_CLEAR;
-> +	for (i = 0; i < alloc_size; i++)
-> +		seq_list->list[i] = L2CAP_SEQ_LIST_CLEAR;
-> +
-> +	return err;
-> +}
-> +
-> +static inline void l2cap_seq_list_free(struct l2cap_seq_list *seq_list)
-> +{
-> +	kfree(seq_list->list);
-> +}
-> +
-> +static inline bool l2cap_seq_list_contains(struct l2cap_seq_list *seq_list,
-> +					   u16 seq)
-> +{
-> +	/* Constant-time check for list membership */
-> +	return seq_list->list[seq & seq_list->mask] != L2CAP_SEQ_LIST_CLEAR;
-> +}
-> +
-> +static u16 l2cap_seq_list_remove(struct l2cap_seq_list *seq_list, u16 seq)
-> +{
-> +	u16 mask = seq_list->mask;
-> +
-> +	BT_DBG("seq_list %p, seq %d", seq_list, (int) seq);
-> +
-> +	if (seq_list->head == L2CAP_SEQ_LIST_CLEAR) {
-> +		/* In case someone tries to pop the head of an empty list */
-> +		BT_DBG("List empty");
+My name is Michal Poczwardowski[1], 22, Poland. I am interested in
+taking part in this year's Google Summer of Code.
 
-I think that see debug statement should go away. Do you really need
-them?
+Idea[2] to implement MAP looks challenging. I have few questions. I've
+read obexd code a bit, I understand that there is plugins/mas.c that
+implements Massage Access Service and probably client/map.c that
+handles client. Idea is assigned to obexd but it's already ready? And
+the goal is to create some kind of C client application that could
+communicate with server using client's api from obexd? I'll be really
+happy if you answer and point me where I'm wrong.
 
-> +		return L2CAP_SEQ_LIST_CLEAR;
-> +	} else if (seq_list->head == seq) {
-> +		/* Head can be removed in constant time */
-> +		BT_DBG("Remove head");
-> +		seq_list->head = seq_list->list[seq & mask];
-> +		seq_list->list[seq & mask] = L2CAP_SEQ_LIST_CLEAR;
-> +
-> +		if (seq_list->head == L2CAP_SEQ_LIST_TAIL) {
-> +			seq_list->head = L2CAP_SEQ_LIST_CLEAR;
-> +			seq_list->tail = L2CAP_SEQ_LIST_CLEAR;
-> +		}
-> +	} else {
-> +		/* Walk the list to find the sequence number */
-> +		u16 prev = seq_list->head;
-> +		BT_DBG("Find and remove");
-> +		while (seq_list->list[prev & mask] != seq) {
-> +			prev = seq_list->list[prev & mask];
-> +			if (prev == L2CAP_SEQ_LIST_TAIL) {
-> +				BT_DBG("seq %d not in list", (int) seq);
-> +				return L2CAP_SEQ_LIST_CLEAR;
-> +			}
-> +		}
-> +
-> +		/* Unlink the number from the list and clear it */
-> +		seq_list->list[prev & mask] = seq_list->list[seq & mask];
-> +		seq_list->list[seq & mask] = L2CAP_SEQ_LIST_CLEAR;
-> +		if (seq_list->tail == seq)
-> +			seq_list->tail = prev;
-> +	}
-> +	return seq;
-> +}
-> +
-> +static u16 l2cap_seq_list_pop(struct l2cap_seq_list *seq_list)
-> +{
-> +	/* Remove the head in constant time */
-> +	return l2cap_seq_list_remove(seq_list, seq_list->head);
-> +}
-> +
-> +static void l2cap_seq_list_clear(struct l2cap_seq_list *seq_list)
-> +{
-> +	if (seq_list->head != L2CAP_SEQ_LIST_CLEAR) {
-> +		u16 i;
-> +		for (i = 0; i <= seq_list->mask; i++)
-> +			seq_list->list[i] = L2CAP_SEQ_LIST_CLEAR;
-> +
-> +		seq_list->head = L2CAP_SEQ_LIST_CLEAR;
-> +		seq_list->tail = L2CAP_SEQ_LIST_CLEAR;
-> +	}
-> +}
-> +
-> +static void l2cap_seq_list_append(struct l2cap_seq_list *seq_list, u16 seq)
-> +{
-> +	u16 mask = seq_list->mask;
-> +
-> +	/* All appends happen in constant time */
-> +	BT_DBG("seq_list %p, seq %d", seq_list, (int) seq);
-> +
-> +	if (seq_list->list[seq & mask] == L2CAP_SEQ_LIST_CLEAR) {
-> +		if (seq_list->tail == L2CAP_SEQ_LIST_CLEAR)
-> +			seq_list->head = seq;
-> +		else
-> +			seq_list->list[seq_list->tail & mask] = seq;
-> +
-> +		seq_list->tail = seq;
-> +		seq_list->list[seq & mask] = L2CAP_SEQ_LIST_TAIL;
-> +	}
-> +}
-> +
->  static void l2cap_chan_timeout(struct work_struct *work)
->  {
->  	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
-> @@ -404,6 +532,8 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
->  
->  		skb_queue_purge(&chan->srej_q);
->  
-> +		l2cap_seq_list_free(&chan->srej_list);
-> +		l2cap_seq_list_free(&chan->retrans_list);
->  		list_for_each_entry_safe(l, tmp, &chan->srej_l, list) {
->  			list_del(&l->list);
->  			kfree(l);
-> @@ -2052,6 +2182,8 @@ static inline void l2cap_ertm_init(struct l2cap_chan *chan)
->  
->  	skb_queue_head_init(&chan->srej_q);
->  
-> +	l2cap_seq_list_init(&chan->srej_list, chan->tx_win);
-> +	l2cap_seq_list_init(&chan->retrans_list, chan->remote_tx_win);
->  	INIT_LIST_HEAD(&chan->srej_l);
->  }
->  
-
-Besides removing the debug statements, this looks good to me.
-
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-Regards
-
-Marcel
+Second interesting idea is "OBEX file system". There is a solution
+called ObexFs[3]. I've been using it for few years. As far as I know
+It's based on different obex implementation and it would be nice to
+prepare obexd solution. Have some initial mentors been assigned to
+obexd realated ideas?
 
 
+[1] http://dmpgsoc.azalayah.net/
+[2] http://www.bluez.org/development/gsoc/gsoc-ideas-list-2012/
+[3] http://dev.zuckschwerdt.org/openobex/wiki/ObexFs
+
+Thanks,
+Michal
+
+dmp@freenode
