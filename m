@@ -1,30 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 Mar 2012 13:18:46 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Clean up l2cap_chan_connect
-Message-ID: <20120330101844.GD12694@aemeltch-MOBL1>
-References: <1333094228-31591-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1333097689.1870.249.camel@aeonflux>
+Date: Fri, 30 Mar 2012 13:14:10 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Daniel Wagner <wagi@monom.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Daniel Wagner <daniel.wagner@bmw-carit.de>
+Subject: Re: [PATCH] Makefile: Add simple-player and test-nap
+Message-ID: <20120330101410.GA9564@x220>
+References: <1333030461-28221-1-git-send-email-wagi@monom.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1333097689.1870.249.camel@aeonflux>
+In-Reply-To: <1333030461-28221-1-git-send-email-wagi@monom.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Daniel,
 
-On Fri, Mar 30, 2012 at 10:54:49AM +0200, Marcel Holtmann wrote:
-> Hi Andrei,
+On Thu, Mar 29, 2012, Daniel Wagner wrote:
+> From: Daniel Wagner <daniel.wagner@bmw-carit.de>
 > 
-> > Reduce number of arguments by two and in future by another one. All
-> > those parameters are passed inside L2CAP sockaddr_l2 pointer.
+> ---
+> Hi,
 > 
-> I am not sure that using sockaddr_l2 is a good idea. Are these socket
-> address structs used directly in other parts of the networking
-> subsystems anywhere?
+> it seems that these two scripts are missing in the list
+> of test scripts. 
+> 
+> cheers,
+> daniel
+> 
+>  Makefile.tools |    3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Makefile.tools b/Makefile.tools
+> index f997a3f..7a8be0e 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -222,7 +222,8 @@ EXTRA_DIST += test/apitest test/sap-client test/hsplay test/hsmicro \
+>  		test/test-sap-server test/test-oob test/test-serial-proxy \
+>  		test/test-thermometer test/test-health test/test-health-sink \
+>  		test/service-record.dtd test/service-did.xml \
+> -		test/service-spp.xml test/service-opp.xml test/service-ftp.xml
+> +		test/service-spp.xml test/service-opp.xml test/service-ftp.xml \
+> +		test/simple-player test/test-nap
+>  
+>  
+>  if HIDD
 
-Apparently not much.
+This doesn't apply to current git:
 
-Best regards 
-Andrei Emeltchenko 
+Applying: Makefile: Add simple-player and test-nap
+error: patch failed: Makefile.tools:222
+error: Makefile.tools: patch does not apply
+Patch failed at 0001 Makefile: Add simple-player and test-nap
+
+Could you also add "to EXTRA_DIST" to the commit message to make it
+clear what's being done. Thanks.
+
+Johan
