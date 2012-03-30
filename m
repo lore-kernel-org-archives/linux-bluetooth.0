@@ -1,30 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 Mar 2012 14:35:56 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bruna Moreira <bruna.moreira@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 BlueZ 3/4] device: Appearance characteristic from GAP
- service
-Message-ID: <20120330113556.GA13864@x220>
-References: <1332854978-26072-1-git-send-email-bruna.moreira@openbossa.org>
- <1333031882-15644-1-git-send-email-bruna.moreira@openbossa.org>
+Message-ID: <4F759854.5040705@monom.org>
+Date: Fri, 30 Mar 2012 13:26:12 +0200
+From: Daniel Wagner <wagi@monom.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1333031882-15644-1-git-send-email-bruna.moreira@openbossa.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Makefile: Add simple-player and test-nap
+References: <1333030461-28221-1-git-send-email-wagi@monom.org> <20120330101410.GA9564@x220>
+In-Reply-To: <20120330101410.GA9564@x220>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bruna,
+Hi Johan,
 
-On Thu, Mar 29, 2012, Bruna Moreira wrote:
-> After searching for primary services, the appearance characteristic is
-> read from GAP service and saved in "appearance" file. Running
-> GetProperty in device interface, will show the respective icon based in
-> "appearance" value.
-> ---
->  src/device.c |   70 ++++++++++++++++++++++++++++++++++++++++++++++++++++-----
->  1 files changed, 63 insertions(+), 7 deletions(-)
+On 30.03.2012 12:14, Johan Hedberg wrote:
+> This doesn't apply to current git:
 
-All four patches in this set have been applied. Thanks.
+Oops, sorry. I'll send an update asap.
 
-Johan
+> Could you also add "to EXTRA_DIST" to the commit message to make it
+> clear what's being done. Thanks.
+
+Sure.
+
+cheers,
+daniel
+
