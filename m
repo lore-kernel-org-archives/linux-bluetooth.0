@@ -1,40 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hemant Gupta <hemant.gupta@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: Hemant Gupta <hemantgupta.ste@gmail.com>,
-	Hemant Gupta <hemant.gupta@stericsson.com>
-Subject: [PATCH v1] Adapter: Fix Discovering state while Powering Off
-Date: Fri, 30 Mar 2012 22:26:09 +0530
-Message-ID: <1333126569-1606-1-git-send-email-hemant.gupta@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CAN_we7NMSMsi70eeCnqw9G0_12ORLaJzkTQWOyi9pP=1=QZRKg@mail.gmail.com>
+References: <1333122925-12890-1-git-send-email-fonsecasantos.rafael@gmail.com> <CAN_we7NMSMsi70eeCnqw9G0_12ORLaJzkTQWOyi9pP=1=QZRKg@mail.gmail.com>
+From: Rafael Fonseca <fonsecasantos.rafael@gmail.com>
+Date: Fri, 30 Mar 2012 13:15:48 -0300
+Message-ID: <CAPsQmjq2qQNXdXfKpzKXuMyKi6kzu-30QvqiDtfYNf4i5+rn0g@mail.gmail.com>
+Subject: Re: [PATCH] Fix spellings errors.
+To: Daniele Forsi <dforsi@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes the adater discovering state while powering off.
-Without this fix, BlueZ sends incorrect discovering state to upper
-layers while switching off.
----
- src/adapter.c |    6 ++++++
- 1 files changed, 6 insertions(+), 0 deletions(-)
+On Fri, Mar 30, 2012 at 13:09, Daniele Forsi <dforsi@gmail.com> wrote:
+> 2012/3/30 Rafael Fonseca:
+>
+>> -       /* endianess prevent direct cast */
+>> +       /* endianness prevent direct cast */
+>
+> s/prevent/prevents/
 
-diff --git a/src/adapter.c b/src/adapter.c
-index f8f46f8..eb9745f 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -289,6 +289,12 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode,
- 			return err;
- 
- 		adapter->off_requested = TRUE;
-+		/*
-+		 * Change the discovering state to FALSE, otherwise
-+		 * inquiry fails to start if BT is switched off and then on
-+		 * while inquiry is already active.
-+		 */
-+		adapter->discovering = FALSE;
- 
- 		goto done;
- 	}
+Thanks! Should I send a new fixed version?
+
+
+Att.
 -- 
-1.7.0.4
-
+Rafael Fonseca
