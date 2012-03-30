@@ -1,39 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hemant Gupta <hemant.gupta@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: Naresh Gupta <naresh.gupta@stericsson.com>,
-	Hemant Gupta <hemantgupta.ste@gmail.com>,
-	Hemant Gupta <hemant.gupta@stericsson.com>
-Subject: [PATCH] Bluetooth: Send correct address type for LTK
-Date: Fri, 30 Mar 2012 17:23:35 +0530
-Message-ID: <1333108415-12504-1-git-send-email-hemant.gupta@stericsson.com>
+Date: Fri, 30 Mar 2012 14:35:56 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bruna Moreira <bruna.moreira@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 BlueZ 3/4] device: Appearance characteristic from GAP
+ service
+Message-ID: <20120330113556.GA13864@x220>
+References: <1332854978-26072-1-git-send-email-bruna.moreira@openbossa.org>
+ <1333031882-15644-1-git-send-email-bruna.moreira@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1333031882-15644-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch updates the address type sent from kernel to
-management interface of BlueZ while sending the Long Term
-Key.
+Hi Bruna,
 
-Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
----
- net/bluetooth/mgmt.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Thu, Mar 29, 2012, Bruna Moreira wrote:
+> After searching for primary services, the appearance characteristic is
+> read from GAP service and saved in "appearance" file. Running
+> GetProperty in device interface, will show the respective icon based in
+> "appearance" value.
+> ---
+>  src/device.c |   70 ++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+>  1 files changed, 63 insertions(+), 7 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 5a56e0c..b4f7e32 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2978,7 +2978,7 @@ int mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, u8 persistent)
- 
- 	ev.store_hint = persistent;
- 	bacpy(&ev.key.addr.bdaddr, &key->bdaddr);
--	ev.key.addr.type = key->bdaddr_type;
-+	ev.key.addr.type = link_to_mgmt(LE_LINK, key->bdaddr_type);
- 	ev.key.authenticated = key->authenticated;
- 	ev.key.enc_size = key->enc_size;
- 	ev.key.ediv = key->ediv;
--- 
-1.7.0.4
+All four patches in this set have been applied. Thanks.
 
+Johan
