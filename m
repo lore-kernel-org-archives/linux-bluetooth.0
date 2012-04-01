@@ -1,77 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 2 Apr 2012 09:55:27 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Alexander Holler <holler@ahsoftware.de>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: bluetooth: fix deadlock on device reset and power down
-Message-ID: <20120402065525.GA29687@aemeltch-MOBL1>
-References: <4F77055A.2070502@ahsoftware.de>
+Message-ID: <4F7869F1.9020109@tu-ilmenau.de>
+Date: Sun, 01 Apr 2012 16:45:05 +0200
+From: Steffen Becker <steffen.becker@tu-ilmenau.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4F77055A.2070502@ahsoftware.de>
-Sender: linux-kernel-owner@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: pand-error after installing bluez4.99 & patch
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alexander,
+Hello,
 
-On Sat, Mar 31, 2012 at 03:23:38PM +0200, Alexander Holler wrote:
-> I've experienced a deadlock on shutdown using kernel 3.3 and tracked
-> it down. Because I'm not very familiar with the bluetooth stack I'm
-> not sure if the below patch is correct, but it fixed the problem
-> here.
+it's me again and it's pretty annoying that i don't found any forum user 
+who can help me, that's why i write to the mailinglist:
+Until last week i've had no problems using the pand-command (with 
+BlueZ-4.98).
+But after installed BlueZ-4.99 and the Patch <<Adding SSP debug mode 
+configuration to hciconfig>> (March, 19th) this command doesn't work.
+Two PCs with a bluetooth3.0-Dongle:
+PC2 # sdptool add NAP
+PC1 # sdptool add NAP
+PC2 # pand -s -r NAP -M
+PC1 # pand -c <bluetooth-address>
+-> no error message, but the connection failed, as seen in 
+/var/lib/messages (of PC1):
 
-Could you please attach deadlock dump?
+Mar 29 16:12:29 localhost kernel: usb 2-1.1: new full-speed USB device numb
+er 4 using ehci_hcd
+Mar 29 16:12:29 localhost kernel: usb 2-1.1: New USB device found, idVendor
+=0a5c, idProduct=2198
+Mar 29 16:12:29 localhost kernel: usb 2-1.1: New USB device strings: 
+Mfr=1, Product=2, SerialNumber=3
+Mar 29 16:12:29 localhost kernel: usb 2-1.1: Product: Broadcom Bluetooth 
+3.0 Device
+Mar 29 16:12:29 localhost kernel: usb 2-1.1: Manufacturer: Broadcom Corp
+Mar 29 16:12:29 localhost kernel: usb 2-1.1: SerialNumber: 000272240204
+Mar 29 16:12:29 localhost bluetoothd[2208]: HCI dev 0 registered
+Mar 29 16:12:29 localhost bluetoothd[2208]: Listening for HCI events on hci0
+Mar 29 16:12:29 localhost /etc/init.d/bluetooth[3063]: status: inactive
+Mar 29 16:12:29 localhost bluetoothd[2208]: HCI dev 0 up
+Mar 29 16:12:29 localhost bluetoothd[2208]: Unable to load keys to 
+adapter_ops: Function not implemented (38)
+Mar 29 16:12:29 localhost bluetoothd[2208]: Adapter /org/bluez/2205/hci0 
+has been enabled
+Mar 29 16:12:49 localhost pand[3095]: Bluetooth PAN daemon version 4.99
+Mar 29 16:12:49 localhost pand[3095]: Connecting to 00:02:72:AE:58:73
+Mar 29 16:12:50 localhost pand[3095]: Connect to 00:02:72:AE:58:73 
+failed. Connection refused(111)
 
-> 
-> Commit 09fd0de5bd8f8ef3317e5365f92f1a13dcd89aa9 introduced a deadlock:
-> 
-> bluetoothd calls ioctl HCIDEVDOWN
->     hci_sock_ioctl()
->         hci_dev_close()
->             hci_dev_do_close()
->                 hci_dev_lock(hdev);
->                 inquiry_cache_flush();
->                 hci_conn_hash_flush();
->                     hci_conn_del()
->                         cancel_delayed_work_sync()
->                             hci_conn_timeout()
->                                 hci_dev_lock(hdev); /* DEADLOCK */
 
-I am actually not sure that hci_conn_timeout locks hdev. Why do you think
-so?
+Hope somebody can tell me what's the problem.
 
-Best regards 
-Andrei Emeltchenko 
-
->                 hci_dev_unlock(hdev);
-> 
-> Signed-off-by: Alexander Holler <holler@ahsoftware.de>
-> ---
->  net/bluetooth/hci_core.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 5aeb624..3428036 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -629,8 +629,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
-> 
->  	hci_dev_lock(hdev);
->  	inquiry_cache_flush(hdev);
-> -	hci_conn_hash_flush(hdev);
->  	hci_dev_unlock(hdev);
-> +	hci_conn_hash_flush(hdev);
-> 
->  	hci_notify(hdev, HCI_DEV_DOWN);
-> 
-> @@ -713,8 +713,8 @@ int hci_dev_reset(__u16 dev)
-> 
->  	hci_dev_lock(hdev);
->  	inquiry_cache_flush(hdev);
-> -	hci_conn_hash_flush(hdev);
->  	hci_dev_unlock(hdev);
-> +	hci_conn_hash_flush(hdev);
-> 
->  	if (hdev->flush)
->  		hdev->flush(hdev);
-
+Regards,
+Steffen
