@@ -1,63 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 2 Apr 2012 09:55:27 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Alexander Holler <holler@ahsoftware.de>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: bluetooth: fix deadlock on device reset and power down
+Message-ID: <20120402065525.GA29687@aemeltch-MOBL1>
+References: <4F77055A.2070502@ahsoftware.de>
 MIME-Version: 1.0
-In-Reply-To: <1332879859-20268-1-git-send-email-arik@wizery.com>
-References: <1332879859-20268-1-git-send-email-arik@wizery.com>
-From: Arik Nemtsov <arik@wizery.com>
-Date: Mon, 2 Apr 2012 10:03:36 +0300
-Message-ID: <CA+XVXfcJ=zGx9Qz6tEEEoBi9F4F6jN_bgnT5+axrN3p9zRNx-A@mail.gmail.com>
-Subject: Re: [PATCH v6 0/6] Implement ProximityReporter profiles
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4F77055A.2070502@ahsoftware.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping?
+Hi Alexander,
 
-On Tue, Mar 27, 2012 at 22:24, Arik Nemtsov <arik@wizery.com> wrote:
-> This patch-set implements the Link loss and Immediate Alert GATT
-> server profiles.
->
-> A few API calls are added/changed in preparation, the most notable of
-> which is the addition of the remote-device to each GATT read/write callback.
->
-> The new profiles are separated into their own files for clarity.
->
-> A ProximityReporter D-Bus interface is registered for each remote device.
-> Property queries and PropertyChanged notifications are implemented, in
-> accordance to doc/proximity-api.txt.
->
-> v5->6: Fix immalert bug on unregister path. Rename att-bluez.h to
-> att-database.h. Rebase on latest master (Makefile.am changes).
->
-> Arik Nemtsov (6):
->  att: add remote btd_device to ATT read/write callbacks
->  proximity: reporter: save global D-Bus connection
->  proximity: reporter: move definitions to .h and add util function
->  proximity: link loss: implement link loss server
->  proximity: immediate alert: implement immediate alert server
->  proximity: reporter: implement D-Bus API
->
->  Makefile.am            |    4 +-
->  attrib/att-database.h  |   44 +++++++
->  attrib/att.h           |   20 ---
->  attrib/gatt-service.c  |    1 +
->  plugins/gatt-example.c |    4 +-
->  proximity/immalert.c   |  289 +++++++++++++++++++++++++++++++++++++++++
->  proximity/immalert.h   |   26 ++++
->  proximity/linkloss.c   |  337 ++++++++++++++++++++++++++++++++++++++++++++++++
->  proximity/linkloss.h   |   26 ++++
->  proximity/reporter.c   |  250 ++++++++++++++++++++++++++----------
->  proximity/reporter.h   |   16 +++
->  src/attrib-server.c    |   20 ++-
->  time/server.c          |    7 +-
->  13 files changed, 946 insertions(+), 98 deletions(-)
->  create mode 100644 attrib/att-database.h
->  create mode 100644 proximity/immalert.c
->  create mode 100644 proximity/immalert.h
->  create mode 100644 proximity/linkloss.c
->  create mode 100644 proximity/linkloss.h
->
-> --
-> 1.7.5.4
->
+On Sat, Mar 31, 2012 at 03:23:38PM +0200, Alexander Holler wrote:
+> I've experienced a deadlock on shutdown using kernel 3.3 and tracked
+> it down. Because I'm not very familiar with the bluetooth stack I'm
+> not sure if the below patch is correct, but it fixed the problem
+> here.
+
+Could you please attach deadlock dump?
+
+> 
+> Commit 09fd0de5bd8f8ef3317e5365f92f1a13dcd89aa9 introduced a deadlock:
+> 
+> bluetoothd calls ioctl HCIDEVDOWN
+>     hci_sock_ioctl()
+>         hci_dev_close()
+>             hci_dev_do_close()
+>                 hci_dev_lock(hdev);
+>                 inquiry_cache_flush();
+>                 hci_conn_hash_flush();
+>                     hci_conn_del()
+>                         cancel_delayed_work_sync()
+>                             hci_conn_timeout()
+>                                 hci_dev_lock(hdev); /* DEADLOCK */
+
+I am actually not sure that hci_conn_timeout locks hdev. Why do you think
+so?
+
+Best regards 
+Andrei Emeltchenko 
+
+>                 hci_dev_unlock(hdev);
+> 
+> Signed-off-by: Alexander Holler <holler@ahsoftware.de>
+> ---
+>  net/bluetooth/hci_core.c |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 5aeb624..3428036 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -629,8 +629,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+> 
+>  	hci_dev_lock(hdev);
+>  	inquiry_cache_flush(hdev);
+> -	hci_conn_hash_flush(hdev);
+>  	hci_dev_unlock(hdev);
+> +	hci_conn_hash_flush(hdev);
+> 
+>  	hci_notify(hdev, HCI_DEV_DOWN);
+> 
+> @@ -713,8 +713,8 @@ int hci_dev_reset(__u16 dev)
+> 
+>  	hci_dev_lock(hdev);
+>  	inquiry_cache_flush(hdev);
+> -	hci_conn_hash_flush(hdev);
+>  	hci_dev_unlock(hdev);
+> +	hci_conn_hash_flush(hdev);
+> 
+>  	if (hdev->flush)
+>  		hdev->flush(hdev);
+
