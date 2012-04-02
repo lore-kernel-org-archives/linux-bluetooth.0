@@ -1,178 +1,259 @@
 Return-Path: <cyrus@holtmann.org>
-Reply-To: <wyrles@ytram.com>
-From: "Tom Allebrandi" <wyrles@ytram.com>
-To: "'Steffen Becker'" <steffen.becker@tu-ilmenau.de>,
-	<linux-bluetooth@vger.kernel.org>
-References: <4F7349EC.8080706@tu-ilmenau.de>
-In-Reply-To: <4F7349EC.8080706@tu-ilmenau.de>
-Subject: RE: problem with using BPA500
-Date: Mon, 2 Apr 2012 12:11:21 -0700
-Message-ID: <093a01cd1104$69615420$3c23fc60$@ytram.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+From: Arik Nemtsov <arik@wizery.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: Arik Nemtsov <arik@wizery.com>
+Subject: [PATCH v8 6/6] proximity: reporter: implement D-Bus API
+Date: Mon,  2 Apr 2012 22:12:42 +0300
+Message-Id: <1333393962-21394-6-git-send-email-arik@wizery.com>
+In-Reply-To: <1333393962-21394-1-git-send-email-arik@wizery.com>
+References: <1333393962-21394-1-git-send-email-arik@wizery.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> -----Original Message-----
-> Hello,
-> 
-> i have a problem with sniffing my 2 bluetooth devices. Google & forums
-> didn't helped me.
-> I use the BPA500 for sniffing two BT3.0 devices; maybe someone of you also
-> use this. This is my problem:
-> The frontline technical support told me, that i have to put my devices in
-> discovery mode & at least one device in ssp debug mode. And it is
-important
-> that the devices get paired AFTER i click on "Start Sniffing".
-> I did so, but in my LMP there is some Opcode missing. There is only:
-> ...
-> au_rand
-> sres
-> encrypt_mode_req
-> 
-> But there SHOULD be something like that:
-> ...
-> comb_key
-> au_rand
-> sres
-> au_rand
-> sres
-> setup_complete
-> encrypt_mode_req
-> 
-> I think there is no problem with the BPA software, because when i sniff
-> BT2.0 devices, everything works fine (because i don't have to use a ssp
-> debug mode). And the BPA-support says, there are two possible misstakes:
-> either the devices are paired before sniffing, or no device is in sspdebug
-> mode. But i think i did this right.
-> 
-> Maybe you find out what i did wrong:
-> 
-> - two gentoo-PCs with two BT3.0 Dongles and i installed the latest bluez &
-> the patch "Adding SSP debug mode configuration to hciconfig" on both PCs
-> PC2 # hciconfig hci0 piscan
-> PC1 # hciconfig hci0 piscan
-> PC1 # hciconfig hci0 sspdebug 1
-> (in a 2nd try also: PC2 # hciconfig hci0 sspdebug 1) click on "start
-sniffing" at
-> the software
-> PC2 # rfcomm listen 0 1
-> PC1 # rfcomm -r connect 0 <bluetooth-adress> 1
-> 
-> The connection worked (as seen on the two conncted PCs) but the sniffing
-> software didn't really captured it. The Icon is blue indeed (so it's
-> synchronized), but somehow there is missing something, because it doesn't
-> sniff correctly.
-> 
-> Hope someone of you can help me.
-> 
-> Regards,
-> Steffen
+Use a device driver to track all GATT supporting devices and register
+a D-Bus interface per remote device.
 
-Hi!
+Implement the "GetProperties" method of the D-Bus interface by querying
+the alert level of the remote device in the link-loss and
+immediate-alert proximity profiles. The default alert level values for
+non-connected devices are "none".
+---
+ proximity/reporter.c |  191 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 files changed, 183 insertions(+), 8 deletions(-)
 
-If you don't get two sets of 
-
--> au_rand
-<- sres
-<- au_rand
--> sres
-
-then no pairing occurred. Mutual LMP authentication (au_rand/sres in each
-direction) is only used during pairing.
-
-(A) For traditional pin code based pairing you should see
-
--> in_rand
--> comb_key
-<- comb_key
-
- (B) For SSP based pairing, you should see
-
--> io_capability_req
-<- io_capability_res
-<-> some other SSP related messages based on the I/O capabilities
--> dhkey_check
-<- accepted
-<- dhkey_check
--> accepted
-
-You should always see sequence (A) or (B) if pairing takes place. Neither of
-these have anything to do with SSP Debug Mode.
-
-
-So, given what you are seeing, I agree with Frontline tech support, no
-pairing is taking place.
-
-You might want to run HCIdump and look at the HCI sequence.
-
-<- link_key_request
--> link_key_request_reply
-
-Means the devices are already paired
-
-<- link_key_request
--> link_key_request_negative_reply
-
-Means the devices are not already paired
-
-----------
-
-Secure Simple Pairing uses the Diffie-Hellman Elliptic Curve algorithm
-(DHEC).
-
-DHEC as used in Bluetooth is based on private secrets (keys) that are only
-known to each controller. You cannot set the private key nor can you read it
-out of the controller. Most controllers make one up as needed.
-
-The private keys are never on the air:  values derived from the keys  -- the
-"public keys" -- are exchanged between the devices.
-
-The "magic" of DHEC is that if you know
-
-	Private Key A		Private Key B
-	Public Key A		Public Key A
-	Public Key B		Public Key B
-
-you can feed those triplets into a formula that will produce the same
-answer.
-
-Since the private keys cannot be known, that pretty much makes air sniffing
-useless.... UNLESS you enable SSP Debug Mode.
-
-In SSP Debug Mode a set of well known keys is used.
-
-If device A is in SSP debug mode
-
-	Debug Mode Private Key A	Private Key B
-	Debug Mode Public Key A	Debug Mode Public Key A
-	Public Key B			Public Key B
-
-Feeding those triplets into the formula that will produce the same answer.
-
-Similarly, if device B is in SSP debug mode
-
-	Private Key A			Debug Mode Private Key B
-	Public Key A			Public Key A
-	Debug Mode Public Key B	Debug Mode Public Key B
-
-Feeding those triplets into the formula that will produce the same answer.
-
-The trick is that when the air sniffer sees either of the debug mode public
-keys on the air, it automatically knows the corresponding debug mode private
-key for that device. That gives the air sniffer one (or both) of the
-triplets that are used by the devices allowing it  (the air sniffer) to
-compute the same answer.
-
-----------
-
-So in short, the air sniffer should always see the exchanges that I listed
-in the first section of my answer. SSP debug mode lets the air sniffer do
-something useful with the data that it collected.
-
-Cheers!
-
---- tom
-
+diff --git a/proximity/reporter.c b/proximity/reporter.c
+index 4768e5f..cb30da5 100644
+--- a/proximity/reporter.c
++++ b/proximity/reporter.c
+@@ -31,8 +31,14 @@
+ #include <adapter.h>
+ #include <errno.h>
+ 
++#include <dbus/dbus.h>
++#include <gdbus.h>
++
+ #include "log.h"
+ 
++#include "dbus-common.h"
++#include "error.h"
++#include "device.h"
+ #include "hcid.h"
+ #include "att.h"
+ #include "att-database.h"
+@@ -42,7 +48,39 @@
+ #include "linkloss.h"
+ #include "immalert.h"
+ 
+-static DBusConnection *connection;
++#define BLUEZ_SERVICE "org.bluez"
++
++#define GATT_UUID     "00001801-0000-1000-8000-00805f9b34fb"
++
++struct reporter_adapter {
++	DBusConnection *conn;
++	struct btd_adapter *adapter;
++	GSList *devices;
++};
++
++static GSList *reporter_adapters;
++
++static int radapter_cmp(gconstpointer a, gconstpointer b)
++{
++	const struct reporter_adapter *radapter = a;
++	const struct btd_adapter *adapter = b;
++
++	if (radapter->adapter == adapter)
++		return 0;
++
++	return -1;
++}
++
++static struct reporter_adapter *
++find_reporter_adapter(struct btd_adapter *adapter)
++{
++	GSList *l = g_slist_find_custom(reporter_adapters, adapter,
++								radapter_cmp);
++	if (!l)
++		return NULL;
++
++	return l->data;
++}
+ 
+ const char *get_alert_level_string(uint8_t level)
+ {
+@@ -102,28 +140,165 @@ static void register_tx_power(struct btd_adapter *adapter)
+ 	g_assert(h - start_handle == svc_size);
+ }
+ 
++static DBusMessage *get_properties(DBusConnection *conn,
++						DBusMessage *msg, void *data)
++{
++	DBusMessageIter iter;
++	DBusMessageIter dict;
++	DBusMessage *reply = NULL;
++	const char *linkloss_level, *immalert_level;
++	struct btd_device *device = data;
++
++	reply = dbus_message_new_method_return(msg);
++	if (!reply)
++		return NULL;
++
++	linkloss_level = link_loss_get_alert_level(device);
++	immalert_level = imm_alert_get_level(device);
++
++	dbus_message_iter_init_append(reply, &iter);
++
++	if (!dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict))
++		goto err;
++
++	dict_append_entry(&dict, "LinkLossAlertLevel", DBUS_TYPE_STRING,
++							&linkloss_level);
++	dict_append_entry(&dict, "ImmediateAlertLevel", DBUS_TYPE_STRING,
++							&immalert_level);
++
++	if (!dbus_message_iter_close_container(&iter, &dict))
++		goto err;
++
++	return reply;
++
++err:
++	if (reply)
++		dbus_message_unref(reply);
++	return btd_error_failed(msg, "not enough memory");
++}
++
++static GDBusMethodTable reporter_methods[] = {
++	{ "GetProperties",	"",	"a{sv}",	get_properties	},
++	{ }
++};
++
++static GDBusSignalTable reporter_signals[] = {
++	{ "PropertyChanged",	"sv"	},
++	{ }
++};
++
++static void unregister_reporter_device(gpointer data, gpointer user_data)
++{
++	struct btd_device *device = data;
++	struct reporter_adapter *radapter = user_data;
++	const char *path = device_get_path(device);
++
++	DBG("unregister on device %s", path);
++
++	g_dbus_unregister_interface(radapter->conn, path,
++					PROXIMITY_REPORTER_INTERFACE);
++
++	radapter->devices = g_slist_remove(radapter->devices, device);
++	btd_device_unref(device);
++}
++
++static void register_reporter_device(struct btd_device *device,
++					struct reporter_adapter *radapter)
++{
++	const char *path = device_get_path(device);
++
++	DBG("register on device %s", path);
++
++	g_dbus_register_interface(radapter->conn, path,
++					PROXIMITY_REPORTER_INTERFACE,
++					reporter_methods, reporter_signals,
++					NULL, device, NULL);
++
++	btd_device_ref(device);
++	radapter->devices = g_slist_prepend(radapter->devices, device);
++}
++
++static int reporter_device_probe(struct btd_device *device, GSList *uuids)
++{
++	struct reporter_adapter *radapter;
++	struct btd_adapter *adapter = device_get_adapter(device);
++
++	radapter = find_reporter_adapter(adapter);
++	if (!radapter)
++		return -1;
++
++	register_reporter_device(device, radapter);
++	return 0;
++}
++
++static void reporter_device_remove(struct btd_device *device)
++{
++	struct reporter_adapter *radapter;
++	struct btd_adapter *adapter = device_get_adapter(device);
++
++	radapter = find_reporter_adapter(adapter);
++	if (!radapter)
++		return;
++
++	unregister_reporter_device(device, radapter);
++}
++
++/* device driver for tracking remote GATT client devices */
++static struct btd_device_driver reporter_device_driver = {
++	.name = "Proximity GATT Reporter Device Tracker Driver",
++	.uuids = BTD_UUIDS(GATT_UUID),
++	.probe = reporter_device_probe,
++	.remove = reporter_device_remove,
++};
++
+ int reporter_init(struct btd_adapter *adapter)
+ {
++	struct reporter_adapter *radapter;
++	DBusConnection *conn;
++
+ 	if (!main_opts.gatt_enabled) {
+ 		DBG("GATT is disabled");
+ 		return -ENOTSUP;
+ 	}
+ 
+-	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
+-	if (connection == NULL)
+-		return -EIO;
+-	DBG("Proximity Reporter for adapter %p", adapter);
++	conn = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
++	if (!conn)
++		return -1;
+ 
+-	link_loss_register(adapter, connection);
++	radapter = g_new0(struct reporter_adapter, 1);
++	radapter->adapter = adapter;
++	radapter->conn = conn;
++
++	link_loss_register(adapter, radapter->conn);
+ 	register_tx_power(adapter);
+-	imm_alert_register(adapter, connection);
++	imm_alert_register(adapter, radapter->conn);
++
++	btd_register_device_driver(&reporter_device_driver);
++
++	reporter_adapters = g_slist_prepend(reporter_adapters, radapter);
++	DBG("Proximity Reporter for adapter %p", adapter);
+ 
+ 	return 0;
+ }
+ 
+ void reporter_exit(struct btd_adapter *adapter)
+ {
++	struct reporter_adapter *radapter = find_reporter_adapter(adapter);
++	if (!radapter)
++		return;
++
++	btd_unregister_device_driver(&reporter_device_driver);
++
++	g_slist_foreach(radapter->devices, unregister_reporter_device,
++								radapter);
++
+ 	link_loss_unregister(adapter);
+ 	imm_alert_unregister(adapter);
+-	dbus_connection_unref(connection);
++	dbus_connection_unref(radapter->conn);
++
++	reporter_adapters = g_slist_remove(reporter_adapters, radapter);
++	g_free(radapter);
+ }
+-- 
+1.7.5.4
 
