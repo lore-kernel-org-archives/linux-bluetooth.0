@@ -1,90 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4F796E98.8070603@ahsoftware.de>
+Date: Mon, 02 Apr 2012 11:17:12 +0200
+From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
-In-Reply-To: <CABax29U=bsb0T2FQtzkQ2WGOkDTgJ8STshcu8fRmC4QvHEv=QQ@mail.gmail.com>
-References: <CABax29VLUHg_jePnhHz_6WHYCZBHoir5TBLuauK+Ktfg9-8Xjw@mail.gmail.com>
-	<CACY+gR3t4RXuhUEi9486qsP+p0GCYArHW+PO5QfBfEUfnd=xEg@mail.gmail.com>
-	<CABax29X1tFt8Am_i7y5nZsjs_D2QY9pbv19316Wn6RVq7ksEDA@mail.gmail.com>
-	<CACY+gR2DeQE2UaYwD8AQonNxtZ+=uZm7qY+BaqgjBQKoZSZHYA@mail.gmail.com>
-	<CABax29U8N2nOge34tr=G2f-fZvowCHPf3V=N2an-vC+x=UBdiQ@mail.gmail.com>
-	<CACY+gR2PkP76J2Dw9xobpeGsU2HKhsOYvU6Wcx8WCcq1opihiA@mail.gmail.com>
-	<CABax29VadeA+6WZWRDiZZUhpRqk2Nk35__b0Cjfz8HO12Tq4vQ@mail.gmail.com>
-	<CACY+gR0DJfbOgfSGHrsAj5vk00v4-_+KYwR+SF+0BRRs2oYBkw@mail.gmail.com>
-	<CABax29X+ke_PO9obAxbEJjdx68g8JW4ZZn7vS7mYpE7+00iYng@mail.gmail.com>
-	<CABax29WFvAXH9g8CnOtEDAqfmKmURnt4eYY58fi+P9zBa5Ji1A@mail.gmail.com>
-	<CACY+gR3pqj6xoJ-G-pt5QTY6BjuyUNXTZRzsQmmutcSNBzY3qQ@mail.gmail.com>
-	<CABax29Unh0AOhExp_FJwUr=edmPSDXy=_YJAXN81M5tp5+yUxw@mail.gmail.com>
-	<CABax29XWLWcBT6hHgSQud6qzhQ-Y-WAMjQ8ytCT7Px09H1iQtg@mail.gmail.com>
-	<CACY+gR3aPvvMRvNW+c3QdF8UkGR4ZGPChWt4MAoa+5fK=HSBNQ@mail.gmail.com>
-	<CABax29U=bsb0T2FQtzkQ2WGOkDTgJ8STshcu8fRmC4QvHEv=QQ@mail.gmail.com>
-Date: Mon, 2 Apr 2012 12:44:04 +0300
-Message-ID: <CACY+gR326euT9fgXMZF_XLV28peJUJVWxOVZAA_xNEfHAsRRWA@mail.gmail.com>
-Subject: Re: [PATCH] Re: A2DP quality (bluetooth-alsa)
-From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+CC: David Herrmann <dh.herrmann@googlemail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	stable@vger.kernel.org
+Subject: Re: bluetooth: fix deadlock on device reset and power down
+References: <4F77055A.2070502@ahsoftware.de> <20120402065525.GA29687@aemeltch-MOBL1> <4F796377.2050008@ahsoftware.de> <CANq1E4RCQvQX6deGOTjdhbEkAahZD9MmAmfgz-Y-+wDfRtx0dw@mail.gmail.com> <20120402090337.GB29687@aemeltch-MOBL1>
+In-Reply-To: <20120402090337.GB29687@aemeltch-MOBL1>
+Content-Type: text/plain; charset=iso-8859-1
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Mar 28, 2012 at 2:28 AM, qduaty <qduaty@gmail.com> wrote:
-> ALSA bitpool patch is attached.
->
-> 2012/3/27 Siarhei Siamashka <siarhei.siamashka@gmail.com>:
->> The first patch adds debug prints to syslog from sbc encoder, just to
->> clearly confirm the real bitpool used by the encoder.
->
-> It obviously worked:
->
-> Mar 27 17:49:41 machina-turbo pulseaudio[2355]: sbc_encode: bitpool set to 138
->
->> The second patch removes default_bitpool() limitation, and this boosts
->> bitpool from 53 to 64 for me.
->
-> I found it was my device that prevented Bluez from using higher
-> bitpools. Bluez assumes that requesting a wider range of bitpools from
-> a device will cause an error, and indeed, my device cannot be
-> configured with a bitpool range wider than 2-53. So the only way to
-> achieve higher bitrates is to force them.
+Am 02.04.2012 11:03, schrieb Andrei Emeltchenko:
+> Hi guys,
+> 
+> On Mon, Apr 02, 2012 at 10:44:43AM +0200, David Herrmann wrote:
+>> Hi Andrei and Alexander
+>>
+>> On Mon, Apr 2, 2012 at 10:29 AM, Alexander Holler <holler@ahsoftware.de> wrote:
+>>> Am 02.04.2012 08:55, schrieb Andrei Emeltchenko:
+>>>> Hi Alexander,
+>>>>
+>>>> On Sat, Mar 31, 2012 at 03:23:38PM +0200, Alexander Holler wrote:
+>>>>> I've experienced a deadlock on shutdown using kernel 3.3 and tracked
+>>>>> it down. Because I'm not very familiar with the bluetooth stack I'm
+>>>>> not sure if the below patch is correct, but it fixed the problem
+>>>>> here.
+>>>>
+>>>> Could you please attach deadlock dump?
+>>>>
+>>>>>
+>>>>> Commit 09fd0de5bd8f8ef3317e5365f92f1a13dcd89aa9 introduced a deadlock:
+>>>>>
+>>>>> bluetoothd calls ioctl HCIDEVDOWN
+>>>>>     hci_sock_ioctl()
+>>>>>         hci_dev_close()
+>>>>>             hci_dev_do_close()
+>>>>>                 hci_dev_lock(hdev);
+>>>>>                 inquiry_cache_flush();
+>>>>>                 hci_conn_hash_flush();
+>>>>>                     hci_conn_del()
+>>>>>                         cancel_delayed_work_sync()
+>>>>>                             hci_conn_timeout()
+>>>>>                                 hci_dev_lock(hdev); /* DEADLOCK */
+>>>>
+>>>> I am actually not sure that hci_conn_timeout locks hdev. Why do you think
+>>>> so?
+>>>
+>>> By reading the source, printk and suffering through the deadlock. It's
+>>> especially painfull when using a bt-keyboard and systemd, because
+>>> systemd tries 4 times (~ some minutes) to kill bluetoothd before it
+>>> marks the service as failed and finally continues to shut down.
+>>
+>> hci_conn_timeout does lock the device. See the source. But the problem
+> 
+> I think you need to check commit e72acc13c770a82b4ce4a07e9716f29320eae0f8
+> 
+> commit e72acc13c770a82b4ce4a07e9716f29320eae0f8
+> Author: Andre Guedes <andre.guedes@openbossa.org>
+> Date:   Fri Jan 27 19:42:03 2012 -0300
+> 
+>     Bluetooth: Remove unneeded locking
+>     
+>     We don't need locking hdev in hci_conn_timeout() since it doesn't
+>     access any hdev's shared resources, it basically queues HCI commands.
 
-I guess this depends on the headset. Your patch hacks around and
-allows you to use higher bitpool with your Nokia BH-503 headset. With
-my Logitech FreePulse headset, your patch does not seem to break audio
-playback, but on the other hand such radical changes are not needed
-(just removing default_bitpool() is enough to be able to set bitpool
-to 128 via ./asoundrc). For somebody else your patch might possibly
-even break audio playback if their headset does not like to be forced.
+So if the locks in hci_conn_timeout() aren't needed, your commit which
+removes them should go to the stable tree because it fixes a painful
+deadlock.
 
-> There is (was) a rather serious problem in the ALSA module, when it
-> tried to set bitpool exceding device capabilities, it ended with an
-> error and next tries, even with a valid bitpool, resulted in "Invalid
-> seid 0" in syslog and required bluetooth service to be restarted. With
-> my patch, bluez only uses the configured bitpool for sbc, without
-> sending it to the device. So, any bitpool value not exceeding true
-> device and adapter capabilities will work (and these can be much
-> higher than negotiated).
+Regards,
 
-Apparently this works a bit different in my case and I don't get the
-same "Invalid seid 0" error.
+Alexander
 
-In any case, what we have here is that (some?) A2DP headsets can
-support a lot higher SBC bitpool settings than they are normally
-reporting. Now the big question is how to probe for this information
-without violating negotiation protocol in any way and not causing any
-regressions. The next question is how to decide which bitpool to use
-by default, because in my case bitpool 128 occasionally causes some
-skips in music playback which did not happen with lower bitpool
-settings.
-
-Could you provide a short summary for this whole discussion? The
-discussion has been changing from bitpool negotiation to SBC codec
-improvements back and forth. And now it's becoming hard to follow and
-see which problems are still relevant and need to be solved. Also do
-you want to work on some code yourself or mostly trying to escalate
-the problems?
-
-A2DP is in the list of ideas for BlueZ GSoC, so maybe that's a good
-chance to get some improvements implemented:
-http://www.bluez.org/development/gsoc/gsoc-ideas-list-2012/
-
--- 
-Best regards,
-Siarhei Siamashka
