@@ -1,113 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <4F797C80.7070107@ahsoftware.de>
-References: <4F77055A.2070502@ahsoftware.de>
-	<20120402065525.GA29687@aemeltch-MOBL1>
-	<4F796377.2050008@ahsoftware.de>
-	<CANq1E4RCQvQX6deGOTjdhbEkAahZD9MmAmfgz-Y-+wDfRtx0dw@mail.gmail.com>
-	<20120402090337.GB29687@aemeltch-MOBL1>
-	<4F796E98.8070603@ahsoftware.de>
-	<4F797C80.7070107@ahsoftware.de>
-Date: Mon, 2 Apr 2012 10:52:16 -0300
-Message-ID: <CACJA=fUgp-Dg1_9RHySHhU5r6W8_jgGMhE6=Aj2Jnt==muHrbg@mail.gmail.com>
-Subject: Re: bluetooth: fix deadlock on device reset and power down
+In-Reply-To: <1333168753.1870.261.camel@aeonflux>
+References: <1333148706-11008-1-git-send-email-andre.guedes@openbossa.org>
+	<1333168753.1870.261.camel@aeonflux>
+Date: Mon, 2 Apr 2012 10:14:34 -0300
+Message-ID: <CACJA=fUFdF9ZOcGdhggcfRRjaj-2i-Wnyw6w-6n=-eSNQgMgqA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Remove MGMT_ADDR_INVALID macro
 From: Andre Guedes <andre.guedes@openbossa.org>
-To: Alexander Holler <holler@ahsoftware.de>
-Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	David Herrmann <dh.herrmann@googlemail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	stable@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Marcel,
 
-On Mon, Apr 2, 2012 at 7:16 AM, Alexander Holler <holler@ahsoftware.de> wrote:
-> Am 02.04.2012 11:17, schrieb Alexander Holler:
+On Sat, Mar 31, 2012 at 1:39 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Andre,
 >
->> Am 02.04.2012 11:03, schrieb Andrei Emeltchenko:
->>>
->>> Hi guys,
->>>
->>> On Mon, Apr 02, 2012 at 10:44:43AM +0200, David Herrmann wrote:
->>>>
->>>> Hi Andrei and Alexander
->>>>
->>>> On Mon, Apr 2, 2012 at 10:29 AM, Alexander Holler<holler@ahsoftware.de>
->>>>  wrote:
->>>>>
->>>>> Am 02.04.2012 08:55, schrieb Andrei Emeltchenko:
->>>>>>
->>>>>> Hi Alexander,
->>>>>>
->>>>>> On Sat, Mar 31, 2012 at 03:23:38PM +0200, Alexander Holler wrote:
->>>>>>>
->>>>>>> I've experienced a deadlock on shutdown using kernel 3.3 and tracked
->>>>>>> it down. Because I'm not very familiar with the bluetooth stack I'm
->>>>>>> not sure if the below patch is correct, but it fixed the problem
->>>>>>> here.
->>>>>>
->>>>>>
->>>>>> Could you please attach deadlock dump?
->>>>>>
->>>>>>>
->>>>>>> Commit 09fd0de5bd8f8ef3317e5365f92f1a13dcd89aa9 introduced a
->>>>>>> deadlock:
->>>>>>>
->>>>>>> bluetoothd calls ioctl HCIDEVDOWN
->>>>>>>     hci_sock_ioctl()
->>>>>>>         hci_dev_close()
->>>>>>>             hci_dev_do_close()
->>>>>>>                 hci_dev_lock(hdev);
->>>>>>>                 inquiry_cache_flush();
->>>>>>>                 hci_conn_hash_flush();
->>>>>>>                     hci_conn_del()
->>>>>>>                         cancel_delayed_work_sync()
->>>>>>>                             hci_conn_timeout()
->>>>>>>                                 hci_dev_lock(hdev); /* DEADLOCK */
->>>>>>
->>>>>>
->>>>>> I am actually not sure that hci_conn_timeout locks hdev. Why do you
->>>>>> think
->>>>>> so?
->>>>>
->>>>>
->>>>> By reading the source, printk and suffering through the deadlock. It's
->>>>> especially painfull when using a bt-keyboard and systemd, because
->>>>> systemd tries 4 times (~ some minutes) to kill bluetoothd before it
->>>>> marks the service as failed and finally continues to shut down.
->>>>
->>>>
->>>> hci_conn_timeout does lock the device. See the source. But the problem
->>>
->>>
->>> I think you need to check commit e72acc13c770a82b4ce4a07e9716f29320eae0f8
->>>
->>> commit e72acc13c770a82b4ce4a07e9716f29320eae0f8
->>> Author: Andre Guedes<andre.guedes@openbossa.org>
->>> Date:   Fri Jan 27 19:42:03 2012 -0300
->>>
->>>     Bluetooth: Remove unneeded locking
->>>
->>>     We don't need locking hdev in hci_conn_timeout() since it doesn't
->>>     access any hdev's shared resources, it basically queues HCI commands.
+>> This patch removes the MGMT_ADDR_INVALID macro. If the address type
+>> isn't LE, we consider it is BR/EDR type.
 >>
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>> =A0include/net/bluetooth/hci_core.h | =A0 =A01 -
+>> =A0net/bluetooth/mgmt.c =A0 =A0 =A0 =A0 =A0 =A0 | =A0 19 +++++----------=
+----
+>> =A02 files changed, 5 insertions(+), 15 deletions(-)
 >>
->> So if the locks in hci_conn_timeout() aren't needed, your commit which
->> removes them should go to the stable tree because it fixes a painful
->> deadlock.
+>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hc=
+i_core.h
+>> index c8d5beb..c0b232c 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -967,7 +967,6 @@ void hci_sock_dev_event(struct hci_dev *hdev, int ev=
+ent);
+>> =A0#define MGMT_ADDR_BREDR =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A00x=
+00
+>> =A0#define MGMT_ADDR_LE_PUBLIC =A0 =A0 =A0 =A0 =A00x01
+>> =A0#define MGMT_ADDR_LE_RANDOM =A0 =A0 =A0 =A0 =A00x02
+>> -#define MGMT_ADDR_INVALID =A0 =A0 =A0 =A0 =A0 =A00xff
+>>
+>> =A0#define DISCOV_TYPE_BREDR =A0 =A0 =A0 =A0 =A0 =A0(BIT(MGMT_ADDR_BREDR=
+))
+>> =A0#define DISCOV_TYPE_LE =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (B=
+IT(MGMT_ADDR_LE_PUBLIC) | \
+>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+>> index b4f7e32..c13ea5f 100644
+>> --- a/net/bluetooth/mgmt.c
+>> +++ b/net/bluetooth/mgmt.c
+>> @@ -1635,20 +1635,13 @@ failed:
+>>
+>> =A0static u8 link_to_mgmt(u8 link_type, u8 addr_type)
+>> =A0{
+>> - =A0 =A0 switch (link_type) {
+>> - =A0 =A0 case LE_LINK:
+>> - =A0 =A0 =A0 =A0 =A0 =A0 switch (addr_type) {
+>> - =A0 =A0 =A0 =A0 =A0 =A0 case ADDR_LE_DEV_PUBLIC:
+>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return MGMT_ADDR_LE_PUBLIC;
+>> - =A0 =A0 =A0 =A0 =A0 =A0 case ADDR_LE_DEV_RANDOM:
+>> + =A0 =A0 if (link_type =3D=3D LE_LINK) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (addr_type =3D=3D ADDR_LE_DEV_RANDOM)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return MGMT_ADDR_LE_RANDOM;
+>> - =A0 =A0 =A0 =A0 =A0 =A0 default:
+>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return MGMT_ADDR_INVALID;
+>> - =A0 =A0 =A0 =A0 =A0 =A0 }
+>> - =A0 =A0 case ACL_LINK:
+>> + =A0 =A0 =A0 =A0 =A0 =A0 else
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return MGMT_ADDR_LE_PUBLIC;
+>> + =A0 =A0 } else {
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 return MGMT_ADDR_BREDR;
+>> - =A0 =A0 default:
+>> - =A0 =A0 =A0 =A0 =A0 =A0 return MGMT_ADDR_INVALID;
+>> =A0 =A0 =A0 }
+>> =A0}
+>>
 >
->
-> Oh, sorry, that patch is not from you, your first name is only similiar.
-> I've added the author to cc, just in case the lock might still be needed in
-> 3.3 if no other patches (from 3.4) besides that one are applied.
+> and what is the reason to remove the nice switch statement here? I
+> prefer a default label with a nice comment that we fallback to BR/EDR.
 
-It is still applicable. It was applied to bluetooth-next tree a week
-after 3.3 merge window was closed. This is the reason why it is not
-present in 3.3.
+Ok, I'll change this and send a new version of this patch.
 
-BR,
+Thanks,
 
 Andre
