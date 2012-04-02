@@ -2,1021 +2,461 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v9 7/9] audio: Move HFP/HSP AG servers to telephony.c
-Date: Mon,  2 Apr 2012 15:11:21 +0200
-Message-Id: <1333372283-10487-8-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v9 3/9] audio: Remove dummy tel driver
+Date: Mon,  2 Apr 2012 15:11:17 +0200
+Message-Id: <1333372283-10487-4-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1333372283-10487-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1333372283-10487-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Move HeadSet/HandsFree AudioGateway RFComm servers from audio/manager.c
-to audio/telephony.c.
-Doing this, each RfComm server is started (and the related SDP record
-advertised) only when an agent registers for its specific profile.
+Remove dummy telephony driver which has been deprecated by
+org.bluez.Telephony interface.
 ---
- audio/headset.c   |   50 +++----
- audio/headset.h   |    5 +-
- audio/manager.c   |  386 +----------------------------------------------------
- audio/telephony.c |  310 ++++++++++++++++++++++++++++++++++++++++++-
- audio/telephony.h |    2 -
- 5 files changed, 329 insertions(+), 424 deletions(-)
+ audio/telephony-dummy.c |  433 -----------------------------------------------
+ 1 files changed, 0 insertions(+), 433 deletions(-)
+ delete mode 100644 audio/telephony-dummy.c
 
-diff --git a/audio/headset.c b/audio/headset.c
-index d449ec5..3b1ca9d 100644
---- a/audio/headset.c
-+++ b/audio/headset.c
-@@ -388,7 +388,6 @@ void headset_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- {
- 	struct audio_device *dev = user_data;
- 	struct headset *hs = dev->headset;
--	struct btd_adapter *adapter;
- 	struct pending_connect *p = hs->pending;
- 	char hs_address[18];
- 	void *agent;
-@@ -398,15 +397,6 @@ void headset_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 		goto failed;
- 	}
- 
--	adapter = device_get_adapter(dev->btd_dev);
+diff --git a/audio/telephony-dummy.c b/audio/telephony-dummy.c
+deleted file mode 100644
+index 1f89079..0000000
+--- a/audio/telephony-dummy.c
++++ /dev/null
+@@ -1,433 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2006-2010  Nokia Corporation
+- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
 -
--	/* For HFP telephony isn't ready just disconnect */
--	if (hs->hfp_active && !telephony_get_ready_state(adapter)) {
--		error("Unable to accept HFP connection since the telephony "
--				"subsystem isn't initialized");
--		goto failed;
--	}
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
 -
- 	hs->rfcomm = hs->tmp_rfcomm;
- 	hs->tmp_rfcomm = NULL;
- 
-@@ -561,20 +551,30 @@ static int get_records(struct audio_device *device, headset_stream_cb_t cb,
- 			void *user_data, unsigned int *cb_id)
- {
- 	struct headset *hs = device->headset;
--	uint16_t svclass;
-+	struct btd_adapter *adapter;
-+	void *hsp_ag_agent, *hfp_ag_agent;
-+	uint16_t svclass = 0;
- 	uuid_t uuid;
- 	int err;
- 
--	if (hs->pending && hs->pending->svclass == HANDSFREE_SVCLASS_ID)
--		svclass = HEADSET_SVCLASS_ID;
+-#include <stdlib.h>
+-#include <stdio.h>
+-#include <stdint.h>
+-#include <glib.h>
+-#include <dbus/dbus.h>
+-#include <gdbus.h>
+-
+-#include "log.h"
+-#include "telephony.h"
+-#include "error.h"
+-
+-#define TELEPHONY_DUMMY_IFACE "org.bluez.TelephonyTest"
+-#define TELEPHONY_DUMMY_PATH "/org/bluez/test"
+-
+-static DBusConnection *connection = NULL;
+-
+-static const char *chld_str = "0,1,1x,2,2x,3,4";
+-static char *subscriber_number = NULL;
+-static char *active_call_number = NULL;
+-static int active_call_status = 0;
+-static int active_call_dir = 0;
+-
+-static gboolean events_enabled = FALSE;
+-
+-static struct indicator dummy_indicators[] =
+-{
+-	{ "battchg",	"0-5",	5,	TRUE },
+-	{ "signal",	"0-5",	5,	TRUE },
+-	{ "service",	"0,1",	1,	TRUE },
+-	{ "call",	"0,1",	0,	TRUE },
+-	{ "callsetup",	"0-3",	0,	TRUE },
+-	{ "callheld",	"0-2",	0,	FALSE },
+-	{ "roam",	"0,1",	0,	TRUE },
+-	{ NULL }
+-};
+-
+-void telephony_device_connected(void *telephony_device)
+-{
+-	DBG("telephony-dummy: device %p connected", telephony_device);
+-}
+-
+-void telephony_device_disconnected(void *telephony_device)
+-{
+-	DBG("telephony-dummy: device %p disconnected", telephony_device);
+-	events_enabled = FALSE;
+-}
+-
+-void telephony_event_reporting_req(void *telephony_device, int ind)
+-{
+-	events_enabled = ind == 1 ? TRUE : FALSE;
+-
+-	telephony_event_reporting_rsp(telephony_device, CME_ERROR_NONE);
+-}
+-
+-void telephony_response_and_hold_req(void *telephony_device, int rh)
+-{
+-	telephony_response_and_hold_rsp(telephony_device,
+-						CME_ERROR_NOT_SUPPORTED);
+-}
+-
+-void telephony_last_dialed_number_req(void *telephony_device)
+-{
+-	telephony_last_dialed_number_rsp(telephony_device, CME_ERROR_NONE);
+-
+-	/* Notify outgoing call set-up successfully initiated */
+-	telephony_update_indicator(dummy_indicators, "callsetup",
+-					EV_CALLSETUP_OUTGOING);
+-	telephony_update_indicator(dummy_indicators, "callsetup",
+-					EV_CALLSETUP_ALERTING);
+-
+-	active_call_status = CALL_STATUS_ALERTING;
+-	active_call_dir = CALL_DIR_OUTGOING;
+-}
+-
+-void telephony_terminate_call_req(void *telephony_device)
+-{
+-	g_free(active_call_number);
+-	active_call_number = NULL;
+-
+-	telephony_terminate_call_rsp(telephony_device, CME_ERROR_NONE);
+-
+-	if (telephony_get_indicator(dummy_indicators, "callsetup") > 0)
+-		telephony_update_indicator(dummy_indicators, "callsetup",
+-						EV_CALLSETUP_INACTIVE);
 -	else
--		svclass = hs->search_hfp ? HANDSFREE_SVCLASS_ID :
--							HEADSET_SVCLASS_ID;
-+	adapter = device_get_adapter(device->btd_dev);
-+
-+	hsp_ag_agent = telephony_agent_by_uuid(adapter, HSP_AG_UUID);
-+	hfp_ag_agent = telephony_agent_by_uuid(adapter, HFP_AG_UUID);
- 
--	if (svclass == HANDSFREE_SVCLASS_ID)
-+	if (hfp_ag_agent && hs->search_hfp && hs->pending == NULL) {
-+		svclass = HANDSFREE_SVCLASS_ID;
- 		hs->connecting_uuid = HFP_AG_UUID;
--	else
-+	} else if (hsp_ag_agent) {
-+		svclass = HEADSET_SVCLASS_ID;
- 		hs->connecting_uuid = HSP_AG_UUID;
-+	} else {
-+		if (hs->pending) {
-+			pending_connect_finalize(device);
-+			headset_set_state(device, HEADSET_STATE_DISCONNECTED);
-+		}
-+		return -1;
-+	}
- 
- 	sdp_uuid16_create(&uuid, svclass);
- 
-@@ -698,7 +698,6 @@ static DBusMessage *hs_connect(DBusConnection *conn, DBusMessage *msg,
- {
- 	struct audio_device *device = data;
- 	struct headset *hs = device->headset;
--	struct btd_adapter *adapter;
- 	int err;
- 
- 	if (hs->state == HEADSET_STATE_CONNECTING)
-@@ -706,11 +705,6 @@ static DBusMessage *hs_connect(DBusConnection *conn, DBusMessage *msg,
- 	else if (hs->state > HEADSET_STATE_CONNECTING)
- 		return btd_error_already_connected(msg);
- 
--	adapter = device_get_adapter(device->btd_dev);
--
--	if (hs->hfp_handle && !telephony_get_ready_state(adapter))
--		return btd_error_not_ready(msg);
--
- 	device->auto_connect = FALSE;
- 
- 	err = rfcomm_connect(device, NULL, NULL, NULL);
-@@ -920,14 +914,14 @@ register_iface:
- 	return hs;
- }
- 
--uint32_t headset_config_init(GKeyFile *config)
-+void headset_config_init(GKeyFile *config)
- {
- 	GError *err = NULL;
- 	char *str;
- 
- 	/* Use the default values if there is no config file */
- 	if (config == NULL)
--		return telephony_get_ag_features();
-+		return;
- 
- 	str = g_key_file_get_string(config, "General", "SCORouting",
- 					&err);
-@@ -943,8 +937,6 @@ uint32_t headset_config_init(GKeyFile *config)
- 			error("Invalid Headset Routing value: %s", str);
- 		g_free(str);
- 	}
--
--	return telephony_get_ag_features();
- }
- 
- static gboolean hs_dc_timeout(struct audio_device *dev)
-@@ -1185,7 +1177,7 @@ void headset_set_state(struct audio_device *dev, headset_state_t state)
- 		value = FALSE;
- 		close_sco(dev);
- 
--		if (dev->headset->slc)  {
-+		if (dev->headset->slc) {
- 			telephony_device_disconnect(dev->headset->slc);
- 			dev->headset->slc = NULL;
- 		}
-diff --git a/audio/headset.h b/audio/headset.h
-index 35d128f..25a6563 100644
---- a/audio/headset.h
-+++ b/audio/headset.h
-@@ -24,9 +24,6 @@
- 
- #define AUDIO_HEADSET_INTERFACE "org.bluez.Headset"
- 
--#define DEFAULT_HS_AG_CHANNEL 12
--#define DEFAULT_HF_AG_CHANNEL 13
--
- typedef enum {
- 	HEADSET_STATE_DISCONNECTED,
- 	HEADSET_STATE_CONNECTING,
-@@ -62,7 +59,7 @@ struct headset *headset_init(struct audio_device *dev, uint16_t svc,
- 
- void headset_unregister(struct audio_device *dev);
- 
--uint32_t headset_config_init(GKeyFile *config);
-+void headset_config_init(GKeyFile *config);
- 
- void headset_update(struct audio_device *dev, uint16_t svc,
- 			const char *uuidstr);
-diff --git a/audio/manager.c b/audio/manager.c
-index a5f6d2f..f1a8b3e 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -94,11 +94,7 @@ typedef enum {
- struct audio_adapter {
- 	struct btd_adapter *btd_adapter;
- 	gboolean powered;
--	uint32_t hsp_ag_record_id;
--	uint32_t hfp_ag_record_id;
- 	uint32_t hfp_hs_record_id;
--	GIOChannel *hsp_ag_server;
--	GIOChannel *hfp_ag_server;
- 	GIOChannel *hfp_hs_server;
- 	gint ref;
- };
-@@ -232,62 +228,6 @@ static void handle_uuid(const char *uuidstr, struct audio_device *device)
- 	}
- }
- 
--static sdp_record_t *hsp_ag_record(uint8_t ch)
--{
--	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
--	uuid_t root_uuid, svclass_uuid, ga_svclass_uuid;
--	uuid_t l2cap_uuid, rfcomm_uuid;
--	sdp_profile_desc_t profile;
--	sdp_record_t *record;
--	sdp_list_t *aproto, *proto[2];
--	sdp_data_t *channel;
--
--	record = sdp_record_alloc();
--	if (!record)
--		return NULL;
--
--	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
--	root = sdp_list_append(0, &root_uuid);
--	sdp_set_browse_groups(record, root);
--
--	sdp_uuid16_create(&svclass_uuid, HEADSET_AGW_SVCLASS_ID);
--	svclass_id = sdp_list_append(0, &svclass_uuid);
--	sdp_uuid16_create(&ga_svclass_uuid, GENERIC_AUDIO_SVCLASS_ID);
--	svclass_id = sdp_list_append(svclass_id, &ga_svclass_uuid);
--	sdp_set_service_classes(record, svclass_id);
--
--	sdp_uuid16_create(&profile.uuid, HEADSET_PROFILE_ID);
--	profile.version = 0x0102;
--	pfseq = sdp_list_append(0, &profile);
--	sdp_set_profile_descs(record, pfseq);
--
--	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
--	proto[0] = sdp_list_append(0, &l2cap_uuid);
--	apseq = sdp_list_append(0, proto[0]);
--
--	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
--	proto[1] = sdp_list_append(0, &rfcomm_uuid);
--	channel = sdp_data_alloc(SDP_UINT8, &ch);
--	proto[1] = sdp_list_append(proto[1], channel);
--	apseq = sdp_list_append(apseq, proto[1]);
--
--	aproto = sdp_list_append(0, apseq);
--	sdp_set_access_protos(record, aproto);
--
--	sdp_set_info_attr(record, "Headset Audio Gateway", 0, 0);
--
--	sdp_data_free(channel);
--	sdp_list_free(proto[0], 0);
--	sdp_list_free(proto[1], 0);
--	sdp_list_free(apseq, 0);
--	sdp_list_free(pfseq, 0);
--	sdp_list_free(aproto, 0);
--	sdp_list_free(root, 0);
--	sdp_list_free(svclass_id, 0);
--
--	return record;
+-		telephony_update_indicator(dummy_indicators, "call",
+-						EV_CALL_INACTIVE);
 -}
 -
- static sdp_record_t *hfp_hs_record(uint8_t ch)
- {
- 	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-@@ -344,201 +284,6 @@ static sdp_record_t *hfp_hs_record(uint8_t ch)
- 	return record;
- }
- 
--static sdp_record_t *hfp_ag_record(uint8_t ch, uint32_t feat)
+-void telephony_answer_call_req(void *telephony_device)
 -{
--	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
--	uuid_t root_uuid, svclass_uuid, ga_svclass_uuid;
--	uuid_t l2cap_uuid, rfcomm_uuid;
--	sdp_profile_desc_t profile;
--	sdp_list_t *aproto, *proto[2];
--	sdp_record_t *record;
--	sdp_data_t *channel, *features;
--	uint8_t netid = 0x01;
--	uint16_t sdpfeat;
--	sdp_data_t *network;
+-	telephony_answer_call_rsp(telephony_device, CME_ERROR_NONE);
 -
--	record = sdp_record_alloc();
--	if (!record)
--		return NULL;
+-	telephony_update_indicator(dummy_indicators, "call", EV_CALL_ACTIVE);
+-	telephony_update_indicator(dummy_indicators, "callsetup",
+-					EV_CALLSETUP_INACTIVE);
 -
--	network = sdp_data_alloc(SDP_UINT8, &netid);
--	if (!network) {
--		sdp_record_free(record);
--		return NULL;
--	}
--
--	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
--	root = sdp_list_append(0, &root_uuid);
--	sdp_set_browse_groups(record, root);
--
--	sdp_uuid16_create(&svclass_uuid, HANDSFREE_AGW_SVCLASS_ID);
--	svclass_id = sdp_list_append(0, &svclass_uuid);
--	sdp_uuid16_create(&ga_svclass_uuid, GENERIC_AUDIO_SVCLASS_ID);
--	svclass_id = sdp_list_append(svclass_id, &ga_svclass_uuid);
--	sdp_set_service_classes(record, svclass_id);
--
--	sdp_uuid16_create(&profile.uuid, HANDSFREE_PROFILE_ID);
--	profile.version = 0x0105;
--	pfseq = sdp_list_append(0, &profile);
--	sdp_set_profile_descs(record, pfseq);
--
--	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
--	proto[0] = sdp_list_append(0, &l2cap_uuid);
--	apseq = sdp_list_append(0, proto[0]);
--
--	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
--	proto[1] = sdp_list_append(0, &rfcomm_uuid);
--	channel = sdp_data_alloc(SDP_UINT8, &ch);
--	proto[1] = sdp_list_append(proto[1], channel);
--	apseq = sdp_list_append(apseq, proto[1]);
--
--	sdpfeat = (uint16_t) feat & 0xF;
--	features = sdp_data_alloc(SDP_UINT16, &sdpfeat);
--	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
--
--	aproto = sdp_list_append(0, apseq);
--	sdp_set_access_protos(record, aproto);
--
--	sdp_set_info_attr(record, "Hands-Free Audio Gateway", 0, 0);
--
--	sdp_attr_add(record, SDP_ATTR_EXTERNAL_NETWORK, network);
--
--	sdp_data_free(channel);
--	sdp_list_free(proto[0], 0);
--	sdp_list_free(proto[1], 0);
--	sdp_list_free(apseq, 0);
--	sdp_list_free(pfseq, 0);
--	sdp_list_free(aproto, 0);
--	sdp_list_free(root, 0);
--	sdp_list_free(svclass_id, 0);
--
--	return record;
+-	active_call_status = CALL_STATUS_ACTIVE;
 -}
 -
--static void headset_auth_cb(DBusError *derr, void *user_data)
+-void telephony_dial_number_req(void *telephony_device, const char *number)
 -{
--	struct audio_device *device = user_data;
--	GError *err = NULL;
--	GIOChannel *io;
+-	g_free(active_call_number);
+-	active_call_number = g_strdup(number);
 -
--	if (device->hs_preauth_id) {
--		g_source_remove(device->hs_preauth_id);
--		device->hs_preauth_id = 0;
--	}
+-	DBG("telephony-dummy: dial request to %s", active_call_number);
 -
--	if (derr && dbus_error_is_set(derr)) {
--		error("Access denied: %s", derr->message);
--		headset_set_state(device, HEADSET_STATE_DISCONNECTED);
--		return;
--	}
+-	telephony_dial_number_rsp(telephony_device, CME_ERROR_NONE);
 -
--	io = headset_get_rfcomm(device);
+-	/* Notify outgoing call set-up successfully initiated */
+-	telephony_update_indicator(dummy_indicators, "callsetup",
+-					EV_CALLSETUP_OUTGOING);
+-	telephony_update_indicator(dummy_indicators, "callsetup",
+-					EV_CALLSETUP_ALERTING);
 -
--	if (!bt_io_accept(io, headset_connect_cb, device, NULL, &err)) {
--		error("bt_io_accept: %s", err->message);
--		g_error_free(err);
--		headset_set_state(device, HEADSET_STATE_DISCONNECTED);
--		return;
--	}
+-	active_call_status = CALL_STATUS_ALERTING;
+-	active_call_dir = CALL_DIR_OUTGOING;
 -}
 -
--static gboolean hs_preauth_cb(GIOChannel *chan, GIOCondition cond,
--							gpointer user_data)
+-void telephony_transmit_dtmf_req(void *telephony_device, char tone)
 -{
--	struct audio_device *device = user_data;
--
--	DBG("Headset disconnected during authorization");
--
--	audio_device_cancel_authorization(device, headset_auth_cb, device);
--
--	headset_set_state(device, HEADSET_STATE_DISCONNECTED);
--
--	device->hs_preauth_id = 0;
--
--	return FALSE;
+-	DBG("telephony-dummy: transmit dtmf: %c", tone);
+-	telephony_transmit_dtmf_rsp(telephony_device, CME_ERROR_NONE);
 -}
 -
--static void ag_confirm(GIOChannel *chan, gpointer data)
+-void telephony_subscriber_number_req(void *telephony_device)
 -{
--	const char *server_uuid, *remote_uuid;
--	struct audio_device *device;
--	gboolean hfp_active;
--	bdaddr_t src, dst;
--	int perr;
--	GError *err = NULL;
--	uint8_t ch;
--
--	bt_io_get(chan, BT_IO_RFCOMM, &err,
--			BT_IO_OPT_SOURCE_BDADDR, &src,
--			BT_IO_OPT_DEST_BDADDR, &dst,
--			BT_IO_OPT_CHANNEL, &ch,
--			BT_IO_OPT_INVALID);
--	if (err) {
--		error("%s", err->message);
--		g_error_free(err);
--		goto drop;
--	}
--
--	if (ch == DEFAULT_HS_AG_CHANNEL) {
--		hfp_active = FALSE;
--		server_uuid = HSP_AG_UUID;
--		remote_uuid = HSP_HS_UUID;
--	} else {
--		hfp_active = TRUE;
--		server_uuid = HFP_AG_UUID;
--		remote_uuid = HFP_HS_UUID;
--	}
--
--	device = manager_get_device(&src, &dst, TRUE);
--	if (!device)
--		goto drop;
--
--	if (!manager_allow_headset_connection(device)) {
--		DBG("Refusing headset: too many existing connections");
--		goto drop;
--	}
--
--	if (!device->headset) {
--		btd_device_add_uuid(device->btd_dev, remote_uuid);
--		if (!device->headset)
--			goto drop;
--	}
--
--	if (headset_get_state(device) > HEADSET_STATE_DISCONNECTED) {
--		DBG("Refusing new connection since one already exists");
--		goto drop;
--	}
--
--	headset_set_hfp_active(device, hfp_active);
--	headset_set_rfcomm_initiator(device, TRUE);
--
--	if (headset_connect_rfcomm(device, chan) < 0) {
--		error("headset_connect_rfcomm failed");
--		goto drop;
--	}
--
--	headset_set_state(device, HEADSET_STATE_CONNECTING);
--
--	perr = audio_device_request_authorization(device, server_uuid,
--						headset_auth_cb, device);
--	if (perr < 0) {
--		DBG("Authorization denied: %s", strerror(-perr));
--		headset_set_state(device, HEADSET_STATE_DISCONNECTED);
--		return;
--	}
--
--	device->hs_preauth_id = g_io_add_watch(chan,
--					G_IO_NVAL | G_IO_HUP | G_IO_ERR,
--					hs_preauth_cb, device);
--
--	device->auto_connect = auto_connect;
--
--	return;
--
--drop:
--	g_io_channel_shutdown(chan, TRUE, NULL);
+-	DBG("telephony-dummy: subscriber number request");
+-	if (subscriber_number)
+-		telephony_subscriber_number_ind(subscriber_number,
+-						NUMBER_TYPE_TELEPHONY,
+-						SUBSCRIBER_SERVICE_VOICE);
+-	telephony_subscriber_number_rsp(telephony_device, CME_ERROR_NONE);
 -}
 -
- static void gateway_auth_cb(DBusError *derr, void *user_data)
- {
- 	struct audio_device *device = user_data;
-@@ -614,108 +359,6 @@ drop:
- 	g_io_channel_shutdown(chan, TRUE, NULL);
- }
- 
--static int headset_server_init(struct audio_adapter *adapter)
+-void telephony_list_current_calls_req(void *telephony_device)
 -{
--	uint8_t chan = DEFAULT_HS_AG_CHANNEL;
--	sdp_record_t *record;
--	gboolean master = TRUE;
--	GError *err = NULL;
--	uint32_t features;
--	GIOChannel *io;
--	bdaddr_t src;
+-	DBG("telephony-dummy: list current calls request");
+-	if (active_call_number)
+-		telephony_list_current_call_ind(1, active_call_dir,
+-						active_call_status,
+-						CALL_MODE_VOICE,
+-						CALL_MULTIPARTY_NO,
+-						active_call_number,
+-						NUMBER_TYPE_TELEPHONY);
+-	telephony_list_current_calls_rsp(telephony_device, CME_ERROR_NONE);
+-}
 -
--	if (config) {
--		gboolean tmp;
+-void telephony_operator_selection_req(void *telephony_device)
+-{
+-	telephony_operator_selection_ind(OPERATOR_MODE_AUTO, "DummyOperator");
+-	telephony_operator_selection_rsp(telephony_device, CME_ERROR_NONE);
+-}
 -
--		tmp = g_key_file_get_boolean(config, "General", "Master",
--						&err);
--		if (err) {
--			DBG("audio.conf: %s", err->message);
--			g_clear_error(&err);
--		} else
--			master = tmp;
+-void telephony_call_hold_req(void *telephony_device, const char *cmd)
+-{
+-	DBG("telephony-dymmy: got call hold request %s", cmd);
+-	telephony_call_hold_rsp(telephony_device, CME_ERROR_NONE);
+-}
+-
+-void telephony_nr_and_ec_req(void *telephony_device, gboolean enable)
+-{
+-	DBG("telephony-dummy: got %s NR and EC request",
+-			enable ? "enable" : "disable");
+-
+-	telephony_nr_and_ec_rsp(telephony_device, CME_ERROR_NONE);
+-}
+-
+-void telephony_voice_dial_req(void *telephony_device, gboolean enable)
+-{
+-	DBG("telephony-dummy: got %s voice dial request",
+-			enable ? "enable" : "disable");
+-
+-	g_dbus_emit_signal(connection, TELEPHONY_DUMMY_PATH,
+-			TELEPHONY_DUMMY_IFACE, "VoiceDial",
+-			DBUS_TYPE_INVALID);
+-
+-	telephony_voice_dial_rsp(telephony_device, CME_ERROR_NONE);
+-}
+-
+-void telephony_key_press_req(void *telephony_device, const char *keys)
+-{
+-	DBG("telephony-dummy: got key press request for %s", keys);
+-	telephony_key_press_rsp(telephony_device, CME_ERROR_NONE);
+-}
+-
+-/* D-Bus method handlers */
+-static DBusMessage *outgoing_call(DBusConnection *conn, DBusMessage *msg,
+-					void *data)
+-{
+-	const char *number;
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &number,
+-						DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	DBG("telephony-dummy: outgoing call to %s", number);
+-
+-	g_free(active_call_number);
+-	active_call_number = g_strdup(number);
+-
+-	telephony_update_indicator(dummy_indicators, "callsetup",
+-					EV_CALLSETUP_OUTGOING);
+-	telephony_update_indicator(dummy_indicators, "callsetup",
+-					EV_CALLSETUP_ALERTING);
+-
+-	active_call_status = CALL_STATUS_ALERTING;
+-	active_call_dir = CALL_DIR_OUTGOING;
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *incoming_call(DBusConnection *conn, DBusMessage *msg,
+-					void *data)
+-{
+-	const char *number;
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &number,
+-						DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	DBG("telephony-dummy: incoming call to %s", number);
+-
+-	g_free(active_call_number);
+-	active_call_number = g_strdup(number);
+-
+-	telephony_update_indicator(dummy_indicators, "callsetup",
+-					EV_CALLSETUP_INCOMING);
+-
+-	active_call_status = CALL_STATUS_INCOMING;
+-	active_call_dir = CALL_DIR_INCOMING;
+-
+-	telephony_incoming_call_ind(number, NUMBER_TYPE_TELEPHONY);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *cancel_call(DBusConnection *conn, DBusMessage *msg,
+-					void *data)
+-{
+-	DBG("telephony-dummy: cancel call");
+-
+-	g_free(active_call_number);
+-	active_call_number = NULL;
+-
+-	if (telephony_get_indicator(dummy_indicators, "callsetup") > 0) {
+-		telephony_update_indicator(dummy_indicators, "callsetup",
+-						EV_CALLSETUP_INACTIVE);
+-		telephony_calling_stopped_ind();
 -	}
 -
--	adapter_get_address(adapter->btd_adapter, &src);
+-	if (telephony_get_indicator(dummy_indicators, "call") > 0)
+-		telephony_update_indicator(dummy_indicators, "call",
+-						EV_CALL_INACTIVE);
 -
--	io =  bt_io_listen(BT_IO_RFCOMM, NULL, ag_confirm, adapter, NULL, &err,
--				BT_IO_OPT_SOURCE_BDADDR, &src,
--				BT_IO_OPT_CHANNEL, chan,
--				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
--				BT_IO_OPT_MASTER, master,
--				BT_IO_OPT_INVALID);
--	if (!io)
--		goto failed;
+-	return dbus_message_new_method_return(msg);
+-}
 -
--	adapter->hsp_ag_server = io;
+-static DBusMessage *signal_strength(DBusConnection *conn, DBusMessage *msg,
+-					void *data)
+-{
+-	dbus_uint32_t strength;
 -
--	record = hsp_ag_record(chan);
--	if (!record) {
--		error("Unable to allocate new service record");
--		goto failed;
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT32, &strength,
+-						DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	if (strength > 5)
+-		return btd_error_invalid_args(msg);
+-
+-	telephony_update_indicator(dummy_indicators, "signal", strength);
+-
+-	DBG("telephony-dummy: signal strength set to %u", strength);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *battery_level(DBusConnection *conn, DBusMessage *msg,
+-					void *data)
+-{
+-	dbus_uint32_t level;
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT32, &level,
+-						DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	if (level > 5)
+-		return btd_error_invalid_args(msg);
+-
+-	telephony_update_indicator(dummy_indicators, "battchg", level);
+-
+-	DBG("telephony-dummy: battery level set to %u", level);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *roaming_status(DBusConnection *conn, DBusMessage *msg,
+-					void *data)
+-{
+-	dbus_bool_t roaming;
+-	int val;
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_BOOLEAN, &roaming,
+-						DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	val = roaming ? EV_ROAM_ACTIVE : EV_ROAM_INACTIVE;
+-
+-	telephony_update_indicator(dummy_indicators, "roam", val);
+-
+-	DBG("telephony-dummy: roaming status set to %d", val);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *registration_status(DBusConnection *conn, DBusMessage *msg,
+-					void *data)
+-{
+-	dbus_bool_t registration;
+-	int val;
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_BOOLEAN, &registration,
+-						DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	val = registration ? EV_SERVICE_PRESENT : EV_SERVICE_NONE;
+-
+-	telephony_update_indicator(dummy_indicators, "service", val);
+-
+-	DBG("telephony-dummy: registration status set to %d", val);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *set_subscriber_number(DBusConnection *conn,
+-						DBusMessage *msg,
+-						void *data)
+-{
+-	const char *number;
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &number,
+-						DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	g_free(subscriber_number);
+-	subscriber_number = g_strdup(number);
+-
+-	DBG("telephony-dummy: subscriber number set to %s", number);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static GDBusMethodTable dummy_methods[] = {
+-	{ "OutgoingCall",	"s",	"",	outgoing_call		},
+-	{ "IncomingCall",	"s",	"",	incoming_call		},
+-	{ "CancelCall",		"",	"",	cancel_call		},
+-	{ "SignalStrength",	"u",	"",	signal_strength		},
+-	{ "BatteryLevel",	"u",	"",	battery_level		},
+-	{ "RoamingStatus",	"b",	"",	roaming_status		},
+-	{ "RegistrationStatus",	"b",	"",	registration_status	},
+-	{ "SetSubscriberNumber","s",	"",	set_subscriber_number	},
+-	{ }
+-};
+-
+-static GDBusSignalTable dummy_signals[] = {
+-	{ "VoiceDial",	"" },
+-	{ }
+-};
+-
+-int telephony_init(void)
+-{
+-	uint32_t features = AG_FEATURE_REJECT_A_CALL |
+-				AG_FEATURE_ENHANCED_CALL_STATUS |
+-				AG_FEATURE_EXTENDED_ERROR_RESULT_CODES;
+-
+-	DBG("");
+-
+-	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
+-
+-	if (g_dbus_register_interface(connection, TELEPHONY_DUMMY_PATH,
+-					TELEPHONY_DUMMY_IFACE,
+-					dummy_methods, dummy_signals,
+-					NULL, NULL, NULL) == FALSE) {
+-		error("telephony-dummy interface %s init failed on path %s",
+-			TELEPHONY_DUMMY_IFACE, TELEPHONY_DUMMY_PATH);
+-		return -1;
 -	}
 -
--	if (add_record_to_server(&src, record) < 0) {
--		error("Unable to register HS AG service record");
--		sdp_record_free(record);
--		goto failed;
--	}
--	adapter->hsp_ag_record_id = record->handle;
--
--	features = headset_config_init(config);
--
--	if (!enabled.hfp)
--		return 0;
--
--	chan = DEFAULT_HF_AG_CHANNEL;
--
--	io = bt_io_listen(BT_IO_RFCOMM, NULL, ag_confirm, adapter, NULL, &err,
--				BT_IO_OPT_SOURCE_BDADDR, &src,
--				BT_IO_OPT_CHANNEL, chan,
--				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
--				BT_IO_OPT_MASTER, master,
--				BT_IO_OPT_INVALID);
--	if (!io)
--		goto failed;
--
--	adapter->hfp_ag_server = io;
--
--	record = hfp_ag_record(chan, features);
--	if (!record) {
--		error("Unable to allocate new service record");
--		goto failed;
--	}
--
--	if (add_record_to_server(&src, record) < 0) {
--		error("Unable to register HF AG service record");
--		sdp_record_free(record);
--		goto failed;
--	}
--	adapter->hfp_ag_record_id = record->handle;
+-	telephony_ready_ind(features, dummy_indicators, BTRH_NOT_SUPPORTED,
+-								chld_str);
 -
 -	return 0;
--
--failed:
--	if (err) {
--		error("%s", err->message);
--		g_error_free(err);
--	}
--
--	if (adapter->hsp_ag_server) {
--		g_io_channel_shutdown(adapter->hsp_ag_server, TRUE, NULL);
--		g_io_channel_unref(adapter->hsp_ag_server);
--		adapter->hsp_ag_server = NULL;
--	}
--
--	if (adapter->hfp_ag_server) {
--		g_io_channel_shutdown(adapter->hfp_ag_server, TRUE, NULL);
--		g_io_channel_unref(adapter->hfp_ag_server);
--		adapter->hfp_ag_server = NULL;
--	}
--
--	return -1;
 -}
 -
- static int gateway_server_init(struct audio_adapter *adapter)
- {
- 	uint8_t chan = DEFAULT_HFP_HS_CHANNEL;
-@@ -910,7 +553,6 @@ static int headset_server_probe(struct btd_adapter *adapter)
- {
- 	struct audio_adapter *adp;
- 	const gchar *path = adapter_get_path(adapter);
--	int err;
- 
- 	DBG("path %s", path);
- 
-@@ -920,11 +562,7 @@ static int headset_server_probe(struct btd_adapter *adapter)
- 
- 	btd_adapter_register_powered_callback(adapter, state_changed);
- 
--	err = headset_server_init(adp);
--	if (err < 0) {
--		audio_adapter_unref(adp);
--		return err;
--	}
-+	headset_config_init(config);
- 
- 	return 0;
- }
-@@ -940,28 +578,6 @@ static void headset_server_remove(struct btd_adapter *adapter)
- 	if (!adp)
- 		return;
- 
--	if (adp->hsp_ag_record_id) {
--		remove_record_from_server(adp->hsp_ag_record_id);
--		adp->hsp_ag_record_id = 0;
--	}
+-void telephony_exit(void)
+-{
+-	DBG("");
 -
--	if (adp->hsp_ag_server) {
--		g_io_channel_shutdown(adp->hsp_ag_server, TRUE, NULL);
--		g_io_channel_unref(adp->hsp_ag_server);
--		adp->hsp_ag_server = NULL;
--	}
+-	g_dbus_unregister_interface(connection, TELEPHONY_DUMMY_PATH,
+-						TELEPHONY_DUMMY_IFACE);
+-	dbus_connection_unref(connection);
+-	connection = NULL;
 -
--	if (adp->hfp_ag_record_id) {
--		remove_record_from_server(adp->hfp_ag_record_id);
--		adp->hfp_ag_record_id = 0;
--	}
--
--	if (adp->hfp_ag_server) {
--		g_io_channel_shutdown(adp->hfp_ag_server, TRUE, NULL);
--		g_io_channel_unref(adp->hfp_ag_server);
--		adp->hfp_ag_server = NULL;
--	}
--
- 	btd_adapter_unregister_powered_callback(adapter, state_changed);
- 
- 	audio_adapter_unref(adp);
-diff --git a/audio/telephony.c b/audio/telephony.c
-index 9fe4309..5c68f42 100644
---- a/audio/telephony.c
-+++ b/audio/telephony.c
-@@ -39,6 +39,7 @@
- #include "btio.h"
- #include "log.h"
- #include "device.h"
-+#include "manager.h"
- #include "error.h"
- #include "glib-helper.h"
- #include "sdp-client.h"
-@@ -47,12 +48,17 @@
- #include "dbus-common.h"
- #include "../src/adapter.h"
- #include "../src/device.h"
-+#include "sdpd.h"
- 
- #define AUDIO_TELEPHONY_INTERFACE "org.bluez.Telephony"
- #define AUDIO_TELEPHONY_AGENT_INTERFACE "org.bluez.TelephonyAgent"
- 
- #define DEFAULT_HS_HS_CHANNEL 6
-+#define DEFAULT_HS_AG_CHANNEL 12
- #define DEFAULT_HF_HS_CHANNEL 7
-+#define DEFAULT_HF_AG_CHANNEL 13
-+
-+struct tel_agent;
- 
- struct tel_device {
- 	struct audio_device	*au_dev;
-@@ -70,6 +76,8 @@ struct default_agent {
- 	const char		*r_uuid;
- 	uint16_t		r_class;
- 	uint16_t		r_profile;
-+	sdp_record_t		*(*record_init)(struct tel_agent *agent);
-+	BtIOConfirm		confirm;
- 	DBusPendingCallNotifyFunction connection_reply;
- };
- 
-@@ -81,6 +89,8 @@ struct tel_agent {
- 	uint16_t		version;
- 	uint16_t		features;
- 	struct default_agent	*properties;
-+	GIOChannel		*io;
-+	uint32_t		record_id;
- };
- 
- static DBusConnection *connection = NULL;
-@@ -91,6 +101,14 @@ static void free_agent(struct tel_agent *agent)
- {
- 	DBusMessage *msg;
- 
-+	if (agent->record_id)
-+		remove_record_from_server(agent->record_id);
-+
-+	if (agent->io) {
-+		g_io_channel_shutdown(agent->io, TRUE, NULL);
-+		g_io_channel_unref(agent->io);
-+	}
-+
- 	if (agent->watch) {
- 		msg = dbus_message_new_method_call(agent->name, agent->path,
- 				AUDIO_TELEPHONY_AGENT_INTERFACE, "Release");
-@@ -375,14 +393,256 @@ void telephony_device_disconnected(void *telephony_device)
- 	DBG("telephony-dbus: device %p disconnected", telephony_device);
- }
- 
--gboolean telephony_get_ready_state(void *adapter)
-+static sdp_record_t *hsp_ag_record(struct tel_agent * agent)
- {
--	return find_agent(adapter, NULL, NULL, HFP_AG_UUID) ? TRUE : FALSE;
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	uuid_t root_uuid, svclass_uuid, ga_svclass_uuid;
-+	uuid_t l2cap_uuid, rfcomm_uuid;
-+	sdp_profile_desc_t profile;
-+	sdp_record_t *record;
-+	sdp_list_t *aproto, *proto[2];
-+	sdp_data_t *channel;
-+
-+	record = sdp_record_alloc();
-+	if (!record)
-+		return NULL;
-+
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(0, &root_uuid);
-+	sdp_set_browse_groups(record, root);
-+
-+	sdp_uuid16_create(&svclass_uuid, HEADSET_AGW_SVCLASS_ID);
-+	svclass_id = sdp_list_append(0, &svclass_uuid);
-+	sdp_uuid16_create(&ga_svclass_uuid, GENERIC_AUDIO_SVCLASS_ID);
-+	svclass_id = sdp_list_append(svclass_id, &ga_svclass_uuid);
-+	sdp_set_service_classes(record, svclass_id);
-+
-+	sdp_uuid16_create(&profile.uuid, HEADSET_PROFILE_ID);
-+	profile.version = agent->version;
-+	pfseq = sdp_list_append(0, &profile);
-+	sdp_set_profile_descs(record, pfseq);
-+
-+	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
-+	proto[0] = sdp_list_append(0, &l2cap_uuid);
-+	apseq = sdp_list_append(0, proto[0]);
-+
-+	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
-+	proto[1] = sdp_list_append(0, &rfcomm_uuid);
-+	channel = sdp_data_alloc(SDP_UINT8, &agent->properties->channel);
-+	proto[1] = sdp_list_append(proto[1], channel);
-+	apseq = sdp_list_append(apseq, proto[1]);
-+
-+	aproto = sdp_list_append(0, apseq);
-+	sdp_set_access_protos(record, aproto);
-+
-+	sdp_set_info_attr(record, "Headset Audio Gateway", 0, 0);
-+
-+	sdp_data_free(channel);
-+	sdp_list_free(proto[0], 0);
-+	sdp_list_free(proto[1], 0);
-+	sdp_list_free(apseq, 0);
-+	sdp_list_free(pfseq, 0);
-+	sdp_list_free(aproto, 0);
-+	sdp_list_free(root, 0);
-+	sdp_list_free(svclass_id, 0);
-+
-+	return record;
- }
- 
--uint32_t telephony_get_ag_features(void)
-+static sdp_record_t *hfp_ag_record(struct tel_agent * agent)
- {
--	return 0;
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	uuid_t root_uuid, svclass_uuid, ga_svclass_uuid;
-+	uuid_t l2cap_uuid, rfcomm_uuid;
-+	sdp_profile_desc_t profile;
-+	sdp_list_t *aproto, *proto[2];
-+	sdp_record_t *record;
-+	sdp_data_t *channel, *features;
-+	uint8_t netid;
-+	uint16_t sdpfeat;
-+	sdp_data_t *network;
-+
-+	record = sdp_record_alloc();
-+	if (!record)
-+		return NULL;
-+
-+	netid = agent->features & AG_FEATURE_REJECT_A_CALL ? 1 : 0;
-+	network = sdp_data_alloc(SDP_UINT8, &netid);
-+	if (!network) {
-+		sdp_record_free(record);
-+		return NULL;
-+	}
-+
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(0, &root_uuid);
-+	sdp_set_browse_groups(record, root);
-+
-+	sdp_uuid16_create(&svclass_uuid, HANDSFREE_AGW_SVCLASS_ID);
-+	svclass_id = sdp_list_append(0, &svclass_uuid);
-+	sdp_uuid16_create(&ga_svclass_uuid, GENERIC_AUDIO_SVCLASS_ID);
-+	svclass_id = sdp_list_append(svclass_id, &ga_svclass_uuid);
-+	sdp_set_service_classes(record, svclass_id);
-+
-+	sdp_uuid16_create(&profile.uuid, HANDSFREE_PROFILE_ID);
-+	profile.version = agent->version;
-+	pfseq = sdp_list_append(0, &profile);
-+	sdp_set_profile_descs(record, pfseq);
-+
-+	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
-+	proto[0] = sdp_list_append(0, &l2cap_uuid);
-+	apseq = sdp_list_append(0, proto[0]);
-+
-+	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
-+	proto[1] = sdp_list_append(0, &rfcomm_uuid);
-+	channel = sdp_data_alloc(SDP_UINT8, &agent->properties->channel);
-+	proto[1] = sdp_list_append(proto[1], channel);
-+	apseq = sdp_list_append(apseq, proto[1]);
-+
-+	sdpfeat = agent->features & 0x1F;
-+	features = sdp_data_alloc(SDP_UINT16, &sdpfeat);
-+	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
-+
-+	aproto = sdp_list_append(0, apseq);
-+	sdp_set_access_protos(record, aproto);
-+
-+	sdp_set_info_attr(record, "Hands-Free Audio Gateway", 0, 0);
-+
-+	sdp_attr_add(record, SDP_ATTR_EXTERNAL_NETWORK, network);
-+
-+	sdp_data_free(channel);
-+	sdp_list_free(proto[0], 0);
-+	sdp_list_free(proto[1], 0);
-+	sdp_list_free(apseq, 0);
-+	sdp_list_free(pfseq, 0);
-+	sdp_list_free(aproto, 0);
-+	sdp_list_free(root, 0);
-+	sdp_list_free(svclass_id, 0);
-+
-+	return record;
-+}
-+
-+static void headset_auth_cb(DBusError *derr, void *user_data)
-+{
-+	struct audio_device *device = user_data;
-+	GError *err = NULL;
-+	GIOChannel *io;
-+
-+	if (device->hs_preauth_id) {
-+		g_source_remove(device->hs_preauth_id);
-+		device->hs_preauth_id = 0;
-+	}
-+
-+	if (derr && dbus_error_is_set(derr)) {
-+		error("Access denied: %s", derr->message);
-+		headset_set_state(device, HEADSET_STATE_DISCONNECTED);
-+		return;
-+	}
-+
-+	io = headset_get_rfcomm(device);
-+
-+	if (!bt_io_accept(io, headset_connect_cb, device, NULL, &err)) {
-+		error("bt_io_accept: %s", err->message);
-+		g_error_free(err);
-+		headset_set_state(device, HEADSET_STATE_DISCONNECTED);
-+		return;
-+	}
-+}
-+
-+static gboolean hs_preauth_cb(GIOChannel *chan, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	struct audio_device *device = user_data;
-+
-+	DBG("Headset disconnected during authorization");
-+
-+	audio_device_cancel_authorization(device, headset_auth_cb, device);
-+
-+	headset_set_state(device, HEADSET_STATE_DISCONNECTED);
-+
-+	device->hs_preauth_id = 0;
-+
-+	return FALSE;
-+}
-+
-+static void ag_confirm(GIOChannel *chan, gpointer data)
-+{
-+	struct tel_agent *agent = data;
-+	struct audio_device *device;
-+	gboolean hfp_active;
-+	bdaddr_t src, dst;
-+	int perr;
-+	GError *err = NULL;
-+	uint8_t ch;
-+
-+	bt_io_get(chan, BT_IO_RFCOMM, &err,
-+			BT_IO_OPT_SOURCE_BDADDR, &src,
-+			BT_IO_OPT_DEST_BDADDR, &dst,
-+			BT_IO_OPT_CHANNEL, &ch,
-+			BT_IO_OPT_INVALID);
-+	if (err) {
-+		error("%s", err->message);
-+		g_error_free(err);
-+		goto drop;
-+	}
-+
-+	/* TODO: to remove ? */
-+	if (ch == DEFAULT_HS_AG_CHANNEL)
-+		hfp_active = FALSE;
-+	else
-+		hfp_active = TRUE;
-+
-+	device = manager_get_device(&src, &dst, TRUE);
-+	if (!device)
-+		goto drop;
-+
-+	if (!manager_allow_headset_connection(device)) {
-+		DBG("Refusing headset: too many existing connections");
-+		goto drop;
-+	}
-+
-+	if (!device->headset) {
-+		btd_device_add_uuid(device->btd_dev, agent->properties->r_uuid);
-+		if (!device->headset)
-+			goto drop;
-+	}
-+
-+	if (headset_get_state(device) > HEADSET_STATE_DISCONNECTED) {
-+		DBG("Refusing new connection since one already exists");
-+		goto drop;
-+	}
-+
-+	headset_set_hfp_active(device, hfp_active);
-+	headset_set_rfcomm_initiator(device, TRUE);
-+	headset_set_connecting_uuid(device, agent->properties->uuid);
-+
-+	if (headset_connect_rfcomm(device, chan) < 0) {
-+		error("headset_connect_rfcomm failed");
-+		goto drop;
-+	}
-+
-+	headset_set_state(device, HEADSET_STATE_CONNECTING);
-+
-+	perr = audio_device_request_authorization(device,
-+						agent->properties->uuid,
-+						headset_auth_cb, device);
-+	if (perr < 0) {
-+		DBG("Authorization denied: %s", strerror(-perr));
-+		headset_set_state(device, HEADSET_STATE_DISCONNECTED);
-+		return;
-+	}
-+
-+	device->hs_preauth_id = g_io_add_watch(chan,
-+					G_IO_NVAL | G_IO_HUP | G_IO_ERR,
-+					hs_preauth_cb, device);
-+
-+#if 0
-+	device->auto_connect = auto_connect;
-+#endif
-+
-+	return;
-+
-+drop:
-+	g_io_channel_shutdown(chan, TRUE, NULL);
- }
- 
- static struct default_agent default_properties[] = {
-@@ -391,12 +651,16 @@ static struct default_agent default_properties[] = {
- 		HSP_HS_UUID,
- 		HEADSET_SVCLASS_ID,
- 		HEADSET_PROFILE_ID,
-+		hsp_ag_record,
-+		ag_confirm,
- 		hs_newconnection_reply },
- 	{ HFP_AG_UUID,
- 		DEFAULT_HF_AG_CHANNEL,
- 		HFP_HS_UUID,
- 		HANDSFREE_SVCLASS_ID,
- 		HANDSFREE_PROFILE_ID,
-+		hfp_ag_record,
-+		ag_confirm,
- 		hs_newconnection_reply },
- };
- 
-@@ -445,6 +709,10 @@ static DBusMessage *register_agent(DBusConnection *conn,
- 	uint16_t version = 0;
- 	uint16_t features = 0xFFFF;
- 	struct tel_agent *agent;
-+	sdp_record_t *record;
-+	bdaddr_t src;
-+	gboolean master = TRUE;
-+	GError *err = NULL;
- 
- 	sender = dbus_message_get_sender(msg);
- 
-@@ -475,9 +743,43 @@ static DBusMessage *register_agent(DBusConnection *conn,
- 							agent_disconnect_cb,
- 							agent, NULL);
- 
-+	record = agent->properties->record_init(agent);
-+	if (!record) {
-+		error("Unable to allocate new service record");
-+		return btd_error_failed(msg, "Unable to allocate new service " \
-+						"record");
-+	}
-+
- 	DBG("Register agent : %s%s for %s version 0x%04X with features 0x%02X",
- 					sender, path, uuid, version, features);
- 
-+	/* start RFComm agent server */
-+	adapter_get_address(adapter, &src);
-+
-+	agent->io = bt_io_listen(BT_IO_RFCOMM, NULL, agent->properties->confirm,
-+				agent, NULL, &err,
-+				BT_IO_OPT_SOURCE_BDADDR, &src,
-+				BT_IO_OPT_CHANNEL, agent->properties->channel,
-+				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-+				BT_IO_OPT_MASTER, master,
-+				BT_IO_OPT_INVALID);
-+	if (agent->io == NULL) {
-+		error("Unable to register server");
-+		sdp_record_free(record);
-+		free_agent(agent);
-+		return btd_error_failed(msg, "Failed to register server");
-+	}
-+
-+	/* advertise agent sdp record */
-+	if (add_record_to_server(&src, record) < 0) {
-+		error("Unable to register service record");
-+		sdp_record_free(record);
-+		free_agent(agent);
-+		return btd_error_failed(msg, "Failed to register sdp record");
-+	}
-+
-+	agent->record_id = record->handle;
-+
- 	agents = g_slist_append(agents, agent);
- 
- 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
-diff --git a/audio/telephony.h b/audio/telephony.h
-index dfb8328..6d6a955 100644
---- a/audio/telephony.h
-+++ b/audio/telephony.h
-@@ -54,8 +54,6 @@ void telephony_device_connected(void *telephony_device);
- void telephony_device_disconnect(void *slc);
- void telephony_device_disconnected(void *telephony_device);
- 
--gboolean telephony_get_ready_state(void *adapter);
--uint32_t telephony_get_ag_features(void);
- void *telephony_agent_by_uuid(void *adapter, const char *uuid);
- 
- int telephony_adapter_init(void *adapter);
+-	telephony_deinit();
+-}
 -- 
 1.7.1
 
