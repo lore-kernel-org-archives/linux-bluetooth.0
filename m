@@ -1,83 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F797C80.7070107@ahsoftware.de>
-Date: Mon, 02 Apr 2012 12:16:32 +0200
-From: Alexander Holler <holler@ahsoftware.de>
+Date: Mon, 2 Apr 2012 12:46:33 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Arik Nemtsov <arik@wizery.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v6 0/6] Implement ProximityReporter profiles
+Message-ID: <20120402094633.GA26168@x220>
+References: <1332879859-20268-1-git-send-email-arik@wizery.com>
+ <CA+XVXfcJ=zGx9Qz6tEEEoBi9F4F6jN_bgnT5+axrN3p9zRNx-A@mail.gmail.com>
 MIME-Version: 1.0
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-CC: David Herrmann <dh.herrmann@googlemail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	stable@vger.kernel.org, Andre Guedes <andre.guedes@openbossa.org>
-Subject: Re: bluetooth: fix deadlock on device reset and power down
-References: <4F77055A.2070502@ahsoftware.de> <20120402065525.GA29687@aemeltch-MOBL1> <4F796377.2050008@ahsoftware.de> <CANq1E4RCQvQX6deGOTjdhbEkAahZD9MmAmfgz-Y-+wDfRtx0dw@mail.gmail.com> <20120402090337.GB29687@aemeltch-MOBL1> <4F796E98.8070603@ahsoftware.de>
-In-Reply-To: <4F796E98.8070603@ahsoftware.de>
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CA+XVXfcJ=zGx9Qz6tEEEoBi9F4F6jN_bgnT5+axrN3p9zRNx-A@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 02.04.2012 11:17, schrieb Alexander Holler:
-> Am 02.04.2012 11:03, schrieb Andrei Emeltchenko:
->> Hi guys,
->>
->> On Mon, Apr 02, 2012 at 10:44:43AM +0200, David Herrmann wrote:
->>> Hi Andrei and Alexander
->>>
->>> On Mon, Apr 2, 2012 at 10:29 AM, Alexander Holler<holler@ahsoftware.de>  wrote:
->>>> Am 02.04.2012 08:55, schrieb Andrei Emeltchenko:
->>>>> Hi Alexander,
->>>>>
->>>>> On Sat, Mar 31, 2012 at 03:23:38PM +0200, Alexander Holler wrote:
->>>>>> I've experienced a deadlock on shutdown using kernel 3.3 and tracked
->>>>>> it down. Because I'm not very familiar with the bluetooth stack I'm
->>>>>> not sure if the below patch is correct, but it fixed the problem
->>>>>> here.
->>>>>
->>>>> Could you please attach deadlock dump?
->>>>>
->>>>>>
->>>>>> Commit 09fd0de5bd8f8ef3317e5365f92f1a13dcd89aa9 introduced a deadlock:
->>>>>>
->>>>>> bluetoothd calls ioctl HCIDEVDOWN
->>>>>>      hci_sock_ioctl()
->>>>>>          hci_dev_close()
->>>>>>              hci_dev_do_close()
->>>>>>                  hci_dev_lock(hdev);
->>>>>>                  inquiry_cache_flush();
->>>>>>                  hci_conn_hash_flush();
->>>>>>                      hci_conn_del()
->>>>>>                          cancel_delayed_work_sync()
->>>>>>                              hci_conn_timeout()
->>>>>>                                  hci_dev_lock(hdev); /* DEADLOCK */
->>>>>
->>>>> I am actually not sure that hci_conn_timeout locks hdev. Why do you think
->>>>> so?
->>>>
->>>> By reading the source, printk and suffering through the deadlock. It's
->>>> especially painfull when using a bt-keyboard and systemd, because
->>>> systemd tries 4 times (~ some minutes) to kill bluetoothd before it
->>>> marks the service as failed and finally continues to shut down.
->>>
->>> hci_conn_timeout does lock the device. See the source. But the problem
->>
->> I think you need to check commit e72acc13c770a82b4ce4a07e9716f29320eae0f8
->>
->> commit e72acc13c770a82b4ce4a07e9716f29320eae0f8
->> Author: Andre Guedes<andre.guedes@openbossa.org>
->> Date:   Fri Jan 27 19:42:03 2012 -0300
->>
->>      Bluetooth: Remove unneeded locking
->>
->>      We don't need locking hdev in hci_conn_timeout() since it doesn't
->>      access any hdev's shared resources, it basically queues HCI commands.
->
-> So if the locks in hci_conn_timeout() aren't needed, your commit which
-> removes them should go to the stable tree because it fixes a painful
-> deadlock.
+Hi Arik,
 
-Oh, sorry, that patch is not from you, your first name is only similiar. 
-I've added the author to cc, just in case the lock might still be needed 
-in 3.3 if no other patches (from 3.4) besides that one are applied.
+On Mon, Apr 02, 2012, Arik Nemtsov wrote:
+> ping?
 
-Regards,
+Don't top post please.
 
-Alexander
+> On Tue, Mar 27, 2012 at 22:24, Arik Nemtsov <arik@wizery.com> wrote:
+> > This patch-set implements the Link loss and Immediate Alert GATT
+> > server profiles.
+> >
+> > A few API calls are added/changed in preparation, the most notable of
+> > which is the addition of the remote-device to each GATT read/write callback.
+> >
+> > The new profiles are separated into their own files for clarity.
+> >
+> > A ProximityReporter D-Bus interface is registered for each remote device.
+> > Property queries and PropertyChanged notifications are implemented, in
+> > accordance to doc/proximity-api.txt.
+> >
+> > v5->6: Fix immalert bug on unregister path. Rename att-bluez.h to
+> > att-database.h. Rebase on latest master (Makefile.am changes).
+> >
+> > Arik Nemtsov (6):
+> >  att: add remote btd_device to ATT read/write callbacks
+> >  proximity: reporter: save global D-Bus connection
+> >  proximity: reporter: move definitions to .h and add util function
+> >  proximity: link loss: implement link loss server
+> >  proximity: immediate alert: implement immediate alert server
+> >  proximity: reporter: implement D-Bus API
+> >
+> >  Makefile.am            |    4 +-
+> >  attrib/att-database.h  |   44 +++++++
+> >  attrib/att.h           |   20 ---
+> >  attrib/gatt-service.c  |    1 +
+> >  plugins/gatt-example.c |    4 +-
+> >  proximity/immalert.c   |  289 +++++++++++++++++++++++++++++++++++++++++
+> >  proximity/immalert.h   |   26 ++++
+> >  proximity/linkloss.c   |  337 ++++++++++++++++++++++++++++++++++++++++++++++++
+> >  proximity/linkloss.h   |   26 ++++
+> >  proximity/reporter.c   |  250 ++++++++++++++++++++++++++----------
+> >  proximity/reporter.h   |   16 +++
+> >  src/attrib-server.c    |   20 ++-
+> >  time/server.c          |    7 +-
+> >  13 files changed, 946 insertions(+), 98 deletions(-)
+> >  create mode 100644 attrib/att-database.h
+> >  create mode 100644 proximity/immalert.c
+> >  create mode 100644 proximity/immalert.h
+> >  create mode 100644 proximity/linkloss.c
+> >  create mode 100644 proximity/linkloss.h
+
+Firstly the patches do not apply:
+
+Applying: att: add remote btd_device to ATT read/write callbacks
+/home/jh/src/bluez/.git/rebase-apply/patch:61: new blank line at EOF.
++
+fatal: 1 line adds whitespace errors.
+Patch failed at 0001 att: add remote btd_device to ATT read/write callbacks
+
+And secondly you haven't replied anything to Lizardos mail yet.
+
+Johan
