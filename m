@@ -1,79 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 2 Apr 2012 21:51:45 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Remove MGMT_ADDR_INVALID macro
-Message-ID: <20120402185145.GA6610@x220.ger.corp.intel.com>
-References: <CACJA=fUFdF9ZOcGdhggcfRRjaj-2i-Wnyw6w-6n=-eSNQgMgqA@mail.gmail.com>
- <1333388404-20773-1-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1333388404-20773-1-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <20120402145518.GC31518@x220.P-661HNU-F1>
+References: <1333365444-9029-1-git-send-email-arik@wizery.com>
+ <1333365444-9029-2-git-send-email-arik@wizery.com> <20120402145518.GC31518@x220.P-661HNU-F1>
+From: Arik Nemtsov <arik@wizery.com>
+Date: Mon, 2 Apr 2012 21:37:36 +0300
+Message-ID: <CA+XVXffA_Ym1+983JaZR1QMyykb7+H8-JxQqKgwGrAYpc5yx7g@mail.gmail.com>
+Subject: Re: [PATCH v7 2/6] proximity: reporter: save global D-Bus connection
+To: Arik Nemtsov <arik@wizery.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+On Mon, Apr 2, 2012 at 17:55, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Arik,
+>
+> On Mon, Apr 02, 2012, Arik Nemtsov wrote:
+>> --- a/proximity/reporter.c
+>> +++ b/proximity/reporter.c
+>> @@ -40,6 +40,7 @@
+>>  #include "attrib-server.h"
+>>  #include "reporter.h"
+>>
+>> +static DBusConnection *connection;
+>>  #define IMMEDIATE_ALERT_SVC_UUID     0x1802
+>>  #define LINK_LOSS_SVC_UUID           0x1803
+>>  #define TX_POWER_SVC_UUID            0x1804
+>
+> Please move the new static variable after the defines and the enum.
+> Thats's usually where we place them (right before the actual functions
+> start).
+>
 
-On Mon, Apr 02, 2012, Andre Guedes wrote:
-> This patch removes the MGMT_ADDR_INVALID macro. If the address type
-> isn't LE, we consider it is BR/EDR type.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  include/net/bluetooth/hci_core.h |    1 -
->  net/bluetooth/mgmt.c             |   14 ++++++--------
->  2 files changed, 6 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index c8d5beb..c0b232c 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -967,7 +967,6 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
->  #define MGMT_ADDR_BREDR			0x00
->  #define MGMT_ADDR_LE_PUBLIC		0x01
->  #define MGMT_ADDR_LE_RANDOM		0x02
-> -#define MGMT_ADDR_INVALID		0xff
->  
->  #define DISCOV_TYPE_BREDR		(BIT(MGMT_ADDR_BREDR))
->  #define DISCOV_TYPE_LE			(BIT(MGMT_ADDR_LE_PUBLIC) | \
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index b4f7e32..bcfc20e 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -1640,15 +1640,15 @@ static u8 link_to_mgmt(u8 link_type, u8 addr_type)
->  		switch (addr_type) {
->  		case ADDR_LE_DEV_PUBLIC:
->  			return MGMT_ADDR_LE_PUBLIC;
-> -		case ADDR_LE_DEV_RANDOM:
-> -			return MGMT_ADDR_LE_RANDOM;
-> +
->  		default:
-> -			return MGMT_ADDR_INVALID;
-> +			/* Fallback to LE Random address type */
-> +			return MGMT_ADDR_LE_RANDOM;
->  		}
-> -	case ACL_LINK:
-> -		return MGMT_ADDR_BREDR;
-> +
->  	default:
-> -		return MGMT_ADDR_INVALID;
-> +		/* Fallback to BR/EDR type */
-> +		return MGMT_ADDR_BREDR;
->  	}
->  }
->  
-> @@ -1690,8 +1690,6 @@ static int get_connections(struct sock *sk, struct hci_dev *hdev, void *data,
->  			continue;
->  		bacpy(&rp->addr[i].bdaddr, &c->dst);
->  		rp->addr[i].type = link_to_mgmt(c->type, c->dst_type);
-> -		if (rp->addr[i].type == MGMT_ADDR_INVALID)
-> -			continue;
->  		i++;
->  	}
->  
+Well this variable disappears in the patch "proximity: reporter:
+implement D-Bus API", where we start saving the D-Bus connection per
+reporter_adapter. So I'm guessing this is moot?
 
-How does this behave with SCO_LINK? Are you sure those wont now get
-listed in the mgmt get_connections response?
-
-Johan
+Arik
