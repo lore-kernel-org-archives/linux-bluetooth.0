@@ -1,32 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120330102545.GB9799@x220>
-References: <1332349255-15764-1-git-send-email-anderson.lizardo@openbossa.org>
-	<1332881029-1732-1-git-send-email-anderson.lizardo@openbossa.org>
-	<1332881029-1732-9-git-send-email-anderson.lizardo@openbossa.org>
-	<20120330102545.GB9799@x220>
-Date: Mon, 2 Apr 2012 09:56:49 -0400
-Message-ID: <CAJdJm_MyR7HtQxbK_WyOPmSd+bXW6Um9xDafxRkmbywN0uh3YA@mail.gmail.com>
-Subject: Re: [PATCH v2 BlueZ 8/8] gattrib: Protect GAttrib when there is a
- pending write
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH v3 BlueZ 2/2] gattrib: Protect GAttrib when there is a pending write
+Date: Mon,  2 Apr 2012 09:56:36 -0400
+Message-Id: <1333374996-3126-3-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1333374996-3126-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1332349255-15764-1-git-send-email-anderson.lizardo@openbossa.org>
+ <1333374996-3126-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
-On Fri, Mar 30, 2012 at 6:25 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> So I'll be awaiting v3's of patch 5 and 8.
+---
+ attrib/gattrib.c |   12 ++++++++----
+ 1 files changed, 8 insertions(+), 4 deletions(-)
 
-Just sent fixed versions. I also did a small refactor to patch 5 to
-remove the nested if(). Hope that makes the code clearer.
-
-Regards,
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index 8a1e97b..769be36 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -293,14 +293,18 @@ static void destroy_sender(gpointer data)
+ 	struct _GAttrib *attrib = data;
+ 
+ 	attrib->write_watch = 0;
++	g_attrib_unref(attrib);
+ }
+ 
+ static void wake_up_sender(struct _GAttrib *attrib)
+ {
+-	if (attrib->write_watch == 0)
+-		attrib->write_watch = g_io_add_watch_full(attrib->io,
+-			G_PRIORITY_DEFAULT, G_IO_OUT, can_write_data,
+-			attrib, destroy_sender);
++	if (attrib->write_watch > 0)
++		return;
++
++	attrib = g_attrib_ref(attrib);
++	attrib->write_watch = g_io_add_watch_full(attrib->io,
++				G_PRIORITY_DEFAULT, G_IO_OUT,
++				can_write_data, attrib, destroy_sender);
+ }
+ 
+ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.5.4
+
