@@ -1,47 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 2 Apr 2012 17:46:23 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-	sunil.a.kumar@intel.com, rashmi.g.nair@intel.com,
-	prashant.khanzode@intel.com, luiz.von.dentz@intel.com
-Subject: Re: [PATCH BlueZ] AVCTP: return not-implemented for unknown
- passthrough
-Message-ID: <20120402144623.GA31518@x220.P-661HNU-F1>
-References: <CABBYNZL32nUYXTXTM1gCmRhGms5qGpW2uibyT5j5gDBow8Akiw@mail.gmail.com>
- <1330438817-23824-1-git-send-email-lucas.demarchi@profusion.mobi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1330438817-23824-1-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <20120330102545.GB9799@x220>
+References: <1332349255-15764-1-git-send-email-anderson.lizardo@openbossa.org>
+	<1332881029-1732-1-git-send-email-anderson.lizardo@openbossa.org>
+	<1332881029-1732-9-git-send-email-anderson.lizardo@openbossa.org>
+	<20120330102545.GB9799@x220>
+Date: Mon, 2 Apr 2012 09:56:49 -0400
+Message-ID: <CAJdJm_MyR7HtQxbK_WyOPmSd+bXW6Um9xDafxRkmbywN0uh3YA@mail.gmail.com>
+Subject: Re: [PATCH v2 BlueZ 8/8] gattrib: Protect GAttrib when there is a
+ pending write
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Johan,
 
-On Tue, Feb 28, 2012, Lucas De Marchi wrote:
-> ---
->  audio/avctp.c |    5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/audio/avctp.c b/audio/avctp.c
-> index 5bd5db1..1d425eb 100644
-> --- a/audio/avctp.c
-> +++ b/audio/avctp.c
-> @@ -235,9 +235,12 @@ static size_t handle_panel_passthrough(struct avctp *session,
->  		break;
->  	}
->  
-> -	if (key_map[i].name == NULL)
-> +	if (key_map[i].name == NULL) {
->  		DBG("AV/C: unknown button 0x%02X %s",
->  						operands[0] & 0x7F, status);
-> +		*code = AVC_CTYPE_NOT_IMPLEMENTED;
-> +		return 0;
-> +	}
->  
->  done:
->  	*code = AVC_CTYPE_ACCEPTED;
+On Fri, Mar 30, 2012 at 6:25 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> So I'll be awaiting v3's of patch 5 and 8.
 
-Applied. Thanks.
+Just sent fixed versions. I also did a small refactor to patch 5 to
+remove the nested if(). Hope that makes the code clearer.
 
-Johan
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
