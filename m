@@ -1,271 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arik Nemtsov <arik@wizery.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: Arik Nemtsov <arik@wizery.com>
-Subject: [PATCH v8 1/6] att: add remote btd_device to ATT read/write callbacks
-Date: Mon,  2 Apr 2012 22:12:37 +0300
-Message-Id: <1333393962-21394-1-git-send-email-arik@wizery.com>
+Date: Mon, 2 Apr 2012 21:51:45 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Remove MGMT_ADDR_INVALID macro
+Message-ID: <20120402185145.GA6610@x220.ger.corp.intel.com>
+References: <CACJA=fUFdF9ZOcGdhggcfRRjaj-2i-Wnyw6w-6n=-eSNQgMgqA@mail.gmail.com>
+ <1333388404-20773-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1333388404-20773-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows us to identify the remote device that made the ATT
-read/write.
----
- attrib/att-database.h  |   43 +++++++++++++++++++++++++++++++++++++++++++
- attrib/att.h           |   20 --------------------
- attrib/gatt-service.c  |    1 +
- plugins/gatt-example.c |    4 +++-
- proximity/reporter.c   |    1 +
- src/attrib-server.c    |   20 +++++++++++++++-----
- time/server.c          |    7 +++++--
- 7 files changed, 68 insertions(+), 28 deletions(-)
- create mode 100644 attrib/att-database.h
+Hi Andre,
 
-diff --git a/attrib/att-database.h b/attrib/att-database.h
-new file mode 100644
-index 0000000..3e854aa
---- /dev/null
-+++ b/attrib/att-database.h
-@@ -0,0 +1,43 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Texas Instruments Corporation
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+/* Requirements for read/write operations */
-+enum {
-+	ATT_NONE,		/* No restrictions */
-+	ATT_AUTHENTICATION,	/* Authentication required */
-+	ATT_AUTHORIZATION,	/* Authorization required */
-+	ATT_NOT_PERMITTED,	/* Operation not permitted */
-+};
-+
-+struct attribute {
-+	uint16_t handle;
-+	bt_uuid_t uuid;
-+	int read_reqs;
-+	int write_reqs;
-+	uint8_t (*read_cb)(struct attribute *a, struct btd_device *device,
-+							gpointer user_data);
-+	uint8_t (*write_cb)(struct attribute *a, struct btd_device *device,
-+							gpointer user_data);
-+	gpointer cb_user_data;
-+	int len;
-+	uint8_t *data;
-+};
-diff --git a/attrib/att.h b/attrib/att.h
-index 09511d2..1e128a7 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
-@@ -117,26 +117,6 @@
- #define ATT_CID					4
- #define ATT_PSM					31
- 
--/* Requirements for read/write operations */
--enum {
--	ATT_NONE,		/* No restrictions */
--	ATT_AUTHENTICATION,	/* Authentication required */
--	ATT_AUTHORIZATION,	/* Authorization required */
--	ATT_NOT_PERMITTED,	/* Operation not permitted */
--};
--
--struct attribute {
--	uint16_t handle;
--	bt_uuid_t uuid;
--	int read_reqs;
--	int write_reqs;
--	uint8_t (*read_cb)(struct attribute *a, gpointer user_data);
--	uint8_t (*write_cb)(struct attribute *a, gpointer user_data);
--	gpointer cb_user_data;
--	int len;
--	uint8_t *data;
--};
--
- struct att_data_list {
- 	uint16_t num;
- 	uint16_t len;
-diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
-index 4592a90..6a44a06 100644
---- a/attrib/gatt-service.c
-+++ b/attrib/gatt-service.c
-@@ -32,6 +32,7 @@
- #include <adapter.h>
- 
- #include "att.h"
-+#include "att-database.h"
- #include "gattrib.h"
- #include "attrib-server.h"
- #include "gatt-service.h"
-diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
-index 58b222c..482bc2d 100644
---- a/plugins/gatt-example.c
-+++ b/plugins/gatt-example.c
-@@ -37,6 +37,7 @@
- #include "gattrib.h"
- #include "gatt-service.h"
- #include "att.h"
-+#include "att-database.h"
- #include "attrib-server.h"
- 
- /* FIXME: Not defined by SIG? UUID128? */
-@@ -92,7 +93,8 @@ static gint adapter_cmp(gconstpointer a, gconstpointer b)
- 	return -1;
- }
- 
--static uint8_t battery_state_read(struct attribute *a, gpointer user_data)
-+static uint8_t battery_state_read(struct attribute *a,
-+				  struct btd_device *device, gpointer user_data)
- {
- 	struct btd_adapter *adapter = user_data;
- 	uint8_t value;
-diff --git a/proximity/reporter.c b/proximity/reporter.c
-index 74e6297..bbb97ea 100644
---- a/proximity/reporter.c
-+++ b/proximity/reporter.c
-@@ -35,6 +35,7 @@
- 
- #include "hcid.h"
- #include "att.h"
-+#include "att-database.h"
- #include "gattrib.h"
- #include "attrib-server.h"
- #include "reporter.h"
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 5775861..18a0218 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -47,6 +47,7 @@
- #include "device.h"
- #include "manager.h"
- #include "att.h"
-+#include "att-database.h"
- #include "gattrib.h"
- #include "storage.h"
- 
-@@ -76,6 +77,7 @@ struct gatt_channel {
- 	gboolean encrypted;
- 	struct gatt_server *server;
- 	guint cleanup_id;
-+	struct btd_device *device;
- };
- 
- struct group_elem {
-@@ -112,6 +114,9 @@ static void channel_free(struct gatt_channel *channel)
- 	if (channel->cleanup_id)
- 		g_source_remove(channel->cleanup_id);
- 
-+	if (channel->device)
-+		btd_device_unref(channel->device);
-+
- 	g_attrib_unref(channel->attrib);
- 	g_free(channel);
- }
-@@ -452,7 +457,8 @@ static uint16_t read_by_group(struct gatt_channel *channel, uint16_t start,
- 								a->read_reqs);
- 
- 		if (status == 0x00 && a->read_cb)
--			status = a->read_cb(a, a->cb_user_data);
-+			status = a->read_cb(a, channel->device,
-+							a->cb_user_data);
- 
- 		if (status) {
- 			g_slist_free_full(groups, g_free);
-@@ -541,7 +547,8 @@ static uint16_t read_by_type(struct gatt_channel *channel, uint16_t start,
- 								a->read_reqs);
- 
- 		if (status == 0x00 && a->read_cb)
--			status = a->read_cb(a, a->cb_user_data);
-+			status = a->read_cb(a, channel->device,
-+							a->cb_user_data);
- 
- 		if (status) {
- 			g_slist_free(types);
-@@ -753,7 +760,7 @@ static uint16_t read_value(struct gatt_channel *channel, uint16_t handle,
- 	status = att_check_reqs(channel, ATT_OP_READ_REQ, a->read_reqs);
- 
- 	if (status == 0x00 && a->read_cb)
--		status = a->read_cb(a, a->cb_user_data);
-+		status = a->read_cb(a, channel->device, a->cb_user_data);
- 
- 	if (status)
- 		return enc_error_resp(ATT_OP_READ_REQ, handle, status, pdu,
-@@ -796,7 +803,7 @@ static uint16_t read_blob(struct gatt_channel *channel, uint16_t handle,
- 	status = att_check_reqs(channel, ATT_OP_READ_BLOB_REQ, a->read_reqs);
- 
- 	if (status == 0x00 && a->read_cb)
--		status = a->read_cb(a, a->cb_user_data);
-+		status = a->read_cb(a, channel->device, a->cb_user_data);
- 
- 	if (status)
- 		return enc_error_resp(ATT_OP_READ_BLOB_REQ, handle, status,
-@@ -833,7 +840,8 @@ static uint16_t write_value(struct gatt_channel *channel, uint16_t handle,
- 							value, vlen, NULL);
- 
- 		if (a->write_cb) {
--			status = a->write_cb(a, a->cb_user_data);
-+			status = a->write_cb(a, channel->device,
-+							a->cb_user_data);
- 			if (status)
- 				return enc_error_resp(ATT_OP_WRITE_REQ, handle,
- 							status, pdu, len);
-@@ -1067,6 +1075,8 @@ guint attrib_channel_attach(GAttrib *attrib)
- 	channel->cleanup_id = g_io_add_watch(io, G_IO_HUP, channel_watch_cb,
- 								channel);
- 
-+	channel->device = btd_device_ref(device);
-+
- 	server->clients = g_slist_append(server->clients, channel);
- 
- 	return channel->id;
-diff --git a/time/server.c b/time/server.c
-index 42b12e2..58d0bcc 100644
---- a/time/server.c
-+++ b/time/server.c
-@@ -33,6 +33,7 @@
- #include <adapter.h>
- 
- #include "att.h"
-+#include "att-database.h"
- #include "gattrib.h"
- #include "attrib-server.h"
- #include "gatt-service.h"
-@@ -78,7 +79,8 @@ static int encode_current_time(uint8_t value[10])
- 	return 0;
- }
- 
--static uint8_t current_time_read(struct attribute *a, gpointer user_data)
-+static uint8_t current_time_read(struct attribute *a,
-+				 struct btd_device *device, gpointer user_data)
- {
- 	uint8_t value[10];
- 
-@@ -91,7 +93,8 @@ static uint8_t current_time_read(struct attribute *a, gpointer user_data)
- 	return 0;
- }
- 
--static uint8_t local_time_info_read(struct attribute *a, gpointer user_data)
-+static uint8_t local_time_info_read(struct attribute *a,
-+				struct btd_device *device, gpointer user_data)
- {
- 	uint8_t value[2];
- 
--- 
-1.7.5.4
+On Mon, Apr 02, 2012, Andre Guedes wrote:
+> This patch removes the MGMT_ADDR_INVALID macro. If the address type
+> isn't LE, we consider it is BR/EDR type.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  include/net/bluetooth/hci_core.h |    1 -
+>  net/bluetooth/mgmt.c             |   14 ++++++--------
+>  2 files changed, 6 insertions(+), 9 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index c8d5beb..c0b232c 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -967,7 +967,6 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+>  #define MGMT_ADDR_BREDR			0x00
+>  #define MGMT_ADDR_LE_PUBLIC		0x01
+>  #define MGMT_ADDR_LE_RANDOM		0x02
+> -#define MGMT_ADDR_INVALID		0xff
+>  
+>  #define DISCOV_TYPE_BREDR		(BIT(MGMT_ADDR_BREDR))
+>  #define DISCOV_TYPE_LE			(BIT(MGMT_ADDR_LE_PUBLIC) | \
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index b4f7e32..bcfc20e 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -1640,15 +1640,15 @@ static u8 link_to_mgmt(u8 link_type, u8 addr_type)
+>  		switch (addr_type) {
+>  		case ADDR_LE_DEV_PUBLIC:
+>  			return MGMT_ADDR_LE_PUBLIC;
+> -		case ADDR_LE_DEV_RANDOM:
+> -			return MGMT_ADDR_LE_RANDOM;
+> +
+>  		default:
+> -			return MGMT_ADDR_INVALID;
+> +			/* Fallback to LE Random address type */
+> +			return MGMT_ADDR_LE_RANDOM;
+>  		}
+> -	case ACL_LINK:
+> -		return MGMT_ADDR_BREDR;
+> +
+>  	default:
+> -		return MGMT_ADDR_INVALID;
+> +		/* Fallback to BR/EDR type */
+> +		return MGMT_ADDR_BREDR;
+>  	}
+>  }
+>  
+> @@ -1690,8 +1690,6 @@ static int get_connections(struct sock *sk, struct hci_dev *hdev, void *data,
+>  			continue;
+>  		bacpy(&rp->addr[i].bdaddr, &c->dst);
+>  		rp->addr[i].type = link_to_mgmt(c->type, c->dst_type);
+> -		if (rp->addr[i].type == MGMT_ADDR_INVALID)
+> -			continue;
+>  		i++;
+>  	}
+>  
 
+How does this behave with SCO_LINK? Are you sure those wont now get
+listed in the mgmt get_connections response?
+
+Johan
