@@ -1,48 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 3 Apr 2012 13:41:14 +0300
+Date: Tue, 3 Apr 2012 13:21:17 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Hemant Gupta <hemant.gupta@stericsson.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Hemant Gupta <hemantgupta.ste@gmail.com>
-Subject: Re: [PATCH v1] Adapter: Fix Discovering state while Powering Off
-Message-ID: <20120403104114.GB23054@x220>
-References: <1333126569-1606-1-git-send-email-hemant.gupta@stericsson.com>
+To: Vishal AGARWAL <vishal.agarwal@stericsson.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Naresh-kumar GUPTA <naresh.gupta@stericsson.com>
+Subject: Re: [PATCH] Bluetooth: Link Keys should be stored if MITM is not
+ required
+Message-ID: <20120403102117.GA23054@x220>
+References: <1333444794-27148-1-git-send-email-vishal.agarwal@stericsson.com>
+ <20120403093803.GA21118@x220>
+ <B4268AAFAFA3E244B5B0641D591491704EA2851205@EXDCVYMBSTM006.EQ1STM.local>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1333126569-1606-1-git-send-email-hemant.gupta@stericsson.com>
+In-Reply-To: <B4268AAFAFA3E244B5B0641D591491704EA2851205@EXDCVYMBSTM006.EQ1STM.local>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hemant,
+Hi Vishal,
 
-On Fri, Mar 30, 2012, Hemant Gupta wrote:
-> This patch fixes the adater discovering state while powering off.
-> Without this fix, BlueZ sends incorrect discovering state to upper
-> layers while switching off.
-> ---
->  src/adapter.c |    6 ++++++
->  1 files changed, 6 insertions(+), 0 deletions(-)
-> 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index f8f46f8..eb9745f 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -289,6 +289,12 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode,
->  			return err;
->  
->  		adapter->off_requested = TRUE;
-> +		/*
-> +		 * Change the discovering state to FALSE, otherwise
-> +		 * inquiry fails to start if BT is switched off and then on
-> +		 * while inquiry is already active.
-> +		 */
-> +		adapter->discovering = FALSE;
->  
->  		goto done;
->  	}
+On Tue, Apr 03, 2012, Vishal AGARWAL wrote:
+> I am testing with PTS. I have attached the HCI dump also for this
+> case.
 
-Wouldn't the right place to do this be in btd_adapter_stop()? (after
-sending the Discovering signal). Actually, wouldn't the right thing be
-to call adapter_set_discovering() in btd_adapter_stop?
+First of all please stop top posting. It's not tolerated on this list.
+Replying to an inline quoted mail makes it even doubly worse since it
+completely messes up the history of the thread.
+
+About the hcidump you attached we're getting the following from the
+remote device:
+
+ HCI Event: IO Capability Response (0x32) plen 9
+    bdaddr 00:80:98:E7:32:4C capability 0x01 oob 0x00 auth 0x00
+    Capability: DisplayYesNo (OOB data not present)
+    Authentication: No Bonding (No MITM Protection)
+
+I.e. the PTS is telling us to *not* store the key. Which test case is
+this? To my understanding the PTS doesn't have BR/EDR GAP tests but you
+need to use the BITE for them. Has something changed in that regard?
+
+Looking at the full trace we're getting a link key request before
+dropping the ACL. What we should probably do is to not immediately drop
+the key from our list but instead keep it there as long as the
+connection is up. I think that would still be in line with what the
+specification expects us to do with no-bonding keys.
+
+Now that I look at hciops it's more or less what's happening: it never
+writes the key to the file system but does keep it in its list at
+runtime.
+
+So to conclude, the right fix is not what you've proposed but to modify
+the code to hang on to the key until the ACL link goes down. I.e. please
+add a "persistent" flag to struct link_key and add code to remove any
+such keys from hdev->link_keys when the ACL goes away.
 
 Johan
