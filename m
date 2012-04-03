@@ -1,43 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] attrib: Fix "make distcheck" build
-Date: Tue,  3 Apr 2012 12:01:31 -0400
-Message-Id: <1333468891-2686-1-git-send-email-anderson.lizardo@openbossa.org>
+Message-ID: <1333461650.1870.289.camel@aeonflux>
+Subject: Re: [PATCH v1] Bluetooth: Fix packet type for ESCO Link
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Hemant Gupta <hemantgupta.ste@gmail.com>
+Cc: Hemant Gupta <hemant.gupta@stericsson.com>,
+	linux-bluetooth@vger.kernel.org,
+	Naresh Gupta <naresh.gupta@stericsson.com>
+Date: Tue, 03 Apr 2012 07:00:50 -0700
+In-Reply-To: <CACj007nj+fpeHV=KPsp2D-G_z=ixJuK-+5=XxNuR-x0Y5auRmw@mail.gmail.com>
+References: <1333458907-28940-1-git-send-email-hemant.gupta@stericsson.com>
+	 <1333460117.1870.287.camel@aeonflux>
+	 <CACj007nj+fpeHV=KPsp2D-G_z=ixJuK-+5=XxNuR-x0Y5auRmw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Any new header files (att-database.h in this case) need to be added to
-Makefile.am.
+Hi Hemant,
 
-Fixes this "make distcheck" error:
+> >> This patch fixes the packet type for ESCO Link which was incorrectly
+> >> set for EDR ESCO Packet Types. Anding esco_type with ~EDR_ESCO_MASK
+> >> results in loosing information of esco packet type (EDR Packet
+> >> types are inverted as per BT Spec) that resulted in wrong calculation
+> >> of packet type in hci_setup_sync() API causing the HCI Setup Synchronous
+> >> Connection Command to fail.
+> >
+> > any chance you can add a hcidump trace to the commit message to show
+> > this failure?
+> >
+> I am attaching the hcicump Logs, that can be viewed in Capture File
+> Viewer of FTS.
+> In that the problem can be seen in HCI Tab, Frame # 619, where the
+> packet type is
+> incorrect resulting in command failure with error code 0x1a.
 
-  CC     attrib/bluetoothd-gatt-service.o
-../attrib/gatt-service.c:35:26: fatal error: att-database.h: No such
-file or directory
-compilation terminated.
-make[2]: *** [attrib/bluetoothd-gatt-service.o] Error 1
-make[1]: *** [all] Error 2
-make: *** [distcheck] Error 1
----
- Makefile.am |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+so me installing a Windows to just view the logs is not going to
+happen ;)
 
-diff --git a/Makefile.am b/Makefile.am
-index d475555..d6c1d73 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -106,7 +106,8 @@ sbc_sbctest_CFLAGS = $(AM_CFLAGS) @SNDFILE_CFLAGS@
- endif
- endif
- 
--attrib_sources = attrib/att.h attrib/att.c attrib/gatt.h attrib/gatt.c \
-+attrib_sources = attrib/att.h attrib/att-database.h attrib/att.c \
-+		attrib/gatt.h attrib/gatt.c \
- 		attrib/gattrib.h attrib/gattrib.c attrib/client.h \
- 		attrib/client.c attrib/gatt-service.h attrib/gatt-service.c
- 
--- 
-1.7.5.4
+Since you run BlueZ on one side, please just create a hcidump trace. If
+you store them in BTSnoop format, you can open it with FTS as well.
+
+Regards
+
+Marcel
+
 
