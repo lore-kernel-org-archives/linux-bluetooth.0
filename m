@@ -1,174 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vishal AGARWAL <vishal.agarwal@stericsson.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Naresh-kumar GUPTA <naresh.gupta@stericsson.com>
-Date: Tue, 3 Apr 2012 11:57:33 +0200
-Subject: RE: [PATCH] Bluetooth: Link Keys should be stored if MITM is not
- required
-Message-ID: <B4268AAFAFA3E244B5B0641D591491704EA2851205@EXDCVYMBSTM006.EQ1STM.local>
-References: <1333444794-27148-1-git-send-email-vishal.agarwal@stericsson.com>
- <20120403093803.GA21118@x220>
-In-Reply-To: <20120403093803.GA21118@x220>
-Content-Type: multipart/mixed;
-	boundary="_002_B4268AAFAFA3E244B5B0641D591491704EA2851205EXDCVYMBSTM00_"
+From: Hemant Gupta <hemant.gupta@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: Naresh Gupta <naresh.gupta@stericsson.com>,
+	Hemant Gupta <hemantgupta.ste@gmail.com>,
+	Hemant Gupta <hemant.gupta@stericsson.com>
+Subject: [PATCH] Bluetooth: Fix packet type for ESCO Link
+Date: Tue, 3 Apr 2012 15:16:56 +0530
+Message-ID: <1333446416-8129-1-git-send-email-hemant.gupta@stericsson.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---_002_B4268AAFAFA3E244B5B0641D591491704EA2851205EXDCVYMBSTM00_
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+This patch fixes the packet type for ESCO Link which was incorrectly
+set for EDR ESCO Packet Types.
 
-Hi Johan,
+Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
+---
+ net/bluetooth/hci_conn.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-I am testing with PTS. I have attached the HCI dump also for this case.
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 947172b..bff6bc1 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -396,7 +396,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
+ 			conn->pkt_type = hdev->pkt_type & SCO_PTYPE_MASK;
+ 		break;
+ 	case ESCO_LINK:
+-		conn->pkt_type = hdev->esco_type & ~EDR_ESCO_MASK;
++		conn->pkt_type = hdev->esco_type ^ ~EDR_ESCO_MASK;
+ 		break;
+ 	}
+ 
+-- 
+1.7.0.4
 
-Also pls refer to function "link_key_request" in file hciops.c. It also has=
- the same kind of implementation.
-
-	/* Don't use unauthenticated combination keys if MITM is
-	 * required */
-	if (key_info->type =3D=3D 0x04 && conn->loc_auth !=3D 0xff &&
-						(conn->loc_auth & 0x01))
-		hci_send_cmd(dev->sk, OGF_LINK_CTL, OCF_LINK_KEY_NEG_REPLY,
-								6, dba);
-	else if (key_info->type =3D=3D 0x00 &&
-				sec_level =3D=3D BT_SECURITY_HIGH &&
-				key_info->pin_len <16) {
-		hci_send_cmd(dev->sk, OGF_LINK_CTL, OCF_LINK_KEY_NEG_REPLY,
-								6, dba);
-	} else {
-		link_key_reply_cp lr;
-
-		memcpy(lr.link_key, key_info->key, 16);
-		bacpy(&lr.bdaddr, dba);
-
-		hci_send_cmd(dev->sk, OGF_LINK_CTL, OCF_LINK_KEY_REPLY,
-						LINK_KEY_REPLY_CP_SIZE, &lr);
-	}
-
-Same PTS setup is passing if we use hci_ops instead of mgmt_ops because of =
-the first check in which it checks if for MITM (conn->loc_auth & 0x01).
-And if MITM is not required then key of type 04 (UNAUTHENTICATED_COMBINATIO=
-N_KEY) will also work.
-
-In case you are not able to open logs in this format, pls let me know. I wi=
-ll provide you raw HCI dump.
-
-Thanks
-Vishal
-
------Original Message-----
-From: Johan Hedberg [mailto:johan.hedberg@gmail.com]=20
-Sent: Tuesday, April 03, 2012 3:08 PM
-To: Vishal AGARWAL
-Cc: linux-bluetooth@vger.kernel.org; Naresh-kumar GUPTA
-Subject: Re: [PATCH] Bluetooth: Link Keys should be stored if MITM is not r=
-equired
-
-Hi,
-
-On Tue, Apr 03, 2012, Vishal Agarwal wrote:
-> If MITM protection is not required then except for Debug Keys, all
-> link keys should be persistent. And they should be stored for future
-> use.
->=20
-> Change-Id: Id438d424b999e9a30f29193d02ac266bee5f672b
-> Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
-> ---
->  net/bluetooth/hci_core.c |    4 ++++
->  1 files changed, 4 insertions(+), 0 deletions(-)
->=20
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index c5ee97c..bcb68dd 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1246,6 +1246,10 @@ static int hci_persistent_key(struct hci_dev *hdev=
-, struct hci_conn *conn,
->  	if (conn->remote_auth =3D=3D 0x02 || conn->remote_auth =3D=3D 0x03)
->  		return 1;
-> =20
-> +	/* If MITM is not required then store the Link Key */
-> +	if (!(conn->auth_type & 0x01))
-> +		return 1;
-> +
->  	/* If none of the above criteria match, then don't store the key
->  	 * persistently */
->  	return 0;
-
-Nack.
-
-This doesn't make much sense to me. Why should the MITM flag have
-anything to do with the persistency of the key?
-
-This looks more like a workaround for some device that is incorrectly
-having a no-bonding requirement (which means that we should *not* store
-the key). Please describe what kind of setup you've seen this with and
-include a hcidump for it showing the local and remote authentication
-requirement and IO capabilities.
-
-Johan
-
---_002_B4268AAFAFA3E244B5B0641D591491704EA2851205EXDCVYMBSTM00_
-Content-Type: application/octet-stream; name="cfa.cfa"
-Content-Description: cfa.cfa
-Content-Disposition: attachment; filename="cfa.cfa"; size=2911;
-	creation-date="Fri, 30 Mar 2012 07:14:39 GMT";
-	modification-date="Fri, 30 Mar 2012 07:32:49 GMT"
-Content-Transfer-Encoding: base64
-
-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
-AAEAFQ==
-
---_002_B4268AAFAFA3E244B5B0641D591491704EA2851205EXDCVYMBSTM00_--
