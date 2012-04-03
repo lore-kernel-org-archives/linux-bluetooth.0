@@ -1,34 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 3 Apr 2012 13:52:39 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Arik Nemtsov <arik@wizery.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v8 1/6] att: add remote btd_device to ATT read/write
- callbacks
-Message-ID: <20120403105239.GA26586@x220.ger.corp.intel.com>
-References: <1333393962-21394-1-git-send-email-arik@wizery.com>
+From: Hemant GUPTA <hemant.gupta@stericsson.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Hemant Gupta <hemantgupta.ste@gmail.com>
+Date: Tue, 3 Apr 2012 12:50:33 +0200
+Subject: RE: [PATCH v1] Adapter: Fix Discovering state while Powering Off
+Message-ID: <AA50405D3B026C488CB3DB0AADE6954020064F5D94@EXDCVYMBSTM005.EQ1STM.local>
+References: <1333126569-1606-1-git-send-email-hemant.gupta@stericsson.com>
+ <20120403104114.GB23054@x220>
+In-Reply-To: <20120403104114.GB23054@x220>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1333393962-21394-1-git-send-email-arik@wizery.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arik,
+Hi Johan,
 
-On Mon, Apr 02, 2012, Arik Nemtsov wrote:
-> This allows us to identify the remote device that made the ATT
-> read/write.
+-----Original Message-----
+From: Johan Hedberg [mailto:johan.hedberg@gmail.com] 
+Sent: Tuesday, April 03, 2012 4:11 PM
+To: Hemant GUPTA
+Cc: linux-bluetooth@vger.kernel.org; Hemant Gupta
+Subject: Re: [PATCH v1] Adapter: Fix Discovering state while Powering Off
+
+Hi Hemant,
+
+On Fri, Mar 30, 2012, Hemant Gupta wrote:
+> This patch fixes the adater discovering state while powering off.
+> Without this fix, BlueZ sends incorrect discovering state to upper 
+> layers while switching off.
 > ---
->  attrib/att-database.h  |   43 +++++++++++++++++++++++++++++++++++++++++++
->  attrib/att.h           |   20 --------------------
->  attrib/gatt-service.c  |    1 +
->  plugins/gatt-example.c |    4 +++-
->  proximity/reporter.c   |    1 +
->  src/attrib-server.c    |   20 +++++++++++++++-----
->  time/server.c          |    7 +++++--
->  7 files changed, 68 insertions(+), 28 deletions(-)
->  create mode 100644 attrib/att-database.h
+>  src/adapter.c |    6 ++++++
+>  1 files changed, 6 insertions(+), 0 deletions(-)
+> 
+> diff --git a/src/adapter.c b/src/adapter.c index f8f46f8..eb9745f 
+> 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -289,6 +289,12 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode,
+>  			return err;
+>  
+>  		adapter->off_requested = TRUE;
+> +		/*
+> +		 * Change the discovering state to FALSE, otherwise
+> +		 * inquiry fails to start if BT is switched off and then on
+> +		 * while inquiry is already active.
+> +		 */
+> +		adapter->discovering = FALSE;
+>  
+>  		goto done;
+>  	}
 
-All patches in this set have been applied. Thanks.
+Wouldn't the right place to do this be in btd_adapter_stop()? (after sending the Discovering signal). Actually, wouldn't the right thing be to call adapter_set_discovering() in btd_adapter_stop?
+Yes that looks like a good place. Regarding the call to adapter_set_discovering(), I had earlier thought of same, but seeing the code of adapter_set_discovering(), it will also set the out of range devices, and would emit device disappeared signal to upper layers, which might get wrong indication that some devices might have disappeared. So I thought that this would be anyways updated during the enxt time Inquiry is performed when BT is witched back on. What do you think about this ?
 
 Johan
+
+BR
+Hemant
