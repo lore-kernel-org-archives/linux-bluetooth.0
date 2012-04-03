@@ -1,87 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 3 Apr 2012 14:41:29 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vishal AGARWAL <vishal.agarwal@stericsson.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Naresh-kumar GUPTA <naresh.gupta@stericsson.com>
+Subject: Re: [PATCH] Bluetooth: Link Keys should be stored if MITM is not
+ required
+Message-ID: <20120403114129.GA28294@x220.ger.corp.intel.com>
+References: <1333444794-27148-1-git-send-email-vishal.agarwal@stericsson.com>
+ <20120403093803.GA21118@x220>
+ <B4268AAFAFA3E244B5B0641D591491704EA2851205@EXDCVYMBSTM006.EQ1STM.local>
+ <20120403102117.GA23054@x220>
 MIME-Version: 1.0
-In-Reply-To: <20120402185145.GA6610@x220.ger.corp.intel.com>
-References: <CACJA=fUFdF9ZOcGdhggcfRRjaj-2i-Wnyw6w-6n=-eSNQgMgqA@mail.gmail.com>
-	<1333388404-20773-1-git-send-email-andre.guedes@openbossa.org>
-	<20120402185145.GA6610@x220.ger.corp.intel.com>
-Date: Tue, 3 Apr 2012 08:43:03 -0300
-Message-ID: <CACJA=fXBCmA82uGhdi9x7gWNme1-VbXs8BLhkToXKT=eTbohTQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Remove MGMT_ADDR_INVALID macro
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120403102117.GA23054@x220>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Vishal,
 
-On Mon, Apr 2, 2012 at 3:51 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Andre,
->
-> On Mon, Apr 02, 2012, Andre Guedes wrote:
->> This patch removes the MGMT_ADDR_INVALID macro. If the address type
->> isn't LE, we consider it is BR/EDR type.
->>
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->>  include/net/bluetooth/hci_core.h |    1 -
->>  net/bluetooth/mgmt.c             |   14 ++++++--------
->>  2 files changed, 6 insertions(+), 9 deletions(-)
->>
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->> index c8d5beb..c0b232c 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -967,7 +967,6 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
->>  #define MGMT_ADDR_BREDR                      0x00
->>  #define MGMT_ADDR_LE_PUBLIC          0x01
->>  #define MGMT_ADDR_LE_RANDOM          0x02
->> -#define MGMT_ADDR_INVALID            0xff
->>
->>  #define DISCOV_TYPE_BREDR            (BIT(MGMT_ADDR_BREDR))
->>  #define DISCOV_TYPE_LE                       (BIT(MGMT_ADDR_LE_PUBLIC) | \
->> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index b4f7e32..bcfc20e 100644
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -1640,15 +1640,15 @@ static u8 link_to_mgmt(u8 link_type, u8 addr_type)
->>               switch (addr_type) {
->>               case ADDR_LE_DEV_PUBLIC:
->>                       return MGMT_ADDR_LE_PUBLIC;
->> -             case ADDR_LE_DEV_RANDOM:
->> -                     return MGMT_ADDR_LE_RANDOM;
->> +
->>               default:
->> -                     return MGMT_ADDR_INVALID;
->> +                     /* Fallback to LE Random address type */
->> +                     return MGMT_ADDR_LE_RANDOM;
->>               }
->> -     case ACL_LINK:
->> -             return MGMT_ADDR_BREDR;
->> +
->>       default:
->> -             return MGMT_ADDR_INVALID;
->> +             /* Fallback to BR/EDR type */
->> +             return MGMT_ADDR_BREDR;
->>       }
->>  }
->>
->> @@ -1690,8 +1690,6 @@ static int get_connections(struct sock *sk, struct hci_dev *hdev, void *data,
->>                       continue;
->>               bacpy(&rp->addr[i].bdaddr, &c->dst);
->>               rp->addr[i].type = link_to_mgmt(c->type, c->dst_type);
->> -             if (rp->addr[i].type == MGMT_ADDR_INVALID)
->> -                     continue;
->>               i++;
->>       }
->>
->
-> How does this behave with SCO_LINK? Are you sure those wont now get
-> listed in the mgmt get_connections response?
+On Tue, Apr 03, 2012, Johan Hedberg wrote:
+> Hi Vishal,
+> 
+> On Tue, Apr 03, 2012, Vishal AGARWAL wrote:
+> > I am testing with PTS. I have attached the HCI dump also for this
+> > case.
+> 
+> First of all please stop top posting. It's not tolerated on this list.
+> Replying to an inline quoted mail makes it even doubly worse since it
+> completely messes up the history of the thread.
+> 
+> About the hcidump you attached we're getting the following from the
+> remote device:
+> 
+>  HCI Event: IO Capability Response (0x32) plen 9
+>     bdaddr 00:80:98:E7:32:4C capability 0x01 oob 0x00 auth 0x00
+>     Capability: DisplayYesNo (OOB data not present)
+>     Authentication: No Bonding (No MITM Protection)
+> 
+> I.e. the PTS is telling us to *not* store the key. Which test case is
+> this? To my understanding the PTS doesn't have BR/EDR GAP tests but you
+> need to use the BITE for them. Has something changed in that regard?
+> 
+> Looking at the full trace we're getting a link key request before
+> dropping the ACL. What we should probably do is to not immediately drop
+> the key from our list but instead keep it there as long as the
+> connection is up. I think that would still be in line with what the
+> specification expects us to do with no-bonding keys.
+> 
+> Now that I look at hciops it's more or less what's happening: it never
+> writes the key to the file system but does keep it in its list at
+> runtime.
+> 
+> So to conclude, the right fix is not what you've proposed but to modify
+> the code to hang on to the key until the ACL link goes down. I.e. please
+> add a "persistent" flag to struct link_key and add code to remove any
+> such keys from hdev->link_keys when the ACL goes away.
 
-You're right, we need to check link type here.
+Additionally, to avoid iterating hdev->link_keys unnecessarily it'd
+probably make sense to add a flag to hci_conn to indicate that it has a
+temporary key in hdev->link_keys, or maybe even add a direct reference
+to the key to struct hci_conn.
 
-Thanks,
+Also, please let me know if you can do this by the end of this week
+since it's something that should preferably be fixed before 3.4 goes
+out.
 
-Andre
+Johan
