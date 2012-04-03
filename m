@@ -1,44 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 4 Apr 2012 00:14:07 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: "Thiago S. A." <thiago.xth1@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: GSoC Projects
-Message-ID: <20120404031407.GA25889@joana>
-References: <CAMBjcSuF_CvWAOvMdS53aR8vm3tRam8+qeEhjcaaoCygn0U=Fw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CAMBjcSuF_CvWAOvMdS53aR8vm3tRam8+qeEhjcaaoCygn0U=Fw@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: padovan@profusion.mobi,
+	pkrystad@codeaurora.org,
+	marcel@holtmann.org,
+	Mat Martineau <mathewm@codeaurora.org>
+Subject: [PATCHv3 2/2] Bluetooth: Functions for handling ERTM control fields
+Date: Tue,  3 Apr 2012 15:48:52 -0700
+Message-Id: <1333493332-24623-3-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1333493332-24623-1-git-send-email-mathewm@codeaurora.org>
+References: <1333493332-24623-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Thiago,
+These functions encode or decode ERTM control fields (extended or
+enhanced) to or from the new l2cap_ctrl structure.
 
-* Thiago S. A. <thiago.xth1@gmail.com> [2012-03-26 00:45:47 -0300]:
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ net/bluetooth/l2cap_core.c |   99 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 99 insertions(+)
 
-> Hi,
-> I am a master student in computer science at Unicamp, Brazil.
-> I program in C / C + + for four years and have experience with STL,
-> OpenGL, SDL  and I am studying glib.
-> 
-> I was interested mainly by the projects "Implement AVRCP 1.3
-> Controller Role"and "Visualization of Bluetooth traffic" for the BlueZ
-> GSoC.
-> To better understand the projects I researched the repository and I am
-> studying the source code.
-> 
-> For the first project I'm reading the specification of AVRCP 1.3
-> (available in bluetooth dot org) and analyzing the code files
-> controller.c, media.c and avrcp.c of the audio folder.
-> 
-> For the second project I researched about the bustle for the D-Bus and
-> so I could see how the tool should be, I also discovered that the
-> bustle uses GTK for the graphical interface.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 650e9f5..b1eac5a 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -780,6 +780,103 @@ static inline void l2cap_send_rr_or_rnr(struct l2cap_chan *chan, u32 control)
+ 	l2cap_send_sframe(chan, control);
+ }
+ 
++static u16 __pack_enhanced_control(struct l2cap_ctrl *control)
++{
++	u16 packed;
++
++	packed = control->reqseq << L2CAP_CTRL_REQSEQ_SHIFT;
++	packed |= control->final << L2CAP_CTRL_FINAL_SHIFT;
++
++	if (control->sframe) {
++		packed |= control->poll << L2CAP_CTRL_POLL_SHIFT;
++		packed |= control->super << L2CAP_CTRL_SUPER_SHIFT;
++		packed |= L2CAP_CTRL_FRAME_TYPE;
++	} else {
++		packed |= control->sar << L2CAP_CTRL_SAR_SHIFT;
++		packed |= control->txseq << L2CAP_CTRL_TXSEQ_SHIFT;
++	}
++
++	return packed;
++}
++
++static void __get_enhanced_control(u16 enh, struct l2cap_ctrl *control)
++{
++	control->reqseq = (enh & L2CAP_CTRL_REQSEQ) >> L2CAP_CTRL_REQSEQ_SHIFT;
++	control->final = (enh & L2CAP_CTRL_FINAL) >> L2CAP_CTRL_FINAL_SHIFT;
++
++	if (enh & L2CAP_CTRL_FRAME_TYPE) {
++		/* S-Frame */
++		control->sframe = 1;
++		control->poll = (enh & L2CAP_CTRL_POLL) >> L2CAP_CTRL_POLL_SHIFT;
++		control->super = (enh & L2CAP_CTRL_SUPERVISE) >> L2CAP_CTRL_SUPER_SHIFT;
++
++		control->sar = 0;
++		control->txseq = 0;
++	} else {
++		/* I-Frame */
++		control->sframe = 0;
++		control->sar = (enh & L2CAP_CTRL_SAR) >> L2CAP_CTRL_SAR_SHIFT;
++		control->txseq = (enh & L2CAP_CTRL_TXSEQ) >> L2CAP_CTRL_TXSEQ_SHIFT;
++
++		control->poll = 0;
++		control->super = 0;
++	}
++}
++
++static u32 __pack_extended_control(struct l2cap_ctrl *control)
++{
++	u32 packed;
++
++	packed = control->reqseq << L2CAP_EXT_CTRL_REQSEQ_SHIFT;
++	packed |= control->final << L2CAP_EXT_CTRL_FINAL_SHIFT;
++
++	if (control->sframe) {
++		packed |= control->poll << L2CAP_EXT_CTRL_POLL_SHIFT;
++		packed |= control->super << L2CAP_EXT_CTRL_SUPER_SHIFT;
++		packed |= L2CAP_EXT_CTRL_FRAME_TYPE;
++	} else {
++		packed |= control->sar << L2CAP_EXT_CTRL_SAR_SHIFT;
++		packed |= control->txseq << L2CAP_EXT_CTRL_TXSEQ_SHIFT;
++	}
++
++	return packed;
++}
++
++static void __get_extended_control(u32 ext, struct l2cap_ctrl *control)
++{
++	control->reqseq = (ext & L2CAP_EXT_CTRL_REQSEQ) >> L2CAP_EXT_CTRL_REQSEQ_SHIFT;
++	control->final = (ext & L2CAP_EXT_CTRL_FINAL) >> L2CAP_EXT_CTRL_FINAL_SHIFT;
++
++	if (ext & L2CAP_EXT_CTRL_FRAME_TYPE) {
++		/* S-Frame */
++		control->sframe = 1;
++		control->poll = (ext & L2CAP_EXT_CTRL_POLL) >> L2CAP_EXT_CTRL_POLL_SHIFT;
++		control->super = (ext & L2CAP_EXT_CTRL_SUPERVISE) >> L2CAP_EXT_CTRL_SUPER_SHIFT;
++
++		control->sar = 0;
++		control->txseq = 0;
++	} else {
++		/* I-Frame */
++		control->sframe = 0;
++		control->sar = (ext & L2CAP_EXT_CTRL_SAR) >> L2CAP_EXT_CTRL_SAR_SHIFT;
++		control->txseq = (ext & L2CAP_EXT_CTRL_TXSEQ) >> L2CAP_EXT_CTRL_TXSEQ_SHIFT;
++
++		control->poll = 0;
++		control->super = 0;
++	}
++}
++
++static void __set_control(struct l2cap_chan *chan, struct sk_buff *skb)
++{
++	if (test_bit(FLAG_EXT_CTRL, &chan->flags)) {
++		__get_extended_control(get_unaligned_le32(skb->data),
++				       &bt_cb(skb)->control);
++	} else {
++		__get_enhanced_control(get_unaligned_le16(skb->data),
++				       &bt_cb(skb)->control);
++	}
++}
++
+ static inline int __l2cap_no_conn_pending(struct l2cap_chan *chan)
+ {
+ 	return !test_bit(CONF_CONNECT_PEND, &chan->conf_state);
+@@ -4354,6 +4451,8 @@ static int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
+ 	u16 req_seq;
+ 	int len, next_tx_seq_offset, req_seq_offset;
+ 
++	__set_control(chan, skb);
++
+ 	control = __get_control(chan, skb->data);
+ 	skb_pull(skb, __ctrl_size(chan));
+ 	len = skb->len;
+-- 
+1.7.9.4
 
-I recommend you to start write your proposal for the project you like more
-(you can write for both ideas actually) and then submit to the google-melange
-interface. There all mentors can see your proposal and comment on it, ask for
-more information or discuss parts that are unclear.  You can also find us on
-#bluez-gsoc on freenode.
-
-	Gustavo
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
