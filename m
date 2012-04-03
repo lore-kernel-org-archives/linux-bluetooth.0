@@ -1,32 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 3 Apr 2012 14:20:30 +0300
+Date: Tue, 3 Apr 2012 14:19:43 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Rafael Fonseca <fonsecasantos.rafael@gmail.com>
-Cc: Daniele Forsi <dforsi@gmail.com>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix spellings errors.
-Message-ID: <20120403112030.GB27222@x220.ger.corp.intel.com>
-References: <1333122925-12890-1-git-send-email-fonsecasantos.rafael@gmail.com>
- <CAN_we7NMSMsi70eeCnqw9G0_12ORLaJzkTQWOyi9pP=1=QZRKg@mail.gmail.com>
- <CAPsQmjq2qQNXdXfKpzKXuMyKi6kzu-30QvqiDtfYNf4i5+rn0g@mail.gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 BlueZ 0/2] Generic GATT client fixes
+Message-ID: <20120403111943.GA27222@x220.ger.corp.intel.com>
+References: <1332349255-15764-1-git-send-email-anderson.lizardo@openbossa.org>
+ <1333374996-3126-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CAPsQmjq2qQNXdXfKpzKXuMyKi6kzu-30QvqiDtfYNf4i5+rn0g@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1333374996-3126-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafael,
+Hi,
 
-On Fri, Mar 30, 2012, Rafael Fonseca wrote:
-> On Fri, Mar 30, 2012 at 13:09, Daniele Forsi <dforsi@gmail.com> wrote:
-> > 2012/3/30 Rafael Fonseca:
-> >
-> >> -       /* endianess prevent direct cast */
-> >> +       /* endianness prevent direct cast */
-> >
-> > s/prevent/prevents/
+On Mon, Apr 02, 2012, Anderson Lizardo wrote:
+> These are the remaining patches, with fixes from Johan comments.
 > 
-> Thanks! Should I send a new fixed version?
+> Claudio Takahasi (2):
+>   attrib: Fix missing Discovery reply when disconnected
+>   gattrib: Protect GAttrib when there is a pending write
+> 
+>  attrib/client.c  |   14 ++++++++++++++
+>  attrib/gattrib.c |   12 ++++++++----
+>  2 files changed, 22 insertions(+), 4 deletions(-)
 
-Yes, please send a v2.
+Both patches have been applied. Thanks.
 
 Johan
