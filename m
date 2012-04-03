@@ -1,33 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1333460117.1870.287.camel@aeonflux>
-Subject: Re: [PATCH v1] Bluetooth: Fix packet type for ESCO Link
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Hemant Gupta <hemant.gupta@stericsson.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Naresh Gupta <naresh.gupta@stericsson.com>,
-	Hemant Gupta <hemantgupta.ste@gmail.com>
-Date: Tue, 03 Apr 2012 06:35:17 -0700
-In-Reply-To: <1333458907-28940-1-git-send-email-hemant.gupta@stericsson.com>
-References: <1333458907-28940-1-git-send-email-hemant.gupta@stericsson.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <20120403112030.GB27222@x220.ger.corp.intel.com>
+References: <1333122925-12890-1-git-send-email-fonsecasantos.rafael@gmail.com>
+ <CAN_we7NMSMsi70eeCnqw9G0_12ORLaJzkTQWOyi9pP=1=QZRKg@mail.gmail.com>
+ <CAPsQmjq2qQNXdXfKpzKXuMyKi6kzu-30QvqiDtfYNf4i5+rn0g@mail.gmail.com> <20120403112030.GB27222@x220.ger.corp.intel.com>
+From: Rafael Fonseca <fonsecasantos.rafael@gmail.com>
+Date: Tue, 3 Apr 2012 10:32:47 -0300
+Message-ID: <CAPsQmjrXL0vT8fFe8qwJECtj7nsGf7N=Aa07USKXE5uhza-AQA@mail.gmail.com>
+Subject: Re: [PATCH] Fix spellings errors.
+To: linux-bluetooth@vger.kernel.org
+Cc: johan.hedberg@gmail.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hemant,
+Hi Johan,
 
-> This patch fixes the packet type for ESCO Link which was incorrectly
-> set for EDR ESCO Packet Types. Anding esco_type with ~EDR_ESCO_MASK
-> results in loosing information of esco packet type (EDR Packet
-> types are inverted as per BT Spec) that resulted in wrong calculation
-> of packet type in hci_setup_sync() API causing the HCI Setup Synchronous
-> Connection Command to fail.
+On Tue, Apr 3, 2012 at 08:20, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Rafael,
+>
+> On Fri, Mar 30, 2012, Rafael Fonseca wrote:
+>>
+>> Thanks! Should I send a new fixed version?
+>
+> Yes, please send a v2.
 
-any chance you can add a hcidump trace to the commit message to show
-this failure?
-
-Regards
-
-Marcel
+I sent a fixed version but forgot to annotate it as v2, sorry.
 
 
+Att.
+-- 
+Rafael Fonseca
