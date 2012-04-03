@@ -1,38 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hemant Gupta <hemant.gupta@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: Naresh Gupta <naresh.gupta@stericsson.com>,
-	Hemant Gupta <hemantgupta.ste@gmail.com>,
-	Hemant Gupta <hemant.gupta@stericsson.com>
-Subject: [PATCH] Bluetooth: Fix packet type for ESCO Link
-Date: Tue, 3 Apr 2012 15:16:56 +0530
-Message-ID: <1333446416-8129-1-git-send-email-hemant.gupta@stericsson.com>
+Date: Tue, 3 Apr 2012 12:42:37 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bruna Moreira <bruna.moreira@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 BlueZ] adapter: Fix segfault when icon is uninitialized
+Message-ID: <20120403094237.GA21680@x220>
+References: <1333394427-9803-1-git-send-email-bruna.moreira@openbossa.org>
+ <1333397122-22456-1-git-send-email-bruna.moreira@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1333397122-22456-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes the packet type for ESCO Link which was incorrectly
-set for EDR ESCO Packet Types.
+Hi Bruna,
 
-Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
----
- net/bluetooth/hci_conn.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Mon, Apr 02, 2012, Bruna Moreira wrote:
+> If device type is LE and GAP Appearance characteristic does not exist,
+> the icon will not be initialized.
+> ---
+>  src/adapter.c |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 947172b..bff6bc1 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -396,7 +396,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- 			conn->pkt_type = hdev->pkt_type & SCO_PTYPE_MASK;
- 		break;
- 	case ESCO_LINK:
--		conn->pkt_type = hdev->esco_type & ~EDR_ESCO_MASK;
-+		conn->pkt_type = hdev->esco_type ^ ~EDR_ESCO_MASK;
- 		break;
- 	}
- 
--- 
-1.7.0.4
+Applied. Thanks.
 
+Johan
