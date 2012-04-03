@@ -1,22 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anju Manoj <anju.manoj@sasken.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 3 Apr 2012 16:13:09 +0530
-Subject: how to test thermometer profile using existing example available in
- bluez
-Message-ID: <2316A524B7DB8C4AB39B9EDEDF597C8F015B35BB064F@EXGMBX01.sasken.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Tue, 3 Apr 2012 13:52:39 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Arik Nemtsov <arik@wizery.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v8 1/6] att: add remote btd_device to ATT read/write
+ callbacks
+Message-ID: <20120403105239.GA26586@x220.ger.corp.intel.com>
+References: <1333393962-21394-1-git-send-email-arik@wizery.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1333393962-21394-1-git-send-email-arik@wizery.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Arik,
 
-Hi all
+On Mon, Apr 02, 2012, Arik Nemtsov wrote:
+> This allows us to identify the remote device that made the ATT
+> read/write.
+> ---
+>  attrib/att-database.h  |   43 +++++++++++++++++++++++++++++++++++++++++++
+>  attrib/att.h           |   20 --------------------
+>  attrib/gatt-service.c  |    1 +
+>  plugins/gatt-example.c |    4 +++-
+>  proximity/reporter.c   |    1 +
+>  src/attrib-server.c    |   20 +++++++++++++++-----
+>  time/server.c          |    7 +++++--
+>  7 files changed, 68 insertions(+), 28 deletions(-)
+>  create mode 100644 attrib/att-database.h
 
-              Can u share how to test thermometer python script available in bluez4.99
+All patches in this set have been applied. Thanks.
 
-thanks in advance
-
-
-SASKEN BUSINESS DISCLAIMER: This message may contain confidential, proprietary or legally privileged information. In case you are not the original intended Recipient of the message, you must not, directly or indirectly, use, disclose, distribute, print, or copy any part of this message and you are requested to delete it and inform the sender. Any views expressed in this message are those of the individual sender unless otherwise stated. Nothing contained in this message shall be construed as an offer or acceptance of any offer by Sasken Communication Technologies Limited ("Sasken") unless sent with that express intent and with due authority of Sasken. Sasken has taken enough precautions to prevent the spread of viruses. However the company accepts no liability for any damage caused by any virus transmitted by this email.
-Read Disclaimer at http://www.sasken.com/extras/mail_disclaimer.html
+Johan
