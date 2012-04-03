@@ -5,183 +5,130 @@ Cc: linux-wireless@vger.kernel.org,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <padovan@profusion.mobi>,
 	Bing Zhao <bzhao@marvell.com>, Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH 2/2] Bluetooth: btmrvl: add support for SDIO suspend/resume callbacks
-Date: Mon,  2 Apr 2012 19:53:39 -0700
-Message-Id: <1333421619-8182-2-git-send-email-bzhao@marvell.com>
-In-Reply-To: <1333421619-8182-1-git-send-email-bzhao@marvell.com>
-References: <1333421619-8182-1-git-send-email-bzhao@marvell.com>
+Subject: [PATCH 1/2] Bluetooth: btmrvl: configure default host sleep parameters
+Date: Mon,  2 Apr 2012 19:53:38 -0700
+Message-Id: <1333421619-8182-1-git-send-email-bzhao@marvell.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Amitkumar Karwar <akarwar@marvell.com>
 
-Host sleep is activated using already configured host sleep
-parameters in suspend handler and it is cancelled in resume
-handler.
+Currently debugfs commands "hscfgcmd" and "gpiogap" are provided
+for host sleep configuration. But if user doesn't configure host
+sleep parameters using these commands, host sleep activation is
+failed during suspend (support for suspend and resume handlers is
+added in next patch).
+
+Default host sleep configuration is done during driver initialisation
+in this patch.
 
 Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
 Signed-off-by: Bing Zhao <bzhao@marvell.com>
 ---
- drivers/bluetooth/btmrvl_drv.h  |    2 +
- drivers/bluetooth/btmrvl_main.c |    3 +-
- drivers/bluetooth/btmrvl_sdio.c |  100 +++++++++++++++++++++++++++++++++++++++
- 3 files changed, 104 insertions(+), 1 deletions(-)
+ drivers/bluetooth/btmrvl_drv.h  |    1 +
+ drivers/bluetooth/btmrvl_main.c |   53 ++++++++++++++++++++++----------------
+ drivers/bluetooth/btmrvl_sdio.c |    3 ++
+ 3 files changed, 35 insertions(+), 22 deletions(-)
 
 diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-index 2c79e76..94f2d65 100644
+index 90bda50..2c79e76 100644
 --- a/drivers/bluetooth/btmrvl_drv.h
 +++ b/drivers/bluetooth/btmrvl_drv.h
-@@ -67,6 +67,7 @@ struct btmrvl_adapter {
- 	u8 wakeup_tries;
- 	wait_queue_head_t cmd_wait_q;
- 	u8 cmd_complete;
-+	bool is_suspended;
- };
+@@ -139,6 +139,7 @@ void btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb);
+ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb);
  
- struct btmrvl_private {
-@@ -142,6 +143,7 @@ int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, int subcmd);
- int btmrvl_send_hscfg_cmd(struct btmrvl_private *priv);
+ int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, int subcmd);
++int btmrvl_send_hscfg_cmd(struct btmrvl_private *priv);
  int btmrvl_enable_ps(struct btmrvl_private *priv);
  int btmrvl_prepare_command(struct btmrvl_private *priv);
-+int btmrvl_enable_hs(struct btmrvl_private *priv);
  
- #ifdef CONFIG_DEBUG_FS
- void btmrvl_debugfs_init(struct hci_dev *hdev);
 diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index a880537..681ca9d 100644
+index d1209ad..a880537 100644
 --- a/drivers/bluetooth/btmrvl_main.c
 +++ b/drivers/bluetooth/btmrvl_main.c
-@@ -262,7 +262,7 @@ int btmrvl_enable_ps(struct btmrvl_private *priv)
+@@ -200,6 +200,36 @@ int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, int subcmd)
  }
- EXPORT_SYMBOL_GPL(btmrvl_enable_ps);
+ EXPORT_SYMBOL_GPL(btmrvl_send_module_cfg_cmd);
  
--static int btmrvl_enable_hs(struct btmrvl_private *priv)
-+int btmrvl_enable_hs(struct btmrvl_private *priv)
- {
- 	struct sk_buff *skb;
- 	struct btmrvl_cmd *cmd;
-@@ -298,6 +298,7 @@ static int btmrvl_enable_hs(struct btmrvl_private *priv)
- 
- 	return ret;
- }
-+EXPORT_SYMBOL_GPL(btmrvl_enable_hs);
- 
- int btmrvl_prepare_command(struct btmrvl_private *priv)
- {
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index f93a7a2..35a3e7c 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -1051,11 +1051,111 @@ static void btmrvl_sdio_remove(struct sdio_func *func)
- 	}
- }
- 
-+static int btmrvl_sdio_suspend(struct device *dev)
++int btmrvl_send_hscfg_cmd(struct btmrvl_private *priv)
 +{
-+	struct sdio_func *func = dev_to_sdio_func(dev);
-+	struct btmrvl_sdio_card *card;
-+	struct btmrvl_private *priv;
-+	mmc_pm_flag_t pm_flags;
-+	struct hci_dev *hcidev;
++	struct sk_buff *skb;
++	struct btmrvl_cmd *cmd;
 +
-+	if (func) {
-+		pm_flags = sdio_get_host_pm_caps(func);
-+		BT_DBG("%s: suspend: PM flags = 0x%x\n", sdio_func_id(func),
-+		       pm_flags);
-+		if (!(pm_flags & MMC_PM_KEEP_POWER)) {
-+			BT_ERR("%s: cannot remain alive while host is "
-+			       "suspended\n", sdio_func_id(func));
-+			return -ENOSYS;
-+		}
-+		card = sdio_get_drvdata(func);
-+		if (!card || !card->priv) {
-+			BT_ERR("Card or priv structure is not valid\n");
-+			return 0;
-+		}
-+	} else {
-+		BT_ERR("sdio_func is not specified\n");
-+		return 0;
++	skb = bt_skb_alloc(sizeof(*cmd), GFP_ATOMIC);
++	if (!skb) {
++		BT_ERR("No free skb");
++		return -ENOMEM;
 +	}
 +
-+	priv = card->priv;
++	cmd = (struct btmrvl_cmd *) skb_put(skb, sizeof(*cmd));
++	cmd->ocf_ogf = cpu_to_le16(hci_opcode_pack(OGF,
++						   BT_CMD_HOST_SLEEP_CONFIG));
++	cmd->length = 2;
++	cmd->data[0] = (priv->btmrvl_dev.gpio_gap & 0xff00) >> 8;
++	cmd->data[1] = (u8) (priv->btmrvl_dev.gpio_gap & 0x00ff);
 +
-+	if (priv->adapter->hs_state != HS_ACTIVATED) {
-+		if (btmrvl_enable_hs(priv)) {
-+			BT_ERR("HS not actived, suspend fail!\n");
-+			return -EBUSY;
-+		}
-+	}
-+	hcidev = priv->btmrvl_dev.hcidev;
-+	BT_DBG("%s: SDIO suspend\n", hcidev->name);
-+	hci_suspend_dev(hcidev);
-+	skb_queue_purge(&priv->adapter->tx_queue);
++	bt_cb(skb)->pkt_type = MRVL_VENDOR_PKT;
 +
-+	priv->adapter->is_suspended = true;
++	skb->dev = (void *) priv->btmrvl_dev.hcidev;
++	skb_queue_head(&priv->adapter->tx_queue, skb);
 +
-+	/* We will keep the power when hs enabled successfully */
-+	if (priv->adapter->hs_state == HS_ACTIVATED) {
-+		BT_DBG("suspend with MMC_PM_KEEP_POWER\n");
-+		return sdio_set_host_pm_flags(func, MMC_PM_KEEP_POWER);
-+	} else {
-+		BT_DBG("suspend without MMC_PM_KEEP_POWER\n");
-+		return 0;
-+	}
-+}
-+
-+static int btmrvl_sdio_resume(struct device *dev)
-+{
-+	struct sdio_func *func = dev_to_sdio_func(dev);
-+	struct btmrvl_sdio_card *card;
-+	struct btmrvl_private *priv;
-+	mmc_pm_flag_t pm_flags;
-+	struct hci_dev *hcidev;
-+
-+	if (func) {
-+		pm_flags = sdio_get_host_pm_caps(func);
-+		BT_DBG("%s: resume: PM flags = 0x%x\n", sdio_func_id(func),
-+		       pm_flags);
-+		card = sdio_get_drvdata(func);
-+		if (!card || !card->priv) {
-+			BT_ERR("Card or priv structure is not valid\n");
-+			return 0;
-+		}
-+	} else {
-+		BT_ERR("sdio_func is not specified\n");
-+		return 0;
-+	}
-+	priv = card->priv;
-+
-+	if (!priv->adapter->is_suspended) {
-+		BT_DBG("device already resumed\n");
-+		return 0;
-+	}
-+
-+	priv->adapter->is_suspended = false;
-+	hcidev = priv->btmrvl_dev.hcidev;
-+	BT_DBG("%s: SDIO resume\n", hcidev->name);
-+	hci_resume_dev(hcidev);
-+	priv->hw_wakeup_firmware(priv);
-+	priv->adapter->hs_state = HS_DEACTIVATED;
-+	BT_DBG("%s: HS DEACTIVATED in resume!\n", hcidev->name);
++	BT_DBG("Queue HSCFG Command, gpio=0x%x, gap=0x%x", cmd->data[0],
++	       cmd->data[1]);
 +
 +	return 0;
 +}
++EXPORT_SYMBOL_GPL(btmrvl_send_hscfg_cmd);
 +
-+static const struct dev_pm_ops btmrvl_sdio_pm_ops = {
-+	.suspend	= btmrvl_sdio_suspend,
-+	.resume		= btmrvl_sdio_resume,
-+};
-+
- static struct sdio_driver bt_mrvl_sdio = {
- 	.name		= "btmrvl_sdio",
- 	.id_table	= btmrvl_sdio_ids,
- 	.probe		= btmrvl_sdio_probe,
- 	.remove		= btmrvl_sdio_remove,
-+	.drv = {
-+		.owner = THIS_MODULE,
-+		.pm = &btmrvl_sdio_pm_ops,
-+	}
- };
+ int btmrvl_enable_ps(struct btmrvl_private *priv)
+ {
+ 	struct sk_buff *skb;
+@@ -271,32 +301,11 @@ static int btmrvl_enable_hs(struct btmrvl_private *priv)
  
- static int __init btmrvl_sdio_init_module(void)
+ int btmrvl_prepare_command(struct btmrvl_private *priv)
+ {
+-	struct sk_buff *skb = NULL;
+-	struct btmrvl_cmd *cmd;
+ 	int ret = 0;
+ 
+ 	if (priv->btmrvl_dev.hscfgcmd) {
+ 		priv->btmrvl_dev.hscfgcmd = 0;
+-
+-		skb = bt_skb_alloc(sizeof(*cmd), GFP_ATOMIC);
+-		if (skb == NULL) {
+-			BT_ERR("No free skb");
+-			return -ENOMEM;
+-		}
+-
+-		cmd = (struct btmrvl_cmd *) skb_put(skb, sizeof(*cmd));
+-		cmd->ocf_ogf = cpu_to_le16(hci_opcode_pack(OGF, BT_CMD_HOST_SLEEP_CONFIG));
+-		cmd->length = 2;
+-		cmd->data[0] = (priv->btmrvl_dev.gpio_gap & 0xff00) >> 8;
+-		cmd->data[1] = (u8) (priv->btmrvl_dev.gpio_gap & 0x00ff);
+-
+-		bt_cb(skb)->pkt_type = MRVL_VENDOR_PKT;
+-
+-		skb->dev = (void *) priv->btmrvl_dev.hcidev;
+-		skb_queue_head(&priv->adapter->tx_queue, skb);
+-
+-		BT_DBG("Queue HSCFG Command, gpio=0x%x, gap=0x%x",
+-						cmd->data[0], cmd->data[1]);
++		btmrvl_send_hscfg_cmd(priv);
+ 	}
+ 
+ 	if (priv->btmrvl_dev.pscmd) {
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 27b74b0..f93a7a2 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -1013,6 +1013,9 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
+ 	priv->btmrvl_dev.psmode = 1;
+ 	btmrvl_enable_ps(priv);
+ 
++	priv->btmrvl_dev.gpio_gap = 0xffff;
++	btmrvl_send_hscfg_cmd(priv);
++
+ 	return 0;
+ 
+ disable_host_int:
 -- 
 1.7.4.1
