@@ -1,26 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCH BlueZ 0/2] Add support for find included services
-Date: Wed,  4 Apr 2012 16:45:51 -0400
-Message-Id: <1333572353-10332-1-git-send-email-jefferson.delfes@openbossa.org>
+Message-ID: <1333571483.16897.1.camel@aeonflux>
+Subject: Re: [PATCHv4 2/2] Bluetooth: Functions for handling ERTM control
+ fields
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	pkrystad@codeaurora.org, andrei.emeltchenko.news@gmail.com,
+	szymon.janc@tieto.com
+Date: Wed, 04 Apr 2012 13:31:23 -0700
+In-Reply-To: <1333564183-23442-3-git-send-email-mathewm@codeaurora.org>
+References: <1333564183-23442-1-git-send-email-mathewm@codeaurora.org>
+	 <1333564183-23442-3-git-send-email-mathewm@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch series introduces support for find included services.
-The interactive mode of gatttool receives a new command "included" that
-uses gatt_find_included to find these services in given range.
+Hi Mat,
 
-Jefferson Delfes (2):
-  GATT: Add support for find included services
-  gatttool: Add "included" command
+> These functions encode or decode ERTM control fields (extended or
+> enhanced) to or from the new l2cap_ctrl structure.
+> 
+> Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/l2cap_core.c |   99 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 99 insertions(+)
 
- attrib/gatt.c        |  173 ++++++++++++++++++++++++++++++++++++++++++++++++++
- attrib/gatt.h        |    9 +++
- attrib/interactive.c |   54 ++++++++++++++++
- 3 files changed, 236 insertions(+)
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
--- 
-1.7.9.5
+Regards
+
+Marcel
+
 
