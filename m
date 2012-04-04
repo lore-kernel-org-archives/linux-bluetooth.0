@@ -1,38 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mat Martineau <mathewm@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: gustavo@padovan.org, pkrystad@codeaurora.org, marcel@holtmann.org,
-	andrei.emeltchenko.news@gmail.com, szymon.janc@tieto.com,
-	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCHv4 0/2] ERTM state machine changes, part 1
-Date: Wed,  4 Apr 2012 11:29:41 -0700
-Message-Id: <1333564183-23442-1-git-send-email-mathewm@codeaurora.org>
+MIME-Version: 1.0
+In-Reply-To: <2316A524B7DB8C4AB39B9EDEDF597C8F015B35BB0654@EXGMBX01.sasken.com>
+References: <2316A524B7DB8C4AB39B9EDEDF597C8F015B35BB0653@EXGMBX01.sasken.com>
+	<20120404134117.GA14816@samus>
+	<2316A524B7DB8C4AB39B9EDEDF597C8F015B35BB0654@EXGMBX01.sasken.com>
+Date: Wed, 4 Apr 2012 13:17:43 -0400
+Message-ID: <CAJdJm_NMVykyL3ebeGfVfQHuFqkcXrS04Lx+VV=_hUP_BtD=CA@mail.gmail.com>
+Subject: Re: unable to find the lex libraries
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anju Manoj <anju.manoj@sasken.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is the first of several patch series to rework the ERTM state
-machine.
+Hi,
 
-PATCHv1: Four patches, two patches updating header files were merged
-PATCHv2: Reworked utility functions for seq_lists and control headers.
-PATCHv3: Removed extra debug output, added error handling for
-  allocation failure, used some long lines at Marcel's request, removed
-  an unnecessary variable, and added a __set_control function.
-PATCHv4: Use roundup_pow_of_two macro and kmalloc
+On Wed, Apr 4, 2012 at 1:05 PM, Anju Manoj <anju.manoj@sasken.com> wrote:
+> hi,
+>
+> i already installed flex.
 
-Mat Martineau (2):
-  Bluetooth: Add the l2cap_seq_list structure for tracking frames
-    (Acked-by Marcel at v2, but added new error handling code in v3)
-  Bluetooth: Functions for handling ERTM control fields
+Be sure to install bison as well.
 
- include/net/bluetooth/l2cap.h |   12 ++
- net/bluetooth/l2cap_core.c    |  247 +++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 251 insertions(+), 8 deletions(-)
-
+Regards,
 -- 
-1.7.9.4
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
