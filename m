@@ -1,76 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 4 Apr 2012 10:12:12 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	pkrystad@codeaurora.org, marcel@holtmann.org
+Subject: Re: [PATCHv3 2/2] Bluetooth: Functions for handling ERTM control
+ fields
+Message-ID: <20120404071205.GA17251@aemeltch-MOBL1>
+References: <1333493332-24623-1-git-send-email-mathewm@codeaurora.org>
+ <1333493332-24623-3-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <CABax29XEJ5V5_cN9ieXfb1byDB7bQsuuwenJLOUDos7NNuepaQ@mail.gmail.com>
-References: <CABax29VLUHg_jePnhHz_6WHYCZBHoir5TBLuauK+Ktfg9-8Xjw@mail.gmail.com>
-	<CACY+gR3t4RXuhUEi9486qsP+p0GCYArHW+PO5QfBfEUfnd=xEg@mail.gmail.com>
-	<CABax29X1tFt8Am_i7y5nZsjs_D2QY9pbv19316Wn6RVq7ksEDA@mail.gmail.com>
-	<CACY+gR2DeQE2UaYwD8AQonNxtZ+=uZm7qY+BaqgjBQKoZSZHYA@mail.gmail.com>
-	<CABax29U8N2nOge34tr=G2f-fZvowCHPf3V=N2an-vC+x=UBdiQ@mail.gmail.com>
-	<CACY+gR2PkP76J2Dw9xobpeGsU2HKhsOYvU6Wcx8WCcq1opihiA@mail.gmail.com>
-	<CABax29VadeA+6WZWRDiZZUhpRqk2Nk35__b0Cjfz8HO12Tq4vQ@mail.gmail.com>
-	<CACY+gR0DJfbOgfSGHrsAj5vk00v4-_+KYwR+SF+0BRRs2oYBkw@mail.gmail.com>
-	<CABax29X+ke_PO9obAxbEJjdx68g8JW4ZZn7vS7mYpE7+00iYng@mail.gmail.com>
-	<CABax29WFvAXH9g8CnOtEDAqfmKmURnt4eYY58fi+P9zBa5Ji1A@mail.gmail.com>
-	<CACY+gR3pqj6xoJ-G-pt5QTY6BjuyUNXTZRzsQmmutcSNBzY3qQ@mail.gmail.com>
-	<CABax29Unh0AOhExp_FJwUr=edmPSDXy=_YJAXN81M5tp5+yUxw@mail.gmail.com>
-	<CABax29XWLWcBT6hHgSQud6qzhQ-Y-WAMjQ8ytCT7Px09H1iQtg@mail.gmail.com>
-	<CACY+gR3aPvvMRvNW+c3QdF8UkGR4ZGPChWt4MAoa+5fK=HSBNQ@mail.gmail.com>
-	<CABax29U=bsb0T2FQtzkQ2WGOkDTgJ8STshcu8fRmC4QvHEv=QQ@mail.gmail.com>
-	<CACY+gR326euT9fgXMZF_XLV28peJUJVWxOVZAA_xNEfHAsRRWA@mail.gmail.com>
-	<CABax29XEJ5V5_cN9ieXfb1byDB7bQsuuwenJLOUDos7NNuepaQ@mail.gmail.com>
-Date: Wed, 4 Apr 2012 11:12:44 +0300
-Message-ID: <CACY+gR3rjZ9_5zJ2yAf7Z+yfa7RsNWBRhNk5NJadpF5_V2TS7Q@mail.gmail.com>
-Subject: Re: [PATCH] Re: A2DP quality (bluetooth-alsa)
-From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1333493332-24623-3-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Apr 3, 2012 at 3:56 AM, qduaty <qduaty@gmail.com> wrote:
-> 2012/4/2 Siarhei Siamashka <siarhei.siamashka@gmail.com>:
->> Could you provide a short summary for this whole discussion? The
->> discussion has been changing from bitpool negotiation to SBC codec
->> improvements back and forth. And now it's becoming hard to follow and
->> see which problems are still relevant and need to be solved. Also do
->> you want to work on some code yourself or mostly trying to escalate
->> the problems?
->>
->> A2DP is in the list of ideas for BlueZ GSoC, so maybe that's a good
->> chance to get some improvements implemented:
->> http://www.bluez.org/development/gsoc/gsoc-ideas-list-2012/
->
-> Ok. This is the summary.
-> 1. It was found that Bluez can occasionally limit available bitpool
-> because some devices report a narrow bitpool range that does not
-> reflect their real capabilities. A solution was proposed by means of
-> encoding at a higher bitpool than negotiated, and it was confirmed to
-> both work and not break compatibility, unless it is misused.
-> 2. It was found that Bluez audio sink has quality problems even on
-> high bitpools. An SBC encoder fix was proposed, which (re)enables
-> floating point processing. Tests are needed to confirm whether it
-> improves quality in all cases.
-> 3. It was (previously) found and now confirmed that reducing volume in
-> SBC encoder by a factor of 0.7-0.8 improves quality by eliminating
-> audible effects of clipping in the decoder.
+Hi Mat,
 
-OK, thanks.
+On Tue, Apr 03, 2012 at 03:48:52PM -0700, Mat Martineau wrote:
+> These functions encode or decode ERTM control fields (extended or
+> enhanced) to or from the new l2cap_ctrl structure.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 
-> For myself, I'm likely to be done with it. I've already solved the
-> problems that prevented me from using A2DP on Linux. Further work
-> would require more time and I cannot benefit from it (but students
-> obviously can).
+Looks good now.
 
-Fair enough.
+Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> My proposals:
-> 1. Introduce a less restrictive input format for the audio sink, such
-> as float32. Currently it supports only S16LE, which is not suitable
-> for audio processing (ALSA softvol is a known example).
-> 2. Find out what quality problems the SBC decoder has and fix them.
-> Possibly introduce floating point output to eliminate clipping.
-> 3. Implement proper (adaptive?) clipping prevention in the SBC encoder.
 
--- 
-Best regards,
-Siarhei Siamashka
+> ---
+>  net/bluetooth/l2cap_core.c |   99 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 99 insertions(+)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 650e9f5..b1eac5a 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -780,6 +780,103 @@ static inline void l2cap_send_rr_or_rnr(struct l2cap_chan *chan, u32 control)
+>  	l2cap_send_sframe(chan, control);
+>  }
+>  
+> +static u16 __pack_enhanced_control(struct l2cap_ctrl *control)
+> +{
+> +	u16 packed;
+> +
+> +	packed = control->reqseq << L2CAP_CTRL_REQSEQ_SHIFT;
+> +	packed |= control->final << L2CAP_CTRL_FINAL_SHIFT;
+> +
+> +	if (control->sframe) {
+> +		packed |= control->poll << L2CAP_CTRL_POLL_SHIFT;
+> +		packed |= control->super << L2CAP_CTRL_SUPER_SHIFT;
+> +		packed |= L2CAP_CTRL_FRAME_TYPE;
+> +	} else {
+> +		packed |= control->sar << L2CAP_CTRL_SAR_SHIFT;
+> +		packed |= control->txseq << L2CAP_CTRL_TXSEQ_SHIFT;
+> +	}
+> +
+> +	return packed;
+> +}
+> +
+> +static void __get_enhanced_control(u16 enh, struct l2cap_ctrl *control)
+> +{
+> +	control->reqseq = (enh & L2CAP_CTRL_REQSEQ) >> L2CAP_CTRL_REQSEQ_SHIFT;
+> +	control->final = (enh & L2CAP_CTRL_FINAL) >> L2CAP_CTRL_FINAL_SHIFT;
+> +
+> +	if (enh & L2CAP_CTRL_FRAME_TYPE) {
+> +		/* S-Frame */
+> +		control->sframe = 1;
+> +		control->poll = (enh & L2CAP_CTRL_POLL) >> L2CAP_CTRL_POLL_SHIFT;
+> +		control->super = (enh & L2CAP_CTRL_SUPERVISE) >> L2CAP_CTRL_SUPER_SHIFT;
+> +
+> +		control->sar = 0;
+> +		control->txseq = 0;
+> +	} else {
+> +		/* I-Frame */
+> +		control->sframe = 0;
+> +		control->sar = (enh & L2CAP_CTRL_SAR) >> L2CAP_CTRL_SAR_SHIFT;
+> +		control->txseq = (enh & L2CAP_CTRL_TXSEQ) >> L2CAP_CTRL_TXSEQ_SHIFT;
+> +
+> +		control->poll = 0;
+> +		control->super = 0;
+> +	}
+> +}
+> +
+> +static u32 __pack_extended_control(struct l2cap_ctrl *control)
+> +{
+> +	u32 packed;
+> +
+> +	packed = control->reqseq << L2CAP_EXT_CTRL_REQSEQ_SHIFT;
+> +	packed |= control->final << L2CAP_EXT_CTRL_FINAL_SHIFT;
+> +
+> +	if (control->sframe) {
+> +		packed |= control->poll << L2CAP_EXT_CTRL_POLL_SHIFT;
+> +		packed |= control->super << L2CAP_EXT_CTRL_SUPER_SHIFT;
+> +		packed |= L2CAP_EXT_CTRL_FRAME_TYPE;
+> +	} else {
+> +		packed |= control->sar << L2CAP_EXT_CTRL_SAR_SHIFT;
+> +		packed |= control->txseq << L2CAP_EXT_CTRL_TXSEQ_SHIFT;
+> +	}
+> +
+> +	return packed;
+> +}
+> +
+> +static void __get_extended_control(u32 ext, struct l2cap_ctrl *control)
+> +{
+> +	control->reqseq = (ext & L2CAP_EXT_CTRL_REQSEQ) >> L2CAP_EXT_CTRL_REQSEQ_SHIFT;
+> +	control->final = (ext & L2CAP_EXT_CTRL_FINAL) >> L2CAP_EXT_CTRL_FINAL_SHIFT;
+> +
+> +	if (ext & L2CAP_EXT_CTRL_FRAME_TYPE) {
+> +		/* S-Frame */
+> +		control->sframe = 1;
+> +		control->poll = (ext & L2CAP_EXT_CTRL_POLL) >> L2CAP_EXT_CTRL_POLL_SHIFT;
+> +		control->super = (ext & L2CAP_EXT_CTRL_SUPERVISE) >> L2CAP_EXT_CTRL_SUPER_SHIFT;
+> +
+> +		control->sar = 0;
+> +		control->txseq = 0;
+> +	} else {
+> +		/* I-Frame */
+> +		control->sframe = 0;
+> +		control->sar = (ext & L2CAP_EXT_CTRL_SAR) >> L2CAP_EXT_CTRL_SAR_SHIFT;
+> +		control->txseq = (ext & L2CAP_EXT_CTRL_TXSEQ) >> L2CAP_EXT_CTRL_TXSEQ_SHIFT;
+> +
+> +		control->poll = 0;
+> +		control->super = 0;
+> +	}
+> +}
+> +
+> +static void __set_control(struct l2cap_chan *chan, struct sk_buff *skb)
+> +{
+> +	if (test_bit(FLAG_EXT_CTRL, &chan->flags)) {
+> +		__get_extended_control(get_unaligned_le32(skb->data),
+> +				       &bt_cb(skb)->control);
+> +	} else {
+> +		__get_enhanced_control(get_unaligned_le16(skb->data),
+> +				       &bt_cb(skb)->control);
+> +	}
+> +}
+> +
+>  static inline int __l2cap_no_conn_pending(struct l2cap_chan *chan)
+>  {
+>  	return !test_bit(CONF_CONNECT_PEND, &chan->conf_state);
+> @@ -4354,6 +4451,8 @@ static int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
+>  	u16 req_seq;
+>  	int len, next_tx_seq_offset, req_seq_offset;
+>  
+> +	__set_control(chan, skb);
+> +
+>  	control = __get_control(chan, skb->data);
+>  	skb_pull(skb, __ctrl_size(chan));
+>  	len = skb->len;
+> -- 
+> 1.7.9.4
+> 
+> --
+> Mat Martineau
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
