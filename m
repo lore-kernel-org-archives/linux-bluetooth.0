@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: chen.ganir@ti.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH v6 3/4] DeviceInfo: Discover Characteristics
-Date: Wed,  4 Apr 2012 11:28:56 +0300
-Message-Id: <1333528137-9305-4-git-send-email-chen.ganir@ti.com>
+Subject: [PATCH v6 2/4] DeviceInfo: Add connection logic
+Date: Wed,  4 Apr 2012 11:28:55 +0300
+Message-Id: <1333528137-9305-3-git-send-email-chen.ganir@ti.com>
 In-Reply-To: <1333528137-9305-1-git-send-email-chen.ganir@ti.com>
 References: <1333528137-9305-1-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,160 +12,79 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chen Ganir <chen.ganir@ti.com>
 
-Add logic to discover all characteristics and build a
-characteristic list.
+Add connection logic to the Device Information Plugin. When the
+driver is loaded, it will request a connection to the remote device
+and release the connection request when destroyed.
 ---
- deviceinfo/deviceinfo.c |   47 ++++++++++++++++++++++++++++++++++++++++++++++-
- deviceinfo/deviceinfo.h |    2 +-
- deviceinfo/manager.c    |   22 +++++++++++++++++++++-
- 3 files changed, 68 insertions(+), 3 deletions(-)
+ deviceinfo/deviceinfo.c |   27 +++++++++++++++++++++++++++
+ 1 files changed, 27 insertions(+), 0 deletions(-)
 
 diff --git a/deviceinfo/deviceinfo.c b/deviceinfo/deviceinfo.c
-index 150b061..8e4e8cb 100644
+index fed0cc8..150b061 100644
 --- a/deviceinfo/deviceinfo.c
 +++ b/deviceinfo/deviceinfo.c
-@@ -33,16 +33,26 @@
+@@ -28,6 +28,8 @@
+ #include <bluetooth/uuid.h>
+ #include "adapter.h"
+ #include "device.h"
++#include "gattrib.h"
++#include "attio.h"
  #include "att.h"
  #include "gattrib.h"
  #include "gatt.h"
-+#include "log.h"
- #include "deviceinfo.h"
+@@ -35,6 +37,8 @@
  
-+#define PNPID_UUID		"00002a50-0000-1000-8000-00805f9b34fb"
-+
  struct deviceinfo {
  	struct btd_device	*dev;		/* Device reference */
- 	GAttrib			*attrib;	/* GATT connection */
- 	guint			attioid;	/* Att watcher id */
-+	struct att_range	*svc_range;	/* DeviceInfo range */
-+	GSList			*chars;		/* Characteristics */
++	GAttrib			*attrib;	/* GATT connection */
++	guint			attioid;	/* Att watcher id */
  };
  
  static GSList *servers = NULL;
- 
-+struct characteristic {
-+	struct gatt_char	attr;	/* Characteristic */
-+	struct deviceinfo	*d;	/* deviceinfo where the char belongs */
-+};
-+
- static void deviceinfo_free(gpointer user_data)
+@@ -43,6 +47,12 @@ static void deviceinfo_free(gpointer user_data)
  {
  	struct deviceinfo *d = user_data;
-@@ -53,7 +63,10 @@ static void deviceinfo_free(gpointer user_data)
- 	if (d->attrib != NULL)
- 		g_attrib_unref(d->attrib);
  
-+	g_slist_free_full(d->chars, g_free);
++	if (d->attioid > 0)
++		btd_device_remove_attio_callback(d->dev, d->attioid);
++
++	if (d->attrib != NULL)
++		g_attrib_unref(d->attrib);
 +
  	btd_device_unref(d->dev);
-+	g_free(d->svc_range);
  	g_free(d);
  }
- 
-@@ -68,11 +81,40 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
+@@ -58,6 +68,21 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
  	return -1;
  }
  
-+static void configure_deviceinfo_cb(GSList *characteristics, guint8 status,
-+							gpointer user_data)
++static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
 +{
 +	struct deviceinfo *d = user_data;
-+	GSList *l;
 +
-+	if (status != 0) {
-+		error("Discover deviceinfo characteristics: %s",
-+							att_ecode2str(status));
-+		return;
-+	}
-+
-+	for (l = characteristics; l; l = l->next) {
-+		struct gatt_char *c = l->data;
-+		struct characteristic *ch;
-+
-+		ch = g_new0(struct characteristic, 1);
-+		ch->attr.handle = c->handle;
-+		ch->attr.properties = c->properties;
-+		ch->attr.value_handle = c->value_handle;
-+		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
-+		ch->d = d;
-+
-+		d->chars = g_slist_append(d->chars, ch);
-+	}
++	d->attrib = g_attrib_ref(attrib);
 +}
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
- {
- 	struct deviceinfo *d = user_data;
- 
- 	d->attrib = g_attrib_ref(attrib);
 +
-+	gatt_discover_char(d->attrib, d->svc_range->start, d->svc_range->end,
-+					NULL, configure_deviceinfo_cb, d);
- }
- 
- static void attio_disconnected_cb(gpointer user_data)
-@@ -83,12 +125,15 @@ static void attio_disconnected_cb(gpointer user_data)
- 	d->attrib = NULL;
- }
- 
--int deviceinfo_register(struct btd_device *device)
-+int deviceinfo_register(struct btd_device *device, struct gatt_primary *prim)
++static void attio_disconnected_cb(gpointer user_data)
++{
++	struct deviceinfo *d = user_data;
++
++	g_attrib_unref(d->attrib);
++	d->attrib = NULL;
++}
++
+ int deviceinfo_register(struct btd_device *device)
  {
  	struct deviceinfo *d;
- 
- 	d = g_new0(struct deviceinfo, 1);
- 	d->dev = btd_device_ref(device);
-+	d->svc_range = g_new0(struct att_range, 1);
-+	d->svc_range->start = prim->range.start;
-+	d->svc_range->end = prim->range.end;
+@@ -67,6 +92,8 @@ int deviceinfo_register(struct btd_device *device)
  
  	servers = g_slist_prepend(servers, d);
  
-diff --git a/deviceinfo/deviceinfo.h b/deviceinfo/deviceinfo.h
-index 0ea6ff5..7a804a5 100644
---- a/deviceinfo/deviceinfo.h
-+++ b/deviceinfo/deviceinfo.h
-@@ -20,5 +20,5 @@
-  *
-  */
- 
--int deviceinfo_register(struct btd_device *device);
-+int deviceinfo_register(struct btd_device *device, struct gatt_primary *prim);
- void deviceinfo_unregister(struct btd_device *device);
-diff --git a/deviceinfo/manager.c b/deviceinfo/manager.c
-index d5de171..c2378c2 100644
---- a/deviceinfo/manager.c
-+++ b/deviceinfo/manager.c
-@@ -34,9 +34,29 @@
- 
- #define DEVICE_INFORMATION_UUID		"0000180a-0000-1000-8000-00805f9b34fb"
- 
-+static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
-+{
-+	const struct gatt_primary *prim = a;
-+	const char *uuid = b;
-+
-+	return g_strcmp0(prim->uuid, uuid);
-+}
-+
- static int deviceinfo_driver_probe(struct btd_device *device, GSList *uuids)
- {
--	return deviceinfo_register(device);
-+	struct gatt_primary *prim;
-+	GSList *primaries, *l;
-+
-+	primaries = btd_device_get_primaries(device);
-+
-+	l = g_slist_find_custom(primaries, DEVICE_INFORMATION_UUID,
-+							primary_uuid_cmp);
-+	if (l == NULL)
-+		return -EINVAL;
-+
-+	prim = l->data;
-+
-+	return deviceinfo_register(device, prim);
++	d->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
++						attio_disconnected_cb, d);
+ 	return 0;
  }
  
- static void deviceinfo_driver_remove(struct btd_device *device)
 -- 
 1.7.4.1
 
