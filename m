@@ -1,42 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hemant Gupta <hemant.gupta@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: Naresh Gupta <naresh.gupta@stericsson.com>,
-	Hemant Gupta <hemantgupta.ste@gmail.com>,
-	Hemant Gupta <hemant.gupta@stericsson.com>
-Subject: [PATCH] Bluetooth: Fix packet type for ESCO Link
-Date: Wed, 4 Apr 2012 11:08:29 +0530
-Message-ID: <1333517909-11164-1-git-send-email-hemant.gupta@stericsson.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Message-id: <05C57A66007544188BE786ECFA833CBA@sisodomain.com>
+From: Jaganath <jaganath.k@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+References: <1332844351-13732-1-git-send-email-jaganath.k@samsung.com>
+In-reply-to: <1332844351-13732-1-git-send-email-jaganath.k@samsung.com>
+Subject: Re: [PATCH obexd 1/2] gobex: Introduce g_obex_abort_transfer()
+Date: Wed, 04 Apr 2012 10:41:00 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch uses the corect packet type for ESCO Link.
-Without this patch esco packet types were anded with ~EDR_ESCO_MASK
-resulting in setting bits that are not supported by controller
-to 0 which means that corresponding EDR ESCO packet type is
-supported(EDR Packet types are inverted as per BT Spec) which might
-not be the case.
 
-Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
----
- net/bluetooth/hci_conn.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Hi,
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 947172b..1060fb6 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -396,7 +396,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- 			conn->pkt_type = hdev->pkt_type & SCO_PTYPE_MASK;
- 		break;
- 	case ESCO_LINK:
--		conn->pkt_type = hdev->esco_type & ~EDR_ESCO_MASK;
-+		conn->pkt_type = hdev->esco_type ^ EDR_ESCO_MASK;
- 		break;
- 	}
- 
--- 
-1.7.0.4
+--------------------------------------------------
+From: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
+Sent: Tuesday, March 27, 2012 4:02 PM
+To: <linux-bluetooth@vger.kernel.org>
+Cc: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
+Subject: [PATCH obexd 1/2] gobex: Introduce g_obex_abort_transfer()
 
+> This function sends the abort request and wait for response before
+> disconnection. This patch fixes the issue ABORT packet not sending
+> when user cancels the transfer.
+> ---
+> gobex/gobex-transfer.c |   22 +++++++++++++++++++++-
+> gobex/gobex.c          |    4 ++--
+> gobex/gobex.h          |    4 ++++
+> 3 files changed, 27 insertions(+), 3 deletions(-)
+> 
+
+Any update on this patch please?
+
+Thanks,
+Jaganath 
