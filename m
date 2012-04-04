@@ -1,145 +1,282 @@
 Return-Path: <cyrus@holtmann.org>
 From: Mat Martineau <mathewm@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: gustavo@padovan.org,
-	pkrystad@codeaurora.org,
-	marcel@holtmann.org,
-	andrei.emeltchenko.news@gmail.com,
-	szymon.janc@tieto.com,
+Cc: gustavo@padovan.org, pkrystad@codeaurora.org, marcel@holtmann.org,
+	andrei.emeltchenko.news@gmail.com, szymon.janc@tieto.com,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCHv4 2/2] Bluetooth: Functions for handling ERTM control fields
-Date: Wed,  4 Apr 2012 11:29:43 -0700
-Message-Id: <1333564183-23442-3-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv4 1/2] Bluetooth: Add the l2cap_seq_list structure for tracking frames
+Date: Wed,  4 Apr 2012 11:29:42 -0700
+Message-Id: <1333564183-23442-2-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1333564183-23442-1-git-send-email-mathewm@codeaurora.org>
 References: <1333564183-23442-1-git-send-email-mathewm@codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These functions encode or decode ERTM control fields (extended or
-enhanced) to or from the new l2cap_ctrl structure.
+A sequence list is a data structure used to track frames that need to
+be retransmitted, and frames that have been requested for
+retransmission by the remote device.  It can compactly represent a
+list of sequence numbers within the ERTM transmit window.  Memory for
+the list is allocated once at connection time, and common operations
+in ERTM are O(1).
 
-Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |   99 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 99 insertions(+)
+ include/net/bluetooth/l2cap.h |   12 ++++
+ net/bluetooth/l2cap_core.c    |  148 ++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 152 insertions(+), 8 deletions(-)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index f6f0500..5d65b3d 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -407,6 +407,16 @@ struct l2cap_conn_param_update_rsp {
+ #define L2CAP_CONN_PARAM_REJECTED	0x0001
+ 
+ /* ----- L2CAP channels and connections ----- */
++struct l2cap_seq_list {
++	__u16	head;
++	__u16	tail;
++	__u16	mask;
++	__u16	*list;
++};
++
++#define L2CAP_SEQ_LIST_CLEAR	0xFFFF
++#define L2CAP_SEQ_LIST_TAIL	0x8000
++
+ struct srej_list {
+ 	__u16	tx_seq;
+ 	struct list_head list;
+@@ -501,6 +511,8 @@ struct l2cap_chan {
+ 	struct sk_buff		*tx_send_head;
+ 	struct sk_buff_head	tx_q;
+ 	struct sk_buff_head	srej_q;
++	struct l2cap_seq_list	srej_list;
++	struct l2cap_seq_list	retrans_list;
+ 	struct list_head	srej_l;
+ 
+ 	struct list_head	list;
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4d207de..1d149d0 100644
+index 3caff27..4d207de 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -776,6 +776,103 @@ static inline void l2cap_send_rr_or_rnr(struct l2cap_chan *chan, u32 control)
- 	l2cap_send_sframe(chan, control);
+@@ -233,6 +233,121 @@ static inline void l2cap_chan_set_err(struct l2cap_chan *chan, int err)
+ 	release_sock(sk);
  }
  
-+static u16 __pack_enhanced_control(struct l2cap_ctrl *control)
++/* ---- L2CAP sequence number lists ---- */
++
++/* For ERTM, ordered lists of sequence numbers must be tracked for
++ * SREJ requests that are received and for frames that are to be
++ * retransmitted. These seq_list functions implement a singly-linked
++ * list in an array, where membership in the list can also be checked
++ * in constant time. Items can also be added to the tail of the list
++ * and removed from the head in constant time, without further memory
++ * allocs or frees.
++ */
++
++static int l2cap_seq_list_init(struct l2cap_seq_list *seq_list, u16 size)
 +{
-+	u16 packed;
++	size_t alloc_size, i;
 +
-+	packed = control->reqseq << L2CAP_CTRL_REQSEQ_SHIFT;
-+	packed |= control->final << L2CAP_CTRL_FINAL_SHIFT;
++	/* Allocated size is a power of 2 to map sequence numbers
++	 * (which may be up to 14 bits) in to a smaller array that is
++	 * sized for the negotiated ERTM transmit windows.
++	 */
++	alloc_size = roundup_pow_of_two(size);
 +
-+	if (control->sframe) {
-+		packed |= control->poll << L2CAP_CTRL_POLL_SHIFT;
-+		packed |= control->super << L2CAP_CTRL_SUPER_SHIFT;
-+		packed |= L2CAP_CTRL_FRAME_TYPE;
-+	} else {
-+		packed |= control->sar << L2CAP_CTRL_SAR_SHIFT;
-+		packed |= control->txseq << L2CAP_CTRL_TXSEQ_SHIFT;
-+	}
++	seq_list->list = kmalloc(sizeof(u16) * alloc_size, GFP_KERNEL);
++	if (!seq_list->list)
++		return -ENOMEM;
 +
-+	return packed;
++	seq_list->mask = alloc_size - 1;
++	seq_list->head = L2CAP_SEQ_LIST_CLEAR;
++	seq_list->tail = L2CAP_SEQ_LIST_CLEAR;
++	for (i = 0; i < alloc_size; i++)
++		seq_list->list[i] = L2CAP_SEQ_LIST_CLEAR;
++
++	return 0;
 +}
 +
-+static void __get_enhanced_control(u16 enh, struct l2cap_ctrl *control)
++static inline void l2cap_seq_list_free(struct l2cap_seq_list *seq_list)
 +{
-+	control->reqseq = (enh & L2CAP_CTRL_REQSEQ) >> L2CAP_CTRL_REQSEQ_SHIFT;
-+	control->final = (enh & L2CAP_CTRL_FINAL) >> L2CAP_CTRL_FINAL_SHIFT;
++	kfree(seq_list->list);
++}
 +
-+	if (enh & L2CAP_CTRL_FRAME_TYPE) {
-+		/* S-Frame */
-+		control->sframe = 1;
-+		control->poll = (enh & L2CAP_CTRL_POLL) >> L2CAP_CTRL_POLL_SHIFT;
-+		control->super = (enh & L2CAP_CTRL_SUPERVISE) >> L2CAP_CTRL_SUPER_SHIFT;
++static inline bool l2cap_seq_list_contains(struct l2cap_seq_list *seq_list,
++					   u16 seq)
++{
++	/* Constant-time check for list membership */
++	return seq_list->list[seq & seq_list->mask] != L2CAP_SEQ_LIST_CLEAR;
++}
 +
-+		control->sar = 0;
-+		control->txseq = 0;
++static u16 l2cap_seq_list_remove(struct l2cap_seq_list *seq_list, u16 seq)
++{
++	u16 mask = seq_list->mask;
++
++	if (seq_list->head == L2CAP_SEQ_LIST_CLEAR) {
++		/* In case someone tries to pop the head of an empty list */
++		return L2CAP_SEQ_LIST_CLEAR;
++	} else if (seq_list->head == seq) {
++		/* Head can be removed in constant time */
++		seq_list->head = seq_list->list[seq & mask];
++		seq_list->list[seq & mask] = L2CAP_SEQ_LIST_CLEAR;
++
++		if (seq_list->head == L2CAP_SEQ_LIST_TAIL) {
++			seq_list->head = L2CAP_SEQ_LIST_CLEAR;
++			seq_list->tail = L2CAP_SEQ_LIST_CLEAR;
++		}
 +	} else {
-+		/* I-Frame */
-+		control->sframe = 0;
-+		control->sar = (enh & L2CAP_CTRL_SAR) >> L2CAP_CTRL_SAR_SHIFT;
-+		control->txseq = (enh & L2CAP_CTRL_TXSEQ) >> L2CAP_CTRL_TXSEQ_SHIFT;
++		/* Walk the list to find the sequence number */
++		u16 prev = seq_list->head;
++		while (seq_list->list[prev & mask] != seq) {
++			prev = seq_list->list[prev & mask];
++			if (prev == L2CAP_SEQ_LIST_TAIL)
++				return L2CAP_SEQ_LIST_CLEAR;
++		}
 +
-+		control->poll = 0;
-+		control->super = 0;
++		/* Unlink the number from the list and clear it */
++		seq_list->list[prev & mask] = seq_list->list[seq & mask];
++		seq_list->list[seq & mask] = L2CAP_SEQ_LIST_CLEAR;
++		if (seq_list->tail == seq)
++			seq_list->tail = prev;
++	}
++	return seq;
++}
++
++static u16 l2cap_seq_list_pop(struct l2cap_seq_list *seq_list)
++{
++	/* Remove the head in constant time */
++	return l2cap_seq_list_remove(seq_list, seq_list->head);
++}
++
++static void l2cap_seq_list_clear(struct l2cap_seq_list *seq_list)
++{
++	if (seq_list->head != L2CAP_SEQ_LIST_CLEAR) {
++		u16 i;
++		for (i = 0; i <= seq_list->mask; i++)
++			seq_list->list[i] = L2CAP_SEQ_LIST_CLEAR;
++
++		seq_list->head = L2CAP_SEQ_LIST_CLEAR;
++		seq_list->tail = L2CAP_SEQ_LIST_CLEAR;
 +	}
 +}
 +
-+static u32 __pack_extended_control(struct l2cap_ctrl *control)
++static void l2cap_seq_list_append(struct l2cap_seq_list *seq_list, u16 seq)
 +{
-+	u32 packed;
++	u16 mask = seq_list->mask;
 +
-+	packed = control->reqseq << L2CAP_EXT_CTRL_REQSEQ_SHIFT;
-+	packed |= control->final << L2CAP_EXT_CTRL_FINAL_SHIFT;
++	/* All appends happen in constant time */
 +
-+	if (control->sframe) {
-+		packed |= control->poll << L2CAP_EXT_CTRL_POLL_SHIFT;
-+		packed |= control->super << L2CAP_EXT_CTRL_SUPER_SHIFT;
-+		packed |= L2CAP_EXT_CTRL_FRAME_TYPE;
-+	} else {
-+		packed |= control->sar << L2CAP_EXT_CTRL_SAR_SHIFT;
-+		packed |= control->txseq << L2CAP_EXT_CTRL_TXSEQ_SHIFT;
-+	}
++	if (seq_list->list[seq & mask] == L2CAP_SEQ_LIST_CLEAR) {
++		if (seq_list->tail == L2CAP_SEQ_LIST_CLEAR)
++			seq_list->head = seq;
++		else
++			seq_list->list[seq_list->tail & mask] = seq;
 +
-+	return packed;
-+}
-+
-+static void __get_extended_control(u32 ext, struct l2cap_ctrl *control)
-+{
-+	control->reqseq = (ext & L2CAP_EXT_CTRL_REQSEQ) >> L2CAP_EXT_CTRL_REQSEQ_SHIFT;
-+	control->final = (ext & L2CAP_EXT_CTRL_FINAL) >> L2CAP_EXT_CTRL_FINAL_SHIFT;
-+
-+	if (ext & L2CAP_EXT_CTRL_FRAME_TYPE) {
-+		/* S-Frame */
-+		control->sframe = 1;
-+		control->poll = (ext & L2CAP_EXT_CTRL_POLL) >> L2CAP_EXT_CTRL_POLL_SHIFT;
-+		control->super = (ext & L2CAP_EXT_CTRL_SUPERVISE) >> L2CAP_EXT_CTRL_SUPER_SHIFT;
-+
-+		control->sar = 0;
-+		control->txseq = 0;
-+	} else {
-+		/* I-Frame */
-+		control->sframe = 0;
-+		control->sar = (ext & L2CAP_EXT_CTRL_SAR) >> L2CAP_EXT_CTRL_SAR_SHIFT;
-+		control->txseq = (ext & L2CAP_EXT_CTRL_TXSEQ) >> L2CAP_EXT_CTRL_TXSEQ_SHIFT;
-+
-+		control->poll = 0;
-+		control->super = 0;
++		seq_list->tail = seq;
++		seq_list->list[seq & mask] = L2CAP_SEQ_LIST_TAIL;
 +	}
 +}
 +
-+static void __set_control(struct l2cap_chan *chan, struct sk_buff *skb)
-+{
-+	if (test_bit(FLAG_EXT_CTRL, &chan->flags)) {
-+		__get_extended_control(get_unaligned_le32(skb->data),
-+				       &bt_cb(skb)->control);
-+	} else {
-+		__get_enhanced_control(get_unaligned_le16(skb->data),
-+				       &bt_cb(skb)->control);
-+	}
-+}
-+
- static inline int __l2cap_no_conn_pending(struct l2cap_chan *chan)
+ static void l2cap_chan_timeout(struct work_struct *work)
  {
- 	return !test_bit(CONF_CONNECT_PEND, &chan->conf_state);
-@@ -4350,6 +4447,8 @@ static int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
- 	u16 req_seq;
- 	int len, next_tx_seq_offset, req_seq_offset;
+ 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
+@@ -404,6 +519,8 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
  
-+	__set_control(chan, skb);
+ 		skb_queue_purge(&chan->srej_q);
+ 
++		l2cap_seq_list_free(&chan->srej_list);
++		l2cap_seq_list_free(&chan->retrans_list);
+ 		list_for_each_entry_safe(l, tmp, &chan->srej_l, list) {
+ 			list_del(&l->list);
+ 			kfree(l);
+@@ -2038,8 +2155,10 @@ static void l2cap_ack_timeout(struct work_struct *work)
+ 	l2cap_chan_put(chan);
+ }
+ 
+-static inline void l2cap_ertm_init(struct l2cap_chan *chan)
++static inline int l2cap_ertm_init(struct l2cap_chan *chan)
+ {
++	int err;
 +
- 	control = __get_control(chan, skb->data);
- 	skb_pull(skb, __ctrl_size(chan));
- 	len = skb->len;
+ 	chan->expected_ack_seq = 0;
+ 	chan->unacked_frames = 0;
+ 	chan->buffer_seq = 0;
+@@ -2053,6 +2172,11 @@ static inline void l2cap_ertm_init(struct l2cap_chan *chan)
+ 	skb_queue_head_init(&chan->srej_q);
+ 
+ 	INIT_LIST_HEAD(&chan->srej_l);
++	err = l2cap_seq_list_init(&chan->srej_list, chan->tx_win);
++	if (err < 0)
++		return err;
++
++	return l2cap_seq_list_init(&chan->retrans_list, chan->remote_tx_win);
+ }
+ 
+ static inline __u8 l2cap_select_mode(__u8 mode, __u16 remote_feat_mask)
+@@ -2846,7 +2970,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	u16 dcid, flags;
+ 	u8 rsp[64];
+ 	struct l2cap_chan *chan;
+-	int len;
++	int len, err = 0;
+ 
+ 	dcid  = __le16_to_cpu(req->dcid);
+ 	flags = __le16_to_cpu(req->flags);
+@@ -2917,9 +3041,13 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 		chan->expected_tx_seq = 0;
+ 		skb_queue_head_init(&chan->tx_q);
+ 		if (chan->mode == L2CAP_MODE_ERTM)
+-			l2cap_ertm_init(chan);
++			err = l2cap_ertm_init(chan);
++
++		if (err < 0)
++			l2cap_send_disconn_req(chan->conn, chan, -err);
++		else
++			l2cap_chan_ready(chan);
+ 
+-		l2cap_chan_ready(chan);
+ 		goto unlock;
+ 	}
+ 
+@@ -2947,7 +3075,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 
+ unlock:
+ 	l2cap_chan_unlock(chan);
+-	return 0;
++	return err;
+ }
+ 
+ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd, u8 *data)
+@@ -2956,6 +3084,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	u16 scid, flags, result;
+ 	struct l2cap_chan *chan;
+ 	int len = le16_to_cpu(cmd->len) - sizeof(*rsp);
++	int err = 0;
+ 
+ 	scid   = __le16_to_cpu(rsp->scid);
+ 	flags  = __le16_to_cpu(rsp->flags);
+@@ -3047,14 +3176,17 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 		chan->expected_tx_seq = 0;
+ 		skb_queue_head_init(&chan->tx_q);
+ 		if (chan->mode ==  L2CAP_MODE_ERTM)
+-			l2cap_ertm_init(chan);
++			err = l2cap_ertm_init(chan);
+ 
+-		l2cap_chan_ready(chan);
++		if (err < 0)
++			l2cap_send_disconn_req(chan->conn, chan, -err);
++		else
++			l2cap_chan_ready(chan);
+ 	}
+ 
+ done:
+ 	l2cap_chan_unlock(chan);
+-	return 0;
++	return err;
+ }
+ 
+ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd, u8 *data)
 -- 
 1.7.9.4
 
