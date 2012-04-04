@@ -1,131 +1,191 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v2 3/5] Bluetooth: Add dst_type parameter to hci_connect
-Date: Wed,  4 Apr 2012 17:16:08 -0300
-Message-Id: <1333570570-1288-4-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v2 2/5] Bluetooth: Move address type macros to bluetooth.h
+Date: Wed,  4 Apr 2012 17:16:07 -0300
+Message-Id: <1333570570-1288-3-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1333570570-1288-1-git-send-email-andre.guedes@openbossa.org>
 References: <1333570570-1288-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the dst_type parameter to hci_connect function.
-Instead of searching the address type in advertising cache, we
-use the dst_type parameter to establish LE connections.
-
-The dst_type is ignored for BR/EDR connection establishment.
+This patch moves address type macros to bluetooth.h since they will be
+used by management interface and Bluetooth socket interface. It also
+replaces the macro prefix MGMT_ADDR_ by BDADDR_.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |    2 +-
- net/bluetooth/hci_conn.c         |   12 ++++--------
- net/bluetooth/l2cap_core.c       |    4 ++--
- net/bluetooth/mgmt.c             |    8 ++++----
- net/bluetooth/sco.c              |    3 ++-
- 5 files changed, 13 insertions(+), 16 deletions(-)
+ include/net/bluetooth/bluetooth.h |    5 +++++
+ include/net/bluetooth/hci_core.h  |   16 ++++++----------
+ net/bluetooth/mgmt.c              |   28 ++++++++++++++--------------
+ 3 files changed, 25 insertions(+), 24 deletions(-)
 
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index f2c8bdf..3fe927d 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -163,6 +163,11 @@ typedef struct {
+ 	__u8 b[6];
+ } __packed bdaddr_t;
+ 
++/* BD Address type */
++#define BDADDR_BREDR		0x00
++#define BDADDR_LE_PUBLIC	0x01
++#define BDADDR_LE_RANDOM	0x02
++
+ #define BDADDR_ANY   (&(bdaddr_t) {{0, 0, 0, 0, 0, 0}})
+ #define BDADDR_LOCAL (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
+ 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 542fea2..9083a95 100644
+index c0b232c..542fea2 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -574,7 +574,7 @@ int hci_chan_del(struct hci_chan *chan);
- void hci_chan_list_flush(struct hci_conn *conn);
+@@ -964,16 +964,12 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb);
+ void hci_sock_dev_event(struct hci_dev *hdev, int event);
  
- struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
--						__u8 sec_level, __u8 auth_type);
-+				__u8 dst_type, __u8 sec_level, __u8 auth_type);
- int hci_conn_check_link_mode(struct hci_conn *conn);
- int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
- int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 947172b..4975a76 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -514,7 +514,8 @@ EXPORT_SYMBOL(hci_get_route);
- 
- /* Create SCO, ACL or LE connection.
-  * Device _must_ be locked */
--struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8 sec_level, __u8 auth_type)
-+struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
-+				__u8 dst_type, __u8 sec_level, __u8 auth_type)
- {
- 	struct hci_conn *acl;
- 	struct hci_conn *sco;
-@@ -523,21 +524,16 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
- 	BT_DBG("%s dst %s", hdev->name, batostr(dst));
- 
- 	if (type == LE_LINK) {
--		struct adv_entry *entry;
+ /* Management interface */
+-#define MGMT_ADDR_BREDR			0x00
+-#define MGMT_ADDR_LE_PUBLIC		0x01
+-#define MGMT_ADDR_LE_RANDOM		0x02
 -
- 		le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
- 		if (le)
- 			return ERR_PTR(-EBUSY);
+-#define DISCOV_TYPE_BREDR		(BIT(MGMT_ADDR_BREDR))
+-#define DISCOV_TYPE_LE			(BIT(MGMT_ADDR_LE_PUBLIC) | \
+-						BIT(MGMT_ADDR_LE_RANDOM))
+-#define DISCOV_TYPE_INTERLEAVED		(BIT(MGMT_ADDR_BREDR) | \
+-						BIT(MGMT_ADDR_LE_PUBLIC) | \
+-						BIT(MGMT_ADDR_LE_RANDOM))
++#define DISCOV_TYPE_BREDR		(BIT(BDADDR_BREDR))
++#define DISCOV_TYPE_LE			(BIT(BDADDR_LE_PUBLIC) | \
++						BIT(BDADDR_LE_RANDOM))
++#define DISCOV_TYPE_INTERLEAVED		(BIT(BDADDR_BREDR) | \
++						BIT(BDADDR_LE_PUBLIC) | \
++						BIT(BDADDR_LE_RANDOM))
  
--		entry = hci_find_adv_entry(hdev, dst);
--		if (!entry)
--			return ERR_PTR(-EHOSTUNREACH);
--
- 		le = hci_conn_add(hdev, LE_LINK, dst);
- 		if (!le)
- 			return ERR_PTR(-ENOMEM);
- 
--		le->dst_type = entry->bdaddr_type;
-+		le->dst_type = (dst_type == BDADDR_LE_PUBLIC) ?
-+				ADDR_LE_DEV_PUBLIC : ADDR_LE_DEV_RANDOM;
- 
- 		hci_le_connect(le);
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 3caff27..6090bad 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1216,10 +1216,10 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
- 	auth_type = l2cap_get_auth_type(chan);
- 
- 	if (chan->dcid == L2CAP_CID_LE_DATA)
--		hcon = hci_connect(hdev, LE_LINK, dst,
-+		hcon = hci_connect(hdev, LE_LINK, dst, BDADDR_LE_RANDOM,
- 					chan->sec_level, auth_type);
- 	else
--		hcon = hci_connect(hdev, ACL_LINK, dst,
-+		hcon = hci_connect(hdev, ACL_LINK, dst, BDADDR_BREDR,
- 					chan->sec_level, auth_type);
- 
- 	if (IS_ERR(hcon)) {
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
+ int mgmt_index_added(struct hci_dev *hdev);
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c6e70b6..b637aad 100644
+index 4e7a01f..c6e70b6 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1911,11 +1911,11 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+@@ -1532,7 +1532,7 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto unlock;
+ 	}
+ 
+-	if (cp->addr.type == MGMT_ADDR_BREDR)
++	if (cp->addr.type == BDADDR_BREDR)
+ 		err = hci_remove_link_key(hdev, &cp->addr.bdaddr);
+ 	else
+ 		err = hci_remove_ltk(hdev, &cp->addr.bdaddr);
+@@ -1544,7 +1544,7 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
+ 
+ 	if (cp->disconnect) {
+-		if (cp->addr.type == MGMT_ADDR_BREDR)
++		if (cp->addr.type == BDADDR_BREDR)
+ 			conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
+ 							&cp->addr.bdaddr);
+ 		else
+@@ -1604,7 +1604,7 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto failed;
+ 	}
+ 
+-	if (cp->addr.type == MGMT_ADDR_BREDR)
++	if (cp->addr.type == BDADDR_BREDR)
+ 		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->addr.bdaddr);
+ 	else
+ 		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->addr.bdaddr);
+@@ -1639,16 +1639,16 @@ static u8 link_to_mgmt(u8 link_type, u8 addr_type)
+ 	case LE_LINK:
+ 		switch (addr_type) {
+ 		case ADDR_LE_DEV_PUBLIC:
+-			return MGMT_ADDR_LE_PUBLIC;
++			return BDADDR_LE_PUBLIC;
+ 
+ 		default:
+ 			/* Fallback to LE Random address type */
+-			return MGMT_ADDR_LE_RANDOM;
++			return BDADDR_LE_RANDOM;
+ 		}
+ 
+ 	default:
+ 		/* Fallback to BR/EDR type */
+-		return MGMT_ADDR_BREDR;
++		return BDADDR_BREDR;
+ 	}
+ }
+ 
+@@ -1910,7 +1910,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	else
  		auth_type = HCI_AT_DEDICATED_BONDING_MITM;
  
- 	if (cp->addr.type == BDADDR_BREDR)
--		conn = hci_connect(hdev, ACL_LINK, &cp->addr.bdaddr, sec_level,
--				   auth_type);
-+		conn = hci_connect(hdev, ACL_LINK, &cp->addr.bdaddr,
-+					cp->addr.type, sec_level, auth_type);
+-	if (cp->addr.type == MGMT_ADDR_BREDR)
++	if (cp->addr.type == BDADDR_BREDR)
+ 		conn = hci_connect(hdev, ACL_LINK, &cp->addr.bdaddr, sec_level,
+ 				   auth_type);
  	else
--		conn = hci_connect(hdev, LE_LINK, &cp->addr.bdaddr, sec_level,
--				   auth_type);
-+		conn = hci_connect(hdev, LE_LINK, &cp->addr.bdaddr,
-+					cp->addr.type, sec_level, auth_type);
+@@ -1943,7 +1943,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
  
- 	memset(&rp, 0, sizeof(rp));
- 	bacpy(&rp.addr.bdaddr, &cp->addr.bdaddr);
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 8bf26d1..c17a022 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -196,7 +196,8 @@ static int sco_connect(struct sock *sk)
- 	else
- 		type = SCO_LINK;
+ 	/* For LE, just connecting isn't a proof that the pairing finished */
+-	if (cp->addr.type == MGMT_ADDR_BREDR)
++	if (cp->addr.type == BDADDR_BREDR)
+ 		conn->connect_cfm_cb = pairing_complete_cb;
  
--	hcon = hci_connect(hdev, type, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
-+	hcon = hci_connect(hdev, type, dst, BDADDR_BREDR, BT_SECURITY_LOW,
-+				HCI_AT_NO_BONDING);
- 	if (IS_ERR(hcon)) {
- 		err = PTR_ERR(hcon);
+ 	conn->security_cfm_cb = pairing_complete_cb;
+@@ -2020,7 +2020,7 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
  		goto done;
+ 	}
+ 
+-	if (type == MGMT_ADDR_BREDR)
++	if (type == BDADDR_BREDR)
+ 		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, bdaddr);
+ 	else
+ 		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, bdaddr);
+@@ -2031,7 +2031,7 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
+ 		goto done;
+ 	}
+ 
+-	if (type == MGMT_ADDR_LE_PUBLIC || type == MGMT_ADDR_LE_RANDOM) {
++	if (type == BDADDR_LE_PUBLIC || type == BDADDR_LE_RANDOM) {
+ 		/* Continue with pairing via SMP */
+ 		err = smp_user_confirm_reply(conn, mgmt_op, passkey);
+ 
+@@ -2962,7 +2962,7 @@ int mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key, u8 persistent)
+ 
+ 	ev.store_hint = persistent;
+ 	bacpy(&ev.key.addr.bdaddr, &key->bdaddr);
+-	ev.key.addr.type = MGMT_ADDR_BREDR;
++	ev.key.addr.type = BDADDR_BREDR;
+ 	ev.key.type = key->type;
+ 	memcpy(ev.key.val, key->val, 16);
+ 	ev.key.pin_len = key->pin_len;
+@@ -3120,7 +3120,7 @@ int mgmt_pin_code_request(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 secure)
+ 	struct mgmt_ev_pin_code_request ev;
+ 
+ 	bacpy(&ev.addr.bdaddr, bdaddr);
+-	ev.addr.type = MGMT_ADDR_BREDR;
++	ev.addr.type = BDADDR_BREDR;
+ 	ev.secure = secure;
+ 
+ 	return mgmt_event(MGMT_EV_PIN_CODE_REQUEST, hdev, &ev, sizeof(ev),
+@@ -3139,7 +3139,7 @@ int mgmt_pin_code_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 		return -ENOENT;
+ 
+ 	bacpy(&rp.addr.bdaddr, bdaddr);
+-	rp.addr.type = MGMT_ADDR_BREDR;
++	rp.addr.type = BDADDR_BREDR;
+ 
+ 	err = cmd_complete(cmd->sk, hdev->id, MGMT_OP_PIN_CODE_REPLY,
+ 			   mgmt_status(status), &rp, sizeof(rp));
+@@ -3161,7 +3161,7 @@ int mgmt_pin_code_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 		return -ENOENT;
+ 
+ 	bacpy(&rp.addr.bdaddr, bdaddr);
+-	rp.addr.type = MGMT_ADDR_BREDR;
++	rp.addr.type = BDADDR_BREDR;
+ 
+ 	err = cmd_complete(cmd->sk, hdev->id, MGMT_OP_PIN_CODE_NEG_REPLY,
+ 			   mgmt_status(status), &rp, sizeof(rp));
 -- 
 1.7.9.4
 
