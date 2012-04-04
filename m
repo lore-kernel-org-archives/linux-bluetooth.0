@@ -1,80 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vishal Agarwal <vishal.agarwal@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: <vishal.agarwal@stericsson.com>
-Subject: [PATCH] Bluetooth: Temporary keys should be retained during connection
-Date: Wed, 4 Apr 2012 17:15:40 +0530
-Message-ID: <1333539940-29061-1-git-send-email-vishal.agarwal@stericsson.com>
+Message-ID: <4F7C2DE4.3040502@tieto.com>
+Date: Wed, 4 Apr 2012 13:17:56 +0200
+From: Garbat Rafal <rafal.garbat@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Finalize discovery after discover message
+ was rejected.
+References: <1331314055-18669-1-git-send-email-rafal.garbat@tieto.com> <20120404102047.GA29893@x220> <4F7C2AF7.10500@tieto.com> <20120404110834.GA3300@x220> <20120404111002.GA3463@x220>
+In-Reply-To: <20120404111002.GA3463@x220>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If a key is non persistent then it should not be used in future
-connections but it should be kept for current connection. And it
-should be removed when connecion is removed.
-
-Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
----
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_core.c         |    8 ++++----
- net/bluetooth/mgmt.c             |    6 ++++++
- 3 files changed, 11 insertions(+), 4 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c8d5beb..6c2d436 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -318,6 +318,7 @@ struct hci_conn {
- 
- 	__u8		remote_cap;
- 	__u8		remote_auth;
-+	bool		temp_link_key;
- 
- 	unsigned int	sent;
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 286f3fc..6542b03 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1330,10 +1330,10 @@ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
- 
- 	mgmt_new_link_key(hdev, key, persistent);
- 
--	if (!persistent) {
--		list_del(&key->list);
--		kfree(key);
--	}
-+	if (persistent)
-+		conn->temp_link_key = false;
-+	else
-+		conn->temp_link_key = true;
- 
- 	return 0;
- }
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b4f7e32..bc6f89e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3060,12 +3060,18 @@ int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
- {
- 	struct mgmt_addr_info ev;
- 	struct sock *sk = NULL;
-+	struct hci_conn *conn;
- 	int err;
- 
- 	mgmt_pending_foreach(MGMT_OP_DISCONNECT, hdev, disconnect_rsp, &sk);
- 
- 	bacpy(&ev.bdaddr, bdaddr);
- 	ev.type = link_to_mgmt(link_type, addr_type);
-+	if (link_type == ACL_LINK) {
-+		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, bdaddr);
-+		if (conn->temp_link_key)
-+			hci_remove_link_key(hdev, bdaddr);
-+	}
- 
- 	err = mgmt_event(MGMT_EV_DEVICE_DISCONNECTED, hdev, &ev, sizeof(ev),
- 			 sk);
--- 
-1.7.0.4
-
+On 04/04/2012 01:10 PM, Johan Hedberg wrote:
+> On Wed, Apr 04, 2012, Johan Hedberg wrote:
+>> Hi Rafal,
+>>
+>> On Wed, Apr 04, 2012, Garbat Rafal wrote:
+>>>> The patch looks ok'ish but it doesn't compile:
+>>>>
+>>>> audio/avdtp.c: In function ‘avdtp_parse_rej’:
+>>>> audio/avdtp.c:3071:11: error: ‘struct avdtp’ has no member named ‘used_data’
+>>>>
+>>>> Secondly, please use a "avdtp:" prefix for the commit message
+>>>> ("Bluetooth" is only reserved for kernel patches) and remove the '.'
+>>> >from the end of the summary line.
+>>>> Johan
+>>> Sorry, just a nasty typo. Will fix it and send patch once again.
+>> The thing I'm more worried about is that this seems to imply that you've
+>> neither run the code nor even tried to compile it. Is that the case?
+> I.e. how do you know that the patch is correct if you haven't tested it?
+>
+> Johan
+It was tested (special use case with one of the carkits we had) and I 
+did this typo when I was porting
+this from the other project.  Sorry, it was done in a hurry.
