@@ -1,86 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: Mat Martineau <mathewm@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v2 0/5] LE Connection
-Date: Wed,  4 Apr 2012 17:16:05 -0300
-Message-Id: <1333570570-1288-1-git-send-email-andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: gustavo@padovan.org,
+	pkrystad@codeaurora.org,
+	marcel@holtmann.org,
+	andrei.emeltchenko.news@gmail.com,
+	szymon.janc@tieto.com,
+	Mat Martineau <mathewm@codeaurora.org>
+Subject: [PATCHv4 2/2] Bluetooth: Functions for handling ERTM control fields
+Date: Wed,  4 Apr 2012 11:29:43 -0700
+Message-Id: <1333564183-23442-3-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1333564183-23442-1-git-send-email-mathewm@codeaurora.org>
+References: <1333564183-23442-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+These functions encode or decode ERTM control fields (extended or
+enhanced) to or from the new l2cap_ctrl structure.
 
-This RFC v2 series implements all comments from previous version sent last
-week. It also implements the remaining kernel changes (step 4).
+Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ net/bluetooth/l2cap_core.c |   99 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 99 insertions(+)
 
-The main changes are:
-1. Move and rename address type macros to bluetooth.h
-2. Remove advertising cache code
-
-Claudio is about to send the user-space RFC series (step 2). It basically
-set the address type info for LE connect() calls. This RFC series and
-Claudio's RFC series implement all four steps (described in previous cover
-letter) which enable user-space informing the address type to kernel in order
-to properly establish LE connections.
-
->From previous cover letter:
------ cut -----
-In order to establish a LE connection, we need to know the address type
-(public or random) from the remote device. Since this information was not
-exposed to user-space and we were not sure about changing the Bluetooth ABI
-at that time, we came up with a in-kernel solution to enable LE connections.
-
-We store sensitive information (bdaddr and bdaddr_type) gathered from LE
-advertising report events. Once we get a connection request from user-space,
-we search the destination address in the advertising cache to get its type
-and then start the connection establishment.
-
-Nevertheless, today, the remote device address type is exposed to user-space
-through management interface events. We can use this information to establish
-LE connection and drop the advertising cache in kernel.
-
-To achieve that, we may add the address type field to struct sockaddr_l2.
-This new field would be used for LE connection only. BR/EDR sockets would just
-ignore it. We wouldn't even need to set this field for BR/EDR sockets.
-
-These changes would be taken in four steps:
-1. Kernel: add address type info to struct sockaddr_l2
-2. User-space: set the address type field for LE connections
-3. Kernel: use address type info from user-space instead of checking
-   advertising cache
-4. Kernel: remove advertising cache code
-
-This RFC series implements steps 1 and 3. User-space work is still under
-development and we'll send a RFC soon. Step 4 would be started as soon as
-we have steps 1, 2 and 3 done.
------ cut -----
-
-BTW, this series depends on "[PATCH] Bluetooth: Remove MGMT_ADDR_INVALID macro"
-already sent to the ML.
-
-Regards,
-
-Andre Guedes
-
-
-Andre Guedes (5):
-  Bluetooth: Add address type to struct sockaddr_l2
-  Bluetooth: Move address type macros to bluetooth.h
-  Bluetooth: Add dst_type parameter to hci_connect
-  Bluetooth: Use address type info from User-space
-  Bluetooth: Remove advertising cache
-
- include/net/bluetooth/bluetooth.h |    5 +++
- include/net/bluetooth/hci_core.h  |   27 ++++---------
- include/net/bluetooth/l2cap.h     |    3 +-
- net/bluetooth/hci_conn.c          |   12 ++----
- net/bluetooth/hci_core.c          |   75 -------------------------------------
- net/bluetooth/hci_event.c         |    7 ----
- net/bluetooth/l2cap_core.c        |   11 +++---
- net/bluetooth/l2cap_sock.c        |    2 +-
- net/bluetooth/mgmt.c              |   36 +++++++++---------
- net/bluetooth/sco.c               |    3 +-
- 10 files changed, 45 insertions(+), 136 deletions(-)
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 4d207de..1d149d0 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -776,6 +776,103 @@ static inline void l2cap_send_rr_or_rnr(struct l2cap_chan *chan, u32 control)
+ 	l2cap_send_sframe(chan, control);
+ }
+ 
++static u16 __pack_enhanced_control(struct l2cap_ctrl *control)
++{
++	u16 packed;
++
++	packed = control->reqseq << L2CAP_CTRL_REQSEQ_SHIFT;
++	packed |= control->final << L2CAP_CTRL_FINAL_SHIFT;
++
++	if (control->sframe) {
++		packed |= control->poll << L2CAP_CTRL_POLL_SHIFT;
++		packed |= control->super << L2CAP_CTRL_SUPER_SHIFT;
++		packed |= L2CAP_CTRL_FRAME_TYPE;
++	} else {
++		packed |= control->sar << L2CAP_CTRL_SAR_SHIFT;
++		packed |= control->txseq << L2CAP_CTRL_TXSEQ_SHIFT;
++	}
++
++	return packed;
++}
++
++static void __get_enhanced_control(u16 enh, struct l2cap_ctrl *control)
++{
++	control->reqseq = (enh & L2CAP_CTRL_REQSEQ) >> L2CAP_CTRL_REQSEQ_SHIFT;
++	control->final = (enh & L2CAP_CTRL_FINAL) >> L2CAP_CTRL_FINAL_SHIFT;
++
++	if (enh & L2CAP_CTRL_FRAME_TYPE) {
++		/* S-Frame */
++		control->sframe = 1;
++		control->poll = (enh & L2CAP_CTRL_POLL) >> L2CAP_CTRL_POLL_SHIFT;
++		control->super = (enh & L2CAP_CTRL_SUPERVISE) >> L2CAP_CTRL_SUPER_SHIFT;
++
++		control->sar = 0;
++		control->txseq = 0;
++	} else {
++		/* I-Frame */
++		control->sframe = 0;
++		control->sar = (enh & L2CAP_CTRL_SAR) >> L2CAP_CTRL_SAR_SHIFT;
++		control->txseq = (enh & L2CAP_CTRL_TXSEQ) >> L2CAP_CTRL_TXSEQ_SHIFT;
++
++		control->poll = 0;
++		control->super = 0;
++	}
++}
++
++static u32 __pack_extended_control(struct l2cap_ctrl *control)
++{
++	u32 packed;
++
++	packed = control->reqseq << L2CAP_EXT_CTRL_REQSEQ_SHIFT;
++	packed |= control->final << L2CAP_EXT_CTRL_FINAL_SHIFT;
++
++	if (control->sframe) {
++		packed |= control->poll << L2CAP_EXT_CTRL_POLL_SHIFT;
++		packed |= control->super << L2CAP_EXT_CTRL_SUPER_SHIFT;
++		packed |= L2CAP_EXT_CTRL_FRAME_TYPE;
++	} else {
++		packed |= control->sar << L2CAP_EXT_CTRL_SAR_SHIFT;
++		packed |= control->txseq << L2CAP_EXT_CTRL_TXSEQ_SHIFT;
++	}
++
++	return packed;
++}
++
++static void __get_extended_control(u32 ext, struct l2cap_ctrl *control)
++{
++	control->reqseq = (ext & L2CAP_EXT_CTRL_REQSEQ) >> L2CAP_EXT_CTRL_REQSEQ_SHIFT;
++	control->final = (ext & L2CAP_EXT_CTRL_FINAL) >> L2CAP_EXT_CTRL_FINAL_SHIFT;
++
++	if (ext & L2CAP_EXT_CTRL_FRAME_TYPE) {
++		/* S-Frame */
++		control->sframe = 1;
++		control->poll = (ext & L2CAP_EXT_CTRL_POLL) >> L2CAP_EXT_CTRL_POLL_SHIFT;
++		control->super = (ext & L2CAP_EXT_CTRL_SUPERVISE) >> L2CAP_EXT_CTRL_SUPER_SHIFT;
++
++		control->sar = 0;
++		control->txseq = 0;
++	} else {
++		/* I-Frame */
++		control->sframe = 0;
++		control->sar = (ext & L2CAP_EXT_CTRL_SAR) >> L2CAP_EXT_CTRL_SAR_SHIFT;
++		control->txseq = (ext & L2CAP_EXT_CTRL_TXSEQ) >> L2CAP_EXT_CTRL_TXSEQ_SHIFT;
++
++		control->poll = 0;
++		control->super = 0;
++	}
++}
++
++static void __set_control(struct l2cap_chan *chan, struct sk_buff *skb)
++{
++	if (test_bit(FLAG_EXT_CTRL, &chan->flags)) {
++		__get_extended_control(get_unaligned_le32(skb->data),
++				       &bt_cb(skb)->control);
++	} else {
++		__get_enhanced_control(get_unaligned_le16(skb->data),
++				       &bt_cb(skb)->control);
++	}
++}
++
+ static inline int __l2cap_no_conn_pending(struct l2cap_chan *chan)
+ {
+ 	return !test_bit(CONF_CONNECT_PEND, &chan->conf_state);
+@@ -4350,6 +4447,8 @@ static int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
+ 	u16 req_seq;
+ 	int len, next_tx_seq_offset, req_seq_offset;
+ 
++	__set_control(chan, skb);
++
+ 	control = __get_control(chan, skb->data);
+ 	skb_pull(skb, __ctrl_size(chan));
+ 	len = skb->len;
 -- 
 1.7.9.4
 
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
