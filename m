@@ -1,59 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20120404122217.GA15085@x220>
-References: <1333539940-29061-1-git-send-email-vishal.agarwal@stericsson.com>
-	<20120404115301.GA5081@x220>
-	<CA+_sZW9cqfW4Nz0C21av25VzwkSTat6QW6FoWGDzcA=oezgGLg@mail.gmail.com>
-	<20120404122217.GA15085@x220>
-Date: Wed, 4 Apr 2012 18:02:17 +0530
-Message-ID: <CA+_sZW-55fFpgKo5RU9g3cmubSqF270DW_TS=RUxWyS0zkwmqg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Temporary keys should be retained during connection
-From: vishal agarwal <vishal.bluez@gmail.com>
-To: vishal agarwal <vishal.bluez@gmail.com>,
-	Vishal Agarwal <vishal.agarwal@stericsson.com>,
-	linux-bluetooth@vger.kernel.org
+In-Reply-To: <CAJdJm_Mk10friZJRfRe_ZyuXQcYJbActGTHZr1HEwtc8pQUwjw@mail.gmail.com>
+References: <1333458907-28940-1-git-send-email-hemant.gupta@stericsson.com>
+	<CAJdJm_Mk10friZJRfRe_ZyuXQcYJbActGTHZr1HEwtc8pQUwjw@mail.gmail.com>
+Date: Wed, 4 Apr 2012 17:55:18 +0530
+Message-ID: <CACj007nKHwA2NVu2hc9ZGxWmeCamaR8w2m2FqKz5ueRGpSpYsA@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: Fix packet type for ESCO Link
+From: Hemant Gupta <hemantgupta.ste@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Hemant Gupta <hemant.gupta@stericsson.com>,
+	linux-bluetooth@vger.kernel.org,
+	Naresh Gupta <naresh.gupta@stericsson.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Anderson,
 
-On Wed, Apr 4, 2012 at 5:52 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Vishal,
+On Tue, Apr 3, 2012 at 7:20 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Hemant,
 >
-> On Wed, Apr 04, 2012, vishal agarwal wrote:
->> > Firstly, did you verify that this fixes your test case? You still
->> > didn't tell us what test case this is, btw.
->
-> What about the above?
->
-Yes with this PTS testcase is passing now, the testcase which was failing
-earlier TC_PSE_SSM_BI_02_C (test case for PBAP server)
-
->> > Since setting the flag is outside of mgmt.c I think the removal should
->> > also be. That way you also avoid an extra call to
->> > hci_conn_hash_lookup_ba. I.e. please put the removal in
->> > hci_disconn_complete_evt.
->> >
->> > I'd also still like to hear your opinion of the second option I
->> > proposed. If you had a reference to struct link_key in hci_conn then
->> > you'd just need to call list_del() and nothing else to remove it (i.e.
->> > no iteration of hdev->link_keys necessary.
+> On Tue, Apr 3, 2012 at 9:15 AM, Hemant Gupta
+> <hemant.gupta@stericsson.com> wrote:
+>> This patch fixes the packet type for ESCO Link which was incorrectly
+>> set for EDR ESCO Packet Types. Anding esco_type with ~EDR_ESCO_MASK
+>> results in loosing information of esco packet type (EDR Packet
+>> types are inverted as per BT Spec) that resulted in wrong calculation
+>> of packet type in hci_setup_sync() API causing the HCI Setup Synchronous
+>> Connection Command to fail.
 >>
->> If I implement it this way then there will be two new variables added,
->> one in hci_conn to store the reference of key and other one is inside
->> link_key structure to store if key is temporary or not.
->> or you want me to store reference of key to hci_conn only when the key
->> is temporary?
->> in this case also code might become complicated to handle cases if key
->> is re generated and new key is not temporary but the older one was.
+>> Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
+>> ---
+>>  net/bluetooth/hci_conn.c |    2 +-
+>>  1 files changed, 1 insertions(+), 1 deletions(-)
 >>
->> So in my opinion after the changes you suggested (moving code in
->> hci_disconn_complete_evt), this is also OK. lesser and clearer code.
+>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+>> index 947172b..bff6bc1 100644
+>> --- a/net/bluetooth/hci_conn.c
+>> +++ b/net/bluetooth/hci_conn.c
+>> @@ -396,7 +396,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
+>>                        conn->pkt_type = hdev->pkt_type & SCO_PTYPE_MASK;
+>>                break;
+>>        case ESCO_LINK:
+>> -               conn->pkt_type = hdev->esco_type & ~EDR_ESCO_MASK;
+>> +               conn->pkt_type = hdev->esco_type ^ ~EDR_ESCO_MASK;
 >
-> Ok, fair enough. The hci_disconn_complete_evt change should be enough
-> then.
+> I don't know ESCO, but using XOR (~MASK) will basically invert all
+> bits not set in the mask (and keep those in the mask untouched).
 >
-> Johan
+> This means even reserved/RFU bits will be set. I suspect this is not desirable.
 
-Vishal
+Thanks for the suggestion, I have updated the patch today. Please have
+a look at the same and let me know your comments.
+>
+> Regards,
+> --
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
+
+
+
+-- 
+Best Regards
+Hemant Gupta
+ST-Ericsson India
