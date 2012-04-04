@@ -1,28 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 4 Apr 2012 13:03:33 +0300
+Date: Wed, 4 Apr 2012 13:01:17 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Hemant Gupta <hemant.gupta@stericsson.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Hemant Gupta <hemantgupta.ste@gmail.com>
-Subject: Re: [PATCH v2] Adapter: Fix Discovering state while Powering Off
-Message-ID: <20120404100333.GC11856@x220>
-References: <1333454039-6961-1-git-send-email-hemant.gupta@stericsson.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/3] gdbus: Use destroy callback for service watch
+Message-ID: <20120404100117.GB11856@x220>
+References: <1333469700-29879-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1333454039-6961-1-git-send-email-hemant.gupta@stericsson.com>
+In-Reply-To: <1333469700-29879-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hemant,
+Hi Lizardo,
 
-On Tue, Apr 03, 2012, Hemant Gupta wrote:
-> This patch fixes the adater discovering state while powering off.
-> Without this fix, BlueZ sends incorrect discovering state to upper
-> layers while switching off.
+On Tue, Apr 03, 2012, Anderson Lizardo wrote:
+> Even though service watches accepted a "destroy" callback, they were
+> being ignored. This fix properly pass them along so they are called when
+> the watch is removed.
 > ---
->  src/adapter.c |    9 ++++++++-
->  1 files changed, 8 insertions(+), 1 deletions(-)
+>  gdbus/watch.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-Applied (with a few modifications). Thanks.
+All three patches have been applied. I also applied this gdbus one to
+the obexd tree. Thanks.
 
 Johan
