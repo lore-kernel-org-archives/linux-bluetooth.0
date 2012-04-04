@@ -1,28 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 4 Apr 2012 13:01:17 +0300
+Date: Wed, 4 Apr 2012 12:56:42 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/3] gdbus: Use destroy callback for service watch
-Message-ID: <20120404100117.GB11856@x220>
-References: <1333469700-29879-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: Re: [PATCH BlueZ] attrib: Fix "make distcheck" build
+Message-ID: <20120404095642.GA11856@x220>
+References: <1333468891-2686-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1333469700-29879-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1333468891-2686-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Lizardo,
 
 On Tue, Apr 03, 2012, Anderson Lizardo wrote:
-> Even though service watches accepted a "destroy" callback, they were
-> being ignored. This fix properly pass them along so they are called when
-> the watch is removed.
+> Any new header files (att-database.h in this case) need to be added to
+> Makefile.am.
+> 
+> Fixes this "make distcheck" error:
+> 
+>   CC     attrib/bluetoothd-gatt-service.o
+> ../attrib/gatt-service.c:35:26: fatal error: att-database.h: No such
+> file or directory
+> compilation terminated.
+> make[2]: *** [attrib/bluetoothd-gatt-service.o] Error 1
+> make[1]: *** [all] Error 2
+> make: *** [distcheck] Error 1
 > ---
->  gdbus/watch.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  Makefile.am |    3 ++-
+>  1 files changed, 2 insertions(+), 1 deletions(-)
 
-All three patches have been applied. I also applied this gdbus one to
-the obexd tree. Thanks.
+Applied. Thanks.
 
 Johan
