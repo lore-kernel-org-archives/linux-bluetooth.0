@@ -1,49 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+From: Anju Manoj <anju.manoj@sasken.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 4 Apr 2012 22:35:10 +0530
+Subject: RE: unable to find the lex libraries
+Message-ID: <2316A524B7DB8C4AB39B9EDEDF597C8F015B35BB0654@EXGMBX01.sasken.com>
+References: <2316A524B7DB8C4AB39B9EDEDF597C8F015B35BB0653@EXGMBX01.sasken.com>,<20120404134117.GA14816@samus>
+In-Reply-To: <20120404134117.GA14816@samus>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <1333553048.2125.31.camel@novo.hadess.net>
-References: <CAKZqhqfupD+b9FjKRhOjFzZ1kH_17SGPK7n+9hkb8JyiP9Qr=g@mail.gmail.com>
-	<CAKZqhqcWhpfnhY-8aDd88LprfS9KankxCjoFoUmL=xJHOVqEmQ@mail.gmail.com>
-	<1333553048.2125.31.camel@novo.hadess.net>
-Date: Wed, 4 Apr 2012 19:16:45 +0200
-Message-ID: <CAKZqhqdx7XGCgQAdaEsiig8g6XBNn1fV3DOuJ2kL3Z=k1vq6_Q@mail.gmail.com>
-Subject: Re: GSoC: Obexd Ideas
-From: dmp <dmp0x7c5@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for response.
+hi,
 
-Previous version of my proposal presented dbus implementation. As
-vcgomes suggested yesterday during IRC conversation at #bluez-gsoc
-I've already fixed my proposal and now it's prepared for gobex
-library.
+i already installed flex.
 
-I plan to implement fuse based solution, but your experience with gvfs
-might be helpful.
+Anju
+________________________________________
+From: Vinicius Costa Gomes [vinicius.gomes@openbossa.org]
+Sent: Wednesday, April 04, 2012 7:11 PM
+To: Anju Manoj
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: unable to find the lex libraries
 
-Thanks,
-Michal
+Hi Anju,
 
-
-On 4 April 2012 17:24, Bastien Nocera <hadess@hadess.net> wrote:
-> On Wed, 2012-04-04 at 16:38 +0200, dmp wrote:
->> Hello,
->>
->> I've submitted proposal [1] for "OBEX Filesystem In Userspace". I'll
->> be grateful if someone could give me some comments. There are still
->> few days to improve.
->>
->> [1] http://www.google-melange.com/gsoc/proposal/review/google/gsoc2012/dmp/44002
+On 17:19 Wed 04 Apr, Anju Manoj wrote:
+> hi all,
 >
-> FWIW, having written the ObexFTP gvfs backend twice already, that using
-> a D-Bus API is a bad idea. Instead, the code should use gobex directly.
-> It would make the code more robust, and easier to debug.
+>         i am having a bluez4.82 with me and i am trying  to configure it using the below command in ubuntu 11.04
 >
-> I'm happy doing code reviews, or answer gvfs specific questions if those
-> crop up during the SoC project.
+> ./configure --enable-maintainer-mode --enable-health --enable-attrib  --enable-gstreamer --enable-alsa --enable-usb --enable-tracer --enable-tools --enable-bccmd --enable-pcmcia --enable-hid2hci --enable-dfutool --enable-hidd --enable-pand --enable-dund --enable-cups --enable-test --enable-udevrules --enable-configfiles --enable-debug --enable-maemo6 --enable-hal
 >
-> Cheers
+> now i am getting an error
 >
+>   LEX    tools/lexer.c
+> make[1]: *** [tools/lexer.c] Error 1
+> make: *** [all] Error 2
+>
+> not able to find which lex library have to be installed in order to get around this problem
+
+Most probably you just need to install flex, Ubuntu has it.
+
+>
+> Please help me as i am new to this technology.
+>
+> Anju
+>
+> SASKEN BUSINESS DISCLAIMER: This message may contain confidential, proprietary or legally privileged information. In case you are not the original intended Recipient of the message, you must not, directly or indirectly, use, disclose, distribute, print, or copy any part of this message and you are requested to delete it and inform the sender. Any views expressed in this message are those of the individual sender unless otherwise stated. Nothing contained in this message shall be construed as an offer or acceptance of any offer by Sasken Communication Technologies Limited ("Sasken") unless sent with that express intent and with due authority of Sasken. Sasken has taken enough precautions to prevent the spread of viruses. However the company accepts no liability for any damage caused by any virus transmitted by this email.
+> Read Disclaimer at http://www.sasken.com/extras/mail_disclaimer.html
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+Cheers,
+--
+Vinicius
