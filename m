@@ -1,61 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 4 Apr 2012 15:22:17 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: vishal agarwal <vishal.bluez@gmail.com>
+Cc: Vishal Agarwal <vishal.agarwal@stericsson.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Temporary keys should be retained during
+ connection
+Message-ID: <20120404122217.GA15085@x220>
+References: <1333539940-29061-1-git-send-email-vishal.agarwal@stericsson.com>
+ <20120404115301.GA5081@x220>
+ <CA+_sZW9cqfW4Nz0C21av25VzwkSTat6QW6FoWGDzcA=oezgGLg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1333461650.1870.289.camel@aeonflux>
-References: <1333458907-28940-1-git-send-email-hemant.gupta@stericsson.com>
-	<1333460117.1870.287.camel@aeonflux>
-	<CACj007nj+fpeHV=KPsp2D-G_z=ixJuK-+5=XxNuR-x0Y5auRmw@mail.gmail.com>
-	<1333461650.1870.289.camel@aeonflux>
-Date: Wed, 4 Apr 2012 17:54:18 +0530
-Message-ID: <CACj007ncL89Uf_mJWxFcq39R6fcTgjEPqUU=pDS-9p5r0ESK+Q@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: Fix packet type for ESCO Link
-From: Hemant Gupta <hemantgupta.ste@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Hemant Gupta <hemant.gupta@stericsson.com>,
-	linux-bluetooth@vger.kernel.org,
-	Naresh Gupta <naresh.gupta@stericsson.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CA+_sZW9cqfW4Nz0C21av25VzwkSTat6QW6FoWGDzcA=oezgGLg@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Vishal,
 
-On Tue, Apr 3, 2012 at 7:30 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Hemant,
->
->> >> This patch fixes the packet type for ESCO Link which was incorrectly
->> >> set for EDR ESCO Packet Types. Anding esco_type with ~EDR_ESCO_MASK
->> >> results in loosing information of esco packet type (EDR Packet
->> >> types are inverted as per BT Spec) that resulted in wrong calculation
->> >> of packet type in hci_setup_sync() API causing the HCI Setup Synchronous
->> >> Connection Command to fail.
->> >
->> > any chance you can add a hcidump trace to the commit message to show
->> > this failure?
->> >
->> I am attaching the hcicump Logs, that can be viewed in Capture File
->> Viewer of FTS.
->> In that the problem can be seen in HCI Tab, Frame # 619, where the
->> packet type is
->> incorrect resulting in command failure with error code 0x1a.
->
-> so me installing a Windows to just view the logs is not going to
-> happen ;)
->
-> Since you run BlueZ on one side, please just create a hcidump trace. If
-> you store them in BTSnoop format, you can open it with FTS as well.
->
-I have uploaded another patch, please have a look. I found some issues in my
-fix yesterday, so I have updated the patch with proper commit message.
+On Wed, Apr 04, 2012, vishal agarwal wrote:
+> > Firstly, did you verify that this fixes your test case? You still
+> > didn't tell us what test case this is, btw.
 
-> Regards
->
-> Marcel
->
->
+What about the above?
 
+> > Since setting the flag is outside of mgmt.c I think the removal should
+> > also be. That way you also avoid an extra call to
+> > hci_conn_hash_lookup_ba. I.e. please put the removal in
+> > hci_disconn_complete_evt.
+> >
+> > I'd also still like to hear your opinion of the second option I
+> > proposed. If you had a reference to struct link_key in hci_conn then
+> > you'd just need to call list_del() and nothing else to remove it (i.e.
+> > no iteration of hdev->link_keys necessary.
+> 
+> If I implement it this way then there will be two new variables added,
+> one in hci_conn to store the reference of key and other one is inside
+> link_key structure to store if key is temporary or not.
+> or you want me to store reference of key to hci_conn only when the key
+> is temporary?
+> in this case also code might become complicated to handle cases if key
+> is re generated and new key is not temporary but the older one was.
+>
+> So in my opinion after the changes you suggested (moving code in
+> hci_disconn_complete_evt), this is also OK. lesser and clearer code.
 
+Ok, fair enough. The hci_disconn_complete_evt change should be enough
+then.
 
--- 
-Best Regards
-Hemant Gupta
-ST-Ericsson India
+Johan
