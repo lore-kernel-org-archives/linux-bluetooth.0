@@ -1,53 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 4 Apr 2012 10:41:17 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Anju Manoj <anju.manoj@sasken.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: unable to find the lex libraries
+Message-ID: <20120404134117.GA14816@samus>
+References: <2316A524B7DB8C4AB39B9EDEDF597C8F015B35BB0653@EXGMBX01.sasken.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKZqhqfupD+b9FjKRhOjFzZ1kH_17SGPK7n+9hkb8JyiP9Qr=g@mail.gmail.com>
-References: <CAKZqhqfupD+b9FjKRhOjFzZ1kH_17SGPK7n+9hkb8JyiP9Qr=g@mail.gmail.com>
-Date: Wed, 4 Apr 2012 16:38:11 +0200
-Message-ID: <CAKZqhqcWhpfnhY-8aDd88LprfS9KankxCjoFoUmL=xJHOVqEmQ@mail.gmail.com>
-Subject: Re: GSoC: Obexd Ideas
-From: dmp <dmp0x7c5@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <2316A524B7DB8C4AB39B9EDEDF597C8F015B35BB0653@EXGMBX01.sasken.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Anju,
 
-I've submitted proposal [1] for "OBEX Filesystem In Userspace". I'll
-be grateful if someone could give me some comments. There are still
-few days to improve.
+On 17:19 Wed 04 Apr, Anju Manoj wrote:
+> hi all,
+> 
+>         i am having a bluez4.82 with me and i am trying  to configure it using the below command in ubuntu 11.04
+> 
+> ./configure --enable-maintainer-mode --enable-health --enable-attrib  --enable-gstreamer --enable-alsa --enable-usb --enable-tracer --enable-tools --enable-bccmd --enable-pcmcia --enable-hid2hci --enable-dfutool --enable-hidd --enable-pand --enable-dund --enable-cups --enable-test --enable-udevrules --enable-configfiles --enable-debug --enable-maemo6 --enable-hal
+> 
+> now i am getting an error
+> 
+>   LEX    tools/lexer.c
+> make[1]: *** [tools/lexer.c] Error 1
+> make: *** [all] Error 2
+> 
+> not able to find which lex library have to be installed in order to get around this problem
 
-[1] http://www.google-melange.com/gsoc/proposal/review/google/gsoc2012/dmp/44002
+Most probably you just need to install flex, Ubuntu has it.
 
-Thanks,
-Michal
+> 
+> Please help me as i am new to this technology.
+> 
+> Anju
+> 
+> SASKEN BUSINESS DISCLAIMER: This message may contain confidential, proprietary or legally privileged information. In case you are not the original intended Recipient of the message, you must not, directly or indirectly, use, disclose, distribute, print, or copy any part of this message and you are requested to delete it and inform the sender. Any views expressed in this message are those of the individual sender unless otherwise stated. Nothing contained in this message shall be construed as an offer or acceptance of any offer by Sasken Communication Technologies Limited ("Sasken") unless sent with that express intent and with due authority of Sasken. Sasken has taken enough precautions to prevent the spread of viruses. However the company accepts no liability for any damage caused by any virus transmitted by this email.
+> Read Disclaimer at http://www.sasken.com/extras/mail_disclaimer.html
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-On 30 March 2012 02:55, dmp <dmp0x7c5@gmail.com> wrote:
-> Hello BlueZ Community,
->
-> My name is Michal Poczwardowski[1], 22, Poland. I am interested in
-> taking part in this year's Google Summer of Code.
->
-> Idea[2] to implement MAP looks challenging. I have few questions. I've
-> read obexd code a bit, I understand that there is plugins/mas.c that
-> implements Massage Access Service and probably client/map.c that
-> handles client. Idea is assigned to obexd but it's already ready? And
-> the goal is to create some kind of C client application that could
-> communicate with server using client's api from obexd? I'll be really
-> happy if you answer and point me where I'm wrong.
->
-> Second interesting idea is "OBEX file system". There is a solution
-> called ObexFs[3]. I've been using it for few years. As far as I know
-> It's based on different obex implementation and it would be nice to
-> prepare obexd solution. Have some initial mentors been assigned to
-> obexd realated ideas?
->
->
-> [1] http://dmpgsoc.azalayah.net/
-> [2] http://www.bluez.org/development/gsoc/gsoc-ideas-list-2012/
-> [3] http://dev.zuckschwerdt.org/openobex/wiki/ObexFs
->
-> Thanks,
-> Michal
->
-> dmp@freenode
+
+Cheers,
+-- 
+Vinicius
