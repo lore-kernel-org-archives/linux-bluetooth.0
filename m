@@ -1,52 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
-From: Scott James Remnant <scott@netsplit.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: keybuk@chromium.org, marcel@holtmann.org, hadess@hadess.net,
-	Scott James Remnant <scott@netsplit.com>
-Subject: [PATCHv3 0/4] Support bonding callsbacks and retrying bondings
-Date: Thu,  5 Apr 2012 15:40:49 -0700
-Message-Id: <1333665653-30266-1-git-send-email-scott@netsplit.com>
+Cc: Andre Guedes <andre.guedes@openbossa.org>
+Subject: [RFC BlueZ v1 7/7] l2test: Add option to inform the address type
+Date: Thu,  5 Apr 2012 19:38:57 -0300
+Message-Id: <1333665537-22020-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <20120405063513.GA804@aemeltch-MOBL1>
+References: <20120405063513.GA804@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Rationale: in many pairing scenarios, it's desirable to be automatically
-provide a PIN (either generated or fixed) for a device and only involve
-the user if that PIN is rejected by the host.
+From: Andre Guedes <andre.guedes@openbossa.org>
 
-Both GNOME Bluetooth and Android handle this inside their Agent which
-means each deployment has to implement its own code to do the same
-thing. These patches allow this behavior to be common by moving it into
-BlueZ.
+This patch adds 'V' option to inform the address type. Possible values
+are: "bredr", "le_public", and "le_random".
+---
+ test/l2test.c |   27 +++++++++++++++++++++++++--
+ 1 files changed, 25 insertions(+), 2 deletions(-)
 
-This patch set adds plugin support for a callback called when bonding
-of a device successfully completes, fails, or is cancelled. In the
-success and failure cases, the callback may return TRUE to cause the
-bonding to be retried after a short backoff period.
-
-Backoff drops the ACL connection and reopens again later, this is not
-only cleaner to implement in the bluetoothd code itself, but matches
-the behavior of both Android (which implements this in its Agent) and
-OS X, so is more likely to be compatible with devices out there even
-though we could theoretically hold the ACL link open.
-
-btsnoop of OS X performing PIN generation and falling back to PIN can
-be seen here: 
-
-http://chromium-os.googlecode.com/issues/attachment?aid=280220006001&
- name=BT+Motorola+Wireless+Keyboard.cfa&
- token=SA_vDEsF87_CU-BcqJ1C8bWd6Zk%3A1333665473760
-
-Scott James Remnant (4):
-  Add support for retrying a bonding
-  plugin: Add bonding callback support for plugins
-  bonding: retry if callback returns TRUE
-  bonding: call plugin callback on cancellation
-
- src/adapter.c |    2 +-
- src/device.c  |   89 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/device.h  |    9 ++++++
- 3 files changed, 99 insertions(+), 1 deletions(-)
-
+diff --git a/test/l2test.c b/test/l2test.c
+index ae81aec..f66486d 100644
+--- a/test/l2test.c
++++ b/test/l2test.c
+@@ -117,6 +117,7 @@ static int defer_setup = 0;
+ static int priority = -1;
+ static int rcvbuf = 0;
+ static int chan_policy = -1;
++static int bdaddr_type = 0;
+ 
+ struct lookup_table {
+ 	char	*name;
+@@ -141,6 +142,13 @@ static struct lookup_table chan_policies[] = {
+ 	{ NULL,		0					},
+ };
+ 
++static struct lookup_table bdaddr_types[] = {
++	{ "bredr",	BDADDR_BREDR		},
++	{ "le_public",	BDADDR_LE_PUBLIC	},
++	{ "le_random",	BDADDR_LE_RANDOM	},
++	{ NULL,		0			},
++};
++
+ static int get_lookup_flag(struct lookup_table *table, char *name)
+ {
+ 	int i;
+@@ -362,6 +370,7 @@ static int do_connect(char *svr)
+ 	memset(&addr, 0, sizeof(addr));
+ 	addr.l2_family = AF_BLUETOOTH;
+ 	str2ba(svr, &addr.l2_bdaddr);
++	addr.l2_bdaddr_type = bdaddr_type;
+ 	if (cid)
+ 		addr.l2_cid = htobs(cid);
+ 	else if (psm)
+@@ -1020,6 +1029,7 @@ static void info_request(char *svr)
+ 	memset(&addr, 0, sizeof(addr));
+ 	addr.l2_family = AF_BLUETOOTH;
+ 	str2ba(svr, &addr.l2_bdaddr);
++	addr.l2_bdaddr_type = bdaddr_type;
+ 
+ 	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0 ) {
+ 		perror("Can't connect socket");
+@@ -1167,6 +1177,7 @@ static void do_pairing(char *svr)
+ 	memset(&addr, 0, sizeof(addr));
+ 	addr.l2_family = AF_BLUETOOTH;
+ 	str2ba(svr, &addr.l2_bdaddr);
++	addr.l2_bdaddr_type = bdaddr_type;
+ 
+ 	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0 ) {
+ 		perror("Can't connect socket");
+@@ -1224,7 +1235,8 @@ static void usage(void)
+ 		"\t[-E] request encryption\n"
+ 		"\t[-S] secure connection\n"
+ 		"\t[-M] become master\n"
+-		"\t[-T] enable timestamps\n");
++		"\t[-T] enable timestamps\n"
++		"\t[-V type] address type (help for list, default = bredr)\n");
+ }
+ 
+ int main(int argc, char *argv[])
+@@ -1235,7 +1247,7 @@ int main(int argc, char *argv[])
+ 	bacpy(&bdaddr, BDADDR_ANY);
+ 
+ 	while ((opt = getopt(argc, argv, "rdscuwmntqxyzpb:a:"
+-		"i:P:I:O:J:B:N:L:W:C:D:X:F:Q:Z:Y:H:K:RUGAESMT")) != EOF) {
++		"i:P:I:O:J:B:N:L:W:C:D:X:F:Q:Z:Y:H:K:V:RUGAESMT")) != EOF) {
+ 		switch (opt) {
+ 		case 'r':
+ 			mode = RECV;
+@@ -1430,6 +1442,17 @@ int main(int argc, char *argv[])
+ 			rcvbuf = atoi(optarg);
+ 			break;
+ 
++		case 'V':
++			bdaddr_type = get_lookup_flag(bdaddr_types, optarg);
++
++			if (bdaddr_type == -1) {
++				print_lookup_values(bdaddr_types,
++						"List Address types:");
++				exit(1);
++			}
++
++			break;
++
+ 		default:
+ 			usage();
+ 			exit(1);
 -- 
-1.7.7.3
+1.7.8.5
 
