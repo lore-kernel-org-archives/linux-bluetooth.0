@@ -3,91 +3,96 @@ From: Scott James Remnant <scott@netsplit.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: keybuk@chromium.org, marcel@holtmann.org, hadess@hadess.net,
 	Scott James Remnant <scott@netsplit.com>
-Subject: [PATCHv3 2/4] plugin: Add bonding callback support for plugins
-Date: Thu,  5 Apr 2012 15:40:51 -0700
-Message-Id: <1333665653-30266-3-git-send-email-scott@netsplit.com>
+Subject: [PATCHv3 1/4] Add support for retrying a bonding
+Date: Thu,  5 Apr 2012 15:40:50 -0700
+Message-Id: <1333665653-30266-2-git-send-email-scott@netsplit.com>
 In-Reply-To: <1333665653-30266-1-git-send-email-scott@netsplit.com>
 References: <1333665653-30266-1-git-send-email-scott@netsplit.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Allow plugins to register a bonding callback on a device, this will be
-called on completion or cancellation of a bonding attempt on that
-device and allow retrying of the bonding attempt.
-
-These callbacks will only be called once, in the case of retrying the
-callback must be registered again separately from another callback
-(e.g. the pincode callback).
+In order to retry a bonding we need a timer that will perform the
+retry, we need to stash the status and capability of the bonding
+request so it can use them again, and in the case of a retrying
+bonding attempt we need to not tear down the temporary D-Bus device
+object on the adapter.
 ---
- src/device.c |   19 +++++++++++++++++++
- src/device.h |    8 ++++++++
- 2 files changed, 27 insertions(+), 0 deletions(-)
+ src/adapter.c |    2 +-
+ src/device.c  |   14 ++++++++++++++
+ src/device.h  |    1 +
+ 3 files changed, 16 insertions(+), 1 deletions(-)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index d5c1a04..4ae926f 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3004,7 +3004,7 @@ void adapter_remove_connection(struct btd_adapter *adapter,
+ 	if (device_is_authenticating(device))
+ 		device_cancel_authentication(device, TRUE);
+ 
+-	if (device_is_temporary(device)) {
++	if (device_is_temporary(device) && !device_is_retrying(device)) {
+ 		const char *path = device_get_path(device);
+ 
+ 		DBG("Removing temporary device %s", path);
 diff --git a/src/device.c b/src/device.c
-index feb330c..53ca977 100644
+index df3fbac..feb330c 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -147,6 +147,7 @@ struct btd_device {
- 	GSList		*primaries;		/* List of primary services */
- 	GSList		*drivers;		/* List of device drivers */
- 	GSList		*watches;		/* List of disconnect_data */
-+	GSList          *bonding_callbacks;	/* List of bonding callbacks */
- 	gboolean	temporary;
- 	struct agent	*agent;
- 	guint		disconn_timer;
-@@ -267,8 +268,12 @@ static void device_free(gpointer user_data)
- 	g_slist_free_full(device->attios, g_free);
- 	g_slist_free_full(device->attios_offline, g_free);
+@@ -88,6 +88,9 @@ struct bonding_req {
+ 	DBusMessage *msg;
+ 	guint listener_id;
+ 	struct btd_device *device;
++	uint8_t capability;
++	uint8_t status;
++	guint retry_timer;
+ };
  
-+	g_slist_free(device->bonding_callbacks);
-+
- 	att_cleanup(device);
+ struct authentication_req {
+@@ -2364,6 +2367,9 @@ static void bonding_request_free(struct bonding_req *bonding)
+ 	if (bonding->conn)
+ 		dbus_connection_unref(bonding->conn);
  
-+	g_attrib_unref(device->attrib);
++	if (bonding->retry_timer)
++		g_source_remove(bonding->retry_timer);
 +
- 	if (device->tmp_records)
- 		sdp_list_free(device->tmp_records,
- 					(sdp_free_func_t) sdp_record_free);
-@@ -2542,6 +2547,20 @@ static void device_auth_req_free(struct btd_device *device)
+ 	device = bonding->device;
+ 	g_free(bonding);
+ 
+@@ -2436,6 +2442,7 @@ proceed:
+ 
+ 	bonding->conn = dbus_connection_ref(conn);
+ 	bonding->msg = dbus_message_ref(msg);
++	bonding->capability = capability;
+ 
+ 	return bonding;
+ }
+@@ -2535,6 +2542,13 @@ static void device_auth_req_free(struct btd_device *device)
  	device->authr = NULL;
  }
  
-+void btd_device_register_bonding_cb(struct btd_device *device,
-+						btd_device_bonding_cb_t cb)
++gboolean device_is_retrying(struct btd_device *device)
 +{
-+	device->bonding_callbacks = g_slist_prepend(
-+						device->bonding_callbacks, cb);
++	struct bonding_req *bonding = device->bonding;
++
++	return bonding && bonding->retry_timer != 0;
 +}
 +
-+void btd_device_unregister_bonding_cb(struct btd_device *device,
-+						btd_device_bonding_cb_t cb)
-+{
-+	device->bonding_callbacks = g_slist_remove(
-+						device->bonding_callbacks, cb);
-+}
-+
- gboolean device_is_retrying(struct btd_device *device)
+ void device_bonding_complete(struct btd_device *device, uint8_t status)
  {
  	struct bonding_req *bonding = device->bonding;
 diff --git a/src/device.h b/src/device.h
-index f06042c..2a7409a 100644
+index f3d6c70..f06042c 100644
 --- a/src/device.h
 +++ b/src/device.h
-@@ -103,6 +103,14 @@ guint device_add_disconnect_watch(struct btd_device *device,
- void device_remove_disconnect_watch(struct btd_device *device, guint id);
- void device_set_class(struct btd_device *device, uint32_t value);
- 
-+typedef gboolean (*btd_device_bonding_cb_t) (struct btd_device *device,
-+					gboolean complete, uint8_t status);
-+
-+void btd_device_register_bonding_cb(struct btd_device *dev,
-+						btd_device_bonding_cb_t cb);
-+void btd_device_unregister_bonding_cb(struct btd_device *dev,
-+						btd_device_bonding_cb_t cb);
-+
- #define BTD_UUIDS(args...) ((const char *[]) { args, NULL } )
- 
- struct btd_device_driver {
+@@ -75,6 +75,7 @@ void device_set_temporary(struct btd_device *device, gboolean temporary);
+ void device_set_bonded(struct btd_device *device, gboolean bonded);
+ void device_set_auto_connect(struct btd_device *device, gboolean enable);
+ gboolean device_is_connected(struct btd_device *device);
++gboolean device_is_retrying(struct btd_device *device);
+ DBusMessage *device_create_bonding(struct btd_device *device,
+ 				DBusConnection *conn, DBusMessage *msg,
+ 				const char *agent_path, uint8_t capability);
 -- 
 1.7.7.3
 
