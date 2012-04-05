@@ -1,40 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v3 0/5] LE Connection
-Date: Thu,  5 Apr 2012 14:17:16 -0300
-Message-Id: <1333646241-12574-1-git-send-email-andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1333642493.16897.7.camel@aeonflux>
+References: <1333597594-21532-1-git-send-email-hemant.gupta@stericsson.com>
+	<CACj007nwsZumYtKkFcEu2jQa=f7dZJYJ=szXEMVhO0n5goRCjg@mail.gmail.com>
+	<1333642493.16897.7.camel@aeonflux>
+Date: Thu, 5 Apr 2012 22:17:17 +0530
+Message-ID: <CACj007m7_3B=MiFZHGr9UHu2Fuq0_KOvgM1mhRXStp+se=nvvg@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: Fix packet type for ESCO Link
+From: Hemant Gupta <hemantgupta.ste@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+	Hemant Gupta <hemant.gupta@stericsson.com>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Marcel,
 
-This new version fixes all aligning style issues.
+On Thu, Apr 5, 2012 at 9:44 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+> Hi Hemant,
+>
+>> > This patch uses the corect packet type for ESCO Link.
+>> > Without this patch esco packet types were anded with ~EDR_ESCO_MASK
+>> > resulting in setting bits that are not supported by controller
+>> > to 0 which means that corresponding EDR ESCO packet type is
+>> > supported(EDR Packet types are inverted as per BT Spec) which might
+>> > not be the case.
+>> >
+>> Any comments on this patch ?
+>
+> as I said before, I like to see a hcidump in the commit messages that
+> shows the failure.
+>
+I am not sure the hcidump would indicate the exact problem, because the pro=
+blem
+is of selecting wrong eSCO edr pkt type of local device and moreover
+my code base is bit different from upstream code.
 
-BR,
+For eg:
+Local Controller supports only 3-EV5, 2-EV5 and 3-EV3 of the EDR eSCO packe=
+t
+types and does not support 2-EV3 packet type.
 
-Andre Guedes
+This would mean that while creating the esco_type in function
+hci_cc_read_local_features()
+the ESCO_2EV3 bit would not be set and all other EDR eSCO bits would be set=
+.
+Resulting hdev->esco_type =3D 0x0380
+
+Now in hci_conn_add() when the pkt_type is being calculated for eSCO
+Link, wrong calculation
+would take place as below:
+
+conn->pkt_type =3D hdev->esco_type & ~EDR_ESCO_MASK;
+                      =3D 0x0380 & ~0x03C0 =3D 0x0380 & 0xFC3F =3D 0x0000
+Since the EDR eSCO bits are invertedThis indicates that ultimately all
+EDR eSCO packet types are supported, which is not correct as local
+controller is not supporting the 2-EV3 packet type.
+
+As per calculations of the patch
+conn->pkt_type =3D hdev->esco_type & ~EDR_ESCO_MASK;
+                      =3D 0x0380 ^ 0x03C0 =3D 0x0040
+which correctly indicates that packet type used excludes the 2-EV3
+packet type not supported by local controller.
+
+Please let me know your views on this.
+
+> Regards
+>
+> Marcel
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 
 
-Andre Guedes (5):
-  Bluetooth: Add address type to struct sockaddr_l2
-  Bluetooth: Move address type macros to bluetooth.h
-  Bluetooth: Add dst_type parameter to hci_connect
-  Bluetooth: Use address type info from User-space
-  Bluetooth: Remove advertising cache
 
- include/net/bluetooth/bluetooth.h |    5 +++
- include/net/bluetooth/hci_core.h  |   27 ++++---------
- include/net/bluetooth/l2cap.h     |    3 +-
- net/bluetooth/hci_conn.c          |   12 ++----
- net/bluetooth/hci_core.c          |   75 -------------------------------------
- net/bluetooth/hci_event.c         |    7 ----
- net/bluetooth/l2cap_core.c        |   15 ++++----
- net/bluetooth/l2cap_sock.c        |    2 +-
- net/bluetooth/mgmt.c              |   36 +++++++++---------
- net/bluetooth/sco.c               |    3 +-
- 10 files changed, 47 insertions(+), 138 deletions(-)
-
--- 
-1.7.9.4
-
+--=20
+Best Regards
+Hemant Gupta
+ST-Ericsson India
