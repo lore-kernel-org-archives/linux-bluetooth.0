@@ -1,45 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 Apr 2012 09:35:15 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Andre Guedes <andre.guedes@openbossa.org>
-Subject: Re: [RFC BlueZ 4/4] l2test: Add option to inform the address type
-Message-ID: <20120405063513.GA804@aemeltch-MOBL1>
-References: <1333570571-29650-1-git-send-email-claudio.takahasi@openbossa.org>
- <1333570571-29650-4-git-send-email-claudio.takahasi@openbossa.org>
+From: <joohi.rastogi@stericsson.com>
+To: User Name <linux-bluetooth@vger.kernel.org>
+Cc: User Name2 <joohi.rastogi@stericsson.com>
+Subject: [PATCH] AVRCP: Fixed response length for Subunit Info command
+Date: Thu, 5 Apr 2012 11:28:08 +0530
+Message-ID: <1333605488-23543-1-git-send-email-joohi.rastogi@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1333570571-29650-4-git-send-email-claudio.takahasi@openbossa.org>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+From: Joohi Rastogi <joohi.rastogi@stericsson.com>
 
-On Wed, Apr 04, 2012 at 05:16:11PM -0300, Claudio Takahasi wrote:
-...
+This affect PTS Test Case TC_TG_ICC_BV_02_I
+---
+ audio/avctp.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-> +	addr.l2_bdaddr_type = bdaddr_type;
->  	if (cid)
-
-...
-
-> @@ -1020,6 +1022,7 @@ static void info_request(char *svr)
-> +	addr.l2_bdaddr_type = bdaddr_type;
-
-...
-
-> @@ -1167,6 +1170,7 @@ static void do_pairing(char *svr)
-> +	addr.l2_bdaddr_type = bdaddr_type;
-
-...
-
-> +		case 'V':
-> +			bdaddr_type = atoi(optarg);
-
-Apparently there is no check that value is correct. I think that you can
-use here lookup_table (see l2cap_modes and chan_policies).
-
-Best regards 
-Andrei Emeltchenko 
+diff --git a/audio/avctp.c b/audio/avctp.c
+index 009b94c..d8f740a 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -295,7 +295,7 @@ static size_t handle_subunit_info(struct avctp *session,
+ 
+ 	DBG("reply to AVC_OP_SUBUNITINFO");
+ 
+-	return 0;
++	return operand_count;
+ }
+ 
+ static struct avctp_pdu_handler *find_handler(GSList *list, uint8_t opcode)
+-- 
+1.7.5.4
 
