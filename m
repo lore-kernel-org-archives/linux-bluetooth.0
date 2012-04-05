@@ -1,35 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Anju Manoj <anju.manoj@sasken.com>
-Subject: Re: how to get lex library
-Date: Thu, 5 Apr 2012 09:02:35 +0200
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <2316A524B7DB8C4AB39B9EDEDF597C8F015B35BB0656@EXGMBX01.sasken.com>
-In-Reply-To: <2316A524B7DB8C4AB39B9EDEDF597C8F015B35BB0656@EXGMBX01.sasken.com>
+Date: Thu, 5 Apr 2012 09:35:15 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Andre Guedes <andre.guedes@openbossa.org>
+Subject: Re: [RFC BlueZ 4/4] l2test: Add option to inform the address type
+Message-ID: <20120405063513.GA804@aemeltch-MOBL1>
+References: <1333570571-29650-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1333570571-29650-4-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Message-ID: <201204050902.35937.szymon.janc@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1333570571-29650-4-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Claudio,
 
-> I already installed bison also,please help me
-> 
-> Anju
-> 
-> Hi,
-> 
-> On Wed, Apr 4, 2012 at 1:05 PM, Anju Manoj <anju.manoj@sasken.com> wrote:
-> > hi,
-> >
-> > i already installed flex.
-> 
-> Be sure to install bison as well.
+On Wed, Apr 04, 2012 at 05:16:11PM -0300, Claudio Takahasi wrote:
+...
 
-Since you are using ubuntu I would suggest 'sudo apt-get build-dep bluez' which
-should install all packages required to build bluez package.
+> +	addr.l2_bdaddr_type = bdaddr_type;
+>  	if (cid)
 
--- 
-BR
-Szymon Janc
+...
+
+> @@ -1020,6 +1022,7 @@ static void info_request(char *svr)
+> +	addr.l2_bdaddr_type = bdaddr_type;
+
+...
+
+> @@ -1167,6 +1170,7 @@ static void do_pairing(char *svr)
+> +	addr.l2_bdaddr_type = bdaddr_type;
+
+...
+
+> +		case 'V':
+> +			bdaddr_type = atoi(optarg);
+
+Apparently there is no check that value is correct. I think that you can
+use here lookup_table (see l2cap_modes and chan_policies).
+
+Best regards 
+Andrei Emeltchenko 
+
