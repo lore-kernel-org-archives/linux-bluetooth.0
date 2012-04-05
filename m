@@ -1,37 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hemant Gupta <hemant.gupta@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: Hemant Gupta <hemantgupta.ste@gmail.com>,
-	Hemant Gupta <hemant.gupta@stericsson.com>
-Subject: [PATCH] Bluetooth: Send Connect failed event when LE Connection fails
-Date: Thu, 5 Apr 2012 14:23:09 +0530
-Message-ID: <1333615989-15979-1-git-send-email-hemant.gupta@stericsson.com>
+Date: Thu, 5 Apr 2012 11:52:38 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Remove MGMT_ADDR_INVALID macro
+Message-ID: <20120405085238.GA29038@x220>
+References: <1333453614-4954-1-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1333453614-4954-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds management connect failed event when LE Create Connection
-Command fails to inform BlueZ that LE Connection failed to get established.
+Hi Andre,
 
-Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
----
- net/bluetooth/hci_event.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+On Tue, Apr 03, 2012, Andre Guedes wrote:
+> This patch removes the MGMT_ADDR_INVALID macro. If the address type
+> isn't LE, we consider it is BR/EDR type.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  include/net/bluetooth/hci_core.h |    1 -
+>  net/bluetooth/mgmt.c             |   14 +++++++-------
+>  2 files changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7325300..89662f0 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1649,6 +1649,8 @@ static void hci_cs_le_create_conn(struct hci_dev *hdev, __u8 status)
- 	if (status) {
- 		if (conn && conn->state == BT_CONNECT) {
- 			conn->state = BT_CLOSED;
-+			mgmt_connect_failed(hdev, &cp->peer_addr, conn->type,
-+							conn->dst_type, status);
- 			hci_proto_connect_cfm(conn, status);
- 			hci_conn_del(conn);
- 		}
--- 
-1.7.0.4
+Applied to the bluetooth-next tree. Thanks.
 
+Johan
