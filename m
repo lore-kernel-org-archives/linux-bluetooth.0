@@ -1,72 +1,192 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1333647992.16897.13.camel@aeonflux>
-Subject: Re: [PATCH v3] Bluetooth: Fix packet type for ESCO Link
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Hemant Gupta <hemantgupta.ste@gmail.com>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Hemant Gupta <hemant.gupta@stericsson.com>
-Date: Thu, 05 Apr 2012 10:46:32 -0700
-In-Reply-To: <CACj007m7_3B=MiFZHGr9UHu2Fuq0_KOvgM1mhRXStp+se=nvvg@mail.gmail.com>
-References: <1333597594-21532-1-git-send-email-hemant.gupta@stericsson.com>
-	 <CACj007nwsZumYtKkFcEu2jQa=f7dZJYJ=szXEMVhO0n5goRCjg@mail.gmail.com>
-	 <1333642493.16897.7.camel@aeonflux>
-	 <CACj007m7_3B=MiFZHGr9UHu2Fuq0_KOvgM1mhRXStp+se=nvvg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC v3 5/5] Bluetooth: Remove advertising cache
+Date: Thu,  5 Apr 2012 14:17:21 -0300
+Message-Id: <1333646241-12574-6-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1333646241-12574-1-git-send-email-andre.guedes@openbossa.org>
+References: <1333646241-12574-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hemant,
+User-space pass the remote device address type to kernel through
+struct sockaddr_l2 what makes the advertising useless. This patch
+removes all advertising cache code.
 
-> >> > This patch uses the corect packet type for ESCO Link.
-> >> > Without this patch esco packet types were anded with ~EDR_ESCO_MASK
-> >> > resulting in setting bits that are not supported by controller
-> >> > to 0 which means that corresponding EDR ESCO packet type is
-> >> > supported(EDR Packet types are inverted as per BT Spec) which might
-> >> > not be the case.
-> >> >
-> >> Any comments on this patch ?
-> >
-> > as I said before, I like to see a hcidump in the commit messages that
-> > shows the failure.
-> >
-> I am not sure the hcidump would indicate the exact problem, because the problem
-> is of selecting wrong eSCO edr pkt type of local device and moreover
-> my code base is bit different from upstream code.
-> 
-> For eg:
-> Local Controller supports only 3-EV5, 2-EV5 and 3-EV3 of the EDR eSCO packet
-> types and does not support 2-EV3 packet type.
-> 
-> This would mean that while creating the esco_type in function
-> hci_cc_read_local_features()
-> the ESCO_2EV3 bit would not be set and all other EDR eSCO bits would be set.
-> Resulting hdev->esco_type = 0x0380
-> 
-> Now in hci_conn_add() when the pkt_type is being calculated for eSCO
-> Link, wrong calculation
-> would take place as below:
-> 
-> conn->pkt_type = hdev->esco_type & ~EDR_ESCO_MASK;
->                       = 0x0380 & ~0x03C0 = 0x0380 & 0xFC3F = 0x0000
-> Since the EDR eSCO bits are invertedThis indicates that ultimately all
-> EDR eSCO packet types are supported, which is not correct as local
-> controller is not supporting the 2-EV3 packet type.
-> 
-> As per calculations of the patch
-> conn->pkt_type = hdev->esco_type & ~EDR_ESCO_MASK;
->                       = 0x0380 ^ 0x03C0 = 0x0040
-> which correctly indicates that packet type used excludes the 2-EV3
-> packet type not supported by local controller.
-> 
-> Please let me know your views on this.
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ include/net/bluetooth/hci_core.h |    9 -----
+ net/bluetooth/hci_core.c         |   75 --------------------------------------
+ net/bluetooth/hci_event.c        |    7 ----
+ 3 files changed, 91 deletions(-)
 
-this sounds like a really good explanation that should go into the
-commit message. Don't you agree?
-
-Regards
-
-Marcel
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 99d2cde..4653124 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -255,9 +255,6 @@ struct hci_dev {
+ 
+ 	struct list_head	remote_oob_data;
+ 
+-	struct list_head	adv_entries;
+-	struct delayed_work	adv_work;
+-
+ 	struct hci_dev_stats	stat;
+ 
+ 	struct sk_buff_head	driver_init;
+@@ -691,12 +688,6 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
+ 								u8 *randomizer);
+ int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ 
+-#define ADV_CLEAR_TIMEOUT (3*60*HZ) /* Three minutes */
+-int hci_adv_entries_clear(struct hci_dev *hdev);
+-struct adv_entry *hci_find_adv_entry(struct hci_dev *hdev, bdaddr_t *bdaddr);
+-int hci_add_adv_entry(struct hci_dev *hdev,
+-					struct hci_ev_le_advertising_info *ev);
+-
+ void hci_del_off_timer(struct hci_dev *hdev);
+ 
+ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 9629645..9618fe1 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1546,75 +1546,6 @@ int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
+ 	return mgmt_device_unblocked(hdev, bdaddr, type);
+ }
+ 
+-static void hci_clear_adv_cache(struct work_struct *work)
+-{
+-	struct hci_dev *hdev = container_of(work, struct hci_dev,
+-					    adv_work.work);
+-
+-	hci_dev_lock(hdev);
+-
+-	hci_adv_entries_clear(hdev);
+-
+-	hci_dev_unlock(hdev);
+-}
+-
+-int hci_adv_entries_clear(struct hci_dev *hdev)
+-{
+-	struct adv_entry *entry, *tmp;
+-
+-	list_for_each_entry_safe(entry, tmp, &hdev->adv_entries, list) {
+-		list_del(&entry->list);
+-		kfree(entry);
+-	}
+-
+-	BT_DBG("%s adv cache cleared", hdev->name);
+-
+-	return 0;
+-}
+-
+-struct adv_entry *hci_find_adv_entry(struct hci_dev *hdev, bdaddr_t *bdaddr)
+-{
+-	struct adv_entry *entry;
+-
+-	list_for_each_entry(entry, &hdev->adv_entries, list)
+-		if (bacmp(bdaddr, &entry->bdaddr) == 0)
+-			return entry;
+-
+-	return NULL;
+-}
+-
+-static inline int is_connectable_adv(u8 evt_type)
+-{
+-	if (evt_type == ADV_IND || evt_type == ADV_DIRECT_IND)
+-		return 1;
+-
+-	return 0;
+-}
+-
+-int hci_add_adv_entry(struct hci_dev *hdev,
+-					struct hci_ev_le_advertising_info *ev) { struct adv_entry *entry; if (!is_connectable_adv(ev->evt_type))
+-		return -EINVAL;
+-
+-	/* Only new entries should be added to adv_entries. So, if
+-	 * bdaddr was found, don't add it. */
+-	if (hci_find_adv_entry(hdev, &ev->bdaddr))
+-		return 0;
+-
+-	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
+-	if (!entry)
+-		return -ENOMEM;
+-
+-	bacpy(&entry->bdaddr, &ev->bdaddr);
+-	entry->bdaddr_type = ev->bdaddr_type;
+-
+-	list_add(&entry->list, &hdev->adv_entries);
+-
+-	BT_DBG("%s adv entry added: address %s type %u", hdev->name,
+-				batostr(&entry->bdaddr), entry->bdaddr_type);
+-
+-	return 0;
+-}
+-
+ static void le_scan_param_req(struct hci_dev *hdev, unsigned long opt)
+ {
+ 	struct le_scan_params *param =  (struct le_scan_params *) opt;
+@@ -1808,9 +1739,6 @@ int hci_register_dev(struct hci_dev *hdev)
+ 
+ 	INIT_LIST_HEAD(&hdev->remote_oob_data);
+ 
+-	INIT_LIST_HEAD(&hdev->adv_entries);
+-
+-	INIT_DELAYED_WORK(&hdev->adv_work, hci_clear_adv_cache);
+ 	INIT_WORK(&hdev->power_on, hci_power_on);
+ 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+ 
+@@ -1904,8 +1832,6 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 
+ 	hci_del_sysfs(hdev);
+ 
+-	cancel_delayed_work_sync(&hdev->adv_work);
+-
+ 	destroy_workqueue(hdev->workqueue);
+ 
+ 	hci_dev_lock(hdev);
+@@ -1914,7 +1840,6 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_link_keys_clear(hdev);
+ 	hci_smp_ltks_clear(hdev);
+ 	hci_remote_oob_data_clear(hdev);
+-	hci_adv_entries_clear(hdev);
+ 	hci_dev_unlock(hdev);
+ 
+ 	hci_dev_put(hdev);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7325300..f78524f 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1101,10 +1101,7 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 
+ 		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
+ 
+-		cancel_delayed_work_sync(&hdev->adv_work);
+-
+ 		hci_dev_lock(hdev);
+-		hci_adv_entries_clear(hdev);
+ 		hci_discovery_set_state(hdev, DISCOVERY_FINDING);
+ 		hci_dev_unlock(hdev);
+ 		break;
+@@ -1119,8 +1116,6 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 
+ 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
+ 
+-		schedule_delayed_work(&hdev->adv_work, ADV_CLEAR_TIMEOUT);
+-
+ 		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
+ 				hdev->discovery.state == DISCOVERY_FINDING) {
+ 			mgmt_interleaved_discovery(hdev);
+@@ -3349,8 +3344,6 @@ static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
+ 	while (num_reports--) {
+ 		struct hci_ev_le_advertising_info *ev = ptr;
+ 
+-		hci_add_adv_entry(hdev, ev);
+-
+ 		rssi = ev->data[ev->length];
+ 		mgmt_device_found(hdev, &ev->bdaddr, LE_LINK, ev->bdaddr_type,
+ 				  NULL, rssi, 0, 1, ev->data, ev->length);
+-- 
+1.7.9.4
 
