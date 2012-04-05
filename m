@@ -1,51 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20120405063513.GA804@aemeltch-MOBL1>
-References: <1333570571-29650-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1333570571-29650-4-git-send-email-claudio.takahasi@openbossa.org>
-	<20120405063513.GA804@aemeltch-MOBL1>
-Date: Thu, 5 Apr 2012 20:17:17 -0300
-Message-ID: <CACJA=fV5G2K7DFJqC1yO=FiaeZqAJBkfPDUKLTcovWy0ZcvHgQ@mail.gmail.com>
-Subject: Re: [RFC BlueZ 4/4] l2test: Add option to inform the address type
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
+Reply-To: eric.fort@gmail.com
+In-Reply-To: <CAO2Z-nZChjwE2hsBTJ4gKwpSRU5xwrorigUTmf6zP8+PR6=iDg@mail.gmail.com>
+References: <CAO2Z-nZChjwE2hsBTJ4gKwpSRU5xwrorigUTmf6zP8+PR6=iDg@mail.gmail.com>
+From: Eric Fort <eric.fort@gmail.com>
+Date: Thu, 5 Apr 2012 16:06:08 -0700
+Message-ID: <CAO2Z-nY0ASxA37f950gNKD51ViZvz75J6Q1+sbAH6bfGjyf7Zg@mail.gmail.com>
+Subject: Re: bluetooth adapters
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+previously posted with html as that's google's default.  hope it goes
+through this time as plain text.
 
-On Thu, Apr 5, 2012 at 3:35 AM, Andrei Emeltchenko
-<andrei.emeltchenko.news@gmail.com> wrote:
-> Hi Claudio,
->
-> On Wed, Apr 04, 2012 at 05:16:11PM -0300, Claudio Takahasi wrote:
-> ...
->
->> +     addr.l2_bdaddr_type = bdaddr_type;
->>       if (cid)
->
-> ...
->
->> @@ -1020,6 +1022,7 @@ static void info_request(char *svr)
->> +     addr.l2_bdaddr_type = bdaddr_type;
->
-> ...
->
->> @@ -1167,6 +1170,7 @@ static void do_pairing(char *svr)
->> +     addr.l2_bdaddr_type = bdaddr_type;
->
-> ...
->
->> +             case 'V':
->> +                     bdaddr_type = atoi(optarg);
->
-> Apparently there is no check that value is correct. I think that you can
-> use here lookup_table (see l2cap_modes and chan_policies).
+Eric
 
-Sure, I'll do it.
-
-Thanks,
-
-Andre
+On Thu, Apr 5, 2012 at 3:09 PM, Eric Fort <eric.fort@gmail.com> wrote:
+>
+> Trying to add bluetooth capability to one of my linux based devices
+> (device has a singleUSB host port):
+>
+>
+> Where can I find a listing of known linux compatable usb bluetooth
+> adapters (and their internal chipsets)?
+>
+> any recommendations for use with BlueZ?  I'm looking for a class 1
+> adapter.
+>
+> Also, are the available bt profiles dependent upon the chosen adapter or
+> does the adapter simply handle the physical layer? (keyboard and mouse will
+> be first but audio in/out will follow soon after as well as network
+> connections...)
+>
+> Thanks,
+>
+> Eric
