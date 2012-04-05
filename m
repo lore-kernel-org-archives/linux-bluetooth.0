@@ -1,67 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anju Manoj <anju.manoj@sasken.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 5 Apr 2012 10:10:33 +0530
-Subject: how to get lex library
-Message-ID: <2316A524B7DB8C4AB39B9EDEDF597C8F015B35BB0656@EXGMBX01.sasken.com>
-Content-Type: text/plain; charset="us-ascii"
+From: Hemant Gupta <hemant.gupta@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: Hemant Gupta <hemantgupta.ste@gmail.com>,
+	Hemant Gupta <hemant.gupta@stericsson.com>
+Subject: [PATCH v3] Bluetooth: Fix packet type for ESCO Link
+Date: Thu, 5 Apr 2012 09:16:34 +0530
+Message-ID: <1333597594-21532-1-git-send-email-hemant.gupta@stericsson.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This patch uses the corect packet type for ESCO Link.
+Without this patch esco packet types were anded with ~EDR_ESCO_MASK
+resulting in setting bits that are not supported by controller
+to 0 which means that corresponding EDR ESCO packet type is
+supported(EDR Packet types are inverted as per BT Spec) which might
+not be the case.
 
-I already installed bison also,please help me
+Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
+---
+ net/bluetooth/hci_conn.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Anju
-
-Hi,
-
-On Wed, Apr 4, 2012 at 1:05 PM, Anju Manoj <anju.manoj@sasken.com> wrote:
-> hi,
->
-> i already installed flex.
-
-Be sure to install bison as well.
-
-Regards,
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 947172b..1060fb6 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -396,7 +396,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
+ 			conn->pkt_type = hdev->pkt_type & SCO_PTYPE_MASK;
+ 		break;
+ 	case ESCO_LINK:
+-		conn->pkt_type = hdev->esco_type & ~EDR_ESCO_MASK;
++		conn->pkt_type = hdev->esco_type ^ EDR_ESCO_MASK;
+ 		break;
+ 	}
+ 
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.0.4
 
-Hi Anju,
-
-On 17:19 Wed 04 Apr, Anju Manoj wrote:
-> hi all,
->
->         i am having a bluez4.82 with me and i am trying  to configure it using the below command in ubuntu 11.04
->
-> ./configure --enable-maintainer-mode --enable-health --enable-attrib  --enable-gstreamer --enable-alsa --enable-usb --enable-tracer --enable-tools --enable-bccmd --enable-pcmcia --enable-hid2hci --enable-dfutool --enable-hidd --enable-pand --enable-dund --enable-cups --enable-test --enable-udevrules --enable-configfiles --enable-debug --enable-maemo6 --enable-hal
->
-> now i am getting an error
->
->   LEX    tools/lexer.c
-> make[1]: *** [tools/lexer.c] Error 1
-> make: *** [all] Error 2
->
-> not able to find which lex library have to be installed in order to get around this problem
-
-Most probably you just need to install flex, Ubuntu has it.
-
->
-> Please help me as i am new to this technology.
->
-> Anju
->
-> SASKEN BUSINESS DISCLAIMER: This message may contain confidential, proprietary or legally privileged information. In case you are not the original intended Recipient of the message, you must not, directly or indirectly, use, disclose, distribute, print, or copy any part of this message and you are requested to delete it and inform the sender. Any views expressed in this message are those of the individual sender unless otherwise stated. Nothing contained in this message shall be construed as an offer or acceptance of any offer by Sasken Communication Technologies Limited ("Sasken") unless sent with that express intent and with due authority of Sasken. Sasken has taken enough precautions to prevent the spread of viruses. However the company accepts no liability for any damage caused by any virus transmitted by this email.
-> Read Disclaimer at http://www.sasken.com/extras/mail_disclaimer.html
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
--- 
-Vinicius
