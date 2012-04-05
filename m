@@ -3,167 +3,113 @@ From: Scott James Remnant <scott@netsplit.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: keybuk@chromium.org, marcel@hotmann.org, hadess@hadess.net,
 	Scott James Remnant <scott@netsplit.com>
-Subject: [PATCHv3 3/8] agent: add DisplayPinCode method
-Date: Thu,  5 Apr 2012 15:29:35 -0700
-Message-Id: <1333664980-29165-4-git-send-email-scott@netsplit.com>
+Subject: [PATCHv3 2/8] Pass passkey by pointer rather than by value
+Date: Thu,  5 Apr 2012 15:29:34 -0700
+Message-Id: <1333664980-29165-3-git-send-email-scott@netsplit.com>
 In-Reply-To: <1333664980-29165-1-git-send-email-scott@netsplit.com>
 References: <1333664980-29165-1-git-send-email-scott@netsplit.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In constrast to DisplayPasskey, this sends a UTF-8 string PIN code
-to the agent; also we support a callback for the case where the
-Agent doesn't implement this new method so we can fallback.
+This allows alternate data of a different type to be passed to
+device_request_authentication() for other notification types such
+as those that require a PIN.
 ---
- src/agent.c |  112 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- src/agent.h |    4 ++
- 2 files changed, 115 insertions(+), 1 deletions(-)
+ src/device.c |    9 +++++----
+ src/device.h |    2 +-
+ src/event.c  |    8 ++++----
+ 3 files changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/src/agent.c b/src/agent.c
-index 9b942e8..23e3b43 100644
---- a/src/agent.c
-+++ b/src/agent.c
-@@ -52,7 +52,8 @@ typedef enum {
- 	AGENT_REQUEST_CONFIRMATION,
- 	AGENT_REQUEST_PINCODE,
- 	AGENT_REQUEST_AUTHORIZE,
--	AGENT_REQUEST_CONFIRM_MODE
-+	AGENT_REQUEST_CONFIRM_MODE,
-+	AGENT_REQUEST_DISPLAY_PINCODE,
- } agent_request_type_t;
- 
- struct agent {
-@@ -699,6 +700,115 @@ int agent_display_passkey(struct agent *agent, struct btd_device *device,
- 	return 0;
+diff --git a/src/device.c b/src/device.c
+index 0ae52ce..0a77f80 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2753,7 +2753,7 @@ done:
  }
  
-+static void display_pincode_reply(DBusPendingCall *call, void *user_data)
-+{
-+	struct agent_request *req = user_data;
-+	struct agent *agent = req->agent;
-+	DBusMessage *message;
-+	DBusError err;
-+	agent_cb cb = req->cb;
-+
-+	/* clear agent->request early; our callback will likely try
-+	 * another request */
-+	agent->request = NULL;
-+
-+	/* steal_reply will always return non-NULL since the callback
-+	 * is only called after a reply has been received */
-+	message = dbus_pending_call_steal_reply(call);
-+
-+	dbus_error_init(&err);
-+	if (dbus_set_error_from_message(&err, message)) {
-+		error("Agent replied with an error: %s, %s",
-+				err.name, err.message);
-+
-+		cb(agent, &err, req->user_data);
-+
-+		if (dbus_error_has_name(&err, DBUS_ERROR_NO_REPLY)) {
-+			agent_cancel(agent);
-+			dbus_message_unref(message);
-+			dbus_error_free(&err);
-+			return;
-+		}
-+
-+		dbus_error_free(&err);
-+		goto done;
-+	}
-+
-+	dbus_error_init(&err);
-+	if (!dbus_message_get_args(message, &err, DBUS_TYPE_INVALID)) {
-+		error("Wrong reply signature: %s", err.message);
-+		cb(agent, &err, req->user_data);
-+		dbus_error_free(&err);
-+		goto done;
-+	}
-+
-+	cb(agent, NULL, req->user_data);
-+done:
-+	dbus_message_unref(message);
-+
-+	agent_request_free(req, TRUE);
-+}
-+
-+static int display_pincode_request_new(struct agent_request *req,
-+					const char *device_path,
-+					const char *pincode)
-+{
-+	struct agent *agent = req->agent;
-+
-+	req->msg = dbus_message_new_method_call(agent->name, agent->path,
-+				"org.bluez.Agent", "DisplayPinCode");
-+	if (req->msg == NULL) {
-+		error("Couldn't allocate D-Bus message");
-+		return -ENOMEM;
-+	}
-+
-+	dbus_message_append_args(req->msg,
-+				DBUS_TYPE_OBJECT_PATH, &device_path,
-+				DBUS_TYPE_STRING, &pincode,
-+				DBUS_TYPE_INVALID);
-+
-+	if (dbus_connection_send_with_reply(connection, req->msg,
-+				&req->call, REQUEST_TIMEOUT) == FALSE) {
-+		error("D-Bus send failed");
-+		return -EIO;
-+	}
-+
-+	dbus_pending_call_set_notify(req->call, display_pincode_reply,
-+								req, NULL);
-+
-+	return 0;
-+}
-+
-+int agent_display_pincode(struct agent *agent, struct btd_device *device,
-+				const char *pincode, agent_cb cb,
-+				void *user_data, GDestroyNotify destroy)
-+{
-+	struct agent_request *req;
-+	const gchar *dev_path = device_get_path(device);
-+	int err;
-+
-+	if (agent->request)
-+		return -EBUSY;
-+
-+	DBG("Calling Agent.DisplayPinCode: name=%s, path=%s, pincode=%s",
-+			agent->name, agent->path, pincode);
-+
-+	req = agent_request_new(agent, AGENT_REQUEST_DISPLAY_PINCODE, cb,
-+				user_data, destroy);
-+
-+	err = display_pincode_request_new(req, dev_path, pincode);
-+	if (err < 0)
-+		goto failed;
-+
-+	agent->request = req;
-+
-+	return 0;
-+
-+failed:
-+	agent_request_free(req, FALSE);
-+	return err;
-+}
-+
- uint8_t agent_get_io_capability(struct agent *agent)
+ int device_request_authentication(struct btd_device *device, auth_type_t type,
+-				uint32_t passkey, gboolean secure, void *cb)
++					void *data, gboolean secure, void *cb)
  {
- 	return agent->capability;
-diff --git a/src/agent.h b/src/agent.h
-index f62bf3b..69ad42b 100644
---- a/src/agent.h
-+++ b/src/agent.h
-@@ -64,6 +64,10 @@ int agent_request_confirmation(struct agent *agent, struct btd_device *device,
- int agent_display_passkey(struct agent *agent, struct btd_device *device,
- 				uint32_t passkey);
+ 	struct authentication_req *auth;
+ 	struct agent *agent;
+@@ -2779,7 +2779,6 @@ int device_request_authentication(struct btd_device *device, auth_type_t type,
+ 	auth->device = device;
+ 	auth->cb = cb;
+ 	auth->type = type;
+-	auth->passkey = passkey;
+ 	auth->secure = secure;
+ 	device->authr = auth;
  
-+int agent_display_pincode(struct agent *agent, struct btd_device *device,
-+				const char *pincode, agent_cb cb,
-+				void *user_data, GDestroyNotify destroy);
-+
- int agent_cancel(struct agent *agent);
+@@ -2793,11 +2792,13 @@ int device_request_authentication(struct btd_device *device, auth_type_t type,
+ 								auth, NULL);
+ 		break;
+ 	case AUTH_TYPE_CONFIRM:
+-		err = agent_request_confirmation(agent, device, passkey,
++		auth->passkey = *(uint32_t *)data;
++		err = agent_request_confirmation(agent, device, auth->passkey,
+ 						confirm_cb, auth, NULL);
+ 		break;
+ 	case AUTH_TYPE_NOTIFY_PASSKEY:
+-		err = agent_display_passkey(agent, device, passkey);
++		auth->passkey = *(uint32_t *)data;
++		err = agent_display_passkey(agent, device, auth->passkey);
+ 		break;
+ 	default:
+ 		err = -EINVAL;
+diff --git a/src/device.h b/src/device.h
+index d5fdf45..4aca224 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -84,7 +84,7 @@ gboolean device_is_creating(struct btd_device *device, const char *sender);
+ gboolean device_is_bonding(struct btd_device *device, const char *sender);
+ void device_cancel_bonding(struct btd_device *device, uint8_t status);
+ int device_request_authentication(struct btd_device *device, auth_type_t type,
+-				uint32_t passkey, gboolean secure, void *cb);
++					void *data, gboolean secure, void *cb);
+ void device_cancel_authentication(struct btd_device *device, gboolean aborted);
+ gboolean device_is_authenticating(struct btd_device *device);
+ gboolean device_is_authorizing(struct btd_device *device);
+diff --git a/src/event.c b/src/event.c
+index 3259e7d..a4a60d0 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -130,7 +130,7 @@ int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba, gboolean secure)
+ 		return 0;
+ 	}
  
- gboolean agent_is_busy(struct agent *agent, void *user_data);
+-	return device_request_authentication(device, AUTH_TYPE_PINCODE, 0,
++	return device_request_authentication(device, AUTH_TYPE_PINCODE, NULL,
+ 							secure, pincode_cb);
+ }
+ 
+@@ -179,7 +179,7 @@ int btd_event_user_confirm(bdaddr_t *sba, bdaddr_t *dba, uint32_t passkey)
+ 		return -ENODEV;
+ 
+ 	return device_request_authentication(device, AUTH_TYPE_CONFIRM,
+-						passkey, FALSE, confirm_cb);
++						&passkey, FALSE, confirm_cb);
+ }
+ 
+ int btd_event_user_passkey(bdaddr_t *sba, bdaddr_t *dba)
+@@ -190,7 +190,7 @@ int btd_event_user_passkey(bdaddr_t *sba, bdaddr_t *dba)
+ 	if (!get_adapter_and_device(sba, dba, &adapter, &device, TRUE))
+ 		return -ENODEV;
+ 
+-	return device_request_authentication(device, AUTH_TYPE_PASSKEY, 0,
++	return device_request_authentication(device, AUTH_TYPE_PASSKEY, NULL,
+ 							FALSE, passkey_cb);
+ }
+ 
+@@ -203,7 +203,7 @@ int btd_event_user_notify(bdaddr_t *sba, bdaddr_t *dba, uint32_t passkey)
+ 		return -ENODEV;
+ 
+ 	return device_request_authentication(device, AUTH_TYPE_NOTIFY_PASSKEY,
+-							passkey, FALSE, NULL);
++							&passkey, FALSE, NULL);
+ }
+ 
+ void btd_event_simple_pairing_complete(bdaddr_t *local, bdaddr_t *peer,
 -- 
 1.7.7.3
 
