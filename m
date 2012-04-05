@@ -1,21 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120404031407.GA25889@joana>
-References: <CAMBjcSuF_CvWAOvMdS53aR8vm3tRam8+qeEhjcaaoCygn0U=Fw@mail.gmail.com>
-	<20120404031407.GA25889@joana>
-Date: Thu, 5 Apr 2012 19:16:16 -0300
-Message-ID: <CAMBjcSuKxdx6X=2WikEFnH9OM5q6qkxZUC1rb1U8LW8+tFu0vw@mail.gmail.com>
-Subject: Re: GSoC Projects
-From: "Thiago S. A." <thiago.xth1@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	"Thiago S. A." <thiago.xth1@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1333663889.16897.18.camel@aeonflux>
+Subject: Re: question on timestamps generated with "hcidump -t"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Oliver Neukum <oliver@neukum.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 05 Apr 2012 15:11:29 -0700
+In-Reply-To: <201204052239.27843.oliver@neukum.org>
+References: <201204052100.17893.oliver@neukum.org>
+	 <1333654479.16897.17.camel@aeonflux> <201204052239.27843.oliver@neukum.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-I submeted my proposal [1].
-I thank any hint.
+Hi Oliver,
 
-[1] .http://www.bluez.org/development/gsoc/gsoc-ideas-list-2012/
+> > > could somebody enlighten me, when exactly those timestamps are generated?
+> > 
+> > they are normally stamped when they enter our internal queues. So the
+> > Bluetooth core stamps them when they come from the driver.
+> 
+> Thanks. That means if they come from btusb on ehci they are
+> stamped in interrupt.
+> So it is not possible that an event is late because the work queue
+> was congested.
+
+not that I can tell. And yes, in case of USB they are stamped in
+interrupt.
+
+But with USB keep in mind that HCI events and HCI ACL data is on
+different endpoints.
+
+Regards
+
+Marcel
+
+
