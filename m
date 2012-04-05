@@ -1,29 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 Apr 2012 13:15:55 +0300
+Date: Thu, 5 Apr 2012 12:53:12 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] DeviceInfo: Fix compilation with old glib
-Message-ID: <20120405101555.GA32212@x220>
-References: <1333551502-28159-1-git-send-email-szymon.janc@tieto.com>
+To: joohi.rastogi@stericsson.com
+Cc: User Name <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] AVRCP: Fixed response length for Subunit Info command
+Message-ID: <20120405095312.GB30695@x220>
+References: <1333605488-23543-1-git-send-email-joohi.rastogi@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1333551502-28159-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1333605488-23543-1-git-send-email-joohi.rastogi@stericsson.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Joohi,
 
-On Wed, Apr 04, 2012, Szymon Janc wrote:
-> Add missing include glib-compat.h to deviceinfo.c. deviceinfo_free
-> is using g_slist_free_full() which is not available in old glib
-> resulting in compilation error.
+On Thu, Apr 05, 2012, joohi.rastogi@stericsson.com wrote:
+> From: Joohi Rastogi <joohi.rastogi@stericsson.com>
 > 
-> deviceinfo/deviceinfo.c: In function ‘deviceinfo_free’:
-> deviceinfo/deviceinfo.c:66: error: implicit declaration of function ‘g_slist_free_full’
+> This affect PTS Test Case TC_TG_ICC_BV_02_I
 > ---
->  deviceinfo/deviceinfo.c |    1 +
->  1 file changed, 1 insertion(+)
+>  audio/avctp.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/audio/avctp.c b/audio/avctp.c
+> index 009b94c..d8f740a 100644
+> --- a/audio/avctp.c
+> +++ b/audio/avctp.c
+> @@ -295,7 +295,7 @@ static size_t handle_subunit_info(struct avctp *session,
+>  
+>  	DBG("reply to AVC_OP_SUBUNITINFO");
+>  
+> -	return 0;
+> +	return operand_count;
+>  }
+>  
+>  static struct avctp_pdu_handler *find_handler(GSList *list, uint8_t opcode)
 
 Applied. Thanks.
 
