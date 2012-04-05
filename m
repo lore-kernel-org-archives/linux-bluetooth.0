@@ -1,41 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 Apr 2012 12:52:58 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: joohi.rastogi@stericsson.com
-Cc: User Name <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] AVRCP: Fixed response length for Unit Info command
-Message-ID: <20120405095258.GA30695@x220>
-References: <1333604469-18883-1-git-send-email-joohi.rastogi@stericsson.com>
+From: Hemant Gupta <hemant.gupta@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: Hemant Gupta <hemantgupta.ste@gmail.com>,
+	Hemant Gupta <hemant.gupta@stericsson.com>
+Subject: [PATCH] Bluetooth: Send Connect failed event when LE Connection fails
+Date: Thu, 5 Apr 2012 14:23:09 +0530
+Message-ID: <1333615989-15979-1-git-send-email-hemant.gupta@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1333604469-18883-1-git-send-email-joohi.rastogi@stericsson.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joohi,
+This patch adds management connect failed event when LE Create Connection
+Command fails to inform BlueZ that LE Connection failed to get established.
 
-On Thu, Apr 05, 2012, joohi.rastogi@stericsson.com wrote:
-> From: Joohi Rastogi <joohi.rastogi@stericsson.com>
-> 
-> This affect PTS Test Case TC_TG_ICC_BV_01_I
-> ---
->  audio/avctp.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/audio/avctp.c b/audio/avctp.c
-> index 009b94c..91a7886 100644
-> --- a/audio/avctp.c
-> +++ b/audio/avctp.c
-> @@ -271,7 +271,7 @@ static size_t handle_unit_info(struct avctp *session,
->  
->  	DBG("reply to AVC_OP_UNITINFO");
->  
-> -	return 0;
-> +	return operand_count;
->  }
->  
->  static size_t handle_subunit_info(struct avctp *session,
+Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
+---
+ net/bluetooth/hci_event.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-Applied. Thanks.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7325300..89662f0 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1649,6 +1649,8 @@ static void hci_cs_le_create_conn(struct hci_dev *hdev, __u8 status)
+ 	if (status) {
+ 		if (conn && conn->state == BT_CONNECT) {
+ 			conn->state = BT_CLOSED;
++			mgmt_connect_failed(hdev, &cp->peer_addr, conn->type,
++							conn->dst_type, status);
+ 			hci_proto_connect_cfm(conn, status);
+ 			hci_conn_del(conn);
+ 		}
+-- 
+1.7.0.4
 
-Johan
