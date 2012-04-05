@@ -1,83 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 Apr 2012 13:58:24 +0300
+Date: Thu, 5 Apr 2012 13:54:14 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Hemant Gupta <hemant.gupta@stericsson.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	Hemant Gupta <hemantgupta.ste@gmail.com>
-Subject: Re: [PATCH] Bluetooth: Send Discovery Stopped event when discovery
- fails
-Message-ID: <20120405105824.GH32212@x220>
-References: <1333603129-18813-1-git-send-email-hemant.gupta@stericsson.com>
+Subject: Re: [PATCH] Bluetooth: Don't set Discoverty Type while stopping
+ Discovery
+Message-ID: <20120405105414.GG32212@x220>
+References: <1333601841-2301-1-git-send-email-hemant.gupta@stericsson.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1333603129-18813-1-git-send-email-hemant.gupta@stericsson.com>
+In-Reply-To: <1333601841-2301-1-git-send-email-hemant.gupta@stericsson.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Hemant,
 
 On Thu, Apr 05, 2012, Hemant Gupta wrote:
-> This patch sends MGMT_EV_DISCOVERING event to manamgement interface of
-> BlueZ to indicate that discovery is stopped in case of discovery failure.
-> Without this patch discovery session of BlueZ was not getting freed.
-> This event was not sent from kernel in case discovery state is still
-> DISCOVERY_STARTING.
+> This patch prevents resetting of discovery type while stopping
+> discovery, which was sending wrong type information to management
+> interface of BlueZ when discovery failed.
 > 
 > Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
 > ---
->  net/bluetooth/hci_core.c |    2 +-
->  net/bluetooth/mgmt.c     |   16 +---------------
->  2 files changed, 2 insertions(+), 16 deletions(-)
+>  net/bluetooth/hci_core.c |    1 -
+>  1 files changed, 0 insertions(+), 1 deletions(-)
 
-This patch in general doesn't make much sense to me.
-
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 9629645..b97a7dc 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -384,7 +384,7 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
->  
->  	switch (state) {
->  	case DISCOVERY_STOPPED:
-> -		if (hdev->discovery.state != DISCOVERY_STARTING)
-> +		if (hdev->discovery.state != DISCOVERY_STOPPED)
->  			mgmt_discovering(hdev, 0);
->  		break;
-
-This is wrong in several different ways. Firstly it's wrong since we
-only do mgmt_discovering(hdev, 1) when going to DISCOVERY_FINDING state
-so mgmt_discovering(hdev, 0) should not be called before that. Secondly
-it's wrong because the function will return if hdev->discovery.state ==
-state, i.e. your if statement would always evaluate to true and
-therefore be redundant.
-
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -3572,23 +3572,9 @@ int mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
->  
->  int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
->  {
-> -	struct pending_cmd *cmd;
-> -	u8 type;
-> -	int err;
-> -
->  	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
->  
-> -	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
-> -	if (!cmd)
-> -		return -ENOENT;
-> -
-> -	type = hdev->discovery.type;
-> -
-> -	err = cmd_complete(cmd->sk, hdev->id, cmd->opcode, mgmt_status(status),
-> -			   &type, sizeof(type));
-> -	mgmt_pending_remove(cmd);
-> -
-> -	return err;
-> +	return 0;
->  }
-
-So who sends the appropriate command complete event to start_discovery
-now? I don't see any other place that would do it.
+Applied to bluetooth-next, but you really need to start using a spell
+checker on your commit messages. Also, you don't necessarily need to
+refer to the behavior caused to current user space since it's perfectly
+possible to justify the patch without that. Furthermore, please prefix
+any fixes with "Fix ...". It makes it easier to get these pulled once
+applied to bluetooth.git (less explaining to do to the wireless
+maintainer).
 
 Johan
