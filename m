@@ -1,29 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 Apr 2012 11:52:38 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Remove MGMT_ADDR_INVALID macro
-Message-ID: <20120405085238.GA29038@x220>
-References: <1333453614-4954-1-git-send-email-andre.guedes@openbossa.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Anju Manoj <anju.manoj@sasken.com>
+Subject: Re: how to get lex library
+Date: Thu, 5 Apr 2012 09:02:35 +0200
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <2316A524B7DB8C4AB39B9EDEDF597C8F015B35BB0656@EXGMBX01.sasken.com>
+In-Reply-To: <2316A524B7DB8C4AB39B9EDEDF597C8F015B35BB0656@EXGMBX01.sasken.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1333453614-4954-1-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset="us-ascii"
+Message-ID: <201204050902.35937.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi,
 
-On Tue, Apr 03, 2012, Andre Guedes wrote:
-> This patch removes the MGMT_ADDR_INVALID macro. If the address type
-> isn't LE, we consider it is BR/EDR type.
+> I already installed bison also,please help me
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  include/net/bluetooth/hci_core.h |    1 -
->  net/bluetooth/mgmt.c             |   14 +++++++-------
->  2 files changed, 7 insertions(+), 8 deletions(-)
+> Anju
+> 
+> Hi,
+> 
+> On Wed, Apr 4, 2012 at 1:05 PM, Anju Manoj <anju.manoj@sasken.com> wrote:
+> > hi,
+> >
+> > i already installed flex.
+> 
+> Be sure to install bison as well.
 
-Applied to the bluetooth-next tree. Thanks.
+Since you are using ubuntu I would suggest 'sudo apt-get build-dep bluez' which
+should install all packages required to build bluez package.
 
-Johan
+-- 
+BR
+Szymon Janc
