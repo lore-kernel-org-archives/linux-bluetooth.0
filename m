@@ -1,72 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vishal Agarwal <vishal.agarwal@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: <vishal.agarwal@stericsson.com>
-Subject: [PATCH v2] Bluetooth: Temporary keys should be retained during connection
-Date: Thu, 5 Apr 2012 16:48:19 +0530
-Message-ID: <1333624699-7922-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20120405102208.GC32212@x220>
+References: <1333570570-1288-1-git-send-email-andre.guedes@openbossa.org>
+	<1333570570-1288-4-git-send-email-andre.guedes@openbossa.org>
+	<20120405102208.GC32212@x220>
+Date: Thu, 5 Apr 2012 07:17:30 -0400
+Message-ID: <CAJdJm_O0Qf07kfXP9ReyDtasL6d3fnRiCCnbpvwoYUWE+me2LA@mail.gmail.com>
+Subject: Re: [RFC v2 3/5] Bluetooth: Add dst_type parameter to hci_connect
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If a key is non persistent then it should not be used in future
-connections but it should be kept for current connection. And
-it should be removed when connecion is removed.
-Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
----
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_core.c         |   11 +++++++----
- net/bluetooth/hci_event.c        |    2 ++
- 3 files changed, 10 insertions(+), 4 deletions(-)
+Hi Johan,
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c0b232c..ce7a415 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -318,6 +318,7 @@ struct hci_conn {
- 
- 	__u8		remote_cap;
- 	__u8		remote_auth;
-+	bool		temp_link_key;
- 
- 	unsigned int	sent;
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 286f3fc..fddd0ac 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1330,10 +1330,13 @@ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
- 
- 	mgmt_new_link_key(hdev, key, persistent);
- 
--	if (!persistent) {
--		list_del(&key->list);
--		kfree(key);
--	}
-+	if (!conn)
-+		return 0;
-+
-+	if (persistent)
-+		conn->temp_link_key = false;
-+	else
-+		conn->temp_link_key = true;
- 
- 	return 0;
- }
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7325300..0b19852 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1928,6 +1928,8 @@ static inline void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff
- 	}
- 
- 	if (ev->status == 0) {
-+		if (conn->type == ACL_LINK && conn->temp_link_key)
-+			hci_remove_link_key(hdev, &conn->dst);
- 		hci_proto_disconn_cfm(conn, ev->reason);
- 		hci_conn_del(conn);
- 	}
+On Thu, Apr 5, 2012 at 6:22 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Andre,
+>
+> On Wed, Apr 04, 2012, Andre Guedes wrote:
+>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>> index 542fea2..9083a95 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -574,7 +574,7 @@ int hci_chan_del(struct hci_chan *chan);
+>>  void hci_chan_list_flush(struct hci_conn *conn);
+>>
+>>  struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+>> -                                             __u8 sec_level, __u8 auth_type);
+>> +                             __u8 dst_type, __u8 sec_level, __u8 auth_type);
+>
+> It seems like you're not using the "new" style of aligning with the
+> opening parenthesis here.
+
+About this alignment, should it be done with spaces when necessary
+(i.e. when using just tabs does not align)?
+
+I think I have missed discussions about this (maybe because I don't
+follow LKML closely).
+
+Regards,
 -- 
-1.7.0.4
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
