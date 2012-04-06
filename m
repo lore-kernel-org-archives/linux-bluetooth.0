@@ -1,32 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1333799079.16897.24.camel@aeonflux>
-Subject: Re: [PATCH 1/2] Bluetooth: Remove err parameter from alloc_skb()
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gustavo Padovan <gustavo@padovan.org>
+Date: Fri, 6 Apr 2012 20:55:27 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Sat, 07 Apr 2012 13:44:39 +0200
-In-Reply-To: <1333754148-18796-1-git-send-email-gustavo@padovan.org>
-References: <1333754148-18796-1-git-send-email-gustavo@padovan.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: Re: [RFCv6 12/26] Bluetooth: A2MP: Process A2MP Discover Request
+Message-ID: <20120406235527.GH2915@joana>
+References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1332941509-21345-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1332941509-21345-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Andrei,
 
-> Use ERR_PTR maginc instead.
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-03-28 16:31:35 +0300]:
+
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
-> ---
->  include/net/bluetooth/l2cap.h |    2 +-
->  net/bluetooth/l2cap_core.c    |   30 +++++++++++++-----------------
->  net/bluetooth/l2cap_sock.c    |   12 ++++++++----
->  3 files changed, 22 insertions(+), 22 deletions(-)
+> Process A2MP Discover Request, code makes sure that first
+> controller in the list is BREDR one. Trace is shown below:
+> 
+> ...
+> > ACL data: handle 11 flags 0x02 dlen 16
+>     A2MP: Discover req: mtu/mps 670 mask: 0x0000
+> < ACL data: handle 11 flags 0x00 dlen 22
+>     A2MP: Discover rsp: mtu/mps 670 mask: 0x0000
+>       Controller list:
+>         id 0 type 0 (BR-EDR) status 0x01 (Bluetooth only)
+>         id 1 type 1 (802.11 AMP) status 0x01 (Bluetooth only)
+> ...
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+I think patch 11 and 12 can be merged.
 
-Regards
-
-Marcel
-
-
+	Gustavo
