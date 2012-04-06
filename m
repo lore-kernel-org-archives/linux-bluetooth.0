@@ -1,41 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 6 Apr 2012 07:48:45 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: gustavo@padovan.org, johan.hedberg@gmail.com
-cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org,
-    andrei.emeltchenko.news@gmail.com, szymon.janc@tieto.com,
-    Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCHv4 2/2] Bluetooth: Functions for handling ERTM control
- fields
-In-Reply-To: <1333571483.16897.1.camel@aeonflux>
-Message-ID: <alpine.DEB.2.02.1204060745350.25380@mathewm-linux>
-References: <1333564183-23442-1-git-send-email-mathewm@codeaurora.org>  <1333564183-23442-3-git-send-email-mathewm@codeaurora.org> <1333571483.16897.1.camel@aeonflux>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+In-Reply-To: <CAMBjcSuKxdx6X=2WikEFnH9OM5q6qkxZUC1rb1U8LW8+tFu0vw@mail.gmail.com>
+References: <CAMBjcSuF_CvWAOvMdS53aR8vm3tRam8+qeEhjcaaoCygn0U=Fw@mail.gmail.com>
+	<20120404031407.GA25889@joana>
+	<CAMBjcSuKxdx6X=2WikEFnH9OM5q6qkxZUC1rb1U8LW8+tFu0vw@mail.gmail.com>
+Date: Thu, 5 Apr 2012 23:53:34 -0300
+Message-ID: <CAMBjcSvm3-ssSXNo06sjV_-LxtzXumEDNVEONArmhg_-1aaaJw@mail.gmail.com>
+Subject: Re: GSoC Projects
+From: "Thiago S. A." <thiago.xth1@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	"Thiago S. A." <thiago.xth1@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-Gustavo (or Johan) -
-
-On Wed, 4 Apr 2012, Marcel Holtmann wrote:
-
-> Hi Mat,
+2012/4/5 Thiago S. A. <thiago.xth1@gmail.com>:
+> Hi,
+> I submeted my proposal [1].
+> I thank any hint.
 >
->> These functions encode or decode ERTM control fields (extended or
->> enhanced) to or from the new l2cap_ctrl structure.
->>
->> Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
->> ---
->>  net/bluetooth/l2cap_core.c |   99 ++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 99 insertions(+)
->
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> [1] .http://www.bluez.org/development/gsoc/gsoc-ideas-list-2012/
 
-Could you apply the two patches from this patchset?
 
-Thanks,
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Sorry, I posted a incorrect link for my proposal, the correct link is:
+http://www.google-melange.com/gsoc/proposal/review/google/gsoc2012/xth1/1#
