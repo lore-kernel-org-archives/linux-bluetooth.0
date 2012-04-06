@@ -1,88 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <20120405225446.GA19517@samus>
+References: <1333665653-30266-1-git-send-email-scott@netsplit.com>
+	<1333665653-30266-3-git-send-email-scott@netsplit.com>
+	<20120405225446.GA19517@samus>
+Date: Fri, 6 Apr 2012 12:37:01 -0700
+Message-ID: <CA+bD78hqiYahExdvsxnFB9mjZNz4Vh104=2_wN4=6TBxGvMRow@mail.gmail.com>
+Subject: Re: [PATCHv3 2/4] plugin: Add bonding callback support for plugins
 From: Scott James Remnant <scott@netsplit.com>
 To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: Scott James Remnant <scott@netsplit.com>,
-	linux-bluetooth@vger.kernel.org, keybuk@chromium.org,
-	marcel@holtmann.org, hadess@hadess.net
-Subject: [PATCHv3 2/4v2] bonding: retry if callback returns TRUE
-Date: Fri,  6 Apr 2012 12:37:09 -0700
-Message-Id: <1333741029-3249-1-git-send-email-scott@netsplit.com>
-In-Reply-To: <20120405225446.GA19517@samus>
-References: <1333665653-30266-1-git-send-email-scott@netsplit.com> <1333665653-30266-3-git-send-email-scott@netsplit.com> <20120405225446.GA19517@samus>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org, marcel@holtmann.org,
+	hadess@hadess.net
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When a bonding completes, pass the status to any plugin bonding
-callbacks; if any return TRUE than set a timer to retry the bonding
-after an appropriate backoff period.
----
- src/device.c |   46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 46 insertions(+), 0 deletions(-)
+On Thu, Apr 5, 2012 at 3:54 PM, Vinicius Costa Gomes
+<vinicius.gomes@openbossa.org> wrote:
 
-diff --git a/src/device.c b/src/device.c
-index 5ecf546..cd659d3 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2565,6 +2565,44 @@ void btd_device_unregister_bonding_cb(struct btd_device *device,
- 						device->bonding_callbacks, cb);
- }
- 
-+static gboolean device_bonding_retry(gpointer data)
-+{
-+	struct btd_device *device = data;
-+	struct btd_adapter *adapter = device_get_adapter(device);
-+	struct bonding_req *bonding = device->bonding;
-+	int err;
-+
-+	if (!bonding)
-+		return FALSE;
-+
-+	DBG("retrying bonding");
-+	err = adapter_create_bonding(adapter, &device->bdaddr,
-+					device->type, bonding->capability);
-+	if (err < 0)
-+		device_bonding_complete(device, bonding->status);
-+
-+	bonding->retry_timer = 0;
-+	return FALSE;
-+}
-+
-+static gboolean device_bonding_get_retry(struct btd_device *device,
-+								uint8_t status)
-+{
-+	GSList *l;
-+	btd_device_bonding_cb_t cb;
-+	gboolean retry = FALSE;
-+
-+	for (l = device->bonding_callbacks; l != NULL; l = g_slist_next(l)) {
-+		cb = l->data;
-+		retry |= cb(device, TRUE, status);
-+	}
-+
-+	g_slist_free(device->bonding_callbacks);
-+	device->bonding_callbacks = NULL;
-+
-+	return retry;
-+}
-+
- gboolean device_is_retrying(struct btd_device *device)
- {
- 	struct bonding_req *bonding = device->bonding;
-@@ -2579,6 +2617,14 @@ void device_bonding_complete(struct btd_device *device, uint8_t status)
- 
- 	DBG("bonding %p status 0x%02x", bonding, status);
- 
-+	if (device_bonding_get_retry(device, status) && status) {
-+		DBG("backing off and retrying");
-+		bonding->status = status;
-+		bonding->retry_timer = g_timeout_add(3000,
-+						device_bonding_retry, device);
-+		return;
-+	}
-+
- 	if (auth && (auth->type == AUTH_TYPE_NOTIFY_PASSKEY
- 		     || auth->type == AUTH_TYPE_NOTIFY_PINCODE) && auth->agent)
- 		agent_cancel(auth->agent);
--- 
-1.7.7.3
+> Hi Scott,
+>
+>> =A0 =A0 =A0 att_cleanup(device);
+>>
+>> + =A0 =A0 g_attrib_unref(device->attrib);
+>> +
+>
+> This seems unrelated to your series.
+>
 
+Ah, good catch, looks like a rebase error; corrected patch to follow this m=
+ail.
+
+Scott
+--=20
+Have you ever, ever felt like this?
+Had strange things happen? =A0Are you going round the twist?
