@@ -1,32 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 6 Apr 2012 19:38:44 -0300
+Date: Fri, 6 Apr 2012 19:36:08 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv6 01/26] Bluetooth: Add Read Local AMP Info to init
-Message-ID: <20120406223844.GC2915@joana>
-References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1332941509-21345-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org,
+	marcel@holtmann.org, andrei.emeltchenko.news@gmail.com,
+	szymon.janc@tieto.com
+Subject: Re: [PATCHv4 2/2] Bluetooth: Functions for handling ERTM control
+ fields
+Message-ID: <20120406223608.GB2915@joana>
+References: <1333564183-23442-1-git-send-email-mathewm@codeaurora.org>
+ <1333564183-23442-3-git-send-email-mathewm@codeaurora.org>
+ <20120406222935.GA2915@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1332941509-21345-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20120406222935.GA2915@joana>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Mat,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-03-28 16:31:24 +0300]:
+* Gustavo Padovan <gustavo@padovan.org> [2012-04-06 19:29:35 -0300]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> AMP Info will be used in Discovery Response.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/hci_core.c |    3 +++
->  1 files changed, 3 insertions(+), 0 deletions(-)
+> Hi Mat,
+>=20
+> * Mat Martineau <mathewm@codeaurora.org> [2012-04-04 11:29:43 -0700]:
+>=20
+> > These functions encode or decode ERTM control fields (extended or
+> > enhanced) to or from the new l2cap_ctrl structure.
+> >=20
+> > Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> > ---
+> >  net/bluetooth/l2cap_core.c |   99 ++++++++++++++++++++++++++++++++++++=
+++++++++
+> >  1 file changed, 99 insertions(+)
+>=20
+> Both patches were applied to bluetooth-next. thanks.
 
-Applied, thanks.
+net/bluetooth/l2cap_core.c:317:12: warning: =E2=80=98l2cap_seq_list_pop=E2=
+=80=99 defined but not used [-Wunused-function]
+net/bluetooth/l2cap_core.c:323:13: warning: =E2=80=98l2cap_seq_list_clear=
+=E2=80=99 defined but not used [-Wunused-function]
+net/bluetooth/l2cap_core.c:335:13: warning: =E2=80=98l2cap_seq_list_append=
+=E2=80=99 defined but not used [-Wunused-function]
+net/bluetooth/l2cap_core.c:780:12: warning: =E2=80=98__pack_enhanced_contro=
+l=E2=80=99 defined but not used [-Wunused-function]
+net/bluetooth/l2cap_core.c:823:12: warning: =E2=80=98__pack_extended_contro=
+l=E2=80=99 defined but not used [-Wunused-function]
+
+So, this is not good, we can't just throw unused code here, they will gener=
+ate
+warnings and I'll get complains from maintainers above me if I merge this.
+Both patches were reverted.
 
 	Gustavo
