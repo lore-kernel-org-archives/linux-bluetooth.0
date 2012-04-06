@@ -1,33 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 6 Apr 2012 19:29:35 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org,
-	marcel@holtmann.org, andrei.emeltchenko.news@gmail.com,
-	szymon.janc@tieto.com
-Subject: Re: [PATCHv4 2/2] Bluetooth: Functions for handling ERTM control
- fields
-Message-ID: <20120406222935.GA2915@joana>
-References: <1333564183-23442-1-git-send-email-mathewm@codeaurora.org>
- <1333564183-23442-3-git-send-email-mathewm@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1333564183-23442-3-git-send-email-mathewm@codeaurora.org>
+From: Scott James Remnant <scott@netsplit.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: Scott James Remnant <scott@netsplit.com>,
+	linux-bluetooth@vger.kernel.org, keybuk@chromium.org,
+	marcel@holtmann.org, hadess@hadess.net
+Subject: [PATCHv3 2/4v2] bonding: retry if callback returns TRUE
+Date: Fri,  6 Apr 2012 12:37:09 -0700
+Message-Id: <1333741029-3249-1-git-send-email-scott@netsplit.com>
+In-Reply-To: <20120405225446.GA19517@samus>
+References: <1333665653-30266-1-git-send-email-scott@netsplit.com> <1333665653-30266-3-git-send-email-scott@netsplit.com> <20120405225446.GA19517@samus>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+When a bonding completes, pass the status to any plugin bonding
+callbacks; if any return TRUE than set a timer to retry the bonding
+after an appropriate backoff period.
+---
+ src/device.c |   46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 46 insertions(+), 0 deletions(-)
 
-* Mat Martineau <mathewm@codeaurora.org> [2012-04-04 11:29:43 -0700]:
+diff --git a/src/device.c b/src/device.c
+index 5ecf546..cd659d3 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2565,6 +2565,44 @@ void btd_device_unregister_bonding_cb(struct btd_device *device,
+ 						device->bonding_callbacks, cb);
+ }
+ 
++static gboolean device_bonding_retry(gpointer data)
++{
++	struct btd_device *device = data;
++	struct btd_adapter *adapter = device_get_adapter(device);
++	struct bonding_req *bonding = device->bonding;
++	int err;
++
++	if (!bonding)
++		return FALSE;
++
++	DBG("retrying bonding");
++	err = adapter_create_bonding(adapter, &device->bdaddr,
++					device->type, bonding->capability);
++	if (err < 0)
++		device_bonding_complete(device, bonding->status);
++
++	bonding->retry_timer = 0;
++	return FALSE;
++}
++
++static gboolean device_bonding_get_retry(struct btd_device *device,
++								uint8_t status)
++{
++	GSList *l;
++	btd_device_bonding_cb_t cb;
++	gboolean retry = FALSE;
++
++	for (l = device->bonding_callbacks; l != NULL; l = g_slist_next(l)) {
++		cb = l->data;
++		retry |= cb(device, TRUE, status);
++	}
++
++	g_slist_free(device->bonding_callbacks);
++	device->bonding_callbacks = NULL;
++
++	return retry;
++}
++
+ gboolean device_is_retrying(struct btd_device *device)
+ {
+ 	struct bonding_req *bonding = device->bonding;
+@@ -2579,6 +2617,14 @@ void device_bonding_complete(struct btd_device *device, uint8_t status)
+ 
+ 	DBG("bonding %p status 0x%02x", bonding, status);
+ 
++	if (device_bonding_get_retry(device, status) && status) {
++		DBG("backing off and retrying");
++		bonding->status = status;
++		bonding->retry_timer = g_timeout_add(3000,
++						device_bonding_retry, device);
++		return;
++	}
++
+ 	if (auth && (auth->type == AUTH_TYPE_NOTIFY_PASSKEY
+ 		     || auth->type == AUTH_TYPE_NOTIFY_PINCODE) && auth->agent)
+ 		agent_cancel(auth->agent);
+-- 
+1.7.7.3
 
-> These functions encode or decode ERTM control fields (extended or
-> enhanced) to or from the new l2cap_ctrl structure.
-> 
-> Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  net/bluetooth/l2cap_core.c |   99 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 99 insertions(+)
-
-Both patches were applied to bluetooth-next. thanks.
-
-	Gustavo
