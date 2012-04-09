@@ -2,63 +2,36 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd 2/3] MAP: Input parameters for GetMessagesListing
-Date: Mon,  9 Apr 2012 23:02:59 +0200
-Message-Id: <1334005380-31302-2-git-send-email-lkslawek@gmail.com>
-In-Reply-To: <1334005380-31302-1-git-send-email-lkslawek@gmail.com>
-References: <1334005380-31302-1-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH obexd 1/3] MAP: Mark filter strings const
+Date: Mon,  9 Apr 2012 23:02:58 +0200
+Message-Id: <1334005380-31302-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- plugins/mas.c |   27 +++++++++++++++++++++++++--
- 1 files changed, 25 insertions(+), 2 deletions(-)
+ plugins/messages.h |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/plugins/mas.c b/plugins/mas.c
-index 97a37e4..76dc8e9 100644
---- a/plugins/mas.c
-+++ b/plugins/mas.c
-@@ -531,6 +531,9 @@ static void *msg_listing_open(const char *name, int oflag, mode_t mode,
- {
- 	struct mas_session *mas = driver_data;
- 	struct messages_filter filter = { 0, };
-+	/* 1024 is the default when there was no MaxListCount sent */
-+	uint16_t max = 1024;
-+	uint16_t offset = 0;
+diff --git a/plugins/messages.h b/plugins/messages.h
+index 00a040c..2cdd92f 100644
+--- a/plugins/messages.h
++++ b/plugins/messages.h
+@@ -111,11 +111,11 @@ struct messages_event {
+ struct messages_filter {
+ 	uint32_t parameter_mask;
+ 	uint8_t type;
+-	char *period_begin;
+-	char *period_end;
++	const char *period_begin;
++	const char *period_end;
+ 	uint8_t read_status;
+-	char *recipient;
+-	char *originator;
++	const char *recipient;
++	const char *originator;
+ 	uint8_t priority;
+ };
  
- 	DBG("");
- 
-@@ -539,8 +542,28 @@ static void *msg_listing_open(const char *name, int oflag, mode_t mode,
- 		return NULL;
- 	}
- 
--	*err = messages_get_messages_listing(mas->backend_data, name, 0xffff, 0,
--			&filter,
-+	map_ap_get_u16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
-+	map_ap_get_u16(mas->inparams, MAP_AP_STARTOFFSET, &offset);
-+
-+	map_ap_get_u32(mas->inparams, MAP_AP_PARAMETERMASK,
-+						&filter.parameter_mask);
-+	map_ap_get_u8(mas->inparams, MAP_AP_FILTERMESSAGETYPE,
-+						&filter.type);
-+	filter.period_begin = map_ap_get_string(mas->inparams,
-+						MAP_AP_FILTERPERIODBEGIN);
-+	filter.period_end = map_ap_get_string(mas->inparams,
-+						MAP_AP_FILTERPERIODEND);
-+	map_ap_get_u8(mas->inparams, MAP_AP_FILTERREADSTATUS,
-+						&filter.read_status);
-+	filter.recipient = map_ap_get_string(mas->inparams,
-+						MAP_AP_FILTERRECIPIENT);
-+	filter.originator = map_ap_get_string(mas->inparams,
-+						MAP_AP_FILTERORIGINATOR);
-+	map_ap_get_u8(mas->inparams, MAP_AP_FILTERPRIORITY,
-+						&filter.priority);
-+
-+	*err = messages_get_messages_listing(mas->backend_data, name, max,
-+			offset, &filter,
- 			get_messages_listing_cb, mas);
- 
- 	mas->buffer = g_string_new("");
 -- 
 1.7.5.1
 
