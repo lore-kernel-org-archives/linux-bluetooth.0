@@ -1,37 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd 1/3] MAP: Mark filter strings const
-Date: Mon,  9 Apr 2012 23:02:58 +0200
-Message-Id: <1334005380-31302-1-git-send-email-lkslawek@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 9 Apr 2012 22:49:49 +0200 (CEST)
+From: Jesper Juhl <jj@chaosbits.net>
+To: linux-kernel@vger.kernel.org
+cc: trivial@kernel.org, linux-bluetooth@vger.kernel.org,
+    Johan Hedberg <johan.hedberg@gmail.com>,
+    Gustavo Padovan <gustavo@padovan.org>,
+    Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH 01/26] Bluetooth: btmrvl_sdio: remove pointless conditional
+ before release_firmware()
+In-Reply-To: <alpine.LNX.2.00.1204092157340.13925@swampdragon.chaosbits.net>
+Message-ID: <alpine.LNX.2.00.1204092158070.13925@swampdragon.chaosbits.net>
+References: <alpine.LNX.2.00.1204092157340.13925@swampdragon.chaosbits.net>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- plugins/messages.h |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+release_firmware() deals gracefullt with NULL pointers so there's no
+reason to test for one prior to calling the function.
 
-diff --git a/plugins/messages.h b/plugins/messages.h
-index 00a040c..2cdd92f 100644
---- a/plugins/messages.h
-+++ b/plugins/messages.h
-@@ -111,11 +111,11 @@ struct messages_event {
- struct messages_filter {
- 	uint32_t parameter_mask;
- 	uint8_t type;
--	char *period_begin;
--	char *period_end;
-+	const char *period_begin;
-+	const char *period_end;
- 	uint8_t read_status;
--	char *recipient;
--	char *originator;
-+	const char *recipient;
-+	const char *originator;
- 	uint8_t priority;
- };
+Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+---
+ drivers/bluetooth/btmrvl_sdio.c |    9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 27b74b0..ed62c7f 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -339,9 +339,7 @@ static int btmrvl_sdio_download_helper(struct btmrvl_sdio_card *card)
+ 
+ done:
+ 	kfree(tmphlprbuf);
+-	if (fw_helper)
+-		release_firmware(fw_helper);
+-
++	release_firmware(fw_helper);
+ 	return ret;
+ }
+ 
+@@ -484,10 +482,7 @@ static int btmrvl_sdio_download_fw_w_helper(struct btmrvl_sdio_card *card)
+ 
+ done:
+ 	kfree(tmpfwbuf);
+-
+-	if (fw_firmware)
+-		release_firmware(fw_firmware);
+-
++	release_firmware(fw_firmware);
+ 	return ret;
+ }
  
 -- 
-1.7.5.1
+1.7.10
 
+
+-- 
+Jesper Juhl <jj@chaosbits.net>       http://www.chaosbits.net/
+Don't top-post http://www.catb.org/jargon/html/T/top-post.html
+Plain text mails only, please.
