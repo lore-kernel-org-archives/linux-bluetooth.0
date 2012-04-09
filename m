@@ -1,46 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
+From: Hemant Gupta <hemant.gupta@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: Hemant Gupta <hemant.gupta@stericsson.com>
+Subject: [PATCH] mgmtops: Handle Start Discovery Complete in case of failure
+Date: Mon, 9 Apr 2012 12:37:31 +0530
+Message-ID: <1333955251-8377-1-git-send-email-hemant.gupta@stericsson.com>
 MIME-Version: 1.0
-In-Reply-To: <1333955136.16897.26.camel@aeonflux>
-References: <1333950443-32114-1-git-send-email-hemant.gupta@stericsson.com>
-	<1333955136.16897.26.camel@aeonflux>
-Date: Mon, 9 Apr 2012 12:38:41 +0530
-Message-ID: <CACj007m9UkLZCP8eMqe+Va94a3nfHQ_pB2VY8eS6DxoNkSq8Sw@mail.gmail.com>
-Subject: Re: [PATCH] mgmtops: Handle Start Discovery Complete in case of failure
-From: Hemant Gupta <hemantgupta.ste@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Hemant Gupta <hemant.gupta@stericsson.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+This patch adds handling of start discovery complete event in cases
+when discovery fails to get started.
+---
+ plugins/mgmtops.c |   32 +++++++++++++++++++++++++++++++-
+ 1 files changed, 31 insertions(+), 1 deletions(-)
 
-On Mon, Apr 9, 2012 at 12:35 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Hemant,
->
->> This patch adds handling of start discovery complete event in cases
->> when discovery fails to get started.
->>
->> Change-Id: I214c8deb10fd97a529faeec50d789478aea2f402
->
-> please do not include the Android specific change id stuff in the
-> upstream patches.
->
-Thanks for pointing out, missed it somehow. I have re-sent a new patch.
-> Regards
->
-> Marcel
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index 612368f..d8518af 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -1258,6 +1258,36 @@ static void read_local_oob_data_complete(int sk, uint16_t index, void *buf,
+ 		oob_read_local_data_complete(adapter, rp->hash, rp->randomizer);
+ }
+ 
++static void start_discovery_complete(int sk, uint16_t index, uint8_t status,
++				     void *buf, size_t len)
++{
++	uint8_t *type = buf;
++	struct btd_adapter *adapter;
++
++	if (len != sizeof(*type)) {
++		error("start_discovery_complete event size mismatch "
++		      "(%zu != %zu)", len, sizeof(*type));
++		return;
++	}
++
++	if (index > max_index) {
++		error("Unexpected index %u in start_discovery_complete",
++		      index);
++		return;
++	}
++
++	if (!status)
++		return;
++
++	DBG("hci%u type%d status%d", index, *type, status);
++
++	adapter = manager_find_adapter_by_id(index);
++
++	if (adapter)
++		/* Start discovery failed, inform upper layers. */
++		adapter_set_discovering(adapter, FALSE);
++}
++
+ static void mgmt_read_rssi_complete(int sk, uint16_t index, void *buf, size_t len)
+ {
+ 	struct mgmt_rp_read_rssi *rp = buf;
+@@ -1546,7 +1576,7 @@ static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
+ 		DBG("set_fast_connectable complete");
+ 		break;
+ 	case MGMT_OP_START_DISCOVERY:
+-		DBG("start_discovery complete");
++		start_discovery_complete(sk, index, ev->status, ev->data, len);
+ 		break;
+ 	case MGMT_OP_STOP_DISCOVERY:
+ 		DBG("stop_discovery complete");
 -- 
-Best Regards
-Hemant Gupta
-ST-Ericsson India
+1.7.0.4
+
