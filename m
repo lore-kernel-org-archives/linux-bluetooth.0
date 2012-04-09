@@ -2,59 +2,63 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd 3/3] MAP: Output parameters for GetMessagesListing
-Date: Mon,  9 Apr 2012 23:03:00 +0200
-Message-Id: <1334005380-31302-3-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH obexd 2/3] MAP: Input parameters for GetMessagesListing
+Date: Mon,  9 Apr 2012 23:02:59 +0200
+Message-Id: <1334005380-31302-2-git-send-email-lkslawek@gmail.com>
 In-Reply-To: <1334005380-31302-1-git-send-email-lkslawek@gmail.com>
 References: <1334005380-31302-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- plugins/mas.c |   17 +++++++++++++++++
- 1 files changed, 17 insertions(+), 0 deletions(-)
+ plugins/mas.c |   27 +++++++++++++++++++++++++--
+ 1 files changed, 25 insertions(+), 2 deletions(-)
 
 diff --git a/plugins/mas.c b/plugins/mas.c
-index 76dc8e9..576c206 100644
+index 97a37e4..76dc8e9 100644
 --- a/plugins/mas.c
 +++ b/plugins/mas.c
-@@ -282,12 +282,22 @@ static void get_messages_listing_cb(void *session, int err, uint16_t size,
- 					void *user_data)
+@@ -531,6 +531,9 @@ static void *msg_listing_open(const char *name, int oflag, mode_t mode,
  {
- 	struct mas_session *mas = user_data;
+ 	struct mas_session *mas = driver_data;
+ 	struct messages_filter filter = { 0, };
++	/* 1024 is the default when there was no MaxListCount sent */
 +	uint16_t max = 1024;
++	uint16_t offset = 0;
  
- 	if (err < 0 && err != -EAGAIN) {
- 		obex_object_set_io_flags(mas, G_IO_ERR, err);
- 		return;
+ 	DBG("");
+ 
+@@ -539,8 +542,28 @@ static void *msg_listing_open(const char *name, int oflag, mode_t mode,
+ 		return NULL;
  	}
  
+-	*err = messages_get_messages_listing(mas->backend_data, name, 0xffff, 0,
+-			&filter,
 +	map_ap_get_u16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
++	map_ap_get_u16(mas->inparams, MAP_AP_STARTOFFSET, &offset);
 +
-+	if (max == 0) {
-+		if (!entry)
-+			mas->finished = TRUE;
++	map_ap_get_u32(mas->inparams, MAP_AP_PARAMETERMASK,
++						&filter.parameter_mask);
++	map_ap_get_u8(mas->inparams, MAP_AP_FILTERMESSAGETYPE,
++						&filter.type);
++	filter.period_begin = map_ap_get_string(mas->inparams,
++						MAP_AP_FILTERPERIODBEGIN);
++	filter.period_end = map_ap_get_string(mas->inparams,
++						MAP_AP_FILTERPERIODEND);
++	map_ap_get_u8(mas->inparams, MAP_AP_FILTERREADSTATUS,
++						&filter.read_status);
++	filter.recipient = map_ap_get_string(mas->inparams,
++						MAP_AP_FILTERRECIPIENT);
++	filter.originator = map_ap_get_string(mas->inparams,
++						MAP_AP_FILTERORIGINATOR);
++	map_ap_get_u8(mas->inparams, MAP_AP_FILTERPRIORITY,
++						&filter.priority);
 +
-+		goto proceed;
-+	}
-+
- 	if (!mas->nth_call) {
- 		g_string_append(mas->buffer, ML_BODY_BEGIN);
- 		mas->nth_call = TRUE;
-@@ -379,6 +389,13 @@ static void get_messages_listing_cb(void *session, int err, uint16_t size,
- 	g_string_append(mas->buffer, "/>\n");
++	*err = messages_get_messages_listing(mas->backend_data, name, max,
++			offset, &filter,
+ 			get_messages_listing_cb, mas);
  
- proceed:
-+	if (!entry) {
-+		map_ap_set_u16(mas->outparams, MAP_AP_MESSAGESLISTINGSIZE,
-+							size);
-+		map_ap_set_u8(mas->outparams, MAP_AP_NEWMESSAGE,
-+							newmsg ? 1 : 0);
-+	}
-+
- 	if (err != -EAGAIN)
- 		obex_object_set_io_flags(mas, G_IO_IN, 0);
- }
+ 	mas->buffer = g_string_new("");
 -- 
 1.7.5.1
 
