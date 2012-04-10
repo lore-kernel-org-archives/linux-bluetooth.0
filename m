@@ -1,45 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v1 00/11] client: transfer implementation improvements
-Date: Tue, 10 Apr 2012 15:38:21 +0200
-Message-Id: <1334065112-14966-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Tue, 10 Apr 2012 15:47:44 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Julian Calaby <julian.calaby@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
+Message-ID: <20120410124742.GA17779@aemeltch-MOBL1>
+References: <1334059909-20513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1334059909-20513-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CAGRGNgX+R0CrtF2tBJ1AASBqkhHjmEfcqVnJiTd_1mXFL2rVUw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CAGRGNgX+R0CrtF2tBJ1AASBqkhHjmEfcqVnJiTd_1mXFL2rVUw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Julian,
 
-This second version of the series integrates the review from Luiz, affecting patches from v0 01/11 to 05/11. These changes mainly consist of minor corrections including early return statements and function renaming.
+Thanks for review,
 
->From previous cover letter:
+On Tue, Apr 10, 2012 at 10:26:11PM +1000, Julian Calaby wrote:
+> > --- a/net/mac80211/iface.c
+> > +++ b/net/mac80211/iface.c
+> > @@ -898,6 +900,11 @@ static void ieee80211_setup_sdata(struct ieee80211_sub_if_data *sdata,
+> >        case NL80211_IFTYPE_WDS:
+> >        case NL80211_IFTYPE_AP_VLAN:
+> >                break;
+> > +       case NL80211_IFTYPE_VIRTUAL_AMP80211:
+> > +#ifdef CONFIG_MAC80211_VIRTUAL_AMP
+> > +               ieee80211_vamp_setup_sdata(sdata);
+> > +               break;
+> > +#endif
+> >        case NL80211_IFTYPE_UNSPECIFIED:
+> >        case NUM_NL80211_IFTYPES:
+> >                BUG();
+> 
+> Should this really BUG() if VAMP is not enabled? Maybe print a warning
+> and return an error instead.
 
-This patch series includes internal rewrites particularly regarding transfer.c. It includes some api changes, minor fixes and internal refactoring, none of which should affect the D-Bus api.
+I will make it empty inline function.
 
-These changes are convenient by themselves, but they are also motivated by the D-Bus changes to be discussed soon. For example, patch 07/11 separates memory-based transfers from the filesystem-based ones, which will make it easier to decide if memory-based transfers should be removed (as it has been proposed).
+> > diff --git a/net/mac80211/virtual_amp.h b/net/mac80211/virtual_amp.h
+> > new file mode 100644
+> > index 0000000..5b7d219
+> > --- /dev/null
+> > +++ b/net/mac80211/virtual_amp.h
+> > @@ -0,0 +1,29 @@
+> > +/*
+> > + * Virtual / Software AMP 80211 BT Controller header
+> > + *
+> > + * Copyright 2012 Intel Corp.
+> > + *
+> > + * Written by andrei.emeltchenko@intel.com
+> > + *
+> > + * This program is free software; you can redistribute it and/or modify
+> > + * it under the terms of the GNU General Public License version 2 as
+> > + * published by the Free Software Foundation.
+> > + */
+> > +
+> > +#include "ieee80211_i.h"
+> > +
+> > +#ifdef CONFIG_MAC80211_VIRTUAL_AMP
+> > +
+> > +void ieee80211_vamp_setup_sdata(struct ieee80211_sub_if_data *sdata);
+> > +void ieee80211_vamp_clean_sdata(struct ieee80211_sub_if_data *sdata);
+> > +
+> > +struct vamp_data {
+> > +       struct hci_dev *hdev;
+> > +
+> > +       unsigned long flags;
+> > +
+> > +       struct work_struct work;
+> > +       struct sk_buff_head txq;
+> > +};
+> > +
+> > +#endif /* CONFIG_MAC80211_VIRTUAL_AMP */
+> 
+> A cleaner way of doing this is to have the function prototypes
+> specified as empty inline functions when CONFIG_MAC80211_VIRTUAL_AMP
+> is not defined and remove the #ifdefs in the main code. GCC's smart
+> enough to compile away all the empty functions.
 
-Another example is patch 08/11, which will be get simplified once the D-Bus agent is removed.
+Will do this way.
 
-Mikel Astiz (11):
-  client: minor buffer access api changes
-  client: remove unused field
-  client: refactor transfer callback use
-  client: fix progress report before field update
-  client: transfer api merges put and get
-  client: transfers take gobex when starting
-  client: separate memory transfers in transfer api
-  client: open transfer file during creation
-  client: delete file in case of error
-  client: unify transfer implementation
-  client: double transfer buf size in each realloc
-
- client/pbap.c     |    2 +-
- client/session.c  |  146 +++++-------
- client/session.h  |    4 +-
- client/transfer.c |  683 ++++++++++++++++++++++++++++++++---------------------
- client/transfer.h |   48 +++--
- 5 files changed, 508 insertions(+), 375 deletions(-)
-
--- 
-1.7.7.6
+Best regards 
+Andrei Emeltchenko 
 
