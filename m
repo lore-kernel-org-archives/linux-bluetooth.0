@@ -1,70 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hemant Gupta <hemant.gupta@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: Hemant Gupta <hemant.gupta@stericsson.com>
-Subject: [PATCH v3] mgmtops: Handle Start Discovery Complete in case of failure
-Date: Tue, 10 Apr 2012 17:18:47 +0530
-Message-ID: <1334058527-25520-1-git-send-email-hemant.gupta@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20120410103306.GA9418@x220>
+References: <1334052807-14320-1-git-send-email-hemant.gupta@stericsson.com>
+	<20120410103306.GA9418@x220>
+Date: Tue, 10 Apr 2012 17:17:10 +0530
+Message-ID: <CACj007=tu=x=+A5xEP3Zan-rrZC6vQF+N4A8m5Lsh03iKWZzYg@mail.gmail.com>
+Subject: Re: [PATCH v1] mgmtops: Handle Start Discovery Complete in case of failure
+From: Hemant Gupta <hemantgupta.ste@gmail.com>
+To: Hemant Gupta <hemant.gupta@stericsson.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds handling of start discovery complete event in cases
-when discovery fails to get started.
----
- plugins/mgmtops.c |   31 ++++++++++++++++++++++++++++++-
- 1 files changed, 30 insertions(+), 1 deletions(-)
+Hi Johan,
 
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index c08117f..733f1a6 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -1255,6 +1255,35 @@ static void read_local_oob_data_complete(int sk, uint16_t index, void *buf,
- 		oob_read_local_data_complete(adapter, rp->hash, rp->randomizer);
- }
- 
-+static void start_discovery_complete(int sk, uint16_t index, uint8_t status,
-+							void *buf, size_t len)
-+{
-+	uint8_t *type = buf;
-+	struct btd_adapter *adapter;
-+
-+	if (len != sizeof(*type)) {
-+		error("start_discovery_complete event size mismatch "
-+					"(%zu != %zu)", len, sizeof(*type));
-+		return;
-+	}
-+
-+	DBG("hci%u type %u status %u", index, *type, status);
-+
-+	if (index > max_index) {
-+		error("Unexpected index %u in start_discovery_complete",
-+								index);
-+		return;
-+	}
-+
-+	if (!status)
-+		return;
-+
-+	adapter = manager_find_adapter_by_id(index);
-+	if (adapter)
-+		/* Start discovery failed, inform upper layers. */
-+		adapter_set_discovering(adapter, FALSE);
-+}
-+
- static void read_local_oob_data_failed(int sk, uint16_t index)
- {
- 	struct btd_adapter *adapter;
-@@ -1421,7 +1450,7 @@ static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
- 		DBG("set_fast_connectable complete");
- 		break;
- 	case MGMT_OP_START_DISCOVERY:
--		DBG("start_discovery complete");
-+		start_discovery_complete(sk, index, ev->status, ev->data, len);
- 		break;
- 	case MGMT_OP_STOP_DISCOVERY:
- 		DBG("stop_discovery complete");
+On Tue, Apr 10, 2012 at 4:03 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Hemant,
+>
+> On Tue, Apr 10, 2012, Hemant Gupta wrote:
+>> This patch adds handling of start discovery complete event in cases
+>> when discovery fails to get started.
+>> ---
+>>  plugins/mgmtops.c |   33 ++++++++++++++++++++++++++++++++-
+>>  1 files changed, 32 insertions(+), 1 deletions(-)
+>
+> The patch is now applied but I still had to fix it up manually myself:
+>
+>> +static void start_discovery_complete(int sk, uint16_t index, uint8_t status,
+>> +                                  void *buf, size_t len)
+>
+> Incorrect indentation above: you should indent with tabs as much as
+> possible while remaining under the 80 character boundary.
+>
+>> +     if (len != sizeof(*type)) {
+>> +             error("start_discovery_complete event size mismatch "
+>> +                     "(%zu != %zu)", len, sizeof(*type));
+>
+> This should also be indented more.
+>
+>> +     DBG("type %u status %u", *type, status);
+>
+> Where did the hci%u go? I meant move the entire DBG statement here and
+> not just part of it (it's perfectly fine to print the index value even
+> though it's > max_index).
+>
+>> +     if (index > max_index) {
+>> +             error("Unexpected index %u in start_discovery_complete",
+>> +                     index);
+>
+> Incorrect indentation again (should be indented more)
+>
+>> +     DBG("hci%u", index);
+>
+> And the above should go away assuming that you move the entire statement
+> to the new location.
+>
+Thanks for the comments, I will upload a new patch soon.
+
+> I think we'll need to reexamine the user space coding style now that the
+> kernel doesn't use a strict tabs-only approach anymore. But for now
+> we're still following the style we've always used in user space.
+>
+> Johan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-1.7.0.4
-
+Best Regards
+Hemant Gupta
+ST-Ericsson India
