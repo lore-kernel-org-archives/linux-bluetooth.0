@@ -1,50 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 10 Apr 2012 13:04:56 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Hemant Gupta <hemantgupta.ste@gmail.com>
+Cc: Hemant Gupta <hemant.gupta@stericsson.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] mgmtops: Handle Start Discovery Complete in case of
+ failure
+Message-ID: <20120410100456.GA7832@x220>
+References: <1333955251-8377-1-git-send-email-hemant.gupta@stericsson.com>
+ <20120410091320.GA6124@x220>
+ <CACj007=DC4gon83DoNTLn-X8gG+ehojwY7E-bVP3YxMkLvhFKA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <05C57A66007544188BE786ECFA833CBA@sisodomain.com>
-References: <1332844351-13732-1-git-send-email-jaganath.k@samsung.com>
-	<05C57A66007544188BE786ECFA833CBA@sisodomain.com>
-Date: Tue, 10 Apr 2012 07:11:59 -0300
-Message-ID: <CABBYNZ+vXAmWW-cuEyTAkGa1y7q-zYB=o4Yx_BKfycf161XjiQ@mail.gmail.com>
-Subject: Re: [PATCH obexd 1/2] gobex: Introduce g_obex_abort_transfer()
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jaganath <jaganath.k@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CACj007=DC4gon83DoNTLn-X8gG+ehojwY7E-bVP3YxMkLvhFKA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi Hemant,
 
-On Wed, Apr 4, 2012 at 2:11 AM, Jaganath <jaganath.k@samsung.com> wrote:
->
-> Hi,
->
-> --------------------------------------------------
-> From: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
-> Sent: Tuesday, March 27, 2012 4:02 PM
-> To: <linux-bluetooth@vger.kernel.org>
-> Cc: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
-> Subject: [PATCH obexd 1/2] gobex: Introduce g_obex_abort_transfer()
->
->
->> This function sends the abort request and wait for response before
->> disconnection. This patch fixes the issue ABORT packet not sending
->> when user cancels the transfer.
->> ---
->> gobex/gobex-transfer.c |   22 +++++++++++++++++++++-
->> gobex/gobex.c          |    4 ++--
->> gobex/gobex.h          |    4 ++++
->> 3 files changed, 27 insertions(+), 3 deletions(-)
->>
->
-> Any update on this patch please?
+On Tue, Apr 10, 2012, Hemant Gupta wrote:
+> Sorry, but I thought we need to allign to the opening brace.
 
-g_obex_abort_transfer seems like a good idea, I just did not like the
-idea of resetting the callback though because then we cannot tell when
-remote has replied which is what Transfer.Cancel should be doing.
+That's for the kernel. We haven't changed the expected coding style for
+user space.
 
-Btw, can you please add a unit test for this problem?
-
-
--- 
-Luiz Augusto von Dentz
+Johan
