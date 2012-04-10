@@ -1,72 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hemant Gupta <hemant.gupta@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: Hemant Gupta <hemant.gupta@stericsson.com>
-Subject: [PATCH v1] mgmtops: Handle Start Discovery Complete in case of failure
-Date: Tue, 10 Apr 2012 15:43:27 +0530
-Message-ID: <1334052807-14320-1-git-send-email-hemant.gupta@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <05C57A66007544188BE786ECFA833CBA@sisodomain.com>
+References: <1332844351-13732-1-git-send-email-jaganath.k@samsung.com>
+	<05C57A66007544188BE786ECFA833CBA@sisodomain.com>
+Date: Tue, 10 Apr 2012 07:11:59 -0300
+Message-ID: <CABBYNZ+vXAmWW-cuEyTAkGa1y7q-zYB=o4Yx_BKfycf161XjiQ@mail.gmail.com>
+Subject: Re: [PATCH obexd 1/2] gobex: Introduce g_obex_abort_transfer()
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jaganath <jaganath.k@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds handling of start discovery complete event in cases
-when discovery fails to get started.
----
- plugins/mgmtops.c |   33 ++++++++++++++++++++++++++++++++-
- 1 files changed, 32 insertions(+), 1 deletions(-)
+Hi Jaganath,
 
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index c08117f..9de490d 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -1255,6 +1255,37 @@ static void read_local_oob_data_complete(int sk, uint16_t index, void *buf,
- 		oob_read_local_data_complete(adapter, rp->hash, rp->randomizer);
- }
- 
-+static void start_discovery_complete(int sk, uint16_t index, uint8_t status,
-+				     void *buf, size_t len)
-+{
-+	uint8_t *type = buf;
-+	struct btd_adapter *adapter;
-+
-+	if (len != sizeof(*type)) {
-+		error("start_discovery_complete event size mismatch "
-+			"(%zu != %zu)", len, sizeof(*type));
-+		return;
-+	}
-+
-+	DBG("type %u status %u", *type, status);
-+
-+	if (index > max_index) {
-+		error("Unexpected index %u in start_discovery_complete",
-+			index);
-+		return;
-+	}
-+
-+	if (!status)
-+		return;
-+
-+	DBG("hci%u", index);
-+
-+	adapter = manager_find_adapter_by_id(index);
-+	if (adapter)
-+		/* Start discovery failed, inform upper layers. */
-+		adapter_set_discovering(adapter, FALSE);
-+}
-+
- static void read_local_oob_data_failed(int sk, uint16_t index)
- {
- 	struct btd_adapter *adapter;
-@@ -1421,7 +1452,7 @@ static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
- 		DBG("set_fast_connectable complete");
- 		break;
- 	case MGMT_OP_START_DISCOVERY:
--		DBG("start_discovery complete");
-+		start_discovery_complete(sk, index, ev->status, ev->data, len);
- 		break;
- 	case MGMT_OP_STOP_DISCOVERY:
- 		DBG("stop_discovery complete");
+On Wed, Apr 4, 2012 at 2:11 AM, Jaganath <jaganath.k@samsung.com> wrote:
+>
+> Hi,
+>
+> --------------------------------------------------
+> From: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
+> Sent: Tuesday, March 27, 2012 4:02 PM
+> To: <linux-bluetooth@vger.kernel.org>
+> Cc: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
+> Subject: [PATCH obexd 1/2] gobex: Introduce g_obex_abort_transfer()
+>
+>
+>> This function sends the abort request and wait for response before
+>> disconnection. This patch fixes the issue ABORT packet not sending
+>> when user cancels the transfer.
+>> ---
+>> gobex/gobex-transfer.c |   22 +++++++++++++++++++++-
+>> gobex/gobex.c          |    4 ++--
+>> gobex/gobex.h          |    4 ++++
+>> 3 files changed, 27 insertions(+), 3 deletions(-)
+>>
+>
+> Any update on this patch please?
+
+g_obex_abort_transfer seems like a good idea, I just did not like the
+idea of resetting the callback though because then we cannot tell when
+remote has replied which is what Transfer.Cancel should be doing.
+
+Btw, can you please add a unit test for this problem?
+
+
 -- 
-1.7.0.4
-
+Luiz Augusto von Dentz
