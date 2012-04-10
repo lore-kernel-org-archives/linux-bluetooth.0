@@ -1,91 +1,181 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] audio: Fix memory leak when headset server probe() fails
-Date: Tue, 10 Apr 2012 16:22:48 -0400
-Message-Id: <1334089368-6920-1-git-send-email-anderson.lizardo@openbossa.org>
+Message-ID: <4F846257.1060807@sipsolutions.net>
+Date: Tue, 10 Apr 2012 18:39:51 +0200
+From: Johannes Berg <johannes@sipsolutions.net>
+MIME-Version: 1.0
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+CC: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
+References: <1334059909-20513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1334059909-20513-2-git-send-email-Andrei.Emeltchenko.news@gmail.com> (sfid-20120410_141120_556160_FD038CE7)
+In-Reply-To: <1334059909-20513-2-git-send-email-Andrei.Emeltchenko.news@gmail.com> (sfid-20120410_141120_556160_FD038CE7)
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If RFCOMM is disabled on the kernel, headset_server_probe() fails.
-Relevant log messages:
+Hi Andrei,
 
- audio/manager.c:headset_server_probe() path /org/bluez/499/hci0
- src/adapter.c:btd_adapter_ref() 0x4bb4f78: ref=6
- audio/manager.c:audio_adapter_ref() 0x4ca3010: ref=1
- socket(STREAM, RFCOMM): Protocol not supported (93)
- audio/manager.c:audio_adapter_unref() 0x4ca3010: ref=0
- src/adapter.c:btd_adapter_unref() 0x4bb4f78: ref=5
- audio-headset: Operation not permitted (1)
+> Add new interface type VIRTUAL_AMP80211 which emulates Bluetooth AMP
+> Controller. AMP is Alternate MAC/PHYs Controller for Bluetooth sybsystem.
+> When an AMP is common between the two devices, the Bluetooth system
+> provides mechanisms for moving data traffic from BR/EDR Controller to
+> an AMP Controller.
 
-The powered callback should only be registered if adapter driver probe
-was successful. The callback unregister was moved to the beginning of
-headset_server_remove() for consistency.
+Interesting work. I would have expected to see more work in cfg80211 
+though, this is a bit unexpected. How is it controlled at all?
 
-This fixes this memory leak:
+>   create mode 100644 net/mac80211/virtual_amp.c
 
-==499== 8 bytes in 1 blocks are definitely lost in loss record 44 of 182
-==499==    at 0x4826444: malloc (vg_replace_malloc.c:263)
-==499==    by 0x4877243: g_malloc (gmem.c:132)
-==499==    by 0x488D088: g_slice_alloc (gslice.c:836)
-==499==    by 0x488E8A5: g_slist_append (gslist.c:230)
-==499==    by 0x18AEEE: btd_adapter_register_powered_callback
-(adapter.c:3416)
-==499==    by 0x11AF61: headset_server_probe (manager.c:919)
-==499==    by 0x18B67B: probe_driver (adapter.c:2033)
-==499==    by 0x1908F5: adapter_init (adapter.c:2048)
-==499==    by 0x189D20: btd_manager_register_adapter (manager.c:397)
-==499==    by 0x1649AF: mgmt_cmd_complete (mgmtops.c:1075)
-==499==    by 0x16665E: mgmt_event (mgmtops.c:1780)
-==499==    by 0x48B2EFA: g_io_unix_dispatch (giounix.c:162)
----
- audio/manager.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+Also, why is it "virtual"? I would rather you name the file btamp.c or 
+such -- to you, AMP may mean something, but to us wifi people it really 
+doesn't mean much. I suspect most wouldn't even know where to look for a 
+definition of it.
 
-NOTE: I was only able to test the failure case as illustrated below, but I
-expect that nothing else is affected, given that no other code is expected to
-run after probe() fails (right?)
- 
-diff --git a/audio/manager.c b/audio/manager.c
-index 170ed23..aa2547c 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -916,14 +916,14 @@ static int headset_server_probe(struct btd_adapter *adapter)
- 	if (!adp)
- 		return -EINVAL;
- 
--	btd_adapter_register_powered_callback(adapter, state_changed);
--
- 	err = headset_server_init(adp);
- 	if (err < 0) {
- 		audio_adapter_unref(adp);
- 		return err;
- 	}
- 
-+	btd_adapter_register_powered_callback(adapter, state_changed);
-+
- 	return 0;
- }
- 
-@@ -934,6 +934,8 @@ static void headset_server_remove(struct btd_adapter *adapter)
- 
- 	DBG("path %s", path);
- 
-+	btd_adapter_unregister_powered_callback(adapter, state_changed);
-+
- 	adp = find_adapter(adapters, adapter);
- 	if (!adp)
- 		return;
-@@ -960,8 +962,6 @@ static void headset_server_remove(struct btd_adapter *adapter)
- 		adp->hfp_ag_server = NULL;
- 	}
- 
--	btd_adapter_unregister_powered_callback(adapter, state_changed);
--
- 	audio_adapter_unref(adp);
- }
- 
--- 
-1.7.5.4
+> --- a/drivers/net/wireless/mac80211_hwsim.c
+> +++ b/drivers/net/wireless/mac80211_hwsim.c
+> @@ -1783,7 +1783,8 @@ static int __init init_mac80211_hwsim(void)
+>   			BIT(NL80211_IFTYPE_P2P_CLIENT) |
+>   			BIT(NL80211_IFTYPE_P2P_GO) |
+>   			BIT(NL80211_IFTYPE_ADHOC) |
+> -			BIT(NL80211_IFTYPE_MESH_POINT);
+> +			BIT(NL80211_IFTYPE_MESH_POINT) |
+> +			BIT(NL80211_IFTYPE_VIRTUAL_AMP80211);
 
+This is insufficient, it should also beacon.
+
+> +++ b/include/linux/nl80211.h
+> @@ -1546,6 +1546,7 @@ enum nl80211_iftype {
+>   	NL80211_IFTYPE_MESH_POINT,
+>   	NL80211_IFTYPE_P2P_CLIENT,
+>   	NL80211_IFTYPE_P2P_GO,
+> +	NL80211_IFTYPE_VIRTUAL_AMP80211,
+
+I believe that this may need additional checks in cfg80211 so that you 
+can't simply add this interface type.
+
+> +config MAC80211_VIRTUAL_AMP
+> +	bool "Virtual AMP80211 device"
+> +	---help---
+> +	  Enable Bluetooth Virtual / Software AMP 80211 controller.
+> +	  When AMP is common between two devices data may be routed
+> +	  through fast 80211 connection from standard Bluetooth BR/EDR
+
+802.11, and the whole virtual vs. Bluetooth thing again.
+
+Also, it seems this really needs a dependency on BT.
+
+> diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
+> index d9798a3..0e39ed7 100644
+> --- a/net/mac80211/ieee80211_i.h
+> +++ b/net/mac80211/ieee80211_i.h
+> @@ -709,6 +709,10 @@ struct ieee80211_sub_if_data {
+>   	u32 rc_rateidx_mask[IEEE80211_NUM_BANDS];
+>   	u8  rc_rateidx_mcs_mask[IEEE80211_NUM_BANDS][IEEE80211_HT_MCS_MASK_LEN];
+>
+> +#ifdef CONFIG_MAC80211_VIRTUAL_AMP
+> +	struct hci_dev *hdev;
+> +#endif
+
+That should be inside the union:
+
+>   	union {
+>   		struct ieee80211_if_ap ap;
+>   		struct ieee80211_if_wds wds;
+
+> @@ -898,6 +900,11 @@ static void ieee80211_setup_sdata(struct ieee80211_sub_if_data *sdata,
+>   	case NL80211_IFTYPE_WDS:
+>   	case NL80211_IFTYPE_AP_VLAN:
+>   		break;
+> +	case NL80211_IFTYPE_VIRTUAL_AMP80211:
+> +#ifdef CONFIG_MAC80211_VIRTUAL_AMP
+> +		ieee80211_vamp_setup_sdata(sdata);
+
+I also really don't like the abbrevation "vamp". It means even less than 
+"virtual AMP", particularly for people not familiar with BT terminology. 
+Please also use btamp or so.
+
+> +static void ieee80211_clean_sdata(struct ieee80211_sub_if_data *sdata)
+> +{
+> +	switch (sdata->vif.type) {
+> +	case NL80211_IFTYPE_VIRTUAL_AMP80211:
+> +#ifdef CONFIG_MAC80211_VIRTUAL_AMP
+> +		ieee80211_vamp_clean_sdata(sdata);
+> +#endif
+
+That's really bad form. Please hide the ifdefs better, or use an if 
+construct with something like vif_is_mesh() below that will not need ifdefs:
+
+> @@ -1230,6 +1250,9 @@ void ieee80211_if_remove(struct ieee80211_sub_if_data *sdata)
+>   	if (ieee80211_vif_is_mesh(&sdata->vif))
+>   		mesh_path_flush_by_iface(sdata);
+>
+> +	/* clean up type-dependent data */
+> +	ieee80211_clean_sdata(sdata);
+
+Seems you should move the mesh pieces into the new function ... Possibly 
+as a previous refactor patch.
+
+> --- a/net/mac80211/util.c
+> +++ b/net/mac80211/util.c
+> @@ -1299,6 +1299,7 @@ int ieee80211_reconfig(struct ieee80211_local *local)
+>   		case NUM_NL80211_IFTYPES:
+>   		case NL80211_IFTYPE_P2P_CLIENT:
+>   		case NL80211_IFTYPE_P2P_GO:
+> +		case NL80211_IFTYPE_VIRTUAL_AMP80211:
+>   			WARN_ON(1);
+
+Umm. This can happen, I'd say.
+
+> +#include<net/bluetooth/bluetooth.h>
+
+I'm not sure I fully trust thunderbird, but there seem to be missing spaces.
+
+> +static int virtual_amp_init(struct ieee80211_sub_if_data *sdata)
+> +{
+> +	struct hci_dev *hdev;
+> +	struct vamp_data *data;
+> +
+> +	data = kzalloc(sizeof(struct vamp_data), GFP_KERNEL);
+> +	if (!data)
+> +		return -ENOMEM;
+
+Why can't you embed the data in the union inside the sdata? it's 
+probably smaller than managed anyway.
+
+> +	hdev->bus = HCI_VIRTUAL;
+
+Should that really be that way?
+
+> +	hci_set_drvdata(hdev, data);
+> +
+> +	hdev->dev_type = HCI_AMP;
+> +
+> +	hdev->open     = vamp_open_dev;
+> +	hdev->close    = vamp_close_dev;
+> +	hdev->flush    = vamp_flush;
+> +	hdev->send     = vamp_send_frame;
+> +
+> +	if (hci_register_dev(hdev)<  0) {
+> +		BT_ERR("Can't register HCI device");
+> +		kfree(data);
+> +		hci_free_dev(hdev);
+> +		return -EBUSY;
+> +	}
+
+Why go have return values when you don't use them:
+
+> +void ieee80211_vamp_setup_sdata(struct ieee80211_sub_if_data *sdata)
+> +{
+> +	pr_info("Create virtual AMP device");
+> +
+> +	virtual_amp_init(sdata);
+> +
+> +}
+
+Anyway.
+
+I don't get this patch at all. Why am I reviewing some very very basic 
+skeleton code when we should be discussing userspace APIs (we have 
+already discussed them with a few people years ago), how the AMP is 
+going to be managed, how the security handshake is going to work, etc.
+
+johannes
