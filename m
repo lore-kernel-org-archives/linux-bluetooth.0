@@ -1,63 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: [RFCv1] Draft Software/Virtual AMP80211
-Date: Tue, 10 Apr 2012 15:11:48 +0300
-Message-Id: <1334059909-20513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 10 Apr 2012 14:58:20 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Hemant Gupta <hemantgupta.ste@gmail.com>
+Cc: Hemant Gupta <hemant.gupta@stericsson.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v1] mgmtops: Handle Start Discovery Complete in case of
+ failure
+Message-ID: <20120410115820.GA4777@x220>
+References: <1334052807-14320-1-git-send-email-hemant.gupta@stericsson.com>
+ <20120410103306.GA9418@x220>
+ <CACj007=tu=x=+A5xEP3Zan-rrZC6vQF+N4A8m5Lsh03iKWZzYg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CACj007=tu=x=+A5xEP3Zan-rrZC6vQF+N4A8m5Lsh03iKWZzYg@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Hemant,
 
-RFC for Software / Virtual _DRAFT_ implementation of Bluetooth High Speed
-by using wireless driver.
+On Tue, Apr 10, 2012, Hemant Gupta wrote:
+> On Tue, Apr 10, 2012 at 4:03 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> > Hi Hemant,
+> >
+> > On Tue, Apr 10, 2012, Hemant Gupta wrote:
+> >> This patch adds handling of start discovery complete event in cases
+> >> when discovery fails to get started.
+> >> ---
+> >>  plugins/mgmtops.c |   33 ++++++++++++++++++++++++++++++++-
+> >>  1 files changed, 32 insertions(+), 1 deletions(-)
+> >
+> > The patch is now applied but I still had to fix it up manually myself:
+<snip>
+> Thanks for the comments, I will upload a new patch soon.
 
-Currently it can be used for testing Bluetooth A2MP protocol.
+I think you missed my comment above that I already fixed this myself and
+applied the patch :)
 
-Please comment is this right way of implementing things like: using virtual
-interface to enable AMP. Shall I use module instead? Shall I put files to
-mac80211 or use other location? Is name "vamp" OK? Other variants are:
-softamp, soft_amp, soft_amp80211, etc.
-
-Main ideas:
- - Use existing wireless infrastructure nl80211, mac80211.
- - Use virtual interface of type NL80211_IFTYPE_VIRTUAL_AMP80211. Then all
-drivers supporting virtual interface should work.
-
-After modifying iw it will be enabled by adding new virtual interface.
-
-# iw phy <physical device> interface add vamp type vamp
-# iw dev
-phy#0
-	Interface vamp
-		ifindex 6
-		type Virtual AMP
-...
-# hciconfig 
-hci1:	Type: AMP  Bus: VIRTUAL
-	BD Address: 00:00:00:00:00:00  ACL MTU: 0:0  SCO MTU: 0:0
-	DOWN 
-	RX bytes:0 acl:0 sco:0 events:0 errors:0
-	TX bytes:0 acl:0 sco:0 commands:0 errors:0
-...
-
-
-Andrei Emeltchenko (1):
-  mac80211: Adds Software / Virtual AMP 80211
-
- drivers/net/wireless/mac80211_hwsim.c |    3 +-
- include/linux/nl80211.h               |    1 +
- net/mac80211/Kconfig                  |    8 ++
- net/mac80211/Makefile                 |    2 +
- net/mac80211/ieee80211_i.h            |    4 +
- net/mac80211/iface.c                  |   25 ++++
- net/mac80211/util.c                   |    1 +
- net/mac80211/virtual_amp.c            |  205 +++++++++++++++++++++++++++++++++
- net/mac80211/virtual_amp.h            |   29 +++++
- 9 files changed, 277 insertions(+), 1 deletions(-)
- create mode 100644 net/mac80211/virtual_amp.c
- create mode 100644 net/mac80211/virtual_amp.h
-
--- 
-1.7.9.1
-
+Johan
