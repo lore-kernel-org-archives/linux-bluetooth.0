@@ -1,114 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1333643105.16897.12.camel@aeonflux>
-References: <1333624699-7922-1-git-send-email-vishal.agarwal@stericsson.com>
-	<1333643105.16897.12.camel@aeonflux>
-Date: Wed, 11 Apr 2012 09:13:19 +0530
-Message-ID: <CA+_sZW_hNAMvxKzUXcvBYDEQTtzK=q0VSyKgWJkLiU5RpZTvuw@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Temporary keys should be retained during connection
-From: vishal agarwal <vishal.bluez@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Vishal Agarwal <vishal.agarwal@stericsson.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1334093378.16897.62.camel@aeonflux>
+Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Date: Tue, 10 Apr 2012 23:29:38 +0200
+In-Reply-To: <4F84A422.3030900@sipsolutions.net>
+References: <1334059909-20513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	  <1334059909-20513-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	  (sfid-20120410_141120_556160_FD038CE7) <4F846257.1060807@sipsolutions.net>
+	 <1334092668.16897.54.camel@aeonflux> <4F84A422.3030900@sipsolutions.net>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johannes,
 
-On Thu, Apr 5, 2012 at 9:55 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
-:
-> Hi Vishal,
->
->> If a key is non persistent then it should not be used in future
->> connections but it should be kept for current connection. And
->> it should be removed when connecion is removed.
->> Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
->> ---
->> =A0include/net/bluetooth/hci_core.h | =A0 =A01 +
->> =A0net/bluetooth/hci_core.c =A0 =A0 =A0 =A0 | =A0 11 +++++++----
->> =A0net/bluetooth/hci_event.c =A0 =A0 =A0 =A0| =A0 =A02 ++
->> =A03 files changed, 10 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hc=
-i_core.h
->> index c0b232c..ce7a415 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -318,6 +318,7 @@ struct hci_conn {
->>
->> =A0 =A0 =A0 __u8 =A0 =A0 =A0 =A0 =A0 =A0remote_cap;
->> =A0 =A0 =A0 __u8 =A0 =A0 =A0 =A0 =A0 =A0remote_auth;
->> + =A0 =A0 bool =A0 =A0 =A0 =A0 =A0 =A0temp_link_key;
->
-> I would actually rename this into an action. So something like
-> flush_key.
->
->> =A0 =A0 =A0 unsigned int =A0 =A0sent;
->>
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index 286f3fc..fddd0ac 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -1330,10 +1330,13 @@ int hci_add_link_key(struct hci_dev *hdev, struc=
-t hci_conn *conn, int new_key,
->>
->> =A0 =A0 =A0 mgmt_new_link_key(hdev, key, persistent);
->>
->> - =A0 =A0 if (!persistent) {
->> - =A0 =A0 =A0 =A0 =A0 =A0 list_del(&key->list);
->> - =A0 =A0 =A0 =A0 =A0 =A0 kfree(key);
->> - =A0 =A0 }
->> + =A0 =A0 if (!conn)
->> + =A0 =A0 =A0 =A0 =A0 =A0 return 0;
->> +
->> + =A0 =A0 if (persistent)
->> + =A0 =A0 =A0 =A0 =A0 =A0 conn->temp_link_key =3D false;
->> + =A0 =A0 else
->> + =A0 =A0 =A0 =A0 =A0 =A0 conn->temp_link_key =3D true;
->
-> So I would actually prefer a cleanup patch first that changes
-> hci_persistent_key() function into a bool return value.
->
-> After that it could become just like this
->
-> =A0 =A0 =A0 =A0conn->temp_link_key =3D !persistent;
->
+> >> I don't get this patch at all. Why am I reviewing some very very basic
+> >> skeleton code when we should be discussing userspace APIs (we have
+> >> already discussed them with a few people years ago), how the AMP is
+> >> going to be managed, how the security handshake is going to work, etc.
+> >
+> > adding AMP (meaning Bluetooth Alternate MAC/PHY in case anybody cares)
+> > for SoftMac WiFi cards should be done solely in kernel space between
+> > Bluetooth core and mac80211. All the FullMac cards will expose the HCI
+> > AMP directly via the Bluetooth core. See Marvell solution for example.
+> >
+> > If we require a userspace interaction, I think we are doing something
+> > wrong here. And as far as I can tell, the only tricky part is the WPA2
+> > PSK 4-way handshake. We would need a kernel implementation for that.
+> 
+> You already know I disagree, I don't want this code re-implemented in 
+> kernel space when adding a few tightly controlled APIs is all it needs 
+> to use an existing implementation of the relevant mechanisms.
 
-As this persistent variable is also used in function mgmt_new_link_key,
-which sends this value to bluez as store_hint and bluez stores the key
-on the basis of this value. So this will require 2 cleanup patches, one for
-bluez and one for kernel. thats what you want?
->>
->> =A0 =A0 =A0 return 0;
->> =A0}
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index 7325300..0b19852 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -1928,6 +1928,8 @@ static inline void hci_disconn_complete_evt(struct=
- hci_dev *hdev, struct sk_buff
->> =A0 =A0 =A0 }
->>
->> =A0 =A0 =A0 if (ev->status =3D=3D 0) {
->> + =A0 =A0 =A0 =A0 =A0 =A0 if (conn->type =3D=3D ACL_LINK && conn->temp_l=
-ink_key)
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 hci_remove_link_key(hdev, &con=
-n->dst);
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 hci_proto_disconn_cfm(conn, ev->reason);
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 hci_conn_del(conn);
->> =A0 =A0 =A0 }
->
-> Otherwise this looks all reasonable.
->
-> Regards
->
-> Marcel
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+I know that, but I still think it is the right approach here. It might
+take me a bit longer to convince you ;)
 
-Thanks
-Vishal
+The whole AMP control goes via A2MP and L2CAP and both are fully
+implemented inside the kernel. In theory we do not even need to expose
+HCI AMP interfaces to userspace. We just do it for convince right now so
+we can sniff the transfers, but even that is no longer needed with the
+addition of the Bluetooth monitor socket.
+
+Anyway, my real point is that we should not need any extra userspace API
+to add support for Bluetooth HS in mac80211.
+
+Regards
+
+Marcel
+
+
