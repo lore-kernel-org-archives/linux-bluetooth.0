@@ -1,40 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 Apr 2012 10:30:07 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: vishal agarwal <vishal.bluez@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Vishal Agarwal <vishal.agarwal@stericsson.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Temporary keys should be retained during
- connection
-Message-ID: <20120411073007.GA10605@x220.P-661HNU-F1>
-References: <1333624699-7922-1-git-send-email-vishal.agarwal@stericsson.com>
- <1333643105.16897.12.camel@aeonflux>
- <CA+_sZW_hNAMvxKzUXcvBYDEQTtzK=q0VSyKgWJkLiU5RpZTvuw@mail.gmail.com>
+Date: Wed, 11 Apr 2012 10:11:21 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+	linux-wireless@vger.kernel.org
+Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
+Message-ID: <20120411071119.GC17779@aemeltch-MOBL1>
+References: <1334059909-20513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1334059909-20513-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <4F846257.1060807@sipsolutions.net>
+ <1334092668.16897.54.camel@aeonflux>
+ <4F84A422.3030900@sipsolutions.net>
+ <4F84A52A.7050905@sipsolutions.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CA+_sZW_hNAMvxKzUXcvBYDEQTtzK=q0VSyKgWJkLiU5RpZTvuw@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4F84A52A.7050905@sipsolutions.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vishal,
+Hi Johannes,
 
-On Wed, Apr 11, 2012, vishal agarwal wrote:
-> > So I would actually prefer a cleanup patch first that changes
-> > hci_persistent_key() function into a bool return value.
+On Tue, Apr 10, 2012 at 02:24:58PM -0700, Johannes Berg wrote:
+> On 4/10/2012 2:20 PM, Johannes Berg wrote:
+> >>>I don't get this patch at all. Why am I reviewing some very very basic
+> >>>skeleton code when we should be discussing userspace APIs (we have
+> >>>already discussed them with a few people years ago), how the AMP is
+> >>>going to be managed, how the security handshake is going to work, etc.
+> >>
+> >>adding AMP (meaning Bluetooth Alternate MAC/PHY in case anybody cares)
+> >>for SoftMac WiFi cards should be done solely in kernel space between
+> >>Bluetooth core and mac80211. All the FullMac cards will expose the HCI
+> >>AMP directly via the Bluetooth core. See Marvell solution for example.
+> >>
+> >>If we require a userspace interaction, I think we are doing something
+> >>wrong here. And as far as I can tell, the only tricky part is the WPA2
+> >>PSK 4-way handshake. We would need a kernel implementation for that.
 > >
-> > After that it could become just like this
-> >
-> >        conn->temp_link_key = !persistent;
-> >
+> >You already know I disagree, I don't want this code re-implemented in
+> >kernel space when adding a few tightly controlled APIs is all it needs
+> >to use an existing implementation of the relevant mechanisms.
 > 
-> As this persistent variable is also used in function mgmt_new_link_key,
-> which sends this value to bluez as store_hint and bluez stores the key
-> on the basis of this value. So this will require 2 cleanup patches, one for
-> bluez and one for kernel. thats what you want?
+> There are also additional complexities like wpa_supplicant having to
+> know whether to set up/tear down a BT AMP interface for P2P
+> concurrency etc.,
 
-No, don't change the mgmt protocol or user space. Changing
-mgmt_new_link_key to take bool instead of u8 as a parameter does make
-sense though and you could have that in the same cleanup patch as the
-hci_persistent_key change.
+I am new to the wireless code but can new virtual interface separate those
+interfaces? They can have different MAC addresses and you can run
+wpa_supplicant for each virtual interface separately.
 
-Johan
+Best regards 
+Andrei Emeltchenko 
