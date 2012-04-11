@@ -3,9 +3,9 @@ From: Michal Labedzki <michal.labedzki@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <luiz.dentz@gmail.com>, <lucas.demarchi@profusion.mobi>,
 	Michal Labedzki <michal.labedzki@tieto.com>
-Subject: [PATCH 2/3] AVRCP: Remove unused field in player structure
-Date: Wed, 11 Apr 2012 11:12:37 +0200
-Message-ID: <1334135558-21866-3-git-send-email-michal.labedzki@tieto.com>
+Subject: [PATCH 1/3] AVRCP: Add missing capability for TrackReachedEnd
+Date: Wed, 11 Apr 2012 11:12:36 +0200
+Message-ID: <1334135558-21866-2-git-send-email-michal.labedzki@tieto.com>
 In-Reply-To: <1334135558-21866-1-git-send-email-michal.labedzki@tieto.com>
 References: <1334135558-21866-1-git-send-email-michal.labedzki@tieto.com>
 MIME-Version: 1.0
@@ -13,23 +13,30 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remove unused "audio_device" field in player structure.
+Add missing capability for TrackReachedEnd.
 ---
- audio/avrcp.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
+ audio/avrcp.c |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/audio/avrcp.c b/audio/avrcp.c
-index d456023..f0c9665 100644
+index 8eba046..d456023 100644
 --- a/audio/avrcp.c
 +++ b/audio/avrcp.c
-@@ -146,7 +146,6 @@ struct pending_pdu {
- struct avrcp_player {
- 	struct avrcp_server *server;
- 	struct avctp *session;
--	struct audio_device *dev;
+@@ -557,11 +557,12 @@ static uint8_t avrcp_handle_get_capabilities(struct avrcp_player *player,
  
- 	unsigned int handler;
- 	uint16_t registered_events;
+ 		return AVC_CTYPE_STABLE;
+ 	case CAP_EVENTS_SUPPORTED:
+-		pdu->params_len = htons(5);
+-		pdu->params[1] = 3;
++		pdu->params_len = htons(2 + 4);
++		pdu->params[1] = 4;
+ 		pdu->params[2] = AVRCP_EVENT_STATUS_CHANGED;
+ 		pdu->params[3] = AVRCP_EVENT_TRACK_CHANGED;
+ 		pdu->params[4] = AVRCP_EVENT_TRACK_REACHED_START;
++		pdu->params[5] = AVRCP_EVENT_TRACK_REACHED_END;
+ 
+ 		return AVC_CTYPE_STABLE;
+ 	}
 -- 
 on behalf of ST-Ericsson
 
