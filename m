@@ -1,67 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 11 Apr 2012 16:33:53 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv6 05/26] Bluetooth: A2MP: Build and Send msg helpers
+Message-ID: <20120411133351.GA22183@aemeltch-MOBL1>
+References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1332941509-21345-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1332941509-21345-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20120406224439.GE2915@joana>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+Rd8Gh+yZUOhtnqHc-r4PKuxqgzMDYRJMoPpvhKv=jAQ@mail.gmail.com>
-References: <1334069261-3668-1-git-send-email-lkslawek@gmail.com>
-	<CABBYNZ+Rd8Gh+yZUOhtnqHc-r4PKuxqgzMDYRJMoPpvhKv=jAQ@mail.gmail.com>
-Date: Wed, 11 Apr 2012 16:04:02 +0200
-Message-ID: <CA+i+Aw2=gfaoQimn4bG8hSYRRacwMbCy9SNigs7ji-ejy0kr-w@mail.gmail.com>
-Subject: Re: [PATCH obexd v2 1/3] MAP: Mark filter strings const
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120406224439.GE2915@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Apr 11, 2012 at 3:19 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Slawomir,
->
-> On Tue, Apr 10, 2012 at 5:47 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
->> This structure is used for giving filters as input argument to
->> messages_get_messages_listing(). There is no need for the string members
->> to be modifiable in this context. And making them const plays well with
->> map_ap_get_string(), from which the values of these members are going to
->> be retrieved.
->> ---
->> v2: Turn on verbose mode in commit messages
->>
->>  plugins/messages.h |    8 ++++----
->>  1 files changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/plugins/messages.h b/plugins/messages.h
->> index 00a040c..2cdd92f 100644
->> --- a/plugins/messages.h
->> +++ b/plugins/messages.h
->> @@ -111,11 +111,11 @@ struct messages_event {
->>  struct messages_filter {
->>        uint32_t parameter_mask;
->>        uint8_t type;
->> -       char *period_begin;
->> -       char *period_end;
->> +       const char *period_begin;
->> +       const char *period_end;
->>        uint8_t read_status;
->> -       char *recipient;
->> -       char *originator;
->> +       const char *recipient;
->> +       const char *originator;
->>        uint8_t priority;
->>  };
->>
->> --
->> 1.7.5.1
->
-> Don't you need to free them at some point? If it is just a reference
-> then it is probably fine, but if you have to free them then it might
-> be better this way.
+Hi Gustavo,
 
-Just reference to strings stored in another data structure, which
-takes care of freeing them when request is finished.
+On Fri, Apr 06, 2012 at 07:44:39PM -0300, Gustavo Padovan wrote:
+> > +static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
+> > +		      void *data)
+> > +{
+> > +	struct a2mp_cmd *cmd;
+> > +
+> > +	cmd = __a2mp_build(code, ident, len, data);
+> > +	if (!cmd)
+> > +		return;
+> > +
+> > +	__a2mp_send(mgr, (u8 *)cmd, len + sizeof(*cmd));
+> 
+> Do you really need __a2mp_send(), are you going to use it somewhere else? If
+> not just inline its code here.
 
->
-> --
-> Luiz Augusto von Dentz
+Will do this way.
 
--- 
-Slawomir Bochenski
+Best regards 
+Andrei Emeltchenko 
