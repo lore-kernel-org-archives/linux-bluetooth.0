@@ -1,64 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1334158493.16897.115.camel@aeonflux>
-Subject: RE: [PATCH v0 4/6] Bluetooth: Simplify outgoing SCO scheduling code
+Message-ID: <1334158393.16897.113.camel@aeonflux>
+Subject: Re: [PATCHv2] Bluetooth: Fix registering hci with duplicate name
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Mikel Astiz <Mikel.Astiz@bmw-carit.de>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Mikel Astiz <mikel.astiz.oss@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 11 Apr 2012 17:34:53 +0200
-In-Reply-To: <66BD268F973E3544A665E5F503FB38B71AFB76466C@DC01.bmw-carit.intra>
-References: <1334126932-27327-1-git-send-email-mikel.astiz.oss@gmail.com>
-	 <1334126932-27327-5-git-send-email-mikel.astiz.oss@gmail.com>
-	 <1334136286.16897.98.camel@aeonflux>
-	 <CABBYNZJFYJGWWLvOoAfkKJm7KR6-c4dJLObdF8UsD47WyFe2kQ@mail.gmail.com>
-	 <66BD268F973E3544A665E5F503FB38B71AFB76466C@DC01.bmw-carit.intra>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 11 Apr 2012 17:33:13 +0200
+In-Reply-To: <20120411110733.GG17779@aemeltch-MOBL1>
+References: <1334132612-29610-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1334137632-30696-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1334137926.16897.104.camel@aeonflux>
+	 <20120411100526.GE17779@aemeltch-MOBL1>
+	 <1334139637.16897.107.camel@aeonflux>
+	 <20120411103103.GF17779@aemeltch-MOBL1>
+	 <1334141317.16897.111.camel@aeonflux>
+	 <20120411110733.GG17779@aemeltch-MOBL1>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Andrei,
 
-> > >> All data produced by userspace is sent to the controller without any
-> > >> flow control. This was also the case before this patch, but now it's
-> > >> more obvious and readable.
-> > >
-> > > as in the previous patch. You can only do this if you make sure that
-> > > the controller does not have flow control enabled. You need another
-> > > basic check here to ensure this first. Otherwise a lot of things
-> > might break.
-> 
-> These patches should break nothing for several reasons:
-> 
-> 1. HCI SCO flow control is NOT enabled by default, as described in the spec volume 2 part E section 7.3.37.
-> 
-> 2. The kernel does not read or write this parameter, which means it wouldn't even know if the controller would have it enabled for some strange reason (however I haven't managed to find any controller that even supports this).
-
-this does not mean we just remove code now. We should start fixing that
-and read the setting actually.
-
-> > It also seems to remove any quote/fairness of the scheduling, actually
-> > Im not sure how it works because it sends the frames regardless of the
-> > number of available slots/buffers indicated by sco_cnt, I also wonder
-> > how it will scale with multiple SCO connections, even though it is
-> > quite rare to have more than one who knows what crazy ideas people will
-> > come.
+> > > > > > > @@ -1755,16 +1756,17 @@ int hci_register_dev(struct hci_dev *hdev)
+> > > > > > >  
+> > > > > > >  	write_lock(&hci_dev_list_lock);
+> > > > > > >  
+> > > > > > > -	/* Find first available device id */
+> > > > > > > -	list_for_each(p, &hci_dev_list) {
+> > > > > > > -		if (list_entry(p, struct hci_dev, list)->id != id)
+> > > > > > > -			break;
+> > > > > > > -		head = p; id++;
+> > > > > > > -	}
+> > > > > > I am now a little bit confused. Is it not enough to just replace head
+> > > > > > with &hci_dev_list to get this fixed? Or why is this failing in the
+> > > > > > first place actually.
+> > > > > 
+> > > > > You can see actual code above. If you have hci0 and hci1 adding third AMP
+> > > > > will fail since it just checks 0!=1 => break and trying to create hci1
+> > > > > again.
+> > > > 
+> > > > I see a problem when you having only AMPs (no BR/EDR controller). Then
+> > > > hci0 will be skipped and keep trying to create hci1 over and over again.
+> > > > 
+> > > > However in the case we have BR/EDR controller on hci0 and hci1 as AMP,
+> > > > then this should just work.
+> > > > 
+> > > > So we need to fix the case where we have no BR/EDR controller on hci0
+> > > > and trying to fix something else. Or did I get confused?
+> > > 
+> > > I think you got confused. 
+> > > 
+> > > We have hci0 (BREDR) and hci1 (AMP)
+> > > 
+> > > so list_for_each would give us first entry with id=0; Adding third (AMP)
+> > > would compare 1 (as given by id = (hdev->dev_type == HCI_BREDR) ? 0 : 1)
+> > > and 0 (id for BREDR) => break from the loop and tries to use id=1 again
+> > > for third controller.
+> > > 
+> > > Actually I do not know how the current code works at all, it is really
+> > > broken.
 > > 
+> > so it is broken on two levels actually. The case where we have no
+> > BR/EDRI controller as hci0 is also broken.
+> > 
+> > Can you try to come up with a different solution that is not using a bit
+> > mask. That one might overflow actually. Something like this:
+> > 
+> > 	min_id = (hdev->dev_type == HCI_BREDR) ? 0 : 1)
+> > 
+> > 	for each (...) {
+> > 		if (id >= min_id && hdev->id != id)
+> > 			break;
+> > 
+> > 		...
+> > 	}
 > 
-> 3. The previous implementation in the kernel seems to be totally useless, given that sco_cnt is never updated (grep for "sco_cnt--" or check hci_sched_sco() and hci_sched_esco()). So the idea of a quota is just an illusion here.
+> I think that would not work. If we have for example hci0,hci1,hci2 and
+> adding another one would choose hci2 again since (2 > 1) && (hdev->id=1 !=
+> 2)
 > 
-> Maybe I'm missing something here, that's why I need your feedback :-)
+> otherwise I think this is a bit complex when compared to bitmask which is
+> used in netdev in dev_alloc_name but they use a page:
 > 
-> In a nutshell: if some controller does support SCO flow control, it would be straightforward to support it in the Kernel (I actually have an implementation but wasn't able to test it).
-> 
-> If the controller doesn't have this feature, which is the most common case, then we either do in the kernel (time-based), in userspace, or both. For the moment I just propose to do it in userspace, as we've been doing recently despite the illusion I mention above.
-> 
-> Regarding multiple SCOs, it's not a problem at all. It's actually what I'm trying to achieve with these patches.
+> /* Use one page as a bit array of possible slots */
+> inuse = (unsigned long *) get_zeroed_page(GFP_ATOMIC);
 
-Lets read the settings first and see what current controllers are doing.
-That part needs to be fixed first. It is something we have been lazy and
-ignoring it.
+I think we should not go over board with allocating a page.
+
+> BTW: what is max number of controllers we support?
+
+uint16 - 1 number of controllers can be handled.
 
 Regards
 
