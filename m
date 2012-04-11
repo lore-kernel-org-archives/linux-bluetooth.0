@@ -1,98 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1334158393.16897.113.camel@aeonflux>
-Subject: Re: [PATCHv2] Bluetooth: Fix registering hci with duplicate name
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 11 Apr 2012 17:33:13 +0200
-In-Reply-To: <20120411110733.GG17779@aemeltch-MOBL1>
-References: <1334132612-29610-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1334137632-30696-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1334137926.16897.104.camel@aeonflux>
-	 <20120411100526.GE17779@aemeltch-MOBL1>
-	 <1334139637.16897.107.camel@aeonflux>
-	 <20120411103103.GF17779@aemeltch-MOBL1>
-	 <1334141317.16897.111.camel@aeonflux>
-	 <20120411110733.GG17779@aemeltch-MOBL1>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix registering HCI devices with duplicate name
+Date: Wed, 11 Apr 2012 17:32:08 +0200
+Message-Id: <1334158328-6956-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+When adding HCI devices hci_register_dev assigns the same name
+hci1 for subsequently added AMP devices.
 
-> > > > > > > @@ -1755,16 +1756,17 @@ int hci_register_dev(struct hci_dev *hdev)
-> > > > > > >  
-> > > > > > >  	write_lock(&hci_dev_list_lock);
-> > > > > > >  
-> > > > > > > -	/* Find first available device id */
-> > > > > > > -	list_for_each(p, &hci_dev_list) {
-> > > > > > > -		if (list_entry(p, struct hci_dev, list)->id != id)
-> > > > > > > -			break;
-> > > > > > > -		head = p; id++;
-> > > > > > > -	}
-> > > > > > I am now a little bit confused. Is it not enough to just replace head
-> > > > > > with &hci_dev_list to get this fixed? Or why is this failing in the
-> > > > > > first place actually.
-> > > > > 
-> > > > > You can see actual code above. If you have hci0 and hci1 adding third AMP
-> > > > > will fail since it just checks 0!=1 => break and trying to create hci1
-> > > > > again.
-> > > > 
-> > > > I see a problem when you having only AMPs (no BR/EDR controller). Then
-> > > > hci0 will be skipped and keep trying to create hci1 over and over again.
-> > > > 
-> > > > However in the case we have BR/EDR controller on hci0 and hci1 as AMP,
-> > > > then this should just work.
-> > > > 
-> > > > So we need to fix the case where we have no BR/EDR controller on hci0
-> > > > and trying to fix something else. Or did I get confused?
-> > > 
-> > > I think you got confused. 
-> > > 
-> > > We have hci0 (BREDR) and hci1 (AMP)
-> > > 
-> > > so list_for_each would give us first entry with id=0; Adding third (AMP)
-> > > would compare 1 (as given by id = (hdev->dev_type == HCI_BREDR) ? 0 : 1)
-> > > and 0 (id for BREDR) => break from the loop and tries to use id=1 again
-> > > for third controller.
-> > > 
-> > > Actually I do not know how the current code works at all, it is really
-> > > broken.
-> > 
-> > so it is broken on two levels actually. The case where we have no
-> > BR/EDRI controller as hci0 is also broken.
-> > 
-> > Can you try to come up with a different solution that is not using a bit
-> > mask. That one might overflow actually. Something like this:
-> > 
-> > 	min_id = (hdev->dev_type == HCI_BREDR) ? 0 : 1)
-> > 
-> > 	for each (...) {
-> > 		if (id >= min_id && hdev->id != id)
-> > 			break;
-> > 
-> > 		...
-> > 	}
-> 
-> I think that would not work. If we have for example hci0,hci1,hci2 and
-> adding another one would choose hci2 again since (2 > 1) && (hdev->id=1 !=
-> 2)
-> 
-> otherwise I think this is a bit complex when compared to bitmask which is
-> used in netdev in dev_alloc_name but they use a page:
-> 
-> /* Use one page as a bit array of possible slots */
-> inuse = (unsigned long *) get_zeroed_page(GFP_ATOMIC);
+...
+[ 6958.381886] sysfs: cannot create duplicate filename
+        '/devices/virtual/bluetooth/hci1
+...
 
-I think we should not go over board with allocating a page.
+Reported-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c |    7 ++++---
+ 1 files changed, 4 insertions(+), 3 deletions(-)
 
-> BTW: what is max number of controllers we support?
-
-uint16 - 1 number of controllers can be handled.
-
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 52c7abf..4becd28 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1741,7 +1741,7 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
+ int hci_register_dev(struct hci_dev *hdev)
+ {
+ 	struct list_head *head = &hci_dev_list, *p;
+-	int i, id, error;
++	int i, error, min_id, id = 0;
+ 
+ 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
+ 
+@@ -1751,13 +1751,14 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	/* Do not allow HCI_AMP devices to register at index 0,
+ 	 * so the index can be used as the AMP controller ID.
+ 	 */
+-	id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
++	min_id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
+ 
+ 	write_lock(&hci_dev_list_lock);
+ 
+ 	/* Find first available device id */
+ 	list_for_each(p, &hci_dev_list) {
+-		if (list_entry(p, struct hci_dev, list)->id != id)
++		if (min_id >= id &&
++		    list_entry(p, struct hci_dev, list)->id != id)
+ 			break;
+ 		head = p; id++;
+ 	}
+-- 
+1.7.7.6
 
