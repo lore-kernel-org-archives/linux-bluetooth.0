@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1334127438-27617-3-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1334127438-27617-2-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1334127438-27617-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1334127438-27617-3-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Wed, 11 Apr 2012 14:21:13 +0300
-Message-ID: <CABBYNZ+ymoodi=M=5v3qbybmC3F1aA9AgVY3ukQZjDW5Lkkz8w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v0 2/7] audio: Fix gateway state check
+	<1334127438-27617-2-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Wed, 11 Apr 2012 14:20:12 +0300
+Message-ID: <CABBYNZJF8XSSdVH2PCB7aX2eNyrPq5Nfj7L5gGV-WMcXyUaPhg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v0 1/7] btio: Fix bind SCO socket only if server
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Mikel Astiz <mikel.astiz.oss@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
@@ -19,34 +19,33 @@ Hi Mikel,
 On Wed, Apr 11, 2012 at 9:57 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
 > From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 >
-> Gateway should be considered active also if connecting or playing.
->
-> This could for example lead to manager_find_device() not returning a
-> device that is connecting, and thus the corresponding endpoint would
-> never be created in the Media API.
+> When the socket is open is client mode, the bind() system call should
+> not be used.
 > ---
->  audio/device.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  btio/btio.c |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
 >
-> diff --git a/audio/device.c b/audio/device.c
-> index a9d35f9..ee1ade1 100644
-> --- a/audio/device.c
-> +++ b/audio/device.c
-> @@ -701,7 +701,7 @@ gboolean audio_device_is_active(struct audio_device *dev,
->                                control_is_active(dev))
->                return TRUE;
->        else if (!strcmp(interface, AUDIO_GATEWAY_INTERFACE) && dev->gateway &&
-> -                               gateway_is_connected(dev))
-> +                               gateway_is_active(dev))
->                return TRUE;
->
->        return FALSE;
+> diff --git a/btio/btio.c b/btio/btio.c
+> index 9781ec4..7564d85 100644
+> --- a/btio/btio.c
+> +++ b/btio/btio.c
+> @@ -1317,8 +1317,9 @@ static GIOChannel *create_io(BtIOType type, gboolean server,
+>                        ERROR_FAILED(err, "socket(SEQPACKET, SCO)", errno);
+>                        return NULL;
+>                }
+> -               if (sco_bind(sock, &opts->src, err) < 0)
+> -                       goto failed;
+> +               if (server)
+> +                       if (sco_bind(sock, &opts->src, err) < 0)
+> +                               goto failed;
+>                if (!sco_set(sock, opts->mtu, err))
+>                        goto failed;
+>                break;
 > --
 > 1.7.7.6
->
-> --
 
-Looks good, ack.
+Ack, in future send this kind of trivial/obvious fix in separated so
+it can easily be picked.
 
 
 -- 
