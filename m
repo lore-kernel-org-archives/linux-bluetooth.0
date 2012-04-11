@@ -1,85 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1334092777.16897.56.camel@aeonflux>
-References: <1333649382-16220-1-git-send-email-hemant.gupta@stericsson.com>
-	<CACj007nWobij7TKibumiz6MN3LP7U8nVRRLhYwEx5KcyJ1cz+w@mail.gmail.com>
-	<1334092777.16897.56.camel@aeonflux>
-Date: Wed, 11 Apr 2012 09:34:01 +0530
-Message-ID: <CACj007nfbG7wu+uQfVwA9QrE+b1yFJc4LpOfVQRr1x20rSFn7g@mail.gmail.com>
-Subject: Re: [PATCH v4] Bluetooth: Fix packet type for ESCO Link
-From: Hemant Gupta <hemantgupta.ste@gmail.com>
+In-Reply-To: <1333643105.16897.12.camel@aeonflux>
+References: <1333624699-7922-1-git-send-email-vishal.agarwal@stericsson.com>
+	<1333643105.16897.12.camel@aeonflux>
+Date: Wed, 11 Apr 2012 09:13:19 +0530
+Message-ID: <CA+_sZW_hNAMvxKzUXcvBYDEQTtzK=q0VSyKgWJkLiU5RpZTvuw@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Temporary keys should be retained during connection
+From: vishal agarwal <vishal.bluez@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Hemant Gupta <hemant.gupta@stericsson.com>
+Cc: Vishal Agarwal <vishal.agarwal@stericsson.com>, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Wed, Apr 11, 2012 at 2:49 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Hemant,
+On Thu, Apr 5, 2012 at 9:55 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+> Hi Vishal,
 >
->> > This patch uses the corect packet type for ESCO Link.
->> > Without this patch esco packet types were anded with ~EDR_ESCO_MASK
->> > resulting in setting bits that are not supported by controller
->> > to 0 which means that corresponding EDR ESCO packet type is
->> > supported(EDR Packet types are inverted as per BT Spec) which might
->> > not be the case.
->> >
->> > For eg:
->> > Local Controller supports only 3-EV5, 2-EV5 and 3-EV3 of the EDR eSCO
->> > packet types and does not support 2-EV3 packet type. This would mean
->> > that while creating the esco_type in function
->> > hci_cc_read_local_features() the ESCO_2EV3 bit would not be set and
->> > all other EDR eSCO bits would be set resulting in
->> > hdev->esco_type =3D 0x0380
->> >
->> > Now in hci_conn_add() when the pkt_type is being calculated for eSCO
->> > Link, wrong calculation would take place as below:
->> >
->> > conn->pkt_type =3D hdev->esco_type & ~EDR_ESCO_MASK;
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=3D 0x0380 & ~0x03C0 =3D 0x0380 & 0xFC3=
-F
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =3D 0x0000
->> > Since the EDR eSCO bits are inverted, this would indicate that all
->> > EDR eSCO packet types are supported, which is not correct as local
->> > controller is not supporting the 2-EV3 packet type.
->> >
->> > As per calculations of the patch
->> > conn->pkt_type =3D hdev->esco_type ^ EDR_ESCO_MASK;
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=3D 0x0380 ^ 0x03C0
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =3D 0x0040
->> > which correctly indicates that packet type used excludes the 2-EV3
->> > packet type not supported by local controller.
->> >
->> Any comments on the updated patch with commit message.
+>> If a key is non persistent then it should not be used in future
+>> connections but it should be kept for current connection. And
+>> it should be removed when connecion is removed.
+>> Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
+>> ---
+>> =A0include/net/bluetooth/hci_core.h | =A0 =A01 +
+>> =A0net/bluetooth/hci_core.c =A0 =A0 =A0 =A0 | =A0 11 +++++++----
+>> =A0net/bluetooth/hci_event.c =A0 =A0 =A0 =A0| =A0 =A02 ++
+>> =A03 files changed, 10 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hc=
+i_core.h
+>> index c0b232c..ce7a415 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -318,6 +318,7 @@ struct hci_conn {
+>>
+>> =A0 =A0 =A0 __u8 =A0 =A0 =A0 =A0 =A0 =A0remote_cap;
+>> =A0 =A0 =A0 __u8 =A0 =A0 =A0 =A0 =A0 =A0remote_auth;
+>> + =A0 =A0 bool =A0 =A0 =A0 =A0 =A0 =A0temp_link_key;
 >
-> for some strange reason, I have not seen v4 so far. However this message
-> made it through.
+> I would actually rename this into an action. So something like
+> flush_key.
 >
->> > Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
->> > ---
->> > =A0net/bluetooth/hci_conn.c | =A0 =A02 +-
->> > =A01 files changed, 1 insertions(+), 1 deletions(-)
+>> =A0 =A0 =A0 unsigned int =A0 =A0sent;
+>>
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index 286f3fc..fddd0ac 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -1330,10 +1330,13 @@ int hci_add_link_key(struct hci_dev *hdev, struc=
+t hci_conn *conn, int new_key,
+>>
+>> =A0 =A0 =A0 mgmt_new_link_key(hdev, key, persistent);
+>>
+>> - =A0 =A0 if (!persistent) {
+>> - =A0 =A0 =A0 =A0 =A0 =A0 list_del(&key->list);
+>> - =A0 =A0 =A0 =A0 =A0 =A0 kfree(key);
+>> - =A0 =A0 }
+>> + =A0 =A0 if (!conn)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 return 0;
+>> +
+>> + =A0 =A0 if (persistent)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 conn->temp_link_key =3D false;
+>> + =A0 =A0 else
+>> + =A0 =A0 =A0 =A0 =A0 =A0 conn->temp_link_key =3D true;
 >
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> So I would actually prefer a cleanup patch first that changes
+> hci_persistent_key() function into a bool return value.
 >
-> You might need to resend it in case it never reached Johan and Gustavo
-> either.
+> After that it could become just like this
 >
-Thanks for letting me know that somehow v4 of patch never made to
-mailing list :(
-I have now sent the v4 patch keeping your ACK.
+> =A0 =A0 =A0 =A0conn->temp_link_key =3D !persistent;
+>
+
+As this persistent variable is also used in function mgmt_new_link_key,
+which sends this value to bluez as store_hint and bluez stores the key
+on the basis of this value. So this will require 2 cleanup patches, one for
+bluez and one for kernel. thats what you want?
+>>
+>> =A0 =A0 =A0 return 0;
+>> =A0}
+>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>> index 7325300..0b19852 100644
+>> --- a/net/bluetooth/hci_event.c
+>> +++ b/net/bluetooth/hci_event.c
+>> @@ -1928,6 +1928,8 @@ static inline void hci_disconn_complete_evt(struct=
+ hci_dev *hdev, struct sk_buff
+>> =A0 =A0 =A0 }
+>>
+>> =A0 =A0 =A0 if (ev->status =3D=3D 0) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (conn->type =3D=3D ACL_LINK && conn->temp_l=
+ink_key)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 hci_remove_link_key(hdev, &con=
+n->dst);
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 hci_proto_disconn_cfm(conn, ev->reason);
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 hci_conn_del(conn);
+>> =A0 =A0 =A0 }
+>
+> Otherwise this looks all reasonable.
+>
 > Regards
 >
 > Marcel
 >
 >
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 
-
-
---=20
-Best Regards
-Hemant Gupta
-ST-Ericsson India
+Thanks
+Vishal
