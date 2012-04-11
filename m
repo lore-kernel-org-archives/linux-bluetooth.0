@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1334136396.16897.99.camel@aeonflux>
-Subject: Re: [PATCH v0 5/6] Bluetooth: btusb: Dynamic alternate setting
+Message-ID: <1334136286.16897.98.camel@aeonflux>
+Subject: Re: [PATCH v0 4/6] Bluetooth: Simplify outgoing SCO scheduling code
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Mikel Astiz <mikel.astiz.oss@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Date: Wed, 11 Apr 2012 11:26:36 +0200
-In-Reply-To: <1334126932-27327-6-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Wed, 11 Apr 2012 11:24:46 +0200
+In-Reply-To: <1334126932-27327-5-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1334126932-27327-1-git-send-email-mikel.astiz.oss@gmail.com>
-	 <1334126932-27327-6-git-send-email-mikel.astiz.oss@gmail.com>
+	 <1334126932-27327-5-git-send-email-mikel.astiz.oss@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,17 +16,17 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mikel,
 
-> The alternate setting must be dynamically set according to the number of
-> active SCO links, and the bit depth of the audio. The possible values
-> for the alternate setting are described in the Bluetooth Core
-> Specification, Volume 4, Part B, section 2.1.1.
+> This patch refactors the SCO scheduling algorithm to remove code that is
+> not making any difference. There is no HCI SCO flow control in the
+> kernel so the scheduling can be simplified.
 > 
-> Signed-off-by: Mikel Astiz <mikel.astiz.oss@gmail.com>
-> ---
->  drivers/bluetooth/btusb.c |   13 +++++++++++--
->  1 files changed, 11 insertions(+), 2 deletions(-)
+> All data produced by userspace is sent to the controller without any
+> flow control. This was also the case before this patch, but now it's
+> more obvious and readable.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+as in the previous patch. You can only do this if you make sure that the
+controller does not have flow control enabled. You need another basic
+check here to ensure this first. Otherwise a lot of things might break.
 
 Regards
 
