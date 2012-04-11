@@ -1,55 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 11 Apr 2012 13:31:05 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2] Bluetooth: Fix registering hci with duplicate name
+Message-ID: <20120411103103.GF17779@aemeltch-MOBL1>
+References: <1334132612-29610-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1334137632-30696-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1334137926.16897.104.camel@aeonflux>
+ <20120411100526.GE17779@aemeltch-MOBL1>
+ <1334139637.16897.107.camel@aeonflux>
 MIME-Version: 1.0
-In-Reply-To: <1334135558-21866-2-git-send-email-michal.labedzki@tieto.com>
-References: <1334135558-21866-1-git-send-email-michal.labedzki@tieto.com>
-	<1334135558-21866-2-git-send-email-michal.labedzki@tieto.com>
-Date: Wed, 11 Apr 2012 13:48:22 +0300
-Message-ID: <CABBYNZKK+6UyXxJ=eethVf9AOMknMsty93tFaKeP_gpkzrFtdg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] AVRCP: Add missing capability for TrackReachedEnd
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michal Labedzki <michal.labedzki@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, lucas.demarchi@profusion.mobi
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1334139637.16897.107.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Hi Marcel,
 
-On Wed, Apr 11, 2012 at 12:12 PM, Michal Labedzki
-<michal.labedzki@tieto.com> wrote:
-> Add missing capability for TrackReachedEnd.
-> ---
->  audio/avrcp.c |    5 +++--
->  1 files changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index 8eba046..d456023 100644
-> --- a/audio/avrcp.c
-> +++ b/audio/avrcp.c
-> @@ -557,11 +557,12 @@ static uint8_t avrcp_handle_get_capabilities(struct avrcp_player *player,
->
->                return AVC_CTYPE_STABLE;
->        case CAP_EVENTS_SUPPORTED:
-> -               pdu->params_len = htons(5);
-> -               pdu->params[1] = 3;
-> +               pdu->params_len = htons(2 + 4);
+On Wed, Apr 11, 2012 at 12:20:37PM +0200, Marcel Holtmann wrote:
+> Hi Andrei,
+> 
+> > > > @@ -1755,16 +1756,17 @@ int hci_register_dev(struct hci_dev *hdev)
+> > > >  
+> > > >  	write_lock(&hci_dev_list_lock);
+> > > >  
+> > > > -	/* Find first available device id */
+> > > > -	list_for_each(p, &hci_dev_list) {
+> > > > -		if (list_entry(p, struct hci_dev, list)->id != id)
+> > > > -			break;
+> > > > -		head = p; id++;
+> > > > -	}
+> > > I am now a little bit confused. Is it not enough to just replace head
+> > > with &hci_dev_list to get this fixed? Or why is this failing in the
+> > > first place actually.
+> > 
+> > You can see actual code above. If you have hci0 and hci1 adding third AMP
+> > will fail since it just checks 0!=1 => break and trying to create hci1
+> > again.
+> 
+> I see a problem when you having only AMPs (no BR/EDR controller). Then
+> hci0 will be skipped and keep trying to create hci1 over and over again.
+> 
+> However in the case we have BR/EDR controller on hci0 and hci1 as AMP,
+> then this should just work.
+> 
+> So we need to fix the case where we have no BR/EDR controller on hci0
+> and trying to fix something else. Or did I get confused?
 
-I think we could have params_lens done latter using params[1] e.g
-pdu->params_len = htons(2 + pdu->params[1]) to make it simpler to add
-new events.
+I think you got confused. 
 
-> +               pdu->params[1] = 4;
->                pdu->params[2] = AVRCP_EVENT_STATUS_CHANGED;
->                pdu->params[3] = AVRCP_EVENT_TRACK_CHANGED;
->                pdu->params[4] = AVRCP_EVENT_TRACK_REACHED_START;
-> +               pdu->params[5] = AVRCP_EVENT_TRACK_REACHED_END;
->
->                return AVC_CTYPE_STABLE;
->        }
-> --
-> on behalf of ST-Ericsson
+We have hci0 (BREDR) and hci1 (AMP)
 
-The rest looks good.
+so list_for_each would give us first entry with id=0; Adding third (AMP)
+would compare 1 (as given by id = (hdev->dev_type == HCI_BREDR) ? 0 : 1)
+and 0 (id for BREDR) => break from the loop and tries to use id=1 again
+for third controller.
 
--- 
-Luiz Augusto von Dentz
+Actually I do not know how the current code works at all, it is really
+broken.
+
+> 
+> > > Also this change will of course break the fix that we added to ensure
+> > > that the HCI list comes sorted when calling hciconfig.
+> > 
+> > Actually it still works. But if we want it to stay ordered after
+> > deleting/adding then we need a small fix.
+> 
+> We added a fix for it to keep them sorted. So we might should retain
+> that behavior from now on.
+
+will do that.
+
+Best regards 
+Andrei Emeltchenko 
