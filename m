@@ -1,82 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1334116936-16171-1-git-send-email-hemant.gupta@stericsson.com>
+From: Hemant GUPTA <hemant.gupta@stericsson.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"gustavo@padovan.org" <gustavo@padovan.org>
+Date: Wed, 11 Apr 2012 06:11:28 +0200
+Subject: [PATCH v4] Bluetooth: Fix packet type for ESCO Link
+Message-ID: <AA50405D3B026C488CB3DB0AADE69540205AC50440@EXDCVYMBSTM005.EQ1STM.local>
 References: <1334116936-16171-1-git-send-email-hemant.gupta@stericsson.com>
-Date: Wed, 11 Apr 2012 09:43:31 +0530
-Message-ID: <CACj007krmYyNtOdwjOb3JPyP7yLgEpsceo02JXm4Wrn+pNyQDg@mail.gmail.com>
-Subject: Re: [PATCH v4] Bluetooth: Fix packet type for ESCO Link
-From: Hemant Gupta <hemantgupta.ste@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, gustavo@padovan.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Hemant Gupta <hemant.gupta@stericsson.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1334116936-16171-1-git-send-email-hemant.gupta@stericsson.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel, Johan, Gustavo,
-
-On Wed, Apr 11, 2012 at 9:32 AM, Hemant Gupta
-<hemant.gupta@stericsson.com> wrote:
-> This patch uses the corect packet type for ESCO Link.
-> Without this patch esco packet types were anded with ~EDR_ESCO_MASK
-> resulting in setting bits that are not supported by controller
-> to 0 which means that corresponding EDR ESCO packet type is
-> supported(EDR Packet types are inverted as per BT Spec) which might
-> not be the case.
->
-> For eg:
-> Local Controller supports only 3-EV5, 2-EV5 and 3-EV3 of the EDR eSCO
-> packet types and does not support 2-EV3 packet type. This would mean
-> that while creating the esco_type in function
-> hci_cc_read_local_features() the ESCO_2EV3 bit would not be set and
-> all other EDR eSCO bits would be set resulting in
-> hdev->esco_type = 0x0380
->
-> Now in hci_conn_add() when the pkt_type is being calculated for eSCO
-> Link, wrong calculation would take place as below:
->
-> conn->pkt_type = hdev->esco_type & ~EDR_ESCO_MASK;
->                = 0x0380 & ~0x03C0 = 0x0380 & 0xFC3F
->               = 0x0000
-> Since the EDR eSCO bits are inverted, this would indicate that all
-> EDR eSCO packet types are supported, which is not correct as local
-> controller is not supporting the 2-EV3 packet type.
->
-> As per calculations of the patch
-> conn->pkt_type = hdev->esco_type ^ EDR_ESCO_MASK;
->                = 0x0380 ^ 0x03C0
->               = 0x0040
-> which correctly indicates that packet type used excludes the 2-EV3
-> packet type not supported by local controller.
->
-> Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_conn.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 947172b..1060fb6 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -396,7 +396,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
->                        conn->pkt_type = hdev->pkt_type & SCO_PTYPE_MASK;
->                break;
->        case ESCO_LINK:
-> -               conn->pkt_type = hdev->esco_type & ~EDR_ESCO_MASK;
-> +               conn->pkt_type = hdev->esco_type ^ EDR_ESCO_MASK;
->                break;
->        }
->
-> --
-> 1.7.0.4
->
-
-Resending the patch with Marcel's ACK, because I am not sure if it
-made to the mailing list again or not.
-
--- 
-Best Regards
-Hemant Gupta
-ST-Ericsson India
+VGhpcyBwYXRjaCB1c2VzIHRoZSBjb3JlY3QgcGFja2V0IHR5cGUgZm9yIEVTQ08gTGluay4NCldp
+dGhvdXQgdGhpcyBwYXRjaCBlc2NvIHBhY2tldCB0eXBlcyB3ZXJlIGFuZGVkIHdpdGggfkVEUl9F
+U0NPX01BU0sgcmVzdWx0aW5nIGluIHNldHRpbmcgYml0cyB0aGF0IGFyZSBub3Qgc3VwcG9ydGVk
+IGJ5IGNvbnRyb2xsZXIgdG8gMCB3aGljaCBtZWFucyB0aGF0IGNvcnJlc3BvbmRpbmcgRURSIEVT
+Q08gcGFja2V0IHR5cGUgaXMgc3VwcG9ydGVkKEVEUiBQYWNrZXQgdHlwZXMgYXJlIGludmVydGVk
+IGFzIHBlciBCVCBTcGVjKSB3aGljaCBtaWdodCBub3QgYmUgdGhlIGNhc2UuDQoNCkZvciBlZzoN
+CkxvY2FsIENvbnRyb2xsZXIgc3VwcG9ydHMgb25seSAzLUVWNSwgMi1FVjUgYW5kIDMtRVYzIG9m
+IHRoZSBFRFIgZVNDTyBwYWNrZXQgdHlwZXMgYW5kIGRvZXMgbm90IHN1cHBvcnQgMi1FVjMgcGFj
+a2V0IHR5cGUuIFRoaXMgd291bGQgbWVhbiB0aGF0IHdoaWxlIGNyZWF0aW5nIHRoZSBlc2NvX3R5
+cGUgaW4gZnVuY3Rpb24NCmhjaV9jY19yZWFkX2xvY2FsX2ZlYXR1cmVzKCkgdGhlIEVTQ09fMkVW
+MyBiaXQgd291bGQgbm90IGJlIHNldCBhbmQgYWxsIG90aGVyIEVEUiBlU0NPIGJpdHMgd291bGQg
+YmUgc2V0IHJlc3VsdGluZyBpbg0KaGRldi0+ZXNjb190eXBlID0gMHgwMzgwDQoNCk5vdyBpbiBo
+Y2lfY29ubl9hZGQoKSB3aGVuIHRoZSBwa3RfdHlwZSBpcyBiZWluZyBjYWxjdWxhdGVkIGZvciBl
+U0NPIExpbmssIHdyb25nIGNhbGN1bGF0aW9uIHdvdWxkIHRha2UgcGxhY2UgYXMgYmVsb3c6DQoN
+CmNvbm4tPnBrdF90eXBlID0gaGRldi0+ZXNjb190eXBlICYgfkVEUl9FU0NPX01BU0s7DQogwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgPSAweDAzODAgJiB+MHgwM0MwID0gMHgwMzgwICYgMHhGQzNGDQog
+ICAgICAgICAgICAgICA9IDB4MDAwMA0KU2luY2UgdGhlIEVEUiBlU0NPIGJpdHMgYXJlIGludmVy
+dGVkLCB0aGlzIHdvdWxkIGluZGljYXRlIHRoYXQgYWxsIEVEUiBlU0NPIHBhY2tldCB0eXBlcyBh
+cmUgc3VwcG9ydGVkLCB3aGljaCBpcyBub3QgY29ycmVjdCBhcyBsb2NhbCBjb250cm9sbGVyIGlz
+IG5vdCBzdXBwb3J0aW5nIHRoZSAyLUVWMyBwYWNrZXQgdHlwZS4NCg0KQXMgcGVyIGNhbGN1bGF0
+aW9ucyBvZiB0aGUgcGF0Y2gNCmNvbm4tPnBrdF90eXBlID0gaGRldi0+ZXNjb190eXBlIF4gRURS
+X0VTQ09fTUFTSzsNCiDCoCDCoCDCoCDCoCDCoCDCoCDCoCA9IDB4MDM4MCBeIDB4MDNDMA0KICAg
+ICAgICAgICAgICAgPSAweDAwNDANCndoaWNoIGNvcnJlY3RseSBpbmRpY2F0ZXMgdGhhdCBwYWNr
+ZXQgdHlwZSB1c2VkIGV4Y2x1ZGVzIHRoZSAyLUVWMyBwYWNrZXQgdHlwZSBub3Qgc3VwcG9ydGVk
+IGJ5IGxvY2FsIGNvbnRyb2xsZXIuDQoNClNpZ25lZC1vZmYtYnk6IEhlbWFudCBHdXB0YSA8aGVt
+YW50Lmd1cHRhQHN0ZXJpY3Nzb24uY29tPg0KQWNrZWQtYnk6IE1hcmNlbCBIb2x0bWFubiA8bWFy
+Y2VsQGhvbHRtYW5uLm9yZz4NCi0tLQ0KIG5ldC9ibHVldG9vdGgvaGNpX2Nvbm4uYyB8ICAgIDIg
+Ky0NCiAxIGZpbGVzIGNoYW5nZWQsIDEgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbnMoLSkNCg0K
+ZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvaGNpX2Nvbm4uYyBiL25ldC9ibHVldG9vdGgvaGNp
+X2Nvbm4uYyBpbmRleCA5NDcxNzJiLi4xMDYwZmI2IDEwMDY0NA0KLS0tIGEvbmV0L2JsdWV0b290
+aC9oY2lfY29ubi5jDQorKysgYi9uZXQvYmx1ZXRvb3RoL2hjaV9jb25uLmMNCkBAIC0zOTYsNyAr
+Mzk2LDcgQEAgc3RydWN0IGhjaV9jb25uICpoY2lfY29ubl9hZGQoc3RydWN0IGhjaV9kZXYgKmhk
+ZXYsIGludCB0eXBlLCBiZGFkZHJfdCAqZHN0KQ0KIAkJCWNvbm4tPnBrdF90eXBlID0gaGRldi0+
+cGt0X3R5cGUgJiBTQ09fUFRZUEVfTUFTSzsNCiAJCWJyZWFrOw0KIAljYXNlIEVTQ09fTElOSzoN
+Ci0JCWNvbm4tPnBrdF90eXBlID0gaGRldi0+ZXNjb190eXBlICYgfkVEUl9FU0NPX01BU0s7DQor
+CQljb25uLT5wa3RfdHlwZSA9IGhkZXYtPmVzY29fdHlwZSBeIEVEUl9FU0NPX01BU0s7DQogCQli
+cmVhazsNCiAJfQ0KIA0KLS0NCjEuNy4wLjQNCg0K
