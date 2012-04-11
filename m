@@ -1,82 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 Apr 2012 10:05:16 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-	linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
-Message-ID: <20120411070514.GB17779@aemeltch-MOBL1>
-References: <1334059909-20513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1334059909-20513-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <4F846257.1060807@sipsolutions.net>
- <1334092668.16897.54.camel@aeonflux>
- <4F84A422.3030900@sipsolutions.net>
- <1334093378.16897.62.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334093378.16897.62.camel@aeonflux>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH BlueZ v0 6/7] media: Enable parallel requests to endpoint
+Date: Wed, 11 Apr 2012 08:57:17 +0200
+Message-Id: <1334127438-27617-7-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1334127438-27617-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1334127438-27617-1-git-send-email-mikel.astiz.oss@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johannes and Marcel,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-On Tue, Apr 10, 2012 at 11:29:38PM +0200, Marcel Holtmann wrote:
-> Hi Johannes,
-> 
-> > >> I don't get this patch at all. Why am I reviewing some very very basic
-> > >> skeleton code when we should be discussing userspace APIs (we have
-> > >> already discussed them with a few people years ago), how the AMP is
-> > >> going to be managed, how the security handshake is going to work, etc.
+If endpoint is handling several devices, it should be able to handle
+multiple requests, one per each.
+---
+ audio/media.c |   46 ++++++++++++++++++++++++----------------------
+ 1 files changed, 24 insertions(+), 22 deletions(-)
 
-Do we have some outcome from that discussion?
+diff --git a/audio/media.c b/audio/media.c
+index 3324103..4384758 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -67,6 +67,7 @@ struct media_adapter {
+ };
+ 
+ struct endpoint_request {
++	struct media_endpoint	*endpoint;
+ 	DBusMessage		*msg;
+ 	DBusPendingCall		*call;
+ 	media_endpoint_cb_t	cb;
+@@ -85,7 +86,7 @@ struct media_endpoint {
+ 	guint			hs_watch;
+ 	guint			ag_watch;
+ 	guint			watch;
+-	struct endpoint_request *request;
++	GSList			*requests;
+ 	struct media_adapter	*adapter;
+ 	GSList			*transports;
+ };
+@@ -127,15 +128,22 @@ static void endpoint_request_free(struct endpoint_request *request)
+ 	g_free(request);
+ }
+ 
+-static void media_endpoint_cancel(struct media_endpoint *endpoint)
++static void media_endpoint_cancel(struct endpoint_request *request)
+ {
+-	struct endpoint_request *request = endpoint->request;
++	struct media_endpoint *endpoint = request->endpoint;
+ 
+ 	if (request->call)
+ 		dbus_pending_call_cancel(request->call);
+ 
++	endpoint->requests = g_slist_remove(endpoint->requests, request);
++
+ 	endpoint_request_free(request);
+-	endpoint->request = NULL;
++}
++
++static void media_endpoint_cancel_all(struct media_endpoint *endpoint)
++{
++	while (endpoint->requests != NULL)
++		media_endpoint_cancel(endpoint->requests->data);
+ }
+ 
+ static void media_endpoint_destroy(struct media_endpoint *endpoint)
+@@ -150,8 +158,7 @@ static void media_endpoint_destroy(struct media_endpoint *endpoint)
+ 	if (endpoint->ag_watch)
+ 		gateway_remove_state_cb(endpoint->ag_watch);
+ 
+-	if (endpoint->request)
+-		media_endpoint_cancel(endpoint);
++	media_endpoint_cancel_all(endpoint);
+ 
+ 	g_slist_free_full(endpoint->transports,
+ 				(GDestroyNotify) media_transport_destroy);
+@@ -228,8 +235,7 @@ done:
+ 
+ static void clear_endpoint(struct media_endpoint *endpoint)
+ {
+-	if (endpoint->request)
+-		media_endpoint_cancel(endpoint);
++	media_endpoint_cancel_all(endpoint);
+ 
+ 	while (endpoint->transports != NULL)
+ 		clear_configuration(endpoint, endpoint->transports->data);
+@@ -237,8 +243,8 @@ static void clear_endpoint(struct media_endpoint *endpoint)
+ 
+ static void endpoint_reply(DBusPendingCall *call, void *user_data)
+ {
+-	struct media_endpoint *endpoint = user_data;
+-	struct endpoint_request *request = endpoint->request;
++	struct endpoint_request *request = user_data;
++	struct media_endpoint *endpoint = request->endpoint;
+ 	DBusMessage *reply;
+ 	DBusError err;
+ 	gboolean value;
+@@ -299,9 +305,8 @@ done:
+ 	if (request->cb)
+ 		request->cb(endpoint, ret, size, request->user_data);
+ 
+-	if (endpoint->request)
+-		endpoint_request_free(endpoint->request);
+-	endpoint->request = NULL;
++	endpoint->requests = g_slist_remove(endpoint->requests, request);
++	endpoint_request_free(request);
+ }
+ 
+ static gboolean media_endpoint_async_call(DBusConnection *conn,
+@@ -313,9 +318,6 @@ static gboolean media_endpoint_async_call(DBusConnection *conn,
+ {
+ 	struct endpoint_request *request;
+ 
+-	if (endpoint->request)
+-		return FALSE;
+-
+ 	request = g_new0(struct endpoint_request, 1);
+ 
+ 	/* Timeout should be less than avdtp request timeout (4 seconds) */
+@@ -326,13 +328,16 @@ static gboolean media_endpoint_async_call(DBusConnection *conn,
+ 		return FALSE;
+ 	}
+ 
+-	dbus_pending_call_set_notify(request->call, endpoint_reply, endpoint, NULL);
++	dbus_pending_call_set_notify(request->call, endpoint_reply, request,
++									NULL);
+ 
++	request->endpoint = endpoint;
+ 	request->msg = msg;
+ 	request->cb = cb;
+ 	request->destroy = destroy;
+ 	request->user_data = user_data;
+-	endpoint->request = request;
++
++	endpoint->requests = g_slist_append(endpoint->requests, request);
+ 
+ 	DBG("Calling %s: name = %s path = %s", dbus_message_get_member(msg),
+ 			dbus_message_get_destination(msg),
+@@ -351,9 +356,6 @@ static gboolean select_configuration(struct media_endpoint *endpoint,
+ 	DBusConnection *conn;
+ 	DBusMessage *msg;
+ 
+-	if (endpoint->request != NULL)
+-		return FALSE;
+-
+ 	conn = endpoint->adapter->conn;
+ 
+ 	msg = dbus_message_new_method_call(endpoint->sender, endpoint->path,
+@@ -412,7 +414,7 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
+ 
+ 	transport = find_device_transport(endpoint, device);
+ 
+-	if (transport != NULL || endpoint->request != NULL)
++	if (transport != NULL)
+ 		return FALSE;
+ 
+ 	conn = endpoint->adapter->conn;
+-- 
+1.7.7.6
 
-> > > adding AMP (meaning Bluetooth Alternate MAC/PHY in case anybody cares)
-> > > for SoftMac WiFi cards should be done solely in kernel space between
-> > > Bluetooth core and mac80211. All the FullMac cards will expose the HCI
-> > > AMP directly via the Bluetooth core. See Marvell solution for example.
-
-Also Qualcomm.
-
-> > > If we require a userspace interaction, I think we are doing something
-> > > wrong here. And as far as I can tell, the only tricky part is the WPA2
-> > > PSK 4-way handshake. We would need a kernel implementation for that.
-> > 
-> > You already know I disagree, I don't want this code re-implemented in 
-> > kernel space when adding a few tightly controlled APIs is all it needs 
-> > to use an existing implementation of the relevant mechanisms.
-> 
-> I know that, but I still think it is the right approach here. It might
-> take me a bit longer to convince you ;)
-> 
-> The whole AMP control goes via A2MP and L2CAP and both are fully
-> implemented inside the kernel. In theory we do not even need to expose
-> HCI AMP interfaces to userspace.
-
-Johannes, you can think of SoftAMP as analog of SoftMAC (vs FullMAC).
-SoftMAC is also possible to implement in user space but only
-authentication is done this way.
-
-Consider use case when user sends data over Bluetooth High Speed. Data
-go from obex user space to kernel L2CAP. Then you just need to add
-MAC header and send to wireless device. But you are proposing to copy data
-to user space for processing; then user space needs to copy data again to 
-kernel and then to wireless device.
-
-I think that user does not need to know that it uses High Speed, it just
-notice that speed is better :). Do you require any special API for
-latest and greatest wireless standard? Why user shall care about it?
-
-Best regards 
-Andrei Emeltchenko 
-
-> We just do it for convince right now so
-> we can sniff the transfers, but even that is no longer needed with the
-> addition of the Bluetooth monitor socket.
-> 
-> Anyway, my real point is that we should not need any extra userspace API
-> to add support for Bluetooth HS in mac80211.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
