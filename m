@@ -3,9 +3,9 @@ From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>,
 	Mikel Astiz <mikel.astiz.oss@gmail.com>
-Subject: [PATCH v0 6/6] Bluetooth: Remove outgoing MTU check
-Date: Wed, 11 Apr 2012 08:48:52 +0200
-Message-Id: <1334126932-27327-7-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH v0 3/6] Bluetooth: Remove unused HCI event handling
+Date: Wed, 11 Apr 2012 08:48:49 +0200
+Message-Id: <1334126932-27327-4-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1334126932-27327-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1334126932-27327-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,35 +13,35 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-MTU is known in userland so there is no real need to check this in the
-kernel, specially because no SCO flow control is done anyway.
+Function hci_num_comp_pkts_evt() doesn't need to handle SCO connections
+unless SCO flow control is explicitly enabled, as described in the
+Bluetooth Core Specification, Volume 4, Part B, section 7.7.19.
 
-In addition, when multiple SCO links are active, many BT chips will work
-only if bigger packets are being sent. In this case the MTU is not
-relevant any more and typically the size of the incoming packets can be
-used also for outgoing packets. This is often greater than the MTU so it
-is necessary that we remove this check.
+Even in the unlikely case that the hardware supports this feature, the
+kernel does not enable it.
 
 Signed-off-by: Mikel Astiz <mikel.astiz.oss@gmail.com>
 ---
- net/bluetooth/sco.c |    4 ----
- 1 files changed, 0 insertions(+), 4 deletions(-)
+ net/bluetooth/hci_event.c |    6 ------
+ 1 files changed, 0 insertions(+), 6 deletions(-)
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index b48370b..9ae9e31 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -236,10 +236,6 @@ static inline int sco_send_frame(struct sock *sk, struct msghdr *msg, int len)
- 	struct sk_buff *skb;
- 	int err;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index bb6d802..78f0d58 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2538,12 +2538,6 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+ 			}
+ 			break;
  
--	/* Check outgoing MTU */
--	if (len > conn->mtu)
--		return -EINVAL;
+-		case SCO_LINK:
+-			hdev->sco_cnt += count;
+-			if (hdev->sco_cnt > hdev->sco_pkts)
+-				hdev->sco_cnt = hdev->sco_pkts;
+-			break;
 -
- 	BT_DBG("sk %p len %d", sk, len);
- 
- 	skb = bt_skb_send_alloc(sk, len, msg->msg_flags & MSG_DONTWAIT, &err);
+ 		default:
+ 			BT_ERR("Unknown type %d conn %p", conn->type, conn);
+ 			break;
 -- 
 1.7.7.6
 
