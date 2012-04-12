@@ -1,69 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix registering HCI devices with duplicate name
-Date: Thu, 12 Apr 2012 14:39:57 +0300
-Message-Id: <1334230797-11212-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1334158328-6956-1-git-send-email-marcel@holtmann.org>
-References: <1334158328-6956-1-git-send-email-marcel@holtmann.org>
+Date: Thu, 12 Apr 2012 14:37:38 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] audio: Fix memory leak when headset server probe()
+ fails
+Message-ID: <20120412113738.GA18837@x220.ger.corp.intel.com>
+References: <1334089368-6920-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1334089368-6920-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Lizardo,
 
-When adding HCI devices hci_register_dev assigns the same name
-hci1 for subsequently added AMP devices. This is modified version
-of Marcel Holtmann patch.
+On Tue, Apr 10, 2012, Anderson Lizardo wrote:
+> If RFCOMM is disabled on the kernel, headset_server_probe() fails.
+> Relevant log messages:
+> 
+>  audio/manager.c:headset_server_probe() path /org/bluez/499/hci0
+>  src/adapter.c:btd_adapter_ref() 0x4bb4f78: ref=6
+>  audio/manager.c:audio_adapter_ref() 0x4ca3010: ref=1
+>  socket(STREAM, RFCOMM): Protocol not supported (93)
+>  audio/manager.c:audio_adapter_unref() 0x4ca3010: ref=0
+>  src/adapter.c:btd_adapter_unref() 0x4bb4f78: ref=5
+>  audio-headset: Operation not permitted (1)
+> 
+> The powered callback should only be registered if adapter driver probe
+> was successful. The callback unregister was moved to the beginning of
+> headset_server_remove() for consistency.
+> 
+> This fixes this memory leak:
+> 
+> ==499== 8 bytes in 1 blocks are definitely lost in loss record 44 of 182
+> ==499==    at 0x4826444: malloc (vg_replace_malloc.c:263)
+> ==499==    by 0x4877243: g_malloc (gmem.c:132)
+> ==499==    by 0x488D088: g_slice_alloc (gslice.c:836)
+> ==499==    by 0x488E8A5: g_slist_append (gslist.c:230)
+> ==499==    by 0x18AEEE: btd_adapter_register_powered_callback
+> (adapter.c:3416)
+> ==499==    by 0x11AF61: headset_server_probe (manager.c:919)
+> ==499==    by 0x18B67B: probe_driver (adapter.c:2033)
+> ==499==    by 0x1908F5: adapter_init (adapter.c:2048)
+> ==499==    by 0x189D20: btd_manager_register_adapter (manager.c:397)
+> ==499==    by 0x1649AF: mgmt_cmd_complete (mgmtops.c:1075)
+> ==499==    by 0x16665E: mgmt_event (mgmtops.c:1780)
+> ==499==    by 0x48B2EFA: g_io_unix_dispatch (giounix.c:162)
+> ---
+>  audio/manager.c |    8 ++++----
+>  1 files changed, 4 insertions(+), 4 deletions(-)
 
-...
-[ 6958.381886] sysfs: cannot create duplicate filename
-        '/devices/virtual/bluetooth/hci1
-...
+Applied. Thanks.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/hci_core.c |   10 ++++++----
- 1 files changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 52c7abf..99e93cd 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1741,7 +1741,7 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
- int hci_register_dev(struct hci_dev *hdev)
- {
- 	struct list_head *head = &hci_dev_list, *p;
--	int i, id, error;
-+	int i, error, min_id, id = 0;
- 
- 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
- 
-@@ -1751,20 +1751,22 @@ int hci_register_dev(struct hci_dev *hdev)
- 	/* Do not allow HCI_AMP devices to register at index 0,
- 	 * so the index can be used as the AMP controller ID.
- 	 */
--	id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
-+	min_id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
- 
- 	write_lock(&hci_dev_list_lock);
- 
- 	/* Find first available device id */
- 	list_for_each(p, &hci_dev_list) {
--		if (list_entry(p, struct hci_dev, list)->id != id)
-+		struct hci_dev *hdev = list_entry(p, struct hci_dev, list);
-+		if (min_id <= id && hdev->id != id)
- 			break;
-+
- 		head = p; id++;
- 	}
- 
- 	sprintf(hdev->name, "hci%d", id);
- 	hdev->id = id;
--	list_add_tail(&hdev->list, head);
-+	list_add(&hdev->list, head);
- 
- 	mutex_init(&hdev->lock);
- 
--- 
-1.7.9.1
-
+Johan
