@@ -1,35 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 12 Apr 2012 14:51:40 +0300
+Date: Thu, 12 Apr 2012 14:47:21 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Remove err parameter from alloc_skb()
-Message-ID: <20120412115140.GB20659@x220.ger.corp.intel.com>
-References: <1333754148-18796-1-git-send-email-gustavo@padovan.org>
- <1333799079.16897.24.camel@aeonflux>
+To: Michal Labedzki <michal.labedzki@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+	lucas.demarchi@profusion.mobi
+Subject: Re: [PATCH v2 1/3] AVRCP: Add missing capability for TrackReachedEnd
+Message-ID: <20120412114721.GA20659@x220.ger.corp.intel.com>
+References: <CABBYNZKK+6UyXxJ=eethVf9AOMknMsty93tFaKeP_gpkzrFtdg@mail.gmail.com>
+ <1334142318-24916-1-git-send-email-michal.labedzki@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1333799079.16897.24.camel@aeonflux>
+In-Reply-To: <1334142318-24916-1-git-send-email-michal.labedzki@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Michal,
 
-On Sat, Apr 07, 2012, Marcel Holtmann wrote:
-> Hi Gustavo,
+On Wed, Apr 11, 2012, Michal Labedzki wrote:
+> Add missing capability for TrackReachedEnd.
+> ---
+>  audio/avrcp.c |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
 > 
-> > Use ERR_PTR maginc instead.
-> > 
-> > Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
-> > ---
-> >  include/net/bluetooth/l2cap.h |    2 +-
-> >  net/bluetooth/l2cap_core.c    |   30 +++++++++++++-----------------
-> >  net/bluetooth/l2cap_sock.c    |   12 ++++++++----
-> >  3 files changed, 22 insertions(+), 22 deletions(-)
-> 
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> diff --git a/audio/avrcp.c b/audio/avrcp.c
+> index 8eba046..6eb4bb1 100644
+> --- a/audio/avrcp.c
+> +++ b/audio/avrcp.c
+> @@ -557,12 +557,13 @@ static uint8_t avrcp_handle_get_capabilities(struct avrcp_player *player,
+>  
+>  		return AVC_CTYPE_STABLE;
+>  	case CAP_EVENTS_SUPPORTED:
+> -		pdu->params_len = htons(5);
+> -		pdu->params[1] = 3;
+> +		pdu->params[1] = 4;
+>  		pdu->params[2] = AVRCP_EVENT_STATUS_CHANGED;
+>  		pdu->params[3] = AVRCP_EVENT_TRACK_CHANGED;
+>  		pdu->params[4] = AVRCP_EVENT_TRACK_REACHED_START;
+> +		pdu->params[5] = AVRCP_EVENT_TRACK_REACHED_END;
+>  
+> +		pdu->params_len = htons(2 + pdu->params[1]);
+>  		return AVC_CTYPE_STABLE;
+>  	}
 
-Applied to bluetooth-next.
+This patch has been applied. Thanks.
 
 Johan
