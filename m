@@ -1,47 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 12 Apr 2012 14:47:21 +0300
+Date: Thu, 12 Apr 2012 14:40:17 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Michal Labedzki <michal.labedzki@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-	lucas.demarchi@profusion.mobi
-Subject: Re: [PATCH v2 1/3] AVRCP: Add missing capability for TrackReachedEnd
-Message-ID: <20120412114721.GA20659@x220.ger.corp.intel.com>
-References: <CABBYNZKK+6UyXxJ=eethVf9AOMknMsty93tFaKeP_gpkzrFtdg@mail.gmail.com>
- <1334142318-24916-1-git-send-email-michal.labedzki@tieto.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd v2 1/3] MAP: Mark filter strings const
+Message-ID: <20120412114017.GB18837@x220.ger.corp.intel.com>
+References: <1334069261-3668-1-git-send-email-lkslawek@gmail.com>
+ <CABBYNZ+Rd8Gh+yZUOhtnqHc-r4PKuxqgzMDYRJMoPpvhKv=jAQ@mail.gmail.com>
+ <CA+i+Aw2=gfaoQimn4bG8hSYRRacwMbCy9SNigs7ji-ejy0kr-w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334142318-24916-1-git-send-email-michal.labedzki@tieto.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CA+i+Aw2=gfaoQimn4bG8hSYRRacwMbCy9SNigs7ji-ejy0kr-w@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Hi Slawek,
 
-On Wed, Apr 11, 2012, Michal Labedzki wrote:
-> Add missing capability for TrackReachedEnd.
-> ---
->  audio/avrcp.c |    5 +++--
->  1 files changed, 3 insertions(+), 2 deletions(-)
+On Wed, Apr 11, 2012, Slawomir Bochenski wrote:
+> On Wed, Apr 11, 2012 at 3:19 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> > Hi Slawomir,
+> >
+> > On Tue, Apr 10, 2012 at 5:47 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
+> >> This structure is used for giving filters as input argument to
+> >> messages_get_messages_listing(). There is no need for the string members
+> >> to be modifiable in this context. And making them const plays well with
+> >> map_ap_get_string(), from which the values of these members are going to
+> >> be retrieved.
+> >> ---
+> >> v2: Turn on verbose mode in commit messages
+> >>
+> >>  plugins/messages.h |    8 ++++----
+> >>  1 files changed, 4 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/plugins/messages.h b/plugins/messages.h
+> >> index 00a040c..2cdd92f 100644
+> >> --- a/plugins/messages.h
+> >> +++ b/plugins/messages.h
+> >> @@ -111,11 +111,11 @@ struct messages_event {
+> >>  struct messages_filter {
+> >>        uint32_t parameter_mask;
+> >>        uint8_t type;
+> >> -       char *period_begin;
+> >> -       char *period_end;
+> >> +       const char *period_begin;
+> >> +       const char *period_end;
+> >>        uint8_t read_status;
+> >> -       char *recipient;
+> >> -       char *originator;
+> >> +       const char *recipient;
+> >> +       const char *originator;
+> >>        uint8_t priority;
+> >>  };
+> >>
+> >> --
+> >> 1.7.5.1
+> >
+> > Don't you need to free them at some point? If it is just a reference
+> > then it is probably fine, but if you have to free them then it might
+> > be better this way.
 > 
-> diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index 8eba046..6eb4bb1 100644
-> --- a/audio/avrcp.c
-> +++ b/audio/avrcp.c
-> @@ -557,12 +557,13 @@ static uint8_t avrcp_handle_get_capabilities(struct avrcp_player *player,
->  
->  		return AVC_CTYPE_STABLE;
->  	case CAP_EVENTS_SUPPORTED:
-> -		pdu->params_len = htons(5);
-> -		pdu->params[1] = 3;
-> +		pdu->params[1] = 4;
->  		pdu->params[2] = AVRCP_EVENT_STATUS_CHANGED;
->  		pdu->params[3] = AVRCP_EVENT_TRACK_CHANGED;
->  		pdu->params[4] = AVRCP_EVENT_TRACK_REACHED_START;
-> +		pdu->params[5] = AVRCP_EVENT_TRACK_REACHED_END;
->  
-> +		pdu->params_len = htons(2 + pdu->params[1]);
->  		return AVC_CTYPE_STABLE;
->  	}
+> Just reference to strings stored in another data structure, which
+> takes care of freeing them when request is finished.
 
-This patch has been applied. Thanks.
+That should be mentioned in the commit message (and if it had been from
+the start all this unnecessary discussion could have been avoided).
 
 Johan
