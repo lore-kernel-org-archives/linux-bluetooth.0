@@ -2,35 +2,33 @@ Return-Path: <cyrus@holtmann.org>
 From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Syam Sidhardhan <s.syam@samsung.com>
-Subject: [PATCH BlueZ 05/19] gateway: Fix D-Bus memory leak in audio
-Date: Thu, 12 Apr 2012 20:32:56 +0530
-Message-id: <1334243001-17016-6-git-send-email-s.syam@samsung.com>
+Subject: [PATCH BlueZ 03/19] agent: Free the agent request properly
+Date: Thu, 12 Apr 2012 20:32:54 +0530
+Message-id: <1334243001-17016-4-git-send-email-s.syam@samsung.com>
 In-reply-to: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
 References: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+In the case of error, Unref the req->msg which is allocated inside the
+pincode_request_new()
 ---
- audio/gateway.c |    5 ++++-
- 1 files changed, 4 insertions(+), 1 deletions(-)
+ src/agent.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/audio/gateway.c b/audio/gateway.c
-index 131f93f..19f8ce3 100644
---- a/audio/gateway.c
-+++ b/audio/gateway.c
-@@ -182,8 +182,11 @@ static gboolean agent_sendfd(struct hf_agent *agent, int fd,
- 					DBUS_TYPE_UINT16, &gw->version,
- 					DBUS_TYPE_INVALID);
+diff --git a/src/agent.c b/src/agent.c
+index 9b942e8..363630e 100644
+--- a/src/agent.c
++++ b/src/agent.c
+@@ -456,7 +456,7 @@ int agent_request_pincode(struct agent *agent, struct btd_device *device,
+ 	return 0;
  
--	if (dbus_connection_send_with_reply(dev->conn, msg, &call, -1) == FALSE)
-+	if (dbus_connection_send_with_reply(dev->conn, msg,
-+							&call, -1) == FALSE) {
-+		dbus_message_unref(msg);
- 		return FALSE;
-+	}
+ failed:
+-	g_free(req);
++	agent_request_free(req, FALSE);
+ 	return err;
+ }
  
- 	dbus_pending_call_set_notify(call, notify, dev, NULL);
- 	dbus_pending_call_unref(call);
 -- 
 1.7.4.1
 
