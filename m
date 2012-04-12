@@ -2,35 +2,57 @@ Return-Path: <cyrus@holtmann.org>
 From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Syam Sidhardhan <s.syam@samsung.com>
-Subject: [PATCH obexd 1/4] client: Fix memory leak during session connect
-Date: Thu, 12 Apr 2012 20:33:12 +0530
-Message-id: <1334243001-17016-22-git-send-email-s.syam@samsung.com>
+Subject: [PATCH BlueZ 17/19] src: Fix newline before EOF
+Date: Thu, 12 Apr 2012 20:33:08 +0530
+Message-id: <1334243001-17016-18-git-send-email-s.syam@samsung.com>
 In-reply-to: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
 References: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- client/session.c |    5 ++++-
- 1 files changed, 4 insertions(+), 1 deletions(-)
+ src/agent.h      |    1 -
+ src/log.h        |    1 -
+ src/sdp-client.c |    1 -
+ src/storage.h    |    1 -
+ 4 files changed, 0 insertions(+), 4 deletions(-)
 
-diff --git a/client/session.c b/client/session.c
-index a9883c7..0663262 100644
---- a/client/session.c
-+++ b/client/session.c
-@@ -407,8 +407,11 @@ static int session_connect(struct obc_session *session,
- 	}
+diff --git a/src/agent.h b/src/agent.h
+index f62bf3b..063a188 100644
+--- a/src/agent.h
++++ b/src/agent.h
+@@ -74,4 +74,3 @@ gboolean agent_matches(struct agent *agent, const char *name, const char *path);
  
- 	/* Ongoing connection */
--	if (session->id > 0)
-+	if (session->id > 0) {
-+		obc_session_unref(callback->session);
-+		g_free(callback);
- 		return 0;
-+	}
+ void agent_init(void);
+ void agent_exit(void);
+-
+diff --git a/src/log.h b/src/log.h
+index b43b2b7..51c52e6 100644
+--- a/src/log.h
++++ b/src/log.h
+@@ -56,4 +56,3 @@ void __btd_enable_debug(struct btd_debug_desc *start,
+ 	if (__btd_debug_desc.flags & BTD_DEBUG_FLAG_PRINT) \
+ 		btd_debug("%s:%s() " fmt,  __FILE__, __FUNCTION__ , ## arg); \
+ } while (0)
+-
+diff --git a/src/sdp-client.c b/src/sdp-client.c
+index f119313..3e78dde 100644
+--- a/src/sdp-client.c
++++ b/src/sdp-client.c
+@@ -366,4 +366,3 @@ int bt_cancel_discovery(const bdaddr_t *src, const bdaddr_t *dst)
  
- 	session->id = transport->connect(session->source, session->destination,
- 					driver->uuid, session->channel,
+ 	return 0;
+ }
+-
+diff --git a/src/storage.h b/src/storage.h
+index 6967f97..6255ae8 100644
+--- a/src/storage.h
++++ b/src/storage.h
+@@ -95,4 +95,3 @@ int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key);
+ gboolean has_longtermkeys(bdaddr_t *local, bdaddr_t *peer);
+ 
+ #define PNP_UUID		"00001200-0000-1000-8000-00805f9b34fb"
+-
 -- 
 1.7.4.1
 
