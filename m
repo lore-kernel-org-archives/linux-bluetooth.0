@@ -1,101 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 12 Apr 2012 10:38:31 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+From: Mikel Astiz <Mikel.Astiz@bmw-carit.de>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix registering HCI devices with duplicate
- name
-Message-ID: <20120412073829.GC5341@aemeltch-MOBL1>
-References: <1334158328-6956-1-git-send-email-marcel@holtmann.org>
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Mikel Astiz
+	<mikel.astiz.oss@gmail.com>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>
+Date: Thu, 12 Apr 2012 07:58:01 +0200
+Subject: RE: [PATCH v0 4/6] Bluetooth: Simplify outgoing SCO scheduling code
+Message-ID: <66BD268F973E3544A665E5F503FB38B71AFB764678@DC01.bmw-carit.intra>
+References: <1334126932-27327-1-git-send-email-mikel.astiz.oss@gmail.com>
+	 <1334126932-27327-5-git-send-email-mikel.astiz.oss@gmail.com>
+	 <1334136286.16897.98.camel@aeonflux>
+	 <CABBYNZJFYJGWWLvOoAfkKJm7KR6-c4dJLObdF8UsD47WyFe2kQ@mail.gmail.com>
+	 <66BD268F973E3544A665E5F503FB38B71AFB76466C@DC01.bmw-carit.intra>
+ <1334158493.16897.115.camel@aeonflux>
+In-Reply-To: <1334158493.16897.115.camel@aeonflux>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334158328-6956-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Wed, Apr 11, 2012 at 05:32:08PM +0200, Marcel Holtmann wrote:
-> When adding HCI devices hci_register_dev assigns the same name
-> hci1 for subsequently added AMP devices.
-> 
-> ...
-> [ 6958.381886] sysfs: cannot create duplicate filename
->         '/devices/virtual/bluetooth/hci1
-> ...
-> 
-> Reported-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_core.c |    7 ++++---
->  1 files changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 52c7abf..4becd28 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1741,7 +1741,7 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
->  int hci_register_dev(struct hci_dev *hdev)
->  {
->  	struct list_head *head = &hci_dev_list, *p;
-> -	int i, id, error;
-> +	int i, error, min_id, id = 0;
->  
->  	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
->  
-> @@ -1751,13 +1751,14 @@ int hci_register_dev(struct hci_dev *hdev)
->  	/* Do not allow HCI_AMP devices to register at index 0,
->  	 * so the index can be used as the AMP controller ID.
->  	 */
-> -	id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
-> +	min_id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
->  
->  	write_lock(&hci_dev_list_lock);
->  
->  	/* Find first available device id */
->  	list_for_each(p, &hci_dev_list) {
-> -		if (list_entry(p, struct hci_dev, list)->id != id)
-> +		if (min_id >= id &&
-> +		    list_entry(p, struct hci_dev, list)->id != id)
->  			break;
-
-I have tested a bit and sometimes this does not work, apparently you need
-to change
-
-<------8<------------------------------------
-|
-|@@ -1813,7 +1813,7 @@ int hci_register_dev(struct hci_dev *hdev)
-| 
-|          sprintf(hdev->name, "hci%d", id);
-|          hdev->id = id;
-|  -       list_add_tail(&hdev->list, head);
-|  +       list_add(&hdev->list, head);
-|
-|          mutex_init(&hdev->lock);
-|
-<------8<------------------------------------
-
-Otherwise it does not allow to create second AMP:
-
-[   97.055459] Create virtual AMP device
-[   97.083333] Bluetooth: min_id 1 id 1
-[  180.063159] Create virtual AMP device
-[  180.140567] Bluetooth: min_id 1 id 0
-[  180.182268] ------------[ cut here ]------------
-[  180.200463] WARNING: at fs/sysfs/dir.c:508 sysfs_add_one+0x9b/0xd0()
-[  180.253814] sysfs: cannot create duplicate filename
-'/class/bluetooth/hci0'
-
-But even with this I still get sometimes errors below after
-adding/removing virtual AMPs.
-
-[  219.358959] Bluetooth: min_id 1 id 4
-[  219.367534] ------------[ cut here ]------------
-[  219.373130] WARNING: at fs/sysfs/dir.c:508 sysfs_add_one+0x9b/0xd0()
-[  219.386933] sysfs: cannot create duplicate filename
-'/devices/virtual/bluetooth/hci4'
-
-
-BTW: Have you checked my patch version 3.
-
-Best regards 
-Andrei Emeltchenko 
+SGkgTWFyY2VsLA0KDQo+IA0KPiBIaSBNaWtlbCwNCj4gDQo+ID4gPiA+PiBBbGwgZGF0YSBwcm9k
+dWNlZCBieSB1c2Vyc3BhY2UgaXMgc2VudCB0byB0aGUgY29udHJvbGxlciB3aXRob3V0DQo+ID4g
+PiA+PiBhbnkgZmxvdyBjb250cm9sLiBUaGlzIHdhcyBhbHNvIHRoZSBjYXNlIGJlZm9yZSB0aGlz
+IHBhdGNoLCBidXQNCj4gPiA+ID4+IG5vdyBpdCdzIG1vcmUgb2J2aW91cyBhbmQgcmVhZGFibGUu
+DQo+ID4gPiA+DQo+ID4gPiA+IGFzIGluIHRoZSBwcmV2aW91cyBwYXRjaC4gWW91IGNhbiBvbmx5
+IGRvIHRoaXMgaWYgeW91IG1ha2Ugc3VyZQ0KPiA+ID4gPiB0aGF0IHRoZSBjb250cm9sbGVyIGRv
+ZXMgbm90IGhhdmUgZmxvdyBjb250cm9sIGVuYWJsZWQuIFlvdSBuZWVkDQo+ID4gPiA+IGFub3Ro
+ZXIgYmFzaWMgY2hlY2sgaGVyZSB0byBlbnN1cmUgdGhpcyBmaXJzdC4gT3RoZXJ3aXNlIGEgbG90
+IG9mDQo+ID4gPiA+IHRoaW5ncw0KPiA+ID4gbWlnaHQgYnJlYWsuDQo+ID4NCj4gPiBUaGVzZSBw
+YXRjaGVzIHNob3VsZCBicmVhayBub3RoaW5nIGZvciBzZXZlcmFsIHJlYXNvbnM6DQo+ID4NCj4g
+PiAxLiBIQ0kgU0NPIGZsb3cgY29udHJvbCBpcyBOT1QgZW5hYmxlZCBieSBkZWZhdWx0LCBhcyBk
+ZXNjcmliZWQgaW4NCj4gdGhlIHNwZWMgdm9sdW1lIDIgcGFydCBFIHNlY3Rpb24gNy4zLjM3Lg0K
+PiA+DQo+ID4gMi4gVGhlIGtlcm5lbCBkb2VzIG5vdCByZWFkIG9yIHdyaXRlIHRoaXMgcGFyYW1l
+dGVyLCB3aGljaCBtZWFucyBpdA0KPiB3b3VsZG4ndCBldmVuIGtub3cgaWYgdGhlIGNvbnRyb2xs
+ZXIgd291bGQgaGF2ZSBpdCBlbmFibGVkIGZvciBzb21lDQo+IHN0cmFuZ2UgcmVhc29uIChob3dl
+dmVyIEkgaGF2ZW4ndCBtYW5hZ2VkIHRvIGZpbmQgYW55IGNvbnRyb2xsZXIgdGhhdA0KPiBldmVu
+IHN1cHBvcnRzIHRoaXMpLg0KPiANCj4gdGhpcyBkb2VzIG5vdCBtZWFuIHdlIGp1c3QgcmVtb3Zl
+IGNvZGUgbm93LiBXZSBzaG91bGQgc3RhcnQgZml4aW5nIHRoYXQNCj4gYW5kIHJlYWQgdGhlIHNl
+dHRpbmcgYWN0dWFsbHkuDQo+IA0KPiA+ID4gSXQgYWxzbyBzZWVtcyB0byByZW1vdmUgYW55IHF1
+b3RlL2ZhaXJuZXNzIG9mIHRoZSBzY2hlZHVsaW5nLA0KPiA+ID4gYWN0dWFsbHkgSW0gbm90IHN1
+cmUgaG93IGl0IHdvcmtzIGJlY2F1c2UgaXQgc2VuZHMgdGhlIGZyYW1lcw0KPiA+ID4gcmVnYXJk
+bGVzcyBvZiB0aGUgbnVtYmVyIG9mIGF2YWlsYWJsZSBzbG90cy9idWZmZXJzIGluZGljYXRlZCBi
+eQ0KPiA+ID4gc2NvX2NudCwgSSBhbHNvIHdvbmRlciBob3cgaXQgd2lsbCBzY2FsZSB3aXRoIG11
+bHRpcGxlIFNDTw0KPiA+ID4gY29ubmVjdGlvbnMsIGV2ZW4gdGhvdWdoIGl0IGlzIHF1aXRlIHJh
+cmUgdG8gaGF2ZSBtb3JlIHRoYW4gb25lIHdobw0KPiA+ID4ga25vd3Mgd2hhdCBjcmF6eSBpZGVh
+cyBwZW9wbGUgd2lsbCBjb21lLg0KPiA+ID4NCj4gPg0KPiA+IDMuIFRoZSBwcmV2aW91cyBpbXBs
+ZW1lbnRhdGlvbiBpbiB0aGUga2VybmVsIHNlZW1zIHRvIGJlIHRvdGFsbHkNCj4gdXNlbGVzcywg
+Z2l2ZW4gdGhhdCBzY29fY250IGlzIG5ldmVyIHVwZGF0ZWQgKGdyZXAgZm9yICJzY29fY250LS0i
+IG9yDQo+IGNoZWNrIGhjaV9zY2hlZF9zY28oKSBhbmQgaGNpX3NjaGVkX2VzY28oKSkuIFNvIHRo
+ZSBpZGVhIG9mIGEgcXVvdGEgaXMNCj4ganVzdCBhbiBpbGx1c2lvbiBoZXJlLg0KPiA+DQo+ID4g
+TWF5YmUgSSdtIG1pc3Npbmcgc29tZXRoaW5nIGhlcmUsIHRoYXQncyB3aHkgSSBuZWVkIHlvdXIg
+ZmVlZGJhY2sgOi0pDQo+ID4NCj4gPiBJbiBhIG51dHNoZWxsOiBpZiBzb21lIGNvbnRyb2xsZXIg
+ZG9lcyBzdXBwb3J0IFNDTyBmbG93IGNvbnRyb2wsIGl0DQo+IHdvdWxkIGJlIHN0cmFpZ2h0Zm9y
+d2FyZCB0byBzdXBwb3J0IGl0IGluIHRoZSBLZXJuZWwgKEkgYWN0dWFsbHkgaGF2ZQ0KPiBhbiBp
+bXBsZW1lbnRhdGlvbiBidXQgd2Fzbid0IGFibGUgdG8gdGVzdCBpdCkuDQo+ID4NCj4gPiBJZiB0
+aGUgY29udHJvbGxlciBkb2Vzbid0IGhhdmUgdGhpcyBmZWF0dXJlLCB3aGljaCBpcyB0aGUgbW9z
+dCBjb21tb24NCj4gY2FzZSwgdGhlbiB3ZSBlaXRoZXIgZG8gaW4gdGhlIGtlcm5lbCAodGltZS1i
+YXNlZCksIGluIHVzZXJzcGFjZSwgb3INCj4gYm90aC4gRm9yIHRoZSBtb21lbnQgSSBqdXN0IHBy
+b3Bvc2UgdG8gZG8gaXQgaW4gdXNlcnNwYWNlLCBhcyB3ZSd2ZQ0KPiBiZWVuIGRvaW5nIHJlY2Vu
+dGx5IGRlc3BpdGUgdGhlIGlsbHVzaW9uIEkgbWVudGlvbiBhYm92ZS4NCj4gPg0KPiA+IFJlZ2Fy
+ZGluZyBtdWx0aXBsZSBTQ09zLCBpdCdzIG5vdCBhIHByb2JsZW0gYXQgYWxsLiBJdCdzIGFjdHVh
+bGx5DQo+IHdoYXQgSSdtIHRyeWluZyB0byBhY2hpZXZlIHdpdGggdGhlc2UgcGF0Y2hlcy4NCj4g
+DQo+IExldHMgcmVhZCB0aGUgc2V0dGluZ3MgZmlyc3QgYW5kIHNlZSB3aGF0IGN1cnJlbnQgY29u
+dHJvbGxlcnMgYXJlDQo+IGRvaW5nLg0KPiBUaGF0IHBhcnQgbmVlZHMgdG8gYmUgZml4ZWQgZmly
+c3QuIEl0IGlzIHNvbWV0aGluZyB3ZSBoYXZlIGJlZW4gbGF6eQ0KPiBhbmQgaWdub3JpbmcgaXQu
+DQo+IA0KDQpXZSBkb24ndCBhY3R1YWxseSBuZWVkIHRvIHJlYWQgYW55dGhpbmcgYmVjYXVzZSB0
+aGUgZmVhdHVyZSBpcyBkaXNhYmxlZCBieSBkZWZhdWx0LiBBcyBJIHNhaWQsIHRoYXQncyBjbGVh
+ciBpbiB0aGUgc3BlY2lmaWNhdGlvbi4NCg0KV2UgbWlnaHQgdHJ5IHRvIHdyaXRlIGl0IChzZXQg
+aXQgdG8gMSkgYnV0IHRoaXMgaXMgbm90IHN1cHBvcnRlZCBieSB0aGUgbWFpbiBjb250cm9sbGVy
+IG1hbnVmYWN0dXJlcnMgKHRvIGJlIGNvbmZpcm1lZCwgYnV0IHRoYXQncyB0aGUgZmVlZGJhY2sg
+SSBoYXZlKS4gU29tZSBjb250cm9sbGVycyBsaXN0IHRoaXMgZmVhdHVyZSBpbiB0aGUgc3VwcG9y
+dGVkIGNvbW1hbmQgbGlzdCAoc2VjdGlvbiA2LjI3IG9jdGV0IDEwIGJpdCA0KSwgYnV0IHN0aWxs
+IGl0J3Mgbm90IHBvc3NpYmxlIHRvIGVuYWJsZSBpdC4NCg0KU28gSSBkb24ndCByZWFsbHkgZ2V0
+IHdoeSB3ZSBzaG91bGQgY29tcGxpY2F0ZSB0aGUga2VybmVsIGNvZGUgZm9yIHNvbWV0aGluZyB0
+aGF0IGlzIHZlcnkgcmFyZSwgYW5kIHRoYXQgcHJvYmFibHkgbmV2ZXIgYWN0dWFsbHkgd29ya2Vk
+Lg0KDQpVc2Vyc3BhY2UgY29kZSBuZWVkcyB0byBkbyBmbG93IGNvbnRyb2wgYW55d2F5ICh0aW1l
+LWJhc2VkKSwgYW5kIEkgZG9uJ3QgdGhpbmsgd2Ugd2FudCBpdCBpbiB0d28gZGlmZmVyZW50IHBs
+YWNlcy4NCg0KVGhlIG9ubHkgcmVhc29uYWJsZSBhbHRlcm5hdGl2ZSBJIHNlZSBpcyB0aGF0IHRo
+ZSBrZXJuZWwgd291bGQgZG8gZmxvdyBjb250cm9sIGFsd2F5cywgd2l0aCBvciB3aXRob3V0IGhh
+cmR3YXJlIHN1cHBvcnQuIEFzIEkgYWxyZWFkeSBzYWlkLCB0aGlzIHNob3VsZCBiZSBxdWl0ZSBz
+aW1wbGUsIGJ1dCBzdGlsbCB3ZSBhcmUgYWRkaW5nIGxpbmVzIG9mIGNvZGUgd2l0aG91dCBhbnkg
+cmVhbCBiZW5lZml0Lg0KDQpDaGVlcnMsDQpNaWtlbA0KDQo=
