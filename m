@@ -1,182 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 12 Apr 2012 12:51:11 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Message-ID: <1334224208.16897.138.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Fix registering HCI devices with duplicate
+ name
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] GATT: Add support for find included services
-Message-ID: <20120412095111.GA8925@x220.ger.corp.intel.com>
-References: <1333572353-10332-1-git-send-email-jefferson.delfes@openbossa.org>
- <1333572353-10332-2-git-send-email-jefferson.delfes@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1333572353-10332-2-git-send-email-jefferson.delfes@openbossa.org>
+Date: Thu, 12 Apr 2012 11:50:08 +0200
+In-Reply-To: <20120412073829.GC5341@aemeltch-MOBL1>
+References: <1334158328-6956-1-git-send-email-marcel@holtmann.org>
+	 <20120412073829.GC5341@aemeltch-MOBL1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jefferson,
+Hi Andrei,
 
-On Wed, Apr 04, 2012, Jefferson Delfes wrote:
-> Some services like HID over LE can reference another service using
-> included services.
+> > When adding HCI devices hci_register_dev assigns the same name
+> > hci1 for subsequently added AMP devices.
+> > 
+> > ...
+> > [ 6958.381886] sysfs: cannot create duplicate filename
+> >         '/devices/virtual/bluetooth/hci1
+> > ...
+> > 
+> > Reported-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> > ---
+> >  net/bluetooth/hci_core.c |    7 ++++---
+> >  1 files changed, 4 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index 52c7abf..4becd28 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -1741,7 +1741,7 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
+> >  int hci_register_dev(struct hci_dev *hdev)
+> >  {
+> >  	struct list_head *head = &hci_dev_list, *p;
+> > -	int i, id, error;
+> > +	int i, error, min_id, id = 0;
+> >  
+> >  	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
+> >  
+> > @@ -1751,13 +1751,14 @@ int hci_register_dev(struct hci_dev *hdev)
+> >  	/* Do not allow HCI_AMP devices to register at index 0,
+> >  	 * so the index can be used as the AMP controller ID.
+> >  	 */
+> > -	id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
+> > +	min_id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
+> >  
+> >  	write_lock(&hci_dev_list_lock);
+> >  
+> >  	/* Find first available device id */
+> >  	list_for_each(p, &hci_dev_list) {
+> > -		if (list_entry(p, struct hci_dev, list)->id != id)
+> > +		if (min_id >= id &&
+> > +		    list_entry(p, struct hci_dev, list)->id != id)
+> >  			break;
 > 
-> See Vol 3, Part G, section 2.6.3 of Core specification for more
-> details.
-> ---
->  attrib/gatt.c |  173 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  attrib/gatt.h |    9 +++
->  2 files changed, 182 insertions(+)
+> I have tested a bit and sometimes this does not work, apparently you need
+> to change
 > 
-> diff --git a/attrib/gatt.c b/attrib/gatt.c
-> index 1c3ff78..3802200 100644
-> --- a/attrib/gatt.c
-> +++ b/attrib/gatt.c
-> @@ -47,6 +47,22 @@ struct discover_primary {
->  	void *user_data;
->  };
->  
-> +struct find_included {
-> +	GAttrib *attrib;
-> +	uint16_t end;
-> +	GSList *includes;
-> +	gatt_cb_t cb;
-> +	uint16_t n_uuid_missing;
-> +	gboolean final;
-> +	unsigned int err;
-> +	void *user_data;
-> +};
+> <------8<------------------------------------
+> |
+> |@@ -1813,7 +1813,7 @@ int hci_register_dev(struct hci_dev *hdev)
+> | 
+> |          sprintf(hdev->name, "hci%d", id);
+> |          hdev->id = id;
+> |  -       list_add_tail(&hdev->list, head);
+> |  +       list_add(&hdev->list, head);
+> |
+> |          mutex_init(&hdev->lock);
+> |
+> <------8<------------------------------------
+>
+> Otherwise it does not allow to create second AMP:
+> 
+> [   97.055459] Create virtual AMP device
+> [   97.083333] Bluetooth: min_id 1 id 1
+> [  180.063159] Create virtual AMP device
+> [  180.140567] Bluetooth: min_id 1 id 0
+> [  180.182268] ------------[ cut here ]------------
+> [  180.200463] WARNING: at fs/sysfs/dir.c:508 sysfs_add_one+0x9b/0xd0()
+> [  180.253814] sysfs: cannot create duplicate filename
+> '/class/bluetooth/hci0'
 
-Could you try to make this struct a bit more readable, e.g. use tabs to
-align the variable names and group related things together (like cb and
-user_data). I think uuids_missing or missing_uuids would be better than
-n_uuid_missing.
+that makes sense. Since if the list is not ordered, we are obviously
+failing here to pick the right id. So it is important that we keep our
+list ordered.
 
-> +static size_t encode_find_included(uint16_t start, uint16_t end,
-> +					uint8_t *pdu, size_t len)
-> +{
-> +	bt_uuid_t uuid;
-> +	
-> +	bt_uuid16_create(&uuid, GATT_INCLUDE_UUID);
+> But even with this I still get sometimes errors below after
+> adding/removing virtual AMPs.
+> 
+> [  219.358959] Bluetooth: min_id 1 id 4
+> [  219.367534] ------------[ cut here ]------------
+> [  219.373130] WARNING: at fs/sysfs/dir.c:508 sysfs_add_one+0x9b/0xd0()
+> [  219.386933] sysfs: cannot create duplicate filename
+> '/devices/virtual/bluetooth/hci4'
 
-The empty line above is not actually empty but adds an unnecessary tab.
-Please fix.
+Can you print out the order of the list when this happens. Something is
+fishy here. And I bet it is broken for a while now. Just that nobody has
+really noticed yet.
 
-> +static void included_cb(uint8_t status, const uint8_t *pdu, uint16_t len,
-> +							gpointer user_data)
-> +{
-> +	struct find_included *fi = user_data;
-> +	struct att_data_list *list;
-> +	unsigned int i;
-> +	uint16_t last_handle = fi->end;
-> +
-> +	if (status) {
-> +		if (status != ATT_ECODE_ATTR_NOT_FOUND)
-> +			fi->err = status;
-> +		fi->final = TRUE;
-> +		goto done;
-> +	}
-> +
-> +	list = dec_read_by_type_resp(pdu, len);
-> +	if (list == NULL) {
-> +		fi->err = ATT_ECODE_IO;
-> +		fi->final = TRUE;
-> +		goto done;
-> +	}
-> +
-> +	for (i = 0; i < list->num; i++) {
-> +		const uint8_t *data = list->data[i];
-> +		struct gatt_included *include;
-> +		
-> +		/* Skipping invalid data */
+> BTW: Have you checked my patch version 3.
 
-The above empty line is not actually empty but adds two unnecessary
-tabs. Please fix.
+If we have to run through that list twice, then we are doing something
+wrong. Also having to run through the whole list seems pointless. We
+just need to make sure that the list stays ordered.
 
-> +		if (list->len != 6 && list->len != 8)
-> +			continue;
+Regards
 
-The value of list->len doesn't change anywhere inside this for loop so
-it doesn't make sense to keep checking for it at every iteration.
-Instead it seems like the right place to check for it is before entering
-the for loop.
+Marcel
 
-> +
-> +		include = g_new0(struct gatt_included, 1);
-> +		include->handle = att_get_u16(&data[0]);
-> +		include->range.start = att_get_u16(&data[2]);
-> +		include->range.end = att_get_u16(&data[4]);
-> +		fi->includes = g_slist_append(fi->includes, include);
-> +
-> +		if (list->len == 8) {
-> +			bt_uuid_t uuid128;
-> +			bt_uuid_t uuid16 = att_get_uuid16(&data[6]);
-> +			bt_uuid_to_uuid128(&uuid16, &uuid128);
-> +			bt_uuid_to_string(&uuid128, include->uuid,
-> +						sizeof(include->uuid));
-> +		} else {
-> +			uint8_t *buf;
-> +			int buflen;
-> +			uint16_t plen;
-> +			struct find_include_data *fid =
-> +					g_new0(struct find_include_data, 1);
-> +			fid->find_incl = fi;
-> +			fid->gatt_incl = include;
-> +
-> +			/* 128-bit UUID, we need to "resolve" it */
-> +			buf = g_attrib_get_buffer(fi->attrib, &buflen);
-> +			plen = enc_read_req(include->range.start, buf, buflen);
-> +			fi->n_uuid_missing++;
-> +			g_attrib_send(fi->attrib, 0, buf[0], buf,
-> +						plen, find_included_helper,
-> +						fid, NULL);
-> +		}
-> +
-> +		last_handle = include->handle;
-> +	}
-> +
-> +	att_data_list_free(list);
-> +
-> +	if (last_handle != fi->end) {
-> +		int buflen = 0;
-> +		uint8_t *buf = g_attrib_get_buffer(fi->attrib, &buflen);
-> +		size_t oplen = encode_find_included(last_handle + 1,
-> +							fi->end, buf, buflen);
-> +
-> +		g_attrib_send(fi->attrib, 0, buf[0], buf, oplen,
-> +					included_cb, fi, NULL);
-> +	} else
-> +		fi->final = TRUE;
-> +
-> +done:
-> +	if (fi->final && fi->n_uuid_missing == 0) {
-> +		fi->cb(fi->includes, fi->err, fi->user_data);
-> +		find_included_free(fi);
-> +	}
-> +}
 
-This whole function is too long. See if you can refactor it somehow.
-
-> +unsigned int gatt_find_included(GAttrib *attrib, uint16_t start, uint16_t end,
-> +				gatt_cb_t func, gpointer user_data)
-> +{
-> +	struct find_included *fi;
-> +	int buflen;
-> +	uint8_t *buf = g_attrib_get_buffer(attrib, &buflen);
-> +	size_t plen;
-> +
-> +	plen = encode_find_included(start, end, buf, buflen);
-> +	if (plen == 0)
-> +		return 0;
-> +
-> +	fi = g_new0(struct find_included, 1);
-> +	fi->attrib = g_attrib_ref(attrib);
-> +	fi->end = end;
-> +	fi->cb = func;
-> +	fi->user_data = user_data;
-> +
-> +	return g_attrib_send(attrib, 0, buf[0], buf, plen, included_cb,
-> +					fi, NULL);
-
-Looks like the above line is not appropriately indented. Please indent
-as much as possible while staying under 80 chars.
-
-Johan
