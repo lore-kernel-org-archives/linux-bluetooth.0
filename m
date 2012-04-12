@@ -1,48 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120412091832.GA8109@x220.ger.corp.intel.com>
-References: <1334127438-27617-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1334127438-27617-2-git-send-email-mikel.astiz.oss@gmail.com>
-	<CABBYNZJF8XSSdVH2PCB7aX2eNyrPq5Nfj7L5gGV-WMcXyUaPhg@mail.gmail.com>
-	<CABBYNZ+So=kMMjN+ZkLB+gHnAy2EZGvhATbANSdfbpnWEMbQYQ@mail.gmail.com>
-	<66BD268F973E3544A665E5F503FB38B71AFB7646BB@DC01.bmw-carit.intra>
-	<20120412091832.GA8109@x220.ger.corp.intel.com>
-Date: Thu, 12 Apr 2012 17:29:25 +0200
-Message-ID: <CANT-zCXhbJJbyjj9U4oeU2q2USfUETvXR5SzJ4wcw+VpTqtwmw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v0 1/7] btio: Fix bind SCO socket only if server
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: Mikel Astiz <Mikel.Astiz@bmw-carit.de>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Syam Sidhardhan <s.syam@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Syam Sidhardhan <s.syam@samsung.com>
+Subject: [PATCH BlueZ 14/19] network: Remove header declared but not defined
+Date: Thu, 12 Apr 2012 20:33:05 +0530
+Message-id: <1334243001-17016-15-git-send-email-s.syam@samsung.com>
+In-reply-to: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
+References: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+---
+ network/server.h |    2 --
+ 1 files changed, 0 insertions(+), 2 deletions(-)
 
-On Thu, Apr 12, 2012 at 11:18 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->
-> Hi Mikel,
->
-> On Thu, Apr 12, 2012, Mikel Astiz wrote:
-> > If I understand this correctly, this means we need some kernel
-> > patches. Either (a) we add the source address in sockaddr_sco so we
-> > can drop the bind() call (because sco_sock_connect would already
-> > receive both addresses), or (b) we modify sco_sock_bind such that it
-> > doesn't complain with EADDRINUSE.
-> >
-> > I don't have much experience with sockets but the second approach
-> > seems a workaround to me.
->
-> Actually b) sounds more like a bugfix than a workaround (and a doesn't
-> sound like a good idea at all). Returning that error only makes sense
-> for server sockets but we can't know if this is a server socket or not
-> at the bind stage. What should probably be done is that the EADDRINUSE
-> isn't returned for bind() but for listen().
->
-> Johan
+diff --git a/network/server.h b/network/server.h
+index d88acab..6351f6d 100644
+--- a/network/server.h
++++ b/network/server.h
+@@ -25,5 +25,3 @@ int server_init(DBusConnection *conn, gboolean secure);
+ void server_exit(void);
+ int server_register(struct btd_adapter *adapter);
+ int server_unregister(struct btd_adapter *adapter);
+-
+-int server_find_data(const char *path, const char *pattern);
+-- 
+1.7.4.1
 
-I will soon send a kernel patch that follows your suggestion.
-
-Cheers,
-Mikel
