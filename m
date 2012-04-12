@@ -1,114 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vishal Agarwal <vishal.agarwal@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: <vishal.agarwal@stericsson.com>
-Subject: [PATCH] Bluetooth: hci_persistent_key should return bool
-Date: Thu, 12 Apr 2012 15:33:33 +0530
-Message-ID: <1334225013-27564-1-git-send-email-vishal.agarwal@stericsson.com>
+Date: Thu, 12 Apr 2012 13:03:30 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix registering HCI devices with duplicate
+ name
+Message-ID: <20120412100328.GF5341@aemeltch-MOBL1>
+References: <1334158328-6956-1-git-send-email-marcel@holtmann.org>
+ <20120412073829.GC5341@aemeltch-MOBL1>
+ <1334224208.16897.138.camel@aeonflux>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1334224208.16897.138.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch changes the return type of function hci_persistent_key
-from int to bool.
-Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
----
- include/net/bluetooth/hci_core.h |    2 +-
- net/bluetooth/hci_core.c         |   21 +++++++++++----------
- net/bluetooth/mgmt.c             |    2 +-
- 3 files changed, 13 insertions(+), 12 deletions(-)
+Hi Marcel
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c0b232c..8a9abe2 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -983,7 +983,7 @@ int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable);
- int mgmt_connectable(struct hci_dev *hdev, u8 connectable);
- int mgmt_write_scan_failed(struct hci_dev *hdev, u8 scan, u8 status);
- int mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key,
--		      u8 persistent);
-+		      bool persistent);
- int mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 			  u8 addr_type, u32 flags, u8 *name, u8 name_len,
- 			  u8 *dev_class);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 52c7abf..703c28d 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1219,40 +1219,40 @@ struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
- 	return NULL;
- }
- 
--static int hci_persistent_key(struct hci_dev *hdev, struct hci_conn *conn,
-+static bool hci_persistent_key(struct hci_dev *hdev, struct hci_conn *conn,
- 						u8 key_type, u8 old_key_type)
- {
- 	/* Legacy key */
- 	if (key_type < 0x03)
--		return 1;
-+		return true;
- 
- 	/* Debug keys are insecure so don't store them persistently */
- 	if (key_type == HCI_LK_DEBUG_COMBINATION)
--		return 0;
-+		return false;
- 
- 	/* Changed combination key and there's no previous one */
- 	if (key_type == HCI_LK_CHANGED_COMBINATION && old_key_type == 0xff)
--		return 0;
-+		return false;
- 
- 	/* Security mode 3 case */
- 	if (!conn)
--		return 1;
-+		return true;
- 
- 	/* Neither local nor remote side had no-bonding as requirement */
- 	if (conn->auth_type > 0x01 && conn->remote_auth > 0x01)
--		return 1;
-+		return true;
- 
- 	/* Local side had dedicated bonding as requirement */
- 	if (conn->auth_type == 0x02 || conn->auth_type == 0x03)
--		return 1;
-+		return true;
- 
- 	/* Remote side had dedicated bonding as requirement */
- 	if (conn->remote_auth == 0x02 || conn->remote_auth == 0x03)
--		return 1;
-+		return true;
- 
- 	/* If none of the above criteria match, then don't store the key
- 	 * persistently */
--	return 0;
-+	return false;
- }
- 
- struct smp_ltk *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8])
-@@ -1289,7 +1289,8 @@ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
- 		     bdaddr_t *bdaddr, u8 *val, u8 type, u8 pin_len)
- {
- 	struct link_key *key, *old_key;
--	u8 old_key_type, persistent;
-+	u8 old_key_type;
-+	bool persistent;
- 
- 	old_key = hci_find_link_key(hdev, bdaddr);
- 	if (old_key) {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 4e7a01f..fe36ed9 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2954,7 +2954,7 @@ int mgmt_write_scan_failed(struct hci_dev *hdev, u8 scan, u8 status)
- 	return 0;
- }
- 
--int mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key, u8 persistent)
-+int mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key, bool persistent)
- {
- 	struct mgmt_ev_new_link_key ev;
- 
--- 
-1.7.0.4
+On Thu, Apr 12, 2012 at 11:50:08AM +0200, Marcel Holtmann wrote:
+> > > @@ -1751,13 +1751,14 @@ int hci_register_dev(struct hci_dev *hdev)
+> > >  	/* Do not allow HCI_AMP devices to register at index 0,
+> > >  	 * so the index can be used as the AMP controller ID.
+> > >  	 */
+> > > -	id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
+> > > +	min_id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
+> > >  
+> > >  	write_lock(&hci_dev_list_lock);
+> > >  
+> > >  	/* Find first available device id */
+> > >  	list_for_each(p, &hci_dev_list) {
+> > > -		if (list_entry(p, struct hci_dev, list)->id != id)
+> > > +		if (min_id >= id &&
+> > > +		    list_entry(p, struct hci_dev, list)->id != id)
+> > >  			break;
+> > 
+> > I have tested a bit and sometimes this does not work, apparently you need
+> > to change
+> > 
+> > <------8<------------------------------------
+> > |
+> > |@@ -1813,7 +1813,7 @@ int hci_register_dev(struct hci_dev *hdev)
+> > | 
+> > |          sprintf(hdev->name, "hci%d", id);
+> > |          hdev->id = id;
+> > |  -       list_add_tail(&hdev->list, head);
+> > |  +       list_add(&hdev->list, head);
+> > |
+> > |          mutex_init(&hdev->lock);
+> > |
+> > <------8<------------------------------------
+> >
+> > Otherwise it does not allow to create second AMP:
+> > 
+> > [   97.055459] Create virtual AMP device
+> > [   97.083333] Bluetooth: min_id 1 id 1
+> > [  180.063159] Create virtual AMP device
+> > [  180.140567] Bluetooth: min_id 1 id 0
+> > [  180.182268] ------------[ cut here ]------------
+> > [  180.200463] WARNING: at fs/sysfs/dir.c:508 sysfs_add_one+0x9b/0xd0()
+> > [  180.253814] sysfs: cannot create duplicate filename
+> > '/class/bluetooth/hci0'
+> 
+> that makes sense. Since if the list is not ordered, we are obviously
+> failing here to pick the right id. So it is important that we keep our
+> list ordered.
+> 
+> > But even with this I still get sometimes errors below after
+> > adding/removing virtual AMPs.
+> > 
+> > [  219.358959] Bluetooth: min_id 1 id 4
+> > [  219.367534] ------------[ cut here ]------------
+> > [  219.373130] WARNING: at fs/sysfs/dir.c:508 sysfs_add_one+0x9b/0xd0()
+> > [  219.386933] sysfs: cannot create duplicate filename
+> > '/devices/virtual/bluetooth/hci4'
+> 
+> Can you print out the order of the list when this happens. Something is
+> fishy here. And I bet it is broken for a while now. Just that nobody has
+> really noticed yet.
 
+I had hci0...hci4 then removed hci3 and created again and it chooses hci4.
+This is because logic is not smart and just checks hdev->id != id
+
+[  162.994073] Create virtual AMP device
+[  163.018114] Bluetooth: min_id 1 id 3
+[  166.452585] Create virtual AMP device
+[  166.508589] Bluetooth: min_id 1 id 4
+[  197.062710] Clean up virtual AMP device => hci3
+[  202.391750] Create virtual AMP device
+[  202.425382] Bluetooth: min_id 1 id 4
+[  202.428386] ------------[ cut here ]------------
+[  202.431338] WARNING: at fs/sysfs/dir.c:508 sysfs_add_one+0x9b/0xd0()
+[  202.541644] sysfs: cannot create duplicate filename
+'/devices/virtual/bluetooth/hci4'
+
+> > BTW: Have you checked my patch version 3.
+> 
+> If we have to run through that list twice, then we are doing something
+> wrong. Also having to run through the whole list seems pointless. We
+> just need to make sure that the list stays ordered.
+
+We are not running through the whole list, just until found free id.
+
+Best regards 
+Andrei Emeltchenko 
