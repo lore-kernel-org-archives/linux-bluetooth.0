@@ -1,56 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 12 Apr 2012 14:37:38 +0300
+Date: Thu, 12 Apr 2012 14:28:37 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] audio: Fix memory leak when headset server probe()
- fails
-Message-ID: <20120412113738.GA18837@x220.ger.corp.intel.com>
-References: <1334089368-6920-1-git-send-email-anderson.lizardo@openbossa.org>
+To: Scott James Remnant <scott@netsplit.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org, keybuk@chromium.org,
+	marcel@holtmann.org, hadess@hadess.net
+Subject: Re: [PATCHv3 2/4v2] bonding: retry if callback returns TRUE
+Message-ID: <20120412112837.GB14780@x220.ger.corp.intel.com>
+References: <1333665653-30266-1-git-send-email-scott@netsplit.com>
+ <1333665653-30266-3-git-send-email-scott@netsplit.com>
+ <20120405225446.GA19517@samus>
+ <1333741029-3249-1-git-send-email-scott@netsplit.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334089368-6920-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1333741029-3249-1-git-send-email-scott@netsplit.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Scott,
 
-On Tue, Apr 10, 2012, Anderson Lizardo wrote:
-> If RFCOMM is disabled on the kernel, headset_server_probe() fails.
-> Relevant log messages:
-> 
->  audio/manager.c:headset_server_probe() path /org/bluez/499/hci0
->  src/adapter.c:btd_adapter_ref() 0x4bb4f78: ref=6
->  audio/manager.c:audio_adapter_ref() 0x4ca3010: ref=1
->  socket(STREAM, RFCOMM): Protocol not supported (93)
->  audio/manager.c:audio_adapter_unref() 0x4ca3010: ref=0
->  src/adapter.c:btd_adapter_unref() 0x4bb4f78: ref=5
->  audio-headset: Operation not permitted (1)
-> 
-> The powered callback should only be registered if adapter driver probe
-> was successful. The callback unregister was moved to the beginning of
-> headset_server_remove() for consistency.
-> 
-> This fixes this memory leak:
-> 
-> ==499== 8 bytes in 1 blocks are definitely lost in loss record 44 of 182
-> ==499==    at 0x4826444: malloc (vg_replace_malloc.c:263)
-> ==499==    by 0x4877243: g_malloc (gmem.c:132)
-> ==499==    by 0x488D088: g_slice_alloc (gslice.c:836)
-> ==499==    by 0x488E8A5: g_slist_append (gslist.c:230)
-> ==499==    by 0x18AEEE: btd_adapter_register_powered_callback
-> (adapter.c:3416)
-> ==499==    by 0x11AF61: headset_server_probe (manager.c:919)
-> ==499==    by 0x18B67B: probe_driver (adapter.c:2033)
-> ==499==    by 0x1908F5: adapter_init (adapter.c:2048)
-> ==499==    by 0x189D20: btd_manager_register_adapter (manager.c:397)
-> ==499==    by 0x1649AF: mgmt_cmd_complete (mgmtops.c:1075)
-> ==499==    by 0x16665E: mgmt_event (mgmtops.c:1780)
-> ==499==    by 0x48B2EFA: g_io_unix_dispatch (giounix.c:162)
+On Fri, Apr 06, 2012, Scott James Remnant wrote:
+> When a bonding completes, pass the status to any plugin bonding
+> callbacks; if any return TRUE than set a timer to retry the bonding
+> after an appropriate backoff period.
 > ---
->  audio/manager.c |    8 ++++----
->  1 files changed, 4 insertions(+), 4 deletions(-)
+>  src/device.c |   46 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 46 insertions(+), 0 deletions(-)
 
-Applied. Thanks.
+I think you messed up something here. This is not v2 of patch 2/4 but
+seems to be a resend of patch 3/4.
 
 Johan
