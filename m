@@ -1,82 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <Mikel.Astiz@bmw-carit.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Mikel Astiz
-	<mikel.astiz.oss@gmail.com>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Date: Thu, 12 Apr 2012 07:58:01 +0200
-Subject: RE: [PATCH v0 4/6] Bluetooth: Simplify outgoing SCO scheduling code
-Message-ID: <66BD268F973E3544A665E5F503FB38B71AFB764678@DC01.bmw-carit.intra>
-References: <1334126932-27327-1-git-send-email-mikel.astiz.oss@gmail.com>
-	 <1334126932-27327-5-git-send-email-mikel.astiz.oss@gmail.com>
-	 <1334136286.16897.98.camel@aeonflux>
-	 <CABBYNZJFYJGWWLvOoAfkKJm7KR6-c4dJLObdF8UsD47WyFe2kQ@mail.gmail.com>
-	 <66BD268F973E3544A665E5F503FB38B71AFB76466C@DC01.bmw-carit.intra>
- <1334158493.16897.115.camel@aeonflux>
-In-Reply-To: <1334158493.16897.115.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [RFC PATCH BlueZ] doc: Document Broadcaster/Observer API
+Date: Wed, 11 Apr 2012 21:04:28 -0400
+Message-Id: <1334192668-21433-2-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1334192668-21433-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1334192668-21433-1-git-send-email-anderson.lizardo@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQo+IA0KPiBIaSBNaWtlbCwNCj4gDQo+ID4gPiA+PiBBbGwgZGF0YSBwcm9k
-dWNlZCBieSB1c2Vyc3BhY2UgaXMgc2VudCB0byB0aGUgY29udHJvbGxlciB3aXRob3V0DQo+ID4g
-PiA+PiBhbnkgZmxvdyBjb250cm9sLiBUaGlzIHdhcyBhbHNvIHRoZSBjYXNlIGJlZm9yZSB0aGlz
-IHBhdGNoLCBidXQNCj4gPiA+ID4+IG5vdyBpdCdzIG1vcmUgb2J2aW91cyBhbmQgcmVhZGFibGUu
-DQo+ID4gPiA+DQo+ID4gPiA+IGFzIGluIHRoZSBwcmV2aW91cyBwYXRjaC4gWW91IGNhbiBvbmx5
-IGRvIHRoaXMgaWYgeW91IG1ha2Ugc3VyZQ0KPiA+ID4gPiB0aGF0IHRoZSBjb250cm9sbGVyIGRv
-ZXMgbm90IGhhdmUgZmxvdyBjb250cm9sIGVuYWJsZWQuIFlvdSBuZWVkDQo+ID4gPiA+IGFub3Ro
-ZXIgYmFzaWMgY2hlY2sgaGVyZSB0byBlbnN1cmUgdGhpcyBmaXJzdC4gT3RoZXJ3aXNlIGEgbG90
-IG9mDQo+ID4gPiA+IHRoaW5ncw0KPiA+ID4gbWlnaHQgYnJlYWsuDQo+ID4NCj4gPiBUaGVzZSBw
-YXRjaGVzIHNob3VsZCBicmVhayBub3RoaW5nIGZvciBzZXZlcmFsIHJlYXNvbnM6DQo+ID4NCj4g
-PiAxLiBIQ0kgU0NPIGZsb3cgY29udHJvbCBpcyBOT1QgZW5hYmxlZCBieSBkZWZhdWx0LCBhcyBk
-ZXNjcmliZWQgaW4NCj4gdGhlIHNwZWMgdm9sdW1lIDIgcGFydCBFIHNlY3Rpb24gNy4zLjM3Lg0K
-PiA+DQo+ID4gMi4gVGhlIGtlcm5lbCBkb2VzIG5vdCByZWFkIG9yIHdyaXRlIHRoaXMgcGFyYW1l
-dGVyLCB3aGljaCBtZWFucyBpdA0KPiB3b3VsZG4ndCBldmVuIGtub3cgaWYgdGhlIGNvbnRyb2xs
-ZXIgd291bGQgaGF2ZSBpdCBlbmFibGVkIGZvciBzb21lDQo+IHN0cmFuZ2UgcmVhc29uIChob3dl
-dmVyIEkgaGF2ZW4ndCBtYW5hZ2VkIHRvIGZpbmQgYW55IGNvbnRyb2xsZXIgdGhhdA0KPiBldmVu
-IHN1cHBvcnRzIHRoaXMpLg0KPiANCj4gdGhpcyBkb2VzIG5vdCBtZWFuIHdlIGp1c3QgcmVtb3Zl
-IGNvZGUgbm93LiBXZSBzaG91bGQgc3RhcnQgZml4aW5nIHRoYXQNCj4gYW5kIHJlYWQgdGhlIHNl
-dHRpbmcgYWN0dWFsbHkuDQo+IA0KPiA+ID4gSXQgYWxzbyBzZWVtcyB0byByZW1vdmUgYW55IHF1
-b3RlL2ZhaXJuZXNzIG9mIHRoZSBzY2hlZHVsaW5nLA0KPiA+ID4gYWN0dWFsbHkgSW0gbm90IHN1
-cmUgaG93IGl0IHdvcmtzIGJlY2F1c2UgaXQgc2VuZHMgdGhlIGZyYW1lcw0KPiA+ID4gcmVnYXJk
-bGVzcyBvZiB0aGUgbnVtYmVyIG9mIGF2YWlsYWJsZSBzbG90cy9idWZmZXJzIGluZGljYXRlZCBi
-eQ0KPiA+ID4gc2NvX2NudCwgSSBhbHNvIHdvbmRlciBob3cgaXQgd2lsbCBzY2FsZSB3aXRoIG11
-bHRpcGxlIFNDTw0KPiA+ID4gY29ubmVjdGlvbnMsIGV2ZW4gdGhvdWdoIGl0IGlzIHF1aXRlIHJh
-cmUgdG8gaGF2ZSBtb3JlIHRoYW4gb25lIHdobw0KPiA+ID4ga25vd3Mgd2hhdCBjcmF6eSBpZGVh
-cyBwZW9wbGUgd2lsbCBjb21lLg0KPiA+ID4NCj4gPg0KPiA+IDMuIFRoZSBwcmV2aW91cyBpbXBs
-ZW1lbnRhdGlvbiBpbiB0aGUga2VybmVsIHNlZW1zIHRvIGJlIHRvdGFsbHkNCj4gdXNlbGVzcywg
-Z2l2ZW4gdGhhdCBzY29fY250IGlzIG5ldmVyIHVwZGF0ZWQgKGdyZXAgZm9yICJzY29fY250LS0i
-IG9yDQo+IGNoZWNrIGhjaV9zY2hlZF9zY28oKSBhbmQgaGNpX3NjaGVkX2VzY28oKSkuIFNvIHRo
-ZSBpZGVhIG9mIGEgcXVvdGEgaXMNCj4ganVzdCBhbiBpbGx1c2lvbiBoZXJlLg0KPiA+DQo+ID4g
-TWF5YmUgSSdtIG1pc3Npbmcgc29tZXRoaW5nIGhlcmUsIHRoYXQncyB3aHkgSSBuZWVkIHlvdXIg
-ZmVlZGJhY2sgOi0pDQo+ID4NCj4gPiBJbiBhIG51dHNoZWxsOiBpZiBzb21lIGNvbnRyb2xsZXIg
-ZG9lcyBzdXBwb3J0IFNDTyBmbG93IGNvbnRyb2wsIGl0DQo+IHdvdWxkIGJlIHN0cmFpZ2h0Zm9y
-d2FyZCB0byBzdXBwb3J0IGl0IGluIHRoZSBLZXJuZWwgKEkgYWN0dWFsbHkgaGF2ZQ0KPiBhbiBp
-bXBsZW1lbnRhdGlvbiBidXQgd2Fzbid0IGFibGUgdG8gdGVzdCBpdCkuDQo+ID4NCj4gPiBJZiB0
-aGUgY29udHJvbGxlciBkb2Vzbid0IGhhdmUgdGhpcyBmZWF0dXJlLCB3aGljaCBpcyB0aGUgbW9z
-dCBjb21tb24NCj4gY2FzZSwgdGhlbiB3ZSBlaXRoZXIgZG8gaW4gdGhlIGtlcm5lbCAodGltZS1i
-YXNlZCksIGluIHVzZXJzcGFjZSwgb3INCj4gYm90aC4gRm9yIHRoZSBtb21lbnQgSSBqdXN0IHBy
-b3Bvc2UgdG8gZG8gaXQgaW4gdXNlcnNwYWNlLCBhcyB3ZSd2ZQ0KPiBiZWVuIGRvaW5nIHJlY2Vu
-dGx5IGRlc3BpdGUgdGhlIGlsbHVzaW9uIEkgbWVudGlvbiBhYm92ZS4NCj4gPg0KPiA+IFJlZ2Fy
-ZGluZyBtdWx0aXBsZSBTQ09zLCBpdCdzIG5vdCBhIHByb2JsZW0gYXQgYWxsLiBJdCdzIGFjdHVh
-bGx5DQo+IHdoYXQgSSdtIHRyeWluZyB0byBhY2hpZXZlIHdpdGggdGhlc2UgcGF0Y2hlcy4NCj4g
-DQo+IExldHMgcmVhZCB0aGUgc2V0dGluZ3MgZmlyc3QgYW5kIHNlZSB3aGF0IGN1cnJlbnQgY29u
-dHJvbGxlcnMgYXJlDQo+IGRvaW5nLg0KPiBUaGF0IHBhcnQgbmVlZHMgdG8gYmUgZml4ZWQgZmly
-c3QuIEl0IGlzIHNvbWV0aGluZyB3ZSBoYXZlIGJlZW4gbGF6eQ0KPiBhbmQgaWdub3JpbmcgaXQu
-DQo+IA0KDQpXZSBkb24ndCBhY3R1YWxseSBuZWVkIHRvIHJlYWQgYW55dGhpbmcgYmVjYXVzZSB0
-aGUgZmVhdHVyZSBpcyBkaXNhYmxlZCBieSBkZWZhdWx0LiBBcyBJIHNhaWQsIHRoYXQncyBjbGVh
-ciBpbiB0aGUgc3BlY2lmaWNhdGlvbi4NCg0KV2UgbWlnaHQgdHJ5IHRvIHdyaXRlIGl0IChzZXQg
-aXQgdG8gMSkgYnV0IHRoaXMgaXMgbm90IHN1cHBvcnRlZCBieSB0aGUgbWFpbiBjb250cm9sbGVy
-IG1hbnVmYWN0dXJlcnMgKHRvIGJlIGNvbmZpcm1lZCwgYnV0IHRoYXQncyB0aGUgZmVlZGJhY2sg
-SSBoYXZlKS4gU29tZSBjb250cm9sbGVycyBsaXN0IHRoaXMgZmVhdHVyZSBpbiB0aGUgc3VwcG9y
-dGVkIGNvbW1hbmQgbGlzdCAoc2VjdGlvbiA2LjI3IG9jdGV0IDEwIGJpdCA0KSwgYnV0IHN0aWxs
-IGl0J3Mgbm90IHBvc3NpYmxlIHRvIGVuYWJsZSBpdC4NCg0KU28gSSBkb24ndCByZWFsbHkgZ2V0
-IHdoeSB3ZSBzaG91bGQgY29tcGxpY2F0ZSB0aGUga2VybmVsIGNvZGUgZm9yIHNvbWV0aGluZyB0
-aGF0IGlzIHZlcnkgcmFyZSwgYW5kIHRoYXQgcHJvYmFibHkgbmV2ZXIgYWN0dWFsbHkgd29ya2Vk
-Lg0KDQpVc2Vyc3BhY2UgY29kZSBuZWVkcyB0byBkbyBmbG93IGNvbnRyb2wgYW55d2F5ICh0aW1l
-LWJhc2VkKSwgYW5kIEkgZG9uJ3QgdGhpbmsgd2Ugd2FudCBpdCBpbiB0d28gZGlmZmVyZW50IHBs
-YWNlcy4NCg0KVGhlIG9ubHkgcmVhc29uYWJsZSBhbHRlcm5hdGl2ZSBJIHNlZSBpcyB0aGF0IHRo
-ZSBrZXJuZWwgd291bGQgZG8gZmxvdyBjb250cm9sIGFsd2F5cywgd2l0aCBvciB3aXRob3V0IGhh
-cmR3YXJlIHN1cHBvcnQuIEFzIEkgYWxyZWFkeSBzYWlkLCB0aGlzIHNob3VsZCBiZSBxdWl0ZSBz
-aW1wbGUsIGJ1dCBzdGlsbCB3ZSBhcmUgYWRkaW5nIGxpbmVzIG9mIGNvZGUgd2l0aG91dCBhbnkg
-cmVhbCBiZW5lZml0Lg0KDQpDaGVlcnMsDQpNaWtlbA0KDQo=
+---
+ doc/adapter-api.txt |   56 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 56 insertions(+), 0 deletions(-)
+
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 20cef03..67f9f62 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -181,6 +181,48 @@ Methods		dict GetProperties()
+ 
+ 			Possible errors: org.bluez.Error.DoesNotExist
+ 
++		void RegisterBroadcaster(dict values)
++
++			Set Advertising data for broadcast. Different
++			applications can register different Adv. data types,
++			and they are all concatenated to form the Adv. data.
++			Broadcasting is enabled as soon as the first
++			RegisterBroadcaster() call is made.
++
++			Use UnregisterBroadcaster() to release Adv. data for
++			the application. Advertising data is also released when
++			application exits, and once the last Broadcaster exits,
++			advertising is disabled.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.Failed
++
++		void UnregisterBroadcaster()
++
++			This method will release any previously set Advertising
++			data.
++
++			Note that a broadcast procedure is shared between all
++			sessions, thus calling UnregisterBroadcaster() will
++			only release a single session.
++
++			Possible errors: org.bluez.Error.Failed
++
++		void RegisterObserver(object agent, array{byte} data_types)
++
++			Registers an observer agent to monitor broadcasts. This
++			agent will be notified whenever a broadcast is received
++			that contains any of selected Advertising data types.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++
++		void UnregisterObserver(object agent)
++
++			Unregisters an observer. Broadcasts will not be
++			notified to this agent anymore.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++
+ Signals		PropertyChanged(string name, variant value)
+ 
+ 			This signal indicates a changed value of the given
+@@ -284,3 +326,17 @@ Properties	string Address [readonly]
+ 
+ 			List of 128-bit UUIDs that represents the available
+ 			local services.
++
++
++Observer hierarchy
++==================
++
++Service		unique name
++Interface	org.bluez.Observer
++Object path	freely definable
++
++Methods		void BroadcastReceived(string address, byte data_type,
++								variant value)
++
++			This callback gets called when a broadcast data has
++			arrived with selected Advertising Data type.
+-- 
+1.7.5.4
+
