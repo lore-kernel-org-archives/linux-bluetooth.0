@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1334065112-14966-5-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1334065112-14966-4-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1334065112-14966-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1334065112-14966-5-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Thu, 12 Apr 2012 14:08:55 +0300
-Message-ID: <CABBYNZL+=4=LLYKyatUtKOpTuo2ERttHOozW-smTtuN-0GJ4CQ@mail.gmail.com>
-Subject: Re: [PATCH obexd v1 04/11] client: fix progress report before field update
+	<1334065112-14966-4-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Thu, 12 Apr 2012 13:58:53 +0300
+Message-ID: <CABBYNZJP6P+=vtcjVG1figcb+1iktyjOJvEXhB-pgFwiayQa7Q@mail.gmail.com>
+Subject: Re: [PATCH obexd v1 03/11] client: refactor transfer callback use
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Mikel Astiz <mikel.astiz.oss@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
@@ -19,46 +19,14 @@ Hi Mikel,
 On Tue, Apr 10, 2012 at 4:38 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
 > From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 >
-> The progress report in put_xfer_progress was done before the
-> corresponding field was updated.
-> ---
->  client/transfer.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
+> Separated internal functions are used to report success, failure, and
+> progress, instead of using the callback directly.
 >
-> diff --git a/client/transfer.c b/client/transfer.c
-> index 3b4f8f2..b558d84 100644
-> --- a/client/transfer.c
-> +++ b/client/transfer.c
-> @@ -494,10 +494,10 @@ static gssize put_xfer_progress(void *buf, gsize len, gpointer user_data)
->        if (size <= 0)
->                return size;
->
-> -       transfer_notify_progress(transfer);
-> -
->        transfer->transferred += size;
->
-> +       transfer_notify_progress(transfer);
-> +
->        return size;
->  }
->
-> --
-> 1.7.7.6
+> This makes the code more readable.
 
-git blame indicates this has been there in the past but it was changed
-by this commit:
-
-commit e1891acc03a22cc59f0dfb29869243f3ca81e716
-Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date:   Mon Oct 3 18:43:16 2011 +0300
-
-    Fix possible crash when indicating progress
-
-    The amount of transferred bytes should only be updated after it has
-    been sent.
-
-It may not crash anymore, but the change is still logically correct
-since the data has yet to be sent.
+It adds more debug output but its also adds more lines of code,
+perhaps if you join transfer_notify_complete and transfer_notify_error
+then Im fine with it.
 
 -- 
 Luiz Augusto von Dentz
