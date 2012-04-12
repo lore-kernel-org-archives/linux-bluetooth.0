@@ -1,125 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <20120412091832.GA8109@x220.ger.corp.intel.com>
+References: <1334127438-27617-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1334127438-27617-2-git-send-email-mikel.astiz.oss@gmail.com>
+	<CABBYNZJF8XSSdVH2PCB7aX2eNyrPq5Nfj7L5gGV-WMcXyUaPhg@mail.gmail.com>
+	<CABBYNZ+So=kMMjN+ZkLB+gHnAy2EZGvhATbANSdfbpnWEMbQYQ@mail.gmail.com>
+	<66BD268F973E3544A665E5F503FB38B71AFB7646BB@DC01.bmw-carit.intra>
+	<20120412091832.GA8109@x220.ger.corp.intel.com>
+Date: Thu, 12 Apr 2012 17:29:25 +0200
+Message-ID: <CANT-zCXhbJJbyjj9U4oeU2q2USfUETvXR5SzJ4wcw+VpTqtwmw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v0 1/7] btio: Fix bind SCO socket only if server
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>,
-	Mikel Astiz <mikel.astiz.oss@gmail.com>
-Subject: [PATCH] Bluetooth: Fix ADDRINUSE check in SCO sockets
-Date: Thu, 12 Apr 2012 17:30:50 +0200
-Message-Id: <1334244650-11174-1-git-send-email-mikel.astiz.oss@gmail.com>
+To: Mikel Astiz <Mikel.Astiz@bmw-carit.de>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Johan,
 
-The ADDRINUSE error should be returned only when the SCO socket is being
-used as a server. This means it should be checked in sco_sock_listen()
-instead of in sco_sock_bind(), because in the later we can't know if it
-is a server or not.
+On Thu, Apr 12, 2012 at 11:18 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>
+> Hi Mikel,
+>
+> On Thu, Apr 12, 2012, Mikel Astiz wrote:
+> > If I understand this correctly, this means we need some kernel
+> > patches. Either (a) we add the source address in sockaddr_sco so we
+> > can drop the bind() call (because sco_sock_connect would already
+> > receive both addresses), or (b) we modify sco_sock_bind such that it
+> > doesn't complain with EADDRINUSE.
+> >
+> > I don't have much experience with sockets but the second approach
+> > seems a workaround to me.
+>
+> Actually b) sounds more like a bugfix than a workaround (and a doesn't
+> sound like a good idea at all). Returning that error only makes sense
+> for server sockets but we can't know if this is a server socket or not
+> at the bind stage. What should probably be done is that the EADDRINUSE
+> isn't returned for bind() but for listen().
+>
+> Johan
 
-This patch is required in order to use multiple SCO connections in the
-same Bluetooth adapter.
+I will soon send a kernel patch that follows your suggestion.
 
-Signed-off-by: Mikel Astiz <mikel.astiz.oss@gmail.com>
----
- net/bluetooth/sco.c |   49 ++++++++++++++++++++++++++++++-------------------
- 1 files changed, 30 insertions(+), 19 deletions(-)
-
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 8bf26d1..3a81d81 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -278,17 +278,30 @@ drop:
- }
- 
- /* -------- Socket interface ---------- */
--static struct sock *__sco_get_sock_by_addr(bdaddr_t *ba)
-+static int __sco_is_addr_in_use(bdaddr_t *src)
- {
- 	struct sock *sk;
- 	struct hlist_node *node;
- 
--	sk_for_each(sk, node, &sco_sk_list.head)
--		if (!bacmp(&bt_sk(sk)->src, ba))
--			goto found;
--	sk = NULL;
--found:
--	return sk;
-+	sk_for_each(sk, node, &sco_sk_list.head) {
-+		if (sk->sk_state != BT_LISTEN)
-+			continue;
-+
-+		/* Exact match */
-+		if (!bacmp(&bt_sk(sk)->src, src))
-+			return 1;
-+
-+		/* Closest match */
-+		if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY))
-+			return 1;
-+
-+		/* Match any if given src is BDADDR_ANY */
-+		if (!bacmp(src, BDADDR_ANY))
-+			return 1;
-+	}
-+
-+	/* No match found so address is free */
-+	return 0;
- }
- 
- /* Find socket listening on source bdaddr.
-@@ -467,7 +480,6 @@ static int sco_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
- {
- 	struct sockaddr_sco *sa = (struct sockaddr_sco *) addr;
- 	struct sock *sk = sock->sk;
--	bdaddr_t *src = &sa->sco_bdaddr;
- 	int err = 0;
- 
- 	BT_DBG("sk %p %s", sk, batostr(&sa->sco_bdaddr));
-@@ -482,17 +494,9 @@ static int sco_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
- 		goto done;
- 	}
- 
--	write_lock(&sco_sk_list.lock);
--
--	if (bacmp(src, BDADDR_ANY) && __sco_get_sock_by_addr(src)) {
--		err = -EADDRINUSE;
--	} else {
--		/* Save source address */
--		bacpy(&bt_sk(sk)->src, &sa->sco_bdaddr);
--		sk->sk_state = BT_BOUND;
--	}
--
--	write_unlock(&sco_sk_list.lock);
-+	/* Save source address */
-+	bacpy(&bt_sk(sk)->src, &sa->sco_bdaddr);
-+	sk->sk_state = BT_BOUND;
- 
- done:
- 	release_sock(sk);
-@@ -543,17 +547,24 @@ static int sco_sock_listen(struct socket *sock, int backlog)
- 	BT_DBG("sk %p backlog %d", sk, backlog);
- 
- 	lock_sock(sk);
-+	write_lock(&sco_sk_list.lock);
- 
- 	if (sk->sk_state != BT_BOUND || sock->type != SOCK_SEQPACKET) {
- 		err = -EBADFD;
- 		goto done;
- 	}
- 
-+	if (__sco_is_addr_in_use(&bt_sk(sk)->src)) {
-+		err = -EADDRINUSE;
-+		goto done;
-+	}
-+
- 	sk->sk_max_ack_backlog = backlog;
- 	sk->sk_ack_backlog = 0;
- 	sk->sk_state = BT_LISTEN;
- 
- done:
-+	write_unlock(&sco_sk_list.lock);
- 	release_sock(sk);
- 	return err;
- }
--- 
-1.7.7.6
-
+Cheers,
+Mikel
