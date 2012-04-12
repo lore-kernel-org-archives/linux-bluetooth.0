@@ -1,38 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1334243001-17016-3-git-send-email-s.syam@samsung.com>
-References: <1334243001-17016-1-git-send-email-s.syam@samsung.com> <1334243001-17016-3-git-send-email-s.syam@samsung.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Thu, 12 Apr 2012 17:30:02 -0300
-Message-ID: <CAMOw1v4Xohsu5nW8+LECEgsUHUFwTh_3ZtaEqLztgbd-NtKv2w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 02/19] avrcp: Fix the response ctype of SetPlayerApplicationSettingValue
-To: Syam Sidhardhan <s.syam@samsung.com>
+Date: Thu, 12 Apr 2012 22:00:31 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH obexd v3 1/3] MAP: Mark filter strings const
+Message-ID: <20120412190031.GB29311@x220.P-661HNU-F1>
+References: <1334256809-15052-1-git-send-email-lkslawek@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1334256809-15052-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Apr 12, 2012 at 12:02 PM, Syam Sidhardhan <s.syam@samsung.com> wrote:
-> Request ctype of "SetPlayerApplicationSettingValue" is CONTROL,
-> so response should be ACCEPTED instead of STABLE.
+Hi Slawek,
+
+On Thu, Apr 12, 2012, Slawomir Bochenski wrote:
+> This structure is used for giving filters as input argument to
+> messages_get_messages_listing(). There is no need for the string members
+> to be modifiable in this context. And making them const plays well with
+> map_ap_get_string(), from which the values of these members are going to
+> be retrieved.
+> 
+> The string pointers here are simply references to data held in map_ap_t
+> *inparams.
 > ---
->  audio/avrcp.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index 8eba046..70e5bbf 100644
-> --- a/audio/avrcp.c
-> +++ b/audio/avrcp.c
-> @@ -791,7 +791,7 @@ static uint8_t avrcp_handle_set_player_value(struct avrcp_player *player,
->        if (len) {
->                pdu->params_len = 0;
->
-> -               return AVC_CTYPE_STABLE;
-> +               return AVC_CTYPE_ACCEPTED;
+> v3: Add paragraph about pointers being references to data held in another data structure.
+>  plugins/messages.h |    8 ++++----
+>  1 files changed, 4 insertions(+), 4 deletions(-)
 
-Similar to "e8e323e avrcp: Fix response ctype of AbortContinuingResponse"
+All three patches have been applied. Thanks.
 
-Ack.
-
-
-Lucas De Marchi
+Johan
