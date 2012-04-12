@@ -1,55 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 12 Apr 2012 13:45:24 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix registering HCI devices with duplicate
- name
-Message-ID: <20120412104521.GA2779@aemeltch-MOBL1>
-References: <1334158328-6956-1-git-send-email-marcel@holtmann.org>
- <20120412073829.GC5341@aemeltch-MOBL1>
- <1334224208.16897.138.camel@aeonflux>
- <20120412100328.GF5341@aemeltch-MOBL1>
- <1334225714.16897.142.camel@aeonflux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334225714.16897.142.camel@aeonflux>
+In-Reply-To: <1334065112-14966-3-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1334065112-14966-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1334065112-14966-3-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Thu, 12 Apr 2012 13:31:27 +0300
+Message-ID: <CABBYNZKUJaiEC4H6VXoPVPvdUwNgHK5fukvgTfLNbRbWNv2axQ@mail.gmail.com>
+Subject: Re: [PATCH obexd v1 02/11] client: remove unused field
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Mikel,
 
-On Thu, Apr 12, 2012 at 12:15:14PM +0200, Marcel Holtmann wrote:
-> then lets fix the logic we have right now. It can not be that hard to
-> have this behave correctly. Find the proper next free id and find the
-> right location in the list to add it to.
+On Tue, Apr 10, 2012 at 4:38 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>
+> The errorcode field is set but never used, so it can safely be removed.
+> In addition there is no need for such a field, because errors can be
+> propagated using the available callback.
+> ---
+>  client/transfer.c |   22 +++++-----------------
+>  1 files changed, 5 insertions(+), 17 deletions(-)
+>
+> diff --git a/client/transfer.c b/client/transfer.c
+> index 988ec10..a609aa9 100644
+> --- a/client/transfer.c
+> +++ b/client/transfer.c
+> @@ -70,7 +70,6 @@ struct obc_transfer {
+>        int filled;
+>        gint64 size;
+>        gint64 transferred;
+> -       int err;
+>  };
+>
+>  static GQuark obc_transfer_error_quark(void)
+> @@ -310,10 +309,8 @@ static void get_buf_xfer_complete(GObex *obex, GError *err, gpointer user_data)
+>
+>        transfer->xfer = 0;
+>
+> -       if (err) {
+> -               transfer->err = err->code;
+> +       if (err)
+>                goto done;
+> -       }
+>
+>        if (transfer->filled > 0 &&
+>                        transfer->buffer[transfer->filled - 1] == '\0')
+> @@ -407,14 +404,9 @@ static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
+>
+>        transfer->xfer = 0;
+>
+> -       if (err) {
+> -               transfer->err = err->code;
+> -               goto done;
+> -       }
+> -
+> -       transfer->size = transfer->transferred;
+> +       if (err == NULL)
+> +               transfer->size = transfer->transferred;
+>
+> -done:
+>        if (callback)
+>                callback->func(transfer, transfer->size, err, callback->data);
+>  }
+> @@ -431,10 +423,8 @@ static gboolean get_xfer_progress(const void *buf, gsize len,
+>                gint w;
+>
+>                w = write(transfer->fd, transfer->buffer, transfer->filled);
+> -               if (w < 0) {
+> -                       transfer->err = -errno;
+> +               if (w < 0)
+>                        return FALSE;
+> -               }
+>
+>                transfer->filled -= w;
+>        }
+> @@ -478,10 +468,8 @@ static gssize put_xfer_progress(void *buf, gsize len, gpointer user_data)
+>        gssize size;
+>
+>        size = read(transfer->fd, buf, len);
+> -       if (size <= 0) {
+> -               transfer->err = -errno;
+> +       if (size <= 0)
+>                return size;
+> -       }
+>
+>        if (callback)
+>                callback->func(transfer, transfer->transferred, NULL,
+> --
+> 1.7.7.6
 
-We are highly dependent here on ordered list which is not good IMO,
-especially given that BR/EDR shall be first element with id=0. This of
-course works well in default situation when we have only 2 controllers.
+Ack.
 
-> > > > BTW: Have you checked my patch version 3.
-> > > 
-> > > If we have to run through that list twice, then we are doing something
-> > > wrong. Also having to run through the whole list seems pointless. We
-> > > just need to make sure that the list stays ordered.
-> > 
-> > We are not running through the whole list, just until found free id.
-> 
-> You are running the whole list for the bitmask creation and then a
-> second time for finding the right location in the list. Fair enough that
-
-Second run is not needed, we can just add to the tail of the list. In most
-cases list will still be ordered and this does not matter since we do not
-depend on ordered list.
-
-Best regards 
-Andrei Emeltchenko 
-
-> the second time you only run until you found a free spot, but
-> nevertheless, you run it again.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
+-- 
+Luiz Augusto von Dentz
