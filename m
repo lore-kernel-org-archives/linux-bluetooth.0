@@ -1,72 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: Syam Sidhardhan <s.syam@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Syam Sidhardhan <s.syam@samsung.com>
-Subject: [PATCH BlueZ 00/19] Fix D-Bus memory leaks, bluetooth name,
- double unref etc
-Date: Thu, 12 Apr 2012 20:32:51 +0530
-Message-id: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1334162966.16897.122.camel@aeonflux>
+References: <CACj007=jwOuFXOwXX9z+24KT_WvrCmFrVFp8ru_ncMuQriqYMQ@mail.gmail.com>
+	<1334162966.16897.122.camel@aeonflux>
+Date: Thu, 12 Apr 2012 20:38:33 +0530
+Message-ID: <CACj007moPAWrPZ-bcu-J+QmkRVCV34QCKEiMAmdqtnpCn9WiNw@mail.gmail.com>
+Subject: Re: [RFC] BITE test case TP/SEC/SEM/BV-10-C fails
+From: Hemant Gupta <hemantgupta.ste@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Hemant Gupta <hemant.gupta@stericsson.com>, Naresh Gupta <naresh.gupta@stericsson.com>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This series of patches fixes the following issues.
+Hi Marcel,
 
-Syam Sidhardhan (19):
-  health: Fix memory leak
-  avrcp: Fix the response ctype of SetPlayerApplicationSettingValue
-  agent: Free the agent request properly
-  gstavdtpsink: Fix D-Bus memory leak in audio
-  gateway: Fix D-Bus memory leak in audio
-  gateway: Fix D-Bus reply memory leak
-  hci: Retrieve the bluetooth name correctly
-  hciconfig: Remove unwanted NULL termination
-  agent: Fix double D-Bus message unref
-  sdpd-request: Fix passing zero instead of NULL
-  sap-u8500: Fix empty parameter list in function declaration
-  adapter: Remove headers declared but not defined
-  headset: Remove header declared but not defined
-  network: Remove header declared but not defined
-  audio: Fix newline before EOF
-  input: Fix newline before EOF
-  src: Fix newline before EOF
-  doc: Fix typo
-  Add Syam's email address
+On Wed, Apr 11, 2012 at 10:19 PM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> Hi Hemant,
+>
+>> I have found a regression issue with latest kernel code. I am trying
+>> to execute the test case for GAP TP/SEC/SEM/BV-10-C using BITE.
+>> Below is the test purpose
+>>
+>> 5.4.4.6 TP/SEC/SEM/BV-10-C Security Mode 4 - Master
+>> Verify that the IUT disconnects the connection if the initiating side
+>> sends the L2CAP_ConnectReq without first enabling encryption. IUT has
+>> 2.1 Host and 2.1 Con-troller. Tester has 2.1 Host and 2.1 Controller.
+>>
+>> As per my analysis,
+>> 1) Host is sending HCI Disconnect request before L2CAP_ConnectReq is
+>> sent from BITE Tester (It sends it after 5 seconds).
+>> 2) This HCI Disconnect is initiated after 4 secs (approx), from host
+>> side, since there is no other request received from Remote side after
+>> creating ACL.
+>>
+>> static inline void hci_conn_put(struct hci_conn *conn)
+>> {
+>> .......
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (conn->state =3D=3D BT_CO=
+NNECTED) {
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 timeo =3D ms=
+ecs_to_jiffies(conn->disc_timeout);
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!conn->o=
+ut)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 timeo *=3D 2;
+>> .......
+>> }
+>>
+>> Here conn->disc_timeout =3D HCI_DISCONN_TIMEOUT =3D 2 Secs.
+>>
+>> I checked that this timeout has been changed in new kernel, and
+>> earlier code, the mulitplication factor for incoming connection was
+>> timeo *=3D 5 (20 even before).
+>>
+>> After increasing the timeout for hci disconnect to more than 5
+>> seconds, test case TP/SEC/SEM/BV-10-C passes.
+>> Could you confirm if this is acceptable fix to pass the test case.
+>
+> can we get the BITE tester fixed. It is stupid that it waits 5 seconds
+> before sending the L2CAP_Connect_Req. File an errata against the BITE
+> tester.
+>
+> I know that we passed this test case before and I tracked the timeout
+> change back to a commit from me from 2009:
+>
+> commit 052b30b0a8eec8db5b18ad49effdf2a9ba4c1e1a
+> Author: Marcel Holtmann <marcel@holtmann.org>
+> Date: =A0 Sun Apr 26 20:01:22 2009 +0200
+>
+> =A0 =A0Bluetooth: Add different pairing timeout for Legacy Pairing
+>
+> So clearly 3 years ago, this is a breakage in the BITE tester now.
+> Someone else would have noticed in this time frame.
+>
+Thanks for the comments, we have raised the issue with AT4Wireless
+now, and awaiting there feedback for the same.
 
- AUTHORS              |    1 +
- audio/avrcp.c        |    2 +-
- audio/gateway.c      |   11 +++++++----
- audio/gsta2dpsink.c  |    1 -
- audio/gsta2dpsink.h  |    1 -
- audio/gstavdtpsink.c |    4 +++-
- audio/gstrtpsbcpay.c |    1 -
- audio/gstsbcdec.c    |    2 --
- audio/gstsbcenc.c    |    2 --
- audio/gstsbcparse.c  |    1 -
- audio/gstsbcutil.c   |    1 -
- audio/gstsbcutil.h   |    1 -
- audio/headset.h      |    1 -
- doc/adapter-api.txt  |    2 +-
- doc/audio-api.txt    |    2 +-
- doc/device-api.txt   |    2 +-
- doc/health-api.txt   |    6 +++---
- doc/media-api.txt    |    6 +++---
- doc/mgmt-api.txt     |    2 +-
- doc/serial-api.txt   |    2 +-
- health/mcap.c        |    1 +
- input/sixpair.c      |    1 -
- lib/hci.c            |    5 +++--
- network/server.h     |    2 --
- sap/sap-u8500.c      |    2 +-
- src/adapter.h        |    2 --
- src/agent.c          |    3 +--
- src/agent.h          |    1 -
- src/log.h            |    1 -
- src/sdp-client.c     |    1 -
- src/sdpd-request.c   |    2 +-
- src/storage.h        |    1 -
- tools/hciconfig.c    |    2 --
- 33 files changed, 30 insertions(+), 45 deletions(-)
+> Regards
+>
+> Marcel
+>
+>
 
--- 
-1.7.4.1
 
+
+--=20
+Best Regards
+Hemant Gupta
+ST-Ericsson India
