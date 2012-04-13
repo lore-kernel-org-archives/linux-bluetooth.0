@@ -1,55 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Apr 2012 12:51:20 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Syam Sidhardhan <s.syam@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 07/19] hci: Retrieve the bluetooth name correctly
-Message-ID: <20120413095120.GB11639@x220.ger.corp.intel.com>
-References: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
- <1334243001-17016-8-git-send-email-s.syam@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334243001-17016-8-git-send-email-s.syam@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Fri, 13 Apr 2012 11:49:19 +0200
+From: aep <aep@exys.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: Lenovo W510 Bluetooth Controller stopped working in 3.4-rc1
+In-Reply-To: <20120413093400.GC10780@x220.ger.corp.intel.com>
+References: <abfb31f0565ebacddd25efec883e31dc@exys.org>
+ <20120413093400.GC10780@x220.ger.corp.intel.com>
+Message-ID: <d62a71fa204a8a9e8568309b9c1d2f6b@exys.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+On Fri, 13 Apr 2012 12:34:00 +0300, Johan Hedberg wrote:
 
-On Thu, Apr 12, 2012, Syam Sidhardhan wrote:
-> If we set the bluetooth name length as maximum 248 bytes,
-> then while retrieving back we were getting only 247 bytes.
-> This problem can be verified using hciconfig tool.
-> ---
->  lib/hci.c |    5 +++--
->  1 files changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/lib/hci.c b/lib/hci.c
-> index 269c021..9f829c9 100644
-> --- a/lib/hci.c
-> +++ b/lib/hci.c
-> @@ -1417,8 +1417,9 @@ int hci_read_local_name(int dd, int len, char *name, int to)
->  		return -1;
->  	}
->  
-> -	rp.name[247] = '\0';
-> -	strncpy(name, (char *) rp.name, len);
-> +	strncpy(name, (char *) rp.name, len - 1);
-> +	name[len - 1] = '\0';
-> +
->  	return 0;
->  }
+> I don't think that commit or that module parameter has anything to do
+> with this.
 
-This doesn't look quite right to me. What if the local name is not nul
-terminated (exactly 248 characters) and an application passes a buffer
-greater than 249 characters. It seems to me like you'd get a buffer over
-flow with the strncpy call in that case.
+Actually, i didn't respond again due to the embarrassing fact that i 
+added the parameter to the wrong module.
+After adding bluetooth.enable_hs=1 to the kernel commandline (bluetooth 
+is compiled in here), it worked again.
 
-Also, since this is a public library function we need to be very careful
-not to break the ABI. Some application might be "depending" on the
-brokeness of this function and break if we fix it.
+> What user space version are you using?
 
-Since we're planning on making almost everything of libbluetooth private
-to BlueZ starting with 5.0 (I believe the socket structs and definitions
-may be the only exception) I'm not sure these two patches are worth it.
+bluez version 4.98
 
-Johan
+> What do you mean by
+> "vanished without any trace"? Does hciconfig -a or hciconfig hci0 not
+> show anything?
+
+no, and no, and neither anything in dmesg other then that the module 
+was loaded.
+
+> If this is related to mgmt being now enabled by default
+> could you try running user space with "bluetoothd -P mgmtops"?
+
+
+Not sure if that does any good, since adding the parameter did the job, 
+and my /usr/lib/bluetooth/plugins/ is empty.
+Let me know if you still think this helps debugging, then i'll try 
+later.
+
+
+thanks
