@@ -1,41 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Apr 2012 13:01:01 +0300
+Date: Fri, 13 Apr 2012 12:51:20 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: AceLan Kao <acelan.kao@canonical.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Add support for Atheros [13d3:3362]
-Message-ID: <20120413100101.GC11639@x220.ger.corp.intel.com>
-References: <1334309997-882-1-git-send-email-acelan.kao@canonical.com>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 07/19] hci: Retrieve the bluetooth name correctly
+Message-ID: <20120413095120.GB11639@x220.ger.corp.intel.com>
+References: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
+ <1334243001-17016-8-git-send-email-s.syam@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334309997-882-1-git-send-email-acelan.kao@canonical.com>
+In-Reply-To: <1334243001-17016-8-git-send-email-s.syam@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi AceLan,
+Hi Syam,
 
-On Fri, Apr 13, 2012, AceLan Kao wrote:
-> Add another vendor specific ID for Atheros AR3012 device.
-> This chip is wrapped by IMC Networks.
-> 
-> output of usb-devices:
-> T:  Bus=01 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  5 Spd=12  MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=13d3 ProdID=3362 Rev=00.02
-> S:  Manufacturer=Atheros Communications
-> S:  Product=Bluetooth USB Host Controller
-> S:  SerialNumber=Alaska Day 2006
-> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> 
-> Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+On Thu, Apr 12, 2012, Syam Sidhardhan wrote:
+> If we set the bluetooth name length as maximum 248 bytes,
+> then while retrieving back we were getting only 247 bytes.
+> This problem can be verified using hciconfig tool.
 > ---
->  drivers/bluetooth/ath3k.c |    2 ++
->  drivers/bluetooth/btusb.c |    1 +
->  2 files changed, 3 insertions(+), 0 deletions(-)
+>  lib/hci.c |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/lib/hci.c b/lib/hci.c
+> index 269c021..9f829c9 100644
+> --- a/lib/hci.c
+> +++ b/lib/hci.c
+> @@ -1417,8 +1417,9 @@ int hci_read_local_name(int dd, int len, char *name, int to)
+>  		return -1;
+>  	}
+>  
+> -	rp.name[247] = '\0';
+> -	strncpy(name, (char *) rp.name, len);
+> +	strncpy(name, (char *) rp.name, len - 1);
+> +	name[len - 1] = '\0';
+> +
+>  	return 0;
+>  }
 
-Applied to the bluetooth and bluetooth-next trees. Thanks.
+This doesn't look quite right to me. What if the local name is not nul
+terminated (exactly 248 characters) and an application passes a buffer
+greater than 249 characters. It seems to me like you'd get a buffer over
+flow with the strncpy call in that case.
+
+Also, since this is a public library function we need to be very careful
+not to break the ABI. Some application might be "depending" on the
+brokeness of this function and break if we fix it.
+
+Since we're planning on making almost everything of libbluetooth private
+to BlueZ starting with 5.0 (I believe the socket structs and definitions
+may be the only exception) I'm not sure these two patches are worth it.
 
 Johan
