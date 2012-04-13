@@ -1,44 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Apr 2012 12:03:17 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [PATCH] Bluetooth: Fix ADDRINUSE check in SCO sockets
-Message-ID: <20120413090317.GB10234@x220.ger.corp.intel.com>
-References: <1334244650-11174-1-git-send-email-mikel.astiz.oss@gmail.com>
+From: Vishal Agarwal <vishal.agarwal@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: <vishal.agarwal@stericsson.com>
+Subject: [PATCH 2/2] Bluetooth: Temporary keys should be retained during connection
+Date: Fri, 13 Apr 2012 14:31:15 +0530
+Message-ID: <1334307675-2983-2-git-send-email-vishal.agarwal@stericsson.com>
+In-Reply-To: <1334307675-2983-1-git-send-email-vishal.agarwal@stericsson.com>
+References: <1334307675-2983-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334244650-11174-1-git-send-email-mikel.astiz.oss@gmail.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+If a key is non persistent then it should not be used in future
+connections but it should be kept for current connection. And it
+should be removed when connecion is removed.
 
-On Thu, Apr 12, 2012, Mikel Astiz wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-> 
-> The ADDRINUSE error should be returned only when the SCO socket is being
-> used as a server. This means it should be checked in sco_sock_listen()
-> instead of in sco_sock_bind(), because in the later we can't know if it
-> is a server or not.
-> 
-> This patch is required in order to use multiple SCO connections in the
-> same Bluetooth adapter.
-> 
-> Signed-off-by: Mikel Astiz <mikel.astiz.oss@gmail.com>
-> ---
->  net/bluetooth/sco.c |   49 ++++++++++++++++++++++++++++++-------------------
->  1 files changed, 30 insertions(+), 19 deletions(-)
+Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
+---
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_core.c         |    8 ++++----
+ net/bluetooth/hci_event.c        |    2 ++
+ 3 files changed, 7 insertions(+), 4 deletions(-)
 
-In general the patch looks ok to me except for a few things regarding
-the helper function:
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 8a9abe2..afdea95 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -318,6 +318,7 @@ struct hci_conn {
+ 
+ 	__u8		remote_cap;
+ 	__u8		remote_auth;
++	bool		flush_key;
+ 
+ 	unsigned int	sent;
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 703c28d..4daee98 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1333,10 +1333,10 @@ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+ 
+ 	mgmt_new_link_key(hdev, key, persistent);
+ 
+-	if (!persistent) {
+-		list_del(&key->list);
+-		kfree(key);
+-	}
++	if (!conn)
++		return 0;
++
++	conn->flush_key = !persistent;
+ 
+ 	return 0;
+ }
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index bb6d802..5c23548 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1930,6 +1930,8 @@ static inline void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 	}
+ 
+ 	if (ev->status == 0) {
++		if (conn->type == ACL_LINK && conn->flush_key)
++			hci_remove_link_key(hdev, &conn->dst);
+ 		hci_proto_disconn_cfm(conn, ev->reason);
+ 		hci_conn_del(conn);
+ 	}
+-- 
+1.7.0.4
 
-> +static int __sco_is_addr_in_use(bdaddr_t *src)
-
-I suppose bool makes more sense than int here. The naming sounds also a
-bit awkward to me (otoh maybe this is a normal convention): I'd just
-leave out the "_is_" part or at least move it after "addr" to make it
-sound more like normal English.
-
-Johan
