@@ -1,67 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Apr 2012 11:08:18 -0500 (CDT)
-From: Manoj Iyer <manoj.iyer@canonical.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-cc: Manoj Iyer <manoj.iyer@canonical.com>, linux-kernel@vger.kernel.org,
-    linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: btusb: Add vendor specific ID (0489 e042)
- for BCM20702A0
-In-Reply-To: <20120413092312.GA10780@x220.ger.corp.intel.com>
-Message-ID: <alpine.DEB.2.02.1204131106150.3180@lazy>
-References: <1333981348-3720-1-git-send-email-manoj.iyer@canonical.com> <1333981348-3720-2-git-send-email-manoj.iyer@canonical.com> <20120413092312.GA10780@x220.ger.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+From: Steven Harms <sjharms@gmail.com>
+To: Steven Harms <sjharms@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/1] Add bluetooth support for Foxconn - Hon Hai bluetooth usb present in Acer TimelineX AS4830TG-6808
+Date: Fri, 13 Apr 2012 09:47:07 -0400
+Message-Id: <1334324827-6017-1-git-send-email-sjharms@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
-Johan,
+Signed-off-by: Steven Harms <sjharms@gmail.com>
+---
+ drivers/bluetooth/btusb.c |    3 +++
+ 1 file changed, 3 insertions(+)
 
-I also sent another patch following this one with
-
-Subject	[PATCH] Bluetooth: btusb: Add vendor specific ID (0a5c:21f4) 
-BCM20702A0
-Date	Wed, 11 Apr 2012 13:39:23 -0500
-
-https://lkml.org/lkml/2012/4/11/358
-
-Just thought I will mention it to you coz both the subject lines look 
-similar except for the IDs, sorry about that, the 2nd one was reported 
-right after I submitted the 1st patch. Can you please review that as well?
-
--- manoj
-
-On Fri, 13 Apr 2012, Johan Hedberg wrote:
-
-> Hi Manoj,
->
-> On Mon, Apr 09, 2012, Manoj Iyer wrote:
->> T: Bus=02 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#= 3 Spd=12 MxCh= 0
->> D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
->> P: Vendor=0489 ProdID=e042 Rev=01.12
->> S: Manufacturer=Broadcom Corp
->> S: Product=BCM20702A0
->> S: SerialNumber=E4D53DCA61B5
->> C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
->> I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
->> I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
->> I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
->> I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
->>
->> Reported-by: Dennis Chua <dennis.chua@canonical.com>
->> Signed-off-by: Manoj Iyer <manoj.iyer@canonical.com>
->> ---
->>  drivers/bluetooth/btusb.c |    1 +
->>  1 files changed, 1 insertions(+), 0 deletions(-)
->
-> Applied to both bluetooth.git and bluetooth-next.git. Thanks.
->
-> Johan
->
->
-
---
-====================
-Manoj Iyer
-Ubuntu/Canonical
-Hardware Enablement
-====================
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 3311b81..7d7d614 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -107,6 +107,9 @@ static struct usb_device_id btusb_table[] = {
+ 	{ USB_DEVICE(0x0a5c, 0x21f3) },
+ 	{ USB_DEVICE(0x413c, 0x8197) },
+ 
++	/* Foxconn - Hon Hai */
++	{ USB_DEVICE(0x0489, 0xe033) },
++
+ 	{ }	/* Terminating entry */
+ };
+ 
+-- 
+1.7.9.5
