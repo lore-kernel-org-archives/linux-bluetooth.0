@@ -1,46 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 2/2] Bluetooth: Fix debug printing unallocated name
-Date: Fri, 13 Apr 2012 14:21:39 +0300
-Message-Id: <1334316099-18492-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1334316099-18492-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1334311590-1135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1334316099-18492-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <d62a71fa204a8a9e8568309b9c1d2f6b@exys.org>
+References: <abfb31f0565ebacddd25efec883e31dc@exys.org>
+	<20120413093400.GC10780@x220.ger.corp.intel.com>
+	<d62a71fa204a8a9e8568309b9c1d2f6b@exys.org>
+Date: Fri, 13 Apr 2012 06:42:07 -0400
+Message-ID: <CAJdJm_PE-_3OZoDCXRf6wne_myQDCSV9wcvA9RnGt_W6uH5BRQ@mail.gmail.com>
+Subject: Re: Lenovo W510 Bluetooth Controller stopped working in 3.4-rc1
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: aep <aep@exys.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi aep,
 
-It does make sense to print hdev name after allocation.
+On Fri, Apr 13, 2012 at 5:49 AM, aep <aep@exys.org> wrote:
+>> If this is related to mgmt being now enabled by default
+>> could you try running user space with "bluetoothd -P mgmtops"?
+>
+> Not sure if that does any good, since adding the parameter did the job, and
+> my /usr/lib/bluetooth/plugins/ is empty.
+> Let me know if you still think this helps debugging, then i'll try later.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/hci_core.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+BlueZ plugins by default are "built-in", i.e. they are linked inside
+the bluetoothd binary. But even built-in plugins can be disabled with
+-P.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 9596a82..a3c955f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1744,8 +1744,6 @@ int hci_register_dev(struct hci_dev *hdev)
- 	int i, id, error;
- 	unsigned long *inuse;
- 
--	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
--
- 	if (!hdev->open || !hdev->close)
- 		return -EINVAL;
- 
-@@ -1768,6 +1766,8 @@ int hci_register_dev(struct hci_dev *hdev)
- 	sprintf(hdev->name, "hci%d", id);
- 	hdev->id = id;
- 
-+	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
-+
- 	list_add_tail(&hdev->list, &hci_dev_list);
- 
- 	mutex_init(&hdev->lock);
+What Johan is suggesting is to disable the mgmtops plugin so that
+hciops is used instead. If this works, it is due to a known regression
+which happens with incompatible userspace tools and kernel versions.
+
+Fortunately, a proper fix is on the way for the next upstream release.
+So you can use this workaround for now.
+
+Best Regards,
 -- 
-1.7.9.5
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
