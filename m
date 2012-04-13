@@ -1,75 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 1/2] sdp-client: Add ability to clear cached session
-Date: Fri, 13 Apr 2012 12:11:42 +0200
-Message-ID: <1334311903-7218-1-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 13 Apr 2012 13:08:44 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd 0/4] Fix memory leak, remove unused struct etc
+Message-ID: <20120413100844.GB17640@x220.ger.corp.intel.com>
+References: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
+ <1334243001-17016-21-git-send-email-s.syam@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1334243001-17016-21-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will be usefull for disconnecting SDP L2CAP channel before cached
-session timeout fires.
----
- src/sdp-client.c |   22 +++++++++++++++++++++-
- src/sdp-client.h |    1 +
- 2 files changed, 22 insertions(+), 1 deletion(-)
+Hi Syam,
 
-diff --git a/src/sdp-client.c b/src/sdp-client.c
-index 3e78dde..55e59c2 100644
---- a/src/sdp-client.c
-+++ b/src/sdp-client.c
-@@ -61,7 +61,7 @@ static gboolean cached_session_expired(gpointer user_data)
- 	return FALSE;
- }
- 
--static sdp_session_t *get_sdp_session(const bdaddr_t *src, const bdaddr_t *dst)
-+static sdp_session_t *get_cached_sdp_session(const bdaddr_t *src, const bdaddr_t *dst)
- {
- 	GSList *l;
- 
-@@ -82,6 +82,17 @@ static sdp_session_t *get_sdp_session(const bdaddr_t *src, const bdaddr_t *dst)
- 		return session;
- 	}
- 
-+	return NULL;
-+}
-+
-+static sdp_session_t *get_sdp_session(const bdaddr_t *src, const bdaddr_t *dst)
-+{
-+	sdp_session_t *session;
-+
-+	session = get_cached_sdp_session(src, dst);
-+	if (session)
-+		return session;
-+
- 	return sdp_connect(src, dst, SDP_NON_BLOCKING);
- }
- 
-@@ -366,3 +377,12 @@ int bt_cancel_discovery(const bdaddr_t *src, const bdaddr_t *dst)
- 
- 	return 0;
- }
-+
-+void bt_clear_cached_session(const bdaddr_t *src, const bdaddr_t *dst)
-+{
-+	sdp_session_t *session;
-+
-+	session = get_cached_sdp_session(src, dst);
-+	if (session)
-+		sdp_close(session);
-+}
-diff --git a/src/sdp-client.h b/src/sdp-client.h
-index 13d9121..9191594 100644
---- a/src/sdp-client.h
-+++ b/src/sdp-client.h
-@@ -28,3 +28,4 @@ int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
- 			uuid_t *uuid, bt_callback_t cb, void *user_data,
- 			bt_destroy_t destroy);
- int bt_cancel_discovery(const bdaddr_t *src, const bdaddr_t *dst);
-+void bt_clear_cached_session(const bdaddr_t *src, const bdaddr_t *dst);
--- 
-on behalf of ST-Ericsson
+On Thu, Apr 12, 2012, Syam Sidhardhan wrote:
+> This series of patches fixes the following issues in obexd.
+> 
+> Syam Sidhardhan (4):
+>   client: Fix memory leak during session connect
+>   src: Use goto for avoiding code duplication
+>   src: Remove headers declared but not defined
+>   client: Remove unused struct session_callback
+> 
+>  client/session.c |   10 ++++------
+>  src/manager.c    |    4 ++--
+>  src/obex.h       |    4 ----
+>  3 files changed, 6 insertions(+), 12 deletions(-)
 
+All patches in this set have been applied. Thanks.
+
+Johan
