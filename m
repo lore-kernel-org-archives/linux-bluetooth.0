@@ -1,34 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Apr 2012 13:08:44 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Syam Sidhardhan <s.syam@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 0/4] Fix memory leak, remove unused struct etc
-Message-ID: <20120413100844.GB17640@x220.ger.corp.intel.com>
-References: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
- <1334243001-17016-21-git-send-email-s.syam@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334243001-17016-21-git-send-email-s.syam@samsung.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 0/2] Fixing device registration bugs
+Date: Fri, 13 Apr 2012 13:06:28 +0300
+Message-Id: <1334311590-1135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Thu, Apr 12, 2012, Syam Sidhardhan wrote:
-> This series of patches fixes the following issues in obexd.
-> 
-> Syam Sidhardhan (4):
->   client: Fix memory leak during session connect
->   src: Use goto for avoiding code duplication
->   src: Remove headers declared but not defined
->   client: Remove unused struct session_callback
-> 
->  client/session.c |   10 ++++------
->  src/manager.c    |    4 ++--
->  src/obex.h       |    4 ----
->  3 files changed, 6 insertions(+), 12 deletions(-)
+It does make sense to use bitmask marking used device ids.
+This approach is used in device name allocation in many places
+like:
 
-All patches in this set have been applied. Thanks.
+..
+drivers/infiniband/core/device.c <<alloc_name>>
+net/core/dev.c <<__dev_alloc_name>>
+net/core/sock.c <<assign_proto_idx>>
+..
 
-Johan
+Andrei Emeltchenko (2):
+  Bluetooth: Fix registering hci with duplicate name
+  Bluetooth: Fix debug printing unallocated name
+
+ net/bluetooth/hci_core.c |   32 ++++++++++++++++++--------------
+ 1 files changed, 18 insertions(+), 14 deletions(-)
+
+-- 
+1.7.9.1
+
