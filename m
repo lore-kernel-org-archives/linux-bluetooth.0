@@ -1,132 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 13 Apr 2012 11:08:18 -0500 (CDT)
+From: Manoj Iyer <manoj.iyer@canonical.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+cc: Manoj Iyer <manoj.iyer@canonical.com>, linux-kernel@vger.kernel.org,
+    linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: btusb: Add vendor specific ID (0489 e042)
+ for BCM20702A0
+In-Reply-To: <20120413092312.GA10780@x220.ger.corp.intel.com>
+Message-ID: <alpine.DEB.2.02.1204131106150.3180@lazy>
+References: <1333981348-3720-1-git-send-email-manoj.iyer@canonical.com> <1333981348-3720-2-git-send-email-manoj.iyer@canonical.com> <20120413092312.GA10780@x220.ger.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1334316099-18492-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1334311590-1135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1334316099-18492-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1334316099-18492-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Fri, 13 Apr 2012 13:25:35 -0300
-Message-ID: <CAA37ikaFf+=9yR_qa6_QFNjOxAf3DZ5D_R7kZ28ZycjuVaLSsg@mail.gmail.com>
-Subject: Re: [PATCHv3 1/2] Bluetooth: Fix registering hci with duplicate name
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
 
-On Fri, Apr 13, 2012 at 8:21 AM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
->
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> When adding HCI devices hci_register_dev may assigns the same name
-> hciX for subsequently added HCI devices. Use bitmask to find free
-> device ID the same way as it is done in other subsystems.
->
-> ...
-> [ 6958.381886] sysfs: cannot create duplicate filename
->        '/devices/virtual/bluetooth/hci1
-> ...
->
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  include/net/bluetooth/hci.h |    3 +++
->  net/bluetooth/hci_core.c    |   28 ++++++++++++++++------------
->  2 files changed, 19 insertions(+), 12 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 346f087..38b837b 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -56,6 +56,9 @@
->  #define HCI_BREDR      0x00
->  #define HCI_AMP                0x01
->
-> +/* First BR/EDR Controller shall have ID = 0 */
-> +#define HCI_BREDR_ID   0
-> +
->  /* HCI device quirks */
->  enum {
->        HCI_QUIRK_NO_RESET,
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 52c7abf..9596a82 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1740,31 +1740,35 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
->  /* Register HCI device */
->  int hci_register_dev(struct hci_dev *hdev)
->  {
-> -       struct list_head *head = &hci_dev_list, *p;
-> +       struct hci_dev *d;
->        int i, id, error;
-> +       unsigned long *inuse;
->
->        BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
->
->        if (!hdev->open || !hdev->close)
->                return -EINVAL;
->
-> -       /* Do not allow HCI_AMP devices to register at index 0,
-> -        * so the index can be used as the AMP controller ID.
-> -        */
-> -       id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
-> +       inuse = (unsigned long *) get_zeroed_page(GFP_KERNEL);
-> +       if (!inuse)
-> +               return -ENOMEM;
->
->        write_lock(&hci_dev_list_lock);
->
-> -       /* Find first available device id */
-> -       list_for_each(p, &hci_dev_list) {
-> -               if (list_entry(p, struct hci_dev, list)->id != id)
-> -                       break;
-> -               head = p; id++;
-> -       }
-> +       /* Index HCI_BREDR_ID reserved for BR/EDR controllers */
-> +       if (hdev->dev_type != HCI_BREDR)
-> +               set_bit(HCI_BREDR_ID, inuse);
-> +
-> +       list_for_each_entry(d, &hci_dev_list, list)
-> +               set_bit(d->id, inuse);
-> +
-> +       id = find_first_zero_bit(inuse, PAGE_SIZE * 8);
-> +       free_page((unsigned long) inuse);
->
->        sprintf(hdev->name, "hci%d", id);
->        hdev->id = id;
-> -       list_add_tail(&hdev->list, head);
-> +
-> +       list_add_tail(&hdev->list, &hci_dev_list);
+Johan,
 
-Well, I don't like this bitmask approach, really. We used to have this
-list ordered and the code was doing that before we added the
-restriction of index 0 for AMP devices, I think. Using a bitmask looks
-overkill to me when we can probably modify the loop to find the first
-available ID. Marcel even suggested an approach with a pseudo code
-that seems to be the best way to go. Something along the lines of:
+I also sent another patch following this one with
 
-       list_for_each(p, &hci_dev_list) {
-               if (list_entry(p, struct hci_dev, list)->id > id)
-/* just replacing != with > */
-                       break;
-               head = p; id++;
-       }
+Subject	[PATCH] Bluetooth: btusb: Add vendor specific ID (0a5c:21f4) 
+BCM20702A0
+Date	Wed, 11 Apr 2012 13:39:23 -0500
 
-We assume id starts with the number we'll try to add the new device
-and keep iterating until we find the proper place. The only difference
-is we start with 0 for BR/EDR and 1 for AMP devices. Then every
-hdev->id in the _ordered_ list <= to the id we want we increment id
-and move head. In the end we'll have id as the first available one and
-head is where you need to add hdev (before head) to the list to keep
-it ordered. Right? Does that work for you? Am I missing anything here?
+https://lkml.org/lkml/2012/4/11/358
 
-Best regards,
+Just thought I will mention it to you coz both the subject lines look 
+similar except for the IDs, sorry about that, the 2nd one was reported 
+right after I submitted the 1st patch. Can you please review that as well?
+
+-- manoj
+
+On Fri, 13 Apr 2012, Johan Hedberg wrote:
+
+> Hi Manoj,
+>
+> On Mon, Apr 09, 2012, Manoj Iyer wrote:
+>> T: Bus=02 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#= 3 Spd=12 MxCh= 0
+>> D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+>> P: Vendor=0489 ProdID=e042 Rev=01.12
+>> S: Manufacturer=Broadcom Corp
+>> S: Product=BCM20702A0
+>> S: SerialNumber=E4D53DCA61B5
+>> C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+>> I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+>> I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+>> I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+>> I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+>>
+>> Reported-by: Dennis Chua <dennis.chua@canonical.com>
+>> Signed-off-by: Manoj Iyer <manoj.iyer@canonical.com>
+>> ---
+>>  drivers/bluetooth/btusb.c |    1 +
+>>  1 files changed, 1 insertions(+), 0 deletions(-)
+>
+> Applied to both bluetooth.git and bluetooth-next.git. Thanks.
+>
+> Johan
+>
+>
 
 --
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+====================
+Manoj Iyer
+Ubuntu/Canonical
+Hardware Enablement
+====================
