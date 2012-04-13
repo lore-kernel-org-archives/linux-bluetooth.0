@@ -1,32 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
+From: Vishal Agarwal <vishal.agarwal@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: <vishal.agarwal@stericsson.com>
+Subject: [PATCHv2 2/2] Bluetooth: Temporary keys should be retained during connection
+Date: Fri, 13 Apr 2012 17:43:23 +0530
+Message-ID: <1334319203-9482-2-git-send-email-vishal.agarwal@stericsson.com>
+In-Reply-To: <1334319203-9482-1-git-send-email-vishal.agarwal@stericsson.com>
+References: <1334319203-9482-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Fri, 13 Apr 2012 14:24:26 +0200
-From: aep <aep@exys.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
- <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: Lenovo W510 Bluetooth Controller stopped working in 3.4-rc1
-In-Reply-To: <CAJdJm_PE-_3OZoDCXRf6wne_myQDCSV9wcvA9RnGt_W6uH5BRQ@mail.gmail.com>
-References: <abfb31f0565ebacddd25efec883e31dc@exys.org>
- <20120413093400.GC10780@x220.ger.corp.intel.com>
- <d62a71fa204a8a9e8568309b9c1d2f6b@exys.org>
- <CAJdJm_PE-_3OZoDCXRf6wne_myQDCSV9wcvA9RnGt_W6uH5BRQ@mail.gmail.com>
-Message-ID: <262096715f0861dba5cbe24a0edb7014@exys.org>
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-heya,
+If a key is non persistent then it should not be used in future
+connections but it should be kept for current connection. And it
+should be removed when connecion is removed.
 
-On Fri, 13 Apr 2012 06:42:07 -0400, Anderson Lizardo wrote:
+Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
+---
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_core.c         |    6 ++----
+ net/bluetooth/hci_event.c        |    2 ++
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
-> What Johan is suggesting is to disable the mgmtops plugin so that
-> hciops is used instead. If this works, it is due to a known 
-> regression
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 8a9abe2..afdea95 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -318,6 +318,7 @@ struct hci_conn {
+ 
+ 	__u8		remote_cap;
+ 	__u8		remote_auth;
++	bool		flush_key;
+ 
+ 	unsigned int	sent;
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 703c28d..1101f7d 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1333,10 +1333,8 @@ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+ 
+ 	mgmt_new_link_key(hdev, key, persistent);
+ 
+-	if (!persistent) {
+-		list_del(&key->list);
+-		kfree(key);
+-	}
++	if (!conn)
++		conn->flush_key = !persistent;
+ 
+ 	return 0;
+ }
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index bb6d802..5c23548 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1930,6 +1930,8 @@ static inline void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 	}
+ 
+ 	if (ev->status == 0) {
++		if (conn->type == ACL_LINK && conn->flush_key)
++			hci_remove_link_key(hdev, &conn->dst);
+ 		hci_proto_disconn_cfm(conn, ev->reason);
+ 		hci_conn_del(conn);
+ 	}
+-- 
+1.7.0.4
 
-Ah, sorry, i didn't realize the difference between -p and -P.
-
-I confirm it works again without the bluetooth.enable_hs=1 but with -P 
-mgmtops.
-
-thanks!
