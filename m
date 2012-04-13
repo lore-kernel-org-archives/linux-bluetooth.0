@@ -1,35 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Steven Harms <sjharms@gmail.com>
-To: Steven Harms <sjharms@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/1] Add bluetooth support for Foxconn - Hon Hai bluetooth usb present in Acer TimelineX AS4830TG-6808
-Date: Fri, 13 Apr 2012 09:47:07 -0400
-Message-Id: <1334324827-6017-1-git-send-email-sjharms@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Fri, 13 Apr 2012 14:24:26 +0200
+From: aep <aep@exys.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+ <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: Lenovo W510 Bluetooth Controller stopped working in 3.4-rc1
+In-Reply-To: <CAJdJm_PE-_3OZoDCXRf6wne_myQDCSV9wcvA9RnGt_W6uH5BRQ@mail.gmail.com>
+References: <abfb31f0565ebacddd25efec883e31dc@exys.org>
+ <20120413093400.GC10780@x220.ger.corp.intel.com>
+ <d62a71fa204a8a9e8568309b9c1d2f6b@exys.org>
+ <CAJdJm_PE-_3OZoDCXRf6wne_myQDCSV9wcvA9RnGt_W6uH5BRQ@mail.gmail.com>
+Message-ID: <262096715f0861dba5cbe24a0edb7014@exys.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+heya,
 
-Signed-off-by: Steven Harms <sjharms@gmail.com>
----
- drivers/bluetooth/btusb.c |    3 +++
- 1 file changed, 3 insertions(+)
+On Fri, 13 Apr 2012 06:42:07 -0400, Anderson Lizardo wrote:
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 3311b81..7d7d614 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -107,6 +107,9 @@ static struct usb_device_id btusb_table[] = {
- 	{ USB_DEVICE(0x0a5c, 0x21f3) },
- 	{ USB_DEVICE(0x413c, 0x8197) },
- 
-+	/* Foxconn - Hon Hai */
-+	{ USB_DEVICE(0x0489, 0xe033) },
-+
- 	{ }	/* Terminating entry */
- };
- 
--- 
-1.7.9.5
+> What Johan is suggesting is to disable the mgmtops plugin so that
+> hciops is used instead. If this works, it is due to a known 
+> regression
+
+Ah, sorry, i didn't realize the difference between -p and -P.
+
+I confirm it works again without the bluetooth.enable_hs=1 but with -P 
+mgmtops.
+
+thanks!
