@@ -1,30 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Apr 2012 19:08:14 -0300
+Date: Fri, 13 Apr 2012 19:01:49 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
-Subject: Re: [PATCH] Bluetooth: Fix missing break in hci_cmd_complete_evt
-Message-ID: <20120413220814.GE1680@joana>
-References: <1334313162-12290-1-git-send-email-szymon.janc@tieto.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [PATCH v0 2/6] Bluetooth: Remove unnecessary check
+Message-ID: <20120413220149.GD1680@joana>
+References: <1334126932-27327-1-git-send-email-mikel.astiz.oss@gmail.com>
+ <1334126932-27327-3-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334313162-12290-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1334126932-27327-3-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Mikel,
 
-* Szymon Janc <szymon.janc@tieto.com> [2012-04-13 12:32:42 +0200]:
+* Mikel Astiz <mikel.astiz.oss@gmail.com> [2012-04-11 08:48:48 +0200]:
 
-> Command complete event for HCI_OP_USER_PASSKEY_NEG_REPLY would result
-> in calling handler function also for HCI_OP_LE_SET_SCAN_PARAM. This
-> could result in undefined behaviour.
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 > 
-> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> The function already fails if the given size is greater than the MTU, so
+> there is no need to consider that case afterwards.
+> 
+> Signed-off-by: Mikel Astiz <mikel.astiz.oss@gmail.com>
 > ---
->  net/bluetooth/hci_event.c |    1 +
->  1 file changed, 1 insertion(+)
+>  net/bluetooth/sco.c |   10 ++++------
+>  1 files changed, 4 insertions(+), 6 deletions(-)
 
-Applied to both bluetooth and bluetooth-next trees. Thanks.
+Applied to bluetooth-next, thanks.
 
 	Gustavo
