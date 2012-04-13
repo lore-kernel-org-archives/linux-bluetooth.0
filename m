@@ -1,47 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 13 Apr 2012 12:47:21 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 00/19] Fix D-Bus memory leaks, bluetooth name,
+ double unref etc
+Message-ID: <20120413094721.GA11639@x220.ger.corp.intel.com>
+References: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Fri, 13 Apr 2012 11:49:19 +0200
-From: aep <aep@exys.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: Lenovo W510 Bluetooth Controller stopped working in 3.4-rc1
-In-Reply-To: <20120413093400.GC10780@x220.ger.corp.intel.com>
-References: <abfb31f0565ebacddd25efec883e31dc@exys.org>
- <20120413093400.GC10780@x220.ger.corp.intel.com>
-Message-ID: <d62a71fa204a8a9e8568309b9c1d2f6b@exys.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 13 Apr 2012 12:34:00 +0300, Johan Hedberg wrote:
+Hi Syam,
 
-> I don't think that commit or that module parameter has anything to do
-> with this.
+On Thu, Apr 12, 2012, Syam Sidhardhan wrote:
+> This series of patches fixes the following issues.
+> 
+> Syam Sidhardhan (19):
+>   health: Fix memory leak
+>   avrcp: Fix the response ctype of SetPlayerApplicationSettingValue
+>   agent: Free the agent request properly
+>   gstavdtpsink: Fix D-Bus memory leak in audio
+>   gateway: Fix D-Bus memory leak in audio
+>   gateway: Fix D-Bus reply memory leak
+>   hci: Retrieve the bluetooth name correctly
+>   hciconfig: Remove unwanted NULL termination
+>   agent: Fix double D-Bus message unref
+>   sdpd-request: Fix passing zero instead of NULL
+>   sap-u8500: Fix empty parameter list in function declaration
+>   adapter: Remove headers declared but not defined
+>   headset: Remove header declared but not defined
+>   network: Remove header declared but not defined
+>   audio: Fix newline before EOF
+>   input: Fix newline before EOF
+>   src: Fix newline before EOF
+>   doc: Fix typo
+>   Add Syam's email address
 
-Actually, i didn't respond again due to the embarrassing fact that i 
-added the parameter to the wrong module.
-After adding bluetooth.enable_hs=1 to the kernel commandline (bluetooth 
-is compiled in here), it worked again.
+Thanks a lot for these cleanups and fixes! I've applied all except the
+hci & hciconfig patches regarding the adapter name since those need a
+bit of discussing.
 
-> What user space version are you using?
-
-bluez version 4.98
-
-> What do you mean by
-> "vanished without any trace"? Does hciconfig -a or hciconfig hci0 not
-> show anything?
-
-no, and no, and neither anything in dmesg other then that the module 
-was loaded.
-
-> If this is related to mgmt being now enabled by default
-> could you try running user space with "bluetoothd -P mgmtops"?
-
-
-Not sure if that does any good, since adding the parameter did the job, 
-and my /usr/lib/bluetooth/plugins/ is empty.
-Let me know if you still think this helps debugging, then i'll try 
-later.
-
-
-thanks
+Johan
