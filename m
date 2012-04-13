@@ -1,92 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAMXE1-o8oPdPF6Ry1nFUcnHFUMXs8U_ghysKN3nhCeTsFFx7Mw@mail.gmail.com>
-References: <1334311590-1135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1334316099-18492-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1334316099-18492-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<CAA37ikaFf+=9yR_qa6_QFNjOxAf3DZ5D_R7kZ28ZycjuVaLSsg@mail.gmail.com>
-	<CAMXE1-o8oPdPF6Ry1nFUcnHFUMXs8U_ghysKN3nhCeTsFFx7Mw@mail.gmail.com>
-Date: Fri, 13 Apr 2012 17:05:43 -0300
-Message-ID: <CAA37ikZL4pf8n4iWdPgLtUD6sJCG2anKq4my-HJurWKnBYcoyg@mail.gmail.com>
-Subject: Re: [PATCHv3 1/2] Bluetooth: Fix registering hci with duplicate name
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Steven Harms <sjharms@gmail.com>
+To: Steven Harms <sjharms@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/1] Add Foxconn / Hon Hai IDs for btusb module
+Date: Fri, 13 Apr 2012 14:45:55 -0400
+Message-Id: <1334342755-7371-1-git-send-email-sjharms@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+This change adds 0x0489:0xe033 to the btusb module.
 
-On Fri, Apr 13, 2012 at 3:39 PM, Andrei Emeltchenko
-<andrei.emeltchenko.news@gmail.com> wrote:
-> Hi Ulisses,
->
-> On Fri, Apr 13, 2012 at 7:25 PM, Ulisses Furquim <ulisses@profusion.mobi> wrote:
->
->> On Fri, Apr 13, 2012 at 8:21 AM, Andrei Emeltchenko
->> <Andrei.Emeltchenko.news@gmail.com> wrote:
->>>
->>> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->>>
->>> When adding HCI devices hci_register_dev may assigns the same name
->>> hciX for subsequently added HCI devices. Use bitmask to find free
->>> device ID the same way as it is done in other subsystems.
->>>
->>> ...
->>> [ 6958.381886] sysfs: cannot create duplicate filename
->>>        '/devices/virtual/bluetooth/hci1
->> Well, I don't like this bitmask approach, really. We used to have this
->> list ordered and the code was doing that before we added the
->> restriction of index 0 for AMP devices, I think.
->
-> I think it just was not tested enough.
+This bluetooth usb device is integrated in the Acer TimelineX AS4830TG-6808 notebook.
 
-Probably.
+Output from /sys/kernel/debug/usb/devices:
 
->> Using a bitmask looks
->> overkill to me when we can probably modify the loop to find the first
->
-> This approach is used in many places when choosing device id, specifically
-> in network device code, so I just took it as I do not like to reinvent
-> the wheel.
+T:  Bus=01 Lev=02 Prnt=02 Port=05 Cnt=02 Dev#=  4 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0489 ProdID=e033 Rev= 2.29
+S:  Manufacturer=Broadcom Corp
+S:  Product=Acer Module
+S:  SerialNumber=60D819F74101
+C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  32 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  32 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
-I know and I agree not reinventing the wheel but AFAIK they use
-bitmask when they don't have the list and thus mark everything and
-then extract the information they need afterwards. Our case is very
-simple, we do have the list already and the code doesn't run often so
-it looks overkill to me the bitmask approach.
+Signed-off-by: Steven Harms <sjharms@gmail.com>
+---
+ drivers/bluetooth/btusb.c |    3 +++
+ 1 file changed, 3 insertions(+)
 
->> available ID. Marcel even suggested an approach with a pseudo code
->> that seems to be the best way to go. Something along the lines of:
->>
->>        list_for_each(p, &hci_dev_list) {
->>                if (list_entry(p, struct hci_dev, list)->id > id)
->> /* just replacing != with > */
->>                        break;
->>                head = p; id++;
->>        }
->>
->> We assume id starts with the number we'll try to add the new device
->> and keep iterating until we find the proper place. The only difference
->> is we start with 0 for BR/EDR and 1 for AMP devices. Then every
->> hdev->id in the _ordered_ list <= to the id we want we increment id
->> and move head. In the end we'll have id as the first available one and
->> head is where you need to add hdev (before head) to the list to keep
->> it ordered. Right? Does that work for you? Am I missing anything here?
->
-> Please better send a patch ;) Either way is OK for me.
-
-Did it work for you? Sorry, couldn't test it here and that's why I
-just sent comments and asked if I wasn't missing anything. :-) But I
-can try to send a patch later today, just in case.
-
-Best regards,
-
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 3311b81..7d7d614 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -107,6 +107,9 @@ static struct usb_device_id btusb_table[] = {
+ 	{ USB_DEVICE(0x0a5c, 0x21f3) },
+ 	{ USB_DEVICE(0x413c, 0x8197) },
+ 
++	/* Foxconn - Hon Hai */
++	{ USB_DEVICE(0x0489, 0xe033) },
++
+ 	{ }	/* Terminating entry */
+ };
+ 
 -- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+1.7.9.5
