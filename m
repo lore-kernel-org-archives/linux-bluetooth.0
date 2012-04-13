@@ -1,39 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Apr 2012 18:59:51 -0300
+Date: Fri, 13 Apr 2012 18:48:17 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [PATCH v0 1/6] Bluetooth: Use unsigned int instead of signed int
-Message-ID: <20120413215950.GC1680@joana>
-References: <1334126932-27327-1-git-send-email-mikel.astiz.oss@gmail.com>
- <1334126932-27327-2-git-send-email-mikel.astiz.oss@gmail.com>
+To: Manoj Iyer <manoj.iyer@canonical.com>
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: btusb: Add vendor specific ID (0a5c:21f4)
+ BCM20702A0
+Message-ID: <20120413214817.GB1680@joana>
+References: <1334169563-2948-1-git-send-email-manoj.iyer@canonical.com>
+ <1334169563-2948-2-git-send-email-manoj.iyer@canonical.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334126932-27327-2-git-send-email-mikel.astiz.oss@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1334169563-2948-2-git-send-email-manoj.iyer@canonical.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Manoj,
 
-* Mikel Astiz <mikel.astiz.oss@gmail.com> [2012-04-11 08:48:47 +0200]:
+* Manoj Iyer <manoj.iyer@canonical.com> [2012-04-11 13:39:23 -0500]:
 
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-> 
-> The involved values are all unsigned and thus unsigned int should be
-> used instead of signed int. Assigning ~0 to a signed int results in -1,
-> which is confusing and error-prone, while the code is trying to set the
-> maximum value possible.
-> 
-> The code still works because the C standard defines that unsigned
-> comparison will be performed in these cases, when comparing an unsigned
-> int and a signed int.
-> 
-> Signed-off-by: Mikel Astiz <mikel.astiz.oss@gmail.com>
-> ---
->  net/bluetooth/hci_core.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
+> usb-devices:
+> T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0a5c ProdID=21f4 Rev=01.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM20702A0
+> S:  SerialNumber=E4D53DF15584
+> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
-Applied to bluetooth-next thanks.
+You need to give the usb-devices for the non-working case. I know it
+works but we need to document this right in the commit message.
 
 	Gustavo
