@@ -1,74 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 1/2] sdp-client: Add ability to clear cached session
-Date: Fri, 13 Apr 2012 11:34:18 +0200
-Message-ID: <1334309659-2046-1-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 13 Apr 2012 12:34:00 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: aep <aep@exys.org>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: Lenovo W510 Bluetooth Controller stopped working in 3.4-rc1
+Message-ID: <20120413093400.GC10780@x220.ger.corp.intel.com>
+References: <abfb31f0565ebacddd25efec883e31dc@exys.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <abfb31f0565ebacddd25efec883e31dc@exys.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will be usefull for disconnecting SDP L2CAP channel before cached
-session timeout fires.
----
- src/sdp-client.c |   21 ++++++++++++++++++++-
- src/sdp-client.h |    1 +
- 2 files changed, 21 insertions(+), 1 deletion(-)
+Hi aep,
 
-diff --git a/src/sdp-client.c b/src/sdp-client.c
-index f119313..55e59c2 100644
---- a/src/sdp-client.c
-+++ b/src/sdp-client.c
-@@ -61,7 +61,7 @@ static gboolean cached_session_expired(gpointer user_data)
- 	return FALSE;
- }
- 
--static sdp_session_t *get_sdp_session(const bdaddr_t *src, const bdaddr_t *dst)
-+static sdp_session_t *get_cached_sdp_session(const bdaddr_t *src, const bdaddr_t *dst)
- {
- 	GSList *l;
- 
-@@ -82,6 +82,17 @@ static sdp_session_t *get_sdp_session(const bdaddr_t *src, const bdaddr_t *dst)
- 		return session;
- 	}
- 
-+	return NULL;
-+}
-+
-+static sdp_session_t *get_sdp_session(const bdaddr_t *src, const bdaddr_t *dst)
-+{
-+	sdp_session_t *session;
-+
-+	session = get_cached_sdp_session(src, dst);
-+	if (session)
-+		return session;
-+
- 	return sdp_connect(src, dst, SDP_NON_BLOCKING);
- }
- 
-@@ -367,3 +378,11 @@ int bt_cancel_discovery(const bdaddr_t *src, const bdaddr_t *dst)
- 	return 0;
- }
- 
-+void bt_clear_cached_session(const bdaddr_t *src, const bdaddr_t *dst)
-+{
-+	sdp_session_t *session;
-+
-+	session = get_cached_sdp_session(src, dst);
-+	if (session)
-+		sdp_close(session);
-+}
-diff --git a/src/sdp-client.h b/src/sdp-client.h
-index 13d9121..9191594 100644
---- a/src/sdp-client.h
-+++ b/src/sdp-client.h
-@@ -28,3 +28,4 @@ int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
- 			uuid_t *uuid, bt_callback_t cb, void *user_data,
- 			bt_destroy_t destroy);
- int bt_cancel_discovery(const bdaddr_t *src, const bdaddr_t *dst);
-+void bt_clear_cached_session(const bdaddr_t *src, const bdaddr_t *dst);
--- 
-on behalf of ST-Ericsson
+On Thu, Apr 12, 2012, aep wrote:
+> not sure how to debug further. hci0 simply vanished without any
+> trace left in dmesg.
+> lsusb says :
+>     Bus 001 Device 004: ID 0a5c:217f Broadcom Corp. Bluetooth
+> Controller
+> git bisect says this one is the evil one:
+>     d7b7e79688c07b445bc52adfedf9a176be156f4b Bluetooth: Set
+> supported settings based on enabled HS and/or LE
+> although i'm not sure if that is true, so here's the complete bisect
+> log:
+> 
+> git bisect start '--' 'net/bluetooth'
+> git bisect bad dd775ae2549217d3ae09363e3edb305d0fa19928
+> git bisect good b01543dfe67bb1d191998e90d20534dc354de059
+> git bisect good 2f39cdb7a270da24532734dfdfd10c490be981c4
+> git bisect bad 7770c4aacaf34fb69cb2acfb7469e9b4e34f1674
+> git bisect bad 1b009c982482ee0e4cbabcd9bdae690a29119ede
+> git bisect bad cacaf52f51697f832a26e8fdaa7b8e85785085da
+> git bisect good 801f13bd8ecc58f2cf42ec602a2b5db10fc5a132
+> git bisect bad d930650b59be72342bc373ef52006ca99c1dd09e
+> git bisect bad 4b95a24ce12c4545fd7d2e3075841dc3119d1d71
+> 
+> 
+> i guess what i should try is to add any of these parameters when
+> loading the module,
+> but that doesn't seem to work:
+> 
+> [  179.793014] btusb: Unknown parameter `enable_hs'
+> 
+> grep enable_hs ./drivers/bluetooth/btusb.ko  confirms there is no
+> such string.
 
+I don't think that commit or that module parameter has anything to do
+with this. What user space version are you using? What do you mean by
+"vanished without any trace"? Does hciconfig -a or hciconfig hci0 not
+show anything? If this is related to mgmt being now enabled by default
+could you try running user space with "bluetoothd -P mgmtops"?
+
+Johan
