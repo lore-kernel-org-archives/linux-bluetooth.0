@@ -1,65 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: AceLan Kao <acelan@gmail.com>
-From: AceLan Kao <acelan.kao@canonical.com>
-To: linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH] Bluetooth: Add support for Atheros [13d3:3362]
-Date: Fri, 13 Apr 2012 17:39:57 +0800
-Message-Id: <1334309997-882-1-git-send-email-acelan.kao@canonical.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 2/2] input: Disconnect SDP before connecting HID if HIDSDPDisable is set
+Date: Fri, 13 Apr 2012 11:34:19 +0200
+Message-ID: <1334309659-2046-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1334309659-2046-1-git-send-email-szymon.janc@tieto.com>
+References: <1334309659-2046-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add another vendor specific ID for Atheros AR3012 device.
-This chip is wrapped by IMC Networks.
-
-output of usb-devices:
-T:  Bus=01 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  5 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3362 Rev=00.02
-S:  Manufacturer=Atheros Communications
-S:  Product=Bluetooth USB Host Controller
-S:  SerialNumber=Alaska Day 2006
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-
-Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+If remote HID device has HIDSDPDisable attribute present and set to
+true host should disconnect SDP channel before connecting HID control
+channel. Such devices multiplex resources between SDP and HID L2CAP
+channels and will reject connection to HID control channel if SDP
+channel is already connected.
 ---
- drivers/bluetooth/ath3k.c |    2 ++
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 3 insertions(+), 0 deletions(-)
+ input/device.c  |   25 +++++++++++++++++++++----
+ input/device.h  |    2 +-
+ input/manager.c |    4 ++--
+ 3 files changed, 24 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index ae9edca..639a161 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -75,6 +75,7 @@ static struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x0CF3, 0x311D) },
- 	{ USB_DEVICE(0x13d3, 0x3375) },
- 	{ USB_DEVICE(0x04CA, 0x3005) },
-+	{ USB_DEVICE(0x13d3, 0x3362) },
+diff --git a/input/device.c b/input/device.c
+index 743699f..59388d8 100644
+--- a/input/device.c
++++ b/input/device.c
+@@ -56,6 +56,8 @@
+ #include "fakehid.h"
+ #include "btio.h"
  
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -94,6 +95,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x0cf3, 0x311D), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
++#include "sdp-client.h"
++
+ #define INPUT_DEVICE_INTERFACE "org.bluez.Input"
  
- 	{ }	/* Terminating entry */
- };
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 9af450a..a497544 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -134,6 +134,7 @@ static struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
+ #define BUF_SIZE		16
+@@ -83,6 +85,7 @@ struct input_device {
+ 	bdaddr_t		dst;
+ 	uint32_t		handle;
+ 	guint			dc_id;
++	gboolean		disable_sdp;
+ 	char			*name;
+ 	struct btd_device	*device;
+ 	GSList			*connections;
+@@ -931,6 +934,9 @@ static DBusMessage *input_device_connect(DBusConnection *conn,
+ 		/* HID devices */
+ 		GIOChannel *io;
  
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
++		if (idev->disable_sdp)
++			bt_clear_cached_session(&idev->src, &idev->dst);
++
+ 		io = bt_io_connect(BT_IO_L2CAP, control_connect_cb, iconn,
+ 					NULL, &err,
+ 					BT_IO_OPT_SOURCE_BDADDR, &idev->src,
+@@ -1028,7 +1034,7 @@ static GDBusSignalTable device_signals[] = {
+ 
+ static struct input_device *input_device_new(DBusConnection *conn,
+ 				struct btd_device *device, const char *path,
+-				const uint32_t handle)
++				const uint32_t handle, gboolean disable_sdp)
+ {
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+ 	struct input_device *idev;
+@@ -1041,6 +1047,7 @@ static struct input_device *input_device_new(DBusConnection *conn,
+ 	idev->path = g_strdup(path);
+ 	idev->conn = dbus_connection_ref(conn);
+ 	idev->handle = handle;
++	idev->disable_sdp = disable_sdp;
+ 
+ 	ba2str(&idev->src, src_addr);
+ 	ba2str(&idev->dst, dst_addr);
+@@ -1075,16 +1082,26 @@ static struct input_conn *input_conn_new(struct input_device *idev,
+ 	return iconn;
+ }
+ 
++static gboolean is_device_sdp_disable(const sdp_record_t *rec)
++{
++	sdp_data_t *data;
++
++	data = sdp_data_get(rec, SDP_ATTR_HID_SDP_DISABLE);
++
++	return data && data->val.uint8;
++}
++
+ int input_device_register(DBusConnection *conn, struct btd_device *device,
+ 					const char *path, const char *uuid,
+-					uint32_t handle, int timeout)
++					const sdp_record_t *rec, int timeout)
+ {
+ 	struct input_device *idev;
+ 	struct input_conn *iconn;
+ 
+ 	idev = find_device_by_path(devices, path);
+ 	if (!idev) {
+-		idev = input_device_new(conn, device, path, handle);
++		idev = input_device_new(conn, device, path, rec->handle,
++					is_device_sdp_disable(rec));
+ 		if (!idev)
+ 			return -EINVAL;
+ 		devices = g_slist_append(devices, idev);
+@@ -1107,7 +1124,7 @@ int fake_input_register(DBusConnection *conn, struct btd_device *device,
+ 
+ 	idev = find_device_by_path(devices, path);
+ 	if (!idev) {
+-		idev = input_device_new(conn, device, path, 0);
++		idev = input_device_new(conn, device, path, 0, FALSE);
+ 		if (!idev)
+ 			return -EINVAL;
+ 		devices = g_slist_append(devices, idev);
+diff --git a/input/device.h b/input/device.h
+index 356d9ed..c14b81a 100644
+--- a/input/device.h
++++ b/input/device.h
+@@ -46,7 +46,7 @@ int fake_input_register(DBusConnection *conn, struct btd_device *device,
+ 			const char *path, const char *uuid, uint8_t channel);
+ int input_device_register(DBusConnection *conn, struct btd_device *device,
+ 					const char *path, const char *uuid,
+-					uint32_t handle, int timeout);
++					const sdp_record_t *rec, int timeout);
+ int input_device_unregister(const char *path, const char *uuid);
+ 
+ int input_device_set_channel(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+diff --git a/input/manager.c b/input/manager.c
+index 9bcab10..4ac5686 100644
+--- a/input/manager.c
++++ b/input/manager.c
+@@ -66,8 +66,8 @@ static int hid_device_probe(struct btd_device *device, GSList *uuids)
+ 	if (!rec)
+ 		return -1;
+ 
+-	return input_device_register(connection, device, path, HID_UUID,
+-						rec->handle, idle_timeout * 60);
++	return input_device_register(connection, device, path, HID_UUID, rec,
++							idle_timeout * 60);
+ }
+ 
+ static void hid_device_remove(struct btd_device *device)
 -- 
-1.7.9.1
+on behalf of ST-Ericsson
+
