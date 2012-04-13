@@ -1,42 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <kanak.gupta@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] Bluetooth: Fix missing break in hci_cmd_complete_evt
+Date: Fri, 13 Apr 2012 12:32:42 +0200
+Message-ID: <1334313162-12290-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <d62a71fa204a8a9e8568309b9c1d2f6b@exys.org>
-References: <abfb31f0565ebacddd25efec883e31dc@exys.org>
-	<20120413093400.GC10780@x220.ger.corp.intel.com>
-	<d62a71fa204a8a9e8568309b9c1d2f6b@exys.org>
-Date: Fri, 13 Apr 2012 06:42:07 -0400
-Message-ID: <CAJdJm_PE-_3OZoDCXRf6wne_myQDCSV9wcvA9RnGt_W6uH5BRQ@mail.gmail.com>
-Subject: Re: Lenovo W510 Bluetooth Controller stopped working in 3.4-rc1
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: aep <aep@exys.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi aep,
+Command complete event for HCI_OP_USER_PASSKEY_NEG_REPLY would result
+in calling handler function also for HCI_OP_LE_SET_SCAN_PARAM. This
+could result in undefined behaviour.
 
-On Fri, Apr 13, 2012 at 5:49 AM, aep <aep@exys.org> wrote:
->> If this is related to mgmt being now enabled by default
->> could you try running user space with "bluetoothd -P mgmtops"?
->
-> Not sure if that does any good, since adding the parameter did the job, and
-> my /usr/lib/bluetooth/plugins/ is empty.
-> Let me know if you still think this helps debugging, then i'll try later.
+Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+---
+ net/bluetooth/hci_event.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-BlueZ plugins by default are "built-in", i.e. they are linked inside
-the bluetoothd binary. But even built-in plugins can be disabled with
--P.
-
-What Johan is suggesting is to disable the mgmtops plugin so that
-hciops is used instead. If this works, it is due to a known regression
-which happens with incompatible userspace tools and kernel versions.
-
-Fortunately, a proper fix is on the way for the next upstream release.
-So you can use this workaround for now.
-
-Best Regards,
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index bb6d802..f8c6174 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2344,6 +2344,7 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 
+ 	case HCI_OP_USER_PASSKEY_NEG_REPLY:
+ 		hci_cc_user_passkey_neg_reply(hdev, skb);
++		break;
+ 
+ 	case HCI_OP_LE_SET_SCAN_PARAM:
+ 		hci_cc_le_set_scan_param(hdev, skb);
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+on behalf of ST-Ericsson
+
