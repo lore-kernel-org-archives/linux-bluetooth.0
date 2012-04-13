@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Apr 2012 21:15:52 +1000 (EST)
-From: Michael McCallum <linuxbluez@mccallum.nu>
+Date: Fri, 13 Apr 2012 21:14:56 +1000 (EST)
+From: Michael McCallum <michael@mccallum.nu>
 To: linux-bluetooth@vger.kernel.org
 Subject: AVRCP Passthrough Commands issue with Kenwood Car stereo
-Message-ID: <df6cc686-a338-45d8-ae76-a9245036451f@mail1>
-In-Reply-To: <636c01cf-20fb-428a-9b68-65951d99b94f@mail1>
+Message-ID: <636c01cf-20fb-428a-9b68-65951d99b94f@mail1>
+In-Reply-To: <CAJdJm_PE-_3OZoDCXRf6wne_myQDCSV9wcvA9RnGt_W6uH5BRQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
