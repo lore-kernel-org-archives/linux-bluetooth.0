@@ -1,27 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 14 Apr 2012 19:29:24 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Syam Sidhardhan <s.syam@samsung.com>
+Message-ID: <1334419295.16897.150.camel@aeonflux>
+Subject: Re: [PATCH 1/1] Add DBG() calls to authorization logic
+From: Marcel Holtmann <marcel@holtmann.org>
+To: chanyeol.park@samsung.com
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 5/5] Bluetooth: mgmt: Remove unwanted goto statement
-Message-ID: <20120414162924.GA31865@x220.P-661HNU-F1>
-References: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
- <1334243001-17016-31-git-send-email-s.syam@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334243001-17016-31-git-send-email-s.syam@samsung.com>
+Date: Sat, 14 Apr 2012 18:01:35 +0200
+In-Reply-To: <1334380599-17052-1-git-send-email-chanyeol.park@samsung.com>
+References: <1334380599-17052-1-git-send-email-chanyeol.park@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+Hi Chan-yeol,
 
-On Thu, Apr 12, 2012, Syam Sidhardhan wrote:
-> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+> Sometimes BlueZ Agent is disappear suddenly or not registered
+> because of agent problem. but Bluez just prints "Operation Not
+> permiited"
+> 
+> This will help debugging.
 > ---
->  net/bluetooth/mgmt.c |   16 ++++------------
->  1 files changed, 4 insertions(+), 12 deletions(-)
+>  audio/manager.c |    2 +-
+>  src/adapter.c   |    1 +
+>  2 files changed, 2 insertions(+), 1 deletions(-)
+> 
+> diff --git a/audio/manager.c b/audio/manager.c
+> index aa2547c..20453e6 100644
+> --- a/audio/manager.c
+> +++ b/audio/manager.c
+> @@ -604,7 +604,7 @@ static void hf_io_cb(GIOChannel *chan, gpointer data)
+>  	perr = audio_device_request_authorization(device, server_uuid,
+>  						gateway_auth_cb, device);
+>  	if (perr < 0) {
+> -		DBG("Authorization denied!");
+> +		DBG("Authorization denied: %s", strerror(-perr));
+>  		gateway_set_state(device, GATEWAY_STATE_DISCONNECTED);
+>  	}
 
-This patch has also been applied (after adding a proper commit message
-which is required for all kernel patches).
+it is fine to keep this as debug messages, ...
 
-Johan
+>  
+> diff --git a/src/adapter.c b/src/adapter.c
+> index d10db10..15d502f 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -3107,6 +3107,7 @@ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
+>  
+>  	agent = device_get_agent(device);
+>  	if (!agent) {
+> +		DBG("Can't find device agent");
+
+..., but this debug message is kinda useless as debug message. It should
+be a warning message. Having to enable debug to see is a broken idea.
+
+>  		g_free(auth);
+>  		return -EPERM;
+>  	}
+
+Regards
+
+Marcel
+
+
