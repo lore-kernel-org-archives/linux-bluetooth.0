@@ -1,118 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [RFC PATCH BlueZ] LE Broadcaster/Observer API proposal
-Date: Mon, 16 Apr 2012 08:03:27 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B47E6C9@DNCE05.ent.ti.com>
-References: <1334192668-21433-1-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1334192668-21433-1-git-send-email-anderson.lizardo@openbossa.org>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Subject: [PATCH v2 1/1] Bluetooth: Fix EADDRINUSE check in SCO sockets
+Date: Mon, 16 Apr 2012 09:58:28 +0200
+Message-Id: <1334563108-8526-2-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1334563108-8526-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1334563108-8526-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Lizardo,
+The EADDRINUSE error should be returned only when the SCO socket is
+being used as a server. This means it should be checked in
+sco_sock_listen() instead of in sco_sock_bind(), because in the later we
+can't know if it is a server or not.
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Anderson Lizardo
-> Sent: Thursday, April 12, 2012 4:04 AM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: Anderson Lizardo
-> Subject: [RFC PATCH BlueZ] LE Broadcaster/Observer API proposal
-> 
-> Hi,
-> 
-> This patch contains an API proposal for implementing LE
-> Broadcaster/Observer
-> roles in BlueZ. These roles allow to transfer data unidirectionally
-> (from
-> Broadcaster to Observer) in a connectionless setup. See Core spec Vol
-> 3, Part
-> C, section 9.1 for more details.
-> 
-> The API consists on extending the Adapter API to support
-> Observer/Broadcaster
-> procedures. These are implemented as methods separate from Discovery,
-> given
-> that Broadcaster devices are non-connectable and non-discoverable.
-> 
-> Multiple D-Bus clients can register for Observer mode, as well as for
-> Broadcaster. BlueZ is thus responsible for constructing the Adv. Data
-> (in
-> Broadcaster mode) or routing the broadcast data (in Observer mode) to
-> the
-> applications.
-> 
-> On Broadcaster, multiple applications cannot broadcast the same Adv.
-> data type.
+This patch is required in order to use multiple SCO connections in the
+same Bluetooth adapter.
 
-This looks a bit problematic. What if two applications wish to broadcast services ? Or Service Solicitation ? or Service Data ? This could lead to problems.
+Signed-off-by: Mikel Astiz <mikel.astiz.oss@gmail.com>
+---
+ net/bluetooth/sco.c |   49 ++++++++++++++++++++++++++++++-------------------
+ 1 files changed, 30 insertions(+), 19 deletions(-)
 
-In addition, what about TX Power, or Flags - which module is responsible for sending this data ? Will it be public for any application, or will you have some kind of allowed Advertising packets for external application, and some reserved for system ?
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 8bf26d1..45bedd3 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -278,17 +278,30 @@ drop:
+ }
+ 
+ /* -------- Socket interface ---------- */
+-static struct sock *__sco_get_sock_by_addr(bdaddr_t *ba)
++static bool __sco_addr_in_use(bdaddr_t *src)
+ {
+ 	struct sock *sk;
+ 	struct hlist_node *node;
+ 
+-	sk_for_each(sk, node, &sco_sk_list.head)
+-		if (!bacmp(&bt_sk(sk)->src, ba))
+-			goto found;
+-	sk = NULL;
+-found:
+-	return sk;
++	sk_for_each(sk, node, &sco_sk_list.head) {
++		if (sk->sk_state != BT_LISTEN)
++			continue;
++
++		/* Exact match */
++		if (!bacmp(&bt_sk(sk)->src, src))
++			return true;
++
++		/* Closest match */
++		if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY))
++			return true;
++
++		/* Match any if given src is BDADDR_ANY */
++		if (!bacmp(src, BDADDR_ANY))
++			return true;
++	}
++
++	/* No match found so address is free */
++	return false;
+ }
+ 
+ /* Find socket listening on source bdaddr.
+@@ -467,7 +480,6 @@ static int sco_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
+ {
+ 	struct sockaddr_sco *sa = (struct sockaddr_sco *) addr;
+ 	struct sock *sk = sock->sk;
+-	bdaddr_t *src = &sa->sco_bdaddr;
+ 	int err = 0;
+ 
+ 	BT_DBG("sk %p %s", sk, batostr(&sa->sco_bdaddr));
+@@ -482,17 +494,9 @@ static int sco_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
+ 		goto done;
+ 	}
+ 
+-	write_lock(&sco_sk_list.lock);
+-
+-	if (bacmp(src, BDADDR_ANY) && __sco_get_sock_by_addr(src)) {
+-		err = -EADDRINUSE;
+-	} else {
+-		/* Save source address */
+-		bacpy(&bt_sk(sk)->src, &sa->sco_bdaddr);
+-		sk->sk_state = BT_BOUND;
+-	}
+-
+-	write_unlock(&sco_sk_list.lock);
++	/* Save source address */
++	bacpy(&bt_sk(sk)->src, &sa->sco_bdaddr);
++	sk->sk_state = BT_BOUND;
+ 
+ done:
+ 	release_sock(sk);
+@@ -543,17 +547,24 @@ static int sco_sock_listen(struct socket *sock, int backlog)
+ 	BT_DBG("sk %p backlog %d", sk, backlog);
+ 
+ 	lock_sock(sk);
++	write_lock(&sco_sk_list.lock);
+ 
+ 	if (sk->sk_state != BT_BOUND || sock->type != SOCK_SEQPACKET) {
+ 		err = -EBADFD;
+ 		goto done;
+ 	}
+ 
++	if (__sco_addr_in_use(&bt_sk(sk)->src)) {
++		err = -EADDRINUSE;
++		goto done;
++	}
++
+ 	sk->sk_max_ack_backlog = backlog;
+ 	sk->sk_ack_backlog = 0;
+ 	sk->sk_state = BT_LISTEN;
+ 
+ done:
++	write_unlock(&sco_sk_list.lock);
+ 	release_sock(sk);
+ 	return err;
+ }
+-- 
+1.7.7.6
 
-Are you planning to support duplicate filtering ?
-
-What are you planning to do if the Advertising data exceeds the MAX ADV Data size ? Will you split the data somehow to multiple advertising packets ? What is the logic behind such a split ?
-
-How will you allow a user to select whether the data is to be sent over Advertising or Scan Response ?
-
-How will you allow a user or system to configure scan parameters for observer or advertising parameters for broadcasters ?
-
-I'm guessing you will need to add more D-BUS Api's, or at least allow setting those parameters in the main.conf file ?
-
-> On Observer, the application(s) register(s) a callback that will be
-> called only
-> when the specified Adv. types are present on the received advertising
-> event.
-> 
-> We considered using signals for broadcast data, but it turns out it can
-> cause
-> too much D-Bus traffic given that all registered applications will
-> receive the
-> signals. The callback approach allows to ignore broadcasts which have
-> no
-> information relevant to an application.
-> 
-I agree with that.
-
-
-> Note that this proposal does not describe the necessary mgmt API
-> changes. This
-> will come once we agree on the higher level D-Bus API. But it should be
-> expected that new commands for enabling/disabling observer/broadcaster
-> modes
-> and setting adv. data will be necessary, as well as modifying the
-> current
-> kernel code that ignores non-connectable advertising (which are used by
-> Observers).
-I also think you need to add PropertyChanged for Broadcasting, since you will need to stop broadcasting when connecting to a device, or when the power is turned off for example. In addition, you will need to figure out a way to synchronize all the GAP LE roles, according to what is allowed or disallowed.
-
-> 
-> Comments and suggestions are welcome.
-> 
-> Anderson Lizardo (1):
->   doc: Document Broadcaster/Observer API
-> 
->  doc/adapter-api.txt |   56
-> +++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 56 insertions(+), 0 deletions(-)
-> 
-> --
-> 1.7.5.4
-> 
-> --
-> Anderson Lizardo
-> Instituto Nokia de Tecnologia - INdT
-> Manaus - Brazil
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-
-> bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
-Thanks,
-Chen Ganir
