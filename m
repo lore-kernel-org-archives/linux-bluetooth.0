@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: chanyeol.park@samsung.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Add warning if there is no authorization agent
-Date: Mon, 16 Apr 2012 17:27:00 +0900
-Message-id: <1334564820-31556-2-git-send-email-chanyeol.park@samsung.com>
+Subject: [PATCH 1/2] Add function for printing warnings
+Date: Mon, 16 Apr 2012 17:26:59 +0900
+Message-id: <1334564820-31556-1-git-send-email-chanyeol.park@samsung.com>
 In-reply-to: <1334562608.16897.164.camel@aeonflux>
 References: <1334562608.16897.164.camel@aeonflux>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,41 +11,46 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chan-yeol Park <chanyeol.park@samsung.com>
 
-Sometimes BlueZ Agent is disappear suddenly or not registered
-because of agent problem. but Bluez just prints "Operation Not
-permiited"
-
-This will help debugging.
 ---
- audio/manager.c |    2 +-
- src/adapter.c   |    1 +
- 2 files changed, 2 insertions(+), 1 deletions(-)
+ src/log.c |   12 ++++++++++++
+ src/log.h |    1 +
+ 2 files changed, 13 insertions(+), 0 deletions(-)
 
-diff --git a/audio/manager.c b/audio/manager.c
-index aa2547c..20453e6 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -604,7 +604,7 @@ static void hf_io_cb(GIOChannel *chan, gpointer data)
- 	perr = audio_device_request_authorization(device, server_uuid,
- 						gateway_auth_cb, device);
- 	if (perr < 0) {
--		DBG("Authorization denied!");
-+		DBG("Authorization denied: %s", strerror(-perr));
- 		gateway_set_state(device, GATEWAY_STATE_DISCONNECTED);
- 	}
+diff --git a/src/log.c b/src/log.c
+index 4a50117..adbfba9 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -55,6 +55,18 @@ void error(const char *format, ...)
+ 	va_end(ap);
+ }
  
-diff --git a/src/adapter.c b/src/adapter.c
-index d10db10..a5bab34 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3107,6 +3107,7 @@ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
++void warn(const char *format, ...)
++{
++	va_list ap;
++
++	va_start(ap, format);
++
++	vsyslog(LOG_WARNING, format, ap);
++
++	va_end(ap);
++}
++
++
+ void btd_debug(const char *format, ...)
+ {
+ 	va_list ap;
+diff --git a/src/log.h b/src/log.h
+index 51c52e6..cdcb146 100644
+--- a/src/log.h
++++ b/src/log.h
+@@ -23,6 +23,7 @@
  
- 	agent = device_get_agent(device);
- 	if (!agent) {
-+		warn("Can't find device agent");
- 		g_free(auth);
- 		return -EPERM;
- 	}
+ void info(const char *format, ...) __attribute__((format(printf, 1, 2)));
+ void error(const char *format, ...) __attribute__((format(printf, 1, 2)));
++void warn(const char *format, ...) __attribute__((format(printf, 1, 2)));
+ 
+ void btd_debug(const char *format, ...) __attribute__((format(printf, 1, 2)));
+ 
 -- 
 1.7.5.4
 
