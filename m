@@ -1,35 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 16 Apr 2012 18:46:02 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [PATCH v0 5/6] Bluetooth: btusb: Dynamic alternate setting
-Message-ID: <20120416214602.GA2796@joana>
-References: <1334126932-27327-1-git-send-email-mikel.astiz.oss@gmail.com>
- <1334126932-27327-6-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Mon, 16 Apr 2012 23:41:14 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd] client: Fix regression when calling
+ obc_session_shutdown within callback
+Message-ID: <20120416204114.GA17024@x220.ger.corp.intel.com>
+References: <1334572807-2578-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334126932-27327-6-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1334572807-2578-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Luiz,
 
-* Mikel Astiz <mikel.astiz.oss@gmail.com> [2012-04-11 08:48:51 +0200]:
-
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-> 
-> The alternate setting must be dynamically set according to the number of
-> active SCO links, and the bit depth of the audio. The possible values
-> for the alternate setting are described in the Bluetooth Core
-> Specification, Volume 4, Part B, section 2.1.1.
-> 
-> Signed-off-by: Mikel Astiz <mikel.astiz.oss@gmail.com>
+On Mon, Apr 16, 2012, Luiz Augusto von Dentz wrote:
+> Commit c07ddfbd019d3545cce2d7ec694143cdc55a2167 introduced the freeing of
+> the active pending request on obc_session_shutdown without checking if
+> the request was already processed/terminated.
 > ---
->  drivers/bluetooth/btusb.c |   13 +++++++++++--
->  1 files changed, 11 insertions(+), 2 deletions(-)
+>  client/session.c |    4 +++-
+>  1 files changed, 3 insertions(+), 1 deletions(-)
 
-Applied, thanks.
+Applied. Thanks.
 
-	Gustavo
+Johan
