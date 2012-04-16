@@ -1,39 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hemant Gupta <hemant.gupta@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: Naresh Gupta <naresh.gupta@stericsson.com>,
-	Hemant Gupta <hemant.gupta@stericsson.com>
-Subject: [PATCH] Bluetooth: mgmt: Fix address type while loading Long Term Key
-Date: Mon, 16 Apr 2012 10:43:01 +0530
-Message-ID: <1334553181-10884-1-git-send-email-hemant.gupta@stericsson.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: chanyeol.park@samsung.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/1] Add sbc cap null case while GST AVDTP Signaling.
+Date: Mon, 16 Apr 2012 11:59:59 +0900
+Message-id: <1334545199-25012-1-git-send-email-chanyeol.park@samsung.com>
+In-reply-to: <1334419155.16897.148.camel@aeonflux>
+References: <1334419155.16897.148.camel@aeonflux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes the address type while loading long term keys when BT is
-switched on. Without this fix pairing is reinitated even though LTK exists
-for remote device because of mismatch of address type.
+From: Chan-yeol Park <chanyeol.park@samsung.com>
 
-Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
+Due to RF condition or headset malfunctioning, gst audio plug-in
+could not get sbc(mandatory codec) information.
 ---
- net/bluetooth/mgmt.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+ audio/gstavdtpsink.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 880b7c9..b84de64 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2652,7 +2652,8 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
- 		else
- 			type = HCI_SMP_LTK_SLAVE;
+diff --git a/audio/gstavdtpsink.c b/audio/gstavdtpsink.c
+index b448d57..af04a56 100644
+--- a/audio/gstavdtpsink.c
++++ b/audio/gstavdtpsink.c
+@@ -1121,6 +1121,11 @@ static gboolean gst_avdtp_sink_update_caps(GstAvdtpSink *self)
+ 	sbc = (void *) gst_avdtp_find_caps(self, BT_A2DP_SBC_SINK);
+ 	mpeg = (void *) gst_avdtp_find_caps(self, BT_A2DP_MPEG12_SINK);
  
--		hci_add_ltk(hdev, &key->addr.bdaddr, key->addr.type,
-+		hci_add_ltk(hdev, &key->addr.bdaddr,
-+			    mgmt_to_link(LE_LINK, key->addr.type),
- 			    type, 0, key->authenticated, key->val,
- 			    key->enc_size, key->ediv, key->rand);
- 	}
++	if (!sbc) {
++		GST_ERROR_OBJECT(self, "Failed to find mandatory SBC sink");
++		return FALSE;
++	}
++
+ 	sbc_structure = gst_avdtp_sink_parse_sbc_caps(self, sbc);
+ 	mpeg_structure = gst_avdtp_sink_parse_mpeg_caps(self, mpeg);
+ 
 -- 
-1.7.0.4
+1.7.5.4
 
