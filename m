@@ -1,56 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: chanyeol.park@samsung.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Add function for printing warnings
-Date: Mon, 16 Apr 2012 17:26:59 +0900
-Message-id: <1334564820-31556-1-git-send-email-chanyeol.park@samsung.com>
-In-reply-to: <1334562608.16897.164.camel@aeonflux>
-References: <1334562608.16897.164.camel@aeonflux>
+Date: Mon, 16 Apr 2012 11:18:30 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Tomasz =?utf-8?Q?Mi=C5=9B?= <ext73@wp.pl>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [kernel 3.3.x - 3.3.2] btusb & usb-storage regression = btusb &
+ usb storage crash
+Message-ID: <20120416081828.GC32078@aemeltch-MOBL1>
+References: <4f8bce1d1af270.80920174@wp.pl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <4f8bce1d1af270.80920174@wp.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chan-yeol Park <chanyeol.park@samsung.com>
+Hi Tomasz,
 
----
- src/log.c |   12 ++++++++++++
- src/log.h |    1 +
- 2 files changed, 13 insertions(+), 0 deletions(-)
+On Mon, Apr 16, 2012 at 09:45:33AM +0200, Tomasz Miś wrote:
+> So, here it is results for kernel 3.3.2 with enabled catalyst -
+> dmesg.log and the results on the open drivers - here only a 'picture' -
+> the system has been totally 'crashed' - as I wrote earlier on the
+> linux-usb, this situation occurs when unlink usb-bluetooth dongle in a
+> call to another device, or turn off the Bluetooth example, under KDE
+> 
+> http://dl.dropbox.com/u/72313101/3.3.2-btusb-usb-storage-crash.jpeg
 
-diff --git a/src/log.c b/src/log.c
-index 4a50117..adbfba9 100644
---- a/src/log.c
-+++ b/src/log.c
-@@ -55,6 +55,18 @@ void error(const char *format, ...)
- 	va_end(ap);
- }
- 
-+void warn(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, format);
-+
-+	vsyslog(LOG_WARNING, format, ap);
-+
-+	va_end(ap);
-+}
-+
-+
- void btd_debug(const char *format, ...)
- {
- 	va_list ap;
-diff --git a/src/log.h b/src/log.h
-index 51c52e6..cdcb146 100644
---- a/src/log.h
-+++ b/src/log.h
-@@ -23,6 +23,7 @@
- 
- void info(const char *format, ...) __attribute__((format(printf, 1, 2)));
- void error(const char *format, ...) __attribute__((format(printf, 1, 2)));
-+void warn(const char *format, ...) __attribute__((format(printf, 1, 2)));
- 
- void btd_debug(const char *format, ...) __attribute__((format(printf, 1, 2)));
- 
--- 
-1.7.5.4
+Can you try patches mentioned here:
+
+https://lkml.org/lkml/2012/3/7/68
+
+Best regards 
+Andrei Emeltchenko 
 
