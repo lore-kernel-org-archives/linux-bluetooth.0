@@ -1,63 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hemant Gupta <hemant.gupta@stericsson.com>
+From: Vishal Agarwal <vishal.agarwal@stericsson.com>
 To: <linux-bluetooth@vger.kernel.org>
-Cc: Hemant Gupta <hemant.gupta@stericsson.com>
-Subject: [PATCH v2] Bluetooth: mgmt: Fix address type while loading Long Term Key
-Date: Mon, 16 Apr 2012 14:48:42 +0530
-Message-ID: <1334567922-8253-1-git-send-email-hemant.gupta@stericsson.com>
+Cc: <vishal.agarwal@stericsson.com>
+Subject: [PATCHv3 2/2] Bluetooth: Temporary keys should be retained during connection
+Date: Mon, 16 Apr 2012 14:44:44 +0530
+Message-ID: <1334567684-14210-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes the address type while loading long term keys when BT is
-switched on. Without this fix pairing is reinitated even though LTK
-exists for remote device because of mismatch of address type.
+If a key is non persistent then it should not be used in future
+connections but it should be kept for current connection. And it
+should be removed when connecion is removed.
 
-Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
+Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
 ---
- net/bluetooth/mgmt.c |   22 +++++++++++++++++++++-
- 1 files changed, 21 insertions(+), 1 deletions(-)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_core.c         |    6 ++----
+ net/bluetooth/hci_event.c        |    2 ++
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 880b7c9..457863d 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1644,6 +1644,25 @@ static u8 link_to_mgmt(u8 link_type, u8 addr_type)
- 	}
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 8a9abe2..afdea95 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -318,6 +318,7 @@ struct hci_conn {
+ 
+ 	__u8		remote_cap;
+ 	__u8		remote_auth;
++	bool		flush_key;
+ 
+ 	unsigned int	sent;
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 703c28d..b080ad4 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1333,10 +1333,8 @@ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+ 
+ 	mgmt_new_link_key(hdev, key, persistent);
+ 
+-	if (!persistent) {
+-		list_del(&key->list);
+-		kfree(key);
+-	}
++	if (conn)
++		conn->flush_key = !persistent;
+ 
+ 	return 0;
  }
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index bb6d802..5c23548 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1930,6 +1930,8 @@ static inline void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 	}
  
-+static u8 mgmt_to_link(u8 link_type, u8 addr_type)
-+{
-+	switch (link_type) {
-+	case LE_LINK:
-+		switch (addr_type) {
-+		case MGMT_ADDR_LE_PUBLIC:
-+			return ADDR_LE_DEV_PUBLIC;
-+
-+		default:
-+			/* Fallback to LE Random address type */
-+			return ADDR_LE_DEV_RANDOM;
-+		}
-+
-+	default:
-+		/* Fallback to BR/EDR type */
-+		return ACL_LINK;
-+	}
-+}
-+
- static int get_connections(struct sock *sk, struct hci_dev *hdev, void *data,
- 			   u16 data_len)
- {
-@@ -2652,7 +2671,8 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
- 		else
- 			type = HCI_SMP_LTK_SLAVE;
- 
--		hci_add_ltk(hdev, &key->addr.bdaddr, key->addr.type,
-+		hci_add_ltk(hdev, &key->addr.bdaddr,
-+			    mgmt_to_link(LE_LINK, key->addr.type),
- 			    type, 0, key->authenticated, key->val,
- 			    key->enc_size, key->ediv, key->rand);
+ 	if (ev->status == 0) {
++		if (conn->type == ACL_LINK && conn->flush_key)
++			hci_remove_link_key(hdev, &conn->dst);
+ 		hci_proto_disconn_cfm(conn, ev->reason);
+ 		hci_conn_del(conn);
  	}
 -- 
 1.7.0.4
