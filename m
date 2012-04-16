@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: chanyeol.park@samsung.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/3] adapter: Add warning if there is no authorization agent
-Date: Mon, 16 Apr 2012 20:56:33 +0900
-Message-id: <1334577394-577-2-git-send-email-chanyeol.park@samsung.com>
+Subject: [PATCH v2 1/3] src: Add function for printing warnings
+Date: Mon, 16 Apr 2012 20:56:32 +0900
+Message-id: <1334577394-577-1-git-send-email-chanyeol.park@samsung.com>
 In-reply-to: <1334565413.16897.167.camel@aeonflux>
 References: <1334565413.16897.167.camel@aeonflux>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,27 +11,45 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chan-yeol Park <chanyeol.park@samsung.com>
 
-Sometimes BlueZ Agent is disappear suddenly or not registered
-because of agent problem. but Bluez just prints "Operation Not
-permiited"
-
-This will help debugging.
 ---
- src/adapter.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ src/log.c |   11 +++++++++++
+ src/log.h |    1 +
+ 2 files changed, 12 insertions(+), 0 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index d10db10..a5bab34 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3107,6 +3107,7 @@ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
+diff --git a/src/log.c b/src/log.c
+index 4a50117..75a98a9 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -44,6 +44,17 @@ void info(const char *format, ...)
+ 	va_end(ap);
+ }
  
- 	agent = device_get_agent(device);
- 	if (!agent) {
-+		warn("Can't find device agent");
- 		g_free(auth);
- 		return -EPERM;
- 	}
++void warn(const char *format, ...)
++{
++	va_list ap;
++
++	va_start(ap, format);
++
++	vsyslog(LOG_WARNING, format, ap);
++
++	va_end(ap);
++}
++
+ void error(const char *format, ...)
+ {
+ 	va_list ap;
+diff --git a/src/log.h b/src/log.h
+index 51c52e6..3d34fa3 100644
+--- a/src/log.h
++++ b/src/log.h
+@@ -22,6 +22,7 @@
+  */
+ 
+ void info(const char *format, ...) __attribute__((format(printf, 1, 2)));
++void warn(const char *format, ...) __attribute__((format(printf, 1, 2)));
+ void error(const char *format, ...) __attribute__((format(printf, 1, 2)));
+ 
+ void btd_debug(const char *format, ...) __attribute__((format(printf, 1, 2)));
 -- 
 1.7.5.4
 
