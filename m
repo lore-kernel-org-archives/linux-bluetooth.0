@@ -1,49 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 16 Apr 2012 11:45:22 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Hemant Gupta <hemant.gupta@stericsson.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Naresh Gupta <naresh.gupta@stericsson.com>
-Subject: Re: [PATCH] Bluetooth: mgmt: Fix address type while loading Long
- Term Key
-Message-ID: <20120416084522.GA24483@x220.ger.corp.intel.com>
-References: <1334553181-10884-1-git-send-email-hemant.gupta@stericsson.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334553181-10884-1-git-send-email-hemant.gupta@stericsson.com>
+Message-ID: <1334565413.16897.167.camel@aeonflux>
+Subject: Re: [PATCH 1/2] Add function for printing warnings
+From: Marcel Holtmann <marcel@holtmann.org>
+To: chanyeol.park@samsung.com
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 16 Apr 2012 10:36:53 +0200
+In-Reply-To: <1334564820-31556-1-git-send-email-chanyeol.park@samsung.com>
+References: <1334562608.16897.164.camel@aeonflux>
+	 <1334564820-31556-1-git-send-email-chanyeol.park@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hemant,
+Hi Chan-yeol,
 
-On Mon, Apr 16, 2012, Hemant Gupta wrote:
-> This patch fixes the address type while loading long term keys when BT is
-> switched on. Without this fix pairing is reinitated even though LTK exists
-> for remote device because of mismatch of address type.
-> 
-> Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
 > ---
->  net/bluetooth/mgmt.c |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
+>  src/log.c |   12 ++++++++++++
+>  src/log.h |    1 +
+>  2 files changed, 13 insertions(+), 0 deletions(-)
 > 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 880b7c9..b84de64 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -2652,7 +2652,8 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
->  		else
->  			type = HCI_SMP_LTK_SLAVE;
+> diff --git a/src/log.c b/src/log.c
+> index 4a50117..adbfba9 100644
+> --- a/src/log.c
+> +++ b/src/log.c
+> @@ -55,6 +55,18 @@ void error(const char *format, ...)
+>  	va_end(ap);
+>  }
 >  
-> -		hci_add_ltk(hdev, &key->addr.bdaddr, key->addr.type,
-> +		hci_add_ltk(hdev, &key->addr.bdaddr,
-> +			    mgmt_to_link(LE_LINK, key->addr.type),
->  			    type, 0, key->authenticated, key->val,
->  			    key->enc_size, key->ediv, key->rand);
->  	}
+> +void warn(const char *format, ...)
+> +{
+> +	va_list ap;
+> +
+> +	va_start(ap, format);
+> +
+> +	vsyslog(LOG_WARNING, format, ap);
+> +
+> +	va_end(ap);
+> +}
+> +
+> +
 
-This doesn't compile:
+the patch is fine, but just for consistence sake, you should put warn()
+after info() function.
 
-net/bluetooth/mgmt.c: In function 'load_long_term_keys':
-net/bluetooth/mgmt.c:2656:8: error: implicit declaration of function 'mgmt_to_link' [-Werror=implicit-function-declaration]
+And no double empty lines between functions please. That is not part of
+our coding style. And if you saw it somewhere else in the code, then
+that is an oversight.
 
-Johan
+>  void btd_debug(const char *format, ...)
+>  {
+>  	va_list ap;
+> diff --git a/src/log.h b/src/log.h
+> index 51c52e6..cdcb146 100644
+> --- a/src/log.h
+> +++ b/src/log.h
+> @@ -23,6 +23,7 @@
+>  
+>  void info(const char *format, ...) __attribute__((format(printf, 1, 2)));
+>  void error(const char *format, ...) __attribute__((format(printf, 1, 2)));
+> +void warn(const char *format, ...) __attribute__((format(printf, 1, 2)));
+
+Same here. warn() comes after info().
+
+>  
+>  void btd_debug(const char *format, ...) __attribute__((format(printf, 1, 2)));
+>  
+
+Regards
+
+Marcel
+
+
