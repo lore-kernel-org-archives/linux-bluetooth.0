@@ -1,54 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: chanyeol.park@samsung.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/1] Add DBG() calls to authorization logic
-Date: Mon, 16 Apr 2012 15:22:24 +0900
-Message-id: <1334557344-15400-1-git-send-email-chanyeol.park@samsung.com>
-In-reply-to: <1334419295.16897.150.camel@aeonflux>
-References: <1334419295.16897.150.camel@aeonflux>
+From: Hemant Gupta <hemant.gupta@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: Naresh Gupta <naresh.gupta@stericsson.com>,
+	Hemant Gupta <hemant.gupta@stericsson.com>
+Subject: [PATCH] Bluetooth: mgmt: Fix address type while loading Long Term Key
+Date: Mon, 16 Apr 2012 10:43:01 +0530
+Message-ID: <1334553181-10884-1-git-send-email-hemant.gupta@stericsson.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chan-yeol Park <chanyeol.park@samsung.com>
+This patch fixes the address type while loading long term keys when BT is
+switched on. Without this fix pairing is reinitated even though LTK exists
+for remote device because of mismatch of address type.
 
-Sometimes BlueZ Agent is disappear suddenly or not registered
-because of agent problem. but Bluez just prints "Operation Not
-permiited"
-
-This will help debugging.
-
-As Marcel guided, I replace DBG with error because I can't find how to
-print out warning message
+Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
 ---
- audio/manager.c |    2 +-
- src/adapter.c   |    1 +
- 2 files changed, 2 insertions(+), 1 deletions(-)
+ net/bluetooth/mgmt.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-diff --git a/audio/manager.c b/audio/manager.c
-index aa2547c..20453e6 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -604,7 +604,7 @@ static void hf_io_cb(GIOChannel *chan, gpointer data)
- 	perr = audio_device_request_authorization(device, server_uuid,
- 						gateway_auth_cb, device);
- 	if (perr < 0) {
--		DBG("Authorization denied!");
-+		DBG("Authorization denied: %s", strerror(-perr));
- 		gateway_set_state(device, GATEWAY_STATE_DISCONNECTED);
- 	}
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 880b7c9..b84de64 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2652,7 +2652,8 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 		else
+ 			type = HCI_SMP_LTK_SLAVE;
  
-diff --git a/src/adapter.c b/src/adapter.c
-index d10db10..7b83392 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3107,6 +3107,7 @@ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
- 
- 	agent = device_get_agent(device);
- 	if (!agent) {
-+		error("Can't find device agent");
- 		g_free(auth);
- 		return -EPERM;
+-		hci_add_ltk(hdev, &key->addr.bdaddr, key->addr.type,
++		hci_add_ltk(hdev, &key->addr.bdaddr,
++			    mgmt_to_link(LE_LINK, key->addr.type),
+ 			    type, 0, key->authenticated, key->val,
+ 			    key->enc_size, key->ediv, key->rand);
  	}
 -- 
-1.7.5.4
+1.7.0.4
 
