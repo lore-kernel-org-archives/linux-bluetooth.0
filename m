@@ -1,34 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1334566621.16897.168.camel@aeonflux>
-Subject: Re: [PATCHv2 1/2] Bluetooth: hci_persistent_key should return bool
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vishal Agarwal <vishal.agarwal@stericsson.com>
+Date: Mon, 16 Apr 2012 11:50:38 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: chanyeol.park@samsung.com
 Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 16 Apr 2012 10:57:01 +0200
-In-Reply-To: <1334319203-9482-1-git-send-email-vishal.agarwal@stericsson.com>
-References: <1334319203-9482-1-git-send-email-vishal.agarwal@stericsson.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: Re: [PATCH 1/1] Fix default disabled values in audio.conf
+Message-ID: <20120416085038.GA24652@x220.ger.corp.intel.com>
+References: <1334382204-17937-1-git-send-email-chanyeol.park@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1334382204-17937-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vishal,
+Hi Chan-yeol,
 
-> This patch changes the return type of function hci_persistent_key
-> from int to bool because it makes more sense to return information
-> whether a key is persistent or not as a bool.
+On Sat, Apr 14, 2012, chanyeol.park@samsung.com wrote:
+> From: Chan-yeol Park <chanyeol.park@samsung.com>
 > 
-> Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
+> Disabled features in audio.conf should be the same with source code
+> "audio/manager.c:struct enabled_interfaces enabled".
 > ---
->  include/net/bluetooth/hci_core.h |    2 +-
->  net/bluetooth/hci_core.c         |   21 +++++++++++----------
->  net/bluetooth/mgmt.c             |    2 +-
->  3 files changed, 13 insertions(+), 12 deletions(-)
+>  audio/audio.conf |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Applied. Thanks.
 
-Regards
-
-Marcel
-
-
+Johan
