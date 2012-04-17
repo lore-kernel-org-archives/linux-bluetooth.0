@@ -1,36 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
+From: Vishal Agarwal <vishal.agarwal@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: <vishal.agarwal@stericsson.com>
+Subject: [PATCH] Bluetooth: Auth combination keys should be stored permanently
+Date: Tue, 17 Apr 2012 17:29:13 +0530
+Message-ID: <1334663953-15017-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
-In-Reply-To: <1334127438-27617-4-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1334127438-27617-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1334127438-27617-4-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Tue, 17 Apr 2012 15:20:08 +0300
-Message-ID: <CABBYNZJ4Oty4iSPyTpBHc7Zsxr+bn66Epq1HoYREwdaDrDCM7Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v0 3/7] audio: Add multiple device search to manager
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+If either local or remote device auth type is general bonding
+(for ex. if local auth type is 0 but remote auth type is 5) then it
+will result in link key of type authenticated link key. Which according
+to spec should be stored for future use. So in case of key type
+HCI_LK_AUTH_COMBINATION true should be return.
 
-On Wed, Apr 11, 2012 at 9:57 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-> -struct audio_device *manager_find_device(const char *path,
-> +GSList *manager_find_devices(const char *path,
->                                        const bdaddr_t *src,
->                                        const bdaddr_t *dst,
->                                        const char *interface,
-> -                                       gboolean connected)
-> +                                       gboolean connected,
-> +                                       size_t max_count)
->  {
+Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
+---
+ net/bluetooth/hci_core.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
-It doesn't look like this max_count parameter is going to be useful,
-iirc you only use 0 in the patches so I would recommending leaving it
-out for now.
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index c4dc263..e5fcb29 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1250,6 +1250,10 @@ static bool hci_persistent_key(struct hci_dev *hdev, struct hci_conn *conn,
+ 	if (conn->remote_auth == 0x02 || conn->remote_auth == 0x03)
+ 		return true;
+ 
++	/*If Key type is Authenticated combination key then store it*/
++	if (key_type == HCI_LK_AUTH_COMBINATION)
++		return true;
++
+ 	/* If none of the above criteria match, then don't store the key
+ 	 * persistently */
+ 	return false;
 -- 
-Luiz Augusto von Dentz
+1.7.0.4
+
