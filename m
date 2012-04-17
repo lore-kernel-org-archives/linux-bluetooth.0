@@ -1,56 +1,864 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ulisses Furquim <ulisses@profusion.mobi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org
-Subject: [PATCH v2] Bluetooth: Fix registering hci with duplicate name
-Date: Tue, 17 Apr 2012 10:41:27 -0300
-Message-Id: <1334670087-2622-1-git-send-email-ulisses@profusion.mobi>
+Subject: [PATCH obexd v2] client: Remove buffer based transfer
+Date: Tue, 17 Apr 2012 16:18:19 +0300
+Message-Id: <1334668699-18194-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When adding HCI devices hci_register_dev assigns the same name
-hci1 for subsequently added AMP devices.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-...
-[ 6958.381886] sysfs: cannot create duplicate filename
-       '/devices/virtual/bluetooth/hci1
-...
-
-We assume id starts with the number we'll try to add the new device
-and keep iterating until we find the proper place. The only difference
-is we start with 0 for BR/EDR device and 1 for AMP devices (thus AMP
-devices will never receive register as index 0). Then every hdev->id in
-the _ordered_ list <= to the id we want we increment id and move the
-variable head. In the end we'll have id as the first available one and
-head is where you need to add hdev after to keep the list ordered.
-
-Reported-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
+Simplify the code by using temporary files and eliminates reallocations.
 ---
+v2: Remove DEFAULT_BUFFER_SIZE define
 
-v2 - only increment id when we find it's already there in the list.
+ client/ftp.c      |    8 +-
+ client/manager.c  |   18 +++-
+ client/map.c      |    9 +-
+ client/pbap.c     |   43 ++++++---
+ client/session.c  |   60 +++++++++----
+ client/session.h  |    5 +-
+ client/sync.c     |   35 +++++---
+ client/transfer.c |  247 +++++++++++++++++------------------------------------
+ client/transfer.h |    5 +-
+ 9 files changed, 202 insertions(+), 228 deletions(-)
 
----
- net/bluetooth/hci_core.c |    7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index c4dc263..e2202a1 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1754,9 +1754,12 @@ int hci_register_dev(struct hci_dev *hdev)
+diff --git a/client/ftp.c b/client/ftp.c
+index 9be5d69..f415f2f 100644
+--- a/client/ftp.c
++++ b/client/ftp.c
+@@ -196,13 +196,12 @@ static void list_folder_callback(struct obc_session *session,
+ 	GMarkupParseContext *ctxt;
+ 	DBusMessage *reply;
+ 	DBusMessageIter iter, array;
+-	const char *buf;
++	char *contents;
+ 	size_t size;
  
- 	/* Find first available device id */
- 	list_for_each(p, &hci_dev_list) {
--		if (list_entry(p, struct hci_dev, list)->id != id)
-+		int nid = list_entry(p, struct hci_dev, list)->id;
-+		if (nid > id)
- 			break;
--		head = p; id++;
-+		if (nid == id)
-+			id++;
-+		head = p;
+ 	reply = dbus_message_new_method_return(msg);
+ 
+-	buf = obc_session_get_buffer(session, &size);
+-	if (size == 0)
++	if (obc_session_get_contents(session, &contents, &size) < 0)
+ 		goto done;
+ 
+ 	dbus_message_iter_init_append(reply, &iter);
+@@ -212,9 +211,10 @@ static void list_folder_callback(struct obc_session *session,
+ 			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+ 			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &array);
+ 	ctxt = g_markup_parse_context_new(&parser, 0, &array, NULL);
+-	g_markup_parse_context_parse(ctxt, buf, strlen(buf) - 1, NULL);
++	g_markup_parse_context_parse(ctxt, contents, size, NULL);
+ 	g_markup_parse_context_free(ctxt);
+ 	dbus_message_iter_close_container(&iter, &array);
++	g_free(contents);
+ 
+ done:
+ 	g_dbus_send_message(conn, reply);
+diff --git a/client/manager.c b/client/manager.c
+index 2e01e54..4f0b750 100644
+--- a/client/manager.c
++++ b/client/manager.c
+@@ -442,8 +442,9 @@ static void capabilities_complete_callback(struct obc_session *session,
+ 						GError *err, void *user_data)
+ {
+ 	struct send_data *data = user_data;
+-	const char *capabilities;
++	char *contents;
+ 	size_t size;
++	int perr;
+ 
+ 	if (err != NULL) {
+ 		DBusMessage *error = g_dbus_create_error(data->message,
+@@ -453,13 +454,20 @@ static void capabilities_complete_callback(struct obc_session *session,
+ 		goto done;
  	}
  
- 	sprintf(hdev->name, "hci%d", id);
+-	capabilities = obc_session_get_buffer(session, &size);
+-	if (size == 0)
+-		capabilities = "";
++	perr = obc_session_get_contents(session, &contents, &size);
++	if (perr < 0) {
++		DBusMessage *error = g_dbus_create_error(data->message,
++						"org.openobex.Error.Failed",
++						"Error reading contents: %s",
++						strerror(-perr));
++		g_dbus_send_message(data->connection, error);
++		goto done;
++	}
+ 
+ 	g_dbus_send_reply(data->connection, data->message,
+-			DBUS_TYPE_STRING, &capabilities,
++			DBUS_TYPE_STRING, &contents,
+ 			DBUS_TYPE_INVALID);
++	g_free(contents);
+ 
+ done:
+ 
+diff --git a/client/map.c b/client/map.c
+index 68b1fbc..fe4ea4b 100644
+--- a/client/map.c
++++ b/client/map.c
+@@ -98,7 +98,7 @@ static void buffer_cb(struct obc_session *session, GError *err,
+ {
+ 	struct map_data *map = user_data;
+ 	DBusMessage *reply;
+-	const char *buf;
++	char *contents;
+ 	size_t size;
+ 
+ 	if (err != NULL) {
+@@ -108,13 +108,12 @@ static void buffer_cb(struct obc_session *session, GError *err,
+ 		goto done;
+ 	}
+ 
+-	buf = obc_session_get_buffer(session, &size);
+-	if (size == 0)
+-		buf = "";
++	obc_session_get_contents(session, &contents, &size);
+ 
+-	reply = g_dbus_create_reply(map->msg, DBUS_TYPE_STRING, &buf,
++	reply = g_dbus_create_reply(map->msg, DBUS_TYPE_STRING, &contents,
+ 							DBUS_TYPE_INVALID);
+ 
++	g_free(contents);
+ done:
+ 	g_dbus_send_message(conn, reply);
+ 	dbus_message_unref(map->msg);
+diff --git a/client/pbap.c b/client/pbap.c
+index 53a608e..3084dd9 100644
+--- a/client/pbap.c
++++ b/client/pbap.c
+@@ -343,8 +343,9 @@ static void pull_phonebook_callback(struct obc_session *session,
+ {
+ 	struct pending_request *request = user_data;
+ 	DBusMessage *reply;
+-	const char *buf;
++	char *contents;
+ 	size_t size;
++	int perr;
+ 
+ 	if (err) {
+ 		reply = g_dbus_create_error(request->msg,
+@@ -353,16 +354,23 @@ static void pull_phonebook_callback(struct obc_session *session,
+ 		goto send;
+ 	}
+ 
+-	reply = dbus_message_new_method_return(request->msg);
++	perr = obc_session_get_contents(session, &contents, &size);
++	if (perr < 0) {
++		reply = g_dbus_create_error(request->msg,
++						"org.openobex.Error.Failed",
++						"Error reading contents: %s",
++						strerror(-perr));
++		goto send;
++	}
+ 
+-	buf = obc_session_get_buffer(session, &size);
+-	if (size == 0)
+-		buf = "";
++	reply = dbus_message_new_method_return(request->msg);
+ 
+ 	dbus_message_append_args(reply,
+-			DBUS_TYPE_STRING, &buf,
++			DBUS_TYPE_STRING, &contents,
+ 			DBUS_TYPE_INVALID);
+ 
++	g_free(contents);
++
+ send:
+ 	g_dbus_send_message(conn, reply);
+ 	pending_request_free(request);
+@@ -403,8 +411,9 @@ static void pull_vcard_listing_callback(struct obc_session *session,
+ 	GMarkupParseContext *ctxt;
+ 	DBusMessage *reply;
+ 	DBusMessageIter iter, array;
+-	const char *buf;
++	char *contents;
+ 	size_t size;
++	int perr;
+ 
+ 	if (err) {
+ 		reply = g_dbus_create_error(request->msg,
+@@ -413,11 +422,16 @@ static void pull_vcard_listing_callback(struct obc_session *session,
+ 		goto send;
+ 	}
+ 
+-	reply = dbus_message_new_method_return(request->msg);
++	perr = obc_session_get_contents(session, &contents, &size);
++	if (perr < 0) {
++		reply = g_dbus_create_error(request->msg,
++						"org.openobex.Error.Failed",
++						"Error reading contents: %s",
++						strerror(-perr));
++		goto send;
++	}
+ 
+-	buf = obc_session_get_buffer(session, &size);
+-	if (size == 0)
+-		buf = "";
++	reply = dbus_message_new_method_return(request->msg);
+ 
+ 	dbus_message_iter_init_append(reply, &iter);
+ 	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+@@ -425,9 +439,10 @@ static void pull_vcard_listing_callback(struct obc_session *session,
+ 			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_STRING_AS_STRING
+ 			DBUS_STRUCT_END_CHAR_AS_STRING, &array);
+ 	ctxt = g_markup_parse_context_new(&listing_parser, 0, &array, NULL);
+-	g_markup_parse_context_parse(ctxt, buf, strlen(buf) - 1, NULL);
++	g_markup_parse_context_parse(ctxt, contents, size, NULL);
+ 	g_markup_parse_context_free(ctxt);
+ 	dbus_message_iter_close_container(&iter, &array);
++	g_free(contents);
+ 
+ send:
+ 	g_dbus_send_message(conn, reply);
+@@ -775,7 +790,7 @@ static DBusMessage *pbap_list(DBusConnection *connection,
+ 		return g_dbus_create_error(message,
+ 				ERROR_INF ".Forbidden", "Call Select first of all");
+ 
+-	return pull_vcard_listing(pbap, message, "", pbap->order, "",
++	return pull_vcard_listing(pbap, message, NULL, pbap->order, "",
+ 				ATTRIB_NAME, DEFAULT_COUNT, DEFAULT_OFFSET);
+ }
+ 
+@@ -809,7 +824,7 @@ static DBusMessage *pbap_search(DBusConnection *connection,
+ 		return g_dbus_create_error(message,
+ 				ERROR_INF ".InvalidArguments", NULL);
+ 
+-	return pull_vcard_listing(pbap, message, "", pbap->order, value,
++	return pull_vcard_listing(pbap, message, NULL, pbap->order, value,
+ 					attrib, DEFAULT_COUNT, DEFAULT_OFFSET);
+ }
+ 
+diff --git a/client/session.c b/client/session.c
+index 868eb9f..0ff7e0a 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -25,6 +25,8 @@
+ #include <config.h>
+ #endif
+ 
++#include <stdlib.h>
++#include <stdio.h>
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+@@ -1059,31 +1061,59 @@ static void session_prepare_put(gpointer data, gpointer user_data)
+ 	DBG("Transfer(%p) started", transfer);
+ }
+ 
+-int obc_session_put(struct obc_session *session, char *buf, const char *name)
++int obc_session_put(struct obc_session *session, const char *buf, const char *name)
+ {
++	char tmpname[] = { '/', 't', 'm', 'p', '/', 'o', 'b', 'e', 'x', '-',
++			'c', 'l', 'i', 'e', 'n', 't', 'X', 'X', 'X', 'X', 'X',
++			'X', '\0' };
+ 	struct obc_transfer *transfer;
+ 	const char *agent;
++	int fd, err;
+ 
+-	if (session->obex == NULL) {
+-		g_free(buf);
++	if (session->obex == NULL)
+ 		return -ENOTCONN;
++
++	fd = mkstemp(tmpname);
++	if (fd < 0) {
++		error("mkstemp(): %s(%d)", strerror(errno), errno);
++		return -errno;
++	}
++
++	err = write(fd, buf, strlen(buf));
++	if (err < 0) {
++		error("write(): %s(%d)", strerror(errno), errno);
++		err = -errno;
++		goto done;
+ 	}
+ 
+ 	agent = obc_agent_get_name(session->agent);
+ 
+ 	transfer = obc_transfer_register(session->conn, session->obex,
+-							agent, NULL,
++							agent, tmpname,
+ 							name, NULL,
+ 							NULL);
+ 	if (transfer == NULL) {
+-		g_free(buf);
+-		return -EIO;
++		err = -EIO;
++		goto done;
+ 	}
+ 
+-	obc_transfer_set_buffer(transfer, buf);
++	err = obc_transfer_set_file(transfer);
++	if (err < 0) {
++		obc_transfer_unregister(transfer);
++		goto done;
++	}
+ 
+-	return session_request(session, transfer, session_prepare_put,
+-								NULL, NULL);
++	err = session_request(session, transfer, session_prepare_put, NULL,
++									NULL);
++	if (err < 0) {
++		obc_transfer_unregister(transfer);
++		goto done;
++	}
++
++done:
++	close(fd);
++	remove(tmpname);
++	return err;
+ }
+ 
+ static void agent_destroy(gpointer data, gpointer user_data)
+@@ -1156,24 +1186,20 @@ static struct obc_transfer *obc_session_get_transfer(
+ 	return session->p->transfer;
+ }
+ 
+-const char *obc_session_get_buffer(struct obc_session *session, size_t *size)
++int obc_session_get_contents(struct obc_session *session, char **contents,
++								size_t *size)
+ {
+ 	struct obc_transfer *transfer;
+-	const char *buf;
+ 
+ 	transfer = obc_session_get_transfer(session);
+ 	if (transfer == NULL) {
+ 		if (size != NULL)
+ 			*size = 0;
+ 
+-		return NULL;
++		return -EINVAL;
+ 	}
+ 
+-	buf = obc_transfer_get_buffer(transfer, size);
+-
+-	obc_transfer_clear_buffer(transfer);
+-
+-	return buf;
++	return obc_transfer_get_contents(transfer, contents, size);
+ }
+ 
+ void *obc_session_get_params(struct obc_session *session, size_t *size)
+diff --git a/client/session.h b/client/session.h
+index 4bfb41d..6b9fd81 100644
+--- a/client/session.h
++++ b/client/session.h
+@@ -52,7 +52,8 @@ const char *obc_session_get_agent(struct obc_session *session);
+ 
+ const char *obc_session_get_path(struct obc_session *session);
+ const char *obc_session_get_target(struct obc_session *session);
+-const char *obc_session_get_buffer(struct obc_session *session, size_t *size);
++int obc_session_get_contents(struct obc_session *session, char **contents,
++								size_t *size);
+ void *obc_session_get_params(struct obc_session *session, size_t *size);
+ 
+ int obc_session_send(struct obc_session *session, const char *filename,
+@@ -66,7 +67,7 @@ int obc_session_pull(struct obc_session *session,
+ 				session_callback_t function, void *user_data);
+ const char *obc_session_register(struct obc_session *session,
+ 						GDBusDestroyFunction destroy);
+-int obc_session_put(struct obc_session *session, char *buf,
++int obc_session_put(struct obc_session *session, const char *buf,
+ 				const char *name);
+ 
+ guint obc_session_setpath(struct obc_session *session, const char *path,
+diff --git a/client/sync.c b/client/sync.c
+index 7d713a8..b7cbbaa 100644
+--- a/client/sync.c
++++ b/client/sync.c
+@@ -27,6 +27,7 @@
+ #endif
+ 
+ #include <errno.h>
++#include <string.h>
+ 
+ #include <glib.h>
+ #include <gdbus.h>
+@@ -87,19 +88,34 @@ static void sync_getphonebook_callback(struct obc_session *session,
+ {
+ 	struct sync_data *sync = user_data;
+ 	DBusMessage *reply;
+-	const char *buf;
++	char *contents;
+ 	size_t size;
++	int perr;
++
++	if (err) {
++		reply = g_dbus_create_error(sync->msg,
++						"org.openobex.Error.Failed",
++						"%s", err->message);
++		goto send;
++	}
++
++	perr = obc_session_get_contents(session, &contents, &size);
++	if (perr < 0) {
++		reply = g_dbus_create_error(sync->msg,
++						"org.openobex.Error.Failed",
++						"Error reading contents: %s",
++						strerror(-perr));
++		goto send;
++	}
+ 
+ 	reply = dbus_message_new_method_return(sync->msg);
+ 
+-	buf = obc_session_get_buffer(session, &size);
+-	if (buf == NULL)
+-		buf = "";
++	dbus_message_append_args(reply, DBUS_TYPE_STRING, &contents,
++							DBUS_TYPE_INVALID);
+ 
+-	dbus_message_append_args(reply,
+-		DBUS_TYPE_STRING, &buf,
+-		DBUS_TYPE_INVALID);
++	g_free(contents);
+ 
++send:
+ 	g_dbus_send_message(conn, reply);
+ 	dbus_message_unref(sync->msg);
+ 	sync->msg = NULL;
+@@ -133,7 +149,6 @@ static DBusMessage *sync_putphonebook(DBusConnection *connection,
+ {
+ 	struct sync_data *sync = user_data;
+ 	const char *buf;
+-	char *buffer;
+ 
+ 	if (dbus_message_get_args(message, NULL,
+ 			DBUS_TYPE_STRING, &buf,
+@@ -145,9 +160,7 @@ static DBusMessage *sync_putphonebook(DBusConnection *connection,
+ 	if (!sync->phonebook_path)
+ 		sync->phonebook_path = g_strdup("telecom/pb.vcf");
+ 
+-	buffer = g_strdup(buf);
+-
+-	if (obc_session_put(sync->session, buffer, sync->phonebook_path) < 0)
++	if (obc_session_put(sync->session, buf, sync->phonebook_path) < 0)
+ 		return g_dbus_create_error(message,
+ 				ERROR_INF ".Failed", "Failed");
+ 
+diff --git a/client/transfer.c b/client/transfer.c
+index f476680..80e9c2c 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -25,6 +25,8 @@
+ #include <config.h>
+ #endif
+ 
++#include <stdlib.h>
++#include <stdio.h>
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+@@ -42,8 +44,6 @@
+ #define TRANSFER_INTERFACE  "org.openobex.Transfer"
+ #define TRANSFER_BASEPATH   "/org/openobex"
+ 
+-#define DEFAULT_BUFFER_SIZE 4096
+-
+ #define OBC_TRANSFER_ERROR obc_transfer_error_quark()
+ 
+ static guint64 counter = 0;
+@@ -61,13 +61,11 @@ struct obc_transfer {
+ 	char *agent;		/* Transfer agent */
+ 	char *path;		/* Transfer path */
+ 	gchar *filename;	/* Transfer file location */
++	char *tmpname;		/* Transfer temporary location */
+ 	char *name;		/* Transfer object name */
+ 	char *type;		/* Transfer object type */
+ 	int fd;
+ 	guint xfer;
+-	char *buffer;
+-	size_t buffer_len;
+-	int filled;
+ 	gint64 size;
+ 	gint64 transferred;
+ 	int err;
+@@ -207,6 +205,11 @@ static void obc_transfer_free(struct obc_transfer *transfer)
+ 		g_free(transfer->params);
+ 	}
+ 
++	if (transfer->tmpname) {
++		remove(transfer->tmpname);
++		g_free(transfer->tmpname);
++	}
++
+ 	if (transfer->conn)
+ 		dbus_connection_unref(transfer->conn);
+ 
+@@ -219,7 +222,6 @@ static void obc_transfer_free(struct obc_transfer *transfer)
+ 	g_free(transfer->name);
+ 	g_free(transfer->type);
+ 	g_free(transfer->path);
+-	g_free(transfer->buffer);
+ 	g_free(transfer);
+ }
+ 
+@@ -282,31 +284,35 @@ void obc_transfer_unregister(struct obc_transfer *transfer)
+ 	obc_transfer_free(transfer);
+ }
+ 
+-static void obc_transfer_read(struct obc_transfer *transfer,
+-						const void *buf, gsize len)
++static gboolean get_xfer_progress(const void *buf, gsize len,
++							gpointer user_data)
+ {
+-	gsize bsize;
++	struct obc_transfer *transfer = user_data;
++	struct transfer_callback *callback = transfer->callback;
++
++	if (transfer->fd > 0) {
++		gint w;
+ 
+-	/* copy all buffered data */
+-	bsize = transfer->buffer_len - transfer->filled;
++		w = write(transfer->fd, buf, len);
++		if (w < 0) {
++			transfer->err = -errno;
++			return FALSE;
++		}
+ 
+-	if (bsize < len) {
+-		transfer->buffer_len += len - bsize;
+-		transfer->buffer = g_realloc(transfer->buffer,
+-							transfer->buffer_len);
++		transfer->transferred += w;
+ 	}
+ 
+-	memcpy(transfer->buffer + transfer->filled, buf, len);
++	if (callback && transfer->transferred != transfer->size)
++		callback->func(transfer, transfer->transferred, NULL,
++							callback->data);
+ 
+-	transfer->filled += len;
+-	transfer->transferred += len;
++	return TRUE;
+ }
+ 
+-static void get_buf_xfer_complete(GObex *obex, GError *err, gpointer user_data)
++static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
+ {
+ 	struct obc_transfer *transfer = user_data;
+ 	struct transfer_callback *callback = transfer->callback;
+-	gsize bsize;
+ 
+ 	transfer->xfer = 0;
+ 
+@@ -315,30 +321,17 @@ static void get_buf_xfer_complete(GObex *obex, GError *err, gpointer user_data)
+ 		goto done;
+ 	}
+ 
+-	if (transfer->filled > 0 &&
+-			transfer->buffer[transfer->filled - 1] == '\0')
+-		goto done;
+-
+-	bsize = transfer->buffer_len - transfer->filled;
+-	if (bsize < 1) {
+-		transfer->buffer_len += 1;
+-		transfer->buffer = g_realloc(transfer->buffer,
+-						transfer->buffer_len);
+-	}
+-
+-	transfer->buffer[transfer->filled] = '\0';
+-	transfer->size = strlen(transfer->buffer);
++	transfer->size = transfer->transferred;
+ 
+ done:
+ 	if (callback)
+ 		callback->func(transfer, transfer->size, err, callback->data);
+ }
+ 
+-static void get_buf_xfer_progress(GObex *obex, GError *err, GObexPacket *rsp,
++static void get_xfer_progress_first(GObex *obex, GError *err, GObexPacket *rsp,
+ 							gpointer user_data)
+ {
+ 	struct obc_transfer *transfer = user_data;
+-	struct transfer_callback *callback = transfer->callback;
+ 	GObexPacket *req;
+ 	GObexHeader *hdr;
+ 	const guint8 *buf;
+@@ -347,7 +340,7 @@ static void get_buf_xfer_progress(GObex *obex, GError *err, GObexPacket *rsp,
+ 	gboolean final;
+ 
+ 	if (err != NULL) {
+-		get_buf_xfer_complete(obex, err, transfer);
++		xfer_complete(obex, err, transfer);
+ 		return;
+ 	}
+ 
+@@ -355,7 +348,7 @@ static void get_buf_xfer_progress(GObex *obex, GError *err, GObexPacket *rsp,
+ 	if (rspcode != G_OBEX_RSP_SUCCESS && rspcode != G_OBEX_RSP_CONTINUE) {
+ 		err = g_error_new(OBC_TRANSFER_ERROR, rspcode,
+ 					"Transfer failed (0x%02x)", rspcode);
+-		get_buf_xfer_complete(obex, err, transfer);
++		xfer_complete(obex, err, transfer);
+ 		g_error_free(err);
+ 		return;
+ 	}
+@@ -379,96 +372,21 @@ static void get_buf_xfer_progress(GObex *obex, GError *err, GObexPacket *rsp,
+ 	if (hdr) {
+ 		g_obex_header_get_bytes(hdr, &buf, &len);
+ 		if (len != 0)
+-			obc_transfer_read(transfer, buf, len);
++			get_xfer_progress(buf, len, transfer);
+ 	}
+ 
+ 	if (rspcode == G_OBEX_RSP_SUCCESS) {
+-		get_buf_xfer_complete(obex, err, transfer);
++		xfer_complete(obex, err, transfer);
+ 		return;
+ 	}
+ 
+ 	if (!g_obex_srm_active(obex)) {
+ 		req = g_obex_packet_new(G_OBEX_OP_GET, TRUE, G_OBEX_HDR_INVALID);
+ 
+-		transfer->xfer = g_obex_send_req(obex, req, -1,
+-							get_buf_xfer_progress,
+-							transfer, &err);
+-	}
+-
+-	if (callback && transfer->transferred != transfer->size)
+-		callback->func(transfer, transfer->transferred, err,
+-							callback->data);
+-}
+-
+-static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
+-{
+-	struct obc_transfer *transfer = user_data;
+-	struct transfer_callback *callback = transfer->callback;
+-
+-	transfer->xfer = 0;
+-
+-	if (err) {
+-		transfer->err = err->code;
+-		goto done;
+-	}
+-
+-	transfer->size = transfer->transferred;
+-
+-done:
+-	if (callback)
+-		callback->func(transfer, transfer->size, err, callback->data);
+-}
+-
+-static gboolean get_xfer_progress(const void *buf, gsize len,
+-							gpointer user_data)
+-{
+-	struct obc_transfer *transfer = user_data;
+-	struct transfer_callback *callback = transfer->callback;
+-
+-	obc_transfer_read(transfer, buf, len);
+-
+-	if (transfer->fd > 0) {
+-		gint w;
+-
+-		w = write(transfer->fd, transfer->buffer, transfer->filled);
+-		if (w < 0) {
+-			transfer->err = -errno;
+-			return FALSE;
+-		}
+-
+-		transfer->filled -= w;
++		transfer->xfer = g_obex_get_req_pkt(obex, req, get_xfer_progress,
++						xfer_complete, transfer,
++						&err);
+ 	}
+-
+-	if (callback && transfer->transferred != transfer->size)
+-		callback->func(transfer, transfer->transferred, NULL,
+-							callback->data);
+-
+-	return TRUE;
+-}
+-
+-static gssize put_buf_xfer_progress(void *buf, gsize len, gpointer user_data)
+-{
+-	struct obc_transfer *transfer = user_data;
+-	struct transfer_callback *callback = transfer->callback;
+-	gsize size;
+-
+-	if (transfer->transferred == transfer->size)
+-		return 0;
+-
+-	size = transfer->size - transfer->transferred;
+-	size = len > size ? len : size;
+-	if (size == 0)
+-		return 0;
+-
+-	memcpy(buf, transfer->buffer + transfer->transferred, size);
+-
+-	transfer->transferred += size;
+-
+-	if (callback)
+-		callback->func(transfer, transfer->transferred, NULL,
+-							callback->data);
+-
+-	return size;
+ }
+ 
+ static gssize put_xfer_progress(void *buf, gsize len, gpointer user_data)
+@@ -514,29 +432,25 @@ int obc_transfer_get(struct obc_transfer *transfer)
+ {
+ 	GError *err = NULL;
+ 	GObexPacket *req;
+-	GObexDataConsumer data_cb;
+-	GObexFunc complete_cb;
+-	GObexResponseFunc rsp_cb = NULL;
++	int fd;
+ 
+ 	if (transfer->xfer != 0)
+ 		return -EALREADY;
+ 
+-	if (transfer->type != NULL &&
+-			(strncmp(transfer->type, "x-obex/", 7) == 0 ||
+-			strncmp(transfer->type, "x-bt/", 5) == 0)) {
+-		rsp_cb = get_buf_xfer_progress;
+-	} else {
+-		int fd = open(transfer->filename ? : transfer->name,
+-				O_WRONLY | O_CREAT, 0600);
+-		if (fd < 0) {
+-			error("open(): %s(%d)", strerror(errno), errno);
+-			return -errno;
+-		}
+-		transfer->fd = fd;
+-		data_cb = get_xfer_progress;
+-		complete_cb = xfer_complete;
++	if (transfer->filename != NULL)
++		fd = open(transfer->filename, O_WRONLY | O_CREAT, 0600);
++	else {
++		transfer->tmpname = g_strdup("/tmp/obex-clientXXXXXX");
++		fd = mkstemp(transfer->tmpname);
+ 	}
+ 
++	if (fd < 0) {
++		error("open(): %s(%d)", strerror(errno), errno);
++		return -errno;
++	}
++
++	transfer->fd = fd;
++
+ 	req = g_obex_packet_new(G_OBEX_OP_GET, TRUE, G_OBEX_HDR_INVALID);
+ 
+ 	if (transfer->name != NULL)
+@@ -552,14 +466,9 @@ int obc_transfer_get(struct obc_transfer *transfer)
+ 						transfer->params->data,
+ 						transfer->params->size);
+ 
+-	if (rsp_cb)
+-		transfer->xfer = g_obex_send_req(transfer->obex, req, -1,
+-						rsp_cb, transfer, &err);
+-	else
+-		transfer->xfer = g_obex_get_req_pkt(transfer->obex, req,
+-						data_cb, complete_cb, transfer,
+-						&err);
+-
++	transfer->xfer = g_obex_send_req(transfer->obex, req, -1,
++						get_xfer_progress_first,
++						transfer, &err);
+ 	if (transfer->xfer == 0)
+ 		return -ENOTCONN;
+ 
+@@ -570,19 +479,10 @@ int obc_transfer_put(struct obc_transfer *transfer)
+ {
+ 	GError *err = NULL;
+ 	GObexPacket *req;
+-	GObexDataProducer data_cb;
+ 
+ 	if (transfer->xfer != 0)
+ 		return -EALREADY;
+ 
+-	if (transfer->buffer) {
+-		data_cb = put_buf_xfer_progress;
+-		goto done;
+-	}
+-
+-	data_cb = put_xfer_progress;
+-
+-done:
+ 	req = g_obex_packet_new(G_OBEX_OP_PUT, FALSE, G_OBEX_HDR_INVALID);
+ 
+ 	if (transfer->name != NULL)
+@@ -601,9 +501,9 @@ done:
+ 						transfer->params->data,
+ 						transfer->params->size);
+ 
+-	transfer->xfer = g_obex_put_req_pkt(transfer->obex, req, data_cb,
+-						xfer_complete, transfer,
+-						&err);
++	transfer->xfer = g_obex_put_req_pkt(transfer->obex, req,
++					put_xfer_progress, xfer_complete,
++					transfer, &err);
+ 	if (transfer->xfer == 0)
+ 		return -ENOTCONN;
+ 
+@@ -619,23 +519,36 @@ int obc_transfer_get_params(struct obc_transfer *transfer,
+ 	return 0;
+ }
+ 
+-void obc_transfer_clear_buffer(struct obc_transfer *transfer)
++int obc_transfer_get_contents(struct obc_transfer *transfer, char **contents,
++								gsize *size)
+ {
+-	transfer->filled = 0;
+-}
++	struct stat st;
+ 
+-const char *obc_transfer_get_buffer(struct obc_transfer *transfer, size_t *size)
+-{
+-	if (size)
+-		*size = transfer->filled;
++	if (contents == NULL)
++		return -EINVAL;
+ 
+-	return transfer->buffer;
+-}
++	if (fstat(transfer->fd, &st) < 0) {
++		error("fstat(): %s(%d)", strerror(errno), errno);
++		return -errno;
++	}
+ 
+-void obc_transfer_set_buffer(struct obc_transfer *transfer, char *buffer)
+-{
+-	transfer->size = strlen(buffer);
+-	transfer->buffer = buffer;
++	if (lseek(transfer->fd, 0, SEEK_SET) < 0) {
++		error("lseek(): %s(%d)", strerror(errno), errno);
++		return -errno;
++	}
++
++	*contents = g_malloc0(st.st_size + 1);
++
++	if (read(transfer->fd, *contents, st.st_size) < 0) {
++		error("read(): %s(%d)", strerror(errno), errno);
++		g_free(*contents);
++		return -errno;
++	}
++
++	if (size)
++		*size = st.st_size;
++
++	return 0;
+ }
+ 
+ void obc_transfer_set_name(struct obc_transfer *transfer, const char *name)
+diff --git a/client/transfer.h b/client/transfer.h
+index da7d151..7759296 100644
+--- a/client/transfer.h
++++ b/client/transfer.h
+@@ -51,9 +51,8 @@ int obc_transfer_put(struct obc_transfer *transfer);
+ 
+ int obc_transfer_get_params(struct obc_transfer *transfer,
+ 					struct obc_transfer_params *params);
+-const char *obc_transfer_get_buffer(struct obc_transfer *transfer, size_t *size);
+-void obc_transfer_set_buffer(struct obc_transfer *transfer, char *buffer);
+-void obc_transfer_clear_buffer(struct obc_transfer *transfer);
++int obc_transfer_get_contents(struct obc_transfer *transfer, char **contents,
++								gsize *size);
+ 
+ void obc_transfer_set_name(struct obc_transfer *transfer, const char *name);
+ void obc_transfer_set_filename(struct obc_transfer *transfer,
 -- 
-1.7.10
+1.7.7.6
+
