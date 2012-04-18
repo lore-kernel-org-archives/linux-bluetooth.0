@@ -1,50 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1334751359.16897.225.camel@aeonflux>
-Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-	linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
-Date: Wed, 18 Apr 2012 14:15:59 +0200
-In-Reply-To: <20120418121014.GD19228@aemeltch-MOBL1>
-References: <1334059909-20513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1334059909-20513-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <4F846257.1060807@sipsolutions.net> <1334092668.16897.54.camel@aeonflux>
-	 <4F84A422.3030900@sipsolutions.net> <1334093378.16897.62.camel@aeonflux>
-	 <20120411070514.GB17779@aemeltch-MOBL1>
-	 <1334714841.3725.37.camel@jlt3.sipsolutions.net>
-	 <20120418112017.GC19228@aemeltch-MOBL1>
-	 <1334749879.16897.221.camel@aeonflux>
-	 <20120418121014.GD19228@aemeltch-MOBL1>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Device discovery procedure
+Date: Wed, 18 Apr 2012 12:15:06 +0000
+Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B4836F1@DNCE05.ent.ti.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+All,
 
-<snip>
+I've looked into the adapter.c code, after I encountered a little problem. It seems that for some reason, in adapter.c, in function void adapter_set_discovering(...), which is called by mgmt_discovering(...) as a result of discovering state change, we take a decision to start a timer for rescheduling the discovery process again. This relies on the main_opts.discov_interval, and it calls the following code to start the timer:
 
-> > This is also a little bit of confusing since FullMac cards will not
-> > create an AMP virtual interface. With them you just see the HCI AMP
-> > controller on the Bluetooth side. Can an AMP virtual interface be just
-> > virtual inside mac80211 or does it have to have a netdev attached to it?
-> 
-> If we create virtual interface then netdev is allocated and we can handle
-> it with common tools.
+	adapter->discov_id = g_timeout_add_seconds(main_opts.discov_interval, discovery_cb, adapter);
 
-what common tools do you wanna use here. We actually do not wanna have
-them show up as netdev devices at all. AMP connections don't have IP
-addresses or anything else for that matter. We do not even need the
-statistics here since they will be counted within HCI AMP controller in
-the Bluetooth subsystem.
+If the main_opts.discov_interval is equal to 0, this means that the discovery procedure will restart immediately, and loop forever until someone explicitly stops the discovery.
 
-If you wanna do IP over AMP, it would be via BNEP. And the netdev you
-are getting would come as bnep0 from the Bluetooth stack and not via the
-mac80211 stack.
-
-Regards
-
-Marcel
+Is this intentional? Is this how it's supposed to work ? Is there a way to disable this behavior?
 
 
+Thanks,
+
+Chen Ganir
+Texas Instruments
