@@ -1,32 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ 1/5] gdbus: return if method signature is malformed
-Date: Wed, 18 Apr 2012 13:47:58 -0300
-Message-Id: <1334767682-27121-1-git-send-email-lucas.demarchi@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 18 Apr 2012 08:39:31 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Johannes Berg <johannes@sipsolutions.net>,
+    Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+    linux-wireless@vger.kernel.org
+Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
+In-Reply-To: <4F8ED913.4040807@sipsolutions.net>
+Message-ID: <alpine.DEB.2.02.1204180818190.25494@mathewm-linux>
+References: <1334059909-20513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1334059909-20513-2-git-send-email-Andrei.Emeltchenko.news@gmail.com> <4F846257.1060807@sipsolutions.net> <1334092668.16897.54.camel@aeonflux> <4F84A422.3030900@sipsolutions.net>
+ <4F84A52A.7050905@sipsolutions.net> <20120411071119.GC17779@aemeltch-MOBL1> <1334714611.3725.34.camel@jlt3.sipsolutions.net> <20120418121551.GE19228@aemeltch-MOBL1> <4F8ED1D0.1070401@sipsolutions.net> <20120418145202.GH19228@aemeltch-MOBL1>
+ <4F8ED913.4040807@sipsolutions.net>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- gdbus/object.c |    4 ++++
- 1 file changed, 4 insertions(+)
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 8bc12f5..7a94156 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -107,6 +107,10 @@ static void print_arguments(GString *gstr, const char *sig,
- 				break;
- 		}
- 
-+		if (!complete) {
-+			error("Unexpected signature: %s", sig);
-+			return;
-+		}
- 
- 		if (direction)
- 			g_string_append_printf(gstr,
--- 
-1.7.10
+Andrei and Johannes -
 
+On Wed, 18 Apr 2012, Johannes Berg wrote:
+
+> Hi Andrei,
+>
+>>> No, this is incorrect. If one device wants to connect on one
+>>> channel, the other typically has to use the same channel. If one
+>>> device wants to scan, the other will be affected. Some hardware may
+>>> support switching around between two channels, but might also
+>>> support more than 2 virtual interfaces, so again they won't be
+>>> independent.
+>> 
+>> BTW: which devices can switch channels?
+>
+> None today, I'm working on it.
+>
+>>> Therefore, you need something managing all this concurrency. This is
+>>> in a small part the driver which will enforce restrictions (it will
+>>> reject new impossible things), but mostly the supplicant which can
+>>> make policy decisions about which usage should win.
+>> 
+>> This doesn't sound like a rocket science to me. IMO this might be done in
+>> drivers. Those drivers which can switch channels why do they need
+>> wpa_supplicant involved making this decision?
+>
+> I don't think you understand.
+>
+> Say our device can do 3 virtual interfaces, on 2 channels. Then if the user 
+> is connected to some managed network (say office network), one interface & 
+> channel is used up. Now the user has AMP running, another channel might be 
+> used up. Now the user wants to do P2P negotiation. Now the supplicant, which 
+> is doing the negotiation, needs to know that it can negotiate only one of 
+> those two channels, not any other. Or maybe P2P should win, then it might 
+> disconnect the AMP or the managed connection. But all those are policy 
+> decisions, so the driver can't really handle them.
+
+I concur with Johannes...
+
+All of the AMP PALs I've seen are restricted to using the current 
+wireless channel if a wireless interface is active.  The consequence 
+is that if you have two BT3.0+HS devices, and their wireless 
+interfaces are associated with different APs on different channels, 
+then they are unable to use AMP.
+
+Trying to manage two active channels with a single-radio wireless 
+devices is non-trivial -- there may be simultaneous beacons on 
+different channels, for example.  I suppose it could be a different 
+situation when a wireless device has independent radios for 2.4GHz and 
+5GHz bands, but there's still a need to make decisions about which 
+channel(s) to use and how they are to be shared.
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
