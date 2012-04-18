@@ -2,80 +2,106 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org,
-	=?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@gmail.com>
-Subject: [RFC v2 07/16] HoG: enable "Report" characteristic notification
-Date: Wed, 18 Apr 2012 19:08:15 -0300
-Message-Id: <1334786904-26282-8-git-send-email-jprvita@openbossa.org>
+Cc: claudio.takahasi@openbossa.org
+Subject: [RFC v2 05/16] HoG: discover descriptors for all characteristics
+Date: Wed, 18 Apr 2012 19:08:13 -0300
+Message-Id: <1334786904-26282-6-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
 References: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: João Paulo Rechi Vita <jprvita@gmail.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
+"Report" characteristic has "Report Reference Characteristic" descriptor and
+"Client Characteristic Configuration" descriptor.
 ---
- input/hog_device.c |   30 +++++++++++++++++++++++++++---
- 1 files changed, 27 insertions(+), 3 deletions(-)
+ input/hog_device.c |   56 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 55 insertions(+), 1 deletions(-)
 
 diff --git a/input/hog_device.c b/input/hog_device.c
-index 2eec825..ac6d4c9 100644
+index a1b0bb4..7d2b6c0 100644
 --- a/input/hog_device.c
 +++ b/input/hog_device.c
-@@ -71,10 +71,30 @@ static void report_free(struct report *report)
+@@ -70,6 +70,55 @@ static void report_free(struct report *report)
  	g_free(report);
  }
  
-+static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
-+					guint16 plen, gpointer user_data)
++static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
++					guint16 len, gpointer user_data)
 +{
++	struct report *report = user_data;
++	struct att_data_list *list;
++	uint8_t format;
++	int i;
++
 +	if (status != 0) {
-+		error("Write report characteristic descriptor failed: %s",
++		error("Discover all characteristic descriptors failed: %s",
 +							att_ecode2str(status));
 +		return;
 +	}
 +
-+	DBG("Report characteristic descriptor written: notification enabled");
++	list = dec_find_info_resp(pdu, len, &format);
++	if (list == NULL)
++		return;
++
++	if (format != 0x01)
++		goto done;
++
++	for (i = 0; i < list->num; i++) {
++		uint16_t uuid16;
++		uint8_t *value;
++
++		value = list->data[i];
++		uuid16 = att_get_u16(&value[2]);
++
++		DBG("%s descriptor: 0x%04x", report->decl->uuid, uuid16);
++	}
++
++done:
++	att_data_list_free(list);
 +}
 +
-+static void write_ccc(uint16_t handle, gpointer user_data)
++static void discover_descriptor(GAttrib *attrib, struct gatt_char *chr,
++				struct gatt_char *next, gpointer user_data)
 +{
-+	struct hog_device *hogdev = user_data;
-+	uint8_t value[] = { 0x01, 0x00 };
++	uint16_t start, end;
 +
-+	gatt_write_char(hogdev->attrib, handle, value, sizeof(value),
-+					report_ccc_written_cb, hogdev);
++	start = chr->value_handle + 1;
++	end = (next ? next->handle - 1 : 0xffff);
++
++	if (start >= end)
++		return;
++
++	gatt_find_info(attrib, start, end, discover_descriptor_cb, user_data);
 +}
 +
- static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
- 					guint16 len, gpointer user_data)
+ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
  {
--	struct report *report = user_data;
- 	struct att_data_list *list;
- 	uint8_t format;
- 	int i;
-@@ -93,13 +113,17 @@ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
- 		goto done;
+ 	struct hog_device *hogdev = user_data;
+@@ -86,9 +135,12 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ 	bt_uuid16_create(&report_uuid, HOG_REPORT_UUID);
  
- 	for (i = 0; i < list->num; i++) {
--		uint16_t uuid16;
-+		uint16_t uuid16, handle;
- 		uint8_t *value;
+ 	for (l = chars; l; l = g_slist_next(l)) {
+-		struct gatt_char *chr = l->data;
++		struct gatt_char *chr, *next;
+ 		bt_uuid_t uuid;
  
- 		value = list->data[i];
-+		handle = att_get_u16(value);
- 		uuid16 = att_get_u16(&value[2]);
- 
--		DBG("%s descriptor: 0x%04x", report->decl->uuid, uuid16);
-+		if (uuid16 != GATT_CLIENT_CHARAC_CFG_UUID)
-+			continue;
++		chr = l->data;
++		next = l->next ? l->next->data : NULL;
 +
-+		write_ccc(handle, user_data);
- 	}
+ 		DBG("0x%04x UUID: %s properties: %02x",
+ 				chr->handle, chr->uuid, chr->properties);
  
- done:
+@@ -100,6 +152,8 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ 		report = g_new0(struct report, 1);
+ 		report->decl = g_memdup(chr, sizeof(*chr));
+ 		hogdev->reports = g_slist_append(hogdev->reports, report);
++
++		discover_descriptor(hogdev->attrib, chr, next, hogdev);
+ 	}
+ }
+ 
 -- 
 1.7.7.6
 
