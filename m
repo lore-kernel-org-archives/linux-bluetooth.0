@@ -1,40 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hemant Gupta <hemant.gupta@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: Hemant Gupta <hemant.gupta@stericsson.com>
-Subject: [PATCH] Bluetooth: Update L2CAP Channel State for LE Link during Pairing
-Date: Wed, 18 Apr 2012 10:24:34 +0530
-Message-ID: <1334724874-3086-1-git-send-email-hemant.gupta@stericsson.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1334714841.3725.37.camel@jlt3.sipsolutions.net>
+Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+	linux-wireless@vger.kernel.org
+Date: Tue, 17 Apr 2012 19:07:21 -0700
+In-Reply-To: <20120411070514.GB17779@aemeltch-MOBL1>
+References: 
+	<1334059909-20513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1334059909-20513-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <4F846257.1060807@sipsolutions.net> <1334092668.16897.54.camel@aeonflux>
+	 <4F84A422.3030900@sipsolutions.net> <1334093378.16897.62.camel@aeonflux>
+	 <20120411070514.GB17779@aemeltch-MOBL1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch updates the L2CAP Channel state to Connected when LE Link
-is established, so that data transmission can start on CID 4.
-Without this fix if remote side sends data on CID 4 immidiately after
-LE Link was established, data was being discarded in l2cap_att_channel()
-API because channel state was still BT_CONNECT when SMP pairing is in
-progress. This was resulting in disconnection from remote side after 30 seconds
-since ATT request was not answered by user space as data was discarded.
+Hi,
 
-Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
----
- net/bluetooth/l2cap_core.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+> > > >> I don't get this patch at all. Why am I reviewing some very very basic
+> > > >> skeleton code when we should be discussing userspace APIs (we have
+> > > >> already discussed them with a few people years ago), how the AMP is
+> > > >> going to be managed, how the security handshake is going to work, etc.
+> 
+> Do we have some outcome from that discussion?
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 15478b3..20dbebb 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1189,6 +1189,7 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 		l2cap_chan_lock(chan);
- 
- 		if (conn->hcon->type == LE_LINK) {
-+			__l2cap_state_change(chan, BT_CONNECTED);
- 			if (smp_conn_security(conn, chan->sec_level))
- 				l2cap_chan_ready(chan);
- 
--- 
-1.7.0.4
+This API-defining patch is probably the best we have:
+http://johannes.sipsolutions.net/patches/kernel/all/2010-10-13-15%
+3a24/035-bt3-amp.patch
 
+> > The whole AMP control goes via A2MP and L2CAP and both are fully
+> > implemented inside the kernel. In theory we do not even need to expose
+> > HCI AMP interfaces to userspace.
+> 
+> Johannes, you can think of SoftAMP as analog of SoftMAC (vs FullMAC).
+> SoftMAC is also possible to implement in user space but only
+> authentication is done this way.
+
+Yeah, and we also implement roaming and crypto stuff in userspace, for
+softmac. Heck, we implement crypto in userspace even for fullmac, so
+really ...
+
+> Consider use case when user sends data over Bluetooth High Speed. Data
+> go from obex user space to kernel L2CAP. Then you just need to add
+> MAC header and send to wireless device. But you are proposing to copy data
+> to user space for processing; then user space needs to copy data again to 
+> kernel and then to wireless device.
+
+I never said data should be copied. If you thought I did, you
+misunderstood me.
+
+> I think that user does not need to know that it uses High Speed, it just
+> notice that speed is better :). Do you require any special API for
+> latest and greatest wireless standard? Why user shall care about it?
+
+Well, actually, yes, most new wireless standards do require new API for
+the supplicant to be able to use them. The *user* never needs to know
+about it of course -- consider the supplicant part of the wireless
+stack.
+
+johannes
