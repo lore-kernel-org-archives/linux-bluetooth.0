@@ -1,26 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Device discovery procedure
-Date: Wed, 18 Apr 2012 12:15:06 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B4836F1@DNCE05.ent.ti.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Wed, 18 Apr 2012 15:15:52 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+	linux-wireless@vger.kernel.org
+Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
+Message-ID: <20120418121551.GE19228@aemeltch-MOBL1>
+References: <1334059909-20513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1334059909-20513-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <4F846257.1060807@sipsolutions.net>
+ <1334092668.16897.54.camel@aeonflux>
+ <4F84A422.3030900@sipsolutions.net>
+ <4F84A52A.7050905@sipsolutions.net>
+ <20120411071119.GC17779@aemeltch-MOBL1>
+ <1334714611.3725.34.camel@jlt3.sipsolutions.net>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1334714611.3725.34.camel@jlt3.sipsolutions.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-All,
+Hi Johannes,
 
-I've looked into the adapter.c code, after I encountered a little problem. It seems that for some reason, in adapter.c, in function void adapter_set_discovering(...), which is called by mgmt_discovering(...) as a result of discovering state change, we take a decision to start a timer for rescheduling the discovery process again. This relies on the main_opts.discov_interval, and it calls the following code to start the timer:
+On Tue, Apr 17, 2012 at 07:03:31PM -0700, Johannes Berg wrote:
+> > I am new to the wireless code but can new virtual interface separate those
+> > interfaces? They can have different MAC addresses and you can run
+> > wpa_supplicant for each virtual interface separately.
+> 
+> It's never in your best interest to run one supplicant per virtual
+> interface, you want to run one per piece of hardware so it can
+> coordinate between virtual interfaces.
 
-	adapter->discov_id = g_timeout_add_seconds(main_opts.discov_interval, discovery_cb, adapter);
+Do I understand it right that virtual interfaces are like separate devices from
+user point of view? If I create virtual interface and assign MAC I can
+transfer data through it without affecting other interfaces? Then
+wpa_supplicant does not need to know about it at all.
 
-If the main_opts.discov_interval is equal to 0, this means that the discovery procedure will restart immediately, and loop forever until someone explicitly stops the discovery.
-
-Is this intentional? Is this how it's supposed to work ? Is there a way to disable this behavior?
-
-
-Thanks,
-
-Chen Ganir
-Texas Instruments
+Best regards 
+Andrei Emeltchenko 
