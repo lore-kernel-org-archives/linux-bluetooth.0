@@ -1,50 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <F0070FBC0FB3174D8D11444EB2D5B0260B4836F1@DNCE05.ent.ti.com>
-References: <F0070FBC0FB3174D8D11444EB2D5B0260B4836F1@DNCE05.ent.ti.com>
-Date: Wed, 18 Apr 2012 23:51:12 +0300
-Message-ID: <CABBYNZK3bVZF-EWcP5MWANVc-e7j_8j2YKpUTZ28edCu6d6QeA@mail.gmail.com>
-Subject: Re: Device discovery procedure
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "Ganir, Chen" <chen.ganir@ti.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1334767682-27121-3-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1334767682-27121-1-git-send-email-lucas.demarchi@profusion.mobi> <1334767682-27121-3-git-send-email-lucas.demarchi@profusion.mobi>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Wed, 18 Apr 2012 15:57:08 -0300
+Message-ID: <CAMOw1v5qVgy5yW+btczvrKxu9LbygTdJ38ywjsH+DpA7Ju1o-w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/5] gdbus: add decorated DBus signature for methods
+To: linux-bluetooth@vger.kernel.org
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
-
-On Wed, Apr 18, 2012 at 3:15 PM, Ganir, Chen <chen.ganir@ti.com> wrote:
-> All,
+On Wed, Apr 18, 2012 at 1:48 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> To generate better introspection data we need to keep the name of each
+> argument in GDBusMethodTable. With decorated signatures we can save
+> them, while being compatible with the previous format. It is supposed to
+> be used as following:
 >
-> I've looked into the adapter.c code, after I encountered a little problem. It seems that for some reason, in adapter.c, in function void adapter_set_discovering(...), which is called by mgmt_discovering(...) as a result of discovering state change, we take a decision to start a timer for rescheduling the discovery process again. This relies on the main_opts.discov_interval, and it calls the following code to start the timer:
+> s[argname1]o[argname2]
 >
->        adapter->discov_id = g_timeout_add_seconds(main_opts.discov_interval, discovery_cb, adapter);
+> We can't simply change signature to this format because we need to be
+> able to rapidly check if messages have that same signature when they
+> arrive: that is a much hotter path than the Introspect call, which
+> this patch tries to solve.
 >
-> If the main_opts.discov_interval is equal to 0, this means that the discovery procedure will restart immediately, and loop forever until someone explicitly stops the discovery.
+> Therefore, when registering the interface we create the undecorated
+> signature and save on the same structure, that is used by everybody.
+> Introspect can later make use of the decorated version, exporting
+> argument names.
+> ---
+>  gdbus/gdbus.h  |    7 +++++--
+>  gdbus/object.c |   34 +++++++++++++++++++++++++++++++++-
+>  2 files changed, 38 insertions(+), 3 deletions(-)
 
-The implementation has changed a little bit with introduction of mgmt,
-before it used to tell the time window where used for doing name
-resolving between, thus setting it 0 would disable name resolving.
+Don't bother too much with the current implementation, only with the
+idea of adding the arguments using "decorated signatures". This
+implementation has some bugs that I need to work out yet. Same apply
+for patches 4 and 5.
 
-Now main_opts.discov_interval doesn't control name resolving anymore,
-the names will continue to be resolved until all discovered devices
-have their names resolved (skipping the ones that for some reason
-failed).
-
-So there is a little behavior changing in the sense that each
-discovery round is no longer deterministic, it will go on until all
-names are resolved, and so with main_opts.discov_interval you can only
-add a delay to before starting a next discovery which perhaps is not
-that useful.
-
-> Is this intentional? Is this how it's supposed to work ? Is there a way to disable this behavior?
-
-Looping forever is intentional, has been for a while actually, what
-doesn't seems to be intentional is removing the possibility to disable
-name resolving by setting the interval to 0, actually our default
-should probably be 0 now not 30 seconds since during all this time we
-gonna be idle.
-
--- 
-Luiz Augusto von Dentz
+Lucas De Marchi
