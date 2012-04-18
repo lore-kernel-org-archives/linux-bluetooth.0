@@ -3,9 +3,9 @@ From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org
-Subject: [RFC v2 11/16] GATT: Add Report Reference Descriptor declaration
-Date: Wed, 18 Apr 2012 19:08:19 -0300
-Message-Id: <1334786904-26282-12-git-send-email-jprvita@openbossa.org>
+Subject: [RFC v2 10/16] HoG: Use real values for vendor and product IDs
+Date: Wed, 18 Apr 2012 19:08:18 -0300
+Message-Id: <1334786904-26282-11-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
 References: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,24 +13,52 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
-This patch adds the Report Reference Descriptor assigned number
-declaration defined by the Bluetooth SIG.
+This patch replaces the hard-code values for vendor and product IDs
+by the values obtained from the device core functions. Vendor and
+product IDs are read from the remote's Device Information Service.
 ---
- attrib/att.h |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ input/hog_device.c |   17 ++++++++++++-----
+ 1 files changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/attrib/att.h b/attrib/att.h
-index 1e128a7..a74eb5a 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
-@@ -44,6 +44,7 @@
- #define GATT_CHARAC_FMT_UUID		0x2904
- #define GATT_CHARAC_AGREG_FMT_UUID	0x2905
- #define GATT_CHARAC_VALID_RANGE_UUID	0x2906
-+#define GATT_REPORT_REFERENCE		0x2908
+diff --git a/input/hog_device.c b/input/hog_device.c
+index 9066191..89e9332 100644
+--- a/input/hog_device.c
++++ b/input/hog_device.c
+@@ -192,6 +192,7 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	struct hog_device *hogdev = user_data;
+ 	struct uhid_event ev;
+ 	uint8_t value[ATT_MAX_MTU];
++	uint16_t vendor_src, vendor, product, version;
+ 	int vlen, i;
  
- /* Attribute Protocol Opcodes */
- #define ATT_OP_ERROR			0x01
+ 	if (status != 0) {
+@@ -212,15 +213,21 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 			DBG("\t %02x %02x", value[i], value[i + 1]);
+ 	}
+ 
++	vendor_src = btd_device_get_vendor_src(hogdev->device);
++	vendor = btd_device_get_vendor(hogdev->device);
++	product = btd_device_get_product(hogdev->device);
++	version = btd_device_get_version(hogdev->device);
++	DBG("DIS information: vendor_src=0x%X, vendor=0x%X, product=0x%X, "
++			"version=0x%X",	vendor_src, vendor, product, version);
++
+ 	/* create UHID device */
+ 	memset(&ev, 0, sizeof(ev));
+ 	ev.type = UHID_CREATE;
+-	/* TODO: get info from DIS */
+ 	strcpy((char*)ev.u.create.name, "bluez-hog-device");
+-	ev.u.create.vendor = 0xBEBA;
+-	ev.u.create.product = 0xCAFE;
+-	ev.u.create.version = 0;
+-	ev.u.create.country = 0;
++	ev.u.create.vendor = vendor;
++	ev.u.create.product = product;
++	ev.u.create.version = version;
++	ev.u.create.country = 0; /* get this info from the right place */
+ 	ev.u.create.bus = BUS_USB; /* BUS_BLUETOOTH doesn't work here */
+ 	ev.u.create.rd_data = value;
+ 	ev.u.create.rd_size = vlen;
 -- 
 1.7.7.6
 
