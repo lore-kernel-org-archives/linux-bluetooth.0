@@ -4,150 +4,79 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Antonio Ospite <ospite@studenti.unina.it>,
 	Bastien Nocera <hadess@hadess.net>,
 	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: [PATCH BlueZ v2 2/3] device: add a btd_device_set_trusted() call
-Date: Wed, 18 Apr 2012 11:38:10 +0200
-Message-Id: <1334741891-11869-3-git-send-email-ospite@studenti.unina.it>
+Subject: [PATCH BlueZ v2 1/3] manager: add a btd_manager_get_default_adapter_address_str() call
+Date: Wed, 18 Apr 2012 11:38:09 +0200
+Message-Id: <1334741891-11869-2-git-send-email-ospite@studenti.unina.it>
 In-Reply-To: <1334741891-11869-1-git-send-email-ospite@studenti.unina.it>
 References: <1334741891-11869-1-git-send-email-ospite@studenti.unina.it>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add a new btd_* call to set a device as trusted, meant to be used by
-_external_ plugins, this avoid making public these symbols:
+Add a new btd_* call to get the default adapter address as a string,
+meant to be used by _external_ plugins, this is to avoid to make public
+these symbols:
 
-  record_from_string
-  store_record
-  sdp_record_free
-  str2ba
-  str2ba
-  store_device_id
-  write_trust
-  dbus_bus_get
-  manager_find_adapter
-  adapter_get_device
-  dbus_connection_unref
+  manager_get_default_adapter
+  adapter_get_address
+  bt_malloc
+  ba2str
 ---
 
-If BlueZ can pull the required parameters itself from trusted devices this can
-be simplified, if not then the name should be fixed to make clearer what the
-function does.
+Alternatively a version without the _str prefix can be used which
+returns a bdaddr_t, but I have to make ba2str a global symbol so I can
+make the conversion to string in the plugin itself.
 
- src/device.c |   74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/device.h |    9 +++++++
- 2 files changed, 83 insertions(+)
+Let me know how do you like that.
 
-diff --git a/src/device.c b/src/device.c
-index ea6fec2..6e434c1 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -49,6 +49,7 @@
- #include "att.h"
- #include "hcid.h"
- #include "adapter.h"
-+#include "manager.h"
- #include "gattrib.h"
- #include "attio.h"
- #include "device.h"
-@@ -2948,6 +2949,79 @@ GSList *btd_device_get_primaries(struct btd_device *device)
- 	return device->primaries;
+
+ src/manager.c |   21 +++++++++++++++++++++
+ src/manager.h |    1 +
+ 2 files changed, 22 insertions(+)
+
+diff --git a/src/manager.c b/src/manager.c
+index 6244516..fbd5ef8 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -270,6 +270,27 @@ struct btd_adapter *manager_get_default_adapter(void)
+ 	return manager_find_adapter_by_id(default_adapter_id);
  }
  
-+int btd_device_set_trusted(const char *adapter_address,
-+			   const char *device_address,
-+			   char *name,
-+			   uint16_t vendor_id_source,
-+			   uint16_t vendor_id,
-+			   uint16_t product_id,
-+			   uint16_t version_id,
-+			   const char *uuid,
-+			   const char *sdp_record)
++char *btd_manager_get_default_adapter_address_str(void)
 +{
 +	struct btd_adapter *adapter;
-+	struct btd_device *device;
-+	DBusConnection *conn;
-+	bdaddr_t src;
-+	bdaddr_t dst;
-+	sdp_record_t *record;
-+	int ret = 0;
++	bdaddr_t adapter_bdaddr;
++	char *str;
 +
-+	record = record_from_string(sdp_record);
-+	if (record == NULL) {
-+		ret = -ENODEV;
-+		goto out;
-+	}
-+	ret = store_record(adapter_address, device_address, record);
-+	sdp_record_free(record);
-+	if (ret < 0)
-+		goto out;
-+
-+	str2ba(adapter_address, &src);
-+	str2ba(device_address, &dst);
-+
-+	/* Set the device id */
-+	store_device_id(adapter_address, device_address, vendor_id_source, vendor_id,
-+			product_id, version_id);
-+	/* Don't write a profile here,
-+	 * it will be updated when the device connects */
-+
-+	write_trust(adapter_address, device_address, "[all]", TRUE);
-+
-+	conn = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
-+	if (conn == NULL) {
-+		DBG("Failed to get on the bus");
-+		ret = -EPERM;
-+		goto out;
-+	}
-+
-+	adapter = manager_find_adapter(&src);
++	adapter = manager_get_default_adapter();
 +	if (adapter == NULL) {
-+		DBG("Failed to get the adapter");
-+		ret = -EPERM;
-+		goto out_dbus_unref;
++		return NULL;
 +	}
 +
-+	/* This is needed: adapter_find_device() wouldn't need a Dbus
-+	 * connection but it would not be enough as it only searches for
-+	 * already existing devices, while adapter_get_device() will create a
-+	 * new device if necessary.
-+	 */
-+	device = adapter_get_device(conn, adapter, device_address);
-+	if (device == NULL) {
-+		DBG("Failed to get the device");
-+		ret = -ENODEV;
-+		goto out_dbus_unref;
-+	}
++	adapter_get_address(adapter, &adapter_bdaddr);
 +
-+	btd_device_add_uuid(device, uuid);
++	str = bt_malloc(18);
++	if (str == NULL)
++		return NULL;
 +
-+out_dbus_unref:
-+	dbus_connection_unref(conn);
-+out:
-+	return ret;
++	ba2str(&adapter_bdaddr, str);
++	return str;
 +}
 +
- void btd_device_add_uuid(struct btd_device *device, const char *uuid)
+ static void manager_remove_adapter(struct btd_adapter *adapter)
  {
- 	GSList *uuid_list;
-diff --git a/src/device.h b/src/device.h
-index 690c64d..1011e3e 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -57,6 +57,15 @@ void device_register_services(DBusConnection *conn, struct btd_device *device,
- 						GSList *prim_list, int psm);
- GSList *device_services_from_record(struct btd_device *device,
- 							GSList *profiles);
-+int btd_device_set_trusted(const char *adapter_address,
-+			   const char *device_address,
-+			   char *name,
-+			   uint16_t vendor_id_source,
-+			   uint16_t vendor_id,
-+			   uint16_t product_id,
-+			   uint16_t version_id,
-+			   const char *uuid,
-+			   const char *sdp_record);
- void btd_device_add_uuid(struct btd_device *device, const char *uuid);
- struct btd_adapter *device_get_adapter(struct btd_device *device);
- void device_get_address(struct btd_device *device, bdaddr_t *bdaddr,
+ 	uint16_t dev_id = adapter_get_dev_id(adapter);
+diff --git a/src/manager.h b/src/manager.h
+index 264cd25..7df882e 100644
+--- a/src/manager.h
++++ b/src/manager.h
+@@ -36,6 +36,7 @@ const char *manager_get_base_path(void);
+ struct btd_adapter *manager_find_adapter(const bdaddr_t *sba);
+ struct btd_adapter *manager_find_adapter_by_id(int id);
+ struct btd_adapter *manager_get_default_adapter(void);
++char *btd_manager_get_default_adapter_address_str(void);
+ void manager_foreach_adapter(adapter_cb func, gpointer user_data);
+ GSList *manager_get_adapters(void);
+ struct btd_adapter *btd_manager_register_adapter(int id, gboolean up);
 -- 
 1.7.10
 
