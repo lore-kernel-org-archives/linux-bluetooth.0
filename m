@@ -2,184 +2,225 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org,
-	=?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-Subject: [RFC v2 16/16] HoG: Prepend report id to the HID report
-Date: Wed, 18 Apr 2012 19:08:24 -0300
-Message-Id: <1334786904-26282-17-git-send-email-jprvita@openbossa.org>
+Cc: claudio.takahasi@openbossa.org
+Subject: [RFC v2 14/16] GATT: Move GATT assigned numbers to GATT header
+Date: Wed, 18 Apr 2012 19:08:22 -0300
+Message-Id: <1334786904-26282-15-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
 References: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the report descriptor has a report id tag it have to be prepended
-to the report data to construct the report itself.
----
- input/hog_device.c |   74 ++++++++++++++++++++++++++++++++++++++++++----------
- 1 files changed, 60 insertions(+), 14 deletions(-)
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
-diff --git a/input/hog_device.c b/input/hog_device.c
-index cfe8f03..b7eea96 100644
---- a/input/hog_device.c
-+++ b/input/hog_device.c
-@@ -59,10 +59,6 @@
- #define MIN(x, y) ((x) < (y) ? (x) : (y))
- #endif
+---
+ attrib/att.h           |   28 ----------------------------
+ attrib/gatt-service.c  |    3 ++-
+ attrib/gatt.h          |   29 +++++++++++++++++++++++++++++
+ plugins/gatt-example.c |    1 +
+ proximity/immalert.c   |    3 ++-
+ proximity/linkloss.c   |    3 ++-
+ proximity/reporter.c   |    3 ++-
+ src/attrib-server.c    |    3 ++-
+ time/server.c          |    3 ++-
+ 9 files changed, 42 insertions(+), 34 deletions(-)
+
+diff --git a/attrib/att.h b/attrib/att.h
+index ba11da7..d12a7f2 100644
+--- a/attrib/att.h
++++ b/attrib/att.h
+@@ -22,30 +22,6 @@
+  *
+  */
  
--struct report {
--	struct gatt_char *decl;
--};
+-/* GATT Profile Attribute types */
+-#define GATT_PRIM_SVC_UUID		0x2800
+-#define GATT_SND_SVC_UUID		0x2801
+-#define GATT_INCLUDE_UUID		0x2802
+-#define GATT_CHARAC_UUID		0x2803
 -
- struct hog_device {
- 	char			*path;
- 	struct btd_device	*device;
-@@ -72,6 +68,14 @@ struct hog_device {
- 	struct gatt_primary	*hog_primary;
- 	GSList			*reports;
- 	int			uhid_fd;
-+	gboolean		prepend_id;
-+};
+-/* GATT Characteristic Types */
+-#define GATT_CHARAC_DEVICE_NAME			0x2A00
+-#define GATT_CHARAC_APPEARANCE			0x2A01
+-#define GATT_CHARAC_PERIPHERAL_PRIV_FLAG	0x2A02
+-#define GATT_CHARAC_RECONNECTION_ADDRESS	0x2A03
+-#define GATT_CHARAC_PERIPHERAL_PREF_CONN	0x2A04
+-#define GATT_CHARAC_SERVICE_CHANGED		0x2A05
+-
+-/* GATT Characteristic Descriptors */
+-#define GATT_CHARAC_EXT_PROPER_UUID	0x2900
+-#define GATT_CHARAC_USER_DESC_UUID	0x2901
+-#define GATT_CLIENT_CHARAC_CFG_UUID	0x2902
+-#define GATT_SERVER_CHARAC_CFG_UUID	0x2903
+-#define GATT_CHARAC_FMT_UUID		0x2904
+-#define GATT_CHARAC_AGREG_FMT_UUID	0x2905
+-#define GATT_CHARAC_VALID_RANGE_UUID	0x2906
+-#define GATT_REPORT_REFERENCE		0x2908
+-
+ /* Attribute Protocol Opcodes */
+ #define ATT_OP_ERROR			0x01
+ #define ATT_OP_MTU_REQ			0x02
+@@ -107,10 +83,6 @@
+ #define ATT_CHAR_PROPER_AUTH			0x40
+ #define ATT_CHAR_PROPER_EXT_PROPER		0x80
+ 
+-/* Client Characteristic Configuration bit field */
+-#define GATT_CLIENT_CHARAC_CFG_NOTIF_BIT	0x0001
+-#define GATT_CLIENT_CHARAC_CFG_IND_BIT		0x0002
+-
+ #define ATT_MAX_MTU				256
+ #define ATT_DEFAULT_L2CAP_MTU			48
+ #define ATT_DEFAULT_LE_MTU			23
+diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
+index d8f7b37..a9de98c 100644
+--- a/attrib/gatt-service.c
++++ b/attrib/gatt-service.c
+@@ -31,9 +31,10 @@
+ #include <bluetooth/sdp.h>
+ #include <adapter.h>
+ 
++#include "gattrib.h"
+ #include "att.h"
++#include "gatt.h"
+ #include "att-database.h"
+-#include "gattrib.h"
+ #include "attrib-server.h"
+ #include "gatt-service.h"
+ #include "log.h"
+diff --git a/attrib/gatt.h b/attrib/gatt.h
+index 1732270..53be000 100644
+--- a/attrib/gatt.h
++++ b/attrib/gatt.h
+@@ -21,8 +21,37 @@
+  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  *
+  */
 +
-+struct report {
-+	uint8_t			id;
-+	uint8_t			type;
-+	struct gatt_char	*decl;
-+	struct hog_device	*hogdev;
- };
+ #include <bluetooth/sdp.h>
  
- static GSList *devices = NULL;
-@@ -82,12 +86,23 @@ static void report_free(struct report *report)
- 	g_free(report);
- }
- 
-+static gint report_handle_cmp(gconstpointer a, gconstpointer b)
-+{
-+	const struct report *report = a;
-+	uint16_t handle = GPOINTER_TO_UINT(b);
++/* GATT Profile Attribute types */
++#define GATT_PRIM_SVC_UUID		0x2800
++#define GATT_SND_SVC_UUID		0x2801
++#define GATT_INCLUDE_UUID		0x2802
++#define GATT_CHARAC_UUID		0x2803
 +
-+	return report->decl->value_handle - handle;
-+}
++/* GATT Characteristic Types */
++#define GATT_CHARAC_DEVICE_NAME			0x2A00
++#define GATT_CHARAC_APPEARANCE			0x2A01
++#define GATT_CHARAC_PERIPHERAL_PRIV_FLAG	0x2A02
++#define GATT_CHARAC_RECONNECTION_ADDRESS	0x2A03
++#define GATT_CHARAC_PERIPHERAL_PREF_CONN	0x2A04
++#define GATT_CHARAC_SERVICE_CHANGED		0x2A05
 +
- static void report_value_cb(const uint8_t *pdu, uint16_t len, gpointer user_data)
- {
- 	struct hog_device *hogdev = user_data;
- 	struct uhid_event ev;
- 	uint16_t handle;
- 	uint16_t report_size = len - 3;
-+	GSList *l;
-+	struct report *report;
-+	uint8_t *buf;
- 
- 	if (len < 3) {
- 		error("Malformed ATT notification");
-@@ -100,10 +115,26 @@ static void report_value_cb(const uint8_t *pdu, uint16_t len, gpointer user_data
- 				"0x%02x", handle, pdu[2], pdu[3], pdu[4],
- 				pdu[5], pdu[6], pdu[7], pdu[8], pdu[9]);
- 
-+	l = g_slist_find_custom(hogdev->reports, GUINT_TO_POINTER(handle),
-+							report_handle_cmp);
-+	if (!l) {
-+		error("Invalid report");
-+		return;
-+	}
-+	report = l->data;
++/* GATT Characteristic Descriptors */
++#define GATT_CHARAC_EXT_PROPER_UUID	0x2900
++#define GATT_CHARAC_USER_DESC_UUID	0x2901
++#define GATT_CLIENT_CHARAC_CFG_UUID	0x2902
++#define GATT_SERVER_CHARAC_CFG_UUID	0x2903
++#define GATT_CHARAC_FMT_UUID		0x2904
++#define GATT_CHARAC_AGREG_FMT_UUID	0x2905
++#define GATT_CHARAC_VALID_RANGE_UUID	0x2906
++#define GATT_REPORT_REFERENCE		0x2908
 +
- 	memset(&ev, 0, sizeof(ev));
- 	ev.type = UHID_INPUT;
- 	ev.u.input.size = MIN(report_size, UHID_DATA_MAX);
--	memcpy(ev.u.input.data, &pdu[3], MIN(report_size, UHID_DATA_MAX));
++/* Client Characteristic Configuration bit field */
++#define GATT_CLIENT_CHARAC_CFG_NOTIF_BIT	0x0001
++#define GATT_CLIENT_CHARAC_CFG_IND_BIT		0x0002
 +
-+	buf = ev.u.input.data;
-+	if (hogdev->prepend_id) {
-+		*buf = report->id;
-+		buf++;
-+		ev.u.input.size++;
-+	}
-+
-+	memcpy(buf, &pdu[3], MIN(report_size, UHID_DATA_MAX));
+ typedef void (*gatt_cb_t) (GSList *l, guint8 status, gpointer user_data);
  
- 	if (write(hogdev->uhid_fd, &ev, sizeof(ev)) < 0)
- 		error("UHID write failed: %s", strerror(errno));
-@@ -133,6 +164,8 @@ static void write_ccc(uint16_t handle, gpointer user_data)
- static void report_reference_cb(guint8 status, const guint8 *pdu,
- 					guint16 plen, gpointer user_data)
- {
-+	struct report *report = user_data;
-+
- 	if (status != 0) {
- 		error("Read Report Reference descriptor failed: %s",
- 							att_ecode2str(status));
-@@ -144,13 +177,16 @@ static void report_reference_cb(guint8 status, const guint8 *pdu,
- 		return;
- 	}
+ struct gatt_primary {
+diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
+index 482bc2d..cd2c481 100644
+--- a/plugins/gatt-example.c
++++ b/plugins/gatt-example.c
+@@ -37,6 +37,7 @@
+ #include "gattrib.h"
+ #include "gatt-service.h"
+ #include "att.h"
++#include "gatt.h"
+ #include "att-database.h"
+ #include "attrib-server.h"
  
-+	report->id = pdu[1];
-+	report->type = pdu[2];
- 	DBG("Report ID: 0x%02x Report type: 0x%02x", pdu[1], pdu[2]);
- }
+diff --git a/proximity/immalert.c b/proximity/immalert.c
+index 4aa973f..1540b61 100644
+--- a/proximity/immalert.c
++++ b/proximity/immalert.c
+@@ -32,9 +32,10 @@
+ #include <gdbus.h>
  
- static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
- 					guint16 len, gpointer user_data)
- {
--	struct hog_device *hogdev = user_data;
-+	struct report *report = user_data;
-+	struct hog_device *hogdev = report->hogdev;
- 	struct att_data_list *list;
- 	uint8_t format;
- 	int i;
-@@ -177,10 +213,10 @@ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
- 		uuid16 = att_get_u16(&value[2]);
+ #include "log.h"
++#include "gattrib.h"
+ #include "att.h"
++#include "gatt.h"
+ #include "att-database.h"
+-#include "gattrib.h"
+ #include "gatt-service.h"
+ #include "attrib-server.h"
+ #include "device.h"
+diff --git a/proximity/linkloss.c b/proximity/linkloss.c
+index 239eba9..14403cb 100644
+--- a/proximity/linkloss.c
++++ b/proximity/linkloss.c
+@@ -32,9 +32,10 @@
+ #include <gdbus.h>
  
- 		if (uuid16 == GATT_CLIENT_CHARAC_CFG_UUID)
--			write_ccc(handle, user_data);
-+			write_ccc(handle, hogdev);
- 		else if (uuid16 == GATT_REPORT_REFERENCE)
- 			gatt_read_char(hogdev->attrib, handle, 0,
--					report_reference_cb, hogdev);
-+					report_reference_cb, report);
- 	}
+ #include "log.h"
+-#include "att.h"
+ #include "att-database.h"
+ #include "gattrib.h"
++#include "att.h"
++#include "gatt.h"
+ #include "gatt-service.h"
+ #include "attrib-server.h"
+ #include "device.h"
+diff --git a/proximity/reporter.c b/proximity/reporter.c
+index cb30da5..6d63f25 100644
+--- a/proximity/reporter.c
++++ b/proximity/reporter.c
+@@ -40,9 +40,10 @@
+ #include "error.h"
+ #include "device.h"
+ #include "hcid.h"
++#include "gattrib.h"
+ #include "att.h"
++#include "gatt.h"
+ #include "att-database.h"
+-#include "gattrib.h"
+ #include "attrib-server.h"
+ #include "reporter.h"
+ #include "linkloss.h"
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 21b1501..9a211d9 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -45,9 +45,10 @@
+ #include "adapter.h"
+ #include "device.h"
+ #include "manager.h"
++#include "gattrib.h"
+ #include "att.h"
++#include "gatt.h"
+ #include "att-database.h"
+-#include "gattrib.h"
+ #include "storage.h"
  
- done:
-@@ -221,11 +257,20 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 	}
+ #include "attrib-server.h"
+diff --git a/time/server.c b/time/server.c
+index 58d0bcc..13a7bbe 100644
+--- a/time/server.c
++++ b/time/server.c
+@@ -32,9 +32,10 @@
+ #include <bluetooth/uuid.h>
+ #include <adapter.h>
  
- 	DBG("Report MAP:");
--	for (i = 0; i < vlen; i += 2) {
--		if (i + 1 == vlen)
--			DBG("\t %02x", value[i]);
--		else
--			DBG("\t %02x %02x", value[i], value[i + 1]);
-+	for (i = 0; i < vlen; i++) {
-+		switch (value[i]) {
-+			case 0x85:
-+			case 0x86:
-+			case 0x87:
-+				hogdev->prepend_id = TRUE;
-+		}
-+
-+		if (i % 2 == 0) {
-+			if (i + 1 == vlen)
-+				DBG("\t %02x", value[i]);
-+			else
-+				DBG("\t %02x %02x", value[i], value[i + 1]);
-+		}
- 	}
- 
- 	vendor_src = btd_device_get_vendor_src(hogdev->device);
-@@ -281,10 +326,11 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
- 
- 		if (bt_uuid_cmp(&uuid, &report_uuid) == 0) {
- 			report = g_new0(struct report, 1);
-+			report->hogdev = hogdev;
- 			report->decl = g_memdup(chr, sizeof(*chr));
- 			hogdev->reports = g_slist_append(hogdev->reports,
- 								report);
--			discover_descriptor(hogdev->attrib, chr, next, hogdev);
-+			discover_descriptor(hogdev->attrib, chr, next, report);
- 		} else if (bt_uuid_cmp(&uuid, &report_map_uuid) == 0)
- 			gatt_read_char(hogdev->attrib, chr->value_handle, 0,
- 						report_map_read_cb, hogdev);
++#include "gattrib.h"
+ #include "att.h"
++#include "gatt.h"
+ #include "att-database.h"
+-#include "gattrib.h"
+ #include "attrib-server.h"
+ #include "gatt-service.h"
+ #include "log.h"
 -- 
 1.7.7.6
 
