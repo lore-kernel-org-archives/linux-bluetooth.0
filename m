@@ -1,63 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1334714841.3725.37.camel@jlt3.sipsolutions.net>
+Message-ID: <1334714611.3725.34.camel@jlt3.sipsolutions.net>
 Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
 From: Johannes Berg <johannes@sipsolutions.net>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-	linux-wireless@vger.kernel.org
-Date: Tue, 17 Apr 2012 19:07:21 -0700
-In-Reply-To: <20120411070514.GB17779@aemeltch-MOBL1>
-References: 
-	<1334059909-20513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Date: Tue, 17 Apr 2012 19:03:31 -0700
+In-Reply-To: <20120411071119.GC17779@aemeltch-MOBL1>
+References: <1334059909-20513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 	 <1334059909-20513-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 	 <4F846257.1060807@sipsolutions.net> <1334092668.16897.54.camel@aeonflux>
-	 <4F84A422.3030900@sipsolutions.net> <1334093378.16897.62.camel@aeonflux>
-	 <20120411070514.GB17779@aemeltch-MOBL1>
+	 <4F84A422.3030900@sipsolutions.net> <4F84A52A.7050905@sipsolutions.net>
+	 <20120411071119.GC17779@aemeltch-MOBL1>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrei,
 
-> > > >> I don't get this patch at all. Why am I reviewing some very very basic
-> > > >> skeleton code when we should be discussing userspace APIs (we have
-> > > >> already discussed them with a few people years ago), how the AMP is
-> > > >> going to be managed, how the security handshake is going to work, etc.
-> 
-> Do we have some outcome from that discussion?
+Sorry for the delay. I wrote answers to a lot of email on Friday morning
+but they all disappeared into the void -- not really sure what happened.
 
-This API-defining patch is probably the best we have:
-http://johannes.sipsolutions.net/patches/kernel/all/2010-10-13-15%
-3a24/035-bt3-amp.patch
+> I am new to the wireless code but can new virtual interface separate those
+> interfaces? They can have different MAC addresses and you can run
+> wpa_supplicant for each virtual interface separately.
 
-> > The whole AMP control goes via A2MP and L2CAP and both are fully
-> > implemented inside the kernel. In theory we do not even need to expose
-> > HCI AMP interfaces to userspace.
-> 
-> Johannes, you can think of SoftAMP as analog of SoftMAC (vs FullMAC).
-> SoftMAC is also possible to implement in user space but only
-> authentication is done this way.
-
-Yeah, and we also implement roaming and crypto stuff in userspace, for
-softmac. Heck, we implement crypto in userspace even for fullmac, so
-really ...
-
-> Consider use case when user sends data over Bluetooth High Speed. Data
-> go from obex user space to kernel L2CAP. Then you just need to add
-> MAC header and send to wireless device. But you are proposing to copy data
-> to user space for processing; then user space needs to copy data again to 
-> kernel and then to wireless device.
-
-I never said data should be copied. If you thought I did, you
-misunderstood me.
-
-> I think that user does not need to know that it uses High Speed, it just
-> notice that speed is better :). Do you require any special API for
-> latest and greatest wireless standard? Why user shall care about it?
-
-Well, actually, yes, most new wireless standards do require new API for
-the supplicant to be able to use them. The *user* never needs to know
-about it of course -- consider the supplicant part of the wireless
-stack.
+It's never in your best interest to run one supplicant per virtual
+interface, you want to run one per piece of hardware so it can
+coordinate between virtual interfaces.
 
 johannes
+
