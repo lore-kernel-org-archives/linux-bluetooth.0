@@ -1,52 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 18 Apr 2012 12:12:09 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Daniel Wagner <wagi@monom.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Daniel Wagner <daniel.wagner@bmw-carit.de>
+Subject: Re: [PATCH] Makefile: Always add all test scripts to EXTRA_DIST
+Message-ID: <20120418091209.GA27050@x220.ger.corp.intel.com>
+References: <1334739217-17509-1-git-send-email-wagi@monom.org>
 MIME-Version: 1.0
-In-Reply-To: <1334726339-21809-1-git-send-email-hemant.gupta@stericsson.com>
-References: <1334726339-21809-1-git-send-email-hemant.gupta@stericsson.com>
-Date: Wed, 18 Apr 2012 14:46:08 +0530
-Message-ID: <CACj007kQ+BhttkCr9SM3OdiGOb15E5=Csi07U4gsYR+6E3wTog@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Don't distribute keys in case of Encryption Failure
-From: Hemant Gupta <hemantgupta.ste@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Hemant Gupta <hemant.gupta@stericsson.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1334739217-17509-1-git-send-email-wagi@monom.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Please ignore this patch, will send new patch shortly.
+Hi Daniel,
 
-On Wed, Apr 18, 2012 at 10:48 AM, Hemant Gupta
-<hemant.gupta@stericsson.com> wrote:
-> SMP Keys should only be distributeed when encryption is successful.
->
-> Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
+On Wed, Apr 18, 2012, Daniel Wagner wrote:
+> With commit e407e9ac6d8bfde31f95ed5d7e7bcecf0cfe48ed
+> test-attrib, test-proximity and test-thermometer are only packaged
+> when "./configure --enable-gatt && make dist" is called.
+> 
+> The dist target should be independant on the configure flags.
 > ---
->  net/bluetooth/l2cap_core.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 20dbebb..42d3e97 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -4812,7 +4812,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
->
->        BT_DBG("conn %p", conn);
->
-> -       if (hcon->type == LE_LINK) {
-> +       if (hcon->type == LE_LINK && !status && encrypt) {
->                smp_distribute_keys(conn, 0);
->                cancel_delayed_work(&conn->security_timer);
->        }
-> --
-> 1.7.0.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  Makefile.tools |    5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 
+Applied. Thanks.
 
-
--- 
-Best Regards
-Hemant Gupta
-ST-Ericsson India
+Johan
