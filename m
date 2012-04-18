@@ -2,80 +2,184 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [RFC v2 15/16] HoG: Register only one notification callback
-Date: Wed, 18 Apr 2012 19:08:23 -0300
-Message-Id: <1334786904-26282-16-git-send-email-jprvita@openbossa.org>
+Cc: claudio.takahasi@openbossa.org,
+	=?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+Subject: [RFC v2 16/16] HoG: Prepend report id to the HID report
+Date: Wed, 18 Apr 2012 19:08:24 -0300
+Message-Id: <1334786904-26282-17-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
 References: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-
-Fix registering the notification callback per report. Only one instance
-of GAttrib callback for all report notifications should be registered.
+If the report descriptor has a report id tag it have to be prepended
+to the report data to construct the report itself.
 ---
- input/hog_device.c |   17 +++++++++++------
- 1 files changed, 11 insertions(+), 6 deletions(-)
+ input/hog_device.c |   74 ++++++++++++++++++++++++++++++++++++++++++----------
+ 1 files changed, 60 insertions(+), 14 deletions(-)
 
 diff --git a/input/hog_device.c b/input/hog_device.c
-index a522699..cfe8f03 100644
+index cfe8f03..b7eea96 100644
 --- a/input/hog_device.c
 +++ b/input/hog_device.c
-@@ -68,6 +68,7 @@ struct hog_device {
+@@ -59,10 +59,6 @@
+ #define MIN(x, y) ((x) < (y) ? (x) : (y))
+ #endif
+ 
+-struct report {
+-	struct gatt_char *decl;
+-};
+-
+ struct hog_device {
+ 	char			*path;
  	struct btd_device	*device;
- 	GAttrib			*attrib;
- 	guint			attioid;
-+	guint			report_cb_id;
+@@ -72,6 +68,14 @@ struct hog_device {
  	struct gatt_primary	*hog_primary;
  	GSList			*reports;
  	int			uhid_fd;
-@@ -111,8 +112,6 @@ static void report_value_cb(const uint8_t *pdu, uint16_t len, gpointer user_data
- static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
- 					guint16 plen, gpointer user_data)
- {
--	struct hog_device *hogdev = user_data;
--
- 	if (status != 0) {
- 		error("Write report characteristic descriptor failed: %s",
- 							att_ecode2str(status));
-@@ -120,9 +119,6 @@ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
- 	}
++	gboolean		prepend_id;
++};
++
++struct report {
++	uint8_t			id;
++	uint8_t			type;
++	struct gatt_char	*decl;
++	struct hog_device	*hogdev;
+ };
  
- 	DBG("Report characteristic descriptor written: notification enabled");
--
--	g_attrib_register(hogdev->attrib, ATT_OP_HANDLE_NOTIFY, report_value_cb,
--								hogdev, NULL);
+ static GSList *devices = NULL;
+@@ -82,12 +86,23 @@ static void report_free(struct report *report)
+ 	g_free(report);
  }
  
- static void write_ccc(uint16_t handle, gpointer user_data)
-@@ -309,8 +305,14 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
- 		return;
++static gint report_handle_cmp(gconstpointer a, gconstpointer b)
++{
++	const struct report *report = a;
++	uint16_t handle = GPOINTER_TO_UINT(b);
++
++	return report->decl->value_handle - handle;
++}
++
+ static void report_value_cb(const uint8_t *pdu, uint16_t len, gpointer user_data)
+ {
+ 	struct hog_device *hogdev = user_data;
+ 	struct uhid_event ev;
+ 	uint16_t handle;
+ 	uint16_t report_size = len - 3;
++	GSList *l;
++	struct report *report;
++	uint8_t *buf;
  
- 	hogdev->uhid_fd = open(UHID_DEVICE_FILE, O_RDWR | O_CLOEXEC);
--	if (hogdev->uhid_fd < 0)
-+	if (hogdev->uhid_fd < 0) {
- 		error("Failed to open UHID device: %s", strerror(errno));
+ 	if (len < 3) {
+ 		error("Malformed ATT notification");
+@@ -100,10 +115,26 @@ static void report_value_cb(const uint8_t *pdu, uint16_t len, gpointer user_data
+ 				"0x%02x", handle, pdu[2], pdu[3], pdu[4],
+ 				pdu[5], pdu[6], pdu[7], pdu[8], pdu[9]);
+ 
++	l = g_slist_find_custom(hogdev->reports, GUINT_TO_POINTER(handle),
++							report_handle_cmp);
++	if (!l) {
++		error("Invalid report");
 +		return;
 +	}
++	report = l->data;
 +
-+	hogdev->report_cb_id = g_attrib_register(hogdev->attrib,
-+					ATT_OP_HANDLE_NOTIFY, report_value_cb,
-+					hogdev, NULL);
+ 	memset(&ev, 0, sizeof(ev));
+ 	ev.type = UHID_INPUT;
+ 	ev.u.input.size = MIN(report_size, UHID_DATA_MAX);
+-	memcpy(ev.u.input.data, &pdu[3], MIN(report_size, UHID_DATA_MAX));
++
++	buf = ev.u.input.data;
++	if (hogdev->prepend_id) {
++		*buf = report->id;
++		buf++;
++		ev.u.input.size++;
++	}
++
++	memcpy(buf, &pdu[3], MIN(report_size, UHID_DATA_MAX));
+ 
+ 	if (write(hogdev->uhid_fd, &ev, sizeof(ev)) < 0)
+ 		error("UHID write failed: %s", strerror(errno));
+@@ -133,6 +164,8 @@ static void write_ccc(uint16_t handle, gpointer user_data)
+ static void report_reference_cb(guint8 status, const guint8 *pdu,
+ 					guint16 plen, gpointer user_data)
+ {
++	struct report *report = user_data;
++
+ 	if (status != 0) {
+ 		error("Read Report Reference descriptor failed: %s",
+ 							att_ecode2str(status));
+@@ -144,13 +177,16 @@ static void report_reference_cb(guint8 status, const guint8 *pdu,
+ 		return;
+ 	}
+ 
++	report->id = pdu[1];
++	report->type = pdu[2];
+ 	DBG("Report ID: 0x%02x Report type: 0x%02x", pdu[1], pdu[2]);
  }
  
- static void attio_disconnected_cb(gpointer user_data)
-@@ -326,6 +328,9 @@ static void attio_disconnected_cb(gpointer user_data)
- 	close(hogdev->uhid_fd);
- 	hogdev->uhid_fd = -1;
+ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+ 					guint16 len, gpointer user_data)
+ {
+-	struct hog_device *hogdev = user_data;
++	struct report *report = user_data;
++	struct hog_device *hogdev = report->hogdev;
+ 	struct att_data_list *list;
+ 	uint8_t format;
+ 	int i;
+@@ -177,10 +213,10 @@ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+ 		uuid16 = att_get_u16(&value[2]);
  
-+	g_attrib_unregister(hogdev->attrib, hogdev->report_cb_id);
-+	hogdev->report_cb_id = 0;
+ 		if (uuid16 == GATT_CLIENT_CHARAC_CFG_UUID)
+-			write_ccc(handle, user_data);
++			write_ccc(handle, hogdev);
+ 		else if (uuid16 == GATT_REPORT_REFERENCE)
+ 			gatt_read_char(hogdev->attrib, handle, 0,
+-					report_reference_cb, hogdev);
++					report_reference_cb, report);
+ 	}
+ 
+ done:
+@@ -221,11 +257,20 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	}
+ 
+ 	DBG("Report MAP:");
+-	for (i = 0; i < vlen; i += 2) {
+-		if (i + 1 == vlen)
+-			DBG("\t %02x", value[i]);
+-		else
+-			DBG("\t %02x %02x", value[i], value[i + 1]);
++	for (i = 0; i < vlen; i++) {
++		switch (value[i]) {
++			case 0x85:
++			case 0x86:
++			case 0x87:
++				hogdev->prepend_id = TRUE;
++		}
 +
- 	g_attrib_unref(hogdev->attrib);
- 	hogdev->attrib = NULL;
- }
++		if (i % 2 == 0) {
++			if (i + 1 == vlen)
++				DBG("\t %02x", value[i]);
++			else
++				DBG("\t %02x %02x", value[i], value[i + 1]);
++		}
+ 	}
+ 
+ 	vendor_src = btd_device_get_vendor_src(hogdev->device);
+@@ -281,10 +326,11 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ 
+ 		if (bt_uuid_cmp(&uuid, &report_uuid) == 0) {
+ 			report = g_new0(struct report, 1);
++			report->hogdev = hogdev;
+ 			report->decl = g_memdup(chr, sizeof(*chr));
+ 			hogdev->reports = g_slist_append(hogdev->reports,
+ 								report);
+-			discover_descriptor(hogdev->attrib, chr, next, hogdev);
++			discover_descriptor(hogdev->attrib, chr, next, report);
+ 		} else if (bt_uuid_cmp(&uuid, &report_map_uuid) == 0)
+ 			gatt_read_char(hogdev->attrib, chr->value_handle, 0,
+ 						report_map_read_cb, hogdev);
 -- 
 1.7.7.6
 
