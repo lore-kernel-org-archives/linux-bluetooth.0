@@ -1,123 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 Apr 2012 14:20:19 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-	linux-wireless@vger.kernel.org
-Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
-Message-ID: <20120418112017.GC19228@aemeltch-MOBL1>
-References: <1334059909-20513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1334059909-20513-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <4F846257.1060807@sipsolutions.net>
- <1334092668.16897.54.camel@aeonflux>
- <4F84A422.3030900@sipsolutions.net>
- <1334093378.16897.62.camel@aeonflux>
- <20120411070514.GB17779@aemeltch-MOBL1>
- <1334714841.3725.37.camel@jlt3.sipsolutions.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334714841.3725.37.camel@jlt3.sipsolutions.net>
+Message-ID: <1334746924.8818.115.camel@novo.hadess.net>
+Subject: Re: [PATCH BlueZ v2 1/3] manager: add a
+ btd_manager_get_default_adapter_address_str() call
+From: Bastien Nocera <hadess@hadess.net>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Date: Wed, 18 Apr 2012 12:02:04 +0100
+In-Reply-To: <1334741891-11869-2-git-send-email-ospite@studenti.unina.it>
+References: <1334741891-11869-1-git-send-email-ospite@studenti.unina.it>
+	 <1334741891-11869-2-git-send-email-ospite@studenti.unina.it>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johannes,
-
-On Tue, Apr 17, 2012 at 07:07:21PM -0700, Johannes Berg wrote:
-> > > > >> I don't get this patch at all. Why am I reviewing some very very basic
-> > > > >> skeleton code when we should be discussing userspace APIs (we have
-> > > > >> already discussed them with a few people years ago), how the AMP is
-> > > > >> going to be managed, how the security handshake is going to work, etc.
-> > 
-> > Do we have some outcome from that discussion?
+On Wed, 2012-04-18 at 11:38 +0200, Antonio Ospite wrote:
+> Add a new btd_* call to get the default adapter address as a string,
+> meant to be used by _external_ plugins, this is to avoid to make public
+> these symbols:
 > 
-> This API-defining patch is probably the best we have:
-> http://johannes.sipsolutions.net/patches/kernel/all/2010-10-13-15%
-> 3a24/035-bt3-amp.patch
+>   manager_get_default_adapter
+>   adapter_get_address
+>   bt_malloc
 
-Thanks for the link. After looking to the patches I think that there are
-some similarities with respect to interface type. As I understood the
-basic idea is the same: create virtual interface. But in your case the
-implementation is really difficult.
+It's already public.
 
-Why do we need netlink commands like NL80211_CMD_HCI_AMP_ADD and
-NL80211_CMD_HCI_AMP_DELETE if what we need is to create/delete virtual
-interface which can be done with standard tools with a several lines
-patch to iw:
+>   ba2str
 
-<------8<---------------------------------------------------------------------
-|  diff --git a/interface.c b/interface.c
-|  index 6c90f9d..49227ce 100644
-|  --- a/interface.c
-|  +++ b/interface.c
-|  @@ -136,6 +136,9 @@ static int get_if_type(int *argc, char ***argv, enum
-|  nl80211_iftype *type,
-|          } else if (strcmp(tpstr, "__p2pgo") == 0) {
-|                  *type = NL80211_IFTYPE_P2P_GO;
-|                  return 0;
-|  +       } else if (strcmp(tpstr, "vamp") == 0) {
-|  +               *type = NL80211_IFTYPE_VIRTUAL_AMP;
-|  +               return 0;
-|          }
-|
-|          fprintf(stderr, "invalid interface type %s\n", tpstr);
-|  diff --git a/nl80211.h b/nl80211.h
-|  index e474f6e..ad4a252 100644
-|  --- a/nl80211.h
-|  +++ b/nl80211.h
-|  @@ -1546,6 +1546,7 @@ enum nl80211_iftype {
-|          NL80211_IFTYPE_MESH_POINT,
-|          NL80211_IFTYPE_P2P_CLIENT,
-|          NL80211_IFTYPE_P2P_GO,
-|  +       NL80211_IFTYPE_VIRTUAL_AMP,
-|
-|          /* keep last */
-|          NUM_NL80211_IFTYPES,
-|  diff --git a/util.c b/util.c
-|  index 103ded9..bf2fefe 100644
-|  --- a/util.c
-|  +++ b/util.c
-|  @@ -132,6 +132,7 @@ static const char *ifmodes[NL80211_IFTYPE_MAX + 1] = {
-|          "mesh point",
-|          "P2P-client",
-|          "P2P-GO",
-|  +       "Virtual AMP",
-|   };
-|
-|   static char modebuf[100];
-|
-<------8<---------------------------------------------------------------------
+Already public.
 
-Anyway I think that this is not an issue since those commands can be
-easily added.
-
-> > > The whole AMP control goes via A2MP and L2CAP and both are fully
-> > > implemented inside the kernel. In theory we do not even need to expose
-> > > HCI AMP interfaces to userspace.
-> > 
-> > Johannes, you can think of SoftAMP as analog of SoftMAC (vs FullMAC).
-> > SoftMAC is also possible to implement in user space but only
-> > authentication is done this way.
+> ---
 > 
-> Yeah, and we also implement roaming and crypto stuff in userspace, for
-> softmac. Heck, we implement crypto in userspace even for fullmac, so
-> really ...
-
-Does crypto stuff mean getting symmetric key?
-
-I see that all commands by default are sent via netlink to wpa_supplicant.
-I think that we can send those command which cannot be handled by us
-directly but I believe most command might be handled directly.
-
-> > Consider use case when user sends data over Bluetooth High Speed. Data
-> > go from obex user space to kernel L2CAP. Then you just need to add
-> > MAC header and send to wireless device. But you are proposing to copy data
-> > to user space for processing; then user space needs to copy data again to 
-> > kernel and then to wireless device.
+> Alternatively a version without the _str prefix can be used which
+> returns a bdaddr_t, but I have to make ba2str a global symbol so I can
+> make the conversion to string in the plugin itself.
 > 
-> I never said data should be copied. If you thought I did, you
-> misunderstood me.
+> Let me know how do you like that.
 
-I see now that data are sent directly through ieee80211_tx_skb and
-received through ieee80211_deliver_skb. BTW: Have you tested those patches?
+ba2str() is in libbluetooth.
+$ grep ba2str /usr/include/bluetooth/bluetooth.h 
+int ba2str(const bdaddr_t *ba, char *str);
 
-Best regards 
-Andrei Emeltchenko 
+So it's already public.
+
+> 
+>  src/manager.c |   21 +++++++++++++++++++++
+>  src/manager.h |    1 +
+>  2 files changed, 22 insertions(+)
+> 
+> diff --git a/src/manager.c b/src/manager.c
+> index 6244516..fbd5ef8 100644
+> --- a/src/manager.c
+> +++ b/src/manager.c
+> @@ -270,6 +270,27 @@ struct btd_adapter *manager_get_default_adapter(void)
+>  	return manager_find_adapter_by_id(default_adapter_id);
+>  }
+>  
+> +char *btd_manager_get_default_adapter_address_str(void)
+> +{
+> +	struct btd_adapter *adapter;
+> +	bdaddr_t adapter_bdaddr;
+> +	char *str;
+> +
+> +	adapter = manager_get_default_adapter();
+> +	if (adapter == NULL) {
+> +		return NULL;
+> +	}
+> +
+> +	adapter_get_address(adapter, &adapter_bdaddr);
+> +
+> +	str = bt_malloc(18);
+
+You could have used batostr() instead, so you wouldn't have needed to do
+the allocation yourself. Use bt_free() to free.
+
+> +	if (str == NULL)
+> +		return NULL;
+> +
+> +	ba2str(&adapter_bdaddr, str);
+> +	return str;
+> +}
+> +
+>  static void manager_remove_adapter(struct btd_adapter *adapter)
+>  {
+>  	uint16_t dev_id = adapter_get_dev_id(adapter);
+> diff --git a/src/manager.h b/src/manager.h
+> index 264cd25..7df882e 100644
+> --- a/src/manager.h
+> +++ b/src/manager.h
+> @@ -36,6 +36,7 @@ const char *manager_get_base_path(void);
+>  struct btd_adapter *manager_find_adapter(const bdaddr_t *sba);
+>  struct btd_adapter *manager_find_adapter_by_id(int id);
+>  struct btd_adapter *manager_get_default_adapter(void);
+> +char *btd_manager_get_default_adapter_address_str(void);
+>  void manager_foreach_adapter(adapter_cb func, gpointer user_data);
+>  GSList *manager_get_adapters(void);
+>  struct btd_adapter *btd_manager_register_adapter(int id, gboolean up);
+
+
