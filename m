@@ -4,121 +4,150 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Antonio Ospite <ospite@studenti.unina.it>,
 	Bastien Nocera <hadess@hadess.net>,
 	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: [PATCH BlueZ v2 0/3] Current status of playstation-peripheral plugin
-Date: Wed, 18 Apr 2012 11:38:08 +0200
-Message-Id: <1334741891-11869-1-git-send-email-ospite@studenti.unina.it>
+Subject: [PATCH BlueZ v2 2/3] device: add a btd_device_set_trusted() call
+Date: Wed, 18 Apr 2012 11:38:10 +0200
+Message-Id: <1334741891-11869-3-git-send-email-ospite@studenti.unina.it>
+In-Reply-To: <1334741891-11869-1-git-send-email-ospite@studenti.unina.it>
+References: <1334741891-11869-1-git-send-email-ospite@studenti.unina.it>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a short summary about Playstation peripherals and their pairing
-mechanism, to recap the current status of the playstation-peripheral plugin,
-propose a working solution and discuss possible better ones.
+Add a new btd_* call to set a device as trusted, meant to be used by
+_external_ plugins, this avoid making public these symbols:
 
->From now on in this message I sometime call a Playstation peripheral
-simply a "device".
+  record_from_string
+  store_record
+  sdp_record_free
+  str2ba
+  str2ba
+  store_device_id
+  write_trust
+  dbus_bus_get
+  manager_find_adapter
+  adapter_get_device
+  dbus_connection_unref
+---
 
-Bastien, please check if I am forgetting anything :)
+If BlueZ can pull the required parameters itself from trusted devices this can
+be simplified, if not then the name should be fixed to make clearer what the
+function does.
 
-WHAT we need the plugin to do:
+ src/device.c |   74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/device.h |    9 +++++++
+ 2 files changed, 83 insertions(+)
 
-  - When a device is connected via USB:
-    + Fetch the (default) adapter bdaddr (from BlueZ) and store it into
-      the device
-    + Fetch the device bdaddr (from the device via USB/HID) and make the
-      device _trusted_ by the adapter (is "trusted" the correct term
-      here? Or maybe this is more like a "static association"? Are the
-      term "trusted" and "associated" in bluetooth context defined
-      anywhere?)
-
-  - When the device is connected via BT:
-    + Nothing! It should work automatically.
-
-  - Set LEDs when possible.
-
-WHY we need that:
-
-  Playstation peripherals require/support USB cable pairing.
-
-  It is required in the sense that devices will talk only to adapters
-  they know.
-
-  It is supported in the sense that this mechanism is optional on _some_
-  devices like the PS3 Keypad.
-
-  On the PS3 these cable paired devices can be used via BT without
-  further association steps once they have been connected
-  _at_least_once_ via USB to a certain host (with a certain BT adapter
-  that is), we would like to have the same behavior with BlueZ.
-
-The current HOW:
-
-  We have the parameters (uuid, sdp record) to make the device "trusted"
-  all hardcoded in the plugin and we create the BlueZ files under
-  /var/lib/bluetooth/<adapter_bdaddr> using blues functions every time
-  a device is connected via USB.
-  
-  NOTE: I don't know if we can make BlueZ pull those parameters from the
-  device itself somehow when the device connects via BT _the_first_time_
-
-  It has been suggested that this plugin is kept _external_ for three
-  reasons:
-    - it is not worth making bluetoothd bigger for a plugin used by very
-      few people
-    - avoid linking bluetoothd to libudev, which is needed by the plugin
-    - external plugins offer a finer packaging granularity (if the user
-      need this plugin it just have to install the .so provided by
-      a package prepared by distributors and restart bluetoothd, no need
-      to recompile)
-
-  But _external_ plugins can only use symbols exported as global in
-  src/bluetooth.ver, which currently are:
-
-    btd_*;
-    g_dbus_*;
-    info;
-    error;
-    debug;
-
-  So to avoid exporting more global symbols, for now I introduced two
-  new btd_* calls to do what I though I needed.
-
-  NOTE: the new functions were three in a first iteration but I managed
-  to remove one of them.
-
-The three patches below show the current status.
-
-The first two are prerequisites needed if we want to keep the plugin
-_external_, the third patch is the plugin itself.
-
-If you have any suggestion about how the development should proceed from
-here on I'd like to hear from you.
-
-Thanks,
-   Antonio
-
-Antonio Ospite (3):
-  manager: add a btd_manager_get_default_adapter_address_str() call
-  device: add a btd_device_set_trusted() call
-  Add playstation-peripheral plugin: USB pairing and LEDs settings
-
- Makefile.am                          |    7 +
- acinclude.m4                         |   10 +
- plugins/playstation-peripheral-hid.c |  263 ++++++++++++++++++++++++
- plugins/playstation-peripheral-hid.h |   10 +
- plugins/playstation-peripheral.c     |  376 ++++++++++++++++++++++++++++++++++
- src/device.c                         |   74 +++++++
- src/device.h                         |    9 +
- src/manager.c                        |   21 ++
- src/manager.h                        |    1 +
- 9 files changed, 771 insertions(+)
- create mode 100644 plugins/playstation-peripheral-hid.c
- create mode 100644 plugins/playstation-peripheral-hid.h
- create mode 100644 plugins/playstation-peripheral.c
-
+diff --git a/src/device.c b/src/device.c
+index ea6fec2..6e434c1 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -49,6 +49,7 @@
+ #include "att.h"
+ #include "hcid.h"
+ #include "adapter.h"
++#include "manager.h"
+ #include "gattrib.h"
+ #include "attio.h"
+ #include "device.h"
+@@ -2948,6 +2949,79 @@ GSList *btd_device_get_primaries(struct btd_device *device)
+ 	return device->primaries;
+ }
+ 
++int btd_device_set_trusted(const char *adapter_address,
++			   const char *device_address,
++			   char *name,
++			   uint16_t vendor_id_source,
++			   uint16_t vendor_id,
++			   uint16_t product_id,
++			   uint16_t version_id,
++			   const char *uuid,
++			   const char *sdp_record)
++{
++	struct btd_adapter *adapter;
++	struct btd_device *device;
++	DBusConnection *conn;
++	bdaddr_t src;
++	bdaddr_t dst;
++	sdp_record_t *record;
++	int ret = 0;
++
++	record = record_from_string(sdp_record);
++	if (record == NULL) {
++		ret = -ENODEV;
++		goto out;
++	}
++	ret = store_record(adapter_address, device_address, record);
++	sdp_record_free(record);
++	if (ret < 0)
++		goto out;
++
++	str2ba(adapter_address, &src);
++	str2ba(device_address, &dst);
++
++	/* Set the device id */
++	store_device_id(adapter_address, device_address, vendor_id_source, vendor_id,
++			product_id, version_id);
++	/* Don't write a profile here,
++	 * it will be updated when the device connects */
++
++	write_trust(adapter_address, device_address, "[all]", TRUE);
++
++	conn = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
++	if (conn == NULL) {
++		DBG("Failed to get on the bus");
++		ret = -EPERM;
++		goto out;
++	}
++
++	adapter = manager_find_adapter(&src);
++	if (adapter == NULL) {
++		DBG("Failed to get the adapter");
++		ret = -EPERM;
++		goto out_dbus_unref;
++	}
++
++	/* This is needed: adapter_find_device() wouldn't need a Dbus
++	 * connection but it would not be enough as it only searches for
++	 * already existing devices, while adapter_get_device() will create a
++	 * new device if necessary.
++	 */
++	device = adapter_get_device(conn, adapter, device_address);
++	if (device == NULL) {
++		DBG("Failed to get the device");
++		ret = -ENODEV;
++		goto out_dbus_unref;
++	}
++
++	btd_device_add_uuid(device, uuid);
++
++out_dbus_unref:
++	dbus_connection_unref(conn);
++out:
++	return ret;
++}
++
+ void btd_device_add_uuid(struct btd_device *device, const char *uuid)
+ {
+ 	GSList *uuid_list;
+diff --git a/src/device.h b/src/device.h
+index 690c64d..1011e3e 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -57,6 +57,15 @@ void device_register_services(DBusConnection *conn, struct btd_device *device,
+ 						GSList *prim_list, int psm);
+ GSList *device_services_from_record(struct btd_device *device,
+ 							GSList *profiles);
++int btd_device_set_trusted(const char *adapter_address,
++			   const char *device_address,
++			   char *name,
++			   uint16_t vendor_id_source,
++			   uint16_t vendor_id,
++			   uint16_t product_id,
++			   uint16_t version_id,
++			   const char *uuid,
++			   const char *sdp_record);
+ void btd_device_add_uuid(struct btd_device *device, const char *uuid);
+ struct btd_adapter *device_get_adapter(struct btd_device *device);
+ void device_get_address(struct btd_device *device, bdaddr_t *bdaddr,
 -- 
-Antonio Ospite
-http://ao2.it
+1.7.10
 
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
