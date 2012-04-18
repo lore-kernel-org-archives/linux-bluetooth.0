@@ -1,74 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 Apr 2012 08:39:31 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Johannes Berg <johannes@sipsolutions.net>,
-    Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-    linux-wireless@vger.kernel.org
-Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
-In-Reply-To: <4F8ED913.4040807@sipsolutions.net>
-Message-ID: <alpine.DEB.2.02.1204180818190.25494@mathewm-linux>
-References: <1334059909-20513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1334059909-20513-2-git-send-email-Andrei.Emeltchenko.news@gmail.com> <4F846257.1060807@sipsolutions.net> <1334092668.16897.54.camel@aeonflux> <4F84A422.3030900@sipsolutions.net>
- <4F84A52A.7050905@sipsolutions.net> <20120411071119.GC17779@aemeltch-MOBL1> <1334714611.3725.34.camel@jlt3.sipsolutions.net> <20120418121551.GE19228@aemeltch-MOBL1> <4F8ED1D0.1070401@sipsolutions.net> <20120418145202.GH19228@aemeltch-MOBL1>
- <4F8ED913.4040807@sipsolutions.net>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+From: Ulisses Furquim <ulisses@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org
+Subject: [PATCH v3] Bluetooth: Fix registering hci with duplicate name
+Date: Wed, 18 Apr 2012 12:13:04 -0300
+Message-Id: <1334761984-5400-1-git-send-email-ulisses@profusion.mobi>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+When adding HCI devices hci_register_dev assigns the same name
+hci1 for subsequently added AMP devices.
 
-Andrei and Johannes -
+...
+[ 6958.381886] sysfs: cannot create duplicate filename
+       '/devices/virtual/bluetooth/hci1
+...
 
-On Wed, 18 Apr 2012, Johannes Berg wrote:
+We assume id starts with the number we'll try to add the new device
+and keep iterating until we find the proper place. The only difference
+is we start with 0 for BR/EDR device and 1 for AMP devices (thus AMP
+devices will never receive register as index 0). Then every hdev->id in
+the _ordered_ list <= to the id we want we increment id and move the
+variable head. In the end we'll have id as the first available one and
+head is where you need to add hdev after to keep the list ordered.
 
-> Hi Andrei,
->
->>> No, this is incorrect. If one device wants to connect on one
->>> channel, the other typically has to use the same channel. If one
->>> device wants to scan, the other will be affected. Some hardware may
->>> support switching around between two channels, but might also
->>> support more than 2 virtual interfaces, so again they won't be
->>> independent.
->> 
->> BTW: which devices can switch channels?
->
-> None today, I'm working on it.
->
->>> Therefore, you need something managing all this concurrency. This is
->>> in a small part the driver which will enforce restrictions (it will
->>> reject new impossible things), but mostly the supplicant which can
->>> make policy decisions about which usage should win.
->> 
->> This doesn't sound like a rocket science to me. IMO this might be done in
->> drivers. Those drivers which can switch channels why do they need
->> wpa_supplicant involved making this decision?
->
-> I don't think you understand.
->
-> Say our device can do 3 virtual interfaces, on 2 channels. Then if the user 
-> is connected to some managed network (say office network), one interface & 
-> channel is used up. Now the user has AMP running, another channel might be 
-> used up. Now the user wants to do P2P negotiation. Now the supplicant, which 
-> is doing the negotiation, needs to know that it can negotiate only one of 
-> those two channels, not any other. Or maybe P2P should win, then it might 
-> disconnect the AMP or the managed connection. But all those are policy 
-> decisions, so the driver can't really handle them.
+Reported-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
+---
 
-I concur with Johannes...
+v3 - really add new hdev after head to keep the list ordered.
+v2 - only increment id when we find it's already there in the list.
 
-All of the AMP PALs I've seen are restricted to using the current 
-wireless channel if a wireless interface is active.  The consequence 
-is that if you have two BT3.0+HS devices, and their wireless 
-interfaces are associated with different APs on different channels, 
-then they are unable to use AMP.
+---
+ net/bluetooth/hci_core.c |   16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-Trying to manage two active channels with a single-radio wireless 
-devices is non-trivial -- there may be simultaneous beacons on 
-different channels, for example.  I suppose it could be a different 
-situation when a wireless device has independent radios for 2.4GHz and 
-5GHz bands, but there's still a need to make decisions about which 
-channel(s) to use and how they are to be shared.
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index c4dc263..2b98c33 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1739,24 +1739,28 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
+ /* Register HCI device */
+ int hci_register_dev(struct hci_dev *hdev)
+ {
+-	struct list_head *head = &hci_dev_list, *p;
++	struct list_head *head, *p;
+ 	int i, id, error;
+ 
+ 	if (!hdev->open || !hdev->close)
+ 		return -EINVAL;
+ 
++	write_lock(&hci_dev_list_lock);
++
+ 	/* Do not allow HCI_AMP devices to register at index 0,
+ 	 * so the index can be used as the AMP controller ID.
+ 	 */
+ 	id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
+-
+-	write_lock(&hci_dev_list_lock);
++	head = &hci_dev_list;
+ 
+ 	/* Find first available device id */
+ 	list_for_each(p, &hci_dev_list) {
+-		if (list_entry(p, struct hci_dev, list)->id != id)
++		int nid = list_entry(p, struct hci_dev, list)->id;
++		if (nid > id)
+ 			break;
+-		head = p; id++;
++		if (nid == id)
++			id++;
++		head = p;
+ 	}
+ 
+ 	sprintf(hdev->name, "hci%d", id);
+@@ -1764,7 +1768,7 @@ int hci_register_dev(struct hci_dev *hdev)
+ 
+ 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
+ 
+-	list_add_tail(&hdev->list, head);
++	list_add(&hdev->list, head);
+ 
+ 	mutex_init(&hdev->lock);
+ 
+-- 
+1.7.10
