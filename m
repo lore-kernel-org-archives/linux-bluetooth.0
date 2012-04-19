@@ -1,64 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1334850818.16897.294.camel@aeonflux>
-Subject: Re: [PATCH 3/3] Bluetooth: Don't check source address in SCO bind
- function
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 19 Apr 2012 17:53:38 +0200
-In-Reply-To: <20120419145222.GE4127@joana>
-References: <1334835833-21828-3-git-send-email-marcel@holtmann.org>
-	 <20120419145222.GE4127@joana>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Hemant Gupta <hemant.gupta@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: Hemant Gupta <hemant.gupta@stericsson.com>
+Subject: [PATCH v1] Bluetooth: Update L2CAP Channel State for LE Link during Pairing
+Date: Thu, 19 Apr 2012 21:15:42 +0530
+Message-ID: <1334850342-23063-1-git-send-email-hemant.gupta@stericsson.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+This patch updates the L2CAP Channel state to Connected when LE Link
+is established, so that data transmission can start on CID 4.
+Without this fix if remote side sends data on CID 4 immidiately after
+LE Link was established, data was being discarded in l2cap_att_channel()
+API because channel state was still BT_CONNECT when SMP pairing is in
+progress. This was resulting in disconnection from remote side after 30 seconds
+since ATT request was not answered by user space as data was discarded.
 
-> * Marcel Holtmann <marcel@holtmann.org> [2012-04-19 13:43:53 +0200]:
-> 
-> > Checking the source address in SCO bind function will prevent from
-> > having an incoming and outgoing SCO socket. However that might be
-> > needed in case of multiple SCO connections on a single device.
-> > 
-> > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> > ---
-> >  net/bluetooth/sco.c |   16 ++++++----------
-> >  1 files changed, 6 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> > index 2fb9636..8b2548c 100644
-> > --- a/net/bluetooth/sco.c
-> > +++ b/net/bluetooth/sco.c
-> > @@ -463,7 +463,6 @@ static int sco_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
-> >  {
-> >  	struct sockaddr_sco *sa = (struct sockaddr_sco *) addr;
-> >  	struct sock *sk = sock->sk;
-> > -	bdaddr_t *src = &sa->sco_bdaddr;
-> >  	int err = 0;
-> >  
-> >  	BT_DBG("sk %p %s", sk, batostr(&sa->sco_bdaddr));
-> > @@ -478,17 +477,14 @@ static int sco_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
-> >  		goto done;
-> >  	}
-> >  
-> > -	write_lock(&sco_sk_list.lock);
-> > -
-> > -	if (bacmp(src, BDADDR_ANY) && __sco_get_sock_by_addr(src)) {
-> > -		err = -EADDRINUSE;
-> 
-> this patch adds a compiling warning:
-> 
->   CC [M]  net/bluetooth/sco.o
->   net/bluetooth/sco.c:277:21: warning: ‘__sco_get_sock_by_addr’ defined
->   but not used [-Wunused-function]
+Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
+---
+ net/bluetooth/l2cap_core.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-I am fixing that with the next patch. I just ended up splitting them
-into two to get this logical correct.
-
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 15478b3..ef0cc91 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1189,7 +1189,7 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+ 		l2cap_chan_lock(chan);
+ 
+ 		if (conn->hcon->type == LE_LINK) {
+-			if (smp_conn_security(conn, chan->sec_level))
++			if (!smp_conn_security(conn, chan->sec_level))
+ 				l2cap_chan_ready(chan);
+ 
+ 		} else if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+-- 
+1.7.0.4
 
