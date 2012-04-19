@@ -1,66 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: AceLan Kao <acelan@gmail.com>
-From: AceLan Kao <acelan.kao@canonical.com>
-To: linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH] Bluetooth: Add support for AR3012 [0cf3:e004]
-Date: Thu, 19 Apr 2012 14:53:45 +0800
-Message-Id: <1334818425-13601-1-git-send-email-acelan.kao@canonical.com>
+Date: Thu, 19 Apr 2012 09:36:00 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+	linux-wireless@vger.kernel.org
+Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
+Message-ID: <20120419063558.GA16002@aemeltch-MOBL1>
+References: <4F846257.1060807@sipsolutions.net>
+ <1334092668.16897.54.camel@aeonflux>
+ <4F84A422.3030900@sipsolutions.net>
+ <4F84A52A.7050905@sipsolutions.net>
+ <20120411071119.GC17779@aemeltch-MOBL1>
+ <1334714611.3725.34.camel@jlt3.sipsolutions.net>
+ <20120418121551.GE19228@aemeltch-MOBL1>
+ <4F8ED1D0.1070401@sipsolutions.net>
+ <20120418145202.GH19228@aemeltch-MOBL1>
+ <4F8ED913.4040807@sipsolutions.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4F8ED913.4040807@sipsolutions.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add another vendor specific ID for Atheros AR3012
+Hi Johannes,
 
-output of usb-devices:
-T:  Bus=02 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  4 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cf3 ProdID=e004 Rev=00.02
-S:  Manufacturer=Atheros Communications
-S:  Product=Bluetooth USB Host Controller
-S:  SerialNumber=Alaska Day 2006
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+On Wed, Apr 18, 2012 at 08:09:07AM -0700, Johannes Berg wrote:
+> Hi Andrei,
+> 
+> >>No, this is incorrect. If one device wants to connect on one
+> >>channel, the other typically has to use the same channel. If one
+> >>device wants to scan, the other will be affected. Some hardware may
+> >>support switching around between two channels, but might also
+> >>support more than 2 virtual interfaces, so again they won't be
+> >>independent.
+> >
+> >BTW: which devices can switch channels?
+> 
+> None today, I'm working on it.
 
-BugLink: https://bugs.launchpad.net/bugs/922715
+If this is not possible how people setup wireless hotspot using virtual
+interfaces and run wpa_supplicant and hostapd on each separately.
+Like here:
 
-Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
----
- drivers/bluetooth/ath3k.c |    2 ++
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 3 insertions(+)
+http://linuxalfi.wordpress.com/2011/11/08/connectify-for-linux-with-single-wireless-interface/
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 639a161..57fd867 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -76,6 +76,7 @@ static struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3375) },
- 	{ USB_DEVICE(0x04CA, 0x3005) },
- 	{ USB_DEVICE(0x13d3, 0x3362) },
-+	{ USB_DEVICE(0x0CF3, 0xE004) },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -96,6 +97,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
- 
- 	{ }	/* Terminating entry */
- };
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index fd2045e..de17121 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -138,6 +138,7 @@ static struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
--- 
-1.7.9.5
+Best regards 
+Andrei Emeltchenko 
