@@ -1,145 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH v3] gdbus: save copy of undecorated signature
-Date: Fri, 20 Apr 2012 01:28:54 -0300
-Message-Id: <1334896134-2339-1-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1334851345-11058-2-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1334851345-11058-2-git-send-email-lucas.demarchi@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 19 Apr 2012 15:52:57 -0500
+From: Jonathan Nieder <jrnieder@gmail.com>
+To: Greg KH <gregkh@linux-foundation.org>
+Cc: stable@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	"Cho, Yu-Chen" <acho@novell.com>,
+	Henry-Nicolas Tourneur <henry.nicolas@tourneur.be>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Oliver Neukum <oliver@neukum.name>, "Lee, Chun-Yi" <jlee@suse.com>
+Subject: Re: [3.0.y, 3.2.y, 3.3.y] Re: [PATCH] Add Atheros maryann PIDVID
+ support
+Message-ID: <20120419205256.GB2429@burratino>
+References: <00c20c839b7ac6f027ab935f8cf0992c93c5f2fd.1329809368.git.acho@suse.com>
+ <20120412215819.GA15416@burratino>
+ <20120419194607.GA31130@kroah.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120419194607.GA31130@kroah.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
+Greg KH wrote:
+> On Thu, Apr 12, 2012 at 04:58:20PM -0500, Jonathan Nieder wrote:
 
-v3: fix undecorate signature generating wrong data
+>>  9498ba7a1d38 Bluetooth: Adding USB device 13d3:3375 as an Atheros AR3012
+>>  07c0ea874d43 Bluetooth: Add Atheros maryann PIDVID support
+[...]
+> Now applied, thanks.
 
- gdbus/object.c |   82 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 82 insertions(+)
-
-diff --git a/gdbus/object.c b/gdbus/object.c
-index e378074..6133d8c 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -25,6 +25,7 @@
- #include <config.h>
- #endif
- 
-+#include <assert.h>
- #include <stdio.h>
- #include <string.h>
- 
-@@ -46,7 +47,10 @@ struct generic_data {
- struct interface_data {
- 	char *name;
- 	const GDBusMethodTable *methods;
-+	char **method_signatures;
-+	char **reply_signatures;
- 	const GDBusSignalTable *signals;
-+	char **signal_signatures;
- 	const GDBusPropertyTable *properties;
- 	void *user_data;
- 	GDBusDestroyFunction destroy;
-@@ -501,6 +505,79 @@ static GDBusMethodTable introspect_methods[] = {
- 	{ }
- };
- 
-+static char *undecorate_signature(const char *src)
-+{
-+	GString *dst = g_string_new(NULL);
-+	size_t len;
-+
-+	for (len = 0; *src; src++) {
-+		switch (*src) {
-+		case '[':
-+			assert(len > 0);
-+			g_string_append_len(dst, src - len, len);
-+
-+			while (*src && *src != ']')
-+				src++;
-+
-+			/* end of string without matching ']' */
-+			assert(*src == ']');
-+			len = 0;
-+			break;
-+		case ']':
-+			/* ']' without '[' */
-+			assert(0);
-+			break;
-+		default:
-+			len++;
-+		}
-+	}
-+
-+	g_string_append_len(dst, src, len);
-+
-+	return g_string_free(dst, FALSE);
-+}
-+
-+static void undecorate_signals(struct interface_data *iface)
-+{
-+	const GDBusSignalTable *s;
-+	size_t n, i;
-+	char **sigs;
-+
-+	for (s = iface->signals, n = 0; s && s->name; s++)
-+		n++;
-+
-+	sigs = g_new(char *, n + 1);
-+	sigs[n] = NULL;
-+
-+	for (s = iface->signals, i = 0; s && s->name; s++, i++)
-+		sigs[i] = undecorate_signature(s->signature);
-+
-+	iface->signal_signatures = sigs;
-+}
-+
-+static void undecorate_methods(struct interface_data *iface)
-+{
-+	const GDBusMethodTable *m;
-+	size_t n, i;
-+	char **sigs, **reply_sigs;
-+
-+	for (m = iface->methods, n = 0; m && m->name; m++)
-+		n++;
-+
-+	sigs = g_new(char *, n + 1);
-+	reply_sigs = g_new(char *, n + 1);
-+	sigs[n] = NULL;
-+	reply_sigs[n] = NULL;
-+
-+	for (m = iface->methods, i = 0; m && m->name; m++, i++) {
-+		sigs[i] = undecorate_signature(m->signature);
-+		reply_sigs[i] = undecorate_signature(m->reply);
-+	}
-+
-+	iface->method_signatures = sigs;
-+	iface->reply_signatures = reply_sigs;
-+}
-+
- static void add_interface(struct generic_data *data, const char *name,
- 				const GDBusMethodTable *methods,
- 				const GDBusSignalTable *signals,
-@@ -513,7 +590,9 @@ static void add_interface(struct generic_data *data, const char *name,
- 	iface = g_new0(struct interface_data, 1);
- 	iface->name = g_strdup(name);
- 	iface->methods = methods;
-+	undecorate_methods(iface);
- 	iface->signals = signals;
-+	undecorate_signals(iface);
- 	iface->properties = properties;
- 	iface->user_data = user_data;
- 	iface->destroy = destroy;
-@@ -568,6 +647,9 @@ static gboolean remove_interface(struct generic_data *data, const char *name)
- 		iface->destroy(iface->user_data);
- 
- 	g_free(iface->name);
-+	g_strfreev(iface->method_signatures);
-+	g_strfreev(iface->reply_signatures);
-+	g_strfreev(iface->signal_signatures);
- 	g_free(iface);
- 
- 	return TRUE;
--- 
-1.7.10
-
+Looks good.  Thanks, Greg.
