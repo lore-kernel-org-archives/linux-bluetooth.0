@@ -1,43 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Split error handling for L2CAP listen sockets
-Date: Thu, 19 Apr 2012 13:43:51 +0200
-Message-Id: <1334835833-21828-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CANT-zCWLxhwuPYV8MOVHGGPLeksJjBGf-n2VTVTF1p_Fg8CTEQ@mail.gmail.com>
+References: <1334756834-19770-1-git-send-email-luiz.dentz@gmail.com>
+	<CANT-zCWLxhwuPYV8MOVHGGPLeksJjBGf-n2VTVTF1p_Fg8CTEQ@mail.gmail.com>
+Date: Thu, 19 Apr 2012 12:50:53 +0300
+Message-ID: <CABBYNZKdoNGNDV2gFSWtdFhdL3nAiMfXWQiGrt538XMpL2dqRA@mail.gmail.com>
+Subject: Re: [PATCH obexd v3] client: Remove buffer based transfer
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Split the checks for sk->sk_state and sk->sk_type for L2CAP listen
-sockets. This makes the code more readable.
+Hi Mikel,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/l2cap_sock.c |    8 ++++++--
- 1 files changed, 6 insertions(+), 2 deletions(-)
+On Thu, Apr 19, 2012 at 12:24 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 1463b5d..4d03b45 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -148,12 +148,16 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
- 
- 	lock_sock(sk);
- 
--	if ((sock->type != SOCK_SEQPACKET && sock->type != SOCK_STREAM)
--			|| sk->sk_state != BT_BOUND) {
-+	if (sk->sk_state != BT_BOUND) {
- 		err = -EBADFD;
- 		goto done;
- 	}
- 
-+	if (sk->sk_type != SOCK_SEQPACKET && sk->sk_type != SOCK_STREAM) {
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
- 	switch (chan->mode) {
- 	case L2CAP_MODE_BASIC:
- 		break;
+>> +       err = transfer_open(transfer, O_RDONLY, 0);
+>> +       if (err < 0)
+>> +               return err;
+>> +
+>> +       if (contents != NULL) {
+>> +               ssize_t w = write(transfer->fd, contents, size);
+>
+> This is not going to work because of O_RDONLY. And you can't use
+> WRONLY either because this function is used for put operations.
+
+While this is not logically correct, it works because it normally will
+call g_file_open_tmp which does open the file with connect mode, so
+the mode is ignored.
+
+> In general, I think is not a good idea to get obc_transfer_set_file()
+> involved in this patch. This function should disappear once we open
+> the files during creation.
+>
+> Using obc_transfer_set_contents() would be better, as you initially
+> suggested. But first it would be convenient to have the "v1 08/11:
+> client: open transfer file during creation" patch, which as was posted
+> in the mailing list depends on several other patches in that series,
+> but if you agree with this idea I can send the relevant ones again,
+> specially to avoid patch 07/11 which now wouldn't make sense.
+
+Im working on integrate your patches on top of this one.
+
 -- 
-1.7.7.6
-
+Luiz Augusto von Dentz
