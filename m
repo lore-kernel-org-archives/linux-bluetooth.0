@@ -1,32 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Apr 2012 11:03:08 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Hemant Gupta <hemant.gupta@stericsson.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Update L2CAP Channel State for LE Link during
- Pairing
-Message-ID: <20120419140308.GA4127@joana>
-References: <1334724874-3086-1-git-send-email-hemant.gupta@stericsson.com>
+Date: Thu, 19 Apr 2012 16:39:09 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
+Message-ID: <20120419133907.GD16002@aemeltch-MOBL1>
+References: <4F84A422.3030900@sipsolutions.net>
+ <4F84A52A.7050905@sipsolutions.net>
+ <20120411071119.GC17779@aemeltch-MOBL1>
+ <1334714611.3725.34.camel@jlt3.sipsolutions.net>
+ <20120418121551.GE19228@aemeltch-MOBL1>
+ <4F8ED1D0.1070401@sipsolutions.net>
+ <20120418145202.GH19228@aemeltch-MOBL1>
+ <4F8ED913.4040807@sipsolutions.net>
+ <20120419063558.GA16002@aemeltch-MOBL1>
+ <4F9012E9.1040409@sipsolutions.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334724874-3086-1-git-send-email-hemant.gupta@stericsson.com>
+In-Reply-To: <4F9012E9.1040409@sipsolutions.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hemant,
+Hi Johannes,
 
-* Hemant Gupta <hemant.gupta@stericsson.com> [2012-04-18 10:24:34 +0530]:
+On Thu, Apr 19, 2012 at 06:28:09AM -0700, Johannes Berg wrote:
+> On 4/18/2012 11:36 PM, Andrei Emeltchenko wrote:
+> >>>>No, this is incorrect. If one device wants to connect on one
+> >>>>channel, the other typically has to use the same channel. If one
+> >>>>device wants to scan, the other will be affected. Some hardware may
+> >>>>support switching around between two channels, but might also
+> >>>>support more than 2 virtual interfaces, so again they won't be
+> >>>>independent.
+> >>>
+> >>>BTW: which devices can switch channels?
+> >>
+> >>None today, I'm working on it.
+> >
+> >If this is not possible how people setup wireless hotspot using virtual
+> >interfaces and run wpa_supplicant and hostapd on each separately.
+> >Like here:
+> >
+> >http://linuxalfi.wordpress.com/2011/11/08/connectify-for-linux-with-single-wireless-interface/
+> 
+> Of course it's possible. Are you deliberately misunderstanding me?
+> 
+> You cannot use more than one channel today. We are changing that. To
+> do good channel management, rather than hard-coding it in your
+> config, you want to run a single wpa_s controlling all interfaces.
 
-> This patch updates the L2CAP Channel state to Connected when LE Link
-> is established, so that data transmission can start on CID 4.
-> Without this fix if remote side sends data on CID 4 immidiately after
-> LE Link was established, data was being discarded in l2cap_att_channel()
-> API because channel state was still BT_CONNECT when SMP pairing is in
-> progress. This was resulting in disconnection from remote side after 30 seconds
-> since ATT request was not answered by user space as data was discarded.
+Can wpa_supplicant be an AP? I though that functionality is split to
+hostap and wpa_supplicant.
 
-I'm not too familiar with all LE specifications, but doesn't this initial
-data need to be secured? If the channel is not secure (the pairing has
-not finished yet) and we may be transmitting in a not secure enough place.
-
-	Gustavo
+Best regards 
+Andrei Emeltchenko 
