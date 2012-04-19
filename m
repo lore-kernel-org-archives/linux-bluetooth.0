@@ -2,141 +2,37 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH v2 3/6] gdbus: save copy of undecorated signature
-Date: Thu, 19 Apr 2012 13:02:22 -0300
-Message-Id: <1334851345-11058-2-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1334851345-11058-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1334851345-11058-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH v2 2/6] gdbus: do not call memset for terminating NUL
+Date: Thu, 19 Apr 2012 13:02:21 -0300
+Message-Id: <1334851345-11058-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- gdbus/object.c |   82 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 82 insertions(+)
+ gdbus/object.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/gdbus/object.c b/gdbus/object.c
-index e378074..0ac2b30 100644
+index 7a94156..e378074 100644
 --- a/gdbus/object.c
 +++ b/gdbus/object.c
-@@ -25,6 +25,7 @@
- #include <config.h>
- #endif
+@@ -72,7 +72,6 @@ static void print_arguments(GString *gstr, const char *sig,
  
-+#include <assert.h>
- #include <stdio.h>
- #include <string.h>
+ 		complete = FALSE;
+ 		struct_level = dict_level = 0;
+-		memset(type, 0, sizeof(type));
  
-@@ -46,7 +47,10 @@ struct generic_data {
- struct interface_data {
- 	char *name;
- 	const GDBusMethodTable *methods;
-+	char **method_signatures;
-+	char **reply_signatures;
- 	const GDBusSignalTable *signals;
-+	char **signal_signatures;
- 	const GDBusPropertyTable *properties;
- 	void *user_data;
- 	GDBusDestroyFunction destroy;
-@@ -501,6 +505,79 @@ static GDBusMethodTable introspect_methods[] = {
- 	{ }
- };
+ 		/* Gather enough data to have a single complete type */
+ 		for (len = 0; len < (sizeof(type) - 1) && sig[i]; len++, i++) {
+@@ -107,6 +106,8 @@ static void print_arguments(GString *gstr, const char *sig,
+ 				break;
+ 		}
  
-+static char *undecorate_signature(const char *src)
-+{
-+	GString *dst = g_string_new(NULL);
-+	size_t len;
++		type[len + 1] = '\0';
 +
-+	for (len = 0; *src; src++) {
-+		switch (*src) {
-+		case '[':
-+			assert(len > 0);
-+			g_string_append_len(dst, src, len);
-+
-+			while (*src && *src != ']')
-+				src++;
-+
-+			/* end of string without matching ']' */
-+			assert(*src == ']');
-+			len = 0;
-+			break;
-+		case ']':
-+			/* ']' without '[' */
-+			assert(0);
-+			break;
-+		default:
-+			len++;
-+		}
-+	}
-+
-+	g_string_append_len(dst, src, len);
-+
-+	return g_string_free(dst, FALSE);
-+}
-+
-+static void undecorate_signals(struct interface_data *iface)
-+{
-+	const GDBusSignalTable *s;
-+	size_t n, i;
-+	char **sigs;
-+
-+	for (s = iface->signals, n = 0; s && s->name; s++)
-+		n++;
-+
-+	sigs = g_new(char *, n + 1);
-+	sigs[n] = NULL;
-+
-+	for (s = iface->signals, i = 0; s && s->name; s++, i++)
-+		sigs[i] = undecorate_signature(s->signature);
-+
-+	iface->signal_signatures = sigs;
-+}
-+
-+static void undecorate_methods(struct interface_data *iface)
-+{
-+	const GDBusMethodTable *m;
-+	size_t n, i;
-+	char **sigs, **reply_sigs;
-+
-+	for (m = iface->methods, n = 0; m && m->name; m++)
-+		n++;
-+
-+	sigs = g_new(char *, n + 1);
-+	reply_sigs = g_new(char *, n + 1);
-+	sigs[n] = NULL;
-+	reply_sigs[n] = NULL;
-+
-+	for (m = iface->methods, i = 0; m && m->name; m++, i++) {
-+		sigs[i] = undecorate_signature(m->signature);
-+		reply_sigs[i] = undecorate_signature(m->reply);
-+	}
-+
-+	iface->method_signatures = sigs;
-+	iface->reply_signatures = reply_sigs;
-+}
-+
- static void add_interface(struct generic_data *data, const char *name,
- 				const GDBusMethodTable *methods,
- 				const GDBusSignalTable *signals,
-@@ -513,7 +590,9 @@ static void add_interface(struct generic_data *data, const char *name,
- 	iface = g_new0(struct interface_data, 1);
- 	iface->name = g_strdup(name);
- 	iface->methods = methods;
-+	undecorate_methods(iface);
- 	iface->signals = signals;
-+	undecorate_signals(iface);
- 	iface->properties = properties;
- 	iface->user_data = user_data;
- 	iface->destroy = destroy;
-@@ -568,6 +647,9 @@ static gboolean remove_interface(struct generic_data *data, const char *name)
- 		iface->destroy(iface->user_data);
- 
- 	g_free(iface->name);
-+	g_strfreev(iface->method_signatures);
-+	g_strfreev(iface->reply_signatures);
-+	g_strfreev(iface->signal_signatures);
- 	g_free(iface);
- 
- 	return TRUE;
+ 		if (!complete) {
+ 			error("Unexpected signature: %s", sig);
+ 			return;
 -- 
 1.7.10
 
