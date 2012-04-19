@@ -1,29 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Apr 2012 11:39:04 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Bluetooth: Split error handling for L2CAP listen
- sockets
-Message-ID: <20120419143904.GC4127@joana>
-References: <1334835833-21828-1-git-send-email-marcel@holtmann.org>
+Message-ID: <4F901F69.4000304@sipsolutions.net>
+Date: Thu, 19 Apr 2012 07:21:29 -0700
+From: Johannes Berg <johannes@sipsolutions.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334835833-21828-1-git-send-email-marcel@holtmann.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
+References: <4F84A422.3030900@sipsolutions.net> <4F84A52A.7050905@sipsolutions.net> <20120411071119.GC17779@aemeltch-MOBL1> <1334714611.3725.34.camel@jlt3.sipsolutions.net> <20120418121551.GE19228@aemeltch-MOBL1> <4F8ED1D0.1070401@sipsolutions.net> <20120418145202.GH19228@aemeltch-MOBL1> <4F8ED913.4040807@sipsolutions.net> <20120419063558.GA16002@aemeltch-MOBL1> <4F9012E9.1040409@sipsolutions.net> <20120419133907.GD16002@aemeltch-MOBL1>
+In-Reply-To: <20120419133907.GD16002@aemeltch-MOBL1>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+On 4/19/2012 6:39 AM, Andrei Emeltchenko wrote:
+>> You cannot use more than one channel today. We are changing that. To
+>> do good channel management, rather than hard-coding it in your
+>> config, you want to run a single wpa_s controlling all interfaces.
+>
+> Can wpa_supplicant be an AP? I though that functionality is split to
+> hostap and wpa_supplicant.
 
-* Marcel Holtmann <marcel@holtmann.org> [2012-04-19 13:43:51 +0200]:
+Yes, it can.
 
-> Split the checks for sk->sk_state and sk->sk_type for L2CAP listen
-> sockets. This makes the code more readable.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/l2cap_sock.c |    8 ++++++--
->  1 files changed, 6 insertions(+), 2 deletions(-)
-
-Applied to bluetooth-next, thanks.
-
-	Gustavo
+johannes
