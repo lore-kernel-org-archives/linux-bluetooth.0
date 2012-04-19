@@ -1,24 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Apr 2012 10:56:43 +0300
+Date: Thu, 19 Apr 2012 10:51:40 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org
-Subject: Re: [RFC v2 00/16] HoG plugin
-Message-ID: <20120419075643.GB20738@x220.ger.corp.intel.com>
-References: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
+To: Scott James Remnant <scott@netsplit.com>
+Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org,
+	marcel@holtmann.org, hemant.gupta@stericsson.com
+Subject: Re: [PATCH] hciops: map KeyboardDisplay IO Capability to DisplayYesNo
+Message-ID: <20120419075140.GA20738@x220.ger.corp.intel.com>
+References: <1334786461-5643-1-git-send-email-scott@netsplit.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1334786461-5643-1-git-send-email-scott@netsplit.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi João Paulo,
+Hi Scott,
 
-On Wed, Apr 18, 2012, João Paulo Rechi Vita wrote:
-> LE pairing is broken on bluetooth-next atm.
+On Wed, Apr 18, 2012, Scott James Remnant wrote:
+> Since hciops is not used for LE devices, if an agent announces the
+> KeyboardDisplay IO Capability when creating a bonding, map it to
+> DisplayYesNo.
+> 
+> This matches the existing change in hciops_set_io_capability which
+> is only used in the RegisterAgent path.
+> ---
+>  plugins/hciops.c |    5 ++++-
+>  1 files changed, 4 insertions(+), 1 deletions(-)
 
-What exactly is broken? Have you already sent patches to fix this? We've
-been planning to enable LE support by default in 3.5 (based on current
-bluetooth-next) so this needs to be fixed asap.
+Applied. Thanks.
 
 Johan
