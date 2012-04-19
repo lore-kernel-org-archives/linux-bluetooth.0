@@ -2,207 +2,141 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH v2 4/6] gdbus: use argument name in method introspection
-Date: Thu, 19 Apr 2012 13:02:23 -0300
-Message-Id: <1334851345-11058-3-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH v2 3/6] gdbus: save copy of undecorated signature
+Date: Thu, 19 Apr 2012 13:02:22 -0300
+Message-Id: <1334851345-11058-2-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1334851345-11058-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1334851345-11058-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- gdbus/gdbus.h  |    6 ++---
- gdbus/object.c |   70 ++++++++++++++++++++++++++++++++++++++++----------------
- 2 files changed, 53 insertions(+), 23 deletions(-)
+ gdbus/object.c |   82 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 82 insertions(+)
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index a0583e6..a5843e0 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -84,8 +84,8 @@ typedef enum {
- 
- typedef struct {
- 	const char *name;
--	const char *signature;
--	const char *reply;
-+	const char *decorated_signature;
-+	const char *decorated_reply;
- 	GDBusMethodFunction function;
- 	GDBusMethodFlags flags;
- 	unsigned int privilege;
-@@ -93,7 +93,7 @@ typedef struct {
- 
- typedef struct {
- 	const char *name;
--	const char *signature;
-+	const char *decorated_signature;
- 	GDBusSignalFlags flags;
- } GDBusSignalTable;
- 
 diff --git a/gdbus/object.c b/gdbus/object.c
-index 0ac2b30..a2df77e 100644
+index e378074..0ac2b30 100644
 --- a/gdbus/object.c
 +++ b/gdbus/object.c
-@@ -69,6 +69,7 @@ static void print_arguments(GString *gstr, const char *sig,
- 	int i;
+@@ -25,6 +25,7 @@
+ #include <config.h>
+ #endif
  
- 	for (i = 0; sig[i]; i++) {
-+		const char *name;
- 		char type[32];
- 		int struct_level, dict_level;
- 		unsigned int len;
-@@ -112,19 +113,44 @@ static void print_arguments(GString *gstr, const char *sig,
++#include <assert.h>
+ #include <stdio.h>
+ #include <string.h>
  
- 		type[len + 1] = '\0';
+@@ -46,7 +47,10 @@ struct generic_data {
+ struct interface_data {
+ 	char *name;
+ 	const GDBusMethodTable *methods;
++	char **method_signatures;
++	char **reply_signatures;
+ 	const GDBusSignalTable *signals;
++	char **signal_signatures;
+ 	const GDBusPropertyTable *properties;
+ 	void *user_data;
+ 	GDBusDestroyFunction destroy;
+@@ -501,6 +505,79 @@ static GDBusMethodTable introspect_methods[] = {
+ 	{ }
+ };
  
-+		 /* Check if there is an arg name and parse it */
-+		if (sig[i + 1] == '[') {
-+			const char *name_end = name = &sig[i + 2];
++static char *undecorate_signature(const char *src)
++{
++	GString *dst = g_string_new(NULL);
++	size_t len;
 +
-+			for (;;) {
-+				if (*name_end == '\0') {
-+					error("Unexpected signature: %s", sig);
-+					return;
-+				}
++	for (len = 0; *src; src++) {
++		switch (*src) {
++		case '[':
++			assert(len > 0);
++			g_string_append_len(dst, src, len);
 +
-+				if (*name_end == ']')
-+					break;
++			while (*src && *src != ']')
++				src++;
 +
-+				name_end++;
-+			}
++			/* end of string without matching ']' */
++			assert(*src == ']');
++			len = 0;
++			break;
++		case ']':
++			/* ']' without '[' */
++			assert(0);
++			break;
++		default:
++			len++;
++		}
++	}
 +
-+			len = name_end - name;
-+			i += len + 2;
-+		} else
-+			name = NULL;
++	g_string_append_len(dst, src, len);
 +
- 		if (!complete) {
- 			error("Unexpected signature: %s", sig);
- 			return;
- 		}
- 
-+		g_string_append_printf(gstr, "\t\t\t<arg type=\"%s\"", type);
++	return g_string_free(dst, FALSE);
++}
 +
- 		if (direction)
--			g_string_append_printf(gstr,
--					"\t\t\t<arg type=\"%s\" direction=\"%s\"/>\n",
--					type, direction);
--		else
--			g_string_append_printf(gstr,
--					"\t\t\t<arg type=\"%s\"/>\n",
--					type);
-+			g_string_append_printf(gstr, " direction=\"%s\"",
-+								direction);
++static void undecorate_signals(struct interface_data *iface)
++{
++	const GDBusSignalTable *s;
++	size_t n, i;
++	char **sigs;
 +
-+		if (name)
-+			g_string_append_printf(gstr, " name=\"%.*s\"",
-+								len, name);
++	for (s = iface->signals, n = 0; s && s->name; s++)
++		n++;
 +
++	sigs = g_new(char *, n + 1);
++	sigs[n] = NULL;
 +
-+		g_string_append_printf(gstr,"/>\n");
- 	}
- }
++	for (s = iface->signals, i = 0; s && s->name; s++, i++)
++		sigs[i] = undecorate_signature(s->signature);
++
++	iface->signal_signatures = sigs;
++}
++
++static void undecorate_methods(struct interface_data *iface)
++{
++	const GDBusMethodTable *m;
++	size_t n, i;
++	char **sigs, **reply_sigs;
++
++	for (m = iface->methods, n = 0; m && m->name; m++)
++		n++;
++
++	sigs = g_new(char *, n + 1);
++	reply_sigs = g_new(char *, n + 1);
++	sigs[n] = NULL;
++	reply_sigs[n] = NULL;
++
++	for (m = iface->methods, i = 0; m && m->name; m++, i++) {
++		sigs[i] = undecorate_signature(m->signature);
++		reply_sigs[i] = undecorate_signature(m->reply);
++	}
++
++	iface->method_signatures = sigs;
++	iface->reply_signatures = reply_sigs;
++}
++
+ static void add_interface(struct generic_data *data, const char *name,
+ 				const GDBusMethodTable *methods,
+ 				const GDBusSignalTable *signals,
+@@ -513,7 +590,9 @@ static void add_interface(struct generic_data *data, const char *name,
+ 	iface = g_new0(struct interface_data, 1);
+ 	iface->name = g_strdup(name);
+ 	iface->methods = methods;
++	undecorate_methods(iface);
+ 	iface->signals = signals;
++	undecorate_signals(iface);
+ 	iface->properties = properties;
+ 	iface->user_data = user_data;
+ 	iface->destroy = destroy;
+@@ -568,6 +647,9 @@ static gboolean remove_interface(struct generic_data *data, const char *name)
+ 		iface->destroy(iface->user_data);
  
-@@ -134,26 +160,27 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
- 	const GDBusSignalTable *signal;
+ 	g_free(iface->name);
++	g_strfreev(iface->method_signatures);
++	g_strfreev(iface->reply_signatures);
++	g_strfreev(iface->signal_signatures);
+ 	g_free(iface);
  
- 	for (method = iface->methods; method && method->name; method++) {
--		if (!strlen(method->signature) && !strlen(method->reply))
-+		if (!strlen(method->decorated_signature) &&
-+					!strlen(method->decorated_reply))
- 			g_string_append_printf(gstr, "\t\t<method name=\"%s\"/>\n",
- 								method->name);
- 		else {
- 			g_string_append_printf(gstr, "\t\t<method name=\"%s\">\n",
- 								method->name);
--			print_arguments(gstr, method->signature, "in");
--			print_arguments(gstr, method->reply, "out");
-+			print_arguments(gstr, method->decorated_signature, "in");
-+			print_arguments(gstr, method->decorated_reply, "out");
- 			g_string_append_printf(gstr, "\t\t</method>\n");
- 		}
- 	}
- 
- 	for (signal = iface->signals; signal && signal->name; signal++) {
--		if (!strlen(signal->signature))
-+		if (!strlen(signal->decorated_signature))
- 			g_string_append_printf(gstr, "\t\t<signal name=\"%s\"/>\n",
- 								signal->name);
- 		else {
- 			g_string_append_printf(gstr, "\t\t<signal name=\"%s\">\n",
- 								signal->name);
--			print_arguments(gstr, signal->signature, NULL);
-+			print_arguments(gstr, signal->decorated_signature, NULL);
- 			g_string_append_printf(gstr, "\t\t</signal>\n");
- 		}
- 	}
-@@ -432,6 +459,7 @@ static DBusHandlerResult generic_message(DBusConnection *connection,
- 	struct interface_data *iface;
- 	const GDBusMethodTable *method;
- 	const char *interface;
-+	size_t i;
- 
- 	interface = dbus_message_get_interface(message);
- 
-@@ -439,14 +467,14 @@ static DBusHandlerResult generic_message(DBusConnection *connection,
- 	if (iface == NULL)
- 		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- 
--	for (method = iface->methods; method &&
--			method->name && method->function; method++) {
-+	for (method = iface->methods, i = 0; method &&
-+			method->name && method->function; method++, i++) {
- 		if (dbus_message_is_method_call(message, iface->name,
- 							method->name) == FALSE)
- 			continue;
- 
- 		if (dbus_message_has_signature(message,
--						method->signature) == FALSE)
-+					iface->method_signatures[i]) == FALSE)
- 			continue;
- 
- 		if (check_privilege(connection, message, method,
-@@ -550,7 +578,7 @@ static void undecorate_signals(struct interface_data *iface)
- 	sigs[n] = NULL;
- 
- 	for (s = iface->signals, i = 0; s && s->name; s++, i++)
--		sigs[i] = undecorate_signature(s->signature);
-+		sigs[i] = undecorate_signature(s->decorated_signature);
- 
- 	iface->signal_signatures = sigs;
- }
-@@ -570,8 +598,8 @@ static void undecorate_methods(struct interface_data *iface)
- 	reply_sigs[n] = NULL;
- 
- 	for (m = iface->methods, i = 0; m && m->name; m++, i++) {
--		sigs[i] = undecorate_signature(m->signature);
--		reply_sigs[i] = undecorate_signature(m->reply);
-+		sigs[i] = undecorate_signature(m->decorated_signature);
-+		reply_sigs[i] = undecorate_signature(m->decorated_reply);
- 	}
- 
- 	iface->method_signatures = sigs;
-@@ -685,6 +713,7 @@ static gboolean check_signal(DBusConnection *conn, const char *path,
- 	struct generic_data *data = NULL;
- 	struct interface_data *iface;
- 	const GDBusSignalTable *signal;
-+	size_t i;
- 
- 	*args = NULL;
- 	if (!dbus_connection_get_object_path_data(conn, path,
-@@ -701,9 +730,10 @@ static gboolean check_signal(DBusConnection *conn, const char *path,
- 		return FALSE;
- 	}
- 
--	for (signal = iface->signals; signal && signal->name; signal++) {
-+	for (signal = iface->signals, i = 0; signal && signal->name;
-+							signal++, i++) {
- 		if (!strcmp(signal->name, name)) {
--			*args = signal->signature;
-+			*args = iface->signal_signatures[i];
- 			break;
- 		}
- 	}
+ 	return TRUE;
 -- 
 1.7.10
 
