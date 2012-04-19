@@ -1,48 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CANT-zCWLxhwuPYV8MOVHGGPLeksJjBGf-n2VTVTF1p_Fg8CTEQ@mail.gmail.com>
-References: <1334756834-19770-1-git-send-email-luiz.dentz@gmail.com>
-	<CANT-zCWLxhwuPYV8MOVHGGPLeksJjBGf-n2VTVTF1p_Fg8CTEQ@mail.gmail.com>
-Date: Thu, 19 Apr 2012 12:50:53 +0300
-Message-ID: <CABBYNZKdoNGNDV2gFSWtdFhdL3nAiMfXWQiGrt538XMpL2dqRA@mail.gmail.com>
-Subject: Re: [PATCH obexd v3] client: Remove buffer based transfer
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
+References: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
+From: Arik Nemtsov <arik@wizery.com>
+Date: Thu, 19 Apr 2012 12:45:23 +0300
+Message-ID: <CA+XVXfeJ254A2kVTvpR6GyjAJvdNC_G6=840C9aDQjbeT+y_cQ@mail.gmail.com>
+Subject: Re: [RFC v2 00/16] HoG plugin
+To: =?ISO-8859-1?Q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org,
+	Ido Yariv <ido@wizery.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+2012/4/19 João Paulo Rechi Vita <jprvita@openbossa.org>:
+> Second draft of the HoG plugin. Code went through a lot of refactoring and is
+> much cleaner now. The report descriptor parsing (to get the report id) is
+> hackish and it doesn't support more than one device simultaneosly, probably
+> due to a kernel bug (reports come from the wrong socket). We're investigating
+> it.
 
-On Thu, Apr 19, 2012 at 12:24 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+Maybe this patch can help you? We encountered a similar issue with
+multiple devices.
 
->> +       err = transfer_open(transfer, O_RDONLY, 0);
->> +       if (err < 0)
->> +               return err;
->> +
->> +       if (contents != NULL) {
->> +               ssize_t w = write(transfer->fd, contents, size);
->
-> This is not going to work because of O_RDONLY. And you can't use
-> WRONLY either because this function is used for put operations.
+http://permalink.gmane.org/gmane.linux.bluez.kernel/22397
 
-While this is not logically correct, it works because it normally will
-call g_file_open_tmp which does open the file with connect mode, so
-the mode is ignored.
-
-> In general, I think is not a good idea to get obc_transfer_set_file()
-> involved in this patch. This function should disappear once we open
-> the files during creation.
->
-> Using obc_transfer_set_contents() would be better, as you initially
-> suggested. But first it would be convenient to have the "v1 08/11:
-> client: open transfer file during creation" patch, which as was posted
-> in the mailing list depends on several other patches in that series,
-> but if you agree with this idea I can send the relevant ones again,
-> specially to avoid patch 07/11 which now wouldn't make sense.
-
-Im working on integrate your patches on top of this one.
-
--- 
-Luiz Augusto von Dentz
+Arik
