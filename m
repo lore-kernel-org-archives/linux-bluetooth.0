@@ -1,71 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Apr 2012 15:31:36 +0300
-From: Johan Hedberg <johan.hedberg@intel.com>
-To: "Wang, Arron" <arron.wang@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 2/2] rfkill: Set device powered even adapter is not
- created
-Message-ID: <20120419123136.GA27022@x220.ger.corp.intel.com>
-References: <1326704570-22854-1-git-send-email-arron.wang@intel.com>
- <20120419074533.GA20567@x220.ger.corp.intel.com>
- <3B8E4CEA2CC045459E7856C66B82CE930FD5E48E@SHSMSX102.ccr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <3B8E4CEA2CC045459E7856C66B82CE930FD5E48E@SHSMSX102.ccr.corp.intel.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Restrict to one SCO listening socket
+Date: Thu, 19 Apr 2012 14:19:33 +0200
+Message-Id: <1334837973-9277-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arron,
+The SCO sockets are only identified by its address. So only allow one
+SCO socket in listening state per address or BDADDR_ANY.
 
-On Thu, Apr 19, 2012, Wang, Arron wrote:
-> >> --- a/src/rfkill.c
-> >> +++ b/src/rfkill.c
-> >> @@ -128,11 +128,18 @@ static gboolean rfkill_event(GIOChannel *chan,
-> >>  	if (id < 0)
-> >>  		return TRUE;
-> >>
-> >> +	DBG("RFKILL unblock for hci%d", id);
-> >> +
-> >>  	adapter = manager_find_adapter_by_id(id);
-> >> -	if (!adapter)
-> >> +	if (!adapter) {
-> >> +		/*
-> >> +		 * If device is rfkilled, the initialize operation
-> >> +		 * may failed and adapter is not created, then we
-> >> +		 * need to set the device powered directly.
-> >> +		 */
-> >> +		adapter_ops_set_powered(id, TRUE);
-> >>  		return TRUE;
-> >> -
-> >> -	DBG("RFKILL unblock for hci%d", id);
-> >> +	}
-> >>
-> >>  	btd_adapter_restore_powered(adapter);
-> >
-> >This looks more like a workaround to another issue: if the kernel is
-> >aware of the adapter but user space isn't it means that something has
-> >gone wrong during the initialization process and *that* should be
-> >fixed instead of blindly attempting to power on the adapter id
-> >anyway.
-> 
-> Kernel works well and can detect the adapter, Bluetooth initialize failed
-> due to when we init HCI device, we try to start the device, however the
-> device is hardware/software rfkilled. From the code, we only init the
-> adapter when the device is up, this result in the current code in rfkill.c
-> can't bring up the device because adapter is NULL. Also only the kernel
-> detected the device we can get the rfkill event, the code in rfkill.c also
-> checked the device, then it is safe to power on the device in rfkill.c
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/sco.c |   35 +++++++++++++++++------------------
+ 1 files changed, 17 insertions(+), 18 deletions(-)
 
-Ok, now I understand the issue better. Unfortunately your approach wont
-work with the management interface since the HCI index is invalid until
-the kernel has been able to send the first basic HCI commands. The
-expectation there is also that the first mgmt command to be sent for a
-new index is read_info.
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 8b2548c..de5d055 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -274,29 +274,15 @@ drop:
+ }
+ 
+ /* -------- Socket interface ---------- */
+-static struct sock *__sco_get_sock_by_addr(bdaddr_t *ba)
+-{
+-	struct sock *sk;
+-	struct hlist_node *node;
+-
+-	sk_for_each(sk, node, &sco_sk_list.head)
+-		if (!bacmp(&bt_sk(sk)->src, ba))
+-			goto found;
+-	sk = NULL;
+-found:
+-	return sk;
+-}
+ 
+ /* Find socket listening on source bdaddr.
+  * Returns closest match.
+  */
+-static struct sock *sco_get_sock_listen(bdaddr_t *src)
++static struct sock *__sco_get_sock_by_addr(bdaddr_t *src)
+ {
+ 	struct sock *sk = NULL, *sk1 = NULL;
+ 	struct hlist_node *node;
+ 
+-	read_lock(&sco_sk_list.lock);
+-
+ 	sk_for_each(sk, node, &sco_sk_list.head) {
+ 		if (sk->sk_state != BT_LISTEN)
+ 			continue;
+@@ -310,8 +296,6 @@ static struct sock *sco_get_sock_listen(bdaddr_t *src)
+ 			sk1 = sk;
+ 	}
+ 
+-	read_unlock(&sco_sk_list.lock);
+-
+ 	return node ? sk : sk1;
+ }
+ 
+@@ -530,6 +514,7 @@ done:
+ static int sco_sock_listen(struct socket *sock, int backlog)
+ {
+ 	struct sock *sk = sock->sk;
++	bdaddr_t *src = &bt_sk(sk)->src;
+ 	int err = 0;
+ 
+ 	BT_DBG("sk %p backlog %d", sk, backlog);
+@@ -546,8 +531,19 @@ static int sco_sock_listen(struct socket *sock, int backlog)
+ 		goto done;
+ 	}
+ 
++	write_lock(&sco_sk_list.lock);
++
++	if (__sco_get_sock_by_addr(src))
++		err = -EADDRINUSE;
++
++	write_unlock(&sco_sk_list.lock);
++
++	if (err < 0)
++		goto done;
++
+ 	sk->sk_max_ack_backlog = backlog;
+ 	sk->sk_ack_backlog = 0;
++
+ 	sk->sk_state = BT_LISTEN;
+ 
+ done:
+@@ -856,7 +852,10 @@ static void sco_conn_ready(struct sco_conn *conn)
+ 		sk->sk_state_change(sk);
+ 		bh_unlock_sock(sk);
+ 	} else {
+-		parent = sco_get_sock_listen(conn->src);
++		read_lock(&sco_sk_list.lock);
++		parent = __sco_get_sock_by_addr(conn->src);
++		read_unlock(&sco_sk_list.lock);
++
+ 		if (!parent)
+ 			goto done;
+ 
+-- 
+1.7.7.6
 
-I had a brief chat with Marcel and one potential solution would be to
-have a kernel side timer for rfkilled devices to let the basic HCI
-commands be sent before bringing the adapter down. This would allow user
-space to have a properly initialized adapter object and your patches
-wouldn't be needed.
-
-Johan
