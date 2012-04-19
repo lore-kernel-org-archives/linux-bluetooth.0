@@ -1,99 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Apr 2012 10:08:47 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Ulisses Furquim <ulisses@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: [PATCH v3] Bluetooth: Fix registering hci with duplicate name
-Message-ID: <20120419070846.GC16002@aemeltch-MOBL1>
-References: <1334761984-5400-1-git-send-email-ulisses@profusion.mobi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334761984-5400-1-git-send-email-ulisses@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: AceLan Kao <acelan@gmail.com>
+From: AceLan Kao <acelan.kao@canonical.com>
+To: linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Add support for AR3012 [0cf3:e004]
+Date: Thu, 19 Apr 2012 14:53:45 +0800
+Message-Id: <1334818425-13601-1-git-send-email-acelan.kao@canonical.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ulisses,
+Add another vendor specific ID for Atheros AR3012
 
-On Wed, Apr 18, 2012 at 12:13:04PM -0300, Ulisses Furquim wrote:
-> When adding HCI devices hci_register_dev assigns the same name
-> hci1 for subsequently added AMP devices.
-> 
-> ...
-> [ 6958.381886] sysfs: cannot create duplicate filename
->        '/devices/virtual/bluetooth/hci1
-> ...
-> 
-> We assume id starts with the number we'll try to add the new device
-> and keep iterating until we find the proper place. The only difference
-> is we start with 0 for BR/EDR device and 1 for AMP devices (thus AMP
-> devices will never receive register as index 0). Then every hdev->id in
-> the _ordered_ list <= to the id we want we increment id and move the
-> variable head. In the end we'll have id as the first available one and
-> head is where you need to add hdev after to keep the list ordered.
-> 
-> Reported-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> Signed-off-by: Ulisses Furquim <ulisses@profusion.mobi>
-> ---
-> 
-> v3 - really add new hdev after head to keep the list ordered.
-> v2 - only increment id when we find it's already there in the list.
-> 
-> ---
->  net/bluetooth/hci_core.c |   16 ++++++++++------
->  1 file changed, 10 insertions(+), 6 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index c4dc263..2b98c33 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1739,24 +1739,28 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
->  /* Register HCI device */
->  int hci_register_dev(struct hci_dev *hdev)
->  {
-> -	struct list_head *head = &hci_dev_list, *p;
-> +	struct list_head *head, *p;
->  	int i, id, error;
->  
->  	if (!hdev->open || !hdev->close)
->  		return -EINVAL;
->  
-> +	write_lock(&hci_dev_list_lock);
-> +
->  	/* Do not allow HCI_AMP devices to register at index 0,
->  	 * so the index can be used as the AMP controller ID.
->  	 */
->  	id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
-> -
-> -	write_lock(&hci_dev_list_lock);
-> +	head = &hci_dev_list;
->  
->  	/* Find first available device id */
->  	list_for_each(p, &hci_dev_list) {
-> -		if (list_entry(p, struct hci_dev, list)->id != id)
-> +		int nid = list_entry(p, struct hci_dev, list)->id;
-> +		if (nid > id)
->  			break;
-> -		head = p; id++;
-> +		if (nid == id)
-> +			id++;
-> +		head = p;
->  	}
+output of usb-devices:
+T:  Bus=02 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  4 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=e004 Rev=00.02
+S:  Manufacturer=Atheros Communications
+S:  Product=Bluetooth USB Host Controller
+S:  SerialNumber=Alaska Day 2006
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-This looks to be working but I still prefer bitmask approach as it results
-in simpler code like shown below:
+BugLink: https://bugs.launchpad.net/bugs/922715
 
-<------8<------------------------------------------
-|  list_for_each_entry(d, &hci_dev_list, list)
-|          set_bit(d->id, inuse);
-|
-|  id = find_first_zero_bit(inuse, PAGE_SIZE * 8);
-|
-<------8<------------------------------------------
+Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+---
+ drivers/bluetooth/ath3k.c |    2 ++
+ drivers/bluetooth/btusb.c |    1 +
+ 2 files changed, 3 insertions(+)
 
-Anyway I leave it to maintainers to decide.
-
-Tested-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com> 
-
-Best regards 
-Andrei Emeltchenko 
-
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 639a161..57fd867 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -76,6 +76,7 @@ static struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3375) },
+ 	{ USB_DEVICE(0x04CA, 0x3005) },
+ 	{ USB_DEVICE(0x13d3, 0x3362) },
++	{ USB_DEVICE(0x0CF3, 0xE004) },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -96,6 +97,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 
+ 	{ }	/* Terminating entry */
+ };
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index fd2045e..de17121 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -138,6 +138,7 @@ static struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+-- 
+1.7.9.5
