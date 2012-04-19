@@ -1,25 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F901F69.4000304@sipsolutions.net>
-Date: Thu, 19 Apr 2012 07:21:29 -0700
-From: Johannes Berg <johannes@sipsolutions.net>
+Date: Thu, 19 Apr 2012 11:16:48 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Hemant Gupta <hemant.gupta@stericsson.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v1] Bluetooth: Don't distribute keys in case of
+ Encryption Failure
+Message-ID: <20120419141648.GB4127@joana>
+References: <1334740586-22347-1-git-send-email-hemant.gupta@stericsson.com>
 MIME-Version: 1.0
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: Re: [RFCv1] mac80211: Adds Software / Virtual AMP 80211
-References: <4F84A422.3030900@sipsolutions.net> <4F84A52A.7050905@sipsolutions.net> <20120411071119.GC17779@aemeltch-MOBL1> <1334714611.3725.34.camel@jlt3.sipsolutions.net> <20120418121551.GE19228@aemeltch-MOBL1> <4F8ED1D0.1070401@sipsolutions.net> <20120418145202.GH19228@aemeltch-MOBL1> <4F8ED913.4040807@sipsolutions.net> <20120419063558.GA16002@aemeltch-MOBL1> <4F9012E9.1040409@sipsolutions.net> <20120419133907.GD16002@aemeltch-MOBL1>
-In-Reply-To: <20120419133907.GD16002@aemeltch-MOBL1>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1334740586-22347-1-git-send-email-hemant.gupta@stericsson.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 4/19/2012 6:39 AM, Andrei Emeltchenko wrote:
->> You cannot use more than one channel today. We are changing that. To
->> do good channel management, rather than hard-coding it in your
->> config, you want to run a single wpa_s controlling all interfaces.
->
-> Can wpa_supplicant be an AP? I though that functionality is split to
-> hostap and wpa_supplicant.
+Hi Hemant,
 
-Yes, it can.
+* Hemant Gupta <hemant.gupta@stericsson.com> [2012-04-18 14:46:26 +0530]:
 
-johannes
+> SMP Keys should only be distributeed when encryption is successful.
+> 
+> Signed-off-by: Hemant Gupta <hemant.gupta@stericsson.com>
+> ---
+>  net/bluetooth/l2cap_core.c |    3 ++-
+>  1 files changed, 2 insertions(+), 1 deletions(-)
+
+Patch has been applied to bluetooth-next. Thanks.
+
+	Gustavo
