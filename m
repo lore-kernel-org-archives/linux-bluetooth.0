@@ -1,442 +1,326 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 5/6 v2] client: open file during transfer creation
-Date: Fri, 20 Apr 2012 14:40:05 +0300
-Message-Id: <1334922006-19654-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 3/6] client: transfer api merges put and get
+Date: Fri, 20 Apr 2012 14:40:03 +0300
+Message-Id: <1334922006-19654-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1334922006-19654-1-git-send-email-luiz.dentz@gmail.com>
 References: <1334922006-19654-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-This simplify the API a bit by not having to call obc_transfer_set_file
-to open the file.
+A new enum type is used to distinguish put and get transfers.
 
-In addition to that split transfer creation/registration function so
-GET/PUT can have more specific logic and different paramenters.
+This is more convenient since it is done when registering the transfer,
+and not when it is actually started. The main benefits would be:
+    - Some actions can be taken during creation, such as opening files.
+    - session.c gets simplified.
+    - The size of a put transfer can be exposed in D-Bus, while queued.
+    - The transfer operation (put or get) can be exposed in D-Bus.
+
+None of these D-Bus changes are included in this patch.
 ---
- client/session.c  |   50 +++++++-------
- client/transfer.c |  208 ++++++++++++++++++++++++++++++++---------------------
- client/transfer.h |   15 +++--
- 3 files changed, 162 insertions(+), 111 deletions(-)
+ client/session.c  |   67 ++++++++++++++++------------------------------------
+ client/transfer.c |   53 ++++++++++++++++++++++++++++++-----------
+ client/transfer.h |    5 ++-
+ 3 files changed, 63 insertions(+), 62 deletions(-)
 
 diff --git a/client/session.c b/client/session.c
-index 306e2ba..7515ff0 100644
+index 1638a18..ab20b88 100644
 --- a/client/session.c
 +++ b/client/session.c
-@@ -661,6 +661,7 @@ static void session_request_reply(DBusPendingCall *call, gpointer user_data)
- 	DBusMessage *reply = dbus_pending_call_steal_reply(call);
- 	const char *name;
- 	DBusError derr;
-+	int err;
+@@ -100,7 +100,7 @@ struct obc_session {
  
- 	dbus_error_init(&derr);
- 	if (dbus_set_error_from_message(&derr, reply)) {
-@@ -685,13 +686,26 @@ static void session_request_reply(DBusPendingCall *call, gpointer user_data)
+ static GSList *sessions = NULL;
  
+-static void session_prepare_put(gpointer data, gpointer user_data);
++static void session_start_transfer(gpointer data, gpointer user_data);
+ static void session_terminate_transfer(struct obc_session *session,
+ 					struct obc_transfer *transfer,
+ 					GError *gerr);
+@@ -686,7 +686,7 @@ static void session_request_reply(DBusPendingCall *call, gpointer user_data)
  	DBG("Agent.Request() reply: %s", name);
  
--	if (strlen(name)) {
--		if (obc_transfer_get_operation(transfer) == G_OBEX_OP_PUT)
--			obc_transfer_set_name(transfer, name);
--		else
--			obc_transfer_set_filename(transfer, name);
-+	if (strlen(name) == 0)
-+		goto done;
-+
-+	if (obc_transfer_get_operation(transfer) == G_OBEX_OP_PUT) {
-+		obc_transfer_set_name(transfer, name);
-+		goto done;
-+	}
-+
-+	err = obc_transfer_set_filename(transfer, name);
-+	if (err < 0) {
-+		GError *gerr = NULL;
-+
-+		g_set_error(&gerr, OBEX_IO_ERROR, err,
-+						"Unable to set filename");
-+		session_terminate_transfer(session, transfer, gerr);
-+		g_clear_error(&gerr);
-+		return;
+ 	if (strlen(name)) {
+-		if (p->auth_complete == session_prepare_put)
++		if (obc_transfer_get_operation(transfer) == G_OBEX_OP_PUT)
+ 			obc_transfer_set_name(transfer, name);
+ 		else
+ 			obc_transfer_set_filename(transfer, name);
+@@ -731,7 +731,6 @@ static int pending_request_auth(struct pending_request *p)
+ 
+ static int session_request(struct obc_session *session,
+ 					struct obc_transfer *transfer,
+-					GFunc auth_complete,
+ 					session_callback_t func,
+ 					void *data)
+ {
+@@ -740,7 +739,8 @@ static int session_request(struct obc_session *session,
+ 
+ 	obc_transfer_set_callback(transfer, transfer_progress, session);
+ 
+-	p = pending_request_new(session, transfer, auth_complete, func, data);
++	p = pending_request_new(session, transfer, session_start_transfer,
++								func, data);
+ 
+ 	if (session->p) {
+ 		g_queue_push_tail(session->queue, p);
+@@ -917,19 +917,15 @@ fail:
+ 	session_notify_error(session, transfer, err);
+ }
+ 
+-static void session_prepare_get(gpointer data, gpointer user_data)
++static void session_start_transfer(gpointer data, gpointer user_data)
+ {
+ 	struct obc_session *session = data;
+ 	struct obc_transfer *transfer = user_data;
+-	int ret;
++	GError *err = NULL;
+ 
+-	ret = obc_transfer_get(transfer);
+-	if (ret < 0) {
+-		GError *gerr = NULL;
+-
+-		g_set_error(&gerr, OBEX_IO_ERROR, ret, "%s", strerror(-ret));
+-		session_notify_error(session, transfer, gerr);
+-		g_clear_error(&gerr);
++	if (!obc_transfer_start(transfer, &err)) {
++		session_notify_error(session, transfer, err);
++		g_clear_error(&err);
+ 		return;
  	}
  
-+done:
- 	if (p->auth_complete)
- 		p->auth_complete(session, transfer);
- 
-@@ -956,8 +970,8 @@ int obc_session_get(struct obc_session *session, const char *type,
- 	else
+@@ -961,8 +957,9 @@ int obc_session_get(struct obc_session *session, const char *type,
  		agent = NULL;
  
--	transfer = obc_transfer_register(session->conn, agent, G_OBEX_OP_GET,
--					targetfile, name, type, params);
-+	transfer = obc_transfer_get(session->conn, agent, targetfile, name,
-+								type, params);
+ 	transfer = obc_transfer_register(session->conn, session->obex,
+-							agent, targetfile,
+-							name, type, params);
++						agent, G_OBEX_OP_GET,
++						targetfile, name,
++						type, params);
  	if (transfer == NULL) {
  		if (params != NULL) {
  			g_free(params->data);
-@@ -974,24 +988,17 @@ int obc_session_send(struct obc_session *session, const char *filename,
- {
- 	struct obc_transfer *transfer;
- 	const char *agent;
--	int err;
+@@ -971,8 +968,7 @@ int obc_session_get(struct obc_session *session, const char *type,
+ 		return -EIO;
+ 	}
  
- 	if (session->obex == NULL)
- 		return -ENOTCONN;
+-	return session_request(session, transfer, session_prepare_get,
+-							func, user_data);
++	return session_request(session, transfer, func, user_data);
+ }
  
+ int obc_session_send(struct obc_session *session, const char *filename,
+@@ -988,8 +984,9 @@ int obc_session_send(struct obc_session *session, const char *filename,
  	agent = obc_agent_get_name(session->agent);
  
--	transfer = obc_transfer_register(session->conn, agent, G_OBEX_OP_PUT,
--						filename, name, NULL, NULL);
-+	transfer = obc_transfer_put(session->conn, agent, filename, name,
-+					NULL, NULL, 0, NULL);
+ 	transfer = obc_transfer_register(session->conn, session->obex,
+-							agent, filename,
+-							name, NULL, NULL);
++						agent, G_OBEX_OP_PUT,
++						filename, name,
++						NULL, NULL);
  	if (transfer == NULL)
  		return -EINVAL;
  
--	err = obc_transfer_set_file(transfer, NULL, 0);
--	if (err < 0) {
--		obc_transfer_unregister(transfer);
--		return err;
--	}
--
- 	return session_request(session, transfer, NULL, NULL);
+@@ -999,8 +996,7 @@ int obc_session_send(struct obc_session *session, const char *filename,
+ 		return err;
+ 	}
+ 
+-	return session_request(session, transfer, session_prepare_put,
+-								NULL, NULL);
++	return session_request(session, transfer, NULL, NULL);
  }
  
-@@ -1038,24 +1045,17 @@ int obc_session_put(struct obc_session *session, const char *contents,
+ int obc_session_pull(struct obc_session *session,
+@@ -1041,26 +1037,6 @@ fail:
+ 	return NULL;
+ }
+ 
+-static void session_prepare_put(gpointer data, gpointer user_data)
+-{
+-	struct obc_session *session = data;
+-	struct obc_transfer *transfer = user_data;
+-	int ret;
+-
+-	ret = obc_transfer_put(transfer);
+-	if (ret < 0) {
+-		GError *gerr = NULL;
+-
+-		g_set_error(&gerr, OBEX_IO_ERROR, ret, "%s (%d)",
+-							strerror(-ret), -ret);
+-		session_notify_error(session, transfer, gerr);
+-		g_clear_error(&gerr);
+-		return;
+-	}
+-
+-	DBG("Transfer(%p) started", transfer);
+-}
+-
+ int obc_session_put(struct obc_session *session, const char *contents,
+ 					size_t size, const char *name)
  {
- 	struct obc_transfer *transfer;
- 	const char *agent;
--	int err;
- 
- 	if (session->obex == NULL)
- 		return -ENOTCONN;
- 
+@@ -1074,9 +1050,9 @@ int obc_session_put(struct obc_session *session, const char *contents,
  	agent = obc_agent_get_name(session->agent);
  
--	transfer = obc_transfer_register(session->conn, agent, G_OBEX_OP_PUT,
--						NULL, name, NULL, NULL);
-+	transfer = obc_transfer_put(session->conn, agent, NULL, name, NULL,
-+							contents, size, NULL);
+ 	transfer = obc_transfer_register(session->conn, session->obex,
+-							agent, NULL,
+-							name, NULL,
+-							NULL);
++							agent, G_OBEX_OP_PUT,
++							NULL, name,
++							NULL, NULL);
  	if (transfer == NULL)
  		return -EIO;
  
--	err = obc_transfer_set_file(transfer, contents, size);
--	if (err < 0) {
--		obc_transfer_unregister(transfer);
--		return err;
--	}
--
- 	return session_request(session, transfer, NULL, NULL);
+@@ -1086,8 +1062,7 @@ int obc_session_put(struct obc_session *session, const char *contents,
+ 		return err;
+ 	}
+ 
+-	return session_request(session, transfer, session_prepare_put, NULL,
+-									NULL);
++	return session_request(session, transfer, NULL, NULL);
  }
  
+ static void agent_destroy(gpointer data, gpointer user_data)
 diff --git a/client/transfer.c b/client/transfer.c
-index 35e8940..e6e07e1 100644
+index 1fa23c3..34dc277 100644
 --- a/client/transfer.c
 +++ b/client/transfer.c
-@@ -219,7 +219,7 @@ static void obc_transfer_free(struct obc_transfer *transfer)
- 	g_free(transfer);
- }
+@@ -55,6 +55,7 @@ struct transfer_callback {
  
--struct obc_transfer *obc_transfer_register(DBusConnection *conn,
-+static struct obc_transfer *obc_transfer_register(DBusConnection *conn,
+ struct obc_transfer {
+ 	GObex *obex;
++	guint8 op;
+ 	struct obc_transfer_params *params;
+ 	struct transfer_callback *callback;
+ 	DBusConnection *conn;
+@@ -221,6 +222,7 @@ static void obc_transfer_free(struct obc_transfer *transfer)
+ struct obc_transfer *obc_transfer_register(DBusConnection *conn,
+ 						GObex *obex,
  						const char *agent,
- 						guint8 op,
++						guint8 op,
  						const char *filename,
-@@ -247,23 +247,131 @@ struct obc_transfer *obc_transfer_register(DBusConnection *conn,
- 			TRANSFER_BASEPATH, counter++);
+ 						const char *name,
+ 						const char *type,
+@@ -230,6 +232,7 @@ struct obc_transfer *obc_transfer_register(DBusConnection *conn,
  
- 	transfer->conn = dbus_bus_get(DBUS_BUS_SESSION, NULL);
--	if (transfer->conn == NULL) {
--		obc_transfer_free(transfer);
--		return NULL;
--	}
-+	if (transfer->conn == NULL)
-+		goto fail;
- 
- 	if (g_dbus_register_interface(transfer->conn, transfer->path,
- 				TRANSFER_INTERFACE,
- 				obc_transfer_methods, NULL, NULL,
--				transfer, NULL) == FALSE) {
-+				transfer, NULL) == FALSE)
-+		goto fail;
-+
-+done:
-+	DBG("%p registered %s", transfer, transfer->path);
-+
-+	return transfer;
-+
-+fail:
-+	obc_transfer_free(transfer);
-+
-+	return NULL;
-+}
-+
-+static int transfer_open(struct obc_transfer *transfer, int flags, mode_t mode)
-+{
-+	GError *err = NULL;
-+	int fd;
-+
-+	if (transfer->filename != NULL) {
-+		fd = open(transfer->filename, flags, mode);
-+		if (fd < 0) {
-+			error("open(): %s(%d)", strerror(errno), errno);
-+			return -errno;
-+		}
-+		goto done;
-+	}
-+
-+	fd = g_file_open_tmp("obex-clientXXXXXX", &transfer->filename, &err);
-+	if (fd < 0) {
-+		error("g_file_open_tmp(): %s", err->message);
-+		g_error_free(err);
-+		return -EFAULT;
-+	}
-+
-+	remove(transfer->filename);
-+
-+done:
-+	transfer->fd = fd;
-+	return fd;
-+}
-+
-+struct obc_transfer *obc_transfer_get(DBusConnection *conn,
-+					const char *agent,
-+					const char *filename,
-+					const char *name,
-+					const char *type,
-+					struct obc_transfer_params *params)
-+{
-+	struct obc_transfer *transfer;
-+
-+	transfer = obc_transfer_register(conn, agent, G_OBEX_OP_GET, filename,
-+							name, type, params);
-+	if (transfer == NULL)
-+		return NULL;
-+
-+	if (transfer_open(transfer, O_WRONLY | O_CREAT | O_TRUNC, 0600) < 0) {
- 		obc_transfer_free(transfer);
- 		return NULL;
- 	}
- 
--done:
--	DBG("%p registered %s", transfer, transfer->path);
-+	return transfer;
-+}
-+
-+struct obc_transfer *obc_transfer_put(DBusConnection *conn,
-+					const char *agent,
-+					const char *filename,
-+					const char *name,
-+					const char *type,
-+					const char *contents,
-+					size_t size,
-+					struct obc_transfer_params *params)
-+{
-+	struct obc_transfer *transfer;
-+	struct stat st;
-+	int perr;
-+
-+	transfer = obc_transfer_register(conn, agent, G_OBEX_OP_PUT, filename,
-+							name, type, params);
-+	if (transfer == NULL)
-+		return NULL;
-+
-+	if (contents != NULL) {
-+		ssize_t w;
-+
-+		perr = transfer_open(transfer, O_RDWR, 0);
-+		if (perr < 0)
-+			goto fail;
-+
-+		w = write(transfer->fd, contents, size);
-+		if (w < 0) {
-+			error("write(): %s(%d)", strerror(errno), errno);
-+			perr = -errno;
-+			goto fail;
-+		} else if ((size_t) w != size) {
-+			error("Unable to write all contents to file");
-+			perr = -EFAULT;
-+			goto fail;
-+		}
-+	} else {
-+		perr = transfer_open(transfer, O_RDONLY, 0);
-+		if (perr < 0)
-+			goto fail;
-+	}
-+
-+	perr = fstat(transfer->fd, &st);
-+	if (perr < 0) {
-+		error("fstat(): %s(%d)", strerror(errno), errno);
-+		perr = -errno;
-+		goto fail;
-+	}
-+
-+	transfer->size = st.st_size;
- 
- 	return transfer;
-+
-+fail:
-+	obc_transfer_free(transfer);
-+	return NULL;
- }
- 
- void obc_transfer_unregister(struct obc_transfer *transfer)
-@@ -416,38 +524,9 @@ gboolean obc_transfer_set_callback(struct obc_transfer *transfer,
- 	return TRUE;
- }
- 
--static int transfer_open(struct obc_transfer *transfer, int flags, mode_t mode)
--{
--	GError *err = NULL;
--	int fd;
--
--	if (transfer->filename != NULL) {
--		fd = open(transfer->filename, flags, mode);
--		if (fd < 0) {
--			error("open(): %s(%d)", strerror(errno), errno);
--			return -errno;
--		}
--		goto done;
--	}
--
--	fd = g_file_open_tmp("obex-clientXXXXXX", &transfer->filename, &err);
--	if (fd < 0) {
--		error("g_file_open_tmp(): %s", err->message);
--		g_error_free(err);
--		return -EFAULT;
--	}
--
--	remove(transfer->filename);
--
--done:
--	transfer->fd = fd;
--	return fd;
--}
--
- static gboolean transfer_start_get(struct obc_transfer *transfer, GError **err)
- {
- 	GObexPacket *req;
--	int perr;
- 
- 	if (transfer->xfer > 0) {
- 		g_set_error(err, OBC_TRANSFER_ERROR, -EALREADY,
-@@ -455,10 +534,6 @@ static gboolean transfer_start_get(struct obc_transfer *transfer, GError **err)
- 		return FALSE;
- 	}
- 
--	perr = transfer_open(transfer, O_WRONLY | O_CREAT, 0600);
--	if (perr < 0)
--		return perr;
--
- 	req = g_obex_packet_new(G_OBEX_OP_GET, TRUE, G_OBEX_HDR_INVALID);
- 
- 	if (transfer->name != NULL)
-@@ -591,11 +666,21 @@ void obc_transfer_set_name(struct obc_transfer *transfer, const char *name)
- 	transfer->name = g_strdup(name);
- }
- 
--void obc_transfer_set_filename(struct obc_transfer *transfer,
-+int obc_transfer_set_filename(struct obc_transfer *transfer,
- 					const char *filename)
- {
-+	int err;
-+
-+	err = rename(transfer->filename, filename);
-+	if (err < 0) {
-+		error("rename(): %s (%d)", strerror(errno), errno);
-+		return -errno;
-+	}
-+
- 	g_free(transfer->filename);
+ 	transfer = g_new0(struct obc_transfer, 1);
+ 	transfer->obex = g_obex_ref(obex);
++	transfer->op = op;
+ 	transfer->agent = g_strdup(agent);
  	transfer->filename = g_strdup(filename);
-+
-+	return 0;
+ 	transfer->name = g_strdup(name);
+@@ -443,14 +446,16 @@ done:
+ 	return fd;
  }
  
- const char *obc_transfer_get_path(struct obc_transfer *transfer)
-@@ -607,42 +692,3 @@ gint64 obc_transfer_get_size(struct obc_transfer *transfer)
+-int obc_transfer_get(struct obc_transfer *transfer)
++static gboolean transfer_start_get(struct obc_transfer *transfer, GError **err)
  {
- 	return transfer->size;
- }
--
--int obc_transfer_set_file(struct obc_transfer *transfer, const char *contents,
--								size_t size)
--{
--	int err;
--	struct stat st;
--
--	err = transfer_open(transfer, O_RDONLY, 0);
--	if (err < 0)
--		return err;
--
--	if (contents != NULL) {
--		ssize_t w = write(transfer->fd, contents, size);
--		if (w < 0) {
--			error("write(): %s(%d)", strerror(errno), errno);
--			err = -errno;
--			goto fail;
--		} else if ((size_t) w != size) {
--			error("Unable to write all contents to file");
--			err = -EFAULT;
--			goto fail;
--		}
--	}
--
--	err = fstat(transfer->fd, &st);
--	if (err < 0) {
--		error("fstat(): %s(%d)", strerror(errno), errno);
--		err = -errno;
--		goto fail;
--	}
--
--	transfer->size = st.st_size;
--
+-	GError *err = NULL;
+ 	GObexPacket *req;
+ 	int perr;
+ 
+-	if (transfer->xfer != 0)
+-		return -EALREADY;
++	if (transfer->xfer > 0) {
++		g_set_error(err, OBC_TRANSFER_ERROR, -EALREADY,
++						"Transfer already started");
++		return FALSE;
++	}
+ 
+ 	perr = transfer_open(transfer, O_WRONLY | O_CREAT, 0600);
+ 	if (perr < 0)
+@@ -473,20 +478,22 @@ int obc_transfer_get(struct obc_transfer *transfer)
+ 
+ 	transfer->xfer = g_obex_send_req(transfer->obex, req, -1,
+ 						get_xfer_progress_first,
+-						transfer, &err);
++						transfer, err);
+ 	if (transfer->xfer == 0)
+-		return -ENOTCONN;
++		return FALSE;
+ 
 -	return 0;
--fail:
--	close(transfer->fd);
--	transfer->fd = -1;
--	return err;
--}
++	return TRUE;
+ }
+ 
+-int obc_transfer_put(struct obc_transfer *transfer)
++static gboolean transfer_start_put(struct obc_transfer *transfer, GError **err)
+ {
+-	GError *err = NULL;
+ 	GObexPacket *req;
+ 
+-	if (transfer->xfer != 0)
+-		return -EALREADY;
++	if (transfer->xfer > 0) {
++		g_set_error(err, OBC_TRANSFER_ERROR, -EALREADY,
++						"Transfer already started");
++		return FALSE;
++	}
+ 
+ 	req = g_obex_packet_new(G_OBEX_OP_PUT, FALSE, G_OBEX_HDR_INVALID);
+ 
+@@ -508,11 +515,29 @@ int obc_transfer_put(struct obc_transfer *transfer)
+ 
+ 	transfer->xfer = g_obex_put_req_pkt(transfer->obex, req,
+ 					put_xfer_progress, xfer_complete,
+-					transfer, &err);
++					transfer, err);
+ 	if (transfer->xfer == 0)
+-		return -ENOTCONN;
++		return FALSE;
+ 
+-	return 0;
++	return TRUE;
++}
++
++gboolean obc_transfer_start(struct obc_transfer *transfer, GError **err)
++{
++	switch (transfer->op) {
++	case G_OBEX_OP_GET:
++		return transfer_start_get(transfer, err);
++	case G_OBEX_OP_PUT:
++		return transfer_start_put(transfer, err);
++	}
++
++	g_set_error(err, OBC_TRANSFER_ERROR, -ENOTSUP, "Not supported");
++	return FALSE;
++}
++
++guint8 obc_transfer_get_operation(struct obc_transfer *transfer)
++{
++	return transfer->op;
+ }
+ 
+ int obc_transfer_get_params(struct obc_transfer *transfer,
 diff --git a/client/transfer.h b/client/transfer.h
-index b044ce1..a84e415 100644
+index a65981c..7858423 100644
 --- a/client/transfer.h
 +++ b/client/transfer.h
-@@ -32,13 +32,20 @@ typedef void (*transfer_callback_t) (struct obc_transfer *transfer,
- 					gint64 transferred, GError *err,
- 					void *user_data);
- 
--struct obc_transfer *obc_transfer_register(DBusConnection *conn,
-+struct obc_transfer *obc_transfer_get(DBusConnection *conn,
+@@ -35,6 +35,7 @@ typedef void (*transfer_callback_t) (struct obc_transfer *transfer,
+ struct obc_transfer *obc_transfer_register(DBusConnection *conn,
+ 					GObex *obex,
  					const char *agent,
--					guint8 op,
++					guint8 op,
  					const char *filename,
  					const char *name,
  					const char *type,
+@@ -46,8 +47,8 @@ gboolean obc_transfer_set_callback(struct obc_transfer *transfer,
+ 					transfer_callback_t func,
+ 					void *user_data);
+ 
+-int obc_transfer_get(struct obc_transfer *transfer);
+-int obc_transfer_put(struct obc_transfer *transfer);
++gboolean obc_transfer_start(struct obc_transfer *transfer, GError **err);
++guint8 obc_transfer_get_operation(struct obc_transfer *transfer);
+ 
+ int obc_transfer_get_params(struct obc_transfer *transfer,
  					struct obc_transfer_params *params);
-+struct obc_transfer *obc_transfer_put(DBusConnection *conn,
-+					const char *agent,
-+					const char *filename,
-+					const char *name,
-+					const char *type,
-+					const char *contents,
-+					size_t size,
-+					struct obc_transfer_params *params);
- 
- void obc_transfer_unregister(struct obc_transfer *transfer);
- 
-@@ -56,9 +63,7 @@ int obc_transfer_get_contents(struct obc_transfer *transfer, char **contents,
- 								size_t *size);
- 
- void obc_transfer_set_name(struct obc_transfer *transfer, const char *name);
--void obc_transfer_set_filename(struct obc_transfer *transfer,
-+int obc_transfer_set_filename(struct obc_transfer *transfer,
- 					const char *filename);
- const char *obc_transfer_get_path(struct obc_transfer *transfer);
- gint64 obc_transfer_get_size(struct obc_transfer *transfer);
--int obc_transfer_set_file(struct obc_transfer *transfer, const char *contents,
--								size_t size);
 -- 
 1.7.7.6
 
