@@ -1,37 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Fri, 20 Apr 2012 17:40:03 -0500
-Message-ID: <CAB7rCTjRzTZP6TDgsrWvFxE8zuFuYDBQdMnjyvnM4p6Cw=ro2g@mail.gmail.com>
-Subject: PTS / linkkey issue
-From: Mike <puffy.taco@gmail.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1334786904-26282-16-git-send-email-jprvita@openbossa.org>
+References: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
+	<1334786904-26282-16-git-send-email-jprvita@openbossa.org>
+Date: Fri, 20 Apr 2012 15:31:44 -0400
+Message-ID: <CAJdJm_OetAmLuiMzZdPFu+TYC4Nh9x9SsJA=YJhYG0fZFe=zkw@mail.gmail.com>
+Subject: Re: [RFC v2 15/16] HoG: Register only one notification callback
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: =?ISO-8859-1?Q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Claudio,
 
-I'm having a somewhat relate issue to Vishal AGARWAL [1].  The trouble
-I have is that the PTS system is requesting auth type 0, and Bluez
-happily obliges.  This leaves the PTS device as temporary, and BlueZ
-then deletes this device after the end of the connection.  This
-prevents me from being able to pass TP/OOR/BV-02-I: [HF reconnects to
-AG].  The code is designed to periodically reconnect to the AG after
-it detects a link timeout.  But, if BlueZ has deleted the device, I
-don't do that.  This also somewhat applies to the A2DP test cases, as
-my device must be left in pairing mode in order for the tests to pass.
+2012/4/18 João Paulo Rechi Vita <jprvita@openbossa.org>:
+> From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+>
+> Fix registering the notification callback per report. Only one instance
+> of GAttrib callback for all report notifications should be registered.
+> ---
+>  input/hog_device.c |   17 +++++++++++------
+>  1 files changed, 11 insertions(+), 6 deletions(-)
 
-So, my question to people who have used PTS, is there a way to get the
-PTS to perform a pairing that is not 0x00 MITM Protection Not Required
-– No Bonding. Numeric comparison with automatic accept allowed?  I'm
-using an older kernel that doesn't have the mgmt interface (2.6.33
-with some features/fixes backported from newer kernels) but am using
-the latest BlueZ from git (at least of a month ago or so).  But even
-so, the proposal of keeping the linkkey around for the ACL session
-would be useless, I think, because the intent is to have a link
-timeout event.
+Shouldn't this patch be squashed with some other on this series?
 
-Thanks,
-Mike
-
-[1] http://www.spinics.net/lists/linux-bluetooth/msg23346.html
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
