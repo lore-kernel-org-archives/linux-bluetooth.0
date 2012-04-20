@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv7 05/23] Bluetooth: A2MP: Definitions for A2MP commands
-Date: Fri, 20 Apr 2012 14:09:33 +0300
-Message-Id: <1334920191-29308-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv7 09/23] Bluetooth: A2MP: Process A2MP Discover Request
+Date: Fri, 20 Apr 2012 14:09:37 +0300
+Message-Id: <1334920191-29308-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1334920191-29308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1334920191-29308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,97 +12,174 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Define A2MP command IDs and packet structures.
+Adds helper functions to count HCI devs and process A2MP Discover
+Request, code makes sure that first controller in the list is
+BREDR one. Trace is shown below:
+
+...
+> ACL data: handle 11 flags 0x02 dlen 16
+    A2MP: Discover req: mtu/mps 670 mask: 0x0000
+< ACL data: handle 11 flags 0x00 dlen 22
+    A2MP: Discover rsp: mtu/mps 670 mask: 0x0000
+      Controller list:
+        id 0 type 0 (BR-EDR) status 0x01 (Bluetooth only)
+        id 1 type 1 (802.11 AMP) status 0x01 (Bluetooth only)
+...
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |   73 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 73 insertions(+)
+ include/net/bluetooth/a2mp.h     |    2 +
+ include/net/bluetooth/hci_core.h |   13 ++++++
+ net/bluetooth/a2mp.c             |   85 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 100 insertions(+)
 
 diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 995f1c0..39160f5 100644
+index 2eb46ee..c9aa9c5 100644
 --- a/include/net/bluetooth/a2mp.h
 +++ b/include/net/bluetooth/a2mp.h
-@@ -31,6 +31,79 @@ struct a2mp_cmd {
- 	__u8	data[0];
- } __packed;
+@@ -15,6 +15,8 @@
+ #ifndef __A2MP_H
+ #define __A2MP_H
  
-+/* A2MP command codes */
-+#define A2MP_COMMAND_REJ         0x01
-+struct a2mp_cmd_rej {
-+	__le16	reason;
-+	__u8	data[0];
-+} __packed;
++#define A2MP_FEAT_EXT	0x8000
 +
-+#define A2MP_DISCOVER_REQ        0x02
-+struct a2mp_discov_req {
-+	__le16	mtu;
-+	__le16	ext_feat;
-+} __packed;
-+
-+struct a2mp_cl {
-+	__u8	id;
-+	__u8	type;
-+	__u8	status;
-+} __packed;
-+
-+#define A2MP_DISCOVER_RSP        0x03
-+struct a2mp_discov_rsp {
-+	__le16     mtu;
-+	__le16     ext_feat;
-+	struct a2mp_cl cl[0];
-+} __packed;
-+
-+#define A2MP_CHANGE_NOTIFY       0x04
-+#define A2MP_CHANGE_RSP          0x05
-+
-+#define A2MP_GETINFO_REQ         0x06
-+struct a2mp_info_req {
-+	__u8       id;
-+} __packed;
-+
-+#define A2MP_GETINFO_RSP         0x07
-+struct a2mp_info_rsp {
-+	__u8	id;
-+	__u8	status;
-+	__le32	total_bw;
-+	__le32	max_bw;
-+	__le32	min_latency;
-+	__le16	pal_cap;
-+	__le16	assoc_size;
-+} __packed;
-+
-+#define A2MP_GETAMPASSOC_REQ     0x08
-+struct a2mp_amp_assoc_req {
-+	__u8	id;
-+} __packed;
-+
-+#define A2MP_GETAMPASSOC_RSP     0x09
-+struct a2mp_amp_assoc_rsp {
-+	__u8	id;
-+	__u8	status;
-+	__u8	amp_assoc[0];
-+} __packed;
-+
-+#define A2MP_CREATEPHYSLINK_REQ  0x0A
-+#define A2MP_DISCONNPHYSLINK_REQ 0x0C
-+struct a2mp_physlink_req {
-+	__u8	local_id;
-+	__u8	remote_id;
-+	__u8	amp_assoc[0];
-+} __packed;
-+
-+#define A2MP_CREATEPHYSLINK_RSP  0x0B
-+#define A2MP_DISCONNPHYSLINK_RSP 0x0D
-+struct a2mp_physlink_rsp {
-+	__u8	local_id;
-+	__u8	remote_id;
-+	__u8	status;
-+} __packed;
-+
- void amp_mgr_get(struct amp_mgr *mgr);
- int amp_mgr_put(struct amp_mgr *mgr);
+ struct amp_mgr {
+ 	struct list_head	list;
+ 	struct l2cap_conn	*l2cap_conn;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 16ab35d..67e8eaa 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -644,6 +644,19 @@ static inline void hci_set_drvdata(struct hci_dev *hdev, void *data)
+ 	dev_set_drvdata(&hdev->dev, data);
+ }
  
++/* hci_dev_list shall be locked */
++static inline uint8_t __hci_num_ctrl(void)
++{
++	uint8_t count = 0;
++	struct list_head *p;
++
++	list_for_each(p, &hci_dev_list) {
++		count++;
++	}
++
++	return count;
++}
++
+ struct hci_dev *hci_dev_get(int index);
+ struct hci_dev *hci_get_route(bdaddr_t *src, bdaddr_t *dst);
+ 
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 4f3e6f9..b4eb294 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -63,6 +63,36 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
+ 	kfree(cmd);
+ }
+ 
++static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
++{
++	cl->id = 0;
++	cl->type = 0;
++	cl->status = 1;
++}
++
++/* hci_dev_list shall be locked */
++static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl, u8 num_ctrl)
++{
++	int i = 0;
++	struct hci_dev *hdev;
++
++	__a2mp_cl_bredr(cl);
++
++	list_for_each_entry(hdev, &hci_dev_list, list) {
++		/* Iterate through AMP controllers */
++		if (hdev->id == HCI_BREDR_ID)
++			continue;
++
++		/* Starting from second entry */
++		if (++i >= num_ctrl)
++			return;
++
++		cl[i].id = hdev->id;
++		cl[i].type = hdev->amp_type;
++		cl[i].status = hdev->amp_status;
++	}
++}
++
+ /* Processing A2MP messages */
+ static int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
+ 			    struct a2mp_cmd *hdr)
+@@ -79,6 +109,58 @@ static int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
+ }
+ 
++static inline int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
++				    struct a2mp_cmd *hdr)
++{
++	struct a2mp_discov_req *req = (struct a2mp_discov_req *) skb->data;
++	u16 len = le16_to_cpu(hdr->len);
++	struct a2mp_discov_rsp *rsp;
++	u16 ext_feat;
++	u8 num_ctrl;
++
++	if (len < sizeof(*req))
++		return -EINVAL;
++
++	skb_pull(skb, sizeof(*req));
++
++	ext_feat = le16_to_cpu(req->ext_feat);
++
++	BT_DBG("mtu %d efm 0x%4.4x", le16_to_cpu(req->mtu), ext_feat);
++
++	/* check that packet is not broken for now */
++	while (ext_feat & A2MP_FEAT_EXT) {
++		if (len < sizeof(ext_feat))
++			return -EINVAL;
++
++		ext_feat = get_unaligned_le16(skb->data);
++		BT_DBG("efm 0x%4.4x", ext_feat);
++		len -= sizeof(ext_feat);
++		skb_pull(skb, sizeof(ext_feat));
++	}
++
++	read_lock(&hci_dev_list_lock);
++
++	num_ctrl = __hci_num_ctrl();
++	len = num_ctrl * sizeof(struct a2mp_cl) + sizeof(*rsp);
++	rsp = kmalloc(len, GFP_ATOMIC);
++	if (!rsp) {
++		read_unlock(&hci_dev_list_lock);
++		return -ENOMEM;
++	}
++
++	rsp->mtu = cpu_to_le16(L2CAP_A2MP_DEFAULT_MTU);
++	rsp->ext_feat = 0;
++
++	__a2mp_add_cl(mgr, rsp->cl, num_ctrl);
++
++	read_unlock(&hci_dev_list_lock);
++
++	a2mp_send(mgr, A2MP_DISCOVER_RSP, hdr->ident, len, rsp);
++
++	kfree(rsp);
++	return 0;
++}
++
+ /* Handle A2MP signalling */
+ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ {
+@@ -109,6 +191,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 			break;
+ 
+ 		case A2MP_DISCOVER_REQ:
++			err = a2mp_discover_req(mgr, skb, hdr);
++			break;
++
+ 		case A2MP_CHANGE_NOTIFY:
+ 		case A2MP_GETINFO_REQ:
+ 		case A2MP_GETAMPASSOC_REQ:
 -- 
 1.7.9.5
 
