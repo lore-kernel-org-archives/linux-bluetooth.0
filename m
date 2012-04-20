@@ -1,102 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 20 Apr 2012 17:08:26 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v2 0/3] Current status of playstation-peripheral
+ plugin
+Message-ID: <20120420140825.GA19909@x220.P-661HNU-F1>
+References: <1334741891-11869-1-git-send-email-ospite@studenti.unina.it>
+ <1334748297.8818.121.camel@novo.hadess.net>
+ <20120420143625.7e8c2a9d8e73b18211bc1ca4@studenti.unina.it>
 MIME-Version: 1.0
-In-Reply-To: <1334920191-29308-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1334920191-29308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1334920191-29308-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Fri, 20 Apr 2012 11:09:29 -0300
-Message-ID: <CAA37ikbktPhFA6i_crUo7U-59jEeG4Kj+rAviPwLvSiFwPtARw@mail.gmail.com>
-Subject: Re: [RFCv7 04/23] Bluetooth: A2MP: Add chan callbacks
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120420143625.7e8c2a9d8e73b18211bc1ca4@studenti.unina.it>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Antonio,
 
-On Fri, Apr 20, 2012 at 8:09 AM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Add state change, close and skb allocation callbacks.
->
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/a2mp.c |   40 ++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 40 insertions(+)
->
-> diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-> index cb3bf74..67a7ad4 100644
-> --- a/net/bluetooth/a2mp.c
-> +++ b/net/bluetooth/a2mp.c
-> @@ -63,8 +63,46 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
->        kfree(cmd);
->  }
->
-> +static void a2mp_chan_state_change_cb(void *data, int state)
-> +{
-> +       struct amp_mgr *mgr = data;
-> +       struct l2cap_chan *chan;
-> +
-> +       if (!mgr)
-> +               return;
-> +
-> +       chan = mgr->a2mp_chan;
-> +
-> +       BT_DBG("chan %p state %s", chan, state_to_string(state));
-> +
-> +       chan->state = state;
+On Fri, Apr 20, 2012, Antonio Ospite wrote:
+> I'll add this information as a comment in the code.
+> 
+> > > Bastien, please check if I am forgetting anything :)
+> > > 
+> > > WHAT we need the plugin to do:
+> > > 
+> > >   - When a device is connected via USB:
+> > >     + Fetch the (default) adapter bdaddr (from BlueZ) and store it into
+> > >       the device
+> > >     + Fetch the device bdaddr (from the device via USB/HID) and make the
+> > >       device _trusted_ by the adapter (is "trusted" the correct term
+> > >       here?
+> > 
+> > Setting it as trusted isn't the only thing you're doing. You're making
+> > it known (meaning that you fill in details such as its SDP record,
+> > including name), then adding it as trusted so that BlueZ doesn't ask the
+> > user whether this device is allowed to connect.
+> > 
+> > You need a separate function to make it "known" and insert it into
+> > BlueZ's database. _set_trusted() should be a function that takes a
+> > single device and a value (whether to trust or untrust), that's it.
+> > 
+> > So you need to split it in 2 separate functions.
+> 
+> OK, so the operations we are doing are:
+> 	- Make the device "known" (add its details to the database of
+>           devices known by a given adapter)
+> 	- Make the device trusted (enable its connection)
+> 
+> Has the first operation a more official name? How does it relate to
+> the "association" operation? Is it a device operation, in the sense
+> that we are adding a device, or rather an adapter operation, in the
+> sense that we are filling the database of a given adapter?
 
-Do we have to l2cap_chan_lock() here? Or is that taken care somewhere else?
+I'd make it an adapter operation and I'd also suggest to explore the
+option of using the same API that devices get added to storage during
+"normal" device discovery: btd_event_device_found(). After all you are
+discovering a device in this use case. The only speciality is that it
+happens over USB instead of traditional Bluetooth inquiry. That way you
+would only need to add the set_trusted function and nothing else.
 
-> +       switch (state) {
-> +       case BT_CLOSED:
-> +               if (mgr)
-> +                       amp_mgr_put(mgr);
-> +               break;
-> +       }
-> +}
-> +
-> +static void a2mp_chan_close_cb(void *data)
-> +{
-> +       struct amp_mgr *mgr = data;
-> +
-> +       l2cap_chan_destroy(mgr->a2mp_chan);
-> +}
-> +
-> +static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
-> +                                             unsigned long len, int nb)
-> +{
-> +       return bt_skb_alloc(len, GFP_KERNEL);
-> +}
-> +
->  static struct l2cap_ops a2mp_chan_ops = {
->        .name = "L2CAP A2MP channel",
-> +       .state_change = a2mp_chan_state_change_cb,
-> +       .close = a2mp_chan_close_cb,
-> +       .alloc_skb = a2mp_chan_alloc_skb_cb,
->  };
->
->  static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
-> @@ -102,6 +140,8 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
->        chan->remote_mps = chan->omtu;
->        chan->mps = chan->omtu;
->
-> +       chan->state = BT_CONNECTED;
-> +
->        return chan;
->  }
->
-> --
-> 1.7.9.5
-
-Regards,
-
--- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+Johan
