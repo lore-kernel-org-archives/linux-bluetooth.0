@@ -1,29 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 20 Apr 2012 14:27:05 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] input: add error message when auth fails
-Date: Fri, 20 Apr 2012 14:36:15 -0300
-Message-Id: <1334943375-23475-1-git-send-email-gustavo@padovan.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3] Bluetooth: Restrict to one SCO listening socket
+Message-ID: <20120420172420.GC3911@joana>
+References: <1334839078-14958-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1334839078-14958-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- input/server.c |    2 ++
- 1 file changed, 2 insertions(+)
+Hi Marcel,
 
-diff --git a/input/server.c b/input/server.c
-index cea08d1..ed09a73 100644
---- a/input/server.c
-+++ b/input/server.c
-@@ -176,6 +176,8 @@ static void confirm_event_cb(GIOChannel *chan, gpointer user_data)
- 	if (ret == 0)
- 		return;
- 
-+	error("Authorization failed(%d): %s", -ret, strerror(-ret));
-+
- 	g_io_channel_unref(server->confirm);
- 	server->confirm = NULL;
- 
--- 
-1.7.10
+* Marcel Holtmann <marcel@holtmann.org> [2012-04-19 14:37:58 +0200]:
 
+> The SCO sockets are only identified by its address. So only allow one
+> SCO socket in listening state per address or BDADDR_ANY.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/sco.c |   29 ++++++++++++++++++++++-------
+>  1 files changed, 22 insertions(+), 7 deletions(-)
+
+Patch has been applied to bluetooth-next. Thanks.
+
+	Gustavo
