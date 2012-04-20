@@ -1,59 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Syam Sidhardhan <s.syam@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Syam Sidhardhan <s.syam@samsung.com>
-Subject: [PATCH v1 2/5] Bluetooth: Remove unused hci_le_ltk_neg_reply()
-Date: Fri, 20 Apr 2012 22:12:31 +0530
-Message-id: <1334940151-9519-1-git-send-email-s.syam@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <20120419075643.GB20738@x220.ger.corp.intel.com>
+References: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
+	<20120419075643.GB20738@x220.ger.corp.intel.com>
+Date: Fri, 20 Apr 2012 14:01:17 -0300
+Message-ID: <CAAngNMb6ZufCt1-LnmbYxWLkRRst=QyB6nkFD7wCueqiqFHn6Q@mail.gmail.com>
+Subject: Re: [RFC v2 00/16] HoG plugin
+From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
+To: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>,
+	linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-No one is using hci_le_ltk_neg_reply() in bluetooth subsystem.
+Hello Johan
 
-Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
----
- include/net/bluetooth/hci_core.h |    2 --
- net/bluetooth/hci_conn.c         |   14 --------------
- 2 files changed, 0 insertions(+), 16 deletions(-)
+On Thu, Apr 19, 2012 at 4:56 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi João Paulo,
+>
+> On Wed, Apr 18, 2012, João Paulo Rechi Vita wrote:
+>> LE pairing is broken on bluetooth-next atm.
+>
+> What exactly is broken? Have you already sent patches to fix this? We've
+> been planning to enable LE support by default in 3.5 (based on current
+> bluetooth-next) so this needs to be fixed asap.
+>
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 6e170de..ed9eaba 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1069,8 +1069,6 @@ void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max,
- 					u16 latency, u16 to_multiplier);
- void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
- 							__u8 ltk[16]);
--void hci_le_ltk_neg_reply(struct hci_conn *conn);
--
- int hci_do_inquiry(struct hci_dev *hdev, u8 length);
- int hci_cancel_inquiry(struct hci_dev *hdev);
- int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 74418ba..43e0d49 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -224,20 +224,6 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
- }
- EXPORT_SYMBOL(hci_le_start_enc);
- 
--void hci_le_ltk_neg_reply(struct hci_conn *conn)
--{
--	struct hci_dev *hdev = conn->hdev;
--	struct hci_cp_le_ltk_neg_reply cp;
--
--	BT_DBG("%p", conn);
--
--	memset(&cp, 0, sizeof(cp));
--
--	cp.handle = cpu_to_le16(conn->handle);
--
--	hci_send_cmd(hdev, HCI_OP_LE_LTK_NEG_REPLY, sizeof(cp), &cp);
--}
--
- /* Device _must_ be locked */
- void hci_sco_setup(struct hci_conn *conn, __u8 status)
- {
+Pairing from bluetoothd through CreatePairedDevice() is currently
+broken for LE devices. The problem is that userspace creates a LE
+connection before pairing, to be able to ATT traffic coming during the
+pairing process. When it latter triggers pairing, an error is returned
+due to the already existing connection.
+
+Vinicius sent a patch [1] on February fixing this issue, but it have
+never been integrated. It doesn't apply anymore, so I'm going to
+re-send a version that apply.
+
+[1] http://article.gmane.org/gmane.linux.bluez.kernel/21234/match=bluetooth+add+support+reusing+same+hci_conn+le+links
+
 -- 
-1.7.4.1
-
+João Paulo Rechi Vita
+Openbossa Labs - INdT
