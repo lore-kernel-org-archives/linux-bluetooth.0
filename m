@@ -1,61 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1334786904-26282-4-git-send-email-jprvita@openbossa.org>
-References: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
-	<1334786904-26282-4-git-send-email-jprvita@openbossa.org>
-Date: Fri, 20 Apr 2012 13:52:34 -0400
-Message-ID: <CAJdJm_OkfN1NjZ7=ufFqcfhH=C=YZ7T-V8pTy-TN0SLe02K1XQ@mail.gmail.com>
-Subject: Re: [RFC v2 03/16] HoG: load primary service handle
+In-Reply-To: <1334836112-25482-1-git-send-email-hemant.gupta@stericsson.com>
+References: <1334836112-25482-1-git-send-email-hemant.gupta@stericsson.com>
+Date: Fri, 20 Apr 2012 13:39:59 -0400
+Message-ID: <CAJdJm_N+pi8sWSPtSv+G9LmWg0bNEXgEK+LKxn8F0wv8ygoj7Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Store LE device address type with primary list
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: =?ISO-8859-1?Q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org
+To: Hemant Gupta <hemant.gupta@stericsson.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi João,
+Hi Hemant,
 
-2012/4/18 João Paulo Rechi Vita <jprvita@openbossa.org>:
->  int hog_device_register(struct btd_device *device, const char *path)
->  {
->        struct hog_device *hogdev;
-> +       struct gatt_primary *prim;
+On Thu, Apr 19, 2012 at 7:48 AM, Hemant Gupta
+<hemant.gupta@stericsson.com> wrote:
+> @@ -1920,13 +1920,17 @@ static void create_stored_device_from_primary(char *key, char *value,
+>        struct btd_adapter *adapter = user_data;
+>        struct btd_device *device;
+>        GSList *services, *uuids, *l;
+> +       addr_type_t addr_type;
 >
->        hogdev = find_device_by_path(devices, path);
->        if (hogdev)
->                return -EALREADY;
+>        if (g_slist_find_custom(adapter->devices,
+>                        key, (GCompareFunc) device_address_cmp))
+>                return;
 >
-> +       prim = load_hog_primary(device);
-> +       if (!prim)
-> +               return -EINVAL;
+> -       /* FIXME: Get the correct LE addr type (public/random) */
+> -       device = device_create(connection, adapter, key, ADDR_TYPE_LE_PUBLIC);
+> +       sscanf(value, "%d ", &addr_type);
+> +       /* Increment by 2 (address type and space) */
+> +       value += 2;
+
+I think it is a good idea to check for sscanf() return and if it
+fails, assume addr_type as ADDR_TYPE_LE_PUBLIC the value as primary
+data only. Remember that the system may have previously stored primary
+data in the old format.
+
 > +
->        hogdev = hog_device_new(device, path);
-> -       if (!hogdev)
-> +       if (!hogdev) {
-> +               g_free(prim);
-
-This g_free() call does not look correct. load_hog_primary() returns a
-pointer to GSList data (more specifically from the primary service
-list), which is freed in another part of BlueZ.
-
-So I think you can safely just return here.
-
->                return -ENOMEM;
-> +       }
-> +
-> +       hogdev->hog_primary = g_memdup(prim, sizeof(*prim));
+> +       device = device_create(connection, adapter, key, addr_type);
+>        if (!device)
+>                return;
 >
->        hogdev->attioid = btd_device_add_attio_callback(device,
->                                                        attio_connected_cb,
-> @@ -122,6 +154,7 @@ static void hog_device_free(struct hog_device *hogdev)
->  {
->        btd_device_unref(hogdev->device);
->        g_free(hogdev->path);
-> +       g_free(hogdev->hog_primary);
->        g_free(hogdev);
->  }
 
-Regards,
+
+Are you planning to add support for other address types in BlueZ GATT
+server? It would be nice if you could share your plans on this topic.
+
+
+Best Regards,
 -- 
 Anderson Lizardo
 Instituto Nokia de Tecnologia - INdT
