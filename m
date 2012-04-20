@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv7 22/23] Bluetooth: AMP: Use HCI callback for Read AMP Info
-Date: Fri, 20 Apr 2012 14:09:50 +0300
-Message-Id: <1334920191-29308-23-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv7 20/23] Bluetooth: General HCI callback implementation
+Date: Fri, 20 Apr 2012 14:09:48 +0300
+Message-Id: <1334920191-29308-21-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1334920191-29308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1334920191-29308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,177 +12,172 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Adds Read Local AMP Info HCI command with callback to be executed
-when receiving command complete event.
+Add general HCI callback implementation. Can be used for executing
+HCI commands from A2MP protocol.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/amp.h |   19 +++++++++++++++++
- net/bluetooth/Makefile      |    2 +-
- net/bluetooth/a2mp.c        |    5 +++++
- net/bluetooth/amp.c         |   49 +++++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c   |   13 ++++++++++--
- 5 files changed, 85 insertions(+), 3 deletions(-)
- create mode 100644 include/net/bluetooth/amp.h
- create mode 100644 net/bluetooth/amp.c
+ include/net/bluetooth/hci_core.h |   20 ++++++++++
+ net/bluetooth/hci_core.c         |   82 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 102 insertions(+)
 
-diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
-new file mode 100644
-index 0000000..2751bf6
---- /dev/null
-+++ b/include/net/bluetooth/amp.h
-@@ -0,0 +1,19 @@
-+/*
-+   Copyright (c) 2011,2012 Intel Corp.
-+
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License version 2 and
-+   only version 2 as published by the Free Software Foundation.
-+
-+   This program is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+   GNU General Public License for more details.
-+*/
-+
-+#ifndef __AMP_H
-+#define __AMP_H
-+
-+int amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr);
-+
-+#endif /* __AMP_H */
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index fa6d94a..dea6a28 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -10,4 +10,4 @@ obj-$(CONFIG_BT_HIDP)	+= hidp/
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 67e8eaa..276092e 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -131,6 +131,17 @@ struct le_scan_params {
  
- bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
- 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
--	a2mp.o
-+	a2mp.o amp.o
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index a49acb6..39a3009 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -16,6 +16,7 @@
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/a2mp.h>
-+#include <net/bluetooth/amp.h>
+ #define HCI_MAX_SHORT_NAME_LENGTH	10
  
- /* A2MP build & send command helper functions */
- static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
-@@ -90,6 +91,10 @@ static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl, u8 num_ctrl)
- 		cl[i].id = hdev->id;
- 		cl[i].type = hdev->amp_type;
- 		cl[i].status = hdev->amp_status;
++struct hci_dev;
 +
-+		read_unlock(&hci_dev_list_lock);
-+		amp_read_loc_info(hdev, mgr);
-+		read_lock(&hci_dev_list_lock);
- 	}
++struct hci_cb_cmd {
++	struct list_head list;
++	u16 opcode;
++	u8 status;
++	void *opt;
++	void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
++	void (*destructor)(struct hci_cb_cmd *cmd);
++};
++
+ #define NUM_REASSEMBLY 4
+ struct hci_dev {
+ 	struct list_head list;
+@@ -243,6 +254,9 @@ struct hci_dev {
+ 
+ 	struct list_head	mgmt_pending;
+ 
++	struct mutex		cb_list_lock;
++	struct list_head	cb_list;
++
+ 	struct discovery_state	discovery;
+ 	struct hci_conn_hash	conn_hash;
+ 	struct list_head	blacklist;
+@@ -1091,4 +1105,10 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
+ 		int timeout);
+ int hci_cancel_le_scan(struct hci_dev *hdev);
+ 
++struct hci_cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode);
++int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
++	void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd), void *opt,
++		void (*destructor)(struct hci_cb_cmd *cmd), gfp_t flags);
++void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
++
+ #endif /* __HCI_CORE_H */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 1806762..9deee5f 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -57,6 +57,7 @@
+ static void hci_rx_work(struct work_struct *work);
+ static void hci_cmd_work(struct work_struct *work);
+ static void hci_tx_work(struct work_struct *work);
++static void hci_cb_clear(struct hci_dev *hdev);
+ 
+ /* HCI device list */
+ LIST_HEAD(hci_dev_list);
+@@ -1851,6 +1852,9 @@ int hci_register_dev(struct hci_dev *hdev)
+ 
+ 	INIT_LIST_HEAD(&hdev->mgmt_pending);
+ 
++	INIT_LIST_HEAD(&hdev->cb_list);
++	mutex_init(&hdev->cb_list_lock);
++
+ 	INIT_LIST_HEAD(&hdev->blacklist);
+ 
+ 	INIT_LIST_HEAD(&hdev->uuids);
+@@ -1967,6 +1971,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_smp_ltks_clear(hdev);
+ 	hci_remote_oob_data_clear(hdev);
+ 	hci_adv_entries_clear(hdev);
++	hci_cb_clear(hdev);
+ 	hci_dev_unlock(hdev);
+ 
+ 	hci_dev_put(hdev);
+@@ -2266,6 +2271,83 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+ 	return 0;
  }
  
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-new file mode 100644
-index 0000000..af009e0
---- /dev/null
-+++ b/net/bluetooth/amp.c
-@@ -0,0 +1,49 @@
-+/*
-+   Copyright (c) 2011,2012 Intel Corp.
-+
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License version 2 and
-+   only version 2 as published by the Free Software Foundation.
-+
-+   This program is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+   GNU General Public License for more details.
-+*/
-+
-+#include <linux/workqueue.h>
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci.h>
-+#include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/a2mp.h>
-+#include <net/bluetooth/amp.h>
-+
-+static void amp_read_loc_info_complete(struct hci_dev *hdev,
-+				       struct hci_cb_cmd *cmd)
++static int hci_add_cb(struct hci_dev *hdev, __u16 opcode,
++		void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
++	void *opt, void (*destructor)(struct hci_cb_cmd *cmd), gfp_t flags)
 +{
-+	BT_DBG("%s cmd %p mgr %p", hdev->name, cmd, cmd->opt);
-+}
-+
-+static void cb_destructor(struct hci_cb_cmd *cmd)
-+{
-+	struct amp_mgr *mgr = cmd->opt;
-+
-+	BT_DBG("Destructor cmd %p mgr %p", cmd, mgr);
-+
-+	amp_mgr_put(mgr);
-+	kfree(cmd);
-+}
-+
-+int amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr)
-+{
-+	int err = 0;
-+
-+	BT_DBG("%s mgr %p", hdev->name, mgr);
-+
-+	amp_mgr_get(mgr);
-+
-+	hci_cmd_cb(hdev, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL,
-+		amp_read_loc_info_complete, mgr, cb_destructor, GFP_ATOMIC);
-+
-+	return err;
-+}
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8a13f90..0282d78 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -43,6 +43,7 @@
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/a2mp.h>
- 
- /* Handle HCI Event packets */
- 
-@@ -848,14 +849,15 @@ static void hci_cc_write_ca_timeout(struct hci_dev *hdev, struct sk_buff *skb)
- }
- 
- static void hci_cc_read_local_amp_info(struct hci_dev *hdev,
--		struct sk_buff *skb)
-+							struct sk_buff *skb)
- {
- 	struct hci_rp_read_local_amp_info *rp = (void *) skb->data;
 +	struct hci_cb_cmd *cmd;
- 
- 	BT_DBG("%s status 0x%x", hdev->name, rp->status);
- 
- 	if (rp->status)
--		return;
-+		goto send;
- 
- 	hdev->amp_status = rp->amp_status;
- 	hdev->amp_total_bw = __le32_to_cpu(rp->total_bw);
-@@ -869,6 +871,13 @@ static void hci_cc_read_local_amp_info(struct hci_dev *hdev,
- 	hdev->amp_max_flush_to = __le32_to_cpu(rp->max_flush_to);
- 
- 	hci_req_complete(hdev, HCI_OP_READ_LOCAL_AMP_INFO, rp->status);
 +
-+send:
-+	cmd = hci_find_cb(hdev, HCI_OP_READ_LOCAL_AMP_INFO);
-+	if (cmd) {
-+		cmd->status = rp->status;
-+		hci_queue_cb(hdev, cmd, hdev->workqueue);
++	cmd = kmalloc(sizeof(*cmd), flags);
++	if (!cmd)
++		return -ENOMEM;
++
++	cmd->cb = cb;
++	cmd->opcode = opcode;
++	cmd->opt = opt;
++	cmd->status = 0;
++	cmd->destructor = destructor;
++
++	mutex_lock(&hdev->cb_list_lock);
++	list_add(&cmd->list, &hdev->cb_list);
++	mutex_unlock(&hdev->cb_list_lock);
++
++	return 0;
++}
++
++struct hci_cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
++{
++	struct hci_cb_cmd *cmd;
++
++	mutex_lock(&hdev->cb_list_lock);
++	list_for_each_entry(cmd, &hdev->cb_list, list)
++		if (cmd->opcode == opcode) {
++			mutex_unlock(&hdev->cb_list_lock);
++			return cmd;
++		}
++	mutex_unlock(&hdev->cb_list_lock);
++
++	return NULL;
++}
++
++void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd)
++{
++	mutex_lock(&hdev->cb_list_lock);
++	list_del(&cmd->list);
++	mutex_unlock(&hdev->cb_list_lock);
++
++	if (cmd->destructor) {
++		cmd->destructor(cmd);
++	} else {
++		kfree(cmd->opt);
++		kfree(cmd);
 +	}
- }
- 
- static void hci_cc_delete_stored_link_key(struct hci_dev *hdev,
++}
++
++static void hci_cb_clear(struct hci_dev *hdev)
++{
++	struct hci_cb_cmd *cmd, *tmp;
++
++	list_for_each_entry_safe(cmd, tmp, &hdev->cb_list, list)
++		hci_remove_cb(hdev, cmd);
++}
++
++/* Send HCI command with callback */
++int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
++		void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
++	void *opt, void (*destructor)(struct hci_cb_cmd *cmd), gfp_t flags)
++{
++	int ret;
++
++	if (!cb)
++		return -EINVAL;
++
++	ret = hci_add_cb(hdev, opcode, cb, opt, destructor, flags);
++	if (ret)
++		return ret;
++
++	return hci_send_cmd(hdev, opcode, plen, param);
++}
++
+ /* Get data from the previously sent command */
+ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
+ {
 -- 
 1.7.9.5
 
