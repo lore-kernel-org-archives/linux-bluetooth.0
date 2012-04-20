@@ -2,174 +2,152 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 2/2] Bluetooth: Add support for reusing the same hci_conn for LE links
-Date: Fri, 20 Apr 2012 15:46:08 -0300
-Message-Id: <1334947568-3437-2-git-send-email-jprvita@openbossa.org>
-In-Reply-To: <1334947568-3437-1-git-send-email-jprvita@openbossa.org>
-References: <1334947568-3437-1-git-send-email-jprvita@openbossa.org>
+Cc: Ido Yariv <ido@wizery.com>, Arik Nemtsov <arik@wizery.com>
+Subject: [PATCH 1/2] Bluetooth: Search global l2cap channels by src/dst addresses
+Date: Fri, 20 Apr 2012 15:46:07 -0300
+Message-Id: <1334947568-3437-1-git-send-email-jprvita@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+From: Ido Yariv <ido@wizery.com>
 
-As most LE devices leave advertising mode when they enter the connected
-state, we may want to "pass" that connection to other users.
+The cid or psm and the source address might not be enough to uniquely
+identify a global channel, especially when the source address is our
+own.
 
-The first user will be the pairing procedure, the connection is
-established without an associated socket, after the pairing is
-complete, userspace may want to discover via GATT what services the
-newly bonded device has.
+For instance, when trying to communicate with two LE devices in master
+mode, data received from the both devices is sent to the same socket.
 
-If userspace establishes the connection while the timeout still
-hasn't expired, the connection will be re-used.
+Fix this by taking the destination address into account when choosing
+the socket.
 
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Signed-off-by: Ido Yariv <ido@wizery.com>
+Signed-off-by: Arik Nemtsov <arik@wizery.com>
 Tested-by: João Paulo Rechi Vita <jprvita@openbossa.org>
 ---
- net/bluetooth/hci_conn.c   |   32 ++++++++++++----------
- net/bluetooth/l2cap_core.c |   63 ++++++++++++++++++++++++++++----------------
- 2 files changed, 58 insertions(+), 37 deletions(-)
+ net/bluetooth/l2cap_core.c |   43 +++++++++++++++++++++++++++++++------------
+ 1 files changed, 31 insertions(+), 12 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 947172b..f361d3b 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -523,23 +523,27 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
- 	BT_DBG("%s dst %s", hdev->name, batostr(dst));
- 
- 	if (type == LE_LINK) {
--		struct adv_entry *entry;
-+		struct adv_entry *entry = NULL;
- 
- 		le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
--		if (le)
--			return ERR_PTR(-EBUSY);
--
--		entry = hci_find_adv_entry(hdev, dst);
--		if (!entry)
--			return ERR_PTR(-EHOSTUNREACH);
--
--		le = hci_conn_add(hdev, LE_LINK, dst);
--		if (!le)
--			return ERR_PTR(-ENOMEM);
--
--		le->dst_type = entry->bdaddr_type;
-+		if (!le) {
-+			entry = hci_find_adv_entry(hdev, dst);
-+			if (!entry)
-+				return ERR_PTR(-EHOSTUNREACH);
-+
-+			le = hci_conn_add(hdev, LE_LINK, dst);
-+			if (!le)
-+				return ERR_PTR(-ENOMEM);
-+
-+			le->dst_type = entry->bdaddr_type;
-+			le->pending_sec_level = sec_level;
-+			le->sec_level = BT_SECURITY_LOW;
-+			le->auth_type = auth_type;
-+			hci_le_connect(le);
-+		}
- 
--		hci_le_connect(le);
-+		le->pending_sec_level = sec_level;
-+		le->auth_type = auth_type;
- 
- 		hci_conn_hold(le);
- 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 23d1fbd..9b23db5 100644
+index 97bb212..23d1fbd 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -918,10 +918,38 @@ static void l2cap_send_conn_req(struct l2cap_chan *chan)
- 	l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_REQ, sizeof(req), &req);
+@@ -1067,10 +1067,11 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 	mutex_unlock(&conn->chan_lock);
  }
  
-+static void l2cap_chan_ready(struct l2cap_chan *chan)
-+{
-+	struct sock *sk = chan->sk;
-+	struct sock *parent;
-+
-+	lock_sock(sk);
-+
-+	parent = bt_sk(sk)->parent;
-+
-+	BT_DBG("sk %p, parent %p", sk, parent);
-+
-+	chan->conf_state = 0;
-+	__clear_chan_timer(chan);
-+
-+	__l2cap_state_change(chan, BT_CONNECTED);
-+	sk->sk_state_change(sk);
-+
-+	if (parent)
-+		parent->sk_data_ready(parent, 0);
-+
-+	release_sock(sk);
-+}
-+
- static void l2cap_do_start(struct l2cap_chan *chan)
+-/* Find socket with cid and source bdaddr.
++/* Find socket with cid and source/destination bdaddr.
+  * Returns closest match, locked.
+  */
+-static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid, bdaddr_t *src)
++static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
++						bdaddr_t *src, bdaddr_t *dst)
  {
- 	struct l2cap_conn *conn = chan->conn;
+ 	struct l2cap_chan *c, *c1 = NULL;
  
-+	if (conn->hcon->type == LE_LINK) {
-+		l2cap_chan_ready(chan);
-+		return;
-+	}
+@@ -1083,14 +1084,22 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid, bdaddr_t
+ 			continue;
+ 
+ 		if (c->scid == cid) {
++			int src_match, dst_match;
++			int src_any, dst_any;
 +
- 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT) {
- 		if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
- 			return;
-@@ -1156,29 +1184,6 @@ clean:
- 	release_sock(parent);
- }
+ 			/* Exact match. */
+-			if (!bacmp(&bt_sk(sk)->src, src)) {
++			src_match = !bacmp(&bt_sk(sk)->src, src);
++			dst_match = !bacmp(&bt_sk(sk)->dst, dst);
++			if (src_match && dst_match) {
+ 				read_unlock(&chan_list_lock);
+ 				return c;
+ 			}
  
--static void l2cap_chan_ready(struct l2cap_chan *chan)
--{
--	struct sock *sk = chan->sk;
--	struct sock *parent;
--
--	lock_sock(sk);
--
--	parent = bt_sk(sk)->parent;
--
--	BT_DBG("sk %p, parent %p", sk, parent);
--
--	chan->conf_state = 0;
--	__clear_chan_timer(chan);
--
--	__l2cap_state_change(chan, BT_CONNECTED);
--	sk->sk_state_change(sk);
--
--	if (parent)
--		parent->sk_data_ready(parent, 0);
--
--	release_sock(sk);
--}
--
- static void l2cap_conn_ready(struct l2cap_conn *conn)
+ 			/* Closest match */
+-			if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY))
++			src_any = !bacmp(&bt_sk(sk)->src, BDADDR_ANY);
++			dst_any = !bacmp(&bt_sk(sk)->dst, BDADDR_ANY);
++			if ((src_match && dst_any) || (src_any && dst_match) ||
++							(src_any && dst_any))
+ 				c1 = c;
+ 		}
+ 	}
+@@ -1109,7 +1118,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 
+ 	/* Check if we have socket listening on cid */
+ 	pchan = l2cap_global_chan_by_scid(BT_LISTEN, L2CAP_CID_LE_DATA,
+-							conn->src);
++							conn->src, conn->dst);
+ 	if (!pchan)
+ 		return;
+ 
+@@ -1337,10 +1346,12 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+ 
+ /* ---- Socket interface ---- */
+ 
+-/* Find socket with psm and source bdaddr.
++/* Find socket with psm and source / destination bdaddr.
+  * Returns closest match.
+  */
+-static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr_t *src)
++static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
++							bdaddr_t *src,
++							bdaddr_t *dst)
+ {
+ 	struct l2cap_chan *c, *c1 = NULL;
+ 
+@@ -1353,14 +1364,22 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr
+ 			continue;
+ 
+ 		if (c->psm == psm) {
++			int src_match, dst_match;
++			int src_any, dst_any;
++
+ 			/* Exact match. */
+-			if (!bacmp(&bt_sk(sk)->src, src)) {
++			src_match = !bacmp(&bt_sk(sk)->src, src);
++			dst_match = !bacmp(&bt_sk(sk)->dst, dst);
++			if (src_match && dst_match) {
+ 				read_unlock(&chan_list_lock);
+ 				return c;
+ 			}
+ 
+ 			/* Closest match */
+-			if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY))
++			src_any = !bacmp(&bt_sk(sk)->src, BDADDR_ANY);
++			dst_any = !bacmp(&bt_sk(sk)->dst, BDADDR_ANY);
++			if ((src_match && dst_any) || (src_any && dst_match) ||
++							(src_any && dst_any))
+ 				c1 = c;
+ 		}
+ 	}
+@@ -2887,7 +2906,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 	BT_DBG("psm 0x%2.2x scid 0x%4.4x", __le16_to_cpu(psm), scid);
+ 
+ 	/* Check if we have socket listening on psm */
+-	pchan = l2cap_global_chan_by_psm(BT_LISTEN, psm, conn->src);
++	pchan = l2cap_global_chan_by_psm(BT_LISTEN, psm, conn->src, conn->dst);
+ 	if (!pchan) {
+ 		result = L2CAP_CR_BAD_PSM;
+ 		goto sendresp;
+@@ -4627,7 +4646,7 @@ static inline int l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm, str
  {
  	struct l2cap_chan *chan;
-@@ -1492,6 +1497,18 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
- 		goto done;
- 	}
  
-+	if (hcon->type == LE_LINK) {
-+		err = 0;
-+
-+		if (!list_empty(&conn->chan_l)) {
-+			err = -EBUSY;
-+			hci_conn_put(hcon);
-+		}
-+
-+		if (err)
-+			goto done;
-+	}
-+
- 	/* Update source addr of the socket */
- 	bacpy(src, conn->src);
+-	chan = l2cap_global_chan_by_psm(0, psm, conn->src);
++	chan = l2cap_global_chan_by_psm(0, psm, conn->src, conn->dst);
+ 	if (!chan)
+ 		goto drop;
+ 
+@@ -4652,7 +4671,7 @@ static inline int l2cap_att_channel(struct l2cap_conn *conn, u16 cid, struct sk_
+ {
+ 	struct l2cap_chan *chan;
+ 
+-	chan = l2cap_global_chan_by_scid(0, cid, conn->src);
++	chan = l2cap_global_chan_by_scid(0, cid, conn->src, conn->dst);
+ 	if (!chan)
+ 		goto drop;
  
 -- 
 1.7.7.6
