@@ -1,42 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CA+XVXfeJ254A2kVTvpR6GyjAJvdNC_G6=840C9aDQjbeT+y_cQ@mail.gmail.com>
-References: <1334786904-26282-1-git-send-email-jprvita@openbossa.org>
-	<CA+XVXfeJ254A2kVTvpR6GyjAJvdNC_G6=840C9aDQjbeT+y_cQ@mail.gmail.com>
-Date: Fri, 20 Apr 2012 14:06:02 -0300
-Message-ID: <CAAngNMahrp2Umt3sR6QB7ex8zwNu-WsepbhdwUq1oUWcyy1e_g@mail.gmail.com>
-Subject: Re: [RFC v2 00/16] HoG plugin
-From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-To: Arik Nemtsov <arik@wizery.com>
-Cc: linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org,
-	Ido Yariv <ido@wizery.com>
-Content-Type: text/plain; charset=UTF-8
+From: Syam Sidhardhan <s.syam@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Syam Sidhardhan <s.syam@samsung.com>
+Subject: [PATCH v1 2/5] Bluetooth: Remove unused hci_le_ltk_neg_reply()
+Date: Fri, 20 Apr 2012 22:12:31 +0530
+Message-id: <1334940151-9519-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Arik,
+No one is using hci_le_ltk_neg_reply() in bluetooth subsystem.
 
-2012/4/19 Arik Nemtsov <arik@wizery.com>:
-> 2012/4/19 João Paulo Rechi Vita <jprvita@openbossa.org>:
->> Second draft of the HoG plugin. Code went through a lot of refactoring and is
->> much cleaner now. The report descriptor parsing (to get the report id) is
->> hackish and it doesn't support more than one device simultaneosly, probably
->> due to a kernel bug (reports come from the wrong socket). We're investigating
->> it.
->
-> Maybe this patch can help you? We encountered a similar issue with
-> multiple devices.
->
-> http://permalink.gmane.org/gmane.linux.bluez.kernel/22397
->
+Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+---
+ include/net/bluetooth/hci_core.h |    2 --
+ net/bluetooth/hci_conn.c         |   14 --------------
+ 2 files changed, 0 insertions(+), 16 deletions(-)
 
-This patch fixes the problem for me, but it doesn't apply cleanly on
-bluetooth-next anymore. I've manually made the changes with a very
-small modification to make it more readable and re-commited on my tree
-keeping the commit message and authorship. Can I re-send it to the
-list? Or do you prefer to do it yourself? I've also added a tested-by
-tag to it.
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 6e170de..ed9eaba 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1069,8 +1069,6 @@ void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max,
+ 					u16 latency, u16 to_multiplier);
+ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
+ 							__u8 ltk[16]);
+-void hci_le_ltk_neg_reply(struct hci_conn *conn);
+-
+ int hci_do_inquiry(struct hci_dev *hdev, u8 length);
+ int hci_cancel_inquiry(struct hci_dev *hdev);
+ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 74418ba..43e0d49 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -224,20 +224,6 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
+ }
+ EXPORT_SYMBOL(hci_le_start_enc);
+ 
+-void hci_le_ltk_neg_reply(struct hci_conn *conn)
+-{
+-	struct hci_dev *hdev = conn->hdev;
+-	struct hci_cp_le_ltk_neg_reply cp;
+-
+-	BT_DBG("%p", conn);
+-
+-	memset(&cp, 0, sizeof(cp));
+-
+-	cp.handle = cpu_to_le16(conn->handle);
+-
+-	hci_send_cmd(hdev, HCI_OP_LE_LTK_NEG_REPLY, sizeof(cp), &cp);
+-}
+-
+ /* Device _must_ be locked */
+ void hci_sco_setup(struct hci_conn *conn, __u8 status)
+ {
 -- 
-João Paulo Rechi Vita
-Openbossa Labs - INdT
+1.7.4.1
+
