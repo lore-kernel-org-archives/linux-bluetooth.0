@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv7 21/23] Bluetooth: Process HCI callbacks in a workqueue
-Date: Fri, 20 Apr 2012 14:09:49 +0300
-Message-Id: <1334920191-29308-22-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv7 18/23] Bluetooth: physical link HCI interface to AMP
+Date: Fri, 20 Apr 2012 14:09:46 +0300
+Message-Id: <1334920191-29308-19-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1334920191-29308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1334920191-29308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,78 +12,114 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Use workqueue to process HCI callbacks.
+Adds support for physical link create/acceppt/disconnect AMP HCI
+commands. To be used by the upper layer.
+Backport from CodeAurora & Atheros
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    2 ++
- net/bluetooth/hci_core.c         |   41 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+)
+ include/net/bluetooth/hci.h |   24 +++++++++++++++++++++++
+ net/bluetooth/hci_core.c    |   45 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 69 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 276092e..2fa5c3d 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1110,5 +1110,7 @@ int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
- 	void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd), void *opt,
- 		void (*destructor)(struct hci_cb_cmd *cmd), gfp_t flags);
- void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
-+void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
-+					struct workqueue_struct *workqueue);
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 346f087..49bf231 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -30,6 +30,8 @@
+ #define HCI_MAX_EVENT_SIZE	260
+ #define HCI_MAX_FRAME_SIZE	(HCI_MAX_ACL_SIZE + 4)
  
- #endif /* __HCI_CORE_H */
++#define HCI_MAX_AMP_KEY_SIZE	32
++
+ /* HCI dev events */
+ #define HCI_DEV_REG			1
+ #define HCI_DEV_UNREG			2
+@@ -523,6 +525,28 @@ struct hci_cp_io_capability_neg_reply {
+ 	__u8     reason;
+ } __packed;
+ 
++#define HCI_OP_CREATE_PHY_LINK		0x0435
++struct hci_cp_create_phy_link {
++	__u8     handle;
++	__u8     key_len;
++	__u8     key_type;
++	__u8     key[HCI_MAX_AMP_KEY_SIZE];
++} __packed;
++
++#define HCI_OP_ACCEPT_PHY_LINK		0x0436
++struct hci_cp_accept_phy_link {
++	__u8	handle;
++	__u8	key_len;
++	__u8	key_type;
++	__u8	key[HCI_MAX_AMP_KEY_SIZE];
++} __packed;
++
++#define HCI_OP_DISC_PHY_LINK		0x0437
++struct hci_cp_disc_phy_link {
++	__u8     handle;
++	__u8     reason;
++} __packed;
++
+ #define HCI_OP_SNIFF_MODE		0x0803
+ struct hci_cp_sniff_mode {
+ 	__le16   handle;
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 9deee5f..82431f5 100644
+index c2e710b..1806762 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2309,6 +2309,47 @@ struct hci_cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
- 	return NULL;
+@@ -340,6 +340,51 @@ static void hci_linkpol_req(struct hci_dev *hdev, unsigned long opt)
+ 	hci_send_cmd(hdev, HCI_OP_WRITE_DEF_LINK_POLICY, 2, &policy);
  }
  
-+struct hci_cb_work {
-+	struct work_struct work;
-+	struct hci_dev *hdev;
-+	struct hci_cb_cmd *cmd;
-+};
-+
-+static void hci_cb_worker(struct work_struct *w)
++/* AMP HCI interface */
++void hci_phylink_create_req(struct hci_dev *hdev, __u8 handle, __u8 key_len,
++						__u8 key_type, __u8 *key)
 +{
-+	struct hci_cb_work *work = (struct hci_cb_work *) w;
-+	struct hci_cb_cmd *cmd = work->cmd;
-+	struct hci_dev *hdev = work->hdev;
++	struct hci_cp_create_phy_link cp;
 +
-+	cmd->cb(hdev, cmd);
++	cp.handle	= handle;
++	cp.key_type	= key_type;
++	cp.key_len	= min_t(__u8, key_len, HCI_MAX_AMP_KEY_SIZE);
 +
-+	hci_remove_cb(hdev, cmd);
-+	kfree(w);
-+	hci_dev_put(hdev);
++	BT_DBG("key len %d, phy handle %d", cp.key_len, cp.handle);
++
++	memcpy(cp.key, key, cp.key_len);
++	hci_send_cmd(hdev, HCI_OP_CREATE_PHY_LINK, sizeof(cp), &cp);
 +}
++EXPORT_SYMBOL(hci_phylink_create_req);
 +
-+void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
-+					struct workqueue_struct *workqueue)
++void hci_phylink_accept_req(struct hci_dev *hdev, __u8 handle, __u8 key_len,
++						__u8 key_type, __u8 *key)
 +{
-+	struct hci_cb_work *work;
++	struct hci_cp_accept_phy_link cp;
 +
-+	BT_DBG("Queue cmd %p opt %p", cmd, cmd->opt);
++	cp.handle	= handle;
++	cp.key_type	= key_type;
++	cp.key_len	= min_t(__u8, key_len, HCI_MAX_AMP_KEY_SIZE);
 +
-+	work = kmalloc(sizeof(*work), GFP_KERNEL);
-+	if (!work)
-+		return;
++	BT_DBG("key len %d, phy handle %d", cp.key_len, cp.handle);
 +
-+	INIT_WORK(&work->work, hci_cb_worker);
-+	work->hdev = hdev;
-+	work->cmd = cmd;
-+	hci_dev_hold(hdev);
-+
-+	if (!queue_work(workqueue, &work->work)) {
-+		kfree(work);
-+		hci_dev_put(hdev);
-+	}
++	memcpy(cp.key, key, cp.key_len);
++	hci_send_cmd(hdev, HCI_OP_ACCEPT_PHY_LINK, sizeof(cp), &cp);
 +}
++EXPORT_SYMBOL(hci_phylink_accept_req);
 +
- void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd)
- {
- 	mutex_lock(&hdev->cb_list_lock);
++void hci_phylink_disc_req(struct hci_dev *hdev, __u8 handle, __u8 reason)
++{
++	struct hci_cp_disc_phy_link cp;
++
++	BT_DBG("handle %d reason %d", handle, reason);
++
++	cp.handle = handle;
++	cp.reason = reason;
++	hci_send_cmd(hdev, HCI_OP_DISC_PHY_LINK, sizeof(cp), &cp);
++}
++EXPORT_SYMBOL(hci_phylink_disc_req);
++
+ /* Get HCI device by index.
+  * Device is held on return. */
+ struct hci_dev *hci_dev_get(int index)
 -- 
 1.7.9.5
 
