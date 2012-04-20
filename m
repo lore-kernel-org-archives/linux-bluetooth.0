@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv7 09/23] Bluetooth: A2MP: Process A2MP Discover Request
-Date: Fri, 20 Apr 2012 14:09:37 +0300
-Message-Id: <1334920191-29308-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv7 16/23] Bluetooth: A2MP: Handling fixed channels
+Date: Fri, 20 Apr 2012 14:09:44 +0300
+Message-Id: <1334920191-29308-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1334920191-29308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1334920191-29308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,174 +12,104 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Adds helper functions to count HCI devs and process A2MP Discover
-Request, code makes sure that first controller in the list is
-BREDR one. Trace is shown below:
-
-...
-> ACL data: handle 11 flags 0x02 dlen 16
-    A2MP: Discover req: mtu/mps 670 mask: 0x0000
-< ACL data: handle 11 flags 0x00 dlen 22
-    A2MP: Discover rsp: mtu/mps 670 mask: 0x0000
-      Controller list:
-        id 0 type 0 (BR-EDR) status 0x01 (Bluetooth only)
-        id 1 type 1 (802.11 AMP) status 0x01 (Bluetooth only)
-...
+A2MP fixed channel do not have sk
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h     |    2 +
- include/net/bluetooth/hci_core.h |   13 ++++++
- net/bluetooth/a2mp.c             |   85 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 100 insertions(+)
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/a2mp.c          |    3 +--
+ net/bluetooth/l2cap_core.c    |   17 +++++++++++++++--
+ 3 files changed, 17 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 2eb46ee..c9aa9c5 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -15,6 +15,8 @@
- #ifndef __A2MP_H
- #define __A2MP_H
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index a8c4457..e36f7c5 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -576,6 +576,7 @@ struct l2cap_conn {
+ #define L2CAP_CHAN_RAW			1
+ #define L2CAP_CHAN_CONN_LESS		2
+ #define L2CAP_CHAN_CONN_ORIENTED	3
++#define L2CAP_CHAN_CONN_FIX_A2MP	4
  
-+#define A2MP_FEAT_EXT	0x8000
-+
- struct amp_mgr {
- 	struct list_head	list;
- 	struct l2cap_conn	*l2cap_conn;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 16ab35d..67e8eaa 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -644,6 +644,19 @@ static inline void hci_set_drvdata(struct hci_dev *hdev, void *data)
- 	dev_set_drvdata(&hdev->dev, data);
- }
- 
-+/* hci_dev_list shall be locked */
-+static inline uint8_t __hci_num_ctrl(void)
-+{
-+	uint8_t count = 0;
-+	struct list_head *p;
-+
-+	list_for_each(p, &hci_dev_list) {
-+		count++;
-+	}
-+
-+	return count;
-+}
-+
- struct hci_dev *hci_dev_get(int index);
- struct hci_dev *hci_get_route(bdaddr_t *src, bdaddr_t *dst);
- 
+ /* ----- L2CAP socket info ----- */
+ #define l2cap_pi(sk) ((struct l2cap_pinfo *) sk)
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 4f3e6f9..b4eb294 100644
+index 4675785..aa93e0b 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -63,6 +63,36 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
- 	kfree(cmd);
- }
+@@ -462,8 +462,7 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
  
-+static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
-+{
-+	cl->id = 0;
-+	cl->type = 0;
-+	cl->status = 1;
-+}
-+
-+/* hci_dev_list shall be locked */
-+static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl, u8 num_ctrl)
-+{
-+	int i = 0;
-+	struct hci_dev *hdev;
-+
-+	__a2mp_cl_bredr(cl);
-+
-+	list_for_each_entry(hdev, &hci_dev_list, list) {
-+		/* Iterate through AMP controllers */
-+		if (hdev->id == HCI_BREDR_ID)
-+			continue;
-+
-+		/* Starting from second entry */
-+		if (++i >= num_ctrl)
-+			return;
-+
-+		cl[i].id = hdev->id;
-+		cl[i].type = hdev->amp_type;
-+		cl[i].status = hdev->amp_status;
-+	}
-+}
-+
- /* Processing A2MP messages */
- static int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
- 			    struct a2mp_cmd *hdr)
-@@ -79,6 +109,58 @@ static int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
- 	return 0;
- }
+ 	hci_conn_hold(conn->hcon);
  
-+static inline int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
-+				    struct a2mp_cmd *hdr)
-+{
-+	struct a2mp_discov_req *req = (struct a2mp_discov_req *) skb->data;
-+	u16 len = le16_to_cpu(hdr->len);
-+	struct a2mp_discov_rsp *rsp;
-+	u16 ext_feat;
-+	u8 num_ctrl;
+-	chan->omtu = L2CAP_A2MP_DEFAULT_MTU;
+-	chan->imtu = L2CAP_A2MP_DEFAULT_MTU;
++	chan->chan_type = L2CAP_CHAN_CONN_FIX_A2MP;
+ 	chan->flush_to = L2CAP_DEFAULT_FLUSH_TO;
+ 
+ 	chan->ops = &a2mp_chan_ops;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b6d0d0b..d0aeb56 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -453,6 +453,13 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ 		chan->omtu = L2CAP_DEFAULT_MTU;
+ 		break;
+ 
++	case L2CAP_CHAN_CONN_FIX_A2MP:
++		chan->scid = L2CAP_CID_A2MP;
++		chan->dcid = L2CAP_CID_A2MP;
++		chan->omtu = L2CAP_A2MP_DEFAULT_MTU;
++		chan->imtu = L2CAP_A2MP_DEFAULT_MTU;
++		break;
 +
-+	if (len < sizeof(*req))
-+		return -EINVAL;
-+
-+	skb_pull(skb, sizeof(*req));
-+
-+	ext_feat = le16_to_cpu(req->ext_feat);
-+
-+	BT_DBG("mtu %d efm 0x%4.4x", le16_to_cpu(req->mtu), ext_feat);
-+
-+	/* check that packet is not broken for now */
-+	while (ext_feat & A2MP_FEAT_EXT) {
-+		if (len < sizeof(ext_feat))
-+			return -EINVAL;
-+
-+		ext_feat = get_unaligned_le16(skb->data);
-+		BT_DBG("efm 0x%4.4x", ext_feat);
-+		len -= sizeof(ext_feat);
-+		skb_pull(skb, sizeof(ext_feat));
-+	}
-+
-+	read_lock(&hci_dev_list_lock);
-+
-+	num_ctrl = __hci_num_ctrl();
-+	len = num_ctrl * sizeof(struct a2mp_cl) + sizeof(*rsp);
-+	rsp = kmalloc(len, GFP_ATOMIC);
-+	if (!rsp) {
-+		read_unlock(&hci_dev_list_lock);
-+		return -ENOMEM;
-+	}
-+
-+	rsp->mtu = cpu_to_le16(L2CAP_A2MP_DEFAULT_MTU);
-+	rsp->ext_feat = 0;
-+
-+	__a2mp_add_cl(mgr, rsp->cl, num_ctrl);
-+
-+	read_unlock(&hci_dev_list_lock);
-+
-+	a2mp_send(mgr, A2MP_DISCOVER_RSP, hdr->ident, len, rsp);
-+
-+	kfree(rsp);
-+	return 0;
-+}
-+
- /* Handle A2MP signalling */
- static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 	default:
+ 		/* Raw socket can send/recv signalling messages only */
+ 		chan->scid = L2CAP_CID_SIGNALING;
+@@ -483,7 +490,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
  {
-@@ -109,6 +191,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
- 			break;
+ 	struct sock *sk = chan->sk;
+ 	struct l2cap_conn *conn = chan->conn;
+-	struct sock *parent = bt_sk(sk)->parent;
++	struct sock *parent;
  
- 		case A2MP_DISCOVER_REQ:
-+			err = a2mp_discover_req(mgr, skb, hdr);
-+			break;
+ 	__clear_chan_timer(chan);
+ 
+@@ -499,6 +506,9 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 		hci_conn_put(conn->hcon);
+ 	}
+ 
++	if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
++		goto clean;
 +
- 		case A2MP_CHANGE_NOTIFY:
- 		case A2MP_GETINFO_REQ:
- 		case A2MP_GETAMPASSOC_REQ:
+ 	lock_sock(sk);
+ 
+ 	__l2cap_state_change(chan, BT_CLOSED);
+@@ -507,6 +517,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 	if (err)
+ 		__l2cap_chan_set_err(chan, err);
+ 
++	parent = bt_sk(sk)->parent;
+ 	if (parent) {
+ 		bt_accept_unlink(sk);
+ 		parent->sk_data_ready(parent, 0);
+@@ -519,6 +530,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 			test_bit(CONF_INPUT_DONE, &chan->conf_state)))
+ 		return;
+ 
++clean:
+ 	skb_queue_purge(&chan->tx_q);
+ 
+ 	if (chan->mode == L2CAP_MODE_ERTM) {
+@@ -1543,7 +1555,8 @@ static void l2cap_monitor_timeout(struct work_struct *work)
+ 	l2cap_chan_lock(chan);
+ 
+ 	if (chan->retry_count >= chan->remote_max_tx) {
+-		l2cap_send_disconn_req(chan->conn, chan, ECONNABORTED);
++		if (chan->chan_type != L2CAP_CHAN_CONN_FIX_A2MP)
++			l2cap_send_disconn_req(chan->conn, chan, ECONNABORTED);
+ 		l2cap_chan_unlock(chan);
+ 		l2cap_chan_put(chan);
+ 		return;
 -- 
 1.7.9.5
 
