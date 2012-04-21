@@ -1,63 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1335004527.16897.337.camel@aeonflux>
-References: <CAB7rCTjRzTZP6TDgsrWvFxE8zuFuYDBQdMnjyvnM4p6Cw=ro2g@mail.gmail.com>
-	<1335004527.16897.337.camel@aeonflux>
-Date: Sat, 21 Apr 2012 12:06:35 -0500
-Message-ID: <CAB7rCTiu18D8h611avpWqP9fD2STaWMErN7bSv-af-7yvraQaw@mail.gmail.com>
-Subject: Re: PTS / linkkey issue
-From: Mike <puffy.taco@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20120327170741.GF9856@joana>
+References: <1332865260-3779-1-git-send-email-marcel@holtmann.org>
+	<20120327170741.GF9856@joana>
+Date: Sat, 21 Apr 2012 14:00:40 -0300
+Message-ID: <CACJA=fUhctkObH22YB62CD+7cnanA0-FSBKG8QJFZgzkhuDN2g@mail.gmail.com>
+Subject: Re: [PATCH] MAINTAINERS: update Bluetooth tree locations
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Gustavo Padovan <gustavo@padovan.org>, Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Marcel/Gustavo,
 
-On Sat, Apr 21, 2012 at 5:35 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+On Tue, Mar 27, 2012 at 2:07 PM, Gustavo Padovan <gustavo@padovan.org> wrot=
 e:
-> Hi Mike,
+> Hi Marcel,
 >
->> I'm having a somewhat relate issue to Vishal AGARWAL [1]. =A0The trouble
->> I have is that the PTS system is requesting auth type 0, and Bluez
->> happily obliges. =A0This leaves the PTS device as temporary, and BlueZ
->> then deletes this device after the end of the connection. =A0This
->> prevents me from being able to pass TP/OOR/BV-02-I: [HF reconnects to
->> AG]. =A0The code is designed to periodically reconnect to the AG after
->> it detects a link timeout. =A0But, if BlueZ has deleted the device, I
->> don't do that. =A0This also somewhat applies to the A2DP test cases, as
->> my device must be left in pairing mode in order for the tests to pass.
+> * Marcel Holtmann <marcel@holtmann.org> [2012-03-27 18:21:00 +0200]:
+>
+>> Make use of a shared tree setup to limit the confusions on which
+>> tree is current.
 >>
->> So, my question to people who have used PTS, is there a way to get the
->> PTS to perform a pairing that is not 0x00 MITM Protection Not Required
->> =96 No Bonding. Numeric comparison with automatic accept allowed? =A0I'm
->> using an older kernel that doesn't have the mgmt interface (2.6.33
->> with some features/fixes backported from newer kernels) but am using
->> the latest BlueZ from git (at least of a month ago or so). =A0But even
->> so, the proposal of keeping the linkkey around for the ACL session
->> would be useless, I think, because the intent is to have a link
->> timeout event.
+>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>> ---
+>> =A0MAINTAINERS | =A0 =A08 ++++----
+>> =A01 files changed, 4 insertions(+), 4 deletions(-)
 >
-> can you quickly check if for some weird reason the PTS uses debug keys
-> or if you enabled debug keys within BlueZ.
+> Applied to the new bluetooth tree. :)
 >
-> We treat debug keys even worse than no bonding. Unless you set DebugKeys
-> in /etc/bluetooth/main.conf they are thrown out right away. However be
-> really careful here. That option is only for debugging. You should never
-> ever leave that on in a production device. You would make your device
-> vulnerable like no tomorrow.
->
-> Regards
->
-> Marcel
->
->
+> =A0 =A0 =A0 =A0Gustavo
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 
-I checked hci dumps of both the init of my unit and the trace from the
-PTS run, and neither had sent the HCI_Write_Simple_Pairing_Debug_mode
-command.  Plus we can see that the key type is 0x04, Unauthenticated
-Combination Key.  I also verified that DebugKeys was false in
-main.conf.
+We need to update kernel trees in bluez.org too.
 
-Thanks,
-Mike
+Andre
