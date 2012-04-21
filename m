@@ -1,82 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_N+pi8sWSPtSv+G9LmWg0bNEXgEK+LKxn8F0wv8ygoj7Q@mail.gmail.com>
-References: <1334836112-25482-1-git-send-email-hemant.gupta@stericsson.com>
-	<CAJdJm_N+pi8sWSPtSv+G9LmWg0bNEXgEK+LKxn8F0wv8ygoj7Q@mail.gmail.com>
-Date: Sat, 21 Apr 2012 13:47:06 +0530
-Message-ID: <CACj007mpjMuUe-q5DioAQJFhUM8mpzWXU93S111NOq075u_QZQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] Store LE device address type with primary list
-From: Hemant Gupta <hemantgupta.ste@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Hemant Gupta <hemant.gupta@stericsson.com>,
-	linux-bluetooth@vger.kernel.org
+In-Reply-To: <CAB7rCTiRt9H9+xr6Txt=NnSFunSTT=WHYcJ-qWWPHg7ZgXQdKw@mail.gmail.com>
+References: <CAB7rCTjRzTZP6TDgsrWvFxE8zuFuYDBQdMnjyvnM4p6Cw=ro2g@mail.gmail.com>
+	<014a01cd1f55$aeff71b0$0cfe5510$@ytram.com>
+	<CAB7rCTiRt9H9+xr6Txt=NnSFunSTT=WHYcJ-qWWPHg7ZgXQdKw@mail.gmail.com>
+Date: Fri, 20 Apr 2012 20:57:48 -0500
+Message-ID: <CAB7rCTi+o-C91zTHw2STZw9USfS_fKrV+EenstQQ1pM7-=QX_w@mail.gmail.com>
+Subject: Re: PTS / linkkey issue
+From: Mike <puffy.taco@gmail.com>
+To: wyrles@ytram.com
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
-
-On Fri, Apr 20, 2012 at 11:09 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Hemant,
+On Fri, Apr 20, 2012 at 7:45 PM, Mike <puffy.taco@gmail.com> wrote:
+> Hi Tom,
 >
-> On Thu, Apr 19, 2012 at 7:48 AM, Hemant Gupta
-> <hemant.gupta@stericsson.com> wrote:
->> @@ -1920,13 +1920,17 @@ static void create_stored_device_from_primary(char *key, char *value,
->>        struct btd_adapter *adapter = user_data;
->>        struct btd_device *device;
->>        GSList *services, *uuids, *l;
->> +       addr_type_t addr_type;
+> On Fri, Apr 20, 2012 at 7:28 PM, Tom Allebrandi <wyrles@ytram.com> wrote:
+>> Hi Mike -
 >>
->>        if (g_slist_find_custom(adapter->devices,
->>                        key, (GCompareFunc) device_address_cmp))
->>                return;
+>>> -----Original Message-----
+>>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>>> owner@vger.kernel.org] On Behalf Of Mike
+>>> Sent: Friday, April 20, 2012 3:40 PM
+>>> To: linux-bluetooth
+>>> Subject: PTS / linkkey issue
+>>>
+>>> Hi,
+>>>
+>>> I'm having a somewhat relate issue to Vishal AGARWAL [1].  The trouble I
+>>> have is that the PTS system is requesting auth type 0, and Bluez happily
+>>> obliges.  This leaves the PTS device as temporary, and BlueZ then deletes
+>> this
+>>> device after the end of the connection.  This prevents me from being able
+>> to
+>>> pass TP/OOR/BV-02-I: [HF reconnects to AG].  The code is designed to
+>>> periodically reconnect to the AG after it detects a link timeout.  But, if
+>> BlueZ
+>>> has deleted the device, I don't do that.  This also somewhat applies to
+>> the
+>>> A2DP test cases, as my device must be left in pairing mode in order for
+>> the
+>>> tests to pass.
+>>>
+>>> So, my question to people who have used PTS, is there a way to get the PTS
+>>> to perform a pairing that is not 0x00 MITM Protection Not Required - No
+>>> Bonding. Numeric comparison with automatic accept allowed?  I'm using an
+>>> older kernel that doesn't have the mgmt interface (2.6.33 with some
+>>> features/fixes backported from newer kernels) but am using the latest
+>> BlueZ
+>>> from git (at least of a month ago or so).  But even so, the proposal of
+>> keeping
+>>> the linkkey around for the ACL session would be useless, I think, because
+>> the
+>>> intent is to have a link timeout event.
+>>>
+>>> Thanks,
+>>> Mike
+>>>
+>>> [1] http://www.spinics.net/lists/linux-bluetooth/msg23346.html
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+>> in
+>>> the body of a message to majordomo@vger.kernel.org More majordomo
+>>> info at  http://vger.kernel.org/majordomo-info.html
 >>
->> -       /* FIXME: Get the correct LE addr type (public/random) */
->> -       device = device_create(connection, adapter, key, ADDR_TYPE_LE_PUBLIC);
->> +       sscanf(value, "%d ", &addr_type);
->> +       /* Increment by 2 (address type and space) */
->> +       value += 2;
->
-> I think it is a good idea to check for sscanf() return and if it
-> fails, assume addr_type as ADDR_TYPE_LE_PUBLIC the value as primary
-> data only. Remember that the system may have previously stored primary
-> data in the old format.
->
-Thanks, will update this in next patch.
-
->> +
->> +       device = device_create(connection, adapter, key, addr_type);
->>        if (!device)
->>                return;
+>> PTS may be requesting "no man in the middle protection" but what is your
+>> system (BlueZ) requesting? If your system is also requesting no MITM then
+>> that would explain what you are seeing.
+>>
+>> If your system is requesting "man in the middle protection", then I think
+>> that is what gets used resulting in an authenticated link key. Do you have
+>> an HCIdump or PTSPV trace around so we can see what your device is asking
+>> for.
+>>
+>> At least that's the way I read the core spec. I could be wrong, that area is
+>> a little confusing :-).
+>>
+>> --- tom
+>> tom allebrandi
+>> wyrles@ytram.com
 >>
 >
+> There's not much to the trace.  The PTS' response to the HCI IO
+> Capability request event gives a 0x00.  The default in the BlueZ code
+> is 0x04, but it appears it gives that up and takes the 0x00.  In
+> pairing with an iPhone, I see BlueZ respond with a 0x04 code, and
+> eventually both sides have indicated 0x04.
 >
-> Are you planning to add support for other address types in BlueZ GATT
-> server? It would be nice if you could share your plans on this topic.
-
-For the moment no. I was testing with Nordic device which has random
-device address
-type, and found this issue when trying to connect to nordic device
-again after rebooting
-our device. Since BlueZ creates the stored device from primary and was
-taking address
-type as Public, reconnection was not possible.
-
+> The bluetoothd log with PTS containted:
 >
-> Best Regards,
-> --
-> Anderson Lizardo
-> Instituto Nokia de Tecnologia - INdT
-> Manaus - Brazil
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> bluetoothd[501]: plugins/hciops.c:link_key_notify() key type 0x04 old
+> key type 0x04
+> bluetoothd[501]: plugins/hciops.c:link_key_notify() local auth 0x00
+> and remote auth 0x00
+>
+> Thanks,
+> Mike
 
+I see that there are at least two open issues filed against PTS on this:
 
+https://www.bluetooth.org/pts/issues/view_issue.cfm?id=6925
+https://www.bluetooth.org/pts/issues/view_issue.cfm?id=6942
 
--- 
-Best Regards
-Hemant Gupta
-ST-Ericsson India
+These have been open for almost 2 years!  Tom, is this something that
+is actively being worked on by the Bluetooth SIG?  I see it was
+assigned to you at one point.  Does BlueZ have something wrong?  It
+seems like an option to select General Bonding would fix things for a
+bunch of people!
+
+Thanks,
+Mike
