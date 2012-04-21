@@ -1,93 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	padovan@profusion.mobi,
-	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 1/3] Bluetooth: Move hci_alloc/free_dev close to hci_register/unregister_dev
-Date: Sun, 22 Apr 2012 14:39:57 +0200
-Message-Id: <1335098400-24571-1-git-send-email-dh.herrmann@googlemail.com>
+Date: Sat, 21 Apr 2012 18:37:03 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] MAINTAINERS: update Bluetooth tree locations
+Message-ID: <20120421213703.GA8142@joana>
+References: <1332865260-3779-1-git-send-email-marcel@holtmann.org>
+ <20120327170741.GF9856@joana>
+ <CACJA=fUhctkObH22YB62CD+7cnanA0-FSBKG8QJFZgzkhuDN2g@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CACJA=fUhctkObH22YB62CD+7cnanA0-FSBKG8QJFZgzkhuDN2g@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-alloc() and register() (and free() and unregister()) are closely related
-so move them more closely together. This will also allow to move
-functionality from register() to alloc() without needing
-forward-declarations.
+Hi Andre,
 
-Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
----
- net/bluetooth/hci_core.c |   52 +++++++++++++++++++++++-----------------------
- 1 file changed, 26 insertions(+), 26 deletions(-)
+* Andre Guedes <andre.guedes@openbossa.org> [2012-04-21 14:00:40 -0300]:
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2b98c33..1b9362c 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1093,32 +1093,6 @@ static const struct rfkill_ops hci_rfkill_ops = {
- 	.set_block = hci_rfkill_set_block,
- };
- 
--/* Alloc HCI device */
--struct hci_dev *hci_alloc_dev(void)
--{
--	struct hci_dev *hdev;
--
--	hdev = kzalloc(sizeof(struct hci_dev), GFP_KERNEL);
--	if (!hdev)
--		return NULL;
--
--	hci_init_sysfs(hdev);
--	skb_queue_head_init(&hdev->driver_init);
--
--	return hdev;
--}
--EXPORT_SYMBOL(hci_alloc_dev);
--
--/* Free HCI device */
--void hci_free_dev(struct hci_dev *hdev)
--{
--	skb_queue_purge(&hdev->driver_init);
--
--	/* will free via device release */
--	put_device(&hdev->dev);
--}
--EXPORT_SYMBOL(hci_free_dev);
--
- static void hci_power_on(struct work_struct *work)
- {
- 	struct hci_dev *hdev = container_of(work, struct hci_dev, power_on);
-@@ -1736,6 +1710,32 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
- 	return 0;
- }
- 
-+/* Alloc HCI device */
-+struct hci_dev *hci_alloc_dev(void)
-+{
-+	struct hci_dev *hdev;
-+
-+	hdev = kzalloc(sizeof(struct hci_dev), GFP_KERNEL);
-+	if (!hdev)
-+		return NULL;
-+
-+	hci_init_sysfs(hdev);
-+	skb_queue_head_init(&hdev->driver_init);
-+
-+	return hdev;
-+}
-+EXPORT_SYMBOL(hci_alloc_dev);
-+
-+/* Free HCI device */
-+void hci_free_dev(struct hci_dev *hdev)
-+{
-+	skb_queue_purge(&hdev->driver_init);
-+
-+	/* will free via device release */
-+	put_device(&hdev->dev);
-+}
-+EXPORT_SYMBOL(hci_free_dev);
-+
- /* Register HCI device */
- int hci_register_dev(struct hci_dev *hdev)
- {
--- 
-1.7.10
+> Hi Marcel/Gustavo,
+>=20
+> On Tue, Mar 27, 2012 at 2:07 PM, Gustavo Padovan <gustavo@padovan.org> wr=
+ote:
+> > Hi Marcel,
+> >
+> > * Marcel Holtmann <marcel@holtmann.org> [2012-03-27 18:21:00 +0200]:
+> >
+> >> Make use of a shared tree setup to limit the confusions on which
+> >> tree is current.
+> >>
+> >> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> >> ---
+> >> =A0MAINTAINERS | =A0 =A08 ++++----
+> >> =A01 files changed, 4 insertions(+), 4 deletions(-)
+> >
+> > Applied to the new bluetooth tree. :)
+> >
+> > =A0 =A0 =A0 =A0Gustavo
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetoo=
+th" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>=20
+> We need to update kernel trees in bluez.org too.
+
+I just fixed it, thanks for the report.
+
+	Gustavo
