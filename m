@@ -4,187 +4,90 @@ To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	padovan@profusion.mobi,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 2/3] Bluetooth: Move device initialization to hci_alloc_dev()
-Date: Sun, 22 Apr 2012 14:39:58 +0200
-Message-Id: <1335098400-24571-2-git-send-email-dh.herrmann@googlemail.com>
-In-Reply-To: <1335098400-24571-1-git-send-email-dh.herrmann@googlemail.com>
-References: <1335098400-24571-1-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 1/3] Bluetooth: Move hci_alloc/free_dev close to hci_register/unregister_dev
+Date: Sun, 22 Apr 2012 14:39:57 +0200
+Message-Id: <1335098400-24571-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We currently initialize locks, lists, works, etc. in hci_register_dev()
-(hci_alloc_dev() was added later) which is bogus because an hdev is in an
-invalid state if it is not registered.
-This patch moves all memory initialization to hci_alloc_dev(). Device
-registering and registration of sub-modules is still left in
-hci_register_dev() as it belongs there.
-
-The benefit is (despite cleaning up the code-base) we can now always be
-sure that an hdev is a valid object and can be locked and worked on even
-though it may not be registered.
-
-This patch also reorders the initialization to be easier to understand.
-First the memory is initialized, then all generic structures and as last
-step the sub-init functions are called. This guarantees that all
-dependencies are initialized in the right order and makes it also easier
-to find a specific line. We previously initialized it in the same order as
-the "struct hci_dev" is declared which seems pretty random.
+alloc() and register() (and free() and unregister()) are closely related
+so move them more closely together. This will also allow to move
+functionality from register() to alloc() without needing
+forward-declarations.
 
 Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 ---
-Sorry for reordering the calls, it makes reviewing very hard. However, I think
-it improves readability a _lot_. I can resend without reordering if you want.
-
-Regards
-David
-
- net/bluetooth/hci_core.c |  115 +++++++++++++++++++++-------------------------
- 1 file changed, 52 insertions(+), 63 deletions(-)
+ net/bluetooth/hci_core.c |   52 +++++++++++++++++++++++-----------------------
+ 1 file changed, 26 insertions(+), 26 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 1b9362c..1df4b6d 100644
+index 2b98c33..1b9362c 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -1714,13 +1714,63 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
- struct hci_dev *hci_alloc_dev(void)
- {
- 	struct hci_dev *hdev;
-+	int i;
+@@ -1093,32 +1093,6 @@ static const struct rfkill_ops hci_rfkill_ops = {
+ 	.set_block = hci_rfkill_set_block,
+ };
  
- 	hdev = kzalloc(sizeof(struct hci_dev), GFP_KERNEL);
- 	if (!hdev)
- 		return NULL;
- 
+-/* Alloc HCI device */
+-struct hci_dev *hci_alloc_dev(void)
+-{
+-	struct hci_dev *hdev;
+-
+-	hdev = kzalloc(sizeof(struct hci_dev), GFP_KERNEL);
+-	if (!hdev)
+-		return NULL;
+-
 -	hci_init_sysfs(hdev);
-+	hdev->flags = 0;
-+	hdev->dev_flags = 0;
-+	hdev->pkt_type  = (HCI_DM1 | HCI_DH1 | HCI_HV1);
-+	hdev->esco_type = (ESCO_HV1);
-+	hdev->link_mode = (HCI_LM_ACCEPT);
-+	hdev->io_capability = 0x03; /* No Input No Output */
+-	skb_queue_head_init(&hdev->driver_init);
+-
+-	return hdev;
+-}
+-EXPORT_SYMBOL(hci_alloc_dev);
+-
+-/* Free HCI device */
+-void hci_free_dev(struct hci_dev *hdev)
+-{
+-	skb_queue_purge(&hdev->driver_init);
+-
+-	/* will free via device release */
+-	put_device(&hdev->dev);
+-}
+-EXPORT_SYMBOL(hci_free_dev);
+-
+ static void hci_power_on(struct work_struct *work)
+ {
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev, power_on);
+@@ -1736,6 +1710,32 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
+ 	return 0;
+ }
+ 
++/* Alloc HCI device */
++struct hci_dev *hci_alloc_dev(void)
++{
++	struct hci_dev *hdev;
 +
-+	hdev->idle_timeout = 0;
-+	hdev->sniff_max_interval = 800;
-+	hdev->sniff_min_interval = 80;
-+
-+	mutex_init(&hdev->lock);
-+	mutex_init(&hdev->req_lock);
-+
-+	INIT_LIST_HEAD(&hdev->mgmt_pending);
-+	INIT_LIST_HEAD(&hdev->blacklist);
-+	INIT_LIST_HEAD(&hdev->uuids);
-+	INIT_LIST_HEAD(&hdev->link_keys);
-+	INIT_LIST_HEAD(&hdev->long_term_keys);
-+	INIT_LIST_HEAD(&hdev->remote_oob_data);
-+	INIT_LIST_HEAD(&hdev->adv_entries);
-+
-+	INIT_WORK(&hdev->rx_work, hci_rx_work);
-+	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
-+	INIT_WORK(&hdev->tx_work, hci_tx_work);
-+	INIT_WORK(&hdev->power_on, hci_power_on);
-+	INIT_WORK(&hdev->le_scan, le_scan_work);
-+
-+	INIT_DELAYED_WORK(&hdev->adv_work, hci_clear_adv_cache);
-+	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
-+	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
-+	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
-+
- 	skb_queue_head_init(&hdev->driver_init);
-+	skb_queue_head_init(&hdev->rx_q);
-+	skb_queue_head_init(&hdev->cmd_q);
-+	skb_queue_head_init(&hdev->raw_q);
-+
-+	init_waitqueue_head(&hdev->req_wait_q);
-+
-+	setup_timer(&hdev->cmd_timer, hci_cmd_timer, (unsigned long) hdev);
-+
-+	memset(&hdev->stat, 0, sizeof(struct hci_dev_stats));
-+	atomic_set(&hdev->promisc, 0);
-+
-+	for (i = 0; i < NUM_REASSEMBLY; i++)
-+		hdev->reassembly[i] = NULL;
++	hdev = kzalloc(sizeof(struct hci_dev), GFP_KERNEL);
++	if (!hdev)
++		return NULL;
 +
 +	hci_init_sysfs(hdev);
-+	discovery_init(hdev);
-+	hci_conn_hash_init(hdev);
- 
- 	return hdev;
- }
-@@ -1740,7 +1790,7 @@ EXPORT_SYMBOL(hci_free_dev);
++	skb_queue_head_init(&hdev->driver_init);
++
++	return hdev;
++}
++EXPORT_SYMBOL(hci_alloc_dev);
++
++/* Free HCI device */
++void hci_free_dev(struct hci_dev *hdev)
++{
++	skb_queue_purge(&hdev->driver_init);
++
++	/* will free via device release */
++	put_device(&hdev->dev);
++}
++EXPORT_SYMBOL(hci_free_dev);
++
+ /* Register HCI device */
  int hci_register_dev(struct hci_dev *hdev)
  {
- 	struct list_head *head, *p;
--	int i, id, error;
-+	int id, error;
- 
- 	if (!hdev->open || !hdev->close)
- 		return -EINVAL;
-@@ -1770,67 +1820,6 @@ int hci_register_dev(struct hci_dev *hdev)
- 
- 	list_add(&hdev->list, head);
- 
--	mutex_init(&hdev->lock);
--
--	hdev->flags = 0;
--	hdev->dev_flags = 0;
--	hdev->pkt_type  = (HCI_DM1 | HCI_DH1 | HCI_HV1);
--	hdev->esco_type = (ESCO_HV1);
--	hdev->link_mode = (HCI_LM_ACCEPT);
--	hdev->io_capability = 0x03; /* No Input No Output */
--
--	hdev->idle_timeout = 0;
--	hdev->sniff_max_interval = 800;
--	hdev->sniff_min_interval = 80;
--
--	INIT_WORK(&hdev->rx_work, hci_rx_work);
--	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
--	INIT_WORK(&hdev->tx_work, hci_tx_work);
--
--
--	skb_queue_head_init(&hdev->rx_q);
--	skb_queue_head_init(&hdev->cmd_q);
--	skb_queue_head_init(&hdev->raw_q);
--
--	setup_timer(&hdev->cmd_timer, hci_cmd_timer, (unsigned long) hdev);
--
--	for (i = 0; i < NUM_REASSEMBLY; i++)
--		hdev->reassembly[i] = NULL;
--
--	init_waitqueue_head(&hdev->req_wait_q);
--	mutex_init(&hdev->req_lock);
--
--	discovery_init(hdev);
--
--	hci_conn_hash_init(hdev);
--
--	INIT_LIST_HEAD(&hdev->mgmt_pending);
--
--	INIT_LIST_HEAD(&hdev->blacklist);
--
--	INIT_LIST_HEAD(&hdev->uuids);
--
--	INIT_LIST_HEAD(&hdev->link_keys);
--	INIT_LIST_HEAD(&hdev->long_term_keys);
--
--	INIT_LIST_HEAD(&hdev->remote_oob_data);
--
--	INIT_LIST_HEAD(&hdev->adv_entries);
--
--	INIT_DELAYED_WORK(&hdev->adv_work, hci_clear_adv_cache);
--	INIT_WORK(&hdev->power_on, hci_power_on);
--	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
--
--	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
--
--	memset(&hdev->stat, 0, sizeof(struct hci_dev_stats));
--
--	atomic_set(&hdev->promisc, 0);
--
--	INIT_WORK(&hdev->le_scan, le_scan_work);
--
--	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
--
- 	write_unlock(&hci_dev_list_lock);
- 
- 	hdev->workqueue = alloc_workqueue(hdev->name, WQ_HIGHPRI | WQ_UNBOUND |
 -- 
 1.7.10
