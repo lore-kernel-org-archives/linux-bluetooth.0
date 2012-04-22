@@ -1,49 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1335102475.16897.351.camel@aeonflux>
-Subject: Re: [PATCH 2/3] Bluetooth: Move device initialization to
- hci_alloc_dev()
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Date: Sun, 22 Apr 2012 15:47:55 +0200
-In-Reply-To: <1335098400-24571-2-git-send-email-dh.herrmann@googlemail.com>
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	padovan@profusion.mobi,
+	David Herrmann <dh.herrmann@googlemail.com>
+Subject: [PATCH 3/3] Bluetooth: Remove unneeded initialization in hci_alloc_dev()
+Date: Sun, 22 Apr 2012 14:39:59 +0200
+Message-Id: <1335098400-24571-3-git-send-email-dh.herrmann@googlemail.com>
+In-Reply-To: <1335098400-24571-1-git-send-email-dh.herrmann@googlemail.com>
 References: <1335098400-24571-1-git-send-email-dh.herrmann@googlemail.com>
-	 <1335098400-24571-2-git-send-email-dh.herrmann@googlemail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+We allocate memory with kzalloc() so there is no need to call
+memset(..., 0, ...) or similar.
 
-> We currently initialize locks, lists, works, etc. in hci_register_dev()
-> (hci_alloc_dev() was added later) which is bogus because an hdev is in an
-> invalid state if it is not registered.
-> This patch moves all memory initialization to hci_alloc_dev(). Device
-> registering and registration of sub-modules is still left in
-> hci_register_dev() as it belongs there.
-> 
-> The benefit is (despite cleaning up the code-base) we can now always be
-> sure that an hdev is a valid object and can be locked and worked on even
-> though it may not be registered.
-> 
-> This patch also reorders the initialization to be easier to understand.
-> First the memory is initialized, then all generic structures and as last
-> step the sub-init functions are called. This guarantees that all
-> dependencies are initialized in the right order and makes it also easier
-> to find a specific line. We previously initialized it in the same order as
-> the "struct hci_dev" is declared which seems pretty random.
-> 
-> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
-> ---
-> Sorry for reordering the calls, it makes reviewing very hard. However, I think
-> it improves readability a _lot_. I can resend without reordering if you want.
+Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
+---
+For the curious reader: ATOMIC_INIT(x) is defined to { (x) } for every
+architecture so we can safely remove it, too.
 
-I am fine with this. And I could not spot any issue here. So I went
-ahead and applied all 3 patches to bluetooth-next tree.
+ net/bluetooth/hci_core.c |   10 ----------
+ 1 file changed, 10 deletions(-)
 
-Regards
-
-Marcel
-
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 1df4b6d..3b97ad3 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1714,20 +1714,16 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
+ struct hci_dev *hci_alloc_dev(void)
+ {
+ 	struct hci_dev *hdev;
+-	int i;
+ 
+ 	hdev = kzalloc(sizeof(struct hci_dev), GFP_KERNEL);
+ 	if (!hdev)
+ 		return NULL;
+ 
+-	hdev->flags = 0;
+-	hdev->dev_flags = 0;
+ 	hdev->pkt_type  = (HCI_DM1 | HCI_DH1 | HCI_HV1);
+ 	hdev->esco_type = (ESCO_HV1);
+ 	hdev->link_mode = (HCI_LM_ACCEPT);
+ 	hdev->io_capability = 0x03; /* No Input No Output */
+ 
+-	hdev->idle_timeout = 0;
+ 	hdev->sniff_max_interval = 800;
+ 	hdev->sniff_min_interval = 80;
+ 
+@@ -1762,12 +1758,6 @@ struct hci_dev *hci_alloc_dev(void)
+ 
+ 	setup_timer(&hdev->cmd_timer, hci_cmd_timer, (unsigned long) hdev);
+ 
+-	memset(&hdev->stat, 0, sizeof(struct hci_dev_stats));
+-	atomic_set(&hdev->promisc, 0);
+-
+-	for (i = 0; i < NUM_REASSEMBLY; i++)
+-		hdev->reassembly[i] = NULL;
+-
+ 	hci_init_sysfs(hdev);
+ 	discovery_init(hdev);
+ 	hci_conn_hash_init(hdev);
+-- 
+1.7.10
