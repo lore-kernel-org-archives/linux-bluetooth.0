@@ -1,42 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Apr 2012 09:47:20 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org, Ido Yariv <ido@wizery.com>,
-	Arik Nemtsov <arik@wizery.com>
-Subject: Re: [PATCH 1/2] Bluetooth: Search global l2cap channels by src/dst
- addresses
-Message-ID: <20120423124720.GA18564@joana>
-References: <1334947568-3437-1-git-send-email-jprvita@openbossa.org>
+Date: Mon, 23 Apr 2012 13:41:30 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] core: Remove DiscoverSchedulerInterval option from
+ main.conf
+Message-ID: <20120423104130.GA11747@x220>
+References: <1334858615-11750-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1334947568-3437-1-git-send-email-jprvita@openbossa.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1334858615-11750-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi João,
+Hi Luiz,
 
-* João Paulo Rechi Vita <jprvita@openbossa.org> [2012-04-20 15:46:07 -0300]:
-
-> From: Ido Yariv <ido@wizery.com>
-> 
-> The cid or psm and the source address might not be enough to uniquely
-> identify a global channel, especially when the source address is our
-> own.
-> 
-> For instance, when trying to communicate with two LE devices in master
-> mode, data received from the both devices is sent to the same socket.
-> 
-> Fix this by taking the destination address into account when choosing
-> the socket.
-> 
-> Signed-off-by: Ido Yariv <ido@wizery.com>
-> Signed-off-by: Arik Nemtsov <arik@wizery.com>
-> Tested-by: João Paulo Rechi Vita <jprvita@openbossa.org>
+On Thu, Apr 19, 2012, Luiz Augusto von Dentz wrote:
+> This option was designed to be the time where name resolving would happen
+> in between inquiries, but with the introdution of mgmt interface this is
+> no longer the case as it treats the discovery as both inquiry/scan + name
+> resolving and keeping it just to delay discovery rounds is probably
+> useless.
 > ---
->  net/bluetooth/l2cap_core.c |   43 +++++++++++++++++++++++++++++++------------
->  1 files changed, 31 insertions(+), 12 deletions(-)
+>  src/adapter.c |    5 ++---
+>  src/hcid.h    |    1 -
+>  src/main.c    |   10 ----------
+>  src/main.conf |    4 ----
+>  4 files changed, 2 insertions(+), 18 deletions(-)
 
-Patch has been applied, thanks.
+Applied. Thanks.
 
-	Gustavo
+Johan
