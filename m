@@ -1,40 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Apr 2012 13:15:35 +0300
+Date: Mon, 23 Apr 2012 12:57:16 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] input: add error message when auth fails
-Message-ID: <20120423101535.GA8903@x220>
-References: <1334943375-23475-1-git-send-email-gustavo@padovan.org>
+Subject: Re: [RFC BlueZ 1/1] core: Fix adapter mode inconsistency
+Message-ID: <20120423095716.GA6922@x220>
+References: <1335170075-12363-1-git-send-email-mikel.astiz.oss@gmail.com>
+ <1335170075-12363-2-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334943375-23475-1-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1335170075-12363-2-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Mikel,
 
-On Fri, Apr 20, 2012, Gustavo Padovan wrote:
-> ---
->  input/server.c |    2 ++
->  1 file changed, 2 insertions(+)
+On Mon, Apr 23, 2012, Mikel Astiz wrote:
+> The mode change in btd_adapter_start() doesn't check if the adapter is
+> discoverable, creating an inconsistency between the plugin and the core.
 > 
-> diff --git a/input/server.c b/input/server.c
-> index cea08d1..ed09a73 100644
-> --- a/input/server.c
-> +++ b/input/server.c
-> @@ -176,6 +176,8 @@ static void confirm_event_cb(GIOChannel *chan, gpointer user_data)
->  	if (ret == 0)
->  		return;
->  
-> +	error("Authorization failed(%d): %s", -ret, strerror(-ret));
-> +
->  	g_io_channel_unref(server->confirm);
->  	server->confirm = NULL;
+> Using the management interface it is easy to reproduce the problem, by
+> starting BlueZ while the adapter is discoverable. After this, the state
+> cannot be changed.
+> ---
+>  src/adapter.c |    6 +++++-
+>  1 files changed, 5 insertions(+), 1 deletions(-)
 
-Thanks, applied after making the message a bit more informative.
-Remember that error() doesn't include any context info like DBG() does,
-i.e. you wouldn't even know that the error message is from the input
-plugin.
+Thanks. Applied, but I really wish we could clean up and simplify this
+code. Probably adapter->mode and adapter->scan_mode should be completely
+removed and new connectable and discoverable boolean variables added
+(since this is how the mgmt API anyway presents these settings).
 
 Johan
