@@ -1,35 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Apr 2012 13:33:30 +0300
+Date: Mon, 23 Apr 2012 13:15:35 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd] client: Fix possible memory leak on pbap module
-Message-ID: <20120423103330.GA10109@x220>
-References: <1334757111-19982-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH] input: add error message when auth fails
+Message-ID: <20120423101535.GA8903@x220>
+References: <1334943375-23475-1-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334757111-19982-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1334943375-23475-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Gustavo,
 
-On Wed, Apr 18, 2012, Luiz Augusto von Dentz wrote:
-> 16 bytes in 1 blocks are definitely lost in loss record 26 of 146
->    at 0x4A075B2: realloc (vg_replace_malloc.c:525)
->    by 0x3B5104B76D: g_realloc (in /lib64/libglib-2.0.so.0.3000.2)
->    by 0x3B51064A96: ??? (in /lib64/libglib-2.0.so.0.3000.2)
->    by 0x3B51065156: g_string_insert_len (in /lib64/libglib-2.0.so.0.3000.2)
->    by 0x3B510305BC: ??? (in /lib64/libglib-2.0.so.0.3000.2)
->    by 0x3B51031BE7: g_build_filename (in /lib64/libglib-2.0.so.0.3000.2)
->    by 0x416FEE: pbap_select (pbap.c:254)
->    by 0x406CCE: process_message (object.c:224)
->    by 0x3B5301D9A0: ??? (in /lib64/libdbus-1.so.3.5.6)
->    by 0x3B5300F92F: dbus_connection_dispatch (in /lib64/libdbus-1.so.3.5.6)
+On Fri, Apr 20, 2012, Gustavo Padovan wrote:
 > ---
->  client/pbap.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
+>  input/server.c |    2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/input/server.c b/input/server.c
+> index cea08d1..ed09a73 100644
+> --- a/input/server.c
+> +++ b/input/server.c
+> @@ -176,6 +176,8 @@ static void confirm_event_cb(GIOChannel *chan, gpointer user_data)
+>  	if (ret == 0)
+>  		return;
+>  
+> +	error("Authorization failed(%d): %s", -ret, strerror(-ret));
+> +
+>  	g_io_channel_unref(server->confirm);
+>  	server->confirm = NULL;
 
-Applied. Thanks.
+Thanks, applied after making the message a bit more informative.
+Remember that error() doesn't include any context info like DBG() does,
+i.e. you wouldn't even know that the error message is from the input
+plugin.
 
 Johan
