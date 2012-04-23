@@ -1,49 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 23 Apr 2012 10:26:06 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Ulisses Furquim <ulisses@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv7 04/23] Bluetooth: A2MP: Add chan callbacks
+Message-ID: <20120423072604.GB8904@aemeltch-MOBL1>
+References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1334920191-29308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1334920191-29308-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CAA37ikbktPhFA6i_crUo7U-59jEeG4Kj+rAviPwLvSiFwPtARw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1335164553.16897.371.camel@aeonflux>
-References: <CAB7rCTjRzTZP6TDgsrWvFxE8zuFuYDBQdMnjyvnM4p6Cw=ro2g@mail.gmail.com>
-	<1335004527.16897.337.camel@aeonflux>
-	<CAB7rCTiu18D8h611avpWqP9fD2STaWMErN7bSv-af-7yvraQaw@mail.gmail.com>
-	<1335035377.16897.340.camel@aeonflux>
-	<CAB7rCTgxpeXiMqz8__GEzEekkCb79yU--TEq6N=qZMuyuR+SoQ@mail.gmail.com>
-	<1335042808.16897.350.camel@aeonflux>
-	<CAB7rCThjFzL7Ji=eVf_KSrn-DxytG7qdoXb+zf5o+Rgx5JhkXA@mail.gmail.com>
-	<1335125337.16897.357.camel@aeonflux>
-	<CAB7rCTgLNv=BUznKMN3hU3NM_7odUsoELC2LZGYFwX6Xqawg5Q@mail.gmail.com>
-	<1335130524.16897.365.camel@aeonflux>
-	<20120422222246.GA27438@x220.P-661HNU-F1>
-	<1335164553.16897.371.camel@aeonflux>
-Date: Mon, 23 Apr 2012 11:24:06 +0300
-Message-ID: <CABBYNZK9ne2wae=LsO_uxMXR3KvHeLUMGOKYo8EBLeadv0T8WA@mail.gmail.com>
-Subject: Re: PTS / linkkey issue
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>, Mike <puffy.taco@gmail.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CAA37ikbktPhFA6i_crUo7U-59jEeG4Kj+rAviPwLvSiFwPtARw@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Ulisses,
 
-On Mon, Apr 23, 2012 at 10:02 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> I was considering that if pairing is allowed and security is either
-> medium or high, then we force a repairing if the link key is temporary.
->
-> Something like in the area of a no bonding link key is only allowed to
-> connect a security low service. And if pairing is not allowed and you
-> try to access a medium or high security service with no bonding, you
-> will just get rejected.
->
+On Fri, Apr 20, 2012 at 11:09:29AM -0300, Ulisses Furquim wrote:
+> > +static void a2mp_chan_state_change_cb(void *data, int state)
+> > +{
+> > +       struct amp_mgr *mgr = data;
+> > +       struct l2cap_chan *chan;
+> > +
+> > +       if (!mgr)
+> > +               return;
+> > +
+> > +       chan = mgr->a2mp_chan;
+> > +
+> > +       BT_DBG("chan %p state %s", chan, state_to_string(state));
+> > +
+> > +       chan->state = state;
+> 
+> Do we have to l2cap_chan_lock() here? Or is that taken care somewhere else?
 
-But the reattempt could possible generate a no bonding again and if we
-just reject it might cause more IOP problems.
+Yes by caller of state_change
 
-@Mike: You can mark the device as non-temporary by calling
-Adapter.CreateDevice, bluetoothd will attempt to do another sdp browse
-but it should be fine for PTS as we do reversed sdp anyway when
-someone pair to us, I guess that would work as workaround for
-qualification but I wouldn't enable this behavior on production.
+Best regards 
+Andrei Emeltchenko 
 
--- 
-Luiz Augusto von Dentz
