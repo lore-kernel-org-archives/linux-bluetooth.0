@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: [RFCv2 2/6] mac80211: softamp: Adds build config option
-Date: Tue, 24 Apr 2012 16:17:36 +0300
-Message-Id: <1335273460-12682-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 3/6] hwsim: Adds support for BT SOFTAMP for testing
+Date: Tue, 24 Apr 2012 16:17:37 +0300
+Message-Id: <1335273460-12682-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1335273460-12682-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1335273460-12682-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-wireless-owner@vger.kernel.org
@@ -14,43 +14,23 @@ From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/mac80211/Kconfig  |    9 +++++++++
- net/mac80211/Makefile |    2 ++
- 2 files changed, 11 insertions(+)
+ drivers/net/wireless/mac80211_hwsim.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/mac80211/Kconfig b/net/mac80211/Kconfig
-index 96ddb72..661b679 100644
---- a/net/mac80211/Kconfig
-+++ b/net/mac80211/Kconfig
-@@ -67,6 +67,15 @@ config MAC80211_RC_DEFAULT_MINSTREL
+diff --git a/drivers/net/wireless/mac80211_hwsim.c b/drivers/net/wireless/mac80211_hwsim.c
+index b7ce6a6..bff3699 100644
+--- a/drivers/net/wireless/mac80211_hwsim.c
++++ b/drivers/net/wireless/mac80211_hwsim.c
+@@ -1783,7 +1783,8 @@ static int __init init_mac80211_hwsim(void)
+ 			BIT(NL80211_IFTYPE_P2P_CLIENT) |
+ 			BIT(NL80211_IFTYPE_P2P_GO) |
+ 			BIT(NL80211_IFTYPE_ADHOC) |
+-			BIT(NL80211_IFTYPE_MESH_POINT);
++			BIT(NL80211_IFTYPE_MESH_POINT) |
++			BIT(NL80211_IFTYPE_BLUETOOTH_SOFTAMP);
  
- endchoice
- 
-+config MAC80211_BLUETOOTH_SOFTAMP
-+	bool "Bluetooth Soft AMP80211 device"
-+	depends on BT
-+	---help---
-+	  Enable Bluetooth Virtual / Software AMP 80211 controller.
-+	  When AMP is common between two devices data may be routed
-+	  through fast 80211 connection from standard Bluetooth BR/EDR
-+	  connection.
-+
- config MAC80211_RC_DEFAULT
- 	string
- 	default "minstrel_ht" if MAC80211_RC_DEFAULT_MINSTREL && MAC80211_RC_MINSTREL_HT
-diff --git a/net/mac80211/Makefile b/net/mac80211/Makefile
-index 1be7a45..ff0131e 100644
---- a/net/mac80211/Makefile
-+++ b/net/mac80211/Makefile
-@@ -40,6 +40,8 @@ mac80211-$(CONFIG_MAC80211_MESH) += \
- 	mesh_plink.o \
- 	mesh_hwmp.o
- 
-+mac80211-$(CONFIG_MAC80211_BLUETOOTH_SOFTAMP) += virtual_amp.o
-+
- mac80211-$(CONFIG_PM) += pm.o
- 
- CFLAGS_driver-trace.o := -I$(src)
+ 		hw->flags = IEEE80211_HW_MFP_CAPABLE |
+ 			    IEEE80211_HW_SIGNAL_DBM |
 -- 
 1.7.9.5
 
