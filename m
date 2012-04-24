@@ -1,247 +1,288 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Apr 2012 10:47:39 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth 2012-04-23
-Message-ID: <20120424134739.GB9343@joana>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="EVF5PPMfhYS0aIcm"
-Sender: linux-kernel-owner@vger.kernel.org
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: [RFCv2 6/6] mac80211: softamp: Handle data traffic
+Date: Tue, 24 Apr 2012 16:17:40 +0300
+Message-Id: <1335273460-12682-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1335273460-12682-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1335273460-12682-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
---EVF5PPMfhYS0aIcm
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Adds handling for data traffic. The patch is partly based on patch:
+"mac80211: BT3 AMP support".
 
-Hi John,
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/linux/ieee80211.h  |   13 +++++
+ net/mac80211/rx.c          |    4 ++
+ net/mac80211/sta_info.h    |    4 ++
+ net/mac80211/virtual_amp.c |  131 +++++++++++++++++++++++++++++++++++++++++++-
+ net/mac80211/virtual_amp.h |   19 +++++++
+ 5 files changed, 170 insertions(+), 1 deletion(-)
 
-This is our first request for 3.5. In this set there is some changes
-regarding periodic scan, endian fixes and support for new devices.=20
-The rest are just fixes and small improvements.
+diff --git a/include/linux/ieee80211.h b/include/linux/ieee80211.h
+index 210e2c3..f19728e 100644
+--- a/include/linux/ieee80211.h
++++ b/include/linux/ieee80211.h
+@@ -184,6 +184,19 @@ struct ieee80211_qos_hdr {
+ 	__le16 qos_ctrl;
+ } __attribute__ ((packed));
+ 
++#define P80211_OUI_LEN 3
++
++struct ieee80211_llc_snap_hdr {
++	/* LLC */
++	u8 dsap;   /* always 0xAA */
++	u8 ssap;   /* always 0xAA */
++	u8 ctrl;   /* always 0x03 */
++
++	/* SNAP */
++	u8 oui[P80211_OUI_LEN];    /* organizational universal id */
++	__be16 proto;
++} __attribute__ ((packed));
++
+ /**
+  * ieee80211_has_tods - check if IEEE80211_FCTL_TODS is set
+  * @fc: frame control bytes in little-endian byteorder
+diff --git a/net/mac80211/rx.c b/net/mac80211/rx.c
+index bcfe8c7..760d20c 100644
+--- a/net/mac80211/rx.c
++++ b/net/mac80211/rx.c
+@@ -30,6 +30,7 @@
+ #include "tkip.h"
+ #include "wme.h"
+ #include "rate.h"
++#include "virtual_amp.h"
+ 
+ /*
+  * monitor mode reception
+@@ -1767,6 +1768,9 @@ ieee80211_deliver_skb(struct ieee80211_rx_data *rx)
+ 				skb = NULL;
+ 			}
+ 		}
++	} else if (ieee80211_vif_is_softamp(&sdata->vif)) {
++		ieee80211_softamp_receive_skb(sdata, rx->skb, rx->sta);
++		return;
+ 	}
+ 
+ 	if (skb) {
+diff --git a/net/mac80211/sta_info.h b/net/mac80211/sta_info.h
+index ab05768..47ed9f0 100644
+--- a/net/mac80211/sta_info.h
++++ b/net/mac80211/sta_info.h
+@@ -362,6 +362,10 @@ struct sta_info {
+ 	} debugfs;
+ #endif
+ 
++#ifdef CONFIG_MAC80211_BLUETOOTH_SOFTAMP
++	u16 hci_handle;
++#endif
++
+ 	unsigned int lost_packets;
+ 	unsigned int beacon_loss_count;
+ 
+diff --git a/net/mac80211/virtual_amp.c b/net/mac80211/virtual_amp.c
+index 62ebb50..6d2ffef 100644
+--- a/net/mac80211/virtual_amp.c
++++ b/net/mac80211/virtual_amp.c
+@@ -432,14 +432,137 @@ drop:
+ 	kfree_skb(skb);
+ }
+ 
++void ieee80211_softamp_receive_skb(struct ieee80211_sub_if_data *sdata,
++				   struct sk_buff *skb, struct sta_info *sta)
++{
++	struct ethhdr *hdr = (void *) skb->data;
++	struct ieee80211_llc_snap_hdr *snap_hdr;
++	struct hci_acl_hdr *acl_hdr;
++	int min_hdr = sizeof(*hdr) + sizeof(*snap_hdr);
++	u16 proto;
++
++	if (!sta)
++		goto drop;
++
++	if (skb->len < min_hdr)
++		goto drop;
++
++	if (compare_ether_addr(sta->sta.addr, hdr->h_source) ||
++	    compare_ether_addr(sdata->vif.addr, hdr->h_dest))
++		goto drop;
++
++	skb_pull(skb, sizeof(*hdr));
++
++	snap_hdr = (void *) skb->data;
++	if (snap_hdr->dsap != 0xAA || snap_hdr->ssap != 0xAA ||
++	     snap_hdr->ctrl != 0x03 || snap_hdr->oui[0] != 0x00 ||
++	     snap_hdr->oui[1] != 0x19 || snap_hdr->oui[2] != 0x58)
++		goto drop;
++
++	skb_pull(skb, sizeof(*snap_hdr));
++
++	proto = ntohs(snap_hdr->proto);
++	switch (proto) {
++	case SOFTAMP_ACL_DATA:
++		acl_hdr = (void *) skb_push(skb, sizeof(*acl_hdr));
++		acl_hdr->handle = 0;
++		acl_hdr->dlen = cpu_to_le16(skb->len - sizeof(*acl_hdr));
++		memset(skb->cb, 0, sizeof(skb->cb));
++		bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
++		skb->dev = (void *)sdata->u.softamp.hdev;
++		hci_recv_frame(skb);
++		break;
++	}
++
++drop:
++	kfree_skb(skb);
++}
++
++static struct sta_info *find_sta_for_hndl(struct ieee80211_sub_if_data *sdata,
++					  u16 handle)
++{
++	struct sta_info *sta;
++
++	list_for_each_entry_rcu(sta, &sdata->local->sta_list, list) {
++		if (sta->sdata != sdata)
++			continue;
++		if (sta->hci_handle == handle)
++			return sta;
++	}
++
++	return NULL;
++}
++
++static void softamp_xmit_sta(struct ieee80211_sub_if_data *sdata,
++			     struct sk_buff *skb, struct sta_info *sta,
++			     u16 proto)
++{
++	struct ieee80211_tx_info *info;
++	struct ieee80211_hdr *hdr;
++	struct ieee80211_llc_snap_hdr *snap_hdr;
++	struct sk_buff *nskb;
++	u16 fc;
++	__le16 *qos;
++
++	fc = IEEE80211_FCTL_FROMDS | IEEE80211_FCTL_TODS |
++	     IEEE80211_FTYPE_DATA | IEEE80211_STYPE_DATA;
++
++	nskb = skb_copy_expand(skb, sizeof(*hdr) + sizeof(*snap_hdr) +
++			       sizeof(*qos), 0, GFP_ATOMIC);
++	kfree_skb(skb);
++
++	if (!nskb)
++		return;
++
++	skb = nskb;
++
++	snap_hdr = (void *) skb_push(skb, sizeof(*snap_hdr));
++
++	/* 802.11 AMP LLC/SNAP encapsulation. All fields except proto
++	   are hardcoded in Bluetooth Core Specification v4.0 */
++	snap_hdr->dsap = 0xAA;
++	snap_hdr->ssap = 0xAA;
++	snap_hdr->ctrl = 0x03;
++	snap_hdr->oui[0] = 0x00;
++	snap_hdr->oui[1] = 0x19;
++	snap_hdr->oui[2] = 0x58;
++
++	/* Apparently this is __be */
++	snap_hdr->proto = htons(proto);
++
++	/* QoS */
++	if (test_sta_flag(sta, WLAN_STA_WME) && sdata->local->hw.queues >= 4) {
++		fc |= IEEE80211_STYPE_QOS_DATA;
++		qos = (void *)skb_push(skb, sizeof(*qos));
++		*qos = 0;
++	}
++
++	hdr = (void *) skb_put(skb, sizeof(*hdr));
++	memcpy(hdr->addr1, sta->sta.addr, ETH_ALEN);
++	memcpy(hdr->addr2, sdata->vif.addr, ETH_ALEN);
++	memcpy(hdr->addr3, sta->sta.addr, ETH_ALEN);
++	memcpy(hdr->addr4, sdata->vif.addr, ETH_ALEN);
++	hdr->frame_control = cpu_to_le16(fc);
++
++	info = IEEE80211_SKB_CB(skb);
++	memset(info, 0, sizeof(*info));
++
++	ieee80211_tx_skb(sdata, skb);
++}
++
+ static void vamp_acldata_packet(struct vamp_data *data, struct sk_buff *skb)
+ {
+ 	struct hci_acl_hdr *hdr = (void *) skb->data;
++	struct ieee80211_sub_if_data *sdata = data->sdata;
++	struct sta_info *sta;
+ 	__u16 handle, flags;
+ 
+ 	if (skb->len < sizeof(*hdr))
+ 		goto drop;
+ 
++	if (skb->len != sizeof(*hdr) + le16_to_cpu(hdr->dlen))
++		goto drop;
++
+ 	skb_pull(skb, HCI_ACL_HDR_SIZE);
+ 
+ 	handle = __le16_to_cpu(hdr->handle);
+@@ -449,7 +572,13 @@ static void vamp_acldata_packet(struct vamp_data *data, struct sk_buff *skb)
+ 	BT_DBG("%s len %d handle 0x%x flags 0x%x", data->hdev->name, skb->len,
+ 	       handle, flags);
+ 
+-	/* Send data through WIFI */
++	rcu_read_lock();
++
++	sta = find_sta_for_hndl(sdata, handle);
++	if (sta)
++		softamp_xmit_sta(sdata, skb, sta, 1);
++
++	rcu_read_unlock();
+ 
+ drop:
+ 	kfree_skb(skb);
+diff --git a/net/mac80211/virtual_amp.h b/net/mac80211/virtual_amp.h
+index a353ac3..d55da78 100644
+--- a/net/mac80211/virtual_amp.h
++++ b/net/mac80211/virtual_amp.h
+@@ -24,6 +24,13 @@
+ #define SOFTAMP_PAL_CAP_TYPE		4
+ #define SOFTAMP_PAL_VER_INFO		5
+ 
++/* Protocol identifiers for LLC/SNAP hdr */
++#define SOFTAMP_ACL_DATA		1
++#define SOFTAMP_ACTIVITY_REPORT		2
++#define SOFTAMP_SECURITY_FRAME		3
++#define SOFTAMP_LINK_SUPERVISION_REQ	4
++#define SOFTAMP_LINK_SUPERVISION_REPLY	5
++
+ /* Data types related to ASSOC data */
+ struct tlv {
+ 	__u8 type;
+@@ -40,6 +47,8 @@ struct softamp_pref_chans {
+ 
+ void ieee80211_vamp_setup_sdata(struct ieee80211_sub_if_data *sdata);
+ void ieee80211_vamp_clean_sdata(struct ieee80211_sub_if_data *sdata);
++void ieee80211_softamp_receive_skb(struct ieee80211_sub_if_data *sdata,
++				   struct sk_buff *skb, struct sta_info *sta);
+ 
+ struct vamp_data {
+ 	struct hci_dev *hdev;
+@@ -74,4 +83,14 @@ ieee80211_vamp_setup_sdata(struct ieee80211_sub_if_data *sdata) {}
+ static inline void
+ ieee80211_vamp_clean_sdata(struct ieee80211_sub_if_data *sdata) {}
+ 
++static inline void
++ieee80211_softamp_receive_skb(struct ieee80211_sub_if_data *sdata,
++			      struct sk_buff *skb, struct sta_info *sta)
++{}
++
+ #endif /* CONFIG_MAC80211_BLUETOOTH_SOFTAMP */
++
++static inline bool ieee80211_vif_is_softamp(struct ieee80211_vif *vif)
++{
++	return vif->type == NL80211_IFTYPE_BLUETOOTH_SOFTAMP;
++}
+-- 
+1.7.9.5
 
-Please pull, or let me know if something is wrong. Thanks.
-
-	Gustavo
-
-
-The following changes since commit 66f3b913e68e8e62bd2f9499495eeb6cc81b2662:
-
-  Bluetooth: Fix userspace compatibility issue with mgmt interface (2012-04=
--05 15:05:51 -0300)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next fo=
-r-upstream
-
-for you to fetch changes up to 86f7a807b6b35eba074a04d7130bee151f413613:
-
-  Bluetooth: Fix coding style issues (2012-04-24 16:04:01 +0300)
-
-----------------------------------------------------------------
-AceLan Kao (3):
-      Bluetooth: Add support for Atheros [04ca:3005]
-      Bluetooth: Add support for Atheros [13d3:3362]
-      Bluetooth: Add support for AR3012 [0cf3:e004]
-
-Andre Guedes (10):
-      Bluetooth: Check FINDING state in interleaved discovery
-      Bluetooth: Add hci_cancel_le_scan() to hci_core
-      Bluetooth: LE support for MGMT stop discovery
-      Bluetooth: Replace EPERM by EALREADY in hci_cancel_inquiry
-      Bluetooth: Refactor stop_discovery
-      Bluetooth: Add Periodic Inquiry command complete handler
-      Bluetooth: Add HCI_PERIODIC_INQ to dev_flags
-      Bluetooth: Check HCI_PERIODIC_INQ in start_discovery
-      Bluetooth: Ignore inquiry results from periodic inquiry
-      Bluetooth: Remove MGMT_ADDR_INVALID macro
-
-Andrei Emeltchenko (26):
-      Bluetooth: Correct type for hdev lmp_subver
-      Bluetooth: trivial: Correct endian conversion
-      Bluetooth: Correct type for ediv to __le16
-      Bluetooth: Fix extra conversion to __le32
-      Bluetooth: Correct chan->psm endian conversions
-      Bluetooth: Correct ediv in SMP
-      Bluetooth: Correct length calc in L2CAP conf rsp
-      Bluetooth: Correct CID endian notation
-      Bluetooth: Convert error codes to le16
-      Bluetooth: trivial: Fix endian conversion mode
-      Bluetooth: mgmt: Add missing endian conversion
-      Bluetooth: trivial: Correct types
-      Bluetooth: Fix type in cpu_to_le conversion
-      Bluetooth: Fix opcode access in hci_complete
-      Bluetooth: trivial: Remove sparse warnings
-      Bluetooth: Silence sparse warning
-      Bluetooth: mgmt: Fix timeout type
-      Bluetooth: Remove unneeded timer clear
-      Bluetooth: Fix memory leaks due to chan refcnt
-      Bluetooth: Make L2CAP chan_add functions static
-      Bluetooth: Comments and style fixes
-      Bluetooth: Remove unneeded zero initialization
-      Bluetooth: Add Read Local AMP Info to init
-      Bluetooth: Adds set_default function in L2CAP setup
-      Bluetooth: trivial: Remove empty line
-      Bluetooth: Fix debug printing unallocated name
-
-Brian Gix (1):
-      Bluetooth: mgmt: Fix corruption of device_connected pkt
-
-Cho, Yu-Chen (1):
-      Bluetooth: Add Atheros maryann PIDVID support
-
-David Herrmann (5):
-      Bluetooth: Remove redundant hdev->parent field
-      Bluetooth: vhci: Ignore return code of nonseekable_open()
-      Bluetooth: Move hci_alloc/free_dev close to hci_register/unregister_d=
-ev
-      Bluetooth: Move device initialization to hci_alloc_dev()
-      Bluetooth: Remove unneeded initialization in hci_alloc_dev()
-
-Don Zickus (1):
-      Bluetooth: btusb: typo in Broadcom SoftSailing id
-
-Gustavo Padovan (6):
-      Bluetooth: Remove sk parameter from l2cap_chan_create()
-      Bluetooth: Fix userspace compatibility issue with mgmt interface
-      Merge git://git.kernel.org/.../bluetooth/bluetooth
-      Bluetooth: Remove err parameter from alloc_skb()
-      Bluetooth: remove unneeded declaration of sco_conn_del()
-      Bluetooth: Fix coding style issues
-
-Hemant Gupta (6):
-      Bluetooth: Use correct flags for checking HCI_SSP_ENABLED bit
-      Bluetooth: Send correct address type for LTK
-      Bluetooth: Fix clearing discovery type when stopping discovery
-      Bluetooth: mgmt: Fix missing connect failed event for LE
-      Bluetooth: mgmt: Fix address type while loading Long Term Key
-      Bluetooth: Don't distribute keys in case of Encryption Failure
-
-Ido Yariv (1):
-      Bluetooth: Search global l2cap channels by src/dst addresses
-
-Jesper Juhl (1):
-      Bluetooth: btmrvl_sdio: remove pointless conditional before release_f=
-irmware()
-
-Johan Hedberg (2):
-      Bluetooth: Don't increment twice in eir_has_data_type()
-      Bluetooth: Check for minimum data length in eir_has_data_type()
-
-Johan Hovold (2):
-      Bluetooth: hci_ldisc: fix NULL-pointer dereference on tty_close
-      Bluetooth: hci_core: fix NULL-pointer dereference at unregister
-
-Jo=E3o Paulo Rechi Vita (1):
-      Bluetooth: btusb: Add USB device ID "0a5c 21e8"
-
-Luis R. Rodriguez (1):
-      Bluetooth: properly use pr_fmt() on lib.c
-
-Lukasz Rymanowski (1):
-      Bluetooth: Remove not needed status parameter
-
-Manoj Iyer (1):
-      Bluetooth: btusb: Add vendor specific ID (0489 e042) for BCM20702A0
-
-Marcel Holtmann (10):
-      Bluetooth: Add TX power tag to EIR data
-      Bluetooth: Handle EIR tags for Device ID
-      Bluetooth: Add management command for setting Device ID
-      Bluetooth: Fix broken usage of put_unaligned_le16
-      Bluetooth: Fix broken usage of get_unaligned_le16
-      Bluetooth: Update management interface revision
-      Bluetooth: Split error handling for L2CAP listen sockets
-      Bluetooth: Split error handling for SCO listen sockets
-      Bluetooth: Don't check source address in SCO bind function
-      Bluetooth: Restrict to one SCO listening socket
-
-Mat Martineau (4):
-      Bluetooth: Add definitions and struct members for new ERTM state mach=
-ine
-      Bluetooth: Add a structure to carry ERTM data in skb control blocks
-      Bluetooth: Add the l2cap_seq_list structure for tracking frames
-      Bluetooth: Functions for handling ERTM control fields
-
-Mikel Astiz (3):
-      Bluetooth: Use unsigned int instead of signed int
-      Bluetooth: Remove unnecessary check
-      Bluetooth: btusb: Dynamic alternate setting
-
-Santosh Nayak (1):
-      Bluetooth: Fix Endian Bug.
-
-Steven Harms (1):
-      Add Foxconn / Hon Hai IDs for btusb module
-
-Syam Sidhardhan (3):
-      Bluetooth: remove header declared but not defined
-      Bluetooth: Remove strtoba header declared but not defined
-      Bluetooth: mgmt: Remove unwanted goto statements
-
-Szymon Janc (3):
-      Bluetooth: mgmt: Fix some code style and indentation issues
-      Bluetooth: mgmt: Don't allow to set invalid value to DeviceID source
-      Bluetooth: Fix missing break in hci_cmd_complete_evt
-
-Ulisses Furquim (1):
-      Bluetooth: Fix registering hci with duplicate name
-
-Vinicius Costa Gomes (1):
-      Bluetooth: Add support for reusing the same hci_conn for LE links
-
-Vishal Agarwal (2):
-      Bluetooth: hci_persistent_key should return bool
-      Bluetooth: Temporary keys should be retained during connection
-
- drivers/bluetooth/ath3k.c         |    4 +
- drivers/bluetooth/btmrvl_sdio.c   |    9 +-
- drivers/bluetooth/btusb.c         |   19 +-
- drivers/bluetooth/hci_ldisc.c     |    2 +-
- drivers/bluetooth/hci_vhci.c      |    3 +-
- include/net/bluetooth/bluetooth.h |   14 +-
- include/net/bluetooth/hci.h       |    7 +
- include/net/bluetooth/hci_core.h  |   21 +-
- include/net/bluetooth/l2cap.h     |   78 ++++++-
- include/net/bluetooth/mgmt.h      |    9 +
- include/net/bluetooth/smp.h       |    2 +-
- net/bluetooth/hci_conn.c          |   32 +--
- net/bluetooth/hci_core.c          |  206 +++++++++---------
- net/bluetooth/hci_event.c         |   61 +++++-
- net/bluetooth/hci_sysfs.c         |    5 +-
- net/bluetooth/l2cap_core.c        |  454 ++++++++++++++++++++++++++++++++-=
-------
- net/bluetooth/l2cap_sock.c        |   33 +--
- net/bluetooth/lib.c               |    2 +
- net/bluetooth/mgmt.c              |  225 ++++++++++++-------
- net/bluetooth/sco.c               |   72 ++++---
- net/bluetooth/smp.c               |    2 +-
- 21 files changed, 901 insertions(+), 359 deletions(-)
-
---EVF5PPMfhYS0aIcm
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAEBAgAGBQJPlq77AAoJEPs3PUX4s20oRq8P+wWsfbe53J8eRM31WTiqA4Gk
-dN3V6L+9aJqFJaeqiNQ2ccAuK1Oq78yUw2ewSSNldaPfXOlu51utNmsK2sh5GpM8
-uJqO0q7Y/Ha98HtLgaJoXA22fg/LjL4kkxmNtPMLqE5f3Um4q/9HLJN0rCcCt1dj
-QaLNB8s2GthSmVUu8h31B/K7fx2//u9QTmkCJVK0thjO6bpQZCVj+/E5ADqOwRrV
-JePtTiNohGvOeh+SdyekH8+oG8YP2T+1YQr78PRVoMVs1v0MTAYnP4Yjq1Rtwlct
-5HxP/7J4pl03nz8TOtThMbDT/we6re7dxg3Oxp9CtTCqUFgGA3GCTXnN5jJqCWo/
-KiaxLaX4/lJfRC5Ia+2yAQ9S+9KtPLdRHscKaDD7qT0aCyPH96CAdIEHkZib8DII
-sLTy5vg9bra8ftLIta4DBcHtOJZLu1bXw1dWjBVqpFm5IrZhDXQ28zuN0KaWKdy/
-uiAabJzuFcNSYz7b9Q/z8ctDD7bMLNbgfHksQjHO45JzBzBS9j43juMCKzu1sWYU
-SAQR90G00eLMGVQ/OF3+DTHy6SZuiFMQUHslhvEt7whj1ShYcIFzSsXpnsOX3Tq7
-6XuPtsD94mF9oT3y8GTVqlMCd7R1G2KxAm+LWnrhnLdkQjwoOMKNzSg0tWDZXp6w
-hAoinG2gY7WxbHhxGOaj
-=RnQo
------END PGP SIGNATURE-----
-
---EVF5PPMfhYS0aIcm--
