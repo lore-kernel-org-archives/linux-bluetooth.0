@@ -1,64 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 24 Apr 2012 13:12:06 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2012-04-24
+Message-ID: <20120424161206.GC9343@joana>
 MIME-Version: 1.0
-In-Reply-To: <CACJA=fXwkotOD5kUVEDCGEx31XYkyaMXn72hoTqDMFFOrSQ4+Q@mail.gmail.com>
-References: <1333646241-12574-1-git-send-email-andre.guedes@openbossa.org>
-	<1333646241-12574-2-git-send-email-andre.guedes@openbossa.org>
-	<1333648179.16897.16.camel@aeonflux>
-	<CACJA=fXwkotOD5kUVEDCGEx31XYkyaMXn72hoTqDMFFOrSQ4+Q@mail.gmail.com>
-Date: Tue, 24 Apr 2012 13:42:13 -0300
-Message-ID: <CACJA=fVKYXZLZ2F3kcPEVEE=DhEoiur_KacOonLDy3vq0xvZpA@mail.gmail.com>
-Subject: Re: [RFC v3 1/5] Bluetooth: Add address type to struct sockaddr_l2
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="61jdw2sOBCFtR2d/"
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
 
-On Thu, Apr 5, 2012 at 7:18 PM, Andre Guedes <andre.guedes@openbossa.org> w=
-rote:
-> Hi Marcel,
->
-> On Thu, Apr 5, 2012 at 2:49 PM, Marcel Holtmann <marcel@holtmann.org> wro=
-te:
->> Hi Andre,
->>
->>> This patch adds the address type info to struct sockaddr_l2 so
->>> user-space can inform the remote device address type required
->>> to establish LE connections.
->>>
->>> Soon, instead of looking the advertising cache up to discover the
->>> address type, we'll use this address type info to establish LE
->>> connections.
->>>
->>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->>> ---
->>> =A0include/net/bluetooth/l2cap.h | =A0 =A01 +
->>> =A01 file changed, 1 insertion(+)
->>>
->>> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2ca=
-p.h
->>> index f6f0500..d14967e 100644
->>> --- a/include/net/bluetooth/l2cap.h
->>> +++ b/include/net/bluetooth/l2cap.h
->>> @@ -57,6 +57,7 @@ struct sockaddr_l2 {
->>> =A0 =A0 =A0 __le16 =A0 =A0 =A0 =A0 =A0l2_psm;
->>> =A0 =A0 =A0 bdaddr_t =A0 =A0 =A0 =A0l2_bdaddr;
->>> =A0 =A0 =A0 __le16 =A0 =A0 =A0 =A0 =A0l2_cid;
->>> + =A0 =A0 __u8 =A0 =A0 =A0 =A0 =A0 =A0l2_bdaddr_type;
->>> =A0};
->>
->> so I am trying to come up with a better name for this value. It feels a
->> little bit too long to me.
->>
->> I was considering l2_bdtype, but that is not really semantically correct
->> here. Or would it be fine? We could do l2_bdatype, but that does not
->> really make it any better either.
->
-> Yes, it is a little big to me too. But that was the best name I could
-> find. Other names just don't clearly say what this field means.
+--61jdw2sOBCFtR2d/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-So, do we keep this name?
+Hi John,
 
-Andre
+A few more fixes to 3.4, there is tree new device id supported, a missing
+break and a fix to retain key during the connection.
+
+Please pull. Thanks.
+
+	Gustavo
+
+--
+
+The following changes since commit 66f3b913e68e8e62bd2f9499495eeb6cc81b2662:
+
+  Bluetooth: Fix userspace compatibility issue with mgmt interface (2012-04-05 15:05:51 -0300)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth for-upstream
+
+for you to fetch changes up to 985140369be1e886754d8ac0375dd64e4f727311:
+
+  Add Foxconn / Hon Hai IDs for btusb module (2012-04-24 11:38:41 -0300)
+
+----------------------------------------------------------------
+AceLan Kao (2):
+      Bluetooth: Add support for Atheros [13d3:3362]
+      Bluetooth: Add support for AR3012 [0cf3:e004]
+
+Manoj Iyer (1):
+      Bluetooth: btusb: Add vendor specific ID (0489 e042) for BCM20702A0
+
+Steven Harms (1):
+      Add Foxconn / Hon Hai IDs for btusb module
+
+Szymon Janc (1):
+      Bluetooth: Fix missing break in hci_cmd_complete_evt
+
+Vishal Agarwal (2):
+      Bluetooth: hci_persistent_key should return bool
+      Bluetooth: Temporary keys should be retained during connection
+
+ drivers/bluetooth/ath3k.c        |    4 ++++
+ drivers/bluetooth/btusb.c        |    6 ++++++
+ include/net/bluetooth/hci_core.h |    3 ++-
+ net/bluetooth/hci_core.c         |   27 +++++++++++++--------------
+ net/bluetooth/hci_event.c        |    3 +++
+ net/bluetooth/mgmt.c             |    2 +-
+ 6 files changed, 29 insertions(+), 16 deletions(-)
+
+--61jdw2sOBCFtR2d/
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBAgAGBQJPltDWAAoJEPs3PUX4s20odxIQAIvDhmfZyBmzGTa8KQtXQ/LV
+EkkcLF3eQ2lmgk59U+ugm4FYTZcDG2GuOn7S4lCel7bTtqrgbuh8djKgCoq4wvPa
+KN16XzDRwl1guBY7ncgvG8yzPEMuII+qf6JcuVF2G8SRYF2r4GARQQOtmphVKr31
+5vMDJC4mCtz8V4YdrFG6ZPxBSbclGyjcxvNFgPXnf3Nxb6i2s+UIjicZXLAgeD+b
+f5QlUeERZDTAs6l6bf50Uq+JbKCyMm/ra4/4VIWeBt8zsvZcHWbPaETLlZsGK/hx
+HAwt4SXyBOG3IC0rH/dJ1Eb/IOsRJmxGCX50fuNXHCQgbw2xdhVRuCsuKvBwpcrq
+pw2AMJa6DTDs1+GKgj91ZfYfjqv02CjRCZEpLEeR8B75+GFVnJY2datsI2GIo/Bd
+melp41L1x+7ivdVNjh0k7IOskUat8nBATrbl2V3zeYVGd3/JWwAUPRzqJkEri2Gg
+k+qlZR2Uu8qSjclgJS7IFnIFWMUUsAdMj/ijl0lhcU7B4M6rs2jIBMu3Ew74F8Qr
+rY9KfVAttVO4Bskg+earnwuynvLFcs1rLkg9ZEbYFrWM3X7W0027dGoApp597N/P
+d6LnyfThIoS+S94EpaT+XAJgKg2Z4BTZNZRDsxZiv0Fp5dia5QNpR3c2WN+bRzdl
+SRRRY4uwyt/N/xF+rY0n
+=pgi+
+-----END PGP SIGNATURE-----
+
+--61jdw2sOBCFtR2d/--
