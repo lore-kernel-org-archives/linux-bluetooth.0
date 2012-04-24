@@ -1,72 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: [RFCv2 0/6] Draft Software/Virtual AMP80211
-Date: Tue, 24 Apr 2012 16:17:34 +0300
-Message-Id: <1335273460-12682-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-wireless-owner@vger.kernel.org
+Date: Tue, 24 Apr 2012 10:10:52 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix coding style in the code
+Message-ID: <20120424131052.GA9343@joana>
+References: <1335240565-5582-1-git-send-email-gustavo@padovan.org>
+ <20120424070100.GA2650@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120424070100.GA2650@aemeltch-MOBL1>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andrei,
 
-RFC for Software / Virtual _DRAFT_ implementation of Bluetooth High Speed
-by using wireless driver. Currently it can be used for testing Bluetooth
-A2MP protocol.
+* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-04-24 10:01:02 +0300]:
 
-Changes:
-	RFCv2: Process basic HCI commands and basic data traffic; added skeleton
-	for Netlink comms, took comments from reviewers.
-	RFCv1: Initial release.
+> Hi Gustavo,
+> 
+> On Tue, Apr 24, 2012 at 01:09:25AM -0300, Gustavo Padovan wrote:
+> > New code added to the Bluetooth subsystem need to be complaint with the
+> > new syle rules.
+> 
+> Would it be better if we change coding style only when changing code,
+> otherwise people need to rebase too much without a reason. Though for mgmt
+> code which is new it does make sense.
 
-TODO:
-	Change names from vamp to <softamp|bt_softamp|etc>
+Yes, it would, but we weren't careful and let this ones go into the
+tree. Now we need to fix them otherwise DaveM can block our code from
+going mainline.
 
-Main ideas:
- - Use existing wireless infrastructure nl80211, mac80211.
- - Use virtual interface of type NL80211_IFTYPE_BLUETOOTH_AMP. Then all
-drivers supporting virtual interface should work.
-
-After modifying iw it will be enabled by adding new virtual interface.
-
-# iw phy <physical device> interface add vamp type vamp
-# iw dev
-phy#0
-	Interface vamp
-		ifindex 6
-		type Virtual AMP
-...
-# hciconfig 
-hci1:	Type: AMP  Bus: VIRTUAL
-	BD Address: 00:00:00:00:00:00  ACL MTU: 0:0  SCO MTU: 0:0
-	DOWN 
-	RX bytes:0 acl:0 sco:0 events:0 errors:0
-	TX bytes:0 acl:0 sco:0 commands:0 errors:0
-...
-
-Andrei Emeltchenko (6):
-  mac80211: softamp: Adds Bluetooth Software AMP
-  mac80211: softamp: Adds build config option
-  hwsim: Adds support for BT SOFTAMP for testing
-  mac80211: softamp: Handle assoc request
-  mac80211: softamp: Netlink interface to softamp
-  mac80211: softamp: Handle data traffic
-
- drivers/net/wireless/mac80211_hwsim.c |    3 +-
- include/linux/ieee80211.h             |   13 +
- include/linux/nl80211.h               |    1 +
- net/mac80211/Kconfig                  |    9 +
- net/mac80211/Makefile                 |    2 +
- net/mac80211/ieee80211_i.h            |    5 +
- net/mac80211/iface.c                  |    9 +
- net/mac80211/rx.c                     |    4 +
- net/mac80211/sta_info.h               |    4 +
- net/mac80211/util.c                   |    1 +
- net/mac80211/virtual_amp.c            |  675 +++++++++++++++++++++++++++++++++
- net/mac80211/virtual_amp.h            |   96 +++++
- 12 files changed, 821 insertions(+), 1 deletion(-)
- create mode 100644 net/mac80211/virtual_amp.c
- create mode 100644 net/mac80211/virtual_amp.h
-
--- 
-1.7.9.5
-
+	Gustavo
