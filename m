@@ -1,67 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Apr 2012 01:16:52 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, linville@tuxdriver.com,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] bluetooth: properly use pr_fmt() on lib.c
-Message-ID: <20120424041652.GF18564@joana>
-References: <1335235506-32243-1-git-send-email-mcgrof@do-not-panic.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="zx4FCpZtqtKETZ7O"
-In-Reply-To: <1335235506-32243-1-git-send-email-mcgrof@do-not-panic.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix coding style in the code
+Date: Tue, 24 Apr 2012 01:09:25 -0300
+Message-Id: <1335240565-5582-1-git-send-email-gustavo@padovan.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+New code added to the Bluetooth subsystem need to be complaint with the
+new syle rules.
 
---zx4FCpZtqtKETZ7O
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
+---
+ net/bluetooth/hci_core.c   |    2 +-
+ net/bluetooth/hci_event.c  |    2 +-
+ net/bluetooth/l2cap_core.c |   12 +++++++-----
+ net/bluetooth/mgmt.c       |   12 ++++++------
+ 4 files changed, 15 insertions(+), 13 deletions(-)
 
-Hi Luiz,
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 3b97ad3..0d9ed01 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1194,7 +1194,7 @@ struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ }
+ 
+ static bool hci_persistent_key(struct hci_dev *hdev, struct hci_conn *conn,
+-						u8 key_type, u8 old_key_type)
++			       u8 key_type, u8 old_key_type)
+ {
+ 	/* Legacy key */
+ 	if (key_type < 0x03)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 8a13f90..fb23c47 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -208,7 +208,7 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	/* Reset all non-persistent flags */
+ 	hdev->dev_flags &= ~(BIT(HCI_LE_SCAN) | BIT(HCI_PENDING_CLASS) |
+-							BIT(HCI_PERIODIC_INQ));
++			     BIT(HCI_PERIODIC_INQ));
+ 
+ 	hdev->discovery.state = DISCOVERY_STOPPED;
+ }
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 9b23db5..9d6c650 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1099,7 +1099,8 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+  * Returns closest match, locked.
+  */
+ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
+-						bdaddr_t *src, bdaddr_t *dst)
++					            bdaddr_t *src,
++						    bdaddr_t *dst)
+ {
+ 	struct l2cap_chan *c, *c1 = NULL;
+ 
+@@ -1146,7 +1147,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 
+ 	/* Check if we have socket listening on cid */
+ 	pchan = l2cap_global_chan_by_scid(BT_LISTEN, L2CAP_CID_LE_DATA,
+-							conn->src, conn->dst);
++					  conn->src, conn->dst);
+ 	if (!pchan)
+ 		return;
+ 
+@@ -1355,8 +1356,8 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+  * Returns closest match.
+  */
+ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
+-							bdaddr_t *src,
+-							bdaddr_t *dst)
++						   bdaddr_t *src,
++						   bdaddr_t *dst)
+ {
+ 	struct l2cap_chan *c, *c1 = NULL;
+ 
+@@ -4684,7 +4685,8 @@ drop:
+ 	return 0;
+ }
+ 
+-static inline int l2cap_att_channel(struct l2cap_conn *conn, u16 cid, struct sk_buff *skb)
++static inline int l2cap_att_channel(struct l2cap_conn *conn, u16 cid,
++		                    struct sk_buff *skb)
+ {
+ 	struct l2cap_chan *chan;
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 6bbb52c..1606514 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2425,17 +2425,16 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+ 							NAME_PENDING);
+ 		if (!e) {
+ 			mgmt_pending_remove(cmd);
+-			err = cmd_complete(sk, hdev->id,
+-						MGMT_OP_STOP_DISCOVERY, 0,
+-						&mgmt_cp->type,
+-						sizeof(mgmt_cp->type));
++			err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
++					   0, &mgmt_cp->type,
++					   sizeof(mgmt_cp->type));
+ 			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+ 			goto unlock;
+ 		}
+ 
+ 		bacpy(&cp.bdaddr, &e->data.bdaddr);
+ 		err = hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ_CANCEL,
+-					sizeof(cp), &cp);
++				   sizeof(cp), &cp);
+ 
+ 		break;
+ 
+@@ -2959,7 +2958,8 @@ int mgmt_write_scan_failed(struct hci_dev *hdev, u8 scan, u8 status)
+ 	return 0;
+ }
+ 
+-int mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key, bool persistent)
++int mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key,
++		      bool persistent)
+ {
+ 	struct mgmt_ev_new_link_key ev;
+ 
+-- 
+1.7.10
 
-* Luis R. Rodriguez <mcgrof@do-not-panic.com> [2012-04-23 19:45:06 -0700]:
-
-> From: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>
->=20
-> pr_fmt() is either defined or we redefine it. Typically
-> drivers define it prior to including printk.h but this
-> is done under the assumption that no other subsystem
-> it uses has already defined pr_fmt(). In such cases
-> pr_fmt() should be undefined and redefined.
->=20
-> Doing this properly shaves down compilation time quite
-> considerably.
->=20
-> Signed-off-by: Luis R. Rodriguez <mcgrof@do-not-panic.com>
-> ---
->  net/bluetooth/lib.c |    2 ++
->  1 file changed, 2 insertions(+)
-
-Patch has been applie, thanks.
-
-	Gustavo
-
---zx4FCpZtqtKETZ7O
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAEBAgAGBQJPlik0AAoJEPs3PUX4s20oi7EQAKtZ+91Wphb/nsvrgM6uO2pB
-nHcl830oLPFYLUej+iSeBbWLFsGPRO2/8QjL77PHsqArzXGc79jNbm2PGIUxqK9i
-pxBKDqxh5dhnqKfRSLZIIrXowpB6TUnnbn39+mBHcpG6BAtw91DkFLfMA+MXv2K1
-TIXFaBKyO41gTlogwUz+28v/zuzP081JW98+DM+7MLu1ZYm04yvByPOSr0a8xBPG
-P6iVI5sQ6DfmDadbHkW8l4OsNGoqituQtHdu7RhznOyoCdjYHwqCFpplChiAFfz3
-xYGejofrFty79irG0WyNuZUiG3ZfdglRNFWtSKYpbzHCHSiQFN3yIadx42/82PEl
-b729fJ8IdXH+dkKKkdbFaa5hUdeFVmsECtbOjPbXq8WcNzmnmuJgPjMlMGnXNsDk
-xCzf5kIUox90bwxSGaI92GK8cN1zLdAMh0LukhlfxHMiaiRZyCZh9WeqDtZJIrFa
-GwiT4q1Xc48rjjcq9S0CuuKP5iLTMBcDCTtizLn13gY2DP4iWpQfgdSM2NV4C5Y/
-oXm6phwl6MROsZCoXWxbLjQqwB+Ia4TTc+w9vw3WsrvZLJUDAJ9UP1q/hRjfZoy7
-X3VtGUEYgiq++IbpJwfgnK8eJ2bYbZnzYoo43dKwICuO1GPiFgUj5LGNUL4VGfzb
-DbpGw4sOIygtvf6I5daY
-=4uz+
------END PGP SIGNATURE-----
-
---zx4FCpZtqtKETZ7O--
