@@ -1,71 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 2/6 v3] client: remove unused field
-Date: Tue, 24 Apr 2012 12:20:03 +0300
-Message-Id: <1335259207-16111-2-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 6/6 v3] client: Remove file in case of error
+Date: Tue, 24 Apr 2012 12:20:07 +0300
+Message-Id: <1335259207-16111-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1335259207-16111-1-git-send-email-luiz.dentz@gmail.com>
 References: <1335259207-16111-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The errorcode field is set but never used, so it can safely be removed.
-In addition there is no need for such a field, because errors can be
-propagated using the available callback.
+If the transfer operation is GET and it has not complete by the time its
+freed remove the file as its contents maybe corrupted/incomplete.
 ---
- client/transfer.c |   13 +++----------
- 1 files changed, 3 insertions(+), 10 deletions(-)
+ client/transfer.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
 diff --git a/client/transfer.c b/client/transfer.c
-index f1cdbf0..1fa23c3 100644
+index 5fcc35d..230f3ae 100644
 --- a/client/transfer.c
 +++ b/client/transfer.c
-@@ -67,7 +67,6 @@ struct obc_transfer {
- 	guint xfer;
- 	gint64 size;
- 	gint64 transferred;
--	int err;
- };
+@@ -196,6 +196,10 @@ static void obc_transfer_free(struct obc_transfer *transfer)
+ 	if (transfer->xfer)
+ 		g_obex_cancel_transfer(transfer->xfer);
  
- static GQuark obc_transfer_error_quark(void)
-@@ -288,10 +287,8 @@ static gboolean get_xfer_progress(const void *buf, gsize len,
- 		gint w;
++	if (transfer->op == G_OBEX_OP_GET &&
++					transfer->transferred != transfer->size)
++		remove(transfer->filename);
++
+ 	if (transfer->fd > 0)
+ 		close(transfer->fd);
  
- 		w = write(transfer->fd, buf, len);
--		if (w < 0) {
--			transfer->err = -errno;
-+		if (w < 0)
- 			return FALSE;
--		}
- 
- 		transfer->transferred += w;
- 	}
-@@ -310,10 +307,8 @@ static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
- 
- 	transfer->xfer = 0;
- 
--	if (err) {
--		transfer->err = err->code;
-+	if (err)
- 		goto done;
--	}
- 
- 	transfer->size = transfer->transferred;
- 
-@@ -390,10 +385,8 @@ static gssize put_xfer_progress(void *buf, gsize len, gpointer user_data)
- 	gssize size;
- 
- 	size = read(transfer->fd, buf, len);
--	if (size <= 0) {
--		transfer->err = -errno;
-+	if (size <= 0)
- 		return size;
--	}
- 
- 	if (callback)
- 		callback->func(transfer, transfer->transferred, NULL,
 -- 
 1.7.7.6
 
