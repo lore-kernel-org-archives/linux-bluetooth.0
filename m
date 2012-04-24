@@ -1,34 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Apr 2012 10:10:52 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
+Date: Tue, 24 Apr 2012 16:07:24 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH] Bluetooth: Fix coding style in the code
-Message-ID: <20120424131052.GA9343@joana>
+Message-ID: <20120424130724.GA4104@x220.P-661HNU-F1>
 References: <1335240565-5582-1-git-send-email-gustavo@padovan.org>
- <20120424070100.GA2650@aemeltch-MOBL1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120424070100.GA2650@aemeltch-MOBL1>
+In-Reply-To: <1335240565-5582-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Gustavo,
 
-* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-04-24 10:01:02 +0300]:
-
-> Hi Gustavo,
+On Tue, Apr 24, 2012, Gustavo Padovan wrote:
+> New code added to the Bluetooth subsystem need to be complaint with the
+> new syle rules.
 > 
-> On Tue, Apr 24, 2012 at 01:09:25AM -0300, Gustavo Padovan wrote:
-> > New code added to the Bluetooth subsystem need to be complaint with the
-> > new syle rules.
-> 
-> Would it be better if we change coding style only when changing code,
-> otherwise people need to rebase too much without a reason. Though for mgmt
-> code which is new it does make sense.
+> Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
+> ---
+>  net/bluetooth/hci_core.c   |    2 +-
+>  net/bluetooth/hci_event.c  |    2 +-
+>  net/bluetooth/l2cap_core.c |   12 +++++++-----
+>  net/bluetooth/mgmt.c       |   12 ++++++------
+>  4 files changed, 15 insertions(+), 13 deletions(-)
 
-Yes, it would, but we weren't careful and let this ones go into the
-tree. Now we need to fix them otherwise DaveM can block our code from
-going mainline.
+Applied to bluetooth-next after fixing up the spelling issues in the
+commit message. Thanks.
 
-	Gustavo
+Johan
