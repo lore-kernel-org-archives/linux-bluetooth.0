@@ -1,161 +1,327 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F968FF7.7060303@tu-ilmenau.de>
-Date: Tue, 24 Apr 2012 13:35:19 +0200
-From: Steffen Becker <steffen.becker@tu-ilmenau.de>
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Can't connect Bluetooth Devices
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: [PATCH obexd 3/6 v3] client: transfer api merges put and get
+Date: Tue, 24 Apr 2012 12:20:04 +0300
+Message-Id: <1335259207-16111-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1335259207-16111-1-git-send-email-luiz.dentz@gmail.com>
+References: <1335259207-16111-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-I still have a problem to connect my bluetooth devices via pand command. 
-I've been searching the internet and asked in forums, but i didn't get 
-an answer.
+A new enum type is used to distinguish put and get transfers.
 
-I have 2 gentoo-PCs with a Bluetooth-3.0 Dongle at each PC.
-Circa 2 weeks ago, everything worked. BlueZ-4.96 was installed and I had 
-no problems to connect my devices via pand and via rfcomm command.
-But then I asked you for an SSP debug mode patch, because I wanted to 
-sniff my rfcomm connection. At the same time BlueZ-4.99 was released and 
-so I installed the new BlueZ-version and the patch.
-I also deleted the stored linkkey and I was happy that I was able to 
-sniff my rfcomm-connection.
-But thenceforth I can't connect my devices via pand command.
+This is more convenient since it is done when registering the transfer,
+and not when it is actually started. The main benefits would be:
+    - Some actions can be taken during creation, such as opening files.
+    - session.c gets simplified.
+    - The size of a put transfer can be exposed in D-Bus, while queued.
+    - The transfer operation (put or get) can be exposed in D-Bus.
 
-Then I tried to install the BlueZ-4.99 *without* the patch, but I still 
-couldn't connect via pand.
-I also tried to install BlueZ-4.96, but the problem was still the same. 
-So I think it's no problem of the patch or the newer BlueZ-version, but 
-I really have no idea what's wrong.
+None of these D-Bus changes are included in this patch.
+---
+ client/session.c  |   67 ++++++++++++++++------------------------------------
+ client/transfer.c |   54 +++++++++++++++++++++++++++++++-----------
+ client/transfer.h |    5 ++-
+ 3 files changed, 64 insertions(+), 62 deletions(-)
 
-If you need any of my configuration-files, just tell me and I will send it.
-
-In the end, I show the hcidump message when I try to connect via pand 
-command.
-
-Hope anyone can help me.
-
-Regards,
-Steffen
-
-
-# hcidump -i hci0
-HCI sniffer - Bluetooth packet analyzer ver 2.3
-device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
- > HCI Event: Connect Request (0x04) plen 10
-     bdaddr 00:02:72:AE:58:73 class 0x420100 type ACL
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-     bdaddr 00:02:72:AE:58:73 role 0x00
-     Role: Master
- > HCI Event: Command Status (0x0f) plen 4
-     Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
- > HCI Event: Role Change (0x12) plen 8
-     status 0x00 bdaddr 00:02:72:AE:58:73 role 0x00
-     Role: Master
- > HCI Event: Connect Complete (0x03) plen 11
-     status 0x00 handle 11 bdaddr 00:02:72:AE:58:73 type ACL encrypt 0x00
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-     handle 11
- > HCI Event: Max Slots Change (0x1b) plen 3
-     handle 11 slots 5
- > HCI Event: Command Status (0x0f) plen 4
-     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
- > HCI Event: Read Remote Supported Features (0x0b) plen 11
-     status 0x00 handle 11
-     Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x79 0x87
-< HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
-     handle 11 page 1
- > HCI Event: Command Status (0x0f) plen 4
-     Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
- > HCI Event: Read Remote Extended Features (0x23) plen 13
-     status 0x00 handle 11 page 1 max 1
-     Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-     bdaddr 00:02:72:AE:58:73 mode 2 clkoffset 0x0000
- > HCI Event: Command Status (0x0f) plen 4
-     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
- > HCI Event: Remote Name Req Complete (0x07) plen 255
-     status 0x00 bdaddr 00:02:72:AE:58:73 name 'bluetooth1-0'
- > HCI Event: IO Capability Response (0x32) plen 9
-     bdaddr 00:02:72:AE:58:73 capability 0x03 oob 0x00 auth 0x00
-     Capability: NoInputNoOutput (OOB data not present)
-     Authentication: No Bonding (No MITM Protection)
- > HCI Event: IO Capability Request (0x31) plen 6
-     bdaddr 00:02:72:AE:58:73
-< HCI Command: IO Capability Request Reply (0x01|0x002b) plen 9
-     bdaddr 00:02:72:AE:58:73 capability 0x03 oob 0x00 auth 0x00
-     Capability: NoInputNoOutput (OOB data not present)
-     Authentication: No Bonding (No MITM Protection)
- > HCI Event: Command Complete (0x0e) plen 10
-     IO Capability Request Reply (0x01|0x002b) ncmd 1
-     status 0x00 bdaddr 00:02:72:AE:58:73
- > HCI Event: User Confirmation Request (0x33) plen 10
-     bdaddr 00:02:72:AE:58:73 passkey 800553
-< HCI Command: User Confirmation Request Reply (0x01|0x002c) plen 6
-     bdaddr 00:02:72:AE:58:73
- > HCI Event: Command Complete (0x0e) plen 10
-     User Confirmation Request Reply (0x01|0x002c) ncmd 1
-     status 0x00 bdaddr 00:02:72:AE:58:73
- > HCI Event: Simple Pairing Complete (0x36) plen 7
-     status 0x00 bdaddr 00:02:72:AE:58:73
- > HCI Event: Link Key Notification (0x18) plen 23
-     bdaddr 00:02:72:AE:58:73 key E1C30FE5E1D620AC6DC78BB5A4AC299A type 4
-     Type: Unauthenticated Combination Key
- > HCI Event: Encrypt Change (0x08) plen 4
-     status 0x00 handle 11 encrypt 0x01
- > ACL data: handle 11 flags 0x02 dlen 10
-     L2CAP(s): Info req: type 2
-< ACL data: handle 11 flags 0x00 dlen 16
-     L2CAP(s): Info rsp: type 2 result 0
-       Extended feature mask 0x00b8
-         Enhanced Retransmission mode
-         Streaming mode
-         FCS Option
-         Fixed Channels
- > ACL data: handle 11 flags 0x02 dlen 10
-     L2CAP(s): Info req: type 3
-< ACL data: handle 11 flags 0x00 dlen 20
-     L2CAP(s): Info rsp: type 3 result 0
-       Fixed channel list 0x00000002
-         L2CAP Signalling Channel
- > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 11 packets 2
- > ACL data: handle 11 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 15 scid 0x0040
-< ACL data: handle 11 flags 0x00 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 0
-       Connection pending - No futher information available
-< ACL data: handle 11 flags 0x00 dlen 10
-     L2CAP(s): Info req: type 2
- > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 11 packets 2
- > ACL data: handle 11 flags 0x02 dlen 16
-     L2CAP(s): Info rsp: type 2 result 0
-       Extended feature mask 0x00b8
-         Enhanced Retransmission mode
-         Streaming mode
-         FCS Option
-         Fixed Channels
-< ACL data: handle 11 flags 0x00 dlen 10
-     L2CAP(s): Info req: type 3
- > ACL data: handle 11 flags 0x02 dlen 20
-     L2CAP(s): Info rsp: type 3 result 0
-       Fixed channel list 0x00000002
-         L2CAP Signalling Channel
-< ACL data: handle 11 flags 0x00 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 2
-       Connection pending - Authorization pending
-< ACL data: handle 11 flags 0x00 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 3 status 0
-       Connection refused - security block
- > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 11 packets 2
- > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 11 packets 1
- > HCI Event: Disconn Complete (0x05) plen 4
-     status 0x00 handle 11 reason 0x13
-     Reason: Remote User Terminated Connection
+diff --git a/client/session.c b/client/session.c
+index fe47f9d..ab20b88 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -100,7 +100,7 @@ struct obc_session {
+ 
+ static GSList *sessions = NULL;
+ 
+-static void session_prepare_put(gpointer data, gpointer user_data);
++static void session_start_transfer(gpointer data, gpointer user_data);
+ static void session_terminate_transfer(struct obc_session *session,
+ 					struct obc_transfer *transfer,
+ 					GError *gerr);
+@@ -686,7 +686,7 @@ static void session_request_reply(DBusPendingCall *call, gpointer user_data)
+ 	DBG("Agent.Request() reply: %s", name);
+ 
+ 	if (strlen(name)) {
+-		if (p->auth_complete == session_prepare_put)
++		if (obc_transfer_get_operation(transfer) == G_OBEX_OP_PUT)
+ 			obc_transfer_set_name(transfer, name);
+ 		else
+ 			obc_transfer_set_filename(transfer, name);
+@@ -731,7 +731,6 @@ static int pending_request_auth(struct pending_request *p)
+ 
+ static int session_request(struct obc_session *session,
+ 					struct obc_transfer *transfer,
+-					GFunc auth_complete,
+ 					session_callback_t func,
+ 					void *data)
+ {
+@@ -740,7 +739,8 @@ static int session_request(struct obc_session *session,
+ 
+ 	obc_transfer_set_callback(transfer, transfer_progress, session);
+ 
+-	p = pending_request_new(session, transfer, auth_complete, func, data);
++	p = pending_request_new(session, transfer, session_start_transfer,
++								func, data);
+ 
+ 	if (session->p) {
+ 		g_queue_push_tail(session->queue, p);
+@@ -917,19 +917,15 @@ fail:
+ 	session_notify_error(session, transfer, err);
+ }
+ 
+-static void session_prepare_get(gpointer data, gpointer user_data)
++static void session_start_transfer(gpointer data, gpointer user_data)
+ {
+ 	struct obc_session *session = data;
+ 	struct obc_transfer *transfer = user_data;
+-	int ret;
++	GError *err = NULL;
+ 
+-	ret = obc_transfer_get(transfer);
+-	if (ret < 0) {
+-		GError *gerr = NULL;
+-
+-		g_set_error(&gerr, OBEX_IO_ERROR, ret, "%s", strerror(-ret));
+-		session_notify_error(session, transfer, gerr);
+-		g_clear_error(&gerr);
++	if (!obc_transfer_start(transfer, &err)) {
++		session_notify_error(session, transfer, err);
++		g_clear_error(&err);
+ 		return;
+ 	}
+ 
+@@ -961,8 +957,9 @@ int obc_session_get(struct obc_session *session, const char *type,
+ 		agent = NULL;
+ 
+ 	transfer = obc_transfer_register(session->conn, session->obex,
+-							agent, targetfile,
+-							name, type, params);
++						agent, G_OBEX_OP_GET,
++						targetfile, name,
++						type, params);
+ 	if (transfer == NULL) {
+ 		if (params != NULL) {
+ 			g_free(params->data);
+@@ -971,8 +968,7 @@ int obc_session_get(struct obc_session *session, const char *type,
+ 		return -EIO;
+ 	}
+ 
+-	return session_request(session, transfer, session_prepare_get,
+-							func, user_data);
++	return session_request(session, transfer, func, user_data);
+ }
+ 
+ int obc_session_send(struct obc_session *session, const char *filename,
+@@ -988,8 +984,9 @@ int obc_session_send(struct obc_session *session, const char *filename,
+ 	agent = obc_agent_get_name(session->agent);
+ 
+ 	transfer = obc_transfer_register(session->conn, session->obex,
+-							agent, filename,
+-							name, NULL, NULL);
++						agent, G_OBEX_OP_PUT,
++						filename, name,
++						NULL, NULL);
+ 	if (transfer == NULL)
+ 		return -EINVAL;
+ 
+@@ -999,8 +996,7 @@ int obc_session_send(struct obc_session *session, const char *filename,
+ 		return err;
+ 	}
+ 
+-	return session_request(session, transfer, session_prepare_put,
+-								NULL, NULL);
++	return session_request(session, transfer, NULL, NULL);
+ }
+ 
+ int obc_session_pull(struct obc_session *session,
+@@ -1041,26 +1037,6 @@ fail:
+ 	return NULL;
+ }
+ 
+-static void session_prepare_put(gpointer data, gpointer user_data)
+-{
+-	struct obc_session *session = data;
+-	struct obc_transfer *transfer = user_data;
+-	int ret;
+-
+-	ret = obc_transfer_put(transfer);
+-	if (ret < 0) {
+-		GError *gerr = NULL;
+-
+-		g_set_error(&gerr, OBEX_IO_ERROR, ret, "%s (%d)",
+-							strerror(-ret), -ret);
+-		session_notify_error(session, transfer, gerr);
+-		g_clear_error(&gerr);
+-		return;
+-	}
+-
+-	DBG("Transfer(%p) started", transfer);
+-}
+-
+ int obc_session_put(struct obc_session *session, const char *contents,
+ 					size_t size, const char *name)
+ {
+@@ -1074,9 +1050,9 @@ int obc_session_put(struct obc_session *session, const char *contents,
+ 	agent = obc_agent_get_name(session->agent);
+ 
+ 	transfer = obc_transfer_register(session->conn, session->obex,
+-							agent, NULL,
+-							name, NULL,
+-							NULL);
++							agent, G_OBEX_OP_PUT,
++							NULL, name,
++							NULL, NULL);
+ 	if (transfer == NULL)
+ 		return -EIO;
+ 
+@@ -1086,8 +1062,7 @@ int obc_session_put(struct obc_session *session, const char *contents,
+ 		return err;
+ 	}
+ 
+-	return session_request(session, transfer, session_prepare_put,
+-								NULL, NULL);
++	return session_request(session, transfer, NULL, NULL);
+ }
+ 
+ static void agent_destroy(gpointer data, gpointer user_data)
+diff --git a/client/transfer.c b/client/transfer.c
+index 1fa23c3..259d3aa 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -55,6 +55,7 @@ struct transfer_callback {
+ 
+ struct obc_transfer {
+ 	GObex *obex;
++	guint8 op;
+ 	struct obc_transfer_params *params;
+ 	struct transfer_callback *callback;
+ 	DBusConnection *conn;
+@@ -221,6 +222,7 @@ static void obc_transfer_free(struct obc_transfer *transfer)
+ struct obc_transfer *obc_transfer_register(DBusConnection *conn,
+ 						GObex *obex,
+ 						const char *agent,
++						guint8 op,
+ 						const char *filename,
+ 						const char *name,
+ 						const char *type,
+@@ -230,6 +232,7 @@ struct obc_transfer *obc_transfer_register(DBusConnection *conn,
+ 
+ 	transfer = g_new0(struct obc_transfer, 1);
+ 	transfer->obex = g_obex_ref(obex);
++	transfer->op = op;
+ 	transfer->agent = g_strdup(agent);
+ 	transfer->filename = g_strdup(filename);
+ 	transfer->name = g_strdup(name);
+@@ -443,14 +446,16 @@ done:
+ 	return fd;
+ }
+ 
+-int obc_transfer_get(struct obc_transfer *transfer)
++static gboolean transfer_start_get(struct obc_transfer *transfer, GError **err)
+ {
+-	GError *err = NULL;
+ 	GObexPacket *req;
+ 	int perr;
+ 
+-	if (transfer->xfer != 0)
+-		return -EALREADY;
++	if (transfer->xfer > 0) {
++		g_set_error(err, OBC_TRANSFER_ERROR, -EALREADY,
++						"Transfer already started");
++		return FALSE;
++	}
+ 
+ 	perr = transfer_open(transfer, O_WRONLY | O_CREAT, 0600);
+ 	if (perr < 0)
+@@ -473,20 +478,22 @@ int obc_transfer_get(struct obc_transfer *transfer)
+ 
+ 	transfer->xfer = g_obex_send_req(transfer->obex, req, -1,
+ 						get_xfer_progress_first,
+-						transfer, &err);
++						transfer, err);
+ 	if (transfer->xfer == 0)
+-		return -ENOTCONN;
++		return FALSE;
+ 
+-	return 0;
++	return TRUE;
+ }
+ 
+-int obc_transfer_put(struct obc_transfer *transfer)
++static gboolean transfer_start_put(struct obc_transfer *transfer, GError **err)
+ {
+-	GError *err = NULL;
+ 	GObexPacket *req;
+ 
+-	if (transfer->xfer != 0)
+-		return -EALREADY;
++	if (transfer->xfer > 0) {
++		g_set_error(err, OBC_TRANSFER_ERROR, -EALREADY,
++						"Transfer already started");
++		return FALSE;
++	}
+ 
+ 	req = g_obex_packet_new(G_OBEX_OP_PUT, FALSE, G_OBEX_HDR_INVALID);
+ 
+@@ -508,11 +515,30 @@ int obc_transfer_put(struct obc_transfer *transfer)
+ 
+ 	transfer->xfer = g_obex_put_req_pkt(transfer->obex, req,
+ 					put_xfer_progress, xfer_complete,
+-					transfer, &err);
++					transfer, err);
+ 	if (transfer->xfer == 0)
+-		return -ENOTCONN;
++		return FALSE;
+ 
+-	return 0;
++	return TRUE;
++}
++
++gboolean obc_transfer_start(struct obc_transfer *transfer, GObex *obex,
++								GError **err)
++{
++	switch (transfer->op) {
++	case G_OBEX_OP_GET:
++		return transfer_start_get(transfer, err);
++	case G_OBEX_OP_PUT:
++		return transfer_start_put(transfer, err);
++	}
++
++	g_set_error(err, OBC_TRANSFER_ERROR, -ENOTSUP, "Not supported");
++	return FALSE;
++}
++
++guint8 obc_transfer_get_operation(struct obc_transfer *transfer)
++{
++	return transfer->op;
+ }
+ 
+ int obc_transfer_get_params(struct obc_transfer *transfer,
+diff --git a/client/transfer.h b/client/transfer.h
+index a65981c..7858423 100644
+--- a/client/transfer.h
++++ b/client/transfer.h
+@@ -35,6 +35,7 @@ typedef void (*transfer_callback_t) (struct obc_transfer *transfer,
+ struct obc_transfer *obc_transfer_register(DBusConnection *conn,
+ 					GObex *obex,
+ 					const char *agent,
++					guint8 op,
+ 					const char *filename,
+ 					const char *name,
+ 					const char *type,
+@@ -46,8 +47,8 @@ gboolean obc_transfer_set_callback(struct obc_transfer *transfer,
+ 					transfer_callback_t func,
+ 					void *user_data);
+ 
+-int obc_transfer_get(struct obc_transfer *transfer);
+-int obc_transfer_put(struct obc_transfer *transfer);
++gboolean obc_transfer_start(struct obc_transfer *transfer, GError **err);
++guint8 obc_transfer_get_operation(struct obc_transfer *transfer);
+ 
+ int obc_transfer_get_params(struct obc_transfer *transfer,
+ 					struct obc_transfer_params *params);
+-- 
+1.7.7.6
 
