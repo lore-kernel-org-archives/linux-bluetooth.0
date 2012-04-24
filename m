@@ -1,36 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Remove useless code in hci_connect
-Date: Tue, 24 Apr 2012 16:11:11 -0300
-Message-Id: <1335294671-25585-1-git-send-email-andre.guedes@openbossa.org>
+Date: Tue, 24 Apr 2012 10:47:16 -0700
+From: Greg KH <greg@kroah.com>
+To: Jonathan Nieder <jrnieder@gmail.com>
+Cc: AceLan Kao <acelan.kao@canonical.com>, stable@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [3.0,3.2][PATCH] Bluetooth: Add support for Atheros [04ca:3005]
+Message-ID: <20120424174716.GB28788@kroah.com>
+References: <1335237105-12291-1-git-send-email-acelan.kao@canonical.com>
+ <20120424035114.GA30442@burratino>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120424035114.GA30442@burratino>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes unneeded variable assignments in hci_connect.
-'sec_level' is already assigned to BT_SECURITY_LOW in hci_le_connect
-and 'pending_sec_level' and 'auth_type' are assigned right after
-if statement.
+On Mon, Apr 23, 2012 at 10:51:14PM -0500, Jonathan Nieder wrote:
+> AceLan Kao wrote:
+> 
+> > [Subject: [3.0,3.2][PATCH] Bluetooth: Add support for Atheros [04ca:3005]]
+> >
+> > commit 55ed7d4d1469eafbe3ad7e8fcd44f5af27845a81 upstream
+> 
+> Looks reasonable.  Should 3.3.y get this, too?
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
----
- net/bluetooth/hci_conn.c |    3 ---
- 1 file changed, 3 deletions(-)
+Yes, AceLan, please don't think you can skip stable kernel trees, all
+that are relevant should have the patches applied.
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index f361d3b..140e00a 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -536,9 +536,6 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
- 				return ERR_PTR(-ENOMEM);
- 
- 			le->dst_type = entry->bdaddr_type;
--			le->pending_sec_level = sec_level;
--			le->sec_level = BT_SECURITY_LOW;
--			le->auth_type = auth_type;
- 			hci_le_connect(le);
- 		}
- 
--- 
-1.7.10
-
+greg k-h
