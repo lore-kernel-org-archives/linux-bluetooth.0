@@ -1,33 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Apr 2012 15:49:26 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/6 v4] client: Remove buffer based transfer
-Message-ID: <20120424124926.GA2327@x220.P-661HNU-F1>
-References: <1335268995-20572-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH obexd 6/6 v4] client: Remove file in case of error
+Date: Tue, 24 Apr 2012 15:03:15 +0300
+Message-Id: <1335268995-20572-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1335268995-20572-1-git-send-email-luiz.dentz@gmail.com>
+References: <1335268995-20572-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Apr 24, 2012, Luiz Augusto von Dentz wrote:
-> Simplify the code by using temporary files and eliminates reallocations.
-> ---
->  client/ftp.c      |    8 +-
->  client/manager.c  |   18 +++-
->  client/map.c      |   18 +++-
->  client/pbap.c     |   39 +++++--
->  client/session.c  |   34 +++---
->  client/session.h  |    7 +-
->  client/sync.c     |   36 +++++--
->  client/transfer.c |  301 ++++++++++++++++++++++-------------------------------
->  client/transfer.h |    8 +-
->  9 files changed, 230 insertions(+), 239 deletions(-)
+If the transfer operation is GET and it has not complete by the time its
+freed remove the file as its contents maybe corrupted/incomplete.
+---
+ client/transfer.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
-All six patches have been applied. Thanks.
+diff --git a/client/transfer.c b/client/transfer.c
+index 5fcc35d..230f3ae 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -196,6 +196,10 @@ static void obc_transfer_free(struct obc_transfer *transfer)
+ 	if (transfer->xfer)
+ 		g_obex_cancel_transfer(transfer->xfer);
+ 
++	if (transfer->op == G_OBEX_OP_GET &&
++					transfer->transferred != transfer->size)
++		remove(transfer->filename);
++
+ 	if (transfer->fd > 0)
+ 		close(transfer->fd);
+ 
+-- 
+1.7.7.6
 
-Johan
