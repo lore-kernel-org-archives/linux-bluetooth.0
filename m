@@ -1,63 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
+From: Hemant Gupta <hemant.gupta@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: Hemant Gupta <hemant.gupta@stericsson.com>
+Subject: [PATCH v2] Store LE device address type with primary list
+Date: Wed, 25 Apr 2012 18:57:00 +0530
+Message-ID: <1335360420-23445-1-git-send-email-hemant.gupta@stericsson.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_O5tke32fB352Pbkrvt98EgZiowgOpAbp2JK9QspgxDxw@mail.gmail.com>
-References: <1335328441-20307-1-git-send-email-hemant.gupta@stericsson.com>
-	<CAJdJm_O5tke32fB352Pbkrvt98EgZiowgOpAbp2JK9QspgxDxw@mail.gmail.com>
-Date: Wed, 25 Apr 2012 18:58:01 +0530
-Message-ID: <CACj007k-YAtk74nw2VQjGEBhFMuSBimTB7---L0R6mfxF=TSjA@mail.gmail.com>
-Subject: Re: [PATCH v1] Store LE device address type with primary list
-From: Hemant Gupta <hemantgupta.ste@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Hemant Gupta <hemant.gupta@stericsson.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+This patch stores the address type while storing the primary services
+of LE Device which is later used for re-creating device from primary
+service database.
+---
+ src/adapter.c |   10 ++++++++--
+ src/device.c  |    9 +++++++--
+ 2 files changed, 15 insertions(+), 4 deletions(-)
 
-On Wed, Apr 25, 2012 at 5:43 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Hemant,
->
-> On Wed, Apr 25, 2012 at 12:34 AM, Hemant Gupta
-> <hemant.gupta@stericsson.com> wrote:
->> -       /* FIXME: Get the correct LE addr type (public/random) */
->> -       device = device_create(connection, adapter, key, ADDR_TYPE_LE_PUBLIC);
->> +       /* Check if address type and space can be parsed properly */
->> +       if (sscanf(value, "%d ", &addr_type) == 2)
->
-> Are you sure "2" is the correct return value here? The manpage says:
->
-> "These functions return the number of input items successfully matched
-> and assigned [...]"
->
-> So I would imagine it should return 1 if addr_type is filled, 0
-> otherwise. Can you verify this?
-Thanks for pointing out, I have fixed that in new patch.
-
-> (unless sscanf() counts the whitespace as input.)
->
->> +               /* Increment by 2 (address type and space) */
->> +               value += 2;
->> +
->> +       device = device_create(connection, adapter, key, addr_type);
->>        if (!device)
->>                return;
->
-> Regards,
-> --
-> Anderson Lizardo
-> Instituto Nokia de Tecnologia - INdT
-> Manaus - Brazil
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/src/adapter.c b/src/adapter.c
+index 12b6aeb..5df49e3 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1920,13 +1920,19 @@ static void create_stored_device_from_primary(char *key, char *value,
+ 	struct btd_adapter *adapter = user_data;
+ 	struct btd_device *device;
+ 	GSList *services, *uuids, *l;
++	/* Assume address type to be public by default */
++	addr_type_t addr_type = ADDR_TYPE_LE_PUBLIC;
+ 
+ 	if (g_slist_find_custom(adapter->devices,
+ 			key, (GCompareFunc) device_address_cmp))
+ 		return;
+ 
+-	/* FIXME: Get the correct LE addr type (public/random) */
+-	device = device_create(connection, adapter, key, ADDR_TYPE_LE_PUBLIC);
++	/* Check if address type can be parsed properly */
++	if (sscanf(value, "%d", &addr_type))
++		/* Increment by 2 (address type and space) */
++		value += 2;
++
++	device = device_create(connection, adapter, key, addr_type);
+ 	if (!device)
+ 		return;
+ 
+diff --git a/src/device.c b/src/device.c
+index ea6fec2..9c15d28 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1748,14 +1748,19 @@ static void store_services(struct btd_device *device)
+ {
+ 	struct btd_adapter *adapter = device->adapter;
+ 	bdaddr_t dba, sba;
+-	char *str = primary_list_to_string(device->primaries);
++	addr_type_t addr_type;
++	char *primary = primary_list_to_string(device->primaries);
++	/* Allocate extra space for address type, space and \0 */
++	char *str = g_malloc(strlen(primary) + 2 + 1);
+ 
+ 	adapter_get_address(adapter, &sba);
+-	device_get_address(device, &dba, NULL);
++	device_get_address(device, &dba, &addr_type);
++	sprintf(str, "%d %s", addr_type, primary);
+ 
+ 	write_device_services(&sba, &dba, str);
+ 
+ 	g_free(str);
++	g_free(primary);
+ }
+ 
+ static void attio_connected(gpointer data, gpointer user_data)
 -- 
-Best Regards
-Hemant Gupta
-ST-Ericsson India
+1.7.0.4
+
