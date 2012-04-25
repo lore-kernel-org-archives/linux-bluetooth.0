@@ -1,77 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 25 Apr 2012 16:58:25 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv7 17/23] Bluetooth: A2MP: Manage incoming connections
+Message-ID: <20120425195824.GC2781@joana>
+References: <1332519246-16656-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1334920191-29308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1334920191-29308-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1335365016.6263.28.camel@ierdnac-hp>
-References: <1335365016.6263.28.camel@ierdnac-hp>
-Date: Wed, 25 Apr 2012 23:59:58 +0300
-Message-ID: <CAMXE1-rhPegy+97JwKQKBqrza-PZZX4H0RAYp35oDePmgEWHJw@mail.gmail.com>
-Subject: Re: bluetooth oops
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: andrei.popa@i-neo.ro
-Cc: linux-kernel@vger.kernel.org,
-	Bluetooth Linux <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1334920191-29308-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei
+Hi Andrei,
 
-On Wed, Apr 25, 2012 at 5:43 PM, Andrei Popa <andrei.popa@i-neo.ro> wrote:
->
-> I was using kernel (Linux hp 3.3.3-pf-c236 #1 SMP PREEMPT Mon Apr 23
-> 21:09:50 EEST 2012 x86_64 Intel(R) Core(TM) i3 CPU M 380 @ 2.53GHz
-> GenuineIntel GNU/Linux) with pf patchset and when I was pairing a
-> bluettoth phone with the computer it oopses:
->
->
-> BUG: unable to handle kernel paging request at 0000000100000000
-> IP: [<ffffffff817a42f5>] _raw_spin_lock_irqsave+0x25/0x50
-> PGD 0
-> Oops: 0002 [#1] PREEMPT SMP
-> CPU 2
-> Modules linked in: r8169 rt2800pci eeprom_93cx6 rt2x00pci rt2800lib
-> rt2x00lib mac80211 psmouse cfg80211 [last unloaded: r8169]
->
-> Pid: 15651, comm: bluetoothd Not tainted 3.3.3-pf-c236 #1
-> Hewlett-Packard HP ProBook 4320s/1423
-> RIP: 0010:[<ffffffff817a42f5>]  [<ffffffff817a42f5>]
-> _raw_spin_lock_irqsave+0x25/0x50
-> RSP: 0000:ffff8801f1143d10  EFLAGS: 00010002
-> RAX: 0000000000000100 RBX: 0000000100000000 RCX: 000000000000006d
-> RDX: 0000000000000206 RSI: ffff8801f1143d50 RDI: 0000000100000000
-> RBP: ffff8801f2ba08f0 R08: 0000000000000000 R09: 0000000000000000
-> R10: 000000000000000a R11: 0000000000000000 R12: ffff8801f1143d50
-> R13: 0000000100000000 R14: 00007fff2cfa5880 R15: 00007fa7c6e08760
-> FS:  00007fa7c6db5700(0000) GS:ffff88023bc80000(0000)
-> knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
-> CR2: 0000000100000000 CR3: 000000010868a000 CR4: 00000000000006e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-> Process bluetoothd (pid: 15651, threadinfo ffff8801f1142000, task
-> ffff88022a8eed70)
-> Stack:
-> ffffffff8107e3b3 0000000000000000 ffff8801f2ba08d8 0000000000000000
-> ffff8801f1143db0 ffff8801ef429570 ffffffff8107e82f ffff8801f1143d68
-> ffffffff8174abe0 ffffffff819b715b ffff8801f2ba0800 0000000000000000
-> atkbd serio0: Unknown key released (translated set 2, code 0xf8 on
-> isa0060/serio0).
-> atkbd serio0: Use 'setkeycodes e078 <keycode>' to make it known.
-> Call Trace:
-> [<ffffffff8107e3b3>] ? lock_timer_base.clone.28+0x33/0x70
-> [<ffffffff8107e82f>] ? del_timer+0x1f/0x80
-> [<ffffffff8174abe0>] ? hci_conn_del_sysfs+0x60/0xa0
-> [<ffffffff8173ebd0>] ? hci_conn_del+0x20/0x220
-> [<ffffffff8173ee40>] ? hci_conn_hash_flush+0x70/0xd0
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-04-20 14:09:45 +0300]:
 
-Probably related to:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Handle incoming A2MP connection by creating AMP manager and
+> processing A2MP messages.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  include/net/bluetooth/a2mp.h |    4 ++++
+>  net/bluetooth/a2mp.c         |   12 ++++++++++++
+>  net/bluetooth/l2cap_core.c   |   13 +++++++++----
+>  3 files changed, 25 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+> index c9aa9c5..6304e14 100644
+> --- a/include/net/bluetooth/a2mp.h
+> +++ b/include/net/bluetooth/a2mp.h
+> @@ -15,6 +15,8 @@
+>  #ifndef __A2MP_H
+>  #define __A2MP_H
+>  
+> +#include <net/bluetooth/l2cap.h>
+> +
+>  #define A2MP_FEAT_EXT	0x8000
+>  
+>  struct amp_mgr {
+> @@ -118,5 +120,7 @@ struct a2mp_physlink_rsp {
+>  
+>  void amp_mgr_get(struct amp_mgr *mgr);
+>  int amp_mgr_put(struct amp_mgr *mgr);
+> +struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
+> +				       struct sk_buff *skb);
+>  
+>  #endif /* __A2MP_H */
+> diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+> index aa93e0b..a49acb6 100644
+> --- a/net/bluetooth/a2mp.c
+> +++ b/net/bluetooth/a2mp.c
+> @@ -541,3 +541,15 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
+>  
+>  	return mgr;
+>  }
+> +
+> +struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
+> +				       struct sk_buff *skb)
+> +{
+> +	struct amp_mgr *mgr;
+> +
+> +	mgr = amp_mgr_create(conn);
+> +
+> +	BT_DBG("mgr: %p chan %p", mgr, mgr->a2mp_chan);
+> +
+> +	return mgr->a2mp_chan;
+> +}
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index d0aeb56..ed434b0 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -56,6 +56,7 @@
+>  #include <net/bluetooth/hci_core.h>
+>  #include <net/bluetooth/l2cap.h>
+>  #include <net/bluetooth/smp.h>
+> +#include <net/bluetooth/a2mp.h>
+>  
+>  bool disable_ertm;
+>  
+> @@ -4554,10 +4555,14 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+>  
+>  	chan = l2cap_get_chan_by_scid(conn, cid);
+>  	if (!chan) {
+> -		BT_DBG("unknown cid 0x%4.4x", cid);
+> -		/* Drop packet and return */
+> -		kfree_skb(skb);
+> -		return 0;
+> +		if (cid == L2CAP_CID_A2MP) {
+> +			chan = a2mp_channel_create(conn, skb);
 
-https://lkml.org/lkml/2012/3/7/68
+This code should be inside l2cap_recv_frame. take a look there.
 
-Could you try those patches below:
-
-http://git.kernel.org/?p=linux/kernel/git/next/linux-next.git;a=patch;h=2a5a5ec620a29d4ba07743c3151cdf0a417c8f8c
-http://git.kernel.org/?p=linux/kernel/git/next/linux-next.git;a=patch;h=3c4e0df028935618d052235ba85bc7079be13394
-
-
-Regards,
-Andrei
+	Gustavo
