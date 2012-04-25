@@ -1,93 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 7/8] Bluetooth: Use address type info from user-space
-Date: Tue, 24 Apr 2012 21:02:55 -0300
-Message-Id: <1335312176-21306-8-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 6/8] Bluetooth: Add dst_type parameter to hci_connect
+Date: Tue, 24 Apr 2012 21:02:54 -0300
+Message-Id: <1335312176-21306-7-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1335312176-21306-1-git-send-email-andre.guedes@openbossa.org>
 References: <1335312176-21306-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In order to establish a LE connection we need the address type
-information. User-space already pass this information to kernel
-through struct sockaddr_l2.
+This patch adds the dst_type parameter to hci_connect function.
+Instead of searching the address type in advertising cache, we
+use the dst_type parameter to establish LE connections.
 
-This patch adds the dst_type parameter to l2cap_chan_connect so we
-are able to pass the address type info from user-space down to
-hci_conn layer.
+The dst_type is ignored for BR/EDR connection establishment.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/l2cap.h |    2 +-
- net/bluetooth/l2cap_core.c    |   11 ++++++-----
- net/bluetooth/l2cap_sock.c    |    2 +-
- 3 files changed, 8 insertions(+), 7 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 +-
+ net/bluetooth/hci_conn.c         |   11 +++--------
+ net/bluetooth/l2cap_core.c       |    8 ++++----
+ net/bluetooth/mgmt.c             |    8 ++++----
+ net/bluetooth/sco.c              |    3 ++-
+ 5 files changed, 14 insertions(+), 18 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 95741da..22e9ec9 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -922,7 +922,7 @@ struct l2cap_chan *l2cap_chan_create(void);
- void l2cap_chan_close(struct l2cap_chan *chan, int reason);
- void l2cap_chan_destroy(struct l2cap_chan *chan);
- int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
--								bdaddr_t *dst);
-+		       bdaddr_t *dst, u8 dst_type);
- int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
- 								u32 priority);
- void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 7e7fe3f..e69a9ee 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -575,7 +575,7 @@ int hci_chan_del(struct hci_chan *chan);
+ void hci_chan_list_flush(struct hci_conn *conn);
+ 
+ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+-						__u8 sec_level, __u8 auth_type);
++			     __u8 dst_type, __u8 sec_level, __u8 auth_type);
+ int hci_conn_check_link_mode(struct hci_conn *conn);
+ int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
+ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 140e00a..fb364ff 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -514,7 +514,8 @@ EXPORT_SYMBOL(hci_get_route);
+ 
+ /* Create SCO, ACL or LE connection.
+  * Device _must_ be locked */
+-struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8 sec_level, __u8 auth_type)
++struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
++			     __u8 dst_type, __u8 sec_level, __u8 auth_type)
+ {
+ 	struct hci_conn *acl;
+ 	struct hci_conn *sco;
+@@ -523,19 +524,13 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
+ 	BT_DBG("%s dst %s", hdev->name, batostr(dst));
+ 
+ 	if (type == LE_LINK) {
+-		struct adv_entry *entry = NULL;
+-
+ 		le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
+ 		if (!le) {
+-			entry = hci_find_adv_entry(hdev, dst);
+-			if (!entry)
+-				return ERR_PTR(-EHOSTUNREACH);
+-
+ 			le = hci_conn_add(hdev, LE_LINK, dst);
+ 			if (!le)
+ 				return ERR_PTR(-ENOMEM);
+ 
+-			le->dst_type = entry->bdaddr_type;
++			le->dst_type = bdaddr_to_le(dst_type);
+ 			hci_le_connect(le);
+ 		}
+ 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 7451fa2..beb7194 100644
+index 9d6c650..7451fa2 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1395,7 +1395,8 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
- 	return c1;
- }
- 
--int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *dst)
-+int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
-+		       bdaddr_t *dst, u8 dst_type)
- {
- 	struct sock *sk = chan->sk;
- 	bdaddr_t *src = &bt_sk(sk)->src;
-@@ -1405,8 +1406,8 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
- 	__u8 auth_type;
- 	int err;
- 
--	BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
--						__le16_to_cpu(chan->psm));
-+	BT_DBG("%s -> %s (type %u) psm 0x%2.2x", batostr(src), batostr(dst),
-+	       dst_type, __le16_to_cpu(chan->psm));
- 
- 	hdev = hci_get_route(dst, src);
- 	if (!hdev)
-@@ -1480,10 +1481,10 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+@@ -1480,11 +1480,11 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
  	auth_type = l2cap_get_auth_type(chan);
  
  	if (chan->dcid == L2CAP_CID_LE_DATA)
--		hcon = hci_connect(hdev, LE_LINK, dst, BDADDR_LE_RANDOM,
-+		hcon = hci_connect(hdev, LE_LINK, dst, dst_type,
- 				   chan->sec_level, auth_type);
+-		hcon = hci_connect(hdev, LE_LINK, dst,
+-					chan->sec_level, auth_type);
++		hcon = hci_connect(hdev, LE_LINK, dst, BDADDR_LE_RANDOM,
++				   chan->sec_level, auth_type);
  	else
--		hcon = hci_connect(hdev, ACL_LINK, dst, BDADDR_BREDR,
-+		hcon = hci_connect(hdev, ACL_LINK, dst, dst_type,
- 				   chan->sec_level, auth_type);
+-		hcon = hci_connect(hdev, ACL_LINK, dst,
+-					chan->sec_level, auth_type);
++		hcon = hci_connect(hdev, ACL_LINK, dst, BDADDR_BREDR,
++				   chan->sec_level, auth_type);
  
  	if (IS_ERR(hcon)) {
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 4d03b45..0f30785 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -124,7 +124,7 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
- 		return -EINVAL;
+ 		err = PTR_ERR(hcon);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 2c77473..79e7770 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1903,11 +1903,11 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		auth_type = HCI_AT_DEDICATED_BONDING_MITM;
  
- 	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
--				&la.l2_bdaddr);
-+				 &la.l2_bdaddr, la.l2_bdaddr_type);
- 	if (err)
- 		return err;
+ 	if (cp->addr.type == BDADDR_BREDR)
+-		conn = hci_connect(hdev, ACL_LINK, &cp->addr.bdaddr, sec_level,
+-				   auth_type);
++		conn = hci_connect(hdev, ACL_LINK, &cp->addr.bdaddr,
++				   cp->addr.type, sec_level, auth_type);
+ 	else
+-		conn = hci_connect(hdev, LE_LINK, &cp->addr.bdaddr, sec_level,
+-				   auth_type);
++		conn = hci_connect(hdev, LE_LINK, &cp->addr.bdaddr,
++				   cp->addr.type, sec_level, auth_type);
  
+ 	memset(&rp, 0, sizeof(rp));
+ 	bacpy(&rp.addr.bdaddr, &cp->addr.bdaddr);
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index fc6c790..bd3638f 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -194,7 +194,8 @@ static int sco_connect(struct sock *sk)
+ 	else
+ 		type = SCO_LINK;
+ 
+-	hcon = hci_connect(hdev, type, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
++	hcon = hci_connect(hdev, type, dst, BDADDR_BREDR, BT_SECURITY_LOW,
++			   HCI_AT_NO_BONDING);
+ 	if (IS_ERR(hcon)) {
+ 		err = PTR_ERR(hcon);
+ 		goto done;
 -- 
 1.7.10
 
