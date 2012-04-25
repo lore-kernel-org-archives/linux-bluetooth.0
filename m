@@ -1,153 +1,199 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/8] Bluetooth: Rename link_to_mgmt to link_to_bdaddr
-Date: Tue, 24 Apr 2012 21:02:50 -0300
-Message-Id: <1335312176-21306-3-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 1/8] Bluetooth: Move address type macros to bluetooth.h
+Date: Tue, 24 Apr 2012 21:02:49 -0300
+Message-Id: <1335312176-21306-2-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1335312176-21306-1-git-send-email-andre.guedes@openbossa.org>
 References: <1335312176-21306-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since address type macros are not only related to Management
-Interface anymore, it makes sense to rename the helper function
-link_to_mgmt to link_to_bdaddr.
+This patch moves address type macros to bluetooth.h since they will be
+used by management interface and Bluetooth socket interface. It also
+replaces the macro prefix MGMT_ADDR_ by BDADDR_.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/mgmt.c |   28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ include/net/bluetooth/bluetooth.h |    5 +++++
+ include/net/bluetooth/hci_core.h  |   16 ++++++----------
+ net/bluetooth/mgmt.c              |   30 +++++++++++++++---------------
+ 3 files changed, 26 insertions(+), 25 deletions(-)
 
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index d0e44a4..27a6a93 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -163,6 +163,11 @@ typedef struct {
+ 	__u8 b[6];
+ } __packed bdaddr_t;
+ 
++/* BD Address type */
++#define BDADDR_BREDR		0x00
++#define BDADDR_LE_PUBLIC	0x01
++#define BDADDR_LE_RANDOM	0x02
++
+ #define BDADDR_ANY   (&(bdaddr_t) {{0, 0, 0, 0, 0, 0}})
+ #define BDADDR_LOCAL (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
+ 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index ef6e654..6777432 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -963,16 +963,12 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb);
+ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+ 
+ /* Management interface */
+-#define MGMT_ADDR_BREDR			0x00
+-#define MGMT_ADDR_LE_PUBLIC		0x01
+-#define MGMT_ADDR_LE_RANDOM		0x02
+-
+-#define DISCOV_TYPE_BREDR		(BIT(MGMT_ADDR_BREDR))
+-#define DISCOV_TYPE_LE			(BIT(MGMT_ADDR_LE_PUBLIC) | \
+-						BIT(MGMT_ADDR_LE_RANDOM))
+-#define DISCOV_TYPE_INTERLEAVED		(BIT(MGMT_ADDR_BREDR) | \
+-						BIT(MGMT_ADDR_LE_PUBLIC) | \
+-						BIT(MGMT_ADDR_LE_RANDOM))
++#define DISCOV_TYPE_BREDR		(BIT(BDADDR_BREDR))
++#define DISCOV_TYPE_LE			(BIT(BDADDR_LE_PUBLIC) | \
++					 BIT(BDADDR_LE_RANDOM))
++#define DISCOV_TYPE_INTERLEAVED		(BIT(BDADDR_BREDR) | \
++					 BIT(BDADDR_LE_PUBLIC) | \
++					 BIT(BDADDR_LE_RANDOM))
+ 
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
+ int mgmt_index_added(struct hci_dev *hdev);
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a9c7330..40c7514 100644
+index 1606514..a9c7330 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1625,7 +1625,7 @@ failed:
- 	return err;
+@@ -1524,7 +1524,7 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto unlock;
+ 	}
+ 
+-	if (cp->addr.type == MGMT_ADDR_BREDR)
++	if (cp->addr.type == BDADDR_BREDR)
+ 		err = hci_remove_link_key(hdev, &cp->addr.bdaddr);
+ 	else
+ 		err = hci_remove_ltk(hdev, &cp->addr.bdaddr);
+@@ -1536,7 +1536,7 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
+ 
+ 	if (cp->disconnect) {
+-		if (cp->addr.type == MGMT_ADDR_BREDR)
++		if (cp->addr.type == BDADDR_BREDR)
+ 			conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
+ 							&cp->addr.bdaddr);
+ 		else
+@@ -1596,7 +1596,7 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto failed;
+ 	}
+ 
+-	if (cp->addr.type == MGMT_ADDR_BREDR)
++	if (cp->addr.type == BDADDR_BREDR)
+ 		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->addr.bdaddr);
+ 	else
+ 		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->addr.bdaddr);
+@@ -1631,23 +1631,23 @@ static u8 link_to_mgmt(u8 link_type, u8 addr_type)
+ 	case LE_LINK:
+ 		switch (addr_type) {
+ 		case ADDR_LE_DEV_PUBLIC:
+-			return MGMT_ADDR_LE_PUBLIC;
++			return BDADDR_LE_PUBLIC;
+ 
+ 		default:
+ 			/* Fallback to LE Random address type */
+-			return MGMT_ADDR_LE_RANDOM;
++			return BDADDR_LE_RANDOM;
+ 		}
+ 
+ 	default:
+ 		/* Fallback to BR/EDR type */
+-		return MGMT_ADDR_BREDR;
++		return BDADDR_BREDR;
+ 	}
  }
  
--static u8 link_to_mgmt(u8 link_type, u8 addr_type)
-+static u8 link_to_bdaddr(u8 link_type, u8 addr_type)
+ static u8 mgmt_to_le(u8 mgmt_type)
  {
- 	switch (link_type) {
- 	case LE_LINK:
-@@ -1693,7 +1693,7 @@ static int get_connections(struct sock *sk, struct hci_dev *hdev, void *data,
- 		if (!test_bit(HCI_CONN_MGMT_CONNECTED, &c->flags))
- 			continue;
- 		bacpy(&rp->addr[i].bdaddr, &c->dst);
--		rp->addr[i].type = link_to_mgmt(c->type, c->dst_type);
-+		rp->addr[i].type = link_to_bdaddr(c->type, c->dst_type);
- 		if (c->type == SCO_LINK || c->type == ESCO_LINK)
- 			continue;
- 		i++;
-@@ -1860,7 +1860,7 @@ static void pairing_complete(struct pending_cmd *cmd, u8 status)
- 	struct hci_conn *conn = cmd->user_data;
+ 	switch (mgmt_type) {
+-	case MGMT_ADDR_LE_PUBLIC:
++	case BDADDR_LE_PUBLIC:
+ 		return ADDR_LE_DEV_PUBLIC;
  
- 	bacpy(&rp.addr.bdaddr, &conn->dst);
--	rp.addr.type = link_to_mgmt(conn->type, conn->dst_type);
-+	rp.addr.type = link_to_bdaddr(conn->type, conn->dst_type);
+ 	default:
+@@ -1914,7 +1914,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	else
+ 		auth_type = HCI_AT_DEDICATED_BONDING_MITM;
  
- 	cmd_complete(cmd->sk, cmd->index, MGMT_OP_PAIR_DEVICE, status,
- 		     &rp, sizeof(rp));
-@@ -2983,7 +2983,7 @@ int mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, u8 persistent)
+-	if (cp->addr.type == MGMT_ADDR_BREDR)
++	if (cp->addr.type == BDADDR_BREDR)
+ 		conn = hci_connect(hdev, ACL_LINK, &cp->addr.bdaddr, sec_level,
+ 				   auth_type);
+ 	else
+@@ -1947,7 +1947,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
+ 
+ 	/* For LE, just connecting isn't a proof that the pairing finished */
+-	if (cp->addr.type == MGMT_ADDR_BREDR)
++	if (cp->addr.type == BDADDR_BREDR)
+ 		conn->connect_cfm_cb = pairing_complete_cb;
+ 
+ 	conn->security_cfm_cb = pairing_complete_cb;
+@@ -2024,7 +2024,7 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
+ 		goto done;
+ 	}
+ 
+-	if (type == MGMT_ADDR_BREDR)
++	if (type == BDADDR_BREDR)
+ 		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, bdaddr);
+ 	else
+ 		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, bdaddr);
+@@ -2035,7 +2035,7 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
+ 		goto done;
+ 	}
+ 
+-	if (type == MGMT_ADDR_LE_PUBLIC || type == MGMT_ADDR_LE_RANDOM) {
++	if (type == BDADDR_LE_PUBLIC || type == BDADDR_LE_RANDOM) {
+ 		/* Continue with pairing via SMP */
+ 		err = smp_user_confirm_reply(conn, mgmt_op, passkey);
+ 
+@@ -2967,7 +2967,7 @@ int mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key,
  
  	ev.store_hint = persistent;
  	bacpy(&ev.key.addr.bdaddr, &key->bdaddr);
--	ev.key.addr.type = link_to_mgmt(LE_LINK, key->bdaddr_type);
-+	ev.key.addr.type = link_to_bdaddr(LE_LINK, key->bdaddr_type);
- 	ev.key.authenticated = key->authenticated;
- 	ev.key.enc_size = key->enc_size;
- 	ev.key.ediv = key->ediv;
-@@ -3007,7 +3007,7 @@ int mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	u16 eir_len = 0;
+-	ev.key.addr.type = MGMT_ADDR_BREDR;
++	ev.key.addr.type = BDADDR_BREDR;
+ 	ev.key.type = key->type;
+ 	memcpy(ev.key.val, key->val, 16);
+ 	ev.key.pin_len = key->pin_len;
+@@ -3125,7 +3125,7 @@ int mgmt_pin_code_request(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 secure)
+ 	struct mgmt_ev_pin_code_request ev;
  
- 	bacpy(&ev->addr.bdaddr, bdaddr);
--	ev->addr.type = link_to_mgmt(link_type, addr_type);
-+	ev->addr.type = link_to_bdaddr(link_type, addr_type);
+ 	bacpy(&ev.addr.bdaddr, bdaddr);
+-	ev.addr.type = MGMT_ADDR_BREDR;
++	ev.addr.type = BDADDR_BREDR;
+ 	ev.secure = secure;
  
- 	ev->flags = __cpu_to_le32(flags);
- 
-@@ -3070,7 +3070,7 @@ int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 	mgmt_pending_foreach(MGMT_OP_DISCONNECT, hdev, disconnect_rsp, &sk);
- 
- 	bacpy(&ev.bdaddr, bdaddr);
--	ev.type = link_to_mgmt(link_type, addr_type);
-+	ev.type = link_to_bdaddr(link_type, addr_type);
- 
- 	err = mgmt_event(MGMT_EV_DEVICE_DISCONNECTED, hdev, &ev, sizeof(ev),
- 			 sk);
-@@ -3096,7 +3096,7 @@ int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	return mgmt_event(MGMT_EV_PIN_CODE_REQUEST, hdev, &ev, sizeof(ev),
+@@ -3144,7 +3144,7 @@ int mgmt_pin_code_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
  		return -ENOENT;
  
  	bacpy(&rp.addr.bdaddr, bdaddr);
--	rp.addr.type = link_to_mgmt(link_type, addr_type);
-+	rp.addr.type = link_to_bdaddr(link_type, addr_type);
+-	rp.addr.type = MGMT_ADDR_BREDR;
++	rp.addr.type = BDADDR_BREDR;
  
- 	err = cmd_complete(cmd->sk, cmd->index, MGMT_OP_DISCONNECT,
+ 	err = cmd_complete(cmd->sk, hdev->id, MGMT_OP_PIN_CODE_REPLY,
  			   mgmt_status(status), &rp, sizeof(rp));
-@@ -3114,7 +3114,7 @@ int mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	struct mgmt_ev_connect_failed ev;
- 
- 	bacpy(&ev.addr.bdaddr, bdaddr);
--	ev.addr.type = link_to_mgmt(link_type, addr_type);
-+	ev.addr.type = link_to_bdaddr(link_type, addr_type);
- 	ev.status = mgmt_status(status);
- 
- 	return mgmt_event(MGMT_EV_CONNECT_FAILED, hdev, &ev, sizeof(ev), NULL);
-@@ -3185,7 +3185,7 @@ int mgmt_user_confirm_request(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 	BT_DBG("%s", hdev->name);
- 
- 	bacpy(&ev.addr.bdaddr, bdaddr);
--	ev.addr.type = link_to_mgmt(link_type, addr_type);
-+	ev.addr.type = link_to_bdaddr(link_type, addr_type);
- 	ev.confirm_hint = confirm_hint;
- 	ev.value = value;
- 
-@@ -3201,7 +3201,7 @@ int mgmt_user_passkey_request(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 	BT_DBG("%s", hdev->name);
- 
- 	bacpy(&ev.addr.bdaddr, bdaddr);
--	ev.addr.type = link_to_mgmt(link_type, addr_type);
-+	ev.addr.type = link_to_bdaddr(link_type, addr_type);
- 
- 	return mgmt_event(MGMT_EV_USER_PASSKEY_REQUEST, hdev, &ev, sizeof(ev),
- 			  NULL);
-@@ -3220,7 +3220,7 @@ static int user_pairing_resp_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+@@ -3166,7 +3166,7 @@ int mgmt_pin_code_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
  		return -ENOENT;
  
  	bacpy(&rp.addr.bdaddr, bdaddr);
--	rp.addr.type = link_to_mgmt(link_type, addr_type);
-+	rp.addr.type = link_to_bdaddr(link_type, addr_type);
- 	err = cmd_complete(cmd->sk, hdev->id, opcode, mgmt_status(status),
- 			   &rp, sizeof(rp));
+-	rp.addr.type = MGMT_ADDR_BREDR;
++	rp.addr.type = BDADDR_BREDR;
  
-@@ -3263,7 +3263,7 @@ int mgmt_auth_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	struct mgmt_ev_auth_failed ev;
- 
- 	bacpy(&ev.addr.bdaddr, bdaddr);
--	ev.addr.type = link_to_mgmt(link_type, addr_type);
-+	ev.addr.type = link_to_bdaddr(link_type, addr_type);
- 	ev.status = mgmt_status(status);
- 
- 	return mgmt_event(MGMT_EV_AUTH_FAILED, hdev, &ev, sizeof(ev), NULL);
-@@ -3530,7 +3530,7 @@ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	memset(buf, 0, sizeof(buf));
- 
- 	bacpy(&ev->addr.bdaddr, bdaddr);
--	ev->addr.type = link_to_mgmt(link_type, addr_type);
-+	ev->addr.type = link_to_bdaddr(link_type, addr_type);
- 	ev->rssi = rssi;
- 	if (cfm_name)
- 		ev->flags[0] |= MGMT_DEV_FOUND_CONFIRM_NAME;
-@@ -3563,7 +3563,7 @@ int mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	memset(buf, 0, sizeof(buf));
- 
- 	bacpy(&ev->addr.bdaddr, bdaddr);
--	ev->addr.type = link_to_mgmt(link_type, addr_type);
-+	ev->addr.type = link_to_bdaddr(link_type, addr_type);
- 	ev->rssi = rssi;
- 
- 	eir_len = eir_append_data(ev->eir, 0, EIR_NAME_COMPLETE, name,
+ 	err = cmd_complete(cmd->sk, hdev->id, MGMT_OP_PIN_CODE_NEG_REPLY,
+ 			   mgmt_status(status), &rp, sizeof(rp));
 -- 
 1.7.10
 
