@@ -3,8 +3,8 @@ MIME-Version: 1.0
 In-Reply-To: <20120425090505.GA25179@x220>
 References: <1335340311-25057-1-git-send-email-vishal.agarwal@stericsson.com>
 	<20120425090505.GA25179@x220>
-Date: Wed, 25 Apr 2012 15:29:27 +0530
-Message-ID: <CA+_sZW-SWqjgyM7y-czsjdAw=d2T+0uvscGTvCXN4K87SYvXVw@mail.gmail.com>
+Date: Wed, 25 Apr 2012 15:27:25 +0530
+Message-ID: <CA+_sZW-2a4NiLA4SpYV44DLwWnnFeiD88_K_gQOSQX9rN9Bugg@mail.gmail.com>
 Subject: Re: [PATCH] Bluetooth: eir_append_data should take care of padding
 From: vishal agarwal <vishal.bluez@gmail.com>
 To: Vishal Agarwal <vishal.agarwal@stericsson.com>,
@@ -14,6 +14,14 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
+
+In function mgmt_device_found, which is called from
+hci_extended_inquiry_result_evt
+eir_append_data function is called without taking care of padding
+bytes. I will create a new function
+which will return the padding offset in the EIR data andit will be
+called in function
+mgmt_device_found before calling the eir_append_data function.
 
 On Wed, Apr 25, 2012 at 2:35 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
 > Hi Vishal,
@@ -67,14 +75,6 @@ On Wed, Apr 25, 2012 at 2:35 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
 > padded zeroes. If you see misuse of this somewhere please submit a patch
 > for that instead.
 >
-
-In function mgmt_device_found, which is called from
-hci_extended_inquiry_result_evt eir_append_data function is called
-without taking care of padding bytes. I will create a new function
-which will return the padding offset in the EIR data andit will be
-called in function mgmt_device_found before calling the
-eir_append_data function.
-
 > Johan
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
