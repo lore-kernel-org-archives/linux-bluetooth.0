@@ -1,198 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 8/8] Bluetooth: Remove advertising cache
-Date: Tue, 24 Apr 2012 21:02:56 -0300
-Message-Id: <1335312176-21306-9-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 7/8] Bluetooth: Use address type info from user-space
+Date: Tue, 24 Apr 2012 21:02:55 -0300
+Message-Id: <1335312176-21306-8-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1335312176-21306-1-git-send-email-andre.guedes@openbossa.org>
 References: <1335312176-21306-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-User-space pass the remote device address type to kernel through
-struct sockaddr_l2 what makes the advertising useless. This patch
-removes all advertising cache code.
+In order to establish a LE connection we need the address type
+information. User-space already pass this information to kernel
+through struct sockaddr_l2.
+
+This patch adds the dst_type parameter to l2cap_chan_connect so we
+are able to pass the address type info from user-space down to
+hci_conn layer.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |    9 -----
- net/bluetooth/hci_core.c         |   74 --------------------------------------
- net/bluetooth/hci_event.c        |    7 ----
- 3 files changed, 90 deletions(-)
+ include/net/bluetooth/l2cap.h |    2 +-
+ net/bluetooth/l2cap_core.c    |   11 ++++++-----
+ net/bluetooth/l2cap_sock.c    |    2 +-
+ 3 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e69a9ee..d1e744f 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -255,9 +255,6 @@ struct hci_dev {
- 
- 	struct list_head	remote_oob_data;
- 
--	struct list_head	adv_entries;
--	struct delayed_work	adv_work;
--
- 	struct hci_dev_stats	stat;
- 
- 	struct sk_buff_head	driver_init;
-@@ -692,12 +689,6 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
- 								u8 *randomizer);
- int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr);
- 
--#define ADV_CLEAR_TIMEOUT (3*60*HZ) /* Three minutes */
--int hci_adv_entries_clear(struct hci_dev *hdev);
--struct adv_entry *hci_find_adv_entry(struct hci_dev *hdev, bdaddr_t *bdaddr);
--int hci_add_adv_entry(struct hci_dev *hdev,
--					struct hci_ev_le_advertising_info *ev);
--
- void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
- 
- int hci_recv_frame(struct sk_buff *skb);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ce8535f..0e5839c 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1522,75 +1522,6 @@ int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
- 	return mgmt_device_unblocked(hdev, bdaddr, type);
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 95741da..22e9ec9 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -922,7 +922,7 @@ struct l2cap_chan *l2cap_chan_create(void);
+ void l2cap_chan_close(struct l2cap_chan *chan, int reason);
+ void l2cap_chan_destroy(struct l2cap_chan *chan);
+ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+-								bdaddr_t *dst);
++		       bdaddr_t *dst, u8 dst_type);
+ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 								u32 priority);
+ void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 7451fa2..beb7194 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1395,7 +1395,8 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
+ 	return c1;
  }
  
--static void hci_clear_adv_cache(struct work_struct *work)
--{
--	struct hci_dev *hdev = container_of(work, struct hci_dev,
--					    adv_work.work);
--
--	hci_dev_lock(hdev);
--
--	hci_adv_entries_clear(hdev);
--
--	hci_dev_unlock(hdev);
--}
--
--int hci_adv_entries_clear(struct hci_dev *hdev)
--{
--	struct adv_entry *entry, *tmp;
--
--	list_for_each_entry_safe(entry, tmp, &hdev->adv_entries, list) {
--		list_del(&entry->list);
--		kfree(entry);
--	}
--
--	BT_DBG("%s adv cache cleared", hdev->name);
--
--	return 0;
--}
--
--struct adv_entry *hci_find_adv_entry(struct hci_dev *hdev, bdaddr_t *bdaddr)
--{
--	struct adv_entry *entry;
--
--	list_for_each_entry(entry, &hdev->adv_entries, list)
--		if (bacmp(bdaddr, &entry->bdaddr) == 0)
--			return entry;
--
--	return NULL;
--}
--
--static inline int is_connectable_adv(u8 evt_type)
--{
--	if (evt_type == ADV_IND || evt_type == ADV_DIRECT_IND)
--		return 1;
--
--	return 0;
--}
--
--int hci_add_adv_entry(struct hci_dev *hdev,
--					struct hci_ev_le_advertising_info *ev) { struct adv_entry *entry; if (!is_connectable_adv(ev->evt_type))
--		return -EINVAL;
--
--	/* Only new entries should be added to adv_entries. So, if
--	 * bdaddr was found, don't add it. */
--	if (hci_find_adv_entry(hdev, &ev->bdaddr))
--		return 0;
--
--	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
--	if (!entry)
--		return -ENOMEM;
--
--	bacpy(&entry->bdaddr, &ev->bdaddr);
--	entry->bdaddr_type = ev->bdaddr_type;
--
--	list_add(&entry->list, &hdev->adv_entries);
--
--	BT_DBG("%s adv entry added: address %s type %u", hdev->name,
--				batostr(&entry->bdaddr), entry->bdaddr_type);
--
--	return 0;
--}
--
- static void le_scan_param_req(struct hci_dev *hdev, unsigned long opt)
+-int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *dst)
++int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
++		       bdaddr_t *dst, u8 dst_type)
  {
- 	struct le_scan_params *param =  (struct le_scan_params *) opt;
-@@ -1736,7 +1667,6 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_LIST_HEAD(&hdev->link_keys);
- 	INIT_LIST_HEAD(&hdev->long_term_keys);
- 	INIT_LIST_HEAD(&hdev->remote_oob_data);
--	INIT_LIST_HEAD(&hdev->adv_entries);
+ 	struct sock *sk = chan->sk;
+ 	bdaddr_t *src = &bt_sk(sk)->src;
+@@ -1405,8 +1406,8 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+ 	__u8 auth_type;
+ 	int err;
  
- 	INIT_WORK(&hdev->rx_work, hci_rx_work);
- 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
-@@ -1744,7 +1674,6 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_WORK(&hdev->power_on, hci_power_on);
- 	INIT_WORK(&hdev->le_scan, le_scan_work);
+-	BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
+-						__le16_to_cpu(chan->psm));
++	BT_DBG("%s -> %s (type %u) psm 0x%2.2x", batostr(src), batostr(dst),
++	       dst_type, __le16_to_cpu(chan->psm));
  
--	INIT_DELAYED_WORK(&hdev->adv_work, hci_clear_adv_cache);
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
- 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
- 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
-@@ -1890,8 +1819,6 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	hdev = hci_get_route(dst, src);
+ 	if (!hdev)
+@@ -1480,10 +1481,10 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+ 	auth_type = l2cap_get_auth_type(chan);
  
- 	hci_del_sysfs(hdev);
+ 	if (chan->dcid == L2CAP_CID_LE_DATA)
+-		hcon = hci_connect(hdev, LE_LINK, dst, BDADDR_LE_RANDOM,
++		hcon = hci_connect(hdev, LE_LINK, dst, dst_type,
+ 				   chan->sec_level, auth_type);
+ 	else
+-		hcon = hci_connect(hdev, ACL_LINK, dst, BDADDR_BREDR,
++		hcon = hci_connect(hdev, ACL_LINK, dst, dst_type,
+ 				   chan->sec_level, auth_type);
  
--	cancel_delayed_work_sync(&hdev->adv_work);
--
- 	destroy_workqueue(hdev->workqueue);
+ 	if (IS_ERR(hcon)) {
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 4d03b45..0f30785 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -124,7 +124,7 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+ 		return -EINVAL;
  
- 	hci_dev_lock(hdev);
-@@ -1900,7 +1827,6 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	hci_link_keys_clear(hdev);
- 	hci_smp_ltks_clear(hdev);
- 	hci_remote_oob_data_clear(hdev);
--	hci_adv_entries_clear(hdev);
- 	hci_dev_unlock(hdev);
+ 	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
+-				&la.l2_bdaddr);
++				 &la.l2_bdaddr, la.l2_bdaddr_type);
+ 	if (err)
+ 		return err;
  
- 	hci_dev_put(hdev);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index fb23c47..ec6c195 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1101,10 +1101,7 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 
- 		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 
--		cancel_delayed_work_sync(&hdev->adv_work);
--
- 		hci_dev_lock(hdev);
--		hci_adv_entries_clear(hdev);
- 		hci_discovery_set_state(hdev, DISCOVERY_FINDING);
- 		hci_dev_unlock(hdev);
- 		break;
-@@ -1119,8 +1116,6 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 
- 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 
--		schedule_delayed_work(&hdev->adv_work, ADV_CLEAR_TIMEOUT);
--
- 		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
- 				hdev->discovery.state == DISCOVERY_FINDING) {
- 			mgmt_interleaved_discovery(hdev);
-@@ -3354,8 +3349,6 @@ static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
- 	while (num_reports--) {
- 		struct hci_ev_le_advertising_info *ev = ptr;
- 
--		hci_add_adv_entry(hdev, ev);
--
- 		rssi = ev->data[ev->length];
- 		mgmt_device_found(hdev, &ev->bdaddr, LE_LINK, ev->bdaddr_type,
- 				  NULL, rssi, 0, 1, ev->data, ev->length);
 -- 
 1.7.10
 
