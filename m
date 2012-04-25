@@ -1,66 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 25 Apr 2012 12:05:05 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vishal Agarwal <vishal.agarwal@stericsson.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: eir_append_data should take care of padding
-Message-ID: <20120425090505.GA25179@x220>
-References: <1335340311-25057-1-git-send-email-vishal.agarwal@stericsson.com>
+Date: Wed, 25 Apr 2012 11:46:43 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Manoj <manojkr.sharma@stericsson.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Anurag Gupta <anurag.gupta@stericsson.com>
+Subject: Re: [PATCH 1/2] Bluetooth: Fix L2CAP ERTM packet queue corruption
+Message-ID: <20120425084641.GC23023@aemeltch-MOBL1>
+References: <1335342544-17320-1-git-send-email-manojkr.sharma@stericsson.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1335340311-25057-1-git-send-email-vishal.agarwal@stericsson.com>
+In-Reply-To: <1335342544-17320-1-git-send-email-manojkr.sharma@stericsson.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vishal,
+Hi Manoj,
 
-On Wed, Apr 25, 2012, Vishal Agarwal wrote:
-> EIR data received from controller might contain padding zeros.
-> In this case data should be appended in the starting of padding
-> instead of at the end of padding. Data added after the padding will
-> be discarded by user space.
+On Wed, Apr 25, 2012 at 01:59:03PM +0530, Manoj wrote:
+> While running in L2CAP ERTM mode, sometimes ERTM packet queue
+> gets corrupted because though method l2cap_ertm_send() is not
+> thread-safe, it is called simultaneously from multiple
+> threads.
+
+Could you give examples how queue is corrupted?
+
+Best regards 
+Andrei Emeltchenko 
+
 > 
-> Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
+> Signed-off-by: Manoj <manojkr.sharma@stericsson.com>
 > ---
->  include/net/bluetooth/hci_core.h |   21 +++++++++++++++++----
->  1 files changed, 17 insertions(+), 4 deletions(-)
+>  net/bluetooth/l2cap_core.c |    3 ++-
+>  1 files changed, 2 insertions(+), 1 deletions(-)
 > 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index ef6e654..9e42e2b 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -938,11 +938,24 @@ static inline bool eir_has_data_type(u8 *data, size_t data_len, u8 type)
->  static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
->  				  u8 data_len)
->  {
-> -	eir[eir_len++] = sizeof(type) + data_len;
-> -	eir[eir_len++] = type;
-> -	memcpy(&eir[eir_len], data, data_len);
-> -	eir_len += data_len;
-> +	u8 field_len;
-> +	size_t parsed = 0;
-> +
-> +	while (parsed < eir_len - 1) {
-> +		field_len = eir[0];
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 19807c9..a9319e2 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1713,6 +1713,7 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
+>  	if (chan->state != BT_CONNECTED)
+>  		return -ENOTCONN;
 >  
-> +		if (field_len == 0) {
-> +			eir[0] = sizeof(type) + data_len;
-> +			eir[1] = type;
-> +			memcpy(&eir[2], data, data_len);
-> +			/* data_len + 1 byte for size + 1 byte for type */
-> +			eir_len = parsed + data_len + 2;
-> +			break;
-> +		}
-> +
-> +		parsed += field_len + 1;
-> +		eir += field_len + 1;
-> +	}
->  	return eir_len;
-
-I don't really see the point of this. The eir_len parameter passed to
-this function is supposed to be the length of the significant
-(non-padded) data. I.e. it should already indicate the start of the
-padded zeroes. If you see misuse of this somewhere please submit a patch
-for that instead.
-
-Johan
+> +	mutex_lock(&chan->conn->chan_lock);
+>  	while ((skb = chan->tx_send_head) && (!l2cap_tx_window_full(chan))) {
+>  
+>  		if (chan->remote_max_tx &&
+> @@ -1765,7 +1766,7 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
+>  		else
+>  			chan->tx_send_head = skb_queue_next(&chan->tx_q, skb);
+>  	}
+> -
+> +	mutex_unlock(&chan->conn->chan_lock);
+>  	return nsent;
+>  }
+>  
+> -- 
+> 1.6.6.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
