@@ -1,78 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/8] Bluetooth: Move bdaddr_to_le to hci_core
-Date: Tue, 24 Apr 2012 21:02:53 -0300
-Message-Id: <1335312176-21306-6-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 4/8] Bluetooth: Add address type to struct sockaddr_l2
+Date: Tue, 24 Apr 2012 21:02:52 -0300
+Message-Id: <1335312176-21306-5-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1335312176-21306-1-git-send-email-andre.guedes@openbossa.org>
 References: <1335312176-21306-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves the helper function bdaddr_to_le to hci_core, so it
-can be used in mgmt.c and hci_conn.c.
+This patch adds the address type info to struct sockaddr_l2 so
+user-space can inform the remote device address type required
+to establish LE connections.
+
+Soon, instead of looking the advertising cache up to discover the
+address type, we'll use this address type info to establish LE
+connections.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |    2 ++
- net/bluetooth/hci_core.c         |   12 ++++++++++++
- net/bluetooth/mgmt.c             |   12 ------------
- 3 files changed, 14 insertions(+), 12 deletions(-)
+ include/net/bluetooth/l2cap.h |    1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 6777432..7e7fe3f 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1073,4 +1073,6 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
- 		int timeout);
- int hci_cancel_le_scan(struct hci_dev *hdev);
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 0fac788..95741da 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -57,6 +57,7 @@ struct sockaddr_l2 {
+ 	__le16		l2_psm;
+ 	bdaddr_t	l2_bdaddr;
+ 	__le16		l2_cid;
++	__u8		l2_bdaddr_type;
+ };
  
-+u8 bdaddr_to_le(u8 bdaddr_type);
-+
- #endif /* __HCI_CORE_H */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 0d9ed01..ce8535f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2947,3 +2947,15 @@ int hci_cancel_inquiry(struct hci_dev *hdev)
- 
- 	return hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
- }
-+
-+u8 bdaddr_to_le(u8 bdaddr_type)
-+{
-+	switch (bdaddr_type) {
-+	case BDADDR_LE_PUBLIC:
-+		return ADDR_LE_DEV_PUBLIC;
-+
-+	default:
-+		/* Fallback to LE Random address type */
-+		return ADDR_LE_DEV_RANDOM;
-+	}
-+}
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 6d80cb3..2c77473 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1644,18 +1644,6 @@ static u8 link_to_bdaddr(u8 link_type, u8 addr_type)
- 	}
- }
- 
--static u8 bdaddr_to_le(u8 bdaddr_type)
--{
--	switch (bdaddr_type) {
--	case BDADDR_LE_PUBLIC:
--		return ADDR_LE_DEV_PUBLIC;
--
--	default:
--		/* Fallback to LE Random address type */
--		return ADDR_LE_DEV_RANDOM;
--	}
--}
--
- static int get_connections(struct sock *sk, struct hci_dev *hdev, void *data,
- 			   u16 data_len)
- {
+ /* L2CAP socket options */
 -- 
 1.7.10
 
