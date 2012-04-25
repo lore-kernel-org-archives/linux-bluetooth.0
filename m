@@ -1,35 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
+From: Hemant Gupta <hemant.gupta@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: Hemant Gupta <hemant.gupta@stericsson.com>
+Subject: [PATCH v1] Store LE device address type with primary list
+Date: Wed, 25 Apr 2012 10:04:01 +0530
+Message-ID: <1335328441-20307-1-git-send-email-hemant.gupta@stericsson.com>
 MIME-Version: 1.0
-From: Rafael Fonseca <fonsecasantos.rafael@gmail.com>
-Date: Wed, 25 Apr 2012 02:54:57 -0300
-Message-ID: <CAPsQmjrMuUbiqymU48V2m4Lz7_33gudS8FMHijoNq_9UquPosw@mail.gmail.com>
-Subject: Google Summer of Code 2012 - Introduction
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Bluez community,
+This patch stores the address type while storing the primary services
+of LE Device which is later used for re-creating device from primary
+service database.
+---
+ src/adapter.c |   10 ++++++++--
+ src/device.c  |    9 +++++++--
+ 2 files changed, 15 insertions(+), 4 deletions(-)
 
-It is a great honor for me to join this year's Google Summer of Code,
-specially in the Bluez project.
-
-I am Rafael Fonseca (rfonseca on IRC), a Computer Scientist graduated
-from State University of Campinas (Unicamp), Brazil. I'm currently in
-the last year of the master degree -- started in 2011 -- in Theory of
-Computing on the same university.
-
-My job as a GSoC student is to implement the controller role specified
-in the AVRCP 1.3 specification that adds music metadata information
-like Artist Name and Track title.
-
-If someone needs to contact me, I am always around #bluez and
-#bluez-gsoc and my current timezone is GMT-3.
-
-I am really looking forward to start coding and contributing to the
-community as soon as possible!
-
-
-Best regards
+diff --git a/src/adapter.c b/src/adapter.c
+index 12b6aeb..5df49e3 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1920,13 +1920,19 @@ static void create_stored_device_from_primary(char *key, char *value,
+ 	struct btd_adapter *adapter = user_data;
+ 	struct btd_device *device;
+ 	GSList *services, *uuids, *l;
++	/* Assume address type to be public by default */
++	addr_type_t addr_type = ADDR_TYPE_LE_PUBLIC;
+ 
+ 	if (g_slist_find_custom(adapter->devices,
+ 			key, (GCompareFunc) device_address_cmp))
+ 		return;
+ 
+-	/* FIXME: Get the correct LE addr type (public/random) */
+-	device = device_create(connection, adapter, key, ADDR_TYPE_LE_PUBLIC);
++	/* Check if address type and space can be parsed properly */
++	if (sscanf(value, "%d ", &addr_type) == 2)
++		/* Increment by 2 (address type and space) */
++		value += 2;
++
++	device = device_create(connection, adapter, key, addr_type);
+ 	if (!device)
+ 		return;
+ 
+diff --git a/src/device.c b/src/device.c
+index ea6fec2..9c15d28 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1748,14 +1748,19 @@ static void store_services(struct btd_device *device)
+ {
+ 	struct btd_adapter *adapter = device->adapter;
+ 	bdaddr_t dba, sba;
+-	char *str = primary_list_to_string(device->primaries);
++	addr_type_t addr_type;
++	char *primary = primary_list_to_string(device->primaries);
++	/* Allocate extra space for address type, space and \0 */
++	char *str = g_malloc(strlen(primary) + 2 + 1);
+ 
+ 	adapter_get_address(adapter, &sba);
+-	device_get_address(device, &dba, NULL);
++	device_get_address(device, &dba, &addr_type);
++	sprintf(str, "%d %s", addr_type, primary);
+ 
+ 	write_device_services(&sba, &dba, str);
+ 
+ 	g_free(str);
++	g_free(primary);
+ }
+ 
+ static void attio_connected(gpointer data, gpointer user_data)
 -- 
-Rafael Fonseca
+1.7.0.4
+
