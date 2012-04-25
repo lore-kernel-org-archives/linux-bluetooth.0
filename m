@@ -2,50 +2,45 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 1/7] Add Bluetooth address type in sockaddr_l2
-Date: Tue, 24 Apr 2012 22:42:25 -0300
-Message-Id: <1335318151-21063-2-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1335318151-21063-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1335318151-21063-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 0/7] Add address type to L2CAP socket
+Date: Tue, 24 Apr 2012 22:42:24 -0300
+Message-Id: <1335318151-21063-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the address type information to sockaddr_l2 structure,
-allowing the userspace to inform the remote address type required for
-LE Create Connection command.
----
- lib/bluetooth.h |    5 +++++
- lib/l2cap.h     |    1 +
- 2 files changed, 6 insertions(+), 0 deletions(-)
+Dependency: "[PATCH 0/8] LE Connection"
 
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index 0541842..0fc4508 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -222,6 +222,11 @@ typedef struct {
- 	uint8_t b[6];
- } __attribute__((packed)) bdaddr_t;
- 
-+/* BD Address type */
-+#define BDADDR_BREDR           0x00
-+#define BDADDR_LE_PUBLIC       0x01
-+#define BDADDR_LE_RANDOM       0x02
-+
- #define BDADDR_ANY   (&(bdaddr_t) {{0, 0, 0, 0, 0, 0}})
- #define BDADDR_ALL   (&(bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}})
- #define BDADDR_LOCAL (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
-diff --git a/lib/l2cap.h b/lib/l2cap.h
-index 5806aaa..5ce94c4 100644
---- a/lib/l2cap.h
-+++ b/lib/l2cap.h
-@@ -43,6 +43,7 @@ struct sockaddr_l2 {
- 	unsigned short	l2_psm;
- 	bdaddr_t	l2_bdaddr;
- 	unsigned short	l2_cid;
-+	uint8_t		l2_bdaddr_type;
- };
- 
- /* L2CAP socket options */
+Rebased version of the previous RFC: "[RFC BlueZ v1 1/7] Add Bluetooth
+address type in sockaddr_l2"
+
+Andre Guedes (1):
+  l2test: Add option to inform the address type
+
+Claudio Takahasi (6):
+  Add Bluetooth address type in sockaddr_l2
+  btio: Add address type in bt_io_connect
+  Add address type for BLE bt_io_connect calls
+  Remove leftover field in remote_dev_info struct
+  Remove addr_type_t definition from adapter.h
+  Remove MGMT address type definition
+
+ btio/btio.c       |   21 +++++++++++---
+ btio/btio.h       |    1 +
+ lib/bluetooth.h   |    5 +++
+ lib/l2cap.h       |    1 +
+ lib/mgmt.h        |    5 ---
+ mgmt/main.c       |   26 +++++++++---------
+ plugins/hciops.c  |   51 ++++++++++++++++++----------------
+ plugins/mgmtops.c |   77 +++++++++++++++++-----------------------------------
+ src/adapter.c     |   70 ++++++++++++++++++++++++-----------------------
+ src/adapter.h     |   45 +++++++++++++------------------
+ src/device.c      |   59 +++++++++++++++++++++-------------------
+ src/device.h      |    6 ++--
+ src/event.c       |   29 ++++++++++---------
+ src/event.h       |    6 ++--
+ test/l2test.c     |   27 +++++++++++++++++-
+ 15 files changed, 221 insertions(+), 208 deletions(-)
+
 -- 
 1.7.8.5
 
