@@ -1,77 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vishal Agarwal <vishal.agarwal@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: <vishal.agarwal@stericsson.com>
-Subject: [PATCH] Bluetooth: Padding should be removed from EIR data
-Date: Wed, 25 Apr 2012 18:57:14 +0530
-Message-ID: <1335360434-28774-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CAJdJm_O5tke32fB352Pbkrvt98EgZiowgOpAbp2JK9QspgxDxw@mail.gmail.com>
+References: <1335328441-20307-1-git-send-email-hemant.gupta@stericsson.com>
+	<CAJdJm_O5tke32fB352Pbkrvt98EgZiowgOpAbp2JK9QspgxDxw@mail.gmail.com>
+Date: Wed, 25 Apr 2012 18:58:01 +0530
+Message-ID: <CACj007k-YAtk74nw2VQjGEBhFMuSBimTB7---L0R6mfxF=TSjA@mail.gmail.com>
+Subject: Re: [PATCH v1] Store LE device address type with primary list
+From: Hemant Gupta <hemantgupta.ste@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Hemant Gupta <hemant.gupta@stericsson.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-EIR data received from controller might contain padding zeros.
-This padding should be removed before any further processing and
-sending it over mgmt interface.
+Hi Anderson,
 
-Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
----
- include/net/bluetooth/hci_core.h |   17 +++++++++++++++++
- net/bluetooth/hci_event.c        |    4 +++-
- 2 files changed, 20 insertions(+), 1 deletions(-)
+On Wed, Apr 25, 2012 at 5:43 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Hemant,
+>
+> On Wed, Apr 25, 2012 at 12:34 AM, Hemant Gupta
+> <hemant.gupta@stericsson.com> wrote:
+>> -       /* FIXME: Get the correct LE addr type (public/random) */
+>> -       device = device_create(connection, adapter, key, ADDR_TYPE_LE_PUBLIC);
+>> +       /* Check if address type and space can be parsed properly */
+>> +       if (sscanf(value, "%d ", &addr_type) == 2)
+>
+> Are you sure "2" is the correct return value here? The manpage says:
+>
+> "These functions return the number of input items successfully matched
+> and assigned [...]"
+>
+> So I would imagine it should return 1 if addr_type is filled, 0
+> otherwise. Can you verify this?
+Thanks for pointing out, I have fixed that in new patch.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ef6e654..eec721c 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -935,6 +935,23 @@ static inline bool eir_has_data_type(u8 *data, size_t data_len, u8 type)
- 	return false;
- }
- 
-+static inline size_t eir_get_padding_offset(u8 *eir, size_t eir_len)
-+{
-+	u8 field_len;
-+	size_t parsed = 0;
-+
-+	while (parsed < eir_len) {
-+		field_len = eir[0];
-+
-+		if (field_len == 0)
-+			return parsed;
-+
-+		parsed += field_len + 1;
-+		eir += field_len + 1;
-+	}
-+	return eir_len;
-+}
-+
- static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
- 				  u8 data_len)
- {
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index fb23c47..067464f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3000,6 +3000,7 @@ static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct
- 	struct inquiry_data data;
- 	struct extended_inquiry_info *info = (void *) (skb->data + 1);
- 	int num_rsp = *((__u8 *) skb->data);
-+	size_t eir_len;
- 
- 	BT_DBG("%s num_rsp %d", hdev->name, num_rsp);
- 
-@@ -3032,9 +3033,10 @@ static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct
- 
- 		name_known = hci_inquiry_cache_update(hdev, &data, name_known,
- 						      &ssp);
-+		eir_len = eir_get_padding_offset(info->data, sizeof(info->data));
- 		mgmt_device_found(hdev, &info->bdaddr, ACL_LINK, 0x00,
- 				  info->dev_class, info->rssi, !name_known,
--				  ssp, info->data, sizeof(info->data));
-+				  ssp, info->data, eir_len);
- 	}
- 
- 	hci_dev_unlock(hdev);
+> (unless sscanf() counts the whitespace as input.)
+>
+>> +               /* Increment by 2 (address type and space) */
+>> +               value += 2;
+>> +
+>> +       device = device_create(connection, adapter, key, addr_type);
+>>        if (!device)
+>>                return;
+>
+> Regards,
+> --
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-1.7.0.4
-
+Best Regards
+Hemant Gupta
+ST-Ericsson India
