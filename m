@@ -1,39 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/8] Bluetooth: Add address type to struct sockaddr_l2
-Date: Tue, 24 Apr 2012 21:02:52 -0300
-Message-Id: <1335312176-21306-5-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 3/8] Bluetooth: Rename mgmt_to_le to bdaddr_to_le
+Date: Tue, 24 Apr 2012 21:02:51 -0300
+Message-Id: <1335312176-21306-4-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1335312176-21306-1-git-send-email-andre.guedes@openbossa.org>
 References: <1335312176-21306-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the address type info to struct sockaddr_l2 so
-user-space can inform the remote device address type required
-to establish LE connections.
-
-Soon, instead of looking the advertising cache up to discover the
-address type, we'll use this address type info to establish LE
-connections.
+Since address type macros are not only related to Management
+Interface anymore, it makes sense to rename the helper function
+mgmt_to_le to bdaddr_to_le.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/l2cap.h |    1 +
- 1 file changed, 1 insertion(+)
+ net/bluetooth/mgmt.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 0fac788..95741da 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -57,6 +57,7 @@ struct sockaddr_l2 {
- 	__le16		l2_psm;
- 	bdaddr_t	l2_bdaddr;
- 	__le16		l2_cid;
-+	__u8		l2_bdaddr_type;
- };
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 40c7514..6d80cb3 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1644,9 +1644,9 @@ static u8 link_to_bdaddr(u8 link_type, u8 addr_type)
+ 	}
+ }
  
- /* L2CAP socket options */
+-static u8 mgmt_to_le(u8 mgmt_type)
++static u8 bdaddr_to_le(u8 bdaddr_type)
+ {
+-	switch (mgmt_type) {
++	switch (bdaddr_type) {
+ 	case BDADDR_LE_PUBLIC:
+ 		return ADDR_LE_DEV_PUBLIC;
+ 
+@@ -2664,7 +2664,7 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 			type = HCI_SMP_LTK_SLAVE;
+ 
+ 		hci_add_ltk(hdev, &key->addr.bdaddr,
+-			    mgmt_to_le(key->addr.type),
++			    bdaddr_to_le(key->addr.type),
+ 			    type, 0, key->authenticated, key->val,
+ 			    key->enc_size, key->ediv, key->rand);
+ 	}
 -- 
 1.7.10
 
