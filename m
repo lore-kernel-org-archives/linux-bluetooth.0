@@ -1,42 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 25 Apr 2012 16:48:52 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: coekbe <coekbe@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Bug report: bluetoothd broken for a USB dongle since bluez 4.85
-Message-ID: <20120425194852.GB2781@joana>
-References: <CAK678xgXnf-bgBRGU+tyNdnUv4VoGM+XyH15W0jw8h3Wypi+_A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CAK678xgXnf-bgBRGU+tyNdnUv4VoGM+XyH15W0jw8h3Wypi+_A@mail.gmail.com>
+In-Reply-To: <1335367519-16361-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1335367519-16361-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Wed, 25 Apr 2012 15:35:47 -0400
+Message-ID: <CAJdJm_Pbndzgs6OKkkyQiXNYhTFwpwhHkf+V_WDkFWV-Q=xkNw@mail.gmail.com>
+Subject: Re: [PATCH] gatttool: Fix handle parsing in cmd_char_write()
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi coekbe,
+Hi Andrzej,
 
-* coekbe <coekbe@gmail.com> [2012-04-25 10:06:18 +0300]:
+On Wed, Apr 25, 2012 at 11:25 AM, Andrzej Kaczmarek
+<andrzej.kaczmarek@tieto.com> wrote:
+> errno is not set to 0 before call to strtoll() so cmd_char_write() can fail
+> even with proper data. Use strtohandle() helper function instead.
+> ---
+>  attrib/interactive.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-> Hi linux-bluetooth,
-> 
-> I have a Prodige bluetooth USB dongle that does not work with bluez
-> starting with version 4.85. Specifically, the command "hcitool scan"
-> does not find any bluetooth devices (my phone). Version 4.84 is good,
-> though. Git bisecting found the culprit:
-> 
-> ----------------
-> commit 5b1a2a39dc7710f5a58e4f676389fea06764800b
-> Author: Johan Hedberg <johan.hedberg@nokia.com>
-> Date:   Tue Jan 11 00:16:33 2011 +0200
-> 
->     Fix event mask setting for 1.1 controllers
-> 
->     Controllers based on the core spec 1.1 support the event mask HCI
->     command but need a very stripped down default value for the mask. This
->     patch makes sure the command gets issued for 1.1 controllers with the
->     appropriate value.
-> 
-> --------------------
+Looks good.
 
-Can you also send the output of hciconfig -a?
-
-	Gustavo
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
