@@ -1,51 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-From: Ryan Lewis <me@ryanlewis.net>
-Date: Wed, 25 Apr 2012 23:07:09 -0400
-Message-ID: <CA+L2dvFR7vF0Kjt6EknWvxqnUXpvckqWSdPgU7vxR_vrrhk8Gw@mail.gmail.com>
-Subject: update for btusb
+In-Reply-To: <CA+6PnXyWFRAAMA4iVM4Y2R2tfewjcDXz-wwtLoiz75vwO2Rnbw@mail.gmail.com>
+References: <20120425041218.GB8940@joana>
+	<CA+6PnXyWFRAAMA4iVM4Y2R2tfewjcDXz-wwtLoiz75vwO2Rnbw@mail.gmail.com>
+Date: Thu, 26 Apr 2012 03:23:08 +0200
+Message-ID: <CAKZqhqepkvRfJj+qp3x+t4X+7KOt8pFh3YZFx8HNc7MiTdJMQg@mail.gmail.com>
+Subject: Re: Google Summer of Code: Accepted Students Announced
+From: dmp <dmp0x7c5@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On 26 April 2012 02:08, Anton Weber <anton@antweb.me> wrote:
+> On 25 April 2012 05:12, Gustavo Padovan <gustavo@padovan.org> wrote:
+>> Hi Everyone,
+>>
+>> Yesterday Google released the accepted students for this yearâ€™s Google Summer
+>> of Code and BlueZ will be participating with 4 students:
+>>
+>> Project: Bluetooth Replayer
+>> Student: Anton Weber
+>> Mentor: Anderson Lizardo
+>>
+>> Project: OBEX Filesystem In Userspace
+>> Student: MichaÅ‚ Poczwardowski
+>> Mentor: Vinicius Gomes
+>>
+>> Project: Implement AVRCP 1.3 Controller Role
+>> Student: Rafael Fonseca
+>> Mentor: Luiz Augusto von Dentz
+>>
+>> Project: Visualization of Bluetooth traffic
+>> Student: Thiago da Silva Arruda
+>> Mentor: Gustavo Padovan
+>>
+>> It is now community bonding time, where students get know their mentors and the
+>> community. As their first task they will be sending introduction e-mails to
+>> this list about theirselves and their projects.
+>>
+>> We wish a great summer to all students. :-)
+>>
+>> Â  Â  Â  Â Gustavo
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at Â http://vger.kernel.org/majordomo-info.html
+>
+> Hey everyone and thanks for the warm welcome!
+>
+> I'm Anton Weber and I'm an undergrad student in Computer
+> Science/Embedded Systems at the University of Applied Sciences in
+> OsnabrÃ¼ck.
+> Although I'm currently finishing off my degree in the UK as part of an
+> exchange programme for my final year.
+>
+> I'll be implementing the "Bluetooth Replayer", a tool that can replay
+> hcidump logs on a VHCI interface to simulate real hardware.
+> You will find me in the #bluez and #bluez-gsoc channel under the nick
+> antweb_. Feel free to contact me there or via email!
+>
+> Really looking forward to working with my mentor and the BlueZ community.
+> This is my first time I applied GSoC, so I'm more than excited to get started!
+>
+> Best,
+> Ant
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at Â http://vger.kernel.org/majordomo-info.html
 
-I have a Fujitsu T901 which reports this bluetooth chip :
-$ lsusb
-..
-Bus 002 Device 006: ID 0489:e031 Foxconn / Hon Hai
-..
+Hello BlueZ Community,
 
-It does not work out of the box, here is usb-devices:
+My name's MichaÅ‚ Poczwardowski, student from Poland (UTC+2), my
+nickname is dmp and I will code during this summer for BlueZ :)
 
-T:  Bus=02 Lev=02 Prnt=02 Port=03 Cnt=04 Dev#=  6 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e031 Rev=01.12
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM20702A0
-S:  SerialNumber=9439E59707C7
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+I'm undergraduate Engineer in Computer Science. I've been studying at
+Technical University of GdaÅ„sk (4th year) and successfully
+participated in last yearâ€™s GSoC for Tcl/Tk Community.
 
-After reviewing this file:
-http://git.kernel.org/?p=linux/kernel/git/torvalds/linux.git;a=blob_plain;f=drivers/bluetooth/btusb.c;hb=HEAD
+My project is "OBEX FIlesystem In Userspace". Here is a short
+description taken from my proposal: FUSE allows to create filesystems
+in userspace and gobex, the OBEX library used by obexd, allows to
+operate with files on obex server. The goal is to connect these two
+powers. Prepared solution will allow to mount obex device and access
+them like they were in the local filesystem.
 
-	/* Broadcom BCM20702A0 */
-	{ USB_DEVICE(0x0a5c, 0x21e3) },
-	{ USB_DEVICE(0x0a5c, 0x21e6) },
-	{ USB_DEVICE(0x0a5c, 0x21e8) },
-	{ USB_DEVICE(0x0a5c, 0x21f3) },
-	{ USB_DEVICE(0x413c, 0x8197) },
-
-
-It is clear that my device is simply not listed. I will attempt to
-compile a modified driver and see if it makes things work, and if it
-does, i'll submit a patch (if necessary).
-
+I'm glad that my application has been accepted and thanks for the warm welcome.
 
 Thanks,
--rhl
+Michal
+
+dmp@freenode
