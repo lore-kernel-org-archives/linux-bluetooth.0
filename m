@@ -3,9 +3,9 @@ From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [BlueZ 13/15] GATT: Rename Characteristic Configuration constants
-Date: Thu, 26 Apr 2012 16:45:43 -0300
-Message-Id: <1335469545-1007-13-git-send-email-jprvita@openbossa.org>
+Subject: [BlueZ 12/15] HoG: Add read Report Reference descriptor
+Date: Thu, 26 Apr 2012 16:45:42 -0300
+Message-Id: <1335469545-1007-12-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1335469545-1007-1-git-send-email-jprvita@openbossa.org>
 References: <1335469545-1007-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,57 +13,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
-This patch renames the constants related to Client Characteristic
-Configuration bit field to use a proper name since it is related to
-GATT instead of ATT.
+This patch adds the GATT operation to read the value of the Report
+Reference descriptor of the Report characteristic.
 ---
- attrib/att.h              |    4 ++--
- thermometer/thermometer.c |    6 +++---
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ input/hog_device.c |   27 +++++++++++++++++++++++----
+ 1 files changed, 23 insertions(+), 4 deletions(-)
 
-diff --git a/attrib/att.h b/attrib/att.h
-index a74eb5a..ba11da7 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
-@@ -108,8 +108,8 @@
- #define ATT_CHAR_PROPER_EXT_PROPER		0x80
+diff --git a/input/hog_device.c b/input/hog_device.c
+index 6a7cda2..99de25c 100644
+--- a/input/hog_device.c
++++ b/input/hog_device.c
+@@ -120,9 +120,27 @@ static void write_ccc(uint16_t handle, gpointer user_data)
+ 					report_ccc_written_cb, hogdev);
+ }
  
- /* Client Characteristic Configuration bit field */
--#define ATT_CLIENT_CHAR_CONF_NOTIFICATION	0x0001
--#define ATT_CLIENT_CHAR_CONF_INDICATION		0x0002
-+#define GATT_CLIENT_CHARAC_CFG_NOTIF_BIT	0x0001
-+#define GATT_CLIENT_CHARAC_CFG_IND_BIT		0x0002
++static void report_reference_cb(guint8 status, const guint8 *pdu,
++					guint16 plen, gpointer user_data)
++{
++	if (status != 0) {
++		error("Read Report Reference descriptor failed: %s",
++							att_ecode2str(status));
++		return;
++	}
++
++	if (plen != 3) {
++		error("Malformed ATT read response");
++		return;
++	}
++
++	DBG("Report ID: 0x%02x Report type: 0x%02x", pdu[1], pdu[2]);
++}
++
+ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+ 					guint16 len, gpointer user_data)
+ {
++	struct hog_device *hogdev = user_data;
+ 	struct att_data_list *list;
+ 	uint8_t format;
+ 	int i;
+@@ -148,10 +166,11 @@ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+ 		handle = att_get_u16(value);
+ 		uuid16 = att_get_u16(&value[2]);
  
- #define ATT_MAX_MTU				256
- #define ATT_DEFAULT_L2CAP_MTU			48
-diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
-index 92c0225..b2d41cd 100644
---- a/thermometer/thermometer.c
-+++ b/thermometer/thermometer.c
-@@ -363,7 +363,7 @@ static void process_thermometer_desc(struct descriptor *desc)
- 			if (g_slist_length(ch->t->fwatchers) == 0)
- 				return;
+-		if (uuid16 != GATT_CLIENT_CHARAC_CFG_UUID)
+-			continue;
+-
+-		write_ccc(handle, user_data);
++		if (uuid16 == GATT_CLIENT_CHARAC_CFG_UUID)
++			write_ccc(handle, user_data);
++		else if (uuid16 == GATT_REPORT_REFERENCE)
++			gatt_read_char(hogdev->attrib, handle, 0,
++					report_reference_cb, hogdev);
+ 	}
  
--			val = ATT_CLIENT_CHAR_CONF_INDICATION;
-+			val = GATT_CLIENT_CHARAC_CFG_IND_BIT;
- 			msg = g_strdup("Enable Temperature Measurement "
- 								"indication");
- 		} else if (g_strcmp0(ch->attr.uuid,
-@@ -371,12 +371,12 @@ static void process_thermometer_desc(struct descriptor *desc)
- 			if (g_slist_length(ch->t->iwatchers) == 0)
- 				return;
- 
--			val = ATT_CLIENT_CHAR_CONF_NOTIFICATION;
-+			val = GATT_CLIENT_CHARAC_CFG_NOTIF_BIT;
- 			msg = g_strdup("Enable Intermediate Temperature "
- 								"notification");
- 		} else if (g_strcmp0(ch->attr.uuid,
- 					MEASUREMENT_INTERVAL_UUID) == 0) {
--			val = ATT_CLIENT_CHAR_CONF_INDICATION;
-+			val = GATT_CLIENT_CHARAC_CFG_IND_BIT;
- 			msg = g_strdup("Enable Measurement Interval "
- 								"indication");
- 		} else
+ done:
 -- 
 1.7.7.6
 
