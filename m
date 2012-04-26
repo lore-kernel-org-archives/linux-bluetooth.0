@@ -1,50 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAPsQmjrMuUbiqymU48V2m4Lz7_33gudS8FMHijoNq_9UquPosw@mail.gmail.com>
-References: <CAPsQmjrMuUbiqymU48V2m4Lz7_33gudS8FMHijoNq_9UquPosw@mail.gmail.com>
-Date: Thu, 26 Apr 2012 12:43:01 +0300
-Message-ID: <CABBYNZK8W_4beoA+qg1e4E7QpsoswAzCULVbO9djgBkk8L1Wdg@mail.gmail.com>
-Subject: Re: Google Summer of Code 2012 - Introduction
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Rafael Fonseca <fonsecasantos.rafael@gmail.com>
+Date: Thu, 26 Apr 2012 12:32:03 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Hemant Gupta <hemant.gupta@stericsson.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH v2] Store LE device address type with primary list
+Message-ID: <20120426093203.GB18380@x220>
+References: <1335360420-23445-1-git-send-email-hemant.gupta@stericsson.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1335360420-23445-1-git-send-email-hemant.gupta@stericsson.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafael,
+Hi Hemant,
 
-On Wed, Apr 25, 2012 at 8:54 AM, Rafael Fonseca
-<fonsecasantos.rafael@gmail.com> wrote:
-> Hi, Bluez community,
->
-> It is a great honor for me to join this year's Google Summer of Code,
-> specially in the Bluez project.
->
-> I am Rafael Fonseca (rfonseca on IRC), a Computer Scientist graduated
-> from State University of Campinas (Unicamp), Brazil. I'm currently in
-> the last year of the master degree -- started in 2011 -- in Theory of
-> Computing on the same university.
->
-> My job as a GSoC student is to implement the controller role specified
-> in the AVRCP 1.3 specification that adds music metadata information
-> like Artist Name and Track title.
->
-> If someone needs to contact me, I am always around #bluez and
-> #bluez-gsoc and my current timezone is GMT-3.
->
-> I am really looking forward to start coding and contributing to the
-> community as soon as possible!
+On Wed, Apr 25, 2012, Hemant Gupta wrote:
+> This patch stores the address type while storing the primary services
+> of LE Device which is later used for re-creating device from primary
+> service database.
+> ---
+>  src/adapter.c |   10 ++++++++--
+>  src/device.c  |    9 +++++++--
+>  2 files changed, 15 insertions(+), 4 deletions(-)
 
-Welcome, Im gonna be your mentor you can find me at #bluez or
-#bluez-gsoc my nickname is Vudentz. Please take your time to get
-acquainted with BlueZ source tree and git, configure your name and
-email properly on ~/.gitconfig, also fell free to setup a clone in
-http://gitorious.org/bluez or any other similar site where you can
-publish changes that are not ready for upstream.
+Would it make more sense (and I'm not asking just you but also the
+INdTers) to have the address type as part of the key instead of the
+value. After all it's basically an extension to the address and that way
+tightly bound to it. Maybe something like the following:
 
-I also would like that you keep this thread updated, could be weekly
-or bi-weekly you choose, with the progress of the project.
+11:22:33:44:55:66|1 <value1>
+aa:bb:cc:dd:ee:ff|0 <value2>
 
--- 
-Luiz Augusto von Dentz
+The same should then also be considered for the longtermkeys file.
+
+Johan
