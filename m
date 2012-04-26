@@ -1,45 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120426145842.GA8697@x220.P-661HNU-F1>
-References: <1335451079-11868-1-git-send-email-luiz.dentz@gmail.com>
-	<20120426145842.GA8697@x220.P-661HNU-F1>
-Date: Thu, 26 Apr 2012 18:01:29 +0300
-Message-ID: <CABBYNZLTu-XM5Ns+gNYSWgW5Gyy_2-FWDgTVc7_+farTJXdzeA@mail.gmail.com>
+Date: Thu, 26 Apr 2012 18:05:30 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH obexd 1/2] client: Fix not propagating GError in session
  API functions
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <20120426150530.GB8697@x220.P-661HNU-F1>
+References: <1335451079-11868-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1335451079-11868-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Luiz,
 
-On Thu, Apr 26, 2012 at 5:58 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Luiz,
->
-> On Thu, Apr 26, 2012, Luiz Augusto von Dentz wrote:
->> +gboolean obc_session_put(struct obc_session *session, const char *contents,
->> +                             size_t size, const char *name, GError **err)
->>  {
->>       struct obc_transfer *transfer;
->>       const char *agent;
->> @@ -1052,11 +1057,11 @@ int obc_session_put(struct obc_session *session, const char *contents,
->>       agent = obc_agent_get_name(session->agent);
->>
->>       transfer = obc_transfer_put(session->conn, agent, NULL, name, NULL,
->> -                                                     contents, size, NULL);
->> +                                             contents, size, NULL, err);
->>       if (transfer == NULL)
->>               return -EIO;
->
-> This doesn't seem right. You're changing the function to return gboolean
-> instead of int but yet it returns -EIO upon error?
+On Thu, Apr 26, 2012, Luiz Augusto von Dentz wrote:
+> -int obc_session_get(struct obc_session *session, const char *type,
+> -		const char *name, const char *targetfile,
+> -		const guint8 *apparam, gint apparam_size,
+> -		session_callback_t func, void *user_data)
+> +gboolean obc_session_get(struct obc_session *session, const char *type,
+> +				const char *name, const char *targetfile,
+> +				const guint8 *apparam, gint apparam_size,
+> +				session_callback_t func, void *user_data,
+> +				GError **err)
+>  {
+>  	struct obc_transfer *transfer;
+>  	struct obc_transfer_params *params = NULL;
+>  	const char *agent;
+>  
+> -	if (session->obex == NULL)
+> -		return -ENOTCONN;
+> +	if (session->obex == NULL) {
+> +		g_set_error(err, OBEX_IO_ERROR, -ENOTCONN,
+> +						"Session not connected");
+> +		return 0;
+> +	}
+>  
+>  	if (apparam != NULL) {
+>  		params = g_new0(struct obc_transfer_params, 1);
+> @@ -971,20 +975,20 @@ int obc_session_get(struct obc_session *session, const char *type,
+>  		agent = NULL;
+>  
+>  	transfer = obc_transfer_get(session->conn, agent, targetfile, name,
+> -								type, params);
+> +							type, params, err);
+>  	if (transfer == NULL) {
+>  		if (params != NULL) {
+>  			g_free(params->data);
+>  			g_free(params);
+>  		}
+> -		return -EIO;
+> +		return 0;
+>  	}
 
-It is obviously wrong, not sure how I missed it and the compiler
-didn't complain.
+Here's another (similar) strange thing: you're changing the function to
+return gboolean yet you're returning values such as 0 in it.
 
-
--- 
-Luiz Augusto von Dentz
+Johan
