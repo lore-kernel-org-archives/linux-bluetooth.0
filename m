@@ -2,44 +2,57 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-Subject: [BlueZ 02/15] HoG: register ATTIO callbacks
-Date: Thu, 26 Apr 2012 16:45:32 -0300
-Message-Id: <1335469545-1007-2-git-send-email-jprvita@openbossa.org>
-In-Reply-To: <1335469545-1007-1-git-send-email-jprvita@openbossa.org>
-References: <1335469545-1007-1-git-send-email-jprvita@openbossa.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [BlueZ 01/15] HoG: Register HID over GATT device driver
+Date: Thu, 26 Apr 2012 16:45:31 -0300
+Message-Id: <1335469545-1007-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This way the LE connection is kept up. Also set device to autoconnect.
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+
 ---
- Makefile.am        |    2 +-
- input/hog_device.c |  141 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- input/hog_device.h |    3 +
- input/manager.c    |    4 +-
- 4 files changed, 148 insertions(+), 2 deletions(-)
- create mode 100644 input/hog_device.c
+ Makefile.am        |    5 +++++
+ acinclude.m4       |    1 +
+ input/hog_device.h |   25 +++++++++++++++++++++++++
+ input/main.c       |   13 +++++++++++++
+ input/manager.c    |   34 ++++++++++++++++++++++++++++++++++
+ input/manager.h    |    3 +++
+ 6 files changed, 81 insertions(+), 0 deletions(-)
+ create mode 100644 input/hog_device.h
 
 diff --git a/Makefile.am b/Makefile.am
-index 6e152f4..50777dc 100644
+index 62705f6..6e152f4 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -185,7 +185,7 @@ endif
- 
- if HOGPLUGIN
- builtin_modules += hog
--builtin_sources += input/hog_device.h
-+builtin_sources += input/hog_device.h input/hog_device.c
+@@ -183,6 +183,11 @@ builtin_sources += input/main.c \
+ 			input/fakehid.c input/fakehid.h
  endif
  
++if HOGPLUGIN
++builtin_modules += hog
++builtin_sources += input/hog_device.h
++endif
++
  if SERIALPLUGIN
-diff --git a/input/hog_device.c b/input/hog_device.c
+ builtin_modules += serial
+ builtin_sources += serial/main.c \
+diff --git a/acinclude.m4 b/acinclude.m4
+index dcf9a48..8656379 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -392,4 +392,5 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	AM_CONDITIONAL(DBUSOOBPLUGIN, test "${dbusoob_enable}" = "yes")
+ 	AM_CONDITIONAL(WIIMOTEPLUGIN, test "${wiimote_enable}" = "yes")
+ 	AM_CONDITIONAL(GATTMODULES, test "${gatt_enable}" = "yes")
++	AM_CONDITIONAL(HOGPLUGIN, test "${gatt_enable}" = "yes" && test "${input_enable}" = "yes")
+ ])
+diff --git a/input/hog_device.h b/input/hog_device.h
 new file mode 100644
-index 0000000..687dc95
+index 0000000..a0158ea
 --- /dev/null
-+++ b/input/hog_device.c
-@@ -0,0 +1,141 @@
++++ b/input/hog_device.h
+@@ -0,0 +1,25 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -64,156 +77,88 @@ index 0000000..687dc95
 + *
 + */
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdlib.h>
-+#include <errno.h>
-+#include <unistd.h>
-+
-+#include <bluetooth/bluetooth.h>
-+
-+#include <glib.h>
-+
-+#include "log.h"
-+
-+#include "../src/adapter.h"
-+#include "../src/device.h"
-+
-+#include "hog_device.h"
-+
-+#include "gattrib.h"
-+#include "attio.h"
-+
-+struct hog_device {
-+	char			*path;
-+	struct btd_device	*device;
-+	GAttrib			*attrib;
-+	guint			attioid;
-+};
-+
-+static GSList *devices = NULL;
-+
-+static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
-+{
-+	struct hog_device *hogdev = user_data;
-+
-+	hogdev->attrib = g_attrib_ref(attrib);
-+}
-+
-+static void attio_disconnected_cb(gpointer user_data)
-+{
-+	struct hog_device *hogdev = user_data;
-+
-+	g_attrib_unref(hogdev->attrib);
-+	hogdev->attrib = NULL;
-+}
-+
-+static struct hog_device *find_device_by_path(GSList *list, const char *path)
-+{
-+	for (; list; list = list->next) {
-+		struct hog_device *hogdev = list->data;
-+
-+		if (!strcmp(hogdev->path, path))
-+			return hogdev;
-+	}
-+
-+	return NULL;
-+}
-+
-+static struct hog_device *hog_device_new(struct btd_device *device,
-+							const char *path)
-+{
-+	struct hog_device *hogdev;
-+
-+	hogdev = g_new0(struct hog_device, 1);
-+	if (!hogdev)
-+		return NULL;
-+
-+	hogdev->path = g_strdup(path);
-+	hogdev->device = btd_device_ref(device);
-+
-+	return hogdev;
-+}
-+
-+int hog_device_register(struct btd_device *device, const char *path)
-+{
-+	struct hog_device *hogdev;
-+
-+	hogdev = find_device_by_path(devices, path);
-+	if (hogdev)
-+		return -EALREADY;
-+
-+	hogdev = hog_device_new(device, path);
-+	if (!hogdev)
-+		return -ENOMEM;
-+
-+	hogdev->attioid = btd_device_add_attio_callback(device,
-+							attio_connected_cb,
-+							attio_disconnected_cb,
-+							hogdev);
-+	device_set_auto_connect(device, TRUE);
-+
-+	devices = g_slist_append(devices, hogdev);
-+
-+	return 0;
-+}
-+
-+static void hog_device_free(struct hog_device *hogdev)
-+{
-+	btd_device_unref(hogdev->device);
-+	g_free(hogdev->path);
-+	g_free(hogdev);
-+}
-+
-+int hog_device_unregister(const char *path)
-+{
-+	struct hog_device *hogdev;
-+
-+	hogdev = find_device_by_path(devices, path);
-+	if (hogdev == NULL)
-+		return -EINVAL;
-+
-+	btd_device_remove_attio_callback(hogdev->device, hogdev->attioid);
-+	devices = g_slist_remove(devices, hogdev);
-+	hog_device_free(hogdev);
-+
-+	return 0;
-+}
-diff --git a/input/hog_device.h b/input/hog_device.h
-index a0158ea..ce6a79e 100644
---- a/input/hog_device.h
-+++ b/input/hog_device.h
-@@ -23,3 +23,6 @@
-  */
++#define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
+diff --git a/input/main.c b/input/main.c
+index da09b86..2aac3db 100644
+--- a/input/main.c
++++ b/input/main.c
+@@ -84,3 +84,16 @@ static void input_exit(void)
  
- #define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
+ BLUETOOTH_PLUGIN_DEFINE(input, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
+ 							input_init, input_exit)
 +
-+int hog_device_register(struct btd_device *device, const char *path);
-+int hog_device_unregister(const char *path);
++static int hog_init(void)
++{
++	return hog_manager_init();
++}
++
++static void hog_exit(void)
++{
++	hog_manager_exit();
++}
++
++BLUETOOTH_PLUGIN_DEFINE(hog, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++							hog_init, hog_exit)
 diff --git a/input/manager.c b/input/manager.c
-index e1d1f81..3707e88 100644
+index 4ac5686..e1d1f81 100644
 --- a/input/manager.c
 +++ b/input/manager.c
-@@ -202,7 +202,7 @@ static int hog_device_probe(struct btd_device *device, GSList *uuids)
+@@ -39,6 +39,7 @@
+ #include "../src/device.h"
  
- 	DBG("path %s", path);
+ #include "device.h"
++#include "hog_device.h"
+ #include "server.h"
+ #include "manager.h"
  
--	return 0;
-+	return hog_device_register(device, path);
+@@ -194,3 +195,36 @@ void input_manager_exit(void)
+ 
+ 	connection = NULL;
  }
- 
- static void hog_device_remove(struct btd_device *device)
-@@ -210,6 +210,8 @@ static void hog_device_remove(struct btd_device *device)
- 	const gchar *path = device_get_path(device);
- 
- 	DBG("path %s", path);
 +
-+	hog_device_unregister(path);
- }
++static int hog_device_probe(struct btd_device *device, GSList *uuids)
++{
++	const char *path = device_get_path(device);
++
++	DBG("path %s", path);
++
++	return 0;
++}
++
++static void hog_device_remove(struct btd_device *device)
++{
++	const gchar *path = device_get_path(device);
++
++	DBG("path %s", path);
++}
++
++static struct btd_device_driver hog_driver = {
++	.name	= "input-hog",
++	.uuids	= BTD_UUIDS(HOG_UUID),
++	.probe	= hog_device_probe,
++	.remove	= hog_device_remove,
++};
++
++int hog_manager_init(void)
++{
++	return btd_register_device_driver(&hog_driver);
++}
++
++void hog_manager_exit(void)
++{
++	btd_unregister_device_driver(&hog_driver);
++}
+diff --git a/input/manager.h b/input/manager.h
+index 7b93c5b..468de64 100644
+--- a/input/manager.h
++++ b/input/manager.h
+@@ -23,3 +23,6 @@
  
- static struct btd_device_driver hog_driver = {
+ int input_manager_init(DBusConnection *conn, GKeyFile *config);
+ void input_manager_exit(void);
++
++int hog_manager_init(void);
++void hog_manager_exit(void);
 -- 
 1.7.7.6
 
