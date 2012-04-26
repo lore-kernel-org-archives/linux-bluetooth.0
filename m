@@ -1,22 +1,181 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 26 Apr 2012 16:47:01 -0300
-Message-ID: <CAMBjcSsDp2RZxAQOqu3cbWyCv7sdnhfmGWi3Ux_NPJyqKWvoYw@mail.gmail.com>
-Subject: GSoC student introduction
-From: "Thiago S. A." <thiago.xth1@gmail.com>
+From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+Subject: [BlueZ 15/15] HoG: Prepend report id to the HID report
+Date: Thu, 26 Apr 2012 16:45:45 -0300
+Message-Id: <1335469545-1007-15-git-send-email-jprvita@openbossa.org>
+In-Reply-To: <1335469545-1007-1-git-send-email-jprvita@openbossa.org>
+References: <1335469545-1007-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello, BlueZ community!
+If the report descriptor has a report id tag it has to be prepended
+to the report data to construct the report itself.
+---
+ input/hog_device.c |   74 ++++++++++++++++++++++++++++++++++++++++++----------
+ 1 files changed, 60 insertions(+), 14 deletions(-)
 
-My name is Thiago da Silva Arruda (xth1 on IRC) .
- I'm a computer science (master's degree) student at Unicamp, Brazil.
+diff --git a/input/hog_device.c b/input/hog_device.c
+index 99de25c..081f33c 100644
+--- a/input/hog_device.c
++++ b/input/hog_device.c
+@@ -59,10 +59,6 @@
+ #define MIN(x, y) ((x) < (y) ? (x) : (y))
+ #endif
+ 
+-struct report {
+-	struct gatt_char *decl;
+-};
+-
+ struct hog_device {
+ 	char			*path;
+ 	struct btd_device	*device;
+@@ -72,16 +68,35 @@ struct hog_device {
+ 	struct gatt_primary	*hog_primary;
+ 	GSList			*reports;
+ 	int			uhid_fd;
++	gboolean		prepend_id;
++};
++
++struct report {
++	uint8_t			id;
++	uint8_t			type;
++	struct gatt_char	*decl;
++	struct hog_device	*hogdev;
+ };
+ 
+ static GSList *devices = NULL;
+ 
++static gint report_handle_cmp(gconstpointer a, gconstpointer b)
++{
++	const struct report *report = a;
++	uint16_t handle = GPOINTER_TO_UINT(b);
++
++	return report->decl->value_handle - handle;
++}
++
+ static void report_value_cb(const uint8_t *pdu, uint16_t len, gpointer user_data)
+ {
+ 	struct hog_device *hogdev = user_data;
+ 	struct uhid_event ev;
+ 	uint16_t handle;
+ 	uint16_t report_size = len - 3;
++	GSList *l;
++	struct report *report;
++	uint8_t *buf;
+ 
+ 	if (len < 3) { /* 1-byte opcode + 2-byte handle */
+ 		error("Malformed ATT notification");
+@@ -90,10 +105,26 @@ static void report_value_cb(const uint8_t *pdu, uint16_t len, gpointer user_data
+ 
+ 	handle = att_get_u16(&pdu[1]);
+ 
++	l = g_slist_find_custom(hogdev->reports, GUINT_TO_POINTER(handle),
++							report_handle_cmp);
++	if (!l) {
++		error("Invalid report");
++		return;
++	}
++	report = l->data;
++
+ 	memset(&ev, 0, sizeof(ev));
+ 	ev.type = UHID_INPUT;
+ 	ev.u.input.size = MIN(report_size, UHID_DATA_MAX);
+-	memcpy(ev.u.input.data, &pdu[3], MIN(report_size, UHID_DATA_MAX));
++
++	buf = ev.u.input.data;
++	if (hogdev->prepend_id) {
++		*buf = report->id;
++		buf++;
++		ev.u.input.size++;
++	}
++
++	memcpy(buf, &pdu[3], MIN(report_size, UHID_DATA_MAX));
+ 
+ 	if (write(hogdev->uhid_fd, &ev, sizeof(ev)) < 0)
+ 		error("UHID write failed: %s", strerror(errno));
+@@ -123,6 +154,8 @@ static void write_ccc(uint16_t handle, gpointer user_data)
+ static void report_reference_cb(guint8 status, const guint8 *pdu,
+ 					guint16 plen, gpointer user_data)
+ {
++	struct report *report = user_data;
++
+ 	if (status != 0) {
+ 		error("Read Report Reference descriptor failed: %s",
+ 							att_ecode2str(status));
+@@ -134,13 +167,16 @@ static void report_reference_cb(guint8 status, const guint8 *pdu,
+ 		return;
+ 	}
+ 
++	report->id = pdu[1];
++	report->type = pdu[2];
+ 	DBG("Report ID: 0x%02x Report type: 0x%02x", pdu[1], pdu[2]);
+ }
+ 
+ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+ 					guint16 len, gpointer user_data)
+ {
+-	struct hog_device *hogdev = user_data;
++	struct report *report = user_data;
++	struct hog_device *hogdev = report->hogdev;
+ 	struct att_data_list *list;
+ 	uint8_t format;
+ 	int i;
+@@ -167,10 +203,10 @@ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+ 		uuid16 = att_get_u16(&value[2]);
+ 
+ 		if (uuid16 == GATT_CLIENT_CHARAC_CFG_UUID)
+-			write_ccc(handle, user_data);
++			write_ccc(handle, hogdev);
+ 		else if (uuid16 == GATT_REPORT_REFERENCE)
+ 			gatt_read_char(hogdev->attrib, handle, 0,
+-					report_reference_cb, hogdev);
++					report_reference_cb, report);
+ 	}
+ 
+ done:
+@@ -211,11 +247,20 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	}
+ 
+ 	DBG("Report MAP:");
+-	for (i = 0; i < vlen; i += 2) {
+-		if (i + 1 == vlen)
+-			DBG("\t %02x", value[i]);
+-		else
+-			DBG("\t %02x %02x", value[i], value[i + 1]);
++	for (i = 0; i < vlen; i++) {
++		switch (value[i]) {
++			case 0x85:
++			case 0x86:
++			case 0x87:
++				hogdev->prepend_id = TRUE;
++		}
++
++		if (i % 2 == 0) {
++			if (i + 1 == vlen)
++				DBG("\t %02x", value[i]);
++			else
++				DBG("\t %02x %02x", value[i], value[i + 1]);
++		}
+ 	}
+ 
+ 	vendor_src = btd_device_get_vendor_src(hogdev->device);
+@@ -271,10 +316,11 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ 
+ 		if (bt_uuid_cmp(&uuid, &report_uuid) == 0) {
+ 			report = g_new0(struct report, 1);
++			report->hogdev = hogdev;
+ 			report->decl = g_memdup(chr, sizeof(*chr));
+ 			hogdev->reports = g_slist_append(hogdev->reports,
+ 								report);
+-			discover_descriptor(hogdev->attrib, chr, next, hogdev);
++			discover_descriptor(hogdev->attrib, chr, next, report);
+ 		} else if (bt_uuid_cmp(&uuid, &report_map_uuid) == 0)
+ 			gatt_read_char(hogdev->attrib, chr->value_handle, 0,
+ 						report_map_read_cb, hogdev);
+-- 
+1.7.7.6
 
-I am honored for acceptance in Google Summer of Code 2012.
-I'm gonna work in  tool for  visualize Bluetooth traffic as sequence
-diagrams and I thanks any hint.
-I'm excited to start to programming and contribute to the BlueZ comunity!
-
-Goodbye.
