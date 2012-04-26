@@ -4,69 +4,74 @@ From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
-Subject: [BlueZ 08/15] HoG: add report notification handler
-Date: Thu, 26 Apr 2012 16:45:38 -0300
-Message-Id: <1335469545-1007-8-git-send-email-jprvita@openbossa.org>
+Subject: [BlueZ 07/15] HoG: enable "Report" characteristic notification
+Date: Thu, 26 Apr 2012 16:45:37 -0300
+Message-Id: <1335469545-1007-7-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1335469545-1007-1-git-send-email-jprvita@openbossa.org>
 References: <1335469545-1007-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- input/hog_device.c |   21 +++++++++++++++++++++
- 1 files changed, 21 insertions(+), 0 deletions(-)
+ input/hog_device.c |   30 +++++++++++++++++++++++++++---
+ 1 files changed, 27 insertions(+), 3 deletions(-)
 
 diff --git a/input/hog_device.c b/input/hog_device.c
-index 28e7cad..923ecf7 100644
+index c28d337..28e7cad 100644
 --- a/input/hog_device.c
 +++ b/input/hog_device.c
-@@ -59,12 +59,26 @@ struct hog_device {
- 	struct btd_device	*device;
- 	GAttrib			*attrib;
- 	guint			attioid;
-+	guint			report_cb_id;
- 	struct gatt_primary	*hog_primary;
- 	GSList			*reports;
- };
+@@ -65,10 +65,30 @@ struct hog_device {
  
  static GSList *devices = NULL;
  
-+static void report_value_cb(const uint8_t *pdu, uint16_t len, gpointer user_data)
++static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
++					guint16 plen, gpointer user_data)
 +{
-+	uint16_t handle;
-+
-+	if (len < 3) { /* 1-byte opcode + 2-byte handle */
-+		error("Malformed ATT notification");
++	if (status != 0) {
++		error("Write report characteristic descriptor failed: %s",
++							att_ecode2str(status));
 +		return;
 +	}
 +
-+	handle = att_get_u16(&pdu[1]);
-+	DBG("Report notification on handle 0x%04x", handle);
++	DBG("Report characteristic descriptor written: notification enabled");
 +}
 +
- static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
- 					guint16 plen, gpointer user_data)
- {
-@@ -212,12 +226,19 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
- 
- 	gatt_discover_char(hogdev->attrib, prim->range.start, prim->range.end,
- 					NULL, char_discovered_cb, hogdev);
++static void write_ccc(uint16_t handle, gpointer user_data)
++{
++	struct hog_device *hogdev = user_data;
++	uint8_t value[] = { 0x01, 0x00 };
 +
-+	hogdev->report_cb_id = g_attrib_register(hogdev->attrib,
-+					ATT_OP_HANDLE_NOTIFY, report_value_cb,
-+					hogdev, NULL);
- }
- 
- static void attio_disconnected_cb(gpointer user_data)
- {
- 	struct hog_device *hogdev = user_data;
- 
-+	g_attrib_unregister(hogdev->attrib, hogdev->report_cb_id);
-+	hogdev->report_cb_id = 0;
++	gatt_write_char(hogdev->attrib, handle, value, sizeof(value),
++					report_ccc_written_cb, hogdev);
++}
 +
- 	g_attrib_unref(hogdev->attrib);
- 	hogdev->attrib = NULL;
- }
+ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+ 					guint16 len, gpointer user_data)
+ {
+-	struct report *report = user_data;
+ 	struct att_data_list *list;
+ 	uint8_t format;
+ 	int i;
+@@ -87,13 +107,17 @@ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+ 		goto done;
+ 
+ 	for (i = 0; i < list->num; i++) {
+-		uint16_t uuid16;
++		uint16_t uuid16, handle;
+ 		uint8_t *value;
+ 
+ 		value = list->data[i];
++		handle = att_get_u16(value);
+ 		uuid16 = att_get_u16(&value[2]);
+ 
+-		DBG("%s descriptor: 0x%04x", report->decl->uuid, uuid16);
++		if (uuid16 != GATT_CLIENT_CHARAC_CFG_UUID)
++			continue;
++
++		write_ccc(handle, user_data);
+ 	}
+ 
+ done:
 -- 
 1.7.7.6
 
