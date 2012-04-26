@@ -1,76 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAngNMYx4YcC8kEuZkEgojbFLf7BtchTCEDs927P+oqfr_oKnQ@mail.gmail.com>
-References: <1332793209-2950-1-git-send-email-dh.herrmann@googlemail.com>
-	<CAAngNMa0npQwBv+y_giRTOeLUMYiEnwWw4-cA+xMiRRsK732Mw@mail.gmail.com>
-	<CAAngNMaOHRRfTy5yT9ys0Cv5yB5t-zEVxwcZWuK64BEA4oRy2g@mail.gmail.com>
-	<alpine.LNX.2.00.1204031513070.9041@pobox.suse.cz>
-	<CAAngNMYx4YcC8kEuZkEgojbFLf7BtchTCEDs927P+oqfr_oKnQ@mail.gmail.com>
-Date: Thu, 26 Apr 2012 14:22:09 -0300
-Message-ID: <CAKT1EBesnson8JR+rTFtQyjATUj09QhR99Lg=ouN4aCeJJbviQ@mail.gmail.com>
-Subject: Re: [RFC v2 0/1] User-space HID I/O Driver
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: David Herrmann <dh.herrmann@googlemail.com>, Jiri Kosina <jkosina@suse.cz>
-Cc: Joao Paulo Rechi Vita <jprvita@openbossa.org>, linux-input@vger.kernel.org, chen.ganir@ti.com,
-	linux-bluetooth@vger.kernel.org, anderson.lizardo@openbossa.org,
-	marcel@holtmann.org
+In-Reply-To: <CAB=NE6ViDGHPn=OsqFK1rJb-5J+1xzvf3h9+Rd-MgmWpn-T2fA@mail.gmail.com>
+References: <1335235603-32420-1-git-send-email-mcgrof@do-not-panic.com>
+ <20120424.004745.1479792296922367681.davem@davemloft.net> <CAB=NE6WBw3aJrch0JvxZ7jGb_rFW5Z4XWvYc1KqsBqBu+G8mjw@mail.gmail.com>
+ <CAB=NE6ViDGHPn=OsqFK1rJb-5J+1xzvf3h9+Rd-MgmWpn-T2fA@mail.gmail.com>
+From: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>
+Date: Thu, 26 Apr 2012 08:53:30 -0700
+Message-ID: <CAB=NE6VR6hPqoUmRH=YVr+MKu+Sn8tq2asv957zfD+SVWzk75A@mail.gmail.com>
+Subject: Re: [PATCH] b44: properly use pr_fmt()
+To: David Miller <davem@davemloft.net>
+Cc: zambrano@broadcom.com, netdev@vger.kernel.org,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	Arend Van Spriel <arend@broadcom.com>,
+	Joe Perches <joe@perches.com>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David/Jiri,
-
-On Wed, Apr 4, 2012 at 7:59 PM, Joao Paulo Rechi Vita
-<jprvita@openbossa.org> wrote:
-> On Tue, Apr 3, 2012 at 7:14 PM, Jiri Kosina <jkosina@suse.cz> wrote:
->> On Tue, 3 Apr 2012, Joao Paulo Rechi Vita wrote:
->>
->>> >> This is the second revision of the UHID driver. It basically allows =
-to register
->>> >> hid_ll_drivers in user-space. This is needed to implement Bluetooth =
-HoG (HID
->>> >> over GATT) as discussed earlier.
->>> >>
->>> >
->>> > We have a first prototype implementation of the HoG plugin working
->>> > with the uhid driver \o/
->>> >
+On Thu, Apr 26, 2012 at 6:02 AM, Luis R. Rodriguez
+<mcgrof@do-not-panic.com> wrote:
+> On Thu, Apr 26, 2012 at 5:23 AM, Luis R. Rodriguez
+> <mcgrof@do-not-panic.com> wrote:
+>> On Mon, Apr 23, 2012 at 9:47 PM, David Miller <davem@davemloft.net> wrote:
+>>> From: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>
+>>> Date: Mon, 23 Apr 2012 19:46:43 -0700
 >>>
->>> I'm having problems with modifiers keys (they don't work). The USB-HID
->>> spec says that for each modifier key pressed a bit have to be set on
->>> the modifiers byte (byte 2) of the report array. Dumping the data both
->>> on the HoG plugin on bluetoothd and through hidraw for the created HID
->>> device shows that these bits are being set correctly.
+>>>> From: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>
+>>>>
+>>>> pr_fmt() is either defined or we redefine it. Typically
+>>>> drivers define it prior to including printk.h but this
+>>>> is done under the assumption that no other subsystem
+>>>> it uses has already defined pr_fmt(). In such cases
+>>>> pr_fmt() should be undefined and redefined.
+>>>>
+>>>> Doing this properly shaves down compilation time quite
+>>>> considerably.
+>>>>
+>>>> Signed-off-by: Luis R. Rodriguez <mcgrof@do-not-panic.com>
 >>>
->>> Any idea of what could be wrong or additional checks that can be perfor=
-med?
+>>> Every driver defines pr_fmt then includes the headers.  I do not
+>>> see any other place which performs the initial undef of pr_fmt
+>>> like you want to start doing here.
 >>
->> So hidraw shows the respective bits set properly, but they are not comin=
-g
->> out of /dev/input/eventX, right?
+>> One example is, and that is where I got the hint:
 >>
->
-> Exactly.
->
->> How about /syse/kernel/debug/hid/<device>/events, does it show the event=
-s?
+>> drivers/net/wireless/mwifiex/decl.h
 >>
+>>> If there is a reason we should start doing this, it would appear
+>>> to be a universal reason, not one specific to this driver.
+>>
+>> Sure.
+>>
+>>> If that's the case, we should formally agree to this and then work
+>>> on gradually converting all the drivers in reasonably sized chunks.
+>>
+>> Understood.
+>>
+>>> Either way I can't apply this patch as-is, sorry Luis.
+>>
+>> So the issue can occur if any parent header ends up defining this,
+>> this could happen if a subsystem wants to define the pr_fmt in their
+>> own header and a driver for example wants to override this. In theory
+>> this does not occur but in practice this may vary and if we want to
+>> ensure this does not happen perhaps the thing to do is to document
+>> this as such.
+>>
+>> I just tested allmodconfig though and checked compilation for V=1
+>> against drivers/net/wireless/ and found no issues against linux-next
+>> though so in practice at least for wireless networking it seems we are
+>> squeaky clean in its usage. I'll test across the kernel though next to
+>> see if there are any real violators of the assumption. Unfortunately
+>> I've hit an issue with compiling allmodconfig already with linux-next
+>> that is already reported so my homework will be to find a shiny
+>> linux-next to compile test against allmodconfig.
+>>
+>> An area that this does clearly happen but that likely does not merit
+>> and upstream change for is in the backport work compat that defines
+>> this for older kernels and later we have to also backport users of
+>> pr_fmt such as pr_emerg_once. Ultimately drivers will want to actually
+>> then override this and in that case the undef is necessary as
+>> otherwise you get the redefinition warning which incurs in practice a
+>> considerable CPU performance hit at compilation time.
 >
-> Thanks for the help, but it wasn't needed. The problem was actually on
-> the userspace HoG->HID parsing, we're adding an additional 0x00 byte
-> to the beginning of the array. Now modifiers works!
+> Additionally Arend has pointed pointed out that previously printk.h
+> was removed as a direct include as well given that kernel.h includes
+> it already:
 >
-> --
-> Jo=C3=A3o Paulo Rechi Vita
-> Openbossa Labs - INdT
+> https://lkml.org/lkml/2011/5/25/331
+>
+> So this would be a second issue with this patch.
 
+OK I found no pr_fmt warnings at all for make allmodconfig ; make V=1
+; on v3.4-rc4. For this and others reason stated then yes, this patch
+is simply bogus.
 
-The basic features are now working, we have tested HoG keyboard and
-mouse. The major features missing related to HID are output/feature
-reports, and suspend.
-
-My HID knowledge is quite limited but it seems that output reports are
-not working on uhid, at least I didn't see events from the host. Even
-for USB keyboard it doesn't work, do you have any pointers?
-
-BR,
-Claudio
+  Luis
