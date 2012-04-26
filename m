@@ -1,124 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 2/2] client: Return request id when generating a request in session API
-Date: Thu, 26 Apr 2012 17:37:59 +0300
-Message-Id: <1335451079-11868-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1335451079-11868-1-git-send-email-luiz.dentz@gmail.com>
-References: <1335451079-11868-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 26 Apr 2012 17:31:29 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 BlueZ 1/2] GATT: Add support for find included services
+Message-ID: <20120426143129.GA7588@x220.P-661HNU-F1>
+References: <1333572353-10332-1-git-send-email-jefferson.delfes@openbossa.org>
+ <1334350864-5509-1-git-send-email-jefferson.delfes@openbossa.org>
+ <1334350864-5509-2-git-send-email-jefferson.delfes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1334350864-5509-2-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Jefferson,
 
-This is more consistent with other functions and allow the caller to
-cancel the request using obc_session_cancel.
----
- client/session.c |   16 ++++++++--------
- client/session.h |    8 ++++----
- 2 files changed, 12 insertions(+), 12 deletions(-)
+On Fri, Apr 13, 2012, Jefferson Delfes wrote:
+> --- a/attrib/gatt.c
+> +++ b/attrib/gatt.c
+> @@ -47,6 +47,22 @@ struct discover_primary {
+>  	void *user_data;
+>  };
+>  
+> +struct find_included {
+> +	GAttrib		*attrib;
+> +	uint16_t	end;
+> +	GSList		*includes;
+> +	gatt_cb_t	cb;
+> +	void		*user_data;
+> +	uint16_t	missing_uuids;	/* number of missing 128-bit UUID */
+> +	gboolean	final;		/* final data flag */
+> +	unsigned int	err;
+> +};
+> +
+> +struct find_include_data {
+> +	struct find_included *find_incl;
+> +	struct gatt_included *gatt_incl;
+> +};
 
-diff --git a/client/session.c b/client/session.c
-index 1c923f4..92d3626 100644
---- a/client/session.c
-+++ b/client/session.c
-@@ -743,7 +743,7 @@ static int pending_request_auth(struct pending_request *p)
- 									NULL);
- }
- 
--static gboolean session_request(struct obc_session *session,
-+static guint session_request(struct obc_session *session,
- 					struct obc_transfer *transfer,
- 					session_callback_t func,
- 					void *data, GError **err)
-@@ -757,19 +757,19 @@ static gboolean session_request(struct obc_session *session,
- 								func, data);
- 	if (session->p) {
- 		g_queue_push_tail(session->queue, p);
--		return TRUE;
-+		return p->id;
- 	}
- 
- 	perr = pending_request_auth(p);
- 	if (perr < 0) {
- 		g_set_error(err, OBEX_IO_ERROR, perr, "Authorization failed");
- 		pending_request_free(p);
--		return FALSE;
-+		return 0;
- 	}
- 
- 	session->p = p;
- 
--	return TRUE;
-+	return p->id;
- }
- 
- static void session_process_queue(struct obc_session *session)
-@@ -946,7 +946,7 @@ static void session_start_transfer(gpointer data, gpointer user_data)
- 	DBG("Transfer(%p) started", transfer);
- }
- 
--gboolean obc_session_get(struct obc_session *session, const char *type,
-+guint obc_session_get(struct obc_session *session, const char *type,
- 				const char *name, const char *targetfile,
- 				const guint8 *apparam, gint apparam_size,
- 				session_callback_t func, void *user_data,
-@@ -987,7 +987,7 @@ gboolean obc_session_get(struct obc_session *session, const char *type,
- 	return session_request(session, transfer, func, user_data, err);
- }
- 
--gboolean obc_session_send(struct obc_session *session, const char *filename,
-+guint obc_session_send(struct obc_session *session, const char *filename,
- 				const char *name, GError **err)
- {
- 	struct obc_transfer *transfer;
-@@ -1006,7 +1006,7 @@ gboolean obc_session_send(struct obc_session *session, const char *filename,
- 	return session_request(session, transfer, NULL, NULL, err);
- }
- 
--gboolean obc_session_pull(struct obc_session *session,
-+guint obc_session_pull(struct obc_session *session,
- 				const char *type, const char *targetfile,
- 				session_callback_t function, void *user_data,
- 				GError **err)
-@@ -1045,7 +1045,7 @@ fail:
- 	return NULL;
- }
- 
--gboolean obc_session_put(struct obc_session *session, const char *contents,
-+guint obc_session_put(struct obc_session *session, const char *contents,
- 				size_t size, const char *name, GError **err)
- {
- 	struct obc_transfer *transfer;
-diff --git a/client/session.h b/client/session.h
-index a0ee321..c443392 100644
---- a/client/session.h
-+++ b/client/session.h
-@@ -56,20 +56,20 @@ int obc_session_get_contents(struct obc_session *session, char **contents,
- 								size_t *size);
- void *obc_session_get_params(struct obc_session *session, size_t *size);
- 
--gboolean obc_session_send(struct obc_session *session, const char *filename,
-+guint obc_session_send(struct obc_session *session, const char *filename,
- 				const char *name, GError **err);
--gboolean obc_session_get(struct obc_session *session, const char *type,
-+guint obc_session_get(struct obc_session *session, const char *type,
- 				const char *name, const char *targetfile,
- 				const guint8  *apparam, gint apparam_size,
- 				session_callback_t func, void *user_data,
- 				GError **err);
--gboolean obc_session_pull(struct obc_session *session,
-+guint obc_session_pull(struct obc_session *session,
- 				const char *type, const char *targetfile,
- 				session_callback_t function, void *user_data,
- 				GError **err);
- const char *obc_session_register(struct obc_session *session,
- 						GDBusDestroyFunction destroy);
--gboolean obc_session_put(struct obc_session *session, const char *contents,
-+guint obc_session_put(struct obc_session *session, const char *contents,
- 				size_t size, const char *name, GError **err);
- 
- guint obc_session_setpath(struct obc_session *session, const char *path,
--- 
-1.7.7.6
+The reason I didn't apply this immediately and instead put it aside (and
+then forgot about it) is that I'm having trouble figuring out these data
+structures, their purposes and their relation to each other. The first
+thing that starts off the confusion is that you've named than based on
+an action instead of something that could be considered an object.
 
+So please try to come up with better naming for them, and if the new
+names do not in themselves already explain most of the purpose then at
+least provide proper code comments to clarify this.
+
+Another thing that threw me off is the "fid" variable naming. The
+existing and most common use of "id" is a shorthand for "identifier". So
+what's "fid"? A file identifier? Please come up with better names for
+these things. In many cases the context is quite clear and if you can't
+come up with anything better simply "data" could be good enough.
+
+Johan
