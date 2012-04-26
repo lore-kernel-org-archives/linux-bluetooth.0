@@ -1,49 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120426093203.GB18380@x220>
-References: <1335360420-23445-1-git-send-email-hemant.gupta@stericsson.com>
-	<20120426093203.GB18380@x220>
-Date: Thu, 26 Apr 2012 18:02:31 -0300
-Message-ID: <CAKT1EBc6inPjxW0QqT7MQAvt0iad2cZs59MC_W4NExtyBUkXqw@mail.gmail.com>
-Subject: Re: [PATCH v2] Store LE device address type with primary list
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Hemant Gupta <hemant.gupta@stericsson.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH RFC BlueZ v2 1/1] doc: Document Broadcaster/Observer API
+Date: Thu, 26 Apr 2012 17:03:26 -0400
+Message-Id: <1335474206-21914-2-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1335474206-21914-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1334192668-21433-1-git-send-email-anderson.lizardo@openbossa.org>
+ <1335474206-21914-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hemant/Johan:
+---
+ doc/adapter-api.txt |   71 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 71 insertions(+), 0 deletions(-)
 
-On Thu, Apr 26, 2012 at 6:32 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Hemant,
->
-> On Wed, Apr 25, 2012, Hemant Gupta wrote:
->> This patch stores the address type while storing the primary services
->> of LE Device which is later used for re-creating device from primary
->> service database.
->> ---
->>  src/adapter.c |   10 ++++++++--
->>  src/device.c  |    9 +++++++--
->>  2 files changed, 15 insertions(+), 4 deletions(-)
->
-> Would it make more sense (and I'm not asking just you but also the
-> INdTers) to have the address type as part of the key instead of the
-> value. After all it's basically an extension to the address and that way
-> tightly bound to it. Maybe something like the following:
->
-> 11:22:33:44:55:66|1 <value1>
-> aa:bb:cc:dd:ee:ff|0 <value2>
->
-> The same should then also be considered for the longtermkeys file.
->
-> Johan
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 0cded8c..346e7c3 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -181,6 +181,55 @@ Methods		dict GetProperties()
+ 
+ 			Possible errors: org.bluez.Error.DoesNotExist
+ 
++		void RegisterBroadcaster(dict values)
++
++			Set Advertising data for broadcast. Different
++			applications can register different Adv. data types,
++			and they are all concatenated to form the Adv. data.
++			Broadcasting is enabled as soon as the first
++			RegisterBroadcaster() call is made.
++
++			Use UnregisterBroadcaster() to release Adv. data for
++			the application. Advertising data is also released when
++			application exits, and once the last Broadcaster exits,
++			advertising is disabled.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.Failed
++
++		void UpdateBroadcastData(dict values)
++
++			Replace Advertising data for broadcast. This method can
++			only be called after RegisterBroadcaster().
++
++			Possible errors: org.bluez.Error.Failed
++
++		void UnregisterBroadcaster()
++
++			This method will release any previously set Advertising
++			data.
++
++			Note that a broadcast procedure is shared between all
++			sessions, thus calling UnregisterBroadcaster() will
++			only release a single session.
++
++			Possible errors: org.bluez.Error.Failed
++
++		void RegisterObserver(object agent, array{byte} data_types)
++
++			Registers an observer agent to monitor broadcasts. This
++			agent will be notified whenever a broadcast is received
++			that contains any of selected Advertising data types.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++
++		void UnregisterObserver(object agent)
++
++			Unregisters an observer. Broadcasts will not be
++			notified to this agent anymore.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++
+ Signals		PropertyChanged(string name, variant value)
+ 
+ 			This signal indicates a changed value of the given
+@@ -276,6 +325,14 @@ Properties	string Address [readonly]
+ 
+ 			Indicates that a device discovery procedure is active.
+ 
++		boolean Broadcasting [readonly]
++
++			Indicates that a broadcast procedure is active.
++
++		boolean Observing [readonly]
++
++			Indicates that an observation procedure is active.
++
+ 		array{object} Devices [readonly]
+ 
+ 			List of device object paths.
+@@ -284,3 +341,17 @@ Properties	string Address [readonly]
+ 
+ 			List of 128-bit UUIDs that represents the available
+ 			local services.
++
++
++Observer hierarchy
++==================
++
++Service		unique name
++Interface	org.bluez.Observer
++Object path	freely definable
++
++Methods		void BroadcastReceived(string address, byte data_type,
++								variant value)
++
++			This callback gets called when a broadcast data has
++			arrived with selected Advertising Data type.
+-- 
+1.7.5.4
 
-I agree if we append the address type for all LE/GATT storage
-files(not only for primary and longtermkeys).
-Probably we will have minor problems between BlueZ releases, but IMO
-it is acceptable since LE it is not officially supported.
-btw: the separator commonly used in the storage files is "#" instead of "|".
-
-BR,
-Claudio
