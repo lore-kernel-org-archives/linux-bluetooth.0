@@ -1,41 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 26 Apr 2012 17:05:32 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vishal Agarwal <vishal.agarwal@stericsson.com>
+Cc: linux-bluetooth@vger.kernel.org, naresh.gupta@stericsson.com
+Subject: Re: [PATCH] Bluetooth: Non significant part should be removed from
+ EIR data
+Message-ID: <20120426140532.GA6986@x220.P-661HNU-F1>
+References: <1335448196-16093-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZK8W_4beoA+qg1e4E7QpsoswAzCULVbO9djgBkk8L1Wdg@mail.gmail.com>
-References: <CAPsQmjrMuUbiqymU48V2m4Lz7_33gudS8FMHijoNq_9UquPosw@mail.gmail.com>
- <CABBYNZK8W_4beoA+qg1e4E7QpsoswAzCULVbO9djgBkk8L1Wdg@mail.gmail.com>
-From: Rafael Fonseca <fonsecasantos.rafael@gmail.com>
-Date: Thu, 26 Apr 2012 11:09:39 -0300
-Message-ID: <CAPsQmjqVJ93mpSv-0S6s2KavKonh6+=1R4QgUDRfjRtv7QwWnA@mail.gmail.com>
-Subject: Re: Google Summer of Code 2012 - Introduction
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1335448196-16093-1-git-send-email-vishal.agarwal@stericsson.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Luiz,
+Hi Vishal,
 
-On Thu, Apr 26, 2012 at 06:43, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Rafael,
->
-> Welcome, Im gonna be your mentor you can find me at #bluez or
-> #bluez-gsoc my nickname is Vudentz. Please take your time to get
-> acquainted with BlueZ source tree and git, configure your name and
-> email properly on ~/.gitconfig, also fell free to setup a clone in
-> http://gitorious.org/bluez or any other similar site where you can
-> publish changes that are not ready for upstream.
+On Thu, Apr 26, 2012, Vishal Agarwal wrote:
+> Fix to remove non significant part(Padding zeros) of EIR data.
+> Mgmt interface expects to receive only the significant part so
+> it should be removed from the EIR data.
+> 
+> Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
+> ---
+>  include/net/bluetooth/hci_core.h |   17 +++++++++++++++++
+>  net/bluetooth/hci_event.c        |    4 +++-
+>  2 files changed, 20 insertions(+), 1 deletions(-)
 
-I've just set up a repository in gitorious:
-https://gitorious.org/~r4f4rfs/bluez/rfonseca-gsoc.
+I fixed up the commit message a bit more and then applied the patch to
+bluetooth.git as well as bluetooth-next.git. Thanks!
 
-
-> I also would like that you keep this thread updated, could be weekly
-> or bi-weekly you choose, with the progress of the project.
-
-Ok. I prefer to do a bi-weekly report.
-
-
-Best regards
--- 
-Rafael Fonseca
+Johan
