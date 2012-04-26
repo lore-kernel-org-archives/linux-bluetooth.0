@@ -1,14 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1335422688.16897.430.camel@aeonflux>
-Subject: Re: [RFC 8/8] Bluetooth: Add Code Aurora Forum copyright
+Message-ID: <1335422612.16897.429.camel@aeonflux>
+Subject: Re: [RFC 7/8] Bluetooth: Refactor L2CAP ERTM and streaming transmit
+ segmentation
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Mat Martineau <mathewm@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
 	pkrystad@codeaurora.org, andrei.emeltchenko.news@gmail.com
-Date: Thu, 26 Apr 2012 08:44:48 +0200
-In-Reply-To: <1335396979-11692-9-git-send-email-mathewm@codeaurora.org>
+Date: Thu, 26 Apr 2012 08:43:32 +0200
+In-Reply-To: <1335396979-11692-8-git-send-email-mathewm@codeaurora.org>
 References: <1335396979-11692-1-git-send-email-mathewm@codeaurora.org>
-	 <1335396979-11692-9-git-send-email-mathewm@codeaurora.org>
+	 <1335396979-11692-8-git-send-email-mathewm@codeaurora.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,15 +17,21 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mat,
 
-> Adding Code Aurora Forum copyright information due to significant
-> additions of code.
+> Use more common code for ERTM and streaming mode segmentation and
+> transmission, and begin using skb control block data for delaying
+> extended or enhanced header generation until just before the packet is
+> transmitted.  This code is also better suited for resegmentation,
+> which is needed when L2CAP links are reconfigured after an AMP channel
+> move.
 > 
 > Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 > ---
->  net/bluetooth/l2cap_core.c |    1 +
->  1 file changed, 1 insertion(+)
+>  include/net/bluetooth/l2cap.h |    1 +
+>  net/bluetooth/l2cap_core.c    |  155 +++++++++++++++++++++++------------------
+>  2 files changed, 90 insertions(+), 66 deletions(-)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+from what I can see, this looks good, but I like to see a second review
+of this from someone else.
 
 Regards
 
