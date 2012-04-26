@@ -1,60 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 26 Apr 2012 13:57:17 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vishal Agarwal <vishal.agarwal@stericsson.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Padding should be removed from EIR data
-Message-ID: <20120426105717.GA1573@x220>
-References: <1335360434-28774-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1335360434-28774-1-git-send-email-vishal.agarwal@stericsson.com>
+In-Reply-To: <CAPsQmjrMuUbiqymU48V2m4Lz7_33gudS8FMHijoNq_9UquPosw@mail.gmail.com>
+References: <CAPsQmjrMuUbiqymU48V2m4Lz7_33gudS8FMHijoNq_9UquPosw@mail.gmail.com>
+Date: Thu, 26 Apr 2012 12:43:01 +0300
+Message-ID: <CABBYNZK8W_4beoA+qg1e4E7QpsoswAzCULVbO9djgBkk8L1Wdg@mail.gmail.com>
+Subject: Re: Google Summer of Code 2012 - Introduction
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Rafael Fonseca <fonsecasantos.rafael@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vishal,
+Hi Rafael,
 
-On Wed, Apr 25, 2012, Vishal Agarwal wrote:
-> EIR data received from controller might contain padding zeros.
-> This padding should be removed before any further processing and
-> sending it over mgmt interface.
-> 
-> Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
-> ---
->  include/net/bluetooth/hci_core.h |   17 +++++++++++++++++
->  net/bluetooth/hci_event.c        |    4 +++-
->  2 files changed, 20 insertions(+), 1 deletions(-)
+On Wed, Apr 25, 2012 at 8:54 AM, Rafael Fonseca
+<fonsecasantos.rafael@gmail.com> wrote:
+> Hi, Bluez community,
+>
+> It is a great honor for me to join this year's Google Summer of Code,
+> specially in the Bluez project.
+>
+> I am Rafael Fonseca (rfonseca on IRC), a Computer Scientist graduated
+> from State University of Campinas (Unicamp), Brazil. I'm currently in
+> the last year of the master degree -- started in 2011 -- in Theory of
+> Computing on the same university.
+>
+> My job as a GSoC student is to implement the controller role specified
+> in the AVRCP 1.3 specification that adds music metadata information
+> like Artist Name and Track title.
+>
+> If someone needs to contact me, I am always around #bluez and
+> #bluez-gsoc and my current timezone is GMT-3.
+>
+> I am really looking forward to start coding and contributing to the
+> community as soon as possible!
 
-Could you please prefix the summary line as Fix... It makes it easier to
-get this to 3.4 as this really must go there. Also explain in the commit
-message that the mgmt_device_found expects to receive only the
-significant part of the EIR data.
+Welcome, Im gonna be your mentor you can find me at #bluez or
+#bluez-gsoc my nickname is Vudentz. Please take your time to get
+acquainted with BlueZ source tree and git, configure your name and
+email properly on ~/.gitconfig, also fell free to setup a clone in
+http://gitorious.org/bluez or any other similar site where you can
+publish changes that are not ready for upstream.
 
-> +static inline size_t eir_get_padding_offset(u8 *eir, size_t eir_len)
+I also would like that you keep this thread updated, could be weekly
+or bi-weekly you choose, with the progress of the project.
 
-I'm not completely sure about this name. Would eir_significant_len()
-sound better? The core spec uses the terminology "significant part" and
-non-significant part" to refer to this so I thought reusing that might
-make it clearer what we're dealing with.
-
-> +	u8 field_len;
-> +	size_t parsed = 0;
-> +
-> +	while (parsed < eir_len) {
-> +		field_len = eir[0];
-
-You should define field_len here instead of the beginning of the
-function since it's not used outside of the while-loop.
-
-> +
-> +		if (field_len == 0)
-> +			return parsed;
-> +
-> +		parsed += field_len + 1;
-> +		eir += field_len + 1;
-> +	}
-> +	return eir_len;
-
-Add an empty line before the return statement please.
-
-Johan
+-- 
+Luiz Augusto von Dentz
