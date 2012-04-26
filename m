@@ -1,58 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 26 Apr 2012 17:31:29 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 BlueZ 1/2] GATT: Add support for find included services
-Message-ID: <20120426143129.GA7588@x220.P-661HNU-F1>
-References: <1333572353-10332-1-git-send-email-jefferson.delfes@openbossa.org>
- <1334350864-5509-1-git-send-email-jefferson.delfes@openbossa.org>
- <1334350864-5509-2-git-send-email-jefferson.delfes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334350864-5509-2-git-send-email-jefferson.delfes@openbossa.org>
+In-Reply-To: <CABBYNZK8W_4beoA+qg1e4E7QpsoswAzCULVbO9djgBkk8L1Wdg@mail.gmail.com>
+References: <CAPsQmjrMuUbiqymU48V2m4Lz7_33gudS8FMHijoNq_9UquPosw@mail.gmail.com>
+ <CABBYNZK8W_4beoA+qg1e4E7QpsoswAzCULVbO9djgBkk8L1Wdg@mail.gmail.com>
+From: Rafael Fonseca <fonsecasantos.rafael@gmail.com>
+Date: Thu, 26 Apr 2012 11:09:39 -0300
+Message-ID: <CAPsQmjqVJ93mpSv-0S6s2KavKonh6+=1R4QgUDRfjRtv7QwWnA@mail.gmail.com>
+Subject: Re: Google Summer of Code 2012 - Introduction
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jefferson,
+Hi, Luiz,
 
-On Fri, Apr 13, 2012, Jefferson Delfes wrote:
-> --- a/attrib/gatt.c
-> +++ b/attrib/gatt.c
-> @@ -47,6 +47,22 @@ struct discover_primary {
->  	void *user_data;
->  };
->  
-> +struct find_included {
-> +	GAttrib		*attrib;
-> +	uint16_t	end;
-> +	GSList		*includes;
-> +	gatt_cb_t	cb;
-> +	void		*user_data;
-> +	uint16_t	missing_uuids;	/* number of missing 128-bit UUID */
-> +	gboolean	final;		/* final data flag */
-> +	unsigned int	err;
-> +};
-> +
-> +struct find_include_data {
-> +	struct find_included *find_incl;
-> +	struct gatt_included *gatt_incl;
-> +};
+On Thu, Apr 26, 2012 at 06:43, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Rafael,
+>
+> Welcome, Im gonna be your mentor you can find me at #bluez or
+> #bluez-gsoc my nickname is Vudentz. Please take your time to get
+> acquainted with BlueZ source tree and git, configure your name and
+> email properly on ~/.gitconfig, also fell free to setup a clone in
+> http://gitorious.org/bluez or any other similar site where you can
+> publish changes that are not ready for upstream.
 
-The reason I didn't apply this immediately and instead put it aside (and
-then forgot about it) is that I'm having trouble figuring out these data
-structures, their purposes and their relation to each other. The first
-thing that starts off the confusion is that you've named than based on
-an action instead of something that could be considered an object.
+I've just set up a repository in gitorious:
+https://gitorious.org/~r4f4rfs/bluez/rfonseca-gsoc.
 
-So please try to come up with better naming for them, and if the new
-names do not in themselves already explain most of the purpose then at
-least provide proper code comments to clarify this.
 
-Another thing that threw me off is the "fid" variable naming. The
-existing and most common use of "id" is a shorthand for "identifier". So
-what's "fid"? A file identifier? Please come up with better names for
-these things. In many cases the context is quite clear and if you can't
-come up with anything better simply "data" could be good enough.
+> I also would like that you keep this thread updated, could be weekly
+> or bi-weekly you choose, with the progress of the project.
 
-Johan
+Ok. I prefer to do a bi-weekly report.
+
+
+Best regards
+-- 
+Rafael Fonseca
