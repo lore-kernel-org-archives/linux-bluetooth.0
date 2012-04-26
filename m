@@ -1,47 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 26 Apr 2012 09:42:20 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: coekbe <coekbe@gmail.com>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: Bug report: bluetoothd broken for a USB dongle since bluez 4.85
-Message-ID: <20120426064220.GA14645@x220.P-661HNU-F1>
-References: <CAK678xgXnf-bgBRGU+tyNdnUv4VoGM+XyH15W0jw8h3Wypi+_A@mail.gmail.com>
- <20120425194852.GB2781@joana>
- <CAK678xiBPbdnx=U4tV4Zj0=0vraU1RwyEpxe3W7fy7TA6gTqVQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAK678xiBPbdnx=U4tV4Zj0=0vraU1RwyEpxe3W7fy7TA6gTqVQ@mail.gmail.com>
+Message-ID: <1335422456.16897.427.camel@aeonflux>
+Subject: Re: [RFC 5/8] Bluetooth: Move recently-added ERTM header unpacking
+ functions
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	pkrystad@codeaurora.org, andrei.emeltchenko.news@gmail.com
+Date: Thu, 26 Apr 2012 08:40:56 +0200
+In-Reply-To: <1335396979-11692-6-git-send-email-mathewm@codeaurora.org>
+References: <1335396979-11692-1-git-send-email-mathewm@codeaurora.org>
+	 <1335396979-11692-6-git-send-email-mathewm@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Colin,
+Hi Mat,
 
-On Thu, Apr 26, 2012, coekbe wrote:
-> Perhaps the following is the correct patch (works with my device):
+> Moving these functions simplifies future patches by eliminating
+> forward declarations, makes future patches easier to review, and
+> better preserves 'git blame' information.
 > 
-> -----------------------------------------------------------------
-> --- bluez-4.99/plugins/hciops.c.orig	2012-03-05 11:03:57.000000000 +0200
-> +++ bluez-4.99/plugins/hciops.c	2012-04-26 06:38:53.105166053 +0300
-> @@ -565,7 +565,7 @@ static void set_event_mask(int index)
->  	}
-> 
->  	if (dev->features[3] & LMP_RSSI_INQ)
-> -		events[4] |= 0x04; /* Inquiry Result with RSSI */
-> +		events[4] |= 0x02; /* Inquiry Result with RSSI */
-> 
->  	if (dev->features[5] & LMP_SNIFF_SUBR)
->  		events[5] |= 0x20; /* Sniff Subrating */
-> -------------------------------------------------------------------
-> 
-> Above the code that I quoted there's another "event[4] |= 0x02" with the comment
-> "Inquiry Result with RSSI". Surely it cannot be both 0x02 and 0x04?
-> The bluetooth spec 1.2 suggests 0x02 is correct.
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/l2cap_core.c |  120 ++++++++++++++++++++++----------------------
+>  1 file changed, 60 insertions(+), 60 deletions(-)
 
-Yes, you're right. The correct value is 0x02 and 0x04 (which means "Read
-Remote Extended Features Complete" that your dongle doesn't support).
-I've pushed a patch to bluez.git to fix this and I'll also send a patch
-in a minute for the kernel which will be needed when using mgmtops
-instead of hciops.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Johan
+Regards
+
+Marcel
+
+
