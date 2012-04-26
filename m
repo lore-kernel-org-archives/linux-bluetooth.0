@@ -1,28 +1,22 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 26 Apr 2012 16:07:57 -0400 (EDT)
-Message-Id: <20120426.160757.1741140873728970494.davem@davemloft.net>
-To: mcgrof@do-not-panic.com
-Cc: zambrano@broadcom.com, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	arend@broadcom.com, joe@perches.com
-Subject: Re: [PATCH] b44: properly use pr_fmt()
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <CAB=NE6VR6hPqoUmRH=YVr+MKu+Sn8tq2asv957zfD+SVWzk75A@mail.gmail.com>
-References: <CAB=NE6WBw3aJrch0JvxZ7jGb_rFW5Z4XWvYc1KqsBqBu+G8mjw@mail.gmail.com>
-	<CAB=NE6ViDGHPn=OsqFK1rJb-5J+1xzvf3h9+Rd-MgmWpn-T2fA@mail.gmail.com>
-	<CAB=NE6VR6hPqoUmRH=YVr+MKu+Sn8tq2asv957zfD+SVWzk75A@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: linux-wireless-owner@vger.kernel.org
+MIME-Version: 1.0
+Date: Thu, 26 Apr 2012 16:47:01 -0300
+Message-ID: <CAMBjcSsDp2RZxAQOqu3cbWyCv7sdnhfmGWi3Ux_NPJyqKWvoYw@mail.gmail.com>
+Subject: GSoC student introduction
+From: "Thiago S. A." <thiago.xth1@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>
-Date: Thu, 26 Apr 2012 08:53:30 -0700
+Hello, BlueZ community!
 
-> OK I found no pr_fmt warnings at all for make allmodconfig ; make V=1
-> ; on v3.4-rc4. For this and others reason stated then yes, this patch
-> is simply bogus.
+My name is Thiago da Silva Arruda (xth1 on IRC) .
+ I'm a computer science (master's degree) student at Unicamp, Brazil.
 
-This is what I expected, thanks for sorting this out :-)
+I am honored for acceptance in Google Summer of Code 2012.
+I'm gonna work in  tool for  visualize Bluetooth traffic as sequence
+diagrams and I thanks any hint.
+I'm excited to start to programming and contribute to the BlueZ comunity!
 
-We're in the rally!
+Goodbye.
