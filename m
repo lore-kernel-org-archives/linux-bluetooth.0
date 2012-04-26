@@ -1,106 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 26 Apr 2012 16:35:56 -0700 (PDT)
+Date: Thu, 26 Apr 2012 15:03:52 -0700 (PDT)
 From: Mat Martineau <mathewm@codeaurora.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org, marcel@holtmann.org,
-    pkrystad@codeaurora.org
-Subject: Re: [RFC 1/8] Bluetooth: Improve ERTM sequence number offset
- calculation
-In-Reply-To: <20120426071002.GB2659@aemeltch-MOBL1>
-Message-ID: <alpine.DEB.2.02.1204261504510.13179@mathewm-linux>
-References: <1335396979-11692-1-git-send-email-mathewm@codeaurora.org> <1335396979-11692-2-git-send-email-mathewm@codeaurora.org> <20120426071002.GB2659@aemeltch-MOBL1>
+To: Marcel Holtmann <marcel@holtmann.org>
+cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	pkrystad@codeaurora.org, andrei.emeltchenko.news@gmail.com
+Subject: Re: [RFC 2/8] Bluetooth: Initialize new l2cap_chan structure
+ members
+In-Reply-To: <1335422322.16897.423.camel@aeonflux>
+Message-ID: <alpine.DEB.2.02.1204261437550.13179@mathewm-linux>
+References: <1335396979-11692-1-git-send-email-mathewm@codeaurora.org>  <1335396979-11692-3-git-send-email-mathewm@codeaurora.org> <1335422322.16897.423.camel@aeonflux>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
-Hi Andrei -
+Marcel -
 
-On Thu, 26 Apr 2012, Andrei Emeltchenko wrote:
+On Thu, 26 Apr 2012, Marcel Holtmann wrote:
 
 > Hi Mat,
 >
-> On Wed, Apr 25, 2012 at 04:36:12PM -0700, Mat Martineau wrote:
->> Instead of using modular division, the offset can be calculated using
->> only addition and subtraction.  The previous calculation did not work
->> as intended and was more difficult to understand, involving unsigned
->> integer underflow and a check for a negative value where one was not
->> possible.
->
-> BTW: in what cases this was not working?
-
-"offset" was always positive, because "x % y" always gives a positive 
-result if y is a positive number.  The 'if' clause was dead code, 
-which was obviously not intended.
-
-If seq2 > seq1, then the value would wrap back around to a large 
-positive integer because both seq1 and seq2 are unsigned, so the value 
-of (seq1 - seq2) is also unsigned.  Suppose seq1 is 0 and seq2 is 1. 
-In unsigned 16-bit integer math, 0 - 1 == 65535 due to underflow.
-
-65535 % (63+1) is 63: luckily, the right answer for the most common tx 
-window (63).
-
-65535 % (163+1) is 99: but the offset should be 163
-
+>> Structure members used by ERTM or streaming mode need to be
+>> initialized when an ERTM or streaming mode link is configured.  Some
+>> duplicate code is also eliminated by moving in to the ERTM init
+>> function.
 >>
 >> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 >> ---
->>  include/net/bluetooth/l2cap.h |   11 ++++-------
->>  1 file changed, 4 insertions(+), 7 deletions(-)
+>>  net/bluetooth/l2cap_core.c |   25 +++++++++++++++++--------
+>>  1 file changed, 17 insertions(+), 8 deletions(-)
 >>
->> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
->> index 22e9ec9..92c0423 100644
->> --- a/include/net/bluetooth/l2cap.h
->> +++ b/include/net/bluetooth/l2cap.h
->> @@ -724,13 +724,10 @@ static inline bool l2cap_clear_timer(struct l2cap_chan *chan,
->>
->>  static inline int __seq_offset(struct l2cap_chan *chan, __u16 seq1, __u16 seq2)
+>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>> index beb7194..35c0a29 100644
+>> --- a/net/bluetooth/l2cap_core.c
+>> +++ b/net/bluetooth/l2cap_core.c
+>> @@ -2315,17 +2315,30 @@ static inline int l2cap_ertm_init(struct l2cap_chan *chan)
 >>  {
->> -	int offset;
->> -
->> -	offset = (seq1 - seq2) % (chan->tx_win_max + 1);
->> -	if (offset < 0)
->> -		offset += (chan->tx_win_max + 1);
->> -
->> -	return offset;
->> +	if (seq1 >= seq2)
->> +		return seq1 - seq2;
->> +	else
->> +		return chan->tx_win_max + 1 - seq2 + seq1;
->>  }
+>>  	int err;
+>>
+>> +	chan->next_tx_seq = 0;
+>> +	chan->expected_tx_seq = 0;
+>>  	chan->expected_ack_seq = 0;
+>>  	chan->unacked_frames = 0;
+>>  	chan->buffer_seq = 0;
+>>  	chan->num_acked = 0;
+>>  	chan->frames_sent = 0;
+>> +	chan->last_acked_seq = 0;
+>> +	chan->sdu = NULL;
+>> +	chan->sdu_last_frag = NULL;
+>> +	chan->sdu_len = 0;
+>> +
+>> +	if (chan->mode != L2CAP_MODE_ERTM)
+>> +		return 0;
+>> +
+>> +	chan->rx_state = L2CAP_RX_STATE_RECV;
+>> +	chan->tx_state = L2CAP_TX_STATE_XMIT;
+>>
+>>  	INIT_DELAYED_WORK(&chan->retrans_timer, l2cap_retrans_timeout);
+>>  	INIT_DELAYED_WORK(&chan->monitor_timer, l2cap_monitor_timeout);
+>>  	INIT_DELAYED_WORK(&chan->ack_timer, l2cap_ack_timeout);
+>>
+>>  	skb_queue_head_init(&chan->srej_q);
+>> +	skb_queue_head_init(&chan->tx_q);
+>>
+>>  	INIT_LIST_HEAD(&chan->srej_l);
+>>  	err = l2cap_seq_list_init(&chan->srej_list, chan->tx_win);
+>> @@ -3193,10 +3206,8 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+>>
+>>  		l2cap_state_change(chan, BT_CONNECTED);
+>>
+>> -		chan->next_tx_seq = 0;
+>> -		chan->expected_tx_seq = 0;
+>> -		skb_queue_head_init(&chan->tx_q);
+>> -		if (chan->mode == L2CAP_MODE_ERTM)
+>> +		if (chan->mode == L2CAP_MODE_ERTM ||
+>> +					chan->mode == L2CAP_MODE_STREAMING)
+>>  			err = l2cap_ertm_init(chan);
 >
-> You seems are changing logic, not improving as you patch states. 
-> Your offset might be bigger then tx_win_max. Was this intended?
+> we need to make this compliant with the coding style the Dave Miller
+> forced onto us. So either we turn this into a switch statement or we
+> have to do it like this:
+>
+> 		if (chan->mode == ... ||
+> 		    chan->mode == ...)
+> 			err = l2cap_ertm_init(...);
 
-The new code is correct.
+Ok, I had misunderstood what Dave wanted.  From this message:
 
-Here's a python test program for all possible inputs with
-tx_win_max == 63:
+http://article.gmane.org/gmane.linux.network/222716
 
-<code>
-#!/usr/bin/env python
-def seq_offset(tx_win_max, seq1, seq2):
-     if (seq1 >= seq2):
-         return seq1 - seq2
-     else:
-         return tx_win_max + 1 - seq2 + seq1
+I thought he was only looking for that kind of alignment in function 
+calls and prototypes.  However, here:
 
-tx_win_max = 63
-max_offset = -1
-min_offset = tx_win_max + 1
+http://article.gmane.org/gmane.linux.kernel.wireless.general/85043
 
-for i in range(tx_win_max+1):
-     for j in range(tx_win_max+1):
-         offset = seq_offset(tx_win_max, i, j)
-         min_offset = min(offset, min_offset)
-         max_offset = max(offset, max_offset)
+he mentions 'if' statements.
 
-print "min: %d, max: %d" % (min_offset, max_offset)
-</code>
 
-It prints:
-min: 0, max: 63
+I will update my changes to reflect Dave's style on all long lines 
+with parens.
+
+
+> Please keep this in mind. Otherwise we do not get the patches merged
+> into the networking trees. If you wanna avoid this, I am fine using
+> switch statements:
+>
+> 		switch (chan->mode) {
+> 		case L2CAP_MODE_ERTM:
+> 		case L2CAP_MODE_STREAMING:
+> 			err = l2cap_ertm_init(...);
+> 			break;
+> 		}
 
 
 --
