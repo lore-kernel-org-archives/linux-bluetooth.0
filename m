@@ -1,37 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1335552700.16897.477.camel@aeonflux>
-Subject: Re: hcidump / avtest issues
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mike <puffy.taco@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Fri, 27 Apr 2012 20:51:40 +0200
-In-Reply-To: <CAB7rCTgK1eZwHQVp-VXxzWH_CmE_uygvcJ2HMJfZSTdE_LGiSw@mail.gmail.com>
-References: <CAB7rCTgK1eZwHQVp-VXxzWH_CmE_uygvcJ2HMJfZSTdE_LGiSw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 27 Apr 2012 13:44:39 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        alexander.smirnov@siemens.com, Sergey.Sobolev@siemens.com
+Subject: CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit 2012
+ (Barcelona!)
+Message-ID: <20120427174439.GC16207@tuxdriver.com>
+References: <20120322192406.GB2432@tuxdriver.com>
+ <1332698585.1870.88.camel@aeonflux>
+ <20120326145433.GE13806@tuxdriver.com>
+ <1332774906.1870.98.camel@aeonflux>
+ <20120326152541.GH13806@tuxdriver.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120326152541.GH13806@tuxdriver.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mike,
+On Mon, Mar 26, 2012 at 11:25:42AM -0400, John W. Linville wrote:
+> On Mon, Mar 26, 2012 at 05:15:06PM +0200, Marcel Holtmann wrote:
+> 
+> > > I don't think that 1 day is enough.  2 might not be enough, depending
+> > > on how we stage it.  Do you think that we would have more than one
+> > > "track" (e.g. separate Blueooth/802.11/NFC sessions)?  A single
+> > > "plenary" session?  Or some mix?
+> > 
+> > so what about 2 days single track and 1 day with breakout sessions. So
+> > we could do 12 talks with morning and afternoon sessions on the 3rd day
+> > as needed.
+> > 
+> > If we have many proposals for presentations, we can always go switch to
+> > 2 tracks. If we require LinuxCon registration, then it should be no
+> > problem to get a second room. If not, I have to negotiate with Angela
+> > next week ;)
+> 
+> My only concern is filling the number of slots.  Will we have 12+
+> presentation poposals?
 
-> I'm having issues where hcidump seems to be losing packets.  I'm
-> trying to collect traces of avtest running.  Avtest properly prints
-> out that it sent a packet and received a reply, but I don't always see
-> it in hcidump.  Seems if I run avtest a lot successively, it does show
-> up.  I'm running a 2.6.33.20 kernel with hcidump-2.3.  Let me know if
-> the kernel is just too ancient, but I'd like to know if others have
-> seen this type of issue.
+Just to keep the ball rolling...
 
-actually hcidump can not loose any packets. Write them into a file in
-BTSnoop format and double check with Wireshark or the Frontline Viewer.
+Angela has reserved space for us at the Hotel Fira
+Palace for the Wireless Summit on Thurs, Nov 8th and Fri, Nov 9th.
+Please note that this will overlap Yocto Dev Days, oVirt Summit and
+KVM Forum at the same venue.
 
-The kernel is always sending the exact copy to the hcidump sockets and
-thus there is no way you loose packets. The only explanation would be
-that L2CAP socket has a bug and swallows it. Have you checked that
-avtest actually reports L2CAP send errors.
+Now, we need some talk proposals!  Please post in this thread (or
+contact me or Marcel directly if necessary) to propose talks.  I would
+love to see any topics on any relevant technologies, as well as topics
+about how the projects are being managed, new sub-projects, etc.
+It seems like a long time away right now, but it is a good time to
+start thinking... :-)
 
-Regards
+Thanks,
 
-Marcel
-
-
+John
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
