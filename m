@@ -1,71 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [BlueZ v3 00/10] gdbus: Better D-Bus introspection
-Date: Fri, 27 Apr 2012 18:14:35 -0300
-Message-Id: <1335561285-3332-1-git-send-email-lucas.demarchi@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CAB7rCThfbJQq3ckA=rT4wyWfCHEJeN6XRhHR9nDTyz_iQfbkgQ@mail.gmail.com>
+References: <CAB7rCTgK1eZwHQVp-VXxzWH_CmE_uygvcJ2HMJfZSTdE_LGiSw@mail.gmail.com>
+	<1335552700.16897.477.camel@aeonflux>
+	<CAB7rCTgEJSP5B08Z+R67bDsj1uoxNbJZiE=JHURR4jJZd4kz=w@mail.gmail.com>
+	<CAB7rCThDkFW+jRdw2Q9kJD3EROAGT=e6vmm5H0gaKq+J9q5A+A@mail.gmail.com>
+	<1335559908.16897.481.camel@aeonflux>
+	<CAB7rCThfbJQq3ckA=rT4wyWfCHEJeN6XRhHR9nDTyz_iQfbkgQ@mail.gmail.com>
+Date: Fri, 27 Apr 2012 16:12:48 -0500
+Message-ID: <CAB7rCTijZWu3GVV2g-zmotN6ebOxrN+u69ri=poSkizZNHAXfg@mail.gmail.com>
+Subject: Re: hcidump / avtest issues
+From: Mike <puffy.taco@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This series improves D-Bus introspection in gdbus to ease the life of people
-using our interface: they can rely on binding generator available for QT, GTK
-and others.
+On Fri, Apr 27, 2012 at 3:57 PM, Mike <puffy.taco@gmail.com> wrote:
+> Hi Marcel,
+>
+>>> >>> I'm having issues where hcidump seems to be losing packets. =A0I'm
+>>> >>> trying to collect traces of avtest running. =A0Avtest properly prin=
+ts
+>>> >>> out that it sent a packet and received a reply, but I don't always =
+see
+>>> >>> it in hcidump. =A0Seems if I run avtest a lot successively, it does=
+ show
+>>> >>> up. =A0I'm running a 2.6.33.20 kernel with hcidump-2.3. =A0Let me k=
+now if
+>>> >>> the kernel is just too ancient, but I'd like to know if others have
+>>> >>> seen this type of issue.
+>>> >>
+>>> >> actually hcidump can not loose any packets. Write them into a file i=
+n
+>>> >> BTSnoop format and double check with Wireshark or the Frontline View=
+er.
+>>> >>
+>>> >> The kernel is always sending the exact copy to the hcidump sockets a=
+nd
+>>> >> thus there is no way you loose packets. The only explanation would b=
+e
+>>> >> that L2CAP socket has a bug and swallows it. Have you checked that
+>>> >> avtest actually reports L2CAP send errors.
+>>> >
+>>> > I was saving in btsnoop and looking at it in wireshark. =A0And verifi=
+ed
+>>> > that the other side got the command by enabling debug mode on
+>>> > bluetoothd. =A0But now I see the packet is sort of there, but it's
+>>> > malformed!
+>>> >
+>>> > Bad:
+>>> > < 02 01 20 07 00 03 00 40 00 00 06 04
+>>> >> 02 01 20 07 00 03 00 40 00 03 06 31
+>>> >
+>>> > Good:
+>>> > < 02 01 20 07 00 03 00 42 00 00 06 04
+>>> >> 02 01 20 07 00 03 00 42 00 03 06 31
+>>> >
+>>> > Somehow one byte is wrong (40 bad, 42 good). =A0Any ideas on that? =
+=A0Let
+>>> > me know if you'd like the logs, but I verified the --raw output of
+>>> > hcidump had the same issue.
+>>>
+>>> BTW, I would say the issue exists more when SDP is going on (as when I
+>>> run the test a lot before a disconnect, it starts working -- no more
+>>> SDP later on). =A0And we can see that it classified the packet as SDP,
+>>> not AVDTP. =A0I'm tracking the hcidump code now, not entirely sure how
+>>> data goes into one or the other.
+>>
+>> the hcidump code is pure raw data. It is the same data that goes to the
+>> driver. Trust me here, that is how the kernel works, it clones the skb
+>> before sending to the driver and sends a copy back to hcidump. So you
+>> will not find a bug in the hcidump raw data.
+>>
+>> The only way something can go wrong if L2CAP has an issue. Are you using
+>> L2CAP basic modem or enhanced retransmission?
+>
+> Looks like ERTM was added in 2.6.36, and I didn't backport it, so must be=
+ basic.
 
-We are doing basically 3 things:
-
- - Adding the name of the arguments in methods and signals
- - Adding some annotations:
- 	- deprecated
-	- no-reply
- - Constifying the tables
-
-First two patches were only 2 easy fixes during the development
-
-Lucas De Marchi (10):
-  gdbus: return if method signature is malformed
-  gdbus: do not call memset for terminating NUL
-  gdbus: save copy of undecorated signature
-  gdbus: use argument name in method introspection
-  gdbus: add decorated signature to arguments
-  gdbus: add decorated signature to return values
-  gdbus: add Deprecated annotation to introspection
-  gdbus: add Method.NoReply annotation to introspection
-  Constify GDBus method tables
-  Constify GDBus signal tables
-
- attrib/client.c           |   14 ++--
- audio/control.c           |    6 +-
- audio/device.c            |    8 +-
- audio/gateway.c           |   12 +--
- audio/headset.c           |   22 +++---
- audio/media.c             |   10 +--
- audio/sink.c              |    8 +-
- audio/source.c            |    8 +-
- audio/telephony-dummy.c   |   18 ++---
- audio/telephony-maemo5.c  |    4 +-
- audio/transport.c         |   14 ++--
- doc/serial-api.txt        |    2 +-
- gdbus/gdbus.h             |    6 +-
- gdbus/object.c            |  178 ++++++++++++++++++++++++++++++++++++++++-----
- health/hdp.c              |   28 +++----
- input/device.c            |    8 +-
- network/connection.c      |   10 +--
- network/server.c          |    6 +-
- plugins/dbusoob.c         |    8 +-
- plugins/service.c         |   10 +--
- proximity/monitor.c       |   10 +--
- proximity/reporter.c      |    8 +-
- sap/sap-dummy.c           |    8 +-
- sap/server.c              |    8 +-
- serial/port.c             |    8 +-
- serial/proxy.c            |   20 ++---
- src/adapter.c             |   36 ++++-----
- src/device.c              |   12 +--
- src/manager.c             |   20 ++---
- thermometer/thermometer.c |   18 ++---
- 30 files changed, 333 insertions(+), 195 deletions(-)
-
--- 
-1.7.10
-
+Unless it was added earlier.  I'm really not familiar enough.  Just
+running avtest.c, sending invalid commands!
