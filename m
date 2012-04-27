@@ -3,85 +3,97 @@ From: Mat Martineau <mathewm@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
 	marcel@holtmann.org
 Cc: pkrystad@codeaurora.org, andrei.emeltchenko.news@gmail.com
-Subject: [RFCv2 6/8] Bluetooth: Lock the L2CAP channel when sending
-Date: Fri, 27 Apr 2012 16:50:53 -0700
-Message-Id: <1335570655-30878-7-git-send-email-mathewm@codeaurora.org>
+Subject: [RFCv2 3/8] Bluetooth: Make better use of l2cap_chan reference counting
+Date: Fri, 27 Apr 2012 16:50:50 -0700
+Message-Id: <1335570655-30878-4-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1335570655-30878-1-git-send-email-mathewm@codeaurora.org>
 References: <1335570655-30878-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The ERTM and streaming mode transmit queue must only be accessed while
-the L2CAP channel lock is held.  Locking the channel before calling
-l2cap_chan_send ensures that multiple threads cannot simultaneously
-manipulate the queue when sending and receiving concurrently.
+L2CAP sockets contain a pointer to l2cap_chan that needs to be
+reference counted in order to prevent a possible dangling pointer when
+the channel is freed.
 
-L2CAP channel locking had previously moved to the l2cap_chan struct
-instead of the associated socket, so some of the old socket locking
-can also be removed in this patch.
+There were a few other cases where an l2cap_chan pointer on the stack
+was dereferenced after a call to l2cap_chan_del. Those pointers are
+also now reference counted.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- include/net/bluetooth/bluetooth.h |    2 --
- net/bluetooth/l2cap_sock.c        |   15 ++++++++-------
- 2 files changed, 8 insertions(+), 9 deletions(-)
+ net/bluetooth/l2cap_core.c |    6 ++++++
+ net/bluetooth/l2cap_sock.c |    3 +++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 2fb268f..90678a9 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -256,12 +256,10 @@ static inline struct sk_buff *bt_skb_send_alloc(struct sock *sk,
- {
- 	struct sk_buff *skb;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index c3d3cfc..5963cd2 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1257,6 +1257,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
  
--	release_sock(sk);
- 	if ((skb = sock_alloc_send_skb(sk, len + BT_SKB_RESERVE, nb, err))) {
- 		skb_reserve(skb, BT_SKB_RESERVE);
- 		bt_cb(skb)->incoming  = 0;
+ 	/* Kill channels */
+ 	list_for_each_entry_safe(chan, l, &conn->chan_l, list) {
++		l2cap_chan_hold(chan);
+ 		l2cap_chan_lock(chan);
+ 
+ 		l2cap_chan_del(chan, err);
+@@ -1264,6 +1265,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 		l2cap_chan_unlock(chan);
+ 
+ 		chan->ops->close(chan->data);
++		l2cap_chan_put(chan);
  	}
--	lock_sock(sk);
  
- 	if (!skb && *err)
- 		return NULL;
+ 	mutex_unlock(&conn->chan_lock);
+@@ -3376,11 +3378,13 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
+ 	sk->sk_shutdown = SHUTDOWN_MASK;
+ 	release_sock(sk);
+ 
++	l2cap_chan_hold(chan);
+ 	l2cap_chan_del(chan, ECONNRESET);
+ 
+ 	l2cap_chan_unlock(chan);
+ 
+ 	chan->ops->close(chan->data);
++	l2cap_chan_put(chan);
+ 
+ 	mutex_unlock(&conn->chan_lock);
+ 
+@@ -3408,11 +3412,13 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
+ 
+ 	l2cap_chan_lock(chan);
+ 
++	l2cap_chan_hold(chan);
+ 	l2cap_chan_del(chan, 0);
+ 
+ 	l2cap_chan_unlock(chan);
+ 
+ 	chan->ops->close(chan->data);
++	l2cap_chan_put(chan);
+ 
+ 	mutex_unlock(&conn->chan_lock);
+ 
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 82b6368..ac8ce10 100644
+index 0f30785..82b6368 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -716,16 +716,13 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct ms
- 	if (msg->msg_flags & MSG_OOB)
- 		return -EOPNOTSUPP;
+@@ -956,6 +956,7 @@ static void l2cap_sock_destruct(struct sock *sk)
+ {
+ 	BT_DBG("sk %p", sk);
  
--	lock_sock(sk);
--
--	if (sk->sk_state != BT_CONNECTED) {
--		release_sock(sk);
-+	if (sk->sk_state != BT_CONNECTED)
- 		return -ENOTCONN;
--	}
++	l2cap_chan_put(l2cap_pi(sk)->chan);
+ 	if (l2cap_pi(sk)->rx_busy_skb) {
+ 		kfree_skb(l2cap_pi(sk)->rx_busy_skb);
+ 		l2cap_pi(sk)->rx_busy_skb = NULL;
+@@ -1057,6 +1058,8 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock, int p
+ 		return NULL;
+ 	}
  
-+	l2cap_chan_lock(chan);
- 	err = l2cap_chan_send(chan, msg, len, sk->sk_priority);
-+	l2cap_chan_unlock(chan);
- 
--	release_sock(sk);
- 	return err;
- }
- 
-@@ -936,9 +933,13 @@ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
- 	struct sk_buff *skb;
- 	int err;
- 
-+	l2cap_chan_unlock(chan);
++	l2cap_chan_hold(chan);
 +
- 	skb = bt_skb_send_alloc(chan->sk, len, nb, &err);
- 	if (!skb)
--		return (ERR_PTR(err));
-+		skb = ERR_PTR(err);
-+
-+	l2cap_chan_lock(chan);
+ 	chan->sk = sk;
  
- 	return skb;
- }
+ 	l2cap_pi(sk)->chan = chan;
 -- 
 1.7.10
 
