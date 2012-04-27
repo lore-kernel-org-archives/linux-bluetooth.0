@@ -5,34 +5,78 @@ To: linux-bluetooth@vger.kernel.org,
 	marcel@holtmann.org
 Cc: pkrystad@codeaurora.org,
 	andrei.emeltchenko.news@gmail.com
-Subject: [RFCv2 8/8] Bluetooth: Add Code Aurora Forum copyright
-Date: Fri, 27 Apr 2012 16:50:55 -0700
-Message-Id: <1335570655-30878-9-git-send-email-mathewm@codeaurora.org>
+Subject: [RFCv2 5/8] Bluetooth: Restore locking semantics when looking up L2CAP channels
+Date: Fri, 27 Apr 2012 16:50:52 -0700
+Message-Id: <1335570655-30878-6-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1335570655-30878-1-git-send-email-mathewm@codeaurora.org>
 References: <1335570655-30878-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adding Code Aurora Forum copyright information due to significant
-additions of code.
+As the comment for l2cap_get_chan_by_scid indicated, the function used
+to return a locked socket.  The lock for the socket was acquired while
+the channel list was also locked.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+When locking was moved over to the l2cap_chan structure, the channel
+lock was no longer acquired with the channel list still locked.  This
+made it possible for the l2cap_chan to be deleted after
+conn->chan_lock was released but before l2cap_chan_lock was called.
+Making the call to l2cap_chan_lock before releasing conn->chan_lock
+makes it impossible for the l2cap_chan to be deleted at the wrong
+time.
+
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |    1 +
- 1 file changed, 1 insertion(+)
+ net/bluetooth/l2cap_core.c |   10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index d424b86..b855847 100644
+index e543b53..347aaa5 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -4,6 +4,7 @@
-    Copyright (C) 2009-2010 Gustavo F. Padovan <gustavo@padovan.org>
-    Copyright (C) 2010 Google Inc.
-    Copyright (C) 2011 ProFUSION Embedded Systems
-+   Copyright (c) 2012 Code Aurora Forum.  All rights reserved.
+@@ -98,13 +98,15 @@ static struct l2cap_chan *__l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16
+ }
  
-    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
+ /* Find channel with given SCID.
+- * Returns locked socket */
++ * Returns locked channel. */
+ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 cid)
+ {
+ 	struct l2cap_chan *c;
  
+ 	mutex_lock(&conn->chan_lock);
+ 	c = __l2cap_get_chan_by_scid(conn, cid);
++	if (c)
++		l2cap_chan_lock(c);
+ 	mutex_unlock(&conn->chan_lock);
+ 
+ 	return c;
+@@ -3141,8 +3143,6 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	if (!chan)
+ 		return -ENOENT;
+ 
+-	l2cap_chan_lock(chan);
+-
+ 	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2) {
+ 		struct l2cap_cmd_rej_cid rej;
+ 
+@@ -3255,8 +3255,6 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	if (!chan)
+ 		return 0;
+ 
+-	l2cap_chan_lock(chan);
+-
+ 	switch (result) {
+ 	case L2CAP_CONF_SUCCESS:
+ 		l2cap_conf_rfc_get(chan, rsp->data, len);
+@@ -4589,8 +4587,6 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 		return 0;
+ 	}
+ 
+-	l2cap_chan_lock(chan);
+-
+ 	BT_DBG("chan %p, len %d", chan, skb->len);
+ 
+ 	if (chan->state != BT_CONNECTED)
 -- 
 1.7.10
 
