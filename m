@@ -1,55 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 27 Apr 2012 15:15:30 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: Hemant Gupta <hemant.gupta@stericsson.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Store LE device address type with primary list
-Message-ID: <20120427121530.GA24803@x220.P-661HNU-F1>
-References: <1335360420-23445-1-git-send-email-hemant.gupta@stericsson.com>
- <20120426093203.GB18380@x220>
- <CAKT1EBc6inPjxW0QqT7MQAvt0iad2cZs59MC_W4NExtyBUkXqw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CAKT1EBc6inPjxW0QqT7MQAvt0iad2cZs59MC_W4NExtyBUkXqw@mail.gmail.com>
+In-Reply-To: <1335524387-22831-5-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1335524387-22831-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1335524387-22831-5-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Fri, 27 Apr 2012 14:45:51 +0300
+Message-ID: <CABBYNZ+9a7RNc23Tcf=PS6oEND2b9dNg6OKiKGb8cGnK18vCfg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 4/5] media: Create multiple transports if needed
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Mikel,
 
-On Thu, Apr 26, 2012, Claudio Takahasi wrote:
-> On Thu, Apr 26, 2012 at 6:32 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> > Hi Hemant,
-> >
-> > On Wed, Apr 25, 2012, Hemant Gupta wrote:
-> >> This patch stores the address type while storing the primary services
-> >> of LE Device which is later used for re-creating device from primary
-> >> service database.
-> >> ---
-> >>  src/adapter.c |   10 ++++++++--
-> >>  src/device.c  |    9 +++++++--
-> >>  2 files changed, 15 insertions(+), 4 deletions(-)
-> >
-> > Would it make more sense (and I'm not asking just you but also the
-> > INdTers) to have the address type as part of the key instead of the
-> > value. After all it's basically an extension to the address and that way
-> > tightly bound to it. Maybe something like the following:
-> >
-> > 11:22:33:44:55:66|1 <value1>
-> > aa:bb:cc:dd:ee:ff|0 <value2>
-> >
-> > The same should then also be considered for the longtermkeys file.
-> >
-> > Johan
-> 
-> I agree if we append the address type for all LE/GATT storage
-> files(not only for primary and longtermkeys).
-> Probably we will have minor problems between BlueZ releases, but IMO
-> it is acceptable since LE it is not officially supported.
-> btw: the separator commonly used in the storage files is "#" instead of "|".
+On Fri, Apr 27, 2012 at 1:59 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
 
-I'm fine with using # and yes all LE related files should use this
-convention. And if possible these changes should go in before the next
-BlueZ release.
+> -static struct media_transport *get_unique_transport(
+> -                                       struct media_endpoint *endpoint)
+> -{
+> -       if (endpoint->transports == NULL)
+> -               return NULL;
+> -
+> -       if (endpoint->transports->next != NULL)
+> -               return NULL;
+> -
+> -       return endpoint->transports->data;
+> -}
 
-Johan
+This shouldn't be here in the first place.
+
+>        } else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
+>                                        strcasecmp(uuid, HSP_AG_UUID) == 0) {
+> -               struct audio_device *dev;
+> +               GSList *list;
+> +               GSList *l;
+>
+>                endpoint->hs_watch = headset_add_state_cb(headset_state_changed,
+>                                                                endpoint);
+> -               dev = manager_find_device(NULL, &adapter->src, BDADDR_ANY,
+> +               list = manager_find_devices(NULL, &adapter->src, BDADDR_ANY,
+>                                                AUDIO_HEADSET_INTERFACE, TRUE);
+> -               if (dev)
+> +
+> +               for (l = list; l != NULL; l = l->next) {
+> +                       struct audio_device *dev = l->data;
+> +
+>                        set_configuration(endpoint, dev, NULL, 0,
+>                                                headset_setconf_cb, dev, NULL);
+> +               }
+> +
+> +               g_slist_free(list);
+>        } else if (strcasecmp(uuid, HFP_HS_UUID) == 0 ||
+>                                        strcasecmp(uuid, HSP_HS_UUID) == 0) {
+> -               struct audio_device *dev;
+> +               GSList *list;
+> +               GSList *l;
+>
+>                endpoint->ag_watch = gateway_add_state_cb(gateway_state_changed,
+>                                                                endpoint);
+> -               dev = manager_find_device(NULL, &adapter->src, BDADDR_ANY,
+> +               list = manager_find_devices(NULL, &adapter->src, BDADDR_ANY,
+>                                                AUDIO_GATEWAY_INTERFACE, TRUE);
+> -               if (dev)
+> +
+> +               for (l = list; l != NULL; l = l->next) {
+> +                       struct audio_device *dev = l->data;
+> +
+>                        set_configuration(endpoint, dev, NULL, 0,
+>                                                gateway_setconf_cb, dev, NULL);
+> +               }
+> +
+> +               g_slist_free(list);
+>        } else {
+>                if (err)
+>                        *err = -EINVAL;
+
+This function is becoming too big/complex, please split it per
+uuid/role whenever possible.
+
+
+-- 
+Luiz Augusto von Dentz
