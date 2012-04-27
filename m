@@ -1,23 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <201204271541.q3RFfVd5006035@imr-da04.mx.aol.com>
-Date: Fri, 27 Apr 2012 11:40:58 -0400
-From: Kal Torak <chronognosis@aim.com>
+MIME-Version: 1.0
+Date: Fri, 27 Apr 2012 10:21:23 -0500
+Message-ID: <CAB7rCTgK1eZwHQVp-VXxzWH_CmE_uygvcJ2HMJfZSTdE_LGiSw@mail.gmail.com>
+Subject: hcidump / avtest issues
+From: Mike <puffy.taco@gmail.com>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: main.conf issues
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello, When I setup the main.conf with the values for Name, Class,
-PairableTimeout and DiscoverableTimeout, and restart the bluetoothd,
-hciconfig shows that nothing change name still the same, I cant "see"
-the device from the outside(iscan is disabled), and the class still
-0x000100, and I must re-do hciconfig hci name #### class #### and
-hciconfig hci0 piscan by hand to make the device visible and try
-streaming support, OTOH I just can't see and/or connect to the device.
-a ConWise 6622 Bluetooth dongle.
-I'm using bluez-4.99 and linux 3.2.15.Any information will be usefull...
+Hi,
 
-Regards, 
-Torak
+I'm having issues where hcidump seems to be losing packets.  I'm
+trying to collect traces of avtest running.  Avtest properly prints
+out that it sent a packet and received a reply, but I don't always see
+it in hcidump.  Seems if I run avtest a lot successively, it does show
+up.  I'm running a 2.6.33.20 kernel with hcidump-2.3.  Let me know if
+the kernel is just too ancient, but I'd like to know if others have
+seen this type of issue.
+
+Thanks,
+Mike
