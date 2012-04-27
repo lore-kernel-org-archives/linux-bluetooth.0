@@ -1,34 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 26 Apr 2012 23:19:07 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	pkrystad@codeaurora.org, andrei.emeltchenko.news@gmail.com
-Subject: Re: [RFC 1/8] Bluetooth: Improve ERTM sequence number offset
- calculation
-Message-ID: <20120427021907.GA16993@joana>
-References: <1335396979-11692-1-git-send-email-mathewm@codeaurora.org>
- <1335396979-11692-2-git-send-email-mathewm@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1335396979-11692-2-git-send-email-mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] monitor: add version information
+Date: Thu, 26 Apr 2012 23:00:37 -0300
+Message-Id: <1335492037-14196-2-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1335492037-14196-1-git-send-email-gustavo@padovan.org>
+References: <1335492037-14196-1-git-send-email-gustavo@padovan.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+---
+ monitor/main.c |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-* Mat Martineau <mathewm@codeaurora.org> [2012-04-25 16:36:12 -0700]:
+diff --git a/monitor/main.c b/monitor/main.c
+index 3c4886f..4e8b433 100644
+--- a/monitor/main.c
++++ b/monitor/main.c
+@@ -58,6 +58,7 @@ static void usage(void)
+ 
+ static const struct option main_options[] = {
+ 	{ "btsnoop",	required_argument, NULL, 'b'	},
++	{ "version",	no_argument,	   NULL, 'v'	},
+ 	{ "help",	no_argument,	   NULL, 'h'	},
+ 	{ }
+ };
+@@ -72,7 +73,7 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "bh", main_options, NULL);
++		opt = getopt_long(argc, argv, "bvh", main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+ 
+@@ -80,6 +81,9 @@ int main(int argc, char *argv[])
+ 		case 'b':
+ 			btsnoop_open(optarg);
+ 			break;
++		case 'v':
++			printf("%s\n", VERSION);
++			return EXIT_SUCCESS;
+ 		case 'h':
+ 			usage();
+ 			return EXIT_SUCCESS;
+-- 
+1.7.10
 
-> Instead of using modular division, the offset can be calculated using
-> only addition and subtraction.  The previous calculation did not work
-> as intended and was more difficult to understand, involving unsigned
-> integer underflow and a check for a negative value where one was not
-> possible.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  include/net/bluetooth/l2cap.h |   11 ++++-------
->  1 file changed, 4 insertions(+), 7 deletions(-)
-
-Patch has been applied to bluetooth-next. thanks.
-
-	Gustavo
