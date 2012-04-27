@@ -2,86 +2,76 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Subject: [PATCH obexd v0 5/6] client: Remove deprecated part of session API
-Date: Fri, 27 Apr 2012 12:33:39 +0200
-Message-Id: <1335522820-11826-6-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v0 6/6] client: Remove transfer from queue before callback
+Date: Fri, 27 Apr 2012 12:33:40 +0200
+Message-Id: <1335522820-11826-7-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1335522820-11826-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1335522820-11826-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Once the modules are using the new callback style, the session API can
-be simplified and the old functions to access session->p removed.
+It is safer to remove the transfer from the internal queue (including
+session->p) before calling the transfer callback. This makes sure the
+callback will not manipulate the session in a way that the transfer is
+removed more than once.
+
+This was previously protected with session->p->id != 0 checks, but once
+the new callbacks have been adopted in session API, this logic can be
+removed.
 ---
- client/session.c |   40 ----------------------------------------
- client/session.h |    3 ---
- 2 files changed, 0 insertions(+), 43 deletions(-)
+ client/session.c |   20 +++++++++-----------
+ 1 files changed, 9 insertions(+), 11 deletions(-)
 
 diff --git a/client/session.c b/client/session.c
-index 50947d3..ea717a6 100644
+index ea717a6..bb00684 100644
 --- a/client/session.c
 +++ b/client/session.c
-@@ -1140,46 +1140,6 @@ const char *obc_session_get_target(struct obc_session *session)
- 	return session->driver->target;
+@@ -496,15 +496,16 @@ void obc_session_shutdown(struct obc_session *session)
+ 	err = g_error_new(OBEX_IO_ERROR, OBEX_IO_DISCONNECTED,
+ 						"Session closed by user");
+ 
+-	if (session->p != NULL && session->p->id != 0) {
++	if (session->p != NULL) {
+ 		session_transfer_callback_t callback = session->p->func;
+ 
++		p = session->p;
++		session->p = NULL;
++
+ 		if (callback)
+-			callback(session, session->p->transfer, err,
+-							session->p->data);
++			callback(session, p->transfer, err, p->data);
+ 
+-		pending_request_free(session->p);
+-		session->p = NULL;
++		pending_request_free(p);
+ 	}
+ 
+ 	while ((p = g_queue_pop_head(session->queue))) {
+@@ -843,9 +844,8 @@ static void session_terminate_transfer(struct obc_session *session,
+ 
+ 		p = match->data;
+ 		g_queue_delete_link(session->queue, match);
+-	}
+-
+-	p->id = 0;
++	} else
++		session->p = NULL;
+ 
+ 	obc_session_ref(session);
+ 
+@@ -855,10 +855,8 @@ static void session_terminate_transfer(struct obc_session *session,
+ 
+ 	pending_request_free(p);
+ 
+-	if (p == session->p) {
+-		session->p = NULL;
++	if (session->p == NULL)
+ 		session_process_queue(session);
+-	}
+ 
+ 	obc_session_unref(session);
  }
- 
--static struct obc_transfer *obc_session_get_transfer(
--						struct obc_session *session)
--{
--	if (session->p == NULL)
--		return NULL;
--
--	return session->p->transfer;
--}
--
--int obc_session_get_contents(struct obc_session *session, char **contents,
--								size_t *size)
--{
--	struct obc_transfer *transfer;
--
--	transfer = obc_session_get_transfer(session);
--	if (transfer == NULL) {
--		if (size != NULL)
--			*size = 0;
--
--		return -EINVAL;
--	}
--
--	return obc_transfer_get_contents(transfer, contents, size);
--}
--
--const void *obc_session_get_params(struct obc_session *session, size_t *size)
--{
--	struct obc_transfer *transfer;
--
--	transfer = obc_session_get_transfer(session);
--	if (transfer == NULL) {
--		if (size != NULL)
--			*size = 0;
--
--		return NULL;
--	}
--
--	return obc_transfer_get_params(transfer, size);
--}
--
- static void setpath_complete(struct obc_session *session, GError *err,
- 							void *user_data)
- {
-diff --git a/client/session.h b/client/session.h
-index d97abc3..2717194 100644
---- a/client/session.h
-+++ b/client/session.h
-@@ -56,9 +56,6 @@ const char *obc_session_get_agent(struct obc_session *session);
- 
- const char *obc_session_get_path(struct obc_session *session);
- const char *obc_session_get_target(struct obc_session *session);
--int obc_session_get_contents(struct obc_session *session, char **contents,
--								size_t *size);
--const void *obc_session_get_params(struct obc_session *session, size_t *size);
- 
- guint obc_session_send(struct obc_session *session, const char *filename,
- 				const char *name, GError **err);
 -- 
 1.7.7.6
 
