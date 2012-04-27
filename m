@@ -2,81 +2,45 @@ Return-Path: <cyrus@holtmann.org>
 From: Henrique Dante de Almeida <hdante@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Henrique Dante de Almeida <hdante@profusion.mobi>
-Subject: [PATCH RFC 1/4] manager: implement support for DBus.Properties.Get
-Date: Fri, 27 Apr 2012 18:54:03 -0300
-Message-Id: <1335563646-9944-2-git-send-email-hdante@profusion.mobi>
-In-Reply-To: <1335563646-9944-1-git-send-email-hdante@profusion.mobi>
-References: <1335563646-9944-1-git-send-email-hdante@profusion.mobi>
+Subject: [PATCH RFC 0/4] Reference implementation for DBUS.Properties
+Date: Fri, 27 Apr 2012 18:54:02 -0300
+Message-Id: <1335563646-9944-1-git-send-email-hdante@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/manager.c |   31 +++++++++++++++++++++++++++++--
- 1 files changed, 29 insertions(+), 2 deletions(-)
+Reference implementation for org.freedesktop.DBus.Properties.* in
+manager, device, adapter and thermometer using de Marchi's getter/setter
+implementation.
 
-diff --git a/src/manager.c b/src/manager.c
-index f43861d..b159f62 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -160,6 +160,27 @@ static DBusMessage *list_adapters(DBusConnection *conn,
- 	return reply;
- }
- 
-+static gboolean get_property_adapters(DBusConnection *connection,
-+	DBusMessage *message, const GDBusPropertyTable *property,
-+	DBusMessageIter *variant, void *data)
-+{
-+	DBusMessageIter iter;
-+	GSList *list;
-+
-+	dbus_message_iter_open_container(variant, DBUS_TYPE_ARRAY,
-+		DBUS_TYPE_OBJECT_PATH_AS_STRING, &iter);
-+
-+	for (list = adapters; list; list = list->next) {
-+		struct btd_adapter *adapter = list->data;
-+		const char *adapter_path = adapter_get_path(adapter);
-+		dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH,
-+			&adapter_path);
-+	}
-+
-+	dbus_message_iter_close_container(variant, &iter);
-+	return TRUE;
-+}
-+
- static DBusMessage *get_properties(DBusConnection *conn,
- 					DBusMessage *msg, void *data)
- {
-@@ -197,7 +218,8 @@ static DBusMessage *get_properties(DBusConnection *conn,
- }
- 
- static const GDBusMethodTable manager_methods[] = {
--	{ "GetProperties",	"",	"a{sv}[properties]",get_properties	},
-+	{ "GetProperties",	"",	"a{sv}[properties]", get_properties,
-+						G_DBUS_METHOD_FLAG_DEPRECATED},
- 	{ "DefaultAdapter",	"",	"o[adapter]",	default_adapter	},
- 	{ "FindAdapter", "s[pattern]", "o[adapter]", find_adapter },
- 	{ "ListAdapters",	"",	"ao[adapters]",	list_adapters,
-@@ -213,6 +235,11 @@ static const GDBusSignalTable manager_signals[] = {
- 	{ }
- };
- 
-+static const GDBusPropertyTable manager_properties[] = {
-+	{ "Adapters", "ao", 0, get_property_adapters, NULL, NULL },
-+	{ }
-+};
-+
- dbus_bool_t manager_init(DBusConnection *conn, const char *path)
- {
- 	connection = conn;
-@@ -221,7 +248,7 @@ dbus_bool_t manager_init(DBusConnection *conn, const char *path)
- 
- 	return g_dbus_register_interface(conn, "/", MANAGER_INTERFACE,
- 					manager_methods, manager_signals,
--					NULL, NULL, NULL);
-+					manager_properties, NULL, NULL);
- }
- 
- static void manager_update_adapters(void)
+Notes:
+* Current GetProperties/SetPropety implementations flagged as deprecated
+* Current implementation for the "Icon" property in device.c has a potential
+assignment to an uninitialized value (when both read_remote_class and
+read_remote_appearance return error). In the new implementation, this case
+is handled as a non existent property.
+* The new implementation separates the exists() logic from the actual
+read/write and since the "Icon" and "Class" properties in device.c are read
+from a file, the new implementation reads the file twice. If it's better
+(and safe) to move the properties to some allocated structure, I can change
+the code.
+* In functions that return arrays (get_property_uuids, get_property_services,
+etc) I keep the extra array allocation from the current code, but if it's not
+desired, I can remove it.
+
+
+Henrique Dante de Almeida (4):
+  manager: implement support for DBus.Properties.Get
+  thermometer: implement support for DBus.Properties.Get and
+    DBus.Properties.Set
+  adapter: implement DBus.Properties
+  device: implement DBus.Properties
+
+ src/adapter.c             |  280 +++++++++++++++++++++++++++++++++
+ src/device.c              |  384 ++++++++++++++++++++++++++++++++++++++++++++-
+ src/manager.c             |   31 ++++-
+ thermometer/thermometer.c |   86 ++++++++++-
+ 4 files changed, 772 insertions(+), 9 deletions(-)
+
 -- 
 1.7.5.4
 
