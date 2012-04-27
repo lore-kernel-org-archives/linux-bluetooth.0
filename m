@@ -1,46 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Henrique Dante de Almeida <hdante@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Henrique Dante de Almeida <hdante@profusion.mobi>
-Subject: [PATCH RFC 0/4] Reference implementation for DBUS.Properties
-Date: Fri, 27 Apr 2012 18:54:02 -0300
-Message-Id: <1335563646-9944-1-git-send-email-hdante@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <20120427174439.GC16207@tuxdriver.com>
+References: <20120322192406.GB2432@tuxdriver.com>
+	<1332698585.1870.88.camel@aeonflux>
+	<20120326145433.GE13806@tuxdriver.com>
+	<1332774906.1870.98.camel@aeonflux>
+	<20120326152541.GH13806@tuxdriver.com>
+	<20120427174439.GC16207@tuxdriver.com>
+Date: Sat, 28 Apr 2012 00:40:17 +0300
+Message-ID: <CAMXE1-ojy-SnZxdZKMiL+ouiZWDnj_V1axTK713Y78fBPi3Rmw@mail.gmail.com>
+Subject: Re: CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit 2012 (Barcelona!)
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: "John W. Linville" <linville@tuxdriver.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-wireless@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, alexander.smirnov@siemens.com,
+	Sergey.Sobolev@siemens.com
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Reference implementation for org.freedesktop.DBus.Properties.* in
-manager, device, adapter and thermometer using de Marchi's getter/setter
-implementation.
+Hi guys,
 
-Notes:
-* Current GetProperties/SetPropety implementations flagged as deprecated
-* Current implementation for the "Icon" property in device.c has a potential
-assignment to an uninitialized value (when both read_remote_class and
-read_remote_appearance return error). In the new implementation, this case
-is handled as a non existent property.
-* The new implementation separates the exists() logic from the actual
-read/write and since the "Icon" and "Class" properties in device.c are read
-from a file, the new implementation reads the file twice. If it's better
-(and safe) to move the properties to some allocated structure, I can change
-the code.
-* In functions that return arrays (get_property_uuids, get_property_services,
-etc) I keep the extra array allocation from the current code, but if it's not
-desired, I can remove it.
+On Fri, Apr 27, 2012 at 8:44 PM, John W. Linville
+<linville@tuxdriver.com> wrote:
+> Now, we need some talk proposals! =A0Please post in this thread (or
+> contact me or Marcel directly if necessary) to propose talks. =A0I would
+> love to see any topics on any relevant technologies, as well as topics
+> about how the projects are being managed, new sub-projects, etc.
+> It seems like a long time away right now, but it is a good time to
+> start thinking... :-)
 
+I propose to talk about Software / Virtual Bluetooth AMP Controller (softam=
+p).
+It can be implemented through wireless stack in mac80211.
 
-Henrique Dante de Almeida (4):
-  manager: implement support for DBus.Properties.Get
-  thermometer: implement support for DBus.Properties.Get and
-    DBus.Properties.Set
-  adapter: implement DBus.Properties
-  device: implement DBus.Properties
+AMP is Alternate MAC/PHYs Controller for Bluetooth sybsystem.
+When an AMP is common between the two devices, the Bluetooth system
+provides mechanisms for moving data traffic from BR/EDR Controller to
+an AMP Controller.
 
- src/adapter.c             |  280 +++++++++++++++++++++++++++++++++
- src/device.c              |  384 ++++++++++++++++++++++++++++++++++++++++++++-
- src/manager.c             |   31 ++++-
- thermometer/thermometer.c |   86 ++++++++++-
- 4 files changed, 772 insertions(+), 9 deletions(-)
+I've recently posted RFC which implement some functionality and can be used
+as example of interfaces.
 
--- 
-1.7.5.4
-
+Regards,
+Andrei
