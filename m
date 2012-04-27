@@ -5,78 +5,84 @@ To: linux-bluetooth@vger.kernel.org,
 	marcel@holtmann.org
 Cc: pkrystad@codeaurora.org,
 	andrei.emeltchenko.news@gmail.com
-Subject: [RFCv2 5/8] Bluetooth: Restore locking semantics when looking up L2CAP channels
-Date: Fri, 27 Apr 2012 16:50:52 -0700
-Message-Id: <1335570655-30878-6-git-send-email-mathewm@codeaurora.org>
+Subject: [RFCv2 1/8] Bluetooth: Initialize new l2cap_chan structure members
+Date: Fri, 27 Apr 2012 16:50:48 -0700
+Message-Id: <1335570655-30878-2-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1335570655-30878-1-git-send-email-mathewm@codeaurora.org>
 References: <1335570655-30878-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As the comment for l2cap_get_chan_by_scid indicated, the function used
-to return a locked socket.  The lock for the socket was acquired while
-the channel list was also locked.
-
-When locking was moved over to the l2cap_chan structure, the channel
-lock was no longer acquired with the channel list still locked.  This
-made it possible for the l2cap_chan to be deleted after
-conn->chan_lock was released but before l2cap_chan_lock was called.
-Making the call to l2cap_chan_lock before releasing conn->chan_lock
-makes it impossible for the l2cap_chan to be deleted at the wrong
-time.
+Structure members used by ERTM or streaming mode need to be
+initialized when an ERTM or streaming mode link is configured.  Some
+duplicate code is also eliminated by moving in to the ERTM init
+function.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |   10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ net/bluetooth/l2cap_core.c |   25 +++++++++++++++++--------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e543b53..347aaa5 100644
+index f19f7bc..78a334b 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -98,13 +98,15 @@ static struct l2cap_chan *__l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16
- }
- 
- /* Find channel with given SCID.
-- * Returns locked socket */
-+ * Returns locked channel. */
- static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 cid)
+@@ -2315,17 +2315,30 @@ static inline int l2cap_ertm_init(struct l2cap_chan *chan)
  {
- 	struct l2cap_chan *c;
+ 	int err;
  
- 	mutex_lock(&conn->chan_lock);
- 	c = __l2cap_get_chan_by_scid(conn, cid);
-+	if (c)
-+		l2cap_chan_lock(c);
- 	mutex_unlock(&conn->chan_lock);
++	chan->next_tx_seq = 0;
++	chan->expected_tx_seq = 0;
+ 	chan->expected_ack_seq = 0;
+ 	chan->unacked_frames = 0;
+ 	chan->buffer_seq = 0;
+ 	chan->num_acked = 0;
+ 	chan->frames_sent = 0;
++	chan->last_acked_seq = 0;
++	chan->sdu = NULL;
++	chan->sdu_last_frag = NULL;
++	chan->sdu_len = 0;
++
++	if (chan->mode != L2CAP_MODE_ERTM)
++		return 0;
++
++	chan->rx_state = L2CAP_RX_STATE_RECV;
++	chan->tx_state = L2CAP_TX_STATE_XMIT;
  
- 	return c;
-@@ -3141,8 +3143,6 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	if (!chan)
- 		return -ENOENT;
+ 	INIT_DELAYED_WORK(&chan->retrans_timer, l2cap_retrans_timeout);
+ 	INIT_DELAYED_WORK(&chan->monitor_timer, l2cap_monitor_timeout);
+ 	INIT_DELAYED_WORK(&chan->ack_timer, l2cap_ack_timeout);
  
--	l2cap_chan_lock(chan);
--
- 	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2) {
- 		struct l2cap_cmd_rej_cid rej;
+ 	skb_queue_head_init(&chan->srej_q);
++	skb_queue_head_init(&chan->tx_q);
  
-@@ -3255,8 +3255,6 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	if (!chan)
- 		return 0;
+ 	INIT_LIST_HEAD(&chan->srej_l);
+ 	err = l2cap_seq_list_init(&chan->srej_list, chan->tx_win);
+@@ -3193,10 +3206,8 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
  
--	l2cap_chan_lock(chan);
--
- 	switch (result) {
- 	case L2CAP_CONF_SUCCESS:
- 		l2cap_conf_rfc_get(chan, rsp->data, len);
-@@ -4589,8 +4587,6 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
- 		return 0;
- 	}
+ 		l2cap_state_change(chan, BT_CONNECTED);
  
--	l2cap_chan_lock(chan);
--
- 	BT_DBG("chan %p, len %d", chan, skb->len);
+-		chan->next_tx_seq = 0;
+-		chan->expected_tx_seq = 0;
+-		skb_queue_head_init(&chan->tx_q);
+-		if (chan->mode == L2CAP_MODE_ERTM)
++		if (chan->mode == L2CAP_MODE_ERTM ||
++		    chan->mode == L2CAP_MODE_STREAMING)
+ 			err = l2cap_ertm_init(chan);
  
- 	if (chan->state != BT_CONNECTED)
+ 		if (err < 0)
+@@ -3328,10 +3339,8 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 		set_default_fcs(chan);
+ 
+ 		l2cap_state_change(chan, BT_CONNECTED);
+-		chan->next_tx_seq = 0;
+-		chan->expected_tx_seq = 0;
+-		skb_queue_head_init(&chan->tx_q);
+-		if (chan->mode ==  L2CAP_MODE_ERTM)
++		if (chan->mode == L2CAP_MODE_ERTM ||
++		    chan->mode == L2CAP_MODE_STREAMING)
+ 			err = l2cap_ertm_init(chan);
+ 
+ 		if (err < 0)
 -- 
 1.7.10
 
