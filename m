@@ -1,67 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mike Brudevold <puffy.taco@gmail.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Michael Brudevold <michael.brudevold@logicpd.com>
-Subject: [PATCH] audio: Fix AVDTP General Reject message
-Date: Fri, 27 Apr 2012 12:22:21 -0500
-Message-Id: <1335547341-19459-1-git-send-email-puffy.taco@gmail.com>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH RFC BlueZ 1/1] attrib: Retry ATT request when link is unencrypted
+Date: Fri, 27 Apr 2012 12:05:25 -0400
+Message-Id: <1335542725-8806-2-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1335542725-8806-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1335542725-8806-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Michael Brudevold <michael.brudevold@logicpd.com>
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 
-As per spec, bits other than Transaction Label and Packet Type are RFA. This
-fixes the RFA bits which were previously set to the invalid signal_id.
-
-Test case TP/SIG/SMG/BI-28-C.
+If the client side receives an Error Response with "Insufficient
+Authentication" or "Insufficient Encryption", it will increase the link
+security level and send the same request again.
 ---
- audio/avdtp.c |   11 +++++------
- 1 files changed, 5 insertions(+), 6 deletions(-)
+ attrib/gattrib.c |   32 ++++++++++++++++++++++++++++++++
+ src/device.c     |    2 +-
+ 2 files changed, 33 insertions(+), 1 deletions(-)
 
-diff --git a/audio/avdtp.c b/audio/avdtp.c
-index 34d49d2..6dd19ba 100644
---- a/audio/avdtp.c
-+++ b/audio/avdtp.c
-@@ -1348,11 +1348,10 @@ static GSList *caps_to_list(uint8_t *data, int size,
- 	return caps;
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index 769be36..e551aef 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -61,6 +61,7 @@ struct command {
+ 	guint16 len;
+ 	guint8 expected;
+ 	gboolean sent;
++	gboolean retry;
+ 	GAttribResultFunc func;
+ 	gpointer user_data;
+ 	GDestroyNotify notify;
+@@ -307,6 +308,22 @@ static void wake_up_sender(struct _GAttrib *attrib)
+ 				can_write_data, attrib, destroy_sender);
  }
  
--static gboolean avdtp_unknown_cmd(struct avdtp *session, uint8_t transaction,
--							uint8_t signal_id)
-+static gboolean avdtp_unknown_cmd(struct avdtp *session, uint8_t transaction)
++static void increase_sec_level(struct _GAttrib *attrib)
++{
++	BtIOSecLevel sec_level;
++
++	bt_io_get(attrib->io, BT_IO_L2CAP, NULL,
++			BT_IO_OPT_SEC_LEVEL, &sec_level,
++			BT_IO_OPT_INVALID);
++
++	if (sec_level < BT_IO_SEC_HIGH) {
++		sec_level++;
++		bt_io_set(attrib->io, BT_IO_L2CAP, NULL,
++					BT_IO_OPT_SEC_LEVEL, sec_level,
++					BT_IO_OPT_INVALID);
++	}
++}
++
+ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
  {
- 	return avdtp_send(session, transaction, AVDTP_MSG_TYPE_GEN_REJECT,
--							signal_id, NULL, 0);
-+							0, NULL, 0);
- }
+ 	struct _GAttrib *attrib = data;
+@@ -368,6 +385,20 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
+ 	status = 0;
  
- static gboolean avdtp_discover_cmd(struct avdtp *session, uint8_t transaction,
-@@ -1412,7 +1411,7 @@ static gboolean avdtp_getcap_cmd(struct avdtp *session, uint8_t transaction,
+ done:
++	if ((status == ATT_ECODE_INSUFF_ENC ||
++				status == ATT_ECODE_AUTHENTICATION) &&
++				cmd && cmd->retry) {
++		/* Increase security level */
++		increase_sec_level(attrib);
++
++		/* Retry request once */
++		cmd->sent = FALSE;
++		cmd->retry = FALSE;
++		g_queue_push_head(attrib->queue, cmd);
++		wake_up_sender(attrib);
++		return TRUE;
++	}
++
+ 	qempty = attrib->queue == NULL || g_queue_is_empty(attrib->queue);
+ 
+ 	if (cmd) {
+@@ -434,6 +465,7 @@ guint g_attrib_send(GAttrib *attrib, guint id, guint8 opcode,
+ 	c->func = func;
+ 	c->user_data = user_data;
+ 	c->notify = notify;
++	c->retry = TRUE;
+ 
+ 	if (id) {
+ 		c->id = id;
+diff --git a/src/device.c b/src/device.c
+index 021b200..37b05f4 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2003,7 +2003,7 @@ static gboolean att_connect(gpointer user_data)
+ 				BT_IO_OPT_DEST_BDADDR, &device->bdaddr,
+ 				BT_IO_OPT_DEST_TYPE, device->bdaddr_type,
+ 				BT_IO_OPT_CID, ATT_CID,
+-				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+ 				BT_IO_OPT_INVALID);
  	}
- 
- 	if (get_all && session->server->version < 0x0103)
--		return avdtp_unknown_cmd(session, transaction, cmd);
-+		return avdtp_unknown_cmd(session, transaction);
- 
- 	if (!sep->ind->get_capability(session, sep, get_all, &caps,
- 							&err, sep->user_data))
-@@ -1894,7 +1893,7 @@ failed:
- static gboolean avdtp_secctl_cmd(struct avdtp *session, uint8_t transaction,
- 					struct seid_req *req, int size)
- {
--	return avdtp_unknown_cmd(session, transaction, AVDTP_SECURITY_CONTROL);
-+	return avdtp_unknown_cmd(session, transaction);
- }
- 
- static gboolean avdtp_delayreport_cmd(struct avdtp *session,
-@@ -1988,7 +1987,7 @@ static gboolean avdtp_parse_cmd(struct avdtp *session, uint8_t transaction,
- 		return avdtp_delayreport_cmd(session, transaction, buf, size);
- 	default:
- 		DBG("Received unknown request id %u", signal_id);
--		return avdtp_unknown_cmd(session, transaction, signal_id);
-+		return avdtp_unknown_cmd(session, transaction);
- 	}
- }
  
 -- 
 1.7.5.4
