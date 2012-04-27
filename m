@@ -5,84 +5,79 @@ To: linux-bluetooth@vger.kernel.org,
 	marcel@holtmann.org
 Cc: pkrystad@codeaurora.org,
 	andrei.emeltchenko.news@gmail.com
-Subject: [RFCv2 1/8] Bluetooth: Initialize new l2cap_chan structure members
-Date: Fri, 27 Apr 2012 16:50:48 -0700
-Message-Id: <1335570655-30878-2-git-send-email-mathewm@codeaurora.org>
+Subject: [RFCv2 4/8] Bluetooth: Fix a redundant and problematic incoming MTU check
+Date: Fri, 27 Apr 2012 16:50:51 -0700
+Message-Id: <1335570655-30878-5-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1335570655-30878-1-git-send-email-mathewm@codeaurora.org>
 References: <1335570655-30878-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Structure members used by ERTM or streaming mode need to be
-initialized when an ERTM or streaming mode link is configured.  Some
-duplicate code is also eliminated by moving in to the ERTM init
-function.
+The L2CAP MTU for incoming data is verified differently depending on
+the L2CAP mode, so the check is best performed in a mode-specific
+context.  Checking the incoming MTU before HCI fragment reassembly is
+a layer violation and assumes all bytes after the standard L2CAP
+header are L2CAP data.
+
+This approadch causes issues with unsegmented ERTM or streaming mode
+frames, where there are additional enhanced or extended headers before
+the data payload and possible FCS bytes after the data payload.  A
+valid frame could be as many as 10 bytes larger than the MTU.
+
+Removing this code is the best fix, because the MTU is checked later
+on for all L2CAP data frames (connectionless, basic, ERTM, and
+streaming).  This also gets rid of outdated locking (socket instead of
+l2cap_chan) and an extra lookup of the channel ID.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |   25 +++++++++++++++++--------
- 1 file changed, 17 insertions(+), 8 deletions(-)
+ net/bluetooth/l2cap_core.c |   20 --------------------
+ 1 file changed, 20 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f19f7bc..78a334b 100644
+index 5963cd2..e543b53 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -2315,17 +2315,30 @@ static inline int l2cap_ertm_init(struct l2cap_chan *chan)
- {
- 	int err;
+@@ -4953,8 +4953,6 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
  
-+	chan->next_tx_seq = 0;
-+	chan->expected_tx_seq = 0;
- 	chan->expected_ack_seq = 0;
- 	chan->unacked_frames = 0;
- 	chan->buffer_seq = 0;
- 	chan->num_acked = 0;
- 	chan->frames_sent = 0;
-+	chan->last_acked_seq = 0;
-+	chan->sdu = NULL;
-+	chan->sdu_last_frag = NULL;
-+	chan->sdu_len = 0;
-+
-+	if (chan->mode != L2CAP_MODE_ERTM)
-+		return 0;
-+
-+	chan->rx_state = L2CAP_RX_STATE_RECV;
-+	chan->tx_state = L2CAP_TX_STATE_XMIT;
+ 	if (!(flags & ACL_CONT)) {
+ 		struct l2cap_hdr *hdr;
+-		struct l2cap_chan *chan;
+-		u16 cid;
+ 		int len;
  
- 	INIT_DELAYED_WORK(&chan->retrans_timer, l2cap_retrans_timeout);
- 	INIT_DELAYED_WORK(&chan->monitor_timer, l2cap_monitor_timeout);
- 	INIT_DELAYED_WORK(&chan->ack_timer, l2cap_ack_timeout);
+ 		if (conn->rx_len) {
+@@ -4974,7 +4972,6 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
  
- 	skb_queue_head_init(&chan->srej_q);
-+	skb_queue_head_init(&chan->tx_q);
+ 		hdr = (struct l2cap_hdr *) skb->data;
+ 		len = __le16_to_cpu(hdr->len) + L2CAP_HDR_SIZE;
+-		cid = __le16_to_cpu(hdr->cid);
  
- 	INIT_LIST_HEAD(&chan->srej_l);
- 	err = l2cap_seq_list_init(&chan->srej_list, chan->tx_win);
-@@ -3193,10 +3206,8 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 		if (len == skb->len) {
+ 			/* Complete frame received */
+@@ -4991,23 +4988,6 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 			goto drop;
+ 		}
  
- 		l2cap_state_change(chan, BT_CONNECTED);
- 
--		chan->next_tx_seq = 0;
--		chan->expected_tx_seq = 0;
--		skb_queue_head_init(&chan->tx_q);
--		if (chan->mode == L2CAP_MODE_ERTM)
-+		if (chan->mode == L2CAP_MODE_ERTM ||
-+		    chan->mode == L2CAP_MODE_STREAMING)
- 			err = l2cap_ertm_init(chan);
- 
- 		if (err < 0)
-@@ -3328,10 +3339,8 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		set_default_fcs(chan);
- 
- 		l2cap_state_change(chan, BT_CONNECTED);
--		chan->next_tx_seq = 0;
--		chan->expected_tx_seq = 0;
--		skb_queue_head_init(&chan->tx_q);
--		if (chan->mode ==  L2CAP_MODE_ERTM)
-+		if (chan->mode == L2CAP_MODE_ERTM ||
-+		    chan->mode == L2CAP_MODE_STREAMING)
- 			err = l2cap_ertm_init(chan);
- 
- 		if (err < 0)
+-		chan = l2cap_get_chan_by_scid(conn, cid);
+-
+-		if (chan && chan->sk) {
+-			struct sock *sk = chan->sk;
+-			lock_sock(sk);
+-
+-			if (chan->imtu < len - L2CAP_HDR_SIZE) {
+-				BT_ERR("Frame exceeding recv MTU (len %d, "
+-							"MTU %d)", len,
+-							chan->imtu);
+-				release_sock(sk);
+-				l2cap_conn_unreliable(conn, ECOMM);
+-				goto drop;
+-			}
+-			release_sock(sk);
+-		}
+-
+ 		/* Allocate skb for the complete frame (with header) */
+ 		conn->rx_skb = bt_skb_alloc(len, GFP_ATOMIC);
+ 		if (!conn->rx_skb)
 -- 
 1.7.10
 
