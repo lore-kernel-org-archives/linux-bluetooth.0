@@ -2,87 +2,83 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [BlueZ RFC 3/5] gdbus: implement DBus.Properties.GetAll method
-Date: Fri, 27 Apr 2012 18:25:20 -0300
-Message-Id: <1335561922-3518-4-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [BlueZ RFC 1/5] gdbus: add skeleton of DBus.Properties interface
+Date: Fri, 27 Apr 2012 18:25:18 -0300
+Message-Id: <1335561922-3518-2-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1335561922-3518-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1335561922-3518-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This interface is responsible for handling properties of all objects in
+a given path. Right now it only registers itself, doing nothing useful.
+A conversion to this new layout will be done by subsequent patches.
+
+org.freedesktop.org.DBus.Properties spec can be found at
+http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-properties
 ---
- gdbus/object.c |   58 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 57 insertions(+), 1 deletion(-)
+ gdbus/object.c |   34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
 diff --git a/gdbus/object.c b/gdbus/object.c
-index 0259f46..5a1db15 100644
+index 540d1fc..31113e0 100644
 --- a/gdbus/object.c
 +++ b/gdbus/object.c
-@@ -627,7 +627,63 @@ static DBusMessage *properties_get(DBusConnection *connection,
- static DBusMessage *properties_get_all(DBusConnection *connection,
- 					DBusMessage *message, void *user_data)
+@@ -554,6 +554,36 @@ static const GDBusMethodTable introspect_methods[] = {
+ 	{ }
+ };
+ 
++static DBusMessage *properties_get(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	return NULL;
++}
++
++static DBusMessage *properties_get_all(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	return NULL;
++}
++
++static DBusMessage *properties_set(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	return NULL;
++}
++
++static const GDBusMethodTable properties_methods[] = {
++	{ "Get", "s[interface_name]s[property_name]", "v[value]", properties_get },
++	{ "Set", "s[interface_name]s[property_name]v[value]", "", properties_set },
++	{ "GetAll", "s[interface_name]", "a{sv}[props]", properties_get_all },
++	{ }
++};
++
++static const GDBusSignalTable properties_signals[] = {
++	{ "PropertiesChanged", "s[interface_name]a{sv}[changed_properties]as[invalidated_properties]" },
++	{ }
++};
++
+ static char *undecorate_signature(const char *src)
  {
--	return NULL;
-+	struct generic_data *data = user_data;
-+	struct interface_data *iface;
-+	const GDBusPropertyTable *p;
-+	const char *interface_name;
-+	DBusMessageIter iter, dict;
-+	DBusMessage *reply;
+ 	GString *dst = g_string_new(NULL);
+@@ -679,6 +709,9 @@ static struct generic_data *object_path_ref(DBusConnection *connection,
+ 	add_interface(data, DBUS_INTERFACE_INTROSPECTABLE,
+ 			introspect_methods, NULL, NULL, data, NULL);
+ 
++	add_interface(data, DBUS_INTERFACE_PROPERTIES, properties_methods,
++					properties_signals, NULL, data, NULL);
 +
-+	if (!dbus_message_get_args(message, NULL,
-+					DBUS_TYPE_STRING, &interface_name,
-+					DBUS_TYPE_INVALID))
-+		return NULL;
-+
-+	iface = find_interface(data->interfaces, interface_name);
-+	if (iface == NULL)
-+		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
-+				"No such interface '%s'", interface_name);
-+
-+	reply = dbus_message_new_method_return(message);
-+	if (reply == NULL)
-+		return NULL;
-+
-+	dbus_message_iter_init_append(reply, &iter);
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-+			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-+			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
-+
-+	for (p = iface->properties; p && p->name; p++) {
-+		DBusMessageIter entry, value;
-+
-+		if (p->get == NULL)
-+			continue;
-+
-+		if (p->exists != NULL && !p->exists(p, iface->user_data))
-+			continue;
-+
-+		dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY,
-+								NULL, &entry);
-+		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
-+								p->name);
-+		dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
-+							p->type, &value);
-+
-+		if (!p->get(connection, message, p, &value, iface->user_data)) {
-+			dbus_message_iter_abandon_container(&entry, &value);
-+			dbus_message_iter_abandon_container(&dict, &entry);
-+			dbus_message_unref(reply);
-+			return NULL;
-+		}
-+
-+		dbus_message_iter_close_container(&entry, &value);
-+		dbus_message_iter_close_container(&dict, &entry);
-+	}
-+
-+	dbus_message_iter_close_container(&iter, &dict);
-+
-+	return reply;
+ 	return data;
  }
  
- static DBusMessage *properties_set(DBusConnection *connection,
+@@ -721,6 +754,7 @@ static void object_path_unref(DBusConnection *connection, const char *path)
+ 		return;
+ 
+ 	remove_interface(data, DBUS_INTERFACE_INTROSPECTABLE);
++	remove_interface(data, DBUS_INTERFACE_PROPERTIES);
+ 
+ 	invalidate_parent_data(connection, path);
+ 
 -- 
 1.7.10
 
