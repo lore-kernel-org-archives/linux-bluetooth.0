@@ -1,45 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120427174439.GC16207@tuxdriver.com>
-References: <20120322192406.GB2432@tuxdriver.com>
-	<1332698585.1870.88.camel@aeonflux>
-	<20120326145433.GE13806@tuxdriver.com>
-	<1332774906.1870.98.camel@aeonflux>
-	<20120326152541.GH13806@tuxdriver.com>
-	<20120427174439.GC16207@tuxdriver.com>
-Date: Sat, 28 Apr 2012 00:40:17 +0300
-Message-ID: <CAMXE1-ojy-SnZxdZKMiL+ouiZWDnj_V1axTK713Y78fBPi3Rmw@mail.gmail.com>
-Subject: Re: CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit 2012 (Barcelona!)
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: "John W. Linville" <linville@tuxdriver.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-wireless@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, alexander.smirnov@siemens.com,
-	Sergey.Sobolev@siemens.com
-Content-Type: text/plain; charset=ISO-8859-1
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [BlueZ RFC 5/5] gdbus: add properties into interface introspection
+Date: Fri, 27 Apr 2012 18:25:22 -0300
+Message-Id: <1335561922-3518-6-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1335561922-3518-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1335561922-3518-1-git-send-email-lucas.demarchi@profusion.mobi>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi guys,
+---
+ gdbus/object.c |   16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-On Fri, Apr 27, 2012 at 8:44 PM, John W. Linville
-<linville@tuxdriver.com> wrote:
-> Now, we need some talk proposals! =A0Please post in this thread (or
-> contact me or Marcel directly if necessary) to propose talks. =A0I would
-> love to see any topics on any relevant technologies, as well as topics
-> about how the projects are being managed, new sub-projects, etc.
-> It seems like a long time away right now, but it is a good time to
-> start thinking... :-)
+diff --git a/gdbus/object.c b/gdbus/object.c
+index ff5380a..701352c 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -158,6 +158,7 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
+ {
+ 	const GDBusMethodTable *method;
+ 	const GDBusSignalTable *signal;
++	const GDBusPropertyTable *property;
+ 
+ 	for (method = iface->methods; method && method->name; method++) {
+ 		gboolean deprecated = method->flags &
+@@ -205,6 +206,21 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
+ 			g_string_append_printf(gstr, "\t\t</signal>\n");
+ 		}
+ 	}
++
++	for (property = iface->properties; property && property->name; property++) {
++		gboolean deprecated = property->flags &
++					G_DBUS_PROPERTY_FLAG_DEPRECATED;
++
++		g_string_append_printf(gstr, "\t\t<property name=\"%s\" type=\"%s\" access=\"%s%s\"",
++						property->name, property->type,
++						property->get ? "read" : "",
++						property->set ? "write" : "");
++
++		if (!deprecated)
++			g_string_append_printf(gstr, "/>\n");
++		else
++			g_string_append_printf(gstr, ">\n\t\t\t<annotation name=\"org.freedesktop.DBus.Deprecated\" value=\"true\"/>\n\t\t</property>\n");
++	}
+ }
+ 
+ static void generate_introspection_xml(DBusConnection *conn,
+-- 
+1.7.10
 
-I propose to talk about Software / Virtual Bluetooth AMP Controller (softam=
-p).
-It can be implemented through wireless stack in mac80211.
-
-AMP is Alternate MAC/PHYs Controller for Bluetooth sybsystem.
-When an AMP is common between the two devices, the Bluetooth system
-provides mechanisms for moving data traffic from BR/EDR Controller to
-an AMP Controller.
-
-I've recently posted RFC which implement some functionality and can be used
-as example of interfaces.
-
-Regards,
-Andrei
