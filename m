@@ -1,59 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 27 Apr 2012 13:44:39 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        alexander.smirnov@siemens.com, Sergey.Sobolev@siemens.com
-Subject: CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit 2012
- (Barcelona!)
-Message-ID: <20120427174439.GC16207@tuxdriver.com>
-References: <20120322192406.GB2432@tuxdriver.com>
- <1332698585.1870.88.camel@aeonflux>
- <20120326145433.GE13806@tuxdriver.com>
- <1332774906.1870.98.camel@aeonflux>
- <20120326152541.GH13806@tuxdriver.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120326152541.GH13806@tuxdriver.com>
+From: Mike Brudevold <puffy.taco@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Michael Brudevold <michael.brudevold@logicpd.com>
+Subject: [PATCH] audio: Fix AVDTP General Reject message
+Date: Fri, 27 Apr 2012 12:22:21 -0500
+Message-Id: <1335547341-19459-1-git-send-email-puffy.taco@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Mar 26, 2012 at 11:25:42AM -0400, John W. Linville wrote:
-> On Mon, Mar 26, 2012 at 05:15:06PM +0200, Marcel Holtmann wrote:
-> 
-> > > I don't think that 1 day is enough.  2 might not be enough, depending
-> > > on how we stage it.  Do you think that we would have more than one
-> > > "track" (e.g. separate Blueooth/802.11/NFC sessions)?  A single
-> > > "plenary" session?  Or some mix?
-> > 
-> > so what about 2 days single track and 1 day with breakout sessions. So
-> > we could do 12 talks with morning and afternoon sessions on the 3rd day
-> > as needed.
-> > 
-> > If we have many proposals for presentations, we can always go switch to
-> > 2 tracks. If we require LinuxCon registration, then it should be no
-> > problem to get a second room. If not, I have to negotiate with Angela
-> > next week ;)
-> 
-> My only concern is filling the number of slots.  Will we have 12+
-> presentation poposals?
+From: Michael Brudevold <michael.brudevold@logicpd.com>
 
-Just to keep the ball rolling...
+As per spec, bits other than Transaction Label and Packet Type are RFA. This
+fixes the RFA bits which were previously set to the invalid signal_id.
 
-Angela has reserved space for us at the Hotel Fira
-Palace for the Wireless Summit on Thurs, Nov 8th and Fri, Nov 9th.
-Please note that this will overlap Yocto Dev Days, oVirt Summit and
-KVM Forum at the same venue.
+Test case TP/SIG/SMG/BI-28-C.
+---
+ audio/avdtp.c |   11 +++++------
+ 1 files changed, 5 insertions(+), 6 deletions(-)
 
-Now, we need some talk proposals!  Please post in this thread (or
-contact me or Marcel directly if necessary) to propose talks.  I would
-love to see any topics on any relevant technologies, as well as topics
-about how the projects are being managed, new sub-projects, etc.
-It seems like a long time away right now, but it is a good time to
-start thinking... :-)
-
-Thanks,
-
-John
+diff --git a/audio/avdtp.c b/audio/avdtp.c
+index 34d49d2..6dd19ba 100644
+--- a/audio/avdtp.c
++++ b/audio/avdtp.c
+@@ -1348,11 +1348,10 @@ static GSList *caps_to_list(uint8_t *data, int size,
+ 	return caps;
+ }
+ 
+-static gboolean avdtp_unknown_cmd(struct avdtp *session, uint8_t transaction,
+-							uint8_t signal_id)
++static gboolean avdtp_unknown_cmd(struct avdtp *session, uint8_t transaction)
+ {
+ 	return avdtp_send(session, transaction, AVDTP_MSG_TYPE_GEN_REJECT,
+-							signal_id, NULL, 0);
++							0, NULL, 0);
+ }
+ 
+ static gboolean avdtp_discover_cmd(struct avdtp *session, uint8_t transaction,
+@@ -1412,7 +1411,7 @@ static gboolean avdtp_getcap_cmd(struct avdtp *session, uint8_t transaction,
+ 	}
+ 
+ 	if (get_all && session->server->version < 0x0103)
+-		return avdtp_unknown_cmd(session, transaction, cmd);
++		return avdtp_unknown_cmd(session, transaction);
+ 
+ 	if (!sep->ind->get_capability(session, sep, get_all, &caps,
+ 							&err, sep->user_data))
+@@ -1894,7 +1893,7 @@ failed:
+ static gboolean avdtp_secctl_cmd(struct avdtp *session, uint8_t transaction,
+ 					struct seid_req *req, int size)
+ {
+-	return avdtp_unknown_cmd(session, transaction, AVDTP_SECURITY_CONTROL);
++	return avdtp_unknown_cmd(session, transaction);
+ }
+ 
+ static gboolean avdtp_delayreport_cmd(struct avdtp *session,
+@@ -1988,7 +1987,7 @@ static gboolean avdtp_parse_cmd(struct avdtp *session, uint8_t transaction,
+ 		return avdtp_delayreport_cmd(session, transaction, buf, size);
+ 	default:
+ 		DBG("Received unknown request id %u", signal_id);
+-		return avdtp_unknown_cmd(session, transaction, signal_id);
++		return avdtp_unknown_cmd(session, transaction);
+ 	}
+ }
+ 
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+1.7.5.4
+
