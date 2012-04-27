@@ -2,135 +2,44 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [BlueZ RFC 2/5] gdbus: implement DBus.Properties.Get method
-Date: Fri, 27 Apr 2012 18:25:19 -0300
-Message-Id: <1335561922-3518-3-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1335561922-3518-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1335561922-3518-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [BlueZ RFC 0/5] gdbus: Add support for DBus.Properties interface
+Date: Fri, 27 Apr 2012 18:25:17 -0300
+Message-Id: <1335561922-3518-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- gdbus/gdbus.h  |   15 +++++++++++--
- gdbus/object.c |   66 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 78 insertions(+), 3 deletions(-)
+Hey,
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index a5843e0..359e8a0 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -55,6 +55,15 @@ typedef void (* GDBusDestroyFunction) (void *user_data);
- typedef DBusMessage * (* GDBusMethodFunction) (DBusConnection *connection,
- 					DBusMessage *message, void *user_data);
- 
-+typedef struct GDBusPropertyTable GDBusPropertyTable;
-+typedef gboolean (*GDBusPropertyGetter)(DBusConnection *connection,
-+					DBusMessage *message,
-+					const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data);
-+
-+typedef gboolean (*GDBusPropertyExists)(const GDBusPropertyTable *property,
-+								void *data);
-+
- typedef guint32 GDBusPendingReply;
- 
- typedef void (* GDBusSecurityFunction) (DBusConnection *connection,
-@@ -97,11 +106,13 @@ typedef struct {
- 	GDBusSignalFlags flags;
- } GDBusSignalTable;
- 
--typedef struct {
-+struct GDBusPropertyTable {
- 	const char *name;
- 	const char *type;
- 	GDBusPropertyFlags flags;
--} GDBusPropertyTable;
-+	GDBusPropertyGetter get;
-+	GDBusPropertyExists exists;
-+};
- 
- typedef struct {
- 	unsigned int privilege;
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 31113e0..0259f46 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -554,10 +554,74 @@ static const GDBusMethodTable introspect_methods[] = {
- 	{ }
- };
- 
-+static inline const GDBusPropertyTable *find_property(const GDBusPropertyTable *properties,
-+							const char *property_name)
-+{
-+	const GDBusPropertyTable *p;
-+
-+	for (p = properties; p && p->name; p++) {
-+		if (strcmp(property_name, p->name) == 0)
-+			return p;
-+	}
-+
-+	return NULL;
-+}
-+
- static DBusMessage *properties_get(DBusConnection *connection,
- 					DBusMessage *message, void *user_data)
- {
--	return NULL;
-+	struct generic_data *data = user_data;
-+	struct interface_data *iface;
-+	const GDBusPropertyTable *property;
-+	const char *interface_name, *property_name;
-+	DBusMessageIter iter, value;
-+	DBusMessage *reply;
-+
-+	if (!dbus_message_get_args(message, NULL,
-+					DBUS_TYPE_STRING, &interface_name,
-+					DBUS_TYPE_STRING, &property_name,
-+					DBUS_TYPE_INVALID))
-+		return NULL;
-+
-+	iface = find_interface(data->interfaces, interface_name);
-+	if (iface == NULL)
-+		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
-+				"No such interface '%s'", interface_name);
-+
-+	property = find_property(iface->properties, property_name);
-+	if (property == NULL)
-+		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
-+				"No such property '%s'", property_name);
-+
-+	if (property->exists != NULL &&
-+			!property->exists(property, iface->user_data))
-+		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
-+						"No such property '%s'",
-+						property_name);
-+
-+	if (property->get == NULL)
-+		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
-+					"Property '%s' is not readable",
-+					property_name);
-+
-+	reply = dbus_message_new_method_return(message);
-+	if (reply == NULL)
-+		return NULL;
-+
-+	dbus_message_iter_init_append(reply, &iter);
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_VARIANT,
-+						property->type, &value);
-+
-+	if (!property->get(connection, message, property, &value,
-+							iface->user_data)) {
-+		dbus_message_iter_abandon_container(&iter, &value);
-+		dbus_message_unref(reply);
-+		return NULL;
-+	}
-+
-+	dbus_message_iter_close_container(&iter, &value);
-+
-+	return reply;
- }
- 
- static DBusMessage *properties_get_all(DBusConnection *connection,
+This series adds DBus.Properties interface to gdbus - it's still missing the
+PropertiesChanged signal, but we'd like to share early this code to get feedback.
+
+See http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-properties
+
+The intention is to replace the GetProperties method per-interface and use this
+interface per-object instead. It adds some nice things like getting properties
+separately, too.
+
+This is just the infrastructure needed in gdbus. Henrique (that's working with
+me on this) will send soon his changes on some of the interfaces so you can take
+a look how it will be after these patches. After that we can work on finishing the
+conversion for the other interfaces.
+
+
+If you are going to test this series, it is intended to be applied on top of my
+previous series improving gdbus introspection.
+
+
+Lucas De Marchi (5):
+  gdbus: add skeleton of DBus.Properties interface
+  gdbus: implement DBus.Properties.Get method
+  gdbus: implement DBus.Properties.GetAll method
+  gdbus: implement DBus.Properties.Set method
+  gdbus: add properties into interface introspection
+
+ gdbus/gdbus.h  |   21 +++++-
+ gdbus/object.c |  224 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 243 insertions(+), 2 deletions(-)
+
 -- 
 1.7.10
 
