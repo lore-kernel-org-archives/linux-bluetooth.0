@@ -1,55 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F9B0108.2000007@tu-ilmenau.de>
-Date: Fri, 27 Apr 2012 22:26:48 +0200
-From: Steffen Becker <steffen.becker@tu-ilmenau.de>
 MIME-Version: 1.0
-To: Kal Torak <chronognosis@aim.com>
-CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: main.conf issues
-References: <201204271541.q3RFfVd5006035@imr-da04.mx.aol.com>
-In-Reply-To: <201204271541.q3RFfVd5006035@imr-da04.mx.aol.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CAB7rCTgEJSP5B08Z+R67bDsj1uoxNbJZiE=JHURR4jJZd4kz=w@mail.gmail.com>
+References: <CAB7rCTgK1eZwHQVp-VXxzWH_CmE_uygvcJ2HMJfZSTdE_LGiSw@mail.gmail.com>
+	<1335552700.16897.477.camel@aeonflux>
+	<CAB7rCTgEJSP5B08Z+R67bDsj1uoxNbJZiE=JHURR4jJZd4kz=w@mail.gmail.com>
+Date: Fri, 27 Apr 2012 15:13:59 -0500
+Message-ID: <CAB7rCThDkFW+jRdw2Q9kJD3EROAGT=e6vmm5H0gaKq+J9q5A+A@mail.gmail.com>
+Subject: Re: hcidump / avtest issues
+From: Mike <puffy.taco@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Torak,
-
-I'm not very familiar with BlueZ (also just asking questions on this 
-mailing list), but what I can tell is that:
-You have to setup this file:
-/var/lib/bluetooth/<local-bdaddr>/config
-At the moment I can't look up the right syntax for all the 
-configuration, but if i remember right, for enabling discoverable mode 
-you have to enter something like this in the config-file:
-
-onmode discoverable
-mode discoverable
-
-For changing the name of your device, you have to edit this line in the 
-config-file:
-
-name <your-name>
-
-Hope this helps you.
-Regards,
-Steffen
-
-
-Am 27.04.2012 17:40, schrieb Kal Torak:
-> Hello, When I setup the main.conf with the values for Name, Class,
-> PairableTimeout and DiscoverableTimeout, and restart the bluetoothd,
-> hciconfig shows that nothing change name still the same, I cant "see"
-> the device from the outside(iscan is disabled), and the class still
-> 0x000100, and I must re-do hciconfig hci name #### class #### and
-> hciconfig hci0 piscan by hand to make the device visible and try
-> streaming support, OTOH I just can't see and/or connect to the device.
-> a ConWise 6622 Bluetooth dongle.
-> I'm using bluez-4.99 and linux 3.2.15.Any information will be usefull...
+>>> I'm having issues where hcidump seems to be losing packets. =A0I'm
+>>> trying to collect traces of avtest running. =A0Avtest properly prints
+>>> out that it sent a packet and received a reply, but I don't always see
+>>> it in hcidump. =A0Seems if I run avtest a lot successively, it does sho=
+w
+>>> up. =A0I'm running a 2.6.33.20 kernel with hcidump-2.3. =A0Let me know =
+if
+>>> the kernel is just too ancient, but I'd like to know if others have
+>>> seen this type of issue.
+>>
+>> actually hcidump can not loose any packets. Write them into a file in
+>> BTSnoop format and double check with Wireshark or the Frontline Viewer.
+>>
+>> The kernel is always sending the exact copy to the hcidump sockets and
+>> thus there is no way you loose packets. The only explanation would be
+>> that L2CAP socket has a bug and swallows it. Have you checked that
+>> avtest actually reports L2CAP send errors.
 >
-> Regards,
-> Torak
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> I was saving in btsnoop and looking at it in wireshark. =A0And verified
+> that the other side got the command by enabling debug mode on
+> bluetoothd. =A0But now I see the packet is sort of there, but it's
+> malformed!
+>
+> Bad:
+> < 02 01 20 07 00 03 00 40 00 00 06 04
+>> 02 01 20 07 00 03 00 40 00 03 06 31
+>
+> Good:
+> < 02 01 20 07 00 03 00 42 00 00 06 04
+>> 02 01 20 07 00 03 00 42 00 03 06 31
+>
+> Somehow one byte is wrong (40 bad, 42 good). =A0Any ideas on that? =A0Let
+> me know if you'd like the logs, but I verified the --raw output of
+> hcidump had the same issue.
 
+BTW, I would say the issue exists more when SDP is going on (as when I
+run the test a lot before a disconnect, it starts working -- no more
+SDP later on).  And we can see that it classified the packet as SDP,
+not AVDTP.  I'm tracking the hcidump code now, not entirely sure how
+data goes into one or the other.
