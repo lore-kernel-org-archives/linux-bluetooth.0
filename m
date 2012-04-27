@@ -1,71 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1335559908.16897.481.camel@aeonflux>
-Subject: Re: hcidump / avtest issues
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mike <puffy.taco@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Fri, 27 Apr 2012 22:51:48 +0200
-In-Reply-To: <CAB7rCThDkFW+jRdw2Q9kJD3EROAGT=e6vmm5H0gaKq+J9q5A+A@mail.gmail.com>
-References: <CAB7rCTgK1eZwHQVp-VXxzWH_CmE_uygvcJ2HMJfZSTdE_LGiSw@mail.gmail.com>
-	 <1335552700.16897.477.camel@aeonflux>
-	 <CAB7rCTgEJSP5B08Z+R67bDsj1uoxNbJZiE=JHURR4jJZd4kz=w@mail.gmail.com>
-	 <CAB7rCThDkFW+jRdw2Q9kJD3EROAGT=e6vmm5H0gaKq+J9q5A+A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Message-ID: <4F9B0108.2000007@tu-ilmenau.de>
+Date: Fri, 27 Apr 2012 22:26:48 +0200
+From: Steffen Becker <steffen.becker@tu-ilmenau.de>
+MIME-Version: 1.0
+To: Kal Torak <chronognosis@aim.com>
+CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: main.conf issues
+References: <201204271541.q3RFfVd5006035@imr-da04.mx.aol.com>
+In-Reply-To: <201204271541.q3RFfVd5006035@imr-da04.mx.aol.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mike,
+Hello Torak,
 
-> >>> I'm having issues where hcidump seems to be losing packets.  I'm
-> >>> trying to collect traces of avtest running.  Avtest properly prints
-> >>> out that it sent a packet and received a reply, but I don't always see
-> >>> it in hcidump.  Seems if I run avtest a lot successively, it does show
-> >>> up.  I'm running a 2.6.33.20 kernel with hcidump-2.3.  Let me know if
-> >>> the kernel is just too ancient, but I'd like to know if others have
-> >>> seen this type of issue.
-> >>
-> >> actually hcidump can not loose any packets. Write them into a file in
-> >> BTSnoop format and double check with Wireshark or the Frontline Viewer.
-> >>
-> >> The kernel is always sending the exact copy to the hcidump sockets and
-> >> thus there is no way you loose packets. The only explanation would be
-> >> that L2CAP socket has a bug and swallows it. Have you checked that
-> >> avtest actually reports L2CAP send errors.
-> >
-> > I was saving in btsnoop and looking at it in wireshark.  And verified
-> > that the other side got the command by enabling debug mode on
-> > bluetoothd.  But now I see the packet is sort of there, but it's
-> > malformed!
-> >
-> > Bad:
-> > < 02 01 20 07 00 03 00 40 00 00 06 04
-> >> 02 01 20 07 00 03 00 40 00 03 06 31
-> >
-> > Good:
-> > < 02 01 20 07 00 03 00 42 00 00 06 04
-> >> 02 01 20 07 00 03 00 42 00 03 06 31
-> >
-> > Somehow one byte is wrong (40 bad, 42 good).  Any ideas on that?  Let
-> > me know if you'd like the logs, but I verified the --raw output of
-> > hcidump had the same issue.
-> 
-> BTW, I would say the issue exists more when SDP is going on (as when I
-> run the test a lot before a disconnect, it starts working -- no more
-> SDP later on).  And we can see that it classified the packet as SDP,
-> not AVDTP.  I'm tracking the hcidump code now, not entirely sure how
-> data goes into one or the other.
+I'm not very familiar with BlueZ (also just asking questions on this 
+mailing list), but what I can tell is that:
+You have to setup this file:
+/var/lib/bluetooth/<local-bdaddr>/config
+At the moment I can't look up the right syntax for all the 
+configuration, but if i remember right, for enabling discoverable mode 
+you have to enter something like this in the config-file:
 
-the hcidump code is pure raw data. It is the same data that goes to the
-driver. Trust me here, that is how the kernel works, it clones the skb
-before sending to the driver and sends a copy back to hcidump. So you
-will not find a bug in the hcidump raw data.
+onmode discoverable
+mode discoverable
 
-The only way something can go wrong if L2CAP has an issue. Are you using
-L2CAP basic modem or enhanced retransmission?
+For changing the name of your device, you have to edit this line in the 
+config-file:
 
-Regards
+name <your-name>
 
-Marcel
+Hope this helps you.
+Regards,
+Steffen
 
+
+Am 27.04.2012 17:40, schrieb Kal Torak:
+> Hello, When I setup the main.conf with the values for Name, Class,
+> PairableTimeout and DiscoverableTimeout, and restart the bluetoothd,
+> hciconfig shows that nothing change name still the same, I cant "see"
+> the device from the outside(iscan is disabled), and the class still
+> 0x000100, and I must re-do hciconfig hci name #### class #### and
+> hciconfig hci0 piscan by hand to make the device visible and try
+> streaming support, OTOH I just can't see and/or connect to the device.
+> a ConWise 6622 Bluetooth dongle.
+> I'm using bluez-4.99 and linux 3.2.15.Any information will be usefull...
+>
+> Regards,
+> Torak
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
