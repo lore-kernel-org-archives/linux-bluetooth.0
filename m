@@ -1,23 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Fri, 27 Apr 2012 10:21:23 -0500
-Message-ID: <CAB7rCTgK1eZwHQVp-VXxzWH_CmE_uygvcJ2HMJfZSTdE_LGiSw@mail.gmail.com>
-Subject: hcidump / avtest issues
-From: Mike <puffy.taco@gmail.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ] mgmtops: Fix wrong parameter order for btd_event_ltk_notify()
+Date: Fri, 27 Apr 2012 10:57:02 -0400
+Message-Id: <1335538622-8271-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+The "master" parameter was in the wrong place.
+---
+ plugins/mgmtops.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-I'm having issues where hcidump seems to be losing packets.  I'm
-trying to collect traces of avtest running.  Avtest properly prints
-out that it sent a packet and received a reply, but I don't always see
-it in hcidump.  Seems if I run avtest a lot successively, it does show
-up.  I'm running a 2.6.33.20 kernel with hcidump-2.3.  Let me know if
-the kernel is just too ancient, but I'd like to know if others have
-seen this type of issue.
+To those interested, this was not noticed before because:
 
-Thanks,
-Mike
+* We don't use the stored information yet (although we will probably use soon
+  the "authenticated" field for ATT requests that return "Insufficient
+  Authentication")
+* The storage types for master/authenticated/enc_size are compatible.
+
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index ddd544d..22fa329 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -1694,9 +1694,9 @@ static void mgmt_new_ltk(int sk, uint16_t index, void *buf, size_t len)
+ 
+ 	if (ev->store_hint) {
+ 		btd_event_ltk_notify(&info->bdaddr, &ev->key.addr.bdaddr,
+-				ev->key.addr.type, ev->key.val,
++				ev->key.addr.type, ev->key.val, ev->key.master,
+ 				ev->key.authenticated, ev->key.enc_size,
+-				ev->key.master, ev->key.ediv, ev->key.rand);
++				ev->key.ediv, ev->key.rand);
+ 	}
+ 
+ 	if (ev->key.master)
+-- 
+1.7.5.4
+
