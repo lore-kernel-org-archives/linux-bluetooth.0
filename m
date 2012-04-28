@@ -1,39 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 28 Apr 2012 12:43:10 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mike Brudevold <puffy.taco@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Michael Brudevold <michael.brudevold@logicpd.com>
-Subject: Re: [PATCH] audio: Fix AVDTP General Reject message
-Message-ID: <20120428094310.GA7293@x220.P-661HNU-F1>
-References: <1335547341-19459-1-git-send-email-puffy.taco@gmail.com>
+Message-ID: <4F9B8715.9090409@siemens.com>
+Date: Sat, 28 Apr 2012 09:58:45 +0400
+From: Alexander Smirnov <Alexander.Smirnov@siemens.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1335547341-19459-1-git-send-email-puffy.taco@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: "John W. Linville" <linville@tuxdriver.com>
+CC: Marcel Holtmann <marcel@holtmann.org>, linux-wireless@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit 2012
+ (Barcelona!)
+References: <20120322192406.GB2432@tuxdriver.com> <1332698585.1870.88.camel@aeonflux> <20120326145433.GE13806@tuxdriver.com> <1332774906.1870.98.camel@aeonflux> <20120326152541.GH13806@tuxdriver.com> <20120427174439.GC16207@tuxdriver.com>
+In-Reply-To: <20120427174439.GC16207@tuxdriver.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Hi colleagues,
 
-On Fri, Apr 27, 2012, Mike Brudevold wrote:
-> From: Michael Brudevold <michael.brudevold@logicpd.com>
-> 
-> As per spec, bits other than Transaction Label and Packet Type are RFA. This
-> fixes the RFA bits which were previously set to the invalid signal_id.
-> 
-> Test case TP/SIG/SMG/BI-28-C.
-> ---
->  audio/avdtp.c |   11 +++++------
->  1 files changed, 5 insertions(+), 6 deletions(-)
+On 04/27/2012 09:44 PM, John W. Linville wrote:
+> Just to keep the ball rolling...
+>
+> Angela has reserved space for us at the Hotel Fira
+> Palace for the Wireless Summit on Thurs, Nov 8th and Fri, Nov 9th.
+> Please note that this will overlap Yocto Dev Days, oVirt Summit and
+> KVM Forum at the same venue.
+>
+> Now, we need some talk proposals!  Please post in this thread (or
+> contact me or Marcel directly if necessary) to propose talks.  I would
+> love to see any topics on any relevant technologies, as well as topics
+> about how the projects are being managed, new sub-projects, etc.
+> It seems like a long time away right now, but it is a good time to
+> start thinking... :-)
+>
+> Thanks,
+>
+> John
 
-See commit 998b0976e28cd33cbfd2f71b6f27a162da6fe668
+ From my site I can have a talk about IEEE 802.15.4 Linux stack 
+implementation and IPv6 networking over such a networks, i.e. 6lowpan.
 
-This is how BlueZ used to behave until ESR04 was released (still
-available on bluetooth.org adopted specs page) which clarified the AVDTP
-1.0 specification (both profile and test spec) to define general reject
-as containing the signal id. For whatever reason it seems like the
-content of ESR04 never made it the the 1.2 spec version. I'd like to get
-some clarity on this, i.e. was the errata dropped on purpose or by
-mistake.
-
-Johan
+-- 
+With best regards,
+Alexander Smirnov
