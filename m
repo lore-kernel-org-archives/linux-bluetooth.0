@@ -1,42 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4F9B8715.9090409@siemens.com>
-Date: Sat, 28 Apr 2012 09:58:45 +0400
-From: Alexander Smirnov <Alexander.Smirnov@siemens.com>
+Date: Fri, 27 Apr 2012 21:30:15 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	pkrystad@codeaurora.org, andrei.emeltchenko.news@gmail.com
+Subject: Re: [RFCv2 6/8] Bluetooth: Lock the L2CAP channel when sending
+Message-ID: <20120428003015.GB2917@joana>
+References: <1335570655-30878-1-git-send-email-mathewm@codeaurora.org>
+ <1335570655-30878-7-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
-To: "John W. Linville" <linville@tuxdriver.com>
-CC: Marcel Holtmann <marcel@holtmann.org>, linux-wireless@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit 2012
- (Barcelona!)
-References: <20120322192406.GB2432@tuxdriver.com> <1332698585.1870.88.camel@aeonflux> <20120326145433.GE13806@tuxdriver.com> <1332774906.1870.98.camel@aeonflux> <20120326152541.GH13806@tuxdriver.com> <20120427174439.GC16207@tuxdriver.com>
-In-Reply-To: <20120427174439.GC16207@tuxdriver.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1335570655-30878-7-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi colleagues,
+Hi Mat,
 
-On 04/27/2012 09:44 PM, John W. Linville wrote:
-> Just to keep the ball rolling...
->
-> Angela has reserved space for us at the Hotel Fira
-> Palace for the Wireless Summit on Thurs, Nov 8th and Fri, Nov 9th.
-> Please note that this will overlap Yocto Dev Days, oVirt Summit and
-> KVM Forum at the same venue.
->
-> Now, we need some talk proposals!  Please post in this thread (or
-> contact me or Marcel directly if necessary) to propose talks.  I would
-> love to see any topics on any relevant technologies, as well as topics
-> about how the projects are being managed, new sub-projects, etc.
-> It seems like a long time away right now, but it is a good time to
-> start thinking... :-)
->
-> Thanks,
->
-> John
+* Mat Martineau <mathewm@codeaurora.org> [2012-04-27 16:50:53 -0700]:
 
- From my site I can have a talk about IEEE 802.15.4 Linux stack 
-implementation and IPv6 networking over such a networks, i.e. 6lowpan.
+> The ERTM and streaming mode transmit queue must only be accessed while
+> the L2CAP channel lock is held.  Locking the channel before calling
+> l2cap_chan_send ensures that multiple threads cannot simultaneously
+> manipulate the queue when sending and receiving concurrently.
+> 
+> L2CAP channel locking had previously moved to the l2cap_chan struct
+> instead of the associated socket, so some of the old socket locking
+> can also be removed in this patch.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  include/net/bluetooth/bluetooth.h |    2 --
+>  net/bluetooth/l2cap_sock.c        |   15 ++++++++-------
+>  2 files changed, 8 insertions(+), 9 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 2fb268f..90678a9 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -256,12 +256,10 @@ static inline struct sk_buff *bt_skb_send_alloc(struct sock *sk,
+>  {
+>  	struct sk_buff *skb;
+>  
+> -	release_sock(sk);
+>  	if ((skb = sock_alloc_send_skb(sk, len + BT_SKB_RESERVE, nb, err))) {
+>  		skb_reserve(skb, BT_SKB_RESERVE);
+>  		bt_cb(skb)->incoming  = 0;
+>  	}
+> -	lock_sock(sk);
+>  
+>  	if (!skb && *err)
+>  		return NULL;
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 82b6368..ac8ce10 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -716,16 +716,13 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct ms
+>  	if (msg->msg_flags & MSG_OOB)
+>  		return -EOPNOTSUPP;
+>  
+> -	lock_sock(sk);
+> -
+> -	if (sk->sk_state != BT_CONNECTED) {
+> -		release_sock(sk);
+> +	if (sk->sk_state != BT_CONNECTED)
+>  		return -ENOTCONN;
+> -	}
+>  
+> +	l2cap_chan_lock(chan);
+>  	err = l2cap_chan_send(chan, msg, len, sk->sk_priority);
+> +	l2cap_chan_unlock(chan);
 
--- 
-With best regards,
-Alexander Smirnov
+I would move these l2cap_chan_{,un}lock calls to inside
+l2cap_chan_send(). The less we use l2cap_chan_* functions here the
+better.
+>  
+> -	release_sock(sk);
+>  	return err;
+>  }
+>  
+> @@ -936,9 +933,13 @@ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
+>  	struct sk_buff *skb;
+>  	int err;
+>  
+> +	l2cap_chan_unlock(chan);
+> +
+>  	skb = bt_skb_send_alloc(chan->sk, len, nb, &err);
+>  	if (!skb)
+> -		return (ERR_PTR(err));
+> +		skb = ERR_PTR(err);
+> +
+> +	l2cap_chan_lock(chan);
+
+I would suggest the same here, but it might not be worth, since we would
+need to create wrapper to call alloc_skb().
+
+	Gustavo
