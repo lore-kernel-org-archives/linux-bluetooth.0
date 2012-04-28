@@ -1,44 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120428094310.GA7293@x220.P-661HNU-F1>
-References: <1335547341-19459-1-git-send-email-puffy.taco@gmail.com>
-	<20120428094310.GA7293@x220.P-661HNU-F1>
-Date: Sat, 28 Apr 2012 10:58:11 -0500
-Message-ID: <CAB7rCTi743ZsxiE4y=1mH=o1-YqxD-DA08pAW7Xfx3A-NgxopA@mail.gmail.com>
-Subject: Re: [PATCH] audio: Fix AVDTP General Reject message
-From: Mike <puffy.taco@gmail.com>
+Message-ID: <1335626216.14431.3.camel@sirocco.config>
+Subject: [PATCH] Fix adaptername shutdown
+From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Sat, 28 Apr 2012 16:16:56 +0100
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+An inotify watch descriptor isn't a file descriptor, so don't
+treat it as such and remove it properly.
+---
+ plugins/adaptername.c |   13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
->> As per spec, bits other than Transaction Label and Packet Type are RFA. This
->> fixes the RFA bits which were previously set to the invalid signal_id.
->>
->> Test case TP/SIG/SMG/BI-28-C.
->> ---
->>  audio/avdtp.c |   11 +++++------
->>  1 files changed, 5 insertions(+), 6 deletions(-)
->
-> See commit 998b0976e28cd33cbfd2f71b6f27a162da6fe668
->
-> This is how BlueZ used to behave until ESR04 was released (still
-> available on bluetooth.org adopted specs page) which clarified the AVDTP
-> 1.0 specification (both profile and test spec) to define general reject
-> as containing the signal id. For whatever reason it seems like the
-> content of ESR04 never made it the the 1.2 spec version. I'd like to get
-> some clarity on this, i.e. was the errata dropped on purpose or by
-> mistake.
+diff --git a/plugins/adaptername.c b/plugins/adaptername.c
+index e154e92..9af19aa 100644
+--- a/plugins/adaptername.c
++++ b/plugins/adaptername.c
+@@ -52,7 +52,7 @@
+ #define MACHINE_INFO_FILE "machine-info"
+ 
+ static GIOChannel *inotify = NULL;
+-static int watch_fd = -1;
++static int watch_d = -1;
+ 
+ /* This file is part of systemd's hostnamed functionality:
+  * http://0pointer.de/public/systemd-man/machine-info.html
+@@ -292,8 +292,8 @@ static int adaptername_init(void)
+ 	mask |= IN_MOVED_FROM;
+ 	mask |= IN_MOVED_TO;
+ 
+-	watch_fd = inotify_add_watch(inot_fd, MACHINE_INFO_DIR, mask);
+-	if (watch_fd < 0) {
++	watch_d = inotify_add_watch(inot_fd, MACHINE_INFO_DIR, mask);
++	if (watch_d < 0) {
+ 		error("Failed to setup watch for '%s'", MACHINE_INFO_DIR);
+ 		close(inot_fd);
+ 		return 0;
+@@ -310,8 +310,11 @@ static int adaptername_init(void)
+ 
+ static void adaptername_exit(void)
+ {
+-	if (watch_fd >= 0)
+-		close(watch_fd);
++	if (watch_d >= 0 && inotify != NULL) {
++		int inot_fd;
++		inot_fd = g_io_channel_unix_get_fd (inotify);
++		inotify_rm_watch(inot_fd, watch_d);
++	}
+ 	if (inotify != NULL) {
+ 		g_io_channel_shutdown(inotify, FALSE, NULL);
+ 		g_io_channel_unref(inotify);
+-- 
+1.7.10
 
-I think this [1] covers it.  It looks like they are in the process of
-adding a new PICS option that declares support for ESR04, but it's not
-quite there yet which is why my test plan had TP/SIG/SMG/BI-28-C.  The
-ESR04 test case (TP/SIG/SMG/ESR04/BI-28-C) is already in the test
-spec.  You can drop this patch.
 
-Thanks!
-Mike
-
-[1] https://www.bluetooth.org/tse/errata_view.cfm?errata_id=2834
