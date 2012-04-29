@@ -1,26 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 29 Apr 2012 22:40:41 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix adaptername shutdown
-Message-ID: <20120429194041.GA5851@x220.P-661HNU-F1>
-References: <1335626216.14431.3.camel@sirocco.config>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1335626216.14431.3.camel@sirocco.config>
+In-Reply-To: <20120428101311.GA9270@x220.P-661HNU-F1>
+References: <CAB7rCTiT6m368AReu0mbVVp+Ptc9frQLXp+AvsOY8csyKiVEhg@mail.gmail.com>
+	<20120428095617.GA7550@x220.P-661HNU-F1>
+	<20120428101311.GA9270@x220.P-661HNU-F1>
+Date: Sun, 29 Apr 2012 14:36:38 -0500
+Message-ID: <CAB7rCTgz9q79G7hp=cHPFakkhWV=AweyAFqiTzRN_65BEucruw@mail.gmail.com>
+Subject: Re: TP/SIG/SMG/BI-02-C failure
+From: Mike <puffy.taco@gmail.com>
+To: Mike <puffy.taco@gmail.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Johan,
 
-On Sat, Apr 28, 2012, Bastien Nocera wrote:
-> An inotify watch descriptor isn't a file descriptor, so don't
-> treat it as such and remove it properly.
-> ---
->  plugins/adaptername.c |   13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
+>> > For those who are more familiar with the position of
+>> > "remove_disconnect_timer(session);" in session_cb, does it make sense
+>> > to move that outside the AVDTP_MSG_TYPE_COMMAND block so that even the
+>> > invalid discover command (general reject) turns off the timer?
+>>
+>> The timer is only removed if there are no streams present
+>
+> Sorry, that should say "if there *are* streams present":
+>
+>                if (session->streams && session->dc_timer)
+>                        remove_disconnect_timer(session);
 
-Applied. Thanks.
+The BQE has accepted it as is, now that he's had enough time to look at it.
 
-Johan
+Thanks,
+Mike
