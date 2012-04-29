@@ -1,37 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 29 Apr 2012 17:25:00 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	pkrystad@codeaurora.org, andrei.emeltchenko.news@gmail.com
-Subject: Re: [RFCv2 3/8] Bluetooth: Make better use of l2cap_chan reference
- counting
-Message-ID: <20120429202500.GC2917@joana>
-References: <1335570655-30878-1-git-send-email-mathewm@codeaurora.org>
- <1335570655-30878-4-git-send-email-mathewm@codeaurora.org>
+Date: Sun, 29 Apr 2012 22:40:41 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix adaptername shutdown
+Message-ID: <20120429194041.GA5851@x220.P-661HNU-F1>
+References: <1335626216.14431.3.camel@sirocco.config>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1335570655-30878-4-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1335626216.14431.3.camel@sirocco.config>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi Bastien,
 
-* Mat Martineau <mathewm@codeaurora.org> [2012-04-27 16:50:50 -0700]:
-
-> L2CAP sockets contain a pointer to l2cap_chan that needs to be
-> reference counted in order to prevent a possible dangling pointer when
-> the channel is freed.
-> 
-> There were a few other cases where an l2cap_chan pointer on the stack
-> was dereferenced after a call to l2cap_chan_del. Those pointers are
-> also now reference counted.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+On Sat, Apr 28, 2012, Bastien Nocera wrote:
+> An inotify watch descriptor isn't a file descriptor, so don't
+> treat it as such and remove it properly.
 > ---
->  net/bluetooth/l2cap_core.c |    6 ++++++
->  net/bluetooth/l2cap_sock.c |    3 +++
->  2 files changed, 9 insertions(+)
+>  plugins/adaptername.c |   13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
 
-Patches 1 to 3 applied to bluetooth-next. Thanks.
+Applied. Thanks.
 
-	Gustavo
+Johan
