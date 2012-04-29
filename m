@@ -1,63 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <4F9B0108.2000007@tu-ilmenau.de>
-References: <201204271541.q3RFfVd5006035@imr-da04.mx.aol.com>
-	<4F9B0108.2000007@tu-ilmenau.de>
-Date: Sun, 29 Apr 2012 14:44:50 +0300
-Message-ID: <CABBYNZJ2ygZ42r==cDbBFmtzmOFTA-HnDCWk_XM669pHYtfs5Q@mail.gmail.com>
-Subject: Re: main.conf issues
+In-Reply-To: <1335561922-3518-4-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1335561922-3518-1-git-send-email-lucas.demarchi@profusion.mobi>
+	<1335561922-3518-4-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Sun, 29 Apr 2012 14:22:27 +0300
+Message-ID: <CABBYNZLOF5TTU+oey-bRY-z-orXWndfmKiN81QbkqFaHXboZ4Q@mail.gmail.com>
+Subject: Re: [BlueZ RFC 3/5] gdbus: implement DBus.Properties.GetAll method
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Steffen Becker <steffen.becker@tu-ilmenau.de>
-Cc: Kal Torak <chronognosis@aim.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lucas,
 
-On Fri, Apr 27, 2012 at 11:26 PM, Steffen Becker
-<steffen.becker@tu-ilmenau.de> wrote:
-> Hello Torak,
->
-> I'm not very familiar with BlueZ (also just asking questions on this mailing
-> list), but what I can tell is that:
-> You have to setup this file:
-> /var/lib/bluetooth/<local-bdaddr>/config
-> At the moment I can't look up the right syntax for all the configuration,
-> but if i remember right, for enabling discoverable mode you have to enter
-> something like this in the config-file:
->
-> onmode discoverable
-> mode discoverable
->
-> For changing the name of your device, you have to edit this line in the
-> config-file:
->
-> name <your-name>
+On Sat, Apr 28, 2012 at 12:25 AM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> +               if (p->exists != NULL && !p->exists(p, iface->user_data))
+> +                       continue;
+> +
+> +               dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY,
+> +                                                               NULL, &entry);
+> +               dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
+> +                                                               p->name);
+> +               dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
+> +                                                       p->type, &value);
+> +
+> +               if (!p->get(connection, message, p, &value, iface->user_data)) {
+> +                       dbus_message_iter_abandon_container(&entry, &value);
+> +                       dbus_message_iter_abandon_container(&dict, &entry);
+> +                       dbus_message_unref(reply);
+> +                       return NULL;
+> +               }
 
-Please no top-posting here, those files are not supposed to be
-manually edited, use D-Bus API otherwise you may cause
-inconsistencies.
+I would do this a little different, make the callback return the value
+(void *) so you don't even need to create any container if it returns
+NULL, if the value is set then you create the container and use the
+registered type to add the value to the container, obviously this is
+limited to values that doesn't require another container but IMO that
+should not be the case of any of our properties.
 
->> Hello, When I setup the main.conf with the values for Name, Class,
->> PairableTimeout and DiscoverableTimeout, and restart the bluetoothd,
->> hciconfig shows that nothing change name still the same, I cant "see"
->> the device from the outside(iscan is disabled), and the class still
->> 0x000100, and I must re-do hciconfig hci name #### class #### and
->> hciconfig hci0 piscan by hand to make the device visible and try
->> streaming support, OTOH I just can't see and/or connect to the device.
->> a ConWise 6622 Bluetooth dongle.
->> I'm using bluez-4.99 and linux 3.2.15.Any information will be usefull...
-
-You don't have to do that in main.conf, except for class, those values
-are only used when there is nothing already configured, so to change
-this you really should be using D-Bus. You can find under
-tests/test-adapter how to set this permanently in the configuration of
-the adapter.
-
-Btw, for the class it actually gets updated automatically when you
-register the services.
 
 -- 
 Luiz Augusto von Dentz
