@@ -1,40 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 29 Apr 2012 17:25:46 -0300
+Date: Sun, 29 Apr 2012 17:25:00 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
 To: Mat Martineau <mathewm@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
 	pkrystad@codeaurora.org, andrei.emeltchenko.news@gmail.com
-Subject: Re: [RFCv2 5/8] Bluetooth: Restore locking semantics when looking up
- L2CAP channels
-Message-ID: <20120429202546.GD2917@joana>
+Subject: Re: [RFCv2 3/8] Bluetooth: Make better use of l2cap_chan reference
+ counting
+Message-ID: <20120429202500.GC2917@joana>
 References: <1335570655-30878-1-git-send-email-mathewm@codeaurora.org>
- <1335570655-30878-6-git-send-email-mathewm@codeaurora.org>
+ <1335570655-30878-4-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1335570655-30878-6-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1335570655-30878-4-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mat,
 
-* Mat Martineau <mathewm@codeaurora.org> [2012-04-27 16:50:52 -0700]:
+* Mat Martineau <mathewm@codeaurora.org> [2012-04-27 16:50:50 -0700]:
 
-> As the comment for l2cap_get_chan_by_scid indicated, the function used
-> to return a locked socket.  The lock for the socket was acquired while
-> the channel list was also locked.
+> L2CAP sockets contain a pointer to l2cap_chan that needs to be
+> reference counted in order to prevent a possible dangling pointer when
+> the channel is freed.
 > 
-> When locking was moved over to the l2cap_chan structure, the channel
-> lock was no longer acquired with the channel list still locked.  This
-> made it possible for the l2cap_chan to be deleted after
-> conn->chan_lock was released but before l2cap_chan_lock was called.
-> Making the call to l2cap_chan_lock before releasing conn->chan_lock
-> makes it impossible for the l2cap_chan to be deleted at the wrong
-> time.
+> There were a few other cases where an l2cap_chan pointer on the stack
+> was dereferenced after a call to l2cap_chan_del. Those pointers are
+> also now reference counted.
 > 
 > Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 > ---
->  net/bluetooth/l2cap_core.c |   10 +++-------
->  1 file changed, 3 insertions(+), 7 deletions(-)
+>  net/bluetooth/l2cap_core.c |    6 ++++++
+>  net/bluetooth/l2cap_sock.c |    3 +++
+>  2 files changed, 9 insertions(+)
 
-Applied to bluetooth-next. Thanks.
+Patches 1 to 3 applied to bluetooth-next. Thanks.
 
 	Gustavo
