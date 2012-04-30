@@ -1,53 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZKNN4Fy4wrnWv45Kg1KdRddv3JdkmKK2ezpOVtXaVZdcQ@mail.gmail.com>
-References: <1335561285-3332-1-git-send-email-lucas.demarchi@profusion.mobi>
- <CABBYNZKpoaxMXA--qbXqq=TDW69KcmP=Uiv9nacq2vJ0gTvMNQ@mail.gmail.com>
- <CAMOw1v4xkAgNkhMRmLP=Q6ffieL9fAS8Ej3uZEJv7tSp_sU3tg@mail.gmail.com> <CABBYNZKNN4Fy4wrnWv45Kg1KdRddv3JdkmKK2ezpOVtXaVZdcQ@mail.gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 30 Apr 2012 10:37:00 -0300
-Message-ID: <CAMOw1v6O0nsSqx3drJrCtsAFB4Dm5st2ANVyKFdSLejp6m1AUg@mail.gmail.com>
-Subject: Re: [BlueZ v3 00/10] gdbus: Better D-Bus introspection
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Balance locking in L2CAP
+Date: Mon, 30 Apr 2012 14:55:15 +0300
+Message-Id: <1335786916-9845-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Apr 30, 2012 at 7:34 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Lucas,
->
-> On Mon, Apr 30, 2012 at 12:40 AM, Lucas De Marchi
-> <lucas.demarchi@profusion.mobi> wrote:
->>
->> Since we are using '[' and ']' only internally. I don't see a problem
->> with that. If D-Bus start using it we can change later. Of course it's
->> better to convince D-Bus guys to reserve that, but IMO this shouldn't
->> be a blocker.
->>
->> From the chars you suggested, only '@' seems reasonable and I can
->> change to this char if we agree on it.
->
->  Either way IMO it is ugly to mess around with the signature but
-> perhaps it is the only alternative we have.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-There are other ways, but they have shortcomings, too -> the other 2
-approaches that I sent to this ML have the shortcoming that in C it's
-not possible to initialize flexible array members in a nested context.
+After applying commit 62065ab3d37d7e71f44fb986ade6a285fa4c50fa locks
+get unbalanced. That commit required another patch to be applied.
 
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |    3 +++
+ 1 file changed, 3 insertions(+)
 
->
-> I wonder how other binding works in this regard, or they always have
-> to depend on a xml file that describes the interface? iirc that used
-> to be the case for GTK and QT, perhaps python is the only one that can
-> really make use of this in runtime as d-feet seems to be able to use
-> this information already.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 99e5c88..057bb1c 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5053,6 +5053,9 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 			release_sock(sk);
+ 		}
+ 
++		if (chan)
++			l2cap_chan_unlock(chan);
++
+ 		/* Allocate skb for the complete frame (with header) */
+ 		conn->rx_skb = bt_skb_alloc(len, GFP_ATOMIC);
+ 		if (!conn->rx_skb)
+-- 
+1.7.9.5
 
-As far as I checked, what glib does is to maintain the arguments in a
-separate array (http://developer.gnome.org/gio/stable/gio-D-Bus-Introspection-Data.html#GDBusMethodInfo-struct).
-This implies that for each method we need to declare the arguments in
-a separate structure, not nested as we are doing now.
-
-
-Lucas De Marchi
