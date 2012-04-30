@@ -1,47 +1,137 @@
 Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Subject: [PATCH obexd v1 2/6] client: Avoid GObex dependency from transfer.h
-Date: Mon, 30 Apr 2012 17:26:23 +0200
-Message-Id: <1335799587-10370-3-git-send-email-mikel.astiz.oss@gmail.com>
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH obexd v1 1/6] client: Minor buffer access API changes
+Date: Mon, 30 Apr 2012 17:26:22 +0200
+Message-Id: <1335799587-10370-2-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1335799587-10370-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1335799587-10370-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This workaround makes it possible to include transfer.h from the
-modules, without adding a dependency to GObex.
----
- client/transfer.c |    2 +-
- client/transfer.h |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 89690d0..411a7c0 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -610,7 +610,7 @@ static gboolean transfer_start_put(struct obc_transfer *transfer, GError **err)
- 	return TRUE;
+Trivial changes in buffer getters in both session and transfer,
+regarding the access of transfer parameters:
+	- const qualifiers added, to avoid unwanted frees
+	- Buffers are now returned as void* instead of guint8*
+---
+ client/pbap.c     |    2 +-
+ client/session.c  |   17 +++++++----------
+ client/session.h  |    2 +-
+ client/transfer.c |   12 +++++++-----
+ client/transfer.h |    6 +++---
+ 5 files changed, 19 insertions(+), 20 deletions(-)
+
+diff --git a/client/pbap.c b/client/pbap.c
+index baf2ca6..d96b651 100644
+--- a/client/pbap.c
++++ b/client/pbap.c
+@@ -294,7 +294,7 @@ static void pbap_setpath_cb(struct obc_session *session, GError *err,
+ static void read_return_apparam(struct obc_session *session,
+ 				guint16 *phone_book_size, guint8 *new_missed_calls)
+ {
+-	struct apparam_hdr *hdr;
++	const struct apparam_hdr *hdr;
+ 	size_t size;
+ 
+ 	*phone_book_size = 0;
+diff --git a/client/session.c b/client/session.c
+index e277fa0..824ef49 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -1156,22 +1156,19 @@ int obc_session_get_contents(struct obc_session *session, char **contents,
+ 	return obc_transfer_get_contents(transfer, contents, size);
  }
  
--gboolean obc_transfer_start(struct obc_transfer *transfer, GObex *obex,
-+gboolean obc_transfer_start(struct obc_transfer *transfer, void *obex,
- 								GError **err)
+-void *obc_session_get_params(struct obc_session *session, size_t *size)
++const void *obc_session_get_params(struct obc_session *session, size_t *size)
  {
- 	transfer->obex = g_obex_ref(obex);
+ 	struct obc_transfer *transfer;
+-	struct obc_transfer_params params;
+ 
+-	transfer= obc_session_get_transfer(session);
+-	if (transfer == NULL)
+-		return NULL;
++	transfer = obc_session_get_transfer(session);
++	if (transfer == NULL) {
++		if (size != NULL)
++			*size = 0;
+ 
+-	if (obc_transfer_get_params(transfer, &params) < 0)
+ 		return NULL;
++	}
+ 
+-	if (size)
+-		*size = params.size;
+-
+-	return params.data;
++	return obc_transfer_get_params(transfer, size);
+ }
+ 
+ static void setpath_complete(struct obc_session *session, GError *err,
+diff --git a/client/session.h b/client/session.h
+index c443392..b44cf3f 100644
+--- a/client/session.h
++++ b/client/session.h
+@@ -54,7 +54,7 @@ const char *obc_session_get_path(struct obc_session *session);
+ const char *obc_session_get_target(struct obc_session *session);
+ int obc_session_get_contents(struct obc_session *session, char **contents,
+ 								size_t *size);
+-void *obc_session_get_params(struct obc_session *session, size_t *size);
++const void *obc_session_get_params(struct obc_session *session, size_t *size);
+ 
+ guint obc_session_send(struct obc_session *session, const char *filename,
+ 				const char *name, GError **err);
+diff --git a/client/transfer.c b/client/transfer.c
+index 8b5d126..89690d0 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -631,13 +631,15 @@ guint8 obc_transfer_get_operation(struct obc_transfer *transfer)
+ 	return transfer->op;
+ }
+ 
+-int obc_transfer_get_params(struct obc_transfer *transfer,
+-					struct obc_transfer_params *params)
++const void *obc_transfer_get_params(struct obc_transfer *transfer, size_t *size)
+ {
+-	params->data = transfer->params->data;
+-	params->size = transfer->params->size;
++	if (transfer->params == NULL)
++		return NULL;
+ 
+-	return 0;
++	if (size != NULL)
++		*size = transfer->params->size;
++
++	return transfer->params->data;
+ }
+ 
+ int obc_transfer_get_contents(struct obc_transfer *transfer, char **contents,
 diff --git a/client/transfer.h b/client/transfer.h
-index f42e21f..1b83d18 100644
+index 3f5e22d..f42e21f 100644
 --- a/client/transfer.h
 +++ b/client/transfer.h
-@@ -55,7 +55,7 @@ gboolean obc_transfer_set_callback(struct obc_transfer *transfer,
- 					transfer_callback_t func,
- 					void *user_data);
+@@ -22,7 +22,7 @@
+  */
  
--gboolean obc_transfer_start(struct obc_transfer *transfer, GObex *obex,
-+gboolean obc_transfer_start(struct obc_transfer *transfer, void *obex,
+ struct obc_transfer_params {
+-	guint8 *data;
++	void *data;
+ 	size_t size;
+ };
+ 
+@@ -59,8 +59,8 @@ gboolean obc_transfer_start(struct obc_transfer *transfer, GObex *obex,
  								GError **err);
  guint8 obc_transfer_get_operation(struct obc_transfer *transfer);
+ 
+-int obc_transfer_get_params(struct obc_transfer *transfer,
+-					struct obc_transfer_params *params);
++const void *obc_transfer_get_params(struct obc_transfer *transfer,
++								size_t *size);
+ int obc_transfer_get_contents(struct obc_transfer *transfer, char **contents,
+ 								size_t *size);
  
 -- 
 1.7.7.6
