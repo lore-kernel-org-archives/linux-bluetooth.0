@@ -1,36 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Balance locking in L2CAP
-Date: Mon, 30 Apr 2012 14:55:15 +0300
-Message-Id: <1335786916-9845-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: [PATCH obexd] opp: Emit TransferStarted signal only if stream start is
+ success
+Date: Mon, 30 Apr 2012 16:41:41 +0530
+Message-id: <1335784301-7606-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-After applying commit 62065ab3d37d7e71f44fb986ade6a285fa4c50fa locks
-get unbalanced. That commit required another patch to be applied.
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Even if obex_put_stream_start() fails TransferStarted signal will be
+emitted where as transfer start is actually failed.
 ---
- net/bluetooth/l2cap_core.c |    3 +++
- 1 file changed, 3 insertions(+)
+ plugins/opp.c |    7 +++++--
+ 1 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 99e5c88..057bb1c 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5053,6 +5053,9 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 			release_sock(sk);
- 		}
+diff --git a/plugins/opp.c b/plugins/opp.c
+index fa3ee91..c7ddc63 100644
+--- a/plugins/opp.c
++++ b/plugins/opp.c
+@@ -154,12 +154,15 @@ skip_auth:
  
-+		if (chan)
-+			l2cap_chan_unlock(chan);
+ 	path = g_build_filename(folder, name, NULL);
+ 
+-	manager_emit_transfer_started(os);
+-
+ 	err = obex_put_stream_start(os, path);
+ 
+ 	g_free(path);
+ 
++	if (err < 0)
++		goto failed;
 +
- 		/* Allocate skb for the complete frame (with header) */
- 		conn->rx_skb = bt_skb_alloc(len, GFP_ATOMIC);
- 		if (!conn->rx_skb)
++	manager_emit_transfer_started(os);
++
+ failed:
+ 	g_free(folder);
+ 	g_free(name);
 -- 
-1.7.9.5
+1.7.1
 
