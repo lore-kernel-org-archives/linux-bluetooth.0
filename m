@@ -1,53 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Apr 2012 08:02:44 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Gustavo Padovan <gustavo@padovan.org>
-cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-    pkrystad@codeaurora.org, andrei.emeltchenko.news@gmail.com
-Subject: Re: [RFCv2 5/8] Bluetooth: Restore locking semantics when looking
- up L2CAP channels
-In-Reply-To: <20120429202546.GD2917@joana>
-Message-ID: <alpine.DEB.2.02.1204300800280.2723@mathewm-linux>
-References: <1335570655-30878-1-git-send-email-mathewm@codeaurora.org> <1335570655-30878-6-git-send-email-mathewm@codeaurora.org> <20120429202546.GD2917@joana>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+In-Reply-To: <CABBYNZKNN4Fy4wrnWv45Kg1KdRddv3JdkmKK2ezpOVtXaVZdcQ@mail.gmail.com>
+References: <1335561285-3332-1-git-send-email-lucas.demarchi@profusion.mobi>
+ <CABBYNZKpoaxMXA--qbXqq=TDW69KcmP=Uiv9nacq2vJ0gTvMNQ@mail.gmail.com>
+ <CAMOw1v4xkAgNkhMRmLP=Q6ffieL9fAS8Ej3uZEJv7tSp_sU3tg@mail.gmail.com> <CABBYNZKNN4Fy4wrnWv45Kg1KdRddv3JdkmKK2ezpOVtXaVZdcQ@mail.gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 30 Apr 2012 10:37:00 -0300
+Message-ID: <CAMOw1v6O0nsSqx3drJrCtsAFB4Dm5st2ANVyKFdSLejp6m1AUg@mail.gmail.com>
+Subject: Re: [BlueZ v3 00/10] gdbus: Better D-Bus introspection
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-Gustavo -
-
-On Sun, 29 Apr 2012, Gustavo Padovan wrote:
-
-> Hi Mat,
+On Mon, Apr 30, 2012 at 7:34 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lucas,
 >
-> * Mat Martineau <mathewm@codeaurora.org> [2012-04-27 16:50:52 -0700]:
->
->> As the comment for l2cap_get_chan_by_scid indicated, the function used
->> to return a locked socket.  The lock for the socket was acquired while
->> the channel list was also locked.
+> On Mon, Apr 30, 2012 at 12:40 AM, Lucas De Marchi
+> <lucas.demarchi@profusion.mobi> wrote:
 >>
->> When locking was moved over to the l2cap_chan structure, the channel
->> lock was no longer acquired with the channel list still locked.  This
->> made it possible for the l2cap_chan to be deleted after
->> conn->chan_lock was released but before l2cap_chan_lock was called.
->> Making the call to l2cap_chan_lock before releasing conn->chan_lock
->> makes it impossible for the l2cap_chan to be deleted at the wrong
->> time.
+>> Since we are using '[' and ']' only internally. I don't see a problem
+>> with that. If D-Bus start using it we can change later. Of course it's
+>> better to convince D-Bus guys to reserve that, but IMO this shouldn't
+>> be a blocker.
 >>
->> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
->> ---
->>  net/bluetooth/l2cap_core.c |   10 +++-------
->>  1 file changed, 3 insertions(+), 7 deletions(-)
+>> From the chars you suggested, only '@' seems reasonable and I can
+>> change to this char if we agree on it.
 >
-> Applied to bluetooth-next. Thanks.
+>  Either way IMO it is ugly to mess around with the signature but
+> perhaps it is the only alternative we have.
 
-Please revert this for now.  This patch causes a locking imbalance if 
-patch 4/8 is not merged first, and is the main reason I requested that 
-*none* of these patches be merged yet in my cover letter message.
+There are other ways, but they have shortcomings, too -> the other 2
+approaches that I sent to this ML have the shortcoming that in C it's
+not possible to initialize flexible array members in a nested context.
 
-Thanks,
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+>
+> I wonder how other binding works in this regard, or they always have
+> to depend on a xml file that describes the interface? iirc that used
+> to be the case for GTK and QT, perhaps python is the only one that can
+> really make use of this in runtime as d-feet seems to be able to use
+> this information already.
+
+As far as I checked, what glib does is to maintain the arguments in a
+separate array (http://developer.gnome.org/gio/stable/gio-D-Bus-Introspection-Data.html#GDBusMethodInfo-struct).
+This implies that for each method we need to declare the arguments in
+a separate structure, not nested as we are doing now.
+
+
+Lucas De Marchi
