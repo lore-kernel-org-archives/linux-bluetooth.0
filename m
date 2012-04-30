@@ -1,104 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH obexd 1/3] gobex: Add callback and userdata parameter to
- g_obex_cancel_transfer()
-Date: Mon, 30 Apr 2012 16:32:21 +0530
-Message-id: <1335783741-7398-1-git-send-email-jaganath.k@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <CAMOw1v4xkAgNkhMRmLP=Q6ffieL9fAS8Ej3uZEJv7tSp_sU3tg@mail.gmail.com>
+References: <1335561285-3332-1-git-send-email-lucas.demarchi@profusion.mobi>
+	<CABBYNZKpoaxMXA--qbXqq=TDW69KcmP=Uiv9nacq2vJ0gTvMNQ@mail.gmail.com>
+	<CAMOw1v4xkAgNkhMRmLP=Q6ffieL9fAS8Ej3uZEJv7tSp_sU3tg@mail.gmail.com>
+Date: Mon, 30 Apr 2012 13:34:30 +0300
+Message-ID: <CABBYNZKNN4Fy4wrnWv45Kg1KdRddv3JdkmKK2ezpOVtXaVZdcQ@mail.gmail.com>
+Subject: Re: [BlueZ v3 00/10] gdbus: Better D-Bus introspection
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If callback is provided in g_obex_cancel_transfer() current complete
-callback will be replaced by the new one and user will be informed
-when abort completes.
----
- gobex/gobex-transfer.c |   17 +++++++++++++++--
- gobex/gobex.c          |    4 ++--
- gobex/gobex.h          |    5 ++++-
- 3 files changed, 21 insertions(+), 5 deletions(-)
+Hi Lucas,
 
-diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-index c62a91e..1627e9d 100644
---- a/gobex/gobex-transfer.c
-+++ b/gobex/gobex-transfer.c
-@@ -624,9 +624,11 @@ guint g_obex_get_rsp(GObex *obex, GObexDataProducer data_func,
- 							user_data, err);
- }
- 
--gboolean g_obex_cancel_transfer(guint id)
-+gboolean g_obex_cancel_transfer(guint id, GObexFunc complete_func,
-+			gpointer user_data)
- {
- 	struct transfer *transfer = NULL;
-+	gboolean ret = TRUE;
- 
- 	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", id);
- 
-@@ -635,6 +637,17 @@ gboolean g_obex_cancel_transfer(guint id)
- 	if (transfer == NULL)
- 		return FALSE;
- 
--	transfer_free(transfer);
-+	if (complete_func == NULL)
-+		goto free;
-+
-+	transfer->complete_func = complete_func;
-+	transfer->user_data = user_data;
-+	if ((ret = g_obex_pending_req_abort(transfer->obex, NULL)) == FALSE)
-+		goto free;
-+
- 	return TRUE;
-+
-+free:
-+	transfer_free(transfer);
-+	return ret;
- }
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index f31b733..b20542d 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -684,7 +684,7 @@ static gint pending_pkt_cmp(gconstpointer a, gconstpointer b)
- 	return (p->id - id);
- }
- 
--static gboolean pending_req_abort(GObex *obex, GError **err)
-+gboolean g_obex_pending_req_abort(GObex *obex, GError **err)
- {
- 	struct pending_pkt *p = obex->pending_req;
- 	GObexPacket *req;
-@@ -728,7 +728,7 @@ gboolean g_obex_cancel_req(GObex *obex, guint req_id, gboolean remove_callback)
- 	struct pending_pkt *p;
- 
- 	if (obex->pending_req && obex->pending_req->id == req_id) {
--		if (!pending_req_abort(obex, NULL)) {
-+		if (!g_obex_pending_req_abort(obex, NULL)) {
- 			p = obex->pending_req;
- 			obex->pending_req = NULL;
- 			goto immediate_completion;
-diff --git a/gobex/gobex.h b/gobex/gobex.h
-index aacdb53..8cbabb6 100644
---- a/gobex/gobex.h
-+++ b/gobex/gobex.h
-@@ -49,6 +49,8 @@ guint g_obex_send_req(GObex *obex, GObexPacket *req, gint timeout,
- gboolean g_obex_cancel_req(GObex *obex, guint req_id,
- 						gboolean remove_callback);
- 
-+gboolean g_obex_pending_req_abort(GObex *obex, GError **err);
-+
- gboolean g_obex_send_rsp(GObex *obex, guint8 rspcode, GError **err,
- 						guint8 first_hdr_type, ...);
- 
-@@ -122,7 +124,8 @@ guint g_obex_get_rsp_pkt(GObex *obex, GObexPacket *rsp,
- 			GObexDataProducer data_func, GObexFunc complete_func,
- 			gpointer user_data, GError **err);
- 
--gboolean g_obex_cancel_transfer(guint id);
-+gboolean g_obex_cancel_transfer(guint id, GObexFunc complete_func,
-+			gpointer user_data);
- 
- const char *g_obex_strerror(guint8 err_code);
- guint8 g_obex_errno_to_rsp(int err);
+On Mon, Apr 30, 2012 at 12:40 AM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+>
+> Since we are using '[' and ']' only internally. I don't see a problem
+> with that. If D-Bus start using it we can change later. Of course it's
+> better to convince D-Bus guys to reserve that, but IMO this shouldn't
+> be a blocker.
+>
+> From the chars you suggested, only '@' seems reasonable and I can
+> change to this char if we agree on it.
+
+ Either way IMO it is ugly to mess around with the signature but
+perhaps it is the only alternative we have.
+
+I wonder how other binding works in this regard, or they always have
+to depend on a xml file that describes the interface? iirc that used
+to be the case for GTK and QT, perhaps python is the only one that can
+really make use of this in runtime as d-feet seems to be able to use
+this information already.
+
 -- 
-1.7.1
-
+Luiz Augusto von Dentz
