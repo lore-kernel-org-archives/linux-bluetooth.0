@@ -2,73 +2,125 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Subject: [PATCH obexd v1 6/6] client: Remove transfer from queue before callback
-Date: Mon, 30 Apr 2012 17:26:27 +0200
-Message-Id: <1335799587-10370-7-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v1 4/6] client: Use new session callback style in modules
+Date: Mon, 30 Apr 2012 17:26:25 +0200
+Message-Id: <1335799587-10370-5-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1335799587-10370-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1335799587-10370-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is safer to remove the transfer from the internal queue (including
-session->p) before calling the transfer callback. This makes sure the
-callback will not manipulate the session in a way that the transfer is
-removed more than once.
-
-This was previously protected with session->p->id != 0 checks, but once
-the new callbacks have been adopted in session API, this logic can be
-removed.
+The session API now provides the transfer object in the callback, so
+the modules can directly access the transfer object.
 ---
- client/session.c |   20 +++++++++-----------
- 1 files changed, 9 insertions(+), 11 deletions(-)
+ client/ftp.c     |    2 +-
+ client/manager.c |    2 +-
+ client/map.c     |    2 +-
+ client/pbap.c    |   10 +++++-----
+ client/sync.c    |    2 +-
+ 5 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/client/session.c b/client/session.c
-index b994080..3a8807b 100644
---- a/client/session.c
-+++ b/client/session.c
-@@ -497,12 +497,13 @@ void obc_session_shutdown(struct obc_session *session)
- 						"Session closed by user");
+diff --git a/client/ftp.c b/client/ftp.c
+index 0cb3adc..86c2a3c 100644
+--- a/client/ftp.c
++++ b/client/ftp.c
+@@ -204,7 +204,7 @@ static void list_folder_callback(struct obc_session *session,
  
- 	if (session->p != NULL && session->p->id != 0) {
--		if (session->p->func)
--			session->p->func(session, session->p->transfer, err,
--							session->p->data);
--
--		pending_request_free(session->p);
-+		p = session->p;
- 		session->p = NULL;
-+
-+		if (p->func)
-+			p->func(session, p->transfer, err, p->data);
-+
-+		pending_request_free(p);
+ 	reply = dbus_message_new_method_return(msg);
+ 
+-	if (obc_session_get_contents(session, &contents, &size) < 0)
++	if (obc_transfer_get_contents(transfer, &contents, &size) < 0)
+ 		goto done;
+ 
+ 	dbus_message_iter_init_append(reply, &iter);
+diff --git a/client/manager.c b/client/manager.c
+index 820ef37..a46519f 100644
+--- a/client/manager.c
++++ b/client/manager.c
+@@ -468,7 +468,7 @@ static void capabilities_complete_callback(struct obc_session *session,
+ 		goto done;
  	}
  
- 	while ((p = g_queue_pop_head(session->queue))) {
-@@ -836,9 +837,8 @@ static void session_terminate_transfer(struct obc_session *session,
+-	perr = obc_session_get_contents(session, &contents, &size);
++	perr = obc_transfer_get_contents(transfer, &contents, &size);
+ 	if (perr < 0) {
+ 		DBusMessage *error = g_dbus_create_error(data->message,
+ 						"org.openobex.Error.Failed",
+diff --git a/client/map.c b/client/map.c
+index 50d02c6..eb06834 100644
+--- a/client/map.c
++++ b/client/map.c
+@@ -113,7 +113,7 @@ static void buffer_cb(struct obc_session *session,
+ 		goto done;
+ 	}
  
- 		p = match->data;
- 		g_queue_delete_link(session->queue, match);
--	}
--
--	p->id = 0;
-+	} else
-+		session->p = NULL;
- 
- 	obc_session_ref(session);
- 
-@@ -847,10 +847,8 @@ static void session_terminate_transfer(struct obc_session *session,
- 
- 	pending_request_free(p);
- 
--	if (p == session->p) {
--		session->p = NULL;
-+	if (session->p == NULL)
- 		session_process_queue(session);
--	}
- 
- 	obc_session_unref(session);
+-	perr = obc_session_get_contents(session, &contents, &size);
++	perr = obc_transfer_get_contents(transfer, &contents, &size);
+ 	if (perr < 0) {
+ 		reply = g_dbus_create_error(map->msg,
+ 						"org.openobex.Error.Failed",
+diff --git a/client/pbap.c b/client/pbap.c
+index c43d8dd..b178aff 100644
+--- a/client/pbap.c
++++ b/client/pbap.c
+@@ -293,7 +293,7 @@ static void pbap_setpath_cb(struct obc_session *session,
+ 	pending_request_free(request);
  }
+ 
+-static void read_return_apparam(struct obc_session *session,
++static void read_return_apparam(struct obc_transfer *transfer,
+ 				guint16 *phone_book_size, guint8 *new_missed_calls)
+ {
+ 	const struct apparam_hdr *hdr;
+@@ -302,7 +302,7 @@ static void read_return_apparam(struct obc_session *session,
+ 	*phone_book_size = 0;
+ 	*new_missed_calls = 0;
+ 
+-	hdr = obc_session_get_params(session, &size);
++	hdr = obc_transfer_get_params(transfer, &size);
+ 	if (hdr == NULL)
+ 		return;
+ 
+@@ -357,7 +357,7 @@ static void pull_phonebook_callback(struct obc_session *session,
+ 		goto send;
+ 	}
+ 
+-	perr = obc_session_get_contents(session, &contents, &size);
++	perr = obc_transfer_get_contents(transfer, &contents, &size);
+ 	if (perr < 0) {
+ 		reply = g_dbus_create_error(request->msg,
+ 						"org.openobex.Error.Failed",
+@@ -397,7 +397,7 @@ static void phonebook_size_callback(struct obc_session *session,
+ 
+ 	reply = dbus_message_new_method_return(request->msg);
+ 
+-	read_return_apparam(session, &phone_book_size, &new_missed_calls);
++	read_return_apparam(transfer, &phone_book_size, &new_missed_calls);
+ 
+ 	dbus_message_append_args(reply,
+ 			DBUS_TYPE_UINT16, &phone_book_size,
+@@ -427,7 +427,7 @@ static void pull_vcard_listing_callback(struct obc_session *session,
+ 		goto send;
+ 	}
+ 
+-	perr = obc_session_get_contents(session, &contents, &size);
++	perr = obc_transfer_get_contents(transfer, &contents, &size);
+ 	if (perr < 0) {
+ 		reply = g_dbus_create_error(request->msg,
+ 						"org.openobex.Error.Failed",
+diff --git a/client/sync.c b/client/sync.c
+index c549040..c0b3800 100644
+--- a/client/sync.c
++++ b/client/sync.c
+@@ -101,7 +101,7 @@ static void sync_getphonebook_callback(struct obc_session *session,
+ 		goto send;
+ 	}
+ 
+-	perr = obc_session_get_contents(session, &contents, &size);
++	perr = obc_transfer_get_contents(transfer, &contents, &size);
+ 	if (perr < 0) {
+ 		reply = g_dbus_create_error(sync->msg,
+ 						"org.openobex.Error.Failed",
 -- 
 1.7.7.6
 
