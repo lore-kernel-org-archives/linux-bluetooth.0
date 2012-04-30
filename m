@@ -2,41 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Jaganath Kanakkassery <jaganath.k@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH obexd] opp: Emit TransferStarted signal only if stream start is
- success
-Date: Mon, 30 Apr 2012 16:41:41 +0530
-Message-id: <1335784301-7606-1-git-send-email-jaganath.k@samsung.com>
+Subject: [PATCH obexd 3/3] gobex: Remove g_idle_add to exit main loop in
+ test_stream_put_req_abort()
+Date: Mon, 30 Apr 2012 16:34:13 +0530
+Message-id: <1335783853-7462-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Even if obex_put_stream_start() fails TransferStarted signal will be
-emitted where as transfer start is actually failed.
+A callback is provided in g_obex_cancel_transfer() which will be called
+when abort completes which exists the mail loop as well
 ---
- plugins/opp.c |    7 +++++--
- 1 files changed, 5 insertions(+), 2 deletions(-)
+ unit/test-gobex-transfer.c |   10 +++-------
+ 1 files changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/plugins/opp.c b/plugins/opp.c
-index fa3ee91..c7ddc63 100644
---- a/plugins/opp.c
-+++ b/plugins/opp.c
-@@ -154,12 +154,15 @@ skip_auth:
+diff --git a/unit/test-gobex-transfer.c b/unit/test-gobex-transfer.c
+index 85ba6fa..2f05784 100644
+--- a/unit/test-gobex-transfer.c
++++ b/unit/test-gobex-transfer.c
+@@ -456,12 +456,8 @@ static gboolean cancel_transfer(gpointer user_data)
+ {
+ 	struct test_data *d = user_data;
  
- 	path = g_build_filename(folder, name, NULL);
+-	if (d->id > 0) {
+-		g_obex_cancel_transfer(d->id);
+-		d->id = 0;
+-		g_idle_add(cancel_transfer, user_data);
+-	} else
+-		g_main_loop_quit(d->mainloop);
++	if (d->id > 0)
++		g_obex_cancel_transfer(d->id, transfer_complete, user_data);
  
--	manager_emit_transfer_started(os);
--
- 	err = obex_put_stream_start(os, path);
+ 	return FALSE;
+ }
+@@ -509,7 +505,7 @@ static void test_stream_put_req_abort(void)
+ 	g_source_remove(io_id);
+ 	g_obex_unref(obex);
  
- 	g_free(path);
+-	g_assert_no_error(d.err);
++	g_assert_error(d.err, G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED);
+ }
  
-+	if (err < 0)
-+		goto failed;
-+
-+	manager_emit_transfer_started(os);
-+
- failed:
- 	g_free(folder);
- 	g_free(name);
+ static void test_stream_put_rsp_abort(void)
 -- 
 1.7.1
 
