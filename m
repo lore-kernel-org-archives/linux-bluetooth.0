@@ -1,45 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <201205011821.q41ILXXx011867@imr-ma03.mx.aol.com>
-References: <201204271541.q3RFfVd5006035@imr-da04.mx.aol.com>
-	<4F9B0108.2000007@tu-ilmenau.de>
-	<CABBYNZJ2ygZ42r==cDbBFmtzmOFTA-HnDCWk_XM669pHYtfs5Q@mail.gmail.com>
-	<201205011821.q41ILXXx011867@imr-ma03.mx.aol.com>
-Date: Wed, 2 May 2012 11:08:34 +0300
-Message-ID: <CABBYNZLLCj_cA__ZQazR81OUScbtAKJrbCfV70O3BgTC05=ueg@mail.gmail.com>
-Subject: Re: main.conf issues
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Kal Torak <chronognosis@aim.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 1 May 2012 17:24:54 -0600
+From: Jonathan Corbet <corbet@lwn.net>
+To: Matthew Garrett <mjg59@srcf.ucam.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [now bisected] Weird bluetooth keyboard regression - just me?
+Message-ID: <20120501172454.0e811379@lwn.net>
+In-Reply-To: <20120501192736.GA29770@srcf.ucam.org>
+References: <20120501073711.028d31d6@lwn.net>
+	<20120501110156.2b6e0561@lwn.net>
+	<20120501171901.GA26006@srcf.ucam.org>
+	<20120501120145.21f65ae2@lwn.net>
+	<20120501183149.GA28536@srcf.ucam.org>
+	<20120501123923.01ac1138@lwn.net>
+	<20120501185455.GA29060@srcf.ucam.org>
+	<20120501192736.GA29770@srcf.ucam.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kal,
+On Tue, 1 May 2012 20:27:36 +0100
+Matthew Garrett <mjg59@srcf.ucam.org> wrote:
 
-On Tue, May 1, 2012 at 9:20 PM, Kal Torak <chronognosis@aim.com> wrote:
->> You don't have to do that in main.conf, except for class, those values
->> are only used when there is nothing already configured, so to change
->> this you really should be using D-Bus. You can find under
->> tests/test-adapter how to set this permanently in the configuration of
->> the adapter.
->>
-> I do that, via tests/test-adapter, and right now it works, thanks to
-> both. I was paired both devices, my phone with my pc and I can use
-> obex-stuff and so. But when I've paired devices, then this appears
-> at /var/log/messages
->
-> May  1 14:10:33 p5s800-vm dbus[411]: [system] Rejected send message, 2
-> matched rules; type="method_call", sender=":1.37" (uid=100 pid=1037
-> comm="/usr/bin/pulseaudio --start ") interface="org.bluez.Device"
-> member="GetProperties" error name="(unset)" requested_reply="0"
-> destination="org.bluez" (uid=0 pid=603 comm="/usr/sbin/bluetoothd ")
+> What does removable in the parent device say? 
 
-It seems some security policy is blocking PulseAudio to send messages
-to bluetoothd, check your /etc/dbus-1/system.d/bluetooth.conf, there
-is a sample configuration file in the repository src/bluetooth.conf
-which should work with PulseAudio.
+"unknown".
 
+> In either case, does the 
+> attached file help if dropped into /lib/udev/rules.d ?
 
--- 
-Luiz Augusto von Dentz
+Nope, no joy there.  
+
+Thanks,
+
+jon
