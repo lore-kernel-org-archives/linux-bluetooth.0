@@ -1,35 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 1 May 2012 13:00:14 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Jonathan Corbet <corbet@lwn.net>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: Weird bluetooth keyboard regression - just me?
-Message-ID: <20120501160014.GB1419@joana>
-References: <20120501073711.028d31d6@lwn.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120501073711.028d31d6@lwn.net>
+Message-id: <689E6E1F4998496D92F8631D325F12A3@sisodomain.com>
+From: Syam Sidhardhan <s.syam@samsung.com>
+To: Andre Guedes <andre.guedes@openbossa.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org,
+	Vinicius Gomes <vinicius.gomes@openbossa.org>
+References: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
+ <1334243001-17016-27-git-send-email-s.syam@samsung.com>
+ <20120413221700.GF1680@joana>
+ <CACJA=fW=3ZHUh1r-TzDPhsxydRkDJiN62Dg4yMetw1v+i-zf_Q@mail.gmail.com>
+Subject: Re: [PATCH 1/5] Bluetooth: Remove unused hci_le_ltk_reply()
+Date: Tue, 01 May 2012 21:18:28 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jon,
+Hi,
+----- Original Message ----- 
+From: "Andre Guedes" <andre.guedes@openbossa.org>
+To: "Gustavo Padovan" <gustavo@padovan.org>; "Syam Sidhardhan" 
+<s.syam@samsung.com>; <linux-bluetooth@vger.kernel.org>; "Vinicius Gomes" 
+<vinicius.gomes@openbossa.org>
+Sent: Friday, April 20, 2012 11:43 PM
+Subject: Re: [PATCH 1/5] Bluetooth: Remove unused hci_le_ltk_reply()
 
-* Jonathan Corbet <corbet@lwn.net> [2012-05-01 07:37:11 -0600]:
 
-> Life has not been conducive to frivolities like trying new kernels, but I
-> finally gave 3.4-rc5 a go yesterday.  I'm seeing some decidedly weird
-> keyboard behavior; it seems surprising that nobody else has complained.
-> 
-> I have a logitech Dinovo Edge bluetooth keyboard that I've used for
-> years.  With 3.4 kernels, the keyboard generates no input until I've
-> banged on it for a couple of seconds.  If I continually hit characters,
-> they make it through; as soon as I stop for even a brief period (even
-> somebody as verbose as me has to come up for air occasionally), it goes
-> back to sleep.
+> Hi Syam/Gustavo,
+>
+> On Fri, Apr 13, 2012 at 7:17 PM, Gustavo Padovan <gustavo@padovan.org> 
+> wrote:
+>> Hi Syam,
+>>
+>> * Syam Sidhardhan <s.syam@samsung.com> [2012-04-12 20:33:17 +0530]:
+>>
+>>> In this API, we were using sizeof operator for an array
+>>> given as function argument, which is invalid.
+>>> However this API is not used anywhere.
+>>>
+>>> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+>>> ---
+>>> include/net/bluetooth/hci_core.h | 1 -
+>>> net/bluetooth/hci_conn.c | 16 ----------------
+>>> 2 files changed, 0 insertions(+), 17 deletions(-)
+>>>
+>>> diff --git a/include/net/bluetooth/hci_core.h 
+>>> b/include/net/bluetooth/hci_core.h
+>>> index c0b232c..6e170de 100644
+>>> --- a/include/net/bluetooth/hci_core.h
+>>> +++ b/include/net/bluetooth/hci_core.h
+>>> @@ -1069,7 +1069,6 @@ void hci_le_conn_update(struct hci_conn *conn, u16 
+>>> min, u16 max,
+>>> u16 latency, u16 to_multiplier);
+>>> void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
+>>> __u8 ltk[16]);
+>>> -void hci_le_ltk_reply(struct hci_conn *conn, u8 ltk[16]);
+>>
+>> I'll let Andre comment here, I'm not sure if this is going to be used on
+>> the future or not.
+>
+> I'm not sure too, I think Vinicius can tell more about that.
+>
+> Regarding the memcpy call, yes, it is definitely bogus.
+>
 
-This looks weird, I suspect of something. Could you try running
-'bluetoothd -nd -P mgmtops' and check if the problem still happens too
-you?
+ping
 
-	Gustavo
+Regards,
+Syam 
+
