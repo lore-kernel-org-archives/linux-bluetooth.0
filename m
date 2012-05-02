@@ -1,43 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <867ED1B9D6CB4EF3A2D0D64A55AB021C@sisodomain.com>
-From: Jaganath <jaganath.k@samsung.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1335784301-7606-1-git-send-email-jaganath.k@samsung.com>
+References: <1335784301-7606-1-git-send-email-jaganath.k@samsung.com>
+Date: Wed, 2 May 2012 16:13:06 +0300
+Message-ID: <CABBYNZJE321X-iK6oU203t-8xzdcnsDZQxTV-g4YwKZ_fGrBnA@mail.gmail.com>
+Subject: Re: [PATCH obexd] opp: Emit TransferStarted signal only if stream
+ start is success
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
 Cc: linux-bluetooth@vger.kernel.org
-References: <1335783741-7398-1-git-send-email-jaganath.k@samsung.com>
- <CABBYNZ+DeySnQQvmgu9i9YX8_KHw50vnQigqiJnSetyLFHMjtA@mail.gmail.com>
-In-reply-to: <CABBYNZ+DeySnQQvmgu9i9YX8_KHw50vnQigqiJnSetyLFHMjtA@mail.gmail.com>
-Subject: Re: [PATCH obexd 1/3] gobex: Add callback and userdata parameter to
- g_obex_cancel_transfer()
-Date: Wed, 02 May 2012 18:57:33 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Jaganath,
 
---------------------------------------------------
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Sent: Wednesday, May 02, 2012 6:02 PM
-To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH obexd 1/3] gobex: Add callback and userdata parameter to 
-g_obex_cancel_transfer()
-
-> Hi Jaganath,
+On Mon, Apr 30, 2012 at 2:11 PM, Jaganath Kanakkassery
+<jaganath.k@samsung.com> wrote:
+> Even if obex_put_stream_start() fails TransferStarted signal will be
+> emitted where as transfer start is actually failed.
+> ---
+>  plugins/opp.c |    7 +++++--
+>  1 files changed, 5 insertions(+), 2 deletions(-)
 >
-> On Mon, Apr 30, 2012 at 2:02 PM, Jaganath Kanakkassery
-> <jaganath.k@samsung.com> wrote:
->> +free:
->> +       transfer_free(transfer);
->> +       return ret;
->>  }
+> diff --git a/plugins/opp.c b/plugins/opp.c
+> index fa3ee91..c7ddc63 100644
+> --- a/plugins/opp.c
+> +++ b/plugins/opp.c
+> @@ -154,12 +154,15 @@ skip_auth:
 >
-> Just be completely save here name the label something else than free
-> (e.g. done).
+>        path = g_build_filename(folder, name, NULL);
+>
+> -       manager_emit_transfer_started(os);
+> -
+>        err = obex_put_stream_start(os, path);
+>
+>        g_free(path);
+>
+> +       if (err < 0)
+> +               goto failed;
+> +
+> +       manager_emit_transfer_started(os);
+> +
+>  failed:
+>        g_free(folder);
+>        g_free(name);
+> --
+> 1.7.1
 
-Ok, I will rename it to done and send patch.
+Applied, thanks.
 
-Thanks,
-Jaganath 
-
+-- 
+Luiz Augusto von Dentz
