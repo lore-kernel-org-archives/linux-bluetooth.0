@@ -1,191 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4FA1BB1C.6060409@tu-ilmenau.de>
-Date: Thu, 03 May 2012 00:54:20 +0200
-From: Steffen Becker <steffen.becker@tu-ilmenau.de>
+Date: Wed, 2 May 2012 19:49:25 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next 2012-05-02
+Message-ID: <20120502222749.GD16030@joana>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Can't connect Bluetooth Devices
-References: <4F968FF7.7060303@tu-ilmenau.de>
-In-Reply-To: <4F968FF7.7060303@tu-ilmenau.de>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="10jrOL3x2xqLmOsH"
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello everyone,
 
-Am 24.04.2012 13:35, schrieb Steffen Becker:
-> Hello,
->
-> I still have a problem to connect my bluetooth devices via pand 
-> command. I've been searching the internet and asked in forums, but i 
-> didn't get an answer.
->
-> I have 2 gentoo-PCs with a Bluetooth-3.0 Dongle at each PC.
-> Circa 2 weeks ago, everything worked. BlueZ-4.96 was installed and I 
-> had no problems to connect my devices via pand and via rfcomm command.
-> But then I asked you for an SSP debug mode patch, because I wanted to 
-> sniff my rfcomm connection. At the same time BlueZ-4.99 was released 
-> and so I installed the new BlueZ-version and the patch.
-> I also deleted the stored linkkey and I was happy that I was able to 
-> sniff my rfcomm-connection.
-> But thenceforth I can't connect my devices via pand command.
->
-> Then I tried to install the BlueZ-4.99 *without* the patch, but I 
-> still couldn't connect via pand.
-> I also tried to install BlueZ-4.96, but the problem was still the 
-> same. So I think it's no problem of the patch or the newer 
-> BlueZ-version, but I really have no idea what's wrong.
->
-> If you need any of my configuration-files, just tell me and I will 
-> send it.
->
-> In the end, I show the hcidump message when I try to connect via pand 
-> command.
->
-> Hope anyone can help me.
->
-> Regards,
-> Steffen
->
->
-> # hcidump -i hci0
-> HCI sniffer - Bluetooth packet analyzer ver 2.3
-> device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
-> > HCI Event: Connect Request (0x04) plen 10
->     bdaddr 00:02:72:AE:58:73 class 0x420100 type ACL
-> < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
->     bdaddr 00:02:72:AE:58:73 role 0x00
->     Role: Master
-> > HCI Event: Command Status (0x0f) plen 4
->     Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
-> > HCI Event: Role Change (0x12) plen 8
->     status 0x00 bdaddr 00:02:72:AE:58:73 role 0x00
->     Role: Master
-> > HCI Event: Connect Complete (0x03) plen 11
->     status 0x00 handle 11 bdaddr 00:02:72:AE:58:73 type ACL encrypt 0x00
-> < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
->     handle 11
-> > HCI Event: Max Slots Change (0x1b) plen 3
->     handle 11 slots 5
-> > HCI Event: Command Status (0x0f) plen 4
->     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-> > HCI Event: Read Remote Supported Features (0x0b) plen 11
->     status 0x00 handle 11
->     Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x79 0x87
-> < HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
->     handle 11 page 1
-> > HCI Event: Command Status (0x0f) plen 4
->     Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
-> > HCI Event: Read Remote Extended Features (0x23) plen 13
->     status 0x00 handle 11 page 1 max 1
->     Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
->     bdaddr 00:02:72:AE:58:73 mode 2 clkoffset 0x0000
-> > HCI Event: Command Status (0x0f) plen 4
->     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> > HCI Event: Remote Name Req Complete (0x07) plen 255
->     status 0x00 bdaddr 00:02:72:AE:58:73 name 'bluetooth1-0'
-> > HCI Event: IO Capability Response (0x32) plen 9
->     bdaddr 00:02:72:AE:58:73 capability 0x03 oob 0x00 auth 0x00
->     Capability: NoInputNoOutput (OOB data not present)
->     Authentication: No Bonding (No MITM Protection)
-> > HCI Event: IO Capability Request (0x31) plen 6
->     bdaddr 00:02:72:AE:58:73
-> < HCI Command: IO Capability Request Reply (0x01|0x002b) plen 9
->     bdaddr 00:02:72:AE:58:73 capability 0x03 oob 0x00 auth 0x00
->     Capability: NoInputNoOutput (OOB data not present)
->     Authentication: No Bonding (No MITM Protection)
-> > HCI Event: Command Complete (0x0e) plen 10
->     IO Capability Request Reply (0x01|0x002b) ncmd 1
->     status 0x00 bdaddr 00:02:72:AE:58:73
-> > HCI Event: User Confirmation Request (0x33) plen 10
->     bdaddr 00:02:72:AE:58:73 passkey 800553
-> < HCI Command: User Confirmation Request Reply (0x01|0x002c) plen 6
->     bdaddr 00:02:72:AE:58:73
-> > HCI Event: Command Complete (0x0e) plen 10
->     User Confirmation Request Reply (0x01|0x002c) ncmd 1
->     status 0x00 bdaddr 00:02:72:AE:58:73
-> > HCI Event: Simple Pairing Complete (0x36) plen 7
->     status 0x00 bdaddr 00:02:72:AE:58:73
-> > HCI Event: Link Key Notification (0x18) plen 23
->     bdaddr 00:02:72:AE:58:73 key E1C30FE5E1D620AC6DC78BB5A4AC299A type 4
->     Type: Unauthenticated Combination Key
-> > HCI Event: Encrypt Change (0x08) plen 4
->     status 0x00 handle 11 encrypt 0x01
-> > ACL data: handle 11 flags 0x02 dlen 10
->     L2CAP(s): Info req: type 2
-> < ACL data: handle 11 flags 0x00 dlen 16
->     L2CAP(s): Info rsp: type 2 result 0
->       Extended feature mask 0x00b8
->         Enhanced Retransmission mode
->         Streaming mode
->         FCS Option
->         Fixed Channels
-> > ACL data: handle 11 flags 0x02 dlen 10
->     L2CAP(s): Info req: type 3
-> < ACL data: handle 11 flags 0x00 dlen 20
->     L2CAP(s): Info rsp: type 3 result 0
->       Fixed channel list 0x00000002
->         L2CAP Signalling Channel
-> > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 11 packets 2
-> > ACL data: handle 11 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 15 scid 0x0040
-> < ACL data: handle 11 flags 0x00 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 0
->       Connection pending - No futher information available
-> < ACL data: handle 11 flags 0x00 dlen 10
->     L2CAP(s): Info req: type 2
-> > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 11 packets 2
-> > ACL data: handle 11 flags 0x02 dlen 16
->     L2CAP(s): Info rsp: type 2 result 0
->       Extended feature mask 0x00b8
->         Enhanced Retransmission mode
->         Streaming mode
->         FCS Option
->         Fixed Channels
-> < ACL data: handle 11 flags 0x00 dlen 10
->     L2CAP(s): Info req: type 3
-> > ACL data: handle 11 flags 0x02 dlen 20
->     L2CAP(s): Info rsp: type 3 result 0
->       Fixed channel list 0x00000002
->         L2CAP Signalling Channel
-> < ACL data: handle 11 flags 0x00 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 2
->       Connection pending - Authorization pending
-> < ACL data: handle 11 flags 0x00 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 3 status 0
->       Connection refused - security block
-> > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 11 packets 2
-> > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 11 packets 1
-> > HCI Event: Disconn Complete (0x05) plen 4
->     status 0x00 handle 11 reason 0x13
->     Reason: Remote User Terminated Connection
->
-> -- 
-> To unsubscribe from this list: send the line "unsubscribe 
-> linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+--10jrOL3x2xqLmOsH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-That's still my problem, but now I have a different question regarding
-to that:
-As I said, I deleted the stored linkkey to get my rfcomm-connection sniffed.
-Now I think this (deleting the linkkey) is the problem why I can't
-connect via pand. Am I right?
-With "deleting" I mean: I just deleted the file "linkkeys" in
-/var/lib/bluetooth/<local-bdaddr>/
+Hi John,
 
-So my question is: How can I create a new linkkey (so that hopefully my
-pand-connection works) ?
-I tried the command "hciconfig hci0 putkey" but nothing happened.
-I also tried to copy a backup-file ("linkkeys"-file) into both of my
-/var/lib/bluetooth-folders, but it looks like the devices don't use the
-key from that backup-file.
+Another set of changes to the 3.5 kernel. The main changes here are in the =
+LE
+code, by Andre Guedes and in the L2CAP ERTM implementation by Mat Martineau.
+The rest of the patches are just clean up and small fixes.
 
-Regards,
-Steffen
+Please pull!=20
 
+	Gustavo
+
+---
+
+The following changes since commit 11069ef318f92fb5960ebd7f9c01e5bc0dcb63fc:
+
+  mac80211: don't transmit 40MHz frames to 20MHz peer (2012-04-27 16:07:24 =
+-0400)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next fo=
+r-upstream
+
+for you to fetch changes up to 6bed2e71fa55572b6e1355594a119e54b20eb426:
+
+  bluetooth: Add support for Foxconn/Hon Hai AR5BBU22 0489:E03C (2012-05-02=
+ 18:13:29 -0300)
+
+----------------------------------------------------------------
+Amitkumar Karwar (1):
+      Bluetooth: btmrvl: configure default host sleep parameters
+
+Andre Guedes (9):
+      Bluetooth: Remove useless code in hci_connect
+      Bluetooth: Move address type macros to bluetooth.h
+      Bluetooth: Rename link_to_mgmt to link_to_bdaddr
+      Bluetooth: Rename mgmt_to_le to bdaddr_to_le
+      Bluetooth: Add address type to struct sockaddr_l2
+      Bluetooth: Move bdaddr_to_le to hci_core
+      Bluetooth: Add dst_type parameter to hci_connect
+      Bluetooth: Use address type info from user-space
+      Bluetooth: Remove advertising cache
+
+Gustavo Padovan (1):
+      Bluetooth: Remove unneeded elements from size calculation
+
+Johan Hedberg (1):
+      Bluetooth: Fix Inquiry with RSSI event mask
+
+Mat Martineau (8):
+      Bluetooth: Improve ERTM sequence number offset calculation
+      Bluetooth: Remove duplicate structure members from bt_skb_cb
+      Bluetooth: Move recently-added ERTM header packing functions
+      Bluetooth: Move recently-added ERTM header unpacking functions
+      Bluetooth: Initialize new l2cap_chan structure members
+      Bluetooth: Remove unused function
+      Bluetooth: Make better use of l2cap_chan reference counting
+      Bluetooth: Add Code Aurora Forum copyright
+
+Michael Gruetzner (1):
+      bluetooth: Add support for Foxconn/Hon Hai AR5BBU22 0489:E03C
+
+Syam Sidhardhan (1):
+      Bluetooth: Remove unused hci_le_ltk_reply()
+
+Vishal Agarwal (1):
+      Bluetooth: Fix EIR data generation for mgmt_device_found
+
+ drivers/bluetooth/ath3k.c         |    6 +
+ drivers/bluetooth/btmrvl_drv.h    |    1 +
+ drivers/bluetooth/btmrvl_main.c   |   53 ++++---
+ drivers/bluetooth/btmrvl_sdio.c   |    3 +
+ drivers/bluetooth/btusb.c         |    3 +
+ include/net/bluetooth/bluetooth.h |    8 +-
+ include/net/bluetooth/hci_core.h  |   47 ++++---
+ include/net/bluetooth/l2cap.h     |   14 +-
+ net/bluetooth/hci_conn.c          |   30 +---
+ net/bluetooth/hci_core.c          |   86 ++----------
+ net/bluetooth/hci_event.c         |   13 +-
+ net/bluetooth/l2cap_core.c        |  294 ++++++++++++++++++++-------------=
+------
+ net/bluetooth/l2cap_sock.c        |    5 +-
+ net/bluetooth/mgmt.c              |   78 +++++------
+ net/bluetooth/sco.c               |    3 +-
+ 15 files changed, 289 insertions(+), 355 deletions(-)
+
+--10jrOL3x2xqLmOsH
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBAgAGBQJPobn1AAoJEPs3PUX4s20oD+EQAIKEdbkeQjl9tfv9mtynmE3O
+NLqzeLswpGqOuMPuM4yaH4Lb5KdM+NLNyQUSMz1XCDGgGmd2rhixUCATsmKZXG6b
+KpHPl77pdKO0wfhJGkk9N+S/wop5v+exUI7dC+rB+7TSNIX78zRrh+hFTDXEqwKz
+8Rel3RH3tk9BlzhlPyinCFy443BxufKfPm562+1klfLfiOoWXwgFG1ryVyWTO3oZ
+CpXmDGCSfEQvBDmF/8bKSO5chmiBen7gO824sqiWpqdpxvZTsiwuGO/aClikNJZN
+dJeuTxaTxT1cyouvAcL2tMlOr2q/wtYMZGgkP5tZi1migu0A2dKSJI2wJSfaG5fN
+14bR4gFKfqMTQLKQMUado4k1uVh+AhlwDLs4R66hrk4S7hJRyCZZmrjmRZX+WPQm
+P2l3eXLSzrsGkZcE8JpKEWuA3awYC4+hERx4Hx5xBvh+9wBJZCgZu5nLIMWY+iZx
+3ErDL8Nr1ddXfvHGAVyzc+ECYLsrQ1orTJHEw+wJxwOnbnF6SqvHYOW5SXMppOuN
+8wdW8YNEI8sB5XG3oMYdQEOT3eFtDSdj9jsIq+E6w9NzR45lv6rzjTXsTPO4lHr5
+9IH+h380yB2WA5AU3lEiXGwBL1yQnB/7FFM9Zr3TyB0yO7QY9cMlCfObWMxnxCEU
+Q+HF+Bp5pXcnKHVHwZmV
+=2AA6
+-----END PGP SIGNATURE-----
+
+--10jrOL3x2xqLmOsH--
