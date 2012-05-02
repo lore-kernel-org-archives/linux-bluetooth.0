@@ -1,36 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH BlueZ] audio: Reset hfp and hs handle before connection
-Date: Wed, 02 May 2012 15:41:20 +0530
-Message-id: <1335953480-8902-1-git-send-email-jaganath.k@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <201205011821.q41ILXXx011867@imr-ma03.mx.aol.com>
+References: <201204271541.q3RFfVd5006035@imr-da04.mx.aol.com>
+	<4F9B0108.2000007@tu-ilmenau.de>
+	<CABBYNZJ2ygZ42r==cDbBFmtzmOFTA-HnDCWk_XM669pHYtfs5Q@mail.gmail.com>
+	<201205011821.q41ILXXx011867@imr-ma03.mx.aol.com>
+Date: Wed, 2 May 2012 11:08:34 +0300
+Message-ID: <CABBYNZLLCj_cA__ZQazR81OUScbtAKJrbCfV70O3BgTC05=ueg@mail.gmail.com>
+Subject: Re: main.conf issues
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Kal Torak <chronognosis@aim.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When bluez initiates headset connection  hfp and hs handle is saved
-each time when initiating connection. So at some point if hf service
-is removed in remote headset then bluez connects to hs service. But
-because of previously stored hfp handle bluez thinks that connection
-made to hs service is hfp connection and waits for at commands.
-Eventually bluez connection state will be incorrectly set.
----
- audio/headset.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+Hi Kal,
 
-diff --git a/audio/headset.c b/audio/headset.c
-index 04b26a9..27367d7 100644
---- a/audio/headset.c
-+++ b/audio/headset.c
-@@ -1462,6 +1462,8 @@ static int headset_set_channel(struct headset *headset,
- 	}
- 
- 	headset->rfcomm_ch = ch;
-+	headset->hfp_handle = 0;
-+	headset->hsp_handle = 0;
- 
- 	if (svc == HANDSFREE_SVCLASS_ID) {
- 		headset->hfp_handle = record->handle;
+On Tue, May 1, 2012 at 9:20 PM, Kal Torak <chronognosis@aim.com> wrote:
+>> You don't have to do that in main.conf, except for class, those values
+>> are only used when there is nothing already configured, so to change
+>> this you really should be using D-Bus. You can find under
+>> tests/test-adapter how to set this permanently in the configuration of
+>> the adapter.
+>>
+> I do that, via tests/test-adapter, and right now it works, thanks to
+> both. I was paired both devices, my phone with my pc and I can use
+> obex-stuff and so. But when I've paired devices, then this appears
+> at /var/log/messages
+>
+> May  1 14:10:33 p5s800-vm dbus[411]: [system] Rejected send message, 2
+> matched rules; type="method_call", sender=":1.37" (uid=100 pid=1037
+> comm="/usr/bin/pulseaudio --start ") interface="org.bluez.Device"
+> member="GetProperties" error name="(unset)" requested_reply="0"
+> destination="org.bluez" (uid=0 pid=603 comm="/usr/sbin/bluetoothd ")
+
+It seems some security policy is blocking PulseAudio to send messages
+to bluetoothd, check your /etc/dbus-1/system.d/bluetooth.conf, there
+is a sample configuration file in the repository src/bluetooth.conf
+which should work with PulseAudio.
+
+
 -- 
-1.7.1
-
+Luiz Augusto von Dentz
