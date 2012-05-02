@@ -1,59 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1335799587-10370-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1335799587-10370-1-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Wed, 2 May 2012 14:56:45 +0300
-Message-ID: <CABBYNZ+EJqTuhNM6_xQsiKT+PnXVWxQD=ABk=Cx5jnM35uKzhQ@mail.gmail.com>
-Subject: Re: [PATCH obexd v1 0/6] client: rethink transfer data access in
- session API
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Date: Wed, 2 May 2012 14:53:49 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH BlueZ] mgmtops: Fix wrong parameter order for
+ btd_event_ltk_notify()
+Message-ID: <20120502115349.GA20544@x220.ger.corp.intel.com>
+References: <1335538622-8271-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1335538622-8271-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Lizardo,
 
-On Mon, Apr 30, 2012 at 6:26 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> This second version modifies patch v0 2/6 (now v1 3/6 due to new dependency) in order to use one single callback type in session API, according to the proposal from Luiz.
->
-> From previous cover letter:
->
-> This patch series proposes a change in the session API such that the concept of "active transfer" (session->p) is removed from the API. This is possible once the callbacks provide the pointer to the transfer object, which can be used by the modules to access the data they are interested in.
->
-> This transfer object pointer is guaranteed to be valid during the duration of the callback, but nothing else can be assumed. In particular there is no ownership change involved.
->
-> The new approach is less error-prone and avoids API duplication between transfer and session APIs.
->
-> Mikel Astiz (6):
->  client: Minor buffer access API changes
->  client: Avoid GObex dependency from transfer.h
->  client: Give transfer pointer in session callbacks
->  client: Use new session callback style in modules
->  client: Remove deprecated part of session API
->  client: Remove transfer from queue before callback
->
->  client/driver.c   |    2 +
->  client/ftp.c      |   15 +++++---
->  client/manager.c  |   14 ++++++--
->  client/map.c      |   13 ++++---
->  client/opp.c      |    3 ++
->  client/pbap.c     |   27 +++++++++------
->  client/session.c  |   93 ++++++++++++++--------------------------------------
->  client/session.h  |    4 +--
->  client/sync.c     |    4 ++-
->  client/transfer.c |   14 ++++---
->  client/transfer.h |    8 ++--
->  11 files changed, 89 insertions(+), 108 deletions(-)
->
-> --
-> 1.7.7.6
+On Fri, Apr 27, 2012, Anderson Lizardo wrote:
+> The "master" parameter was in the wrong place.
+> ---
+>  plugins/mgmtops.c |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> To those interested, this was not noticed before because:
+> 
+> * We don't use the stored information yet (although we will probably use soon
+>   the "authenticated" field for ATT requests that return "Insufficient
+>   Authentication")
+> * The storage types for master/authenticated/enc_size are compatible.
 
-I reviewed and did some testing but when I was about to apply them I
-noticed that your email has changed after 1/6, could you please fix
-that?
+Applied. Thanks.
 
-
--- 
-Luiz Augusto von Dentz
+Johan
