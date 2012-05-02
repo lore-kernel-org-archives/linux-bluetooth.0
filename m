@@ -1,32 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 May 2012 14:53:49 +0300
+Date: Wed, 2 May 2012 14:41:18 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] mgmtops: Fix wrong parameter order for
- btd_event_ltk_notify()
-Message-ID: <20120502115349.GA20544@x220.ger.corp.intel.com>
-References: <1335538622-8271-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: Re: [PATCH BlueZ v1] audio: Reset hfp and hs handle before connection
+Message-ID: <20120502114118.GA20389@x220.ger.corp.intel.com>
+References: <1335958590-9249-1-git-send-email-jaganath.k@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1335538622-8271-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1335958590-9249-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Jaganath,
 
-On Fri, Apr 27, 2012, Anderson Lizardo wrote:
-> The "master" parameter was in the wrong place.
+On Wed, May 02, 2012, Jaganath Kanakkassery wrote:
+> When bluez initiates headset connection  hfp and hs handle is saved
+> each time when initiating connection. So at some point if hf service
+> is removed in remote headset then bluez connects to hs service. But
+> because of previously stored hfp handle bluez thinks that connection
+> made to hs service is hfp connection and waits for at commands.
+> Eventually bluez connection state will be incorrectly set.
 > ---
->  plugins/mgmtops.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> To those interested, this was not noticed before because:
-> 
-> * We don't use the stored information yet (although we will probably use soon
->   the "authenticated" field for ATT requests that return "Insufficient
->   Authentication")
-> * The storage types for master/authenticated/enc_size are compatible.
+>  audio/headset.c |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
 
 Applied. Thanks.
 
