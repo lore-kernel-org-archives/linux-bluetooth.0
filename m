@@ -1,33 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 May 2012 22:50:34 +0100
-From: Matthew Garrett <mjg59@srcf.ucam.org>
-To: Jonathan Corbet <corbet@lwn.net>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [now bisected] Weird bluetooth keyboard regression - just me?
-Message-ID: <20120502215034.GA622@srcf.ucam.org>
-References: <20120501073711.028d31d6@lwn.net>
- <20120501110156.2b6e0561@lwn.net>
- <20120501171901.GA26006@srcf.ucam.org>
- <20120501120145.21f65ae2@lwn.net>
- <20120501183149.GA28536@srcf.ucam.org>
- <20120501123923.01ac1138@lwn.net>
- <20120501185455.GA29060@srcf.ucam.org>
- <20120501192736.GA29770@srcf.ucam.org>
- <20120501172454.0e811379@lwn.net>
+Date: Wed, 2 May 2012 14:40:35 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org, gustavo@padovan.org, marcel@holtmann.org
+cc: pkrystad@codeaurora.org, ulisses@profusion.mobi,
+    andrei.emeltchenko.news@gmail.com
+Subject: Re: [PATCH 0/4] ERTM state machine changes, part 2
+In-Reply-To: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
+Message-ID: <alpine.DEB.2.02.1205021433560.18552@mathewm-linux>
+References: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120501172454.0e811379@lwn.net>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, May 01, 2012 at 05:24:54PM -0600, Jonathan Corbet wrote:
-> > In either case, does the 
-> > attached file help if dropped into /lib/udev/rules.d ?
-> 
-> Nope, no joy there.  
 
-You tested after rebooting?
+On Wed, 2 May 2012, Mat Martineau wrote:
 
--- 
-Matthew Garrett | mjg59@srcf.ucam.org
+> This is the second patch series reworking the ERTM state machine and
+> closely related streaming mode code.  These patches include bug fixes
+> and segmentation of outgoing L2CAP data.
+>
+> RFCv1:   Four of eight patches were merged.
+> RFCv2:   Fixed the send lock patch, found and fixed a few more issues
+>         with locking, reference counting, and unused code.  Four of
+>         eight patches were merged.
+> PATCHv1: Confirmed ERTM operation with locking and segmentation updates
+>
+>
+> Mat Martineau (4):
+>  Bluetooth: Fix a redundant and problematic incoming MTU check
+>  Bluetooth: Restore locking semantics when looking up L2CAP channels
+>  Bluetooth: Lock the L2CAP channel when sending
+>  Bluetooth: Refactor L2CAP ERTM and streaming transmit segmentation
+>
+> include/net/bluetooth/bluetooth.h |    2 -
+> include/net/bluetooth/l2cap.h     |    1 +
+> net/bluetooth/l2cap_core.c        |  184 +++++++++++++++++++------------------
+> net/bluetooth/l2cap_sock.c        |   15 +--
+> 4 files changed, 103 insertions(+), 99 deletions(-)
+>
+> -- 
+> 1.7.10
+
+Patches 1, 2, and 3 might be appropriate for the bluetooth repository 
+(not just bluetooth-next).
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
