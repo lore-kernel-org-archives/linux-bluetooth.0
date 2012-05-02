@@ -6,79 +6,34 @@ To: linux-bluetooth@vger.kernel.org,
 Cc: pkrystad@codeaurora.org,
 	ulisses@profusion.mobi,
 	andrei.emeltchenko.news@gmail.com
-Subject: [PATCH 1/4] Bluetooth: Fix a redundant and problematic incoming MTU check
-Date: Wed,  2 May 2012 09:41:59 -0700
-Message-Id: <1335976922-19456-2-git-send-email-mathewm@codeaurora.org>
-In-Reply-To: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
-References: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 0/4] ERTM state machine changes, part 2
+Date: Wed,  2 May 2012 09:41:58 -0700
+Message-Id: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The L2CAP MTU for incoming data is verified differently depending on
-the L2CAP mode, so the check is best performed in a mode-specific
-context.  Checking the incoming MTU before HCI fragment reassembly is
-a layer violation and assumes all bytes after the standard L2CAP
-header are L2CAP data.
+This is the second patch series reworking the ERTM state machine and
+closely related streaming mode code.  These patches include bug fixes
+and segmentation of outgoing L2CAP data.
 
-This approach causes issues with unsegmented ERTM or streaming mode
-frames, where there are additional enhanced or extended headers before
-the data payload and possible FCS bytes after the data payload.  A
-valid frame could be as many as 10 bytes larger than the MTU.
+RFCv1:   Four of eight patches were merged.
+RFCv2:   Fixed the send lock patch, found and fixed a few more issues
+         with locking, reference counting, and unused code.  Four of
+         eight patches were merged.
+PATCHv1: Confirmed ERTM operation with locking and segmentation updates
 
-Removing this code is the best fix, because the MTU is checked later
-on for all L2CAP data frames (connectionless, basic, ERTM, and
-streaming).  This also gets rid of outdated locking (socket instead of
-l2cap_chan) and an extra lookup of the channel ID.
 
-Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
----
- net/bluetooth/l2cap_core.c |   20 --------------------
- 1 file changed, 20 deletions(-)
+Mat Martineau (4):
+  Bluetooth: Fix a redundant and problematic incoming MTU check
+  Bluetooth: Restore locking semantics when looking up L2CAP channels
+  Bluetooth: Lock the L2CAP channel when sending
+  Bluetooth: Refactor L2CAP ERTM and streaming transmit segmentation
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 870116a..5d556b0 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4953,8 +4953,6 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 
- 	if (!(flags & ACL_CONT)) {
- 		struct l2cap_hdr *hdr;
--		struct l2cap_chan *chan;
--		u16 cid;
- 		int len;
- 
- 		if (conn->rx_len) {
-@@ -4974,7 +4972,6 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 
- 		hdr = (struct l2cap_hdr *) skb->data;
- 		len = __le16_to_cpu(hdr->len) + L2CAP_HDR_SIZE;
--		cid = __le16_to_cpu(hdr->cid);
- 
- 		if (len == skb->len) {
- 			/* Complete frame received */
-@@ -4991,23 +4988,6 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 			goto drop;
- 		}
- 
--		chan = l2cap_get_chan_by_scid(conn, cid);
--
--		if (chan && chan->sk) {
--			struct sock *sk = chan->sk;
--			lock_sock(sk);
--
--			if (chan->imtu < len - L2CAP_HDR_SIZE) {
--				BT_ERR("Frame exceeding recv MTU (len %d, "
--							"MTU %d)", len,
--							chan->imtu);
--				release_sock(sk);
--				l2cap_conn_unreliable(conn, ECOMM);
--				goto drop;
--			}
--			release_sock(sk);
--		}
--
- 		/* Allocate skb for the complete frame (with header) */
- 		conn->rx_skb = bt_skb_alloc(len, GFP_ATOMIC);
- 		if (!conn->rx_skb)
+ include/net/bluetooth/bluetooth.h |    2 -
+ include/net/bluetooth/l2cap.h     |    1 +
+ net/bluetooth/l2cap_core.c        |  184 +++++++++++++++++++------------------
+ net/bluetooth/l2cap_sock.c        |   15 +--
+ 4 files changed, 103 insertions(+), 99 deletions(-)
+
 -- 
 1.7.10
 
