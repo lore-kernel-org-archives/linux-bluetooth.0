@@ -1,59 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 2 May 2012 15:25:30 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [PATCH BlueZ v2 2/6] audio: Add multiple device search to manager
+Message-ID: <20120502182529.GB4019@samus>
+References: <1335776199-16704-1-git-send-email-mikel.astiz.oss@gmail.com>
+ <1335776199-16704-3-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1335799650-17597-1-git-send-email-dh.herrmann@googlemail.com>
-References: <1335799650-17597-1-git-send-email-dh.herrmann@googlemail.com>
-Date: Wed, 2 May 2012 16:09:32 -0300
-Message-ID: <CAAngNMabAxO9fVN2DM=5xPJAVk_is3QoS1=+TGZPJAbY3TYHMQ@mail.gmail.com>
-Subject: Re: [PATCH 0/1] HID: User-space HID I/O driver (UHID)
-From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-input@vger.kernel.org, jkosina@suse.cz, marcel@holtmann.org,
-	claudio.takahasi@openbossa.org, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1335776199-16704-3-git-send-email-mikel.astiz.oss@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Apr 30, 2012 at 12:27 PM, David Herrmann
-<dh.herrmann@googlemail.com> wrote:
-> Hi
->
-> This implements a hid_ll_driver user-space interface similar to uinput fo=
-r the
-> input devices. It allows to implement the HID transport-layer in user-spa=
-ce as
-> required by Bluetooth Low-Energy (HoG).
->
-> This is my "first final revision" for the module. Please review and test.
-> Changes from the previous RFCs include:
-> =C2=A0- The feature-report mechanism is now implemented
-> =C2=A0- Several min_t() fixes
-> =C2=A0- Minor coding-style issues
->
-> I did not change __attribute__((__packed__)) to __packed as the latter on=
-e is
-> not provided to user-space.
->
-> If there are any more issues, please tell me. And for the record, the HoG=
- devs
-> told me that they are working since several months with it now so we have=
- a real
-> user-space application that needs it ;)
->
-> If there are no more issues (which i doubt) I can also resend this splitt=
-ed into
-> multiple patches.
->
+Hi Mikel,
 
-Thanks for your work, David. I'll test and review this new version.
-Did you find out the what is the problem when passing BUS_BLUETOOTH on
-the 'bus' field of the create request?
+On 10:56 Mon 30 Apr, Mikel Astiz wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+> 
+> This method is useful to search or than one device fulfulling certain
 
-Also, how does the HID subsystem differentiate from HID protocol
-versions? We've just found out that HoG exposes what HID protocol
-version the device implements, is it the case of having an extra field
-on the uhid_create_req structure to pass this information, or is it
-already present on the HID descriptor (sorry for my limited knowledge
-on the HID protocol itself)?
+I guess you meant "for more than one".
 
---=20
-Jo=C3=A3o Paulo Rechi Vita
-Openbossa Labs - INdT
+Other than this nitpick the patch looks good.
+
+> criteria.
+> ---
+>  audio/manager.c |   25 ++++++++++++++++++++++---
+>  audio/manager.h |    6 ++++++
+>  2 files changed, 28 insertions(+), 3 deletions(-)
+> 
+> diff --git a/audio/manager.c b/audio/manager.c
+> index 20453e6..9c7d0d3 100644
+> --- a/audio/manager.c
+> +++ b/audio/manager.c
+> @@ -1300,12 +1300,13 @@ void audio_manager_exit(void)
+>  	btd_unregister_device_driver(&audio_driver);
+>  }
+>  
+> -struct audio_device *manager_find_device(const char *path,
+> +GSList *manager_find_devices(const char *path,
+>  					const bdaddr_t *src,
+>  					const bdaddr_t *dst,
+>  					const char *interface,
+>  					gboolean connected)
+>  {
+> +	GSList *result = NULL;
+>  	GSList *l;
+>  
+>  	for (l = devices; l != NULL; l = l->next) {
+> @@ -1343,10 +1344,28 @@ struct audio_device *manager_find_device(const char *path,
+>  		if (connected && !audio_device_is_active(dev, interface))
+>  			continue;
+>  
+> -		return dev;
+> +		result = g_slist_append(result, dev);
+>  	}
+>  
+> -	return NULL;
+> +	return result;
+> +}
+> +
+> +struct audio_device *manager_find_device(const char *path,
+> +					const bdaddr_t *src,
+> +					const bdaddr_t *dst,
+> +					const char *interface,
+> +					gboolean connected)
+> +{
+> +	struct audio_device *result;
+> +	GSList *l;
+> +
+> +	l = manager_find_devices(path, src, dst, interface, connected);
+> +	if (l == NULL)
+> +		return NULL;
+> +
+> +	result = l->data;
+> +	g_slist_free(l);
+> +	return result;
+>  }
+>  
+>  struct audio_device *manager_get_device(const bdaddr_t *src,
+> diff --git a/audio/manager.h b/audio/manager.h
+> index cfc646c..f1d3021 100644
+> --- a/audio/manager.h
+> +++ b/audio/manager.h
+> @@ -46,6 +46,12 @@ struct audio_device *manager_find_device(const char *path,
+>  					const char *interface,
+>  					gboolean connected);
+>  
+> +GSList *manager_find_devices(const char *path,
+> +					const bdaddr_t *src,
+> +					const bdaddr_t *dst,
+> +					const char *interface,
+> +					gboolean connected);
+> +
+>  struct audio_device *manager_get_device(const bdaddr_t *src,
+>  					const bdaddr_t *dst,
+>  					gboolean create);
+> -- 
+> 1.7.7.6
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+Cheers,
+-- 
+Vinicius
