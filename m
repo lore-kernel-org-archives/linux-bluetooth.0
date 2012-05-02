@@ -1,112 +1,280 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 May 2012 15:25:30 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [PATCH BlueZ v2 2/6] audio: Add multiple device search to manager
-Message-ID: <20120502182529.GB4019@samus>
-References: <1335776199-16704-1-git-send-email-mikel.astiz.oss@gmail.com>
- <1335776199-16704-3-git-send-email-mikel.astiz.oss@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1335776199-16704-3-git-send-email-mikel.astiz.oss@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org,
+	gustavo@padovan.org,
+	marcel@holtmann.org
+Cc: pkrystad@codeaurora.org,
+	ulisses@profusion.mobi,
+	andrei.emeltchenko.news@gmail.com
+Subject: [PATCH 4/4] Bluetooth: Refactor L2CAP ERTM and streaming transmit segmentation
+Date: Wed,  2 May 2012 09:42:02 -0700
+Message-Id: <1335976922-19456-5-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
+References: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Use more common code for ERTM and streaming mode segmentation and
+transmission, and begin using skb control block data for delaying
+extended or enhanced header generation until just before the packet is
+transmitted.  This code is also better suited for resegmentation,
+which is needed when L2CAP links are reconfigured after an AMP channel
+move.
 
-On 10:56 Mon 30 Apr, Mikel Astiz wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-> 
-> This method is useful to search or than one device fulfulling certain
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/l2cap_core.c    |  154 ++++++++++++++++++++++++-----------------
+ 2 files changed, 92 insertions(+), 63 deletions(-)
 
-I guess you meant "for more than one".
-
-Other than this nitpick the patch looks good.
-
-> criteria.
-> ---
->  audio/manager.c |   25 ++++++++++++++++++++++---
->  audio/manager.h |    6 ++++++
->  2 files changed, 28 insertions(+), 3 deletions(-)
-> 
-> diff --git a/audio/manager.c b/audio/manager.c
-> index 20453e6..9c7d0d3 100644
-> --- a/audio/manager.c
-> +++ b/audio/manager.c
-> @@ -1300,12 +1300,13 @@ void audio_manager_exit(void)
->  	btd_unregister_device_driver(&audio_driver);
->  }
->  
-> -struct audio_device *manager_find_device(const char *path,
-> +GSList *manager_find_devices(const char *path,
->  					const bdaddr_t *src,
->  					const bdaddr_t *dst,
->  					const char *interface,
->  					gboolean connected)
->  {
-> +	GSList *result = NULL;
->  	GSList *l;
->  
->  	for (l = devices; l != NULL; l = l->next) {
-> @@ -1343,10 +1344,28 @@ struct audio_device *manager_find_device(const char *path,
->  		if (connected && !audio_device_is_active(dev, interface))
->  			continue;
->  
-> -		return dev;
-> +		result = g_slist_append(result, dev);
->  	}
->  
-> -	return NULL;
-> +	return result;
-> +}
-> +
-> +struct audio_device *manager_find_device(const char *path,
-> +					const bdaddr_t *src,
-> +					const bdaddr_t *dst,
-> +					const char *interface,
-> +					gboolean connected)
-> +{
-> +	struct audio_device *result;
-> +	GSList *l;
-> +
-> +	l = manager_find_devices(path, src, dst, interface, connected);
-> +	if (l == NULL)
-> +		return NULL;
-> +
-> +	result = l->data;
-> +	g_slist_free(l);
-> +	return result;
->  }
->  
->  struct audio_device *manager_get_device(const bdaddr_t *src,
-> diff --git a/audio/manager.h b/audio/manager.h
-> index cfc646c..f1d3021 100644
-> --- a/audio/manager.h
-> +++ b/audio/manager.h
-> @@ -46,6 +46,12 @@ struct audio_device *manager_find_device(const char *path,
->  					const char *interface,
->  					gboolean connected);
->  
-> +GSList *manager_find_devices(const char *path,
-> +					const bdaddr_t *src,
-> +					const bdaddr_t *dst,
-> +					const char *interface,
-> +					gboolean connected);
-> +
->  struct audio_device *manager_get_device(const bdaddr_t *src,
->  					const bdaddr_t *dst,
->  					gboolean create);
-> -- 
-> 1.7.7.6
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 92c0423..88c128a 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -44,6 +44,7 @@
+ #define L2CAP_DEFAULT_MAX_SDU_SIZE	0xFFFF
+ #define L2CAP_DEFAULT_SDU_ITIME		0xFFFFFFFF
+ #define L2CAP_DEFAULT_ACC_LAT		0xFFFFFFFF
++#define L2CAP_BREDR_MAX_PAYLOAD		1019    /* 3-DH5 packet */
+ 
+ #define L2CAP_DISC_TIMEOUT		msecs_to_jiffies(100)
+ #define L2CAP_DISC_REJ_TIMEOUT		msecs_to_jiffies(5000)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 813cf06..5e3d016 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1636,6 +1636,7 @@ static void l2cap_streaming_send(struct l2cap_chan *chan)
+ 	while ((skb = skb_dequeue(&chan->tx_q))) {
+ 		control = __get_control(chan, skb->data + L2CAP_HDR_SIZE);
+ 		control |= __set_txseq(chan, chan->next_tx_seq);
++		control |= __set_ctrl_sar(chan, bt_cb(skb)->control.sar);
+ 		__put_control(chan, control, skb->data + L2CAP_HDR_SIZE);
+ 
+ 		if (chan->fcs == L2CAP_FCS_CRC16) {
+@@ -1708,6 +1709,9 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
+ 	if (chan->state != BT_CONNECTED)
+ 		return -ENOTCONN;
+ 
++	if (test_bit(CONN_REMOTE_BUSY, &chan->conn_state))
++		return 0;
++
+ 	while ((skb = chan->tx_send_head) && (!l2cap_tx_window_full(chan))) {
+ 
+ 		if (chan->remote_max_tx &&
+@@ -1728,6 +1732,7 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
+ 
+ 		control |= __set_reqseq(chan, chan->buffer_seq);
+ 		control |= __set_txseq(chan, chan->next_tx_seq);
++		control |= __set_ctrl_sar(chan, bt_cb(skb)->control.sar);
+ 
+ 		__put_control(chan, control, tx_skb->data + L2CAP_HDR_SIZE);
+ 
+@@ -1923,7 +1928,7 @@ static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
+ 
+ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
+ 						struct msghdr *msg, size_t len,
+-						u32 control, u16 sdulen)
++						u16 sdulen)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct sk_buff *skb;
+@@ -1958,7 +1963,7 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
+ 	lh->cid = cpu_to_le16(chan->dcid);
+ 	lh->len = cpu_to_le16(len + (hlen - L2CAP_HDR_SIZE));
+ 
+-	__put_control(chan, control, skb_put(skb, __ctrl_size(chan)));
++	__put_control(chan, 0, skb_put(skb, __ctrl_size(chan)));
+ 
+ 	if (sdulen)
+ 		put_unaligned_le16(sdulen, skb_put(skb, L2CAP_SDULEN_SIZE));
+@@ -1976,57 +1981,78 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
+ 	return skb;
+ }
+ 
+-static int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
++static int l2cap_segment_sdu(struct l2cap_chan *chan,
++			     struct sk_buff_head *seg_queue,
++			     struct msghdr *msg, size_t len)
+ {
+ 	struct sk_buff *skb;
+-	struct sk_buff_head sar_queue;
+-	u32 control;
+-	size_t size = 0;
++	u16 sdu_len;
++	size_t pdu_len;
++	int err = 0;
++	u8 sar;
+ 
+-	skb_queue_head_init(&sar_queue);
+-	control = __set_ctrl_sar(chan, L2CAP_SAR_START);
+-	skb = l2cap_create_iframe_pdu(chan, msg, chan->remote_mps, control, len);
+-	if (IS_ERR(skb))
+-		return PTR_ERR(skb);
++	BT_DBG("chan %p, msg %p, len %d", chan, msg, (int)len);
+ 
+-	__skb_queue_tail(&sar_queue, skb);
+-	len -= chan->remote_mps;
+-	size += chan->remote_mps;
++	/* It is critical that ERTM PDUs fit in a single HCI fragment,
++	 * so fragmented skbs are not used.  The HCI layer's handling
++	 * of fragmented skbs is not compatible with ERTM's queueing.
++	 */
++
++	/* PDU size is derived from the HCI MTU */
++	pdu_len = chan->conn->mtu;
++
++	pdu_len = min_t(size_t, pdu_len, L2CAP_BREDR_MAX_PAYLOAD);
++
++	/* Adjust for largest possible L2CAP overhead. */
++	pdu_len -= L2CAP_EXT_HDR_SIZE + L2CAP_FCS_SIZE;
++
++	/* Remote device may have requested smaller PDUs */
++	pdu_len = min_t(size_t, pdu_len, chan->remote_mps);
++
++	if (len <= pdu_len) {
++		sar = L2CAP_SAR_UNSEGMENTED;
++		sdu_len = 0;
++		pdu_len = len;
++	} else {
++		sar = L2CAP_SAR_START;
++		sdu_len = len;
++		pdu_len -= L2CAP_SDULEN_SIZE;
++	}
+ 
+ 	while (len > 0) {
+-		size_t buflen;
++		skb = l2cap_create_iframe_pdu(chan, msg, pdu_len, sdu_len);
+ 
+-		if (len > chan->remote_mps) {
+-			control = __set_ctrl_sar(chan, L2CAP_SAR_CONTINUE);
+-			buflen = chan->remote_mps;
+-		} else {
+-			control = __set_ctrl_sar(chan, L2CAP_SAR_END);
+-			buflen = len;
+-		}
+-
+-		skb = l2cap_create_iframe_pdu(chan, msg, buflen, control, 0);
+ 		if (IS_ERR(skb)) {
+-			skb_queue_purge(&sar_queue);
++			__skb_queue_purge(seg_queue);
+ 			return PTR_ERR(skb);
+ 		}
+ 
+-		__skb_queue_tail(&sar_queue, skb);
+-		len -= buflen;
+-		size += buflen;
+-	}
+-	skb_queue_splice_tail(&sar_queue, &chan->tx_q);
+-	if (chan->tx_send_head == NULL)
+-		chan->tx_send_head = sar_queue.next;
++		bt_cb(skb)->control.sar = sar;
++		__skb_queue_tail(seg_queue, skb);
+ 
+-	return size;
++		len -= pdu_len;
++		if (sdu_len) {
++			sdu_len = 0;
++			pdu_len += L2CAP_SDULEN_SIZE;
++		}
++
++		if (len <= pdu_len) {
++			sar = L2CAP_SAR_END;
++			pdu_len = len;
++		} else {
++			sar = L2CAP_SAR_CONTINUE;
++		}
++	}
++
++	return err;
+ }
+ 
+ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 								u32 priority)
+ {
+ 	struct sk_buff *skb;
+-	u32 control;
+ 	int err;
++	struct sk_buff_head seg_queue;
+ 
+ 	/* Connectionless channel */
+ 	if (chan->chan_type == L2CAP_CHAN_CONN_LESS) {
+@@ -2055,42 +2081,44 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 
+ 	case L2CAP_MODE_ERTM:
+ 	case L2CAP_MODE_STREAMING:
+-		/* Entire SDU fits into one PDU */
+-		if (len <= chan->remote_mps) {
+-			control = __set_ctrl_sar(chan, L2CAP_SAR_UNSEGMENTED);
+-			skb = l2cap_create_iframe_pdu(chan, msg, len, control,
+-									0);
+-			if (IS_ERR(skb))
+-				return PTR_ERR(skb);
+-
+-			__skb_queue_tail(&chan->tx_q, skb);
+-
+-			if (chan->tx_send_head == NULL)
+-				chan->tx_send_head = skb;
+-
+-		} else {
+-			/* Segment SDU into multiples PDUs */
+-			err = l2cap_sar_segment_sdu(chan, msg, len);
+-			if (err < 0)
+-				return err;
++		/* Check outgoing MTU */
++		if (len > chan->omtu) {
++			err = -EMSGSIZE;
++			break;
+ 		}
+ 
+-		if (chan->mode == L2CAP_MODE_STREAMING) {
++		__skb_queue_head_init(&seg_queue);
++
++		/* Do segmentation before calling in to the state machine,
++		 * since it's possible to block while waiting for memory
++		 * allocation.
++		 */
++		err = l2cap_segment_sdu(chan, &seg_queue, msg, len);
++
++		/* The channel could have been closed while segmenting,
++		 * check that it is still connected.
++		 */
++		if (chan->state != BT_CONNECTED) {
++			__skb_queue_purge(&seg_queue);
++			err = -ENOTCONN;
++		}
++
++		if (err)
++			break;
++
++		skb_queue_splice_tail_init(&seg_queue, &chan->tx_q);
++		if (chan->mode == L2CAP_MODE_ERTM)
++			err = l2cap_ertm_send(chan);
++		else
+ 			l2cap_streaming_send(chan);
+-			err = len;
+-			break;
+-		}
+ 
+-		if (test_bit(CONN_REMOTE_BUSY, &chan->conn_state) &&
+-				test_bit(CONN_WAIT_F, &chan->conn_state)) {
+-			err = len;
+-			break;
+-		}
+-
+-		err = l2cap_ertm_send(chan);
+ 		if (err >= 0)
+ 			err = len;
+ 
++		/* If the skbs were not queued for sending, they'll still be in
++		 * seg_queue and need to be purged.
++		 */
++		__skb_queue_purge(&seg_queue);
+ 		break;
+ 
+ 	default:
 -- 
-Vinicius
+1.7.10
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
