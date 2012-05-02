@@ -1,32 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 May 2012 11:58:30 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Syam Sidhardhan <s.syam@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/5] Bluetooth: Remove unused hci_le_ltk_reply()
-Message-ID: <20120502145830.GA16030@joana>
-References: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
- <1334243001-17016-27-git-send-email-s.syam@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1334243001-17016-27-git-send-email-s.syam@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Remove unneeded elements from size calculation
+Date: Wed,  2 May 2012 11:56:17 -0300
+Message-Id: <1335970577-19224-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+hlen - L2CAP_HDR_SIZE = 0, so we don't need to add them in the
+calculation.
 
-* Syam Sidhardhan <s.syam@samsung.com> [2012-04-12 20:33:17 +0530]:
+Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
+---
+ net/bluetooth/l2cap_core.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> In this API, we were using sizeof operator for an array
-> given as function argument, which is invalid.
-> However this API is not used anywhere.
-> 
-> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
-> ---
->  include/net/bluetooth/hci_core.h |    1 -
->  net/bluetooth/hci_conn.c         |   16 ----------------
->  2 files changed, 0 insertions(+), 17 deletions(-)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 0f2b1be..870116a 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1909,7 +1909,7 @@ static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
+ 	/* Create L2CAP header */
+ 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+ 	lh->cid = cpu_to_le16(chan->dcid);
+-	lh->len = cpu_to_le16(len + (hlen - L2CAP_HDR_SIZE));
++	lh->len = cpu_to_le16(len);
+ 
+ 	err = l2cap_skbuff_fromiovec(chan, msg, len, count, skb);
+ 	if (unlikely(err < 0)) {
+-- 
+1.7.10
 
-Patch has been applied to bluetooth-next. Thanks.
-
-	Gustavo
