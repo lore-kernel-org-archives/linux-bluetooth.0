@@ -1,43 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mat Martineau <mathewm@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org,
-	gustavo@padovan.org,
-	marcel@holtmann.org
-Cc: pkrystad@codeaurora.org,
-	ulisses@profusion.mobi,
-	andrei.emeltchenko.news@gmail.com
-Subject: [PATCH 0/4] ERTM state machine changes, part 2
-Date: Wed,  2 May 2012 09:41:58 -0700
-Message-Id: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
+Date: Wed, 2 May 2012 18:55:10 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Remove unneeded elements from size calculation
+Message-ID: <20120502155510.GA25604@x220.P-661HNU-F1>
+References: <1335970577-19224-1-git-send-email-gustavo@padovan.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1335970577-19224-1-git-send-email-gustavo@padovan.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is the second patch series reworking the ERTM state machine and
-closely related streaming mode code.  These patches include bug fixes
-and segmentation of outgoing L2CAP data.
+Hi Gustavo,
 
-RFCv1:   Four of eight patches were merged.
-RFCv2:   Fixed the send lock patch, found and fixed a few more issues
-         with locking, reference counting, and unused code.  Four of
-         eight patches were merged.
-PATCHv1: Confirmed ERTM operation with locking and segmentation updates
+On Wed, May 02, 2012, Gustavo Padovan wrote:
+> hlen - L2CAP_HDR_SIZE = 0, so we don't need to add them in the
+> calculation.
+> 
+> Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
+> ---
+>  net/bluetooth/l2cap_core.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
+Applied to bluetooth-next. Thanks.
 
-Mat Martineau (4):
-  Bluetooth: Fix a redundant and problematic incoming MTU check
-  Bluetooth: Restore locking semantics when looking up L2CAP channels
-  Bluetooth: Lock the L2CAP channel when sending
-  Bluetooth: Refactor L2CAP ERTM and streaming transmit segmentation
-
- include/net/bluetooth/bluetooth.h |    2 -
- include/net/bluetooth/l2cap.h     |    1 +
- net/bluetooth/l2cap_core.c        |  184 +++++++++++++++++++------------------
- net/bluetooth/l2cap_sock.c        |   15 +--
- 4 files changed, 103 insertions(+), 99 deletions(-)
-
--- 
-1.7.10
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Johan
