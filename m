@@ -6,78 +6,79 @@ To: linux-bluetooth@vger.kernel.org,
 Cc: pkrystad@codeaurora.org,
 	ulisses@profusion.mobi,
 	andrei.emeltchenko.news@gmail.com
-Subject: [PATCH 2/4] Bluetooth: Restore locking semantics when looking up L2CAP channels
-Date: Wed,  2 May 2012 09:42:00 -0700
-Message-Id: <1335976922-19456-3-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 1/4] Bluetooth: Fix a redundant and problematic incoming MTU check
+Date: Wed,  2 May 2012 09:41:59 -0700
+Message-Id: <1335976922-19456-2-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
 References: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As the comment for l2cap_get_chan_by_scid indicated, the function used
-to return a locked socket.  The lock for the socket was acquired while
-the channel list was also locked.
+The L2CAP MTU for incoming data is verified differently depending on
+the L2CAP mode, so the check is best performed in a mode-specific
+context.  Checking the incoming MTU before HCI fragment reassembly is
+a layer violation and assumes all bytes after the standard L2CAP
+header are L2CAP data.
 
-When locking was moved over to the l2cap_chan structure, the channel
-lock was no longer acquired with the channel list still locked.  This
-made it possible for the l2cap_chan to be deleted after
-conn->chan_lock was released but before l2cap_chan_lock was called.
-Making the call to l2cap_chan_lock before releasing conn->chan_lock
-makes it impossible for the l2cap_chan to be deleted at the wrong
-time.
+This approach causes issues with unsegmented ERTM or streaming mode
+frames, where there are additional enhanced or extended headers before
+the data payload and possible FCS bytes after the data payload.  A
+valid frame could be as many as 10 bytes larger than the MTU.
+
+Removing this code is the best fix, because the MTU is checked later
+on for all L2CAP data frames (connectionless, basic, ERTM, and
+streaming).  This also gets rid of outdated locking (socket instead of
+l2cap_chan) and an extra lookup of the channel ID.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |   10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ net/bluetooth/l2cap_core.c |   20 --------------------
+ 1 file changed, 20 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 5d556b0..813cf06 100644
+index 870116a..5d556b0 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -98,13 +98,15 @@ static struct l2cap_chan *__l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16
- }
+@@ -4953,8 +4953,6 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
  
- /* Find channel with given SCID.
-- * Returns locked socket */
-+ * Returns locked channel. */
- static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 cid)
- {
- 	struct l2cap_chan *c;
+ 	if (!(flags & ACL_CONT)) {
+ 		struct l2cap_hdr *hdr;
+-		struct l2cap_chan *chan;
+-		u16 cid;
+ 		int len;
  
- 	mutex_lock(&conn->chan_lock);
- 	c = __l2cap_get_chan_by_scid(conn, cid);
-+	if (c)
-+		l2cap_chan_lock(c);
- 	mutex_unlock(&conn->chan_lock);
+ 		if (conn->rx_len) {
+@@ -4974,7 +4972,6 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
  
- 	return c;
-@@ -3141,8 +3143,6 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	if (!chan)
- 		return -ENOENT;
+ 		hdr = (struct l2cap_hdr *) skb->data;
+ 		len = __le16_to_cpu(hdr->len) + L2CAP_HDR_SIZE;
+-		cid = __le16_to_cpu(hdr->cid);
  
--	l2cap_chan_lock(chan);
+ 		if (len == skb->len) {
+ 			/* Complete frame received */
+@@ -4991,23 +4988,6 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 			goto drop;
+ 		}
+ 
+-		chan = l2cap_get_chan_by_scid(conn, cid);
 -
- 	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2) {
- 		struct l2cap_cmd_rej_cid rej;
- 
-@@ -3255,8 +3255,6 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	if (!chan)
- 		return 0;
- 
--	l2cap_chan_lock(chan);
+-		if (chan && chan->sk) {
+-			struct sock *sk = chan->sk;
+-			lock_sock(sk);
 -
- 	switch (result) {
- 	case L2CAP_CONF_SUCCESS:
- 		l2cap_conf_rfc_get(chan, rsp->data, len);
-@@ -4589,8 +4587,6 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
- 		return 0;
- 	}
- 
--	l2cap_chan_lock(chan);
+-			if (chan->imtu < len - L2CAP_HDR_SIZE) {
+-				BT_ERR("Frame exceeding recv MTU (len %d, "
+-							"MTU %d)", len,
+-							chan->imtu);
+-				release_sock(sk);
+-				l2cap_conn_unreliable(conn, ECOMM);
+-				goto drop;
+-			}
+-			release_sock(sk);
+-		}
 -
- 	BT_DBG("chan %p, len %d", chan, skb->len);
- 
- 	if (chan->state != BT_CONNECTED)
+ 		/* Allocate skb for the complete frame (with header) */
+ 		conn->rx_skb = bt_skb_alloc(len, GFP_ATOMIC);
+ 		if (!conn->rx_skb)
 -- 
 1.7.10
 
