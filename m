@@ -1,33 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Remove unneeded elements from size calculation
-Date: Wed,  2 May 2012 11:56:17 -0300
-Message-Id: <1335970577-19224-1-git-send-email-gustavo@padovan.org>
+Date: Wed, 2 May 2012 11:38:05 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: Andre Guedes <andre.guedes@openbossa.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/5] Bluetooth: Remove unused hci_le_ltk_reply()
+Message-ID: <20120502143805.GA4019@samus>
+References: <1334243001-17016-1-git-send-email-s.syam@samsung.com>
+ <1334243001-17016-27-git-send-email-s.syam@samsung.com>
+ <20120413221700.GF1680@joana>
+ <CACJA=fW=3ZHUh1r-TzDPhsxydRkDJiN62Dg4yMetw1v+i-zf_Q@mail.gmail.com>
+ <689E6E1F4998496D92F8631D325F12A3@sisodomain.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <689E6E1F4998496D92F8631D325F12A3@sisodomain.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hlen - L2CAP_HDR_SIZE = 0, so we don't need to add them in the
-calculation.
+Hi Syam and Johan,
 
-Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
----
- net/bluetooth/l2cap_core.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 21:18 Tue 01 May, Syam Sidhardhan wrote:
+> Hi,
+> ----- Original Message ----- From: "Andre Guedes"
+> <andre.guedes@openbossa.org>
+> To: "Gustavo Padovan" <gustavo@padovan.org>; "Syam Sidhardhan"
+> <s.syam@samsung.com>; <linux-bluetooth@vger.kernel.org>; "Vinicius
+> Gomes" <vinicius.gomes@openbossa.org>
+> Sent: Friday, April 20, 2012 11:43 PM
+> Subject: Re: [PATCH 1/5] Bluetooth: Remove unused hci_le_ltk_reply()
+> 
+> 
+> >Hi Syam/Gustavo,
+> >
+> >On Fri, Apr 13, 2012 at 7:17 PM, Gustavo Padovan
+> ><gustavo@padovan.org> wrote:
+> >>Hi Syam,
+> >>
+> >>* Syam Sidhardhan <s.syam@samsung.com> [2012-04-12 20:33:17 +0530]:
+> >>
+> >>>In this API, we were using sizeof operator for an array
+> >>>given as function argument, which is invalid.
+> >>>However this API is not used anywhere.
+> >>>
+> >>>Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+> >>>---
+> >>>include/net/bluetooth/hci_core.h | 1 -
+> >>>net/bluetooth/hci_conn.c | 16 ----------------
+> >>>2 files changed, 0 insertions(+), 17 deletions(-)
+> >>>
+> >>>diff --git a/include/net/bluetooth/hci_core.h
+> >>>b/include/net/bluetooth/hci_core.h
+> >>>index c0b232c..6e170de 100644
+> >>>--- a/include/net/bluetooth/hci_core.h
+> >>>+++ b/include/net/bluetooth/hci_core.h
+> >>>@@ -1069,7 +1069,6 @@ void hci_le_conn_update(struct hci_conn
+> >>>*conn, u16 min, u16 max,
+> >>>u16 latency, u16 to_multiplier);
+> >>>void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
+> >>>__u8 ltk[16]);
+> >>>-void hci_le_ltk_reply(struct hci_conn *conn, u8 ltk[16]);
+> >>
+> >>I'll let Andre comment here, I'm not sure if this is going to be used on
+> >>the future or not.
+> >
+> >I'm not sure too, I think Vinicius can tell more about that.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 0f2b1be..870116a 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1909,7 +1909,7 @@ static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
- 	/* Create L2CAP header */
- 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
- 	lh->cid = cpu_to_le16(chan->dcid);
--	lh->len = cpu_to_le16(len + (hlen - L2CAP_HDR_SIZE));
-+	lh->len = cpu_to_le16(len);
- 
- 	err = l2cap_skbuff_fromiovec(chan, msg, len, count, skb);
- 	if (unlikely(err < 0)) {
+Just in case you missed what I just said on IRC: that function can be
+removed.
+
+> >
+> >Regarding the memcpy call, yes, it is definitely bogus.
+> >
+> 
+> ping
+> 
+> Regards,
+> Syam
+> 
+
+Cheers,
 -- 
-1.7.10
-
+Vinicius
