@@ -1,42 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 3 May 2012 23:30:28 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] SAP: Fix not unregistering dummy interface on exit
-Message-ID: <20120503203028.GA21259@x220.P-661HNU-F1>
-References: <1336056083-21126-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1336056083-21126-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 3 May 2012 14:40:25 -0400
+Message-ID: <CACEkAT65YcQ9ggbJfzMOrh7c=E8F1qSKKEx1EUUrMVvc4Z+pHw@mail.gmail.com>
+Subject: determining link quality for poor connections
+From: Andy Pyles <ajpyles@cs.wm.edu>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+In reading the spec, I noticed that implementation of link quality is
+up to the implementation of the bluetooth chip manufacturer.
+After testing this (hci_read_link_quality())  on two separate
+bluetooth chipsets, I got some inconsistent results.
 
-On Thu, May 03, 2012, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Dummy interface is registered on plugin init and is never unregistered
-> ---
->  sap/sap-dummy.c |    2 ++
->  1 files changed, 2 insertions(+), 0 deletions(-)
-> 
-> diff --git a/sap/sap-dummy.c b/sap/sap-dummy.c
-> index acdec77..3060dde 100644
-> --- a/sap/sap-dummy.c
-> +++ b/sap/sap-dummy.c
-> @@ -340,6 +340,8 @@ int sap_init(void)
->  
->  void sap_exit(void)
->  {
-> +	g_dbus_unregister_interface(connection, SAP_DUMMY_PATH, SAP_DUMMY_IFACE);
-> +
->  	dbus_connection_unref(connection);
->  	connection = NULL;
->  }
+The test scenario involes sending a simple l2cap message every second
+to a mobile device with bluetooth.
+The mobile device displays the received message to the console.
+I gradually walk away from the sender until the messages are no longer
+displayed (meaning outside of the range.)
+I have bluez 4.98.
 
-Applied, but I had to first fix the line you're adding since it was over
-80 characters.
+After each packet is sent I retrieve the link quality (hci_read_link_quality()).
+I tested this scenario on two different bluetooth chipsets:
 
-Johan
+Broadcom device id: 0a5c:217f:  I receive link quality of 255 ( the
+entire duration)
+Atheros-Qualcom devide id:  04ca:3004 (ath3k device) I receive link
+quality of 172 ( the entire duration)
+(I also confirmed these results with hcitool)
+
+It seems that link_quality is not a useful parameter. As the link
+quality is obviously impaired, this function always returns the same
+value.  I'm also retrieving RSSI which seems to be more indicative of
+the poor connection quality.
+
+Is there a better way to determine link quality? Is there a way to
+count packets which need to be re-transmitted?
