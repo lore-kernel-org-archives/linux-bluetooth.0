@@ -1,38 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Tom Gundersen <teg@jklm.no>
+MIME-Version: 1.0
+In-Reply-To: <1336048142-1194-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1336048142-1194-1-git-send-email-lucas.demarchi@profusion.mobi>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Thu, 3 May 2012 19:15:09 -0300
+Message-ID: <CAMOw1v4CNd39VTA9atMnYAmq+LATBc50PBPLR1tvy0Y1gM9=oA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v4 00/13] gdbus: Better D-Bus introspection
 To: linux-bluetooth@vger.kernel.org
-Cc: Tom Gundersen <teg@jklm.no>
-Subject: [PATCH 1/2] systemd: don't order against syslog.target
-Date: Fri,  4 May 2012 00:21:52 +0200
-Message-Id: <1336083713-8417-1-git-send-email-teg@jklm.no>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This was only needed in old versions of systemd. All messages are logged
-by default to the journal now, no ordering required.
+On Thu, May 3, 2012 at 9:28 AM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+>
+> This is v4 of this series. The biggest difference from v3 is that we are
+> not
+> adding a decorated signature anymore. Instead we define the type
+> GDBusArgInfo
+> and add fields in_args, out_args and args into the tables.
+>
+> First 4 patches are the same as before and are independent from the
+> others.
+>
+> Patches 5, 6, 7, 8 and 9 are split like this because gdbus is used in
+> projects
+> other than BlueZ, so the first 2 patches can be easily ported there.
 
-Signed-off-by: Tom Gundersen <teg@jklm.no>
----
- src/bluetooth.service.in |    2 --
- 1 file changed, 2 deletions(-)
+And if these patches break VIM's highlight for you:
+https://groups.google.com/forum/#!msg/vim_dev/_IL5jM1-t_w/D-vIwZM2RfwJ
 
-diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
-index 02b6707..8a9edb6 100644
---- a/src/bluetooth.service.in
-+++ b/src/bluetooth.service.in
-@@ -1,12 +1,10 @@
- [Unit]
- Description=Bluetooth service
--After=syslog.target
- 
- [Service]
- Type=dbus
- BusName=org.bluez
- ExecStart=@prefix@/sbin/bluetoothd -n
--StandardOutput=syslog
- 
- [Install]
- WantedBy=bluetooth.target
--- 
-1.7.10.1
-
+Lucas De Marchi
