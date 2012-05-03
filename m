@@ -1,27 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 3 May 2012 23:44:10 +0300
+Date: Thu, 3 May 2012 23:30:28 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Blueooth: Remove hlen variable
-Message-ID: <20120503204410.GA21912@x220.P-661HNU-F1>
-References: <1336031661-29266-1-git-send-email-gustavo@padovan.org>
+Subject: Re: [PATCH BlueZ] SAP: Fix not unregistering dummy interface on exit
+Message-ID: <20120503203028.GA21259@x220.P-661HNU-F1>
+References: <1336056083-21126-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1336031661-29266-1-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1336056083-21126-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Luiz,
 
-On Thu, May 03, 2012, Gustavo Padovan wrote:
-> hlen has a fixed size of L2CAP_HDR_SIZE, use this instead.
+On Thu, May 03, 2012, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
+> Dummy interface is registered on plugin init and is never unregistered
 > ---
->  net/bluetooth/l2cap_core.c |    6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  sap/sap-dummy.c |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
+> 
+> diff --git a/sap/sap-dummy.c b/sap/sap-dummy.c
+> index acdec77..3060dde 100644
+> --- a/sap/sap-dummy.c
+> +++ b/sap/sap-dummy.c
+> @@ -340,6 +340,8 @@ int sap_init(void)
+>  
+>  void sap_exit(void)
+>  {
+> +	g_dbus_unregister_interface(connection, SAP_DUMMY_PATH, SAP_DUMMY_IFACE);
+> +
+>  	dbus_connection_unref(connection);
+>  	connection = NULL;
+>  }
 
-Applied to bluetooth-next (after doing s/Blueooth/Bluetooth/)
+Applied, but I had to first fix the line you're adding since it was over
+80 characters.
 
 Johan
