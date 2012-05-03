@@ -1,136 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Date: Thu, 3 May 2012 11:28:12 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 1/6] client: Minor buffer access API changes
-Date: Thu,  3 May 2012 10:28:25 +0200
-Message-Id: <1336033710-2471-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Remove unneeded calculation and magic number
+Message-ID: <20120503082811.GE7483@aemeltch-MOBL1>
+References: <1336031752-8153-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20120503081814.GA8310@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120503081814.GA8310@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi,
 
-Trivial changes in buffer getters in both session and transfer,
-regarding the access of transfer parameters:
-	- const qualifiers added, to avoid unwanted frees
-	- Buffers are now returned as void* instead of guint8*
----
- client/pbap.c     |    2 +-
- client/session.c  |   17 +++++++----------
- client/session.h  |    2 +-
- client/transfer.c |   12 +++++++-----
- client/transfer.h |    6 +++---
- 5 files changed, 19 insertions(+), 20 deletions(-)
+On Thu, May 03, 2012 at 11:18:21AM +0300, Andrei Emeltchenko wrote:
+> Hi,
+> 
+> On Thu, May 03, 2012 at 10:55:52AM +0300, Andrei Emeltchenko wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > Remove magic number unneeded calculation since
+> > hlen = L2CAP_HDR_SIZE + L2CAP_PSMLEN_SIZE
+> 
+> Since Gustavo removed hlen I'll do the same.
 
-diff --git a/client/pbap.c b/client/pbap.c
-index baf2ca6..d96b651 100644
---- a/client/pbap.c
-+++ b/client/pbap.c
-@@ -294,7 +294,7 @@ static void pbap_setpath_cb(struct obc_session *session, GError *err,
- static void read_return_apparam(struct obc_session *session,
- 				guint16 *phone_book_size, guint8 *new_missed_calls)
- {
--	struct apparam_hdr *hdr;
-+	const struct apparam_hdr *hdr;
- 	size_t size;
- 
- 	*phone_book_size = 0;
-diff --git a/client/session.c b/client/session.c
-index e277fa0..824ef49 100644
---- a/client/session.c
-+++ b/client/session.c
-@@ -1156,22 +1156,19 @@ int obc_session_get_contents(struct obc_session *session, char **contents,
- 	return obc_transfer_get_contents(transfer, contents, size);
- }
- 
--void *obc_session_get_params(struct obc_session *session, size_t *size)
-+const void *obc_session_get_params(struct obc_session *session, size_t *size)
- {
- 	struct obc_transfer *transfer;
--	struct obc_transfer_params params;
- 
--	transfer= obc_session_get_transfer(session);
--	if (transfer == NULL)
--		return NULL;
-+	transfer = obc_session_get_transfer(session);
-+	if (transfer == NULL) {
-+		if (size != NULL)
-+			*size = 0;
- 
--	if (obc_transfer_get_params(transfer, &params) < 0)
- 		return NULL;
-+	}
- 
--	if (size)
--		*size = params.size;
--
--	return params.data;
-+	return obc_transfer_get_params(transfer, size);
- }
- 
- static void setpath_complete(struct obc_session *session, GError *err,
-diff --git a/client/session.h b/client/session.h
-index c443392..b44cf3f 100644
---- a/client/session.h
-+++ b/client/session.h
-@@ -54,7 +54,7 @@ const char *obc_session_get_path(struct obc_session *session);
- const char *obc_session_get_target(struct obc_session *session);
- int obc_session_get_contents(struct obc_session *session, char **contents,
- 								size_t *size);
--void *obc_session_get_params(struct obc_session *session, size_t *size);
-+const void *obc_session_get_params(struct obc_session *session, size_t *size);
- 
- guint obc_session_send(struct obc_session *session, const char *filename,
- 				const char *name, GError **err);
-diff --git a/client/transfer.c b/client/transfer.c
-index 8b5d126..89690d0 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -631,13 +631,15 @@ guint8 obc_transfer_get_operation(struct obc_transfer *transfer)
- 	return transfer->op;
- }
- 
--int obc_transfer_get_params(struct obc_transfer *transfer,
--					struct obc_transfer_params *params)
-+const void *obc_transfer_get_params(struct obc_transfer *transfer, size_t *size)
- {
--	params->data = transfer->params->data;
--	params->size = transfer->params->size;
-+	if (transfer->params == NULL)
-+		return NULL;
- 
--	return 0;
-+	if (size != NULL)
-+		*size = transfer->params->size;
-+
-+	return transfer->params->data;
- }
- 
- int obc_transfer_get_contents(struct obc_transfer *transfer, char **contents,
-diff --git a/client/transfer.h b/client/transfer.h
-index 3f5e22d..f42e21f 100644
---- a/client/transfer.h
-+++ b/client/transfer.h
-@@ -22,7 +22,7 @@
-  */
- 
- struct obc_transfer_params {
--	guint8 *data;
-+	void *data;
- 	size_t size;
- };
- 
-@@ -59,8 +59,8 @@ gboolean obc_transfer_start(struct obc_transfer *transfer, GObex *obex,
- 								GError **err);
- guint8 obc_transfer_get_operation(struct obc_transfer *transfer);
- 
--int obc_transfer_get_params(struct obc_transfer *transfer,
--					struct obc_transfer_params *params);
-+const void *obc_transfer_get_params(struct obc_transfer *transfer,
-+								size_t *size);
- int obc_transfer_get_contents(struct obc_transfer *transfer, char **contents,
- 								size_t *size);
- 
--- 
-1.7.7.6
+I think now that patch good enough as is
 
+Best regards 
+Andrei Emeltchenko 
+
+> 
+> Best regards 
+> Andrei Emeltchenko 
+> 
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  net/bluetooth/l2cap_core.c |    4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index 07a09cc..1748c3c 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -1922,8 +1922,8 @@ static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
+> >  	/* Create L2CAP header */
+> >  	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+> >  	lh->cid = cpu_to_le16(chan->dcid);
+> > -	lh->len = cpu_to_le16(len + (hlen - L2CAP_HDR_SIZE));
+> > -	put_unaligned(chan->psm, skb_put(skb, 2));
+> > +	lh->len = cpu_to_le16(len + L2CAP_PSMLEN_SIZE);
+> > +	put_unaligned(chan->psm, skb_put(skb, L2CAP_PSMLEN_SIZE));
+> >  
+> >  	err = l2cap_skbuff_fromiovec(chan, msg, len, count, skb);
+> >  	if (unlikely(err < 0)) {
+> > -- 
+> > 1.7.9.5
+> > 
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
