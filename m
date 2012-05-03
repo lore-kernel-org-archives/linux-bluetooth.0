@@ -1,59 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
+From: Tom Gundersen <teg@jklm.no>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: report the right security level in getsockopt
-Date: Thu,  3 May 2012 22:59:54 -0300
-Message-Id: <1336096794-16993-2-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1336096794-16993-1-git-send-email-gustavo@padovan.org>
-References: <1336096794-16993-1-git-send-email-gustavo@padovan.org>
+Cc: Tom Gundersen <teg@jklm.no>
+Subject: [PATCH 2/2] udev: remove udev activation of the blutooth daemon
+Date: Fri,  4 May 2012 00:21:53 +0200
+Message-Id: <1336083713-8417-2-git-send-email-teg@jklm.no>
+In-Reply-To: <1336083713-8417-1-git-send-email-teg@jklm.no>
+References: <1336083713-8417-1-git-send-email-teg@jklm.no>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-During a security level elevation we need to keep track of the current
-security level of a connection until the new one is not confirmed.
+Udev is not meant to spawn long-running processes, and as of the next udev
+version such processes will be killed.
 
-Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
+If using systemd, device activation can be used to get the same effect.
+
+On Arch we have been disabling this rule for a long time, even though we
+don't use systemd, as it was causing more problems than it was worth.
+
+Signed-off-by: Tom Gundersen <teg@jklm.no>
 ---
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/l2cap_sock.c    |    6 +++++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ Makefile.am                |    5 ++---
+ configure.ac               |    3 +--
+ scripts/bluetooth.rules.in |    4 ----
+ 3 files changed, 3 insertions(+), 9 deletions(-)
+ delete mode 100644 scripts/bluetooth.rules.in
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 92c0423..ff34be7 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -446,6 +446,7 @@ struct l2cap_chan {
- 	__le16		sport;
+diff --git a/Makefile.am b/Makefile.am
+index 62705f6..44e82c0 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -389,7 +389,7 @@ include Makefile.tools
+ if DATAFILES
+ rulesdir = @UDEV_DIR@/rules.d
  
- 	__u8		sec_level;
-+	__u8		current_sl;
+-udev_files = scripts/bluetooth.rules
++udev_files =
  
- 	__u8		ident;
+ if HID2HCI
+ udev_files += scripts/bluetooth-hid2hci.rules
+@@ -408,8 +408,7 @@ endif
  
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 7e3386f..8f59fa6 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -379,7 +379,10 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
- 		}
+ CLEANFILES += $(rules_DATA)
  
- 		memset(&sec, 0, sizeof(sec));
--		sec.level = chan->sec_level;
-+		if (bt_sk(sk)->suspended)
-+			sec.level = chan->current_sl;
-+		else
-+			sec.level = chan->sec_level;
+-EXTRA_DIST += scripts/bluetooth.rules \
+-		scripts/bluetooth-hid2hci.rules scripts/bluetooth-serial.rules
++EXTRA_DIST += scripts/bluetooth-hid2hci.rules scripts/bluetooth-serial.rules
  
- 		if (sk->sk_state == BT_CONNECTED)
- 			sec.key_size = chan->conn->hcon->enc_key_size;
-@@ -577,6 +580,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
- 			break;
- 		}
+ EXTRA_DIST += doc/manager-api.txt \
+ 		doc/adapter-api.txt doc/device-api.txt \
+diff --git a/configure.ac b/configure.ac
+index f298909..44f33ad 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -71,5 +71,4 @@ if (test -n "${path_systemdunit}"); then
+ fi
+ AM_CONDITIONAL(SYSTEMD, test -n "${path_systemdunit}")
  
-+		chan->current_sl = chan->sec_level;
- 		chan->sec_level = sec.level;
- 
- 		if (!chan->conn)
+-AC_OUTPUT(Makefile scripts/bluetooth.rules doc/version.xml
+-			src/bluetoothd.8 src/bluetooth.service bluez.pc)
++AC_OUTPUT(Makefile doc/version.xml src/bluetoothd.8 src/bluetooth.service bluez.pc)
+diff --git a/scripts/bluetooth.rules.in b/scripts/bluetooth.rules.in
+deleted file mode 100644
+index 64df69d..0000000
+--- a/scripts/bluetooth.rules.in
++++ /dev/null
+@@ -1,4 +0,0 @@
+-# Run helper every time a Bluetooth device appears
+-# On remove actions, bluetoothd should go away by itself
+-ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="@prefix@/sbin/bluetoothd --udev"
+-ACTION=="change", SUBSYSTEM=="bluetooth", RUN+="@prefix@/sbin/bluetoothd --udev"
 -- 
-1.7.10
+1.7.10.1
 
