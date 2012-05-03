@@ -1,39 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 3 May 2012 14:40:25 -0400
-Message-ID: <CACEkAT65YcQ9ggbJfzMOrh7c=E8F1qSKKEx1EUUrMVvc4Z+pHw@mail.gmail.com>
-Subject: determining link quality for poor connections
-From: Andy Pyles <ajpyles@cs.wm.edu>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CAAngNMabAxO9fVN2DM=5xPJAVk_is3QoS1=+TGZPJAbY3TYHMQ@mail.gmail.com>
+References: <1335799650-17597-1-git-send-email-dh.herrmann@googlemail.com>
+	<CAAngNMabAxO9fVN2DM=5xPJAVk_is3QoS1=+TGZPJAbY3TYHMQ@mail.gmail.com>
+Date: Thu, 3 May 2012 17:33:37 +0200
+Message-ID: <CANq1E4QaRHtGxt3d=Z2mvqAFhTY2zid20GGNZ2ZzHjStGepc+A@mail.gmail.com>
+Subject: Re: [PATCH 0/1] HID: User-space HID I/O driver (UHID)
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: Joao Paulo Rechi Vita <jprvita@openbossa.org>
+Cc: linux-input@vger.kernel.org, jkosina@suse.cz, marcel@holtmann.org,
+	claudio.takahasi@openbossa.org, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In reading the spec, I noticed that implementation of link quality is
-up to the implementation of the bluetooth chip manufacturer.
-After testing this (hci_read_link_quality())  on two separate
-bluetooth chipsets, I got some inconsistent results.
+Hi Joao
 
-The test scenario involes sending a simple l2cap message every second
-to a mobile device with bluetooth.
-The mobile device displays the received message to the console.
-I gradually walk away from the sender until the messages are no longer
-displayed (meaning outside of the range.)
-I have bluez 4.98.
+On Wed, May 2, 2012 at 9:09 PM, Joao Paulo Rechi Vita
+<jprvita@openbossa.org> wrote:
+> On Mon, Apr 30, 2012 at 12:27 PM, David Herrmann
+> <dh.herrmann@googlemail.com> wrote:
+>> Hi
+>>
+>> This implements a hid_ll_driver user-space interface similar to uinput f=
+or the
+>> input devices. It allows to implement the HID transport-layer in user-sp=
+ace as
+>> required by Bluetooth Low-Energy (HoG).
+>>
+>> This is my "first final revision" for the module. Please review and test=
+.
+>> Changes from the previous RFCs include:
+>> =A0- The feature-report mechanism is now implemented
+>> =A0- Several min_t() fixes
+>> =A0- Minor coding-style issues
+>>
+>> I did not change __attribute__((__packed__)) to __packed as the latter o=
+ne is
+>> not provided to user-space.
+>>
+>> If there are any more issues, please tell me. And for the record, the Ho=
+G devs
+>> told me that they are working since several months with it now so we hav=
+e a real
+>> user-space application that needs it ;)
+>>
+>> If there are no more issues (which i doubt) I can also resend this split=
+ted into
+>> multiple patches.
+>>
+>
+> Thanks for your work, David. I'll test and review this new version.
+> Did you find out the what is the problem when passing BUS_BLUETOOTH on
+> the 'bus' field of the create request?
 
-After each packet is sent I retrieve the link quality (hci_read_link_quality()).
-I tested this scenario on two different bluetooth chipsets:
+I've spent some time looking into that but I haven't found the
+problem, yet. Maybe Jiri can comment here.
 
-Broadcom device id: 0a5c:217f:  I receive link quality of 255 ( the
-entire duration)
-Atheros-Qualcom devide id:  04ca:3004 (ath3k device) I receive link
-quality of 172 ( the entire duration)
-(I also confirmed these results with hcitool)
+> Also, how does the HID subsystem differentiate from HID protocol
+> versions? We've just found out that HoG exposes what HID protocol
+> version the device implements, is it the case of having an extra field
+> on the uhid_create_req structure to pass this information, or is it
+> already present on the HID descriptor (sorry for my limited knowledge
+> on the HID protocol itself)?
 
-It seems that link_quality is not a useful parameter. As the link
-quality is obviously impaired, this function always returns the same
-value.  I'm also retrieving RSSI which seems to be more indicative of
-the poor connection quality.
+There is already a "version" field in UHID_CREATE. It isn't mandatory,
+though, so setting it to 0 works. I even think the HID core doesn't
+even look into that value except for printk messages.
 
-Is there a better way to determine link quality? Is there a way to
-count packets which need to be re-transmitted?
+> --
+> Jo=E3o Paulo Rechi Vita
+> Openbossa Labs - INdT
+
+Thanks
+David
