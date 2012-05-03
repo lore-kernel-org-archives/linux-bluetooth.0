@@ -1,36 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC obexd v0 0/2] D-Bus error from GError
-Date: Thu,  3 May 2012 11:44:33 +0200
-Message-Id: <1336038275-19591-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Thu, 3 May 2012 12:44:29 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Steffen Becker <steffen.becker@tu-ilmenau.de>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: Can't connect Bluetooth Devices
+Message-ID: <20120503094429.GA6226@x220>
+References: <4F968FF7.7060303@tu-ilmenau.de>
+ <4FA1BB1C.6060409@tu-ilmenau.de>
+ <20120502225815.GE16030@joana>
+ <4FA23B93.8090204@tu-ilmenau.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4FA23B93.8090204@tu-ilmenau.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Steffen,
 
-It is common that a D-Bus error message must be create from a GError object. Often this also involves freeing the GError's memory, which leads to boilerplate code. This RFC proposes a helper function in gdbus in order to remove this code.
+On Thu, May 03, 2012, Steffen Becker wrote:
+> >A linkkey is created during the pairing procedure, just pair your
+> >devices and you will be done.
+> >And let only bluetoothd touch the /var/lib/bluetooth
+> >directory, don't touch there yourself.
+> >
+> >	Gustavo
+> 
+> Thanks for your fast reply, but that's exactly what I don't know:
+> How can I pair my devices?
 
-The proposed name is g_dbus_steal_from_gerror(), which creates a DBusMessage out of a GError object, automatically frees the memory, and sets the pointer to NULL.
+You pair using the CreatePairedDevice D-Bus method that BlueZ provides.
+There are various front-ends that you can use to call this method. If
+you've got GNOME installed then a pairing wizard should be just a few
+mouse clicks away through the Bluetooth icon in the upper right-hand
+corner. If you've only got the command line you can use e.g. the
+simple-agent python script (under the test subdirectory):
 
-This removes 75 error-handling lines from the obex-client codebase, as included in patch 2/2. There are some other occurrences in the server side and also in BlueZ, but these have not been included here.
+	test/simple-agent hci0 <remote address>
 
-As returning GError objects starts to be more common in internal APIs (as planned for obex-client), this helper function would be even more convenient.
+Btw, is there something that the network plugin (which you can operate
+using e.g. test/test-network) doesn't provide but pand does? We'll
+probably remove pand from the source tree along with BlueZ 5.0 so it'd
+be good to know any deficiencies it has.
 
-Mikel Astiz (2):
-  gdbus: Add helper function for error-handling
-  client: Use new D-Bus helper function
-
- client/ftp.c     |   85 +++++++++++++++--------------------------------------
- client/manager.c |   12 ++-----
- client/map.c     |   31 ++++++--------------
- client/pbap.c    |   29 +++++-------------
- client/sync.c    |   20 ++++---------
- gdbus/gdbus.h    |    4 ++
- gdbus/object.c   |   11 +++++++
- 7 files changed, 66 insertions(+), 126 deletions(-)
-
--- 
-1.7.7.6
-
+Johan
