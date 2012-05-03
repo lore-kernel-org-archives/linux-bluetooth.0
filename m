@@ -1,73 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ v4 00/13] gdbus: Better D-Bus introspection
-Date: Thu,  3 May 2012 09:28:49 -0300
-Message-Id: <1336048142-1194-1-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Thu, 3 May 2012 14:23:04 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [RFC obexd v0 1/2] gdbus: Add helper function for error-handling
+Message-ID: <20120503112304.GA9270@x220.ger.corp.intel.com>
+References: <1336038275-19591-1-git-send-email-mikel.astiz.oss@gmail.com>
+ <1336038275-19591-2-git-send-email-mikel.astiz.oss@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1336038275-19591-2-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is v4 of this series. The biggest difference from v3 is that we are not
-adding a decorated signature anymore. Instead we define the type GDBusArgInfo
-and add fields in_args, out_args and args into the tables.
+Hi Mikel,
 
-First 4 patches are the same as before and are independent from the others.
+On Thu, May 03, 2012, Mikel Astiz wrote:
+> +DBusMessage *g_dbus_steal_from_gerror(DBusMessage *message, const char *name,
+> +								GError **err)
+> +{
+> +	DBusMessage *reply;
+> +
+> +	reply = g_dbus_create_error(message, name, "%s", (*err)->message);
+> +	g_clear_error(err);
+> +
+> +	return reply;
+> +}
 
-Patches 5, 6, 7, 8 and 9 are split like this because gdbus is used in projects
-other than BlueZ, so the first 2 patches can be easily ported there.
+Did you consider following the semantics of dbus_set_error_from_message?
 
-Patches 10 and 11 add annotations, just as in v3.
+The calling code could then look something like:
 
-Last 2 patches are minor fixes, because checking the same thing twice don't
-make it a stronger check.
+	if (g_dbus_steal_from_gerror(&gerr, "foo.bar.baz", &reply))
+		return reply;
 
-Lucas De Marchi (13):
-  gdbus: return if method signature is malformed
-  gdbus: do not call memset for terminating NUL
-  Constify GDBus method tables
-  Constify GDBus signal tables
-  gdbus: add argument info to methods and signals
-  Convert GDBus methods and signals to use GDBusArgInfo
-  gdbus: use GDBusArgInfo to generate introspection
-  gdbus: loop over args to check message signature
-  gdbus: remove signatures from tables
-  gdbus: add Deprecated annotation in introspection
-  gdbus: add Method.NoReply annotation in introspection
-  gdbus: do not check signature twice
-  adapter: do not check signature twice
+	do other stuff since there was no error...
 
- attrib/client.c           |   35 ++++++++----
- audio/control.c           |   33 +++++++----
- audio/device.c            |   23 +++++---
- audio/gateway.c           |   30 ++++++----
- audio/headset.c           |   93 +++++++++++++++++++------------
- audio/media.c             |   23 ++++++--
- audio/sink.c              |   37 ++++++------
- audio/source.c            |   24 ++++----
- audio/telephony-dummy.c   |   38 +++++++++----
- audio/telephony-maemo5.c  |    8 ++-
- audio/transport.c         |   30 +++++++---
- gdbus/gdbus.h             |   11 +++-
- gdbus/object.c            |  136 ++++++++++++++++++++++-----------------------
- health/hdp.c              |   69 ++++++++++++++++-------
- input/device.c            |   19 ++++---
- network/connection.c      |   23 +++++---
- network/server.c          |   11 +++-
- plugins/dbusoob.c         |   18 ++++--
- plugins/service.c         |   24 +++++---
- proximity/monitor.c       |   19 +++++--
- proximity/reporter.c      |   14 +++--
- sap/sap-dummy.c           |   18 ++++--
- sap/server.c              |   16 ++++--
- serial/port.c             |   17 ++++--
- serial/proxy.c            |   38 +++++++++----
- src/adapter.c             |   94 ++++++++++++++++++++-----------
- src/device.c              |   32 +++++++----
- src/manager.c             |   40 +++++++++----
- thermometer/thermometer.c |   35 ++++++++----
- 29 files changed, 655 insertions(+), 353 deletions(-)
+One thing that bothers me a bit is that you're forcing the use of a
+single generic D-Bus error code for what may be a multitude of various
+GError codes/domains (the only inherited part being the error message).
+It'd be nice if we could somehow provide a mapping table from GError
+codes/domains to D-Bus errors and only in the no-match case fall back to
+a generic "org.bluez.Error.Failed".
 
--- 
-1.7.10
-
+Johan
