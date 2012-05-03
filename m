@@ -1,31 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 3 May 2012 03:43:04 -0300
+Date: Thu, 3 May 2012 03:06:35 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+To: Syam Sidhardhan <s.syam@samsung.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Enable Low Energy support by default
-Message-ID: <20120503064304.GH16030@joana>
-References: <1336021951-19413-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH v1 2/5] Bluetooth: Remove unused hci_le_ltk_neg_reply()
+Message-ID: <20120503060635.GG16030@joana>
+References: <1334940151-9519-1-git-send-email-s.syam@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1336021951-19413-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1334940151-9519-1-git-send-email-s.syam@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Syam,
 
-* Marcel Holtmann <marcel@holtmann.org> [2012-05-03 07:12:31 +0200]:
+* Syam Sidhardhan <s.syam@samsung.com> [2012-04-20 22:12:31 +0530]:
 
-> The Bluetooth Low Energy support so far was disabled by default via
-> a module parameter. With this change the module parameter will be removed
-> and Low Energy is enabled by default.
+> No one is using hci_le_ltk_neg_reply() in bluetooth subsystem.
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
 > ---
->  include/net/bluetooth/hci.h |    1 -
->  net/bluetooth/hci_event.c   |    2 +-
->  net/bluetooth/mgmt.c        |   12 +++---------
->  3 files changed, 4 insertions(+), 11 deletions(-)
+>  include/net/bluetooth/hci_core.h |    2 --
+>  net/bluetooth/hci_conn.c         |   14 --------------
+>  2 files changed, 0 insertions(+), 16 deletions(-)
 
-Patch has been applied to bluetooth-next. thanks.
+Patch has been applied to bluetooth-next. Thanks.
 
 	Gustavo
