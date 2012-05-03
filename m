@@ -2,39 +2,72 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ v4 02/13] gdbus: do not call memset for terminating NUL
-Date: Thu,  3 May 2012 09:28:51 -0300
-Message-Id: <1336048142-1194-3-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1336048142-1194-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1336048142-1194-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ v4 00/13] gdbus: Better D-Bus introspection
+Date: Thu,  3 May 2012 09:28:49 -0300
+Message-Id: <1336048142-1194-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- gdbus/object.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+This is v4 of this series. The biggest difference from v3 is that we are not
+adding a decorated signature anymore. Instead we define the type GDBusArgInfo
+and add fields in_args, out_args and args into the tables.
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 7a94156..e378074 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -72,7 +72,6 @@ static void print_arguments(GString *gstr, const char *sig,
- 
- 		complete = FALSE;
- 		struct_level = dict_level = 0;
--		memset(type, 0, sizeof(type));
- 
- 		/* Gather enough data to have a single complete type */
- 		for (len = 0; len < (sizeof(type) - 1) && sig[i]; len++, i++) {
-@@ -107,6 +106,8 @@ static void print_arguments(GString *gstr, const char *sig,
- 				break;
- 		}
- 
-+		type[len + 1] = '\0';
-+
- 		if (!complete) {
- 			error("Unexpected signature: %s", sig);
- 			return;
+First 4 patches are the same as before and are independent from the others.
+
+Patches 5, 6, 7, 8 and 9 are split like this because gdbus is used in projects
+other than BlueZ, so the first 2 patches can be easily ported there.
+
+Patches 10 and 11 add annotations, just as in v3.
+
+Last 2 patches are minor fixes, because checking the same thing twice don't
+make it a stronger check.
+
+Lucas De Marchi (13):
+  gdbus: return if method signature is malformed
+  gdbus: do not call memset for terminating NUL
+  Constify GDBus method tables
+  Constify GDBus signal tables
+  gdbus: add argument info to methods and signals
+  Convert GDBus methods and signals to use GDBusArgInfo
+  gdbus: use GDBusArgInfo to generate introspection
+  gdbus: loop over args to check message signature
+  gdbus: remove signatures from tables
+  gdbus: add Deprecated annotation in introspection
+  gdbus: add Method.NoReply annotation in introspection
+  gdbus: do not check signature twice
+  adapter: do not check signature twice
+
+ attrib/client.c           |   35 ++++++++----
+ audio/control.c           |   33 +++++++----
+ audio/device.c            |   23 +++++---
+ audio/gateway.c           |   30 ++++++----
+ audio/headset.c           |   93 +++++++++++++++++++------------
+ audio/media.c             |   23 ++++++--
+ audio/sink.c              |   37 ++++++------
+ audio/source.c            |   24 ++++----
+ audio/telephony-dummy.c   |   38 +++++++++----
+ audio/telephony-maemo5.c  |    8 ++-
+ audio/transport.c         |   30 +++++++---
+ gdbus/gdbus.h             |   11 +++-
+ gdbus/object.c            |  136 ++++++++++++++++++++++-----------------------
+ health/hdp.c              |   69 ++++++++++++++++-------
+ input/device.c            |   19 ++++---
+ network/connection.c      |   23 +++++---
+ network/server.c          |   11 +++-
+ plugins/dbusoob.c         |   18 ++++--
+ plugins/service.c         |   24 +++++---
+ proximity/monitor.c       |   19 +++++--
+ proximity/reporter.c      |   14 +++--
+ sap/sap-dummy.c           |   18 ++++--
+ sap/server.c              |   16 ++++--
+ serial/port.c             |   17 ++++--
+ serial/proxy.c            |   38 +++++++++----
+ src/adapter.c             |   94 ++++++++++++++++++++-----------
+ src/device.c              |   32 +++++++----
+ src/manager.c             |   40 +++++++++----
+ thermometer/thermometer.c |   35 ++++++++----
+ 29 files changed, 655 insertions(+), 353 deletions(-)
+
 -- 
 1.7.10
 
