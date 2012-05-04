@@ -1,31 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 May 2012 16:23:29 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Remove unneeded calculation and magic number
-Message-ID: <20120504192329.GA11510@joana>
-References: <1336031752-8153-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1336031752-8153-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1335976922-19456-5-git-send-email-mathewm@codeaurora.org>
+References: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
+	<1335976922-19456-5-git-send-email-mathewm@codeaurora.org>
+Date: Fri, 4 May 2012 16:12:25 -0300
+Message-ID: <CAA37ikaAHTN_M7kPgqwkyy3+2jUa2WPY8kUFBqfcxvNCNwx1Dg@mail.gmail.com>
+Subject: Re: [PATCH 4/4] Bluetooth: Refactor L2CAP ERTM and streaming transmit segmentation
+From: Ulisses Furquim <ulisses@profusion.mobi>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org, marcel@holtmann.org,
+	pkrystad@codeaurora.org, andrei.emeltchenko.news@gmail.com
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Mat,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-05-03 10:55:52 +0300]:
-
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Remove magic number unneeded calculation since
-> hlen = L2CAP_HDR_SIZE + L2CAP_PSMLEN_SIZE
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Wed, May 2, 2012 at 1:42 PM, Mat Martineau <mathewm@codeaurora.org> wrot=
+e:
+> Use more common code for ERTM and streaming mode segmentation and
+> transmission, and begin using skb control block data for delaying
+> extended or enhanced header generation until just before the packet is
+> transmitted. =A0This code is also better suited for resegmentation,
+> which is needed when L2CAP links are reconfigured after an AMP channel
+> move.
+>
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 > ---
->  net/bluetooth/l2cap_core.c |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> =A0include/net/bluetooth/l2cap.h | =A0 =A01 +
+> =A0net/bluetooth/l2cap_core.c =A0 =A0| =A0154 ++++++++++++++++++++++++---=
+--------------
+> =A02 files changed, 92 insertions(+), 63 deletions(-)
 
-Patch has been applied. Thanks.
+This patch also looks good to me, but it'd be good if Andrei or
+someone else could check as well.
 
-	Gustavo
+Regards,
+
+--=20
+Ulisses Furquim
+ProFUSION embedded systems
+http://profusion.mobi
+Mobile: +55 19 9250 0942
+Skype: ulissesffs
