@@ -1,117 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1336125426-30445-1-git-send-email-jaganath.k@samsung.com>
-References: <1336125426-30445-1-git-send-email-jaganath.k@samsung.com>
-Date: Fri, 4 May 2012 17:05:34 +0300
-Message-ID: <CABBYNZKEtBLw8R_KuFF=dFMHhQn_LajBB4zjq+x_p316DrUeZw@mail.gmail.com>
-Subject: Re: [PATCH obexd v2 1/3] gobex: Add callback and userdata parameter
- to g_obex_cancel_transfer()
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH BlueZ v3 5/6] media: Create multiple transports if needed
+Date: Fri,  4 May 2012 15:14:39 +0200
+Message-Id: <1336137280-6692-6-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1336137280-6692-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1336137280-6692-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-On Fri, May 4, 2012 at 12:57 PM, Jaganath Kanakkassery
-<jaganath.k@samsung.com> wrote:
-> If callback is provided in g_obex_cancel_transfer() current complete
-> callback will be replaced by the new one and user will be informed
-> when abort completes.
-> ---
->  gobex/gobex-transfer.c |   17 +++++++++++++++--
->  gobex/gobex.c          |    4 ++--
->  gobex/gobex.h          |    5 ++++-
->  3 files changed, 21 insertions(+), 5 deletions(-)
->
-> diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-> index c62a91e..724c788 100644
-> --- a/gobex/gobex-transfer.c
-> +++ b/gobex/gobex-transfer.c
-> @@ -624,9 +624,11 @@ guint g_obex_get_rsp(GObex *obex, GObexDataProducer data_func,
->                                                        user_data, err);
->  }
->
-> -gboolean g_obex_cancel_transfer(guint id)
-> +gboolean g_obex_cancel_transfer(guint id, GObexFunc complete_func,
-> +                       gpointer user_data)
->  {
->        struct transfer *transfer = NULL;
-> +       gboolean ret = TRUE;
->
->        g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", id);
->
-> @@ -635,6 +637,17 @@ gboolean g_obex_cancel_transfer(guint id)
->        if (transfer == NULL)
->                return FALSE;
->
-> +       if (complete_func == NULL)
-> +               goto done;
-> +
-> +       transfer->complete_func = complete_func;
-> +       transfer->user_data = user_data;
-> +
-> +       ret = g_obex_pending_req_abort(transfer->obex, NULL);
-> +       if (ret)
-> +               return TRUE;
-> +
-> +done:
->        transfer_free(transfer);
-> -       return TRUE;
-> +       return ret;
->  }
-> diff --git a/gobex/gobex.c b/gobex/gobex.c
-> index f31b733..b20542d 100644
-> --- a/gobex/gobex.c
-> +++ b/gobex/gobex.c
-> @@ -684,7 +684,7 @@ static gint pending_pkt_cmp(gconstpointer a, gconstpointer b)
->        return (p->id - id);
->  }
->
-> -static gboolean pending_req_abort(GObex *obex, GError **err)
-> +gboolean g_obex_pending_req_abort(GObex *obex, GError **err)
->  {
->        struct pending_pkt *p = obex->pending_req;
->        GObexPacket *req;
-> @@ -728,7 +728,7 @@ gboolean g_obex_cancel_req(GObex *obex, guint req_id, gboolean remove_callback)
->        struct pending_pkt *p;
->
->        if (obex->pending_req && obex->pending_req->id == req_id) {
-> -               if (!pending_req_abort(obex, NULL)) {
-> +               if (!g_obex_pending_req_abort(obex, NULL)) {
->                        p = obex->pending_req;
->                        obex->pending_req = NULL;
->                        goto immediate_completion;
-> diff --git a/gobex/gobex.h b/gobex/gobex.h
-> index aacdb53..3120da2 100644
-> --- a/gobex/gobex.h
-> +++ b/gobex/gobex.h
-> @@ -49,6 +49,8 @@ guint g_obex_send_req(GObex *obex, GObexPacket *req, gint timeout,
->  gboolean g_obex_cancel_req(GObex *obex, guint req_id,
->                                                gboolean remove_callback);
->
-> +gboolean g_obex_pending_req_abort(GObex *obex, GError **err);
-> +
->  gboolean g_obex_send_rsp(GObex *obex, guint8 rspcode, GError **err,
->                                                guint8 first_hdr_type, ...);
->
-> @@ -122,7 +124,8 @@ guint g_obex_get_rsp_pkt(GObex *obex, GObexPacket *rsp,
->                        GObexDataProducer data_func, GObexFunc complete_func,
->                        gpointer user_data, GError **err);
->
-> -gboolean g_obex_cancel_transfer(guint id);
-> +gboolean g_obex_cancel_transfer(guint id, GObexFunc complete_func,
-> +                                                       gpointer user_data);
->
->  const char *g_obex_strerror(guint8 err_code);
->  guint8 g_obex_errno_to_rsp(int err);
-> --
-> 1.7.1
+During endpoint registration one than one device might be connected.
+Thus all matching devices should have one transport each.
+---
+ audio/media.c |   26 ++++++++++++++++++++------
+ 1 files changed, 20 insertions(+), 6 deletions(-)
 
-All 3 patches are now upstream, thanks.
-
-
+diff --git a/audio/media.c b/audio/media.c
+index 88b994f..9c7a103 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -688,30 +688,44 @@ static gboolean endpoint_init_a2dp_sink(struct media_endpoint *endpoint,
+ 
+ static gboolean endpoint_init_ag(struct media_endpoint *endpoint, int *err)
+ {
+-	struct audio_device *dev;
++	GSList *list;
++	GSList *l;
+ 
+ 	endpoint->hs_watch = headset_add_state_cb(headset_state_changed,
+ 								endpoint);
+-	dev = manager_find_device(NULL, &endpoint->adapter->src, BDADDR_ANY,
++	list = manager_find_devices(NULL, &endpoint->adapter->src, BDADDR_ANY,
+ 						AUDIO_HEADSET_INTERFACE, TRUE);
+-	if (dev)
++
++	for (l = list; l != NULL; l = l->next) {
++		struct audio_device *dev = l->data;
++
+ 		set_configuration(endpoint, dev, NULL, 0,
+ 						headset_setconf_cb, dev, NULL);
++	}
++
++	g_slist_free(list);
+ 
+ 	return TRUE;
+ }
+ 
+ static gboolean endpoint_init_hs(struct media_endpoint *endpoint, int *err)
+ {
+-	struct audio_device *dev;
++	GSList *list;
++	GSList *l;
+ 
+ 	endpoint->ag_watch = gateway_add_state_cb(gateway_state_changed,
+ 								endpoint);
+-	dev = manager_find_device(NULL, &endpoint->adapter->src, BDADDR_ANY,
++	list = manager_find_devices(NULL, &endpoint->adapter->src, BDADDR_ANY,
+ 						AUDIO_GATEWAY_INTERFACE, TRUE);
+-	if (dev)
++
++	for (l = list; l != NULL; l = l->next) {
++		struct audio_device *dev = l->data;
++
+ 		set_configuration(endpoint, dev, NULL, 0,
+ 						gateway_setconf_cb, dev, NULL);
++	}
++
++	g_slist_free(list);
+ 
+ 	return TRUE;
+ }
 -- 
-Luiz Augusto von Dentz
+1.7.7.6
+
