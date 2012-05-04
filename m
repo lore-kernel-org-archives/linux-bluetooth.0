@@ -1,42 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 0/6] Create transfers in modules
-Date: Fri,  4 May 2012 14:39:32 +0200
-Message-Id: <1336135178-21707-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH v2] Bluetooth: mgmt: Fix device_connected sending order
+Date: Fri,  4 May 2012 13:45:29 +0300
+Message-Id: <1336128329-6650-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1336127870-5930-1-git-send-email-johan.hedberg@gmail.com>
+References: <1336127870-5930-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch series changes the way transfers are created, as discussed in IRC. Instead of having the session API offer all common operations, the modules now use the transfer API directly, and then queue the transfer in the session using obc_session_queue().
+The mgmt_ev_device_connected signal must be sent before any event
+indications happen for sockets associated with the connection. Otherwise
+e.g. device authorization for the sockets will fail with ENOTCONN as
+user space things that there is no baseband link.
 
-The motivation behind this change is that the transfer-initiator module needs to have access to the created object, to be able to access some member variables. This is required for the D-Bus changes in the pipeline.
+This patch fixes the issue by ensuring that the device_connected event
+if sent (if it hasn't been so already) as soon as the first ACL data
+packet arrives from the remote device.
 
-Another alternative to this patch series would be to simply return the transfer pointer in the session API for functions such as obc_session_get(). IMO this would actually be better.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+v2: Fixed missing hdev locking
 
-Please review the changes with care (specially patch 6/6) since there is a lot of code rewrite.
+ net/bluetooth/hci_core.c  |    8 ++++++++
+ net/bluetooth/hci_event.c |    4 ++--
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-Mikel Astiz (6):
-  client: Fix possible double free of params
-  client: Split internal obc_transfer_register()
-  client: Transfer API splits create and register
-  client: Buffer-passing changes in transfer API
-  client: Flip parameter order in transfer API
-  client: Create transfers in modules
-
- client/ftp.c      |   25 +++++++---
- client/manager.c  |   24 +++++++---
- client/map.c      |   18 ++++---
- client/pbap.c     |   30 +++++++-----
- client/session.c  |  130 +++++++++++++----------------------------------------
- client/session.h  |   17 ++-----
- client/sync.c     |   20 +++++---
- client/transfer.c |   83 +++++++++++++++++----------------
- client/transfer.h |   27 +++++-------
- 9 files changed, 163 insertions(+), 211 deletions(-)
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index a7607e4..b5bab83 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2785,6 +2785,14 @@ static inline void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (conn) {
+ 		hci_conn_enter_active_mode(conn, BT_POWER_FORCE_ACTIVE_OFF);
+ 
++		hci_dev_lock(hdev);
++		if (test_bit(HCI_MGMT, &hdev->dev_flags) &&
++		    !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
++			mgmt_device_connected(hdev, &conn->dst, conn->type,
++					      conn->dst_type, 0, NULL, 0,
++					      conn->dev_class);
++		hci_dev_unlock(hdev);
++
+ 		/* Send to upper protocol */
+ 		l2cap_recv_acldata(conn, skb, flags);
+ 		return;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index d986e7b..1d686e1 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2110,7 +2110,7 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
+ 		goto unlock;
+ 	}
+ 
+-	if (!ev->status) {
++	if (!ev->status && !test_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)) {
+ 		struct hci_cp_remote_name_req cp;
+ 		memset(&cp, 0, sizeof(cp));
+ 		bacpy(&cp.bdaddr, &conn->dst);
+@@ -2879,7 +2879,7 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
+ 	if (conn->state != BT_CONFIG)
+ 		goto unlock;
+ 
+-	if (!ev->status) {
++	if (!ev->status && !test_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)) {
+ 		struct hci_cp_remote_name_req cp;
+ 		memset(&cp, 0, sizeof(cp));
+ 		bacpy(&cp.bdaddr, &conn->dst);
 -- 
-1.7.7.6
+1.7.10
 
