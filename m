@@ -2,78 +2,41 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 1/6] client: Fix possible double free of params
-Date: Fri,  4 May 2012 14:39:33 +0200
-Message-Id: <1336135178-21707-2-git-send-email-mikel.astiz.oss@gmail.com>
-In-Reply-To: <1336135178-21707-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1336135178-21707-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v0 0/6] Create transfers in modules
+Date: Fri,  4 May 2012 14:39:32 +0200
+Message-Id: <1336135178-21707-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-obc_transfer_get() and obc_transfer_put() should only assume ownership
-of the given params only in case of success. Otherwise some erros might
-result in a double free of such memory.
----
- client/transfer.c |    9 +++++----
- 1 files changed, 5 insertions(+), 4 deletions(-)
+This patch series changes the way transfers are created, as discussed in IRC. Instead of having the session API offer all common operations, the modules now use the transfer API directly, and then queue the transfer in the session using obc_session_queue().
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 411a7c0..58baa85 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -229,7 +229,6 @@ static struct obc_transfer *obc_transfer_register(DBusConnection *conn,
- 						const char *filename,
- 						const char *name,
- 						const char *type,
--						struct obc_transfer_params *params,
- 						GError **err)
- {
- 	struct obc_transfer *transfer;
-@@ -240,7 +239,6 @@ static struct obc_transfer *obc_transfer_register(DBusConnection *conn,
- 	transfer->filename = g_strdup(filename);
- 	transfer->name = g_strdup(name);
- 	transfer->type = g_strdup(type);
--	transfer->params = params;
- 
- 	/* for OBEX specific mime types we don't need to register a transfer */
- 	if (type != NULL &&
-@@ -319,7 +317,7 @@ struct obc_transfer *obc_transfer_get(DBusConnection *conn,
- 	int perr;
- 
- 	transfer = obc_transfer_register(conn, agent, G_OBEX_OP_GET, filename,
--						name, type, params, err);
-+							name, type, err);
- 	if (transfer == NULL)
- 		return NULL;
- 
-@@ -329,6 +327,8 @@ struct obc_transfer *obc_transfer_get(DBusConnection *conn,
- 		return NULL;
- 	}
- 
-+	transfer->params = params;
-+
- 	return transfer;
- }
- 
-@@ -347,7 +347,7 @@ struct obc_transfer *obc_transfer_put(DBusConnection *conn,
- 	int perr;
- 
- 	transfer = obc_transfer_register(conn, agent, G_OBEX_OP_PUT, filename,
--						name, type, params, err);
-+							name, type, err);
- 	if (transfer == NULL)
- 		return NULL;
- 
-@@ -381,6 +381,7 @@ struct obc_transfer *obc_transfer_put(DBusConnection *conn,
- 	}
- 
- 	transfer->size = st.st_size;
-+	transfer->params = params;
- 
- 	return transfer;
- 
+The motivation behind this change is that the transfer-initiator module needs to have access to the created object, to be able to access some member variables. This is required for the D-Bus changes in the pipeline.
+
+Another alternative to this patch series would be to simply return the transfer pointer in the session API for functions such as obc_session_get(). IMO this would actually be better.
+
+Please review the changes with care (specially patch 6/6) since there is a lot of code rewrite.
+
+Mikel Astiz (6):
+  client: Fix possible double free of params
+  client: Split internal obc_transfer_register()
+  client: Transfer API splits create and register
+  client: Buffer-passing changes in transfer API
+  client: Flip parameter order in transfer API
+  client: Create transfers in modules
+
+ client/ftp.c      |   25 +++++++---
+ client/manager.c  |   24 +++++++---
+ client/map.c      |   18 ++++---
+ client/pbap.c     |   30 +++++++-----
+ client/session.c  |  130 +++++++++++++----------------------------------------
+ client/session.h  |   17 ++-----
+ client/sync.c     |   20 +++++---
+ client/transfer.c |   83 +++++++++++++++++----------------
+ client/transfer.h |   27 +++++-------
+ 9 files changed, 163 insertions(+), 211 deletions(-)
+
 -- 
 1.7.7.6
 
