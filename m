@@ -1,51 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1335976922-19456-2-git-send-email-mathewm@codeaurora.org>
-References: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
-	<1335976922-19456-2-git-send-email-mathewm@codeaurora.org>
-Date: Fri, 4 May 2012 15:55:16 -0300
-Message-ID: <CAA37ika9JvSW1WCDtcnuQnFu3DppGsDx6BqbowiJ1kyz8LBJBQ@mail.gmail.com>
-Subject: Re: [PATCH 1/4] Bluetooth: Fix a redundant and problematic incoming
- MTU check
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org, marcel@holtmann.org,
-	pkrystad@codeaurora.org, andrei.emeltchenko.news@gmail.com
+Message-Id: <201205041732.q44HWi2m019553@imr-da03.mx.aol.com>
+Date: Fri, 4 May 2012 13:32:02 -0400
+From: Kal Torak <chronognosis@aim.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: main.conf issues
+In-Reply-To: <CABBYNZLLCj_cA__ZQazR81OUScbtAKJrbCfV70O3BgTC05=ueg@mail.gmail.com>
+References: <201204271541.q3RFfVd5006035@imr-da04.mx.aol.com>
+	<4F9B0108.2000007@tu-ilmenau.de>
+	<CABBYNZJ2ygZ42r==cDbBFmtzmOFTA-HnDCWk_XM669pHYtfs5Q@mail.gmail.com>
+	<201205011821.q41ILXXx011867@imr-ma03.mx.aol.com>
+	<CABBYNZLLCj_cA__ZQazR81OUScbtAKJrbCfV70O3BgTC05=ueg@mail.gmail.com>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Wed, 2 May 2012 11:08:34 +0300
+Luiz Augusto von Dentz <luiz.dentz@gmail.com> escribió:
 
-On Wed, May 2, 2012 at 1:41 PM, Mat Martineau <mathewm@codeaurora.org> wrot=
-e:
-> The L2CAP MTU for incoming data is verified differently depending on
-> the L2CAP mode, so the check is best performed in a mode-specific
-> context. =A0Checking the incoming MTU before HCI fragment reassembly is
-> a layer violation and assumes all bytes after the standard L2CAP
-> header are L2CAP data.
->
-> This approach causes issues with unsegmented ERTM or streaming mode
-> frames, where there are additional enhanced or extended headers before
-> the data payload and possible FCS bytes after the data payload. =A0A
-> valid frame could be as many as 10 bytes larger than the MTU.
->
-> Removing this code is the best fix, because the MTU is checked later
-> on for all L2CAP data frames (connectionless, basic, ERTM, and
-> streaming). =A0This also gets rid of outdated locking (socket instead of
-> l2cap_chan) and an extra lookup of the channel ID.
->
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
-> =A0net/bluetooth/l2cap_core.c | =A0 20 --------------------
-> =A01 file changed, 20 deletions(-)
+> It seems some security policy is blocking PulseAudio to send messages
+> to bluetoothd, check your /etc/dbus-1/system.d/bluetooth.conf, there
+> is a sample configuration file in the repository src/bluetooth.conf
+> which should work with PulseAudio.
+> 
+> 
 
-This looks good and correct to me.
-
-Regards,
-
---=20
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+Thank you Luiz, I solve that, rigth now I can call the methods
+from dbus-send. But now I'm trying to complete mi initial purpose
+Stream from the device, but I can't do that, when I try to do
+org.bluez.AudioSource.Connect, the method return a error, Unable to
+setup the stream, and bluetoohd logs Unable to select SEP
+at /var/log/messages... What mean that ? SEP ?
+Regards
