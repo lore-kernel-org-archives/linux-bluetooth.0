@@ -1,68 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: mgmt: Fix device_connected sending order
-Date: Fri,  4 May 2012 13:37:50 +0300
-Message-Id: <1336127870-5930-1-git-send-email-johan.hedberg@gmail.com>
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: [PATCH obexd v2 3/3] gobex: Remove g_idle_add to exit main loop in
+ test_stream_put_req_abort()
+Date: Fri, 04 May 2012 15:27:06 +0530
+Message-id: <1336125426-30445-3-git-send-email-jaganath.k@samsung.com>
+In-reply-to: <1336125426-30445-1-git-send-email-jaganath.k@samsung.com>
+References: <1336125426-30445-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
-
-The mgmt_ev_device_connected signal must be sent before any event
-indications happen for sockets associated with the connection. Otherwise
-e.g. device authorization for the sockets will fail with ENOTCONN as
-user space things that there is no baseband link.
-
-This patch fixes the issue by ensuring that the device_connected event
-if sent (if it hasn't been so already) as soon as the first ACL data
-packet arrives from the remote device.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+A callback is provided in g_obex_cancel_transfer() which will be called
+when abort completes which exists the mail loop as well
 ---
- net/bluetooth/hci_core.c  |    6 ++++++
- net/bluetooth/hci_event.c |    4 ++--
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ unit/test-gobex-transfer.c |   10 +++-------
+ 1 files changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a7607e4..0a69272 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2785,6 +2785,12 @@ static inline void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (conn) {
- 		hci_conn_enter_active_mode(conn, BT_POWER_FORCE_ACTIVE_OFF);
+diff --git a/unit/test-gobex-transfer.c b/unit/test-gobex-transfer.c
+index 85ba6fa..2f05784 100644
+--- a/unit/test-gobex-transfer.c
++++ b/unit/test-gobex-transfer.c
+@@ -456,12 +456,8 @@ static gboolean cancel_transfer(gpointer user_data)
+ {
+ 	struct test_data *d = user_data;
  
-+		if (test_bit(HCI_MGMT, &hdev->dev_flags) &&
-+		    !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
-+			mgmt_device_connected(hdev, &conn->dst, conn->type,
-+					      conn->dst_type, 0, NULL, 0,
-+					      conn->dev_class);
-+
- 		/* Send to upper protocol */
- 		l2cap_recv_acldata(conn, skb, flags);
- 		return;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index d986e7b..1d686e1 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2110,7 +2110,7 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
- 		goto unlock;
- 	}
+-	if (d->id > 0) {
+-		g_obex_cancel_transfer(d->id);
+-		d->id = 0;
+-		g_idle_add(cancel_transfer, user_data);
+-	} else
+-		g_main_loop_quit(d->mainloop);
++	if (d->id > 0)
++		g_obex_cancel_transfer(d->id, transfer_complete, user_data);
  
--	if (!ev->status) {
-+	if (!ev->status && !test_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)) {
- 		struct hci_cp_remote_name_req cp;
- 		memset(&cp, 0, sizeof(cp));
- 		bacpy(&cp.bdaddr, &conn->dst);
-@@ -2879,7 +2879,7 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
- 	if (conn->state != BT_CONFIG)
- 		goto unlock;
+ 	return FALSE;
+ }
+@@ -509,7 +505,7 @@ static void test_stream_put_req_abort(void)
+ 	g_source_remove(io_id);
+ 	g_obex_unref(obex);
  
--	if (!ev->status) {
-+	if (!ev->status && !test_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)) {
- 		struct hci_cp_remote_name_req cp;
- 		memset(&cp, 0, sizeof(cp));
- 		bacpy(&cp.bdaddr, &conn->dst);
+-	g_assert_no_error(d.err);
++	g_assert_error(d.err, G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED);
+ }
+ 
+ static void test_stream_put_rsp_abort(void)
 -- 
-1.7.10
+1.7.1
 
