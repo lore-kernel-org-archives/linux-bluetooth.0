@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 5/6] client: Flip parameter order in transfer API
-Date: Fri,  4 May 2012 14:39:37 +0200
-Message-Id: <1336135178-21707-6-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v0 2/6] client: Split internal obc_transfer_register()
+Date: Fri,  4 May 2012 14:39:34 +0200
+Message-Id: <1336135178-21707-3-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1336135178-21707-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1336135178-21707-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,87 +12,124 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-This minor change makes the transfer API more consistent with the
-parameter-order used in the session API.
+The creation process has been internally split into two steps: creation
+and D-Bus registration. This is easier to understand and it also allows
+to expose these two-steps in the transfer API.
 ---
- client/session.c  |    4 ++--
- client/transfer.c |    8 ++++----
- client/transfer.h |    8 ++++----
- 3 files changed, 10 insertions(+), 10 deletions(-)
+ client/transfer.c |   51 ++++++++++++++++++++++++++++-----------------------
+ 1 files changed, 28 insertions(+), 23 deletions(-)
 
-diff --git a/client/session.c b/client/session.c
-index 8523a86..f8f8da4 100644
---- a/client/session.c
-+++ b/client/session.c
-@@ -970,7 +970,7 @@ guint obc_session_get(struct obc_session *session, const char *type,
- 		return 0;
- 	}
- 
--	transfer = obc_transfer_get(targetfile, name, type, apparam,
-+	transfer = obc_transfer_get(type, name, targetfile, apparam,
- 							apparam_size, err);
- 	if (transfer == NULL)
- 		return 0;
-@@ -989,7 +989,7 @@ guint obc_session_send(struct obc_session *session, const char *filename,
- 		return 0;
- 	}
- 
--	transfer = obc_transfer_put(filename, name, NULL, NULL, 0, NULL, 0,
-+	transfer = obc_transfer_put(NULL, name, filename, NULL, 0, NULL, 0,
- 									err);
- 	if (transfer == NULL)
- 		return 0;
 diff --git a/client/transfer.c b/client/transfer.c
-index 7bf687c..ecf3232 100644
+index 58baa85..a725e19 100644
 --- a/client/transfer.c
 +++ b/client/transfer.c
-@@ -319,9 +319,9 @@ done:
- 	return TRUE;
+@@ -223,29 +223,35 @@ static void obc_transfer_free(struct obc_transfer *transfer)
+ 	g_free(transfer);
  }
  
--struct obc_transfer *obc_transfer_get(const char *filename,
-+struct obc_transfer *obc_transfer_get(const char *type,
- 					const char *name,
--					const char *type,
-+					const char *filename,
- 					const void *params, size_t psize,
- 					GError **err)
+-static struct obc_transfer *obc_transfer_register(DBusConnection *conn,
+-						const char *agent,
+-						guint8 op,
++static struct obc_transfer *obc_transfer_create(guint8 op,
+ 						const char *filename,
+ 						const char *name,
+-						const char *type,
+-						GError **err)
++						const char *type)
  {
-@@ -340,9 +340,9 @@ struct obc_transfer *obc_transfer_get(const char *filename,
- 	return transfer;
+ 	struct obc_transfer *transfer;
+ 
+ 	transfer = g_new0(struct obc_transfer, 1);
+ 	transfer->op = op;
+-	transfer->agent = g_strdup(agent);
+ 	transfer->filename = g_strdup(filename);
+ 	transfer->name = g_strdup(name);
+ 	transfer->type = g_strdup(type);
+ 
++	return transfer;
++}
++
++static gboolean obc_transfer_register(struct obc_transfer *transfer,
++						DBusConnection *conn,
++						const char *agent,
++						GError **err)
++{
+ 	/* for OBEX specific mime types we don't need to register a transfer */
+-	if (type != NULL &&
+-			(strncmp(type, "x-obex/", 7) == 0 ||
+-			strncmp(type, "x-bt/", 5) == 0))
++	if (transfer->type != NULL &&
++			(strncmp(transfer->type, "x-obex/", 7) == 0 ||
++			strncmp(transfer->type, "x-bt/", 5) == 0))
+ 		goto done;
+ 
++	transfer->agent = g_strdup(agent);
++
+ 	transfer->path = g_strdup_printf("%s/transfer%ju",
+ 			TRANSFER_BASEPATH, counter++);
+ 
+@@ -253,7 +259,7 @@ static struct obc_transfer *obc_transfer_register(DBusConnection *conn,
+ 	if (transfer->conn == NULL) {
+ 		g_set_error(err, OBC_TRANSFER_ERROR, -EFAULT,
+ 						"Unable to connect to D-Bus");
+-		goto fail;
++		return FALSE;
+ 	}
+ 
+ 	if (g_dbus_register_interface(transfer->conn, transfer->path,
+@@ -262,18 +268,13 @@ static struct obc_transfer *obc_transfer_register(DBusConnection *conn,
+ 				transfer, NULL) == FALSE) {
+ 		g_set_error(err, OBC_TRANSFER_ERROR, -EFAULT,
+ 						"Unable to register to D-Bus");
+-		goto fail;
++		return FALSE;
+ 	}
+ 
+ done:
+ 	DBG("%p registered %s", transfer, transfer->path);
+ 
+-	return transfer;
+-
+-fail:
+-	obc_transfer_free(transfer);
+-
+-	return NULL;
++	return TRUE;
  }
  
--struct obc_transfer *obc_transfer_put(const char *filename,
-+struct obc_transfer *obc_transfer_put(const char *type,
- 					const char *name,
--					const char *type,
-+					const char *filename,
- 					const void *contents, size_t csize,
- 					const void *params, size_t psize,
- 					GError **err)
-diff --git a/client/transfer.h b/client/transfer.h
-index aebba7f..94bb800 100644
---- a/client/transfer.h
-+++ b/client/transfer.h
-@@ -27,14 +27,14 @@ typedef void (*transfer_callback_t) (struct obc_transfer *transfer,
- 					gint64 transferred, GError *err,
- 					void *user_data);
+ static gboolean transfer_open(struct obc_transfer *transfer, int flags,
+@@ -316,10 +317,12 @@ struct obc_transfer *obc_transfer_get(DBusConnection *conn,
+ 	struct obc_transfer *transfer;
+ 	int perr;
  
--struct obc_transfer *obc_transfer_get(const char *filename,
-+struct obc_transfer *obc_transfer_get(const char *type,
- 					const char *name,
--					const char *type,
-+					const char *filename,
- 					const void *params, size_t psize,
- 					GError **err);
--struct obc_transfer *obc_transfer_put(const char *filename,
-+struct obc_transfer *obc_transfer_put(const char *type,
- 					const char *name,
--					const char *type,
-+					const char *filename,
- 					const void *contents, size_t csize,
- 					const void *params, size_t psize,
- 					GError **err);
+-	transfer = obc_transfer_register(conn, agent, G_OBEX_OP_GET, filename,
+-							name, type, err);
+-	if (transfer == NULL)
++	transfer = obc_transfer_create(G_OBEX_OP_GET, filename, name, type);
++
++	if (!obc_transfer_register(transfer, conn, agent, err)) {
++		obc_transfer_free(transfer);
+ 		return NULL;
++	}
+ 
+ 	perr = transfer_open(transfer, O_WRONLY | O_CREAT | O_TRUNC, 0600, err);
+ 	if (perr < 0) {
+@@ -346,10 +349,12 @@ struct obc_transfer *obc_transfer_put(DBusConnection *conn,
+ 	struct stat st;
+ 	int perr;
+ 
+-	transfer = obc_transfer_register(conn, agent, G_OBEX_OP_PUT, filename,
+-							name, type, err);
+-	if (transfer == NULL)
++	transfer = obc_transfer_create(G_OBEX_OP_PUT, filename, name, type);
++
++	if (!obc_transfer_register(transfer, conn, agent, err)) {
++		obc_transfer_free(transfer);
+ 		return NULL;
++	}
+ 
+ 	if (contents != NULL) {
+ 		ssize_t w;
 -- 
 1.7.7.6
 
