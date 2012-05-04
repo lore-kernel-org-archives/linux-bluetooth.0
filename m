@@ -1,45 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1335976922-19456-4-git-send-email-mathewm@codeaurora.org>
-References: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
-	<1335976922-19456-4-git-send-email-mathewm@codeaurora.org>
-Date: Fri, 4 May 2012 16:06:27 -0300
-Message-ID: <CAA37ikaut-vNWLS1d9vGUWV=rLMH6Ud72j8Mwn3+u18-a_Bf-w@mail.gmail.com>
-Subject: Re: [PATCH 3/4] Bluetooth: Lock the L2CAP channel when sending
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org, marcel@holtmann.org,
-	pkrystad@codeaurora.org, andrei.emeltchenko.news@gmail.com
-Content-Type: text/plain; charset=ISO-8859-1
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix coding style
+Date: Fri,  4 May 2012 15:59:48 -0300
+Message-Id: <1336157988-4602-1-git-send-email-gustavo@padovan.org>
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Fix offending styles all over the tree. This is in conformance David
+Miller's style rules.
 
-On Wed, May 2, 2012 at 1:42 PM, Mat Martineau <mathewm@codeaurora.org> wrot=
-e:
-> The ERTM and streaming mode transmit queue must only be accessed while
-> the L2CAP channel lock is held. =A0Locking the channel before calling
-> l2cap_chan_send ensures that multiple threads cannot simultaneously
-> manipulate the queue when sending and receiving concurrently.
->
-> L2CAP channel locking had previously moved to the l2cap_chan struct
-> instead of the associated socket, so some of the old socket locking
-> can also be removed in this patch.
->
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
-> =A0include/net/bluetooth/bluetooth.h | =A0 =A02 --
-> =A0net/bluetooth/l2cap_sock.c =A0 =A0 =A0 =A0| =A0 15 ++++++++-------
-> =A02 files changed, 8 insertions(+), 9 deletions(-)
+Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
+---
+ include/net/bluetooth/hci_core.h |    2 +-
+ net/bluetooth/hci_event.c        |    2 +-
+ net/bluetooth/l2cap_core.c       |   12 ++++++------
+ net/bluetooth/l2cap_sock.c       |    2 +-
+ 4 files changed, 9 insertions(+), 9 deletions(-)
 
-Looks good. I'm just wondering if we still have issues with chan lock
-versus sock lock elsewhere. Maybe you've done some auditing of this?
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index ef6e654..6148352 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -433,7 +433,7 @@ static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 	return (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
+-				test_bit(HCI_CONN_SSP_ENABLED, &conn->flags));
++		test_bit(HCI_CONN_SSP_ENABLED, &conn->flags));
+ }
+ 
+ static inline void hci_conn_hash_init(struct hci_dev *hdev)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index fb23c47..a094315 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1122,7 +1122,7 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 		schedule_delayed_work(&hdev->adv_work, ADV_CLEAR_TIMEOUT);
+ 
+ 		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
+-				hdev->discovery.state == DISCOVERY_FINDING) {
++		    hdev->discovery.state == DISCOVERY_FINDING) {
+ 			mgmt_interleaved_discovery(hdev);
+ 		} else {
+ 			hci_dev_lock(hdev);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 9d6c650..89a50ed 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -426,7 +426,7 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan)
+ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ {
+ 	BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
+-			__le16_to_cpu(chan->psm), chan->dcid);
++	       __le16_to_cpu(chan->psm), chan->dcid);
+ 
+ 	conn->disc_reason = HCI_ERROR_REMOTE_USER_TERM;
+ 
+@@ -1128,7 +1128,7 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
+ 			src_any = !bacmp(&bt_sk(sk)->src, BDADDR_ANY);
+ 			dst_any = !bacmp(&bt_sk(sk)->dst, BDADDR_ANY);
+ 			if ((src_match && dst_any) || (src_any && dst_match) ||
+-							(src_any && dst_any))
++			    (src_any && dst_any))
+ 				c1 = c;
+ 		}
+ 	}
+@@ -1385,7 +1385,7 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
+ 			src_any = !bacmp(&bt_sk(sk)->src, BDADDR_ANY);
+ 			dst_any = !bacmp(&bt_sk(sk)->dst, BDADDR_ANY);
+ 			if ((src_match && dst_any) || (src_any && dst_match) ||
+-							(src_any && dst_any))
++			    (src_any && dst_any))
+ 				c1 = c;
+ 		}
+ 	}
+@@ -1406,7 +1406,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
+ 	int err;
+ 
+ 	BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
+-						__le16_to_cpu(chan->psm));
++	       __le16_to_cpu(chan->psm));
+ 
+ 	hdev = hci_get_route(dst, src);
+ 	if (!hdev)
+@@ -3245,8 +3245,8 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	flags  = __le16_to_cpu(rsp->flags);
+ 	result = __le16_to_cpu(rsp->result);
+ 
+-	BT_DBG("scid 0x%4.4x flags 0x%2.2x result 0x%2.2x len %d",
+-			scid, flags, result, len);
++	BT_DBG("scid 0x%4.4x flags 0x%2.2x result 0x%2.2x len %d", scid, flags,
++	       result, len);
+ 
+ 	chan = l2cap_get_chan_by_scid(conn, scid);
+ 	if (!chan)
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 4d03b45..8d8b50a 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -938,7 +938,7 @@ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
+ 
+ 	skb = bt_skb_send_alloc(chan->sk, len, nb, &err);
+ 	if (!skb)
+-		return (ERR_PTR(err));
++		return ERR_PTR(err);
+ 
+ 	return skb;
+ }
+-- 
+1.7.10
 
-Regards,
-
---=20
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
