@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH BlueZ v3 6/6] media: Enable parallel requests to endpoint
-Date: Fri,  4 May 2012 15:14:40 +0200
-Message-Id: <1336137280-6692-7-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH BlueZ v3 4/6] media: Split media_endpoint_create
+Date: Fri,  4 May 2012 15:14:38 +0200
+Message-Id: <1336137280-6692-5-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1336137280-6692-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1336137280-6692-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,150 +12,168 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-If endpoint is handling several devices, it should be able to handle
-multiple requests, one per each.
+This function is starting to be too long and needs to be split.
+
+After this patch, the resulting code should be exactly equivalent as the
+previous implementation.
 ---
- audio/media.c |   46 ++++++++++++++++++++++++----------------------
- 1 files changed, 24 insertions(+), 22 deletions(-)
+ audio/media.c |  119 +++++++++++++++++++++++++++++++++++++-------------------
+ 1 files changed, 78 insertions(+), 41 deletions(-)
 
 diff --git a/audio/media.c b/audio/media.c
-index 9c7a103..61ec153 100644
+index fd5a369..88b994f 100644
 --- a/audio/media.c
 +++ b/audio/media.c
-@@ -67,6 +67,7 @@ struct media_adapter {
- };
- 
- struct endpoint_request {
-+	struct media_endpoint	*endpoint;
- 	DBusMessage		*msg;
- 	DBusPendingCall		*call;
- 	media_endpoint_cb_t	cb;
-@@ -85,7 +86,7 @@ struct media_endpoint {
- 	guint			hs_watch;
- 	guint			ag_watch;
- 	guint			watch;
--	struct endpoint_request *request;
-+	GSList			*requests;
- 	struct media_adapter	*adapter;
- 	GSList			*transports;
- };
-@@ -127,15 +128,22 @@ static void endpoint_request_free(struct endpoint_request *request)
- 	g_free(request);
+@@ -658,6 +658,64 @@ static void gateway_state_changed(struct audio_device *dev,
+ 	}
  }
  
--static void media_endpoint_cancel(struct media_endpoint *endpoint)
-+static void media_endpoint_cancel(struct endpoint_request *request)
- {
--	struct endpoint_request *request = endpoint->request;
-+	struct media_endpoint *endpoint = request->endpoint;
- 
- 	if (request->call)
- 		dbus_pending_call_cancel(request->call);
- 
-+	endpoint->requests = g_slist_remove(endpoint->requests, request);
++static gboolean endpoint_init_a2dp_source(struct media_endpoint *endpoint,
++						gboolean delay_reporting,
++						int *err)
++{
++	endpoint->sep = a2dp_add_sep(&endpoint->adapter->src,
++					AVDTP_SEP_TYPE_SOURCE, endpoint->codec,
++					delay_reporting, &a2dp_endpoint,
++					endpoint, a2dp_destroy_endpoint, err);
++	if (endpoint->sep == NULL)
++		return FALSE;
 +
- 	endpoint_request_free(request);
--	endpoint->request = NULL;
++	return TRUE;
 +}
 +
-+static void media_endpoint_cancel_all(struct media_endpoint *endpoint)
++static gboolean endpoint_init_a2dp_sink(struct media_endpoint *endpoint,
++						gboolean delay_reporting,
++						int *err)
 +{
-+	while (endpoint->requests != NULL)
-+		media_endpoint_cancel(endpoint->requests->data);
- }
- 
- static void media_endpoint_destroy(struct media_endpoint *endpoint)
-@@ -150,8 +158,7 @@ static void media_endpoint_destroy(struct media_endpoint *endpoint)
- 	if (endpoint->ag_watch)
- 		gateway_remove_state_cb(endpoint->ag_watch);
- 
--	if (endpoint->request)
--		media_endpoint_cancel(endpoint);
-+	media_endpoint_cancel_all(endpoint);
- 
- 	g_slist_free_full(endpoint->transports,
- 				(GDestroyNotify) media_transport_destroy);
-@@ -228,8 +235,7 @@ done:
- 
- static void clear_endpoint(struct media_endpoint *endpoint)
++	endpoint->sep = a2dp_add_sep(&endpoint->adapter->src,
++					AVDTP_SEP_TYPE_SINK, endpoint->codec,
++					delay_reporting, &a2dp_endpoint,
++					endpoint, a2dp_destroy_endpoint, err);
++	if (endpoint->sep == NULL)
++		return FALSE;
++
++	return TRUE;
++}
++
++static gboolean endpoint_init_ag(struct media_endpoint *endpoint, int *err)
++{
++	struct audio_device *dev;
++
++	endpoint->hs_watch = headset_add_state_cb(headset_state_changed,
++								endpoint);
++	dev = manager_find_device(NULL, &endpoint->adapter->src, BDADDR_ANY,
++						AUDIO_HEADSET_INTERFACE, TRUE);
++	if (dev)
++		set_configuration(endpoint, dev, NULL, 0,
++						headset_setconf_cb, dev, NULL);
++
++	return TRUE;
++}
++
++static gboolean endpoint_init_hs(struct media_endpoint *endpoint, int *err)
++{
++	struct audio_device *dev;
++
++	endpoint->ag_watch = gateway_add_state_cb(gateway_state_changed,
++								endpoint);
++	dev = manager_find_device(NULL, &endpoint->adapter->src, BDADDR_ANY,
++						AUDIO_GATEWAY_INTERFACE, TRUE);
++	if (dev)
++		set_configuration(endpoint, dev, NULL, 0,
++						gateway_setconf_cb, dev, NULL);
++
++	return TRUE;
++}
++
+ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapter,
+ 						const char *sender,
+ 						const char *path,
+@@ -669,6 +727,7 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
+ 						int *err)
  {
--	if (endpoint->request)
--		media_endpoint_cancel(endpoint);
-+	media_endpoint_cancel_all(endpoint);
+ 	struct media_endpoint *endpoint;
++	gboolean succeeded;
  
- 	while (endpoint->transports != NULL)
- 		clear_configuration(endpoint, endpoint->transports->data);
-@@ -237,8 +243,8 @@ static void clear_endpoint(struct media_endpoint *endpoint)
+ 	endpoint = g_new0(struct media_endpoint, 1);
+ 	endpoint->sender = g_strdup(sender);
+@@ -684,46 +743,28 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
  
- static void endpoint_reply(DBusPendingCall *call, void *user_data)
- {
--	struct media_endpoint *endpoint = user_data;
--	struct endpoint_request *request = endpoint->request;
-+	struct endpoint_request *request = user_data;
-+	struct media_endpoint *endpoint = request->endpoint;
- 	DBusMessage *reply;
- 	DBusError err;
- 	gboolean value;
-@@ -299,9 +305,8 @@ done:
- 	if (request->cb)
- 		request->cb(endpoint, ret, size, request->user_data);
+ 	endpoint->adapter = adapter;
  
--	if (endpoint->request)
--		endpoint_request_free(endpoint->request);
--	endpoint->request = NULL;
-+	endpoint->requests = g_slist_remove(endpoint->requests, request);
-+	endpoint_request_free(request);
- }
- 
- static gboolean media_endpoint_async_call(DBusConnection *conn,
-@@ -313,9 +318,6 @@ static gboolean media_endpoint_async_call(DBusConnection *conn,
- {
- 	struct endpoint_request *request;
- 
--	if (endpoint->request)
--		return FALSE;
+-	if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0) {
+-		endpoint->sep = a2dp_add_sep(&adapter->src,
+-					AVDTP_SEP_TYPE_SOURCE, codec,
+-					delay_reporting, &a2dp_endpoint,
+-					endpoint, a2dp_destroy_endpoint, err);
+-		if (endpoint->sep == NULL)
+-			goto failed;
+-	} else if (strcasecmp(uuid, A2DP_SINK_UUID) == 0) {
+-		endpoint->sep = a2dp_add_sep(&adapter->src,
+-					AVDTP_SEP_TYPE_SINK, codec,
+-					delay_reporting, &a2dp_endpoint,
+-					endpoint, a2dp_destroy_endpoint, err);
+-		if (endpoint->sep == NULL)
+-			goto failed;
+-	} else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
+-					strcasecmp(uuid, HSP_AG_UUID) == 0) {
+-		struct audio_device *dev;
 -
- 	request = g_new0(struct endpoint_request, 1);
+-		endpoint->hs_watch = headset_add_state_cb(headset_state_changed,
+-								endpoint);
+-		dev = manager_find_device(NULL, &adapter->src, BDADDR_ANY,
+-						AUDIO_HEADSET_INTERFACE, TRUE);
+-		if (dev)
+-			set_configuration(endpoint, dev, NULL, 0,
+-						headset_setconf_cb, dev, NULL);
+-	} else if (strcasecmp(uuid, HFP_HS_UUID) == 0 ||
+-					strcasecmp(uuid, HSP_HS_UUID) == 0) {
+-		struct audio_device *dev;
++	if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0)
++		succeeded = endpoint_init_a2dp_source(endpoint,
++							delay_reporting, err);
++	else if (strcasecmp(uuid, A2DP_SINK_UUID) == 0)
++		succeeded = endpoint_init_a2dp_sink(endpoint,
++							delay_reporting, err);
++	else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
++					strcasecmp(uuid, HSP_AG_UUID) == 0)
++		succeeded = endpoint_init_ag(endpoint, err);
++	else if (strcasecmp(uuid, HFP_HS_UUID) == 0 ||
++					strcasecmp(uuid, HSP_HS_UUID) == 0)
++		succeeded = endpoint_init_hs(endpoint, err);
++	else {
++		succeeded = FALSE;
  
- 	/* Timeout should be less than avdtp request timeout (4 seconds) */
-@@ -326,13 +328,16 @@ static gboolean media_endpoint_async_call(DBusConnection *conn,
- 		return FALSE;
+-		endpoint->ag_watch = gateway_add_state_cb(gateway_state_changed,
+-								endpoint);
+-		dev = manager_find_device(NULL, &adapter->src, BDADDR_ANY,
+-						AUDIO_GATEWAY_INTERFACE, TRUE);
+-		if (dev)
+-			set_configuration(endpoint, dev, NULL, 0,
+-						gateway_setconf_cb, dev, NULL);
+-	} else {
+ 		if (err)
+ 			*err = -EINVAL;
+-		goto failed;
++	}
++
++	if (!succeeded) {
++		g_free(endpoint);
++		return NULL;
  	}
  
--	dbus_pending_call_set_notify(request->call, endpoint_reply, endpoint, NULL);
-+	dbus_pending_call_set_notify(request->call, endpoint_reply, request,
-+									NULL);
- 
-+	request->endpoint = endpoint;
- 	request->msg = msg;
- 	request->cb = cb;
- 	request->destroy = destroy;
- 	request->user_data = user_data;
--	endpoint->request = request;
-+
-+	endpoint->requests = g_slist_append(endpoint->requests, request);
- 
- 	DBG("Calling %s: name = %s path = %s", dbus_message_get_member(msg),
- 			dbus_message_get_destination(msg),
-@@ -351,9 +356,6 @@ static gboolean select_configuration(struct media_endpoint *endpoint,
- 	DBusConnection *conn;
- 	DBusMessage *msg;
- 
--	if (endpoint->request != NULL)
--		return FALSE;
+ 	endpoint->watch = g_dbus_add_disconnect_watch(adapter->conn, sender,
+@@ -736,10 +777,6 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
+ 	if (err)
+ 		*err = 0;
+ 	return endpoint;
 -
- 	conn = endpoint->adapter->conn;
+-failed:
+-	g_free(endpoint);
+-	return NULL;
+ }
  
- 	msg = dbus_message_new_method_call(endpoint->sender, endpoint->path,
-@@ -412,7 +414,7 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
- 
- 	transport = find_device_transport(endpoint, device);
- 
--	if (transport != NULL || endpoint->request != NULL)
-+	if (transport != NULL)
- 		return FALSE;
- 
- 	conn = endpoint->adapter->conn;
+ static struct media_endpoint *media_adapter_find_endpoint(
 -- 
 1.7.7.6
 
