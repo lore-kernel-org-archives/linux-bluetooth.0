@@ -1,50 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 May 2012 14:54:17 -0700 (PDT)
 From: Mat Martineau <mathewm@codeaurora.org>
-To: Ulisses Furquim <ulisses@profusion.mobi>
-cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org, marcel@holtmann.org,
-    pkrystad@codeaurora.org, andrei.emeltchenko.news@gmail.com
-Subject: Re: [PATCH 3/4] Bluetooth: Lock the L2CAP channel when sending
-In-Reply-To: <CAA37ikaut-vNWLS1d9vGUWV=rLMH6Ud72j8Mwn3+u18-a_Bf-w@mail.gmail.com>
-Message-ID: <alpine.DEB.2.02.1205041444580.22429@mathewm-linux>
-References: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org> <1335976922-19456-4-git-send-email-mathewm@codeaurora.org> <CAA37ikaut-vNWLS1d9vGUWV=rLMH6Ud72j8Mwn3+u18-a_Bf-w@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=ISO-8859-1; format=flowed
+To: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
+Cc: pkrystad@codeaurora.org
+Subject: [PATCHv2 1/2] Bluetooth: Restore locking semantics when looking up L2CAP channels
+Date: Fri,  4 May 2012 14:20:30 -0700
+Message-Id: <1336166431-4926-2-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1336166431-4926-1-git-send-email-mathewm@codeaurora.org>
+References: <1336166431-4926-1-git-send-email-mathewm@codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+As the comment for l2cap_get_chan_by_scid indicated, the function used
+to return a locked socket.  The lock for the socket was acquired while
+the channel list was also locked.
 
-Hi Ulisses -
+When locking was moved over to the l2cap_chan structure, the channel
+lock was no longer acquired with the channel list still locked.  This
+made it possible for the l2cap_chan to be deleted after
+conn->chan_lock was released but before l2cap_chan_lock was called.
+Making the call to l2cap_chan_lock before releasing conn->chan_lock
+makes it impossible for the l2cap_chan to be deleted at the wrong
+time.
 
-On Fri, 4 May 2012, Ulisses Furquim wrote:
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ net/bluetooth/l2cap_core.c |   10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
-> Hi Mat,
->
-> On Wed, May 2, 2012 at 1:42 PM, Mat Martineau <mathewm@codeaurora.org> wrote:
->> The ERTM and streaming mode transmit queue must only be accessed while
->> the L2CAP channel lock is held.  Locking the channel before calling
->> l2cap_chan_send ensures that multiple threads cannot simultaneously
->> manipulate the queue when sending and receiving concurrently.
->>
->> L2CAP channel locking had previously moved to the l2cap_chan struct
->> instead of the associated socket, so some of the old socket locking
->> can also be removed in this patch.
->>
->> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
->> ---
->>  include/net/bluetooth/bluetooth.h |    2 --
->>  net/bluetooth/l2cap_sock.c        |   15 ++++++++-------
->>  2 files changed, 8 insertions(+), 9 deletions(-)
->
-> Looks good. I'm just wondering if we still have issues with chan lock
-> versus sock lock elsewhere. Maybe you've done some auditing of this?
-
-I did an extensive review of the locking code with respect to ERTM 
-last week, and I'm satisfied with the use of chan_lock there.
-
-The work to decouple l2cap_chan from sockets is not yet complete, so 
-there are still socket locking calls at connect and disconnect time. 
-The data path looks like it is clear of socket locks now.
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 2f94067..11236ac 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -98,13 +98,15 @@ static struct l2cap_chan *__l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16
+ }
+ 
+ /* Find channel with given SCID.
+- * Returns locked socket */
++ * Returns locked channel. */
+ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 cid)
+ {
+ 	struct l2cap_chan *c;
+ 
+ 	mutex_lock(&conn->chan_lock);
+ 	c = __l2cap_get_chan_by_scid(conn, cid);
++	if (c)
++		l2cap_chan_lock(c);
+ 	mutex_unlock(&conn->chan_lock);
+ 
+ 	return c;
+@@ -2860,8 +2862,6 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	if (!chan)
+ 		return -ENOENT;
+ 
+-	l2cap_chan_lock(chan);
+-
+ 	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2) {
+ 		struct l2cap_cmd_rej_cid rej;
+ 
+@@ -2971,8 +2971,6 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	if (!chan)
+ 		return 0;
+ 
+-	l2cap_chan_lock(chan);
+-
+ 	switch (result) {
+ 	case L2CAP_CONF_SUCCESS:
+ 		l2cap_conf_rfc_get(chan, rsp->data, len);
+@@ -4296,8 +4294,6 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 		return 0;
+ 	}
+ 
+-	l2cap_chan_lock(chan);
+-
+ 	BT_DBG("chan %p, len %d", chan, skb->len);
+ 
+ 	if (chan->state != BT_CONNECTED)
+-- 
+1.7.10
 
 --
 Mat Martineau
