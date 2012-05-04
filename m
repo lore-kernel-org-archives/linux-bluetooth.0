@@ -1,45 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 May 2012 17:37:51 -0300
+Date: Fri, 4 May 2012 16:51:46 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	pkrystad@codeaurora.org, ulisses@profusion.mobi,
-	andrei.emeltchenko.news@gmail.com
-Subject: Re: [PATCH 1/4] Bluetooth: Fix a redundant and problematic incoming
- MTU check
-Message-ID: <20120504203751.GC11510@joana>
-References: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
- <1335976922-19456-2-git-send-email-mathewm@codeaurora.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: mgmt: Fix device_connected sending order
+Message-ID: <20120504195145.GB11510@joana>
+References: <1336127870-5930-1-git-send-email-johan.hedberg@gmail.com>
+ <1336128329-6650-1-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1335976922-19456-2-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1336128329-6650-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi Johan,
 
-* Mat Martineau <mathewm@codeaurora.org> [2012-05-02 09:41:59 -0700]:
+* Johan Hedberg <johan.hedberg@gmail.com> [2012-05-04 13:45:29 +0300]:
 
-> The L2CAP MTU for incoming data is verified differently depending on
-> the L2CAP mode, so the check is best performed in a mode-specific
-> context.  Checking the incoming MTU before HCI fragment reassembly is
-> a layer violation and assumes all bytes after the standard L2CAP
-> header are L2CAP data.
+> From: Johan Hedberg <johan.hedberg@intel.com>
 > 
-> This approach causes issues with unsegmented ERTM or streaming mode
-> frames, where there are additional enhanced or extended headers before
-> the data payload and possible FCS bytes after the data payload.  A
-> valid frame could be as many as 10 bytes larger than the MTU.
+> The mgmt_ev_device_connected signal must be sent before any event
+> indications happen for sockets associated with the connection. Otherwise
+> e.g. device authorization for the sockets will fail with ENOTCONN as
+> user space things that there is no baseband link.
 > 
-> Removing this code is the best fix, because the MTU is checked later
-> on for all L2CAP data frames (connectionless, basic, ERTM, and
-> streaming).  This also gets rid of outdated locking (socket instead of
-> l2cap_chan) and an extra lookup of the channel ID.
+> This patch fixes the issue by ensuring that the device_connected event
+> if sent (if it hasn't been so already) as soon as the first ACL data
+> packet arrives from the remote device.
+
+This patch fixes the ENOTCONN issue for me. Let's see if Marcel or
+someone else wants comment on it before we go ahead and apply it.
 > 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  net/bluetooth/l2cap_core.c |   20 --------------------
->  1 file changed, 20 deletions(-)
-
-Patch has been applied to the bluetooth tree. Thanks.
-
 	Gustavo
