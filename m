@@ -1,11 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: mgmt: Fix device_connected sending order
-Date: Fri,  4 May 2012 13:45:29 +0300
-Message-Id: <1336128329-6650-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1336127870-5930-1-git-send-email-johan.hedberg@gmail.com>
-References: <1336127870-5930-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: mgmt: Fix device_connected sending order
+Date: Fri,  4 May 2012 13:37:50 +0300
+Message-Id: <1336127870-5930-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -22,27 +20,23 @@ packet arrives from the remote device.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
-v2: Fixed missing hdev locking
-
- net/bluetooth/hci_core.c  |    8 ++++++++
+ net/bluetooth/hci_core.c  |    6 ++++++
  net/bluetooth/hci_event.c |    4 ++--
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a7607e4..b5bab83 100644
+index a7607e4..0a69272 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2785,6 +2785,14 @@ static inline void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -2785,6 +2785,12 @@ static inline void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
  	if (conn) {
  		hci_conn_enter_active_mode(conn, BT_POWER_FORCE_ACTIVE_OFF);
  
-+		hci_dev_lock(hdev);
 +		if (test_bit(HCI_MGMT, &hdev->dev_flags) &&
 +		    !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
 +			mgmt_device_connected(hdev, &conn->dst, conn->type,
 +					      conn->dst_type, 0, NULL, 0,
 +					      conn->dev_class);
-+		hci_dev_unlock(hdev);
 +
  		/* Send to upper protocol */
  		l2cap_recv_acldata(conn, skb, flags);
