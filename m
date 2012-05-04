@@ -1,108 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] input: increase security level of the connection
-Date: Thu,  3 May 2012 23:01:19 -0300
-Message-Id: <1336096879-17327-1-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 1/2] Bluetooth: notify userspace of security level change
+Date: Thu,  3 May 2012 22:59:53 -0300
+Message-Id: <1336096794-16993-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- input/device.c |   45 +++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 43 insertions(+), 2 deletions(-)
+When the userspace request a security level change it needs to be notified
+of when the change is complete.
+This patch make the socket non writable while the security request is
+ongoing. If it succeeds POLL_OUT is emitted, otherwise the channel is
+disconnected.
 
-diff --git a/input/device.c b/input/device.c
-index 59388d8..092560d 100644
---- a/input/device.c
-+++ b/input/device.c
-@@ -74,7 +74,9 @@ struct input_conn {
- 	GIOChannel		*intr_io;
- 	guint			ctrl_watch;
- 	guint			intr_watch;
-+	guint			sec_watch;
- 	int			timeout;
-+	struct hidp_connadd_req *req;
- 	struct input_device	*idev;
+Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
+---
+ include/net/bluetooth/bluetooth.h |    1 +
+ net/bluetooth/af_bluetooth.c      |    2 +-
+ net/bluetooth/hci_event.c         |    7 +++++++
+ net/bluetooth/l2cap_core.c        |    5 +++++
+ net/bluetooth/l2cap_sock.c        |   10 +++++-----
+ 5 files changed, 19 insertions(+), 6 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 2fb268f..4e750df 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -195,6 +195,7 @@ struct bt_sock {
+ 	struct list_head accept_q;
+ 	struct sock *parent;
+ 	u32 defer_setup;
++	bool  suspended;
  };
  
-@@ -128,6 +130,9 @@ static void input_conn_free(struct input_conn *iconn)
- 	if (iconn->intr_watch)
- 		g_source_remove(iconn->intr_watch);
+ struct bt_sock_list {
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 72eb187..6fb68a9 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -450,7 +450,7 @@ unsigned int bt_sock_poll(struct file *file, struct socket *sock, poll_table *wa
+ 			sk->sk_state == BT_CONFIG)
+ 		return mask;
  
-+	if (iconn->sec_watch)
-+		g_source_remove(iconn->sec_watch);
-+
- 	if (iconn->intr_io)
- 		g_io_channel_unref(iconn->intr_io);
+-	if (sock_writeable(sk))
++	if (!bt_sk(sk)->suspended && sock_writeable(sk))
+ 		mask |= POLLOUT | POLLWRNORM | POLLWRBAND;
+ 	else
+ 		set_bit(SOCK_ASYNC_NOSPACE, &sk->sk_socket->flags);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 507fcec..86f74f6 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2062,6 +2062,12 @@ static inline void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *
  
-@@ -566,14 +571,31 @@ cleanup:
- 	g_free(req);
- }
+ 		clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
  
-+static gboolean encrypt_notify(GIOChannel *io, GIOCondition condition,
-+								gpointer data)
-+{
-+	struct input_conn *iconn = data;
-+	struct hidp_connadd_req *req = iconn->req;
-+
-+	DBG(" ");
-+
-+	encrypt_completed(0, req);
-+
-+	iconn->sec_watch = 0;
-+	iconn->req = NULL;
-+
-+	return FALSE;
-+}
-+
- static int hidp_add_connection(const struct input_device *idev,
--				const struct input_conn *iconn)
-+					struct input_conn *iconn)
- {
- 	struct hidp_connadd_req *req;
- 	struct fake_hid *fake_hid;
- 	struct fake_input *fake;
- 	sdp_record_t *rec;
- 	char src_addr[18], dst_addr[18];
-+	GError *gerr = NULL;
- 	int err;
- 
- 	req = g_new0(struct hidp_connadd_req, 1);
-@@ -627,7 +649,12 @@ static int hidp_add_connection(const struct input_device *idev,
- 		if (err == 0) {
- 			/* Waiting async encryption */
- 			return 0;
--		} else if (err != -EALREADY) {
++		if (ev->status && conn->state == BT_CONNECTED) {
++			hci_acl_disconn(conn, 0x13);
++			hci_conn_put(conn);
++			goto unlock;
 +		}
 +
-+		if (err == -ENOSYS)
-+			goto nosys;
-+
-+		if (err != -EALREADY) {
- 			error("encrypt_link: %s (%d)", strerror(-err), -err);
- 			goto cleanup;
- 		}
-@@ -640,6 +667,20 @@ cleanup:
- 	g_free(req);
+ 		if (conn->state == BT_CONFIG) {
+ 			if (!ev->status)
+ 				conn->state = BT_CONNECTED;
+@@ -2072,6 +2078,7 @@ static inline void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *
+ 			hci_encrypt_cfm(conn, ev->status, ev->encrypt);
+ 	}
  
- 	return err;
-+
-+nosys:
-+	if (!bt_io_set(iconn->intr_io, BT_IO_L2CAP, &gerr,
-+				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-+				BT_IO_OPT_INVALID)) {
-+		error("btio: %s", gerr->message);
-+		g_error_free(gerr);
-+		goto cleanup;
-+	}
-+
-+	iconn->req = req;
-+	iconn->sec_watch = g_io_add_watch(iconn->intr_io, G_IO_OUT,
-+							encrypt_notify, iconn);
-+	return 0;
++unlock:
+ 	hci_dev_unlock(hdev);
  }
  
- static int is_connected(struct input_conn *iconn)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 0f2b1be..67053f8 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4884,6 +4884,11 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 
+ 		if (!status && (chan->state == BT_CONNECTED ||
+ 						chan->state == BT_CONFIG)) {
++			struct sock *sk = chan->sk;
++
++			bt_sk(sk)->suspended = false;
++			sk->sk_state_change(sk);
++
+ 			l2cap_check_encryption(chan, encrypt);
+ 			l2cap_chan_unlock(chan);
+ 			continue;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 82b6368..7e3386f 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -596,12 +596,12 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+ 			sk->sk_state = BT_CONFIG;
+ 			chan->state = BT_CONFIG;
+ 
+-		/* or for ACL link, under defer_setup time */
+-		} else if (sk->sk_state == BT_CONNECT2 &&
+-					bt_sk(sk)->defer_setup) {
+-			err = l2cap_chan_check_security(chan);
++		/* or for ACL link */
+ 		} else {
+-			err = -EINVAL;
++			if (!l2cap_chan_check_security(chan))
++				bt_sk(sk)->suspended = true;
++			else
++				sk->sk_state_change(sk);
+ 		}
+ 		break;
+ 
 -- 
 1.7.10
 
