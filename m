@@ -2,147 +2,103 @@ Return-Path: <cyrus@holtmann.org>
 From: Jaganath Kanakkassery <jaganath.k@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH obexd v2 2/3] client: Wait for abort completion before
- Transfer.Cancel returns
-Date: Fri, 04 May 2012 15:27:05 +0530
-Message-id: <1336125426-30445-2-git-send-email-jaganath.k@samsung.com>
-In-reply-to: <1336125426-30445-1-git-send-email-jaganath.k@samsung.com>
-References: <1336125426-30445-1-git-send-email-jaganath.k@samsung.com>
+Subject: [PATCH obexd v2 1/3] gobex: Add callback and userdata parameter to
+ g_obex_cancel_transfer()
+Date: Fri, 04 May 2012 15:27:04 +0530
+Message-id: <1336125426-30445-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A new callback is given to g_obex_cancel_transfer() which will be
-called when abort completes and then only "Cancel" method reply will
-be sent to user
+If callback is provided in g_obex_cancel_transfer() current complete
+callback will be replaced by the new one and user will be informed
+when abort completes.
 ---
- client/transfer.c |   65 ++++++++++++++++++++++++++++++++++------------------
- 1 files changed, 42 insertions(+), 23 deletions(-)
+ gobex/gobex-transfer.c |   17 +++++++++++++++--
+ gobex/gobex.c          |    4 ++--
+ gobex/gobex.h          |    5 ++++-
+ 3 files changed, 21 insertions(+), 5 deletions(-)
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 411a7c0..d796239 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -59,6 +59,7 @@ struct obc_transfer {
- 	struct obc_transfer_params *params;
- 	struct transfer_callback *callback;
- 	DBusConnection *conn;
-+	DBusMessage *msg;
- 	char *agent;		/* Transfer agent */
- 	char *path;		/* Transfer path */
- 	gchar *filename;	/* Transfer file location */
-@@ -136,37 +137,51 @@ static DBusMessage *obc_transfer_get_properties(DBusConnection *connection,
- 	return reply;
+diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+index c62a91e..724c788 100644
+--- a/gobex/gobex-transfer.c
++++ b/gobex/gobex-transfer.c
+@@ -624,9 +624,11 @@ guint g_obex_get_rsp(GObex *obex, GObexDataProducer data_func,
+ 							user_data, err);
  }
  
--static void obc_transfer_abort(struct obc_transfer *transfer)
-+static void abort_complete(GObex *obex, GError *err, gpointer user_data)
+-gboolean g_obex_cancel_transfer(guint id)
++gboolean g_obex_cancel_transfer(guint id, GObexFunc complete_func,
++			gpointer user_data)
  {
-+	struct obc_transfer *transfer = user_data;
- 	struct transfer_callback *callback = transfer->callback;
-+	DBusMessage *reply;
+ 	struct transfer *transfer = NULL;
++	gboolean ret = TRUE;
  
--	if (transfer->xfer > 0) {
--		g_obex_cancel_transfer(transfer->xfer);
--		transfer->xfer = 0;
--	}
-+	transfer->xfer = 0;
+ 	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", id);
  
--	if (transfer->obex != NULL) {
--		g_obex_unref(transfer->obex);
--		transfer->obex = NULL;
--	}
-+	reply = dbus_message_new_method_return(transfer->msg);
-+	if (reply)
-+		g_dbus_send_message(transfer->conn, reply);
+@@ -635,6 +637,17 @@ gboolean g_obex_cancel_transfer(guint id)
+ 	if (transfer == NULL)
+ 		return FALSE;
  
--	if (callback) {
--		GError *err;
-+	dbus_message_unref(transfer->msg);
-+	transfer->msg = NULL;
- 
--		err = g_error_new(OBC_TRANSFER_ERROR, -ECANCELED, "%s",
--							strerror(ECANCELED));
--		callback->func(transfer, transfer->transferred, err,
-+	if (callback) {
-+		if (err) {
-+			callback->func(transfer, transfer->transferred, err,
- 							callback->data);
--		g_error_free(err);
-+		} else {
-+			GError *abort_err;
++	if (complete_func == NULL)
++		goto done;
 +
-+			abort_err = g_error_new(OBC_TRANSFER_ERROR, -ECANCELED, "%s",
-+						"Transfer cancelled by user");
-+			callback->func(transfer, transfer->transferred, abort_err,
-+								callback->data);
-+			g_error_free(abort_err);
-+		}
- 	}
++	transfer->complete_func = complete_func;
++	transfer->user_data = user_data;
++
++	ret = g_obex_pending_req_abort(transfer->obex, NULL);
++	if (ret)
++		return TRUE;
++
++done:
+ 	transfer_free(transfer);
+-	return TRUE;
++	return ret;
+ }
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index f31b733..b20542d 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -684,7 +684,7 @@ static gint pending_pkt_cmp(gconstpointer a, gconstpointer b)
+ 	return (p->id - id);
  }
  
-+static gboolean obc_transfer_abort(struct obc_transfer *transfer)
-+{
-+	if (transfer->xfer == 0)
-+		return FALSE;
-+
-+	return g_obex_cancel_transfer(transfer->xfer, abort_complete,
-+								transfer);
-+}
-+
- static DBusMessage *obc_transfer_cancel(DBusConnection *connection,
- 					DBusMessage *message, void *user_data)
+-static gboolean pending_req_abort(GObex *obex, GError **err)
++gboolean g_obex_pending_req_abort(GObex *obex, GError **err)
  {
- 	struct obc_transfer *transfer = user_data;
- 	const gchar *sender;
--	DBusMessage *reply;
+ 	struct pending_pkt *p = obex->pending_req;
+ 	GObexPacket *req;
+@@ -728,7 +728,7 @@ gboolean g_obex_cancel_req(GObex *obex, guint req_id, gboolean remove_callback)
+ 	struct pending_pkt *p;
  
- 	sender = dbus_message_get_sender(message);
- 	if (g_strcmp0(transfer->agent, sender) != 0)
-@@ -174,18 +189,19 @@ static DBusMessage *obc_transfer_cancel(DBusConnection *connection,
- 				"org.openobex.Error.NotAuthorized",
- 				"Not Authorized");
+ 	if (obex->pending_req && obex->pending_req->id == req_id) {
+-		if (!pending_req_abort(obex, NULL)) {
++		if (!g_obex_pending_req_abort(obex, NULL)) {
+ 			p = obex->pending_req;
+ 			obex->pending_req = NULL;
+ 			goto immediate_completion;
+diff --git a/gobex/gobex.h b/gobex/gobex.h
+index aacdb53..3120da2 100644
+--- a/gobex/gobex.h
++++ b/gobex/gobex.h
+@@ -49,6 +49,8 @@ guint g_obex_send_req(GObex *obex, GObexPacket *req, gint timeout,
+ gboolean g_obex_cancel_req(GObex *obex, guint req_id,
+ 						gboolean remove_callback);
  
--	reply = dbus_message_new_method_return(message);
--	if (!reply)
--		return NULL;
-+	if (!obc_transfer_abort(transfer))
-+		return g_dbus_create_error(message,
-+				"org.openobex.Error.Failed",
-+				"Failed");
- 
--	obc_transfer_abort(transfer);
-+	transfer->msg = dbus_message_ref(message);
- 
--	return reply;
-+	return NULL;
- }
- 
- static GDBusMethodTable obc_transfer_methods[] = {
- 	{ "GetProperties", "", "a{sv}", obc_transfer_get_properties },
--	{ "Cancel", "", "", obc_transfer_cancel },
-+	{ "Cancel", "", "", obc_transfer_cancel, G_DBUS_METHOD_FLAG_ASYNC },
- 	{ }
- };
- 
-@@ -194,7 +210,7 @@ static void obc_transfer_free(struct obc_transfer *transfer)
- 	DBG("%p", transfer);
- 
- 	if (transfer->xfer)
--		g_obex_cancel_transfer(transfer->xfer);
-+		g_obex_cancel_transfer(transfer->xfer, NULL, NULL);
- 
- 	if (transfer->op == G_OBEX_OP_GET &&
- 					transfer->transferred != transfer->size)
-@@ -211,6 +227,9 @@ static void obc_transfer_free(struct obc_transfer *transfer)
- 	if (transfer->conn)
- 		dbus_connection_unref(transfer->conn);
- 
-+	if (transfer->msg)
-+		dbus_message_unref(transfer->msg);
++gboolean g_obex_pending_req_abort(GObex *obex, GError **err);
 +
- 	if (transfer->obex)
- 		g_obex_unref(transfer->obex);
+ gboolean g_obex_send_rsp(GObex *obex, guint8 rspcode, GError **err,
+ 						guint8 first_hdr_type, ...);
  
+@@ -122,7 +124,8 @@ guint g_obex_get_rsp_pkt(GObex *obex, GObexPacket *rsp,
+ 			GObexDataProducer data_func, GObexFunc complete_func,
+ 			gpointer user_data, GError **err);
+ 
+-gboolean g_obex_cancel_transfer(guint id);
++gboolean g_obex_cancel_transfer(guint id, GObexFunc complete_func,
++							gpointer user_data);
+ 
+ const char *g_obex_strerror(guint8 err_code);
+ guint8 g_obex_errno_to_rsp(int err);
 -- 
 1.7.1
 
