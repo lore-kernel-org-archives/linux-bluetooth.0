@@ -1,92 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CANq1E4QaRHtGxt3d=Z2mvqAFhTY2zid20GGNZ2ZzHjStGepc+A@mail.gmail.com>
-References: <1335799650-17597-1-git-send-email-dh.herrmann@googlemail.com>
-	<CAAngNMabAxO9fVN2DM=5xPJAVk_is3QoS1=+TGZPJAbY3TYHMQ@mail.gmail.com>
-	<CANq1E4QaRHtGxt3d=Z2mvqAFhTY2zid20GGNZ2ZzHjStGepc+A@mail.gmail.com>
-Date: Sat, 5 May 2012 17:50:14 +0200
-Message-ID: <CANq1E4Qs0sy_c8103i69DxMaWJjvE2-9EGzrXmCGxv-YhLkPBQ@mail.gmail.com>
-Subject: Re: [PATCH 0/1] HID: User-space HID I/O driver (UHID)
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-Cc: linux-input@vger.kernel.org, jkosina@suse.cz, marcel@holtmann.org,
-	claudio.takahasi@openbossa.org, linux-bluetooth@vger.kernel.org
+In-Reply-To: <alpine.DEB.2.02.1205041444580.22429@mathewm-linux>
+References: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
+	<1335976922-19456-4-git-send-email-mathewm@codeaurora.org>
+	<CAA37ikaut-vNWLS1d9vGUWV=rLMH6Ud72j8Mwn3+u18-a_Bf-w@mail.gmail.com>
+	<alpine.DEB.2.02.1205041444580.22429@mathewm-linux>
+Date: Fri, 4 May 2012 22:11:55 -0300
+Message-ID: <CAA37ikZFFC-eyQ578aks3hiO8DYGwvbQADntZG82TUOkb91ALA@mail.gmail.com>
+Subject: Re: [PATCH 3/4] Bluetooth: Lock the L2CAP channel when sending
+From: Ulisses Furquim <ulisses@profusion.mobi>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	marcel@holtmann.org, pkrystad@codeaurora.org,
+	andrei.emeltchenko.news@gmail.com
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joao
+Hi Mat,
 
-On Thu, May 3, 2012 at 5:33 PM, David Herrmann
-<dh.herrmann@googlemail.com> wrote:
-> Hi Joao
+On Fri, May 4, 2012 at 6:54 PM, Mat Martineau <mathewm@codeaurora.org> wrote:
 >
-> On Wed, May 2, 2012 at 9:09 PM, Joao Paulo Rechi Vita
-> <jprvita@openbossa.org> wrote:
->> On Mon, Apr 30, 2012 at 12:27 PM, David Herrmann
->> <dh.herrmann@googlemail.com> wrote:
->>> Hi
->>>
->>> This implements a hid_ll_driver user-space interface similar to uinput =
-for the
->>> input devices. It allows to implement the HID transport-layer in user-s=
-pace as
->>> required by Bluetooth Low-Energy (HoG).
->>>
->>> This is my "first final revision" for the module. Please review and tes=
-t.
->>> Changes from the previous RFCs include:
->>> =A0- The feature-report mechanism is now implemented
->>> =A0- Several min_t() fixes
->>> =A0- Minor coding-style issues
->>>
->>> I did not change __attribute__((__packed__)) to __packed as the latter =
-one is
->>> not provided to user-space.
->>>
->>> If there are any more issues, please tell me. And for the record, the H=
-oG devs
->>> told me that they are working since several months with it now so we ha=
-ve a real
->>> user-space application that needs it ;)
->>>
->>> If there are no more issues (which i doubt) I can also resend this spli=
-tted into
->>> multiple patches.
->>>
+> Hi Ulisses -
+>
+>
+> On Fri, 4 May 2012, Ulisses Furquim wrote:
+>
+>> Hi Mat,
 >>
->> Thanks for your work, David. I'll test and review this new version.
->> Did you find out the what is the problem when passing BUS_BLUETOOTH on
->> the 'bus' field of the create request?
+>> On Wed, May 2, 2012 at 1:42 PM, Mat Martineau <mathewm@codeaurora.org>
+>> wrote:
+>>>
+>>> The ERTM and streaming mode transmit queue must only be accessed while
+>>> the L2CAP channel lock is held.  Locking the channel before calling
+>>> l2cap_chan_send ensures that multiple threads cannot simultaneously
+>>> manipulate the queue when sending and receiving concurrently.
+>>>
+>>> L2CAP channel locking had previously moved to the l2cap_chan struct
+>>> instead of the associated socket, so some of the old socket locking
+>>> can also be removed in this patch.
+>>>
+>>> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+>>> ---
+>>>  include/net/bluetooth/bluetooth.h |    2 --
+>>>  net/bluetooth/l2cap_sock.c        |   15 ++++++++-------
+>>>  2 files changed, 8 insertions(+), 9 deletions(-)
+>>
+>>
+>> Looks good. I'm just wondering if we still have issues with chan lock
+>> versus sock lock elsewhere. Maybe you've done some auditing of this?
 >
-> I've spent some time looking into that but I haven't found the
-> problem, yet. Maybe Jiri can comment here.
-
-hid-next should fix this:
-http://git.kernel.org/?p=3Dlinux/kernel/git/jikos/hid.git;a=3Dcommitdiff;h=
-=3D8215d557e5f3a70e50e07c857d35c250fee62a73
-
-I actually haven't tested UHID with hid-next. Some core interfaces are
-changed and I will update UHID as soon as Linus pulls the HID updates.
-
-The BUS_USB problems should be gone, though.
-
->> Also, how does the HID subsystem differentiate from HID protocol
->> versions? We've just found out that HoG exposes what HID protocol
->> version the device implements, is it the case of having an extra field
->> on the uhid_create_req structure to pass this information, or is it
->> already present on the HID descriptor (sorry for my limited knowledge
->> on the HID protocol itself)?
+> I did an extensive review of the locking code with respect to ERTM last
+> week, and I'm satisfied with the use of chan_lock there.
 >
-> There is already a "version" field in UHID_CREATE. It isn't mandatory,
-> though, so setting it to 0 works. I even think the HID core doesn't
-> even look into that value except for printk messages.
->
->> --
->> Jo=E3o Paulo Rechi Vita
->> Openbossa Labs - INdT
->
-> Thanks
-> David
+> The work to decouple l2cap_chan from sockets is not yet complete, so there
+> are still socket locking calls at connect and disconnect time. The data path
+> looks like it is clear of socket locks now.
 
-Regards
-David
+Thanks, that's good to know.
+
+Regards,
+
+-- 
+Ulisses Furquim
+ProFUSION embedded systems
+http://profusion.mobi
+Mobile: +55 19 9250 0942
+Skype: ulissesffs
