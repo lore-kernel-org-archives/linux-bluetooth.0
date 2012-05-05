@@ -1,69 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 4 May 2012 21:12:43 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2012-05-04
+Message-ID: <20120505001243.GC23728@joana>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.02.1205041444580.22429@mathewm-linux>
-References: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org>
-	<1335976922-19456-4-git-send-email-mathewm@codeaurora.org>
-	<CAA37ikaut-vNWLS1d9vGUWV=rLMH6Ud72j8Mwn3+u18-a_Bf-w@mail.gmail.com>
-	<alpine.DEB.2.02.1205041444580.22429@mathewm-linux>
-Date: Fri, 4 May 2012 22:11:55 -0300
-Message-ID: <CAA37ikZFFC-eyQ578aks3hiO8DYGwvbQADntZG82TUOkb91ALA@mail.gmail.com>
-Subject: Re: [PATCH 3/4] Bluetooth: Lock the L2CAP channel when sending
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	marcel@holtmann.org, pkrystad@codeaurora.org,
-	andrei.emeltchenko.news@gmail.com
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="k1lZvvs/B4yU6o8G"
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
 
-On Fri, May 4, 2012 at 6:54 PM, Mat Martineau <mathewm@codeaurora.org> wrote:
->
-> Hi Ulisses -
->
->
-> On Fri, 4 May 2012, Ulisses Furquim wrote:
->
->> Hi Mat,
->>
->> On Wed, May 2, 2012 at 1:42 PM, Mat Martineau <mathewm@codeaurora.org>
->> wrote:
->>>
->>> The ERTM and streaming mode transmit queue must only be accessed while
->>> the L2CAP channel lock is held.  Locking the channel before calling
->>> l2cap_chan_send ensures that multiple threads cannot simultaneously
->>> manipulate the queue when sending and receiving concurrently.
->>>
->>> L2CAP channel locking had previously moved to the l2cap_chan struct
->>> instead of the associated socket, so some of the old socket locking
->>> can also be removed in this patch.
->>>
->>> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
->>> ---
->>>  include/net/bluetooth/bluetooth.h |    2 --
->>>  net/bluetooth/l2cap_sock.c        |   15 ++++++++-------
->>>  2 files changed, 8 insertions(+), 9 deletions(-)
->>
->>
->> Looks good. I'm just wondering if we still have issues with chan lock
->> versus sock lock elsewhere. Maybe you've done some auditing of this?
->
-> I did an extensive review of the locking code with respect to ERTM last
-> week, and I'm satisfied with the use of chan_lock there.
->
-> The work to decouple l2cap_chan from sockets is not yet complete, so there
-> are still socket locking calls at connect and disconnect time. The data path
-> looks like it is clear of socket locks now.
+--k1lZvvs/B4yU6o8G
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thanks, that's good to know.
+Hi John,
 
-Regards,
+A few more patch to 3.4. There is 3 fixes from Mat Martineau, a fix for
+a incoming MTU check that was breaking ERTM, still on ERTM there is a
+patch that fixes concurrency with one of our locks. His third patch is
+related to lock fixes too.
+Besides that Johan fixed a wrong bit set in the Inquiry code, Vishal
+Agarwal added a EIR fix and finally we have support for one more usb id.
 
--- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+Please pull or let me know of any problems!
+
+	Gustavo
+
+---
+
+The following changes since commit 985140369be1e886754d8ac0375dd64e4f727311:
+
+  Add Foxconn / Hon Hai IDs for btusb module (2012-04-24 11:38:41 -0300)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth for-upstream
+
+for you to fetch changes up to 78521bdb4a42770c4c2d48317c00ec0d7f451a08:
+
+  Bluetooth: Lock the L2CAP channel when sending (2012-05-04 20:56:29 -0300)
+
+----------------------------------------------------------------
+Johan Hedberg (1):
+      Bluetooth: Fix Inquiry with RSSI event mask
+
+Mat Martineau (3):
+      Bluetooth: Fix a redundant and problematic incoming MTU check
+      Bluetooth: Restore locking semantics when looking up L2CAP channels
+      Bluetooth: Lock the L2CAP channel when sending
+
+Michael Gruetzner (1):
+      bluetooth: Add support for Foxconn/Hon Hai AR5BBU22 0489:E03C
+
+Vishal Agarwal (1):
+      Bluetooth: Fix EIR data generation for mgmt_device_found
+
+ drivers/bluetooth/ath3k.c         |    6 ++++++
+ drivers/bluetooth/btusb.c         |    3 +++
+ include/net/bluetooth/bluetooth.h |    2 --
+ include/net/bluetooth/hci_core.h  |   17 +++++++++++++++++
+ net/bluetooth/hci_event.c         |    6 ++++--
+ net/bluetooth/l2cap_core.c        |   30 +++---------------------------
+ net/bluetooth/l2cap_sock.c        |   19 +++++++++++--------
+ 7 files changed, 44 insertions(+), 39 deletions(-)
+
+
+--k1lZvvs/B4yU6o8G
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBAgAGBQJPpHB7AAoJEPs3PUX4s20oDGEQAKO2ZR5q735Yi+gGkqww68It
+r1zGCHFsyGRlq4egeCwuC8bzjKIYhVz7TuC8DqN1dX0BHjtoBWtyCahktj1gOhU8
+30XccbBJNLPnTJKceTueF+/54q53mVguQiypDn+Kjfgokbpw2cZAT0yuSHfBYmYF
+4t9RL1OIdl4LM9sDsnE0zAP7dRlKLB5zaw3NdHvxJqaQtjfnp9gOyZBX8J4ccZUB
+VJ4Nhq8IJ63TvnsRKuTbwFGoVezMYXmglnNioCslsQMLLH70SVCiNTnoDiedAmjb
+KECCl5NQOPloKemm2mSIMb3xutbCfB1m8NJFcXrhrNFsjx1piRrcd//8QnDXY8pZ
+aHVuX45aqC08nnQyZAxANxDuzCKJKQJGTT/yMxYNWotA9GSAbjkM93JQ/+jB6ULd
+dVZdzLLtFP1u8aPgQfdXdixBEALDyHx8iIu8nBX86xPorhj6ckKbNE+ByNSWVqYo
+gpp9sWjjCJFwBIATl0gT1JSL3BRcKSNnJs/QLaTbUB4yQyevPqb80vyiVPau0/GM
+BM6m7RtTiUFT792t43WWd3o3FocvrKXU9EImxiJBvlBmUeXsZ05mqdKL9obAVzLV
+MYa9PDDuMwkI4vjv1isJ5V9mSqd/Wf8xrMsnTEFqUIQQohFe9RPho3RmKarFoUWh
+lw5F6CdX5WrRARSSyPAx
+=TY3/
+-----END PGP SIGNATURE-----
+
+--k1lZvvs/B4yU6o8G--
