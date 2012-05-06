@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1336320833.5970.84.camel@aeonflux>
-Subject: Re: [PATCH 2/2] Bluetooth: report the right security level in
- getsockopt
+Message-ID: <1336320446.5970.80.camel@aeonflux>
+Subject: Re: [PATCH 1/2] Bluetooth: notify userspace of security level change
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Gustavo Padovan <gustavo@padovan.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Sun, 06 May 2012 09:13:53 -0700
-In-Reply-To: <1336096794-16993-2-git-send-email-gustavo@padovan.org>
+Date: Sun, 06 May 2012 09:07:26 -0700
+In-Reply-To: <1336096794-16993-1-git-send-email-gustavo@padovan.org>
 References: <1336096794-16993-1-git-send-email-gustavo@padovan.org>
-	 <1336096794-16993-2-git-send-email-gustavo@padovan.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,61 +14,118 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Gustavo,
 
-> During a security level elevation we need to keep track of the current
-> security level of a connection until the new one is not confirmed.
+> When the userspace request a security level change it needs to be notified
+> of when the change is complete.
+> This patch make the socket non writable while the security request is
+> ongoing. If it succeeds POLL_OUT is emitted, otherwise the channel is
+> disconnected.
 > 
 > Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
 > ---
->  include/net/bluetooth/l2cap.h |    1 +
->  net/bluetooth/l2cap_sock.c    |    6 +++++-
->  2 files changed, 6 insertions(+), 1 deletion(-)
+>  include/net/bluetooth/bluetooth.h |    1 +
+>  net/bluetooth/af_bluetooth.c      |    2 +-
+>  net/bluetooth/hci_event.c         |    7 +++++++
+>  net/bluetooth/l2cap_core.c        |    5 +++++
+>  net/bluetooth/l2cap_sock.c        |   10 +++++-----
+>  5 files changed, 19 insertions(+), 6 deletions(-)
 > 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 92c0423..ff34be7 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -446,6 +446,7 @@ struct l2cap_chan {
->  	__le16		sport;
->  
->  	__u8		sec_level;
-> +	__u8		current_sl;
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 2fb268f..4e750df 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -195,6 +195,7 @@ struct bt_sock {
+>  	struct list_head accept_q;
+>  	struct sock *parent;
+>  	u32 defer_setup;
+> +	bool  suspended;
 
-this name is not good. Call it active_sec_level or cur_sec_level.
+you have double spaces here. Please pay attention.
 
+>  };
 >  
->  	__u8		ident;
+>  struct bt_sock_list {
+> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+> index 72eb187..6fb68a9 100644
+> --- a/net/bluetooth/af_bluetooth.c
+> +++ b/net/bluetooth/af_bluetooth.c
+> @@ -450,7 +450,7 @@ unsigned int bt_sock_poll(struct file *file, struct socket *sock, poll_table *wa
+>  			sk->sk_state == BT_CONFIG)
+>  		return mask;
 >  
+> -	if (sock_writeable(sk))
+> +	if (!bt_sk(sk)->suspended && sock_writeable(sk))
+>  		mask |= POLLOUT | POLLWRNORM | POLLWRBAND;
+>  	else
+>  		set_bit(SOCK_ASYNC_NOSPACE, &sk->sk_socket->flags);
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 507fcec..86f74f6 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -2062,6 +2062,12 @@ static inline void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *
+>  
+>  		clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
+>  
+> +		if (ev->status && conn->state == BT_CONNECTED) {
+> +			hci_acl_disconn(conn, 0x13);
+> +			hci_conn_put(conn);
+> +			goto unlock;
+> +		}
+> +
+>  		if (conn->state == BT_CONFIG) {
+>  			if (!ev->status)
+>  				conn->state = BT_CONNECTED;
+> @@ -2072,6 +2078,7 @@ static inline void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *
+>  			hci_encrypt_cfm(conn, ev->status, ev->encrypt);
+>  	}
+>  
+> +unlock:
+>  	hci_dev_unlock(hdev);
+>  }
+>  
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 0f2b1be..67053f8 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -4884,6 +4884,11 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+>  
+>  		if (!status && (chan->state == BT_CONNECTED ||
+>  						chan->state == BT_CONFIG)) {
+
+You do know that this one will be showing up in Dave's coding style
+complaint. You might wanna fix this with a pre-patch first.
+
+> +			struct sock *sk = chan->sk;
+> +
+> +			bt_sk(sk)->suspended = false;
+> +			sk->sk_state_change(sk);
+> +
+>  			l2cap_check_encryption(chan, encrypt);
+>  			l2cap_chan_unlock(chan);
+>  			continue;
 > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 7e3386f..8f59fa6 100644
+> index 82b6368..7e3386f 100644
 > --- a/net/bluetooth/l2cap_sock.c
 > +++ b/net/bluetooth/l2cap_sock.c
-> @@ -379,7 +379,10 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+> @@ -596,12 +596,12 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+>  			sk->sk_state = BT_CONFIG;
+>  			chan->state = BT_CONFIG;
+>  
+> -		/* or for ACL link, under defer_setup time */
+> -		} else if (sk->sk_state == BT_CONNECT2 &&
+> -					bt_sk(sk)->defer_setup) {
+> -			err = l2cap_chan_check_security(chan);
+> +		/* or for ACL link */
+>  		} else {
+> -			err = -EINVAL;
+> +			if (!l2cap_chan_check_security(chan))
+> +				bt_sk(sk)->suspended = true;
+> +			else
+> +				sk->sk_state_change(sk);
 >  		}
->  
->  		memset(&sec, 0, sizeof(sec));
-> -		sec.level = chan->sec_level;
-> +		if (bt_sk(sk)->suspended)
-> +			sec.level = chan->current_sl;
-> +		else
-> +			sec.level = chan->sec_level;
+>  		break;
 
-I think getsockopt should just return the actual current active security
-level.
-
-And why are we not accessing this via chan->conn->hcon->sec_level and
-its pending_sec_level variables.
-
->  
->  		if (sk->sk_state == BT_CONNECTED)
->  			sec.key_size = chan->conn->hcon->enc_key_size;
-> @@ -577,6 +580,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
->  			break;
->  		}
->  
-> +		chan->current_sl = chan->sec_level;
->  		chan->sec_level = sec.level;
->  
->  		if (!chan->conn)
+Why is this change correct? You are changing this from applying to only
+incoming connections (CONNECT2) to also outgoing connections (CONNECT).
 
 Regards
 
