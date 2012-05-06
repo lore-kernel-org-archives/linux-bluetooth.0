@@ -1,38 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1336320975.5970.85.camel@aeonflux>
-Subject: Re: [PATCH v2] Bluetooth: mgmt: Fix device_connected sending order
+Message-ID: <1336320833.5970.84.camel@aeonflux>
+Subject: Re: [PATCH 2/2] Bluetooth: report the right security level in
+ getsockopt
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Sun, 06 May 2012 09:16:15 -0700
-In-Reply-To: <1336128329-6650-1-git-send-email-johan.hedberg@gmail.com>
-References: <1336127870-5930-1-git-send-email-johan.hedberg@gmail.com>
-	 <1336128329-6650-1-git-send-email-johan.hedberg@gmail.com>
+Date: Sun, 06 May 2012 09:13:53 -0700
+In-Reply-To: <1336096794-16993-2-git-send-email-gustavo@padovan.org>
+References: <1336096794-16993-1-git-send-email-gustavo@padovan.org>
+	 <1336096794-16993-2-git-send-email-gustavo@padovan.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Gustavo,
 
-> The mgmt_ev_device_connected signal must be sent before any event
-> indications happen for sockets associated with the connection. Otherwise
-> e.g. device authorization for the sockets will fail with ENOTCONN as
-> user space things that there is no baseband link.
+> During a security level elevation we need to keep track of the current
+> security level of a connection until the new one is not confirmed.
 > 
-> This patch fixes the issue by ensuring that the device_connected event
-> if sent (if it hasn't been so already) as soon as the first ACL data
-> packet arrives from the remote device.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
 > ---
-> v2: Fixed missing hdev locking
+>  include/net/bluetooth/l2cap.h |    1 +
+>  net/bluetooth/l2cap_sock.c    |    6 +++++-
+>  2 files changed, 6 insertions(+), 1 deletion(-)
 > 
->  net/bluetooth/hci_core.c  |    8 ++++++++
->  net/bluetooth/hci_event.c |    4 ++--
->  2 files changed, 10 insertions(+), 2 deletions(-)
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 92c0423..ff34be7 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -446,6 +446,7 @@ struct l2cap_chan {
+>  	__le16		sport;
+>  
+>  	__u8		sec_level;
+> +	__u8		current_sl;
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+this name is not good. Call it active_sec_level or cur_sec_level.
+
+>  
+>  	__u8		ident;
+>  
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 7e3386f..8f59fa6 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -379,7 +379,10 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+>  		}
+>  
+>  		memset(&sec, 0, sizeof(sec));
+> -		sec.level = chan->sec_level;
+> +		if (bt_sk(sk)->suspended)
+> +			sec.level = chan->current_sl;
+> +		else
+> +			sec.level = chan->sec_level;
+
+I think getsockopt should just return the actual current active security
+level.
+
+And why are we not accessing this via chan->conn->hcon->sec_level and
+its pending_sec_level variables.
+
+>  
+>  		if (sk->sk_state == BT_CONNECTED)
+>  			sec.key_size = chan->conn->hcon->enc_key_size;
+> @@ -577,6 +580,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+>  			break;
+>  		}
+>  
+> +		chan->current_sl = chan->sec_level;
+>  		chan->sec_level = sec.level;
+>  
+>  		if (!chan->conn)
 
 Regards
 
