@@ -1,33 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 06 May 2012 12:36:56 -0400 (EDT)
-Message-Id: <20120506.123656.1335354317428258137.davem@davemloft.net>
-To: gustavo@padovan.org
-Cc: linville@tuxdriver.com, linux-bluetooth@vger.kernel.org,
-	linux-wireless@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix coding style
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <1336157988-4602-1-git-send-email-gustavo@padovan.org>
-References: <1336157988-4602-1-git-send-email-gustavo@padovan.org>
+Message-ID: <1336320975.5970.85.camel@aeonflux>
+Subject: Re: [PATCH v2] Bluetooth: mgmt: Fix device_connected sending order
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sun, 06 May 2012 09:16:15 -0700
+In-Reply-To: <1336128329-6650-1-git-send-email-johan.hedberg@gmail.com>
+References: <1336127870-5930-1-git-send-email-johan.hedberg@gmail.com>
+	 <1336128329-6650-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo@padovan.org>
-Date: Fri,  4 May 2012 15:59:48 -0300
+Hi Johan,
 
-> Fix offending styles all over the tree. This is in conformance David
-> Miller's style rules.
+> The mgmt_ev_device_connected signal must be sent before any event
+> indications happen for sockets associated with the connection. Otherwise
+> e.g. device authorization for the sockets will fail with ENOTCONN as
+> user space things that there is no baseband link.
+> 
+> This patch fixes the issue by ensuring that the device_connected event
+> if sent (if it hasn't been so already) as soon as the first ACL data
+> packet arrives from the remote device.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> v2: Fixed missing hdev locking
+> 
+>  net/bluetooth/hci_core.c  |    8 ++++++++
+>  net/bluetooth/hci_event.c |    4 ++--
+>  2 files changed, 10 insertions(+), 2 deletions(-)
 
-They aren't just my style rules.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-And, if your plan is to patch things up afterwards so you don't
-have to change existing commits in your tree, think again.
+Regards
 
-I absolutely will not pull a tree from John that has commits in
-it that add the bad indentation.
+Marcel
 
-You have to respin your tree with fixed commits.
 
-The bluetooth folks have to understand that they are on an extremely
-short leash right now.
