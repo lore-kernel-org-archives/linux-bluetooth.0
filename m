@@ -1,62 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4FA6C460.9010209@tu-ilmenau.de>
-Date: Sun, 06 May 2012 20:35:12 +0200
-From: Steffen Becker <steffen.becker@tu-ilmenau.de>
 MIME-Version: 1.0
-To: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: Can't connect Bluetooth Devices
-References: <4F968FF7.7060303@tu-ilmenau.de> <4FA1BB1C.6060409@tu-ilmenau.de> <20120502225815.GE16030@joana> <4FA23B93.8090204@tu-ilmenau.de> <20120503094429.GA6226@x220>
-In-Reply-To: <20120503094429.GA6226@x220>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <20120506.123656.1335354317428258137.davem@davemloft.net>
+References: <1336157988-4602-1-git-send-email-gustavo@padovan.org>
+	<20120506.123656.1335354317428258137.davem@davemloft.net>
+Date: Sun, 6 May 2012 19:46:46 +0200
+Message-ID: <CANq1E4TTfDxZPsOqqWUT7PqTKUr8nCTC-wo=iGe_pxoUmnecgQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix coding style
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: David Miller <davem@davemloft.net>
+Cc: gustavo@padovan.org, linville@tuxdriver.com,
+	linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi David
 
-Am 03.05.2012 11:44, schrieb Johan Hedberg:
-> Hi Steffen,
+On Sun, May 6, 2012 at 6:36 PM, David Miller <davem@davemloft.net> wrote:
+> From: Gustavo Padovan <gustavo@padovan.org>
+> Date: Fri,  4 May 2012 15:59:48 -0300
 >
-> On Thu, May 03, 2012, Steffen Becker wrote:
->>> A linkkey is created during the pairing procedure, just pair your
->>> devices and you will be done.
->>> And let only bluetoothd touch the /var/lib/bluetooth
->>> directory, don't touch there yourself.
->>>
->>> 	Gustavo
->> Thanks for your fast reply, but that's exactly what I don't know:
->> How can I pair my devices?
-> You pair using the CreatePairedDevice D-Bus method that BlueZ provides.
-> There are various front-ends that you can use to call this method. If
-> you've got GNOME installed then a pairing wizard should be just a few
-> mouse clicks away through the Bluetooth icon in the upper right-hand
-> corner. If you've only got the command line you can use e.g. the
-> simple-agent python script (under the test subdirectory):
+>> Fix offending styles all over the tree. This is in conformance David
+>> Miller's style rules.
 >
-> 	test/simple-agent hci0<remote address>
+> They aren't just my style rules.
+
+Whose rules are they?
+
+Reading ./Documentation/CodingStyle I see:
++++++++
+Outside of comments, documentation and except in Kconfig, spaces are never
+used for indentation, and the above example is deliberately broken.
++++++++
+
+Or looking at the last 3 of Linus' commits that use multi-line
+expressions, none of them uses mixed tabs+spaces to have lined-up
+indentation (which is what you recommend):
+
+e419b4cc585680940bc42f8ca8a071d6023fb1bb vfs: make word-at-a-time...
+6be5ceb02e98eaf6cfc4f8b12a896d04023f340d VM: Add "vm_mmap" helper...
+a554bea89948dfb6d2f9c4c62ce2b12b2dac18ad selinux: don't inline...
+
+So why so reluctant to calling it "David's style"?
+
+> And, if your plan is to patch things up afterwards so you don't
+> have to change existing commits in your tree, think again.
 >
-> Btw, is there something that the network plugin (which you can operate
-> using e.g. test/test-network) doesn't provide but pand does? We'll
-> probably remove pand from the source tree along with BlueZ 5.0 so it'd
-> be good to know any deficiencies it has.
+> I absolutely will not pull a tree from John that has commits in
+> it that add the bad indentation.
 >
-> Johan
+> You have to respin your tree with fixed commits.
 
-Sorry for this late answer and thank you for that hint; but I haven't 
-tried it yet - will do this tomorrow.
+That's just old code that is reindented. Nothing special. All new
+commits use the new coding-style properly.
 
-To your question:
-There are some special things I want to do using the pand-command 
-(because it worked well the last years with that):
-1.) Using the "iperf" command to display & compare the data rate of a) a 
-bluetooth1.0-Dongle and b) a bluetooth3.0-Dongle
-2.) Using the "iperf" command between two bluetooth-devices and at the 
-same time also using the "iperf"-command between two WLAN-devices (2 
-PC's: at each PC one bluetooth-device & one WLAN-Stick) -> With a 
-sniffing tool I want to check the AFH of Bluetooth.
-3.) Send a "big" (media-)file to show how Bluetooth3.0 uses the "WLAN"-mode.
+> The bluetooth folks have to understand that they are on an extremely
+> short leash right now.
 
-Is all this possible without pand-connection? If yes - how?
-
-Reagrds,
-Steffen
+Regards
+David
