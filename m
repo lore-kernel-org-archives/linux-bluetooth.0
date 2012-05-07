@@ -1,38 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 07 May 2012 16:06:09 -0400 (EDT)
-Message-Id: <20120507.160609.1784484093679983272.davem@davemloft.net>
-To: lucas.demarchi@profusion.mobi
+MIME-Version: 1.0
+In-Reply-To: <20120507.115228.1171858914064928263.davem@davemloft.net>
+References: <CANq1E4TTfDxZPsOqqWUT7PqTKUr8nCTC-wo=iGe_pxoUmnecgQ@mail.gmail.com>
+ <20120506.145304.1998242927519675381.davem@davemloft.net> <20120507081411.GA19002@aemeltch-MOBL1>
+ <20120507.115228.1171858914064928263.davem@davemloft.net>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 7 May 2012 16:49:16 -0300
+Message-ID: <CAMOw1v474CTigis2xNBF53YP-NMt2XmMR_zvqNAeN8kmEQjxGA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix coding style
+To: David Miller <davem@davemloft.net>
 Cc: andrei.emeltchenko.news@gmail.com, dh.herrmann@googlemail.com,
 	gustavo@padovan.org, linville@tuxdriver.com,
 	linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix coding style
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <CAMOw1v474CTigis2xNBF53YP-NMt2XmMR_zvqNAeN8kmEQjxGA@mail.gmail.com>
-References: <20120507081411.GA19002@aemeltch-MOBL1>
-	<20120507.115228.1171858914064928263.davem@davemloft.net>
-	<CAMOw1v474CTigis2xNBF53YP-NMt2XmMR_zvqNAeN8kmEQjxGA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 7 May 2012 16:49:16 -0300
+On Mon, May 7, 2012 at 12:52 PM, David Miller <davem@davemloft.net> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+> Date: Mon, 7 May 2012 11:14:13 +0300
+>
+>> If you think that Documentation/CodingStyle is a crap why don't you send a
+>> patch to fix it?
+>
+> The same reason I don't go try and fix broken networking RFCs.
+>
+> Documents are never are the final verdict on anything, there will
+> always be areas where such documents are wrong and common sense should
+> prevail.
 
-> Doing so also means we don't create our own rules and impose them on
-> others, like happened some time ago
-> (https://lkml.org/lkml/2012/4/16/473).
+Then we go and fix the docs. This is how they work, or at least should.
 
-You conveniently forgot to show that Linus said that it's OK for a
-subsystem maintainer to request that kind of coding style, it's just
-not OK to impose it tree-wide.
+Doing so also means we don't create our own rules and impose them on
+others, like happened some time ago
+(https://lkml.org/lkml/2012/4/16/473).
 
-Any particular reason you guys make such a big deal about this whereas
-everyone else is quite fine with it and never gives me any problems?
-
-In the end, this hurts bluetooth, because if you anger me that means
-it's going to be harder and take longer for your changes to get into
-the tree.
-
-You can ignore this pracitcal aspect of this whole ordeal at your
-own peril.
+Regards,
+Lucas De Marchi
