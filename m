@@ -1,73 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1336410360.5970.103.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Fix coding style
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Miller <davem@davemloft.net>
-Cc: dh.herrmann@googlemail.com, gustavo@padovan.org,
-	linville@tuxdriver.com, linux-bluetooth@vger.kernel.org,
-	linux-wireless@vger.kernel.org
-Date: Mon, 07 May 2012 10:06:00 -0700
-In-Reply-To: <20120506.145304.1998242927519675381.davem@davemloft.net>
-References: <1336157988-4602-1-git-send-email-gustavo@padovan.org>
-	 <20120506.123656.1335354317428258137.davem@davemloft.net>
-	 <CANq1E4TTfDxZPsOqqWUT7PqTKUr8nCTC-wo=iGe_pxoUmnecgQ@mail.gmail.com>
-	 <20120506.145304.1998242927519675381.davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1336137280-6692-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1336137280-6692-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Mon, 7 May 2012 09:57:41 -0700
+Message-ID: <CABBYNZJ6jGd8YyyPNXOTk2Yt7EFve78=zEpDnWP3nkZC2XvfGg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 0/6] Multiple Bluetooth SCO connections (userspace)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
+Hi Mikel,
 
-> > Whose rules are they?
-> 
-> Find me an example in another major core subsystem, let's use
-> mm/memory.c as an example as that file gets hit by a lot of people,
-> that uses the multi-line conditional TAB-only crap you guys seem to
-> keep using.
-> 
-> They don't.  All the examples you'll find are of the form:
-> 
-> 	if (a &&
-> 	    b)
-> 
-> not:
-> 
-> 	if (a &&
-> 			b)
+On Fri, May 4, 2012 at 6:14 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>
+> This version is exactly the same as v2 with the exception of the minor fixes pointed out by Luiz and Vinicius.
+>
+> From original cover letter:
+>
+> This patch series includes patches that have been useful to connect two HCI-based SCO links simultaneously. This can be used for example to connect to HSP headsets at the same time.
+>
+> The patch series is divided in three groups: kernel patches, BlueZ userspace patches and PulseAudio patches for module-bluetooth-device.
+>
+> The kernel patches include some code cleanup and more importantly a dynamically changing alternate setting in btusb driver. These ideas have been taken from the patches I found in [1]. The last patch, “Bluetooth: Remove outgoing MTU check” should be considered with care, since there probably are better approaches to solve this (WIP).
+>
+> The BlueZ userspace patches add some necessary infrastructure to support such use-cases.
+>
+> The PulseAudio patches provide some changes to be able to test the rest of the code. The first three patches have been reused from a previously submitted patch series, and only the last two patches are relevant for this purpose. They provide some simple workarounds and should not be considered a proper solution.
+>
+> As I said, the easiest may to test these patches is by using two Bluetooth headsets. You should use the Media API (Enable=Media in audio.conf), connect both headsets, and use pacmd to set their profile to hsp.
+>
+> [1] http://bluetooth-alsa.sourceforge.net/future.html
+>
+> Mikel Astiz (6):
+>  audio: Fix gateway state check
+>  audio: Add multiple device search to manager
+>  media: Support multiple transports per endpoint
+>  media: Split media_endpoint_create
+>  media: Create multiple transports if needed
+>  media: Enable parallel requests to endpoint
+>
+>  audio/device.c  |    2 +-
+>  audio/manager.c |   25 +++++-
+>  audio/manager.h |    6 ++
+>  audio/media.c   |  271 ++++++++++++++++++++++++++++++++++++-------------------
+>  4 files changed, 207 insertions(+), 97 deletions(-)
+>
+> --
+> 1.7.7.6
 
-except of course in zap_vma_ptes(), remap_pmd_range(), remap_pud_range()
-and do_wp_page().
-
-So we also have this one:
-
-		if ((vma->vm_flags & (VM_WRITE|VM_SHARED)) ==
-				     (VM_WRITE|VM_SHARED))
-			goto reuse;
-
-And this:
-
-	} else if (unlikely((vma->vm_flags & (VM_WRITE|VM_SHARED)) ==
-					(VM_WRITE|VM_SHARED))) {
-
-What kind of style requirement is that one?
-
-			tmp = vma->vm_ops->page_mkwrite(vma, &vmf);
-			if (unlikely(tmp &
-					(VM_FAULT_ERROR | VM_FAULT_NOPAGE))) {
-				ret = tmp;
-				goto unwritable_page;
-			}
-
-Have you actually looked at mm/memory.c and confirmed that it is a good
-example of multi-line indentation?
-
-When it comes to function declaration and function calls, the style in
-mm/memory.c is mixed. We can start counting, but for both other
-multi-line cases it seems that tab-only indentation is predominant.
-
-Regards
-
-Marcel
+All 6 patches are now upstream, thanks.
 
 
+
+-- 
+Luiz Augusto von Dentz
