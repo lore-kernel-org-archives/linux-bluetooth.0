@@ -1,45 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 07 May 2012 17:41:07 -0400 (EDT)
-Message-Id: <20120507.174107.946344637365261681.davem@davemloft.net>
-To: marcel@holtmann.org
-Cc: lucas.demarchi@profusion.mobi, andrei.emeltchenko.news@gmail.com,
-        dh.herrmann@googlemail.com, gustavo@padovan.org,
-        linville@tuxdriver.com, linux-bluetooth@vger.kernel.org,
-        linux-wireless@vger.kernel.org
+Message-ID: <1336426419.5970.131.camel@aeonflux>
 Subject: Re: [PATCH] Bluetooth: Fix coding style
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <1336426419.5970.131.camel@aeonflux>
-References: <CAMOw1v474CTigis2xNBF53YP-NMt2XmMR_zvqNAeN8kmEQjxGA@mail.gmail.com>
-	<20120507.160609.1784484093679983272.davem@davemloft.net>
-	<1336426419.5970.131.camel@aeonflux>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Miller <davem@davemloft.net>
+Cc: lucas.demarchi@profusion.mobi, andrei.emeltchenko.news@gmail.com,
+	dh.herrmann@googlemail.com, gustavo@padovan.org,
+	linville@tuxdriver.com, linux-bluetooth@vger.kernel.org,
+	linux-wireless@vger.kernel.org
+Date: Mon, 07 May 2012 14:33:39 -0700
+In-Reply-To: <20120507.160609.1784484093679983272.davem@davemloft.net>
+References: <20120507081411.GA19002@aemeltch-MOBL1>
+	 <20120507.115228.1171858914064928263.davem@davemloft.net>
+	 <CAMOw1v474CTigis2xNBF53YP-NMt2XmMR_zvqNAeN8kmEQjxGA@mail.gmail.com>
+	 <20120507.160609.1784484093679983272.davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Marcel Holtmann <marcel@holtmann.org>
-Date: Mon, 07 May 2012 14:33:39 -0700
+Hi Dave,
 
->> > Doing so also means we don't create our own rules and impose them on
->> > others, like happened some time ago
->> > (https://lkml.org/lkml/2012/4/16/473).
->> 
->> You conveniently forgot to show that Linus said that it's OK for a
->> subsystem maintainer to request that kind of coding style, it's just
->> not OK to impose it tree-wide.
+> > Doing so also means we don't create our own rules and impose them on
+> > others, like happened some time ago
+> > (https://lkml.org/lkml/2012/4/16/473).
 > 
-> may I ask some clarification on to what level of subsystem maintainers
-> this applies. Is this only 1st level subsystem. Or would this extend to
-> 2nd level subsystems as well?
+> You conveniently forgot to show that Linus said that it's OK for a
+> subsystem maintainer to request that kind of coding style, it's just
+> not OK to impose it tree-wide.
 
-It's a perogative of whatever the desire is of the trees your changes
-percolate up into on the way to Linus.
+may I ask some clarification on to what level of subsystem maintainers
+this applies. Is this only 1st level subsystem. Or would this extend to
+2nd level subsystems as well?
 
-John may want certain things to look certain ways in the wireless
-code, and I may have such requirements too.  Therefore a wireless
-change is subjected to both John's and my tastes.
+Regards
 
-I'm really done talking about this, and I'm absolutely not working on
-documentation or checkpatch.pl changes.
+Marcel
 
-Instead I'm going to work on fixing bugs, reviewing patches, and
-putting together -stable submissions.
+
