@@ -1,26 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1336390921.4325.19.camel@jlt3.sipsolutions.net>
-Subject: Re: [RFCv2 4/6] mac80211: softamp: Handle assoc request
+Message-ID: <1336390879.4325.18.camel@jlt3.sipsolutions.net>
+Subject: Re: [RFCv2 1/6] mac80211: softamp: Adds Bluetooth Software AMP
 From: Johannes Berg <johannes@sipsolutions.net>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
-Date: Mon, 07 May 2012 13:42:01 +0200
-In-Reply-To: <1335273460-12682-5-git-send-email-Andrei.Emeltchenko.news@gmail.com> (sfid-20120424_151656_805125_63BCA33F)
+Date: Mon, 07 May 2012 13:41:19 +0200
+In-Reply-To: <1335273460-12682-2-git-send-email-Andrei.Emeltchenko.news@gmail.com> (sfid-20120424_151757_538854_521E8B0B)
 References: <1335273460-12682-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1335273460-12682-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 (sfid-20120424_151656_805125_63BCA33F)
+	 <1335273460-12682-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 (sfid-20120424_151757_538854_521E8B0B)
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 On Tue, 2012-04-24 at 16:17 +0300, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Handle AMP assoc request.
 
-This needs knowledge about channel preferences etc. I think it should be
-done in wpa_supplicant.
+> --- a/include/linux/nl80211.h
+> +++ b/include/linux/nl80211.h
+> @@ -1546,6 +1546,7 @@ enum nl80211_iftype {
+>  	NL80211_IFTYPE_MESH_POINT,
+>  	NL80211_IFTYPE_P2P_CLIENT,
+>  	NL80211_IFTYPE_P2P_GO,
+> +	NL80211_IFTYPE_BLUETOOTH_SOFTAMP,
+
+That should probably be a separate patch also updating cfg80211 (and
+maybe mac80211) where needed (at least to suppress the warnings you
+saw). Also documentation is needed.
+
+> @@ -211,6 +212,7 @@ static int ieee80211_do_open(struct net_device *dev, bool coming_up)
+>  	case NL80211_IFTYPE_STATION:
+>  	case NL80211_IFTYPE_MONITOR:
+>  	case NL80211_IFTYPE_ADHOC:
+> +	case NL80211_IFTYPE_BLUETOOTH_SOFTAMP:
+>  		/* no special treatment */
+>  		break;
+
+You should never be able to come here with this interface type -- maybe
+make it a warning or something.
+
+> +static int vamp_send_frame(struct sk_buff *skb)
+> +{
+> +	struct hci_dev *hdev = (struct hci_dev *) skb->dev;
+> +	struct vamp_data *data;
+> +
+> +	BT_DBG("%s", hdev->name);
+> +
+> +	if (!hdev) {
+> +		BT_ERR("Frame for unknown HCI device (hdev=NULL)");
+> +		return -ENODEV;
+> +	}
+> +
+> +	if (!test_bit(HCI_RUNNING, &hdev->flags))
+> +		return -EBUSY;
+> +
+> +	data = hci_get_drvdata(hdev);
+> +
+> +	skb_queue_tail(&data->txq, skb);
+> +
+> +	schedule_work(&data->work);
+
+I don't understand the need for the asynchronous handling.
 
 johannes
 
