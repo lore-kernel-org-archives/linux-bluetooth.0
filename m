@@ -1,66 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1336390879.4325.18.camel@jlt3.sipsolutions.net>
-Subject: Re: [RFCv2 1/6] mac80211: softamp: Adds Bluetooth Software AMP
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
-Date: Mon, 07 May 2012 13:41:19 +0200
-In-Reply-To: <1335273460-12682-2-git-send-email-Andrei.Emeltchenko.news@gmail.com> (sfid-20120424_151757_538854_521E8B0B)
-References: <1335273460-12682-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1335273460-12682-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 (sfid-20120424_151757_538854_521E8B0B)
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-wireless-owner@vger.kernel.org
+From: "Arend van Spriel" <arend@broadcom.com>
+To: "Rob Landley" <rob@landley.net>
+cc: linux-doc@vger.kernel.org, "Arend van Spriel" <arend@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Gustavo Padovan" <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: [PATCH] Documentation: CodingStyle: add alignment rule for
+ breaking statements
+Date: Mon, 7 May 2012 12:51:32 +0200
+Message-ID: <1336387892-3730-1-git-send-email-arend@broadcom.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2012-04-24 at 16:17 +0300, Andrei Emeltchenko wrote:
+The coding style document does cover breaking lines that are hitting
+the 80 column boundary. However, how to format the portions is not
+in the document. The submitted patches mostly align them on the same
+column so that seems the consensus on it and in recent thread [1] this
+lead to push-back on patches by David Miller. As the script checkpatch
+already validate patches against this alignment rule it seems time to
+add the rule to the coding style so people can not use the argument
+that it is not there.
 
-> --- a/include/linux/nl80211.h
-> +++ b/include/linux/nl80211.h
-> @@ -1546,6 +1546,7 @@ enum nl80211_iftype {
->  	NL80211_IFTYPE_MESH_POINT,
->  	NL80211_IFTYPE_P2P_CLIENT,
->  	NL80211_IFTYPE_P2P_GO,
-> +	NL80211_IFTYPE_BLUETOOTH_SOFTAMP,
+[1] http://article.gmane.org/gmane.linux.bluez.kernel/24759
 
-That should probably be a separate patch also updating cfg80211 (and
-maybe mac80211) where needed (at least to suppress the warnings you
-saw). Also documentation is needed.
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Signed-off-by: Arend van Spriel <arend@broadcom.com>
+---
+ Documentation/CodingStyle |   12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-> @@ -211,6 +212,7 @@ static int ieee80211_do_open(struct net_device *dev, bool coming_up)
->  	case NL80211_IFTYPE_STATION:
->  	case NL80211_IFTYPE_MONITOR:
->  	case NL80211_IFTYPE_ADHOC:
-> +	case NL80211_IFTYPE_BLUETOOTH_SOFTAMP:
->  		/* no special treatment */
->  		break;
+diff --git a/Documentation/CodingStyle b/Documentation/CodingStyle
+index c58b236..bfb9008 100644
+--- a/Documentation/CodingStyle
++++ b/Documentation/CodingStyle
+@@ -87,6 +87,18 @@ are placed substantially to the right. The same applies to function headers
+ with a long argument list. However, never break user-visible strings such as
+ printk messages, because that breaks the ability to grep for them.
+ 
++When breaking statements you should align the sensible chunks to the same
++column. This may involve adding a couple of spaces behind the tabs of the
++next line(s), eg.:
++
++static inline const struct device *chunk_device(struct device *parent,
++						bool sensible_device_chunks)
++{
++	if (parent)
++		if (somewhat_lengthy_global_logical_condition &&
++		    sensible_device_chunks)
++			perform_the_jobs(parent);
++}
+ 
+ 		Chapter 3: Placing Braces and Spaces
+ 
+-- 
+1.7.9.5
 
-You should never be able to come here with this interface type -- maybe
-make it a warning or something.
-
-> +static int vamp_send_frame(struct sk_buff *skb)
-> +{
-> +	struct hci_dev *hdev = (struct hci_dev *) skb->dev;
-> +	struct vamp_data *data;
-> +
-> +	BT_DBG("%s", hdev->name);
-> +
-> +	if (!hdev) {
-> +		BT_ERR("Frame for unknown HCI device (hdev=NULL)");
-> +		return -ENODEV;
-> +	}
-> +
-> +	if (!test_bit(HCI_RUNNING, &hdev->flags))
-> +		return -EBUSY;
-> +
-> +	data = hci_get_drvdata(hdev);
-> +
-> +	skb_queue_tail(&data->txq, skb);
-> +
-> +	schedule_work(&data->work);
-
-I don't understand the need for the asynchronous handling.
-
-johannes
 
