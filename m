@@ -1,36 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1336412121.5970.104.camel@aeonflux>
-Subject: Re: [PATCH -v2 1/2] Bluetooth: notify userspace of security level
- change
+Message-ID: <1336410360.5970.103.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Fix coding style
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 07 May 2012 10:35:21 -0700
-In-Reply-To: <1336370846-7979-1-git-send-email-gustavo@padovan.org>
-References: <1336370846-7979-1-git-send-email-gustavo@padovan.org>
+To: David Miller <davem@davemloft.net>
+Cc: dh.herrmann@googlemail.com, gustavo@padovan.org,
+	linville@tuxdriver.com, linux-bluetooth@vger.kernel.org,
+	linux-wireless@vger.kernel.org
+Date: Mon, 07 May 2012 10:06:00 -0700
+In-Reply-To: <20120506.145304.1998242927519675381.davem@davemloft.net>
+References: <1336157988-4602-1-git-send-email-gustavo@padovan.org>
+	 <20120506.123656.1335354317428258137.davem@davemloft.net>
+	 <CANq1E4TTfDxZPsOqqWUT7PqTKUr8nCTC-wo=iGe_pxoUmnecgQ@mail.gmail.com>
+	 <20120506.145304.1998242927519675381.davem@davemloft.net>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Dave,
 
-> When the userspace request a security level change it needs to be notified
-> of when the change is complete.
-> This patch make the socket non writable while the security request is
-> ongoing. If it succeeds POLL_OUT is emitted, otherwise the channel is
-> disconnected.
+> > Whose rules are they?
 > 
-> Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
-> ---
->  include/net/bluetooth/bluetooth.h |    1 +
->  net/bluetooth/af_bluetooth.c      |    2 +-
->  net/bluetooth/hci_event.c         |    7 +++++++
->  net/bluetooth/l2cap_core.c        |    5 +++++
->  net/bluetooth/l2cap_sock.c        |   15 ++++++++++-----
->  5 files changed, 24 insertions(+), 6 deletions(-)
+> Find me an example in another major core subsystem, let's use
+> mm/memory.c as an example as that file gets hit by a lot of people,
+> that uses the multi-line conditional TAB-only crap you guys seem to
+> keep using.
+> 
+> They don't.  All the examples you'll find are of the form:
+> 
+> 	if (a &&
+> 	    b)
+> 
+> not:
+> 
+> 	if (a &&
+> 			b)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+except of course in zap_vma_ptes(), remap_pmd_range(), remap_pud_range()
+and do_wp_page().
+
+So we also have this one:
+
+		if ((vma->vm_flags & (VM_WRITE|VM_SHARED)) ==
+				     (VM_WRITE|VM_SHARED))
+			goto reuse;
+
+And this:
+
+	} else if (unlikely((vma->vm_flags & (VM_WRITE|VM_SHARED)) ==
+					(VM_WRITE|VM_SHARED))) {
+
+What kind of style requirement is that one?
+
+			tmp = vma->vm_ops->page_mkwrite(vma, &vmf);
+			if (unlikely(tmp &
+					(VM_FAULT_ERROR | VM_FAULT_NOPAGE))) {
+				ret = tmp;
+				goto unwritable_page;
+			}
+
+Have you actually looked at mm/memory.c and confirmed that it is a good
+example of multi-line indentation?
+
+When it comes to function declaration and function calls, the style in
+mm/memory.c is mixed. We can start counting, but for both other
+multi-line cases it seems that tab-only indentation is predominant.
 
 Regards
 
