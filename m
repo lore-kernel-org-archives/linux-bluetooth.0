@@ -1,40 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 May 2012 10:57:39 -0700
+Date: Mon, 7 May 2012 10:56:19 -0700
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+To: Gustavo Padovan <gustavo@padovan.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: mgmt: Fix device_connected sending order
-Message-ID: <20120507175739.GA5708@x220.hpllc.com>
-References: <1336127870-5930-1-git-send-email-johan.hedberg@gmail.com>
- <1336128329-6650-1-git-send-email-johan.hedberg@gmail.com>
- <1336320975.5970.85.camel@aeonflux>
+Subject: Re: [PATCH -v2 1/2] Bluetooth: notify userspace of security level
+ change
+Message-ID: <20120507175619.GA5679@x220.hpllc.com>
+References: <1336370846-7979-1-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1336320975.5970.85.camel@aeonflux>
+In-Reply-To: <1336370846-7979-1-git-send-email-gustavo@padovan.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Gustavo,
 
-On Sun, May 06, 2012, Marcel Holtmann wrote:
-> > The mgmt_ev_device_connected signal must be sent before any event
-> > indications happen for sockets associated with the connection. Otherwise
-> > e.g. device authorization for the sockets will fail with ENOTCONN as
-> > user space things that there is no baseband link.
-> > 
-> > This patch fixes the issue by ensuring that the device_connected event
-> > if sent (if it hasn't been so already) as soon as the first ACL data
-> > packet arrives from the remote device.
-> > 
-> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> > ---
-> > v2: Fixed missing hdev locking
-> > 
-> >  net/bluetooth/hci_core.c  |    8 ++++++++
-> >  net/bluetooth/hci_event.c |    4 ++--
-> >  2 files changed, 10 insertions(+), 2 deletions(-)
+On Mon, May 07, 2012, Gustavo Padovan wrote:
+> When the userspace request a security level change it needs to be notified
+> of when the change is complete.
+> This patch make the socket non writable while the security request is
+> ongoing. If it succeeds POLL_OUT is emitted, otherwise the channel is
+> disconnected.
 > 
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
+> ---
+>  include/net/bluetooth/bluetooth.h |    1 +
+>  net/bluetooth/af_bluetooth.c      |    2 +-
+>  net/bluetooth/hci_event.c         |    7 +++++++
+>  net/bluetooth/l2cap_core.c        |    5 +++++
+>  net/bluetooth/l2cap_sock.c        |   15 ++++++++++-----
+>  5 files changed, 24 insertions(+), 6 deletions(-)
 
-Thanks. The patch is now in bluetooth.git.
+Both patches have been applied to bluetooth.git.
 
 Johan
