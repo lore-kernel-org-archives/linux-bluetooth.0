@@ -1,61 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1336137280-6692-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1336137280-6692-1-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Mon, 7 May 2012 09:57:41 -0700
-Message-ID: <CABBYNZJ6jGd8YyyPNXOTk2Yt7EFve78=zEpDnWP3nkZC2XvfGg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 0/6] Multiple Bluetooth SCO connections (userspace)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=windows-1252
+Date: Mon, 07 May 2012 11:56:55 -0400 (EDT)
+Message-Id: <20120507.115655.1099092499206396209.davem@davemloft.net>
+To: gustavo@padovan.org
+Cc: linville@tuxdriver.com, linux-bluetooth@vger.kernel.org,
+	linux-wireless@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix coding style
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20120507152113.GA5192@joana>
+References: <1336157988-4602-1-git-send-email-gustavo@padovan.org>
+	<20120506.123656.1335354317428258137.davem@davemloft.net>
+	<20120507152113.GA5192@joana>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+From: Gustavo Padovan <gustavo@padovan.org>
+Date: Mon, 7 May 2012 12:24:05 -0300
 
-On Fri, May 4, 2012 at 6:14 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> This version is exactly the same as v2 with the exception of the minor fixes pointed out by Luiz and Vinicius.
->
-> From original cover letter:
->
-> This patch series includes patches that have been useful to connect two HCI-based SCO links simultaneously. This can be used for example to connect to HSP headsets at the same time.
->
-> The patch series is divided in three groups: kernel patches, BlueZ userspace patches and PulseAudio patches for module-bluetooth-device.
->
-> The kernel patches include some code cleanup and more importantly a dynamically changing alternate setting in btusb driver. These ideas have been taken from the patches I found in [1]. The last patch, “Bluetooth: Remove outgoing MTU check” should be considered with care, since there probably are better approaches to solve this (WIP).
->
-> The BlueZ userspace patches add some necessary infrastructure to support such use-cases.
->
-> The PulseAudio patches provide some changes to be able to test the rest of the code. The first three patches have been reused from a previously submitted patch series, and only the last two patches are relevant for this purpose. They provide some simple workarounds and should not be considered a proper solution.
->
-> As I said, the easiest may to test these patches is by using two Bluetooth headsets. You should use the Media API (Enable=Media in audio.conf), connect both headsets, and use pacmd to set their profile to hsp.
->
-> [1] http://bluetooth-alsa.sourceforge.net/future.html
->
-> Mikel Astiz (6):
->  audio: Fix gateway state check
->  audio: Add multiple device search to manager
->  media: Support multiple transports per endpoint
->  media: Split media_endpoint_create
->  media: Create multiple transports if needed
->  media: Enable parallel requests to endpoint
->
->  audio/device.c  |    2 +-
->  audio/manager.c |   25 +++++-
->  audio/manager.h |    6 ++
->  audio/media.c   |  271 ++++++++++++++++++++++++++++++++++++-------------------
->  4 files changed, 207 insertions(+), 97 deletions(-)
->
-> --
-> 1.7.7.6
+> * David Miller <davem@davemloft.net> [2012-05-06 12:36:56 -0400]:
+> 
+>> From: Gustavo Padovan <gustavo@padovan.org>
+>> Date: Fri,  4 May 2012 15:59:48 -0300
+>> 
+>> > Fix offending styles all over the tree. This is in conformance David
+>> > Miller's style rules.
+>> 
+>> They aren't just my style rules.
+>> 
+>> And, if your plan is to patch things up afterwards so you don't
+>> have to change existing commits in your tree, think again.
+>> 
+>> I absolutely will not pull a tree from John that has commits in
+>> it that add the bad indentation.
+>> 
+>> You have to respin your tree with fixed commits.
+> 
+> John, can you please unpull the bluetooth tree from wireless-next? I'll be
+> fixing he affected commits and the send you a new pull request. Thanks.
 
-All 6 patches are now upstream, thanks.
+And John also make sure these guys don't add unreasonable commit log
+messages saying things like that this multi-line condition style thing
+is my specific coding style.  It's not.
 
-
-
--- 
-Luiz Augusto von Dentz
