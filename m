@@ -1,39 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20120507.115228.1171858914064928263.davem@davemloft.net>
-References: <CANq1E4TTfDxZPsOqqWUT7PqTKUr8nCTC-wo=iGe_pxoUmnecgQ@mail.gmail.com>
- <20120506.145304.1998242927519675381.davem@davemloft.net> <20120507081411.GA19002@aemeltch-MOBL1>
- <20120507.115228.1171858914064928263.davem@davemloft.net>
+In-Reply-To: <20120506.145304.1998242927519675381.davem@davemloft.net>
+References: <1336157988-4602-1-git-send-email-gustavo@padovan.org>
+ <20120506.123656.1335354317428258137.davem@davemloft.net> <CANq1E4TTfDxZPsOqqWUT7PqTKUr8nCTC-wo=iGe_pxoUmnecgQ@mail.gmail.com>
+ <20120506.145304.1998242927519675381.davem@davemloft.net>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 7 May 2012 16:49:16 -0300
-Message-ID: <CAMOw1v474CTigis2xNBF53YP-NMt2XmMR_zvqNAeN8kmEQjxGA@mail.gmail.com>
+Date: Mon, 7 May 2012 16:40:01 -0300
+Message-ID: <CAMOw1v7LGZ9jN3BdRSuw5iBNWUNOff+aaUCcXaz+YShpxjLLHA@mail.gmail.com>
 Subject: Re: [PATCH] Bluetooth: Fix coding style
 To: David Miller <davem@davemloft.net>
-Cc: andrei.emeltchenko.news@gmail.com, dh.herrmann@googlemail.com,
-	gustavo@padovan.org, linville@tuxdriver.com,
-	linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Cc: dh.herrmann@googlemail.com, gustavo@padovan.org,
+	linville@tuxdriver.com, linux-bluetooth@vger.kernel.org,
+	linux-wireless@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, May 7, 2012 at 12:52 PM, David Miller <davem@davemloft.net> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-> Date: Mon, 7 May 2012 11:14:13 +0300
+On Sun, May 6, 2012 at 3:53 PM, David Miller <davem@davemloft.net> wrote:
+> From: David Herrmann <dh.herrmann@googlemail.com>
+> Date: Sun, 6 May 2012 19:46:46 +0200
 >
->> If you think that Documentation/CodingStyle is a crap why don't you send a
->> patch to fix it?
+>> Whose rules are they?
 >
-> The same reason I don't go try and fix broken networking RFCs.
->
-> Documents are never are the final verdict on anything, there will
-> always be areas where such documents are wrong and common sense should
-> prevail.
+> Find me an example in another major core subsystem, let's use
 
-Then we go and fix the docs. This is how they work, or at least should.
+The ones he pointed out, coming from Linus aren't enough?
 
-Doing so also means we don't create our own rules and impose them on
-others, like happened some time ago
-(https://lkml.org/lkml/2012/4/16/473).
+
+> mm/memory.c as an example as that file gets hit by a lot of people,
+> that uses the multi-line conditional TAB-only crap you guys seem to
+> keep using.
+
+Look again at this file and you'll see there is mixed style.
+
+
+>
+> They don't.  All the examples you'll find are of the form:
+>
+>        if (a &&
+>            b)
+>
+> not:
+>
+>        if (a &&
+>                        b)
+>
+> like I see happening in bluetooth all the time.
+>
+> How did you think they figured that out?  Did they read someone's
+> mind?
+
+No, they used the default in emacs or another editor that has this as
+default, i.e. mix tabs and spaces
+
 
 Regards,
 Lucas De Marchi
