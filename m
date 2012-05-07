@@ -1,36 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 May 2012 10:56:19 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH -v2 1/2] Bluetooth: notify userspace of security level
- change
-Message-ID: <20120507175619.GA5679@x220.hpllc.com>
-References: <1336370846-7979-1-git-send-email-gustavo@padovan.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1336370846-7979-1-git-send-email-gustavo@padovan.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 07 May 2012 13:55:47 -0400 (EDT)
+Message-Id: <20120507.135547.704675228233645115.davem@davemloft.net>
+To: marcel@holtmann.org
+Cc: dh.herrmann@googlemail.com, gustavo@padovan.org, linville@tuxdriver.com,
+        linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix coding style
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <1336410360.5970.103.camel@aeonflux>
+References: <CANq1E4TTfDxZPsOqqWUT7PqTKUr8nCTC-wo=iGe_pxoUmnecgQ@mail.gmail.com>
+	<20120506.145304.1998242927519675381.davem@davemloft.net>
+	<1336410360.5970.103.camel@aeonflux>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+From: Marcel Holtmann <marcel@holtmann.org>
+Date: Mon, 07 May 2012 10:06:00 -0700
 
-On Mon, May 07, 2012, Gustavo Padovan wrote:
-> When the userspace request a security level change it needs to be notified
-> of when the change is complete.
-> This patch make the socket non writable while the security request is
-> ongoing. If it succeeds POLL_OUT is emitted, otherwise the channel is
-> disconnected.
-> 
-> Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
-> ---
->  include/net/bluetooth/bluetooth.h |    1 +
->  net/bluetooth/af_bluetooth.c      |    2 +-
->  net/bluetooth/hci_event.c         |    7 +++++++
->  net/bluetooth/l2cap_core.c        |    5 +++++
->  net/bluetooth/l2cap_sock.c        |   15 ++++++++++-----
->  5 files changed, 24 insertions(+), 6 deletions(-)
+> When it comes to function declaration and function calls, the style in
+> mm/memory.c is mixed. We can start counting, but for both other
+> multi-line cases it seems that tab-only indentation is predominant.
 
-Both patches have been applied to bluetooth.git.
+Fair enough.
 
-Johan
+But you know what the real issue is?
+
+I have told the bluetooth folks this matters to me, repeatedly.
+
+And then when I pushback when some unacceptable changes slip through,
+they put a bullseye on my head and say I'm being unreasonable.
+
+What's unreasonable about a maintainer telling you multiple times
+to do things a certain way and then getting mad when you still
+don't listen?
