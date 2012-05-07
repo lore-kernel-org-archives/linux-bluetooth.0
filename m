@@ -1,42 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 2/2] client: Use signalfd to handle unix signals
-Date: Mon,  7 May 2012 14:48:26 -0700
-Message-Id: <1336427306-17716-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1336427306-17716-1-git-send-email-luiz.dentz@gmail.com>
-References: <1336427306-17716-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 1/2] core: Use signalfd to handle unix signals
+Date: Mon,  7 May 2012 14:48:25 -0700
+Message-Id: <1336427306-17716-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
----
- client/main.c |   94 ++++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 files changed, 84 insertions(+), 10 deletions(-)
+Writing anything to syslog in the signal handler can cause a deadlock
+with any ongoing syslog write.
 
-diff --git a/client/main.c b/client/main.c
-index 80f9413..7d86833 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -30,6 +30,8 @@
- #include <string.h>
- #include <signal.h>
- #include <syslog.h>
-+#include <unistd.h>
+This is also aligned with what BlueZ and other projects has been doing.
+---
+ src/main.c |   92 ++++++++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 files changed, 78 insertions(+), 14 deletions(-)
+
+diff --git a/src/main.c b/src/main.c
+index 992a646..a2a94f7 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -35,6 +35,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/wait.h>
 +#include <sys/signalfd.h>
+ #include <fcntl.h>
+ #include <termios.h>
+ #include <getopt.h>
+@@ -53,15 +54,82 @@
  
- #include <glib.h>
- #include <gdbus.h>
-@@ -39,6 +41,83 @@
+ static GMainLoop *main_loop = NULL;
  
- static GMainLoop *event_loop = NULL;
- 
+-static void sig_term(int sig)
 +static unsigned int __terminated = 0;
 +
 +static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
 +							gpointer user_data)
-+{
+ {
+-	info("Terminating due to signal %d", sig);
+-	g_main_loop_quit(main_loop);
 +	struct signalfd_siginfo si;
 +	ssize_t result;
 +	int fd;
@@ -55,7 +59,7 @@ index 80f9413..7d86833 100644
 +	case SIGTERM:
 +		if (__terminated == 0) {
 +			info("Terminating");
-+			g_main_loop_quit(event_loop);
++			g_main_loop_quit(main_loop);
 +		}
 +
 +		__terminated = 1;
@@ -69,10 +73,12 @@ index 80f9413..7d86833 100644
 +	}
 +
 +	return TRUE;
-+}
-+
+ }
+ 
+-static void sig_debug(int sig)
 +static guint setup_signalfd(void)
-+{
+ {
+-	__obex_log_enable_debug();
 +	GIOChannel *channel;
 +	guint source;
 +	sigset_t mask;
@@ -81,6 +87,7 @@ index 80f9413..7d86833 100644
 +	sigemptyset(&mask);
 +	sigaddset(&mask, SIGINT);
 +	sigaddset(&mask, SIGTERM);
++	sigaddset(&mask, SIGUSR2);
 +	sigaddset(&mask, SIGPIPE);
 +
 +	if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0) {
@@ -107,54 +114,46 @@ index 80f9413..7d86833 100644
 +	g_io_channel_unref(channel);
 +
 +	return source;
-+}
-+
- static char *option_debug = NULL;
- static gboolean option_stderr = FALSE;
+ }
  
-@@ -62,16 +141,12 @@ static GOptionEntry options[] = {
- 	{ NULL },
- };
- 
--static void sig_term(int sig)
--{
--	g_main_loop_quit(event_loop);
--}
- 
- int main(int argc, char *argv[])
+ static gboolean option_detach = TRUE;
+@@ -179,7 +247,7 @@ int main(int argc, char *argv[])
  {
  	GOptionContext *context;
+ 	GError *err = NULL;
 -	struct sigaction sa;
- 	GError *gerr = NULL;
 +	guint signal;
  
- 	context = g_option_context_new(NULL);
- 	g_option_context_add_main_entries(context, options, NULL);
-@@ -87,6 +162,8 @@ int main(int argc, char *argv[])
+ #ifdef NEED_THREADS
+ 	if (g_thread_supported() == FALSE)
+@@ -213,6 +281,8 @@ int main(int argc, char *argv[])
  
- 	event_loop = g_main_loop_new(NULL, FALSE);
+ 	main_loop = g_main_loop_new(NULL, FALSE);
  
 +	signal = setup_signalfd();
 +
- 	__obex_log_init("obex-client", option_debug, !option_stderr);
- 
- 	if (manager_init() < 0)
-@@ -94,13 +171,10 @@ int main(int argc, char *argv[])
- 
- 	DBG("Entering main loop");
+ #ifdef NEED_THREADS
+ 	if (dbus_threads_init_default() == FALSE) {
+ 		fprintf(stderr, "Can't init usage of threads\n");
+@@ -251,16 +321,10 @@ int main(int argc, char *argv[])
+ 		exit(EXIT_FAILURE);
+ 	}
  
 -	memset(&sa, 0, sizeof(sa));
 -	sa.sa_handler = sig_term;
 -	sigaction(SIGINT, &sa, NULL);
 -	sigaction(SIGTERM, &sa, NULL);
 -
- 	g_main_loop_run(event_loop);
+-	sa.sa_handler = sig_debug;
+-	sigaction(SIGUSR2, &sa, NULL);
+-
+ 	g_main_loop_run(main_loop);
  
 +	g_source_remove(signal);
 +
- 	manager_exit();
+ 	obex_server_exit();
  
- 	g_main_loop_unref(event_loop);
+ 	plugin_cleanup();
 -- 
 1.7.7.6
 
