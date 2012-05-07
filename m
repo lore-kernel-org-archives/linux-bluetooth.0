@@ -1,58 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 7 May 2012 11:35:05 -0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] hcidump: Process A2MP Assoc Rsp
+Message-ID: <20120507183505.GC7230@x220.hpllc.com>
+References: <1336398567-27842-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1336398567-27842-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20120506.145304.1998242927519675381.davem@davemloft.net>
-References: <1336157988-4602-1-git-send-email-gustavo@padovan.org>
- <20120506.123656.1335354317428258137.davem@davemloft.net> <CANq1E4TTfDxZPsOqqWUT7PqTKUr8nCTC-wo=iGe_pxoUmnecgQ@mail.gmail.com>
- <20120506.145304.1998242927519675381.davem@davemloft.net>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 7 May 2012 16:40:01 -0300
-Message-ID: <CAMOw1v7LGZ9jN3BdRSuw5iBNWUNOff+aaUCcXaz+YShpxjLLHA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix coding style
-To: David Miller <davem@davemloft.net>
-Cc: dh.herrmann@googlemail.com, gustavo@padovan.org,
-	linville@tuxdriver.com, linux-bluetooth@vger.kernel.org,
-	linux-wireless@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-wireless-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1336398567-27842-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, May 6, 2012 at 3:53 PM, David Miller <davem@davemloft.net> wrote:
-> From: David Herrmann <dh.herrmann@googlemail.com>
-> Date: Sun, 6 May 2012 19:46:46 +0200
->
->> Whose rules are they?
->
-> Find me an example in another major core subsystem, let's use
+Hi Andrei,
 
-The ones he pointed out, coming from Linus aren't enough?
+On Mon, May 07, 2012, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> ---
+>  lib/a2mp.h     |   38 +++++++++++++++++++++
+>  parser/l2cap.c |  100 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
+>  2 files changed, 130 insertions(+), 8 deletions(-)
 
+I can't apply this since it wont apply to bluez.git (bluez lib/ should
+stay in sync with hcidump). Please split this into two patches.
 
-> mm/memory.c as an example as that file gets hit by a lot of people,
-> that uses the multi-line conditional TAB-only crap you guys seem to
-> keep using.
-
-Look again at this file and you'll see there is mixed style.
-
-
->
-> They don't.  All the examples you'll find are of the form:
->
->        if (a &&
->            b)
->
-> not:
->
->        if (a &&
->                        b)
->
-> like I see happening in bluetooth all the time.
->
-> How did you think they figured that out?  Did they read someone's
-> mind?
-
-No, they used the default in emacs or another editor that has this as
-default, i.e. mix tabs and spaces
-
-
-Regards,
-Lucas De Marchi
+Johan
