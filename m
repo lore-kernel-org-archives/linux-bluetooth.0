@@ -1,37 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 May 2012 11:30:40 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] gatttool: Add option to specify LE address type
-Message-ID: <20120507183040.GA7230@x220.hpllc.com>
-References: <1336396142-6439-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1336396142-6439-1-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <CALF0-+U0YwO+1BtXC4rz0hGNR7AjEjwUnF+MAnAX+SiOTSujDQ@mail.gmail.com>
+References: <CALF0-+U0YwO+1BtXC4rz0hGNR7AjEjwUnF+MAnAX+SiOTSujDQ@mail.gmail.com>
+Date: Mon, 7 May 2012 15:20:12 -0300
+Message-ID: <CALF0-+W=io9JZZz9gX71tGyYZnh_idcRWRSjP0RFkLjFmm0bfQ@mail.gmail.com>
+Subject: Re: [Q] Crappy bluetooth usb adapter is timing out
+From: Ezequiel Garcia <elezegarcia@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi,
 
-On Mon, May 07, 2012, Andrzej Kaczmarek wrote:
-> This patch makes possible to specify LE address type.
-> 
-> After advertising cache was removed from kernel we should always specify
-> address type for LE link when calling bt_io_connect() as otherwise random
-> will always be used.
-> 
-> LE address type can be specified either by 'addr-type' or 't' command line
-> parameter or as additional parameter to 'connect' command in interactive mode.
-> 
-> Possible values are 'public' (default) and 'random'.
-> ---
->  attrib/gatttool.c    |    8 ++++++--
->  attrib/gatttool.h    |    7 ++++---
->  attrib/interactive.c |   17 +++++++++++++----
->  attrib/utils.c       |   12 ++++++++++--
->  4 files changed, 33 insertions(+), 11 deletions(-)
+On Mon, May 7, 2012 at 3:10 PM, Ezequiel Garcia <elezegarcia@gmail.com> wrote:
+> I get this message:
+> "Can't init device hci0: Connection timed out (110)"
+>
+> I've tracked this down to hciconfig.c, when it calls
+> HCIDEVUP ioctl.
+>
+> I just wanted to know if I'm doing anything wrong, and
+> if I can raise any timer value, so I don't get the timeout error.
+>
 
-Applied. Thanks.
+So, I was just looking at HCIDEVUP ioctl on my kernel code, and it seems
+that the timer value is controlled by "HCI_INIT_TIMEOUT" macro,
+and that macro is currently set to 10 seconds.
 
-Johan
+Now, 10 seconds looks like more than reasonable to me, so I guess
+the smart solution is to just re-try the operation.
+
+FWIW, does any of you ever experience this kind of issue?
+I would like to know in what ways is my device crappy ;)
+
+Thanks,
+Ezequiel.
