@@ -1,45 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 07 May 2012 11:56:55 -0400 (EDT)
-Message-Id: <20120507.115655.1099092499206396209.davem@davemloft.net>
-To: gustavo@padovan.org
-Cc: linville@tuxdriver.com, linux-bluetooth@vger.kernel.org,
+Date: Mon, 07 May 2012 11:52:28 -0400 (EDT)
+Message-Id: <20120507.115228.1171858914064928263.davem@davemloft.net>
+To: andrei.emeltchenko.news@gmail.com
+Cc: dh.herrmann@googlemail.com, gustavo@padovan.org,
+	linville@tuxdriver.com, linux-bluetooth@vger.kernel.org,
 	linux-wireless@vger.kernel.org
 Subject: Re: [PATCH] Bluetooth: Fix coding style
 From: David Miller <davem@davemloft.net>
-In-Reply-To: <20120507152113.GA5192@joana>
-References: <1336157988-4602-1-git-send-email-gustavo@padovan.org>
-	<20120506.123656.1335354317428258137.davem@davemloft.net>
-	<20120507152113.GA5192@joana>
+In-Reply-To: <20120507081411.GA19002@aemeltch-MOBL1>
+References: <CANq1E4TTfDxZPsOqqWUT7PqTKUr8nCTC-wo=iGe_pxoUmnecgQ@mail.gmail.com>
+	<20120506.145304.1998242927519675381.davem@davemloft.net>
+	<20120507081411.GA19002@aemeltch-MOBL1>
 Mime-Version: 1.0
 Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo@padovan.org>
-Date: Mon, 7 May 2012 12:24:05 -0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Date: Mon, 7 May 2012 11:14:13 +0300
 
-> * David Miller <davem@davemloft.net> [2012-05-06 12:36:56 -0400]:
-> 
->> From: Gustavo Padovan <gustavo@padovan.org>
->> Date: Fri,  4 May 2012 15:59:48 -0300
->> 
->> > Fix offending styles all over the tree. This is in conformance David
->> > Miller's style rules.
->> 
->> They aren't just my style rules.
->> 
->> And, if your plan is to patch things up afterwards so you don't
->> have to change existing commits in your tree, think again.
->> 
->> I absolutely will not pull a tree from John that has commits in
->> it that add the bad indentation.
->> 
->> You have to respin your tree with fixed commits.
-> 
-> John, can you please unpull the bluetooth tree from wireless-next? I'll be
-> fixing he affected commits and the send you a new pull request. Thanks.
+> If you think that Documentation/CodingStyle is a crap why don't you send a
+> patch to fix it?
 
-And John also make sure these guys don't add unreasonable commit log
-messages saying things like that this multi-line condition style thing
-is my specific coding style.  It's not.
+The same reason I don't go try and fix broken networking RFCs.
 
+Documents are never are the final verdict on anything, there will
+always be areas where such documents are wrong and common sense should
+prevail.
+
+If you take them %100 of the time on face value, and use them as an
+opportunity to turn your brain completely off, that's your problem.
+
+And it's amusing that you ask me to fix the document.  You're
+unwillingness to go look at other core areas of the kernel and see
+what they do there is just an evasive act rather than an attempt to
+understand the point I'm trying to make.
