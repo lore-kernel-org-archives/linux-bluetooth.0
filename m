@@ -1,187 +1,199 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] hcidump: Process A2MP Assoc Rsp
-Date: Mon,  7 May 2012 16:49:27 +0300
-Message-Id: <1336398567-27842-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1336398567-27842-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1336398567-27842-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH] gatttool: Add option to specify LE address type
+Date: Mon, 7 May 2012 15:09:02 +0200
+Message-ID: <1336396142-6439-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+This patch makes possible to specify LE address type.
 
+After advertising cache was removed from kernel we should always specify
+address type for LE link when calling bt_io_connect() as otherwise random
+will always be used.
+
+LE address type can be specified either by 'addr-type' or 't' command line
+parameter or as additional parameter to 'connect' command in interactive mode.
+
+Possible values are 'public' (default) and 'random'.
 ---
- lib/a2mp.h     |   38 +++++++++++++++++++++
- parser/l2cap.c |  100 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 130 insertions(+), 8 deletions(-)
+ attrib/gatttool.c    |    8 ++++++--
+ attrib/gatttool.h    |    7 ++++---
+ attrib/interactive.c |   17 +++++++++++++----
+ attrib/utils.c       |   12 ++++++++++--
+ 4 files changed, 33 insertions(+), 11 deletions(-)
 
-diff --git a/lib/a2mp.h b/lib/a2mp.h
-index da937d1..ac308e7 100644
---- a/lib/a2mp.h
-+++ b/lib/a2mp.h
-@@ -142,6 +142,44 @@ struct a2mp_disconn_rsp {
- #define A2MP_STATUS_PHYS_LINK_EXISTS			0x05
- #define A2MP_STATUS_SECURITY_VIOLATION			0x06
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index 21514af..8a43ec1 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -44,6 +44,7 @@
  
-+#define MAC_ADDR_TYPE		1
-+#define PREF_CHANLIST_TYPE	2
-+#define CONNECTED_CHAN		3
-+#define PAL_CAP_TYPE		4
-+#define PAL_VER_INFO		5
-+
-+struct tlv {
-+	uint8_t type;
-+	uint16_t len;
-+	uint8_t val[0];
-+} __attribute__ ((packed));
-+
-+struct pal_ver {
-+	uint8_t ver;
-+	uint16_t company_id;
-+	uint16_t sub_ver;
-+} __attribute__ ((packed));
-+
-+struct country_triplet {
-+	union {
-+		struct {
-+			uint8_t first_channel;
-+			uint8_t num_channels;
-+			int8_t max_power;
-+		} __attribute__ ((packed)) chans;
-+		struct {
-+			uint8_t reg_extension_id;
-+			uint8_t reg_class;
-+			uint8_t coverage_class;
-+		} __attribute__ ((packed)) ext;
-+	};
-+} __attribute__ ((packed));
-+
-+struct chan_list {
-+	uint8_t country_code[3];
-+	struct country_triplet triplets[0];
-+} __attribute__ ((packed));
-+
- #ifdef __cplusplus
- }
- #endif
-diff --git a/parser/l2cap.c b/parser/l2cap.c
-index 69383e6..11ce11c 100644
---- a/parser/l2cap.c
-+++ b/parser/l2cap.c
-@@ -1162,20 +1162,104 @@ static inline void a2mp_assoc_req(int level, struct frame *frm)
- 	printf("Get AMP Assoc req: id %d\n", h->id);
- }
+ static gchar *opt_src = NULL;
+ static gchar *opt_dst = NULL;
++static gchar *opt_dst_type = NULL;
+ static gchar *opt_value = NULL;
+ static gchar *opt_sec_level = NULL;
+ static bt_uuid_t *opt_uuid = NULL;
+@@ -523,6 +524,8 @@ static GOptionEntry options[] = {
+ 		"Specify local adapter interface", "hciX" },
+ 	{ "device", 'b', 0, G_OPTION_ARG_STRING, &opt_dst,
+ 		"Specify remote Bluetooth address", "MAC" },
++	{ "addr-type", 't', 0, G_OPTION_ARG_STRING, &opt_dst_type,
++		"Set LE address type. Default: public", "[public | random]"},
+ 	{ "mtu", 'm', 0, G_OPTION_ARG_INT, &opt_mtu,
+ 		"Specify the MTU size", "MTU" },
+ 	{ "psm", 'p', 0, G_OPTION_ARG_INT, &opt_psm,
+@@ -539,6 +542,7 @@ int main(int argc, char *argv[])
+ 	GError *gerr = NULL;
+ 	GIOChannel *chan;
  
-+static void a2mp_dump_chanlist(int level, struct tlv *tlv, char *prefix)
-+{
-+	struct chan_list *chan_list = (struct chan_list *) tlv->val;
-+	struct country_triplet *triplet;
-+	int i, num;
-+
-+	num = tlv->len / sizeof(*triplet);
-+
-+	printf("%s number of triplets %d\n", prefix, num);
-+
-+	p_indent(level+2, 0);
-+
-+	printf("Country code: %c%c%c\n", chan_list->country_code[0],
-+	       chan_list->country_code[1], chan_list->country_code[2]);
-+
-+	for (i = 0; i < num; i++) {
-+		triplet = &chan_list->triplets[i];
-+
-+		p_indent(level+2, 0);
-+
-+		if (triplet->chans.first_channel >= 201) {
-+			printf("Reg ext id %d reg class %d coverage class %d\n",
-+			       triplet->ext.reg_extension_id,
-+			       triplet->ext.reg_class,
-+			       triplet->ext.coverage_class);
-+		} else {
-+			if (triplet->chans.num_channels == 1)
-+				printf("Channel %d max power %d\n",
-+						triplet->chans.first_channel,
-+						triplet->chans.max_power);
-+			else
-+				printf("Channels %d - %d max power %d\n",
-+						triplet->chans.first_channel,
-+						triplet->chans.first_channel +
-+						triplet->chans.num_channels,
-+						triplet->chans.max_power);
-+		}
-+	}
-+}
-+
- static inline void a2mp_assoc_dump(int level, uint8_t *assoc, uint16_t len)
- {
--	int i;
-+	struct tlv *tlv;
++	opt_dst_type = g_strdup("public");
+ 	opt_sec_level = g_strdup("low");
  
- 	p_indent(level, 0);
--	printf("Assoc data:");
--	for (i = 0; i < len; i++) {
--		if (!(i%16)) {
--			printf("\n");
--			p_indent(level+1, 0);
-+	printf("Assoc data [len %d]:", len);
-+
-+	tlv = (struct tlv *) assoc;
-+	while (len > sizeof(*tlv)) {
-+		uint16_t tlvlen = btohs(tlv->len);
-+		struct pal_ver *ver;
-+		char addr[18];
-+
-+		p_indent(level+1, 0);
-+
-+		switch (tlv->type) {
-+		case MAC_ADDR_TYPE:
-+			if (tlvlen != 6)
-+				break;
-+			/* Use bdaddr since same length */
-+			p_ba2str((bdaddr_t *) tlv->val, addr);
-+			printf("MAC: %s\n", addr);
-+			break;
-+
-+		case PREF_CHANLIST_TYPE:
-+			a2mp_dump_chanlist(level, tlv, "Preferred Chan List");
-+			break;
-+
-+		case CONNECTED_CHAN:
-+			a2mp_dump_chanlist(level, tlv, "Connected Chan List");
-+			break;
-+
-+		case PAL_CAP_TYPE:
-+			if (tlvlen != 4)
-+				break;
-+			printf("PAL CAP: %2.2x %2.2x %2.2x %2.2x\n",
-+			       tlv->val[0], tlv->val[1], tlv->val[2],
-+			       tlv->val[3]);
-+			break;
-+
-+		case PAL_VER_INFO:
-+			if (tlvlen != 5)
-+				break;
-+			ver = (struct pal_ver *) tlv->val;
-+			printf("PAL VER: %2.2x Comp ID: %4.4x SubVer: %4.4x\n",
-+			       ver->ver, btohs(ver->company_id),
-+			       btohs(ver->sub_ver));
-+			break;
-+
-+		default:
-+			printf("Unrecognized type %d\n", tlv->type);
-+			break;
- 		}
--		printf("%2.2x ",*assoc++);
-+
-+		len -= tlvlen + sizeof(*tlv);
-+		assoc += tlvlen + sizeof(*tlv);
-+		tlv = (struct tlv *) assoc;
+ 	context = g_option_context_new(NULL);
+@@ -573,7 +577,7 @@ int main(int argc, char *argv[])
  	}
--	printf("\n");
+ 
+ 	if (opt_interactive) {
+-		interactive(opt_src, opt_dst, opt_psm);
++		interactive(opt_src, opt_dst, opt_dst_type, opt_psm);
+ 		goto done;
+ 	}
+ 
+@@ -597,7 +601,7 @@ int main(int argc, char *argv[])
+ 		goto done;
+ 	}
+ 
+-	chan = gatt_connect(opt_src, opt_dst, opt_sec_level,
++	chan = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
+ 					opt_psm, opt_mtu, connect_cb);
+ 	if (chan == NULL) {
+ 		got_error = TRUE;
+diff --git a/attrib/gatttool.h b/attrib/gatttool.h
+index 89ac282..a38339b 100644
+--- a/attrib/gatttool.h
++++ b/attrib/gatttool.h
+@@ -21,8 +21,9 @@
+  *
+  */
+ 
+-int interactive(const gchar *src, const gchar *dst, gboolean le);
++int interactive(const gchar *src, const gchar *dst, const gchar *dst_type,
++		gboolean le);
+ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
+-			const gchar *sec_level, int psm, int mtu,
+-			BtIOConnect connect_cb);
++			const gchar *dst_type, const gchar *sec_level,
++			int psm, int mtu, BtIOConnect connect_cb);
+ size_t gatt_attr_data_from_string(const char *str, uint8_t **data);
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 073e3f7..0a01cdf 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -44,6 +44,7 @@ static GString *prompt;
+ 
+ static gchar *opt_src = NULL;
+ static gchar *opt_dst = NULL;
++static gchar *opt_dst_type = NULL;
+ static gchar *opt_sec_level = NULL;
+ static int opt_psm = 0;
+ static int opt_mtu = 0;
+@@ -359,6 +360,12 @@ static void cmd_connect(int argcp, char **argvp)
+ 	if (argcp > 1) {
+ 		g_free(opt_dst);
+ 		opt_dst = g_strdup(argvp[1]);
++
++		g_free(opt_dst_type);
++		if (argcp > 2)
++			opt_dst_type = g_strdup(argvp[2]);
++		else
++			opt_dst_type = g_strdup("public");
+ 	}
+ 
+ 	if (opt_dst == NULL) {
+@@ -367,8 +374,8 @@ static void cmd_connect(int argcp, char **argvp)
+ 	}
+ 
+ 	set_state(STATE_CONNECTING);
+-	iochannel = gatt_connect(opt_src, opt_dst, opt_sec_level, opt_psm,
+-						opt_mtu, connect_cb);
++	iochannel = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
++						opt_psm, opt_mtu, connect_cb);
+ 	if (iochannel == NULL)
+ 		set_state(STATE_DISCONNECTED);
+ 	else
+@@ -735,7 +742,7 @@ static struct {
+ 		"Exit interactive mode" },
+ 	{ "quit",		cmd_exit,	"",
+ 		"Exit interactive mode" },
+-	{ "connect",		cmd_connect,	"[address]",
++	{ "connect",		cmd_connect,	"[address [address type]]",
+ 		"Connect to a remote device" },
+ 	{ "disconnect",		cmd_disconnect,	"",
+ 		"Disconnect from a remote device" },
+@@ -842,7 +849,8 @@ static char **commands_completion(const char *text, int start, int end)
+ 		return NULL;
  }
  
- static inline void a2mp_assoc_rsp(int level, struct frame *frm, uint16_t len)
+-int interactive(const gchar *src, const gchar *dst, int psm)
++int interactive(const gchar *src, const gchar *dst,
++		const gchar *dst_type, int psm)
+ {
+ 	GIOChannel *pchan;
+ 	gint events;
+@@ -851,6 +859,7 @@ int interactive(const gchar *src, const gchar *dst, int psm)
+ 
+ 	opt_src = g_strdup(src);
+ 	opt_dst = g_strdup(dst);
++	opt_dst_type = g_strdup(dst_type);
+ 	opt_psm = psm;
+ 
+ 	prompt = g_string_new(NULL);
+diff --git a/attrib/utils.c b/attrib/utils.c
+index 22d23a4..c951f44 100644
+--- a/attrib/utils.c
++++ b/attrib/utils.c
+@@ -41,11 +41,12 @@
+ #define ATT_MIN_MTU_L2CAP	48
+ 
+ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
+-				const gchar *sec_level, int psm, int mtu,
+-				BtIOConnect connect_cb)
++				const gchar *dst_type, const gchar *sec_level,
++				int psm, int mtu, BtIOConnect connect_cb)
+ {
+ 	GIOChannel *chan;
+ 	bdaddr_t sba, dba;
++	uint8_t dest_type;
+ 	GError *err = NULL;
+ 	BtIOSecLevel sec;
+ 	int minimum_mtu;
+@@ -74,6 +75,12 @@ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
+ 	} else
+ 		bacpy(&sba, BDADDR_ANY);
+ 
++	/* Not used for BR/EDR */
++	if (strcmp(dst_type, "random") == 0)
++		dest_type = BDADDR_LE_RANDOM;
++	else
++		dest_type = BDADDR_LE_PUBLIC;
++
+ 	if (strcmp(sec_level, "medium") == 0)
+ 		sec = BT_IO_SEC_MEDIUM;
+ 	else if (strcmp(sec_level, "high") == 0)
+@@ -85,6 +92,7 @@ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
+ 		chan = bt_io_connect(BT_IO_L2CAP, connect_cb, NULL, NULL, &err,
+ 				BT_IO_OPT_SOURCE_BDADDR, &sba,
+ 				BT_IO_OPT_DEST_BDADDR, &dba,
++				BT_IO_OPT_DEST_TYPE, dest_type,
+ 				BT_IO_OPT_CID, ATT_CID,
+ 				BT_IO_OPT_OMTU, mtu,
+ 				BT_IO_OPT_SEC_LEVEL, sec,
 -- 
 1.7.9.5
 
