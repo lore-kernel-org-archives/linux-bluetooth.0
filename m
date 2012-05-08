@@ -1,35 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAPsQmjqVJ93mpSv-0S6s2KavKonh6+=1R4QgUDRfjRtv7QwWnA@mail.gmail.com>
-References: <CAPsQmjrMuUbiqymU48V2m4Lz7_33gudS8FMHijoNq_9UquPosw@mail.gmail.com>
- <CABBYNZK8W_4beoA+qg1e4E7QpsoswAzCULVbO9djgBkk8L1Wdg@mail.gmail.com> <CAPsQmjqVJ93mpSv-0S6s2KavKonh6+=1R4QgUDRfjRtv7QwWnA@mail.gmail.com>
-From: Rafael Fonseca <fonsecasantos.rafael@gmail.com>
-Date: Tue, 8 May 2012 14:02:52 -0300
-Message-ID: <CAPsQmjpr=m0JHFp-Dv6tuiGYSiJGLdHHY98eAE7NNdCt94rO8A@mail.gmail.com>
-Subject: Re: Google Summer of Code 2012 - Introduction
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <1336488880.5970.149.camel@aeonflux>
+Subject: Re: [PATCH 3/3] Bluetooth: Remove batostr()
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ulisses Furquim <ulisses@profusion.mobi>
+Cc: David Herrmann <dh.herrmann@googlemail.com>,
+	linux-bluetooth@vger.kernel.org, gustavo@padovan.org
+Date: Tue, 08 May 2012 07:54:40 -0700
+In-Reply-To: <CAA37ikZW1H1zfPr8d5uonpY0SEZk=dbDQ+XsYhOytXg4ExuLAA@mail.gmail.com>
+References: <1336483706-1533-1-git-send-email-dh.herrmann@googlemail.com>
+	 <1336483706-1533-3-git-send-email-dh.herrmann@googlemail.com>
+	 <CAA37ikZW1H1zfPr8d5uonpY0SEZk=dbDQ+XsYhOytXg4ExuLAA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Ulisses,
 
-it's time for reporting my progress in these first two weeks.
+> > batostr() is not used anywhere and I don't see any reason why we should
+> > keep it. Use ba2str() instead.
+> >
+> > Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
+> > ---
+> >  include/net/bluetooth/bluetooth.h |    1 -
+> >  net/bluetooth/lib.c               |   14 --------------
+> >  2 files changed, 15 deletions(-)
+> 
+> The patchset looks good to me. I'm also not sure we need another
+> specifier for snprintf().
+> 
+> Given we had static buffers instead of allocating them in the stack
+> every time it'd be good to hear from Marcel if we had a reason and if
+> it's still valid. IMO we don't have problems with stack usage in our
+> code paths now but I haven't actually checked it.
 
-I've actually done less than I expected since my second bluetooth
-dongle has not arrived yet, making it difficult for me to test and
-better understand the AVRCP profile implementation. Meanwhile, I'm
-studying the source code and learning how to use some debugging tools,
-like dbus-monitor, hcidump and d-feet.
+that code is most likely 11+ years old. It is actually not from me. So
+if you wanna know why, you need to track down Max.
 
-As suggested by Luiz, I will implement the MediaPlayer interface for
-devices supporting AVRCP > 1.3 in the media.c file. The first step is
-to change our record to 1.3 and check remote's device record.
+Using %pM and baswap seems to be the best approach for fixing this right
+now. However I am not against introducing a snprintf modifier for
+Bluetooth addresses.
 
-Any suggestions or comments are welcome!
+Regards
+
+Marcel
 
 
-Best Regards
--- 
-Rafael Fonseca
