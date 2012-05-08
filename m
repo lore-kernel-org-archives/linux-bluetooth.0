@@ -1,48 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 8 May 2012 10:42:31 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	Mat Martineau <mathewm@codeaurora.org>,
-	linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
-Subject: Re: [PATCHv2 2/2] Bluetooth: Lock the L2CAP channel when sending
-Message-ID: <20120508074223.GA29352@aemeltch-MOBL1>
-References: <1336166431-4926-1-git-send-email-mathewm@codeaurora.org>
- <1336166431-4926-3-git-send-email-mathewm@codeaurora.org>
- <20120505000104.GB23728@joana>
+Date: Tue, 8 May 2012 04:07:54 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2012-05-04
+Message-ID: <20120508070211.GB11843@joana>
+References: <20120505001243.GC23728@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120505000104.GB23728@joana>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="lCAWRPmW1mITcIfM"
+In-Reply-To: <20120505001243.GC23728@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
 
-On Fri, May 04, 2012 at 09:01:04PM -0300, Gustavo Padovan wrote:
-> Hi Mat,
-> 
-> * Mat Martineau <mathewm@codeaurora.org> [2012-05-04 14:20:31 -0700]:
-> 
-> > The ERTM and streaming mode transmit queue must only be accessed while
-> > the L2CAP channel lock is held.  Locking the channel before calling
-> > l2cap_chan_send ensures that multiple threads cannot simultaneously
-> > manipulate the queue when sending and receiving concurrently.
-> > 
-> > L2CAP channel locking had previously moved to the l2cap_chan struct
-> > instead of the associated socket, so some of the old socket locking
-> > can also be removed in this patch.
-> > 
-> > Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> > ---
-> >  include/net/bluetooth/bluetooth.h |    2 --
-> >  net/bluetooth/l2cap_sock.c        |   19 +++++++++++--------
-> >  2 files changed, 11 insertions(+), 10 deletions(-)
-> 
-> Patch has been applied to the bluetooth tree. Thanks.
+--lCAWRPmW1mITcIfM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-What about applying the first patch? I actually pulled that patch from
-bluetooth-next and modified locking in my code but now that patch seems to
-be lost.
+Hi John,
 
-Best regards 
-Andrei Emeltchenko 
+* Gustavo Padovan <gustavo@padovan.org> [2012-05-04 21:12:43 -0300]:
 
+> Hi John,
+>=20
+> A few more patch to 3.4. There is 3 fixes from Mat Martineau, a fix for
+> a incoming MTU check that was breaking ERTM, still on ERTM there is a
+> patch that fixes concurrency with one of our locks. His third patch is
+> related to lock fixes too.
+> Besides that Johan fixed a wrong bit set in the Inquiry code, Vishal
+> Agarwal added a EIR fix and finally we have support for one more usb id.
+>=20
+> Please pull or let me know of any problems!
+
+I saw that you didn't pull this yet, so I decided to re-do this pull reques=
+t.
+We have more 3 important fixes to go in. They fix a regression that was
+preventing Bluetooth keyboard to work. I'll re-do the whole pull request
+message, so you can copy and paste it easily:
+
+A few more patch to 3.4. There is 3 fixes from Mat Martineau, a fix for a
+incoming MTU check that was breaking ERTM, still on ERTM there is a patch t=
+hat
+fixes concurrency with one of our locks. His third patch is related to lock
+fixes too.
+Besides that Johan fixed a wrong bit set in the Inquiry code, Vishal Agarwal
+added a EIR fix and finally we have support for one more usb id.  Finally
+Johan and I fixed a regression that was preventing bluetooth keyboard to wo=
+rk.
+
+Please pull or let me know of any problems!
+
+	Gustavo
+
+---
+
+The following changes since commit 985140369be1e886754d8ac0375dd64e4f727311:
+
+  Add Foxconn / Hon Hai IDs for btusb module (2012-04-24 11:38:41 -0300)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for=
+-upstream
+
+for you to fetch changes up to fbcb6a061652b38257a1d8bcf6ebd70fc1771549:
+
+  Bluetooth: mgmt: Fix device_connected sending order (2012-05-07 20:56:30 =
++0300)
+
+----------------------------------------------------------------
+Gustavo Padovan (2):
+      Bluetooth: notify userspace of security level change
+      Bluetooth: report the right security level in getsockopt
+
+Johan Hedberg (2):
+      Bluetooth: Fix Inquiry with RSSI event mask
+      Bluetooth: mgmt: Fix device_connected sending order
+
+Mat Martineau (3):
+      Bluetooth: Fix a redundant and problematic incoming MTU check
+      Bluetooth: Restore locking semantics when looking up L2CAP channels
+      Bluetooth: Lock the L2CAP channel when sending
+
+Michael Gruetzner (1):
+      bluetooth: Add support for Foxconn/Hon Hai AR5BBU22 0489:E03C
+
+Vishal Agarwal (1):
+      Bluetooth: Fix EIR data generation for mgmt_device_found
+
+ drivers/bluetooth/ath3k.c         |    6 ++++++
+ drivers/bluetooth/btusb.c         |    3 +++
+ include/net/bluetooth/bluetooth.h |    3 +--
+ include/net/bluetooth/hci_core.h  |   17 +++++++++++++++++
+ net/bluetooth/af_bluetooth.c      |    2 +-
+ net/bluetooth/hci_core.c          |    8 ++++++++
+ net/bluetooth/hci_event.c         |   17 +++++++++++++----
+ net/bluetooth/l2cap_core.c        |   35 ++++++++-------------------------=
+--
+ net/bluetooth/l2cap_sock.c        |   39 +++++++++++++++++++++++++--------=
+------
+ 9 files changed, 82 insertions(+), 48 deletions(-)
+
+--lCAWRPmW1mITcIfM
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBAgAGBQJPqMZKAAoJEPs3PUX4s20owrEP/3fRjmR3d8E5nEzJUMg+LHtN
+t6vbBpi61YN6pb7cJMCWTTfKrMO58qWt2BhMe7SymoTjoxq5Z2g2j2T9cv0MVbUy
+/hokx/GN9c/lKyBUt90sbxOTOW/whnJhuv1T9G6KmVseewNDciEZugNFNlnPlI7Z
+gLZogCR15v9B/H4iA4B4baJuMEon3+A9U1wKPACRFwZYf1QGvwyiwbiYxmdgZudx
+WDcdTe9zCDfiwibStcv1/DzOo3peTHHxSnURlbs3R80DwPS3SDBN3e8xOIF155gl
+ltbXUOgicPyWRYcpbeJHlyI0ueEJTydWU9tNTDSPFImW0sO68UJVx9EeNcFi+Zzk
+BGOIP9hd3HqMD3ULoeWZpcckTNeGZfDQzb+NEF11+jdihRpUT3DPSVN3Ofj8vVrq
+6LuSYucZ6jWUrOv5S76slnlQp61KkyuLnHnD1R4zDpBZsqN+6calr+HCqaea3uYk
+zza6HAdkXM4gstXBX1HqA2qiYAYH8I0aBQOm0mM02PJJLCQD+akfqqAQulS/9gqj
+UFFS8lY0xJFEXOcBIEMEAxf6htIwHe8JqxUhH3kwzZV9xBDMhu7f3ZNzQ7i80N2i
+B6P2RtdIW56LFMMd5ufwisyu4FjWvobCBnqVyx02W40Qf7nGYtfZi1RcYnAYfH5b
+k6yYm2BvaDPoxoLIfQu2
+=tEYg
+-----END PGP SIGNATURE-----
+
+--lCAWRPmW1mITcIfM--
