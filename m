@@ -1,62 +1,152 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@googlemail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	gustavo@padovan.org,
-	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 1/3] Bluetooth: Introduce ba2str()
-Date: Tue,  8 May 2012 15:28:24 +0200
-Message-Id: <1336483706-1533-1-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 2/2] Decode A2MP Get AMP Assoc rsp
+Date: Tue,  8 May 2012 12:44:07 +0300
+Message-Id: <1336470247-1646-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1336470247-1646-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1336470247-1646-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We use batostr() in many debug messages even though it uses static
-buffers. This is definitely not thread-safe and should be replaced by
-buffers on the stack of the caller.
-ba2str() is similar to batostr() but takes as argument a pointer to a
-buffer of at least size BDADDR_STRLEN=18. It returns it's argument so we
-can still use it in debug messages directly.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
+Adds decoding Assoc data:
+
+...
+> ACL data: handle 11 flags 0x02 dlen 53
+    A2MP: Get AMP Assoc rsp: id 1 status (0) Success
+      Assoc data [len 39]:
+        MAC: <address>
+        Preferred Chan List number of triplets 4
+          Country code: XXX
+          Reg ext id 201 reg class 254 coverage class 0
+          Channel 1 max power 20
+          Channels 2 - 12 max power 20
+          Channels 4 - 8 max power 0
+        PAL CAP: 00 00 00 00
+        PAL VER: 01 Comp ID: <id> SubVer: 0001
+...
 ---
- include/net/bluetooth/bluetooth.h |    4 ++++
- net/bluetooth/lib.c               |   10 ++++++++++
- 2 files changed, 14 insertions(+)
+ parser/l2cap.c |   99 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 91 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 2fb268f..9b22536 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -184,6 +184,10 @@ static inline void bacpy(bdaddr_t *dst, bdaddr_t *src)
- void baswap(bdaddr_t *dst, bdaddr_t *src);
- char *batostr(bdaddr_t *ba);
- 
-+#define BDADDR_STRLEN 18
-+
-+char *ba2str(bdaddr_t *ba, char buf[BDADDR_STRLEN]);
-+
- /* Common socket structures and functions */
- 
- #define bt_sk(__sk) ((struct bt_sock *) __sk)
-diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
-index 84ff96f..6dcb788 100644
---- a/net/bluetooth/lib.c
-+++ b/net/bluetooth/lib.c
-@@ -62,6 +62,16 @@ char *batostr(bdaddr_t *ba)
+diff --git a/parser/l2cap.c b/parser/l2cap.c
+index 69383e6..8a1469b 100644
+--- a/parser/l2cap.c
++++ b/parser/l2cap.c
+@@ -1162,20 +1162,103 @@ static inline void a2mp_assoc_req(int level, struct frame *frm)
+ 	printf("Get AMP Assoc req: id %d\n", h->id);
  }
- EXPORT_SYMBOL(batostr);
  
-+char *ba2str(bdaddr_t *ba, char buf[BDADDR_STRLEN])
++static void a2mp_dump_chanlist(int level, struct tlv *tlv, char *prefix)
 +{
-+	sprintf(buf, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
-+		ba->b[5], ba->b[4], ba->b[3],
-+		ba->b[2], ba->b[1], ba->b[0]);
++	struct chan_list *chan_list = (struct chan_list *) tlv->val;
++	struct country_triplet *triplet;
++	int i, num;
 +
-+	return buf;
++	num = tlv->len / sizeof(*triplet);
++
++	printf("%s number of triplets %d\n", prefix, num);
++
++	p_indent(level+2, 0);
++
++	printf("Country code: %c%c%c\n", chan_list->country_code[0],
++	       chan_list->country_code[1], chan_list->country_code[2]);
++
++	for (i = 0; i < num; i++) {
++		triplet = &chan_list->triplets[i];
++
++		p_indent(level+2, 0);
++
++		if (triplet->chans.first_channel >= 201) {
++			printf("Reg ext id %d reg class %d coverage class %d\n",
++			       triplet->ext.reg_extension_id,
++			       triplet->ext.reg_class,
++			       triplet->ext.coverage_class);
++		} else {
++			if (triplet->chans.num_channels == 1)
++				printf("Channel %d max power %d\n",
++						triplet->chans.first_channel,
++						triplet->chans.max_power);
++			else
++				printf("Channels %d - %d max power %d\n",
++						triplet->chans.first_channel,
++						triplet->chans.first_channel +
++						triplet->chans.num_channels,
++						triplet->chans.max_power);
++		}
++	}
 +}
-+EXPORT_SYMBOL(ba2str);
 +
- /* Bluetooth error codes to Unix errno mapping */
- int bt_to_errno(__u16 code)
+ static inline void a2mp_assoc_dump(int level, uint8_t *assoc, uint16_t len)
  {
+-	int i;
++	struct tlv *tlv;
+ 
+ 	p_indent(level, 0);
+-	printf("Assoc data:");
+-	for (i = 0; i < len; i++) {
+-		if (!(i%16)) {
+-			printf("\n");
+-			p_indent(level+1, 0);
++	printf("Assoc data [len %d]:\n", len);
++
++	tlv = (struct tlv *) assoc;
++	while (len > sizeof(*tlv)) {
++		uint16_t tlvlen = btohs(tlv->len);
++		struct pal_ver *ver;
++
++		p_indent(level+1, 0);
++
++		switch (tlv->type) {
++		case MAC_ADDR_TYPE:
++			if (tlvlen != 6)
++				break;
++			printf("MAC: %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X\n",
++			       tlv->val[0], tlv->val[1], tlv->val[2],
++			       tlv->val[3], tlv->val[4], tlv->val[5]);
++			break;
++
++		case PREF_CHANLIST_TYPE:
++			a2mp_dump_chanlist(level, tlv, "Preferred Chan List");
++			break;
++
++		case CONNECTED_CHAN:
++			a2mp_dump_chanlist(level, tlv, "Connected Chan List");
++			break;
++
++		case PAL_CAP_TYPE:
++			if (tlvlen != 4)
++				break;
++			printf("PAL CAP: %2.2x %2.2x %2.2x %2.2x\n",
++			       tlv->val[0], tlv->val[1], tlv->val[2],
++			       tlv->val[3]);
++			break;
++
++		case PAL_VER_INFO:
++			if (tlvlen != 5)
++				break;
++			ver = (struct pal_ver *) tlv->val;
++			printf("PAL VER: %2.2x Comp ID: %4.4x SubVer: %4.4x\n",
++			       ver->ver, btohs(ver->company_id),
++			       btohs(ver->sub_ver));
++			break;
++
++		default:
++			printf("Unrecognized type %d\n", tlv->type);
++			break;
+ 		}
+-		printf("%2.2x ",*assoc++);
++
++		len -= tlvlen + sizeof(*tlv);
++		assoc += tlvlen + sizeof(*tlv);
++		tlv = (struct tlv *) assoc;
+ 	}
+-	printf("\n");
+ }
+ 
+ static inline void a2mp_assoc_rsp(int level, struct frame *frm, uint16_t len)
 -- 
-1.7.10.1
+1.7.9.5
+
