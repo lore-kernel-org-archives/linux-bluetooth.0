@@ -1,24 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 May 2012 23:44:51 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
+Date: Tue, 8 May 2012 03:16:10 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] input: increase security level of the connection
-Message-ID: <20120508064451.GA20100@x220.avt.com>
-References: <1336096879-17327-1-git-send-email-gustavo@padovan.org>
+Subject: Re: [PATCH obexd 3/3] client: Add handler for SIGUSR2
+Message-ID: <20120508061610.GA11843@joana>
+References: <1336435253-19081-1-git-send-email-luiz.dentz@gmail.com>
+ <1336435253-19081-3-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1336096879-17327-1-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1336435253-19081-3-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Luiz,
 
-On Thu, May 03, 2012, Gustavo Padovan wrote:
-> ---
->  input/device.c |   45 +++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 43 insertions(+), 2 deletions(-)
+* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2012-05-07 17:00:53 -0700]:
 
-Applied. Thanks.
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This signal enables debug for obed so just do the same for obex-client
 
-Johan
+I think you meant "obexd" here.
+
+	Gustavo
