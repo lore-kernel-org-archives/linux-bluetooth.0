@@ -1,44 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 8 May 2012 17:30:12 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: David Herrmann <dh.herrmann@googlemail.com>,
+	linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>
+Subject: Re: batostr() function
+Message-ID: <20120508143011.GD29352@aemeltch-MOBL1>
+References: <1336391383.4325.24.camel@jlt3.sipsolutions.net>
+ <CANq1E4QW4vSn_r9C=rirShE+-eyPjRX+b5tpC+mx69Hs6aEYqQ@mail.gmail.com>
+ <1336487108.4320.2.camel@jlt3.sipsolutions.net>
 MIME-Version: 1.0
-In-Reply-To: <1336483706-1533-3-git-send-email-dh.herrmann@googlemail.com>
-References: <1336483706-1533-1-git-send-email-dh.herrmann@googlemail.com>
-	<1336483706-1533-3-git-send-email-dh.herrmann@googlemail.com>
-Date: Tue, 8 May 2012 11:30:31 -0300
-Message-ID: <CAA37ikZW1H1zfPr8d5uonpY0SEZk=dbDQ+XsYhOytXg4ExuLAA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Bluetooth: Remove batostr()
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, gustavo@padovan.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1336487108.4320.2.camel@jlt3.sipsolutions.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+On Tue, May 08, 2012 at 04:25:08PM +0200, Johannes Berg wrote:
+> On Tue, 2012-05-08 at 15:30 +0200, David Herrmann wrote:
+> > Hi Johannes
+> > 
+> > On Mon, May 7, 2012 at 1:49 PM, Johannes Berg <johannes@sipsolutions.net> wrote:
+> > > Really? 2 static buffers that are used alternately based on a static
+> > > variable? How can that possibly be thread-safe? That may work in very
+> > > restricted scenarios, but ...
+> > 
+> > Looking at "git blame" it seems the whole function is still from
+> > linux-2.4. Looks like no-one ever noticed. I've sent a patchset fixing
+> > it, thanks.
+> 
+> I was thinking you could use %pM, but it seems BT addresses are stored
+> the wrong way around for some reason ...
 
-On Tue, May 8, 2012 at 10:28 AM, David Herrmann
-<dh.herrmann@googlemail.com> wrote:
-> batostr() is not used anywhere and I don't see any reason why we should
-> keep it. Use ba2str() instead.
->
-> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
-> ---
-> =A0include/net/bluetooth/bluetooth.h | =A0 =A01 -
-> =A0net/bluetooth/lib.c =A0 =A0 =A0 =A0 =A0 =A0 =A0 | =A0 14 -------------=
--
-> =A02 files changed, 15 deletions(-)
+This looks like better idea then allocating buffers, we can use swap to
+take care about "wrong order".
 
-The patchset looks good to me. I'm also not sure we need another
-specifier for snprintf().
+Best regards 
+Andrei Emeltchenko 
 
-Given we had static buffers instead of allocating them in the stack
-every time it'd be good to hear from Marcel if we had a reason and if
-it's still valid. IMO we don't have problems with stack usage in our
-code paths now but I haven't actually checked it.
-
-Regards,
-
---=20
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
