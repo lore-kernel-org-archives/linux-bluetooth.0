@@ -1,51 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1336499313.4320.4.camel@jlt3.sipsolutions.net>
-References: <1336391383.4325.24.camel@jlt3.sipsolutions.net>
- <CANq1E4QW4vSn_r9C=rirShE+-eyPjRX+b5tpC+mx69Hs6aEYqQ@mail.gmail.com>
- <1336487108.4320.2.camel@jlt3.sipsolutions.net> <20120508143011.GD29352@aemeltch-MOBL1>
- <1336497532.29640.24.camel@joe2Laptop> <1336499313.4320.4.camel@jlt3.sipsolutions.net>
-From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Tue, 8 May 2012 11:26:53 -0700
-Message-ID: <CAB=NE6VLbGkXfB+zCt_J3xpiUE7ThE2ynPpGZCGWCE+uE+7u_g@mail.gmail.com>
-Subject: Re: batostr() function
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: Joe Perches <joe@perches.com>,
-	Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	David Herrmann <dh.herrmann@googlemail.com>,
-	linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: netdev-owner@vger.kernel.org
+In-Reply-To: <1336488880.5970.149.camel@aeonflux>
+References: <1336483706-1533-1-git-send-email-dh.herrmann@googlemail.com>
+	<1336483706-1533-3-git-send-email-dh.herrmann@googlemail.com>
+	<CAA37ikZW1H1zfPr8d5uonpY0SEZk=dbDQ+XsYhOytXg4ExuLAA@mail.gmail.com>
+	<1336488880.5970.149.camel@aeonflux>
+Date: Tue, 8 May 2012 15:11:01 -0300
+Message-ID: <CAA37ikaTN=jyf4NfVvLp0SmfPSmCvAodt-DEro+RB=y+g8sFyw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Bluetooth: Remove batostr()
+From: Ulisses Furquim <ulisses@profusion.mobi>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: David Herrmann <dh.herrmann@googlemail.com>, linux-bluetooth@vger.kernel.org,
+	gustavo@padovan.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, May 8, 2012 at 10:48 AM, Johannes Berg
-<johannes@sipsolutions.net> wrote:
-> On Tue, 2012-05-08 at 10:18 -0700, Joe Perches wrote:
->> On Tue, 2012-05-08 at 17:30 +0300, Andrei Emeltchenko wrote:
->> > On Tue, May 08, 2012 at 04:25:08PM +0200, Johannes Berg wrote:
->> > > On Tue, 2012-05-08 at 15:30 +0200, David Herrmann wrote:
->> > > > Hi Johannes
->> > > >
->> > > > On Mon, May 7, 2012 at 1:49 PM, Johannes Berg <johannes@sipsolutions.net> wrote:
->> > > > > Really? 2 static buffers that are used alternately based on a static
->> > > > > variable? How can that possibly be thread-safe? That may work in very
->> > > > > restricted scenarios, but ...
->> > > >
->> > > > Looking at "git blame" it seems the whole function is still from
->> > > > linux-2.4. Looks like no-one ever noticed. I've sent a patchset fixing
->> > > > it, thanks.
->> > >
->> > > I was thinking you could use %pM, but it seems BT addresses are stored
->> > > the wrong way around for some reason ...
->> >
->> > This looks like better idea then allocating buffers, we can use swap to
->> > take care about "wrong order".
->>
->> https://lkml.org/lkml/2010/12/3/358
+Hi Marcel,
+
+On Tue, May 8, 2012 at 11:54 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Ulisses,
 >
-> Pretty much what I had in mind, thanks. Luis, you'll notice that this
-> will be a pain to backport in compat. :-)
+>> > batostr() is not used anywhere and I don't see any reason why we shoul=
+d
+>> > keep it. Use ba2str() instead.
+>> >
+>> > Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
+>> > ---
+>> > =A0include/net/bluetooth/bluetooth.h | =A0 =A01 -
+>> > =A0net/bluetooth/lib.c =A0 =A0 =A0 =A0 =A0 =A0 =A0 | =A0 14 ----------=
+----
+>> > =A02 files changed, 15 deletions(-)
+>>
+>> The patchset looks good to me. I'm also not sure we need another
+>> specifier for snprintf().
+>>
+>> Given we had static buffers instead of allocating them in the stack
+>> every time it'd be good to hear from Marcel if we had a reason and if
+>> it's still valid. IMO we don't have problems with stack usage in our
+>> code paths now but I haven't actually checked it.
+>
+> that code is most likely 11+ years old. It is actually not from me. So
+> if you wanna know why, you need to track down Max.
+>
+> Using %pM and baswap seems to be the best approach for fixing this right
+> now. However I am not against introducing a snprintf modifier for
+> Bluetooth addresses.
 
-Mumble grumble. Oh well! :) I'm starting to enjoy the curve balls.
+I see. Ok, makes sense. David or Andrei? Will any of you guys send a patch?
 
-  Luis
+Regards,
+
+--=20
+Ulisses Furquim
+ProFUSION embedded systems
+http://profusion.mobi
+Mobile: +55 19 9250 0942
+Skype: ulissesffs
