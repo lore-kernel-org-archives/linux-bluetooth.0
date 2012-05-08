@@ -4,58 +4,59 @@ To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	gustavo@padovan.org,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 3/3] Bluetooth: Remove batostr()
-Date: Tue,  8 May 2012 15:28:26 +0200
-Message-Id: <1336483706-1533-3-git-send-email-dh.herrmann@googlemail.com>
-In-Reply-To: <1336483706-1533-1-git-send-email-dh.herrmann@googlemail.com>
-References: <1336483706-1533-1-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 1/3] Bluetooth: Introduce ba2str()
+Date: Tue,  8 May 2012 15:28:24 +0200
+Message-Id: <1336483706-1533-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-batostr() is not used anywhere and I don't see any reason why we should
-keep it. Use ba2str() instead.
+We use batostr() in many debug messages even though it uses static
+buffers. This is definitely not thread-safe and should be replaced by
+buffers on the stack of the caller.
+ba2str() is similar to batostr() but takes as argument a pointer to a
+buffer of at least size BDADDR_STRLEN=18. It returns it's argument so we
+can still use it in debug messages directly.
 
 Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 ---
- include/net/bluetooth/bluetooth.h |    1 -
- net/bluetooth/lib.c               |   14 --------------
- 2 files changed, 15 deletions(-)
+ include/net/bluetooth/bluetooth.h |    4 ++++
+ net/bluetooth/lib.c               |   10 ++++++++++
+ 2 files changed, 14 insertions(+)
 
 diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 9b22536..fe9d5d1 100644
+index 2fb268f..9b22536 100644
 --- a/include/net/bluetooth/bluetooth.h
 +++ b/include/net/bluetooth/bluetooth.h
-@@ -182,7 +182,6 @@ static inline void bacpy(bdaddr_t *dst, bdaddr_t *src)
- }
- 
+@@ -184,6 +184,10 @@ static inline void bacpy(bdaddr_t *dst, bdaddr_t *src)
  void baswap(bdaddr_t *dst, bdaddr_t *src);
--char *batostr(bdaddr_t *ba);
+ char *batostr(bdaddr_t *ba);
  
- #define BDADDR_STRLEN 18
++#define BDADDR_STRLEN 18
++
++char *ba2str(bdaddr_t *ba, char buf[BDADDR_STRLEN]);
++
+ /* Common socket structures and functions */
  
+ #define bt_sk(__sk) ((struct bt_sock *) __sk)
 diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
-index 6dcb788..6304863 100644
+index 84ff96f..6dcb788 100644
 --- a/net/bluetooth/lib.c
 +++ b/net/bluetooth/lib.c
-@@ -48,20 +48,6 @@ void baswap(bdaddr_t *dst, bdaddr_t *src)
+@@ -62,6 +62,16 @@ char *batostr(bdaddr_t *ba)
  }
- EXPORT_SYMBOL(baswap);
+ EXPORT_SYMBOL(batostr);
  
--char *batostr(bdaddr_t *ba)
--{
--	static char str[2][18];
--	static int i = 1;
--
--	i ^= 1;
--	sprintf(str[i], "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
--		ba->b[5], ba->b[4], ba->b[3],
--		ba->b[2], ba->b[1], ba->b[0]);
--
--	return str[i];
--}
--EXPORT_SYMBOL(batostr);
--
- char *ba2str(bdaddr_t *ba, char buf[BDADDR_STRLEN])
++char *ba2str(bdaddr_t *ba, char buf[BDADDR_STRLEN])
++{
++	sprintf(buf, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
++		ba->b[5], ba->b[4], ba->b[3],
++		ba->b[2], ba->b[1], ba->b[0]);
++
++	return buf;
++}
++EXPORT_SYMBOL(ba2str);
++
+ /* Bluetooth error codes to Unix errno mapping */
+ int bt_to_errno(__u16 code)
  {
- 	sprintf(buf, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
 -- 
 1.7.10.1
