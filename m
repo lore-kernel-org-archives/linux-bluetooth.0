@@ -1,45 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 9 May 2012 09:27:18 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Gustavo Padovan <gustavo@padovan.org>
+cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: Fix skb length calculation
+In-Reply-To: <1336569159-4710-2-git-send-email-gustavo@padovan.org>
+Message-ID: <alpine.DEB.2.02.1205090754190.2090@mathewm-linux>
+References: <1336569159-4710-1-git-send-email-gustavo@padovan.org> <1336569159-4710-2-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
-In-Reply-To: <1336560327-20483-1-git-send-email-joohi.rastogi@stericsson.com>
-References: <1336560327-20483-1-git-send-email-joohi.rastogi@stericsson.com>
-Date: Wed, 9 May 2012 10:04:28 -0700
-Message-ID: <CABBYNZLxAUATMf3H9ZwdP1FU0aG34fS_PP69nD0KB6t37pCz_g@mail.gmail.com>
-Subject: Re: [PATCH] AVRCP: Add missing Player Setting feature in TG record
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: joohi.rastogi@stericsson.com
-Cc: User Name <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-On Wed, May 9, 2012 at 3:45 AM,  <joohi.rastogi@stericsson.com> wrote:
-> From: Joohi Rastogi <joohi.rastogi@stericsson.com>
+Hi Gustavo -
+
+On Wed, 9 May 2012, Gustavo Padovan wrote:
+
+> When we add a fragment to a skb, len, data_len and truesize fields needs
+> to be updated.
 >
+> Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
 > ---
->  audio/avrcp.c |   15 +++++++++++++--
->  1 files changed, 13 insertions(+), 2 deletions(-)
+> net/bluetooth/l2cap_core.c |    4 ++++
+> 1 file changed, 4 insertions(+)
 >
-> diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index df39d04..22cc933 100644
-> --- a/audio/avrcp.c
-> +++ b/audio/avrcp.c
-> @@ -89,6 +89,12 @@
->  #define CAP_COMPANY_ID         0x02
->  #define CAP_EVENTS_SUPPORTED   0x03
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 66a1a55..8d7c6ba 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1851,6 +1851,10 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
+> 		sent += count;
+> 		len  -= count;
 >
-> +#define AVRCP_FEATURE_CATEGORY_1               0x0001
-> +#define AVRCP_FEATURE_CATEGORY_2               0x0002
-> +#define AVRCP_FEATURE_CATEGORY_3               0x0004
-> +#define AVRCP_FEATURE_CATEGORY_4               0x0008
-> +#define AVRCP_FEATURE_PLAYER_SETTINGS          0x0010
+> +		skb->len += (*frag)->len;
+> +		skb->data_len += (*frag)->len;
+> +		skb->truesize += (*frag)->truesize;
 > +
+> 		frag = &(*frag)->next;
+> 	}
+>
+> -- 
+> 1.7.10.1
 
-There seems to be 2 different things, first it adds defines to
-category features and second it adds  player settings feature support,
-can you split them?
+Good to hear that MSG_MORE support is in progress!  Is this change 
+necessary to support MSG_MORE, or is it only something you noticed 
+while working on that feature?
 
 
--- 
-Luiz Augusto von Dentz
+I think this patch breaks SO_SNDBUF accounting, which uses 
+skb->truesize in the sock_wfree() destructor.
+
+For outgoing packets, L2CAP and HCI currently use skb fragments in a 
+non-standard way.  The &skb_shinfo(skb)->frag_list and skb->next 
+pointers are used to group HCI fragments so they are placed in the HCI 
+send queue all at once.  But they are *not* intended to represent a 
+"normal" fragmented skb.
+
+Once the list of skbs is passed to hci_send_acl(), hci_queue_acl() 
+separates all of the linked skbs before being placing them in the HCI 
+chan->data_q.  Since the driver sees packets coming out of 
+chan->data_q, it only sees unfragmented skbs.  If you change 
+skb->truesize on the first HCI fragment, sk->sk_wmem_alloc will be 
+adjusted for the bytes used by that first fragment plus the bytes used 
+by all of the continuation fragments.  However, all of the later 
+continuation fragments will adjust sk->sk_wmem_alloc too!
+
+
+There are other problems due to the non-standard use of skb fragments 
+by HCI and L2CAP.  One is that it is confusing, and makes changes that 
+*should* work (like this one) instead cause breakage.
+
+The big problem is that the skb->next pointer is used for both skb 
+queuing and skb fragment lists.  On top of that, skb clones share the 
+&skb_shinfo(skb)->frag_list pointer - so the continuation fragments 
+and their 'next' pointers are also shared between clones!  When 
+hci_queue_acl() puts each fragment in the chan->data_q, the skb->next 
+pointers of the fragments are overwritten.  If there is a clone of the 
+head skb in another queue (like the ERTM tx queue), its fragments get 
+corrupted.  This is why ERTM PDUs must fit in a single HCI fragment, 
+so that no fragment lists are included in the ERTM tx queue.  Some 
+devices (especially USB) have very short HCI MTUs, which makes ERTM 
+much less efficient on those devices.
+
+
+I see these options:
+
+  * Add comments to explain non-standard use of skb fragments
+
+  * Keep your change above, but also modify hci_queue_acl() to rewrite 
+the len, data_len, and truesize values of the head skb before queueing 
+it.
+
+  * Try to find a different way to represent HCI fragments that fits 
+with standard skb usage and interacts better with ERTM tx queues.
+
+What sounds good to you?
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
