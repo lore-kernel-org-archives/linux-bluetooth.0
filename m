@@ -1,32 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 May 2012 01:09:01 -0300
+Date: Wed, 9 May 2012 01:04:26 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Eldad Zack <eldad@fogrefinery.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net/bluetooth/bnep/core.c: use constant for ethertype
-Message-ID: <20120509040901.GC2362@joana>
-References: <1336428575-28996-1-git-send-email-eldad@fogrefinery.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: bluetooth-next rebased on top of wireless-next
+Message-ID: <20120509040426.GB2362@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1336428575-28996-1-git-send-email-eldad@fogrefinery.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eldad,
+Hi Everyone,
 
-* Eldad Zack <eldad@fogrefinery.com> [2012-05-08 00:09:35 +0200]:
+Unfortunately we were forced to rebase the bluetooth-next tree on top of the
+wireless-next tree of today (commit 341352d), we apologize for the problems
+this may cause to you.
 
-> The dot1q ethertype number (0x8100) is embedded in the code, although
-> it is already defined in included headers.
-> 
-> Signed-off-by: Eldad Zack <eldad@fogrefinery.com>
-> ---
->  net/bluetooth/bnep/core.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+And there is more, I also had to edit some commits to fix coding style issues.
+So don't worry if some piece of the code looks slightly different from what
+you wrote, it was just style fix.
 
-Patch has been applied to bluetooth-next. Thanks.
+Our apologizes!
 
 	Gustavo
