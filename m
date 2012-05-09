@@ -1,30 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 09 May 2012 21:21:10 -0400 (EDT)
-Message-Id: <20120509.212110.437114897180819434.davem@davemloft.net>
-To: joe@perches.com
-Cc: netdev@vger.kernel.org, bridge@lists.linux-foundation.org,
-	netfilter-devel@vger.kernel.org, netfilter@vger.kernel.org,
-	coreteam@netfilter.org, linux-wireless@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 00/13] net: Add and use ether_addr_equal
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <cover.1336538937.git.joe@perches.com>
-References: <cover.1336538937.git.joe@perches.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Date: Wed, 9 May 2012 20:41:34 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATC -v2 2/2] Bluetooth: Fix skb length calculation
+Message-ID: <20120509234134.GC28375@joana>
+References: <1336598836-28478-1-git-send-email-gustavo@padovan.org>
+ <1336598836-28478-2-git-send-email-gustavo@padovan.org>
+ <alpine.DEB.2.02.1205091627350.2090@mathewm-linux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <alpine.DEB.2.02.1205091627350.2090@mathewm-linux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Joe Perches <joe@perches.com>
-Date: Tue,  8 May 2012 21:56:44 -0700
+Hi Mat,
 
-> Add a boolean function to test 2 ethernet addresses for equality
-> Convert compare_ether_addr uses to ether_addr_equal
+* Mat Martineau <mathewm@codeaurora.org> [2012-05-09 16:28:53 -0700]:
 
-This series looks great, I'll apply all of it.
+> 
+> On Wed, 9 May 2012, Gustavo Padovan wrote:
+> 
+> >When we add a fragment to a skb, len, data_len and truesize fields needs
+> >to be updated.
+> 
+> truesize is not updated in this version of the patch.  Also, change
+> "needs" to "need"
 
-Thanks Joe.
+Thanks for the English fixes in both patches! I'll resend a v3 with those
+fixes in.
 
-That case you didn't convert in mac80211 is probably the
-bug Johannes was talking about which started this whole
-discussion.
+	Gustavo
