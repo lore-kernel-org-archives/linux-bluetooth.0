@@ -1,71 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
+From: <joohi.rastogi@stericsson.com>
+To: User Name <linux-bluetooth@vger.kernel.org>
+Cc: User Name2 <joohi.rastogi@stericsson.com>
+Subject: [PATCH] AVRCP: Add missing Player Setting feature in TG record
+Date: Wed, 9 May 2012 16:15:27 +0530
+Message-ID: <1336560327-20483-1-git-send-email-joohi.rastogi@stericsson.com>
 MIME-Version: 1.0
-In-Reply-To: <20120509090205.GC7628@aemeltch-MOBL1>
-References: <1336483706-1533-1-git-send-email-dh.herrmann@googlemail.com>
-	<1336483706-1533-3-git-send-email-dh.herrmann@googlemail.com>
-	<CAA37ikZW1H1zfPr8d5uonpY0SEZk=dbDQ+XsYhOytXg4ExuLAA@mail.gmail.com>
-	<1336488880.5970.149.camel@aeonflux>
-	<CAA37ikaTN=jyf4NfVvLp0SmfPSmCvAodt-DEro+RB=y+g8sFyw@mail.gmail.com>
-	<20120509090205.GC7628@aemeltch-MOBL1>
-Date: Wed, 9 May 2012 08:17:59 -0300
-Message-ID: <CAA37ikbBTtBrPeNprtDyGCuHUZ+_WupKCDhDZMZa-mrRELDGJQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Bluetooth: Remove batostr()
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Ulisses Furquim <ulisses@profusion.mobi>, Marcel Holtmann <marcel@holtmann.org>,
-	David Herrmann <dh.herrmann@googlemail.com>, linux-bluetooth@vger.kernel.org,
-	gustavo@padovan.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Joohi Rastogi <joohi.rastogi@stericsson.com>
 
-On Wed, May 9, 2012 at 6:02 AM, Andrei Emeltchenko
-<andrei.emeltchenko.news@gmail.com> wrote:
-> Hi Ulisses,
->
-> On Tue, May 08, 2012 at 03:11:01PM -0300, Ulisses Furquim wrote:
->> >> > batostr() is not used anywhere and I don't see any reason why we sh=
-ould
->> >> > keep it. Use ba2str() instead.
->> >> >
->> >> > Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
->> >> > ---
->> >> > =A0include/net/bluetooth/bluetooth.h | =A0 =A01 -
->> >> > =A0net/bluetooth/lib.c =A0 =A0 =A0 =A0 =A0 =A0 =A0 | =A0 14 -------=
--------
->> >> > =A02 files changed, 15 deletions(-)
->> >>
->> >> The patchset looks good to me. I'm also not sure we need another
->> >> specifier for snprintf().
->> >>
->> >> Given we had static buffers instead of allocating them in the stack
->> >> every time it'd be good to hear from Marcel if we had a reason and if
->> >> it's still valid. IMO we don't have problems with stack usage in our
->> >> code paths now but I haven't actually checked it.
->> >
->> > that code is most likely 11+ years old. It is actually not from me. So
->> > if you wanna know why, you need to track down Max.
->> >
->> > Using %pM and baswap seems to be the best approach for fixing this rig=
-ht
->> > now. However I am not against introducing a snprintf modifier for
->> > Bluetooth addresses.
->>
->> I see. Ok, makes sense. David or Andrei? Will any of you guys send a pat=
-ch?
->
-> I think that adding print specifier is the best option, we can apply old
-> patch from Joe Perches.
+---
+ audio/avrcp.c |   15 +++++++++++++--
+ 1 files changed, 13 insertions(+), 2 deletions(-)
 
-Indeed. I've just seen his e-mail and patch. I just don't understand
-why we haven't merged it before.
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index df39d04..22cc933 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -89,6 +89,12 @@
+ #define CAP_COMPANY_ID		0x02
+ #define CAP_EVENTS_SUPPORTED	0x03
+ 
++#define AVRCP_FEATURE_CATEGORY_1		0x0001
++#define AVRCP_FEATURE_CATEGORY_2		0x0002
++#define AVRCP_FEATURE_CATEGORY_3		0x0004
++#define AVRCP_FEATURE_CATEGORY_4		0x0008
++#define AVRCP_FEATURE_PLAYER_SETTINGS		0x0010
++
+ enum battery_status {
+ 	BATTERY_STATUS_NORMAL =		0,
+ 	BATTERY_STATUS_WARNING =	1,
+@@ -174,7 +180,9 @@ static sdp_record_t *avrcp_ct_record(void)
+ 	sdp_record_t *record;
+ 	sdp_data_t *psm, *version, *features;
+ 	uint16_t lp = AVCTP_PSM;
+-	uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103, feat = 0x000f;
++	uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103;
++	uint16_t feat = (AVRCP_FEATURE_CATEGORY_1 | AVRCP_FEATURE_CATEGORY_2
++		| AVRCP_FEATURE_CATEGORY_3 | AVRCP_FEATURE_CATEGORY_4);
+ 
+ 	record = sdp_record_alloc();
+ 	if (!record)
+@@ -238,7 +246,10 @@ static sdp_record_t *avrcp_tg_record(void)
+ 	sdp_record_t *record;
+ 	sdp_data_t *psm, *version, *features;
+ 	uint16_t lp = AVCTP_PSM;
+-	uint16_t avrcp_ver = 0x0103, avctp_ver = 0x0103, feat = 0x000f;
++	uint16_t avrcp_ver = 0x0103, avctp_ver = 0x0103;
++	uint16_t feat = (AVRCP_FEATURE_CATEGORY_1 | AVRCP_FEATURE_CATEGORY_2
++		| AVRCP_FEATURE_CATEGORY_3 | AVRCP_FEATURE_CATEGORY_4
++		| AVRCP_FEATURE_PLAYER_SETTINGS);
+ 
+ 	record = sdp_record_alloc();
+ 	if (!record)
+-- 
+1.7.5.4
 
-Regards,
-
---=20
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
