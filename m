@@ -1,32 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Message-ID: <4FAA5D6C.9010708@tu-ilmenau.de>
+Date: Wed, 09 May 2012 14:05:00 +0200
+From: Steffen Becker <steffen.becker@tu-ilmenau.de>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [PATCH BlueZ 1/2] build: Fix typo in AM_CFLAGS
-Date: Wed,  9 May 2012 09:06:16 -0300
-Message-Id: <1336565177-1532-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: Re: Can't connect Bluetooth Devices
+References: <4F968FF7.7060303@tu-ilmenau.de> <4FA1BB1C.6060409@tu-ilmenau.de> <20120502225815.GE16030@joana> <4FA23B93.8090204@tu-ilmenau.de> <20120503094429.GA6226@x220> <4FA6C460.9010209@tu-ilmenau.de>
+In-Reply-To: <4FA6C460.9010209@tu-ilmenau.de>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Lucas De Marchi <lucas.de.marchi@gmail.com>
+Hello Johan & all the others,
 
----
- Makefile.am |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Am 06.05.2012 20:35, schrieb Steffen Becker:
+> Hi Johan,
+>
+> Am 03.05.2012 11:44, schrieb Johan Hedberg:
+>> Hi Steffen,
+>>
+>> On Thu, May 03, 2012, Steffen Becker wrote:
+>>>> A linkkey is created during the pairing procedure, just pair your
+>>>> devices and you will be done.
+>>>> And let only bluetoothd touch the /var/lib/bluetooth
+>>>> directory, don't touch there yourself.
+>>>>
+>>>>     Gustavo
+>>> Thanks for your fast reply, but that's exactly what I don't know:
+>>> How can I pair my devices?
+>> You pair using the CreatePairedDevice D-Bus method that BlueZ provides.
+>> There are various front-ends that you can use to call this method. If
+>> you've got GNOME installed then a pairing wizard should be just a few
+>> mouse clicks away through the Bluetooth icon in the upper right-hand
+>> corner. If you've only got the command line you can use e.g. the
+>> simple-agent python script (under the test subdirectory):
+>>
+>>     test/simple-agent hci0<remote address>
+>>
+>> Btw, is there something that the network plugin (which you can operate
+>> using e.g. test/test-network) doesn't provide but pand does? We'll
+>> probably remove pand from the source tree along with BlueZ 5.0 so it'd
+>> be good to know any deficiencies it has.
+>>
+>> Johan
+>
+> Sorry for this late answer and thank you for that hint; but I haven't 
+> tried it yet - will do this tomorrow.
+>
+> To your question:
+> There are some special things I want to do using the pand-command 
+> (because it worked well the last years with that):
+> 1.) Using the "iperf" command to display & compare the data rate of a) 
+> a bluetooth1.0-Dongle and b) a bluetooth3.0-Dongle
+> 2.) Using the "iperf" command between two bluetooth-devices and at the 
+> same time also using the "iperf"-command between two WLAN-devices (2 
+> PC's: at each PC one bluetooth-device & one WLAN-Stick) -> With a 
+> sniffing tool I want to check the AFH of Bluetooth.
+> 3.) Send a "big" (media-)file to show how Bluetooth3.0 uses the 
+> "WLAN"-mode.
+>
+> Is all this possible without pand-connection? If yes - how?
+>
+> Reagrds,
+> Steffen
 
-diff --git a/Makefile.am b/Makefile.am
-index 44e82c0..1d8eea2 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -348,7 +348,7 @@ audio_libasound_module_ctl_bluetooth_la_SOURCES = audio/ctl_bluetooth.c \
- audio_libasound_module_ctl_bluetooth_la_LDFLAGS = -module -avoid-version #-export-symbols-regex [_]*snd_ctl_.*
- audio_libasound_module_ctl_bluetooth_la_LIBADD = \
- 					lib/libbluetooth-private.la @ALSA_LIBS@
--audio_libasound_module_ctl_bluetooth_la_CFLAGS = $(AM_CLAGS) @ALSA_CFLAGS@
-+audio_libasound_module_ctl_bluetooth_la_CFLAGS = $(AM_CFLAGS) @ALSA_CFLAGS@
- 
- if DATAFILES
- alsaconfdir = $(datadir)/alsa
--- 
-1.7.10.1
+Do you have any information about how I can handle these 3 activities 
+without "pand"-connection?
 
+Regards,
+Steffen
