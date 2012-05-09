@@ -1,101 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 May 2012 09:27:18 -0700 (PDT)
+Date: Wed, 9 May 2012 09:22:34 -0700 (PDT)
 From: Mat Martineau <mathewm@codeaurora.org>
 To: Gustavo Padovan <gustavo@padovan.org>
 cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Fix skb length calculation
-In-Reply-To: <1336569159-4710-2-git-send-email-gustavo@padovan.org>
-Message-ID: <alpine.DEB.2.02.1205090754190.2090@mathewm-linux>
-References: <1336569159-4710-1-git-send-email-gustavo@padovan.org> <1336569159-4710-2-git-send-email-gustavo@padovan.org>
+Subject: Re: [PATCH 1/2] Bluetooth: Fix packet size informed to the
+ controller
+In-Reply-To: <1336569159-4710-1-git-send-email-gustavo@padovan.org>
+Message-ID: <alpine.DEB.2.02.1205090919280.2090@mathewm-linux>
+References: <1336569159-4710-1-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
-Hi Gustavo -
+Gustavo -
 
 On Wed, 9 May 2012, Gustavo Padovan wrote:
 
-> When we add a fragment to a skb, len, data_len and truesize fields needs
-> to be updated.
+> skb->len is the wrong var to tell the size of a packet, skb->len keeps the
+> size of the overall skb, including its head and fragments, then when
+> sending the head the wrong size is passed if the we have a framented skb.
+> We fix this by using skb_datalen(skb) which is the total skb size minus
+> the fragments size, i.e., the actual head size.
+>
+> This bug appeared when implementing MSG_MORE support for L2CAP sockets, it
+> never showed up before because l2cap_skbuff_fromiovec() never accounted skb
+> size correctly. A following patch will fix this.
 >
 > Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
 > ---
-> net/bluetooth/l2cap_core.c |    4 ++++
-> 1 file changed, 4 insertions(+)
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 66a1a55..8d7c6ba 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -1851,6 +1851,10 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
-> 		sent += count;
-> 		len  -= count;
->
-> +		skb->len += (*frag)->len;
-> +		skb->data_len += (*frag)->len;
-> +		skb->truesize += (*frag)->truesize;
-> +
-> 		frag = &(*frag)->next;
-> 	}
->
-> -- 
-> 1.7.10.1
+> drivers/bluetooth/bluecard_cs.c |    5 +++--
+> drivers/bluetooth/bpa10x.c      |    4 ++--
+> drivers/bluetooth/bt3c_cs.c     |    4 ++--
+> drivers/bluetooth/btusb.c       |    4 ++--
+> drivers/bluetooth/btwilink.c    |    2 +-
+> drivers/bluetooth/dtl1_cs.c     |   13 +++++++------
+> drivers/bluetooth/hci_bcsp.c    |    8 ++++++--
+> drivers/bluetooth/hci_ldisc.c   |    7 ++++---
+> drivers/bluetooth/hci_vhci.c    |    2 +-
+> net/bluetooth/hci_core.c        |    2 +-
+> 10 files changed, 29 insertions(+), 22 deletions(-)
 
-Good to hear that MSG_MORE support is in progress!  Is this change 
-necessary to support MSG_MORE, or is it only something you noticed 
-while working on that feature?
-
-
-I think this patch breaks SO_SNDBUF accounting, which uses 
-skb->truesize in the sock_wfree() destructor.
-
-For outgoing packets, L2CAP and HCI currently use skb fragments in a 
-non-standard way.  The &skb_shinfo(skb)->frag_list and skb->next 
-pointers are used to group HCI fragments so they are placed in the HCI 
-send queue all at once.  But they are *not* intended to represent a 
-"normal" fragmented skb.
-
-Once the list of skbs is passed to hci_send_acl(), hci_queue_acl() 
-separates all of the linked skbs before being placing them in the HCI 
-chan->data_q.  Since the driver sees packets coming out of 
-chan->data_q, it only sees unfragmented skbs.  If you change 
-skb->truesize on the first HCI fragment, sk->sk_wmem_alloc will be 
-adjusted for the bytes used by that first fragment plus the bytes used 
-by all of the continuation fragments.  However, all of the later 
-continuation fragments will adjust sk->sk_wmem_alloc too!
-
-
-There are other problems due to the non-standard use of skb fragments 
-by HCI and L2CAP.  One is that it is confusing, and makes changes that 
-*should* work (like this one) instead cause breakage.
-
-The big problem is that the skb->next pointer is used for both skb 
-queuing and skb fragment lists.  On top of that, skb clones share the 
-&skb_shinfo(skb)->frag_list pointer - so the continuation fragments 
-and their 'next' pointers are also shared between clones!  When 
-hci_queue_acl() puts each fragment in the chan->data_q, the skb->next 
-pointers of the fragments are overwritten.  If there is a clone of the 
-head skb in another queue (like the ERTM tx queue), its fragments get 
-corrupted.  This is why ERTM PDUs must fit in a single HCI fragment, 
-so that no fragment lists are included in the ERTM tx queue.  Some 
-devices (especially USB) have very short HCI MTUs, which makes ERTM 
-much less efficient on those devices.
-
-
-I see these options:
-
-  * Add comments to explain non-standard use of skb fragments
-
-  * Keep your change above, but also modify hci_queue_acl() to rewrite 
-the len, data_len, and truesize values of the head skb before queueing 
-it.
-
-  * Try to find a different way to represent HCI fragments that fits 
-with standard skb usage and interacts better with ERTM tx queues.
-
-What sounds good to you?
+The drivers should never see fragmented skbs, so this change should 
+not be necessary.  See my reply to the next patch for the full 
+background information.
 
 --
 Mat Martineau
