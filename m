@@ -1,41 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: <chen.ganir@ti.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH] eir: Keep parsed eir_data on error
-Date: Wed, 9 May 2012 12:21:15 +0300
-Message-ID: <1336555275-32638-1-git-send-email-chen.ganir@ti.com>
+Date: Wed, 9 May 2012 12:02:07 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Ulisses Furquim <ulisses@profusion.mobi>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	David Herrmann <dh.herrmann@googlemail.com>,
+	linux-bluetooth@vger.kernel.org, gustavo@padovan.org
+Subject: Re: [PATCH 3/3] Bluetooth: Remove batostr()
+Message-ID: <20120509090205.GC7628@aemeltch-MOBL1>
+References: <1336483706-1533-1-git-send-email-dh.herrmann@googlemail.com>
+ <1336483706-1533-3-git-send-email-dh.herrmann@googlemail.com>
+ <CAA37ikZW1H1zfPr8d5uonpY0SEZk=dbDQ+XsYhOytXg4ExuLAA@mail.gmail.com>
+ <1336488880.5970.149.camel@aeonflux>
+ <CAA37ikaTN=jyf4NfVvLp0SmfPSmCvAodt-DEro+RB=y+g8sFyw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CAA37ikaTN=jyf4NfVvLp0SmfPSmCvAodt-DEro+RB=y+g8sFyw@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Ganir <chen.ganir@ti.com>
+Hi Ulisses,
 
-Do not discard already parsed eir_data on eir data length error.
-Data corruption may occur, but this does not mean that we need
-to ignore already parsed valid eir data
----
- src/eir.c |    5 ++---
- 1 files changed, 2 insertions(+), 3 deletions(-)
+On Tue, May 08, 2012 at 03:11:01PM -0300, Ulisses Furquim wrote:
+> >> > batostr() is not used anywhere and I don't see any reason why we should
+> >> > keep it. Use ba2str() instead.
+> >> >
+> >> > Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
+> >> > ---
+> >> >  include/net/bluetooth/bluetooth.h |    1 -
+> >> >  net/bluetooth/lib.c               |   14 --------------
+> >> >  2 files changed, 15 deletions(-)
+> >>
+> >> The patchset looks good to me. I'm also not sure we need another
+> >> specifier for snprintf().
+> >>
+> >> Given we had static buffers instead of allocating them in the stack
+> >> every time it'd be good to hear from Marcel if we had a reason and if
+> >> it's still valid. IMO we don't have problems with stack usage in our
+> >> code paths now but I haven't actually checked it.
+> >
+> > that code is most likely 11+ years old. It is actually not from me. So
+> > if you wanna know why, you need to track down Max.
+> >
+> > Using %pM and baswap seems to be the best approach for fixing this right
+> > now. However I am not against introducing a snprintf modifier for
+> > Bluetooth addresses.
+> 
+> I see. Ok, makes sense. David or Andrei? Will any of you guys send a patch?
 
-diff --git a/src/eir.c b/src/eir.c
-index 310cd53..f2f6992 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -114,10 +114,9 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
- 
- 		len += field_len + 1;
- 
--		/* Bail out if got incorrect length */
-+		/* Do not continue EIR Data parsing if got incorrect length */
- 		if (len > eir_len) {
--			eir_data_free(eir);
--			return -EINVAL;
-+			return 0;
- 		}
- 
- 		data_len = field_len - 1;
--- 
-1.7.0.4
+I think that adding print specifier is the best option, we can apply old
+patch from Joe Perches.
 
+Best regards 
+Andrei Emeltchenko 
