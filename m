@@ -1,61 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: <joohi.rastogi@stericsson.com>
-To: User Name <linux-bluetooth@vger.kernel.org>
-Cc: User Name2 <joohi.rastogi@stericsson.com>
-Subject: [PATCH] AVRCP: Add missing Player Setting feature in TG record
-Date: Wed, 9 May 2012 16:15:27 +0530
-Message-ID: <1336560327-20483-1-git-send-email-joohi.rastogi@stericsson.com>
+From: <chen.ganir@ti.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Chen Ganir <chen.ganir@ti.com>
+Subject: [PATCH] eir: Keep parsed eir_data on error
+Date: Wed, 9 May 2012 12:21:15 +0300
+Message-ID: <1336555275-32638-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Joohi Rastogi <joohi.rastogi@stericsson.com>
+From: Chen Ganir <chen.ganir@ti.com>
 
+Do not discard already parsed eir_data on eir data length error.
+Data corruption may occur, but this does not mean that we need
+to ignore already parsed valid eir data
 ---
- audio/avrcp.c |   15 +++++++++++++--
- 1 files changed, 13 insertions(+), 2 deletions(-)
+ src/eir.c |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index df39d04..22cc933 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -89,6 +89,12 @@
- #define CAP_COMPANY_ID		0x02
- #define CAP_EVENTS_SUPPORTED	0x03
+diff --git a/src/eir.c b/src/eir.c
+index 310cd53..f2f6992 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -114,10 +114,9 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
  
-+#define AVRCP_FEATURE_CATEGORY_1		0x0001
-+#define AVRCP_FEATURE_CATEGORY_2		0x0002
-+#define AVRCP_FEATURE_CATEGORY_3		0x0004
-+#define AVRCP_FEATURE_CATEGORY_4		0x0008
-+#define AVRCP_FEATURE_PLAYER_SETTINGS		0x0010
-+
- enum battery_status {
- 	BATTERY_STATUS_NORMAL =		0,
- 	BATTERY_STATUS_WARNING =	1,
-@@ -174,7 +180,9 @@ static sdp_record_t *avrcp_ct_record(void)
- 	sdp_record_t *record;
- 	sdp_data_t *psm, *version, *features;
- 	uint16_t lp = AVCTP_PSM;
--	uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103, feat = 0x000f;
-+	uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103;
-+	uint16_t feat = (AVRCP_FEATURE_CATEGORY_1 | AVRCP_FEATURE_CATEGORY_2
-+		| AVRCP_FEATURE_CATEGORY_3 | AVRCP_FEATURE_CATEGORY_4);
+ 		len += field_len + 1;
  
- 	record = sdp_record_alloc();
- 	if (!record)
-@@ -238,7 +246,10 @@ static sdp_record_t *avrcp_tg_record(void)
- 	sdp_record_t *record;
- 	sdp_data_t *psm, *version, *features;
- 	uint16_t lp = AVCTP_PSM;
--	uint16_t avrcp_ver = 0x0103, avctp_ver = 0x0103, feat = 0x000f;
-+	uint16_t avrcp_ver = 0x0103, avctp_ver = 0x0103;
-+	uint16_t feat = (AVRCP_FEATURE_CATEGORY_1 | AVRCP_FEATURE_CATEGORY_2
-+		| AVRCP_FEATURE_CATEGORY_3 | AVRCP_FEATURE_CATEGORY_4
-+		| AVRCP_FEATURE_PLAYER_SETTINGS);
+-		/* Bail out if got incorrect length */
++		/* Do not continue EIR Data parsing if got incorrect length */
+ 		if (len > eir_len) {
+-			eir_data_free(eir);
+-			return -EINVAL;
++			return 0;
+ 		}
  
- 	record = sdp_record_alloc();
- 	if (!record)
+ 		data_len = field_len - 1;
 -- 
-1.7.5.4
+1.7.0.4
 
