@@ -1,34 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vani <vani.patel@stericsson.com>
-To: User Name <linux-bluetooth@vger.kernel.org>
-Cc: User Name2 <vani.patel@stericsson.com>
-Subject: [PATCH BlueZ 1/3] Adds TG Record for AVRCP 1.4
-Date: Thu, 10 May 2012 15:58:59 +0530
-Message-ID: <1336645739-25307-1-git-send-email-vani.patel@stericsson.com>
+Date: Thu, 10 May 2012 12:19:22 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: Joao Paulo Rechi Vita <jprvita@openbossa.org>,
+	linux-input@vger.kernel.org, marcel@holtmann.org,
+	claudio.takahasi@openbossa.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/1] HID: User-space HID I/O driver (UHID)
+In-Reply-To: <CANq1E4QaRHtGxt3d=Z2mvqAFhTY2zid20GGNZ2ZzHjStGepc+A@mail.gmail.com>
+Message-ID: <alpine.LNX.2.00.1205101218030.31253@pobox.suse.cz>
+References: <1335799650-17597-1-git-send-email-dh.herrmann@googlemail.com> <CAAngNMabAxO9fVN2DM=5xPJAVk_is3QoS1=+TGZPJAbY3TYHMQ@mail.gmail.com> <CANq1E4QaRHtGxt3d=Z2mvqAFhTY2zid20GGNZ2ZzHjStGepc+A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Vani Patel <vani.patel@stericsson.com>
+On Thu, 3 May 2012, David Herrmann wrote:
 
----
- audio/avrcp.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+> > Thanks for your work, David. I'll test and review this new version.
+> > Did you find out the what is the problem when passing BUS_BLUETOOTH on
+> > the 'bus' field of the create request?
+> 
+> I've spent some time looking into that but I haven't found the
+> problem, yet. Maybe Jiri can comment here.
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index df39d04..9ec0730 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -238,7 +238,7 @@ static sdp_record_t *avrcp_tg_record(void)
- 	sdp_record_t *record;
- 	sdp_data_t *psm, *version, *features;
- 	uint16_t lp = AVCTP_PSM;
--	uint16_t avrcp_ver = 0x0103, avctp_ver = 0x0103, feat = 0x000f;
-+	uint16_t avrcp_ver = 0x0104, avctp_ver = 0x0103, feat = 0x000f;
- 
- 	record = sdp_record_alloc();
- 	if (!record)
+This should now all be handled correctly using the hid-generic mechanism. 
+If you still see any problems with this (currently in linux-next, more 
+precisely 'device-groups' branch in hid.git), please let me know.
+
 -- 
-1.7.5.4
-
+Jiri Kosina
+SUSE Labs
