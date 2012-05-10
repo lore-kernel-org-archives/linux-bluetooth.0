@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Vani <vani.patel@stericsson.com>
 To: User Name <linux-bluetooth@vger.kernel.org>
 Cc: User Name2 <vani.patel@stericsson.com>
-Subject: [PATCH BlueZ 2/3] AVRCP: Defines property Volume for Media Transport interface
-Date: Thu, 10 May 2012 16:00:48 +0530
-Message-ID: <1336645848-28590-1-git-send-email-vani.patel@stericsson.com>
+Subject: [PATCH BlueZ 1/3] Adds TG Record for AVRCP 1.4
+Date: Thu, 10 May 2012 15:58:59 +0530
+Message-ID: <1336645739-25307-1-git-send-email-vani.patel@stericsson.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,24 +12,23 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Vani Patel <vani.patel@stericsson.com>
 
-This property shall be changed/updated
-for Absolute Volume functionality
 ---
- doc/media-api.txt |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
+ audio/avrcp.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index 7a593c3..9ca9a4a 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -341,3 +341,7 @@ Properties	object Device [readonly]
- 			Optional. Indicates where is the transport being routed
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index df39d04..9ec0730 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -238,7 +238,7 @@ static sdp_record_t *avrcp_tg_record(void)
+ 	sdp_record_t *record;
+ 	sdp_data_t *psm, *version, *features;
+ 	uint16_t lp = AVCTP_PSM;
+-	uint16_t avrcp_ver = 0x0103, avctp_ver = 0x0103, feat = 0x000f;
++	uint16_t avrcp_ver = 0x0104, avctp_ver = 0x0103, feat = 0x000f;
  
- 			Possible Values: "HCI" or "PCM"
-+
-+		byte Volume [readwrite] 
-+			
-+			Indicates percentage value of maximum volume. 
+ 	record = sdp_record_alloc();
+ 	if (!record)
 -- 
 1.7.5.4
 
