@@ -1,32 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1336632528.4334.1.camel@jlt3.sipsolutions.net>
-Subject: Re: [PATCH 00/13] net: Add and use ether_addr_equal
-From: Johannes Berg <johannes@sipsolutions.net>
-To: David Miller <davem@davemloft.net>
-Cc: joe@perches.com, netdev@vger.kernel.org,
-	bridge@lists.linux-foundation.org, netfilter-devel@vger.kernel.org,
-	netfilter@vger.kernel.org, coreteam@netfilter.org,
-	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Date: Thu, 10 May 2012 08:48:48 +0200
-In-Reply-To: <20120509.212110.437114897180819434.davem@davemloft.net> (sfid-20120510_032248_153593_581BC374)
-References: <cover.1336538937.git.joe@perches.com>
-	 <20120509.212110.437114897180819434.davem@davemloft.net>
-	 (sfid-20120510_032248_153593_581BC374)
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+From: <joohi.rastogi@stericsson.com>
+To: User Name <linux-bluetooth@vger.kernel.org>
+Cc: User Name2 <joohi.rastogi@stericsson.com>
+Subject: [PATCH 2/2] AVRCP: Add missing Player Setting feature in TG record
+Date: Thu, 10 May 2012 11:57:44 +0530
+Message-ID: <1336631264-27977-1-git-send-email-joohi.rastogi@stericsson.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2012-05-09 at 21:21 -0400, David Miller wrote:
+From: Joohi Rastogi <joohi.rastogi@stericsson.com>
 
-> That case you didn't convert in mac80211 is probably the
-> bug Johannes was talking about which started this whole
-> discussion.
+---
+ audio/avrcp.c |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
-The bug case that started it all is in net/wireless/scan.c and Emmanuel
-has since changed it back to memcmp(). Not sure if that's the one you
-were referring to or not :-)
-
-johannes
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index 1b35c3f..7ed1bbb 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -93,6 +93,7 @@
+ #define AVRCP_FEATURE_CATEGORY_2	0x0002
+ #define AVRCP_FEATURE_CATEGORY_3	0x0004
+ #define AVRCP_FEATURE_CATEGORY_4	0x0008
++#define AVRCP_FEATURE_PLAYER_SETTINGS	0x0010
+ 
+ enum battery_status {
+ 	BATTERY_STATUS_NORMAL =		0,
+@@ -247,7 +248,8 @@ static sdp_record_t *avrcp_tg_record(void)
+ 	uint16_t lp = AVCTP_PSM;
+ 	uint16_t avrcp_ver = 0x0103, avctp_ver = 0x0103;
+ 	uint16_t feat = (AVRCP_FEATURE_CATEGORY_1 | AVRCP_FEATURE_CATEGORY_2
+-		| AVRCP_FEATURE_CATEGORY_3 | AVRCP_FEATURE_CATEGORY_4);
++		| AVRCP_FEATURE_CATEGORY_3 | AVRCP_FEATURE_CATEGORY_4
++		| AVRCP_FEATURE_PLAYER_SETTINGS);
+ 
+ 	record = sdp_record_alloc();
+ 	if (!record)
+-- 
+1.7.5.4
 
