@@ -1,51 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 10 May 2012 16:44:58 -0700
+Date: Thu, 10 May 2012 16:42:04 -0700
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 0/9] Fix indentation and tab misuse
-Message-ID: <20120510234458.GA11800@x220.colubris.lan>
-References: <1335537412-26478-1-git-send-email-anderson.lizardo@openbossa.org>
+To: Johan Hovold <jhovold@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH BlueZ] csr_bcsp: fix link establishment
+Message-ID: <20120510234204.GA7917@x220.colubris.lan>
+References: <1335531838-10627-1-git-send-email-jhovold@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1335537412-26478-1-git-send-email-anderson.lizardo@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1335531838-10627-1-git-send-email-jhovold@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Johan,
 
-On Fri, Apr 27, 2012, Anderson Lizardo wrote:
+On Fri, Apr 27, 2012, Johan Hovold wrote:
+> The current link-establishment implementation times out if a packet is
+> not received after the link is active (i.e. reception of CONF_RESP).
+> 
+> Fix by making sure that the link establishment loop in open is
+> terminated when ubcsp sets the UBCSP_PACKET_SENT flag (on reception of
+> CONF_RESP) rather than UBCSP_PACKET_RECEIVED (on reception of any later
+> packages).
+> 
+> ---
+> 
 > Hi,
 > 
-> These are minor style fixes found "semi-automatically" while reviewing code.
+> This patch is required in order to be able to use devices with link managers
+> that do not send any packets after the link has been established (i.e. after
+> sending CONF_RESP).
 > 
-> Best Regards,
+> I have two devices here; one which sends an HCI_EVENT_PKT after link
+> establishment and one which doesn't. Both work with hciattach, but bccmd times
+> out during link establishment with the latter one. Both work with bccmd with
+> the patch applied.
 > 
-> Anderson Lizardo (9):
->   lib: Fix tab misuse
->   tools: Fix tab misuse
->   event: Fix tab misuse
->   device: Fix tab misuse
->   sap: Fix tab misuse
->   monitor: Fix tab misuse
->   deviceinfo: Fix indentation and tab misuse
->   audio: Fix tab misuse
->   hidd: Fix indentation
+> It appears to me that this is a bug which has perhaps simply not been
+> discovered as most devices do send something after LE. The ubcsp
+> implementation, however, clearly sets the UBCSP_PACKET_SENT flag when reaching
+> the link-active state and not the received flag which csr_open_bcsp checks for.
 > 
->  audio/pcm_bluetooth.c   |    2 +-
->  compat/hidd.c           |    2 +-
->  deviceinfo/deviceinfo.c |    4 ++--
->  lib/hci.c               |    2 +-
->  lib/hci_lib.h           |    2 +-
->  monitor/packet.c        |    2 +-
->  sap/server.c            |    2 +-
->  src/device.c            |    2 +-
->  src/event.c             |    2 +-
->  src/event.h             |    2 +-
->  tools/hciattach_ath3k.c |    2 +-
->  tools/sdptool.c         |    2 +-
->  12 files changed, 13 insertions(+), 13 deletions(-)
+> Thanks,
+> Johan
+> 
+>  tools/csr_bcsp.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-All patches in this set have been applied. Thanks.
+Applied. Thanks.
 
 Johan
