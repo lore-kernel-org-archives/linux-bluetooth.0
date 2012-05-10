@@ -1,31 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 10 May 2012 12:19:22 +0200 (CEST)
-From: Jiri Kosina <jkosina@suse.cz>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: Joao Paulo Rechi Vita <jprvita@openbossa.org>,
-	linux-input@vger.kernel.org, marcel@holtmann.org,
-	claudio.takahasi@openbossa.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/1] HID: User-space HID I/O driver (UHID)
-In-Reply-To: <CANq1E4QaRHtGxt3d=Z2mvqAFhTY2zid20GGNZ2ZzHjStGepc+A@mail.gmail.com>
-Message-ID: <alpine.LNX.2.00.1205101218030.31253@pobox.suse.cz>
-References: <1335799650-17597-1-git-send-email-dh.herrmann@googlemail.com> <CAAngNMabAxO9fVN2DM=5xPJAVk_is3QoS1=+TGZPJAbY3TYHMQ@mail.gmail.com> <CANq1E4QaRHtGxt3d=Z2mvqAFhTY2zid20GGNZ2ZzHjStGepc+A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [hcidump PATCHv2 2/2] Decode A2MP Get AMP Assoc rsp
+Date: Thu, 10 May 2012 11:08:52 +0300
+Message-Id: <1336637333-20723-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1336637333-20723-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <20120508202209.GA10294@x220.hpllc.com>
+ <1336637333-20723-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 3 May 2012, David Herrmann wrote:
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> > Thanks for your work, David. I'll test and review this new version.
-> > Did you find out the what is the problem when passing BUS_BLUETOOTH on
-> > the 'bus' field of the create request?
-> 
-> I've spent some time looking into that but I haven't found the
-> problem, yet. Maybe Jiri can comment here.
+Adds decoding Assoc data:
 
-This should now all be handled correctly using the hid-generic mechanism. 
-If you still see any problems with this (currently in linux-next, more 
-precisely 'device-groups' branch in hid.git), please let me know.
+...
+> ACL data: handle 11 flags 0x02 dlen 53
+    A2MP: Get AMP Assoc rsp: id 1 status (0) Success
+      Assoc data [len 39]:
+        MAC: <address>
+        Preferred Chan List number of triplets 4
+          Country code: XXX
+          Reg ext id 201 reg class 254 coverage class 0
+          Channel 1 max power 20
+          Channels 2 - 12 max power 20
+          Channels 4 - 8 max power 0
+        PAL CAP: 00 00 00 00
+        PAL VER: 01 Comp ID: <id> SubVer: 0001
+...
+---
+ parser/l2cap.c |   99 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 91 insertions(+), 8 deletions(-)
 
+diff --git a/parser/l2cap.c b/parser/l2cap.c
+index 69383e6..b6a7c57 100644
+--- a/parser/l2cap.c
++++ b/parser/l2cap.c
+@@ -1162,20 +1162,103 @@ static inline void a2mp_assoc_req(int level, struct frame *frm)
+ 	printf("Get AMP Assoc req: id %d\n", h->id);
+ }
+ 
++static void a2mp_dump_chanlist(int level, struct a2mp_tlv *tlv, char *prefix)
++{
++	struct a2mp_chan_list *chan_list = (struct a2mp_chan_list *) tlv->val;
++	struct a2mp_country_triplet *triplet;
++	int i, num;
++
++	num = tlv->len / sizeof(*triplet);
++
++	printf("%s number of triplets %d\n", prefix, num);
++
++	p_indent(level+2, 0);
++
++	printf("Country code: %c%c%c\n", chan_list->country_code[0],
++	       chan_list->country_code[1], chan_list->country_code[2]);
++
++	for (i = 0; i < num; i++) {
++		triplet = &chan_list->triplets[i];
++
++		p_indent(level+2, 0);
++
++		if (triplet->chans.first_channel >= 201) {
++			printf("Reg ext id %d reg class %d coverage class %d\n",
++			       triplet->ext.reg_extension_id,
++			       triplet->ext.reg_class,
++			       triplet->ext.coverage_class);
++		} else {
++			if (triplet->chans.num_channels == 1)
++				printf("Channel %d max power %d\n",
++						triplet->chans.first_channel,
++						triplet->chans.max_power);
++			else
++				printf("Channels %d - %d max power %d\n",
++						triplet->chans.first_channel,
++						triplet->chans.first_channel +
++						triplet->chans.num_channels,
++						triplet->chans.max_power);
++		}
++	}
++}
++
+ static inline void a2mp_assoc_dump(int level, uint8_t *assoc, uint16_t len)
+ {
+-	int i;
++	struct a2mp_tlv *tlv;
+ 
+ 	p_indent(level, 0);
+-	printf("Assoc data:");
+-	for (i = 0; i < len; i++) {
+-		if (!(i%16)) {
+-			printf("\n");
+-			p_indent(level+1, 0);
++	printf("Assoc data [len %d]:\n", len);
++
++	tlv = (struct a2mp_tlv *) assoc;
++	while (len > sizeof(*tlv)) {
++		uint16_t tlvlen = btohs(tlv->len);
++		struct a2mp_pal_ver *ver;
++
++		p_indent(level+1, 0);
++
++		switch (tlv->type) {
++		case A2MP_MAC_ADDR_TYPE:
++			if (tlvlen != 6)
++				break;
++			printf("MAC: %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X\n",
++			       tlv->val[0], tlv->val[1], tlv->val[2],
++			       tlv->val[3], tlv->val[4], tlv->val[5]);
++			break;
++
++		case A2MP_PREF_CHANLIST_TYPE:
++			a2mp_dump_chanlist(level, tlv, "Preferred Chan List");
++			break;
++
++		case A2MP_CONNECTED_CHAN:
++			a2mp_dump_chanlist(level, tlv, "Connected Chan List");
++			break;
++
++		case A2MP_PAL_CAP_TYPE:
++			if (tlvlen != 4)
++				break;
++			printf("PAL CAP: %2.2x %2.2x %2.2x %2.2x\n",
++			       tlv->val[0], tlv->val[1], tlv->val[2],
++			       tlv->val[3]);
++			break;
++
++		case A2MP_PAL_VER_INFO:
++			if (tlvlen != 5)
++				break;
++			ver = (struct a2mp_pal_ver *) tlv->val;
++			printf("PAL VER: %2.2x Comp ID: %4.4x SubVer: %4.4x\n",
++			       ver->ver, btohs(ver->company_id),
++			       btohs(ver->sub_ver));
++			break;
++
++		default:
++			printf("Unrecognized type %d\n", tlv->type);
++			break;
+ 		}
+-		printf("%2.2x ",*assoc++);
++
++		len -= tlvlen + sizeof(*tlv);
++		assoc += tlvlen + sizeof(*tlv);
++		tlv = (struct a2mp_tlv *) assoc;
+ 	}
+-	printf("\n");
+ }
+ 
+ static inline void a2mp_assoc_rsp(int level, struct frame *frm, uint16_t len)
 -- 
-Jiri Kosina
-SUSE Labs
+1.7.9.5
+
