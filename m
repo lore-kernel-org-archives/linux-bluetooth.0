@@ -1,36 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1336778486.16292.0.camel@joe2Laptop>
-Subject: Re: [PATCH 0/2] Add and use vsprintf extension %pMbt for bluetooth
- macs
-From: Joe Perches <joe@perches.com>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan"
-	 <padovan@profusion.mobi>, linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Fri, 11 May 2012 16:21:26 -0700
-In-Reply-To: <20120509090156.GB8473@aemeltch-MOBL1>
-References: <cover.1291419007.git.joe@perches.com>
-	 <20120509090156.GB8473@aemeltch-MOBL1>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Fri, 11 May 2012 20:13:19 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/4] monitor: add device filter support
+Message-ID: <20120511231318.GB9909@samus>
+References: <1336753132-8282-1-git-send-email-gustavo@padovan.org>
+ <1336753132-8282-2-git-send-email-gustavo@padovan.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1336753132-8282-2-git-send-email-gustavo@padovan.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2012-05-09 at 12:01 +0300, Andrei Emeltchenko wrote:
-> Hi Joe
-> 
-> On Fri, Dec 03, 2010 at 06:33:02PM -0800, Joe Perches wrote:
-> > Using vsprintf extensions can save text and data.
-> > Add %pMbt for the byte reversed output for bluetooth addresses.
-> > 
-> > Joe Perches (2):
-> >   vsprintf: Add %pMbt, bluetooth mac address
-> >   bluetooth: Use printf extension %pMbt
-> 
-> I think this would be the best way to solve our issues with batostr.
-> 
-> BTW: What is the status with this patch series?
+Hi Gustavo,
 
-18 month old patches generally don't apply.
+On 13:18 Fri 11 May, Gustavo Padovan wrote:
+> -i hciX option will show only data from the specified device
+> ---
+>  monitor/main.c   |   12 ++++++++++--
+>  monitor/packet.c |   10 +++++++++-
+>  monitor/packet.h |    2 +-
+>  3 files changed, 20 insertions(+), 4 deletions(-)
+> 
+> diff --git a/monitor/main.c b/monitor/main.c
+> index 90e32c5..99b53e9 100644
+> --- a/monitor/main.c
+> +++ b/monitor/main.c
+> @@ -28,6 +28,7 @@
+>  
+>  #include <stdio.h>
+>  #include <stdlib.h>
+> +#include <string.h>
+>  #include <getopt.h>
+>  
+>  #include "mainloop.h"
+> @@ -52,12 +53,14 @@ static void usage(void)
+>  		"Usage:\n");
+>  	printf("\tbtmon [options]\n");
+>  	printf("options:\n"
+> +		"\t-i dev                HCI device\n"
+>  		"\t-b, --btsnoop <file>  Save dump in btsnoop format\n"
+>  		"\t-h, --help            Show help options\n");
+>  }
+>  
+>  static const struct option main_options[] = {
+>  	{ "btsnoop",	required_argument, NULL, 'b'	},
+> +	{ "",		required_argument, NULL, 'i'	},
 
-If you want to bring it forward or redo it,
-please do.
+btmgmt is calling this "index", how about using the same long name for
+consistency?
+
+[snip]
+
+
+Cheers,
+-- 
+Vinicius
