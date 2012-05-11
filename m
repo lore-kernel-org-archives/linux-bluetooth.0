@@ -1,32 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 11 May 2012 13:14:47 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Vani <vani.patel@stericsson.com>
-Cc: User Name <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ 2/4] AVRCP: Get media transport DBus connection
-Message-ID: <20120511161447.GA7620@joana>
-References: <1336734176-16669-1-git-send-email-vani.patel@stericsson.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1336734176-16669-1-git-send-email-vani.patel@stericsson.com>
+From: Paulo Alcantara <paulo.alcantara@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
+Subject: [PATCH BlueZ v2] core: Remove unused variable
+Date: Fri, 11 May 2012 12:45:35 -0300
+Message-Id: <1336751135-21337-1-git-send-email-paulo.alcantara@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vani,
+"srcaddr" variable is not used for anything else in
+btd_event_remote_name() function. So, remove it for now.
+---
+ src/event.c |    3 ---
+ 1 files changed, 0 insertions(+), 3 deletions(-)
 
-* Vani <vani.patel@stericsson.com> [2012-05-11 16:32:56 +0530]:
+diff --git a/src/event.c b/src/event.c
+index 514744b..8ecb942 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -318,7 +318,6 @@ void btd_event_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class)
+ void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
+ {
+ 	struct btd_adapter *adapter;
+-	char srcaddr[18];
+ 	struct btd_device *device;
+ 	struct remote_dev_info *dev_info;
+ 
+@@ -339,8 +338,6 @@ void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
+ 	if (!get_adapter_and_device(local, peer, &adapter, &device, FALSE))
+ 		return;
+ 
+-	ba2str(local, srcaddr);
+-
+ 	dev_info = adapter_search_found_devices(adapter, peer);
+ 	if (dev_info) {
+ 		g_free(dev_info->name);
+-- 
+1.7.5.4
 
-> From: Vani Patel <vani.patel@stericsson.com>
-> 
-> Defines a function that will return DBus connection
-> for media transport
-> ---
->  audio/transport.c |    5 +++++
->  audio/transport.h |    1 +
->  2 files changed, 6 insertions(+), 0 deletions(-)
->  mode change 100644 => 100755 audio/transport.c
->  mode change 100644 => 100755 audio/transport.h
-
-You changed the mode of the file, please fix this.
-
-	Gustavo
