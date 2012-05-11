@@ -1,40 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Paulo Alcantara <paulo.alcantara@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ v2] core: Remove unused variable
-Date: Fri, 11 May 2012 12:45:35 -0300
-Message-Id: <1336751135-21337-1-git-send-email-paulo.alcantara@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLqwJR0NB-id4obX08qsxNPhh=iOuN-bko7NBzAsZEG_Q@mail.gmail.com>
+References: <1336707680-25287-1-git-send-email-paulo.alcantara@openbossa.org>
+	<CABBYNZLqwJR0NB-id4obX08qsxNPhh=iOuN-bko7NBzAsZEG_Q@mail.gmail.com>
+Date: Fri, 11 May 2012 11:26:48 -0300
+Message-ID: <CABaZHJoPAm-Gh=QxmpCjf0xv0G30OG1kzaXRcKc7vMyQXdL-jg@mail.gmail.com>
+Subject: Re: [PATCH] event: Remove unused variable
+From: paulo alcantara <paulo.alcantara@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-"srcaddr" variable is not used for anything else in
-btd_event_remote_name() function. So, remove it for now.
----
- src/event.c |    3 ---
- 1 files changed, 0 insertions(+), 3 deletions(-)
+Hi Luiz,
 
-diff --git a/src/event.c b/src/event.c
-index 514744b..8ecb942 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -318,7 +318,6 @@ void btd_event_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class)
- void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
- {
- 	struct btd_adapter *adapter;
--	char srcaddr[18];
- 	struct btd_device *device;
- 	struct remote_dev_info *dev_info;
- 
-@@ -339,8 +338,6 @@ void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
- 	if (!get_adapter_and_device(local, peer, &adapter, &device, FALSE))
- 		return;
- 
--	ba2str(local, srcaddr);
--
- 	dev_info = adapter_search_found_devices(adapter, peer);
- 	if (dev_info) {
- 		g_free(dev_info->name);
--- 
-1.7.5.4
+On Fri, May 11, 2012 at 10:31 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> I believe the correct prefix here would be core, IMO event is too
+> generic. Other than that the patch looks good.
 
+Yes, you're right. I'll change the prefix to "core" and then resend it.
+
+Thanks for pointing it out!
+
+
+-Paulo
