@@ -1,356 +1,151 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 11 May 2012 14:55:54 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Gustavo Padovan <gustavo@padovan.org>
-cc: linux-bluetooth@vger.kernel.org, bgix@codeaurora.org,
-	luiz.dentz@gmail.com
-Subject: Re: [PATCH 3/4] Bluetooth: Add MSG_MORE support to L2CAP sockets
-In-Reply-To: <20120511191502.GB7620@joana>
-Message-ID: <alpine.DEB.2.02.1205111324570.17554@mathewm-linux>
-References: <1336752974-7747-1-git-send-email-gustavo@padovan.org> <1336752974-7747-2-git-send-email-gustavo@padovan.org> <1336752974-7747-3-git-send-email-gustavo@padovan.org> <alpine.DEB.2.02.1205111126420.17554@mathewm-linux>
- <20120511191502.GB7620@joana>
+Date: Fri, 11 May 2012 17:16:20 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: David Miller <davem@davemloft.net>
+Cc: linville@tuxdriver.com, linux-wireless@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: pull request: bluetooth 2012-05-04
+Message-ID: <20120511201620.GD7620@joana>
+References: <20120505001243.GC23728@joana>
+ <20120508070211.GB11843@joana>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="LZvS9be/3tNcYl/X"
+In-Reply-To: <20120508070211.GB11843@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
-Gustavo -
+--LZvS9be/3tNcYl/X
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I've added Luiz as a cc: because I assume he's interested in MSG_MORE 
-for OBEX over L2CAP and might have an opinion about the behavior of 
-this feature.
+Hi Dave,
 
-On Fri, 11 May 2012, Gustavo Padovan wrote:
+I couldn't get this pull by John this week, he's been unresponsive.
+We would love to see this code in the 3.4 kernel (not sure if this would be
+possible if Linus do not release the -rc7, there are important fixes=20
+in the pull request, such as a fix to a regression that was breaking blueto=
+oth
+keyboards.
 
-> Hi Mat.
->
-> * Mat Martineau <mathewm@codeaurora.org> [2012-05-11 11:31:50 -0700]:
->
->>
->> Hi Gustavo -
->>
->> On Fri, 11 May 2012, Gustavo Padovan wrote:
->>
->>> MSG_MORE enables us to save buffer space in userspace, the packet are
->>> built directly in the kernel and sent when their size reaches the Output
->>> MTU value.
->>>
->>> Only MSG_MORE for Basic Mode is supported right now. chan->skb_more keeps
->>> a pointer to the L2CAP packet that is being build through many calls to
->>> send().
->>
->> Could you explain more about how you expect it to work?
->>
->> I would assume the application would do a series of sends:
->>
->> send(fd, buf, len, MSG_MORE);
->> ...
->> send(fd, buf, len, MSG_MORE);
->> ...
->> send(fd, buf, len, MSG_MORE);
->> ...
->> send(fd, buf, len, 0);
->>
->> and the SDU would be sent the first time there is no MSG_MORE flag.
->> If the MTU is exceeded, the SDU is not sent and an error is
->> returned.
->
-> No, a PDU is sent every time the buffered data achieves the size of the
-> channel MTU, then skb_more starts to buffer the next pdu to be sent.
-> A send with the MSG_MORE flag unset would tell to send everything that is
-> queued.
+Please let me know if you have any problems with this! I checked this code =
+for
+coding style issues too. Thanks.
 
-Given that L2CAP is a datagram protocol, I don't think triggering a 
-send every time a PDU is filled is the right thing to do.
+	Gustavo
 
->> What should happen if a send() with MSG_MORE completely fills an SDU
->> (length of data sent is equal to MTU)?  Does it make sense to treat
->> it like a normal send, or return an error so that application knows
->> that later calls with MSG_MORE will not append?  Or does the full
->> SDU not get sent, and a zero-length send() with no MSG_MORE would
->> trigger the transmission?
->
-> It get sent right away. Also I don't think the application needs to 
-> know such kind of information. It deliveries the data to the kernel 
-> and the kernel decides when to send the data.
+* Gustavo Padovan <gustavo@padovan.org> [2012-05-08 04:07:54 -0300]:
 
-It is critical for the application to exactly control the beginning 
-and end of each PDU.  When other remote stacks receive data and pass 
-it up to a Bluetooth profile, those profiles depend on having a 
-complete PDU for the profile to work with.  An L2CAP connection is not 
-a stream, the specifications don't treat it that way and neither do 
-other Bluetooth stacks.
-
-Consider A2DP.  An SBC media packet has a header byte, followed by a 
-number of SBC frames.  The header specifies the number of complete 
-frames that follow in that PDU.
-
-Here's a simplified example, and assume the MTU is 500 bytes.
-
-send(fd, header_buf, 1, MSG_MORE); // header says there are 5 frames
-send(fd, frame1, 100, MSG_MORE); // SBC frame 1
-send(fd, frame2, 100, MSG_MORE); // SBC frame 2
-send(fd, frame3, 100, MSG_MORE); // SBC frame 3
-send(fd, frame4, 100, MSG_MORE); // SBC frame 4
-send(fd, frame5, 100, 0);        // SBC frame 5
-
-This would send out two PDUs:
-
-* First PDU is 500 bytes.  The last SBC frame is incomplete (which 
-would trigger a decoder error in SBC).  The remote device would not 
-simply look for more data in the next PDU.
-
-* Second PDU is one byte.  It is not a valid header because it is the 
-last byte of SBC data.  The header would essentially be random data, 
-and the receiver would experience a second error.
-
-I'm suggesting that it's better for the "SBC frame 5" send to return 
-EMSGSIZE, exactly like what would have happened if the 501-byte frame 
-had been sent using a single call to send() with no MSG_MORE.  The 
-profile code is doing something invalid, and it should know that there 
-was an error.  Having the kernel silently split up PDUs does not help 
-anybody.
-
->>>
->>> Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
->>> ---
->>> include/net/bluetooth/l2cap.h |    2 +
->>> net/bluetooth/l2cap_core.c    |  116 ++++++++++++++++++++++++++++++++++++++---
->>> 2 files changed, 110 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
->>> index 1c7d1cd..5f2845d 100644
->>> --- a/include/net/bluetooth/l2cap.h
->>> +++ b/include/net/bluetooth/l2cap.h
->>> @@ -520,6 +520,8 @@ struct l2cap_chan {
->>> 	struct list_head	list;
->>> 	struct list_head	global_l;
->>>
->>> +	struct sk_buff		*skb_more;
->>> +
->>> 	void			*data;
->>> 	struct l2cap_ops	*ops;
->>> 	struct mutex		lock;
->>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->>> index e5a4fd9..73bf8a8 100644
->>> --- a/net/bluetooth/l2cap_core.c
->>> +++ b/net/bluetooth/l2cap_core.c
->>> @@ -1827,6 +1827,8 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
->>> 	struct sk_buff **frag;
->>> 	int sent = 0;
->>>
->>> +	count = min_t(unsigned int, count, len);
->>> +
->>> 	if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count))
->>> 		return -EFAULT;
->>>
->>> @@ -1903,9 +1905,13 @@ static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
->>> 	int err, count;
->>> 	struct l2cap_hdr *lh;
->>>
->>> -	BT_DBG("chan %p len %d", chan, (int)len);
->>> +	BT_DBG("chan %p len %d aclmtu %d" , chan, (int)len, conn->mtu);
->>>
->>> -	count = min_t(unsigned int, (conn->mtu - L2CAP_HDR_SIZE), len);
->>> +	if (msg->msg_flags & MSG_MORE)
->>> +		count = min_t(unsigned int, (conn->mtu - L2CAP_HDR_SIZE),
->>> +			      chan->omtu);
->>> +	else
->>> +		count = min_t(unsigned int, (conn->mtu - L2CAP_HDR_SIZE), len);
->>>
->>> 	skb = chan->ops->alloc_skb(chan, count + L2CAP_HDR_SIZE,
->>> 				   msg->msg_flags & MSG_DONTWAIT);
->>> @@ -2048,6 +2054,75 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
->>> 	return err;
->>> }
->>>
->>> +static int l2cap_append_pdu(struct l2cap_chan *chan, struct msghdr *msg,
->>> +			    size_t len)
->>> +{
->>> +	struct l2cap_conn *conn = chan->conn;
->>> +	struct sk_buff **frag, *skb = chan->skb_more;
->>> +	int sent = 0;
->>> +	unsigned int count;
->>> +	struct l2cap_hdr *lh;
->>> +
->>> +	BT_DBG("chan %p len %ld", chan, len);
->>> +
->>> +	frag = &skb_shinfo(skb)->frag_list;
->>> +	if (*frag)
->>> +		goto frags;
->>
->> I think this would be more readable without the goto - just use a
->> normal if statement with a code block.  There's only one nested if
->> statement.
->>
->>> +
->>> +	count = min_t(unsigned int, (conn->mtu - L2CAP_HDR_SIZE),
->>> +		      chan->omtu);
->>> +	count = count - skb->len + L2CAP_HDR_SIZE;
->>> +	count = min_t(unsigned int, count, len);
->>> +
->>> +	if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count))
->>> +		return -EFAULT;
->>> +
->>> +	sent += count;
->>> +	len  -= count;
->>> +
->>> +frags:
->>> +	while (*frag)
->>> +		frag = &(*frag)->next;
->>> +
->>> +	while (len) {
->>> +		count = chan->omtu - skb->len + L2CAP_HDR_SIZE;
->>> +		count = min_t(unsigned int, count, len);
->>> +		count = min_t(unsigned int, conn->mtu, count);
->>> +
->>> +		*frag = chan->ops->alloc_skb(chan, count,
->>> +					     msg->msg_flags & MSG_DONTWAIT);
->>> +		if (IS_ERR(*frag))
->>> +			return PTR_ERR(*frag);
->>> +
->>> +		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov,
->>> +				     count))
->>> +			return -EFAULT;
->>> +
->>> +		(*frag)->priority = skb->priority;
->>> +
->>> +		sent += count;
->>> +		len  -= count;
->>> +
->>> +		skb->len += (*frag)->len;
->>> +		skb->data_len += (*frag)->len;
->>> +
->>> +		frag = &(*frag)->next;
->>> +
->>> +		if (skb->len == chan->omtu + L2CAP_HDR_SIZE)
->>> +			break;
->>
->> Don't you want to return -EMSGSIZE if the data doesn't fit in one SDU?
->
-> You are reading it wrong. This checks if the buffered achieve the OMTU size,
-> if yes we break and send the data. Later l2cap_create_basic_pdu() is called to
-> deal with the remaining data.
-
-Again, this doesn't keep the boundaries between PDUs that profiles 
-expect.
-
->
->>
->>> +	}
->>> +
->>> +	lh = (struct l2cap_hdr *) skb->data;
->>> +	lh->len = cpu_to_le16(skb->len - L2CAP_HDR_SIZE);
->>> +
->>> +	if (skb->len == chan->omtu + L2CAP_HDR_SIZE) {
->>> +		l2cap_do_send(chan, skb);
->>
->> I don't think it's good to put a send in here.  Let the calling
->> function do the send, so it's in one place.
->
-> This make the logic much more simple, otherwise extra checks will be needed in
-> l2cap_chan_send()
->
->>
->>> +		chan->skb_more = NULL;
->>> +	}
->>> +
->>> +	return sent;
->>> +}
->>> +
->>> int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
->>> 								u32 priority)
->>> {
->>> @@ -2068,16 +2143,41 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
->>> 	switch (chan->mode) {
->>> 	case L2CAP_MODE_BASIC:
->>> 		/* Check outgoing MTU */
->>> -		if (len > chan->omtu)
->>> +		if (len > chan->omtu) {
->>> +			kfree_skb(chan->skb_more);
->>
->> Set skb_more to NULL after freeing.
->
-> Yes.
->
->>
->>> 			return -EMSGSIZE;
->>> +		}
->>>
->>> -		/* Create a basic PDU */
->>> -		skb = l2cap_create_basic_pdu(chan, msg, len, priority);
->>> -		if (IS_ERR(skb))
->>> +		err = len;
->>> +		if (chan->skb_more) {
->>> +			int sent = l2cap_append_pdu(chan, msg, len);
->>> +
->>> +			if (sent < 0) {
->>> +				kfree_skb(chan->skb_more);
->>> +				return sent;
->>> +			}
->>> +
->>> +			len -= sent;
->>> +		}
->>> +
->>> +		if (len)
->>> +			skb = l2cap_create_basic_pdu(chan, msg, len, priority);
->>
->> Shouldn't this be the 'else' clause for the above if statement?  You
->> should either call l2cap_append_pdu or l2cap_create_basic_pdu, but
->> never both.  Better to structure the logic so that they are
->> obviously mutually exclusive.
->
-> No, that is the continuation of what I send above, if we call
-> l2cap_append_pdu(), completely fill a pdu and send it we would new a call to
-> l2cap_create_basic_pdu() if there is more data to queue (len > 0)
->
->>
->>> +		else
->>> +			skb = chan->skb_more;
->>> +
->>> +		if (IS_ERR(skb)) {
->>> +			kfree_skb(chan->skb_more);
->>
->> Set skb_more to NULL after freeing.
->
-> Yes.
->
->>
->>> 			return PTR_ERR(skb);
->>> +		}
->>> +
->>> +		if (!skb)
->>> +			return err;
->>> +
->>> +		if (msg->msg_flags & MSG_MORE && skb->len < chan->omtu)
->>> +			chan->skb_more = skb;
->>> +		else
->>> +			l2cap_do_send(chan, skb);
->>
->> I think l2cap_do_send() should be called if and only if MSG_MORE is
->> not set, unless there is an MTU problem.
->
-> If the queued data equals the omtu then we send it.
->
->>
->> Also, do you need to account for L2CAP_HDR_SIZE when checking
->> skb->len?
->
-> I think so.
+> Hi John,
+>=20
+> * Gustavo Padovan <gustavo@padovan.org> [2012-05-04 21:12:43 -0300]:
+>=20
+> > Hi John,
+> >=20
+> > A few more patch to 3.4. There is 3 fixes from Mat Martineau, a fix for
+> > a incoming MTU check that was breaking ERTM, still on ERTM there is a
+> > patch that fixes concurrency with one of our locks. His third patch is
+> > related to lock fixes too.
+> > Besides that Johan fixed a wrong bit set in the Inquiry code, Vishal
+> > Agarwal added a EIR fix and finally we have support for one more usb id.
+> >=20
+> > Please pull or let me know of any problems!
+>=20
+> I saw that you didn't pull this yet, so I decided to re-do this pull requ=
+est.
+> We have more 3 important fixes to go in. They fix a regression that was
+> preventing Bluetooth keyboard to work. I'll re-do the whole pull request
+> message, so you can copy and paste it easily:
+>=20
+> A few more patch to 3.4. There is 3 fixes from Mat Martineau, a fix for a
+> incoming MTU check that was breaking ERTM, still on ERTM there is a patch=
+ that
+> fixes concurrency with one of our locks. His third patch is related to lo=
+ck
+> fixes too.
+> Besides that Johan fixed a wrong bit set in the Inquiry code, Vishal Agar=
+wal
+> added a EIR fix and finally we have support for one more usb id.  Finally
+> Johan and I fixed a regression that was preventing bluetooth keyboard to =
+work.
+>=20
+> Please pull or let me know of any problems!
+>=20
+> 	Gustavo
+>=20
+> ---
+>=20
+> The following changes since commit 985140369be1e886754d8ac0375dd64e4f7273=
+11:
+>=20
+>   Add Foxconn / Hon Hai IDs for btusb module (2012-04-24 11:38:41 -0300)
+>=20
+> are available in the git repository at:
+>=20
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git f=
+or-upstream
+>=20
+> for you to fetch changes up to fbcb6a061652b38257a1d8bcf6ebd70fc1771549:
+>=20
+>   Bluetooth: mgmt: Fix device_connected sending order (2012-05-07 20:56:3=
+0 +0300)
+>=20
+> ----------------------------------------------------------------
+> Gustavo Padovan (2):
+>       Bluetooth: notify userspace of security level change
+>       Bluetooth: report the right security level in getsockopt
+>=20
+> Johan Hedberg (2):
+>       Bluetooth: Fix Inquiry with RSSI event mask
+>       Bluetooth: mgmt: Fix device_connected sending order
+>=20
+> Mat Martineau (3):
+>       Bluetooth: Fix a redundant and problematic incoming MTU check
+>       Bluetooth: Restore locking semantics when looking up L2CAP channels
+>       Bluetooth: Lock the L2CAP channel when sending
+>=20
+> Michael Gruetzner (1):
+>       bluetooth: Add support for Foxconn/Hon Hai AR5BBU22 0489:E03C
+>=20
+> Vishal Agarwal (1):
+>       Bluetooth: Fix EIR data generation for mgmt_device_found
+>=20
+>  drivers/bluetooth/ath3k.c         |    6 ++++++
+>  drivers/bluetooth/btusb.c         |    3 +++
+>  include/net/bluetooth/bluetooth.h |    3 +--
+>  include/net/bluetooth/hci_core.h  |   17 +++++++++++++++++
+>  net/bluetooth/af_bluetooth.c      |    2 +-
+>  net/bluetooth/hci_core.c          |    8 ++++++++
+>  net/bluetooth/hci_event.c         |   17 +++++++++++++----
+>  net/bluetooth/l2cap_core.c        |   35 ++++++++-----------------------=
+----
+>  net/bluetooth/l2cap_sock.c        |   39 +++++++++++++++++++++++++------=
+--------
+>  9 files changed, 82 insertions(+), 48 deletions(-)
 
 
-Can you provide a use case where letting the kernel pick the PDU 
-boundaries based on the MTU helps a profile or application?  It seems 
-like only buggy profiles would attempt to send more data than the MTU 
-allows, so it doesn't make sense to let them do that.
+--LZvS9be/3tNcYl/X
+Content-Type: application/pgp-signature
 
-If you only send a PDU when the MSG_MORE flag is unset and return 
-EMSGSIZE whenever the MTU is exceeded, you get simpler kernel code and 
-less confusion among profile developers.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+iQIcBAEBAgAGBQJPrXOUAAoJEPs3PUX4s20o1V4P/i5hG0D3EojWsQDMVj19lnfa
+3hNML4xwfZt5Mhj5INmsAkSkIW0vdr/eIhn//WFY/Y5LfTLVLHGHAIZKdwz7RiKi
+S48jbCHK28Sx9b8En44Bd9SYR96UoFJum0b/XgoUE50lvFdDweG6/6xjVUftchCg
+buu4RrtklfEx3QmAJXec9Cnn1chiZSn40Yiuok5z+rSVG8+GhWrkd9TyYkEKgZu2
+DZ5wCgocNHJnnOwH9sTHsr1VX1azWoajtlEwzVc8PK13sBw68gRxSECT4fUy57HM
+r8mDi1V+VY3OHVUMRQ7bExUzKJNKtX8+T5y/942OAnAImwrZo/pJ7zMO2BvOVfma
+iJssDpqA6UKFPvd1ZHV9gw6aOq0QLfLQsRaSsnkT01o+bcRVqd6/GLgnle33VgC8
+oT6jDs4T/dI3535QmPsROyh9AkD7vGfSpyc9nKwqA0KdIUPZcCGOzmboPKtfc8i2
++5hvksdXgHWqiBItal1qGXjyrZHqe3O7cV0+SQqxuNGu37PAoM1BXt87FuvNCyqj
+tjXJbZn+zSeLt6qyIPcHImwxLW1s/cKe6G1e2IH4HXA/l12i2Z/phPC8dpSwK+xv
+tu6ZdPY4WKG1rRuKoVGA5+8V+c0zo5aN57NTE50Xeo/p47Q6vhysqu9VHC7agkc+
+mF6YIHsulo55ZWPpuOEb
+=aVuD
+-----END PGP SIGNATURE-----
 
+--LZvS9be/3tNcYl/X--
