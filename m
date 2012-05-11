@@ -1,98 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1336734130-31397-1-git-send-email-vani.patel@stericsson.com>
-References: <1336734130-31397-1-git-send-email-vani.patel@stericsson.com>
-Date: Fri, 11 May 2012 06:48:48 -0700
-Message-ID: <CABBYNZKUQhQzuGYVsZQPWAnNZKitgH5bURcn7VzyWwXEKS0Z0Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/4] AVRCP: Register for VolumeChanged Notification
+In-Reply-To: <1336707680-25287-1-git-send-email-paulo.alcantara@openbossa.org>
+References: <1336707680-25287-1-git-send-email-paulo.alcantara@openbossa.org>
+Date: Fri, 11 May 2012 06:31:15 -0700
+Message-ID: <CABBYNZLqwJR0NB-id4obX08qsxNPhh=iOuN-bko7NBzAsZEG_Q@mail.gmail.com>
+Subject: Re: [PATCH] event: Remove unused variable
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vani <vani.patel@stericsson.com>
-Cc: User Name <linux-bluetooth@vger.kernel.org>
+To: Paulo Alcantara <paulo.alcantara@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vani,
+Hi Paulo,
 
-On Fri, May 11, 2012 at 4:02 AM, Vani <vani.patel@stericsson.com> wrote:
-> From: Vani Patel <vani.patel@stericsson.com>
->
-> On connection of control channel, VolumeChanged
-> notification is registered with the CT.
+On Thu, May 10, 2012 at 8:41 PM, Paulo Alcantara
+<paulo.alcantara@openbossa.org> wrote:
+> "srcaddr" variable is not used for anything else in
+> btd_event_remote_name() function. So, remove it for now.
 > ---
->  audio/avctp.c |    1 +
->  audio/avrcp.c |   25 ++++++++++++++++++++++++-
->  audio/avrcp.h |    4 +++-
->  3 files changed, 28 insertions(+), 2 deletions(-)
+>  src/event.c |    3 ---
+>  1 files changed, 0 insertions(+), 3 deletions(-)
 >
-> diff --git a/audio/avctp.c b/audio/avctp.c
-> index c5fbc1b..0cbd114 100755
-> --- a/audio/avctp.c
-> +++ b/audio/avctp.c
-> @@ -607,6 +607,7 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
->        init_uinput(session);
+> diff --git a/src/event.c b/src/event.c
+> index 514744b..8ecb942 100644
+> --- a/src/event.c
+> +++ b/src/event.c
+> @@ -318,7 +318,6 @@ void btd_event_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class)
+>  void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
+>  {
+>        struct btd_adapter *adapter;
+> -       char srcaddr[18];
+>        struct btd_device *device;
+>        struct remote_dev_info *dev_info;
 >
->        avctp_set_state(session, AVCTP_STATE_CONNECTED);
-> +       register_volume_notification(session);
->        session->mtu = imtu;
->        session->io_id = g_io_add_watch(chan,
->                                G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-> diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index 2b25253..f4f1b6a 100755
-> --- a/audio/avrcp.c
-> +++ b/audio/avrcp.c
-> @@ -91,6 +91,7 @@
->  #define CAP_EVENTS_SUPPORTED   0x03
->  #define COMMAND                0
->  #define RESPONSE               1
-> +#define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH 5
+> @@ -339,8 +338,6 @@ void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
+>        if (!get_adapter_and_device(local, peer, &adapter, &device, FALSE))
+>                return;
 >
->  enum battery_status {
->        BATTERY_STATUS_NORMAL =         0,
-> @@ -591,11 +592,12 @@ static uint8_t avrcp_handle_get_capabilities(struct avrcp_player *player,
->
->                return AVC_CTYPE_STABLE;
->        case CAP_EVENTS_SUPPORTED:
-> -               pdu->params[1] = 4;
-> +               pdu->params[1] = 5;
->                pdu->params[2] = AVRCP_EVENT_STATUS_CHANGED;
->                pdu->params[3] = AVRCP_EVENT_TRACK_CHANGED;
->                pdu->params[4] = AVRCP_EVENT_TRACK_REACHED_START;
->                pdu->params[5] = AVRCP_EVENT_TRACK_REACHED_END;
-> +               pdu->params[6] = AVRCP_EVENT_VOLUME_CHANGED;
+> -       ba2str(local, srcaddr);
+> -
+>        dev_info = adapter_search_found_devices(adapter, peer);
+>        if (dev_info) {
+>                g_free(dev_info->name);
+> --
+> 1.7.7.6
 
-I believe this is no really necessary, at least not for the role you
-are implementing since the headset is the one that should have this,
-not us.
-
-> +
-> +void register_volume_notification(struct avctp *session)
-> +{
-> +       uint8_t buf[AVRCP_HEADER_LENGTH + AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH];
-> +       struct avrcp_header *pdu = (void *) buf;
-> +       static uint8_t transaction = 0;
-
-I don't think the transaction is per command, so IMO we should have a
-common one inside avctp which gets incremented on each request.
-
-> +
-> +       memset(buf, 0, sizeof(buf));
-> +
-> +       set_company_id(pdu->company_id, IEEEID_BTSIG);
-> +       pdu->pdu_id = AVRCP_REGISTER_NOTIFICATION;
-> +       pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
-> +       pdu->params[0] = AVRCP_EVENT_VOLUME_CHANGED;
-> +       pdu->params_len = htons (AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH);
-> +
-> +       uint8_t length = AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
-> +
-> +       uint8_t error = avctp_send_vendordep(session, transaction++,
-> +                               AVC_CTYPE_NOTIFY, AVC_SUBUNIT_PANEL,
-> +                               buf, length, COMMAND);
-
-Variable definition should be in the very beginning of the function,
-actually I don't think this even compile, so I wonder how you are
-testing this code? Please fix them.
+I believe the correct prefix here would be core, IMO event is too
+generic. Other than that the patch looks good.
 
 
 -- 
