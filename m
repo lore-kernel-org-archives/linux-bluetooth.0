@@ -1,68 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 13 May 2012 07:31:21 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	"John W. Linville" <linville@tuxdriver.com>,
-	David Miller <davem@davemloft.net>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth 2012-05-04
-Message-ID: <20120513043121.GA22845@x220.P-661HNU-F1>
-References: <20120505001243.GC23728@joana>
- <20120508070211.GB11843@joana>
- <20120511201620.GD7620@joana>
- <20120512182227.GA30574@tuxdriver.com>
- <20120512190900.GA15956@joana>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120512190900.GA15956@joana>
-Sender: linux-wireless-owner@vger.kernel.org
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: davem@davemloft.net, linux-wireless@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Johan Hedberg <johan.hedberg@intel.com>
+Subject: [PATCH 2/2] Bluetooth: mgmt: Fix device_connected sending order
+Date: Sat, 12 May 2012 16:11:50 -0300
+Message-Id: <1336849910-29064-2-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1336849910-29064-1-git-send-email-gustavo@padovan.org>
+References: <20120512190900.GA15956@joana>
+ <1336849910-29064-1-git-send-email-gustavo@padovan.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Sat, May 12, 2012, Gustavo Padovan wrote:
-> In my point of view there are two commits there that are really necessary:
-> 
-> Gustavo Padovan (2):
->       Bluetooth: report the right security level in getsockopt
-> 
-> Johan Hedberg (2):
->       Bluetooth: mgmt: Fix device_connected sending order
-> 
-> They fix a userspace breakage caused by:
-> 
-> Author: Marcel Holtmann <marcel@holtmann.org>
-> Date:   Mon Feb 20 21:24:37 2012 +0100
-> 
->     Bluetooth: Always enable management interface
->     
->     The management interface API has reached stable version 1.0 and thus
->     it can now be always enabled. All future changes will be made backwards
->     compatible.
->     
->     Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->     Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> 
-> This cause no crash, but it make bluetooth keyboards stop to work with Linux.
-> This a serious breakage IMO. I really would like to see at least these two
-> patches in. The other fixes can wait.
+The mgmt_ev_device_connected signal must be sent before any event
+indications happen for sockets associated with the connection. Otherwise
+e.g. device authorization for the sockets will fail with ENOTCONN as
+user space things that there is no baseband link.
 
-I'd just like to add some further background since I don't think it's
-that obvious how these are regression fixes:
+This patch fixes the issue by ensuring that the device_connected event
+if sent (if it hasn't been so already) as soon as the first ACL data
+packet arrives from the remote device.
 
-The device_connected fix should be quite self-explanatory, but it's
-actually a wider issue than just for keyboards. All profiles that do
-incoming connection authorization (e.g. headsets) will break without it
-with specific hardware. The reason it wasn't caught earlier is that it
-only occurs with specific Bluetooth adapters.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c  |    8 ++++++++
+ net/bluetooth/hci_event.c |    4 ++--
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-As for the security level patch, this fixes L2CAP socket based security
-level elevation during a connection. The HID profile needs this (for
-keyboards) and it is the only way to achieve the security level
-elevation when using the management interface to talk to the kernel
-(hence the management enabling patch being the one that exposes this
-issue).
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index a7607e4..b5bab83 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2785,6 +2785,14 @@ static inline void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (conn) {
+ 		hci_conn_enter_active_mode(conn, BT_POWER_FORCE_ACTIVE_OFF);
+ 
++		hci_dev_lock(hdev);
++		if (test_bit(HCI_MGMT, &hdev->dev_flags) &&
++		    !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
++			mgmt_device_connected(hdev, &conn->dst, conn->type,
++					      conn->dst_type, 0, NULL, 0,
++					      conn->dev_class);
++		hci_dev_unlock(hdev);
++
+ 		/* Send to upper protocol */
+ 		l2cap_recv_acldata(conn, skb, flags);
+ 		return;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index ff38cc6..7d66b8b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2110,7 +2110,7 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
+ 		goto unlock;
+ 	}
+ 
+-	if (!ev->status) {
++	if (!ev->status && !test_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)) {
+ 		struct hci_cp_remote_name_req cp;
+ 		memset(&cp, 0, sizeof(cp));
+ 		bacpy(&cp.bdaddr, &conn->dst);
+@@ -2879,7 +2879,7 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
+ 	if (conn->state != BT_CONFIG)
+ 		goto unlock;
+ 
+-	if (!ev->status) {
++	if (!ev->status && !test_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)) {
+ 		struct hci_cp_remote_name_req cp;
+ 		memset(&cp, 0, sizeof(cp));
+ 		bacpy(&cp.bdaddr, &conn->dst);
+-- 
+1.7.10.1
 
-Johan
