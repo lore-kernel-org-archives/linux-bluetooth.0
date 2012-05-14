@@ -1,113 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 May 2012 12:37:38 +0200
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Bastien Nocera <hadess@hadess.net>,
-	linux-bluetooth@vger.kernel.org,
-	Scott James Remnant <scott@netsplit.com>
-Subject: Re: [PATCH BlueZ v2 0/3] Current status of playstation-peripheral
- plugin
-Message-Id: <20120514123738.73a1b4f4b92ddb5e0f5f11fb@studenti.unina.it>
-In-Reply-To: <20120420140825.GA19909@x220.P-661HNU-F1>
-References: <1334741891-11869-1-git-send-email-ospite@studenti.unina.it>
-	<1334748297.8818.121.camel@novo.hadess.net>
-	<20120420143625.7e8c2a9d8e73b18211bc1ca4@studenti.unina.it>
-	<20120420140825.GA19909@x220.P-661HNU-F1>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Mon__14_May_2012_12_37_38_+0200_MiP_B6aF_Q=ixBkQ"
+From: Vani-dineshbhai PATEL X <vani.patel@stericsson.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: User Name <linux-bluetooth@vger.kernel.org>
+Date: Mon, 14 May 2012 12:23:24 +0200
+Subject: RE: [PATCH BlueZ 1/4] AVRCP: Register for VolumeChanged Notification
+Message-ID: <747C1E83C744F44E9ACFB89FAEEC2C7B234A3F2EF0@EXDCVYMBSTM005.EQ1STM.local>
+References: <1336734130-31397-1-git-send-email-vani.patel@stericsson.com>
+ <CABBYNZKUQhQzuGYVsZQPWAnNZKitgH5bURcn7VzyWwXEKS0Z0Q@mail.gmail.com>
+In-Reply-To: <CABBYNZKUQhQzuGYVsZQPWAnNZKitgH5bURcn7VzyWwXEKS0Z0Q@mail.gmail.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Signature=_Mon__14_May_2012_12_37_38_+0200_MiP_B6aF_Q=ixBkQ
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Luiz,
 
-On Fri, 20 Apr 2012 17:08:26 +0300
-Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+> Sent: Friday, May 11, 2012 7:19 PM
+> To: Vani-dineshbhai PATEL X
+> Cc: User Name
+> Subject: Re: [PATCH BlueZ 1/4] AVRCP: Register for VolumeChanged
+> Notification
+> 
+> Hi Vani,
+> 
+> On Fri, May 11, 2012 at 4:02 AM, Vani <vani.patel@stericsson.com>
+> wrote:
+> > From: Vani Patel <vani.patel@stericsson.com>
+> >
+> > On connection of control channel, VolumeChanged
+> > notification is registered with the CT.
+> > ---
+> >  audio/avctp.c |    1 +
+> >  audio/avrcp.c |   25 ++++++++++++++++++++++++-
+> >  audio/avrcp.h |    4 +++-
+> >  3 files changed, 28 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/audio/avctp.c b/audio/avctp.c
+> > index c5fbc1b..0cbd114 100755
+> > --- a/audio/avctp.c
+> > +++ b/audio/avctp.c
+> > @@ -607,6 +607,7 @@ static void avctp_connect_cb(GIOChannel *chan,
+> GError *err, gpointer data)
+> >        init_uinput(session);
+> >
+> >        avctp_set_state(session, AVCTP_STATE_CONNECTED);
+> > +       register_volume_notification(session);
+> >        session->mtu = imtu;
+> >        session->io_id = g_io_add_watch(chan,
+> >                                G_IO_IN | G_IO_ERR | G_IO_HUP |
+> G_IO_NVAL,
+> > diff --git a/audio/avrcp.c b/audio/avrcp.c
+> > index 2b25253..f4f1b6a 100755
+> > --- a/audio/avrcp.c
+> > +++ b/audio/avrcp.c
+> > @@ -91,6 +91,7 @@
+> >  #define CAP_EVENTS_SUPPORTED   0x03
+> >  #define COMMAND                0
+> >  #define RESPONSE               1
+> > +#define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH 5
+> >
+> >  enum battery_status {
+> >        BATTERY_STATUS_NORMAL =         0,
+> > @@ -591,11 +592,12 @@ static uint8_t
+> avrcp_handle_get_capabilities(struct avrcp_player *player,
+> >
+> >                return AVC_CTYPE_STABLE;
+> >        case CAP_EVENTS_SUPPORTED:
+> > -               pdu->params[1] = 4;
+> > +               pdu->params[1] = 5;
+> >                pdu->params[2] = AVRCP_EVENT_STATUS_CHANGED;
+> >                pdu->params[3] = AVRCP_EVENT_TRACK_CHANGED;
+> >                pdu->params[4] = AVRCP_EVENT_TRACK_REACHED_START;
+> >                pdu->params[5] = AVRCP_EVENT_TRACK_REACHED_END;
+> > +               pdu->params[6] = AVRCP_EVENT_VOLUME_CHANGED;
+> 
+> I believe this is no really necessary, at least not for the role you
+> are implementing since the headset is the one that should have this,
+> not us.
+> 
+Removed in the next patch set.
+> > +
+> > +void register_volume_notification(struct avctp *session)
+> > +{
+> > +       uint8_t buf[AVRCP_HEADER_LENGTH +
+> AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH];
+> > +       struct avrcp_header *pdu = (void *) buf;
+> > +       static uint8_t transaction = 0;
+> 
+> I don't think the transaction is per command, so IMO we should have a
+> common one inside avctp which gets incremented on each request.
+> 
+Yes, you are correct. I made a mistake. Rectified in the next patch set.
+> > +
+> > +       memset(buf, 0, sizeof(buf));
+> > +
+> > +       set_company_id(pdu->company_id, IEEEID_BTSIG);
+> > +       pdu->pdu_id = AVRCP_REGISTER_NOTIFICATION;
+> > +       pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
+> > +       pdu->params[0] = AVRCP_EVENT_VOLUME_CHANGED;
+> > +       pdu->params_len = htons
+> (AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH);
+> > +
+> > +       uint8_t length = AVRCP_HEADER_LENGTH + ntohs(pdu-
+> >params_len);
+> > +
+> > +       uint8_t error = avctp_send_vendordep(session, transaction++,
+> > +                               AVC_CTYPE_NOTIFY, AVC_SUBUNIT_PANEL,
+> > +                               buf, length, COMMAND);
+> 
+> Variable definition should be in the very beginning of the function,
+> actually I don't think this even compile, so I wonder how you are
+> testing this code? Please fix them.
+> 
+Rectified in next patch set. This does compile on my Ubuntu machine as well as Android without warnings. I have tested on both these platforms.
+> 
+> --
+> Luiz Augusto von Dentz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-
+> bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-> Hi Antonio,
->=20
-> On Fri, Apr 20, 2012, Antonio Ospite wrote:
-> > I'll add this information as a comment in the code.
-> >=20
-> > > > Bastien, please check if I am forgetting anything :)
-> > > >=20
-> > > > WHAT we need the plugin to do:
-> > > >=20
-> > > >   - When a device is connected via USB:
-> > > >     + Fetch the (default) adapter bdaddr (from BlueZ) and store it =
-into
-> > > >       the device
-> > > >     + Fetch the device bdaddr (from the device via USB/HID) and mak=
-e the
-> > > >       device _trusted_ by the adapter (is "trusted" the correct term
-> > > >       here?
-> > >=20
-> > > Setting it as trusted isn't the only thing you're doing. You're making
-> > > it known (meaning that you fill in details such as its SDP record,
-> > > including name), then adding it as trusted so that BlueZ doesn't ask =
-the
-> > > user whether this device is allowed to connect.
-> > >=20
-> > > You need a separate function to make it "known" and insert it into
-> > > BlueZ's database. _set_trusted() should be a function that takes a
-> > > single device and a value (whether to trust or untrust), that's it.
-> > >=20
-> > > So you need to split it in 2 separate functions.
-> >=20
-> > OK, so the operations we are doing are:
-> > 	- Make the device "known" (add its details to the database of
-> >           devices known by a given adapter)
-> > 	- Make the device trusted (enable its connection)
-> >=20
-> > Has the first operation a more official name? How does it relate to
-> > the "association" operation? Is it a device operation, in the sense
-> > that we are adding a device, or rather an adapter operation, in the
-> > sense that we are filling the database of a given adapter?
->=20
-> I'd make it an adapter operation and I'd also suggest to explore the
-> option of using the same API that devices get added to storage during
-> "normal" device discovery: btd_event_device_found(). After all you are
-> discovering a device in this use case. The only speciality is that it
-> happens over USB instead of traditional Bluetooth inquiry. That way you
-> would only need to add the set_trusted function and nothing else.
->=20
-
-OK, so far I've split the set_trusted() bits and moved the old big
-function to adapter.c, it is now called: btd_create_stored_device()
-
-I noticed than set_trusted() (i.e. writing to the trusts file) has to be
-called before I create the device when connected via USB, otherwise
-the later connection via BT does not succeed.
-
-I am still looking how to use the adapter API in
-btd_create_stored_device(), Scott if you are still willing to help I am
-sending you the latest patches privately to avoid making too much noise
-here for very small incremental changes.
-
-Regards,
-   Antonio
-
---=20
-Antonio Ospite
-http://ao2.it
-
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
-
---Signature=_Mon__14_May_2012_12_37_38_+0200_MiP_B6aF_Q=ixBkQ
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iEYEARECAAYFAk+w4HIACgkQ5xr2akVTsAGvHQCdHlK4H47i/Wb8krVM95lGkVgG
-WDkAn2cD7qYgk59AjwZTrKAcCxH1HUSR
-=US09
------END PGP SIGNATURE-----
-
---Signature=_Mon__14_May_2012_12_37_38_+0200_MiP_B6aF_Q=ixBkQ--
+Thanks & Regards,
+Vani Patel
