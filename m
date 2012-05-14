@@ -1,68 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 May 2012 08:47:14 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	marcel@holtmann.org, pkrystad@codeaurora.org,
-	ulisses@profusion.mobi
-Subject: Re: [PATCH 4/4] Bluetooth: Refactor L2CAP ERTM and streaming transmit
- segmentation
-In-Reply-To: <20120514095244.GA10127@aemeltch-MOBL1>
-Message-ID: <alpine.DEB.2.02.1205140828150.23969@mathewm-linux>
-References: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org> <1335976922-19456-5-git-send-email-mathewm@codeaurora.org> <20120514095244.GA10127@aemeltch-MOBL1>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [RFC v0] Bluetooth: mgmt: Add device disconnect reason
+Date: Mon, 14 May 2012 17:34:59 +0200
+Message-Id: <1337009699-19831-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Hi Andrei -
+MGMT_EV_DEVICE_DISCONNECTED should expose the disconnection reason to
+userland.
 
-On Mon, 14 May 2012, Andrei Emeltchenko wrote:
+Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
+---
+ include/net/bluetooth/hci_core.h |    2 +-
+ include/net/bluetooth/mgmt.h     |    4 ++++
+ net/bluetooth/hci_event.c        |    2 +-
+ net/bluetooth/mgmt.c             |    9 +++++----
+ 4 files changed, 11 insertions(+), 6 deletions(-)
 
-> Hi Mat,
->
-> On Wed, May 02, 2012 at 09:42:02AM -0700, Mat Martineau wrote:
->> Use more common code for ERTM and streaming mode segmentation and
->> transmission, and begin using skb control block data for delaying
->> extended or enhanced header generation until just before the packet is
->> transmitted.  This code is also better suited for resegmentation,
->> which is needed when L2CAP links are reconfigured after an AMP channel
->> move.
->
-> ...
->> @@ -1708,6 +1709,9 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
->>  	if (chan->state != BT_CONNECTED)
->>  		return -ENOTCONN;
->>
->> +	if (test_bit(CONN_REMOTE_BUSY, &chan->conn_state))
->> +		return 0;
->> +
->>  	while ((skb = chan->tx_send_head) && (!l2cap_tx_window_full(chan))) {
->
-> We check here chan->tx_send_head. But:
->
-> ...
->> -	skb_queue_splice_tail(&sar_queue, &chan->tx_q);
->> -	if (chan->tx_send_head == NULL)
->> -		chan->tx_send_head = sar_queue.next;
-> ...
->
->> -
->> -			if (chan->tx_send_head == NULL)
->> -				chan->tx_send_head = skb;
-> ...
->
-> tx_send_head seems to be always NULL due to the change above. Have you
-> tested that it actually works?
-
-I did some checks with l2test, but now that I look at the code I must 
-have made a mistake (like accidentally using the wrong build).  Sorry 
-about that, I'll send a fix ASAP.
-
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b60d2c8..4c7252c 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -974,7 +974,7 @@ int mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 			  u8 addr_type, u32 flags, u8 *name, u8 name_len,
+ 			  u8 *dev_class);
+ int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
+-			     u8 link_type, u8 addr_type);
++			     u8 link_type, u8 addr_type, u8 reason);
+ int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			   u8 link_type, u8 addr_type, u8 status);
+ int mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 23fd054..5845af9 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -406,6 +406,10 @@ struct mgmt_ev_device_connected {
+ } __packed;
+ 
+ #define MGMT_EV_DEVICE_DISCONNECTED	0x000C
++struct mgmt_ev_device_disconnected {
++	struct mgmt_addr_info addr;
++	__u8	reason;
++} __packed;
+ 
+ #define MGMT_EV_CONNECT_FAILED		0x000D
+ struct mgmt_ev_connect_failed {
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index d81262a..e33dbeb 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1920,7 +1920,7 @@ static inline void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 						conn->dst_type, ev->status);
+ 		else
+ 			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
+-						 conn->dst_type);
++						 conn->dst_type, ev->reason);
+ 	}
+ 
+ 	if (ev->status == 0) {
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 25d2207..89af7c6 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3047,16 +3047,17 @@ static void unpair_device_rsp(struct pending_cmd *cmd, void *data)
+ }
+ 
+ int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
+-			     u8 link_type, u8 addr_type)
++			     u8 link_type, u8 addr_type, u8 reason)
+ {
+-	struct mgmt_addr_info ev;
++	struct mgmt_ev_device_disconnected ev;
+ 	struct sock *sk = NULL;
+ 	int err;
+ 
+ 	mgmt_pending_foreach(MGMT_OP_DISCONNECT, hdev, disconnect_rsp, &sk);
+ 
+-	bacpy(&ev.bdaddr, bdaddr);
+-	ev.type = link_to_bdaddr(link_type, addr_type);
++	bacpy(&ev.addr.bdaddr, bdaddr);
++	ev.addr.type = link_to_bdaddr(link_type, addr_type);
++	ev.reason = reason;
+ 
+ 	err = mgmt_event(MGMT_EV_DEVICE_DISCONNECTED, hdev, &ev, sizeof(ev),
+ 			 sk);
+-- 
+1.7.7.6
 
