@@ -2,95 +2,41 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v0 2/5] Use defines instead of magic numbers
-Date: Mon, 14 May 2012 17:33:01 +0200
-Message-Id: <1337009584-17181-3-git-send-email-mikel.astiz.oss@gmail.com>
-In-Reply-To: <1337009584-17181-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1337009584-17181-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v0 0/5] ACL disconnect reason
+Date: Mon, 14 May 2012 17:32:59 +0200
+Message-Id: <1337009584-17181-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The error-handling code should use the defines instead of magic numbers.
----
- src/device.c |   42 +++++++++++++++++++++---------------------
- 1 files changed, 21 insertions(+), 21 deletions(-)
+Some use-cases require distinguishing the reason behind an ACL disconnection. Particularly, IVI use-cases regarding HFP and A2DP need to know if a disconnection was due to a timeout, in order to know which should be the reconnection strategy.
 
-diff --git a/src/device.c b/src/device.c
-index 2a8812e..82dc2ca 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2303,48 +2303,48 @@ static DBusMessage *new_authentication_return(DBusMessage *msg, int status)
- 	case 0x00: /* success */
- 		return dbus_message_new_method_return(msg);
- 
--	case 0x04: /* page timeout */
-+	case HCI_PAGE_TIMEOUT:
- 		return dbus_message_new_error(msg,
- 				ERROR_INTERFACE ".ConnectionAttemptFailed",
- 				"Page Timeout");
--	case 0x08: /* connection timeout */
-+	case HCI_CONNECTION_TIMEOUT:
- 		return dbus_message_new_error(msg,
- 				ERROR_INTERFACE ".ConnectionAttemptFailed",
- 				"Connection Timeout");
--	case 0x10: /* connection accept timeout */
--	case 0x22: /* LMP response timeout */
--	case 0x28: /* instant passed - is this a timeout? */
-+	case HCI_HOST_TIMEOUT:
-+	case HCI_LMP_RESPONSE_TIMEOUT:
-+	case HCI_INSTANT_PASSED: /* is this a timeout? */
- 		return dbus_message_new_error(msg,
- 					ERROR_INTERFACE ".AuthenticationTimeout",
- 					"Authentication Timeout");
--	case 0x17: /* too frequent pairing attempts */
-+	case HCI_REPEATED_ATTEMPTS: /* too frequent pairing attempts */
- 		return dbus_message_new_error(msg,
- 					ERROR_INTERFACE ".RepeatedAttempts",
- 					"Repeated Attempts");
- 
--	case 0x06:
--	case 0x18: /* pairing not allowed (e.g. gw rejected attempt) */
-+	case HCI_PIN_OR_KEY_MISSING:
-+	case HCI_PAIRING_NOT_ALLOWED: /* e.g. gw rejected attempt */
- 		return dbus_message_new_error(msg,
- 					ERROR_INTERFACE ".AuthenticationRejected",
- 					"Authentication Rejected");
- 
--	case 0x07: /* memory capacity */
--	case 0x09: /* connection limit */
--	case 0x0a: /* synchronous connection limit */
--	case 0x0d: /* limited resources */
--	case 0x13: /* user ended the connection */
--	case 0x14: /* terminated due to low resources */
--	case 0x16: /* connection terminated */
-+	case HCI_MEMORY_FULL:
-+	case HCI_MAX_NUMBER_OF_CONNECTIONS:
-+	case HCI_MAX_NUMBER_OF_SCO_CONNECTIONS:
-+	case HCI_REJECTED_LIMITED_RESOURCES:
-+	case HCI_OE_USER_ENDED_CONNECTION:
-+	case HCI_OE_LOW_RESOURCES:
-+	case HCI_CONNECTION_TERMINATED:
- 		return dbus_message_new_error(msg,
- 					ERROR_INTERFACE ".AuthenticationCanceled",
- 					"Authentication Canceled");
- 
--	case 0x05: /* authentication failure */
--	case 0x0E: /* rejected due to security reasons - is this auth failure? */
--	case 0x25: /* encryption mode not acceptable - is this auth failure? */
--	case 0x26: /* link key cannot be changed - is this auth failure? */
--	case 0x29: /* pairing with unit key unsupported - is this auth failure? */
--	case 0x2f: /* insufficient security - is this auth failure? */
-+	case HCI_AUTHENTICATION_FAILURE:
-+	case HCI_REJECTED_SECURITY: /* is this auth failure? */
-+	case HCI_ENCRYPTION_MODE_NOT_ACCEPTED: /* is this auth failure? */
-+	case HCI_UNIT_LINK_KEY_USED: /* is this auth failure? */
-+	case HCI_PAIRING_NOT_SUPPORTED: /* is this auth failure? */
-+	case HCI_INSUFFICIENT_SECURITY: /* is this auth failure? */
- 	default:
- 		return dbus_message_new_error(msg,
- 					ERROR_INTERFACE ".AuthenticationFailed",
+This information needs to be exposed to some component implementing the specific policy of each application. Typically neither BlueZ or oFono (in case of HFP) would be the case. This means the disconnect reason needs to be exposed in D-Bus.
+
+In this patch series the proposed approach is to add a signal in the device API, given that we already have some low-level disconnection-related API there. Another approach would be to support it in the specific HFP and A2DP interfaces.
+
+In addition, the kernel doesn't provide this information when using the management interface. Either the management interface is extended (the corresponding patch will be sent soon) or this field needs to be reported through a RFCOMM socket option after a POLLHUP disconnect event. This second approach would require to handle it separatedly in userspace for HFP and A2DP (and potentially for other profiles), and besides, assuming BlueZ is responsible for exposing the field in D-Bus, it would be necessary to hold a copy of the RFCOMM socket.
+
+Mikel Astiz (5):
+  doc: Add D-Bus signal to provide disconnect reason
+  Use defines instead of magic numbers
+  Propagate disconnect reason to adapter
+  Propagate disconnect reason to device
+  Send D-Bus signal to propagate disconnect reason
+
+ doc/device-api.txt |   14 ++++++++++++++
+ lib/mgmt.h         |    5 +++++
+ plugins/hciops.c   |    2 +-
+ plugins/mgmtops.c  |   10 ++++++++--
+ src/adapter.c      |    7 ++++---
+ src/adapter.h      |    2 +-
+ src/device.c       |   51 +++++++++++++++++++++++++++++----------------------
+ src/device.h       |    3 ++-
+ src/event.c        |    4 ++--
+ src/event.h        |    3 ++-
+ 10 files changed, 68 insertions(+), 33 deletions(-)
+
 -- 
 1.7.7.6
 
