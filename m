@@ -1,28 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1336979924.4303.5.camel@jlt3.sipsolutions.net>
-Subject: Re: CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit 2012
- (Barcelona!)
-From: Johannes Berg <johannes@sipsolutions.net>
-To: "John W. Linville" <linville@tuxdriver.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-wireless@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, alexander.smirnov@siemens.com,
-	Sergey.Sobolev@siemens.com
-Date: Mon, 14 May 2012 09:18:44 +0200
-In-Reply-To: <20120427174439.GC16207@tuxdriver.com> (sfid-20120427_194754_950690_60A07BB5)
-References: <20120322192406.GB2432@tuxdriver.com>
-	 <1332698585.1870.88.camel@aeonflux> <20120326145433.GE13806@tuxdriver.com>
-	 <1332774906.1870.98.camel@aeonflux> <20120326152541.GH13806@tuxdriver.com>
-	 <20120427174439.GC16207@tuxdriver.com>
-	 (sfid-20120427_194754_950690_60A07BB5)
+Message-ID: <1336964326.5970.238.camel@aeonflux>
+Subject: Re: [PATCH 2/4] monitor: add device filter support
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sun, 13 May 2012 19:58:46 -0700
+In-Reply-To: <1336753132-8282-2-git-send-email-gustavo@padovan.org>
+References: <1336753132-8282-1-git-send-email-gustavo@padovan.org>
+	 <1336753132-8282-2-git-send-email-gustavo@padovan.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2012-04-27 at 13:44 -0400, John W. Linville wrote:
+Hi Gustavo,
 
-> Angela has reserved space for us at the Hotel Fira
-> Palace for the Wireless Summit on Thurs, Nov 8th and Fri, Nov 9th.
+> -i hciX option will show only data from the specified device
+> ---
+>  monitor/main.c   |   12 ++++++++++--
+>  monitor/packet.c |   10 +++++++++-
+>  monitor/packet.h |    2 +-
+>  3 files changed, 20 insertions(+), 4 deletions(-)
 
-FWIW, I will not be able to attend.
+so what is this option actually good for? I think it is the wrong
+approach for dealing with this.
 
-johannes
+We better have some generic filtering mechanism, then trying to just
+duplicate options from hcidump into btmon.
+
+btmon is different in the fact that it is actually able to record all
+packets from all devices. You also do not wanna filter based on index
+number. You wanna filter based on BD_ADDR and BR/EDR vs AMP.
+
+Regards
+
+Marcel
+
+
