@@ -1,47 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 May 2012 17:02:20 -0300
+Date: Mon, 14 May 2012 16:33:42 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Cc: padovan@profusion.mobi, linux-bluetooth@vger.kernel.org
-Subject: Re: Bluetooth: Fix input device registration
-Message-ID: <20120514200220.GB23475@joana>
-References: <20120514132955.GA13369@elgon.mountain>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
+Subject: Re: [PATCH] Bluetooth: Update tx_send_head when sending ERTM data
+Message-ID: <20120514193342.GA23475@joana>
+References: <1337019873-27017-1-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120514132955.GA13369@elgon.mountain>
+In-Reply-To: <1337019873-27017-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dan,
+Hi Mat,
 
-* Dan Carpenter <dan.carpenter@oracle.com> [2012-05-14 16:30:03 +0300]:
+* Mat Martineau <mathewm@codeaurora.org> [2012-05-14 11:24:33 -0700]:
 
-> Hi, I am working on some new stuff for Smatch and sending bug reports
-> on potential bugs I find as I go.
+> Commit 94122bbe9c8c4ad7ba9f02f9a30bfc95672c404e introduced a problem
+> where tx_send_head was not set to point to the first skb in the ERTM
+> transmit queue, which stalled data transmission.  This change sets
+> that pointer when transmission is not already in progress.
 > 
-> ----
-> This is a semi-automatic email about new static checker warnings.
-> 
-> The patch 3415a5fdde71: "Bluetooth: Fix input device registration" 
-> from Oct 6, 2011, leads to the following Smatch complaint:
-> 
-> net/bluetooth/hidp/core.c:1072 hidp_add_connection()
-> 	 error: we previously assumed 'session->input' could be null (see line 1049)
-> 
-> net/bluetooth/hidp/core.c
->   1046          if (session->hid) {
->   1047                  vendor  = session->hid->vendor;
->   1048			product = session->hid->product;
->   1049		} else if (session->input) {
->   1050			vendor  = session->input->id.vendor;
->   1051			product = session->input->id.product;
->   1052		} else {
->                 ^^^^^^^^
-> If we hit this else clause then "session->input" and "session->hid" are
-> both NULL.
+> Reported-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/l2cap_core.c |    3 +++
+>  1 file changed, 3 insertions(+)
 
-Actually both can never be NULL at the same time here. If after call
-hdip_setup_input() session->input is still NULL, the we goto purge and skip
-the code below.
+Patch has been applied to bluetooth-next. Thanks.
 
 	Gustavo
