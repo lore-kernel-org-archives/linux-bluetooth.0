@@ -1,42 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v0 0/5] ACL disconnect reason
-Date: Mon, 14 May 2012 17:32:59 +0200
-Message-Id: <1337009584-17181-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Mon, 14 May 2012 16:30:03 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: padovan@profusion.mobi
+Cc: linux-bluetooth@vger.kernel.org
+Subject: re: Bluetooth: Fix input device registration
+Message-ID: <20120514132955.GA13369@elgon.mountain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi, I am working on some new stuff for Smatch and sending bug reports
+on potential bugs I find as I go.
 
-Some use-cases require distinguishing the reason behind an ACL disconnection. Particularly, IVI use-cases regarding HFP and A2DP need to know if a disconnection was due to a timeout, in order to know which should be the reconnection strategy.
+----
+This is a semi-automatic email about new static checker warnings.
 
-This information needs to be exposed to some component implementing the specific policy of each application. Typically neither BlueZ or oFono (in case of HFP) would be the case. This means the disconnect reason needs to be exposed in D-Bus.
+The patch 3415a5fdde71: "Bluetooth: Fix input device registration" 
+from Oct 6, 2011, leads to the following Smatch complaint:
 
-In this patch series the proposed approach is to add a signal in the device API, given that we already have some low-level disconnection-related API there. Another approach would be to support it in the specific HFP and A2DP interfaces.
+net/bluetooth/hidp/core.c:1072 hidp_add_connection()
+	 error: we previously assumed 'session->input' could be null (see line 1049)
 
-In addition, the kernel doesn't provide this information when using the management interface. Either the management interface is extended (the corresponding patch will be sent soon) or this field needs to be reported through a RFCOMM socket option after a POLLHUP disconnect event. This second approach would require to handle it separatedly in userspace for HFP and A2DP (and potentially for other profiles), and besides, assuming BlueZ is responsible for exposing the field in D-Bus, it would be necessary to hold a copy of the RFCOMM socket.
+net/bluetooth/hidp/core.c
+  1046          if (session->hid) {
+  1047                  vendor  = session->hid->vendor;
+  1048			product = session->hid->product;
+  1049		} else if (session->input) {
+  1050			vendor  = session->input->id.vendor;
+  1051			product = session->input->id.product;
+  1052		} else {
+                ^^^^^^^^
+If we hit this else clause then "session->input" and "session->hid" are
+both NULL.
 
-Mikel Astiz (5):
-  doc: Add D-Bus signal to provide disconnect reason
-  Use defines instead of magic numbers
-  Propagate disconnect reason to adapter
-  Propagate disconnect reason to device
-  Send D-Bus signal to propagate disconnect reason
+  1053			vendor = 0x0000;
+  1054			product = 0x0000;
+  1055		}
+  1056	
+  1057		session->task = kthread_run(hidp_session, session, "khidpd_%04x%04x",
+  1058								vendor, product);
+  1059		if (IS_ERR(session->task)) {
+  1060			err = PTR_ERR(session->task);
+  1061			goto unlink;
+  1062		}
+  1063	
+  1064		while (session->waiting_for_startup) {
+  1065			wait_event_interruptible(session->startup_queue,
+  1066				!session->waiting_for_startup);
+  1067		}
+  1068	
+  1069		if (session->hid)
+  1070			err = hid_add_device(session->hid);
+  1071		else
+  1072			err = input_register_device(session->input);
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+It leads to a NULL dereference inside the input_register_device() call.
 
- doc/device-api.txt |   14 ++++++++++++++
- lib/mgmt.h         |    5 +++++
- plugins/hciops.c   |    2 +-
- plugins/mgmtops.c  |   10 ++++++++--
- src/adapter.c      |    7 ++++---
- src/adapter.h      |    2 +-
- src/device.c       |   51 +++++++++++++++++++++++++++++----------------------
- src/device.h       |    3 ++-
- src/event.c        |    4 ++--
- src/event.h        |    3 ++-
- 10 files changed, 68 insertions(+), 33 deletions(-)
+  1073	
+  1074		if (err < 0) {
 
--- 
-1.7.7.6
+regards,
+dan carpenter
 
