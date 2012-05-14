@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Vani <vani.patel@stericsson.com>
 To: User Name <linux-bluetooth@vger.kernel.org>
 Cc: User Name2 <vani.patel@stericsson.com>
-Subject: [PATCH Bluez v2 2/4] AVRCP: Get media transport DBus connection
-Date: Mon, 14 May 2012 15:47:37 +0530
-Message-ID: <1336990657-24387-1-git-send-email-vani.patel@stericsson.com>
+Subject: [PATCH Bluez v2 1/4] AVRCP: Register for VolumeChanged Notification
+Date: Mon, 14 May 2012 15:46:55 +0530
+Message-ID: <1336990615-24344-1-git-send-email-vani.patel@stericsson.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,35 +12,132 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Vani Patel <vani.patel@stericsson.com>
 
-Defines a function that will return DBus connection
-for media transport
+On connection of control channel, VolumeChanged
+notification is registered with the CT.
 ---
- audio/transport.c |    5 +++++
- audio/transport.h |    1 +
- 2 files changed, 6 insertions(+), 0 deletions(-)
+ audio/avctp.c |    5 +++--
+ audio/avctp.h |    2 +-
+ audio/avrcp.c |   29 ++++++++++++++++++++++++++++-
+ audio/avrcp.h |    4 +++-
+ 4 files changed, 35 insertions(+), 5 deletions(-)
 
-diff --git a/audio/transport.c b/audio/transport.c
-index 7bf7309..6ea0748 100644
---- a/audio/transport.c
-+++ b/audio/transport.c
-@@ -1054,3 +1054,8 @@ struct audio_device *media_transport_get_dev(struct media_transport *transport)
+diff --git a/audio/avctp.c b/audio/avctp.c
+index 5161703..0cbd114 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -607,6 +607,7 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ 	init_uinput(session);
+ 
+ 	avctp_set_state(session, AVCTP_STATE_CONNECTED);
++	register_volume_notification(session);
+ 	session->mtu = imtu;
+ 	session->io_id = g_io_add_watch(chan,
+ 				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+@@ -892,7 +893,7 @@ int avctp_send_passthrough(struct avctp *session, uint8_t op)
+ 
+ int avctp_send_vendordep(struct avctp *session, uint8_t transaction,
+ 				uint8_t code, uint8_t subunit,
+-				uint8_t *operands, size_t operand_count)
++				uint8_t *operands, size_t operand_count, uint8_t cr)
  {
- 	return transport->device;
+ 	uint8_t *buf;
+ 	struct avctp_header *avctp;
+@@ -914,7 +915,7 @@ int avctp_send_vendordep(struct avctp *session, uint8_t transaction,
+ 
+ 	avctp->transaction = transaction;
+ 	avctp->packet_type = AVCTP_PACKET_SINGLE;
+-	avctp->cr = AVCTP_RESPONSE;
++	avctp->cr = cr;
+ 	avctp->pid = htons(AV_REMOTE_SVCLASS_ID);
+ 
+ 	avc->code = code;
+diff --git a/audio/avctp.h b/audio/avctp.h
+index 9727485..0b9ff37 100644
+--- a/audio/avctp.h
++++ b/audio/avctp.h
+@@ -96,4 +96,4 @@ gboolean avctp_unregister_pdu_handler(unsigned int id);
+ int avctp_send_passthrough(struct avctp *session, uint8_t op);
+ int avctp_send_vendordep(struct avctp *session, uint8_t transaction,
+ 				uint8_t code, uint8_t subunit,
+-				uint8_t *operands, size_t operand_count);
++				uint8_t *operands, size_t operand_count, uint8_t cr);
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index df39d04..cde2885 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -88,6 +88,10 @@
+ /* Capabilities for AVRCP_GET_CAPABILITIES pdu */
+ #define CAP_COMPANY_ID		0x02
+ #define CAP_EVENTS_SUPPORTED	0x03
++#define COMMAND		0
++#define RESPONSE		1
++
++#define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH 5
+ 
+ enum battery_status {
+ 	BATTERY_STATUS_NORMAL =		0,
+@@ -159,6 +163,7 @@ struct avrcp_player {
+ 
+ static GSList *servers = NULL;
+ static unsigned int avctp_id = 0;
++static uint8_t transaction = 0;
+ 
+ /* Company IDs supported by this device */
+ static uint32_t company_ids[] = {
+@@ -395,7 +400,7 @@ int avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data)
+ 
+ 	err = avctp_send_vendordep(player->session, player->transaction_events[id],
+ 					AVC_CTYPE_CHANGED, AVC_SUBUNIT_PANEL,
+-					buf, size + AVRCP_HEADER_LENGTH);
++					buf, size + AVRCP_HEADER_LENGTH, RESPONSE);
+ 	if (err < 0)
+ 		return err;
+ 
+@@ -1327,3 +1332,25 @@ void avrcp_unregister_player(struct avrcp_player *player)
+ 
+ 	player_destroy(player);
  }
 +
-+DBusConnection *media_transport_get_conn(struct media_transport *transport)
++void register_volume_notification(struct avctp *session)
 +{
-+	return transport->conn;
++	uint8_t buf[AVRCP_HEADER_LENGTH + AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH];
++	struct avrcp_header *pdu = (void *) buf;
++	uint8_t length, error;
++
++	memset(buf, 0, sizeof(buf));
++
++	set_company_id(pdu->company_id, IEEEID_BTSIG);
++	pdu->pdu_id = AVRCP_REGISTER_NOTIFICATION;
++	pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
++	pdu->params[0] = AVRCP_EVENT_VOLUME_CHANGED;
++	pdu->params_len = htons(AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH);
++
++	length = AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
++
++	error = avctp_send_vendordep(session, transaction++,
++						AVC_CTYPE_NOTIFY, AVC_SUBUNIT_PANEL,
++						buf, length, COMMAND);
++
 +}
-diff --git a/audio/transport.h b/audio/transport.h
-index 1f86cde..94dbb69 100644
---- a/audio/transport.h
-+++ b/audio/transport.h
-@@ -37,3 +37,4 @@ void media_transport_update_delay(struct media_transport *transport,
- 							uint16_t delay);
- void transport_get_properties(struct media_transport *transport,
- 							DBusMessageIter *iter);
-+DBusConnection *media_transport_get_conn(struct media_transport *transport);
+diff --git a/audio/avrcp.h b/audio/avrcp.h
+index 8a09546..d299b67 100644
+--- a/audio/avrcp.h
++++ b/audio/avrcp.h
+@@ -73,7 +73,8 @@
+ #define AVRCP_EVENT_TRACK_CHANGED	0x02
+ #define AVRCP_EVENT_TRACK_REACHED_END	0x03
+ #define AVRCP_EVENT_TRACK_REACHED_START	0x04
+-#define AVRCP_EVENT_LAST		AVRCP_EVENT_TRACK_REACHED_START
++#define AVRCP_EVENT_VOLUME_CHANGED	0x0d
++#define AVRCP_EVENT_LAST		AVRCP_EVENT_VOLUME_CHANGED
+ 
+ struct avrcp_player_cb {
+ 	int (*get_setting) (uint8_t attr, void *user_data);
+@@ -100,3 +101,4 @@ void avrcp_unregister_player(struct avrcp_player *player);
+ int avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data);
+ 
+ size_t avrcp_handle_vendor_reject(uint8_t *code, uint8_t *operands);
++void register_volume_notification ( struct avctp *session);
 -- 
 1.7.5.4
 
