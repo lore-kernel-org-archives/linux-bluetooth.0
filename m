@@ -1,43 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 14 May 2012 08:47:14 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	marcel@holtmann.org, pkrystad@codeaurora.org,
+	ulisses@profusion.mobi
+Subject: Re: [PATCH 4/4] Bluetooth: Refactor L2CAP ERTM and streaming transmit
+ segmentation
+In-Reply-To: <20120514095244.GA10127@aemeltch-MOBL1>
+Message-ID: <alpine.DEB.2.02.1205140828150.23969@mathewm-linux>
+References: <1335976922-19456-1-git-send-email-mathewm@codeaurora.org> <1335976922-19456-5-git-send-email-mathewm@codeaurora.org> <20120514095244.GA10127@aemeltch-MOBL1>
 MIME-Version: 1.0
-In-Reply-To: <1337009584-17181-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1337009584-17181-1-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Mon, 14 May 2012 20:00:43 +0300
-Message-ID: <CABBYNZKyPPb=Ov+6p6-9PUY6nrBTD1M_Ew9YeF_cxt8OQ5x85Q@mail.gmail.com>
-Subject: Re: [RFC BlueZ v0 0/5] ACL disconnect reason
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
 
-On Mon, May 14, 2012 at 6:32 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Andrei -
+
+On Mon, 14 May 2012, Andrei Emeltchenko wrote:
+
+> Hi Mat,
 >
-> Some use-cases require distinguishing the reason behind an ACL disconnection. Particularly, IVI use-cases regarding HFP and A2DP need to know if a disconnection was due to a timeout, in order to know which should be the reconnection strategy.
-
-Afaik there is only one use case which is link loss aka out of range,
-because of that carkit/headset policy is normally clean disconnect do
-not reconnect, non-clean disconnect do reconnect.
-
+> On Wed, May 02, 2012 at 09:42:02AM -0700, Mat Martineau wrote:
+>> Use more common code for ERTM and streaming mode segmentation and
+>> transmission, and begin using skb control block data for delaying
+>> extended or enhanced header generation until just before the packet is
+>> transmitted.  This code is also better suited for resegmentation,
+>> which is needed when L2CAP links are reconfigured after an AMP channel
+>> move.
 >
-> This information needs to be exposed to some component implementing the specific policy of each application. Typically neither BlueZ or oFono (in case of HFP) would be the case. This means the disconnect reason needs to be exposed in D-Bus.
+> ...
+>> @@ -1708,6 +1709,9 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
+>>  	if (chan->state != BT_CONNECTED)
+>>  		return -ENOTCONN;
+>>
+>> +	if (test_bit(CONN_REMOTE_BUSY, &chan->conn_state))
+>> +		return 0;
+>> +
+>>  	while ((skb = chan->tx_send_head) && (!l2cap_tx_window_full(chan))) {
 >
-> In this patch series the proposed approach is to add a signal in the device API, given that we already have some low-level disconnection-related API there. Another approach would be to support it in the specific HFP and A2DP interfaces.
+> We check here chan->tx_send_head. But:
+>
+> ...
+>> -	skb_queue_splice_tail(&sar_queue, &chan->tx_q);
+>> -	if (chan->tx_send_head == NULL)
+>> -		chan->tx_send_head = sar_queue.next;
+> ...
+>
+>> -
+>> -			if (chan->tx_send_head == NULL)
+>> -				chan->tx_send_head = skb;
+> ...
+>
+> tx_send_head seems to be always NULL due to the change above. Have you
+> tested that it actually works?
 
-The disconnect reason might no be necessary, have you thought about
-implementing the reconnection logic directly in bluetoothd? This way
-we can test this without the UI, and we know when for example A2DP has
-disconnect without CLOSE command or things like that and afaik we can
-query the error from the socket.
+I did some checks with l2test, but now that I look at the code I must 
+have made a mistake (like accidentally using the wrong build).  Sorry 
+about that, I'll send a fix ASAP.
 
-Btw, none of this is useful without tuning the link supervision
-timeout because the current one used by BlueZ iirc is 20 seconds, far
-too big for being able to recover the audio.
 
--- 
-Luiz Augusto von Dentz
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
