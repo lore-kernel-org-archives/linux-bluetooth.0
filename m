@@ -2,92 +2,65 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v0] Bluetooth: mgmt: Add device disconnect reason
-Date: Mon, 14 May 2012 17:34:59 +0200
-Message-Id: <1337009699-19831-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v0 4/5] Propagate disconnect reason to device
+Date: Mon, 14 May 2012 17:33:03 +0200
+Message-Id: <1337009584-17181-5-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1337009584-17181-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1337009584-17181-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-MGMT_EV_DEVICE_DISCONNECTED should expose the disconnection reason to
-userland.
-
-Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Internally propagate disconnect reason in order to make it public in the
+D-Bus API.
 ---
- include/net/bluetooth/hci_core.h |    2 +-
- include/net/bluetooth/mgmt.h     |    4 ++++
- net/bluetooth/hci_event.c        |    2 +-
- net/bluetooth/mgmt.c             |    9 +++++----
- 4 files changed, 11 insertions(+), 6 deletions(-)
+ src/adapter.c |    2 +-
+ src/device.c  |    3 ++-
+ src/device.h  |    3 ++-
+ 3 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b60d2c8..4c7252c 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -974,7 +974,7 @@ int mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 			  u8 addr_type, u32 flags, u8 *name, u8 name_len,
- 			  u8 *dev_class);
- int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
--			     u8 link_type, u8 addr_type);
-+			     u8 link_type, u8 addr_type, u8 reason);
- int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			   u8 link_type, u8 addr_type, u8 status);
- int mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 23fd054..5845af9 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -406,6 +406,10 @@ struct mgmt_ev_device_connected {
- } __packed;
- 
- #define MGMT_EV_DEVICE_DISCONNECTED	0x000C
-+struct mgmt_ev_device_disconnected {
-+	struct mgmt_addr_info addr;
-+	__u8	reason;
-+} __packed;
- 
- #define MGMT_EV_CONNECT_FAILED		0x000D
- struct mgmt_ev_connect_failed {
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index d81262a..e33dbeb 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1920,7 +1920,7 @@ static inline void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff
- 						conn->dst_type, ev->status);
- 		else
- 			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
--						 conn->dst_type);
-+						 conn->dst_type, ev->reason);
+diff --git a/src/adapter.c b/src/adapter.c
+index b9a90dd..4ed32a7 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3001,7 +3001,7 @@ void adapter_remove_connection(struct btd_adapter *adapter,
+ 		return;
  	}
  
- 	if (ev->status == 0) {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 25d2207..89af7c6 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3047,16 +3047,17 @@ static void unpair_device_rsp(struct pending_cmd *cmd, void *data)
+-	device_remove_connection(device, connection);
++	device_remove_connection(device, connection, reason);
+ 
+ 	adapter->connections = g_slist_remove(adapter->connections, device);
+ 
+diff --git a/src/device.c b/src/device.c
+index 82dc2ca..b2b9d54 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -915,7 +915,8 @@ void device_add_connection(struct btd_device *device, DBusConnection *conn)
+ 					DBUS_TYPE_BOOLEAN, &device->connected);
  }
  
- int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
--			     u8 link_type, u8 addr_type)
-+			     u8 link_type, u8 addr_type, u8 reason)
+-void device_remove_connection(struct btd_device *device, DBusConnection *conn)
++void device_remove_connection(struct btd_device *device, DBusConnection *conn,
++								uint8_t reason)
  {
--	struct mgmt_addr_info ev;
-+	struct mgmt_ev_device_disconnected ev;
- 	struct sock *sk = NULL;
- 	int err;
+ 	if (!device->connected) {
+ 		char addr[18];
+diff --git a/src/device.h b/src/device.h
+index 51140c7..f77d3aa 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -91,7 +91,8 @@ gboolean device_is_authenticating(struct btd_device *device);
+ gboolean device_is_authorizing(struct btd_device *device);
+ void device_set_authorizing(struct btd_device *device, gboolean auth);
+ void device_add_connection(struct btd_device *device, DBusConnection *conn);
+-void device_remove_connection(struct btd_device *device, DBusConnection *conn);
++void device_remove_connection(struct btd_device *device, DBusConnection *conn,
++								uint8_t reason);
+ void device_request_disconnect(struct btd_device *device, DBusMessage *msg);
  
- 	mgmt_pending_foreach(MGMT_OP_DISCONNECT, hdev, disconnect_rsp, &sk);
- 
--	bacpy(&ev.bdaddr, bdaddr);
--	ev.type = link_to_bdaddr(link_type, addr_type);
-+	bacpy(&ev.addr.bdaddr, bdaddr);
-+	ev.addr.type = link_to_bdaddr(link_type, addr_type);
-+	ev.reason = reason;
- 
- 	err = mgmt_event(MGMT_EV_DEVICE_DISCONNECTED, hdev, &ev, sizeof(ev),
- 			 sk);
+ typedef void (*disconnect_watch) (struct btd_device *device, gboolean removal,
 -- 
 1.7.7.6
 
