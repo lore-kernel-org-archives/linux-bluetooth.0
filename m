@@ -1,129 +1,222 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vani-dineshbhai PATEL X <vani.patel@stericsson.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: User Name <linux-bluetooth@vger.kernel.org>
-Date: Mon, 14 May 2012 12:23:24 +0200
-Subject: RE: [PATCH BlueZ 1/4] AVRCP: Register for VolumeChanged Notification
-Message-ID: <747C1E83C744F44E9ACFB89FAEEC2C7B234A3F2EF0@EXDCVYMBSTM005.EQ1STM.local>
-References: <1336734130-31397-1-git-send-email-vani.patel@stericsson.com>
- <CABBYNZKUQhQzuGYVsZQPWAnNZKitgH5bURcn7VzyWwXEKS0Z0Q@mail.gmail.com>
-In-Reply-To: <CABBYNZKUQhQzuGYVsZQPWAnNZKitgH5bURcn7VzyWwXEKS0Z0Q@mail.gmail.com>
-Content-Type: text/plain; charset="iso-8859-1"
+From: Vani <vani.patel@stericsson.com>
+To: User Name <linux-bluetooth@vger.kernel.org>
+Cc: User Name2 <vani.patel@stericsson.com>
+Subject: [PATCH Bluez v2 4/4] AVRCP: Response for VolumeChanged Notification
+Date: Mon, 14 May 2012 15:48:12 +0530
+Message-ID: <1336990692-24441-1-git-send-email-vani.patel@stericsson.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Vani Patel <vani.patel@stericsson.com>
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
-> Sent: Friday, May 11, 2012 7:19 PM
-> To: Vani-dineshbhai PATEL X
-> Cc: User Name
-> Subject: Re: [PATCH BlueZ 1/4] AVRCP: Register for VolumeChanged
-> Notification
-> 
-> Hi Vani,
-> 
-> On Fri, May 11, 2012 at 4:02 AM, Vani <vani.patel@stericsson.com>
-> wrote:
-> > From: Vani Patel <vani.patel@stericsson.com>
-> >
-> > On connection of control channel, VolumeChanged
-> > notification is registered with the CT.
-> > ---
-> >  audio/avctp.c |    1 +
-> >  audio/avrcp.c |   25 ++++++++++++++++++++++++-
-> >  audio/avrcp.h |    4 +++-
-> >  3 files changed, 28 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/audio/avctp.c b/audio/avctp.c
-> > index c5fbc1b..0cbd114 100755
-> > --- a/audio/avctp.c
-> > +++ b/audio/avctp.c
-> > @@ -607,6 +607,7 @@ static void avctp_connect_cb(GIOChannel *chan,
-> GError *err, gpointer data)
-> >        init_uinput(session);
-> >
-> >        avctp_set_state(session, AVCTP_STATE_CONNECTED);
-> > +       register_volume_notification(session);
-> >        session->mtu = imtu;
-> >        session->io_id = g_io_add_watch(chan,
-> >                                G_IO_IN | G_IO_ERR | G_IO_HUP |
-> G_IO_NVAL,
-> > diff --git a/audio/avrcp.c b/audio/avrcp.c
-> > index 2b25253..f4f1b6a 100755
-> > --- a/audio/avrcp.c
-> > +++ b/audio/avrcp.c
-> > @@ -91,6 +91,7 @@
-> >  #define CAP_EVENTS_SUPPORTED   0x03
-> >  #define COMMAND                0
-> >  #define RESPONSE               1
-> > +#define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH 5
-> >
-> >  enum battery_status {
-> >        BATTERY_STATUS_NORMAL =         0,
-> > @@ -591,11 +592,12 @@ static uint8_t
-> avrcp_handle_get_capabilities(struct avrcp_player *player,
-> >
-> >                return AVC_CTYPE_STABLE;
-> >        case CAP_EVENTS_SUPPORTED:
-> > -               pdu->params[1] = 4;
-> > +               pdu->params[1] = 5;
-> >                pdu->params[2] = AVRCP_EVENT_STATUS_CHANGED;
-> >                pdu->params[3] = AVRCP_EVENT_TRACK_CHANGED;
-> >                pdu->params[4] = AVRCP_EVENT_TRACK_REACHED_START;
-> >                pdu->params[5] = AVRCP_EVENT_TRACK_REACHED_END;
-> > +               pdu->params[6] = AVRCP_EVENT_VOLUME_CHANGED;
-> 
-> I believe this is no really necessary, at least not for the role you
-> are implementing since the headset is the one that should have this,
-> not us.
-> 
-Removed in the next patch set.
-> > +
-> > +void register_volume_notification(struct avctp *session)
-> > +{
-> > +       uint8_t buf[AVRCP_HEADER_LENGTH +
-> AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH];
-> > +       struct avrcp_header *pdu = (void *) buf;
-> > +       static uint8_t transaction = 0;
-> 
-> I don't think the transaction is per command, so IMO we should have a
-> common one inside avctp which gets incremented on each request.
-> 
-Yes, you are correct. I made a mistake. Rectified in the next patch set.
-> > +
-> > +       memset(buf, 0, sizeof(buf));
-> > +
-> > +       set_company_id(pdu->company_id, IEEEID_BTSIG);
-> > +       pdu->pdu_id = AVRCP_REGISTER_NOTIFICATION;
-> > +       pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
-> > +       pdu->params[0] = AVRCP_EVENT_VOLUME_CHANGED;
-> > +       pdu->params_len = htons
-> (AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH);
-> > +
-> > +       uint8_t length = AVRCP_HEADER_LENGTH + ntohs(pdu-
-> >params_len);
-> > +
-> > +       uint8_t error = avctp_send_vendordep(session, transaction++,
-> > +                               AVC_CTYPE_NOTIFY, AVC_SUBUNIT_PANEL,
-> > +                               buf, length, COMMAND);
-> 
-> Variable definition should be in the very beginning of the function,
-> actually I don't think this even compile, so I wonder how you are
-> testing this code? Please fix them.
-> 
-Rectified in next patch set. This does compile on my Ubuntu machine as well as Android without warnings. I have tested on both these platforms.
-> 
-> --
-> Luiz Augusto von Dentz
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-
-> bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Handling of Interim and Changed response for
+VolumeChanged notification.
+---
+ audio/avctp.c |   18 ++++++++----------
+ audio/avrcp.c |   18 ++++++++++++++++++
+ audio/avrcp.h |    2 ++
+ audio/media.c |   56 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 4 files changed, 83 insertions(+), 11 deletions(-)
 
-Thanks & Regards,
-Vani Patel
+diff --git a/audio/avctp.c b/audio/avctp.c
+index 0cbd114..6ea2311 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -403,7 +403,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 	uint8_t buf[1024], *operands, code, subunit;
+ 	struct avctp_header *avctp;
+ 	struct avc_header *avc;
+-	int ret, packet_size, operand_count, sock;
++	int ret, packet_size, operand_count, sock, avrcp_packet_length;
+ 	struct avctp_pdu_handler *handler;
+ 
+ 	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL))
+@@ -448,9 +448,6 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 			avc->code, avc->subunit_type, avc->subunit_id,
+ 			avc->opcode, operand_count);
+ 
+-	if (avctp->cr == AVCTP_RESPONSE)
+-		return TRUE;
+-
+ 	packet_size = AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH;
+ 	avctp->cr = AVCTP_RESPONSE;
+ 
+@@ -476,19 +473,20 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 	code = avc->code;
+ 	subunit = avc->subunit_type;
+ 
+-	packet_size += handler->cb(session, avctp->transaction, &code,
++	avrcp_packet_length = handler->cb(session, avctp->transaction, &code,
+ 					&subunit, operands, operand_count,
+ 					handler->user_data);
+-
++	packet_size += avrcp_packet_length;
+ 	avc->code = code;
+ 	avc->subunit_type = subunit;
+ 
+ done:
+-	ret = write(sock, buf, packet_size);
+-	if (ret != packet_size)
+-		goto failed;
++	if (avrcp_packet_length == 0)
++		return TRUE;
+ 
+-	return TRUE;
++	ret = write(sock, buf, packet_size);
++	if (ret == packet_size)
++		return TRUE;
+ 
+ failed:
+ 	DBG("AVCTP session %p got disconnected", session);
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index 60a55df..fc48b6a 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -999,6 +999,18 @@ err:
+ 	return AVC_CTYPE_REJECTED;
+ }
+ 
++static uint8_t avrcp_handle_volume_changed(struct avrcp_player *player,
++						struct avrcp_header *pdu,
++						uint8_t transaction)
++{
++	uint8_t abs_volume = pdu->params[1] & 0x7F;
++	uint16_t len = ntohs(pdu->params_len);
++
++	if(player->cb->set_volume != NULL)
++		player->cb->set_volume(abs_volume, player->dev, player->user_data);
++
++	return 0;
++}
+ 
+ static struct pdu_handler {
+ 	uint8_t pdu_id;
+@@ -1057,6 +1069,12 @@ static size_t handle_vendordep_pdu(struct avctp *session, uint8_t transaction,
+ 	DBG("AVRCP PDU 0x%02X, company 0x%06X len 0x%04X",
+ 			pdu->pdu_id, company_id, pdu->params_len);
+ 
++	if (pdu->pdu_id == AVRCP_REGISTER_NOTIFICATION) {
++		if (pdu->params[0] == AVRCP_EVENT_VOLUME_CHANGED)
++			return avrcp_handle_volume_changed(player, pdu, transaction);
++		else
++			return 0;
++	}
+ 	pdu->packet_type = 0;
+ 	pdu->rsvd = 0;
+ 
+diff --git a/audio/avrcp.h b/audio/avrcp.h
+index 6ca5ea4..0ca845f 100644
+--- a/audio/avrcp.h
++++ b/audio/avrcp.h
+@@ -84,6 +84,7 @@ struct avrcp_player_cb {
+ 	GList *(*list_metadata) (void *user_data);
+ 	uint8_t (*get_status) (void *user_data);
+ 	uint32_t (*get_position) (void *user_data);
++	void (*set_volume) (uint8_t volume, struct audio_device *dev, void *user_data);
+ };
+ 
+ int avrcp_register(DBusConnection *conn, const bdaddr_t *src, GKeyFile *config);
+@@ -99,6 +100,7 @@ struct avrcp_player *avrcp_register_player(const bdaddr_t *src,
+ void avrcp_unregister_player(struct avrcp_player *player);
+ 
+ int avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data);
++int avrcp_player_set_volume(struct avrcp_player *player, void *data);
+ 
+ size_t avrcp_handle_vendor_reject(uint8_t *code, uint8_t *operands);
+ void register_volume_notification ( struct avctp *session);
+diff --git a/audio/media.c b/audio/media.c
+index 61ec153..cb391f0 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -55,6 +55,7 @@
+ #define MEDIA_INTERFACE "org.bluez.Media"
+ #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint"
+ #define MEDIA_PLAYER_INTERFACE "org.bluez.MediaPlayer"
++#define MEDIA_TRANSPORT_INTERFACE "org.bluez.MediaTransport"
+ 
+ #define REQUEST_TIMEOUT (3 * 1000)		/* 3 seconds */
+ 
+@@ -101,8 +102,10 @@ struct media_player {
+ 	guint			watch;
+ 	guint			property_watch;
+ 	guint			track_watch;
++	guint                   volume_watch;
+ 	uint8_t			status;
+ 	uint32_t		position;
++	uint8_t			volume;
+ 	GTimer			*timer;
+ };
+ 
+@@ -1340,6 +1343,56 @@ static uint32_t get_position(void *user_data)
+ 	return mp->position + sec * 1000 + msec;
+ }
+ 
++static void set_volume(uint8_t volume, struct audio_device *dev, void *user_data)
++{
++	struct media_player *mp = user_data;
++	DBusMessage *msg;
++	DBusMessageIter iter, value;
++	const char *property = "Volume";
++	GSList *l;
++	const char *path;
++
++	if (mp->volume == volume)
++		return;
++
++	mp->volume = volume;
++
++	for (l = mp->adapter->endpoints; l; l = l->next) {
++
++		struct media_endpoint *endpoint;
++		struct media_transport *transport;
++
++		if (l->data == NULL)
++			continue;
++
++		endpoint = l->data;
++		transport = find_device_transport(endpoint, dev);
++		
++		if (transport == NULL)
++			continue;
++
++		path = media_transport_get_path(transport);
++		msg = dbus_message_new_method_call("org.bluez",
++							path,
++							MEDIA_TRANSPORT_INTERFACE,
++							"SetProperty");
++		if (!msg) {
++			DBG ( "Unable to allocate new.PropertyChanged msg\n");
++			continue;
++		}
++
++		dbus_message_iter_init_append(msg, &iter);
++		dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &property);
++		dbus_message_iter_open_container(&iter, DBUS_TYPE_VARIANT, DBUS_TYPE_BYTE_AS_STRING, &value);
++		dbus_message_iter_append_basic(&value, DBUS_TYPE_BYTE, &volume);
++		dbus_message_iter_close_container(&iter, &value);
++		
++		if (!dbus_connection_send(media_transport_get_conn(transport), msg, NULL))
++			continue;
++	}
++
++	register_volume_notification (avrcp_get_session(mp->player));
++}
+ static struct avrcp_player_cb player_cb = {
+ 	.get_setting = get_setting,
+ 	.set_setting = set_setting,
+@@ -1347,7 +1400,8 @@ static struct avrcp_player_cb player_cb = {
+ 	.get_uid = get_uid,
+ 	.get_metadata = get_metadata,
+ 	.get_position = get_position,
+-	.get_status = get_status
++	.get_status = get_status,
++	.set_volume = set_volume
+ };
+ 
+ static void media_player_exit(DBusConnection *connection, void *user_data)
+-- 
+1.7.5.4
+
