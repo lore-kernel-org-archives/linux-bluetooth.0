@@ -1,716 +1,386 @@
 Return-Path: <cyrus@holtmann.org>
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Cc: tedd.an@intel.com
-Subject: [PATCH] hciattach: Add support for Intel Bluetooth device
-Date: Mon, 14 May 2012 17:16:47 -0700
-Message-ID: <32612923.A9jgX3dogm@tedd-ubuntu>
+Message-ID: <4FB185FF.2060401@tu-ilmenau.de>
+Date: Tue, 15 May 2012 00:23:59 +0200
+From: Steffen Becker <steffen.becker@tu-ilmenau.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Can't connect Bluetooth Devices
+References: <4F968FF7.7060303@tu-ilmenau.de> <4FA1BB1C.6060409@tu-ilmenau.de> <20120502225815.GE16030@joana> <4FA23B93.8090204@tu-ilmenau.de> <20120503094429.GA6226@x220> <4FA6C460.9010209@tu-ilmenau.de> <4FAA5D6C.9010708@tu-ilmenau.de> <4FAA7F06.6050805@tu-ilmenau.de>
+In-Reply-To: <4FAA7F06.6050805@tu-ilmenau.de>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+Hello everyone,
 
-This patch enables the Intel Bluetooth device (UART sku) over the H4 protocol.
-It is responsible for bring up the device into known state by configuring
-the baudrate and applying the patches, if required.
+> as I said, I have two gentoo-PCs with a Bluetooth3.0-Dongle at each PC.
+> Now I tried to use the bluetooth-test-network to connect:
+> But connection was refused and I don't know how to fix it. Down below 
+> you find the
+> # bluez-test-network
+> # monitor-bluetooth
+> and
+> # hcidump -i hci0
+> -messages of both PCs. On top of that, there are different error 
+> messages at both PCs!
+>
+> Hope you can help me in this case.
+>
+> Regards,
+> Steffen
+>
+>
+> So here it is:
+>
+> PC1:
+> bluetooth1 ~ # bluez-test-discovery
+> [ 00:02:72:AE:58:73 ]
+>     Name = bluetooth2-0
+>     Paired = 1
+>     LegacyPairing = 0
+>     Alias = bluetooth2-0
+>     UUIDs = 
+> dbus.Array([dbus.String(u'00001116-0000-1000-8000-00805f9b34fb'), 
+> dbus.String(u'00001103-0000-1000-8000-00805f9b34fb'), 
+> dbus.String(u'0000110e-0000-1000-8000-00805f9b34fb'), 
+> dbus.String(u'0000110c-0000-1000-8000-00805f9b34fb'), 
+> dbus.String(u'0000110a-0000-1000-8000-00805f9b34fb'), 
+> dbus.String(u'0000111f-0000-1000-8000-00805f9b34fb'), 
+> dbus.String(u'00001112-0000-1000-8000-00805f9b34fb')], 
+> signature=dbus.Signature('s'), variant_level=1)
+>     Address = 00:02:72:AE:58:73
+>     RSSI = -37
+>     Class = 0x4a0100
+>     Trusted = 1
+>     Icon = computer
+>
+> ------------------------------------------------------------------------------------- 
+>
+>
+> bluetooth1 ~ # bluez-test-network 00:02:72:AE:58:73 nap
+> Traceback (most recent call last):
+>   File "/usr/bin/bluez-test-network", line 45, in <module>
+>     iface = network.Connect(service)
+>   File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line 68, 
+> in __call__
+>     return self._proxy_method(*args, **keywords)
+>   File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line 143, 
+> in __call__
+>     **keywords)
+>   File "/usr/lib64/python2.7/site-packages/dbus/connection.py", line 
+> 630, in call_blocking
+>     message, timeout)
+> dbus.exceptions.DBusException: org.bluez.Error.Failed: Connection 
+> refused (111)
+>
+> ------------------------------------------------------------------------------------- 
+>
+>
+> bluetooth1 ~ # monitor-bluetooth
+> {Device.PropertyChanged} [/org/bluez/2821/hci0/dev_00_02_72_AE_58_73] 
+> Connected = 1
+> {Device.PropertyChanged} [/org/bluez/2821/hci0/dev_00_02_72_AE_58_73] 
+> Connected = 0
+>
+> ------------------------------------------------------------------------------------- 
+>
+>
+> bluetooth1 ~ # hcidump -i hci0
+> HCI sniffer - Bluetooth packet analyzer ver 2.3
+> device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:02:72:AE:58:73 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> > HCI Event: Command Status (0x0f) plen 4
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> > HCI Event: Role Change (0x12) plen 8
+>     status 0x00 bdaddr 00:02:72:AE:58:73 role 0x01
+>     Role: Slave
+> > HCI Event: Connect Complete (0x03) plen 11
+>     status 0x00 handle 12 bdaddr 00:02:72:AE:58:73 type ACL encrypt 0x00
+> < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+>     handle 12
+> > HCI Event: Max Slots Change (0x1b) plen 3
+>     handle 12 slots 5
+> > HCI Event: Command Status (0x0f) plen 4
+>     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+> > HCI Event: Read Remote Supported Features (0x0b) plen 11
+>     status 0x00 handle 12
+>     Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x79 0x87
+> < HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
+>     handle 12 page 1
+> > HCI Event: Command Status (0x0f) plen 4
+>     Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
+> > HCI Event: Read Remote Extended Features (0x23) plen 13
+>     status 0x00 handle 12 page 1 max 1
+>     Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
+>     bdaddr 00:02:72:AE:58:73 mode 2 clkoffset 0x0000
+> > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> > HCI Event: Remote Name Req Complete (0x07) plen 255
+>     status 0x00 bdaddr 00:02:72:AE:58:73 name 'bluetooth2-0'
+> < HCI Command: Authentication Requested (0x01|0x0011) plen 2
+>     handle 12
+> > HCI Event: Command Status (0x0f) plen 4
+>     Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
+> > HCI Event: Link Key Request (0x17) plen 6
+>     bdaddr 00:02:72:AE:58:73
+> < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+>     bdaddr 00:02:72:AE:58:73 key C6A4D268E42E81CAD233A2C61FA7993A
+> > HCI Event: Command Complete (0x0e) plen 10
+>     Link Key Request Reply (0x01|0x000b) ncmd 1
+>     status 0x00 bdaddr 00:02:72:AE:58:73
+> > HCI Event: Auth Complete (0x06) plen 3
+>     status 0x00 handle 12
+> < HCI Command: Set Connection Encryption (0x01|0x0013) plen 3
+>     handle 12 encrypt 0x01
+> > HCI Event: Command Status (0x0f) plen 4
+>     Set Connection Encryption (0x01|0x0013) status 0x00 ncmd 1
+> > HCI Event: Encrypt Change (0x08) plen 4
+>     status 0x00 handle 12 encrypt 0x01
+> < ACL data: handle 12 flags 0x00 dlen 10
+>     L2CAP(s): Info req: type 2
+> > ACL data: handle 12 flags 0x02 dlen 16
+>     L2CAP(s): Info rsp: type 2 result 0
+>       Extended feature mask 0x00b8
+>         Enhanced Retransmission mode
+>         Streaming mode
+>         FCS Option
+>         Fixed Channels
+> < ACL data: handle 12 flags 0x00 dlen 10
+>     L2CAP(s): Info req: type 3
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 2
+> > ACL data: handle 12 flags 0x02 dlen 20
+>     L2CAP(s): Info rsp: type 3 result 0
+>       Fixed channel list 0x00000002
+>         L2CAP Signalling Channel
+> < ACL data: handle 12 flags 0x00 dlen 12
+>     L2CAP(s): Connect req: psm 15 scid 0x0040
+> > ACL data: handle 12 flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 0
+>       Connection pending - No futher information available
+> > ACL data: handle 12 flags 0x02 dlen 10
+>     L2CAP(s): Info req: type 2
+> < ACL data: handle 12 flags 0x00 dlen 16
+>     L2CAP(s): Info rsp: type 2 result 0
+>       Extended feature mask 0x00b8
+>         Enhanced Retransmission mode
+>         Streaming mode
+>         FCS Option
+>         Fixed Channels
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 2
+> > ACL data: handle 12 flags 0x02 dlen 10
+>     L2CAP(s): Info req: type 3
+> < ACL data: handle 12 flags 0x00 dlen 20
+>     L2CAP(s): Info rsp: type 3 result 0
+>       Fixed channel list 0x00000002
+>         L2CAP Signalling Channel
+> > ACL data: handle 12 flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 2
+>       Connection pending - Authorization pending
+> > ACL data: handle 12 flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 3 status 0
+>       Connection refused - security block
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 1
+> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>     handle 12 reason 0x13
+>     Reason: Remote User Terminated Connection
+> > HCI Event: Command Status (0x0f) plen 4
+>     Disconnect (0x01|0x0006) status 0x00 ncmd 1
+> > HCI Event: Disconn Complete (0x05) plen 4
+>     status 0x00 handle 12 reason 0x16
+>     Reason: Connection Terminated by Local Host
+>
+>
+> ------------------------------------------------------------------------------------- 
+>
+> ------------------------------------------------------------------------------------- 
+>
+>
+> PC2:
+> bluetooth2 ~ # bluez-test-discovery
+> [ 00:02:72:24:02:04 ]
+>     Name = bluetooth1-0
+>     Paired = 1
+>     LegacyPairing = 0
+>     Alias = bluetooth1-0
+>     UUIDs = 
+> dbus.Array([dbus.String(u'00001103-0000-1000-8000-00805f9b34fb'), 
+> dbus.String(u'0000110e-0000-1000-8000-00805f9b34fb'), 
+> dbus.String(u'0000110c-0000-1000-8000-00805f9b34fb'), 
+> dbus.String(u'0000110a-0000-1000-8000-00805f9b34fb'), 
+> dbus.String(u'0000111f-0000-1000-8000-00805f9b34fb'), 
+> dbus.String(u'00001112-0000-1000-8000-00805f9b34fb')], 
+> signature=dbus.Signature('s'), variant_level=1)
+>     Address = 00:02:72:24:02:04
+>     RSSI = -38
+>     Class = 0x4a0100
+>     Trusted = 1
+>     Icon = computer
+>
+> ------------------------------------------------------------------------------------- 
+>
+>
+> bluetooth2 ~ # bluez-test-network 00:02:72:24:02:04 nap
+> Traceback (most recent call last):
+>   File "/usr/bin/bluez-test-network", line 45, in <module>
+>     iface = network.Connect(service)
+>   File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line 68, 
+> in __call__
+>     return self._proxy_method(*args, **keywords)
+>   File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line 143, 
+> in __call__
+>     **keywords)
+>   File "/usr/lib64/python2.7/site-packages/dbus/connection.py", line 
+> 630, in call_blocking
+>     message, timeout)
+> dbus.exceptions.DBusException: 
+> org.freedesktop.DBus.Error.UnknownMethod: Method "Connect" with 
+> signature "s" on interface "org.bluez.Network" doesn't exist
+>
+> ------------------------------------------------------------------------------------- 
+>
+>
+> bluetooth2 ~ # monitor-bluetooth
+>
+> ------------------------------------------------------------------------------------- 
+>
+>
+> bluetooth2 bluetooth # hcidump -i hci0
+> HCI sniffer - Bluetooth packet analyzer ver 2.3
+> device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
+>
+> ------------------------------------------------------------------------------------- 
+>
+> ------------------------------------------------------------------------------------- 
+>
+>
+> monitor and hcidump at bluetooth2 when bluetooth1 tries to connect:
+>
+> bluetooth2 ~ # monitor-bluetooth
+> {Device.PropertyChanged} [/org/bluez/2937/hci0/dev_00_02_72_24_02_04] 
+> Connected = 1
+> {Device.PropertyChanged} [/org/bluez/2937/hci0/dev_00_02_72_24_02_04] 
+> Connected = 0
+>
+> ------------------------------------------------------------------------------------- 
+>
+>
+> bluetooth2 bluetooth # hcidump -i hci0
+> HCI sniffer - Bluetooth packet analyzer ver 2.3
+> device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
+> > HCI Event: Connect Request (0x04) plen 10
+>     bdaddr 00:02:72:24:02:04 class 0x4a0100 type ACL
+> < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+>     bdaddr 00:02:72:24:02:04 role 0x00
+>     Role: Master
+> > HCI Event: Command Status (0x0f) plen 4
+>     Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
+> > HCI Event: Role Change (0x12) plen 8
+>     status 0x00 bdaddr 00:02:72:24:02:04 role 0x00
+>     Role: Master
+> > HCI Event: Connect Complete (0x03) plen 11
+>     status 0x00 handle 12 bdaddr 00:02:72:24:02:04 type ACL encrypt 0x00
+> < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+>     handle 12
+> > HCI Event: Command Status (0x0f) plen 4
+>     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+> > HCI Event: Read Remote Supported Features (0x0b) plen 11
+>     status 0x00 handle 12
+>     Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x79 0x87
+> < HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
+>     handle 12 page 1
+> > HCI Event: Max Slots Change (0x1b) plen 3
+>     handle 12 slots 5
+> > HCI Event: Command Status (0x0f) plen 4
+>     Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
+> > HCI Event: Read Remote Extended Features (0x23) plen 13
+>     status 0x00 handle 12 page 1 max 1
+>     Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
+>     bdaddr 00:02:72:24:02:04 mode 2 clkoffset 0x0000
+> > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> > HCI Event: Remote Name Req Complete (0x07) plen 255
+>     status 0x00 bdaddr 00:02:72:24:02:04 name 'bluetooth1-0'
+> > HCI Event: Link Key Request (0x17) plen 6
+>     bdaddr 00:02:72:24:02:04
+> < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+>     bdaddr 00:02:72:24:02:04 key C6A4D268E42E81CAD233A2C61FA7993A
+> > HCI Event: Command Complete (0x0e) plen 10
+>     Link Key Request Reply (0x01|0x000b) ncmd 1
+>     status 0x00 bdaddr 00:02:72:24:02:04
+> > HCI Event: Encrypt Change (0x08) plen 4
+>     status 0x00 handle 12 encrypt 0x01
+> > ACL data: handle 12 flags 0x02 dlen 10
+>     L2CAP(s): Info req: type 2
+> < ACL data: handle 12 flags 0x00 dlen 16
+>     L2CAP(s): Info rsp: type 2 result 0
+>       Extended feature mask 0x00b8
+>         Enhanced Retransmission mode
+>         Streaming mode
+>         FCS Option
+>         Fixed Channels
+> > ACL data: handle 12 flags 0x02 dlen 10
+>     L2CAP(s): Info req: type 3
+> < ACL data: handle 12 flags 0x00 dlen 20
+>     L2CAP(s): Info rsp: type 3 result 0
+>       Fixed channel list 0x00000002
+>         L2CAP Signalling Channel
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 2
+> > ACL data: handle 12 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 15 scid 0x0040
+> < ACL data: handle 12 flags 0x00 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 0
+>       Connection pending - No futher information available
+> < ACL data: handle 12 flags 0x00 dlen 10
+>     L2CAP(s): Info req: type 2
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 2
+> > ACL data: handle 12 flags 0x02 dlen 16
+>     L2CAP(s): Info rsp: type 2 result 0
+>       Extended feature mask 0x00b8
+>         Enhanced Retransmission mode
+>         Streaming mode
+>         FCS Option
+>         Fixed Channels
+> < ACL data: handle 12 flags 0x00 dlen 10
+>     L2CAP(s): Info req: type 3
+> > ACL data: handle 12 flags 0x02 dlen 20
+>     L2CAP(s): Info rsp: type 3 result 0
+>       Fixed channel list 0x00000002
+>         L2CAP Signalling Channel
+> < ACL data: handle 12 flags 0x00 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 2
+>       Connection pending - Authorization pending
+> < ACL data: handle 12 flags 0x00 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 3 status 0
+>       Connection refused - security block
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 2
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 1
+> > HCI Event: Disconn Complete (0x05) plen 4
+>     status 0x00 handle 12 reason 0x13
+>     Reason: Remote User Terminated Connection
+>
+>
+> -- 
+> To unsubscribe from this list: send the line "unsubscribe 
+> linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
----
- Makefile.tools          |    3 +-
- tools/hciattach.8       |    3 +
- tools/hciattach.c       |   13 ++
- tools/hciattach.h       |    1 +
- tools/hciattach_intel.c |  596 
-+++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 615 insertions(+), 1 deletion(-)
- create mode 100644 tools/hciattach_intel.c
+I dealed the last few days with this problem, but I didn't gained any 
+new information =(
+I really don't know how to fix this problem.
+Why can't I create a connection between my two devices?
+Please help me, I really don't know what to do.
 
-diff --git a/Makefile.tools b/Makefile.tools
-index cb0d1d0..4df7453 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -27,7 +27,8 @@ tools_hciattach_SOURCES = tools/hciattach.c 
-tools/hciattach.h \
- 						tools/hciattach_ti.c \
- 						tools/hciattach_tialt.c \
- 						tools/hciattach_ath3k.c \
--						tools/hciattach_qualcomm.c
-+						tools/hciattach_qualcomm.c \
-+						tools/hciattach_intel.c
- tools_hciattach_LDADD = lib/libbluetooth-private.la
- 
- tools_hciconfig_SOURCES = tools/hciconfig.c tools/csr.h tools/csr.c \
-diff --git a/tools/hciattach.8 b/tools/hciattach.8
-index e0e2730..cc97cad 100644
---- a/tools/hciattach.8
-+++ b/tools/hciattach.8
-@@ -89,6 +89,9 @@ Serial adapters using CSR chips with BCSP serial protocol
- .TP
- .B ath3k
- Atheros AR300x based serial Bluetooth device
-+.TP
-+.B intel
-+Intel Bluetooth device
- .RE
- 
- Supported IDs are (manufacturer id, product id)
-diff --git a/tools/hciattach.c b/tools/hciattach.c
-index e0a9821..3e73956 100644
---- a/tools/hciattach.c
-+++ b/tools/hciattach.c
-@@ -131,6 +131,10 @@ static int uart_speed(int s)
- 	case 3500000:
- 		return B3500000;
- #endif
-+#ifdef B3710000
-+	case 3710000
-+		return B3710000;
-+#endif
- #ifdef B4000000
- 	case 4000000:
- 		return B4000000;
-@@ -322,6 +326,11 @@ static int qualcomm(int fd, struct uart_t *u, struct 
-termios *ti)
- 	return qualcomm_init(fd, u->speed, ti, u->bdaddr);
- }
- 
-+static int intel(int fd, struct uart_t *u, struct termios *ti)
-+{
-+	return intel_init(fd, u->init_speed, &u->speed, ti);
-+}
-+
- static int read_check(int fd, void *buf, int count)
- {
- 	int res;
-@@ -1137,6 +1146,10 @@ struct uart_t uart[] = {
- 	{ "qualcomm",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200,
- 			FLOW_CTL, DISABLE_PM, NULL, qualcomm, NULL },
- 
-+	/* Intel Bluetooth Module */
-+	{ "intel",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200,
-+			FLOW_CTL, DISABLE_PM, NULL, intel, NULL },
-+
- 	{ NULL, 0 }
- };
- 
-diff --git a/tools/hciattach.h b/tools/hciattach.h
-index f8093ff..a24dbc4 100644
---- a/tools/hciattach.h
-+++ b/tools/hciattach.h
-@@ -56,3 +56,4 @@ int ath3k_init(int fd, int speed, int init_speed, char 
-*bdaddr,
- 						struct termios *ti);
- int ath3k_post(int fd, int pm);
- int qualcomm_init(int fd, int speed, struct termios *ti, const char *bdaddr);
-+int intel_init(int fd, int init_speed, int *speed, struct termios *ti);
-diff --git a/tools/hciattach_intel.c b/tools/hciattach_intel.c
-new file mode 100644
-index 0000000..9129993
---- /dev/null
-+++ b/tools/hciattach_intel.c
-@@ -0,0 +1,596 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  
-USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <string.h>
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <sys/param.h>
-+#include <sys/ioctl.h>
-+#include <time.h>
-+
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/hci.h>
-+#include <bluetooth/hci_lib.h>
-+
-+#include "hciattach.h"
-+
-+#ifdef INTEL_DEBUG
-+#define DBGPRINT(fmt, args...)	printf("DBG: " fmt "\n", ## args)
-+#define PRINT_PACKET(buf, len, msg)	{	\
-+	int i;					\
-+	printf("%s\n", msg);			\
-+	for (i = 0; i < len; i++)		\
-+		printf("%02X ", buf[i]);	\
-+	printf("\n");				\
-+	}
-+#else
-+#define DBGPRINT(fmt, args...)
-+#define PRINT_PACKET(buf, len, msg)
-+#endif
-+
-+#define PATCH_SEQ_EXT           ".bseq"
-+#define PATCH_FILE_PATH         "/lib/firmware/intel/"
-+#define PATCH_MAX_LEN           260
-+#define PATCH_TYPE_CMD          1
-+#define PATCH_TYPE_EVT          2
-+
-+#define INTEL_VER_PARAM_LEN     9
-+#define INTEL_MFG_PARAM_LEN     2
-+
-+/**
-+ * A data structure for a patch entry.
-+ */
-+struct patch_entry {
-+	int type;
-+	int len;
-+	unsigned char data[PATCH_MAX_LEN];
-+};
-+
-+/**
-+ * A structure for patch context
-+ */
-+struct patch_ctx {
-+	int dev;
-+	int fd;
-+	int patch_error;
-+	int reset_enable_patch;
-+};
-+
-+/**
-+ * Send HCI command to the controller
-+ */
-+static int intel_write_cmd(int dev, unsigned char *buf, int len)
-+{
-+	int ret;
-+
-+	PRINT_PACKET(buf, len, "<----- SEND CMD: ");
-+
-+	ret = write(dev, buf, len);
-+	if (ret < 0)
-+		return -errno;
-+
-+	if (ret != len)
-+		return -1;
-+
-+	return ret;
-+}
-+
-+/**
-+ * Read the event from the controller
-+ */
-+static int intel_read_evt(int dev, unsigned char *buf, int len)
-+{
-+	int ret;
-+
-+	ret = read_hci_event(dev, buf, len);
-+	if (ret < 0)
-+		return -1;
-+
-+	PRINT_PACKET(buf, ret, "-----> READ EVT: ");
-+
-+	return ret;
-+}
-+
-+/**
-+ * Validate HCI events
-+ */
-+static int validate_events(struct patch_entry *event,
-+		struct patch_entry *entry)
-+{
-+	if (event == NULL || entry == NULL) {
-+		DBGPRINT("invalid patch entry parameters");
-+		return -1;
-+	}
-+
-+	if (event->len != entry->len) {
-+		DBGPRINT("lengths are mismatched:[%d|%d]",
-+				event->len, entry->len);
-+		return -1;
-+	}
-+
-+	if (memcmp(event->data, entry->data, event->len)) {
-+		DBGPRINT("data is mismatched");
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * Read the next patch entry one line at a time
-+ */
-+static int get_next_patch_entry(int fd, struct patch_entry *entry)
-+{
-+	int len, size;
-+	char rb;
-+
-+	if (read(fd, &rb, 1) <= 0)
-+		return 0;
-+
-+	entry->type = rb;
-+	len = 0;
-+
-+	switch (entry->type) {
-+	case PATCH_TYPE_CMD:
-+		entry->data[0] = HCI_COMMAND_PKT;
-+
-+		if (read(fd, &entry->data[1], 3) < 0)
-+			return -1;
-+
-+		size = (int)entry->data[3];
-+
-+		if (read(fd, &entry->data[4], size) < 0)
-+			return -1;
-+
-+		entry->len = HCI_TYPE_LEN + HCI_COMMAND_HDR_SIZE + size;
-+
-+		break;
-+
-+	case PATCH_TYPE_EVT:
-+		entry->data[0] = HCI_EVENT_PKT;
-+
-+		if (read(fd, &entry->data[len], 2) < 0)
-+			return -1;
-+
-+		size = (int)entry->data[2];
-+
-+		if (read(fd, &entry->data[3], size) < 0)
-+			return -1;
-+
-+		entry->len = HCI_TYPE_LEN + HCI_EVENT_HDR_SIZE + size;
-+
-+		break;
-+
-+	default:
-+		fprintf(stderr, "invalid patch entry(%d)\n", entry->type);
-+		return -1;
-+	}
-+
-+	return len;
-+}
-+
-+/**
-+ * Download the patch set to the controller and verify the event
-+ */
-+static int intel_download_patch(struct patch_ctx *ctx)
-+{
-+	int ret;
-+	struct patch_entry entry;
-+	struct patch_entry event;
-+
-+	DBGPRINT("start patch downloading");
-+
-+	do {
-+		ret = get_next_patch_entry(ctx->fd, &entry);
-+		if (ret <= 0) {
-+			ctx->patch_error = 1;
-+			break;
-+		}
-+
-+		switch (entry.type) {
-+		case PATCH_TYPE_CMD:
-+			ret = intel_write_cmd(ctx->dev,
-+					entry.data,
-+					entry.len);
-+			if (ret <= 0) {
-+				fprintf(stderr, "failed to send cmd(%d)\n",
-+						ret);
-+				return ret;
-+			}
-+			break;
-+
-+		case PATCH_TYPE_EVT:
-+			ret = intel_read_evt(ctx->dev, event.data,
-+					sizeof(event.data));
-+			if (ret <= 0) {
-+				fprintf(stderr, "failed to read evt(%d)\n",
-+						ret);
-+				return ret;
-+			}
-+			event.len = ret;
-+
-+			if (validate_events(&event, &entry) < 0) {
-+				DBGPRINT("events are mismatched");
-+				ctx->patch_error = 1;
-+				return -1;
-+			}
-+			break;
-+
-+		default:
-+			fprintf(stderr, "unknown patch type(%d)\n",
-+					entry.type);
-+			return -1;
-+		}
-+	} while (1);
-+
-+	return ret;
-+}
-+
-+static int open_patch_file(struct patch_ctx *ctx, char *fw_ver)
-+{
-+	char patch_file[PATH_MAX];
-+
-+	snprintf(patch_file, PATH_MAX, "%s%s%s", PATCH_FILE_PATH,
-+			fw_ver, PATCH_SEQ_EXT);
-+	DBGPRINT("PATCH_FILE: %s", patch_file);
-+
-+	ctx->fd = open(patch_file, O_RDONLY);
-+	if (ctx->fd < 0) {
-+		DBGPRINT("cannot open patch file. go to post patch");
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * Prepare the controller for patching.
-+ */
-+static int pre_patch(struct patch_ctx *ctx)
-+{
-+	int ret, i;
-+	struct patch_entry entry;
-+	char fw_ver[INTEL_VER_PARAM_LEN * 2];
-+
-+	DBGPRINT("start pre_patch");
-+
-+	entry.data[0] = HCI_COMMAND_PKT;
-+	entry.data[1] = 0x11;
-+	entry.data[2] = 0xFC;
-+	entry.data[3] = 0x02;
-+	entry.data[4] = 0x01;
-+	entry.data[5] = 0x00;
-+	entry.len = HCI_TYPE_LEN + HCI_COMMAND_HDR_SIZE + INTEL_MFG_PARAM_LEN;
-+
-+	ret = intel_write_cmd(ctx->dev, entry.data, entry.len);
-+	if (ret < 0) {
-+		fprintf(stderr, "failed to send cmd(%d)\n", ret);
-+		return ret;
-+	}
-+
-+	ret = intel_read_evt(ctx->dev, entry.data, sizeof(entry.data));
-+	if (ret < 0) {
-+		fprintf(stderr, "failed to read evt(%d)\n", ret);
-+		return ret;
-+	}
-+	entry.len = ret;
-+
-+	if (entry.data[6] != 0x00) {
-+		DBGPRINT("command failed. status=%02x", entry.data[6]);
-+		ctx->patch_error = 1;
-+		return -1;
-+	}
-+
-+	entry.data[0] = HCI_COMMAND_PKT;
-+	entry.data[1] = 0x05;
-+	entry.data[2] = 0xFC;
-+	entry.data[3] = 0x00;
-+	entry.len = HCI_TYPE_LEN + HCI_COMMAND_HDR_SIZE;
-+
-+	ret = intel_write_cmd(ctx->dev, entry.data, entry.len);
-+	if (ret < 0) {
-+		fprintf(stderr, "failed to send cmd(%d)\n", ret);
-+		return ret;
-+	}
-+
-+	ret = intel_read_evt(ctx->dev, entry.data, sizeof(entry.data));
-+	if (ret < 0) {
-+		fprintf(stderr, "failed to read evt(%d)\n", ret);
-+		return ret;
-+	}
-+	entry.len = ret;
-+
-+	if (entry.data[6] != 0x00) {
-+		DBGPRINT("command failed. status=%02x", entry.data[6]);
-+		ctx->patch_error = 1;
-+		return -1;
-+	}
-+
-+	for (i = 0; i < INTEL_VER_PARAM_LEN; i++)
-+		sprintf(&fw_ver[i*2], "%02x", entry.data[7+i]);
-+
-+	if (open_patch_file(ctx, fw_ver) < 0) {
-+		ctx->patch_error = 1;
-+		return -1;
-+	}
-+
-+	return ret;
-+}
-+
-+/*
-+ * check the event is startup event
-+ */
-+static int is_startup_evt(unsigned char *buf)
-+{
-+	if (buf[1] == 0xFF && buf[2] == 0x01 && buf[3] == 0x00)
-+		return 1;
-+
-+	return 0;
-+}
-+
-+/**
-+ * Finalize the patch process and reset the controller
-+ */
-+static int post_patch(struct patch_ctx *ctx)
-+{
-+	int ret;
-+	struct patch_entry entry;
-+
-+	DBGPRINT("start post_patch");
-+
-+	entry.data[0] = HCI_COMMAND_PKT;
-+	entry.data[1] = 0x11;
-+	entry.data[2] = 0xFC;
-+	entry.data[3] = 0x02;
-+	entry.data[4] = 0x00;
-+	if (ctx->reset_enable_patch)
-+		entry.data[5] = 0x02;
-+	else
-+		entry.data[5] = 0x01;
-+
-+	entry.len = HCI_TYPE_LEN + HCI_COMMAND_HDR_SIZE + INTEL_MFG_PARAM_LEN;
-+
-+	ret = intel_write_cmd(ctx->dev, entry.data, entry.len);
-+	if (ret < 0) {
-+		fprintf(stderr, "failed to send cmd(%d)\n", ret);
-+		return ret;
-+	}
-+
-+	ret = intel_read_evt(ctx->dev, entry.data, sizeof(entry.data));
-+	if (ret < 0) {
-+		fprintf(stderr, "failed to read evt(%d)\n", ret);
-+		return ret;
-+	}
-+	entry.len = ret;
-+
-+	if (entry.data[6] != 0x00) {
-+		fprintf(stderr, "cmd failed. st=%02x\n", entry.data[6]);
-+		return -1;
-+	}
-+
-+	do {
-+		ret = intel_read_evt(ctx->dev, entry.data,
-+					sizeof(entry.data));
-+		if (ret < 0) {
-+			fprintf(stderr, "failed to read cmd(%d)\n", ret);
-+			return ret;
-+		}
-+		entry.len = ret;
-+	} while (!is_startup_evt(entry.data));
-+
-+	return ret;
-+}
-+
-+/**
-+ * Main routine that handles the device patching process.
-+ */
-+static int intel_patch_device(struct patch_ctx *ctx)
-+{
-+	int ret;
-+
-+	ret = pre_patch(ctx);
-+	if (ret < 0) {
-+		if (!ctx->patch_error) {
-+			fprintf(stderr, "I/O error: pre_patch failed\n");
-+			return ret;
-+		}
-+
-+		DBGPRINT("patch failed. proceed to post patch");
-+		goto post_patch;
-+	}
-+
-+	ret = intel_download_patch(ctx);
-+	if (ret < 0) {
-+		if (!ctx->patch_error) {
-+			fprintf(stderr, "I/O error: download_patch failed\n");
-+			close(ctx->fd);
-+			return ret;
-+		}
-+	} else {
-+		DBGPRINT("patch done");
-+		ctx->reset_enable_patch = 1;
-+	}
-+
-+	close(ctx->fd);
-+
-+post_patch:
-+	ret = post_patch(ctx);
-+	if (ret < 0) {
-+		fprintf(stderr, "post_patch failed(%d)\n", ret);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int set_rts(int dev, int rtsval)
-+{
-+	int arg;
-+
-+	if (ioctl(dev, TIOCMGET, &arg) < 0) {
-+		perror("cannot get TIOCMGET");
-+		return -errno;
-+	}
-+	if (rtsval)
-+		arg |= TIOCM_RTS;
-+	else
-+		arg &= ~TIOCM_RTS;
-+
-+	if (ioctl(dev, TIOCMSET, &arg) == -1) {
-+		perror("cannot set TIOCMGET");
-+		return -errno;
-+	}
-+
-+	return 0;
-+}
-+
-+static unsigned char get_intel_speed(int speed)
-+{
-+	switch (speed) {
-+	case 9600:
-+		return 0x00;
-+	case 19200:
-+		return 0x01;
-+	case 38400:
-+		return 0x02;
-+	case 57600:
-+		return 0x03;
-+	case 115200:
-+		return 0x04;
-+	case 230400:
-+		return 0x05;
-+	case 460800:
-+		return 0x06;
-+	case 921600:
-+		return 0x07;
-+	case 1843200:
-+		return 0x08;
-+	case 3250000:
-+		return 0x09;
-+	case 2000000:
-+		return 0x0A;
-+	case 3000000:
-+		return 0x0B;
-+	default:
-+		return 0xFF;
-+	}
-+}
-+
-+/**
-+ * if it failed to change to new baudrate, it will rollback
-+ * to initial baudrate
-+ */
-+static int change_baudrate(int dev, int init_speed, int *speed,
-+				struct termios *ti)
-+{
-+	int ret;
-+	unsigned char br;
-+	unsigned char cmd[5];
-+	unsigned char evt[7];
-+
-+	DBGPRINT("start baudrate change");
-+
-+	ret = set_rts(dev, 0);
-+	if (ret < 0) {
-+		fprintf(stderr, "failed to clear RTS\n");
-+		return ret;
-+	}
-+
-+	cmd[0] = HCI_COMMAND_PKT;
-+	cmd[1] = 0x06;
-+	cmd[2] = 0xFC;
-+	cmd[3] = 0x01;
-+
-+	br = get_intel_speed(*speed);
-+	if (br == 0xFF) {
-+		fprintf(stderr, "speed %d is not supported\n", *speed);
-+		return -1;
-+	}
-+	cmd[4] = br;
-+
-+	ret = intel_write_cmd(dev, cmd, sizeof(cmd));
-+	if (ret < 0) {
-+		fprintf(stderr, "failed to send cmd(%d)\n", ret);
-+		return ret;
-+	}
-+
-+	/*
-+	 *  wait for buffer to be consumed by the controller
-+	 */
-+	usleep(300000);
-+
-+	if (set_speed(dev, ti, *speed) < 0) {
-+		fprintf(stderr, "can't set to new baud rate\n");
-+		return -1;
-+	}
-+
-+	ret = set_rts(dev, 1);
-+	if (ret < 0) {
-+		fprintf(stderr, "failed to set RTS\n");
-+		return ret;
-+	}
-+
-+	ret = intel_read_evt(dev, evt, sizeof(evt));
-+	if (ret < 0) {
-+		fprintf(stderr, "failed to read evt(%d)\n", ret);
-+		return ret;
-+	}
-+
-+	if (evt[4] != 0x00) {
-+		fprintf(stderr,
-+			"failed to change speed. use default speed %d\n",
-+			init_speed);
-+		*speed = init_speed;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * An entry point for Intel specific initialization
-+ */
-+int intel_init(int dev, int init_speed, int *speed, struct termios *ti)
-+{
-+	int ret = 0;
-+	struct patch_ctx ctx;
-+
-+	if (change_baudrate(dev, init_speed, speed, ti) < 0)
-+		return -1;
-+
-+	ctx.dev = dev;
-+	ctx.patch_error = 0;
-+	ctx.reset_enable_patch = 0;
-+
-+	ret = intel_patch_device(&ctx);
-+	if (ret < 0)
-+		fprintf(stderr, "failed to initialize the device");
-+
-+	return ret;
-+}
--- 
-1.7.9.5
-
-
--- 
-Regards
-Tedd Ho-Jeong An
-Intel Corporation
+Regards,
+Steffen
