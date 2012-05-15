@@ -1,34 +1,22 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 May 2012 10:22:05 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	pkrystad@codeaurora.org
-Subject: Re: [PATCH] Bluetooth: Initialize the transmit queue for L2CAP
- streaming mode
-Message-ID: <20120515072203.GA31087@aemeltch-MOBL1>
-References: <1337032167-30454-1-git-send-email-mathewm@codeaurora.org>
+Message-ID: <4FB20159.5040102@monom.org>
+Date: Tue, 15 May 2012 09:10:17 +0200
+From: Daniel Wagner <wagi@monom.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337032167-30454-1-git-send-email-mathewm@codeaurora.org>
+To: "Zhang, Jingke" <jingke.zhang@intel.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Bluez/Obexd upstream test result_20120515
+References: <8C91AD8ED4077A4786B34154085899251024A31C@SHSMSX102.ccr.corp.intel.com> <4FB1FB3F.1030506@monom.org> <8C91AD8ED4077A4786B34154085899251024A3A8@SHSMSX102.ccr.corp.intel.com>
+In-Reply-To: <8C91AD8ED4077A4786B34154085899251024A3A8@SHSMSX102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi,
 
-On Mon, May 14, 2012 at 02:49:27PM -0700, Mat Martineau wrote:
-> Commit 105bdf9ec19e729bacdb33861c74fcf3eb39eb37 introduced a
-> regression in L2CAP streaming mode due to rearranged initialization
-> code that is shared between ERTM and streaming mode.  This change
-> makes sure the transmit queue is initialized in both modes.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> I change the bug security options, please check again. Thanks for your comments. 
 
-This one I did not test yet.
+All except 25115 25113 25103 25102 are accessible.
 
-Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com> 
-
-Best regards 
-Andrei Emeltchenko 
-
-
+Thanks,
+Daniel
