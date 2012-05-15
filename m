@@ -1,55 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 15 May 2012 10:38:40 +0300
+From: Johan Hedberg <johan.hedberg@intel.com>
+To: "Zhang, Jingke" <jingke.zhang@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Bluez/Obexd upstream test result_20120515
+Message-ID: <20120515073840.GA19367@x220>
+References: <8C91AD8ED4077A4786B34154085899251024A31C@SHSMSX102.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1336135178-21707-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1336135178-21707-1-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Tue, 15 May 2012 10:44:25 +0300
-Message-ID: <CABBYNZKNDyRcmNtWCJpe8QAkgF7_hDNANrzWP1wqWhTGGqpcNg@mail.gmail.com>
-Subject: Re: [PATCH obexd v0 0/6] Create transfers in modules
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <8C91AD8ED4077A4786B34154085899251024A31C@SHSMSX102.ccr.corp.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Jingke,
 
-On Fri, May 4, 2012 at 3:39 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> This patch series changes the way transfers are created, as discussed in IRC. Instead of having the session API offer all common operations, the modules now use the transfer API directly, and then queue the transfer in the session using obc_session_queue().
->
-> The motivation behind this change is that the transfer-initiator module needs to have access to the created object, to be able to access some member variables. This is required for the D-Bus changes in the pipeline.
->
-> Another alternative to this patch series would be to simply return the transfer pointer in the session API for functions such as obc_session_get(). IMO this would actually be better.
->
-> Please review the changes with care (specially patch 6/6) since there is a lot of code rewrite.
->
-> Mikel Astiz (6):
->  client: Fix possible double free of params
->  client: Split internal obc_transfer_register()
->  client: Transfer API splits create and register
->  client: Buffer-passing changes in transfer API
->  client: Flip parameter order in transfer API
->  client: Create transfers in modules
->
->  client/ftp.c      |   25 +++++++---
->  client/manager.c  |   24 +++++++---
->  client/map.c      |   18 ++++---
->  client/pbap.c     |   30 +++++++-----
->  client/session.c  |  130 +++++++++++++----------------------------------------
->  client/session.h  |   17 ++-----
->  client/sync.c     |   20 +++++---
->  client/transfer.c |   83 +++++++++++++++++----------------
->  client/transfer.h |   27 +++++-------
->  9 files changed, 163 insertions(+), 211 deletions(-)
->
-> --
-> 1.7.7.6
+On Tue, May 15, 2012, Zhang, Jingke wrote:
+> https://bugs.meego.com/show_bug.cgi?id=25111 upstream bluez configure
+> parameter needs VDP profile enabled Does upstream bluez support VDP
+> profile?
 
-All 6 patches are now upstream.
+BlueZ doesn't support VDP so this bug doesn't seem valid, and even if it
+did support it configure script options and config file settings are a
+packaging issue, i.e. not upstream related.
 
-
--- 
-Luiz Augusto von Dentz
+Johan
