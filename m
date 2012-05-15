@@ -1,22 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4FB20159.5040102@monom.org>
-Date: Tue, 15 May 2012 09:10:17 +0200
-From: Daniel Wagner <wagi@monom.org>
-MIME-Version: 1.0
-To: "Zhang, Jingke" <jingke.zhang@intel.com>
+From: "Zhang, Jingke" <jingke.zhang@intel.com>
+To: Daniel Wagner <wagi@monom.org>
 CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Bluez/Obexd upstream test result_20120515
-References: <8C91AD8ED4077A4786B34154085899251024A31C@SHSMSX102.ccr.corp.intel.com> <4FB1FB3F.1030506@monom.org> <8C91AD8ED4077A4786B34154085899251024A3A8@SHSMSX102.ccr.corp.intel.com>
-In-Reply-To: <8C91AD8ED4077A4786B34154085899251024A3A8@SHSMSX102.ccr.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: RE: Bluez/Obexd upstream test result_20120515
+Date: Tue, 15 May 2012 06:54:12 +0000
+Message-ID: <8C91AD8ED4077A4786B34154085899251024A3A8@SHSMSX102.ccr.corp.intel.com>
+References: <8C91AD8ED4077A4786B34154085899251024A31C@SHSMSX102.ccr.corp.intel.com>
+ <4FB1FB3F.1030506@monom.org>
+In-Reply-To: <4FB1FB3F.1030506@monom.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-> I change the bug security options, please check again. Thanks for your comments. 
-
-All except 25115 25113 25103 25102 are accessible.
-
-Thanks,
-Daniel
+SGkgRGFuaWVsLA0KSSBjaGFuZ2UgdGhlIGJ1ZyBzZWN1cml0eSBvcHRpb25zLCBwbGVhc2UgY2hl
+Y2sgYWdhaW4uIFRoYW5rcyBmb3IgeW91ciBjb21tZW50cy4gDQoNCi0tLS0tT3JpZ2luYWwgTWVz
+c2FnZS0tLS0tDQpGcm9tOiBEYW5pZWwgV2FnbmVyIFttYWlsdG86d2FnaUBtb25vbS5vcmddIA0K
+U2VudDogVHVlc2RheSwgTWF5IDE1LCAyMDEyIDI6NDQgUE0NClRvOiBaaGFuZywgSmluZ2tlDQpD
+YzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogUmU6IEJsdWV6L09i
+ZXhkIHVwc3RyZWFtIHRlc3QgcmVzdWx0XzIwMTIwNTE1DQoNCkhpLA0KDQpPbiAwNS8xNS8yMDEy
+IDA1OjE3IEFNLCBaaGFuZywgSmluZ2tlIHdyb3RlOg0KPiBIaSBhbGwsDQo+IFRoaXMgaXMgdGVz
+dCByZXBvcnQgZm9yIGJsdWV6LTQuOTkuMTM4LmdhNTIxNTQwIGFuZCBvYmV4ZC0wLjQ1LjQwLmcw
+ZjI1MzE0LiANCg0KVGhhbmtzIGZvciB0aGUgcmVwb3J0LiBJIGhhdmUgdHJpZWQgdG8gYWNjZXNz
+IGEgZmV3IG9mIHRoZSBidWdzLm1lZWdvLmNvbSBsaW5rcy4gSXQgc2VlbXMgdGhleSBhcmUgbm90
+IGZyZWVseSBhY2Nlc3NpYmxlOg0KDQoiWW91IGFyZSBub3QgYXV0aG9yaXplZCB0byBhY2Nlc3Mg
+YnVnICMyNTEwNy4gVG8gc2VlIHRoaXMgYnVnLCB5b3UgbXVzdCBmaXJzdCBsb2cgaW4gdG8gYW4g
+YWNjb3VudCB3aXRoIHRoZSBhcHByb3ByaWF0ZSBwZXJtaXNzaW9ucy4iDQoNCkNvdWxkIHlvdSBj
+aGFuZ2UgdGhhdD8NCg0KY2hlZXJzLA0KZGFuaWVsDQo=
