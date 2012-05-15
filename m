@@ -1,37 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 1/2] bluetooth: Fix not setting port to 0 when listen fails
-Date: Tue, 15 May 2012 19:16:45 +0300
-Message-Id: <1337098606-5710-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 15 May 2012 09:09:43 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Gustavo Padovan <gustavo@padovan.org>
+cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix wrong set of skb fragments
+In-Reply-To: <1337097436-4099-1-git-send-email-gustavo@padovan.org>
+Message-ID: <alpine.DEB.2.02.1205150903110.2063@mathewm-linux>
+References: <1337097436-4099-1-git-send-email-gustavo@padovan.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-With some only kernels auto assigning psm seem to fail, leaving the psm
-with wrong value:
+Gustavo -
 
-obexd[2930]: plugins/bluetooth.c:start() listening on channel 9
-obexd[2930]: bluetooth: unable to listen in psm 65535
-obexd[2930]: plugins/bluetooth.c:start() listening on channel 10
-obexd[2930]: bluetooth: unable to listen in psm 65535
----
- plugins/bluetooth.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+On Tue, 15 May 2012, Gustavo Padovan wrote:
 
-diff --git a/plugins/bluetooth.c b/plugins/bluetooth.c
-index aab50fd..79de9a2 100644
---- a/plugins/bluetooth.c
-+++ b/plugins/bluetooth.c
-@@ -607,6 +607,7 @@ static GSList *start(struct obex_server *server,
- 		error("bluetooth: unable to listen in psm %d: %s",
- 				service->port, err->message);
- 		g_error_free(err);
-+		service->port = 0;
- 	} else {
- 		l = g_slist_prepend(l, io);
- 		bt_io_get(io, BT_IO_L2CAP, &err, BT_IO_OPT_PSM, &service->port,
--- 
-1.7.7.6
+> If alloc() fails we let the frags linked list with garbage value(the err
+> ptr value) in its last element.
+
+Change "let" to "left", maybe?  Also missing a space after the first 
+"value".
+
+> Reported-by: Mat Martineau <mathewm@codeaurora.org>
+> Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
+> ---
+> net/bluetooth/l2cap_core.c |   10 +++++++---
+> 1 file changed, 7 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 869beb3..8c8a803 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1836,13 +1836,17 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
+> 	/* Continuation fragments (no L2CAP header) */
+> 	frag = &skb_shinfo(skb)->frag_list;
+> 	while (len) {
+> +		struct sk_buff *tmp;
+> +
+> 		count = min_t(unsigned int, conn->mtu, len);
+>
+> -		*frag = chan->ops->alloc_skb(chan, count,
+> +		tmp = chan->ops->alloc_skb(chan, count,
+> 					     msg->msg_flags & MSG_DONTWAIT);
+
+Fix up the alignment of the continuation line here.
+
+> +		if (IS_ERR(tmp))
+> +			return PTR_ERR(tmp);
+> +
+> +		*frag = tmp;
+>
+> -		if (IS_ERR(*frag))
+> -			return PTR_ERR(*frag);
+> 		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
+> 			return -EFAULT;
+>
+> -- 
+> 1.7.10.1
+
+Other than that, it looks good to me!
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
