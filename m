@@ -1,39 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 May 2012 20:01:06 +0200
-From: Pavel Machek <pavel@ucw.cz>
-To: Oliver Neukum <oneukum@suse.de>
-Cc: "Rafael J. Wysocki" <rjw@sisk.pl>,
-	kernel list <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	gustavo@padovan.org, johan.hedberg@gmail.com
-Subject: Re: 3.4.0-rc7 regression: bluetooth vs. s2ram
-Message-ID: <20120515180105.GA1923@elf.ucw.cz>
-References: <20120515131453.GA1936@elf.ucw.cz>
- <201205151529.01603.oneukum@suse.de>
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: Johan Hedberg <johan.hedberg@intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] hciattach: Add support for Intel Bluetooth device
+Date: Tue, 15 May 2012 10:26:40 -0700
+Message-ID: <1507913.3W6pHHIlAc@tedd-ubuntu>
+In-Reply-To: <20120515074634.GA19482@x220>
+References: <32612923.A9jgX3dogm@tedd-ubuntu> <1337044988.5970.244.camel@aeonflux> <20120515074634.GA19482@x220>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <201205151529.01603.oneukum@suse.de>
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue 2012-05-15 15:29:01, Oliver Neukum wrote:
-> Am Dienstag, 15. Mai 2012, 15:14:57 schrieb Pavel Machek:
-> > If I suspend without bnep0 active, resume works. 
-> > 
-> > (This has worked before, but "before" may mean 3.2 in this case).
-> > 
-> > Can someone test/reproduce this? Ideas?
-> > 
-> > PS: Under normal suspend/resume, I see these warnings in the
-> > log. Maybe relevant?
+Johan.
+
+I just sent a patch via "git send-email". I hope this will work at this time.
+
+Thanks.
+
+Tedd
+
+On Tuesday, May 15, 2012 10:46:34 AM Johan Hedberg wrote:
+> Hi Marcel,
 > 
-> Most likely. Something has introduced a bug that crashes if the controller
-> over which a bnep is run is getting away. Does it survive a surprise removal
-> of the BT device while bnep is up?
-
-No, it does not. If I turn off hardware radio kill switch, machine
-dies in the same way. So not just sleep related...
-									Pavel
-
+> On Mon, May 14, 2012, Marcel Holtmann wrote:
+> > > This patch enables the Intel Bluetooth device (UART sku) over the H4 protocol.
+> > > It is responsible for bring up the device into known state by configuring
+> > > the baudrate and applying the patches, if required.
+> > > 
+> > > ---
+> > >  Makefile.tools          |    3 +-
+> > >  tools/hciattach.8       |    3 +
+> > >  tools/hciattach.c       |   13 ++
+> > >  tools/hciattach.h       |    1 +
+> > >  tools/hciattach_intel.c |  596 
+> > > +++++++++++++++++++++++++++++++++++++++++++++++
+> > >  5 files changed, 615 insertions(+), 1 deletion(-)
+> > >  create mode 100644 tools/hciattach_intel.c
+> > 
+> > looks good to me.
+> > 
+> > Johan, feel free to apply this patch.
+> 
+> Looks ok to me too, except that it doesn't apply:
+> 
+> Applying: hciattach: Add support for Intel Bluetooth device
+> fatal: corrupt patch at line 16
+> Patch failed at 0001 hciattach: Add support for Intel Bluetooth device
+> 
+> As you can see even from the diffstat Tedd's email client is splitting
+> long lines. Please try to use git send-email to resend or fix your mail
+> client not to mangle the patch.
+> 
+> Johan
 -- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+Regards
+Tedd Ho-Jeong An
+Intel Corporation
