@@ -1,46 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix wrong set of skb fragments
-Date: Tue, 15 May 2012 12:57:16 -0300
-Message-Id: <1337097436-4099-1-git-send-email-gustavo@padovan.org>
+MIME-Version: 1.0
+In-Reply-To: <CANT-zCVAD0H7akcDZSeNaPjJ3u9Vbw9BEKm-A08Rva9M7ACCSw@mail.gmail.com>
+References: <1337009699-19831-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<CAJdJm_MVPxMp9QG9_CBmGn0YeMc_Hbhiipy+brSXsqjMzFuRjA@mail.gmail.com>
+	<CANT-zCVAD0H7akcDZSeNaPjJ3u9Vbw9BEKm-A08Rva9M7ACCSw@mail.gmail.com>
+Date: Tue, 15 May 2012 11:24:22 -0400
+Message-ID: <CAJdJm_ODjiGv2-OTXpxA51+jkafbvWLcrSWLpvaa-UcL5G1fHA@mail.gmail.com>
+Subject: Re: [RFC v0] Bluetooth: mgmt: Add device disconnect reason
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If alloc() fails we let the frags linked list with garbage value(the err
-ptr value) in its last element.
+Hi Mikel,
 
-Reported-by: Mat Martineau <mathewm@codeaurora.org>
-Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
----
- net/bluetooth/l2cap_core.c |   10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+On Tue, May 15, 2012 at 11:03 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> Hi Lizardo,
+>
+> On Tue, May 15, 2012 at 4:15 PM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+>> Hi Mikel,
+>>
+>> On Mon, May 14, 2012 at 11:34 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>>> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>>>
+>>> MGMT_EV_DEVICE_DISCONNECTED should expose the disconnection reason to
+>>> userland.
+>>
+>> There is "getsockopt(sock, SOL_SOCKET, SO_ERROR, &sk_err, &len)". Why
+>> is it not enough?
+>
+> Could you please be more specific? Which socket type exposes this
+> disconnect reason?
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 869beb3..8c8a803 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1836,13 +1836,17 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
- 	/* Continuation fragments (no L2CAP header) */
- 	frag = &skb_shinfo(skb)->frag_list;
- 	while (len) {
-+		struct sk_buff *tmp;
-+
- 		count = min_t(unsigned int, conn->mtu, len);
- 
--		*frag = chan->ops->alloc_skb(chan, count,
-+		tmp = chan->ops->alloc_skb(chan, count,
- 					     msg->msg_flags & MSG_DONTWAIT);
-+		if (IS_ERR(tmp))
-+			return PTR_ERR(tmp);
-+
-+		*frag = tmp;
- 
--		if (IS_ERR(*frag))
--			return PTR_ERR(*frag);
- 		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
- 			return -EFAULT;
- 
+It's L2CAP. Not sure about other socket types (I didn't check them).
+BlueZ already uses it in some places (grep for "SO_ERROR"), and we use
+it on GATT code for exactly the same reason you describe (many GATT
+profiles describe specific behavior depending on disconnect reason
+being timeout or not)
+
+Regards,
 -- 
-1.7.10.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
