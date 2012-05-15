@@ -1,29 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Zhang, Jingke" <jingke.zhang@intel.com>
-To: Daniel Wagner <wagi@monom.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Bluez/Obexd upstream test result_20120515
-Date: Tue, 15 May 2012 06:54:12 +0000
-Message-ID: <8C91AD8ED4077A4786B34154085899251024A3A8@SHSMSX102.ccr.corp.intel.com>
-References: <8C91AD8ED4077A4786B34154085899251024A31C@SHSMSX102.ccr.corp.intel.com>
- <4FB1FB3F.1030506@monom.org>
-In-Reply-To: <4FB1FB3F.1030506@monom.org>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <CABBYNZKyPPb=Ov+6p6-9PUY6nrBTD1M_Ew9YeF_cxt8OQ5x85Q@mail.gmail.com>
+References: <1337009584-17181-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<CABBYNZKyPPb=Ov+6p6-9PUY6nrBTD1M_Ew9YeF_cxt8OQ5x85Q@mail.gmail.com>
+Date: Tue, 15 May 2012 08:46:35 +0200
+Message-ID: <CANT-zCU-CTWq-9ZR+YQQfuQWKHnxut_dXBA1Cpna9vTJvO5J9w@mail.gmail.com>
+Subject: Re: [RFC BlueZ v0 0/5] ACL disconnect reason
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgRGFuaWVsLA0KSSBjaGFuZ2UgdGhlIGJ1ZyBzZWN1cml0eSBvcHRpb25zLCBwbGVhc2UgY2hl
-Y2sgYWdhaW4uIFRoYW5rcyBmb3IgeW91ciBjb21tZW50cy4gDQoNCi0tLS0tT3JpZ2luYWwgTWVz
-c2FnZS0tLS0tDQpGcm9tOiBEYW5pZWwgV2FnbmVyIFttYWlsdG86d2FnaUBtb25vbS5vcmddIA0K
-U2VudDogVHVlc2RheSwgTWF5IDE1LCAyMDEyIDI6NDQgUE0NClRvOiBaaGFuZywgSmluZ2tlDQpD
-YzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogUmU6IEJsdWV6L09i
-ZXhkIHVwc3RyZWFtIHRlc3QgcmVzdWx0XzIwMTIwNTE1DQoNCkhpLA0KDQpPbiAwNS8xNS8yMDEy
-IDA1OjE3IEFNLCBaaGFuZywgSmluZ2tlIHdyb3RlOg0KPiBIaSBhbGwsDQo+IFRoaXMgaXMgdGVz
-dCByZXBvcnQgZm9yIGJsdWV6LTQuOTkuMTM4LmdhNTIxNTQwIGFuZCBvYmV4ZC0wLjQ1LjQwLmcw
-ZjI1MzE0LiANCg0KVGhhbmtzIGZvciB0aGUgcmVwb3J0LiBJIGhhdmUgdHJpZWQgdG8gYWNjZXNz
-IGEgZmV3IG9mIHRoZSBidWdzLm1lZWdvLmNvbSBsaW5rcy4gSXQgc2VlbXMgdGhleSBhcmUgbm90
-IGZyZWVseSBhY2Nlc3NpYmxlOg0KDQoiWW91IGFyZSBub3QgYXV0aG9yaXplZCB0byBhY2Nlc3Mg
-YnVnICMyNTEwNy4gVG8gc2VlIHRoaXMgYnVnLCB5b3UgbXVzdCBmaXJzdCBsb2cgaW4gdG8gYW4g
-YWNjb3VudCB3aXRoIHRoZSBhcHByb3ByaWF0ZSBwZXJtaXNzaW9ucy4iDQoNCkNvdWxkIHlvdSBj
-aGFuZ2UgdGhhdD8NCg0KY2hlZXJzLA0KZGFuaWVsDQo=
+Hi Luiz,
+
+On Mon, May 14, 2012 at 7:00 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Mikel,
+>
+> On Mon, May 14, 2012 at 6:32 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>>
+>> Some use-cases require distinguishing the reason behind an ACL disconnection. Particularly, IVI use-cases regarding HFP and A2DP need to know if a disconnection was due to a timeout, in order to know which should be the reconnection strategy.
+>
+> Afaik there is only one use case which is link loss aka out of range,
+> because of that carkit/headset policy is normally clean disconnect do
+> not reconnect, non-clean disconnect do reconnect.
+
+Right, with a few exceptions including clean disconnection during
+head-unit shutdown.
+
+>>
+>> This information needs to be exposed to some component implementing the specific policy of each application. Typically neither BlueZ or oFono (in case of HFP) would be the case. This means the disconnect reason needs to be exposed in D-Bus.
+>>
+>> In this patch series the proposed approach is to add a signal in the device API, given that we already have some low-level disconnection-related API there. Another approach would be to support it in the specific HFP and A2DP interfaces.
+>
+> The disconnect reason might no be necessary, have you thought about
+> implementing the reconnection logic directly in bluetoothd? This way
+> we can test this without the UI, and we know when for example A2DP has
+> disconnect without CLOSE command or things like that and afaik we can
+> query the error from the socket.
+
+The connection/reconnection policy is manufacturer and model-specific.
+Therefore I find it difficult that we could include this inside
+bluetoothd.
+
+Having said that, I would be happy to review any proposal.
+
+> Btw, none of this is useful without tuning the link supervision
+> timeout because the current one used by BlueZ iirc is 20 seconds, far
+> too big for being able to recover the audio.
+
+That should definitely be tuned. However it's not always about
+recovering audio, but knowing to which phone the car should connect.
+With HFP there might be no audio and no voicecall during connection.
+
+Cheers,
+
+Mikel
