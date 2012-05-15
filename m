@@ -1,31 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 May 2012 10:54:08 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: "Zhang, Jingke" <jingke.zhang@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Bluez/Obexd upstream test result_20120515
-Message-ID: <20120515075406.GC31087@aemeltch-MOBL1>
-References: <8C91AD8ED4077A4786B34154085899251024A31C@SHSMSX102.ccr.corp.intel.com>
+Date: Tue, 15 May 2012 10:46:34 +0300
+From: Johan Hedberg <johan.hedberg@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Tedd Ho-Jeong An <tedd.an@intel.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] hciattach: Add support for Intel Bluetooth device
+Message-ID: <20120515074634.GA19482@x220>
+References: <32612923.A9jgX3dogm@tedd-ubuntu>
+ <1337044988.5970.244.camel@aeonflux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <8C91AD8ED4077A4786B34154085899251024A31C@SHSMSX102.ccr.corp.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1337044988.5970.244.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jingke,
+Hi Marcel,
 
-On Tue, May 15, 2012 at 03:17:52AM +0000, Zhang, Jingke wrote:
-...
-> New bugs (4): ===============================================
-> https://bugs.meego.com/show_bug.cgi?id=25109 [Regression to 0.44]
-> obexd-0.45 FTP-Server failed to accept file transfer request Regression
-> to obexd-0.44 (FTP Server). FTP/OPP failed. 
+On Mon, May 14, 2012, Marcel Holtmann wrote:
+> > This patch enables the Intel Bluetooth device (UART sku) over the H4 protocol.
+> > It is responsible for bring up the device into known state by configuring
+> > the baudrate and applying the patches, if required.
+> > 
+> > ---
+> >  Makefile.tools          |    3 +-
+> >  tools/hciattach.8       |    3 +
+> >  tools/hciattach.c       |   13 ++
+> >  tools/hciattach.h       |    1 +
+> >  tools/hciattach_intel.c |  596 
+> > +++++++++++++++++++++++++++++++++++++++++++++++
+> >  5 files changed, 615 insertions(+), 1 deletion(-)
+> >  create mode 100644 tools/hciattach_intel.c
 > 
-> https://bugs.meego.com/show_bug.cgi?id=25109 [obexd-server]
-> timer_softirq cause kernel panic after FTP file transfer
+> looks good to me.
+> 
+> Johan, feel free to apply this patch.
 
-Are those the same bug 25109 ?
+Looks ok to me too, except that it doesn't apply:
 
-Best regards 
-Andrei Emeltchenko 
+Applying: hciattach: Add support for Intel Bluetooth device
+fatal: corrupt patch at line 16
+Patch failed at 0001 hciattach: Add support for Intel Bluetooth device
 
+As you can see even from the diffstat Tedd's email client is splitting
+long lines. Please try to use git send-email to resend or fix your mail
+client not to mangle the patch.
+
+Johan
