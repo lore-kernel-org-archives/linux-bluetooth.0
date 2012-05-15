@@ -1,29 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 May 2012 10:28:07 +0300
+Date: Tue, 15 May 2012 10:22:05 +0300
 From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: "Zhang, Jingke" <jingke.zhang@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Bluez/Obexd upstream test result_20120515
-Message-ID: <20120515072805.GB31087@aemeltch-MOBL1>
-References: <8C91AD8ED4077A4786B34154085899251024A31C@SHSMSX102.ccr.corp.intel.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	pkrystad@codeaurora.org
+Subject: Re: [PATCH] Bluetooth: Initialize the transmit queue for L2CAP
+ streaming mode
+Message-ID: <20120515072203.GA31087@aemeltch-MOBL1>
+References: <1337032167-30454-1-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <8C91AD8ED4077A4786B34154085899251024A31C@SHSMSX102.ccr.corp.intel.com>
+In-Reply-To: <1337032167-30454-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jingke,
+Hi Mat,
 
-On Tue, May 15, 2012 at 03:17:52AM +0000, Zhang, Jingke wrote:
-> Hi all, This is test report for bluez-4.99.138.ga521540 and
-> obexd-0.45.40.g0f25314. 
+On Mon, May 14, 2012 at 02:49:27PM -0700, Mat Martineau wrote:
+> Commit 105bdf9ec19e729bacdb33861c74fcf3eb39eb37 introduced a
+> regression in L2CAP streaming mode due to rearranged initialization
+> code that is shared between ERTM and streaming mode.  This change
+> makes sure the transmit queue is initialized in both modes.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 
-...
+This one I did not test yet.
 
-> Obexd-server-0.45 (server daemon) will cause old kernel (3.0.27) panic
-
-Are you testing against this kernel?
+Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com> 
 
 Best regards 
 Andrei Emeltchenko 
+
 
