@@ -1,30 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4FB1FB3F.1030506@monom.org>
-Date: Tue, 15 May 2012 08:44:15 +0200
-From: Daniel Wagner <wagi@monom.org>
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "Ganir, Chen" <chen.ganir@ti.com>
+Subject: RE: [PATCH] eir: Keep parsed eir_data on error
+Date: Tue, 15 May 2012 05:46:50 +0000
+Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B4C5C6A@DNCE05.ent.ti.com>
+References: <1336555275-32638-1-git-send-email-chen.ganir@ti.com>
+In-Reply-To: <1336555275-32638-1-git-send-email-chen.ganir@ti.com>
+Content-Type: text/plain; charset="Windows-1252"
 MIME-Version: 1.0
-To: "Zhang, Jingke" <jingke.zhang@intel.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Bluez/Obexd upstream test result_20120515
-References: <8C91AD8ED4077A4786B34154085899251024A31C@SHSMSX102.ccr.corp.intel.com>
-In-Reply-To: <8C91AD8ED4077A4786B34154085899251024A31C@SHSMSX102.ccr.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+> -----Original Message-----
+> From: Ganir, Chen
+> Sent: Wednesday, May 09, 2012 12:21 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: Ganir, Chen
+> Subject: [PATCH] eir: Keep parsed eir_data on error
+> 
+> From: Chen Ganir <chen.ganir@ti.com>
+> 
+> Do not discard already parsed eir_data on eir data length error.
+> Data corruption may occur, but this does not mean that we need
+> to ignore already parsed valid eir data
+> ---
+>  src/eir.c |    5 ++---
+>  1 files changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/src/eir.c b/src/eir.c
+> index 310cd53..f2f6992 100644
+> --- a/src/eir.c
+> +++ b/src/eir.c
+> @@ -114,10 +114,9 @@ int eir_parse(struct eir_data *eir, uint8_t
+> *eir_data, uint8_t eir_len)
+> 
+>  		len += field_len + 1;
+> 
+> -		/* Bail out if got incorrect length */
+> +		/* Do not continue EIR Data parsing if got incorrect length
+> */
+>  		if (len > eir_len) {
+> -			eir_data_free(eir);
+> -			return -EINVAL;
+> +			return 0;
+>  		}
+> 
+>  		data_len = field_len - 1;
+> --
+> 1.7.0.4
 
-On 05/15/2012 05:17 AM, Zhang, Jingke wrote:
-> Hi all,
-> This is test report for bluez-4.99.138.ga521540 and obexd-0.45.40.g0f25314. 
+Ping ?
 
-Thanks for the report. I have tried to access a few of the
-bugs.meego.com links. It seems they are not freely accessible:
+BR,
+Chen Ganir.
 
-"You are not authorized to access bug #25107. To see this bug, you must
-first log in to an account with the appropriate permissions."
-
-Could you change that?
-
-cheers,
-daniel
