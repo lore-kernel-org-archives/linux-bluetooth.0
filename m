@@ -1,31 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
+From: Oliver Neukum <oneukum@suse.de>
+To: Pavel Machek <pavel@ucw.cz>
+Subject: Re: 3.4.0-rc7 regression: bluetooth vs. s2ram
+Date: Tue, 15 May 2012 15:29:01 +0200
+Cc: "Rafael J. Wysocki" <rjw@sisk.pl>,
+	kernel list <linux-kernel@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	gustavo@padovan.org, johan.hedberg@gmail.com
+References: <20120515131453.GA1936@elf.ucw.cz>
+In-Reply-To: <20120515131453.GA1936@elf.ucw.cz>
 MIME-Version: 1.0
-In-Reply-To: <1337009699-19831-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1337009699-19831-1-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Tue, 15 May 2012 10:15:12 -0400
-Message-ID: <CAJdJm_MVPxMp9QG9_CBmGn0YeMc_Hbhiipy+brSXsqjMzFuRjA@mail.gmail.com>
-Subject: Re: [RFC v0] Bluetooth: mgmt: Add device disconnect reason
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201205151529.01603.oneukum@suse.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Am Dienstag, 15. Mai 2012, 15:14:57 schrieb Pavel Machek:
+> If I suspend without bnep0 active, resume works. 
+> 
+> (This has worked before, but "before" may mean 3.2 in this case).
+> 
+> Can someone test/reproduce this? Ideas?
+> 
+>                                                                         Pavel
+> 
+> PS: Under normal suspend/resume, I see these warnings in the
+> log. Maybe relevant?
 
-On Mon, May 14, 2012 at 11:34 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> MGMT_EV_DEVICE_DISCONNECTED should expose the disconnection reason to
-> userland.
+Most likely. Something has introduced a bug that crashes if the controller
+over which a bnep is run is getting away. Does it survive a surprise removal
+of the BT device while bnep is up?
 
-There is "getsockopt(sock, SOL_SOCKET, SO_ERROR, &sk_err, &len)". Why
-is it not enough?
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+	Regards
+		Oliver
