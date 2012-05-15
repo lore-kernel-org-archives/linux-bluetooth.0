@@ -1,46 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 May 2012 10:46:34 +0300
-From: Johan Hedberg <johan.hedberg@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Tedd Ho-Jeong An <tedd.an@intel.com>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] hciattach: Add support for Intel Bluetooth device
-Message-ID: <20120515074634.GA19482@x220>
-References: <32612923.A9jgX3dogm@tedd-ubuntu>
- <1337044988.5970.244.camel@aeonflux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337044988.5970.244.camel@aeonflux>
+In-Reply-To: <1336135178-21707-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1336135178-21707-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Tue, 15 May 2012 10:44:25 +0300
+Message-ID: <CABBYNZKNDyRcmNtWCJpe8QAkgF7_hDNANrzWP1wqWhTGGqpcNg@mail.gmail.com>
+Subject: Re: [PATCH obexd v0 0/6] Create transfers in modules
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Mikel,
 
-On Mon, May 14, 2012, Marcel Holtmann wrote:
-> > This patch enables the Intel Bluetooth device (UART sku) over the H4 protocol.
-> > It is responsible for bring up the device into known state by configuring
-> > the baudrate and applying the patches, if required.
-> > 
-> > ---
-> >  Makefile.tools          |    3 +-
-> >  tools/hciattach.8       |    3 +
-> >  tools/hciattach.c       |   13 ++
-> >  tools/hciattach.h       |    1 +
-> >  tools/hciattach_intel.c |  596 
-> > +++++++++++++++++++++++++++++++++++++++++++++++
-> >  5 files changed, 615 insertions(+), 1 deletion(-)
-> >  create mode 100644 tools/hciattach_intel.c
-> 
-> looks good to me.
-> 
-> Johan, feel free to apply this patch.
+On Fri, May 4, 2012 at 3:39 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>
+> This patch series changes the way transfers are created, as discussed in IRC. Instead of having the session API offer all common operations, the modules now use the transfer API directly, and then queue the transfer in the session using obc_session_queue().
+>
+> The motivation behind this change is that the transfer-initiator module needs to have access to the created object, to be able to access some member variables. This is required for the D-Bus changes in the pipeline.
+>
+> Another alternative to this patch series would be to simply return the transfer pointer in the session API for functions such as obc_session_get(). IMO this would actually be better.
+>
+> Please review the changes with care (specially patch 6/6) since there is a lot of code rewrite.
+>
+> Mikel Astiz (6):
+>  client: Fix possible double free of params
+>  client: Split internal obc_transfer_register()
+>  client: Transfer API splits create and register
+>  client: Buffer-passing changes in transfer API
+>  client: Flip parameter order in transfer API
+>  client: Create transfers in modules
+>
+>  client/ftp.c      |   25 +++++++---
+>  client/manager.c  |   24 +++++++---
+>  client/map.c      |   18 ++++---
+>  client/pbap.c     |   30 +++++++-----
+>  client/session.c  |  130 +++++++++++++----------------------------------------
+>  client/session.h  |   17 ++-----
+>  client/sync.c     |   20 +++++---
+>  client/transfer.c |   83 +++++++++++++++++----------------
+>  client/transfer.h |   27 +++++-------
+>  9 files changed, 163 insertions(+), 211 deletions(-)
+>
+> --
+> 1.7.7.6
 
-Looks ok to me too, except that it doesn't apply:
+All 6 patches are now upstream.
 
-Applying: hciattach: Add support for Intel Bluetooth device
-fatal: corrupt patch at line 16
-Patch failed at 0001 hciattach: Add support for Intel Bluetooth device
 
-As you can see even from the diffstat Tedd's email client is splitting
-long lines. Please try to use git send-email to resend or fix your mail
-client not to mangle the patch.
-
-Johan
+-- 
+Luiz Augusto von Dentz
