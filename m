@@ -1,60 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To: Johan Hedberg <johan.hedberg@intel.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] hciattach: Add support for Intel Bluetooth device
-Date: Tue, 15 May 2012 09:45:39 -0700
-Message-ID: <8975994.9MKe1oad44@tedd-ubuntu>
-In-Reply-To: <20120515074634.GA19482@x220>
-References: <32612923.A9jgX3dogm@tedd-ubuntu> <1337044988.5970.244.camel@aeonflux> <20120515074634.GA19482@x220>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH -v2] Bluetooth: Fix wrong set of skb fragments
+Date: Tue, 15 May 2012 13:22:55 -0300
+Message-Id: <1337098975-4859-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Johan.
+If alloc() fails we let the frags linked list with garbage value(the err
+ptr value) in its last element.
 
-I will try to send with git send-mail command.
+Reported-by: Mat Martineau <mathewm@codeaurora.org>
+Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
+---
+ net/bluetooth/l2cap_core.c |   12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-Thanks.
-
-Tedd
-
-On Tuesday, May 15, 2012 10:46:34 AM Johan Hedberg wrote:
-> Hi Marcel,
-> 
-> On Mon, May 14, 2012, Marcel Holtmann wrote:
-> > > This patch enables the Intel Bluetooth device (UART sku) over the H4 protocol.
-> > > It is responsible for bring up the device into known state by configuring
-> > > the baudrate and applying the patches, if required.
-> > > 
-> > > ---
-> > >  Makefile.tools          |    3 +-
-> > >  tools/hciattach.8       |    3 +
-> > >  tools/hciattach.c       |   13 ++
-> > >  tools/hciattach.h       |    1 +
-> > >  tools/hciattach_intel.c |  596 
-> > > +++++++++++++++++++++++++++++++++++++++++++++++
-> > >  5 files changed, 615 insertions(+), 1 deletion(-)
-> > >  create mode 100644 tools/hciattach_intel.c
-> > 
-> > looks good to me.
-> > 
-> > Johan, feel free to apply this patch.
-> 
-> Looks ok to me too, except that it doesn't apply:
-> 
-> Applying: hciattach: Add support for Intel Bluetooth device
-> fatal: corrupt patch at line 16
-> Patch failed at 0001 hciattach: Add support for Intel Bluetooth device
-> 
-> As you can see even from the diffstat Tedd's email client is splitting
-> long lines. Please try to use git send-email to resend or fix your mail
-> client not to mangle the patch.
-> 
-> Johan
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 869beb3..8a84a18 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1836,13 +1836,17 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
+ 	/* Continuation fragments (no L2CAP header) */
+ 	frag = &skb_shinfo(skb)->frag_list;
+ 	while (len) {
++		struct sk_buff *tmp;
++
+ 		count = min_t(unsigned int, conn->mtu, len);
+ 
+-		*frag = chan->ops->alloc_skb(chan, count,
+-					     msg->msg_flags & MSG_DONTWAIT);
++		tmp = chan->ops->alloc_skb(chan, count,
++					   msg->msg_flags & MSG_DONTWAIT);
++		if (IS_ERR(tmp))
++			return PTR_ERR(tmp);
++
++		*frag = tmp;
+ 
+-		if (IS_ERR(*frag))
+-			return PTR_ERR(*frag);
+ 		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
+ 			return -EFAULT;
+ 
 -- 
-Regards
-Tedd Ho-Jeong An
-Intel Corporation
+1.7.10.1
+
