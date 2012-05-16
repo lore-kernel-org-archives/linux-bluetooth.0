@@ -1,79 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ v5 00/13] gdbus: Better D-Bus introspection
-Date: Wed, 16 May 2012 20:33:00 -0300
-Message-Id: <1337211193-18230-1-git-send-email-lucas.demarchi@profusion.mobi>
+Message-ID: <1337207944.4107.57.camel@deadeye>
+Subject: Re: [PATCH] ar3k: add patch and sysconfig for QCA9564(Aphrodite)
+From: Ben Hutchings <ben@decadent.org.uk>
+To: "Yao, Costa" <cqyao@qca.qualcomm.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	qca-linux-team <qca-linux-team@qualcomm.com>
+Date: Wed, 16 May 2012 23:39:04 +0100
+In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DF71079@nasanexd02b.na.qualcomm.com>
+References: <07BBB2AAB1A10A488A2AD166C7CB8B0DF71079@nasanexd02b.na.qualcomm.com>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-/Z/HR6AUxZS5SeWjjDce"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v5: only rebase
 
-Message from v4: 
+--=-/Z/HR6AUxZS5SeWjjDce
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, 2012-04-26 at 06:49 +0000, Yao, Costa wrote:
+> From 8996c5715384d8f4dc40df4ad9b7686ddc654847 Mon Sep 17 00:00:00 2001
+> From: Costa Yao <cqyao@qca.qualcomm.com>
+> Date: Thu, 26 Apr 2012 14:38:06 +0800
+> Subject: [PATCH] ar3k: add patch and sysconfig for QCA9564(Aphrodite)
+>=20
+> add patch and sysconfig for Qualcomm Atheros QCA9564
+>=20
+> Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
+> ---
+>  WHENCE                       |    2 ++
+>  ar3k/AthrBT_0x31010000.dfu   |  Bin 0 -> 38916 bytes
+>  ar3k/ramps_0x31010000_40.dfu |  Bin 0 -> 1434 bytes
+>  3 files changed, 2 insertions(+), 0 deletions(-)
+>  create mode 100644 ar3k/AthrBT_0x31010000.dfu
+>  create mode 100644 ar3k/ramps_0x31010000_40.dfu
+[...]
 
-	This is v4 of this series. The biggest difference from v3 is that we are not
-	adding a decorated signature anymore. Instead we define the type GDBusArgInfo
-	and add fields in_args, out_args and args into the tables.
+Applied, thanks.
 
-	First 4 patches are the same as before and are independent from the others.
+Ben.
 
-	Patches 5, 6, 7, 8 and 9 are split like this because gdbus is used in projects
-	other than BlueZ, so the first 2 patches can be easily ported there.
+--=20
+Ben Hutchings
+The two most common things in the universe are hydrogen and stupidity.
 
-	Patches 10 and 11 add annotations, just as in v3.
+--=-/Z/HR6AUxZS5SeWjjDce
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
 
-	Last 2 patches are minor fixes, because checking the same thing twice don't
-	make it a stronger check.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
 
+iQIVAwUAT7QsiOe/yOyVhhEJAQp1aQ//S0twaNvFz0UuXZ8l7/8bgevSx9QQ2OZx
+tNAWTUPVS3f+L4Iph5AB+q+JpGiyeGrfceAMYM8JnVCUxhJltN4mDYZB6kOWCoSr
+n7B9cZdDrPb9AiWr9hZDlX4JFr9DMnTrgl80FNTSAejUjfzeOonKHCaSGFHQuLnk
+aGXpaHOlAkBDuN84Da9oTkJkUxpkrhOzajK3blLdGZMMQeh/Ye5vrG2AjBwN99iQ
+BXxlDXwsn+0gJ5qUzIlbndnKrff/L1YpJPCZGR/OVVR3F7RPTRNd/x24imezz2KV
+EsvQCs6YwqD8mAtDY0QHEpInUENERLvJr6Yifm/o+AOro5SUprUS4xZYMgRUpVAQ
+L1otP1GFHfXj9eByp9EJiBSH/Qclkvxl3fC0Mdwj8r/5+rRhl6hjhT9wdd+Q77m2
+ci3a+V8FR6lsCqERb1EW9ALkSowlkHilD9r86KCocjK3zAOg4qgcwc2JSsD4jKAE
+ThseuRm3hlah947NELs93vBfH+KjoM/gieCJqeK5Gvyhf9ed5sKqOMbWxW24YoLs
+VU/lhKvO04LY0IepYi59PvkW9cHwKo1jC+DQVh7RVMuceMUIoNbWH87GAWa+L0Q8
+awe20bi8ElSOMJx82mLj0SLeDPSYwsYtF5bH03e5ouebnEQyAtnbbWNGMRe8PZj9
+zaUD1HDYUnM=
+=5sQc
+-----END PGP SIGNATURE-----
 
-Lucas De Marchi (13):
-  gdbus: return if method signature is malformed
-  gdbus: do not call memset for terminating NUL
-  Constify GDBus method tables
-  Constify GDBus signal tables
-  gdbus: add argument info to methods and signals
-  Convert GDBus methods and signals to use GDBusArgInfo
-  gdbus: use GDBusArgInfo to generate introspection
-  gdbus: loop over args to check message signature
-  gdbus: remove signatures from tables
-  gdbus: add Deprecated annotation in introspection
-  gdbus: add Method.NoReply annotation in introspection
-  gdbus: do not check signature twice
-  adapter: do not check signature twice
-
- attrib/client.c           |   35 ++++++++----
- audio/control.c           |   33 +++++++----
- audio/device.c            |   23 +++++---
- audio/gateway.c           |   30 ++++++----
- audio/headset.c           |   93 +++++++++++++++++++------------
- audio/media.c             |   23 ++++++--
- audio/sink.c              |   37 ++++++------
- audio/source.c            |   24 ++++----
- audio/telephony-dummy.c   |   38 +++++++++----
- audio/telephony-maemo5.c  |    8 ++-
- audio/transport.c         |   30 +++++++---
- gdbus/gdbus.h             |   11 +++-
- gdbus/object.c            |  136 ++++++++++++++++++++++-----------------------
- health/hdp.c              |   69 ++++++++++++++++-------
- input/device.c            |   19 ++++---
- network/connection.c      |   23 +++++---
- network/server.c          |   11 +++-
- plugins/dbusoob.c         |   18 ++++--
- plugins/service.c         |   24 +++++---
- proximity/monitor.c       |   19 +++++--
- proximity/reporter.c      |   14 +++--
- sap/sap-dummy.c           |   18 ++++--
- sap/server.c              |   16 ++++--
- serial/port.c             |   17 ++++--
- serial/proxy.c            |   38 +++++++++----
- src/adapter.c             |   94 ++++++++++++++++++++-----------
- src/device.c              |   32 +++++++----
- src/manager.c             |   40 +++++++++----
- thermometer/thermometer.c |   35 ++++++++----
- 29 files changed, 655 insertions(+), 353 deletions(-)
-
--- 
-1.7.10.2
-
+--=-/Z/HR6AUxZS5SeWjjDce--
