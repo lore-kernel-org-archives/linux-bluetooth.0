@@ -1,62 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 May 2012 11:14:15 +0300
+Date: Wed, 16 May 2012 11:12:03 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: vishal agarwal <vishal.bluez@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Vishal Agarwal <vishal.agarwal@stericsson.com>
-Subject: Re: [PATCH] textfile: fix missing call to munmap in wite_key
-Message-ID: <20120516081415.GA29073@x220>
-References: <1336657428-14129-1-git-send-email-vishal.agarwal@stericsson.com>
- <CA+_sZW8tYxCyfKrc8_r0E+toOj=HQxfDWaQTY=ezmxd6Jtg+AA@mail.gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [hcidump PATCHv2 2/2] Decode A2MP Get AMP Assoc rsp
+Message-ID: <20120516081203.GB28189@x220>
+References: <1336637333-20723-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1336637333-20723-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CA+_sZW8tYxCyfKrc8_r0E+toOj=HQxfDWaQTY=ezmxd6Jtg+AA@mail.gmail.com>
+In-Reply-To: <1336637333-20723-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vishal,
+Hi Andrei,
 
-On Wed, May 16, 2012, vishal agarwal wrote:
-> On 5/10/12, Vishal Agarwal <vishal.agarwal@stericsson.com> wrote:
-> > In some cases it was possible that munmap is not called corresponding
-> > to mmap, which might result in future read or writes to fail.
-> > ---
-> >  src/textfile.c |    2 +-
-> >  1 files changed, 1 insertions(+), 1 deletions(-)
-> >
-> > diff --git a/src/textfile.c b/src/textfile.c
-> > index 2712cd8..9d88fbc 100644
-> > --- a/src/textfile.c
-> > +++ b/src/textfile.c
-> > @@ -220,8 +220,8 @@ static int write_key(const char *pathname, const char
-> > *key, const char *value, i
-> >  	len = strlen(key);
-> >  	off = find_key(map, size, key, len, icase);
-> >  	if (!off) {
-> > +		munmap(map, size);
-> >  		if (value) {
-> > -			munmap(map, size);
-> >  			lseek(fd, size, SEEK_SET);
-> >  			err = write_key_value(fd, key, value);
-> >  		}
-> > --
-> > 1.7.0.4
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> > in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> >
-> 
-> Did you get a chance to look at it. Just to brief about the problem -
-> If we try to pair unpair device many times then in certain conditions
-> munmap is not called and after some times the mmap starts failing.
-> which will result in nsuccessful pairing or unpairing.
-> This patch fixes this issue.
+On Thu, May 10, 2012, Andrei Emeltchenko wrote:
+> +	printf("Country code: %c%c%c\n", chan_list->country_code[0],
+> +	       chan_list->country_code[1], chan_list->country_code[2]);
 
-Sorry, I did actually take a look at it and concluded it was correct,
-but I forgot to apply it. The patch has been pushed upstream now.
-Thanks.
+We still use tabs-only indentation in user space. The above line is
+violating this.
+
+> +			printf("Reg ext id %d reg class %d coverage class %d\n",
+> +			       triplet->ext.reg_extension_id,
+> +			       triplet->ext.reg_class,
+> +			       triplet->ext.coverage_class);
+
+Same here.
+
+> +			if (triplet->chans.num_channels == 1)
+> +			printf("MAC: %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X\n",
+> +			       tlv->val[0], tlv->val[1], tlv->val[2],
+> +			       tlv->val[3], tlv->val[4], tlv->val[5]);
+
+And here. Btw, it also looks like the printf is incorrectly indented
+(same indentation as the if).
+
+> +			printf("PAL CAP: %2.2x %2.2x %2.2x %2.2x\n",
+> +			       tlv->val[0], tlv->val[1], tlv->val[2],
+> +			       tlv->val[3]);
+
+Tabs + spaces here again.
+
+> +			printf("PAL VER: %2.2x Comp ID: %4.4x SubVer: %4.4x\n",
+> +			       ver->ver, btohs(ver->company_id),
+> +			       btohs(ver->sub_ver));
+
+And here.
 
 Johan
