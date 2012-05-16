@@ -1,32 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 May 2012 18:45:15 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Bluetooth: Create flags for bt_sk()
-Message-ID: <20120516154515.GA16250@x220>
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] Bluetooth: Report proper error number in disconnection
+Date: Wed, 16 May 2012 12:17:12 -0300
+Message-Id: <1337181432-979-3-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1337181432-979-2-git-send-email-gustavo@padovan.org>
 References: <1337181432-979-1-git-send-email-gustavo@padovan.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337181432-979-1-git-send-email-gustavo@padovan.org>
+ <1337181432-979-2-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+If encryption change fails we should disconnect with auth failure error
+code.
 
-On Wed, May 16, 2012, Gustavo Padovan wrote:
-> defer_setup and suspended are now flags into bt_sk().
-> 
-> Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
-> ---
->  include/net/bluetooth/bluetooth.h |    8 ++++++--
->  net/bluetooth/af_bluetooth.c      |    8 ++++----
->  net/bluetooth/l2cap_core.c        |   14 ++++++++------
->  net/bluetooth/l2cap_sock.c        |   21 +++++++++++++--------
->  net/bluetooth/rfcomm/sock.c       |   14 ++++++++++----
->  5 files changed, 41 insertions(+), 24 deletions(-)
+Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
+---
+ net/bluetooth/hci_event.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Patches 1 and 3 have been applied to bluetooth-next. I left 2/3 out as
-we agreed since it doesn't compile.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 9c60e0d..4eefb7f 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2063,7 +2063,7 @@ static inline void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *
+ 		clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
+ 
+ 		if (ev->status && conn->state == BT_CONNECTED) {
+-			hci_acl_disconn(conn, 0x13);
++			hci_acl_disconn(conn, HCI_ERROR_AUTH_FAILURE);
+ 			hci_conn_put(conn);
+ 			goto unlock;
+ 		}
+-- 
+1.7.10.1
 
-Johan
