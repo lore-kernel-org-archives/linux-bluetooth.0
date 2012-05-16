@@ -1,56 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120516134405.GA4652@echo>
-References: <CAB0Wyvkwq0+0zo=Fy-5Fe5hxENq5S284DS0ARZEbhkWfYno6zQ@mail.gmail.com>
-	<20120516134405.GA4652@echo>
-Date: Thu, 17 May 2012 09:33:50 +0800
-Message-ID: <CAB0Wyv=O-dXZT0fqO1RdtQpHvpRFephcbZuT_zp7CX3Tx_DyhA@mail.gmail.com>
-Subject: Re: Anyone knows the chip model for IOGEAR Bluetooth 4.0 USB Micro
- Adapter (GBU521) ?
-From: "Min Jun,Xi" <xi.minjun@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org, anderson.lizardo@openbossa.org
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <1337211803.5970.274.camel@aeonflux>
+Subject: Re: [PATCH BlueZ v5 09/13] gdbus: remove signatures from tables
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 16 May 2012 16:43:23 -0700
+In-Reply-To: <1337211193-18230-10-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1337211193-18230-1-git-send-email-lucas.demarchi@profusion.mobi>
+	 <1337211193-18230-10-git-send-email-lucas.demarchi@profusion.mobi>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
-Thank you very much! I will buy one and have a try.
+Hi Lucas,
 
-On Wed, May 16, 2012 at 9:44 PM, Vinicius Costa Gomes
-<vinicius.gomes@openbossa.org> wrote:
-> Hi,
->
-> On 10:27 Wed 16 May, Min Jun,Xi wrote:
->> Hello All,
->>
->> Anderson (in CC list) suggests BlueZ only support the dual-mode USB
->> dongle, so I am trying to find one avaliable dual-mode Bluetooth 4.0
->> USB dongle, which can be driven by BlueZ under Linux.
->> Finally, I found IOGEAR Bluetooth 4.0 USB Micro Adapter (GBU521),
->> which is said to be dual-mode. Here my question is: does anyone know
->> which chip is used by this adapter? Can it be driven by BlueZ?
->
-> I don't know for sure which chip it uses. But probably it will work with
-> BlueZ, and if it doesn't, it would just need a 2-line patch to make it work.
->
->>
->> Thank you very much!
->> --
->> Best regards,
->> Xi Minjun
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
-> Cheers,
-> --
-> Vinicius
+>  attrib/client.c           |   12 +++++-----
+>  audio/control.c           |   18 +++++++--------
+>  audio/device.c            |   13 +++++------
+>  audio/gateway.c           |   16 ++++++-------
+>  audio/headset.c           |   55 +++++++++++++++++++++------------------------
+>  audio/media.c             |    8 +++----
+>  audio/sink.c              |   25 +++++++++------------
+>  audio/source.c            |   14 +++++-------
+>  audio/telephony-dummy.c   |   18 +++++++--------
+>  audio/telephony-maemo5.c  |    2 +-
+>  audio/transport.c         |   10 ++++-----
+>  gdbus/gdbus.h             |    3 ---
+>  gdbus/object.c            |    2 +-
+
+you can not intermix this. I want gdbus/ patches separated.
+
+> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+> index 610cb19..e9e8929 100644
+> --- a/gdbus/gdbus.h
+> +++ b/gdbus/gdbus.h
+> @@ -91,8 +91,6 @@ typedef struct {
+>  
+>  typedef struct {
+>  	const char *name;
+> -	const char *signature;
+> -	const char *reply;
+>  	GDBusMethodFunction function;
+>  	GDBusMethodFlags flags;
+>  	unsigned int privilege;
+> @@ -102,7 +100,6 @@ typedef struct {
+>  
+>  typedef struct {
+>  	const char *name;
+> -	const char *signature;
+>  	GDBusSignalFlags flags;
+>  	const GDBusArgInfo *args;
+>  } GDBusSignalTable;
+
+instead of removing these, why don't we make them NULL and start
+using .function and .flags syntax for the method/signal tables as a
+first step.
+
+Regards
+
+Marcel
 
 
-
--- 
-Best regards,
-Xi Minjun
