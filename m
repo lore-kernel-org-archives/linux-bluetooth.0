@@ -1,250 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Create flags for bt_sk()
-Date: Wed, 16 May 2012 12:17:10 -0300
-Message-Id: <1337181432-979-1-git-send-email-gustavo@padovan.org>
+Date: Wed, 16 May 2012 18:01:25 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Dean Jenkins <djenkins@mvista.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Proposal to remove the rfcomm session refcnt and use the rfcomm
+ state machine to delete the session
+Message-ID: <20120516150124.GD10880@aemeltch-MOBL1>
+References: <CAJ2qBzYiTtLaDEnwqFMGS1JS+OuUaxTGrn70YE-oL3JnLi53Jg@mail.gmail.com>
+ <CAJ2qBzbxL8r4x88DteVeR-P9ooXfsL81LQrUuwXxf1eK_zidug@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAJ2qBzbxL8r4x88DteVeR-P9ooXfsL81LQrUuwXxf1eK_zidug@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-defer_setup and suspended are now flags into bt_sk().
+Hi Dean,
 
-Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
----
- include/net/bluetooth/bluetooth.h |    8 ++++++--
- net/bluetooth/af_bluetooth.c      |    8 ++++----
- net/bluetooth/l2cap_core.c        |   14 ++++++++------
- net/bluetooth/l2cap_sock.c        |   21 +++++++++++++--------
- net/bluetooth/rfcomm/sock.c       |   14 ++++++++++----
- 5 files changed, 41 insertions(+), 24 deletions(-)
+On Tue, May 15, 2012 at 07:25:02PM +0100, Dean Jenkins wrote:
+> Signed-off-by: Dean Jenkins <djenkins@mvista.com>
+> ---
+>  net/bluetooth/rfcomm/core.c |   15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> index 8a60238..d95c34e 100644
+> --- a/net/bluetooth/rfcomm/core.c
+> +++ b/net/bluetooth/rfcomm/core.c
+> @@ -618,6 +618,15 @@ static struct rfcomm_session
+> *rfcomm_session_add(struct socket *sock, int state)
+>                         return NULL;
+>                 }
+> 
+> +       /*
+> +        * refcnt must be 1 before adding to the session list
+> +        * otherwise threads such as rfcomm_security_cfm()
+> +        * can interrupt and cause
+> +        * rfcomm_session_hold() ... rfcomm_session_put() sequence to
+> +        * erroneously delete the session structure.
+> +        */
+> +       rfcomm_session_hold(s);
+> +
+>         list_add(&s->list, &session_list);
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 7981ca4..961669b 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -194,8 +194,12 @@ struct bt_sock {
- 	bdaddr_t    dst;
- 	struct list_head accept_q;
- 	struct sock *parent;
--	u32 defer_setup;
--	bool suspended;
-+	unsigned long flags;
-+};
-+
-+enum {
-+	BT_SK_DEFER_SETUP,
-+	BT_SK_SUSPEND,
- };
- 
- struct bt_sock_list {
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 6fb68a9..46e7f86 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -210,7 +210,7 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
- 		}
- 
- 		if (sk->sk_state == BT_CONNECTED || !newsock ||
--						bt_sk(parent)->defer_setup) {
-+		    test_bit(BT_DEFER_SETUP, &bt_sk(parent)->flags)) {
- 			bt_accept_unlink(sk);
- 			if (newsock)
- 				sock_graft(sk, newsock);
-@@ -410,8 +410,8 @@ static inline unsigned int bt_accept_poll(struct sock *parent)
- 	list_for_each_safe(p, n, &bt_sk(parent)->accept_q) {
- 		sk = (struct sock *) list_entry(p, struct bt_sock, accept_q);
- 		if (sk->sk_state == BT_CONNECTED ||
--					(bt_sk(parent)->defer_setup &&
--						sk->sk_state == BT_CONNECT2))
-+		    (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags) &&
-+		     sk->sk_state == BT_CONNECT2))
- 			return POLLIN | POLLRDNORM;
- 	}
- 
-@@ -450,7 +450,7 @@ unsigned int bt_sock_poll(struct file *file, struct socket *sock, poll_table *wa
- 			sk->sk_state == BT_CONFIG)
- 		return mask;
- 
--	if (!bt_sk(sk)->suspended && sock_writeable(sk))
-+	if (!test_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags) && sock_writeable(sk))
- 		mask |= POLLOUT | POLLWRNORM | POLLWRBAND;
- 	else
- 		set_bit(SOCK_ASYNC_NOSPACE, &sk->sk_socket->flags);
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 285c5e1..24f144b 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -71,7 +71,7 @@ static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
- 								void *data);
- static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data);
- static void l2cap_send_disconn_req(struct l2cap_conn *conn,
--				struct l2cap_chan *chan, int err);
-+				   struct l2cap_chan *chan, int err);
- 
- /* ---- L2CAP channels ---- */
- 
-@@ -586,7 +586,7 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
- 			struct l2cap_conn_rsp rsp;
- 			__u16 result;
- 
--			if (bt_sk(sk)->defer_setup)
-+			if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags))
- 				result = L2CAP_CR_SEC_BLOCK;
- 			else
- 				result = L2CAP_CR_BAD_PSM;
-@@ -1050,7 +1050,8 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 
- 			if (l2cap_chan_check_security(chan)) {
- 				lock_sock(sk);
--				if (bt_sk(sk)->defer_setup) {
-+				if (test_bit(BT_SK_DEFER_SETUP,
-+					     &bt_sk(sk)->flags)) {
- 					struct sock *parent = bt_sk(sk)->parent;
- 					rsp.result = cpu_to_le16(L2CAP_CR_PEND);
- 					rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
-@@ -3032,7 +3033,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 
- 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE) {
- 		if (l2cap_chan_check_security(chan)) {
--			if (bt_sk(sk)->defer_setup) {
-+			if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
- 				__l2cap_state_change(chan, BT_CONNECT2);
- 				result = L2CAP_CR_PEND;
- 				status = L2CAP_CS_AUTHOR_PEND;
-@@ -4924,7 +4925,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 						chan->state == BT_CONFIG)) {
- 			struct sock *sk = chan->sk;
- 
--			bt_sk(sk)->suspended = false;
-+			clear_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
- 			sk->sk_state_change(sk);
- 
- 			l2cap_check_encryption(chan, encrypt);
-@@ -4946,7 +4947,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 			lock_sock(sk);
- 
- 			if (!status) {
--				if (bt_sk(sk)->defer_setup) {
-+				if (test_bit(BT_SK_DEFER_SETUP,
-+					     &bt_sk(sk)->flags)) {
- 					struct sock *parent = bt_sk(sk)->parent;
- 					res = L2CAP_CR_PEND;
- 					stat = L2CAP_CS_AUTHOR_PEND;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index f52d58e..3bb1611 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -324,8 +324,8 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
- 
- 	case L2CAP_CONNINFO:
- 		if (sk->sk_state != BT_CONNECTED &&
--					!(sk->sk_state == BT_CONNECT2 &&
--						bt_sk(sk)->defer_setup)) {
-+		    !(sk->sk_state == BT_CONNECT2 &&
-+		      test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags))) {
- 			err = -ENOTCONN;
- 			break;
- 		}
-@@ -399,7 +399,8 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
- 			break;
- 		}
- 
--		if (put_user(bt_sk(sk)->defer_setup, (u32 __user *) optval))
-+		if (put_user(test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags),
-+			     (u32 __user *) optval))
- 			err = -EFAULT;
- 
- 		break;
-@@ -601,10 +602,10 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
- 
- 		/* or for ACL link */
- 		} else if ((sk->sk_state == BT_CONNECT2 &&
--			   bt_sk(sk)->defer_setup) ||
-+			   test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) ||
- 			   sk->sk_state == BT_CONNECTED) {
- 			if (!l2cap_chan_check_security(chan))
--				bt_sk(sk)->suspended = true;
-+				set_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
- 			else
- 				sk->sk_state_change(sk);
- 		} else {
-@@ -623,7 +624,10 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
- 			break;
- 		}
- 
--		bt_sk(sk)->defer_setup = opt;
-+		if (opt)
-+			set_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
-+		else
-+			clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
- 		break;
- 
- 	case BT_FLUSHABLE:
-@@ -741,7 +745,8 @@ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct ms
- 
- 	lock_sock(sk);
- 
--	if (sk->sk_state == BT_CONNECT2 && bt_sk(sk)->defer_setup) {
-+	if (sk->sk_state == BT_CONNECT2 && test_bit(BT_SK_DEFER_SETUP,
-+						    &bt_sk(sk)->flags)) {
- 		sk->sk_state = BT_CONFIG;
- 		pi->chan->state = BT_CONFIG;
- 
-@@ -984,7 +989,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
- 		struct l2cap_chan *pchan = l2cap_pi(parent)->chan;
- 
- 		sk->sk_type = parent->sk_type;
--		bt_sk(sk)->defer_setup = bt_sk(parent)->defer_setup;
-+		bt_sk(sk)->flags = bt_sk(parent)->flags;
- 
- 		chan->chan_type = pchan->chan_type;
- 		chan->imtu = pchan->imtu;
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index a55a43e..e8707de 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -260,7 +260,8 @@ static void rfcomm_sock_init(struct sock *sk, struct sock *parent)
- 
- 	if (parent) {
- 		sk->sk_type = parent->sk_type;
--		pi->dlc->defer_setup = bt_sk(parent)->defer_setup;
-+		pi->dlc->defer_setup = test_bit(BT_SK_DEFER_SETUP,
-+						&bt_sk(parent)->flags);
- 
- 		pi->sec_level = rfcomm_pi(parent)->sec_level;
- 		pi->role_switch = rfcomm_pi(parent)->role_switch;
-@@ -731,7 +732,11 @@ static int rfcomm_sock_setsockopt(struct socket *sock, int level, int optname, c
- 			break;
- 		}
- 
--		bt_sk(sk)->defer_setup = opt;
-+		if (opt)
-+			set_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
-+		else
-+			clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
-+
- 		break;
- 
- 	default:
-@@ -849,7 +854,8 @@ static int rfcomm_sock_getsockopt(struct socket *sock, int level, int optname, c
- 			break;
- 		}
- 
--		if (put_user(bt_sk(sk)->defer_setup, (u32 __user *) optval))
-+		if (put_user(test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags),
-+			     (u32 __user *) optval))
- 			err = -EFAULT;
- 
- 		break;
-@@ -972,7 +978,7 @@ int rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc *
- done:
- 	bh_unlock_sock(parent);
- 
--	if (bt_sk(parent)->defer_setup)
-+	if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags))
- 		parent->sk_state_change(parent);
- 
- 	return result;
--- 
-1.7.10.1
+This looks right to me.
 
+> 
+>         return s;
+> @@ -678,6 +687,9 @@ static void rfcomm_session_close(struct
+> rfcomm_session *s, int err)
+> 
+>         rfcomm_session_clear_timer(s);
+>         rfcomm_session_put(s);
+> +
+> +       /* to match with initial session creation rfcomm_session_hold() */
+> +       rfcomm_session_put(s);
+
+Quickly looking to the changed it looks like refcounting is not changed
+for accepting rfcomm but changed for connecting side. Have you tested both
+situations?
+
+>  }
+> 
+>  static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
+> @@ -1905,8 +1917,6 @@ static inline void
+> rfcomm_accept_connection(struct rfcomm_session *s)
+> 
+>         s = rfcomm_session_add(nsock, BT_OPEN);
+>         if (s) {
+> -               rfcomm_session_hold(s);
+> -
+
+this and 
+
+>                 /* We should adjust MTU on incoming sessions.
+>                  * L2CAP MTU minus UIH header and FCS. */
+>                 s->mtu = min(l2cap_pi(nsock->sk)->chan->omtu,
+> @@ -2027,7 +2037,6 @@ static int rfcomm_add_listener(bdaddr_t *ba)
+>         if (!s)
+>                 goto failed;
+> 
+> -       rfcomm_session_hold(s);
+
+this looks OK given that we hold session when creating.
+
+Also in the code there are places when we check is rfcomm session
+initiator and then make refcounting which means something is wrong.
+
+Best regards 
+Andrei Emeltchenko 
