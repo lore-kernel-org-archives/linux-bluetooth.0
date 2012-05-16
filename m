@@ -1,34 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 May 2012 10:57:49 +0300
+Date: Wed, 16 May 2012 10:52:28 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/2] bluetooth: Fix not setting port to 0 when
- listen fails
-Message-ID: <20120516075749.GA26388@x220>
-References: <1337098606-5710-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH] Bluetooth: improve readability of l2cap_seq_list code.
+Message-ID: <20120516075228.GD25830@x220>
+References: <1336598880-28568-1-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337098606-5710-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1336598880-28568-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Gustavo,
 
-On Tue, May 15, 2012, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, May 09, 2012, Gustavo Padovan wrote:
+> Removes one indentation level.
 > 
-> With some only kernels auto assigning psm seem to fail, leaving the psm
-> with wrong value:
-> 
-> obexd[2930]: plugins/bluetooth.c:start() listening on channel 9
-> obexd[2930]: bluetooth: unable to listen in psm 65535
-> obexd[2930]: plugins/bluetooth.c:start() listening on channel 10
-> obexd[2930]: bluetooth: unable to listen in psm 65535
+> Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
 > ---
->  plugins/bluetooth.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
+>  net/bluetooth/l2cap_core.c |   33 ++++++++++++++++++---------------
+>  1 file changed, 18 insertions(+), 15 deletions(-)
 
-Both patches have been applied. Thanks.
+Applied to bluetooth-next. Thanks.
 
 Johan
