@@ -1,43 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] hciemu: Fix gcc 4.7 compilation error
-Date: Wed, 16 May 2012 13:07:09 +0300
-Message-Id: <1337162829-12536-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Oliver Neukum <oneukum@suse.de>
+To: Pavel Machek <pavel@ucw.cz>
+Subject: Re: 3.4.0-rc7 regression: bluetooth vs. s2ram
+Date: Wed, 16 May 2012 11:03:50 +0200
+Cc: "Rafael J. Wysocki" <rjw@sisk.pl>,
+	kernel list <linux-kernel@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	gustavo@padovan.org, johan.hedberg@gmail.com
+References: <20120515131453.GA1936@elf.ucw.cz> <201205151529.01603.oneukum@suse.de> <20120515180105.GA1923@elf.ucw.cz>
+In-Reply-To: <20120515180105.GA1923@elf.ucw.cz>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201205161103.50317.oneukum@suse.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Am Dienstag, 15. Mai 2012, 20:01:06 schrieb Pavel Machek:
+> On Tue 2012-05-15 15:29:01, Oliver Neukum wrote:
+> > Am Dienstag, 15. Mai 2012, 15:14:57 schrieb Pavel Machek:
+> > > If I suspend without bnep0 active, resume works. 
+> > > 
+> > > (This has worked before, but "before" may mean 3.2 in this case).
+> > > 
+> > > Can someone test/reproduce this? Ideas?
+> > > 
+> > > PS: Under normal suspend/resume, I see these warnings in the
+> > > log. Maybe relevant?
+> > 
+> > Most likely. Something has introduced a bug that crashes if the controller
+> > over which a bnep is run is getting away. Does it survive a surprise removal
+> > of the BT device while bnep is up?
+> 
+> No, it does not. If I turn off hardware radio kill switch, machine
+> dies in the same way. So not just sleep related...
 
-This patch fixes the following compilation error with gcc 4.7:
+You lose power, btusb cannot deal with that and you get an unplug/replug cycle.
+Can you get an oops when you are hitting the kill switch?
 
-  CC     test/hciemu.o
-test/hciemu.c: In function 'getbdaddrbyname':
-test/hciemu.c:1115:3: error: dereferencing type-punned pointer will break strict-aliasing rules [-Werror=strict-aliasing]
----
-I'm sending this to the list since I'm not completely sure what the code
-is supposed to do or if this is the right fix or not.
-
- test/hciemu.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/test/hciemu.c b/test/hciemu.c
-index 260e29a..4c62223 100644
---- a/test/hciemu.c
-+++ b/test/hciemu.c
-@@ -1109,10 +1109,11 @@ static int getbdaddrbyname(char *str, bdaddr_t *ba)
- 	if (n == 0) {
- 		/* loopback port */
- 		in_addr_t addr = INADDR_LOOPBACK;
-+		uint16_t be16 = htons(atoi(str));
- 		bdaddr_t b;
- 
- 		memcpy(&b, &addr, 4);
--		*(uint16_t *) (&b.b[4]) = htons(atoi(str));
-+		memcpy(&b.b[4], &be16, sizeof(be16));
- 		baswap(ba, &b);
- 
- 		return 0;
--- 
-1.7.10
-
+	Regards
+		Oliver
