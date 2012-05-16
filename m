@@ -1,36 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJdJm_MXwG0vicPL1zPDBYKj-GXRgacvyg9wqpe5OAhey5q4VA@mail.gmail.com>
-References: <1322850850-18019-1-git-send-email-anderson.lizardo@openbossa.org>
- <CA+XVXffynitA+JYzRnqiRJPQyyrTh+HMNUWQgb0LzD4iowoxpg@mail.gmail.com> <CAJdJm_MXwG0vicPL1zPDBYKj-GXRgacvyg9wqpe5OAhey5q4VA@mail.gmail.com>
-From: "Arun K. Singh" <arunkat@gmail.com>
-Date: Wed, 16 May 2012 17:10:44 +0530
-Message-ID: <CAOnmHE9P-PUQOLh_skQxBXZx53fBe9u4jHu8HoDTwZEVOd4xAg@mail.gmail.com>
-Subject: Re: [PATCH RFC BlueZ 0/5] Time Profile (server) improvements
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Arik Nemtsov <arik@wizery.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] hciemu: Fix gcc 4.7 compilation error
+Date: Wed, 16 May 2012 13:07:09 +0300
+Message-Id: <1337162829-12536-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Thu, Feb 2, 2012 at 4:42 AM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
+This patch fixes the following compilation error with gcc 4.7:
 
-<snip>
-..
+  CC     test/hciemu.o
+test/hciemu.c: In function 'getbdaddrbyname':
+test/hciemu.c:1115:3: error: dereferencing type-punned pointer will break strict-aliasing rules [-Werror=strict-aliasing]
+---
+I'm sending this to the list since I'm not completely sure what the code
+is supposed to do or if this is the right fix or not.
 
-> But even with the initial implementation, most Time clients will be
-> supported just fine. They will just not be able to update the phone's
-> own time or be notified of manual changes to the phone time (this will
-> be supported with the D-Bus API).
+ test/hciemu.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Unless I missed such discussions on Time client support, could you
-comment on plans to support it. From what I figure is a time client
-will need to configure few things on the server such as notifying on
-time udpates/reference time etc. which may need dedicated API's. Do
-you have plans to support time client API's as well?
+diff --git a/test/hciemu.c b/test/hciemu.c
+index 260e29a..4c62223 100644
+--- a/test/hciemu.c
++++ b/test/hciemu.c
+@@ -1109,10 +1109,11 @@ static int getbdaddrbyname(char *str, bdaddr_t *ba)
+ 	if (n == 0) {
+ 		/* loopback port */
+ 		in_addr_t addr = INADDR_LOOPBACK;
++		uint16_t be16 = htons(atoi(str));
+ 		bdaddr_t b;
+ 
+ 		memcpy(&b, &addr, 4);
+-		*(uint16_t *) (&b.b[4]) = htons(atoi(str));
++		memcpy(&b.b[4], &be16, sizeof(be16));
+ 		baswap(ba, &b);
+ 
+ 		return 0;
+-- 
+1.7.10
 
-Thanks,
-Arun
