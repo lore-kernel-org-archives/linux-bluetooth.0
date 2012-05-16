@@ -1,29 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 May 2012 10:47:29 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH -v2] Bluetooth: Fix wrong set of skb fragments
-Message-ID: <20120516074729.GA25830@x220>
-References: <1337098975-4859-1-git-send-email-gustavo@padovan.org>
+Date: Wed, 16 May 2012 10:41:29 +0300
+From: Johan Hedberg <johan.hedberg@intel.com>
+To: Tedd Ho-Jeong An <tedd.an@intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] hciattach: Add support for Intel Bluetooth device
+Message-ID: <20120516074129.GA17339@x220>
+References: <1337102609-7922-1-git-send-email-tedd.an@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337098975-4859-1-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1337102609-7922-1-git-send-email-tedd.an@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Tedd,
 
-On Tue, May 15, 2012, Gustavo Padovan wrote:
-> If alloc() fails we let the frags linked list with garbage value(the err
-> ptr value) in its last element.
+On Tue, May 15, 2012, Tedd Ho-Jeong An wrote:
+> This patch enables the Intel Bluetooth device (UART sku) over the H4
+> protocol. It is responsible for bring up the device into known state
+> by configuring the baudrate and applying the patches, if required.
 > 
-> Reported-by: Mat Martineau <mathewm@codeaurora.org>
-> Signed-off-by: Gustavo Padovan <gustavo@padovan.org>
 > ---
->  net/bluetooth/l2cap_core.c |   12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
+>  Makefile.tools          |    3 +-
+>  tools/hciattach.8       |    3 +
+>  tools/hciattach.c       |   13 ++
+>  tools/hciattach.h       |    1 +
+>  tools/hciattach_intel.c |  596 +++++++++++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 615 insertions(+), 1 deletion(-)
+>  create mode 100644 tools/hciattach_intel.c
 
-Applied to bluetooth-next. Thanks.
+Applied. Thanks.
 
 Johan
