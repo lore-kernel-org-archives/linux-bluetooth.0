@@ -1,44 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 May 2012 10:44:05 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: "Min Jun,Xi" <xi.minjun@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, anderson.lizardo@openbossa.org
-Subject: Re: Anyone knows the chip model for IOGEAR Bluetooth 4.0 USB Micro
- Adapter (GBU521) ?
-Message-ID: <20120516134405.GA4652@echo>
-References: <CAB0Wyvkwq0+0zo=Fy-5Fe5hxENq5S284DS0ARZEbhkWfYno6zQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAB0Wyvkwq0+0zo=Fy-5Fe5hxENq5S284DS0ARZEbhkWfYno6zQ@mail.gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ] doc: Update possible values of Agent capabilities
+Date: Wed, 16 May 2012 09:26:24 -0300
+Message-Id: <1337171184-909-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ doc/adapter-api.txt |    9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-On 10:27 Wed 16 May, Min Jun,Xi wrote:
-> Hello All,
-> 
-> Anderson (in CC list) suggests BlueZ only support the dual-mode USB
-> dongle, so I am trying to find one avaliable dual-mode Bluetooth 4.0
-> USB dongle, which can be driven by BlueZ under Linux.
-> Finally, I found IOGEAR Bluetooth 4.0 USB Micro Adapter (GBU521),
-> which is said to be dual-mode. Here my question is: does anyone know
-> which chip is used by this adapter? Can it be driven by BlueZ?
-
-I don't know for sure which chip it uses. But probably it will work with
-BlueZ, and if it doesn't, it would just need a 2-line patch to make it work.
-
-> 
-> Thank you very much!
-> --
-> Best regards,
-> Xi Minjun
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 0cded8c..dccb6bf 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -165,10 +165,11 @@ Methods		dict GetProperties()
+ 			of its registered agents will be removed.
+ 
+ 			The capability parameter can have the values
+-			"DisplayOnly", "DisplayYesNo", "KeyboardOnly" and
+-			"NoInputNoOutput" which reflects the input and output
+-			capabilities of the agent. If an empty string is
+-			used it will fallback to "DisplayYesNo".
++			"DisplayOnly", "DisplayYesNo", "KeyboardOnly",
++			"NoInputNoOutput" and "KeyboardDisplay" which reflects
++			the input and output capabilities of the agent. If an
++			empty string is used it will fallback to
++			"DisplayYesNo".
+ 
+ 			Possible errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.AlreadyExists
 -- 
-Vinicius
+1.7.10.2
+
