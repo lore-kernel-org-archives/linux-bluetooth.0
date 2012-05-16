@@ -1,123 +1,162 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 16 May 2012 14:09:24 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2012-05-16
+Message-ID: <20120516180924.GA28167@tuxdriver.com>
+References: <20120516155340.GC1414@joana>
 MIME-Version: 1.0
-In-Reply-To: <1336432823-3359-2-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1336432823-3359-1-git-send-email-andrzej.kaczmarek@tieto.com>
-	<1336432823-3359-2-git-send-email-andrzej.kaczmarek@tieto.com>
-Date: Wed, 16 May 2012 15:23:15 -0300
-Message-ID: <CACJA=fWjYhn2rR_fSwaznj7YwOjR45vwwsmKpSvAyZpURHE0Nw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Use hci_conn data to handle failed LE
- Connection Complete
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120516155340.GC1414@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
-
-On Mon, May 7, 2012 at 8:20 PM, Andrzej Kaczmarek
-<andrzej.kaczmarek@tieto.com> wrote:
-> This patch changes way LE Connection Complete event with error status are
-> handled by reusing peer information stored in hci_conn instead of these
-> returned in event packet which may not be always valid.
->
-> LE Connection Complete event for failed (cancelled) connection does not
-> include peer address on some Bluetooth chips and only status parameter is
-> filled. In such case appriopriate hci_conn is not removed and subsequent
-> connections to given peer won't be possible.
-
-Some firmwares implementation (I've seen this in some Broadcom and
-ST-Ericsson dongles so far) don't include the address in the LE
-Connection Complete Event in the case of a cancel. The reason is that
-it is also possible to connect using the whitelist (a set of BD
-addresses), and in that case, it would not even be possible to include
-an address. Thus we should not assume that it contains a meaningful
-address.
-
-> 2012-05-07 11:21:39.133378 < HCI Command: LE Create Connection (0x08|0x000d) plen 25
->    bdaddr 00:22:D0:10:13:EE type 1
-> 2012-05-07 11:21:39.138774 > HCI Event: Command Status (0x0f) plen 4
->    LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
-> 2012-05-07 11:21:44.752854 < HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0
-> 2012-05-07 11:21:44.759475 > HCI Event: Command Complete (0x0e) plen 4
->    LE Create Connection Cancel (0x08|0x000e) ncmd 1
-> 2012-05-07 11:21:44.764479 > HCI Event: LE Meta Event (0x3e) plen 19
->    LE Connection Complete
->      status 0x02 handle 0, role master
->      bdaddr 00:00:00:00:00:00 (Public)
->
-> [14898.739425] [6603] hci_connect: hci0 dst 00:22:D0:10:13:EE
-> [14898.739429] [6603] hci_conn_add: hci0 dst 00:22:D0:10:13:EE
-> [14898.739434] [6603] hci_conn_init_sysfs: conn ffff880079f03000
-> [14898.739440] [6603] hci_send_cmd: hci0 opcode 0x200d plen 25
-> [14898.739443] [6603] hci_send_cmd: skb len 28
-> [14898.739487] [6603] hci_chan_create: hci0 conn ffff880079f03000
-> ...
-> [14938.860231] [55] hci_send_cmd: hci0 opcode 0x200e plen 0
-> ...
-> [14938.876427] [55] hci_le_conn_complete_evt: hci0 status 2
-> [14938.876433] [55] hci_conn_add: hci0 dst 00:00:00:00:00:00
-> [14938.876439] [55] hci_conn_init_sysfs: conn ffff88007aeff800
-> [14938.876454] [55] hci_send_to_control: len 14
-> [14938.876470] [55] l2cap_connect_cfm: hcon ffff88007aeff800 bdaddr 00:00:00:00:00:00 status 2
-> [14938.876474] [55] hci_conn_del: hci0 conn ffff88007aeff800 handle 0
->
-> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+On Wed, May 16, 2012 at 12:53:40PM -0300, Gustavo Padovan wrote:
+> Hi John,
+> 
+> A big pull request for inclusion in 3.5. In this set there is some changes
+> regarding periodic scan and LE, endian fixes, L2CAP ERTM improvements. There
+> is also fixes, clean ups and small improvements all over the tree.
+> I also included the patches rejected in the bluetooth pull request.
+> 
+> I checked the whole diff of this pull request for offending coding style
+> changes and couldn't spot anything wrong.
+> 
+> I merged wireless/master into this.
+> 
+> Please pull, or let me know of any problems!
+> 
+> 	Gustavo
+> 
 > ---
->  net/bluetooth/hci_event.c |   22 +++++++++++++---------
->  1 file changed, 13 insertions(+), 9 deletions(-)
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index b739baf..6ddb79e 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -3300,6 +3300,19 @@ static inline void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff
->
->        hci_dev_lock(hdev);
->
-> +       if (ev->status) {
-> +               conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
-> +               if (!conn)
-> +                       goto unlock;
-> +
-> +               mgmt_connect_failed(hdev, &conn->dst, conn->type,
-> +                                               conn->dst_type, ev->status);
-> +               hci_proto_connect_cfm(conn, ev->status);
-> +               conn->state = BT_CLOSED;
-> +               hci_conn_del(conn);
-> +               goto unlock;
-> +       }
-> +
->        conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &ev->bdaddr);
->        if (!conn) {
->                conn = hci_conn_add(hdev, LE_LINK, &ev->bdaddr);
-> @@ -3312,15 +3325,6 @@ static inline void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff
->                conn->dst_type = ev->bdaddr_type;
->        }
->
-> -       if (ev->status) {
-> -               mgmt_connect_failed(hdev, &ev->bdaddr, conn->type,
-> -                                               conn->dst_type, ev->status);
-> -               hci_proto_connect_cfm(conn, ev->status);
-> -               conn->state = BT_CLOSED;
-> -               hci_conn_del(conn);
-> -               goto unlock;
-> -       }
-> -
->        if (!test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
->                mgmt_device_connected(hdev, &ev->bdaddr, conn->type,
->                                      conn->dst_type, 0, NULL, 0, NULL);
-> --
-> 1.7.9.5
+> 
+> The following changes since commit 341352d13dae752610342923c53ebe461624ee2c:
+> 
+>   iwlwifi: fix-up some merge damage from commit 0d6c4a2 (2012-05-08 22:18:09 -0400)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next for-upstream
+> 
+> for you to fetch changes up to cde5b476786450fb058a23502372d63c3e8629d0:
+> 
+>   Bluetooth: Report proper error number in disconnection (2012-05-16 18:44:35 +0300)
+> 
+> ----------------------------------------------------------------
+> Amitkumar Karwar (2):
+>       Bluetooth: btmrvl: configure default host sleep parameters
+>       Bluetooth: btmrvl: add support for SDIO suspend/resume callbacks
+> 
+> Andre Guedes (21):
+>       Bluetooth: Check FINDING state in interleaved discovery
+>       Bluetooth: Add hci_cancel_le_scan() to hci_core
+>       Bluetooth: LE support for MGMT stop discovery
+>       Bluetooth: Replace EPERM by EALREADY in hci_cancel_inquiry
+>       Bluetooth: Refactor stop_discovery
+>       Bluetooth: Add Periodic Inquiry command complete handler
+>       Bluetooth: Add HCI_PERIODIC_INQ to dev_flags
+>       Bluetooth: Check HCI_PERIODIC_INQ in start_discovery
+>       Bluetooth: Ignore inquiry results from periodic inquiry
+>       Bluetooth: Add Periodic Inquiry command complete handler
+>       Bluetooth: Add HCI_PERIODIC_INQ to dev_flags
+>       Bluetooth: Remove MGMT_ADDR_INVALID macro
+>       Bluetooth: Remove useless code in hci_connect
+>       Bluetooth: Move address type macros to bluetooth.h
+>       Bluetooth: Rename link_to_mgmt to link_to_bdaddr
+>       Bluetooth: Add address type to struct sockaddr_l2
+>       Bluetooth: Rename mgmt_to_le to bdaddr_to_le
+>       Bluetooth: Move bdaddr_to_le to hci_core
+>       Bluetooth: Add dst_type parameter to hci_connect
+>       Bluetooth: Use address type info from user-space
+>       Bluetooth: Remove advertising cache
+> 
+> Andrei Emeltchenko (24):
+>       Bluetooth: trivial: Correct endian conversion
+>       Bluetooth: Correct type for hdev lmp_subver
+>       Bluetooth: Correct type for ediv to __le16
+>       Bluetooth: Fix extra conversion to __le32
+>       Bluetooth: Correct chan->psm endian conversions
+>       Bluetooth: Correct ediv in SMP
+>       Bluetooth: Correct length calc in L2CAP conf rsp
+>       Bluetooth: Correct CID endian notation
+>       Bluetooth: Convert error codes to le16
+>       Bluetooth: trivial: Fix endian conversion mode
+>       Bluetooth: trivial: Correct types
+>       Bluetooth: Fix type in cpu_to_le conversion
+>       Bluetooth: Fix opcode access in hci_complete
+>       Bluetooth: trivial: Remove sparse warnings
+>       Bluetooth: Silence sparse warning
+>       Bluetooth: Comments and style fixes
+>       Bluetooth: Remove unneeded timer clear
+>       Bluetooth: Make L2CAP chan_add functions static
+>       Bluetooth: Remove unneeded zero initialization
+>       Bluetooth: Add Read Local AMP Info to init
+>       Bluetooth: Adds set_default function in L2CAP setup
+>       Bluetooth: Fix debug printing unallocated name
+>       Bluetooth: trivial: Remove empty line
+>       Bluetooth: Remove unneeded calculation and magic number
+> 
+> Cristian Chilipirea (1):
+>       Bluetooth: Fixed checkpatch warnings
+> 
+> David Herrmann (5):
+>       Bluetooth: Remove redundant hdev->parent field
+>       Bluetooth: vhci: Ignore return code of nonseekable_open()
+>       Bluetooth: Move hci_alloc/free_dev close to hci_register/unregister_dev
+>       Bluetooth: Move device initialization to hci_alloc_dev()
+>       Bluetooth: Remove unneeded initialization in hci_alloc_dev()
+> 
+> Eldad Zack (1):
+>       Bluetooth: bnep: use constant for ethertype
+> 
+> Gustavo Padovan (13):
+>       Bluetooth: Remove sk parameter from l2cap_chan_create()
+>       Bluetooth: Remove err parameter from alloc_skb()
+>       Bluetooth: remove unneeded declaration of sco_conn_del()
+>       Bluetooth: Remove unneeded elements from size calculation
+>       Bluetooth: Remove hlen variable
+>       Bluetooth: notify userspace of security level change
+>       Bluetooth: Fix wrong set of skb fragments
+>       Bluetooth: Fix packet size provided to the controller
+>       Bluetooth: Fix skb length calculation
+>       Bluetooth: improve readability of l2cap_seq_list code
+>       Bluetooth: report the right security level in getsockopt
+>       Bluetooth: Create flags for bt_sk()
+>       Bluetooth: Report proper error number in disconnection
+> 
+> Hemant Gupta (5):
+>       Bluetooth: Send correct address type for LTK
+>       Bluetooth: Fix clearing discovery type when stopping discovery
+>       Bluetooth: mgmt: Fix missing connect failed event for LE
+>       Bluetooth: mgmt: Fix address type while loading Long Term Key
+>       Bluetooth: Don't distribute keys in case of Encryption Failure
+> 
+> Ido Yariv (1):
+>       Bluetooth: Search global l2cap channels by src/dst addresses
+> 
+> Jesper Juhl (1):
+>       Bluetooth: btmrvl_sdio: remove pointless conditional before release_firmware()
+> 
+> Johan Hedberg (2):
+>       Bluetooth: mgmt: Fix device_connected sending order
+>       Bluetooth: Fix Inquiry with RSSI event mask
+> 
+> Larry Finger (1):
+>       rtlwifi: fix for race condition when firmware is cached
 
-Since we can only have one ongoing LE connection initiation at time,
-checking hci_conn in state BT_CONNECT is enough.
+????
 
-The patch looks good to me.
+What did you do here?  I thought that maybe you had pulled from the
+wireless tree, but the commit ID is different.
 
-Acked-by: Andre Guedes <andre.guedes@openbossa.org>
+I know that you want this to get merged in time for the window --
+but it has to be done right.  Occasionally there might be a reason
+for the same patch to end-up in two places, but in this case you have
+an rtlwifi patch being replicated in the Bluetooth tree...
 
-BR,
-
-Andre
+John
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
