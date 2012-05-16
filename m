@@ -1,41 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oneukum@suse.de>
-To: Pavel Machek <pavel@ucw.cz>
-Subject: Re: 3.4.0-rc7 regression: bluetooth vs. s2ram
-Date: Wed, 16 May 2012 11:03:50 +0200
-Cc: "Rafael J. Wysocki" <rjw@sisk.pl>,
-	kernel list <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	gustavo@padovan.org, johan.hedberg@gmail.com
-References: <20120515131453.GA1936@elf.ucw.cz> <201205151529.01603.oneukum@suse.de> <20120515180105.GA1923@elf.ucw.cz>
-In-Reply-To: <20120515180105.GA1923@elf.ucw.cz>
+Date: Wed, 16 May 2012 11:30:31 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Decode A2MP Get AMP Assoc rsp
+Message-ID: <20120516083031.GA9635@x220>
+References: <20120516081203.GB28189@x220>
+ <1337156812-16939-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201205161103.50317.oneukum@suse.de>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1337156812-16939-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am Dienstag, 15. Mai 2012, 20:01:06 schrieb Pavel Machek:
-> On Tue 2012-05-15 15:29:01, Oliver Neukum wrote:
-> > Am Dienstag, 15. Mai 2012, 15:14:57 schrieb Pavel Machek:
-> > > If I suspend without bnep0 active, resume works. 
-> > > 
-> > > (This has worked before, but "before" may mean 3.2 in this case).
-> > > 
-> > > Can someone test/reproduce this? Ideas?
-> > > 
-> > > PS: Under normal suspend/resume, I see these warnings in the
-> > > log. Maybe relevant?
-> > 
-> > Most likely. Something has introduced a bug that crashes if the controller
-> > over which a bnep is run is getting away. Does it survive a surprise removal
-> > of the BT device while bnep is up?
+Hi Andrei,
+
+On Wed, May 16, 2012, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> No, it does not. If I turn off hardware radio kill switch, machine
-> dies in the same way. So not just sleep related...
+> Adds decoding Assoc data:
+> 
+> ...
+> > ACL data: handle 11 flags 0x02 dlen 53
+>     A2MP: Get AMP Assoc rsp: id 1 status (0) Success
+>       Assoc data [len 39]:
+>         MAC: <address>
+>         Preferred Chan List number of triplets 4
+>           Country code: XXX
+>           Reg ext id 201 reg class 254 coverage class 0
+>           Channel 1 max power 20
+>           Channels 2 - 12 max power 20
+>           Channels 4 - 8 max power 0
+>         PAL CAP: 00 00 00 00
+>         PAL VER: 01 Comp ID: <id> SubVer: 0001
+> ...
+> ---
+>  parser/l2cap.c |  101 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 92 insertions(+), 9 deletions(-)
 
-You lose power, btusb cannot deal with that and you get an unplug/replug cycle.
-Can you get an oops when you are hitting the kill switch?
+Applied. Thanks.
 
-	Regards
-		Oliver
+Johan
