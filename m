@@ -1,70 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1337207944.4107.57.camel@deadeye>
-Subject: Re: [PATCH] ar3k: add patch and sysconfig for QCA9564(Aphrodite)
-From: Ben Hutchings <ben@decadent.org.uk>
-To: "Yao, Costa" <cqyao@qca.qualcomm.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	qca-linux-team <qca-linux-team@qualcomm.com>
-Date: Wed, 16 May 2012 23:39:04 +0100
-In-Reply-To: <07BBB2AAB1A10A488A2AD166C7CB8B0DF71079@nasanexd02b.na.qualcomm.com>
-References: <07BBB2AAB1A10A488A2AD166C7CB8B0DF71079@nasanexd02b.na.qualcomm.com>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-/Z/HR6AUxZS5SeWjjDce"
+Message-ID: <1337204910.5970.271.camel@aeonflux>
+Subject: Re: [PATCH v2] Bluetooth: Use hci_conn data to handle failed LE
+ Connection Complete
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrzej Kaczmarek <andrzejk@gmail.com>
+Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>,
+	linux-bluetooth@vger.kernel.org
+Date: Wed, 16 May 2012 14:48:30 -0700
+In-Reply-To: <CA+6KyKZ0vrPHoXXfWwJdiVLDR+59azRwWMhJbjndM+Aw_dKSwA@mail.gmail.com>
+References: <1337201737-5983-1-git-send-email-andrzej.kaczmarek@tieto.com>
+	 <1337202331.5970.269.camel@aeonflux>
+	 <CA+6KyKZ0vrPHoXXfWwJdiVLDR+59azRwWMhJbjndM+Aw_dKSwA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Andrzej,
 
---=-/Z/HR6AUxZS5SeWjjDce
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> >>       hci_dev_lock(hdev);
+> >>
+> >> +     if (ev->status) {
+> >> +             conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
+> >> +             if (!conn)
+> >> +                     goto unlock;
+> >> +
+> >> +             mgmt_connect_failed(hdev, &conn->dst, conn->type,
+> >> +                                 conn->dst_type, ev->status);
+> >> +             hci_proto_connect_cfm(conn, ev->status);
+> >> +             conn->state = BT_CLOSED;
+> >> +             hci_conn_del(conn);
+> >> +             goto unlock;
+> >> +     }
+> >> +
+> >>       conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &ev->bdaddr);
+> >>       if (!conn) {
+> >>               conn = hci_conn_add(hdev, LE_LINK, &ev->bdaddr);
+> >
+> > this change is wrong. We are now treating every single adapter as being
+> > broken. That is not acceptable.
+> 
+> Why do you think these adapters are broken? As I explained in cover
+> letter for v1, spec does not require peer address to be provided in
+> Connection Complete which is reasonable since we can only have one
+> pending connection request. Also as Claudio and Andre noticed such
+> behaviour could be to simplify whitelist implementation - in case of
+> connection request using whitelist it does not make sense to include
+> specific peer address in event.
 
-On Thu, 2012-04-26 at 06:49 +0000, Yao, Costa wrote:
-> From 8996c5715384d8f4dc40df4ad9b7686ddc654847 Mon Sep 17 00:00:00 2001
-> From: Costa Yao <cqyao@qca.qualcomm.com>
-> Date: Thu, 26 Apr 2012 14:38:06 +0800
-> Subject: [PATCH] ar3k: add patch and sysconfig for QCA9564(Aphrodite)
->=20
-> add patch and sysconfig for Qualcomm Atheros QCA9564
->=20
-> Signed-off-by: Costa Yao <cqyao@qca.qualcomm.com>
-> ---
->  WHENCE                       |    2 ++
->  ar3k/AthrBT_0x31010000.dfu   |  Bin 0 -> 38916 bytes
->  ar3k/ramps_0x31010000_40.dfu |  Bin 0 -> 1434 bytes
->  3 files changed, 2 insertions(+), 0 deletions(-)
->  create mode 100644 ar3k/AthrBT_0x31010000.dfu
->  create mode 100644 ar3k/ramps_0x31010000_40.dfu
-[...]
+what has whitelist behavior to do with this event in the failure case?
 
-Applied, thanks.
+> > We should only add a tweak if the BD_ADDR parameter is BDADDR_ANY and
+> > not as a general rule. In addition if we do this, we need to print a
+> > warning to dmesg to make this known.
+> 
+> Perhaps we can just add warning in case BD_ADDR is not BDADDR_ANY and
+> we cannot find hci_conn for it - in such case most probably something
+> went wrong.
 
-Ben.
+What are the adapters from Broadcom, CSR, TI and ST are returning in a
+failure case? Are they all omitting the BD_ADDR value?
 
---=20
-Ben Hutchings
-The two most common things in the universe are hydrogen and stupidity.
+Regards
 
---=-/Z/HR6AUxZS5SeWjjDce
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+Marcel
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQIVAwUAT7QsiOe/yOyVhhEJAQp1aQ//S0twaNvFz0UuXZ8l7/8bgevSx9QQ2OZx
-tNAWTUPVS3f+L4Iph5AB+q+JpGiyeGrfceAMYM8JnVCUxhJltN4mDYZB6kOWCoSr
-n7B9cZdDrPb9AiWr9hZDlX4JFr9DMnTrgl80FNTSAejUjfzeOonKHCaSGFHQuLnk
-aGXpaHOlAkBDuN84Da9oTkJkUxpkrhOzajK3blLdGZMMQeh/Ye5vrG2AjBwN99iQ
-BXxlDXwsn+0gJ5qUzIlbndnKrff/L1YpJPCZGR/OVVR3F7RPTRNd/x24imezz2KV
-EsvQCs6YwqD8mAtDY0QHEpInUENERLvJr6Yifm/o+AOro5SUprUS4xZYMgRUpVAQ
-L1otP1GFHfXj9eByp9EJiBSH/Qclkvxl3fC0Mdwj8r/5+rRhl6hjhT9wdd+Q77m2
-ci3a+V8FR6lsCqERb1EW9ALkSowlkHilD9r86KCocjK3zAOg4qgcwc2JSsD4jKAE
-ThseuRm3hlah947NELs93vBfH+KjoM/gieCJqeK5Gvyhf9ed5sKqOMbWxW24YoLs
-VU/lhKvO04LY0IepYi59PvkW9cHwKo1jC+DQVh7RVMuceMUIoNbWH87GAWa+L0Q8
-awe20bi8ElSOMJx82mLj0SLeDPSYwsYtF5bH03e5ouebnEQyAtnbbWNGMRe8PZj9
-zaUD1HDYUnM=
-=5sQc
------END PGP SIGNATURE-----
-
---=-/Z/HR6AUxZS5SeWjjDce--
