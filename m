@@ -2,33 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ v6 01/15] gdbus: return if method signature is malformed
-Date: Thu, 17 May 2012 15:19:58 -0300
-Message-Id: <1337278812-4837-2-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ v6 05/15] gdbus: add argument info to methods and signals
+Date: Thu, 17 May 2012 15:20:02 -0300
+Message-Id: <1337278812-4837-6-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1337278812-4837-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1337278812-4837-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- gdbus/object.c |    4 ++++
- 1 file changed, 4 insertions(+)
+ gdbus/gdbus.h |    8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 8bc12f5..7a94156 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -107,6 +107,10 @@ static void print_arguments(GString *gstr, const char *sig,
- 				break;
- 		}
+diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+index a0583e6..e5e7938 100644
+--- a/gdbus/gdbus.h
++++ b/gdbus/gdbus.h
+@@ -85,16 +85,24 @@ typedef enum {
+ typedef struct {
+ 	const char *name;
+ 	const char *signature;
++} GDBusArgInfo;
++
++typedef struct {
++	const char *name;
++	const char *signature;
+ 	const char *reply;
+ 	GDBusMethodFunction function;
+ 	GDBusMethodFlags flags;
+ 	unsigned int privilege;
++	const GDBusArgInfo *in_args;
++	const GDBusArgInfo *out_args;
+ } GDBusMethodTable;
  
-+		if (!complete) {
-+			error("Unexpected signature: %s", sig);
-+			return;
-+		}
+ typedef struct {
+ 	const char *name;
+ 	const char *signature;
+ 	GDBusSignalFlags flags;
++	const GDBusArgInfo *args;
+ } GDBusSignalTable;
  
- 		if (direction)
- 			g_string_append_printf(gstr,
+ typedef struct {
 -- 
 1.7.10.2
 
