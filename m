@@ -1,56 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 17 May 2012 17:40:15 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: santhosh aj <ajsant@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Auto Generate configure & make files
+Message-ID: <20120517144015.GA20883@x220.P-661HNU-F1>
+References: <CAP6uk1On=Re6wOo6-HSD=g8iHdWE9bgxJcJ0NF3w9vTRnTfGvA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAOnmHE9P-PUQOLh_skQxBXZx53fBe9u4jHu8HoDTwZEVOd4xAg@mail.gmail.com>
-References: <1322850850-18019-1-git-send-email-anderson.lizardo@openbossa.org>
-	<CA+XVXffynitA+JYzRnqiRJPQyyrTh+HMNUWQgb0LzD4iowoxpg@mail.gmail.com>
-	<CAJdJm_MXwG0vicPL1zPDBYKj-GXRgacvyg9wqpe5OAhey5q4VA@mail.gmail.com>
-	<CAOnmHE9P-PUQOLh_skQxBXZx53fBe9u4jHu8HoDTwZEVOd4xAg@mail.gmail.com>
-Date: Thu, 17 May 2012 10:50:41 -0400
-Message-ID: <CAJdJm_O9dhJg3BZZjiTH+6a0VrryXEnxUZf670jPCJUAZ-=0sw@mail.gmail.com>
-Subject: Re: [PATCH RFC BlueZ 0/5] Time Profile (server) improvements
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: "Arun K. Singh" <arunkat@gmail.com>
-Cc: Arik Nemtsov <arik@wizery.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAP6uk1On=Re6wOo6-HSD=g8iHdWE9bgxJcJ0NF3w9vTRnTfGvA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arun,
+Hi Santosh,
 
-On Wed, May 16, 2012 at 7:40 AM, Arun K. Singh <arunkat@gmail.com> wrote:
-> Hi Anderson,
->
-> On Thu, Feb 2, 2012 at 4:42 AM, Anderson Lizardo
-> <anderson.lizardo@openbossa.org> wrote:
->
-> <snip>
-> ..
->
->> But even with the initial implementation, most Time clients will be
->> supported just fine. They will just not be able to update the phone's
->> own time or be notified of manual changes to the phone time (this will
->> be supported with the D-Bus API).
->
-> Unless I missed such discussions on Time client support, could you
-> comment on plans to support it. From what I figure is a time client
-> will need to configure few things on the server such as notifying on
-> time udpates/reference time etc. which may need dedicated API's. Do
-> you have plans to support time client API's as well?
+On Thu, May 17, 2012, santhosh aj wrote:
+> Can any one please tell me what is the proper order/commands to
+> generate configure.in, .configure, Makefile.in, config.h.in. If we
+> download a snapshot from git repository
+> (http://git.kernel.org/?p=bluetooth/bluez.git;a=summary) these file
+> will be missing. I found a link which give some information about this
+> (http://www.nondot.org/sabre/Mirrored/autoconf-2.12/autoconf_2.html).
+> but if some one can tell the proper steps it will be help a lot for
+> all who doesn't know.
 
-The current code (and the relevant discussion) is only related to Time
-Server D-BUS API. It is needed so the platform specific stuff (e.g.
-system clock update) can be done outside of BlueZ, by a Time "agent".
+The git tree contains a script called bootstrap that will do this for
+you. A bootstrap-configure script is also provided which additionally
+calls the configure script with options that are appropriate for BlueZ
+development (but not necessarily for product use).
 
-If you are interested on implementing Time Client support, you will
-need to propose a separate API. I am not aware of anyone working on
-client side support.
-
->
-> Thanks,
-> Arun
-
-Best Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
