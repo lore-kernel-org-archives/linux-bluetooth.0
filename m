@@ -1,40 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ v6 02/15] gdbus: do not call memset for terminating NUL
-Date: Thu, 17 May 2012 15:19:59 -0300
-Message-Id: <1337278812-4837-3-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1337278812-4837-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1337278812-4837-1-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Thu, 17 May 2012 20:52:39 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Alex Elsayed <eternaleye@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v4] Add dbus service file that references the systemd unit
+Message-ID: <20120517175239.GA26353@x220.P-661HNU-F1>
+References: <3754404.7KqlubBV4t@arkadios>
+ <8a401753379e62beba65d277ad3d360280386463.1337273908.git.eternaleye@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <8a401753379e62beba65d277ad3d360280386463.1337273908.git.eternaleye@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- gdbus/object.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hi Alex,
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 7a94156..e378074 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -72,7 +72,6 @@ static void print_arguments(GString *gstr, const char *sig,
- 
- 		complete = FALSE;
- 		struct_level = dict_level = 0;
--		memset(type, 0, sizeof(type));
- 
- 		/* Gather enough data to have a single complete type */
- 		for (len = 0; len < (sizeof(type) - 1) && sig[i]; len++, i++) {
-@@ -107,6 +106,8 @@ static void print_arguments(GString *gstr, const char *sig,
- 				break;
- 		}
- 
-+		type[len + 1] = '\0';
-+
- 		if (!complete) {
- 			error("Unexpected signature: %s", sig);
- 			return;
--- 
-1.7.10.2
+On Thu, May 17, 2012, Alex Elsayed wrote:
+> This allows bluez to be bus-activated.
+> ---
+> v4: Drop Exec= from dbus service (only systemd activation supported)
+> v3: Use alias as SystemdService so 'systemctl enable/disable' works
+> v2: Fix whitespace error
+> 
+>  Makefile.am              |    2 ++
+>  src/bluetooth.service.in |    1 +
+>  src/org.bluez.service    |    5 +++++
+>  3 files changed, 8 insertions(+)
+>  create mode 100644 src/org.bluez.service
 
+Applied. Thanks.
+
+Johan
