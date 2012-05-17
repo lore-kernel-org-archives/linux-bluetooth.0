@@ -1,62 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alex Elsayed <eternaleye@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Alex Elsayed <eternaleye@gmail.com>
-Subject: [PATCH v4] Add dbus service file that references the systemd unit
-Date: Thu, 17 May 2012 10:00:27 -0700
-Message-Id: <8a401753379e62beba65d277ad3d360280386463.1337273908.git.eternaleye@gmail.com>
-In-Reply-To: <3754404.7KqlubBV4t@arkadios>
-References: <3754404.7KqlubBV4t@arkadios>
+Message-ID: <1337273004.5970.279.camel@aeonflux>
+Subject: Re: [PATCH v2] Add dbus service file that references the systemd
+ unit
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alex Elsayed <eternaleye@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 17 May 2012 09:43:24 -0700
+In-Reply-To: <4094065.PHO1OqQSqp@arkadios>
+References: <20120516080134.GA27987@x220>
+	 <3bc04a064cb81285510d978c3c867e5ea5203600.1337201604.git.eternaleye@gmail.com>
+	 <20120517150237.GA21315@x220.P-661HNU-F1> <4094065.PHO1OqQSqp@arkadios>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows bluez to be bus-activated.
----
-v4: Drop Exec= from dbus service (only systemd activation supported)
-v3: Use alias as SystemdService so 'systemctl enable/disable' works
-v2: Fix whitespace error
+Hi Alex,
 
- Makefile.am              |    2 ++
- src/bluetooth.service.in |    1 +
- src/org.bluez.service    |    5 +++++
- 3 files changed, 8 insertions(+)
- create mode 100644 src/org.bluez.service
+> > On Wed, May 16, 2012, Alex Elsayed wrote:
+> > > This allows bluez to be bus-activated.
+> > > 
+> > > v2: Fix whitespace error
+> > 
+> > This v2 line shouldn't be part of the commit message. You can put stuff
+> > like that between the --- line and the diff line (usually before the
+> > diffstat).
+> 
+> Alright, I'll fix that
+> 
+> > > +++ b/src/org.bluez.service.in
+> > > @@ -0,0 +1,5 @@
+> > > +[D-BUS Service]
+> > > +Name=org.bluez
+> > > +Exec=@prefix@/sbin/bluetoothd -n
+> > > +User=root
+> > > +SystemdService=bluetooth.service
+> > 
+> > My Fedora 16 installation seems to provide its own org.bluez.service:
+> > 
+> > $ cat /usr/share/dbus-1/system-services/org.bluez.service
+> > [D-BUS Service]
+> > Name=org.bluez
+> > Exec=/bin/false
+> > User=root
+> > SystemdService=dbus-org.bluez.service
+> > 
+> > Could you explain why it's a bit different from what you're providing
+> > (particularly the /bin/false part). I'm not really an expert with with
+> > systemd/D-Bus files so you'll need to convince me of why your variant is
+> > correct (or more appropriate than the Fedora one) before it goes upstream.
+> 
+> Sure. In a systemd environment the Exec= line is ignored and the 
+> SystemdService is activated instead iff a SystemdService line exists. In a non-
+> systemd environment, however, the Exec= line is used to start the service. 
+> Since Fedora is standardizing on systemd, they omitted that line, but that 
+> means that bus activation will fail on non-systemd distros, such as ubuntu and 
+> debian.
 
-diff --git a/Makefile.am b/Makefile.am
-index 44e82c0..82df92e 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -27,8 +27,10 @@ include_HEADERS =
- 
- if DATAFILES
- dbusdir = $(sysconfdir)/dbus-1/system.d
-+dbusservicedir = $(datadir)/dbus-1/system-services
- 
- dbus_DATA = src/bluetooth.conf
-+dbusservice_DATA = src/org.bluez.service
- 
- confdir = $(sysconfdir)/bluetooth
- 
-diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
-index 8a9edb6..2a576a3 100644
---- a/src/bluetooth.service.in
-+++ b/src/bluetooth.service.in
-@@ -8,3 +8,4 @@ ExecStart=@prefix@/sbin/bluetoothd -n
- 
- [Install]
- WantedBy=bluetooth.target
-+Alias=dbus-org.bluez.service
-diff --git a/src/org.bluez.service b/src/org.bluez.service
-new file mode 100644
-index 0000000..dd7ae8f
---- /dev/null
-+++ b/src/org.bluez.service
-@@ -0,0 +1,5 @@
-+[D-BUS Service]
-+Name=org.bluez
-+Exec=/bin/false
-+User=root
-+SystemdService=dbus-org.bluez.service
--- 
-1.7.10.2
+actually non-systemd based distros is something I do not care about
+anymore. The only thing that BlueZ should ship is systemd integration.
+
+If a distro wants to deviate from systemd, then they have to go an fix
+that up by themselves. This is not something I will allow upstream.
+
+Regards
+
+Marcel
+
 
