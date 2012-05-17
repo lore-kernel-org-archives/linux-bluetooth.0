@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ v6 14/15] gdbus: do not check signature twice
-Date: Thu, 17 May 2012 15:20:11 -0300
-Message-Id: <1337278812-4837-15-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ v6 15/15] adapter: do not check signature twice
+Date: Thu, 17 May 2012 15:20:12 -0300
+Message-Id: <1337278812-4837-16-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1337278812-4837-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1337278812-4837-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,25 +13,23 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Message signature is already checked in generic_message(), so there's no
 need to check again in the callback.
 ---
- gdbus/object.c |    5 -----
- 1 file changed, 5 deletions(-)
+ src/adapter.c |    3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index dacbe58..2dd7c0e 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -174,11 +174,6 @@ static DBusMessage *introspect(DBusConnection *connection,
- 	struct generic_data *data = user_data;
- 	DBusMessage *reply;
+diff --git a/src/adapter.c b/src/adapter.c
+index e2e466d..dafe595 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1317,9 +1317,6 @@ static DBusMessage *list_devices(DBusConnection *conn,
+ 	DBusMessageIter array_iter;
+ 	const gchar *dev_path;
  
--	if (!dbus_message_has_signature(message, DBUS_TYPE_INVALID_AS_STRING)) {
--		error("Unexpected signature to introspect call");
--		return NULL;
--	}
+-	if (!dbus_message_has_signature(msg, DBUS_TYPE_INVALID_AS_STRING))
+-		return btd_error_invalid_args(msg);
 -
- 	if (data->introspect == NULL)
- 		generate_introspection_xml(connection, data,
- 						dbus_message_get_path(message));
+ 	reply = dbus_message_new_method_return(msg);
+ 	if (!reply)
+ 		return NULL;
 -- 
 1.7.10.2
 
