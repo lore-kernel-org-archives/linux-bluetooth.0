@@ -1,49 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 May 2012 18:02:37 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Alex Elsayed <eternaleye@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Add dbus service file that references the systemd unit
-Message-ID: <20120517150237.GA21315@x220.P-661HNU-F1>
-References: <20120516080134.GA27987@x220>
- <3bc04a064cb81285510d978c3c867e5ea5203600.1337201604.git.eternaleye@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <3bc04a064cb81285510d978c3c867e5ea5203600.1337201604.git.eternaleye@gmail.com>
+In-Reply-To: <CAOnmHE9P-PUQOLh_skQxBXZx53fBe9u4jHu8HoDTwZEVOd4xAg@mail.gmail.com>
+References: <1322850850-18019-1-git-send-email-anderson.lizardo@openbossa.org>
+	<CA+XVXffynitA+JYzRnqiRJPQyyrTh+HMNUWQgb0LzD4iowoxpg@mail.gmail.com>
+	<CAJdJm_MXwG0vicPL1zPDBYKj-GXRgacvyg9wqpe5OAhey5q4VA@mail.gmail.com>
+	<CAOnmHE9P-PUQOLh_skQxBXZx53fBe9u4jHu8HoDTwZEVOd4xAg@mail.gmail.com>
+Date: Thu, 17 May 2012 10:50:41 -0400
+Message-ID: <CAJdJm_O9dhJg3BZZjiTH+6a0VrryXEnxUZf670jPCJUAZ-=0sw@mail.gmail.com>
+Subject: Re: [PATCH RFC BlueZ 0/5] Time Profile (server) improvements
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: "Arun K. Singh" <arunkat@gmail.com>
+Cc: Arik Nemtsov <arik@wizery.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Arun,
 
-On Wed, May 16, 2012, Alex Elsayed wrote:
-> This allows bluez to be bus-activated.
-> 
-> v2: Fix whitespace error
+On Wed, May 16, 2012 at 7:40 AM, Arun K. Singh <arunkat@gmail.com> wrote:
+> Hi Anderson,
+>
+> On Thu, Feb 2, 2012 at 4:42 AM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+>
+> <snip>
+> ..
+>
+>> But even with the initial implementation, most Time clients will be
+>> supported just fine. They will just not be able to update the phone's
+>> own time or be notified of manual changes to the phone time (this will
+>> be supported with the D-Bus API).
+>
+> Unless I missed such discussions on Time client support, could you
+> comment on plans to support it. From what I figure is a time client
+> will need to configure few things on the server such as notifying on
+> time udpates/reference time etc. which may need dedicated API's. Do
+> you have plans to support time client API's as well?
 
-This v2 line shouldn't be part of the commit message. You can put stuff
-like that between the --- line and the diff line (usually before the
-diffstat).
+The current code (and the relevant discussion) is only related to Time
+Server D-BUS API. It is needed so the platform specific stuff (e.g.
+system clock update) can be done outside of BlueZ, by a Time "agent".
 
-> +++ b/src/org.bluez.service.in
-> @@ -0,0 +1,5 @@
-> +[D-BUS Service]
-> +Name=org.bluez
-> +Exec=@prefix@/sbin/bluetoothd -n
-> +User=root
-> +SystemdService=bluetooth.service
+If you are interested on implementing Time Client support, you will
+need to propose a separate API. I am not aware of anyone working on
+client side support.
 
-My Fedora 16 installation seems to provide its own org.bluez.service:
+>
+> Thanks,
+> Arun
 
-$ cat /usr/share/dbus-1/system-services/org.bluez.service 
-[D-BUS Service]
-Name=org.bluez
-Exec=/bin/false
-User=root
-SystemdService=dbus-org.bluez.service
-
-Could you explain why it's a bit different from what you're providing
-(particularly the /bin/false part). I'm not really an expert with with
-systemd/D-Bus files so you'll need to convince me of why your variant is
-correct (or more appropriate than the Fedora one) before it goes upstream.
-
-Johan
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
