@@ -2,134 +2,130 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ v6 08/15] gdbus: use GDBusArgInfo to generate introspection
-Date: Thu, 17 May 2012 15:20:05 -0300
-Message-Id: <1337278812-4837-9-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ v6 06/15] gdbus: add and use helpers for table declarations
+Date: Thu, 17 May 2012 15:20:03 -0300
+Message-Id: <1337278812-4837-7-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1337278812-4837-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1337278812-4837-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-By using GDBusArgInfo in methods and signals, the introspection
-generation is much simpler and we can add each argument name.
 ---
- gdbus/object.c |   75 +++++++++++---------------------------------------------
- 1 file changed, 14 insertions(+), 61 deletions(-)
+ gdbus/gdbus.h  |   86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ gdbus/object.c |    3 +-
+ 2 files changed, 88 insertions(+), 1 deletion(-)
 
+diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+index e5e7938..8354633 100644
+--- a/gdbus/gdbus.h
++++ b/gdbus/gdbus.h
+@@ -118,6 +118,92 @@ typedef struct {
+ 	GDBusSecurityFunction function;
+ } GDBusSecurityTable;
+ 
++#define GDBUS_ARGS(args...) (const GDBusArgInfo[]) { args, { } }
++
++#define _GDBUS_METHOD(_name, _signature, _reply, _in_args, _out_args, _function) \
++	.name = _name, \
++	.signature = _signature, \
++	.reply = _reply, \
++	.in_args = _in_args, \
++	.out_args = _out_args, \
++	.function = _function
++
++#define _GDBUS_ASYNC_METHOD(_name, _signature, _reply, _in_args, _out_args, _function) \
++	.name = _name, \
++	.signature = _signature, \
++	.reply = _reply, \
++	.in_args = _in_args, \
++	.out_args = _out_args, \
++	.function = _function, \
++	.flags = G_DBUS_METHOD_FLAG_ASYNC
++
++#define _GDBUS_DEPRECATED_METHOD(_name, _signature, _reply, _in_args, _out_args, _function) \
++	.name = _name, \
++	.signature = _signature, \
++	.reply = _reply, \
++	.in_args = _in_args, \
++	.out_args = _out_args, \
++	.function = _function, \
++	.flags = G_DBUS_METHOD_FLAG_DEPRECATED
++
++#define _GDBUS_DEPRECATED_ASYNC_METHOD(_name, _signature, _reply, _in_args, _out_args, _function) \
++	.name = _name, \
++	.signature = _signature, \
++	.reply = _reply, \
++	.in_args = _in_args, \
++	.out_args = _out_args, \
++	.function = _function, \
++	.flags = G_DBUS_METHOD_FLAG_ASYNC | G_DBUS_METHOD_FLAG_DEPRECATED
++
++#define _GDBUS_SIGNAL(_name, _signature, _args) \
++	.name = _name, \
++	.signature = _signature, \
++	.args = _args
++
++#define _GDBUS_DEPRECATED_SIGNAL(_name, _signature, _args) \
++	.name = _name, \
++	.signature = _signature, \
++	.args = _args, \
++	.flags = G_DBUS_SIGNAL_FLAG_DEPRECATED
++
++/* Helpers with no signature and reply */
++
++#define GDBUS_METHOD(_name, _in_args, _out_args, _function) \
++	.name = _name, \
++	.in_args = _in_args, \
++	.out_args = _out_args, \
++	.function = _function
++
++#define GDBUS_ASYNC_METHOD(_name, _in_args, _out_args, _function) \
++	.name = _name, \
++	.in_args = _in_args, \
++	.out_args = _out_args, \
++	.function = _function, \
++	.flags = G_DBUS_METHOD_FLAG_ASYNC
++
++#define GDBUS_DEPRECATED_METHOD(_name, _in_args, _out_args, _function) \
++	.name = _name, \
++	.in_args = _in_args, \
++	.out_args = _out_args, \
++	.function = _function, \
++	.flags = G_DBUS_METHOD_FLAG_DEPRECATED
++
++#define GDBUS_DEPRECATED_ASYNC_METHOD(_name, _in_args, _out_args, _function) \
++	.name = _name, \
++	.in_args = _in_args, \
++	.out_args = _out_args, \
++	.function = _function, \
++	.flags = G_DBUS_METHOD_FLAG_ASYNC | G_DBUS_METHOD_FLAG_DEPRECATED
++
++#define GDBUS_SIGNAL(_name, _args) \
++	.name = _name, \
++	.args = _args
++
++#define GDBUS_DEPRECATED_SIGNAL(_name, _args) \
++	.name = _name, \
++	.args = _args, \
++	.flags = G_DBUS_SIGNAL_FLAG_DEPRECATED
++
+ gboolean g_dbus_register_interface(DBusConnection *connection,
+ 					const char *path, const char *name,
+ 					const GDBusMethodTable *methods,
 diff --git a/gdbus/object.c b/gdbus/object.c
-index 2ddc574..3ac6a0b 100644
+index 0ef6c80..2ddc574 100644
 --- a/gdbus/object.c
 +++ b/gdbus/object.c
-@@ -59,68 +59,20 @@ struct security_data {
- 	void *iface_user_data;
- };
- 
--static void print_arguments(GString *gstr, const char *sig,
-+static void print_arguments(GString *gstr, const GDBusArgInfo *args,
- 						const char *direction)
- {
--	int i;
--
--	for (i = 0; sig[i]; i++) {
--		char type[32];
--		int struct_level, dict_level;
--		unsigned int len;
--		gboolean complete;
--
--		complete = FALSE;
--		struct_level = dict_level = 0;
--
--		/* Gather enough data to have a single complete type */
--		for (len = 0; len < (sizeof(type) - 1) && sig[i]; len++, i++) {
--			switch (sig[i]) {
--			case '(':
--				struct_level++;
--				break;
--			case ')':
--				struct_level--;
--				if (struct_level <= 0 && dict_level <= 0)
--					complete = TRUE;
--				break;
--			case '{':
--				dict_level++;
--				break;
--			case '}':
--				dict_level--;
--				if (struct_level <= 0 && dict_level <= 0)
--					complete = TRUE;
--				break;
--			case 'a':
--				break;
--			default:
--				if (struct_level <= 0 && dict_level <= 0)
--					complete = TRUE;
--				break;
--			}
--
--			type[len] = sig[i];
--
--			if (complete)
--				break;
--		}
--
--		type[len + 1] = '\0';
--
--		if (!complete) {
--			error("Unexpected signature: %s", sig);
--			return;
--		}
-+	for (; args && args->name; args++) {
-+		g_string_append_printf(gstr,
-+					"\t\t\t<arg name=\"%s\" type=\"%s\"",
-+					args->name, args->signature);
- 
- 		if (direction)
- 			g_string_append_printf(gstr,
--					"\t\t\t<arg type=\"%s\" direction=\"%s\"/>\n",
--					type, direction);
-+					" direction=\"%s\"/>\n", direction);
- 		else
--			g_string_append_printf(gstr,
--					"\t\t\t<arg type=\"%s\"/>\n",
--					type);
-+			g_string_append_printf(gstr, "/>\n");
-+
- 	}
+@@ -497,7 +497,8 @@ done:
  }
  
-@@ -130,26 +82,27 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
- 	const GDBusSignalTable *signal;
+ static const GDBusMethodTable introspect_methods[] = {
+-	{ "Introspect",	"",	"s", introspect	},
++	{ _GDBUS_METHOD("Introspect", "", "s", NULL,
++			GDBUS_ARGS({ "xml", "s" }), introspect) },
+ 	{ }
+ };
  
- 	for (method = iface->methods; method && method->name; method++) {
--		if (!strlen(method->signature) && !strlen(method->reply))
-+		if (!(method->in_args && method->in_args->name) &&
-+				!(method->out_args && method->out_args->name))
- 			g_string_append_printf(gstr, "\t\t<method name=\"%s\"/>\n",
- 								method->name);
- 		else {
- 			g_string_append_printf(gstr, "\t\t<method name=\"%s\">\n",
- 								method->name);
--			print_arguments(gstr, method->signature, "in");
--			print_arguments(gstr, method->reply, "out");
-+			print_arguments(gstr, method->in_args, "in");
-+			print_arguments(gstr, method->out_args, "out");
- 			g_string_append_printf(gstr, "\t\t</method>\n");
- 		}
- 	}
- 
- 	for (signal = iface->signals; signal && signal->name; signal++) {
--		if (!strlen(signal->signature))
-+		if (!(signal->args && signal->args->name))
- 			g_string_append_printf(gstr, "\t\t<signal name=\"%s\"/>\n",
- 								signal->name);
- 		else {
- 			g_string_append_printf(gstr, "\t\t<signal name=\"%s\">\n",
- 								signal->name);
--			print_arguments(gstr, signal->signature, NULL);
-+			print_arguments(gstr, signal->args, NULL);
- 			g_string_append_printf(gstr, "\t\t</signal>\n");
- 		}
- 	}
 -- 
 1.7.10.2
 
