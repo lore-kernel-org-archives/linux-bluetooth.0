@@ -5,112 +5,214 @@ To: linux-bluetooth@vger.kernel.org,
 	marcel@holtmann.org,
 	ulisses@profusion.mobi
 Cc: pkrystad@codeaurora.org
-Subject: [PATCH 09/25] Bluetooth: Refactor l2cap_send_ack
-Date: Thu, 17 May 2012 20:53:39 -0700
-Message-Id: <1337313235-26535-10-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 07/25] Bluetooth: Add streaming mode receive and incoming packet classifier
+Date: Thu, 17 May 2012 20:53:37 -0700
+Message-Id: <1337313235-26535-8-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1337313235-26535-1-git-send-email-mathewm@codeaurora.org>
 References: <1337313235-26535-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The function now encapsulates more of the logic to either immediately
-send an ack if the transmit window is over 75% full, or wait for the
-ack timer to expire if the transmit window is not full enough.  It is
-also able to push out waiting iframes that can carry an
-acknowledgement.
+Streaming mode reception is fairly simple, with in-sequence frames
+being reassembled as they arrive.  Out-of-sequence frames are dropped,
+and also clear any partially-assembled SDUs that may exist.
+
+The packet classifier determines if the txseq value of the incoming
+packet is expected, invalid (resulting in a disconnection), invalid
+(ignorable), duplicate, or having to do with an SREJ request that was
+previously sent.  The rules for each classification are defined in the
+ERTM specification, and consolidating these rules in one place helps
+clarify the receive state machine.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |   68 ++++++++++++++++++++++++++++++--------------
- 1 file changed, 47 insertions(+), 21 deletions(-)
+ net/bluetooth/l2cap_core.c |  136 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 130 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ce8bffd..9c3f51c 100644
+index 3f6bec9..50cc36b 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1769,28 +1769,54 @@ static int l2cap_retransmit_frames(struct l2cap_chan *chan)
- 	return ret;
+@@ -2417,6 +2417,13 @@ static int l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+ 	return err;
  }
  
--static void __l2cap_send_ack(struct l2cap_chan *chan)
--{
--	u32 control = 0;
--
--	control |= __set_reqseq(chan, chan->buffer_seq);
--
--	if (test_bit(CONN_LOCAL_BUSY, &chan->conn_state)) {
--		control |= __set_ctrl_super(chan, L2CAP_SUPER_RNR);
--		set_bit(CONN_RNR_SENT, &chan->conn_state);
--		return;
--	}
--
--	if (l2cap_ertm_send(chan) > 0)
--		return;
--
--	control |= __set_ctrl_super(chan, L2CAP_SUPER_RR);
--}
--
- static void l2cap_send_ack(struct l2cap_chan *chan)
++static void l2cap_pass_to_tx(struct l2cap_chan *chan,
++			     struct l2cap_ctrl *control)
++{
++	BT_DBG("chan %p, control %p", chan, control);
++	l2cap_tx(chan, control, 0, L2CAP_EV_RECV_REQSEQ_AND_FBIT);
++}
++
+ /* Copy frame to all raw sockets on that connection */
+ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
  {
--	__clear_ack_timer(chan);
--	__l2cap_send_ack(chan);
-+	struct l2cap_ctrl control;
-+	u16 frames_to_ack = __seq_offset(chan, chan->buffer_seq,
-+					 chan->last_acked_seq);
-+	int threshold;
-+
-+	BT_DBG("chan %p last_acked_seq %d buffer_seq %d",
-+	       chan, chan->last_acked_seq, chan->buffer_seq);
-+
-+	memset(&control, 0, sizeof(control));
-+	control.sframe = 1;
-+
-+	if (test_bit(CONN_LOCAL_BUSY, &chan->conn_state) &&
-+	    chan->rx_state == L2CAP_RX_STATE_RECV) {
-+		__clear_ack_timer(chan);
-+		control.super = L2CAP_SUPER_RNR;
-+		control.reqseq = chan->buffer_seq;
-+		l2cap_send_sframe(chan, &control);
-+	} else {
-+		if (!test_bit(CONN_REMOTE_BUSY, &chan->conn_state)) {
-+			l2cap_ertm_send(chan);
-+			/* If any i-frames were sent, they included an ack */
-+			if (chan->buffer_seq == chan->last_acked_seq)
-+				frames_to_ack = 0;
-+		}
-+
-+		/* Ack now if the tx window is 3/4ths full.
-+		 * Calculate without mul or div
-+		 */
-+		threshold = chan->tx_win;
-+		threshold += threshold << 1;
-+		threshold >>= 2;
-+
-+		BT_DBG("frames_to_ack %d, threshold %d", (int)frames_to_ack,
-+		       threshold);
-+
-+		if (frames_to_ack >= threshold) {
-+			__clear_ack_timer(chan);
-+			control.super = L2CAP_SUPER_RR;
-+			control.reqseq = chan->buffer_seq;
-+			l2cap_send_sframe(chan, &control);
-+			frames_to_ack = 0;
-+		}
-+
-+		if (frames_to_ack)
-+			__set_ack_timer(chan);
-+	}
+@@ -4321,11 +4328,12 @@ static void append_skb_frag(struct sk_buff *skb,
+ 	skb->truesize += new_frag->truesize;
  }
  
- static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
-@@ -2536,7 +2562,7 @@ static void l2cap_ack_timeout(struct work_struct *work)
+-static int l2cap_reassemble_sdu(struct l2cap_chan *chan, struct sk_buff *skb, u32 control)
++static int l2cap_reassemble_sdu(struct l2cap_chan *chan, struct sk_buff *skb,
++				struct l2cap_ctrl *control)
+ {
+ 	int err = -EINVAL;
  
- 	l2cap_chan_lock(chan);
+-	switch (__get_ctrl_sar(chan, control)) {
++	switch (control->sar) {
+ 	case L2CAP_SAR_UNSEGMENTED:
+ 		if (chan->sdu)
+ 			break;
+@@ -4460,7 +4468,6 @@ static void l2cap_check_srej_gap(struct l2cap_chan *chan, u16 tx_seq)
  
--	__l2cap_send_ack(chan);
-+	l2cap_send_ack(chan);
+ 		skb = skb_dequeue(&chan->srej_q);
+ 		control = __set_ctrl_sar(chan, bt_cb(skb)->control.sar);
+-		err = l2cap_reassemble_sdu(chan, skb, control);
  
- 	l2cap_chan_unlock(chan);
+ 		if (err < 0) {
+ 			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
+@@ -4634,7 +4641,6 @@ expected:
+ 		return 0;
+ 	}
  
+-	err = l2cap_reassemble_sdu(chan, skb, rx_control);
+ 	chan->buffer_seq = __next_seq(chan, chan->buffer_seq);
+ 
+ 	if (err < 0) {
+@@ -4819,6 +4825,93 @@ static inline int l2cap_data_channel_sframe(struct l2cap_chan *chan, u32 rx_cont
+ 	return 0;
+ }
+ 
++static u8 l2cap_classify_txseq(struct l2cap_chan *chan, u16 txseq)
++{
++	BT_DBG("chan %p, txseq %d", chan, txseq);
++
++	BT_DBG("last_acked_seq %d, expected_tx_seq %d", chan->last_acked_seq,
++	       chan->expected_tx_seq);
++
++	if (chan->rx_state == L2CAP_RX_STATE_SREJ_SENT) {
++		if (__seq_offset(chan, txseq, chan->last_acked_seq) >=
++								chan->tx_win) {
++			/* See notes below regarding "double poll" and
++			 * invalid packets.
++			 */
++			if (chan->tx_win <= ((chan->tx_win_max + 1) >> 1)) {
++				BT_DBG("Invalid/Ignore - after SREJ");
++				return L2CAP_TXSEQ_INVALID_IGNORE;
++			} else {
++				BT_DBG("Invalid - in window after SREJ sent");
++				return L2CAP_TXSEQ_INVALID;
++			}
++		}
++
++		if (chan->srej_list.head == txseq) {
++			BT_DBG("Expected SREJ");
++			return L2CAP_TXSEQ_EXPECTED_SREJ;
++		}
++
++		if (l2cap_ertm_seq_in_queue(&chan->srej_q, txseq)) {
++			BT_DBG("Duplicate SREJ - txseq already stored");
++			return L2CAP_TXSEQ_DUPLICATE_SREJ;
++		}
++
++		if (l2cap_seq_list_contains(&chan->srej_list, txseq)) {
++			BT_DBG("Unexpected SREJ - not requested");
++			return L2CAP_TXSEQ_UNEXPECTED_SREJ;
++		}
++	}
++
++	if (chan->expected_tx_seq == txseq) {
++		if (__seq_offset(chan, txseq, chan->last_acked_seq) >=
++		    chan->tx_win) {
++			BT_DBG("Invalid - txseq outside tx window");
++			return L2CAP_TXSEQ_INVALID;
++		} else {
++			BT_DBG("Expected");
++			return L2CAP_TXSEQ_EXPECTED;
++		}
++	}
++
++	if (__seq_offset(chan, txseq, chan->last_acked_seq) <
++		__seq_offset(chan, chan->expected_tx_seq,
++			     chan->last_acked_seq)){
++		BT_DBG("Duplicate - expected_tx_seq later than txseq");
++		return L2CAP_TXSEQ_DUPLICATE;
++	}
++
++	if (__seq_offset(chan, txseq, chan->last_acked_seq) >= chan->tx_win) {
++		/* A source of invalid packets is a "double poll" condition,
++		 * where delays cause us to send multiple poll packets.  If
++		 * the remote stack receives and processes both polls,
++		 * sequence numbers can wrap around in such a way that a
++		 * resent frame has a sequence number that looks like new data
++		 * with a sequence gap.  This would trigger an erroneous SREJ
++		 * request.
++		 *
++		 * Fortunately, this is impossible with a tx window that's
++		 * less than half of the maximum sequence number, which allows
++		 * invalid frames to be safely ignored.
++		 *
++		 * With tx window sizes greater than half of the tx window
++		 * maximum, the frame is invalid and cannot be ignored.  This
++		 * causes a disconnect.
++		 */
++
++		if (chan->tx_win <= ((chan->tx_win_max + 1) >> 1)) {
++			BT_DBG("Invalid/Ignore - txseq outside tx window");
++			return L2CAP_TXSEQ_INVALID_IGNORE;
++		} else {
++			BT_DBG("Invalid - txseq outside tx window");
++			return L2CAP_TXSEQ_INVALID;
++		}
++	} else {
++		BT_DBG("Unexpected - txseq indicates missing frames");
++		return L2CAP_TXSEQ_UNEXPECTED;
++	}
++}
++
+ static int l2cap_rx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+ 		    struct sk_buff *skb, u8 event)
+ {
+@@ -4829,8 +4922,39 @@ static int l2cap_rx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+ static int l2cap_stream_rx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+ 			   struct sk_buff *skb)
+ {
+-	/* Placeholder */
+-	return -ENOTSUPP;
++	int err = 0;
++
++	BT_DBG("chan %p, control %p, skb %p, state %d", chan, control, skb,
++	       chan->rx_state);
++
++	if (l2cap_classify_txseq(chan, control->txseq) ==
++	    L2CAP_TXSEQ_EXPECTED) {
++		l2cap_pass_to_tx(chan, control);
++
++		BT_DBG("buffer_seq %d->%d", chan->buffer_seq,
++		       __next_seq(chan, chan->buffer_seq));
++
++		chan->buffer_seq = __next_seq(chan, chan->buffer_seq);
++
++		l2cap_reassemble_sdu(chan, skb, control);
++	} else {
++		if (chan->sdu) {
++			kfree_skb(chan->sdu);
++			chan->sdu = NULL;
++		}
++		chan->sdu_last_frag = NULL;
++		chan->sdu_len = 0;
++
++		if (skb) {
++			BT_DBG("Freeing %p", skb);
++			kfree_skb(skb);
++		}
++	}
++
++	chan->last_acked_seq = control->txseq;
++	chan->expected_tx_seq = __next_seq(chan, control->txseq);
++
++	return err;
+ }
+ 
+ static int l2cap_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
 -- 
 1.7.10
 
