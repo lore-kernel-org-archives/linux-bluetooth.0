@@ -1,62 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 May 2012 14:38:11 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: chanyeol.park@samsung.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Fix A2DP Sink/Source recognition
-Message-ID: <20120518113811.GA1375@x220.P-661HNU-F1>
-References: <1337331254-30749-1-git-send-email-chanyeol.park@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337331254-30749-1-git-send-email-chanyeol.park@samsung.com>
+In-Reply-To: <20120517144015.GA20883@x220.P-661HNU-F1>
+References: <CAP6uk1On=Re6wOo6-HSD=g8iHdWE9bgxJcJ0NF3w9vTRnTfGvA@mail.gmail.com>
+	<20120517144015.GA20883@x220.P-661HNU-F1>
+Date: Fri, 18 May 2012 17:03:18 +0530
+Message-ID: <CAP6uk1OGcSJxdiLGET53Xa=kNBuqtLedTaEoAwokxJmdWPUz=w@mail.gmail.com>
+Subject: Re: Auto Generate configure & make files
+From: santhosh aj <ajsant@gmail.com>
+To: santhosh aj <ajsant@gmail.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chanyeol,
+On Thu, May 17, 2012 at 8:10 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Santosh,
+>
+> On Thu, May 17, 2012, santhosh aj wrote:
+>> Can any one please tell me what is the proper order/commands to
+>> generate configure.in, .configure, Makefile.in, config.h.in. If we
+>> download a snapshot from git repository
+>> (http://git.kernel.org/?p=bluetooth/bluez.git;a=summary) these file
+>> will be missing. I found a link which give some information about this
+>> (http://www.nondot.org/sabre/Mirrored/autoconf-2.12/autoconf_2.html).
+>> but if some one can tell the proper steps it will be help a lot for
+>> all who doesn't know.
+>
+> The git tree contains a script called bootstrap that will do this for
+> you. A bootstrap-configure script is also provided which additionally
+> calls the configure script with options that are appropriate for BlueZ
+> development (but not necessarily for product use).
+>
+> Johan
 
-On Fri, May 18, 2012, chanyeol.park@samsung.com wrote:
-> From: Chan-yeol Park <chanyeol.park@samsung.com>
-> 
-> ---
->  audio/a2dp.c     |    8 ++++----
->  audio/audio.conf |    2 +-
->  audio/manager.c  |    4 ++--
->  3 files changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/audio/a2dp.c b/audio/a2dp.c
-> index cc8f139..145dcf6 100644
-> --- a/audio/a2dp.c
-> +++ b/audio/a2dp.c
-> @@ -1406,9 +1406,9 @@ int a2dp_register(DBusConnection *conn, const bdaddr_t *src, GKeyFile *config)
->  		g_clear_error(&err);
->  	} else {
->  		if (strstr(str, "Sink"))
-> -			source = TRUE;
-> -		if (strstr(str, "Source"))
->  			sink = TRUE;
-> +		if (strstr(str, "Source"))
-> +			source = TRUE;
->  		if (strstr(str, "Socket"))
->  			socket = TRUE;
->  		g_free(str);
-> @@ -1421,9 +1421,9 @@ int a2dp_register(DBusConnection *conn, const bdaddr_t *src, GKeyFile *config)
->  		g_clear_error(&err);
->  	} else {
->  		if (strstr(str, "Sink"))
-> -			source = FALSE;
-> -		if (strstr(str, "Source"))
->  			sink = FALSE;
-> +		if (strstr(str, "Source"))
-> +			source = FALSE;
->  		if (strstr(str, "Socket"))
->  			socket = FALSE;
->  		g_free(str);
-
-This doesn't look right to me. The config file values have (for
-historical reasons) been referring to the remote device object D-Bus
-interface names whereas these gboolean variables are used to determine
-what kind of local stream endpoints need to be registered. So having
-e.g. support for "Source" on a remote device requires registering a
-local sink stream endpoint.
-
-Johan
+Thank you very much. It worked. libtool & libcapabilities were
+missing. After installing those it worked.
