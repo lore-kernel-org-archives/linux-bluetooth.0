@@ -1,32 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <20120518160634.GA8380@x220.P-661HNU-F1>
+References: <1337356807-7199-1-git-send-email-luiz.dentz@gmail.com>
+	<1337356807-7199-2-git-send-email-luiz.dentz@gmail.com>
+	<20120518160634.GA8380@x220.P-661HNU-F1>
+Date: Fri, 18 May 2012 19:07:57 +0300
+Message-ID: <CABBYNZJfwZe5m+LrmjUzMVJjHRCCO6riVvk1gCOFGKUhBxvYBg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/3] AVRCP: Subscribe for VolumeChanged Notification
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3 v2] AVRCP: Add define for VolumeChanged event
-Date: Fri, 18 May 2012 19:11:42 +0300
-Message-Id: <1337357504-7900-1-git-send-email-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
----
- audio/avrcp.h |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+On Fri, May 18, 2012 at 7:06 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Fri, May 18, 2012, Luiz Augusto von Dentz wrote:
+>> +             DBG("1");
+>> +
+>> +             if (sdp_get_profile_descs(rec, &list) < 0)
+>> +                     return;
+>> +
+>> +             desc = list->data;
+>> +
+>> +             DBG("2");
+>> +
+>> +             if (desc && desc->version >= 0x0104) {
+>> +                     DBG("3");
+>> +                     register_volume_notification(player);
+>> +             }
+>
+> The "1", "2" and "3" logs should probably be removed or at least changed
+> to something more meaningful.
 
-diff --git a/audio/avrcp.h b/audio/avrcp.h
-index 8a09546..9aef081 100644
---- a/audio/avrcp.h
-+++ b/audio/avrcp.h
-@@ -73,7 +73,8 @@
- #define AVRCP_EVENT_TRACK_CHANGED	0x02
- #define AVRCP_EVENT_TRACK_REACHED_END	0x03
- #define AVRCP_EVENT_TRACK_REACHED_START	0x04
--#define AVRCP_EVENT_LAST		AVRCP_EVENT_TRACK_REACHED_START
-+#define AVRCP_EVENT_VOLUME_CHANGED	0x0d
-+#define AVRCP_EVENT_LAST		AVRCP_EVENT_VOLUME_CHANGED
- 
- struct avrcp_player_cb {
- 	int (*get_setting) (uint8_t attr, void *user_data);
+Opps
+
+
 -- 
-1.7.7.6
-
+Luiz Augusto von Dentz
