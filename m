@@ -5,65 +5,86 @@ To: linux-bluetooth@vger.kernel.org,
 	marcel@holtmann.org,
 	ulisses@profusion.mobi
 Cc: pkrystad@codeaurora.org
-Subject: [PATCH 20/25] Bluetooth: Use the ERTM transmit state machine from timeout handlers
-Date: Thu, 17 May 2012 20:53:50 -0700
-Message-Id: <1337313235-26535-21-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 19/25] Bluetooth: Check rules when setting retransmit or monitor timers
+Date: Thu, 17 May 2012 20:53:49 -0700
+Message-Id: <1337313235-26535-20-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1337313235-26535-1-git-send-email-mathewm@codeaurora.org>
 References: <1337313235-26535-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Different states have different actions for retransmit and monitor
-timeouts, so remove the logic for those actions from the timer handlers.
+The ERTM specification requires the retransmit timer to be cancelled
+when the monitor timer is set.  The retransmit timer cannot be set
+again while the monitor timer is pending.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |   19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
+ include/net/bluetooth/l2cap.h |    4 ----
+ net/bluetooth/l2cap_core.c    |   22 ++++++++++++++++++++--
+ 2 files changed, 20 insertions(+), 6 deletions(-)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 7d1da5a..117db8e 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -706,11 +706,7 @@ static inline bool l2cap_clear_timer(struct l2cap_chan *chan,
+ 
+ #define __set_chan_timer(c, t) l2cap_set_timer(c, &c->chan_timer, (t))
+ #define __clear_chan_timer(c) l2cap_clear_timer(c, &c->chan_timer)
+-#define __set_retrans_timer(c) l2cap_set_timer(c, &c->retrans_timer, \
+-		msecs_to_jiffies(L2CAP_DEFAULT_RETRANS_TO));
+ #define __clear_retrans_timer(c) l2cap_clear_timer(c, &c->retrans_timer)
+-#define __set_monitor_timer(c) l2cap_set_timer(c, &c->monitor_timer, \
+-		msecs_to_jiffies(L2CAP_DEFAULT_MONITOR_TO));
+ #define __clear_monitor_timer(c) l2cap_clear_timer(c, &c->monitor_timer)
+ #define __set_ack_timer(c) l2cap_set_timer(c, &chan->ack_timer, \
+ 		msecs_to_jiffies(L2CAP_DEFAULT_ACK_TO));
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 7bacb01..7f3d7cb 100644
+index 0c55403..7bacb01 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1640,17 +1640,14 @@ static void l2cap_monitor_timeout(struct work_struct *work)
- 
- 	l2cap_chan_lock(chan);
- 
--	if (chan->retry_count >= chan->remote_max_tx) {
--		l2cap_send_disconn_req(chan->conn, chan, ECONNABORTED);
-+	if (!chan->conn) {
- 		l2cap_chan_unlock(chan);
- 		l2cap_chan_put(chan);
- 		return;
- 	}
- 
--	chan->retry_count++;
--	__set_monitor_timer(chan);
-+	l2cap_tx(chan, 0, 0, L2CAP_EV_MONITOR_TO);
- 
--	l2cap_send_rr_or_rnr(chan, L2CAP_CTRL_POLL);
- 	l2cap_chan_unlock(chan);
- 	l2cap_chan_put(chan);
+@@ -227,6 +227,24 @@ static inline void l2cap_chan_set_err(struct l2cap_chan *chan, int err)
+ 	release_sock(sk);
  }
-@@ -1664,13 +1661,13 @@ static void l2cap_retrans_timeout(struct work_struct *work)
  
- 	l2cap_chan_lock(chan);
- 
--	chan->retry_count = 1;
--	__set_monitor_timer(chan);
--
--	set_bit(CONN_WAIT_F, &chan->conn_state);
--
--	l2cap_send_rr_or_rnr(chan, L2CAP_CTRL_POLL);
-+	if (!chan->conn) {
-+		l2cap_chan_unlock(chan);
-+		l2cap_chan_put(chan);
-+		return;
++static void __set_retrans_timer(struct l2cap_chan *chan)
++{
++	if (!delayed_work_pending(&chan->monitor_timer) &&
++	    chan->retrans_timeout) {
++		l2cap_set_timer(chan, &chan->retrans_timer,
++				msecs_to_jiffies(chan->retrans_timeout));
 +	}
++}
++
++static void __set_monitor_timer(struct l2cap_chan *chan)
++{
++	__clear_retrans_timer(chan);
++	if (chan->monitor_timeout) {
++		l2cap_set_timer(chan, &chan->monitor_timer,
++				msecs_to_jiffies(chan->monitor_timeout));
++	}
++}
++
+ static struct sk_buff *l2cap_ertm_seq_in_queue(struct sk_buff_head *head,
+ 					       u16 seq)
+ {
+@@ -1616,7 +1634,7 @@ int __l2cap_wait_ack(struct sock *sk)
+ static void l2cap_monitor_timeout(struct work_struct *work)
+ {
+ 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
+-							monitor_timer.work);
++					       monitor_timer.work);
  
-+	l2cap_tx(chan, 0, 0, L2CAP_EV_RETRANS_TO);
- 	l2cap_chan_unlock(chan);
- 	l2cap_chan_put(chan);
- }
+ 	BT_DBG("chan %p", chan);
+ 
+@@ -1640,7 +1658,7 @@ static void l2cap_monitor_timeout(struct work_struct *work)
+ static void l2cap_retrans_timeout(struct work_struct *work)
+ {
+ 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
+-							retrans_timer.work);
++					       retrans_timer.work);
+ 
+ 	BT_DBG("chan %p", chan);
+ 
 -- 
 1.7.10
 
