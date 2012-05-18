@@ -1,32 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] AVRCP: Add define for VolumeChanged event
-Date: Fri, 18 May 2012 19:00:05 +0300
-Message-Id: <1337356807-7199-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 18 May 2012 18:08:59 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: chanyeol.park@samsung.com, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/3] Fix avrcp unregister potential crash
+Message-ID: <20120518150859.GA6384@x220.P-661HNU-F1>
+References: <1337331254-30749-1-git-send-email-chanyeol.park@samsung.com>
+ <1337331254-30749-2-git-send-email-chanyeol.park@samsung.com>
+ <20120518114032.GB1375@x220.P-661HNU-F1>
+ <CAMOw1v4bO_xYRyLReN81riFtmvUxqx_=5AC3p4D9W3yzkn2EWA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CAMOw1v4bO_xYRyLReN81riFtmvUxqx_=5AC3p4D9W3yzkn2EWA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Lucas,
 
----
- audio/avrcp.h |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+On Fri, May 18, 2012, Lucas De Marchi wrote:
+> >> --- a/audio/avrcp.c
+> >> +++ b/audio/avrcp.c
+> >> @@ -1272,8 +1272,11 @@ void avrcp_unregister(const bdaddr_t *src)
+> >>
+> >>       servers = g_slist_remove(servers, server);
+> >>
+> >> -     remove_record_from_server(server->ct_record_id);
+> >> -     remove_record_from_server(server->tg_record_id);
+> >> +     if (server->ct_record_id)
+> >> +             remove_record_from_server(server->ct_record_id);
+> >> +
+> >> +     if (server->tg_record_id)
+> >> +             remove_record_from_server(server->tg_record_id);
+> >>
+> >>       avctp_unregister(&server->src);
+> >>       g_free(server);
+> >
+> > I don't think the commit message for this patch is truthful. If you look
+> > at the code the remove_record_from_server will return ENOENT if you pass
+> > it a non-existent handle. I.e. it will not crash. Please fix the commit
+> > message to reflect what exactly is being fixed (i.e. an unnecessary call
+> > to remove_record_from_server if there is no record handle).
+> 
+> Then I don't see a reason: just let remove_record_from_server() fail ?
+> 
+> Chan, what are you fixing here?
 
-diff --git a/audio/avrcp.h b/audio/avrcp.h
-index 8a09546..9aef081 100644
---- a/audio/avrcp.h
-+++ b/audio/avrcp.h
-@@ -73,7 +73,8 @@
- #define AVRCP_EVENT_TRACK_CHANGED	0x02
- #define AVRCP_EVENT_TRACK_REACHED_END	0x03
- #define AVRCP_EVENT_TRACK_REACHED_START	0x04
--#define AVRCP_EVENT_LAST		AVRCP_EVENT_TRACK_REACHED_START
-+#define AVRCP_EVENT_VOLUME_CHANGED	0x0d
-+#define AVRCP_EVENT_LAST		AVRCP_EVENT_VOLUME_CHANGED
- 
- struct avrcp_player_cb {
- 	int (*get_setting) (uint8_t attr, void *user_data);
--- 
-1.7.7.6
+As discussed on IRC (and Chanyeol should really have explained this in
+the commit message) handle 0 is actually the SDP server's own "master"
+record. So it is plausible that weird behavior might occur if trying to
+remove it. Since this is a SDP server internal detail and it doesn't
+really make sense to remove it I'm thinking that
+remove_record_from_server should return EINVAL if passed a 0 value.
 
+Johan
