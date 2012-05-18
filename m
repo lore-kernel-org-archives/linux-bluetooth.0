@@ -1,44 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1337314755.5970.288.camel@aeonflux>
-Subject: Re: [PATCHv2] Bluetooth: Fix early return from l2cap_chan_del
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	pkrystad@codeaurora.org
-Date: Thu, 17 May 2012 21:19:15 -0700
-In-Reply-To: <1337314449-27842-1-git-send-email-mathewm@codeaurora.org>
-References: <1337314449-27842-1-git-send-email-mathewm@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org,
+	gustavo@padovan.org,
+	marcel@holtmann.org
+Cc: pkrystad@codeaurora.org
+Subject: [PATCHv2] Bluetooth: Fix early return from l2cap_chan_del
+Date: Thu, 17 May 2012 21:14:09 -0700
+Message-Id: <1337314449-27842-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+This fixes a regression from commit
+2ead70b8390d199ca04cd35311b51f5f3676079e that is present in all
+kernels starting at v3.0.
 
-> This fixes a regression from commit
-> 2ead70b8390d199ca04cd35311b51f5f3676079e that is present in all
-> kernels starting at v3.0.
-> 
-> When L2CAP information was moved to struct l2cap_chan, a check was
-> added to l2cap_chan_del to avoid certain cleanup operations when ERTM
-> or streaming mode had not yet been initialized.  The logic in the
-> check did not take in to account that chan->conf_state is set to 0 in
-> l2cap_chan_ready, so l2cap_chan_del failed to cancel timers and leaked
-> memory any time the ERTM queues or lists were not empty.
-> 
-> This change makes sure that l2cap_chan_del only returns early if
-> ERTM initialization was not performed.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  include/net/bluetooth/l2cap.h |    1 +
->  net/bluetooth/l2cap_core.c    |    7 +++++--
->  2 files changed, 6 insertions(+), 2 deletions(-)
+When L2CAP information was moved to struct l2cap_chan, a check was
+added to l2cap_chan_del to avoid certain cleanup operations when ERTM
+or streaming mode had not yet been initialized.  The logic in the
+check did not take in to account that chan->conf_state is set to 0 in
+l2cap_chan_ready, so l2cap_chan_del failed to cancel timers and leaked
+memory any time the ERTM queues or lists were not empty.
 
-patch has been applied to bluetooth-next tree.
+This change makes sure that l2cap_chan_del only returns early if
+ERTM initialization was not performed.
 
-Regards
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/l2cap_core.c    |    7 +++++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-Marcel
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 1c7d1cd..452fcc4 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -597,6 +597,7 @@ enum {
+ 	CONF_EWS_RECV,
+ 	CONF_LOC_CONF_PEND,
+ 	CONF_REM_CONF_PEND,
++	CONF_NOT_COMPLETE,
+ };
+ 
+ #define L2CAP_CONF_MAX_CONF_REQ 2
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 078bf80..d9f215f 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -392,6 +392,9 @@ struct l2cap_chan *l2cap_chan_create(void)
+ 
+ 	atomic_set(&chan->refcnt, 1);
+ 
++	/* This flag is cleared in l2cap_chan_ready() */
++	set_bit(CONF_NOT_COMPLETE, &chan->conf_state);
++
+ 	BT_DBG("chan %p", chan);
+ 
+ 	return chan;
+@@ -509,8 +512,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 
+ 	release_sock(sk);
+ 
+-	if (!(test_bit(CONF_OUTPUT_DONE, &chan->conf_state) &&
+-			test_bit(CONF_INPUT_DONE, &chan->conf_state)))
++	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
+ 		return;
+ 
+ 	skb_queue_purge(&chan->tx_q);
+@@ -923,6 +925,7 @@ static void l2cap_chan_ready(struct l2cap_chan *chan)
+ 
+ 	BT_DBG("sk %p, parent %p", sk, parent);
+ 
++	/* This clears all conf flags, including CONF_NOT_COMPLETE */
+ 	chan->conf_state = 0;
+ 	__clear_chan_timer(chan);
+ 
+-- 
+1.7.10
 
-
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
