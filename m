@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 06/17] Bluetooth: A2MP: Define A2MP status codes
-Date: Fri, 18 May 2012 17:25:39 +0300
-Message-Id: <1337351150-20526-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 12/17] Bluetooth: A2MP: Process A2MP Get AMP Assoc Request
+Date: Fri, 18 May 2012 17:25:45 +0300
+Message-Id: <1337351150-20526-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,35 +11,74 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-A2MP status codes copied from Bluez patch sent by Peter Krystad
-<pkrystad@codeaurora.org>.
+Example trace when receiving AMP Assoc Request with wrong AMP id.
+...
+> ACL data: handle 11 flags 0x02 dlen 13
+    A2MP: Get AMP Assoc req: id 238
+< ACL data: handle 11 flags 0x00 dlen 14
+    A2MP: Get AMP Assoc rsp: id 238 status (1) Invalid Controller ID
+      assoc data:
+...
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |   10 ++++++++++
- 1 file changed, 10 insertions(+)
+ net/bluetooth/a2mp.c |   36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 52e3a70..1f93628 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -105,6 +105,16 @@ struct a2mp_physlink_rsp {
- 	__u8	status;
- } __packed;
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index e48e7f3..5498d67 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -211,6 +211,39 @@ static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
+ }
  
-+/* A2MP response status */
-+#define A2MP_STATUS_SUCCESS			0x00
-+#define A2MP_STATUS_INVALID_CTRL_ID		0x01
-+#define A2MP_STATUS_UNABLE_START_LINK_CREATION	0x02
-+#define A2MP_STATUS_NO_PHYSICAL_LINK_EXISTS	0x02
-+#define A2MP_STATUS_COLLISION_OCCURED		0x03
-+#define A2MP_STATUS_DISCONN_REQ_RECVD		0x04
-+#define A2MP_STATUS_PHYS_LINK_EXISTS		0x05
-+#define A2MP_STATUS_SECURITY_VIOLATION		0x06
++static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
++				struct a2mp_cmd *hdr)
++{
++	struct a2mp_amp_assoc_req *req =
++				(struct a2mp_amp_assoc_req *) skb->data;
++	struct hci_dev *hdev;
 +
- void amp_mgr_get(struct amp_mgr *mgr);
- int amp_mgr_put(struct amp_mgr *mgr);
++	if (le16_to_cpu(hdr->len) < sizeof(*req))
++		return -EINVAL;
++
++	BT_DBG("id %d", req->id);
++
++	hdev = hci_dev_get(req->id);
++	if (!hdev || hdev->amp_type == HCI_BREDR) {
++		struct a2mp_amp_assoc_rsp rsp;
++		rsp.id = req->id;
++		rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
++
++		a2mp_send(mgr, A2MP_GETAMPASSOC_RSP, hdr->ident, sizeof(rsp),
++			  &rsp);
++		goto clean;
++	}
++
++	/* Placeholder for HCI Read AMP Assoc */
++
++clean:
++	if (hdev)
++		hci_dev_put(hdev);
++
++	skb_pull(skb, sizeof(*req));
++	return 0;
++}
++
+ /* Handle A2MP signalling */
+ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ {
+@@ -253,6 +286,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 			break;
  
+ 		case A2MP_GETAMPASSOC_REQ:
++			err = a2mp_getampassoc_req(mgr, skb, hdr);
++			break;
++
+ 		case A2MP_CREATEPHYSLINK_REQ:
+ 		case A2MP_DISCONNPHYSLINK_REQ:
+ 		case A2MP_CHANGE_RSP:
 -- 
 1.7.9.5
 
