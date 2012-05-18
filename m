@@ -5,156 +5,217 @@ To: linux-bluetooth@vger.kernel.org,
 	marcel@holtmann.org,
 	ulisses@profusion.mobi
 Cc: pkrystad@codeaurora.org
-Subject: [PATCH 04/25] Bluetooth: Refactor l2cap_ertm_send
-Date: Thu, 17 May 2012 20:53:34 -0700
-Message-Id: <1337313235-26535-5-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 06/25] Bluetooth: Consolidate common receive code for ERTM and streaming mode
+Date: Thu, 17 May 2012 20:53:36 -0700
+Message-Id: <1337313235-26535-7-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1337313235-26535-1-git-send-email-mathewm@codeaurora.org>
 References: <1337313235-26535-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The new implementation is aware of the new transmit state machine, and
-uses struct l2cap_ctrl to compose ERTM headers.  It also has improved
-error handling for allocation failures, and does not send the packet
-until after all skb and channel data structures are updated.
+Creates a new l2cap_data_rcv function that combines previous code from
+l2cap_ertm_data_rcv and l2cap_data_channel.  This reduces duplicate
+code for streaming mode, and sets up a framework for the ERTM receive
+state machine.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |   79 ++++++++++++++++++++++----------------------
- 1 file changed, 39 insertions(+), 40 deletions(-)
+ net/bluetooth/l2cap_core.c |  126 ++++++++++++++++++++++----------------------
+ 1 file changed, 62 insertions(+), 64 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 93c7e67..fce87e5 100644
+index fd645ff..3f6bec9 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1738,9 +1738,10 @@ static void l2cap_retransmit_one_frame(struct l2cap_chan *chan, u16 tx_seq)
- static int l2cap_ertm_send(struct l2cap_chan *chan)
+@@ -789,9 +789,11 @@ static inline void __unpack_control(struct l2cap_chan *chan,
+ 	if (test_bit(FLAG_EXT_CTRL, &chan->flags)) {
+ 		__unpack_extended_control(get_unaligned_le32(skb->data),
+ 					  &bt_cb(skb)->control);
++		skb_pull(skb, L2CAP_EXT_CTRL_SIZE);
+ 	} else {
+ 		__unpack_enhanced_control(get_unaligned_le16(skb->data),
+ 					  &bt_cb(skb)->control);
++		skb_pull(skb, L2CAP_ENH_CTRL_SIZE);
+ 	}
+ }
+ 
+@@ -4817,27 +4819,39 @@ static inline int l2cap_data_channel_sframe(struct l2cap_chan *chan, u32 rx_cont
+ 	return 0;
+ }
+ 
+-static int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
++static int l2cap_rx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
++		    struct sk_buff *skb, u8 event)
  {
- 	struct sk_buff *skb, *tx_skb;
--	u16 fcs;
 -	u32 control;
--	int nsent = 0;
-+	struct l2cap_ctrl *control;
-+	int sent = 0;
+-	u16 req_seq;
+-	int len, next_tx_seq_offset, req_seq_offset;
++	/* Placeholder */
++	return -ENOTSUPP;
++}
 +
-+	BT_DBG("chan %p", chan);
++static int l2cap_stream_rx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
++			   struct sk_buff *skb)
++{
++	/* Placeholder */
++	return -ENOTSUPP;
++}
++
++static int l2cap_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
++{
++	struct l2cap_ctrl *control = &bt_cb(skb)->control;
++	u16 len;
++	u8 event;
  
- 	if (chan->state != BT_CONNECTED)
- 		return -ENOTCONN;
-@@ -1748,61 +1749,57 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
- 	if (test_bit(CONN_REMOTE_BUSY, &chan->conn_state))
- 		return 0;
+ 	__unpack_control(chan, skb);
  
--	while ((skb = chan->tx_send_head) && (!l2cap_tx_window_full(chan))) {
-+	while (chan->tx_send_head &&
-+	       chan->unacked_frames < chan->remote_tx_win &&
-+	       chan->tx_state == L2CAP_TX_STATE_XMIT) {
+-	control = __get_control(chan, skb->data);
+-	skb_pull(skb, __ctrl_size(chan));
+ 	len = skb->len;
  
--		if (bt_cb(skb)->control.retries == chan->remote_max_tx &&
--		    chan->remote_max_tx) {
--			l2cap_send_disconn_req(chan->conn, chan, ECONNABORTED);
--			break;
--		}
-+		skb = chan->tx_send_head;
+ 	/*
+ 	 * We can just drop the corrupted I-frame here.
+ 	 * Receiver will miss it and start proper recovery
+-	 * procedures and ask retransmission.
++	 * procedures and ask for retransmission.
+ 	 */
+ 	if (l2cap_check_fcs(chan, skb))
+ 		goto drop;
  
--		tx_skb = skb_clone(skb, GFP_ATOMIC);
+-	if (__is_sar_start(chan, control) && !__is_sframe(chan, control))
++	if (!control->sframe && control->sar == L2CAP_SAR_START)
+ 		len -= L2CAP_SDULEN_SIZE;
+ 
+ 	if (chan->fcs == L2CAP_FCS_CRC16)
+@@ -4848,34 +4862,57 @@ static int l2cap_ertm_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
+ 		goto drop;
+ 	}
+ 
+-	req_seq = __get_reqseq(chan, control);
++	if (!control->sframe) {
++		int err;
+ 
+-	req_seq_offset = __seq_offset(chan, req_seq, chan->expected_ack_seq);
++		BT_DBG("iframe sar %d, reqseq %d, final %d, txseq %d",
++		       control->sar, control->reqseq, control->final,
++		       control->txseq);
+ 
+-	next_tx_seq_offset = __seq_offset(chan, chan->next_tx_seq,
+-						chan->expected_ack_seq);
 -
--		bt_cb(skb)->control.retries++;
+-	/* check for invalid req-seq */
+-	if (req_seq_offset > next_tx_seq_offset) {
+-		l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
+-		goto drop;
+-	}
 -
--		control = __get_control(chan, tx_skb->data + L2CAP_HDR_SIZE);
--		control &= __get_sar_mask(chan);
-+		bt_cb(skb)->control.retries = 1;
-+		control = &bt_cb(skb)->control;
- 
- 		if (test_and_clear_bit(CONN_SEND_FBIT, &chan->conn_state))
--			control |= __set_ctrl_final(chan);
-+			control->final = 1;
- 
--		control |= __set_reqseq(chan, chan->buffer_seq);
--		control |= __set_txseq(chan, chan->next_tx_seq);
--		control |= __set_ctrl_sar(chan, bt_cb(skb)->control.sar);
-+		control->reqseq = chan->buffer_seq;
-+		chan->last_acked_seq = chan->buffer_seq;
-+		control->txseq = chan->next_tx_seq;
- 
--		__put_control(chan, control, tx_skb->data + L2CAP_HDR_SIZE);
-+		__pack_control(chan, control, skb);
- 
- 		if (chan->fcs == L2CAP_FCS_CRC16) {
--			fcs = crc16(0, (u8 *)skb->data,
--						tx_skb->len - L2CAP_FCS_SIZE);
--			put_unaligned_le16(fcs, skb->data +
--						tx_skb->len - L2CAP_FCS_SIZE);
-+			u16 fcs = crc16(0, (u8 *) skb->data, skb->len);
-+			put_unaligned_le16(fcs, skb_put(skb, L2CAP_FCS_SIZE));
+-	if (!__is_sframe(chan, control)) {
+-		if (len < 0) {
+-			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
++		/* Validate F-bit - F=0 always valid, F=1 only
++		 * valid in TX WAIT_F
++		 */
++		if (control->final && chan->tx_state != L2CAP_TX_STATE_WAIT_F)
+ 			goto drop;
++
++		if (chan->mode != L2CAP_MODE_STREAMING) {
++			event = L2CAP_EV_RECV_IFRAME;
++			err = l2cap_rx(chan, control, skb, event);
++		} else {
++			err = l2cap_stream_rx(chan, control, skb);
  		}
  
--		l2cap_do_send(chan, tx_skb);
-+		/* Clone after data has been modified. Data is assumed to be
-+		   read-only (for locking purposes) on cloned sk_buffs.
-+		 */
-+		tx_skb = skb_clone(skb, GFP_KERNEL);
+-		l2cap_data_channel_iframe(chan, control, skb);
++		if (err)
++			l2cap_send_disconn_req(chan->conn, chan,
++					       ECONNRESET);
+ 	} else {
++		const u8 rx_func_to_event[4] = {
++			L2CAP_EV_RECV_RR, L2CAP_EV_RECV_REJ,
++			L2CAP_EV_RECV_RNR, L2CAP_EV_RECV_SREJ
++		};
 +
-+		if (!tx_skb)
-+			break;
++		/* Only I-frames are expected in streaming mode */
++		if (chan->mode == L2CAP_MODE_STREAMING)
++			goto drop;
++
++		BT_DBG("sframe reqseq %d, final %d, poll %d, super %d",
++		       control->reqseq, control->final, control->poll,
++		       control->super);
++
+ 		if (len != 0) {
+ 			BT_ERR("%d", len);
+ 			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
+ 			goto drop;
+ 		}
  
- 		__set_retrans_timer(chan);
+-		l2cap_data_channel_sframe(chan, control, skb);
++		/* Validate F and P bits */
++		if (control->final && (control->poll ||
++				       chan->tx_state != L2CAP_TX_STATE_WAIT_F))
++			goto drop;
++
++		event = rx_func_to_event[control->super];
++		if (l2cap_rx(chan, control, skb, event))
++			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
+ 	}
  
--		bt_cb(skb)->control.txseq = chan->next_tx_seq;
+ 	return 0;
+@@ -4888,9 +4925,6 @@ drop:
+ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk_buff *skb)
+ {
+ 	struct l2cap_chan *chan;
+-	u32 control;
+-	u16 tx_seq;
+-	int len;
+ 
+ 	chan = l2cap_get_chan_by_scid(conn, cid);
+ 	if (!chan) {
+@@ -4920,44 +4954,8 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 		break;
+ 
+ 	case L2CAP_MODE_ERTM:
+-		l2cap_ertm_data_rcv(chan, skb);
 -
- 		chan->next_tx_seq = __next_seq(chan, chan->next_tx_seq);
+-		goto done;
 -
--		if (bt_cb(skb)->control.retries == 1) {
--			chan->unacked_frames++;
+ 	case L2CAP_MODE_STREAMING:
+-		control = __get_control(chan, skb->data);
+-		skb_pull(skb, __ctrl_size(chan));
+-		len = skb->len;
 -
--			if (!nsent++)
--				__clear_ack_timer(chan);
+-		if (l2cap_check_fcs(chan, skb))
+-			goto drop;
+-
+-		if (__is_sar_start(chan, control))
+-			len -= L2CAP_SDULEN_SIZE;
+-
+-		if (chan->fcs == L2CAP_FCS_CRC16)
+-			len -= L2CAP_FCS_SIZE;
+-
+-		if (len > chan->mps || len < 0 || __is_sframe(chan, control))
+-			goto drop;
+-
+-		tx_seq = __get_txseq(chan, control);
+-
+-		if (chan->expected_tx_seq != tx_seq) {
+-			/* Frame(s) missing - must discard partial SDU */
+-			kfree_skb(chan->sdu);
+-			chan->sdu = NULL;
+-			chan->sdu_last_frag = NULL;
+-			chan->sdu_len = 0;
+-
+-			/* TODO: Notify userland of missing data */
 -		}
 -
-+		chan->unacked_frames++;
- 		chan->frames_sent++;
-+		sent++;
- 
- 		if (skb_queue_is_last(&chan->tx_q, skb))
- 			chan->tx_send_head = NULL;
- 		else
- 			chan->tx_send_head = skb_queue_next(&chan->tx_q, skb);
-+
-+		l2cap_do_send(chan, tx_skb);
-+		BT_DBG("Sent txseq %d", (int)control->txseq);
- 	}
- 
--	return nsent;
-+	BT_DBG("Sent %d, %d unacked, %d in ERTM queue", sent,
-+	       (int) chan->unacked_frames, skb_queue_len(&chan->tx_q));
-+
-+	return sent;
- }
- 
- static int l2cap_retransmit_frames(struct l2cap_chan *chan)
-@@ -2006,7 +2003,11 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
- 	lh->cid = cpu_to_le16(chan->dcid);
- 	lh->len = cpu_to_le16(len + (hlen - L2CAP_HDR_SIZE));
- 
--	__put_control(chan, 0, skb_put(skb, __ctrl_size(chan)));
-+	/* Control header is populated later */
-+	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
-+		put_unaligned_le32(0, skb_put(skb, L2CAP_EXT_CTRL_SIZE));
-+	else
-+		put_unaligned_le16(0, skb_put(skb, L2CAP_ENH_CTRL_SIZE));
- 
- 	if (sdulen)
- 		put_unaligned_le16(sdulen, skb_put(skb, L2CAP_SDULEN_SIZE));
-@@ -2017,9 +2018,7 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
- 		return ERR_PTR(err);
- 	}
- 
--	if (chan->fcs == L2CAP_FCS_CRC16)
--		put_unaligned_le16(0, skb_put(skb, L2CAP_FCS_SIZE));
+-		chan->expected_tx_seq = __next_seq(chan, tx_seq);
 -
-+	bt_cb(skb)->control.fcs = chan->fcs;
- 	bt_cb(skb)->control.retries = 0;
- 	return skb;
- }
+-		if (l2cap_reassemble_sdu(chan, skb, control) == -EMSGSIZE)
+-			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
+-
++		l2cap_data_rcv(chan, skb);
+ 		goto done;
+ 
+ 	default:
 -- 
 1.7.10
 
