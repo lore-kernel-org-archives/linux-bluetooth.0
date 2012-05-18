@@ -5,34 +5,55 @@ To: linux-bluetooth@vger.kernel.org,
 	marcel@holtmann.org,
 	ulisses@profusion.mobi
 Cc: pkrystad@codeaurora.org
-Subject: [PATCH 01/25] Bluetooth: Change default state of ERTM disable flag
-Date: Thu, 17 May 2012 20:53:31 -0700
-Message-Id: <1337313235-26535-2-git-send-email-mathewm@codeaurora.org>
-In-Reply-To: <1337313235-26535-1-git-send-email-mathewm@codeaurora.org>
-References: <1337313235-26535-1-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 00/25] ERTM state machine changes, part 3
+Date: Thu, 17 May 2012 20:53:30 -0700
+Message-Id: <1337313235-26535-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is to allow for ERTM state machine replacement in the patches
-that follow.
+This completes the switch to the new ERTM state machine.  The patch set 
+needs to be merged all at once, since ERTM will only work with all of 
+the changes applied.
 
-Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
----
- net/bluetooth/l2cap_core.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+There was no way to replace the state machine incrementally, since this 
+is switching ERTM to a whole different design everything needs to be 
+swapped out at once.  I checked with Marcel on this approach in advance.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index aeb4e6e..6557367 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -57,7 +57,7 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/smp.h>
- 
--bool disable_ertm;
-+bool disable_ertm = 1;
- 
- static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
- static u8 l2cap_fixed_chan[8] = { L2CAP_FC_L2CAP, };
+We're running PTS on this code this week, I will let the list know about 
+the test results.
+
+Mat Martineau (25):
+  Bluetooth: Change default state of ERTM disable flag
+  Bluetooth: Add a new L2CAP ERTM transmit state machine.
+  Bluetooth: Refactor l2cap_streaming_send
+  Bluetooth: Refactor l2cap_ertm_send
+  Bluetooth: Refactor l2cap_send_sframe
+  Bluetooth: Consolidate common receive code for ERTM and streaming
+    mode
+  Bluetooth: Add streaming mode receive and incoming packet classifier
+  Bluetooth: Remove receive code that has been superceded
+  Bluetooth: Refactor l2cap_send_ack
+  Bluetooth: Use the transmit state machine for busy state changes
+  Bluetooth: Update l2cap_send_i_or_rr_or_rnr to fit the spec better
+  Bluetooth: Add the ERTM receive state machine
+  Bluetooth: Add implementation for retransmitting all unacked frames
+  Bluetooth: Send SREJ frames when packets go missing
+  Bluetooth: Reassemble all available data when retransmissions
+    succeed.
+  Bluetooth: Handle SREJ requests to resend unacked frames
+  Bluetooth: Handle incoming REJ frames
+  Bluetooth: Use new header structures in l2cap_send_rr_or_rnr
+  Bluetooth: Check rules when setting retransmit or monitor timers
+  Bluetooth: Use the ERTM transmit state machine from timeout handlers
+  Bluetooth: Simplify the ERTM ack timeout
+  Bluetooth: Remove unneccesary inline
+  Bluetooth: Set txwin values for streaming mode
+  Bluetooth: Remove unused ERTM control field macros
+  Bluetooth: Enable ERTM by default
+
+ include/net/bluetooth/l2cap.h |  180 ----
+ net/bluetooth/l2cap_core.c    | 1977 ++++++++++++++++++++++++++---------------
+ 2 files changed, 1262 insertions(+), 895 deletions(-)
+
 -- 
 1.7.10
 
