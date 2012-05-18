@@ -5,100 +5,415 @@ To: linux-bluetooth@vger.kernel.org,
 	marcel@holtmann.org,
 	ulisses@profusion.mobi
 Cc: pkrystad@codeaurora.org
-Subject: [PATCH 14/25] Bluetooth: Send SREJ frames when packets go missing
-Date: Thu, 17 May 2012 20:53:44 -0700
-Message-Id: <1337313235-26535-15-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 12/25] Bluetooth: Add the ERTM receive state machine
+Date: Thu, 17 May 2012 20:53:42 -0700
+Message-Id: <1337313235-26535-13-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1337313235-26535-1-git-send-email-mathewm@codeaurora.org>
 References: <1337313235-26535-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The ERTM specification lays out three scenarios for sending SREJ
-frames to request retransmission of specific frames.  l2cap_send_srej
-requests all frames up to a given txseq that are not already queued
-for reassembly.  l2cap_send_srej_tail only requests the most recent
-missing frame.  l2cap_send_srej_list resends SREJ frames for data that
-was requested for resend but never received.
+This adds a top-level state machine with handlers for two receive
+states defined in the ERTM spec, RECV and SREJ_SENT.  The reqseq value
+of the incoming frame is also validated at the top level and a
+disconnection is forced if it is invalid.  The actions for the RECV
+and SREJ_SENT states are implemented according to the state tables in
+the ERTM specification.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |   56 +++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 53 insertions(+), 3 deletions(-)
+ net/bluetooth/l2cap_core.c |  355 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 353 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 090d489..4efab1b 100644
+index 3a10a30..86c4253 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -2236,17 +2236,67 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+@@ -1757,6 +1757,12 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
+ 	return sent;
+ }
  
- static void l2cap_send_srej(struct l2cap_chan *chan, u16 txseq)
++static void l2cap_retransmit_all(struct l2cap_chan *chan,
++				 struct l2cap_ctrl *control)
++{
++	/* Placeholder */
++}
++
+ static void l2cap_send_ack(struct l2cap_chan *chan)
  {
--	/* Placeholder */
-+	struct l2cap_ctrl control;
-+	u16 seq;
+ 	struct l2cap_ctrl control;
+@@ -2124,6 +2130,21 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 	return err;
+ }
+ 
++static void l2cap_send_srej(struct l2cap_chan *chan, u16 txseq)
++{
++	/* Placeholder */
++}
 +
-+	BT_DBG("chan %p, txseq %d", chan, txseq);
++static void l2cap_send_srej_tail(struct l2cap_chan *chan)
++{
++	/* Placeholder */
++}
 +
-+	memset(&control, 0, sizeof(control));
-+	control.sframe = 1;
-+	control.super = L2CAP_SUPER_SREJ;
++static void l2cap_send_srej_list(struct l2cap_chan *chan, u16 txseq)
++{
++	/* Placeholder */
++}
 +
-+	for (seq = chan->expected_tx_seq; seq != txseq;
-+	     seq = __next_seq(chan, seq)) {
-+		if (!l2cap_ertm_seq_in_queue(&chan->srej_q, seq)) {
-+			control.reqseq = seq;
-+			l2cap_send_sframe(chan, &control);
-+			l2cap_seq_list_append(&chan->srej_list, seq);
+ static void l2cap_process_reqseq(struct l2cap_chan *chan, u16 reqseq)
+ {
+ 	struct sk_buff *acked_skb;
+@@ -4324,6 +4345,24 @@ void l2cap_chan_busy(struct l2cap_chan *chan, int busy)
+ 	l2cap_tx(chan, 0, 0, event);
+ }
+ 
++static int l2cap_rx_queued_iframes(struct l2cap_chan *chan)
++{
++	/* Placeholder */
++	return 0;
++}
++
++static void l2cap_handle_srej(struct l2cap_chan *chan,
++			      struct l2cap_ctrl *control)
++{
++	/* Placeholder */
++}
++
++static void l2cap_handle_rej(struct l2cap_chan *chan,
++			     struct l2cap_ctrl *control)
++{
++	/* Placeholder */
++}
++
+ static u8 l2cap_classify_txseq(struct l2cap_chan *chan, u16 txseq)
+ {
+ 	BT_DBG("chan %p, txseq %d", chan, txseq);
+@@ -4411,11 +4450,323 @@ static u8 l2cap_classify_txseq(struct l2cap_chan *chan, u16 txseq)
+ 	}
+ }
+ 
++static int l2cap_rx_state_recv(struct l2cap_chan *chan,
++			       struct l2cap_ctrl *control,
++			       struct sk_buff *skb, u8 event)
++{
++	int err = 0;
++	bool skb_in_use = 0;
++
++	BT_DBG("chan %p, control %p, skb %p, event %d", chan, control, skb,
++	       event);
++
++	switch (event) {
++	case L2CAP_EV_RECV_IFRAME:
++		switch (l2cap_classify_txseq(chan, control->txseq)) {
++		case L2CAP_TXSEQ_EXPECTED:
++			l2cap_pass_to_tx(chan, control);
++
++			if (test_bit(CONN_LOCAL_BUSY, &chan->conn_state)) {
++				BT_DBG("Busy, discarding expected seq %d",
++				       control->txseq);
++				break;
++			}
++
++			chan->expected_tx_seq = __next_seq(chan,
++							   control->txseq);
++
++			chan->buffer_seq = chan->expected_tx_seq;
++			skb_in_use = 1;
++
++			err = l2cap_reassemble_sdu(chan, skb, control);
++			if (err)
++				break;
++
++			if (control->final) {
++				if (!test_and_clear_bit(CONN_REJ_ACT,
++							&chan->conn_state)) {
++					control->final = 0;
++					l2cap_retransmit_all(chan, control);
++					l2cap_ertm_send(chan);
++				}
++			}
++
++			if (!test_bit(CONN_LOCAL_BUSY, &chan->conn_state))
++				l2cap_send_ack(chan);
++			break;
++		case L2CAP_TXSEQ_UNEXPECTED:
++			l2cap_pass_to_tx(chan, control);
++
++			/* Can't issue SREJ frames in the local busy state.
++			 * Drop this frame, it will be seen as missing
++			 * when local busy is exited.
++			 */
++			if (test_bit(CONN_LOCAL_BUSY, &chan->conn_state)) {
++				BT_DBG("Busy, discarding unexpected seq %d",
++				       control->txseq);
++				break;
++			}
++
++			/* There was a gap in the sequence, so an SREJ
++			 * must be sent for each missing frame.  The
++			 * current frame is stored for later use.
++			 */
++			skb_queue_tail(&chan->srej_q, skb);
++			skb_in_use = 1;
++			BT_DBG("Queued %p (queue len %d)", skb,
++			       skb_queue_len(&chan->srej_q));
++
++			clear_bit(CONN_SREJ_ACT, &chan->conn_state);
++			l2cap_seq_list_clear(&chan->srej_list);
++			l2cap_send_srej(chan, control->txseq);
++
++			chan->rx_state = L2CAP_RX_STATE_SREJ_SENT;
++			break;
++		case L2CAP_TXSEQ_DUPLICATE:
++			l2cap_pass_to_tx(chan, control);
++			break;
++		case L2CAP_TXSEQ_INVALID_IGNORE:
++			break;
++		case L2CAP_TXSEQ_INVALID:
++		default:
++			l2cap_send_disconn_req(chan->conn, chan,
++					       ECONNRESET);
++			break;
 +		}
++		break;
++	case L2CAP_EV_RECV_RR:
++		l2cap_pass_to_tx(chan, control);
++		if (control->final) {
++			clear_bit(CONN_REMOTE_BUSY, &chan->conn_state);
++
++			if (!test_and_clear_bit(CONN_REJ_ACT,
++						&chan->conn_state)) {
++				control->final = 0;
++				l2cap_retransmit_all(chan, control);
++			}
++
++			l2cap_ertm_send(chan);
++		} else if (control->poll) {
++			l2cap_send_i_or_rr_or_rnr(chan);
++		} else {
++			if (test_and_clear_bit(CONN_REMOTE_BUSY,
++					       &chan->conn_state) &&
++			    chan->unacked_frames)
++				__set_retrans_timer(chan);
++
++			l2cap_ertm_send(chan);
++		}
++		break;
++	case L2CAP_EV_RECV_RNR:
++		set_bit(CONN_REMOTE_BUSY, &chan->conn_state);
++		l2cap_pass_to_tx(chan, control);
++		if (control && control->poll) {
++			set_bit(CONN_SEND_FBIT, &chan->conn_state);
++			l2cap_send_rr_or_rnr(chan, 0);
++		}
++		__clear_retrans_timer(chan);
++		l2cap_seq_list_clear(&chan->retrans_list);
++		break;
++	case L2CAP_EV_RECV_REJ:
++		l2cap_handle_rej(chan, control);
++		break;
++	case L2CAP_EV_RECV_SREJ:
++		l2cap_handle_srej(chan, control);
++		break;
++	default:
++		break;
 +	}
 +
-+	chan->expected_tx_seq = __next_seq(chan, txseq);
- }
- 
- static void l2cap_send_srej_tail(struct l2cap_chan *chan)
- {
--	/* Placeholder */
-+	struct l2cap_ctrl control;
++	if (skb && !skb_in_use) {
++		BT_DBG("Freeing %p", skb);
++		kfree_skb(skb);
++	}
 +
-+	BT_DBG("chan %p", chan);
++	return err;
++}
 +
-+	if (chan->srej_list.tail == L2CAP_SEQ_LIST_CLEAR)
-+		return;
++static int l2cap_rx_state_srej_sent(struct l2cap_chan *chan,
++				    struct l2cap_ctrl *control,
++				    struct sk_buff *skb, u8 event)
++{
++	int err = 0;
++	u16 txseq = control->txseq;
++	bool skb_in_use = 0;
 +
-+	memset(&control, 0, sizeof(control));
-+	control.sframe = 1;
-+	control.super = L2CAP_SUPER_SREJ;
-+	control.reqseq = chan->srej_list.tail;
-+	l2cap_send_sframe(chan, &control);
- }
- 
- static void l2cap_send_srej_list(struct l2cap_chan *chan, u16 txseq)
- {
--	/* Placeholder */
-+	struct l2cap_ctrl control;
-+	u16 initial_head;
-+	u16 seq;
++	BT_DBG("chan %p, control %p, skb %p, event %d", chan, control, skb,
++	       event);
 +
-+	BT_DBG("chan %p, txseq %d", chan, txseq);
++	switch (event) {
++	case L2CAP_EV_RECV_IFRAME:
++		switch (l2cap_classify_txseq(chan, txseq)) {
++		case L2CAP_TXSEQ_EXPECTED:
++			/* Keep frame for reassembly later */
++			l2cap_pass_to_tx(chan, control);
++			skb_queue_tail(&chan->srej_q, skb);
++			skb_in_use = 1;
++			BT_DBG("Queued %p (queue len %d)", skb,
++			       skb_queue_len(&chan->srej_q));
 +
-+	memset(&control, 0, sizeof(control));
-+	control.sframe = 1;
-+	control.super = L2CAP_SUPER_SREJ;
-+
-+	/* Capture initial list head to allow only one pass through the list. */
-+	initial_head = chan->srej_list.head;
-+
-+	do {
-+		seq = l2cap_seq_list_pop(&chan->srej_list);
-+		if (seq == txseq || seq == L2CAP_SEQ_LIST_CLEAR)
++			chan->expected_tx_seq = __next_seq(chan, txseq);
 +			break;
++		case L2CAP_TXSEQ_EXPECTED_SREJ:
++			l2cap_seq_list_pop(&chan->srej_list);
 +
-+		control.reqseq = seq;
-+		l2cap_send_sframe(chan, &control);
-+		l2cap_seq_list_append(&chan->srej_list, seq);
-+	} while (chan->srej_list.head != initial_head);
++			l2cap_pass_to_tx(chan, control);
++			skb_queue_tail(&chan->srej_q, skb);
++			skb_in_use = 1;
++			BT_DBG("Queued %p (queue len %d)", skb,
++			       skb_queue_len(&chan->srej_q));
++
++			err = l2cap_rx_queued_iframes(chan);
++			if (err)
++				break;
++
++			break;
++		case L2CAP_TXSEQ_UNEXPECTED:
++			/* Got a frame that can't be reassembled yet.
++			 * Save it for later, and send SREJs to cover
++			 * the missing frames.
++			 */
++			skb_queue_tail(&chan->srej_q, skb);
++			skb_in_use = 1;
++			BT_DBG("Queued %p (queue len %d)", skb,
++			       skb_queue_len(&chan->srej_q));
++
++			l2cap_pass_to_tx(chan, control);
++			l2cap_send_srej(chan, control->txseq);
++			break;
++		case L2CAP_TXSEQ_UNEXPECTED_SREJ:
++			/* This frame was requested with an SREJ, but
++			 * some expected retransmitted frames are
++			 * missing.  Request retransmission of missing
++			 * SREJ'd frames.
++			 */
++			skb_queue_tail(&chan->srej_q, skb);
++			skb_in_use = 1;
++			BT_DBG("Queued %p (queue len %d)", skb,
++			       skb_queue_len(&chan->srej_q));
++
++			l2cap_pass_to_tx(chan, control);
++			l2cap_send_srej_list(chan, control->txseq);
++			break;
++		case L2CAP_TXSEQ_DUPLICATE_SREJ:
++			/* We've already queued this frame.  Drop this copy. */
++			l2cap_pass_to_tx(chan, control);
++			break;
++		case L2CAP_TXSEQ_DUPLICATE:
++			/* Expecting a later sequence number, so this frame
++			 * was already received.  Ignore it completely.
++			 */
++			break;
++		case L2CAP_TXSEQ_INVALID_IGNORE:
++			break;
++		case L2CAP_TXSEQ_INVALID:
++		default:
++			l2cap_send_disconn_req(chan->conn, chan,
++					       ECONNRESET);
++			break;
++		}
++		break;
++	case L2CAP_EV_RECV_RR:
++		l2cap_pass_to_tx(chan, control);
++		if (control->final) {
++			clear_bit(CONN_REMOTE_BUSY, &chan->conn_state);
++
++			if (!test_and_clear_bit(CONN_REJ_ACT,
++						&chan->conn_state)) {
++				control->final = 0;
++				l2cap_retransmit_all(chan, control);
++			}
++
++			l2cap_ertm_send(chan);
++		} else if (control->poll) {
++			if (test_and_clear_bit(CONN_REMOTE_BUSY,
++					       &chan->conn_state) &&
++			    chan->unacked_frames) {
++				__set_retrans_timer(chan);
++			}
++
++			set_bit(CONN_SEND_FBIT, &chan->conn_state);
++			l2cap_send_srej_tail(chan);
++		} else {
++			if (test_and_clear_bit(CONN_REMOTE_BUSY,
++					       &chan->conn_state) &&
++			    chan->unacked_frames)
++				__set_retrans_timer(chan);
++
++			l2cap_send_ack(chan);
++		}
++		break;
++	case L2CAP_EV_RECV_RNR:
++		set_bit(CONN_REMOTE_BUSY, &chan->conn_state);
++		l2cap_pass_to_tx(chan, control);
++		if (control->poll) {
++			l2cap_send_srej_tail(chan);
++		} else {
++			struct l2cap_ctrl rr_control;
++			memset(&rr_control, 0, sizeof(rr_control));
++			rr_control.sframe = 1;
++			rr_control.super = L2CAP_SUPER_RR;
++			rr_control.reqseq = chan->buffer_seq;
++			l2cap_send_sframe(chan, &rr_control);
++		}
++
++		break;
++	case L2CAP_EV_RECV_REJ:
++		l2cap_handle_rej(chan, control);
++		break;
++	case L2CAP_EV_RECV_SREJ:
++		l2cap_handle_srej(chan, control);
++		break;
++	}
++
++	if (skb && !skb_in_use) {
++		BT_DBG("Freeing %p", skb);
++		kfree_skb(skb);
++	}
++
++	return err;
++}
++
++static bool __valid_reqseq(struct l2cap_chan *chan, u16 reqseq)
++{
++	/* Make sure reqseq is for a packet that has been sent but not acked */
++	u16 unacked;
++
++	unacked = __seq_offset(chan, chan->next_tx_seq, chan->expected_ack_seq);
++	return __seq_offset(chan, chan->next_tx_seq, reqseq) <= unacked;
++}
++
+ static int l2cap_rx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+ 		    struct sk_buff *skb, u8 event)
+ {
+-	/* Placeholder */
+-	return -ENOTSUPP;
++	int err = 0;
++
++	BT_DBG("chan %p, control %p, skb %p, event %d, state %d", chan,
++	       control, skb, event, chan->rx_state);
++
++	if (__valid_reqseq(chan, control->reqseq)) {
++		switch (chan->rx_state) {
++		case L2CAP_RX_STATE_RECV:
++			err = l2cap_rx_state_recv(chan, control, skb, event);
++			break;
++		case L2CAP_RX_STATE_SREJ_SENT:
++			err = l2cap_rx_state_srej_sent(chan, control, skb,
++						       event);
++			break;
++		default:
++			/* shut it down */
++			break;
++		}
++	} else {
++		BT_DBG("Invalid reqseq %d (next_tx_seq %d, expected_ack_seq %d",
++		       control->reqseq, chan->next_tx_seq,
++		       chan->expected_ack_seq);
++		l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
++	}
++
++	return err;
  }
  
- static void l2cap_process_reqseq(struct l2cap_chan *chan, u16 reqseq)
+ static int l2cap_stream_rx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
 -- 
 1.7.10
 
