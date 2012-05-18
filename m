@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 02/17] Bluetooth: A2MP: AMP Manager basic functions
-Date: Fri, 18 May 2012 17:25:35 +0300
-Message-Id: <1337351150-20526-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 03/17] Bluetooth: A2MP: Build and Send msg helpers
+Date: Fri, 18 May 2012 17:25:36 +0300
+Message-Id: <1337351150-20526-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,182 +11,89 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Define AMP Manager and some basic functions.
+Helper function to build and send A2MP messages.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h     |   31 ++++++++++++++++++++++
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/a2mp.c             |   54 ++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_conn.c         |   15 +++++++++++
- 4 files changed, 101 insertions(+)
- create mode 100644 include/net/bluetooth/a2mp.h
+ include/net/bluetooth/a2mp.h |    7 +++++++
+ net/bluetooth/a2mp.c         |   46 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 53 insertions(+)
 
 diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-new file mode 100644
-index 0000000..1c55514
---- /dev/null
+index 1c55514..2061e90 100644
+--- a/include/net/bluetooth/a2mp.h
 +++ b/include/net/bluetooth/a2mp.h
-@@ -0,0 +1,31 @@
-+/*
-+   Copyright (c) 2010,2011 Code Aurora Forum.  All rights reserved.
-+   Copyright (c) 2011,2012 Intel Corp.
-+
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License version 2 and
-+   only version 2 as published by the Free Software Foundation.
-+
-+   This program is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+   GNU General Public License for more details.
-+*/
-+
-+#ifndef __A2MP_H
-+#define __A2MP_H
-+
-+struct amp_mgr {
-+	struct list_head	list;
-+	struct l2cap_conn	*l2cap_conn;
-+	struct l2cap_chan	*a2mp_chan;
-+	struct kref		kref;
-+	__u8			ident;
-+	__u8			handle;
-+	unsigned long		flags;
-+};
-+
-+void amp_mgr_get(struct amp_mgr *mgr);
-+int amp_mgr_put(struct amp_mgr *mgr);
-+
-+#endif /* __A2MP_H */
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 20b7d6b..3d9b07f 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -321,6 +321,7 @@ struct hci_conn {
+@@ -25,6 +25,13 @@ struct amp_mgr {
+ 	unsigned long		flags;
+ };
  
- 	struct sk_buff_head data_q;
- 	struct list_head chan_list;
-+	struct list_head mgr_list;
++struct a2mp_cmd {
++	__u8	code;
++	__u8	ident;
++	__le16	len;
++	__u8	data[0];
++} __packed;
++
+ void amp_mgr_get(struct amp_mgr *mgr);
+ int amp_mgr_put(struct amp_mgr *mgr);
  
- 	struct delayed_work disc_work;
- 	struct timer_list idle_timer;
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 1f733b5..85cd29a 100644
+index 85cd29a..cb3bf74 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -15,6 +15,7 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
+@@ -17,6 +17,52 @@
  #include <net/bluetooth/l2cap.h>
-+#include <net/bluetooth/a2mp.h>
+ #include <net/bluetooth/a2mp.h>
  
++/* A2MP build & send command helper functions */
++static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
++{
++	struct a2mp_cmd *cmd;
++	int plen;
++
++	plen = sizeof(*cmd) + len;
++	cmd = kzalloc(plen, GFP_KERNEL);
++	if (!cmd)
++		return NULL;
++
++	cmd->code = code;
++	cmd->ident = ident;
++	cmd->len = cpu_to_le16(len);
++
++	memcpy(cmd->data, data, len);
++
++	return cmd;
++}
++
++static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
++		      void *data)
++{
++	struct l2cap_chan *chan = mgr->a2mp_chan;
++	struct a2mp_cmd *cmd;
++	u16 total_len = len + sizeof(*cmd);
++	struct kvec iv;
++	struct msghdr msg;
++
++	cmd = __a2mp_build(code, ident, len, data);
++	if (!cmd)
++		return;
++
++	iv.iov_base = cmd;
++	iv.iov_len = total_len;
++
++	memset(&msg, 0, sizeof(msg));
++
++	msg.msg_iov = (struct iovec *) &iv;
++	msg.msg_iovlen = 1;
++
++	l2cap_chan_send(chan, &msg, total_len, 0);
++
++	kfree(cmd);
++}
++
  static struct l2cap_ops a2mp_chan_ops = {
  	.name = "L2CAP A2MP channel",
-@@ -57,3 +58,56 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
- 
- 	return chan;
- }
-+
-+/* AMP Manager functions */
-+void amp_mgr_get(struct amp_mgr *mgr)
-+{
-+	BT_DBG("mgr %p", mgr);
-+
-+	kref_get(&mgr->kref);
-+}
-+
-+static void amp_mgr_destroy(struct kref *kref)
-+{
-+	struct amp_mgr *mgr = container_of(kref, struct amp_mgr, kref);
-+
-+	BT_DBG("mgr %p", mgr);
-+
-+	kfree(mgr);
-+}
-+
-+int amp_mgr_put(struct amp_mgr *mgr)
-+{
-+	BT_DBG("mgr %p", mgr);
-+
-+	return kref_put(&mgr->kref, &amp_mgr_destroy);
-+}
-+
-+static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
-+{
-+	struct amp_mgr *mgr;
-+	struct l2cap_chan *chan;
-+
-+	mgr = kzalloc(sizeof(*mgr), GFP_KERNEL);
-+	if (!mgr)
-+		return NULL;
-+
-+	BT_DBG("conn %p mgr %p", conn, mgr);
-+
-+	mgr->l2cap_conn = conn;
-+
-+	chan = a2mp_chan_open(conn);
-+	if (!chan) {
-+		kfree(mgr);
-+		return NULL;
-+	}
-+
-+	mgr->a2mp_chan = chan;
-+	chan->data = mgr;
-+
-+	list_add(&mgr->list, &conn->hcon->mgr_list);
-+
-+	kref_init(&mgr->kref);
-+
-+	return mgr;
-+}
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 971601e..b3aa4f1 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -42,6 +42,7 @@
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/a2mp.h>
- 
- static void hci_le_connect(struct hci_conn *conn)
- {
-@@ -373,6 +374,8 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- 
- 	INIT_LIST_HEAD(&conn->chan_list);
- 
-+	INIT_LIST_HEAD(&conn->mgr_list);
-+
- 	INIT_DELAYED_WORK(&conn->disc_work, hci_conn_timeout);
- 	setup_timer(&conn->idle_timer, hci_conn_idle, (unsigned long)conn);
- 	setup_timer(&conn->auto_accept_timer, hci_conn_auto_accept,
-@@ -393,6 +396,16 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- 	return conn;
- }
- 
-+static void hci_amp_mgr_list_flush(struct hci_conn *conn)
-+{
-+	struct amp_mgr *mgr, *n;
-+
-+	BT_DBG("conn %p", conn);
-+
-+	list_for_each_entry_safe(mgr, n, &conn->mgr_list, list)
-+		amp_mgr_put(mgr);
-+}
-+
- int hci_conn_del(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
-@@ -428,6 +441,8 @@ int hci_conn_del(struct hci_conn *conn)
- 
- 	hci_chan_list_flush(conn);
- 
-+	hci_amp_mgr_list_flush(conn);
-+
- 	hci_conn_hash_del(hdev, conn);
- 	if (hdev->notify)
- 		hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
+ };
 -- 
 1.7.9.5
 
