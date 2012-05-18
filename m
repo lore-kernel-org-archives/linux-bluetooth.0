@@ -1,65 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 00/17] Bluetooth A2MP implementation
-Date: Fri, 18 May 2012 17:25:33 +0300
-Message-Id: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/2] Bluetooth: Define L2CAP conf continuation flag
+Date: Fri, 18 May 2012 17:20:06 +0300
+Message-Id: <1337350806-20326-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1337350806-20326-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1337350806-20326-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Basic A2MP implementation.
+Define Continuation flag which the only flag used from Flags field
+in L2CAP Configuration Request and Response.
 
-Changes:
-	* PATCHv1: Rebasing against latest tree and minor fixes.
-	* RFCv7: Taking comments from review in linux-bluetooth.
-	* RFCv6: Remove some unneded check for sk since they are in different path
-	(A2MP decoded as a data channel wrt L2CAP signalling channel). Style fixes.
-	* RFCv5: Fix memory leaks, sparse warnings and taking comments from upstream.
-	* RFCv4: redesign code to use l2cap channel lock instead of socket lock
-	and general modifications. Basic implementation of HCI callback interface.
-	* RFCv3: redesign code to use l2cap functions instead of kernel sockets
-	L2CAP functions modified to work with channels without sk.
-	* RFCv2: rebased against "workqueue" patches.
-	* RFCv1: added refcnt to amp_mgr, fixed sleeping in atomic
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/l2cap.h |    4 ++++
+ net/bluetooth/l2cap_core.c    |   12 ++++++------
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
-Initially code was based of reference implementations below:
-
-References: Code Aurora (git://codeaurora.org/kernel/msm.git) and Atheros
-(search for: [PATCH 2/3] Add a2mp protocol/AMP manager, by Atheros Linux BT3)
-implementations.
-
-Andrei Emeltchenko (17):
-  Bluetooth: A2MP: Create A2MP channel
-  Bluetooth: A2MP: AMP Manager basic functions
-  Bluetooth: A2MP: Build and Send msg helpers
-  Bluetooth: A2MP: Add chan callbacks
-  Bluetooth: A2MP: Definitions for A2MP commands
-  Bluetooth: A2MP: Define A2MP status codes
-  Bluetooth: A2MP: Process A2MP messages
-  Bluetooth: A2MP: Process A2MP Command Reject
-  Bluetooth: A2MP: Process A2MP Discover Request
-  Bluetooth: A2MP: Process A2MP Change Notify
-  Bluetooth: A2MP: Process A2MP Get Info Request
-  Bluetooth: A2MP: Process A2MP Get AMP Assoc Request
-  Bluetooth: A2MP: Process A2MP Create Physlink Request
-  Bluetooth: A2MP: Process A2MP Disc Physlink Request
-  Bluetooth: A2MP: Process A2MP Command Responses
-  Bluetooth: A2MP: Handling fixed channels
-  Bluetooth: A2MP: Manage incoming connections
-
- include/net/bluetooth/a2mp.h     |  127 +++++++++
- include/net/bluetooth/hci_core.h |   14 +
- include/net/bluetooth/l2cap.h    |    6 +
- net/bluetooth/Makefile           |    3 +-
- net/bluetooth/a2mp.c             |  558 ++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_conn.c         |   15 +
- net/bluetooth/l2cap_core.c       |   43 ++-
- 7 files changed, 757 insertions(+), 9 deletions(-)
- create mode 100644 include/net/bluetooth/a2mp.h
- create mode 100644 net/bluetooth/a2mp.c
-
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 452fcc4..8fdfaca 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -271,6 +271,10 @@ struct l2cap_conf_rsp {
+ #define L2CAP_CONF_PENDING	0x0004
+ #define L2CAP_CONF_EFS_REJECT	0x0005
+ 
++/* conf req/rsp continuation flag */
++#define L2CAP_CONF_FLAG_CONT_CLEARED	0
++#define L2CAP_CONF_FLAG_CONT_SET	1
++
+ struct l2cap_conf_opt {
+ 	__u8       type;
+ 	__u8       len;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index d9f215f..65e56d5 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2544,7 +2544,7 @@ done:
+ 	}
+ 
+ 	req->dcid  = cpu_to_le16(chan->dcid);
+-	req->flags = cpu_to_le16(0);
++	req->flags = cpu_to_le16(L2CAP_CONF_FLAG_CONT_CLEARED);
+ 
+ 	return ptr - data;
+ }
+@@ -2764,7 +2764,7 @@ done:
+ 	}
+ 	rsp->scid   = cpu_to_le16(chan->dcid);
+ 	rsp->result = cpu_to_le16(result);
+-	rsp->flags  = cpu_to_le16(0x0000);
++	rsp->flags  = cpu_to_le16(L2CAP_CONF_FLAG_CONT_CLEARED);
+ 
+ 	return ptr - data;
+ }
+@@ -2863,7 +2863,7 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
+ 	}
+ 
+ 	req->dcid   = cpu_to_le16(chan->dcid);
+-	req->flags  = cpu_to_le16(0x0000);
++	req->flags  = cpu_to_le16(L2CAP_CONF_FLAG_CONT_CLEARED);
+ 
+ 	return ptr - data;
+ }
+@@ -3218,11 +3218,11 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	memcpy(chan->conf_req + chan->conf_len, req->data, len);
+ 	chan->conf_len += len;
+ 
+-	if (flags & 0x0001) {
++	if (flags & L2CAP_CONF_FLAG_CONT_SET) {
+ 		/* Incomplete config. Send empty response. */
+ 		l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
+ 				l2cap_build_conf_rsp(chan, rsp,
+-					L2CAP_CONF_SUCCESS, 0x0001), rsp);
++					L2CAP_CONF_SUCCESS, flags), rsp);
+ 		goto unlock;
+ 	}
+ 
+@@ -3369,7 +3369,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 		goto done;
+ 	}
+ 
+-	if (flags & 0x01)
++	if (flags & L2CAP_CONF_FLAG_CONT_SET)
+ 		goto done;
+ 
+ 	set_bit(CONF_INPUT_DONE, &chan->conf_state);
 -- 
 1.7.9.5
 
