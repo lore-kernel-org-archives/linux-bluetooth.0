@@ -1,22 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 18 May 2012 20:52:53 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: joohi.rastogi@stericsson.com
+Cc: User Name <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/2] AVRCP: Refactor the code using constants
+Message-ID: <20120518175253.GB11492@x220.P-661HNU-F1>
+References: <1337318710-28710-1-git-send-email-joohi.rastogi@stericsson.com>
 MIME-Version: 1.0
-In-Reply-To: <1337140435-12338-1-git-send-email-gustavo@padovan.org>
-References: <1337140435-12338-1-git-send-email-gustavo@padovan.org>
-Date: Fri, 18 May 2012 15:05:12 -0300
-Message-ID: <CAAngNMYoNC_+KsgUNfjPk7i3fK36cfSuikZASbWoEfW912rDLg@mail.gmail.com>
-Subject: Re: [PATCH -v2] Bluetooth: Add MSG_MORE support to L2CAP sockets
-From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1337318710-28710-1-git-send-email-joohi.rastogi@stericsson.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, May 16, 2012 at 12:53 AM, Gustavo Padovan <gustavo@padovan.org> wrote:
-> MSG_MORE enables us to save buffer space in userspace, the packet are
+Hi Joohi,
 
-s/are/is/ ?
+On Fri, May 18, 2012, joohi.rastogi@stericsson.com wrote:
+> ---
+>  audio/avrcp.c |   17 +++++++++++++++--
+>  1 files changed, 15 insertions(+), 2 deletions(-)
 
--- 
-João Paulo Rechi Vita
-Openbossa Labs - INdT
+You'll need to rebase this patch latest git since it doesn't apply
+anymore. Additionally there were some issues:
+
+> +	uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103;
+> +	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
+> +			AVRCP_FEATURE_CATEGORY_2 |
+> +			AVRCP_FEATURE_CATEGORY_3 |
+> +			AVRCP_FEATURE_CATEGORY_4 );
+
+This doesn't look like it's correctly indented. Split lines should be
+indented as much as possible while staying under 80 characters.
+
+> -	uint16_t avrcp_ver = 0x0103, avctp_ver = 0x0103, feat = 0x000f;
+> +	uint16_t avrcp_ver = 0x0103, avctp_ver = 0x0103;
+> +	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
+> +                        AVRCP_FEATURE_CATEGORY_2 |
+> +                        AVRCP_FEATURE_CATEGORY_3 |
+> +                        AVRCP_FEATURE_CATEGORY_4 );
+
+Same here.
+
+Johan
