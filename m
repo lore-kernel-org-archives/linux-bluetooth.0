@@ -5,56 +5,67 @@ To: linux-bluetooth@vger.kernel.org,
 	marcel@holtmann.org,
 	ulisses@profusion.mobi
 Cc: pkrystad@codeaurora.org
-Subject: [PATCH 18/25] Bluetooth: Use new header structures in l2cap_send_rr_or_rnr
-Date: Thu, 17 May 2012 20:53:48 -0700
-Message-Id: <1337313235-26535-19-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 17/25] Bluetooth: Handle incoming REJ frames
+Date: Thu, 17 May 2012 20:53:47 -0700
+Message-Id: <1337313235-26535-18-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1337313235-26535-1-git-send-email-mathewm@codeaurora.org>
 References: <1337313235-26535-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-struct l2cap_ctrl is now used, and the sframe is now sent directly
-rather than depending on a separate call.
+REJ frames are sent by the remote device to request that all frames
+after a given sequence number be retransmitted.  These are also an
+implicit indication that the remote device is not in a busy state and
+can receive new iframes.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |   22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ net/bluetooth/l2cap_core.c |   33 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 32 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 6e1200a..0c55403 100644
+index cd32aa2..6e1200a 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -918,15 +918,23 @@ static void l2cap_send_sframe(struct l2cap_chan *chan,
- 		l2cap_do_send(chan, skb);
- }
- 
--static inline void l2cap_send_rr_or_rnr(struct l2cap_chan *chan, u32 control)
-+static void l2cap_send_rr_or_rnr(struct l2cap_chan *chan, bool poll)
+@@ -4610,7 +4610,38 @@ static void l2cap_handle_srej(struct l2cap_chan *chan,
+ static void l2cap_handle_rej(struct l2cap_chan *chan,
+ 			     struct l2cap_ctrl *control)
  {
--	if (test_bit(CONN_LOCAL_BUSY, &chan->conn_state)) {
--		control |= __set_ctrl_super(chan, L2CAP_SUPER_RNR);
--		set_bit(CONN_RNR_SENT, &chan->conn_state);
--	} else
--		control |= __set_ctrl_super(chan, L2CAP_SUPER_RR);
-+	struct l2cap_ctrl control;
- 
--	control |= __set_reqseq(chan, chan->buffer_seq);
-+	BT_DBG("chan %p, poll %d", chan, poll);
+-	/* Placeholder */
++	struct sk_buff *skb;
 +
-+	memset(&control, 0, sizeof(control));
-+	control.sframe = 1;
-+	control.poll = poll;
++	BT_DBG("chan %p, control %p", chan, control);
 +
-+	if (test_bit(CONN_LOCAL_BUSY, &chan->conn_state))
-+		control.super = L2CAP_SUPER_RNR;
-+	else
-+		control.super = L2CAP_SUPER_RR;
++	if (control->reqseq == chan->next_tx_seq) {
++		BT_DBG("Invalid reqseq %d, disconnecting", control->reqseq);
++		l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
++		return;
++	}
 +
-+	control.reqseq = chan->buffer_seq;
-+	l2cap_send_sframe(chan, &control);
++	skb = l2cap_ertm_seq_in_queue(&chan->tx_q, control->reqseq);
++
++	if (chan->max_tx && skb &&
++	    bt_cb(skb)->control.retries >= chan->max_tx) {
++		BT_DBG("Retry limit exceeded (%d)", chan->max_tx);
++		l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
++		return;
++	}
++
++	clear_bit(CONN_REMOTE_BUSY, &chan->conn_state);
++
++	l2cap_pass_to_tx(chan, control);
++
++	if (control->final) {
++		if (!test_and_clear_bit(CONN_REJ_ACT, &chan->conn_state))
++			l2cap_retransmit_all(chan, control);
++	} else {
++		l2cap_retransmit_all(chan, control);
++		l2cap_ertm_send(chan);
++		if (chan->tx_state == L2CAP_TX_STATE_WAIT_F)
++			set_bit(CONN_REJ_ACT, &chan->conn_state);
++	}
  }
  
- static inline int __l2cap_no_conn_pending(struct l2cap_chan *chan)
+ static u8 l2cap_classify_txseq(struct l2cap_chan *chan, u16 txseq)
 -- 
 1.7.10
 
