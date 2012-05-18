@@ -2,132 +2,40 @@ Return-Path: <cyrus@holtmann.org>
 From: Paulo Alcantara <paulo.alcantara@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ 1/2] storage: Store BLE address type in "primary" file
-Date: Fri, 18 May 2012 17:57:46 -0300
-Message-Id: <1337374667-17802-2-git-send-email-paulo.alcantara@openbossa.org>
-In-Reply-To: <1337374667-17802-1-git-send-email-paulo.alcantara@openbossa.org>
-References: <1337374667-17802-1-git-send-email-paulo.alcantara@openbossa.org>
+Subject: [PATCH BlueZ 0/2] Store address type on storage
+Date: Fri, 18 May 2012 17:57:45 -0300
+Message-Id: <1337374667-17802-1-git-send-email-paulo.alcantara@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-BLE addressing types can be either public or random so the entries in
-the "primary" file did not contain enough information to distinguish
-which addressing type it's supposed to be (LE public or LE random).
-Entries will now contain both BLE address number and BLE address type
-as a single key in every entry in the file.
----
- src/device.c  |    2 +-
- src/storage.c |   40 ++++++++++++++++++++++++++++++++--------
- src/storage.h |    5 +++--
- 3 files changed, 36 insertions(+), 11 deletions(-)
+BLE devices have two different address types: public or
+random. So we need to provide this address type on keys in
+the "primary" file to avoid duplicate BLE address types
+around the BlueZ.
 
-diff --git a/src/device.c b/src/device.c
-index 2695b16..fd13bc3 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1759,7 +1759,7 @@ static void store_services(struct btd_device *device)
- 	adapter_get_address(adapter, &sba);
- 	device_get_address(device, &dba, NULL);
- 
--	write_device_services(&sba, &dba, str);
-+	write_device_services(&sba, &dba, device->bdaddr_type, str);
- 
- 	g_free(str);
- }
-diff --git a/src/storage.c b/src/storage.c
-index 14e5ac3..815060e 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -61,6 +61,19 @@ static inline int create_filename(char *buf, size_t size,
- 	return create_name(buf, size, STORAGEDIR, addr, name);
- }
- 
-+static inline char ba_type2char(uint8_t bdaddr_type)
-+{
-+	switch (bdaddr_type) {
-+	case BDADDR_LE_PUBLIC:
-+		return '1';
-+	case BDADDR_LE_RANDOM:
-+		return '2';
-+	case BDADDR_BREDR:
-+	default:
-+		return '0';
-+	}
-+}
-+
- int read_device_alias(const char *src, const char *dst, char *alias, size_t size)
- {
- 	char filename[PATH_MAX + 1], *tmp;
-@@ -1162,17 +1175,22 @@ int write_blocked(const bdaddr_t *local, const bdaddr_t *remote,
- }
- 
- int write_device_services(const bdaddr_t *sba, const bdaddr_t *dba,
--							const char *services)
-+			  uint8_t bdaddr_type, const char *services)
- {
--	char filename[PATH_MAX + 1], addr[18];
-+	char filename[PATH_MAX + 1], key[20];
- 
- 	create_filename(filename, PATH_MAX, sba, "primary");
- 
- 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- 
--	ba2str(dba, addr);
-+	memset(key, 0, sizeof(key));
- 
--	return textfile_put(filename, addr, services);
-+	/* New format: address#type */
-+	ba2str(dba, key);
-+	key[17] = '#';
-+	key[18] = ba_type2char(bdaddr_type);
-+
-+	return textfile_put(filename, key, services);
- }
- 
- static void filter_keys(char *key, char *value, void *data)
-@@ -1228,15 +1246,21 @@ int delete_device_service(const bdaddr_t *sba, const bdaddr_t *dba)
- 	return textfile_del(filename, address);
- }
- 
--char *read_device_services(const bdaddr_t *sba, const bdaddr_t *dba)
-+char *read_device_services(const bdaddr_t *sba, const bdaddr_t *dba,
-+							uint8_t bdaddr_type)
- {
--	char filename[PATH_MAX + 1], addr[18];
-+	char filename[PATH_MAX + 1], key[20];
- 
- 	create_filename(filename, PATH_MAX, sba, "primary");
- 
--	ba2str(dba, addr);
-+	memset(key, 0, sizeof(key));
- 
--	return textfile_caseget(filename, addr);
-+	/* New format: address#type */
-+	ba2str(dba, key);
-+	key[17] = '#';
-+	key[18] = ba_type2char(bdaddr_type);
-+
-+	return textfile_caseget(filename, key);
- }
- 
- int write_device_characteristics(const bdaddr_t *sba, const bdaddr_t *dba,
-diff --git a/src/storage.h b/src/storage.h
-index 6255ae8..745aff8 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -76,9 +76,10 @@ gboolean read_blocked(const bdaddr_t *local, const bdaddr_t *remote);
- int write_blocked(const bdaddr_t *local, const bdaddr_t *remote,
- 							gboolean blocked);
- int write_device_services(const bdaddr_t *sba, const bdaddr_t *dba,
--							const char *services);
-+				uint8_t bdaddr_type, const char *services);
- int delete_device_service(const bdaddr_t *sba, const bdaddr_t *dba);
--char *read_device_services(const bdaddr_t *sba, const bdaddr_t *dba);
-+char *read_device_services(const bdaddr_t *sba, const bdaddr_t *dba,
-+							uint8_t bdaddr_type);
- int write_device_characteristics(const bdaddr_t *sba, const bdaddr_t *dba,
- 					uint16_t handle, const char *chars);
- char *read_device_characteristics(const bdaddr_t *sba, const bdaddr_t *dba,
+This series changes the storage to store the address type
+together with the device address.
+
+Hemant Gupta has been working on this on "Store LE device
+address type with primary list" but his patch hasn't been
+accepted and he didn't send a new reviewed version of that
+patch.
+
+I have patches for the other storage files as well, I'll send
+them when this series is integrated upstream.
+
+Claudio Takahasi (1):
+  core: Fix creating device from "primary" file
+
+Paulo Alcantara (1):
+  storage: Store BLE address type in "primary" file
+
+ src/adapter.c |   10 +++++++---
+ src/device.c  |    2 +-
+ src/storage.c |   30 ++++++++++++++++++++++++++----
+ src/storage.h |    5 +++--
+ 4 files changed, 37 insertions(+), 10 deletions(-)
+
 -- 
 1.7.7.6
 
