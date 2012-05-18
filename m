@@ -1,35 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH RFC] avdtp: Fix incorrect gchar buffer allocation
-Date: Fri, 18 May 2012 09:46:29 -0400
-Message-Id: <1337348789-21109-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <20120518114032.GB1375@x220.P-661HNU-F1>
+References: <1337331254-30749-1-git-send-email-chanyeol.park@samsung.com>
+ <1337331254-30749-2-git-send-email-chanyeol.park@samsung.com> <20120518114032.GB1375@x220.P-661HNU-F1>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Fri, 18 May 2012 10:02:11 -0300
+Message-ID: <CAMOw1v4bO_xYRyLReN81riFtmvUxqx_=5AC3p4D9W3yzkn2EWA@mail.gmail.com>
+Subject: Re: [PATCH 2/3] Fix avrcp unregister potential crash
+To: chanyeol.park@samsung.com, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The code was allocating an array of gchar pointers, where an array of
-gchar is expected.
----
- audio/gstavdtpsink.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Fri, May 18, 2012 at 8:40 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Chanyeol,
+>
+> On Fri, May 18, 2012, chanyeol.park@samsung.com wrote:
+>> From: Chan-yeol Park <chanyeol.park@samsung.com>
+>>
+>> ---
+>>  audio/avrcp.c |    7 +++++--
+>>  1 file changed, 5 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/audio/avrcp.c b/audio/avrcp.c
+>> index df39d04..2e946c1 100644
+>> --- a/audio/avrcp.c
+>> +++ b/audio/avrcp.c
+>> @@ -1272,8 +1272,11 @@ void avrcp_unregister(const bdaddr_t *src)
+>>
+>>       servers = g_slist_remove(servers, server);
+>>
+>> -     remove_record_from_server(server->ct_record_id);
+>> -     remove_record_from_server(server->tg_record_id);
+>> +     if (server->ct_record_id)
+>> +             remove_record_from_server(server->ct_record_id);
+>> +
+>> +     if (server->tg_record_id)
+>> +             remove_record_from_server(server->tg_record_id);
+>>
+>>       avctp_unregister(&server->src);
+>>       g_free(server);
+>
+> I don't think the commit message for this patch is truthful. If you look
+> at the code the remove_record_from_server will return ENOENT if you pass
+> it a non-existent handle. I.e. it will not crash. Please fix the commit
+> message to reflect what exactly is being fixed (i.e. an unnecessary call
+> to remove_record_from_server if there is no record handle).
 
-I did not check the code at length, but looking at other functions, this is
-most likely a bug.
+Then I don't see a reason: just let remove_record_from_server() fail ?
 
-diff --git a/audio/gstavdtpsink.c b/audio/gstavdtpsink.c
-index af04a56..b5dfae4 100644
---- a/audio/gstavdtpsink.c
-+++ b/audio/gstavdtpsink.c
-@@ -1144,7 +1144,7 @@ static gboolean gst_avdtp_sink_update_caps(GstAvdtpSink *self)
- 
- static gboolean gst_avdtp_sink_get_capabilities(GstAvdtpSink *self)
- {
--	gchar *buf[BT_SUGGESTED_BUFFER_SIZE];
-+	gchar buf[BT_SUGGESTED_BUFFER_SIZE];
- 	struct bt_get_capabilities_req *req = (void *) buf;
- 	struct bt_get_capabilities_rsp *rsp = (void *) buf;
- 	int err;
--- 
-1.7.5.4
+Chan, what are you fixing here?
 
+Lucas De Marchi
