@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 17/17] Bluetooth: A2MP: Manage incoming connections
-Date: Fri, 18 May 2012 17:25:50 +0300
-Message-Id: <1337351150-20526-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 04/17] Bluetooth: A2MP: Add chan callbacks
+Date: Fri, 18 May 2012 17:25:37 +0300
+Message-Id: <1337351150-20526-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,89 +11,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Handle incoming A2MP connection by creating AMP manager and
-processing A2MP messages.
+Add state change, close and skb allocation callbacks.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |    4 ++++
- net/bluetooth/a2mp.c         |   12 ++++++++++++
- net/bluetooth/l2cap_core.c   |   14 ++++++++++----
- 3 files changed, 26 insertions(+), 4 deletions(-)
+ net/bluetooth/a2mp.c |   40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 980c266..b4f74c6 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -15,6 +15,8 @@
- #ifndef __A2MP_H
- #define __A2MP_H
- 
-+#include <net/bluetooth/l2cap.h>
-+
- #define A2MP_FEAT_EXT	0x8000
- 
- struct amp_mgr {
-@@ -119,5 +121,7 @@ struct a2mp_physlink_rsp {
- 
- void amp_mgr_get(struct amp_mgr *mgr);
- int amp_mgr_put(struct amp_mgr *mgr);
-+struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
-+				       struct sk_buff *skb);
- 
- #endif /* __A2MP_H */
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 86b2078..dda297d 100644
+index cb3bf74..67a7ad4 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -544,3 +544,15 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
- 
- 	return mgr;
+@@ -63,8 +63,46 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
+ 	kfree(cmd);
  }
-+
-+struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
-+				       struct sk_buff *skb)
+ 
++static void a2mp_chan_state_change_cb(void *data, int state)
 +{
-+	struct amp_mgr *mgr;
++	struct amp_mgr *mgr = data;
++	struct l2cap_chan *chan;
 +
-+	mgr = amp_mgr_create(conn);
++	if (!mgr)
++		return;
 +
-+	BT_DBG("mgr: %p chan %p", mgr, mgr->a2mp_chan);
++	chan = mgr->a2mp_chan;
 +
-+	return mgr->a2mp_chan;
++	BT_DBG("chan %p state %s", chan, state_to_string(state));
++
++	chan->state = state;
++
++	switch (state) {
++	case BT_CLOSED:
++		if (mgr)
++			amp_mgr_put(mgr);
++		break;
++	}
 +}
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b5c4229..8c9250e 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -56,6 +56,7 @@
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/smp.h>
-+#include <net/bluetooth/a2mp.h>
++
++static void a2mp_chan_close_cb(void *data)
++{
++	struct amp_mgr *mgr = data;
++
++	l2cap_chan_destroy(mgr->a2mp_chan);
++}
++
++static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
++					      unsigned long len, int nb)
++{
++	return bt_skb_alloc(len, GFP_KERNEL);
++}
++
+ static struct l2cap_ops a2mp_chan_ops = {
+ 	.name = "L2CAP A2MP channel",
++	.state_change = a2mp_chan_state_change_cb,
++	.close = a2mp_chan_close_cb,
++	.alloc_skb = a2mp_chan_alloc_skb_cb,
+ };
  
- bool disable_ertm;
+ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
+@@ -102,6 +140,8 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
+ 	chan->remote_mps = chan->omtu;
+ 	chan->mps = chan->omtu;
  
-@@ -4652,10 +4653,15 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
++	chan->state = BT_CONNECTED;
++
+ 	return chan;
+ }
  
- 	chan = l2cap_get_chan_by_scid(conn, cid);
- 	if (!chan) {
--		BT_DBG("unknown cid 0x%4.4x", cid);
--		/* Drop packet and return */
--		kfree_skb(skb);
--		return 0;
-+		if (cid == L2CAP_CID_A2MP) {
-+			chan = a2mp_channel_create(conn, skb);
-+			l2cap_chan_lock(chan);
-+		} else {
-+			BT_DBG("unknown cid 0x%4.4x", cid);
-+			/* Drop packet and return */
-+			kfree_skb(skb);
-+			return 0;
-+		}
- 	}
- 
- 	BT_DBG("chan %p, len %d", chan, skb->len);
 -- 
 1.7.9.5
 
