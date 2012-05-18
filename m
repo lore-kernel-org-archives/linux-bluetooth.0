@@ -1,43 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 May 2012 20:52:53 +0300
+Date: Fri, 18 May 2012 20:50:24 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: joohi.rastogi@stericsson.com
-Cc: User Name <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 1/2] AVRCP: Refactor the code using constants
-Message-ID: <20120518175253.GB11492@x220.P-661HNU-F1>
-References: <1337318710-28710-1-git-send-email-joohi.rastogi@stericsson.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 2/3 v2] AVRCP: Subscribe for VolumeChanged
+ Notification
+Message-ID: <20120518175024.GA11492@x220.P-661HNU-F1>
+References: <1337357504-7900-1-git-send-email-luiz.dentz@gmail.com>
+ <1337357504-7900-2-git-send-email-luiz.dentz@gmail.com>
+ <20120518162726.GA8733@x220.P-661HNU-F1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337318710-28710-1-git-send-email-joohi.rastogi@stericsson.com>
+In-Reply-To: <20120518162726.GA8733@x220.P-661HNU-F1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joohi,
+Hi Luiz,
 
-On Fri, May 18, 2012, joohi.rastogi@stericsson.com wrote:
-> ---
->  audio/avrcp.c |   17 +++++++++++++++--
->  1 files changed, 15 insertions(+), 2 deletions(-)
+On Fri, May 18, 2012, Johan Hedberg wrote:
+> Hi Luiz,
+> 
+> I think the following loop can be simplified a bit:
+> 
+> > +	for (l = session->handlers; l; l = l->next) {
+> > +		struct avctp_rsp_handler *handler = l->data;
+> > +
+> > +		if (handler->id == avctp->transaction) {
+> 
+> Avoid unnecessary indentation by using != and continue;
+> 
+> > +			gboolean ret = FALSE;
+> > +
+> > +			if (handler->func)
+> > +				ret = handler->func(session, avc->code,
+> > +						avc->subunit_type,
+> > +						operands, operand_count,
+> > +						handler->user_data);
+> > +
+> > +			if (ret)
+> > +				return;
+> 
+> Once you've reduced the indentation by the above trick you could even
+> just do:
+> 
+> 	if (handler->func && handler->func(...))
+> 		return;
 
-You'll need to rebase this patch latest git since it doesn't apply
-anymore. Additionally there were some issues:
-
-> +	uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103;
-> +	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
-> +			AVRCP_FEATURE_CATEGORY_2 |
-> +			AVRCP_FEATURE_CATEGORY_3 |
-> +			AVRCP_FEATURE_CATEGORY_4 );
-
-This doesn't look like it's correctly indented. Split lines should be
-indented as much as possible while staying under 80 characters.
-
-> -	uint16_t avrcp_ver = 0x0103, avctp_ver = 0x0103, feat = 0x000f;
-> +	uint16_t avrcp_ver = 0x0103, avctp_ver = 0x0103;
-> +	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
-> +                        AVRCP_FEATURE_CATEGORY_2 |
-> +                        AVRCP_FEATURE_CATEGORY_3 |
-> +                        AVRCP_FEATURE_CATEGORY_4 );
-
-Same here.
+I went ahead and cleaned this up myself along with a couple of other
+coding style issues with the patch and pushed all three upstream.
 
 Johan
