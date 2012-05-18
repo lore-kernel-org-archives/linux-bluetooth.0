@@ -1,55 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 May 2012 18:08:59 +0300
+Date: Fri, 18 May 2012 17:40:44 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: chanyeol.park@samsung.com, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] Fix avrcp unregister potential crash
-Message-ID: <20120518150859.GA6384@x220.P-661HNU-F1>
-References: <1337331254-30749-1-git-send-email-chanyeol.park@samsung.com>
- <1337331254-30749-2-git-send-email-chanyeol.park@samsung.com>
- <20120518114032.GB1375@x220.P-661HNU-F1>
- <CAMOw1v4bO_xYRyLReN81riFtmvUxqx_=5AC3p4D9W3yzkn2EWA@mail.gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Bluetooth: Use defined link key size
+Message-ID: <20120518144044.GA5494@x220.P-661HNU-F1>
+References: <1337350806-20326-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CAMOw1v4bO_xYRyLReN81riFtmvUxqx_=5AC3p4D9W3yzkn2EWA@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1337350806-20326-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Andrei,
 
-On Fri, May 18, 2012, Lucas De Marchi wrote:
-> >> --- a/audio/avrcp.c
-> >> +++ b/audio/avrcp.c
-> >> @@ -1272,8 +1272,11 @@ void avrcp_unregister(const bdaddr_t *src)
-> >>
-> >>       servers = g_slist_remove(servers, server);
-> >>
-> >> -     remove_record_from_server(server->ct_record_id);
-> >> -     remove_record_from_server(server->tg_record_id);
-> >> +     if (server->ct_record_id)
-> >> +             remove_record_from_server(server->ct_record_id);
-> >> +
-> >> +     if (server->tg_record_id)
-> >> +             remove_record_from_server(server->tg_record_id);
-> >>
-> >>       avctp_unregister(&server->src);
-> >>       g_free(server);
-> >
-> > I don't think the commit message for this patch is truthful. If you look
-> > at the code the remove_record_from_server will return ENOENT if you pass
-> > it a non-existent handle. I.e. it will not crash. Please fix the commit
-> > message to reflect what exactly is being fixed (i.e. an unnecessary call
-> > to remove_record_from_server if there is no record handle).
+On Fri, May 18, 2012, Andrei Emeltchenko wrote:
+> Remove magic number with defined link key size. This is especially
+> useful for calculation other keys which are 2 * key_size, etc that
+> makes usage of magic numbers too much.
 > 
-> Then I don't see a reason: just let remove_record_from_server() fail ?
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  include/net/bluetooth/bluetooth.h |    2 ++
+>  include/net/bluetooth/hci.h       |    4 ++--
+>  include/net/bluetooth/hci_core.h  |    2 +-
+>  net/bluetooth/hci_core.c          |    2 +-
+>  net/bluetooth/hci_event.c         |    2 +-
+>  net/bluetooth/mgmt.c              |    2 +-
+>  6 files changed, 8 insertions(+), 6 deletions(-)
 > 
-> Chan, what are you fixing here?
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 961669b..4abedfe 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -68,6 +68,8 @@ struct bt_security {
+>  #define BT_SECURITY_MEDIUM	2
+>  #define BT_SECURITY_HIGH	3
+>  
+> +#define BT_SEC_LINK_KEY_SIZE		16
 
-As discussed on IRC (and Chanyeol should really have explained this in
-the commit message) handle 0 is actually the SDP server's own "master"
-record. So it is plausible that weird behavior might occur if trying to
-remove it. Since this is a SDP server internal detail and it doesn't
-really make sense to remove it I'm thinking that
-remove_record_from_server should return EINVAL if passed a 0 value.
+The patch seems ok'ish to me but I'd remove the _SEC part from the
+define name since it doesn't really buy you anything. Also, I'm a bit
+confused by the commit message. What other keys are "2 * key_size"?
+There are no such occurrences in the patch itself so you should at least
+give some examples in the commit message.
 
 Johan
