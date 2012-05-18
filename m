@@ -1,64 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH RESEND BlueZ v6 00/13] Better D-Bus introspection
-Date: Fri, 18 May 2012 00:23:24 -0300
-Message-Id: <1337311417-1245-1-git-send-email-lucas.demarchi@profusion.mobi>
+Message-ID: <1337309726.5970.284.camel@aeonflux>
+Subject: Re: [PATCH BlueZ v6 03/15] Constify GDBus method tables
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 17 May 2012 19:55:26 -0700
+In-Reply-To: <1337278812-4837-4-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1337278812-4837-1-git-send-email-lucas.demarchi@profusion.mobi>
+	 <1337278812-4837-4-git-send-email-lucas.demarchi@profusion.mobi>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The last time "Constify GDBus method tables" was mixing gdbus/ with the other
-patches. Since the gdbus/ part was already applied, just rebase on top of is
-already there.
+Hi Lucas,
 
+> Constify method tables with the following command:
+> 
+> find . -name '*.[ch]' -exec \
+> 	     sed -i 's/\(GDBusMethodTable .* =\)/const \1/g' {} \;
+> ---
+>  attrib/client.c           |    4 ++--
+>  audio/control.c           |    2 +-
+>  audio/device.c            |    2 +-
+>  audio/gateway.c           |    2 +-
+>  audio/headset.c           |    2 +-
+>  audio/media.c             |    2 +-
+>  audio/sink.c              |    2 +-
+>  audio/source.c            |    2 +-
+>  audio/telephony-dummy.c   |    2 +-
+>  audio/telephony-maemo5.c  |    2 +-
+>  audio/transport.c         |    2 +-
+>  gdbus/object.c            |    2 +-
 
-Lucas De Marchi (13):
-  Constify GDBus method tables
-  Constify GDBus signal tables
-  gdbus: add argument info to methods and signals
-  gdbus: add and use helpers for table declarations
-  Convert GDBus methods to use macro helpers
-  gdbus: use GDBusArgInfo to generate introspection
-  gdbus: loop over args to check message signature
-  Do not set signature and reply in GDBus tables
-  gdbus: remove signature and reply from tables
-  gdbus: add Deprecated annotation in introspection
-  gdbus: add Method.NoReply annotation in introspection
-  gdbus: do not check signature twice
-  adapter: do not check signature twice
+no. As I said before, I want gdbus/ and other separated.
 
- attrib/client.c           |   32 +++++++----
- audio/control.c           |   28 +++++----
- audio/device.c            |   20 ++++---
- audio/gateway.c           |   25 +++++----
- audio/headset.c           |   81 +++++++++++++++------------
- audio/media.c             |   17 ++++--
- audio/sink.c              |   34 +++++------
- audio/source.c            |   21 +++----
- audio/telephony-dummy.c   |   36 ++++++++----
- audio/telephony-maemo5.c  |    7 ++-
- audio/transport.c         |   27 ++++++---
- gdbus/gdbus.h             |   47 +++++++++++++++-
- gdbus/object.c            |  137 +++++++++++++++++++++------------------------
- health/hdp.c              |   65 +++++++++++++--------
- input/device.c            |   18 +++---
- network/connection.c      |   18 +++---
- network/server.c          |   10 +++-
- plugins/dbusoob.c         |   19 +++++--
- plugins/service.c         |   23 +++++---
- proximity/monitor.c       |   16 ++++--
- proximity/reporter.c      |   11 ++--
- sap/sap-dummy.c           |   17 ++++--
- sap/server.c              |   13 +++--
- serial/port.c             |   14 +++--
- serial/proxy.c            |   37 ++++++++----
- src/adapter.c             |   88 ++++++++++++++++++-----------
- src/device.c              |   28 +++++----
- src/manager.c             |   34 +++++++----
- thermometer/thermometer.c |   32 +++++++----
- 29 files changed, 593 insertions(+), 362 deletions(-)
+Regards
 
--- 
-1.7.10.2
+Marcel
+
 
