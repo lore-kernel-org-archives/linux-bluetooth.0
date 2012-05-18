@@ -1,36 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120517144015.GA20883@x220.P-661HNU-F1>
-References: <CAP6uk1On=Re6wOo6-HSD=g8iHdWE9bgxJcJ0NF3w9vTRnTfGvA@mail.gmail.com>
-	<20120517144015.GA20883@x220.P-661HNU-F1>
-Date: Fri, 18 May 2012 17:03:18 +0530
-Message-ID: <CAP6uk1OGcSJxdiLGET53Xa=kNBuqtLedTaEoAwokxJmdWPUz=w@mail.gmail.com>
-Subject: Re: Auto Generate configure & make files
-From: santhosh aj <ajsant@gmail.com>
-To: santhosh aj <ajsant@gmail.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: chanyeol.park@samsung.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/3] Fix avrcp unregister potential crash
+Date: Fri, 18 May 2012 17:54:12 +0900
+Message-id: <1337331254-30749-2-git-send-email-chanyeol.park@samsung.com>
+In-reply-to: <1337331254-30749-1-git-send-email-chanyeol.park@samsung.com>
+References: <1337331254-30749-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, May 17, 2012 at 8:10 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Santosh,
->
-> On Thu, May 17, 2012, santhosh aj wrote:
->> Can any one please tell me what is the proper order/commands to
->> generate configure.in, .configure, Makefile.in, config.h.in. If we
->> download a snapshot from git repository
->> (http://git.kernel.org/?p=bluetooth/bluez.git;a=summary) these file
->> will be missing. I found a link which give some information about this
->> (http://www.nondot.org/sabre/Mirrored/autoconf-2.12/autoconf_2.html).
->> but if some one can tell the proper steps it will be help a lot for
->> all who doesn't know.
->
-> The git tree contains a script called bootstrap that will do this for
-> you. A bootstrap-configure script is also provided which additionally
-> calls the configure script with options that are appropriate for BlueZ
-> development (but not necessarily for product use).
->
-> Johan
+From: Chan-yeol Park <chanyeol.park@samsung.com>
 
-Thank you very much. It worked. libtool & libcapabilities were
-missing. After installing those it worked.
+---
+ audio/avrcp.c |    7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index df39d04..2e946c1 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -1272,8 +1272,11 @@ void avrcp_unregister(const bdaddr_t *src)
+ 
+ 	servers = g_slist_remove(servers, server);
+ 
+-	remove_record_from_server(server->ct_record_id);
+-	remove_record_from_server(server->tg_record_id);
++	if (server->ct_record_id)
++		remove_record_from_server(server->ct_record_id);
++
++	if (server->tg_record_id)
++		remove_record_from_server(server->tg_record_id);
+ 
+ 	avctp_unregister(&server->src);
+ 	g_free(server);
+-- 
+1.7.9.5
+
