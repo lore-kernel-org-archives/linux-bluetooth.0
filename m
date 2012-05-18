@@ -1,76 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-From: chanyeol.park@samsung.com
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Fix A2DP Sink/Source recognition
-Date: Fri, 18 May 2012 17:54:11 +0900
-Message-id: <1337331254-30749-1-git-send-email-chanyeol.park@samsung.com>
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH obexd v0 2/2] client: Simplify error-handling code
+Date: Fri, 18 May 2012 09:54:04 +0200
+Message-Id: <1337327644-17920-2-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1337327644-17920-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1337327644-17920-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chan-yeol Park <chanyeol.park@samsung.com>
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
+Refactor error-handling code to avoid duplicated code.
 ---
- audio/a2dp.c     |    8 ++++----
- audio/audio.conf |    2 +-
- audio/manager.c  |    4 ++--
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ client/manager.c |   48 ++++++++++++++++++------------------------------
+ 1 files changed, 18 insertions(+), 30 deletions(-)
 
-diff --git a/audio/a2dp.c b/audio/a2dp.c
-index cc8f139..145dcf6 100644
---- a/audio/a2dp.c
-+++ b/audio/a2dp.c
-@@ -1406,9 +1406,9 @@ int a2dp_register(DBusConnection *conn, const bdaddr_t *src, GKeyFile *config)
- 		g_clear_error(&err);
- 	} else {
- 		if (strstr(str, "Sink"))
--			source = TRUE;
--		if (strstr(str, "Source"))
- 			sink = TRUE;
-+		if (strstr(str, "Source"))
-+			source = TRUE;
- 		if (strstr(str, "Socket"))
- 			socket = TRUE;
- 		g_free(str);
-@@ -1421,9 +1421,9 @@ int a2dp_register(DBusConnection *conn, const bdaddr_t *src, GKeyFile *config)
- 		g_clear_error(&err);
- 	} else {
- 		if (strstr(str, "Sink"))
--			source = FALSE;
--		if (strstr(str, "Source"))
- 			sink = FALSE;
-+		if (strstr(str, "Source"))
-+			source = FALSE;
- 		if (strstr(str, "Socket"))
- 			socket = FALSE;
- 		g_free(str);
-diff --git a/audio/audio.conf b/audio/audio.conf
-index fd6092a..1abdab9 100644
---- a/audio/audio.conf
-+++ b/audio/audio.conf
-@@ -9,7 +9,7 @@
+diff --git a/client/manager.c b/client/manager.c
+index 53f0d0f..b6d4afc 100644
+--- a/client/manager.c
++++ b/client/manager.c
+@@ -286,32 +286,26 @@ static void pull_obc_session_callback(struct obc_session *session,
+ 	DBusMessage *reply;
+ 	GError *gerr = NULL;
  
- # If we want to disable support for specific services
- # Defaults to supporting all implemented services
--#Disable=Gateway,Source,Socket
-+#Disable=Gateway,Sink,Socket
+-	if (err != NULL) {
+-		reply = g_dbus_create_error(data->message,
+-						"org.openobex.Error.Failed",
+-						"%s", err->message);
++	if (err != NULL)
+ 		goto fail;
+-	}
  
- # SCO routing. Either PCM or HCI (in which case audio is routed to/from ALSA)
- # Defaults to HCI
-diff --git a/audio/manager.c b/audio/manager.c
-index 9c7d0d3..9e5c71c 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -114,8 +114,8 @@ static struct enabled_interfaces enabled = {
- 	.hfp		= TRUE,
- 	.headset	= TRUE,
- 	.gateway	= FALSE,
--	.sink		= TRUE,
--	.source		= FALSE,
-+	.sink		= FALSE,
-+	.source		= TRUE,
- 	.control	= TRUE,
- 	.socket		= FALSE,
- 	.media		= TRUE,
+ 	pull = obc_transfer_get("text/x-vcard", NULL, data->filename, &gerr);
+-	if (pull == NULL) {
+-		reply = g_dbus_create_error(data->message,
+-						"org.openobex.Error.Failed",
+-						"%s", gerr->message);
++	if (pull == NULL)
+ 		goto fail;
+-	}
+ 
+ 	if (!obc_session_queue(session, pull, pull_complete_callback, data,
+-								&gerr)) {
+-		reply = g_dbus_create_error(data->message,
+-						"org.openobex.Error.Failed",
+-						"%s", gerr->message);
++								&gerr))
+ 		goto fail;
+-	}
+ 
+ 	return;
+ 
+ fail:
++	if (err == NULL)
++		err = gerr;
++
++	reply = g_dbus_create_error(data->message,
++						"org.openobex.Error.Failed",
++						"%s", err->message);
+ 	g_dbus_send_message(data->connection, reply);
+ 	shutdown_session(session);
+ 	dbus_message_unref(data->message);
+@@ -513,33 +507,27 @@ static void capability_obc_session_callback(struct obc_session *session,
+ 	DBusMessage *reply;
+ 	GError *gerr = NULL;
+ 
+-	if (err != NULL) {
+-		reply = g_dbus_create_error(data->message,
+-					"org.openobex.Error.Failed",
+-					"%s", err->message);
++	if (err != NULL)
+ 		goto fail;
+-	}
+ 
+ 	pull = obc_transfer_get("x-obex/capability", NULL, data->filename,
+ 									&gerr);
+-	if (pull == NULL) {
+-		reply = g_dbus_create_error(data->message,
+-					"org.openobex.Error.Failed",
+-					"%s", gerr->message);
++	if (pull == NULL)
+ 		goto fail;
+-	}
+ 
+ 	if (!obc_session_queue(session, pull, capabilities_complete_callback,
+-								data, &gerr)) {
+-		reply = g_dbus_create_error(data->message,
+-					"org.openobex.Error.Failed",
+-					"%s", gerr->message);
++								data, &gerr))
+ 		goto fail;
+-	}
+ 
+ 	return;
+ 
+ fail:
++	if (err == NULL)
++		err = gerr;
++
++	reply = g_dbus_create_error(data->message,
++					"org.openobex.Error.Failed",
++					"%s", err->message);
+ 	g_dbus_send_message(data->connection, reply);
+ 	shutdown_session(session);
+ 	dbus_message_unref(data->message);
 -- 
-1.7.9.5
+1.7.7.6
 
