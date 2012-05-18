@@ -5,33 +5,200 @@ To: linux-bluetooth@vger.kernel.org,
 	marcel@holtmann.org,
 	ulisses@profusion.mobi
 Cc: pkrystad@codeaurora.org
-Subject: [PATCH 25/25] Bluetooth: Enable ERTM by default
-Date: Thu, 17 May 2012 20:53:55 -0700
-Message-Id: <1337313235-26535-26-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 24/25] Bluetooth: Remove unused ERTM control field macros
+Date: Thu, 17 May 2012 20:53:54 -0700
+Message-Id: <1337313235-26535-25-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1337313235-26535-1-git-send-email-mathewm@codeaurora.org>
 References: <1337313235-26535-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This enables the new receive and transmit state machines.
+Now that l2cap_ctrl is used to set up control fields, these macros are
+not needed.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/net/bluetooth/l2cap.h |  168 -----------------------------------------
+ 1 file changed, 168 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 1a0f942..0795614 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -57,7 +57,7 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/smp.h>
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 117db8e..7bc4019 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -725,174 +725,6 @@ static inline __u16 __next_seq(struct l2cap_chan *chan, __u16 seq)
+ 	return (seq + 1) % (chan->tx_win_max + 1);
+ }
  
--bool disable_ertm = 1;
-+bool disable_ertm;
+-static inline int l2cap_tx_window_full(struct l2cap_chan *ch)
+-{
+-	int sub;
+-
+-	sub = (ch->next_tx_seq - ch->expected_ack_seq) % 64;
+-
+-	if (sub < 0)
+-		sub += 64;
+-
+-	return sub == ch->remote_tx_win;
+-}
+-
+-static inline __u16 __get_reqseq(struct l2cap_chan *chan, __u32 ctrl)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return (ctrl & L2CAP_EXT_CTRL_REQSEQ) >>
+-						L2CAP_EXT_CTRL_REQSEQ_SHIFT;
+-	else
+-		return (ctrl & L2CAP_CTRL_REQSEQ) >> L2CAP_CTRL_REQSEQ_SHIFT;
+-}
+-
+-static inline __u32 __set_reqseq(struct l2cap_chan *chan, __u32 reqseq)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return (reqseq << L2CAP_EXT_CTRL_REQSEQ_SHIFT) &
+-							L2CAP_EXT_CTRL_REQSEQ;
+-	else
+-		return (reqseq << L2CAP_CTRL_REQSEQ_SHIFT) & L2CAP_CTRL_REQSEQ;
+-}
+-
+-static inline __u16 __get_txseq(struct l2cap_chan *chan, __u32 ctrl)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return (ctrl & L2CAP_EXT_CTRL_TXSEQ) >>
+-						L2CAP_EXT_CTRL_TXSEQ_SHIFT;
+-	else
+-		return (ctrl & L2CAP_CTRL_TXSEQ) >> L2CAP_CTRL_TXSEQ_SHIFT;
+-}
+-
+-static inline __u32 __set_txseq(struct l2cap_chan *chan, __u32 txseq)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return (txseq << L2CAP_EXT_CTRL_TXSEQ_SHIFT) &
+-							L2CAP_EXT_CTRL_TXSEQ;
+-	else
+-		return (txseq << L2CAP_CTRL_TXSEQ_SHIFT) & L2CAP_CTRL_TXSEQ;
+-}
+-
+-static inline bool __is_sframe(struct l2cap_chan *chan, __u32 ctrl)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return ctrl & L2CAP_EXT_CTRL_FRAME_TYPE;
+-	else
+-		return ctrl & L2CAP_CTRL_FRAME_TYPE;
+-}
+-
+-static inline __u32 __set_sframe(struct l2cap_chan *chan)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return L2CAP_EXT_CTRL_FRAME_TYPE;
+-	else
+-		return L2CAP_CTRL_FRAME_TYPE;
+-}
+-
+-static inline __u8 __get_ctrl_sar(struct l2cap_chan *chan, __u32 ctrl)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return (ctrl & L2CAP_EXT_CTRL_SAR) >> L2CAP_EXT_CTRL_SAR_SHIFT;
+-	else
+-		return (ctrl & L2CAP_CTRL_SAR) >> L2CAP_CTRL_SAR_SHIFT;
+-}
+-
+-static inline __u32 __set_ctrl_sar(struct l2cap_chan *chan, __u32 sar)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return (sar << L2CAP_EXT_CTRL_SAR_SHIFT) & L2CAP_EXT_CTRL_SAR;
+-	else
+-		return (sar << L2CAP_CTRL_SAR_SHIFT) & L2CAP_CTRL_SAR;
+-}
+-
+-static inline bool __is_sar_start(struct l2cap_chan *chan, __u32 ctrl)
+-{
+-	return __get_ctrl_sar(chan, ctrl) == L2CAP_SAR_START;
+-}
+-
+-static inline __u32 __get_sar_mask(struct l2cap_chan *chan)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return L2CAP_EXT_CTRL_SAR;
+-	else
+-		return L2CAP_CTRL_SAR;
+-}
+-
+-static inline __u8 __get_ctrl_super(struct l2cap_chan *chan, __u32 ctrl)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return (ctrl & L2CAP_EXT_CTRL_SUPERVISE) >>
+-						L2CAP_EXT_CTRL_SUPER_SHIFT;
+-	else
+-		return (ctrl & L2CAP_CTRL_SUPERVISE) >> L2CAP_CTRL_SUPER_SHIFT;
+-}
+-
+-static inline __u32 __set_ctrl_super(struct l2cap_chan *chan, __u32 super)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return (super << L2CAP_EXT_CTRL_SUPER_SHIFT) &
+-						L2CAP_EXT_CTRL_SUPERVISE;
+-	else
+-		return (super << L2CAP_CTRL_SUPER_SHIFT) &
+-							L2CAP_CTRL_SUPERVISE;
+-}
+-
+-static inline __u32 __set_ctrl_final(struct l2cap_chan *chan)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return L2CAP_EXT_CTRL_FINAL;
+-	else
+-		return L2CAP_CTRL_FINAL;
+-}
+-
+-static inline bool __is_ctrl_final(struct l2cap_chan *chan, __u32 ctrl)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return ctrl & L2CAP_EXT_CTRL_FINAL;
+-	else
+-		return ctrl & L2CAP_CTRL_FINAL;
+-}
+-
+-static inline __u32 __set_ctrl_poll(struct l2cap_chan *chan)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return L2CAP_EXT_CTRL_POLL;
+-	else
+-		return L2CAP_CTRL_POLL;
+-}
+-
+-static inline bool __is_ctrl_poll(struct l2cap_chan *chan, __u32 ctrl)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return ctrl & L2CAP_EXT_CTRL_POLL;
+-	else
+-		return ctrl & L2CAP_CTRL_POLL;
+-}
+-
+-static inline __u32 __get_control(struct l2cap_chan *chan, void *p)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return get_unaligned_le32(p);
+-	else
+-		return get_unaligned_le16(p);
+-}
+-
+-static inline void __put_control(struct l2cap_chan *chan, __u32 control,
+-								void *p)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return put_unaligned_le32(control, p);
+-	else
+-		return put_unaligned_le16(control, p);
+-}
+-
+-static inline __u8 __ctrl_size(struct l2cap_chan *chan)
+-{
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		return L2CAP_EXT_HDR_SIZE - L2CAP_HDR_SIZE;
+-	else
+-		return L2CAP_ENH_HDR_SIZE - L2CAP_HDR_SIZE;
+-}
  
- static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
- static u8 l2cap_fixed_chan[8] = { L2CAP_FC_L2CAP, };
+ extern bool disable_ertm;
+ 
 -- 
 1.7.10
 
