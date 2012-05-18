@@ -1,36 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
+From: Paulo Alcantara <paulo.alcantara@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH] Bluetooth: Do not purge queue in Basic Mode
-Date: Fri, 18 May 2012 19:03:02 -0300
-Message-Id: <1337378582-29271-1-git-send-email-gustavo@padovan.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 2/2] core: Fix creating device from "primary" file
+Date: Fri, 18 May 2012 17:57:47 -0300
+Message-Id: <1337374667-17802-3-git-send-email-paulo.alcantara@openbossa.org>
+In-Reply-To: <1337374667-17802-1-git-send-email-paulo.alcantara@openbossa.org>
+References: <1337374667-17802-1-git-send-email-paulo.alcantara@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
-chan->tx_q is only initialized if we use ERTM or Streaming mode.
-
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+This patch removes the hard-coded address type for the BLE device
+created from the storage.
 ---
- net/bluetooth/l2cap_core.c |    3 +++
- 1 file changed, 3 insertions(+)
+ src/adapter.c |   10 +++++++---
+ 1 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b70dca4..ccd2d85 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -549,6 +549,9 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
+diff --git a/src/adapter.c b/src/adapter.c
+index dafe595..8d86ca8 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1940,13 +1940,17 @@ static void create_stored_device_from_primary(char *key, char *value,
+ 	struct btd_adapter *adapter = user_data;
+ 	struct btd_device *device;
+ 	GSList *services, *uuids, *l;
++	char address[18];
++	uint8_t bdaddr_type;
++
++	if (sscanf(key, "%17s#%hhu", address, &bdaddr_type) != 2)
++		return;
+ 
+ 	if (g_slist_find_custom(adapter->devices,
+-			key, (GCompareFunc) device_address_cmp))
++			address, (GCompareFunc) device_address_cmp))
  		return;
  
-+	if (chan->mode == L2CAP_MODE_BASIC)
-+		return;
-+
- 	skb_queue_purge(&chan->tx_q);
+-	/* FIXME: Get the correct LE addr type (public/random) */
+-	device = device_create(connection, adapter, key, BDADDR_LE_PUBLIC);
++	device = device_create(connection, adapter, address, bdaddr_type);
+ 	if (!device)
+ 		return;
  
- 	if (chan->mode == L2CAP_MODE_ERTM) {
 -- 
-1.7.10.1
+1.7.7.6
 
