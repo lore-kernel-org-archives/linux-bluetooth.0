@@ -1,47 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Sat, 19 May 2012 09:43:41 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Paulo Alcantara <paulo.alcantara@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH BlueZ 2/2] core: Fix creating device from "primary" file
+Message-ID: <20120519064341.GB27057@x220.P-661HNU-F1>
+References: <1337374667-17802-1-git-send-email-paulo.alcantara@openbossa.org>
+ <1337374667-17802-3-git-send-email-paulo.alcantara@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LNX.2.00.1205101218030.31253@pobox.suse.cz>
-References: <1335799650-17597-1-git-send-email-dh.herrmann@googlemail.com>
-	<CAAngNMabAxO9fVN2DM=5xPJAVk_is3QoS1=+TGZPJAbY3TYHMQ@mail.gmail.com>
-	<CANq1E4QaRHtGxt3d=Z2mvqAFhTY2zid20GGNZ2ZzHjStGepc+A@mail.gmail.com>
-	<alpine.LNX.2.00.1205101218030.31253@pobox.suse.cz>
-Date: Sun, 20 May 2012 12:40:14 +0200
-Message-ID: <CANq1E4R_6ByuBALh0z9gxQzy5ZrT4-MY=6RqrcaVFgK0owjtxw@mail.gmail.com>
-Subject: Re: [PATCH 0/1] HID: User-space HID I/O driver (UHID)
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: Jiri Kosina <jkosina@suse.cz>
-Cc: Joao Paulo Rechi Vita <jprvita@openbossa.org>, linux-input@vger.kernel.org, marcel@holtmann.org,
-	claudio.takahasi@openbossa.org, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1337374667-17802-3-git-send-email-paulo.alcantara@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jiri
+Hi,
 
-On Thu, May 10, 2012 at 12:19 PM, Jiri Kosina <jkosina@suse.cz> wrote:
-> On Thu, 3 May 2012, David Herrmann wrote:
->
->> > Thanks for your work, David. I'll test and review this new version.
->> > Did you find out the what is the problem when passing BUS_BLUETOOTH on
->> > the 'bus' field of the create request?
->>
->> I've spent some time looking into that but I haven't found the
->> problem, yet. Maybe Jiri can comment here.
->
-> This should now all be handled correctly using the hid-generic mechanism.
-> If you still see any problems with this (currently in linux-next, more
-> precisely 'device-groups' branch in hid.git), please let me know.
+On Fri, May 18, 2012, Paulo Alcantara wrote:
+> This patch removes the hard-coded address type for the BLE device
+> created from the storage.
+> ---
+>  src/adapter.c |   10 +++++++---
+>  1 files changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/src/adapter.c b/src/adapter.c
+> index dafe595..8d86ca8 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -1940,13 +1940,17 @@ static void create_stored_device_from_primary(char *key, char *value,
+>  	struct btd_adapter *adapter = user_data;
+>  	struct btd_device *device;
+>  	GSList *services, *uuids, *l;
+> +	char address[18];
+> +	uint8_t bdaddr_type;
+> +
+> +	if (sscanf(key, "%17s#%hhu", address, &bdaddr_type) != 2)
+> +		return;
 
-That is working correctly now. Do you have any update on this patch?
-There is no time pressure in merging it but I would like to get some
-feedback what you are thinking about it so I can continue working on
-it.
+What about entries created by older bluetoothd versions? Will they be
+stuck in the storage forever without a way to remove them through the
+usual API? Instead of checking for != 2 maybe the check should instead
+be < 1 and bdaddr_type be pre-initialized to BDADDR_LE_PUBLIC.
 
-If you like I can resend it split into multiple patches. Let me know
-of any problems with it.
-
-> --
-> Jiri Kosina
-> SUSE Labs
-
-Regards
-David
+Johan
