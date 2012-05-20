@@ -1,47 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <4FB992C8.8090105@samsung.com>
-Date: Mon, 21 May 2012 09:56:40 +0900
-From: Minho Ban <mhban@samsung.com>
-MIME-version: 1.0
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC/PATCH] Bluetooth: prevent double l2cap_chan_destroy
-Content-type: text/plain; charset=ISO-8859-1
+MIME-Version: 1.0
+In-Reply-To: <alpine.LNX.2.00.1205101218030.31253@pobox.suse.cz>
+References: <1335799650-17597-1-git-send-email-dh.herrmann@googlemail.com>
+	<CAAngNMabAxO9fVN2DM=5xPJAVk_is3QoS1=+TGZPJAbY3TYHMQ@mail.gmail.com>
+	<CANq1E4QaRHtGxt3d=Z2mvqAFhTY2zid20GGNZ2ZzHjStGepc+A@mail.gmail.com>
+	<alpine.LNX.2.00.1205101218030.31253@pobox.suse.cz>
+Date: Sun, 20 May 2012 12:40:14 +0200
+Message-ID: <CANq1E4R_6ByuBALh0z9gxQzy5ZrT4-MY=6RqrcaVFgK0owjtxw@mail.gmail.com>
+Subject: Re: [PATCH 0/1] HID: User-space HID I/O driver (UHID)
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: Jiri Kosina <jkosina@suse.cz>
+Cc: Joao Paulo Rechi Vita <jprvita@openbossa.org>, linux-input@vger.kernel.org, marcel@holtmann.org,
+	claudio.takahasi@openbossa.org, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-l2cap_sock_kill can be called in l2cap_sock_release and l2cap_sock_close_cb
-either. This lead l2cap_chan_destroy to be called twice for same channel.
-To prevent double list_del and double chan_put, chan_destroy should be protected
-with chan->refcnt and chan_list_lock so that reentrance could be forbidden.
+Hi Jiri
 
-Signed-off-by: Minho Ban <mhban@samsung.com>
----
- net/bluetooth/l2cap_core.c |    8 ++++++--
- 1 files changed, 6 insertions(+), 2 deletions(-)
+On Thu, May 10, 2012 at 12:19 PM, Jiri Kosina <jkosina@suse.cz> wrote:
+> On Thu, 3 May 2012, David Herrmann wrote:
+>
+>> > Thanks for your work, David. I'll test and review this new version.
+>> > Did you find out the what is the problem when passing BUS_BLUETOOTH on
+>> > the 'bus' field of the create request?
+>>
+>> I've spent some time looking into that but I haven't found the
+>> problem, yet. Maybe Jiri can comment here.
+>
+> This should now all be handled correctly using the hid-generic mechanism.
+> If you still see any problems with this (currently in linux-next, more
+> precisely 'device-groups' branch in hid.git), please let me know.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 24f144b..156ca14 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -400,10 +400,14 @@ struct l2cap_chan *l2cap_chan_create(void)
- void l2cap_chan_destroy(struct l2cap_chan *chan)
- {
- 	write_lock(&chan_list_lock);
-+	/* Check if channel is valid */
-+	if (!atomic_read(&chan->refcnt)) {
-+		write_unlock(&chan_list_lock);
-+		return;
-+	}
- 	list_del(&chan->global_l);
--	write_unlock(&chan_list_lock);
--
- 	l2cap_chan_put(chan);
-+	write_unlock(&chan_list_lock);
- }
- 
- void l2cap_chan_set_defaults(struct l2cap_chan *chan)
--- 
-1.7.5.4
+That is working correctly now. Do you have any update on this patch?
+There is no time pressure in merging it but I would like to get some
+feedback what you are thinking about it so I can continue working on
+it.
+
+If you like I can resend it split into multiple patches. Let me know
+of any problems with it.
+
+> --
+> Jiri Kosina
+> SUSE Labs
+
+Regards
+David
