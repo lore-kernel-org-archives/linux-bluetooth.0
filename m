@@ -1,50 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1337612367.3349.2.camel@ufo>
-Subject: [PATCH obexd] build: Remove left over glib-helper.h support
-From: Paul Seidler <pl.seidler@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Date: Mon, 21 May 2012 16:59:27 +0200
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1337600889-23515-1-git-send-email-joohi.rastogi@stericsson.com>
+References: <1337600889-23515-1-git-send-email-joohi.rastogi@stericsson.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 21 May 2012 11:55:07 -0300
+Message-ID: <CAMOw1v7sOOOiP9-wTGs-_HuLEJoWZKGKQxY59Y-n3JGPHpjyWw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2 v2] AVRCP: Refactor the code using constants
+To: joohi.rastogi@stericsson.com
+Cc: User Name <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From 700e24a8fecf3c1376bde878470011e961a29da6 Mon Sep 17 00:00:00 2001
-From: Paul Seidler <pl.seidler@googlemail.com>
-Date: Mon, 21 May 2012 16:31:13 +0200
-Subject: [PATCH] build: Remove left over glib-helper.h support
+On Mon, May 21, 2012 at 8:48 AM,  <joohi.rastogi@stericsson.com> wrote:
+> From: Joohi Rastogi <joohi.rastogi@stericsson.com>
+>
+> ---
+>  audio/avrcp.c |   17 +++++++++++++++--
+>  1 files changed, 15 insertions(+), 2 deletions(-)
+>  mode change 100644 => 100755 audio/avrcp.c
+>
+> diff --git a/audio/avrcp.c b/audio/avrcp.c
+> old mode 100644
+> new mode 100755
+> index d278d4e..356fd76
+> --- a/audio/avrcp.c
+> +++ b/audio/avrcp.c
+> @@ -94,6 +94,11 @@
+>
+>  #define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH 5
+>
+> +#define AVRCP_FEATURE_CATEGORY_1       0x0001
+> +#define AVRCP_FEATURE_CATEGORY_2       0x0002
+> +#define AVRCP_FEATURE_CATEGORY_3       0x0004
+> +#define AVRCP_FEATURE_CATEGORY_4       0x0008
+> +
+>  enum battery_status {
+>        BATTERY_STATUS_NORMAL =         0,
+>        BATTERY_STATUS_WARNING =        1,
+> @@ -179,7 +184,11 @@ static sdp_record_t *avrcp_ct_record(void)
+>        sdp_record_t *record;
+>        sdp_data_t *psm, *version, *features;
+>        uint16_t lp = AVCTP_PSM;
+> -       uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103, feat = 0x000f;
+> +       uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103;
+> +       uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
+> +                                               AVRCP_FEATURE_CATEGORY_2 |
+> +                                               AVRCP_FEATURE_CATEGORY_3 |
+> +                                               AVRCP_FEATURE_CATEGORY_4 );
+>
+>        record = sdp_record_alloc();
+>        if (!record)
+> @@ -243,7 +252,11 @@ static sdp_record_t *avrcp_tg_record(void)
+>        sdp_record_t *record;
+>        sdp_data_t *psm, *version, *features;
+>        uint16_t lp = AVCTP_PSM;
+> -       uint16_t avrcp_ver = 0x0104, avctp_ver = 0x0103, feat = 0x000f;
+> +       uint16_t avrcp_ver = 0x0104, avctp_ver = 0x0103;
+> +       uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
+> +                                               AVRCP_FEATURE_CATEGORY_2 |
+> +                                               AVRCP_FEATURE_CATEGORY_3 |
+> +                                               AVRCP_FEATURE_CATEGORY_4 );
 
----
- plugins/phonebook-ebook.c   |    1 -
- plugins/phonebook-tracker.c |    1 -
- 2 files changed, 2 deletions(-)
 
-diff --git a/plugins/phonebook-ebook.c b/plugins/phonebook-ebook.c
-index c2e8649..a1f06b5 100644
---- a/plugins/phonebook-ebook.c
-+++ b/plugins/phonebook-ebook.c
-@@ -37,7 +37,6 @@
- #include "obex.h"
- #include "service.h"
- #include "phonebook.h"
--#include "glib-helper.h"
- 
- #define QUERY_FN "(contains \"family_name\" \"%s\")"
- #define QUERY_NAME "(contains \"given_name\" \"%s\")"
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index da82ff5..96635c4 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -35,7 +35,6 @@
- #include "mimetype.h"
- #include "phonebook.h"
- #include "vcard.h"
--#include "glib-helper.h"
- 
- #define TRACKER_SERVICE "org.freedesktop.Tracker1"
- #define TRACKER_RESOURCES_PATH "/org/freedesktop/Tracker1/Resources"
--- 
-1.7.10.2
+Ack
 
 
-
+Lucas De Marchi
