@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 04/12] client-test: Update to wrapped OPP session type
-Date: Mon, 21 May 2012 11:07:06 +0200
-Message-Id: <1337591234-24919-5-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v0 09/12] client: Move GetCapabilities to session API
+Date: Mon, 21 May 2012 11:07:11 +0200
+Message-Id: <1337591234-24919-10-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1337591234-24919-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1337591234-24919-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,177 +13,234 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
 ---
- test/exchange-business-cards |   10 ++++-
- test/get-capabilities        |   16 ++++----
- test/pull-business-card      |    9 ++++-
- test/send-files              |   85 ++++++-----------------------------------
- 4 files changed, 37 insertions(+), 83 deletions(-)
+ client/manager.c |  121 ------------------------------------------------------
+ client/session.c |   68 ++++++++++++++++++++++++++++++
+ 2 files changed, 68 insertions(+), 121 deletions(-)
 
-diff --git a/test/exchange-business-cards b/test/exchange-business-cards
-index 4b0c7ed..548ad2d 100755
---- a/test/exchange-business-cards
-+++ b/test/exchange-business-cards
-@@ -11,5 +11,11 @@ if (len(sys.argv) < 4):
- 	print "Usage: %s <device> <clientfile> <file>" % (sys.argv[0])
- 	sys.exit(1)
+diff --git a/client/manager.c b/client/manager.c
+index 4078211..94bcbdf 100644
+--- a/client/manager.c
++++ b/client/manager.c
+@@ -221,133 +221,12 @@ static DBusMessage *remove_session(DBusConnection *connection,
+ 	return dbus_message_new_method_return(message);
+ }
  
--client.ExchangeBusinessCards({ "Destination": sys.argv[1] },
--						sys.argv[2], sys.argv[3])
-+print "Creating Session"
-+session_path = client.CreateSession({"Destination": sys.argv[1],
-+					"Target": "OPP"})
-+opp = dbus.Interface(bus.get_object("org.openobex.client",
-+					session_path),
-+					"org.openobex.ObjectPush")
+-static void capabilities_complete_callback(struct obc_session *session,
+-						struct obc_transfer *transfer,
+-						GError *err, void *user_data)
+-{
+-	struct send_data *data = user_data;
+-	char *contents;
+-	size_t size;
+-	int perr;
+-
+-	if (err != NULL) {
+-		DBusMessage *error = g_dbus_create_error(data->message,
+-					"org.openobex.Error.Failed",
+-					"%s", err->message);
+-		g_dbus_send_message(data->connection, error);
+-		goto done;
+-	}
+-
+-	perr = obc_transfer_get_contents(transfer, &contents, &size);
+-	if (perr < 0) {
+-		DBusMessage *error = g_dbus_create_error(data->message,
+-						"org.openobex.Error.Failed",
+-						"Error reading contents: %s",
+-						strerror(-perr));
+-		g_dbus_send_message(data->connection, error);
+-		goto done;
+-	}
+-
+-	g_dbus_send_reply(data->connection, data->message,
+-			DBUS_TYPE_STRING, &contents,
+-			DBUS_TYPE_INVALID);
+-	g_free(contents);
+-
+-done:
+-
+-	shutdown_session(session);
+-	dbus_message_unref(data->message);
+-	dbus_connection_unref(data->connection);
+-	g_free(data);
+-}
+-
+-static void capability_obc_session_callback(struct obc_session *session,
+-						struct obc_transfer *transfer,
+-						GError *err, void *user_data)
+-{
+-	struct send_data *data = user_data;
+-	struct obc_transfer *pull;
+-	DBusMessage *reply;
+-	GError *gerr = NULL;
+-
+-	if (err != NULL)
+-		goto fail;
+-
+-	pull = obc_transfer_get("x-obex/capability", NULL, NULL, &gerr);
+-	if (pull == NULL)
+-		goto fail;
+-
+-	if (!obc_session_queue(session, pull, capabilities_complete_callback,
+-								data, &gerr))
+-		goto fail;
+-
+-	return;
+-
+-fail:
+-	if (err == NULL)
+-		err = gerr;
+-
+-	reply = g_dbus_create_error(data->message,
+-					"org.openobex.Error.Failed",
+-					"%s", err->message);
+-	g_dbus_send_message(data->connection, reply);
+-	shutdown_session(session);
+-	dbus_message_unref(data->message);
+-	dbus_connection_unref(data->connection);
+-	g_clear_error(&gerr);
+-	g_free(data);
+-}
+-
+-static DBusMessage *get_capabilities(DBusConnection *connection,
+-					DBusMessage *message, void *user_data)
+-{
+-	DBusMessageIter iter, dict;
+-	struct obc_session *session;
+-	struct send_data *data;
+-	const char *source = NULL, *dest = NULL, *target = NULL;
+-	uint8_t channel = 0;
+-
+-	dbus_message_iter_init(message, &iter);
+-	dbus_message_iter_recurse(&iter, &dict);
+-
+-	parse_device_dict(&dict, &source, &dest, &target, &channel);
+-	if ((dest == NULL) || (target == NULL))
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.InvalidArguments", NULL);
+-
+-	data = g_try_malloc0(sizeof(*data));
+-	if (data == NULL)
+-		return g_dbus_create_error(message,
+-					"org.openobex.Error.NoMemory", NULL);
+-
+-	data->connection = dbus_connection_ref(connection);
+-	data->message = dbus_message_ref(message);
+-
+-	session = obc_session_create(source, dest, target, channel,
+-					dbus_message_get_sender(message),
+-					capability_obc_session_callback, data);
+-	if (session != NULL) {
+-		sessions = g_slist_append(sessions, session);
+-		return NULL;
+-	}
+-
+-	dbus_message_unref(data->message);
+-	dbus_connection_unref(data->connection);
+-	g_free(data);
+-
+-	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
+-}
+-
+ static const GDBusMethodTable client_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("CreateSession",
+ 			GDBUS_ARGS({ "devices", "a{sv}" }),
+ 			GDBUS_ARGS({ "session", "o" }), create_session) },
+ 	{ GDBUS_ASYNC_METHOD("RemoveSession",
+ 			GDBUS_ARGS({ "session", "o" }), NULL, remove_session) },
+-	{ GDBUS_ASYNC_METHOD("GetCapabilities",
+-			GDBUS_ARGS({ "device", "a{sv}" }),
+-			GDBUS_ARGS({ "capabilities", "s" }),
+-			get_capabilities) },
+ 	{ }
+ };
+ 
+diff --git a/client/session.c b/client/session.c
+index d4ec55d..1c5e452 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -648,6 +648,71 @@ static DBusMessage *session_get_properties(DBusConnection *connection,
+ 	return reply;
+ }
+ 
++static void capabilities_complete_callback(struct obc_session *session,
++						struct obc_transfer *transfer,
++						GError *err, void *user_data)
++{
++	DBusMessage *message = user_data;
++	char *contents;
++	size_t size;
++	int perr;
 +
-+opp.ExchangeBusinessCards(sys.argv[2], sys.argv[3])
-diff --git a/test/get-capabilities b/test/get-capabilities
-index c835bd9..29120f1 100755
---- a/test/get-capabilities
-+++ b/test/get-capabilities
-@@ -7,14 +7,14 @@ bus = dbus.SessionBus()
- client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
- 					"org.openobex.Client")
- 
--if (len(sys.argv) < 2):
--	print "Usage: %s <device> [target]" % (sys.argv[0])
-+if (len(sys.argv) < 3):
-+	print "Usage: %s <device> <target>" % (sys.argv[0])
- 	sys.exit(1)
- 
--if (len(sys.argv) == 3):
--	dict = {"Destination": sys.argv[1],
--		"Target": sys.argv[2]}
--else:
--	dict = {"Destination": sys.argv[1]}
-+print "Creating Session"
-+session_path = client.CreateSession({"Destination": sys.argv[1],
-+						"Target": sys.argv[2]})
-+session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
-+							"org.openobex.Session")
- 
--print client.GetCapabilities(dict)
-+print session.GetCapabilities()
-diff --git a/test/pull-business-card b/test/pull-business-card
-index b13968d..5912155 100755
---- a/test/pull-business-card
-+++ b/test/pull-business-card
-@@ -28,7 +28,14 @@ if __name__ == '__main__':
- 		print "Usage: %s <device> <file>" % (sys.argv[0])
- 		sys.exit(1)
- 
--	client.PullBusinessCard({ "Destination": sys.argv[1] }, sys.argv[2],
-+	print "Creating Session"
-+	session_path = client.CreateSession({"Destination": sys.argv[1],
-+						"Target": "OPP"})
-+	opp = dbus.Interface(bus.get_object("org.openobex.client",
-+						session_path),
-+						"org.openobex.ObjectPush")
++	if (err != NULL) {
++		DBusMessage *error = g_dbus_create_error(message,
++					"org.openobex.Error.Failed",
++					"%s", err->message);
++		g_dbus_send_message(session->conn, error);
++		goto done;
++	}
 +
-+	opp.PullBusinessCard(sys.argv[2],
- 				reply_handler=success, error_handler=failure)
++	perr = obc_transfer_get_contents(transfer, &contents, &size);
++	if (perr < 0) {
++		DBusMessage *error = g_dbus_create_error(message,
++						"org.openobex.Error.Failed",
++						"Error reading contents: %s",
++						strerror(-perr));
++		g_dbus_send_message(session->conn, error);
++		goto done;
++	}
++
++	g_dbus_send_reply(session->conn, message,
++						DBUS_TYPE_STRING, &contents,
++						DBUS_TYPE_INVALID);
++	g_free(contents);
++
++done:
++	dbus_message_unref(message);
++}
++
++static DBusMessage *get_capabilities(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	struct obc_session *session = user_data;
++	struct obc_transfer *pull;
++	DBusMessage *reply;
++	GError *gerr = NULL;
++
++	pull = obc_transfer_get("x-obex/capability", NULL, NULL, &gerr);
++	if (pull == NULL)
++		goto fail;
++
++	if (!obc_session_queue(session, pull, capabilities_complete_callback,
++								message, &gerr))
++		goto fail;
++
++	dbus_message_ref(message);
++
++	return NULL;
++
++fail:
++	reply = g_dbus_create_error(message,
++					"org.openobex.Error.Failed",
++					"%s", gerr->message);
++	g_error_free(gerr);
++	return reply;
++
++}
++
+ static const GDBusMethodTable session_methods[] = {
+ 	{ GDBUS_METHOD("GetProperties",
+ 				NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+@@ -658,6 +723,9 @@ static const GDBusMethodTable session_methods[] = {
+ 	{ GDBUS_METHOD("ReleaseAgent",
+ 				GDBUS_ARGS({ "agent", "o" }), NULL,
+ 				release_agent) },
++	{ GDBUS_ASYNC_METHOD("GetCapabilities",
++				NULL, GDBUS_ARGS({ "capabilities", "s" }),
++				get_capabilities) },
+ 	{ }
+ };
  
- 	mainloop.run()
-diff --git a/test/send-files b/test/send-files
-index 52f9c04..504a066 100755
---- a/test/send-files
-+++ b/test/send-files
-@@ -1,82 +1,23 @@
- #!/usr/bin/python
- 
--import gobject
--
- import os
- import sys
--import time
- import dbus
--import dbus.service
--import dbus.mainloop.glib
--
--class Agent(dbus.service.Object):
--	def __init__(self, conn=None, obj_path=None):
--		dbus.service.Object.__init__(self, conn, obj_path)
--
--	@dbus.service.method("org.openobex.Agent",
--					in_signature="o", out_signature="s")
--	def Request(self, path):
--		print "Transfer Request"
--		self.transfer = dbus.Interface(bus.get_object("org.openobex.client",
--						path), "org.openobex.Transfer")
--		properties = self.transfer.GetProperties()
--		for key in properties.keys():
--			print "  %s = %s" % (key, properties[key])
--		self.start = True
--		return ""
--
--	@dbus.service.method("org.openobex.Agent",
--					in_signature="ot", out_signature="")
--	def Progress(self, path, transferred):
--		if (self.start):
--			print "Transfer Started"
--			properties = self.transfer.GetProperties()
--			self.transfer_size = properties['Size']
--			self.start_time = time.time()
--			self.start = False
--		else:
--			speed = transferred / abs((time.time() - self.start_time) * 1000)
--			progress = "(" + str(transferred) + "/" + str(self.transfer_size) + " bytes) @ " + str(int(speed)) + " kB/s"
--			out = "\rTransfer progress " + progress
--			sys.stdout.write(out)
--			sys.stdout.flush()
--		return
--
--	@dbus.service.method("org.openobex.Agent",
--					in_signature="o", out_signature="")
--	def Complete(self, path):
--		print "\nTransfer finished"
--		return
--
--	@dbus.service.method("org.openobex.Agent",
--					in_signature="os", out_signature="")
--	def Error(self, path, error):
--		print "\nTransfer finished with an error: %s" % (error)
--		return
--
--	@dbus.service.method("org.openobex.Agent",
--					in_signature="", out_signature="")
--	def Release(self):
--		mainloop.quit()
--		return
--
--if __name__ == '__main__':
--	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
--
--	bus = dbus.SessionBus()
--	client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
--							"org.openobex.Client")
- 
--	if (len(sys.argv) < 3):
--		print "Usage: %s <device> <file> [file*]" % (sys.argv[0])
--		sys.exit(1)
-+bus = dbus.SessionBus()
-+client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
-+						"org.openobex.Client")
- 
--	path = "/test/agent"
--	agent = Agent(bus, path)
-+if (len(sys.argv) < 3):
-+	print "Usage: %s <device> <file> [file*]" % (sys.argv[0])
-+	sys.exit(1)
- 
--	mainloop = gobject.MainLoop()
--	files = [os.path.realpath(f) for f in sys.argv[2:]]
-+files = [os.path.realpath(f) for f in sys.argv[2:]]
- 
--	client.SendFiles({ "Destination": sys.argv[1] }, files, path)
-+print "Creating Session"
-+session_path = client.CreateSession({"Destination": sys.argv[1],
-+					"Target": "OPP"})
-+opp = dbus.Interface(bus.get_object("org.openobex.client", session_path),
-+					"org.openobex.ObjectPush")
- 
--	mainloop.run()
-+opp.SendFiles(files)
 -- 
 1.7.7.6
 
