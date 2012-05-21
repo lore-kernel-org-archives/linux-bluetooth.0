@@ -1,46 +1,164 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 21 May 2012 19:39:49 +0100
-Message-ID: <CA+6PnXxc8CQ7q6LGkDWbP_-2P+4U_MX3rTt237PHhN2nGXeYag@mail.gmail.com>
-Subject: GSoC: Bluetooth Replayer update
-From: Anton Weber <anton@antweb.me>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1337625261.15105.7.camel@aeonflux>
+Subject: Re: [PATCH 2/2] Bluetooth: Remove dead int returns
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Date: Mon, 21 May 2012 20:34:21 +0200
+In-Reply-To: <alpine.DEB.2.02.1205211104570.2239@mathewm-linux>
+References: <1337619502-4565-1-git-send-email-gustavo@padovan.org>
+	 <1337619502-4565-2-git-send-email-gustavo@padovan.org>
+	 <alpine.DEB.2.02.1205211104570.2239@mathewm-linux>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello everyone!
+Hi Mat,
 
-Now that the coding period for GSoC started, I will be regularly
-posting updates to the mailing list.
-This is meant to share my progress, but also to get get the community involved.
-If you have any feedback or suggestions, about the things I wrote or
-about my project in general, please let me know!
-As mentioned in my first email, you can always contact me directly via
-email or IRC as well.
+> 
+> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> >
+> > These functions were returning always 0, we just make then void.
+> >
+> > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > ---
+> > net/bluetooth/l2cap_core.c |   48 +++++++++++++++-----------------------------
+> > 1 file changed, 16 insertions(+), 32 deletions(-)
+> >
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index 5bf8287..b644f40 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -73,7 +73,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data);
+> > static void l2cap_send_disconn_req(struct l2cap_conn *conn,
+> > 				   struct l2cap_chan *chan, int err);
+> >
+> > -static int l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+> > +static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+> > 		    struct sk_buff_head *skbs, u8 event);
+> >
+> > /* ---- L2CAP channels ---- */
+> > @@ -1685,8 +1685,8 @@ static void l2cap_retrans_timeout(struct work_struct *work)
+> > 	l2cap_chan_put(chan);
+> > }
+> >
+> > -static int l2cap_streaming_send(struct l2cap_chan *chan,
+> > -				struct sk_buff_head *skbs)
+> > +static void l2cap_streaming_send(struct l2cap_chan *chan,
+> > +				 struct sk_buff_head *skbs)
+> > {
+> > 	struct sk_buff *skb;
+> > 	struct l2cap_ctrl *control;
+> > @@ -1719,8 +1719,6 @@ static int l2cap_streaming_send(struct l2cap_chan *chan,
+> > 		chan->next_tx_seq = __next_seq(chan, chan->next_tx_seq);
+> > 		chan->frames_sent++;
+> > 	}
+> > -
+> > -	return 0;
+> > }
+> >
+> > static int l2cap_ertm_send(struct l2cap_chan *chan)
+> > @@ -2254,13 +2252,11 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+> > 			break;
+> >
+> > 		if (chan->mode == L2CAP_MODE_ERTM)
+> > -			err = l2cap_tx(chan, NULL, &seg_queue,
+> > -				       L2CAP_EV_DATA_REQUEST);
+> > +			l2cap_tx(chan, NULL, &seg_queue, L2CAP_EV_DATA_REQUEST);
+> > 		else
+> > -			err = l2cap_streaming_send(chan, &seg_queue);
+> > +			l2cap_streaming_send(chan, &seg_queue);
+> >
+> > -		if (!err)
+> > -			err = len;
+> > +		err = len;
+> >
+> > 		/* If the skbs were not queued for sending, they'll still be in
+> > 		 * seg_queue and need to be purged.
+> > @@ -2383,12 +2379,10 @@ static void l2cap_abort_rx_srej_sent(struct l2cap_chan *chan)
+> > 	chan->rx_state = L2CAP_RX_STATE_RECV;
+> > }
+> >
+> > -static int l2cap_tx_state_xmit(struct l2cap_chan *chan,
+> > -			       struct l2cap_ctrl *control,
+> > -			       struct sk_buff_head *skbs, u8 event)
+> > +static void l2cap_tx_state_xmit(struct l2cap_chan *chan,
+> > +				struct l2cap_ctrl *control,
+> > +				struct sk_buff_head *skbs, u8 event)
+> > {
+> > -	int err = 0;
+> > -
+> > 	BT_DBG("chan %p, control %p, skbs %p, event %d", chan, control, skbs,
+> > 	       event);
+> >
+> > @@ -2455,16 +2449,12 @@ static int l2cap_tx_state_xmit(struct l2cap_chan *chan,
+> > 	default:
+> > 		break;
+> > 	}
+> > -
+> > -	return err;
+> > }
+> >
+> > -static int l2cap_tx_state_wait_f(struct l2cap_chan *chan,
+> > -				 struct l2cap_ctrl *control,
+> > -				 struct sk_buff_head *skbs, u8 event)
+> > +static void l2cap_tx_state_wait_f(struct l2cap_chan *chan,
+> > +				  struct l2cap_ctrl *control,
+> > +				  struct sk_buff_head *skbs, u8 event)
+> > {
+> > -	int err = 0;
+> > -
+> > 	BT_DBG("chan %p, control %p, skbs %p, event %d", chan, control, skbs,
+> > 	       event);
+> >
+> > @@ -2537,31 +2527,25 @@ static int l2cap_tx_state_wait_f(struct l2cap_chan *chan,
+> > 	default:
+> > 		break;
+> > 	}
+> > -
+> > -	return err;
+> > }
+> >
+> > -static int l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+> > -		    struct sk_buff_head *skbs, u8 event)
+> > +static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+> > +		     struct sk_buff_head *skbs, u8 event)
+> > {
+> > -	int err = 0;
+> > -
+> > 	BT_DBG("chan %p, control %p, skbs %p, event %d, state %d",
+> > 	       chan, control, skbs, event, chan->tx_state);
+> >
+> > 	switch (chan->tx_state) {
+> > 	case L2CAP_TX_STATE_XMIT:
+> > -		err = l2cap_tx_state_xmit(chan, control, skbs, event);
+> > +		l2cap_tx_state_xmit(chan, control, skbs, event);
+> > 		break;
+> > 	case L2CAP_TX_STATE_WAIT_F:
+> > -		err = l2cap_tx_state_wait_f(chan, control, skbs, event);
+> > +		l2cap_tx_state_wait_f(chan, control, skbs, event);
+> > 		break;
+> > 	default:
+> > 		/* Ignore event */
+> > 		break;
+> > 	}
+> > -
+> > -	return err;
+> > }
+> >
+> > static void l2cap_pass_to_tx(struct l2cap_chan *chan,
+> > -- 
+> > 1.7.10.1
+> 
+> Both patches look fine to me.
 
-To give everyone a better idea of what my project is about, I have
-uploaded the initial project proposal:
-http://antweb.me/tl_files/blog/gsoc12/gsoc_proposal.pdf
-I will do things slightly differently now that I have more of an idea
-what I'm dealing with, but the main structure should stay the same.
+I applied both patches with your Reviewed-by to bluetooth-next.
 
-What happened so far:
-- read up on various guides and the Bluetooth specification
-- played around with git (will upload my work to github once I got
-that far and possibly fork the bluez repo at some point if required)
-- went through hcidump sources (found many bits of code I can reuse,
-especially the parser)
-- had a look at hciemu, but didn't get too far yet
+Regards
 
-Next up:
-- Find out more about hciemu
-- Getting used to automake
-- Write a tool that can execute a simple sequence of commands on a
-VHCI interface.
-  I will start off with a standalone tool for now, but it might be a
-good idea to integrate it in hcidump (more about that when I got that
-far).
+Marcel
 
-Best,
-Anton
+
