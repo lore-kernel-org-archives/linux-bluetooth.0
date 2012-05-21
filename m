@@ -1,49 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 00/12] client: Polishing D-Bus API
-Date: Mon, 21 May 2012 11:07:02 +0200
-Message-Id: <1337591234-24919-1-git-send-email-mikel.astiz.oss@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-id: <4FB9932B.9070101@samsung.com>
+Date: Mon, 21 May 2012 09:58:19 +0900
+From: Minho Ban <mhban@samsung.com>
+MIME-version: 1.0
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix null pointer dereference in l2cap_chan_send
+Content-type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+If l2cap_chan_send is called will null conn it will cause kernel Oops.
+This patch checks if conn is valid before entering l2cap_chan_send.
 
-This patchset includes a first set of D-Bus changes as part of a bigger API rewrite in obex-client. The original API proposal started around 6 months ago ([1]) and it has later been discussed and modified several times.
+2871 [  177.271861] Unable to handle kernel NULL pointer dereference at virtual address 00000010
+2872 [  177.271867] pgd = eadc0000
+2873 [  177.271870] [00000010] *pgd=6ad03831, *pte=00000000, *ppte=00000000
+2874 [  177.271884] Internal error: Oops: 17 [#1] PREEMPT SMP
+2875 [  177.271891] Modules linked in:
+2876 [  177.271900] CPU: 3    Not tainted  (3.0.15-00019-g097836e #36)
+2877 [  177.271925] PC is at l2cap_chan_send+0x8c/0x6f8
+2878 [  177.271933] LR is at 0xc089d59c
+2879 [  177.271940] pc : [<c0531514>]    lr : [<c089d59c>]    psr: 80000013
+2880 [  177.271943] sp : ddda1d50  ip : 0000035c  fp : ddda1dac
+2881 [  177.271948] r10: 0000035c  r9 : 00000000  r8 : ddda1f3c
+2882 [  177.271954] r7 : ed67ec00  r6 : 00000006  r5 : ed67ec00  r4 : 00000003
+2883 [  177.271959] r3 : ddda1d7c  r2 : 0000035c  r1 : 00000000  r0 : ed67ec00
+2884 [  177.271967] Flags: Nzcv  IRQs on  FIQs on  Mode SVC_32 ISA ARM  Segment user
+2885 [  177.271973] Control: 10c5387d  Table: 6adc004a  DAC: 00000015
+~~~ snip ~~~~~
+3000 [  177.272989] Backtrace:
+3001 [  177.273001] [<c0531488>] (l2cap_chan_send+0x0/0x6f8) from [<c053700c>] (l2cap_sock_sendmsg+0xc0/0x15c)
+3002 [  177.273023] [<c0536f4c>] (l2cap_sock_sendmsg+0x0/0x15c) from [<c0458afc>] (sock_sendmsg+0xcc/0xd4)
+3003 [  177.273035] [<c0458a30>] (sock_sendmsg+0x0/0xd4) from [<c0459558>] (sys_sendto+0xb8/0xdc)
+3004 [  177.273041]  r9:ddda0000 r8:00004040 r7:00000000 r6:ebdf9d40 r5:0004fb00
+3005 [  177.273050] r4:0000035c
+3006 [  177.273059] [<c04594a0>] (sys_sendto+0x0/0xdc) from [<c045959c>] (sys_send+0x20/0x28)
+3007 [  177.273077] [<c045957c>] (sys_send+0x0/0x28) from [<c00431c0>] (ret_fast_syscall+0x0/0x30)
+3008 [  177.273087] Code: e5901004 e24b3030 e51ba050 e590e21c (e5914010)
+3009 [  177.273096] ---[ end trace 29a418305c9cffba ]---
 
-This first series proposes some minor refactoring of the existing APIs. The most relevant part, regarding the removal of the agent, is left for a later discussion.
+Signed-off-by: Minho Ban <mhban@samsung.com>
+---
+ net/bluetooth/l2cap_sock.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
-[1] http://marc.info/?l=linux-bluetooth&m=132189357404237&w=2
-
-Mikel Astiz (12):
-  client-doc: Wrap OPP into specific session type
-  client: Use constant instead of NULL variable
-  client: Wrap OPP into specific session type
-  client-test: Update to wrapped OPP session type
-  client-doc: Replace SendFiles with SendFile
-  client: Replace SendFiles with SendFile
-  client-test: Replace SendFiles with SendFile
-  client-doc: Move GetCapabilities to session API
-  client: Move GetCapabilities to session API
-  client-doc: Replace parameter dict with conventional ones
-  client: Replace parameter dict with conventional ones
-  client-test: Replace CreateSession parameter dict
-
- client/manager.c             |  406 ++---------------------------------------
- client/opp.c                 |  205 +++++++++++++++++++++-
- client/session.c             |   68 +++++++
- doc/client-api.txt           |   69 ++++---
- test/exchange-business-cards |    9 +-
- test/ftp-client              |    3 +-
- test/get-capabilities        |   15 +-
- test/list-folders            |    2 +-
- test/map-client              |    3 +-
- test/pbap-client             |    2 +-
- test/pull-business-card      |    8 +-
- test/send-files              |   85 ++--------
- 12 files changed, 370 insertions(+), 505 deletions(-)
-
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 3bb1611..98d4541 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -727,10 +727,12 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct ms
+ 	if (msg->msg_flags & MSG_OOB)
+ 		return -EOPNOTSUPP;
+ 
+-	if (sk->sk_state != BT_CONNECTED)
++	l2cap_chan_lock(chan);
++	if (sk->sk_state != BT_CONNECTED || !chan->conn) {
++		l2cap_chan_unlock(chan);
+ 		return -ENOTCONN;
++	}
+ 
+-	l2cap_chan_lock(chan);
+ 	err = l2cap_chan_send(chan, msg, len, sk->sk_priority);
+ 	l2cap_chan_unlock(chan);
+ 
 -- 
-1.7.7.6
-
+1.7.5.4
