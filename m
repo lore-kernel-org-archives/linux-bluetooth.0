@@ -1,58 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vani-dineshbhai PATEL X <vani.patel@stericsson.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 21 May 2012 15:51:12 +0200
-Subject: RE: [PATCH Bluez v2 1/4] AVRCP: Register for VolumeChanged
- Notification
-Message-ID: <747C1E83C744F44E9ACFB89FAEEC2C7B234A45A602@EXDCVYMBSTM005.EQ1STM.local>
-References: <1336990615-24344-1-git-send-email-vani.patel@stericsson.com>
- <CABBYNZ+_AozCS3GD1Q19gZux-YrF-_Bh1udRW0D+MkNfYC4+SA@mail.gmail.com>
-In-Reply-To: <CABBYNZ+_AozCS3GD1Q19gZux-YrF-_Bh1udRW0D+MkNfYC4+SA@mail.gmail.com>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Silent sparse warnings
+Date: Mon, 21 May 2012 15:47:46 +0300
+Message-Id: <1337604466-3860-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> >
-> >  size_t avrcp_handle_vendor_reject(uint8_t *code, uint8_t *operands);
-> > +void register_volume_notification ( struct avctp *session);
-> > --
-> > 1.7.5.4
-> 
-> I had to change it completely to make it work, Im afraid you never
-> really tested this as it did not compile for me, were you using
-> bootstrap-configure?
-> 
+Silence warnings below:
 
-The code is compiling perfectly at my end and I have tested it several times with PTS before pushing it. I follow below steps to compile my code - 
+net/bluetooth/l2cap_core.c:1662:24: warning: Using plain integer
+as NULL pointer
+net/bluetooth/l2cap_core.c:1662:27: warning: Using plain integer
+as NULL pointer
+net/bluetooth/l2cap_core.c:1683:24: warning: Using plain integer
+as NULL pointer
+net/bluetooth/l2cap_core.c:1683:27: warning: Using plain integer
+as NULL pointer
+net/bluetooth/l2cap_core.c:2260:46: warning: Using plain integer
+as NULL pointer
+net/bluetooth/l2cap_core.c:2574:33: warning: Using plain integer
+as NULL pointer
+net/bluetooth/l2cap_core.c:2581:33: warning: Using plain integer
+as NULL pointer
+net/bluetooth/l2cap_core.c:4556:24: warning: Using plain integer
+as NULL pointer
+net/bluetooth/l2cap_core.c:4556:27: warning: Using plain integer
+as NULL pointer
 
- autoreconf --install
-./configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --libexecdir=/lib
- make
- make install
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |   12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-I also compiled and tested my code using bootstrap-configure by following below steps.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index cb817a0..83d9fce 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1659,7 +1659,7 @@ static void l2cap_monitor_timeout(struct work_struct *work)
+ 		return;
+ 	}
+ 
+-	l2cap_tx(chan, 0, 0, L2CAP_EV_MONITOR_TO);
++	l2cap_tx(chan, NULL, NULL, L2CAP_EV_MONITOR_TO);
+ 
+ 	l2cap_chan_unlock(chan);
+ 	l2cap_chan_put(chan);
+@@ -1680,7 +1680,7 @@ static void l2cap_retrans_timeout(struct work_struct *work)
+ 		return;
+ 	}
+ 
+-	l2cap_tx(chan, 0, 0, L2CAP_EV_RETRANS_TO);
++	l2cap_tx(chan, NULL, NULL, L2CAP_EV_RETRANS_TO);
+ 	l2cap_chan_unlock(chan);
+ 	l2cap_chan_put(chan);
+ }
+@@ -2257,7 +2257,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 			break;
+ 
+ 		if (chan->mode == L2CAP_MODE_ERTM)
+-			err = l2cap_tx(chan, 0, &seg_queue,
++			err = l2cap_tx(chan, NULL, &seg_queue,
+ 				       L2CAP_EV_DATA_REQUEST);
+ 		else
+ 			err = l2cap_streaming_send(chan, &seg_queue);
+@@ -2571,14 +2571,14 @@ static void l2cap_pass_to_tx(struct l2cap_chan *chan,
+ 			     struct l2cap_ctrl *control)
+ {
+ 	BT_DBG("chan %p, control %p", chan, control);
+-	l2cap_tx(chan, control, 0, L2CAP_EV_RECV_REQSEQ_AND_FBIT);
++	l2cap_tx(chan, control, NULL, L2CAP_EV_RECV_REQSEQ_AND_FBIT);
+ }
+ 
+ static void l2cap_pass_to_tx_fbit(struct l2cap_chan *chan,
+ 				  struct l2cap_ctrl *control)
+ {
+ 	BT_DBG("chan %p, control %p", chan, control);
+-	l2cap_tx(chan, control, 0, L2CAP_EV_RECV_FBIT);
++	l2cap_tx(chan, control, NULL, L2CAP_EV_RECV_FBIT);
+ }
+ 
+ /* Copy frame to all raw sockets on that connection */
+@@ -4553,7 +4553,7 @@ void l2cap_chan_busy(struct l2cap_chan *chan, int busy)
+ 		return;
+ 
+ 	event = busy ? L2CAP_EV_LOCAL_BUSY_DETECTED : L2CAP_EV_LOCAL_BUSY_CLEAR;
+-	l2cap_tx(chan, 0, 0, event);
++	l2cap_tx(chan, NULL, NULL, event);
+ }
+ 
+ static int l2cap_rx_queued_iframes(struct l2cap_chan *chan)
+-- 
+1.7.9.5
 
-./bootstrap
-./bootstrap-configure
-./configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --libexecdir=/lib
-make
-make install
-
-Had I known that you were facing compiling issues with my code earlier, I would have published the procedure how I have been compiling the code.
-It would be really nice if you could point any issues with my procedure of compiling & testing the code, so that I can adapt to the correct procedure and follow for any future updates. 
-
-> Anyway, I send a new series that should take care of subscribing to
-> VolumeChanged event which should be working with Sony MW600.
-> 
-> Now the only part missing is to send SetAbsoluteVolume when the volume
-> has changed on our side.
-
-> --
-> Luiz Augusto von Dentz
-
-Thanks & Regards,
-Vani Patel
