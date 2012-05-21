@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 2/3] Bluetooth: Define L2CAP conf continuation flag
-Date: Mon, 21 May 2012 15:10:59 +0300
-Message-Id: <1337602260-30458-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 3/3] Bluetooth: Preserve flags values
+Date: Mon, 21 May 2012 15:11:00 +0300
+Message-Id: <1337602260-30458-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1337602260-30458-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337350806-20326-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1337602260-30458-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,78 +12,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Define Continuation flag which the only flag used from Flags field
-in L2CAP Configuration Request and Response.
+Previous callers of l2cap_build_conf_rsp in l2cap_config_req use
+flags instead of continuation flag hardcoded value. It does not change
+logic and preserve future possible flags.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    3 +++
- net/bluetooth/l2cap_core.c    |   10 +++++-----
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ net/bluetooth/l2cap_core.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 7bc4019..8980cbf 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -271,6 +271,9 @@ struct l2cap_conf_rsp {
- #define L2CAP_CONF_PENDING	0x0004
- #define L2CAP_CONF_EFS_REJECT	0x0005
- 
-+/* configuration req/rsp continuation flag */
-+#define L2CAP_CONF_FLAG_CONTINUATION	0
-+
- struct l2cap_conf_opt {
- 	__u8       type;
- 	__u8       len;
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ae69da8..944c139 100644
+index 944c139..cb817a0 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -2982,7 +2982,7 @@ done:
- 	}
- 
- 	req->dcid  = cpu_to_le16(chan->dcid);
--	req->flags = cpu_to_le16(0);
-+	req->flags = __constant_cpu_to_le16(0);
- 
- 	return ptr - data;
- }
-@@ -3202,7 +3202,7 @@ done:
- 	}
- 	rsp->scid   = cpu_to_le16(chan->dcid);
- 	rsp->result = cpu_to_le16(result);
--	rsp->flags  = cpu_to_le16(0x0000);
-+	rsp->flags  = __constant_cpu_to_le16(0);
- 
- 	return ptr - data;
- }
-@@ -3301,7 +3301,7 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
- 	}
- 
- 	req->dcid   = cpu_to_le16(chan->dcid);
--	req->flags  = cpu_to_le16(0x0000);
-+	req->flags  = __constant_cpu_to_le16(0);
- 
- 	return ptr - data;
- }
-@@ -3656,7 +3656,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	memcpy(chan->conf_req + chan->conf_len, req->data, len);
- 	chan->conf_len += len;
- 
--	if (flags & 0x0001) {
-+	if (flags & BIT(L2CAP_CONF_FLAG_CONTINUATION)) {
+@@ -3660,7 +3660,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
  		/* Incomplete config. Send empty response. */
  		l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
  				l2cap_build_conf_rsp(chan, rsp,
-@@ -3807,7 +3807,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		goto done;
+-					L2CAP_CONF_SUCCESS, 0x0001), rsp);
++					L2CAP_CONF_SUCCESS, flags), rsp);
+ 		goto unlock;
  	}
  
--	if (flags & 0x01)
-+	if (flags & BIT(L2CAP_CONF_FLAG_CONTINUATION))
- 		goto done;
+@@ -3716,7 +3716,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
  
- 	set_bit(CONF_INPUT_DONE, &chan->conf_state);
+ 		l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
+ 					l2cap_build_conf_rsp(chan, rsp,
+-					L2CAP_CONF_SUCCESS, 0x0000), rsp);
++					L2CAP_CONF_SUCCESS, flags), rsp);
+ 	}
+ 
+ unlock:
 -- 
 1.7.9.5
 
