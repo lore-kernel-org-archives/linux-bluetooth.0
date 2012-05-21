@@ -1,42 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 May 2012 17:52:47 -0300 (BRT)
-Message-Id: <20120521.175247.1388227604292700355.pcacjr@zytor.com>
-To: johan.hedberg@gmail.com
-Cc: paulo.alcantara@openbossa.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] storage: Store BLE address type in "primary"
- file
-From: Paulo Alcantara <pcacjr@zytor.com>
-In-Reply-To: <20120519064124.GA27057@x220.P-661HNU-F1>
+From: Paulo Alcantara <paulo.alcantara@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2 2/2] core: Fix creating device from "primary" file
+Date: Mon, 21 May 2012 17:48:36 -0300
+Message-Id: <1337633316-4992-3-git-send-email-paulo.alcantara@openbossa.org>
+In-Reply-To: <1337633316-4992-1-git-send-email-paulo.alcantara@openbossa.org>
 References: <1337374667-17802-1-git-send-email-paulo.alcantara@openbossa.org>
-	<1337374667-17802-2-git-send-email-paulo.alcantara@openbossa.org>
-	<20120519064124.GA27057@x220.P-661HNU-F1>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+ <1337633316-4992-1-git-send-email-paulo.alcantara@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Sat, 19 May 2012 09:41:24 +0300
+This patch removes the hard-coded address type for the BLE device
+created from the storage.
+---
+ src/adapter.c |   10 +++++++---
+ 1 files changed, 7 insertions(+), 3 deletions(-)
 
-> > +	/* New format: address#type */
-> > +	ba2str(dba, key);
-> > +	key[17] = '#';
-> > +	key[18] = ba_type2char(bdaddr_type);
-> 
-> Wouldn't sprintf(&key[17], "#%hhu", bdaddr_type); be much simpler?
+diff --git a/src/adapter.c b/src/adapter.c
+index dafe595..1ca21e6 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1940,13 +1940,17 @@ static void create_stored_device_from_primary(char *key, char *value,
+ 	struct btd_adapter *adapter = user_data;
+ 	struct btd_device *device;
+ 	GSList *services, *uuids, *l;
++	char address[18];
++	uint8_t bdaddr_type;
++
++	if (sscanf(key, "%17s#%hhu", address, &bdaddr_type) < 2)
++		bdaddr_type = BDADDR_LE_PUBLIC;
+ 
+ 	if (g_slist_find_custom(adapter->devices,
+-			key, (GCompareFunc) device_address_cmp))
++			address, (GCompareFunc) device_address_cmp))
+ 		return;
+ 
+-	/* FIXME: Get the correct LE addr type (public/random) */
+-	device = device_create(connection, adapter, key, BDADDR_LE_PUBLIC);
++	device = device_create(connection, adapter, address, bdaddr_type);
+ 	if (!device)
+ 		return;
+ 
+-- 
+1.7.7.6
 
-Agreed. Fixed it.
-
-> > +	/* New format: address#type */
-> > +	ba2str(dba, key);
-> > +	key[17] = '#';
-> > +	key[18] = ba_type2char(bdaddr_type);
-> 
-> Same here.
-
-Fixed it too.
-
-
-		Paulo
