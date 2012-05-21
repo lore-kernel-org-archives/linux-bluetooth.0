@@ -1,40 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 21 May 2012 15:25:56 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Bluetooth: Use defined link key size
+Message-ID: <20120521122554.GB30424@aemeltch-MOBL1>
+References: <1337350806-20326-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20120518144044.GA5494@x220.P-661HNU-F1>
 MIME-Version: 1.0
-In-Reply-To: <CANT-zCWa_U+0fh6de1yMvZLp4xhZfuLoiNNWdi8d93He-Sf0XA@mail.gmail.com>
-References: <1337591234-24919-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1337591234-24919-6-git-send-email-mikel.astiz.oss@gmail.com>
-	<CABBYNZKxOd-1VEvQvj-KmSzTxyAXdJtz14kGDn8Qh8LNbrhyiw@mail.gmail.com>
-	<CANT-zCWa_U+0fh6de1yMvZLp4xhZfuLoiNNWdi8d93He-Sf0XA@mail.gmail.com>
-Date: Mon, 21 May 2012 15:39:53 +0300
-Message-ID: <CABBYNZJWvq-aja2ptbdVd5-ETCQkEZW1qi67YO5X4KdtsPYFhw@mail.gmail.com>
-Subject: Re: [PATCH obexd v0 05/12] client-doc: Replace SendFiles with SendFile
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120518144044.GA5494@x220.P-661HNU-F1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Johan,
 
-On Mon, May 21, 2012 at 2:40 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> In addition, this change does make some sense on its own, since it
-> maps better to the OBEX spec. IIRC SendFiles was there to avoid
-> creating one session per transfer, but this is no longer a problem
-> once OPP is wrapped in a session type. It also allows to have a
-> asynchronous call, so the client can wait until the transfer is
-> finished.
+On Fri, May 18, 2012 at 05:40:44PM +0300, Johan Hedberg wrote:
+> Hi Andrei,
+> 
+> On Fri, May 18, 2012, Andrei Emeltchenko wrote:
+> > Remove magic number with defined link key size. This is especially
+> > useful for calculation other keys which are 2 * key_size, etc that
+> > makes usage of magic numbers too much.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  include/net/bluetooth/bluetooth.h |    2 ++
+> >  include/net/bluetooth/hci.h       |    4 ++--
+> >  include/net/bluetooth/hci_core.h  |    2 +-
+> >  net/bluetooth/hci_core.c          |    2 +-
+> >  net/bluetooth/hci_event.c         |    2 +-
+> >  net/bluetooth/mgmt.c              |    2 +-
+> >  6 files changed, 8 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> > index 961669b..4abedfe 100644
+> > --- a/include/net/bluetooth/bluetooth.h
+> > +++ b/include/net/bluetooth/bluetooth.h
+> > @@ -68,6 +68,8 @@ struct bt_security {
+> >  #define BT_SECURITY_MEDIUM	2
+> >  #define BT_SECURITY_HIGH	3
+> >  
+> > +#define BT_SEC_LINK_KEY_SIZE		16
+> 
+> The patch seems ok'ish to me but I'd remove the _SEC part from the
+> define name since it doesn't really buy you anything. 
 
-I don't think the client should be waiting it to finish, it is a bad
-API because it can take forever to transfer the file and eventually
-the message will timeout while the transfer is still ongoing, besides
-it takes away the possibility to cancel the transfer or watch its
-progress.
+Sent new version with a name proposed by Marcel.
 
-> So I can merge both changes but I would rather keep them separated, so
-> we can have more consistent APIs after each step.
+> Also, I'm a bit
+> confused by the commit message. What other keys are "2 * key_size"?
 
-Hmm, but I would have the changes to the same API at least in the same set.
+This is AMP key size which is calculated from link keys.
 
--- 
-Luiz Augusto von Dentz
+> There are no such occurrences in the patch itself so you should at least
+> give some examples in the commit message.
+
+I deleted this from the patch description.
+
+Best regards 
+Andrei Emeltchenko 
