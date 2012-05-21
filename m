@@ -1,66 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: <joohi.rastogi@stericsson.com>
-To: User Name <linux-bluetooth@vger.kernel.org>
-Cc: User Name2 <joohi.rastogi@stericsson.com>
-Subject: [PATCH BlueZ 1/2 v2] AVRCP: Refactor the code using constants
-Date: Mon, 21 May 2012 17:18:09 +0530
-Message-ID: <1337600889-23515-1-git-send-email-joohi.rastogi@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CABBYNZKxOd-1VEvQvj-KmSzTxyAXdJtz14kGDn8Qh8LNbrhyiw@mail.gmail.com>
+References: <1337591234-24919-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1337591234-24919-6-git-send-email-mikel.astiz.oss@gmail.com>
+	<CABBYNZKxOd-1VEvQvj-KmSzTxyAXdJtz14kGDn8Qh8LNbrhyiw@mail.gmail.com>
+Date: Mon, 21 May 2012 13:40:27 +0200
+Message-ID: <CANT-zCWa_U+0fh6de1yMvZLp4xhZfuLoiNNWdi8d93He-Sf0XA@mail.gmail.com>
+Subject: Re: [PATCH obexd v0 05/12] client-doc: Replace SendFiles with SendFile
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Joohi Rastogi <joohi.rastogi@stericsson.com>
+Hi Luiz,
 
----
- audio/avrcp.c |   17 +++++++++++++++--
- 1 files changed, 15 insertions(+), 2 deletions(-)
- mode change 100644 => 100755 audio/avrcp.c
+On Mon, May 21, 2012 at 11:33 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Mikel,
+>
+> On Mon, May 21, 2012 at 12:07 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>>
+>> Now that OPP sessions exist, sending multiple files can be achieved with
+>> consecutive calls to SendFile. Note that within a session the pending
+>> operations will be queued and sequentially executed.
+>> ---
+>>  doc/client-api.txt |    4 ++--
+>>  1 files changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/doc/client-api.txt b/doc/client-api.txt
+>> index 32caa17..de726a8 100644
+>> --- a/doc/client-api.txt
+>> +++ b/doc/client-api.txt
+>> @@ -65,9 +65,9 @@ Service               org.openobex.client
+>>  Interface      org.openobex.ObjectPush
+>>  Object path    [variable prefix]/{session0,session1,...}
+>>
+>> -Methods                void SendFiles(array{string} files)
+>> +Methods                void SendFile(string sourcefile)
+>>
+>> -                       Send one or multiple local files to the remote device.
+>> +                       Send one local file to the remote device.
+>>
+>>                void PullBusinessCard(string targetfile)
+>>
+>> --
+>> 1.7.7.6
+>
+> Perhaps it is a good idea to return the transfer object here, so the
+> application can track the progress and cancel it which is the whole
+> point of not having multiple files so we can do this properly.
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-old mode 100644
-new mode 100755
-index d278d4e..356fd76
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -94,6 +94,11 @@
- 
- #define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH 5
- 
-+#define AVRCP_FEATURE_CATEGORY_1	0x0001
-+#define AVRCP_FEATURE_CATEGORY_2	0x0002
-+#define AVRCP_FEATURE_CATEGORY_3	0x0004
-+#define AVRCP_FEATURE_CATEGORY_4	0x0008
-+
- enum battery_status {
- 	BATTERY_STATUS_NORMAL =		0,
- 	BATTERY_STATUS_WARNING =	1,
-@@ -179,7 +184,11 @@ static sdp_record_t *avrcp_ct_record(void)
- 	sdp_record_t *record;
- 	sdp_data_t *psm, *version, *features;
- 	uint16_t lp = AVCTP_PSM;
--	uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103, feat = 0x000f;
-+	uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103;
-+	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
-+						AVRCP_FEATURE_CATEGORY_2 |
-+						AVRCP_FEATURE_CATEGORY_3 |
-+						AVRCP_FEATURE_CATEGORY_4 );
- 
- 	record = sdp_record_alloc();
- 	if (!record)
-@@ -243,7 +252,11 @@ static sdp_record_t *avrcp_tg_record(void)
- 	sdp_record_t *record;
- 	sdp_data_t *psm, *version, *features;
- 	uint16_t lp = AVCTP_PSM;
--	uint16_t avrcp_ver = 0x0104, avctp_ver = 0x0103, feat = 0x000f;
-+	uint16_t avrcp_ver = 0x0104, avctp_ver = 0x0103;
-+	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
-+						AVRCP_FEATURE_CATEGORY_2 |
-+						AVRCP_FEATURE_CATEGORY_3 |
-+						AVRCP_FEATURE_CATEGORY_4 );
- 
- 	record = sdp_record_alloc();
- 	if (!record)
--- 
-1.7.5.4
+It is a good idea indeed, but I was planning to do this in a later
+patch along with the rest of the API, for example PullBusinessCard.
+Most of the D-Bus interfaces will need such a transition in fact.
 
+In addition, this change does make some sense on its own, since it
+maps better to the OBEX spec. IIRC SendFiles was there to avoid
+creating one session per transfer, but this is no longer a problem
+once OPP is wrapped in a session type. It also allows to have a
+asynchronous call, so the client can wait until the transfer is
+finished.
+
+So I can merge both changes but I would rather keep them separated, so
+we can have more consistent APIs after each step.
+
+Cheers,
+Mikel
