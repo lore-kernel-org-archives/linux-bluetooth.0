@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 06/12] client: Replace SendFiles with SendFile
-Date: Mon, 21 May 2012 11:07:08 +0200
-Message-Id: <1337591234-24919-7-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v0 12/12] client-test: Replace CreateSession parameter dict
+Date: Mon, 21 May 2012 11:07:14 +0200
+Message-Id: <1337591234-24919-13-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1337591234-24919-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1337591234-24919-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,115 +12,127 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The function is now asynchronous, since it will return only when the
-transfer has been finished.
 ---
- client/opp.c |   66 ++++++++++++++++++++++++++++++++++-----------------------
- 1 files changed, 39 insertions(+), 27 deletions(-)
+ test/exchange-business-cards |    3 +--
+ test/ftp-client              |    3 +--
+ test/get-capabilities        |    3 +--
+ test/list-folders            |    2 +-
+ test/map-client              |    3 +--
+ test/pbap-client             |    2 +-
+ test/pull-business-card      |    3 +--
+ test/send-files              |    3 +--
+ 8 files changed, 8 insertions(+), 14 deletions(-)
 
-diff --git a/client/opp.c b/client/opp.c
-index 424ae8d..67b01a9 100644
---- a/client/opp.c
-+++ b/client/opp.c
-@@ -45,48 +45,60 @@ struct opp_data {
+diff --git a/test/exchange-business-cards b/test/exchange-business-cards
+index 548ad2d..4abe426 100755
+--- a/test/exchange-business-cards
++++ b/test/exchange-business-cards
+@@ -12,8 +12,7 @@ if (len(sys.argv) < 4):
+ 	sys.exit(1)
  
- static DBusConnection *conn = NULL;
+ print "Creating Session"
+-session_path = client.CreateSession({"Destination": sys.argv[1],
+-					"Target": "OPP"})
++session_path = client.CreateSession(sys.argv[1], { "Target": "OPP" })
+ opp = dbus.Interface(bus.get_object("org.openobex.client",
+ 					session_path),
+ 					"org.openobex.ObjectPush")
+diff --git a/test/ftp-client b/test/ftp-client
+index 9bc038d..825f591 100755
+--- a/test/ftp-client
++++ b/test/ftp-client
+@@ -135,8 +135,7 @@ if  __name__ == '__main__':
+     client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
+                             "org.openobex.Client")
  
--static DBusMessage *opp_send_files(DBusConnection *connection,
-+static void send_file_callback(struct obc_session *session,
-+						struct obc_transfer *transfer,
-+						GError *err, void *user_data)
-+{
-+	DBusMessage *msg = user_data;
-+	DBusMessage *reply;
-+
-+	if (err != NULL)
-+		reply = g_dbus_create_error(msg,
-+				ERROR_INF ".Failed", "%s", err->message);
-+	else
-+		reply = dbus_message_new_method_return(msg);
-+
-+	g_dbus_send_message(conn, reply);
-+	dbus_message_unref(msg);
-+}
-+
-+static DBusMessage *opp_send_file(DBusConnection *connection,
- 					DBusMessage *message, void *user_data)
- {
- 	struct opp_data *opp = user_data;
--	DBusMessageIter iter, array;
-+	struct obc_transfer *transfer;
- 	DBusMessage *reply;
-+	char *filename;
-+	char *basename;
- 	GError *err = NULL;
+-    session_path = client.CreateSession({ "Destination": options.device,
+-                                          "Target": "ftp"})
++    session_path = client.CreateSession(options.device, { "Target": "ftp" })
  
--	dbus_message_iter_init(message, &iter);
--	dbus_message_iter_recurse(&iter, &array);
--
--	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_STRING) {
--		char *filename;
--		char *basename;
--		struct obc_transfer *transfer;
--
--		dbus_message_iter_get_basic(&array, &filename);
--		basename = g_path_get_basename(filename);
-+	if (dbus_message_get_args(message, NULL,
-+					DBUS_TYPE_STRING, &filename,
-+					DBUS_TYPE_INVALID) == FALSE)
-+		return g_dbus_create_error(message,
-+				ERROR_INF ".InvalidArguments", NULL);
+     session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+                  "org.openobex.Session")
+diff --git a/test/get-capabilities b/test/get-capabilities
+index 29120f1..09e2d24 100755
+--- a/test/get-capabilities
++++ b/test/get-capabilities
+@@ -12,8 +12,7 @@ if (len(sys.argv) < 3):
+ 	sys.exit(1)
  
--		transfer = obc_transfer_put(NULL, basename, filename, NULL, 0,
--									&err);
-+	basename = g_path_get_basename(filename);
+ print "Creating Session"
+-session_path = client.CreateSession({"Destination": sys.argv[1],
+-						"Target": sys.argv[2]})
++session_path = client.CreateSession(sys.argv[1], { "Target": sys.argv[2] })
+ session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+ 							"org.openobex.Session")
  
--		g_free(basename);
-+	transfer = obc_transfer_put(NULL, basename, filename, NULL, 0, &err);
+diff --git a/test/list-folders b/test/list-folders
+index c7eec10..7239d6d 100755
+--- a/test/list-folders
++++ b/test/list-folders
+@@ -9,7 +9,7 @@ def list_folder(folder):
+ 	client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
+ 				"org.openobex.Client")
  
--		if (transfer == NULL)
--			goto fail;
-+	g_free(basename);
+-	session_path = client.CreateSession({ "Destination": sys.argv[1], "Target": "ftp"})
++	session_path = client.CreateSession(sys.argv[1], { "Target": "ftp" })
  
--		if (!obc_session_queue(opp->session, transfer, NULL, NULL,
--									&err))
--			goto fail;
-+	if (transfer == NULL)
-+		goto fail;
+ 	ftp = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+ 			     "org.openobex.FileTransfer")
+diff --git a/test/map-client b/test/map-client
+index 5c7c447..cf006b6 100755
+--- a/test/map-client
++++ b/test/map-client
+@@ -41,8 +41,7 @@ if  __name__ == '__main__':
+     client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
+                             "org.openobex.Client")
  
--		dbus_message_iter_next(&array);
--	}
-+	if (!obc_session_queue(opp->session, transfer, send_file_callback,
-+								message, &err))
-+		goto fail;
+-    session_path = client.CreateSession({ "Destination": options.device,
+-                                          "Target": "map"})
++    session_path = client.CreateSession( options.device, { "Target": "map" })
  
--	return dbus_message_new_method_return(message);
-+	dbus_message_ref(message);
-+	return NULL;
+     session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+                  "org.openobex.Session")
+diff --git a/test/pbap-client b/test/pbap-client
+index 7456c01..ecca14f 100755
+--- a/test/pbap-client
++++ b/test/pbap-client
+@@ -9,7 +9,7 @@ client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
+ 						"org.openobex.Client")
  
- fail:
- 	reply = g_dbus_create_error(message,
- 				ERROR_INF ".Failed", "%s", err->message);
- 	g_error_free(err);
- 	return reply;
--
- }
+ print "Creating Session"
+-session_path = client.CreateSession({"Destination": sys.argv[1], "Target": "PBAP"})
++session_path = client.CreateSession(sys.argv[1], { "Target": "PBAP" })
+ pbap = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+ 						"org.openobex.PhonebookAccess")
+ session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+diff --git a/test/pull-business-card b/test/pull-business-card
+index 5912155..6f9267b 100755
+--- a/test/pull-business-card
++++ b/test/pull-business-card
+@@ -29,8 +29,7 @@ if __name__ == '__main__':
+ 		sys.exit(1)
  
- static void pull_complete_callback(struct obc_session *session,
-@@ -153,10 +165,10 @@ static DBusMessage *opp_exchange_business_cards(DBusConnection *connection,
- }
+ 	print "Creating Session"
+-	session_path = client.CreateSession({"Destination": sys.argv[1],
+-						"Target": "OPP"})
++	session_path = client.CreateSession(sys.argv[1], { "Target": "OPP" })
+ 	opp = dbus.Interface(bus.get_object("org.openobex.client",
+ 						session_path),
+ 						"org.openobex.ObjectPush")
+diff --git a/test/send-files b/test/send-files
+index aa4862f..5310c06 100755
+--- a/test/send-files
++++ b/test/send-files
+@@ -15,8 +15,7 @@ if (len(sys.argv) < 3):
+ files = [os.path.realpath(f) for f in sys.argv[2:]]
  
- static const GDBusMethodTable opp_methods[] = {
--	{ GDBUS_METHOD("SendFiles",
--		GDBUS_ARGS({ "files", "as" }),
-+	{ GDBUS_ASYNC_METHOD("SendFile",
-+		GDBUS_ARGS({ "sourcefile", "s" }),
- 		NULL,
--		opp_send_files) },
-+		opp_send_file) },
- 	{ GDBUS_ASYNC_METHOD("PullBusinessCard",
- 		GDBUS_ARGS({ "targetfile", "s" }),
- 		NULL,
+ print "Creating Session"
+-session_path = client.CreateSession({"Destination": sys.argv[1],
+-					"Target": "OPP"})
++session_path = client.CreateSession(sys.argv[1], { "Target": "OPP" })
+ opp = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+ 					"org.openobex.ObjectPush")
+ 
 -- 
 1.7.7.6
 
