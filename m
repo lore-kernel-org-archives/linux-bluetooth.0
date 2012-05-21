@@ -1,130 +1,187 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 21 May 2012 15:28:57 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
+Subject: Re: [PATCHv1 16/17] Bluetooth: A2MP: Handling fixed channels
+In-Reply-To: <1337351150-20526-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <alpine.DEB.2.02.1205211438590.2239@mathewm-linux>
+References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1337351150-20526-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <4FB4B13D.1010302@tieto.com>
-References: <1337201737-5983-1-git-send-email-andrzej.kaczmarek@tieto.com>
-	<1337202331.5970.269.camel@aeonflux>
-	<CA+6KyKZ0vrPHoXXfWwJdiVLDR+59azRwWMhJbjndM+Aw_dKSwA@mail.gmail.com>
-	<1337204910.5970.271.camel@aeonflux>
-	<4FB4B13D.1010302@tieto.com>
-Date: Mon, 21 May 2012 19:30:14 -0300
-Message-ID: <CACJA=fVgzh9-RXBeJ=N7KRHDnEo_GTcVOnnv2dc-JMxKriBb4g@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Use hci_conn data to handle failed LE
- Connection Complete
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej/Marcel,
 
-On Thu, May 17, 2012 at 5:05 AM, Andrzej Kaczmarek
-<andrzej.kaczmarek@tieto.com> wrote:
-> Hi Marcel,
+Hi Andrei -
+
+On Fri, 18 May 2012, Andrei Emeltchenko wrote:
+
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
+> A2MP fixed channel do not have sk
 >
-> On 16.05.2012 23:48, Marcel Holtmann wrote:
->>>>>
->>>>> =A0 =A0 =A0 hci_dev_lock(hdev);
->>>>>
->>>>> + =A0 =A0 if (ev->status) {
->>>>> + =A0 =A0 =A0 =A0 =A0 =A0 conn =3D hci_conn_hash_lookup_state(hdev, L=
-E_LINK,
->>>>> BT_CONNECT);
->>>>> + =A0 =A0 =A0 =A0 =A0 =A0 if (!conn)
->>>>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto unlock;
->>>>> +
->>>>> + =A0 =A0 =A0 =A0 =A0 =A0 mgmt_connect_failed(hdev,&conn->dst, conn->=
-type,
->>>>>
->>>>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 con=
-n->dst_type, ev->status);
->>>>> + =A0 =A0 =A0 =A0 =A0 =A0 hci_proto_connect_cfm(conn, ev->status);
->>>>> + =A0 =A0 =A0 =A0 =A0 =A0 conn->state =3D BT_CLOSED;
->>>>> + =A0 =A0 =A0 =A0 =A0 =A0 hci_conn_del(conn);
->>>>> + =A0 =A0 =A0 =A0 =A0 =A0 goto unlock;
->>>>> + =A0 =A0 }
->>>>> +
->>>>> =A0 =A0 =A0 conn =3D hci_conn_hash_lookup_ba(hdev, LE_LINK,&ev->bdadd=
-r);
->>>>> =A0 =A0 =A0 if (!conn) {
->>>>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 conn =3D hci_conn_add(hdev, LE_LINK,&ev->=
-bdaddr);
->>>>
->>>>
->>>> this change is wrong. We are now treating every single adapter as bein=
-g
->>>> broken. That is not acceptable.
->>>
->>>
->>> Why do you think these adapters are broken? As I explained in cover
->>> letter for v1, spec does not require peer address to be provided in
->>> Connection Complete which is reasonable since we can only have one
->>> pending connection request. Also as Claudio and Andre noticed such
->>> behaviour could be to simplify whitelist implementation - in case of
->>> connection request using whitelist it does not make sense to include
->>> specific peer address in event.
->>
->>
->> what has whitelist behavior to do with this event in the failure case?
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+> include/net/bluetooth/l2cap.h |    1 +
+> net/bluetooth/a2mp.c          |    3 +--
+> net/bluetooth/l2cap_core.c    |   25 +++++++++++++++++++++++--
+> 3 files changed, 25 insertions(+), 4 deletions(-)
 >
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 8cc739f..db47103 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -582,6 +582,7 @@ struct l2cap_conn {
+> #define L2CAP_CHAN_RAW			1
+> #define L2CAP_CHAN_CONN_LESS		2
+> #define L2CAP_CHAN_CONN_ORIENTED	3
+> +#define L2CAP_CHAN_CONN_FIX_A2MP	4
 >
-> Just a sidenote on why some vendors may want to omit BD_ADDR and it does =
-not
-> make adapter broken. Not directly related to this scenario.
-
-I was taking a look at Core spec change request document [1] and I found th=
-is:
-
-Erratum 4215, LE connection complete event missing exception
-"... On failure, for this event, all other parameters are not valid."
-
-It clearly states this is an expected behavior and nullify those
-parameters doesn't make the adapter broken.
-
-Thus, in case of failure, we should not rely on those parameters
-(BD_ADDR included) in order to properly handle LE Connection Complete
-Events.
-
->>>> We should only add a tweak if the BD_ADDR parameter is BDADDR_ANY and
->>>> not as a general rule. In addition if we do this, we need to print a
->>>> warning to dmesg to make this known.
->>>
->>>
->>> Perhaps we can just add warning in case BD_ADDR is not BDADDR_ANY and
->>> we cannot find hci_conn for it - in such case most probably something
->>> went wrong.
->>
->>
->> What are the adapters from Broadcom, CSR, TI and ST are returning in a
->> failure case? Are they all omitting the BD_ADDR value?
+> /* ----- L2CAP socket info ----- */
+> #define l2cap_pi(sk) ((struct l2cap_pinfo *) sk)
+> diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+> index 4616da1..86b2078 100644
+> --- a/net/bluetooth/a2mp.c
+> +++ b/net/bluetooth/a2mp.c
+> @@ -465,8 +465,7 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
 >
+> 	hci_conn_hold(conn->hcon);
 >
-> No, I noticed this on BCM and based on previous comments it seems that th=
-is
-> is what BCM and ST(E) are doing while CSR and TI return BD_ADDR. Except t=
-hat
-> previously I was using ST-E chip which did return BD_ADDR so this is not
-> even consistent per manufacturer.
+> -	chan->omtu = L2CAP_A2MP_DEFAULT_MTU;
+> -	chan->imtu = L2CAP_A2MP_DEFAULT_MTU;
+> +	chan->chan_type = L2CAP_CHAN_CONN_FIX_A2MP;
+> 	chan->flush_to = L2CAP_DEFAULT_FLUSH_TO;
 >
-> As said before, omitted BD_ADDR seems to be fine from spec perspective so=
- we
-> should not require it to be present. Since we can have only one LE hci_co=
-nn
-> in BT_CONNECT state it's reasonable to use it here. This is already in
-> patch.
+> 	chan->ops = &a2mp_chan_ops;
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index ee333f0..b5c4229 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -450,6 +450,13 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+> 		chan->omtu = L2CAP_DEFAULT_MTU;
+> 		break;
 >
-> What could be indeed added to this patch is warning message in case BD_AD=
-DR
-> is not BDADDR_ANY and it does not match one stored in hci_conn (either
-> adapter returns random BD_ADDR which is weird or something went wrong).
+> +	case L2CAP_CHAN_CONN_FIX_A2MP:
+> +		chan->scid = L2CAP_CID_A2MP;
+> +		chan->dcid = L2CAP_CID_A2MP;
+> +		chan->omtu = L2CAP_A2MP_DEFAULT_MTU;
+> +		chan->imtu = L2CAP_A2MP_DEFAULT_MTU;
+> +		break;
+> +
+> 	default:
+> 		/* Raw socket can send/recv signalling messages only */
+> 		chan->scid = L2CAP_CID_SIGNALING;
+> @@ -480,7 +487,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+> {
+> 	struct sock *sk = chan->sk;
+> 	struct l2cap_conn *conn = chan->conn;
+> -	struct sock *parent = bt_sk(sk)->parent;
+> +	struct sock *parent;
+>
+> 	__clear_chan_timer(chan);
+>
+> @@ -496,6 +503,9 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+> 		hci_conn_put(conn->hcon);
+> 	}
+>
+> +	if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
+> +		goto clean;
+> +
 
-IMO, this warning message is not really necessary.
+Since this has more to do with socketless channels than A2MP, it might 
+be better to do something more generic here like add a callback to 
+l2cap_ops so this socket code can be removed from l2cap_core rather 
+than worked around.
 
-BR,
+> 	lock_sock(sk);
+>
+> 	__l2cap_state_change(chan, BT_CLOSED);
+> @@ -504,6 +514,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+> 	if (err)
+> 		__l2cap_chan_set_err(chan, err);
+>
+> +	parent = bt_sk(sk)->parent;
+> 	if (parent) {
+> 		bt_accept_unlink(sk);
+> 		parent->sk_data_ready(parent, 0);
+> @@ -515,6 +526,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+> 	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
+> 		return;
+>
+> +clean:
+> 	skb_queue_purge(&chan->tx_q);
+>
+> 	if (chan->mode == L2CAP_MODE_ERTM) {
+> @@ -992,6 +1004,9 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
+> 	if (!conn)
+> 		return;
+>
+> +	if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
+> +		return;
+> +
 
-Andre
+There are places in the ERTM state machine that call 
+l2cap_send_disconn_req() to tear down an unrecoverable ERTM 
+connection.  If the connection remained up, I'm not sure how ERTM will 
+behave.
 
-[1] - https://www.bluetooth.org/Technical/Specifications/enhancements.htm
-(must be signed in Bluetooth SIG)
+I don't know that the spec is very clear about what to do 
+when ERTM must disconnect the channel, but the channel is fixed.
+
+I think it would be best to tell the owner of the channel (A2MP in 
+this case) that the channel has been disconnected using the 
+state_change l2cap op, even if no disconnect request is sent to the 
+remote device.  This way a new A2MP fixed channel can be started up so 
+there is some chance that the two sides of the A2MP ERTM connection 
+can sync up again.
+
+
+> 	if (chan->mode == L2CAP_MODE_ERTM) {
+> 		__clear_retrans_timer(chan);
+> 		__clear_monitor_timer(chan);
+> @@ -1201,6 +1216,11 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+>
+> 		l2cap_chan_lock(chan);
+>
+> +		if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP) {
+> +			l2cap_chan_unlock(chan);
+> +			continue;
+> +		}
+> +
+
+This bypasses the socket code in that loop, but also means the state 
+change is not sent to the AMP manager.  Is there a way to fix up the 
+state change code in l2cap_ops so the socket code can be removed from 
+l2cap_conn_ready and other socketless L2CAP channels will also work 
+without special case code?
+
+> 		if (conn->hcon->type == LE_LINK) {
+> 			if (smp_conn_security(conn, chan->sec_level))
+> 				l2cap_chan_ready(chan);
+> @@ -1581,7 +1601,8 @@ static void l2cap_monitor_timeout(struct work_struct *work)
+> 	l2cap_chan_lock(chan);
+>
+> 	if (chan->retry_count >= chan->remote_max_tx) {
+> -		l2cap_send_disconn_req(chan->conn, chan, ECONNABORTED);
+> +		if (chan->chan_type != L2CAP_CHAN_CONN_FIX_A2MP)
+> +			l2cap_send_disconn_req(chan->conn, chan, ECONNABORTED);
+
+The spec defines the MaxTransmit value as 0xff for the A2MP channel, 
+not 0x00 (for infinite retries).  There is therefore an expectation 
+that the ERTM connection will reset after too many retries - and I 
+don't think it is ok to skip the disconnect here.
+
+> 		l2cap_chan_unlock(chan);
+> 		l2cap_chan_put(chan);
+> 		return;
+> -- 
+> 1.7.9.5
+
+Regards,
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
