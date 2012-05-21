@@ -1,120 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 May 2012 15:45:38 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1 17/17] Bluetooth: A2MP: Manage incoming connections
-In-Reply-To: <1337351150-20526-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Message-ID: <alpine.DEB.2.02.1205211530290.2239@mathewm-linux>
-References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1337351150-20526-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <4FB4B13D.1010302@tieto.com>
+References: <1337201737-5983-1-git-send-email-andrzej.kaczmarek@tieto.com>
+	<1337202331.5970.269.camel@aeonflux>
+	<CA+6KyKZ0vrPHoXXfWwJdiVLDR+59azRwWMhJbjndM+Aw_dKSwA@mail.gmail.com>
+	<1337204910.5970.271.camel@aeonflux>
+	<4FB4B13D.1010302@tieto.com>
+Date: Mon, 21 May 2012 19:30:14 -0300
+Message-ID: <CACJA=fVgzh9-RXBeJ=N7KRHDnEo_GTcVOnnv2dc-JMxKriBb4g@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Use hci_conn data to handle failed LE
+ Connection Complete
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Andrzej/Marcel,
 
-On Fri, 18 May 2012, Andrei Emeltchenko wrote:
+On Thu, May 17, 2012 at 5:05 AM, Andrzej Kaczmarek
+<andrzej.kaczmarek@tieto.com> wrote:
+> Hi Marcel,
+>
+>
+> On 16.05.2012 23:48, Marcel Holtmann wrote:
+>>>>>
+>>>>> =A0 =A0 =A0 hci_dev_lock(hdev);
+>>>>>
+>>>>> + =A0 =A0 if (ev->status) {
+>>>>> + =A0 =A0 =A0 =A0 =A0 =A0 conn =3D hci_conn_hash_lookup_state(hdev, L=
+E_LINK,
+>>>>> BT_CONNECT);
+>>>>> + =A0 =A0 =A0 =A0 =A0 =A0 if (!conn)
+>>>>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto unlock;
+>>>>> +
+>>>>> + =A0 =A0 =A0 =A0 =A0 =A0 mgmt_connect_failed(hdev,&conn->dst, conn->=
+type,
+>>>>>
+>>>>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 con=
+n->dst_type, ev->status);
+>>>>> + =A0 =A0 =A0 =A0 =A0 =A0 hci_proto_connect_cfm(conn, ev->status);
+>>>>> + =A0 =A0 =A0 =A0 =A0 =A0 conn->state =3D BT_CLOSED;
+>>>>> + =A0 =A0 =A0 =A0 =A0 =A0 hci_conn_del(conn);
+>>>>> + =A0 =A0 =A0 =A0 =A0 =A0 goto unlock;
+>>>>> + =A0 =A0 }
+>>>>> +
+>>>>> =A0 =A0 =A0 conn =3D hci_conn_hash_lookup_ba(hdev, LE_LINK,&ev->bdadd=
+r);
+>>>>> =A0 =A0 =A0 if (!conn) {
+>>>>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 conn =3D hci_conn_add(hdev, LE_LINK,&ev->=
+bdaddr);
+>>>>
+>>>>
+>>>> this change is wrong. We are now treating every single adapter as bein=
+g
+>>>> broken. That is not acceptable.
+>>>
+>>>
+>>> Why do you think these adapters are broken? As I explained in cover
+>>> letter for v1, spec does not require peer address to be provided in
+>>> Connection Complete which is reasonable since we can only have one
+>>> pending connection request. Also as Claudio and Andre noticed such
+>>> behaviour could be to simplify whitelist implementation - in case of
+>>> connection request using whitelist it does not make sense to include
+>>> specific peer address in event.
+>>
+>>
+>> what has whitelist behavior to do with this event in the failure case?
+>
+>
+> Just a sidenote on why some vendors may want to omit BD_ADDR and it does =
+not
+> make adapter broken. Not directly related to this scenario.
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Handle incoming A2MP connection by creating AMP manager and
-> processing A2MP messages.
->
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
-> include/net/bluetooth/a2mp.h |    4 ++++
-> net/bluetooth/a2mp.c         |   12 ++++++++++++
-> net/bluetooth/l2cap_core.c   |   14 ++++++++++----
-> 3 files changed, 26 insertions(+), 4 deletions(-)
->
-> diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-> index 980c266..b4f74c6 100644
-> --- a/include/net/bluetooth/a2mp.h
-> +++ b/include/net/bluetooth/a2mp.h
-> @@ -15,6 +15,8 @@
-> #ifndef __A2MP_H
-> #define __A2MP_H
->
-> +#include <net/bluetooth/l2cap.h>
-> +
-> #define A2MP_FEAT_EXT	0x8000
->
-> struct amp_mgr {
-> @@ -119,5 +121,7 @@ struct a2mp_physlink_rsp {
->
-> void amp_mgr_get(struct amp_mgr *mgr);
-> int amp_mgr_put(struct amp_mgr *mgr);
-> +struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
-> +				       struct sk_buff *skb);
->
-> #endif /* __A2MP_H */
-> diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-> index 86b2078..dda297d 100644
-> --- a/net/bluetooth/a2mp.c
-> +++ b/net/bluetooth/a2mp.c
-> @@ -544,3 +544,15 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
->
-> 	return mgr;
-> }
-> +
-> +struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
-> +				       struct sk_buff *skb)
-> +{
-> +	struct amp_mgr *mgr;
-> +
-> +	mgr = amp_mgr_create(conn);
-> +
-> +	BT_DBG("mgr: %p chan %p", mgr, mgr->a2mp_chan);
-> +
-> +	return mgr->a2mp_chan;
-> +}
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index b5c4229..8c9250e 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -56,6 +56,7 @@
-> #include <net/bluetooth/hci_core.h>
-> #include <net/bluetooth/l2cap.h>
-> #include <net/bluetooth/smp.h>
-> +#include <net/bluetooth/a2mp.h>
->
-> bool disable_ertm;
->
-> @@ -4652,10 +4653,15 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
->
-> 	chan = l2cap_get_chan_by_scid(conn, cid);
-> 	if (!chan) {
-> -		BT_DBG("unknown cid 0x%4.4x", cid);
-> -		/* Drop packet and return */
-> -		kfree_skb(skb);
-> -		return 0;
-> +		if (cid == L2CAP_CID_A2MP) {
-> +			chan = a2mp_channel_create(conn, skb);
+I was taking a look at Core spec change request document [1] and I found th=
+is:
 
-This allocates a new AMP manager for each incoming command, doesn't 
-it?  I'd expect the manager to be created once when it is first 
-needed, then remain active until the ACL is closed.
+Erratum 4215, LE connection complete event missing exception
+"... On failure, for this event, all other parameters are not valid."
 
-> +			l2cap_chan_lock(chan);
-> +		} else {
-> +			BT_DBG("unknown cid 0x%4.4x", cid);
-> +			/* Drop packet and return */
-> +			kfree_skb(skb);
-> +			return 0;
-> +		}
-> 	}
+It clearly states this is an expected behavior and nullify those
+parameters doesn't make the adapter broken.
+
+Thus, in case of failure, we should not rely on those parameters
+(BD_ADDR included) in order to properly handle LE Connection Complete
+Events.
+
+>>>> We should only add a tweak if the BD_ADDR parameter is BDADDR_ANY and
+>>>> not as a general rule. In addition if we do this, we need to print a
+>>>> warning to dmesg to make this known.
+>>>
+>>>
+>>> Perhaps we can just add warning in case BD_ADDR is not BDADDR_ANY and
+>>> we cannot find hci_conn for it - in such case most probably something
+>>> went wrong.
+>>
+>>
+>> What are the adapters from Broadcom, CSR, TI and ST are returning in a
+>> failure case? Are they all omitting the BD_ADDR value?
 >
-> 	BT_DBG("chan %p, len %d", chan, skb->len);
-> -- 
-> 1.7.9.5
+>
+> No, I noticed this on BCM and based on previous comments it seems that th=
+is
+> is what BCM and ST(E) are doing while CSR and TI return BD_ADDR. Except t=
+hat
+> previously I was using ST-E chip which did return BD_ADDR so this is not
+> even consistent per manufacturer.
+>
+> As said before, omitted BD_ADDR seems to be fine from spec perspective so=
+ we
+> should not require it to be present. Since we can have only one LE hci_co=
+nn
+> in BT_CONNECT state it's reasonable to use it here. This is already in
+> patch.
+>
+> What could be indeed added to this patch is warning message in case BD_AD=
+DR
+> is not BDADDR_ANY and it does not match one stored in hci_conn (either
+> adapter returns random BD_ADDR which is weird or something went wrong).
 
-How do you plan to create an AMP manager if you don't get an A2MP 
-command from the remote device first?
+IMO, this warning message is not really necessary.
 
-Regards,
+BR,
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Andre
 
+[1] - https://www.bluetooth.org/Technical/Specifications/enhancements.htm
+(must be signed in Bluetooth SIG)
