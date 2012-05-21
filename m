@@ -1,5 +1,5 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 May 2012 13:21:37 -0300
+Date: Mon, 21 May 2012 13:17:07 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
 To: Minho Ban <mhban@samsung.com>
 Cc: Marcel Holtmann <marcel@holtmann.org>,
@@ -7,25 +7,24 @@ Cc: Marcel Holtmann <marcel@holtmann.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [RFC/PATCH] Bluetooth: prevent double l2cap_chan_destroy
-Message-ID: <20120521162137.GE16942@joana>
-References: <4FB992C8.8090105@samsung.com>
+Subject: Re: [PATCH] Bluetooth: Fix null pointer dereference in
+ l2cap_chan_send
+Message-ID: <20120521161707.GD16942@joana>
+References: <4FB9932B.9070101@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4FB992C8.8090105@samsung.com>
+In-Reply-To: <4FB9932B.9070101@samsung.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Minho,
 
-* Minho Ban <mhban@samsung.com> [2012-05-21 09:56:40 +0900]:
+* Minho Ban <mhban@samsung.com> [2012-05-21 09:58:19 +0900]:
 
-> l2cap_sock_kill can be called in l2cap_sock_release and l2cap_sock_close_cb
-> either. This lead l2cap_chan_destroy to be called twice for same channel.
-> To prevent double list_del and double chan_put, chan_destroy should be protected
-> with chan->refcnt and chan_list_lock so that reentrance could be forbidden.
+> If l2cap_chan_send is called will null conn it will cause kernel Oops.
+> This patch checks if conn is valid before entering l2cap_chan_send.
 
-Even if l2cap_sock_kill() is called twice it will call l2cap_chan_destroy()
-only once. If this is not happening we just have a broken piece of code
-somewhere else and not here.
+chan->conn should be always valid, and if not we have a bug somewhere else in
+the code and not in l2cap_chan_send(). It could be a locking problem maybe.
+Also check if you can reproduce this with latest bluetooth-next.
 
 	Gustavo
