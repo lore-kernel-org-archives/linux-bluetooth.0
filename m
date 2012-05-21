@@ -1,51 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Paulo Alcantara <paulo.alcantara@openbossa.org>
+MIME-Version: 1.0
+Date: Mon, 21 May 2012 19:39:49 +0100
+Message-ID: <CA+6PnXxc8CQ7q6LGkDWbP_-2P+4U_MX3rTt237PHhN2nGXeYag@mail.gmail.com>
+Subject: GSoC: Bluetooth Replayer update
+From: Anton Weber <anton@antweb.me>
 To: linux-bluetooth@vger.kernel.org
-Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ v2 0/2] Address type in keys on storage filesystem
-Date: Mon, 21 May 2012 17:48:34 -0300
-Message-Id: <1337633316-4992-1-git-send-email-paulo.alcantara@openbossa.org>
-In-Reply-To: <1337374667-17802-1-git-send-email-paulo.alcantara@openbossa.org>
-References: <1337374667-17802-1-git-send-email-paulo.alcantara@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-BLE devices have two different address types: public or
-random. So we need to provide this address type on keys
-in the "primary" file to avoid duplicate BLE address types
-around the BlueZ.
+Hello everyone!
 
-This series changes the storage to store the address type
-together with the device address.
+Now that the coding period for GSoC started, I will be regularly
+posting updates to the mailing list.
+This is meant to share my progress, but also to get get the community involved.
+If you have any feedback or suggestions, about the things I wrote or
+about my project in general, please let me know!
+As mentioned in my first email, you can always contact me directly via
+email or IRC as well.
 
-Hemant Gupta has been working on this on "Store LE device address
-type with primary list" but his patch hasn't been accepted and
-he didn't send a new reviewed version of that patch.
+To give everyone a better idea of what my project is about, I have
+uploaded the initial project proposal:
+http://antweb.me/tl_files/blog/gsoc12/gsoc_proposal.pdf
+I will do things slightly differently now that I have more of an idea
+what I'm dealing with, but the main structure should stay the same.
 
-I have patches for the other storage files as well, I'll
-send them soon. There is a potential problem in
-device_address_cmp() function which checks the address only.
-I am investigating how to fix it to compare address and type
-without breaking the current code.
+What happened so far:
+- read up on various guides and the Bluetooth specification
+- played around with git (will upload my work to github once I got
+that far and possibly fork the bluez repo at some point if required)
+- went through hcidump sources (found many bits of code I can reuse,
+especially the parser)
+- had a look at hciemu, but didn't get too far yet
 
-v2's changes:
-     - Use sprintf() instead of setting values by indexing
-       strings.
-     - Keep backward compatibility with entries created by
-       older bluetoothd versions.
+Next up:
+- Find out more about hciemu
+- Getting used to automake
+- Write a tool that can execute a simple sequence of commands on a
+VHCI interface.
+  I will start off with a standalone tool for now, but it might be a
+good idea to integrate it in hcidump (more about that when I got that
+far).
 
-Claudio Takahasi (1):
-  core: Fix creating device from "primary" file
-
-Paulo Alcantara (1):
-  storage: Store BLE address type in "primary" file
-
- src/adapter.c |   10 +++++++---
- src/device.c  |    2 +-
- src/storage.c |   32 ++++++++++++++++++++++++--------
- src/storage.h |    5 +++--
- 4 files changed, 35 insertions(+), 14 deletions(-)
-
--- 
-1.7.7.6
-
+Best,
+Anton
