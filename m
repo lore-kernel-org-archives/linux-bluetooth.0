@@ -1,30 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 May 2012 13:17:07 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Minho Ban <mhban@samsung.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix null pointer dereference in
- l2cap_chan_send
-Message-ID: <20120521161707.GD16942@joana>
-References: <4FB9932B.9070101@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4FB9932B.9070101@samsung.com>
+In-Reply-To: <CABBYNZ+0+XrPcq9WGZpehOMLPZ_NBHaukpX3CWfQDkCunVdtVw@mail.gmail.com>
+References: <CAKZqhqe-Go8T+LTvq48PL7FbLs8ffa7oySnC1Em7pK+nuoEQvw@mail.gmail.com>
+	<CABBYNZ+0+XrPcq9WGZpehOMLPZ_NBHaukpX3CWfQDkCunVdtVw@mail.gmail.com>
+Date: Mon, 21 May 2012 13:13:45 -0300
+Message-ID: <CAM4ayVD5_GHr8PxE3E5dCNB9-+hHTSSh98rug-=YGmQ7+BLtjQ@mail.gmail.com>
+Subject: Re: GSoC: OBEX Filesystem In Userspace
+From: =?UTF-8?Q?Vin=C3=ADcius_Costa_Gomes?= <vcgomes@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: dmp <dmp0x7c5@gmail.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Minho,
+Hi Luiz,
 
-* Minho Ban <mhban@samsung.com> [2012-05-21 09:58:19 +0900]:
+On Mon, May 21, 2012 at 9:44 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Michal,
+>
+> On Mon, May 21, 2012 at 2:54 PM, dmp <dmp0x7c5@gmail.com> wrote:
+>> Hello BlueZ Community,
+>>
+>> GSoC coding period started today. Using this thread I will write about
+>> project progress during summer.
+>>
+>> Initially prepared project repository could be found here:
+>> https://github.com/dmp0x7c5/gobexfuse
+>>
+>> We decided to use "gobexfuse" as a project's name :)
+>
+> I thought this could be part of obexd repository, or this is just a
+> clone? At least it doesn't look like a close which would mean you
+> would have to copy gobex which IMO is a bad idea.
 
-> If l2cap_chan_send is called will null conn it will cause kernel Oops.
-> This patch checks if conn is valid before entering l2cap_chan_send.
+Makes sense, we can have this project inside obexd, and just enable it when
+fuse is available in the system. And this makes it easier in case we need to
+extend gobex.
 
-chan->conn should be always valid, and if not we have a bug somewhere else in
-the code and not in l2cap_chan_send(). It could be a locking problem maybe.
-Also check if you can reproduce this with latest bluetooth-next.
+>
+> --
+> Luiz Augusto von Dentz
 
-	Gustavo
+
+Cheers,
+-- 
+Vinicius
