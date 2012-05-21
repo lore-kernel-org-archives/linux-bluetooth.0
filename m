@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 08/12] client-doc: Move GetCapabilities to session API
-Date: Mon, 21 May 2012 11:07:10 +0200
-Message-Id: <1337591234-24919-9-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v0 10/12] client-doc: Replace parameter dict with conventional ones
+Date: Mon, 21 May 2012 11:07:12 +0200
+Message-Id: <1337591234-24919-11-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1337591234-24919-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1337591234-24919-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,36 +12,56 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
+Required arguments are passed as formal parameters in the D-Bus API, and
+an additional dictionary is used to pass target-specific parameters.
+This will allow future extensions without breaking the method signature.
 ---
- doc/client-api.txt |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ doc/client-api.txt |   25 ++++++++++++++++---------
+ 1 files changed, 16 insertions(+), 9 deletions(-)
 
 diff --git a/doc/client-api.txt b/doc/client-api.txt
-index de726a8..a467d40 100644
+index a467d40..cfb4ec9 100644
 --- a/doc/client-api.txt
 +++ b/doc/client-api.txt
-@@ -20,10 +20,6 @@ Methods		object CreateSession(dict device)
+@@ -11,22 +11,29 @@ Service		org.openobex.client
+ Interface	org.openobex.Client
+ Object path	/
  
- 			Unregister session and abort pending transfers.
+-Methods		object CreateSession(dict device)
++Methods		object CreateSession(string destination, dict args)
  
--		string GetCapabilities(dict device)
--
--			Get remote device capabilities.
--
- Properties	string Target
+-			Create a new OBEX session. The device is configured
+-			via properties like in SendFiles.
++			Create a new OBEX session for the given remote address.
  
- 		string Source
-@@ -52,6 +48,10 @@ Methods		dict GetProperties()
+-		void RemoveSession(object session)
++			The last parameter is a dictionary to hold optional or
++			type-specific parameters. Typical parameters that can
++			be set in this dictionary include the following:
  
- 			Release a previously assigned OBEX agent.
+-			Unregister session and abort pending transfers.
++				string "Target" : type of session to be created
++				string "Source" : local address to be used
++				byte "Channel"
  
-+		string GetCapabilities()
-+
-+			Get remote device capabilities.
-+
- Properties	string Source [readonly]
+-Properties	string Target
++			The currently supported targets are the following:
  
- 		string Destination [readonly]
+-		string Source
++				"FTP"
++				"MAP"
++				"OPP"
++				"PBAP"
++				"SYNC"
+ 
+-		string Destination
++		void RemoveSession(object session)
+ 
+-		byte Channel
++			Unregister session and abort pending transfers.
+ 
+ Session hierarchy
+ =================
 -- 
 1.7.7.6
 
