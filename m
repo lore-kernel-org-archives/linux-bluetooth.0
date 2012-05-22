@@ -1,65 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Paulo Alcantara <paulo.alcantara@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ v3 0/3] Store address type on storage
-Date: Tue, 22 May 2012 16:45:24 -0300
-Message-Id: <1337715927-8821-1-git-send-email-paulo.alcantara@openbossa.org>
-In-Reply-To: <1337374667-17802-1-git-send-email-paulo.alcantara@openbossa.org>
-References: <1337374667-17802-1-git-send-email-paulo.alcantara@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <CAMOw1v5cNQ9csPn7k6k7g2v+YdRdZq5-MVHeVfHH+bLzA6qd0Q@mail.gmail.com>
+References: <CAMOw1v5cNQ9csPn7k6k7g2v+YdRdZq5-MVHeVfHH+bLzA6qd0Q@mail.gmail.com>
+Date: Tue, 22 May 2012 15:35:41 -0300
+Message-ID: <CAPdpN3BAmTtdtOaKj9OTbA53THPRubArGS3h49htk-5YJYTCMQ@mail.gmail.com>
+Subject: Re: [HEADS UP] vim users
+From: Gustavo Sverzut Barbieri <barbieri@profusion.mobi>
+To: connman@connman.net
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	ofono@ofono.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-BLE devices have two different address types: public or
-random. So we need to provide this address type on keys
-in the "primary" file to avoid duplicate BLE address types
-around the BlueZ.
+On Tue, May 22, 2012 at 12:38 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+>
+> Hey,
+>
+> As I sent previously to BlueZ mailing list, the patches for d-bus
+> introspection exposes a bug in vim c syntax highlight. There's already
+> a fix for that:
+> https://groups.google.com/forum/#!msg/vim_dev/_IL5jM1-t_w/D-vIwZM2RfwJ
+>
+> I'm not sure when there will be a new version, so I'm attaching to
+> this email the fixed c.vim file. Replace
+> /usr/share/vim/vim73/syntax/c.vim with this one and highlight will be
+> fixed.
 
-This series changes the storage to store the address type
-together with the device address.
+this vim crap is seriously b0rken. Just change to emacs, and start to
+properly align your parenthesis contents ;-)
 
-Hemant Gupta has been working on this on "Store LE device address
-type with primary list" but his patch hasn't been accepted and
-he didn't send a new reviewed version of that patch.
-
-I have patches for the other storage files as well, I'll
-send them soon. There is a potential problem in
-device_address_cmp() function which checks the address only.
-I am investigating how to fix it to compare address and type
-without breaking the current code.
-
-v3's changes:
-     - (1/3): Remove unnecessary comment about the new storage
-       	      format and code that leads with the old storage
-	      format.
-
-     - (2/3): Just use the initial version of this patch (the
-       	      returning < 2 check in sscanf() function).
-
-     - (3/3): New patch that fixes removing device services from
-       	      "primary" file by passing a key with the new
-	      storage format in delete_device_service(). Note
-	      also that this function was modified to only treat
-	      the primary case - since we have old storage format
-	      still being used in the other LE-related storage
-	      files. So, it will need to be modified in order to
-	      delete device services of other files (characteristics,
-	      ccc, etc) on other series.
+</endtrolljoke>
 
 
-Claudio Takahasi (1):
-  core: Fix creating device from "primary" file
-
-Paulo Alcantara (2):
-  storage: Store BLE address type in "primary" file
-  core: Fix removing device services from "primary" file
-
- src/adapter.c |   10 +++++++---
- src/device.c  |    4 ++--
- src/storage.c |   45 ++++++++++++++++++++++++++-------------------
- src/storage.h |    8 +++++---
- 4 files changed, 40 insertions(+), 27 deletions(-)
-
--- 
-1.7.7.6
-
+--
+Gustavo Sverzut Barbieri
+http://profusion.mobi embedded systems
+--------------------------------------
+MSN: barbieri@gmail.com
+Skype: gsbarbieri
+Mobile: +55 (19) 9225-2202
