@@ -1,31 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 1/4] monitor: add include <stdint.h>
-Date: Tue, 22 May 2012 02:40:24 -0300
-Message-Id: <1337665227-7228-1-git-send-email-gustavo@padovan.org>
+From: <joohi.rastogi@stericsson.com>
+To: User Name <linux-bluetooth@vger.kernel.org>
+Cc: User Name2 <joohi.rastogi@stericsson.com>
+Subject: [PATCH Bluez 2/2 v2] AVRCP: Add missing Player Setting feature in TG record
+Date: Tue, 22 May 2012 08:55:47 +0530
+Message-ID: <1337657147-18140-1-git-send-email-joohi.rastogi@stericsson.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+From: Joohi Rastogi <joohi.rastogi@stericsson.com>
 
 ---
- monitor/packet.h |    1 +
- 1 file changed, 1 insertion(+)
+ audio/avrcp.c |    8 +++++---
+ 1 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/monitor/packet.h b/monitor/packet.h
-index 90fc7ec..4c8b698 100644
---- a/monitor/packet.h
-+++ b/monitor/packet.h
-@@ -23,6 +23,7 @@
-  */
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index 356fd76..cb6906d 100755
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -98,6 +98,7 @@
+ #define AVRCP_FEATURE_CATEGORY_2	0x0002
+ #define AVRCP_FEATURE_CATEGORY_3	0x0004
+ #define AVRCP_FEATURE_CATEGORY_4	0x0008
++#define AVRCP_FEATURE_PLAYER_SETTINGS	0x0010
  
- #include <stdbool.h>
-+#include <stdint.h>
- #include <sys/time.h>
+ enum battery_status {
+ 	BATTERY_STATUS_NORMAL =		0,
+@@ -254,9 +255,10 @@ static sdp_record_t *avrcp_tg_record(void)
+ 	uint16_t lp = AVCTP_PSM;
+ 	uint16_t avrcp_ver = 0x0104, avctp_ver = 0x0103;
+ 	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
+-						AVRCP_FEATURE_CATEGORY_2 |
+-						AVRCP_FEATURE_CATEGORY_3 |
+-						AVRCP_FEATURE_CATEGORY_4 );
++					AVRCP_FEATURE_CATEGORY_2 |
++					AVRCP_FEATURE_CATEGORY_3 |
++					AVRCP_FEATURE_CATEGORY_4 |
++					AVRCP_FEATURE_PLAYER_SETTINGS );
  
- #define PACKET_FILTER_SHOW_INDEX	(1 << 0)
+ 	record = sdp_record_alloc();
+ 	if (!record)
 -- 
-1.7.10.1
+1.7.5.4
 
