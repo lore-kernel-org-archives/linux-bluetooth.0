@@ -1,57 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 May 2012 23:00:04 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Anton Weber <anton@antweb.me>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: GSoC: Bluetooth Replayer update
-Message-ID: <20120522020004.GG16942@joana>
-References: <CA+6PnXxc8CQ7q6LGkDWbP_-2P+4U_MX3rTt237PHhN2nGXeYag@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CA+6PnXxc8CQ7q6LGkDWbP_-2P+4U_MX3rTt237PHhN2nGXeYag@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-id: <4FBAE9FE.9030807@samsung.com>
+Date: Tue, 22 May 2012 10:21:02 +0900
+From: Minho Ban <mhban@samsung.com>
+MIME-version: 1.0
+To: Gustavo Padovan <gustavo@padovan.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix null pointer dereference in l2cap_chan_send
+References: <4FB9932B.9070101@samsung.com> <20120521161707.GD16942@joana>
+In-reply-to: <20120521161707.GD16942@joana>
+Content-type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anton,
-
-* Anton Weber <anton@antweb.me> [2012-05-21 19:39:49 +0100]:
-
-> Hello everyone!
+On 05/22/2012 01:17 AM, Gustavo Padovan wrote:
+> Hi Minho,
 > 
-> Now that the coding period for GSoC started, I will be regularly
-> posting updates to the mailing list.
-> This is meant to share my progress, but also to get get the community involved.
-> If you have any feedback or suggestions, about the things I wrote or
-> about my project in general, please let me know!
-> As mentioned in my first email, you can always contact me directly via
-> email or IRC as well.
+> * Minho Ban <mhban@samsung.com> [2012-05-21 09:58:19 +0900]:
 > 
-> To give everyone a better idea of what my project is about, I have
-> uploaded the initial project proposal:
-> http://antweb.me/tl_files/blog/gsoc12/gsoc_proposal.pdf
-> I will do things slightly differently now that I have more of an idea
-> what I'm dealing with, but the main structure should stay the same.
+>> If l2cap_chan_send is called will null conn it will cause kernel Oops.
+>> This patch checks if conn is valid before entering l2cap_chan_send.
 > 
-> What happened so far:
-> - read up on various guides and the Bluetooth specification
-> - played around with git (will upload my work to github once I got
-> that far and possibly fork the bluez repo at some point if required)
-> - went through hcidump sources (found many bits of code I can reuse,
-> especially the parser)
-> - had a look at hciemu, but didn't get too far yet
+> chan->conn should be always valid, and if not we have a bug somewhere else in
+> the code and not in l2cap_chan_send(). It could be a locking problem maybe.
+> Also check if you can reproduce this with latest bluetooth-next.
 > 
-> Next up:
-> - Find out more about hciemu
-> - Getting used to automake
-> - Write a tool that can execute a simple sequence of commands on a
-> VHCI interface.
->   I will start off with a standalone tool for now, but it might be a
-> good idea to integrate it in hcidump (more about that when I got that
-> far).
+> 	Gustavo
+> 
 
-Actually you should use btmon here, instead hcidump. btmon can log starting
-from the time you plug the bluetooth dongle.
-And we have btsnoop output there too, I think you can use it to extract the
-data to replay.
+Thanks for comment. I'm using bluetooth-next backporting to kernel 3.0
+I wonder how do we guarantee chan->conn is valid if other thread release chan->lock
+just after exit l2cap_chan_del.
+It seem l2cap_chan_del is well protected with various mutex (eg, sk, conn, chan) but
+that may not enough to prevent lock waiters from accessing object.
 
-	Gustavo
+Regards,
+Minho Ban
