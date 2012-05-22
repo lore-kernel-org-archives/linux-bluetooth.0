@@ -1,58 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 22 May 2012 11:00:02 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: Re: [PATCH BlueZ v2 2/2] core: Fix creating device from "primary"
- file
-Message-ID: <20120522080002.GA9688@x220>
-References: <1337374667-17802-1-git-send-email-paulo.alcantara@openbossa.org>
- <1337633316-4992-1-git-send-email-paulo.alcantara@openbossa.org>
- <1337633316-4992-3-git-send-email-paulo.alcantara@openbossa.org>
+Date: Tue, 22 May 2012 10:37:42 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv1 17/17] Bluetooth: A2MP: Manage incoming connections
+Message-ID: <20120522073739.GA15818@aemeltch-MOBL1>
+References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1337351150-20526-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <alpine.DEB.2.02.1205211530290.2239@mathewm-linux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337633316-4992-3-git-send-email-paulo.alcantara@openbossa.org>
+In-Reply-To: <alpine.DEB.2.02.1205211530290.2239@mathewm-linux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Mat,
 
-On Mon, May 21, 2012, Paulo Alcantara wrote:
-> From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+On Mon, May 21, 2012 at 03:45:38PM -0700, Mat Martineau wrote:
+...
+> >@@ -4652,10 +4653,15 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+> >
+> >	chan = l2cap_get_chan_by_scid(conn, cid);
+> >	if (!chan) {
+> >-		BT_DBG("unknown cid 0x%4.4x", cid);
+> >-		/* Drop packet and return */
+> >-		kfree_skb(skb);
+> >-		return 0;
+> >+		if (cid == L2CAP_CID_A2MP) {
+> >+			chan = a2mp_channel_create(conn, skb);
 > 
-> This patch removes the hard-coded address type for the BLE device
-> created from the storage.
-> ---
->  src/adapter.c |   10 +++++++---
->  1 files changed, 7 insertions(+), 3 deletions(-)
+> This allocates a new AMP manager for each incoming command, doesn't
+> it?  I'd expect the manager to be created once when it is first
+> needed, then remain active until the ACL is closed.
+
+No. If AMP channel exist it will be returned with l2cap_get_chan_by_scid.
+Channel exist while ACL connection exist.
+
+> >-- 
+> >1.7.9.5
 > 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index dafe595..1ca21e6 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -1940,13 +1940,17 @@ static void create_stored_device_from_primary(char *key, char *value,
->  	struct btd_adapter *adapter = user_data;
->  	struct btd_device *device;
->  	GSList *services, *uuids, *l;
-> +	char address[18];
-> +	uint8_t bdaddr_type;
-> +
-> +	if (sscanf(key, "%17s#%hhu", address, &bdaddr_type) < 2)
-> +		bdaddr_type = BDADDR_LE_PUBLIC;
+> How do you plan to create an AMP manager if you don't get an A2MP
+> command from the remote device first?
 
-That's not safe. What if sscanf returns 0 or a negative value? In that
-case the address variable will remain uninitialized (which is why you
-should have just followed my suggestion of testing for < 1 and returning
-in such a case).
+I have code which is not yet sent. Something like:
 
-Thinking more about this situation I'm not sure if it's any better to
-allow creation of old entries since you won't be able to remove them
-anyway: the remove code looks for a bdaddr#type key which won't exist
-and adding code to look for both types of keys is just bloating the code
-base for a minor benefit.
++void l2cap_discover_amp(struct l2cap_conn *conn)
++{
++	struct a2mp_discov_req req;
++	struct amp_mgr *mgr;
++
++	BT_DBG("%p", conn);
++
++	mgr = amp_mgr_lookup(conn);
++	if (!mgr) {
++		mgr = amp_mgr_create(conn);
++		if (!mgr)
++			return;
++		else
++			amp_mgr_get(mgr);
++	}
++
++	req.mtu = cpu_to_le16(L2CAP_A2MP_DEFAULT_MTU);
++	req.ext_feat = 0;
++	a2mp_send(mgr, A2MP_DISCOVER_REQ, 1, sizeof(req), &req);
++
++	amp_mgr_put(mgr);
++}
 
-So maybe your initial patch of failing in the case of sscanf returning < 2
-is good enough after all.
+Best regards 
+Andrei Emeltchenko 
 
-Johan
