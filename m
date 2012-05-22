@@ -1,58 +1,186 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mat Martineau <mathewm@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	marcel@holtmann.org
-Cc: pkrystad@codeaurora.org
-Subject: [PATCH] Bluetooth: Send a configuration request after security confirmation
-Date: Tue, 22 May 2012 13:48:10 -0700
-Message-Id: <1337719690-986-1-git-send-email-mathewm@codeaurora.org>
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	marcel <marcel@holtmann.org>
+Cc: "tedd.an" <tedd.an@intel.com>
+Subject: [PATCH 2/3] hciattach: replace DBGPRINT macro with common debug print functions
+Date: Tue, 22 May 2012 13:13:06 -0700
+Message-ID: <2246132.lSGiC63fuZ@tedd-ubuntu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Sometimes an ACL link must be raised to a higher security level after
-an L2CAP connection is requested, but before a connection response is
-sent.  In this case, a connection response sent by L2CAP was not
-immediately followed by a configuration request.  Other code paths do
-send this configuration request right away.  It was possible for the
-connection to time out while L2CAP waited for the remote device (like
-PTS) to trigger the configuration process.
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This change immediately sends a configuration request after a connect
-response rather than waiting for a configuration request from the
-remote device.  It fixes connection stalls in a variety of PTS test
-cases.
+This patch removes INTEL_DEBUG macro and replace DBGPRINT with common
+debug print functions.
 
-Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |   11 +++++++++++
- 1 file changed, 11 insertions(+)
+ tools/hciattach_intel.c |   46 ++++++++++++++++------------------------------
+ 1 file changed, 16 insertions(+), 30 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b644f40..f6c3b0c 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5519,6 +5519,17 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 			rsp.status = cpu_to_le16(stat);
- 			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
- 							sizeof(rsp), &rsp);
-+
-+			if (!test_bit(L2CAP_CONF_REQ_SENT, &chan->conf_state) &&
-+			    result == L2CAP_CR_SUCCESS) {
-+				char buf[128];
-+				set_bit(L2CAP_CONF_REQ_SENT, &chan->conf_state);
-+				l2cap_send_cmd(conn, l2cap_get_ident(conn),
-+					       L2CAP_CONF_REQ,
-+					       l2cap_build_conf_req(chan, buf),
-+					       buf);
-+				chan->num_conf_req++;
-+			}
+diff --git a/tools/hciattach_intel.c b/tools/hciattach_intel.c
+index 9129993..ccb0a87 100644
+--- a/tools/hciattach_intel.c
++++ b/tools/hciattach_intel.c
+@@ -41,20 +41,6 @@
+ 
+ #include "hciattach.h"
+ 
+-#ifdef INTEL_DEBUG
+-#define DBGPRINT(fmt, args...)	printf("DBG: " fmt "\n", ## args)
+-#define PRINT_PACKET(buf, len, msg)	{	\
+-	int i;					\
+-	printf("%s\n", msg);			\
+-	for (i = 0; i < len; i++)		\
+-		printf("%02X ", buf[i]);	\
+-	printf("\n");				\
+-	}
+-#else
+-#define DBGPRINT(fmt, args...)
+-#define PRINT_PACKET(buf, len, msg)
+-#endif
+-
+ #define PATCH_SEQ_EXT           ".bseq"
+ #define PATCH_FILE_PATH         "/lib/firmware/intel/"
+ #define PATCH_MAX_LEN           260
+@@ -90,7 +76,7 @@ static int intel_write_cmd(int dev, unsigned char *buf, int len)
+ {
+ 	int ret;
+ 
+-	PRINT_PACKET(buf, len, "<----- SEND CMD: ");
++	dbg_print_pkt("<----- SEND CMD: ", buf, len);
+ 
+ 	ret = write(dev, buf, len);
+ 	if (ret < 0)
+@@ -113,7 +99,7 @@ static int intel_read_evt(int dev, unsigned char *buf, int len)
+ 	if (ret < 0)
+ 		return -1;
+ 
+-	PRINT_PACKET(buf, ret, "-----> READ EVT: ");
++	dbg_print_pkt("-----> READ EVT: ", buf, ret);
+ 
+ 	return ret;
+ }
+@@ -125,18 +111,18 @@ static int validate_events(struct patch_entry *event,
+ 		struct patch_entry *entry)
+ {
+ 	if (event == NULL || entry == NULL) {
+-		DBGPRINT("invalid patch entry parameters");
++		dbg_print("invalid patch entry parameters");
+ 		return -1;
+ 	}
+ 
+ 	if (event->len != entry->len) {
+-		DBGPRINT("lengths are mismatched:[%d|%d]",
++		dbg_print("lengths are mismatched:[%d|%d]",
+ 				event->len, entry->len);
+ 		return -1;
+ 	}
+ 
+ 	if (memcmp(event->data, entry->data, event->len)) {
+-		DBGPRINT("data is mismatched");
++		dbg_print("data is mismatched");
+ 		return -1;
+ 	}
+ 
+@@ -205,7 +191,7 @@ static int intel_download_patch(struct patch_ctx *ctx)
+ 	struct patch_entry entry;
+ 	struct patch_entry event;
+ 
+-	DBGPRINT("start patch downloading");
++	dbg_print("start patch downloading");
+ 
+ 	do {
+ 		ret = get_next_patch_entry(ctx->fd, &entry);
+@@ -237,7 +223,7 @@ static int intel_download_patch(struct patch_ctx *ctx)
+ 			event.len = ret;
+ 
+ 			if (validate_events(&event, &entry) < 0) {
+-				DBGPRINT("events are mismatched");
++				dbg_print("events are mismatched");
+ 				ctx->patch_error = 1;
+ 				return -1;
+ 			}
+@@ -259,11 +245,11 @@ static int open_patch_file(struct patch_ctx *ctx, char *fw_ver)
+ 
+ 	snprintf(patch_file, PATH_MAX, "%s%s%s", PATCH_FILE_PATH,
+ 			fw_ver, PATCH_SEQ_EXT);
+-	DBGPRINT("PATCH_FILE: %s", patch_file);
++	dbg_print("PATCH_FILE: %s", patch_file);
+ 
+ 	ctx->fd = open(patch_file, O_RDONLY);
+ 	if (ctx->fd < 0) {
+-		DBGPRINT("cannot open patch file. go to post patch");
++		dbg_print("cannot open patch file. go to post patch");
+ 		return -1;
+ 	}
+ 
+@@ -279,7 +265,7 @@ static int pre_patch(struct patch_ctx *ctx)
+ 	struct patch_entry entry;
+ 	char fw_ver[INTEL_VER_PARAM_LEN * 2];
+ 
+-	DBGPRINT("start pre_patch");
++	dbg_print("start pre_patch");
+ 
+ 	entry.data[0] = HCI_COMMAND_PKT;
+ 	entry.data[1] = 0x11;
+@@ -303,7 +289,7 @@ static int pre_patch(struct patch_ctx *ctx)
+ 	entry.len = ret;
+ 
+ 	if (entry.data[6] != 0x00) {
+-		DBGPRINT("command failed. status=%02x", entry.data[6]);
++		dbg_print("command failed. status=%02x", entry.data[6]);
+ 		ctx->patch_error = 1;
+ 		return -1;
+ 	}
+@@ -328,7 +314,7 @@ static int pre_patch(struct patch_ctx *ctx)
+ 	entry.len = ret;
+ 
+ 	if (entry.data[6] != 0x00) {
+-		DBGPRINT("command failed. status=%02x", entry.data[6]);
++		dbg_print("command failed. status=%02x", entry.data[6]);
+ 		ctx->patch_error = 1;
+ 		return -1;
+ 	}
+@@ -363,7 +349,7 @@ static int post_patch(struct patch_ctx *ctx)
+ 	int ret;
+ 	struct patch_entry entry;
+ 
+-	DBGPRINT("start post_patch");
++	dbg_print("start post_patch");
+ 
+ 	entry.data[0] = HCI_COMMAND_PKT;
+ 	entry.data[1] = 0x11;
+@@ -422,7 +408,7 @@ static int intel_patch_device(struct patch_ctx *ctx)
+ 			return ret;
  		}
  
- 		l2cap_chan_unlock(chan);
+-		DBGPRINT("patch failed. proceed to post patch");
++		dbg_print("patch failed. proceed to post patch");
+ 		goto post_patch;
+ 	}
+ 
+@@ -434,7 +420,7 @@ static int intel_patch_device(struct patch_ctx *ctx)
+ 			return ret;
+ 		}
+ 	} else {
+-		DBGPRINT("patch done");
++		dbg_print("patch done");
+ 		ctx->reset_enable_patch = 1;
+ 	}
+ 
+@@ -515,7 +501,7 @@ static int change_baudrate(int dev, int init_speed, int *speed,
+ 	unsigned char cmd[5];
+ 	unsigned char evt[7];
+ 
+-	DBGPRINT("start baudrate change");
++	dbg_print("start baudrate change");
+ 
+ 	ret = set_rts(dev, 0);
+ 	if (ret < 0) {
 -- 
-1.7.10
+1.7.9.5
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
