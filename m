@@ -1,64 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 22 May 2012 12:30:18 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH 3/4] monitor: add filter support
-Message-ID: <20120522153018.GA3708@joana>
-References: <1337665227-7228-1-git-send-email-gustavo@padovan.org>
- <1337665227-7228-2-git-send-email-gustavo@padovan.org>
- <1337665227-7228-3-git-send-email-gustavo@padovan.org>
- <20120522150239.GA12709@samus>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120522150239.GA12709@samus>
+In-Reply-To: <1337698698-15471-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1337698698-15471-1-git-send-email-mikel.astiz.oss@gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Tue, 22 May 2012 12:07:09 -0300
+Message-ID: <CAMOw1v6WZCn5CP67Wp4o+VJCC76tn-yiZherrNmEbiRvu_ZUeA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1] gdbus: Fix incorrectly discarded signals
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+On Tue, May 22, 2012 at 11:58 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>
+> Signals with no arguments were incorrectly filtered out due to the NULL
+> inequality check.
+> ---
+>  gdbus/object.c |   10 +++-------
+>  1 files changed, 3 insertions(+), 7 deletions(-)
+>
+> diff --git a/gdbus/object.c b/gdbus/object.c
+> index 2dd7c0e..900e7ab 100644
+> --- a/gdbus/object.c
+> +++ b/gdbus/object.c
+> @@ -612,16 +612,12 @@ static gboolean check_signal(DBusConnection *conn, const char *path,
+>        for (signal = iface->signals; signal && signal->name; signal++) {
+>                if (!strcmp(signal->name, name)) {
+>                        *args = signal->args;
+> -                       break;
+> +                       return TRUE;
+>                }
+>        }
+>
+> -       if (*args == NULL) {
+> -               error("No signal named %s on interface %s", name, interface);
+> -               return FALSE;
+> -       }
+> -
+> -       return TRUE;
+> +       error("No signal named %s on interface %s", name, interface);
+> +       return FALSE;
+>  }
 
-* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2012-05-22 12:02:39 -0300]:
+Ack.
 
-> Hi Gustavo,
-> 
-> Here are some nitpicks, feel free to ignore them.
-> 
-> On 02:40 Tue 22 May, Gustavo Padovan wrote:
-> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> 
-> The title "add filter support" is not totally correct, there was some
-> support for filters, but it was quite basic, right?
-
-Quite basic, and there wasn't any option to set it from command line so I
-decided to call this "add filter support"
-
-> 
-> > 
-> > the packet code receives the data parsed from the filter file and apply
-> > the proper filters to the devices.
-> > ---
-> >  monitor/config_file.c |    4 +-
-> >  monitor/config_file.h |    1 +
-> >  monitor/main.c        |   21 +++++-----
-> >  monitor/packet.c      |  108 ++++++++++++++++++++++++++++++++++++++++---------
-> >  monitor/packet.h      |    4 +-
-> >  5 files changed, 106 insertions(+), 32 deletions(-)
-> > 
-> > diff --git a/monitor/config_file.c b/monitor/config_file.c
-> > index 6fb50f9..464fe4f 100644
-> > --- a/monitor/config_file.c
-> > +++ b/monitor/config_file.c
-> > @@ -79,7 +79,7 @@ static struct filter_options {
-> >  
-> >  struct controller *controller;
-> >  
-> > -static void free_controllers_list(struct list *controllers_l)
-> > +void controllers_list_free(struct list *controllers_l)
-> 
-> This change is somewhat unrelated.
-
-Kind of, I had to export this function for this patch and I changed the name
-to some that makes more sense.
-
-	Gustavo
+Lucas De Marchi
