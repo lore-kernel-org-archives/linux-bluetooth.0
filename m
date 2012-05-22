@@ -1,68 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <4FBAFEF5.2000207@samsung.com>
-Date: Tue, 22 May 2012 11:50:29 +0900
-From: Minho Ban <mhban@samsung.com>
-MIME-version: 1.0
-To: Gustavo Padovan <gustavo@padovan.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC/PATCH] Bluetooth: prevent double l2cap_chan_destroy
-References: <4FB992C8.8090105@samsung.com> <20120521162137.GE16942@joana>
-In-reply-to: <20120521162137.GE16942@joana>
-Content-type: text/plain; charset=ISO-8859-1
+Date: Mon, 21 May 2012 23:00:04 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Anton Weber <anton@antweb.me>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: GSoC: Bluetooth Replayer update
+Message-ID: <20120522020004.GG16942@joana>
+References: <CA+6PnXxc8CQ7q6LGkDWbP_-2P+4U_MX3rTt237PHhN2nGXeYag@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CA+6PnXxc8CQ7q6LGkDWbP_-2P+4U_MX3rTt237PHhN2nGXeYag@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 05/22/2012 01:21 AM, Gustavo Padovan wrote:
-> Hi Minho,
+Hi Anton,
+
+* Anton Weber <anton@antweb.me> [2012-05-21 19:39:49 +0100]:
+
+> Hello everyone!
 > 
-> * Minho Ban <mhban@samsung.com> [2012-05-21 09:56:40 +0900]:
+> Now that the coding period for GSoC started, I will be regularly
+> posting updates to the mailing list.
+> This is meant to share my progress, but also to get get the community involved.
+> If you have any feedback or suggestions, about the things I wrote or
+> about my project in general, please let me know!
+> As mentioned in my first email, you can always contact me directly via
+> email or IRC as well.
 > 
->> l2cap_sock_kill can be called in l2cap_sock_release and l2cap_sock_close_cb
->> either. This lead l2cap_chan_destroy to be called twice for same channel.
->> To prevent double list_del and double chan_put, chan_destroy should be protected
->> with chan->refcnt and chan_list_lock so that reentrance could be forbidden.
+> To give everyone a better idea of what my project is about, I have
+> uploaded the initial project proposal:
+> http://antweb.me/tl_files/blog/gsoc12/gsoc_proposal.pdf
+> I will do things slightly differently now that I have more of an idea
+> what I'm dealing with, but the main structure should stay the same.
 > 
-> Even if l2cap_sock_kill() is called twice it will call l2cap_chan_destroy()
-> only once. If this is not happening we just have a broken piece of code
-> somewhere else and not here.
+> What happened so far:
+> - read up on various guides and the Bluetooth specification
+> - played around with git (will upload my work to github once I got
+> that far and possibly fork the bluez repo at some point if required)
+> - went through hcidump sources (found many bits of code I can reuse,
+> especially the parser)
+> - had a look at hciemu, but didn't get too far yet
 > 
-> 	Gustavo
-> 
+> Next up:
+> - Find out more about hciemu
+> - Getting used to automake
+> - Write a tool that can execute a simple sequence of commands on a
+> VHCI interface.
+>   I will start off with a standalone tool for now, but it might be a
+> good idea to integrate it in hcidump (more about that when I got that
+> far).
 
-Thanks for comment but I could not found any suitable code in l2cap_sock_kill that 
-can make l2cap_chan_destroy to be called just once. sock flag test is not enough to 
-do it.
+Actually you should use btmon here, instead hcidump. btmon can log starting
+from the time you plug the bluetooth dongle.
+And we have btsnoop output there too, I think you can use it to extract the
+data to replay.
 
-I agree this path should not be the fix. Testing chan->refcnt is nonsense because 
-chan might have been freed already. So I looked for another point,
-
-@@ -1343,10 +1343,10 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
-                l2cap_chan_lock(chan);
- 
-                l2cap_chan_del(chan, err);
-+               chan->ops->close(chan->data);
- 
-                l2cap_chan_unlock(chan);
- 
--               chan->ops->close(chan->data);
-                l2cap_chan_put(chan);
-        }
-
-close callback must locate within chan_lock unless it can be scheduled to other thread 
-which may wait for chan_lock in l2cap_sock_shutdown and this lead to duplicate sock_kill.
-
- static void l2cap_sock_kill(struct sock *sk)
- {
--       if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
-+       if (!sock_flag(sk, SOCK_ZAPPED) || sock_flag(sk, SOCK_DEAD) ||
-+                       sk->sk_socket)
-                return;
- 
-        BT_DBG("sk %p state %s", sk, state_to_string(sk->sk_state));
-
-Duplicate sock_kill may happen anyway, need test SOCK_DEAD if chan_destroy is already called.
-
-Regards,
-Minho Ban
+	Gustavo
