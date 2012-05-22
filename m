@@ -1,72 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 22 May 2012 10:37:42 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1 17/17] Bluetooth: A2MP: Manage incoming connections
-Message-ID: <20120522073739.GA15818@aemeltch-MOBL1>
-References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1337351150-20526-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <alpine.DEB.2.02.1205211530290.2239@mathewm-linux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.02.1205211530290.2239@mathewm-linux>
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: [PATCH 4/4] monitor: add example filter file
+Date: Tue, 22 May 2012 02:40:27 -0300
+Message-Id: <1337665227-7228-4-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1337665227-7228-3-git-send-email-gustavo@padovan.org>
+References: <1337665227-7228-1-git-send-email-gustavo@padovan.org>
+ <1337665227-7228-2-git-send-email-gustavo@padovan.org>
+ <1337665227-7228-3-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-On Mon, May 21, 2012 at 03:45:38PM -0700, Mat Martineau wrote:
-...
-> >@@ -4652,10 +4653,15 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
-> >
-> >	chan = l2cap_get_chan_by_scid(conn, cid);
-> >	if (!chan) {
-> >-		BT_DBG("unknown cid 0x%4.4x", cid);
-> >-		/* Drop packet and return */
-> >-		kfree_skb(skb);
-> >-		return 0;
-> >+		if (cid == L2CAP_CID_A2MP) {
-> >+			chan = a2mp_channel_create(conn, skb);
-> 
-> This allocates a new AMP manager for each incoming command, doesn't
-> it?  I'd expect the manager to be created once when it is first
-> needed, then remain active until the ACL is closed.
+---
+ monitor/filter.example |   31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+ create mode 100644 monitor/filter.example
 
-No. If AMP channel exist it will be returned with l2cap_get_chan_by_scid.
-Channel exist while ACL connection exist.
-
-> >-- 
-> >1.7.9.5
-> 
-> How do you plan to create an AMP manager if you don't get an A2MP
-> command from the remote device first?
-
-I have code which is not yet sent. Something like:
-
-+void l2cap_discover_amp(struct l2cap_conn *conn)
-+{
-+	struct a2mp_discov_req req;
-+	struct amp_mgr *mgr;
+diff --git a/monitor/filter.example b/monitor/filter.example
+new file mode 100644
+index 0000000..e84b07f
+--- /dev/null
++++ b/monitor/filter.example
+@@ -0,0 +1,31 @@
++#
++# Example filter file for btmon.
++#
++# It should be used with the -f option of btmon:
++#
++# $ btmon -f <filter file>
++#
++#
++# The basic structure of the file is show below, we always need a 'Controller'
++# keyword followed by a Bluetooth pattern, wild card is accepted.
++#
++# Then there is 4 possible configurations you can specify:
++#  - 'Timestamps' to show timestamps or not
++#  - 'Show' to selects which protocols to show, any protocol not listed here is
++# hided.
++#  - 'Hide' to hide specific protocols. All the others are shown. 'Show' and
++# 'Hide' can't be used together.
++#  - 'Ignore' to ignore this device in btmon.
++#
++# The available options for 'Show' and 'Hide' are l2cap, sco and hci.
 +
-+	BT_DBG("%p", conn);
++Controller *
++	Timestamps on
++	Show l2cap
 +
-+	mgr = amp_mgr_lookup(conn);
-+	if (!mgr) {
-+		mgr = amp_mgr_create(conn);
-+		if (!mgr)
-+			return;
-+		else
-+			amp_mgr_get(mgr);
-+	}
++Controller 00:11:22:33:44:55
++	Timestamps off
++	Hide sco,hci
 +
-+	req.mtu = cpu_to_le16(L2CAP_A2MP_DEFAULT_MTU);
-+	req.ext_feat = 0;
-+	a2mp_send(mgr, A2MP_DISCOVER_REQ, 1, sizeof(req), &req);
-+
-+	amp_mgr_put(mgr);
-+}
-
-Best regards 
-Andrei Emeltchenko 
++Controller CA:FE:CA:FE:*
++	Ignore
+-- 
+1.7.10.1
 
