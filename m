@@ -1,173 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1337742314.15105.23.camel@aeonflux>
-Subject: Re: [PATCH 2/3] Bluetooth: Fix coding style in include/net/bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Date: Wed, 23 May 2012 05:05:14 +0200
-In-Reply-To: <1337724020-3171-2-git-send-email-gustavo@padovan.org>
-References: <1337724020-3171-1-git-send-email-gustavo@padovan.org>
-	 <1337724020-3171-2-git-send-email-gustavo@padovan.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
+Message-id: <4FBC3FD6.6050704@samsung.com>
+Date: Wed, 23 May 2012 10:39:34 +0900
+From: Minho Ban <mhban@samsung.com>
+To: Chanyeol Park <chanyeol.park@samsung.com>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC/PATCH] Bluetooth: prevent double l2cap_chan_destroy
+References: <4FB992C8.8090105@samsung.com> <20120521162137.GE16942@joana>
+ <4FBAFEF5.2000207@samsung.com> <4FBB8544.3040408@samsung.com>
+In-reply-to: <4FBB8544.3040408@samsung.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
-
-> Fix all warning and errors reported by checkpatch but license trailing
-> whitespace and bdaddr_t definition.
+On 05/22/2012 09:23 PM, Chanyeol Park wrote:
+> Hi
 > 
-> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> ---
->  include/net/bluetooth/bluetooth.h |   26 ++++++++++++++------------
->  include/net/bluetooth/hci.h       |    4 ++--
->  include/net/bluetooth/hci_core.h  |   12 +++++++-----
->  3 files changed, 23 insertions(+), 19 deletions(-)
+> On 2012년 05월 22일 11:50, Minho Ban wrote:
+>> @@ -1343,10 +1343,10 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+>>                  l2cap_chan_lock(chan);
+>>
+>>                  l2cap_chan_del(chan, err);
+>> +               chan->ops->close(chan->data);
+>>
+>>                  l2cap_chan_unlock(chan);
+>>
+>> -               chan->ops->close(chan->data);
+>>                  l2cap_chan_put(chan);
+>>          }
+> I think this patch does not make sense Because inside chan->ops->close() "chan" could be freed in the l2cap_chan_destroy().
 > 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 961669b..dc6e819 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -25,7 +25,7 @@
->  #ifndef __BLUETOOTH_H
->  #define __BLUETOOTH_H
->  
-> -#include <asm/types.h>
-> +#include <linux/types.h>
->  #include <asm/byteorder.h>
->  #include <linux/list.h>
->  #include <linux/poll.h>
-> @@ -168,8 +168,8 @@ typedef struct {
->  #define BDADDR_LE_PUBLIC	0x01
->  #define BDADDR_LE_RANDOM	0x02
->  
-> -#define BDADDR_ANY   (&(bdaddr_t) {{0, 0, 0, 0, 0, 0}})
-> -#define BDADDR_LOCAL (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
-> +#define BDADDR_ANY   (&(bdaddr_t) {{0, 0, 0, 0, 0, 0} })
-> +#define BDADDR_LOCAL (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff} })
->  
->  /* Copy, swap, convert BD Address */
->  static inline int bacmp(bdaddr_t *ba1, bdaddr_t *ba2)
-> @@ -215,7 +215,7 @@ int  bt_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
->  				struct msghdr *msg, size_t len, int flags);
->  int  bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
->  			struct msghdr *msg, size_t len, int flags);
-> -uint bt_sock_poll(struct file * file, struct socket *sock, poll_table *wait);
-> +uint bt_sock_poll(struct file *file, struct socket *sock, poll_table *wait);
->  int  bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
->  int  bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo);
->  
-> @@ -225,12 +225,12 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock);
->  
->  /* Skb helpers */
->  struct l2cap_ctrl {
-> -	unsigned int	sframe	: 1,
-> -			poll	: 1,
-> -			final	: 1,
-> -			fcs	: 1,
-> -			sar	: 2,
-> -			super	: 2;
-> +	unsigned int	sframe:1,
-> +			poll:1,
-> +			final:1,
-> +			fcs:1,
-> +			sar:2,
-> +			super:2;
->  	__u16		reqseq;
->  	__u16		txseq;
->  	__u8		retries;
-> @@ -249,7 +249,8 @@ static inline struct sk_buff *bt_skb_alloc(unsigned int len, gfp_t how)
->  {
->  	struct sk_buff *skb;
->  
-> -	if ((skb = alloc_skb(len + BT_SKB_RESERVE, how))) {
-> +	skb = alloc_skb(len + BT_SKB_RESERVE, how);
-> +	if (skb) {
->  		skb_reserve(skb, BT_SKB_RESERVE);
->  		bt_cb(skb)->incoming  = 0;
->  	}
-> @@ -261,7 +262,8 @@ static inline struct sk_buff *bt_skb_send_alloc(struct sock *sk,
->  {
->  	struct sk_buff *skb;
->  
-> -	if ((skb = sock_alloc_send_skb(sk, len + BT_SKB_RESERVE, nb, err))) {
-> +	skb = sock_alloc_send_skb(sk, len + BT_SKB_RESERVE, nb, err);
-> +	if (skb) {
->  		skb_reserve(skb, BT_SKB_RESERVE);
->  		bt_cb(skb)->incoming  = 0;
->  	}
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 66a7b57..1f18f2e 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1307,12 +1307,12 @@ static inline struct hci_sco_hdr *hci_sco_hdr(const struct sk_buff *skb)
->  }
->  
->  /* Command opcode pack/unpack */
-> -#define hci_opcode_pack(ogf, ocf)	(__u16) ((ocf & 0x03ff)|(ogf << 10))
-> +#define hci_opcode_pack(ogf, ocf)	((__u16) ((ocf & 0x03ff)|(ogf << 10)))
->  #define hci_opcode_ogf(op)		(op >> 10)
->  #define hci_opcode_ocf(op)		(op & 0x03ff)
->  
->  /* ACL handle and flags pack/unpack */
-> -#define hci_handle_pack(h, f)	(__u16) ((h & 0x0fff)|(f << 12))
-> +#define hci_handle_pack(h, f)	((__u16) ((h & 0x0fff)|(f << 12)))
->  #define hci_handle(h)		(h & 0x0fff)
->  #define hci_flags(h)		(h >> 12)
->  
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 9fc7728..619d725 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -65,7 +65,7 @@ struct discovery_state {
->  		DISCOVERY_RESOLVING,
->  		DISCOVERY_STOPPING,
->  	} state;
-> -	struct list_head	all;		/* All devices found during inquiry */
-> +	struct list_head	all;	/* All devices found during inquiry */
->  	struct list_head	unknown;	/* Name state not known */
->  	struct list_head	resolve;	/* Name needs to be resolved */
->  	__u32			timestamp;
-> @@ -360,7 +360,8 @@ extern int l2cap_connect_cfm(struct hci_conn *hcon, u8 status);
->  extern int l2cap_disconn_ind(struct hci_conn *hcon);
->  extern int l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason);
->  extern int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt);
-> -extern int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags);
-> +extern int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb,
-> +			      u16 flags);
->  
->  extern int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
->  extern int sco_connect_cfm(struct hci_conn *hcon, __u8 status);
-> @@ -429,8 +430,8 @@ enum {
->  static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
->  {
->  	struct hci_dev *hdev = conn->hdev;
-> -	return (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
-> -				test_bit(HCI_CONN_SSP_ENABLED, &conn->flags));
-> +	return test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
-> +				test_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
 
-if you are changing things here, then you might wanna fix the coding
-style correctly and indent the second test_bit properly.
-
->  }
->  
->  static inline void hci_conn_hash_init(struct hci_dev *hdev)
-> @@ -661,7 +662,8 @@ int hci_get_conn_info(struct hci_dev *hdev, void __user *arg);
->  int hci_get_auth_info(struct hci_dev *hdev, void __user *arg);
->  int hci_inquiry(void __user *arg);
->  
-> -struct bdaddr_list *hci_blacklist_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr);
-> +struct bdaddr_list *hci_blacklist_lookup(struct hci_dev *hdev,
-> +					 bdaddr_t *bdaddr);
->  int hci_blacklist_clear(struct hci_dev *hdev);
->  int hci_blacklist_add(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
->  int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
-
-Regards
-
-Marcel
-
-
+I agree, thanks for pointing out.
