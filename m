@@ -1,53 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 May 2012 11:20:15 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	marcel@holtmann.org, pkrystad@codeaurora.org
-Subject: Re: [PATCHv2] Bluetooth: Send a configuration request after security
- confirmation
-Message-ID: <20120523082013.GB32022@aemeltch-MOBL1>
-References: <1337720145-8019-1-git-send-email-mathewm@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337720145-8019-1-git-send-email-mathewm@codeaurora.org>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: mathewm@codeaurora.org
+Subject: [RFC] Bluetooth: Adds unlink to chan ops
+Date: Wed, 23 May 2012 11:05:49 +0300
+Message-Id: <1337760349-301-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, May 22, 2012 at 01:55:45PM -0700, Mat Martineau wrote:
-> Sometimes an ACL link must be raised to a higher security level after
-> an L2CAP connection is requested, but before a connection response is
-> sent.  In this case, a connection response sent by L2CAP was not
-> immediately followed by a configuration request.  Other code paths do
-> send this configuration request right away.  It was possible for the
-> connection to time out while L2CAP waited for the remote device (like
-> PTS) to trigger the configuration process.
-> 
-> This change immediately sends a configuration request after a connect
-> response rather than waiting for a configuration request from the
-> remote device.  It fixes connection stalls in a variety of PTS test
-> cases.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  net/bluetooth/l2cap_core.c |   11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index b644f40..14c27f4 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -5519,6 +5519,17 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
->  			rsp.status = cpu_to_le16(stat);
->  			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
->  							sizeof(rsp), &rsp);
-> +
-> +			if (!test_bit(CONF_REQ_SENT, &chan->conf_state) &&
-> +			    res == L2CAP_CR_SUCCESS) {
+This helps to separate socket and socketless code. Now socket related
+operations moved to l2cap_sock in unlink callback for channels with sk.
 
-This looks more readable but I think we used to have constructions like
-!status so this would translate to !res
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Reported-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/l2cap_core.c    |   20 ++------------------
+ net/bluetooth/l2cap_sock.c    |   25 +++++++++++++++++++++++++
+ 3 files changed, 28 insertions(+), 18 deletions(-)
 
-Best regards 
-Andrei Emeltchenko 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 69ef077..7ed13e7 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -532,6 +532,7 @@ struct l2cap_ops {
+ 	void			(*state_change) (void *data, int state);
+ 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
+ 					       unsigned long len, int nb);
++	void			(*unlink) (struct l2cap_chan *chan, int err);
+ };
+ 
+ struct l2cap_conn {
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index c64da38..d2b16b5 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -520,9 +520,7 @@ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ 
+ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ {
+-	struct sock *sk = chan->sk;
+ 	struct l2cap_conn *conn = chan->conn;
+-	struct sock *parent;
+ 
+ 	__clear_chan_timer(chan);
+ 
+@@ -541,22 +539,8 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 	if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
+ 		goto clean;
+ 
+-	lock_sock(sk);
+-
+-	__l2cap_state_change(chan, BT_CLOSED);
+-	sock_set_flag(sk, SOCK_ZAPPED);
+-
+-	if (err)
+-		__l2cap_chan_set_err(chan, err);
+-
+-	parent = bt_sk(sk)->parent;
+-	if (parent) {
+-		bt_accept_unlink(sk);
+-		parent->sk_data_ready(parent, 0);
+-	} else
+-		sk->sk_state_change(sk);
+-
+-	release_sock(sk);
++	if (chan->ops->unlink)
++		chan->ops->unlink(chan, err);
+ 
+ 	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
+ 		return;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 3bb1611..d6f481b 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -955,6 +955,30 @@ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
+ 	return skb;
+ }
+ 
++static void l2cap_sock_unlink_cb(struct l2cap_chan *chan, int err)
++{
++	struct sock *sk = chan->sk;
++	struct sock *parent = bt_sk(sk)->parent;
++
++	lock_sock(sk);
++
++	chan->state = BT_CLOSED;
++	sk->sk_state = BT_CLOSED;
++	sock_set_flag(sk, SOCK_ZAPPED);
++
++	if (err)
++		sk->sk_err = err;
++
++	parent = bt_sk(sk)->parent;
++	if (parent) {
++		bt_accept_unlink(sk);
++		parent->sk_data_ready(parent, 0);
++	} else
++		sk->sk_state_change(sk);
++
++	release_sock(sk);
++}
++
+ static struct l2cap_ops l2cap_chan_ops = {
+ 	.name		= "L2CAP Socket Interface",
+ 	.new_connection	= l2cap_sock_new_connection_cb,
+@@ -962,6 +986,7 @@ static struct l2cap_ops l2cap_chan_ops = {
+ 	.close		= l2cap_sock_close_cb,
+ 	.state_change	= l2cap_sock_state_change_cb,
+ 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
++	.unlink		= l2cap_sock_unlink_cb,
+ };
+ 
+ static void l2cap_sock_destruct(struct sock *sk)
+-- 
+1.7.9.5
+
