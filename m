@@ -2,39 +2,45 @@ Return-Path: <cyrus@holtmann.org>
 From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Syam Sidhardhan <s.syam@samsung.com>
-Subject: [PATCH BlueZ 01/12] monitor: Fix memory leak
-Date: Wed, 23 May 2012 21:27:21 +0530
-Message-id: <1337788652-23697-2-git-send-email-s.syam@samsung.com>
-In-reply-to: <1337788652-23697-1-git-send-email-s.syam@samsung.com>
-References: <1337788652-23697-1-git-send-email-s.syam@samsung.com>
+Subject: [PATCH BlueZ 00/12] Redundant D-Bus error init, remove unwanted code,
+ g_free missmatch etc
+Date: Wed, 23 May 2012 21:27:20 +0530
+Message-id: <1337788652-23697-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- monitor/hcidump.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+This series of patches resolves:
+Memory leak, free - g_free mismatch, redundant D-Bus error initilization
+and remove unwanted code.
 
-diff --git a/monitor/hcidump.c b/monitor/hcidump.c
-index 043c75e..373d2f5 100644
---- a/monitor/hcidump.c
-+++ b/monitor/hcidump.c
-@@ -233,7 +233,7 @@ static void device_list(int fd, int max_dev)
- 
- 	if (ioctl(fd, HCIGETDEVLIST, (void *) dl) < 0) {
- 		perror("Failed to get device list");
--		return;
-+		goto done;
- 	}
- 
- 	for (i = 0; i < dl->dev_num; i++, dr++) {
-@@ -253,6 +253,7 @@ static void device_list(int fd, int max_dev)
- 		open_device(dr->dev_id);
- 	}
- 
-+done:
- 	free(dl);
- }
- 
+Syam Sidhardhan (12):
+  monitor: Fix memory leak
+  storage: Use g_free() instead of free()
+  media: Remove redundant D-Bus error initilization
+  telephony-maemo5: Remove redundant D-Bus error initilizations
+  telephony-maemo6: Remove redundant D-Bus error initilization
+  telephony-ofono: Remove redundant D-Bus error initilization
+  agent: Remove redundant D-Bus error initilizations
+  Remove redundant D-Bus error initilization in maemo6 plugin
+  avctp: Fix NULL check after dereference
+  adapter: Remove unwanted if check and code
+  audio: Remove unwanted code from manager
+  input: Remove unwanted codes from device
+
+ audio/avctp.c            |    3 ++-
+ audio/manager.c          |    2 --
+ audio/media.c            |    1 -
+ audio/telephony-maemo5.c |    5 -----
+ audio/telephony-maemo6.c |    1 -
+ audio/telephony-ofono.c  |    1 -
+ input/device.c           |    5 -----
+ monitor/hcidump.c        |    3 ++-
+ plugins/maemo6.c         |    1 -
+ src/adapter.c            |    3 ---
+ src/agent.c              |    5 -----
+ src/storage.c            |    6 +++---
+ 12 files changed, 7 insertions(+), 29 deletions(-)
+
 -- 
 1.7.4.1
 
