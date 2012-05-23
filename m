@@ -1,178 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 02/19] Bluetooth: Add ready to L2CAP channel ops
-Date: Wed, 23 May 2012 18:37:08 +0300
-Message-Id: <1337787445-23235-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH obexd v0 06/16] client-doc: Remove D-Bus agent
+Date: Wed, 23 May 2012 17:00:08 +0200
+Message-Id: <1337785218-8661-7-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1337785218-8661-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1337785218-8661-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Addings ops->ready() helps to separate socket and socketless
-L2CAP channels.
+The request confirmation from the agent is not really useful and the
+rest of the reporting is already reported by the transfer's signal-
+reporting.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+The main benefit of this is that the API is simpler and the client apps
+do not have to register the agent, and can just listen to the relevant
+signals.
 ---
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/l2cap_core.c    |   42 +++++++++++------------------------------
- net/bluetooth/l2cap_sock.c    |   28 +++++++++++++++++++++++++++
- 3 files changed, 40 insertions(+), 31 deletions(-)
+ doc/client-api.txt |   52 ----------------------------------------------------
+ 1 files changed, 0 insertions(+), 52 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index a017249..83a67e8 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -530,6 +530,7 @@ struct l2cap_ops {
- 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
- 					       unsigned long len, int nb);
- 	void			(*unlink) (struct l2cap_chan *chan, int err);
-+	void			(*ready) (struct l2cap_chan *chan);
- };
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index 527df05..656c492 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -46,15 +46,6 @@ Methods		dict GetProperties()
  
- struct l2cap_conn {
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index c81b828..d5ea8af 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -407,7 +407,7 @@ struct l2cap_chan *l2cap_chan_create(void)
+ 			Returns all properties for the session.
  
- 	atomic_set(&chan->refcnt, 1);
- 
--	/* This flag is cleared in l2cap_chan_ready() */
-+	/* This flag is cleared in l2cap chan ops->ready() */
- 	set_bit(CONF_NOT_COMPLETE, &chan->conf_state);
- 
- 	BT_DBG("chan %p", chan);
-@@ -953,36 +953,13 @@ static void l2cap_send_conn_req(struct l2cap_chan *chan)
- 	l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_REQ, sizeof(req), &req);
- }
- 
--static void l2cap_chan_ready(struct l2cap_chan *chan)
--{
--	struct sock *sk = chan->sk;
--	struct sock *parent;
+-		void AssignAgent(object agent)
 -
--	lock_sock(sk);
+-			Assign an OBEX agent to this session. This allows
+-			detailed progress reports about the transactions.
 -
--	parent = bt_sk(sk)->parent;
+-		void ReleaseAgent(object agent)
 -
--	BT_DBG("sk %p, parent %p", sk, parent);
+-			Release a previously assigned OBEX agent.
 -
--	/* This clears all conf flags, including CONF_NOT_COMPLETE */
--	chan->conf_state = 0;
--	__clear_chan_timer(chan);
+ 		string GetCapabilities()
+ 
+ 			Get remote device capabilities.
+@@ -330,46 +321,3 @@ Signals		PropertyChanged(string name, variant value)
+ 
+ 			Informs that the transfer has been terminated because
+ 			of some error.
 -
--	__l2cap_state_change(chan, BT_CONNECTED);
--	sk->sk_state_change(sk);
+-Agent hierarchy
+-===============
 -
--	if (parent)
--		parent->sk_data_ready(parent, 0);
+-Service		unique name
+-Interface	org.openobex.Agent
+-Object path	freely definable
 -
--	release_sock(sk);
--}
+-Methods		void Release()
 -
- static void l2cap_do_start(struct l2cap_chan *chan)
- {
- 	struct l2cap_conn *conn = chan->conn;
- 
- 	if (conn->hcon->type == LE_LINK) {
--		l2cap_chan_ready(chan);
-+		if (chan->ops->ready)
-+			chan->ops->ready(chan);
- 		return;
- 	}
- 
-@@ -1242,8 +1219,8 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 
- 		if (conn->hcon->type == LE_LINK) {
- 			if (smp_conn_security(conn, chan->sec_level))
--				l2cap_chan_ready(chan);
+-			This method gets called when the service daemon
+-			unregisters the agent. An agent can use it to do
+-			cleanup tasks. There is no need to unregister the
+-			agent, because when this method gets called it has
+-			already been unregistered.
 -
-+				if (chan->ops->ready)
-+					chan->ops->ready(chan);
- 		} else if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
- 			struct sock *sk = chan->sk;
- 			__clear_chan_timer(chan);
-@@ -3639,7 +3616,8 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		if (err < 0)
- 			l2cap_send_disconn_req(chan->conn, chan, -err);
- 		else
--			l2cap_chan_ready(chan);
-+			if (chan->ops->ready)
-+				chan->ops->ready(chan);
- 
- 		goto unlock;
- 	}
-@@ -3770,7 +3748,8 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		if (err < 0)
- 			l2cap_send_disconn_req(chan->conn, chan, -err);
- 		else
--			l2cap_chan_ready(chan);
-+			if (chan->ops->ready)
-+				chan->ops->ready(chan);
- 	}
- 
- done:
-@@ -5420,7 +5399,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 		if (chan->scid == L2CAP_CID_LE_DATA) {
- 			if (!status && encrypt) {
- 				chan->sec_level = hcon->sec_level;
--				l2cap_chan_ready(chan);
-+				if (chan->ops->ready)
-+					chan->ops->ready(chan);
- 			}
- 
- 			l2cap_chan_unlock(chan);
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 6749d11..2e078c4 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -978,6 +978,33 @@ static void l2cap_sock_unlink_cb(struct l2cap_chan *chan, int err)
- 	release_sock(sk);
- }
- 
-+static void l2cap_sock_chan_ready_cb(struct l2cap_chan *chan)
-+{
-+	struct sock *sk = chan->sk;
-+	struct sock *parent;
-+
-+	lock_sock(sk);
-+
-+	parent = bt_sk(sk)->parent;
-+
-+	BT_DBG("sk %p, parent %p", sk, parent);
-+
-+	__clear_chan_timer(chan);
-+
-+	/* This clears all conf flags, including CONF_NOT_COMPLETE */
-+	chan->conf_state = 0;
-+
-+	chan->state = BT_CONNECTED;
-+	sk->sk_state = BT_CONNECTED;
-+
-+	sk->sk_state_change(sk);
-+
-+	if (parent)
-+		parent->sk_data_ready(parent, 0);
-+
-+	release_sock(sk);
-+}
-+
- static struct l2cap_ops l2cap_chan_ops = {
- 	.name		= "L2CAP Socket Interface",
- 	.new_connection	= l2cap_sock_new_connection_cb,
-@@ -986,6 +1013,7 @@ static struct l2cap_ops l2cap_chan_ops = {
- 	.state_change	= l2cap_sock_state_change_cb,
- 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
- 	.unlink		= l2cap_sock_unlink_cb,
-+	.ready		= l2cap_sock_chan_ready_cb,
- };
- 
- static void l2cap_sock_destruct(struct sock *sk)
+-		string Request(object transfer)
+-
+-			Accept or reject a new transfer (client and server)
+-			and provide the filename for it.
+-
+-			In case of incoming transfers it is the filename
+-			where to store the file and for outgoing transfers
+-			it is the filename to show the remote device. If left
+-			empty it will be calculated automatically.
+-
+-			Possible errors: org.openobex.Error.Rejected
+-					 org.openobex.Error.Canceled
+-
+-		void Progress(object transfer, uint64 transferred)
+-
+-			Progress within the transfer has been made. The
+-			number of transferred bytes is given as second
+-			argument for convenience.
+-
+-		void Complete(object transfer)
+-
+-			Informs that the transfer has completed successfully.
+-
+-		void Error(object transfer, string message)
+-
+-			Informs that the transfer has been terminated because
+-			of some error.
 -- 
-1.7.9.5
+1.7.7.6
 
