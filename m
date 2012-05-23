@@ -1,37 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1337770927.15105.72.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Rename HCI_QUIRK_NO_RESET to
- HCI_QUIRK_RESET_ON_CLOSE
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, kanak.gupta@stericsson.com
-Date: Wed, 23 May 2012 13:02:07 +0200
-In-Reply-To: <1337769346-16306-1-git-send-email-szymon.janc@tieto.com>
-References: <1337769346-16306-1-git-send-email-szymon.janc@tieto.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1337770651-9282-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1337770651-9282-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 23 May 2012 08:00:54 -0300
+Message-ID: <CAA37ikbxf9bgZeHRwQ3svizkm6caQ_XyoMJEipw+i4y1mpmjjA@mail.gmail.com>
+Subject: Re: [RFC] Bluetooth: Add L2CAP chan ready op
+From: Ulisses Furquim <ulisses@profusion.mobi>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Andrei,
 
-> HCI_QUIRK_NO_RESET name is misleading - purpose of this quirk is to
-> reset device on close instead of init, not to not reset at all.
-> Rename it to HCI_QUIRK_RESET_ON_CLOSE to avoid confusion.
-> 
-> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+On Wed, May 23, 2012 at 7:57 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+>
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Addings ops->ready() helps to separate socket and socketless
+> L2CAP channels.
+>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  drivers/bluetooth/bpa10x.c    |    2 +-
->  drivers/bluetooth/btusb.c     |    6 +++---
->  drivers/bluetooth/hci_ldisc.c |    2 +-
->  include/net/bluetooth/hci.h   |    2 +-
->  net/bluetooth/hci_core.c      |    4 ++--
->  5 files changed, 8 insertions(+), 8 deletions(-)
+>  include/net/bluetooth/l2cap.h |    1 +
+>  net/bluetooth/l2cap_core.c    |   42 +++++++++++------------------------------
+>  net/bluetooth/l2cap_sock.c    |   28 +++++++++++++++++++++++++++
+>  3 files changed, 40 insertions(+), 31 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+Looks good to me. And we do need to refactor other parts in other to
+push sock related code to chan->ops as well.
 
-Regards
+Best regards,
 
-Marcel
-
-
+--
+Ulisses Furquim
+ProFUSION embedded systems
+http://profusion.mobi
+Mobile: +55 19 9250 0942
+Skype: ulissesffs
