@@ -1,114 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1337819284.15105.81.camel@aeonflux>
-Subject: Re: [PATCHv3] Bluetooth: Send a configuration request after
- security confirmation
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	pkrystad@codeaurora.org
-Date: Thu, 24 May 2012 02:28:04 +0200
-In-Reply-To: <1337810370-12066-1-git-send-email-mathewm@codeaurora.org>
-References: <1337742738.15105.30.camel@aeonflux>
-	 <1337810370-12066-1-git-send-email-mathewm@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Wed, 23 May 2012 16:30:39 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 19/19] Bluetooth: A2MP: Manage incoming connections
+In-Reply-To: <1337787445-23235-20-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <alpine.DEB.2.02.1205231627370.6526@mathewm-linux>
+References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1337787445-23235-20-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
 
-> Sometimes an ACL link must be raised to a higher security level after
-> an L2CAP connection is requested, but before a connection response is
-> sent.  In this case, a connection response sent by L2CAP was not
-> immediately followed by a configuration request.  Other code paths do
-> send this configuration request right away.  It was possible for the
-> connection to stall while L2CAP waited for the remote device (like
-> PTS) to trigger the configuration process.
-> 
-> Here is an abbreviated hcidump of the failure case with PTS:
-> 
-> 1337806446.051982 > ACL data: handle 43 flags 0x02 dlen 10
->     L2CAP(s): Info req: type 2
-> 1337806446.052050 < ACL data: handle 43 flags 0x00 dlen 16
->     L2CAP(s): Info rsp: type 2 result 0
->       Extended feature mask 0x000000b8
-> 1337806446.595320 > ACL data: handle 43 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 4097 scid 0x0041
-> 1337806446.595673 < ACL data: handle 43 flags 0x00 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 1 status 0
-> 1337806446.595679 < ACL data: handle 43 flags 0x00 dlen 10
->     L2CAP(s): Info req: type 2
-> 1337806446.669835 > ACL data: handle 43 flags 0x02 dlen 16
->     L2CAP(s): Info rsp: type 2 result 0
->       Extended feature mask 0x00000028
-> 1337806446.669899 < HCI Command: Authentication Requested (0x01|0x0011) plen 2
-> 1337806446.669906 < ACL data: handle 43 flags 0x00 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 1 status 1
-> <security setup here>
-> 1337806446.769888 < ACL data: handle 43 flags 0x00 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 0 status 0
-> 
-> At this point, the connection stalls and no further messages are sent
-> on the L2CAP signaling channel.  No data is received either.
-> 
-> If we immediately send a configuration request after a successful connect
-> response, the connection completes:
-> 
-> 1337724090.041162 > ACL data: handle 43 flags 0x02 dlen 10
->     L2CAP(s): Info req: type 2
-> 1337724090.041236 < ACL data: handle 43 flags 0x00 dlen 16
->     L2CAP(s): Info rsp: type 2 result 0
->       Extended feature mask 0x000000b8
-> 1337724090.597128 > ACL data: handle 43 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 4097 scid 0x0041
-> 1337724090.597236 < ACL data: handle 43 flags 0x00 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 1 status 0
-> 1337724090.597244 < ACL data: handle 43 flags 0x00 dlen 10
->     L2CAP(s): Info req: type 2
-> 1337724090.660842 > ACL data: handle 43 flags 0x02 dlen 16
->     L2CAP(s): Info rsp: type 2 result 0
->       Extended feature mask 0x00000028
-> 1337724090.660926 < HCI Command: Authentication Requested (0x01|0x0011) plen 2
-> 1337724090.660934 < ACL data: handle 43 flags 0x00 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 1 status 1
-> <security setup here>
-> 1337724090.755162 < ACL data: handle 43 flags 0x00 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 0 status 0
-> 1337724090.755171 < ACL data: handle 43 flags 0x00 dlen 23
->     L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 11
-> 1337724091.361847 > ACL data: handle 43 flags 0x02 dlen 29
->     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 15
-> 1337724091.863808 > ACL data: handle 43 flags 0x02 dlen 23
->     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 11
-> 1337724091.863882 < ACL data: handle 43 flags 0x00 dlen 29
->     L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 15
-> 1337724092.683745 > ACL data: handle 43 flags 0x02 dlen 12
->     L2CAP(d): cid 0x0040 len 8 [psm 4097]
->       0000: 00 00 11 22 33 44 34 2f                           ..."3D4/
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+Andrei -
+
+On Wed, 23 May 2012, Andrei Emeltchenko wrote:
+
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Handle incoming A2MP connection by creating AMP manager and
+> processing A2MP messages.
+>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  net/bluetooth/l2cap_core.c |   11 +++++++++++
->  1 file changed, 11 insertions(+)
+> include/net/bluetooth/a2mp.h |    4 ++++
+> net/bluetooth/a2mp.c         |   12 ++++++++++++
+> net/bluetooth/l2cap_core.c   |   14 ++++++++++----
+> 3 files changed, 26 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+> index 96f9cc2..6a76e0a 100644
+> --- a/include/net/bluetooth/a2mp.h
+> +++ b/include/net/bluetooth/a2mp.h
+> @@ -15,6 +15,8 @@
+> #ifndef __A2MP_H
+> #define __A2MP_H
+>
+> +#include <net/bluetooth/l2cap.h>
+> +
+> #define A2MP_FEAT_EXT	0x8000
+>
+> struct amp_mgr {
+> @@ -118,5 +120,7 @@ struct a2mp_physlink_rsp {
+>
+> void amp_mgr_get(struct amp_mgr *mgr);
+> int amp_mgr_put(struct amp_mgr *mgr);
+> +struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
+> +				       struct sk_buff *skb);
+>
+> #endif /* __A2MP_H */
+> diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+> index 894e53c..dc70ee6 100644
+> --- a/net/bluetooth/a2mp.c
+> +++ b/net/bluetooth/a2mp.c
+> @@ -552,3 +552,15 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
+>
+> 	return mgr;
+> }
+> +
+> +struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
+> +				       struct sk_buff *skb)
+> +{
+> +	struct amp_mgr *mgr;
+> +
+> +	mgr = amp_mgr_create(conn);
+> +
+> +	BT_DBG("mgr: %p chan %p", mgr, mgr->a2mp_chan);
+> +
+> +	return mgr->a2mp_chan;
 
-thanks for adding the hcidump data. Patch has been applied to
-bluetooth-next tree.
+mgr can be NULL.
 
+> +}
 > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index e31b005..c9e6ae4 100644
+> index bd9197c..9a89c47 100644
 > --- a/net/bluetooth/l2cap_core.c
 > +++ b/net/bluetooth/l2cap_core.c
-> @@ -5500,6 +5500,17 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
->  			rsp.status = cpu_to_le16(stat);
->  			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
->  							sizeof(rsp), &rsp);
-> +
+> @@ -37,6 +37,7 @@
+> #include <net/bluetooth/hci_core.h>
+> #include <net/bluetooth/l2cap.h>
+> #include <net/bluetooth/smp.h>
+> +#include <net/bluetooth/a2mp.h>
+>
+> bool disable_ertm;
+>
+> @@ -5167,10 +5168,15 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+>
+> 	chan = l2cap_get_chan_by_scid(conn, cid);
+> 	if (!chan) {
+> -		BT_DBG("unknown cid 0x%4.4x", cid);
+> -		/* Drop packet and return */
+> -		kfree_skb(skb);
+> -		return 0;
+> +		if (cid == L2CAP_CID_A2MP) {
+> +			chan = a2mp_channel_create(conn, skb);
 
-We do have a coding style issue with the existing l2cap_send_cmd here.
-Is anybody going to fix that?
+If amp_mgr_create returned NULL, then you would have to handle NULL 
+from a2mp_channel_create too.
 
-Regards
+> +			l2cap_chan_lock(chan);
+> +		} else {
+> +			BT_DBG("unknown cid 0x%4.4x", cid);
+> +			/* Drop packet and return */
+> +			kfree_skb(skb);
+> +			return 0;
+> +		}
+> 	}
+>
+> 	BT_DBG("chan %p, len %d", chan, skb->len);
+> -- 
+> 1.7.9.5
 
-Marcel
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
 
