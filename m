@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 05/16] client: Add transfer event-reporting signals
-Date: Wed, 23 May 2012 17:00:07 +0200
-Message-Id: <1337785218-8661-6-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v0 02/16] client-doc: Add progress property to transfer
+Date: Wed, 23 May 2012 17:00:04 +0200
+Message-Id: <1337785218-8661-3-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1337785218-8661-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1337785218-8661-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,49 +12,33 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-These signals replace the old agent-based notification mechanism.
+This property exposes the number of bytes transferred so far in a given
+transfer.
 ---
- client/transfer.c |   18 ++++++++++++++----
- 1 files changed, 14 insertions(+), 4 deletions(-)
+ doc/client-api.txt |   10 ++++++++++
+ 1 files changed, 10 insertions(+), 0 deletions(-)
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 2c6e1ed..09abe50 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -191,6 +191,8 @@ static const GDBusMethodTable obc_transfer_methods[] = {
- static const GDBusSignalTable obc_transfer_signals[] = {
- 	{ GDBUS_SIGNAL("PropertyChanged",
- 		GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
-+	{ GDBUS_SIGNAL("Complete", NULL) },
-+	{ GDBUS_SIGNAL("Error", GDBUS_ARGS({ "message", "s" })) },
- 	{ }
- };
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index cfb4ec9..cc25543 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -312,6 +312,16 @@ Properties	string Name [readonly]
  
-@@ -451,12 +453,20 @@ static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
+ 			Complete name of the file being received or sent.
  
- 	transfer->xfer = 0;
++		uint64 Progress [readonly, optional]
++
++			Number of bytes transferred. For queued transfers, this
++			value will not be present.
++
++Signals		PropertyChanged(string name, variant value)
++
++			This signal indicates a changed value of the given
++			property.
++
+ Agent hierarchy
+ ===============
  
--	if (err)
--		goto done;
-+	if (err == NULL) {
-+		transfer->size = transfer->transferred;
- 
--	transfer->size = transfer->transferred;
-+		if (transfer->path != NULL)
-+			g_dbus_emit_signal(transfer->conn, transfer->path,
-+						TRANSFER_INTERFACE, "Complete",
-+						DBUS_TYPE_INVALID);
-+	} else if (transfer->path != NULL)
-+		g_dbus_emit_signal(transfer->conn, transfer->path,
-+						TRANSFER_INTERFACE, "Error",
-+						DBUS_TYPE_STRING,
-+						&err->message,
-+						DBUS_TYPE_INVALID);
- 
--done:
- 	if (callback)
- 		callback->func(transfer, transfer->size, err, callback->data);
- }
 -- 
 1.7.7.6
 
