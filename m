@@ -2,199 +2,142 @@ Return-Path: <cyrus@holtmann.org>
 From: Paulo Alcantara <paulo.alcantara@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ 03/15] storage: Store address type in "ccc" file
-Date: Wed, 23 May 2012 15:48:21 -0300
-Message-Id: <1337798914-20974-4-git-send-email-paulo.alcantara@openbossa.org>
+Subject: [PATCH BlueZ 02/15] storage: Store address type in "appearance" file
+Date: Wed, 23 May 2012 15:48:20 -0300
+Message-Id: <1337798914-20974-3-git-send-email-paulo.alcantara@openbossa.org>
 In-Reply-To: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
 References: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Addressing types can be either BR/EDR, BLE public or BLE random so
-the entries in the "ccc" file did not contain enough information to
-distinguish which addressing type it's supposed to be. Entries will
-now contain both address number and address type as a single key in
-every entry in the file.
----
- src/attrib-server.c |   19 ++++++++++++++-----
- src/device.c        |    5 +++++
- src/device.h        |    1 +
- src/storage.c       |   20 ++++++++++----------
- src/storage.h       |    8 ++++----
- 5 files changed, 34 insertions(+), 19 deletions(-)
+BLE addressing types can be either public or random so the entries in
+the "appearance" file did not contain enough information to distinguish
+which addressing type it's supposed to be (LE public or LE random).
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 21b1501..3291e2d 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -737,6 +737,7 @@ static uint16_t read_value(struct gatt_channel *channel, uint16_t handle,
- 	uint8_t status;
- 	GList *l;
- 	uint16_t cccval;
-+	uint8_t bdaddr_type;
- 	guint h = handle;
+Appearance is an information related to BLE device only. Entries will
+now contain both BLE address number and BLE address type as a single key
+in every entry in the file.
+---
+ src/adapter.c |    4 ++--
+ src/device.c  |    6 ++++--
+ src/storage.c |   19 +++++++++++--------
+ src/storage.h |    6 ++++--
+ 4 files changed, 21 insertions(+), 14 deletions(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 18dd5b6..3200ba8 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2736,7 +2736,7 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 		dev->legacy = FALSE;
  
- 	l = g_list_find_custom(channel->server->database,
-@@ -747,9 +748,11 @@ static uint16_t read_value(struct gatt_channel *channel, uint16_t handle,
+ 		if (read_remote_appearance(&adapter->bdaddr, &dev->bdaddr,
+-								&app) == 0)
++						dev->bdaddr_type, &app) == 0)
+ 			icon = gap_appearance_to_icon(app);
+ 		else
+ 			icon = NULL;
+@@ -2875,7 +2875,7 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
+ 		write_remote_class(&adapter->bdaddr, bdaddr, dev_class);
  
- 	a = l->data;
+ 	if (eir_data.appearance != 0)
+-		write_remote_appearance(&adapter->bdaddr, bdaddr,
++		write_remote_appearance(&adapter->bdaddr, bdaddr, bdaddr_type,
+ 							eir_data.appearance);
  
-+	bdaddr_type = device_get_addr_type(channel->device);
-+
- 	if (bt_uuid_cmp(&ccc_uuid, &a->uuid) == 0 &&
--		read_device_ccc(&channel->src, &channel->dst,
--					handle, &cccval) == 0) {
-+		read_device_ccc(&channel->src, &channel->dst, bdaddr_type,
-+							handle, &cccval) == 0) {
- 		uint8_t config[2];
- 
- 		att_put_u16(cccval, config);
-@@ -775,6 +778,7 @@ static uint16_t read_blob(struct gatt_channel *channel, uint16_t handle,
- 	uint8_t status;
- 	GList *l;
- 	uint16_t cccval;
-+	uint8_t bdaddr_type;
- 	guint h = handle;
- 
- 	l = g_list_find_custom(channel->server->database,
-@@ -789,9 +793,11 @@ static uint16_t read_blob(struct gatt_channel *channel, uint16_t handle,
- 		return enc_error_resp(ATT_OP_READ_BLOB_REQ, handle,
- 					ATT_ECODE_INVALID_OFFSET, pdu, len);
- 
-+	bdaddr_type = device_get_addr_type(channel->device);
-+
- 	if (bt_uuid_cmp(&ccc_uuid, &a->uuid) == 0 &&
--		read_device_ccc(&channel->src, &channel->dst,
--					handle, &cccval) == 0) {
-+		read_device_ccc(&channel->src, &channel->dst, bdaddr_type,
-+							handle, &cccval) == 0) {
- 		uint8_t config[2];
- 
- 		att_put_u16(cccval, config);
-@@ -847,7 +853,10 @@ static uint16_t write_value(struct gatt_channel *channel, uint16_t handle,
- 		}
- 	} else {
- 		uint16_t cccval = att_get_u16(value);
--		write_device_ccc(&channel->src, &channel->dst, handle, cccval);
-+		uint8_t bdaddr_type = device_get_addr_type(channel->device);
-+
-+		write_device_ccc(&channel->src, &channel->dst, bdaddr_type,
-+								handle, cccval);
- 	}
- 
- 	return enc_write_resp(pdu, len);
+ 	if (eir_data.name != NULL && eir_data.name_complete)
 diff --git a/src/device.c b/src/device.c
-index eb015ec..a01a524 100644
+index 7cdd025..eb015ec 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -2205,6 +2205,11 @@ void device_set_addr_type(struct btd_device *device, uint8_t bdaddr_type)
- 	device->bdaddr_type = bdaddr_type;
- }
+@@ -373,7 +373,8 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 		icon = class_to_icon(class);
  
-+uint8_t device_get_addr_type(struct btd_device *device)
-+{
-+	return device->bdaddr_type;
-+}
-+
- const gchar *device_get_path(struct btd_device *device)
- {
- 	if (!device)
-diff --git a/src/device.h b/src/device.h
-index 51140c7..26e17f7 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -62,6 +62,7 @@ struct btd_adapter *device_get_adapter(struct btd_device *device);
- void device_get_address(struct btd_device *device, bdaddr_t *bdaddr,
- 							uint8_t *bdaddr_type);
- void device_set_addr_type(struct btd_device *device, uint8_t bdaddr_type);
-+uint8_t device_get_addr_type(struct btd_device *device);
- const gchar *device_get_path(struct btd_device *device);
- struct agent *device_get_agent(struct btd_device *device);
- gboolean device_is_bredr(struct btd_device *device);
+ 		dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32, &class);
+-	} else if (read_remote_appearance(&src, &device->bdaddr, &app) == 0)
++	} else if (read_remote_appearance(&src, &device->bdaddr,
++						device->bdaddr_type, &app) == 0)
+ 		/* Appearance */
+ 		icon = gap_appearance_to_icon(app);
+ 
+@@ -1851,7 +1852,8 @@ static void appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	app = att_get_u16(atval);
+ 
+ 	adapter_get_address(adapter, &src);
+-	write_remote_appearance(&src, &device->bdaddr, app);
++	write_remote_appearance(&src, &device->bdaddr, device->bdaddr_type,
++									app);
+ 
+ done:
+ 	att_data_list_free(list);
 diff --git a/src/storage.c b/src/storage.c
-index bf3c5bb..ed02f96 100644
+index 5c0ef5c..bf3c5bb 100644
 --- a/src/storage.c
 +++ b/src/storage.c
-@@ -1229,12 +1229,12 @@ int delete_device_service(const bdaddr_t *sba, const bdaddr_t *dba,
- 	create_filename(filename, PATH_MAX, sba, "attributes");
- 	delete_by_pattern(filename, key);
+@@ -281,16 +281,17 @@ int read_local_class(bdaddr_t *bdaddr, uint8_t *class)
+ 	return 0;
+ }
  
+-int read_remote_appearance(bdaddr_t *local, bdaddr_t *peer,
++int read_remote_appearance(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
+ 							uint16_t *appearance)
+ {
+-	char filename[PATH_MAX + 1], addr[18], *str;
++	char filename[PATH_MAX + 1], key[20], *str;
+ 
+ 	create_filename(filename, PATH_MAX, local, "appearance");
+ 
+-	ba2str(peer, addr);
++	ba2str(peer, key);
 +	sprintf(&key[17], "#%hhu", bdaddr_type);
-+
- 	/* Deleting all CCC values of a given key */
- 	create_filename(filename, PATH_MAX, sba, "ccc");
- 	delete_by_pattern(filename, key);
  
--	sprintf(&key[17], "#%hhu", bdaddr_type);
--
- 	create_filename(filename, PATH_MAX, sba, "primary");
+-	str = textfile_get(filename, addr);
++	str = textfile_get(filename, key);
+ 	if (!str)
+ 		return -ENOENT;
  
- 	return textfile_del(filename, key);
-@@ -1307,10 +1307,10 @@ int read_device_attributes(const bdaddr_t *sba, textfile_cb func, void *data)
- 	return textfile_foreach(filename, func, data);
+@@ -305,18 +306,20 @@ int read_remote_appearance(bdaddr_t *local, bdaddr_t *peer,
  }
  
--int read_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint16_t handle,
--							uint16_t *value)
-+int read_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
-+					uint16_t handle, uint16_t *value)
+ int write_remote_appearance(bdaddr_t *local, bdaddr_t *peer,
+-							uint16_t appearance)
++				uint8_t bdaddr_type, uint16_t appearance)
  {
--	char filename[PATH_MAX + 1], addr[18], key[23];
-+	char filename[PATH_MAX + 1], addr[18], key[25];
- 	char *str;
- 	unsigned int config;
- 	int err = 0;
-@@ -1318,7 +1318,7 @@ int read_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint16_t handle,
- 	create_filename(filename, PATH_MAX, local, "ccc");
+-	char filename[PATH_MAX + 1], addr[18], str[7];
++	char filename[PATH_MAX + 1], key[20], str[7];
  
- 	ba2str(peer, addr);
--	snprintf(key, sizeof(key), "%17s#%04X", addr, handle);
-+	snprintf(key, sizeof(key), "%17s#%hhu#%04X", addr, bdaddr_type, handle);
- 
- 	str = textfile_caseget(filename, key);
- 	if (str == NULL)
-@@ -1334,18 +1334,18 @@ int read_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint16_t handle,
- 	return err;
- }
- 
--int write_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint16_t handle,
--							uint16_t value)
-+int write_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
-+					uint16_t handle, uint16_t value)
- {
--	char filename[PATH_MAX + 1], addr[18], key[23], config[5];
-+	char filename[PATH_MAX + 1], addr[18], key[25], config[5];
- 
- 	create_filename(filename, PATH_MAX, local, "ccc");
+ 	create_filename(filename, PATH_MAX, local, "appearance");
  
  	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
  
- 	ba2str(peer, addr);
-+	snprintf(key, sizeof(key), "%17s#%hhu#%04X", addr, bdaddr_type, handle);
+-	ba2str(peer, addr);
++	ba2str(peer, key);
++	sprintf(&key[17], "#%hhu", bdaddr_type);
++
+ 	sprintf(str, "0x%4.4x", appearance);
  
--	snprintf(key, sizeof(key), "%17s#%04X", addr, handle);
- 	snprintf(config, sizeof(config), "%04X", value);
+-	return textfile_put(filename, addr, str);
++	return textfile_put(filename, key, str);
+ }
  
- 	return textfile_put(filename, key, config);
+ int write_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class)
 diff --git a/src/storage.h b/src/storage.h
-index db33b43..b6d24e9 100644
+index c3be64a..db33b43 100644
 --- a/src/storage.h
 +++ b/src/storage.h
-@@ -91,10 +91,10 @@ char *read_device_characteristics(const bdaddr_t *sba, const bdaddr_t *dba,
- int write_device_attribute(const bdaddr_t *sba, const bdaddr_t *dba,
-                                         uint16_t handle, const char *chars);
- int read_device_attributes(const bdaddr_t *sba, textfile_cb func, void *data);
--int read_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint16_t handle,
--							uint16_t *value);
--int write_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint16_t handle,
--							uint16_t value);
-+int read_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
-+					uint16_t handle, uint16_t *value);
-+int write_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
-+					uint16_t handle, uint16_t value);
- void delete_device_ccc(bdaddr_t *local, bdaddr_t *peer);
- int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key);
- gboolean has_longtermkeys(bdaddr_t *local, bdaddr_t *peer);
+@@ -36,8 +36,10 @@ int write_local_name(bdaddr_t *bdaddr, const char *name);
+ int read_local_name(bdaddr_t *bdaddr, char *name);
+ int write_local_class(bdaddr_t *bdaddr, uint8_t *class);
+ int read_local_class(bdaddr_t *bdaddr, uint8_t *class);
+-int write_remote_appearance(bdaddr_t *local, bdaddr_t *peer, uint16_t appearance);
+-int read_remote_appearance(bdaddr_t *local, bdaddr_t *peer, uint16_t *appearance);
++int write_remote_appearance(bdaddr_t *local, bdaddr_t *peer,
++				uint8_t bdaddr_type, uint16_t appearance);
++int read_remote_appearance(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
++							uint16_t *appearance);
+ int write_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class);
+ int read_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t *class);
+ int write_device_name(bdaddr_t *local, bdaddr_t *peer, char *name);
 -- 
 1.7.7.6
 
