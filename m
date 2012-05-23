@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 May 2012 16:16:37 -0700 (PDT)
+Date: Wed, 23 May 2012 16:13:49 -0700 (PDT)
 From: Mat Martineau <mathewm@codeaurora.org>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 02/19] Bluetooth: Add ready to L2CAP channel ops
-In-Reply-To: <1337787445-23235-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Message-ID: <alpine.DEB.2.02.1205231614400.6526@mathewm-linux>
-References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1337787445-23235-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCHv2 01/19] Bluetooth: Add unlink to L2CAP channel ops
+In-Reply-To: <1337787445-23235-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <alpine.DEB.2.02.1205231505380.6526@mathewm-linux>
+References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1337787445-23235-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -19,158 +19,101 @@ On Wed, 23 May 2012, Andrei Emeltchenko wrote:
 
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
-> Addings ops->ready() helps to separate socket and socketless
-> L2CAP channels.
+> This helps to separate socket and socketless code. Now socket related
+> operations moved to l2cap_sock in unlink callback for channels with sk.
 >
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
 > include/net/bluetooth/l2cap.h |    1 +
-> net/bluetooth/l2cap_core.c    |   42 +++++++++++------------------------------
-> net/bluetooth/l2cap_sock.c    |   28 +++++++++++++++++++++++++++
-> 3 files changed, 40 insertions(+), 31 deletions(-)
+> net/bluetooth/l2cap_core.c    |   19 ++-----------------
+> net/bluetooth/l2cap_sock.c    |   25 +++++++++++++++++++++++++
+> 3 files changed, 28 insertions(+), 17 deletions(-)
 >
 > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index a017249..83a67e8 100644
+> index 0142257..a017249 100644
 > --- a/include/net/bluetooth/l2cap.h
 > +++ b/include/net/bluetooth/l2cap.h
-> @@ -530,6 +530,7 @@ struct l2cap_ops {
+> @@ -529,6 +529,7 @@ struct l2cap_ops {
+> 	void			(*state_change) (void *data, int state);
 > 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
 > 					       unsigned long len, int nb);
-> 	void			(*unlink) (struct l2cap_chan *chan, int err);
-> +	void			(*ready) (struct l2cap_chan *chan);
+> +	void			(*unlink) (struct l2cap_chan *chan, int err);
 > };
 >
 > struct l2cap_conn {
 > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index c81b828..d5ea8af 100644
+> index e31b005..c81b828 100644
 > --- a/net/bluetooth/l2cap_core.c
 > +++ b/net/bluetooth/l2cap_core.c
-> @@ -407,7 +407,7 @@ struct l2cap_chan *l2cap_chan_create(void)
+> @@ -493,9 +493,7 @@ static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
 >
-> 	atomic_set(&chan->refcnt, 1);
->
-> -	/* This flag is cleared in l2cap_chan_ready() */
-> +	/* This flag is cleared in l2cap chan ops->ready() */
-> 	set_bit(CONF_NOT_COMPLETE, &chan->conf_state);
->
-> 	BT_DBG("chan %p", chan);
-> @@ -953,36 +953,13 @@ static void l2cap_send_conn_req(struct l2cap_chan *chan)
-> 	l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_REQ, sizeof(req), &req);
-> }
->
-> -static void l2cap_chan_ready(struct l2cap_chan *chan)
-> -{
+> static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+> {
 > -	struct sock *sk = chan->sk;
-> -	struct sock *parent;
-> -
+> 	struct l2cap_conn *conn = chan->conn;
+> -	struct sock *parent = bt_sk(sk)->parent;
+>
+> 	__clear_chan_timer(chan);
+>
+> @@ -511,21 +509,8 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+> 		hci_conn_put(conn->hcon);
+> 	}
+>
 > -	lock_sock(sk);
 > -
-> -	parent = bt_sk(sk)->parent;
+> -	__l2cap_state_change(chan, BT_CLOSED);
+> -	sock_set_flag(sk, SOCK_ZAPPED);
 > -
-> -	BT_DBG("sk %p, parent %p", sk, parent);
+> -	if (err)
+> -		__l2cap_chan_set_err(chan, err);
 > -
-> -	/* This clears all conf flags, including CONF_NOT_COMPLETE */
-> -	chan->conf_state = 0;
-> -	__clear_chan_timer(chan);
-> -
-> -	__l2cap_state_change(chan, BT_CONNECTED);
-> -	sk->sk_state_change(sk);
-> -
-> -	if (parent)
+> -	if (parent) {
+> -		bt_accept_unlink(sk);
 > -		parent->sk_data_ready(parent, 0);
+> -	} else
+> -		sk->sk_state_change(sk);
 > -
 > -	release_sock(sk);
-> -}
-> -
-> static void l2cap_do_start(struct l2cap_chan *chan)
-> {
-> 	struct l2cap_conn *conn = chan->conn;
+> +	if (chan->ops->unlink)
+> +		chan->ops->unlink(chan, err);
 >
-> 	if (conn->hcon->type == LE_LINK) {
-> -		l2cap_chan_ready(chan);
-> +		if (chan->ops->ready)
-> +			chan->ops->ready(chan);
+> 	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
 > 		return;
-> 	}
->
-> @@ -1242,8 +1219,8 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
->
-> 		if (conn->hcon->type == LE_LINK) {
-> 			if (smp_conn_security(conn, chan->sec_level))
-> -				l2cap_chan_ready(chan);
-> -
-> +				if (chan->ops->ready)
-> +					chan->ops->ready(chan);
-> 		} else if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
-> 			struct sock *sk = chan->sk;
-> 			__clear_chan_timer(chan);
-> @@ -3639,7 +3616,8 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
-> 		if (err < 0)
-> 			l2cap_send_disconn_req(chan->conn, chan, -err);
-> 		else
-> -			l2cap_chan_ready(chan);
-> +			if (chan->ops->ready)
-> +				chan->ops->ready(chan);
->
-> 		goto unlock;
-> 	}
-> @@ -3770,7 +3748,8 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
-> 		if (err < 0)
-> 			l2cap_send_disconn_req(chan->conn, chan, -err);
-> 		else
-> -			l2cap_chan_ready(chan);
-> +			if (chan->ops->ready)
-> +				chan->ops->ready(chan);
-> 	}
->
-> done:
-> @@ -5420,7 +5399,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
-> 		if (chan->scid == L2CAP_CID_LE_DATA) {
-> 			if (!status && encrypt) {
-> 				chan->sec_level = hcon->sec_level;
-> -				l2cap_chan_ready(chan);
-> +				if (chan->ops->ready)
-> +					chan->ops->ready(chan);
-> 			}
->
-> 			l2cap_chan_unlock(chan);
 > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 6749d11..2e078c4 100644
+> index 4d36605..6749d11 100644
 > --- a/net/bluetooth/l2cap_sock.c
 > +++ b/net/bluetooth/l2cap_sock.c
-> @@ -978,6 +978,33 @@ static void l2cap_sock_unlink_cb(struct l2cap_chan *chan, int err)
-> 	release_sock(sk);
+> @@ -954,6 +954,30 @@ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
+> 	return skb;
 > }
 >
-> +static void l2cap_sock_chan_ready_cb(struct l2cap_chan *chan)
+> +static void l2cap_sock_unlink_cb(struct l2cap_chan *chan, int err)
 > +{
 > +	struct sock *sk = chan->sk;
-> +	struct sock *parent;
+> +	struct sock *parent = bt_sk(sk)->parent;
 > +
 > +	lock_sock(sk);
 > +
+> +	chan->state = BT_CLOSED;
+
+I think this line had better stay in l2cap_chan_del - otherwise every 
+unlink callback has to do it.  It's also the only modification to chan 
+in here.  Since the channel must be locked before l2cap_chan_del is 
+called anyway, I don't think it matters if chan->state is modified 
+before or after the call to chan->ops->unlink.
+
+> +	sk->sk_state = BT_CLOSED;
+> +	sock_set_flag(sk, SOCK_ZAPPED);
+> +
+> +	if (err)
+> +		sk->sk_err = err;
+> +
 > +	parent = bt_sk(sk)->parent;
-> +
-> +	BT_DBG("sk %p, parent %p", sk, parent);
-> +
-> +	__clear_chan_timer(chan);
-> +
-> +	/* This clears all conf flags, including CONF_NOT_COMPLETE */
-> +	chan->conf_state = 0;
-> +
-> +	chan->state = BT_CONNECTED;
-
-Similar to patch 1, would there be some benefit to leaving the chan 
-code (timer clearing, state and conf_state modification) in 
-l2cap_core?  These things need to happen even if chan->ops->ready is 
-NULL.
-
-> +	sk->sk_state = BT_CONNECTED;
-> +
-> +	sk->sk_state_change(sk);
-> +
-> +	if (parent)
+> +	if (parent) {
+> +		bt_accept_unlink(sk);
 > +		parent->sk_data_ready(parent, 0);
+> +	} else
+> +		sk->sk_state_change(sk);
 > +
 > +	release_sock(sk);
 > +}
@@ -178,18 +121,21 @@ NULL.
 > static struct l2cap_ops l2cap_chan_ops = {
 > 	.name		= "L2CAP Socket Interface",
 > 	.new_connection	= l2cap_sock_new_connection_cb,
-> @@ -986,6 +1013,7 @@ static struct l2cap_ops l2cap_chan_ops = {
+> @@ -961,6 +985,7 @@ static struct l2cap_ops l2cap_chan_ops = {
+> 	.close		= l2cap_sock_close_cb,
 > 	.state_change	= l2cap_sock_state_change_cb,
 > 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
-> 	.unlink		= l2cap_sock_unlink_cb,
-> +	.ready		= l2cap_sock_chan_ready_cb,
+> +	.unlink		= l2cap_sock_unlink_cb,
 > };
 >
 > static void l2cap_sock_destruct(struct sock *sk)
 > -- 
 > 1.7.9.5
 
+
+
 --
 Mat Martineau
 Employee of Qualcomm Innovation Center, Inc.
 Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
