@@ -2,40 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Syam Sidhardhan <s.syam@samsung.com>
-Subject: [PATCH BlueZ 09/12] avctp: Fix NULL check after dereference
-Date: Wed, 23 May 2012 21:27:29 +0530
-Message-id: <1337788652-23697-10-git-send-email-s.syam@samsung.com>
+Subject: [PATCH BlueZ 08/12] Remove redundant D-Bus error initilization in
+ maemo6 plugin
+Date: Wed, 23 May 2012 21:27:28 +0530
+Message-id: <1337788652-23697-9-git-send-email-s.syam@samsung.com>
 In-reply-to: <1337788652-23697-1-git-send-email-s.syam@samsung.com>
 References: <1337788652-23697-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Check for session != NULL has to be done before accessing session.
 ---
- audio/avctp.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+ plugins/maemo6.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index d98d097..1bc2a1d 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -320,7 +320,7 @@ static struct avctp_pdu_handler *find_handler(GSList *list, uint8_t opcode)
- 
- static void avctp_disconnected(struct avctp *session)
- {
--	struct avctp_server *server = session->server;
-+	struct avctp_server *server;
- 
- 	if (!session)
- 		return;
-@@ -356,6 +356,7 @@ static void avctp_disconnected(struct avctp *session)
- 		session->uinput = -1;
+diff --git a/plugins/maemo6.c b/plugins/maemo6.c
+index 6c34116..4819af4 100644
+--- a/plugins/maemo6.c
++++ b/plugins/maemo6.c
+@@ -130,7 +130,6 @@ static void read_radio_states_cb(DBusPendingCall *call, void *user_data)
+ 		goto done;
  	}
  
-+	server = session->server;
- 	server->sessions = g_slist_remove(server->sessions, session);
- 	g_slist_free_full(session->handlers, g_free);
- 	g_free(session);
+-	dbus_error_init(&derr);
+ 	if (dbus_message_get_args(reply, &derr,
+ 				DBUS_TYPE_UINT32, &radio_states,
+ 				DBUS_TYPE_INVALID) == FALSE) {
 -- 
 1.7.4.1
 
