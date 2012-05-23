@@ -1,137 +1,166 @@
 Return-Path: <cyrus@holtmann.org>
 From: Henrique Dante de Almeida <hdante@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 06/11] gdbus: use GDBusArgInfo to generate introspection
-Date: Wed, 23 May 2012 10:20:03 -0300
-Message-Id: <1337779208-3555-7-git-send-email-hdante@profusion.mobi>
+Cc: Henrique Dante de Almeida <hdante@profusion.mobi>
+Subject: [PATCH 05/11] Convert GDBus methods and signals to use macro helpers
+Date: Wed, 23 May 2012 10:20:02 -0300
+Message-Id: <1337779208-3555-6-git-send-email-hdante@profusion.mobi>
 In-Reply-To: <1337779208-3555-1-git-send-email-hdante@profusion.mobi>
 References: <1337779208-3555-1-git-send-email-hdante@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-
-By using GDBusArgInfo in methods and signals, the introspection
-generation is much simpler and we can add each argument name.
+With these macro helpers we can separate in/out arguments and use their
+own vector.
 ---
- gdbus/object.c |   75 +++++++++++---------------------------------------------
- 1 file changed, 14 insertions(+), 61 deletions(-)
+ src/adapter.c |   19 ++++++++++++-------
+ src/device.c  |   15 +++++++++++----
+ src/manager.c |   17 ++++++++++++-----
+ src/ndef.c    |    4 +++-
+ src/tag.c     |   15 +++++++++++----
+ 5 files changed, 49 insertions(+), 21 deletions(-)
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 2ddc574..3ac6a0b 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -59,68 +59,20 @@ struct security_data {
- 	void *iface_user_data;
- };
- 
--static void print_arguments(GString *gstr, const char *sig,
-+static void print_arguments(GString *gstr, const GDBusArgInfo *args,
- 						const char *direction)
- {
--	int i;
--
--	for (i = 0; sig[i]; i++) {
--		char type[32];
--		int struct_level, dict_level;
--		unsigned int len;
--		gboolean complete;
--
--		complete = FALSE;
--		struct_level = dict_level = 0;
--
--		/* Gather enough data to have a single complete type */
--		for (len = 0; len < (sizeof(type) - 1) && sig[i]; len++, i++) {
--			switch (sig[i]) {
--			case '(':
--				struct_level++;
--				break;
--			case ')':
--				struct_level--;
--				if (struct_level <= 0 && dict_level <= 0)
--					complete = TRUE;
--				break;
--			case '{':
--				dict_level++;
--				break;
--			case '}':
--				dict_level--;
--				if (struct_level <= 0 && dict_level <= 0)
--					complete = TRUE;
--				break;
--			case 'a':
--				break;
--			default:
--				if (struct_level <= 0 && dict_level <= 0)
--					complete = TRUE;
--				break;
--			}
--
--			type[len] = sig[i];
--
--			if (complete)
--				break;
--		}
--
--		type[len + 1] = '\0';
--
--		if (!complete) {
--			error("Unexpected signature: %s", sig);
--			return;
--		}
-+	for (; args && args->name; args++) {
-+		g_string_append_printf(gstr,
-+					"\t\t\t<arg name=\"%s\" type=\"%s\"",
-+					args->name, args->signature);
- 
- 		if (direction)
- 			g_string_append_printf(gstr,
--					"\t\t\t<arg type=\"%s\" direction=\"%s\"/>\n",
--					type, direction);
-+					" direction=\"%s\"/>\n", direction);
- 		else
--			g_string_append_printf(gstr,
--					"\t\t\t<arg type=\"%s\"/>\n",
--					type);
-+			g_string_append_printf(gstr, "/>\n");
-+
- 	}
+diff --git a/src/adapter.c b/src/adapter.c
+index 8574d52..5cbafa1 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -463,17 +463,22 @@ static void tag_present_cb(uint32_t adapter_idx, uint32_t target_idx,
  }
  
-@@ -130,26 +82,27 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
- 	const GDBusSignalTable *signal;
+ static const GDBusMethodTable adapter_methods[] = {
+-	{ "GetProperties",     "",      "a{sv}", get_properties     },
+-	{ "SetProperty",       "sv",    "",      set_property       },
+-	{ "StartPoll",         "",      "",      start_poll         },
+-	{ "StopPoll",          "",      "",      stop_poll          },
++	{ _GDBUS_METHOD("GetProperties", "", "a{sv}",
++				NULL, GDBUS_ARGS({"properties", "a{sv}"}),
++				get_properties) },
++	{ _GDBUS_METHOD("SetProperty", "sv", "",
++				GDBUS_ARGS({"name", "s"}, {"value", "v"}),
++				NULL, set_property) },
++	{ _GDBUS_METHOD("StartPoll", "", "", NULL, NULL, start_poll) },
++	{ _GDBUS_METHOD("StopPoll", "", "", NULL, NULL, stop_poll) },
+ 	{ },
+ };
  
- 	for (method = iface->methods; method && method->name; method++) {
--		if (!strlen(method->signature) && !strlen(method->reply))
-+		if (!(method->in_args && method->in_args->name) &&
-+				!(method->out_args && method->out_args->name))
- 			g_string_append_printf(gstr, "\t\t<method name=\"%s\"/>\n",
- 								method->name);
- 		else {
- 			g_string_append_printf(gstr, "\t\t<method name=\"%s\">\n",
- 								method->name);
--			print_arguments(gstr, method->signature, "in");
--			print_arguments(gstr, method->reply, "out");
-+			print_arguments(gstr, method->in_args, "in");
-+			print_arguments(gstr, method->out_args, "out");
- 			g_string_append_printf(gstr, "\t\t</method>\n");
- 		}
- 	}
+ static const GDBusSignalTable adapter_signals[] = {
+-	{ "PropertyChanged",		"sv"	},
+-	{ "TagFound",		        "o"	},
+-	{ "TagLost",			"o"	},
++	{ _GDBUS_SIGNAL("PropertyChanged", "sv",
++				GDBUS_ARGS({"name", "s"}, {"value", "v"})) },
++	{ _GDBUS_SIGNAL("TagFound", "o", GDBUS_ARGS({"address", "o"})) },
++	{ _GDBUS_SIGNAL("TagLost", "o", GDBUS_ARGS({"address", "o"})) },
+ 	{ }
+ };
  
- 	for (signal = iface->signals; signal && signal->name; signal++) {
--		if (!strlen(signal->signature))
-+		if (!(signal->args && signal->args->name))
- 			g_string_append_printf(gstr, "\t\t<signal name=\"%s\"/>\n",
- 								signal->name);
- 		else {
- 			g_string_append_printf(gstr, "\t\t<signal name=\"%s\">\n",
- 								signal->name);
--			print_arguments(gstr, signal->signature, NULL);
-+			print_arguments(gstr, signal->args, NULL);
- 			g_string_append_printf(gstr, "\t\t</signal>\n");
- 		}
- 	}
+diff --git a/src/device.c b/src/device.c
+index b53e24d..2b1527d 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -234,14 +234,21 @@ error:
+ }
+ 
+ static const GDBusMethodTable device_methods[] = {
+-	{ "GetProperties",     "",      "a{sv}", get_properties     },
+-	{ "SetProperty",       "sv",    "",      set_property       },
+-	{ "Push",             "a{sv}",  "",      push_ndef          },
++	{ _GDBUS_METHOD("GetProperties", "", "a{sv}",
++				NULL, GDBUS_ARGS({"properties", "a{sv}"}),
++				get_properties) },
++	{ _GDBUS_METHOD("SetProperty", "sv", "",
++				GDBUS_ARGS({"name", "s"}, {"value", "v"}),
++				NULL, set_property) },
++	{ _GDBUS_METHOD("Push", "a{sv}", "",
++					GDBUS_ARGS({"attributes", "a{sv}"}),
++					NULL, push_ndef) },
+ 	{ },
+ };
+ 
+ static const GDBusSignalTable device_signals[] = {
+-	{ "PropertyChanged",		"sv"	},
++	{ _GDBUS_SIGNAL("PropertyChanged", "sv",
++				GDBUS_ARGS({"name", "s"}, {"value", "v"})) },
+ 	{ }
+ };
+ 
+diff --git a/src/manager.c b/src/manager.c
+index 241c472..f1ac5ea 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -134,15 +134,22 @@ void __near_manager_adapter_remove(uint32_t idx)
+ }
+ 
+ static const GDBusMethodTable manager_methods[] = {
+-	{ "GetProperties",     "",      "a{sv}", get_properties     },
+-	{ "SetProperty",       "sv",    "",      set_property       },
++	{ _GDBUS_METHOD("GetProperties", "", "a{sv}",
++				NULL, GDBUS_ARGS({"properties", "a{sv}"}),
++				get_properties) },
++	{ _GDBUS_METHOD("SetProperty", "sv", "",
++				GDBUS_ARGS({"name", "s"}, {"value", "v"}),
++				NULL, set_property) },
+ 	{ },
+ };
+ 
+ static const GDBusSignalTable manager_signals[] = {
+-	{ "PropertyChanged",		"sv"	},
+-	{ "AdapterAdded",		"o"	},
+-	{ "AdapterRemoved",		"o"	},
++	{ _GDBUS_SIGNAL("PropertyChanged", "sv",
++				GDBUS_ARGS({"name", "s"}, {"value", "v"})) },
++	{ _GDBUS_SIGNAL("AdapterAdded", "o",
++					GDBUS_ARGS({"adapter", "o" })) },
++	{ _GDBUS_SIGNAL("AdapterRemoved", "o",
++					GDBUS_ARGS({"adapter", "o" })) },
+ 	{ }
+ };
+ 
+diff --git a/src/ndef.c b/src/ndef.c
+index 029941a..a23c508 100644
+--- a/src/ndef.c
++++ b/src/ndef.c
+@@ -419,7 +419,9 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ }
+ 
+ static const GDBusMethodTable record_methods[] = {
+-	{ "GetProperties",     "",      "a{sv}", get_properties     },
++	{ _GDBUS_METHOD("GetProperties", "", "a{sv}",
++				NULL, GDBUS_ARGS({"properties", "a{sv}"}),
++				get_properties) },
+ 	{ },
+ };
+ 
+diff --git a/src/tag.c b/src/tag.c
+index d660749..f3ab092 100644
+--- a/src/tag.c
++++ b/src/tag.c
+@@ -323,14 +323,21 @@ fail:
+ }
+ 
+ static const GDBusMethodTable tag_methods[] = {
+-	{ "GetProperties",     "",      "a{sv}", get_properties     },
+-	{ "SetProperty",       "sv",    "",      set_property       },
+-	{ "Write",             "a{sv}", "",      write_ndef         },
++	{ _GDBUS_METHOD("GetProperties", "", "a{sv}",
++				NULL, GDBUS_ARGS({"properties", "a{sv}"}),
++				get_properties) },
++	{ _GDBUS_METHOD("SetProperty", "sv", "",
++				GDBUS_ARGS({"name", "s"}, {"value", "v"}),
++				NULL, set_property) },
++	{ _GDBUS_METHOD("Write", "a{sv}", "",
++					GDBUS_ARGS({"attributes", "a{sv}"}),
++					NULL, write_ndef) },
+ 	{ },
+ };
+ 
+ static const GDBusSignalTable tag_signals[] = {
+-	{ "PropertyChanged",		"sv"	},
++	{ _GDBUS_SIGNAL("PropertyChanged", "sv",
++				GDBUS_ARGS({"name", "s"}, {"value", "v"})) },
+ 	{ }
+ };
+ 
 -- 
 1.7.9.5
 
