@@ -1,195 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 2/6] Bluetooth: Remove 'register' usage from the subsystem
-Date: Wed, 23 May 2012 04:04:19 -0300
-Message-Id: <1337756663-19805-2-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1337756663-19805-1-git-send-email-gustavo@padovan.org>
-References: <1337756663-19805-1-git-send-email-gustavo@padovan.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "An, Tedd" <tedd.an@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH 1/3] hciattach: add common debug print functions and
+ toggle option
+Date: Wed, 23 May 2012 04:38:16 +0000
+Message-ID: <BB52B9B497F0EE4EB05C192A0408F6601970C6A9@ORSMSX104.amr.corp.intel.com>
+References: <148659297.eyne5QQyzV@tedd-ubuntu>
+ <1337742978.15105.34.camel@aeonflux>
+In-Reply-To: <1337742978.15105.34.camel@aeonflux>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-
-Let the compiler chooses what is best.
-
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
----
- drivers/bluetooth/bluecard_cs.c |   10 +++++-----
- drivers/bluetooth/bt3c_cs.c     |    4 ++--
- drivers/bluetooth/btuart_cs.c   |    4 ++--
- drivers/bluetooth/dtl1_cs.c     |    4 ++--
- drivers/bluetooth/hci_bcsp.c    |    2 +-
- drivers/bluetooth/hci_h4.c      |    2 +-
- drivers/bluetooth/hci_ll.c      |    6 +++---
- net/bluetooth/hci_conn.c        |    2 +-
- net/bluetooth/hci_sock.c        |    2 +-
- net/bluetooth/sco.c             |    2 +-
- 10 files changed, 19 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/bluetooth/bluecard_cs.c b/drivers/bluetooth/bluecard_cs.c
-index 1fcd923..585c88e 100644
---- a/drivers/bluetooth/bluecard_cs.c
-+++ b/drivers/bluetooth/bluecard_cs.c
-@@ -231,12 +231,12 @@ static void bluecard_write_wakeup(bluecard_info_t *info)
- 	}
- 
- 	do {
--		register unsigned int iobase = info->p_dev->resource[0]->start;
--		register unsigned int offset;
--		register unsigned char command;
--		register unsigned long ready_bit;
-+		unsigned int iobase = info->p_dev->resource[0]->start;
-+		unsigned int offset;
-+		unsigned char command;
-+		unsigned long ready_bit;
- 		register struct sk_buff *skb;
--		register int len;
-+		int len;
- 
- 		clear_bit(XMIT_WAKEUP, &(info->tx_state));
- 
-diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
-index 308c859..b2b0fbb 100644
---- a/drivers/bluetooth/bt3c_cs.c
-+++ b/drivers/bluetooth/bt3c_cs.c
-@@ -186,9 +186,9 @@ static void bt3c_write_wakeup(bt3c_info_t *info)
- 		return;
- 
- 	do {
--		register unsigned int iobase = info->p_dev->resource[0]->start;
-+		unsigned int iobase = info->p_dev->resource[0]->start;
- 		register struct sk_buff *skb;
--		register int len;
-+		int len;
- 
- 		if (!pcmcia_dev_present(info->p_dev))
- 			break;
-diff --git a/drivers/bluetooth/btuart_cs.c b/drivers/bluetooth/btuart_cs.c
-index c4fc2f3..65b8d99 100644
---- a/drivers/bluetooth/btuart_cs.c
-+++ b/drivers/bluetooth/btuart_cs.c
-@@ -140,9 +140,9 @@ static void btuart_write_wakeup(btuart_info_t *info)
- 	}
- 
- 	do {
--		register unsigned int iobase = info->p_dev->resource[0]->start;
-+		unsigned int iobase = info->p_dev->resource[0]->start;
- 		register struct sk_buff *skb;
--		register int len;
-+		int len;
- 
- 		clear_bit(XMIT_WAKEUP, &(info->tx_state));
- 
-diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
-index 6e8d961..b1b37cc 100644
---- a/drivers/bluetooth/dtl1_cs.c
-+++ b/drivers/bluetooth/dtl1_cs.c
-@@ -144,9 +144,9 @@ static void dtl1_write_wakeup(dtl1_info_t *info)
- 	}
- 
- 	do {
--		register unsigned int iobase = info->p_dev->resource[0]->start;
-+		unsigned int iobase = info->p_dev->resource[0]->start;
- 		register struct sk_buff *skb;
--		register int len;
-+		int len;
- 
- 		clear_bit(XMIT_WAKEUP, &(info->tx_state));
- 
-diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
-index 661a8dc..57e502e 100644
---- a/drivers/bluetooth/hci_bcsp.c
-+++ b/drivers/bluetooth/hci_bcsp.c
-@@ -552,7 +552,7 @@ static u16 bscp_get_crc(struct bcsp_struct *bcsp)
- static int bcsp_recv(struct hci_uart *hu, void *data, int count)
- {
- 	struct bcsp_struct *bcsp = hu->priv;
--	register unsigned char *ptr;
-+	unsigned char *ptr;
- 
- 	BT_DBG("hu %p count %d rx_state %d rx_count %ld", 
- 		hu, count, bcsp->rx_state, bcsp->rx_count);
-diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
-index 7483294..c60623f 100644
---- a/drivers/bluetooth/hci_h4.c
-+++ b/drivers/bluetooth/hci_h4.c
-@@ -126,7 +126,7 @@ static int h4_enqueue(struct hci_uart *hu, struct sk_buff *skb)
- 
- static inline int h4_check_data_len(struct h4_struct *h4, int len)
- {
--	register int room = skb_tailroom(h4->rx_skb);
-+	int room = skb_tailroom(h4->rx_skb);
- 
- 	BT_DBG("len %d room %d", len, room);
- 
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index b874c0e..ff6d589 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -348,7 +348,7 @@ static int ll_enqueue(struct hci_uart *hu, struct sk_buff *skb)
- 
- static inline int ll_check_data_len(struct ll_struct *ll, int len)
- {
--	register int room = skb_tailroom(ll->rx_skb);
-+	int room = skb_tailroom(ll->rx_skb);
- 
- 	BT_DBG("len %d room %d", len, room);
- 
-@@ -374,11 +374,11 @@ static inline int ll_check_data_len(struct ll_struct *ll, int len)
- static int ll_recv(struct hci_uart *hu, void *data, int count)
- {
- 	struct ll_struct *ll = hu->priv;
--	register char *ptr;
-+	char *ptr;
- 	struct hci_event_hdr *eh;
- 	struct hci_acl_hdr   *ah;
- 	struct hci_sco_hdr   *sh;
--	register int len, type, dlen;
-+	int len, type, dlen;
- 
- 	BT_DBG("hu %p count %d rx_state %ld rx_count %ld", hu, count, ll->rx_state, ll->rx_count);
- 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 971601e..b9f13f6 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -800,7 +800,7 @@ EXPORT_SYMBOL(hci_conn_put_device);
- 
- int hci_get_conn_list(void __user *arg)
- {
--	register struct hci_conn *c;
-+	struct hci_conn *c;
- 	struct hci_conn_list_req req, *cl;
- 	struct hci_conn_info *ci;
- 	struct hci_dev *hdev;
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 89767ad..c1e0c3d 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -118,7 +118,7 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
- 			continue;
- 
- 		if (bt_cb(skb)->pkt_type == HCI_EVENT_PKT) {
--			register int evt = (*(__u8 *)skb->data & HCI_FLT_EVENT_BITS);
-+			int evt = (*(__u8 *)skb->data & HCI_FLT_EVENT_BITS);
- 
- 			if (!hci_test_bit(evt, &flt->event_mask))
- 				continue;
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 824ae2f..6401cca 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -908,7 +908,7 @@ done:
- /* ----- SCO interface with lower layer (HCI) ----- */
- int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
- {
--	register struct sock *sk;
-+	struct sock *sk;
- 	struct hlist_node *node;
- 	int lm = 0;
- 
--- 
-1.7.10.1
-
+TWFyY2VsLg0KDQpUaGFua3MgZm9yIHRoZSBjb21tZW50cy4gSSBqdXN0IGZpeGVkIHVwIGFuZCBz
+ZW50IHRoZSBwYXRjaGVzLg0KQlRXLCBkbyB5b3Ugd2FudCBtZSB0byBydW4gdGhlICJjaGVja3Bh
+dGNoIiB3aXRoIGhjaWF0dGFjaC5jIGFuZCBoY2lhdHRhY2guaCB0byBmaXggdGhlIGNvZGluZyBz
+dHlsZT8NCkV2ZW4gd2l0aCBteSAicm9va2llIiBleWVzLCBJIGNhbiBzZWUgc29tZSBjb2Rpbmcg
+c3R5bGUgaXNzdWUuDQoNCkxldCBtZSBrbm93Lg0KDQpSZWdhcmRzLg0KDQpUZWRkDQoNCj4gLS0t
+LS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWFyY2VsIEhvbHRtYW5uIFttYWlsdG86
+bWFyY2VsQGhvbHRtYW5uLm9yZ10NCj4gU2VudDogVHVlc2RheSwgTWF5IDIyLCAyMDEyIDg6MTYg
+UE0NCj4gVG86IEFuLCBUZWRkDQo+IENjOiBsaW51eC1ibHVldG9vdGgNCj4gU3ViamVjdDogUmU6
+IFtQQVRDSCAxLzNdIGhjaWF0dGFjaDogYWRkIGNvbW1vbiBkZWJ1ZyBwcmludCBmdW5jdGlvbnMg
+YW5kDQo+IHRvZ2dsZSBvcHRpb24NCj4gDQo+IEhpIFRlZGQsDQo+IA0KPiA+IFRoaXMgYWRkcyBj
+b21tb24gZGVidWcgcHJpbnQgZnVuY3Rpb25zIHRoYXQgcHJpbnQgdGhlIGRlYnVnIG1lc3NhZ2Vz
+DQo+ID4gdG8gc3RkZXJyIGFuZCBpdCBjYW4gYmUgdG9nZ2xlZCB3aXRoJy1kJyBvcHRpb24gaW4g
+dGhlIHBhcmFtZXRlci4NCj4gPg0KPiA+IEl0IHByb3ZpZGVzIHR3byBmdW5jdGlvbnM6IG9uZSBm
+b3IgbWVzc2FnZSBhbmQgdGhlIG90aGVyIGZvciBkYXRhIGNvbnRlbnRzLg0KPiA+DQo+ID4gLS0t
+DQo+ID4gIHRvb2xzL2hjaWF0dGFjaC44IHwgICAgNCArKysrDQo+ID4gIHRvb2xzL2hjaWF0dGFj
+aC5jIHwgICAzNiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0NCj4gPiAgdG9v
+bHMvaGNpYXR0YWNoLmggfCAgICAzICsrKw0KPiA+ICAzIGZpbGVzIGNoYW5nZWQsIDQxIGluc2Vy
+dGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvdG9vbHMvaGNp
+YXR0YWNoLjggYi90b29scy9oY2lhdHRhY2guOCBpbmRleA0KPiA+IGNjOTdjYWQuLmVjY2JjNjEg
+MTAwNjQ0DQo+ID4gLS0tIGEvdG9vbHMvaGNpYXR0YWNoLjgNCj4gPiArKysgYi90b29scy9oY2lh
+dHRhY2guOA0KPiA+IEBAIC02LDYgKzYsNyBAQCBoY2lhdHRhY2ggXC0gYXR0YWNoIHNlcmlhbCBk
+ZXZpY2VzIHZpYSBVQVJUIEhDSSB0bw0KPiA+IEJsdWVaIHN0YWNrICAuUkIgW1x8IFwtYiBcfF0g
+IC5SQiBbXHwgXC1uIFx8XSAgLlJCIFtcfCBcLXAgXHxdDQo+ID4gKy5SQiBbXHwgXC1kIFx8XQ0K
+PiA+ICAuUkIgW1x8IFwtdA0KPiA+ICAuSVIgdGltZW91dCBcfF0NCj4gPiAgLlJCIFtcfCBcLXMN
+Cj4gPiBAQCAtMzIsNiArMzMsOSBAQCBEb24ndCBkZXRhY2ggZnJvbSBjb250cm9sbGluZyB0ZXJt
+aW5hbC4NCj4gPiAgLkIgXC1wDQo+ID4gIFByaW50IHRoZSBQSUQgd2hlbiBkZXRhY2hpbmcuDQo+
+ID4gIC5UUA0KPiA+ICsuQiBcLWQNCj4gPiArUHJpbnQgZGVidWcgbWVzc2FnZXMgdG8gc3RkZXJy
+Lg0KPiA+ICsuVFANCj4gPiAgLkJJIFwtdCAiIHRpbWVvdXQiDQo+ID4gIFNwZWNpZnkgYW4gaW5p
+dGlhbGl6YXRpb24gdGltZW91dC4gIChEZWZhdWx0IGlzIDUgc2Vjb25kcy4pICAuVFAgZGlmZg0K
+PiA+IC0tZ2l0IGEvdG9vbHMvaGNpYXR0YWNoLmMgYi90b29scy9oY2lhdHRhY2guYyBpbmRleCAz
+ZTczOTU2Li4wNmFlOWQ2DQo+ID4gMTAwNjQ0DQo+ID4gLS0tIGEvdG9vbHMvaGNpYXR0YWNoLmMN
+Cj4gPiArKysgYi90b29scy9oY2lhdHRhY2guYw0KPiA+IEBAIC00Miw2ICs0Miw3IEBADQo+ID4g
+ICNpbmNsdWRlIDxzeXMvcG9sbC5oPg0KPiA+ICAjaW5jbHVkZSA8c3lzL3BhcmFtLmg+DQo+ID4g
+ICNpbmNsdWRlIDxzeXMvaW9jdGwuaD4NCj4gPiArI2luY2x1ZGUgPHN0ZGFyZy5oPg0KPiA+DQo+
+ID4gICNpbmNsdWRlIDxibHVldG9vdGgvYmx1ZXRvb3RoLmg+DQo+ID4gICNpbmNsdWRlIDxibHVl
+dG9vdGgvaGNpLmg+DQo+ID4gQEAgLTczLDYgKzc0LDggQEAgc3RydWN0IHVhcnRfdCB7DQo+ID4N
+Cj4gPiAgc3RhdGljIHZvbGF0aWxlIHNpZ19hdG9taWNfdCBfX2lvX2NhbmNlbGVkID0gMDsNCj4g
+Pg0KPiA+ICtzdGF0aWMgaW50IGdfZGVidWc7DQo+ID4gKw0KPiA+ICBzdGF0aWMgdm9pZCBzaWdf
+aHVwKGludCBzaWcpDQo+ID4gIHsNCj4gPiAgfQ0KPiA+IEBAIC0xNDQsNiArMTQ3LDMwIEBAIHN0
+YXRpYyBpbnQgdWFydF9zcGVlZChpbnQgcykNCj4gPiAgCX0NCj4gPiAgfQ0KPiA+DQo+ID4gK3Zv
+aWQgZGJnX3ByaW50KGNvbnN0IGNoYXIgKmZtdCwgLi4uKQ0KPiA+ICt7DQo+ID4gKwl2YV9saXN0
+IGFyZ3M7DQo+IA0KPiBleHRyYSBlbXB0eSBsaW5lIGJldHdlZW4gdmFyaWFibGVzIGFuZCBjb2Rl
+IHBsZWFzZS4NCj4gDQo+ID4gKwlpZihnX2RlYnVnKSB7DQo+IA0KPiBFeHRyYSBzcGFjZSBhZnRl
+ciBpZiBhbmQgYmVmb3JlICguDQo+IA0KPiA+ICsJCWZwcmludGYoc3RkZXJyLCAiZGJnOiAiKTsN
+Cj4gPiArCQl2YV9zdGFydChhcmdzLCBmbXQpOw0KPiA+ICsJCXZmcHJpbnRmKHN0ZGVyciwgZm10
+LCBhcmdzKTsNCj4gPiArCQl2YV9lbmQoYXJncyk7DQo+ID4gKwkJZnByaW50ZihzdGRlcnIsICJc
+biIpOw0KPiA+ICsJfQ0KPiA+ICt9DQo+ID4gKw0KPiA+ICt2b2lkIGRiZ19wcmludF9wa3QoY29u
+c3QgY2hhciAqc3RyLCB1bnNpZ25lZCBjaGFyICpkYXRhLCBpbnQgbGVuKSB7DQo+ID4gKwlpbnQg
+aTsNCj4gDQo+IFNhbWUgaGVyZS4NCj4gDQo+ID4gKwlpZihnX2RlYnVnKSB7DQo+IA0KPiBBbmQg
+aGVyZS4NCj4gDQo+ID4gKwkJZnByaW50ZihzdGRlcnIsICJkYmc6ICVzIiwgc3RyKTsNCj4gPiAr
+CQlmb3IgKGkgPSAwOyBpIDwgbGVuOyBpKyspIHsNCj4gPiArCQkJZnByaW50ZihzdGRlcnIsICIl
+MDJ4ICIsIGRhdGFbaV0pOw0KPiA+ICsJCX0NCj4gDQo+IE5vIHsgfSBuZWVkZWQgZm9yIHNpbmds
+ZSBzdGF0ZW1lbnRzLg0KPiANCj4gPiArCQlmcHJpbnRmKHN0ZGVyciwgIlxuIik7DQo+ID4gKwl9
+DQo+ID4gK30NCj4gPiArDQo+ID4gIGludCBzZXRfc3BlZWQoaW50IGZkLCBzdHJ1Y3QgdGVybWlv
+cyAqdGksIGludCBzcGVlZCkgIHsNCj4gPiAgCWlmIChjZnNldG9zcGVlZCh0aSwgdWFydF9zcGVl
+ZChzcGVlZCkpIDwgMCkgQEAgLTEyNjAsNyArMTI4Nyw3IEBADQo+ID4gc3RhdGljIHZvaWQgdXNh
+Z2Uodm9pZCkgIHsNCj4gPiAgCXByaW50ZigiaGNpYXR0YWNoIC0gSENJIFVBUlQgZHJpdmVyIGlu
+aXRpYWxpemF0aW9uIHV0aWxpdHlcbiIpOw0KPiA+ICAJcHJpbnRmKCJVc2FnZTpcbiIpOw0KPiA+
+IC0JcHJpbnRmKCJcdGhjaWF0dGFjaCBbLW5dIFstcF0gWy1iXSBbLXJdIFstdCB0aW1lb3V0XSBb
+LXMgaW5pdGlhbF9zcGVlZF0NCj4gPHR0eT4gPHR5cGUgfCBpZD4gW3NwZWVkXSBbZmxvd3xub2Zs
+b3ddIFtiZGFkZHJdXG4iKTsNCj4gPiArCXByaW50ZigiXHRoY2lhdHRhY2ggWy1uXSBbLXBdIFst
+Yl0gWy1yXSBbLWRdIFstdCB0aW1lb3V0XSBbLXMNCj4gPiAraW5pdGlhbF9zcGVlZF0gPHR0eT4g
+PHR5cGUgfCBpZD4gW3NwZWVkXSBbZmxvd3xub2Zsb3ddIFtiZGFkZHJdXG4iKTsNCj4gPiAgCXBy
+aW50ZigiXHRoY2lhdHRhY2ggLWxcbiIpOw0KPiA+ICB9DQo+ID4NCj4gPiBAQCAtMTI4MCw4ICsx
+MzA3LDkgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkNCj4gPiAgCWRldGFjaCA9
+IDE7DQo+ID4gIAlwcmludHBpZCA9IDA7DQo+ID4gIAlyYXcgPSAwOw0KPiA+ICsJZ19kZWJ1ZyA9
+IDA7DQo+IA0KPiBJIHJhdGhlciBoYXZlIHlvdSBub3Qgc3RhcnQgd2l0aCBnXyBmb3IgZ2xvYmFs
+IHNlbWFudGljLiBXZSBoYXZlIG5vdCBiZWVuDQo+IHVzaW5nIGl0LCBzbyBzdGFydGluZyBpdCBu
+b3cgaXMgbWFraW5nIGl0IGNvbmZ1c2luZy4NCj4gDQo+ID4NCj4gPiAtCXdoaWxlICgob3B0PWdl
+dG9wdChhcmdjLCBhcmd2LCAiYm5wdDpzOmxyIikpICE9IEVPRikgew0KPiA+ICsJd2hpbGUgKChv
+cHQ9Z2V0b3B0KGFyZ2MsIGFyZ3YsICJibnBkdDpzOmxyIikpICE9IEVPRikgew0KPiA+ICAJCXN3
+aXRjaChvcHQpIHsNCj4gPiAgCQljYXNlICdiJzoNCj4gPiAgCQkJc2VuZF9icmVhayA9IDE7DQo+
+ID4gQEAgLTEzMTQsNiArMTM0MiwxMCBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltd
+KQ0KPiA+ICAJCQlyYXcgPSAxOw0KPiA+ICAJCQlicmVhazsNCj4gPg0KPiA+ICsJCWNhc2UgJ2Qn
+Og0KPiA+ICsJCQlnX2RlYnVnID0gMTsNCj4gPiArCQkJYnJlYWs7DQo+ID4gKw0KPiA+ICAJCWRl
+ZmF1bHQ6DQo+ID4gIAkJCXVzYWdlKCk7DQo+ID4gIAkJCWV4aXQoMSk7DQo+ID4gZGlmZiAtLWdp
+dCBhL3Rvb2xzL2hjaWF0dGFjaC5oIGIvdG9vbHMvaGNpYXR0YWNoLmggaW5kZXgNCj4gPiBhMjRk
+YmM0Li5jNTI4ZjJiIDEwMDY0NA0KPiA+IC0tLSBhL3Rvb2xzL2hjaWF0dGFjaC5oDQo+ID4gKysr
+IGIvdG9vbHMvaGNpYXR0YWNoLmgNCj4gPiBAQCAtNDQsNiArNDQsOSBAQA0KPiA+ICAjZGVmaW5l
+IEhDSV9VQVJUX1JFU0VUX09OX0lOSVQJMQ0KPiA+ICAjZGVmaW5lIEhDSV9VQVJUX0NSRUFURV9B
+TVAJMg0KPiA+DQo+ID4gK3ZvaWQgZGJnX3ByaW50KGNvbnN0IGNoYXIgKmZtdCwgLi4uKTsgdm9p
+ZCBkYmdfcHJpbnRfcGt0KGNvbnN0IGNoYXIgKg0KPiA+ICtzdHIsIHVuc2lnbmVkIGNoYXIgKiBk
+YXRhLCBpbnQgbGVuKTsNCj4gDQo+IGl0IGlzIGNoYXIgKnN0ciBoZXJlLiBObyBleHRyYSBzcGFj
+ZS4NCj4gDQo+ID4gKw0KPiA+ICBpbnQgcmVhZF9oY2lfZXZlbnQoaW50IGZkLCB1bnNpZ25lZCBj
+aGFyKiBidWYsIGludCBzaXplKTsNCj4gDQo+IEFuZCBjbGVhcmx5IG5vdCB5b3VyIGZhdWx0LCB0
+aGlzIG9uZSBpcyB3cm9uZyBhcyB3ZWxsLiBUaGUgaGNpYXR0YWNoIGlzIGEgcG9zdGVyDQo+IGNo
+aWxkIG9mIGJhZCBjb2Rpbmcgc3R5bGUuIFRpbWUgdG8gY2xlYW4gdGhhdCB1cCBhIGxpdHRsZSBi
+aXQgOykNCj4gDQo+ID4gIGludCBzZXRfc3BlZWQoaW50IGZkLCBzdHJ1Y3QgdGVybWlvcyAqdGks
+IGludCBzcGVlZCk7DQo+ID4NCj4gDQo+IFJlZ2FyZHMNCj4gDQo+IE1hcmNlbA0KPiANCg0K
