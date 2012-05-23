@@ -1,88 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3] Bluetooth: Define L2CAP conf continuation flag
-Date: Wed, 23 May 2012 15:44:06 +0300
-Message-Id: <1337777047-13515-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1337771107.15105.74.camel@aeonflux>
-References: <1337771107.15105.74.camel@aeonflux>
+Message-ID: <1337771517.15105.77.camel@aeonflux>
+Subject: Re: [PATCH 1/6] Bluetooth: Remove most of the inline usage
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Date: Wed, 23 May 2012 13:11:57 +0200
+In-Reply-To: <1337756663-19805-1-git-send-email-gustavo@padovan.org>
+References: <1337756663-19805-1-git-send-email-gustavo@padovan.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Gustavo,
 
-Define Continuation flag which the only flag used from Flags field
-in L2CAP Configuration Request and Response.
+> Only obvious cases were left as inline, mostly oneline functions.
+> 
+> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> ---
+>  net/bluetooth/bnep/core.c   |    4 +-
+>  net/bluetooth/bnep/netdev.c |    6 +-
+>  net/bluetooth/hci_core.c    |   33 +++++-----
+>  net/bluetooth/hci_event.c   |  144 ++++++++++++++++++-------------------------
+>  net/bluetooth/hci_sock.c    |    6 +-
+>  net/bluetooth/hidp/core.c   |    4 +-
+>  net/bluetooth/mgmt.c        |    2 +-
+>  net/bluetooth/rfcomm/core.c |   18 +++---
+>  net/bluetooth/rfcomm/tty.c  |    4 +-
+>  net/bluetooth/sco.c         |    9 +--
+>  10 files changed, 104 insertions(+), 126 deletions(-)
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/l2cap.h |    3 +++
- net/bluetooth/l2cap_core.c    |   10 +++++-----
- 2 files changed, 8 insertions(+), 5 deletions(-)
+all 6 patches have been applied to bluetooth-next tree.
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 7bc4019..5de6912 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -271,6 +271,9 @@ struct l2cap_conf_rsp {
- #define L2CAP_CONF_PENDING	0x0004
- #define L2CAP_CONF_EFS_REJECT	0x0005
- 
-+/* configuration req/rsp continuation flag */
-+#define L2CAP_CONF_FLAG_CONTINUATION	1
-+
- struct l2cap_conf_opt {
- 	__u8       type;
- 	__u8       len;
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f6b7855..e31b005 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2944,7 +2944,7 @@ done:
- 	}
- 
- 	req->dcid  = cpu_to_le16(chan->dcid);
--	req->flags = cpu_to_le16(0);
-+	req->flags = __constant_cpu_to_le16(0);
- 
- 	return ptr - data;
- }
-@@ -3164,7 +3164,7 @@ done:
- 	}
- 	rsp->scid   = cpu_to_le16(chan->dcid);
- 	rsp->result = cpu_to_le16(result);
--	rsp->flags  = cpu_to_le16(0x0000);
-+	rsp->flags  = __constant_cpu_to_le16(0);
- 
- 	return ptr - data;
- }
-@@ -3263,7 +3263,7 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
- 	}
- 
- 	req->dcid   = cpu_to_le16(chan->dcid);
--	req->flags  = cpu_to_le16(0x0000);
-+	req->flags  = __constant_cpu_to_le16(0);
- 
- 	return ptr - data;
- }
-@@ -3618,7 +3618,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	memcpy(chan->conf_req + chan->conf_len, req->data, len);
- 	chan->conf_len += len;
- 
--	if (flags & 0x0001) {
-+	if (flags & L2CAP_CONF_FLAG_CONTINUATION) {
- 		/* Incomplete config. Send empty response. */
- 		l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
- 				l2cap_build_conf_rsp(chan, rsp,
-@@ -3769,7 +3769,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		goto done;
- 	}
- 
--	if (flags & 0x01)
-+	if (flags & L2CAP_CONF_FLAG_CONTINUATION)
- 		goto done;
- 
- 	set_bit(CONF_INPUT_DONE, &chan->conf_state);
--- 
-1.7.9.5
+However we need to watch out for some of these include removal since in
+some cases there are still needed on non-x86 platforms.
+
+Regards
+
+Marcel
+
 
