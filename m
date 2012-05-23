@@ -1,141 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 May 2012 16:13:49 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 01/19] Bluetooth: Add unlink to L2CAP channel ops
-In-Reply-To: <1337787445-23235-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Message-ID: <alpine.DEB.2.02.1205231505380.6526@mathewm-linux>
-References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1337787445-23235-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1337612075-2697-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1337612075-2697-1-git-send-email-lucas.demarchi@profusion.mobi>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Wed, 23 May 2012 19:24:35 -0300
+Message-ID: <CAMOw1v4bP74N9ugbQ5RuFbnw_k8JUp7fRkQ+79TvQa0qpRN-ZA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gdbus: add macro for methods marked as NOREPLY
+To: linux-bluetooth@vger.kernel.org
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Marcel,
 
-Andrei -
-
-On Wed, 23 May 2012, Andrei Emeltchenko wrote:
-
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> This helps to separate socket and socketless code. Now socket related
-> operations moved to l2cap_sock in unlink callback for channels with sk.
->
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Mon, May 21, 2012 at 11:54 AM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
 > ---
-> include/net/bluetooth/l2cap.h |    1 +
-> net/bluetooth/l2cap_core.c    |   19 ++-----------------
-> net/bluetooth/l2cap_sock.c    |   25 +++++++++++++++++++++++++
-> 3 files changed, 28 insertions(+), 17 deletions(-)
 >
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 0142257..a017249 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -529,6 +529,7 @@ struct l2cap_ops {
-> 	void			(*state_change) (void *data, int state);
-> 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
-> 					       unsigned long len, int nb);
-> +	void			(*unlink) (struct l2cap_chan *chan, int err);
-> };
+> This one is not used in BlueZ, but it was necessary for other projects us=
+ing
+> gdbus. It's better to keep them in sync.
 >
-> struct l2cap_conn {
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index e31b005..c81b828 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -493,9 +493,7 @@ static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+> =A0gdbus/gdbus.h | =A0 =A07 +++++++
+> =A01 file changed, 7 insertions(+)
 >
-> static void l2cap_chan_del(struct l2cap_chan *chan, int err)
-> {
-> -	struct sock *sk = chan->sk;
-> 	struct l2cap_conn *conn = chan->conn;
-> -	struct sock *parent = bt_sk(sk)->parent;
->
-> 	__clear_chan_timer(chan);
->
-> @@ -511,21 +509,8 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
-> 		hci_conn_put(conn->hcon);
-> 	}
->
-> -	lock_sock(sk);
-> -
-> -	__l2cap_state_change(chan, BT_CLOSED);
-> -	sock_set_flag(sk, SOCK_ZAPPED);
-> -
-> -	if (err)
-> -		__l2cap_chan_set_err(chan, err);
-> -
-> -	if (parent) {
-> -		bt_accept_unlink(sk);
-> -		parent->sk_data_ready(parent, 0);
-> -	} else
-> -		sk->sk_state_change(sk);
-> -
-> -	release_sock(sk);
-> +	if (chan->ops->unlink)
-> +		chan->ops->unlink(chan, err);
->
-> 	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
-> 		return;
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 4d36605..6749d11 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -954,6 +954,30 @@ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
-> 	return skb;
-> }
->
-> +static void l2cap_sock_unlink_cb(struct l2cap_chan *chan, int err)
-> +{
-> +	struct sock *sk = chan->sk;
-> +	struct sock *parent = bt_sk(sk)->parent;
-> +
-> +	lock_sock(sk);
-> +
-> +	chan->state = BT_CLOSED;
+> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+> index e2e160d..0a8a27c 100644
+> --- a/gdbus/gdbus.h
+> +++ b/gdbus/gdbus.h
 
-I think this line had better stay in l2cap_chan_del - otherwise every 
-unlink callback has to do it.  It's also the only modification to chan 
-in here.  Since the channel must be locked before l2cap_chan_del is 
-called anyway, I don't think it matters if chan->state is modified 
-before or after the call to chan->ops->unlink.
-
-> +	sk->sk_state = BT_CLOSED;
-> +	sock_set_flag(sk, SOCK_ZAPPED);
-> +
-> +	if (err)
-> +		sk->sk_err = err;
-> +
-> +	parent = bt_sk(sk)->parent;
-> +	if (parent) {
-> +		bt_accept_unlink(sk);
-> +		parent->sk_data_ready(parent, 0);
-> +	} else
-> +		sk->sk_state_change(sk);
-> +
-> +	release_sock(sk);
-> +}
-> +
-> static struct l2cap_ops l2cap_chan_ops = {
-> 	.name		= "L2CAP Socket Interface",
-> 	.new_connection	= l2cap_sock_new_connection_cb,
-> @@ -961,6 +985,7 @@ static struct l2cap_ops l2cap_chan_ops = {
-> 	.close		= l2cap_sock_close_cb,
-> 	.state_change	= l2cap_sock_state_change_cb,
-> 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
-> +	.unlink		= l2cap_sock_unlink_cb,
-> };
->
-> static void l2cap_sock_destruct(struct sock *sk)
-> -- 
-> 1.7.9.5
+This one is still missing in BlueZ, neard and ConnMan.
 
 
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
+Lucas De Marchi
