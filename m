@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Henrique Dante de Almeida <hdante@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 11/11] gdbus: add Method.NoReply annotation in introspection
-Date: Wed, 23 May 2012 10:20:08 -0300
-Message-Id: <1337779208-3555-12-git-send-email-hdante@profusion.mobi>
+Subject: [PATCH 09/11] gdbus: remove signature and reply from tables
+Date: Wed, 23 May 2012 10:20:06 -0300
+Message-Id: <1337779208-3555-10-git-send-email-hdante@profusion.mobi>
 In-Reply-To: <1337779208-3555-1-git-send-email-hdante@profusion.mobi>
 References: <1337779208-3555-1-git-send-email-hdante@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,35 +13,99 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 
 ---
- gdbus/object.c |    7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ gdbus/gdbus.h  |   51 ---------------------------------------------------
+ gdbus/object.c |    2 +-
+ 2 files changed, 1 insertion(+), 52 deletions(-)
 
+diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+index 8354633..e2e160d 100644
+--- a/gdbus/gdbus.h
++++ b/gdbus/gdbus.h
+@@ -89,8 +89,6 @@ typedef struct {
+ 
+ typedef struct {
+ 	const char *name;
+-	const char *signature;
+-	const char *reply;
+ 	GDBusMethodFunction function;
+ 	GDBusMethodFlags flags;
+ 	unsigned int privilege;
+@@ -100,7 +98,6 @@ typedef struct {
+ 
+ typedef struct {
+ 	const char *name;
+-	const char *signature;
+ 	GDBusSignalFlags flags;
+ 	const GDBusArgInfo *args;
+ } GDBusSignalTable;
+@@ -120,54 +117,6 @@ typedef struct {
+ 
+ #define GDBUS_ARGS(args...) (const GDBusArgInfo[]) { args, { } }
+ 
+-#define _GDBUS_METHOD(_name, _signature, _reply, _in_args, _out_args, _function) \
+-	.name = _name, \
+-	.signature = _signature, \
+-	.reply = _reply, \
+-	.in_args = _in_args, \
+-	.out_args = _out_args, \
+-	.function = _function
+-
+-#define _GDBUS_ASYNC_METHOD(_name, _signature, _reply, _in_args, _out_args, _function) \
+-	.name = _name, \
+-	.signature = _signature, \
+-	.reply = _reply, \
+-	.in_args = _in_args, \
+-	.out_args = _out_args, \
+-	.function = _function, \
+-	.flags = G_DBUS_METHOD_FLAG_ASYNC
+-
+-#define _GDBUS_DEPRECATED_METHOD(_name, _signature, _reply, _in_args, _out_args, _function) \
+-	.name = _name, \
+-	.signature = _signature, \
+-	.reply = _reply, \
+-	.in_args = _in_args, \
+-	.out_args = _out_args, \
+-	.function = _function, \
+-	.flags = G_DBUS_METHOD_FLAG_DEPRECATED
+-
+-#define _GDBUS_DEPRECATED_ASYNC_METHOD(_name, _signature, _reply, _in_args, _out_args, _function) \
+-	.name = _name, \
+-	.signature = _signature, \
+-	.reply = _reply, \
+-	.in_args = _in_args, \
+-	.out_args = _out_args, \
+-	.function = _function, \
+-	.flags = G_DBUS_METHOD_FLAG_ASYNC | G_DBUS_METHOD_FLAG_DEPRECATED
+-
+-#define _GDBUS_SIGNAL(_name, _signature, _args) \
+-	.name = _name, \
+-	.signature = _signature, \
+-	.args = _args
+-
+-#define _GDBUS_DEPRECATED_SIGNAL(_name, _signature, _args) \
+-	.name = _name, \
+-	.signature = _signature, \
+-	.args = _args, \
+-	.flags = G_DBUS_SIGNAL_FLAG_DEPRECATED
+-
+-/* Helpers with no signature and reply */
+-
+ #define GDBUS_METHOD(_name, _in_args, _out_args, _function) \
+ 	.name = _name, \
+ 	.in_args = _in_args, \
 diff --git a/gdbus/object.c b/gdbus/object.c
-index 95947f3..dacbe58 100644
+index b187bb5..fcdd6ec 100644
 --- a/gdbus/object.c
 +++ b/gdbus/object.c
-@@ -84,8 +84,10 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
- 	for (method = iface->methods; method && method->name; method++) {
- 		gboolean deprecated = method->flags &
- 						G_DBUS_METHOD_FLAG_DEPRECATED;
-+		gboolean noreply = method->flags &
-+						G_DBUS_METHOD_FLAG_NOREPLY;
+@@ -471,7 +471,7 @@ done:
+ }
  
--		if (!deprecated &&
-+		if (!deprecated && !noreply &&
- 				!(method->in_args && method->in_args->name) &&
- 				!(method->out_args && method->out_args->name))
- 			g_string_append_printf(gstr, "\t\t<method name=\"%s\"/>\n",
-@@ -99,6 +101,9 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
- 			if (deprecated)
- 				g_string_append_printf(gstr, "\t\t\t<annotation name=\"org.freedesktop.DBus.Deprecated\" value=\"true\"/>\n");
- 
-+			if (noreply)
-+				g_string_append_printf(gstr, "\t\t\t<annotation name=\"org.freedesktop.DBus.Method.NoReply\" value=\"true\"/>\n");
-+
- 			g_string_append_printf(gstr, "\t\t</method>\n");
- 		}
- 	}
+ static const GDBusMethodTable introspect_methods[] = {
+-	{ _GDBUS_METHOD("Introspect", "", "s", NULL,
++	{ GDBUS_METHOD("Introspect", NULL,
+ 			GDBUS_ARGS({ "xml", "s" }), introspect) },
+ 	{ }
+ };
 -- 
 1.7.9.5
 
