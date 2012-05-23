@@ -1,46 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 May 2012 15:55:29 +0200 (CEST)
-From: Jiri Kosina <jkosina@suse.cz>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: Joao Paulo Rechi Vita <jprvita@openbossa.org>,
-	linux-input@vger.kernel.org, marcel@holtmann.org,
-	claudio.takahasi@openbossa.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/1] HID: User-space HID I/O driver (UHID)
-In-Reply-To: <CANq1E4R_6ByuBALh0z9gxQzy5ZrT4-MY=6RqrcaVFgK0owjtxw@mail.gmail.com>
-Message-ID: <alpine.LNX.2.00.1205231554450.30445@pobox.suse.cz>
-References: <1335799650-17597-1-git-send-email-dh.herrmann@googlemail.com> <CAAngNMabAxO9fVN2DM=5xPJAVk_is3QoS1=+TGZPJAbY3TYHMQ@mail.gmail.com> <CANq1E4QaRHtGxt3d=Z2mvqAFhTY2zid20GGNZ2ZzHjStGepc+A@mail.gmail.com> <alpine.LNX.2.00.1205101218030.31253@pobox.suse.cz>
- <CANq1E4R_6ByuBALh0z9gxQzy5ZrT4-MY=6RqrcaVFgK0owjtxw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-ID: <1337779699.15105.79.camel@aeonflux>
+Subject: Re: [PATCH 00/11] gdbus: Better D-Bus introspection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Henrique Dante de Almeida <hdante@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 23 May 2012 15:28:19 +0200
+In-Reply-To: <1337779208-3555-1-git-send-email-hdante@profusion.mobi>
+References: <1337779208-3555-1-git-send-email-hdante@profusion.mobi>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, 20 May 2012, David Herrmann wrote:
+Hi Henrique,
 
-> >> > Thanks for your work, David. I'll test and review this new version.
-> >> > Did you find out the what is the problem when passing BUS_BLUETOOTH on
-> >> > the 'bus' field of the create request?
-> >>
-> >> I've spent some time looking into that but I haven't found the
-> >> problem, yet. Maybe Jiri can comment here.
-> >
-> > This should now all be handled correctly using the hid-generic mechanism.
-> > If you still see any problems with this (currently in linux-next, more
-> > precisely 'device-groups' branch in hid.git), please let me know.
+> Introspection patches to neard
 > 
-> That is working correctly now. 
-
-Thanks for checking.
-
-> Do you have any update on this patch? There is no time pressure in 
-> merging it but I would like to get some feedback what you are thinking 
-> about it so I can continue working on it.
+> Henrique Dante de Almeida (4):
+>   Constify GDBus method tables
+>   Constify GDBus signal tables
+>   Convert GDBus methods and signals to use macro helpers
+>   Do not set signature and reply in GDBus tables
 > 
-> If you like I can resend it split into multiple patches. Let me know
-> of any problems with it.
+> Lucas De Marchi (7):
+>   gdbus: add argument info to methods and signals
+>   gdbus: add and use helpers for table declarations
+>   gdbus: use GDBusArgInfo to generate introspection
+>   gdbus: loop over args to check message signature
+>   gdbus: remove signature and reply from tables
+>   gdbus: add Deprecated annotation in introspection
+>   gdbus: add Method.NoReply annotation in introspection
+> 
+>  gdbus/gdbus.h  |   47 +++++++++++++++++++-
+>  gdbus/object.c |  132 +++++++++++++++++++++++++++-----------------------------
+>  src/adapter.c  |   23 ++++++----
+>  src/device.c   |   19 +++++---
+>  src/manager.c  |   19 +++++---
+>  src/ndef.c     |    6 ++-
+>  src/tag.c      |   18 +++++---
+>  7 files changed, 163 insertions(+), 101 deletions(-)
 
-Yes, that would be very much preferred on my side -- huge condensed 
-patches are much harder to review (if the split is done properly). Thanks!
+wrong mailing list, but I applied all 11 patches now.
 
--- 
-Jiri Kosina
-SUSE Labs
+Regards
+
+Marcel
+
+
