@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 13/19] Bluetooth: A2MP: Process A2MP Get Info Request
-Date: Wed, 23 May 2012 18:37:19 +0300
-Message-Id: <1337787445-23235-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 06/19] Bluetooth: A2MP: Add chan callbacks
+Date: Wed, 23 May 2012 18:37:12 +0300
+Message-Id: <1337787445-23235-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,79 +12,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Process A2MP Get Info Request.
-Example of trace log for invalid controller id is shown below:
-
-...
-> ACL data: handle 11 flags 0x02 dlen 13
-    A2MP: Get Info req: id 238
-< ACL data: handle 11 flags 0x00 dlen 30
-    A2MP: Get Info rsp: id 238 status (1) Invalid Controller ID
-...
-
-Note that If the Status field is set to Invalid Controller ID all subsequent
-fields in the AMP Get Info Response shall be ignored by the receiver.
+Add state change, close and skb allocation callbacks.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ net/bluetooth/a2mp.c |   40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index d60be75..d636c0c 100644
+index e7e5f5f..eb98541 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -177,6 +177,40 @@ static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
- 	return 0;
+@@ -63,8 +63,46 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
+ 	kfree(cmd);
  }
  
-+static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
-+			    struct a2mp_cmd *hdr)
++static void a2mp_chan_state_change_cb(void *data, int state)
 +{
-+	struct a2mp_info_req *req  = (struct a2mp_info_req *) skb->data;
-+	struct a2mp_info_rsp rsp;
-+	struct hci_dev *hdev;
++	struct amp_mgr *mgr = data;
++	struct l2cap_chan *chan;
 +
-+	if (le16_to_cpu(hdr->len) < sizeof(*req))
-+		return -EINVAL;
++	if (!mgr)
++		return;
 +
-+	BT_DBG("id %d", req->id);
++	chan = mgr->a2mp_chan;
 +
-+	rsp.id = req->id;
-+	rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
++	BT_DBG("chan %p state %s", chan, state_to_string(state));
 +
-+	hdev = hci_dev_get(req->id);
-+	if (hdev && hdev->amp_type != HCI_BREDR) {
-+		rsp.status = 0;
-+		rsp.total_bw = cpu_to_le32(hdev->amp_total_bw);
-+		rsp.max_bw = cpu_to_le32(hdev->amp_max_bw);
-+		rsp.min_latency = cpu_to_le32(hdev->amp_min_latency);
-+		rsp.pal_cap = cpu_to_le16(hdev->amp_pal_cap);
-+		rsp.assoc_size = cpu_to_le16(hdev->amp_assoc_size);
++	chan->state = state;
++
++	switch (state) {
++	case BT_CLOSED:
++		if (mgr)
++			amp_mgr_put(mgr);
++		break;
 +	}
-+
-+	if (hdev)
-+		hci_dev_put(hdev);
-+
-+	a2mp_send(mgr, A2MP_GETINFO_RSP, hdr->ident, sizeof(rsp), &rsp);
-+
-+	skb_pull(skb, sizeof(*req));
-+	return 0;
 +}
 +
- /* Handle A2MP signalling */
- static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
- {
-@@ -215,6 +249,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
- 			break;
- 
- 		case A2MP_GETINFO_REQ:
-+			err = a2mp_getinfo_req(mgr, skb, hdr);
-+			break;
++static void a2mp_chan_close_cb(void *data)
++{
++	struct amp_mgr *mgr = data;
 +
- 		case A2MP_GETAMPASSOC_REQ:
- 		case A2MP_CREATEPHYSLINK_REQ:
- 		case A2MP_DISCONNPHYSLINK_REQ:
++	l2cap_chan_destroy(mgr->a2mp_chan);
++}
++
++static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
++					      unsigned long len, int nb)
++{
++	return bt_skb_alloc(len, GFP_KERNEL);
++}
++
+ static struct l2cap_ops a2mp_chan_ops = {
+ 	.name = "L2CAP A2MP channel",
++	.state_change = a2mp_chan_state_change_cb,
++	.close = a2mp_chan_close_cb,
++	.alloc_skb = a2mp_chan_alloc_skb_cb,
+ };
+ 
+ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
+@@ -110,6 +148,8 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
+ 	chan->remote_mps = chan->omtu;
+ 	chan->mps = chan->omtu;
+ 
++	chan->state = BT_CONNECTED;
++
+ 	return chan;
+ }
+ 
 -- 
 1.7.9.5
 
