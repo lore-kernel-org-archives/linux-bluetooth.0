@@ -1,71 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 May 2012 17:05:07 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v3 0/3] Store address type on storage
-Message-ID: <20120523140507.GA11158@x220.P-661HNU-F1>
-References: <1337374667-17802-1-git-send-email-paulo.alcantara@openbossa.org>
- <1337715927-8821-1-git-send-email-paulo.alcantara@openbossa.org>
+Date: Wed, 23 May 2012 15:55:29 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: Joao Paulo Rechi Vita <jprvita@openbossa.org>,
+	linux-input@vger.kernel.org, marcel@holtmann.org,
+	claudio.takahasi@openbossa.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/1] HID: User-space HID I/O driver (UHID)
+In-Reply-To: <CANq1E4R_6ByuBALh0z9gxQzy5ZrT4-MY=6RqrcaVFgK0owjtxw@mail.gmail.com>
+Message-ID: <alpine.LNX.2.00.1205231554450.30445@pobox.suse.cz>
+References: <1335799650-17597-1-git-send-email-dh.herrmann@googlemail.com> <CAAngNMabAxO9fVN2DM=5xPJAVk_is3QoS1=+TGZPJAbY3TYHMQ@mail.gmail.com> <CANq1E4QaRHtGxt3d=Z2mvqAFhTY2zid20GGNZ2ZzHjStGepc+A@mail.gmail.com> <alpine.LNX.2.00.1205101218030.31253@pobox.suse.cz>
+ <CANq1E4R_6ByuBALh0z9gxQzy5ZrT4-MY=6RqrcaVFgK0owjtxw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337715927-8821-1-git-send-email-paulo.alcantara@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Paulo,
+On Sun, 20 May 2012, David Herrmann wrote:
 
-On Tue, May 22, 2012, Paulo Alcantara wrote:
-> BLE devices have two different address types: public or
-> random. So we need to provide this address type on keys
-> in the "primary" file to avoid duplicate BLE address types
-> around the BlueZ.
+> >> > Thanks for your work, David. I'll test and review this new version.
+> >> > Did you find out the what is the problem when passing BUS_BLUETOOTH on
+> >> > the 'bus' field of the create request?
+> >>
+> >> I've spent some time looking into that but I haven't found the
+> >> problem, yet. Maybe Jiri can comment here.
+> >
+> > This should now all be handled correctly using the hid-generic mechanism.
+> > If you still see any problems with this (currently in linux-next, more
+> > precisely 'device-groups' branch in hid.git), please let me know.
 > 
-> This series changes the storage to store the address type
-> together with the device address.
-> 
-> Hemant Gupta has been working on this on "Store LE device address
-> type with primary list" but his patch hasn't been accepted and
-> he didn't send a new reviewed version of that patch.
-> 
-> I have patches for the other storage files as well, I'll
-> send them soon. There is a potential problem in
-> device_address_cmp() function which checks the address only.
-> I am investigating how to fix it to compare address and type
-> without breaking the current code.
-> 
-> v3's changes:
->      - (1/3): Remove unnecessary comment about the new storage
->        	      format and code that leads with the old storage
-> 	      format.
-> 
->      - (2/3): Just use the initial version of this patch (the
->        	      returning < 2 check in sscanf() function).
-> 
->      - (3/3): New patch that fixes removing device services from
->        	      "primary" file by passing a key with the new
-> 	      storage format in delete_device_service(). Note
-> 	      also that this function was modified to only treat
-> 	      the primary case - since we have old storage format
-> 	      still being used in the other LE-related storage
-> 	      files. So, it will need to be modified in order to
-> 	      delete device services of other files (characteristics,
-> 	      ccc, etc) on other series.
-> 
-> 
-> Claudio Takahasi (1):
->   core: Fix creating device from "primary" file
-> 
-> Paulo Alcantara (2):
->   storage: Store BLE address type in "primary" file
->   core: Fix removing device services from "primary" file
-> 
->  src/adapter.c |   10 +++++++---
->  src/device.c  |    4 ++--
->  src/storage.c |   45 ++++++++++++++++++++++++++-------------------
->  src/storage.h |    8 +++++---
->  4 files changed, 40 insertions(+), 27 deletions(-)
+> That is working correctly now. 
 
-All three patches have been applied. Thanks.
+Thanks for checking.
 
-Johan
+> Do you have any update on this patch? There is no time pressure in 
+> merging it but I would like to get some feedback what you are thinking 
+> about it so I can continue working on it.
+> 
+> If you like I can resend it split into multiple patches. Let me know
+> of any problems with it.
+
+Yes, that would be very much preferred on my side -- huge condensed 
+patches are much harder to review (if the split is done properly). Thanks!
+
+-- 
+Jiri Kosina
+SUSE Labs
