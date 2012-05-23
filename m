@@ -1,120 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 23 May 2012 10:49:57 +0300
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: mathewm@codeaurora.org
-Subject: [RFC] Bluetooth: Adds unlink to chan ops
-Date: Wed, 23 May 2012 11:05:49 +0300
-Message-Id: <1337760349-301-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
+Subject: Re: [PATCHv1 01/17] Bluetooth: A2MP: Create A2MP channel
+Message-ID: <20120523074950.GA32022@aemeltch-MOBL1>
+References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1337351150-20526-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <alpine.DEB.2.02.1205221039100.2239@mathewm-linux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <alpine.DEB.2.02.1205221039100.2239@mathewm-linux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Mat,
 
-This helps to separate socket and socketless code. Now socket related
-operations moved to l2cap_sock in unlink callback for channels with sk.
+On Tue, May 22, 2012 at 10:45:07AM -0700, Mat Martineau wrote:
+> >+static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
+> >+{
+> >+	struct l2cap_chan *chan;
+> >+
+> >+	chan = l2cap_chan_create();
+> >+	if (!chan)
+> >+		return NULL;
+> >+
+> >+	BT_DBG("chan %p", chan);
+> >+
+> >+	hci_conn_hold(conn->hcon);
+> 
+> Holding the hcon will keep the ACL open after all of the other L2CAP
+> channels have closed (unless I missed some code later in the patch
+> series).  The A2MP fixed channel should not keep the ACL open.  If
+> the connection is not held here, then there shouldn't be a put in
+> l2cap_chan_del for the A2MP channel either.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Reported-by: Mat Martineau <mathewm@codeaurora.org>
----
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/l2cap_core.c    |   20 ++------------------
- net/bluetooth/l2cap_sock.c    |   25 +++++++++++++++++++++++++
- 3 files changed, 28 insertions(+), 18 deletions(-)
+l2cap_chan_del makes hci_conn_put, also for a2mp channel. The behavior is
+the same for fixed and normal channels.
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 69ef077..7ed13e7 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -532,6 +532,7 @@ struct l2cap_ops {
- 	void			(*state_change) (void *data, int state);
- 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
- 					       unsigned long len, int nb);
-+	void			(*unlink) (struct l2cap_chan *chan, int err);
- };
+Best regards 
+Andrei Emeltchenko 
  
- struct l2cap_conn {
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index c64da38..d2b16b5 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -520,9 +520,7 @@ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 
- static void l2cap_chan_del(struct l2cap_chan *chan, int err)
- {
--	struct sock *sk = chan->sk;
- 	struct l2cap_conn *conn = chan->conn;
--	struct sock *parent;
- 
- 	__clear_chan_timer(chan);
- 
-@@ -541,22 +539,8 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 	if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
- 		goto clean;
- 
--	lock_sock(sk);
--
--	__l2cap_state_change(chan, BT_CLOSED);
--	sock_set_flag(sk, SOCK_ZAPPED);
--
--	if (err)
--		__l2cap_chan_set_err(chan, err);
--
--	parent = bt_sk(sk)->parent;
--	if (parent) {
--		bt_accept_unlink(sk);
--		parent->sk_data_ready(parent, 0);
--	} else
--		sk->sk_state_change(sk);
--
--	release_sock(sk);
-+	if (chan->ops->unlink)
-+		chan->ops->unlink(chan, err);
- 
- 	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
- 		return;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 3bb1611..d6f481b 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -955,6 +955,30 @@ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
- 	return skb;
- }
- 
-+static void l2cap_sock_unlink_cb(struct l2cap_chan *chan, int err)
-+{
-+	struct sock *sk = chan->sk;
-+	struct sock *parent = bt_sk(sk)->parent;
-+
-+	lock_sock(sk);
-+
-+	chan->state = BT_CLOSED;
-+	sk->sk_state = BT_CLOSED;
-+	sock_set_flag(sk, SOCK_ZAPPED);
-+
-+	if (err)
-+		sk->sk_err = err;
-+
-+	parent = bt_sk(sk)->parent;
-+	if (parent) {
-+		bt_accept_unlink(sk);
-+		parent->sk_data_ready(parent, 0);
-+	} else
-+		sk->sk_state_change(sk);
-+
-+	release_sock(sk);
-+}
-+
- static struct l2cap_ops l2cap_chan_ops = {
- 	.name		= "L2CAP Socket Interface",
- 	.new_connection	= l2cap_sock_new_connection_cb,
-@@ -962,6 +986,7 @@ static struct l2cap_ops l2cap_chan_ops = {
- 	.close		= l2cap_sock_close_cb,
- 	.state_change	= l2cap_sock_state_change_cb,
- 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
-+	.unlink		= l2cap_sock_unlink_cb,
- };
- 
- static void l2cap_sock_destruct(struct sock *sk)
--- 
-1.7.9.5
-
