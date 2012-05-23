@@ -1,104 +1,182 @@
 Return-Path: <cyrus@holtmann.org>
-From: "An, Tedd" <tedd.an@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH 1/3] hciattach: add common debug print functions and
- toggle option
-Date: Wed, 23 May 2012 04:38:16 +0000
-Message-ID: <BB52B9B497F0EE4EB05C192A0408F6601970C6A9@ORSMSX104.amr.corp.intel.com>
-References: <148659297.eyne5QQyzV@tedd-ubuntu>
- <1337742978.15105.34.camel@aeonflux>
-In-Reply-To: <1337742978.15105.34.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: linux-bluetooth@vger.kernel.org, marcel <marcel@holtmann.org>
+Cc: "tedd.an" <tedd.an@intel.com>
+Subject: [PATCH v2 2/3] hciattach: replace DBGPRINT macro with common debug print functions
+Date: Tue, 22 May 2012 21:35:37 -0700
+Message-ID: <1372810.LzkPS8x1vv@tedd-ubuntu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-TWFyY2VsLg0KDQpUaGFua3MgZm9yIHRoZSBjb21tZW50cy4gSSBqdXN0IGZpeGVkIHVwIGFuZCBz
-ZW50IHRoZSBwYXRjaGVzLg0KQlRXLCBkbyB5b3Ugd2FudCBtZSB0byBydW4gdGhlICJjaGVja3Bh
-dGNoIiB3aXRoIGhjaWF0dGFjaC5jIGFuZCBoY2lhdHRhY2guaCB0byBmaXggdGhlIGNvZGluZyBz
-dHlsZT8NCkV2ZW4gd2l0aCBteSAicm9va2llIiBleWVzLCBJIGNhbiBzZWUgc29tZSBjb2Rpbmcg
-c3R5bGUgaXNzdWUuDQoNCkxldCBtZSBrbm93Lg0KDQpSZWdhcmRzLg0KDQpUZWRkDQoNCj4gLS0t
-LS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWFyY2VsIEhvbHRtYW5uIFttYWlsdG86
-bWFyY2VsQGhvbHRtYW5uLm9yZ10NCj4gU2VudDogVHVlc2RheSwgTWF5IDIyLCAyMDEyIDg6MTYg
-UE0NCj4gVG86IEFuLCBUZWRkDQo+IENjOiBsaW51eC1ibHVldG9vdGgNCj4gU3ViamVjdDogUmU6
-IFtQQVRDSCAxLzNdIGhjaWF0dGFjaDogYWRkIGNvbW1vbiBkZWJ1ZyBwcmludCBmdW5jdGlvbnMg
-YW5kDQo+IHRvZ2dsZSBvcHRpb24NCj4gDQo+IEhpIFRlZGQsDQo+IA0KPiA+IFRoaXMgYWRkcyBj
-b21tb24gZGVidWcgcHJpbnQgZnVuY3Rpb25zIHRoYXQgcHJpbnQgdGhlIGRlYnVnIG1lc3NhZ2Vz
-DQo+ID4gdG8gc3RkZXJyIGFuZCBpdCBjYW4gYmUgdG9nZ2xlZCB3aXRoJy1kJyBvcHRpb24gaW4g
-dGhlIHBhcmFtZXRlci4NCj4gPg0KPiA+IEl0IHByb3ZpZGVzIHR3byBmdW5jdGlvbnM6IG9uZSBm
-b3IgbWVzc2FnZSBhbmQgdGhlIG90aGVyIGZvciBkYXRhIGNvbnRlbnRzLg0KPiA+DQo+ID4gLS0t
-DQo+ID4gIHRvb2xzL2hjaWF0dGFjaC44IHwgICAgNCArKysrDQo+ID4gIHRvb2xzL2hjaWF0dGFj
-aC5jIHwgICAzNiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0NCj4gPiAgdG9v
-bHMvaGNpYXR0YWNoLmggfCAgICAzICsrKw0KPiA+ICAzIGZpbGVzIGNoYW5nZWQsIDQxIGluc2Vy
-dGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvdG9vbHMvaGNp
-YXR0YWNoLjggYi90b29scy9oY2lhdHRhY2guOCBpbmRleA0KPiA+IGNjOTdjYWQuLmVjY2JjNjEg
-MTAwNjQ0DQo+ID4gLS0tIGEvdG9vbHMvaGNpYXR0YWNoLjgNCj4gPiArKysgYi90b29scy9oY2lh
-dHRhY2guOA0KPiA+IEBAIC02LDYgKzYsNyBAQCBoY2lhdHRhY2ggXC0gYXR0YWNoIHNlcmlhbCBk
-ZXZpY2VzIHZpYSBVQVJUIEhDSSB0bw0KPiA+IEJsdWVaIHN0YWNrICAuUkIgW1x8IFwtYiBcfF0g
-IC5SQiBbXHwgXC1uIFx8XSAgLlJCIFtcfCBcLXAgXHxdDQo+ID4gKy5SQiBbXHwgXC1kIFx8XQ0K
-PiA+ICAuUkIgW1x8IFwtdA0KPiA+ICAuSVIgdGltZW91dCBcfF0NCj4gPiAgLlJCIFtcfCBcLXMN
-Cj4gPiBAQCAtMzIsNiArMzMsOSBAQCBEb24ndCBkZXRhY2ggZnJvbSBjb250cm9sbGluZyB0ZXJt
-aW5hbC4NCj4gPiAgLkIgXC1wDQo+ID4gIFByaW50IHRoZSBQSUQgd2hlbiBkZXRhY2hpbmcuDQo+
-ID4gIC5UUA0KPiA+ICsuQiBcLWQNCj4gPiArUHJpbnQgZGVidWcgbWVzc2FnZXMgdG8gc3RkZXJy
-Lg0KPiA+ICsuVFANCj4gPiAgLkJJIFwtdCAiIHRpbWVvdXQiDQo+ID4gIFNwZWNpZnkgYW4gaW5p
-dGlhbGl6YXRpb24gdGltZW91dC4gIChEZWZhdWx0IGlzIDUgc2Vjb25kcy4pICAuVFAgZGlmZg0K
-PiA+IC0tZ2l0IGEvdG9vbHMvaGNpYXR0YWNoLmMgYi90b29scy9oY2lhdHRhY2guYyBpbmRleCAz
-ZTczOTU2Li4wNmFlOWQ2DQo+ID4gMTAwNjQ0DQo+ID4gLS0tIGEvdG9vbHMvaGNpYXR0YWNoLmMN
-Cj4gPiArKysgYi90b29scy9oY2lhdHRhY2guYw0KPiA+IEBAIC00Miw2ICs0Miw3IEBADQo+ID4g
-ICNpbmNsdWRlIDxzeXMvcG9sbC5oPg0KPiA+ICAjaW5jbHVkZSA8c3lzL3BhcmFtLmg+DQo+ID4g
-ICNpbmNsdWRlIDxzeXMvaW9jdGwuaD4NCj4gPiArI2luY2x1ZGUgPHN0ZGFyZy5oPg0KPiA+DQo+
-ID4gICNpbmNsdWRlIDxibHVldG9vdGgvYmx1ZXRvb3RoLmg+DQo+ID4gICNpbmNsdWRlIDxibHVl
-dG9vdGgvaGNpLmg+DQo+ID4gQEAgLTczLDYgKzc0LDggQEAgc3RydWN0IHVhcnRfdCB7DQo+ID4N
-Cj4gPiAgc3RhdGljIHZvbGF0aWxlIHNpZ19hdG9taWNfdCBfX2lvX2NhbmNlbGVkID0gMDsNCj4g
-Pg0KPiA+ICtzdGF0aWMgaW50IGdfZGVidWc7DQo+ID4gKw0KPiA+ICBzdGF0aWMgdm9pZCBzaWdf
-aHVwKGludCBzaWcpDQo+ID4gIHsNCj4gPiAgfQ0KPiA+IEBAIC0xNDQsNiArMTQ3LDMwIEBAIHN0
-YXRpYyBpbnQgdWFydF9zcGVlZChpbnQgcykNCj4gPiAgCX0NCj4gPiAgfQ0KPiA+DQo+ID4gK3Zv
-aWQgZGJnX3ByaW50KGNvbnN0IGNoYXIgKmZtdCwgLi4uKQ0KPiA+ICt7DQo+ID4gKwl2YV9saXN0
-IGFyZ3M7DQo+IA0KPiBleHRyYSBlbXB0eSBsaW5lIGJldHdlZW4gdmFyaWFibGVzIGFuZCBjb2Rl
-IHBsZWFzZS4NCj4gDQo+ID4gKwlpZihnX2RlYnVnKSB7DQo+IA0KPiBFeHRyYSBzcGFjZSBhZnRl
-ciBpZiBhbmQgYmVmb3JlICguDQo+IA0KPiA+ICsJCWZwcmludGYoc3RkZXJyLCAiZGJnOiAiKTsN
-Cj4gPiArCQl2YV9zdGFydChhcmdzLCBmbXQpOw0KPiA+ICsJCXZmcHJpbnRmKHN0ZGVyciwgZm10
-LCBhcmdzKTsNCj4gPiArCQl2YV9lbmQoYXJncyk7DQo+ID4gKwkJZnByaW50ZihzdGRlcnIsICJc
-biIpOw0KPiA+ICsJfQ0KPiA+ICt9DQo+ID4gKw0KPiA+ICt2b2lkIGRiZ19wcmludF9wa3QoY29u
-c3QgY2hhciAqc3RyLCB1bnNpZ25lZCBjaGFyICpkYXRhLCBpbnQgbGVuKSB7DQo+ID4gKwlpbnQg
-aTsNCj4gDQo+IFNhbWUgaGVyZS4NCj4gDQo+ID4gKwlpZihnX2RlYnVnKSB7DQo+IA0KPiBBbmQg
-aGVyZS4NCj4gDQo+ID4gKwkJZnByaW50ZihzdGRlcnIsICJkYmc6ICVzIiwgc3RyKTsNCj4gPiAr
-CQlmb3IgKGkgPSAwOyBpIDwgbGVuOyBpKyspIHsNCj4gPiArCQkJZnByaW50ZihzdGRlcnIsICIl
-MDJ4ICIsIGRhdGFbaV0pOw0KPiA+ICsJCX0NCj4gDQo+IE5vIHsgfSBuZWVkZWQgZm9yIHNpbmds
-ZSBzdGF0ZW1lbnRzLg0KPiANCj4gPiArCQlmcHJpbnRmKHN0ZGVyciwgIlxuIik7DQo+ID4gKwl9
-DQo+ID4gK30NCj4gPiArDQo+ID4gIGludCBzZXRfc3BlZWQoaW50IGZkLCBzdHJ1Y3QgdGVybWlv
-cyAqdGksIGludCBzcGVlZCkgIHsNCj4gPiAgCWlmIChjZnNldG9zcGVlZCh0aSwgdWFydF9zcGVl
-ZChzcGVlZCkpIDwgMCkgQEAgLTEyNjAsNyArMTI4Nyw3IEBADQo+ID4gc3RhdGljIHZvaWQgdXNh
-Z2Uodm9pZCkgIHsNCj4gPiAgCXByaW50ZigiaGNpYXR0YWNoIC0gSENJIFVBUlQgZHJpdmVyIGlu
-aXRpYWxpemF0aW9uIHV0aWxpdHlcbiIpOw0KPiA+ICAJcHJpbnRmKCJVc2FnZTpcbiIpOw0KPiA+
-IC0JcHJpbnRmKCJcdGhjaWF0dGFjaCBbLW5dIFstcF0gWy1iXSBbLXJdIFstdCB0aW1lb3V0XSBb
-LXMgaW5pdGlhbF9zcGVlZF0NCj4gPHR0eT4gPHR5cGUgfCBpZD4gW3NwZWVkXSBbZmxvd3xub2Zs
-b3ddIFtiZGFkZHJdXG4iKTsNCj4gPiArCXByaW50ZigiXHRoY2lhdHRhY2ggWy1uXSBbLXBdIFst
-Yl0gWy1yXSBbLWRdIFstdCB0aW1lb3V0XSBbLXMNCj4gPiAraW5pdGlhbF9zcGVlZF0gPHR0eT4g
-PHR5cGUgfCBpZD4gW3NwZWVkXSBbZmxvd3xub2Zsb3ddIFtiZGFkZHJdXG4iKTsNCj4gPiAgCXBy
-aW50ZigiXHRoY2lhdHRhY2ggLWxcbiIpOw0KPiA+ICB9DQo+ID4NCj4gPiBAQCAtMTI4MCw4ICsx
-MzA3LDkgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkNCj4gPiAgCWRldGFjaCA9
-IDE7DQo+ID4gIAlwcmludHBpZCA9IDA7DQo+ID4gIAlyYXcgPSAwOw0KPiA+ICsJZ19kZWJ1ZyA9
-IDA7DQo+IA0KPiBJIHJhdGhlciBoYXZlIHlvdSBub3Qgc3RhcnQgd2l0aCBnXyBmb3IgZ2xvYmFs
-IHNlbWFudGljLiBXZSBoYXZlIG5vdCBiZWVuDQo+IHVzaW5nIGl0LCBzbyBzdGFydGluZyBpdCBu
-b3cgaXMgbWFraW5nIGl0IGNvbmZ1c2luZy4NCj4gDQo+ID4NCj4gPiAtCXdoaWxlICgob3B0PWdl
-dG9wdChhcmdjLCBhcmd2LCAiYm5wdDpzOmxyIikpICE9IEVPRikgew0KPiA+ICsJd2hpbGUgKChv
-cHQ9Z2V0b3B0KGFyZ2MsIGFyZ3YsICJibnBkdDpzOmxyIikpICE9IEVPRikgew0KPiA+ICAJCXN3
-aXRjaChvcHQpIHsNCj4gPiAgCQljYXNlICdiJzoNCj4gPiAgCQkJc2VuZF9icmVhayA9IDE7DQo+
-ID4gQEAgLTEzMTQsNiArMTM0MiwxMCBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltd
-KQ0KPiA+ICAJCQlyYXcgPSAxOw0KPiA+ICAJCQlicmVhazsNCj4gPg0KPiA+ICsJCWNhc2UgJ2Qn
-Og0KPiA+ICsJCQlnX2RlYnVnID0gMTsNCj4gPiArCQkJYnJlYWs7DQo+ID4gKw0KPiA+ICAJCWRl
-ZmF1bHQ6DQo+ID4gIAkJCXVzYWdlKCk7DQo+ID4gIAkJCWV4aXQoMSk7DQo+ID4gZGlmZiAtLWdp
-dCBhL3Rvb2xzL2hjaWF0dGFjaC5oIGIvdG9vbHMvaGNpYXR0YWNoLmggaW5kZXgNCj4gPiBhMjRk
-YmM0Li5jNTI4ZjJiIDEwMDY0NA0KPiA+IC0tLSBhL3Rvb2xzL2hjaWF0dGFjaC5oDQo+ID4gKysr
-IGIvdG9vbHMvaGNpYXR0YWNoLmgNCj4gPiBAQCAtNDQsNiArNDQsOSBAQA0KPiA+ICAjZGVmaW5l
-IEhDSV9VQVJUX1JFU0VUX09OX0lOSVQJMQ0KPiA+ICAjZGVmaW5lIEhDSV9VQVJUX0NSRUFURV9B
-TVAJMg0KPiA+DQo+ID4gK3ZvaWQgZGJnX3ByaW50KGNvbnN0IGNoYXIgKmZtdCwgLi4uKTsgdm9p
-ZCBkYmdfcHJpbnRfcGt0KGNvbnN0IGNoYXIgKg0KPiA+ICtzdHIsIHVuc2lnbmVkIGNoYXIgKiBk
-YXRhLCBpbnQgbGVuKTsNCj4gDQo+IGl0IGlzIGNoYXIgKnN0ciBoZXJlLiBObyBleHRyYSBzcGFj
-ZS4NCj4gDQo+ID4gKw0KPiA+ICBpbnQgcmVhZF9oY2lfZXZlbnQoaW50IGZkLCB1bnNpZ25lZCBj
-aGFyKiBidWYsIGludCBzaXplKTsNCj4gDQo+IEFuZCBjbGVhcmx5IG5vdCB5b3VyIGZhdWx0LCB0
-aGlzIG9uZSBpcyB3cm9uZyBhcyB3ZWxsLiBUaGUgaGNpYXR0YWNoIGlzIGEgcG9zdGVyDQo+IGNo
-aWxkIG9mIGJhZCBjb2Rpbmcgc3R5bGUuIFRpbWUgdG8gY2xlYW4gdGhhdCB1cCBhIGxpdHRsZSBi
-aXQgOykNCj4gDQo+ID4gIGludCBzZXRfc3BlZWQoaW50IGZkLCBzdHJ1Y3QgdGVybWlvcyAqdGks
-IGludCBzcGVlZCk7DQo+ID4NCj4gDQo+IFJlZ2FyZHMNCj4gDQo+IE1hcmNlbA0KPiANCg0K
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+
+This patch removes INTEL_DEBUG macro and replace DBGPRINT with common
+debug print functions.
+
+---
+ tools/hciattach_intel.c |   46 ++++++++++++++++------------------------------
+ 1 file changed, 16 insertions(+), 30 deletions(-)
+
+diff --git a/tools/hciattach_intel.c b/tools/hciattach_intel.c
+index 9129993..ccb0a87 100644
+--- a/tools/hciattach_intel.c
++++ b/tools/hciattach_intel.c
+@@ -41,20 +41,6 @@
+ 
+ #include "hciattach.h"
+ 
+-#ifdef INTEL_DEBUG
+-#define DBGPRINT(fmt, args...)	printf("DBG: " fmt "\n", ## args)
+-#define PRINT_PACKET(buf, len, msg)	{	\
+-	int i;					\
+-	printf("%s\n", msg);			\
+-	for (i = 0; i < len; i++)		\
+-		printf("%02X ", buf[i]);	\
+-	printf("\n");				\
+-	}
+-#else
+-#define DBGPRINT(fmt, args...)
+-#define PRINT_PACKET(buf, len, msg)
+-#endif
+-
+ #define PATCH_SEQ_EXT           ".bseq"
+ #define PATCH_FILE_PATH         "/lib/firmware/intel/"
+ #define PATCH_MAX_LEN           260
+@@ -90,7 +76,7 @@ static int intel_write_cmd(int dev, unsigned char *buf, int len)
+ {
+ 	int ret;
+ 
+-	PRINT_PACKET(buf, len, "<----- SEND CMD: ");
++	dbg_print_pkt("<----- SEND CMD: ", buf, len);
+ 
+ 	ret = write(dev, buf, len);
+ 	if (ret < 0)
+@@ -113,7 +99,7 @@ static int intel_read_evt(int dev, unsigned char *buf, int len)
+ 	if (ret < 0)
+ 		return -1;
+ 
+-	PRINT_PACKET(buf, ret, "-----> READ EVT: ");
++	dbg_print_pkt("-----> READ EVT: ", buf, ret);
+ 
+ 	return ret;
+ }
+@@ -125,18 +111,18 @@ static int validate_events(struct patch_entry *event,
+ 		struct patch_entry *entry)
+ {
+ 	if (event == NULL || entry == NULL) {
+-		DBGPRINT("invalid patch entry parameters");
++		dbg_print("invalid patch entry parameters");
+ 		return -1;
+ 	}
+ 
+ 	if (event->len != entry->len) {
+-		DBGPRINT("lengths are mismatched:[%d|%d]",
++		dbg_print("lengths are mismatched:[%d|%d]",
+ 				event->len, entry->len);
+ 		return -1;
+ 	}
+ 
+ 	if (memcmp(event->data, entry->data, event->len)) {
+-		DBGPRINT("data is mismatched");
++		dbg_print("data is mismatched");
+ 		return -1;
+ 	}
+ 
+@@ -205,7 +191,7 @@ static int intel_download_patch(struct patch_ctx *ctx)
+ 	struct patch_entry entry;
+ 	struct patch_entry event;
+ 
+-	DBGPRINT("start patch downloading");
++	dbg_print("start patch downloading");
+ 
+ 	do {
+ 		ret = get_next_patch_entry(ctx->fd, &entry);
+@@ -237,7 +223,7 @@ static int intel_download_patch(struct patch_ctx *ctx)
+ 			event.len = ret;
+ 
+ 			if (validate_events(&event, &entry) < 0) {
+-				DBGPRINT("events are mismatched");
++				dbg_print("events are mismatched");
+ 				ctx->patch_error = 1;
+ 				return -1;
+ 			}
+@@ -259,11 +245,11 @@ static int open_patch_file(struct patch_ctx *ctx, char *fw_ver)
+ 
+ 	snprintf(patch_file, PATH_MAX, "%s%s%s", PATCH_FILE_PATH,
+ 			fw_ver, PATCH_SEQ_EXT);
+-	DBGPRINT("PATCH_FILE: %s", patch_file);
++	dbg_print("PATCH_FILE: %s", patch_file);
+ 
+ 	ctx->fd = open(patch_file, O_RDONLY);
+ 	if (ctx->fd < 0) {
+-		DBGPRINT("cannot open patch file. go to post patch");
++		dbg_print("cannot open patch file. go to post patch");
+ 		return -1;
+ 	}
+ 
+@@ -279,7 +265,7 @@ static int pre_patch(struct patch_ctx *ctx)
+ 	struct patch_entry entry;
+ 	char fw_ver[INTEL_VER_PARAM_LEN * 2];
+ 
+-	DBGPRINT("start pre_patch");
++	dbg_print("start pre_patch");
+ 
+ 	entry.data[0] = HCI_COMMAND_PKT;
+ 	entry.data[1] = 0x11;
+@@ -303,7 +289,7 @@ static int pre_patch(struct patch_ctx *ctx)
+ 	entry.len = ret;
+ 
+ 	if (entry.data[6] != 0x00) {
+-		DBGPRINT("command failed. status=%02x", entry.data[6]);
++		dbg_print("command failed. status=%02x", entry.data[6]);
+ 		ctx->patch_error = 1;
+ 		return -1;
+ 	}
+@@ -328,7 +314,7 @@ static int pre_patch(struct patch_ctx *ctx)
+ 	entry.len = ret;
+ 
+ 	if (entry.data[6] != 0x00) {
+-		DBGPRINT("command failed. status=%02x", entry.data[6]);
++		dbg_print("command failed. status=%02x", entry.data[6]);
+ 		ctx->patch_error = 1;
+ 		return -1;
+ 	}
+@@ -363,7 +349,7 @@ static int post_patch(struct patch_ctx *ctx)
+ 	int ret;
+ 	struct patch_entry entry;
+ 
+-	DBGPRINT("start post_patch");
++	dbg_print("start post_patch");
+ 
+ 	entry.data[0] = HCI_COMMAND_PKT;
+ 	entry.data[1] = 0x11;
+@@ -422,7 +408,7 @@ static int intel_patch_device(struct patch_ctx *ctx)
+ 			return ret;
+ 		}
+ 
+-		DBGPRINT("patch failed. proceed to post patch");
++		dbg_print("patch failed. proceed to post patch");
+ 		goto post_patch;
+ 	}
+ 
+@@ -434,7 +420,7 @@ static int intel_patch_device(struct patch_ctx *ctx)
+ 			return ret;
+ 		}
+ 	} else {
+-		DBGPRINT("patch done");
++		dbg_print("patch done");
+ 		ctx->reset_enable_patch = 1;
+ 	}
+ 
+@@ -515,7 +501,7 @@ static int change_baudrate(int dev, int init_speed, int *speed,
+ 	unsigned char cmd[5];
+ 	unsigned char evt[7];
+ 
+-	DBGPRINT("start baudrate change");
++	dbg_print("start baudrate change");
+ 
+ 	ret = set_rts(dev, 0);
+ 	if (ret < 0) {
+-- 
+1.7.9.5
