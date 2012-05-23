@@ -1,92 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: Henrique Dante de Almeida <hdante@profusion.mobi>
+From: Daniel Wagner <wagi@monom.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Henrique Dante de Almeida <hdante@profusion.mobi>
-Subject: [PATCH 01/11]  Constify GDBus method tables
-Date: Wed, 23 May 2012 10:19:58 -0300
-Message-Id: <1337779208-3555-2-git-send-email-hdante@profusion.mobi>
-In-Reply-To: <1337779208-3555-1-git-send-email-hdante@profusion.mobi>
-References: <1337779208-3555-1-git-send-email-hdante@profusion.mobi>
+Cc: Daniel Wagner <daniel.wagner@bmw-carit.de>
+Subject: [RFC] device: Ignore DUN if PAN is present
+Date: Wed, 23 May 2012 14:51:25 +0200
+Message-Id: <1337777485-23498-1-git-send-email-wagi@monom.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-    Constify method tables with the following command:
+From: Daniel Wagner <daniel.wagner@bmw-carit.de>
 
-    find . -name '*.[ch]' -exec \
-                 sed -i 's/\(GDBusMethodTable .* =\)/const \1/g' {} \;
+Filtering DUN out at BlueZ level reduces the number of CPU cycles and
+memory spend just to figure out that PAN is always preferred over DUN.
+
+Doing this could on a the network manager level (e.g. ConnMan) or
+at an intermediate daemon such as dundee which handles AT command
+parsing and PPP setup is possible just more expensive.
+
+Thereforem just ignore the DUN completely and do not even announce it.
 ---
- src/adapter.c |    2 +-
- src/device.c  |    2 +-
- src/manager.c |    2 +-
- src/ndef.c    |    2 +-
- src/tag.c     |    2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
+ serial/common.h |   24 ++++++++++++++++++++++++
+ src/device.c    |   17 +++++++++++++++++
+ 2 files changed, 41 insertions(+)
+ create mode 100644 serial/common.h
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 3300968..ca662dc 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -462,7 +462,7 @@ static void tag_present_cb(uint32_t adapter_idx, uint32_t target_idx,
- 					check_presence, adapter);
- }
- 
--static GDBusMethodTable adapter_methods[] = {
-+static const GDBusMethodTable adapter_methods[] = {
- 	{ "GetProperties",     "",      "a{sv}", get_properties     },
- 	{ "SetProperty",       "sv",    "",      set_property       },
- 	{ "StartPoll",         "",      "",      start_poll         },
+diff --git a/serial/common.h b/serial/common.h
+new file mode 100644
+index 0000000..429bf65
+--- /dev/null
++++ b/serial/common.h
+@@ -0,0 +1,24 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012  BMW Car IT GmbH. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#define DUN_GW_UUID	"00001103-0000-1000-8000-00805f9b34fb"
 diff --git a/src/device.c b/src/device.c
-index bb86d27..b550c9b 100644
+index 2695b16..7b7f9e2 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -233,7 +233,7 @@ error:
- 	return __near_error_failed(msg, -err);
+@@ -63,6 +63,8 @@
+ #include "btio.h"
+ #include "attrib-server.h"
+ #include "attrib/client.h"
++#include "network/common.h"
++#include "serial/common.h"
+ 
+ #define DISCONNECT_TIMER	2
+ #define DISCOVERY_TIMER		2
+@@ -1521,6 +1523,21 @@ static void update_services(struct browse_req *req, sdp_list_t *recs)
+ 
+ 		sdp_list_free(svcclass, free);
+ 	}
++
++	if (g_slist_find_custom(req->profiles_added, NAP_UUID,
++					(GCompareFunc) strcmp) != NULL) {
++		GSList *l;
++
++		l = g_slist_find_custom(req->profiles_added,
++							DUN_GW_UUID,
++							(GCompareFunc) strcmp);
++		if (l != NULL) {
++			DBG("Skipping DUN entry because PAN was found.");
++			g_free(l->data);
++			req->profiles_added = g_slist_remove_link(
++							req->profiles_added, l);
++		}
++	}
  }
  
--static GDBusMethodTable device_methods[] = {
-+static const GDBusMethodTable device_methods[] = {
- 	{ "GetProperties",     "",      "a{sv}", get_properties     },
- 	{ "SetProperty",       "sv",    "",      set_property       },
- 	{ "Push",             "a{sv}",  "",      push_ndef          },
-diff --git a/src/manager.c b/src/manager.c
-index d5ea970..4aff3a7 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -133,7 +133,7 @@ void __near_manager_adapter_remove(uint32_t idx)
- 				NULL);
- }
- 
--static GDBusMethodTable manager_methods[] = {
-+static const GDBusMethodTable manager_methods[] = {
- 	{ "GetProperties",     "",      "a{sv}", get_properties     },
- 	{ "SetProperty",       "sv",    "",      set_property       },
- 	{ },
-diff --git a/src/ndef.c b/src/ndef.c
-index 87d82ec..029941a 100644
---- a/src/ndef.c
-+++ b/src/ndef.c
-@@ -418,7 +418,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 	return reply;
- }
- 
--static GDBusMethodTable record_methods[] = {
-+static const GDBusMethodTable record_methods[] = {
- 	{ "GetProperties",     "",      "a{sv}", get_properties     },
- 	{ },
- };
-diff --git a/src/tag.c b/src/tag.c
-index d4de24f..1d85814 100644
---- a/src/tag.c
-+++ b/src/tag.c
-@@ -322,7 +322,7 @@ fail:
- 	return __near_error_failed(msg, ENOMEM);
- }
- 
--static GDBusMethodTable tag_methods[] = {
-+static const GDBusMethodTable tag_methods[] = {
- 	{ "GetProperties",     "",      "a{sv}", get_properties     },
- 	{ "SetProperty",       "sv",    "",      set_property       },
- 	{ "Write",             "a{sv}", "",      write_ndef         },
+ static void store_profiles(struct btd_device *device)
 -- 
-1.7.9.5
+1.7.10.130.g36e6c
 
