@@ -1,60 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Paulo Alcantara <paulo.alcantara@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ 00/15] Store address type on storage - remaining files
-Date: Wed, 23 May 2012 15:48:18 -0300
-Message-Id: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
+Date: Wed, 23 May 2012 15:02:52 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 10/12] adapter: Remove unwanted if check and code
+Message-ID: <20120523180252.GB32263@samus>
+References: <1337788652-23697-1-git-send-email-s.syam@samsung.com>
+ <1337788652-23697-11-git-send-email-s.syam@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1337788652-23697-11-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset contains the remaining changes for the new storage format
-used (bdaddr#type) on storage files (LE-only or shared files).
+Hi Syam,
 
-The files that have been changed so far are:
-    primaries, characteristics, appearance, ccc, names, aliases,
-    longtermkeys, attributes, blocked.
+On 21:27 Wed 23 May, Syam Sidhardhan wrote:
+> Here the variable agent never be NULL, so no need to check it
+> against NULL.
+> ---
+>  src/adapter.c |    3 ---
+>  1 files changed, 0 insertions(+), 3 deletions(-)
+> 
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 18dd5b6..16d379c 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -1618,9 +1618,6 @@ static DBusMessage *register_agent(DBusConnection *conn, DBusMessage *msg,
+>  
+>  	agent = agent_create(adapter, name, path, cap,
+>  				(agent_remove_cb) agent_removed, adapter);
+> -	if (!agent)
+> -		return btd_error_failed(msg, "Failed to create a new agent");
+> -
 
-Unchanged files:
-    lastseen, lastused, eir, classes, manufacturers, features, linkkeys,
-    pincodes, trusts, profiles.
+While you are at it, you could remove the "agent" variable.
 
-Maybe we should initially use the new storage format in lastseen,
-lastused and trusts files as well. However, I'm not quite sure about
-that. So, what do you guys think about using the new storage format in
-these files ?
+Apart from this, the series looks good.
+
+>  	adapter->agent = agent;
+>  
+>  	DBG("Agent registered for hci%d at %s:%s", adapter->dev_id, name,
+> -- 
+> 1.7.4.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
-Claudio Takahasi (4):
-  storage: Store address type in "aliases" file
-  storage: Store address type in blocked file
-  storage: Rename characteristic to characteristics
-  storage: Rename primary file to primaries
-
-Paulo Alcantara (11):
-  storage: Store address type in "characteristics"
-  storage: Store address type in "appearance" file
-  storage: Store address type in "ccc" file
-  storage: Store address type in "names" file
-  core: Fix reading stored data from "aliases" and "names" file
-  storage: Do not store address type twice
-  storage: Store address type in "longtermkeys" file
-  core: Fix creating device from "longtermkeys" file
-  storage: Store address type in "attributes" file
-  core: Fix creating device from "blocked" file
-  core: Fix deleting entries
-
- attrib/client.c     |   31 +++++++----
- input/device.c      |    6 ++-
- src/adapter.c       |   64 ++++++++++++++--------
- src/attrib-server.c |   19 +++++--
- src/device.c        |   49 +++++++++++------
- src/device.h        |    1 +
- src/event.c         |   13 +++--
- src/storage.c       |  147 +++++++++++++++++++++++++++++---------------------
- src/storage.h       |   44 +++++++++------
- 9 files changed, 232 insertions(+), 142 deletions(-)
-
+Cheers,
 -- 
-1.7.7.6
-
+Vinicius
