@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 06/19] Bluetooth: A2MP: Add chan callbacks
-Date: Wed, 23 May 2012 18:37:12 +0300
-Message-Id: <1337787445-23235-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 14/19] Bluetooth: A2MP: Process A2MP Get AMP Assoc Request
+Date: Wed, 23 May 2012 18:37:20 +0300
+Message-Id: <1337787445-23235-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,73 +12,74 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add state change, close and skb allocation callbacks.
+Example trace when receiving AMP Assoc Request with wrong AMP id.
+...
+> ACL data: handle 11 flags 0x02 dlen 13
+    A2MP: Get AMP Assoc req: id 238
+< ACL data: handle 11 flags 0x00 dlen 14
+    A2MP: Get AMP Assoc rsp: id 238 status (1) Invalid Controller ID
+      assoc data:
+...
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ net/bluetooth/a2mp.c |   36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index e7e5f5f..eb98541 100644
+index d636c0c..c98a402 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -63,8 +63,46 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
- 	kfree(cmd);
+@@ -211,6 +211,39 @@ static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
  }
  
-+static void a2mp_chan_state_change_cb(void *data, int state)
++static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
++				struct a2mp_cmd *hdr)
 +{
-+	struct amp_mgr *mgr = data;
-+	struct l2cap_chan *chan;
++	struct a2mp_amp_assoc_req *req =
++				(struct a2mp_amp_assoc_req *) skb->data;
++	struct hci_dev *hdev;
 +
-+	if (!mgr)
-+		return;
++	if (le16_to_cpu(hdr->len) < sizeof(*req))
++		return -EINVAL;
 +
-+	chan = mgr->a2mp_chan;
++	BT_DBG("id %d", req->id);
 +
-+	BT_DBG("chan %p state %s", chan, state_to_string(state));
++	hdev = hci_dev_get(req->id);
++	if (!hdev || hdev->amp_type == HCI_BREDR) {
++		struct a2mp_amp_assoc_rsp rsp;
++		rsp.id = req->id;
++		rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
 +
-+	chan->state = state;
-+
-+	switch (state) {
-+	case BT_CLOSED:
-+		if (mgr)
-+			amp_mgr_put(mgr);
-+		break;
++		a2mp_send(mgr, A2MP_GETAMPASSOC_RSP, hdr->ident, sizeof(rsp),
++			  &rsp);
++		goto clean;
 +	}
++
++	/* Placeholder for HCI Read AMP Assoc */
++
++clean:
++	if (hdev)
++		hci_dev_put(hdev);
++
++	skb_pull(skb, sizeof(*req));
++	return 0;
 +}
 +
-+static void a2mp_chan_close_cb(void *data)
-+{
-+	struct amp_mgr *mgr = data;
-+
-+	l2cap_chan_destroy(mgr->a2mp_chan);
-+}
-+
-+static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
-+					      unsigned long len, int nb)
-+{
-+	return bt_skb_alloc(len, GFP_KERNEL);
-+}
-+
- static struct l2cap_ops a2mp_chan_ops = {
- 	.name = "L2CAP A2MP channel",
-+	.state_change = a2mp_chan_state_change_cb,
-+	.close = a2mp_chan_close_cb,
-+	.alloc_skb = a2mp_chan_alloc_skb_cb,
- };
+ /* Handle A2MP signalling */
+ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ {
+@@ -253,6 +286,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 			break;
  
- static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
-@@ -110,6 +148,8 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
- 	chan->remote_mps = chan->omtu;
- 	chan->mps = chan->omtu;
- 
-+	chan->state = BT_CONNECTED;
+ 		case A2MP_GETAMPASSOC_REQ:
++			err = a2mp_getampassoc_req(mgr, skb, hdr);
++			break;
 +
- 	return chan;
- }
- 
+ 		case A2MP_CREATEPHYSLINK_REQ:
+ 		case A2MP_DISCONNPHYSLINK_REQ:
+ 		case A2MP_CHANGE_RSP:
 -- 
 1.7.9.5
 
