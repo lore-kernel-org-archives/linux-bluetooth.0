@@ -1,120 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120523203120.GA21117@joana>
-References: <1337760349-301-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<20120523203120.GA21117@joana>
-Date: Wed, 23 May 2012 19:03:21 -0300
-Message-ID: <CAA37ikaPnF3h_D9DPV3+u6qH93e1MY6zoWDuuqesJjcaeCBi0w@mail.gmail.com>
-Subject: Re: [RFC] Bluetooth: Adds unlink to chan ops
-From: Ulisses Furquim <ulisses@profusion.mobi>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org, mathewm@codeaurora.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	marcel@holtmann.org
+Cc: pkrystad@codeaurora.org
+Subject: [PATCHv3] Bluetooth: Send a configuration request after security confirmation
+Date: Wed, 23 May 2012 14:59:30 -0700
+Message-Id: <1337810370-12066-1-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1337742738.15105.30.camel@aeonflux>
+References: <1337742738.15105.30.camel@aeonflux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Sometimes an ACL link must be raised to a higher security level after
+an L2CAP connection is requested, but before a connection response is
+sent.  In this case, a connection response sent by L2CAP was not
+immediately followed by a configuration request.  Other code paths do
+send this configuration request right away.  It was possible for the
+connection to stall while L2CAP waited for the remote device (like
+PTS) to trigger the configuration process.
 
-On Wed, May 23, 2012 at 5:31 PM, Gustavo Padovan <gustavo@padovan.org> wrote:
-> Hi Andrei,
->
-> * Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-05-23 11:05:49 +0300]:
->
->> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->>
->> This helps to separate socket and socketless code. Now socket related
->> operations moved to l2cap_sock in unlink callback for channels with sk.
->>
->> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->> Reported-by: Mat Martineau <mathewm@codeaurora.org>
->> ---
->>  include/net/bluetooth/l2cap.h |    1 +
->>  net/bluetooth/l2cap_core.c    |   20 ++------------------
->>  net/bluetooth/l2cap_sock.c    |   25 +++++++++++++++++++++++++
->>  3 files changed, 28 insertions(+), 18 deletions(-)
->>
->> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
->> index 69ef077..7ed13e7 100644
->> --- a/include/net/bluetooth/l2cap.h
->> +++ b/include/net/bluetooth/l2cap.h
->> @@ -532,6 +532,7 @@ struct l2cap_ops {
->>       void                    (*state_change) (void *data, int state);
->>       struct sk_buff          *(*alloc_skb) (struct l2cap_chan *chan,
->>                                              unsigned long len, int nb);
->> +     void                    (*unlink) (struct l2cap_chan *chan, int err);
->>  };
->>
->>  struct l2cap_conn {
->> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->> index c64da38..d2b16b5 100644
->> --- a/net/bluetooth/l2cap_core.c
->> +++ b/net/bluetooth/l2cap_core.c
->> @@ -520,9 +520,7 @@ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
->>
->>  static void l2cap_chan_del(struct l2cap_chan *chan, int err)
->>  {
->> -     struct sock *sk = chan->sk;
->>       struct l2cap_conn *conn = chan->conn;
->> -     struct sock *parent;
->>
->>       __clear_chan_timer(chan);
->>
->> @@ -541,22 +539,8 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
->>       if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
->>               goto clean;
->>
->> -     lock_sock(sk);
->> -
->> -     __l2cap_state_change(chan, BT_CLOSED);
->> -     sock_set_flag(sk, SOCK_ZAPPED);
->> -
->> -     if (err)
->> -             __l2cap_chan_set_err(chan, err);
->> -
->> -     parent = bt_sk(sk)->parent;
->> -     if (parent) {
->> -             bt_accept_unlink(sk);
->> -             parent->sk_data_ready(parent, 0);
->> -     } else
->> -             sk->sk_state_change(sk);
->> -
->> -     release_sock(sk);
->> +     if (chan->ops->unlink)
->> +             chan->ops->unlink(chan, err);
->>
->>       if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
->>               return;
->> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
->> index 3bb1611..d6f481b 100644
->> --- a/net/bluetooth/l2cap_sock.c
->> +++ b/net/bluetooth/l2cap_sock.c
->> @@ -955,6 +955,30 @@ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
->>       return skb;
->>  }
->>
->> +static void l2cap_sock_unlink_cb(struct l2cap_chan *chan, int err)
->> +{
->> +     struct sock *sk = chan->sk;
->> +     struct sock *parent = bt_sk(sk)->parent;
->> +
->> +     lock_sock(sk);
->> +
->> +     chan->state = BT_CLOSED;
->> +     sk->sk_state = BT_CLOSED;
->> +     sock_set_flag(sk, SOCK_ZAPPED);
->
-> I think we can improve this code and call it everytime we need to set
-> SOCK_ZAPPED. We just need a bit more of logic here.
+Here is an abbreviated hcidump of the failure case with PTS:
 
-We might, if it's not a big of a change. Otherwise I think this kind
-of change needs to be incremental.
+1337806446.051982 > ACL data: handle 43 flags 0x02 dlen 10
+    L2CAP(s): Info req: type 2
+1337806446.052050 < ACL data: handle 43 flags 0x00 dlen 16
+    L2CAP(s): Info rsp: type 2 result 0
+      Extended feature mask 0x000000b8
+1337806446.595320 > ACL data: handle 43 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 4097 scid 0x0041
+1337806446.595673 < ACL data: handle 43 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 1 status 0
+1337806446.595679 < ACL data: handle 43 flags 0x00 dlen 10
+    L2CAP(s): Info req: type 2
+1337806446.669835 > ACL data: handle 43 flags 0x02 dlen 16
+    L2CAP(s): Info rsp: type 2 result 0
+      Extended feature mask 0x00000028
+1337806446.669899 < HCI Command: Authentication Requested (0x01|0x0011) plen 2
+1337806446.669906 < ACL data: handle 43 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 1 status 1
+<security setup here>
+1337806446.769888 < ACL data: handle 43 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 0 status 0
 
-Regards,
+At this point, the connection stalls and no further messages are sent
+on the L2CAP signaling channel.  No data is received either.
 
+If we immediately send a configuration request after a successful connect
+response, the connection completes:
+
+1337724090.041162 > ACL data: handle 43 flags 0x02 dlen 10
+    L2CAP(s): Info req: type 2
+1337724090.041236 < ACL data: handle 43 flags 0x00 dlen 16
+    L2CAP(s): Info rsp: type 2 result 0
+      Extended feature mask 0x000000b8
+1337724090.597128 > ACL data: handle 43 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 4097 scid 0x0041
+1337724090.597236 < ACL data: handle 43 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 1 status 0
+1337724090.597244 < ACL data: handle 43 flags 0x00 dlen 10
+    L2CAP(s): Info req: type 2
+1337724090.660842 > ACL data: handle 43 flags 0x02 dlen 16
+    L2CAP(s): Info rsp: type 2 result 0
+      Extended feature mask 0x00000028
+1337724090.660926 < HCI Command: Authentication Requested (0x01|0x0011) plen 2
+1337724090.660934 < ACL data: handle 43 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 1 status 1
+<security setup here>
+1337724090.755162 < ACL data: handle 43 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 0 status 0
+1337724090.755171 < ACL data: handle 43 flags 0x00 dlen 23
+    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 11
+1337724091.361847 > ACL data: handle 43 flags 0x02 dlen 29
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 15
+1337724091.863808 > ACL data: handle 43 flags 0x02 dlen 23
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 11
+1337724091.863882 < ACL data: handle 43 flags 0x00 dlen 29
+    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 15
+1337724092.683745 > ACL data: handle 43 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 4097]
+      0000: 00 00 11 22 33 44 34 2f                           ..."3D4/
+
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ net/bluetooth/l2cap_core.c |   11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index e31b005..c9e6ae4 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5500,6 +5500,17 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 			rsp.status = cpu_to_le16(stat);
+ 			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
+ 							sizeof(rsp), &rsp);
++
++			if (!test_bit(CONF_REQ_SENT, &chan->conf_state) &&
++			    res == L2CAP_CR_SUCCESS) {
++				char buf[128];
++				set_bit(CONF_REQ_SENT, &chan->conf_state);
++				l2cap_send_cmd(conn, l2cap_get_ident(conn),
++					       L2CAP_CONF_REQ,
++					       l2cap_build_conf_req(chan, buf),
++					       buf);
++				chan->num_conf_req++;
++			}
+ 		}
+ 
+ 		l2cap_chan_unlock(chan);
 -- 
-Ulisses Furquim
-ProFUSION embedded systems
-http://profusion.mobi
-Mobile: +55 19 9250 0942
-Skype: ulissesffs
+1.7.10
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
