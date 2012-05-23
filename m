@@ -2,309 +2,162 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 4/6] Bluetooth: Fix coding style in the subsystem
-Date: Wed, 23 May 2012 04:04:21 -0300
-Message-Id: <1337756663-19805-4-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1337756663-19805-3-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 3/6] Bluetooth: Fix coding style in include/net/bluetooth
+Date: Wed, 23 May 2012 04:04:20 -0300
+Message-Id: <1337756663-19805-3-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1337756663-19805-2-git-send-email-gustavo@padovan.org>
 References: <1337756663-19805-1-git-send-email-gustavo@padovan.org>
  <1337756663-19805-2-git-send-email-gustavo@padovan.org>
- <1337756663-19805-3-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-This is some leftover from the last patches that fixed style. It is mostly
-line over 80 characters fixes reported by checkpatch.pl.
-checkpatch.pl is clean for these files now.
+Fix all warning and errors reported by checkpatch but license trailing
+whitespace and bdaddr_t definition.
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
- net/bluetooth/af_bluetooth.c |    3 ++-
- net/bluetooth/hci_conn.c     |    3 ++-
- net/bluetooth/hci_core.c     |    7 +++++--
- net/bluetooth/hci_event.c    |   23 ++++++++++++++---------
- net/bluetooth/hci_sock.c     |   21 ++++++++++++++-------
- net/bluetooth/hci_sysfs.c    |    4 ++--
- net/bluetooth/lib.c          |    2 +-
- net/bluetooth/mgmt.c         |   12 ++++++++----
- 8 files changed, 48 insertions(+), 27 deletions(-)
+ include/net/bluetooth/bluetooth.h |   26 ++++++++++++++------------
+ include/net/bluetooth/hci.h       |    4 ++--
+ include/net/bluetooth/hci_core.h  |   12 +++++++-----
+ 3 files changed, 23 insertions(+), 19 deletions(-)
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 46e7f86..e31a20f 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -418,7 +418,8 @@ static inline unsigned int bt_accept_poll(struct sock *parent)
- 	return 0;
- }
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index b98181b..7a9f961 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -25,7 +25,7 @@
+ #ifndef __BLUETOOTH_H
+ #define __BLUETOOTH_H
  
--unsigned int bt_sock_poll(struct file *file, struct socket *sock, poll_table *wait)
-+unsigned int bt_sock_poll(struct file *file, struct socket *sock,
-+			  poll_table *wait)
+-#include <asm/types.h>
++#include <linux/types.h>
+ #include <asm/byteorder.h>
+ #include <linux/list.h>
+ #include <linux/poll.h>
+@@ -168,8 +168,8 @@ typedef struct {
+ #define BDADDR_LE_PUBLIC	0x01
+ #define BDADDR_LE_RANDOM	0x02
+ 
+-#define BDADDR_ANY   (&(bdaddr_t) {{0, 0, 0, 0, 0, 0}})
+-#define BDADDR_LOCAL (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
++#define BDADDR_ANY   (&(bdaddr_t) {{0, 0, 0, 0, 0, 0} })
++#define BDADDR_LOCAL (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff} })
+ 
+ /* Copy, swap, convert BD Address */
+ static inline int bacmp(bdaddr_t *ba1, bdaddr_t *ba2)
+@@ -215,7 +215,7 @@ int  bt_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
+ 				struct msghdr *msg, size_t len, int flags);
+ int  bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
+ 			struct msghdr *msg, size_t len, int flags);
+-uint bt_sock_poll(struct file * file, struct socket *sock, poll_table *wait);
++uint bt_sock_poll(struct file *file, struct socket *sock, poll_table *wait);
+ int  bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
+ int  bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo);
+ 
+@@ -225,12 +225,12 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock);
+ 
+ /* Skb helpers */
+ struct l2cap_ctrl {
+-	unsigned int	sframe	: 1,
+-			poll	: 1,
+-			final	: 1,
+-			fcs	: 1,
+-			sar	: 2,
+-			super	: 2;
++	unsigned int	sframe:1,
++			poll:1,
++			final:1,
++			fcs:1,
++			sar:2,
++			super:2;
+ 	__u16		reqseq;
+ 	__u16		txseq;
+ 	__u8		retries;
+@@ -249,7 +249,8 @@ static inline struct sk_buff *bt_skb_alloc(unsigned int len, gfp_t how)
  {
- 	struct sock *sk = sock->sk;
- 	unsigned int mask = 0;
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b9f13f6..fc39c02 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -454,7 +454,8 @@ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src)
- 	read_lock(&hci_dev_list_lock);
+ 	struct sk_buff *skb;
  
- 	list_for_each_entry(d, &hci_dev_list, list) {
--		if (!test_bit(HCI_UP, &d->flags) || test_bit(HCI_RAW, &d->flags))
-+		if (!test_bit(HCI_UP, &d->flags) ||
-+		    test_bit(HCI_RAW, &d->flags))
- 			continue;
- 
- 		/* Simple routing:
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 7ea8302..738d983 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -622,7 +622,9 @@ int hci_inquiry(void __user *arg)
- 			goto done;
+-	if ((skb = alloc_skb(len + BT_SKB_RESERVE, how))) {
++	skb = alloc_skb(len + BT_SKB_RESERVE, how);
++	if (skb) {
+ 		skb_reserve(skb, BT_SKB_RESERVE);
+ 		bt_cb(skb)->incoming  = 0;
  	}
- 
--	/* for unlimited number of responses we will use buffer with 255 entries */
-+	/* for unlimited number of responses we will use buffer with
-+	 * 255 entries
-+	 */
- 	max_rsp = (ir.num_rsp == 0) ? 255 : ir.num_rsp;
- 
- 	/* cache_dump can't sleep. Therefore we allocate temp buffer and then
-@@ -2610,7 +2612,8 @@ static void hci_sched_esco(struct hci_dev *hdev)
- 	if (!hci_conn_num(hdev, ESCO_LINK))
- 		return;
- 
--	while (hdev->sco_cnt && (conn = hci_low_sent(hdev, ESCO_LINK, &quote))) {
-+	while (hdev->sco_cnt && (conn = hci_low_sent(hdev, ESCO_LINK,
-+						     &quote))) {
- 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
- 			BT_DBG("skb %p len %d", skb, skb->len);
- 			hci_send_frame(skb);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index c8ef6d8..23f5353 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -409,7 +409,8 @@ static void hci_cc_read_voice_setting(struct hci_dev *hdev, struct sk_buff *skb)
- 		hdev->notify(hdev, HCI_NOTIFY_VOICE_SETTING);
- }
- 
--static void hci_cc_write_voice_setting(struct hci_dev *hdev, struct sk_buff *skb)
-+static void hci_cc_write_voice_setting(struct hci_dev *hdev,
-+				       struct sk_buff *skb)
+@@ -261,7 +262,8 @@ static inline struct sk_buff *bt_skb_send_alloc(struct sock *sk,
  {
- 	__u8 status = *((__u8 *) skb->data);
- 	__u16 setting;
-@@ -648,7 +649,8 @@ static void hci_setup_link_policy(struct hci_dev *hdev)
- 	hci_send_cmd(hdev, HCI_OP_WRITE_DEF_LINK_POLICY, sizeof(cp), &cp);
- }
+ 	struct sk_buff *skb;
  
--static void hci_cc_read_local_commands(struct hci_dev *hdev, struct sk_buff *skb)
-+static void hci_cc_read_local_commands(struct hci_dev *hdev,
-+				       struct sk_buff *skb)
- {
- 	struct hci_rp_read_local_commands *rp = (void *) skb->data;
- 
-@@ -666,7 +668,8 @@ done:
- 	hci_req_complete(hdev, HCI_OP_READ_LOCAL_COMMANDS, rp->status);
- }
- 
--static void hci_cc_read_local_features(struct hci_dev *hdev, struct sk_buff *skb)
-+static void hci_cc_read_local_features(struct hci_dev *hdev,
-+				       struct sk_buff *skb)
- {
- 	struct hci_rp_read_local_features *rp = (void *) skb->data;
- 
-@@ -1845,7 +1848,8 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		if (ie)
- 			memcpy(ie->data.dev_class, ev->dev_class, 3);
- 
--		conn = hci_conn_hash_lookup_ba(hdev, ev->link_type, &ev->bdaddr);
-+		conn = hci_conn_hash_lookup_ba(hdev, ev->link_type,
-+					       &ev->bdaddr);
- 		if (!conn) {
- 			conn = hci_conn_add(hdev, ev->link_type, &ev->bdaddr);
- 			if (!conn) {
-@@ -2623,7 +2627,8 @@ static void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		conn->mode = ev->mode;
- 		conn->interval = __le16_to_cpu(ev->interval);
- 
--		if (!test_and_clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags)) {
-+		if (!test_and_clear_bit(HCI_CONN_MODE_CHANGE_PEND,
-+					&conn->flags)) {
- 			if (conn->mode == HCI_CM_ACTIVE)
- 				set_bit(HCI_CONN_POWER_SAVE, &conn->flags);
- 			else
-@@ -2714,8 +2719,8 @@ static void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 		if (key->type == HCI_LK_COMBINATION && key->pin_len < 16 &&
- 		    conn->pending_sec_level == BT_SECURITY_HIGH) {
--			BT_DBG("%s ignoring key unauthenticated for high \
--			       security", hdev->name);
-+			BT_DBG("%s ignoring key unauthenticated for high security",
-+			       hdev->name);
- 			goto not_found;
- 		}
- 
-@@ -3097,8 +3102,8 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		conn->auth_type = hci_get_auth_req(conn);
- 		cp.authentication = conn->auth_type;
- 
--		if ((conn->out || test_bit(HCI_CONN_REMOTE_OOB, &conn->flags)) &&
--		    hci_find_remote_oob_data(hdev, &conn->dst))
-+		if (hci_find_remote_oob_data(hdev, &conn->dst) &&
-+		    (conn->out || test_bit(HCI_CONN_REMOTE_OOB, &conn->flags)))
- 			cp.oob_data = 0x01;
- 		else
- 			cp.oob_data = 0x00;
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index c1e0c3d..9d8e1c3 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -241,7 +241,8 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
- 			struct hci_mon_hdr *hdr;
- 
- 			/* Create a private copy with headroom */
--			skb_copy = __pskb_copy(skb, HCI_MON_HDR_SIZE, GFP_ATOMIC);
-+			skb_copy = __pskb_copy(skb, HCI_MON_HDR_SIZE,
-+					       GFP_ATOMIC);
- 			if (!skb_copy)
- 				continue;
- 
-@@ -542,7 +543,8 @@ static int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd,
+-	if ((skb = sock_alloc_send_skb(sk, len + BT_SKB_RESERVE, nb, err))) {
++	skb = sock_alloc_send_skb(sk, len + BT_SKB_RESERVE, nb, err);
++	if (skb) {
+ 		skb_reserve(skb, BT_SKB_RESERVE);
+ 		bt_cb(skb)->incoming  = 0;
  	}
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 66a7b57..1f18f2e 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1307,12 +1307,12 @@ static inline struct hci_sco_hdr *hci_sco_hdr(const struct sk_buff *skb)
  }
  
--static int hci_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
-+static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
-+			  unsigned long arg)
+ /* Command opcode pack/unpack */
+-#define hci_opcode_pack(ogf, ocf)	(__u16) ((ocf & 0x03ff)|(ogf << 10))
++#define hci_opcode_pack(ogf, ocf)	((__u16) ((ocf & 0x03ff)|(ogf << 10)))
+ #define hci_opcode_ogf(op)		(op >> 10)
+ #define hci_opcode_ocf(op)		(op & 0x03ff)
+ 
+ /* ACL handle and flags pack/unpack */
+-#define hci_handle_pack(h, f)	(__u16) ((h & 0x0fff)|(f << 12))
++#define hci_handle_pack(h, f)	((__u16) ((h & 0x0fff)|(f << 12)))
+ #define hci_handle(h)		(h & 0x0fff)
+ #define hci_flags(h)		(h >> 12)
+ 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 9fc7728..56667f7 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -65,7 +65,7 @@ struct discovery_state {
+ 		DISCOVERY_RESOLVING,
+ 		DISCOVERY_STOPPING,
+ 	} state;
+-	struct list_head	all;		/* All devices found during inquiry */
++	struct list_head	all;	/* All devices found during inquiry */
+ 	struct list_head	unknown;	/* Name state not known */
+ 	struct list_head	resolve;	/* Name needs to be resolved */
+ 	__u32			timestamp;
+@@ -360,7 +360,8 @@ extern int l2cap_connect_cfm(struct hci_conn *hcon, u8 status);
+ extern int l2cap_disconn_ind(struct hci_conn *hcon);
+ extern int l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason);
+ extern int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt);
+-extern int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags);
++extern int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb,
++			      u16 flags);
+ 
+ extern int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ extern int sco_connect_cfm(struct hci_conn *hcon, __u8 status);
+@@ -429,8 +430,8 @@ enum {
+ static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
  {
- 	struct sock *sk = sock->sk;
- 	void __user *argp = (void __user *) arg;
-@@ -603,7 +605,8 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long a
- 	}
+ 	struct hci_dev *hdev = conn->hdev;
+-	return (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
+-				test_bit(HCI_CONN_SSP_ENABLED, &conn->flags));
++	return test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
++	       test_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
  }
  
--static int hci_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
-+static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
-+			 int addr_len)
- {
- 	struct sockaddr_hci haddr;
- 	struct sock *sk = sock->sk;
-@@ -692,7 +695,8 @@ done:
- 	return err;
- }
+ static inline void hci_conn_hash_init(struct hci_dev *hdev)
+@@ -661,7 +662,8 @@ int hci_get_conn_info(struct hci_dev *hdev, void __user *arg);
+ int hci_get_auth_info(struct hci_dev *hdev, void __user *arg);
+ int hci_inquiry(void __user *arg);
  
--static int hci_sock_getname(struct socket *sock, struct sockaddr *addr, int *addr_len, int peer)
-+static int hci_sock_getname(struct socket *sock, struct sockaddr *addr,
-+			    int *addr_len, int peer)
- {
- 	struct sockaddr_hci *haddr = (struct sockaddr_hci *) addr;
- 	struct sock *sk = sock->sk;
-@@ -720,7 +724,8 @@ static void hci_sock_cmsg(struct sock *sk, struct msghdr *msg,
- 
- 	if (mask & HCI_CMSG_DIR) {
- 		int incoming = bt_cb(skb)->incoming;
--		put_cmsg(msg, SOL_HCI, HCI_CMSG_DIR, sizeof(incoming), &incoming);
-+		put_cmsg(msg, SOL_HCI, HCI_CMSG_DIR, sizeof(incoming),
-+			 &incoming);
- 	}
- 
- 	if (mask & HCI_CMSG_TSTAMP) {
-@@ -895,7 +900,8 @@ drop:
- 	goto done;
- }
- 
--static int hci_sock_setsockopt(struct socket *sock, int level, int optname, char __user *optval, unsigned int len)
-+static int hci_sock_setsockopt(struct socket *sock, int level, int optname,
-+			       char __user *optval, unsigned int len)
- {
- 	struct hci_ufilter uf = { .opcode = 0 };
- 	struct sock *sk = sock->sk;
-@@ -977,7 +983,8 @@ done:
- 	return err;
- }
- 
--static int hci_sock_getsockopt(struct socket *sock, int level, int optname, char __user *optval, int __user *optlen)
-+static int hci_sock_getsockopt(struct socket *sock, int level, int optname,
-+			       char __user *optval, int __user *optlen)
- {
- 	struct hci_ufilter uf;
- 	struct sock *sk = sock->sk;
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 847a844..ee8d9ea 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -220,8 +220,8 @@ static ssize_t show_class(struct device *dev,
- 			  struct device_attribute *attr, char *buf)
- {
- 	struct hci_dev *hdev = to_hci_dev(dev);
--	return sprintf(buf, "0x%.2x%.2x%.2x\n",
--		       hdev->dev_class[2], hdev->dev_class[1], hdev->dev_class[0]);
-+	return sprintf(buf, "0x%.2x%.2x%.2x\n", hdev->dev_class[2],
-+		       hdev->dev_class[1], hdev->dev_class[0]);
- }
- 
- static ssize_t show_address(struct device *dev,
-diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
-index 5066288..994bc3c 100644
---- a/net/bluetooth/lib.c
-+++ b/net/bluetooth/lib.c
-@@ -31,7 +31,7 @@
- #include <linux/kernel.h>
- #include <linux/stddef.h>
- #include <linux/string.h>
--#include <asm/errno.h>
-+#include <linux/errno.h>
- 
- #include <net/bluetooth/bluetooth.h>
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 18a2142..b8400bc 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -714,7 +714,8 @@ static struct pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
- }
- 
- static void mgmt_pending_foreach(u16 opcode, struct hci_dev *hdev,
--				 void (*cb)(struct pending_cmd *cmd, void *data),
-+				 void (*cb)(struct pending_cmd *cmd,
-+					    void *data),
- 				 void *data)
- {
- 	struct list_head *p, *n;
-@@ -1594,7 +1595,8 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
- 	}
- 
- 	if (cp->addr.type == BDADDR_BREDR)
--		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->addr.bdaddr);
-+		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
-+					       &cp->addr.bdaddr);
- 	else
- 		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->addr.bdaddr);
- 
-@@ -3226,7 +3228,8 @@ int mgmt_user_confirm_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 					 u8 link_type, u8 addr_type, u8 status)
- {
- 	return user_pairing_resp_complete(hdev, bdaddr, link_type, addr_type,
--					  status, MGMT_OP_USER_CONFIRM_NEG_REPLY);
-+					  status,
-+					  MGMT_OP_USER_CONFIRM_NEG_REPLY);
- }
- 
- int mgmt_user_passkey_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
-@@ -3240,7 +3243,8 @@ int mgmt_user_passkey_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 					 u8 link_type, u8 addr_type, u8 status)
- {
- 	return user_pairing_resp_complete(hdev, bdaddr, link_type, addr_type,
--					  status, MGMT_OP_USER_PASSKEY_NEG_REPLY);
-+					  status,
-+					  MGMT_OP_USER_PASSKEY_NEG_REPLY);
- }
- 
- int mgmt_auth_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+-struct bdaddr_list *hci_blacklist_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr);
++struct bdaddr_list *hci_blacklist_lookup(struct hci_dev *hdev,
++					 bdaddr_t *bdaddr);
+ int hci_blacklist_clear(struct hci_dev *hdev);
+ int hci_blacklist_add(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
+ int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
 -- 
 1.7.10.1
 
