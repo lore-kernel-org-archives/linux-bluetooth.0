@@ -1,75 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 00/19] Bluetooth A2MP implementation
-Date: Wed, 23 May 2012 18:37:06 +0300
-Message-Id: <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 09/19] Bluetooth: A2MP: Process A2MP messages
+Date: Wed, 23 May 2012 18:37:15 +0300
+Message-Id: <1337787445-23235-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Basic A2MP implementation.
+Implement basic processing for AMP Manager Protocol (A2MP).
 
-Changes:
-	* PATCHv2: Rebased against recent changes, changed amp_mgr list to pointer
-	in hci_conn, reworked handling fixed channels and create A2MP channel patches,
-	adding unlink and ready callbacks to get rid of socket dependecies in L2CAP and
-	other minor fixes.
-	* PATCHv1: Rebasing against latest tree and minor fixes.
-	* RFCv7: Taking comments from review in linux-bluetooth.
-	* RFCv6: Remove some unneded check for sk since they are in different path
-	(A2MP decoded as a data channel wrt L2CAP signalling channel). Style fixes.
-	* RFCv5: Fix memory leaks, sparse warnings and taking comments from upstream.
-	* RFCv4: redesign code to use l2cap channel lock instead of socket lock
-	and general modifications. Basic implementation of HCI callback interface.
-	* RFCv3: redesign code to use l2cap functions instead of kernel sockets
-	L2CAP functions modified to work with channels without sk.
-	* RFCv2: rebased against "workqueue" patches.
-	* RFCv1: added refcnt to amp_mgr, fixed sleeping in atomic
+Example below shows processing unrecognized command.
+...
+> ACL data: handle 11 flags 0x02 dlen 12
+    A2MP: code 0x00 ident 3 len 0
+< ACL data: handle 11 flags 0x00 dlen 14
+    A2MP: Command Reject: reason (0) - Command not recognized
+...
 
-Initially code was based of reference implementations below:
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/a2mp.c |   65 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
 
-References: Code Aurora (git://codeaurora.org/kernel/msm.git) and Atheros
-(search for: [PATCH 2/3] Add a2mp protocol/AMP manager, by Atheros Linux BT3)
-implementations.
-
-Andrei Emeltchenko (19):
-  Bluetooth: Add unlink to L2CAP channel ops
-  Bluetooth: Add ready to L2CAP channel ops
-  Bluetooth: A2MP: Create A2MP channel
-  Bluetooth: A2MP: AMP Manager basic functions
-  Bluetooth: A2MP: Build and Send msg helpers
-  Bluetooth: A2MP: Add chan callbacks
-  Bluetooth: A2MP: Definitions for A2MP commands
-  Bluetooth: A2MP: Define A2MP status codes
-  Bluetooth: A2MP: Process A2MP messages
-  Bluetooth: A2MP: Process A2MP Command Reject
-  Bluetooth: A2MP: Process A2MP Discover Request
-  Bluetooth: A2MP: Process A2MP Change Notify
-  Bluetooth: A2MP: Process A2MP Get Info Request
-  Bluetooth: A2MP: Process A2MP Get AMP Assoc Request
-  Bluetooth: A2MP: Process A2MP Create Physlink Request
-  Bluetooth: A2MP: Process A2MP Disc Physlink Request
-  Bluetooth: A2MP: Process A2MP Command Responses
-  Bluetooth: A2MP: Handling fixed channels
-  Bluetooth: A2MP: Manage incoming connections
-
- include/net/bluetooth/a2mp.h     |  126 +++++++++
- include/net/bluetooth/hci.h      |    3 +
- include/net/bluetooth/hci_core.h |   14 +
- include/net/bluetooth/l2cap.h    |    9 +
- net/bluetooth/Makefile           |    3 +-
- net/bluetooth/a2mp.c             |  566 ++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_conn.c         |    4 +
- net/bluetooth/l2cap_core.c       |   98 +++----
- net/bluetooth/l2cap_sock.c       |   53 ++++
- 9 files changed, 820 insertions(+), 56 deletions(-)
- create mode 100644 include/net/bluetooth/a2mp.h
- create mode 100644 net/bluetooth/a2mp.c
-
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index eb98541..92b7671 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -63,6 +63,70 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
+ 	kfree(cmd);
+ }
+ 
++/* Handle A2MP signalling */
++static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
++{
++	struct a2mp_cmd *hdr = (struct a2mp_cmd *) skb->data;
++	struct amp_mgr *mgr = data;
++	int err = 0;
++
++	amp_mgr_get(mgr);
++
++	while (skb->len >= sizeof(*hdr)) {
++		struct a2mp_cmd *hdr = (struct a2mp_cmd *) skb->data;
++		u16 len = le16_to_cpu(hdr->len);
++
++		BT_DBG("code 0x%02x id %d len %d", hdr->code, hdr->ident, len);
++
++		skb_pull(skb, sizeof(*hdr));
++
++		if (len > skb->len || !hdr->ident) {
++			err = -EINVAL;
++			break;
++		}
++
++		mgr->ident = hdr->ident;
++
++		switch (hdr->code) {
++		case A2MP_COMMAND_REJ:
++		case A2MP_DISCOVER_REQ:
++		case A2MP_CHANGE_NOTIFY:
++		case A2MP_GETINFO_REQ:
++		case A2MP_GETAMPASSOC_REQ:
++		case A2MP_CREATEPHYSLINK_REQ:
++		case A2MP_DISCONNPHYSLINK_REQ:
++		case A2MP_CHANGE_RSP:
++		case A2MP_DISCOVER_RSP:
++		case A2MP_GETINFO_RSP:
++		case A2MP_GETAMPASSOC_RSP:
++		case A2MP_CREATEPHYSLINK_RSP:
++		case A2MP_DISCONNPHYSLINK_RSP:
++		default:
++			BT_ERR("Unknown A2MP sig cmd 0x%2.2x", hdr->code);
++			err = -EINVAL;
++			break;
++		}
++	}
++
++	if (err) {
++		struct a2mp_cmd_rej rej;
++		rej.reason = cpu_to_le16(0);
++
++		BT_DBG("Send A2MP Rej: cmd 0x%2.2x err %d", hdr->code, err);
++
++		a2mp_send(mgr, A2MP_COMMAND_REJ, hdr->ident, sizeof(rej),
++			  &rej);
++	}
++
++	/* Always free skb and return success error code to prevent
++	   from sending L2CAP Disconnect over A2MP channel */
++	kfree_skb(skb);
++
++	amp_mgr_put(mgr);
++
++	return 0;
++}
++
+ static void a2mp_chan_state_change_cb(void *data, int state)
+ {
+ 	struct amp_mgr *mgr = data;
+@@ -100,6 +164,7 @@ static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
+ 
+ static struct l2cap_ops a2mp_chan_ops = {
+ 	.name = "L2CAP A2MP channel",
++	.recv = a2mp_chan_recv_cb,
+ 	.state_change = a2mp_chan_state_change_cb,
+ 	.close = a2mp_chan_close_cb,
+ 	.alloc_skb = a2mp_chan_alloc_skb_cb,
 -- 
 1.7.9.5
 
