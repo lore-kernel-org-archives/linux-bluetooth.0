@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 01/19] Bluetooth: Add unlink to L2CAP channel ops
-Date: Wed, 23 May 2012 18:37:07 +0300
-Message-Id: <1337787445-23235-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 13/19] Bluetooth: A2MP: Process A2MP Get Info Request
+Date: Wed, 23 May 2012 18:37:19 +0300
+Message-Id: <1337787445-23235-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,109 +12,79 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This helps to separate socket and socketless code. Now socket related
-operations moved to l2cap_sock in unlink callback for channels with sk.
+Process A2MP Get Info Request.
+Example of trace log for invalid controller id is shown below:
+
+...
+> ACL data: handle 11 flags 0x02 dlen 13
+    A2MP: Get Info req: id 238
+< ACL data: handle 11 flags 0x00 dlen 30
+    A2MP: Get Info rsp: id 238 status (1) Invalid Controller ID
+...
+
+Note that If the Status field is set to Invalid Controller ID all subsequent
+fields in the AMP Get Info Response shall be ignored by the receiver.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/l2cap_core.c    |   19 ++-----------------
- net/bluetooth/l2cap_sock.c    |   25 +++++++++++++++++++++++++
- 3 files changed, 28 insertions(+), 17 deletions(-)
+ net/bluetooth/a2mp.c |   37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 0142257..a017249 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -529,6 +529,7 @@ struct l2cap_ops {
- 	void			(*state_change) (void *data, int state);
- 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
- 					       unsigned long len, int nb);
-+	void			(*unlink) (struct l2cap_chan *chan, int err);
- };
- 
- struct l2cap_conn {
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e31b005..c81b828 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -493,9 +493,7 @@ static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 
- static void l2cap_chan_del(struct l2cap_chan *chan, int err)
- {
--	struct sock *sk = chan->sk;
- 	struct l2cap_conn *conn = chan->conn;
--	struct sock *parent = bt_sk(sk)->parent;
- 
- 	__clear_chan_timer(chan);
- 
-@@ -511,21 +509,8 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 		hci_conn_put(conn->hcon);
- 	}
- 
--	lock_sock(sk);
--
--	__l2cap_state_change(chan, BT_CLOSED);
--	sock_set_flag(sk, SOCK_ZAPPED);
--
--	if (err)
--		__l2cap_chan_set_err(chan, err);
--
--	if (parent) {
--		bt_accept_unlink(sk);
--		parent->sk_data_ready(parent, 0);
--	} else
--		sk->sk_state_change(sk);
--
--	release_sock(sk);
-+	if (chan->ops->unlink)
-+		chan->ops->unlink(chan, err);
- 
- 	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
- 		return;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 4d36605..6749d11 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -954,6 +954,30 @@ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
- 	return skb;
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index d60be75..d636c0c 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -177,6 +177,40 @@ static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
  }
  
-+static void l2cap_sock_unlink_cb(struct l2cap_chan *chan, int err)
++static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
++			    struct a2mp_cmd *hdr)
 +{
-+	struct sock *sk = chan->sk;
-+	struct sock *parent = bt_sk(sk)->parent;
++	struct a2mp_info_req *req  = (struct a2mp_info_req *) skb->data;
++	struct a2mp_info_rsp rsp;
++	struct hci_dev *hdev;
 +
-+	lock_sock(sk);
++	if (le16_to_cpu(hdr->len) < sizeof(*req))
++		return -EINVAL;
 +
-+	chan->state = BT_CLOSED;
-+	sk->sk_state = BT_CLOSED;
-+	sock_set_flag(sk, SOCK_ZAPPED);
++	BT_DBG("id %d", req->id);
 +
-+	if (err)
-+		sk->sk_err = err;
++	rsp.id = req->id;
++	rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
 +
-+	parent = bt_sk(sk)->parent;
-+	if (parent) {
-+		bt_accept_unlink(sk);
-+		parent->sk_data_ready(parent, 0);
-+	} else
-+		sk->sk_state_change(sk);
++	hdev = hci_dev_get(req->id);
++	if (hdev && hdev->amp_type != HCI_BREDR) {
++		rsp.status = 0;
++		rsp.total_bw = cpu_to_le32(hdev->amp_total_bw);
++		rsp.max_bw = cpu_to_le32(hdev->amp_max_bw);
++		rsp.min_latency = cpu_to_le32(hdev->amp_min_latency);
++		rsp.pal_cap = cpu_to_le16(hdev->amp_pal_cap);
++		rsp.assoc_size = cpu_to_le16(hdev->amp_assoc_size);
++	}
 +
-+	release_sock(sk);
++	if (hdev)
++		hci_dev_put(hdev);
++
++	a2mp_send(mgr, A2MP_GETINFO_RSP, hdr->ident, sizeof(rsp), &rsp);
++
++	skb_pull(skb, sizeof(*req));
++	return 0;
 +}
 +
- static struct l2cap_ops l2cap_chan_ops = {
- 	.name		= "L2CAP Socket Interface",
- 	.new_connection	= l2cap_sock_new_connection_cb,
-@@ -961,6 +985,7 @@ static struct l2cap_ops l2cap_chan_ops = {
- 	.close		= l2cap_sock_close_cb,
- 	.state_change	= l2cap_sock_state_change_cb,
- 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
-+	.unlink		= l2cap_sock_unlink_cb,
- };
+ /* Handle A2MP signalling */
+ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ {
+@@ -215,6 +249,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 			break;
  
- static void l2cap_sock_destruct(struct sock *sk)
+ 		case A2MP_GETINFO_REQ:
++			err = a2mp_getinfo_req(mgr, skb, hdr);
++			break;
++
+ 		case A2MP_GETAMPASSOC_REQ:
+ 		case A2MP_CREATEPHYSLINK_REQ:
+ 		case A2MP_DISCONNPHYSLINK_REQ:
 -- 
 1.7.9.5
 
