@@ -1,48 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 May 2012 15:02:52 -0300
+Date: Wed, 23 May 2012 14:40:16 -0300
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Syam Sidhardhan <s.syam@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 10/12] adapter: Remove unwanted if check and code
-Message-ID: <20120523180252.GB32263@samus>
-References: <1337788652-23697-1-git-send-email-s.syam@samsung.com>
- <1337788652-23697-11-git-send-email-s.syam@samsung.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [PATCH obexd v0 03/16] client: Add progress property to transfer
+Message-ID: <20120523174016.GA32263@samus>
+References: <1337785218-8661-1-git-send-email-mikel.astiz.oss@gmail.com>
+ <1337785218-8661-4-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337788652-23697-11-git-send-email-s.syam@samsung.com>
+In-Reply-To: <1337785218-8661-4-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+Hi Mikel,
 
-On 21:27 Wed 23 May, Syam Sidhardhan wrote:
-> Here the variable agent never be NULL, so no need to check it
-> against NULL.
-> ---
->  src/adapter.c |    3 ---
->  1 files changed, 0 insertions(+), 3 deletions(-)
+On 17:00 Wed 23 May, Mikel Astiz wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 > 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 18dd5b6..16d379c 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -1618,9 +1618,6 @@ static DBusMessage *register_agent(DBusConnection *conn, DBusMessage *msg,
+> The number of transferred bytes is exposed in D-Bus using a specific
+> property for this purpose.
+> 
+> Internally, the value of this property does not necessarily match the
+> internal progress counter. In order to avoid D-Bus overhead, the
+> property will be updated at least every N bytes, where N is fixed and
+> hardcoded (TRANSFER_PROGRESS_PERIOD).
+> ---
+>  client/transfer.c |   47 +++++++++++++++++++++++++++++++++++++++++++++--
+>  1 files changed, 45 insertions(+), 2 deletions(-)
+> 
+> diff --git a/client/transfer.c b/client/transfer.c
+> index 8292265..2c6e1ed 100644
+> --- a/client/transfer.c
+> +++ b/client/transfer.c
+> @@ -44,6 +44,7 @@
 >  
->  	agent = agent_create(adapter, name, path, cap,
->  				(agent_remove_cb) agent_removed, adapter);
-> -	if (!agent)
-> -		return btd_error_failed(msg, "Failed to create a new agent");
-> -
+>  #define TRANSFER_INTERFACE  "org.openobex.Transfer"
+>  #define TRANSFER_BASEPATH   "/org/openobex"
+> +#define TRANSFER_PROGRESS_PERIOD (16 * 1024)
 
-While you are at it, you could remove the "agent" variable.
+Just a detail, but this value is half the value of the default Bluetooth
+MTU, right? 
 
-Apart from this, the series looks good.
+For a future improvement, I think it would be nice to consider a value
+related to the MTU.
 
->  	adapter->agent = agent;
+[snip]
+
 >  
->  	DBG("Agent registered for hci%d at %s:%s", adapter->dev_id, name,
 > -- 
-> 1.7.4.1
+> 1.7.7.6
 > 
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
