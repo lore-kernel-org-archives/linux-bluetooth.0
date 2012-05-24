@@ -1,64 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 10:48:46 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-cc: Ulisses Furquim <ulisses@profusion.mobi>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [RFC 3/8] Bluetooth: Add l2cap_chan->ops->ready()
-In-Reply-To: <20120524113721.GS24715@aemeltch-MOBL1>
-Message-ID: <alpine.DEB.2.02.1205241044230.18142@mathewm-linux>
-References: <1337821964-4618-1-git-send-email-gustavo@padovan.org> <1337821964-4618-2-git-send-email-gustavo@padovan.org> <1337821964-4618-3-git-send-email-gustavo@padovan.org> <1337821964-4618-4-git-send-email-gustavo@padovan.org> <20120524093958.GL24715@aemeltch-MOBL1>
- <20120524102342.GQ24715@aemeltch-MOBL1> <CAA37ikZvK=woaW_grv1t6PK0x0d3uz98MmjQL46z9PHPCJA0nA@mail.gmail.com> <20120524113018.GR24715@aemeltch-MOBL1> <CAA37ikZBekiH6Jn2yn4Mkm1BKvrW=rjD62doOkDH3CVUvwpRDA@mail.gmail.com>
- <20120524113721.GS24715@aemeltch-MOBL1>
+Date: Thu, 24 May 2012 14:41:46 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Daniel Wagner <wagi@monom.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Daniel Wagner <daniel.wagner@bmw-carit.de>
+Subject: Re: [PATCH v1 1/3] main: Add IngoreDUN configuration switch
+Message-ID: <20120524174145.GC10754@samus>
+References: <1337853618-7261-1-git-send-email-wagi@monom.org>
+ <1337853618-7261-2-git-send-email-wagi@monom.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=iso-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1337853618-7261-2-git-send-email-wagi@monom.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Daniel,
 
-On Thu, 24 May 2012, Andrei Emeltchenko wrote:
+On 12:00 Thu 24 May, Daniel Wagner wrote:
+> From: Daniel Wagner <daniel.wagner@bmw-carit.de>
+> 
+> ---
+>  src/hcid.h    |    1 +
+>  src/main.c    |    9 +++++++++
+>  src/main.conf |    5 +++++
+>  3 files changed, 15 insertions(+)
+> 
+> diff --git a/src/hcid.h b/src/hcid.h
+> index 1e5e15a..2564467 100644
+> --- a/src/hcid.h
+> +++ b/src/hcid.h
+> @@ -39,6 +39,7 @@ struct main_opts {
+>  	gboolean	name_resolv;
+>  	gboolean	debug_keys;
+>  	gboolean	gatt_enabled;
+> +	gboolean	ignore_dun;
+>  
+>  	uint8_t		mode;
+>  
+> diff --git a/src/main.c b/src/main.c
+> index b062b4a..240326d 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -245,6 +245,14 @@ static void parse_config(GKeyFile *config)
+>  	else
+>  		main_opts.gatt_enabled = boolean;
+>  
+> +	boolean = g_key_file_get_boolean(config, "General",
+> +						"IgnoreDUN", &err);
+> +	if (err) {
+> +		DBG("%s", err->message);
+> +		g_clear_error(&err);
+> +	} else
+> +		main_opts.ignore_dun = boolean;
+> +
+>  	main_opts.link_mode = HCI_LM_ACCEPT;
+>  
+>  	main_opts.link_policy = HCI_LP_RSWITCH | HCI_LP_SNIFF |
+> @@ -262,6 +270,7 @@ static void init_defaults(void)
+>  	main_opts.remember_powered = TRUE;
+>  	main_opts.reverse_sdp = TRUE;
+>  	main_opts.name_resolv = TRUE;
+> +	main_opts.ignore_dun = TRUE;
+>  
+>  	if (gethostname(main_opts.host_name, sizeof(main_opts.host_name) - 1) < 0)
+>  		strcpy(main_opts.host_name, "noname");
+> diff --git a/src/main.conf b/src/main.conf
+> index 787ef4f..676999d 100644
+> --- a/src/main.conf
+> +++ b/src/main.conf
+> @@ -62,3 +62,8 @@ DebugKeys = false
+>  
+>  # Enable the GATT functionality. Default is false
+>  EnableGatt = false
+> +
+> +# If a device supports both DUN and PAN at the same time, ignore the
+> +# DUN profile. Only PAN will be exposed through the D-Bus API in this
+> +# case. The default is true
+> +IgnoreDUN = true
 
-> Hi Ulisses,
->
-> On Thu, May 24, 2012 at 08:31:15AM -0300, Ulisses Furquim wrote:
->> Hi Andrei,
->>
->> On Thu, May 24, 2012 at 8:30 AM, Andrei Emeltchenko
->> <andrei.emeltchenko.news@gmail.com> wrote:
->>> Hi Ulisses,
->>>
->>> On Thu, May 24, 2012 at 08:17:23AM -0300, Ulisses Furquim wrote:
->>>>>>> +   void                    (*ready) (void *data);
->>>>>>
->>>>>> Again, why void *data ?
->>>>>
->>>>> I mean here that for fixed channels we do not need this function at this
->>>>> point since initialization is different.
->>>>
->>>> So? What do you mean? This needs to be generic, I think. It's an
->>>> abstraction after all.
->>>
->>> Fixed channels do not have configuration phase, they are created
->>> CONNECTED (at least A2MP).
->>
->> And your proposal is?
->
-> Fox fixed channels ready is not defined (at least now) so we can just use
-> exact type, see my patch in a minute.
+I would prefer if this would be called something like "PreferPAN" (or
+even "PreferPANoverDUN", but that sounds weird). I, at least, find it
+easier to understand.
 
-For l2cap_ops right now, every callback takes a void* except for 
-alloc_skb.  alloc_skb could get by with a void* by using 
-l2cap_pi(sk)->chan.
+And I am still thinking if it would be worth considering something more
+complex, that would deal with cases like this in general. But as I don't
+have any concrete proposal, I will stop here.
 
-In any case, I think we can agree that some consistency in l2cap_ops 
-would be good!  Either way will work because the void* can give the 
-chan*, and with the chan* you have chan->data.  Let's pick either 
-void* or l2cap_chan* for the callbacks and stick with it.
+> -- 
+> 1.7.10.130.g36e6c
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
+Cheers,
+-- 
+Vinicius
