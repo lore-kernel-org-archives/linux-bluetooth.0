@@ -1,138 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 10:10:28 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Gustavo Padovan <gustavo@padovan.org>
-cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [RFC 8/8] Bluetooth: Add chan->ops->authorize
-In-Reply-To: <1337821964-4618-9-git-send-email-gustavo@padovan.org>
-Message-ID: <alpine.DEB.2.02.1205241000160.18142@mathewm-linux>
-References: <1337821964-4618-1-git-send-email-gustavo@padovan.org> <1337821964-4618-2-git-send-email-gustavo@padovan.org> <1337821964-4618-3-git-send-email-gustavo@padovan.org> <1337821964-4618-4-git-send-email-gustavo@padovan.org>
- <1337821964-4618-5-git-send-email-gustavo@padovan.org> <1337821964-4618-6-git-send-email-gustavo@padovan.org> <1337821964-4618-7-git-send-email-gustavo@padovan.org> <1337821964-4618-8-git-send-email-gustavo@padovan.org>
- <1337821964-4618-9-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+In-Reply-To: <1337865771-11777-6-git-send-email-luiz.dentz@gmail.com>
+References: <1337865771-11777-1-git-send-email-luiz.dentz@gmail.com> <1337865771-11777-6-git-send-email-luiz.dentz@gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Thu, 24 May 2012 14:09:19 -0300
+Message-ID: <CAMOw1v7+=GefR2K+Wkn89W2ZMR7F_Q52Y_g6+bkeCyXBC07Q2Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 6/6] audio: Add Volume property to A2DP transport GetProperties
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-Gustavo -
-
-On Wed, 23 May 2012, Gustavo Padovan wrote:
-
-> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+On Thu, May 24, 2012 at 10:22 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> When DEFER_SETUP is set authorize() will trigger an authorization request
-> to the userspace.
->
-> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> Now that volume is being handled by SetProperty it should also be
+> available in GetProperties.
 > ---
-> include/net/bluetooth/l2cap.h |    1 +
-> net/bluetooth/l2cap_core.c    |   14 ++++++--------
-> net/bluetooth/l2cap_sock.c    |   12 ++++++++++++
-> 3 files changed, 19 insertions(+), 8 deletions(-)
+>  audio/transport.c |    5 +++++
+>  1 files changed, 5 insertions(+), 0 deletions(-)
 >
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 4f81d08..94e375a 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -531,6 +531,7 @@ struct l2cap_ops {
-> 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
-> 					       unsigned long len, int nb);
-> 	void			(*ready) (void *data);
-> +	void			(*authorize) (void *data);
-> };
-
-I'm trying to think of a name more specific to the deferred connection 
-feature than "authorize"...  There's a lot of use of "auth" to refer 
-to "authentication", so it could be confusing to throw "authorize" in 
-to the mix.
-
-"deferred_connect"? 
-"pending_connection"?
-"defer"?
-
->
-> struct l2cap_conn {
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 1305b3b..22ba699 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -1058,12 +1058,10 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
-> 				lock_sock(sk);
-> 				if (test_bit(CONF_DEFER_SETUP,
-> 					     &chan->conf_state)) {
-> -					struct sock *parent = bt_sk(sk)->parent;
-> 					rsp.result = cpu_to_le16(L2CAP_CR_PEND);
-> 					rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
-> -					if (parent)
-> -						parent->sk_data_ready(parent, 0);
-> -
-> +					if(chan->ops->authorize)
-> +						chan->ops->authorize(chan->data);
-> 				} else {
-> 					__l2cap_state_change(chan, BT_CONFIG);
-> 					rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
-> @@ -3380,7 +3378,8 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
-> 				__l2cap_state_change(chan, BT_CONNECT2);
-> 				result = L2CAP_CR_PEND;
-> 				status = L2CAP_CS_AUTHOR_PEND;
-> -				parent->sk_data_ready(parent, 0);
-> +				if(chan->ops->authorize)
-> +					chan->ops->authorize(chan->data);
-> 			} else {
-> 				__l2cap_state_change(chan, BT_CONFIG);
-> 				result = L2CAP_CR_SUCCESS;
-> @@ -5408,11 +5407,10 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
-> 			if (!status) {
-> 				if (test_bit(CONF_DEFER_SETUP,
-> 					     &chan->conf_state)) {
-> -					struct sock *parent = bt_sk(sk)->parent;
-> 					res = L2CAP_CR_PEND;
-> 					stat = L2CAP_CS_AUTHOR_PEND;
-> -					if (parent)
-> -						parent->sk_data_ready(parent, 0);
-> +					if(chan->ops->authorize)
-> +						chan->ops->authorize(chan->data);
-> 				} else {
-> 					__l2cap_state_change(chan, BT_CONFIG);
-> 					res = L2CAP_CR_SUCCESS;
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index dac7b2c..d2a81f1 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -1047,6 +1047,17 @@ static void l2cap_sock_ready_cb(void *data)
-> 	release_sock(sk);
-> }
->
-> +static void l2cap_sock_authorize_cb(void *data)
-> +{
-> +	struct sock *sk = data;
-> +	struct sock *parent;
+> diff --git a/audio/transport.c b/audio/transport.c
+> index 6406ec1..4f86a8b 100644
+> --- a/audio/transport.c
+> +++ b/audio/transport.c
+> @@ -860,6 +860,10 @@ static void get_properties_a2dp(struct media_transport *transport,
+>                                                DBusMessageIter *dict)
+>  {
+>        dict_append_entry(dict, "Delay", DBUS_TYPE_UINT16, &transport->delay);
 > +
-> +	parent = bt_sk(sk)->parent;
-> +
-> +	if (parent)
-> +		parent->sk_data_ready(parent, 0);
-> +}
-> +
-> static struct l2cap_ops l2cap_chan_ops = {
-> 	.name		= "L2CAP Socket Interface",
-> 	.new_connection	= l2cap_sock_new_connection_cb,
-> @@ -1056,6 +1067,7 @@ static struct l2cap_ops l2cap_chan_ops = {
-> 	.state_change	= l2cap_sock_state_change_cb,
-> 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
-> 	.ready		= l2cap_sock_ready_cb,
-> +	.authorize	= l2cap_sock_authorize_cb,
-> };
+> +       if (transport->volume <= 127)
+> +               dict_append_entry(dict, "Volume", DBUS_TYPE_UINT16,
+> +                                                       &transport->volume);
+>  }
 >
-> static void l2cap_sock_destruct(struct sock *sk)
-> -- 
-> 1.7.10.1
+>  static void get_properties_headset(struct media_transport *transport,
+> @@ -1015,6 +1019,7 @@ struct media_transport *media_transport_create(DBusConnection *conn,
+>        transport->size = size;
+>        transport->path = g_strdup_printf("%s/fd%d", device->path, fd++);
+>        transport->fd = -1;
+> +       transport->volume = -1;
+
+Ack
 
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
+Lucas De Marchi
