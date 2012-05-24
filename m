@@ -1,38 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 14:04:12 -0300
+Date: Thu, 24 May 2012 14:01:07 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
 To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
 	linux-bluetooth@vger.kernel.org,
 	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [RFC 1/2] Bluetooth: Create chan->ops->set_err()
-Message-ID: <20120524170412.GE3105@joana>
-References: <1337839374-20443-3-git-send-email-gustavo@padovan.org>
- <1337842817-27865-1-git-send-email-gustavo@padovan.org>
- <20120524082603.GE24715@aemeltch-MOBL1>
+Subject: Re: [RFC 7/8] Bluetooth: Create DEFER_SETUP flag in conf_state
+Message-ID: <20120524170107.GD3105@joana>
+References: <1337821964-4618-1-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-2-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-3-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-4-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-5-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-6-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-7-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-8-git-send-email-gustavo@padovan.org>
+ <20120524095005.GN24715@aemeltch-MOBL1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120524082603.GE24715@aemeltch-MOBL1>
+In-Reply-To: <20120524095005.GN24715@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-05-24 11:26:04 +0300]:
+* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-05-24 12:50:06 +0300]:
 
 > Hi Gustavo,
 > 
-> On Thu, May 24, 2012 at 04:00:16AM -0300, Gustavo Padovan wrote:
-> > -	lock_sock(sk);
-> > -	__l2cap_state_change(chan, BT_DISCONN);
-> > -	__l2cap_chan_set_err(chan, err);
-> > -	release_sock(sk);
-> > +	l2cap_state_change(chan, BT_DISCONN);
-> > +	if(chan->ops->set_err)
-> > +		chan->ops->set_err(chan->data, err);
+> On Wed, May 23, 2012 at 10:12:43PM -0300, Gustavo Padovan wrote:
+> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > 
+> > Remove another socket usage from l2cap_core.c
 > 
-> I do not know can it be done somehow better, currently we lock and unlock
-> sockets for each operation.
+> Good idea.
+> 
+> ...
+> > --- a/net/bluetooth/l2cap_sock.c
+> > +++ b/net/bluetooth/l2cap_sock.c
+> > @@ -623,10 +623,15 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+> >  			break;
+> >  		}
+> >  
+> > -		if (opt)
+> > +		if (opt) {
+> >  			set_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
+> > -		else
+> > +			set_bit(CONF_DEFER_SETUP, &chan->conf_state);
+> > +		} else {
+> >  			clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
+> > +			clear_bit(CONF_DEFER_SETUP, &chan->conf_state);
+> 
+> Do we now have 2 similar flags?
 
-I'm having trouble to get your point, could you please explain?
+Yes, and there is no other way to do this, BT_SK_DEFER_SETUP is for socket
+related usage (mostly in af_bluetooth.c) and CONF_DEFER_SETUP is for
+l2cap_core.c
+
+> 
+> > +		}
+> > +
+> > +
+> 
+> Remove extra line
+
+Sure.
 
 	Gustavo
