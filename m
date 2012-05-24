@@ -1,39 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 13:43:06 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [RFC 0/8] Another step in l2cap_core/sock separation
-Message-ID: <20120524164306.GA3105@joana>
-References: <1337821964-4618-1-git-send-email-gustavo@padovan.org>
- <20120524100228.GP24715@aemeltch-MOBL1>
+Date: Thu, 24 May 2012 08:59:57 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
+Subject: Re: [PATCHv1 01/17] Bluetooth: A2MP: Create A2MP channel
+In-Reply-To: <20120524075105.GB24715@aemeltch-MOBL1>
+Message-ID: <alpine.DEB.2.02.1205240853590.18142@mathewm-linux>
+References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1337351150-20526-2-git-send-email-Andrei.Emeltchenko.news@gmail.com> <alpine.DEB.2.02.1205221039100.2239@mathewm-linux> <20120523074950.GA32022@aemeltch-MOBL1>
+ <alpine.DEB.2.02.1205230842040.6526@mathewm-linux> <20120524075105.GB24715@aemeltch-MOBL1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120524100228.GP24715@aemeltch-MOBL1>
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
 
-* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-05-24 13:02:29 +0300]:
+Hi Andrei -
 
-> Hi Gustavo,
-> 
-> On Wed, May 23, 2012 at 10:12:36PM -0300, Gustavo Padovan wrote:
-> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> > 
-> > Hi,
-> > 
-> > This patchset does a bit more of clean up in l2cap core, it was inially based
-> > on the two patches Andrei has sent to the list today.
-> 
-> Can this RFC be merged with other 2 RFC since otherwise I got lost. 
-> 
-> I also found that my mail reader indent your RFC in a strange way so I
-> thought that they are in the same series.
+On Thu, 24 May 2012, Andrei Emeltchenko wrote:
+> On Wed, May 23, 2012 at 08:44:22AM -0700, Mat Martineau wrote:
+>>>>> +static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
+>>>>> +{
+>>>>> +	struct l2cap_chan *chan;
+>>>>> +
+>>>>> +	chan = l2cap_chan_create();
+>>>>> +	if (!chan)
+>>>>> +		return NULL;
+>>>>> +
+>>>>> +	BT_DBG("chan %p", chan);
+>>>>> +
+>>>>> +	hci_conn_hold(conn->hcon);
+>>>>
+>>>> Holding the hcon will keep the ACL open after all of the other L2CAP
+>>>> channels have closed (unless I missed some code later in the patch
+>>>> series).  The A2MP fixed channel should not keep the ACL open.  If
+>>>> the connection is not held here, then there shouldn't be a put in
+>>>> l2cap_chan_del for the A2MP channel either.
+>>>
+>>> l2cap_chan_del makes hci_conn_put, also for a2mp channel. The behavior is
+>>> the same for fixed and normal channels.
+>>
+>> And when does l2cap_chan_del get called for a fixed channel?  The
+>> fixed channel must not do an hci_conn_hold so the ACL is allowed to
+>> close when all dynamic L2CAP channels have closed.
+>
+> The current approach is to have amp_mgr for hci_conn. It will be freed
+> when in hci_conn_del together with other l2cap channels in
+> hci_chan_list_flush and then we make amp_mgr_put() and destroy mgr.
+>
+> The idea is to make a2mp chan similar to other chans and other chans do
+> hci_conn_hold and hci_conn_put. Otherwise I would need to add extra checks
+> before hci_conn_put which is ugly.
+>
+> I've tested this with PTS and no memory leaks found so far.
 
-And actually they the same series, I just thought twice that I was done with
-this patchset, but then I just found more work to do. 
+The risk is not memory leaks - if the other device closes the ACL, 
+then the A2MP channel will be cleaned up.  But if you had two BlueZ 
+devices with A2MP connected to each other, the ACL would never close 
+as long as the devices remained powered and in range!  Nothing would 
+trigger the flush as long as the hci_conn is held.
 
-	Gustavo
+I think the checks for hci_conn_put are necessary, even if they are 
+ugly.
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
