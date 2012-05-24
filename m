@@ -1,63 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 15:48:46 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Ulisses Furquim <ulisses@profusion.mobi>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [RFC 3/8] Bluetooth: Add l2cap_chan->ops->ready()
-Message-ID: <20120524184846.GD10754@samus>
-References: <1337821964-4618-1-git-send-email-gustavo@padovan.org>
- <1337821964-4618-2-git-send-email-gustavo@padovan.org>
- <1337821964-4618-3-git-send-email-gustavo@padovan.org>
- <1337821964-4618-4-git-send-email-gustavo@padovan.org>
- <20120524093958.GL24715@aemeltch-MOBL1>
- <20120524102342.GQ24715@aemeltch-MOBL1>
- <CAA37ikZvK=woaW_grv1t6PK0x0d3uz98MmjQL46z9PHPCJA0nA@mail.gmail.com>
- <20120524113018.GR24715@aemeltch-MOBL1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20120524113018.GR24715@aemeltch-MOBL1>
+Date: Thu, 24 May 2012 14:57:07 -0300 (BRT)
+Message-Id: <20120524.145707.1901844181634748035.pcacjr@zytor.com>
+To: johan.hedberg@gmail.com
+Cc: paulo.alcantara@openbossa.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 00/15] Store address type on storage - remaining
+ files
+From: Paulo Alcantara <pcacjr@zytor.com>
+In-Reply-To: <20120524075923.GA17458@x220>
+References: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
+	<20120524075923.GA17458@x220>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Johan,
 
-On 14:30 Thu 24 May, Andrei Emeltchenko wrote:
-> Hi Ulisses,
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Thu, 24 May 2012 10:59:23 +0300
+
+> Hi Paulo,
 > 
-> On Thu, May 24, 2012 at 08:17:23AM -0300, Ulisses Furquim wrote:
-> > >> > +   void                    (*ready) (void *data);
-> > >>
-> > >> Again, why void *data ?
-> > >
-> > > I mean here that for fixed channels we do not need this function at this
-> > > point since initialization is different.
+> On Wed, May 23, 2012, Paulo Alcantara wrote:
+> > This patchset contains the remaining changes for the new storage format
+> > used (bdaddr#type) on storage files (LE-only or shared files).
 > > 
-> > So? What do you mean? This needs to be generic, I think. It's an
-> > abstraction after all.
+> > The files that have been changed so far are:
+> >     primaries, characteristics, appearance, ccc, names, aliases,
+> >     longtermkeys, attributes, blocked.
 > 
-> Fixed channels do not have configuration phase, they are created
-> CONNECTED (at least A2MP).
+> Any files that are used for BR/EDR would have to keep their backwards
+> compatibility. Otherwise someone who upgrades from 4.99 to 4.100 will
+> suddenly find that the device they had blocked is not blocked anymore
+> and none of their devices have any names. We can't break something like
+> that between 4.x versions. Are these patches guaranteeing this backwards
+> compatibility? Looking at the patches it doesn't look like they give
+> this guarantee.
 
-You are right, but having this abstraction seems useful.
+Ok, you're right. The only file that we should keep backward compatibility on
+this series is the blocked file, since it's shared by both BR/EDR and LE devices.
 
-In LE, for example, we (ab)use the CONFIG phase for blocking the channel
-while SMP is running (negotiating the encryption of the link), so any 
-applications are not able to send data in a lower security level than
-what they requested.
+I've just made a patch that ensures that we're keeping backward compatibility
+with this file (16/16).
 
-> 
-> Best regards 
-> Andrei Emeltchenko 
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> I could have gone ahead and just applied the patches that are strictly
+> LE-only and gone ahead with the 4.100 release, but since you've mixed a
+> BR/EDR change and an LE change in 15/15 I can't do that. I think the way
+> to proceed is to just do this storage change for LE-only files and then
+> with 5.0 convert the others.
+
+I think you missed anything when looking at this patch. Note that the key
+variable initially contains only the bdaddr (but not the #type appended), so we
+can call delete_entry() for the BR/EDR-only files just before the sprintf() call
+(if the condition on if-statement gets true) which appends the "#type" in the
+key variable, thus avoiding to set the NULL byte at index 17 of the key variable
+for deleting the entries of the BR/EDR-only files.
 
 
-Cheers,
--- 
-Vinicius
+    	     	 Paulo
