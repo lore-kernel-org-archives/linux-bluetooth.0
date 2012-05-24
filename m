@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 11/18] Bluetooth: A2MP: Process A2MP Change Notify
-Date: Thu, 24 May 2012 14:38:21 +0300
-Message-Id: <1337859508-32274-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 07/18] Bluetooth: A2MP: Define A2MP status codes
+Date: Thu, 24 May 2012 14:38:17 +0300
+Message-Id: <1337859508-32274-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1337859508-32274-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1337859508-32274-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,50 +12,35 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Placeholder for A2MP Change Notify handler.
+A2MP status codes copied from Bluez patch sent by Peter Krystad
+<pkrystad@codeaurora.org>.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ include/net/bluetooth/a2mp.h |   10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index ac095ac..d60be75 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -161,6 +161,22 @@ static int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	return 0;
- }
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index 7cbeb91..391acd7 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -104,6 +104,16 @@ struct a2mp_physlink_rsp {
+ 	__u8	status;
+ } __packed;
  
-+static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
-+			      struct a2mp_cmd *hdr)
-+{
-+	struct a2mp_cl *cl = (struct a2mp_cl *) skb->data;
++/* A2MP response status */
++#define A2MP_STATUS_SUCCESS			0x00
++#define A2MP_STATUS_INVALID_CTRL_ID		0x01
++#define A2MP_STATUS_UNABLE_START_LINK_CREATION	0x02
++#define A2MP_STATUS_NO_PHYSICAL_LINK_EXISTS	0x02
++#define A2MP_STATUS_COLLISION_OCCURED		0x03
++#define A2MP_STATUS_DISCONN_REQ_RECVD		0x04
++#define A2MP_STATUS_PHYS_LINK_EXISTS		0x05
++#define A2MP_STATUS_SECURITY_VIOLATION		0x06
 +
-+	while (skb->len >= sizeof(*cl)) {
-+		BT_DBG("Controller id %d type %d status %d", cl->id, cl->type,
-+		       cl->status);
-+		cl = (struct a2mp_cl *) skb_pull(skb, sizeof(*cl));
-+	}
-+
-+	/* TODO send A2MP_CHANGE_RSP */
-+
-+	return 0;
-+}
-+
- /* Handle A2MP signalling */
- static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
- {
-@@ -195,6 +211,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
- 			break;
+ void amp_mgr_get(struct amp_mgr *mgr);
+ int amp_mgr_put(struct amp_mgr *mgr);
  
- 		case A2MP_CHANGE_NOTIFY:
-+			err = a2mp_change_notify(mgr, skb, hdr);
-+			break;
-+
- 		case A2MP_GETINFO_REQ:
- 		case A2MP_GETAMPASSOC_REQ:
- 		case A2MP_CREATEPHYSLINK_REQ:
 -- 
 1.7.9.5
 
