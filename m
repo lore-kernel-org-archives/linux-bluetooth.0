@@ -1,100 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 04/18] Bluetooth: A2MP: Build and Send msg helpers
-Date: Thu, 24 May 2012 14:38:14 +0300
-Message-Id: <1337859508-32274-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1337859508-32274-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1337859508-32274-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 24 May 2012 14:37:23 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Ulisses Furquim <ulisses@profusion.mobi>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [RFC 3/8] Bluetooth: Add l2cap_chan->ops->ready()
+Message-ID: <20120524113721.GS24715@aemeltch-MOBL1>
+References: <1337821964-4618-1-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-2-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-3-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-4-git-send-email-gustavo@padovan.org>
+ <20120524093958.GL24715@aemeltch-MOBL1>
+ <20120524102342.GQ24715@aemeltch-MOBL1>
+ <CAA37ikZvK=woaW_grv1t6PK0x0d3uz98MmjQL46z9PHPCJA0nA@mail.gmail.com>
+ <20120524113018.GR24715@aemeltch-MOBL1>
+ <CAA37ikZBekiH6Jn2yn4Mkm1BKvrW=rjD62doOkDH3CVUvwpRDA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CAA37ikZBekiH6Jn2yn4Mkm1BKvrW=rjD62doOkDH3CVUvwpRDA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Ulisses,
 
-Helper function to build and send A2MP messages.
+On Thu, May 24, 2012 at 08:31:15AM -0300, Ulisses Furquim wrote:
+> Hi Andrei,
+> 
+> On Thu, May 24, 2012 at 8:30 AM, Andrei Emeltchenko
+> <andrei.emeltchenko.news@gmail.com> wrote:
+> > Hi Ulisses,
+> >
+> > On Thu, May 24, 2012 at 08:17:23AM -0300, Ulisses Furquim wrote:
+> >> >> > +   void                    (*ready) (void *data);
+> >> >>
+> >> >> Again, why void *data ?
+> >> >
+> >> > I mean here that for fixed channels we do not need this function at this
+> >> > point since initialization is different.
+> >>
+> >> So? What do you mean? This needs to be generic, I think. It's an
+> >> abstraction after all.
+> >
+> > Fixed channels do not have configuration phase, they are created
+> > CONNECTED (at least A2MP).
+> 
+> And your proposal is?
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/a2mp.h |    7 +++++++
- net/bluetooth/a2mp.c         |   46 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 53 insertions(+)
+Fox fixed channels ready is not defined (at least now) so we can just use
+exact type, see my patch in a minute.
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index ff47540..654df60 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -24,6 +24,13 @@ struct amp_mgr {
- 	unsigned long		flags;
- };
- 
-+struct a2mp_cmd {
-+	__u8	code;
-+	__u8	ident;
-+	__le16	len;
-+	__u8	data[0];
-+} __packed;
-+
- void amp_mgr_get(struct amp_mgr *mgr);
- int amp_mgr_put(struct amp_mgr *mgr);
- 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index ea900fb..e7e5f5f 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -17,6 +17,52 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/a2mp.h>
- 
-+/* A2MP build & send command helper functions */
-+static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
-+{
-+	struct a2mp_cmd *cmd;
-+	int plen;
-+
-+	plen = sizeof(*cmd) + len;
-+	cmd = kzalloc(plen, GFP_KERNEL);
-+	if (!cmd)
-+		return NULL;
-+
-+	cmd->code = code;
-+	cmd->ident = ident;
-+	cmd->len = cpu_to_le16(len);
-+
-+	memcpy(cmd->data, data, len);
-+
-+	return cmd;
-+}
-+
-+static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
-+		      void *data)
-+{
-+	struct l2cap_chan *chan = mgr->a2mp_chan;
-+	struct a2mp_cmd *cmd;
-+	u16 total_len = len + sizeof(*cmd);
-+	struct kvec iv;
-+	struct msghdr msg;
-+
-+	cmd = __a2mp_build(code, ident, len, data);
-+	if (!cmd)
-+		return;
-+
-+	iv.iov_base = cmd;
-+	iv.iov_len = total_len;
-+
-+	memset(&msg, 0, sizeof(msg));
-+
-+	msg.msg_iov = (struct iovec *) &iv;
-+	msg.msg_iovlen = 1;
-+
-+	l2cap_chan_send(chan, &msg, total_len, 0);
-+
-+	kfree(cmd);
-+}
-+
- static struct l2cap_ops a2mp_chan_ops = {
- 	.name = "L2CAP A2MP channel",
- };
--- 
-1.7.9.5
+Best regards 
+Andrei Emeltchenko 
 
