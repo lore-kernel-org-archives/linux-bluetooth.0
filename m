@@ -1,59 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 10:51:12 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
-Subject: Re: [PATCHv1 01/17] Bluetooth: A2MP: Create A2MP channel
-Message-ID: <20120524075105.GB24715@aemeltch-MOBL1>
-References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1337351150-20526-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <alpine.DEB.2.02.1205221039100.2239@mathewm-linux>
- <20120523074950.GA32022@aemeltch-MOBL1>
- <alpine.DEB.2.02.1205230842040.6526@mathewm-linux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.02.1205230842040.6526@mathewm-linux>
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: [RFC 2/2] Bluetooth: Remove last usage of sk->sk_state_change()
+Date: Thu, 24 May 2012 04:00:17 -0300
+Message-Id: <1337842817-27865-2-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1337842817-27865-1-git-send-email-gustavo@padovan.org>
+References: <1337839374-20443-3-git-send-email-gustavo@padovan.org>
+ <1337842817-27865-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-On Wed, May 23, 2012 at 08:44:22AM -0700, Mat Martineau wrote:
-> >>>+static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
-> >>>+{
-> >>>+	struct l2cap_chan *chan;
-> >>>+
-> >>>+	chan = l2cap_chan_create();
-> >>>+	if (!chan)
-> >>>+		return NULL;
-> >>>+
-> >>>+	BT_DBG("chan %p", chan);
-> >>>+
-> >>>+	hci_conn_hold(conn->hcon);
-> >>
-> >>Holding the hcon will keep the ACL open after all of the other L2CAP
-> >>channels have closed (unless I missed some code later in the patch
-> >>series).  The A2MP fixed channel should not keep the ACL open.  If
-> >>the connection is not held here, then there shouldn't be a put in
-> >>l2cap_chan_del for the A2MP channel either.
-> >
-> >l2cap_chan_del makes hci_conn_put, also for a2mp channel. The behavior is
-> >the same for fixed and normal channels.
-> 
-> And when does l2cap_chan_del get called for a fixed channel?  The
-> fixed channel must not do an hci_conn_hold so the ACL is allowed to
-> close when all dynamic L2CAP channels have closed.
+If the is not oriented we should call sk_state_change() just after set the
+channel state to BT_CONNECTED.
 
-The current approach is to have amp_mgr for hci_conn. It will be freed
-when in hci_conn_del together with other l2cap channels in
-hci_chan_list_flush and then we make amp_mgr_put() and destroy mgr.
+Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+---
+ net/bluetooth/l2cap_core.c |    6 +-----
+ net/bluetooth/l2cap_sock.c |    4 ++++
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-The idea is to make a2mp chan similar to other chans and other chans do
-hci_conn_hold and hci_conn_put. Otherwise I would need to add extra checks
-before hci_conn_put which is ugly.
-
-I've tested this with PTS and no memory leaks found so far.
-
-Best regards 
-Andrei Emeltchenko 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 0d22695..6137b48 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1176,12 +1176,8 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+ 				l2cap_chan_ready(chan);
+ 
+ 		} else if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+-			struct sock *sk = chan->sk;
+ 			__clear_chan_timer(chan);
+-			lock_sock(sk);
+-			__l2cap_state_change(chan, BT_CONNECTED);
+-			sk->sk_state_change(sk);
+-			release_sock(sk);
++			l2cap_state_change(chan, BT_CONNECTED);
+ 
+ 		} else if (chan->state == BT_CONNECT)
+ 			l2cap_do_start(chan);
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 0a1a827..9fd9412 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1018,6 +1018,10 @@ static void l2cap_sock_state_change_cb(void *data, int state)
+ 	struct sock *sk = data;
+ 
+ 	sk->sk_state = state;
++
++	if (state == BT_CONNECTED &&
++	    l2cap_pi(sk)->chan->chan_type != L2CAP_CHAN_CONN_ORIENTED)
++		sk->sk_state_change(sk);
+ }
+ 
+ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
+-- 
+1.7.10.1
 
