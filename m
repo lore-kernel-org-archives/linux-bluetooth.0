@@ -1,100 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 14:41:46 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Daniel Wagner <wagi@monom.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Daniel Wagner <daniel.wagner@bmw-carit.de>
-Subject: Re: [PATCH v1 1/3] main: Add IngoreDUN configuration switch
-Message-ID: <20120524174145.GC10754@samus>
-References: <1337853618-7261-1-git-send-email-wagi@monom.org>
- <1337853618-7261-2-git-send-email-wagi@monom.org>
+Date: Thu, 24 May 2012 10:36:54 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Gustavo Padovan <gustavo@padovan.org>
+cc: linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [RFC 2/3] Bluetooth: Move bt_accept_enqueue() call to
+ l2cap_sock.c
+In-Reply-To: <1337839374-20443-2-git-send-email-gustavo@padovan.org>
+Message-ID: <alpine.DEB.2.02.1205241028300.18142@mathewm-linux>
+References: <1337821964-4618-9-git-send-email-gustavo@padovan.org> <1337839374-20443-1-git-send-email-gustavo@padovan.org> <1337839374-20443-2-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337853618-7261-2-git-send-email-wagi@monom.org>
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
 
-On 12:00 Thu 24 May, Daniel Wagner wrote:
-> From: Daniel Wagner <daniel.wagner@bmw-carit.de>
-> 
+
+On Thu, 24 May 2012, Gustavo Padovan wrote:
+
+> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+>
+> bt_accept_enqueue() can be easily placed at the end of
+> l2cap_sock_new_connection_cb().
+>
+> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 > ---
->  src/hcid.h    |    1 +
->  src/main.c    |    9 +++++++++
->  src/main.conf |    5 +++++
->  3 files changed, 15 insertions(+)
-> 
-> diff --git a/src/hcid.h b/src/hcid.h
-> index 1e5e15a..2564467 100644
-> --- a/src/hcid.h
-> +++ b/src/hcid.h
-> @@ -39,6 +39,7 @@ struct main_opts {
->  	gboolean	name_resolv;
->  	gboolean	debug_keys;
->  	gboolean	gatt_enabled;
-> +	gboolean	ignore_dun;
->  
->  	uint8_t		mode;
->  
-> diff --git a/src/main.c b/src/main.c
-> index b062b4a..240326d 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -245,6 +245,14 @@ static void parse_config(GKeyFile *config)
->  	else
->  		main_opts.gatt_enabled = boolean;
->  
-> +	boolean = g_key_file_get_boolean(config, "General",
-> +						"IgnoreDUN", &err);
-> +	if (err) {
-> +		DBG("%s", err->message);
-> +		g_clear_error(&err);
-> +	} else
-> +		main_opts.ignore_dun = boolean;
+> net/bluetooth/l2cap_core.c |    4 ----
+> net/bluetooth/l2cap_sock.c |    2 ++
+> 2 files changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index c9de4f5..5ff294f9 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1165,8 +1165,6 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+> 	bacpy(&bt_sk(sk)->src, conn->src);
+> 	bacpy(&bt_sk(sk)->dst, conn->dst);
+>
+> -	bt_accept_enqueue(parent, sk);
+> -
+> 	l2cap_chan_add(conn, chan);
+>
+> 	l2cap_chan_ready(chan);
+> @@ -3357,8 +3355,6 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+> 	chan->psm  = psm;
+> 	chan->dcid = scid;
+>
+> -	bt_accept_enqueue(parent, sk);
+> -
+
+Can you explain in the commit message why it is ok to move 
+bt_accept_enqueue before the other initialization code in 
+l2cap_connect_req?  It looks like some important setup happens there, 
+but maybe the parent socket lock keeps things serialized.
+
+> 	__l2cap_chan_add(conn, chan);
+>
+> 	dcid = chan->scid;
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index d2a81f1..f4c3e2c 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -915,6 +915,8 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(void *data)
+>
+> 	l2cap_sock_init(sk, parent);
+>
+> +	bt_accept_enqueue(parent, sk);
 > +
->  	main_opts.link_mode = HCI_LM_ACCEPT;
->  
->  	main_opts.link_policy = HCI_LP_RSWITCH | HCI_LP_SNIFF |
-> @@ -262,6 +270,7 @@ static void init_defaults(void)
->  	main_opts.remember_powered = TRUE;
->  	main_opts.reverse_sdp = TRUE;
->  	main_opts.name_resolv = TRUE;
-> +	main_opts.ignore_dun = TRUE;
->  
->  	if (gethostname(main_opts.host_name, sizeof(main_opts.host_name) - 1) < 0)
->  		strcpy(main_opts.host_name, "noname");
-> diff --git a/src/main.conf b/src/main.conf
-> index 787ef4f..676999d 100644
-> --- a/src/main.conf
-> +++ b/src/main.conf
-> @@ -62,3 +62,8 @@ DebugKeys = false
->  
->  # Enable the GATT functionality. Default is false
->  EnableGatt = false
-> +
-> +# If a device supports both DUN and PAN at the same time, ignore the
-> +# DUN profile. Only PAN will be exposed through the D-Bus API in this
-> +# case. The default is true
-> +IgnoreDUN = true
-
-I would prefer if this would be called something like "PreferPAN" (or
-even "PreferPANoverDUN", but that sounds weird). I, at least, find it
-easier to understand.
-
-And I am still thinking if it would be worth considering something more
-complex, that would deal with cases like this in general. But as I don't
-have any concrete proposal, I will stop here.
-
+> 	return l2cap_pi(sk)->chan;
+> }
+>
 > -- 
-> 1.7.10.130.g36e6c
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1.7.10.1
 
 
-Cheers,
--- 
-Vinicius
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
