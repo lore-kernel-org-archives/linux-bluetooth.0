@@ -1,35 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 13:17:09 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Steffen Becker <steffen.becker@tu-ilmenau.de>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: are those patches up-to-date?
-Message-ID: <20120524101709.GA23856@x220>
-References: <31e819c2c3bf85abeabfbe74e3341826@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <31e819c2c3bf85abeabfbe74e3341826@localhost>
+Message-ID: <1337853929.15105.84.camel@aeonflux>
+Subject: Re: [RFC] Reorganizing the BlueZ source tree
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Date: Thu, 24 May 2012 12:05:29 +0200
+In-Reply-To: <1337852769.2115.47.camel@novo.hadess.net>
+References: <20120524081405.GA30941@joana>
+	 <CABBYNZLhWfS6Ff0S8SkCwSXxzt61NzNCBH-K78hQB6dtpPvJ6Q@mail.gmail.com>
+	 <1337852769.2115.47.camel@novo.hadess.net>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steffen,
+Hi Bastien,
 
-On Thu, May 24, 2012, Steffen Becker wrote:
-> I searched a little in your mail archive on gmane and found
-> something that looks similar to my problem. On 25th January 2011 and
-> 26th October 2011 you pushed out two patches because of a security
-> block issue -> "[PATCH] bluetooth: Fix for security block issue."
-> and "[PATCH] Bluetooth: Revert: Fix L2CAP connection establishment".
+> > > The last profiles addition to BlueZ increased a lot the number of folders we
+> > > have in the root dir of the project and it looks like more profiles (and more
+> > > folders) are expected to come.
+> > >
+> > > I talked a bit with Johan about changing the hierarchy of the BlueZ tree and
+> > > the following proposal where 2 new folders are created, 'profiles' and 'libs'
+> > > and things are moved to them.
+> > >
+> > > compat          -> /dev/null (will be removed on 5.0)
+> > > alert           -> profiles
+> > > audio           -> profiles
+> > > cups            -> profiles
+> > > deviceinfo      -> profiles
+> > > health          -> profiles
+> > > input           -> profiles
+> > > lib             -> profiles
+> > > network         -> profiles
+> > > proximity       -> profiles
+> > > sap             -> profiles
+> > > serial          -> profiles
+> > > thermometer     -> profiles
+> > > time            -> profiles
+> > > btio            -> libs
+> > > gdbus           -> libs
+> > > sbc             -> libs
+> > > emulator        -> tools
+> > > mgmt            -> tools
+> > > monitor         -> tools
+> > > attrib
+> > > doc
+> > > plugins
+> > > scripts
+> > > src
+> > > test
+> > > tools
+> > > unit
+> > 
+> > Sounds good, the only problem are gdbus and btio, if we merge obexd
+> > into BlueZ btio will no longer be shared but for gdbus we would have
+> > to align with other projects as well.
 > 
-> The postet hcidump message in the second mail (10/26/2011) looks
-> very similar to my hcidump message.
-> 
-> So I would like to know if those two patches are up-to-date
-> (compatibel with bluez4.99) and/or if they are already included in
-> bluez4.99 (so patching is not necessary) ?
+> While you're at it, change gdbus' name to something that doesn't clash
+> with the GIO GDBus.
 
-Your question doesn't make much sense as those are both kernel patches
-and BlueZ 4.99 is a user space component. I think both of those patches
-can be found in kernel 3.3 and later.
+why would we? This code predates GIO GDBus.
 
-Johan
+Regards
+
+Marcel
+
+
