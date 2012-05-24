@@ -1,62 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 12:38:18 +0300
+Date: Thu, 24 May 2012 12:35:59 +0300
 From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 To: Gustavo Padovan <gustavo@padovan.org>
 Cc: linux-bluetooth@vger.kernel.org,
 	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [RFC 2/8] Bluetooth: Remove extra
- l2cap_state_change(BT_CONNECTED)
-Message-ID: <20120524093816.GK24715@aemeltch-MOBL1>
+Subject: Re: [RFC 1/8] Bluetooth: Move clean up code and set of SOCK_ZAPPED
+ to l2cap_sock.c
+Message-ID: <20120524093557.GJ24715@aemeltch-MOBL1>
 References: <1337821964-4618-1-git-send-email-gustavo@padovan.org>
  <1337821964-4618-2-git-send-email-gustavo@padovan.org>
- <1337821964-4618-3-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337821964-4618-3-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1337821964-4618-2-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Gustavo,
 
-On Wed, May 23, 2012 at 10:12:38PM -0300, Gustavo Padovan wrote:
-> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> 
-> This is already performed inside l2cap_chan_ready(), so we don't need it
-> here again.
-> 
-> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-
-Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com> 
-
-> ---
->  net/bluetooth/l2cap_core.c |    3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index e7a598c..f77b134 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -3608,8 +3608,6 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
->  	if (test_bit(CONF_INPUT_DONE, &chan->conf_state)) {
->  		set_default_fcs(chan);
+On Wed, May 23, 2012 at 10:12:37PM -0300, Gustavo Padovan wrote:
+>  void l2cap_chan_close(struct l2cap_chan *chan, int reason)
+>  {
+>  	struct l2cap_conn *conn = chan->conn;
+> @@ -583,12 +549,8 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
 >  
-> -		l2cap_state_change(chan, BT_CONNECTED);
+>  	switch (chan->state) {
+>  	case BT_LISTEN:
+> -		lock_sock(sk);
+> -		l2cap_chan_cleanup_listen(sk);
 > -
->  		if (chan->mode == L2CAP_MODE_ERTM ||
->  		    chan->mode == L2CAP_MODE_STREAMING)
->  			err = l2cap_ertm_init(chan);
-> @@ -3740,7 +3738,6 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
->  	if (test_bit(CONF_OUTPUT_DONE, &chan->conf_state)) {
->  		set_default_fcs(chan);
+> -		__l2cap_state_change(chan, BT_CLOSED);
+> -		sock_set_flag(sk, SOCK_ZAPPED);
+> -		release_sock(sk);
+> +		if (chan->ops->finalize)
+> +			chan->ops->finalize(chan->data, 0);
+
+Looks like you are handling all cases so this can be put outside of
+switch.
+
+>  		break;
 >  
-> -		l2cap_state_change(chan, BT_CONNECTED);
->  		if (chan->mode == L2CAP_MODE_ERTM ||
->  		    chan->mode == L2CAP_MODE_STREAMING)
->  			err = l2cap_ertm_init(chan);
-> -- 
-> 1.7.10.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  	case BT_CONNECTED:
+> @@ -630,9 +592,8 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
+>  		break;
+>  
+>  	default:
+> -		lock_sock(sk);
+> -		sock_set_flag(sk, SOCK_ZAPPED);
+> -		release_sock(sk);
+> +		if (chan->ops->finalize)
+> +			chan->ops->finalize(chan->data, 0);
+>  		break;
+>  	}
+>  }
+> @@ -3416,7 +3377,9 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+>  
+>  	/* Check if we already have channel with that dcid */
+>  	if (__l2cap_get_chan_by_dcid(conn, scid)) {
+> -		sock_set_flag(sk, SOCK_ZAPPED);
+> +		if (chan->ops->finalize)
+> +			chan->ops->finalize(chan->data, 0);
+> +
+>  		chan->ops->close(chan->data);
+>  		goto response;
+>  	}
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 4d36605..0302cb4 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -872,6 +872,25 @@ static int l2cap_sock_release(struct socket *sock)
+>  	return err;
+>  }
+>  
+> +static void l2cap_sock_cleanup_listen(struct sock *parent)
+> +{
+> +	struct sock *sk;
+> +
+> +	BT_DBG("parent %p", parent);
+> +
+> +	/* Close not yet accepted channels */
+> +	while ((sk = bt_accept_dequeue(parent, NULL))) {
+> +		struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+> +
+> +		l2cap_chan_lock(chan);
+> +		__clear_chan_timer(chan);
+> +		l2cap_chan_close(chan, ECONNRESET);
+> +		l2cap_chan_unlock(chan);
+> +
+> +		l2cap_sock_kill(sk);
+> +	}
+> +}
+> +
+>  static struct l2cap_chan *l2cap_sock_new_connection_cb(void *data)
+>  {
+>  	struct sock *sk, *parent = data;
+> @@ -931,6 +950,49 @@ static void l2cap_sock_close_cb(void *data)
+>  	l2cap_sock_kill(sk);
+>  }
+>  
+> +static void l2cap_sock_finalize_cb(void *data, int err)
+> +{
+> +	struct sock *sk = data;
+
+Why we cannot just use l2cap_sock_finalize_cb(struct sock *sk, int err)
+what is the reason for extra assignment?
+
+I also think finalize is not good name since it does not mean what is
+actually finalized.
+
+Best regards 
+Andrei Emeltchenko 
+
+> +	struct sock *parent;
+> +	struct l2cap_chan *chan;
+> +
+> +	lock_sock(sk);
+> +
+> +	parent = bt_sk(sk)->parent;
+> +	chan = l2cap_pi(sk)->chan;
+> +
+> +	sock_set_flag(sk, SOCK_ZAPPED);
+> +
+> +	switch (chan->state) {
+> +	case BT_OPEN:
+> +	case BT_BOUND:
+> +	case BT_CLOSED:
+> +		break;
+> +	case BT_LISTEN:
+> +		l2cap_sock_cleanup_listen(sk);
+> +		sk->sk_state = BT_CLOSED;
+> +		chan->state = BT_CLOSED;
+> +
+> +		break;
+> +	default:
+> +		sk->sk_state = BT_CLOSED;
+> +		chan->state = BT_CLOSED;
+> +
+> +		sk->sk_err = err;
+> +
+> +		if (parent) {
+> +			bt_accept_unlink(sk);
+> +			parent->sk_data_ready(parent, 0);
+> +		} else {
+> +			sk->sk_state_change(sk);
+> +		}
+> +
+> +		break;
+> +	}
+> +
+> +	release_sock(sk);
+> +}
+> +
+
