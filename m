@@ -1,42 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 14:14:31 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
+Date: Thu, 24 May 2012 10:10:28 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Gustavo Padovan <gustavo@padovan.org>
+cc: linux-bluetooth@vger.kernel.org,
 	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [RFC 1/8] Bluetooth: Move clean up code and set of SOCK_ZAPPED
- to l2cap_sock.c
-Message-ID: <20120524171431.GI3105@joana>
-References: <1337821964-4618-1-git-send-email-gustavo@padovan.org>
- <1337821964-4618-2-git-send-email-gustavo@padovan.org>
- <20120524093557.GJ24715@aemeltch-MOBL1>
- <20120524165611.GB3105@joana>
+Subject: Re: [RFC 8/8] Bluetooth: Add chan->ops->authorize
+In-Reply-To: <1337821964-4618-9-git-send-email-gustavo@padovan.org>
+Message-ID: <alpine.DEB.2.02.1205241000160.18142@mathewm-linux>
+References: <1337821964-4618-1-git-send-email-gustavo@padovan.org> <1337821964-4618-2-git-send-email-gustavo@padovan.org> <1337821964-4618-3-git-send-email-gustavo@padovan.org> <1337821964-4618-4-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-5-git-send-email-gustavo@padovan.org> <1337821964-4618-6-git-send-email-gustavo@padovan.org> <1337821964-4618-7-git-send-email-gustavo@padovan.org> <1337821964-4618-8-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-9-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120524165611.GB3105@joana>
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Gustavo Padovan <gustavo@padovan.org> [2012-05-24 13:56:11 -0300]:
 
-> > >  
-> > > +static void l2cap_sock_finalize_cb(void *data, int err)
-> > > +{
-> > > +	struct sock *sk = data;
-> > 
-> > Why we cannot just use l2cap_sock_finalize_cb(struct sock *sk, int err)
-> > what is the reason for extra assignment?
-> 
-> Because we want to be generic here, we don't know who else will use finalize()
-> so we need to keep a void * here.
-> 
-> > 
-> > I also think finalize is not good name since it does not mean what is
-> > actually finalized.
-> 
-> And it is not, I failed to come with a better name here. The initial one was
-> delete, even worse.
+Gustavo -
 
-Maybe we can go with prepare_finalize() or prepare_close() here.
+On Wed, 23 May 2012, Gustavo Padovan wrote:
 
-	Gustavo
+> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+>
+> When DEFER_SETUP is set authorize() will trigger an authorization request
+> to the userspace.
+>
+> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> ---
+> include/net/bluetooth/l2cap.h |    1 +
+> net/bluetooth/l2cap_core.c    |   14 ++++++--------
+> net/bluetooth/l2cap_sock.c    |   12 ++++++++++++
+> 3 files changed, 19 insertions(+), 8 deletions(-)
+>
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 4f81d08..94e375a 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -531,6 +531,7 @@ struct l2cap_ops {
+> 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
+> 					       unsigned long len, int nb);
+> 	void			(*ready) (void *data);
+> +	void			(*authorize) (void *data);
+> };
+
+I'm trying to think of a name more specific to the deferred connection 
+feature than "authorize"...  There's a lot of use of "auth" to refer 
+to "authentication", so it could be confusing to throw "authorize" in 
+to the mix.
+
+"deferred_connect"? 
+"pending_connection"?
+"defer"?
+
+>
+> struct l2cap_conn {
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 1305b3b..22ba699 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1058,12 +1058,10 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+> 				lock_sock(sk);
+> 				if (test_bit(CONF_DEFER_SETUP,
+> 					     &chan->conf_state)) {
+> -					struct sock *parent = bt_sk(sk)->parent;
+> 					rsp.result = cpu_to_le16(L2CAP_CR_PEND);
+> 					rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
+> -					if (parent)
+> -						parent->sk_data_ready(parent, 0);
+> -
+> +					if(chan->ops->authorize)
+> +						chan->ops->authorize(chan->data);
+> 				} else {
+> 					__l2cap_state_change(chan, BT_CONFIG);
+> 					rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
+> @@ -3380,7 +3378,8 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+> 				__l2cap_state_change(chan, BT_CONNECT2);
+> 				result = L2CAP_CR_PEND;
+> 				status = L2CAP_CS_AUTHOR_PEND;
+> -				parent->sk_data_ready(parent, 0);
+> +				if(chan->ops->authorize)
+> +					chan->ops->authorize(chan->data);
+> 			} else {
+> 				__l2cap_state_change(chan, BT_CONFIG);
+> 				result = L2CAP_CR_SUCCESS;
+> @@ -5408,11 +5407,10 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+> 			if (!status) {
+> 				if (test_bit(CONF_DEFER_SETUP,
+> 					     &chan->conf_state)) {
+> -					struct sock *parent = bt_sk(sk)->parent;
+> 					res = L2CAP_CR_PEND;
+> 					stat = L2CAP_CS_AUTHOR_PEND;
+> -					if (parent)
+> -						parent->sk_data_ready(parent, 0);
+> +					if(chan->ops->authorize)
+> +						chan->ops->authorize(chan->data);
+> 				} else {
+> 					__l2cap_state_change(chan, BT_CONFIG);
+> 					res = L2CAP_CR_SUCCESS;
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index dac7b2c..d2a81f1 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -1047,6 +1047,17 @@ static void l2cap_sock_ready_cb(void *data)
+> 	release_sock(sk);
+> }
+>
+> +static void l2cap_sock_authorize_cb(void *data)
+> +{
+> +	struct sock *sk = data;
+> +	struct sock *parent;
+> +
+> +	parent = bt_sk(sk)->parent;
+> +
+> +	if (parent)
+> +		parent->sk_data_ready(parent, 0);
+> +}
+> +
+> static struct l2cap_ops l2cap_chan_ops = {
+> 	.name		= "L2CAP Socket Interface",
+> 	.new_connection	= l2cap_sock_new_connection_cb,
+> @@ -1056,6 +1067,7 @@ static struct l2cap_ops l2cap_chan_ops = {
+> 	.state_change	= l2cap_sock_state_change_cb,
+> 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
+> 	.ready		= l2cap_sock_ready_cb,
+> +	.authorize	= l2cap_sock_authorize_cb,
+> };
+>
+> static void l2cap_sock_destruct(struct sock *sk)
+> -- 
+> 1.7.10.1
+
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
