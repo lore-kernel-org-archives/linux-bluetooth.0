@@ -1,55 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 13:23:44 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [RFC 3/8] Bluetooth: Add l2cap_chan->ops->ready()
-Message-ID: <20120524102342.GQ24715@aemeltch-MOBL1>
-References: <1337821964-4618-1-git-send-email-gustavo@padovan.org>
- <1337821964-4618-2-git-send-email-gustavo@padovan.org>
- <1337821964-4618-3-git-send-email-gustavo@padovan.org>
- <1337821964-4618-4-git-send-email-gustavo@padovan.org>
- <20120524093958.GL24715@aemeltch-MOBL1>
+Date: Thu, 24 May 2012 13:21:20 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Daniel Wagner <wagi@monom.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Daniel Wagner <daniel.wagner@bmw-carit.de>
+Subject: Re: [PATCH v1 3/3] device: Ignore DUN if PAN is present
+Message-ID: <20120524102120.GC23856@x220>
+References: <1337853618-7261-1-git-send-email-wagi@monom.org>
+ <1337853618-7261-4-git-send-email-wagi@monom.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120524093958.GL24715@aemeltch-MOBL1>
+In-Reply-To: <1337853618-7261-4-git-send-email-wagi@monom.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Daniel,
 
-On Thu, May 24, 2012 at 12:39:59PM +0300, Andrei Emeltchenko wrote:
-> Hi Gustavo,
-> 
-> On Wed, May 23, 2012 at 10:12:39PM -0300, Gustavo Padovan wrote:
-> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> > 
-> > This move socket specific code to l2cap_sock.c.
-> > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> > ---
-> >  include/net/bluetooth/l2cap.h |    1 +
-> >  net/bluetooth/l2cap_core.c    |   18 +++---------------
-> >  net/bluetooth/l2cap_sock.c    |   21 +++++++++++++++++++++
-> >  3 files changed, 25 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> > index 29f7b06..d1f6819 100644
-> > --- a/include/net/bluetooth/l2cap.h
-> > +++ b/include/net/bluetooth/l2cap.h
-> > @@ -530,6 +530,7 @@ struct l2cap_ops {
-> >  	void			(*state_change) (void *data, int state);
-> >  	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
-> >  					       unsigned long len, int nb);
-> > +	void			(*ready) (void *data);
-> 
-> Again, why void *data ?
+On Thu, May 24, 2012, Daniel Wagner wrote:
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -63,6 +63,8 @@
+>  #include "btio.h"
+>  #include "attrib-server.h"
+>  #include "attrib/client.h"
+> +#include "network/common.h"
+> +#include "serial/common.h"
 
-I mean here that for fixed channels we do not need this function at this
-point since initialization is different.
+I don't really like the idea of creating dependencies from the core
+daemon (src/*) to plugin or profile directories. Any other (clean) way
+we could avoid this?
 
-Best regards 
-Andrei Emeltchenko 
-
+Johan
