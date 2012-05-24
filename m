@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 07/18] Bluetooth: A2MP: Define A2MP status codes
-Date: Thu, 24 May 2012 14:38:17 +0300
-Message-Id: <1337859508-32274-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 18/18] Bluetooth: A2MP: Manage incoming connections
+Date: Thu, 24 May 2012 14:38:28 +0300
+Message-Id: <1337859508-32274-19-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1337859508-32274-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1337859508-32274-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,35 +12,98 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-A2MP status codes copied from Bluez patch sent by Peter Krystad
-<pkrystad@codeaurora.org>.
+Handle incoming A2MP connection by creating AMP manager and
+processing A2MP messages.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |   10 ++++++++++
- 1 file changed, 10 insertions(+)
+ include/net/bluetooth/a2mp.h |    4 ++++
+ net/bluetooth/a2mp.c         |   16 ++++++++++++++++
+ net/bluetooth/l2cap_core.c   |   19 +++++++++++++++----
+ 3 files changed, 35 insertions(+), 4 deletions(-)
 
 diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 7cbeb91..391acd7 100644
+index 96f9cc2..6a76e0a 100644
 --- a/include/net/bluetooth/a2mp.h
 +++ b/include/net/bluetooth/a2mp.h
-@@ -104,6 +104,16 @@ struct a2mp_physlink_rsp {
- 	__u8	status;
- } __packed;
+@@ -15,6 +15,8 @@
+ #ifndef __A2MP_H
+ #define __A2MP_H
  
-+/* A2MP response status */
-+#define A2MP_STATUS_SUCCESS			0x00
-+#define A2MP_STATUS_INVALID_CTRL_ID		0x01
-+#define A2MP_STATUS_UNABLE_START_LINK_CREATION	0x02
-+#define A2MP_STATUS_NO_PHYSICAL_LINK_EXISTS	0x02
-+#define A2MP_STATUS_COLLISION_OCCURED		0x03
-+#define A2MP_STATUS_DISCONN_REQ_RECVD		0x04
-+#define A2MP_STATUS_PHYS_LINK_EXISTS		0x05
-+#define A2MP_STATUS_SECURITY_VIOLATION		0x06
++#include <net/bluetooth/l2cap.h>
 +
+ #define A2MP_FEAT_EXT	0x8000
+ 
+ struct amp_mgr {
+@@ -118,5 +120,7 @@ struct a2mp_physlink_rsp {
+ 
  void amp_mgr_get(struct amp_mgr *mgr);
  int amp_mgr_put(struct amp_mgr *mgr);
++struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
++				       struct sk_buff *skb);
  
+ #endif /* __A2MP_H */
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 894e53c..2f0172b 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -552,3 +552,19 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
+ 
+ 	return mgr;
+ }
++
++struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
++				       struct sk_buff *skb)
++{
++	struct amp_mgr *mgr;
++
++	mgr = amp_mgr_create(conn);
++	if (!mgr) {
++		BT_ERR("Could not create AMP manager");
++		return NULL;
++	}
++
++	BT_DBG("mgr: %p chan %p", mgr, mgr->a2mp_chan);
++
++	return mgr->a2mp_chan;
++}
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 3cbdd1d..2cfbc0c 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -37,6 +37,7 @@
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/l2cap.h>
+ #include <net/bluetooth/smp.h>
++#include <net/bluetooth/a2mp.h>
+ 
+ bool disable_ertm;
+ 
+@@ -5175,10 +5176,20 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 
+ 	chan = l2cap_get_chan_by_scid(conn, cid);
+ 	if (!chan) {
+-		BT_DBG("unknown cid 0x%4.4x", cid);
+-		/* Drop packet and return */
+-		kfree_skb(skb);
+-		return 0;
++		if (cid == L2CAP_CID_A2MP) {
++			chan = a2mp_channel_create(conn, skb);
++			if (!chan) {
++				kfree_skb(skb);
++				return 0;
++			}
++
++			l2cap_chan_lock(chan);
++		} else {
++			BT_DBG("unknown cid 0x%4.4x", cid);
++			/* Drop packet and return */
++			kfree_skb(skb);
++			return 0;
++		}
+ 	}
+ 
+ 	BT_DBG("chan %p, len %d", chan, skb->len);
 -- 
 1.7.9.5
 
