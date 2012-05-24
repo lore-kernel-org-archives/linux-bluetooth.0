@@ -1,91 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 13:57:38 -0300
+Date: Thu, 24 May 2012 13:56:11 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
 To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
 	linux-bluetooth@vger.kernel.org,
 	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [RFC 6/8] Bluetooth: Move check for backlog size to l2cap_sock.c
-Message-ID: <20120524165738.GC3105@joana>
+Subject: Re: [RFC 1/8] Bluetooth: Move clean up code and set of SOCK_ZAPPED
+ to l2cap_sock.c
+Message-ID: <20120524165611.GB3105@joana>
 References: <1337821964-4618-1-git-send-email-gustavo@padovan.org>
  <1337821964-4618-2-git-send-email-gustavo@padovan.org>
- <1337821964-4618-3-git-send-email-gustavo@padovan.org>
- <1337821964-4618-4-git-send-email-gustavo@padovan.org>
- <1337821964-4618-5-git-send-email-gustavo@padovan.org>
- <1337821964-4618-6-git-send-email-gustavo@padovan.org>
- <1337821964-4618-7-git-send-email-gustavo@padovan.org>
- <20120524094546.GM24715@aemeltch-MOBL1>
+ <20120524093557.GJ24715@aemeltch-MOBL1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120524094546.GM24715@aemeltch-MOBL1>
+In-Reply-To: <20120524093557.GJ24715@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+
 Hi Andrei,
 
-* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-05-24 12:45:48 +0300]:
+* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-05-24 12:35:59 +0300]:
 
 > Hi Gustavo,
 > 
-> On Wed, May 23, 2012 at 10:12:42PM -0300, Gustavo Padovan wrote:
-> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> > 
-> > Remove socket specific code from l2cap_core.c
-> > 
-> > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> > ---
-> >  net/bluetooth/l2cap_core.c |   12 ------------
-> >  net/bluetooth/l2cap_sock.c |    6 ++++++
-> >  2 files changed, 6 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index 9416c60..46e6fb7 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -1156,12 +1156,6 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+> On Wed, May 23, 2012 at 10:12:37PM -0300, Gustavo Padovan wrote:
+> >  void l2cap_chan_close(struct l2cap_chan *chan, int reason)
+> >  {
+> >  	struct l2cap_conn *conn = chan->conn;
+> > @@ -583,12 +549,8 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
 > >  
-> >  	lock_sock(parent);
-> >  
-> > -	/* Check for backlog size */
-> > -	if (sk_acceptq_is_full(parent)) {
-> > -		BT_DBG("backlog full %d", parent->sk_ack_backlog);
-> > -		goto clean;
-> > -	}
+> >  	switch (chan->state) {
+> >  	case BT_LISTEN:
+> > -		lock_sock(sk);
+> > -		l2cap_chan_cleanup_listen(sk);
 > > -
-> >  	chan = pchan->ops->new_connection(pchan->data);
-> >  	if (!chan)
-> >  		goto clean;
-> > @@ -3348,12 +3342,6 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+> > -		__l2cap_state_change(chan, BT_CLOSED);
+> > -		sock_set_flag(sk, SOCK_ZAPPED);
+> > -		release_sock(sk);
+> > +		if (chan->ops->finalize)
+> > +			chan->ops->finalize(chan->data, 0);
+> 
+> Looks like you are handling all cases so this can be put outside of
+> switch.
+
+No, I'm not, look to the BT_CONNECTED/BT_CONFIG option.
+
+> 
+> >  		break;
 > >  
-> >  	result = L2CAP_CR_NO_MEM;
+> >  	case BT_CONNECTED:
+> > @@ -630,9 +592,8 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
+> >  		break;
 > >  
-> > -	/* Check for backlog size */
-> > -	if (sk_acceptq_is_full(parent)) {
-> > -		BT_DBG("backlog full %d", parent->sk_ack_backlog);
-> > -		goto response;
-> > -	}
-> > -
-> >  	chan = pchan->ops->new_connection(pchan->data);
-> >  	if (!chan)
+> >  	default:
+> > -		lock_sock(sk);
+> > -		sock_set_flag(sk, SOCK_ZAPPED);
+> > -		release_sock(sk);
+> > +		if (chan->ops->finalize)
+> > +			chan->ops->finalize(chan->data, 0);
+> >  		break;
+> >  	}
+> >  }
+> > @@ -3416,7 +3377,9 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+> >  
+> >  	/* Check if we already have channel with that dcid */
+> >  	if (__l2cap_get_chan_by_dcid(conn, scid)) {
+> > -		sock_set_flag(sk, SOCK_ZAPPED);
+> > +		if (chan->ops->finalize)
+> > +			chan->ops->finalize(chan->data, 0);
+> > +
+> >  		chan->ops->close(chan->data);
 > >  		goto response;
+> >  	}
 > > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> > index 8a3620b..bc409a2 100644
+> > index 4d36605..0302cb4 100644
 > > --- a/net/bluetooth/l2cap_sock.c
 > > +++ b/net/bluetooth/l2cap_sock.c
-> > @@ -895,6 +895,12 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(void *data)
+> > @@ -872,6 +872,25 @@ static int l2cap_sock_release(struct socket *sock)
+> >  	return err;
+> >  }
+> >  
+> > +static void l2cap_sock_cleanup_listen(struct sock *parent)
+> > +{
+> > +	struct sock *sk;
+> > +
+> > +	BT_DBG("parent %p", parent);
+> > +
+> > +	/* Close not yet accepted channels */
+> > +	while ((sk = bt_accept_dequeue(parent, NULL))) {
+> > +		struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+> > +
+> > +		l2cap_chan_lock(chan);
+> > +		__clear_chan_timer(chan);
+> > +		l2cap_chan_close(chan, ECONNRESET);
+> > +		l2cap_chan_unlock(chan);
+> > +
+> > +		l2cap_sock_kill(sk);
+> > +	}
+> > +}
+> > +
+> >  static struct l2cap_chan *l2cap_sock_new_connection_cb(void *data)
 > >  {
 > >  	struct sock *sk, *parent = data;
+> > @@ -931,6 +950,49 @@ static void l2cap_sock_close_cb(void *data)
+> >  	l2cap_sock_kill(sk);
+> >  }
 > >  
-> > +	/* Check for backlog size */
-> > +	if (sk_acceptq_is_full(parent)) {
-> > +		BT_DBG("backlog full %d", parent->sk_ack_backlog);
-> > +		return NULL;
-> > +	}
-> > +
+> > +static void l2cap_sock_finalize_cb(void *data, int err)
+> > +{
+> > +	struct sock *sk = data;
 > 
-> Ok I see where comes from this change. I feel that this can be merged with
-> some other patch removing parent sk.
+> Why we cannot just use l2cap_sock_finalize_cb(struct sock *sk, int err)
+> what is the reason for extra assignment?
 
-Let keep this patch as is, the other patch changes locking and I prefer a
-separated patch for it.
+Because we want to be generic here, we don't know who else will use finalize()
+so we need to keep a void * here.
+
+> 
+> I also think finalize is not good name since it does not mean what is
+> actually finalized.
+
+And it is not, I failed to come with a better name here. The initial one was
+delete, even worse.
 
 	Gustavo
