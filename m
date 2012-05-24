@@ -1,33 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 11:26:04 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [RFC 1/2] Bluetooth: Create chan->ops->set_err()
-Message-ID: <20120524082603.GE24715@aemeltch-MOBL1>
-References: <1337839374-20443-3-git-send-email-gustavo@padovan.org>
- <1337842817-27865-1-git-send-email-gustavo@padovan.org>
+Date: Thu, 24 May 2012 11:23:52 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] Reorganizing the BlueZ source tree
+Message-ID: <20120524082352.GA20516@x220>
+References: <20120524081405.GA30941@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337842817-27865-1-git-send-email-gustavo@padovan.org>
+In-Reply-To: <20120524081405.GA30941@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Gustavo,
 
-On Thu, May 24, 2012 at 04:00:16AM -0300, Gustavo Padovan wrote:
-> -	lock_sock(sk);
-> -	__l2cap_state_change(chan, BT_DISCONN);
-> -	__l2cap_chan_set_err(chan, err);
-> -	release_sock(sk);
-> +	l2cap_state_change(chan, BT_DISCONN);
-> +	if(chan->ops->set_err)
-> +		chan->ops->set_err(chan->data, err);
+On Thu, May 24, 2012, Gustavo Padovan wrote:
+> lib             -> profiles
 
-I do not know can it be done somehow better, currently we lock and unlock
-sockets for each operation.
+Was this a typo? I'd have suggested to rename the existing "lib" to the
+new "libs" and after that start moving the other "lib" subdirectories
+there. The existing content of lib might also be reorganized, e.g. move
+SDP code into libs/sdp/
 
-Best regards 
-Andrei Emeltchenko 
-
+Johan
