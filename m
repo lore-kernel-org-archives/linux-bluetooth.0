@@ -1,42 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/6] AVRCP: Fix not setting audio device connected to player
-Date: Thu, 24 May 2012 16:22:47 +0300
-Message-Id: <1337865771-11777-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1337865771-11777-1-git-send-email-luiz.dentz@gmail.com>
-References: <1337865771-11777-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/6] AVCTP: Fix setting wrong transaction id expected for responses
+Date: Thu, 24 May 2012 16:22:46 +0300
+Message-Id: <1337865771-11777-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-While connecting device should be set to match the AVCTP session and when
-disconnected reset it back to NULL.
+The id were incremented after being set to the request so it is always
++1 of the actual transaction.
 ---
- audio/avrcp.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+ audio/avctp.c |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index cb6906d..b09fab0 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -1197,6 +1197,7 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
- 	switch (new_state) {
- 	case AVCTP_STATE_DISCONNECTED:
- 		player->session = NULL;
-+		player->dev = NULL;
- 		player->registered_events = 0;
+diff --git a/audio/avctp.c b/audio/avctp.c
+index 1bc2a1d..5f9afa1 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -982,7 +982,7 @@ int avctp_send_vendordep_req(struct avctp *session, uint8_t code,
+ 	struct avctp_rsp_handler *handler;
+ 	int err;
  
- 		if (player->handler) {
-@@ -1207,6 +1208,7 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
- 		break;
- 	case AVCTP_STATE_CONNECTING:
- 		player->session = avctp_connect(&dev->src, &dev->dst);
-+		player->dev = dev;
+-	err = avctp_send(session, id++, AVCTP_COMMAND, code, subunit,
++	err = avctp_send(session, id, AVCTP_COMMAND, code, subunit,
+ 				AVC_OP_VENDORDEP, operands, operand_count);
+ 	if (err < 0)
+ 		return err;
+@@ -994,6 +994,8 @@ int avctp_send_vendordep_req(struct avctp *session, uint8_t code,
  
- 		if (!player->handler)
- 			player->handler = avctp_register_pdu_handler(
+ 	session->handlers = g_slist_prepend(session->handlers, handler);
+ 
++	id++;
++
+ 	return 0;
+ }
+ 
 -- 
 1.7.7.6
 
