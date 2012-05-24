@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Paulo Alcantara <paulo.alcantara@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ v2 11/16] storage: Store address type in "attributes" file
-Date: Thu, 24 May 2012 15:46:08 -0300
-Message-Id: <1337885173-9129-12-git-send-email-paulo.alcantara@openbossa.org>
+Subject: [PATCH BlueZ v2 10/16] core: Fix creating device from "longtermkeys" file
+Date: Thu, 24 May 2012 15:46:07 -0300
+Message-Id: <1337885173-9129-11-git-send-email-paulo.alcantara@openbossa.org>
 In-Reply-To: <1337885173-9129-1-git-send-email-paulo.alcantara@openbossa.org>
 References: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
  <1337885173-9129-1-git-send-email-paulo.alcantara@openbossa.org>
@@ -12,91 +12,79 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- attrib/client.c |    6 +++++-
- src/storage.c   |   12 ++++--------
- src/storage.h   |    3 ++-
- 3 files changed, 11 insertions(+), 10 deletions(-)
+ src/adapter.c |   26 ++++++++++++++++----------
+ 1 files changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/attrib/client.c b/attrib/client.c
-index 8aa2800..7aefd96 100644
---- a/attrib/client.c
-+++ b/attrib/client.c
-@@ -635,7 +635,9 @@ static GSList *load_characteristics(struct gatt_service *gatt, uint16_t start)
- static void store_attribute(struct gatt_service *gatt, uint16_t handle,
- 				uint16_t type, uint8_t *value, gsize len)
+diff --git a/src/adapter.c b/src/adapter.c
+index 2776204..c1caffd 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1787,7 +1787,8 @@ static struct link_key_info *get_key_info(const char *addr, const char *value)
+ 	return info;
+ }
+ 
+-static struct smp_ltk_info *get_ltk_info(const char *addr, const char *value)
++static struct smp_ltk_info *get_ltk_info(const char *addr, uint8_t bdaddr_type,
++							const char *value)
  {
-+	struct btd_device *device = gatt->dev;
- 	bdaddr_t sba, dba;
-+	uint8_t bdaddr_type;
- 	bt_uuid_t uuid;
- 	char *str, *tmp;
- 	guint i;
-@@ -652,7 +654,9 @@ static void store_attribute(struct gatt_service *gatt, uint16_t handle,
+ 	struct smp_ltk_info *ltk;
+ 	char *ptr;
+@@ -1802,14 +1803,15 @@ static struct smp_ltk_info *get_ltk_info(const char *addr, const char *value)
  
- 	gatt_get_address(gatt, &sba, &dba, NULL);
+ 	str2ba(addr, &ltk->bdaddr);
  
--	write_device_attribute(&sba, &dba, handle, str);
-+	bdaddr_type = device_get_addr_type(device);
++	ltk->bdaddr_type = bdaddr_type;
 +
-+	write_device_attribute(&sba, &dba, bdaddr_type, handle, str);
+ 	str2buf(value, ltk->val, sizeof(ltk->val));
  
- 	g_free(str);
- }
-diff --git a/src/storage.c b/src/storage.c
-index caee8f0..2d15a23 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -1240,14 +1240,10 @@ int delete_device_service(const bdaddr_t *sba, const bdaddr_t *dba,
- 	create_filename(filename, PATH_MAX, sba, "characteristic");
- 	delete_by_pattern(filename, key);
+ 	ptr = (char *) value + 2 * sizeof(ltk->val) + 1;
  
--	key[17] = '\0';
--
- 	/* Deleting all attributes values of a given key */
- 	create_filename(filename, PATH_MAX, sba, "attributes");
- 	delete_by_pattern(filename, key);
+-	ret = sscanf(ptr, " %hhd %hhd %hhd %hhd %hd %n",
+-					(uint8_t *) &ltk->bdaddr_type,
+-					&ltk->authenticated, &ltk->master,
+-					&ltk->enc_size, &ltk->ediv, &i);
++	ret = sscanf(ptr, " %hhd %hhd %hhd %hd %n",
++		     &ltk->authenticated, &ltk->master, &ltk->enc_size,
++							&ltk->ediv, &i);
+ 	if (ret < 2) {
+ 		g_free(ltk);
+ 		return NULL;
+@@ -1851,26 +1853,30 @@ static void create_stored_device_from_ltks(char *key, char *value,
+ 	struct btd_adapter *adapter = keys->adapter;
+ 	struct btd_device *device;
+ 	struct smp_ltk_info *info;
+-	char srcaddr[18];
++	char address[18], srcaddr[18];
++	uint8_t bdaddr_type;
+ 	bdaddr_t src;
  
--	sprintf(&key[17], "#%hhu", bdaddr_type);
--
- 	/* Deleting all CCC values of a given key */
- 	create_filename(filename, PATH_MAX, sba, "ccc");
- 	delete_by_pattern(filename, key);
-@@ -1300,17 +1296,17 @@ char *read_device_characteristics(const bdaddr_t *sba, const bdaddr_t *dba,
- }
+-	info = get_ltk_info(key, value);
++	if (sscanf(key, "%17s#%hhu", address, &bdaddr_type) < 2)
++		return;
++
++	info = get_ltk_info(address, bdaddr_type, value);
+ 	if (info == NULL)
+ 		return;
  
- int write_device_attribute(const bdaddr_t *sba, const bdaddr_t *dba,
--					uint16_t handle, const char *chars)
-+				uint8_t bdaddr_type, uint16_t handle,
-+							const char *chars)
- {
--	char filename[PATH_MAX + 1], addr[18], key[23];
-+	char filename[PATH_MAX + 1], addr[18], key[25];
+ 	keys->keys = g_slist_append(keys->keys, info);
  
- 	create_filename(filename, PATH_MAX, sba, "attributes");
+-	if (g_slist_find_custom(adapter->devices, key,
++	if (g_slist_find_custom(adapter->devices, address,
+ 					(GCompareFunc) device_address_cmp))
+ 		return;
  
- 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+ 	adapter_get_address(adapter, &src);
+ 	ba2str(&src, srcaddr);
  
- 	ba2str(dba, addr);
--
--	snprintf(key, sizeof(key), "%17s#%04X", addr, handle);
-+	snprintf(key, sizeof(key), "%17s#%hhu#%04X", addr, bdaddr_type, handle);
+-	if (g_strcmp0(srcaddr, key) == 0)
++	if (g_strcmp0(srcaddr, address) == 0)
+ 		return;
  
- 	return textfile_put(filename, key, chars);
- }
-diff --git a/src/storage.h b/src/storage.h
-index 67364df..3705d3d 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -94,7 +94,8 @@ int write_device_characteristics(const bdaddr_t *sba, const bdaddr_t *dba,
- char *read_device_characteristics(const bdaddr_t *sba, const bdaddr_t *dba,
- 					uint8_t bdaddr_type, uint16_t handle);
- int write_device_attribute(const bdaddr_t *sba, const bdaddr_t *dba,
--                                        uint16_t handle, const char *chars);
-+				uint8_t bdaddr_type, uint16_t handle,
-+							const char *chars);
- int read_device_attributes(const bdaddr_t *sba, textfile_cb func, void *data);
- int read_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
- 					uint16_t handle, uint16_t *value);
+-	device = device_create(connection, adapter, key, info->bdaddr_type);
++	device = device_create(connection, adapter, address, bdaddr_type);
+ 	if (device) {
+ 		device_set_temporary(device, FALSE);
+ 		adapter->devices = g_slist_append(adapter->devices, device);
 -- 
 1.7.7.6
 
