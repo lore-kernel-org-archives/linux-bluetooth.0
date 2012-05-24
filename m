@@ -1,66 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Paulo Alcantara <paulo.alcantara@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ v2 00/16] Store address type on storage - remaining files
-Date: Thu, 24 May 2012 15:45:57 -0300
-Message-Id: <1337885173-9129-1-git-send-email-paulo.alcantara@openbossa.org>
-In-Reply-To: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
-References: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
+Date: Thu, 24 May 2012 15:48:46 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Ulisses Furquim <ulisses@profusion.mobi>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [RFC 3/8] Bluetooth: Add l2cap_chan->ops->ready()
+Message-ID: <20120524184846.GD10754@samus>
+References: <1337821964-4618-1-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-2-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-3-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-4-git-send-email-gustavo@padovan.org>
+ <20120524093958.GL24715@aemeltch-MOBL1>
+ <20120524102342.GQ24715@aemeltch-MOBL1>
+ <CAA37ikZvK=woaW_grv1t6PK0x0d3uz98MmjQL46z9PHPCJA0nA@mail.gmail.com>
+ <20120524113018.GR24715@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20120524113018.GR24715@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset contains the remaining changes for the new storage format
-used (bdaddr#type) on storage files (LE-only or shared files).
+Hi Andrei,
 
-The files that have been changed so far are:
-    primaries, characteristics, appearance, ccc, names, aliases,
-    longtermkeys, attributes, blocked.
+On 14:30 Thu 24 May, Andrei Emeltchenko wrote:
+> Hi Ulisses,
+> 
+> On Thu, May 24, 2012 at 08:17:23AM -0300, Ulisses Furquim wrote:
+> > >> > +   void                    (*ready) (void *data);
+> > >>
+> > >> Again, why void *data ?
+> > >
+> > > I mean here that for fixed channels we do not need this function at this
+> > > point since initialization is different.
+> > 
+> > So? What do you mean? This needs to be generic, I think. It's an
+> > abstraction after all.
+> 
+> Fixed channels do not have configuration phase, they are created
+> CONNECTED (at least A2MP).
 
-Unchanged files:
-    lastseen, lastused, eir, classes, manufacturers, features, linkkeys,
-    pincodes, trusts, profiles.
+You are right, but having this abstraction seems useful.
+
+In LE, for example, we (ab)use the CONFIG phase for blocking the channel
+while SMP is running (negotiating the encryption of the link), so any 
+applications are not able to send data in a lower security level than
+what they requested.
+
+> 
+> Best regards 
+> Andrei Emeltchenko 
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
-Note: The v2 of this series adds another patch (16/16) which keeps
-      backward compatibility with the old storage format in blocked
-      file since it's shared by both BR/EDR and LE devices, and the
-      patch 15/16 has been modified in order to add some trivial
-      comments in the changed code just to clarify what it's really
-      doing.
-
-
-Claudio Takahasi (4):
-  storage: Store address type in "aliases" file
-  storage: Store address type in blocked file
-  storage: Rename characteristic to characteristics
-  storage: Rename primary file to primaries
-
-Paulo Alcantara (12):
-  storage: Store address type in "characteristics"
-  storage: Store address type in "appearance" file
-  storage: Store address type in "ccc" file
-  storage: Store address type in "names" file
-  core: Fix reading stored data from "aliases" and "names" file
-  storage: Do not store address type twice
-  storage: Store address type in "longtermkeys" file
-  core: Fix creating device from "longtermkeys" file
-  storage: Store address type in "attributes" file
-  core: Fix creating device from "blocked" file
-  core: Fix deleting entries
-  storage: Keep backward compatibility
-
- attrib/client.c     |   31 +++++++----
- input/device.c      |    6 +-
- src/adapter.c       |   64 +++++++++++++--------
- src/attrib-server.c |   19 +++++--
- src/device.c        |   51 +++++++++++------
- src/device.h        |    1 +
- src/event.c         |   13 +++-
- src/storage.c       |  157 ++++++++++++++++++++++++++++++--------------------
- src/storage.h       |   44 +++++++++------
- 9 files changed, 243 insertions(+), 143 deletions(-)
-
+Cheers,
 -- 
-1.7.7.6
-
+Vinicius
