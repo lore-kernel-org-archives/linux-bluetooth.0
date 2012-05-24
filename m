@@ -1,45 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 24 May 2012 17:12:41 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 01/12] Bluetooth: Remove extra l2cap_state_change(BT_CONNECTED)
-Date: Thu, 24 May 2012 19:59:41 -0300
-Message-Id: <1337900389-30915-1-git-send-email-gustavo@padovan.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Denis Kenzior <denkenz@gmail.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PROPOSAL bluetoothd/obexd] doc/features.txt and doc/TODO
+Message-ID: <20120524201241.GA14906@joana>
+References: <CAMOw1v7BR1H9iAROyufdccyJS+WNLMFfRyxgJxt0iQ9SPP0Z-Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAMOw1v7BR1H9iAROyufdccyJS+WNLMFfRyxgJxt0iQ9SPP0Z-Q@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+* Lucas De Marchi <lucas.demarchi@profusion.mobi> [2012-05-24 16:44:47 -0300]:
 
-This is already performed inside l2cap_chan_ready(), so we don't need it
-here again.
+> Hey,
+> 
+> Some times (mainly when I'm preparing presentations about BlueZ) I
+> have to dig the source code and commit log to check which version and
+> features of each protocol is supported in BlueZ. I think this is a
+> common pattern for other BlueZ developers as well. It matters even
+> more when we are proposing implementations of new features (and then
+> we realize it's already implemented) or when we are trying to cover a
+> use case that depends on a feature not done yet.
+> 
+> I propose to follow what oFono does, by maintaining a
+> doc/features.txt and a doc/TODO  (I don't think the
+> "Priority"/"Complexity" is very important in the latter but could be
+> done as well). I'd prefer each developer to fill in the file for
+> profiles he's used with, so the end result is more accurate than if we
+> had only 1 person to do it all. I can contribute an initial version
+> with the features I found the last time I did that.
 
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/l2cap_core.c |    3 ---
- 1 file changed, 3 deletions(-)
+We actually have a TODO file in BlueZ, but it seems out of date. I think it
+was started it during the initial phase of the LE development, but it was
+abandoned at some point.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index c9e6ae4..b9c39f6 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3645,8 +3645,6 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	if (test_bit(CONF_INPUT_DONE, &chan->conf_state)) {
- 		set_default_fcs(chan);
- 
--		l2cap_state_change(chan, BT_CONNECTED);
--
- 		if (chan->mode == L2CAP_MODE_ERTM ||
- 		    chan->mode == L2CAP_MODE_STREAMING)
- 			err = l2cap_ertm_init(chan);
-@@ -3777,7 +3775,6 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	if (test_bit(CONF_OUTPUT_DONE, &chan->conf_state)) {
- 		set_default_fcs(chan);
- 
--		l2cap_state_change(chan, BT_CONNECTED);
- 		if (chan->mode == L2CAP_MODE_ERTM ||
- 		    chan->mode == L2CAP_MODE_STREAMING)
- 			err = l2cap_ertm_init(chan);
--- 
-1.7.10.1
+doc/features.txt would be interesting as well.
 
+	Gustavo
