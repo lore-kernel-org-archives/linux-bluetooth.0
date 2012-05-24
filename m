@@ -1,57 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 11:10:40 +0300
+Date: Thu, 24 May 2012 10:59:23 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Syam Sidhardhan <s.syam@samsung.com>
+To: Paulo Alcantara <paulo.alcantara@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 00/12] Redundant D-Bus error init, remove unwanted
- code, g_free missmatch etc
-Message-ID: <20120524081040.GA18388@x220>
-References: <1337788652-23697-1-git-send-email-s.syam@samsung.com>
+Subject: Re: [PATCH BlueZ 00/15] Store address type on storage - remaining
+ files
+Message-ID: <20120524075923.GA17458@x220>
+References: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337788652-23697-1-git-send-email-s.syam@samsung.com>
+In-Reply-To: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+Hi Paulo,
 
-On Wed, May 23, 2012, Syam Sidhardhan wrote:
-> This series of patches resolves:
-> Memory leak, free - g_free mismatch, redundant D-Bus error initilization
-> and remove unwanted code.
+On Wed, May 23, 2012, Paulo Alcantara wrote:
+> This patchset contains the remaining changes for the new storage format
+> used (bdaddr#type) on storage files (LE-only or shared files).
 > 
-> Syam Sidhardhan (12):
->   monitor: Fix memory leak
->   storage: Use g_free() instead of free()
->   media: Remove redundant D-Bus error initilization
->   telephony-maemo5: Remove redundant D-Bus error initilizations
->   telephony-maemo6: Remove redundant D-Bus error initilization
->   telephony-ofono: Remove redundant D-Bus error initilization
->   agent: Remove redundant D-Bus error initilizations
->   Remove redundant D-Bus error initilization in maemo6 plugin
->   avctp: Fix NULL check after dereference
->   adapter: Remove unwanted if check and code
->   audio: Remove unwanted code from manager
->   input: Remove unwanted codes from device
-> 
->  audio/avctp.c            |    3 ++-
->  audio/manager.c          |    2 --
->  audio/media.c            |    1 -
->  audio/telephony-maemo5.c |    5 -----
->  audio/telephony-maemo6.c |    1 -
->  audio/telephony-ofono.c  |    1 -
->  input/device.c           |    5 -----
->  monitor/hcidump.c        |    3 ++-
->  plugins/maemo6.c         |    1 -
->  src/adapter.c            |    3 ---
->  src/agent.c              |    5 -----
->  src/storage.c            |    6 +++---
->  12 files changed, 7 insertions(+), 29 deletions(-)
+> The files that have been changed so far are:
+>     primaries, characteristics, appearance, ccc, names, aliases,
+>     longtermkeys, attributes, blocked.
 
-I've applied all patches except the telephony ones. Those do not buy us
-very much but come with the expense of conflicting with the pending
-telephony driver removal patches (destined for 5.0). I also applied one
-extra patch from myself to do the agent variable removal suggested by
-Vinicius.
+Any files that are used for BR/EDR would have to keep their backwards
+compatibility. Otherwise someone who upgrades from 4.99 to 4.100 will
+suddenly find that the device they had blocked is not blocked anymore
+and none of their devices have any names. We can't break something like
+that between 4.x versions. Are these patches guaranteeing this backwards
+compatibility? Looking at the patches it doesn't look like they give
+this guarantee.
+
+I thought I made it clear that we can break something like this only for
+LE (since 4.100 is the first version to be considered officially
+supporting LE) but not for BR/EDR.
+
+I could have gone ahead and just applied the patches that are strictly
+LE-only and gone ahead with the 4.100 release, but since you've mixed a
+BR/EDR change and an LE change in 15/15 I can't do that. I think the way
+to proceed is to just do this storage change for LE-only files and then
+with 5.0 convert the others.
+
+One thing left for debate is do we still in 5.0 want to avoid a messed
+up system where someone has storage files from 4.x times and therefore
+gets incomplete device objects (created out of linkkeys files but most
+other data is missing, like names, etc). Probably we should ensure that
+either devices created out of such storage have all info or then the
+devices aren't created at all (meaning we may need to change the key
+format even for BR/EDR-only files like linkkeys).
 
 Johan
