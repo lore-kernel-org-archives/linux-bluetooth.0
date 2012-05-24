@@ -1,32 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 00:01:44 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Bing Zhao <bzhao@marvell.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
+From: Bing Zhao <bzhao@marvell.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org,
 	Andrei Emeltchenko <andrei.emeltchenko@intel.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH RESEND] Bluetooth: btmrvl: add SD8787 Bluetooth AMP
- device ID
-Message-ID: <20120524030144.GC21117@joana>
-References: <1337824204-2380-1-git-send-email-bzhao@marvell.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337824204-2380-1-git-send-email-bzhao@marvell.com>
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>, Bing Zhao <bzhao@marvell.com>
+Subject: [PATCH RESEND] Bluetooth: btmrvl: add SD8787 Bluetooth AMP device ID
+Date: Wed, 23 May 2012 18:50:04 -0700
+Message-Id: <1337824204-2380-1-git-send-email-bzhao@marvell.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bing,
+SD8787 SDIO function 3 (device ID 0x911B) is for Bluetooth AMP.
 
-* Bing Zhao <bzhao@marvell.com> [2012-05-23 18:50:04 -0700]:
+Signed-off-by: Bing Zhao <bzhao@marvell.com>
+---
+Resending to Gustavo's current e-mail address
 
-> SD8787 SDIO function 3 (device ID 0x911B) is for Bluetooth AMP.
-> 
-> Signed-off-by: Bing Zhao <bzhao@marvell.com>
-> ---
-> Resending to Gustavo's current e-mail address
-> 
->  drivers/bluetooth/btmrvl_sdio.c |    3 +++
->  1 files changed, 3 insertions(+), 0 deletions(-)
+ drivers/bluetooth/btmrvl_sdio.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-Patch has been applied to bluetooth-next. Thanks!
-
-	Gustavo
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index a853244..2867499 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -110,6 +110,9 @@ static const struct sdio_device_id btmrvl_sdio_ids[] = {
+ 	/* Marvell SD8787 Bluetooth device */
+ 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x911A),
+ 			.driver_data = (unsigned long) &btmrvl_sdio_sd8787 },
++	/* Marvell SD8787 Bluetooth AMP device */
++	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x911B),
++			.driver_data = (unsigned long) &btmrvl_sdio_sd8787 },
+ 	/* Marvell SD8797 Bluetooth device */
+ 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x912A),
+ 			.driver_data = (unsigned long) &btmrvl_sdio_sd8797 },
+-- 
+1.7.0.4
