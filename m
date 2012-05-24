@@ -1,33 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 14:29:02 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Use __constant when dealing with constants
-Message-ID: <20120524172901.GJ3105@joana>
-References: <1337863371-2584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1337863371-2584-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337863371-2584-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com,
+	Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ] AVRCP: Remove unneeded check for set_volume callback
+Date: Thu, 24 May 2012 14:26:25 -0300
+Message-Id: <1337880385-3894-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+---
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-05-24 15:42:51 +0300]:
+Luiz, feel free to put this in your patchset if you prefer so it doesn't
+conflict with your patches.
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  Note that some lines are over 80 characters (some where already more
->  then 80 characters though).
-> 
->  net/bluetooth/l2cap_core.c |   54 ++++++++++++++++++++++----------------------
->  1 file changed, 27 insertions(+), 27 deletions(-)
+ audio/avrcp.c |    3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Both patches have been applied. Thanks.
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index cb6906d..7eda6e8 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -1150,8 +1150,7 @@ static gboolean avrcp_handle_volume_changed(struct avctp *session,
+ 	if (code == AVC_CTYPE_REJECTED || code == AVC_CTYPE_NOT_IMPLEMENTED)
+ 		return FALSE;
+ 
+-	if (player->cb->set_volume != NULL)
+-		player->cb->set_volume(abs_volume, player->dev, player->user_data);
++	player->cb->set_volume(abs_volume, player->dev, player->user_data);
+ 
+ 	return TRUE;
+ }
+-- 
+1.7.10.2
 
-	Gustavo
