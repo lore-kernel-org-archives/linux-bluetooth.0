@@ -1,205 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 24 May 2012 14:08:11 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [RFC 8/8] Bluetooth: Add chan->ops->authorize
+Message-ID: <20120524170811.GG3105@joana>
+References: <1337821964-4618-1-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-2-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-3-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-4-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-5-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-6-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-7-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-8-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-9-git-send-email-gustavo@padovan.org>
+ <20120524095551.GO24715@aemeltch-MOBL1>
 MIME-Version: 1.0
-In-Reply-To: <1337865771-11777-5-git-send-email-luiz.dentz@gmail.com>
-References: <1337865771-11777-1-git-send-email-luiz.dentz@gmail.com> <1337865771-11777-5-git-send-email-luiz.dentz@gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Thu, 24 May 2012 14:08:09 -0300
-Message-ID: <CAMOw1v5JAENx0xCVYN9C1apdukhqrBEsRsX+ffNAirXuP_aUTA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 5/6] AVRCP: Add support for sending SetAbsoluteVolume
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120524095551.GO24715@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, May 24, 2012 at 10:22 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Once the transport volume is changed update the remote volume by sending
-> SetAbsoluteVolume:
->
-> < AVCTP: Command : pt 0x00 transaction 9 pid 0x110e
->    AV/C: Changed: address 0x48 opcode 0x00
->      Subunit: Panel
->      Opcode: Vendor Dependent
->      Company ID: 0x001958
->      AVRCP: SetAbsoluteVolume: pt Single len 0x0001
->        Volume: 100.00% (127/127)
->> AVCTP: Response : pt 0x00 transaction 9 pid 0x110e
->    AV/C: Accepted: address 0x48 opcode 0x00
->      Subunit: Panel
->      Opcode: Vendor Dependent
->      Company ID: 0x001958
->      AVRCP: SetAbsoluteVolume: pt Single len 0x0001
->        Volume: 100.00% (127/127)
-> ---
->  audio/avrcp.c     |   45 ++++++++++++++++++++++++++++++++++++++++++---
->  audio/avrcp.h     |    2 ++
->  audio/transport.c |   20 +++++++++++++++++++-
->  3 files changed, 63 insertions(+), 4 deletions(-)
->
-> diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index b09fab0..eb5241f 100644
-> --- a/audio/avrcp.c
-> +++ b/audio/avrcp.c
-> @@ -87,6 +87,7 @@
->  #define AVRCP_REGISTER_NOTIFICATION    0x31
->  #define AVRCP_REQUEST_CONTINUING       0x40
->  #define AVRCP_ABORT_CONTINUING         0x41
-> +#define AVRCP_SET_ABSOLUTE_VOLUME      0x50
->
->  /* Capabilities for AVRCP_GET_CAPABILITIES pdu */
->  #define CAP_COMPANY_ID         0x02
-> @@ -1145,15 +1146,20 @@ static gboolean avrcp_handle_volume_changed(struct avctp *session,
->  {
->        struct avrcp_player *player = user_data;
->        struct avrcp_header *pdu = (void *) operands;
-> -       uint8_t abs_volume = pdu->params[1] & 0x7F;
-> +       uint8_t volume = pdu->params[1] & 0x7F;
+Hi Andrei,
 
-Unneeded initialization.
+* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-05-24 12:55:53 +0300]:
 
->
->        if (code == AVC_CTYPE_REJECTED || code == AVC_CTYPE_NOT_IMPLEMENTED)
->                return FALSE;
->
-> +       if (pdu->pdu_id == AVRCP_REGISTER_NOTIFICATION)
-> +               volume = pdu->params[1] & 0x7F;
-> +       else
-> +               volume = pdu->params[0] & 0x7F;
-> +
->        if (player->cb->set_volume != NULL)
-> -               player->cb->set_volume(abs_volume, player->dev, player->user_data);
-> +               player->cb->set_volume(volume, player->dev, player->user_data);
->
-> -       return TRUE;
-> +       return pdu->pdu_id == AVRCP_REGISTER_NOTIFICATION ? TRUE : FALSE;
+> Hi Gustavo,
+> 
+> On Wed, May 23, 2012 at 10:12:44PM -0300, Gustavo Padovan wrote:
+> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > 
+> > When DEFER_SETUP is set authorize() will trigger an authorization request
+> > to the userspace.
+> 
+> Looks good.
+> 
+> > +static void l2cap_sock_authorize_cb(void *data)
+> > +{
+> > +	struct sock *sk = data;
+> > +	struct sock *parent;
+> > +
+> > +	parent = bt_sk(sk)->parent;
+> 
+> But why not:
+> 
+> l2cap_sock_authorize_cb(struct sock *sk)
+> {
+> 	struct sock *parent = bt_sk(sk)->parent;
 
-I don't think tweaking this function to handle both callbacks as you
-did is a good idea. One of the reasons is something is already missing
-in this function: when you receive a "changed notification" you need
-to re-register it for receiving subsequent notifications... i.e. in
-this function you need to call register_volume_notification() again.
-See the end of avrcp_player_event() function and section 6.7.2 of
-AVRCP 1.4 spec:
+We need to be generic, I said that in the other patch already. The chan->sk
+should disappear and the only thing l2cap_core.c will see is chan->data void *
 
-"A registered notification gets changed on receiving CHANGED event
-notification. For a new notification additional NOTIFY command is
-expected to be sent. Only one EventID shall be used per notification
-registration."
-
->  }
->
->  static void register_volume_notification(struct avrcp_player *player)
-> @@ -1404,3 +1410,36 @@ void avrcp_unregister_player(struct avrcp_player *player)
->
->        player_destroy(player);
->  }
-> +
-> +int avrcp_set_volume(struct audio_device *dev, uint8_t volume)
-> +{
-> +       struct avrcp_server *server;
-> +       struct avrcp_player *player;
-> +       uint8_t buf[AVRCP_HEADER_LENGTH + 1];
-> +       struct avrcp_header *pdu = (void *) buf;
-> +
-> +       server = find_server(servers, &dev->src);
-> +       if (server == NULL)
-> +               return -EINVAL;
-> +
-> +       player = server->active_player;
-> +       if (player == NULL)
-> +               return -ENOTSUP;
-> +
-> +       if (player->session == NULL)
-> +               return -ENOTCONN;
-> +
-> +       memset(buf, 0, sizeof(buf));
-> +
-> +       set_company_id(pdu->company_id, IEEEID_BTSIG);
-> +
-> +       pdu->pdu_id = AVRCP_SET_ABSOLUTE_VOLUME;
-> +       pdu->params[0] = volume;
-> +       pdu->params_len = htons(1);
-> +
-> +       DBG("volume=%u", volume);
-> +
-> +       return avctp_send_vendordep_req(player->session, AVC_CTYPE_CHANGED,
-
-wrong CTYPE... it should be CONTROL
-
-> +                                       AVC_SUBUNIT_PANEL, buf, sizeof(buf),
-> +                                       avrcp_handle_volume_changed, player);
-> +}
-> diff --git a/audio/avrcp.h b/audio/avrcp.h
-> index b520ef6..bf11a6c 100644
-> --- a/audio/avrcp.h
-> +++ b/audio/avrcp.h
-> @@ -93,6 +93,7 @@ void avrcp_unregister(const bdaddr_t *src);
->
->  gboolean avrcp_connect(struct audio_device *dev);
->  void avrcp_disconnect(struct audio_device *dev);
-> +int avrcp_set_volume(struct audio_device *dev, uint8_t volume);
->
->  struct avrcp_player *avrcp_register_player(const bdaddr_t *src,
->                                                struct avrcp_player_cb *cb,
-> @@ -102,4 +103,5 @@ void avrcp_unregister_player(struct avrcp_player *player);
->
->  int avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data);
->
-> +
-
-extra newline.
-
->  size_t avrcp_handle_vendor_reject(uint8_t *code, uint8_t *operands);
-> diff --git a/audio/transport.c b/audio/transport.c
-> index 6ed5d21..6406ec1 100644
-> --- a/audio/transport.c
-> +++ b/audio/transport.c
-> @@ -43,6 +43,7 @@
->  #include "a2dp.h"
->  #include "headset.h"
->  #include "gateway.h"
-> +#include "avrcp.h"
->
->  #ifndef DBUS_TYPE_UNIX_FD
->  #define DBUS_TYPE_UNIX_FD -1
-> @@ -77,7 +78,7 @@ struct media_transport {
->        uint16_t                omtu;           /* Transport output mtu */
->        uint16_t                delay;          /* Transport delay (a2dp only) */
->        unsigned int            nrec_id;        /* Transport nrec watch (headset only) */
-> -       uint8_t                 volume;         /* Transport volume */
-> +       uint16_t                volume;         /* Transport volume */
-
-This should be in the previous patch, in which you changed the type.
-
->        gboolean                read_lock;
->        gboolean                write_lock;
->        gboolean                in_use;
-> @@ -753,6 +754,23 @@ static int set_property_a2dp(struct media_transport *transport,
->
->                /* FIXME: send new delay */
->                return 0;
-> +       } else if (g_strcmp0(property, "Volume") == 0) {
-> +               uint16_t volume;
-> +
-> +               if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_UINT16)
-> +                       return -EINVAL;
-> +
-> +               dbus_message_iter_get_basic(value, &volume);
-> +
-> +               if (volume > 127)
-> +                       return -EINVAL;
-> +
-> +               if (transport->volume == volume)
-> +                       return 0;
-> +
-> +               transport->volume = volume;
-> +
-> +               return avrcp_set_volume(transport->device, volume);
->        }
->
-
-Regards,
-Lucas De Marchi
+	Gustavo
