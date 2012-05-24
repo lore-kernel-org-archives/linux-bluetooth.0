@@ -1,197 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Use __constant when dealing with constants
-Date: Thu, 24 May 2012 15:42:51 +0300
-Message-Id: <1337863371-2584-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1337863371-2584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1337863371-2584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: Define and use PSM identifiers
+Date: Thu, 24 May 2012 15:42:50 +0300
+Message-Id: <1337863371-2584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Define assigned Protocol and Service Multiplexor (PSM) identifiers
+and use them instead of magic numbers.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- Note that some lines are over 80 characters (some where already more
- then 80 characters though).
+ include/net/bluetooth/l2cap.h |    4 ++++
+ net/bluetooth/l2cap_core.c    |    4 ++--
+ net/bluetooth/l2cap_sock.c    |    4 ++--
+ 3 files changed, 8 insertions(+), 4 deletions(-)
 
- net/bluetooth/l2cap_core.c |   54 ++++++++++++++++++++++----------------------
- 1 file changed, 27 insertions(+), 27 deletions(-)
-
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 0142257..f44344b 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -229,6 +229,10 @@ struct l2cap_conn_rsp {
+ 	__le16     status;
+ } __packed;
+ 
++/* protocol/service multiplexer (PSM) */
++#define L2CAP_PSM_SDP		0x0001
++#define L2CAP_PSM_RFCOMM	0x0003
++
+ /* channel indentifier */
+ #define L2CAP_CID_SIGNALING	0x0001
+ #define L2CAP_CID_CONN_LESS	0x0002
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 65c3f4e..6eb2ef2 100644
+index c9e6ae4..65c3f4e 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -616,7 +616,7 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
- 			rsp.scid   = cpu_to_le16(chan->dcid);
- 			rsp.dcid   = cpu_to_le16(chan->scid);
- 			rsp.result = cpu_to_le16(result);
--			rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
-+			rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
- 			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
- 							sizeof(rsp), &rsp);
+@@ -648,7 +648,7 @@ static inline u8 l2cap_get_auth_type(struct l2cap_chan *chan)
+ 		default:
+ 			return HCI_AT_NO_BONDING;
  		}
-@@ -1010,7 +1010,7 @@ static void l2cap_do_start(struct l2cap_chan *chan)
- 			l2cap_send_conn_req(chan);
- 	} else {
- 		struct l2cap_info_req req;
--		req.type = cpu_to_le16(L2CAP_IT_FEAT_MASK);
-+		req.type = __constant_cpu_to_le16(L2CAP_IT_FEAT_MASK);
+-	} else if (chan->psm == cpu_to_le16(0x0001)) {
++	} else if (chan->psm == __constant_cpu_to_le16(L2CAP_PSM_SDP)) {
+ 		if (chan->sec_level == BT_SECURITY_LOW)
+ 			chan->sec_level = BT_SECURITY_SDP;
  
- 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_SENT;
- 		conn->info_ident = l2cap_get_ident(conn);
-@@ -1110,20 +1110,20 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 				if (test_bit(BT_SK_DEFER_SETUP,
- 					     &bt_sk(sk)->flags)) {
- 					struct sock *parent = bt_sk(sk)->parent;
--					rsp.result = cpu_to_le16(L2CAP_CR_PEND);
--					rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
-+					rsp.result = __constant_cpu_to_le16(L2CAP_CR_PEND);
-+					rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
- 					if (parent)
- 						parent->sk_data_ready(parent, 0);
+@@ -3393,7 +3393,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 	lock_sock(parent);
  
- 				} else {
- 					__l2cap_state_change(chan, BT_CONFIG);
--					rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
--					rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
-+					rsp.result = __constant_cpu_to_le16(L2CAP_CR_SUCCESS);
-+					rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
- 				}
- 				release_sock(sk);
- 			} else {
--				rsp.result = cpu_to_le16(L2CAP_CR_PEND);
--				rsp.status = cpu_to_le16(L2CAP_CS_AUTHEN_PEND);
-+				rsp.result = __constant_cpu_to_le16(L2CAP_CR_PEND);
-+				rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHEN_PEND);
- 			}
+ 	/* Check if the ACL is secure enough (if not SDP) */
+-	if (psm != cpu_to_le16(0x0001) &&
++	if (psm != __constant_cpu_to_le16(L2CAP_PSM_SDP) &&
+ 				!hci_conn_check_link_mode(conn->hcon)) {
+ 		conn->disc_reason = HCI_ERROR_AUTH_FAILURE;
+ 		result = L2CAP_CR_SEC_BLOCK;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 4d36605..d244361 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -88,8 +88,8 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+ 	if (err < 0)
+ 		goto done;
  
- 			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
-@@ -2595,9 +2595,9 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
- 	lh->len = cpu_to_le16(L2CAP_CMD_HDR_SIZE + dlen);
+-	if (__le16_to_cpu(la.l2_psm) == 0x0001 ||
+-				__le16_to_cpu(la.l2_psm) == 0x0003)
++	if (__le16_to_cpu(la.l2_psm) == L2CAP_PSM_SDP ||
++	    __le16_to_cpu(la.l2_psm) == L2CAP_PSM_RFCOMM)
+ 		chan->sec_level = BT_SECURITY_SDP;
  
- 	if (conn->hcon->type == LE_LINK)
--		lh->cid = cpu_to_le16(L2CAP_CID_LE_SIGNALING);
-+		lh->cid = __constant_cpu_to_le16(L2CAP_CID_LE_SIGNALING);
- 	else
--		lh->cid = cpu_to_le16(L2CAP_CID_SIGNALING);
-+		lh->cid = __constant_cpu_to_le16(L2CAP_CID_SIGNALING);
- 
- 	cmd = (struct l2cap_cmd_hdr *) skb_put(skb, L2CAP_CMD_HDR_SIZE);
- 	cmd->code  = code;
-@@ -2709,8 +2709,8 @@ static void l2cap_add_opt_efs(void **ptr, struct l2cap_chan *chan)
- 		efs.stype	= chan->local_stype;
- 		efs.msdu	= cpu_to_le16(chan->local_msdu);
- 		efs.sdu_itime	= cpu_to_le32(chan->local_sdu_itime);
--		efs.acc_lat	= cpu_to_le32(L2CAP_DEFAULT_ACC_LAT);
--		efs.flush_to	= cpu_to_le32(L2CAP_DEFAULT_FLUSH_TO);
-+		efs.acc_lat	= __constant_cpu_to_le32(L2CAP_DEFAULT_ACC_LAT);
-+		efs.flush_to	= __constant_cpu_to_le32(L2CAP_DEFAULT_FLUSH_TO);
- 		break;
- 
- 	case L2CAP_MODE_STREAMING:
-@@ -3290,8 +3290,8 @@ void __l2cap_connect_rsp_defer(struct l2cap_chan *chan)
- 
- 	rsp.scid   = cpu_to_le16(chan->dcid);
- 	rsp.dcid   = cpu_to_le16(chan->scid);
--	rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
--	rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
-+	rsp.result = __constant_cpu_to_le16(L2CAP_CR_SUCCESS);
-+	rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
- 	l2cap_send_cmd(conn, chan->ident,
- 				L2CAP_CONN_RSP, sizeof(rsp), &rsp);
- 
-@@ -3329,8 +3329,8 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
- 	 * did not send an RFC option.
- 	 */
- 	rfc.mode = chan->mode;
--	rfc.retrans_timeout = cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
--	rfc.monitor_timeout = cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
-+	rfc.retrans_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
-+	rfc.monitor_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
- 	rfc.max_pdu_size = cpu_to_le16(chan->imtu);
- 
- 	BT_ERR("Expected RFC option was not found, using defaults");
-@@ -3474,7 +3474,7 @@ sendresp:
- 
- 	if (result == L2CAP_CR_PEND && status == L2CAP_CS_NO_INFO) {
- 		struct l2cap_info_req info;
--		info.type = cpu_to_le16(L2CAP_IT_FEAT_MASK);
-+		info.type = __constant_cpu_to_le16(L2CAP_IT_FEAT_MASK);
- 
- 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_SENT;
- 		conn->info_ident = l2cap_get_ident(conn);
-@@ -3596,7 +3596,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2) {
- 		struct l2cap_cmd_rej_cid rej;
- 
--		rej.reason = cpu_to_le16(L2CAP_REJ_INVALID_CID);
-+		rej.reason = __constant_cpu_to_le16(L2CAP_REJ_INVALID_CID);
- 		rej.scid = cpu_to_le16(chan->scid);
- 		rej.dcid = cpu_to_le16(chan->dcid);
- 
-@@ -3886,8 +3886,8 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
- 		u8 buf[8];
- 		u32 feat_mask = l2cap_feat_mask;
- 		struct l2cap_info_rsp *rsp = (struct l2cap_info_rsp *) buf;
--		rsp->type   = cpu_to_le16(L2CAP_IT_FEAT_MASK);
--		rsp->result = cpu_to_le16(L2CAP_IR_SUCCESS);
-+		rsp->type   = __constant_cpu_to_le16(L2CAP_IT_FEAT_MASK);
-+		rsp->result = __constant_cpu_to_le16(L2CAP_IR_SUCCESS);
- 		if (!disable_ertm)
- 			feat_mask |= L2CAP_FEAT_ERTM | L2CAP_FEAT_STREAMING
- 							 | L2CAP_FEAT_FCS;
-@@ -3907,15 +3907,15 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
- 		else
- 			l2cap_fixed_chan[0] &= ~L2CAP_FC_A2MP;
- 
--		rsp->type   = cpu_to_le16(L2CAP_IT_FIXED_CHAN);
--		rsp->result = cpu_to_le16(L2CAP_IR_SUCCESS);
-+		rsp->type   = __constant_cpu_to_le16(L2CAP_IT_FIXED_CHAN);
-+		rsp->result = __constant_cpu_to_le16(L2CAP_IR_SUCCESS);
- 		memcpy(rsp->data, l2cap_fixed_chan, sizeof(l2cap_fixed_chan));
- 		l2cap_send_cmd(conn, cmd->ident,
- 					L2CAP_INFO_RSP, sizeof(buf), buf);
- 	} else {
- 		struct l2cap_info_rsp rsp;
- 		rsp.type   = cpu_to_le16(type);
--		rsp.result = cpu_to_le16(L2CAP_IR_NOTSUPP);
-+		rsp.result = __constant_cpu_to_le16(L2CAP_IR_NOTSUPP);
- 		l2cap_send_cmd(conn, cmd->ident,
- 					L2CAP_INFO_RSP, sizeof(rsp), &rsp);
- 	}
-@@ -3955,7 +3955,7 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
- 
- 		if (conn->feat_mask & L2CAP_FEAT_FIXED_CHAN) {
- 			struct l2cap_info_req req;
--			req.type = cpu_to_le16(L2CAP_IT_FIXED_CHAN);
-+			req.type = __constant_cpu_to_le16(L2CAP_IT_FIXED_CHAN);
- 
- 			conn->info_ident = l2cap_get_ident(conn);
- 
-@@ -4190,9 +4190,9 @@ static inline int l2cap_conn_param_update_req(struct l2cap_conn *conn,
- 
- 	err = l2cap_check_conn_param(min, max, latency, to_multiplier);
- 	if (err)
--		rsp.result = cpu_to_le16(L2CAP_CONN_PARAM_REJECTED);
-+		rsp.result = __constant_cpu_to_le16(L2CAP_CONN_PARAM_REJECTED);
- 	else
--		rsp.result = cpu_to_le16(L2CAP_CONN_PARAM_ACCEPTED);
-+		rsp.result = __constant_cpu_to_le16(L2CAP_CONN_PARAM_ACCEPTED);
- 
- 	l2cap_send_cmd(conn, cmd->ident, L2CAP_CONN_PARAM_UPDATE_RSP,
- 							sizeof(rsp), &rsp);
-@@ -4340,7 +4340,7 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
- 			BT_ERR("Wrong link type (%d)", err);
- 
- 			/* FIXME: Map err to a valid reason */
--			rej.reason = cpu_to_le16(L2CAP_REJ_NOT_UNDERSTOOD);
-+			rej.reason = __constant_cpu_to_le16(L2CAP_REJ_NOT_UNDERSTOOD);
- 			l2cap_send_cmd(conn, cmd.ident, L2CAP_COMMAND_REJ, sizeof(rej), &rej);
- 		}
- 
+ 	bacpy(&bt_sk(sk)->src, &la.l2_bdaddr);
 -- 
 1.7.9.5
 
