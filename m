@@ -1,42 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/6] AVCTP: Fix setting wrong transaction id expected for responses
-Date: Thu, 24 May 2012 16:22:46 +0300
-Message-Id: <1337865771-11777-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CALE9AOZkUqp=NJWxiOPtadFmbZvRS9FexH53yeCcqKXMWyuesQ@mail.gmail.com>
+References: <CALE9AOZkUqp=NJWxiOPtadFmbZvRS9FexH53yeCcqKXMWyuesQ@mail.gmail.com>
+Date: Thu, 24 May 2012 14:42:33 +0200
+Message-ID: <CACLukzL9WJtE330wLQoPbkN2A6=rtqJEMKsnzS7KZFohYvygag@mail.gmail.com>
+Subject: Re: help with mcap/csp ??
+From: Santiago Carot <sancane@gmail.com>
+To: Howard <hpage66@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Howard,
 
-The id were incremented after being set to the request so it is always
-+1 of the actual transaction.
----
- audio/avctp.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+2012/5/23 Howard <hpage66@gmail.com>:
+> Does anyone have any  demo code (c/c++) that shows me how to sync two
+> linux machines' clocks with bluetooth bluez mcap/csp? Thanks!
+>
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index 1bc2a1d..5f9afa1 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -982,7 +982,7 @@ int avctp_send_vendordep_req(struct avctp *session, uint8_t code,
- 	struct avctp_rsp_handler *handler;
- 	int err;
- 
--	err = avctp_send(session, id++, AVCTP_COMMAND, code, subunit,
-+	err = avctp_send(session, id, AVCTP_COMMAND, code, subunit,
- 				AVC_OP_VENDORDEP, operands, operand_count);
- 	if (err < 0)
- 		return err;
-@@ -994,6 +994,8 @@ int avctp_send_vendordep_req(struct avctp *session, uint8_t code,
- 
- 	session->handlers = g_slist_prepend(session->handlers, handler);
- 
-+	id++;
-+
- 	return 0;
- }
- 
--- 
-1.7.7.6
+The way in which profiles are used in BlueZ is through a well defined
+D-Bus API. MCAP is developed as a service library ready to be used by
+profiles that require it, at present, as far as I know only HDP uses
+it. So if you are planning to use MCAP from outside of BlueZ you
+should develop a plugin which exports all functionalities you want in
+MCAP through a DBUS API so that you can interact with it.
 
+Regards.
