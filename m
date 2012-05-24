@@ -1,55 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 24 May 2012 00:01:44 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [RFC 1/3] Bluetooth: check for already existent channel before create new one
-Date: Thu, 24 May 2012 03:02:52 -0300
-Message-Id: <1337839374-20443-1-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1337821964-4618-9-git-send-email-gustavo@padovan.org>
-References: <1337821964-4618-9-git-send-email-gustavo@padovan.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Bing Zhao <bzhao@marvell.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
+	Andrei Emeltchenko <andrei.emeltchenko@intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH RESEND] Bluetooth: btmrvl: add SD8787 Bluetooth AMP
+ device ID
+Message-ID: <20120524030144.GC21117@joana>
+References: <1337824204-2380-1-git-send-email-bzhao@marvell.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1337824204-2380-1-git-send-email-bzhao@marvell.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Hi Bing,
 
-Move this check to before the channel time creation simplifies the code
-and avoid memory allocation if the channel already exist.
+* Bing Zhao <bzhao@marvell.com> [2012-05-23 18:50:04 -0700]:
 
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
----
- net/bluetooth/l2cap_core.c |   13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+> SD8787 SDIO function 3 (device ID 0x911B) is for Bluetooth AMP.
+> 
+> Signed-off-by: Bing Zhao <bzhao@marvell.com>
+> ---
+> Resending to Gustavo's current e-mail address
+> 
+>  drivers/bluetooth/btmrvl_sdio.c |    3 +++
+>  1 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 22ba699..c9de4f5 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3340,21 +3340,16 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 
- 	result = L2CAP_CR_NO_MEM;
- 
-+	/* Check if we already have channel with that dcid */
-+	if (__l2cap_get_chan_by_dcid(conn, scid))
-+		goto response;
-+
- 	chan = pchan->ops->new_connection(pchan->data);
- 	if (!chan)
- 		goto response;
- 
- 	sk = chan->sk;
- 
--	/* Check if we already have channel with that dcid */
--	if (__l2cap_get_chan_by_dcid(conn, scid)) {
--		if (chan->ops->finalize)
--			chan->ops->finalize(chan->data, 0);
--
--		chan->ops->close(chan->data);
--		goto response;
--	}
--
- 	hci_conn_hold(conn->hcon);
- 
- 	bacpy(&bt_sk(sk)->src, conn->src);
--- 
-1.7.10.1
+Patch has been applied to bluetooth-next. Thanks!
 
+	Gustavo
