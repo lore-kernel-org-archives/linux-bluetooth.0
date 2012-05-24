@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 06/18] Bluetooth: A2MP: Definitions for A2MP commands
-Date: Thu, 24 May 2012 14:38:16 +0300
-Message-Id: <1337859508-32274-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 11/18] Bluetooth: A2MP: Process A2MP Change Notify
+Date: Thu, 24 May 2012 14:38:21 +0300
+Message-Id: <1337859508-32274-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1337859508-32274-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1337859508-32274-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,97 +12,50 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Define A2MP command IDs and packet structures.
+Placeholder for A2MP Change Notify handler.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |   73 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 73 insertions(+)
+ net/bluetooth/a2mp.c |   19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 654df60..7cbeb91 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -31,6 +31,79 @@ struct a2mp_cmd {
- 	__u8	data[0];
- } __packed;
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index ac095ac..d60be75 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -161,6 +161,22 @@ static int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
+ }
  
-+/* A2MP command codes */
-+#define A2MP_COMMAND_REJ         0x01
-+struct a2mp_cmd_rej {
-+	__le16	reason;
-+	__u8	data[0];
-+} __packed;
++static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
++			      struct a2mp_cmd *hdr)
++{
++	struct a2mp_cl *cl = (struct a2mp_cl *) skb->data;
 +
-+#define A2MP_DISCOVER_REQ        0x02
-+struct a2mp_discov_req {
-+	__le16	mtu;
-+	__le16	ext_feat;
-+} __packed;
++	while (skb->len >= sizeof(*cl)) {
++		BT_DBG("Controller id %d type %d status %d", cl->id, cl->type,
++		       cl->status);
++		cl = (struct a2mp_cl *) skb_pull(skb, sizeof(*cl));
++	}
 +
-+struct a2mp_cl {
-+	__u8	id;
-+	__u8	type;
-+	__u8	status;
-+} __packed;
++	/* TODO send A2MP_CHANGE_RSP */
 +
-+#define A2MP_DISCOVER_RSP        0x03
-+struct a2mp_discov_rsp {
-+	__le16     mtu;
-+	__le16     ext_feat;
-+	struct a2mp_cl cl[0];
-+} __packed;
++	return 0;
++}
 +
-+#define A2MP_CHANGE_NOTIFY       0x04
-+#define A2MP_CHANGE_RSP          0x05
-+
-+#define A2MP_GETINFO_REQ         0x06
-+struct a2mp_info_req {
-+	__u8       id;
-+} __packed;
-+
-+#define A2MP_GETINFO_RSP         0x07
-+struct a2mp_info_rsp {
-+	__u8	id;
-+	__u8	status;
-+	__le32	total_bw;
-+	__le32	max_bw;
-+	__le32	min_latency;
-+	__le16	pal_cap;
-+	__le16	assoc_size;
-+} __packed;
-+
-+#define A2MP_GETAMPASSOC_REQ     0x08
-+struct a2mp_amp_assoc_req {
-+	__u8	id;
-+} __packed;
-+
-+#define A2MP_GETAMPASSOC_RSP     0x09
-+struct a2mp_amp_assoc_rsp {
-+	__u8	id;
-+	__u8	status;
-+	__u8	amp_assoc[0];
-+} __packed;
-+
-+#define A2MP_CREATEPHYSLINK_REQ  0x0A
-+#define A2MP_DISCONNPHYSLINK_REQ 0x0C
-+struct a2mp_physlink_req {
-+	__u8	local_id;
-+	__u8	remote_id;
-+	__u8	amp_assoc[0];
-+} __packed;
-+
-+#define A2MP_CREATEPHYSLINK_RSP  0x0B
-+#define A2MP_DISCONNPHYSLINK_RSP 0x0D
-+struct a2mp_physlink_rsp {
-+	__u8	local_id;
-+	__u8	remote_id;
-+	__u8	status;
-+} __packed;
-+
- void amp_mgr_get(struct amp_mgr *mgr);
- int amp_mgr_put(struct amp_mgr *mgr);
+ /* Handle A2MP signalling */
+ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ {
+@@ -195,6 +211,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 			break;
  
+ 		case A2MP_CHANGE_NOTIFY:
++			err = a2mp_change_notify(mgr, skb, hdr);
++			break;
++
+ 		case A2MP_GETINFO_REQ:
+ 		case A2MP_GETAMPASSOC_REQ:
+ 		case A2MP_CREATEPHYSLINK_REQ:
 -- 
 1.7.9.5
 
