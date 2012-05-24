@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 09/18] Bluetooth: A2MP: Process A2MP Command Reject
-Date: Thu, 24 May 2012 14:38:19 +0300
-Message-Id: <1337859508-32274-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 12/18] Bluetooth: A2MP: Process A2MP Get Info Request
+Date: Thu, 24 May 2012 14:38:22 +0300
+Message-Id: <1337859508-32274-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1337859508-32274-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1337859508-32274-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,50 +12,79 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Placeholder for future A2MP Command Reject handler.
+Process A2MP Get Info Request.
+Example of trace log for invalid controller id is shown below:
+
+...
+> ACL data: handle 11 flags 0x02 dlen 13
+    A2MP: Get Info req: id 238
+< ACL data: handle 11 flags 0x00 dlen 30
+    A2MP: Get Info rsp: id 238 status (1) Invalid Controller ID
+...
+
+Note that If the Status field is set to Invalid Controller ID all subsequent
+fields in the AMP Get Info Response shall be ignored by the receiver.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ net/bluetooth/a2mp.c |   37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 92b7671..4137f9b 100644
+index d60be75..d636c0c 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -63,6 +63,22 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
- 	kfree(cmd);
+@@ -177,6 +177,40 @@ static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
  }
  
-+/* Processing A2MP messages */
-+static int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
++static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
 +			    struct a2mp_cmd *hdr)
 +{
-+	struct a2mp_cmd_rej *rej = (struct a2mp_cmd_rej *) skb->data;
++	struct a2mp_info_req *req  = (struct a2mp_info_req *) skb->data;
++	struct a2mp_info_rsp rsp;
++	struct hci_dev *hdev;
 +
-+	if (le16_to_cpu(hdr->len) < sizeof(*rej))
++	if (le16_to_cpu(hdr->len) < sizeof(*req))
 +		return -EINVAL;
 +
-+	BT_DBG("ident %d reason %d", hdr->ident, le16_to_cpu(rej->reason));
++	BT_DBG("id %d", req->id);
 +
-+	skb_pull(skb, sizeof(*rej));
++	rsp.id = req->id;
++	rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
 +
++	hdev = hci_dev_get(req->id);
++	if (hdev && hdev->amp_type != HCI_BREDR) {
++		rsp.status = 0;
++		rsp.total_bw = cpu_to_le32(hdev->amp_total_bw);
++		rsp.max_bw = cpu_to_le32(hdev->amp_max_bw);
++		rsp.min_latency = cpu_to_le32(hdev->amp_min_latency);
++		rsp.pal_cap = cpu_to_le16(hdev->amp_pal_cap);
++		rsp.assoc_size = cpu_to_le16(hdev->amp_assoc_size);
++	}
++
++	if (hdev)
++		hci_dev_put(hdev);
++
++	a2mp_send(mgr, A2MP_GETINFO_RSP, hdr->ident, sizeof(rsp), &rsp);
++
++	skb_pull(skb, sizeof(*req));
 +	return 0;
 +}
 +
  /* Handle A2MP signalling */
  static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
  {
-@@ -89,6 +105,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+@@ -215,6 +249,9 @@ static int a2mp_chan_recv_cb(void *data, struct sk_buff *skb)
+ 			break;
  
- 		switch (hdr->code) {
- 		case A2MP_COMMAND_REJ:
-+			a2mp_command_rej(mgr, skb, hdr);
+ 		case A2MP_GETINFO_REQ:
++			err = a2mp_getinfo_req(mgr, skb, hdr);
 +			break;
 +
- 		case A2MP_DISCOVER_REQ:
- 		case A2MP_CHANGE_NOTIFY:
- 		case A2MP_GETINFO_REQ:
+ 		case A2MP_GETAMPASSOC_REQ:
+ 		case A2MP_CREATEPHYSLINK_REQ:
+ 		case A2MP_DISCONNPHYSLINK_REQ:
 -- 
 1.7.9.5
 
