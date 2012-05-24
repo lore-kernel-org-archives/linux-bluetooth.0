@@ -1,66 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1337852769.2115.47.camel@novo.hadess.net>
-Subject: Re: [RFC] Reorganizing the BlueZ source tree
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Date: Thu, 24 May 2012 10:46:09 +0100
-In-Reply-To: <CABBYNZLhWfS6Ff0S8SkCwSXxzt61NzNCBH-K78hQB6dtpPvJ6Q@mail.gmail.com>
-References: <20120524081405.GA30941@joana>
-	 <CABBYNZLhWfS6Ff0S8SkCwSXxzt61NzNCBH-K78hQB6dtpPvJ6Q@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
+Date: Thu, 24 May 2012 12:45:48 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [RFC 6/8] Bluetooth: Move check for backlog size to l2cap_sock.c
+Message-ID: <20120524094546.GM24715@aemeltch-MOBL1>
+References: <1337821964-4618-1-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-2-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-3-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-4-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-5-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-6-git-send-email-gustavo@padovan.org>
+ <1337821964-4618-7-git-send-email-gustavo@padovan.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1337821964-4618-7-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2012-05-24 at 11:20 +0300, Luiz Augusto von Dentz wrote:
-> Hi Gustavo,
-> 
-> On Thu, May 24, 2012 at 11:14 AM, Gustavo Padovan <gustavo@padovan.org> wrote:
-> > Hi Everyone,
-> >
-> > The last profiles addition to BlueZ increased a lot the number of folders we
-> > have in the root dir of the project and it looks like more profiles (and more
-> > folders) are expected to come.
-> >
-> > I talked a bit with Johan about changing the hierarchy of the BlueZ tree and
-> > the following proposal where 2 new folders are created, 'profiles' and 'libs'
-> > and things are moved to them.
-> >
-> > compat          -> /dev/null (will be removed on 5.0)
-> > alert           -> profiles
-> > audio           -> profiles
-> > cups            -> profiles
-> > deviceinfo      -> profiles
-> > health          -> profiles
-> > input           -> profiles
-> > lib             -> profiles
-> > network         -> profiles
-> > proximity       -> profiles
-> > sap             -> profiles
-> > serial          -> profiles
-> > thermometer     -> profiles
-> > time            -> profiles
-> > btio            -> libs
-> > gdbus           -> libs
-> > sbc             -> libs
-> > emulator        -> tools
-> > mgmt            -> tools
-> > monitor         -> tools
-> > attrib
-> > doc
-> > plugins
-> > scripts
-> > src
-> > test
-> > tools
-> > unit
-> 
-> Sounds good, the only problem are gdbus and btio, if we merge obexd
-> into BlueZ btio will no longer be shared but for gdbus we would have
-> to align with other projects as well.
+Hi Gustavo,
 
-While you're at it, change gdbus' name to something that doesn't clash
-with the GIO GDBus.
+On Wed, May 23, 2012 at 10:12:42PM -0300, Gustavo Padovan wrote:
+> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> 
+> Remove socket specific code from l2cap_core.c
+> 
+> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> ---
+>  net/bluetooth/l2cap_core.c |   12 ------------
+>  net/bluetooth/l2cap_sock.c |    6 ++++++
+>  2 files changed, 6 insertions(+), 12 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 9416c60..46e6fb7 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1156,12 +1156,6 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+>  
+>  	lock_sock(parent);
+>  
+> -	/* Check for backlog size */
+> -	if (sk_acceptq_is_full(parent)) {
+> -		BT_DBG("backlog full %d", parent->sk_ack_backlog);
+> -		goto clean;
+> -	}
+> -
+>  	chan = pchan->ops->new_connection(pchan->data);
+>  	if (!chan)
+>  		goto clean;
+> @@ -3348,12 +3342,6 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+>  
+>  	result = L2CAP_CR_NO_MEM;
+>  
+> -	/* Check for backlog size */
+> -	if (sk_acceptq_is_full(parent)) {
+> -		BT_DBG("backlog full %d", parent->sk_ack_backlog);
+> -		goto response;
+> -	}
+> -
+>  	chan = pchan->ops->new_connection(pchan->data);
+>  	if (!chan)
+>  		goto response;
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 8a3620b..bc409a2 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -895,6 +895,12 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(void *data)
+>  {
+>  	struct sock *sk, *parent = data;
+>  
+> +	/* Check for backlog size */
+> +	if (sk_acceptq_is_full(parent)) {
+> +		BT_DBG("backlog full %d", parent->sk_ack_backlog);
+> +		return NULL;
+> +	}
+> +
+
+Ok I see where comes from this change. I feel that this can be merged with
+some other patch removing parent sk.
+
+Best regards 
+Andrei Emeltchenko 
 
