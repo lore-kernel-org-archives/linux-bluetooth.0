@@ -1,52 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 10:59:23 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Paulo Alcantara <paulo.alcantara@openbossa.org>
+Date: Thu, 24 May 2012 10:59:39 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 00/15] Store address type on storage - remaining
- files
-Message-ID: <20120524075923.GA17458@x220>
-References: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
+Subject: Re: [PATCHv2 02/19] Bluetooth: Add ready to L2CAP channel ops
+Message-ID: <20120524075936.GC24715@aemeltch-MOBL1>
+References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1337787445-23235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1337787445-23235-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <alpine.DEB.2.02.1205231614400.6526@mathewm-linux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
+In-Reply-To: <alpine.DEB.2.02.1205231614400.6526@mathewm-linux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Paulo,
+Hi Mat,
 
-On Wed, May 23, 2012, Paulo Alcantara wrote:
-> This patchset contains the remaining changes for the new storage format
-> used (bdaddr#type) on storage files (LE-only or shared files).
+On Wed, May 23, 2012 at 04:16:37PM -0700, Mat Martineau wrote:
+> >+static void l2cap_sock_chan_ready_cb(struct l2cap_chan *chan)
+> >+{
+> >+	struct sock *sk = chan->sk;
+> >+	struct sock *parent;
+> >+
+> >+	lock_sock(sk);
+> >+
+> >+	parent = bt_sk(sk)->parent;
+> >+
+> >+	BT_DBG("sk %p, parent %p", sk, parent);
+> >+
+> >+	__clear_chan_timer(chan);
+> >+
+> >+	/* This clears all conf flags, including CONF_NOT_COMPLETE */
+> >+	chan->conf_state = 0;
+> >+
+> >+	chan->state = BT_CONNECTED;
 > 
-> The files that have been changed so far are:
->     primaries, characteristics, appearance, ccc, names, aliases,
->     longtermkeys, attributes, blocked.
+> Similar to patch 1, would there be some benefit to leaving the chan
+> code (timer clearing, state and conf_state modification) in
+> l2cap_core?  These things need to happen even if chan->ops->ready is
+> NULL.
 
-Any files that are used for BR/EDR would have to keep their backwards
-compatibility. Otherwise someone who upgrades from 4.99 to 4.100 will
-suddenly find that the device they had blocked is not blocked anymore
-and none of their devices have any names. We can't break something like
-that between 4.x versions. Are these patches guaranteeing this backwards
-compatibility? Looking at the patches it doesn't look like they give
-this guarantee.
+This can be done, then I would need to create new function like
+l2cap_chan_ready which do chan code and calls ready callback. I will try
+to come out with some solution later today.
 
-I thought I made it clear that we can break something like this only for
-LE (since 4.100 is the first version to be considered officially
-supporting LE) but not for BR/EDR.
+Best regards 
+Andrei Emeltchenko 
 
-I could have gone ahead and just applied the patches that are strictly
-LE-only and gone ahead with the 4.100 release, but since you've mixed a
-BR/EDR change and an LE change in 15/15 I can't do that. I think the way
-to proceed is to just do this storage change for LE-only files and then
-with 5.0 convert the others.
-
-One thing left for debate is do we still in 5.0 want to avoid a messed
-up system where someone has storage files from 4.x times and therefore
-gets incomplete device objects (created out of linkkeys files but most
-other data is missing, like names, etc). Probably we should ensure that
-either devices created out of such storage have all info or then the
-devices aren't created at all (meaning we may need to change the key
-format even for BR/EDR-only files like linkkeys).
-
-Johan
