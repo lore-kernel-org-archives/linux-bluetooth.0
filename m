@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/6] AVRCP: Add support for sending SetAbsoluteVolume
-Date: Thu, 24 May 2012 16:22:50 +0300
-Message-Id: <1337865771-11777-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/6] audio: Fix signature type for transport Volume
+Date: Thu, 24 May 2012 16:22:49 +0300
+Message-Id: <1337865771-11777-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1337865771-11777-1-git-send-email-luiz.dentz@gmail.com>
 References: <1337865771-11777-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,165 +11,22 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Once the transport volume is changed update the remote volume by sending
-SetAbsoluteVolume:
-
-< AVCTP: Command : pt 0x00 transaction 9 pid 0x110e
-    AV/C: Changed: address 0x48 opcode 0x00
-      Subunit: Panel
-      Opcode: Vendor Dependent
-      Company ID: 0x001958
-      AVRCP: SetAbsoluteVolume: pt Single len 0x0001
-        Volume: 100.00% (127/127)
-> AVCTP: Response : pt 0x00 transaction 9 pid 0x110e
-    AV/C: Accepted: address 0x48 opcode 0x00
-      Subunit: Panel
-      Opcode: Vendor Dependent
-      Company ID: 0x001958
-      AVRCP: SetAbsoluteVolume: pt Single len 0x0001
-        Volume: 100.00% (127/127)
+Signature is now uint16 instead of byte
 ---
- audio/avrcp.c     |   45 ++++++++++++++++++++++++++++++++++++++++++---
- audio/avrcp.h     |    2 ++
- audio/transport.c |   20 +++++++++++++++++++-
- 3 files changed, 63 insertions(+), 4 deletions(-)
+ audio/transport.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index b09fab0..eb5241f 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -87,6 +87,7 @@
- #define AVRCP_REGISTER_NOTIFICATION	0x31
- #define AVRCP_REQUEST_CONTINUING	0x40
- #define AVRCP_ABORT_CONTINUING		0x41
-+#define AVRCP_SET_ABSOLUTE_VOLUME	0x50
- 
- /* Capabilities for AVRCP_GET_CAPABILITIES pdu */
- #define CAP_COMPANY_ID		0x02
-@@ -1145,15 +1146,20 @@ static gboolean avrcp_handle_volume_changed(struct avctp *session,
- {
- 	struct avrcp_player *player = user_data;
- 	struct avrcp_header *pdu = (void *) operands;
--	uint8_t abs_volume = pdu->params[1] & 0x7F;
-+	uint8_t volume = pdu->params[1] & 0x7F;
- 
- 	if (code == AVC_CTYPE_REJECTED || code == AVC_CTYPE_NOT_IMPLEMENTED)
- 		return FALSE;
- 
-+	if (pdu->pdu_id == AVRCP_REGISTER_NOTIFICATION)
-+		volume = pdu->params[1] & 0x7F;
-+	else
-+		volume = pdu->params[0] & 0x7F;
-+
- 	if (player->cb->set_volume != NULL)
--		player->cb->set_volume(abs_volume, player->dev, player->user_data);
-+		player->cb->set_volume(volume, player->dev, player->user_data);
- 
--	return TRUE;
-+	return pdu->pdu_id == AVRCP_REGISTER_NOTIFICATION ? TRUE : FALSE;
- }
- 
- static void register_volume_notification(struct avrcp_player *player)
-@@ -1404,3 +1410,36 @@ void avrcp_unregister_player(struct avrcp_player *player)
- 
- 	player_destroy(player);
- }
-+
-+int avrcp_set_volume(struct audio_device *dev, uint8_t volume)
-+{
-+	struct avrcp_server *server;
-+	struct avrcp_player *player;
-+	uint8_t buf[AVRCP_HEADER_LENGTH + 1];
-+	struct avrcp_header *pdu = (void *) buf;
-+
-+	server = find_server(servers, &dev->src);
-+	if (server == NULL)
-+		return -EINVAL;
-+
-+	player = server->active_player;
-+	if (player == NULL)
-+		return -ENOTSUP;
-+
-+	if (player->session == NULL)
-+		return -ENOTCONN;
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	set_company_id(pdu->company_id, IEEEID_BTSIG);
-+
-+	pdu->pdu_id = AVRCP_SET_ABSOLUTE_VOLUME;
-+	pdu->params[0] = volume;
-+	pdu->params_len = htons(1);
-+
-+	DBG("volume=%u", volume);
-+
-+	return avctp_send_vendordep_req(player->session, AVC_CTYPE_CHANGED,
-+					AVC_SUBUNIT_PANEL, buf, sizeof(buf),
-+					avrcp_handle_volume_changed, player);
-+}
-diff --git a/audio/avrcp.h b/audio/avrcp.h
-index b520ef6..bf11a6c 100644
---- a/audio/avrcp.h
-+++ b/audio/avrcp.h
-@@ -93,6 +93,7 @@ void avrcp_unregister(const bdaddr_t *src);
- 
- gboolean avrcp_connect(struct audio_device *dev);
- void avrcp_disconnect(struct audio_device *dev);
-+int avrcp_set_volume(struct audio_device *dev, uint8_t volume);
- 
- struct avrcp_player *avrcp_register_player(const bdaddr_t *src,
- 						struct avrcp_player_cb *cb,
-@@ -102,4 +103,5 @@ void avrcp_unregister_player(struct avrcp_player *player);
- 
- int avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data);
- 
-+
- size_t avrcp_handle_vendor_reject(uint8_t *code, uint8_t *operands);
 diff --git a/audio/transport.c b/audio/transport.c
-index 6ed5d21..6406ec1 100644
+index 4ad8608..6ed5d21 100644
 --- a/audio/transport.c
 +++ b/audio/transport.c
-@@ -43,6 +43,7 @@
- #include "a2dp.h"
- #include "headset.h"
- #include "gateway.h"
-+#include "avrcp.h"
+@@ -1076,5 +1076,5 @@ void media_transport_update_volume(struct media_transport *transport,
  
- #ifndef DBUS_TYPE_UNIX_FD
- #define DBUS_TYPE_UNIX_FD -1
-@@ -77,7 +78,7 @@ struct media_transport {
- 	uint16_t		omtu;		/* Transport output mtu */
- 	uint16_t		delay;		/* Transport delay (a2dp only) */
- 	unsigned int		nrec_id;	/* Transport nrec watch (headset only) */
--	uint8_t			volume;		/* Transport volume */
-+	uint16_t		volume;		/* Transport volume */
- 	gboolean		read_lock;
- 	gboolean		write_lock;
- 	gboolean		in_use;
-@@ -753,6 +754,23 @@ static int set_property_a2dp(struct media_transport *transport,
- 
- 		/* FIXME: send new delay */
- 		return 0;
-+	} else if (g_strcmp0(property, "Volume") == 0) {
-+		uint16_t volume;
-+
-+		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_UINT16)
-+			return -EINVAL;
-+
-+		dbus_message_iter_get_basic(value, &volume);
-+
-+		if (volume > 127)
-+			return -EINVAL;
-+
-+		if (transport->volume == volume)
-+			return 0;
-+
-+		transport->volume = volume;
-+
-+		return avrcp_set_volume(transport->device, volume);
- 	}
- 
- 	return -EINVAL;
+ 	emit_property_changed(transport->conn, transport->path,
+ 				MEDIA_TRANSPORT_INTERFACE, "Volume",
+-				DBUS_TYPE_BYTE, &transport->volume);
++				DBUS_TYPE_UINT16, &transport->volume);
+ }
 -- 
 1.7.7.6
 
