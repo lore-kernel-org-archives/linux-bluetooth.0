@@ -1,55 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 05:14:05 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Reorganizing the BlueZ source tree
-Message-ID: <20120524081405.GA30941@joana>
+Date: Thu, 24 May 2012 11:10:40 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 00/12] Redundant D-Bus error init, remove unwanted
+ code, g_free missmatch etc
+Message-ID: <20120524081040.GA18388@x220>
+References: <1337788652-23697-1-git-send-email-s.syam@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1337788652-23697-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Everyone,
+Hi Syam,
 
-The last profiles addition to BlueZ increased a lot the number of folders we
-have in the root dir of the project and it looks like more profiles (and more
-folders) are expected to come.
+On Wed, May 23, 2012, Syam Sidhardhan wrote:
+> This series of patches resolves:
+> Memory leak, free - g_free mismatch, redundant D-Bus error initilization
+> and remove unwanted code.
+> 
+> Syam Sidhardhan (12):
+>   monitor: Fix memory leak
+>   storage: Use g_free() instead of free()
+>   media: Remove redundant D-Bus error initilization
+>   telephony-maemo5: Remove redundant D-Bus error initilizations
+>   telephony-maemo6: Remove redundant D-Bus error initilization
+>   telephony-ofono: Remove redundant D-Bus error initilization
+>   agent: Remove redundant D-Bus error initilizations
+>   Remove redundant D-Bus error initilization in maemo6 plugin
+>   avctp: Fix NULL check after dereference
+>   adapter: Remove unwanted if check and code
+>   audio: Remove unwanted code from manager
+>   input: Remove unwanted codes from device
+> 
+>  audio/avctp.c            |    3 ++-
+>  audio/manager.c          |    2 --
+>  audio/media.c            |    1 -
+>  audio/telephony-maemo5.c |    5 -----
+>  audio/telephony-maemo6.c |    1 -
+>  audio/telephony-ofono.c  |    1 -
+>  input/device.c           |    5 -----
+>  monitor/hcidump.c        |    3 ++-
+>  plugins/maemo6.c         |    1 -
+>  src/adapter.c            |    3 ---
+>  src/agent.c              |    5 -----
+>  src/storage.c            |    6 +++---
+>  12 files changed, 7 insertions(+), 29 deletions(-)
 
-I talked a bit with Johan about changing the hierarchy of the BlueZ tree and
-the following proposal where 2 new folders are created, 'profiles' and 'libs'
-and things are moved to them.
+I've applied all patches except the telephony ones. Those do not buy us
+very much but come with the expense of conflicting with the pending
+telephony driver removal patches (destined for 5.0). I also applied one
+extra patch from myself to do the agent variable removal suggested by
+Vinicius.
 
-compat          -> /dev/null (will be removed on 5.0)
-alert           -> profiles
-audio           -> profiles
-cups            -> profiles
-deviceinfo      -> profiles
-health          -> profiles
-input           -> profiles
-lib             -> profiles
-network         -> profiles
-proximity       -> profiles
-sap             -> profiles
-serial          -> profiles
-thermometer     -> profiles
-time            -> profiles
-btio            -> libs
-gdbus           -> libs
-sbc             -> libs
-emulator        -> tools
-mgmt            -> tools
-monitor         -> tools
-attrib
-doc
-plugins
-scripts
-src
-test
-tools
-unit
-
-
-In the end we will have 10 folders instead of 28 in the current configuration.
-Folders like 'tools' can also be reorganized.
-
-	Gustavo
+Johan
