@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 05/18] Bluetooth: A2MP: Add chan callbacks
-Date: Thu, 24 May 2012 14:38:15 +0300
-Message-Id: <1337859508-32274-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 06/18] Bluetooth: A2MP: Definitions for A2MP commands
+Date: Thu, 24 May 2012 14:38:16 +0300
+Message-Id: <1337859508-32274-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1337859508-32274-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1337859508-32274-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,72 +12,96 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add state change, close and skb allocation callbacks.
+Define A2MP command IDs and packet structures.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ include/net/bluetooth/a2mp.h |   73 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 73 insertions(+)
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index e7e5f5f..eb98541 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -63,8 +63,46 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
- 	kfree(cmd);
- }
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index 654df60..7cbeb91 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -31,6 +31,79 @@ struct a2mp_cmd {
+ 	__u8	data[0];
+ } __packed;
  
-+static void a2mp_chan_state_change_cb(void *data, int state)
-+{
-+	struct amp_mgr *mgr = data;
-+	struct l2cap_chan *chan;
++/* A2MP command codes */
++#define A2MP_COMMAND_REJ         0x01
++struct a2mp_cmd_rej {
++	__le16	reason;
++	__u8	data[0];
++} __packed;
 +
-+	if (!mgr)
-+		return;
++#define A2MP_DISCOVER_REQ        0x02
++struct a2mp_discov_req {
++	__le16	mtu;
++	__le16	ext_feat;
++} __packed;
 +
-+	chan = mgr->a2mp_chan;
++struct a2mp_cl {
++	__u8	id;
++	__u8	type;
++	__u8	status;
++} __packed;
 +
-+	BT_DBG("chan %p state %s", chan, state_to_string(state));
++#define A2MP_DISCOVER_RSP        0x03
++struct a2mp_discov_rsp {
++	__le16     mtu;
++	__le16     ext_feat;
++	struct a2mp_cl cl[0];
++} __packed;
 +
-+	chan->state = state;
++#define A2MP_CHANGE_NOTIFY       0x04
++#define A2MP_CHANGE_RSP          0x05
 +
-+	switch (state) {
-+	case BT_CLOSED:
-+		if (mgr)
-+			amp_mgr_put(mgr);
-+		break;
-+	}
-+}
++#define A2MP_GETINFO_REQ         0x06
++struct a2mp_info_req {
++	__u8       id;
++} __packed;
 +
-+static void a2mp_chan_close_cb(void *data)
-+{
-+	struct amp_mgr *mgr = data;
++#define A2MP_GETINFO_RSP         0x07
++struct a2mp_info_rsp {
++	__u8	id;
++	__u8	status;
++	__le32	total_bw;
++	__le32	max_bw;
++	__le32	min_latency;
++	__le16	pal_cap;
++	__le16	assoc_size;
++} __packed;
 +
-+	l2cap_chan_destroy(mgr->a2mp_chan);
-+}
++#define A2MP_GETAMPASSOC_REQ     0x08
++struct a2mp_amp_assoc_req {
++	__u8	id;
++} __packed;
 +
-+static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
-+					      unsigned long len, int nb)
-+{
-+	return bt_skb_alloc(len, GFP_KERNEL);
-+}
++#define A2MP_GETAMPASSOC_RSP     0x09
++struct a2mp_amp_assoc_rsp {
++	__u8	id;
++	__u8	status;
++	__u8	amp_assoc[0];
++} __packed;
 +
- static struct l2cap_ops a2mp_chan_ops = {
- 	.name = "L2CAP A2MP channel",
-+	.state_change = a2mp_chan_state_change_cb,
-+	.close = a2mp_chan_close_cb,
-+	.alloc_skb = a2mp_chan_alloc_skb_cb,
- };
- 
- static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
-@@ -110,6 +148,8 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
- 	chan->remote_mps = chan->omtu;
- 	chan->mps = chan->omtu;
- 
-+	chan->state = BT_CONNECTED;
++#define A2MP_CREATEPHYSLINK_REQ  0x0A
++#define A2MP_DISCONNPHYSLINK_REQ 0x0C
++struct a2mp_physlink_req {
++	__u8	local_id;
++	__u8	remote_id;
++	__u8	amp_assoc[0];
++} __packed;
 +
- 	return chan;
- }
++#define A2MP_CREATEPHYSLINK_RSP  0x0B
++#define A2MP_DISCONNPHYSLINK_RSP 0x0D
++struct a2mp_physlink_rsp {
++	__u8	local_id;
++	__u8	remote_id;
++	__u8	status;
++} __packed;
++
+ void amp_mgr_get(struct amp_mgr *mgr);
+ int amp_mgr_put(struct amp_mgr *mgr);
  
 -- 
 1.7.9.5
