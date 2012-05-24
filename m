@@ -1,69 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 08:59:57 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
-Subject: Re: [PATCHv1 01/17] Bluetooth: A2MP: Create A2MP channel
-In-Reply-To: <20120524075105.GB24715@aemeltch-MOBL1>
-Message-ID: <alpine.DEB.2.02.1205240853590.18142@mathewm-linux>
-References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1337351150-20526-2-git-send-email-Andrei.Emeltchenko.news@gmail.com> <alpine.DEB.2.02.1205221039100.2239@mathewm-linux> <20120523074950.GA32022@aemeltch-MOBL1>
- <alpine.DEB.2.02.1205230842040.6526@mathewm-linux> <20120524075105.GB24715@aemeltch-MOBL1>
+Date: Thu, 24 May 2012 11:42:01 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Mikel Astiz <mikel.astiz.oss@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [PATCH obexd v0 03/16] client: Add progress property to transfer
+Message-ID: <20120524144201.GA10754@samus>
+References: <1337785218-8661-1-git-send-email-mikel.astiz.oss@gmail.com>
+ <1337785218-8661-4-git-send-email-mikel.astiz.oss@gmail.com>
+ <20120523174016.GA32263@samus>
+ <CABBYNZLms7f_+85rPROq+pfgXMR3vMnc6pZv_9_2LY5HpzckZQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CABBYNZLms7f_+85rPROq+pfgXMR3vMnc6pZv_9_2LY5HpzckZQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Luiz,
 
-Hi Andrei -
+On 11:25 Thu 24 May, Luiz Augusto von Dentz wrote:
+> Hi Vinicius, Mikel,
+> 
+> On Wed, May 23, 2012 at 8:40 PM, Vinicius Costa Gomes
+> <vinicius.gomes@openbossa.org> wrote:
+> > Hi Mikel,
+> >
+> > On 17:00 Wed 23 May, Mikel Astiz wrote:
+> >> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+> >>
+> >> The number of transferred bytes is exposed in D-Bus using a specific
+> >> property for this purpose.
+> >>
+> >> Internally, the value of this property does not necessarily match the
+> >> internal progress counter. In order to avoid D-Bus overhead, the
+> >> property will be updated at least every N bytes, where N is fixed and
+> >> hardcoded (TRANSFER_PROGRESS_PERIOD).
+> >> ---
+> >>  client/transfer.c |   47 +++++++++++++++++++++++++++++++++++++++++++++--
+> >>  1 files changed, 45 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/client/transfer.c b/client/transfer.c
+> >> index 8292265..2c6e1ed 100644
+> >> --- a/client/transfer.c
+> >> +++ b/client/transfer.c
+> >> @@ -44,6 +44,7 @@
+> >>
+> >>  #define TRANSFER_INTERFACE  "org.openobex.Transfer"
+> >>  #define TRANSFER_BASEPATH   "/org/openobex"
+> >> +#define TRANSFER_PROGRESS_PERIOD (16 * 1024)
+> >
+> > Just a detail, but this value is half the value of the default Bluetooth
+> > MTU, right?
+> >
+> > For a future improvement, I think it would be nice to consider a value
+> > related to the MTU.
+> 
+> Actually I would rather do it time based, send progress once per
+> second, since with high speed this may spam the bus anyway.
 
-On Thu, 24 May 2012, Andrei Emeltchenko wrote:
-> On Wed, May 23, 2012 at 08:44:22AM -0700, Mat Martineau wrote:
->>>>> +static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
->>>>> +{
->>>>> +	struct l2cap_chan *chan;
->>>>> +
->>>>> +	chan = l2cap_chan_create();
->>>>> +	if (!chan)
->>>>> +		return NULL;
->>>>> +
->>>>> +	BT_DBG("chan %p", chan);
->>>>> +
->>>>> +	hci_conn_hold(conn->hcon);
->>>>
->>>> Holding the hcon will keep the ACL open after all of the other L2CAP
->>>> channels have closed (unless I missed some code later in the patch
->>>> series).  The A2MP fixed channel should not keep the ACL open.  If
->>>> the connection is not held here, then there shouldn't be a put in
->>>> l2cap_chan_del for the A2MP channel either.
->>>
->>> l2cap_chan_del makes hci_conn_put, also for a2mp channel. The behavior is
->>> the same for fixed and normal channels.
->>
->> And when does l2cap_chan_del get called for a fixed channel?  The
->> fixed channel must not do an hci_conn_hold so the ACL is allowed to
->> close when all dynamic L2CAP channels have closed.
->
-> The current approach is to have amp_mgr for hci_conn. It will be freed
-> when in hci_conn_del together with other l2cap channels in
-> hci_chan_list_flush and then we make amp_mgr_put() and destroy mgr.
->
-> The idea is to make a2mp chan similar to other chans and other chans do
-> hci_conn_hold and hci_conn_put. Otherwise I would need to add extra checks
-> before hci_conn_put which is ugly.
->
-> I've tested this with PTS and no memory leaks found so far.
+Yeah, that would be even better :-)
 
-The risk is not memory leaks - if the other device closes the ACL, 
-then the A2MP channel will be cleaned up.  But if you had two BlueZ 
-devices with A2MP connected to each other, the ACL would never close 
-as long as the devices remained powered and in range!  Nothing would 
-trigger the flush as long as the hci_conn is held.
+> 
+> 
+> -- 
+> Luiz Augusto von Dentz
 
-I think the checks for hci_conn_put are necessary, even if they are 
-ugly.
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
+Cheers,
+-- 
+Vinicius
