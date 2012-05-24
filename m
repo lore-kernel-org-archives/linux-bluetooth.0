@@ -1,36 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Daniel Wagner <wagi@monom.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Daniel Wagner <daniel.wagner@bmw-carit.de>
-Subject: [PATCH v1 0/3] Prefer PAN over DUN
-Date: Thu, 24 May 2012 12:00:15 +0200
-Message-Id: <1337853618-7261-1-git-send-email-wagi@monom.org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8;
+ format=flowed
+Date: Thu, 24 May 2012 11:56:56 +0200
+From: Steffen Becker <steffen.becker@tu-ilmenau.de>
+To: <linux-bluetooth@vger.kernel.org>
+Subject: are those patches =?UTF-8?Q?up-to-date=3F?=
+Message-ID: <31e819c2c3bf85abeabfbe74e3341826@localhost>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Daniel Wagner <daniel.wagner@bmw-carit.de>
+Hello there,
 
-Hi,
+I searched a little in your mail archive on gmane and found something 
+that looks similar to my problem. On 25th January 2011 and 26th October 
+2011 you pushed out two patches because of a security block issue -> 
+"[PATCH] bluetooth: Fix for security block issue." and "[PATCH] 
+Bluetooth: Revert: Fix L2CAP connection establishment".
 
-as discussed on #bluez I have added a configuration switch for
-this. 
+The postet hcidump message in the second mail (10/26/2011) looks very 
+similar to my hcidump message.
 
-cheers,
-daniel
+So I would like to know if those two patches are up-to-date 
+(compatibel with bluez4.99) and/or if they are already included in 
+bluez4.99 (so patching is not necessary) ?
 
-Daniel Wagner (3):
-  main: Add IngoreDUN configuration switch
-  serial: Add DUN_GW_UUID
-  device: Ignore DUN if PAN is present
+Regards,
 
- serial/common.h |   24 ++++++++++++++++++++++++
- src/device.c    |   20 ++++++++++++++++++++
- src/hcid.h      |    1 +
- src/main.c      |    9 +++++++++
- src/main.conf   |    5 +++++
- 5 files changed, 59 insertions(+)
- create mode 100644 serial/common.h
+Steffen
 
--- 
-1.7.10.130.g36e6c
+
+
+PS:
+
+Here are the URL's I'm talking about:
+
+http://thread.gmane.org/gmane.linux.bluez.kernel/17653/focus=17654
+
+http://thread.gmane.org/gmane.linux.bluez.kernel/10374
 
