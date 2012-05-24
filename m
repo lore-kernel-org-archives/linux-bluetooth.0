@@ -1,40 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 24 May 2012 13:43:06 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [RFC 0/8] Another step in l2cap_core/sock separation
+Message-ID: <20120524164306.GA3105@joana>
+References: <1337821964-4618-1-git-send-email-gustavo@padovan.org>
+ <20120524100228.GP24715@aemeltch-MOBL1>
 MIME-Version: 1.0
-In-Reply-To: <1337865771-11777-4-git-send-email-luiz.dentz@gmail.com>
-References: <1337865771-11777-1-git-send-email-luiz.dentz@gmail.com> <1337865771-11777-4-git-send-email-luiz.dentz@gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Thu, 24 May 2012 13:50:39 -0300
-Message-ID: <CAMOw1v5pMVKSeSLbU2Xbg+erLfeZvzzE3WjsCYwK=-t6zEyv8A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 4/6] audio: Fix signature type for transport Volume
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120524100228.GP24715@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, May 24, 2012 at 10:22 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Signature is now uint16 instead of byte
-> ---
->  audio/transport.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/audio/transport.c b/audio/transport.c
-> index 4ad8608..6ed5d21 100644
-> --- a/audio/transport.c
-> +++ b/audio/transport.c
-> @@ -1076,5 +1076,5 @@ void media_transport_update_volume(struct media_transport *transport,
->
->        emit_property_changed(transport->conn, transport->path,
->                                MEDIA_TRANSPORT_INTERFACE, "Volume",
-> -                               DBUS_TYPE_BYTE, &transport->volume);
-> +                               DBUS_TYPE_UINT16, &transport->volume);
+Hi Andrei,
 
-If you are changing it to uint16_t, why are you saying it's a "fix"?
+* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-05-24 13:02:29 +0300]:
 
-You should change transport->volume type together with this patch as well.
+> Hi Gustavo,
+> 
+> On Wed, May 23, 2012 at 10:12:36PM -0300, Gustavo Padovan wrote:
+> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > 
+> > Hi,
+> > 
+> > This patchset does a bit more of clean up in l2cap core, it was inially based
+> > on the two patches Andrei has sent to the list today.
+> 
+> Can this RFC be merged with other 2 RFC since otherwise I got lost. 
+> 
+> I also found that my mail reader indent your RFC in a strange way so I
+> thought that they are in the same series.
 
+And actually they the same series, I just thought twice that I was done with
+this patchset, but then I just found more work to do. 
 
-Lucas De Marchi
+	Gustavo
