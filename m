@@ -1,60 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 May 2012 14:57:07 -0300 (BRT)
-Message-Id: <20120524.145707.1901844181634748035.pcacjr@zytor.com>
-To: johan.hedberg@gmail.com
-Cc: paulo.alcantara@openbossa.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 00/15] Store address type on storage - remaining
- files
-From: Paulo Alcantara <pcacjr@zytor.com>
-In-Reply-To: <20120524075923.GA17458@x220>
-References: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
-	<20120524075923.GA17458@x220>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Date: Thu, 24 May 2012 10:55:55 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 0/8] Another step in l2cap_core/sock separation
+In-Reply-To: <20120524100228.GP24715@aemeltch-MOBL1>
+Message-ID: <alpine.DEB.2.02.1205241052070.18142@mathewm-linux>
+References: <1337821964-4618-1-git-send-email-gustavo@padovan.org> <20120524100228.GP24715@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Thu, 24 May 2012 10:59:23 +0300
+Gustavo -
 
-> Hi Paulo,
-> 
-> On Wed, May 23, 2012, Paulo Alcantara wrote:
-> > This patchset contains the remaining changes for the new storage format
-> > used (bdaddr#type) on storage files (LE-only or shared files).
-> > 
-> > The files that have been changed so far are:
-> >     primaries, characteristics, appearance, ccc, names, aliases,
-> >     longtermkeys, attributes, blocked.
-> 
-> Any files that are used for BR/EDR would have to keep their backwards
-> compatibility. Otherwise someone who upgrades from 4.99 to 4.100 will
-> suddenly find that the device they had blocked is not blocked anymore
-> and none of their devices have any names. We can't break something like
-> that between 4.x versions. Are these patches guaranteeing this backwards
-> compatibility? Looking at the patches it doesn't look like they give
-> this guarantee.
+On Thu, 24 May 2012, Andrei Emeltchenko wrote:
 
-Ok, you're right. The only file that we should keep backward compatibility on
-this series is the blocked file, since it's shared by both BR/EDR and LE devices.
+> Hi Gustavo,
+>
+> On Wed, May 23, 2012 at 10:12:36PM -0300, Gustavo Padovan wrote:
+>> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+>>
+>> Hi,
+>>
+>> This patchset does a bit more of clean up in l2cap core, it was inially based
+>> on the two patches Andrei has sent to the list today.
+>
+> Can this RFC be merged with other 2 RFC since otherwise I got lost.
+>
+> I also found that my mail reader indent your RFC in a strange way so I
+> thought that they are in the same series.
 
-I've just made a patch that ensures that we're keeping backward compatibility
-with this file (16/16).
+I agree -- using "--chain-reply-to" has made this group of RFC patches
+very difficult to read in a threaded email view.  Would you consider 
+using --no-chain-reply-to with git send-email?
 
-> I could have gone ahead and just applied the patches that are strictly
-> LE-only and gone ahead with the 4.100 release, but since you've mixed a
-> BR/EDR change and an LE change in 15/15 I can't do that. I think the way
-> to proceed is to just do this storage change for LE-only files and then
-> with 5.0 convert the others.
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
-I think you missed anything when looking at this patch. Note that the key
-variable initially contains only the bdaddr (but not the #type appended), so we
-can call delete_entry() for the BR/EDR-only files just before the sprintf() call
-(if the condition on if-statement gets true) which appends the "#type" in the
-key variable, thus avoiding to set the NULL byte at index 17 of the key variable
-for deleting the entries of the BR/EDR-only files.
-
-
-    	     	 Paulo
