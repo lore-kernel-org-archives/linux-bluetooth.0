@@ -4,18 +4,17 @@ To: linux-bluetooth@vger.kernel.org
 Cc: linux-wireless@vger.kernel.org,
 	Andrei Emeltchenko <andrei.emeltchenko@intel.com>,
 	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>, Bing Zhao <bzhao@marvell.com>
-Subject: [PATCH RESEND] Bluetooth: btmrvl: add SD8787 Bluetooth AMP device ID
-Date: Wed, 23 May 2012 18:50:04 -0700
-Message-Id: <1337824204-2380-1-git-send-email-bzhao@marvell.com>
+	Gustavo Padovan <padovan@profusion.mobi>,
+	Bing Zhao <bzhao@marvell.com>
+Subject: [PATCH] Bluetooth: btmrvl: add SD8787 Bluetooth AMP device ID
+Date: Wed, 23 May 2012 18:33:20 -0700
+Message-Id: <1337823200-1964-1-git-send-email-bzhao@marvell.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 SD8787 SDIO function 3 (device ID 0x911B) is for Bluetooth AMP.
 
 Signed-off-by: Bing Zhao <bzhao@marvell.com>
 ---
-Resending to Gustavo's current e-mail address
-
  drivers/bluetooth/btmrvl_sdio.c |    3 +++
  1 files changed, 3 insertions(+), 0 deletions(-)
 
