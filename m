@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/6] audio: Fix signature type for transport Volume
-Date: Thu, 24 May 2012 16:22:49 +0300
-Message-Id: <1337865771-11777-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/6] media-api: Update documentation to include Volume property
+Date: Thu, 24 May 2012 16:22:48 +0300
+Message-Id: <1337865771-11777-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1337865771-11777-1-git-send-email-luiz.dentz@gmail.com>
 References: <1337865771-11777-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,22 +11,26 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Signature is now uint16 instead of byte
 ---
- audio/transport.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ doc/media-api.txt |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
 
-diff --git a/audio/transport.c b/audio/transport.c
-index 4ad8608..6ed5d21 100644
---- a/audio/transport.c
-+++ b/audio/transport.c
-@@ -1076,5 +1076,5 @@ void media_transport_update_volume(struct media_transport *transport,
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index 7a593c3..4446439 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -341,3 +341,11 @@ Properties	object Device [readonly]
+ 			Optional. Indicates where is the transport being routed
  
- 	emit_property_changed(transport->conn, transport->path,
- 				MEDIA_TRANSPORT_INTERFACE, "Volume",
--				DBUS_TYPE_BYTE, &transport->volume);
-+				DBUS_TYPE_UINT16, &transport->volume);
- }
+ 			Possible Values: "HCI" or "PCM"
++
++		uint16 Volume [readwrite]
++
++			Optional. Indicates volume level of the transport,
++			this property is only writeable when the transport was
++			acquired by the sender.
++
++			Possible Values: 0-127
 -- 
 1.7.7.6
 
