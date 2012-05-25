@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAMOw1v5JAENx0xCVYN9C1apdukhqrBEsRsX+ffNAirXuP_aUTA@mail.gmail.com>
+In-Reply-To: <CAMOw1v5pMVKSeSLbU2Xbg+erLfeZvzzE3WjsCYwK=-t6zEyv8A@mail.gmail.com>
 References: <1337865771-11777-1-git-send-email-luiz.dentz@gmail.com>
-	<1337865771-11777-5-git-send-email-luiz.dentz@gmail.com>
-	<CAMOw1v5JAENx0xCVYN9C1apdukhqrBEsRsX+ffNAirXuP_aUTA@mail.gmail.com>
-Date: Fri, 25 May 2012 11:30:03 +0300
-Message-ID: <CABBYNZK6TynjJb2x0Unw9z0ZqxD0CWhveVuBMkFJ_cNZAav+7g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 5/6] AVRCP: Add support for sending SetAbsoluteVolume
+	<1337865771-11777-4-git-send-email-luiz.dentz@gmail.com>
+	<CAMOw1v5pMVKSeSLbU2Xbg+erLfeZvzzE3WjsCYwK=-t6zEyv8A@mail.gmail.com>
+Date: Fri, 25 May 2012 11:21:13 +0300
+Message-ID: <CABBYNZ+MQOG4AAk6ztWZBaF5+iTMzNvJUZetou=r4zq_tKqkaw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 4/6] audio: Fix signature type for transport Volume
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
@@ -16,82 +16,34 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Lucas,
 
-On Thu, May 24, 2012 at 8:08 PM, Lucas De Marchi
+On Thu, May 24, 2012 at 7:50 PM, Lucas De Marchi
 <lucas.demarchi@profusion.mobi> wrote:
->>        if (code == AVC_CTYPE_REJECTED || code == AVC_CTYPE_NOT_IMPLEMENTED)
->>                return FALSE;
+> On Thu, May 24, 2012 at 10:22 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >>
->> +       if (pdu->pdu_id == AVRCP_REGISTER_NOTIFICATION)
->> +               volume = pdu->params[1] & 0x7F;
->> +       else
->> +               volume = pdu->params[0] & 0x7F;
->> +
->>        if (player->cb->set_volume != NULL)
->> -               player->cb->set_volume(abs_volume, player->dev, player->user_data);
->> +               player->cb->set_volume(volume, player->dev, player->user_data);
+>> Signature is now uint16 instead of byte
+>> ---
+>>  audio/transport.c |    2 +-
+>>  1 files changed, 1 insertions(+), 1 deletions(-)
 >>
->> -       return TRUE;
->> +       return pdu->pdu_id == AVRCP_REGISTER_NOTIFICATION ? TRUE : FALSE;
+>> diff --git a/audio/transport.c b/audio/transport.c
+>> index 4ad8608..6ed5d21 100644
+>> --- a/audio/transport.c
+>> +++ b/audio/transport.c
+>> @@ -1076,5 +1076,5 @@ void media_transport_update_volume(struct media_transport *transport,
+>>
+>>        emit_property_changed(transport->conn, transport->path,
+>>                                MEDIA_TRANSPORT_INTERFACE, "Volume",
+>> -                               DBUS_TYPE_BYTE, &transport->volume);
+>> +                               DBUS_TYPE_UINT16, &transport->volume);
 >
-> I don't think tweaking this function to handle both callbacks as you
-> did is a good idea. One of the reasons is something is already missing
-> in this function: when you receive a "changed notification" you need
-> to re-register it for receiving subsequent notifications... i.e. in
-> this function you need to call register_volume_notification() again.
-> See the end of avrcp_player_event() function and section 6.7.2 of
-> AVRCP 1.4 spec:
+> If you are changing it to uint16_t, why are you saying it's a "fix"?
 >
-> "A registered notification gets changed on receiving CHANGED event
-> notification. For a new notification additional NOTIFY command is
-> expected to be sent. Only one EventID shall be used per notification
-> registration."
+> You should change transport->volume type together with this patch as well.
 
-Yep, spec authors always surprises me, apparently they choose racy
-design of one shot notification instead of normal
-subscribe/unsubscribe mechanism.
-
->>  }
->>
->>  static void register_volume_notification(struct avrcp_player *player)
->> @@ -1404,3 +1410,36 @@ void avrcp_unregister_player(struct avrcp_player *player)
->>
->>        player_destroy(player);
->>  }
->> +
->> +int avrcp_set_volume(struct audio_device *dev, uint8_t volume)
->> +{
->> +       struct avrcp_server *server;
->> +       struct avrcp_player *player;
->> +       uint8_t buf[AVRCP_HEADER_LENGTH + 1];
->> +       struct avrcp_header *pdu = (void *) buf;
->> +
->> +       server = find_server(servers, &dev->src);
->> +       if (server == NULL)
->> +               return -EINVAL;
->> +
->> +       player = server->active_player;
->> +       if (player == NULL)
->> +               return -ENOTSUP;
->> +
->> +       if (player->session == NULL)
->> +               return -ENOTCONN;
->> +
->> +       memset(buf, 0, sizeof(buf));
->> +
->> +       set_company_id(pdu->company_id, IEEEID_BTSIG);
->> +
->> +       pdu->pdu_id = AVRCP_SET_ABSOLUTE_VOLUME;
->> +       pdu->params[0] = volume;
->> +       pdu->params_len = htons(1);
->> +
->> +       DBG("volume=%u", volume);
->> +
->> +       return avctp_send_vendordep_req(player->session, AVC_CTYPE_CHANGED,
->
-> wrong CTYPE... it should be CONTROL
-
-Gonna fix it.
-
+Its a fix because this was first introduced and byte type, but you are
+right about uint16_t should be done in this patch.
 
 
 -- 
