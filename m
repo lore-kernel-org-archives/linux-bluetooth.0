@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Paulo Alcantara <paulo.alcantara@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ v3 10/18] core: Fix creating device from "longtermkeys" file
-Date: Fri, 25 May 2012 12:47:02 -0300
-Message-Id: <1337960830-3506-11-git-send-email-paulo.alcantara@openbossa.org>
+Subject: [PATCH BlueZ v3 09/18] storage: Store address type in "longtermkeys" file
+Date: Fri, 25 May 2012 12:47:01 -0300
+Message-Id: <1337960830-3506-10-git-send-email-paulo.alcantara@openbossa.org>
 In-Reply-To: <1337960830-3506-1-git-send-email-paulo.alcantara@openbossa.org>
 References: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
  <1337960830-3506-1-git-send-email-paulo.alcantara@openbossa.org>
@@ -12,79 +12,97 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/adapter.c |   26 ++++++++++++++++----------
- 1 files changed, 16 insertions(+), 10 deletions(-)
+ src/device.c  |    3 ++-
+ src/event.c   |    2 +-
+ src/storage.c |   16 ++++++++++------
+ src/storage.h |    5 +++--
+ 4 files changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 2776204..c1caffd 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1787,7 +1787,8 @@ static struct link_key_info *get_key_info(const char *addr, const char *value)
- 	return info;
+diff --git a/src/device.c b/src/device.c
+index e44ce58..2357684 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1090,7 +1090,8 @@ struct btd_device *device_create(DBusConnection *conn,
+ 		device_set_bonded(device, TRUE);
+ 	}
+ 
+-	if (device_is_le(device) && has_longtermkeys(&src, &device->bdaddr)) {
++	if (device_is_le(device) && has_longtermkeys(&src, &device->bdaddr,
++							device->bdaddr_type)) {
+ 		device_set_paired(device, TRUE);
+ 		device_set_bonded(device, TRUE);
+ 	}
+diff --git a/src/event.c b/src/event.c
+index a1fc016..acfcef3 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -397,7 +397,7 @@ static int store_longtermkey(bdaddr_t *local, bdaddr_t *peer,
+ 	newkey = g_string_append(newkey, str);
+ 	g_free(str);
+ 
+-	err = write_longtermkeys(local, peer, newkey->str);
++	err = write_longtermkeys(local, peer, bdaddr_type, newkey->str);
+ 
+ 	g_string_free(newkey, TRUE);
+ 
+diff --git a/src/storage.c b/src/storage.c
+index 1eb916f..caee8f0 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -1379,9 +1379,10 @@ void delete_device_ccc(bdaddr_t *local, bdaddr_t *peer)
+ 	delete_by_pattern(filename, addr);
  }
  
--static struct smp_ltk_info *get_ltk_info(const char *addr, const char *value)
-+static struct smp_ltk_info *get_ltk_info(const char *addr, uint8_t bdaddr_type,
-+							const char *value)
+-int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key)
++int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
++								const char *key)
  {
- 	struct smp_ltk_info *ltk;
- 	char *ptr;
-@@ -1802,14 +1803,15 @@ static struct smp_ltk_info *get_ltk_info(const char *addr, const char *value)
+-	char filename[PATH_MAX + 1], addr[18];
++	char filename[PATH_MAX + 1], addr[20];
  
- 	str2ba(addr, &ltk->bdaddr);
+ 	if (!key)
+ 		return -EINVAL;
+@@ -1391,18 +1392,21 @@ int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key)
+ 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
  
-+	ltk->bdaddr_type = bdaddr_type;
+ 	ba2str(peer, addr);
++	sprintf(&addr[17], "#%hhu", bdaddr_type);
 +
- 	str2buf(value, ltk->val, sizeof(ltk->val));
+ 	return textfile_put(filename, addr, key);
+ }
  
- 	ptr = (char *) value + 2 * sizeof(ltk->val) + 1;
+-gboolean has_longtermkeys(bdaddr_t *local, bdaddr_t *peer)
++gboolean has_longtermkeys(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type)
+ {
+-	char filename[PATH_MAX + 1], addr[18], *str;
++	char filename[PATH_MAX + 1], key[20], *str;
  
--	ret = sscanf(ptr, " %hhd %hhd %hhd %hhd %hd %n",
--					(uint8_t *) &ltk->bdaddr_type,
--					&ltk->authenticated, &ltk->master,
--					&ltk->enc_size, &ltk->ediv, &i);
-+	ret = sscanf(ptr, " %hhd %hhd %hhd %hd %n",
-+		     &ltk->authenticated, &ltk->master, &ltk->enc_size,
-+							&ltk->ediv, &i);
- 	if (ret < 2) {
- 		g_free(ltk);
- 		return NULL;
-@@ -1851,26 +1853,30 @@ static void create_stored_device_from_ltks(char *key, char *value,
- 	struct btd_adapter *adapter = keys->adapter;
- 	struct btd_device *device;
- 	struct smp_ltk_info *info;
--	char srcaddr[18];
-+	char address[18], srcaddr[18];
-+	uint8_t bdaddr_type;
- 	bdaddr_t src;
+ 	create_filename(filename, PATH_MAX, local, "longtermkeys");
  
--	info = get_ltk_info(key, value);
-+	if (sscanf(key, "%17s#%hhu", address, &bdaddr_type) < 2)
-+		return;
-+
-+	info = get_ltk_info(address, bdaddr_type, value);
- 	if (info == NULL)
- 		return;
+-	ba2str(peer, addr);
++	ba2str(peer, key);
++	sprintf(&key[17], "#%hhu", bdaddr_type);
  
- 	keys->keys = g_slist_append(keys->keys, info);
+-	str = textfile_caseget(filename, addr);
++	str = textfile_caseget(filename, key);
+ 	if (str) {
+ 		free(str);
+ 		return TRUE;
+diff --git a/src/storage.h b/src/storage.h
+index 9032801..67364df 100644
+--- a/src/storage.h
++++ b/src/storage.h
+@@ -101,7 +101,8 @@ int read_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
+ int write_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
+ 					uint16_t handle, uint16_t value);
+ void delete_device_ccc(bdaddr_t *local, bdaddr_t *peer);
+-int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key);
+-gboolean has_longtermkeys(bdaddr_t *local, bdaddr_t *peer);
++int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
++							const char *key);
++gboolean has_longtermkeys(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type);
  
--	if (g_slist_find_custom(adapter->devices, key,
-+	if (g_slist_find_custom(adapter->devices, address,
- 					(GCompareFunc) device_address_cmp))
- 		return;
- 
- 	adapter_get_address(adapter, &src);
- 	ba2str(&src, srcaddr);
- 
--	if (g_strcmp0(srcaddr, key) == 0)
-+	if (g_strcmp0(srcaddr, address) == 0)
- 		return;
- 
--	device = device_create(connection, adapter, key, info->bdaddr_type);
-+	device = device_create(connection, adapter, address, bdaddr_type);
- 	if (device) {
- 		device_set_temporary(device, FALSE);
- 		adapter->devices = g_slist_append(adapter->devices, device);
+ #define PNP_UUID		"00001200-0000-1000-8000-00805f9b34fb"
 -- 
 1.7.7.6
 
