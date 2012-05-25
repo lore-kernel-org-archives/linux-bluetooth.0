@@ -1,113 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 From: Paulo Alcantara <paulo.alcantara@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v3 05/18] storage: Store address type in "aliases" file
-Date: Fri, 25 May 2012 12:46:57 -0300
-Message-Id: <1337960830-3506-6-git-send-email-paulo.alcantara@openbossa.org>
+Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
+Subject: [PATCH BlueZ v3 06/18] core: Fix reading stored data from "aliases" and "names" file
+Date: Fri, 25 May 2012 12:46:58 -0300
+Message-Id: <1337960830-3506-7-git-send-email-paulo.alcantara@openbossa.org>
 In-Reply-To: <1337960830-3506-1-git-send-email-paulo.alcantara@openbossa.org>
 References: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
  <1337960830-3506-1-git-send-email-paulo.alcantara@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-
 ---
- src/device.c  |    7 ++++---
- src/storage.c |   16 ++++++++++++----
- src/storage.h |    6 ++++--
- 3 files changed, 20 insertions(+), 9 deletions(-)
+ src/adapter.c |   16 ++++++++++------
+ 1 files changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index e239da6..a91eba7 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -458,8 +458,8 @@ static DBusMessage *set_alias(DBusConnection *conn, DBusMessage *msg,
- 	ba2str(&device->bdaddr, dstaddr);
- 
- 	/* Remove alias if empty string */
--	err = write_device_alias(srcaddr, dstaddr,
--			g_str_equal(alias, "") ? NULL : alias);
-+	err = write_device_alias(srcaddr, dstaddr, device->bdaddr_type,
-+					g_str_equal(alias, "") ? NULL : alias);
- 	if (err < 0)
- 		return btd_error_failed(msg, strerror(-err));
- 
-@@ -1077,7 +1077,8 @@ struct btd_device *device_create(DBusConnection *conn,
- 	ba2str(&src, srcaddr);
- 
- 	read_device_name(srcaddr, address, bdaddr_type, device->name);
--	if (read_device_alias(srcaddr, address, alias, sizeof(alias)) == 0)
-+	if (read_device_alias(srcaddr, address, bdaddr_type, alias,
-+							sizeof(alias)) == 0)
- 		device->alias = g_strdup(alias);
- 	device->trusted = read_trust(&src, address, GLOBAL_TRUST);
- 
-diff --git a/src/storage.c b/src/storage.c
-index 6fe9279..f2eaae1 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -61,14 +61,18 @@ static inline int create_filename(char *buf, size_t size,
- 	return create_name(buf, size, STORAGEDIR, addr, name);
+diff --git a/src/adapter.c b/src/adapter.c
+index a364935..2776204 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2833,16 +2833,19 @@ static gboolean pairing_is_legacy(bdaddr_t *local, bdaddr_t *peer,
+ 		return TRUE;
  }
  
--int read_device_alias(const char *src, const char *dst, char *alias, size_t size)
-+int read_device_alias(const char *src, const char *dst, uint8_t bdaddr_type,
-+						char *alias, size_t size)
+-static char *read_stored_data(bdaddr_t *local, bdaddr_t *peer, const char *file)
++static char *read_stored_data(bdaddr_t *local, bdaddr_t *peer,
++			      uint8_t bdaddr_type, const char *file)
  {
- 	char filename[PATH_MAX + 1], *tmp;
-+	char key[20];
- 	int err;
+-	char local_addr[18], peer_addr[18], filename[PATH_MAX + 1];
++	char local_addr[18], key[20], filename[PATH_MAX + 1];
  
- 	create_name(filename, PATH_MAX, STORAGEDIR, src, "aliases");
+ 	ba2str(local, local_addr);
+-	ba2str(peer, peer_addr);
  
--	tmp = textfile_get(filename, dst);
-+	snprintf(key, sizeof(key), "%17s#%hhu", dst, bdaddr_type);
+ 	create_name(filename, PATH_MAX, STORAGEDIR, local_addr, file);
+ 
+-	return textfile_get(filename, peer_addr);
++	ba2str(peer, key);
++	sprintf(&key[17], "#%hhu", bdaddr_type);
 +
-+	tmp = textfile_get(filename, key);
- 	if (!tmp)
- 		return -ENXIO;
- 
-@@ -79,15 +83,19 @@ int read_device_alias(const char *src, const char *dst, char *alias, size_t size
- 	return err < 0 ? -EIO : 0;
++	return textfile_get(filename, key);
  }
  
--int write_device_alias(const char *src, const char *dst, const char *alias)
-+int write_device_alias(const char *src, const char *dst, uint8_t bdaddr_type,
-+							const char *alias)
- {
- 	char filename[PATH_MAX + 1];
-+	char key[20];
+ void adapter_update_found_devices(struct btd_adapter *adapter,
+@@ -2900,7 +2903,7 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
  
- 	create_name(filename, PATH_MAX, STORAGEDIR, src, "aliases");
+ 	/* New device in the discovery session */
  
- 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+-	name = read_stored_data(&adapter->bdaddr, bdaddr, "names");
++	name = read_stored_data(&adapter->bdaddr, bdaddr, bdaddr_type, "names");
  
--	return textfile_put(filename, dst, alias);
-+	snprintf(key, sizeof(key), "%17s#%hhu", dst, bdaddr_type);
-+
-+	return textfile_put(filename, key, alias);
- }
+ 	if (bdaddr_type == BDADDR_BREDR) {
+ 		legacy = pairing_is_legacy(&adapter->bdaddr, bdaddr, data,
+@@ -2920,7 +2923,8 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
+ 		adapter_ops->confirm_name(adapter->dev_id, bdaddr, bdaddr_type,
+ 								name_known);
  
- int write_discoverable_timeout(bdaddr_t *bdaddr, int timeout)
-diff --git a/src/storage.h b/src/storage.h
-index 7443d6f..eda7f9b 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -23,8 +23,10 @@
+-	alias = read_stored_data(&adapter->bdaddr, bdaddr, "aliases");
++	alias = read_stored_data(&adapter->bdaddr, bdaddr, bdaddr_type,
++								"aliases");
  
- #include "textfile.h"
- 
--int read_device_alias(const char *src, const char *dst, char *alias, size_t size);
--int write_device_alias(const char *src, const char *dst, const char *alias);
-+int read_device_alias(const char *src, const char *dst, uint8_t bdaddr_type,
-+						char *alias, size_t size);
-+int write_device_alias(const char *src, const char *dst, uint8_t bdaddr_type,
-+							const char *alias);
- int write_discoverable_timeout(bdaddr_t *bdaddr, int timeout);
- int read_discoverable_timeout(const char *src, int *timeout);
- int write_pairable_timeout(bdaddr_t *bdaddr, int timeout);
+ 	dev = found_device_new(bdaddr, bdaddr_type, name, alias, dev_class,
+ 						legacy, eir_data.flags);
 -- 
 1.7.7.6
 
