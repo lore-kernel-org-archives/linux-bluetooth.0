@@ -2,63 +2,44 @@ Return-Path: <cyrus@holtmann.org>
 From: Paulo Alcantara <paulo.alcantara@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ v3 15/18] core: Fix deleting entries
-Date: Fri, 25 May 2012 12:47:07 -0300
-Message-Id: <1337960830-3506-16-git-send-email-paulo.alcantara@openbossa.org>
+Subject: [PATCH BlueZ v3 16/18] storage: Keep backward compatibility in "blocked" file
+Date: Fri, 25 May 2012 12:47:08 -0300
+Message-Id: <1337960830-3506-17-git-send-email-paulo.alcantara@openbossa.org>
 In-Reply-To: <1337960830-3506-1-git-send-email-paulo.alcantara@openbossa.org>
 References: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
  <1337960830-3506-1-git-send-email-paulo.alcantara@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The "aliases" and "longtermkeys" files now use the new storage format,
-so the correct keys must be passed to delete_entry() function.
+The "blocked" file is shared by both BR/EDR and LE devices, so we must
+keep backward compatibility with the old storage format.
 ---
- src/device.c |   21 ++++++++++++++-------
- 1 files changed, 14 insertions(+), 7 deletions(-)
+ src/storage.c |   10 +++++++++-
+ 1 files changed, 9 insertions(+), 1 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 2357684..89a78cf 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1155,23 +1155,30 @@ uint16_t btd_device_get_version(struct btd_device *device)
- static void device_remove_stored(struct btd_device *device)
- {
- 	bdaddr_t src;
--	char addr[18];
-+	char key[20];
- 	DBusConnection *conn = get_dbus_connection();
+diff --git a/src/storage.c b/src/storage.c
+index 33dcace..cb7cde2 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -1155,9 +1155,17 @@ gboolean read_blocked(const bdaddr_t *local, const bdaddr_t *remote,
+ 	sprintf(&key[17], "#%hhu", bdaddr_type);
  
- 	adapter_get_address(device->adapter, &src);
--	ba2str(&device->bdaddr, addr);
-+	ba2str(&device->bdaddr, key);
+ 	str = textfile_caseget(filename, key);
+-	if (!str)
++	if (str != NULL)
++		goto done;
 +
-+	/* key: address only */
-+	delete_entry(&src, "profiles", key);
-+	delete_entry(&src, "trusts", key);
++	/* Try old format (address only) */
++	key[17] = '\0';
++
++	str = textfile_caseget(filename, key);
++	if (str == NULL)
+ 		return FALSE;
  
- 	if (device_is_bonded(device)) {
--		delete_entry(&src, "linkkeys", addr);
--		delete_entry(&src, "aliases", addr);
--		delete_entry(&src, "longtermkeys", addr);
-+		delete_entry(&src, "linkkeys", key);
-+
-+		/* key: appending address type */
-+		sprintf(&key[17], "#%hhu", device->bdaddr_type);
-+
-+		delete_entry(&src, "aliases", key);
-+		delete_entry(&src, "longtermkeys", key);
- 		device_set_bonded(device, FALSE);
- 		device->paired = FALSE;
- 		btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
- 							device->bdaddr_type);
- 	}
--	delete_entry(&src, "profiles", addr);
--	delete_entry(&src, "trusts", addr);
-+
- 	delete_all_records(&src, &device->bdaddr);
- 	delete_device_service(&src, &device->bdaddr, device->bdaddr_type);
++done:
+ 	free(str);
  
+ 	return TRUE;
 -- 
 1.7.7.6
 
