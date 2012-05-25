@@ -1,46 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1337958437.30100.2.camel@joe2Laptop>
-Subject: Re: [RFC] vsprintf: Add %pMR for Bluetooth MAC address
-From: Joe Perches <joe@perches.com>
-To: andrei.emeltchenko.news@gmail.com
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Date: Fri, 25 May 2012 08:07:17 -0700
-In-Reply-To: <1337956368-30621-1-git-send-email-andrei.emeltchenko.news@gmail.com>
-References: <1336778486.16292.0.camel@joe2Laptop>
-	 <1337956368-30621-1-git-send-email-andrei.emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 6/6] audio: Add Volume property to A2DP transport GetProperties
+Date: Fri, 25 May 2012 18:02:48 +0300
+Message-Id: <1337958168-9875-6-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1337958168-9875-1-git-send-email-luiz.dentz@gmail.com>
+References: <1337958168-9875-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2012-05-25 at 17:32 +0300, andrei.emeltchenko.news@gmail.com
-wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Hi Andrei.
+Now that volume is being handled by SetProperty it should also be
+available in GetProperties.
+---
+ audio/transport.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-Just trivia:
-
-> @@ -830,6 +840,7 @@ int kptr_restrict __read_mostly;
->   * - 'm' For a 6-byte MAC address, it prints the hex address without colons
->   * - 'MF' For a 6-byte MAC FDDI address, it prints the address
->   *       with a dash-separated hex notation
-> + * - '[mM]R For a 6-byte MAC Bluetooth address, bits reversed
-
-Reverse order
-
->   * - 'I' [46] for IPv4/IPv6 addresses printed in the usual way
->   *       IPv4 uses dot-separated decimal without leading 0's (1.2.3.4)
->   *       IPv6 uses colon separated network-order 16 bit hex with leading 0's
-> @@ -890,7 +901,8 @@ char *pointer(const char *fmt, char *buf, char *end, void *ptr,
->  		return resource_string(buf, end, ptr, spec, fmt);
->  	case 'M':			/* Colon separated: 00:01:02:03:04:05 */
->  	case 'm':			/* Contiguous: 000102030405 */
-> -					/* [mM]F (FDDI, bit reversed) */
-> +					/* [mM]F (FDDI) */
-> +					/* [mM]R (Bluetooth, bits reversed) */
-
-here too
-
+diff --git a/audio/transport.c b/audio/transport.c
+index bf86390..4273282 100644
+--- a/audio/transport.c
++++ b/audio/transport.c
+@@ -858,6 +858,10 @@ static void get_properties_a2dp(struct media_transport *transport,
+ 						DBusMessageIter *dict)
+ {
+ 	dict_append_entry(dict, "Delay", DBUS_TYPE_UINT16, &transport->delay);
++
++	if (transport->volume <= 127)
++		dict_append_entry(dict, "Volume", DBUS_TYPE_UINT16,
++							&transport->volume);
+ }
+ 
+ static void get_properties_headset(struct media_transport *transport,
+@@ -1013,6 +1017,7 @@ struct media_transport *media_transport_create(DBusConnection *conn,
+ 	transport->size = size;
+ 	transport->path = g_strdup_printf("%s/fd%d", device->path, fd++);
+ 	transport->fd = -1;
++	transport->volume = -1;
+ 
+ 	uuid = media_endpoint_get_uuid(endpoint);
+ 	if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0 ||
+-- 
+1.7.7.6
 
