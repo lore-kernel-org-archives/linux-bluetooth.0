@@ -1,136 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Use __constant modifier in HCI code
-Date: Fri, 25 May 2012 11:38:27 +0300
-Message-Id: <1337935107-28902-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAMOw1v5JAENx0xCVYN9C1apdukhqrBEsRsX+ffNAirXuP_aUTA@mail.gmail.com>
+References: <1337865771-11777-1-git-send-email-luiz.dentz@gmail.com>
+	<1337865771-11777-5-git-send-email-luiz.dentz@gmail.com>
+	<CAMOw1v5JAENx0xCVYN9C1apdukhqrBEsRsX+ffNAirXuP_aUTA@mail.gmail.com>
+Date: Fri, 25 May 2012 11:30:03 +0300
+Message-ID: <CABBYNZK6TynjJb2x0Unw9z0ZqxD0CWhveVuBMkFJ_cNZAav+7g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 5/6] AVRCP: Add support for sending SetAbsoluteVolume
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Lucas,
+
+On Thu, May 24, 2012 at 8:08 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+>>        if (code == AVC_CTYPE_REJECTED || code == AVC_CTYPE_NOT_IMPLEMENTED)
+>>                return FALSE;
+>>
+>> +       if (pdu->pdu_id == AVRCP_REGISTER_NOTIFICATION)
+>> +               volume = pdu->params[1] & 0x7F;
+>> +       else
+>> +               volume = pdu->params[0] & 0x7F;
+>> +
+>>        if (player->cb->set_volume != NULL)
+>> -               player->cb->set_volume(abs_volume, player->dev, player->user_data);
+>> +               player->cb->set_volume(volume, player->dev, player->user_data);
+>>
+>> -       return TRUE;
+>> +       return pdu->pdu_id == AVRCP_REGISTER_NOTIFICATION ? TRUE : FALSE;
+>
+> I don't think tweaking this function to handle both callbacks as you
+> did is a good idea. One of the reasons is something is already missing
+> in this function: when you receive a "changed notification" you need
+> to re-register it for receiving subsequent notifications... i.e. in
+> this function you need to call register_volume_notification() again.
+> See the end of avrcp_player_event() function and section 6.7.2 of
+> AVRCP 1.4 spec:
+>
+> "A registered notification gets changed on receiving CHANGED event
+> notification. For a new notification additional NOTIFY command is
+> expected to be sent. Only one EventID shall be used per notification
+> registration."
+
+Yep, spec authors always surprises me, apparently they choose racy
+design of one shot notification instead of normal
+subscribe/unsubscribe mechanism.
+
+>>  }
+>>
+>>  static void register_volume_notification(struct avrcp_player *player)
+>> @@ -1404,3 +1410,36 @@ void avrcp_unregister_player(struct avrcp_player *player)
+>>
+>>        player_destroy(player);
+>>  }
+>> +
+>> +int avrcp_set_volume(struct audio_device *dev, uint8_t volume)
+>> +{
+>> +       struct avrcp_server *server;
+>> +       struct avrcp_player *player;
+>> +       uint8_t buf[AVRCP_HEADER_LENGTH + 1];
+>> +       struct avrcp_header *pdu = (void *) buf;
+>> +
+>> +       server = find_server(servers, &dev->src);
+>> +       if (server == NULL)
+>> +               return -EINVAL;
+>> +
+>> +       player = server->active_player;
+>> +       if (player == NULL)
+>> +               return -ENOTSUP;
+>> +
+>> +       if (player->session == NULL)
+>> +               return -ENOTCONN;
+>> +
+>> +       memset(buf, 0, sizeof(buf));
+>> +
+>> +       set_company_id(pdu->company_id, IEEEID_BTSIG);
+>> +
+>> +       pdu->pdu_id = AVRCP_SET_ABSOLUTE_VOLUME;
+>> +       pdu->params[0] = volume;
+>> +       pdu->params_len = htons(1);
+>> +
+>> +       DBG("volume=%u", volume);
+>> +
+>> +       return avctp_send_vendordep_req(player->session, AVC_CTYPE_CHANGED,
+>
+> wrong CTYPE... it should be CONTROL
+
+Gonna fix it.
 
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/hci_conn.c  |   36 ++++++++++++++++++------------------
- net/bluetooth/hci_core.c  |    2 +-
- net/bluetooth/hci_event.c |    6 +++---
- 3 files changed, 22 insertions(+), 22 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 111e549..1458667b 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -41,15 +41,15 @@ static void hci_le_connect(struct hci_conn *conn)
- 	conn->sec_level = BT_SECURITY_LOW;
- 
- 	memset(&cp, 0, sizeof(cp));
--	cp.scan_interval = cpu_to_le16(0x0060);
--	cp.scan_window = cpu_to_le16(0x0030);
-+	cp.scan_interval = __constant_cpu_to_le16(0x0060);
-+	cp.scan_window = __constant_cpu_to_le16(0x0030);
- 	bacpy(&cp.peer_addr, &conn->dst);
- 	cp.peer_addr_type = conn->dst_type;
--	cp.conn_interval_min = cpu_to_le16(0x0028);
--	cp.conn_interval_max = cpu_to_le16(0x0038);
--	cp.supervision_timeout = cpu_to_le16(0x002a);
--	cp.min_ce_len = cpu_to_le16(0x0000);
--	cp.max_ce_len = cpu_to_le16(0x0000);
-+	cp.conn_interval_min = __constant_cpu_to_le16(0x0028);
-+	cp.conn_interval_max = __constant_cpu_to_le16(0x0038);
-+	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
-+	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
-+	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
- 
- 	hci_send_cmd(hdev, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
- }
-@@ -86,7 +86,7 @@ void hci_acl_connect(struct hci_conn *conn)
- 			cp.pscan_rep_mode = ie->data.pscan_rep_mode;
- 			cp.pscan_mode     = ie->data.pscan_mode;
- 			cp.clock_offset   = ie->data.clock_offset |
--							cpu_to_le16(0x8000);
-+					    __constant_cpu_to_le16(0x8000);
- 		}
- 
- 		memcpy(conn->dev_class, ie->data.dev_class, 3);
-@@ -162,9 +162,9 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
- 	cp.handle   = cpu_to_le16(handle);
- 	cp.pkt_type = cpu_to_le16(conn->pkt_type);
- 
--	cp.tx_bandwidth   = cpu_to_le32(0x00001f40);
--	cp.rx_bandwidth   = cpu_to_le32(0x00001f40);
--	cp.max_latency    = cpu_to_le16(0xffff);
-+	cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
-+	cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
-+	cp.max_latency    = __constant_cpu_to_le16(0xffff);
- 	cp.voice_setting  = cpu_to_le16(hdev->voice_setting);
- 	cp.retrans_effort = 0xff;
- 
-@@ -184,8 +184,8 @@ void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max,
- 	cp.conn_interval_max	= cpu_to_le16(max);
- 	cp.conn_latency		= cpu_to_le16(latency);
- 	cp.supervision_timeout	= cpu_to_le16(to_multiplier);
--	cp.min_ce_len		= cpu_to_le16(0x0001);
--	cp.max_ce_len		= cpu_to_le16(0x0001);
-+	cp.min_ce_len		= __constant_cpu_to_le16(0x0001);
-+	cp.max_ce_len		= __constant_cpu_to_le16(0x0001);
- 
- 	hci_send_cmd(hdev, HCI_OP_LE_CONN_UPDATE, sizeof(cp), &cp);
- }
-@@ -280,9 +280,9 @@ static void hci_conn_enter_sniff_mode(struct hci_conn *conn)
- 	if (lmp_sniffsubr_capable(hdev) && lmp_sniffsubr_capable(conn)) {
- 		struct hci_cp_sniff_subrate cp;
- 		cp.handle             = cpu_to_le16(conn->handle);
--		cp.max_latency        = cpu_to_le16(0);
--		cp.min_remote_timeout = cpu_to_le16(0);
--		cp.min_local_timeout  = cpu_to_le16(0);
-+		cp.max_latency        = __constant_cpu_to_le16(0);
-+		cp.min_remote_timeout = __constant_cpu_to_le16(0);
-+		cp.min_local_timeout  = __constant_cpu_to_le16(0);
- 		hci_send_cmd(hdev, HCI_OP_SNIFF_SUBRATE, sizeof(cp), &cp);
- 	}
- 
-@@ -291,8 +291,8 @@ static void hci_conn_enter_sniff_mode(struct hci_conn *conn)
- 		cp.handle       = cpu_to_le16(conn->handle);
- 		cp.max_interval = cpu_to_le16(hdev->sniff_max_interval);
- 		cp.min_interval = cpu_to_le16(hdev->sniff_min_interval);
--		cp.attempt      = cpu_to_le16(4);
--		cp.timeout      = cpu_to_le16(1);
-+		cp.attempt      = __constant_cpu_to_le16(4);
-+		cp.timeout      = __constant_cpu_to_le16(1);
- 		hci_send_cmd(hdev, HCI_OP_SNIFF_MODE, sizeof(cp), &cp);
- 	}
- }
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 378e856..2a06575 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -219,7 +219,7 @@ static void bredr_init(struct hci_dev *hdev)
- 	hci_send_cmd(hdev, HCI_OP_SET_EVENT_FLT, 1, &flt_type);
- 
- 	/* Connection accept timeout ~20 secs */
--	param = cpu_to_le16(0x7d00);
-+	param = __constant_cpu_to_le16(0x7d00);
- 	hci_send_cmd(hdev, HCI_OP_WRITE_CA_TIMEOUT, 2, &param);
- 
- 	bacpy(&cp.bdaddr, BDADDR_ANY);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7d3121a..0d402df 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1933,9 +1933,9 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 			bacpy(&cp.bdaddr, &ev->bdaddr);
- 			cp.pkt_type = cpu_to_le16(conn->pkt_type);
- 
--			cp.tx_bandwidth   = cpu_to_le32(0x00001f40);
--			cp.rx_bandwidth   = cpu_to_le32(0x00001f40);
--			cp.max_latency    = cpu_to_le16(0xffff);
-+			cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
-+			cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
-+			cp.max_latency    = __constant_cpu_to_le16(0xffff);
- 			cp.content_format = cpu_to_le16(hdev->voice_setting);
- 			cp.retrans_effort = 0xff;
- 
 -- 
-1.7.9.5
-
+Luiz Augusto von Dentz
