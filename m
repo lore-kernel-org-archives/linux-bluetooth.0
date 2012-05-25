@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v1 09/16] client: Remove unused functions in transfer API
-Date: Fri, 25 May 2012 12:11:26 +0200
-Message-Id: <1337940693-3417-10-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v1 02/16] client-doc: Add progress property to transfer
+Date: Fri, 25 May 2012 12:11:19 +0200
+Message-Id: <1337940693-3417-3-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1337940693-3417-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1337940693-3417-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,59 +12,33 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-After the removal of the agent these functions are not useful any more.
+This property exposes the number of bytes transferred so far in a given
+transfer.
 ---
- client/transfer.c |   23 -----------------------
- client/transfer.h |    3 ---
- 2 files changed, 0 insertions(+), 26 deletions(-)
+ doc/client-api.txt |   10 ++++++++++
+ 1 files changed, 10 insertions(+), 0 deletions(-)
 
-diff --git a/client/transfer.c b/client/transfer.c
-index ab9f84a..f631843 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -730,29 +730,6 @@ int obc_transfer_get_contents(struct obc_transfer *transfer, char **contents,
- 	return 0;
- }
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index cfb4ec9..cc25543 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -312,6 +312,16 @@ Properties	string Name [readonly]
  
--void obc_transfer_set_name(struct obc_transfer *transfer, const char *name)
--{
--	g_free(transfer->name);
--	transfer->name = g_strdup(name);
--}
--
--int obc_transfer_set_filename(struct obc_transfer *transfer,
--					const char *filename)
--{
--	int err;
--
--	err = rename(transfer->filename, filename);
--	if (err < 0) {
--		error("rename(): %s (%d)", strerror(errno), errno);
--		return -errno;
--	}
--
--	g_free(transfer->filename);
--	transfer->filename = g_strdup(filename);
--
--	return 0;
--}
--
- const char *obc_transfer_get_path(struct obc_transfer *transfer)
- {
- 	return transfer->path;
-diff --git a/client/transfer.h b/client/transfer.h
-index a65a2ed..bfa166d 100644
---- a/client/transfer.h
-+++ b/client/transfer.h
-@@ -56,8 +56,5 @@ const void *obc_transfer_get_params(struct obc_transfer *transfer,
- int obc_transfer_get_contents(struct obc_transfer *transfer, char **contents,
- 								size_t *size);
+ 			Complete name of the file being received or sent.
  
--void obc_transfer_set_name(struct obc_transfer *transfer, const char *name);
--int obc_transfer_set_filename(struct obc_transfer *transfer,
--					const char *filename);
- const char *obc_transfer_get_path(struct obc_transfer *transfer);
- gint64 obc_transfer_get_size(struct obc_transfer *transfer);
++		uint64 Progress [readonly, optional]
++
++			Number of bytes transferred. For queued transfers, this
++			value will not be present.
++
++Signals		PropertyChanged(string name, variant value)
++
++			This signal indicates a changed value of the given
++			property.
++
+ Agent hierarchy
+ ===============
+ 
 -- 
 1.7.7.6
 
