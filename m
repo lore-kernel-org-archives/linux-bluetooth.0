@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/6] audio: Fix updating volume property for non-A2DP transports
-Date: Fri, 25 May 2012 18:02:45 +0300
-Message-Id: <1337958168-9875-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/6] AVRCP: Fix not registering to VolumeChanged event again when notified
+Date: Fri, 25 May 2012 18:02:44 +0300
+Message-Id: <1337958168-9875-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1337958168-9875-1-git-send-email-luiz.dentz@gmail.com>
 References: <1337958168-9875-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,34 +11,39 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Volume property is A2DP only
----
- audio/media.c |    8 +++-----
- 1 files changed, 3 insertions(+), 5 deletions(-)
+The spec says:
 
-diff --git a/audio/media.c b/audio/media.c
-index cb8872f..2a2cf37 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -1357,16 +1357,14 @@ static void set_volume(uint8_t volume, struct audio_device *dev, void *user_data
- 	mp->volume = volume;
+"A registered notification gets changed on receiving CHANGED event
+notification. For a new notification additional NOTIFY command is
+expected to be sent."
+---
+ audio/avrcp.c |    7 +++++++
+ 1 files changed, 7 insertions(+), 0 deletions(-)
+
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index 2f96f27..30d696a 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -176,6 +176,8 @@ static uint32_t company_ids[] = {
+ 	IEEEID_BTSIG,
+ };
  
- 	for (l = mp->adapter->endpoints; l; l = l->next) {
--
--		struct media_endpoint *endpoint;
-+		struct media_endpoint *endpoint = l->data;
- 		struct media_transport *transport;
++static void register_volume_notification(struct avrcp_player *player);
++
+ static sdp_record_t *avrcp_ct_record(void)
+ {
+ 	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
+@@ -1154,6 +1156,11 @@ static gboolean avrcp_handle_volume_changed(struct avctp *session,
  
--		if (l->data == NULL)
-+		/* Volume is A2DP only */
-+		if (endpoint->sep == NULL)
- 			continue;
+ 	player->cb->set_volume(volume, player->dev, player->user_data);
  
--		endpoint = l->data;
- 		transport = find_device_transport(endpoint, dev);
--
- 		if (transport == NULL)
- 			continue;
++	if (code == AVC_CTYPE_CHANGED) {
++		register_volume_notification(player);
++		return FALSE;
++	}
++
+ 	return TRUE;
+ }
  
 -- 
 1.7.7.6
