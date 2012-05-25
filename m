@@ -1,37 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 25 May 2012 09:29:36 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 00/12] Another step in l2cap_core/sock separation
-Date: Fri, 25 May 2012 09:30:52 -0300
-Message-Id: <1337949064-26187-1-git-send-email-gustavo@padovan.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3 11/18] Bluetooth: A2MP: Process A2MP Change Notify
+Message-ID: <20120525122936.GC31623@joana>
+References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1337859508-32274-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1337859508-32274-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1337859508-32274-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Hi Andrei,
 
-This is just a rebase on top of lastest bluetooth-next tree, as the
-__constant_cpu_to_le patch from Andrei broke this patch series.
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-05-24 14:38:21 +0300]:
 
-Gustavo Padovan (12):
-  Bluetooth: Remove extra l2cap_state_change(BT_CONNECTED)
-  Bluetooth: Move clean up code and set of SOCK_ZAPPED to l2cap_sock.c
-  Bluetooth: Add l2cap_chan->ops->ready()
-  Bluetooth: Use l2cap_chan_ready() in LE path
-  Bluetooth: Use chan->state instead of sk->sk_state
-  Bluetooth: Move check for backlog size to l2cap_sock.c
-  Bluetooth: Create DEFER_SETUP flag in conf_state
-  Bluetooth: Add chan->ops->defer()
-  Bluetooth: check for already existent channel before create new one
-  Bluetooth: Move bt_accept_enqueue() call to l2cap_sock.c
-  Bluetooth: Remove parent socket usage from l2cap_core.c
-  Bluetooth: Used void * as parameter in alloc_skb()
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Placeholder for A2MP Change Notify handler.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/a2mp.c |   19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+> 
+> diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+> index ac095ac..d60be75 100644
+> --- a/net/bluetooth/a2mp.c
+> +++ b/net/bluetooth/a2mp.c
+> @@ -161,6 +161,22 @@ static int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
+>  	return 0;
+>  }
+>  
+> +static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
+> +			      struct a2mp_cmd *hdr)
+> +{
+> +	struct a2mp_cl *cl = (struct a2mp_cl *) skb->data;
 
- include/net/bluetooth/l2cap.h |    8 ++-
- net/bluetooth/l2cap_core.c    |  152 ++++++++++-------------------------------
- net/bluetooth/l2cap_sock.c    |  129 ++++++++++++++++++++++++++++++++--
- 3 files changed, 164 insertions(+), 125 deletions(-)
+Use void *. Same for the next patches in this series.
 
--- 
-1.7.10.1
-
+	Gustavo
