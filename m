@@ -1,50 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/6] AVRCP: Fix not registering to VolumeChanged event again when notified
-Date: Fri, 25 May 2012 18:02:44 +0300
-Message-Id: <1337958168-9875-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1337958168-9875-1-git-send-email-luiz.dentz@gmail.com>
-References: <1337958168-9875-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/6] AVRCP: Fix initializing volume before checking PDU type
+Date: Fri, 25 May 2012 18:02:43 +0300
+Message-Id: <1337958168-9875-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The spec says:
-
-"A registered notification gets changed on receiving CHANGED event
-notification. For a new notification additional NOTIFY command is
-expected to be sent."
+Response may be rejected or not implemented so the operand used to
+initialize the variable may not even exist.
 ---
- audio/avrcp.c |    7 +++++++
- 1 files changed, 7 insertions(+), 0 deletions(-)
+ audio/avrcp.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 2f96f27..30d696a 100644
+index 87a785b..2f96f27 100644
 --- a/audio/avrcp.c
 +++ b/audio/avrcp.c
-@@ -176,6 +176,8 @@ static uint32_t company_ids[] = {
- 	IEEEID_BTSIG,
- };
- 
-+static void register_volume_notification(struct avrcp_player *player);
-+
- static sdp_record_t *avrcp_ct_record(void)
+@@ -1145,12 +1145,14 @@ static gboolean avrcp_handle_volume_changed(struct avctp *session,
  {
- 	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-@@ -1154,6 +1156,11 @@ static gboolean avrcp_handle_volume_changed(struct avctp *session,
+ 	struct avrcp_player *player = user_data;
+ 	struct avrcp_header *pdu = (void *) operands;
+-	uint8_t abs_volume = pdu->params[1] & 0x7F;
++	uint8_t volume;
  
- 	player->cb->set_volume(volume, player->dev, player->user_data);
+ 	if (code == AVC_CTYPE_REJECTED || code == AVC_CTYPE_NOT_IMPLEMENTED)
+ 		return FALSE;
  
-+	if (code == AVC_CTYPE_CHANGED) {
-+		register_volume_notification(player);
-+		return FALSE;
-+	}
+-	player->cb->set_volume(abs_volume, player->dev, player->user_data);
++	volume = pdu->params[1] & 0x7F;
 +
++	player->cb->set_volume(volume, player->dev, player->user_data);
+ 
  	return TRUE;
  }
- 
 -- 
 1.7.7.6
 
