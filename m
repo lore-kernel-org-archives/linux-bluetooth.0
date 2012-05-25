@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/6] audio: Fix signature type for transport Volume
-Date: Fri, 25 May 2012 18:02:46 +0300
-Message-Id: <1337958168-9875-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/6] audio: Fix updating volume property for non-A2DP transports
+Date: Fri, 25 May 2012 18:02:45 +0300
+Message-Id: <1337958168-9875-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1337958168-9875-1-git-send-email-luiz.dentz@gmail.com>
 References: <1337958168-9875-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,31 +11,35 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Signature is now uint16 instead of byte
+Volume property is A2DP only
 ---
- audio/transport.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ audio/media.c |    8 +++-----
+ 1 files changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/audio/transport.c b/audio/transport.c
-index 4ad8608..ac9d358 100644
---- a/audio/transport.c
-+++ b/audio/transport.c
-@@ -77,7 +77,7 @@ struct media_transport {
- 	uint16_t		omtu;		/* Transport output mtu */
- 	uint16_t		delay;		/* Transport delay (a2dp only) */
- 	unsigned int		nrec_id;	/* Transport nrec watch (headset only) */
--	uint8_t			volume;		/* Transport volume */
-+	uint16_t		volume;		/* Transport volume */
- 	gboolean		read_lock;
- 	gboolean		write_lock;
- 	gboolean		in_use;
-@@ -1076,5 +1076,5 @@ void media_transport_update_volume(struct media_transport *transport,
+diff --git a/audio/media.c b/audio/media.c
+index cb8872f..2a2cf37 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -1357,16 +1357,14 @@ static void set_volume(uint8_t volume, struct audio_device *dev, void *user_data
+ 	mp->volume = volume;
  
- 	emit_property_changed(transport->conn, transport->path,
- 				MEDIA_TRANSPORT_INTERFACE, "Volume",
--				DBUS_TYPE_BYTE, &transport->volume);
-+				DBUS_TYPE_UINT16, &transport->volume);
- }
+ 	for (l = mp->adapter->endpoints; l; l = l->next) {
+-
+-		struct media_endpoint *endpoint;
++		struct media_endpoint *endpoint = l->data;
+ 		struct media_transport *transport;
+ 
+-		if (l->data == NULL)
++		/* Volume is A2DP only */
++		if (endpoint->sep == NULL)
+ 			continue;
+ 
+-		endpoint = l->data;
+ 		transport = find_device_transport(endpoint, dev);
+-
+ 		if (transport == NULL)
+ 			continue;
+ 
 -- 
 1.7.7.6
 
