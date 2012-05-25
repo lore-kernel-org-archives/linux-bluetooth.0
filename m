@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 07/10] SAP: Remove not needed src field from struct sap_server
-Date: Fri, 25 May 2012 16:20:59 +0200
-Message-ID: <1337955662-19016-7-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 04/10] sap-dummy: Small refactor to sap_connect_req
+Date: Fri, 25 May 2012 16:20:56 +0200
+Message-ID: <1337955662-19016-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1337955662-19016-1-git-send-email-szymon.janc@tieto.com>
 References: <1337955662-19016-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,50 +12,57 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-src is only used in sap_server_register, no need to keep in memory for
-SAP session duration.
+This makes function easier to read and more similar to rest of code.
 ---
- sap/server.c |    6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ sap/sap-dummy.c |   24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
 
-diff --git a/sap/server.c b/sap/server.c
-index aedbc60..98440e8 100644
---- a/sap/server.c
-+++ b/sap/server.c
-@@ -72,7 +72,6 @@ struct sap_connection {
- };
- 
- struct sap_server {
--	bdaddr_t src;
- 	char *path;
- 	uint32_t record_id;
- 	GIOChannel *listen_io;
-@@ -1348,7 +1347,6 @@ int sap_server_register(const char *path, bdaddr_t *src)
- 		return -ENOMEM;
+diff --git a/sap/sap-dummy.c b/sap/sap-dummy.c
+index 9a21779..238c5f3 100644
+--- a/sap/sap-dummy.c
++++ b/sap/sap-dummy.c
+@@ -60,26 +60,32 @@ void sap_connect_req(void *sap_device, uint16_t maxmsgsize)
+ 		sap_connect_rsp(sap_device, SAP_STATUS_CONNECTION_FAILED,
+ 								maxmsgsize);
+ 		return;
+-	} else if (max_msg_size_supported > maxmsgsize) {
++	}
++
++	if (max_msg_size_supported > maxmsgsize) {
+ 		sap_connect_rsp(sap_device, SAP_STATUS_MAX_MSG_SIZE_TOO_SMALL,
+ 						max_msg_size_supported);
+ 		return;
+-	} else if (max_msg_size_supported < maxmsgsize) {
++	}
++
++	if (max_msg_size_supported < maxmsgsize) {
+ 		sap_connect_rsp(sap_device,
+ 				SAP_STATUS_MAX_MSG_SIZE_NOT_SUPPORTED,
+ 				max_msg_size_supported);
+ 		return;
+-	} else if (ongoing_call_status) {
++	}
++
++	if (ongoing_call_status) {
+ 		sap_connect_rsp(sap_device, SAP_STATUS_OK_ONGOING_CALL,
+ 						max_msg_size_supported);
+ 		return;
+-	} else {
+-		sim_card_conn_status = SIM_CONNECTED;
+-		sap_data = sap_device;
+-
+-		sap_connect_rsp(sap_device, SAP_STATUS_OK, maxmsgsize);
+-		sap_status_ind(sap_device, SAP_STATUS_CHANGE_CARD_RESET);
  	}
++
++	sim_card_conn_status = SIM_CONNECTED;
++	sap_data = sap_device;
++
++	sap_connect_rsp(sap_device, SAP_STATUS_OK, maxmsgsize);
++	sap_status_ind(sap_device, SAP_STATUS_CHANGE_CARD_RESET);
+ }
  
--	bacpy(&server->src, src);
- 	server->path = g_strdup(path);
- 
- 	record = create_sap_record(SAP_SERVER_CHANNEL);
-@@ -1357,7 +1355,7 @@ int sap_server_register(const char *path, bdaddr_t *src)
- 		goto sdp_err;
- 	}
- 
--	if (add_record_to_server(&server->src, record) < 0) {
-+	if (add_record_to_server(src, record) < 0) {
- 		error("Adding SAP SDP record to the SDP server failed.");
- 		sdp_record_free(record);
- 		goto sdp_err;
-@@ -1367,7 +1365,7 @@ int sap_server_register(const char *path, bdaddr_t *src)
- 
- 	io = bt_io_listen(BT_IO_RFCOMM, NULL, connect_confirm_cb, server,
- 			NULL, &gerr,
--			BT_IO_OPT_SOURCE_BDADDR, &server->src,
-+			BT_IO_OPT_SOURCE_BDADDR, src,
- 			BT_IO_OPT_CHANNEL, SAP_SERVER_CHANNEL,
- 			BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_HIGH,
- 			BT_IO_OPT_MASTER, TRUE,
+ void sap_disconnect_req(void *sap_device, uint8_t linkloss)
 -- 
 on behalf of ST-Ericsson
 
