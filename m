@@ -1,69 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZK6_vVyE7L9pWudM9eC8mfpVjRov83O3wWPBhip5tS=LQ@mail.gmail.com>
+In-Reply-To: <CANT-zCX32WtZbHpPRdWjU114wvJAwfj0JZyGU9sA_Dp-RkhBYA@mail.gmail.com>
 References: <1337940693-3417-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1337940693-3417-5-git-send-email-mikel.astiz.oss@gmail.com>
-	<CABBYNZK6_vVyE7L9pWudM9eC8mfpVjRov83O3wWPBhip5tS=LQ@mail.gmail.com>
-Date: Fri, 25 May 2012 12:57:16 +0200
-Message-ID: <CANT-zCUekb1RL6dM8pvyTx3F8cF1Tv8zvUezedBYS7axa4pc5w@mail.gmail.com>
-Subject: Re: [PATCH obexd v1 04/16] client-doc: Add transfer event-reporting signals
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	<1337940693-3417-4-git-send-email-mikel.astiz.oss@gmail.com>
+	<CABBYNZ+HiG58wPbXkgikR_7m9APwQLYn4E6VhzBdcbmSVPGc6Q@mail.gmail.com>
+	<CANT-zCX32WtZbHpPRdWjU114wvJAwfj0JZyGU9sA_Dp-RkhBYA@mail.gmail.com>
+Date: Fri, 25 May 2012 13:55:45 +0300
+Message-ID: <CABBYNZJ8T3pp1DFCdT3g=XW8NBT7BhHrM+E3t54EZY3d7SwDcw@mail.gmail.com>
+Subject: Re: [PATCH obexd v1 03/16] client: Add progress property to transfer
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	Mikel Astiz <mikel.astiz@bmw-carit.de>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Mikel,
 
-On Fri, May 25, 2012 at 12:50 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Mikel,
+On Fri, May 25, 2012 at 1:45 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> Hi Luiz,
 >
-> On Fri, May 25, 2012 at 1:11 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
->> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+> On Fri, May 25, 2012 at 12:35 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Mikel,
 >>
->> These signals replace the old agent-based notification mechanism.
->> ---
->>  doc/client-api.txt |    9 +++++++++
->>  1 files changed, 9 insertions(+), 0 deletions(-)
+>> On Fri, May 25, 2012 at 1:11 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
 >>
->> diff --git a/doc/client-api.txt b/doc/client-api.txt
->> index cc25543..527df05 100644
->> --- a/doc/client-api.txt
->> +++ b/doc/client-api.txt
->> @@ -322,6 +322,15 @@ Signals            PropertyChanged(string name, variant value)
->>                        This signal indicates a changed value of the given
->>                        property.
+>>> +static void transfer_notify_progress(struct obc_transfer *transfer)
+>>> +{
+>>> +       gint64 now;
+>>> +       gint64 notify;
+>>> +
+>>> +       DBG("Transfer %p progress: %lu bytes", transfer, transfer->transferred);
+>>> +
+>>> +       if (transfer->path == NULL)
+>>> +               return;
+>>> +
+>>> +       if (transfer->transferred == transfer->transferred_dbus)
+>>> +               return;
+>>> +
+>>> +       now = g_get_monotonic_time();
+>>> +       notify = transfer->transferred_dbus_time +
+>>> +                                               TRANSFER_PROGRESS_PERIOD * 1000;
+>>> +
+>>> +       if ((transfer->transferred != transfer->size) && (now < notify))
+>>> +               return;
+>>> +
+>>> +       transfer->transferred_dbus = transfer->transferred;
+>>> +       transfer->transferred_dbus_time = now;
+>>> +
+>>> +       obex_dbus_signal_property_changed(transfer->conn,
+>>> +                                               transfer->path,
+>>> +                                               TRANSFER_INTERFACE, "Progress",
+>>> +                                               DBUS_TYPE_INT64,
+>>> +                                               &transfer->transferred_dbus);
+>>> +}
 >>
->> +               void Complete()
->> +
->> +                       Informs that the transfer has completed successfully.
->> +
->> +               void Error(string message)
->> +
->> +                       Informs that the transfer has been terminated because
->> +                       of some error.
->> +
+>> I would suggest doing it in a different manner using
+>> g_timeout_add_seconds and storing the id, so you just need to know if
+>> the timer is running by checking the id, if there is no timer running
+>> you start it, if there is you just update the bytes transferred and
+>> wait the timeout to be fired where you emit the signal. If in the
+>> meantime the transfer is completed you just have to cleanup using
+>> g_source_remove, this should be simpler because you don't have to
+>> bother how much time has passed on every packet.
 >
-> To avoid any possible confusion I would leave a single signal to tell
-> it is complete e.g. Complete(string message), as for the error Johan
-> suggested something more meaningful like D-Bus error which both error
-> code and error message e.g. Complete(string code, string message),
-> actually maybe we should give some other detail when the transfer is
-> completed such as file location and other properties that might be
-> useful since once this signal is emitted the transfer is gone so there
-> is no way to retrieve this information again.
+> That would certainly avoid a call to g_get_monotonic_time() every time
+> we receive a packet, but on the other hand we would be waking up the
+> process one additional time per second. I'm not sure if there is any
+> performance improvement there.
+>
+> From the implementation complexity point of view both approaches equally simple.
 
-OK, I will change to Complete(string code, string message), although I
-have to say I don't like it very much.
+Actually by using g_timeout_add_seconds we may wake up even less
+because it attempts to group wake-ups, see:
 
-So in that case, we would emit Complete("", "") in case of success, right?
+https://live.gnome.org/GnomeGoals/UseTimeoutAddSeconds
 
-Regarding returning transfer properties, that should not be necessary
-because, as we already discussed, the idea was to return these
-properties in the transfer-initiating method.
-
-Cheers,
-Mikel
+-- 
+Luiz Augusto von Dentz
