@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 05/12] Bluetooth: Use chan->state instead of sk->sk_state
-Date: Fri, 25 May 2012 09:30:57 -0300
-Message-Id: <1337949064-26187-6-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v2 04/12] Bluetooth: Use l2cap_chan_ready() in LE path
+Date: Fri, 25 May 2012 09:30:56 -0300
+Message-Id: <1337949064-26187-5-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1337949064-26187-1-git-send-email-gustavo@padovan.org>
 References: <1337949064-26187-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,26 +12,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-These vars are kept in sync so we can use chan->state here.
+This replace code in l2cap_le_conn_ready() by a similar code in
+l2cap_chan_ready().
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
- net/bluetooth/l2cap_core.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/l2cap_core.c |    5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 3d35210..53e21ca 100644
+index ef84aac..3d35210 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1444,7 +1444,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+@@ -1177,10 +1177,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
  
- 	lock_sock(sk);
+ 	l2cap_chan_add(conn, chan);
  
--	switch (sk->sk_state) {
-+	switch (chan->state) {
- 	case BT_CONNECT:
- 	case BT_CONNECT2:
- 	case BT_CONFIG:
+-	__set_chan_timer(chan, sk->sk_sndtimeo);
+-
+-	__l2cap_state_change(chan, BT_CONNECTED);
+-	parent->sk_data_ready(parent, 0);
++	l2cap_chan_ready(chan);
+ 
+ clean:
+ 	release_sock(parent);
 -- 
 1.7.10.1
 
