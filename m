@@ -1,43 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 May 2012 10:39:22 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Paulo Alcantara <pcacjr@zytor.com>
-Cc: paulo.alcantara@openbossa.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 00/15] Store address type on storage - remaining
- files
-Message-ID: <20120525073922.GA13680@x220>
-References: <1337798914-20974-1-git-send-email-paulo.alcantara@openbossa.org>
- <20120524075923.GA17458@x220>
- <20120524.145707.1901844181634748035.pcacjr@zytor.com>
+Date: Fri, 25 May 2012 10:32:19 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [PATCH 09/12] Bluetooth: check for already existent channel
+ before create new one
+Message-ID: <20120525073217.GE3089@aemeltch-MOBL1>
+References: <1337900389-30915-1-git-send-email-gustavo@padovan.org>
+ <1337900389-30915-9-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120524.145707.1901844181634748035.pcacjr@zytor.com>
+In-Reply-To: <1337900389-30915-9-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Paulo,
+Hi Gustavo,
 
-On Thu, May 24, 2012, Paulo Alcantara wrote:
-> > On Wed, May 23, 2012, Paulo Alcantara wrote:
-> > > This patchset contains the remaining changes for the new storage format
-> > > used (bdaddr#type) on storage files (LE-only or shared files).
-> > > 
-> > > The files that have been changed so far are:
-> > >     primaries, characteristics, appearance, ccc, names, aliases,
-> > >     longtermkeys, attributes, blocked.
-> > 
-> > Any files that are used for BR/EDR would have to keep their backwards
-> > compatibility. Otherwise someone who upgrades from 4.99 to 4.100 will
-> > suddenly find that the device they had blocked is not blocked anymore
-> > and none of their devices have any names. We can't break something like
-> > that between 4.x versions. Are these patches guaranteeing this backwards
-> > compatibility? Looking at the patches it doesn't look like they give
-> > this guarantee.
+On Thu, May 24, 2012 at 07:59:49PM -0300, Gustavo Padovan wrote:
+> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 > 
-> Ok, you're right. The only file that we should keep backward compatibility on
-> this series is the blocked file, since it's shared by both BR/EDR and LE devices.
+> Move this check to before the channel time creation simplifies the code
+> and avoid memory allocation if the channel already exist.
+> 
+> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-The aliases and names files are also shared with BR/EDR. It seems your
-patches do not take this into account.
+Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com> 
 
-Johan
+> ---
+>  net/bluetooth/l2cap_core.c |   13 ++++---------
+>  1 file changed, 4 insertions(+), 9 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 7719508..0df7f49 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -3340,21 +3340,16 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+>  
+>  	result = L2CAP_CR_NO_MEM;
+>  
+> +	/* Check if we already have channel with that dcid */
+> +	if (__l2cap_get_chan_by_dcid(conn, scid))
+> +		goto response;
+> +
+>  	chan = pchan->ops->new_connection(pchan->data);
+>  	if (!chan)
+>  		goto response;
+>  
+>  	sk = chan->sk;
+>  
+> -	/* Check if we already have channel with that dcid */
+> -	if (__l2cap_get_chan_by_dcid(conn, scid)) {
+> -		if (chan->ops->teardown)
+> -			chan->ops->teardown(chan->data, 0);
+> -
+> -		chan->ops->close(chan->data);
+> -		goto response;
+> -	}
+> -
+>  	hci_conn_hold(conn->hcon);
+>  
+>  	bacpy(&bt_sk(sk)->src, conn->src);
+> -- 
+> 1.7.10.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
