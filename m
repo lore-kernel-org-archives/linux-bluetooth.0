@@ -1,139 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Define HCI AMP cmd struct
-Date: Fri, 25 May 2012 14:14:00 +0300
-Message-Id: <1337944440-9361-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1337944440-9361-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1337944440-9361-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZJ8T3pp1DFCdT3g=XW8NBT7BhHrM+E3t54EZY3d7SwDcw@mail.gmail.com>
+References: <1337940693-3417-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1337940693-3417-4-git-send-email-mikel.astiz.oss@gmail.com>
+	<CABBYNZ+HiG58wPbXkgikR_7m9APwQLYn4E6VhzBdcbmSVPGc6Q@mail.gmail.com>
+	<CANT-zCX32WtZbHpPRdWjU114wvJAwfj0JZyGU9sA_Dp-RkhBYA@mail.gmail.com>
+	<CABBYNZJ8T3pp1DFCdT3g=XW8NBT7BhHrM+E3t54EZY3d7SwDcw@mail.gmail.com>
+Date: Fri, 25 May 2012 13:02:06 +0200
+Message-ID: <CANT-zCVoGHyk5ocgC0CdNiTduFOBHYO0eP6Sj1WQNty_iwrm7g@mail.gmail.com>
+Subject: Re: [PATCH obexd v1 03/16] client: Add progress property to transfer
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Luiz,
 
-Add HCI commands to deal with Bluetooth AMP controllers.
-Those commands will be used by bluetooth and softamp code.
+On Fri, May 25, 2012 at 12:55 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Mikel,
+>
+> On Fri, May 25, 2012 at 1:45 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>> Hi Luiz,
+>>
+>> On Fri, May 25, 2012 at 12:35 PM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Mikel,
+>>>
+>>> On Fri, May 25, 2012 at 1:11 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>>>
+>>>> +static void transfer_notify_progress(struct obc_transfer *transfer)
+>>>> +{
+>>>> +       gint64 now;
+>>>> +       gint64 notify;
+>>>> +
+>>>> +       DBG("Transfer %p progress: %lu bytes", transfer, transfer->transferred);
+>>>> +
+>>>> +       if (transfer->path == NULL)
+>>>> +               return;
+>>>> +
+>>>> +       if (transfer->transferred == transfer->transferred_dbus)
+>>>> +               return;
+>>>> +
+>>>> +       now = g_get_monotonic_time();
+>>>> +       notify = transfer->transferred_dbus_time +
+>>>> +                                               TRANSFER_PROGRESS_PERIOD * 1000;
+>>>> +
+>>>> +       if ((transfer->transferred != transfer->size) && (now < notify))
+>>>> +               return;
+>>>> +
+>>>> +       transfer->transferred_dbus = transfer->transferred;
+>>>> +       transfer->transferred_dbus_time = now;
+>>>> +
+>>>> +       obex_dbus_signal_property_changed(transfer->conn,
+>>>> +                                               transfer->path,
+>>>> +                                               TRANSFER_INTERFACE, "Progress",
+>>>> +                                               DBUS_TYPE_INT64,
+>>>> +                                               &transfer->transferred_dbus);
+>>>> +}
+>>>
+>>> I would suggest doing it in a different manner using
+>>> g_timeout_add_seconds and storing the id, so you just need to know if
+>>> the timer is running by checking the id, if there is no timer running
+>>> you start it, if there is you just update the bytes transferred and
+>>> wait the timeout to be fired where you emit the signal. If in the
+>>> meantime the transfer is completed you just have to cleanup using
+>>> g_source_remove, this should be simpler because you don't have to
+>>> bother how much time has passed on every packet.
+>>
+>> That would certainly avoid a call to g_get_monotonic_time() every time
+>> we receive a packet, but on the other hand we would be waking up the
+>> process one additional time per second. I'm not sure if there is any
+>> performance improvement there.
+>>
+>> From the implementation complexity point of view both approaches equally simple.
+>
+> Actually by using g_timeout_add_seconds we may wake up even less
+> because it attempts to group wake-ups, see:
+>
+> https://live.gnome.org/GnomeGoals/UseTimeoutAddSeconds
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/hci.h |   83 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 83 insertions(+)
+That's why I said we would wake up one additional time per second, and
+not per second and transfer. All existing transfers would be grouped
+and signalled together.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index edb6639..afd9594 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -31,6 +31,7 @@
- #define HCI_MAX_FRAME_SIZE	(HCI_MAX_ACL_SIZE + 4)
- 
- #define HCI_LINK_KEY_SIZE	16
-+#define HCI_AMP_LINK_KEY_SIZE	(2 * HCI_LINK_KEY_SIZE)
- 
- /* HCI dev events */
- #define HCI_DEV_REG			1
-@@ -525,6 +526,28 @@ struct hci_cp_io_capability_neg_reply {
- 	__u8     reason;
- } __packed;
- 
-+#define HCI_OP_CREATE_PHY_LINK		0x0435
-+struct hci_cp_create_phy_link {
-+	__u8     phy_handle;
-+	__u8     key_len;
-+	__u8     key_type;
-+	__u8     key[HCI_AMP_LINK_KEY_SIZE];
-+} __packed;
-+
-+#define HCI_OP_ACCEPT_PHY_LINK		0x0436
-+struct hci_cp_accept_phy_link {
-+	__u8     phy_handle;
-+	__u8     key_len;
-+	__u8     key_type;
-+	__u8     key[HCI_AMP_LINK_KEY_SIZE];
-+} __packed;
-+
-+#define HCI_OP_DISC_PHY_LINK		0x0437
-+struct hci_cp_disc_phy_link {
-+	__u8     phy_handle;
-+	__u8     reason;
-+} __packed;
-+
- #define HCI_OP_SNIFF_MODE		0x0803
- struct hci_cp_sniff_mode {
- 	__le16   handle;
-@@ -820,6 +843,33 @@ struct hci_rp_read_local_amp_info {
- 	__le32   be_flush_to;
- } __packed;
- 
-+#define HCI_OP_READ_LOCAL_AMP_ASSOC	0x140a
-+struct hci_cp_read_local_amp_assoc {
-+	__u8     handle;
-+	__le16   len_so_far;
-+	__le16   max_len;
-+} __packed;
-+
-+struct hci_rp_read_local_amp_assoc {
-+	__u8     status;
-+	__u8     handle;
-+	__le16   rem_len;
-+	__u8     frag[0];
-+} __packed;
-+
-+#define HCI_OP_WRITE_REMOTE_AMP_ASSOC	0x140b
-+struct hci_cp_write_remote_amp_assoc {
-+	__u8     handle;
-+	__le16   len_so_far;
-+	__le16   rem_len;
-+	__u8     frag[0];
-+} __packed;
-+
-+struct hci_rp_write_remote_amp_assoc {
-+	__u8     status;
-+	__u8     handle;
-+} __packed;
-+
- #define HCI_OP_LE_SET_EVENT_MASK	0x2001
- struct hci_cp_le_set_event_mask {
- 	__u8     mask[8];
-@@ -1192,6 +1242,39 @@ struct hci_ev_le_meta {
- 	__u8     subevent;
- } __packed;
- 
-+#define HCI_EV_PHY_LINK_COMPLETE	0x40
-+struct hci_ev_phy_link_complete {
-+	__u8     status;
-+	__u8     phy_handle;
-+} __packed;
-+
-+#define HCI_EV_CHANNEL_SELECTED		0x41
-+struct hci_ev_channel_selected {
-+	__u8     phy_handle;
-+} __packed;
-+
-+#define HCI_EV_DISC_PHY_LINK_COMPLETE	0x42
-+struct hci_ev_disc_phy_link_complete {
-+	__u8     status;
-+	__u8     phy_handle;
-+	__u8     reason;
-+} __packed;
-+
-+#define HCI_EV_LOG_LINK_COMPLETE	0x45
-+struct hci_ev_log_link_complete {
-+	__u8     status;
-+	__le16   log_handle;
-+	__u8     phy_handle;
-+	__u8     flow_spec_id;
-+} __packed;
-+
-+#define HCI_EV_DISC_LOG_LINK_COMPLETE	0x46
-+struct hci_ev_disconn_log_link_complete {
-+	__u8     status;
-+	__le16   log_handle;
-+	__u8     reason;
-+} __packed;
-+
- #define HCI_EV_NUM_COMP_BLOCKS		0x48
- struct hci_comp_blocks_info {
- 	__le16   handle;
--- 
-1.7.9.5
+So basically one wake-up per second should be irrelevant I guess, as
+irrelevant as a bunch of calls to g_get_monotonic_time.
 
+Anyway, I will implement your proposal in the next revision.
+
+Cheers,
+Mikel
