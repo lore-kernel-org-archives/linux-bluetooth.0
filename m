@@ -1,34 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 May 2012 16:08:02 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 05/18] Bluetooth: A2MP: Add chan callbacks
-Message-ID: <20120525130801.GI3089@aemeltch-MOBL1>
-References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1337859508-32274-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1337859508-32274-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20120525122037.GB31623@joana>
+Date: Fri, 25 May 2012 09:41:39 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [PATCH -v2 12/12] Bluetooth: Used void * as parameter in
+ alloc_skb()
+Message-ID: <20120525124139.GD31623@joana>
+References: <1337949064-26187-1-git-send-email-gustavo@padovan.org>
+ <1337949064-26187-13-git-send-email-gustavo@padovan.org>
+ <20120525123932.GH3089@aemeltch-MOBL1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120525122037.GB31623@joana>
+In-Reply-To: <20120525123932.GH3089@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Andrei,
 
-On Fri, May 25, 2012 at 09:20:37AM -0300, Gustavo Padovan wrote:
-> >  static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
-> > @@ -110,6 +148,8 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
-> >  	chan->remote_mps = chan->omtu;
-> >  	chan->mps = chan->omtu;
-> >  
-> > +	chan->state = BT_CONNECTED;
-> > +
+* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-05-25 15:39:34 +0300]:
+
+> Hi Gustavo,
 > 
-> This change seems to be unrelated to this patch.
+> On Fri, May 25, 2012 at 09:31:04AM -0300, Gustavo Padovan wrote:
+> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > 
+> > This keep l2cap chan ops functions parameters in sync.
+> > 
+> > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> 
+> ...
+> 
+> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> > index 25a85ab..0f8886b 100644
+> > --- a/include/net/bluetooth/l2cap.h
+> > +++ b/include/net/bluetooth/l2cap.h
+> > @@ -532,8 +532,8 @@ struct l2cap_ops {
+> >  	void			(*close) (void *data);
+> >  	void			(*teardown) (void *data, int err);
+> >  	void			(*state_change) (void *data, int state);
+> > -	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
+> > -					       unsigned long len, int nb);
+> > +	struct sk_buff		*(*alloc_skb) (void *data, unsigned long len,
+> > +					       int nb);
+> 
+> ...
+> 
+> > @@ -1893,7 +1893,7 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
+> >  
+> >  		count = min_t(unsigned int, conn->mtu, len);
+> >  
+> > -		tmp = chan->ops->alloc_skb(chan, count,
+> > +		tmp = chan->ops->alloc_skb(chan->data, count,
+> 
+> Why do we need to pass chan->data instead of chan?
 
-OK, I move it to the first patch.
+We are changing this to make this call have the same parameter as the other
+ops calls, i.e., a void *, so we just pass chan->data here which is the user
+data (struct sock *sk in the l2cap_sock.c case).
 
-Best regards 
-Andrei Emeltchenko 
+	Gustavo
