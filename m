@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v1 03/16] client: Add progress property to transfer
-Date: Fri, 25 May 2012 12:11:20 +0200
-Message-Id: <1337940693-3417-4-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v1 15/16] client: Add signal to report new transfers
+Date: Fri, 25 May 2012 12:11:32 +0200
+Message-Id: <1337940693-3417-16-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1337940693-3417-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1337940693-3417-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,128 +12,120 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The number of transferred bytes is exposed in D-Bus using a specific
-property for this purpose.
-
-Internally, the value of this property does not necessarily match the
-internal progress counter. In order to avoid D-Bus overhead, the
-property will be updated at least every N bytes, where N is fixed and
-hardcoded (TRANSFER_PROGRESS_PERIOD).
 ---
- client/transfer.c |   51 +++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 files changed, 49 insertions(+), 2 deletions(-)
+ client/session.c  |   45 +++++++++++++++++++++++++++++++++++++++++++--
+ client/transfer.c |    2 +-
+ client/transfer.h |    2 ++
+ 3 files changed, 46 insertions(+), 3 deletions(-)
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 8292265..2ac92c3 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -44,6 +44,7 @@
- 
- #define TRANSFER_INTERFACE  "org.openobex.Transfer"
- #define TRANSFER_BASEPATH   "/org/openobex"
-+#define TRANSFER_PROGRESS_PERIOD 1000 /* Milliseconds */
- 
- #define OBC_TRANSFER_ERROR obc_transfer_error_quark()
- 
-@@ -75,6 +76,8 @@ struct obc_transfer {
- 	guint xfer;
- 	gint64 size;
- 	gint64 transferred;
-+	gint64 transferred_dbus;
-+	gint64 transferred_dbus_time;
- };
- 
- static GQuark obc_transfer_error_quark(void)
-@@ -105,6 +108,10 @@ static DBusMessage *obc_transfer_get_properties(DBusConnection *connection,
- 	obex_dbus_dict_append(&dict, "Filename", DBUS_TYPE_STRING,
- 							&transfer->filename);
- 
-+	if (transfer->obex != NULL)
-+		obex_dbus_dict_append(&dict, "Progress", DBUS_TYPE_UINT64,
-+						&transfer->transferred_dbus);
-+
- 	dbus_message_iter_close_container(&iter, &dict);
- 
- 	return reply;
-@@ -182,6 +189,12 @@ static const GDBusMethodTable obc_transfer_methods[] = {
+diff --git a/client/session.c b/client/session.c
+index bb20a61..fcaa97e 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -630,6 +630,12 @@ static const GDBusMethodTable session_methods[] = {
  	{ }
  };
  
-+static const GDBusSignalTable obc_transfer_signals[] = {
-+	{ GDBUS_SIGNAL("PropertyChanged",
-+		GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
++static const GDBusSignalTable session_signals[] = {
++	{ GDBUS_SIGNAL("TransferAdded",
++		GDBUS_ARGS({ "path", "o" }, { "properties", "a{sv}" })) },
 +	{ }
 +};
 +
- static void obc_transfer_free(struct obc_transfer *transfer)
+ static gboolean session_queue_complete(gpointer data)
  {
- 	DBG("%p", transfer);
-@@ -260,8 +273,8 @@ gboolean obc_transfer_register(struct obc_transfer *transfer,
- 
- 	if (g_dbus_register_interface(transfer->conn, transfer->path,
- 				TRANSFER_INTERFACE,
--				obc_transfer_methods, NULL, NULL,
--				transfer, NULL) == FALSE) {
-+				obc_transfer_methods, obc_transfer_signals,
-+				NULL, transfer, NULL) == FALSE) {
- 		g_set_error(err, OBC_TRANSFER_ERROR, -EFAULT,
- 						"Unable to register to D-Bus");
- 		return FALSE;
-@@ -380,6 +393,36 @@ void obc_transfer_unregister(struct obc_transfer *transfer)
- 	obc_transfer_free(transfer);
+ 	struct obc_session *session = data;
+@@ -641,6 +647,34 @@ static gboolean session_queue_complete(gpointer data)
+ 	return FALSE;
  }
  
-+static void transfer_notify_progress(struct obc_transfer *transfer)
++static gboolean emit_transfer_added(struct obc_session *session,
++						struct obc_transfer *transfer)
 +{
-+	gint64 now;
-+	gint64 notify;
++	DBusMessage *signal;
++	DBusMessageIter iter;
++	DBusMessageIter dict;
++	const char *path;
 +
-+	DBG("Transfer %p progress: %lu bytes", transfer, transfer->transferred);
++	signal = dbus_message_new_signal(session->path, SESSION_INTERFACE,
++							"TransferAdded");
++	if (signal == NULL)
++		return FALSE;
 +
-+	if (transfer->path == NULL)
-+		return;
++	dbus_message_iter_init_append(signal, &iter);
 +
-+	if (transfer->transferred == transfer->transferred_dbus)
-+		return;
++	path = obc_transfer_get_path(transfer);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH, &path);
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++						OBC_PROPERTIES_ARRAY_SIGNATURE,
++						&dict);
++	obc_transfer_append_dbus_properties(transfer, &dict);
++	dbus_message_iter_close_container(&iter, &dict);
 +
-+	now = g_get_monotonic_time();
-+	notify = transfer->transferred_dbus_time +
-+						TRANSFER_PROGRESS_PERIOD * 1000;
++	g_dbus_send_message(session->conn, signal);
 +
-+	if ((transfer->transferred != transfer->size) && (now < notify))
-+		return;
-+
-+	transfer->transferred_dbus = transfer->transferred;
-+	transfer->transferred_dbus_time = now;
-+
-+	obex_dbus_signal_property_changed(transfer->conn,
-+						transfer->path,
-+						TRANSFER_INTERFACE, "Progress",
-+						DBUS_TYPE_INT64,
-+						&transfer->transferred_dbus);
++	return TRUE;
 +}
 +
- static gboolean get_xfer_progress(const void *buf, gsize len,
- 							gpointer user_data)
+ guint obc_session_queue(struct obc_session *session,
+ 				struct obc_transfer *transfer,
+ 				session_callback_t func, void *user_data,
+@@ -655,13 +689,19 @@ guint obc_session_queue(struct obc_session *session,
+ 		return 0;
+ 	}
+ 
+-	if (dbus_register)
++	if (dbus_register) {
+ 		if (!obc_transfer_register(transfer, session->conn,
+ 							session->owner, err)) {
+ 			obc_transfer_unregister(transfer);
+ 			return 0;
+ 		}
+ 
++		if (!emit_transfer_added(session, transfer)) {
++			obc_transfer_unregister(transfer);
++			return 0;
++		}
++	}
++
+ 	obc_transfer_set_callback(transfer, transfer_complete, session);
+ 
+ 	p = pending_request_new(session, transfer, func, user_data);
+@@ -794,7 +834,8 @@ const char *obc_session_register(struct obc_session *session,
+ 
+ 	if (g_dbus_register_interface(session->conn, session->path,
+ 					SESSION_INTERFACE, session_methods,
+-					NULL, NULL, session, destroy) == FALSE)
++					session_signals, NULL, session,
++					destroy) == FALSE)
+ 		goto fail;
+ 
+ 	if (session->driver->probe && session->driver->probe(session) < 0) {
+diff --git a/client/transfer.c b/client/transfer.c
+index 2bba7a1..1232712 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -85,7 +85,7 @@ static GQuark obc_transfer_error_quark(void)
+ 	return g_quark_from_static_string("obc-transfer-error-quark");
+ }
+ 
+-static void obc_transfer_append_dbus_properties(struct obc_transfer *transfer,
++void obc_transfer_append_dbus_properties(struct obc_transfer *transfer,
+ 							DBusMessageIter *dict)
  {
-@@ -400,6 +443,8 @@ static gboolean get_xfer_progress(const void *buf, gsize len,
- 		callback->func(transfer, transfer->transferred, NULL,
- 							callback->data);
+ 	obex_dbus_dict_append(dict, "Name", DBUS_TYPE_STRING, &transfer->name);
+diff --git a/client/transfer.h b/client/transfer.h
+index eb5275c..df01a2b 100644
+--- a/client/transfer.h
++++ b/client/transfer.h
+@@ -58,5 +58,7 @@ int obc_transfer_get_contents(struct obc_transfer *transfer, char **contents,
+ const char *obc_transfer_get_path(struct obc_transfer *transfer);
+ gint64 obc_transfer_get_size(struct obc_transfer *transfer);
  
-+	transfer_notify_progress(transfer);
-+
- 	return TRUE;
- }
- 
-@@ -497,6 +542,8 @@ static gssize put_xfer_progress(void *buf, gsize len, gpointer user_data)
- 
- 	transfer->transferred += size;
- 
-+	transfer_notify_progress(transfer);
-+
- 	return size;
- }
- 
++void obc_transfer_append_dbus_properties(struct obc_transfer *transfer,
++							DBusMessageIter *dict);
+ DBusMessage *obc_transfer_create_dbus_reply(struct obc_transfer *transfer,
+ 							DBusMessage *message);
 -- 
 1.7.7.6
 
