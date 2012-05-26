@@ -1,135 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sasha Levin <levinsasha928@gmail.com>
-To: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sasha Levin <levinsasha928@gmail.com>
-Subject: [PATCH] Bluetooth: Really fix registering hci with duplicate name
-Date: Sat, 26 May 2012 21:23:51 +0200
-Message-Id: <1338060231-31108-1-git-send-email-levinsasha928@gmail.com>
+Message-ID: <1338002144.15105.96.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Get a more accurate PDU len
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Date: Sat, 26 May 2012 05:15:44 +0200
+In-Reply-To: <alpine.DEB.2.02.1205251615000.2070@mathewm-linux>
+References: <1337983025-20656-1-git-send-email-gustavo@padovan.org>
+	 <alpine.DEB.2.02.1205251615000.2070@mathewm-linux>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Commit fc50744 ("Bluetooth: Fix registering hci with duplicate name") didn't
-fully fix the duplicate naming issue with devices, and duplicate device names
-could still be created:
+Hi Gustavo,
 
-[  142.484097] device: 'hci1': device_add
-[...]
-[  150.545263] device: 'hci1': device_add
-[  150.550128] kobject: 'hci1' (ffff880014cc4e58): kobject_add_internal: parent: 'bluetooth', set: 'devices'
-[  150.558979] ------------[ cut here ]------------
-[  150.561438] WARNING: at fs/sysfs/dir.c:529 sysfs_add_one+0xb0/0xd0()
-[  150.572974] Hardware name: Bochs
-[  150.580502] sysfs: cannot create duplicate filename '/devices/virtual/bluetooth/hci1'
-[  150.584444] Pid: 7563, comm: trinity-child1 Tainted: G        W    3.4.0-next-20120524-sasha #296
-[...]
+> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> >
+> > Both FCS and Extended header might be or might not be present in a ERTM
+> > channel.
+> >
+> > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > ---
+> > net/bluetooth/l2cap_core.c |    8 +++++++-
+> > 1 file changed, 7 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index c07c134..c614532 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -2143,7 +2143,13 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
+> > 	pdu_len = min_t(size_t, pdu_len, L2CAP_BREDR_MAX_PAYLOAD);
+> >
+> > 	/* Adjust for largest possible L2CAP overhead. */
+> > -	pdu_len -= L2CAP_EXT_HDR_SIZE + L2CAP_FCS_SIZE;
+> > +	if (chan->fcs)
+> > +		pdu_len -= L2CAP_FCS_SIZE;
+> > +
+> > +	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+> > +		pdu_len -= L2CAP_EXT_HDR_SIZE;
+> > +	else
+> > +		pdu_len -= L2CAP_ENH_HDR_SIZE;
+> >
+> > 	/* Remote device may have requested smaller PDUs */
+> > 	pdu_len = min_t(size_t, pdu_len, chan->remote_mps);
+> > -- 
+> > 1.7.10.1
+> 
+> Looks good to me.
+> 
+> Reviewed-by: Mat Martineau <mathewm@codeaurora.org>
 
-Instead of the weird logic and the attempt at keeping the device list sorted,
-just use an IDA.
+patch has been applied to bluetooth-next tree.
 
-Signed-off-by: Sasha Levin <levinsasha928@gmail.com>
----
- net/bluetooth/hci_core.c |   30 ++++++++++++++++--------------
- 1 files changed, 16 insertions(+), 14 deletions(-)
+Regards
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 9c586fb..eca6dd1 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -26,6 +26,7 @@
- /* Bluetooth HCI core. */
- 
- #include <linux/export.h>
-+#include <linux/idr.h>
- 
- #include <linux/rfkill.h>
- 
-@@ -46,6 +47,9 @@ DEFINE_RWLOCK(hci_dev_list_lock);
- LIST_HEAD(hci_cb_list);
- DEFINE_RWLOCK(hci_cb_list_lock);
- 
-+/* HCI ID Numbering */
-+static DEFINE_IDA(hci_index_ida);
-+
- /* ---- HCI notifications ---- */
- 
- static void hci_notify(struct hci_dev *hdev, int event)
-@@ -1689,7 +1693,6 @@ EXPORT_SYMBOL(hci_free_dev);
- /* Register HCI device */
- int hci_register_dev(struct hci_dev *hdev)
- {
--	struct list_head *head, *p;
- 	int id, error;
- 
- 	if (!hdev->open || !hdev->close)
-@@ -1701,25 +1704,19 @@ int hci_register_dev(struct hci_dev *hdev)
- 	 * so the index can be used as the AMP controller ID.
- 	 */
- 	id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
--	head = &hci_dev_list;
- 
--	/* Find first available device id */
--	list_for_each(p, &hci_dev_list) {
--		int nid = list_entry(p, struct hci_dev, list)->id;
--		if (nid > id)
--			break;
--		if (nid == id)
--			id++;
--		head = p;
--	}
-+	error = ida_simple_get(&hci_index_ida, id, 0, GFP_KERNEL);
-+	if (error < 0)
-+		return error;
- 
-+	id = error;
- 	sprintf(hdev->name, "hci%d", id);
- 	hdev->id = id;
- 
- 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
- 
--	list_add(&hdev->list, head);
--
-+	write_lock(&hci_dev_list_lock);
-+	list_add(&hdev->list, &hci_dev_list);
- 	write_unlock(&hci_dev_list_lock);
- 
- 	hdev->workqueue = alloc_workqueue(hdev->name, WQ_HIGHPRI | WQ_UNBOUND |
-@@ -1755,6 +1752,7 @@ int hci_register_dev(struct hci_dev *hdev)
- err_wqueue:
- 	destroy_workqueue(hdev->workqueue);
- err:
-+	ida_simple_remove(&hci_index_ida, hdev->id);
- 	write_lock(&hci_dev_list_lock);
- 	list_del(&hdev->list);
- 	write_unlock(&hci_dev_list_lock);
-@@ -1766,12 +1764,14 @@ EXPORT_SYMBOL(hci_register_dev);
- /* Unregister HCI device */
- void hci_unregister_dev(struct hci_dev *hdev)
- {
--	int i;
-+	int i, id;
- 
- 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
- 
- 	set_bit(HCI_UNREGISTER, &hdev->dev_flags);
- 
-+	id = hdev->id;
-+
- 	write_lock(&hci_dev_list_lock);
- 	list_del(&hdev->list);
- 	write_unlock(&hci_dev_list_lock);
-@@ -1812,6 +1812,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	hci_dev_unlock(hdev);
- 
- 	hci_dev_put(hdev);
-+
-+	ida_simple_remove(&hci_index_ida, id);
- }
- EXPORT_SYMBOL(hci_unregister_dev);
- 
--- 
-1.7.8.6
+Marcel
+
+
