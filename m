@@ -1,234 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v3 01/10] Bluetooth: Use chan as parameters for l2cap chan ops
-Date: Sun, 27 May 2012 22:27:51 -0300
-Message-Id: <1338168480-9646-1-git-send-email-gustavo@padovan.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Sasha Levin <levinsasha928@gmail.com>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sasha Levin <levinsasha928@gmail.com>
+Subject: [PATCH v2] Bluetooth: Really fix registering hci with duplicate name
+Date: Sun, 27 May 2012 22:36:56 +0200
+Message-Id: <1338151016-13494-1-git-send-email-levinsasha928@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Commit fc50744 ("Bluetooth: Fix registering hci with duplicate name") didn't
+fully fix the duplicate naming issue with devices, and duplicate device names
+could still be created:
 
-Use chan instead of void * makes more sense here.
+[  142.484097] device: 'hci1': device_add
+[...]
+[  150.545263] device: 'hci1': device_add
+[  150.550128] kobject: 'hci1' (ffff880014cc4e58): kobject_add_internal: parent: 'bluetooth', set: 'devices'
+[  150.558979] ------------[ cut here ]------------
+[  150.561438] WARNING: at fs/sysfs/dir.c:529 sysfs_add_one+0xb0/0xd0()
+[  150.572974] Hardware name: Bochs
+[  150.580502] sysfs: cannot create duplicate filename '/devices/virtual/bluetooth/hci1'
+[  150.584444] Pid: 7563, comm: trinity-child1 Tainted: G        W    3.4.0-next-20120524-sasha #296
+[...]
 
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Instead of the weird logic and the attempt at keeping the device list sorted,
+just use an IDA.
+
+Signed-off-by: Sasha Levin <levinsasha928@gmail.com>
 ---
- include/net/bluetooth/l2cap.h |   10 ++++++----
- net/bluetooth/l2cap_core.c    |   30 +++++++++++++++---------------
- net/bluetooth/l2cap_sock.c    |   16 ++++++++--------
- 3 files changed, 29 insertions(+), 27 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index f44344b..aa2dbc6 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -527,10 +527,12 @@ struct l2cap_chan {
- struct l2cap_ops {
- 	char			*name;
+Changes from v1:
+
+ - Address comments by Marcel.
+ - Remove errornous mutex lock.
+
+ net/bluetooth/hci_core.c |   41 ++++++++++++++++++++++++-----------------
+ 1 files changed, 24 insertions(+), 17 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 9c586fb..440329b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -26,6 +26,7 @@
+ /* Bluetooth HCI core. */
  
--	struct l2cap_chan	*(*new_connection) (void *data);
--	int			(*recv) (void *data, struct sk_buff *skb);
--	void			(*close) (void *data);
--	void			(*state_change) (void *data, int state);
-+	struct l2cap_chan	*(*new_connection) (struct l2cap_chan *chan);
-+	int			(*recv) (struct l2cap_chan * chan,
-+					 struct sk_buff *skb);
-+	void			(*close) (struct l2cap_chan *chan);
-+	void			(*state_change) (struct l2cap_chan *chan,
-+						 int state);
- 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
- 					       unsigned long len, int nb);
- };
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index de0dc9e..7edc814 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -180,7 +180,7 @@ static void __l2cap_state_change(struct l2cap_chan *chan, int state)
- 						state_to_string(state));
+ #include <linux/export.h>
++#include <linux/idr.h>
  
- 	chan->state = state;
--	chan->ops->state_change(chan->data, state);
-+	chan->ops->state_change(chan, state);
- }
+ #include <linux/rfkill.h>
  
- static void l2cap_state_change(struct l2cap_chan *chan, int state)
-@@ -381,7 +381,7 @@ static void l2cap_chan_timeout(struct work_struct *work)
+@@ -46,6 +47,9 @@ DEFINE_RWLOCK(hci_dev_list_lock);
+ LIST_HEAD(hci_cb_list);
+ DEFINE_RWLOCK(hci_cb_list_lock);
  
- 	l2cap_chan_unlock(chan);
++/* HCI ID Numbering */
++static DEFINE_IDA(hci_index_ida);
++
+ /* ---- HCI notifications ---- */
  
--	chan->ops->close(chan->data);
-+	chan->ops->close(chan);
- 	mutex_unlock(&conn->chan_lock);
- 
- 	l2cap_chan_put(chan);
-@@ -569,7 +569,7 @@ static void l2cap_chan_cleanup_listen(struct sock *parent)
- 		l2cap_chan_close(chan, ECONNRESET);
- 		l2cap_chan_unlock(chan);
- 
--		chan->ops->close(chan->data);
-+		chan->ops->close(chan);
- 	}
- }
- 
-@@ -1213,7 +1213,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
- 		goto clean;
- 	}
- 
--	chan = pchan->ops->new_connection(pchan->data);
-+	chan = pchan->ops->new_connection(pchan);
- 	if (!chan)
- 		goto clean;
- 
-@@ -1324,7 +1324,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 
- 		l2cap_chan_unlock(chan);
- 
--		chan->ops->close(chan->data);
-+		chan->ops->close(chan);
- 		l2cap_chan_put(chan);
- 	}
- 
-@@ -2568,7 +2568,7 @@ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
- 		if (!nskb)
- 			continue;
- 
--		if (chan->ops->recv(chan->data, nskb))
-+		if (chan->ops->recv(chan, nskb))
- 			kfree_skb(nskb);
- 	}
- 
-@@ -3411,7 +3411,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 		goto response;
- 	}
- 
--	chan = pchan->ops->new_connection(pchan->data);
-+	chan = pchan->ops->new_connection(pchan);
- 	if (!chan)
- 		goto response;
- 
-@@ -3420,7 +3420,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 	/* Check if we already have channel with that dcid */
- 	if (__l2cap_get_chan_by_dcid(conn, scid)) {
- 		sock_set_flag(sk, SOCK_ZAPPED);
--		chan->ops->close(chan->data);
-+		chan->ops->close(chan);
- 		goto response;
- 	}
- 
-@@ -3831,7 +3831,7 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
- 
- 	l2cap_chan_unlock(chan);
- 
--	chan->ops->close(chan->data);
-+	chan->ops->close(chan);
- 	l2cap_chan_put(chan);
- 
- 	mutex_unlock(&conn->chan_lock);
-@@ -3865,7 +3865,7 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
- 
- 	l2cap_chan_unlock(chan);
- 
--	chan->ops->close(chan->data);
-+	chan->ops->close(chan);
- 	l2cap_chan_put(chan);
- 
- 	mutex_unlock(&conn->chan_lock);
-@@ -4435,7 +4435,7 @@ static int l2cap_reassemble_sdu(struct l2cap_chan *chan, struct sk_buff *skb,
- 		if (chan->sdu)
- 			break;
- 
--		err = chan->ops->recv(chan->data, skb);
-+		err = chan->ops->recv(chan, skb);
- 		break;
- 
- 	case L2CAP_SAR_START:
-@@ -4485,7 +4485,7 @@ static int l2cap_reassemble_sdu(struct l2cap_chan *chan, struct sk_buff *skb,
- 		if (chan->sdu->len != chan->sdu_len)
- 			break;
- 
--		err = chan->ops->recv(chan->data, chan->sdu);
-+		err = chan->ops->recv(chan, chan->sdu);
- 
- 		if (!err) {
- 			/* Reassembly complete */
-@@ -5207,7 +5207,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
- 		if (chan->imtu < skb->len)
- 			goto drop;
- 
--		if (!chan->ops->recv(chan->data, skb))
-+		if (!chan->ops->recv(chan, skb))
- 			goto done;
- 		break;
- 
-@@ -5246,7 +5246,7 @@ static inline int l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm, str
- 	if (chan->imtu < skb->len)
- 		goto drop;
- 
--	if (!chan->ops->recv(chan->data, skb))
-+	if (!chan->ops->recv(chan, skb))
- 		return 0;
- 
- drop:
-@@ -5272,7 +5272,7 @@ static inline int l2cap_att_channel(struct l2cap_conn *conn, u16 cid,
- 	if (chan->imtu < skb->len)
- 		goto drop;
- 
--	if (!chan->ops->recv(chan->data, skb))
-+	if (!chan->ops->recv(chan, skb))
- 		return 0;
- 
- drop:
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index d244361..db787f6 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -872,9 +872,9 @@ static int l2cap_sock_release(struct socket *sock)
- 	return err;
- }
- 
--static struct l2cap_chan *l2cap_sock_new_connection_cb(void *data)
-+static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+ static void hci_notify(struct hci_dev *hdev, int event)
+@@ -1689,37 +1693,35 @@ EXPORT_SYMBOL(hci_free_dev);
+ /* Register HCI device */
+ int hci_register_dev(struct hci_dev *hdev)
  {
--	struct sock *sk, *parent = data;
-+	struct sock *sk, *parent = chan->data;
+-	struct list_head *head, *p;
+ 	int id, error;
  
- 	sk = l2cap_sock_alloc(sock_net(parent), NULL, BTPROTO_L2CAP,
- 								GFP_ATOMIC);
-@@ -888,10 +888,10 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(void *data)
- 	return l2cap_pi(sk)->chan;
- }
+ 	if (!hdev->open || !hdev->close)
+ 		return -EINVAL;
  
--static int l2cap_sock_recv_cb(void *data, struct sk_buff *skb)
-+static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+-	write_lock(&hci_dev_list_lock);
+-
+ 	/* Do not allow HCI_AMP devices to register at index 0,
+ 	 * so the index can be used as the AMP controller ID.
+ 	 */
+-	id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
+-	head = &hci_dev_list;
+-
+-	/* Find first available device id */
+-	list_for_each(p, &hci_dev_list) {
+-		int nid = list_entry(p, struct hci_dev, list)->id;
+-		if (nid > id)
+-			break;
+-		if (nid == id)
+-			id++;
+-		head = p;
++	switch (hdev->dev_type) {
++	case HCI_BREDR:
++		id = ida_simple_get(&hci_index_ida, 0, 0, GFP_KERNEL);
++		break;
++	case HCI_AMP:
++		id = ida_simple_get(&hci_index_ida, 1, 0, GFP_KERNEL);
++		break;
++	default:
++		return -EINVAL;
+ 	}
+ 
++	if (id < 0)
++		return id;
++
+ 	sprintf(hdev->name, "hci%d", id);
+ 	hdev->id = id;
+ 
+ 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
+ 
+-	list_add(&hdev->list, head);
+-
++	write_lock(&hci_dev_list_lock);
++	list_add(&hdev->list, &hci_dev_list);
+ 	write_unlock(&hci_dev_list_lock);
+ 
+ 	hdev->workqueue = alloc_workqueue(hdev->name, WQ_HIGHPRI | WQ_UNBOUND |
+@@ -1755,6 +1757,7 @@ int hci_register_dev(struct hci_dev *hdev)
+ err_wqueue:
+ 	destroy_workqueue(hdev->workqueue);
+ err:
++	ida_simple_remove(&hci_index_ida, hdev->id);
+ 	write_lock(&hci_dev_list_lock);
+ 	list_del(&hdev->list);
+ 	write_unlock(&hci_dev_list_lock);
+@@ -1766,12 +1769,14 @@ EXPORT_SYMBOL(hci_register_dev);
+ /* Unregister HCI device */
+ void hci_unregister_dev(struct hci_dev *hdev)
  {
- 	int err;
--	struct sock *sk = data;
-+	struct sock *sk = chan->data;
- 	struct l2cap_pinfo *pi = l2cap_pi(sk);
+-	int i;
++	int i, id;
  
- 	lock_sock(sk);
-@@ -924,16 +924,16 @@ done:
- 	return err;
+ 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
+ 
+ 	set_bit(HCI_UNREGISTER, &hdev->dev_flags);
+ 
++	id = hdev->id;
++
+ 	write_lock(&hci_dev_list_lock);
+ 	list_del(&hdev->list);
+ 	write_unlock(&hci_dev_list_lock);
+@@ -1812,6 +1817,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_dev_unlock(hdev);
+ 
+ 	hci_dev_put(hdev);
++
++	ida_simple_remove(&hci_index_ida, id);
  }
+ EXPORT_SYMBOL(hci_unregister_dev);
  
--static void l2cap_sock_close_cb(void *data)
-+static void l2cap_sock_close_cb(struct l2cap_chan *chan)
- {
--	struct sock *sk = data;
-+	struct sock *sk = chan->data;
- 
- 	l2cap_sock_kill(sk);
- }
- 
--static void l2cap_sock_state_change_cb(void *data, int state)
-+static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state)
- {
--	struct sock *sk = data;
-+	struct sock *sk = chan->data;
- 
- 	sk->sk_state = state;
- }
 -- 
-1.7.10.2
-
+1.7.8.6
