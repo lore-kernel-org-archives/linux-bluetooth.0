@@ -1,26 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 27 May 2012 22:42:28 +0300
+Date: Sun, 27 May 2012 22:37:41 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+To: Tom Gundersen <teg@jklm.no>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 01/10] SAP: Remove not needed NULL pointer check in
- check_msg
-Message-ID: <20120527194228.GC31160@x220.P-661HNU-F1>
-References: <1337955662-19016-1-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCH] udev: remove deprecated function
+Message-ID: <20120527193741.GB31160@x220.P-661HNU-F1>
+References: <1338073677-27983-1-git-send-email-teg@jklm.no>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1337955662-19016-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1338073677-27983-1-git-send-email-teg@jklm.no>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Tom,
 
-On Fri, May 25, 2012, Szymon Janc wrote:
-> Buffer passed to check_msg() is always valid.
+On Sun, May 27, 2012, Tom Gundersen wrote:
+> This function has in the past returned "/sys" unconditionally. As of udev-183 it
+> is gone, so just replace it with the string.
 > ---
->  sap/server.c |    3 ---
->  1 file changed, 3 deletions(-)
+>  tools/hid2hci.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-All patches in this set have been applied. Thanks.
+Applied (after reformatting the commit message to have max 72 character
+lines). Thanks.
 
 Johan
