@@ -1,165 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1338102630.15105.112.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Really fix registering hci with duplicate
- name
+Message-ID: <1338095494.15105.106.camel@aeonflux>
+Subject: Re: [PATCH -v2 12/12] Bluetooth: Used void * as parameter in
+ alloc_skb()
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Sasha Levin <levinsasha928@gmail.com>
-Cc: gustavo@padovan.org, johan.hedberg@gmail.com, davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Date: Sun, 27 May 2012 09:10:30 +0200
-In-Reply-To: <1338060231-31108-1-git-send-email-levinsasha928@gmail.com>
-References: <1338060231-31108-1-git-send-email-levinsasha928@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Date: Sun, 27 May 2012 07:11:34 +0200
+In-Reply-To: <20120525124139.GD31623@joana>
+References: <1337949064-26187-1-git-send-email-gustavo@padovan.org>
+	 <1337949064-26187-13-git-send-email-gustavo@padovan.org>
+	 <20120525123932.GH3089@aemeltch-MOBL1> <20120525124139.GD31623@joana>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sasha,
+Hi Gustavo,
 
-> Commit fc50744 ("Bluetooth: Fix registering hci with duplicate name") didn't
-> fully fix the duplicate naming issue with devices, and duplicate device names
-> could still be created:
+> > On Fri, May 25, 2012 at 09:31:04AM -0300, Gustavo Padovan wrote:
+> > > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > > 
+> > > This keep l2cap chan ops functions parameters in sync.
+> > > 
+> > > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > 
+> > ...
+> > 
+> > > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> > > index 25a85ab..0f8886b 100644
+> > > --- a/include/net/bluetooth/l2cap.h
+> > > +++ b/include/net/bluetooth/l2cap.h
+> > > @@ -532,8 +532,8 @@ struct l2cap_ops {
+> > >  	void			(*close) (void *data);
+> > >  	void			(*teardown) (void *data, int err);
+> > >  	void			(*state_change) (void *data, int state);
+> > > -	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
+> > > -					       unsigned long len, int nb);
+> > > +	struct sk_buff		*(*alloc_skb) (void *data, unsigned long len,
+> > > +					       int nb);
+> > 
+> > ...
+> > 
+> > > @@ -1893,7 +1893,7 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
+> > >  
+> > >  		count = min_t(unsigned int, conn->mtu, len);
+> > >  
+> > > -		tmp = chan->ops->alloc_skb(chan, count,
+> > > +		tmp = chan->ops->alloc_skb(chan->data, count,
+> > 
+> > Why do we need to pass chan->data instead of chan?
 > 
-> [  142.484097] device: 'hci1': device_add
-> [...]
-> [  150.545263] device: 'hci1': device_add
-> [  150.550128] kobject: 'hci1' (ffff880014cc4e58): kobject_add_internal: parent: 'bluetooth', set: 'devices'
-> [  150.558979] ------------[ cut here ]------------
-> [  150.561438] WARNING: at fs/sysfs/dir.c:529 sysfs_add_one+0xb0/0xd0()
-> [  150.572974] Hardware name: Bochs
-> [  150.580502] sysfs: cannot create duplicate filename '/devices/virtual/bluetooth/hci1'
-> [  150.584444] Pid: 7563, comm: trinity-child1 Tainted: G        W    3.4.0-next-20120524-sasha #296
-> [...]
-> 
-> Instead of the weird logic and the attempt at keeping the device list sorted,
-> just use an IDA.
-> 
-> Signed-off-by: Sasha Levin <levinsasha928@gmail.com>
-> ---
->  net/bluetooth/hci_core.c |   30 ++++++++++++++++--------------
->  1 files changed, 16 insertions(+), 14 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 9c586fb..eca6dd1 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -26,6 +26,7 @@
->  /* Bluetooth HCI core. */
->  
->  #include <linux/export.h>
-> +#include <linux/idr.h>
->  
->  #include <linux/rfkill.h>
->  
-> @@ -46,6 +47,9 @@ DEFINE_RWLOCK(hci_dev_list_lock);
->  LIST_HEAD(hci_cb_list);
->  DEFINE_RWLOCK(hci_cb_list_lock);
->  
-> +/* HCI ID Numbering */
-> +static DEFINE_IDA(hci_index_ida);
-> +
->  /* ---- HCI notifications ---- */
->  
->  static void hci_notify(struct hci_dev *hdev, int event)
-> @@ -1689,7 +1693,6 @@ EXPORT_SYMBOL(hci_free_dev);
->  /* Register HCI device */
->  int hci_register_dev(struct hci_dev *hdev)
->  {
-> -	struct list_head *head, *p;
->  	int id, error;
->  
->  	if (!hdev->open || !hdev->close)
-> @@ -1701,25 +1704,19 @@ int hci_register_dev(struct hci_dev *hdev)
->  	 * so the index can be used as the AMP controller ID.
->  	 */
->  	id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
-> -	head = &hci_dev_list;
->  
-> -	/* Find first available device id */
-> -	list_for_each(p, &hci_dev_list) {
-> -		int nid = list_entry(p, struct hci_dev, list)->id;
-> -		if (nid > id)
-> -			break;
-> -		if (nid == id)
-> -			id++;
-> -		head = p;
-> -	}
-> +	error = ida_simple_get(&hci_index_ida, id, 0, GFP_KERNEL);
-> +	if (error < 0)
-> +		return error;
->  
-> +	id = error;
+> We are changing this to make this call have the same parameter as the other
+> ops calls, i.e., a void *, so we just pass chan->data here which is the user
+> data (struct sock *sk in the l2cap_sock.c case).
 
-I do not really like this "error" thing here.
-
-Why not something simple like this:
-
-	switch (hdev->dev_type) {
-	case HCI_BREDR:
-		id = ida_simple_get(&hci_index_ida, 0, 0, GFP_KERNEL);
-		break;
-	case HCI_AMP:
-		id = ida_simple_get(&hci_index_idx, 1, 0, GFP_KERNEL);
-		break;
-	default:
-		return -EINVAL;
-	}
-
-	if (id < 0)
-		return id;
-
-It would have the side effect to also check for valid dev_type at the
-same time.
-
-Or just just an extra variable start_id to avoid the "error" naming for
-what is expected to be a positive result in almost all cases.
-
->  	sprintf(hdev->name, "hci%d", id);
->  	hdev->id = id;
->  
->  	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
->  
-> -	list_add(&hdev->list, head);
-> -
-> +	write_lock(&hci_dev_list_lock);
-> +	list_add(&hdev->list, &hci_dev_list);
->  	write_unlock(&hci_dev_list_lock);
->  
->  	hdev->workqueue = alloc_workqueue(hdev->name, WQ_HIGHPRI | WQ_UNBOUND |
-> @@ -1755,6 +1752,7 @@ int hci_register_dev(struct hci_dev *hdev)
->  err_wqueue:
->  	destroy_workqueue(hdev->workqueue);
->  err:
-> +	ida_simple_remove(&hci_index_ida, hdev->id);
->  	write_lock(&hci_dev_list_lock);
->  	list_del(&hdev->list);
->  	write_unlock(&hci_dev_list_lock);
-> @@ -1766,12 +1764,14 @@ EXPORT_SYMBOL(hci_register_dev);
->  /* Unregister HCI device */
->  void hci_unregister_dev(struct hci_dev *hdev)
->  {
-> -	int i;
-> +	int i, id;
->  
->  	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
->  
->  	set_bit(HCI_UNREGISTER, &hdev->dev_flags);
->  
-> +	id = hdev->id;
-> +
->  	write_lock(&hci_dev_list_lock);
->  	list_del(&hdev->list);
->  	write_unlock(&hci_dev_list_lock);
-> @@ -1812,6 +1812,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
->  	hci_dev_unlock(hdev);
->  
->  	hci_dev_put(hdev);
-> +
-> +	ida_simple_remove(&hci_index_ida, id);
->  }
->  EXPORT_SYMBOL(hci_unregister_dev);
->  
+so what is the problem to just pass l2cap_chan in here for all calls and
+then have the it do chan->data inside the callback. This void *data
+thing is dead ugly.
 
 Regards
 
