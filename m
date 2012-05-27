@@ -1,114 +1,168 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 27 May 2012 16:00:20 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH -v2 07/12] Bluetooth: Create DEFER_SETUP flag in
- conf_state
-Message-ID: <20120527190020.GA14106@joana>
-References: <1337949064-26187-1-git-send-email-gustavo@padovan.org>
- <1337949064-26187-8-git-send-email-gustavo@padovan.org>
- <1338095235.15105.103.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338095235.15105.103.camel@aeonflux>
+Message-ID: <1338102630.15105.112.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Really fix registering hci with duplicate
+ name
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Sasha Levin <levinsasha928@gmail.com>
+Cc: gustavo@padovan.org, johan.hedberg@gmail.com, davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Date: Sun, 27 May 2012 09:10:30 +0200
+In-Reply-To: <1338060231-31108-1-git-send-email-levinsasha928@gmail.com>
+References: <1338060231-31108-1-git-send-email-levinsasha928@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Sasha,
 
-* Marcel Holtmann <marcel@holtmann.org> [2012-05-27 07:07:15 +0200]:
-
-> Hi Gustavo,
+> Commit fc50744 ("Bluetooth: Fix registering hci with duplicate name") didn't
+> fully fix the duplicate naming issue with devices, and duplicate device names
+> could still be created:
 > 
-> > Remove another socket usage from l2cap_core.c
-> > 
-> > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> > ---
-> >  include/net/bluetooth/l2cap.h |    1 +
-> >  net/bluetooth/l2cap_core.c    |   12 ++++++------
-> >  net/bluetooth/l2cap_sock.c    |    8 ++++++--
-> >  3 files changed, 13 insertions(+), 8 deletions(-)
-> > 
-> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> > index 3b05f3e..c55b28f 100644
-> > --- a/include/net/bluetooth/l2cap.h
-> > +++ b/include/net/bluetooth/l2cap.h
-> > @@ -599,6 +599,7 @@ enum {
-> >  	CONF_LOC_CONF_PEND,
-> >  	CONF_REM_CONF_PEND,
-> >  	CONF_NOT_COMPLETE,
-> > +	CONF_DEFER_SETUP,
-> >  };
-> >  
-> >  #define L2CAP_CONF_MAX_CONF_REQ 2
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index 01171b1..388bc70 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -569,7 +569,7 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
-> >  			struct l2cap_conn_rsp rsp;
-> >  			__u16 result;
-> >  
-> > -			if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags))
-> > +			if (test_bit(CONF_DEFER_SETUP, &chan->conf_state))
-> >  				result = L2CAP_CR_SEC_BLOCK;
-> >  			else
-> >  				result = L2CAP_CR_BAD_PSM;
-> > @@ -1056,8 +1056,8 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
-> >  
-> >  			if (l2cap_chan_check_security(chan)) {
-> >  				lock_sock(sk);
-> > -				if (test_bit(BT_SK_DEFER_SETUP,
-> > -					     &bt_sk(sk)->flags)) {
-> > +				if (test_bit(CONF_DEFER_SETUP,
-> > +					     &chan->conf_state)) {
-> >  					struct sock *parent = bt_sk(sk)->parent;
-> >  					rsp.result = __constant_cpu_to_le16(L2CAP_CR_PEND);
-> >  					rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
-> > @@ -3376,7 +3376,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
-> >  
-> >  	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE) {
-> >  		if (l2cap_chan_check_security(chan)) {
-> > -			if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
-> > +			if (test_bit(CONF_DEFER_SETUP, &chan->conf_state)) {
-> >  				__l2cap_state_change(chan, BT_CONNECT2);
-> >  				result = L2CAP_CR_PEND;
-> >  				status = L2CAP_CS_AUTHOR_PEND;
-> > @@ -5406,8 +5406,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
-> >  			lock_sock(sk);
-> >  
-> >  			if (!status) {
-> > -				if (test_bit(BT_SK_DEFER_SETUP,
-> > -					     &bt_sk(sk)->flags)) {
-> > +				if (test_bit(CONF_DEFER_SETUP,
-> > +					     &chan->conf_state)) {
-> >  					struct sock *parent = bt_sk(sk)->parent;
-> >  					res = L2CAP_CR_PEND;
-> >  					stat = L2CAP_CS_AUTHOR_PEND;
-> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> > index d2d91b3..51d05a7 100644
-> > --- a/net/bluetooth/l2cap_sock.c
-> > +++ b/net/bluetooth/l2cap_sock.c
-> > @@ -623,10 +623,14 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
-> >  			break;
-> >  		}
-> >  
-> > -		if (opt)
-> > +		if (opt) {
-> >  			set_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
-> > -		else
-> > +			set_bit(CONF_DEFER_SETUP, &chan->conf_state);
-> > +		} else {
-> >  			clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
-> > +			clear_bit(CONF_DEFER_SETUP, &chan->conf_state);
-> > +		}
-> > +
-> >  		break;
+> [  142.484097] device: 'hci1': device_add
+> [...]
+> [  150.545263] device: 'hci1': device_add
+> [  150.550128] kobject: 'hci1' (ffff880014cc4e58): kobject_add_internal: parent: 'bluetooth', set: 'devices'
+> [  150.558979] ------------[ cut here ]------------
+> [  150.561438] WARNING: at fs/sysfs/dir.c:529 sysfs_add_one+0xb0/0xd0()
+> [  150.572974] Hardware name: Bochs
+> [  150.580502] sysfs: cannot create duplicate filename '/devices/virtual/bluetooth/hci1'
+> [  150.584444] Pid: 7563, comm: trinity-child1 Tainted: G        W    3.4.0-next-20120524-sasha #296
+> [...]
 > 
-> and what about the lines above testing this together with BT_SECURITY?
+> Instead of the weird logic and the attempt at keeping the device list sorted,
+> just use an IDA.
+> 
+> Signed-off-by: Sasha Levin <levinsasha928@gmail.com>
+> ---
+>  net/bluetooth/hci_core.c |   30 ++++++++++++++++--------------
+>  1 files changed, 16 insertions(+), 14 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 9c586fb..eca6dd1 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -26,6 +26,7 @@
+>  /* Bluetooth HCI core. */
+>  
+>  #include <linux/export.h>
+> +#include <linux/idr.h>
+>  
+>  #include <linux/rfkill.h>
+>  
+> @@ -46,6 +47,9 @@ DEFINE_RWLOCK(hci_dev_list_lock);
+>  LIST_HEAD(hci_cb_list);
+>  DEFINE_RWLOCK(hci_cb_list_lock);
+>  
+> +/* HCI ID Numbering */
+> +static DEFINE_IDA(hci_index_ida);
+> +
+>  /* ---- HCI notifications ---- */
+>  
+>  static void hci_notify(struct hci_dev *hdev, int event)
+> @@ -1689,7 +1693,6 @@ EXPORT_SYMBOL(hci_free_dev);
+>  /* Register HCI device */
+>  int hci_register_dev(struct hci_dev *hdev)
+>  {
+> -	struct list_head *head, *p;
+>  	int id, error;
+>  
+>  	if (!hdev->open || !hdev->close)
+> @@ -1701,25 +1704,19 @@ int hci_register_dev(struct hci_dev *hdev)
+>  	 * so the index can be used as the AMP controller ID.
+>  	 */
+>  	id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
+> -	head = &hci_dev_list;
+>  
+> -	/* Find first available device id */
+> -	list_for_each(p, &hci_dev_list) {
+> -		int nid = list_entry(p, struct hci_dev, list)->id;
+> -		if (nid > id)
+> -			break;
+> -		if (nid == id)
+> -			id++;
+> -		head = p;
+> -	}
+> +	error = ida_simple_get(&hci_index_ida, id, 0, GFP_KERNEL);
+> +	if (error < 0)
+> +		return error;
+>  
+> +	id = error;
 
-I'm ok with those lines using BT_SK_DEFER_SETUP. CONF_DEFER_SETUP is meant for
-l2cap_core.c use where we should not have access to sk.
+I do not really like this "error" thing here.
 
-	Gustavo
+Why not something simple like this:
+
+	switch (hdev->dev_type) {
+	case HCI_BREDR:
+		id = ida_simple_get(&hci_index_ida, 0, 0, GFP_KERNEL);
+		break;
+	case HCI_AMP:
+		id = ida_simple_get(&hci_index_idx, 1, 0, GFP_KERNEL);
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	if (id < 0)
+		return id;
+
+It would have the side effect to also check for valid dev_type at the
+same time.
+
+Or just just an extra variable start_id to avoid the "error" naming for
+what is expected to be a positive result in almost all cases.
+
+>  	sprintf(hdev->name, "hci%d", id);
+>  	hdev->id = id;
+>  
+>  	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
+>  
+> -	list_add(&hdev->list, head);
+> -
+> +	write_lock(&hci_dev_list_lock);
+> +	list_add(&hdev->list, &hci_dev_list);
+>  	write_unlock(&hci_dev_list_lock);
+>  
+>  	hdev->workqueue = alloc_workqueue(hdev->name, WQ_HIGHPRI | WQ_UNBOUND |
+> @@ -1755,6 +1752,7 @@ int hci_register_dev(struct hci_dev *hdev)
+>  err_wqueue:
+>  	destroy_workqueue(hdev->workqueue);
+>  err:
+> +	ida_simple_remove(&hci_index_ida, hdev->id);
+>  	write_lock(&hci_dev_list_lock);
+>  	list_del(&hdev->list);
+>  	write_unlock(&hci_dev_list_lock);
+> @@ -1766,12 +1764,14 @@ EXPORT_SYMBOL(hci_register_dev);
+>  /* Unregister HCI device */
+>  void hci_unregister_dev(struct hci_dev *hdev)
+>  {
+> -	int i;
+> +	int i, id;
+>  
+>  	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
+>  
+>  	set_bit(HCI_UNREGISTER, &hdev->dev_flags);
+>  
+> +	id = hdev->id;
+> +
+>  	write_lock(&hci_dev_list_lock);
+>  	list_del(&hdev->list);
+>  	write_unlock(&hci_dev_list_lock);
+> @@ -1812,6 +1812,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
+>  	hci_dev_unlock(hdev);
+>  
+>  	hci_dev_put(hdev);
+> +
+> +	ida_simple_remove(&hci_index_ida, id);
+>  }
+>  EXPORT_SYMBOL(hci_unregister_dev);
+>  
+
+Regards
+
+Marcel
+
+
