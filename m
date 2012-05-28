@@ -1,56 +1,125 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1338176868.15105.113.camel@aeonflux>
-Subject: Re: [PATCH v2] Bluetooth: Really fix registering hci with duplicate
- name
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Sasha Levin <levinsasha928@gmail.com>
-Cc: gustavo@padovan.org, johan.hedberg@gmail.com, davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Date: Mon, 28 May 2012 05:47:48 +0200
-In-Reply-To: <1338151016-13494-1-git-send-email-levinsasha928@gmail.com>
-References: <1338151016-13494-1-git-send-email-levinsasha928@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: [PATCH -v3 10/10] Bluetooth: Remove parent socket usage from l2cap_core.c
+Date: Sun, 27 May 2012 22:28:00 -0300
+Message-Id: <1338168480-9646-10-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1338168480-9646-1-git-send-email-gustavo@padovan.org>
+References: <1338168480-9646-1-git-send-email-gustavo@padovan.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sasha,
+From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-> Commit fc50744 ("Bluetooth: Fix registering hci with duplicate name") didn't
-> fully fix the duplicate naming issue with devices, and duplicate device names
-> could still be created:
-> 
-> [  142.484097] device: 'hci1': device_add
-> [...]
-> [  150.545263] device: 'hci1': device_add
-> [  150.550128] kobject: 'hci1' (ffff880014cc4e58): kobject_add_internal: parent: 'bluetooth', set: 'devices'
-> [  150.558979] ------------[ cut here ]------------
-> [  150.561438] WARNING: at fs/sysfs/dir.c:529 sysfs_add_one+0xb0/0xd0()
-> [  150.572974] Hardware name: Bochs
-> [  150.580502] sysfs: cannot create duplicate filename '/devices/virtual/bluetooth/hci1'
-> [  150.584444] Pid: 7563, comm: trinity-child1 Tainted: G        W    3.4.0-next-20120524-sasha #296
-> [...]
-> 
-> Instead of the weird logic and the attempt at keeping the device list sorted,
-> just use an IDA.
-> 
-> Signed-off-by: Sasha Levin <levinsasha928@gmail.com>
-> ---
-> 
-> Changes from v1:
-> 
->  - Address comments by Marcel.
->  - Remove errornous mutex lock.
-> 
->  net/bluetooth/hci_core.c |   41 ++++++++++++++++++++++++-----------------
->  1 files changed, 24 insertions(+), 17 deletions(-)
+We can lock the parent lock only inside the new_connection() call, then we
+just use the l2cap_chan_lock() in core code.
 
-thanks for addressing this. Patch has been applied to bluetooth-next
-tree.
+Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+---
+ net/bluetooth/l2cap_core.c |   16 ++++++----------
+ net/bluetooth/l2cap_sock.c |    9 ++++++++-
+ 2 files changed, 14 insertions(+), 11 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 74843d2..5920a7c 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1139,7 +1139,7 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
+ 
+ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ {
+-	struct sock *parent, *sk;
++	struct sock *sk;
+ 	struct l2cap_chan *chan, *pchan;
+ 
+ 	BT_DBG("");
+@@ -1150,9 +1150,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 	if (!pchan)
+ 		return;
+ 
+-	parent = pchan->sk;
+-
+-	lock_sock(parent);
++	l2cap_chan_lock(pchan);
+ 
+ 	chan = pchan->ops->new_connection(pchan);
+ 	if (!chan)
+@@ -1170,7 +1168,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 	l2cap_chan_ready(chan);
+ 
+ clean:
+-	release_sock(parent);
++	l2cap_chan_unlock(pchan);
+ }
+ 
+ static void l2cap_conn_ready(struct l2cap_conn *conn)
+@@ -3309,7 +3307,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
+ 	struct l2cap_conn_rsp rsp;
+ 	struct l2cap_chan *chan = NULL, *pchan;
+-	struct sock *parent, *sk = NULL;
++	struct sock *sk = NULL;
+ 	int result, status = L2CAP_CS_NO_INFO;
+ 
+ 	u16 dcid = 0, scid = __le16_to_cpu(req->scid);
+@@ -3324,10 +3322,8 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 		goto sendresp;
+ 	}
+ 
+-	parent = pchan->sk;
+-
+ 	mutex_lock(&conn->chan_lock);
+-	lock_sock(parent);
++	l2cap_chan_lock(pchan);
+ 
+ 	/* Check if the ACL is secure enough (if not SDP) */
+ 	if (psm != __constant_cpu_to_le16(L2CAP_PSM_SDP) &&
+@@ -3389,7 +3385,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 	}
+ 
+ response:
+-	release_sock(parent);
++	l2cap_chan_unlock(pchan);
+ 	mutex_unlock(&conn->chan_lock);
+ 
+ sendresp:
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 700eef8..cfb97ca 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -899,16 +899,21 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+ {
+ 	struct sock *sk, *parent = chan->data;
+ 
++	lock_sock(parent);
++
+ 	/* Check for backlog size */
+ 	if (sk_acceptq_is_full(parent)) {
+ 		BT_DBG("backlog full %d", parent->sk_ack_backlog);
++		release_sock(parent);
+ 		return NULL;
+ 	}
+ 
+ 	sk = l2cap_sock_alloc(sock_net(parent), NULL, BTPROTO_L2CAP,
+ 								GFP_ATOMIC);
+-	if (!sk)
++	if (!sk) {
++		release_sock(parent);
+ 		return NULL;
++	}
+ 
+ 	bt_sock_reclassify_lock(sk, BTPROTO_L2CAP);
+ 
+@@ -916,6 +921,8 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+ 
+ 	bt_accept_enqueue(parent, sk);
+ 
++	release_sock(parent);
++
+ 	return l2cap_pi(sk)->chan;
+ }
+ 
+-- 
+1.7.10.2
 
