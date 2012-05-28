@@ -1,67 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 28 May 2012 17:12:24 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [PATCH -v3 07/10] Bluetooth: Add chan->ops->defer()
+Message-ID: <20120528141222.GC3537@aemeltch-MOBL1>
+References: <1338168480-9646-1-git-send-email-gustavo@padovan.org>
+ <1338168480-9646-7-git-send-email-gustavo@padovan.org>
+ <1338177260.15105.117.camel@aeonflux>
 MIME-Version: 1.0
-In-Reply-To: <1338203808-15142-1-git-send-email-luiz.dentz@gmail.com>
-References: <1338203808-15142-1-git-send-email-luiz.dentz@gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 28 May 2012 12:16:35 -0300
-Message-ID: <CAMOw1v4uoOozhXMpLRWy=YSg1EcF-69rej8twKgQ_YjSvf3s=A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2] AVRCP: Fix not registering to VolumeChanged
- event again when notified
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1338177260.15105.117.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, May 28, 2012 at 8:16 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> The spec says:
->
-> "A registered notification gets changed on receiving CHANGED event
-> notification. For a new notification additional NOTIFY command is
-> expected to be sent."
-> ---
-> v2: Fix check to do logical AND not OR
->
->  audio/avrcp.c |    9 ++++++++-
->  1 files changed, 8 insertions(+), 1 deletions(-)
->
-> diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index 131490f..a040099 100644
-> --- a/audio/avrcp.c
-> +++ b/audio/avrcp.c
-> @@ -177,6 +177,8 @@ static uint32_t company_ids[] = {
->        IEEEID_BTSIG,
->  };
->
-> +static void register_volume_notification(struct avrcp_player *player);
-> +
->  static sdp_record_t *avrcp_ct_record(void)
->  {
->        sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-> @@ -1148,13 +1150,18 @@ static gboolean avrcp_handle_volume_changed(struct avctp *session,
->        struct avrcp_header *pdu = (void *) operands;
->        uint8_t volume;
->
-> -       if (code == AVC_CTYPE_REJECTED || code == AVC_CTYPE_NOT_IMPLEMENTED)
-> +       if (code != AVC_CTYPE_INTERIM && code != AVC_CTYPE_CHANGED)
->                return FALSE;
->
->        volume = pdu->params[1] & 0x7F;
->
->        player->cb->set_volume(volume, player->dev, player->user_data);
->
-> +       if (code == AVC_CTYPE_CHANGED) {
-> +               register_volume_notification(player);
-> +               return FALSE;
-> +       }
-> +
->        return TRUE;
->  }
+Hi Marcel and Gustavo,
 
-Ack.
+On Mon, May 28, 2012 at 05:54:20AM +0200, Marcel Holtmann wrote:
+...
 
+> > @@ -1052,6 +1063,7 @@ static struct l2cap_ops l2cap_chan_ops = {
+> >  	.teardown	= l2cap_sock_teardown_cb,
+> >  	.state_change	= l2cap_sock_state_change_cb,
+> >  	.ready		= l2cap_sock_ready_cb,
+> > +	.defer		= l2cap_sock_defer_cb,
+> >  	.alloc_skb	= l2cap_sock_alloc_skb_cb,
+> >  };
+> 
+> In addition can you explain to me how this is suppose to work if defer
+> is not set. Then we never call ready.
 
-Lucas De Marchi
+For fixed channel we do not use ready so this would be OK.
+
+> Also this is a pretty bad idea inside the code. We better do something
+> like l2cap_sock_no_defer like the network subsystem does for general
+> socket. Since otherwise you keep spreading if (defer) all over the
+> places.
+
+This look right, I will change my code following your proposal so Gustavo
+can invoke those functions directly.
+
+Best regards 
+Andrei Emeltchenko 
