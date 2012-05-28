@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v3 05/10] Bluetooth: Move check for backlog size to l2cap_sock.c
-Date: Sun, 27 May 2012 22:27:55 -0300
-Message-Id: <1338168480-9646-5-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v3 04/10] Bluetooth: Use chan->state instead of sk->sk_state
+Date: Sun, 27 May 2012 22:27:54 -0300
+Message-Id: <1338168480-9646-4-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1338168480-9646-1-git-send-email-gustavo@padovan.org>
 References: <1338168480-9646-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,62 +12,55 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-Remove socket specific code from l2cap_core.c
+These vars are kept in sync so we can use chan->state here.
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |   12 ------------
- net/bluetooth/l2cap_sock.c |    6 ++++++
- 2 files changed, 6 insertions(+), 12 deletions(-)
+ net/bluetooth/l2cap_core.c |    9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 35e6d7d..d64c836 100644
+index 5947eb1..35e6d7d 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1156,12 +1156,6 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+@@ -1442,21 +1442,17 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 		goto done;
+ 	}
  
- 	lock_sock(parent);
- 
--	/* Check for backlog size */
--	if (sk_acceptq_is_full(parent)) {
--		BT_DBG("backlog full %d", parent->sk_ack_backlog);
--		goto clean;
--	}
+-	lock_sock(sk);
 -
- 	chan = pchan->ops->new_connection(pchan);
- 	if (!chan)
- 		goto clean;
-@@ -3349,12 +3343,6 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+-	switch (sk->sk_state) {
++	switch (chan->state) {
+ 	case BT_CONNECT:
+ 	case BT_CONNECT2:
+ 	case BT_CONFIG:
+ 		/* Already connecting */
+ 		err = 0;
+-		release_sock(sk);
+ 		goto done;
  
- 	result = L2CAP_CR_NO_MEM;
+ 	case BT_CONNECTED:
+ 		/* Already connected */
+ 		err = -EISCONN;
+-		release_sock(sk);
+ 		goto done;
  
--	/* Check for backlog size */
--	if (sk_acceptq_is_full(parent)) {
--		BT_DBG("backlog full %d", parent->sk_ack_backlog);
--		goto response;
--	}
+ 	case BT_OPEN:
+@@ -1466,13 +1462,12 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 
+ 	default:
+ 		err = -EBADFD;
+-		release_sock(sk);
+ 		goto done;
+ 	}
+ 
+ 	/* Set destination address and psm */
++	lock_sock(sk);
+ 	bacpy(&bt_sk(sk)->dst, dst);
 -
- 	chan = pchan->ops->new_connection(pchan);
- 	if (!chan)
- 		goto response;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 5563023..d856cc8 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -895,6 +895,12 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
- {
- 	struct sock *sk, *parent = chan->data;
+ 	release_sock(sk);
  
-+	/* Check for backlog size */
-+	if (sk_acceptq_is_full(parent)) {
-+		BT_DBG("backlog full %d", parent->sk_ack_backlog);
-+		return NULL;
-+	}
-+
- 	sk = l2cap_sock_alloc(sock_net(parent), NULL, BTPROTO_L2CAP,
- 								GFP_ATOMIC);
- 	if (!sk)
+ 	chan->psm = psm;
 -- 
 1.7.10.2
 
