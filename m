@@ -1,141 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 May 2012 04:16:25 +0300
-From: Ido Yariv <ido@wizery.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] gattrib: Fix a request/response command deadlock
-Message-ID: <20120529011624.GA31806@WorkStation.localnet>
-References: <1338230071-27599-1-git-send-email-ido@wizery.com>
- <20120528194505.GA6742@samus>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120528194505.GA6742@samus>
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: [PATCH 5/5] Bluetooth: Add chan->ops->defer()
+Date: Mon, 28 May 2012 18:16:23 -0300
+Message-Id: <1338239783-26599-5-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1338239783-26599-1-git-send-email-gustavo@padovan.org>
+References: <1338239783-26599-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-On Mon, May 28, 2012 at 04:45:06PM -0300, Vinicius Costa Gomes wrote:
-> Hi Ido,
-> 
-> On 21:34 Mon 28 May, Ido Yariv wrote:
-> > New requests and responses are never sent if a request was sent and the
-> > response for it hasn't been received yet. As a result, if both end
-> > points send requests at the same time, a deadlock could occur. This
-> > could happen, for instance, if the client sends a read request and the
-> > server sends an indication before responding to the read request.
-> > 
-> > Fix this by introducing an additional queue for responses. Responses may
-> > be sent while there's still a pending request/indication.
-> > ---
-> >  attrib/gattrib.c |   86 +++++++++++++++++++++++++++++++++++++++++++----------
-> >  1 files changed, 69 insertions(+), 17 deletions(-)
-> > 
-> > diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-> > index 769be36..769d746 100644
-> > --- a/attrib/gattrib.c
-> > +++ b/attrib/gattrib.c
-> > @@ -47,6 +47,7 @@ struct _GAttrib {
-> >  	guint write_watch;
-> >  	guint timeout_watch;
-> >  	GQueue *queue;
-> > +	GQueue *response_queue;
-> 
-> I would change the name of the other queue as well, to make it clear
-> that the two queues have different objectives.
+When DEFER_SETUP is set defer() will trigger an authorization request
+to the userspace.
 
-Sure, why not.
+Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+---
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/l2cap_core.c    |   11 +++--------
+ net/bluetooth/l2cap_sock.c    |   12 ++++++++++++
+ 3 files changed, 16 insertions(+), 8 deletions(-)
 
-> 
-> >  	GSList *events;
-> >  	guint next_cmd_id;
-> >  	guint next_evt_id;
-> > @@ -175,9 +176,13 @@ static void attrib_destroy(GAttrib *attrib)
-> >  
-> >  	while ((c = g_queue_pop_head(attrib->queue)))
-> >  		command_destroy(c);
-> 
-> I would add a empty line here.
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 0ea4cf1..6d0864e 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -535,6 +535,7 @@ struct l2cap_ops {
+ 	void			(*state_change) (struct l2cap_chan *chan,
+ 						 int state);
+ 	void			(*ready) (struct l2cap_chan *chan);
++	void			(*defer) (struct l2cap_chan *chan);
+ 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
+ 					       unsigned long len, int nb);
+ };
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 9dd354d..2c92028 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1055,12 +1055,9 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 				lock_sock(sk);
+ 				if (test_bit(CONF_DEFER_SETUP,
+ 					     &chan->conf_state)) {
+-					struct sock *parent = bt_sk(sk)->parent;
+ 					rsp.result = __constant_cpu_to_le16(L2CAP_CR_PEND);
+ 					rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
+-					if (parent)
+-						parent->sk_data_ready(parent, 0);
+-
++					chan->ops->defer(chan->data);
+ 				} else {
+ 					__l2cap_state_change(chan, BT_CONFIG);
+ 					rsp.result = __constant_cpu_to_le16(L2CAP_CR_SUCCESS);
+@@ -3365,7 +3362,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 				__l2cap_state_change(chan, BT_CONNECT2);
+ 				result = L2CAP_CR_PEND;
+ 				status = L2CAP_CS_AUTHOR_PEND;
+-				parent->sk_data_ready(parent, 0);
++				chan->ops->defer(chan->data);
+ 			} else {
+ 				__l2cap_state_change(chan, BT_CONFIG);
+ 				result = L2CAP_CR_SUCCESS;
+@@ -5393,11 +5390,9 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 			if (!status) {
+ 				if (test_bit(CONF_DEFER_SETUP,
+ 					     &chan->conf_state)) {
+-					struct sock *parent = bt_sk(sk)->parent;
+ 					res = L2CAP_CR_PEND;
+ 					stat = L2CAP_CS_AUTHOR_PEND;
+-					if (parent)
+-						parent->sk_data_ready(parent, 0);
++					chan->ops->defer(chan->data);
+ 				} else {
+ 					__l2cap_state_change(chan, BT_CONFIG);
+ 					res = L2CAP_CR_SUCCESS;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 1551c67..cfb97ca 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1053,6 +1053,17 @@ static void l2cap_sock_ready_cb(struct l2cap_chan *chan)
+ 	release_sock(sk);
+ }
+ 
++static void l2cap_sock_defer_cb(struct l2cap_chan *chan)
++{
++	struct sock *sk = chan->data;
++	struct sock *parent;
++
++	parent = bt_sk(sk)->parent;
++
++	if (parent)
++		parent->sk_data_ready(parent, 0);
++}
++
+ static struct l2cap_ops l2cap_chan_ops = {
+ 	.name		= "L2CAP Socket Interface",
+ 	.new_connection	= l2cap_sock_new_connection_cb,
+@@ -1061,6 +1072,7 @@ static struct l2cap_ops l2cap_chan_ops = {
+ 	.teardown	= l2cap_sock_teardown_cb,
+ 	.state_change	= l2cap_sock_state_change_cb,
+ 	.ready		= l2cap_sock_ready_cb,
++	.defer		= l2cap_sock_defer_cb,
+ 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
+ };
+ 
+-- 
+1.7.10.2
 
-Done.
-
-> 
-> > +	while ((c = g_queue_pop_head(attrib->response_queue)))
-> > +		command_destroy(c);
-> >  
-> >  	g_queue_free(attrib->queue);
-> >  	attrib->queue = NULL;
-> 
-> And here.
-
-Done.
-
-> 
-> > +	g_queue_free(attrib->response_queue);
-> > +	attrib->response_queue = NULL;
-
-...
-
-> > @@ -421,6 +442,7 @@ guint g_attrib_send(GAttrib *attrib, guint id, guint8 opcode,
-> >  			gpointer user_data, GDestroyNotify notify)
-> >  {
-> >  	struct command *c;
-> > +	GQueue *queue;
-> >  
-> >  	c = g_try_new0(struct command, 1);
-> >  	if (c == NULL)
-> > @@ -435,15 +457,25 @@ guint g_attrib_send(GAttrib *attrib, guint id, guint8 opcode,
-> >  	c->user_data = user_data;
-> >  	c->notify = notify;
-> >  
-> > +	if (is_response(opcode))
-> > +		queue = attrib->response_queue;
-> > +	else
-> > +		queue = attrib->queue;
-> > +
-> >  	if (id) {
-> >  		c->id = id;
-> > -		g_queue_push_head(attrib->queue, c);
-> > +		g_queue_push_head(queue, c);
-> 
-> I don't know if this is the right thing to do for responses. For
-> requests there's is no problem if I rearrange them, but if I rearrange
-> responses I guess that it would confuse the remote side.
-
-Good catch. Though I don't see how this could happen in practice, I'll
-verify that we don't re-order responses to be on the safe side.
-
-> 
-> >  	} else {
-> >  		c->id = ++attrib->next_cmd_id;
-> > -		g_queue_push_tail(attrib->queue, c);
-> > +		g_queue_push_tail(queue, c);
-> >  	}
-
-...
-
-> > -gboolean g_attrib_cancel_all(GAttrib *attrib)
-> > +static gboolean g_attrib_cancel_all_per_queue(GQueue *queue)
-> 
-> I don't think that the g_attrib_ prefix here adds much, if that function
-> is not exported.
-
-Sure, I'll change that.
-
-...
-
-> Other than that, patch looks good.
-
-Thanks for reviewing it!
-
-> 
-> Just for information, some time ago I did something similar, but I never
-> felt sure enough about it, but I guess that I was not that far off, in case
-> you want to take a look:
-> 
-> http://git.infradead.org/users/vcgomes/bluez.git/commitdiff/refs/heads/two-queues
-
-Nice, it looks very similar :)
-
-Thanks,
-Ido.
