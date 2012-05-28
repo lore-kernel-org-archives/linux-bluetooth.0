@@ -1,28 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1338205401-32054-1-git-send-email-par-gunnar.hjalmdahl@stericsson.com>
-References: <1338205401-32054-1-git-send-email-par-gunnar.hjalmdahl@stericsson.com>
-Date: Mon, 28 May 2012 16:44:05 +0300
-Message-ID: <CABBYNZJCCTefo4E6KdUKcuGUsttQX6BDBCHWJFWFgrUxL8D8Lg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] audio: Keep AVDTP POSIX error codes
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Par-Gunnar Hjalmdahl <par-gunnar.hjalmdahl@stericsson.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Kanak Gupta <kanak.gupta@stericsson.com>,
-	Anurag Gupta <anurag.gupta@stericsson.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org, akpm@linux-foundation.org,
+	linux-kernel@vger.kernel.org, adobriyan@gmail.com,
+	andriy.shevchenko@linux.intel.com
+Subject: [PATCHv3] vsprintf: Add %pMR for Bluetooth MAC address
+Date: Mon, 28 May 2012 16:05:16 +0300
+Message-Id: <1338210316-12299-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <CAHp75Vc3sut7R7FF=xHQ0-3HaydPBh86sNnzRjKP8+ow=SOfLg@mail.gmail.com>
+References: <CAHp75Vc3sut7R7FF=xHQ0-3HaydPBh86sNnzRjKP8+ow=SOfLg@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Mon, May 28, 2012 at 2:43 PM, Par-Gunnar Hjalmdahl
-<par-gunnar.hjalmdahl@stericsson.com> wrote:
-> This patch adds functionality to prevent constant use of the EIO POSIX
-> error code for AVDTP responses. The POSIX error codes generated
-> by AVDTP are now kept.
+Bluetooth uses mostly LE byte order which is reversed for visual
+interpretation. Currently in Bluetooth in use unsafe batostr function.
 
-Since we are going to remove the audio IPC this would be useless.
+This is slightly modified version of Joe Perches <joe@perches.com>
+patch (sent Sat, Dec 4, 2010).
 
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+	v3: removed extra variable index
+	v2: changed bluetooth to reversed, syntax fixes
+
+ lib/vsprintf.c |   23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
+
+diff --git a/lib/vsprintf.c b/lib/vsprintf.c
+index abbabec..55052fa 100644
+--- a/lib/vsprintf.c
++++ b/lib/vsprintf.c
+@@ -559,15 +559,28 @@ char *mac_address_string(char *buf, char *end, u8 *addr,
+ 	char *p = mac_addr;
+ 	int i;
+ 	char separator;
++	bool reversed = false;
+ 
+-	if (fmt[1] == 'F') {		/* FDDI canonical format */
++	switch (fmt[1]) {
++	case 'F':
+ 		separator = '-';
+-	} else {
++		break;
++
++	case 'R':
++		reversed = true;
++		/* fall through */
++
++	default:
+ 		separator = ':';
++		break;
+ 	}
+ 
+ 	for (i = 0; i < 6; i++) {
+-		p = hex_byte_pack(p, addr[i]);
++		if (reversed)
++			p = hex_byte_pack(p, addr[5 - i]);
++		else
++			p = hex_byte_pack(p, addr[i]);
++
+ 		if (fmt[0] == 'M' && i != 5)
+ 			*p++ = separator;
+ 	}
+@@ -830,6 +843,7 @@ int kptr_restrict __read_mostly;
+  * - 'm' For a 6-byte MAC address, it prints the hex address without colons
+  * - 'MF' For a 6-byte MAC FDDI address, it prints the address
+  *       with a dash-separated hex notation
++ * - '[mM]R For a 6-byte MAC address, Reverse order (Bluetooth)
+  * - 'I' [46] for IPv4/IPv6 addresses printed in the usual way
+  *       IPv4 uses dot-separated decimal without leading 0's (1.2.3.4)
+  *       IPv6 uses colon separated network-order 16 bit hex with leading 0's
+@@ -890,7 +904,8 @@ char *pointer(const char *fmt, char *buf, char *end, void *ptr,
+ 		return resource_string(buf, end, ptr, spec, fmt);
+ 	case 'M':			/* Colon separated: 00:01:02:03:04:05 */
+ 	case 'm':			/* Contiguous: 000102030405 */
+-					/* [mM]F (FDDI, bit reversed) */
++					/* [mM]F (FDDI) */
++					/* [mM]R (Reverse order; Bluetooth) */
+ 		return mac_address_string(buf, end, ptr, spec, fmt);
+ 	case 'I':			/* Formatted IP supported
+ 					 * 4:	1.2.3.4
 -- 
-Luiz Augusto von Dentz
+1.7.9.5
+
