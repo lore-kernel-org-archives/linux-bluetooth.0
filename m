@@ -1,125 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 28 May 2012 10:24:56 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org,
-	marcel@holtmann.org
-Subject: Re: [PATCHv1 01/17] Bluetooth: A2MP: Create A2MP channel
-Message-ID: <20120528072454.GB31961@aemeltch-MOBL1>
-References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1337351150-20526-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <alpine.DEB.2.02.1205221039100.2239@mathewm-linux>
- <20120523074950.GA32022@aemeltch-MOBL1>
- <alpine.DEB.2.02.1205230842040.6526@mathewm-linux>
- <20120524075105.GB24715@aemeltch-MOBL1>
- <alpine.DEB.2.02.1205240853590.18142@mathewm-linux>
- <20120525080904.GF3089@aemeltch-MOBL1>
- <alpine.DEB.2.02.1205250918520.2070@mathewm-linux>
+Date: Mon, 28 May 2012 09:49:08 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [PATCH -v2 02/12] Bluetooth: Move clean up code and set of
+ SOCK_ZAPPED to l2cap_sock.c
+Message-ID: <20120528064906.GA31961@aemeltch-MOBL1>
+References: <1337949064-26187-1-git-send-email-gustavo@padovan.org>
+ <1337949064-26187-3-git-send-email-gustavo@padovan.org>
+ <1338094828.15105.98.camel@aeonflux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.02.1205250918520.2070@mathewm-linux>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1338094828.15105.98.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi Marcel and Gustavo,
 
-On Fri, May 25, 2012 at 10:18:20AM -0700, Mat Martineau wrote:
-> >On Thu, May 24, 2012 at 08:59:57AM -0700, Mat Martineau wrote:
-> >>On Thu, 24 May 2012, Andrei Emeltchenko wrote:
-> >>>On Wed, May 23, 2012 at 08:44:22AM -0700, Mat Martineau wrote:
-> >>>>>>>+static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
-> >>>>>>>+{
-> >>>>>>>+	struct l2cap_chan *chan;
-> >>>>>>>+
-> >>>>>>>+	chan = l2cap_chan_create();
-> >>>>>>>+	if (!chan)
-> >>>>>>>+		return NULL;
-> >>>>>>>+
-> >>>>>>>+	BT_DBG("chan %p", chan);
-> >>>>>>>+
-> >>>>>>>+	hci_conn_hold(conn->hcon);
-> >>>>>>
-> >>>>>>Holding the hcon will keep the ACL open after all of the other L2CAP
-> >>>>>>channels have closed (unless I missed some code later in the patch
-> >>>>>>series).  The A2MP fixed channel should not keep the ACL open.  If
-> >>>>>>the connection is not held here, then there shouldn't be a put in
-> >>>>>>l2cap_chan_del for the A2MP channel either.
-> >>>>>
-> >>>>>l2cap_chan_del makes hci_conn_put, also for a2mp channel. The behavior is
-> >>>>>the same for fixed and normal channels.
-> >>>>
-> >>>>And when does l2cap_chan_del get called for a fixed channel?  The
-> >>>>fixed channel must not do an hci_conn_hold so the ACL is allowed to
-> >>>>close when all dynamic L2CAP channels have closed.
-> >>>
-> >>>The current approach is to have amp_mgr for hci_conn. It will be freed
-> >>>when in hci_conn_del together with other l2cap channels in
-> >>>hci_chan_list_flush and then we make amp_mgr_put() and destroy mgr.
-> >>>
-> >>>The idea is to make a2mp chan similar to other chans and other chans do
-> >>>hci_conn_hold and hci_conn_put. Otherwise I would need to add extra checks
-> >>>before hci_conn_put which is ugly.
-> >>>
-> >>>I've tested this with PTS and no memory leaks found so far.
-> >>
-> >>The risk is not memory leaks - if the other device closes the ACL,
-> >>then the A2MP channel will be cleaned up.  But if you had two BlueZ
-> >>devices with A2MP connected to each other, the ACL would never close
-> >>as long as the devices remained powered and in range!  Nothing would
-> >>trigger the flush as long as the hci_conn is held.
-> >
-> >Does it indicate that we have problem with rather freeing amp_mgr?
+On Sun, May 27, 2012 at 07:00:28AM +0200, Marcel Holtmann wrote:
+> Hi Gustavo,
 > 
-> It looks like the amp_mgr will be freed if the channel is closed.
-> There's nothing that will close the channel except for:
+> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > 
+> > This remove a bit more of socket code from l2cap core, this calls set the
+> > SOCK_ZAPPED and do some clean up depending on the socket state.
+> > 
+> > Reported-by: Mat Martineau <mathewm@codeaurora.org>
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 > 
-> * Remote device disconnects the ACL
-> * Remote device goes out of range
-> * Local BR/EDR controller is powered down or reset
-> 
-> >>I think the checks for hci_conn_put are necessary, even if they are
-> >>ugly.
-> >
-> >I think that if I have hci_conn_hold when creating channel and
-> >hci_conn_put when closing channel that does not differ from the case when
-> >I do not have hci_conn_put/hold.
-> 
-> If there was something that closed the A2MP channel, there would be
-> no difference.  But nothing closes the A2MP channel.
+> the signed-off-by line indicates that this patch originally was written
+> by Andrei. So I prefer he gets the authorship then. The From: line at
+> the top should say his name.
 
-I actually was thinking about timers which could do clean up.
-
-> >So you are probably referring to the case when hci_conn needs to be closed
-> >but cannot because it has hci_conn_hold in a2mp channel?
-> 
-> Yes.
-> 
-> >This also means that we still have L2CAP channel (a2mp) hanging.
-> >This seems right to me if I did not miss something.
-> 
-> Since A2MP is a fixed channel, it is not opened and closed like
-> typical L2CAP channels.  Consider this scenario:
-> 
-> 1. Remote device decides to connect
-> 2. ACL is created
-> 3. Remote device sends A2MP discover
-> 4. A2MP channel is set up, AMP manager is created, hci_conn_hold for
-> A2MP channel
-> 5. Remote device connects L2CAP channel over BR/EDR.  hci_conn_hold
-> for the data channel
-> 6. A2MP communication to set up physical link
-> 7. L2CAP channel move to AMP controller
-> 8. Data sent over AMP.
-> 9. L2CAP channel disconnected, hci_conn_put for the data channel
-> 10. Device stays in range.  hci_conn reference count is not 0, so
-> ACL is not closed.
-
-My concern here if A2MP does not reference hci_conn can hci_conn be
-removed while we still have A2MP chan in some situation?
-
-I will modify code that A2MP does not reference hci_conn, or create
-special patch with this change.
+This patch was so heavily reworked by Gustavo that he could remove my
+Signed-off-by line.
 
 Best regards 
 Andrei Emeltchenko 
-
