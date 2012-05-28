@@ -1,15 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1338177698.15105.119.camel@aeonflux>
-Subject: Re: [PATCH -v3 08/10] Bluetooth: check for already existent channel
- before create new one
+Message-ID: <1338177544.15105.118.camel@aeonflux>
+Subject: Re: [PATCH -v3 05/10] Bluetooth: Move check for backlog size to
+ l2cap_sock.c
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Gustavo Padovan <gustavo@padovan.org>
 Cc: linux-bluetooth@vger.kernel.org,
 	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Date: Mon, 28 May 2012 06:01:38 +0200
-In-Reply-To: <1338168480-9646-8-git-send-email-gustavo@padovan.org>
+Date: Mon, 28 May 2012 05:59:04 +0200
+In-Reply-To: <1338168480-9646-5-git-send-email-gustavo@padovan.org>
 References: <1338168480-9646-1-git-send-email-gustavo@padovan.org>
-	 <1338168480-9646-8-git-send-email-gustavo@padovan.org>
+	 <1338168480-9646-5-git-send-email-gustavo@padovan.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -17,17 +17,38 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Gustavo,
 
-> Move this check to before the channel time creation simplifies the code
-> and avoid memory allocation if the channel already exist.
+> Remove socket specific code from l2cap_core.c
 > 
 > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 > Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/l2cap_core.c |   13 ++++---------
->  1 file changed, 4 insertions(+), 9 deletions(-)
+>  net/bluetooth/l2cap_core.c |   12 ------------
+>  net/bluetooth/l2cap_sock.c |    6 ++++++
+>  2 files changed, 6 insertions(+), 12 deletions(-)
 
-in addition I also applied this patch to bluetooth-next tree.
+I applied this the first 5 patches to bluetooth-next so far.
+
+<snip>
+
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 5563023..d856cc8 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -895,6 +895,12 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+>  {
+>  	struct sock *sk, *parent = chan->data;
+>  
+> +	/* Check for backlog size */
+> +	if (sk_acceptq_is_full(parent)) {
+> +		BT_DBG("backlog full %d", parent->sk_ack_backlog);
+> +		return NULL;
+> +	}
+> +
+>  	sk = l2cap_sock_alloc(sock_net(parent), NULL, BTPROTO_L2CAP,
+>  								GFP_ATOMIC);
+>  	if (!sk)
+
+And on a side note, does this still have to be GFP_ATOMIC?
 
 Regards
 
