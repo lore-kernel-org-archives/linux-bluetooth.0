@@ -1,98 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 28 May 2012 14:39:45 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Steffen Becker <steffen.becker@tu-ilmenau.de>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: no security block - but connection still gets refused
-Message-ID: <20120528173938.GA4151@samus>
-References: <4FC35278.40903@tu-ilmenau.de>
+Date: Mon, 28 May 2012 13:36:54 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [PATCH -v2 07/12] Bluetooth: Create DEFER_SETUP flag in
+ conf_state
+Message-ID: <20120528163441.GA18839@joana>
+References: <1337949064-26187-1-git-send-email-gustavo@padovan.org>
+ <1337949064-26187-8-git-send-email-gustavo@padovan.org>
+ <1338095235.15105.103.camel@aeonflux>
+ <20120527190020.GA14106@joana>
+ <1338176928.15105.114.camel@aeonflux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4FC35278.40903@tu-ilmenau.de>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1338176928.15105.114.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steffen,
+Hi Marcel,
 
-On 12:24 Mon 28 May, Steffen Becker wrote:
-> Hello Everyone,
+* Marcel Holtmann <marcel@holtmann.org> [2012-05-28 05:48:48 +0200]:
+
+> Hi Gustavo,
 > 
-> I searched for an answer the whole last time, but I didn't gained
-> any new information - so I hope you can help me to solve my problem.
-> I have two gentoo-PCs with a Bluetooth3.0-Dongle at each PC.
-> I have installed net-wireless/bluez with "test-programs" USE-Flag.
-> I tried to connect them via
-> # bluez-test-serial <remote address>
-> and
-> # bluez-test-network <remote address>
+> > > > Remove another socket usage from l2cap_core.c
+> > > > 
+> > > > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > > > ---
+> > > >  include/net/bluetooth/l2cap.h |    1 +
+> > > >  net/bluetooth/l2cap_core.c    |   12 ++++++------
+> > > >  net/bluetooth/l2cap_sock.c    |    8 ++++++--
+> > > >  3 files changed, 13 insertions(+), 8 deletions(-)
+> > > > 
+> > > > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> > > > index 3b05f3e..c55b28f 100644
+> > > > --- a/include/net/bluetooth/l2cap.h
+> > > > +++ b/include/net/bluetooth/l2cap.h
+> > > > @@ -599,6 +599,7 @@ enum {
+> > > >  	CONF_LOC_CONF_PEND,
+> > > >  	CONF_REM_CONF_PEND,
+> > > >  	CONF_NOT_COMPLETE,
+> > > > +	CONF_DEFER_SETUP,
+> > > >  };
+> > > >  
+> > > >  #define L2CAP_CONF_MAX_CONF_REQ 2
+> > > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > > > index 01171b1..388bc70 100644
+> > > > --- a/net/bluetooth/l2cap_core.c
+> > > > +++ b/net/bluetooth/l2cap_core.c
+> > > > @@ -569,7 +569,7 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
+> > > >  			struct l2cap_conn_rsp rsp;
+> > > >  			__u16 result;
+> > > >  
+> > > > -			if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags))
+> > > > +			if (test_bit(CONF_DEFER_SETUP, &chan->conf_state))
+> > > >  				result = L2CAP_CR_SEC_BLOCK;
+> > > >  			else
+> > > >  				result = L2CAP_CR_BAD_PSM;
+> > > > @@ -1056,8 +1056,8 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+> > > >  
+> > > >  			if (l2cap_chan_check_security(chan)) {
+> > > >  				lock_sock(sk);
+> > > > -				if (test_bit(BT_SK_DEFER_SETUP,
+> > > > -					     &bt_sk(sk)->flags)) {
+> > > > +				if (test_bit(CONF_DEFER_SETUP,
+> > > > +					     &chan->conf_state)) {
+> > > >  					struct sock *parent = bt_sk(sk)->parent;
+> > > >  					rsp.result = __constant_cpu_to_le16(L2CAP_CR_PEND);
+> > > >  					rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
+> > > > @@ -3376,7 +3376,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+> > > >  
+> > > >  	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE) {
+> > > >  		if (l2cap_chan_check_security(chan)) {
+> > > > -			if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
+> > > > +			if (test_bit(CONF_DEFER_SETUP, &chan->conf_state)) {
+> > > >  				__l2cap_state_change(chan, BT_CONNECT2);
+> > > >  				result = L2CAP_CR_PEND;
+> > > >  				status = L2CAP_CS_AUTHOR_PEND;
+> > > > @@ -5406,8 +5406,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+> > > >  			lock_sock(sk);
+> > > >  
+> > > >  			if (!status) {
+> > > > -				if (test_bit(BT_SK_DEFER_SETUP,
+> > > > -					     &bt_sk(sk)->flags)) {
+> > > > +				if (test_bit(CONF_DEFER_SETUP,
+> > > > +					     &chan->conf_state)) {
+> > > >  					struct sock *parent = bt_sk(sk)->parent;
+> > > >  					res = L2CAP_CR_PEND;
+> > > >  					stat = L2CAP_CS_AUTHOR_PEND;
+> > > > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> > > > index d2d91b3..51d05a7 100644
+> > > > --- a/net/bluetooth/l2cap_sock.c
+> > > > +++ b/net/bluetooth/l2cap_sock.c
+> > > > @@ -623,10 +623,14 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+> > > >  			break;
+> > > >  		}
+> > > >  
+> > > > -		if (opt)
+> > > > +		if (opt) {
+> > > >  			set_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
+> > > > -		else
+> > > > +			set_bit(CONF_DEFER_SETUP, &chan->conf_state);
+> > > > +		} else {
+> > > >  			clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
+> > > > +			clear_bit(CONF_DEFER_SETUP, &chan->conf_state);
+> > > > +		}
+> > > > +
+> > > >  		break;
+> > > 
+> > > and what about the lines above testing this together with BT_SECURITY?
+> > 
+> > I'm ok with those lines using BT_SK_DEFER_SETUP. CONF_DEFER_SETUP is meant for
+> > l2cap_core.c use where we should not have access to sk.
 > 
-> First important question:
-> How do I have to use this commands? Are these "standalone" commands
-> or do I have to use some "additional" command, e.g. some kind of
-> "listen"-command at the remote device?
+> I am not since it is more states we have to keep in sync. That is a bad
+> idea. What is the real plan here?
 
-Short answer: something like it.
+The plan is to remove the use of bt_sk(sk)->flags from l2cap_core.c and the
+only idea I had until now was coping the DEFER_SETUP bit to chan->conf_state
+flags, however after the copy we can't remove this flags from bt_sk(sk) since
+it is used is socket specific doe too.
 
-Long answer: For example, for network: the server side needs two pieces
-of information from the user before it can be usable, a type of service
-that the user wants to use (PAN, GN, NAP) and a bridge interface to
-connect to. Usually, this is something that your connection manager
-(ConnMan, Network Manager) does. See doc/network-api.txt (in the bluez
-sources).
-
-The serial service is similar, the user needs to inform the server which
-serial port he wants to export via Bluetooth.
-
-Those test scripts only have the client side of things.
-
-> 
-> Next big thing:
-> I always got a "security block"-issue while tried to connect. I
-> searched your mail-archive & you told me, this problem is solved in
-> kernel 3.3 and later.
-> I installed kernel 3.4 and - hooray - no "security block" anymore!
-> *But* the connection still doesn't work. I connect them - they are
-> connected for about 2 seconds - then connection is refused.
-> So I really hope you can have a look at the following lines and tell
-> me how to solve this problem.
-> 
-> PS:
-> I'm sorry for wasting your time, but this case isn't "just for fun
-> for me"; it's important that it works. So I even would donate/pay
-> something if you can help me solve this problem.
-> 
-> Here is what I get when I use test-network:
-> 
-> # bluez-test-network 00:02:72:AE:58:73 NAP
-> 
-> Traceback (most recent call last):
->   File "/usr/bin/bluez-test-network", line 40, in <module>
->     device = adapter.FindDevice(address)
->   File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line
-> 70, in __call__
->     return self._proxy_method(*args, **keywords)
->   File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line
-> 145, in __call__
->     **keywords)
->   File "/usr/lib64/python2.7/site-packages/dbus/connection.py", line
-> 651, in
-> call_blocking
->     message, timeout)
-> dbus.exceptions.DBusException: org.bluez.Error.DoesNotExist: Does Not Exist
-
->From this and the hcidump, the answer is that it could not find a
-server running in the remote side (i.e. the SDP service search returned
-nothing).
-
-
-[snip]
-
-> 
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
--- 
-Vinicius
+	Gustavo
