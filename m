@@ -1,53 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arik Nemtsov <arik@wizery.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: Arik Nemtsov <arik@wizery.com>
-Subject: [PATCH] attrib-server: allow SDP records for secondary GATT services
-Date: Mon, 28 May 2012 23:45:48 +0300
-Message-Id: <1338237948-6141-1-git-send-email-arik@wizery.com>
+Date: Mon, 28 May 2012 23:09:14 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Ido Yariv <ido@wizery.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] attrib-server: Allow zero length attribute update
+Message-ID: <20120528200914.GA474@x220.P-661HNU-F1>
+References: <1338229985-27293-1-git-send-email-ido@wizery.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1338229985-27293-1-git-send-email-ido@wizery.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It seems this is the correct way to discover such services that work
-over BR/EDR (according to section 4.4 in the GATT specification).
----
- src/attrib-server.c |    9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+Hi Ido,
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index dd1bba4..6636192 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -257,8 +257,8 @@ static int attribute_cmp(gconstpointer a1, gconstpointer a2)
- 	return attrib1->handle - attrib2->handle;
- }
- 
--static struct attribute *find_primary_range(struct gatt_server *server,
--						uint16_t start, uint16_t *end)
-+static struct attribute *find_svc_range(struct gatt_server *server,
-+					uint16_t start, uint16_t *end)
- {
- 	struct attribute *attrib;
- 	guint h = start;
-@@ -274,7 +274,8 @@ static struct attribute *find_primary_range(struct gatt_server *server,
- 
- 	attrib = l->data;
- 
--	if (bt_uuid_cmp(&attrib->uuid, &prim_uuid) != 0)
-+	if (bt_uuid_cmp(&attrib->uuid, &prim_uuid) != 0 &&
-+			bt_uuid_cmp(&attrib->uuid, &snd_uuid) != 0)
- 		return NULL;
- 
- 	*end = start;
-@@ -301,7 +302,7 @@ static uint32_t attrib_create_sdp_new(struct gatt_server *server,
- 	uuid_t svc, gap_uuid;
- 	bdaddr_t addr;
- 
--	a = find_primary_range(server, handle, &end);
-+	a = find_svc_range(server, handle, &end);
- 
- 	if (a == NULL)
- 		return 0;
--- 
-1.7.9.5
+On Mon, May 28, 2012, Ido Yariv wrote:
+> attrib_db_update always fails when g_try_realloc returns NULL, not
+> taking into account that the length passed to g_try_realloc could be
+> zero. In this case, g_try_realloc frees the currently allocated memory
+> and returns NULL.
+> As a result, not only will attrib_db_update fail needlessly, a
+> use-after-free could occur as the attribute's length will still hold the
+> length of the freed buffer.
+> 
+> Fix this by only returning an error if the length is non-zero.
+> ---
+>  src/attrib-server.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
+Applied. Thanks.
+
+Johan
