@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2] AVRCP: Fix not registering to VolumeChanged event again when notified
-Date: Mon, 28 May 2012 14:16:48 +0300
-Message-Id: <1338203808-15142-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ] AVRCP: Fix not registering to VolumeChanged event again when notified
+Date: Mon, 28 May 2012 14:00:29 +0300
+Message-Id: <1338202829-14902-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -15,13 +15,11 @@ The spec says:
 notification. For a new notification additional NOTIFY command is
 expected to be sent."
 ---
-v2: Fix check to do logical AND not OR
-
  audio/avrcp.c |    9 ++++++++-
  1 files changed, 8 insertions(+), 1 deletions(-)
 
 diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 131490f..a040099 100644
+index 131490f..ea60ef1 100644
 --- a/audio/avrcp.c
 +++ b/audio/avrcp.c
 @@ -177,6 +177,8 @@ static uint32_t company_ids[] = {
@@ -38,7 +36,7 @@ index 131490f..a040099 100644
  	uint8_t volume;
  
 -	if (code == AVC_CTYPE_REJECTED || code == AVC_CTYPE_NOT_IMPLEMENTED)
-+	if (code != AVC_CTYPE_INTERIM && code != AVC_CTYPE_CHANGED)
++	if (code != AVC_CTYPE_INTERIM || code != AVC_CTYPE_CHANGED)
  		return FALSE;
  
  	volume = pdu->params[1] & 0x7F;
