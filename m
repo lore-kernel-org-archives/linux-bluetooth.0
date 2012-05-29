@@ -1,61 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd] client: Fix not checking if destination exist while renaming file
-Date: Tue, 29 May 2012 15:11:38 +0300
-Message-Id: <1338293498-2356-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCHv4 13/17] Bluetooth: A2MP: Process A2MP Create Physlink Request
+Date: Tue, 29 May 2012 13:59:13 +0300
+Message-Id: <1338289158-25655-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1338289158-25655-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1338289158-25655-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-rename return an error if the destination directory doesn't exist, so
-in case it doesn't exist it should be created before calling rename.
+Placeholder for A2MP Create Physlink Request.
+Handles requests with invalid controler id as shown below:
+
+...
+> ACL data: handle 11 flags 0x02 dlen 50
+    A2MP: Create Physical Link req: local id 1 remote id 85
+      Assoc data:
+        <skipped>
+< ACL data: handle 11 flags 0x00 dlen 15
+    A2MP: Create Physical Link rsp: local id 85 remote id 1 status 1
+      Invalid Controller ID
+...
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- client/transfer.c |   27 +++++++++++++++++++++++++--
- 1 files changed, 25 insertions(+), 2 deletions(-)
+ net/bluetooth/a2mp.c |   40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 3065c9c..772834f 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -715,11 +715,34 @@ int obc_transfer_set_filename(struct obc_transfer *transfer,
- 					const char *filename)
- {
- 	int err;
-+	struct stat st;
-+	char *dirname;
-+	gboolean dir = FALSE;
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 63c5394..870ef009 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -243,6 +243,43 @@ clean:
+ 	return 0;
+ }
+ 
++static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
++				   struct a2mp_cmd *hdr)
++{
++	struct a2mp_physlink_req *req = (void *) skb->data;
 +
-+	dirname = g_path_get_dirname(filename);
-+	if (stat(dirname, &st) < 0) {
-+		if (errno != ENOENT) {
-+			error("stat(): %s (%d)", strerror(errno), errno);
-+			return -errno;
-+		}
++	struct a2mp_physlink_rsp rsp;
++	struct hci_dev *hdev;
 +
-+		if (mkdir(dirname, 0755) < 0) {
-+			error("mkdir(): %s (%d)", strerror(errno), errno);
-+			return -errno;
-+		}
++	if (le16_to_cpu(hdr->len) < sizeof(*req))
++		return -EINVAL;
 +
-+		dir = TRUE;
++	BT_DBG("local_id %d, remote_id %d", req->local_id, req->remote_id);
++
++	rsp.local_id = req->remote_id;
++	rsp.remote_id = req->local_id;
++
++	hdev = hci_dev_get(req->remote_id);
++	if (!hdev || hdev->amp_type != HCI_AMP) {
++		rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
++		goto send_rsp;
 +	}
- 
- 	err = rename(transfer->filename, filename);
- 	if (err < 0) {
--		error("rename(): %s (%d)", strerror(errno), errno);
--		return -errno;
-+		err = -errno;
 +
-+		if (dir)
-+			rmdir(dirname);
++	/* TODO process physlink create */
 +
-+		error("rename(): %s (%d)", strerror(-err), -err);
-+		return -err;
- 	}
++	rsp.status = A2MP_STATUS_SUCCESS;
++
++send_rsp:
++	if (hdev)
++		hci_dev_put(hdev);
++
++	a2mp_send(mgr, A2MP_CREATEPHYSLINK_RSP, hdr->ident, sizeof(rsp),
++		  &rsp);
++
++	skb_pull(skb, le16_to_cpu(hdr->len));
++	return 0;
++}
++
+ /* Handle A2MP signalling */
+ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ {
+@@ -289,6 +326,9 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 			break;
  
- 	g_free(transfer->filename);
+ 		case A2MP_CREATEPHYSLINK_REQ:
++			err = a2mp_createphyslink_req(mgr, skb, hdr);
++			break;
++
+ 		case A2MP_DISCONNPHYSLINK_REQ:
+ 		case A2MP_CHANGE_RSP:
+ 		case A2MP_DISCOVER_RSP:
 -- 
-1.7.7.6
+1.7.9.5
 
