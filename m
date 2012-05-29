@@ -1,72 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 May 2012 12:27:55 -0300
+Date: Tue, 29 May 2012 12:23:57 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH -v2] Bluetooth: Create function to return the ERTM header
- size
-Message-ID: <20120529152755.GB4575@joana>
-References: <1338260107-12880-1-git-send-email-gustavo@padovan.org>
- <1338260317-13308-1-git-send-email-gustavo@padovan.org>
- <20120529065828.GA15895@aemeltch-MOBL1>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Do not check func ready existence
+Message-ID: <20120529152357.GA4575@joana>
+References: <1338239783-26599-3-git-send-email-gustavo@padovan.org>
+ <1338275460-16370-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120529065828.GA15895@aemeltch-MOBL1>
+In-Reply-To: <1338275460-16370-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-05-29 09:58:32 +0300]:
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-05-29 10:11:00 +0300]:
 
-> Hi Gustavo,
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> On Mon, May 28, 2012 at 11:58:37PM -0300, Gustavo Padovan wrote:
-> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> > 
-> > Simplify the handling of different ERTM header size. We were the same
-> > check in some places of the code, and more is expected to come, so just
-> > replace them with a function.
-> > 
-> > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> > ---
-> >  net/bluetooth/l2cap_core.c |   25 +++++++++++--------------
-> >  1 file changed, 11 insertions(+), 14 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index 6f30d1d..ad06393 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -814,17 +814,20 @@ static inline void __pack_control(struct l2cap_chan *chan,
-> >  	}
-> >  }
-> >  
-> > +static inline unsigned int l2cap_ertm_hdr_size(struct l2cap_chan *chan)
-> > +{
-> > +	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
-> > +		return L2CAP_EXT_HDR_SIZE;
-> > +	else
-> > +		return L2CAP_ENH_HDR_SIZE;
-> > +}
-> > +
-> >  static struct sk_buff *l2cap_create_sframe_pdu(struct l2cap_chan *chan,
-> >  					       u32 control)
-> >  {
-> >  	struct sk_buff *skb;
-> >  	struct l2cap_hdr *lh;
-> > -	int hlen;
-> > -
-> > -	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
-> > -		hlen = L2CAP_EXT_HDR_SIZE;
-> > -	else
-> > -		hlen = L2CAP_ENH_HDR_SIZE;
-> > +	int hlen = l2cap_ertm_hdr_size(chan);
+> Functions will be always defined and in case not implemented as
+> dummy __no_func.
 > 
-> I prefer simpler name like:
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/l2cap_core.c |    3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 > 
-> int hlen = __hdr_size(chan); or __ertm_hdr_size
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 2e984ec..6399e3f 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -957,8 +957,7 @@ static void l2cap_chan_ready(struct l2cap_chan *chan)
+>  
+>  	chan->state = BT_CONNECTED;
+>  
+> -	if (chan->ops->ready)
+> -		chan->ops->ready(chan);
+> +	chan->ops->ready(chan);
+>  }
+>  
+>  static void l2cap_choose_conn(struct l2cap_chan *chan)
 
-Yes, __ertm_hdr_size() seems nicer.
+This is not rebased against upstream, we don't have this function in there.
 
 	Gustavo
