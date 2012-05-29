@@ -2,44 +2,78 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v3 2/2] Bluetooth: Remove unused err var from l2cap_segment_sdu()
-Date: Tue, 29 May 2012 13:29:17 -0300
-Message-Id: <1338308957-17282-2-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1338308957-17282-1-git-send-email-gustavo@padovan.org>
-References: <1338308957-17282-1-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v3 1/2] Bluetooth: Create function to return the ERTM header size
+Date: Tue, 29 May 2012 13:29:16 -0300
+Message-Id: <1338308957-17282-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-Trivial fix, let the code cleaner.
+Simplify the handling of different ERTM header size. We were the same
+check in some places of the code, and more is expected to come, so just
+replace them with a function.
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
- net/bluetooth/l2cap_core.c |    3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ net/bluetooth/l2cap_core.c |   25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index acd43aa..db54e2d 100644
+index 3daac2c..acd43aa 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -2067,7 +2067,6 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
- 	struct sk_buff *skb;
- 	u16 sdu_len;
- 	size_t pdu_len;
--	int err = 0;
- 	u8 sar;
- 
- 	BT_DBG("chan %p, msg %p, len %d", chan, msg, (int)len);
-@@ -2126,7 +2125,7 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
- 		}
+@@ -822,17 +822,20 @@ static inline void __pack_control(struct l2cap_chan *chan,
  	}
- 
--	return err;
-+	return 0;
  }
  
- int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
++static inline unsigned int __ertm_hdr_size(struct l2cap_chan *chan)
++{
++	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
++		return L2CAP_EXT_HDR_SIZE;
++	else
++		return L2CAP_ENH_HDR_SIZE;
++}
++
+ static struct sk_buff *l2cap_create_sframe_pdu(struct l2cap_chan *chan,
+ 					       u32 control)
+ {
+ 	struct sk_buff *skb;
+ 	struct l2cap_hdr *lh;
+-	int hlen;
+-
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		hlen = L2CAP_EXT_HDR_SIZE;
+-	else
+-		hlen = L2CAP_ENH_HDR_SIZE;
++	int hlen = __ertm_hdr_size(chan);
+ 
+ 	if (chan->fcs == L2CAP_FCS_CRC16)
+ 		hlen += L2CAP_FCS_SIZE;
+@@ -2017,10 +2020,7 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
+ 	if (!conn)
+ 		return ERR_PTR(-ENOTCONN);
+ 
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		hlen = L2CAP_EXT_HDR_SIZE;
+-	else
+-		hlen = L2CAP_ENH_HDR_SIZE;
++	hlen = __ertm_hdr_size(chan);
+ 
+ 	if (sdulen)
+ 		hlen += L2CAP_SDULEN_SIZE;
+@@ -2086,10 +2086,7 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
+ 	if (chan->fcs)
+ 		pdu_len -= L2CAP_FCS_SIZE;
+ 
+-	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-		pdu_len -= L2CAP_EXT_HDR_SIZE;
+-	else
+-		pdu_len -= L2CAP_ENH_HDR_SIZE;
++	pdu_len -= __ertm_hdr_size(chan);
+ 
+ 	/* Remote device may have requested smaller PDUs */
+ 	pdu_len = min_t(size_t, pdu_len, chan->remote_mps);
 -- 
 1.7.10.2
 
