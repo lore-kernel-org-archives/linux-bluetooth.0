@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 07/17] client: Use transfer owner instead of agent
-Date: Tue, 29 May 2012 11:23:12 +0200
-Message-Id: <1338283402-11085-8-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 11/17] client: Remove obsolete authentication code
+Date: Tue, 29 May 2012 11:23:16 +0200
+Message-Id: <1338283402-11085-12-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,103 +12,223 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The security checks in the transfers' D-Bus API will consider check for
-the transfer owner's path (session owner) instead of the agent path.
+After the removal of the agent, the implementation of the session can be
+simplified by removing all authentication-related code.
 ---
- client/session.c  |    9 ++-------
- client/transfer.c |   10 +++++-----
- client/transfer.h |    2 +-
- 3 files changed, 8 insertions(+), 13 deletions(-)
+ client/session.c |   86 ++++++++++++++++-------------------------------------
+ 1 files changed, 26 insertions(+), 60 deletions(-)
 
 diff --git a/client/session.c b/client/session.c
-index 94256b4..9c4c9f0 100644
+index 8e21da4..9670968 100644
 --- a/client/session.c
 +++ b/client/session.c
-@@ -793,7 +793,6 @@ guint obc_session_queue(struct obc_session *session,
+@@ -68,7 +68,6 @@ struct pending_request {
+ 	guint req_id;
+ 	struct obc_session *session;
+ 	struct obc_transfer *transfer;
+-	GFunc auth_complete;
+ 	session_callback_t func;
+ 	void *data;
+ };
+@@ -95,11 +94,12 @@ struct obc_session {
+ 	gchar *owner;		/* Session owner */
+ 	guint watch;
+ 	GQueue *queue;
++	guint queue_complete_id;
+ };
+ 
+ static GSList *sessions = NULL;
+ 
+-static void session_start_transfer(gpointer data, gpointer user_data);
++static void session_process_queue(struct obc_session *session);
+ static void session_terminate_transfer(struct obc_session *session,
+ 					struct obc_transfer *transfer,
+ 					GError *gerr);
+@@ -139,7 +139,6 @@ static void session_unregistered(struct obc_session *session)
+ 
+ static struct pending_request *pending_request_new(struct obc_session *session,
+ 						struct obc_transfer *transfer,
+-						GFunc auth_complete,
+ 						session_callback_t func,
+ 						void *data)
+ {
+@@ -150,7 +149,6 @@ static struct pending_request *pending_request_new(struct obc_session *session,
+ 	p->id = ++id;
+ 	p->session = obc_session_ref(session);
+ 	p->transfer = transfer;
+-	p->auth_complete = auth_complete;
+ 	p->func = func;
+ 	p->data = data;
+ 
+@@ -172,6 +170,9 @@ static void session_free(struct obc_session *session)
+ {
+ 	DBG("%p", session);
+ 
++	if (session->queue_complete_id != 0)
++		g_source_remove(session->queue_complete_id);
++
+ 	if (session->queue) {
+ 		g_queue_foreach(session->queue, (GFunc) pending_request_free,
+ 									NULL);
+@@ -629,22 +630,15 @@ static const GDBusMethodTable session_methods[] = {
+ 	{ }
+ };
+ 
+-static gboolean session_request_proceed(gpointer data)
++static gboolean session_queue_complete(gpointer data)
+ {
+ 	struct obc_session *session = data;
+-	struct pending_request *p = session->p;
+-	struct obc_transfer *transfer = p->transfer;
+ 
+-	if (p->auth_complete)
+-		p->auth_complete(p->session, transfer);
++	session_process_queue(session);
+ 
+-	return FALSE;
+-}
++	session->queue_complete_id = 0;
+ 
+-static int pending_request_auth(struct pending_request *p)
+-{
+-	g_idle_add(session_request_proceed, p->session);
+-	return 0;
++	return FALSE;
+ }
+ 
+ guint obc_session_queue(struct obc_session *session,
+@@ -653,7 +647,6 @@ guint obc_session_queue(struct obc_session *session,
  				GError **err)
  {
  	struct pending_request *p;
--	const char *agent;
- 	int perr;
+-	int perr;
  
  	if (session->obex == NULL) {
-@@ -803,12 +802,8 @@ guint obc_session_queue(struct obc_session *session,
- 		return 0;
- 	}
- 
--	if (session->agent)
--		agent = obc_agent_get_name(session->agent);
--	else
--		agent = NULL;
--
--	if (!obc_transfer_register(transfer, session->conn, agent, err)) {
-+	if (!obc_transfer_register(transfer, session->conn, session->owner,
-+									err)) {
  		obc_transfer_unregister(transfer);
+@@ -670,21 +663,12 @@ guint obc_session_queue(struct obc_session *session,
+ 
+ 	obc_transfer_set_callback(transfer, transfer_complete, session);
+ 
+-	p = pending_request_new(session, transfer, session_start_transfer,
+-							func, user_data);
+-	if (session->p) {
+-		g_queue_push_tail(session->queue, p);
+-		return p->id;
+-	}
+-
+-	perr = pending_request_auth(p);
+-	if (perr < 0) {
+-		g_set_error(err, OBEX_IO_ERROR, perr, "Authorization failed");
+-		pending_request_free(p);
+-		return 0;
+-	}
++	p = pending_request_new(session, transfer, func, user_data);
++	g_queue_push_tail(session->queue, p);
+ 
+-	session->p = p;
++	if (session->queue_complete_id == 0)
++		session->queue_complete_id = g_idle_add(
++					session_queue_complete, session);
+ 
+ 	return p->id;
+ }
+@@ -702,22 +686,19 @@ static void session_process_queue(struct obc_session *session)
+ 	obc_session_ref(session);
+ 
+ 	while ((p = g_queue_pop_head(session->queue))) {
+-		int err;
++		GError *gerr = NULL;
++
++		DBG("Transfer(%p) started", p->transfer);
+ 
+-		err = pending_request_auth(p);
+-		if (err == 0) {
++		if (obc_transfer_start(p->transfer, session->obex, &gerr)) {
+ 			session->p = p;
+ 			break;
+ 		}
+ 
+-		if (p->func) {
+-			GError *gerr = NULL;
+-
+-			g_set_error(&gerr, OBEX_IO_ERROR, err,
+-							"Authorization failed");
++		if (p->func)
+ 			p->func(session, p->transfer, gerr, p->data);
+-			g_error_free(gerr);
+-		}
++
++		g_clear_error(&gerr);
+ 
+ 		pending_request_free(p);
+ 	}
+@@ -801,21 +782,6 @@ fail:
+ 	session_notify_error(session, transfer, err);
+ }
+ 
+-static void session_start_transfer(gpointer data, gpointer user_data)
+-{
+-	struct obc_session *session = data;
+-	struct obc_transfer *transfer = user_data;
+-	GError *err = NULL;
+-
+-	if (!obc_transfer_start(transfer, session->obex, &err)) {
+-		session_notify_error(session, transfer, err);
+-		g_clear_error(&err);
+-		return;
+-	}
+-
+-	DBG("Transfer(%p) started", transfer);
+-}
+-
+ const char *obc_session_register(struct obc_session *session,
+ 						GDBusDestroyFunction destroy)
+ {
+@@ -950,7 +916,7 @@ guint obc_session_setpath(struct obc_session *session, const char *path,
+ 	data->user_data = user_data;
+ 	data->remaining = g_strsplit(path, "/", 3);
+ 
+-	p = pending_request_new(session, NULL, NULL, setpath_complete, data);
++	p = pending_request_new(session, NULL, setpath_complete, data);
+ 
+ 	/* Relative path */
+ 	if (path[0] != '/') {
+@@ -1025,7 +991,7 @@ guint obc_session_mkdir(struct obc_session *session, const char *folder,
+ 	}
+ 
+ 
+-	p = pending_request_new(session, NULL, NULL, func, user_data);
++	p = pending_request_new(session, NULL, func, user_data);
+ 
+ 	p->req_id = g_obex_mkdir(session->obex, folder, async_cb, p, err);
+ 	if (*err != NULL) {
+@@ -1054,7 +1020,7 @@ guint obc_session_copy(struct obc_session *session, const char *srcname,
  		return 0;
  	}
-diff --git a/client/transfer.c b/client/transfer.c
-index b8931cf..80a6317 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -66,7 +66,7 @@ struct obc_transfer {
- 	struct transfer_callback *callback;
- 	DBusConnection *conn;
- 	DBusMessage *msg;
--	char *agent;		/* Transfer agent */
-+	char *owner;		/* Transfer initiator */
- 	char *path;		/* Transfer path */
- 	gchar *filename;	/* Transfer file location */
- 	char *name;		/* Transfer object name */
-@@ -169,7 +169,7 @@ static DBusMessage *obc_transfer_cancel(DBusConnection *connection,
- 	const gchar *sender;
  
- 	sender = dbus_message_get_sender(message);
--	if (g_strcmp0(transfer->agent, sender) != 0)
-+	if (g_strcmp0(transfer->owner, sender) != 0)
- 		return g_dbus_create_error(message,
- 				"org.openobex.Error.NotAuthorized",
- 				"Not Authorized");
-@@ -236,7 +236,7 @@ static void obc_transfer_free(struct obc_transfer *transfer)
- 		g_obex_unref(transfer->obex);
+-	p = pending_request_new(session, NULL, NULL, func, user_data);
++	p = pending_request_new(session, NULL, func, user_data);
  
- 	g_free(transfer->callback);
--	g_free(transfer->agent);
-+	g_free(transfer->owner);
- 	g_free(transfer->filename);
- 	g_free(transfer->name);
- 	g_free(transfer->type);
-@@ -262,7 +262,7 @@ static struct obc_transfer *obc_transfer_create(guint8 op,
+ 	p->req_id = g_obex_copy(session->obex, srcname, destname, async_cb, p,
+ 									err);
+@@ -1084,7 +1050,7 @@ guint obc_session_move(struct obc_session *session, const char *srcname,
+ 		return 0;
+ 	}
  
- gboolean obc_transfer_register(struct obc_transfer *transfer,
- 						DBusConnection *conn,
--						const char *agent,
-+						const char *owner,
- 						GError **err)
- {
- 	/* for OBEX specific mime types we don't need to register a transfer */
-@@ -271,7 +271,7 @@ gboolean obc_transfer_register(struct obc_transfer *transfer,
- 			strncmp(transfer->type, "x-bt/", 5) == 0))
- 		goto done;
+-	p = pending_request_new(session, NULL, NULL, func, user_data);
++	p = pending_request_new(session, NULL, func, user_data);
  
--	transfer->agent = g_strdup(agent);
-+	transfer->owner = g_strdup(owner);
+ 	p->req_id = g_obex_move(session->obex, srcname, destname, async_cb, p,
+ 									err);
+@@ -1114,7 +1080,7 @@ guint obc_session_delete(struct obc_session *session, const char *file,
+ 		return 0;
+ 	}
  
- 	transfer->path = g_strdup_printf("%s/transfer%ju",
- 			TRANSFER_BASEPATH, counter++);
-diff --git a/client/transfer.h b/client/transfer.h
-index bf40a4c..a65a2ed 100644
---- a/client/transfer.h
-+++ b/client/transfer.h
-@@ -36,7 +36,7 @@ struct obc_transfer *obc_transfer_put(const char *type, const char *name,
+-	p = pending_request_new(session, NULL, NULL, func, user_data);
++	p = pending_request_new(session, NULL, func, user_data);
  
- gboolean obc_transfer_register(struct obc_transfer *transfer,
- 					DBusConnection *conn,
--					const char *agent,
-+					const char *owner,
- 					GError **err);
- 
- void obc_transfer_unregister(struct obc_transfer *transfer);
+ 	p->req_id = g_obex_delete(session->obex, file, async_cb, p, err);
+ 	if (*err != NULL) {
 -- 
 1.7.7.6
 
