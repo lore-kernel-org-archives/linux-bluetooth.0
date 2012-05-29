@@ -1,68 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120529142537.GB13737@samus>
-References: <1338293498-2356-1-git-send-email-luiz.dentz@gmail.com>
-	<20120529142537.GB13737@samus>
-Date: Tue, 29 May 2012 21:08:38 +0300
-Message-ID: <CABBYNZ+spAWjmXkz+-AOSXVigW73hvYr-5UBkc1PBRfzOa03TQ@mail.gmail.com>
-Subject: Re: [PATCH obexd] client: Fix not checking if destination exist while
- renaming file
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Date: Tue, 29 May 2012 14:39:11 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 2/2] Bluetooth: Remove unused HCI timeouts definitions
+Message-ID: <20120529173911.GB18069@joana>
+References: <1338198440-15077-1-git-send-email-szymon.janc@tieto.com>
+ <1338198440-15077-2-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1338198440-15077-2-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Szymon,
 
-On Tue, May 29, 2012 at 5:25 PM, Vinicius Costa Gomes
-<vinicius.gomes@openbossa.org> wrote:
-> Hi Luiz,
->
-> On 15:11 Tue 29 May, Luiz Augusto von Dentz wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> rename return an error if the destination directory doesn't exist, so
->> in case it doesn't exist it should be created before calling rename.
->> ---
->>  client/transfer.c |   27 +++++++++++++++++++++++++--
->>  1 files changed, 25 insertions(+), 2 deletions(-)
->>
->> diff --git a/client/transfer.c b/client/transfer.c
->> index 3065c9c..772834f 100644
->> --- a/client/transfer.c
->> +++ b/client/transfer.c
->> @@ -715,11 +715,34 @@ int obc_transfer_set_filename(struct obc_transfer *transfer,
->>                                       const char *filename)
->>  {
->>       int err;
->> +     struct stat st;
->> +     char *dirname;
->> +     gboolean dir = FALSE;
->> +
->> +     dirname = g_path_get_dirname(filename);
->> +     if (stat(dirname, &st) < 0) {
->> +             if (errno != ENOENT) {
->> +                     error("stat(): %s (%d)", strerror(errno), errno);
->> +                     return -errno;
->> +             }
->> +
->> +             if (mkdir(dirname, 0755) < 0) {
->
-> For example, if my /tmp is empty, and "dirname" is "/tmp/foo/bar", this
-> would fail, right? i.e. mkdir() isn't able to create two (or more) levels
-> at a time.
->
-> So for consistency, I would prefer if the error that the directory
-> doesn't exist is returned, and the user creates the directory himself.
-> This is mostly for FTP, right?
+* Szymon Janc <szymon.janc@tieto.com> [2012-05-28 11:47:20 +0200]:
 
-This is a regression when the Agent returns a different path to save
-the file it used to work, but since we are going to remove the agent
-maybe this function doesn't make sense anymore so the application need
-to set the filename upfront.
+> Those are not used anywhere in code (and never were since introduction
+> in 2006) so just remove them.
+> 
+> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> ---
+>  include/net/bluetooth/hci.h |    2 --
+>  1 file changed, 2 deletions(-)
 
+Patch has been applied to bluetooth-next. Thanks.
 
--- 
-Luiz Augusto von Dentz
+	Gustavo
