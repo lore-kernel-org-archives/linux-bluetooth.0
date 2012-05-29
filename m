@@ -1,88 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 29 May 2012 12:52:19 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH] Bluetooth: Create empty l2cap ops function
-Date: Tue, 29 May 2012 13:19:26 -0300
-Message-Id: <1338308366-11465-1-git-send-email-gustavo@padovan.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv4 17/17] Bluetooth: A2MP: Manage incoming connections
+Message-ID: <20120529155218.GD4575@joana>
+References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1338289158-25655-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1338289158-25655-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1338289158-25655-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Hi Andrei,
 
-A2MP doesn't use part of the L2CAP chan ops API so we just create general
-empty function instead of the A2MP specific one.
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-05-29 13:59:17 +0300]:
 
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
----
- include/net/bluetooth/l2cap.h |   12 ++++++++++++
- net/bluetooth/a2mp.c          |   23 +++--------------------
- 2 files changed, 15 insertions(+), 20 deletions(-)
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Handle incoming A2MP connection by creating AMP manager and
+> processing A2MP messages.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  include/net/bluetooth/a2mp.h |    4 ++++
+>  net/bluetooth/a2mp.c         |   16 ++++++++++++++++
+>  net/bluetooth/l2cap_core.c   |   19 +++++++++++++++----
+>  3 files changed, 35 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index a00b43e..b939e90 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -740,6 +740,18 @@ static inline __u16 __next_seq(struct l2cap_chan *chan, __u16 seq)
- 	return (seq + 1) % (chan->tx_win_max + 1);
- }
- 
-+static inline struct l2cap_chan *l2cap_chan_no_new_connection(struct l2cap_chan *chan)
-+{
-+	return NULL;
-+}
-+
-+static inline void l2cap_chan_no_teardown(struct l2cap_chan *chan, int err)
-+{
-+}
-+
-+static inline void l2cap_chan_no_ready(struct l2cap_chan *chan)
-+{
-+}
- 
- extern bool disable_ertm;
- 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index e08ca2a..ec1ef2e 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -440,23 +440,6 @@ static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
- 	return bt_skb_alloc(len, GFP_KERNEL);
- }
- 
--static struct l2cap_chan *a2mp_chan_no_new_conn_cb(struct l2cap_chan *chan)
--{
--	BT_ERR("new_connection for chan %p not implemented", chan);
--
--	return NULL;
--}
--
--static void a2mp_chan_no_teardown_cb(struct l2cap_chan *chan, int err)
--{
--	BT_ERR("teardown for chan %p not implemented", chan);
--}
--
--static void a2mp_chan_no_ready(struct l2cap_chan *chan)
--{
--	BT_ERR("ready for chan %p not implemented", chan);
--}
--
- static struct l2cap_ops a2mp_chan_ops = {
- 	.name = "L2CAP A2MP channel",
- 	.recv = a2mp_chan_recv_cb,
-@@ -465,9 +448,9 @@ static struct l2cap_ops a2mp_chan_ops = {
- 	.alloc_skb = a2mp_chan_alloc_skb_cb,
- 
- 	/* Not implemented for A2MP */
--	.new_connection = a2mp_chan_no_new_conn_cb,
--	.teardown = a2mp_chan_no_teardown_cb,
--	.ready = a2mp_chan_no_ready,
-+	.new_connection = l2cap_chan_no_new_connection,
-+	.teardown = l2cap_chan_no_teardown,
-+	.ready = l2cap_chan_no_ready,
- };
- 
- static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
--- 
-1.7.10.2
+A 17 patches were applied to bluetooth-next. Thanks.
 
+	Gustavo
