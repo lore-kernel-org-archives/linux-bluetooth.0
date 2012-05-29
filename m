@@ -1,65 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: Paulo Alcantara <paulo.alcantara@openbossa.org>
+From: Ido Yariv <ido@wizery.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ] agent: Fix segmentation fault
-Date: Tue, 29 May 2012 19:32:06 -0300
-Message-Id: <1338330726-11517-1-git-send-email-paulo.alcantara@openbossa.org>
+Cc: Ido Yariv <ido@wizery.com>
+Subject: [PATCH] attrib-server: Fix multiple channels detaching mix-up
+Date: Tue, 29 May 2012 23:20:08 +0300
+Message-Id: <1338322808-15503-1-git-send-email-ido@wizery.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes a segmentation fault when the agent leaves the bus
-and there is a request passkey pending.
+The identifier returned by g_attrib_register is not unique across
+different channels. Since attrib_channel_detach assumes this identifier
+to be unique, it may end up detaching the wrong channel when a device
+disconnects.
 
-bluetoothd[3137]: src/agent.c:agent_exited() Agent exited without
-calling Unregister
-==3137== Invalid read of size 8
-==3137==    at 0x4489E7: device_get_adapter (device.c:2197)
-==3137==    by 0x448C69: passkey_cb (device.c:2757)
-==3137==    by 0x43FA47: agent_free (agent.c:168)
-==3137==    by 0x40A738: service_filter (watch.c:477)
-==3137==    by 0x40A450: message_filter (watch.c:527)
-==3137==    by 0x516451B: dbus_connection_dispatch (in
-/usr/lib64/libdbus-1.so.3.5.8)
-==3137==    by 0x409387: message_dispatch (mainloop.c:76)
-==3137==    by 0x4E7986A: g_timeout_dispatch (in
-/usr/lib64/libglib-2.0.so.0.3000.2)
-==3137==    by 0x4E78091: g_main_context_dispatch (in
-/usr/lib64/libglib-2.0.so.0.3000.2)
-==3137==    by 0x4E78887: g_main_context_iterate.clone.6 (in
-/usr/lib64/libglib-2.0.so.0.3000.2)
-==3137==    by 0x4E78DD9: g_main_loop_run (in
-/usr/lib64/libglib-2.0.so.0.3000.2)
-==3137==    by 0x431AA6: main (main.c:542)
-==3137==  Address 0xe818247c89102594 is not stack'd, malloc'd or
-(recently) free'd
+Fix this by using the channel's pointer as a unique identifier for
+detaching the channel. The identifier returned from g_attrib_register
+will still be used to find the relevant event structure.
 ---
- src/agent.c |    5 +++++
- 1 file changed, 5 insertions(+)
+ src/attrib-server.c |   22 +++++++---------------
+ 1 files changed, 7 insertions(+), 15 deletions(-)
 
-diff --git a/src/agent.c b/src/agent.c
-index 579b03e..e542425 100644
---- a/src/agent.c
-+++ b/src/agent.c
-@@ -153,6 +153,7 @@ void agent_free(struct agent *agent)
- 	if (agent->request) {
- 		DBusError err;
- 		agent_pincode_cb pincode_cb;
-+		agent_passkey_cb passkey_cb;
- 		agent_cb cb;
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index dd1bba4..39085de 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -72,7 +72,7 @@ struct gatt_channel {
+ 	GAttrib *attrib;
+ 	guint mtu;
+ 	gboolean le;
+-	guint id;
++	guint event_id;
+ 	gboolean encrypted;
+ 	struct gatt_server *server;
+ 	guint cleanup_id;
+@@ -1077,8 +1077,8 @@ guint attrib_channel_attach(GAttrib *attrib)
  
- 		dbus_error_init(&err);
-@@ -163,6 +164,10 @@ void agent_free(struct agent *agent)
- 			pincode_cb = agent->request->cb;
- 			pincode_cb(agent, &err, NULL, agent->request->user_data);
- 			break;
-+		case AGENT_REQUEST_PASSKEY:
-+			passkey_cb = agent->request->cb;
-+			passkey_cb(agent, &err, 0, agent->request->user_data);
-+			break;
- 		default:
- 			cb = agent->request->cb;
- 			cb(agent, &err, agent->request->user_data);
+ 
+ 	channel->attrib = g_attrib_ref(attrib);
+-	channel->id = g_attrib_register(channel->attrib, GATTRIB_ALL_REQS,
+-					channel_handler, channel, NULL);
++	channel->event_id = g_attrib_register(channel->attrib, GATTRIB_ALL_REQS,
++						channel_handler, channel, NULL);
+ 
+ 	channel->cleanup_id = g_io_add_watch(io, G_IO_HUP, channel_watch_cb,
+ 								channel);
+@@ -1087,15 +1087,7 @@ guint attrib_channel_attach(GAttrib *attrib)
+ 
+ 	server->clients = g_slist_append(server->clients, channel);
+ 
+-	return channel->id;
+-}
+-
+-static gint channel_id_cmp(gconstpointer data, gconstpointer user_data)
+-{
+-	const struct gatt_channel *channel = data;
+-	guint id = GPOINTER_TO_UINT(user_data);
+-
+-	return channel->id - id;
++	return GPOINTER_TO_UINT(channel);
+ }
+ 
+ gboolean attrib_channel_detach(GAttrib *attrib, guint id)
+@@ -1122,14 +1114,14 @@ gboolean attrib_channel_detach(GAttrib *attrib, guint id)
+ 	if (server == NULL)
+ 		return FALSE;
+ 
+-	l = g_slist_find_custom(server->clients, GUINT_TO_POINTER(id),
+-								channel_id_cmp);
++	/* Make sure the channel was not already freed */
++	l = g_slist_find(server->clients, GUINT_TO_POINTER(id));
+ 	if (!l)
+ 		return FALSE;
+ 
+ 	channel = l->data;
+ 
+-	g_attrib_unregister(channel->attrib, channel->id);
++	g_attrib_unregister(channel->attrib, channel->event_id);
+ 	channel_remove(channel);
+ 
+ 	return TRUE;
 -- 
-1.7.9.5
+1.7.7.6
 
