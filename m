@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 12/17] Bluetooth: A2MP: Process A2MP Get AMP Assoc Request
-Date: Tue, 29 May 2012 13:59:12 +0300
-Message-Id: <1338289158-25655-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 11/17] Bluetooth: A2MP: Process A2MP Get Info Request
+Date: Tue, 29 May 2012 13:59:11 +0300
+Message-Id: <1338289158-25655-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1338289158-25655-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1338289158-25655-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,32 +12,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Example trace when receiving AMP Assoc Request with wrong AMP id.
+Process A2MP Get Info Request.
+Example of trace log for invalid controller id is shown below:
+
 ...
 > ACL data: handle 11 flags 0x02 dlen 13
-    A2MP: Get AMP Assoc req: id 238
-< ACL data: handle 11 flags 0x00 dlen 14
-    A2MP: Get AMP Assoc rsp: id 238 status (1) Invalid Controller ID
-      assoc data:
+    A2MP: Get Info req: id 238
+< ACL data: handle 11 flags 0x00 dlen 30
+    A2MP: Get Info rsp: id 238 status (1) Invalid Controller ID
 ...
+
+Note that If the Status field is set to Invalid Controller ID all subsequent
+fields in the AMP Get Info Response shall be ignored by the receiver.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ net/bluetooth/a2mp.c |   37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 38a0b38..63c5394 100644
+index b610f13..38a0b38 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -211,6 +211,38 @@ static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
+@@ -177,6 +177,40 @@ static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
  	return 0;
  }
  
-+static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
-+				struct a2mp_cmd *hdr)
++static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
++			    struct a2mp_cmd *hdr)
 +{
-+	struct a2mp_amp_assoc_req *req = (void *) skb->data;
++	struct a2mp_info_req *req  = (void *) skb->data;
++	struct a2mp_info_rsp rsp;
 +	struct hci_dev *hdev;
 +
 +	if (le16_to_cpu(hdr->len) < sizeof(*req))
@@ -45,22 +50,23 @@ index 38a0b38..63c5394 100644
 +
 +	BT_DBG("id %d", req->id);
 +
-+	hdev = hci_dev_get(req->id);
-+	if (!hdev || hdev->amp_type == HCI_BREDR) {
-+		struct a2mp_amp_assoc_rsp rsp;
-+		rsp.id = req->id;
-+		rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
++	rsp.id = req->id;
++	rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
 +
-+		a2mp_send(mgr, A2MP_GETAMPASSOC_RSP, hdr->ident, sizeof(rsp),
-+			  &rsp);
-+		goto clean;
++	hdev = hci_dev_get(req->id);
++	if (hdev && hdev->amp_type != HCI_BREDR) {
++		rsp.status = 0;
++		rsp.total_bw = cpu_to_le32(hdev->amp_total_bw);
++		rsp.max_bw = cpu_to_le32(hdev->amp_max_bw);
++		rsp.min_latency = cpu_to_le32(hdev->amp_min_latency);
++		rsp.pal_cap = cpu_to_le16(hdev->amp_pal_cap);
++		rsp.assoc_size = cpu_to_le16(hdev->amp_assoc_size);
 +	}
 +
-+	/* Placeholder for HCI Read AMP Assoc */
-+
-+clean:
 +	if (hdev)
 +		hci_dev_put(hdev);
++
++	a2mp_send(mgr, A2MP_GETINFO_RSP, hdr->ident, sizeof(rsp), &rsp);
 +
 +	skb_pull(skb, sizeof(*req));
 +	return 0;
@@ -69,16 +75,16 @@ index 38a0b38..63c5394 100644
  /* Handle A2MP signalling */
  static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
  {
-@@ -253,6 +285,9 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+@@ -215,6 +249,9 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
  			break;
  
- 		case A2MP_GETAMPASSOC_REQ:
-+			err = a2mp_getampassoc_req(mgr, skb, hdr);
+ 		case A2MP_GETINFO_REQ:
++			err = a2mp_getinfo_req(mgr, skb, hdr);
 +			break;
 +
+ 		case A2MP_GETAMPASSOC_REQ:
  		case A2MP_CREATEPHYSLINK_REQ:
  		case A2MP_DISCONNPHYSLINK_REQ:
- 		case A2MP_CHANGE_RSP:
 -- 
 1.7.9.5
 
