@@ -1,279 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ido Yariv <ido@wizery.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	Ido Yariv <ido@wizery.com>
-Subject: [PATCH v3] gattrib: Fix a request/response command deadlock
-Date: Tue, 29 May 2012 11:39:23 +0300
-Message-Id: <1338280763-3050-1-git-send-email-ido@wizery.com>
-In-Reply-To: <20120529024058.GA2382@echo>
-References: <20120529024058.GA2382@echo>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 29 May 2012 10:48:31 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Sasha Levin <levinsasha928@gmail.com>, gustavo@padovan.org,
+	johan.hedberg@gmail.com, davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: Really fix registering hci with duplicate
+ name
+Message-ID: <20120529074829.GB15895@aemeltch-MOBL1>
+References: <1338151016-13494-1-git-send-email-levinsasha928@gmail.com>
+ <1338176868.15105.113.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1338176868.15105.113.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-New requests and responses are never sent if a request was sent and the
-response for it hasn't been received yet. As a result, if both end
-points send requests at the same time, a deadlock could occur. This
-could happen, for instance, if the client sends a read request and the
-server sends an indication before responding to the read request.
+Hi,
 
-Fix this by introducing an additional queue for responses. Responses may
-be sent while there's still a pending request/indication.
----
-Changes from v2:
-- Cancel responses in g_attrib_cancel_all even if the requests queue is NULL
+On Mon, May 28, 2012 at 05:47:48AM +0200, Marcel Holtmann wrote:
+> Hi Sasha,
+> 
+> > Commit fc50744 ("Bluetooth: Fix registering hci with duplicate name") didn't
+> > fully fix the duplicate naming issue with devices, and duplicate device names
+> > could still be created:
+> > 
+> > [  142.484097] device: 'hci1': device_add
+> > [...]
+> > [  150.545263] device: 'hci1': device_add
+> > [  150.550128] kobject: 'hci1' (ffff880014cc4e58): kobject_add_internal: parent: 'bluetooth', set: 'devices'
+> > [  150.558979] ------------[ cut here ]------------
+> > [  150.561438] WARNING: at fs/sysfs/dir.c:529 sysfs_add_one+0xb0/0xd0()
+> > [  150.572974] Hardware name: Bochs
+> > [  150.580502] sysfs: cannot create duplicate filename '/devices/virtual/bluetooth/hci1'
+> > [  150.584444] Pid: 7563, comm: trinity-child1 Tainted: G        W    3.4.0-next-20120524-sasha #296
+> > [...]
+> > 
+> > Instead of the weird logic and the attempt at keeping the device list sorted,
+> > just use an IDA.
+> > 
+> > Signed-off-by: Sasha Levin <levinsasha928@gmail.com>
+> > ---
+> > 
+> > Changes from v1:
+> > 
+> >  - Address comments by Marcel.
+> >  - Remove errornous mutex lock.
+> > 
+> >  net/bluetooth/hci_core.c |   41 ++++++++++++++++++++++++-----------------
+> >  1 files changed, 24 insertions(+), 17 deletions(-)
+> 
+> thanks for addressing this. Patch has been applied to bluetooth-next
+> tree.
 
- attrib/gattrib.c |  111 ++++++++++++++++++++++++++++++++++++++++++------------
- 1 files changed, 87 insertions(+), 24 deletions(-)
+The patch looks OK but I start to notice kmemleak messages like
+shown below:
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 769be36..9886a92 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -46,7 +46,8 @@ struct _GAttrib {
- 	guint read_watch;
- 	guint write_watch;
- 	guint timeout_watch;
--	GQueue *queue;
-+	GQueue *requests;
-+	GQueue *responses;
- 	GSList *events;
- 	guint next_cmd_id;
- 	guint next_evt_id;
-@@ -173,11 +174,17 @@ static void attrib_destroy(GAttrib *attrib)
- 	GSList *l;
- 	struct command *c;
- 
--	while ((c = g_queue_pop_head(attrib->queue)))
-+	while ((c = g_queue_pop_head(attrib->requests)))
-+		command_destroy(c);
-+
-+	while ((c = g_queue_pop_head(attrib->responses)))
- 		command_destroy(c);
- 
--	g_queue_free(attrib->queue);
--	attrib->queue = NULL;
-+	g_queue_free(attrib->requests);
-+	attrib->requests = NULL;
-+
-+	g_queue_free(attrib->responses);
-+	attrib->responses = NULL;
- 
- 	for (l = attrib->events; l; l = l->next)
- 		event_destroy(l->data);
-@@ -259,21 +266,34 @@ static gboolean can_write_data(GIOChannel *io, GIOCondition cond,
- 	GError *gerr = NULL;
- 	gsize len;
- 	GIOStatus iostat;
-+	GQueue *queue;
- 
- 	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
- 		return FALSE;
- 
--	cmd = g_queue_peek_head(attrib->queue);
-+	queue = attrib->responses;
-+	cmd = g_queue_peek_head(queue);
-+	if (cmd == NULL) {
-+		queue = attrib->requests;
-+		cmd = g_queue_peek_head(queue);
-+	}
- 	if (cmd == NULL)
- 		return FALSE;
- 
-+	/*
-+	 * Verify that we didn't already send this command. This can only
-+	 * happen with elementes from attrib->requests.
-+	 */
-+	if (cmd->sent)
-+		return FALSE;
-+
- 	iostat = g_io_channel_write_chars(io, (gchar *) cmd->pdu, cmd->len,
- 								&len, &gerr);
- 	if (iostat != G_IO_STATUS_NORMAL)
- 		return FALSE;
- 
- 	if (cmd->expected == 0) {
--		g_queue_pop_head(attrib->queue);
-+		g_queue_pop_head(queue);
- 		command_destroy(cmd);
- 
- 		return TRUE;
-@@ -315,7 +335,7 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
- 	uint8_t buf[512], status;
- 	gsize len;
- 	GIOStatus iostat;
--	gboolean qempty;
-+	gboolean norequests, noresponses;
- 
- 	if (attrib->timeout_watch > 0) {
- 		g_source_remove(attrib->timeout_watch);
-@@ -349,7 +369,7 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
- 	if (is_response(buf[0]) == FALSE)
- 		return TRUE;
- 
--	cmd = g_queue_pop_head(attrib->queue);
-+	cmd = g_queue_pop_head(attrib->requests);
- 	if (cmd == NULL) {
- 		/* Keep the watch if we have events to report */
- 		return attrib->events != NULL;
-@@ -368,7 +388,10 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
- 	status = 0;
- 
- done:
--	qempty = attrib->queue == NULL || g_queue_is_empty(attrib->queue);
-+	norequests = attrib->requests == NULL ||
-+			g_queue_is_empty(attrib->requests);
-+	noresponses = attrib->responses == NULL ||
-+			g_queue_is_empty(attrib->responses);
- 
- 	if (cmd) {
- 		if (cmd->func)
-@@ -377,7 +400,7 @@ done:
- 		command_destroy(cmd);
- 	}
- 
--	if (!qempty)
-+	if (!norequests || !noresponses)
- 		wake_up_sender(attrib);
- 
- 	return TRUE;
-@@ -396,7 +419,8 @@ GAttrib *g_attrib_new(GIOChannel *io)
- 		return NULL;
- 
- 	attrib->io = g_io_channel_ref(io);
--	attrib->queue = g_queue_new();
-+	attrib->requests = g_queue_new();
-+	attrib->responses = g_queue_new();
- 
- 	attrib->read_watch = g_io_add_watch(attrib->io,
- 			G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-@@ -421,6 +445,7 @@ guint g_attrib_send(GAttrib *attrib, guint id, guint8 opcode,
- 			gpointer user_data, GDestroyNotify notify)
- {
- 	struct command *c;
-+	GQueue *queue;
- 
- 	c = g_try_new0(struct command, 1);
- 	if (c == NULL)
-@@ -435,15 +460,29 @@ guint g_attrib_send(GAttrib *attrib, guint id, guint8 opcode,
- 	c->user_data = user_data;
- 	c->notify = notify;
- 
-+	if (is_response(opcode))
-+		queue = attrib->responses;
-+	else
-+		queue = attrib->requests;
-+
- 	if (id) {
- 		c->id = id;
--		g_queue_push_head(attrib->queue, c);
-+		if (!is_response(opcode))
-+			g_queue_push_head(queue, c);
-+		else
-+			/* Don't re-order responses even if an ID is given */
-+			g_queue_push_tail(queue, c);
- 	} else {
- 		c->id = ++attrib->next_cmd_id;
--		g_queue_push_tail(attrib->queue, c);
-+		g_queue_push_tail(queue, c);
- 	}
- 
--	if (g_queue_get_length(attrib->queue) == 1)
-+	/*
-+	 * If a command was added to the queue and it was empty before, wake up
-+	 * the sender. If the sender was already woken up by the second queue,
-+	 * wake_up_sender will just return.
-+	 */
-+	if (g_queue_get_length(queue) == 1)
- 		wake_up_sender(attrib);
- 
- 	return c->id;
-@@ -459,38 +498,49 @@ static gint command_cmp_by_id(gconstpointer a, gconstpointer b)
- 
- gboolean g_attrib_cancel(GAttrib *attrib, guint id)
- {
--	GList *l;
-+	GList *l = NULL;
- 	struct command *cmd;
-+	GQueue *queue;
- 
--	if (attrib == NULL || attrib->queue == NULL)
-+	if (attrib == NULL)
- 		return FALSE;
- 
--	l = g_queue_find_custom(attrib->queue, GUINT_TO_POINTER(id),
--							command_cmp_by_id);
-+	queue = attrib->requests;
-+	if (queue)
-+		l = g_queue_find_custom(queue, GUINT_TO_POINTER(id),
-+					command_cmp_by_id);
-+	if (l == NULL) {
-+		queue = attrib->responses;
-+		if (!queue)
-+			return FALSE;
-+		l = g_queue_find_custom(queue, GUINT_TO_POINTER(id),
-+					command_cmp_by_id);
-+	}
-+
- 	if (l == NULL)
- 		return FALSE;
- 
- 	cmd = l->data;
- 
--	if (cmd == g_queue_peek_head(attrib->queue) && cmd->sent)
-+	if (cmd == g_queue_peek_head(queue) && cmd->sent)
- 		cmd->func = NULL;
- 	else {
--		g_queue_remove(attrib->queue, cmd);
-+		g_queue_remove(queue, cmd);
- 		command_destroy(cmd);
- 	}
- 
- 	return TRUE;
- }
- 
--gboolean g_attrib_cancel_all(GAttrib *attrib)
-+static gboolean cancel_all_per_queue(GQueue *queue)
- {
- 	struct command *c, *head = NULL;
- 	gboolean first = TRUE;
- 
--	if (attrib == NULL || attrib->queue == NULL)
-+	if (queue == NULL)
- 		return FALSE;
- 
--	while ((c = g_queue_pop_head(attrib->queue))) {
-+	while ((c = g_queue_pop_head(queue))) {
- 		if (first && c->sent) {
- 			/* If the command was sent ignore its callback ... */
- 			c->func = NULL;
-@@ -504,12 +554,25 @@ gboolean g_attrib_cancel_all(GAttrib *attrib)
- 
- 	if (head) {
- 		/* ... and put it back in the queue */
--		g_queue_push_head(attrib->queue, head);
-+		g_queue_push_head(queue, head);
- 	}
- 
- 	return TRUE;
- }
- 
-+gboolean g_attrib_cancel_all(GAttrib *attrib)
-+{
-+	gboolean ret;
-+
-+	if (attrib == NULL)
-+		return FALSE;
-+
-+	ret = cancel_all_per_queue(attrib->requests);
-+	ret = cancel_all_per_queue(attrib->responses) && ret;
-+
-+	return ret;
-+}
-+
- gboolean g_attrib_set_debug(GAttrib *attrib,
- 		GAttribDebugFunc func, gpointer user_data)
- {
--- 
-1.7.7.6
+...
+unreferenced object 0xf46e4ed8 (size 148):
+  comm "modprobe", pid 656, jiffies 4294900233 (age 4661.940s)
+  hex dump (first 32 bytes):
+    00 00 00 00 40 4e 6e f4 00 00 00 00 00 00 00 00  ....@Nn.........
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<c154dfcc>] kmemleak_alloc+0x3c/0xa0
+    [<c1132c7a>] kmem_cache_alloc+0x14a/0x190
+    [<c12af2dd>] idr_pre_get+0x5d/0x80
+    [<c12af3e5>] ida_pre_get+0x15/0x90
+    [<c12af497>] ida_simple_get+0x37/0xe0
+    [<f8369b79>] 0xf8369b79
+    [<f81be63e>] 0xf81be63e
+    [<c13f2a5e>] usb_probe_interface+0xce/0x210
+    [<c13733cb>] driver_probe_device+0x8b/0x370
+    [<c1373749>] __driver_attach+0x99/0xa0
+    [<c1371902>] bus_for_each_dev+0x42/0x70
+    [<c1372ea1>] driver_attach+0x21/0x30
+    [<c1372a47>] bus_add_driver+0x1c7/0x2e0
+    [<c1373bf6>] driver_register+0x66/0x110
+    [<c13f1acb>] usb_register_driver+0x7b/0x140
+    [<f8005017>] 0xf8005017
+unreferenced object 0xf454c260 (size 148):
+  comm "modprobe", pid 656, jiffies 4294900233 (age 4661.940s)
+  hex dump (first 32 bytes):
+    00 00 00 00 d8 4e 6e f4 00 00 00 00 00 00 00 00  .....Nn.........
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<c154dfcc>] kmemleak_alloc+0x3c/0xa0
+    [<c1132c7a>] kmem_cache_alloc+0x14a/0x190
+    [<c12af2dd>] idr_pre_get+0x5d/0x80
+    [<c12af3e5>] ida_pre_get+0x15/0x90
+    [<c12af497>] ida_simple_get+0x37/0xe0
+    [<f8369b79>] 0xf8369b79
+    [<f81be63e>] 0xf81be63e
+    [<c13f2a5e>] usb_probe_interface+0xce/0x210
+    [<c13733cb>] driver_probe_device+0x8b/0x370
+    [<c1373749>] __driver_attach+0x99/0xa0
+    [<c1371902>] bus_for_each_dev+0x42/0x70
+    [<c1372ea1>] driver_attach+0x21/0x30
+    [<c1372a47>] bus_add_driver+0x1c7/0x2e0
+    [<c1373bf6>] driver_register+0x66/0x110
+    [<c13f1acb>] usb_register_driver+0x7b/0x140
+    [<f8005017>] 0xf8005017
+...
 
+Best regards 
+Andrei Emeltchenko 
