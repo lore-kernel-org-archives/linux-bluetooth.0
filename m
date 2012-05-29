@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 03/17] Bluetooth: A2MP: Build and Send msg helpers
-Date: Tue, 29 May 2012 13:59:03 +0300
-Message-Id: <1338289158-25655-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 12/17] Bluetooth: A2MP: Process A2MP Get AMP Assoc Request
+Date: Tue, 29 May 2012 13:59:12 +0300
+Message-Id: <1338289158-25655-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1338289158-25655-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1338289158-25655-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,89 +12,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Helper function to build and send A2MP messages.
+Example trace when receiving AMP Assoc Request with wrong AMP id.
+...
+> ACL data: handle 11 flags 0x02 dlen 13
+    A2MP: Get AMP Assoc req: id 238
+< ACL data: handle 11 flags 0x00 dlen 14
+    A2MP: Get AMP Assoc rsp: id 238 status (1) Invalid Controller ID
+      assoc data:
+...
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |    7 +++++++
- net/bluetooth/a2mp.c         |   46 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 53 insertions(+)
+ net/bluetooth/a2mp.c |   35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index ff47540..654df60 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -24,6 +24,13 @@ struct amp_mgr {
- 	unsigned long		flags;
- };
- 
-+struct a2mp_cmd {
-+	__u8	code;
-+	__u8	ident;
-+	__le16	len;
-+	__u8	data[0];
-+} __packed;
-+
- void amp_mgr_get(struct amp_mgr *mgr);
- int amp_mgr_put(struct amp_mgr *mgr);
- 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 3c241c2..53f49a0 100644
+index 38a0b38..63c5394 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -17,6 +17,52 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/a2mp.h>
+@@ -211,6 +211,38 @@ static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
+ }
  
-+/* A2MP build & send command helper functions */
-+static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
++static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
++				struct a2mp_cmd *hdr)
 +{
-+	struct a2mp_cmd *cmd;
-+	int plen;
++	struct a2mp_amp_assoc_req *req = (void *) skb->data;
++	struct hci_dev *hdev;
 +
-+	plen = sizeof(*cmd) + len;
-+	cmd = kzalloc(plen, GFP_KERNEL);
-+	if (!cmd)
-+		return NULL;
++	if (le16_to_cpu(hdr->len) < sizeof(*req))
++		return -EINVAL;
 +
-+	cmd->code = code;
-+	cmd->ident = ident;
-+	cmd->len = cpu_to_le16(len);
++	BT_DBG("id %d", req->id);
 +
-+	memcpy(cmd->data, data, len);
++	hdev = hci_dev_get(req->id);
++	if (!hdev || hdev->amp_type == HCI_BREDR) {
++		struct a2mp_amp_assoc_rsp rsp;
++		rsp.id = req->id;
++		rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
 +
-+	return cmd;
++		a2mp_send(mgr, A2MP_GETAMPASSOC_RSP, hdr->ident, sizeof(rsp),
++			  &rsp);
++		goto clean;
++	}
++
++	/* Placeholder for HCI Read AMP Assoc */
++
++clean:
++	if (hdev)
++		hci_dev_put(hdev);
++
++	skb_pull(skb, sizeof(*req));
++	return 0;
 +}
 +
-+static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
-+		      void *data)
-+{
-+	struct l2cap_chan *chan = mgr->a2mp_chan;
-+	struct a2mp_cmd *cmd;
-+	u16 total_len = len + sizeof(*cmd);
-+	struct kvec iv;
-+	struct msghdr msg;
+ /* Handle A2MP signalling */
+ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ {
+@@ -253,6 +285,9 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 			break;
+ 
+ 		case A2MP_GETAMPASSOC_REQ:
++			err = a2mp_getampassoc_req(mgr, skb, hdr);
++			break;
 +
-+	cmd = __a2mp_build(code, ident, len, data);
-+	if (!cmd)
-+		return;
-+
-+	iv.iov_base = cmd;
-+	iv.iov_len = total_len;
-+
-+	memset(&msg, 0, sizeof(msg));
-+
-+	msg.msg_iov = (struct iovec *) &iv;
-+	msg.msg_iovlen = 1;
-+
-+	l2cap_chan_send(chan, &msg, total_len, 0);
-+
-+	kfree(cmd);
-+}
-+
- static struct l2cap_ops a2mp_chan_ops = {
- 	.name = "L2CAP A2MP channel",
- };
+ 		case A2MP_CREATEPHYSLINK_REQ:
+ 		case A2MP_DISCONNPHYSLINK_REQ:
+ 		case A2MP_CHANGE_RSP:
 -- 
 1.7.9.5
 
