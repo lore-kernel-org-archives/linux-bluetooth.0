@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 06/17] Bluetooth: A2MP: Define A2MP status codes
-Date: Tue, 29 May 2012 13:59:06 +0300
-Message-Id: <1338289158-25655-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 01/17] Bluetooth: A2MP: Create A2MP channel
+Date: Tue, 29 May 2012 13:59:01 +0300
+Message-Id: <1338289158-25655-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1338289158-25655-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1338289158-25655-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,34 +12,162 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-A2MP status codes copied from Bluez patch sent by Peter Krystad
-<pkrystad@codeaurora.org>.
+Create and initialize fixed A2MP channel
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |   10 ++++++++++
- 1 file changed, 10 insertions(+)
+ include/net/bluetooth/l2cap.h |    6 ++++
+ net/bluetooth/Makefile        |    3 +-
+ net/bluetooth/a2mp.c          |   69 +++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/l2cap_core.c    |    6 ++--
+ 4 files changed, 80 insertions(+), 4 deletions(-)
+ create mode 100644 net/bluetooth/a2mp.c
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 7cbeb91..391acd7 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -104,6 +104,16 @@ struct a2mp_physlink_rsp {
- 	__u8	status;
- } __packed;
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index c5726c2..aaba222 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -52,6 +52,8 @@
+ #define L2CAP_CONN_TIMEOUT		msecs_to_jiffies(40000)
+ #define L2CAP_INFO_TIMEOUT		msecs_to_jiffies(4000)
  
-+/* A2MP response status */
-+#define A2MP_STATUS_SUCCESS			0x00
-+#define A2MP_STATUS_INVALID_CTRL_ID		0x01
-+#define A2MP_STATUS_UNABLE_START_LINK_CREATION	0x02
-+#define A2MP_STATUS_NO_PHYSICAL_LINK_EXISTS	0x02
-+#define A2MP_STATUS_COLLISION_OCCURED		0x03
-+#define A2MP_STATUS_DISCONN_REQ_RECVD		0x04
-+#define A2MP_STATUS_PHYS_LINK_EXISTS		0x05
-+#define A2MP_STATUS_SECURITY_VIOLATION		0x06
++#define L2CAP_A2MP_DEFAULT_MTU		670
 +
- void amp_mgr_get(struct amp_mgr *mgr);
- int amp_mgr_put(struct amp_mgr *mgr);
+ /* L2CAP socket address */
+ struct sockaddr_l2 {
+ 	sa_family_t	l2_family;
+@@ -236,6 +238,7 @@ struct l2cap_conn_rsp {
+ /* channel indentifier */
+ #define L2CAP_CID_SIGNALING	0x0001
+ #define L2CAP_CID_CONN_LESS	0x0002
++#define L2CAP_CID_A2MP		0x0003
+ #define L2CAP_CID_LE_DATA	0x0004
+ #define L2CAP_CID_LE_SIGNALING	0x0005
+ #define L2CAP_CID_SMP		0x0006
+@@ -758,5 +761,8 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+ int l2cap_chan_check_security(struct l2cap_chan *chan);
+ void l2cap_chan_set_defaults(struct l2cap_chan *chan);
++int l2cap_ertm_init(struct l2cap_chan *chan);
++void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
++void l2cap_chan_del(struct l2cap_chan *chan, int err);
+ 
+ #endif /* __L2CAP_H */
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index 2dc5a57..fa6d94a 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -9,4 +9,5 @@ obj-$(CONFIG_BT_CMTP)	+= cmtp/
+ obj-$(CONFIG_BT_HIDP)	+= hidp/
+ 
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+-	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o
++	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
++	a2mp.o
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+new file mode 100644
+index 0000000..de455a2
+--- /dev/null
++++ b/net/bluetooth/a2mp.c
+@@ -0,0 +1,69 @@
++/*
++   Copyright (c) 2010,2011 Code Aurora Forum.  All rights reserved.
++   Copyright (c) 2011,2012 Intel Corp.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License version 2 and
++   only version 2 as published by the Free Software Foundation.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++*/
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/l2cap.h>
++
++static struct l2cap_ops a2mp_chan_ops = {
++	.name = "L2CAP A2MP channel",
++};
++
++static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
++{
++	struct l2cap_chan *chan;
++	int err;
++
++	chan = l2cap_chan_create();
++	if (!chan)
++		return NULL;
++
++	BT_DBG("chan %p", chan);
++
++	hci_conn_hold(conn->hcon);
++
++	chan->omtu = L2CAP_A2MP_DEFAULT_MTU;
++	chan->imtu = L2CAP_A2MP_DEFAULT_MTU;
++	chan->flush_to = L2CAP_DEFAULT_FLUSH_TO;
++
++	chan->ops = &a2mp_chan_ops;
++
++	l2cap_chan_set_defaults(chan);
++	chan->remote_max_tx = chan->max_tx;
++	chan->remote_tx_win = chan->tx_win;
++
++	chan->retrans_timeout = L2CAP_DEFAULT_RETRANS_TO;
++	chan->monitor_timeout = L2CAP_DEFAULT_MONITOR_TO;
++
++	skb_queue_head_init(&chan->tx_q);
++
++	chan->mode = L2CAP_MODE_ERTM;
++
++	err = l2cap_ertm_init(chan);
++	if (err < 0) {
++		l2cap_chan_del(chan, 0);
++		return NULL;
++	}
++
++	chan->conf_state = 0;
++
++	l2cap_chan_add(conn, chan);
++
++	chan->remote_mps = chan->omtu;
++	chan->mps = chan->omtu;
++
++	chan->state = BT_CONNECTED;
++
++	return chan;
++}
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 4f65a32..eb0ccef 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -484,14 +484,14 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ 	list_add(&chan->list, &conn->chan_l);
+ }
+ 
+-static void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
++void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ {
+ 	mutex_lock(&conn->chan_lock);
+ 	__l2cap_chan_add(conn, chan);
+ 	mutex_unlock(&conn->chan_lock);
+ }
+ 
+-static void l2cap_chan_del(struct l2cap_chan *chan, int err)
++void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+ 
+@@ -2690,7 +2690,7 @@ static void l2cap_ack_timeout(struct work_struct *work)
+ 	l2cap_chan_put(chan);
+ }
+ 
+-static inline int l2cap_ertm_init(struct l2cap_chan *chan)
++int l2cap_ertm_init(struct l2cap_chan *chan)
+ {
+ 	int err;
  
 -- 
 1.7.9.5
