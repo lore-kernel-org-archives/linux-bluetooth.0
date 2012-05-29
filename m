@@ -1,29 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 May 2012 12:35:24 -0300
+Date: Tue, 29 May 2012 12:27:55 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: trivial: Use defined PSMLEN instead of magic
-Message-ID: <20120529153524.GC4575@joana>
-References: <1338275045-16268-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [PATCH -v2] Bluetooth: Create function to return the ERTM header
+ size
+Message-ID: <20120529152755.GB4575@joana>
+References: <1338260107-12880-1-git-send-email-gustavo@padovan.org>
+ <1338260317-13308-1-git-send-email-gustavo@padovan.org>
+ <20120529065828.GA15895@aemeltch-MOBL1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338275045-16268-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <20120529065828.GA15895@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-05-29 10:04:05 +0300]:
+* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-05-29 09:58:32 +0300]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Hi Gustavo,
 > 
+> On Mon, May 28, 2012 at 11:58:37PM -0300, Gustavo Padovan wrote:
+> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > 
+> > Simplify the handling of different ERTM header size. We were the same
+> > check in some places of the code, and more is expected to come, so just
+> > replace them with a function.
+> > 
+> > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > ---
+> >  net/bluetooth/l2cap_core.c |   25 +++++++++++--------------
+> >  1 file changed, 11 insertions(+), 14 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index 6f30d1d..ad06393 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -814,17 +814,20 @@ static inline void __pack_control(struct l2cap_chan *chan,
+> >  	}
+> >  }
+> >  
+> > +static inline unsigned int l2cap_ertm_hdr_size(struct l2cap_chan *chan)
+> > +{
+> > +	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+> > +		return L2CAP_EXT_HDR_SIZE;
+> > +	else
+> > +		return L2CAP_ENH_HDR_SIZE;
+> > +}
+> > +
+> >  static struct sk_buff *l2cap_create_sframe_pdu(struct l2cap_chan *chan,
+> >  					       u32 control)
+> >  {
+> >  	struct sk_buff *skb;
+> >  	struct l2cap_hdr *lh;
+> > -	int hlen;
+> > -
+> > -	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+> > -		hlen = L2CAP_EXT_HDR_SIZE;
+> > -	else
+> > -		hlen = L2CAP_ENH_HDR_SIZE;
+> > +	int hlen = l2cap_ertm_hdr_size(chan);
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> I prefer simpler name like:
+> 
+> int hlen = __hdr_size(chan); or __ertm_hdr_size
 
-Patch has been applied to bluetooth-next. Thanks.
+Yes, __ertm_hdr_size() seems nicer.
 
 	Gustavo
