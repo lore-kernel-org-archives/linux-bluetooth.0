@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 14/17] client: Expose D-Bus data in internal transfer API
-Date: Tue, 29 May 2012 11:23:19 +0200
-Message-Id: <1338283402-11085-15-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 17/17] client-test: Remove agent from ftp-client
+Date: Tue, 29 May 2012 11:23:22 +0200
+Message-Id: <1338283402-11085-18-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,118 +12,108 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Split internal methods logically and expose in transfer API the D-Bus
-path and properties as should be returned by transfer-initiating D-Bus
-methods.
+Remove the use of the agent in the test script. Most of the
+functionality is still there with the exception of progress reporting,
+which is not possible due to some transitional limitations in the D-Bus
+API.
 ---
- client/transfer.c |   64 ++++++++++++++++++++++++++++++++++++++++++----------
- client/transfer.h |    3 ++
- 2 files changed, 54 insertions(+), 13 deletions(-)
+ test/ftp-client |   50 +++++++-------------------------------------------
+ 1 files changed, 7 insertions(+), 43 deletions(-)
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 9693a85..699b09d 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -84,6 +84,19 @@ static GQuark obc_transfer_error_quark(void)
- 	return g_quark_from_static_string("obc-transfer-error-quark");
- }
+diff --git a/test/ftp-client b/test/ftp-client
+index 825f591..8421ade 100755
+--- a/test/ftp-client
++++ b/test/ftp-client
+@@ -9,42 +9,6 @@ import dbus.mainloop.glib
+ import os.path
+ from optparse import OptionParser
  
-+static void obc_transfer_append_dbus_properties(struct obc_transfer *transfer,
-+							DBusMessageIter *dict)
-+{
-+	obex_dbus_dict_append(dict, "Name", DBUS_TYPE_STRING, &transfer->name);
-+	obex_dbus_dict_append(dict, "Size", DBUS_TYPE_UINT64, &transfer->size);
-+	obex_dbus_dict_append(dict, "Filename", DBUS_TYPE_STRING,
-+							&transfer->filename);
-+
-+	if (transfer->obex != NULL)
-+		obex_dbus_dict_append(dict, "Progress", DBUS_TYPE_UINT64,
-+						&transfer->transferred_dbus);
-+}
-+
- static DBusMessage *obc_transfer_get_properties(DBusConnection *connection,
- 					DBusMessage *message, void *user_data)
- {
-@@ -92,30 +105,55 @@ static DBusMessage *obc_transfer_get_properties(DBusConnection *connection,
- 	DBusMessageIter iter, dict;
- 
- 	reply = dbus_message_new_method_return(message);
--	if (!reply)
-+	if (reply == NULL)
- 		return NULL;
- 
- 	dbus_message_iter_init_append(reply, &iter);
+-class Agent(dbus.service.Object):
+-    def __init__(self, conn=None, obj_path=None, verbose=False):
+-        dbus.service.Object.__init__(self, conn, obj_path)
+-        self.verbose = verbose
 -
- 	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
--			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
--			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
--			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
-+						OBC_PROPERTIES_ARRAY_SIGNATURE,
-+						&dict);
- 
--	obex_dbus_dict_append(&dict, "Name", DBUS_TYPE_STRING, &transfer->name);
--	obex_dbus_dict_append(&dict, "Size", DBUS_TYPE_UINT64, &transfer->size);
--	obex_dbus_dict_append(&dict, "Filename", DBUS_TYPE_STRING,
--							&transfer->filename);
+-    @dbus.service.method("org.openobex.Agent",
+-                    in_signature="o", out_signature="s")
+-    def Request(self, path):
+-        return ""
 -
--	if (transfer->obex != NULL)
--		obex_dbus_dict_append(&dict, "Progress", DBUS_TYPE_UINT64,
--						&transfer->transferred_dbus);
-+	obc_transfer_append_dbus_properties(transfer, &dict);
+-    @dbus.service.method("org.openobex.Agent",
+-                    in_signature="ot", out_signature="")
+-    def Progress(self, path, transferred):
+-        if self.verbose:
+-            print "Transfer progress (%d bytes)" % (transferred)
+-        return
+-
+-    @dbus.service.method("org.openobex.Agent",
+-                    in_signature="o", out_signature="")
+-    def Complete(self, path):
+-        if self.verbose:
+-            print "Transfer finished"
+-        mainloop.quit()
+-
+-    @dbus.service.method("org.openobex.Agent",
+-                    in_signature="os", out_signature="")
+-    def Error(self, path, error):
+-        print "Transfer finished with an error: %s" % (error)
+-        mainloop.quit()
+-
+-    @dbus.service.method("org.openobex.Agent",
+-                    in_signature="", out_signature="")
+-    def Release(self):
+-        mainloop.quit()
+-
+-
+ def parse_options():
+     parser.add_option("-d", "--device", dest="device",
+                       help="Device to connect", metavar="DEVICE")
+@@ -74,6 +38,11 @@ def error(err):
+ def void_reply():
+     pass
  
- 	dbus_message_iter_close_container(&iter, &dict);
++def transfer_complete():
++    if options.verbose:
++        print "Transfer finished"
++    mainloop.quit()
++
+ def change_folder(session, new_dir):
+     for node in new_dir.split("/"):
+         session.ChangeFolder(node)
+@@ -88,13 +57,13 @@ def list_folder(session):
+ def put_file(session, filename):
+     session.PutFile(os.path.abspath(filename),
+                     os.path.basename(filename),
+-                    reply_handler=void_reply,
++                    reply_handler=transfer_complete,
+                     error_handler=error)
  
- 	return reply;
- }
+ def get_file(session, filename):
+     session.GetFile(os.path.abspath(filename),
+                     os.path.basename(filename),
+-                    reply_handler=void_reply,
++                    reply_handler=transfer_complete,
+                     error_handler=error)
  
-+static void obc_transfer_append_dbus_data(struct obc_transfer *transfer,
-+							DBusMessageIter *iter)
-+{
-+	const char *path = transfer->path;
-+	DBusMessageIter entry, dict;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_STRUCT, NULL, &entry);
-+	dbus_message_iter_append_basic(&entry, DBUS_TYPE_OBJECT_PATH, &path);
-+	dbus_message_iter_open_container(&entry, DBUS_TYPE_ARRAY,
-+						OBC_PROPERTIES_ARRAY_SIGNATURE,
-+						&dict);
-+
-+	obc_transfer_append_dbus_properties(transfer, &dict);
-+
-+	dbus_message_iter_close_container(&entry, &dict);
-+	dbus_message_iter_close_container(iter, &entry);
-+}
-+
-+DBusMessage *obc_transfer_create_dbus_reply(struct obc_transfer *transfer,
-+							DBusMessage *message)
-+{
-+	DBusMessage *reply;
-+	DBusMessageIter iter;
-+
-+	reply = dbus_message_new_method_return(message);
-+	if (reply == NULL)
-+		return NULL;
-+
-+	dbus_message_iter_init_append(reply, &iter);
-+	obc_transfer_append_dbus_data(transfer, &iter);
-+
-+	return reply;
-+}
-+
- static void abort_complete(GObex *obex, GError *err, gpointer user_data)
- {
- 	struct obc_transfer *transfer = user_data;
-diff --git a/client/transfer.h b/client/transfer.h
-index 15c157a..eb5275c 100644
---- a/client/transfer.h
-+++ b/client/transfer.h
-@@ -57,3 +57,6 @@ int obc_transfer_get_contents(struct obc_transfer *transfer, char **contents,
+ def remove_file(session, filename):
+@@ -129,9 +98,6 @@ if  __name__ == '__main__':
+     bus = dbus.SessionBus()
+     mainloop = gobject.MainLoop()
  
- const char *obc_transfer_get_path(struct obc_transfer *transfer);
- gint64 obc_transfer_get_size(struct obc_transfer *transfer);
-+
-+DBusMessage *obc_transfer_create_dbus_reply(struct obc_transfer *transfer,
-+							DBusMessage *message);
+-    path = "/test/agent"
+-    agent = Agent(bus, path, options.verbose)
+-
+     client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
+                             "org.openobex.Client")
+ 
+@@ -140,8 +106,6 @@ if  __name__ == '__main__':
+     session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+                  "org.openobex.Session")
+ 
+-    session.AssignAgent(path)
+-
+     ftp = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+                  "org.openobex.FileTransfer")
+ 
 -- 
 1.7.7.6
 
