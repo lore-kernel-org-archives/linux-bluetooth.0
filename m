@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 04/17] client-doc: Add transfer event-reporting signals
-Date: Tue, 29 May 2012 11:23:09 +0200
-Message-Id: <1338283402-11085-5-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 05/17] client: Add transfer event-reporting signals
+Date: Tue, 29 May 2012 11:23:10 +0200
+Message-Id: <1338283402-11085-6-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,29 +14,56 @@ From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
 These signals replace the old agent-based notification mechanism.
 ---
- doc/client-api.txt |    9 +++++++++
- 1 files changed, 9 insertions(+), 0 deletions(-)
+ client/transfer.c |   28 +++++++++++++++++++++++-----
+ 1 files changed, 23 insertions(+), 5 deletions(-)
 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index cc25543..223ef9a 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -322,6 +322,15 @@ Signals		PropertyChanged(string name, variant value)
- 			This signal indicates a changed value of the given
- 			property.
+diff --git a/client/transfer.c b/client/transfer.c
+index c1bd4be..b8931cf 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -196,6 +196,9 @@ static const GDBusMethodTable obc_transfer_methods[] = {
+ static const GDBusSignalTable obc_transfer_signals[] = {
+ 	{ GDBUS_SIGNAL("PropertyChanged",
+ 		GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
++	{ GDBUS_SIGNAL("Complete", NULL) },
++	{ GDBUS_SIGNAL("Error",
++		GDBUS_ARGS({ "code", "s" }, { "message", "s" })) },
+ 	{ }
+ };
  
-+		void Complete()
-+
-+			Informs that the transfer has completed successfully.
-+
-+		void Error(string code, string message)
-+
-+			Informs that the transfer has been terminated because
-+			of some error.
-+
- Agent hierarchy
- ===============
+@@ -437,12 +440,27 @@ static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
+ 		transfer->progress_id = 0;
+ 	}
  
+-	if (err)
+-		goto done;
+-
+-	transfer->size = transfer->transferred;
++	if (err == NULL) {
++		transfer->size = transfer->transferred;
++
++		if (transfer->path != NULL)
++			g_dbus_emit_signal(transfer->conn, transfer->path,
++						TRANSFER_INTERFACE, "Complete",
++						DBUS_TYPE_INVALID);
++	} else if (transfer->path != NULL) {
++		char *code = g_strdup_printf("%d", err->code);
++
++		g_dbus_emit_signal(transfer->conn, transfer->path,
++						TRANSFER_INTERFACE, "Error",
++						DBUS_TYPE_STRING,
++						&code,
++						DBUS_TYPE_STRING,
++						&err->message,
++						DBUS_TYPE_INVALID);
++
++		g_free(code);
++	}
+ 
+-done:
+ 	if (callback)
+ 		callback->func(transfer, transfer->size, err, callback->data);
+ }
 -- 
 1.7.7.6
 
