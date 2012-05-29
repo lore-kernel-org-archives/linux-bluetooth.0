@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 03/17] client: Add progress property to transfer
-Date: Tue, 29 May 2012 11:23:08 +0200
-Message-Id: <1338283402-11085-4-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 07/17] client: Use transfer owner instead of agent
+Date: Tue, 29 May 2012 11:23:12 +0200
+Message-Id: <1338283402-11085-8-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,156 +12,103 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The number of transferred bytes is exposed in D-Bus using a specific
-property for this purpose.
-
-Internally, the value of this property does not necessarily match the
-internal progress counter. In order to avoid D-Bus overhead, the
-property will be updated once per second.
+The security checks in the transfers' D-Bus API will consider check for
+the transfer owner's path (session owner) instead of the agent path.
 ---
- client/transfer.c |   66 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 64 insertions(+), 2 deletions(-)
+ client/session.c  |    9 ++-------
+ client/transfer.c |   10 +++++-----
+ client/transfer.h |    2 +-
+ 3 files changed, 8 insertions(+), 13 deletions(-)
 
+diff --git a/client/session.c b/client/session.c
+index 94256b4..9c4c9f0 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -793,7 +793,6 @@ guint obc_session_queue(struct obc_session *session,
+ 				GError **err)
+ {
+ 	struct pending_request *p;
+-	const char *agent;
+ 	int perr;
+ 
+ 	if (session->obex == NULL) {
+@@ -803,12 +802,8 @@ guint obc_session_queue(struct obc_session *session,
+ 		return 0;
+ 	}
+ 
+-	if (session->agent)
+-		agent = obc_agent_get_name(session->agent);
+-	else
+-		agent = NULL;
+-
+-	if (!obc_transfer_register(transfer, session->conn, agent, err)) {
++	if (!obc_transfer_register(transfer, session->conn, session->owner,
++									err)) {
+ 		obc_transfer_unregister(transfer);
+ 		return 0;
+ 	}
 diff --git a/client/transfer.c b/client/transfer.c
-index 8292265..c1bd4be 100644
+index b8931cf..80a6317 100644
 --- a/client/transfer.c
 +++ b/client/transfer.c
-@@ -75,6 +75,8 @@ struct obc_transfer {
- 	guint xfer;
- 	gint64 size;
- 	gint64 transferred;
-+	gint64 transferred_dbus;
-+	guint progress_id;
- };
+@@ -66,7 +66,7 @@ struct obc_transfer {
+ 	struct transfer_callback *callback;
+ 	DBusConnection *conn;
+ 	DBusMessage *msg;
+-	char *agent;		/* Transfer agent */
++	char *owner;		/* Transfer initiator */
+ 	char *path;		/* Transfer path */
+ 	gchar *filename;	/* Transfer file location */
+ 	char *name;		/* Transfer object name */
+@@ -169,7 +169,7 @@ static DBusMessage *obc_transfer_cancel(DBusConnection *connection,
+ 	const gchar *sender;
  
- static GQuark obc_transfer_error_quark(void)
-@@ -105,6 +107,10 @@ static DBusMessage *obc_transfer_get_properties(DBusConnection *connection,
- 	obex_dbus_dict_append(&dict, "Filename", DBUS_TYPE_STRING,
- 							&transfer->filename);
+ 	sender = dbus_message_get_sender(message);
+-	if (g_strcmp0(transfer->agent, sender) != 0)
++	if (g_strcmp0(transfer->owner, sender) != 0)
+ 		return g_dbus_create_error(message,
+ 				"org.openobex.Error.NotAuthorized",
+ 				"Not Authorized");
+@@ -236,7 +236,7 @@ static void obc_transfer_free(struct obc_transfer *transfer)
+ 		g_obex_unref(transfer->obex);
  
-+	if (transfer->obex != NULL)
-+		obex_dbus_dict_append(&dict, "Progress", DBUS_TYPE_UINT64,
-+						&transfer->transferred_dbus);
-+
- 	dbus_message_iter_close_container(&iter, &dict);
+ 	g_free(transfer->callback);
+-	g_free(transfer->agent);
++	g_free(transfer->owner);
+ 	g_free(transfer->filename);
+ 	g_free(transfer->name);
+ 	g_free(transfer->type);
+@@ -262,7 +262,7 @@ static struct obc_transfer *obc_transfer_create(guint8 op,
  
- 	return reply;
-@@ -147,6 +153,11 @@ static gboolean obc_transfer_abort(struct obc_transfer *transfer)
- 	if (transfer->xfer == 0)
- 		return FALSE;
- 
-+	if (transfer->progress_id != 0) {
-+		g_source_remove(transfer->progress_id);
-+		transfer->progress_id = 0;
-+	}
-+
- 	return g_obex_cancel_transfer(transfer->xfer, abort_complete,
- 								transfer);
- }
-@@ -182,6 +193,12 @@ static const GDBusMethodTable obc_transfer_methods[] = {
- 	{ }
- };
- 
-+static const GDBusSignalTable obc_transfer_signals[] = {
-+	{ GDBUS_SIGNAL("PropertyChanged",
-+		GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
-+	{ }
-+};
-+
- static void obc_transfer_free(struct obc_transfer *transfer)
+ gboolean obc_transfer_register(struct obc_transfer *transfer,
+ 						DBusConnection *conn,
+-						const char *agent,
++						const char *owner,
+ 						GError **err)
  {
- 	DBG("%p", transfer);
-@@ -189,6 +206,11 @@ static void obc_transfer_free(struct obc_transfer *transfer)
- 	if (transfer->xfer)
- 		g_obex_cancel_transfer(transfer->xfer, NULL, NULL);
- 
-+	if (transfer->progress_id != 0) {
-+		g_source_remove(transfer->progress_id);
-+		transfer->progress_id = 0;
-+	}
-+
- 	if (transfer->op == G_OBEX_OP_GET &&
- 					transfer->transferred != transfer->size)
- 		remove(transfer->filename);
-@@ -260,8 +282,8 @@ gboolean obc_transfer_register(struct obc_transfer *transfer,
- 
- 	if (g_dbus_register_interface(transfer->conn, transfer->path,
- 				TRANSFER_INTERFACE,
--				obc_transfer_methods, NULL, NULL,
--				transfer, NULL) == FALSE) {
-+				obc_transfer_methods, obc_transfer_signals,
-+				NULL, transfer, NULL) == FALSE) {
- 		g_set_error(err, OBC_TRANSFER_ERROR, -EFAULT,
- 						"Unable to register to D-Bus");
- 		return FALSE;
-@@ -410,6 +432,11 @@ static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
- 
- 	transfer->xfer = 0;
- 
-+	if (transfer->progress_id != 0) {
-+		g_source_remove(transfer->progress_id);
-+		transfer->progress_id = 0;
-+	}
-+
- 	if (err)
+ 	/* for OBEX specific mime types we don't need to register a transfer */
+@@ -271,7 +271,7 @@ gboolean obc_transfer_register(struct obc_transfer *transfer,
+ 			strncmp(transfer->type, "x-bt/", 5) == 0))
  		goto done;
  
-@@ -518,6 +545,29 @@ gboolean obc_transfer_set_callback(struct obc_transfer *transfer,
- 	return TRUE;
- }
+-	transfer->agent = g_strdup(agent);
++	transfer->owner = g_strdup(owner);
  
-+static gboolean report_progress(gpointer data)
-+{
-+	struct obc_transfer *transfer = data;
-+
-+	if (transfer->transferred == transfer->transferred_dbus)
-+		return TRUE;
-+
-+	transfer->transferred_dbus = transfer->transferred;
-+
-+	if (transfer->transferred == transfer->size) {
-+		transfer->progress_id = 0;
-+		return FALSE;
-+	}
-+
-+	obex_dbus_signal_property_changed(transfer->conn,
-+						transfer->path,
-+						TRANSFER_INTERFACE, "Progress",
-+						DBUS_TYPE_INT64,
-+						&transfer->transferred_dbus);
-+
-+	return TRUE;
-+}
-+
- static gboolean transfer_start_get(struct obc_transfer *transfer, GError **err)
- {
- 	GObexPacket *req;
-@@ -549,6 +599,12 @@ static gboolean transfer_start_get(struct obc_transfer *transfer, GError **err)
- 	if (transfer->xfer == 0)
- 		return FALSE;
+ 	transfer->path = g_strdup_printf("%s/transfer%ju",
+ 			TRANSFER_BASEPATH, counter++);
+diff --git a/client/transfer.h b/client/transfer.h
+index bf40a4c..a65a2ed 100644
+--- a/client/transfer.h
++++ b/client/transfer.h
+@@ -36,7 +36,7 @@ struct obc_transfer *obc_transfer_put(const char *type, const char *name,
  
-+	if (transfer->path == NULL)
-+		return TRUE;
-+
-+	transfer->progress_id = g_timeout_add_seconds(1, report_progress,
-+								transfer);
-+
- 	return TRUE;
- }
+ gboolean obc_transfer_register(struct obc_transfer *transfer,
+ 					DBusConnection *conn,
+-					const char *agent,
++					const char *owner,
+ 					GError **err);
  
-@@ -586,6 +642,12 @@ static gboolean transfer_start_put(struct obc_transfer *transfer, GError **err)
- 	if (transfer->xfer == 0)
- 		return FALSE;
- 
-+	if (transfer->path == NULL)
-+		return TRUE;
-+
-+	transfer->progress_id = g_timeout_add_seconds(1, report_progress,
-+								transfer);
-+
- 	return TRUE;
- }
- 
+ void obc_transfer_unregister(struct obc_transfer *transfer);
 -- 
 1.7.7.6
 
