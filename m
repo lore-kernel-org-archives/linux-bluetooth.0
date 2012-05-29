@@ -1,79 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 1/2] Bluetooth: Create function to to the ERTM header size
-Date: Mon, 28 May 2012 23:55:06 -0300
-Message-Id: <1338260107-12880-1-git-send-email-gustavo@padovan.org>
+Date: Mon, 28 May 2012 23:40:58 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Ido Yariv <ido@wizery.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] gattrib: Fix a request/response command deadlock
+Message-ID: <20120529024058.GA2382@echo>
+References: <20120529011624.GA31806@WorkStation.localnet>
+ <1338254446-32725-1-git-send-email-ido@wizery.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1338254446-32725-1-git-send-email-ido@wizery.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Hi Ido,
 
-Simplify the handling of different ERTM header size. We were the same
-check in some places of the code, and more is expected to come, so just
-replace them with a function.
+On 04:20 Tue 29 May, Ido Yariv wrote:
+> New requests and responses are never sent if a request was sent and the
+> response for it hasn't been received yet. As a result, if both end
+> points send requests at the same time, a deadlock could occur. This
+> could happen, for instance, if the client sends a read request and the
+> server sends an indication before responding to the read request.
+> 
+> Fix this by introducing an additional queue for responses. Responses may
+> be sent while there's still a pending request/indication.
+> ---
+>  attrib/gattrib.c |  107 ++++++++++++++++++++++++++++++++++++++++++------------
+>  1 files changed, 83 insertions(+), 24 deletions(-)
+> 
+> diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+> index 769be36..71c94d8 100644
+> --- a/attrib/gattrib.c
+> +++ b/attrib/gattrib.c
 
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
----
- net/bluetooth/l2cap_core.c |   25 +++++++++++--------------
- 1 file changed, 11 insertions(+), 14 deletions(-)
+[snip]
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 6f30d1d..ad06393 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -814,17 +814,20 @@ static inline void __pack_control(struct l2cap_chan *chan,
- 	}
- }
- 
-+static inline unsigned int l2cap_ertm_hdr_size(struct l2cap_chan *chan)
-+{
-+	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
-+		return L2CAP_EXT_HDR_SIZE;
-+	else
-+		return L2CAP_ENH_HDR_SIZE;
-+}
-+
- static struct sk_buff *l2cap_create_sframe_pdu(struct l2cap_chan *chan,
- 					       u32 control)
- {
- 	struct sk_buff *skb;
- 	struct l2cap_hdr *lh;
--	int hlen;
--
--	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
--		hlen = L2CAP_EXT_HDR_SIZE;
--	else
--		hlen = L2CAP_ENH_HDR_SIZE;
-+	int hlen = l2cap_ertm_hdr_size(chan);
- 
- 	if (chan->fcs == L2CAP_FCS_CRC16)
- 		hlen += L2CAP_FCS_SIZE;
-@@ -1999,10 +2002,7 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
- 	if (!conn)
- 		return ERR_PTR(-ENOTCONN);
- 
--	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
--		hlen = L2CAP_EXT_HDR_SIZE;
--	else
--		hlen = L2CAP_ENH_HDR_SIZE;
-+	hlen = l2cap_ertm_hdr_size(chan);
- 
- 	if (sdulen)
- 		hlen += L2CAP_SDULEN_SIZE;
-@@ -2068,10 +2068,7 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
- 	if (chan->fcs)
- 		pdu_len -= L2CAP_FCS_SIZE;
- 
--	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
--		pdu_len -= L2CAP_EXT_HDR_SIZE;
--	else
--		pdu_len -= L2CAP_ENH_HDR_SIZE;
-+	pdu_len -= l2cap_ertm_hdr_size(chan);
- 
- 	/* Remote device may have requested smaller PDUs */
- 	pdu_len = min_t(size_t, pdu_len, chan->remote_mps);
+> @@ -504,12 +554,21 @@ gboolean g_attrib_cancel_all(GAttrib *attrib)
+>  
+>  	if (head) {
+>  		/* ... and put it back in the queue */
+> -		g_queue_push_head(attrib->queue, head);
+> +		g_queue_push_head(queue, head);
+>  	}
+>  
+>  	return TRUE;
+>  }
+>  
+> +gboolean g_attrib_cancel_all(GAttrib *attrib)
+> +{
+> +	if (attrib == NULL)
+> +		return FALSE;
+> +
+> +	return cancel_all_per_queue(attrib->requests) &&
+> +		cancel_all_per_queue(attrib->responses);
+
+Sorry, but I just noticed something, even if it's very unlikely that it would
+happen in practice: if attrib->requests is NULL, it wouldn't cancel the
+responses.
+
+> +}
+> +
+>  gboolean g_attrib_set_debug(GAttrib *attrib,
+>  		GAttribDebugFunc func, gpointer user_data)
+>  {
+> -- 
+> 1.7.7.6
+> 
+
+Cheers,
 -- 
-1.7.10.2
-
+Vinicius
