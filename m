@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 04/17] Bluetooth: A2MP: Add chan callbacks
-Date: Tue, 29 May 2012 13:59:04 +0300
-Message-Id: <1338289158-25655-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 02/17] Bluetooth: A2MP: AMP Manager basic functions
+Date: Tue, 29 May 2012 13:59:02 +0300
+Message-Id: <1338289158-25655-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1338289158-25655-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1337351150-20526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1338289158-25655-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,83 +12,156 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add L2CAP chan ops callbacks.
+Define AMP Manager and some basic functions.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   57 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+ include/net/bluetooth/a2mp.h     |   30 +++++++++++++++++++++
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/a2mp.c             |   54 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_conn.c         |    4 +++
+ 4 files changed, 89 insertions(+)
+ create mode 100644 include/net/bluetooth/a2mp.h
 
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+new file mode 100644
+index 0000000..ff47540
+--- /dev/null
++++ b/include/net/bluetooth/a2mp.h
+@@ -0,0 +1,30 @@
++/*
++   Copyright (c) 2010,2011 Code Aurora Forum.  All rights reserved.
++   Copyright (c) 2011,2012 Intel Corp.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License version 2 and
++   only version 2 as published by the Free Software Foundation.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++*/
++
++#ifndef __A2MP_H
++#define __A2MP_H
++
++struct amp_mgr {
++	struct l2cap_conn	*l2cap_conn;
++	struct l2cap_chan	*a2mp_chan;
++	struct kref		kref;
++	__u8			ident;
++	__u8			handle;
++	unsigned long		flags;
++};
++
++void amp_mgr_get(struct amp_mgr *mgr);
++int amp_mgr_put(struct amp_mgr *mgr);
++
++#endif /* __A2MP_H */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index d584a47..6e64b76 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -332,6 +332,7 @@ struct hci_conn {
+ 	void		*l2cap_data;
+ 	void		*sco_data;
+ 	void		*smp_conn;
++	struct amp_mgr	*amp_mgr;
+ 
+ 	struct hci_conn	*link;
+ 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 53f49a0..4ba67dc 100644
+index de455a2..3c241c2 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -63,8 +63,65 @@ static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
- 	kfree(cmd);
- }
+@@ -15,6 +15,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/l2cap.h>
++#include <net/bluetooth/a2mp.h>
  
-+static void a2mp_chan_close_cb(struct l2cap_chan *chan)
-+{
-+	l2cap_chan_destroy(chan);
-+}
-+
-+static void a2mp_chan_state_change_cb(struct l2cap_chan *chan, int state)
-+{
-+	struct amp_mgr *mgr = chan->data;
-+
-+	if (!mgr)
-+		return;
-+
-+	chan = mgr->a2mp_chan;
-+
-+	BT_DBG("chan %p state %s", chan, state_to_string(state));
-+
-+	chan->state = state;
-+
-+	switch (state) {
-+	case BT_CLOSED:
-+		if (mgr)
-+			amp_mgr_put(mgr);
-+		break;
-+	}
-+}
-+
-+static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
-+					      unsigned long len, int nb)
-+{
-+	return bt_skb_alloc(len, GFP_KERNEL);
-+}
-+
-+static struct l2cap_chan *a2mp_chan_no_new_conn_cb(struct l2cap_chan *chan)
-+{
-+	BT_ERR("new_connection for chan %p not implemented", chan);
-+
-+	return NULL;
-+}
-+
-+static void a2mp_chan_no_teardown_cb(struct l2cap_chan *chan, int err)
-+{
-+	BT_ERR("teardown for chan %p not implemented", chan);
-+}
-+
-+static void a2mp_chan_no_ready(struct l2cap_chan *chan)
-+{
-+	BT_ERR("ready for chan %p not implemented", chan);
-+}
-+
  static struct l2cap_ops a2mp_chan_ops = {
  	.name = "L2CAP A2MP channel",
-+	.close = a2mp_chan_close_cb,
-+	.state_change = a2mp_chan_state_change_cb,
-+	.alloc_skb = a2mp_chan_alloc_skb_cb,
-+
-+	/* Not implemented for A2MP */
-+	.new_connection = a2mp_chan_no_new_conn_cb,
-+	.teardown = a2mp_chan_no_teardown_cb,
-+	.ready = a2mp_chan_no_ready,
- };
+@@ -67,3 +68,56 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
  
- static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
+ 	return chan;
+ }
++
++/* AMP Manager functions */
++void amp_mgr_get(struct amp_mgr *mgr)
++{
++	BT_DBG("mgr %p", mgr);
++
++	kref_get(&mgr->kref);
++}
++
++static void amp_mgr_destroy(struct kref *kref)
++{
++	struct amp_mgr *mgr = container_of(kref, struct amp_mgr, kref);
++
++	BT_DBG("mgr %p", mgr);
++
++	kfree(mgr);
++}
++
++int amp_mgr_put(struct amp_mgr *mgr)
++{
++	BT_DBG("mgr %p", mgr);
++
++	return kref_put(&mgr->kref, &amp_mgr_destroy);
++}
++
++static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
++{
++	struct amp_mgr *mgr;
++	struct l2cap_chan *chan;
++
++	mgr = kzalloc(sizeof(*mgr), GFP_KERNEL);
++	if (!mgr)
++		return NULL;
++
++	BT_DBG("conn %p mgr %p", conn, mgr);
++
++	mgr->l2cap_conn = conn;
++
++	chan = a2mp_chan_open(conn);
++	if (!chan) {
++		kfree(mgr);
++		return NULL;
++	}
++
++	mgr->a2mp_chan = chan;
++	chan->data = mgr;
++
++	conn->hcon->amp_mgr = mgr;
++
++	kref_init(&mgr->kref);
++
++	return mgr;
++}
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 126876d..1458667b 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -28,6 +28,7 @@
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/a2mp.h>
+ 
+ static void hci_le_connect(struct hci_conn *conn)
+ {
+@@ -411,6 +412,9 @@ int hci_conn_del(struct hci_conn *conn)
+ 
+ 	hci_chan_list_flush(conn);
+ 
++	if (conn->amp_mgr)
++		amp_mgr_put(conn->amp_mgr);
++
+ 	hci_conn_hash_del(hdev, conn);
+ 	if (hdev->notify)
+ 		hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
 -- 
 1.7.9.5
 
