@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 12/17] client: Make D-Bus exposure of transfers optional
-Date: Tue, 29 May 2012 11:23:17 +0200
-Message-Id: <1338283402-11085-13-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 10/17] client: Remove internal transfer progress report
+Date: Tue, 29 May 2012 11:23:15 +0200
+Message-Id: <1338283402-11085-11-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,230 +12,152 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The session API lets the modules decide if each transfer should be
-exposed in D-Bus or not, instead of relying on a internal policy inside
-transfer.c that would decide this based on the transfer type.
+The new D-Bus API uses signals to report the progress updates, so the
+internal progress callback is not needed any more.
 ---
- client/ftp.c      |    6 +++---
- client/map.c      |    6 ++++--
- client/opp.c      |    4 ++--
- client/pbap.c     |    8 +++++---
- client/session.c  |   15 ++++++++-------
- client/session.h  |    2 +-
- client/sync.c     |    4 ++--
- client/transfer.c |    7 -------
- 8 files changed, 25 insertions(+), 27 deletions(-)
+ client/session.c  |   25 ++++++-------------------
+ client/transfer.c |   18 +++---------------
+ client/transfer.h |    3 +--
+ 3 files changed, 10 insertions(+), 36 deletions(-)
 
-diff --git a/client/ftp.c b/client/ftp.c
-index 9b2c51d..b7b5081 100644
---- a/client/ftp.c
-+++ b/client/ftp.c
-@@ -237,7 +237,7 @@ static DBusMessage *list_folder(DBusConnection *connection,
- 		goto fail;
- 
- 	if (obc_session_queue(session, transfer, list_folder_callback,
--							message, &err)) {
-+							message, FALSE, &err)) {
- 		dbus_message_ref(message);
- 		return NULL;
- 	}
-@@ -271,7 +271,7 @@ static DBusMessage *get_file(DBusConnection *connection,
- 		goto fail;
- 
- 	if (obc_session_queue(session, transfer, get_file_callback, message,
--								&err)) {
-+								TRUE, &err)) {
- 		dbus_message_ref(message);
- 		return NULL;
- 	}
-@@ -306,7 +306,7 @@ static DBusMessage *put_file(DBusConnection *connection,
- 	if (transfer == NULL)
- 		goto fail;
- 
--	if (obc_session_queue(session, transfer, NULL, NULL, &err))
-+	if (obc_session_queue(session, transfer, NULL, NULL, TRUE, &err))
- 		return dbus_message_new_method_return(message);
- 
- fail:
-diff --git a/client/map.c b/client/map.c
-index 52b7c68..add302a 100644
---- a/client/map.c
-+++ b/client/map.c
-@@ -143,7 +143,8 @@ static DBusMessage *map_get_folder_listing(DBusConnection *connection,
- 	if (transfer == NULL)
- 		goto fail;
- 
--	if (obc_session_queue(map->session, transfer, buffer_cb, map, &err)) {
-+	if (obc_session_queue(map->session, transfer, buffer_cb, map, FALSE,
-+									&err)) {
- 		map->msg = dbus_message_ref(message);
- 		return NULL;
- 	}
-@@ -177,7 +178,8 @@ static DBusMessage *map_get_message_listing(DBusConnection *connection,
- 	if (transfer == NULL)
- 		goto fail;
- 
--	if (obc_session_queue(map->session, transfer, buffer_cb, map, &err)) {
-+	if (obc_session_queue(map->session, transfer, buffer_cb, map, FALSE,
-+									&err)) {
- 		map->msg = dbus_message_ref(message);
- 		return NULL;
- 	}
-diff --git a/client/opp.c b/client/opp.c
-index 67b01a9..f6ba398 100644
---- a/client/opp.c
-+++ b/client/opp.c
-@@ -88,7 +88,7 @@ static DBusMessage *opp_send_file(DBusConnection *connection,
- 		goto fail;
- 
- 	if (!obc_session_queue(opp->session, transfer, send_file_callback,
--								message, &err))
-+							message, TRUE, &err))
- 		goto fail;
- 
- 	dbus_message_ref(message);
-@@ -144,7 +144,7 @@ static DBusMessage *opp_pull_business_card(DBusConnection *connection,
- 		goto fail;
- 
- 	if (!obc_session_queue(opp->session, pull, pull_complete_callback,
--								message, &err))
-+							message, TRUE, &err))
- 		goto fail;
- 
- 	dbus_message_ref(message);
-diff --git a/client/pbap.c b/client/pbap.c
-index 3a771ab..1945fad 100644
---- a/client/pbap.c
-+++ b/client/pbap.c
-@@ -500,7 +500,8 @@ static DBusMessage *pull_phonebook(struct pbap_data *pbap,
- 
- 	obc_transfer_set_params(transfer, &apparam, sizeof(apparam));
- 
--	if (obc_session_queue(pbap->session, transfer, func, request, &err))
-+	if (obc_session_queue(pbap->session, transfer, func, request,
-+								FALSE, &err))
- 		return NULL;
- 
- 	pending_request_free(request);
-@@ -567,7 +568,8 @@ static DBusMessage *pull_vcard_listing(struct pbap_data *pbap,
- 	obc_transfer_set_params(transfer, apparam, apparam_size);
- 
- 	if (obc_session_queue(pbap->session, transfer,
--				pull_vcard_listing_callback, request, &err))
-+					pull_vcard_listing_callback, request,
-+					FALSE, &err))
- 		return NULL;
- 
- 	pending_request_free(request);
-@@ -796,7 +798,7 @@ static DBusMessage *pbap_pull_vcard(DBusConnection *connection,
- 	obc_transfer_set_params(transfer, &apparam, sizeof(apparam));
- 
- 	if (obc_session_queue(pbap->session, transfer, pull_phonebook_callback,
--								request, &err))
-+							request, FALSE, &err))
- 		return NULL;
- 
- 	pending_request_free(request);
 diff --git a/client/session.c b/client/session.c
-index 9670968..bb20a61 100644
+index 989439c..8e21da4 100644
 --- a/client/session.c
 +++ b/client/session.c
-@@ -604,7 +604,7 @@ static DBusMessage *get_capabilities(DBusConnection *connection,
- 		goto fail;
+@@ -103,9 +103,8 @@ static void session_start_transfer(gpointer data, gpointer user_data);
+ static void session_terminate_transfer(struct obc_session *session,
+ 					struct obc_transfer *transfer,
+ 					GError *gerr);
+-static void transfer_progress(struct obc_transfer *transfer,
+-					gint64 transferred, GError *err,
+-					void *user_data);
++static void transfer_complete(struct obc_transfer *transfer,
++					GError *err, void *user_data);
  
- 	if (!obc_session_queue(session, pull, capabilities_complete_callback,
--								message, &gerr))
-+							message, FALSE, &gerr))
- 		goto fail;
- 
- 	dbus_message_ref(message);
-@@ -644,7 +644,7 @@ static gboolean session_queue_complete(gpointer data)
- guint obc_session_queue(struct obc_session *session,
- 				struct obc_transfer *transfer,
- 				session_callback_t func, void *user_data,
--				GError **err)
-+				gboolean dbus_register, GError **err)
+ static GQuark obex_io_error_quark(void)
  {
- 	struct pending_request *p;
- 
-@@ -655,11 +655,12 @@ guint obc_session_queue(struct obc_session *session,
+@@ -669,7 +668,7 @@ guint obc_session_queue(struct obc_session *session,
  		return 0;
  	}
  
--	if (!obc_transfer_register(transfer, session->conn, session->owner,
--									err)) {
--		obc_transfer_unregister(transfer);
--		return 0;
--	}
-+	if (dbus_register)
-+		if (!obc_transfer_register(transfer, session->conn,
-+							session->owner, err)) {
-+			obc_transfer_unregister(transfer);
-+			return 0;
-+		}
+-	obc_transfer_set_callback(transfer, transfer_progress, session);
++	obc_transfer_set_callback(transfer, transfer_complete, session);
  
- 	obc_transfer_set_callback(transfer, transfer_complete, session);
+ 	p = pending_request_new(session, transfer, session_start_transfer,
+ 							func, user_data);
+@@ -786,27 +785,15 @@ static void session_notify_error(struct obc_session *session,
+ 	session_terminate_transfer(session, transfer, err);
+ }
  
-diff --git a/client/session.h b/client/session.h
-index 7f37d29..1f77d56 100644
---- a/client/session.h
-+++ b/client/session.h
-@@ -56,7 +56,7 @@ const char *obc_session_register(struct obc_session *session,
- guint obc_session_queue(struct obc_session *session,
- 				struct obc_transfer *transfer,
- 				session_callback_t func, void *user_data,
--				GError **err);
-+				gboolean dbus_register, GError **err);
- guint obc_session_setpath(struct obc_session *session, const char *path,
- 				session_callback_t func, void *user_data,
- 				GError **err);
-diff --git a/client/sync.c b/client/sync.c
-index d56e066..032f400 100644
---- a/client/sync.c
-+++ b/client/sync.c
-@@ -146,7 +146,7 @@ static DBusMessage *sync_getphonebook(DBusConnection *connection,
+-static void session_notify_progress(struct obc_session *session,
+-					struct obc_transfer *transfer,
+-					gint64 transferred)
+-{
+-	DBG("Transfer(%p) progress: %ld bytes", transfer,
+-			(long int ) transferred);
+-
+-	if (transferred == obc_transfer_get_size(transfer))
+-		session_notify_complete(session, transfer);
+-}
+-
+-static void transfer_progress(struct obc_transfer *transfer,
+-					gint64 transferred, GError *err,
+-					void *user_data)
++static void transfer_complete(struct obc_transfer *transfer,
++					GError *err, void *user_data)
+ {
+ 	struct obc_session *session = user_data;
  
- 	if (obc_session_queue(sync->session, transfer,
- 						sync_getphonebook_callback,
--						sync, &err)) {
-+						sync, TRUE, &err)) {
- 		sync->msg = dbus_message_ref(message);
- 		return NULL;
- 	}
-@@ -182,7 +182,7 @@ static DBusMessage *sync_putphonebook(DBusConnection *connection,
- 	if (transfer == NULL)
+ 	if (err != 0)
  		goto fail;
  
--	if (obc_session_queue(sync->session, transfer, NULL, NULL, &err))
-+	if (obc_session_queue(sync->session, transfer, NULL, NULL, TRUE, &err))
- 		return dbus_message_new_method_return(message);
+-	session_notify_progress(session, transfer, transferred);
++	session_notify_complete(session, transfer);
  
- fail:
+ 	return;
+ 
 diff --git a/client/transfer.c b/client/transfer.c
-index 97c57a4..9693a85 100644
+index bcafed2..97c57a4 100644
 --- a/client/transfer.c
 +++ b/client/transfer.c
-@@ -263,12 +263,6 @@ gboolean obc_transfer_register(struct obc_transfer *transfer,
- 						const char *owner,
- 						GError **err)
- {
--	/* for OBEX specific mime types we don't need to register a transfer */
--	if (transfer->type != NULL &&
--			(strncmp(transfer->type, "x-obex/", 7) == 0 ||
--			strncmp(transfer->type, "x-bt/", 5) == 0))
--		goto done;
--
- 	transfer->owner = g_strdup(owner);
+@@ -135,15 +135,13 @@ static void abort_complete(GObex *obex, GError *err, gpointer user_data)
+ 		return;
  
- 	transfer->path = g_strdup_printf("%s/transfer%ju",
-@@ -290,7 +284,6 @@ gboolean obc_transfer_register(struct obc_transfer *transfer,
- 		return FALSE;
+ 	if (err) {
+-		callback->func(transfer, transfer->transferred, err,
+-							callback->data);
++		callback->func(transfer, err, callback->data);
+ 	} else {
+ 		GError *abort_err;
+ 
+ 		abort_err = g_error_new(OBC_TRANSFER_ERROR, -ECANCELED, "%s",
+ 						"Transfer cancelled by user");
+-		callback->func(transfer, transfer->transferred, abort_err,
+-							callback->data);
++		callback->func(transfer, abort_err, callback->data);
+ 		g_error_free(abort_err);
+ 	}
+ }
+@@ -409,7 +407,6 @@ static gboolean get_xfer_progress(const void *buf, gsize len,
+ 							gpointer user_data)
+ {
+ 	struct obc_transfer *transfer = user_data;
+-	struct transfer_callback *callback = transfer->callback;
+ 
+ 	if (transfer->fd > 0) {
+ 		gint w;
+@@ -421,10 +418,6 @@ static gboolean get_xfer_progress(const void *buf, gsize len,
+ 		transfer->transferred += w;
  	}
  
--done:
- 	DBG("%p registered %s", transfer, transfer->path);
- 
+-	if (callback && transfer->transferred != transfer->size)
+-		callback->func(transfer, transfer->transferred, NULL,
+-							callback->data);
+-
  	return TRUE;
+ }
+ 
+@@ -462,7 +455,7 @@ static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
+ 	}
+ 
+ 	if (callback)
+-		callback->func(transfer, transfer->size, err, callback->data);
++		callback->func(transfer, err, callback->data);
+ }
+ 
+ static void get_xfer_progress_first(GObex *obex, GError *err, GObexPacket *rsp,
+@@ -529,17 +522,12 @@ static void get_xfer_progress_first(GObex *obex, GError *err, GObexPacket *rsp,
+ static gssize put_xfer_progress(void *buf, gsize len, gpointer user_data)
+ {
+ 	struct obc_transfer *transfer = user_data;
+-	struct transfer_callback *callback = transfer->callback;
+ 	gssize size;
+ 
+ 	size = read(transfer->fd, buf, len);
+ 	if (size <= 0)
+ 		return size;
+ 
+-	if (callback)
+-		callback->func(transfer, transfer->transferred, NULL,
+-							callback->data);
+-
+ 	transfer->transferred += size;
+ 
+ 	return size;
+diff --git a/client/transfer.h b/client/transfer.h
+index bfa166d..15c157a 100644
+--- a/client/transfer.h
++++ b/client/transfer.h
+@@ -24,8 +24,7 @@
+ struct obc_transfer;
+ 
+ typedef void (*transfer_callback_t) (struct obc_transfer *transfer,
+-					gint64 transferred, GError *err,
+-					void *user_data);
++					GError *err, void *user_data);
+ 
+ struct obc_transfer *obc_transfer_get(const char *type, const char *name,
+ 					const char *filename, GError **err);
 -- 
 1.7.7.6
 
