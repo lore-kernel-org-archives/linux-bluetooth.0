@@ -1,88 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 May 2012 11:25:37 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd] client: Fix not checking if destination exist
- while renaming file
-Message-ID: <20120529142537.GB13737@samus>
-References: <1338293498-2356-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338293498-2356-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1338286766-5368-2-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1338286766-5368-1-git-send-email-frederic.dalleau@linux.intel.com>
+	<1338286766-5368-2-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Tue, 29 May 2012 17:05:43 +0300
+Message-ID: <CABBYNZKw=--VW-B-y3UNuTNXfk7Cms_Hy=ZECD3w-Rs5x6abRQ@mail.gmail.com>
+Subject: Re: [RFC] network: Reply to extensions at connection setup
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Frédéric,
 
-On 15:11 Tue 29 May, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> rename return an error if the destination directory doesn't exist, so
-> in case it doesn't exist it should be created before calling rename.
-> ---
->  client/transfer.c |   27 +++++++++++++++++++++++++--
->  1 files changed, 25 insertions(+), 2 deletions(-)
-> 
-> diff --git a/client/transfer.c b/client/transfer.c
-> index 3065c9c..772834f 100644
-> --- a/client/transfer.c
-> +++ b/client/transfer.c
-> @@ -715,11 +715,34 @@ int obc_transfer_set_filename(struct obc_transfer *transfer,
->  					const char *filename)
->  {
->  	int err;
-> +	struct stat st;
-> +	char *dirname;
-> +	gboolean dir = FALSE;
+On Tue, May 29, 2012 at 1:19 PM, Frédéric Dalleau
+<frederic.dalleau@linux.intel.com> wrote:
+> +       /* Reply to extensions */
+> +       if (req->type & BNEP_EXT_HEADER) {
+> +               uint8_t pkt[3];
+> +               int l;
 > +
-> +	dirname = g_path_get_dirname(filename);
-> +	if (stat(dirname, &st) < 0) {
-> +		if (errno != ENOENT) {
-> +			error("stat(): %s (%d)", strerror(errno), errno);
-> +			return -errno;
-> +		}
+> +               l = 3 + 2 * req->uuid_size;
+> +               ext = packet + l;
+> +               n -= l;
 > +
-> +		if (mkdir(dirname, 0755) < 0) {
-
-For example, if my /tmp is empty, and "dirname" is "/tmp/foo/bar", this
-would fail, right? i.e. mkdir() isn't able to create two (or more) levels
-at a time.
-
-So for consistency, I would prefer if the error that the directory
-doesn't exist is returned, and the user creates the directory himself.
-This is mostly for FTP, right?
-
-> +			error("mkdir(): %s (%d)", strerror(errno), errno);
-> +			return -errno;
-> +		}
+> +ext:
+> +               if (n <= 3)
+> +                       return FALSE;
 > +
-> +		dir = TRUE;
-> +	}
->  
->  	err = rename(transfer->filename, filename);
->  	if (err < 0) {
-> -		error("rename(): %s (%d)", strerror(errno), errno);
-> -		return -errno;
-> +		err = -errno;
+> +               pkt[0] = BNEP_CONTROL;
+> +               pkt[1] = BNEP_CMD_NOT_UNDERSTOOD;
+> +               pkt[2] = ext[2];
 > +
-> +		if (dir)
-> +			rmdir(dirname);
+> +               send(sk, pkt, sizeof(pkt), 0);
 > +
-> +		error("rename(): %s (%d)", strerror(-err), -err);
-> +		return -err;
->  	}
->  
->  	g_free(transfer->filename);
-> -- 
-> 1.7.7.6
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> +               if ((ext[0] & BNEP_EXT_HEADER) == 0)
+> +                       return FALSE;
+> +
+> +               l = 2 + ext[1];
+> +               ext += l;
+> +               n -= l;
+> +               goto ext;
+> +       }
+> +
+
+It looks bad to use goto backwards in the code, specially when you
+could use a for loop or something like that. Maybe you should this
+part in a separate function where you can initialize the variables and
+responding to each extension request, also it would be useful to have
+the structures of the extension so you can do sizeof and things like
+that to avoid using magic numbers.
 
 
-Cheers,
 -- 
-Vinicius
+Luiz Augusto von Dentz
