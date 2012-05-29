@@ -1,120 +1,167 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 May 2012 09:49:22 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Gustavo Padovan <gustavo@padovan.org>
-cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH] Bluetooth: Create empty l2cap ops function
-In-Reply-To: <alpine.DEB.2.02.1205290926490.16153@mathewm-linux>
-Message-ID: <alpine.DEB.2.02.1205290948170.16153@mathewm-linux>
-References: <1338308366-11465-1-git-send-email-gustavo@padovan.org> <alpine.DEB.2.02.1205290926490.16153@mathewm-linux>
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Subject: Re: [PATCH v2 1/3] hciattach: add common debug print functions and toggle option
+Date: Tue, 29 May 2012 09:51:07 -0700
+Message-ID: <1396804.NRU9s8AsnG@tedd-ubuntu>
+In-Reply-To: <2437344.N06Bp3RTfe@tedd-ubuntu>
+References: <2437344.N06Bp3RTfe@tedd-ubuntu>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Mracel.
 
-Gustavo -
+I sent out the v2 of patches(total 3) after updating with your comment.
 
-On Tue, 29 May 2012, Mat Martineau wrote:
+Let me know if you have any further comments.
 
->
-> Gustavo -
->
-> On Tue, 29 May 2012, Gustavo Padovan wrote:
->
->> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
->> 
->> A2MP doesn't use part of the L2CAP chan ops API so we just create general
->> empty function instead of the A2MP specific one.
->> 
->> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
->> ---
->> include/net/bluetooth/l2cap.h |   12 ++++++++++++
->> net/bluetooth/a2mp.c          |   23 +++--------------------
->> 2 files changed, 15 insertions(+), 20 deletions(-)
->> 
->> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
->> index a00b43e..b939e90 100644
->> --- a/include/net/bluetooth/l2cap.h
->> +++ b/include/net/bluetooth/l2cap.h
->> @@ -740,6 +740,18 @@ static inline __u16 __next_seq(struct l2cap_chan 
->> *chan, __u16 seq)
->> 	return (seq + 1) % (chan->tx_win_max + 1);
->> }
->> 
->> +static inline struct l2cap_chan *l2cap_chan_no_new_connection(struct 
->> l2cap_chan *chan)
->> +{
->> +	return NULL;
->> +}
->> +
->> +static inline void l2cap_chan_no_teardown(struct l2cap_chan *chan, int 
->> err)
->> +{
->> +}
->> +
->> +static inline void l2cap_chan_no_ready(struct l2cap_chan *chan)
->> +{
->> +}
->> 
->> extern bool disable_ertm;
->> 
->> diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
->> index e08ca2a..ec1ef2e 100644
->> --- a/net/bluetooth/a2mp.c
->> +++ b/net/bluetooth/a2mp.c
->> @@ -440,23 +440,6 @@ static struct sk_buff *a2mp_chan_alloc_skb_cb(struct 
->> l2cap_chan *chan,
->> 	return bt_skb_alloc(len, GFP_KERNEL);
->> }
->> 
->> -static struct l2cap_chan *a2mp_chan_no_new_conn_cb(struct l2cap_chan 
->> *chan)
->> -{
->> -	BT_ERR("new_connection for chan %p not implemented", chan);
->> -
->> -	return NULL;
->> -}
->> -
->> -static void a2mp_chan_no_teardown_cb(struct l2cap_chan *chan, int err)
->> -{
->> -	BT_ERR("teardown for chan %p not implemented", chan);
->> -}
->> -
->> -static void a2mp_chan_no_ready(struct l2cap_chan *chan)
->> -{
->> -	BT_ERR("ready for chan %p not implemented", chan);
->> -}
->> -
->> static struct l2cap_ops a2mp_chan_ops = {
->> 	.name = "L2CAP A2MP channel",
->> 	.recv = a2mp_chan_recv_cb,
->> @@ -465,9 +448,9 @@ static struct l2cap_ops a2mp_chan_ops = {
->> 	.alloc_skb = a2mp_chan_alloc_skb_cb,
->>
->> 	/* Not implemented for A2MP */
->> -	.new_connection = a2mp_chan_no_new_conn_cb,
->> -	.teardown = a2mp_chan_no_teardown_cb,
->> -	.ready = a2mp_chan_no_ready,
->> +	.new_connection = l2cap_chan_no_new_connection,
->> +	.teardown = l2cap_chan_no_teardown,
->> +	.ready = l2cap_chan_no_ready,
->> };
->> 
->> static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
->> -- 
->> 1.7.10.2
->
-> If these pointers all need to be populated, will you also remove the NULL 
-> checks for the callbacks in l2cap_core.c?  Maybe the callbacks could be 
-> validated once when the l2cap_chan is set up.
+Tedd
 
-Nevermind, you already have a patch for this.  I should have caught up 
-on the rest of the mailing list first...
-
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+On Tuesday, May 22, 2012 09:35:35 PM you wrote:
+> From: Tedd Ho-Jeong An <tedd.an@intel.com>
+> 
+> This adds common debug print functions that print the debug messages
+> to stderr and it can be toggled with'-d' option in the parameter.
+> 
+> It provides two functions: one for message and the other for data contents.
+> 
+> ---
+>  tools/hciattach.8 |    4 ++++
+>  tools/hciattach.c |   39 ++++++++++++++++++++++++++++++++++++---
+>  tools/hciattach.h |    5 ++++-
+>  3 files changed, 44 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tools/hciattach.8 b/tools/hciattach.8
+> index cc97cad..eccbc61 100644
+> --- a/tools/hciattach.8
+> +++ b/tools/hciattach.8
+> @@ -6,6 +6,7 @@ hciattach \- attach serial devices via UART HCI to BlueZ stack
+>  .RB [\| \-b \|]
+>  .RB [\| \-n \|]
+>  .RB [\| \-p \|]
+> +.RB [\| \-d \|]
+>  .RB [\| \-t
+>  .IR timeout \|]
+>  .RB [\| \-s
+> @@ -32,6 +33,9 @@ Don't detach from controlling terminal.
+>  .B \-p
+>  Print the PID when detaching.
+>  .TP
+> +.B \-d
+> +Print debug messages to stderr.
+> +.TP
+>  .BI \-t " timeout"
+>  Specify an initialization timeout.  (Default is 5 seconds.)
+>  .TP
+> diff --git a/tools/hciattach.c b/tools/hciattach.c
+> index 3e73956..e0a58de 100644
+> --- a/tools/hciattach.c
+> +++ b/tools/hciattach.c
+> @@ -42,6 +42,7 @@
+>  #include <sys/poll.h>
+>  #include <sys/param.h>
+>  #include <sys/ioctl.h>
+> +#include <stdarg.h>
+>  
+>  #include <bluetooth/bluetooth.h>
+>  #include <bluetooth/hci.h>
+> @@ -73,6 +74,8 @@ struct uart_t {
+>  
+>  static volatile sig_atomic_t __io_canceled = 0;
+>  
+> +static int debug;
+> +
+>  static void sig_hup(int sig)
+>  {
+>  }
+> @@ -144,6 +147,31 @@ static int uart_speed(int s)
+>  	}
+>  }
+>  
+> +void dbg_print(const char *fmt, ...)
+> +{
+> +	va_list args;
+> +
+> +	if (debug) {
+> +		fprintf(stderr, "dbg: ");
+> +		va_start(args, fmt);
+> +		vfprintf(stderr, fmt, args);
+> +		va_end(args);
+> +		fprintf(stderr, "\n");
+> +	}
+> +}
+> +
+> +void dbg_print_pkt(char *str, unsigned char *data, int len)
+> +{
+> +	int i;
+> +
+> +	if (debug) {
+> +		fprintf(stderr, "dbg: %s", str);
+> +		for (i = 0; i < len; i++)
+> +			fprintf(stderr, "%02x ", data[i]);
+> +		fprintf(stderr, "\n");
+> +	}
+> +}
+> +
+>  int set_speed(int fd, struct termios *ti, int speed)
+>  {
+>  	if (cfsetospeed(ti, uart_speed(speed)) < 0)
+> @@ -161,7 +189,7 @@ int set_speed(int fd, struct termios *ti, int speed)
+>  /*
+>   * Read an HCI event from the given file descriptor.
+>   */
+> -int read_hci_event(int fd, unsigned char* buf, int size)
+> +int read_hci_event(int fd, unsigned char *buf, int size)
+>  {
+>  	int remain, r;
+>  	int count = 0;
+> @@ -1260,7 +1288,7 @@ static void usage(void)
+>  {
+>  	printf("hciattach - HCI UART driver initialization utility\n");
+>  	printf("Usage:\n");
+> -	printf("\thciattach [-n] [-p] [-b] [-r] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow] [bdaddr]\n");
+> +	printf("\thciattach [-n] [-p] [-b] [-r] [-d] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow] [bdaddr]\n");
+>  	printf("\thciattach -l\n");
+>  }
+>  
+> @@ -1280,8 +1308,9 @@ int main(int argc, char *argv[])
+>  	detach = 1;
+>  	printpid = 0;
+>  	raw = 0;
+> +	debug = 0;
+>  
+> -	while ((opt=getopt(argc, argv, "bnpt:s:lr")) != EOF) {
+> +	while ((opt=getopt(argc, argv, "bnpdt:s:lr")) != EOF) {
+>  		switch(opt) {
+>  		case 'b':
+>  			send_break = 1;
+> @@ -1314,6 +1343,10 @@ int main(int argc, char *argv[])
+>  			raw = 1;
+>  			break;
+>  
+> +		case 'd':
+> +			debug = 1;
+> +			break;
+> +
+>  		default:
+>  			usage();
+>  			exit(1);
+> diff --git a/tools/hciattach.h b/tools/hciattach.h
+> index a24dbc4..a9a0d02 100644
+> --- a/tools/hciattach.h
+> +++ b/tools/hciattach.h
+> @@ -44,7 +44,10 @@
+>  #define HCI_UART_RESET_ON_INIT	1
+>  #define HCI_UART_CREATE_AMP	2
+>  
+> -int read_hci_event(int fd, unsigned char* buf, int size);
+> +void dbg_print(const char *fmt, ...);
+> +void dbg_print_pkt(char *str, unsigned char *data, int len);
+> +
+> +int read_hci_event(int fd, unsigned char *buf, int size);
+>  int set_speed(int fd, struct termios *ti, int speed);
+>  
+>  int texas_init(int fd, int *speed, struct termios *ti);
+> 
