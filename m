@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 17/17] client-test: Remove agent from ftp-client
-Date: Tue, 29 May 2012 11:23:22 +0200
-Message-Id: <1338283402-11085-18-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 16/17] client: Make FileTransfer.PutFile asynchronous
+Date: Tue, 29 May 2012 11:23:21 +0200
+Message-Id: <1338283402-11085-17-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,108 +12,51 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Remove the use of the agent in the test script. Most of the
-functionality is still there with the exception of progress reporting,
-which is not possible due to some transitional limitations in the D-Bus
-API.
----
- test/ftp-client |   50 +++++++-------------------------------------------
- 1 files changed, 7 insertions(+), 43 deletions(-)
+There is no reason to have inconsistent behavior between GetFile and
+PutFile, in FileTransfer D-Bus API.
 
-diff --git a/test/ftp-client b/test/ftp-client
-index 825f591..8421ade 100755
---- a/test/ftp-client
-+++ b/test/ftp-client
-@@ -9,42 +9,6 @@ import dbus.mainloop.glib
- import os.path
- from optparse import OptionParser
+Before this change, PutFile reported success immediately after queueing
+the transfer, even though the D-Bus signature includes the async flag.
+---
+ client/ftp.c |   11 +++++++----
+ 1 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/client/ftp.c b/client/ftp.c
+index b7b5081..c4ad33b 100644
+--- a/client/ftp.c
++++ b/client/ftp.c
+@@ -143,7 +143,7 @@ static const GMarkupParser parser = {
+ 	NULL
+ };
  
--class Agent(dbus.service.Object):
--    def __init__(self, conn=None, obj_path=None, verbose=False):
--        dbus.service.Object.__init__(self, conn, obj_path)
--        self.verbose = verbose
--
--    @dbus.service.method("org.openobex.Agent",
--                    in_signature="o", out_signature="s")
--    def Request(self, path):
--        return ""
--
--    @dbus.service.method("org.openobex.Agent",
--                    in_signature="ot", out_signature="")
--    def Progress(self, path, transferred):
--        if self.verbose:
--            print "Transfer progress (%d bytes)" % (transferred)
--        return
--
--    @dbus.service.method("org.openobex.Agent",
--                    in_signature="o", out_signature="")
--    def Complete(self, path):
--        if self.verbose:
--            print "Transfer finished"
--        mainloop.quit()
--
--    @dbus.service.method("org.openobex.Agent",
--                    in_signature="os", out_signature="")
--    def Error(self, path, error):
--        print "Transfer finished with an error: %s" % (error)
--        mainloop.quit()
--
--    @dbus.service.method("org.openobex.Agent",
--                    in_signature="", out_signature="")
--    def Release(self):
--        mainloop.quit()
--
--
- def parse_options():
-     parser.add_option("-d", "--device", dest="device",
-                       help="Device to connect", metavar="DEVICE")
-@@ -74,6 +38,11 @@ def error(err):
- def void_reply():
-     pass
+-static void get_file_callback(struct obc_session *session,
++static void transfer_callback(struct obc_session *session,
+ 						struct obc_transfer *transfer,
+ 						GError *err, void *user_data)
+ {
+@@ -270,7 +270,7 @@ static DBusMessage *get_file(DBusConnection *connection,
+ 	if (transfer == NULL)
+ 		goto fail;
  
-+def transfer_complete():
-+    if options.verbose:
-+        print "Transfer finished"
-+    mainloop.quit()
-+
- def change_folder(session, new_dir):
-     for node in new_dir.split("/"):
-         session.ChangeFolder(node)
-@@ -88,13 +57,13 @@ def list_folder(session):
- def put_file(session, filename):
-     session.PutFile(os.path.abspath(filename),
-                     os.path.basename(filename),
--                    reply_handler=void_reply,
-+                    reply_handler=transfer_complete,
-                     error_handler=error)
+-	if (obc_session_queue(session, transfer, get_file_callback, message,
++	if (obc_session_queue(session, transfer, transfer_callback, message,
+ 								TRUE, &err)) {
+ 		dbus_message_ref(message);
+ 		return NULL;
+@@ -306,8 +306,11 @@ static DBusMessage *put_file(DBusConnection *connection,
+ 	if (transfer == NULL)
+ 		goto fail;
  
- def get_file(session, filename):
-     session.GetFile(os.path.abspath(filename),
-                     os.path.basename(filename),
--                    reply_handler=void_reply,
-+                    reply_handler=transfer_complete,
-                     error_handler=error)
+-	if (obc_session_queue(session, transfer, NULL, NULL, TRUE, &err))
+-		return dbus_message_new_method_return(message);
++	if (obc_session_queue(session, transfer, transfer_callback, message,
++								TRUE, &err)) {
++		dbus_message_ref(message);
++		return NULL;
++	}
  
- def remove_file(session, filename):
-@@ -129,9 +98,6 @@ if  __name__ == '__main__':
-     bus = dbus.SessionBus()
-     mainloop = gobject.MainLoop()
- 
--    path = "/test/agent"
--    agent = Agent(bus, path, options.verbose)
--
-     client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
-                             "org.openobex.Client")
- 
-@@ -140,8 +106,6 @@ if  __name__ == '__main__':
-     session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
-                  "org.openobex.Session")
- 
--    session.AssignAgent(path)
--
-     ftp = dbus.Interface(bus.get_object("org.openobex.client", session_path),
-                  "org.openobex.FileTransfer")
- 
+ fail:
+ 	reply = g_dbus_create_error(message, "org.openobex.Error.Failed", "%s",
 -- 
 1.7.7.6
 
