@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 05/17] client: Add transfer event-reporting signals
-Date: Tue, 29 May 2012 11:23:10 +0200
-Message-Id: <1338283402-11085-6-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 02/17] client-doc: Add progress property to transfer
+Date: Tue, 29 May 2012 11:23:07 +0200
+Message-Id: <1338283402-11085-3-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,58 +12,33 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-These signals replace the old agent-based notification mechanism.
+This property exposes the number of bytes transferred so far in a given
+transfer.
 ---
- client/transfer.c |   28 +++++++++++++++++++++++-----
- 1 files changed, 23 insertions(+), 5 deletions(-)
+ doc/client-api.txt |   10 ++++++++++
+ 1 files changed, 10 insertions(+), 0 deletions(-)
 
-diff --git a/client/transfer.c b/client/transfer.c
-index c1bd4be..b8931cf 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -196,6 +196,9 @@ static const GDBusMethodTable obc_transfer_methods[] = {
- static const GDBusSignalTable obc_transfer_signals[] = {
- 	{ GDBUS_SIGNAL("PropertyChanged",
- 		GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
-+	{ GDBUS_SIGNAL("Complete", NULL) },
-+	{ GDBUS_SIGNAL("Error",
-+		GDBUS_ARGS({ "code", "s" }, { "message", "s" })) },
- 	{ }
- };
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index cfb4ec9..cc25543 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -312,6 +312,16 @@ Properties	string Name [readonly]
  
-@@ -437,12 +440,27 @@ static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
- 		transfer->progress_id = 0;
- 	}
+ 			Complete name of the file being received or sent.
  
--	if (err)
--		goto done;
--
--	transfer->size = transfer->transferred;
-+	if (err == NULL) {
-+		transfer->size = transfer->transferred;
++		uint64 Progress [readonly, optional]
 +
-+		if (transfer->path != NULL)
-+			g_dbus_emit_signal(transfer->conn, transfer->path,
-+						TRANSFER_INTERFACE, "Complete",
-+						DBUS_TYPE_INVALID);
-+	} else if (transfer->path != NULL) {
-+		char *code = g_strdup_printf("%d", err->code);
++			Number of bytes transferred. For queued transfers, this
++			value will not be present.
 +
-+		g_dbus_emit_signal(transfer->conn, transfer->path,
-+						TRANSFER_INTERFACE, "Error",
-+						DBUS_TYPE_STRING,
-+						&code,
-+						DBUS_TYPE_STRING,
-+						&err->message,
-+						DBUS_TYPE_INVALID);
++Signals		PropertyChanged(string name, variant value)
 +
-+		g_free(code);
-+	}
++			This signal indicates a changed value of the given
++			property.
++
+ Agent hierarchy
+ ===============
  
--done:
- 	if (callback)
- 		callback->func(transfer, transfer->size, err, callback->data);
- }
 -- 
 1.7.7.6
 
