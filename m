@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 06/17] client-doc: Remove D-Bus agent
-Date: Tue, 29 May 2012 11:23:11 +0200
-Message-Id: <1338283402-11085-7-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 03/17] client: Add progress property to transfer
+Date: Tue, 29 May 2012 11:23:08 +0200
+Message-Id: <1338283402-11085-4-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338283402-11085-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,84 +12,156 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The request confirmation from the agent is not really useful and the
-rest of the reporting is already reported by the transfer's signal-
-reporting.
+The number of transferred bytes is exposed in D-Bus using a specific
+property for this purpose.
 
-The main benefit of this is that the API is simpler and the client apps
-do not have to register the agent, and can just listen to the relevant
-signals.
+Internally, the value of this property does not necessarily match the
+internal progress counter. In order to avoid D-Bus overhead, the
+property will be updated once per second.
 ---
- doc/client-api.txt |   52 ----------------------------------------------------
- 1 files changed, 0 insertions(+), 52 deletions(-)
+ client/transfer.c |   66 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 64 insertions(+), 2 deletions(-)
 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 223ef9a..3c6a2e1 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -46,15 +46,6 @@ Methods		dict GetProperties()
+diff --git a/client/transfer.c b/client/transfer.c
+index 8292265..c1bd4be 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -75,6 +75,8 @@ struct obc_transfer {
+ 	guint xfer;
+ 	gint64 size;
+ 	gint64 transferred;
++	gint64 transferred_dbus;
++	guint progress_id;
+ };
  
- 			Returns all properties for the session.
+ static GQuark obc_transfer_error_quark(void)
+@@ -105,6 +107,10 @@ static DBusMessage *obc_transfer_get_properties(DBusConnection *connection,
+ 	obex_dbus_dict_append(&dict, "Filename", DBUS_TYPE_STRING,
+ 							&transfer->filename);
  
--		void AssignAgent(object agent)
--
--			Assign an OBEX agent to this session. This allows
--			detailed progress reports about the transactions.
--
--		void ReleaseAgent(object agent)
--
--			Release a previously assigned OBEX agent.
--
- 		string GetCapabilities()
++	if (transfer->obex != NULL)
++		obex_dbus_dict_append(&dict, "Progress", DBUS_TYPE_UINT64,
++						&transfer->transferred_dbus);
++
+ 	dbus_message_iter_close_container(&iter, &dict);
  
- 			Get remote device capabilities.
-@@ -330,46 +321,3 @@ Signals		PropertyChanged(string name, variant value)
+ 	return reply;
+@@ -147,6 +153,11 @@ static gboolean obc_transfer_abort(struct obc_transfer *transfer)
+ 	if (transfer->xfer == 0)
+ 		return FALSE;
  
- 			Informs that the transfer has been terminated because
- 			of some error.
--
--Agent hierarchy
--===============
--
--Service		unique name
--Interface	org.openobex.Agent
--Object path	freely definable
--
--Methods		void Release()
--
--			This method gets called when the service daemon
--			unregisters the agent. An agent can use it to do
--			cleanup tasks. There is no need to unregister the
--			agent, because when this method gets called it has
--			already been unregistered.
--
--		string Request(object transfer)
--
--			Accept or reject a new transfer (client and server)
--			and provide the filename for it.
--
--			In case of incoming transfers it is the filename
--			where to store the file and for outgoing transfers
--			it is the filename to show the remote device. If left
--			empty it will be calculated automatically.
--
--			Possible errors: org.openobex.Error.Rejected
--					 org.openobex.Error.Canceled
--
--		void Progress(object transfer, uint64 transferred)
--
--			Progress within the transfer has been made. The
--			number of transferred bytes is given as second
--			argument for convenience.
--
--		void Complete(object transfer)
--
--			Informs that the transfer has completed successfully.
--
--		void Error(object transfer, string message)
--
--			Informs that the transfer has been terminated because
--			of some error.
++	if (transfer->progress_id != 0) {
++		g_source_remove(transfer->progress_id);
++		transfer->progress_id = 0;
++	}
++
+ 	return g_obex_cancel_transfer(transfer->xfer, abort_complete,
+ 								transfer);
+ }
+@@ -182,6 +193,12 @@ static const GDBusMethodTable obc_transfer_methods[] = {
+ 	{ }
+ };
+ 
++static const GDBusSignalTable obc_transfer_signals[] = {
++	{ GDBUS_SIGNAL("PropertyChanged",
++		GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
++	{ }
++};
++
+ static void obc_transfer_free(struct obc_transfer *transfer)
+ {
+ 	DBG("%p", transfer);
+@@ -189,6 +206,11 @@ static void obc_transfer_free(struct obc_transfer *transfer)
+ 	if (transfer->xfer)
+ 		g_obex_cancel_transfer(transfer->xfer, NULL, NULL);
+ 
++	if (transfer->progress_id != 0) {
++		g_source_remove(transfer->progress_id);
++		transfer->progress_id = 0;
++	}
++
+ 	if (transfer->op == G_OBEX_OP_GET &&
+ 					transfer->transferred != transfer->size)
+ 		remove(transfer->filename);
+@@ -260,8 +282,8 @@ gboolean obc_transfer_register(struct obc_transfer *transfer,
+ 
+ 	if (g_dbus_register_interface(transfer->conn, transfer->path,
+ 				TRANSFER_INTERFACE,
+-				obc_transfer_methods, NULL, NULL,
+-				transfer, NULL) == FALSE) {
++				obc_transfer_methods, obc_transfer_signals,
++				NULL, transfer, NULL) == FALSE) {
+ 		g_set_error(err, OBC_TRANSFER_ERROR, -EFAULT,
+ 						"Unable to register to D-Bus");
+ 		return FALSE;
+@@ -410,6 +432,11 @@ static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
+ 
+ 	transfer->xfer = 0;
+ 
++	if (transfer->progress_id != 0) {
++		g_source_remove(transfer->progress_id);
++		transfer->progress_id = 0;
++	}
++
+ 	if (err)
+ 		goto done;
+ 
+@@ -518,6 +545,29 @@ gboolean obc_transfer_set_callback(struct obc_transfer *transfer,
+ 	return TRUE;
+ }
+ 
++static gboolean report_progress(gpointer data)
++{
++	struct obc_transfer *transfer = data;
++
++	if (transfer->transferred == transfer->transferred_dbus)
++		return TRUE;
++
++	transfer->transferred_dbus = transfer->transferred;
++
++	if (transfer->transferred == transfer->size) {
++		transfer->progress_id = 0;
++		return FALSE;
++	}
++
++	obex_dbus_signal_property_changed(transfer->conn,
++						transfer->path,
++						TRANSFER_INTERFACE, "Progress",
++						DBUS_TYPE_INT64,
++						&transfer->transferred_dbus);
++
++	return TRUE;
++}
++
+ static gboolean transfer_start_get(struct obc_transfer *transfer, GError **err)
+ {
+ 	GObexPacket *req;
+@@ -549,6 +599,12 @@ static gboolean transfer_start_get(struct obc_transfer *transfer, GError **err)
+ 	if (transfer->xfer == 0)
+ 		return FALSE;
+ 
++	if (transfer->path == NULL)
++		return TRUE;
++
++	transfer->progress_id = g_timeout_add_seconds(1, report_progress,
++								transfer);
++
+ 	return TRUE;
+ }
+ 
+@@ -586,6 +642,12 @@ static gboolean transfer_start_put(struct obc_transfer *transfer, GError **err)
+ 	if (transfer->xfer == 0)
+ 		return FALSE;
+ 
++	if (transfer->path == NULL)
++		return TRUE;
++
++	transfer->progress_id = g_timeout_add_seconds(1, report_progress,
++								transfer);
++
+ 	return TRUE;
+ }
+ 
 -- 
 1.7.7.6
 
