@@ -1,180 +1,222 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] Remove compatibility check for DBUS_TYPE_UNIX_FD
-Date: Wed, 30 May 2012 17:16:19 -0400
-Message-Id: <1338412579-22890-1-git-send-email-anderson.lizardo@openbossa.org>
+Date: Wed, 30 May 2012 21:32:27 +0300
+From: Ido Yariv <ido@wizery.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] attrib-server: Fix multiple channels detaching mix-up
+Message-ID: <20120530183227.GA16709@WorkStation.localnet>
+References: <1338322808-15503-1-git-send-email-ido@wizery.com>
+ <20120530073701.GB6539@x220>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120530073701.GB6539@x220>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since commit c89b589a586e97ad875fbdd1d41f03979157ebb0, D-Bus >= 1.4.0 is
-required. This version already contains Unix FD passing support,
-therefore code that checks for DBUS_TYPE_UNIX_FD definition is
-unnecessary.
+Hi Johan,
+
+On Wed, May 30, 2012 at 10:37:01AM +0300, Johan Hedberg wrote:
+> Hi Ido,
+> 
+> On Tue, May 29, 2012, Ido Yariv wrote:
+> > The identifier returned by g_attrib_register is not unique across
+> > different channels. Since attrib_channel_detach assumes this identifier
+> > to be unique, it may end up detaching the wrong channel when a device
+> > disconnects.
+> > 
+> > Fix this by using the channel's pointer as a unique identifier for
+> > detaching the channel. The identifier returned from g_attrib_register
+> > will still be used to find the relevant event structure.
+> > ---
+> >  src/attrib-server.c |   22 +++++++---------------
+> >  1 files changed, 7 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/src/attrib-server.c b/src/attrib-server.c
+> > index dd1bba4..39085de 100644
+> > --- a/src/attrib-server.c
+> > +++ b/src/attrib-server.c
+> > @@ -72,7 +72,7 @@ struct gatt_channel {
+> >  	GAttrib *attrib;
+> >  	guint mtu;
+> >  	gboolean le;
+> > -	guint id;
+> > +	guint event_id;
+> >  	gboolean encrypted;
+> >  	struct gatt_server *server;
+> >  	guint cleanup_id;
+> > @@ -1077,8 +1077,8 @@ guint attrib_channel_attach(GAttrib *attrib)
+> >  
+> >  
+> >  	channel->attrib = g_attrib_ref(attrib);
+> > -	channel->id = g_attrib_register(channel->attrib, GATTRIB_ALL_REQS,
+> > -					channel_handler, channel, NULL);
+> > +	channel->event_id = g_attrib_register(channel->attrib, GATTRIB_ALL_REQS,
+> > +						channel_handler, channel, NULL);
+> >  
+> >  	channel->cleanup_id = g_io_add_watch(io, G_IO_HUP, channel_watch_cb,
+> >  								channel);
+> > @@ -1087,15 +1087,7 @@ guint attrib_channel_attach(GAttrib *attrib)
+> >  
+> >  	server->clients = g_slist_append(server->clients, channel);
+> >  
+> > -	return channel->id;
+> > -}
+> > -
+> > -static gint channel_id_cmp(gconstpointer data, gconstpointer user_data)
+> > -{
+> > -	const struct gatt_channel *channel = data;
+> > -	guint id = GPOINTER_TO_UINT(user_data);
+> > -
+> > -	return channel->id - id;
+> > +	return GPOINTER_TO_UINT(channel);
+> 
+> I don't think converting a pointer to uint is safe since some systems
+> can have 64-bit pointers but 32-bit uints. These macros are therefore
+> only safe to be used in the other direction, i.e. when starting off with
+> an uint and passing it to an API that expects a pointer.
+
+You're absolutely right, good catch!
+
+How about the below patch? Instead of casting to and from guint, we can
+simply work with gpointer instead.
+
+Thanks,
+Ido.
+
+>From 78254bb099f80ad38e10075fbb73a4d990217630 Mon Sep 17 00:00:00 2001
+From: Ido Yariv <ido@wizery.com>
+Date: Tue, 29 May 2012 21:11:16 +0300
+Subject: [PATCH v2] attrib-server: Fix multiple channels detaching mix-up
+
+The identifier returned by g_attrib_register is not unique across
+different channels. Since attrib_channel_detach assumes this identifier
+to be unique, it may end up detaching the wrong channel when a device
+disconnects.
+
+Fix this by using the channel's pointer as a unique identifier for
+detaching the channel. The identifier returned from g_attrib_register
+will still be used to find the relevant event structure.
 ---
- audio/gateway.c      |    7 -------
- audio/gstavdtpsink.c |    4 ----
- audio/manager.c      |    4 ----
- audio/media.c        |    7 -------
- audio/transport.c    |    4 ----
- doc/hfp-api.txt      |    4 +---
- health/hdp.c         |    4 ----
- serial/port.c        |    7 -------
- 8 files changed, 1 insertion(+), 40 deletions(-)
+ src/attrib-server.c |   26 +++++++++-----------------
+ src/attrib-server.h |    4 ++--
+ src/device.c        |    6 +++---
+ 3 files changed, 14 insertions(+), 22 deletions(-)
 
-Note: only compilation tested.
-
-diff --git a/audio/gateway.c b/audio/gateway.c
-index dcc4f55..6162948 100644
---- a/audio/gateway.c
-+++ b/audio/gateway.c
-@@ -50,10 +50,6 @@
- #include "btio.h"
- #include "dbus-common.h"
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index a6262d0..db2c52d 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -73,7 +73,7 @@ struct gatt_channel {
+ 	GAttrib *attrib;
+ 	guint mtu;
+ 	gboolean le;
+-	guint id;
++	guint event_id;
+ 	gboolean encrypted;
+ 	struct gatt_server *server;
+ 	guint cleanup_id;
+@@ -1023,7 +1023,7 @@ done:
+ 							NULL, NULL, NULL);
+ }
  
--#ifndef DBUS_TYPE_UNIX_FD
--#define DBUS_TYPE_UNIX_FD -1
--#endif
--
- struct hf_agent {
- 	char *name;	/* Bus id */
- 	char *path;	/* D-Bus path */
-@@ -755,9 +751,6 @@ void gateway_unregister(struct audio_device *dev)
- 
- struct gateway *gateway_init(struct audio_device *dev)
+-guint attrib_channel_attach(GAttrib *attrib)
++gpointer attrib_channel_attach(GAttrib *attrib)
  {
--	if (DBUS_TYPE_UNIX_FD < 0)
--		return NULL;
--
- 	if (!g_dbus_register_interface(dev->conn, dev->path,
- 					AUDIO_GATEWAY_INTERFACE,
- 					gateway_methods, gateway_signals,
-diff --git a/audio/gstavdtpsink.c b/audio/gstavdtpsink.c
-index b5dfae4..1f374fc 100644
---- a/audio/gstavdtpsink.c
-+++ b/audio/gstavdtpsink.c
-@@ -64,10 +64,6 @@ GST_DEBUG_CATEGORY_STATIC(avdtp_sink_debug);
- 		g_mutex_unlock(s->sink_lock);		\
- 	} G_STMT_END
+ 	struct gatt_server *server;
+ 	struct btd_device *device;
+@@ -1078,8 +1078,8 @@ guint attrib_channel_attach(GAttrib *attrib)
  
--#ifndef DBUS_TYPE_UNIX_FD
--#define DBUS_TYPE_UNIX_FD -1
--#endif
--
- struct bluetooth_data {
- 	struct bt_get_capabilities_rsp *caps; /* Bluetooth device caps */
- 	guint link_mtu;
-diff --git a/audio/manager.c b/audio/manager.c
-index fb7af98..0b21322 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -70,10 +70,6 @@
- #include "telephony.h"
- #include "unix.h"
  
--#ifndef DBUS_TYPE_UNIX_FD
--#define DBUS_TYPE_UNIX_FD -1
--#endif
--
- typedef enum {
- 	HEADSET	= 1 << 0,
- 	GATEWAY	= 1 << 1,
-diff --git a/audio/media.c b/audio/media.c
-index 2a2cf37..147538c 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -48,10 +48,6 @@
- #include "gateway.h"
- #include "manager.h"
+ 	channel->attrib = g_attrib_ref(attrib);
+-	channel->id = g_attrib_register(channel->attrib, GATTRIB_ALL_REQS,
+-					channel_handler, channel, NULL);
++	channel->event_id = g_attrib_register(channel->attrib, GATTRIB_ALL_REQS,
++						channel_handler, channel, NULL);
  
--#ifndef DBUS_TYPE_UNIX_FD
--#define DBUS_TYPE_UNIX_FD -1
--#endif
+ 	channel->cleanup_id = g_io_add_watch(io, G_IO_HUP, channel_watch_cb,
+ 								channel);
+@@ -1088,18 +1088,10 @@ guint attrib_channel_attach(GAttrib *attrib)
+ 
+ 	server->clients = g_slist_append(server->clients, channel);
+ 
+-	return channel->id;
++	return (gpointer)channel;
+ }
+ 
+-static gint channel_id_cmp(gconstpointer data, gconstpointer user_data)
+-{
+-	const struct gatt_channel *channel = data;
+-	guint id = GPOINTER_TO_UINT(user_data);
 -
- #define MEDIA_INTERFACE "org.bluez.Media"
- #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint"
- #define MEDIA_PLAYER_INTERFACE "org.bluez.MediaPlayer"
-@@ -1857,9 +1853,6 @@ int media_register(DBusConnection *conn, const char *path, const bdaddr_t *src)
+-	return channel->id - id;
+-}
+-
+-gboolean attrib_channel_detach(GAttrib *attrib, guint id)
++gboolean attrib_channel_detach(GAttrib *attrib, gpointer id)
  {
- 	struct media_adapter *adapter;
+ 	struct gatt_server *server;
+ 	struct gatt_channel *channel;
+@@ -1123,14 +1115,14 @@ gboolean attrib_channel_detach(GAttrib *attrib, guint id)
+ 	if (server == NULL)
+ 		return FALSE;
  
--	if (DBUS_TYPE_UNIX_FD < 0)
--		return -EPERM;
--
- 	adapter = g_new0(struct media_adapter, 1);
- 	adapter->conn = dbus_connection_ref(conn);
- 	bacpy(&adapter->src, src);
-diff --git a/audio/transport.c b/audio/transport.c
-index 4273282..40d093b 100644
---- a/audio/transport.c
-+++ b/audio/transport.c
-@@ -45,10 +45,6 @@
- #include "gateway.h"
- #include "avrcp.h"
+-	l = g_slist_find_custom(server->clients, GUINT_TO_POINTER(id),
+-								channel_id_cmp);
++	/* Make sure the channel was not already freed */
++	l = g_slist_find(server->clients, id);
+ 	if (!l)
+ 		return FALSE;
  
--#ifndef DBUS_TYPE_UNIX_FD
--#define DBUS_TYPE_UNIX_FD -1
--#endif
--
- #define MEDIA_TRANSPORT_INTERFACE "org.bluez.MediaTransport"
+ 	channel = l->data;
  
- struct media_request {
-diff --git a/doc/hfp-api.txt b/doc/hfp-api.txt
-index cf2e730..fad89ae 100644
---- a/doc/hfp-api.txt
-+++ b/doc/hfp-api.txt
-@@ -66,9 +66,7 @@ Methods		void NewConnection(filedescriptor fd, uint16 version)
+-	g_attrib_unregister(channel->attrib, channel->id);
++	g_attrib_unregister(channel->attrib, channel->event_id);
+ 	channel_remove(channel);
  
- 			This method gets called whenever a new handsfree
- 			connection has been established.  The objectpath
--			contains the object path of the remote device.  This
--			method assumes that DBus daemon with file descriptor
--			passing capability is being used.
-+			contains the object path of the remote device.
+ 	return TRUE;
+diff --git a/src/attrib-server.h b/src/attrib-server.h
+index 7af0cfa..895d9ef 100644
+--- a/src/attrib-server.h
++++ b/src/attrib-server.h
+@@ -36,5 +36,5 @@ int attrib_gap_set(struct btd_adapter *adapter, uint16_t uuid,
+ uint32_t attrib_create_sdp(struct btd_adapter *adapter, uint16_t handle,
+ 							const char *name);
+ void attrib_free_sdp(uint32_t sdp_handle);
+-guint attrib_channel_attach(GAttrib *attrib);
+-gboolean attrib_channel_detach(GAttrib *attrib, guint id);
++gpointer attrib_channel_attach(GAttrib *attrib);
++gboolean attrib_channel_detach(GAttrib *attrib, gpointer id);
+diff --git a/src/device.c b/src/device.c
+index 7ff09aa..543055f 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -154,7 +154,7 @@ struct btd_device {
+ 	GAttrib		*attrib;
+ 	GSList		*attios;
+ 	GSList		*attios_offline;
+-	guint		attachid;		/* Attrib server attach */
++	gpointer	attachid;		/* Attrib server attach */
+ 	guint		auto_id;		/* Auto connect source id */
  
- 			The agent should only return successfully once the
- 			establishment of the service level connection (SLC)
-diff --git a/health/hdp.c b/health/hdp.c
-index 2f04d2e..2316204 100644
---- a/health/hdp.c
-+++ b/health/hdp.c
-@@ -42,10 +42,6 @@
- #include "hdp.h"
- #include "mcap.h"
+ 	gboolean	connected;
+@@ -205,7 +205,7 @@ static void att_cleanup(struct btd_device *device)
+ {
+ 	if (device->attachid) {
+ 		attrib_channel_detach(device->attrib, device->attachid);
+-		device->attachid = 0;
++		device->attachid = NULL;
+ 	}
  
--#ifndef DBUS_TYPE_UNIX_FD
--	#define DBUS_TYPE_UNIX_FD -1
--#endif
--
- #define ECHO_TIMEOUT	1 /* second */
- #define HDP_ECHO_LEN	15
+ 	if (device->cleanup_id) {
+@@ -1944,7 +1944,7 @@ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
  
-diff --git a/serial/port.c b/serial/port.c
-index f288f90..f90bb6a 100644
---- a/serial/port.c
-+++ b/serial/port.c
-@@ -64,10 +64,6 @@
- #define MAX_OPEN_TRIES		5
- #define OPEN_WAIT		300	/* ms. udev node creation retry wait */
+ 	attrib = g_attrib_new(io);
+ 	device->attachid = attrib_channel_attach(attrib);
+-	if (device->attachid == 0)
++	if (device->attachid == NULL)
+ 		error("Attribute server attach failure!");
  
--#ifndef DBUS_TYPE_UNIX_FD
--#define DBUS_TYPE_UNIX_FD -1
--#endif
--
- struct serial_device {
- 	DBusConnection	*conn;		/* for name listener handling */
- 	bdaddr_t	src;		/* Source (local) address */
-@@ -495,9 +491,6 @@ static DBusMessage *port_connect(DBusConnection *conn,
- 	const char *pattern;
- 	int err;
- 
--	if (dbus_message_has_member(msg, "ConnectFD") && DBUS_TYPE_UNIX_FD < 0)
--		return btd_error_not_supported(msg);
--
- 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &pattern,
- 						DBUS_TYPE_INVALID) == FALSE)
- 		return NULL;
+ 	device->attrib = attrib;
 -- 
-1.7.9.5
+1.7.7.6
 
