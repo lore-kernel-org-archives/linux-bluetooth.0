@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v3 12/14] client: Expose all transfers in D-Bus
-Date: Wed, 30 May 2012 17:50:21 +0200
-Message-Id: <1338393023-29941-13-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v3 13/14] client: Make FileTransfer.PutFile asynchronous
+Date: Wed, 30 May 2012 17:50:22 +0200
+Message-Id: <1338393023-29941-14-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338393023-29941-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338393023-29941-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,39 +12,53 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Relying on a internal policy (based on transfer type) to decide if a
-transfer should be exposed or not in D-Bus has some limitations. The
-simplest possible alternative to this is to expose all transfers in
-D-Bus, assuming the overhead is not significant.
----
- client/transfer.c |    7 -------
- 1 files changed, 0 insertions(+), 7 deletions(-)
+There is no reason to have inconsistent behavior between GetFile and
+PutFile, in FileTransfer D-Bus API.
 
-diff --git a/client/transfer.c b/client/transfer.c
-index a14624d..c073612 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -263,12 +263,6 @@ gboolean obc_transfer_register(struct obc_transfer *transfer,
- 						const char *owner,
- 						GError **err)
+Before this change, PutFile reported success immediately after queueing
+the transfer, even though the D-Bus signature includes the async flag.
+---
+ client/ftp.c |   13 ++++++++-----
+ 1 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/client/ftp.c b/client/ftp.c
+index 9b2c51d..8c72413 100644
+--- a/client/ftp.c
++++ b/client/ftp.c
+@@ -143,7 +143,7 @@ static const GMarkupParser parser = {
+ 	NULL
+ };
+ 
+-static void get_file_callback(struct obc_session *session,
++static void transfer_callback(struct obc_session *session,
+ 						struct obc_transfer *transfer,
+ 						GError *err, void *user_data)
  {
--	/* for OBEX specific mime types we don't need to register a transfer */
--	if (transfer->type != NULL &&
--			(strncmp(transfer->type, "x-obex/", 7) == 0 ||
--			strncmp(transfer->type, "x-bt/", 5) == 0))
--		goto done;
--
- 	transfer->owner = g_strdup(owner);
+@@ -270,8 +270,8 @@ static DBusMessage *get_file(DBusConnection *connection,
+ 	if (transfer == NULL)
+ 		goto fail;
  
- 	transfer->path = g_strdup_printf("%s/transfer%ju",
-@@ -290,7 +284,6 @@ gboolean obc_transfer_register(struct obc_transfer *transfer,
- 		return FALSE;
+-	if (obc_session_queue(session, transfer, get_file_callback, message,
+-								&err)) {
++	if (obc_session_queue(session, transfer, transfer_callback, message,
++									&err)) {
+ 		dbus_message_ref(message);
+ 		return NULL;
  	}
+@@ -306,8 +306,11 @@ static DBusMessage *put_file(DBusConnection *connection,
+ 	if (transfer == NULL)
+ 		goto fail;
  
--done:
- 	DBG("%p registered %s", transfer, transfer->path);
+-	if (obc_session_queue(session, transfer, NULL, NULL, &err))
+-		return dbus_message_new_method_return(message);
++	if (obc_session_queue(session, transfer, transfer_callback, message,
++									&err)) {
++		dbus_message_ref(message);
++		return NULL;
++	}
  
- 	return TRUE;
+ fail:
+ 	reply = g_dbus_create_error(message, "org.openobex.Error.Failed", "%s",
 -- 
 1.7.7.6
 
