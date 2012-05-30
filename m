@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Daniel Wagner <wagi@monom.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Daniel Wagner <daniel.wagner@bmw-carit.de>
-Subject: [PATCH v2 15/15] device: Ignore DUN if PAN is present
-Date: Wed, 30 May 2012 15:00:08 +0200
-Message-Id: <1338382808-29725-16-git-send-email-wagi@monom.org>
+Subject: [PATCH v2 07/15] thermometer: Move UUID definition to core
+Date: Wed, 30 May 2012 15:00:00 +0200
+Message-Id: <1338382808-29725-8-git-send-email-wagi@monom.org>
 In-Reply-To: <1338382808-29725-1-git-send-email-wagi@monom.org>
 References: <1338382808-29725-1-git-send-email-wagi@monom.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,47 +12,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Daniel Wagner <daniel.wagner@bmw-carit.de>
 
-Filtering DUN out at BlueZ level reduces the number of CPU cycles and
-memory spend just to figure out that PAN is always preferred over DUN.
-
-Doing this could on a the network manager level (e.g. ConnMan) or
-at an intermediate daemon such as dundee which handles AT command
-parsing and PPP setup is possible just more expensive.
-
-Therefore, just ignore the DUN completely and do not even announce it.
 ---
- src/device.c |   18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ src/uuid.h                |    6 ++++++
+ thermometer/manager.c     |    4 ++--
+ thermometer/thermometer.c |    7 ++-----
+ 3 files changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 928ea2b..c6112fe 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1530,6 +1530,24 @@ static void update_services(struct browse_req *req, sdp_list_t *recs)
+diff --git a/src/uuid.h b/src/uuid.h
+index 66164b8..24a0e72 100644
+--- a/src/uuid.h
++++ b/src/uuid.h
+@@ -51,3 +51,9 @@
+ #define TX_POWER_UUID		"00001804-0000-1000-8000-00805f9b34fb"
  
- 		sdp_list_free(svcclass, free);
- 	}
+ #define SAP_UUID		"0000112D-0000-1000-8000-00805f9b34fb"
 +
-+	if (!main_opts.prefer_pan)
-+		return;
-+
-+	if (g_slist_find_custom(req->profiles_added, NAP_UUID,
-+					(GCompareFunc) strcmp) != NULL) {
-+		GSList *l;
-+
-+		l = g_slist_find_custom(req->profiles_added,
-+							DUN_GW_UUID,
-+							(GCompareFunc) strcmp);
-+		if (l != NULL) {
-+			DBG("Skipping DUN entry because PAN was found.");
-+			g_free(l->data);
-+			req->profiles_added = g_slist_remove_link(
-+							req->profiles_added, l);
-+		}
-+	}
- }
++#define HEALTH_THERMOMETER_UUID	"00001809-0000-1000-8000-00805f9b34fb"
++#define TEMPERATURE_MEASUREMENT_UUID	"00002a1c-0000-1000-8000-00805f9b34fb"
++#define TEMPERATURE_TYPE_UUID		"00002a1d-0000-1000-8000-00805f9b34fb"
++#define INTERMEDIATE_TEMPERATURE_UUID	"00002a1e-0000-1000-8000-00805f9b34fb"
++#define MEASUREMENT_INTERVAL_UUID	"00002a21-0000-1000-8000-00805f9b34fb"
+diff --git a/thermometer/manager.c b/thermometer/manager.c
+index 8982beb..a436f38 100644
+--- a/thermometer/manager.c
++++ b/thermometer/manager.c
+@@ -24,6 +24,8 @@
+ #include <errno.h>
+ #include <bluetooth/uuid.h>
  
- static void store_profiles(struct btd_device *device)
++#include "../src/uuid.h"
++
+ #include "adapter.h"
+ #include "device.h"
+ #include "att.h"
+@@ -32,8 +34,6 @@
+ #include "thermometer.h"
+ #include "manager.h"
+ 
+-#define HEALTH_THERMOMETER_UUID		"00001809-0000-1000-8000-00805f9b34fb"
+-
+ static DBusConnection *connection = NULL;
+ 
+ static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
+diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
+index 4df9d2c..43bd821 100644
+--- a/thermometer/thermometer.c
++++ b/thermometer/thermometer.c
+@@ -28,6 +28,8 @@
+ #include <errno.h>
+ #include <bluetooth/uuid.h>
+ 
++#include "../src/uuid.h"
++
+ #include "dbus-common.h"
+ #include "adapter.h"
+ #include "device.h"
+@@ -41,11 +43,6 @@
+ 
+ #define THERMOMETER_INTERFACE "org.bluez.Thermometer"
+ 
+-#define TEMPERATURE_MEASUREMENT_UUID	"00002a1c-0000-1000-8000-00805f9b34fb"
+-#define TEMPERATURE_TYPE_UUID		"00002a1d-0000-1000-8000-00805f9b34fb"
+-#define INTERMEDIATE_TEMPERATURE_UUID	"00002a1e-0000-1000-8000-00805f9b34fb"
+-#define MEASUREMENT_INTERVAL_UUID	"00002a21-0000-1000-8000-00805f9b34fb"
+-
+ /* Temperature measurement flag fields */
+ #define TEMP_UNITS		0x01
+ #define TEMP_TIME_STAMP		0x02
 -- 
 1.7.10.130.g36e6c
 
