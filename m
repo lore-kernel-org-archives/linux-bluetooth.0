@@ -1,44 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 May 2012 04:17:18 -0300
+Date: Wed, 30 May 2012 04:05:50 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Do not check func ready existence
-Message-ID: <20120530071718.GK18069@joana>
-References: <20120529152357.GA4575@joana>
- <1338360932-29940-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [PATCH] Bluetooth: Create empty l2cap ops function
+Message-ID: <20120530070550.GJ18069@joana>
+References: <1338308366-11465-1-git-send-email-gustavo@padovan.org>
+ <20120530070158.GA29227@aemeltch-MOBL1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338360932-29940-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <20120530070158.GA29227@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-05-30 09:55:32 +0300]:
+* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-05-30 10:02:00 +0300]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Hi Gustavo,
 > 
-> Functions will be always defined and in case not implemented as
-> dummy __no_func.
+> On Tue, May 29, 2012 at 01:19:26PM -0300, Gustavo Padovan wrote:
+> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > 
+> > A2MP doesn't use part of the L2CAP chan ops API so we just create general
+> > empty function instead of the A2MP specific one.
+> > 
+> > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > ---
+> >  include/net/bluetooth/l2cap.h |   12 ++++++++++++
+> >  net/bluetooth/a2mp.c          |   23 +++--------------------
+> >  2 files changed, 15 insertions(+), 20 deletions(-)
+> > 
+> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> > index a00b43e..b939e90 100644
+> > --- a/include/net/bluetooth/l2cap.h
+> > +++ b/include/net/bluetooth/l2cap.h
+> > @@ -740,6 +740,18 @@ static inline __u16 __next_seq(struct l2cap_chan *chan, __u16 seq)
+> >  	return (seq + 1) % (chan->tx_win_max + 1);
+> >  }
+> >  
+> > +static inline struct l2cap_chan *l2cap_chan_no_new_connection(struct l2cap_chan *chan)
+> > +{
+> > +	return NULL;
+> > +}
+> > +
+> > +static inline void l2cap_chan_no_teardown(struct l2cap_chan *chan, int err)
+> > +{
+> > +}
+> > +
+> > +static inline void l2cap_chan_no_ready(struct l2cap_chan *chan)
+> > +{
+> > +}
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c |    3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 778c0c8..4f65a32 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -937,8 +937,7 @@ static void l2cap_chan_ready(struct l2cap_chan *chan)
->  
->  	chan->state = BT_CONNECTED;
->  
-> -	if (chan->ops->ready)
-> -		chan->ops->ready(chan);
-> +	chan->ops->ready(chan);
+> One note here. Shall we have debug or error message to indicate that
+> function is not implemented?
 
-Patch has been applied to bluetooth-next. Thanks.
+No, these are like NOPs. Shouldn't be noticed by anyone, if you decided to use
+the you are saying that you don't wanna know about it.
 
 	Gustavo
