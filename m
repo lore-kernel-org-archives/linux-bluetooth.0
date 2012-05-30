@@ -1,46 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4FC6240A.3030009@tieto.com>
+Date: Wed, 30 May 2012 15:43:38 +0200
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 2/3] Bluetooth: Return proper mgmt state when LE pairing connection failed
-Date: Wed, 30 May 2012 15:39:22 +0200
-Message-ID: <1338385163-10589-2-git-send-email-andrzej.kaczmarek@tieto.com>
-In-Reply-To: <1338385163-10589-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1338385163-10589-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Andre Guedes <andre.guedes@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v2] Bluetooth: Use hci_conn data to handle failed LE Connection
+ Complete
+References: <1337201737-5983-1-git-send-email-andrzej.kaczmarek@tieto.com>  <1337202331.5970.269.camel@aeonflux>  <CA+6KyKZ0vrPHoXXfWwJdiVLDR+59azRwWMhJbjndM+Aw_dKSwA@mail.gmail.com>  <1337204910.5970.271.camel@aeonflux> <4FB4B13D.1010302@tieto.com>  <CACJA=fVgzh9-RXBeJ=N7KRHDnEo_GTcVOnnv2dc-JMxKriBb4g@mail.gmail.com> <1337928909.15105.88.camel@aeonflux>
+In-Reply-To: <1337928909.15105.88.camel@aeonflux>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-MGMT_STATUS_BUSY should be returned when LE pairing cannot be started due
-to another outgoing connection attempt is ongoing.
+Hi Marcel,
 
-Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
----
- net/bluetooth/mgmt.c |    9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+On 25.05.2012 08:55, Marcel Holtmann wrote:
+>> I was taking a look at Core spec change request document [1] and I found this:
+>>
+>> Erratum 4215, LE connection complete event missing exception
+>> "... On failure, for this event, all other parameters are not valid."
+>>
+>> It clearly states this is an expected behavior and nullify those
+>> parameters doesn't make the adapter broken.
+>>
+>> Thus, in case of failure, we should not rely on those parameters
+>> (BD_ADDR included) in order to properly handle LE Connection Complete
+>> Events.
+>
+> if this is so, then we should only do that and strictly enforce only one
+> LE connection attempt at a time. Also then there is no need to bother
+> with trying to check for the BD_ADDR later.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 205574e..958f764 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1911,8 +1911,15 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 	rp.addr.type = cp->addr.type;
- 
- 	if (IS_ERR(conn)) {
-+		int status;
-+
-+		if (PTR_ERR(conn) == -EBUSY)
-+			status = MGMT_STATUS_BUSY;
-+		else
-+			status = MGMT_STATUS_CONNECT_FAILED;
-+
- 		err = cmd_complete(sk, hdev->id, MGMT_OP_PAIR_DEVICE,
--				   MGMT_STATUS_CONNECT_FAILED, &rp,
-+				   status, &rp,
- 				   sizeof(rp));
- 		goto unlock;
- 	}
--- 
-1.7.9.5
+I created patch which does not allow 2nd outgoing LE connection attempt 
+and also reworded commit message for this one so it does state 
+explicitly that we should consider BDADDR from failed LE Connection 
+Complete as not valid and not use it.
 
+Please take a look at my new patches (3 in total).
+
+BR,
+Andrzej
