@@ -2,100 +2,39 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 3/3] Bluetooth: Fix not removing hci_conn for failed LE connection
-Date: Wed, 30 May 2012 15:39:23 +0200
-Message-ID: <1338385163-10589-3-git-send-email-andrzej.kaczmarek@tieto.com>
-In-Reply-To: <1338385163-10589-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1338385163-10589-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 1/3] Bluetooth: Allow only one LE connection attempt
+Date: Wed, 30 May 2012 15:39:21 +0200
+Message-ID: <1338385163-10589-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch changes way LE Connection Complete event with error status are
-handled. BDADDR returned in such event packet do not need to be valid and
-should not be used to search for existing hci_conn. Instead, any hci_conn
-with BT_CONNECT state should be matched since there can be only one
-pending LE outgoing connection at any time.
-
-If not handled properly, appriopriate hci_conn will not be removed and
-subsequent connection to given peer will try to reuse it without making
-actual connection attempt.
-
-2012-05-07 11:21:39.133378 < HCI Command: LE Create Connection (0x08|0x000d) plen 25
-    bdaddr 00:22:D0:10:13:EE type 1
-2012-05-07 11:21:39.138774 > HCI Event: Command Status (0x0f) plen 4
-    LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
-2012-05-07 11:21:44.752854 < HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0
-2012-05-07 11:21:44.759475 > HCI Event: Command Complete (0x0e) plen 4
-    LE Create Connection Cancel (0x08|0x000e) ncmd 1
-2012-05-07 11:21:44.764479 > HCI Event: LE Meta Event (0x3e) plen 19
-    LE Connection Complete
-      status 0x02 handle 0, role master
-      bdaddr 00:00:00:00:00:00 (Public)
-
-[14898.739425] [6603] hci_connect: hci0 dst 00:22:D0:10:13:EE
-[14898.739429] [6603] hci_conn_add: hci0 dst 00:22:D0:10:13:EE
-[14898.739434] [6603] hci_conn_init_sysfs: conn ffff880079f03000
-[14898.739440] [6603] hci_send_cmd: hci0 opcode 0x200d plen 25
-[14898.739443] [6603] hci_send_cmd: skb len 28
-[14898.739487] [6603] hci_chan_create: hci0 conn ffff880079f03000
-...
-[14938.860231] [55] hci_send_cmd: hci0 opcode 0x200e plen 0
-...
-[14938.876427] [55] hci_le_conn_complete_evt: hci0 status 2
-[14938.876433] [55] hci_conn_add: hci0 dst 00:00:00:00:00:00
-[14938.876439] [55] hci_conn_init_sysfs: conn ffff88007aeff800
-[14938.876454] [55] hci_send_to_control: len 14
-[14938.876470] [55] l2cap_connect_cfm: hcon ffff88007aeff800 bdaddr 00:00:00:00:00:00 status 2
-[14938.876474] [55] hci_conn_del: hci0 conn ffff88007aeff800 handle 0
+Only one outgoing LE connection attempt should be possible.
+hci_connect() will now return -EBUSY in case there's another pending
+outgoing connection.
 
 Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Acked-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_event.c |   22 +++++++++++++---------
- 1 file changed, 13 insertions(+), 9 deletions(-)
+ net/bluetooth/hci_conn.c |    5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index ac86b65..47656be 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3306,6 +3306,19 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	hci_dev_lock(hdev);
- 
-+	if (ev->status) {
-+		conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
-+		if (!conn)
-+			goto unlock;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 1458667b..2fcced3 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -483,6 +483,11 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 	if (type == LE_LINK) {
+ 		le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
+ 		if (!le) {
++			le = hci_conn_hash_lookup_state(hdev, LE_LINK,
++							BT_CONNECT);
++			if (le)
++				return ERR_PTR(-EBUSY);
 +
-+		mgmt_connect_failed(hdev, &conn->dst, conn->type,
-+				    conn->dst_type, ev->status);
-+		hci_proto_connect_cfm(conn, ev->status);
-+		conn->state = BT_CLOSED;
-+		hci_conn_del(conn);
-+		goto unlock;
-+	}
-+
- 	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &ev->bdaddr);
- 	if (!conn) {
- 		conn = hci_conn_add(hdev, LE_LINK, &ev->bdaddr);
-@@ -3318,15 +3331,6 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		conn->dst_type = ev->bdaddr_type;
- 	}
- 
--	if (ev->status) {
--		mgmt_connect_failed(hdev, &ev->bdaddr, conn->type,
--				    conn->dst_type, ev->status);
--		hci_proto_connect_cfm(conn, ev->status);
--		conn->state = BT_CLOSED;
--		hci_conn_del(conn);
--		goto unlock;
--	}
--
- 	if (!test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
- 		mgmt_device_connected(hdev, &ev->bdaddr, conn->type,
- 				      conn->dst_type, 0, NULL, 0, NULL);
+ 			le = hci_conn_add(hdev, LE_LINK, dst);
+ 			if (!le)
+ 				return ERR_PTR(-ENOMEM);
 -- 
 1.7.9.5
 
