@@ -1,64 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v3 00/14] client: Remove D-Bus agent
-Date: Wed, 30 May 2012 17:50:09 +0200
-Message-Id: <1338393023-29941-1-git-send-email-mikel.astiz.oss@gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 3/3] Bluetooth: Fix not removing hci_conn for failed LE connection
+Date: Wed, 30 May 2012 15:39:23 +0200
+Message-ID: <1338385163-10589-3-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1338385163-10589-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1338385163-10589-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+This patch changes way LE Connection Complete event with error status are
+handled. BDADDR returned in such event packet do not need to be valid and
+should not be used to search for existing hci_conn. Instead, any hci_conn
+with BT_CONNECT state should be matched since there can be only one
+pending LE outgoing connection at any time.
 
-Several modifications from previous version as suggested by Luiz, most significantly:
+If not handled properly, appriopriate hci_conn will not be removed and
+subsequent connection to given peer will try to reuse it without making
+actual connection attempt.
 
-* All transfers will now be exposed in D-Bus, so we need no additional flag in the internal session API. The overhead is not considered relevant.
+2012-05-07 11:21:39.133378 < HCI Command: LE Create Connection (0x08|0x000d) plen 25
+    bdaddr 00:22:D0:10:13:EE type 1
+2012-05-07 11:21:39.138774 > HCI Event: Command Status (0x0f) plen 4
+    LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
+2012-05-07 11:21:44.752854 < HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0
+2012-05-07 11:21:44.759475 > HCI Event: Command Complete (0x0e) plen 4
+    LE Create Connection Cancel (0x08|0x000e) ncmd 1
+2012-05-07 11:21:44.764479 > HCI Event: LE Meta Event (0x3e) plen 19
+    LE Connection Complete
+      status 0x02 handle 0, role master
+      bdaddr 00:00:00:00:00:00 (Public)
 
-* The D-Bus signal TransferAdded has been left out (patches v2 13/17, 14/17 and 15/17).
+[14898.739425] [6603] hci_connect: hci0 dst 00:22:D0:10:13:EE
+[14898.739429] [6603] hci_conn_add: hci0 dst 00:22:D0:10:13:EE
+[14898.739434] [6603] hci_conn_init_sysfs: conn ffff880079f03000
+[14898.739440] [6603] hci_send_cmd: hci0 opcode 0x200d plen 25
+[14898.739443] [6603] hci_send_cmd: skb len 28
+[14898.739487] [6603] hci_chan_create: hci0 conn ffff880079f03000
+...
+[14938.860231] [55] hci_send_cmd: hci0 opcode 0x200e plen 0
+...
+[14938.876427] [55] hci_le_conn_complete_evt: hci0 status 2
+[14938.876433] [55] hci_conn_add: hci0 dst 00:00:00:00:00:00
+[14938.876439] [55] hci_conn_init_sysfs: conn ffff88007aeff800
+[14938.876454] [55] hci_send_to_control: len 14
+[14938.876470] [55] l2cap_connect_cfm: hcon ffff88007aeff800 bdaddr 00:00:00:00:00:00 status 2
+[14938.876474] [55] hci_conn_del: hci0 conn ffff88007aeff800 handle 0
 
->From original cover letter:
+Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Acked-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ net/bluetooth/hci_event.c |   22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
 
-This patchset includes a second set of D-Bus changes as part of a bigger API rewrite in obex-client. The original API proposal started around 6 months ago ([1]) and it has later been discussed and modified several times.
-
-This second series focuses on the replacement of the D-Bus agent: the authorization part is entirely removed and the reporting part is now addressed using D-Bus signals. The resulting API is more BlueZ-style and easier to use.
-
-A third and last patchset is left out for later discussion (not proposed yet in the ML). These should extend the D-Bus API such that the transfer-initiating methods will return relevant information (D-Bus path + properties, to be discussed) about the created transfer object.
-
-This results in a transitional API problem regarding FileTransfer interface: once the agent is removed, and before the transfer path is reported, there is no proper way to get transfer notifications. This problem can be seen in patch v0 16/16, but hopefully it's acceptable during the API transition. The fix is not included here to keep a reasonable patchset size.
-Mikel Astiz (14):
-  client: Add D-Bus helper library
-  client-doc: Add progress property to transfer
-  client: Add progress property to transfer
-  client-doc: Add transfer event-reporting signals
-  client: Add transfer event-reporting signals
-  client-doc: Remove D-Bus agent
-  client: Use transfer owner instead of agent
-  client: Remove D-Bus agent
-  client: Remove unused functions in transfer API
-  client: Remove internal transfer progress report
-  client: Remove obsolete authentication code
-  client: Expose all transfers in D-Bus
-  client: Make FileTransfer.PutFile asynchronous
-  client-test: Remove agent from ftp-client
-
- Makefile.am        |    2 +-
- client/agent.c     |  252 -----------------------------------
- client/agent.h     |   43 ------
- client/dbus.c      |  256 +++++++++++++++++++++++++++++++++++
- client/dbus.h      |   66 +++++++++
- client/ftp.c       |   55 ++------
- client/session.c   |  374 ++++++----------------------------------------------
- client/session.h   |    4 -
- client/transfer.c  |  192 ++++++++++++++-------------
- client/transfer.h  |    8 +-
- doc/client-api.txt |   49 +------
- test/ftp-client    |   50 +------
- 12 files changed, 491 insertions(+), 860 deletions(-)
- delete mode 100644 client/agent.c
- delete mode 100644 client/agent.h
- create mode 100644 client/dbus.c
- create mode 100644 client/dbus.h
-
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index ac86b65..47656be 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3306,6 +3306,19 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	hci_dev_lock(hdev);
+ 
++	if (ev->status) {
++		conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
++		if (!conn)
++			goto unlock;
++
++		mgmt_connect_failed(hdev, &conn->dst, conn->type,
++				    conn->dst_type, ev->status);
++		hci_proto_connect_cfm(conn, ev->status);
++		conn->state = BT_CLOSED;
++		hci_conn_del(conn);
++		goto unlock;
++	}
++
+ 	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &ev->bdaddr);
+ 	if (!conn) {
+ 		conn = hci_conn_add(hdev, LE_LINK, &ev->bdaddr);
+@@ -3318,15 +3331,6 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		conn->dst_type = ev->bdaddr_type;
+ 	}
+ 
+-	if (ev->status) {
+-		mgmt_connect_failed(hdev, &ev->bdaddr, conn->type,
+-				    conn->dst_type, ev->status);
+-		hci_proto_connect_cfm(conn, ev->status);
+-		conn->state = BT_CLOSED;
+-		hci_conn_del(conn);
+-		goto unlock;
+-	}
+-
+ 	if (!test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
+ 		mgmt_device_connected(hdev, &ev->bdaddr, conn->type,
+ 				      conn->dst_type, 0, NULL, 0, NULL);
 -- 
-1.7.7.6
+1.7.9.5
 
