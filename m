@@ -2,39 +2,45 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 1/3] Bluetooth: Allow only one LE connection attempt
-Date: Wed, 30 May 2012 15:39:21 +0200
-Message-ID: <1338385163-10589-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 2/3] Bluetooth: Return proper mgmt state when LE pairing connection failed
+Date: Wed, 30 May 2012 15:39:22 +0200
+Message-ID: <1338385163-10589-2-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1338385163-10589-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1338385163-10589-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Only one outgoing LE connection attempt should be possible.
-hci_connect() will now return -EBUSY in case there's another pending
-outgoing connection.
+MGMT_STATUS_BUSY should be returned when LE pairing cannot be started due
+to another outgoing connection attempt is ongoing.
 
 Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 ---
- net/bluetooth/hci_conn.c |    5 +++++
- 1 file changed, 5 insertions(+)
+ net/bluetooth/mgmt.c |    9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 1458667b..2fcced3 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -483,6 +483,11 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 	if (type == LE_LINK) {
- 		le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
- 		if (!le) {
-+			le = hci_conn_hash_lookup_state(hdev, LE_LINK,
-+							BT_CONNECT);
-+			if (le)
-+				return ERR_PTR(-EBUSY);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 205574e..958f764 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1911,8 +1911,15 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	rp.addr.type = cp->addr.type;
+ 
+ 	if (IS_ERR(conn)) {
++		int status;
 +
- 			le = hci_conn_add(hdev, LE_LINK, dst);
- 			if (!le)
- 				return ERR_PTR(-ENOMEM);
++		if (PTR_ERR(conn) == -EBUSY)
++			status = MGMT_STATUS_BUSY;
++		else
++			status = MGMT_STATUS_CONNECT_FAILED;
++
+ 		err = cmd_complete(sk, hdev->id, MGMT_OP_PAIR_DEVICE,
+-				   MGMT_STATUS_CONNECT_FAILED, &rp,
++				   status, &rp,
+ 				   sizeof(rp));
+ 		goto unlock;
+ 	}
 -- 
 1.7.9.5
 
