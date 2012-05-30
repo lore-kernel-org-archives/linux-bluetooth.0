@@ -1,75 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 May 2012 10:55:03 +0300
+Date: Wed, 30 May 2012 10:50:08 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Steve Langasek <steve.langasek@canonical.com>
+To: Arik Nemtsov <arik@wizery.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/1] Update tests to be compatible with gi and python3
-Message-ID: <20120530075503.GI6539@x220>
-References: <20120525054425.GA10062@virgil.dodds.net>
+Subject: Re: [PATCH] attrib-server: allow SDP records for secondary GATT
+ services
+Message-ID: <20120530075008.GH6539@x220>
+References: <1338237948-6141-1-git-send-email-arik@wizery.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120525054425.GA10062@virgil.dodds.net>
+In-Reply-To: <1338237948-6141-1-git-send-email-arik@wizery.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steve,
+Hi Arik,
 
-On Thu, May 24, 2012, Steve Langasek wrote:
-> From: Steve Langasek <steve.langasek@canonical.com>
-> 
-> This patch makes the python tests source-compatible with python 3, while
-> leaving the interpreter at python 2 for now.
-> 
-> The tradeoff is that this source is no longer compatible with python
-> versions < 2.6, and requires gobject-introspection for the glib-based tests.
-> 
-> Signed-off-by: Steve Langasek <steve.langasek@canonical.com>
-
-We don't use signed-off-by for user space patches so please leave it out
-from the commit message.
-
+On Mon, May 28, 2012, Arik Nemtsov wrote:
+> It seems this is the correct way to discover such services that work
+> over BR/EDR (according to section 4.4 in the GATT specification).
 > ---
->  test/list-devices      |   30 ++++++++++---------
->  test/monitor-bluetooth |    6 ++--
->  test/simple-agent      |   41 +++++++++++++------------
->  test/simple-endpoint   |   12 ++++----
->  test/simple-service    |    8 +++--
->  test/test-adapter      |   52 ++++++++++++++++----------------
->  test/test-attrib       |   52 ++++++++++++++++----------------
->  test/test-audio        |    8 +++--
->  test/test-device       |   78 +++++++++++++++++++++++++-----------------------
->  test/test-discovery    |   16 +++++-----
->  test/test-health       |   62 +++++++++++++++++++-------------------
->  test/test-health-sink  |   24 ++++++++-------
->  test/test-input        |    8 +++--
->  test/test-manager      |   12 ++++----
->  test/test-nap          |    8 +++--
->  test/test-network      |   10 ++++---
->  test/test-oob          |   34 +++++++++++----------
->  test/test-proximity    |   14 +++++----
->  test/test-sap-server   |   64 ++++++++++++++++++++-------------------
->  test/test-serial       |   10 ++++---
->  test/test-serial-proxy |    6 ++--
->  test/test-service      |   14 +++++----
->  test/test-telephony    |   38 ++++++++++++-----------
->  test/test-thermometer  |   28 +++++++++--------
->  24 files changed, 342 insertions(+), 293 deletions(-)
+>  src/attrib-server.c |    9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 
-In general the patch looks ok, but unfortunately it doesn't apply
-cleanly:
-
-Applying: Update tests to be compatible with gi and python3
-/home/jh/src/bluez/.git/rebase-apply/patch:838: trailing whitespace.
- 
-/home/jh/src/bluez/.git/rebase-apply/patch:840: trailing whitespace.
- 
-fatal: 2 lines add whitespace errors.
-Patch failed at 0001 Update tests to be compatible with gi and python3
-
-Please fix this and resend. For the future you might want to add the
-following to your gitconfig:
-
-[apply]
-        whitespace = error
+Applied. Thanks.
 
 Johan
