@@ -1,47 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4FC5E94D.4040504@monom.org>
-Date: Wed, 30 May 2012 11:33:01 +0200
-From: Daniel Wagner <wagi@monom.org>
+Date: Wed, 30 May 2012 10:55:03 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Steve Langasek <steve.langasek@canonical.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/1] Update tests to be compatible with gi and python3
+Message-ID: <20120530075503.GI6539@x220>
+References: <20120525054425.GA10062@virgil.dodds.net>
 MIME-Version: 1.0
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v1 1/3] main: Add IngoreDUN configuration switch
-References: <1337853618-7261-1-git-send-email-wagi@monom.org> <1337853618-7261-2-git-send-email-wagi@monom.org> <20120524174145.GC10754@samus>
-In-Reply-To: <20120524174145.GC10754@samus>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120525054425.GA10062@virgil.dodds.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Steve,
 
-Sorry for the late response. Was away :)
-
-On 24.05.2012 19:41, Vinicius Costa Gomes wrote:
->> +
->> +# If a device supports both DUN and PAN at the same time, ignore the
->> +# DUN profile. Only PAN will be exposed through the D-Bus API in this
->> +# case. The default is true
->> +IgnoreDUN = true
+On Thu, May 24, 2012, Steve Langasek wrote:
+> From: Steve Langasek <steve.langasek@canonical.com>
 > 
-> I would prefer if this would be called something like "PreferPAN" (or
-> even "PreferPANoverDUN", but that sounds weird). I, at least, find it
-> easier to understand.
+> This patch makes the python tests source-compatible with python 3, while
+> leaving the interpreter at python 2 for now.
+> 
+> The tradeoff is that this source is no longer compatible with python
+> versions < 2.6, and requires gobject-introspection for the glib-based tests.
+> 
+> Signed-off-by: Steve Langasek <steve.langasek@canonical.com>
 
-Funny, the first version the flag was named "PreferPANoverDUN".
+We don't use signed-off-by for user space patches so please leave it out
+from the commit message.
 
-All other variables are kept short, that is why I used IgnoreDUN. If
-"PreferPANoverDUN" is acceptable, I rather named this way.
+> ---
+>  test/list-devices      |   30 ++++++++++---------
+>  test/monitor-bluetooth |    6 ++--
+>  test/simple-agent      |   41 +++++++++++++------------
+>  test/simple-endpoint   |   12 ++++----
+>  test/simple-service    |    8 +++--
+>  test/test-adapter      |   52 ++++++++++++++++----------------
+>  test/test-attrib       |   52 ++++++++++++++++----------------
+>  test/test-audio        |    8 +++--
+>  test/test-device       |   78 +++++++++++++++++++++++++-----------------------
+>  test/test-discovery    |   16 +++++-----
+>  test/test-health       |   62 +++++++++++++++++++-------------------
+>  test/test-health-sink  |   24 ++++++++-------
+>  test/test-input        |    8 +++--
+>  test/test-manager      |   12 ++++----
+>  test/test-nap          |    8 +++--
+>  test/test-network      |   10 ++++---
+>  test/test-oob          |   34 +++++++++++----------
+>  test/test-proximity    |   14 +++++----
+>  test/test-sap-server   |   64 ++++++++++++++++++++-------------------
+>  test/test-serial       |   10 ++++---
+>  test/test-serial-proxy |    6 ++--
+>  test/test-service      |   14 +++++----
+>  test/test-telephony    |   38 ++++++++++++-----------
+>  test/test-thermometer  |   28 +++++++++--------
+>  24 files changed, 342 insertions(+), 293 deletions(-)
 
-"PreferPAN" is not really correct in my opinion, because PAN will be
-always there just DUN will be filtered out.
+In general the patch looks ok, but unfortunately it doesn't apply
+cleanly:
 
-> And I am still thinking if it would be worth considering something more
-> complex, that would deal with cases like this in general. But as I don't
-> have any concrete proposal, I will stop here.
+Applying: Update tests to be compatible with gi and python3
+/home/jh/src/bluez/.git/rebase-apply/patch:838: trailing whitespace.
+ 
+/home/jh/src/bluez/.git/rebase-apply/patch:840: trailing whitespace.
+ 
+fatal: 2 lines add whitespace errors.
+Patch failed at 0001 Update tests to be compatible with gi and python3
 
-Yep, I was also thinking on something more general for policing. But
-without real use cases I would rather not try to solve something we
-don't have a problem yet.
+Please fix this and resend. For the future you might want to add the
+following to your gitconfig:
 
-thanks,
-daniel
+[apply]
+        whitespace = error
+
+Johan
