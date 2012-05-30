@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v3 09/14] client: Remove unused functions in transfer API
-Date: Wed, 30 May 2012 17:50:18 +0200
-Message-Id: <1338393023-29941-10-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v3 06/14] client-doc: Remove D-Bus agent
+Date: Wed, 30 May 2012 17:50:15 +0200
+Message-Id: <1338393023-29941-7-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338393023-29941-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338393023-29941-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,59 +12,84 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-After the removal of the agent these functions are not useful any more.
----
- client/transfer.c |   23 -----------------------
- client/transfer.h |    3 ---
- 2 files changed, 0 insertions(+), 26 deletions(-)
+The request confirmation from the agent is not really useful and the
+rest of the reporting is already reported by the transfer's signal-
+reporting.
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 0385321..1138aa6 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -753,29 +753,6 @@ int obc_transfer_get_contents(struct obc_transfer *transfer, char **contents,
- 	return 0;
- }
+The main benefit of this is that the API is simpler and the client apps
+do not have to register the agent, and can just listen to the relevant
+signals.
+---
+ doc/client-api.txt |   52 ----------------------------------------------------
+ 1 files changed, 0 insertions(+), 52 deletions(-)
+
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index 223ef9a..3c6a2e1 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -46,15 +46,6 @@ Methods		dict GetProperties()
  
--void obc_transfer_set_name(struct obc_transfer *transfer, const char *name)
--{
--	g_free(transfer->name);
--	transfer->name = g_strdup(name);
--}
--
--int obc_transfer_set_filename(struct obc_transfer *transfer,
--					const char *filename)
--{
--	int err;
--
--	err = rename(transfer->filename, filename);
--	if (err < 0) {
--		error("rename(): %s (%d)", strerror(errno), errno);
--		return -errno;
--	}
--
--	g_free(transfer->filename);
--	transfer->filename = g_strdup(filename);
--
--	return 0;
--}
--
- const char *obc_transfer_get_path(struct obc_transfer *transfer)
- {
- 	return transfer->path;
-diff --git a/client/transfer.h b/client/transfer.h
-index a65a2ed..bfa166d 100644
---- a/client/transfer.h
-+++ b/client/transfer.h
-@@ -56,8 +56,5 @@ const void *obc_transfer_get_params(struct obc_transfer *transfer,
- int obc_transfer_get_contents(struct obc_transfer *transfer, char **contents,
- 								size_t *size);
+ 			Returns all properties for the session.
  
--void obc_transfer_set_name(struct obc_transfer *transfer, const char *name);
--int obc_transfer_set_filename(struct obc_transfer *transfer,
--					const char *filename);
- const char *obc_transfer_get_path(struct obc_transfer *transfer);
- gint64 obc_transfer_get_size(struct obc_transfer *transfer);
+-		void AssignAgent(object agent)
+-
+-			Assign an OBEX agent to this session. This allows
+-			detailed progress reports about the transactions.
+-
+-		void ReleaseAgent(object agent)
+-
+-			Release a previously assigned OBEX agent.
+-
+ 		string GetCapabilities()
+ 
+ 			Get remote device capabilities.
+@@ -330,46 +321,3 @@ Signals		PropertyChanged(string name, variant value)
+ 
+ 			Informs that the transfer has been terminated because
+ 			of some error.
+-
+-Agent hierarchy
+-===============
+-
+-Service		unique name
+-Interface	org.openobex.Agent
+-Object path	freely definable
+-
+-Methods		void Release()
+-
+-			This method gets called when the service daemon
+-			unregisters the agent. An agent can use it to do
+-			cleanup tasks. There is no need to unregister the
+-			agent, because when this method gets called it has
+-			already been unregistered.
+-
+-		string Request(object transfer)
+-
+-			Accept or reject a new transfer (client and server)
+-			and provide the filename for it.
+-
+-			In case of incoming transfers it is the filename
+-			where to store the file and for outgoing transfers
+-			it is the filename to show the remote device. If left
+-			empty it will be calculated automatically.
+-
+-			Possible errors: org.openobex.Error.Rejected
+-					 org.openobex.Error.Canceled
+-
+-		void Progress(object transfer, uint64 transferred)
+-
+-			Progress within the transfer has been made. The
+-			number of transferred bytes is given as second
+-			argument for convenience.
+-
+-		void Complete(object transfer)
+-
+-			Informs that the transfer has completed successfully.
+-
+-		void Error(object transfer, string message)
+-
+-			Informs that the transfer has been terminated because
+-			of some error.
 -- 
 1.7.7.6
 
