@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v3 07/14] client: Use transfer owner instead of agent
-Date: Wed, 30 May 2012 17:50:16 +0200
-Message-Id: <1338393023-29941-8-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v3 14/14] client-test: Remove agent from ftp-client
+Date: Wed, 30 May 2012 17:50:23 +0200
+Message-Id: <1338393023-29941-15-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338393023-29941-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338393023-29941-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,103 +12,108 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The security checks in the transfers' D-Bus API will consider check for
-the transfer owner's path (session owner) instead of the agent path.
+Remove the use of the agent in the test script. Most of the
+functionality is still there with the exception of progress reporting,
+which is not possible due to some transitional limitations in the D-Bus
+API.
 ---
- client/session.c  |    9 ++-------
- client/transfer.c |   10 +++++-----
- client/transfer.h |    2 +-
- 3 files changed, 8 insertions(+), 13 deletions(-)
+ test/ftp-client |   50 +++++++-------------------------------------------
+ 1 files changed, 7 insertions(+), 43 deletions(-)
 
-diff --git a/client/session.c b/client/session.c
-index 94256b4..9c4c9f0 100644
---- a/client/session.c
-+++ b/client/session.c
-@@ -793,7 +793,6 @@ guint obc_session_queue(struct obc_session *session,
- 				GError **err)
- {
- 	struct pending_request *p;
--	const char *agent;
- 	int perr;
+diff --git a/test/ftp-client b/test/ftp-client
+index 825f591..8421ade 100755
+--- a/test/ftp-client
++++ b/test/ftp-client
+@@ -9,42 +9,6 @@ import dbus.mainloop.glib
+ import os.path
+ from optparse import OptionParser
  
- 	if (session->obex == NULL) {
-@@ -803,12 +802,8 @@ guint obc_session_queue(struct obc_session *session,
- 		return 0;
- 	}
- 
--	if (session->agent)
--		agent = obc_agent_get_name(session->agent);
--	else
--		agent = NULL;
+-class Agent(dbus.service.Object):
+-    def __init__(self, conn=None, obj_path=None, verbose=False):
+-        dbus.service.Object.__init__(self, conn, obj_path)
+-        self.verbose = verbose
 -
--	if (!obc_transfer_register(transfer, session->conn, agent, err)) {
-+	if (!obc_transfer_register(transfer, session->conn, session->owner,
-+									err)) {
- 		obc_transfer_unregister(transfer);
- 		return 0;
- 	}
-diff --git a/client/transfer.c b/client/transfer.c
-index 6bf6591..0385321 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -66,7 +66,7 @@ struct obc_transfer {
- 	struct transfer_callback *callback;
- 	DBusConnection *conn;
- 	DBusMessage *msg;
--	char *agent;		/* Transfer agent */
-+	char *owner;		/* Transfer initiator */
- 	char *path;		/* Transfer path */
- 	gchar *filename;	/* Transfer file location */
- 	char *name;		/* Transfer object name */
-@@ -169,7 +169,7 @@ static DBusMessage *obc_transfer_cancel(DBusConnection *connection,
- 	const gchar *sender;
+-    @dbus.service.method("org.openobex.Agent",
+-                    in_signature="o", out_signature="s")
+-    def Request(self, path):
+-        return ""
+-
+-    @dbus.service.method("org.openobex.Agent",
+-                    in_signature="ot", out_signature="")
+-    def Progress(self, path, transferred):
+-        if self.verbose:
+-            print "Transfer progress (%d bytes)" % (transferred)
+-        return
+-
+-    @dbus.service.method("org.openobex.Agent",
+-                    in_signature="o", out_signature="")
+-    def Complete(self, path):
+-        if self.verbose:
+-            print "Transfer finished"
+-        mainloop.quit()
+-
+-    @dbus.service.method("org.openobex.Agent",
+-                    in_signature="os", out_signature="")
+-    def Error(self, path, error):
+-        print "Transfer finished with an error: %s" % (error)
+-        mainloop.quit()
+-
+-    @dbus.service.method("org.openobex.Agent",
+-                    in_signature="", out_signature="")
+-    def Release(self):
+-        mainloop.quit()
+-
+-
+ def parse_options():
+     parser.add_option("-d", "--device", dest="device",
+                       help="Device to connect", metavar="DEVICE")
+@@ -74,6 +38,11 @@ def error(err):
+ def void_reply():
+     pass
  
- 	sender = dbus_message_get_sender(message);
--	if (g_strcmp0(transfer->agent, sender) != 0)
-+	if (g_strcmp0(transfer->owner, sender) != 0)
- 		return g_dbus_create_error(message,
- 				"org.openobex.Error.NotAuthorized",
- 				"Not Authorized");
-@@ -236,7 +236,7 @@ static void obc_transfer_free(struct obc_transfer *transfer)
- 		g_obex_unref(transfer->obex);
++def transfer_complete():
++    if options.verbose:
++        print "Transfer finished"
++    mainloop.quit()
++
+ def change_folder(session, new_dir):
+     for node in new_dir.split("/"):
+         session.ChangeFolder(node)
+@@ -88,13 +57,13 @@ def list_folder(session):
+ def put_file(session, filename):
+     session.PutFile(os.path.abspath(filename),
+                     os.path.basename(filename),
+-                    reply_handler=void_reply,
++                    reply_handler=transfer_complete,
+                     error_handler=error)
  
- 	g_free(transfer->callback);
--	g_free(transfer->agent);
-+	g_free(transfer->owner);
- 	g_free(transfer->filename);
- 	g_free(transfer->name);
- 	g_free(transfer->type);
-@@ -262,7 +262,7 @@ static struct obc_transfer *obc_transfer_create(guint8 op,
+ def get_file(session, filename):
+     session.GetFile(os.path.abspath(filename),
+                     os.path.basename(filename),
+-                    reply_handler=void_reply,
++                    reply_handler=transfer_complete,
+                     error_handler=error)
  
- gboolean obc_transfer_register(struct obc_transfer *transfer,
- 						DBusConnection *conn,
--						const char *agent,
-+						const char *owner,
- 						GError **err)
- {
- 	/* for OBEX specific mime types we don't need to register a transfer */
-@@ -271,7 +271,7 @@ gboolean obc_transfer_register(struct obc_transfer *transfer,
- 			strncmp(transfer->type, "x-bt/", 5) == 0))
- 		goto done;
+ def remove_file(session, filename):
+@@ -129,9 +98,6 @@ if  __name__ == '__main__':
+     bus = dbus.SessionBus()
+     mainloop = gobject.MainLoop()
  
--	transfer->agent = g_strdup(agent);
-+	transfer->owner = g_strdup(owner);
+-    path = "/test/agent"
+-    agent = Agent(bus, path, options.verbose)
+-
+     client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
+                             "org.openobex.Client")
  
- 	transfer->path = g_strdup_printf("%s/transfer%ju",
- 			TRANSFER_BASEPATH, counter++);
-diff --git a/client/transfer.h b/client/transfer.h
-index bf40a4c..a65a2ed 100644
---- a/client/transfer.h
-+++ b/client/transfer.h
-@@ -36,7 +36,7 @@ struct obc_transfer *obc_transfer_put(const char *type, const char *name,
+@@ -140,8 +106,6 @@ if  __name__ == '__main__':
+     session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+                  "org.openobex.Session")
  
- gboolean obc_transfer_register(struct obc_transfer *transfer,
- 					DBusConnection *conn,
--					const char *agent,
-+					const char *owner,
- 					GError **err);
+-    session.AssignAgent(path)
+-
+     ftp = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+                  "org.openobex.FileTransfer")
  
- void obc_transfer_unregister(struct obc_transfer *transfer);
 -- 
 1.7.7.6
 
