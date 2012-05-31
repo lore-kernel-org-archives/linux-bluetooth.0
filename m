@@ -1,63 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: Fix compile warning in l2cap_core.c
-Date: Thu, 31 May 2012 20:39:16 -0300
-Message-Id: <1338507556-10920-1-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH] Bluetooth: Filter duplicated reports in LE scan
+Date: Thu, 31 May 2012 20:01:41 -0300
+Message-Id: <1338505301-25384-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes the following warning reported by gcc 4.7.0:
+This patch enables filtering duplicated advertising reports during
+LE scan.
 
-net/bluetooth/l2cap_core.c: In function 'l2cap_config_rsp':
-net/bluetooth/l2cap_core.c:3302:13: warning: 'rfc.max_pdu_size' may be used uninitialized in this function [-Wmaybe-uninitialized]
-net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.max_pdu_size' was declared here
-net/bluetooth/l2cap_core.c:3298:25: warning: 'rfc.monitor_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
-net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.monitor_timeout' was declared here
-net/bluetooth/l2cap_core.c:3297:25: warning: 'rfc.retrans_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
-net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.retrans_timeout' was declared here
-net/bluetooth/l2cap_core.c:3295:2: warning: 'rfc.mode' may be used uninitialized in this function [-Wmaybe-uninitialized]
-net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.mode' was declared here
+Some LE devices advertise using very small intervals generating lots
+of equal advertising report events to the host. Each event generates
+a mgmt_device_found event which is copied to userspace.
+
+Enabling this feature, duplicated advertising reports are filtered
+at controller's link layer. This way, the controller doesn't wake up
+the host to report duplicated advertising reports and, consequently,
+less data is copied to userspace.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/l2cap_core.c |   16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ net/bluetooth/hci_core.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f9bffe3..6df27cd 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3270,6 +3270,14 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
- 	if ((chan->mode != L2CAP_MODE_ERTM) && (chan->mode != L2CAP_MODE_STREAMING))
- 		return;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 979556a..cf39e95 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1526,6 +1526,7 @@ static void le_scan_enable_req(struct hci_dev *hdev, unsigned long opt)
  
-+	/* Use sane default values in case a misbehaving remote device
-+	 * do not send an RFC option.
-+	 */
-+	rfc.mode = chan->mode;
-+	rfc.retrans_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
-+	rfc.monitor_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
-+	rfc.max_pdu_size = cpu_to_le16(chan->imtu);
-+
- 	while (len >= L2CAP_CONF_OPT_SIZE) {
- 		len -= l2cap_get_conf_opt(&rsp, &type, &olen, &val);
+ 	memset(&cp, 0, sizeof(cp));
+ 	cp.enable = 1;
++	cp.filter_dup = 1;
  
-@@ -3281,14 +3289,6 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
- 		}
- 	}
- 
--	/* Use sane default values in case a misbehaving remote device
--	 * did not send an RFC option.
--	 */
--	rfc.mode = chan->mode;
--	rfc.retrans_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
--	rfc.monitor_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
--	rfc.max_pdu_size = cpu_to_le16(chan->imtu);
--
- 	BT_ERR("Expected RFC option was not found, using defaults");
- 
- done:
+ 	hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+ }
 -- 
 1.7.10.2
 
