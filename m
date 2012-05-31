@@ -1,33 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 31 May 2012 16:58:34 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH -v3 1/2] Bluetooth: Create function to return the ERTM
- header size
-Message-ID: <20120531135834.GA28198@x220.ger.corp.intel.com>
-References: <1338308957-17282-1-git-send-email-gustavo@padovan.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338308957-17282-1-git-send-email-gustavo@padovan.org>
+From: Daniel Wagner <wagi@monom.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Daniel Wagner <daniel.wagner@bmw-carit.de>
+Subject: [PATCH v3 04/14] deviceinfo: Move UUID string definition to lib
+Date: Thu, 31 May 2012 15:43:28 +0200
+Message-Id: <1338471818-20894-5-git-send-email-wagi@monom.org>
+In-Reply-To: <1338471818-20894-1-git-send-email-wagi@monom.org>
+References: <1338471818-20894-1-git-send-email-wagi@monom.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+From: Daniel Wagner <daniel.wagner@bmw-carit.de>
 
-On Tue, May 29, 2012, Gustavo Padovan wrote:
-> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> 
-> Simplify the handling of different ERTM header size. We were the same
-> check in some places of the code, and more is expected to come, so just
-> replace them with a function.
-> 
-> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> ---
->  net/bluetooth/l2cap_core.c |   25 +++++++++++--------------
->  1 file changed, 11 insertions(+), 14 deletions(-)
+---
+ deviceinfo/deviceinfo.c |    2 --
+ deviceinfo/manager.c    |    2 --
+ lib/uuid.h              |    3 +++
+ 3 files changed, 3 insertions(+), 4 deletions(-)
 
-Both patches have been applied to bluetooth-next. Thanks.
+diff --git a/deviceinfo/deviceinfo.c b/deviceinfo/deviceinfo.c
+index 5dd9293..8c3af93 100644
+--- a/deviceinfo/deviceinfo.c
++++ b/deviceinfo/deviceinfo.c
+@@ -37,8 +37,6 @@
+ #include "log.h"
+ #include "deviceinfo.h"
+ 
+-#define PNPID_UUID		"00002a50-0000-1000-8000-00805f9b34fb"
+-
+ struct deviceinfo {
+ 	struct btd_device	*dev;		/* Device reference */
+ 	GAttrib			*attrib;	/* GATT connection */
+diff --git a/deviceinfo/manager.c b/deviceinfo/manager.c
+index c2378c2..1d59918 100644
+--- a/deviceinfo/manager.c
++++ b/deviceinfo/manager.c
+@@ -32,8 +32,6 @@
+ #include "deviceinfo.h"
+ #include "manager.h"
+ 
+-#define DEVICE_INFORMATION_UUID		"0000180a-0000-1000-8000-00805f9b34fb"
+-
+ static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
+ {
+ 	const struct gatt_primary *prim = a;
+diff --git a/lib/uuid.h b/lib/uuid.h
+index 848baed..713075e 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -53,6 +53,9 @@ extern "C" {
+ #define GN_UUID			"00001117-0000-1000-8000-00805f9b34fb"
+ #define BNEP_SVC_UUID		"0000000f-0000-1000-8000-00805f9b34fb"
+ 
++#define PNPID_UUID		"00002a50-0000-1000-8000-00805f9b34fb"
++#define DEVICE_INFORMATION_UUID	"0000180a-0000-1000-8000-00805f9b34fb"
++
+ typedef struct {
+ 	enum {
+ 		BT_UUID_UNSPEC = 0,
+-- 
+1.7.10.130.g36e6c
 
-Johan
