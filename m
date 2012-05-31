@@ -1,41 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 31 May 2012 10:33:10 -0300
+Date: Thu, 31 May 2012 10:27:00 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Bluetooth: Change default MTU for L2CAP ATT channel
-Message-ID: <20120531133310.GO18069@joana>
-References: <1338401329-31429-1-git-send-email-andre.guedes@openbossa.org>
+Subject: Re: [PATCH trivial 3/3] Bluetooth: Make l2cap_att_channel return void
+Message-ID: <20120531132700.GN18069@joana>
+References: <1338452337-22618-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1338452337-22618-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338401329-31429-1-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1338452337-22618-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Andrei,
 
-* Andre Guedes <andre.guedes@openbossa.org> [2012-05-30 15:08:47 -0300]:
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-05-31 11:18:57 +0300]:
 
-> This patch changes the default MTU value for L2CAP ATT fixed channel
-> to L2CAP_DEFAULT_MTU (672 octets).
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Differently from others L2CAP channels, in L2CAP ATT fixed channel
-> there is no MTU negotiation. The MTU value for that channel is up to
-> the L2CAP implementation. The only restriction in L2CAP spec is the
-> MTU value must not be less than 23 octets.
+> l2cap_att_channel always returns 0 which is not used.
 > 
-> At ATT protocol level (on top of L2CAP), we have the ATT_MTU which
-> defines the maximum size of any ATT message sent between client and
-> server. GATT profile defines ATT_MTU default value to 23 octets. If
-> a GATT based profile wants to use ATT_MTU greater than 23 octets
-> (e.g. HID over GATT profile), it should negotiate a new value by
-> executing the GATT Exchange MTU sub-procedure.
-> 
-> Thus, in order to support any value of ATT_MTU negotiated at ATT
-> protocol level, our L2CAP implementation should have L2CAP ATT
-> fixed channel MTU equal or greater than ATT_MAX_MTU (512 octets).
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/l2cap_core.c |    8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
 
-Shouldn't we define a L2CAP_LE_MAX_MTU then and set its value to 512?
-If we will never have anything greater than 512 octets why allow it?
+All 3 patches have been applied to bluetooth-next. Thanks.
 
 	Gustavo
