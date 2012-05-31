@@ -1,39 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 31 May 2012 10:26:06 -0300
+Date: Thu, 31 May 2012 10:22:05 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, mathewm@codeaurora.org
-Subject: Re: [PATCH] Bluetooth: A2MP: Do not reference hci_conn
-Message-ID: <20120531132606.GM18069@joana>
-References: <1338451297-20109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 4/5] Bluetooth: Simplify a the connection type handling
+Message-ID: <20120531132205.GL18069@joana>
+References: <1338423620-32578-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1338423620-32578-4-git-send-email-vinicius.gomes@openbossa.org>
+ <20120531073914.GB17461@aemeltch-MOBL1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338451297-20109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <20120531073914.GB17461@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-05-31 11:01:37 +0300]:
+* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-05-31 10:39:16 +0300]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Hi Vinicius,
 > 
-> Make A2MP channel special channel which do not reference hci_conn.
-> This prevents from keeping ACL connection open when all L2CAP
-> channels got closed.
+> On Wed, May 30, 2012 at 09:20:19PM -0300, Vinicius Costa Gomes wrote:
+> > Now that we have separate ways of doing connections for each link type,
+> > we can do better than an "if" statement to handle each link type.
+> > 
+> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> > ---
+> >  net/bluetooth/hci_conn.c |   11 +++++++----
+> >  1 file changed, 7 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> > index 320cc5d..8848a1e 100644
+> > --- a/net/bluetooth/hci_conn.c
+> > +++ b/net/bluetooth/hci_conn.c
+> > @@ -563,13 +563,16 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+> >  {
+> >  	BT_DBG("%s dst %s", hdev->name, batostr(dst));
+> >  
+> > -	if (type == LE_LINK)
+> > +	switch (type) {
+> > +	case LE_LINK:
+> >  		return add_le_conn(hdev, dst, dst_type, sec_level, auth_type);
+> > -
+> > -	if (type == ACL_LINK)
+> > +	case ACL_LINK:
+> >  		return add_acl_conn(hdev, dst, sec_level, auth_type);
+> > +	case SCO_LINK:
+> > +		return add_sco_conn(hdev, dst, sec_level, auth_type);
 > 
-> hci_conn_hold and hci_conn_put are not reference counts on the
-> hci_conn structure in the typical way.  They are reference counts for
-> the ACL.  When you do the last hci_conn_put, the ACL is disconnected
-> after a timeout.
-> 
-> Reported-by: Mat Martineau <mathewm@codeaurora.org>
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/a2mp.c       |    2 --
->  net/bluetooth/l2cap_core.c |    4 +++-
->  2 files changed, 3 insertions(+), 3 deletions(-)
+> The patches looks OK but somehow I do not like much returns in switch.
+> Some parsers will notice missing breaks which are not needed here...
 
-Patch has been applied to bluetooth-next, thanks.
+Use return here seems ok to me, I just want that these functions gets a hci_
+prefix.
 
 	Gustavo
