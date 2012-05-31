@@ -1,58 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 31 May 2012 10:22:05 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/5] Bluetooth: Simplify a the connection type handling
-Message-ID: <20120531132205.GL18069@joana>
-References: <1338423620-32578-1-git-send-email-vinicius.gomes@openbossa.org>
- <1338423620-32578-4-git-send-email-vinicius.gomes@openbossa.org>
- <20120531073914.GB17461@aemeltch-MOBL1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120531073914.GB17461@aemeltch-MOBL1>
+In-Reply-To: <1338393023-29941-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1338393023-29941-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Thu, 31 May 2012 16:22:09 +0300
+Message-ID: <CABBYNZJsznaHcBrpnqLESvHmP_BwyyVhnruJ3afcn33+WZbtmw@mail.gmail.com>
+Subject: Re: [PATCH obexd v3 00/14] client: Remove D-Bus agent
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Mikel,
 
-* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-05-31 10:39:16 +0300]:
+On Wed, May 30, 2012 at 6:50 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>
+> Several modifications from previous version as suggested by Luiz, most significantly:
+>
+> * All transfers will now be exposed in D-Bus, so we need no additional flag in the internal session API. The overhead is not considered relevant.
+>
+> * The D-Bus signal TransferAdded has been left out (patches v2 13/17, 14/17 and 15/17).
+>
+> From original cover letter:
+>
+> This patchset includes a second set of D-Bus changes as part of a bigger API rewrite in obex-client. The original API proposal started around 6 months ago ([1]) and it has later been discussed and modified several times.
+>
+> This second series focuses on the replacement of the D-Bus agent: the authorization part is entirely removed and the reporting part is now addressed using D-Bus signals. The resulting API is more BlueZ-style and easier to use.
+>
+> A third and last patchset is left out for later discussion (not proposed yet in the ML). These should extend the D-Bus API such that the transfer-initiating methods will return relevant information (D-Bus path + properties, to be discussed) about the created transfer object.
+>
+> This results in a transitional API problem regarding FileTransfer interface: once the agent is removed, and before the transfer path is reported, there is no proper way to get transfer notifications. This problem can be seen in patch v0 16/16, but hopefully it's acceptable during the API transition. The fix is not included here to keep a reasonable patchset size.
+> Mikel Astiz (14):
+>  client: Add D-Bus helper library
+>  client-doc: Add progress property to transfer
+>  client: Add progress property to transfer
+>  client-doc: Add transfer event-reporting signals
+>  client: Add transfer event-reporting signals
+>  client-doc: Remove D-Bus agent
+>  client: Use transfer owner instead of agent
+>  client: Remove D-Bus agent
+>  client: Remove unused functions in transfer API
+>  client: Remove internal transfer progress report
+>  client: Remove obsolete authentication code
+>  client: Expose all transfers in D-Bus
+>  client: Make FileTransfer.PutFile asynchronous
+>  client-test: Remove agent from ftp-client
+>
+>  Makefile.am        |    2 +-
+>  client/agent.c     |  252 -----------------------------------
+>  client/agent.h     |   43 ------
+>  client/dbus.c      |  256 +++++++++++++++++++++++++++++++++++
+>  client/dbus.h      |   66 +++++++++
+>  client/ftp.c       |   55 ++------
+>  client/session.c   |  374 ++++++----------------------------------------------
+>  client/session.h   |    4 -
+>  client/transfer.c  |  192 ++++++++++++++-------------
+>  client/transfer.h  |    8 +-
+>  doc/client-api.txt |   49 +------
+>  test/ftp-client    |   50 +------
+>  12 files changed, 491 insertions(+), 860 deletions(-)
+>  delete mode 100644 client/agent.c
+>  delete mode 100644 client/agent.h
+>  create mode 100644 client/dbus.c
+>  create mode 100644 client/dbus.h
+>
+> --
 
-> Hi Vinicius,
-> 
-> On Wed, May 30, 2012 at 09:20:19PM -0300, Vinicius Costa Gomes wrote:
-> > Now that we have separate ways of doing connections for each link type,
-> > we can do better than an "if" statement to handle each link type.
-> > 
-> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> > ---
-> >  net/bluetooth/hci_conn.c |   11 +++++++----
-> >  1 file changed, 7 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > index 320cc5d..8848a1e 100644
-> > --- a/net/bluetooth/hci_conn.c
-> > +++ b/net/bluetooth/hci_conn.c
-> > @@ -563,13 +563,16 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
-> >  {
-> >  	BT_DBG("%s dst %s", hdev->name, batostr(dst));
-> >  
-> > -	if (type == LE_LINK)
-> > +	switch (type) {
-> > +	case LE_LINK:
-> >  		return add_le_conn(hdev, dst, dst_type, sec_level, auth_type);
-> > -
-> > -	if (type == ACL_LINK)
-> > +	case ACL_LINK:
-> >  		return add_acl_conn(hdev, dst, sec_level, auth_type);
-> > +	case SCO_LINK:
-> > +		return add_sco_conn(hdev, dst, sec_level, auth_type);
-> 
-> The patches looks OK but somehow I do not like much returns in switch.
-> Some parsers will notice missing breaks which are not needed here...
+All 14 patches are now upstream.
 
-Use return here seems ok to me, I just want that these functions gets a hci_
-prefix.
 
-	Gustavo
+-- 
+Luiz Augusto von Dentz
