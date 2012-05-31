@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Daniel Wagner <wagi@monom.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Daniel Wagner <daniel.wagner@bmw-carit.de>
-Subject: [PATCH v3 03/14] network: Move UUID string definition to lib
-Date: Thu, 31 May 2012 15:43:27 +0200
-Message-Id: <1338471818-20894-4-git-send-email-wagi@monom.org>
+Subject: [PATCH v3 07/14] thermometer: Move UUID string definition to lib
+Date: Thu, 31 May 2012 15:43:31 +0200
+Message-Id: <1338471818-20894-8-git-send-email-wagi@monom.org>
 In-Reply-To: <1338471818-20894-1-git-send-email-wagi@monom.org>
 References: <1338471818-20894-1-git-send-email-wagi@monom.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,81 +13,57 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Daniel Wagner <daniel.wagner@bmw-carit.de>
 
 ---
- lib/uuid.h        |    5 +++++
- network/common.c  |    1 +
- network/common.h  |    5 -----
- network/manager.c |    1 +
- network/server.c  |    1 +
- 5 files changed, 8 insertions(+), 5 deletions(-)
+ lib/uuid.h                |    6 ++++++
+ thermometer/manager.c     |    2 --
+ thermometer/thermometer.c |    5 -----
+ 3 files changed, 6 insertions(+), 7 deletions(-)
 
 diff --git a/lib/uuid.h b/lib/uuid.h
-index a44426a..848baed 100644
+index 71af5ae..d47a6af 100644
 --- a/lib/uuid.h
 +++ b/lib/uuid.h
-@@ -48,6 +48,11 @@ extern "C" {
- #define AVRCP_REMOTE_UUID	"0000110e-0000-1000-8000-00805f9b34fb"
- #define AVRCP_TARGET_UUID	"0000110c-0000-1000-8000-00805f9b34fb"
+@@ -63,6 +63,12 @@ extern "C" {
  
-+#define PANU_UUID		"00001115-0000-1000-8000-00805f9b34fb"
-+#define NAP_UUID		"00001116-0000-1000-8000-00805f9b34fb"
-+#define GN_UUID			"00001117-0000-1000-8000-00805f9b34fb"
-+#define BNEP_SVC_UUID		"0000000f-0000-1000-8000-00805f9b34fb"
+ #define SAP_UUID		"0000112D-0000-1000-8000-00805f9b34fb"
+ 
++#define HEALTH_THERMOMETER_UUID		"00001809-0000-1000-8000-00805f9b34fb"
++#define TEMPERATURE_MEASUREMENT_UUID	"00002a1c-0000-1000-8000-00805f9b34fb"
++#define TEMPERATURE_TYPE_UUID		"00002a1d-0000-1000-8000-00805f9b34fb"
++#define INTERMEDIATE_TEMPERATURE_UUID	"00002a1e-0000-1000-8000-00805f9b34fb"
++#define MEASUREMENT_INTERVAL_UUID	"00002a21-0000-1000-8000-00805f9b34fb"
 +
  typedef struct {
  	enum {
  		BT_UUID_UNSPEC = 0,
-diff --git a/network/common.c b/network/common.c
-index c498c25..4704072 100644
---- a/network/common.c
-+++ b/network/common.c
-@@ -39,6 +39,7 @@
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/l2cap.h>
- #include <bluetooth/bnep.h>
-+#include <bluetooth/uuid.h>
+diff --git a/thermometer/manager.c b/thermometer/manager.c
+index 8982beb..3d5452b 100644
+--- a/thermometer/manager.c
++++ b/thermometer/manager.c
+@@ -32,8 +32,6 @@
+ #include "thermometer.h"
+ #include "manager.h"
  
- #include <glib.h>
- 
-diff --git a/network/common.h b/network/common.h
-index fefb754..cb1f08a 100644
---- a/network/common.h
-+++ b/network/common.h
-@@ -21,11 +21,6 @@
-  *
-  */
- 
--#define PANU_UUID	"00001115-0000-1000-8000-00805f9b34fb"
--#define NAP_UUID	"00001116-0000-1000-8000-00805f9b34fb"
--#define GN_UUID		"00001117-0000-1000-8000-00805f9b34fb"
--#define BNEP_SVC_UUID	"0000000f-0000-1000-8000-00805f9b34fb"
+-#define HEALTH_THERMOMETER_UUID		"00001809-0000-1000-8000-00805f9b34fb"
 -
- int bnep_init(void);
- int bnep_cleanup(void);
+ static DBusConnection *connection = NULL;
  
-diff --git a/network/manager.c b/network/manager.c
-index dd0f311..7fcd8f0 100644
---- a/network/manager.c
-+++ b/network/manager.c
-@@ -28,6 +28,7 @@
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/bnep.h>
- #include <bluetooth/sdp.h>
-+#include <bluetooth/uuid.h>
+ static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
+diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
+index 4df9d2c..85f0811 100644
+--- a/thermometer/thermometer.c
++++ b/thermometer/thermometer.c
+@@ -41,11 +41,6 @@
  
- #include <glib.h>
- #include <gdbus.h>
-diff --git a/network/server.c b/network/server.c
-index e39769a..480c7e2 100644
---- a/network/server.c
-+++ b/network/server.c
-@@ -34,6 +34,7 @@
- #include <bluetooth/bnep.h>
- #include <bluetooth/sdp.h>
- #include <bluetooth/sdp_lib.h>
-+#include <bluetooth/uuid.h>
- #include <netinet/in.h>
+ #define THERMOMETER_INTERFACE "org.bluez.Thermometer"
  
- #include <glib.h>
+-#define TEMPERATURE_MEASUREMENT_UUID	"00002a1c-0000-1000-8000-00805f9b34fb"
+-#define TEMPERATURE_TYPE_UUID		"00002a1d-0000-1000-8000-00805f9b34fb"
+-#define INTERMEDIATE_TEMPERATURE_UUID	"00002a1e-0000-1000-8000-00805f9b34fb"
+-#define MEASUREMENT_INTERVAL_UUID	"00002a21-0000-1000-8000-00805f9b34fb"
+-
+ /* Temperature measurement flag fields */
+ #define TEMP_UNITS		0x01
+ #define TEMP_TIME_STAMP		0x02
 -- 
 1.7.10.130.g36e6c
 
