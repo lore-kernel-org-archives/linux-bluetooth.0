@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Daniel Wagner <wagi@monom.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Daniel Wagner <daniel.wagner@bmw-carit.de>
-Subject: [PATCH v3 10/14] input: Move UUID string definition to lib
-Date: Thu, 31 May 2012 15:43:34 +0200
-Message-Id: <1338471818-20894-11-git-send-email-wagi@monom.org>
+Subject: [PATCH v3 05/14] proximity: Move UUID string definition to lib
+Date: Thu, 31 May 2012 15:43:29 +0200
+Message-Id: <1338471818-20894-6-git-send-email-wagi@monom.org>
 In-Reply-To: <1338471818-20894-1-git-send-email-wagi@monom.org>
 References: <1338471818-20894-1-git-send-email-wagi@monom.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,77 +13,55 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Daniel Wagner <daniel.wagner@bmw-carit.de>
 
 ---
- input/device.c  |    1 +
- input/device.h  |    3 ---
- input/manager.c |    1 +
- input/server.c  |    1 +
- lib/uuid.h      |    3 +++
- 5 files changed, 6 insertions(+), 3 deletions(-)
+ lib/uuid.h           |    5 +++++
+ proximity/manager.c  |    4 ----
+ proximity/reporter.c |    2 --
+ 3 files changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/input/device.c b/input/device.c
-index e2c48b9..0e3f4a9 100644
---- a/input/device.c
-+++ b/input/device.c
-@@ -37,6 +37,7 @@
- #include <bluetooth/hidp.h>
- #include <bluetooth/sdp.h>
- #include <bluetooth/sdp_lib.h>
-+#include <bluetooth/uuid.h>
- 
- #include <glib.h>
- #include <dbus/dbus.h>
-diff --git a/input/device.h b/input/device.h
-index c14b81a..509a353 100644
---- a/input/device.h
-+++ b/input/device.h
-@@ -21,9 +21,6 @@
-  *
-  */
- 
--#define HSP_HS_UUID		"00001108-0000-1000-8000-00805F9B34FB"
--#define HID_UUID		"00001124-0000-1000-8000-00805f9b34fb"
--
- #define L2CAP_PSM_HIDP_CTRL	0x11
- #define L2CAP_PSM_HIDP_INTR	0x13
- 
-diff --git a/input/manager.c b/input/manager.c
-index 4ac5686..5cc552b 100644
---- a/input/manager.c
-+++ b/input/manager.c
-@@ -31,6 +31,7 @@
- #include <bluetooth/hci.h>
- #include <bluetooth/sdp.h>
- #include <bluetooth/sdp_lib.h>
-+#include <bluetooth/uuid.h>
- 
- #include <gdbus.h>
- 
-diff --git a/input/server.c b/input/server.c
-index 17e7547..86e2ac8 100644
---- a/input/server.c
-+++ b/input/server.c
-@@ -30,6 +30,7 @@
- 
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/sdp.h>
-+#include <bluetooth/uuid.h>
- 
- #include <glib.h>
- #include <dbus/dbus.h>
 diff --git a/lib/uuid.h b/lib/uuid.h
-index 32f51b7..7e34259 100644
+index 713075e..86679a9 100644
 --- a/lib/uuid.h
 +++ b/lib/uuid.h
-@@ -75,6 +75,9 @@ extern "C" {
- #define HDP_SOURCE_UUID		"00001401-0000-1000-8000-00805f9b34fb"
- #define HDP_SINK_UUID		"00001402-0000-1000-8000-00805f9b34fb"
+@@ -56,6 +56,11 @@ extern "C" {
+ #define PNPID_UUID		"00002a50-0000-1000-8000-00805f9b34fb"
+ #define DEVICE_INFORMATION_UUID	"0000180a-0000-1000-8000-00805f9b34fb"
  
-+#define HSP_HS_UUID		"00001108-0000-1000-8000-00805f9b34fb"
-+#define HID_UUID		"00001124-0000-1000-8000-00805f9b34fb"
++#define GATT_UUID		"00001801-0000-1000-8000-00805f9b34fb"
++#define IMMEDIATE_ALERT_UUID	"00001802-0000-1000-8000-00805f9b34fb"
++#define LINK_LOSS_UUID		"00001803-0000-1000-8000-00805f9b34fb"
++#define TX_POWER_UUID		"00001804-0000-1000-8000-00805f9b34fb"
 +
  typedef struct {
  	enum {
  		BT_UUID_UNSPEC = 0,
+diff --git a/proximity/manager.c b/proximity/manager.c
+index 286f7e3..f2e49a6 100644
+--- a/proximity/manager.c
++++ b/proximity/manager.c
+@@ -39,10 +39,6 @@
+ #include "reporter.h"
+ #include "manager.h"
+ 
+-#define IMMEDIATE_ALERT_UUID	"00001802-0000-1000-8000-00805f9b34fb"
+-#define LINK_LOSS_UUID		"00001803-0000-1000-8000-00805f9b34fb"
+-#define TX_POWER_UUID		"00001804-0000-1000-8000-00805f9b34fb"
+-
+ static DBusConnection *connection = NULL;
+ 
+ static struct enabled enabled  = {
+diff --git a/proximity/reporter.c b/proximity/reporter.c
+index 20779a8..607de2b 100644
+--- a/proximity/reporter.c
++++ b/proximity/reporter.c
+@@ -51,8 +51,6 @@
+ 
+ #define BLUEZ_SERVICE "org.bluez"
+ 
+-#define GATT_UUID     "00001801-0000-1000-8000-00805f9b34fb"
+-
+ struct reporter_adapter {
+ 	DBusConnection *conn;
+ 	struct btd_adapter *adapter;
 -- 
 1.7.10.130.g36e6c
 
