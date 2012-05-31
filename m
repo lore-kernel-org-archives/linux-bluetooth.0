@@ -1,85 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Daniel Wagner <wagi@monom.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Daniel Wagner <daniel.wagner@bmw-carit.de>
-Subject: [PATCH v3 00/14] Prefer PAN over DUN
-Date: Thu, 31 May 2012 15:43:24 +0200
-Message-Id: <1338471818-20894-1-git-send-email-wagi@monom.org>
+Date: Thu, 31 May 2012 10:42:55 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/3] Bluetooth: Check MTU value in
+ l2cap_sock_setsockopt_old
+Message-ID: <20120531134255.GP18069@joana>
+References: <1338401329-31429-1-git-send-email-andre.guedes@openbossa.org>
+ <1338401329-31429-2-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1338401329-31429-2-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Daniel Wagner <daniel.wagner@bmw-carit.de>
+Hi Andre,
 
-Hi,
+* Andre Guedes <andre.guedes@openbossa.org> [2012-05-30 15:08:48 -0300]:
 
-This version moves the UUID strings into the lib instead of the core.
-I tried to do get rid of the UUID string using the *_SVCLASS_ID from sdp.h
-but it is hard to do string magic during precompile time...
+> If user tries to set an invalid MTU value, l2cap_sock_setsockopt_old
+> should return -EINVAL.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  net/bluetooth/l2cap_sock.c |   21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+> 
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index d856cc8..a7ac747 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -445,6 +445,22 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+>  	return err;
+>  }
+>  
+> +static bool is_valid_mtu(struct l2cap_chan *chan, u16 mtu)
 
-cheers,
-daniel
+I prefer if we call this l2cap_valid_mtu()
 
-changes:
+> +{
+> +	switch (chan->scid) {
+> +	case L2CAP_CID_LE_DATA:
+> +		if (mtu < L2CAP_LE_DEFAULT_MTU)
+> +			return 0;
 
-v3: - Move UUID strings into lib
+If you want to return bool you might want to return false here.
 
-v2: - Move all UUID string definition into one header file
-    - Change configuration variable name
-    - This behavior is off by default
+> +		break;
+> +
+> +	default:
+> +		if (mtu < L2CAP_DEFAULT_MIN_MTU)
+> +			return 0;
+> +	}
+> +
+> +	return 1;
 
-Daniel Wagner (14):
-  sdp: Remove unused BASE_UUID definition
-  audio: Move UUID string definition to lib
-  network: Move UUID string definition to lib
-  deviceinfo: Move UUID string definition to lib
-  proximity: Move UUID string definition to lib
-  sap: Move UUID string definition to lib
-  thermometer: Move UUID string definition to lib
-  serial: Move UUID string definition to lib
-  health: Move UUID string definition to lib
-  input: Move UUID string definition to lib
-  pnat: Move UUID string definition to lib
-  core: Move UUID string definition to lib
-  main: Add PreferPANoverDUN configuration switch
-  device: Ignore DUN if PAN is present
+and true here.
 
- audio/avctp.c             |    1 +
- audio/avdtp.c             |    1 +
- audio/avrcp.c             |    1 +
- audio/device.h            |   16 --------------
- audio/manager.c           |    1 +
- audio/media.c             |    2 ++
- audio/transport.c         |    2 ++
- deviceinfo/deviceinfo.c   |    2 --
- deviceinfo/manager.c      |    2 --
- health/hdp_manager.c      |    1 +
- health/hdp_types.h        |    4 ----
- health/hdp_util.c         |    1 +
- input/device.c            |    1 +
- input/device.h            |    3 ---
- input/manager.c           |    1 +
- input/server.c            |    1 +
- lib/sdp.c                 |    2 --
- lib/uuid.h                |   51 +++++++++++++++++++++++++++++++++++++++++++++
- network/common.c          |    1 +
- network/common.h          |    5 -----
- network/manager.c         |    1 +
- network/server.c          |    1 +
- plugins/pnat.c            |    4 ++--
- proximity/manager.c       |    4 ----
- proximity/reporter.c      |    2 --
- sap/server.c              |    2 +-
- serial/manager.c          |    3 +--
- src/device.c              |   19 ++++++++++++++++-
- src/hcid.h                |    1 +
- src/main.c                |    8 +++++++
- src/main.conf             |    5 +++++
- src/storage.c             |    1 +
- src/storage.h             |    2 --
- thermometer/manager.c     |    2 --
- thermometer/thermometer.c |    5 -----
- 35 files changed, 104 insertions(+), 55 deletions(-)
-
--- 
-1.7.10.130.g36e6c
-
+	Gustavo
