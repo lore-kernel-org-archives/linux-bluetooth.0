@@ -1,40 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1338453008-15947-2-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1338453008-15947-1-git-send-email-frederic.dalleau@linux.intel.com>
-	<1338453008-15947-2-git-send-email-frederic.dalleau@linux.intel.com>
-Date: Thu, 31 May 2012 12:38:55 +0300
-Message-ID: <CABBYNZ++UoBw46_+BbCb0eJ1Utt_8XNtk_tJJy7yaE3bc1V4Ow@mail.gmail.com>
-Subject: Re: [PATCH] network: Reply to extensions at connection setup
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
-	<frederic.dalleau@linux.intel.com>
+Date: Thu, 31 May 2012 11:32:19 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH BlueZ] Remove compatibility check for DBUS_TYPE_UNIX_FD
+Message-ID: <20120531083219.GA17071@x220>
+References: <1338412579-22890-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1338412579-22890-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Hi Lizardo,
 
-On Thu, May 31, 2012 at 11:30 AM, Frédéric Dalleau
-<frederic.dalleau@linux.intel.com> wrote:
-> -       if (req->type == BNEP_CONTROL &&
-> +       if ((req->type & ~BNEP_EXT_HEADER) == BNEP_CONTROL &&
->                                req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
->                uint8_t pkt[3];
->
-> @@ -390,7 +416,8 @@ static gboolean bnep_setup(GIOChannel *chan,
->                return FALSE;
->        }
->
-> -       if (req->type != BNEP_CONTROL || req->ctrl != BNEP_SETUP_CONN_REQ)
-> +       if ((req->type & ~BNEP_EXT_HEADER) != BNEP_CONTROL ||
-> +                               req->ctrl != BNEP_SETUP_CONN_REQ)
->                return FALSE;
->
+On Wed, May 30, 2012, Anderson Lizardo wrote:
+> Since commit c89b589a586e97ad875fbdd1d41f03979157ebb0, D-Bus >= 1.4.0 is
+> required. This version already contains Unix FD passing support,
+> therefore code that checks for DBUS_TYPE_UNIX_FD definition is
+> unnecessary.
+> ---
+>  audio/gateway.c      |    7 -------
+>  audio/gstavdtpsink.c |    4 ----
+>  audio/manager.c      |    4 ----
+>  audio/media.c        |    7 -------
+>  audio/transport.c    |    4 ----
+>  doc/hfp-api.txt      |    4 +---
+>  health/hdp.c         |    4 ----
+>  serial/port.c        |    7 -------
+>  8 files changed, 1 insertion(+), 40 deletions(-)
 
-Perhaps you can have a macro for getting just the header type without
-the extension bit e.g. BNEP_HEADER(type) ((type) & ~BNEP_EXT_HEADER)
+Applied. Thanks.
 
--- 
-Luiz Augusto von Dentz
+Johan
