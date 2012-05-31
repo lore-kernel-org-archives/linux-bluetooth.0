@@ -1,60 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 31 May 2012 10:42:55 -0300
+Date: Thu, 31 May 2012 10:33:10 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] Bluetooth: Check MTU value in
- l2cap_sock_setsockopt_old
-Message-ID: <20120531134255.GP18069@joana>
+Subject: Re: [PATCH 1/3] Bluetooth: Change default MTU for L2CAP ATT channel
+Message-ID: <20120531133310.GO18069@joana>
 References: <1338401329-31429-1-git-send-email-andre.guedes@openbossa.org>
- <1338401329-31429-2-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338401329-31429-2-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1338401329-31429-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-* Andre Guedes <andre.guedes@openbossa.org> [2012-05-30 15:08:48 -0300]:
+* Andre Guedes <andre.guedes@openbossa.org> [2012-05-30 15:08:47 -0300]:
 
-> If user tries to set an invalid MTU value, l2cap_sock_setsockopt_old
-> should return -EINVAL.
+> This patch changes the default MTU value for L2CAP ATT fixed channel
+> to L2CAP_DEFAULT_MTU (672 octets).
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  net/bluetooth/l2cap_sock.c |   21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
+> Differently from others L2CAP channels, in L2CAP ATT fixed channel
+> there is no MTU negotiation. The MTU value for that channel is up to
+> the L2CAP implementation. The only restriction in L2CAP spec is the
+> MTU value must not be less than 23 octets.
 > 
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index d856cc8..a7ac747 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -445,6 +445,22 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
->  	return err;
->  }
->  
-> +static bool is_valid_mtu(struct l2cap_chan *chan, u16 mtu)
+> At ATT protocol level (on top of L2CAP), we have the ATT_MTU which
+> defines the maximum size of any ATT message sent between client and
+> server. GATT profile defines ATT_MTU default value to 23 octets. If
+> a GATT based profile wants to use ATT_MTU greater than 23 octets
+> (e.g. HID over GATT profile), it should negotiate a new value by
+> executing the GATT Exchange MTU sub-procedure.
+> 
+> Thus, in order to support any value of ATT_MTU negotiated at ATT
+> protocol level, our L2CAP implementation should have L2CAP ATT
+> fixed channel MTU equal or greater than ATT_MAX_MTU (512 octets).
 
-I prefer if we call this l2cap_valid_mtu()
-
-> +{
-> +	switch (chan->scid) {
-> +	case L2CAP_CID_LE_DATA:
-> +		if (mtu < L2CAP_LE_DEFAULT_MTU)
-> +			return 0;
-
-If you want to return bool you might want to return false here.
-
-> +		break;
-> +
-> +	default:
-> +		if (mtu < L2CAP_DEFAULT_MIN_MTU)
-> +			return 0;
-> +	}
-> +
-> +	return 1;
-
-and true here.
+Shouldn't we define a L2CAP_LE_MAX_MTU then and set its value to 512?
+If we will never have anything greater than 512 octets why allow it?
 
 	Gustavo
