@@ -1,67 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 31 May 2012 15:55:29 -0300
+Date: Thu, 31 May 2012 15:52:31 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
 To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] Bluetooth: Fix not removing hci_conn for failed LE
- connection
-Message-ID: <20120531185529.GB24769@joana>
+Subject: Re: [PATCH 2/3] Bluetooth: Return proper mgmt state when LE pairing
+ connection failed
+Message-ID: <20120531185231.GA24769@joana>
 References: <1338385163-10589-1-git-send-email-andrzej.kaczmarek@tieto.com>
- <1338385163-10589-3-git-send-email-andrzej.kaczmarek@tieto.com>
+ <1338385163-10589-2-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338385163-10589-3-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1338385163-10589-2-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrzej,
 
-* Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com> [2012-05-30 15:39:23 +0200]:
+* Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com> [2012-05-30 15:39:22 +0200]:
 
-> This patch changes way LE Connection Complete event with error status are
-> handled. BDADDR returned in such event packet do not need to be valid and
-> should not be used to search for existing hci_conn. Instead, any hci_conn
-> with BT_CONNECT state should be matched since there can be only one
-> pending LE outgoing connection at any time.
-> 
-> If not handled properly, appriopriate hci_conn will not be removed and
-> subsequent connection to given peer will try to reuse it without making
-> actual connection attempt.
-> 
-> 2012-05-07 11:21:39.133378 < HCI Command: LE Create Connection (0x08|0x000d) plen 25
->     bdaddr 00:22:D0:10:13:EE type 1
-> 2012-05-07 11:21:39.138774 > HCI Event: Command Status (0x0f) plen 4
->     LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
-> 2012-05-07 11:21:44.752854 < HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0
-> 2012-05-07 11:21:44.759475 > HCI Event: Command Complete (0x0e) plen 4
->     LE Create Connection Cancel (0x08|0x000e) ncmd 1
-> 2012-05-07 11:21:44.764479 > HCI Event: LE Meta Event (0x3e) plen 19
->     LE Connection Complete
->       status 0x02 handle 0, role master
->       bdaddr 00:00:00:00:00:00 (Public)
-> 
-> [14898.739425] [6603] hci_connect: hci0 dst 00:22:D0:10:13:EE
-> [14898.739429] [6603] hci_conn_add: hci0 dst 00:22:D0:10:13:EE
-> [14898.739434] [6603] hci_conn_init_sysfs: conn ffff880079f03000
-> [14898.739440] [6603] hci_send_cmd: hci0 opcode 0x200d plen 25
-> [14898.739443] [6603] hci_send_cmd: skb len 28
-> [14898.739487] [6603] hci_chan_create: hci0 conn ffff880079f03000
-> ...
-> [14938.860231] [55] hci_send_cmd: hci0 opcode 0x200e plen 0
-> ...
-> [14938.876427] [55] hci_le_conn_complete_evt: hci0 status 2
-> [14938.876433] [55] hci_conn_add: hci0 dst 00:00:00:00:00:00
-> [14938.876439] [55] hci_conn_init_sysfs: conn ffff88007aeff800
-> [14938.876454] [55] hci_send_to_control: len 14
-> [14938.876470] [55] l2cap_connect_cfm: hcon ffff88007aeff800 bdaddr 00:00:00:00:00:00 status 2
-> [14938.876474] [55] hci_conn_del: hci0 conn ffff88007aeff800 handle 0
+> MGMT_STATUS_BUSY should be returned when LE pairing cannot be started due
+> to another outgoing connection attempt is ongoing.
 > 
 > Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-> Acked-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
->  net/bluetooth/hci_event.c |   22 +++++++++++++---------
->  1 file changed, 13 insertions(+), 9 deletions(-)
+>  net/bluetooth/mgmt.c |    9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
 
-Applied to bluetooth-next. thanks.
+Applied to bluetooth-next. Thanks.
 
 	Gustavo
