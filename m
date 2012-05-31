@@ -1,34 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH] BNEP Reply to extensions at connection setup
-Date: Thu, 31 May 2012 11:30:07 +0300
-Message-Id: <1338453008-15947-1-git-send-email-frederic.dalleau@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+Subject: [PATCH trivial 1/3] Bluetooth: Make l2cap_data_channel return void
+Date: Thu, 31 May 2012 11:18:55 +0300
+Message-Id: <1338452337-22618-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A folk is trying to qualify bluez and told that the following test would fail :
-TP/BNEP/CTRL/BV-19-C. I searched the spec, errata and list archive. I haven't
-found any informations or previous patch related to this test.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-So I wrote a fix, but I think it shouldn't go upstream before it has been
-validated and the folk cannot do that before next month. If anybody has access
-to a test system sooner, please let me know.
+l2cap_data_channel always return 0 which is not used anywhere,
+make it void function.
 
-This version is now restyled as per Luiz comments !
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |    9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-Frédéric Dalleau (1):
-  network: Reply to extensions at connection setup
-
- network/server.c |   34 ++++++++++++++++++++++++++++++++--
- 1 files changed, 32 insertions(+), 2 deletions(-)
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index bef5266..56f5c0e 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5128,7 +5128,8 @@ drop:
+ 	return 0;
+ }
+ 
+-static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk_buff *skb)
++static void l2cap_data_channel(struct l2cap_conn *conn, u16 cid,
++			       struct sk_buff *skb)
+ {
+ 	struct l2cap_chan *chan;
+ 
+@@ -5138,7 +5139,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 			chan = a2mp_channel_create(conn, skb);
+ 			if (!chan) {
+ 				kfree_skb(skb);
+-				return 0;
++				return;
+ 			}
+ 
+ 			l2cap_chan_lock(chan);
+@@ -5146,7 +5147,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 			BT_DBG("unknown cid 0x%4.4x", cid);
+ 			/* Drop packet and return */
+ 			kfree_skb(skb);
+-			return 0;
++			return;
+ 		}
+ 	}
+ 
+@@ -5184,8 +5185,6 @@ drop:
+ 
+ done:
+ 	l2cap_chan_unlock(chan);
+-
+-	return 0;
+ }
+ 
+ static inline int l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm, struct sk_buff *skb)
 -- 
-1.7.5.4
+1.7.9.5
 
