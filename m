@@ -1,57 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Trivial refactoring in __l2cap_chan_add
-Date: Thu, 31 May 2012 20:59:54 -0300
-Message-Id: <1338508794-12534-1-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC] Bluetooth: Fix compile warning in l2cap_core.c
+Date: Thu, 31 May 2012 20:39:16 -0300
+Message-Id: <1338507556-10920-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-All cases in switch statement set chan->omtu to L2CAP_DEFAULT_MTU.
-This patch moves the assignments to outside the switch statement.
+This patch fixes the following warning reported by gcc 4.7.0:
+
+net/bluetooth/l2cap_core.c: In function 'l2cap_config_rsp':
+net/bluetooth/l2cap_core.c:3302:13: warning: 'rfc.max_pdu_size' may be used uninitialized in this function [-Wmaybe-uninitialized]
+net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.max_pdu_size' was declared here
+net/bluetooth/l2cap_core.c:3298:25: warning: 'rfc.monitor_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
+net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.monitor_timeout' was declared here
+net/bluetooth/l2cap_core.c:3297:25: warning: 'rfc.retrans_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
+net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.retrans_timeout' was declared here
+net/bluetooth/l2cap_core.c:3295:2: warning: 'rfc.mode' may be used uninitialized in this function [-Wmaybe-uninitialized]
+net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.mode' was declared here
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/l2cap_core.c |    5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ net/bluetooth/l2cap_core.c |   16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f9bffe3..0ba8875 100644
+index f9bffe3..6df27cd 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -449,13 +449,11 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 	case L2CAP_CHAN_CONN_ORIENTED:
- 		if (conn->hcon->type == LE_LINK) {
- 			/* LE connection */
--			chan->omtu = L2CAP_DEFAULT_MTU;
- 			chan->scid = L2CAP_CID_LE_DATA;
- 			chan->dcid = L2CAP_CID_LE_DATA;
- 		} else {
- 			/* Alloc CID for connection-oriented socket */
- 			chan->scid = l2cap_alloc_cid(conn);
--			chan->omtu = L2CAP_DEFAULT_MTU;
+@@ -3270,6 +3270,14 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
+ 	if ((chan->mode != L2CAP_MODE_ERTM) && (chan->mode != L2CAP_MODE_STREAMING))
+ 		return;
+ 
++	/* Use sane default values in case a misbehaving remote device
++	 * do not send an RFC option.
++	 */
++	rfc.mode = chan->mode;
++	rfc.retrans_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
++	rfc.monitor_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
++	rfc.max_pdu_size = cpu_to_le16(chan->imtu);
++
+ 	while (len >= L2CAP_CONF_OPT_SIZE) {
+ 		len -= l2cap_get_conf_opt(&rsp, &type, &olen, &val);
+ 
+@@ -3281,14 +3289,6 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
  		}
- 		break;
- 
-@@ -463,7 +461,6 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 		/* Connectionless socket */
- 		chan->scid = L2CAP_CID_CONN_LESS;
- 		chan->dcid = L2CAP_CID_CONN_LESS;
--		chan->omtu = L2CAP_DEFAULT_MTU;
- 		break;
- 
- 	case L2CAP_CHAN_CONN_FIX_A2MP:
-@@ -477,9 +474,9 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 		/* Raw socket can send/recv signalling messages only */
- 		chan->scid = L2CAP_CID_SIGNALING;
- 		chan->dcid = L2CAP_CID_SIGNALING;
--		chan->omtu = L2CAP_DEFAULT_MTU;
  	}
  
-+	chan->omtu		= L2CAP_DEFAULT_MTU;
- 	chan->local_id		= L2CAP_BESTEFFORT_ID;
- 	chan->local_stype	= L2CAP_SERV_BESTEFFORT;
- 	chan->local_msdu	= L2CAP_DEFAULT_MAX_SDU_SIZE;
+-	/* Use sane default values in case a misbehaving remote device
+-	 * did not send an RFC option.
+-	 */
+-	rfc.mode = chan->mode;
+-	rfc.retrans_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
+-	rfc.monitor_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
+-	rfc.max_pdu_size = cpu_to_le16(chan->imtu);
+-
+ 	BT_ERR("Expected RFC option was not found, using defaults");
+ 
+ done:
 -- 
 1.7.10.2
 
