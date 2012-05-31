@@ -1,41 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Filter duplicated reports in LE scan
-Date: Thu, 31 May 2012 20:01:41 -0300
-Message-Id: <1338505301-25384-1-git-send-email-andre.guedes@openbossa.org>
+Date: Thu, 31 May 2012 17:55:09 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 3/3] Bluetooth: Rename L2CAP_LE_DEFAULT_MTU
+Message-ID: <20120531205509.GC24769@joana>
+References: <1338494495-21447-1-git-send-email-andre.guedes@openbossa.org>
+ <1338494495-21447-3-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1338494495-21447-3-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch enables filtering duplicated advertising reports during
-LE scan.
+Hi Andre,
 
-Some LE devices advertise using very small intervals generating lots
-of equal advertising report events to the host. Each event generates
-a mgmt_device_found event which is copied to userspace.
+* Andre Guedes <andre.guedes@openbossa.org> [2012-05-31 17:01:35 -0300]:
 
-Enabling this feature, duplicated advertising reports are filtered
-at controller's link layer. This way, the controller doesn't wake up
-the host to report duplicated advertising reports and, consequently,
-less data is copied to userspace.
+> This patch renames L2CAP_LE_DEFAULT_MTU macro to L2CAP_LE_MIN_MTU
+> since it represents the minimum MTU value, not the default MTU
+> value for LE.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  include/net/bluetooth/l2cap.h |    2 +-
+>  net/bluetooth/l2cap_sock.c    |    2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
----
- net/bluetooth/hci_core.c |    1 +
- 1 file changed, 1 insertion(+)
+All 3 patches have been applied to bluetooth-next, thanks.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 979556a..cf39e95 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1526,6 +1526,7 @@ static void le_scan_enable_req(struct hci_dev *hdev, unsigned long opt)
- 
- 	memset(&cp, 0, sizeof(cp));
- 	cp.enable = 1;
-+	cp.filter_dup = 1;
- 
- 	hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
- }
--- 
-1.7.10.2
-
+	Gustavo
