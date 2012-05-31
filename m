@@ -1,49 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/3] Bluetooth: Change default MTU for L2CAP ATT channel
-Date: Thu, 31 May 2012 17:01:33 -0300
-Message-Id: <1338494495-21447-1-git-send-email-andre.guedes@openbossa.org>
+Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: [PATCH 2/2] Bluetooth: Release all locks before sleep
+Date: Thu, 31 May 2012 16:25:44 -0300
+Message-Id: <1338492344-1474-2-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1338492344-1474-1-git-send-email-gustavo@padovan.org>
+References: <1338492344-1474-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch changes the default MTU value for L2CAP ATT fixed channel
-to L2CAP_DEFAULT_MTU (672 octets).
+From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-Differently from others L2CAP channels, in L2CAP ATT fixed channel
-there is no MTU negotiation. The MTU value for that channel is up to
-the L2CAP implementation. The only restriction in L2CAP spec is the
-MTU value must not be less than 23 octets.
+To avoid deadlock we need to release locks while waiting for a ack to
+arrive.
 
-At ATT protocol level (on top of L2CAP), we have the ATT_MTU which
-defines the maximum size of any ATT message sent between client and
-server. GATT profile defines ATT_MTU default value to 23 octets. If
-a GATT based profile wants to use ATT_MTU greater than 23 octets
-(e.g. HID over GATT profile), it should negotiate a new value by
-executing the GATT Exchange MTU sub-procedure.
-
-Thus, in order to support any value of ATT_MTU negotiated at ATT
-protocol level, our L2CAP implementation should have L2CAP ATT
-fixed channel MTU equal or greater than ATT_MAX_MTU (512 octets).
-
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
- net/bluetooth/l2cap_core.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/l2cap_core.c |    5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9750204..f9bffe3 100644
+index 1cb3ca0..94273dc 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -449,7 +449,7 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 	case L2CAP_CHAN_CONN_ORIENTED:
- 		if (conn->hcon->type == LE_LINK) {
- 			/* LE connection */
--			chan->omtu = L2CAP_LE_DEFAULT_MTU;
-+			chan->omtu = L2CAP_DEFAULT_MTU;
- 			chan->scid = L2CAP_CID_LE_DATA;
- 			chan->dcid = L2CAP_CID_LE_DATA;
- 		} else {
+@@ -1553,13 +1553,14 @@ done:
+ int __l2cap_wait_ack(struct sock *sk)
+ {
+ 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
++	struct l2cap_conn *conn = chan->conn;
+ 	DECLARE_WAITQUEUE(wait, current);
+ 	int err = 0;
+ 	int timeo = HZ/5;
+ 
+ 	add_wait_queue(sk_sleep(sk), &wait);
+ 	set_current_state(TASK_INTERRUPTIBLE);
+-	while (chan->unacked_frames > 0 && chan->conn) {
++	while (chan->unacked_frames > 0 && conn) {
+ 		if (!timeo)
+ 			timeo = HZ/5;
+ 
+@@ -1570,7 +1571,9 @@ int __l2cap_wait_ack(struct sock *sk)
+ 
+ 		release_sock(sk);
+ 		l2cap_chan_unlock(chan);
++		mutex_unlock(&conn->chan_lock);
+ 		timeo = schedule_timeout(timeo);
++		mutex_lock(&conn->chan_lock);
+ 		l2cap_chan_lock(chan);
+ 		lock_sock(sk);
+ 		set_current_state(TASK_INTERRUPTIBLE);
 -- 
 1.7.10.2
 
