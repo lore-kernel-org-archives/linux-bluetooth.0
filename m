@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 02/14] client: Support empty filename in obc_transfer_get
-Date: Fri,  1 Jun 2012 12:51:11 +0200
-Message-Id: <1338547883-18907-3-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v0 01/14] client-doc: ObjectPush sessions return transfers
+Date: Fri,  1 Jun 2012 12:51:10 +0200
+Message-Id: <1338547883-18907-2-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338547883-18907-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338547883-18907-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,99 +12,67 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Passing an empty string as a filename for obc_transfer_get will be
-similar to passing a NULL filename. This means a temporary file will be
-created to store the content of the transfer.
-
-NULL and "" are not exactly equivalent though: in case of NULL the file
-will be automatically removed immediately after being open, which means
-that the transfer initiator should also open the file to prevent it from
-being removed (to be used from the modules).
-
-On the other hand, if "" is given, the file will be removed only in case
-of error. So after success the transfer initiator should decide whether
-the file should be removed or not.
-
-This change is convenient in order to expose the same API in D-Bus.
 ---
- client/transfer.c |   28 +++++++++++++++++++++++-----
- 1 files changed, 23 insertions(+), 5 deletions(-)
+ doc/client-api.txt |   34 +++++++++++++++++++++++++++++++---
+ 1 files changed, 31 insertions(+), 3 deletions(-)
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 14006ef..04533b8 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -77,6 +77,7 @@ struct obc_transfer {
- 	gint64 transferred;
- 	gint64 progress;
- 	guint progress_id;
-+	gboolean remove_file_on_error;
- };
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index 3c6a2e1..5377124 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -63,21 +63,49 @@ Service		org.openobex.client
+ Interface	org.openobex.ObjectPush
+ Object path	[variable prefix]/{session0,session1,...}
  
- static GQuark obc_transfer_error_quark(void)
-@@ -293,8 +294,9 @@ static gboolean transfer_open(struct obc_transfer *transfer, int flags,
- 						mode_t mode, GError **err)
- {
- 	int fd;
-+	char *filename;
+-Methods		void SendFile(string sourcefile)
++Methods		object, dict SendFile(string sourcefile)
  
--	if (transfer->filename != NULL) {
-+	if (transfer->filename != NULL && strcmp(transfer->filename, "") != 0) {
- 		fd = open(transfer->filename, flags, mode);
- 		if (fd < 0) {
- 			error("open(): %s(%d)", strerror(errno), errno);
-@@ -305,13 +307,19 @@ static gboolean transfer_open(struct obc_transfer *transfer, int flags,
- 		goto done;
- 	}
+ 			Send one local file to the remote device.
  
--	fd = g_file_open_tmp("obex-clientXXXXXX", &transfer->filename, err);
-+	fd = g_file_open_tmp("obex-clientXXXXXX", &filename, err);
- 	if (fd < 0) {
- 		error("g_file_open_tmp(): %s", (*err)->message);
- 		return FALSE;
- 	}
- 
--	remove(transfer->filename);
-+	if (transfer->filename == NULL)
-+		remove(filename); /* remove always only if NULL was given */
-+	else
-+		transfer->remove_file_on_error = TRUE;
+-		void PullBusinessCard(string targetfile)
++			The returned path represents the newly created transfer,
++			which should be used to find out if the content has been
++			successfully transferred or if the operation fails.
 +
-+	g_free(transfer->filename);
-+	transfer->filename = filename;
- 
- done:
- 	transfer->fd = fd;
-@@ -344,6 +352,12 @@ struct obc_transfer *obc_transfer_put(const char *type, const char *name,
- 	struct stat st;
- 	int perr;
- 
-+	if (filename == NULL || strcmp(filename, "") == 0) {
-+		g_set_error(err, OBC_TRANSFER_ERROR, -EINVAL,
-+						"Invalid filename given");
-+		return NULL;
-+	}
++			The properties of this transfer are also returned along
++			with the object path, to avoid a call to GetProperties.
 +
- 	transfer = obc_transfer_create(G_OBEX_OP_PUT, filename, name, type);
++		object, dict PullBusinessCard(string targetfile)
  
- 	if (contents != NULL) {
-@@ -433,10 +447,14 @@ static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
- 			g_dbus_emit_signal(transfer->conn, transfer->path,
- 						TRANSFER_INTERFACE, "Complete",
- 						DBUS_TYPE_INVALID);
--	} else if (transfer->path != NULL) {
-+	} else {
- 		const char *code = "org.openobex.Error.Failed";
+ 			Request the business card from a remote device and
+ 			store it in the local file.
  
--		g_dbus_emit_signal(transfer->conn, transfer->path,
-+		if (transfer->remove_file_on_error)
-+			remove(transfer->filename);
+-		void ExchangeBusinessCards(string clientfile, string targetfile)
++			If an empty target file is given, a name will be
++			automatically calculated for the temporary file.
 +
-+		if (transfer->path != NULL)
-+			g_dbus_emit_signal(transfer->conn, transfer->path,
- 						TRANSFER_INTERFACE, "Error",
- 						DBUS_TYPE_STRING,
- 						&code,
++			The returned path represents the newly created transfer,
++			which should be used to find out if the content has been
++			successfully transferred or if the operation fails.
++
++			The properties of this transfer are also returned along
++			with the object path, to avoid a call to GetProperties.
++
++		object, dict ExchangeBusinessCards(string clientfile,
++							string targetfile)
+ 
+ 			Push the client's business card to the remote device
+ 			and then retrieve the remote business card and store
+ 			it in a local file.
+ 
++			If an empty target file is given, a name will be
++			automatically calculated for the temporary file.
++
++			The returned path represents the newly created transfer,
++			which should be used to find out if the content has been
++			successfully transferred or if the operation fails.
++
++			The properties of this transfer are also returned along
++			with the object path, to avoid a call to GetProperties.
++
+ File Transfer hierarchy
+ =======================
+ 
 -- 
 1.7.7.6
 
