@@ -1,33 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Remove magic disconnect reason
-Date: Fri,  1 Jun 2012 16:18:25 +0300
-Message-Id: <1338556705-6763-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 1 Jun 2012 16:10:48 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [PATCH] Bluetooth: Create empty l2cap ops function
+Message-ID: <20120601131048.GA13525@x220>
+References: <1338308366-11465-1-git-send-email-gustavo@padovan.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1338308366-11465-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Gustavo,
 
+On Tue, May 29, 2012, Gustavo Padovan wrote:
+> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> 
+> A2MP doesn't use part of the L2CAP chan ops API so we just create general
+> empty function instead of the A2MP specific one.
+> 
+> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> ---
+>  include/net/bluetooth/l2cap.h |   12 ++++++++++++
+>  net/bluetooth/a2mp.c          |   23 +++--------------------
+>  2 files changed, 15 insertions(+), 20 deletions(-)
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/hci_core.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Applied to bluetooth-next. Thanks.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ffcb04b..165d6c3 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2434,7 +2434,7 @@ static void hci_link_tx_to(struct hci_dev *hdev, __u8 type)
- 		if (c->type == type && c->sent) {
- 			BT_ERR("%s killing stalled connection %s",
- 			       hdev->name, batostr(&c->dst));
--			hci_acl_disconn(c, 0x13);
-+			hci_acl_disconn(c, HCI_ERROR_REMOTE_USER_TERM);
- 		}
- 	}
- 
--- 
-1.7.9.5
-
+Johan
