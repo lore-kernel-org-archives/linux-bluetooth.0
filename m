@@ -1,58 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Jun 2012 10:03:12 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Fix compile warning in l2cap_core.c
-Message-ID: <20120601070309.GA3009@aemeltch-MOBL1>
-References: <1338507556-10920-1-git-send-email-andre.guedes@openbossa.org>
+From: Joohi RASTOGI <joohi.rastogi@stericsson.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: User Name <linux-bluetooth@vger.kernel.org>
+Date: Fri, 1 Jun 2012 08:01:43 +0200
+Subject: RE: [PATCH] Sets the information attribute for the service
+Message-ID: <3176460F0F455A44B2E93431E34FC86C2225BD8DFF@EXDCVYMBSTM005.EQ1STM.local>
+References: <1338273973-28767-1-git-send-email-joohi.rastogi@stericsson.com>
+ <20120530074813.GG6539@x220>
+In-Reply-To: <20120530074813.GG6539@x220>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338507556-10920-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Johan,
 
-On Thu, May 31, 2012 at 08:39:16PM -0300, Andre Guedes wrote:
-> This patch fixes the following warning reported by gcc 4.7.0:
+> -----Original Message-----
+> From: Johan Hedberg [mailto:johan.hedberg@gmail.com]
+> Sent: Wednesday, May 30, 2012 1:18 PM
+> To: Joohi RASTOGI
+> Cc: User Name
+> Subject: Re: [PATCH] Sets the information attribute for the service
 > 
-> net/bluetooth/l2cap_core.c: In function 'l2cap_config_rsp':
-> net/bluetooth/l2cap_core.c:3302:13: warning: 'rfc.max_pdu_size' may be used uninitialized in this function [-Wmaybe-uninitialized]
-> net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.max_pdu_size' was declared here
-> net/bluetooth/l2cap_core.c:3298:25: warning: 'rfc.monitor_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
-> net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.monitor_timeout' was declared here
-> net/bluetooth/l2cap_core.c:3297:25: warning: 'rfc.retrans_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
-> net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.retrans_timeout' was declared here
-> net/bluetooth/l2cap_core.c:3295:2: warning: 'rfc.mode' may be used uninitialized in this function [-Wmaybe-uninitialized]
-> net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.mode' was declared here
+> Hi Joohi,
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  net/bluetooth/l2cap_core.c |   16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
+> On Tue, May 29, 2012, joohi.rastogi@stericsson.com wrote:
+> > From: Joohi Rastogi <joohi.rastogi@stericsson.com>
+> >
+> > This patch adds the service name for
+> > Device Identification Profile
+> > ---
+> >  src/sdpd-service.c |    2 ++
+> >  1 files changed, 2 insertions(+), 0 deletions(-)
+> >
+> > diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+> > index 39e05ab..1fa82a6 100644
+> > --- a/src/sdpd-service.c
+> > +++ b/src/sdpd-service.c
+> > @@ -228,6 +228,8 @@ void register_device_id(void)
+> >  	source_data = sdp_data_alloc(SDP_UINT16, &main_opts.did_source);
+> >  	sdp_attr_add(record, 0x0205, source_data);
+> >
+> > +	sdp_set_info_attr(record, "Device Identification", 0, 0);
+> > +
+> >  	update_db_timestamp();
 > 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index f9bffe3..6df27cd 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -3270,6 +3270,14 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
->  	if ((chan->mode != L2CAP_MODE_ERTM) && (chan->mode != L2CAP_MODE_STREAMING))
->  		return;
->  
-> +	/* Use sane default values in case a misbehaving remote device
-> +	 * do not send an RFC option.
-> +	 */
-> +	rfc.mode = chan->mode;
-> +	rfc.retrans_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
-> +	rfc.monitor_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
-> +	rfc.max_pdu_size = cpu_to_le16(chan->imtu);
-> +
+> 0 is an integer, NULL is a pointer. The function call you're adding
+> doesn't take any integer arguments so you should be passing NULL and not
+> 0.
+> 
+I will do the required change and re-push the patch.
 
-I feel that this should be reworked better. If we do not get rfc we assign
-to rfc those values from chan and make conversion cpu_to_le16 and then we
-assign those values again to chan making reverse conversion.
+> That said, I can't find any mention of the service name attribute in the
+> Device ID specification (version 1.3). In fact the table (8.1 on page
+> 17) that lists all mandatory and optional attributes doesn't even have
+> this attribute mentioned as an optional one. So why do you need to have
+> it added? Is there some client that breaks if it's not present?
+> 
+I added the "Service Name" because while doing sdptool browse, every profile displays its Service Name along with other attributes like Service Class ID List, Protocol Descriptor List and Service RecHandle. But, Device ID Profile does not display its Service Name. So, I had added the Service Name attribute as well to the profile.
+For example: For AVRCP TG the sdptool browse response is:
+Service Name: AVRCP TG
+Service RecHandle: 0x10005
+Service Class ID List:
+  "AV Remote Target" (0x110c)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+    PSM: 23
+  "AVCTP" (0x0017)
+    uint16: 0x103
+Profile Descriptor List:
+  "AV Remote" (0x110e)
+    Version: 0x0103
 
-Best regards 
-Andrei Emeltchenko 
+And for Device ID Profile sdptool browse response is:
+Service RecHandle: 0x10000
+Service Class ID List:
+  "PnP Information" (0x1200)
+Profile Descriptor List:
+  "PnP Information" (0x1200)
+    Version: 0x0103
 
+Please let me know your view on this.
+
+
+> Johan
+
+Thanks,
+Joohi Rastogi
