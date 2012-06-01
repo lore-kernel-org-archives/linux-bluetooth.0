@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 3/3] Bluetooth: Add callback cmd clear to ops->teardown
-Date: Fri,  1 Jun 2012 14:44:34 +0300
-Message-Id: <1338551074-7882-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 1/3] Bluetooth: General HCI callback implementation
+Date: Fri,  1 Jun 2012 14:44:32 +0300
+Message-Id: <1338551074-7882-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1338551074-7882-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1338551074-7882-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,83 +11,187 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-ops->teardown takes care about deleting queued callbacks for all AMP
-controllers.
+Add general HCI callback implementation. Can be used for executing
+HCI commands from A2MP protocol.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/a2mp.c             |   16 +++++++++++++---
- net/bluetooth/hci_core.c         |    3 +--
- 3 files changed, 15 insertions(+), 5 deletions(-)
+ include/net/bluetooth/hci_core.h |   21 +++++++++
+ net/bluetooth/hci_core.c         |   88 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 109 insertions(+)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ccf6067..33add72 100644
+index 20fd573..6a31f0c 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1117,5 +1117,6 @@ int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
- void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
- void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
- 		  struct workqueue_struct *workqueue);
-+void hci_cb_clear(struct hci_dev *hdev);
+@@ -130,6 +130,17 @@ struct le_scan_params {
+ 
+ #define HCI_MAX_SHORT_NAME_LENGTH	10
+ 
++struct hci_dev;
++
++struct hci_cb_cmd {
++	struct list_head list;
++	u16 opcode;
++	u8 status;
++	void *opt;
++	void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
++	void (*destructor)(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
++};
++
+ #define NUM_REASSEMBLY 4
+ struct hci_dev {
+ 	struct list_head list;
+@@ -242,6 +253,9 @@ struct hci_dev {
+ 
+ 	struct list_head	mgmt_pending;
+ 
++	struct mutex		cb_list_lock;
++	struct list_head	cb_list;
++
+ 	struct discovery_state	discovery;
+ 	struct hci_conn_hash	conn_hash;
+ 	struct list_head	blacklist;
+@@ -1094,5 +1108,12 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
+ int hci_cancel_le_scan(struct hci_dev *hdev);
+ 
+ u8 bdaddr_to_le(u8 bdaddr_type);
++struct hci_cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode);
++int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
++	       void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
++	       void *opt,
++	       void (*destructor)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
++	       gfp_t flags);
++void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
  
  #endif /* __HCI_CORE_H */
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 0772c68..9d9da98 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -447,9 +447,19 @@ static struct l2cap_chan *a2mp_chan_no_new_conn_cb(struct l2cap_chan *chan)
- 	return NULL;
- }
- 
--static void a2mp_chan_no_teardown_cb(struct l2cap_chan *chan, int err)
-+static void a2mp_chan_teardown_cb(struct l2cap_chan *chan, int err)
- {
--	BT_ERR("teardown for chan %p not implemented", chan);
-+	struct hci_dev *hdev;
-+
-+	BT_DBG("chan %p", chan);
-+
-+	read_lock(&hci_dev_list_lock);
-+	list_for_each_entry(hdev, &hci_dev_list, list) {
-+		/* Iterate through AMP controllers */
-+		if (hdev->amp_type == HCI_AMP)
-+			hci_cb_clear(hdev);
-+	}
-+	read_unlock(&hci_dev_list_lock);
- }
- 
- static void a2mp_chan_no_ready(struct l2cap_chan *chan)
-@@ -466,7 +476,7 @@ static struct l2cap_ops a2mp_chan_ops = {
- 
- 	/* Not implemented for A2MP */
- 	.new_connection = a2mp_chan_no_new_conn_cb,
--	.teardown = a2mp_chan_no_teardown_cb,
-+	.teardown = a2mp_chan_teardown_cb,
- 	.ready = a2mp_chan_no_ready,
- };
- 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 1815c33..ffcb04b 100644
+index 21e3f86..eebb354 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -38,7 +38,6 @@
+@@ -38,6 +38,7 @@
  static void hci_rx_work(struct work_struct *work);
  static void hci_cmd_work(struct work_struct *work);
  static void hci_tx_work(struct work_struct *work);
--static void hci_cb_clear(struct hci_dev *hdev);
++static void hci_cb_clear(struct hci_dev *hdev);
  
  /* HCI device list */
  LIST_HEAD(hci_dev_list);
-@@ -2217,7 +2216,7 @@ void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd)
- 	}
+@@ -1645,6 +1646,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 
+ 	mutex_init(&hdev->lock);
+ 	mutex_init(&hdev->req_lock);
++	mutex_init(&hdev->cb_list_lock);
+ 
+ 	INIT_LIST_HEAD(&hdev->mgmt_pending);
+ 	INIT_LIST_HEAD(&hdev->blacklist);
+@@ -1652,6 +1654,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_LIST_HEAD(&hdev->link_keys);
+ 	INIT_LIST_HEAD(&hdev->long_term_keys);
+ 	INIT_LIST_HEAD(&hdev->remote_oob_data);
++	INIT_LIST_HEAD(&hdev->cb_list);
+ 
+ 	INIT_WORK(&hdev->rx_work, hci_rx_work);
+ 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
+@@ -1814,6 +1817,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_link_keys_clear(hdev);
+ 	hci_smp_ltks_clear(hdev);
+ 	hci_remote_oob_data_clear(hdev);
++	hci_cb_clear(hdev);
+ 	hci_dev_unlock(hdev);
+ 
+ 	hci_dev_put(hdev);
+@@ -2115,6 +2119,90 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+ 	return 0;
  }
  
--static void hci_cb_clear(struct hci_dev *hdev)
-+void hci_cb_clear(struct hci_dev *hdev)
++static int hci_add_cb(struct hci_dev *hdev, __u16 opcode,
++		      void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
++		      void *opt,
++		      void (*destructor)(struct hci_dev *hdev,
++					 struct hci_cb_cmd *cmd),
++		      gfp_t flags)
++{
++	struct hci_cb_cmd *cmd;
++
++	cmd = kmalloc(sizeof(*cmd), flags);
++	if (!cmd)
++		return -ENOMEM;
++
++	cmd->cb = cb;
++	cmd->opcode = opcode;
++	cmd->opt = opt;
++	cmd->status = 0;
++	cmd->destructor = destructor;
++
++	mutex_lock(&hdev->cb_list_lock);
++	list_add(&cmd->list, &hdev->cb_list);
++	mutex_unlock(&hdev->cb_list_lock);
++
++	return 0;
++}
++
++struct hci_cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
++{
++	struct hci_cb_cmd *cmd;
++
++	mutex_lock(&hdev->cb_list_lock);
++	list_for_each_entry(cmd, &hdev->cb_list, list)
++		if (cmd->opcode == opcode) {
++			mutex_unlock(&hdev->cb_list_lock);
++			return cmd;
++		}
++	mutex_unlock(&hdev->cb_list_lock);
++
++	return NULL;
++}
++
++void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd)
++{
++	BT_DBG("%s: remove cmd %p", hdev->name, cmd);
++
++	mutex_lock(&hdev->cb_list_lock);
++	list_del(&cmd->list);
++	mutex_unlock(&hdev->cb_list_lock);
++
++	if (cmd->destructor) {
++		cmd->destructor(hdev, cmd);
++	} else {
++		kfree(cmd->opt);
++		kfree(cmd);
++	}
++}
++
++static void hci_cb_clear(struct hci_dev *hdev)
++{
++	struct hci_cb_cmd *cmd, *tmp;
++
++	list_for_each_entry_safe(cmd, tmp, &hdev->cb_list, list)
++		hci_remove_cb(hdev, cmd);
++}
++
++/* Send HCI command with callback */
++int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
++	       void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
++	       void *opt,
++	       void (*destructor)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
++	       gfp_t flags)
++{
++	int ret;
++
++	if (!cb)
++		return -EINVAL;
++
++	ret = hci_add_cb(hdev, opcode, cb, opt, destructor, flags);
++	if (ret)
++		return ret;
++
++	return hci_send_cmd(hdev, opcode, plen, param);
++}
++
+ /* Get data from the previously sent command */
+ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
  {
- 	struct hci_cb_cmd *cmd, *tmp;
- 
 -- 
 1.7.9.5
 
