@@ -1,57 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 2 Jun 2012 09:09:39 +0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Daniel Wagner <wagi@monom.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Daniel Wagner <daniel.wagner@bmw-carit.de>
-Subject: Re: [PATCH v3 00/14] Prefer PAN over DUN
-Message-ID: <20120602010939.GA22641@x220.docomointertouch.net>
-References: <1338471818-20894-1-git-send-email-wagi@monom.org>
+Date: Fri, 1 Jun 2012 20:27:35 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	"Kirill A. Shutemov" <kirill@shutemov.name>,
+	linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Subject: Re: Two crashes
+Message-ID: <20120601232734.GB31580@samus>
+References: <20120601195809.GA30006@shutemov.name>
+ <20120601202539.GA31580@samus>
+ <20120601231831.GJ24769@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338471818-20894-1-git-send-email-wagi@monom.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20120601231831.GJ24769@joana>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+On 20:18 Fri 01 Jun, Gustavo Padovan wrote:
+> * Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2012-06-01 17:25:39 -0300]:
+> 
 
-On Thu, May 31, 2012, Daniel Wagner wrote:
-> From: Daniel Wagner <daniel.wagner@bmw-carit.de>
-> 
-> Hi,
-> 
-> This version moves the UUID strings into the lib instead of the core.
-> I tried to do get rid of the UUID string using the *_SVCLASS_ID from sdp.h
-> but it is hard to do string magic during precompile time...
-> 
-> cheers,
-> daniel
-> 
-> changes:
-> 
-> v3: - Move UUID strings into lib
-> 
-> v2: - Move all UUID string definition into one header file
->     - Change configuration variable name
->     - This behavior is off by default
-> 
-> Daniel Wagner (14):
->   sdp: Remove unused BASE_UUID definition
->   audio: Move UUID string definition to lib
->   network: Move UUID string definition to lib
->   deviceinfo: Move UUID string definition to lib
->   proximity: Move UUID string definition to lib
->   sap: Move UUID string definition to lib
->   thermometer: Move UUID string definition to lib
->   serial: Move UUID string definition to lib
->   health: Move UUID string definition to lib
->   input: Move UUID string definition to lib
->   pnat: Move UUID string definition to lib
->   core: Move UUID string definition to lib
->   main: Add PreferPANoverDUN configuration switch
->   device: Ignore DUN if PAN is present
+[snip]
 
-I've applied patches 1-12 but I stopped there for now since I'm not
-completely convinced of the config file parameter naming.
+> > 
+> > This looks like this patch ( http://thread.gmane.org/gmane.linux.bluez.kernel/26089 ) may help.
+> > It would be great if you could give it a try.
+> 
+> Vinicius, I think you added the wrong link here.
 
-Johan
+See if this works:
+
+http://permalink.gmane.org/gmane.linux.bluez.kernel/26089
+
+> 
+> 	Gustavo
+
+Cheers,
+-- 
+Vinicius
