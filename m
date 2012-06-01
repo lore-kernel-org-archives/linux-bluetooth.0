@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 08/14] client: Synchronization sessions return transfers
-Date: Fri,  1 Jun 2012 12:51:17 +0200
-Message-Id: <1338547883-18907-9-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v0 07/14] client-doc: Synchronization sessions return transfers
+Date: Fri,  1 Jun 2012 12:51:16 +0200
+Message-Id: <1338547883-18907-8-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338547883-18907-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338547883-18907-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,160 +12,52 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Return the D-Bus path of the transfer representing the operation.
+Note that the parameter given to PutPhonebook now represents the file
+name to be read, instead of containing the phonebook data.
 ---
- client/sync.c |   92 ++++++++++++++++++++------------------------------------
- 1 files changed, 33 insertions(+), 59 deletions(-)
+ doc/client-api.txt |   25 +++++++++++++++++++++----
+ 1 files changed, 21 insertions(+), 4 deletions(-)
 
-diff --git a/client/sync.c b/client/sync.c
-index d56e066..035ab2e 100644
---- a/client/sync.c
-+++ b/client/sync.c
-@@ -84,53 +84,22 @@ static DBusMessage *sync_setlocation(DBusConnection *connection,
- 	return dbus_message_new_method_return(message);
- }
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index 8e0819d..189a7a0 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -292,14 +292,31 @@ Methods		void SetLocation(string location)
+ 				"SIM2"
+ 				......
  
--static void sync_getphonebook_callback(struct obc_session *session,
--					struct obc_transfer *transfer,
--					GError *err, void *user_data)
--{
--	struct sync_data *sync = user_data;
--	DBusMessage *reply;
--	char *contents;
--	size_t size;
--	int perr;
--
--	if (err) {
--		reply = g_dbus_create_error(sync->msg,
--						"org.openobex.Error.Failed",
--						"%s", err->message);
--		goto send;
--	}
--
--	perr = obc_transfer_get_contents(transfer, &contents, &size);
--	if (perr < 0) {
--		reply = g_dbus_create_error(sync->msg,
--						"org.openobex.Error.Failed",
--						"Error reading contents: %s",
--						strerror(-perr));
--		goto send;
--	}
--
--	reply = dbus_message_new_method_return(sync->msg);
--
--	dbus_message_append_args(reply, DBUS_TYPE_STRING, &contents,
--							DBUS_TYPE_INVALID);
--
--	g_free(contents);
--
--send:
--	g_dbus_send_message(conn, reply);
--	dbus_message_unref(sync->msg);
--	sync->msg = NULL;
--}
--
- static DBusMessage *sync_getphonebook(DBusConnection *connection,
- 			DBusMessage *message, void *user_data)
- {
- 	struct sync_data *sync = user_data;
- 	struct obc_transfer *transfer;
-+	const char *target_file;
- 	GError *err = NULL;
- 	DBusMessage *reply;
+-		string GetPhonebook()
++		object, dict GetPhonebook(string targetfile)
  
-+	if (dbus_message_get_args(message, NULL,
-+					DBUS_TYPE_STRING, &target_file,
-+					DBUS_TYPE_INVALID) == FALSE)
-+		return g_dbus_create_error(message,
-+				ERROR_INF ".InvalidArguments",
-+				"Invalid arguments in method call");
+ 			Retrieve an entire Phonebook Object store from remote
+-			device
++			device, and stores it in a local file.
+ 
+-		void PutPhonebook(string obj)
++			If an empty target file is given, a name will be
++			automatically calculated for the temporary file.
 +
- 	if (sync->msg)
- 		return g_dbus_create_error(message,
- 			ERROR_INF ".InProgress", "Transfer in progress");
-@@ -139,17 +108,15 @@ static DBusMessage *sync_getphonebook(DBusConnection *connection,
- 	if (!sync->phonebook_path)
- 		sync->phonebook_path = g_strdup("telecom/pb.vcf");
- 
--	transfer = obc_transfer_get("phonebook", sync->phonebook_path, NULL,
--									&err);
-+	transfer = obc_transfer_get("phonebook", sync->phonebook_path,
-+							target_file, &err);
- 	if (transfer == NULL)
- 		goto fail;
- 
--	if (obc_session_queue(sync->session, transfer,
--						sync_getphonebook_callback,
--						sync, &err)) {
--		sync->msg = dbus_message_ref(message);
--		return NULL;
--	}
-+	if (!obc_session_queue(sync->session, transfer, NULL, NULL, &err))
-+		goto fail;
++			The returned path represents the newly created transfer,
++			which should be used to find out if the content has been
++			successfully transferred or if the operation fails.
 +
-+	return obc_transfer_create_dbus_reply(transfer, message);
++			The properties of this transfer are also returned along
++			with the object path, to avoid a call to GetProperties.
  
- fail:
- 	reply = g_dbus_create_error(message, ERROR_INF ".Failed", "%s",
-@@ -163,27 +130,30 @@ static DBusMessage *sync_putphonebook(DBusConnection *connection,
- {
- 	struct sync_data *sync = user_data;
- 	struct obc_transfer *transfer;
--	const char *buf;
-+	const char *source_file;
- 	GError *err = NULL;
- 	DBusMessage *reply;
- 
- 	if (dbus_message_get_args(message, NULL,
--			DBUS_TYPE_STRING, &buf,
--			DBUS_TYPE_INVALID) == FALSE)
-+					DBUS_TYPE_STRING, &source_file,
-+					DBUS_TYPE_INVALID) == FALSE)
- 		return g_dbus_create_error(message,
--			ERROR_INF ".InvalidArguments", NULL);
-+				ERROR_INF ".InvalidArguments",
-+				"Invalid arguments in method call");
- 
- 	/* set default phonebook_path to memory internal phonebook */
- 	if (!sync->phonebook_path)
- 		sync->phonebook_path = g_strdup("telecom/pb.vcf");
- 
--	transfer = obc_transfer_put(NULL, sync->phonebook_path, NULL, buf,
--							strlen(buf), &err);
-+	transfer = obc_transfer_put(NULL, sync->phonebook_path, source_file,
-+							NULL, 0, &err);
- 	if (transfer == NULL)
- 		goto fail;
- 
--	if (obc_session_queue(sync->session, transfer, NULL, NULL, &err))
--		return dbus_message_new_method_return(message);
-+	if (!obc_session_queue(sync->session, transfer, NULL, NULL, &err))
-+		goto fail;
+-			Send an entire Phonebook Object store to remote device
++		object, dict PutPhonebook(string sourcefile)
 +
-+	return obc_transfer_create_dbus_reply(transfer, message);
++			Send an entire Phonebook Object store to remote device.
++
++			The returned path represents the newly created transfer,
++			which should be used to find out if the content has been
++			successfully transferred or if the operation fails.
++
++			The properties of this transfer are also returned along
++			with the object path, to avoid a call to GetProperties.
  
- fail:
- 	reply = g_dbus_create_error(message, ERROR_INF ".Failed", "%s",
-@@ -196,11 +166,15 @@ static const GDBusMethodTable sync_methods[] = {
- 	{ GDBUS_METHOD("SetLocation",
- 			GDBUS_ARGS({ "location", "s" }), NULL,
- 			sync_setlocation) },
--	{ GDBUS_ASYNC_METHOD("GetPhonebook",
--			NULL, GDBUS_ARGS({ "obj", "s" }),
-+	{ GDBUS_METHOD("GetPhonebook",
-+			GDBUS_ARGS({ "targetfile", "s" }),
-+			GDBUS_ARGS({ "transfer", "o" },
-+					{ "properties", "a{sv}" }),
- 			sync_getphonebook) },
--	{ GDBUS_ASYNC_METHOD("PutPhonebook",
--			GDBUS_ARGS({ "obj", "s" }), NULL,
-+	{ GDBUS_METHOD("PutPhonebook",
-+			GDBUS_ARGS({ "sourcefile", "s" }),
-+			GDBUS_ARGS({ "transfer", "o" },
-+					{ "properties", "a{sv}" }),
- 			sync_putphonebook) },
- 	{ }
- };
+ Message Access hierarchy
+ =========================
 -- 
 1.7.7.6
 
