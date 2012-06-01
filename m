@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 04/14] client: ObjectPush sessions return transfers
-Date: Fri,  1 Jun 2012 12:51:13 +0200
-Message-Id: <1338547883-18907-5-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v0 08/14] client: Synchronization sessions return transfers
+Date: Fri,  1 Jun 2012 12:51:17 +0200
+Message-Id: <1338547883-18907-9-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338547883-18907-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338547883-18907-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,135 +14,156 @@ From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
 Return the D-Bus path of the transfer representing the operation.
 ---
- client/opp.c |   71 ++++++++++-----------------------------------------------
- 1 files changed, 13 insertions(+), 58 deletions(-)
+ client/sync.c |   92 ++++++++++++++++++++------------------------------------
+ 1 files changed, 33 insertions(+), 59 deletions(-)
 
-diff --git a/client/opp.c b/client/opp.c
-index 67b01a9..a3899f8 100644
---- a/client/opp.c
-+++ b/client/opp.c
-@@ -45,23 +45,6 @@ struct opp_data {
- 
- static DBusConnection *conn = NULL;
- 
--static void send_file_callback(struct obc_session *session,
--						struct obc_transfer *transfer,
--						GError *err, void *user_data)
--{
--	DBusMessage *msg = user_data;
--	DBusMessage *reply;
--
--	if (err != NULL)
--		reply = g_dbus_create_error(msg,
--				ERROR_INF ".Failed", "%s", err->message);
--	else
--		reply = dbus_message_new_method_return(msg);
--
--	g_dbus_send_message(conn, reply);
--	dbus_message_unref(msg);
--}
--
- static DBusMessage *opp_send_file(DBusConnection *connection,
- 					DBusMessage *message, void *user_data)
- {
-@@ -87,12 +70,10 @@ static DBusMessage *opp_send_file(DBusConnection *connection,
- 	if (transfer == NULL)
- 		goto fail;
- 
--	if (!obc_session_queue(opp->session, transfer, send_file_callback,
--								message, &err))
-+	if (!obc_session_queue(opp->session, transfer, NULL, NULL, &err))
- 		goto fail;
- 
--	dbus_message_ref(message);
--	return NULL;
-+	return obc_transfer_create_dbus_reply(transfer, message);
- 
- fail:
- 	reply = g_dbus_create_error(message,
-@@ -101,55 +82,29 @@ fail:
- 	return reply;
+diff --git a/client/sync.c b/client/sync.c
+index d56e066..035ab2e 100644
+--- a/client/sync.c
++++ b/client/sync.c
+@@ -84,53 +84,22 @@ static DBusMessage *sync_setlocation(DBusConnection *connection,
+ 	return dbus_message_new_method_return(message);
  }
  
--static void pull_complete_callback(struct obc_session *session,
+-static void sync_getphonebook_callback(struct obc_session *session,
 -					struct obc_transfer *transfer,
 -					GError *err, void *user_data)
 -{
--	DBusMessage *message = user_data;
+-	struct sync_data *sync = user_data;
+-	DBusMessage *reply;
+-	char *contents;
+-	size_t size;
+-	int perr;
 -
--	if (err != NULL) {
--		DBusMessage *error = g_dbus_create_error(message,
--					"org.openobex.Error.Failed",
--					"%s", err->message);
--		g_dbus_send_message(conn, error);
--		goto done;
+-	if (err) {
+-		reply = g_dbus_create_error(sync->msg,
+-						"org.openobex.Error.Failed",
+-						"%s", err->message);
+-		goto send;
 -	}
 -
--	g_dbus_send_reply(conn, message, DBUS_TYPE_INVALID);
+-	perr = obc_transfer_get_contents(transfer, &contents, &size);
+-	if (perr < 0) {
+-		reply = g_dbus_create_error(sync->msg,
+-						"org.openobex.Error.Failed",
+-						"Error reading contents: %s",
+-						strerror(-perr));
+-		goto send;
+-	}
 -
--done:
--	dbus_message_unref(message);
+-	reply = dbus_message_new_method_return(sync->msg);
+-
+-	dbus_message_append_args(reply, DBUS_TYPE_STRING, &contents,
+-							DBUS_TYPE_INVALID);
+-
+-	g_free(contents);
+-
+-send:
+-	g_dbus_send_message(conn, reply);
+-	dbus_message_unref(sync->msg);
+-	sync->msg = NULL;
 -}
 -
- static DBusMessage *opp_pull_business_card(DBusConnection *connection,
- 					DBusMessage *message, void *user_data)
+ static DBusMessage *sync_getphonebook(DBusConnection *connection,
+ 			DBusMessage *message, void *user_data)
  {
- 	struct opp_data *opp = user_data;
- 	struct obc_transfer *pull;
--	DBusMessageIter iter;
- 	DBusMessage *reply;
- 	const char *filename = NULL;
+ 	struct sync_data *sync = user_data;
+ 	struct obc_transfer *transfer;
++	const char *target_file;
  	GError *err = NULL;
+ 	DBusMessage *reply;
  
--	dbus_message_iter_init(message, &iter);
--
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
 +	if (dbus_message_get_args(message, NULL,
-+				DBUS_TYPE_STRING, &filename,
-+				DBUS_TYPE_INVALID) == FALSE)
++					DBUS_TYPE_STRING, &target_file,
++					DBUS_TYPE_INVALID) == FALSE)
++		return g_dbus_create_error(message,
++				ERROR_INF ".InvalidArguments",
++				"Invalid arguments in method call");
++
+ 	if (sync->msg)
  		return g_dbus_create_error(message,
- 				ERROR_INF ".InvalidArguments", NULL);
+ 			ERROR_INF ".InProgress", "Transfer in progress");
+@@ -139,17 +108,15 @@ static DBusMessage *sync_getphonebook(DBusConnection *connection,
+ 	if (!sync->phonebook_path)
+ 		sync->phonebook_path = g_strdup("telecom/pb.vcf");
  
--	dbus_message_iter_get_basic(&iter, &filename);
--
- 	pull = obc_transfer_get("text/x-vcard", NULL, filename, &err);
- 	if (pull == NULL)
+-	transfer = obc_transfer_get("phonebook", sync->phonebook_path, NULL,
+-									&err);
++	transfer = obc_transfer_get("phonebook", sync->phonebook_path,
++							target_file, &err);
+ 	if (transfer == NULL)
  		goto fail;
  
--	if (!obc_session_queue(opp->session, pull, pull_complete_callback,
--								message, &err))
-+	if (!obc_session_queue(opp->session, pull, NULL, NULL, &err))
- 		goto fail;
- 
--	dbus_message_ref(message);
--
--	return NULL;
-+	return obc_transfer_create_dbus_reply(pull, message);
+-	if (obc_session_queue(sync->session, transfer,
+-						sync_getphonebook_callback,
+-						sync, &err)) {
+-		sync->msg = dbus_message_ref(message);
+-		return NULL;
+-	}
++	if (!obc_session_queue(sync->session, transfer, NULL, NULL, &err))
++		goto fail;
++
++	return obc_transfer_create_dbus_reply(transfer, message);
  
  fail:
- 	reply = g_dbus_create_error(message,
-@@ -165,17 +120,17 @@ static DBusMessage *opp_exchange_business_cards(DBusConnection *connection,
- }
+ 	reply = g_dbus_create_error(message, ERROR_INF ".Failed", "%s",
+@@ -163,27 +130,30 @@ static DBusMessage *sync_putphonebook(DBusConnection *connection,
+ {
+ 	struct sync_data *sync = user_data;
+ 	struct obc_transfer *transfer;
+-	const char *buf;
++	const char *source_file;
+ 	GError *err = NULL;
+ 	DBusMessage *reply;
  
- static const GDBusMethodTable opp_methods[] = {
--	{ GDBUS_ASYNC_METHOD("SendFile",
-+	{ GDBUS_METHOD("SendFile",
- 		GDBUS_ARGS({ "sourcefile", "s" }),
--		NULL,
-+		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
- 		opp_send_file) },
--	{ GDBUS_ASYNC_METHOD("PullBusinessCard",
-+	{ GDBUS_METHOD("PullBusinessCard",
- 		GDBUS_ARGS({ "targetfile", "s" }),
--		NULL,
-+		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
- 		opp_pull_business_card) },
--	{ GDBUS_ASYNC_METHOD("ExchangeBusinessCards",
-+	{ GDBUS_METHOD("ExchangeBusinessCards",
- 		GDBUS_ARGS({ "clientfile", "s" }, { "targetfile", "s" }),
--		NULL,
-+		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
- 		opp_exchange_business_cards) },
+ 	if (dbus_message_get_args(message, NULL,
+-			DBUS_TYPE_STRING, &buf,
+-			DBUS_TYPE_INVALID) == FALSE)
++					DBUS_TYPE_STRING, &source_file,
++					DBUS_TYPE_INVALID) == FALSE)
+ 		return g_dbus_create_error(message,
+-			ERROR_INF ".InvalidArguments", NULL);
++				ERROR_INF ".InvalidArguments",
++				"Invalid arguments in method call");
+ 
+ 	/* set default phonebook_path to memory internal phonebook */
+ 	if (!sync->phonebook_path)
+ 		sync->phonebook_path = g_strdup("telecom/pb.vcf");
+ 
+-	transfer = obc_transfer_put(NULL, sync->phonebook_path, NULL, buf,
+-							strlen(buf), &err);
++	transfer = obc_transfer_put(NULL, sync->phonebook_path, source_file,
++							NULL, 0, &err);
+ 	if (transfer == NULL)
+ 		goto fail;
+ 
+-	if (obc_session_queue(sync->session, transfer, NULL, NULL, &err))
+-		return dbus_message_new_method_return(message);
++	if (!obc_session_queue(sync->session, transfer, NULL, NULL, &err))
++		goto fail;
++
++	return obc_transfer_create_dbus_reply(transfer, message);
+ 
+ fail:
+ 	reply = g_dbus_create_error(message, ERROR_INF ".Failed", "%s",
+@@ -196,11 +166,15 @@ static const GDBusMethodTable sync_methods[] = {
+ 	{ GDBUS_METHOD("SetLocation",
+ 			GDBUS_ARGS({ "location", "s" }), NULL,
+ 			sync_setlocation) },
+-	{ GDBUS_ASYNC_METHOD("GetPhonebook",
+-			NULL, GDBUS_ARGS({ "obj", "s" }),
++	{ GDBUS_METHOD("GetPhonebook",
++			GDBUS_ARGS({ "targetfile", "s" }),
++			GDBUS_ARGS({ "transfer", "o" },
++					{ "properties", "a{sv}" }),
+ 			sync_getphonebook) },
+-	{ GDBUS_ASYNC_METHOD("PutPhonebook",
+-			GDBUS_ARGS({ "obj", "s" }), NULL,
++	{ GDBUS_METHOD("PutPhonebook",
++			GDBUS_ARGS({ "sourcefile", "s" }),
++			GDBUS_ARGS({ "transfer", "o" },
++					{ "properties", "a{sv}" }),
+ 			sync_putphonebook) },
  	{ }
  };
 -- 
