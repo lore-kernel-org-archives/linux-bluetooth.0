@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 12/14] client-test: pbap-client uses new API
-Date: Fri,  1 Jun 2012 12:51:21 +0200
-Message-Id: <1338547883-18907-13-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v0 03/14] client: Expose D-Bus data in internal transfer API
+Date: Fri,  1 Jun 2012 12:51:12 +0200
+Message-Id: <1338547883-18907-4-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338547883-18907-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338547883-18907-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,207 +12,112 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
+Expose in transfer API the D-Bus path and properties as should be
+returned by transfer-initiating D-Bus methods.
 ---
- test/pbap-client |  187 +++++++++++++++++++++++++++++++++++++++++++----------
- 1 files changed, 151 insertions(+), 36 deletions(-)
+ client/transfer.c |   62 ++++++++++++++++++++++++++++++++++++++++++----------
+ client/transfer.h |    3 ++
+ 2 files changed, 53 insertions(+), 12 deletions(-)
 
-diff --git a/test/pbap-client b/test/pbap-client
-index ecca14f..2432acf 100755
---- a/test/pbap-client
-+++ b/test/pbap-client
-@@ -1,41 +1,156 @@
- #!/usr/bin/python
+diff --git a/client/transfer.c b/client/transfer.c
+index 04533b8..c4eda84 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -85,6 +85,19 @@ static GQuark obc_transfer_error_quark(void)
+ 	return g_quark_from_static_string("obc-transfer-error-quark");
+ }
  
-+import gobject
++static void obc_transfer_append_dbus_properties(struct obc_transfer *transfer,
++							DBusMessageIter *dict)
++{
++	obex_dbus_dict_append(dict, "Name", DBUS_TYPE_STRING, &transfer->name);
++	obex_dbus_dict_append(dict, "Size", DBUS_TYPE_UINT64, &transfer->size);
++	obex_dbus_dict_append(dict, "Filename", DBUS_TYPE_STRING,
++							&transfer->filename);
 +
- import sys
-+import os
- import dbus
-+import dbus.service
-+import dbus.mainloop.glib
++	if (transfer->obex != NULL)
++		obex_dbus_dict_append(dict, "Progress", DBUS_TYPE_UINT64,
++						&transfer->progress);
++}
 +
-+class Transfer:
-+    def __init__(self, callback_func):
-+        self.callback_func = callback_func
-+        self.path = None
-+        self.filename = None
-+
-+class PbapClient:
-+    def __init__(self, session_path):
-+        self.pending_transfers = 0
-+        self.transfer_dict = dict()
-+        self.flush_func = None
-+        bus = dbus.SessionBus()
-+        self.session = dbus.Interface(bus.get_object("org.openobex.client",
-+                                                     session_path),
-+                                      "org.openobex.Session")
-+        self.pbap = dbus.Interface(bus.get_object("org.openobex.client",
-+                                                  session_path),
-+                                   "org.openobex.PhonebookAccess")
-+        bus.add_signal_receiver(
-+            self.transfer_complete,
-+            dbus_interface="org.openobex.Transfer",
-+            signal_name="Complete",
-+            path_keyword="path")
-+        bus.add_signal_receiver(
-+            self.transfer_error,
-+            dbus_interface="org.openobex.Transfer",
-+            signal_name="Error",
-+            path_keyword="path")
-+
-+    def register(self, reply, transfer):
-+        (path, properties) = reply
-+        transfer.path = path
-+        transfer.filename = properties["Filename"]
-+        self.transfer_dict[path] = transfer
-+        print "Transfer created: %s (file %s)" % (path, transfer.filename)
-+
-+    def error(self, err):
-+        print err
-+        mainloop.quit()
-+
-+    def transfer_complete(self, path):
-+        req = self.transfer_dict.get(path)
-+        if req == None:
-+            return
-+        self.pending_transfers -= 1
-+        print "Transfer %s finished" % path
-+        f = open(req.filename, "r")
-+        os.remove(req.filename)
-+        lines = f.readlines()
-+        del self.transfer_dict[path]
-+        req.callback_func(lines)
-+
-+        if (len(self.transfer_dict) == 0) and (self.pending_transfers == 0):
-+            if self.flush_func != None:
-+                f = self.flush_func
-+                self.flush_func = None
-+                f()
-+
-+    def transfer_error(self, code, message, path):
-+        req = self.transfer_dict.get(path)
-+        if req == None:
-+            return
-+        print "Transfer finished with error %s: %s" % (code, message)
-+        mainloop.quit()
-+
-+    def pull(self, vcard, func):
-+        req = Transfer(func)
-+        self.pbap.Pull(vcard, "",
-+                       reply_handler=lambda r: self.register(r, req),
-+                       error_handler=self.error)
-+        self.pending_transfers += 1
-+
-+    def pull_all(self, func):
-+        req = Transfer(func)
-+        self.pbap.PullAll("",
-+                          reply_handler=lambda r: self.register(r, req),
-+                          error_handler=self.error)
-+        self.pending_transfers += 1
-+
-+    def flush_transfers(self, func):
-+        if (len(self.transfer_dict) == 0) and (self.pending_transfers == 0):
-+            return
-+        self.flush_func = func
-+
-+    def interface(self):
-+        return self.pbap
-+
-+if  __name__ == '__main__':
-+
-+    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-+
-+    bus = dbus.SessionBus()
-+    mainloop = gobject.MainLoop()
-+
-+    client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
-+                            "org.openobex.Client")
-+
-+    if (len(sys.argv) < 2):
-+	print "Usage: %s <device>" % (sys.argv[0])
-+	sys.exit(1)
-+
-+    print "Creating Session"
-+    session_path = client.CreateSession(sys.argv[1], { "Target": "PBAP" })
-+
-+    pbap_client = PbapClient(session_path)
-+
-+    def process_result(lines, header):
-+        if header != None:
-+            print header
-+        for line in lines:
-+            print line,
-+        print
-+
-+    def test_paths(paths):
-+        if len(paths) == 0:
-+            print
-+            print "FINISHED"
-+            mainloop.quit()
-+            return
-+
-+        path = paths[0]
-+
-+        print "\n--- Select Phonebook %s ---\n" % (path)
-+        pbap_client.interface().Select("int", path)
-+
-+        print "\n--- GetSize ---\n"
-+        ret = pbap_client.interface().GetSize()
-+        print "Size = %d\n" % (ret)
-+
-+        print "\n--- List vCard ---\n"
-+        ret = pbap_client.interface().List()
-+        for item in ret:
-+            print "%s : %s" % (item[0], item[1])
-+            pbap_client.interface().SetFormat("vcard30")
-+            pbap_client.interface().SetFilter(["VERSION", "FN", "TEL"]);
-+            pbap_client.pull(item[0], lambda x: process_result(x, None))
-+
-+        pbap_client.interface().SetFormat("vcard30")
-+        pbap_client.interface().SetFilter(["VERSION", "FN", "TEL"]);
-+        pbap_client.pull_all(lambda x: process_result(x, "\n--- PullAll ---\n"))
-+
-+        pbap_client.flush_transfers(lambda: test_paths(paths[1:]))
-+
-+    test_paths(["PB", "ICH", "OCH", "MCH", "CCH"])
+ static DBusMessage *obc_transfer_get_properties(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
+ {
+@@ -97,26 +110,51 @@ static DBusMessage *obc_transfer_get_properties(DBusConnection *connection,
+ 		return NULL;
  
--bus = dbus.SessionBus()
+ 	dbus_message_iter_init_append(reply, &iter);
 -
--client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
--						"org.openobex.Client")
+ 	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++						OBC_PROPERTIES_ARRAY_SIGNATURE,
++						&dict);
+ 
+-	obex_dbus_dict_append(&dict, "Name", DBUS_TYPE_STRING, &transfer->name);
+-	obex_dbus_dict_append(&dict, "Size", DBUS_TYPE_UINT64, &transfer->size);
+-	obex_dbus_dict_append(&dict, "Filename", DBUS_TYPE_STRING,
+-							&transfer->filename);
 -
--print "Creating Session"
--session_path = client.CreateSession(sys.argv[1], { "Target": "PBAP" })
--pbap = dbus.Interface(bus.get_object("org.openobex.client", session_path),
--						"org.openobex.PhonebookAccess")
--session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
--							"org.openobex.Session")
--
--paths = ["PB", "ICH", "OCH", "MCH", "CCH"]
--
--for path in paths:
--	print "\n--- Select Phonebook %s ---\n" % (path)
--	pbap.Select("int", path)
--
--	print "\n--- GetSize ---\n"
--	ret = pbap.GetSize()
--	print "Size = %d\n" % (ret)
--
--	print "\n--- List vCard ---\n"
--	ret = pbap.List()
--	for item in ret:
--		print "%s : %s" % (item[0], item[1])
--		pbap.SetFormat("vcard30")
--		pbap.SetFilter(["VERSION", "FN", "TEL"]);
--		ret = pbap.Pull(item[0])
--		print "%s" % (ret)
--
--	print "\n--- PullAll ---\n"
--	pbap.SetFormat("vcard30")
--	pbap.SetFilter(["VERSION", "FN", "TEL"]);
--	ret = pbap.PullAll()
--	print "%s" % (ret)
-+    mainloop.run()
+-	if (transfer->obex != NULL)
+-		obex_dbus_dict_append(&dict, "Progress", DBUS_TYPE_UINT64,
+-						&transfer->progress);
++	obc_transfer_append_dbus_properties(transfer, &dict);
+ 
+ 	dbus_message_iter_close_container(&iter, &dict);
+ 
+ 	return reply;
+ }
+ 
++static void obc_transfer_append_dbus_data(struct obc_transfer *transfer,
++							DBusMessageIter *iter)
++{
++	const char *path = transfer->path;
++	DBusMessageIter entry, dict;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_STRUCT, NULL, &entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_OBJECT_PATH, &path);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_ARRAY,
++						OBC_PROPERTIES_ARRAY_SIGNATURE,
++						&dict);
++
++	obc_transfer_append_dbus_properties(transfer, &dict);
++
++	dbus_message_iter_close_container(&entry, &dict);
++	dbus_message_iter_close_container(iter, &entry);
++}
++
++DBusMessage *obc_transfer_create_dbus_reply(struct obc_transfer *transfer,
++							DBusMessage *message)
++{
++	DBusMessage *reply;
++	DBusMessageIter iter;
++
++	reply = dbus_message_new_method_return(message);
++	if (reply == NULL)
++		return NULL;
++
++	dbus_message_iter_init_append(reply, &iter);
++	obc_transfer_append_dbus_data(transfer, &iter);
++
++	return reply;
++}
++
+ static void abort_complete(GObex *obex, GError *err, gpointer user_data)
+ {
+ 	struct obc_transfer *transfer = user_data;
+diff --git a/client/transfer.h b/client/transfer.h
+index 15c157a..eb5275c 100644
+--- a/client/transfer.h
++++ b/client/transfer.h
+@@ -57,3 +57,6 @@ int obc_transfer_get_contents(struct obc_transfer *transfer, char **contents,
+ 
+ const char *obc_transfer_get_path(struct obc_transfer *transfer);
+ gint64 obc_transfer_get_size(struct obc_transfer *transfer);
++
++DBusMessage *obc_transfer_create_dbus_reply(struct obc_transfer *transfer,
++							DBusMessage *message);
 -- 
 1.7.7.6
 
