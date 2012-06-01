@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 05/14] client-doc: FileTransfer sessions return transfers
-Date: Fri,  1 Jun 2012 12:51:14 +0200
-Message-Id: <1338547883-18907-6-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v0 02/14] client: Support empty filename in obc_transfer_get
+Date: Fri,  1 Jun 2012 12:51:11 +0200
+Message-Id: <1338547883-18907-3-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338547883-18907-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338547883-18907-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,53 +12,99 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
----
- doc/client-api.txt |   23 +++++++++++++++++------
- 1 files changed, 17 insertions(+), 6 deletions(-)
+Passing an empty string as a filename for obc_transfer_get will be
+similar to passing a NULL filename. This means a temporary file will be
+created to store the content of the transfer.
 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 5377124..8e0819d 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -138,21 +138,32 @@ Methods		void ChangeFolder(string folder)
- 				uint64 Accessed : Last access
- 				uint64 Created : Creation date
+NULL and "" are not exactly equivalent though: in case of NULL the file
+will be automatically removed immediately after being open, which means
+that the transfer initiator should also open the file to prevent it from
+being removed (to be used from the modules).
+
+On the other hand, if "" is given, the file will be removed only in case
+of error. So after success the transfer initiator should decide whether
+the file should be removed or not.
+
+This change is convenient in order to expose the same API in D-Bus.
+---
+ client/transfer.c |   28 +++++++++++++++++++++++-----
+ 1 files changed, 23 insertions(+), 5 deletions(-)
+
+diff --git a/client/transfer.c b/client/transfer.c
+index 14006ef..04533b8 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -77,6 +77,7 @@ struct obc_transfer {
+ 	gint64 transferred;
+ 	gint64 progress;
+ 	guint progress_id;
++	gboolean remove_file_on_error;
+ };
  
--		void GetFile(string targetfile, string sourcefile)
-+		object, dict GetFile(string targetfile, string sourcefile)
+ static GQuark obc_transfer_error_quark(void)
+@@ -293,8 +294,9 @@ static gboolean transfer_open(struct obc_transfer *transfer, int flags,
+ 						mode_t mode, GError **err)
+ {
+ 	int fd;
++	char *filename;
  
- 			Copy the source file (from remote device) to the
- 			target file (on local filesystem).
+-	if (transfer->filename != NULL) {
++	if (transfer->filename != NULL && strcmp(transfer->filename, "") != 0) {
+ 		fd = open(transfer->filename, flags, mode);
+ 		if (fd < 0) {
+ 			error("open(): %s(%d)", strerror(errno), errno);
+@@ -305,13 +307,19 @@ static gboolean transfer_open(struct obc_transfer *transfer, int flags,
+ 		goto done;
+ 	}
  
--			A new Transfer object is created to represent this
--			transaction.
-+			If an empty target file is given, a name will be
-+			automatically calculated for the temporary file.
+-	fd = g_file_open_tmp("obex-clientXXXXXX", &transfer->filename, err);
++	fd = g_file_open_tmp("obex-clientXXXXXX", &filename, err);
+ 	if (fd < 0) {
+ 		error("g_file_open_tmp(): %s", (*err)->message);
+ 		return FALSE;
+ 	}
+ 
+-	remove(transfer->filename);
++	if (transfer->filename == NULL)
++		remove(filename); /* remove always only if NULL was given */
++	else
++		transfer->remove_file_on_error = TRUE;
 +
-+			The returned path represents the newly created transfer,
-+			which should be used to find out if the content has been
-+			successfully transferred or if the operation fails.
++	g_free(transfer->filename);
++	transfer->filename = filename;
  
--		void PutFile(string sourcefile, string targetfile)
-+			The properties of this transfer are also returned along
-+			with the object path, to avoid a call to GetProperties.
+ done:
+ 	transfer->fd = fd;
+@@ -344,6 +352,12 @@ struct obc_transfer *obc_transfer_put(const char *type, const char *name,
+ 	struct stat st;
+ 	int perr;
+ 
++	if (filename == NULL || strcmp(filename, "") == 0) {
++		g_set_error(err, OBC_TRANSFER_ERROR, -EINVAL,
++						"Invalid filename given");
++		return NULL;
++	}
 +
-+		object, dict PutFile(string sourcefile, string targetfile)
+ 	transfer = obc_transfer_create(G_OBEX_OP_PUT, filename, name, type);
  
- 			Copy the source file (from local filesystem) to the
- 			target file (on remote device).
+ 	if (contents != NULL) {
+@@ -433,10 +447,14 @@ static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
+ 			g_dbus_emit_signal(transfer->conn, transfer->path,
+ 						TRANSFER_INTERFACE, "Complete",
+ 						DBUS_TYPE_INVALID);
+-	} else if (transfer->path != NULL) {
++	} else {
+ 		const char *code = "org.openobex.Error.Failed";
  
--			A new Transfer object is created to represent this
--			transaction.
-+			The returned path represents the newly created transfer,
-+			which should be used to find out if the content has been
-+			successfully transferred or if the operation fails.
+-		g_dbus_emit_signal(transfer->conn, transfer->path,
++		if (transfer->remove_file_on_error)
++			remove(transfer->filename);
 +
-+			The properties of this transfer are also returned along
-+			with the object path, to avoid a call to GetProperties.
- 
- 		void CopyFile(string sourcefile, string targetfile)
- 
++		if (transfer->path != NULL)
++			g_dbus_emit_signal(transfer->conn, transfer->path,
+ 						TRANSFER_INTERFACE, "Error",
+ 						DBUS_TYPE_STRING,
+ 						&code,
 -- 
 1.7.7.6
 
