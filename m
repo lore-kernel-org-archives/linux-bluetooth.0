@@ -1,56 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 00/14] client: Return transfer object in D-Bus API
-Date: Fri,  1 Jun 2012 12:51:09 +0200
-Message-Id: <1338547883-18907-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Fri, 1 Jun 2012 10:12:21 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix checking the wrong flag when accepting a
+ socket
+Message-ID: <20120601071220.GC3009@aemeltch-MOBL1>
+References: <1338515619-7448-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1338515619-7448-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Vinicius
 
-This patch series proposes changes in the D-Bus API so that all transfer-initiating methods will return the transfer path. This has several benefits including the possibility to cancel the transfer.
+On Thu, May 31, 2012 at 10:53:39PM -0300, Vinicius Costa Gomes wrote:
+> Most probably a typo, the check should have been for BT_SK_DEFER_SETUP
+> instead of BT_DEFER_SETUP (which right now only represents a socket
+> option).
+> 
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 
-Along with the transfer path, the properties corresponding to this transfer will also be returned, for both performance reasons (avoid a call to GetProperties) and also race conditions (transfer might have been destroyed by the time the client calls to GetProperties).
+Good catch, this was recently introduced by commit c5daa683
 
-In addition, temporary files can now easily be used by the clients, by passing empty strings in the D-Bus API. The actual name of the created temporary file will be included in the transfer properties.
+Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com> 
 
-Mikel Astiz (14):
-  client-doc: ObjectPush sessions return transfers
-  client: Support empty filename in obc_transfer_get
-  client: Expose D-Bus data in internal transfer API
-  client: ObjectPush sessions return transfers
-  client-doc: FileTransfer sessions return transfers
-  client: FileTransfer sessions return transfers
-  client-doc: Synchronization sessions return transfers
-  client: Synchronization sessions return transfers
-  client-doc: PhonebookAccess sessions return transfers
-  client: PhonebookAccess sessions return transfers
-  client-test: ftp-client uses new API
-  client-test: pbap-client uses new API
-  client-test: Add opp-client
-  client: Update copyright statement
-
- client/ftp.c            |   46 ++++--------
- client/opp.c            |   71 +++---------------
- client/pbap.c           |  161 +++++++++++++++++++----------------------
- client/session.c        |    1 +
- client/session.h        |    1 +
- client/sync.c           |   92 ++++++++---------------
- client/transfer.c       |   91 +++++++++++++++++++----
- client/transfer.h       |    4 +
- doc/client-api.txt      |  114 ++++++++++++++++++++++++-----
- test/ftp-client         |  159 ++++++++++++++++++++++++----------------
- test/opp-client         |  101 +++++++++++++++++++++++++
- test/pbap-client        |  187 ++++++++++++++++++++++++++++++++++++++---------
- test/pull-business-card |   40 ----------
- test/send-files         |   23 ------
- 14 files changed, 660 insertions(+), 431 deletions(-)
- create mode 100755 test/opp-client
- delete mode 100755 test/pull-business-card
- delete mode 100755 test/send-files
-
--- 
-1.7.7.6
-
+> ---
+>  net/bluetooth/af_bluetooth.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+> index 2517472..f7db579 100644
+> --- a/net/bluetooth/af_bluetooth.c
+> +++ b/net/bluetooth/af_bluetooth.c
+> @@ -199,7 +199,7 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+>  		}
+>  
+>  		if (sk->sk_state == BT_CONNECTED || !newsock ||
+> -		    test_bit(BT_DEFER_SETUP, &bt_sk(parent)->flags)) {
+> +		    test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags)) {
+>  			bt_accept_unlink(sk);
+>  			if (newsock)
+>  				sock_graft(sk, newsock);
+> -- 
+> 1.7.10.3
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
