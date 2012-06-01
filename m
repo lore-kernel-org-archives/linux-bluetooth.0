@@ -1,29 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Jun 2012 20:02:52 -0300
+Date: Fri, 1 Jun 2012 20:00:52 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Remove magic disconnect reason
-Message-ID: <20120601230252.GG24769@joana>
-References: <1338556705-6763-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix checking the wrong flag when accepting a
+ socket
+Message-ID: <20120601230052.GF24769@joana>
+References: <1338515619-7448-1-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338556705-6763-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1338515619-7448-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Vinicius,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-06-01 16:18:25 +0300]:
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2012-05-31 22:53:39 -0300]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Most probably a typo, the check should have been for BT_SK_DEFER_SETUP
+> instead of BT_DEFER_SETUP (which right now only represents a socket
+> option).
 > 
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 > ---
->  net/bluetooth/hci_core.c |    2 +-
+>  net/bluetooth/af_bluetooth.c |    2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Patch has been applied to bluetooth-next. Thanks.
+Patch has been applied to bluetooth-next. thanks.
 
 	Gustavo
