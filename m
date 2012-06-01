@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 11/14] client-test: ftp-client uses new API
-Date: Fri,  1 Jun 2012 12:51:20 +0200
-Message-Id: <1338547883-18907-12-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v0 06/14] client: FileTransfer sessions return transfers
+Date: Fri,  1 Jun 2012 12:51:15 +0200
+Message-Id: <1338547883-18907-7-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338547883-18907-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338547883-18907-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,202 +12,90 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
+Return the D-Bus path of the transfer representing the operation.
 ---
- test/ftp-client |  159 +++++++++++++++++++++++++++++++++---------------------
- 1 files changed, 97 insertions(+), 62 deletions(-)
+ client/ftp.c |   46 ++++++++++++++--------------------------------
+ 1 files changed, 14 insertions(+), 32 deletions(-)
 
-diff --git a/test/ftp-client b/test/ftp-client
-index 8421ade..f8c33e9 100755
---- a/test/ftp-client
-+++ b/test/ftp-client
-@@ -32,56 +32,94 @@ def parse_options():
+diff --git a/client/ftp.c b/client/ftp.c
+index 8c72413..58aa17f 100644
+--- a/client/ftp.c
++++ b/client/ftp.c
+@@ -143,24 +143,6 @@ static const GMarkupParser parser = {
+ 	NULL
+ };
  
-     return parser.parse_args()
- 
--def error(err):
--    print err
+-static void transfer_callback(struct obc_session *session,
+-						struct obc_transfer *transfer,
+-						GError *err, void *user_data)
+-{
+-	DBusMessage *msg = user_data;
+-	DBusMessage *reply;
 -
--def void_reply():
--    pass
+-	if (err)
+-		reply = g_dbus_create_error(msg,
+-					"org.openobex.Error.Failed",
+-					"%s", err->message);
+-	else
+-		reply = dbus_message_new_method_return(msg);
 -
--def transfer_complete():
--    if options.verbose:
--        print "Transfer finished"
--    mainloop.quit()
+-	g_dbus_send_message(conn, reply);
+-	dbus_message_unref(msg);
+-}
 -
--def change_folder(session, new_dir):
--    for node in new_dir.split("/"):
--        session.ChangeFolder(node)
--
--def list_folder(session):
--    for i in session.ListFolder():
--        if i["Type"] == "folder":
--            print "%s/" % (i["Name"])
--        else:
--            print "%s" % (i["Name"])
--
--def put_file(session, filename):
--    session.PutFile(os.path.abspath(filename),
--                    os.path.basename(filename),
--                    reply_handler=transfer_complete,
--                    error_handler=error)
--
--def get_file(session, filename):
--    session.GetFile(os.path.abspath(filename),
--                    os.path.basename(filename),
--                    reply_handler=transfer_complete,
--                    error_handler=error)
--
--def remove_file(session, filename):
--    session.Delete(filename,
--                    reply_handler=void_reply,
--                    error_handler=error)
--
--def move_file(session, filename, destname):
--    session.MoveFile(filename,
--                    destname,
--                    reply_handler=void_reply,
--                    error_handler=error)
--
--def copy_file(session, filename, destname):
--    session.CopyFile(filename,
--                    destname,
--                    reply_handler=void_reply,
--                    error_handler=error)
-+class FtpClient:
-+    def __init__(self, session_path, verbose=False):
-+        self.transfer_path = None
-+        self.verbose = verbose
-+        bus = dbus.SessionBus()
-+        self.session = dbus.Interface(bus.get_object("org.openobex.client",
-+                                                     session_path),
-+                                      "org.openobex.Session")
-+        self.ftp = dbus.Interface(bus.get_object("org.openobex.client",
-+                                                 session_path),
-+                                  "org.openobex.FileTransfer")
-+        bus.add_signal_receiver(
-+            self.transfer_complete,
-+            dbus_interface="org.openobex.Transfer",
-+            signal_name="Complete",
-+            path_keyword="path")
-+        bus.add_signal_receiver(
-+            self.transfer_error,
-+            dbus_interface="org.openobex.Transfer",
-+            signal_name="Error",
-+            path_keyword="path")
-+
-+    def create_transfer_reply(self, reply):
-+        (path, properties) = reply
-+        self.transfer_path = path
-+        if self.verbose:
-+            print "Transfer created: %s" % path
-+
-+    def generic_reply(self):
-+        if self.verbose:
-+            print "Operation succeeded"
-+
-+    def error(self, err):
-+        print err
-+        mainloop.quit()
-+
-+    def transfer_complete(self, path):
-+        if path != self.transfer_path:
-+            return
-+        if self.verbose:
-+            print "Transfer finished"
-+        mainloop.quit()
-+
-+    def transfer_error(self, code, message, path):
-+        if path != self.transfer_path:
-+            return
-+        print "Transfer finished with error %s: %s" % (code, message)
-+        mainloop.quit()
-+
-+    def change_folder(self, new_dir):
-+        for node in new_dir.split("/"):
-+            self.ftp.ChangeFolder(node)
-+
-+    def list_folder(self):
-+        for i in self.ftp.ListFolder():
-+            if i["Type"] == "folder":
-+                print "%s/" % (i["Name"])
-+            else:
-+                print "%s" % (i["Name"])
-+
-+    def put_file(self, filename):
-+        self.ftp.PutFile(os.path.abspath(filename),
-+                         os.path.basename(filename),
-+                         reply_handler=self.create_transfer_reply,
-+                         error_handler=self.error)
-+
-+    def get_file(self, filename):
-+        self.ftp.GetFile(os.path.abspath(filename),
-+                         os.path.basename(filename),
-+                         reply_handler=self.create_transfer_reply,
-+                         error_handler=self.error)
-+
-+    def remove_file(self, filename):
-+        self.ftp.Delete(filename,
-+                        reply_handler=self.generic_reply,
-+                        error_handler=self.error)
-+
-+    def move_file(self, filename, destname):
-+        self.ftp.MoveFile(filename,
-+                          destname,
-+                          reply_handler=self.generic_reply,
-+                          error_handler=self.error)
-+
-+    def copy_file(self, filename, destname):
-+        self.ftp.CopyFile(filename,
-+                          destname,
-+                          reply_handler=self.generic_reply,
-+                          error_handler=self.error)
+ static void list_folder_callback(struct obc_session *session,
+ 						struct obc_transfer *transfer,
+ 						GError *err, void *user_data)
+@@ -270,11 +252,10 @@ static DBusMessage *get_file(DBusConnection *connection,
+ 	if (transfer == NULL)
+ 		goto fail;
  
- if  __name__ == '__main__':
+-	if (obc_session_queue(session, transfer, transfer_callback, message,
+-									&err)) {
+-		dbus_message_ref(message);
+-		return NULL;
+-	}
++	if (!obc_session_queue(session, transfer, NULL, NULL, &err))
++		goto fail;
++
++	return obc_transfer_create_dbus_reply(transfer, message);
  
-@@ -101,33 +139,30 @@ if  __name__ == '__main__':
-     client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
-                             "org.openobex.Client")
+ fail:
+ 	reply = g_dbus_create_error(message, "org.openobex.Error.Failed", "%s",
+@@ -306,11 +287,10 @@ static DBusMessage *put_file(DBusConnection *connection,
+ 	if (transfer == NULL)
+ 		goto fail;
  
-+    print "Creating Session"
-     session_path = client.CreateSession(options.device, { "Target": "ftp" })
+-	if (obc_session_queue(session, transfer, transfer_callback, message,
+-									&err)) {
+-		dbus_message_ref(message);
+-		return NULL;
+-	}
++	if (!obc_session_queue(session, transfer, NULL, NULL, &err))
++		goto fail;
++
++	return obc_transfer_create_dbus_reply(transfer, message);
  
--    session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
--                 "org.openobex.Session")
--
--    ftp = dbus.Interface(bus.get_object("org.openobex.client", session_path),
--                 "org.openobex.FileTransfer")
-+    ftp_client = FtpClient(session_path)
- 
-     if options.new_dir:
--        change_folder(ftp, options.new_dir)
-+        ftp_client.change_folder(options.new_dir)
- 
-     if options.list_dir:
--        list_folder(ftp)
-+        ftp_client.list_folder()
- 
-     if options.get_file:
--        get_file(ftp, options.get_file)
-+        ftp_client.get_file(options.get_file)
- 
-     if options.put_file:
--        put_file(ftp, options.put_file)
-+        ftp_client.put_file(options.put_file)
- 
-     if options.move_file:
--        move_file(ftp, options.move_file, options.dest_file)
-+        ftp_client.move_file(options.move_file, options.dest_file)
- 
-     if options.copy_file:
--        copy_file(ftp, options.copy_file, options.dest_file)
-+        ftp_client.copy_file(options.copy_file, options.dest_file)
- 
-     if options.remove_file:
--       remove_file(ftp, options.remove_file)
-+       ftp_client.remove_file(options.remove_file)
- 
-     mainloop.run()
+ fail:
+ 	reply = g_dbus_create_error(message, "org.openobex.Error.Failed", "%s",
+@@ -415,11 +395,13 @@ static const GDBusMethodTable ftp_methods[] = {
+ 		GDBUS_ARGS({ "folder", "s" }), NULL, create_folder) },
+ 	{ GDBUS_ASYNC_METHOD("ListFolder",
+ 		NULL, GDBUS_ARGS({ "folderinfo", "aa{sv}" }), list_folder) },
+-	{ GDBUS_ASYNC_METHOD("GetFile",
+-		GDBUS_ARGS({ "targetfile", "s" }, { "sourcefile", "s" }), NULL,
++	{ GDBUS_METHOD("GetFile",
++		GDBUS_ARGS({ "targetfile", "s" }, { "sourcefile", "s" }),
++		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
+ 		get_file) },
+-	{ GDBUS_ASYNC_METHOD("PutFile",
+-		GDBUS_ARGS({ "sourcefile", "s" }, { "targetfile", "s" }), NULL,
++	{ GDBUS_METHOD("PutFile",
++		GDBUS_ARGS({ "sourcefile", "s" }, { "targetfile", "s" }),
++		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
+ 		put_file) },
+ 	{ GDBUS_ASYNC_METHOD("CopyFile",
+ 		GDBUS_ARGS({ "sourcefile", "s" }, { "targetfile", "s" }), NULL,
 -- 
 1.7.7.6
 
