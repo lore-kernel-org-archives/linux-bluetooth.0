@@ -1,56 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Jun 2012 10:06:42 +0300
+Date: Fri, 1 Jun 2012 10:03:12 +0300
 From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Trivial refactoring in __l2cap_chan_add
-Message-ID: <20120601070641.GB3009@aemeltch-MOBL1>
-References: <1338508794-12534-1-git-send-email-andre.guedes@openbossa.org>
+Subject: Re: [RFC] Bluetooth: Fix compile warning in l2cap_core.c
+Message-ID: <20120601070309.GA3009@aemeltch-MOBL1>
+References: <1338507556-10920-1-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338508794-12534-1-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1338507556-10920-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-On Thu, May 31, 2012 at 08:59:54PM -0300, Andre Guedes wrote:
-> All cases in switch statement set chan->omtu to L2CAP_DEFAULT_MTU.
-> This patch moves the assignments to outside the switch statement.
+On Thu, May 31, 2012 at 08:39:16PM -0300, Andre Guedes wrote:
+> This patch fixes the following warning reported by gcc 4.7.0:
+> 
+> net/bluetooth/l2cap_core.c: In function 'l2cap_config_rsp':
+> net/bluetooth/l2cap_core.c:3302:13: warning: 'rfc.max_pdu_size' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.max_pdu_size' was declared here
+> net/bluetooth/l2cap_core.c:3298:25: warning: 'rfc.monitor_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.monitor_timeout' was declared here
+> net/bluetooth/l2cap_core.c:3297:25: warning: 'rfc.retrans_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.retrans_timeout' was declared here
+> net/bluetooth/l2cap_core.c:3295:2: warning: 'rfc.mode' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.mode' was declared here
 > 
 > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
->  net/bluetooth/l2cap_core.c |    5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
+>  net/bluetooth/l2cap_core.c |   16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
 > 
 > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index f9bffe3..0ba8875 100644
+> index f9bffe3..6df27cd 100644
 > --- a/net/bluetooth/l2cap_core.c
 > +++ b/net/bluetooth/l2cap_core.c
-> @@ -449,13 +449,11 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
->  	case L2CAP_CHAN_CONN_ORIENTED:
->  		if (conn->hcon->type == LE_LINK) {
->  			/* LE connection */
-> -			chan->omtu = L2CAP_DEFAULT_MTU;
->  			chan->scid = L2CAP_CID_LE_DATA;
->  			chan->dcid = L2CAP_CID_LE_DATA;
->  		} else {
->  			/* Alloc CID for connection-oriented socket */
->  			chan->scid = l2cap_alloc_cid(conn);
-> -			chan->omtu = L2CAP_DEFAULT_MTU;
->  		}
->  		break;
+> @@ -3270,6 +3270,14 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
+>  	if ((chan->mode != L2CAP_MODE_ERTM) && (chan->mode != L2CAP_MODE_STREAMING))
+>  		return;
 >  
-> @@ -463,7 +461,6 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
->  		/* Connectionless socket */
->  		chan->scid = L2CAP_CID_CONN_LESS;
->  		chan->dcid = L2CAP_CID_CONN_LESS;
-> -		chan->omtu = L2CAP_DEFAULT_MTU;
->  		break;
->  
->  	case L2CAP_CHAN_CONN_FIX_A2MP:
+> +	/* Use sane default values in case a misbehaving remote device
+> +	 * do not send an RFC option.
+> +	 */
+> +	rfc.mode = chan->mode;
+> +	rfc.retrans_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
+> +	rfc.monitor_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
+> +	rfc.max_pdu_size = cpu_to_le16(chan->imtu);
+> +
 
-what about omtu for fixed channel?
+I feel that this should be reworked better. If we do not get rfc we assign
+to rfc those values from chan and make conversion cpu_to_le16 and then we
+assign those values again to chan making reverse conversion.
 
 Best regards 
 Andrei Emeltchenko 
