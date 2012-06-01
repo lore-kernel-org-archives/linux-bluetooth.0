@@ -2,30 +2,34 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH v2 0/5] Bluetooth: Refactoring hci_connect()
-Date: Thu, 31 May 2012 22:57:51 -0300
-Message-Id: <1338515876-7547-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH] Bluetooth: Fix checking the wrong flag when accepting a socket
+Date: Thu, 31 May 2012 22:53:39 -0300
+Message-Id: <1338515619-7448-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Most probably a typo, the check should have been for BT_SK_DEFER_SETUP
+instead of BT_DEFER_SETUP (which right now only represents a socket
+option).
 
-Changes from last version:
- - the functions are now named hci_connect_{acl,le,sco}. I didn't use
- hci_add_* because there is already a function hci_add_sco.
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ net/bluetooth/af_bluetooth.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
-
-Vinicius Costa Gomes (5):
-  Bluetooth: Refactor LE connection into its own function
-  Bluetooth: Refactor ACL connection into its own function
-  Bluetooth: Refactor SCO connection into its own function
-  Bluetooth: Simplify a the connection type handling
-  Bluetooth: Add type information to the hci_connect() debug statement
-
- net/bluetooth/hci_conn.c |   81 ++++++++++++++++++++++++++++++----------------
- 1 file changed, 53 insertions(+), 28 deletions(-)
-
---
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 2517472..f7db579 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -199,7 +199,7 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+ 		}
+ 
+ 		if (sk->sk_state == BT_CONNECTED || !newsock ||
+-		    test_bit(BT_DEFER_SETUP, &bt_sk(parent)->flags)) {
++		    test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags)) {
+ 			bt_accept_unlink(sk);
+ 			if (newsock)
+ 				sock_graft(sk, newsock);
+-- 
 1.7.10.3
 
