@@ -1,27 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 2 Jun 2012 09:12:24 +0800
+Date: Sat, 2 Jun 2012 09:09:39 +0800
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/3] core: Fix repeated connection attempt
-Message-ID: <20120602011224.GB22641@x220.docomointertouch.net>
-References: <1338572919-19071-1-git-send-email-claudio.takahasi@openbossa.org>
+To: Daniel Wagner <wagi@monom.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Daniel Wagner <daniel.wagner@bmw-carit.de>
+Subject: Re: [PATCH v3 00/14] Prefer PAN over DUN
+Message-ID: <20120602010939.GA22641@x220.docomointertouch.net>
+References: <1338471818-20894-1-git-send-email-wagi@monom.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338572919-19071-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1338471818-20894-1-git-send-email-wagi@monom.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Daniel,
 
-On Fri, Jun 01, 2012, Claudio Takahasi wrote:
-> This patch fixes possible repeated connections attempt to the same
-> remote device when there is an attempt pending, since device drivers
-> can request independently ATT connections.
-> ---
->  src/device.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+On Thu, May 31, 2012, Daniel Wagner wrote:
+> From: Daniel Wagner <daniel.wagner@bmw-carit.de>
+> 
+> Hi,
+> 
+> This version moves the UUID strings into the lib instead of the core.
+> I tried to do get rid of the UUID string using the *_SVCLASS_ID from sdp.h
+> but it is hard to do string magic during precompile time...
+> 
+> cheers,
+> daniel
+> 
+> changes:
+> 
+> v3: - Move UUID strings into lib
+> 
+> v2: - Move all UUID string definition into one header file
+>     - Change configuration variable name
+>     - This behavior is off by default
+> 
+> Daniel Wagner (14):
+>   sdp: Remove unused BASE_UUID definition
+>   audio: Move UUID string definition to lib
+>   network: Move UUID string definition to lib
+>   deviceinfo: Move UUID string definition to lib
+>   proximity: Move UUID string definition to lib
+>   sap: Move UUID string definition to lib
+>   thermometer: Move UUID string definition to lib
+>   serial: Move UUID string definition to lib
+>   health: Move UUID string definition to lib
+>   input: Move UUID string definition to lib
+>   pnat: Move UUID string definition to lib
+>   core: Move UUID string definition to lib
+>   main: Add PreferPANoverDUN configuration switch
+>   device: Ignore DUN if PAN is present
 
-All three patches have been applied. Thanks.
+I've applied patches 1-12 but I stopped there for now since I'm not
+completely convinced of the config file parameter naming.
 
 Johan
