@@ -1,42 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Subject: Re: [RFC] Bluetooth: Fix compile warning in l2cap_core.c
-Date: Mon, 4 Jun 2012 09:17:55 +0200
-CC: Andre Guedes <andre.guedes@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <1338507556-10920-1-git-send-email-andre.guedes@openbossa.org> <20120601230918.GH24769@joana>
-In-Reply-To: <20120601230918.GH24769@joana>
+Message-ID: <4FCAE7BB.3030804@jesshaas.com>
+Date: Sat, 02 Jun 2012 21:27:39 -0700
+From: Jess Haas <pa@jesshaas.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Message-ID: <201206040917.56331.szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Using multiple bluetooth headsets at the same time
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+	I am wanting to stream to multiple bluetooth headsets at the same time
+using the a2dp profile. One headset works great but I can't seem to get
+a second one to work.
 
-> * Andre Guedes <andre.guedes@openbossa.org> [2012-05-31 20:39:16 -0300]:
-> 
-> > This patch fixes the following warning reported by gcc 4.7.0:
-> > 
-> > net/bluetooth/l2cap_core.c: In function 'l2cap_config_rsp':
-> > net/bluetooth/l2cap_core.c:3302:13: warning: 'rfc.max_pdu_size' may be used uninitialized in this function [-Wmaybe-uninitialized]
-> > net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.max_pdu_size' was declared here
-> > net/bluetooth/l2cap_core.c:3298:25: warning: 'rfc.monitor_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
-> > net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.monitor_timeout' was declared here
-> > net/bluetooth/l2cap_core.c:3297:25: warning: 'rfc.retrans_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
-> > net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.retrans_timeout' was declared here
-> > net/bluetooth/l2cap_core.c:3295:2: warning: 'rfc.mode' may be used uninitialized in this function [-Wmaybe-uninitialized]
-> > net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.mode' was declared here
-> 
-> So I think this is a false positive, I've seen this warning here for more than
-> a month, since I updated to fedora 17.
-> At some people will disable this warning in the kernel compile process if this
-> appear in others places in the kernel as false positive too.
+	I have both headsets paired and connected and can play using either one
+but when I start playback on the second one(using mplayer -ao
+alsa:device=bluetooth file.mp3)  I get this error:
+[AO_ALSA] alsa-lib: audio/pcm_bluetooth.c:1614:(audioservice_expect)
+BT_OPEN failed : Invalid argument(22)
+[AO_ALSA] Unable to set hw-parameters: Invalid argument
 
-What if remote device misbehaves and sends bogus L2CAP_CONF_RFC i.e. with wrong length?
+Any ideas on if its possible to get this to work and if so where to
+start? I don't mind doing a little coding but have no real experience
+with kernel stuff.
+
+This is my asound.conf:
+pcm.bluetooth {
+        type bluetooth
+        device 00:11:67:39:5A:34
+	profile "a2dp"
+}
 
 
--- 
-BR
-Szymon
+pcm.bluetooth2 {
+        type bluetooth
+        device 00:11:67:66:E2:4B
+        profile "a2dp"
+}
+
+Thanks,
+   Jess
