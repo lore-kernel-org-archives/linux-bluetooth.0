@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v1 13/15] client-test: pbap-client uses new API
-Date: Mon,  4 Jun 2012 11:37:56 +0200
-Message-Id: <1338802678-7009-14-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v1 15/15] client: Update copyright statement
+Date: Mon,  4 Jun 2012 11:37:58 +0200
+Message-Id: <1338802678-7009-16-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338802678-7009-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338802678-7009-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,206 +13,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
 ---
- test/pbap-client |  187 +++++++++++++++++++++++++++++++++++++++++++----------
- 1 files changed, 151 insertions(+), 36 deletions(-)
+ client/session.c   |    1 +
+ client/session.h   |    1 +
+ client/transfer.c  |    1 +
+ client/transfer.h  |    1 +
+ doc/client-api.txt |    1 +
+ 5 files changed, 5 insertions(+), 0 deletions(-)
 
-diff --git a/test/pbap-client b/test/pbap-client
-index ecca14f..2432acf 100755
---- a/test/pbap-client
-+++ b/test/pbap-client
-@@ -1,41 +1,156 @@
- #!/usr/bin/python
+diff --git a/client/session.c b/client/session.c
+index 9670968..ac5c7f2 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -3,6 +3,7 @@
+  *  OBEX Client
+  *
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2011-2012  BMW Car IT GmbH. All rights reserved.
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
+diff --git a/client/session.h b/client/session.h
+index 7f37d29..af71568 100644
+--- a/client/session.h
++++ b/client/session.h
+@@ -3,6 +3,7 @@
+  *  OBEX Client
+  *
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2011-2012  BMW Car IT GmbH. All rights reserved.
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
+diff --git a/client/transfer.c b/client/transfer.c
+index 4963665..b807014 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -3,6 +3,7 @@
+  *  OBEX Client
+  *
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2011-2012  BMW Car IT GmbH. All rights reserved.
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
+diff --git a/client/transfer.h b/client/transfer.h
+index eb5275c..071b6d3 100644
+--- a/client/transfer.h
++++ b/client/transfer.h
+@@ -3,6 +3,7 @@
+  *  OBEX Client
+  *
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2011-2012  BMW Car IT GmbH. All rights reserved.
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index 17c15bb..2165c22 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -2,6 +2,7 @@ OBEX client API description
+ ***************************
  
-+import gobject
-+
- import sys
-+import os
- import dbus
-+import dbus.service
-+import dbus.mainloop.glib
-+
-+class Transfer:
-+    def __init__(self, callback_func):
-+        self.callback_func = callback_func
-+        self.path = None
-+        self.filename = None
-+
-+class PbapClient:
-+    def __init__(self, session_path):
-+        self.pending_transfers = 0
-+        self.transfer_dict = dict()
-+        self.flush_func = None
-+        bus = dbus.SessionBus()
-+        self.session = dbus.Interface(bus.get_object("org.openobex.client",
-+                                                     session_path),
-+                                      "org.openobex.Session")
-+        self.pbap = dbus.Interface(bus.get_object("org.openobex.client",
-+                                                  session_path),
-+                                   "org.openobex.PhonebookAccess")
-+        bus.add_signal_receiver(
-+            self.transfer_complete,
-+            dbus_interface="org.openobex.Transfer",
-+            signal_name="Complete",
-+            path_keyword="path")
-+        bus.add_signal_receiver(
-+            self.transfer_error,
-+            dbus_interface="org.openobex.Transfer",
-+            signal_name="Error",
-+            path_keyword="path")
-+
-+    def register(self, reply, transfer):
-+        (path, properties) = reply
-+        transfer.path = path
-+        transfer.filename = properties["Filename"]
-+        self.transfer_dict[path] = transfer
-+        print "Transfer created: %s (file %s)" % (path, transfer.filename)
-+
-+    def error(self, err):
-+        print err
-+        mainloop.quit()
-+
-+    def transfer_complete(self, path):
-+        req = self.transfer_dict.get(path)
-+        if req == None:
-+            return
-+        self.pending_transfers -= 1
-+        print "Transfer %s finished" % path
-+        f = open(req.filename, "r")
-+        os.remove(req.filename)
-+        lines = f.readlines()
-+        del self.transfer_dict[path]
-+        req.callback_func(lines)
-+
-+        if (len(self.transfer_dict) == 0) and (self.pending_transfers == 0):
-+            if self.flush_func != None:
-+                f = self.flush_func
-+                self.flush_func = None
-+                f()
-+
-+    def transfer_error(self, code, message, path):
-+        req = self.transfer_dict.get(path)
-+        if req == None:
-+            return
-+        print "Transfer finished with error %s: %s" % (code, message)
-+        mainloop.quit()
-+
-+    def pull(self, vcard, func):
-+        req = Transfer(func)
-+        self.pbap.Pull(vcard, "",
-+                       reply_handler=lambda r: self.register(r, req),
-+                       error_handler=self.error)
-+        self.pending_transfers += 1
-+
-+    def pull_all(self, func):
-+        req = Transfer(func)
-+        self.pbap.PullAll("",
-+                          reply_handler=lambda r: self.register(r, req),
-+                          error_handler=self.error)
-+        self.pending_transfers += 1
-+
-+    def flush_transfers(self, func):
-+        if (len(self.transfer_dict) == 0) and (self.pending_transfers == 0):
-+            return
-+        self.flush_func = func
-+
-+    def interface(self):
-+        return self.pbap
-+
-+if  __name__ == '__main__':
-+
-+    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-+
-+    bus = dbus.SessionBus()
-+    mainloop = gobject.MainLoop()
-+
-+    client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
-+                            "org.openobex.Client")
-+
-+    if (len(sys.argv) < 2):
-+	print "Usage: %s <device>" % (sys.argv[0])
-+	sys.exit(1)
-+
-+    print "Creating Session"
-+    session_path = client.CreateSession(sys.argv[1], { "Target": "PBAP" })
-+
-+    pbap_client = PbapClient(session_path)
-+
-+    def process_result(lines, header):
-+        if header != None:
-+            print header
-+        for line in lines:
-+            print line,
-+        print
-+
-+    def test_paths(paths):
-+        if len(paths) == 0:
-+            print
-+            print "FINISHED"
-+            mainloop.quit()
-+            return
-+
-+        path = paths[0]
-+
-+        print "\n--- Select Phonebook %s ---\n" % (path)
-+        pbap_client.interface().Select("int", path)
-+
-+        print "\n--- GetSize ---\n"
-+        ret = pbap_client.interface().GetSize()
-+        print "Size = %d\n" % (ret)
-+
-+        print "\n--- List vCard ---\n"
-+        ret = pbap_client.interface().List()
-+        for item in ret:
-+            print "%s : %s" % (item[0], item[1])
-+            pbap_client.interface().SetFormat("vcard30")
-+            pbap_client.interface().SetFilter(["VERSION", "FN", "TEL"]);
-+            pbap_client.pull(item[0], lambda x: process_result(x, None))
-+
-+        pbap_client.interface().SetFormat("vcard30")
-+        pbap_client.interface().SetFilter(["VERSION", "FN", "TEL"]);
-+        pbap_client.pull_all(lambda x: process_result(x, "\n--- PullAll ---\n"))
-+
-+        pbap_client.flush_transfers(lambda: test_paths(paths[1:]))
-+
-+    test_paths(["PB", "ICH", "OCH", "MCH", "CCH"])
+ Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
++Copyright (C) 2011-2012  BMW Car IT GmbH. All rights reserved.
  
--bus = dbus.SessionBus()
--
--client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
--						"org.openobex.Client")
--
--print "Creating Session"
--session_path = client.CreateSession(sys.argv[1], { "Target": "PBAP" })
--pbap = dbus.Interface(bus.get_object("org.openobex.client", session_path),
--						"org.openobex.PhonebookAccess")
--session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
--							"org.openobex.Session")
--
--paths = ["PB", "ICH", "OCH", "MCH", "CCH"]
--
--for path in paths:
--	print "\n--- Select Phonebook %s ---\n" % (path)
--	pbap.Select("int", path)
--
--	print "\n--- GetSize ---\n"
--	ret = pbap.GetSize()
--	print "Size = %d\n" % (ret)
--
--	print "\n--- List vCard ---\n"
--	ret = pbap.List()
--	for item in ret:
--		print "%s : %s" % (item[0], item[1])
--		pbap.SetFormat("vcard30")
--		pbap.SetFilter(["VERSION", "FN", "TEL"]);
--		ret = pbap.Pull(item[0])
--		print "%s" % (ret)
--
--	print "\n--- PullAll ---\n"
--	pbap.SetFormat("vcard30")
--	pbap.SetFilter(["VERSION", "FN", "TEL"]);
--	ret = pbap.PullAll()
--	print "%s" % (ret)
-+    mainloop.run()
+ 
+ Client hierarchy
 -- 
 1.7.7.6
 
