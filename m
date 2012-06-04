@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v1 08/15] client-doc: Synchronization sessions return transfers
-Date: Mon,  4 Jun 2012 11:37:51 +0200
-Message-Id: <1338802678-7009-9-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v1 05/15] client: ObjectPush sessions return transfers
+Date: Mon,  4 Jun 2012 11:37:48 +0200
+Message-Id: <1338802678-7009-6-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338802678-7009-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338802678-7009-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,52 +12,139 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Note that the parameter given to PutPhonebook now represents the file
-name to be read, instead of containing the phonebook data.
+Return the D-Bus path of the transfer representing the operation.
 ---
- doc/client-api.txt |   25 +++++++++++++++++++++----
- 1 files changed, 21 insertions(+), 4 deletions(-)
+ client/opp.c |   71 ++++++++++-----------------------------------------------
+ 1 files changed, 13 insertions(+), 58 deletions(-)
 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 2c7c03c..5a3e252 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -292,14 +292,31 @@ Methods		void SetLocation(string location)
- 				"SIM2"
- 				......
+diff --git a/client/opp.c b/client/opp.c
+index 67b01a9..a3899f8 100644
+--- a/client/opp.c
++++ b/client/opp.c
+@@ -45,23 +45,6 @@ struct opp_data {
  
--		string GetPhonebook()
-+		object, dict GetPhonebook(string targetfile)
+ static DBusConnection *conn = NULL;
  
- 			Retrieve an entire Phonebook Object store from remote
--			device
-+			device, and stores it in a local file.
+-static void send_file_callback(struct obc_session *session,
+-						struct obc_transfer *transfer,
+-						GError *err, void *user_data)
+-{
+-	DBusMessage *msg = user_data;
+-	DBusMessage *reply;
+-
+-	if (err != NULL)
+-		reply = g_dbus_create_error(msg,
+-				ERROR_INF ".Failed", "%s", err->message);
+-	else
+-		reply = dbus_message_new_method_return(msg);
+-
+-	g_dbus_send_message(conn, reply);
+-	dbus_message_unref(msg);
+-}
+-
+ static DBusMessage *opp_send_file(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
+ {
+@@ -87,12 +70,10 @@ static DBusMessage *opp_send_file(DBusConnection *connection,
+ 	if (transfer == NULL)
+ 		goto fail;
  
--		void PutPhonebook(string obj)
-+			If an empty target file is given, a name will be
-+			automatically calculated for the temporary file.
-+
-+			The returned path represents the newly created transfer,
-+			which should be used to find out if the content has been
-+			successfully transferred or if the operation fails.
-+
-+			The properties of this transfer are also returned along
-+			with the object path, to avoid a call to GetProperties.
+-	if (!obc_session_queue(opp->session, transfer, send_file_callback,
+-								message, &err))
++	if (!obc_session_queue(opp->session, transfer, NULL, NULL, &err))
+ 		goto fail;
  
--			Send an entire Phonebook Object store to remote device
-+		object, dict PutPhonebook(string sourcefile)
-+
-+			Send an entire Phonebook Object store to remote device.
-+
-+			The returned path represents the newly created transfer,
-+			which should be used to find out if the content has been
-+			successfully transferred or if the operation fails.
-+
-+			The properties of this transfer are also returned along
-+			with the object path, to avoid a call to GetProperties.
+-	dbus_message_ref(message);
+-	return NULL;
++	return obc_transfer_create_dbus_reply(transfer, message);
  
- Message Access hierarchy
- =========================
+ fail:
+ 	reply = g_dbus_create_error(message,
+@@ -101,55 +82,29 @@ fail:
+ 	return reply;
+ }
+ 
+-static void pull_complete_callback(struct obc_session *session,
+-					struct obc_transfer *transfer,
+-					GError *err, void *user_data)
+-{
+-	DBusMessage *message = user_data;
+-
+-	if (err != NULL) {
+-		DBusMessage *error = g_dbus_create_error(message,
+-					"org.openobex.Error.Failed",
+-					"%s", err->message);
+-		g_dbus_send_message(conn, error);
+-		goto done;
+-	}
+-
+-	g_dbus_send_reply(conn, message, DBUS_TYPE_INVALID);
+-
+-done:
+-	dbus_message_unref(message);
+-}
+-
+ static DBusMessage *opp_pull_business_card(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
+ {
+ 	struct opp_data *opp = user_data;
+ 	struct obc_transfer *pull;
+-	DBusMessageIter iter;
+ 	DBusMessage *reply;
+ 	const char *filename = NULL;
+ 	GError *err = NULL;
+ 
+-	dbus_message_iter_init(message, &iter);
+-
+-	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++	if (dbus_message_get_args(message, NULL,
++				DBUS_TYPE_STRING, &filename,
++				DBUS_TYPE_INVALID) == FALSE)
+ 		return g_dbus_create_error(message,
+ 				ERROR_INF ".InvalidArguments", NULL);
+ 
+-	dbus_message_iter_get_basic(&iter, &filename);
+-
+ 	pull = obc_transfer_get("text/x-vcard", NULL, filename, &err);
+ 	if (pull == NULL)
+ 		goto fail;
+ 
+-	if (!obc_session_queue(opp->session, pull, pull_complete_callback,
+-								message, &err))
++	if (!obc_session_queue(opp->session, pull, NULL, NULL, &err))
+ 		goto fail;
+ 
+-	dbus_message_ref(message);
+-
+-	return NULL;
++	return obc_transfer_create_dbus_reply(pull, message);
+ 
+ fail:
+ 	reply = g_dbus_create_error(message,
+@@ -165,17 +120,17 @@ static DBusMessage *opp_exchange_business_cards(DBusConnection *connection,
+ }
+ 
+ static const GDBusMethodTable opp_methods[] = {
+-	{ GDBUS_ASYNC_METHOD("SendFile",
++	{ GDBUS_METHOD("SendFile",
+ 		GDBUS_ARGS({ "sourcefile", "s" }),
+-		NULL,
++		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
+ 		opp_send_file) },
+-	{ GDBUS_ASYNC_METHOD("PullBusinessCard",
++	{ GDBUS_METHOD("PullBusinessCard",
+ 		GDBUS_ARGS({ "targetfile", "s" }),
+-		NULL,
++		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
+ 		opp_pull_business_card) },
+-	{ GDBUS_ASYNC_METHOD("ExchangeBusinessCards",
++	{ GDBUS_METHOD("ExchangeBusinessCards",
+ 		GDBUS_ARGS({ "clientfile", "s" }, { "targetfile", "s" }),
+-		NULL,
++		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
+ 		opp_exchange_business_cards) },
+ 	{ }
+ };
 -- 
 1.7.7.6
 
