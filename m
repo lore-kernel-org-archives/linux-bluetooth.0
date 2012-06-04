@@ -1,52 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 01/15] client: Make transfer filename optional
-Date: Mon,  4 Jun 2012 15:50:14 +0200
-Message-Id: <1338817828-12166-2-git-send-email-mikel.astiz.oss@gmail.com>
-In-Reply-To: <1338817828-12166-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1338817828-12166-1-git-send-email-mikel.astiz.oss@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <20120601231335.GI24769@joana>
+References: <1338577525-9182-1-git-send-email-jefferson.delfes@openbossa.org> <20120601231335.GI24769@joana>
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Date: Mon, 4 Jun 2012 09:31:13 -0400
+Message-ID: <CA+_d9qcuTEor62f9R5=1hLJNZLttvGXT--838mO-mQKtGSJanA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix flags of mgmt_device_found event
+To: Gustavo Padovan <gustavo@padovan.org>, Jefferson Delfes <jefferson.delfes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org, marcel@holtmann.org, johan.hedberg@gmail.com
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Gustavo,
 
-The property might not exist for certain transfers, typically when they
-have been initiated internally.
----
- client/transfer.c  |    4 +++-
- doc/client-api.txt |    2 +-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+On Fri, Jun 1, 2012 at 7:13 PM, Gustavo Padovan <gustavo@padovan.org> wrote=
+:
+> Jefferson,
+>
+> * Jefferson Delfes <jefferson.delfes@openbossa.org> [2012-06-01 15:05:25 =
+-0400]:
+>
+>> Change flags field to matches userspace structure.
+>> This field needs to be converted to little endian before forward it.
+>>
+>> Signed-off-by: Jefferson Delfes <jefferson.delfes@openbossa.org>
+>> ---
+>> =A0include/net/bluetooth/mgmt.h | =A0 =A02 +-
+>> =A0net/bluetooth/mgmt.c =A0 =A0 =A0 =A0 | =A0 =A05 +++--
+>> =A02 files changed, 4 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+>> index ebfd91f..3a8a714 100644
+>> --- a/include/net/bluetooth/mgmt.h
+>> +++ b/include/net/bluetooth/mgmt.h
+>> @@ -435,7 +435,7 @@ struct mgmt_ev_auth_failed {
+>> =A0struct mgmt_ev_device_found {
+>> =A0 =A0 =A0 struct mgmt_addr_info addr;
+>> =A0 =A0 =A0 __s8 =A0 =A0rssi;
+>> - =A0 =A0 __u8 =A0 =A0flags[4];
+>> + =A0 =A0 __le32 =A0flags;
+>
+> Seems we are breaking API here, MGMT API is stable now and should have su=
+ch
+> kind of change. However I wanna see what Marcel and Johan has to say abou=
+t
+> this.
+>
+> =A0 =A0 =A0 =A0Gustavo
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 14006ef..e7852e1 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -104,7 +104,9 @@ static DBusMessage *obc_transfer_get_properties(DBusConnection *connection,
- 
- 	obex_dbus_dict_append(&dict, "Name", DBUS_TYPE_STRING, &transfer->name);
- 	obex_dbus_dict_append(&dict, "Size", DBUS_TYPE_UINT64, &transfer->size);
--	obex_dbus_dict_append(&dict, "Filename", DBUS_TYPE_STRING,
-+
-+	if (transfer->filename != NULL)
-+		obex_dbus_dict_append(&dict, "Filename", DBUS_TYPE_STRING,
- 							&transfer->filename);
- 
- 	if (transfer->obex != NULL)
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 3c6a2e1..3b5444d 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -299,7 +299,7 @@ Properties	string Name [readonly]
- 			Size of the transferred object. If the size is
- 			unknown, then this property will not be present.
- 
--		string Filename [readonly]
-+		string Filename [readonly, optional]
- 
- 			Complete name of the file being received or sent.
- 
--- 
-1.7.7.6
+As Johan pointed, we send the same bytes in same order. This patch
+just copy userspace changes in mgmt_ev_device_found structure. There
+was a possible bug on big endian in userspace, but it was fixed in
+previous patch.
 
+Thanks.
