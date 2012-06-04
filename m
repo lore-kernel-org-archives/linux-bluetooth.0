@@ -2,51 +2,62 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v1 01/15] client: Make transfer filename optional
-Date: Mon,  4 Jun 2012 11:37:44 +0200
-Message-Id: <1338802678-7009-2-git-send-email-mikel.astiz.oss@gmail.com>
-In-Reply-To: <1338802678-7009-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1338802678-7009-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v1 00/15] client: Return transfer object in D-Bus API
+Date: Mon,  4 Jun 2012 11:37:43 +0200
+Message-Id: <1338802678-7009-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The property might not exist for certain transfers, typically when they
-have been initiated internally.
----
- client/transfer.c  |    4 +++-
- doc/client-api.txt |    2 +-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+This second version makes the filename property of transfers optional. For transfers initiated internally by the modules (where filename == NULL), the D-Bus property will not be present, and internally the filename will be set to NULL.
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 14006ef..e7852e1 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -104,7 +104,9 @@ static DBusMessage *obc_transfer_get_properties(DBusConnection *connection,
- 
- 	obex_dbus_dict_append(&dict, "Name", DBUS_TYPE_STRING, &transfer->name);
- 	obex_dbus_dict_append(&dict, "Size", DBUS_TYPE_UINT64, &transfer->size);
--	obex_dbus_dict_append(&dict, "Filename", DBUS_TYPE_STRING,
-+
-+	if (transfer->filename != NULL)
-+		obex_dbus_dict_append(&dict, "Filename", DBUS_TYPE_STRING,
- 							&transfer->filename);
- 
- 	if (transfer->obex != NULL)
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 3c6a2e1..3b5444d 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -299,7 +299,7 @@ Properties	string Name [readonly]
- 			Size of the transferred object. If the size is
- 			unknown, then this property will not be present.
- 
--		string Filename [readonly]
-+		string Filename [readonly, optional]
- 
- 			Complete name of the file being received or sent.
- 
+This simplifies patch v0 02/14 by avoiding the additional flag needed to distinguish whether the file should be removed or not on success.
+
+>From original cover letter:
+
+This patch series proposes changes in the D-Bus API so that all transfer-initiating methods will return the transfer path. This has several benefits including the possibility to cancel the transfer.
+
+Along with the transfer path, the properties corresponding to this transfer will also be returned, for both performance reasons (avoid a call to GetProperties) and also race conditions (transfer might have been destroyed by the time the client calls to GetProperties).
+
+In addition, temporary files can now easily be used by the clients, by passing empty strings in the D-Bus API. The actual name of the created temporary file will be included in the transfer properties.
+
+Mikel Astiz (15):
+  client: Make transfer filename optional
+  client-doc: ObjectPush sessions return transfers
+  client: Support empty filename in obc_transfer_get
+  client: Expose D-Bus data in internal transfer API
+  client: ObjectPush sessions return transfers
+  client-doc: FileTransfer sessions return transfers
+  client: FileTransfer sessions return transfers
+  client-doc: Synchronization sessions return transfers
+  client: Synchronization sessions return transfers
+  client-doc: PhonebookAccess sessions return transfers
+  client: PhonebookAccess sessions return transfers
+  client-test: ftp-client uses new API
+  client-test: pbap-client uses new API
+  client-test: Add opp-client
+  client: Update copyright statement
+
+ client/ftp.c            |   46 ++++--------
+ client/opp.c            |   71 +++---------------
+ client/pbap.c           |  161 +++++++++++++++++++----------------------
+ client/session.c        |    1 +
+ client/session.h        |    1 +
+ client/sync.c           |   92 ++++++++---------------
+ client/transfer.c       |   92 +++++++++++++++++++----
+ client/transfer.h       |    4 +
+ doc/client-api.txt      |  116 ++++++++++++++++++++++++-----
+ test/ftp-client         |  159 ++++++++++++++++++++++++----------------
+ test/opp-client         |  101 +++++++++++++++++++++++++
+ test/pbap-client        |  187 ++++++++++++++++++++++++++++++++++++++---------
+ test/pull-business-card |   40 ----------
+ test/send-files         |   23 ------
+ 14 files changed, 662 insertions(+), 432 deletions(-)
+ create mode 100755 test/opp-client
+ delete mode 100755 test/pull-business-card
+ delete mode 100755 test/send-files
+
 -- 
 1.7.7.6
 
