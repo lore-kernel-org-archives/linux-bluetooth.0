@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 13/15] client-test: pbap-client uses new API
-Date: Mon,  4 Jun 2012 15:50:26 +0200
-Message-Id: <1338817828-12166-14-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 11/15] client: PhonebookAccess sessions return transfers
+Date: Mon,  4 Jun 2012 15:50:24 +0200
+Message-Id: <1338817828-12166-12-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338817828-12166-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338817828-12166-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,208 +12,286 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
+Return the D-Bus path of the transfer representing the operation.
 ---
- test/pbap-client |  188 +++++++++++++++++++++++++++++++++++++++++++----------
- 1 files changed, 152 insertions(+), 36 deletions(-)
+ client/pbap.c |  161 ++++++++++++++++++++++++++------------------------------
+ 1 files changed, 75 insertions(+), 86 deletions(-)
 
-diff --git a/test/pbap-client b/test/pbap-client
-index ecca14f..069bde3 100755
---- a/test/pbap-client
-+++ b/test/pbap-client
-@@ -1,41 +1,157 @@
- #!/usr/bin/python
+diff --git a/client/pbap.c b/client/pbap.c
+index 3a771ab..e296eec 100644
+--- a/client/pbap.c
++++ b/client/pbap.c
+@@ -340,45 +340,6 @@ static void read_return_apparam(struct obc_transfer *transfer,
+ 	}
+ }
  
-+import gobject
-+
- import sys
-+import os
- import dbus
-+import dbus.service
-+import dbus.mainloop.glib
-+
-+class Transfer:
-+	def __init__(self, callback_func):
-+		self.callback_func = callback_func
-+		self.path = None
-+		self.filename = None
-+
-+class PbapClient:
-+	def __init__(self, session_path):
-+		self.pending_transfers = 0
-+		self.transfer_dict = dict()
-+		self.flush_func = None
-+		bus = dbus.SessionBus()
-+		obj = bus.get_object("org.openobex.client", session_path)
-+		self.session = dbus.Interface(obj, "org.openobex.Session")
-+		self.pbap = dbus.Interface(obj, "org.openobex.PhonebookAccess")
-+		bus.add_signal_receiver(self.transfer_complete,
-+					dbus_interface="org.openobex.Transfer",
-+					signal_name="Complete",
-+					path_keyword="path")
-+		bus.add_signal_receiver(self.transfer_error,
-+					dbus_interface="org.openobex.Transfer",
-+					signal_name="Error",
-+					path_keyword="path")
-+
-+	def register(self, reply, transfer):
-+		(path, properties) = reply
-+		transfer.path = path
-+		transfer.filename = properties["Filename"]
-+		self.transfer_dict[path] = transfer
-+		print "Transfer created: %s (file %s)" % (path,
-+							transfer.filename)
-+
-+	def error(self, err):
-+		print err
-+		mainloop.quit()
-+
-+	def transfer_complete(self, path):
-+		req = self.transfer_dict.get(path)
-+		if req == None:
-+			return
-+		self.pending_transfers -= 1
-+		print "Transfer %s finished" % path
-+		f = open(req.filename, "r")
-+		os.remove(req.filename)
-+		lines = f.readlines()
-+		del self.transfer_dict[path]
-+		req.callback_func(lines)
-+
-+		if ((len(self.transfer_dict) == 0) and
-+						(self.pending_transfers == 0)):
-+			if self.flush_func != None:
-+				f = self.flush_func
-+				self.flush_func = None
-+				f()
-+
-+	def transfer_error(self, code, message, path):
-+		req = self.transfer_dict.get(path)
-+		if req == None:
-+			return
-+		print "Transfer finished with error %s: %s" % (code, message)
-+		mainloop.quit()
-+
-+	def pull(self, vcard, func):
-+		req = Transfer(func)
-+		self.pbap.Pull(vcard, "",
-+				reply_handler=lambda r: self.register(r, req),
-+				error_handler=self.error)
-+		self.pending_transfers += 1
-+
-+	def pull_all(self, func):
-+		req = Transfer(func)
-+		self.pbap.PullAll("",
-+				reply_handler=lambda r: self.register(r, req),
-+				error_handler=self.error)
-+		self.pending_transfers += 1
-+
-+	def flush_transfers(self, func):
-+		if ((len(self.transfer_dict) == 0) and
-+						(self.pending_transfers == 0)):
-+			return
-+		self.flush_func = func
-+
-+	def interface(self):
-+		return self.pbap
-+
-+if __name__ == '__main__':
-+
-+	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-+
-+	bus = dbus.SessionBus()
-+	mainloop = gobject.MainLoop()
-+
-+	client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
-+							"org.openobex.Client")
-+
-+	if (len(sys.argv) < 2):
-+		print "Usage: %s <device>" % (sys.argv[0])
-+		sys.exit(1)
-+
-+	print "Creating Session"
-+	session_path = client.CreateSession(sys.argv[1], { "Target": "PBAP" })
-+
-+	pbap_client = PbapClient(session_path)
-+
-+	def process_result(lines, header):
-+		if header != None:
-+			print header
-+		for line in lines:
-+			print line,
-+		print
-+
-+	def test_paths(paths):
-+		if len(paths) == 0:
-+			print
-+			print "FINISHED"
-+			mainloop.quit()
-+			return
-+
-+		path = paths[0]
-+
-+		print "\n--- Select Phonebook %s ---\n" % (path)
-+		pbap_client.interface().Select("int", path)
-+
-+		print "\n--- GetSize ---\n"
-+		ret = pbap_client.interface().GetSize()
-+		print "Size = %d\n" % (ret)
-+
-+		print "\n--- List vCard ---\n"
-+		ret = pbap_client.interface().List()
-+		for item in ret:
-+			print "%s : %s" % (item[0], item[1])
-+			pbap_client.interface().SetFormat("vcard30")
-+			pbap_client.interface().SetFilter(["VERSION", "FN",
-+									"TEL"])
-+			pbap_client.pull(item[0],
-+					lambda x: process_result(x, None))
-+
-+		pbap_client.interface().SetFormat("vcard30")
-+		pbap_client.interface().SetFilter(["VERSION", "FN", "TEL"])
-+		pbap_client.pull_all(lambda x:
-+				process_result(x, "\n--- PullAll ---\n"))
-+
-+		pbap_client.flush_transfers(lambda: test_paths(paths[1:]))
-+
-+	test_paths(["PB", "ICH", "OCH", "MCH", "CCH"])
+-static void pull_phonebook_callback(struct obc_session *session,
+-						struct obc_transfer *transfer,
+-						GError *err, void *user_data)
+-{
+-	struct pending_request *request = user_data;
+-	DBusMessage *reply;
+-	char *contents;
+-	size_t size;
+-	int perr;
+-
+-	if (err) {
+-		reply = g_dbus_create_error(request->msg,
+-						"org.openobex.Error.Failed",
+-						"%s", err->message);
+-		goto send;
+-	}
+-
+-	perr = obc_transfer_get_contents(transfer, &contents, &size);
+-	if (perr < 0) {
+-		reply = g_dbus_create_error(request->msg,
+-						"org.openobex.Error.Failed",
+-						"Error reading contents: %s",
+-						strerror(-perr));
+-		goto send;
+-	}
+-
+-	reply = dbus_message_new_method_return(request->msg);
+-
+-	dbus_message_append_args(reply,
+-			DBUS_TYPE_STRING, &contents,
+-			DBUS_TYPE_INVALID);
+-
+-	g_free(contents);
+-
+-send:
+-	g_dbus_send_message(conn, reply);
+-	pending_request_free(request);
+-}
+-
+ static void phonebook_size_callback(struct obc_session *session,
+ 						struct obc_transfer *transfer,
+ 						GError *err, void *user_data)
+@@ -454,22 +415,23 @@ send:
+ 	pending_request_free(request);
+ }
  
--bus = dbus.SessionBus()
+-static DBusMessage *pull_phonebook(struct pbap_data *pbap,
+-					DBusMessage *message, guint8 type,
+-					const char *name, uint64_t filter,
+-					guint8 format, guint16 maxlistcount,
+-					guint16 liststartoffset)
++static struct obc_transfer *pull_phonebook(struct pbap_data *pbap,
++						DBusMessage *message,
++						guint8 type, const char *name,
++						const char *targetfile,
++						uint64_t filter, guint8 format,
++						guint16 maxlistcount,
++						guint16 liststartoffset,
++						GError **err)
+ {
+ 	struct pending_request *request;
+-	struct pullphonebook_apparam apparam;
+ 	struct obc_transfer *transfer;
++	struct pullphonebook_apparam apparam;
+ 	session_callback_t func;
+-	GError *err = NULL;
+-	DBusMessage *reply;
+ 
+-	transfer = obc_transfer_get("x-bt/phonebook", name, NULL, &err);
++	transfer = obc_transfer_get("x-bt/phonebook", name, targetfile, err);
+ 	if (transfer == NULL)
+-		goto fail;
++		return NULL;
+ 
+ 	apparam.filter_tag = FILTER_TAG;
+ 	apparam.filter_len = FILTER_LEN;
+@@ -486,30 +448,29 @@ static DBusMessage *pull_phonebook(struct pbap_data *pbap,
+ 
+ 	switch (type) {
+ 	case PULLPHONEBOOK:
+-		func = pull_phonebook_callback;
++		func = NULL;
++		request = NULL;
+ 		break;
+ 	case GETPHONEBOOKSIZE:
+ 		func = phonebook_size_callback;
++		request = pending_request_new(pbap, message);
+ 		break;
+ 	default:
+ 		error("Unexpected type : 0x%2x", type);
+ 		return NULL;
+ 	}
+ 
+-	request = pending_request_new(pbap, message);
 -
--client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
--						"org.openobex.Client")
+ 	obc_transfer_set_params(transfer, &apparam, sizeof(apparam));
+ 
+-	if (obc_session_queue(pbap->session, transfer, func, request, &err))
++	if (!obc_session_queue(pbap->session, transfer, func, request, err)) {
++		if (request != NULL)
++			pending_request_free(request);
++
+ 		return NULL;
++	}
+ 
+-	pending_request_free(request);
+ 
+-fail:
+-	reply = g_dbus_create_error(message, "org.openobex.Error.Failed", "%s",
+-								err->message);
+-	g_error_free(err);
+-	return reply;
++	return transfer;
+ }
+ 
+ static guint8 *fill_apparam(guint8 *dest, void *buf, guint8 tag, guint8 len)
+@@ -742,32 +703,48 @@ static DBusMessage *pbap_pull_all(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
+ {
+ 	struct pbap_data *pbap = user_data;
+-	DBusMessage * err;
++	struct obc_transfer *transfer;
++	const char *targetfile;
+ 	char *name;
++	GError *err = NULL;
+ 
+ 	if (!pbap->path)
+ 		return g_dbus_create_error(message,
+ 				ERROR_INF ".Forbidden", "Call Select first of all");
+ 
++	if (dbus_message_get_args(message, NULL,
++			DBUS_TYPE_STRING, &targetfile,
++			DBUS_TYPE_INVALID) == FALSE)
++		return g_dbus_create_error(message,
++				ERROR_INF ".InvalidArguments", NULL);
++
+ 	name = g_strconcat(pbap->path, ".vcf", NULL);
+ 
+-	err = pull_phonebook(pbap, message, PULLPHONEBOOK, name,
+-				pbap->filter, pbap->format,
+-				DEFAULT_COUNT, DEFAULT_OFFSET);
++	transfer = pull_phonebook(pbap, message, PULLPHONEBOOK, name,
++				targetfile, pbap->filter, pbap->format,
++				DEFAULT_COUNT, DEFAULT_OFFSET, &err);
+ 	g_free(name);
+-	return err;
++
++	if (transfer == NULL) {
++		DBusMessage *reply = g_dbus_create_error(message,
++				"org.openobex.Error.Failed", "%s",
++				err->message);
++		g_error_free(err);
++		return reply;
++	}
++
++	return obc_transfer_create_dbus_reply(transfer, message);
+ }
+ 
+ static DBusMessage *pbap_pull_vcard(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
+ {
+ 	struct pbap_data *pbap = user_data;
+-	struct pullvcardentry_apparam apparam;
+-	const char *name;
+-	struct pending_request *request;
+ 	struct obc_transfer *transfer;
+-	GError *err = NULL;
++	struct pullvcardentry_apparam apparam;
++	const char *name, *targetfile;
+ 	DBusMessage *reply;
++	GError *err = NULL;
+ 
+ 	if (!pbap->path)
+ 		return g_dbus_create_error(message,
+@@ -776,11 +753,12 @@ static DBusMessage *pbap_pull_vcard(DBusConnection *connection,
+ 
+ 	if (dbus_message_get_args(message, NULL,
+ 			DBUS_TYPE_STRING, &name,
++			DBUS_TYPE_STRING, &targetfile,
+ 			DBUS_TYPE_INVALID) == FALSE)
+ 		return g_dbus_create_error(message,
+ 				ERROR_INF ".InvalidArguments", NULL);
+ 
+-	transfer = obc_transfer_get("x-bt/vcard", name, NULL, &err);
++	transfer = obc_transfer_get("x-bt/vcard", name, targetfile, &err);
+ 	if (transfer == NULL)
+ 		goto fail;
+ 
+@@ -791,15 +769,12 @@ static DBusMessage *pbap_pull_vcard(DBusConnection *connection,
+ 	apparam.format_len = FORMAT_LEN;
+ 	apparam.format = pbap->format;
+ 
+-	request = pending_request_new(pbap, message);
 -
--print "Creating Session"
--session_path = client.CreateSession(sys.argv[1], { "Target": "PBAP" })
--pbap = dbus.Interface(bus.get_object("org.openobex.client", session_path),
--						"org.openobex.PhonebookAccess")
--session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
--							"org.openobex.Session")
--
--paths = ["PB", "ICH", "OCH", "MCH", "CCH"]
--
--for path in paths:
--	print "\n--- Select Phonebook %s ---\n" % (path)
--	pbap.Select("int", path)
--
--	print "\n--- GetSize ---\n"
--	ret = pbap.GetSize()
--	print "Size = %d\n" % (ret)
--
--	print "\n--- List vCard ---\n"
--	ret = pbap.List()
--	for item in ret:
--		print "%s : %s" % (item[0], item[1])
--		pbap.SetFormat("vcard30")
--		pbap.SetFilter(["VERSION", "FN", "TEL"]);
--		ret = pbap.Pull(item[0])
--		print "%s" % (ret)
--
--	print "\n--- PullAll ---\n"
--	pbap.SetFormat("vcard30")
--	pbap.SetFilter(["VERSION", "FN", "TEL"]);
--	ret = pbap.PullAll()
--	print "%s" % (ret)
-+	mainloop.run()
+ 	obc_transfer_set_params(transfer, &apparam, sizeof(apparam));
+ 
+-	if (obc_session_queue(pbap->session, transfer, pull_phonebook_callback,
+-								request, &err))
+-		return NULL;
++	if (!obc_session_queue(pbap->session, transfer, NULL, NULL, &err))
++		goto fail;
+ 
+-	pending_request_free(request);
++	return obc_transfer_create_dbus_reply(transfer, message);
+ 
+ fail:
+ 	reply = g_dbus_create_error(message, "org.openobex.Error.Failed", "%s",
+@@ -859,8 +834,10 @@ static DBusMessage *pbap_get_size(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
+ {
+ 	struct pbap_data *pbap = user_data;
+-	DBusMessage * err;
++	DBusMessage *reply;
++	struct obc_transfer *transfer;
+ 	char *name;
++	GError *err = NULL;
+ 
+ 	if (!pbap->path)
+ 		return g_dbus_create_error(message,
+@@ -868,11 +845,20 @@ static DBusMessage *pbap_get_size(DBusConnection *connection,
+ 
+ 	name = g_strconcat(pbap->path, ".vcf", NULL);
+ 
+-	err = pull_phonebook(pbap, message, GETPHONEBOOKSIZE, name,
++	transfer = pull_phonebook(pbap, message, GETPHONEBOOKSIZE, name, NULL,
+ 				pbap->filter, pbap->format, 0,
+-				DEFAULT_OFFSET);
++				DEFAULT_OFFSET, &err);
++
+ 	g_free(name);
+-	return err;
++
++	if (transfer != NULL)
++		return NULL;
++
++	reply = g_dbus_create_error(message,
++				"org.openobex.Error.Failed", "%s",
++				err->message);
++	g_error_free(err);
++	return reply;
+ }
+ 
+ static DBusMessage *pbap_set_format(DBusConnection *connection,
+@@ -984,13 +970,16 @@ static const GDBusMethodTable pbap_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("Select",
+ 			GDBUS_ARGS({ "location", "s" }, { "phonebook", "s" }),
+ 			NULL, pbap_select) },
+-	{ GDBUS_ASYNC_METHOD("PullAll",
+-				NULL, GDBUS_ARGS({ "phonebook", "s" }),
+-				pbap_pull_all) },
+-	{ GDBUS_ASYNC_METHOD("Pull",
+-				GDBUS_ARGS({ "phonebook_object", "s" }),
+-				GDBUS_ARGS({ "vcard", "s" }),
+-				pbap_pull_vcard) },
++	{ GDBUS_METHOD("PullAll",
++			GDBUS_ARGS({ "targetfile", "s" }),
++			GDBUS_ARGS({ "transfer", "o" },
++					{ "properties", "a{sv}" }),
++			pbap_pull_all) },
++	{ GDBUS_METHOD("Pull",
++			GDBUS_ARGS({ "vcard", "s" }, { "targetfile", "s" }),
++			GDBUS_ARGS({ "transfer", "o" },
++					{ "properties", "a{sv}" }),
++			pbap_pull_vcard) },
+ 	{ GDBUS_ASYNC_METHOD("List",
+ 				NULL, GDBUS_ARGS({ "vcard_listing", "a(ss)" }),
+ 				pbap_list) },
 -- 
 1.7.7.6
 
