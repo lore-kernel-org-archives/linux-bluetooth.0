@@ -1,63 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v1 00/15] client: Return transfer object in D-Bus API
-Date: Mon,  4 Jun 2012 11:37:43 +0200
-Message-Id: <1338802678-7009-1-git-send-email-mikel.astiz.oss@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Subject: Re: [RFC] Bluetooth: Fix compile warning in l2cap_core.c
+Date: Mon, 4 Jun 2012 09:17:55 +0200
+CC: Andre Guedes <andre.guedes@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <1338507556-10920-1-git-send-email-andre.guedes@openbossa.org> <20120601230918.GH24769@joana>
+In-Reply-To: <20120601230918.GH24769@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Message-ID: <201206040917.56331.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi,
 
-This second version makes the filename property of transfers optional. For transfers initiated internally by the modules (where filename == NULL), the D-Bus property will not be present, and internally the filename will be set to NULL.
+> * Andre Guedes <andre.guedes@openbossa.org> [2012-05-31 20:39:16 -0300]:
+> 
+> > This patch fixes the following warning reported by gcc 4.7.0:
+> > 
+> > net/bluetooth/l2cap_core.c: In function 'l2cap_config_rsp':
+> > net/bluetooth/l2cap_core.c:3302:13: warning: 'rfc.max_pdu_size' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> > net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.max_pdu_size' was declared here
+> > net/bluetooth/l2cap_core.c:3298:25: warning: 'rfc.monitor_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> > net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.monitor_timeout' was declared here
+> > net/bluetooth/l2cap_core.c:3297:25: warning: 'rfc.retrans_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> > net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.retrans_timeout' was declared here
+> > net/bluetooth/l2cap_core.c:3295:2: warning: 'rfc.mode' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> > net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.mode' was declared here
+> 
+> So I think this is a false positive, I've seen this warning here for more than
+> a month, since I updated to fedora 17.
+> At some people will disable this warning in the kernel compile process if this
+> appear in others places in the kernel as false positive too.
 
-This simplifies patch v0 02/14 by avoiding the additional flag needed to distinguish whether the file should be removed or not on success.
+What if remote device misbehaves and sends bogus L2CAP_CONF_RFC i.e. with wrong length?
 
->From original cover letter:
-
-This patch series proposes changes in the D-Bus API so that all transfer-initiating methods will return the transfer path. This has several benefits including the possibility to cancel the transfer.
-
-Along with the transfer path, the properties corresponding to this transfer will also be returned, for both performance reasons (avoid a call to GetProperties) and also race conditions (transfer might have been destroyed by the time the client calls to GetProperties).
-
-In addition, temporary files can now easily be used by the clients, by passing empty strings in the D-Bus API. The actual name of the created temporary file will be included in the transfer properties.
-
-Mikel Astiz (15):
-  client: Make transfer filename optional
-  client-doc: ObjectPush sessions return transfers
-  client: Support empty filename in obc_transfer_get
-  client: Expose D-Bus data in internal transfer API
-  client: ObjectPush sessions return transfers
-  client-doc: FileTransfer sessions return transfers
-  client: FileTransfer sessions return transfers
-  client-doc: Synchronization sessions return transfers
-  client: Synchronization sessions return transfers
-  client-doc: PhonebookAccess sessions return transfers
-  client: PhonebookAccess sessions return transfers
-  client-test: ftp-client uses new API
-  client-test: pbap-client uses new API
-  client-test: Add opp-client
-  client: Update copyright statement
-
- client/ftp.c            |   46 ++++--------
- client/opp.c            |   71 +++---------------
- client/pbap.c           |  161 +++++++++++++++++++----------------------
- client/session.c        |    1 +
- client/session.h        |    1 +
- client/sync.c           |   92 ++++++++---------------
- client/transfer.c       |   92 +++++++++++++++++++----
- client/transfer.h       |    4 +
- doc/client-api.txt      |  116 ++++++++++++++++++++++++-----
- test/ftp-client         |  159 ++++++++++++++++++++++++----------------
- test/opp-client         |  101 +++++++++++++++++++++++++
- test/pbap-client        |  187 ++++++++++++++++++++++++++++++++++++++---------
- test/pull-business-card |   40 ----------
- test/send-files         |   23 ------
- 14 files changed, 662 insertions(+), 432 deletions(-)
- create mode 100755 test/opp-client
- delete mode 100755 test/pull-business-card
- delete mode 100755 test/send-files
 
 -- 
-1.7.7.6
-
+BR
+Szymon
