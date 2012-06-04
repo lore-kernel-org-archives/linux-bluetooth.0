@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 10/15] client-doc: PhonebookAccess sessions return transfers
-Date: Mon,  4 Jun 2012 15:50:23 +0200
-Message-Id: <1338817828-12166-11-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 07/15] client: FileTransfer sessions return transfers
+Date: Mon,  4 Jun 2012 15:50:20 +0200
+Message-Id: <1338817828-12166-8-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338817828-12166-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338817828-12166-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,62 +12,90 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
+Return the D-Bus path of the transfer representing the operation.
 ---
- doc/client-api.txt |   31 ++++++++++++++++++++++++++-----
- 1 files changed, 26 insertions(+), 5 deletions(-)
+ client/ftp.c |   46 ++++++++++++++--------------------------------
+ 1 files changed, 14 insertions(+), 32 deletions(-)
 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 5a3e252..17c15bb 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -205,10 +205,21 @@ Methods		void Select(string location, string phonebook)
- 				"mch":	missing call history
- 				"cch":	combination of ich och mch
+diff --git a/client/ftp.c b/client/ftp.c
+index 8c72413..58aa17f 100644
+--- a/client/ftp.c
++++ b/client/ftp.c
+@@ -143,24 +143,6 @@ static const GMarkupParser parser = {
+ 	NULL
+ };
  
--		string PullAll()
-+		object, dict PullAll(string targetfile)
+-static void transfer_callback(struct obc_session *session,
+-						struct obc_transfer *transfer,
+-						GError *err, void *user_data)
+-{
+-	DBusMessage *msg = user_data;
+-	DBusMessage *reply;
+-
+-	if (err)
+-		reply = g_dbus_create_error(msg,
+-					"org.openobex.Error.Failed",
+-					"%s", err->message);
+-	else
+-		reply = dbus_message_new_method_return(msg);
+-
+-	g_dbus_send_message(conn, reply);
+-	dbus_message_unref(msg);
+-}
+-
+ static void list_folder_callback(struct obc_session *session,
+ 						struct obc_transfer *transfer,
+ 						GError *err, void *user_data)
+@@ -270,11 +252,10 @@ static DBusMessage *get_file(DBusConnection *connection,
+ 	if (transfer == NULL)
+ 		goto fail;
  
- 			Return the entire phonebook object from the PSE server
--			in plain string with vcard format.
-+			in plain string with vcard format, and store it in
-+			a local file.
+-	if (obc_session_queue(session, transfer, transfer_callback, message,
+-									&err)) {
+-		dbus_message_ref(message);
+-		return NULL;
+-	}
++	if (!obc_session_queue(session, transfer, NULL, NULL, &err))
++		goto fail;
 +
-+			If an empty target file is given, a name will be
-+			automatically calculated for the temporary file.
-+
-+			The returned path represents the newly created transfer,
-+			which should be used to find out if the content has been
-+			successfully transferred or if the operation fails.
-+
-+			The properties of this transfer are also returned along
-+			with the object path, to avoid a call to GetProperties.
++	return obc_transfer_create_dbus_reply(transfer, message);
  
- 		array{string vcard, string name} List()
+ fail:
+ 	reply = g_dbus_create_error(message, "org.openobex.Error.Failed", "%s",
+@@ -306,11 +287,10 @@ static DBusMessage *put_file(DBusConnection *connection,
+ 	if (transfer == NULL)
+ 		goto fail;
  
-@@ -216,10 +227,20 @@ Methods		void Select(string location, string phonebook)
- 			vcard : name paired string, for example "1.vcf" :
- 				"John".
- 
--		string Pull(string vcard)
-+		object, dict Pull(string vcard, string targetfile)
- 
--			Retrieve the vcard in the current phonebook object
--			for example : Pull("0.vcf")
-+			Retrieve the vcard in the current phonebook object and
-+			store it in a local file.
+-	if (obc_session_queue(session, transfer, transfer_callback, message,
+-									&err)) {
+-		dbus_message_ref(message);
+-		return NULL;
+-	}
++	if (!obc_session_queue(session, transfer, NULL, NULL, &err))
++		goto fail;
 +
-+			If an empty target file is given, a name will be
-+			automatically calculated for the temporary file.
-+
-+			The returned path represents the newly created transfer,
-+			which should be used to find out if the content has been
-+			successfully transferred or if the operation fails.
-+
-+			The properties of this transfer are also returned along
-+			with the object path, to avoid a call to GetProperties.
++	return obc_transfer_create_dbus_reply(transfer, message);
  
- 		array{string vcard, string name}
- 		Search(string field, string value)
+ fail:
+ 	reply = g_dbus_create_error(message, "org.openobex.Error.Failed", "%s",
+@@ -415,11 +395,13 @@ static const GDBusMethodTable ftp_methods[] = {
+ 		GDBUS_ARGS({ "folder", "s" }), NULL, create_folder) },
+ 	{ GDBUS_ASYNC_METHOD("ListFolder",
+ 		NULL, GDBUS_ARGS({ "folderinfo", "aa{sv}" }), list_folder) },
+-	{ GDBUS_ASYNC_METHOD("GetFile",
+-		GDBUS_ARGS({ "targetfile", "s" }, { "sourcefile", "s" }), NULL,
++	{ GDBUS_METHOD("GetFile",
++		GDBUS_ARGS({ "targetfile", "s" }, { "sourcefile", "s" }),
++		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
+ 		get_file) },
+-	{ GDBUS_ASYNC_METHOD("PutFile",
+-		GDBUS_ARGS({ "sourcefile", "s" }, { "targetfile", "s" }), NULL,
++	{ GDBUS_METHOD("PutFile",
++		GDBUS_ARGS({ "sourcefile", "s" }, { "targetfile", "s" }),
++		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
+ 		put_file) },
+ 	{ GDBUS_ASYNC_METHOD("CopyFile",
+ 		GDBUS_ARGS({ "sourcefile", "s" }, { "targetfile", "s" }), NULL,
 -- 
 1.7.7.6
 
