@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 12/15] client-test: ftp-client uses new API
-Date: Mon,  4 Jun 2012 15:50:25 +0200
-Message-Id: <1338817828-12166-13-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 13/15] client-test: pbap-client uses new API
+Date: Mon,  4 Jun 2012 15:50:26 +0200
+Message-Id: <1338817828-12166-14-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338817828-12166-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338817828-12166-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,153 +13,39 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
 ---
- test/ftp-client |  259 ++++++++++++++++++++++++++++++------------------------
- 1 files changed, 144 insertions(+), 115 deletions(-)
+ test/pbap-client |  188 +++++++++++++++++++++++++++++++++++++++++++----------
+ 1 files changed, 152 insertions(+), 36 deletions(-)
 
-diff --git a/test/ftp-client b/test/ftp-client
-index 8421ade..53de0a4 100755
---- a/test/ftp-client
-+++ b/test/ftp-client
-@@ -10,124 +10,153 @@ import os.path
- from optparse import OptionParser
+diff --git a/test/pbap-client b/test/pbap-client
+index ecca14f..069bde3 100755
+--- a/test/pbap-client
++++ b/test/pbap-client
+@@ -1,41 +1,157 @@
+ #!/usr/bin/python
  
- def parse_options():
--    parser.add_option("-d", "--device", dest="device",
--                      help="Device to connect", metavar="DEVICE")
--    parser.add_option("-c", "--chdir", dest="new_dir",
--                      help="Change current directory to DIR", metavar="DIR")
--    parser.add_option("-l", "--list", action="store_true", dest="list_dir",
--                      help="List the current directory")
--    parser.add_option("-g", "--get", dest="get_file",
--                      help="Get FILE", metavar="FILE")
--    parser.add_option("-p", "--put", dest="put_file",
--                      help="Put FILE", metavar="FILE")
--    parser.add_option("-y", "--copy", dest="copy_file",
--                      help="Copy FILE", metavar="FILE")
--    parser.add_option("-m", "--move", dest="move_file",
--                      help="Move FILE", metavar="FILE")
--    parser.add_option("-n", "--destname", dest="dest_file",
--                      help="Destination FILE", metavar="FILE")
--    parser.add_option("-r", "--remove", dest="remove_file",
--                      help="Remove FILE", metavar="FILE")
--    parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
--
--    return parser.parse_args()
--
--def error(err):
--    print err
--
--def void_reply():
--    pass
--
--def transfer_complete():
--    if options.verbose:
--        print "Transfer finished"
--    mainloop.quit()
--
--def change_folder(session, new_dir):
--    for node in new_dir.split("/"):
--        session.ChangeFolder(node)
--
--def list_folder(session):
--    for i in session.ListFolder():
--        if i["Type"] == "folder":
--            print "%s/" % (i["Name"])
--        else:
--            print "%s" % (i["Name"])
--
--def put_file(session, filename):
--    session.PutFile(os.path.abspath(filename),
--                    os.path.basename(filename),
--                    reply_handler=transfer_complete,
--                    error_handler=error)
--
--def get_file(session, filename):
--    session.GetFile(os.path.abspath(filename),
--                    os.path.basename(filename),
--                    reply_handler=transfer_complete,
--                    error_handler=error)
--
--def remove_file(session, filename):
--    session.Delete(filename,
--                    reply_handler=void_reply,
--                    error_handler=error)
--
--def move_file(session, filename, destname):
--    session.MoveFile(filename,
--                    destname,
--                    reply_handler=void_reply,
--                    error_handler=error)
--
--def copy_file(session, filename, destname):
--    session.CopyFile(filename,
--                    destname,
--                    reply_handler=void_reply,
--                    error_handler=error)
--
--if  __name__ == '__main__':
--
--    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
--
--    parser = OptionParser()
--
--    (options, args) = parse_options()
--
--    if not options.device:
--        parser.print_help()
--        sys.exit(0)
--
--    bus = dbus.SessionBus()
--    mainloop = gobject.MainLoop()
--
--    client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
--                            "org.openobex.Client")
--
--    session_path = client.CreateSession(options.device, { "Target": "ftp" })
--
--    session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
--                 "org.openobex.Session")
--
--    ftp = dbus.Interface(bus.get_object("org.openobex.client", session_path),
--                 "org.openobex.FileTransfer")
--
--    if options.new_dir:
--        change_folder(ftp, options.new_dir)
--
--    if options.list_dir:
--        list_folder(ftp)
-+	parser.add_option("-d", "--device", dest="device",
-+				help="Device to connect", metavar="DEVICE")
-+	parser.add_option("-c", "--chdir", dest="new_dir",
-+				help="Change current directory to DIR",
-+				metavar="DIR")
-+	parser.add_option("-l", "--list", action="store_true", dest="list_dir",
-+				help="List the current directory")
-+	parser.add_option("-g", "--get", dest="get_file",
-+				help="Get FILE", metavar="FILE")
-+	parser.add_option("-p", "--put", dest="put_file",
-+				help="Put FILE", metavar="FILE")
-+	parser.add_option("-y", "--copy", dest="copy_file",
-+				help="Copy FILE", metavar="FILE")
-+	parser.add_option("-m", "--move", dest="move_file",
-+				help="Move FILE", metavar="FILE")
-+	parser.add_option("-n", "--destname", dest="dest_file",
-+				help="Destination FILE", metavar="FILE")
-+	parser.add_option("-r", "--remove", dest="remove_file",
-+				help="Remove FILE", metavar="FILE")
-+	parser.add_option("-v", "--verbose", action="store_true",
-+				dest="verbose")
++import gobject
 +
-+	return parser.parse_args()
+ import sys
++import os
+ import dbus
++import dbus.service
++import dbus.mainloop.glib
 +
-+class FtpClient:
-+	def __init__(self, session_path, verbose=False):
-+		self.transfer_path = None
-+		self.verbose = verbose
++class Transfer:
++	def __init__(self, callback_func):
++		self.callback_func = callback_func
++		self.path = None
++		self.filename = None
++
++class PbapClient:
++	def __init__(self, session_path):
++		self.pending_transfers = 0
++		self.transfer_dict = dict()
++		self.flush_func = None
 +		bus = dbus.SessionBus()
 +		obj = bus.get_object("org.openobex.client", session_path)
 +		self.session = dbus.Interface(obj, "org.openobex.Session")
-+		self.ftp = dbus.Interface(obj, "org.openobex.FileTransfer")
++		self.pbap = dbus.Interface(obj, "org.openobex.PhonebookAccess")
 +		bus.add_signal_receiver(self.transfer_complete,
 +					dbus_interface="org.openobex.Transfer",
 +					signal_name="Complete",
@@ -169,81 +55,70 @@ index 8421ade..53de0a4 100755
 +					signal_name="Error",
 +					path_keyword="path")
 +
-+	def create_transfer_reply(self, reply):
++	def register(self, reply, transfer):
 +		(path, properties) = reply
-+		self.transfer_path = path
-+		if self.verbose:
-+			print "Transfer created: %s" % path
-+
-+	def generic_reply(self):
-+		if self.verbose:
-+			print "Operation succeeded"
++		transfer.path = path
++		transfer.filename = properties["Filename"]
++		self.transfer_dict[path] = transfer
++		print "Transfer created: %s (file %s)" % (path,
++							transfer.filename)
 +
 +	def error(self, err):
 +		print err
 +		mainloop.quit()
 +
 +	def transfer_complete(self, path):
-+		if path != self.transfer_path:
++		req = self.transfer_dict.get(path)
++		if req == None:
 +			return
-+		if self.verbose:
-+			print "Transfer finished"
-+		mainloop.quit()
++		self.pending_transfers -= 1
++		print "Transfer %s finished" % path
++		f = open(req.filename, "r")
++		os.remove(req.filename)
++		lines = f.readlines()
++		del self.transfer_dict[path]
++		req.callback_func(lines)
++
++		if ((len(self.transfer_dict) == 0) and
++						(self.pending_transfers == 0)):
++			if self.flush_func != None:
++				f = self.flush_func
++				self.flush_func = None
++				f()
 +
 +	def transfer_error(self, code, message, path):
-+		if path != self.transfer_path:
++		req = self.transfer_dict.get(path)
++		if req == None:
 +			return
 +		print "Transfer finished with error %s: %s" % (code, message)
 +		mainloop.quit()
 +
-+	def change_folder(self, new_dir):
-+		for node in new_dir.split("/"):
-+			self.ftp.ChangeFolder(node)
-+
-+	def list_folder(self):
-+		for i in self.ftp.ListFolder():
-+			if i["Type"] == "folder":
-+				print "%s/" % (i["Name"])
-+			else:
-+				print "%s" % (i["Name"])
-+
-+	def put_file(self, filename):
-+		self.ftp.PutFile(os.path.abspath(filename),
-+				os.path.basename(filename),
-+				reply_handler=self.create_transfer_reply,
++	def pull(self, vcard, func):
++		req = Transfer(func)
++		self.pbap.Pull(vcard, "",
++				reply_handler=lambda r: self.register(r, req),
 +				error_handler=self.error)
++		self.pending_transfers += 1
 +
-+	def get_file(self, filename):
-+		self.ftp.GetFile(os.path.abspath(filename),
-+				os.path.basename(filename),
-+				reply_handler=self.create_transfer_reply,
++	def pull_all(self, func):
++		req = Transfer(func)
++		self.pbap.PullAll("",
++				reply_handler=lambda r: self.register(r, req),
 +				error_handler=self.error)
++		self.pending_transfers += 1
 +
-+	def remove_file(self, filename):
-+		self.ftp.Delete(filename, reply_handler=self.generic_reply,
-+					error_handler=self.error)
++	def flush_transfers(self, func):
++		if ((len(self.transfer_dict) == 0) and
++						(self.pending_transfers == 0)):
++			return
++		self.flush_func = func
 +
-+	def move_file(self, filename, destname):
-+		self.ftp.MoveFile(filename, destname,
-+					reply_handler=self.generic_reply,
-+					error_handler=self.error)
-+
-+	def copy_file(self, filename, destname):
-+		self.ftp.CopyFile(filename, destname,
-+					reply_handler=self.generic_reply,
-+					error_handler=self.error)
++	def interface(self):
++		return self.pbap
 +
 +if __name__ == '__main__':
 +
 +	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-+
-+	parser = OptionParser()
-+
-+	(options, args) = parse_options()
-+
-+	if not options.device:
-+		parser.print_help()
-+		sys.exit(0)
 +
 +	bus = dbus.SessionBus()
 +	mainloop = gobject.MainLoop()
@@ -251,43 +126,93 @@ index 8421ade..53de0a4 100755
 +	client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
 +							"org.openobex.Client")
 +
++	if (len(sys.argv) < 2):
++		print "Usage: %s <device>" % (sys.argv[0])
++		sys.exit(1)
++
 +	print "Creating Session"
-+	session_path = client.CreateSession(options.device, { "Target": "ftp" })
++	session_path = client.CreateSession(sys.argv[1], { "Target": "PBAP" })
 +
-+	ftp_client = FtpClient(session_path)
++	pbap_client = PbapClient(session_path)
 +
-+	if options.new_dir:
-+		ftp_client.change_folder(options.new_dir)
++	def process_result(lines, header):
++		if header != None:
++			print header
++		for line in lines:
++			print line,
++		print
 +
-+	if options.list_dir:
-+		ftp_client.list_folder()
++	def test_paths(paths):
++		if len(paths) == 0:
++			print
++			print "FINISHED"
++			mainloop.quit()
++			return
++
++		path = paths[0]
++
++		print "\n--- Select Phonebook %s ---\n" % (path)
++		pbap_client.interface().Select("int", path)
++
++		print "\n--- GetSize ---\n"
++		ret = pbap_client.interface().GetSize()
++		print "Size = %d\n" % (ret)
++
++		print "\n--- List vCard ---\n"
++		ret = pbap_client.interface().List()
++		for item in ret:
++			print "%s : %s" % (item[0], item[1])
++			pbap_client.interface().SetFormat("vcard30")
++			pbap_client.interface().SetFilter(["VERSION", "FN",
++									"TEL"])
++			pbap_client.pull(item[0],
++					lambda x: process_result(x, None))
++
++		pbap_client.interface().SetFormat("vcard30")
++		pbap_client.interface().SetFilter(["VERSION", "FN", "TEL"])
++		pbap_client.pull_all(lambda x:
++				process_result(x, "\n--- PullAll ---\n"))
++
++		pbap_client.flush_transfers(lambda: test_paths(paths[1:]))
++
++	test_paths(["PB", "ICH", "OCH", "MCH", "CCH"])
  
--    if options.get_file:
--        get_file(ftp, options.get_file)
-+	if options.get_file:
-+		ftp_client.get_file(options.get_file)
- 
--    if options.put_file:
--        put_file(ftp, options.put_file)
-+	if options.put_file:
-+		ftp_client.put_file(options.put_file)
- 
--    if options.move_file:
--        move_file(ftp, options.move_file, options.dest_file)
-+	if options.move_file:
-+		ftp_client.move_file(options.move_file, options.dest_file)
- 
--    if options.copy_file:
--        copy_file(ftp, options.copy_file, options.dest_file)
-+	if options.copy_file:
-+		ftp_client.copy_file(options.copy_file, options.dest_file)
- 
--    if options.remove_file:
--       remove_file(ftp, options.remove_file)
-+	if options.remove_file:
-+		ftp_client.remove_file(options.remove_file)
- 
--    mainloop.run()
+-bus = dbus.SessionBus()
+-
+-client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
+-						"org.openobex.Client")
+-
+-print "Creating Session"
+-session_path = client.CreateSession(sys.argv[1], { "Target": "PBAP" })
+-pbap = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+-						"org.openobex.PhonebookAccess")
+-session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+-							"org.openobex.Session")
+-
+-paths = ["PB", "ICH", "OCH", "MCH", "CCH"]
+-
+-for path in paths:
+-	print "\n--- Select Phonebook %s ---\n" % (path)
+-	pbap.Select("int", path)
+-
+-	print "\n--- GetSize ---\n"
+-	ret = pbap.GetSize()
+-	print "Size = %d\n" % (ret)
+-
+-	print "\n--- List vCard ---\n"
+-	ret = pbap.List()
+-	for item in ret:
+-		print "%s : %s" % (item[0], item[1])
+-		pbap.SetFormat("vcard30")
+-		pbap.SetFilter(["VERSION", "FN", "TEL"]);
+-		ret = pbap.Pull(item[0])
+-		print "%s" % (ret)
+-
+-	print "\n--- PullAll ---\n"
+-	pbap.SetFormat("vcard30")
+-	pbap.SetFilter(["VERSION", "FN", "TEL"]);
+-	ret = pbap.PullAll()
+-	print "%s" % (ret)
 +	mainloop.run()
 -- 
 1.7.7.6
