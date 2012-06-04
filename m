@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v2 02/15] client-doc: ObjectPush sessions return transfers
-Date: Mon,  4 Jun 2012 15:50:15 +0200
-Message-Id: <1338817828-12166-3-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH obexd v2 03/15] client: Support empty filename in obc_transfer_get
+Date: Mon,  4 Jun 2012 15:50:16 +0200
+Message-Id: <1338817828-12166-4-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1338817828-12166-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1338817828-12166-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,67 +12,92 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
----
- doc/client-api.txt |   34 +++++++++++++++++++++++++++++++---
- 1 files changed, 31 insertions(+), 3 deletions(-)
+Passing an empty string as a filename for obc_transfer_get will be
+similar to passing a NULL filename. This means a temporary file will be
+created to store the content of the transfer.
 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 3b5444d..a57f6c2 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -63,21 +63,49 @@ Service		org.openobex.client
- Interface	org.openobex.ObjectPush
- Object path	[variable prefix]/{session0,session1,...}
+NULL and "" are not exactly equivalent though: in case of NULL the file
+will be automatically removed immediately after being open, which means
+that the transfer initiator should also open the file to prevent it from
+being removed (to be used from the modules). In this case, the filename
+will not be exposed in D-Bus.
+
+On the other hand, if "" is given, the file will be removed only in case
+of error. So after success the transfer initiator should decide whether
+the file should be removed or not.
+
+This change is convenient in order to expose the same API in D-Bus.
+---
+ client/transfer.c |   27 ++++++++++++++++++++++-----
+ 1 files changed, 22 insertions(+), 5 deletions(-)
+
+diff --git a/client/transfer.c b/client/transfer.c
+index e7852e1..e6ca72d 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -295,8 +295,9 @@ static gboolean transfer_open(struct obc_transfer *transfer, int flags,
+ 						mode_t mode, GError **err)
+ {
+ 	int fd;
++	char *filename;
  
--Methods		void SendFile(string sourcefile)
-+Methods		object, dict SendFile(string sourcefile)
+-	if (transfer->filename != NULL) {
++	if (transfer->filename != NULL && strcmp(transfer->filename, "") != 0) {
+ 		fd = open(transfer->filename, flags, mode);
+ 		if (fd < 0) {
+ 			error("open(): %s(%d)", strerror(errno), errno);
+@@ -307,13 +308,19 @@ static gboolean transfer_open(struct obc_transfer *transfer, int flags,
+ 		goto done;
+ 	}
  
- 			Send one local file to the remote device.
+-	fd = g_file_open_tmp("obex-clientXXXXXX", &transfer->filename, err);
++	fd = g_file_open_tmp("obex-clientXXXXXX", &filename, err);
+ 	if (fd < 0) {
+ 		error("g_file_open_tmp(): %s", (*err)->message);
+ 		return FALSE;
+ 	}
  
--		void PullBusinessCard(string targetfile)
-+			The returned path represents the newly created transfer,
-+			which should be used to find out if the content has been
-+			successfully transferred or if the operation fails.
-+
-+			The properties of this transfer are also returned along
-+			with the object path, to avoid a call to GetProperties.
-+
-+		object, dict PullBusinessCard(string targetfile)
+-	remove(transfer->filename);
++	if (transfer->filename == NULL) {
++		remove(filename); /* remove always only if NULL was given */
++		g_free(filename);
++	} else {
++		g_free(transfer->filename);
++		transfer->filename = filename;
++	}
  
- 			Request the business card from a remote device and
- 			store it in the local file.
+ done:
+ 	transfer->fd = fd;
+@@ -346,6 +353,12 @@ struct obc_transfer *obc_transfer_put(const char *type, const char *name,
+ 	struct stat st;
+ 	int perr;
  
--		void ExchangeBusinessCards(string clientfile, string targetfile)
-+			If an empty target file is given, a name will be
-+			automatically calculated for the temporary file.
++	if (filename == NULL || strcmp(filename, "") == 0) {
++		g_set_error(err, OBC_TRANSFER_ERROR, -EINVAL,
++						"Invalid filename given");
++		return NULL;
++	}
 +
-+			The returned path represents the newly created transfer,
-+			which should be used to find out if the content has been
-+			successfully transferred or if the operation fails.
-+
-+			The properties of this transfer are also returned along
-+			with the object path, to avoid a call to GetProperties.
-+
-+		object, dict ExchangeBusinessCards(string clientfile,
-+							string targetfile)
+ 	transfer = obc_transfer_create(G_OBEX_OP_PUT, filename, name, type);
  
- 			Push the client's business card to the remote device
- 			and then retrieve the remote business card and store
- 			it in a local file.
+ 	if (contents != NULL) {
+@@ -435,10 +448,14 @@ static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
+ 			g_dbus_emit_signal(transfer->conn, transfer->path,
+ 						TRANSFER_INTERFACE, "Complete",
+ 						DBUS_TYPE_INVALID);
+-	} else if (transfer->path != NULL) {
++	} else {
+ 		const char *code = "org.openobex.Error.Failed";
  
-+			If an empty target file is given, a name will be
-+			automatically calculated for the temporary file.
+-		g_dbus_emit_signal(transfer->conn, transfer->path,
++		if (transfer->op == G_OBEX_OP_GET && transfer->filename != NULL)
++			remove(transfer->filename);
 +
-+			The returned path represents the newly created transfer,
-+			which should be used to find out if the content has been
-+			successfully transferred or if the operation fails.
-+
-+			The properties of this transfer are also returned along
-+			with the object path, to avoid a call to GetProperties.
-+
- File Transfer hierarchy
- =======================
- 
++		if (transfer->path != NULL)
++			g_dbus_emit_signal(transfer->conn, transfer->path,
+ 						TRANSFER_INTERFACE, "Error",
+ 						DBUS_TYPE_STRING,
+ 						&code,
 -- 
 1.7.7.6
 
