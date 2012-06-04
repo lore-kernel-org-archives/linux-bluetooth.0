@@ -1,76 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 4 Jun 2012 10:14:19 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Gustavo Padovan <gustavo@padovan.org>
+cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: Release all locks before sleep
+In-Reply-To: <1338492344-1474-2-git-send-email-gustavo@padovan.org>
+Message-ID: <alpine.DEB.2.02.1206040954120.31902@mathewm-linux>
+References: <1338492344-1474-1-git-send-email-gustavo@padovan.org> <1338492344-1474-2-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
-In-Reply-To: <1338817828-12166-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1338817828-12166-1-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Tue, 5 Jun 2012 00:13:35 +0300
-Message-ID: <CABBYNZJ85cdN8J7DWtDcs9Dc0mBnjAd4u_noRe0fXmJDaQF1vA@mail.gmail.com>
-Subject: Re: [PATCH obexd v2 00/15] client: Return transfer object in D-Bus API
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
 
-On Mon, Jun 4, 2012 at 4:50 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> This third version is very similar to the previous one but now python scripts make use of tabs instead of whitespaces.
->
-> From original cover letter:
->
-> This patch series proposes changes in the D-Bus API so that all transfer-initiating methods will return the transfer path. This has several benefits including the possibility to cancel the transfer.
->
-> Along with the transfer path, the properties corresponding to this transfer will also be returned, for both performance reasons (avoid a call to GetProperties) and also race conditions (transfer might have been destroyed by the time the client calls to GetProperties).
->
-> In addition, temporary files can now easily be used by the clients, by passing empty strings in the D-Bus API. The actual name of the created temporary file will be included in the transfer properties.
->
-> Mikel Astiz (15):
->  client: Make transfer filename optional
->  client-doc: ObjectPush sessions return transfers
->  client: Support empty filename in obc_transfer_get
->  client: Expose D-Bus data in internal transfer API
->  client: ObjectPush sessions return transfers
->  client-doc: FileTransfer sessions return transfers
->  client: FileTransfer sessions return transfers
->  client-doc: Synchronization sessions return transfers
->  client: Synchronization sessions return transfers
->  client-doc: PhonebookAccess sessions return transfers
->  client: PhonebookAccess sessions return transfers
->  client-test: ftp-client uses new API
->  client-test: pbap-client uses new API
->  client-test: Add opp-client
->  client: Update copyright statement
->
->  client/ftp.c            |   46 +++------
->  client/opp.c            |   71 +++-----------
->  client/pbap.c           |  161 ++++++++++++++----------------
->  client/session.c        |    1 +
->  client/session.h        |    1 +
->  client/sync.c           |   92 ++++++-----------
->  client/transfer.c       |   92 ++++++++++++++---
->  client/transfer.h       |    4 +
->  doc/client-api.txt      |  116 ++++++++++++++++++----
->  test/ftp-client         |  259 ++++++++++++++++++++++++++---------------------
->  test/opp-client         |   97 ++++++++++++++++++
->  test/pbap-client        |  188 +++++++++++++++++++++++++++-------
->  test/pull-business-card |   40 -------
->  test/send-files         |   23 ----
->  14 files changed, 706 insertions(+), 485 deletions(-)
->  create mode 100755 test/opp-client
->  delete mode 100755 test/pull-business-card
->  delete mode 100755 test/send-files
->
-> --
-> 1.7.7.6
+Hi Gustavo -
 
-All patches has been applied, I fixed the code style of the script
-myself and there was also an issue with make distcheck as some scripts
-were removed but you forgot to remove them form Makefile.am.
+On Thu, 31 May 2012, Gustavo Padovan wrote:
 
+> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+>
+> To avoid deadlock we need to release locks while waiting for a ack to
+> arrive.
+>
+> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> ---
+> net/bluetooth/l2cap_core.c |    5 ++++-
+> 1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 1cb3ca0..94273dc 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1553,13 +1553,14 @@ done:
+> int __l2cap_wait_ack(struct sock *sk)
+> {
+> 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+> +	struct l2cap_conn *conn = chan->conn;
 
--- 
-Luiz Augusto von Dentz
+I don't think you want to store the l2cap_conn pointer on the stack, 
+the structure can be freed when the locks are released.
+
+> 	DECLARE_WAITQUEUE(wait, current);
+> 	int err = 0;
+> 	int timeo = HZ/5;
+>
+> 	add_wait_queue(sk_sleep(sk), &wait);
+> 	set_current_state(TASK_INTERRUPTIBLE);
+> -	while (chan->unacked_frames > 0 && chan->conn) {
+> +	while (chan->unacked_frames > 0 && conn) {
+> 		if (!timeo)
+> 			timeo = HZ/5;
+>
+> @@ -1570,7 +1571,9 @@ int __l2cap_wait_ack(struct sock *sk)
+>
+> 		release_sock(sk);
+> 		l2cap_chan_unlock(chan);
+> +		mutex_unlock(&conn->chan_lock);
+> 		timeo = schedule_timeout(timeo);
+> +		mutex_lock(&conn->chan_lock);
+> 		l2cap_chan_lock(chan);
+> 		lock_sock(sk);
+> 		set_current_state(TASK_INTERRUPTIBLE);
+> -- 
+> 1.7.10.2
+
+I think it would be better to only acquire the chan_lock mutex when 
+calling l2cap_chan_close in l2cap_sock_shutdown.  However, you will 
+have to be careful to avoid deadlocks.  I think it's only safe to 
+acquire the conn->chan_lock when both the l2cap_chan and the socket 
+are unlocked.  Can you collapse all the locking changes in to one 
+patch?
+
+Since __l2cap_wait_ack is only called from l2cap_sock.c, would it 
+make sense to move the function to l2cap_sock.c?
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
