@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 hcidump 2/4] Fix number of triplet calculation
-Date: Tue,  5 Jun 2012 12:09:19 +0300
-Message-Id: <1338887361-11585-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 hcidump 4/4] Add decoding AMP Assoc data in HCI parser
+Date: Tue,  5 Jun 2012 12:09:21 +0300
+Message-Id: <1338887361-11585-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1338887361-11585-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1338887361-11585-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,23 +11,47 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Country code is also included in the TLV size.
 ---
- parser/l2cap.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ parser/hci.c |   13 ++-----------
+ 1 file changed, 2 insertions(+), 11 deletions(-)
 
-diff --git a/parser/l2cap.c b/parser/l2cap.c
-index 056e2a6..f6ed91d 100644
---- a/parser/l2cap.c
-+++ b/parser/l2cap.c
-@@ -1168,7 +1168,7 @@ static void a2mp_dump_chanlist(int level, struct a2mp_tlv *tlv, char *prefix)
- 	struct a2mp_country_triplet *triplet;
- 	int i, num;
+diff --git a/parser/hci.c b/parser/hci.c
+index 984b554..5b837e9 100644
+--- a/parser/hci.c
++++ b/parser/hci.c
+@@ -36,6 +36,7 @@
+ #include "parser/parser.h"
+ #include "lib/hci.h"
+ #include "lib/hci_lib.h"
++#include "lib/amp.h"
  
--	num = tlv->len / sizeof(*triplet);
-+	num = (tlv->len - sizeof(*chan_list)) / sizeof(*triplet);
+ static uint16_t manufacturer = DEFAULT_COMPID;
  
- 	printf("%s number of triplets %d\n", prefix, num);
+@@ -2599,7 +2600,6 @@ static inline void read_local_amp_assoc_dump(int level, struct frame *frm)
+ {
+ 	read_local_amp_assoc_rp *rp = frm->ptr;
+ 	uint16_t len = btohs(rp->length);
+-	int i;
+ 
+ 	p_indent(level, frm);
+ 	printf("status 0x%2.2x handle 0x%2.2x remaining len %d\n",
+@@ -2608,16 +2608,7 @@ static inline void read_local_amp_assoc_dump(int level, struct frame *frm)
+ 		p_indent(level, frm);
+ 		printf("Error: %s\n", status2str(rp->status));
+ 	} else {
+-		p_indent(level, frm);
+-		printf("assoc data");
+-		for (i = 0; i < len; i++) {
+-			if (!(i % 16)) {
+-				printf("\n");
+-				p_indent(level, frm);
+-			}
+-			printf("%2.2x ", rp->fragment[i]);
+-		}
+-		printf("\n");
++		amp_assoc_dump(level + 1, rp->fragment, len);
+ 	}
+ }
  
 -- 
 1.7.9.5
