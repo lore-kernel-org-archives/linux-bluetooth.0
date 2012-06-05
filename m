@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 06/23 v2] test: Use org.bluez.obex namespace in simple-agent script
-Date: Tue,  5 Jun 2012 16:02:54 +0300
-Message-Id: <1338901391-17138-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 05/23 v2] core: Change agent interface to org.bluez.obex.Agent
+Date: Tue,  5 Jun 2012 16:02:53 +0300
+Message-Id: <1338901391-17138-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1338901391-17138-1-git-send-email-luiz.dentz@gmail.com>
 References: <1338901391-17138-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,95 +12,54 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- test/simple-agent |   37 +++++++++++++++++++------------------
- 1 file changed, 19 insertions(+), 18 deletions(-)
+ plugins/syncevolution.c |    3 +--
+ src/manager.c           |    5 +++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/test/simple-agent b/test/simple-agent
-index 1ac4c17..1902082 100755
---- a/test/simple-agent
-+++ b/test/simple-agent
-@@ -12,8 +12,8 @@ class Agent(dbus.service.Object):
- 		dbus.service.Object.__init__(self, conn, obj_path)
- 		self.pending_auth = False
+diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
+index b0cd626..0778608 100644
+--- a/plugins/syncevolution.c
++++ b/plugins/syncevolution.c
+@@ -365,8 +365,7 @@ static ssize_t synce_read(void *object, void *buf, size_t count)
  
--	@dbus.service.method("org.openobex.Agent",
--					in_signature="osssii", out_signature="s")
-+	@dbus.service.method("org.bluez.obex.Agent", in_signature="osssii",
-+							out_signature="s")
- 	def Authorize(self, dpath, device, filename, ftype, length, time):
- 		global transfers
+ 	append_dict_entry(&dict, "id", DBUS_TYPE_STRING, context->id);
  
-@@ -23,8 +23,9 @@ class Agent(dbus.service.Object):
+-	snprintf(transport, sizeof(transport), "%s.obexd",
+-					OPENOBEX_SERVICE);
++	snprintf(transport, sizeof(transport), "%s.obexd", OBEXD_SERVICE);
+ 	append_dict_entry(&dict, "transport", DBUS_TYPE_STRING, transport);
  
- 		if auth == "n" or auth == "N":
- 			self.pending_auth = False
--			raise dbus.DBusException("org.openobex.Error.Rejected: "
--									"Not Autorized")
-+			raise dbus.DBusException(
-+					"org.bluez.obex.Error.Rejected: "
-+					"Not Autorized")
+ 	snprintf(transport_description, sizeof(transport_description),
+diff --git a/src/manager.c b/src/manager.c
+index 5033881..bd19288 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -49,6 +49,7 @@
+ #define ERROR_INTERFACE OBEXD_SERVICE ".Error"
+ #define TRANSFER_INTERFACE OBEXD_SERVICE ".Transfer"
+ #define SESSION_INTERFACE OBEXD_SERVICE ".Session"
++#define AGENT_INTERFACE OBEXD_SERVICE ".Agent"
  
- 		print "Full filename (including path):"
- 		self.pending_auth = False
-@@ -32,8 +33,8 @@ class Agent(dbus.service.Object):
- 		transfers.append(Transfer(dpath, filename, 0, length))
- 		return raw_input().strip("\n ")
+ #define TIMEOUT 60*1000 /* Timeout for user response (miliseconds) */
  
--	@dbus.service.method("org.openobex.Agent",
--					in_signature="", out_signature="")
-+	@dbus.service.method("org.bluez.obex.Agent", in_signature="",
-+							out_signature="")
- 	def Cancel(self):
- 		print "Authorization Canceled"
- 		self.pending_auth = False
-@@ -53,9 +54,9 @@ class Transfer(object):
- 		self.size = total
+@@ -461,7 +462,7 @@ static void agent_cancel(void)
+ 		return;
  
- 	def cancel(self):
--		transfer_iface = dbus.Interface(bus.get_object("org.openobex",
--														self.dpath),
--										"org.openobex.Transfer")
-+		transfer_iface = dbus.Interface(bus.get_object(
-+						"org.bluez.obex", self.dpath),
-+						"org.bluez.obex.Transfer")
- 		transfer_iface.Cancel()
+ 	msg = dbus_message_new_method_call(agent->bus_name, agent->path,
+-					"org.openobex.Agent", "Cancel");
++						AGENT_INTERFACE, "Cancel");
  
- 	def __str__(self):
-@@ -71,9 +72,9 @@ if __name__ == '__main__':
- 	def new_transfer(dpath):
- 		print "new transfer"
- 		bus.add_signal_receiver(progress,
--								dbus_interface="org.openobex.Transfer",
--								signal_name="Progress",
--								path_keyword="dpath")
-+				dbus_interface="org.bluez.obex.Transfer",
-+				signal_name="Progress",
-+				path_keyword="dpath")
+ 	g_dbus_send_message(connection, msg);
+ }
+@@ -547,7 +548,7 @@ int manager_request_authorization(struct obex_session *os, int32_t time,
+ 	path = g_strdup_printf("/transfer%u", os->id);
  
- 	def transfer_completed(dpath, success):
- 		global transfers
-@@ -96,15 +97,15 @@ if __name__ == '__main__':
- 	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+ 	msg = dbus_message_new_method_call(agent->bus_name, agent->path,
+-					"org.openobex.Agent", "Authorize");
++						AGENT_INTERFACE, "Authorize");
  
- 	bus = dbus.SessionBus()
--	manager = dbus.Interface(bus.get_object("org.openobex", "/"),
--							"org.openobex.Manager")
-+	manager = dbus.Interface(bus.get_object("org.bluez.obex", "/"),
-+						"org.bluez.obex.Manager")
- 	bus.add_signal_receiver(new_transfer,
--							dbus_interface="org.openobex.Manager",
--							signal_name="TransferStarted")
-+				dbus_interface="org.bluez.obex.Manager",
-+				signal_name="TransferStarted")
- 
- 	bus.add_signal_receiver(transfer_completed,
--							dbus_interface="org.openobex.Manager",
--							signal_name="TransferCompleted")
-+				dbus_interface="org.bluez.obex.Manager",
-+				signal_name="TransferCompleted")
- 
- 	path = "/test/agent"
- 	agent = Agent(bus, path)
+ 	dbus_message_append_args(msg,
+ 			DBUS_TYPE_OBJECT_PATH, &path,
 -- 
 1.7.10.2
 
