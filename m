@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 13/23] client-api: Rename PhonebookAccess interface to org.bluez.obex.PhonebookAccess
-Date: Tue,  5 Jun 2012 13:57:11 +0300
-Message-Id: <1338893841-14234-14-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 10/23] client-api: Rename session interface to org.bluez.obex.Session
+Date: Tue,  5 Jun 2012 13:57:08 +0300
+Message-Id: <1338893841-14234-11-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1338893841-14234-1-git-send-email-luiz.dentz@gmail.com>
 References: <1338893841-14234-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,37 +11,40 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+The base is also changed to /org/bluez/obex to follow the new namespace
 ---
- client/pbap.c      |    2 +-
+ client/session.c   |    4 ++--
  doc/client-api.txt |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/client/pbap.c b/client/pbap.c
-index e296eec..9bd93b8 100644
---- a/client/pbap.c
-+++ b/client/pbap.c
-@@ -122,7 +122,7 @@ static const char *filter_list[] = {
- #define FILTER_BIT_MAX	63
- #define FILTER_ALL	0xFFFFFFFFFFFFFFFFULL
+diff --git a/client/session.c b/client/session.c
+index ac5c7f2..7014396 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -45,8 +45,8 @@
+ #include "driver.h"
+ #include "transport.h"
  
--#define PBAP_INTERFACE  "org.openobex.PhonebookAccess"
-+#define PBAP_INTERFACE "org.bluez.obex.PhonebookAccess"
- #define PBAP_UUID "0000112f-0000-1000-8000-00805f9b34fb"
+-#define SESSION_INTERFACE  "org.openobex.Session"
+-#define SESSION_BASEPATH   "/org/openobex"
++#define SESSION_INTERFACE "org.bluez.obex.Session"
++#define SESSION_BASEPATH "/org/bluez/obex"
  
- struct pbap_data {
+ #define OBEX_IO_ERROR obex_io_error_quark()
+ #define OBEX_IO_ERROR_FIRST (0xff + 1)
 diff --git a/doc/client-api.txt b/doc/client-api.txt
-index fc58ee9..5a6189d 100644
+index 6d2c05f..23d05dd 100644
 --- a/doc/client-api.txt
 +++ b/doc/client-api.txt
-@@ -184,7 +184,7 @@ Phonebook Access hierarchy
- =======================
+@@ -40,7 +40,7 @@ Session hierarchy
+ =================
  
  Service		org.bluez.obex.client
--Interface	org.openobex.PhonebookAccess
-+Interface	org.bluez.obex.PhonebookAccess
+-Interface	org.openobex.Session
++Interface	org.bluez.obex.Session
  Object path	[variable prefix]/{session0,session1,...}
  
- Methods		void Select(string location, string phonebook)
+ Methods		dict GetProperties()
 -- 
 1.7.10.2
 
