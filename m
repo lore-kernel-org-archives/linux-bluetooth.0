@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 11/23 v2] client-api: Rename ObjectPush interface to org.bluez.obex.ObjectPush
-Date: Tue,  5 Jun 2012 16:02:59 +0300
-Message-Id: <1338901391-17138-12-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 10/23 v2] client-api: Rename session interface to org.bluez.obex.Session
+Date: Tue,  5 Jun 2012 16:02:58 +0300
+Message-Id: <1338901391-17138-11-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1338901391-17138-1-git-send-email-luiz.dentz@gmail.com>
 References: <1338901391-17138-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,37 +11,40 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+The base is also changed to /org/bluez/obex to follow the new namespace
 ---
- client/opp.c       |    2 +-
+ client/session.c   |    4 ++--
  doc/client-api.txt |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/client/opp.c b/client/opp.c
-index a3899f8..5e84f41 100644
---- a/client/opp.c
-+++ b/client/opp.c
-@@ -36,7 +36,7 @@
- #include "opp.h"
+diff --git a/client/session.c b/client/session.c
+index ac5c7f2..7014396 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -45,8 +45,8 @@
+ #include "driver.h"
+ #include "transport.h"
  
- #define OPP_UUID "00001105-0000-1000-8000-00805f9b34fb"
--#define OPP_INTERFACE "org.openobex.ObjectPush"
-+#define OPP_INTERFACE "org.bluez.obex.ObjectPush"
- #define ERROR_INF OPP_INTERFACE ".Error"
+-#define SESSION_INTERFACE  "org.openobex.Session"
+-#define SESSION_BASEPATH   "/org/openobex"
++#define SESSION_INTERFACE "org.bluez.obex.Session"
++#define SESSION_BASEPATH "/org/bluez/obex"
  
- struct opp_data {
+ #define OBEX_IO_ERROR obex_io_error_quark()
+ #define OBEX_IO_ERROR_FIRST (0xff + 1)
 diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 23d05dd..09aab87 100644
+index 6d2c05f..23d05dd 100644
 --- a/doc/client-api.txt
 +++ b/doc/client-api.txt
-@@ -61,7 +61,7 @@ Object Push hierarchy
- =====================
+@@ -40,7 +40,7 @@ Session hierarchy
+ =================
  
  Service		org.bluez.obex.client
--Interface	org.openobex.ObjectPush
-+Interface	org.bluez.obex.ObjectPush
+-Interface	org.openobex.Session
++Interface	org.bluez.obex.Session
  Object path	[variable prefix]/{session0,session1,...}
  
- Methods		object, dict SendFile(string sourcefile)
+ Methods		dict GetProperties()
 -- 
 1.7.10.2
 
