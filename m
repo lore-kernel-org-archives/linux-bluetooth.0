@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 06/23] test: Use org.bluez.obex namespace in simple-agent script
-Date: Tue,  5 Jun 2012 13:57:04 +0300
-Message-Id: <1338893841-14234-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 07/23] client-api: Change D-Bus namespace to org.bluez.obex.client
+Date: Tue,  5 Jun 2012 13:57:05 +0300
+Message-Id: <1338893841-14234-8-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1338893841-14234-1-git-send-email-luiz.dentz@gmail.com>
 References: <1338893841-14234-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,95 +12,87 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- test/simple-agent |   37 +++++++++++++++++++------------------
- 1 file changed, 19 insertions(+), 18 deletions(-)
+ doc/client-api.txt |   18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/test/simple-agent b/test/simple-agent
-index 1ac4c17..1902082 100755
---- a/test/simple-agent
-+++ b/test/simple-agent
-@@ -12,8 +12,8 @@ class Agent(dbus.service.Object):
- 		dbus.service.Object.__init__(self, conn, obj_path)
- 		self.pending_auth = False
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index 2165c22..6d2c05f 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -8,8 +8,8 @@ Copyright (C) 2011-2012  BMW Car IT GmbH. All rights reserved.
+ Client hierarchy
+ ================
  
--	@dbus.service.method("org.openobex.Agent",
--					in_signature="osssii", out_signature="s")
-+	@dbus.service.method("org.bluez.obex.Agent", in_signature="osssii",
-+							out_signature="s")
- 	def Authorize(self, dpath, device, filename, ftype, length, time):
- 		global transfers
+-Service		org.openobex.client
+-Interface	org.openobex.Client
++Service		org.bluez.obex.client
++Interface	org.bluez.obex.Client
+ Object path	/
  
-@@ -23,8 +23,9 @@ class Agent(dbus.service.Object):
+ Methods		object CreateSession(string destination, dict args)
+@@ -39,7 +39,7 @@ Methods		object CreateSession(string destination, dict args)
+ Session hierarchy
+ =================
  
- 		if auth == "n" or auth == "N":
- 			self.pending_auth = False
--			raise dbus.DBusException("org.openobex.Error.Rejected: "
--									"Not Autorized")
-+			raise dbus.DBusException(
-+					"org.bluez.obex.Error.Rejected: "
-+					"Not Autorized")
+-Service		org.openobex.client
++Service		org.bluez.obex.client
+ Interface	org.openobex.Session
+ Object path	[variable prefix]/{session0,session1,...}
  
- 		print "Full filename (including path):"
- 		self.pending_auth = False
-@@ -32,8 +33,8 @@ class Agent(dbus.service.Object):
- 		transfers.append(Transfer(dpath, filename, 0, length))
- 		return raw_input().strip("\n ")
+@@ -60,7 +60,7 @@ Properties	string Source [readonly]
+ Object Push hierarchy
+ =====================
  
--	@dbus.service.method("org.openobex.Agent",
--					in_signature="", out_signature="")
-+	@dbus.service.method("org.bluez.obex.Agent", in_signature="",
-+							out_signature="")
- 	def Cancel(self):
- 		print "Authorization Canceled"
- 		self.pending_auth = False
-@@ -53,9 +54,9 @@ class Transfer(object):
- 		self.size = total
+-Service		org.openobex.client
++Service		org.bluez.obex.client
+ Interface	org.openobex.ObjectPush
+ Object path	[variable prefix]/{session0,session1,...}
  
- 	def cancel(self):
--		transfer_iface = dbus.Interface(bus.get_object("org.openobex",
--														self.dpath),
--										"org.openobex.Transfer")
-+		transfer_iface = dbus.Interface(bus.get_object(
-+						"org.bluez.obex", self.dpath),
-+						"org.bluez.obex.Transfer")
- 		transfer_iface.Cancel()
+@@ -110,7 +110,7 @@ Methods		object, dict SendFile(string sourcefile)
+ File Transfer hierarchy
+ =======================
  
- 	def __str__(self):
-@@ -71,9 +72,9 @@ if __name__ == '__main__':
- 	def new_transfer(dpath):
- 		print "new transfer"
- 		bus.add_signal_receiver(progress,
--								dbus_interface="org.openobex.Transfer",
--								signal_name="Progress",
--								path_keyword="dpath")
-+				dbus_interface="org.bluez.obex.Transfer",
-+				signal_name="Progress",
-+				path_keyword="dpath")
+-Service		org.openobex.client
++Service		org.bluez.obex.client
+ Interface	org.openobex.FileTransfer
+ Object path	[variable prefix]/{session0,session1,...}
  
- 	def transfer_completed(dpath, success):
- 		global transfers
-@@ -96,15 +97,15 @@ if __name__ == '__main__':
- 	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+@@ -183,7 +183,7 @@ Methods		void ChangeFolder(string folder)
+ Phonebook Access hierarchy
+ =======================
  
- 	bus = dbus.SessionBus()
--	manager = dbus.Interface(bus.get_object("org.openobex", "/"),
--							"org.openobex.Manager")
-+	manager = dbus.Interface(bus.get_object("org.bluez.obex", "/"),
-+						"org.bluez.obex.Manager")
- 	bus.add_signal_receiver(new_transfer,
--							dbus_interface="org.openobex.Manager",
--							signal_name="TransferStarted")
-+				dbus_interface="org.bluez.obex.Manager",
-+				signal_name="TransferStarted")
+-Service		org.openobex.client
++Service		org.bluez.obex.client
+ Interface	org.openobex.PhonebookAccess
+ Object path	[variable prefix]/{session0,session1,...}
  
- 	bus.add_signal_receiver(transfer_completed,
--							dbus_interface="org.openobex.Manager",
--							signal_name="TransferCompleted")
-+				dbus_interface="org.bluez.obex.Manager",
-+				signal_name="TransferCompleted")
+@@ -297,7 +297,7 @@ Methods		void Select(string location, string phonebook)
+ Synchronization hierarchy
+ =======================
  
- 	path = "/test/agent"
- 	agent = Agent(bus, path)
+-Service		org.openobex.client
++Service		org.bluez.obex.client
+ Interface	org.openobex.Synchronization
+ Object path	[variable prefix]/{session0,session1,...}
+ 
+@@ -343,7 +343,7 @@ Methods		void SetLocation(string location)
+ Message Access hierarchy
+ =========================
+ 
+-Service		org.openobex.client
++Service		org.bluez.obex.client
+ Interface	org.openobex.MessageAccess
+ Object path	[variable prefix]/{session0,session1,...}
+ 
+@@ -355,7 +355,7 @@ Methods		void SetFolder(string name)
+ Transfer hierarchy
+ ==================
+ 
+-Service		org.openobex.client
++Service		org.bluez.obex.client
+ Interface	org.openobex.Transfer
+ Object path	[variable prefix]/{transfer0,transfer1,...}
+ 
 -- 
 1.7.10.2
 
