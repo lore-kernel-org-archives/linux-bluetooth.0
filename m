@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 17/23 v2] test: Use org.bluez.obex namespace in exchange-business-cards script
-Date: Tue,  5 Jun 2012 16:03:05 +0300
-Message-Id: <1338901391-17138-18-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 16/23 v2] client-api: Rename Transfer interface to org.bluez.obex.Transfer
+Date: Tue,  5 Jun 2012 16:03:04 +0300
+Message-Id: <1338901391-17138-17-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1338901391-17138-1-git-send-email-luiz.dentz@gmail.com>
 References: <1338901391-17138-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,36 +12,38 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- test/exchange-business-cards |   11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ client/transfer.c  |    4 ++--
+ doc/client-api.txt |    2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/test/exchange-business-cards b/test/exchange-business-cards
-index 4abe426..aace07b 100755
---- a/test/exchange-business-cards
-+++ b/test/exchange-business-cards
-@@ -4,17 +4,16 @@ import sys
- import dbus
+diff --git a/client/transfer.c b/client/transfer.c
+index b807014..000a510 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -43,8 +43,8 @@
+ #include "log.h"
+ #include "transfer.h"
  
- bus = dbus.SessionBus()
--client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
--							"org.openobex.Client")
-+client = dbus.Interface(bus.get_object("org.bluez.obex.client", "/"),
-+					"org.bluez.obex.Client")
+-#define TRANSFER_INTERFACE  "org.openobex.Transfer"
+-#define TRANSFER_BASEPATH   "/org/openobex"
++#define TRANSFER_INTERFACE "org.bluez.obex.Transfer"
++#define TRANSFER_BASEPATH "/org/bluez/obex"
  
- if (len(sys.argv) < 4):
- 	print "Usage: %s <device> <clientfile> <file>" % (sys.argv[0])
- 	sys.exit(1)
+ #define OBC_TRANSFER_ERROR obc_transfer_error_quark()
  
- print "Creating Session"
--session_path = client.CreateSession(sys.argv[1], { "Target": "OPP" })
--opp = dbus.Interface(bus.get_object("org.openobex.client",
--					session_path),
--					"org.openobex.ObjectPush")
-+path = client.CreateSession(sys.argv[1], { "Target": "OPP" })
-+opp = dbus.Interface(bus.get_object("org.bluez.obex.client", path),
-+					"org.bluez.obex.ObjectPush")
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index 76bf722..473920f 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -356,7 +356,7 @@ Transfer hierarchy
+ ==================
  
- opp.ExchangeBusinessCards(sys.argv[2], sys.argv[3])
+ Service		org.bluez.obex.client
+-Interface	org.openobex.Transfer
++Interface	org.bluez.obex.Transfer
+ Object path	[variable prefix]/{transfer0,transfer1,...}
+ 
+ Methods		dict GetProperties()
 -- 
 1.7.10.2
 
