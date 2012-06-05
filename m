@@ -1,97 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1338210316-12299-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <CAHp75Vc3sut7R7FF=xHQ0-3HaydPBh86sNnzRjKP8+ow=SOfLg@mail.gmail.com>
-	<1338210316-12299-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Tue, 5 Jun 2012 14:57:23 +0300
-Message-ID: <CAMXE1-q+Cn0DHqyLFe19ej3z3B2ptdS28H2qKRXJBhpOLaFdEQ@mail.gmail.com>
-Subject: Re: [PATCHv3] vsprintf: Add %pMR for Bluetooth MAC address
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org, akpm@linux-foundation.org,
-	linux-kernel@vger.kernel.org, adobriyan@gmail.com,
-	andriy.shevchenko@linux.intel.com
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-kernel-owner@vger.kernel.org
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH obexd 23/23] test: Use org.bluez.obex namespace in get-capabilities script
+Date: Tue,  5 Jun 2012 13:57:21 +0300
+Message-Id: <1338893841-14234-24-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1338893841-14234-1-git-send-email-luiz.dentz@gmail.com>
+References: <1338893841-14234-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, May 28, 2012 at 4:05 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Bluetooth uses mostly LE byte order which is reversed for visual
-> interpretation. Currently in Bluetooth in use unsafe batostr function.
->
-> This is slightly modified version of Joe Perches <joe@perches.com>
-> patch (sent Sat, Dec 4, 2010).
->
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->        v3: removed extra variable index
->        v2: changed bluetooth to reversed, syntax fixes
->
->  lib/vsprintf.c |   23 +++++++++++++++++++----
->  1 file changed, 19 insertions(+), 4 deletions(-)
->
-> diff --git a/lib/vsprintf.c b/lib/vsprintf.c
-> index abbabec..55052fa 100644
-> --- a/lib/vsprintf.c
-> +++ b/lib/vsprintf.c
-> @@ -559,15 +559,28 @@ char *mac_address_string(char *buf, char *end, u8 *addr,
->        char *p = mac_addr;
->        int i;
->        char separator;
-> +       bool reversed = false;
->
-> -       if (fmt[1] == 'F') {            /* FDDI canonical format */
-> +       switch (fmt[1]) {
-> +       case 'F':
->                separator = '-';
-> -       } else {
-> +               break;
-> +
-> +       case 'R':
-> +               reversed = true;
-> +               /* fall through */
-> +
-> +       default:
->                separator = ':';
-> +               break;
->        }
->
->        for (i = 0; i < 6; i++) {
-> -               p = hex_byte_pack(p, addr[i]);
-> +               if (reversed)
-> +                       p = hex_byte_pack(p, addr[5 - i]);
-> +               else
-> +                       p = hex_byte_pack(p, addr[i]);
-> +
->                if (fmt[0] == 'M' && i != 5)
->                        *p++ = separator;
->        }
-> @@ -830,6 +843,7 @@ int kptr_restrict __read_mostly;
->  * - 'm' For a 6-byte MAC address, it prints the hex address without colons
->  * - 'MF' For a 6-byte MAC FDDI address, it prints the address
->  *       with a dash-separated hex notation
-> + * - '[mM]R For a 6-byte MAC address, Reverse order (Bluetooth)
->  * - 'I' [46] for IPv4/IPv6 addresses printed in the usual way
->  *       IPv4 uses dot-separated decimal without leading 0's (1.2.3.4)
->  *       IPv6 uses colon separated network-order 16 bit hex with leading 0's
-> @@ -890,7 +904,8 @@ char *pointer(const char *fmt, char *buf, char *end, void *ptr,
->                return resource_string(buf, end, ptr, spec, fmt);
->        case 'M':                       /* Colon separated: 00:01:02:03:04:05 */
->        case 'm':                       /* Contiguous: 000102030405 */
-> -                                       /* [mM]F (FDDI, bit reversed) */
-> +                                       /* [mM]F (FDDI) */
-> +                                       /* [mM]R (Reverse order; Bluetooth) */
->                return mac_address_string(buf, end, ptr, spec, fmt);
->        case 'I':                       /* Formatted IP supported
->                                         * 4:   1.2.3.4
-> --
-> 1.7.9.5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+---
+ test/get-capabilities |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/test/get-capabilities b/test/get-capabilities
+index 09e2d24..a06f2eb 100755
+--- a/test/get-capabilities
++++ b/test/get-capabilities
+@@ -4,8 +4,8 @@ import sys
+ import dbus
+ 
+ bus = dbus.SessionBus()
+-client = dbus.Interface(bus.get_object("org.openobex.client", "/"),
+-					"org.openobex.Client")
++client = dbus.Interface(bus.get_object("org.bluez.obex.client", "/"),
++					"org.bluez.obex.Client")
+ 
+ if (len(sys.argv) < 3):
+ 	print "Usage: %s <device> <target>" % (sys.argv[0])
+@@ -13,7 +13,7 @@ if (len(sys.argv) < 3):
+ 
+ print "Creating Session"
+ session_path = client.CreateSession(sys.argv[1], { "Target": sys.argv[2] })
+-session = dbus.Interface(bus.get_object("org.openobex.client", session_path),
+-							"org.openobex.Session")
++session = dbus.Interface(bus.get_object("org.bluez.obex.client", session_path),
++					"org.bluez.obex.Session")
+ 
+ print session.GetCapabilities()
+-- 
+1.7.10.2
+
