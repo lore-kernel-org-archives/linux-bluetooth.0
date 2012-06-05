@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 16/23 v2] client-api: Rename Transfer interface to org.bluez.obex.Transfer
-Date: Tue,  5 Jun 2012 16:03:04 +0300
-Message-Id: <1338901391-17138-17-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 15/23 v2] client-api: Rename MessageAccess interface to org.bluez.obex.MessageAccess
+Date: Tue,  5 Jun 2012 16:03:03 +0300
+Message-Id: <1338901391-17138-16-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1338901391-17138-1-git-send-email-luiz.dentz@gmail.com>
 References: <1338901391-17138-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,38 +12,22 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- client/transfer.c  |    4 ++--
- doc/client-api.txt |    2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ client/map.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/client/transfer.c b/client/transfer.c
-index b807014..000a510 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -43,8 +43,8 @@
- #include "log.h"
- #include "transfer.h"
+diff --git a/client/map.c b/client/map.c
+index 52b7c68..1bf1f4f 100644
+--- a/client/map.c
++++ b/client/map.c
+@@ -40,7 +40,7 @@
+ 	"\xBB\x58\x2B\x40\x42\x0C\x11\xDB\xB0\xDE\x08\x00\x20\x0C\x9A\x66"
+ #define OBEX_MAS_UUID_LEN 16
  
--#define TRANSFER_INTERFACE  "org.openobex.Transfer"
--#define TRANSFER_BASEPATH   "/org/openobex"
-+#define TRANSFER_INTERFACE "org.bluez.obex.Transfer"
-+#define TRANSFER_BASEPATH "/org/bluez/obex"
+-#define MAP_INTERFACE  "org.openobex.MessageAccess"
++#define MAP_INTERFACE "org.bluez.obex.MessageAccess"
+ #define MAS_UUID "00001132-0000-1000-8000-00805f9b34fb"
  
- #define OBC_TRANSFER_ERROR obc_transfer_error_quark()
- 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 76bf722..473920f 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -356,7 +356,7 @@ Transfer hierarchy
- ==================
- 
- Service		org.bluez.obex.client
--Interface	org.openobex.Transfer
-+Interface	org.bluez.obex.Transfer
- Object path	[variable prefix]/{transfer0,transfer1,...}
- 
- Methods		dict GetProperties()
+ struct map_data {
 -- 
 1.7.10.2
 
