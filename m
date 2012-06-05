@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 02/23 v2] core: Change D-Bus namespace to org.bluez.obex
-Date: Tue,  5 Jun 2012 16:02:50 +0300
-Message-Id: <1338901391-17138-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 01/23 v2] obexd-api: Change D-Bus namespace to org.bluez.obexd
+Date: Tue,  5 Jun 2012 16:02:49 +0300
+Message-Id: <1338901391-17138-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1338901391-17138-1-git-send-email-luiz.dentz@gmail.com>
 References: <1338901391-17138-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,122 +11,67 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This changes the namespace from org.openobex to org.bluez.obex
+obexd not longer depend on openobex so it doesn't make any sense to use
+its namespace.
 ---
- src/manager.c |   37 ++++++++++++++++++-------------------
- src/manager.h |    2 +-
- 2 files changed, 19 insertions(+), 20 deletions(-)
+ doc/obexd-api.txt |   16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/src/manager.c b/src/manager.c
-index f649035..5033881 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -44,11 +44,11 @@
- #include "btio.h"
- #include "service.h"
+diff --git a/doc/obexd-api.txt b/doc/obexd-api.txt
+index a7920f4..3244479 100644
+--- a/doc/obexd-api.txt
++++ b/doc/obexd-api.txt
+@@ -8,8 +8,8 @@ Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+ Manager hierarchy
+ ===============
  
--#define OPENOBEX_MANAGER_PATH "/"
--#define OPENOBEX_MANAGER_INTERFACE OPENOBEX_SERVICE ".Manager"
--#define ERROR_INTERFACE OPENOBEX_SERVICE ".Error"
--#define TRANSFER_INTERFACE OPENOBEX_SERVICE ".Transfer"
--#define SESSION_INTERFACE OPENOBEX_SERVICE ".Session"
-+#define OBEX_MANAGER_PATH "/"
-+#define OBEX_MANAGER_INTERFACE OBEXD_SERVICE ".Manager"
-+#define ERROR_INTERFACE OBEXD_SERVICE ".Error"
-+#define TRANSFER_INTERFACE OBEXD_SERVICE ".Transfer"
-+#define SESSION_INTERFACE OBEXD_SERVICE ".Session"
+-Service		org.openobex
+-Interface	org.openobex.Manager
++Service		org.bluez.obex
++Interface	org.bluez.obex.Manager
+ Object path	/
  
- #define TIMEOUT 60*1000 /* Timeout for user response (miliseconds) */
+ Methods
+@@ -19,7 +19,7 @@ Methods
+ 			the user to accept/reject objects. Object push
+ 			service needs to authorize each received object.
  
-@@ -353,8 +353,7 @@ gboolean manager_init(void)
+-			Possible errors: org.openobex.Error.AlreadyExists
++			Possible errors: org.bluez.obex.Error.AlreadyExists
  
- 	dbus_error_init(&err);
+ 		void UnregisterAgent(object agent)
  
--	connection = g_dbus_setup_bus(DBUS_BUS_SESSION, OPENOBEX_SERVICE,
--									&err);
-+	connection = g_dbus_setup_bus(DBUS_BUS_SESSION, OBEXD_SERVICE, &err);
- 	if (connection == NULL) {
- 		if (dbus_error_is_set(&err) == TRUE) {
- 			fprintf(stderr, "%s\n", err.message);
-@@ -364,8 +363,8 @@ gboolean manager_init(void)
- 		return FALSE;
- 	}
+@@ -27,7 +27,7 @@ Methods
+ 			registered. The object path parameter must match the
+ 			same value that has been used on registration.
  
--	return g_dbus_register_interface(connection, OPENOBEX_MANAGER_PATH,
--					OPENOBEX_MANAGER_INTERFACE,
-+	return g_dbus_register_interface(connection, OBEX_MANAGER_PATH,
-+					OBEX_MANAGER_INTERFACE,
- 					manager_methods, manager_signals, NULL,
- 					NULL, NULL);
- }
-@@ -374,8 +373,8 @@ void manager_cleanup(void)
- {
- 	DBG("");
+-			Possible errors: org.openobex.Error.DoesNotExist
++			Possible errors: org.bluez.obex.Error.DoesNotExist
  
--	g_dbus_unregister_interface(connection, OPENOBEX_MANAGER_PATH,
--						OPENOBEX_MANAGER_INTERFACE);
-+	g_dbus_unregister_interface(connection, OBEX_MANAGER_PATH,
-+						OBEX_MANAGER_INTERFACE);
+ Signals		SessionCreated(object session)
+ 			
+@@ -54,8 +54,8 @@ Signals		SessionCreated(object session)
+ Transfer hierarchy
+ ===============
  
- 	/* FIXME: Release agent? */
+-Service		org.openobex
+-Interface	org.openobex.Transfer
++Service		org.bluez.obex
++Interface	org.bluez.obex.Transfer
+ Object path	/transfer{0, 1, 2, ...}
  
-@@ -389,8 +388,8 @@ void manager_emit_transfer_started(struct obex_session *os)
- {
- 	char *path = g_strdup_printf("/transfer%u", os->id);
+ Methods
+@@ -70,8 +70,8 @@ Signals
+ Session hierarchy
+ ===============
  
--	g_dbus_emit_signal(connection, OPENOBEX_MANAGER_PATH,
--			OPENOBEX_MANAGER_INTERFACE, "TransferStarted",
-+	g_dbus_emit_signal(connection, OBEX_MANAGER_PATH,
-+			OBEX_MANAGER_INTERFACE, "TransferStarted",
- 			DBUS_TYPE_OBJECT_PATH, &path,
- 			DBUS_TYPE_INVALID);
+-Service		org.openobex
+-Interface	org.openobex.Session
++Service		org.bluez.obex
++Interface	org.bluez.obex.Session
+ Object path	/session{0, 1, 2, ...}
  
-@@ -401,8 +400,8 @@ static void emit_transfer_completed(struct obex_session *os, gboolean success)
- {
- 	char *path = g_strdup_printf("/transfer%u", os->id);
- 
--	g_dbus_emit_signal(connection, OPENOBEX_MANAGER_PATH,
--			OPENOBEX_MANAGER_INTERFACE, "TransferCompleted",
-+	g_dbus_emit_signal(connection, OBEX_MANAGER_PATH,
-+			OBEX_MANAGER_INTERFACE, "TransferCompleted",
- 			DBUS_TYPE_OBJECT_PATH, &path,
- 			DBUS_TYPE_BOOLEAN, &success,
- 			DBUS_TYPE_INVALID);
-@@ -616,8 +615,8 @@ void manager_register_session(struct obex_session *os)
- 		goto done;
- 	}
- 
--	g_dbus_emit_signal(connection, OPENOBEX_MANAGER_PATH,
--			OPENOBEX_MANAGER_INTERFACE, "SessionCreated",
-+	g_dbus_emit_signal(connection, OBEX_MANAGER_PATH,
-+			OBEX_MANAGER_INTERFACE, "SessionCreated",
- 			DBUS_TYPE_OBJECT_PATH, &path,
- 			DBUS_TYPE_INVALID);
- 
-@@ -629,8 +628,8 @@ void manager_unregister_session(struct obex_session *os)
- {
- 	char *path = g_strdup_printf("/session%u", GPOINTER_TO_UINT(os));
- 
--	g_dbus_emit_signal(connection, OPENOBEX_MANAGER_PATH,
--			OPENOBEX_MANAGER_INTERFACE, "SessionRemoved",
-+	g_dbus_emit_signal(connection, OBEX_MANAGER_PATH,
-+			OBEX_MANAGER_INTERFACE, "SessionRemoved",
- 			DBUS_TYPE_OBJECT_PATH, &path,
- 			DBUS_TYPE_INVALID);
- 
-diff --git a/src/manager.h b/src/manager.h
-index 47aecb8..99303a2 100644
---- a/src/manager.h
-+++ b/src/manager.h
-@@ -23,7 +23,7 @@
- 
- #include <dbus/dbus.h>
- 
--#define OPENOBEX_SERVICE  "org.openobex"
-+#define OBEXD_SERVICE  "org.bluez.obex"
- 
- void manager_register_session(struct obex_session *os);
- void manager_unregister_session(struct obex_session *os);
+ Methods
 -- 
 1.7.10.2
 
