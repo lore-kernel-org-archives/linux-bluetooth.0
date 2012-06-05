@@ -1,128 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] gattrib: Fix command timeout handling
-Date: Tue,  5 Jun 2012 20:17:02 +0800
-Message-Id: <1338898622-18408-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1338210316-12299-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <CAHp75Vc3sut7R7FF=xHQ0-3HaydPBh86sNnzRjKP8+ow=SOfLg@mail.gmail.com>
+	<1338210316-12299-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 5 Jun 2012 14:57:23 +0300
+Message-ID: <CAMXE1-q+Cn0DHqyLFe19ej3z3B2ptdS28H2qKRXJBhpOLaFdEQ@mail.gmail.com>
+Subject: Re: [PATCHv3] vsprintf: Add %pMR for Bluetooth MAC address
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org, akpm@linux-foundation.org,
+	linux-kernel@vger.kernel.org, adobriyan@gmail.com,
+	andriy.shevchenko@linux.intel.com
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+ping
 
-This patch fixes command timeout handling. Previously attrib_destroy was
-explicitly called which ignored any reference holders. This patch fixes
-the issue by first passing errors to command callbacks and after that
-marking the GAttrib object as stale so no further operations can be
-done.
----
-This is an untested patch which should hopefully fix bluetoothd crashes
-when we fail to receive a response to a command. I'm sending it to
-linux-bluetooth in case someone can spot some obvious problem with it.
-If there are no objections I'll complete testing of it during the next
-24 hours and then apply it upstream.
-
- attrib/att.c     |    4 ++++
- attrib/att.h     |    2 ++
- attrib/gattrib.c |   29 ++++++++++++++++++++++++++++-
- 3 files changed, 34 insertions(+), 1 deletions(-)
-
-diff --git a/attrib/att.c b/attrib/att.c
-index a3a8947..c8e2e1d 100644
---- a/attrib/att.c
-+++ b/attrib/att.c
-@@ -72,6 +72,10 @@ const char *att_ecode2str(uint8_t status)
- 		return "Insufficient Resources to complete the request";
- 	case ATT_ECODE_IO:
- 		return "Internal application error: I/O";
-+	case ATT_ECODE_TIMEOUT:
-+		return "A timeout occured";
-+	case ATT_ECODE_ABORTED:
-+		return "The operation was aborted";
- 	default:
- 		return "Unexpected error code";
- 	}
-diff --git a/attrib/att.h b/attrib/att.h
-index d12a7f2..8979c95 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
-@@ -72,6 +72,8 @@
- #define ATT_ECODE_INSUFF_RESOURCES		0x11
- /* Application error */
- #define ATT_ECODE_IO				0xFF
-+#define ATT_ECODE_TIMEOUT			0xFE
-+#define ATT_ECODE_ABORTED			0xFD
- 
- /* Characteristic Property bit field */
- #define ATT_CHAR_PROPER_BROADCAST		0x01
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 9886a92..29c3585 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -53,6 +53,7 @@ struct _GAttrib {
- 	guint next_evt_id;
- 	GDestroyNotify destroy;
- 	gpointer destroy_user_data;
-+	gboolean stale;
- };
- 
- struct command {
-@@ -252,8 +253,25 @@ gboolean g_attrib_set_destroy_function(GAttrib *attrib,
- static gboolean disconnect_timeout(gpointer data)
- {
- 	struct _GAttrib *attrib = data;
-+	struct command *c;
- 
--	attrib_destroy(attrib);
-+	c = g_queue_pop_head(attrib->requests);
-+	if (c == NULL)
-+		goto done;
-+
-+	if (c->func)
-+		c->func(ATT_ECODE_TIMEOUT, NULL, 0, c->user_data);
-+
-+	command_destroy(c);
-+
-+	while ((c = g_queue_pop_head(attrib->requests))) {
-+		if (c->func)
-+			c->func(ATT_ECODE_ABORTED, NULL, 0, c->user_data);
-+		command_destroy(c);
-+	}
-+
-+done:
-+	attrib->stale = TRUE;
- 
- 	return FALSE;
- }
-@@ -268,6 +286,9 @@ static gboolean can_write_data(GIOChannel *io, GIOCondition cond,
- 	GIOStatus iostat;
- 	GQueue *queue;
- 
-+	if (attrib->stale)
-+		return FALSE;
-+
- 	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
- 		return FALSE;
- 
-@@ -337,6 +358,9 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
- 	GIOStatus iostat;
- 	gboolean norequests, noresponses;
- 
-+	if (attrib->stale)
-+		return FALSE;
-+
- 	if (attrib->timeout_watch > 0) {
- 		g_source_remove(attrib->timeout_watch);
- 		attrib->timeout_watch = 0;
-@@ -447,6 +471,9 @@ guint g_attrib_send(GAttrib *attrib, guint id, guint8 opcode,
- 	struct command *c;
- 	GQueue *queue;
- 
-+	if (attrib->stale)
-+		return 0;
-+
- 	c = g_try_new0(struct command, 1);
- 	if (c == NULL)
- 		return 0;
--- 
-1.7.7.6
-
+On Mon, May 28, 2012 at 4:05 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Bluetooth uses mostly LE byte order which is reversed for visual
+> interpretation. Currently in Bluetooth in use unsafe batostr function.
+>
+> This is slightly modified version of Joe Perches <joe@perches.com>
+> patch (sent Sat, Dec 4, 2010).
+>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>        v3: removed extra variable index
+>        v2: changed bluetooth to reversed, syntax fixes
+>
+>  lib/vsprintf.c |   23 +++++++++++++++++++----
+>  1 file changed, 19 insertions(+), 4 deletions(-)
+>
+> diff --git a/lib/vsprintf.c b/lib/vsprintf.c
+> index abbabec..55052fa 100644
+> --- a/lib/vsprintf.c
+> +++ b/lib/vsprintf.c
+> @@ -559,15 +559,28 @@ char *mac_address_string(char *buf, char *end, u8 *addr,
+>        char *p = mac_addr;
+>        int i;
+>        char separator;
+> +       bool reversed = false;
+>
+> -       if (fmt[1] == 'F') {            /* FDDI canonical format */
+> +       switch (fmt[1]) {
+> +       case 'F':
+>                separator = '-';
+> -       } else {
+> +               break;
+> +
+> +       case 'R':
+> +               reversed = true;
+> +               /* fall through */
+> +
+> +       default:
+>                separator = ':';
+> +               break;
+>        }
+>
+>        for (i = 0; i < 6; i++) {
+> -               p = hex_byte_pack(p, addr[i]);
+> +               if (reversed)
+> +                       p = hex_byte_pack(p, addr[5 - i]);
+> +               else
+> +                       p = hex_byte_pack(p, addr[i]);
+> +
+>                if (fmt[0] == 'M' && i != 5)
+>                        *p++ = separator;
+>        }
+> @@ -830,6 +843,7 @@ int kptr_restrict __read_mostly;
+>  * - 'm' For a 6-byte MAC address, it prints the hex address without colons
+>  * - 'MF' For a 6-byte MAC FDDI address, it prints the address
+>  *       with a dash-separated hex notation
+> + * - '[mM]R For a 6-byte MAC address, Reverse order (Bluetooth)
+>  * - 'I' [46] for IPv4/IPv6 addresses printed in the usual way
+>  *       IPv4 uses dot-separated decimal without leading 0's (1.2.3.4)
+>  *       IPv6 uses colon separated network-order 16 bit hex with leading 0's
+> @@ -890,7 +904,8 @@ char *pointer(const char *fmt, char *buf, char *end, void *ptr,
+>                return resource_string(buf, end, ptr, spec, fmt);
+>        case 'M':                       /* Colon separated: 00:01:02:03:04:05 */
+>        case 'm':                       /* Contiguous: 000102030405 */
+> -                                       /* [mM]F (FDDI, bit reversed) */
+> +                                       /* [mM]F (FDDI) */
+> +                                       /* [mM]R (Reverse order; Bluetooth) */
+>                return mac_address_string(buf, end, ptr, spec, fmt);
+>        case 'I':                       /* Formatted IP supported
+>                                         * 4:   1.2.3.4
+> --
+> 1.7.9.5
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
