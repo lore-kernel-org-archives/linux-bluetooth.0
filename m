@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 16/23] client-api: Rename Transfer interface to org.bluez.obex.Transfer
-Date: Tue,  5 Jun 2012 13:57:14 +0300
-Message-Id: <1338893841-14234-17-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 14/23] client-api: Rename Synchronization interface to org.bluez.obex.Synchronization
+Date: Tue,  5 Jun 2012 13:57:12 +0300
+Message-Id: <1338893841-14234-15-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1338893841-14234-1-git-send-email-luiz.dentz@gmail.com>
 References: <1338893841-14234-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,38 +12,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- client/transfer.c  |    4 ++--
+ client/sync.c      |    2 +-
  doc/client-api.txt |    2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/client/transfer.c b/client/transfer.c
-index b807014..000a510 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -43,8 +43,8 @@
- #include "log.h"
- #include "transfer.h"
+diff --git a/client/sync.c b/client/sync.c
+index 035ab2e..65c9210 100644
+--- a/client/sync.c
++++ b/client/sync.c
+@@ -42,7 +42,7 @@
+ #define OBEX_SYNC_UUID "IRMC-SYNC"
+ #define OBEX_SYNC_UUID_LEN 9
  
--#define TRANSFER_INTERFACE  "org.openobex.Transfer"
--#define TRANSFER_BASEPATH   "/org/openobex"
-+#define TRANSFER_INTERFACE "org.bluez.obex.Transfer"
-+#define TRANSFER_BASEPATH "/org/bluez/obex"
- 
- #define OBC_TRANSFER_ERROR obc_transfer_error_quark()
+-#define SYNC_INTERFACE	"org.openobex.Synchronization"
++#define SYNC_INTERFACE "org.bluez.obex.Synchronization"
+ #define ERROR_INF SYNC_INTERFACE ".Error"
+ #define SYNC_UUID "00001104-0000-1000-8000-00805f9b34fb"
  
 diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 76bf722..473920f 100644
+index 5a6189d..76bf722 100644
 --- a/doc/client-api.txt
 +++ b/doc/client-api.txt
-@@ -356,7 +356,7 @@ Transfer hierarchy
- ==================
+@@ -298,7 +298,7 @@ Synchronization hierarchy
+ =======================
  
  Service		org.bluez.obex.client
--Interface	org.openobex.Transfer
-+Interface	org.bluez.obex.Transfer
- Object path	[variable prefix]/{transfer0,transfer1,...}
+-Interface	org.openobex.Synchronization
++Interface	org.bluez.obex.Synchronization
+ Object path	[variable prefix]/{session0,session1,...}
  
- Methods		dict GetProperties()
+ Methods		void SetLocation(string location)
 -- 
 1.7.10.2
 
