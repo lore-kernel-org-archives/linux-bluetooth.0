@@ -1,36 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Jun 2012 16:21:21 +0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vishal Agarwal <vishal.agarwal@stericsson.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: LE pairing is finished if error in connection
-Message-ID: <20120606082121.GA12117@x220>
-References: <1338956756-18699-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338956756-18699-1-git-send-email-vishal.agarwal@stericsson.com>
+In-Reply-To: <CAPGrrxVH_S=bJopAv-9nzW_kL9YxJh4FHYGRby-dZQcjS+jvzw@mail.gmail.com>
+References: <1323703867-20577-1-git-send-email-bulislaw@linux.com>
+	<1323703867-20577-4-git-send-email-bulislaw@linux.com>
+	<20111215115009.GB8056@x220>
+	<CAPGrrxWWRPkCyKgRu2SkEmdhjdZgkjEQ+ES0DhfuoshvsVBUfw@mail.gmail.com>
+	<20111215121700.GA10535@x220>
+	<CAPGrrxVH_S=bJopAv-9nzW_kL9YxJh4FHYGRby-dZQcjS+jvzw@mail.gmail.com>
+Date: Wed, 6 Jun 2012 11:14:36 +0300
+Message-ID: <CABBYNZJgzZwBC4KWf_4huHA4FBuo5+n_cNqobWWnVedQsY8Y-g@mail.gmail.com>
+Subject: Re: [PATCH obexd 4/4] Add support for PullMessagesListing in MAP client
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vishal,
+Hi Bartosz,
 
-On Wed, Jun 06, 2012, Vishal Agarwal wrote:
-> For BR/EDR pairing is assumed to be finished when connection is
-> done. For LE if connection is successful it did not necessarily
-> mean that pairing is also done but if the connection is unsuccessful
-> it should be assumed that pairing procedure is also finished.
-> This patch registers a newfunction with connect_cfm_cb callback for
-> LE link which sends the pairing complete signal to user space if
-> connection is unsuccessful.
-> 
-> Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
-> ---
->  net/bluetooth/mgmt.c |   18 ++++++++++++++++++
->  1 files changed, 18 insertions(+), 0 deletions(-)
+On Thu, Dec 15, 2011 at 2:45 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+>>
+>> So the plan is to return something else than the raw XML that MAP
+>> provides? In that case I don't think it's necessary to hold on to the
+>> exact spec naming of these functions. E.g. GetMessages or GetMessageList
+>> might make more sense in the case that you return a pre-parsed
+>> list/structure of some kind.
+>>
+>> Johan
+>
+> We planned to return dict {field: value}. Generally I don't care much
+> about this name - we can go with GetMessageListing, as I seem to use
+> both forms without noticing it anyway.
 
-The patch looks ok'ish to me but I'd at least change the commit message
-summary line into the form "Fix LE pairing completion with connection
-failure" (or something similar) to make it clear that this is a fix and
-something that needs to go to 3.5.
+Are there still plans to continue this work? I would like to change
+this method to return a dictionary like we do for pbap and perhaps
+unify this in a single listing so we do folder + messages.
 
-Johan
+
+-- 
+Luiz Augusto von Dentz
