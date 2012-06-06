@@ -1,47 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Jun 2012 01:03:06 +0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Date: Wed, 6 Jun 2012 14:00:41 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Ido Yariv <ido@wizery.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Fix deadlock and crash when SMP pairing
- times out
-Message-ID: <20120606170306.GA26644@x220.ccr.corp.intel.com>
-References: <1338979451-15851-1-git-send-email-johan.hedberg@gmail.com>
- <1338979451-15851-2-git-send-email-johan.hedberg@gmail.com>
- <20120606164400.GA11387@samus>
+Subject: Re: [PATCH] gattrib: Fix a premature response timer removal
+Message-ID: <20120606170041.GB11387@samus>
+References: <1338980175-14980-1-git-send-email-ido@wizery.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120606164400.GA11387@samus>
+In-Reply-To: <1338980175-14980-1-git-send-email-ido@wizery.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Ido,
 
-On Wed, Jun 06, 2012, Vinicius Costa Gomes wrote:
-> > The l2cap_conn_del function tries to cancel_sync the security timer, but
-> > when it's called from the timeout function itself a deadlock occurs.
-> > Subsequently the "hcon->l2cap_data = NULL" that's supposed to protect
-> > multiple calls to l2cap_conn_del never gets cleared and when the
-> > connection finally drops we double free's etc which will crash the
-> > kernel.
+On 13:56 Wed 06 Jun, Ido Yariv wrote:
+> A timer is set when a response is expected. The timer is removed when
+> data is received, regardless of whether or not the data is a response.
+> As a result, the timer may be cleared even though a response was not
+> received and there would be no way to detect a command timeout.
 > 
-> I wonder if (inside l2cap_conn_del()) we move "hcon->l2cap_data = NULL"
-> up in the function, probably next to the check for "!conn", would be a
-> safer alternative.
+> Fix this by clearing the timer only after verifying a response was
+> received.
 
-That was one of the things I tried first as well (and it did remove the
-crash) but it doesn't remove the deadlock. The l2cap_conn_del would
-still deadlock in cancel_sync(sec_timer) when called from
-security_timeout().
+The patch looks good.
 
-Moving the NULL assignment to the top would certainly help decrease the
-chance of calling l2cap_conn_del twice but it wouldn't completely remove
-this race condition as clearing the variable + testing its value isn't
-a single atomic operation.
+Just a little background on how things are done this way. This was
+written thinking that when a indication (a request) is received the
+timer should be reset, even if there is already a pending response.
 
-So I'd still consider this deadlock removal patch by itself as necessary
-and valid but additionally the race of calling l2cap_conn_del twice
-would need to be fixed with a separate patch, possibly involving some
-new or existing lock.
+So with this patch we trust that BlueZ will send responses in time, and
+we only handle timeouts from the remote. Which is a good assumption for
+me. At least it is more consistent.
 
-Johan
+Here's my Ack.
+
+> ---
+>  attrib/gattrib.c |   10 +++++-----
+>  1 files changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+> index 29c3585..a1e29a1 100644
+> --- a/attrib/gattrib.c
+> +++ b/attrib/gattrib.c
+> @@ -361,11 +361,6 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
+>  	if (attrib->stale)
+>  		return FALSE;
+>  
+> -	if (attrib->timeout_watch > 0) {
+> -		g_source_remove(attrib->timeout_watch);
+> -		attrib->timeout_watch = 0;
+> -	}
+> -
+>  	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
+>  		attrib->read_watch = 0;
+>  		return FALSE;
+> @@ -393,6 +388,11 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
+>  	if (is_response(buf[0]) == FALSE)
+>  		return TRUE;
+>  
+> +	if (attrib->timeout_watch > 0) {
+> +		g_source_remove(attrib->timeout_watch);
+> +		attrib->timeout_watch = 0;
+> +	}
+> +
+>  	cmd = g_queue_pop_head(attrib->requests);
+>  	if (cmd == NULL) {
+>  		/* Keep the watch if we have events to report */
+> -- 
+> 1.7.7.6
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+Cheers,
+-- 
+Vinicius
