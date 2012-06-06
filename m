@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Michal Labedzki <michal.labedzki@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Michal Labedzki <michal.labedzki@tieto.com>
-Subject: [PATCH 11/13] AVRCP: Handle SetAddressedPlayer command from remote controller
-Date: Wed, 6 Jun 2012 18:06:09 +0200
-Message-ID: <1338998771-18683-11-git-send-email-michal.labedzki@tieto.com>
+Subject: [PATCH 09/13] AVRCP: Implement setting AddressedPlayer with notifications completion
+Date: Wed, 6 Jun 2012 18:06:07 +0200
+Message-ID: <1338998771-18683-9-git-send-email-michal.labedzki@tieto.com>
 In-Reply-To: <1338998771-18683-1-git-send-email-michal.labedzki@tieto.com>
 References: <1338998771-18683-1-git-send-email-michal.labedzki@tieto.com>
 MIME-Version: 1.0
@@ -12,109 +12,176 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Set player selected by controller as addressed player.
+For AVRCP 1.4 complete notifications according to the specification
+by rejecting all registered notifications with coresponding
+transaction id.
+
+For AVRCP 1.3 complete events by reusing already registered events.
+This allows to change media player and notify remote controller
+about metadata changed.
 ---
- audio/avrcp.c |   33 +++++++++++++++++++++++++++++++++
+ audio/avrcp.c |  101 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  audio/avrcp.h |    1 +
- audio/media.c |   15 ++++++++++++++-
- 3 files changed, 48 insertions(+), 1 deletion(-)
+ audio/media.c |    9 +++++
+ 3 files changed, 111 insertions(+)
 
 diff --git a/audio/avrcp.c b/audio/avrcp.c
-index b095884..249ed8e 100644
+index 895001e..a10b3c1 100644
 --- a/audio/avrcp.c
 +++ b/audio/avrcp.c
-@@ -1118,6 +1118,37 @@ err:
- 	return AVC_CTYPE_REJECTED;
- }
+@@ -58,6 +58,8 @@
+ #include "sdpd.h"
+ #include "dbus-common.h"
  
-+static uint8_t avrcp_handle_set_addressed_player(struct avrcp_player *player,
-+							struct avrcp_header *pdu,
-+							uint8_t transaction)
++#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
++
+ #define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH 5
+ 
+ enum company_id {
+@@ -224,6 +226,21 @@ struct avrcp_player {
+ 	GDestroyNotify destroy;
+ };
+ 
++struct status_reply {
++	struct avrcp_header pdu;
++	uint8_t status;
++} __attribute__ ((packed));
++
++static const uint8_t events_to_complete[] = {
++	AVRCP_EVENT_PLAYBACK_STATUS_CHANGED,
++	AVRCP_EVENT_TRACK_CHANGED,
++	AVRCP_EVENT_TRACK_REACHED_END,
++	AVRCP_EVENT_TRACK_REACHED_START,
++	AVRCP_EVENT_PLAYBACK_POS_CHANGED,
++	AVRCP_EVENT_PLAYER_APPLICATION_SETTING_CHANGED,
++	AVRCP_EVENT_NOW_PLAYING_CONTENT_CHANGED
++};
++
+ static GSList *servers = NULL;
+ static unsigned int avctp_id = 0;
+ 
+@@ -1529,3 +1546,87 @@ int avrcp_set_volume(struct audio_device *dev, uint8_t volume)
+ 					AVC_SUBUNIT_PANEL, buf, sizeof(buf),
+ 					avrcp_handle_set_volume, player);
+ }
++
++static void avrcp_events_completion(struct avrcp_player *addressed)
 +{
-+	uint16_t len = ntohs(pdu->params_len);
-+	uint16_t player_id;
++	struct status_reply event;
++	unsigned int i;
++	uint8_t id;
++	int err;
 +
-+	if (len != sizeof(player_id)) {
-+		pdu->params[0] = STATUS_INVALID_PARAMETER;
-+		return AVC_CTYPE_REJECTED;
++	memset(&event, 0, sizeof(event));
++	set_company_id(event.pdu.company_id, IEEEID_BTSIG);
++	event.pdu.pdu_id = AVRCP_REGISTER_NOTIFICATION;
++	event.pdu.params_len = htons(1);
++	event.status = STATUS_ADDRESSED_PLAYER_CHANGED;
++
++	for (i = 0; i < ARRAY_SIZE(events_to_complete); i++) {
++		id = 1 << events_to_complete[i];
++
++		if (!(addressed->registered_events & id))
++			continue;
++
++		err = avctp_send_vendordep(addressed->session,
++						addressed->transaction_events[events_to_complete[i]],
++						AVC_CTYPE_REJECTED, AVC_SUBUNIT_PANEL,
++						(uint8_t *) &event, sizeof(event));
++		if (err < 0)
++			DBG("Cannot complete event %u: %s (%d)",
++				events_to_complete[i], strerror(-err), err);
++
++		addressed->registered_events ^= id;
 +	}
-+
-+	player_id = bt_get_be16(pdu->params);
-+
-+	DBG("Remote controller set addressed player id=%u", player_id);
-+
-+	pdu->params_len = htons(1);
-+
-+	if (!player->cb->set_addressed_player(player_id, player->user_data)) {
-+		if (g_slist_length(player->server->players) == 0)
-+			pdu->params[0] = STATUS_NO_AVAILABLE_PLAYERS;
-+		else
-+			pdu->params[0] = STATUS_INVALID_PLAYER_ID;
-+
-+		return AVC_CTYPE_REJECTED;
-+	}
-+
-+	pdu->params[0] = STATUS_OK;
-+	return AVC_CTYPE_ACCEPTED;
 +}
 +
- static struct pdu_handler {
- 	uint8_t pdu_id;
- 	uint8_t code;
-@@ -1153,6 +1184,8 @@ static struct pdu_handler {
- 					avrcp_handle_request_continuing },
- 		{ AVRCP_ABORT_CONTINUING, AVC_CTYPE_CONTROL,
- 					avrcp_handle_abort_continuing },
-+		{ AVRCP_SET_ADDRESSED_PLAYER, AVC_CTYPE_CONTROL,
-+					avrcp_handle_set_addressed_player },
- 		{ },
- };
- 
++static void avrcp_events_reusing(struct avrcp_player *player)
++{
++	struct avrcp_player *addressed = player->server->addressed_player;
++	uint8_t play_status;
++	uint64_t uid;
++
++	/* Reusing previously registered events for AVRCP 1.3 devices */
++
++	play_status = player->cb->get_status(player->user_data);
++	uid = player->cb->get_uid(player->user_data);
++
++	if (play_status != addressed->cb->get_status(addressed->user_data))
++		avrcp_player_event(addressed,
++					AVRCP_EVENT_PLAYBACK_STATUS_CHANGED,
++					&play_status);
++
++	avrcp_player_event(addressed, AVRCP_EVENT_TRACK_CHANGED, &uid);
++}
++
++gboolean avrcp_set_addressed_player(struct avrcp_player *player, gboolean local)
++{
++	struct avrcp_server *server = player->server;
++
++	if (player == server->addressed_player)
++		return TRUE;
++
++	/* if triggered from remote, try to complete events */
++	if (local) {
++		if (server->version == AVRCP_VERSION_1_3)
++			avrcp_events_reusing(player);
++		else
++			avrcp_events_completion(server->addressed_player);
++	}
++
++	player_abort_pending_pdu(server->addressed_player);
++	player->registered_events = server->addressed_player->registered_events;
++	memcpy(player->transaction_events,
++		server->addressed_player->transaction_events, AVRCP_EVENT_LAST);
++	player->session = server->addressed_player->session;
++	player->dev = server->addressed_player->dev;
++
++	if (server->addressed_player->handler) {
++		avctp_unregister_pdu_handler(server->addressed_player->handler);
++		server->addressed_player->handler = 0;
++	}
++	player->handler = avctp_register_pdu_handler(AVC_OP_VENDORDEP,
++							handle_vendordep_pdu, player);
++
++	server->addressed_player = player;
++
++	return TRUE;
++}
 diff --git a/audio/avrcp.h b/audio/avrcp.h
-index e83e2de..d6b62e2 100644
+index 0045a2c..82f75d4 100644
 --- a/audio/avrcp.h
 +++ b/audio/avrcp.h
-@@ -104,6 +104,7 @@ struct avrcp_player_cb {
- 							void *user_data);
- 	uint16_t (*get_player_id) (void *user_data);
- 	uint16_t (*get_uid_counter) (void *user_data);
-+	gboolean (*set_addressed_player) (uint16_t player_id, void *user_data);
- };
+@@ -116,6 +116,7 @@ struct avrcp_player *avrcp_register_player(const bdaddr_t *src,
+ 						void *user_data,
+ 						GDestroyNotify destroy);
+ void avrcp_unregister_player(struct avrcp_player *player);
++gboolean avrcp_set_addressed_player(struct avrcp_player *player, gboolean local);
  
- int avrcp_register(DBusConnection *conn, const bdaddr_t *src, GKeyFile *config);
+ int avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data);
+ 
 diff --git a/audio/media.c b/audio/media.c
-index 516f12e..c59997b 100644
+index 6ee8955..cac2378 100644
 --- a/audio/media.c
 +++ b/audio/media.c
-@@ -1469,6 +1469,18 @@ static gboolean media_set_addressed_player(struct media_adapter *adapter,
+@@ -1440,8 +1440,17 @@ static gboolean media_set_addressed_player(struct media_adapter *adapter,
+ 		g_strcmp0(adapter->addressed->path, DUMMY_PLAYER) == 0)
+ 		media_player_remove(adapter->addressed);
+ 
++	if (!avrcp_set_addressed_player(mp->player, local))
++		return FALSE;
++
+ 	adapter->addressed = mp;
+ 
++	DBG("Set addressed player id=%u to %s", mp->id, path);
++
++	emit_property_changed(adapter->conn, adapter->path,
++				MEDIA_INTERFACE, "AddressedPlayer",
++				DBUS_TYPE_OBJECT_PATH, &path);
++
  	return TRUE;
  }
  
-+static gboolean set_addressed_player(uint16_t player_id, void *user_data)
-+{
-+	struct media_player *player = user_data;
-+	struct media_player *mp;
-+
-+	mp = media_adapter_find_player_by_id(player->adapter, NULL, player_id);
-+	if (!mp)
-+		return FALSE;
-+
-+	return media_set_addressed_player(player->adapter, player->sender, mp->path, FALSE);
-+}
-+
- static struct avrcp_player_cb player_cb = {
- 	.get_setting = get_setting,
- 	.set_setting = set_setting,
-@@ -1479,7 +1491,8 @@ static struct avrcp_player_cb player_cb = {
- 	.get_status = get_status,
- 	.set_volume = set_volume,
- 	.get_player_id = get_player_id,
--	.get_uid_counter = get_uid_counter
-+	.get_uid_counter = get_uid_counter,
-+	.set_addressed_player = set_addressed_player
- };
- 
- static void media_player_exit(DBusConnection *connection, void *user_data)
 -- 
 on behalf of ST-Ericsson
 
