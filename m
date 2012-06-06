@@ -1,42 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Ido Yariv <ido@wizery.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2 v2] Bluetooth: Fix SMP pairing method selection
-Date: Wed,  6 Jun 2012 18:54:15 +0800
-Message-Id: <1338980055-16205-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1338979451-15851-1-git-send-email-johan.hedberg@gmail.com>
-References: <1338979451-15851-1-git-send-email-johan.hedberg@gmail.com>
+Cc: Ido Yariv <ido@wizery.com>
+Subject: [PATCH] gattrib: Fix a premature response timer removal
+Date: Wed,  6 Jun 2012 13:56:15 +0300
+Message-Id: <1338980175-14980-1-git-send-email-ido@wizery.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+A timer is set when a response is expected. The timer is removed when
+data is received, regardless of whether or not the data is a response.
+As a result, the timer may be cleared even though a response was not
+received and there would be no way to detect a command timeout.
 
-The tk_request function takes the local IO capability as the second last
-parameter and the remote IO capability as the last parameter. They were
-previously swapped: when we receive a pairing response
-req->io_capability contains the local one and rsp->io_capability the
-remote one.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Fix this by clearing the timer only after verifying a response was
+received.
 ---
-v2: s/first/last/ in the commit message.
+ attrib/gattrib.c |   10 +++++-----
+ 1 files changed, 5 insertions(+), 5 deletions(-)
 
- net/bluetooth/smp.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index ff4835b..1885697 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -649,7 +649,7 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index 29c3585..a1e29a1 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -361,11 +361,6 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
+ 	if (attrib->stale)
+ 		return FALSE;
  
- 	auth |= (req->auth_req | rsp->auth_req) & SMP_AUTH_MITM;
+-	if (attrib->timeout_watch > 0) {
+-		g_source_remove(attrib->timeout_watch);
+-		attrib->timeout_watch = 0;
+-	}
+-
+ 	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
+ 		attrib->read_watch = 0;
+ 		return FALSE;
+@@ -393,6 +388,11 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
+ 	if (is_response(buf[0]) == FALSE)
+ 		return TRUE;
  
--	ret = tk_request(conn, 0, auth, rsp->io_capability, req->io_capability);
-+	ret = tk_request(conn, 0, auth, req->io_capability, rsp->io_capability);
- 	if (ret)
- 		return SMP_UNSPECIFIED;
- 
++	if (attrib->timeout_watch > 0) {
++		g_source_remove(attrib->timeout_watch);
++		attrib->timeout_watch = 0;
++	}
++
+ 	cmd = g_queue_pop_head(attrib->requests);
+ 	if (cmd == NULL) {
+ 		/* Keep the watch if we have events to report */
 -- 
-1.7.10
+1.7.7.6
 
