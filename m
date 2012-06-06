@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Michal Labedzki <michal.labedzki@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Michal Labedzki <michal.labedzki@tieto.com>
-Subject: [PATCH 12/13] media-api: Update documentation with setting Addressed Player
-Date: Wed, 6 Jun 2012 18:06:10 +0200
-Message-ID: <1338998771-18683-12-git-send-email-michal.labedzki@tieto.com>
+Subject: [PATCH 11/13] AVRCP: Handle SetAddressedPlayer command from remote controller
+Date: Wed, 6 Jun 2012 18:06:09 +0200
+Message-ID: <1338998771-18683-11-git-send-email-michal.labedzki@tieto.com>
 In-Reply-To: <1338998771-18683-1-git-send-email-michal.labedzki@tieto.com>
 References: <1338998771-18683-1-git-send-email-michal.labedzki@tieto.com>
 MIME-Version: 1.0
@@ -12,59 +12,109 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Media API for Addressed Player allow to change addressed player
-to one from already registered players. If no players are registered
-default dummy player is used.
+Set player selected by controller as addressed player.
 ---
- doc/media-api.txt |   28 +++++++++++++++++++++++++++-
- 1 file changed, 27 insertions(+), 1 deletion(-)
+ audio/avrcp.c |   33 +++++++++++++++++++++++++++++++++
+ audio/avrcp.h |    1 +
+ audio/media.c |   15 ++++++++++++++-
+ 3 files changed, 48 insertions(+), 1 deletion(-)
 
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index 4446439..2e19417 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -8,7 +8,19 @@ Service		org.bluez
- Interface	org.bluez.Media
- Object path	[variable prefix]/{hci0,hci1,...}
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index b095884..249ed8e 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -1118,6 +1118,37 @@ err:
+ 	return AVC_CTYPE_REJECTED;
+ }
  
--Methods		void RegisterEndpoint(object endpoint, dict properties)
-+Methods		dict GetProperties()
++static uint8_t avrcp_handle_set_addressed_player(struct avrcp_player *player,
++							struct avrcp_header *pdu,
++							uint8_t transaction)
++{
++	uint16_t len = ntohs(pdu->params_len);
++	uint16_t player_id;
 +
-+			Returns all properties. See the
-+			properties section for available properties.
++	if (len != sizeof(player_id)) {
++		pdu->params[0] = STATUS_INVALID_PARAMETER;
++		return AVC_CTYPE_REJECTED;
++	}
 +
-+		void SetProperty(string name, variant value)
++	player_id = bt_get_be16(pdu->params);
 +
-+			Changes the value of the specified property. Only
-+			properties that are listed as read-write are changeable.
++	DBG("Remote controller set addressed player id=%u", player_id);
 +
-+			On success this will emit a PropertyChanged signal.
++	pdu->params_len = htons(1);
 +
-+		void RegisterEndpoint(object endpoint, dict properties)
++	if (!player->cb->set_addressed_player(player_id, player->user_data)) {
++		if (g_slist_length(player->server->players) == 0)
++			pdu->params[0] = STATUS_NO_AVAILABLE_PLAYERS;
++		else
++			pdu->params[0] = STATUS_INVALID_PLAYER_ID;
++
++		return AVC_CTYPE_REJECTED;
++	}
++
++	pdu->params[0] = STATUS_OK;
++	return AVC_CTYPE_ACCEPTED;
++}
++
+ static struct pdu_handler {
+ 	uint8_t pdu_id;
+ 	uint8_t code;
+@@ -1153,6 +1184,8 @@ static struct pdu_handler {
+ 					avrcp_handle_request_continuing },
+ 		{ AVRCP_ABORT_CONTINUING, AVC_CTYPE_CONTROL,
+ 					avrcp_handle_abort_continuing },
++		{ AVRCP_SET_ADDRESSED_PLAYER, AVC_CTYPE_CONTROL,
++					avrcp_handle_set_addressed_player },
+ 		{ },
+ };
  
- 			Register a local end point to sender, the sender can
- 			register as many end points as it likes.
-@@ -123,6 +135,20 @@ Methods		void RegisterEndpoint(object endpoint, dict properties)
+diff --git a/audio/avrcp.h b/audio/avrcp.h
+index e83e2de..d6b62e2 100644
+--- a/audio/avrcp.h
++++ b/audio/avrcp.h
+@@ -104,6 +104,7 @@ struct avrcp_player_cb {
+ 							void *user_data);
+ 	uint16_t (*get_player_id) (void *user_data);
+ 	uint16_t (*get_uid_counter) (void *user_data);
++	gboolean (*set_addressed_player) (uint16_t player_id, void *user_data);
+ };
  
- 			Unregister sender media player.
+ int avrcp_register(DBusConnection *conn, const bdaddr_t *src, GKeyFile *config);
+diff --git a/audio/media.c b/audio/media.c
+index 516f12e..c59997b 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -1469,6 +1469,18 @@ static gboolean media_set_addressed_player(struct media_adapter *adapter,
+ 	return TRUE;
+ }
  
-+Signals		PropertyChanged(string name, variant value)
++static gboolean set_addressed_player(uint16_t player_id, void *user_data)
++{
++	struct media_player *player = user_data;
++	struct media_player *mp;
 +
-+			This signal indicates a changed value of the given
-+			property.
++	mp = media_adapter_find_player_by_id(player->adapter, NULL, player_id);
++	if (!mp)
++		return FALSE;
 +
-+Properties	array{object} Players [readonly]
++	return media_set_addressed_player(player->adapter, player->sender, mp->path, FALSE);
++}
 +
-+			List of registered players.
-+
-+		object AddressedPlayer [readwrite]
-+
-+			Set active media player. Only one active player may be
-+			used by remote controller.
-+
- MediaPlayer hierarchy
- =====================
+ static struct avrcp_player_cb player_cb = {
+ 	.get_setting = get_setting,
+ 	.set_setting = set_setting,
+@@ -1479,7 +1491,8 @@ static struct avrcp_player_cb player_cb = {
+ 	.get_status = get_status,
+ 	.set_volume = set_volume,
+ 	.get_player_id = get_player_id,
+-	.get_uid_counter = get_uid_counter
++	.get_uid_counter = get_uid_counter,
++	.set_addressed_player = set_addressed_player
+ };
  
+ static void media_player_exit(DBusConnection *connection, void *user_data)
 -- 
 on behalf of ST-Ericsson
 
