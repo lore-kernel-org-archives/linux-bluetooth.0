@@ -1,37 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1338987962.1817.107.camel@aeonflux>
-Subject: Re: [PATCH 1/2 v2] Bluetooth: Fix SMP pairing method selection
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 06 Jun 2012 22:06:02 +0900
-In-Reply-To: <1338980055-16205-1-git-send-email-johan.hedberg@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2 v2] Bluetooth: Fix SMP pairing method selection
+Date: Wed,  6 Jun 2012 18:54:15 +0800
+Message-Id: <1338980055-16205-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1338979451-15851-1-git-send-email-johan.hedberg@gmail.com>
 References: <1338979451-15851-1-git-send-email-johan.hedberg@gmail.com>
-	 <1338980055-16205-1-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> The tk_request function takes the local IO capability as the second last
-> parameter and the remote IO capability as the last parameter. They were
-> previously swapped: when we receive a pairing response
-> req->io_capability contains the local one and rsp->io_capability the
-> remote one.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> v2: s/first/last/ in the commit message.
-> 
->  net/bluetooth/smp.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+The tk_request function takes the local IO capability as the second last
+parameter and the remote IO capability as the last parameter. They were
+previously swapped: when we receive a pairing response
+req->io_capability contains the local one and rsp->io_capability the
+remote one.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+v2: s/first/last/ in the commit message.
 
-Regards
+ net/bluetooth/smp.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Marcel
-
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index ff4835b..1885697 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -649,7 +649,7 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ 	auth |= (req->auth_req | rsp->auth_req) & SMP_AUTH_MITM;
+ 
+-	ret = tk_request(conn, 0, auth, rsp->io_capability, req->io_capability);
++	ret = tk_request(conn, 0, auth, req->io_capability, rsp->io_capability);
+ 	if (ret)
+ 		return SMP_UNSPECIFIED;
+ 
+-- 
+1.7.10
 
