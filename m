@@ -1,64 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Giancarlo Formicuccia <giancarlo.formicuccia@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] btusb,ath3k: add support for 0930:0219
-Date: Wed, 06 Jun 2012 11:31:54 +0200
-Message-ID: <1758373.5FB2LKGm1H@ilstop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <CABBYNZJgzZwBC4KWf_4huHA4FBuo5+n_cNqobWWnVedQsY8Y-g@mail.gmail.com>
+References: <1323703867-20577-1-git-send-email-bulislaw@linux.com>
+	<1323703867-20577-4-git-send-email-bulislaw@linux.com>
+	<20111215115009.GB8056@x220>
+	<CAPGrrxWWRPkCyKgRu2SkEmdhjdZgkjEQ+ES0DhfuoshvsVBUfw@mail.gmail.com>
+	<20111215121700.GA10535@x220>
+	<CAPGrrxVH_S=bJopAv-9nzW_kL9YxJh4FHYGRby-dZQcjS+jvzw@mail.gmail.com>
+	<CABBYNZJgzZwBC4KWf_4huHA4FBuo5+n_cNqobWWnVedQsY8Y-g@mail.gmail.com>
+Date: Wed, 6 Jun 2012 10:19:50 +0100
+Message-ID: <CAPGrrxUF-KAiZpaPfdinT0ZHXhMt-2CiwBAi3fsrtv23aAUNhQ@mail.gmail.com>
+Subject: Re: [PATCH obexd 4/4] Add support for PullMessagesListing in MAP client
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	=?UTF-8?B?U8WCYXdlayBCb2NoZcWEc2tp?= <lkslawek@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Wed, Jun 6, 2012 at 9:14 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Bartosz,
+>
+> On Thu, Dec 15, 2011 at 2:45 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+>>>
+>>> So the plan is to return something else than the raw XML that MAP
+>>> provides? In that case I don't think it's necessary to hold on to the
+>>> exact spec naming of these functions. E.g. GetMessages or GetMessageList
+>>> might make more sense in the case that you return a pre-parsed
+>>> list/structure of some kind.
+>>>
+>>> Johan
+>>
+>> We planned to return dict {field: value}. Generally I don't care much
+>> about this name - we can go with GetMessageListing, as I seem to use
+>> both forms without noticing it anyway.
+>
+> Are there still plans to continue this work? I would like to change
+> this method to return a dictionary like we do for pbap and perhaps
+> unify this in a single listing so we do folder + messages.
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-this patch adds support for the AR3012 chip found on the Toshiba Sallite M840-1000-XQ.
+Hi Luiz,
+since January I'm not longer Comarch employee - so you probably should
+ask Sławek/Radek/Łukasz whether they're planing to continue work on
+it.
 
-usb-devices shows:
-
-T:  Bus=01 Lev=02 Prnt=02 Port=02 Cnt=01 Dev#=  5 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0930 ProdID=0219 Rev=00.02
-S:  Manufacturer=Atheros Communications
-S:  Product=Bluetooth USB Host Controller
-S:  SerialNumber=Alaska Day 2006
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-
-Thanks,
-
-Giancarlo
-
-Signed-off-by: Giancarlo Formicuccia <giancarlo.formicuccia@gmail.com>
----
-diff -urpN -X linux-3.5-rc1/Documentation/dontdiff linux-3.5-rc1.org/drivers/bluetooth/ath3k.c linux-3.5-rc1/drivers/bluetooth/ath3k.c
---- linux-3.5-rc1.org/drivers/bluetooth/ath3k.c	2012-06-03 03:29:26.000000000 +0200
-+++ linux-3.5-rc1/drivers/bluetooth/ath3k.c	2012-06-06 10:29:11.325484026 +0200
-@@ -77,6 +77,7 @@ static struct usb_device_id ath3k_table[
- 	{ USB_DEVICE(0x04CA, 0x3005) },
- 	{ USB_DEVICE(0x13d3, 0x3362) },
- 	{ USB_DEVICE(0x0CF3, 0xE004) },
-+	{ USB_DEVICE(0x0930, 0x0219) },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -101,6 +102,7 @@ static struct usb_device_id ath3k_blist_
- 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
- 
- 	/* Atheros AR5BBU22 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE03C), .driver_info = BTUSB_ATH3012 },
-diff -urpN -X linux-3.5-rc1/Documentation/dontdiff linux-3.5-rc1.org/drivers/bluetooth/btusb.c linux-3.5-rc1/drivers/bluetooth/btusb.c
---- linux-3.5-rc1.org/drivers/bluetooth/btusb.c	2012-06-03 03:29:26.000000000 +0200
-+++ linux-3.5-rc1/drivers/bluetooth/btusb.c	2012-06-06 10:29:35.616401307 +0200
-@@ -139,6 +139,7 @@ static struct usb_device_id blacklist_ta
- 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
-
+-- 
+Cheers,
+Bartosz Szatkowski
