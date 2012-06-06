@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Michal Labedzki <michal.labedzki@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Michal Labedzki <michal.labedzki@tieto.com>
-Subject: [PATCH 05/13] AVRCP: Register AVRCP before MEDIA interface
-Date: Wed, 6 Jun 2012 18:06:03 +0200
-Message-ID: <1338998771-18683-5-git-send-email-michal.labedzki@tieto.com>
+Subject: [PATCH 04/13] AVRCP: Keep AVRCP version of connected device in server
+Date: Wed, 6 Jun 2012 18:06:02 +0200
+Message-ID: <1338998771-18683-4-git-send-email-michal.labedzki@tieto.com>
 In-Reply-To: <1338998771-18683-1-git-send-email-michal.labedzki@tieto.com>
 References: <1338998771-18683-1-git-send-email-michal.labedzki@tieto.com>
 MIME-Version: 1.0
@@ -12,36 +12,47 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Register AVRCP before MEDIA interface to avoid searching for or
-accessing non-existent AVRCP server.
+This can be used to improve compatibility between
+AVRCP 1.3 vs AVRCP 1.4 devices and implementation in stack.
 ---
- audio/manager.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ audio/avrcp.c |    9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/audio/manager.c b/audio/manager.c
-index d442d1d..076346a 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -1238,6 +1238,9 @@ proceed:
- 	if (enabled.socket)
- 		unix_init();
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index 7576e19..9ff0700 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -200,6 +200,7 @@ struct avrcp_server {
+ 	uint32_t ct_record_id;
+ 	GSList *players;
+ 	struct avrcp_player *addressed_player;
++	uint16_t version;
+ };
  
-+	if (enabled.control)
-+		btd_register_adapter_driver(&avrcp_server_driver);
+ struct pending_pdu {
+@@ -1288,8 +1289,12 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+ 			return;
+ 
+ 		desc = list->data;
++		if (desc)
++			server->version = desc->version;
++		else
++			server->version = AVRCP_VERSION_UNKNOWN;
+ 
+-		if (desc && desc->version >= AVRCP_VERSION_1_4)
++		if (server->version >= AVRCP_VERSION_1_4)
+ 			register_volume_notification(player);
+ 
+ 		sdp_list_free(list, free);
+@@ -1380,6 +1385,8 @@ int avrcp_register(DBusConnection *conn, const bdaddr_t *src, GKeyFile *config)
+ 
+ 	bacpy(&server->src, src);
+ 
++	server->version = AVRCP_VERSION_UNKNOWN;
 +
- 	if (enabled.media)
- 		btd_register_adapter_driver(&media_server_driver);
+ 	servers = g_slist_append(servers, server);
  
-@@ -1250,9 +1253,6 @@ proceed:
- 	if (enabled.source || enabled.sink)
- 		btd_register_adapter_driver(&a2dp_server_driver);
- 
--	if (enabled.control)
--		btd_register_adapter_driver(&avrcp_server_driver);
--
- 	btd_register_device_driver(&audio_driver);
- 
- 	*enable_sco = (enabled.gateway || enabled.headset);
+ 	return 0;
 -- 
 on behalf of ST-Ericsson
 
