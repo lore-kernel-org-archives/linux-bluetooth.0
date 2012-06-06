@@ -1,72 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Jun 2012 13:44:00 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Fix deadlock and crash when SMP pairing
- times out
-Message-ID: <20120606164400.GA11387@samus>
-References: <1338979451-15851-1-git-send-email-johan.hedberg@gmail.com>
- <1338979451-15851-2-git-send-email-johan.hedberg@gmail.com>
+From: Michal Labedzki <michal.labedzki@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Michal Labedzki <michal.labedzki@tieto.com>
+Subject: [PATCH 13/13] doc: Fix typo
+Date: Wed, 6 Jun 2012 18:06:11 +0200
+Message-ID: <1338998771-18683-13-git-send-email-michal.labedzki@tieto.com>
+In-Reply-To: <1338998771-18683-1-git-send-email-michal.labedzki@tieto.com>
+References: <1338998771-18683-1-git-send-email-michal.labedzki@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1338979451-15851-2-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+This patch fix simple typo in documentation of API.
+---
+ doc/adapter-api.txt   |    2 +-
+ doc/audio-api.txt     |    2 +-
+ doc/device-api.txt    |    2 +-
+ doc/media-api.txt     |    2 +-
+ doc/proximity-api.txt |    2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
 
-On 18:44 Wed 06 Jun, Johan Hedberg wrote:
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> The l2cap_conn_del function tries to cancel_sync the security timer, but
-> when it's called from the timeout function itself a deadlock occurs.
-> Subsequently the "hcon->l2cap_data = NULL" that's supposed to protect
-> multiple calls to l2cap_conn_del never gets cleared and when the
-> connection finally drops we double free's etc which will crash the
-> kernel.
-
-I wonder if (inside l2cap_conn_del()) we move "hcon->l2cap_data = NULL"
-up in the function, probably next to the check for "!conn", would be a
-safer alternative.
-
-> 
-> This patch fixes the issue by using the HCI_CONN_LE_SMP_PEND for
-> protecting against this. The same flag is also used for the same purpose
-> in other places in the SMP code.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c |    7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index f9bffe3..4ca8824 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -1314,7 +1314,12 @@ static void security_timeout(struct work_struct *work)
->  	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
->  						security_timer.work);
->  
-> -	l2cap_conn_del(conn->hcon, ETIMEDOUT);
-> +	BT_DBG("conn %p", conn);
-> +
-> +	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
-> +		smp_chan_destroy(conn);
-> +		l2cap_conn_del(conn->hcon, ETIMEDOUT);
-> +	}
->  }
->  
->  static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
-> -- 
-> 1.7.10
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index dccb6bf..916e941 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -24,7 +24,7 @@ Methods		dict GetProperties()
+ 		void SetProperty(string name, variant value)
+ 
+ 			Changes the value of the specified property. Only
+-			properties that are listed a read-write are changeable.
++			properties that are listed as read-write are changeable.
+ 			On success this will emit a PropertyChanged signal.
+ 
+ 			Possible Errors: org.bluez.Error.InvalidArguments
+diff --git a/doc/audio-api.txt b/doc/audio-api.txt
+index 02291fd..9b1737d 100644
+--- a/doc/audio-api.txt
++++ b/doc/audio-api.txt
+@@ -122,7 +122,7 @@ Methods		void Connect()
+ 		void SetProperty(string name, variant value)
+ 
+ 			Changes the value of the specified property. Only
+-			properties that are listed a read-write are changeable.
++			properties that are listed as read-write are changeable.
+ 			On success this will emit a PropertyChanged signal.
+ 
+ 			Possible Errors: org.bluez.Error.DoesNotExist
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index 4a170e4..0f34210 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -25,7 +25,7 @@ Methods		dict GetProperties()
+ 		void SetProperty(string name, variant value)
+ 
+ 			Changes the value of the specified property. Only
+-			properties that are listed a read-write are changeable.
++			properties that are listed as read-write are changeable.
+ 			On success this will emit a PropertyChanged signal.
+ 
+ 			Possible Errors: org.bluez.Error.DoesNotExist
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index 2e19417..0299333 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -315,7 +315,7 @@ Methods		dict GetProperties()
+ 		void SetProperty(string name, variant value)
+ 
+ 			Changes the value of the specified property. Only
+-			properties that are listed a read-write can be changed.
++			properties that are listed as read-write can be changed.
+ 
+ 			On success this will emit a PropertyChanged signal.
+ 
+diff --git a/doc/proximity-api.txt b/doc/proximity-api.txt
+index 0c60d47..c8eae50 100644
+--- a/doc/proximity-api.txt
++++ b/doc/proximity-api.txt
+@@ -19,7 +19,7 @@ Methods		dict GetProperties()
+ 		void SetProperty(string name, variant value)
+ 
+ 			Changes the value of the specified property. Only
+-			properties that are listed a read-write are changeable.
++			properties that are listed as read-write are changeable.
+ 			On success this will emit a PropertyChanged signal.
+ 
+ 			Possible Errors: org.bluez.Error.InvalidArguments
 -- 
-Vinicius
+on behalf of ST-Ericsson
+
