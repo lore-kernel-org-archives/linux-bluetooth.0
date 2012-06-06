@@ -1,52 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ido Yariv <ido@wizery.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ido Yariv <ido@wizery.com>
-Subject: [PATCH] gattrib: Fix a premature response timer removal
-Date: Wed,  6 Jun 2012 13:56:15 +0300
-Message-Id: <1338980175-14980-1-git-send-email-ido@wizery.com>
+Subject: [PATCH 2/2] Bluetooth: Fix deadlock and crash when SMP pairing times out
+Date: Wed,  6 Jun 2012 18:44:11 +0800
+Message-Id: <1338979451-15851-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1338979451-15851-1-git-send-email-johan.hedberg@gmail.com>
+References: <1338979451-15851-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A timer is set when a response is expected. The timer is removed when
-data is received, regardless of whether or not the data is a response.
-As a result, the timer may be cleared even though a response was not
-received and there would be no way to detect a command timeout.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Fix this by clearing the timer only after verifying a response was
-received.
+The l2cap_conn_del function tries to cancel_sync the security timer, but
+when it's called from the timeout function itself a deadlock occurs.
+Subsequently the "hcon->l2cap_data = NULL" that's supposed to protect
+multiple calls to l2cap_conn_del never gets cleared and when the
+connection finally drops we double free's etc which will crash the
+kernel.
+
+This patch fixes the issue by using the HCI_CONN_LE_SMP_PEND for
+protecting against this. The same flag is also used for the same purpose
+in other places in the SMP code.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- attrib/gattrib.c |   10 +++++-----
- 1 files changed, 5 insertions(+), 5 deletions(-)
+ net/bluetooth/l2cap_core.c |    7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 29c3585..a1e29a1 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -361,11 +361,6 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
- 	if (attrib->stale)
- 		return FALSE;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index f9bffe3..4ca8824 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1314,7 +1314,12 @@ static void security_timeout(struct work_struct *work)
+ 	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
+ 						security_timer.work);
  
--	if (attrib->timeout_watch > 0) {
--		g_source_remove(attrib->timeout_watch);
--		attrib->timeout_watch = 0;
--	}
--
- 	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
- 		attrib->read_watch = 0;
- 		return FALSE;
-@@ -393,6 +388,11 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
- 	if (is_response(buf[0]) == FALSE)
- 		return TRUE;
- 
-+	if (attrib->timeout_watch > 0) {
-+		g_source_remove(attrib->timeout_watch);
-+		attrib->timeout_watch = 0;
-+	}
+-	l2cap_conn_del(conn->hcon, ETIMEDOUT);
++	BT_DBG("conn %p", conn);
 +
- 	cmd = g_queue_pop_head(attrib->requests);
- 	if (cmd == NULL) {
- 		/* Keep the watch if we have events to report */
++	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
++		smp_chan_destroy(conn);
++		l2cap_conn_del(conn->hcon, ETIMEDOUT);
++	}
+ }
+ 
+ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
 -- 
-1.7.7.6
+1.7.10
 
