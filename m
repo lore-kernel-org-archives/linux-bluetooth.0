@@ -1,48 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Jun 2012 01:54:22 -0300
+Date: Wed, 6 Jun 2012 01:50:07 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: Bluetooth trees rebased on 3.5-rc1
-Message-ID: <20120606045421.GC2533@joana>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2012-06-06
+Message-ID: <20120606045007.GB2533@joana>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="yEPQxsgoJgBvi8ip"
+	protocol="application/pgp-signature"; boundary="dDRMvlgZJXvWKvBx"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---yEPQxsgoJgBvi8ip
+--dDRMvlgZJXvWKvBx
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-Hi Everyone,
+Hi John,
 
-Johan rebased both bluetooth.git and bluetooth-next on top v3.5-rc1.
-Make sure to rebase yours tree too.
-
-Regards,
+We got a quite important fix for 3.5, a regression was preventing important
+features of Bluetooth from working. Please pull. Thanks.
 
 	Gustavo
 
---yEPQxsgoJgBvi8ip
+---
+The following changes since commit fcb6ff5e2cb83e1de10631f6621f45ca3401bf61:
+
+  iwlwifi: disable WoWLAN if !CONFIG_PM_SLEEP (2012-06-04 15:27:07 -0400)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
+
+for you to fetch changes up to ddcd0f41471a1e0394c8840a119ec3986a78462c:
+
+  Bluetooth: Fix checking the wrong flag when accepting a socket (2012-06-05 06:26:26 +0300)
+
+----------------------------------------------------------------
+Vinicius Costa Gomes (1):
+      Bluetooth: Fix checking the wrong flag when accepting a socket
+
+ net/bluetooth/af_bluetooth.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--dDRMvlgZJXvWKvBx
 Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQIcBAEBAgAGBQJPzuJ9AAoJEPs3PUX4s20o/s0P/3nkvxNbXEac6m29Dam26mpT
-3eHYP8L+YI1NtORpcchPu3lrAmis+tcpjkPtaH+YRTmSwUTqkCgztOc+CI30dExY
-kDOc3M9R2Pro8EC9DR8Lj5E++hc9L2l3xUrXiaOhtaM9+hM4+o2+fwolnjqbA0d3
-rg9up2D6OC5A6d1qjKKEZk+5QJJskh6mjW/LcnSoRGRhM4Oezwv3sHZ+8I4LxWv9
-EEb2JOBQlNC8RMlG/WQpUIpZ6REqveRUwwEKxx+s/ErGq26ulxYu1kJwGNQGqDRV
-Gjup+wCb/+jd4Xv7kpMNaxpz2v4lN9EWk7ZCU7wDC5IMuASM6ZkdNbQX8fwljXR+
-ozVqJdq8FW8Fb2HFG6dLGCFUoe1Zq+aCPXak4FR9ad/JdkeXgqpud8UiG90i5E7g
-HcsPH9G5jZrVO1EzKRqCVJFH89HQSxAmZjb+VaMb9JhFnBAfPNOi6nFYVL50ThlQ
-hwKYNRTpNqo4IuOdSNrlS6Q+1od8IAdv8H/7pcPpZa2N9XmofhYLZr8DkiQmp+dd
-dPH7VeYjzOCE/UEvnwe3mTeWXcF+1QdaOhZeIJMYfFJttpzrN0/NwlqrNrZZ9QKZ
-PO1W5vmjHcGiqEKAuJskDaWOZCfvNYZK206UWzLA9Bbzub5xXoHwF4xgRIPJsHwd
-fc6zunQpGnIdy/dVv1lj
-=1d62
+iQIcBAEBAgAGBQJPzuF/AAoJEPs3PUX4s20oEGEP/ihlMtjS5DdBBxIW00h0uJSf
++QnYwBtaT5+NpFXsdtzJdv8dVv9KJACh1OF18c4+MMzB0Zq/AR8LgXVCqmoL/dgW
+jD2XEVtDOPN73SOvMi7J9ndOvruh14n2j4ap3eRfDme8lLizZ6cHeWKKozn7Fh4X
+gi00vjt/6VptWKXLFaOLdTxcK1dy3HEOQroW2qxfwID/OR2fE/3jIlgKG2Mfk0K7
+vtthCb1Ql76uHnzFMMo0uaBjnOVxXZzgG/1X+BzzYGZcja7B2Ir1ReH+DCJW2zT+
+z2U0MVE8JxxuR9tlvoZghr3J6r9I74crClwoNLky/VKx699A2Mqs3T2DHFi85hRe
+Ngjpjnq8x+9ZBuVWHqSf3YJRp1/gkktwfhf3WWd4klY7arf0lvayqVnBidEWGDia
+LK9QxXXsmbboiohzIpi1JNPqsLCRg5QXOV2h564ly3n4hMG0DjsGWA0B3g0DkuC6
+WJT6tjXsNuyKZ+bYf11XamTKy2+WVJT8GHUHoK9qW4a0JfPJMXXNKDDQ6xwOZgJZ
+FNpifrfY9iGzd5edywGNjr80gTjWxDlq6U5IPYl611wtvoQFoR4t8oktnmZeztKP
+kQhe/7CBIuEYf2Y/90t9BScIul6ilagG4RN2B8ybXfEiem/VeeWpI3zLoFjHNaZD
+5WiUD+1h0Y3mzWg1O9lI
+=3usZ
 -----END PGP SIGNATURE-----
 
---yEPQxsgoJgBvi8ip--
+--dDRMvlgZJXvWKvBx--
