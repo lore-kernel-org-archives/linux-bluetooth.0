@@ -1,55 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZJgzZwBC4KWf_4huHA4FBuo5+n_cNqobWWnVedQsY8Y-g@mail.gmail.com>
-References: <1323703867-20577-1-git-send-email-bulislaw@linux.com>
-	<1323703867-20577-4-git-send-email-bulislaw@linux.com>
-	<20111215115009.GB8056@x220>
-	<CAPGrrxWWRPkCyKgRu2SkEmdhjdZgkjEQ+ES0DhfuoshvsVBUfw@mail.gmail.com>
-	<20111215121700.GA10535@x220>
-	<CAPGrrxVH_S=bJopAv-9nzW_kL9YxJh4FHYGRby-dZQcjS+jvzw@mail.gmail.com>
-	<CABBYNZJgzZwBC4KWf_4huHA4FBuo5+n_cNqobWWnVedQsY8Y-g@mail.gmail.com>
-Date: Wed, 6 Jun 2012 10:19:50 +0100
-Message-ID: <CAPGrrxUF-KAiZpaPfdinT0ZHXhMt-2CiwBAi3fsrtv23aAUNhQ@mail.gmail.com>
-Subject: Re: [PATCH obexd 4/4] Add support for PullMessagesListing in MAP client
-From: Bartosz Szatkowski <bulislaw@linux.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	=?UTF-8?B?U8WCYXdlayBCb2NoZcWEc2tp?= <lkslawek@gmail.com>
+Date: Wed, 6 Jun 2012 12:18:11 +0300
+From: Ido Yariv <ido@wizery.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] attrib-server: Fix multiple channels detaching mix-up
+Message-ID: <20120606091758.GA12782@WorkStation.localnet>
+References: <1338322808-15503-1-git-send-email-ido@wizery.com>
+ <20120530073701.GB6539@x220>
+ <20120530183227.GA16709@WorkStation.localnet>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120530183227.GA16709@WorkStation.localnet>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jun 6, 2012 at 9:14 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Bartosz,
->
-> On Thu, Dec 15, 2011 at 2:45 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
->>>
->>> So the plan is to return something else than the raw XML that MAP
->>> provides? In that case I don't think it's necessary to hold on to the
->>> exact spec naming of these functions. E.g. GetMessages or GetMessageList
->>> might make more sense in the case that you return a pre-parsed
->>> list/structure of some kind.
->>>
->>> Johan
->>
->> We planned to return dict {field: value}. Generally I don't care much
->> about this name - we can go with GetMessageListing, as I seem to use
->> both forms without noticing it anyway.
->
-> Are there still plans to continue this work? I would like to change
-> this method to return a dictionary like we do for pbap and perhaps
-> unify this in a single listing so we do folder + messages.
->
->
-> --
-> Luiz Augusto von Dentz
+Hi Johan,
 
-Hi Luiz,
-since January I'm not longer Comarch employee - so you probably should
-ask Sławek/Radek/Łukasz whether they're planing to continue work on
-it.
+On Wed, May 30, 2012 at 09:32:27PM +0300, Ido Yariv wrote:
+> From 78254bb099f80ad38e10075fbb73a4d990217630 Mon Sep 17 00:00:00 2001
+> From: Ido Yariv <ido@wizery.com>
+> Date: Tue, 29 May 2012 21:11:16 +0300
+> Subject: [PATCH v2] attrib-server: Fix multiple channels detaching mix-up
+> 
+> The identifier returned by g_attrib_register is not unique across
+> different channels. Since attrib_channel_detach assumes this identifier
+> to be unique, it may end up detaching the wrong channel when a device
+> disconnects.
+> 
+> Fix this by using the channel's pointer as a unique identifier for
+> detaching the channel. The identifier returned from g_attrib_register
+> will still be used to find the relevant event structure.
 
--- 
-Cheers,
-Bartosz Szatkowski
+Any thoughts about this one?
+
+Thanks,
+Ido.
