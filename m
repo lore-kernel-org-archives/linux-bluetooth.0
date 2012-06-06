@@ -1,37 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Jun 2012 12:18:11 +0300
-From: Ido Yariv <ido@wizery.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] attrib-server: Fix multiple channels detaching mix-up
-Message-ID: <20120606091758.GA12782@WorkStation.localnet>
-References: <1338322808-15503-1-git-send-email-ido@wizery.com>
- <20120530073701.GB6539@x220>
- <20120530183227.GA16709@WorkStation.localnet>
+Message-ID: <4FCF2021.90801@tu-ilmenau.de>
+Date: Wed, 06 Jun 2012 11:17:21 +0200
+From: Steffen Becker <steffen.becker@tu-ilmenau.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120530183227.GA16709@WorkStation.localnet>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: no security block - but connection still gets refused
+References: <4FC35278.40903@tu-ilmenau.de> <20120528173938.GA4151@samus>
+In-Reply-To: <20120528173938.GA4151@samus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Vinicius,
 
-On Wed, May 30, 2012 at 09:32:27PM +0300, Ido Yariv wrote:
-> From 78254bb099f80ad38e10075fbb73a4d990217630 Mon Sep 17 00:00:00 2001
-> From: Ido Yariv <ido@wizery.com>
-> Date: Tue, 29 May 2012 21:11:16 +0300
-> Subject: [PATCH v2] attrib-server: Fix multiple channels detaching mix-up
-> 
-> The identifier returned by g_attrib_register is not unique across
-> different channels. Since attrib_channel_detach assumes this identifier
-> to be unique, it may end up detaching the wrong channel when a device
-> disconnects.
-> 
-> Fix this by using the channel's pointer as a unique identifier for
-> detaching the channel. The identifier returned from g_attrib_register
-> will still be used to find the relevant event structure.
+Am 28.05.2012 19:39, schrieb Vinicius Costa Gomes:
+> Hi Steffen,
+>
+> On 12:24 Mon 28 May, Steffen Becker wrote:
+>> Hello Everyone,
+>>
+>> I searched for an answer the whole last time, but I didn't gained
+>> any new information - so I hope you can help me to solve my problem.
+>> I have two gentoo-PCs with a Bluetooth3.0-Dongle at each PC.
+>> I have installed net-wireless/bluez with "test-programs" USE-Flag.
+>> I tried to connect them via
+>> # bluez-test-serial<remote address>
+>> and
+>> # bluez-test-network<remote address>
+>>
+>> First important question:
+>> How do I have to use this commands? Are these "standalone" commands
+>> or do I have to use some "additional" command, e.g. some kind of
+>> "listen"-command at the remote device?
+> Short answer: something like it.
+>
+> Long answer: For example, for network: the server side needs two pieces
+> of information from the user before it can be usable, a type of service
+> that the user wants to use (PAN, GN, NAP) and a bridge interface to
+> connect to. Usually, this is something that your connection manager
+> (ConnMan, Network Manager) does. See doc/network-api.txt (in the bluez
+> sources).
+>
+> The serial service is similar, the user needs to inform the server which
+> serial port he wants to export via Bluetooth.
+>
+> Those test scripts only have the client side of things.
+>
+>> Next big thing:
+>> I always got a "security block"-issue while tried to connect. I
+>> searched your mail-archive&  you told me, this problem is solved in
+>> kernel 3.3 and later.
+>> I installed kernel 3.4 and - hooray - no "security block" anymore!
+>> *But* the connection still doesn't work. I connect them - they are
+>> connected for about 2 seconds - then connection is refused.
+>> So I really hope you can have a look at the following lines and tell
+>> me how to solve this problem.
+>>
+>> PS:
+>> I'm sorry for wasting your time, but this case isn't "just for fun
+>> for me"; it's important that it works. So I even would donate/pay
+>> something if you can help me solve this problem.
+>>
+>> Here is what I get when I use test-network:
+>>
+>> # bluez-test-network 00:02:72:AE:58:73 NAP
+>>
+>> Traceback (most recent call last):
+>>    File "/usr/bin/bluez-test-network", line 40, in<module>
+>>      device = adapter.FindDevice(address)
+>>    File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line
+>> 70, in __call__
+>>      return self._proxy_method(*args, **keywords)
+>>    File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line
+>> 145, in __call__
+>>      **keywords)
+>>    File "/usr/lib64/python2.7/site-packages/dbus/connection.py", line
+>> 651, in
+>> call_blocking
+>>      message, timeout)
+>> dbus.exceptions.DBusException: org.bluez.Error.DoesNotExist: Does Not Exist
+>  From this and the hcidump, the answer is that it could not find a
+> server running in the remote side (i.e. the SDP service search returned
+> nothing).
+>
+>
+> [snip]
+>
 
-Any thoughts about this one?
+Thanks for your answer!
+I tried out what you said (installed NetworkManager), but nothing 
+changed. Can you please have a look and tell me what I did wrong?
+This is what i've done:
 
-Thanks,
-Ido.
+# hciconfig hci0 piscan
+# sdptool add NAP
+# /etc/init.d/NetworkManager start
+# /etc/init.d/dbus start
+# bluez-test-network <remote-address> NAP
+
+But nothing changed, the error message after the last command is still 
+the same. I believe, at the remote device I have to do some kind of 
+"respone" or "listen"-command... but I don't know how.
+Hope you can help me in this case.
+
+Regards,
+Steffen
