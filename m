@@ -1,68 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1338998206.19312.10.camel@novo.hadess.net>
-Subject: Re: [RFC] Reorganizing the BlueZ source tree
-From: Bastien Nocera <hadess@hadess.net>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Gustavo Padovan
-	 <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org
-Date: Wed, 06 Jun 2012 16:56:46 +0100
-In-Reply-To: <1337853929.15105.84.camel@aeonflux>
-References: <20120524081405.GA30941@joana>
-	 <CABBYNZLhWfS6Ff0S8SkCwSXxzt61NzNCBH-K78hQB6dtpPvJ6Q@mail.gmail.com>
-	 <1337852769.2115.47.camel@novo.hadess.net>
-	 <1337853929.15105.84.camel@aeonflux>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
+Date: Wed, 6 Jun 2012 23:27:36 +0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] Bluetooth: AMP: Do not set name for AMP ctrl
+Message-ID: <20120606152736.GA25191@x220.ccr.corp.intel.com>
+References: <1338994856-31200-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20120606152225.GA24903@x220.ccr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120606152225.GA24903@x220.ccr.corp.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2012-05-24 at 12:05 +0200, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > > > The last profiles addition to BlueZ increased a lot the number of folders we
-> > > > have in the root dir of the project and it looks like more profiles (and more
-> > > > folders) are expected to come.
-> > > >
-> > > > I talked a bit with Johan about changing the hierarchy of the BlueZ tree and
-> > > > the following proposal where 2 new folders are created, 'profiles' and 'libs'
-> > > > and things are moved to them.
-> > > >
-> > > > compat          -> /dev/null (will be removed on 5.0)
-> > > > alert           -> profiles
-> > > > audio           -> profiles
-> > > > cups            -> profiles
-> > > > deviceinfo      -> profiles
-> > > > health          -> profiles
-> > > > input           -> profiles
-> > > > lib             -> profiles
-> > > > network         -> profiles
-> > > > proximity       -> profiles
-> > > > sap             -> profiles
-> > > > serial          -> profiles
-> > > > thermometer     -> profiles
-> > > > time            -> profiles
-> > > > btio            -> libs
-> > > > gdbus           -> libs
-> > > > sbc             -> libs
-> > > > emulator        -> tools
-> > > > mgmt            -> tools
-> > > > monitor         -> tools
-> > > > attrib
-> > > > doc
-> > > > plugins
-> > > > scripts
-> > > > src
-> > > > test
-> > > > tools
-> > > > unit
-> > > 
-> > > Sounds good, the only problem are gdbus and btio, if we merge obexd
-> > > into BlueZ btio will no longer be shared but for gdbus we would have
-> > > to align with other projects as well.
-> > 
-> > While you're at it, change gdbus' name to something that doesn't clash
-> > with the GIO GDBus.
-> 
-> why would we? This code predates GIO GDBus.
+Hi,
 
-Because people told you that your naming would clash once glib had an
-implementation of D-Bus, which you just laughed away.
+On Wed, Jun 06, 2012, Johan Hedberg wrote:
+> On Wed, Jun 06, 2012, Andrei Emeltchenko wrote:
+> > AMP controllers do not understand this command
+> > 
+> > ...
+> > < HCI Command: Write Local Name (0x03|0x0013) plen 248
+> >    name ''
+> > > HCI Event: Command Complete (0x0e) plen 4
+> >    Write Local Name (0x03|0x0013) ncmd 1
+> >    status 0x01
+> >    Error: Unknown HCI Command
+> > ...
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  net/bluetooth/mgmt.c |    3 +++
+> >  1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> > index 958f764..9afcc84 100644
+> > --- a/net/bluetooth/mgmt.c
+> > +++ b/net/bluetooth/mgmt.c
+> > @@ -2135,6 +2135,9 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
+> >  
+> >  	BT_DBG("");
+> >  
+> > +	if (hdev->amp_type != HCI_BREDR)
+> > +		return -ENOTSUPP;
+> > +
+> >  	hci_dev_lock(hdev);
+> >  
+> >  	memcpy(hdev->short_name, cp->short_name, sizeof(hdev->short_name));
+> 
+> This will essentially make write() fail on the mgmt socket which isn't
+> necessarily the most intuitive behavior (one might think there's
+> something wrong with the socket). What would probably make more sense is
+> to send a proper cmd_status reply with MGMT_STATUS_NOT_SUPPORTED.
+
+Actually, should we even be exposing AMP controllers to begin with
+through mgmt? Maybe we shouldn't even tell user space about them through
+mgmt?
+
+Johan
