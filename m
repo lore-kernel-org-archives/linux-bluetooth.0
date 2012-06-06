@@ -1,68 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Jun 2012 01:50:07 -0300
+Date: Wed, 6 Jun 2012 01:38:59 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth 2012-06-06
-Message-ID: <20120606045007.GB2533@joana>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC] Bluetooth: Fix compile warning in l2cap_core.c
+Message-ID: <20120606043859.GA2533@joana>
+References: <1338507556-10920-1-git-send-email-andre.guedes@openbossa.org>
+ <20120601230918.GH24769@joana>
+ <201206040917.56331.szymon.janc@tieto.com>
+ <CACJA=fWSwywNBrZ_-JNjEXa8nhzYi6gwQ8xnrguErRyYc6gh1w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="dDRMvlgZJXvWKvBx"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CACJA=fWSwywNBrZ_-JNjEXa8nhzYi6gwQ8xnrguErRyYc6gh1w@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Andre,
 
---dDRMvlgZJXvWKvBx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+* Andre Guedes <andre.guedes@openbossa.org> [2012-06-05 16:01:42 -0300]:
 
-Hi John,
+> Hi Gustavo,
+> 
+> On Mon, Jun 4, 2012 at 4:17 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> > Hi,
+> >
+> >> * Andre Guedes <andre.guedes@openbossa.org> [2012-05-31 20:39:16 -0300]:
+> >>
+> >> > This patch fixes the following warning reported by gcc 4.7.0:
+> >> >
+> >> > net/bluetooth/l2cap_core.c: In function 'l2cap_config_rsp':
+> >> > net/bluetooth/l2cap_core.c:3302:13: warning: 'rfc.max_pdu_size' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> >> > net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.max_pdu_size' was declared here
+> >> > net/bluetooth/l2cap_core.c:3298:25: warning: 'rfc.monitor_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> >> > net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.monitor_timeout' was declared here
+> >> > net/bluetooth/l2cap_core.c:3297:25: warning: 'rfc.retrans_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> >> > net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.retrans_timeout' was declared here
+> >> > net/bluetooth/l2cap_core.c:3295:2: warning: 'rfc.mode' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> >> > net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.mode' was declared here
+> >>
+> >> So I think this is a false positive, I've seen this warning here for more than
+> >> a month, since I updated to fedora 17.
+> >> At some people will disable this warning in the kernel compile process if this
+> >> appear in others places in the kernel as false positive too.
+> >
+> > What if remote device misbehaves and sends bogus L2CAP_CONF_RFC i.e. with wrong length?
+> 
+> I'm not sure this is a false positive. If remote device misbehaves and
+> sends bogus L2CAP_CONF_RFC with wrong length (as Szymon said) we go to
+> "done" label and 'rfc' is used uninitialized.
 
-We got a quite important fix for 3.5, a regression was preventing important
-features of Bluetooth from working. Please pull. Thanks.
+Yes, I agree with you guys, but please rebase this against the bluetooth tree
+so we can put this in 3.5 and also rename the patch title as we are not fixing
+a simple compile warning.
 
 	Gustavo
-
----
-The following changes since commit fcb6ff5e2cb83e1de10631f6621f45ca3401bf61:
-
-  iwlwifi: disable WoWLAN if !CONFIG_PM_SLEEP (2012-06-04 15:27:07 -0400)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
-
-for you to fetch changes up to ddcd0f41471a1e0394c8840a119ec3986a78462c:
-
-  Bluetooth: Fix checking the wrong flag when accepting a socket (2012-06-05 06:26:26 +0300)
-
-----------------------------------------------------------------
-Vinicius Costa Gomes (1):
-      Bluetooth: Fix checking the wrong flag when accepting a socket
-
- net/bluetooth/af_bluetooth.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
---dDRMvlgZJXvWKvBx
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAEBAgAGBQJPzuF/AAoJEPs3PUX4s20oEGEP/ihlMtjS5DdBBxIW00h0uJSf
-+QnYwBtaT5+NpFXsdtzJdv8dVv9KJACh1OF18c4+MMzB0Zq/AR8LgXVCqmoL/dgW
-jD2XEVtDOPN73SOvMi7J9ndOvruh14n2j4ap3eRfDme8lLizZ6cHeWKKozn7Fh4X
-gi00vjt/6VptWKXLFaOLdTxcK1dy3HEOQroW2qxfwID/OR2fE/3jIlgKG2Mfk0K7
-vtthCb1Ql76uHnzFMMo0uaBjnOVxXZzgG/1X+BzzYGZcja7B2Ir1ReH+DCJW2zT+
-z2U0MVE8JxxuR9tlvoZghr3J6r9I74crClwoNLky/VKx699A2Mqs3T2DHFi85hRe
-Ngjpjnq8x+9ZBuVWHqSf3YJRp1/gkktwfhf3WWd4klY7arf0lvayqVnBidEWGDia
-LK9QxXXsmbboiohzIpi1JNPqsLCRg5QXOV2h564ly3n4hMG0DjsGWA0B3g0DkuC6
-WJT6tjXsNuyKZ+bYf11XamTKy2+WVJT8GHUHoK9qW4a0JfPJMXXNKDDQ6xwOZgJZ
-FNpifrfY9iGzd5edywGNjr80gTjWxDlq6U5IPYl611wtvoQFoR4t8oktnmZeztKP
-kQhe/7CBIuEYf2Y/90t9BScIul6ilagG4RN2B8ybXfEiem/VeeWpI3zLoFjHNaZD
-5WiUD+1h0Y3mzWg1O9lI
-=3usZ
------END PGP SIGNATURE-----
-
---dDRMvlgZJXvWKvBx--
