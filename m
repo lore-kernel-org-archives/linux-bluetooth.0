@@ -1,252 +1,155 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: Add refcnt to l2cap_conn
-Date: Wed,  6 Jun 2012 17:22:32 +0300
-Message-Id: <1338992552-27895-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 05/17] SAP: Introdue SAP_VDBG macro for verbose log messages
+Date: Wed, 6 Jun 2012 15:19:15 +0200
+Message-ID: <1338988767-19467-5-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1338988767-19467-1-git-send-email-szymon.janc@tieto.com>
+References: <1338988767-19467-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Adding kref to l2cap_conn helps to better handle racing when deleting
-l2cap_conn.
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Some SAP operations (eg. APDU transfer) occurs very often even with
+simple scenarios like subscribing to GSM network. This results in flood
+of log messages. Since those messages are mostly usefull only when
+developing SAP backend hide them after SAP_DEBUG flag.
 ---
- include/net/bluetooth/l2cap.h |    6 +++
- net/bluetooth/l2cap_core.c    |  101 ++++++++++++++++++++++++++++++++++-------
- net/bluetooth/smp.c           |    7 ++-
- 3 files changed, 94 insertions(+), 20 deletions(-)
+ sap/sap-u8500.c |   18 ++++++------------
+ sap/sap.h       |    6 ++++++
+ sap/server.c    |    8 ++++----
+ 3 files changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 3d31ecd..5abfe8a 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -572,6 +572,8 @@ struct l2cap_conn {
+diff --git a/sap/sap-u8500.c b/sap/sap-u8500.c
+index 531dce4..f07209d 100644
+--- a/sap/sap-u8500.c
++++ b/sap/sap-u8500.c
+@@ -38,12 +38,6 @@
+ #define STE_SIMD_SOCK  "/dev/socket/catd_a"
+ #define STE_CLIENT_TAG 0x0000
  
- 	struct list_head	chan_l;
- 	struct mutex		chan_lock;
-+
-+	struct kref		kref;
- };
- 
- #define L2CAP_INFO_CL_MTU_REQ_SENT	0x01
-@@ -779,5 +781,9 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan);
- int l2cap_ertm_init(struct l2cap_chan *chan);
- void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
- void l2cap_chan_del(struct l2cap_chan *chan, int err);
-+void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
-+			  long timeout);
-+bool l2cap_conn_clear_timer(struct l2cap_conn *conn,
-+			    struct delayed_work *work);
- 
- #endif /* __L2CAP_H */
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index eb7094c..b0943f7 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -57,6 +57,64 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
- 
- static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
- 		    struct sk_buff_head *skbs, u8 event);
-+static void l2cap_conn_del(struct hci_conn *hcon, int err);
-+
-+/* ---- L2CAP connections ---- */
-+
-+static void l2cap_conn_get(struct l2cap_conn *conn)
-+{
-+	BT_DBG("conn %p", conn);
-+
-+	kref_get(&conn->kref);
-+}
-+
-+static void l2cap_conn_destroy(struct kref *kref)
-+{
-+	struct l2cap_conn *conn = container_of(kref, struct l2cap_conn, kref);
-+
-+	BT_DBG("conn %p", conn);
-+
-+	l2cap_conn_del(conn->hcon, 0);
-+}
-+
-+static int l2cap_conn_put(struct l2cap_conn *conn)
-+{
-+	BT_DBG("conn %p", conn);
-+
-+	/* conn might be NULL, was checked before in l2cap_conn_del */
-+	if (!conn)
-+		return 1;
-+
-+	return kref_put(&conn->kref, &l2cap_conn_destroy);
-+}
-+
-+void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
-+			  long timeout)
-+{
-+	BT_DBG("conn %p timeout %ld", conn, timeout);
-+
-+	/* If delayed work cancelled do not hold(conn)
-+	   since it is already done with previous set_timer */
-+	if (!cancel_delayed_work(work))
-+		l2cap_conn_get(conn);
-+
-+	schedule_delayed_work(work, timeout);
-+}
-+
-+bool l2cap_conn_clear_timer(struct l2cap_conn *conn, struct delayed_work *work)
-+{
-+	bool ret;
-+
-+	BT_DBG("conn %p", conn);
-+
-+	/* put(conn) if delayed work cancelled otherwise it
-+	   is done in delayed work function */
-+	ret = cancel_delayed_work(work);
-+	if (ret)
-+		l2cap_conn_put(conn);
-+
-+	return ret;
-+}
- 
- /* ---- L2CAP channels ---- */
- 
-@@ -1321,11 +1379,6 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
- 		cancel_delayed_work_sync(&conn->info_timer);
- 
--	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags)) {
--		cancel_delayed_work_sync(&conn->security_timer);
--		smp_chan_destroy(conn);
--	}
+-#ifdef STE_SAP_DEBUG
+-#define DBG_VERBOSE(fmt, arg...) DBG(fmt, arg)
+-#else
+-#define DBG_VERBOSE(fmt...)
+-#endif
 -
- 	hcon->l2cap_data = NULL;
- 	kfree(conn);
- }
-@@ -1333,9 +1386,9 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- static void security_timeout(struct work_struct *work)
+ #define sap_error(fmt, arg...) do { \
+ 	error("STE U8500 SAP: " fmt, ## arg); \
+ 	} while (0)
+@@ -264,7 +258,7 @@ static int send_message(GIOChannel *io, void *buf, size_t size)
  {
- 	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
--						security_timer.work);
-+					       security_timer.work);
+ 	gsize written;
  
--	l2cap_conn_del(conn->hcon, ETIMEDOUT);
-+	l2cap_conn_put(conn);
- }
+-	DBG_VERBOSE("io %p, size %zu", io, size);
++	SAP_VDBG("io %p, size %zu", io, size);
  
- static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
-@@ -1377,10 +1430,14 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+ 	if (g_io_channel_write_chars(io, buf, size, &written, NULL) !=
+ 							G_IO_STATUS_NORMAL)
+@@ -280,7 +274,7 @@ static int send_request(GIOChannel *io, uint16_t id,
+ 	struct ste_message *msg;
+ 	size_t size = sizeof(*msg);
  
- 	INIT_LIST_HEAD(&conn->chan_l);
+-	DBG_VERBOSE("io %p", io);
++	SAP_VDBG("io %p", io);
  
--	if (hcon->type == LE_LINK)
-+	kref_init(&conn->kref);
-+
-+	if (hcon->type == LE_LINK) {
-+		l2cap_conn_get(conn);
- 		INIT_DELAYED_WORK(&conn->security_timer, security_timeout);
--	else
-+	} else {
- 		INIT_DELAYED_WORK(&conn->info_timer, l2cap_info_timeout);
-+	}
+ 	if (param)
+ 		size += param->len;
+@@ -417,7 +411,7 @@ static void recv_response(struct ste_message *msg)
+ 	uint32_t status;
+ 	uint8_t *param;
  
- 	conn->disc_reason = HCI_ERROR_REMOTE_USER_TERM;
+-	DBG_VERBOSE("msg_id 0x%x", msg->id);
++	SAP_VDBG("msg_id 0x%x", msg->id);
  
-@@ -5286,8 +5343,10 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
- 		break;
+ 	if (msg->id == STE_END_SAP_RSP) {
+ 		sap_disconnect_rsp(u8500.sap_data);
+@@ -429,7 +423,7 @@ static void recv_response(struct ste_message *msg)
+ 	status = *(uint32_t *)param;
+ 	param += sizeof(status);
  
- 	case L2CAP_CID_SMP:
--		if (smp_sig_channel(conn, skb))
--			l2cap_conn_del(conn->hcon, EACCES);
-+		if (smp_sig_channel(conn, skb)) {
-+			l2cap_conn_clear_timer(conn, &conn->security_timer);
-+			l2cap_conn_put(conn);
-+		}
- 		break;
+-	DBG_VERBOSE("status 0x%x", status);
++	SAP_VDBG("status 0x%x", status);
  
- 	default:
-@@ -5331,7 +5390,7 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 	switch (msg->id) {
+ 	case STE_START_SAP_RSP:
+@@ -483,7 +477,7 @@ static int recv_message(void *buf, size_t size)
+ 	struct ste_message *msg = buf;
  
- int l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 	do {
+-		DBG_VERBOSE("size %zu msg->len %u.", size, msg->len);
++		SAP_VDBG("size %zu msg->len %u.", size, msg->len);
+ 
+ 		if (size < sizeof(*msg)) {
+ 			sap_error("invalid message received (%zu bytes)", size);
+@@ -641,7 +635,7 @@ void sap_transfer_apdu_req(void *sap_device, struct sap_parameter *param)
  {
--	struct l2cap_conn *conn;
-+	struct l2cap_conn *conn = hcon->l2cap_data;
+ 	uint8_t result;
  
- 	BT_DBG("hcon %p bdaddr %s status %d", hcon, batostr(&hcon->dst), status);
+-	DBG_VERBOSE("sap_device %p param %p", sap_device, param);
++	SAP_VDBG("sap_device %p param %p", sap_device, param);
  
-@@ -5339,8 +5398,12 @@ int l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- 		conn = l2cap_conn_add(hcon, status);
- 		if (conn)
- 			l2cap_conn_ready(conn);
--	} else
--		l2cap_conn_del(hcon, bt_to_errno(status));
-+	} else {
-+		if (hcon->type == LE_LINK)
-+			l2cap_conn_clear_timer(conn, &conn->security_timer);
+ 	if (u8500.state != STE_ENABLED) {
+ 		result = get_sap_result(STE_SEND_APDU_MSG, STE_STATUS_FAILURE);
+diff --git a/sap/sap.h b/sap/sap.h
+index a4d084e..5a98bad 100644
+--- a/sap/sap.h
++++ b/sap/sap.h
+@@ -26,6 +26,12 @@
+ #include <stdint.h>
+ #include <glib.h>
+ 
++#ifdef SAP_DEBUG
++#define SAP_VDBG(fmt, arg...) DBG(fmt, arg)
++#else
++#define SAP_VDBG(fmt...)
++#endif
 +
-+		l2cap_conn_put(conn);
-+	}
+ #define SAP_VERSION 0x0101
  
- 	return 0;
- }
-@@ -5358,9 +5421,14 @@ int l2cap_disconn_ind(struct hci_conn *hcon)
+ /* Connection Status - SAP v1.1 section 5.2.2 */
+diff --git a/sap/server.c b/sap/server.c
+index ec97b39..8612d0d 100644
+--- a/sap/server.c
++++ b/sap/server.c
+@@ -247,7 +247,7 @@ static int send_message(struct sap_connection *conn, void *buf, size_t size)
+ 	if (!conn || !buf)
+ 		return -EINVAL;
  
- int l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason)
+-	DBG("conn %p, size %zu", conn, size);
++	SAP_VDBG("conn %p, size %zu", conn, size);
+ 
+ 	gstatus = g_io_channel_write_chars(conn->io, buf, size, &written,
+ 									&gerr);
+@@ -389,7 +389,7 @@ static int disconnect_req(struct sap_connection *conn, uint8_t disc_type)
+ static void transfer_apdu_req(struct sap_connection *conn,
+ 					struct sap_parameter *param)
  {
-+	struct l2cap_conn *conn = hcon->l2cap_data;
- 	BT_DBG("hcon %p reason %d", hcon, reason);
+-	DBG("conn %p state %d", conn, conn->state);
++	SAP_VDBG("conn %p state %d", conn, conn->state);
  
--	l2cap_conn_del(hcon, bt_to_errno(reason));
-+	if (hcon->type == LE_LINK)
-+		l2cap_conn_clear_timer(conn, &conn->security_timer);
-+
-+	l2cap_conn_put(conn);
-+
- 	return 0;
- }
+ 	if (!param)
+ 		goto error_rsp;
+@@ -712,7 +712,7 @@ int sap_transfer_apdu_rsp(void *sap_device, uint8_t result, uint8_t *apdu,
+ 	if (!conn)
+ 		return -EINVAL;
  
-@@ -5393,7 +5461,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 	if (hcon->type == LE_LINK) {
- 		if (!status && encrypt)
- 			smp_distribute_keys(conn, 0);
--		cancel_delayed_work(&conn->security_timer);
-+
-+		l2cap_conn_clear_timer(conn, &conn->security_timer);
- 	}
+-	DBG("state %d pr 0x%02x", conn->state, conn->processing_req);
++	SAP_VDBG("state %d pr 0x%02x", conn->state, conn->processing_req);
  
- 	mutex_lock(&conn->chan_lock);
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index ff4835b..7aaf849 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -186,8 +186,7 @@ static void smp_send_cmd(struct l2cap_conn *conn, u8 code, u16 len, void *data)
- 	skb->priority = HCI_PRIO_MAX;
- 	hci_send_acl(conn->hchan, skb, 0);
+ 	if (conn->processing_req != SAP_TRANSFER_APDU_REQ)
+ 		return 0;
+@@ -1078,7 +1078,7 @@ static gboolean sap_io_cb(GIOChannel *io, GIOCondition cond, gpointer data)
+ 	GError *gerr = NULL;
+ 	GIOStatus gstatus;
  
--	cancel_delayed_work_sync(&conn->security_timer);
--	schedule_delayed_work(&conn->security_timer, SMP_TIMEOUT);
-+	l2cap_conn_set_timer(conn, &conn->security_timer, SMP_TIMEOUT);
- }
+-	DBG("conn %p io %p", conn, io);
++	SAP_VDBG("conn %p io %p", conn, io);
  
- static __u8 authreq_to_seclevel(__u8 authreq)
-@@ -268,7 +267,7 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason, u8 send)
- 			 hcon->dst_type, reason);
- 
- 	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
--		cancel_delayed_work_sync(&conn->security_timer);
-+		l2cap_conn_clear_timer(conn, &conn->security_timer);
- 		smp_chan_destroy(conn);
- 	}
- }
-@@ -996,7 +995,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
- 
- 	if (conn->hcon->out || force) {
- 		clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags);
--		cancel_delayed_work_sync(&conn->security_timer);
-+		l2cap_conn_clear_timer(conn, &conn->security_timer);
- 		smp_chan_destroy(conn);
- 	}
- 
+ 	if (cond & G_IO_NVAL) {
+ 		DBG("ERR (G_IO_NVAL) on rfcomm socket.");
 -- 
-1.7.9.5
+on behalf of ST-Ericsson
 
