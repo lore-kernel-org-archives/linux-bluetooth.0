@@ -1,50 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Fix deadlock and crash when SMP pairing times out
-Date: Wed,  6 Jun 2012 18:44:11 +0800
-Message-Id: <1338979451-15851-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1338979451-15851-1-git-send-email-johan.hedberg@gmail.com>
-References: <1338979451-15851-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: Fix SMP pairing method selection
+Date: Wed,  6 Jun 2012 18:44:10 +0800
+Message-Id: <1338979451-15851-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The l2cap_conn_del function tries to cancel_sync the security timer, but
-when it's called from the timeout function itself a deadlock occurs.
-Subsequently the "hcon->l2cap_data = NULL" that's supposed to protect
-multiple calls to l2cap_conn_del never gets cleared and when the
-connection finally drops we double free's etc which will crash the
-kernel.
-
-This patch fixes the issue by using the HCI_CONN_LE_SMP_PEND for
-protecting against this. The same flag is also used for the same purpose
-in other places in the SMP code.
+The tk_request function takes the local IO capability as the second last
+parameter and the remote IO capability as the first parameter. They were
+previously swapped: when we receive a pairing response
+req->io_capability contains the local one and rsp->io_capability the
+remote one.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c |    7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ net/bluetooth/smp.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f9bffe3..4ca8824 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1314,7 +1314,12 @@ static void security_timeout(struct work_struct *work)
- 	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
- 						security_timer.work);
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index ff4835b..1885697 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -649,7 +649,7 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
  
--	l2cap_conn_del(conn->hcon, ETIMEDOUT);
-+	BT_DBG("conn %p", conn);
-+
-+	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
-+		smp_chan_destroy(conn);
-+		l2cap_conn_del(conn->hcon, ETIMEDOUT);
-+	}
- }
+ 	auth |= (req->auth_req | rsp->auth_req) & SMP_AUTH_MITM;
  
- static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+-	ret = tk_request(conn, 0, auth, rsp->io_capability, req->io_capability);
++	ret = tk_request(conn, 0, auth, req->io_capability, rsp->io_capability);
+ 	if (ret)
+ 		return SMP_UNSPECIFIED;
+ 
 -- 
 1.7.10
 
