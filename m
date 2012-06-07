@@ -1,65 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vishal Agarwal <vishal.agarwal@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: <naresh.gupta@stericsson.com>,
-	Vishal Agarwal <vishal.agarwal@stericsson.com>
-Subject: [PATCH v2] Bluetooth: Fix LE pairing completion on connection failure
-Date: Thu, 7 Jun 2012 20:27:35 +0530
-Message-ID: <1339081055-23726-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20120607070339.GA11609@x220>
+References: <1339029663-25654-1-git-send-email-andre.guedes@openbossa.org>
+	<20120607070339.GA11609@x220>
+Date: Thu, 7 Jun 2012 09:13:33 -0400
+Message-ID: <CAJdJm_MeLGpgX9PfhaQCZon5Gg9wXFRRWGB8dXqoNx12uJcqZQ@mail.gmail.com>
+Subject: Re: [RFC 1/8] gattrib: Fix GAttrib buffer allocation
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For BR/EDR pairing is assumed to be finished when connection is
-done. For LE if connection is successful it did not necessarily
-mean that pairing is also done but if the connection is unsuccessful
-it should be assumed that pairing procedure is also finished.
-This patch registers a new function with connect_cfm_cb callback for
-LE link which sends the pairing complete signal to user space if
-connection is unsuccessful.
+Hi Johan,
 
-Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
----
- net/bluetooth/mgmt.c |   18 ++++++++++++++++++
- 1 files changed, 18 insertions(+), 0 deletions(-)
+On Thu, Jun 7, 2012 at 3:03 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> I've applied all patches as they look ok and the behavior can't get
+> much more broken than it was previously. I'll also continue testing them
+> at the UPF and do/propose additional fixes if necessary.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 958f764..ce97c37 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1873,6 +1873,22 @@ static void pairing_complete_cb(struct hci_conn *conn, u8 status)
- 		pairing_complete(cmd, mgmt_status(status));
- }
- 
-+static void le_connect_complete_cb(struct hci_conn *conn, u8 status)
-+{
-+	struct pending_cmd *cmd;
-+
-+	BT_DBG("status %u", status);
-+
-+	if (!status)
-+		return;
-+
-+	cmd = find_pairing(conn);
-+	if (!cmd)
-+		BT_DBG("Unable to find a pending command");
-+	else
-+		pairing_complete(cmd, mgmt_status(status));
-+}
-+
- static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 		       u16 len)
- {
-@@ -1941,6 +1957,8 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 	/* For LE, just connecting isn't a proof that the pairing finished */
- 	if (cp->addr.type == BDADDR_BREDR)
- 		conn->connect_cfm_cb = pairing_complete_cb;
-+	else
-+		conn->connect_cfm_cb = le_connect_complete_cb;
- 
- 	conn->security_cfm_cb = pairing_complete_cb;
- 	conn->disconn_cfm_cb = pairing_complete_cb;
+FWIW I reviewed the patches as well and didn't find any issues (only
+minor comments/recommendations on a single patch). We should at some
+point run the MTU tests on PTS to make sure they are passing (although
+the IOP tests on UPF are usually better).
+
+Regards,
 -- 
-1.7.0.4
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
