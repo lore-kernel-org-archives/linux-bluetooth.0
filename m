@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Add support for encryption key refresh
-Date: Thu,  7 Jun 2012 14:58:38 +0800
-Message-Id: <1339052318-11423-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: Fix SMP security elevation from medium to high
+Date: Thu,  7 Jun 2012 14:58:37 +0800
+Message-Id: <1339052318-11423-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1339052318-11423-1-git-send-email-johan.hedberg@gmail.com>
 References: <1339052318-11423-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,101 +11,57 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-With LE/SMP the completion of a security level elavation from medium to
-high is indicated by a HCI Encryption Key Refresh complete event. The
-necessary behavior upon receiving this event is a mix of what's done for
-auth_complete and encryption_change, which is also where most of the
-event handling code has been copied from.
+If we have an unauthenticated key it is not sufficient to acheive high
+security. Therefore, when deciding whether to encrypt the link or
+request pairing, it is essential to in addition to checking the
+existence of a key to also check whether it is authenticated or not.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci.h |    6 ++++++
- net/bluetooth/hci_event.c   |   48 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 54 insertions(+)
+ net/bluetooth/smp.c |    9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 3f5d682..2a6b0b8 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1195,6 +1195,12 @@ struct extended_inquiry_info {
- 	__u8     data[240];
- } __packed;
- 
-+#define HCI_EV_KEY_REFRESH_COMPLETE	0x30
-+struct hci_ev_key_refresh_complete {
-+	__u8	status;
-+	__le16	handle;
-+} __packed;
-+
- #define HCI_EV_IO_CAPA_REQUEST		0x31
- struct hci_ev_io_capa_request {
- 	bdaddr_t bdaddr;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 47656be..1ba929c 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3040,6 +3040,50 @@ static void hci_extended_inquiry_result_evt(struct hci_dev *hdev,
- 	hci_dev_unlock(hdev);
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 1885697..16ef0dc 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -704,7 +704,7 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	return 0;
  }
  
-+static void hci_key_refresh_complete_evt(struct hci_dev *hdev,
-+					 struct sk_buff *skb)
-+{
-+	struct hci_ev_key_refresh_complete *ev = (void *) skb->data;
-+	struct hci_conn *conn;
-+
-+	BT_DBG("%s status %u handle %u", hdev->name, ev->status,
-+	       __le16_to_cpu(ev->handle));
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
-+	if (!conn)
-+		goto unlock;
-+
-+	if (!ev->status)
-+		conn->sec_level = conn->pending_sec_level;
-+
-+	clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
-+
-+	if (ev->status && conn->state == BT_CONNECTED) {
-+		hci_acl_disconn(conn, HCI_ERROR_AUTH_FAILURE);
-+		hci_conn_put(conn);
-+		goto unlock;
-+	}
-+
-+	if (conn->state == BT_CONFIG) {
-+		if (!ev->status)
-+			conn->state = BT_CONNECTED;
-+
-+		hci_proto_connect_cfm(conn, ev->status);
-+		hci_conn_put(conn);
-+	} else {
-+		hci_auth_cfm(conn, ev->status);
-+
-+		hci_conn_hold(conn);
-+		conn->disc_timeout = HCI_DISCONN_TIMEOUT;
-+		hci_conn_put(conn);
-+	}
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+}
-+
- static u8 hci_get_auth_req(struct hci_conn *conn)
+-static u8 smp_ltk_encrypt(struct l2cap_conn *conn)
++static u8 smp_ltk_encrypt(struct l2cap_conn *conn, u8 sec_level)
  {
- 	/* If remote requests dedicated bonding follow that lead */
-@@ -3560,6 +3604,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_extended_inquiry_result_evt(hdev, skb);
- 		break;
+ 	struct smp_ltk *key;
+ 	struct hci_conn *hcon = conn->hcon;
+@@ -713,6 +713,9 @@ static u8 smp_ltk_encrypt(struct l2cap_conn *conn)
+ 	if (!key)
+ 		return 0;
  
-+	case HCI_EV_KEY_REFRESH_COMPLETE:
-+		hci_key_refresh_complete_evt(hdev, skb);
-+		break;
++	if (sec_level > BT_SECURITY_MEDIUM && !key->authenticated)
++		return 0;
 +
- 	case HCI_EV_IO_CAPA_REQUEST:
- 		hci_io_capa_request_evt(hdev, skb);
- 		break;
+ 	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->flags))
+ 		return 1;
+ 
+@@ -733,7 +736,7 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ 	hcon->pending_sec_level = authreq_to_seclevel(rp->auth_req);
+ 
+-	if (smp_ltk_encrypt(conn))
++	if (smp_ltk_encrypt(conn, hcon->pending_sec_level))
+ 		return 0;
+ 
+ 	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
+@@ -772,7 +775,7 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
+ 		return 1;
+ 
+ 	if (hcon->link_mode & HCI_LM_MASTER)
+-		if (smp_ltk_encrypt(conn))
++		if (smp_ltk_encrypt(conn, sec_level))
+ 			goto done;
+ 
+ 	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
 -- 
 1.7.10
 
