@@ -1,126 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vani-dineshbhai PATEL <vani.patel@stericsson.com>
-To: User Name <linux-bluetooth@vger.kernel.org>,
-	Luiz Augusto <luiz.dentz@gmail.com>,
-	Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: Vani <vani.patel@stericsson.com>,
-	Joohi <Joohi.rastogi@stericsson.com>, Vani <vani273@gmail.com>
-Subject: [PATCH BlueZ 1/5] AVRCP: Add TG Record to support AVRCP Browsing
-Date: Thu, 7 Jun 2012 17:00:39 +0530
-Message-ID: <1339068639-16701-1-git-send-email-vani.patel@stericsson.com>
+Date: Thu, 7 Jun 2012 17:18:25 +0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vishal Agarwal <vishal.agarwal@stericsson.com>
+Cc: linux-bluetooth@vger.kernel.org, naresh.gupta@stericsson.com
+Subject: Re: [PATCH v1] Bluetooth: Fix LE pairing completion on connection
+ failure
+Message-ID: <20120607091825.GA16592@x220.ccr.corp.intel.com>
+References: <1339025829-9414-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1339025829-9414-1-git-send-email-vishal.agarwal@stericsson.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Vani Patel <vani.patel@stericsson.com>
+Hi Vishal,
 
-Adds SDP record to support browsing
+On Thu, Jun 07, 2012, Vishal Agarwal wrote:
+> +static void le_connect_complete_cb(struct hci_conn *conn, u8 status)
+> +{
+> +	struct pending_cmd *cmd;
+> +
+> +	BT_DBG("status %u", status);
+> +
+> +	if (!status && conn->type == LE_LINK)
+> +		return;
 
----
- audio/avctp.c |    4 ++--
- audio/avctp.h |    3 ++-
- audio/avrcp.c |   26 ++++++++++++++++++++++----
- 3 files changed, 26 insertions(+), 7 deletions(-)
+The patch looks good to me except that this test for LE_LINK seems
+unnecessary since this callback is anyway only used for LE. Could you
+remove it?
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index ae3c04e..1ce9772 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -802,7 +802,7 @@ static GIOChannel *avctp_server_socket(const bdaddr_t *src, gboolean master)
- 	io = bt_io_listen(BT_IO_L2CAP, NULL, avctp_confirm_cb, NULL,
- 				NULL, &err,
- 				BT_IO_OPT_SOURCE_BDADDR, src,
--				BT_IO_OPT_PSM, AVCTP_PSM,
-+				BT_IO_OPT_PSM, AVCTP_CONTROL_PSM,
- 				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
- 				BT_IO_OPT_MASTER, master,
- 				BT_IO_OPT_INVALID);
-@@ -1087,7 +1087,7 @@ struct avctp *avctp_connect(const bdaddr_t *src, const bdaddr_t *dst)
- 	io = bt_io_connect(BT_IO_L2CAP, avctp_connect_cb, session, NULL, &err,
- 				BT_IO_OPT_SOURCE_BDADDR, &session->server->src,
- 				BT_IO_OPT_DEST_BDADDR, &session->dst,
--				BT_IO_OPT_PSM, AVCTP_PSM,
-+				BT_IO_OPT_PSM, AVCTP_CONTROL_PSM,
- 				BT_IO_OPT_INVALID);
- 	if (err) {
- 		avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
-diff --git a/audio/avctp.h b/audio/avctp.h
-index d0cbd97..34b0c1c 100644
---- a/audio/avctp.h
-+++ b/audio/avctp.h
-@@ -22,7 +22,8 @@
-  *
-  */
- 
--#define AVCTP_PSM 23
-+#define AVCTP_CONTROL_PSM	23
-+#define AVCTP_BROWSING_PSM	27
- 
- #define AVC_MTU 512
- #define AVC_HEADER_LENGTH 3
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 89ee112..2bbc7a3 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -188,7 +188,7 @@ static sdp_record_t *avrcp_ct_record(void)
- 	sdp_list_t *aproto, *proto[2];
- 	sdp_record_t *record;
- 	sdp_data_t *psm, *version, *features;
--	uint16_t lp = AVCTP_PSM;
-+	uint16_t lp = AVCTP_CONTROL_PSM;
- 	uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103;
- 	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
- 						AVRCP_FEATURE_CATEGORY_2 |
-@@ -250,13 +250,15 @@ static sdp_record_t *avrcp_ct_record(void)
- 
- static sdp_record_t *avrcp_tg_record(void)
- {
--	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root, *apseq_browsing;
- 	uuid_t root_uuid, l2cap, avctp, avrtg;
- 	sdp_profile_desc_t profile[1];
- 	sdp_list_t *aproto, *proto[2];
- 	sdp_record_t *record;
--	sdp_data_t *psm, *version, *features;
--	uint16_t lp = AVCTP_PSM;
-+	sdp_data_t *psm, *version, *features, *psm_browsing;
-+	sdp_list_t *aproto_browsing, *proto_browsing[2] = {0};
-+	uint16_t lp = AVCTP_CONTROL_PSM;
-+	uint16_t lp_browsing = AVCTP_BROWSING_PSM;
- 	uint16_t avrcp_ver = 0x0104, avctp_ver = 0x0103;
- 	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
- 					AVRCP_FEATURE_CATEGORY_2 |
-@@ -293,6 +295,18 @@ static sdp_record_t *avrcp_tg_record(void)
- 	aproto = sdp_list_append(0, apseq);
- 	sdp_set_access_protos(record, aproto);
- 
-+	proto_browsing[0] = sdp_list_append(0, &l2cap);
-+	psm_browsing = sdp_data_alloc(SDP_UINT16, &lp_browsing);
-+	proto_browsing[0] = sdp_list_append(proto_browsing[0], psm_browsing);
-+	apseq_browsing = sdp_list_append(0, proto_browsing[0]);
-+
-+	proto_browsing[1] = sdp_list_append(0, &avctp);
-+	proto_browsing[1] = sdp_list_append(proto_browsing[1], version);
-+	apseq_browsing = sdp_list_append(apseq_browsing, proto_browsing[1]);
-+
-+	aproto_browsing = sdp_list_append(0, apseq_browsing);
-+	sdp_set_add_access_protos(record, aproto_browsing);
-+
- 	/* Bluetooth Profile Descriptor List */
- 	sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_PROFILE_ID);
- 	profile[0].version = avrcp_ver;
-@@ -304,6 +318,10 @@ static sdp_record_t *avrcp_tg_record(void)
- 
- 	sdp_set_info_attr(record, "AVRCP TG", 0, 0);
- 
-+	free(psm_browsing);
-+	sdp_list_free(proto_browsing[0], 0);
-+	sdp_list_free(proto_browsing[1], 0);
-+	sdp_list_free(aproto_browsing, 0);
- 	free(psm);
- 	free(version);
- 	sdp_list_free(proto[0], 0);
--- 
-1.7.0.4
-
+Johan
