@@ -1,104 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1338998771-18683-2-git-send-email-michal.labedzki@tieto.com>
-References: <1338998771-18683-1-git-send-email-michal.labedzki@tieto.com>
-	<1338998771-18683-2-git-send-email-michal.labedzki@tieto.com>
-Date: Thu, 7 Jun 2012 11:27:05 +0300
-Message-ID: <CABBYNZK7SE-fSxPdyORsLDWiUa2nOvAr2tH2aERkDqqs144PLQ@mail.gmail.com>
-Subject: Re: [PATCH 02/13] AVRCP: Use name "addressed" instead of "active"
+In-Reply-To: <1338901391-17138-1-git-send-email-luiz.dentz@gmail.com>
+References: <1338901391-17138-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 7 Jun 2012 10:59:32 +0300
+Message-ID: <CABBYNZLDesT4RiYruts=Nz3jEP_MucPBj7W5=9Ed1e9=TNrccg@mail.gmail.com>
+Subject: Re: [PATCH obexd 00/23 v2] Change D-Bus namespace to org.bluez.obex
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michal Labedzki <michal.labedzki@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Hi,
 
-On Wed, Jun 6, 2012 at 7:06 PM, Michal Labedzki
-<michal.labedzki@tieto.com> wrote:
-> AVRCP 1.4 named currently controlled player as "addressed", so use
-> this name instead of "active". In future there where be more "browsing"
-> player that will be active, but not addressed.
-> ---
->  audio/avrcp.c |   12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+On Tue, Jun 5, 2012 at 4:02 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index 196d6a5..7576e19 100644
-> --- a/audio/avrcp.c
-> +++ b/audio/avrcp.c
-> @@ -199,7 +199,7 @@ struct avrcp_server {
->        uint32_t tg_record_id;
->        uint32_t ct_record_id;
->        GSList *players;
-> -       struct avrcp_player *active_player;
-> +       struct avrcp_player *addressed_player;
->  };
+> The following patches changes the namespace from org.openobex to
+> org.bluez.obex, getting rid of the last remaining references to openobex
+> dependency.
 >
->  struct pending_pdu {
-> @@ -1253,7 +1253,7 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
->        if (!server)
->                return;
+> This also serve as a fundation for the possible move of obexd inside BlueZ
+> repository.
 >
-> -       player = server->active_player;
-> +       player = server->addressed_player;
->        if (!player)
->                return;
+> v2: Fix invalid syntax on pbap-client
 >
-> @@ -1446,7 +1446,7 @@ struct avrcp_player *avrcp_register_player(const bdaddr_t *src,
->        player->destroy = destroy;
+> Luiz Augusto von Dentz (23):
+>  obexd-api: Change D-Bus namespace to org.bluez.obexd
+>  core: Change D-Bus namespace to org.bluez.obex
+>  core: Change D-Bus service file to use org.bluez.obex
+>  agent-api: Change D-Bus namespace to org.bluez.obexd
+>  core: Change agent interface to org.bluez.obex.Agent
+>  test: Use org.bluez.obex namespace in simple-agent script
+>  client-api: Change D-Bus namespace to org.bluez.obex.client
+>  client: Change namespace to org.bluez.obex.client
+>  client: Change D-Bus service file to use org.bluez.obex.client
+>  client-api: Rename session interface to org.bluez.obex.Session
+>  client-api: Rename ObjectPush interface to org.bluez.obex.ObjectPush
+>  client-api: Rename FileTransfer interface to
+>    org.bluez.obex.FileTransfer
+>  client-api: Rename PhonebookAccess interface to
+>    org.bluez.obex.PhonebookAccess
+>  client-api: Rename Synchronization interface to
+>    org.bluez.obex.Synchronization
+>  client-api: Rename MessageAccess interface to
+>    org.bluez.obex.MessageAccess
+>  client-api: Rename Transfer interface to org.bluez.obex.Transfer
+>  test: Use org.bluez.obex namespace in exchange-business-cards script
+>  test: Use org.bluez.obex namespace in list-folders script
+>  test: Use org.bluez.obex namespace in ftp-client script
+>  test: Use org.bluez.obex namespace in map-client script
+>  test: Use org.bluez.obex namespace in opp-client script
+>  test: Use org.bluez.obex namespace in pbap-client script
+>  test: Use org.bluez.obex namespace in get-capabilities script
 >
->        if (!server->players)
-> -               server->active_player = player;
-> +               server->addressed_player = player;
->
->        if (!avctp_id)
->                avctp_id = avctp_add_state_cb(state_changed, NULL);
-> @@ -1462,8 +1462,8 @@ void avrcp_unregister_player(struct avrcp_player *player)
->
->        server->players = g_slist_remove(server->players, player);
->
-> -       if (server->active_player == player)
-> -               server->active_player = g_slist_nth_data(server->players, 0);
-> +       if (server->addressed_player == player)
-> +               server->addressed_player = g_slist_nth_data(server->players, 0);
->
->        player_destroy(player);
->  }
-> @@ -1498,7 +1498,7 @@ int avrcp_set_volume(struct audio_device *dev, uint8_t volume)
->        if (server == NULL)
->                return -EINVAL;
->
-> -       player = server->active_player;
-> +       player = server->addressed_player;
->        if (player == NULL)
->                return -ENOTSUP;
+>  client/ftp.c                  |    2 +-
+>  client/manager.c              |    6 +++---
+>  client/map.c                  |    2 +-
+>  client/obex-client.service.in |    2 +-
+>  client/opp.c                  |    2 +-
+>  client/pbap.c                 |    2 +-
+>  client/session.c              |    4 ++--
+>  client/sync.c                 |    2 +-
+>  client/transfer.c             |    4 ++--
+>  doc/agent-api.txt             |    6 +++---
+>  doc/client-api.txt            |   30 ++++++++++++++---------------
+>  doc/obexd-api.txt             |   16 ++++++++--------
+>  plugins/syncevolution.c       |    3 +--
+>  src/manager.c                 |   42 ++++++++++++++++++++---------------------
+>  src/manager.h                 |    2 +-
+>  src/obexd.service.in          |    2 +-
+>  test/exchange-business-cards  |   11 +++++------
+>  test/ftp-client               |   27 +++++++++++++-------------
+>  test/get-capabilities         |    8 ++++----
+>  test/list-folders             |   10 +++++-----
+>  test/map-client               |   10 +++++-----
+>  test/opp-client               |   25 ++++++++++++------------
+>  test/pbap-client              |   38 +++++++++++++++++++++----------------
+>  test/simple-agent             |   37 ++++++++++++++++++------------------
+>  24 files changed, 149 insertions(+), 144 deletions(-)
 >
 > --
-> on behalf of ST-Ericsson
+> 1.7.10.2
 
+This changes are now upstream.
 
-The concept of active and addressed are a bit different, the active
-means the player can be addressed but not necessary in use, this is to
-allow bluetoothd to control the addressed player without another
-component setting it. Iirc I have said this before in irc, but Im not
-sure if was you or someone else, we can detect if a player is active
-e.g by checking its status, this way we can probably pick the first
-player active so they don't have to compete to set themselves as
-addressed or anything like that, then if the player is stopped/become
-inactive we can pick the next active, same goes if the remote device
-change the addressed player we just change it, the player or other
-components don't need to know about the details of which is being
-addressed.
-
-Btw, do you realize that addressed player is controlled by the remote
-device, as far audio is concern it can be mixed with several different
-playbacks in the same stream, so it more a matter of which player's
-metadata the remote would like to display, which is probably idiotic
-since you limit the events and commands to only the addressed and push
-some complexity to the target where it could just have the signalling
-working to as many as the controller can handle.
 
 -- 
 Luiz Augusto von Dentz
