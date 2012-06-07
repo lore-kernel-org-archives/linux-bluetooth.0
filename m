@@ -1,27 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4FD111EB.8070307@shapeseeker.com>
-Date: Thu, 07 Jun 2012 21:41:15 +0100
-From: Brian Smith <door@shapeseeker.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Small Patch for scotest.c
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <CAJdJm_PoOtX2rp2zYs1Jeg-J855NwTvj36iVq=YRuHwVd-5o2g@mail.gmail.com>
+References: <1339029663-25654-1-git-send-email-andre.guedes@openbossa.org>
+	<1339029663-25654-2-git-send-email-andre.guedes@openbossa.org>
+	<CAJdJm_PoOtX2rp2zYs1Jeg-J855NwTvj36iVq=YRuHwVd-5o2g@mail.gmail.com>
+Date: Thu, 7 Jun 2012 17:13:23 -0300
+Message-ID: <CACJA=fUuAHQFz1X23gMxXcLnRxpLgf_Mxfr6XeOce5NBfGmYrw@mail.gmail.com>
+Subject: Re: [RFC 2/8] gattrib: Fix g_attrib_set_mtu
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi there.
-Here is a tiny 3-line patch to scotest.c to get it working. (I've been 
-trying to get bluez working on a Raspberry Pi, hitting USB problems, 
-having a workng scotest is helpful). The problem is that bdaddr never 
-gets initialized and tends to have random data in it, preventing the 
-client/server end from matching up.
+Hi Lizardo,
 
-344a345,346
- >       hci_devba(0, &bdaddr);
- >
+On Wed, Jun 6, 2012 at 10:26 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Andre,
+>
+> On Wed, Jun 6, 2012 at 8:40 PM, Andre Guedes <andre.guedes@openbossa.org> wrote:
+>> 23 octets is the default (and minimum) ATT_MTU value. If someone tries
+>> to set ATT_MTU less than 23 octets g_attrib_set_mtu should fail (return
+>> FALSE). Additionally, there is no constraint regarding the maximum value
+>> of ATT_MTU, so we should not check for it.
+>
+> Even though the spec does not mention a maximum ATT_MTU, we now need
+> to review and fix the ATT operations that mention limits on their PDU
+> (now that we removed the "artificial" 256 octect limit). Some I found:
 
+Yes, we're working on that.
 
--- 
-Brian Smith.
-"The bells of clocktowers stitch the sleeper's dreams together." - Memory Palace
+> Also, what will happen to the ATT_MTU_MAX definition? Is it still
+> being used in other places?
 
+Yes, we use ATT_MTU_MAX to allocate opdu buffers, but we should
+replace ATT_MTU_MAX by the current ATT_MTU.
+
+BR,
+
+Andre
