@@ -2,54 +2,42 @@ Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <aguedespe@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: andre.guedes@openbossa.org
-Subject: [PATCH 3/3] Bluetooth: Use GFP_KERNEL in mgmt events functions
-Date: Thu,  7 Jun 2012 19:05:46 -0300
-Message-Id: <1339106746-22886-3-git-send-email-aguedespe@gmail.com>
-In-Reply-To: <1339106746-22886-1-git-send-email-aguedespe@gmail.com>
-References: <1339106746-22886-1-git-send-email-aguedespe@gmail.com>
+Subject: [PATCH 1/3] Bluetooth: Use GFP_KERNEL in mgmt_handlers
+Date: Thu,  7 Jun 2012 19:05:44 -0300
+Message-Id: <1339106746-22886-1-git-send-email-aguedespe@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-cmd_status, cmd_complete and mgmt_event functions are executed in
-process context and they are not called inside atomic sections. Thus,
-they should use GFP_KERNEL for memory allocation instead of GFP_ATOMIC.
+add_uuid and get_connections mgmt_handlers are executed by user
+threads running in kernel-mode.
 
 Signed-off-by: Andre Guedes <aguedespe@gmail.com>
 ---
- net/bluetooth/mgmt.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ net/bluetooth/mgmt.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9a56b64..2575389 100644
+index 958f764..8c7a6f9 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -210,7 +210,7 @@ static int cmd_status(struct sock *sk, u16 index, u16 cmd, u8 status)
+@@ -1268,7 +1268,7 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 		goto failed;
+ 	}
  
- 	BT_DBG("sock %p, index %u, cmd %u, status %u", sk, index, cmd, status);
+-	uuid = kmalloc(sizeof(*uuid), GFP_ATOMIC);
++	uuid = kmalloc(sizeof(*uuid), GFP_KERNEL);
+ 	if (!uuid) {
+ 		err = -ENOMEM;
+ 		goto failed;
+@@ -1667,7 +1667,7 @@ static int get_connections(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
  
--	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev), GFP_ATOMIC);
-+	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev), GFP_KERNEL);
- 	if (!skb)
- 		return -ENOMEM;
- 
-@@ -241,7 +241,7 @@ static int cmd_complete(struct sock *sk, u16 index, u16 cmd, u8 status,
- 
- 	BT_DBG("sock %p", sk);
- 
--	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev) + rp_len, GFP_ATOMIC);
-+	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev) + rp_len, GFP_KERNEL);
- 	if (!skb)
- 		return -ENOMEM;
- 
-@@ -812,7 +812,7 @@ static int mgmt_event(u16 event, struct hci_dev *hdev, void *data, u16 data_len,
- 	struct sk_buff *skb;
- 	struct mgmt_hdr *hdr;
- 
--	skb = alloc_skb(sizeof(*hdr) + data_len, GFP_ATOMIC);
-+	skb = alloc_skb(sizeof(*hdr) + data_len, GFP_KERNEL);
- 	if (!skb)
- 		return -ENOMEM;
- 
+ 	rp_len = sizeof(*rp) + (i * sizeof(struct mgmt_addr_info));
+-	rp = kmalloc(rp_len, GFP_ATOMIC);
++	rp = kmalloc(rp_len, GFP_KERNEL);
+ 	if (!rp) {
+ 		err = -ENOMEM;
+ 		goto unlock;
 -- 
 1.7.10.3
 
