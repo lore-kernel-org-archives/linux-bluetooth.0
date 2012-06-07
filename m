@@ -1,41 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Jun 2012 16:43:43 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: vishal agarwal <vishal.bluez@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC] Behaviour when LTK is generated as a slave
-Message-ID: <20120607194343.GA10551@echo>
-References: <CA+_sZW_d7hZFvko1eaJJeDsV+QBohx12jgUoGwe=Uu9gCCpZEQ@mail.gmail.com>
+Date: Thu, 7 Jun 2012 23:44:17 +0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Ido Yariv <ido@wizery.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] attrib-server: Fix multiple channels detaching mix-up
+Message-ID: <20120607154417.GC25119@x220.docomointertouch.net>
+References: <1338322808-15503-1-git-send-email-ido@wizery.com>
+ <20120530073701.GB6539@x220>
+ <20120530183227.GA16709@WorkStation.localnet>
+ <20120606091758.GA12782@WorkStation.localnet>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CA+_sZW_d7hZFvko1eaJJeDsV+QBohx12jgUoGwe=Uu9gCCpZEQ@mail.gmail.com>
+In-Reply-To: <20120606091758.GA12782@WorkStation.localnet>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vishal,
+Hi Ido,
 
-On 11:08 Thu 07 Jun, vishal agarwal wrote:
-> Hi Vinicius,
+On Wed, Jun 06, 2012, Ido Yariv wrote:
+> On Wed, May 30, 2012 at 09:32:27PM +0300, Ido Yariv wrote:
+> > From 78254bb099f80ad38e10075fbb73a4d990217630 Mon Sep 17 00:00:00 2001
+> > From: Ido Yariv <ido@wizery.com>
+> > Date: Tue, 29 May 2012 21:11:16 +0300
+> > Subject: [PATCH v2] attrib-server: Fix multiple channels detaching mix-up
+> > 
+> > The identifier returned by g_attrib_register is not unique across
+> > different channels. Since attrib_channel_detach assumes this identifier
+> > to be unique, it may end up detaching the wrong channel when a device
+> > disconnects.
+> > 
+> > Fix this by using the channel's pointer as a unique identifier for
+> > detaching the channel. The identifier returned from g_attrib_register
+> > will still be used to find the relevant event structure.
 > 
-> In file mgmtops.c in function mgmt_new_ltk, function bonding_complete
-> is called only if ev->key.master is true.
-> It means that as a slave when LTK is generated bonding_complete
-> function will not be called. Is it intended? If so please help me in
-> understanding this behaviour.
+> Any thoughts about this one?
 
-Yes, it is intended. The purpose of that "master" field is to inform the
-"direction" of the key.
+I don't really like the idea of returning a pointer (even though an
+opaque one) to code that shouldn't have access to data behind that
+pointer. Could we instead just make this really simple by removing
+attrib->next_evt_id and adding a static guint variable into the
+g_attrib_register function?
 
-For now, that we can only assume the Master role of LE connections, that check
-may be kept simple as that. When we are able to support LE single mode
-adapters (I don't know if it makes sense) that check may need some 
-re-thinking.
-
-> 
-> Thanks
-> Vishal
-
-
-Cheers,
--- 
-Vinicius
+Johan
