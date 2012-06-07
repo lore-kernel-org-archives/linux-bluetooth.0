@@ -1,111 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Paulo Alcantara <paulo.alcantara@openbossa.org>
+From: Andre Guedes <aguedespe@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH] Bluetooth: Report correct error codes on disconnect
-Date: Fri,  8 Jun 2012 00:55:13 -0300
-Message-Id: <1339127713-19325-1-git-send-email-paulo.alcantara@openbossa.org>
+Cc: andre.guedes@openbossa.org
+Subject: [PATCH 3/3] Bluetooth: Use GFP_KERNEL in mgmt events functions
+Date: Thu,  7 Jun 2012 19:05:46 -0300
+Message-Id: <1339106746-22886-3-git-send-email-aguedespe@gmail.com>
+In-Reply-To: <1339106746-22886-1-git-send-email-aguedespe@gmail.com>
+References: <1339106746-22886-1-git-send-email-aguedespe@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When sending LE start encryption command to the target device that hasn't
-any long-term key, its controller will send a LE change event with status
-0x06 (PIN or Key missing), as it is asynchronous event just sent after
-the LE command status, the LE disconnect complete event was overwriting
-this error code with its error code, thus user space was getting the
-unexpected error code.
+cmd_status, cmd_complete and mgmt_event functions are executed in
+process context and they are not called inside atomic sections. Thus,
+they should use GFP_KERNEL for memory allocation instead of GFP_ATOMIC.
 
-This patch fixes the exposing of error codes sent from LE change events
-to user space on disconnect ones by setting them early in disc_reason so
-that hci_disconn_complete_evt() function can decide which error code to
-use by checking disc_reason at the lower layer. If the disc_reason is 0,
-then hci_disconn_complete_evt() needs to use the event status instead.
-
-Signed-off-by: Paulo Alcantara <paulo.alcantara@openbossa.org>
+Signed-off-by: Andre Guedes <aguedespe@gmail.com>
 ---
- include/net/bluetooth/hci_core.h |    6 ++++++
- net/bluetooth/hci_event.c        |   13 +++++++++++--
- net/bluetooth/l2cap_core.c       |   10 ++++++++++
- 3 files changed, 27 insertions(+), 2 deletions(-)
+ net/bluetooth/mgmt.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 20fd573..5d98ae0 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -358,6 +358,7 @@ extern rwlock_t hci_cb_list_lock;
- extern int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
- extern int l2cap_connect_cfm(struct hci_conn *hcon, u8 status);
- extern int l2cap_disconn_ind(struct hci_conn *hcon);
-+extern void l2cap_set_disconn_reason(struct hci_conn *hcon, u8 reason);
- extern int l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason);
- extern int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt);
- extern int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb,
-@@ -781,6 +782,11 @@ static inline int hci_proto_disconn_ind(struct hci_conn *conn)
- 	return l2cap_disconn_ind(conn);
- }
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 9a56b64..2575389 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -210,7 +210,7 @@ static int cmd_status(struct sock *sk, u16 index, u16 cmd, u8 status)
  
-+static inline void hci_set_disconn_reason(struct hci_conn *hconn, __u8 reason)
-+{
-+	l2cap_set_disconn_reason(hconn, reason);
-+}
-+
- static inline void hci_proto_disconn_cfm(struct hci_conn *conn, __u8 reason)
- {
- 	switch (conn->type) {
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 47656be..2c7e4a7 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1915,9 +1915,17 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	}
+ 	BT_DBG("sock %p, index %u, cmd %u, status %u", sk, index, cmd, status);
  
- 	if (ev->status == 0) {
-+		__u8 reason;
-+
- 		if (conn->type == ACL_LINK && conn->flush_key)
- 			hci_remove_link_key(hdev, &conn->dst);
--		hci_proto_disconn_cfm(conn, ev->reason);
-+
-+		reason = hci_proto_disconn_ind(conn);
-+		if (reason)
-+			hci_proto_disconn_cfm(conn, reason);
-+		else
-+			hci_proto_disconn_cfm(conn, ev->reason);
-+
- 		hci_conn_del(conn);
- 	}
+-	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev), GFP_ATOMIC);
++	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev), GFP_KERNEL);
+ 	if (!skb)
+ 		return -ENOMEM;
  
-@@ -2054,7 +2062,8 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
+@@ -241,7 +241,7 @@ static int cmd_complete(struct sock *sk, u16 index, u16 cmd, u8 status,
  
- 		if (ev->status && conn->state == BT_CONNECTED) {
--			hci_acl_disconn(conn, HCI_ERROR_AUTH_FAILURE);
-+			hci_set_disconn_reason(conn, ev->status);
-+			hci_acl_disconn(conn, ev->status);
- 			hci_conn_put(conn);
- 			goto unlock;
- 		}
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f9bffe3..f2d16e0 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5335,6 +5335,16 @@ int l2cap_disconn_ind(struct hci_conn *hcon)
- 	return conn->disc_reason;
- }
+ 	BT_DBG("sock %p", sk);
  
-+void l2cap_set_disconn_reason(struct hci_conn *hcon, u8 reason)
-+{
-+	struct l2cap_conn *conn = hcon->l2cap_data;
-+
-+	BT_DBG("hcon %p reason %d", hcon, reason);
-+
-+	if (conn)
-+		conn->disc_reason = reason;
-+}
-+
- int l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason)
- {
- 	BT_DBG("hcon %p reason %d", hcon, reason);
+-	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev) + rp_len, GFP_ATOMIC);
++	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev) + rp_len, GFP_KERNEL);
+ 	if (!skb)
+ 		return -ENOMEM;
+ 
+@@ -812,7 +812,7 @@ static int mgmt_event(u16 event, struct hci_dev *hdev, void *data, u16 data_len,
+ 	struct sk_buff *skb;
+ 	struct mgmt_hdr *hdr;
+ 
+-	skb = alloc_skb(sizeof(*hdr) + data_len, GFP_ATOMIC);
++	skb = alloc_skb(sizeof(*hdr) + data_len, GFP_KERNEL);
+ 	if (!skb)
+ 		return -ENOMEM;
+ 
 -- 
-1.7.10.2
+1.7.10.3
 
