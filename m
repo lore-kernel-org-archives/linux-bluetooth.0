@@ -1,43 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 7 Jun 2012 16:43:43 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: vishal agarwal <vishal.bluez@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC] Behaviour when LTK is generated as a slave
+Message-ID: <20120607194343.GA10551@echo>
+References: <CA+_sZW_d7hZFvko1eaJJeDsV+QBohx12jgUoGwe=Uu9gCCpZEQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_PoOtX2rp2zYs1Jeg-J855NwTvj36iVq=YRuHwVd-5o2g@mail.gmail.com>
-References: <1339029663-25654-1-git-send-email-andre.guedes@openbossa.org>
-	<1339029663-25654-2-git-send-email-andre.guedes@openbossa.org>
-	<CAJdJm_PoOtX2rp2zYs1Jeg-J855NwTvj36iVq=YRuHwVd-5o2g@mail.gmail.com>
-Date: Thu, 7 Jun 2012 17:13:23 -0300
-Message-ID: <CACJA=fUuAHQFz1X23gMxXcLnRxpLgf_Mxfr6XeOce5NBfGmYrw@mail.gmail.com>
-Subject: Re: [RFC 2/8] gattrib: Fix g_attrib_set_mtu
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CA+_sZW_d7hZFvko1eaJJeDsV+QBohx12jgUoGwe=Uu9gCCpZEQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Vishal,
 
-On Wed, Jun 6, 2012 at 10:26 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Andre,
->
-> On Wed, Jun 6, 2012 at 8:40 PM, Andre Guedes <andre.guedes@openbossa.org> wrote:
->> 23 octets is the default (and minimum) ATT_MTU value. If someone tries
->> to set ATT_MTU less than 23 octets g_attrib_set_mtu should fail (return
->> FALSE). Additionally, there is no constraint regarding the maximum value
->> of ATT_MTU, so we should not check for it.
->
-> Even though the spec does not mention a maximum ATT_MTU, we now need
-> to review and fix the ATT operations that mention limits on their PDU
-> (now that we removed the "artificial" 256 octect limit). Some I found:
+On 11:08 Thu 07 Jun, vishal agarwal wrote:
+> Hi Vinicius,
+> 
+> In file mgmtops.c in function mgmt_new_ltk, function bonding_complete
+> is called only if ev->key.master is true.
+> It means that as a slave when LTK is generated bonding_complete
+> function will not be called. Is it intended? If so please help me in
+> understanding this behaviour.
 
-Yes, we're working on that.
+Yes, it is intended. The purpose of that "master" field is to inform the
+"direction" of the key.
 
-> Also, what will happen to the ATT_MTU_MAX definition? Is it still
-> being used in other places?
+For now, that we can only assume the Master role of LE connections, that check
+may be kept simple as that. When we are able to support LE single mode
+adapters (I don't know if it makes sense) that check may need some 
+re-thinking.
 
-Yes, we use ATT_MTU_MAX to allocate opdu buffers, but we should
-replace ATT_MTU_MAX by the current ATT_MTU.
+> 
+> Thanks
+> Vishal
 
-BR,
 
-Andre
+Cheers,
+-- 
+Vinicius
