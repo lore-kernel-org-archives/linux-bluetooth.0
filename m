@@ -1,249 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1] Bluetooth: Add refcnt to l2cap_conn
-Date: Thu,  7 Jun 2012 10:04:57 +0300
-Message-Id: <1339052697-1193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1338992552-27895-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1338992552-27895-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/2] Bluetooth: Add support for encryption key refresh
+Date: Thu,  7 Jun 2012 14:58:38 +0800
+Message-Id: <1339052318-11423-3-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1339052318-11423-1-git-send-email-johan.hedberg@gmail.com>
+References: <1339052318-11423-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Adding kref to l2cap_conn helps to better handle racing when deleting
-l2cap_conn. Races are created when deleting conn from timeout and from
-the other execution path.
+With LE/SMP the completion of a security level elavation from medium to
+high is indicated by a HCI Encryption Key Refresh complete event. The
+necessary behavior upon receiving this event is a mix of what's done for
+auth_complete and encryption_change, which is also where most of the
+event handling code has been copied from.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
-	PATCHv1: fixes issues with LE
+ include/net/bluetooth/hci.h |    6 ++++++
+ net/bluetooth/hci_event.c   |   48 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 54 insertions(+)
 
- include/net/bluetooth/l2cap.h |    6 +++
- net/bluetooth/l2cap_core.c    |   94 +++++++++++++++++++++++++++++++++++------
- net/bluetooth/smp.c           |    7 ++-
- 3 files changed, 91 insertions(+), 16 deletions(-)
-
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 3d31ecd..5abfe8a 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -572,6 +572,8 @@ struct l2cap_conn {
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 3f5d682..2a6b0b8 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1195,6 +1195,12 @@ struct extended_inquiry_info {
+ 	__u8     data[240];
+ } __packed;
  
- 	struct list_head	chan_l;
- 	struct mutex		chan_lock;
++#define HCI_EV_KEY_REFRESH_COMPLETE	0x30
++struct hci_ev_key_refresh_complete {
++	__u8	status;
++	__le16	handle;
++} __packed;
 +
-+	struct kref		kref;
- };
+ #define HCI_EV_IO_CAPA_REQUEST		0x31
+ struct hci_ev_io_capa_request {
+ 	bdaddr_t bdaddr;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 47656be..1ba929c 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3040,6 +3040,50 @@ static void hci_extended_inquiry_result_evt(struct hci_dev *hdev,
+ 	hci_dev_unlock(hdev);
+ }
  
- #define L2CAP_INFO_CL_MTU_REQ_SENT	0x01
-@@ -779,5 +781,9 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan);
- int l2cap_ertm_init(struct l2cap_chan *chan);
- void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
- void l2cap_chan_del(struct l2cap_chan *chan, int err);
-+void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
-+			  long timeout);
-+bool l2cap_conn_clear_timer(struct l2cap_conn *conn,
-+			    struct delayed_work *work);
- 
- #endif /* __L2CAP_H */
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index eb7094c..d8c320b 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -57,6 +57,64 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
- 
- static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
- 		    struct sk_buff_head *skbs, u8 event);
-+static void l2cap_conn_del(struct hci_conn *hcon, int err);
-+
-+/* ---- L2CAP connections ---- */
-+
-+static void l2cap_conn_get(struct l2cap_conn *conn)
++static void hci_key_refresh_complete_evt(struct hci_dev *hdev,
++					 struct sk_buff *skb)
 +{
-+	BT_DBG("conn %p", conn);
++	struct hci_ev_key_refresh_complete *ev = (void *) skb->data;
++	struct hci_conn *conn;
 +
-+	kref_get(&conn->kref);
-+}
++	BT_DBG("%s status %u handle %u", hdev->name, ev->status,
++	       __le16_to_cpu(ev->handle));
 +
-+static void l2cap_conn_destroy(struct kref *kref)
-+{
-+	struct l2cap_conn *conn = container_of(kref, struct l2cap_conn, kref);
++	hci_dev_lock(hdev);
 +
-+	BT_DBG("conn %p", conn);
-+
-+	l2cap_conn_del(conn->hcon, 0);
-+}
-+
-+static int l2cap_conn_put(struct l2cap_conn *conn)
-+{
-+	BT_DBG("conn %p", conn);
-+
-+	/* conn might be NULL, was checked before in l2cap_conn_del */
++	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
 +	if (!conn)
-+		return 1;
++		goto unlock;
 +
-+	return kref_put(&conn->kref, &l2cap_conn_destroy);
-+}
++	if (!ev->status)
++		conn->sec_level = conn->pending_sec_level;
 +
-+void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
-+			  long timeout)
-+{
-+	BT_DBG("conn %p timeout %ld", conn, timeout);
++	clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
 +
-+	/* If delayed work cancelled do not hold(conn)
-+	   since it is already done with previous set_timer */
-+	if (!cancel_delayed_work(work))
-+		l2cap_conn_get(conn);
-+
-+	schedule_delayed_work(work, timeout);
-+}
-+
-+bool l2cap_conn_clear_timer(struct l2cap_conn *conn, struct delayed_work *work)
-+{
-+	bool ret;
-+
-+	BT_DBG("conn %p", conn);
-+
-+	/* put(conn) if delayed work cancelled otherwise it
-+	   is done in delayed work function */
-+	ret = cancel_delayed_work(work);
-+	if (ret)
-+		l2cap_conn_put(conn);
-+
-+	return ret;
-+}
- 
- /* ---- L2CAP channels ---- */
- 
-@@ -1321,10 +1379,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
- 		cancel_delayed_work_sync(&conn->info_timer);
- 
--	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags)) {
--		cancel_delayed_work_sync(&conn->security_timer);
-+	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
- 		smp_chan_destroy(conn);
--	}
- 
- 	hcon->l2cap_data = NULL;
- 	kfree(conn);
-@@ -1333,9 +1389,9 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- static void security_timeout(struct work_struct *work)
- {
- 	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
--						security_timer.work);
-+					       security_timer.work);
- 
--	l2cap_conn_del(conn->hcon, ETIMEDOUT);
-+	l2cap_conn_put(conn);
- }
- 
- static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
-@@ -1377,6 +1433,8 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
- 
- 	INIT_LIST_HEAD(&conn->chan_l);
- 
-+	kref_init(&conn->kref);
-+
- 	if (hcon->type == LE_LINK)
- 		INIT_DELAYED_WORK(&conn->security_timer, security_timeout);
- 	else
-@@ -5286,8 +5344,10 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
- 		break;
- 
- 	case L2CAP_CID_SMP:
--		if (smp_sig_channel(conn, skb))
--			l2cap_conn_del(conn->hcon, EACCES);
-+		if (smp_sig_channel(conn, skb)) {
-+			l2cap_conn_clear_timer(conn, &conn->security_timer);
-+			l2cap_conn_put(conn);
-+		}
- 		break;
- 
- 	default:
-@@ -5331,7 +5391,7 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
- 
- int l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- {
--	struct l2cap_conn *conn;
-+	struct l2cap_conn *conn = hcon->l2cap_data;
- 
- 	BT_DBG("hcon %p bdaddr %s status %d", hcon, batostr(&hcon->dst), status);
- 
-@@ -5339,8 +5399,12 @@ int l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- 		conn = l2cap_conn_add(hcon, status);
- 		if (conn)
- 			l2cap_conn_ready(conn);
--	} else
--		l2cap_conn_del(hcon, bt_to_errno(status));
-+	} else {
-+		if (hcon->type == LE_LINK)
-+			l2cap_conn_clear_timer(conn, &conn->security_timer);
-+
-+		l2cap_conn_put(conn);
++	if (ev->status && conn->state == BT_CONNECTED) {
++		hci_acl_disconn(conn, HCI_ERROR_AUTH_FAILURE);
++		hci_conn_put(conn);
++		goto unlock;
 +	}
- 
- 	return 0;
- }
-@@ -5358,9 +5422,14 @@ int l2cap_disconn_ind(struct hci_conn *hcon)
- 
- int l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason)
++
++	if (conn->state == BT_CONFIG) {
++		if (!ev->status)
++			conn->state = BT_CONNECTED;
++
++		hci_proto_connect_cfm(conn, ev->status);
++		hci_conn_put(conn);
++	} else {
++		hci_auth_cfm(conn, ev->status);
++
++		hci_conn_hold(conn);
++		conn->disc_timeout = HCI_DISCONN_TIMEOUT;
++		hci_conn_put(conn);
++	}
++
++unlock:
++	hci_dev_unlock(hdev);
++}
++
+ static u8 hci_get_auth_req(struct hci_conn *conn)
  {
-+	struct l2cap_conn *conn = hcon->l2cap_data;
- 	BT_DBG("hcon %p reason %d", hcon, reason);
+ 	/* If remote requests dedicated bonding follow that lead */
+@@ -3560,6 +3604,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_extended_inquiry_result_evt(hdev, skb);
+ 		break;
  
--	l2cap_conn_del(hcon, bt_to_errno(reason));
-+	if (hcon->type == LE_LINK)
-+		l2cap_conn_clear_timer(conn, &conn->security_timer);
++	case HCI_EV_KEY_REFRESH_COMPLETE:
++		hci_key_refresh_complete_evt(hdev, skb);
++		break;
 +
-+	l2cap_conn_put(conn);
-+
- 	return 0;
- }
- 
-@@ -5393,7 +5462,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 	if (hcon->type == LE_LINK) {
- 		if (!status && encrypt)
- 			smp_distribute_keys(conn, 0);
--		cancel_delayed_work(&conn->security_timer);
-+
-+		l2cap_conn_clear_timer(conn, &conn->security_timer);
- 	}
- 
- 	mutex_lock(&conn->chan_lock);
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index ff4835b..7aaf849 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -186,8 +186,7 @@ static void smp_send_cmd(struct l2cap_conn *conn, u8 code, u16 len, void *data)
- 	skb->priority = HCI_PRIO_MAX;
- 	hci_send_acl(conn->hchan, skb, 0);
- 
--	cancel_delayed_work_sync(&conn->security_timer);
--	schedule_delayed_work(&conn->security_timer, SMP_TIMEOUT);
-+	l2cap_conn_set_timer(conn, &conn->security_timer, SMP_TIMEOUT);
- }
- 
- static __u8 authreq_to_seclevel(__u8 authreq)
-@@ -268,7 +267,7 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason, u8 send)
- 			 hcon->dst_type, reason);
- 
- 	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
--		cancel_delayed_work_sync(&conn->security_timer);
-+		l2cap_conn_clear_timer(conn, &conn->security_timer);
- 		smp_chan_destroy(conn);
- 	}
- }
-@@ -996,7 +995,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
- 
- 	if (conn->hcon->out || force) {
- 		clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags);
--		cancel_delayed_work_sync(&conn->security_timer);
-+		l2cap_conn_clear_timer(conn, &conn->security_timer);
- 		smp_chan_destroy(conn);
- 	}
- 
+ 	case HCI_EV_IO_CAPA_REQUEST:
+ 		hci_io_capa_request_evt(hdev, skb);
+ 		break;
 -- 
-1.7.9.5
+1.7.10
 
