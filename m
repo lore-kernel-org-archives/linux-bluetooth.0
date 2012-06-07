@@ -1,44 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Jun 2012 23:44:17 +0800
+Date: Thu, 7 Jun 2012 23:35:29 +0800
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ido Yariv <ido@wizery.com>
+To: Szymon Janc <szymon@janc.net.pl>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] attrib-server: Fix multiple channels detaching mix-up
-Message-ID: <20120607154417.GC25119@x220.docomointertouch.net>
-References: <1338322808-15503-1-git-send-email-ido@wizery.com>
- <20120530073701.GB6539@x220>
- <20120530183227.GA16709@WorkStation.localnet>
- <20120606091758.GA12782@WorkStation.localnet>
+Subject: Re: [PATCH] btmgmt: Fix use after free in mgmt_check_pending
+Message-ID: <20120607153529.GB25119@x220.docomointertouch.net>
+References: <1339011503-28756-1-git-send-email-szymon@janc.net.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120606091758.GA12782@WorkStation.localnet>
+In-Reply-To: <1339011503-28756-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ido,
+Hi Szymon,
 
-On Wed, Jun 06, 2012, Ido Yariv wrote:
-> On Wed, May 30, 2012 at 09:32:27PM +0300, Ido Yariv wrote:
-> > From 78254bb099f80ad38e10075fbb73a4d990217630 Mon Sep 17 00:00:00 2001
-> > From: Ido Yariv <ido@wizery.com>
-> > Date: Tue, 29 May 2012 21:11:16 +0300
-> > Subject: [PATCH v2] attrib-server: Fix multiple channels detaching mix-up
-> > 
-> > The identifier returned by g_attrib_register is not unique across
-> > different channels. Since attrib_channel_detach assumes this identifier
-> > to be unique, it may end up detaching the wrong channel when a device
-> > disconnects.
-> > 
-> > Fix this by using the channel's pointer as a unique identifier for
-> > detaching the channel. The identifier returned from g_attrib_register
-> > will still be used to find the relevant event structure.
-> 
-> Any thoughts about this one?
+On Wed, Jun 06, 2012, Szymon Janc wrote:
+> Break loop when pending command was found and callback called.
+> ---
+>  mgmt/main.c |    1 +
+>  1 file changed, 1 insertion(+)
 
-I don't really like the idea of returning a pointer (even though an
-opaque one) to code that shouldn't have access to data behind that
-pointer. Could we instead just make this really simple by removing
-attrib->next_evt_id and adding a static guint variable into the
-g_attrib_register function?
+Applied. Thanks.
 
 Johan
