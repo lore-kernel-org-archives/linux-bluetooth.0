@@ -1,49 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1339029663-25654-2-git-send-email-andre.guedes@openbossa.org>
-References: <1339029663-25654-1-git-send-email-andre.guedes@openbossa.org>
-	<1339029663-25654-2-git-send-email-andre.guedes@openbossa.org>
-Date: Wed, 6 Jun 2012 21:26:49 -0400
-Message-ID: <CAJdJm_PoOtX2rp2zYs1Jeg-J855NwTvj36iVq=YRuHwVd-5o2g@mail.gmail.com>
-Subject: Re: [RFC 2/8] gattrib: Fix g_attrib_set_mtu
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+Date: Thu, 7 Jun 2012 09:25:38 +0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Ido Yariv <ido@wizery.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] gattrib: Fix a premature response timer removal
+Message-ID: <20120607012538.GA2953@x220>
+References: <1338980175-14980-1-git-send-email-ido@wizery.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1338980175-14980-1-git-send-email-ido@wizery.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Ido,
 
-On Wed, Jun 6, 2012 at 8:40 PM, Andre Guedes <andre.guedes@openbossa.org> wrote:
-> 23 octets is the default (and minimum) ATT_MTU value. If someone tries
-> to set ATT_MTU less than 23 octets g_attrib_set_mtu should fail (return
-> FALSE). Additionally, there is no constraint regarding the maximum value
-> of ATT_MTU, so we should not check for it.
+On Wed, Jun 06, 2012, Ido Yariv wrote:
+> A timer is set when a response is expected. The timer is removed when
+> data is received, regardless of whether or not the data is a response.
+> As a result, the timer may be cleared even though a response was not
+> received and there would be no way to detect a command timeout.
+> 
+> Fix this by clearing the timer only after verifying a response was
+> received.
+> ---
+>  attrib/gattrib.c |   10 +++++-----
+>  1 files changed, 5 insertions(+), 5 deletions(-)
 
-Even though the spec does not mention a maximum ATT_MTU, we now need
-to review and fix the ATT operations that mention limits on their PDU
-(now that we removed the "artificial" 256 octect limit). Some I found:
+Applied. Thanks.
 
-- 3.2.9 Long Attribute Values (page 1839):
-
-The maximum length of an attribute value shall be 512 octets.
-
-- 3.4.4.2 Read By Type Response (page 1853):
-
-The maximum length of an attribute handle-value pair is 255 octets, bounded
-by the Length parameter that is one octet.
-
-- 3.4.4.10 Read by Group Type Response (page 1861):
-
-The maximum length of an Attribute Data is 255 octets, bounded by the Length
-parameter that is one octet.
-
-Also, what will happen to the ATT_MTU_MAX definition? Is it still
-being used in other places?
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
