@@ -1,29 +1,249 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Jun 2012 15:03:39 +0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 1/8] gattrib: Fix GAttrib buffer allocation
-Message-ID: <20120607070339.GA11609@x220>
-References: <1339029663-25654-1-git-send-email-andre.guedes@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1339029663-25654-1-git-send-email-andre.guedes@openbossa.org>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv1] Bluetooth: Add refcnt to l2cap_conn
+Date: Thu,  7 Jun 2012 10:04:57 +0300
+Message-Id: <1339052697-1193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1338992552-27895-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1338992552-27895-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Wed, Jun 06, 2012, Andre Guedes wrote:
-> GAttrib buffer should be allocated according to ATT_MTU value. Over
-> BR/EDR, ATT_MTU should be set to the L2CAP imtu negotiated during
-> L2CAP configuration phase. Over LE, ATT_MTU should be 23 octets.
-> ---
->  attrib/gattrib.c |   32 ++++++++++++++++++++------------
->  1 file changed, 20 insertions(+), 12 deletions(-)
+Adding kref to l2cap_conn helps to better handle racing when deleting
+l2cap_conn. Races are created when deleting conn from timeout and from
+the other execution path.
 
-I've applied all patches as they look ok and the behavior can't get
-much more broken than it was previously. I'll also continue testing them
-at the UPF and do/propose additional fixes if necessary.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+	PATCHv1: fixes issues with LE
 
-Johan
+ include/net/bluetooth/l2cap.h |    6 +++
+ net/bluetooth/l2cap_core.c    |   94 +++++++++++++++++++++++++++++++++++------
+ net/bluetooth/smp.c           |    7 ++-
+ 3 files changed, 91 insertions(+), 16 deletions(-)
+
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 3d31ecd..5abfe8a 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -572,6 +572,8 @@ struct l2cap_conn {
+ 
+ 	struct list_head	chan_l;
+ 	struct mutex		chan_lock;
++
++	struct kref		kref;
+ };
+ 
+ #define L2CAP_INFO_CL_MTU_REQ_SENT	0x01
+@@ -779,5 +781,9 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan);
+ int l2cap_ertm_init(struct l2cap_chan *chan);
+ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void l2cap_chan_del(struct l2cap_chan *chan, int err);
++void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
++			  long timeout);
++bool l2cap_conn_clear_timer(struct l2cap_conn *conn,
++			    struct delayed_work *work);
+ 
+ #endif /* __L2CAP_H */
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index eb7094c..d8c320b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -57,6 +57,64 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
+ 
+ static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+ 		    struct sk_buff_head *skbs, u8 event);
++static void l2cap_conn_del(struct hci_conn *hcon, int err);
++
++/* ---- L2CAP connections ---- */
++
++static void l2cap_conn_get(struct l2cap_conn *conn)
++{
++	BT_DBG("conn %p", conn);
++
++	kref_get(&conn->kref);
++}
++
++static void l2cap_conn_destroy(struct kref *kref)
++{
++	struct l2cap_conn *conn = container_of(kref, struct l2cap_conn, kref);
++
++	BT_DBG("conn %p", conn);
++
++	l2cap_conn_del(conn->hcon, 0);
++}
++
++static int l2cap_conn_put(struct l2cap_conn *conn)
++{
++	BT_DBG("conn %p", conn);
++
++	/* conn might be NULL, was checked before in l2cap_conn_del */
++	if (!conn)
++		return 1;
++
++	return kref_put(&conn->kref, &l2cap_conn_destroy);
++}
++
++void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
++			  long timeout)
++{
++	BT_DBG("conn %p timeout %ld", conn, timeout);
++
++	/* If delayed work cancelled do not hold(conn)
++	   since it is already done with previous set_timer */
++	if (!cancel_delayed_work(work))
++		l2cap_conn_get(conn);
++
++	schedule_delayed_work(work, timeout);
++}
++
++bool l2cap_conn_clear_timer(struct l2cap_conn *conn, struct delayed_work *work)
++{
++	bool ret;
++
++	BT_DBG("conn %p", conn);
++
++	/* put(conn) if delayed work cancelled otherwise it
++	   is done in delayed work function */
++	ret = cancel_delayed_work(work);
++	if (ret)
++		l2cap_conn_put(conn);
++
++	return ret;
++}
+ 
+ /* ---- L2CAP channels ---- */
+ 
+@@ -1321,10 +1379,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+ 		cancel_delayed_work_sync(&conn->info_timer);
+ 
+-	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags)) {
+-		cancel_delayed_work_sync(&conn->security_timer);
++	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
+ 		smp_chan_destroy(conn);
+-	}
+ 
+ 	hcon->l2cap_data = NULL;
+ 	kfree(conn);
+@@ -1333,9 +1389,9 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ static void security_timeout(struct work_struct *work)
+ {
+ 	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
+-						security_timer.work);
++					       security_timer.work);
+ 
+-	l2cap_conn_del(conn->hcon, ETIMEDOUT);
++	l2cap_conn_put(conn);
+ }
+ 
+ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+@@ -1377,6 +1433,8 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+ 
+ 	INIT_LIST_HEAD(&conn->chan_l);
+ 
++	kref_init(&conn->kref);
++
+ 	if (hcon->type == LE_LINK)
+ 		INIT_DELAYED_WORK(&conn->security_timer, security_timeout);
+ 	else
+@@ -5286,8 +5344,10 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		break;
+ 
+ 	case L2CAP_CID_SMP:
+-		if (smp_sig_channel(conn, skb))
+-			l2cap_conn_del(conn->hcon, EACCES);
++		if (smp_sig_channel(conn, skb)) {
++			l2cap_conn_clear_timer(conn, &conn->security_timer);
++			l2cap_conn_put(conn);
++		}
+ 		break;
+ 
+ 	default:
+@@ -5331,7 +5391,7 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 
+ int l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ {
+-	struct l2cap_conn *conn;
++	struct l2cap_conn *conn = hcon->l2cap_data;
+ 
+ 	BT_DBG("hcon %p bdaddr %s status %d", hcon, batostr(&hcon->dst), status);
+ 
+@@ -5339,8 +5399,12 @@ int l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 		conn = l2cap_conn_add(hcon, status);
+ 		if (conn)
+ 			l2cap_conn_ready(conn);
+-	} else
+-		l2cap_conn_del(hcon, bt_to_errno(status));
++	} else {
++		if (hcon->type == LE_LINK)
++			l2cap_conn_clear_timer(conn, &conn->security_timer);
++
++		l2cap_conn_put(conn);
++	}
+ 
+ 	return 0;
+ }
+@@ -5358,9 +5422,14 @@ int l2cap_disconn_ind(struct hci_conn *hcon)
+ 
+ int l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason)
+ {
++	struct l2cap_conn *conn = hcon->l2cap_data;
+ 	BT_DBG("hcon %p reason %d", hcon, reason);
+ 
+-	l2cap_conn_del(hcon, bt_to_errno(reason));
++	if (hcon->type == LE_LINK)
++		l2cap_conn_clear_timer(conn, &conn->security_timer);
++
++	l2cap_conn_put(conn);
++
+ 	return 0;
+ }
+ 
+@@ -5393,7 +5462,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 	if (hcon->type == LE_LINK) {
+ 		if (!status && encrypt)
+ 			smp_distribute_keys(conn, 0);
+-		cancel_delayed_work(&conn->security_timer);
++
++		l2cap_conn_clear_timer(conn, &conn->security_timer);
+ 	}
+ 
+ 	mutex_lock(&conn->chan_lock);
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index ff4835b..7aaf849 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -186,8 +186,7 @@ static void smp_send_cmd(struct l2cap_conn *conn, u8 code, u16 len, void *data)
+ 	skb->priority = HCI_PRIO_MAX;
+ 	hci_send_acl(conn->hchan, skb, 0);
+ 
+-	cancel_delayed_work_sync(&conn->security_timer);
+-	schedule_delayed_work(&conn->security_timer, SMP_TIMEOUT);
++	l2cap_conn_set_timer(conn, &conn->security_timer, SMP_TIMEOUT);
+ }
+ 
+ static __u8 authreq_to_seclevel(__u8 authreq)
+@@ -268,7 +267,7 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason, u8 send)
+ 			 hcon->dst_type, reason);
+ 
+ 	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
+-		cancel_delayed_work_sync(&conn->security_timer);
++		l2cap_conn_clear_timer(conn, &conn->security_timer);
+ 		smp_chan_destroy(conn);
+ 	}
+ }
+@@ -996,7 +995,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
+ 
+ 	if (conn->hcon->out || force) {
+ 		clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags);
+-		cancel_delayed_work_sync(&conn->security_timer);
++		l2cap_conn_clear_timer(conn, &conn->security_timer);
+ 		smp_chan_destroy(conn);
+ 	}
+ 
+-- 
+1.7.9.5
+
