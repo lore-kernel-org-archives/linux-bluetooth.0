@@ -1,59 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Jun 2012 09:48:29 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Fix deadlock and crash when SMP pairing
- times out
-Message-ID: <20120607064828.GB32366@aemeltch-MOBL1>
-References: <1338979451-15851-1-git-send-email-johan.hedberg@gmail.com>
- <1338979451-15851-2-git-send-email-johan.hedberg@gmail.com>
- <20120606164400.GA11387@samus>
- <20120606170306.GA26644@x220.ccr.corp.intel.com>
+Date: Thu, 7 Jun 2012 09:40:43 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] Bluetooth: AMP: Do not set name for AMP ctrl
+Message-ID: <20120607064040.GA32366@aemeltch-MOBL1>
+References: <1338994856-31200-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20120606152225.GA24903@x220.ccr.corp.intel.com>
+ <20120606152736.GA25191@x220.ccr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120606170306.GA26644@x220.ccr.corp.intel.com>
+In-Reply-To: <20120606152736.GA25191@x220.ccr.corp.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-On Thu, Jun 07, 2012 at 01:03:06AM +0800, Johan Hedberg wrote:
-> Hi Vinicius,
+On Wed, Jun 06, 2012 at 11:27:36PM +0800, Johan Hedberg wrote:
+> Hi,
 > 
-> On Wed, Jun 06, 2012, Vinicius Costa Gomes wrote:
-> > > The l2cap_conn_del function tries to cancel_sync the security timer, but
-> > > when it's called from the timeout function itself a deadlock occurs.
-> > > Subsequently the "hcon->l2cap_data = NULL" that's supposed to protect
-> > > multiple calls to l2cap_conn_del never gets cleared and when the
-> > > connection finally drops we double free's etc which will crash the
-> > > kernel.
+> On Wed, Jun 06, 2012, Johan Hedberg wrote:
+> > On Wed, Jun 06, 2012, Andrei Emeltchenko wrote:
+> > > AMP controllers do not understand this command
+> > > 
+> > > ...
+> > > < HCI Command: Write Local Name (0x03|0x0013) plen 248
+> > >    name ''
+> > > > HCI Event: Command Complete (0x0e) plen 4
+> > >    Write Local Name (0x03|0x0013) ncmd 1
+> > >    status 0x01
+> > >    Error: Unknown HCI Command
+> > > ...
+> > > 
+> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > ---
+> > >  net/bluetooth/mgmt.c |    3 +++
+> > >  1 file changed, 3 insertions(+)
+> > > 
+> > > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> > > index 958f764..9afcc84 100644
+> > > --- a/net/bluetooth/mgmt.c
+> > > +++ b/net/bluetooth/mgmt.c
+> > > @@ -2135,6 +2135,9 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
+> > >  
+> > >  	BT_DBG("");
+> > >  
+> > > +	if (hdev->amp_type != HCI_BREDR)
+> > > +		return -ENOTSUPP;
+> > > +
+> > >  	hci_dev_lock(hdev);
+> > >  
+> > >  	memcpy(hdev->short_name, cp->short_name, sizeof(hdev->short_name));
 > > 
-> > I wonder if (inside l2cap_conn_del()) we move "hcon->l2cap_data = NULL"
-> > up in the function, probably next to the check for "!conn", would be a
-> > safer alternative.
+> > This will essentially make write() fail on the mgmt socket which isn't
+> > necessarily the most intuitive behavior (one might think there's
+> > something wrong with the socket). What would probably make more sense is
+> > to send a proper cmd_status reply with MGMT_STATUS_NOT_SUPPORTED.
 > 
-> That was one of the things I tried first as well (and it did remove the
-> crash) but it doesn't remove the deadlock. The l2cap_conn_del would
-> still deadlock in cancel_sync(sec_timer) when called from
-> security_timeout().
+> Actually, should we even be exposing AMP controllers to begin with
+> through mgmt? Maybe we shouldn't even tell user space about them through
+> mgmt?
 
-Have you checked approach with refcnt I sent as RFC? It overcomes those
-problems using similar techniques like for l2cap_chan delayed works.
+This seems to be right. BTW: What is the best way to disable mgmt for
+device?
+ - Clear HCI_MGMT flag ?
+ - Do not run mgmt_powered ?
 
-> Moving the NULL assignment to the top would certainly help decrease the
-> chance of calling l2cap_conn_del twice but it wouldn't completely remove
-> this race condition as clearing the variable + testing its value isn't
-> a single atomic operation.
-> 
-> So I'd still consider this deadlock removal patch by itself as necessary
-> and valid but additionally the race of calling l2cap_conn_del twice
-> would need to be fixed with a separate patch, possibly involving some
-> new or existing lock.
+BTW: Where that flag HCI_MGMT is set and how this check supposed to be
+working?
 
-I will send updated RFC today. It works for BREDR, it would be good to
-test it with LE.
+test_and_set_bit(HCI_MGMT, &hdev->dev_flags))
 
 Best regards 
-Andrei Emeltchenko 
+Andrei Emeltchenko  
 
