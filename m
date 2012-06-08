@@ -1,64 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Andre Guedes <andre.guedes@openbossa.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC] Bluetooth: Fix using uninitialized option in RFCMode
-Date: Fri, 8 Jun 2012 11:33:33 +0200
-Message-ID: <1339148013-4956-1-git-send-email-szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCHv1 1/4] Bluetooth: Use standard HCI cmd timeout for RESET
+Date: Fri, 8 Jun 2012 11:11:45 +0200
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Message-ID: <201206081111.45409.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If remote device sends bogus RFC option with invalid length,
-undefined options values are used. Fix this by using defaults when
-remote misbehaves.
+Hi,
 
-This also fixes the following warning reported by gcc 4.7.0:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Remove magic and use standard HCI cmd timeout
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/hci_core.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index a2e15436c..e5a9a09 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -783,7 +783,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+>  	    test_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks)) {
+>  		set_bit(HCI_INIT, &hdev->flags);
+>  		__hci_request(hdev, hci_reset_req, 0,
+> -			      msecs_to_jiffies(250));
+> +			      msecs_to_jiffies(HCI_CMD_TIMEOUT));
+>  		clear_bit(HCI_INIT, &hdev->flags);
+>  	}
 
-net/bluetooth/l2cap_core.c: In function 'l2cap_config_rsp':
-net/bluetooth/l2cap_core.c:3302:13: warning: 'rfc.max_pdu_size' may be used uninitialized in this function [-Wmaybe-uninitialized]
-net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.max_pdu_size' was declared here
-net/bluetooth/l2cap_core.c:3298:25: warning: 'rfc.monitor_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
-net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.monitor_timeout' was declared here
-net/bluetooth/l2cap_core.c:3297:25: warning: 'rfc.retrans_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
-net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.retrans_timeout' was declared here
-net/bluetooth/l2cap_core.c:3295:2: warning: 'rfc.mode' may be used uninitialized in this function [-Wmaybe-uninitialized]
-net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.mode' was declared here
+In hci_dev_reset reset command is timeouted with HCI_INIT_TIMEOUT, maybe use same?
 
-Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
----
- net/bluetooth/l2cap_core.c |   14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f9bffe3..38e6ecc 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3273,12 +3273,14 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
- 	while (len >= L2CAP_CONF_OPT_SIZE) {
- 		len -= l2cap_get_conf_opt(&rsp, &type, &olen, &val);
- 
--		switch (type) {
--		case L2CAP_CONF_RFC:
--			if (olen == sizeof(rfc))
--				memcpy(&rfc, (void *)val, olen);
--			goto done;
--		}
-+		if (type != L2CAP_CONF_RFC)
-+			continue;
-+
-+		if (olen != sizeof(rfc))
-+			break;
-+
-+		memcpy(&rfc, (void *)val, olen);
-+		goto done;
- 	}
- 
- 	/* Use sane default values in case a misbehaving remote device
 -- 
-on behalf of ST-Ericsson
-
+BR
+Szymon Janc
