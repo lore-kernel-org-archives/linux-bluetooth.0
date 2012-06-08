@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 2/4] Bluetooth: Add opcode to error message
-Date: Fri,  8 Jun 2012 11:12:44 +0300
-Message-Id: <1339143166-6523-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 3/4] Bluetooth: Add debug print specifier
+Date: Fri,  8 Jun 2012 11:12:45 +0300
+Message-Id: <1339143166-6523-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,49 +11,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Sometimes HCI command sending timeouts and gives error message without
-specifying which command causes error. Patch makes sure that opcode
-is printed to help debugging.
+Some functions print opcode as "0xc03" others as "0x0c03". Patch
+ensures that opcodes printed are the in the same format.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/hci_core.c |   13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ net/bluetooth/hci_core.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e5a9a09..8f35f2e 100644
+index 8f35f2e..c7be1bc 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -1369,11 +1369,18 @@ int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr)
+@@ -2097,7 +2097,7 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+ 	struct hci_command_hdr *hdr;
+ 	struct sk_buff *skb;
+ 
+-	BT_DBG("%s opcode 0x%x plen %d", hdev->name, opcode, plen);
++	BT_DBG("%s opcode 0x%04x plen %d", hdev->name, opcode, plen);
+ 
+ 	skb = bt_skb_alloc(len, GFP_ATOMIC);
+ 	if (!skb) {
+@@ -2264,7 +2264,7 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
+ 	if (hdr->opcode != cpu_to_le16(opcode))
+ 		return NULL;
+ 
+-	BT_DBG("%s opcode 0x%x", hdev->name, opcode);
++	BT_DBG("%s opcode 0x%04x", hdev->name, opcode);
+ 
+ 	return hdev->sent_cmd->data + HCI_COMMAND_HDR_SIZE;
  }
- 
- /* HCI command timer function */
--static void hci_cmd_timer(unsigned long arg)
-+static void hci_cmd_timeout(unsigned long arg)
- {
- 	struct hci_dev *hdev = (void *) arg;
- 
--	BT_ERR("%s command tx timeout", hdev->name);
-+	if (hdev->sent_cmd) {
-+		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
-+		u16 opcode = __le16_to_cpu(sent->opcode);
-+
-+		BT_ERR("%s command 0x%04x tx timeout", hdev->name, opcode);
-+	} else
-+		BT_ERR("%s command tx timeout", hdev->name);
-+
- 	atomic_set(&hdev->cmd_cnt, 1);
- 	queue_work(hdev->workqueue, &hdev->cmd_work);
- }
-@@ -1673,7 +1680,7 @@ struct hci_dev *hci_alloc_dev(void)
- 
- 	init_waitqueue_head(&hdev->req_wait_q);
- 
--	setup_timer(&hdev->cmd_timer, hci_cmd_timer, (unsigned long) hdev);
-+	setup_timer(&hdev->cmd_timer, hci_cmd_timeout, (unsigned long) hdev);
- 
- 	hci_init_sysfs(hdev);
- 	discovery_init(hdev);
 -- 
 1.7.9.5
 
