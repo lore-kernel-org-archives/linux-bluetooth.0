@@ -1,289 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 8 Jun 2012 09:54:36 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1] Bluetooth: Add refcnt to l2cap_conn
-In-Reply-To: <1339052697-1193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Message-ID: <alpine.DEB.2.02.1206080843040.15058@mathewm-linux>
-References: <1338992552-27895-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1339052697-1193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 8 Jun 2012 19:01:31 +0300
+From: Ido Yariv <ido@wizery.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] attrib-server: Fix multiple channels detaching mix-up
+Message-ID: <20120608160131.GA11275@NoteStation>
+References: <1338322808-15503-1-git-send-email-ido@wizery.com>
+ <20120530073701.GB6539@x220>
+ <20120530183227.GA16709@WorkStation.localnet>
+ <20120606091758.GA12782@WorkStation.localnet>
+ <20120607154417.GC25119@x220.docomointertouch.net>
+ <20120608153944.GA28852@x220.docomointertouch.net>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120608153944.GA28852@x220.docomointertouch.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Johan,
 
-Andrei -
+On Fri, Jun 08, 2012 at 11:39:44PM +0800, Johan Hedberg wrote:
+> Hi Ido,
+> 
+> On Thu, Jun 07, 2012, Johan Hedberg wrote:
+> > Hi Ido,
+> > 
+> > On Wed, Jun 06, 2012, Ido Yariv wrote:
+> > > On Wed, May 30, 2012 at 09:32:27PM +0300, Ido Yariv wrote:
+> > > > From 78254bb099f80ad38e10075fbb73a4d990217630 Mon Sep 17 00:00:00 2001
+> > > > From: Ido Yariv <ido@wizery.com>
+> > > > Date: Tue, 29 May 2012 21:11:16 +0300
+> > > > Subject: [PATCH v2] attrib-server: Fix multiple channels detaching mix-up
+> > > > 
+> > > > The identifier returned by g_attrib_register is not unique across
+> > > > different channels. Since attrib_channel_detach assumes this identifier
+> > > > to be unique, it may end up detaching the wrong channel when a device
+> > > > disconnects.
+> > > > 
+> > > > Fix this by using the channel's pointer as a unique identifier for
+> > > > detaching the channel. The identifier returned from g_attrib_register
+> > > > will still be used to find the relevant event structure.
+> > > 
+> > > Any thoughts about this one?
+> > 
+> > I don't really like the idea of returning a pointer (even though an
+> > opaque one) to code that shouldn't have access to data behind that
+> > pointer. Could we instead just make this really simple by removing
+> > attrib->next_evt_id and adding a static guint variable into the
+> > g_attrib_register function?
+> 
+> Since I haven't heard back from you and we're way overdue with the 4.100
+> release I went ahead and pushed this simplified solution.
 
-On Thu, 7 Jun 2012, Andrei Emeltchenko wrote:
+Sorry for the delayed response - I was on a trans-atlantic flight.
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Adding kref to l2cap_conn helps to better handle racing when deleting
-> l2cap_conn. Races are created when deleting conn from timeout and from
-> the other execution path.
->
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
-> 	PATCHv1: fixes issues with LE
->
-> include/net/bluetooth/l2cap.h |    6 +++
-> net/bluetooth/l2cap_core.c    |   94 +++++++++++++++++++++++++++++++++++------
-> net/bluetooth/smp.c           |    7 ++-
-> 3 files changed, 91 insertions(+), 16 deletions(-)
->
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 3d31ecd..5abfe8a 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -572,6 +572,8 @@ struct l2cap_conn {
->
-> 	struct list_head	chan_l;
-> 	struct mutex		chan_lock;
-> +
-> +	struct kref		kref;
-> };
->
-> #define L2CAP_INFO_CL_MTU_REQ_SENT	0x01
-> @@ -779,5 +781,9 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan);
-> int l2cap_ertm_init(struct l2cap_chan *chan);
-> void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
-> void l2cap_chan_del(struct l2cap_chan *chan, int err);
-> +void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
-> +			  long timeout);
-> +bool l2cap_conn_clear_timer(struct l2cap_conn *conn,
-> +			    struct delayed_work *work);
->
-> #endif /* __L2CAP_H */
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index eb7094c..d8c320b 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -57,6 +57,64 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
->
-> static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
-> 		    struct sk_buff_head *skbs, u8 event);
-> +static void l2cap_conn_del(struct hci_conn *hcon, int err);
-> +
-> +/* ---- L2CAP connections ---- */
-> +
-> +static void l2cap_conn_get(struct l2cap_conn *conn)
-> +{
-> +	BT_DBG("conn %p", conn);
-> +
-> +	kref_get(&conn->kref);
-> +}
-> +
-> +static void l2cap_conn_destroy(struct kref *kref)
-> +{
-> +	struct l2cap_conn *conn = container_of(kref, struct l2cap_conn, kref);
-> +
-> +	BT_DBG("conn %p", conn);
-> +
-> +	l2cap_conn_del(conn->hcon, 0);
-> +}
-> +
-> +static int l2cap_conn_put(struct l2cap_conn *conn)
-> +{
-> +	BT_DBG("conn %p", conn);
-> +
-> +	/* conn might be NULL, was checked before in l2cap_conn_del */
-> +	if (!conn)
-> +		return 1;
-> +
-> +	return kref_put(&conn->kref, &l2cap_conn_destroy);
-> +}
-> +
-> +void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
-> +			  long timeout)
-> +{
-> +	BT_DBG("conn %p timeout %ld", conn, timeout);
-> +
-> +	/* If delayed work cancelled do not hold(conn)
-> +	   since it is already done with previous set_timer */
-> +	if (!cancel_delayed_work(work))
-> +		l2cap_conn_get(conn);
-> +
-> +	schedule_delayed_work(work, timeout);
-> +}
-> +
-> +bool l2cap_conn_clear_timer(struct l2cap_conn *conn, struct delayed_work *work)
-> +{
-> +	bool ret;
-> +
-> +	BT_DBG("conn %p", conn);
-> +
-> +	/* put(conn) if delayed work cancelled otherwise it
-> +	   is done in delayed work function */
-> +	ret = cancel_delayed_work(work);
-> +	if (ret)
-> +		l2cap_conn_put(conn);
-> +
-> +	return ret;
-> +}
->
-> /* ---- L2CAP channels ---- */
->
-> @@ -1321,10 +1379,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
-> 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
-> 		cancel_delayed_work_sync(&conn->info_timer);
->
-> -	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags)) {
-> -		cancel_delayed_work_sync(&conn->security_timer);
-> +	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
-> 		smp_chan_destroy(conn);
-> -	}
->
-> 	hcon->l2cap_data = NULL;
-> 	kfree(conn);
-> @@ -1333,9 +1389,9 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
-> static void security_timeout(struct work_struct *work)
-> {
-> 	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
-> -						security_timer.work);
-> +					       security_timer.work);
->
-> -	l2cap_conn_del(conn->hcon, ETIMEDOUT);
-> +	l2cap_conn_put(conn);
-> }
->
-> static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
-> @@ -1377,6 +1433,8 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
->
-> 	INIT_LIST_HEAD(&conn->chan_l);
->
-> +	kref_init(&conn->kref);
-> +
-> 	if (hcon->type == LE_LINK)
-> 		INIT_DELAYED_WORK(&conn->security_timer, security_timeout);
-> 	else
-> @@ -5286,8 +5344,10 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
-> 		break;
->
-> 	case L2CAP_CID_SMP:
-> -		if (smp_sig_channel(conn, skb))
-> -			l2cap_conn_del(conn->hcon, EACCES);
-> +		if (smp_sig_channel(conn, skb)) {
-> +			l2cap_conn_clear_timer(conn, &conn->security_timer);
-> +			l2cap_conn_put(conn);
-> +		}
-> 		break;
->
-> 	default:
-> @@ -5331,7 +5391,7 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
->
-> int l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
-> {
-> -	struct l2cap_conn *conn;
-> +	struct l2cap_conn *conn = hcon->l2cap_data;
->
-> 	BT_DBG("hcon %p bdaddr %s status %d", hcon, batostr(&hcon->dst), status);
->
-> @@ -5339,8 +5399,12 @@ int l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
-> 		conn = l2cap_conn_add(hcon, status);
-> 		if (conn)
-> 			l2cap_conn_ready(conn);
-> -	} else
-> -		l2cap_conn_del(hcon, bt_to_errno(status));
-> +	} else {
-> +		if (hcon->type == LE_LINK)
-> +			l2cap_conn_clear_timer(conn, &conn->security_timer);
-> +
-> +		l2cap_conn_put(conn);
-> +	}
->
-> 	return 0;
-> }
-> @@ -5358,9 +5422,14 @@ int l2cap_disconn_ind(struct hci_conn *hcon)
->
-> int l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason)
-> {
-> +	struct l2cap_conn *conn = hcon->l2cap_data;
-> 	BT_DBG("hcon %p reason %d", hcon, reason);
->
-> -	l2cap_conn_del(hcon, bt_to_errno(reason));
-> +	if (hcon->type == LE_LINK)
-> +		l2cap_conn_clear_timer(conn, &conn->security_timer);
-> +
-> +	l2cap_conn_put(conn);
-> +
-> 	return 0;
-> }
->
-> @@ -5393,7 +5462,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
-> 	if (hcon->type == LE_LINK) {
-> 		if (!status && encrypt)
-> 			smp_distribute_keys(conn, 0);
-> -		cancel_delayed_work(&conn->security_timer);
-> +
-> +		l2cap_conn_clear_timer(conn, &conn->security_timer);
-> 	}
->
-> 	mutex_lock(&conn->chan_lock);
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index ff4835b..7aaf849 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -186,8 +186,7 @@ static void smp_send_cmd(struct l2cap_conn *conn, u8 code, u16 len, void *data)
-> 	skb->priority = HCI_PRIO_MAX;
-> 	hci_send_acl(conn->hchan, skb, 0);
->
-> -	cancel_delayed_work_sync(&conn->security_timer);
-> -	schedule_delayed_work(&conn->security_timer, SMP_TIMEOUT);
-> +	l2cap_conn_set_timer(conn, &conn->security_timer, SMP_TIMEOUT);
-> }
->
-> static __u8 authreq_to_seclevel(__u8 authreq)
-> @@ -268,7 +267,7 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason, u8 send)
-> 			 hcon->dst_type, reason);
->
-> 	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
-> -		cancel_delayed_work_sync(&conn->security_timer);
-> +		l2cap_conn_clear_timer(conn, &conn->security_timer);
-> 		smp_chan_destroy(conn);
-> 	}
-> }
-> @@ -996,7 +995,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
->
-> 	if (conn->hcon->out || force) {
-> 		clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags);
-> -		cancel_delayed_work_sync(&conn->security_timer);
-> +		l2cap_conn_clear_timer(conn, &conn->security_timer);
-> 		smp_chan_destroy(conn);
-> 	}
->
-> -- 
-> 1.7.9.5
+This was actually the first revision of this patch. I submitted this
+version, to avoid static variables. In terms of functionality, I'm OK
+with both solutions.
 
-I think it's a very good thing to add reference counting, thanks for 
-doing this work.
-
-I'd like to see the code be more strict about matching the gets & puts 
-up with actual assignments to l2cap_conn pointers:
-
-  * Make sure one reference count is held for hcon->l2cap_data (your 
-patch already does this)
-  * l2cap_conn_put when setting hcon->l2cap_data to NULL
-  * l2cap_conn_get when assigning l2cap_chan->conn
-  * l2cap_conn_put when setting l2cap_chan->conn to NULL or freeing 
-l2cap_chan
-  * Use l2cap_conn_get/put whenever there's a reference to an 
-l2cap_conn struct in an active timer.  You set this up for the 
-security_timer, but info_timer could use it too.
-
-Right now, l2cap_conn_del is only called when the reference count goes 
-to 0.  If l2cap_conn reference counts are added to l2cap_chan, then 
-the reference count wouldn't be 0 if the ACL was forced to close, and 
-the l2cap_chans would not get cleaned up.  I think it would help to 
-make l2cap_conn_del clean up the channels and connection state, and 
-then have l2cap_conn_destroy free the structure.  l2cap_conn_destroy 
-would only have to call l2cap_conn_del if it hadn't been done yet.
-
-
-Regards,
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
+Thanks,
+Ido.
