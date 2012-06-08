@@ -1,60 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 3/5] Bluetooth: Add opcode to error message
-Date: Fri,  8 Jun 2012 14:03:22 +0300
-Message-Id: <1339153405-12070-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1339153405-12070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 1/5] Bluetooth: Use standard HCI cmd timeout for RESET
+Date: Fri,  8 Jun 2012 14:03:20 +0300
+Message-Id: <1339153405-12070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1339153405-12070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Sometimes HCI command sending timeouts and gives error message without
-specifying which command causes error. Patch makes sure that opcode
-is printed to help debugging.
+Remove magic and use standard HCI cmd timeout
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c |   13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ net/bluetooth/hci_core.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 0334ebe..146854f 100644
+index a2e15436c..e5a9a09 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -1366,11 +1366,18 @@ int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr)
- }
+@@ -783,7 +783,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 	    test_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks)) {
+ 		set_bit(HCI_INIT, &hdev->flags);
+ 		__hci_request(hdev, hci_reset_req, 0,
+-			      msecs_to_jiffies(250));
++			      msecs_to_jiffies(HCI_CMD_TIMEOUT));
+ 		clear_bit(HCI_INIT, &hdev->flags);
+ 	}
  
- /* HCI command timer function */
--static void hci_cmd_timer(unsigned long arg)
-+static void hci_cmd_timeout(unsigned long arg)
- {
- 	struct hci_dev *hdev = (void *) arg;
- 
--	BT_ERR("%s command tx timeout", hdev->name);
-+	if (hdev->sent_cmd) {
-+		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
-+		u16 opcode = __le16_to_cpu(sent->opcode);
-+
-+		BT_ERR("%s command 0x%4.4x tx timeout", hdev->name, opcode);
-+	} else
-+		BT_ERR("%s command tx timeout", hdev->name);
-+
- 	atomic_set(&hdev->cmd_cnt, 1);
- 	queue_work(hdev->workqueue, &hdev->cmd_work);
- }
-@@ -1670,7 +1677,7 @@ struct hci_dev *hci_alloc_dev(void)
- 
- 	init_waitqueue_head(&hdev->req_wait_q);
- 
--	setup_timer(&hdev->cmd_timer, hci_cmd_timer, (unsigned long) hdev);
-+	setup_timer(&hdev->cmd_timer, hci_cmd_timeout, (unsigned long) hdev);
- 
- 	hci_init_sysfs(hdev);
- 	discovery_init(hdev);
 -- 
 1.7.9.5
 
