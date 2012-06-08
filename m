@@ -1,79 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 1/2] test: Add progress support to ftp-client
-Date: Fri,  8 Jun 2012 12:54:08 +0300
-Message-Id: <1339149249-24734-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1339148670.19312.23.camel@novo.hadess.net>
+Subject: Re: [RFC] Reorganizing the BlueZ source tree
+From: Bastien Nocera <hadess@hadess.net>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Gustavo Padovan
+	 <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org
+Date: Fri, 08 Jun 2012 10:44:30 +0100
+In-Reply-To: <1339023575.1817.114.camel@aeonflux>
+References: <20120524081405.GA30941@joana>
+	 <CABBYNZLhWfS6Ff0S8SkCwSXxzt61NzNCBH-K78hQB6dtpPvJ6Q@mail.gmail.com>
+	 <1337852769.2115.47.camel@novo.hadess.net>
+	 <1337853929.15105.84.camel@aeonflux>
+	 <1338998206.19312.10.camel@novo.hadess.net>
+	 <1339023575.1817.114.camel@aeonflux>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Thu, 2012-06-07 at 07:59 +0900, Marcel Holtmann wrote:
+> 
+> and I still have all the rights to do so.
+> 
+> As long as we are still based on GLib, this will stay as it is. I am
+> not
+> jumping through any hoops, because David wouldn't respect prior art.
 
-Print transfer progress when verbose mode is enabled.
----
- test/ftp-client |   23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
-
-diff --git a/test/ftp-client b/test/ftp-client
-index 39d7675..064a81a 100755
---- a/test/ftp-client
-+++ b/test/ftp-client
-@@ -35,7 +35,9 @@ def parse_options():
- 
- class FtpClient:
- 	def __init__(self, session_path, verbose=False):
-+		self.progress = 0
- 		self.transfer_path = None
-+		self.transfer_size = 0
- 		self.verbose = verbose
- 		bus = dbus.SessionBus()
- 		obj = bus.get_object("org.bluez.obex.client", session_path)
-@@ -49,10 +51,16 @@ class FtpClient:
- 				dbus_interface="org.bluez.obex.Transfer",
- 				signal_name="Error",
- 				path_keyword="path")
-+		if self.verbose:
-+			bus.add_signal_receiver(self.transfer_progress,
-+				dbus_interface="org.bluez.obex.Transfer",
-+				signal_name="PropertyChanged",
-+				path_keyword="path")
- 
- 	def create_transfer_reply(self, reply):
- 		(path, properties) = reply
- 		self.transfer_path = path
-+		self.transfer_size = properties["Size"]
- 		if self.verbose:
- 			print "Transfer created: %s" % path
- 
-@@ -77,6 +85,19 @@ class FtpClient:
- 		print "Transfer finished with error %s: %s" % (code, message)
- 		mainloop.quit()
- 
-+	def transfer_progress(self, prop, value, path):
-+		if path != self.transfer_path:
-+			return
-+
-+		if prop != "Progress":
-+			return
-+
-+		speed = (value - self.progress) / 1000
-+		print "Transfer progress %d/%d at %d kBps" % (value,
-+							self.transfer_size,
-+							speed)
-+		self.progress = value
-+
- 	def change_folder(self, new_dir):
- 		for node in new_dir.split("/"):
- 			self.ftp.ChangeFolder(node)
-@@ -136,7 +157,7 @@ if  __name__ == '__main__':
- 	print "Creating Session"
- 	path = client.CreateSession(options.device, { "Target": "ftp" })
- 
--	ftp_client = FtpClient(path)
-+	ftp_client = FtpClient(path, options.verbose)
- 
- 	if options.new_dir:
- 		ftp_client.change_folder(options.new_dir)
--- 
-1.7.10.2
-
+How exactly would would have called a D-Bus implementation in GLib?
