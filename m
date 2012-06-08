@@ -1,49 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luis Henriques <luis.henriques@canonical.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: Manoj Iyer <manoj.iyer@canonical.com>,  linux-kernel@vger.kernel.org,  linux-bluetooth@vger.kernel.org,  Johan Hedberg <johan.hedberg@intel.com>,  Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: btusb: Add vendor specific ID (0a5c:21f4) BCM20702A0
-References: <1334169563-2948-1-git-send-email-manoj.iyer@canonical.com>
-	<1334169563-2948-2-git-send-email-manoj.iyer@canonical.com>
-	<20120413214817.GB1680@joana>
-Date: Fri, 08 Jun 2012 15:19:14 +0100
-In-Reply-To: <20120413214817.GB1680@joana> (Gustavo Padovan's message of "Fri,
-	13 Apr 2012 18:48:17 -0300")
-Message-ID: <87lijxyjh9.fsf@canonical.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Marek Vasut <marex@denx.de>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marek Vasut <marex@denx.de>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH] ATH3K: Support AR3011 in Acer Iconia Tab W500
+Date: Fri,  8 Jun 2012 14:32:50 +0200
+Message-Id: <1339158771-11818-1-git-send-email-marex@denx.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Acer used this chip connected via USB:
 
-Gustavo Padovan <gustavo@padovan.org> writes:
+Bus 005 Device 005: ID 0cf3:3005 Atheros Communications, Inc. AR3011 Bluetooth
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               1.10
+  bDeviceClass          224 Wireless
+  bDeviceSubClass         1 Radio Frequency
+  bDeviceProtocol         1 Bluetooth
+  bMaxPacketSize0        64
+  idVendor           0x0cf3 Atheros Communications, Inc.
+  idProduct          0x3005 AR3011 Bluetooth
+  bcdDevice            0.01
+  iManufacturer           0
+  iProduct                0
+  iSerial                 0
+  bNumConfigurations      1
 
-> Hi Manoj,
->
-> * Manoj Iyer <manoj.iyer@canonical.com> [2012-04-11 13:39:23 -0500]:
->
->> usb-devices:
->> T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
->> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
->> P:  Vendor=0a5c ProdID=21f4 Rev=01.12
->> S:  Manufacturer=Broadcom Corp
->> S:  Product=BCM20702A0
->> S:  SerialNumber=E4D53DF15584
->> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
->> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
->> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
->> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
->> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
->
-> You need to give the usb-devices for the non-working case. I know it
-> works but we need to document this right in the commit message.
+Signed-off-by: Marek Vasut <marex@denx.de>
+Cc: Gustavo Padovan <gustavo@padovan.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+---
+ drivers/bluetooth/ath3k.c |    1 +
+ drivers/bluetooth/btusb.c |    1 +
+ 2 files changed, 2 insertions(+)
 
-I was wondering whether there has been any progress with this patch.
-Is there something still pending?
-
-I'll try to get the patch tested as we have a bug open to support this
-hardware.
-
-Cheers,
---
-Luis
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index ad591bd..f0f6202 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -63,6 +63,7 @@ static struct usb_device_id ath3k_table[] = {
+ 
+ 	/* Atheros AR3011 with sflash firmware*/
+ 	{ USB_DEVICE(0x0CF3, 0x3002) },
++	{ USB_DEVICE(0x0CF3, 0xE019) },
+ 	{ USB_DEVICE(0x13d3, 0x3304) },
+ 	{ USB_DEVICE(0x0930, 0x0215) },
+ 	{ USB_DEVICE(0x0489, 0xE03D) },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index a45e717..43144e5 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -117,6 +117,7 @@ static struct usb_device_id blacklist_table[] = {
+ 
+ 	/* Atheros 3011 with sflash firmware */
+ 	{ USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
++	{ USB_DEVICE(0x0cf3, 0xe019), .driver_info = BTUSB_IGNORE },
+ 	{ USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
+ 	{ USB_DEVICE(0x0930, 0x0215), .driver_info = BTUSB_IGNORE },
+ 	{ USB_DEVICE(0x0489, 0xe03d), .driver_info = BTUSB_IGNORE },
+-- 
+1.7.10
