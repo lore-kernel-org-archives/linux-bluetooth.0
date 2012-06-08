@@ -1,128 +1,259 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 8 Jun 2012 10:27:28 +0300
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: mgmt: Fix managing AMP device
-Date: Fri,  8 Jun 2012 11:09:57 +0300
-Message-Id: <1339142997-6387-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <20120607151803.GA24609@x220.docomointertouch.net>
-References: <20120607151803.GA24609@x220.docomointertouch.net>
+Subject: Re: [PATCHv1] Bluetooth: Add refcnt to l2cap_conn
+Message-ID: <20120608072725.GA2730@aemeltch-MOBL1>
+References: <1338992552-27895-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1339052697-1193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1339052697-1193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Any thoughts about this patch?
 
-AMP device shall not be managed by user space for now.
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/hci_core.h |    2 +-
- net/bluetooth/hci_core.c         |    6 ++++--
- net/bluetooth/mgmt.c             |   20 ++++++++++++++++++++
- 3 files changed, 25 insertions(+), 3 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 288eaa8..78d5fe2 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1080,7 +1080,7 @@ int mgmt_discovering(struct hci_dev *hdev, u8 discovering);
- int mgmt_interleaved_discovery(struct hci_dev *hdev);
- int mgmt_device_blocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
- int mgmt_device_unblocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
--
-+bool mgmt_valid_hdev(struct hci_dev *hdev);
- int mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, u8 persistent);
- 
- /* HCI info for socket */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 88d996b..25a86cd 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -699,7 +699,8 @@ int hci_dev_open(__u16 dev)
- 		hci_dev_hold(hdev);
- 		set_bit(HCI_UP, &hdev->flags);
- 		hci_notify(hdev, HCI_DEV_UP);
--		if (!test_bit(HCI_SETUP, &hdev->dev_flags)) {
-+		if (!test_bit(HCI_SETUP, &hdev->dev_flags) &&
-+		    mgmt_valid_hdev(hdev)) {
- 			hci_dev_lock(hdev);
- 			mgmt_powered(hdev, 1);
- 			hci_dev_unlock(hdev);
-@@ -801,7 +802,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	 * and no tasks are scheduled. */
- 	hdev->close(hdev);
- 
--	if (!test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags)) {
-+	if (!test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags) &&
-+	    mgmt_valid_hdev(hdev)) {
- 		hci_dev_lock(hdev);
- 		mgmt_powered(hdev, 0);
- 		hci_dev_unlock(hdev);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 958f764..5ea1305 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -193,6 +193,11 @@ static u8 mgmt_status_table[] = {
- 	MGMT_STATUS_CONNECT_FAILED,	/* MAC Connection Failed */
- };
- 
-+bool mgmt_valid_hdev(struct hci_dev *hdev)
-+{
-+	return hdev->amp_type == HCI_BREDR;
-+}
-+
- static u8 mgmt_status(u8 hci_status)
- {
- 	if (hci_status < ARRAY_SIZE(mgmt_status_table))
-@@ -329,6 +334,9 @@ static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	count = 0;
- 	list_for_each(p, &hci_dev_list) {
-+		if (!mgmt_valid_hdev(hdev))
-+			continue;
-+
- 		count++;
- 	}
- 
-@@ -346,6 +354,9 @@ static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
- 		if (test_bit(HCI_SETUP, &d->dev_flags))
- 			continue;
- 
-+		if (!mgmt_valid_hdev(hdev))
-+			continue;
-+
- 		rp->index[i++] = cpu_to_le16(d->id);
- 		BT_DBG("Added hci%u", d->id);
- 	}
-@@ -2135,6 +2146,9 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	BT_DBG("");
- 
-+	if (hdev->amp_type != HCI_BREDR)
-+		return -ENOTSUPP;
-+
- 	hci_dev_lock(hdev);
- 
- 	memcpy(hdev->short_name, cp->short_name, sizeof(hdev->short_name));
-@@ -2813,6 +2827,9 @@ static void cmd_status_rsp(struct pending_cmd *cmd, void *data)
- 
- int mgmt_index_added(struct hci_dev *hdev)
- {
-+	if (!mgmt_valid_hdev(hdev))
-+		return -ENOTSUPP;
-+
- 	return mgmt_event(MGMT_EV_INDEX_ADDED, hdev, NULL, 0, NULL);
- }
- 
-@@ -2820,6 +2837,9 @@ int mgmt_index_removed(struct hci_dev *hdev)
- {
- 	u8 status = MGMT_STATUS_INVALID_INDEX;
- 
-+	if (!mgmt_valid_hdev(hdev))
-+		return -ENOTSUPP;
-+
- 	mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
- 
- 	return mgmt_event(MGMT_EV_INDEX_REMOVED, hdev, NULL, 0, NULL);
--- 
-1.7.9.5
-
+On Thu, Jun 07, 2012 at 10:04:57AM +0300, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Adding kref to l2cap_conn helps to better handle racing when deleting
+> l2cap_conn. Races are created when deleting conn from timeout and from
+> the other execution path.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+> 	PATCHv1: fixes issues with LE
+> 
+>  include/net/bluetooth/l2cap.h |    6 +++
+>  net/bluetooth/l2cap_core.c    |   94 +++++++++++++++++++++++++++++++++++------
+>  net/bluetooth/smp.c           |    7 ++-
+>  3 files changed, 91 insertions(+), 16 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 3d31ecd..5abfe8a 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -572,6 +572,8 @@ struct l2cap_conn {
+>  
+>  	struct list_head	chan_l;
+>  	struct mutex		chan_lock;
+> +
+> +	struct kref		kref;
+>  };
+>  
+>  #define L2CAP_INFO_CL_MTU_REQ_SENT	0x01
+> @@ -779,5 +781,9 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan);
+>  int l2cap_ertm_init(struct l2cap_chan *chan);
+>  void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+>  void l2cap_chan_del(struct l2cap_chan *chan, int err);
+> +void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
+> +			  long timeout);
+> +bool l2cap_conn_clear_timer(struct l2cap_conn *conn,
+> +			    struct delayed_work *work);
+>  
+>  #endif /* __L2CAP_H */
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index eb7094c..d8c320b 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -57,6 +57,64 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
+>  
+>  static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+>  		    struct sk_buff_head *skbs, u8 event);
+> +static void l2cap_conn_del(struct hci_conn *hcon, int err);
+> +
+> +/* ---- L2CAP connections ---- */
+> +
+> +static void l2cap_conn_get(struct l2cap_conn *conn)
+> +{
+> +	BT_DBG("conn %p", conn);
+> +
+> +	kref_get(&conn->kref);
+> +}
+> +
+> +static void l2cap_conn_destroy(struct kref *kref)
+> +{
+> +	struct l2cap_conn *conn = container_of(kref, struct l2cap_conn, kref);
+> +
+> +	BT_DBG("conn %p", conn);
+> +
+> +	l2cap_conn_del(conn->hcon, 0);
+> +}
+> +
+> +static int l2cap_conn_put(struct l2cap_conn *conn)
+> +{
+> +	BT_DBG("conn %p", conn);
+> +
+> +	/* conn might be NULL, was checked before in l2cap_conn_del */
+> +	if (!conn)
+> +		return 1;
+> +
+> +	return kref_put(&conn->kref, &l2cap_conn_destroy);
+> +}
+> +
+> +void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
+> +			  long timeout)
+> +{
+> +	BT_DBG("conn %p timeout %ld", conn, timeout);
+> +
+> +	/* If delayed work cancelled do not hold(conn)
+> +	   since it is already done with previous set_timer */
+> +	if (!cancel_delayed_work(work))
+> +		l2cap_conn_get(conn);
+> +
+> +	schedule_delayed_work(work, timeout);
+> +}
+> +
+> +bool l2cap_conn_clear_timer(struct l2cap_conn *conn, struct delayed_work *work)
+> +{
+> +	bool ret;
+> +
+> +	BT_DBG("conn %p", conn);
+> +
+> +	/* put(conn) if delayed work cancelled otherwise it
+> +	   is done in delayed work function */
+> +	ret = cancel_delayed_work(work);
+> +	if (ret)
+> +		l2cap_conn_put(conn);
+> +
+> +	return ret;
+> +}
+>  
+>  /* ---- L2CAP channels ---- */
+>  
+> @@ -1321,10 +1379,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+>  	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+>  		cancel_delayed_work_sync(&conn->info_timer);
+>  
+> -	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags)) {
+> -		cancel_delayed_work_sync(&conn->security_timer);
+> +	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
+>  		smp_chan_destroy(conn);
+> -	}
+>  
+>  	hcon->l2cap_data = NULL;
+>  	kfree(conn);
+> @@ -1333,9 +1389,9 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+>  static void security_timeout(struct work_struct *work)
+>  {
+>  	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
+> -						security_timer.work);
+> +					       security_timer.work);
+>  
+> -	l2cap_conn_del(conn->hcon, ETIMEDOUT);
+> +	l2cap_conn_put(conn);
+>  }
+>  
+>  static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+> @@ -1377,6 +1433,8 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+>  
+>  	INIT_LIST_HEAD(&conn->chan_l);
+>  
+> +	kref_init(&conn->kref);
+> +
+>  	if (hcon->type == LE_LINK)
+>  		INIT_DELAYED_WORK(&conn->security_timer, security_timeout);
+>  	else
+> @@ -5286,8 +5344,10 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+>  		break;
+>  
+>  	case L2CAP_CID_SMP:
+> -		if (smp_sig_channel(conn, skb))
+> -			l2cap_conn_del(conn->hcon, EACCES);
+> +		if (smp_sig_channel(conn, skb)) {
+> +			l2cap_conn_clear_timer(conn, &conn->security_timer);
+> +			l2cap_conn_put(conn);
+> +		}
+>  		break;
+>  
+>  	default:
+> @@ -5331,7 +5391,7 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
+>  
+>  int l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+>  {
+> -	struct l2cap_conn *conn;
+> +	struct l2cap_conn *conn = hcon->l2cap_data;
+>  
+>  	BT_DBG("hcon %p bdaddr %s status %d", hcon, batostr(&hcon->dst), status);
+>  
+> @@ -5339,8 +5399,12 @@ int l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+>  		conn = l2cap_conn_add(hcon, status);
+>  		if (conn)
+>  			l2cap_conn_ready(conn);
+> -	} else
+> -		l2cap_conn_del(hcon, bt_to_errno(status));
+> +	} else {
+> +		if (hcon->type == LE_LINK)
+> +			l2cap_conn_clear_timer(conn, &conn->security_timer);
+> +
+> +		l2cap_conn_put(conn);
+> +	}
+>  
+>  	return 0;
+>  }
+> @@ -5358,9 +5422,14 @@ int l2cap_disconn_ind(struct hci_conn *hcon)
+>  
+>  int l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason)
+>  {
+> +	struct l2cap_conn *conn = hcon->l2cap_data;
+>  	BT_DBG("hcon %p reason %d", hcon, reason);
+>  
+> -	l2cap_conn_del(hcon, bt_to_errno(reason));
+> +	if (hcon->type == LE_LINK)
+> +		l2cap_conn_clear_timer(conn, &conn->security_timer);
+> +
+> +	l2cap_conn_put(conn);
+> +
+>  	return 0;
+>  }
+>  
+> @@ -5393,7 +5462,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+>  	if (hcon->type == LE_LINK) {
+>  		if (!status && encrypt)
+>  			smp_distribute_keys(conn, 0);
+> -		cancel_delayed_work(&conn->security_timer);
+> +
+> +		l2cap_conn_clear_timer(conn, &conn->security_timer);
+>  	}
+>  
+>  	mutex_lock(&conn->chan_lock);
+> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> index ff4835b..7aaf849 100644
+> --- a/net/bluetooth/smp.c
+> +++ b/net/bluetooth/smp.c
+> @@ -186,8 +186,7 @@ static void smp_send_cmd(struct l2cap_conn *conn, u8 code, u16 len, void *data)
+>  	skb->priority = HCI_PRIO_MAX;
+>  	hci_send_acl(conn->hchan, skb, 0);
+>  
+> -	cancel_delayed_work_sync(&conn->security_timer);
+> -	schedule_delayed_work(&conn->security_timer, SMP_TIMEOUT);
+> +	l2cap_conn_set_timer(conn, &conn->security_timer, SMP_TIMEOUT);
+>  }
+>  
+>  static __u8 authreq_to_seclevel(__u8 authreq)
+> @@ -268,7 +267,7 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason, u8 send)
+>  			 hcon->dst_type, reason);
+>  
+>  	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
+> -		cancel_delayed_work_sync(&conn->security_timer);
+> +		l2cap_conn_clear_timer(conn, &conn->security_timer);
+>  		smp_chan_destroy(conn);
+>  	}
+>  }
+> @@ -996,7 +995,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
+>  
+>  	if (conn->hcon->out || force) {
+>  		clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags);
+> -		cancel_delayed_work_sync(&conn->security_timer);
+> +		l2cap_conn_clear_timer(conn, &conn->security_timer);
+>  		smp_chan_destroy(conn);
+>  	}
+>  
+> -- 
+> 1.7.9.5
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
