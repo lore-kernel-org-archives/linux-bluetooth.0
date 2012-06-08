@@ -1,20 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1339146047.1817.142.camel@aeonflux>
+Date: Fri, 8 Jun 2012 12:00:26 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCHv1 1/4] Bluetooth: Use standard HCI cmd timeout for RESET
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 08 Jun 2012 18:00:47 +0900
-In-Reply-To: <20120608085315.GC2730@aemeltch-MOBL1>
+Message-ID: <20120608090023.GD2730@aemeltch-MOBL1>
 References: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1339144316.1817.140.camel@aeonflux> <20120608085315.GC2730@aemeltch-MOBL1>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <1339144316.1817.140.camel@aeonflux>
+ <20120608085315.GC2730@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120608085315.GC2730@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
-
+On Fri, Jun 08, 2012 at 11:53:17AM +0300, Andrei Emeltchenko wrote:
+> Hi Marcel,
+> 
+> On Fri, Jun 08, 2012 at 05:31:56PM +0900, Marcel Holtmann wrote:
+> > Hi Andrei,
+> > 
 > > > Remove magic and use standard HCI cmd timeout
 > > > 
 > > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
@@ -49,11 +54,8 @@ Hi Andrei,
 > #define HCI_CMD_TIMEOUT		(1000)	/* 1 seconds */
 > #define HCI_ACL_TX_TIMEOUT	(45000)	/* 45 seconds */
 
-all of them where we do msecs_to_jiffies all the time anyway. See the
-L2CAP code where I started to change this already.
+I think I will convert them in the following patch.
 
-Regards
-
-Marcel
-
+Best regards 
+Andrei Emeltchenko 
 
