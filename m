@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 2/5] Bluetooth: Update HCI timeouts constants to use msecs_to_jiffies
-Date: Fri,  8 Jun 2012 14:03:21 +0300
-Message-Id: <1339153405-12070-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 4/5] Bluetooth: Correct debug print specifier for u16 objects
+Date: Fri,  8 Jun 2012 14:03:23 +0300
+Message-Id: <1339153405-12070-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1339153405-12070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1339153405-12070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,149 +12,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-The HCI constants are always used in form of jiffies. So just
-include the conversion from msecs in the define itself. This has the
-advantage of making the code where the timeout is used more readable
-and avoiding unnecessary conversions.
+Some functions print u16 objects as "0xc03" others as "0x0c03". Patch
+ensures that opcodes printed are the in the same format and consistent
+with bluetooth code.
 
-The patch is similar to commit ba13ccd9 doing the same job for L2CAP
-
-Reported-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h      |   10 +++++-----
- include/net/bluetooth/hci_core.h |    2 +-
- net/bluetooth/hci_core.c         |   25 +++++++++++--------------
- 3 files changed, 17 insertions(+), 20 deletions(-)
+ net/bluetooth/hci_core.c |   12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 23ef7ad..d66bc60 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -150,11 +150,11 @@ enum {
- #define HCIINQUIRY	_IOR('H', 240, int)
- 
- /* HCI timeouts */
--#define HCI_DISCONN_TIMEOUT	(2000)	/* 2 seconds */
--#define HCI_PAIRING_TIMEOUT	(60000)	/* 60 seconds */
--#define HCI_INIT_TIMEOUT	(10000)	/* 10 seconds */
--#define HCI_CMD_TIMEOUT		(1000)	/* 1 seconds */
--#define HCI_ACL_TX_TIMEOUT	(45000)	/* 45 seconds */
-+#define HCI_DISCONN_TIMEOUT	msecs_to_jiffies(2000)	/* 2 seconds */
-+#define HCI_PAIRING_TIMEOUT	msecs_to_jiffies(60000)	/* 60 seconds */
-+#define HCI_INIT_TIMEOUT	msecs_to_jiffies(10000)	/* 10 seconds */
-+#define HCI_CMD_TIMEOUT		msecs_to_jiffies(1000)	/* 1 seconds */
-+#define HCI_ACL_TX_TIMEOUT	msecs_to_jiffies(45000)	/* 45 seconds */
- 
- /* HCI data types */
- #define HCI_COMMAND_PKT		0x01
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 288eaa8..d91d919 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -628,7 +628,7 @@ static inline void hci_conn_put(struct hci_conn *conn)
- 		if (conn->type == ACL_LINK || conn->type == LE_LINK) {
- 			del_timer(&conn->idle_timer);
- 			if (conn->state == BT_CONNECTED) {
--				timeo = msecs_to_jiffies(conn->disc_timeout);
-+				timeo = conn->disc_timeout;
- 				if (!conn->out)
- 					timeo *= 2;
- 			} else {
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e5a9a09..0334ebe 100644
+index 146854f..f1e46b7 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -690,12 +690,11 @@ int hci_dev_open(__u16 dev)
- 		set_bit(HCI_INIT, &hdev->flags);
- 		hdev->init_last_cmd = 0;
+@@ -61,7 +61,7 @@ static void hci_notify(struct hci_dev *hdev, int event)
  
--		ret = __hci_request(hdev, hci_init_req, 0,
--				    msecs_to_jiffies(HCI_INIT_TIMEOUT));
-+		ret = __hci_request(hdev, hci_init_req, 0, HCI_INIT_TIMEOUT);
+ void hci_req_complete(struct hci_dev *hdev, __u16 cmd, int result)
+ {
+-	BT_DBG("%s command 0x%04x result 0x%2.2x", hdev->name, cmd, result);
++	BT_DBG("%s command 0x%4.4x result 0x%2.2x", hdev->name, cmd, result);
  
- 		if (lmp_host_le_capable(hdev))
- 			ret = __hci_request(hdev, hci_le_init_req, 0,
--					    msecs_to_jiffies(HCI_INIT_TIMEOUT));
-+					    HCI_INIT_TIMEOUT);
+ 	/* If this is the init phase check if the completed command matches
+ 	 * the last init command, and if not just return.
+@@ -2094,7 +2094,7 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+ 	struct hci_command_hdr *hdr;
+ 	struct sk_buff *skb;
  
- 		clear_bit(HCI_INIT, &hdev->flags);
- 	}
-@@ -782,8 +781,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	if (!test_bit(HCI_RAW, &hdev->flags) &&
- 	    test_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks)) {
- 		set_bit(HCI_INIT, &hdev->flags);
--		__hci_request(hdev, hci_reset_req, 0,
--			      msecs_to_jiffies(HCI_CMD_TIMEOUT));
-+		__hci_request(hdev, hci_reset_req, 0, HCI_CMD_TIMEOUT);
- 		clear_bit(HCI_INIT, &hdev->flags);
- 	}
+-	BT_DBG("%s opcode 0x%x plen %d", hdev->name, opcode, plen);
++	BT_DBG("%s opcode 0x%4.4x plen %d", hdev->name, opcode, plen);
  
-@@ -872,8 +870,7 @@ int hci_dev_reset(__u16 dev)
- 	hdev->acl_cnt = 0; hdev->sco_cnt = 0; hdev->le_cnt = 0;
+ 	skb = bt_skb_alloc(len, GFP_ATOMIC);
+ 	if (!skb) {
+@@ -2261,7 +2261,7 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
+ 	if (hdr->opcode != cpu_to_le16(opcode))
+ 		return NULL;
  
- 	if (!test_bit(HCI_RAW, &hdev->flags))
--		ret = __hci_request(hdev, hci_reset_req, 0,
--				    msecs_to_jiffies(HCI_INIT_TIMEOUT));
-+		ret = __hci_request(hdev, hci_reset_req, 0, HCI_INIT_TIMEOUT);
+-	BT_DBG("%s opcode 0x%x", hdev->name, opcode);
++	BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
  
- done:
- 	hci_req_unlock(hdev);
-@@ -913,7 +910,7 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
- 	switch (cmd) {
- 	case HCISETAUTH:
- 		err = hci_request(hdev, hci_auth_req, dr.dev_opt,
--				  msecs_to_jiffies(HCI_INIT_TIMEOUT));
-+				  HCI_INIT_TIMEOUT);
- 		break;
- 
- 	case HCISETENCRYPT:
-@@ -925,23 +922,23 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
- 		if (!test_bit(HCI_AUTH, &hdev->flags)) {
- 			/* Auth must be enabled first */
- 			err = hci_request(hdev, hci_auth_req, dr.dev_opt,
--					  msecs_to_jiffies(HCI_INIT_TIMEOUT));
-+					  HCI_INIT_TIMEOUT);
- 			if (err)
- 				break;
- 		}
- 
- 		err = hci_request(hdev, hci_encrypt_req, dr.dev_opt,
--				  msecs_to_jiffies(HCI_INIT_TIMEOUT));
-+				  HCI_INIT_TIMEOUT);
- 		break;
- 
- 	case HCISETSCAN:
- 		err = hci_request(hdev, hci_scan_req, dr.dev_opt,
--				  msecs_to_jiffies(HCI_INIT_TIMEOUT));
-+				  HCI_INIT_TIMEOUT);
- 		break;
- 
- 	case HCISETLINKPOL:
- 		err = hci_request(hdev, hci_linkpol_req, dr.dev_opt,
--				  msecs_to_jiffies(HCI_INIT_TIMEOUT));
-+				  HCI_INIT_TIMEOUT);
- 		break;
- 
- 	case HCISETLINKMODE:
-@@ -2583,7 +2580,7 @@ static void __check_timeout(struct hci_dev *hdev, unsigned int cnt)
- 		/* ACL tx timeout must be longer than maximum
- 		 * link supervision timeout (40.9 seconds) */
- 		if (!cnt && time_after(jiffies, hdev->acl_last_tx +
--				       msecs_to_jiffies(HCI_ACL_TX_TIMEOUT)))
-+				       HCI_ACL_TX_TIMEOUT))
- 			hci_link_tx_to(hdev, ACL_LINK);
- 	}
+ 	return hdev->sent_cmd->data + HCI_COMMAND_HDR_SIZE;
  }
-@@ -2967,7 +2964,7 @@ static void hci_cmd_work(struct work_struct *work)
- 				del_timer(&hdev->cmd_timer);
- 			else
- 				mod_timer(&hdev->cmd_timer,
--				  jiffies + msecs_to_jiffies(HCI_CMD_TIMEOUT));
-+					  jiffies + HCI_CMD_TIMEOUT);
- 		} else {
- 			skb_queue_head(&hdev->cmd_q, skb);
- 			queue_work(hdev->workqueue, &hdev->cmd_work);
+@@ -2331,7 +2331,7 @@ void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags)
+ 	struct hci_conn *conn = chan->conn;
+ 	struct hci_dev *hdev = conn->hdev;
+ 
+-	BT_DBG("%s chan %p flags 0x%x", hdev->name, chan, flags);
++	BT_DBG("%s chan %p flags 0x%4.4x", hdev->name, chan, flags);
+ 
+ 	skb->dev = (void *) hdev;
+ 
+@@ -2831,7 +2831,7 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 	flags  = hci_flags(handle);
+ 	handle = hci_handle(handle);
+ 
+-	BT_DBG("%s len %d handle 0x%x flags 0x%x", hdev->name, skb->len,
++	BT_DBG("%s len %d handle 0x%4.4x flags 0x%4.4x", hdev->name, skb->len,
+ 	       handle, flags);
+ 
+ 	hdev->stat.acl_rx++;
+@@ -2873,7 +2873,7 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	handle = __le16_to_cpu(hdr->handle);
+ 
+-	BT_DBG("%s len %d handle 0x%x", hdev->name, skb->len, handle);
++	BT_DBG("%s len %d handle 0x%4.4x", hdev->name, skb->len, handle);
+ 
+ 	hdev->stat.sco_rx++;
+ 
 -- 
 1.7.9.5
 
