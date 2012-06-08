@@ -1,69 +1,160 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Subject: Re: [PATCHv2 3/5] Bluetooth: Add opcode to error message
-Date: Fri, 8 Jun 2012 13:17:42 +0200
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1339153405-12070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>  <1339153405-12070-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1339153405-12070-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Message-ID: <201206081317.42898.szymon.janc@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 2/5] Bluetooth: Update HCI timeouts constants to use msecs_to_jiffies
+Date: Fri,  8 Jun 2012 14:03:21 +0300
+Message-Id: <1339153405-12070-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1339153405-12070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1339153405-12070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Sometimes HCI command sending timeouts and gives error message without
-> specifying which command causes error. Patch makes sure that opcode
-> is printed to help debugging.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/hci_core.c |   13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 0334ebe..146854f 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1366,11 +1366,18 @@ int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr)
->  }
->  
->  /* HCI command timer function */
-> -static void hci_cmd_timer(unsigned long arg)
-> +static void hci_cmd_timeout(unsigned long arg)
->  {
->  	struct hci_dev *hdev = (void *) arg;
->  
-> -	BT_ERR("%s command tx timeout", hdev->name);
-> +	if (hdev->sent_cmd) {
-> +		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
-> +		u16 opcode = __le16_to_cpu(sent->opcode);
-> +
-> +		BT_ERR("%s command 0x%4.4x tx timeout", hdev->name, opcode);
-> +	} else
-> +		BT_ERR("%s command tx timeout", hdev->name);
-> +
+The HCI constants are always used in form of jiffies. So just
+include the conversion from msecs in the define itself. This has the
+advantage of making the code where the timeout is used more readable
+and avoiding unnecessary conversions.
 
-Just a minor, 'else' should have braces as well.
+The patch is similar to commit ba13ccd9 doing the same job for L2CAP
 
->  	atomic_set(&hdev->cmd_cnt, 1);
->  	queue_work(hdev->workqueue, &hdev->cmd_work);
->  }
-> @@ -1670,7 +1677,7 @@ struct hci_dev *hci_alloc_dev(void)
->  
->  	init_waitqueue_head(&hdev->req_wait_q);
->  
-> -	setup_timer(&hdev->cmd_timer, hci_cmd_timer, (unsigned long) hdev);
-> +	setup_timer(&hdev->cmd_timer, hci_cmd_timeout, (unsigned long) hdev);
->  
->  	hci_init_sysfs(hdev);
->  	discovery_init(hdev);
-> 
+Reported-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/hci.h      |   10 +++++-----
+ include/net/bluetooth/hci_core.h |    2 +-
+ net/bluetooth/hci_core.c         |   25 +++++++++++--------------
+ 3 files changed, 17 insertions(+), 20 deletions(-)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 23ef7ad..d66bc60 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -150,11 +150,11 @@ enum {
+ #define HCIINQUIRY	_IOR('H', 240, int)
+ 
+ /* HCI timeouts */
+-#define HCI_DISCONN_TIMEOUT	(2000)	/* 2 seconds */
+-#define HCI_PAIRING_TIMEOUT	(60000)	/* 60 seconds */
+-#define HCI_INIT_TIMEOUT	(10000)	/* 10 seconds */
+-#define HCI_CMD_TIMEOUT		(1000)	/* 1 seconds */
+-#define HCI_ACL_TX_TIMEOUT	(45000)	/* 45 seconds */
++#define HCI_DISCONN_TIMEOUT	msecs_to_jiffies(2000)	/* 2 seconds */
++#define HCI_PAIRING_TIMEOUT	msecs_to_jiffies(60000)	/* 60 seconds */
++#define HCI_INIT_TIMEOUT	msecs_to_jiffies(10000)	/* 10 seconds */
++#define HCI_CMD_TIMEOUT		msecs_to_jiffies(1000)	/* 1 seconds */
++#define HCI_ACL_TX_TIMEOUT	msecs_to_jiffies(45000)	/* 45 seconds */
+ 
+ /* HCI data types */
+ #define HCI_COMMAND_PKT		0x01
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 288eaa8..d91d919 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -628,7 +628,7 @@ static inline void hci_conn_put(struct hci_conn *conn)
+ 		if (conn->type == ACL_LINK || conn->type == LE_LINK) {
+ 			del_timer(&conn->idle_timer);
+ 			if (conn->state == BT_CONNECTED) {
+-				timeo = msecs_to_jiffies(conn->disc_timeout);
++				timeo = conn->disc_timeout;
+ 				if (!conn->out)
+ 					timeo *= 2;
+ 			} else {
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e5a9a09..0334ebe 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -690,12 +690,11 @@ int hci_dev_open(__u16 dev)
+ 		set_bit(HCI_INIT, &hdev->flags);
+ 		hdev->init_last_cmd = 0;
+ 
+-		ret = __hci_request(hdev, hci_init_req, 0,
+-				    msecs_to_jiffies(HCI_INIT_TIMEOUT));
++		ret = __hci_request(hdev, hci_init_req, 0, HCI_INIT_TIMEOUT);
+ 
+ 		if (lmp_host_le_capable(hdev))
+ 			ret = __hci_request(hdev, hci_le_init_req, 0,
+-					    msecs_to_jiffies(HCI_INIT_TIMEOUT));
++					    HCI_INIT_TIMEOUT);
+ 
+ 		clear_bit(HCI_INIT, &hdev->flags);
+ 	}
+@@ -782,8 +781,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 	if (!test_bit(HCI_RAW, &hdev->flags) &&
+ 	    test_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks)) {
+ 		set_bit(HCI_INIT, &hdev->flags);
+-		__hci_request(hdev, hci_reset_req, 0,
+-			      msecs_to_jiffies(HCI_CMD_TIMEOUT));
++		__hci_request(hdev, hci_reset_req, 0, HCI_CMD_TIMEOUT);
+ 		clear_bit(HCI_INIT, &hdev->flags);
+ 	}
+ 
+@@ -872,8 +870,7 @@ int hci_dev_reset(__u16 dev)
+ 	hdev->acl_cnt = 0; hdev->sco_cnt = 0; hdev->le_cnt = 0;
+ 
+ 	if (!test_bit(HCI_RAW, &hdev->flags))
+-		ret = __hci_request(hdev, hci_reset_req, 0,
+-				    msecs_to_jiffies(HCI_INIT_TIMEOUT));
++		ret = __hci_request(hdev, hci_reset_req, 0, HCI_INIT_TIMEOUT);
+ 
+ done:
+ 	hci_req_unlock(hdev);
+@@ -913,7 +910,7 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
+ 	switch (cmd) {
+ 	case HCISETAUTH:
+ 		err = hci_request(hdev, hci_auth_req, dr.dev_opt,
+-				  msecs_to_jiffies(HCI_INIT_TIMEOUT));
++				  HCI_INIT_TIMEOUT);
+ 		break;
+ 
+ 	case HCISETENCRYPT:
+@@ -925,23 +922,23 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
+ 		if (!test_bit(HCI_AUTH, &hdev->flags)) {
+ 			/* Auth must be enabled first */
+ 			err = hci_request(hdev, hci_auth_req, dr.dev_opt,
+-					  msecs_to_jiffies(HCI_INIT_TIMEOUT));
++					  HCI_INIT_TIMEOUT);
+ 			if (err)
+ 				break;
+ 		}
+ 
+ 		err = hci_request(hdev, hci_encrypt_req, dr.dev_opt,
+-				  msecs_to_jiffies(HCI_INIT_TIMEOUT));
++				  HCI_INIT_TIMEOUT);
+ 		break;
+ 
+ 	case HCISETSCAN:
+ 		err = hci_request(hdev, hci_scan_req, dr.dev_opt,
+-				  msecs_to_jiffies(HCI_INIT_TIMEOUT));
++				  HCI_INIT_TIMEOUT);
+ 		break;
+ 
+ 	case HCISETLINKPOL:
+ 		err = hci_request(hdev, hci_linkpol_req, dr.dev_opt,
+-				  msecs_to_jiffies(HCI_INIT_TIMEOUT));
++				  HCI_INIT_TIMEOUT);
+ 		break;
+ 
+ 	case HCISETLINKMODE:
+@@ -2583,7 +2580,7 @@ static void __check_timeout(struct hci_dev *hdev, unsigned int cnt)
+ 		/* ACL tx timeout must be longer than maximum
+ 		 * link supervision timeout (40.9 seconds) */
+ 		if (!cnt && time_after(jiffies, hdev->acl_last_tx +
+-				       msecs_to_jiffies(HCI_ACL_TX_TIMEOUT)))
++				       HCI_ACL_TX_TIMEOUT))
+ 			hci_link_tx_to(hdev, ACL_LINK);
+ 	}
+ }
+@@ -2967,7 +2964,7 @@ static void hci_cmd_work(struct work_struct *work)
+ 				del_timer(&hdev->cmd_timer);
+ 			else
+ 				mod_timer(&hdev->cmd_timer,
+-				  jiffies + msecs_to_jiffies(HCI_CMD_TIMEOUT));
++					  jiffies + HCI_CMD_TIMEOUT);
+ 		} else {
+ 			skb_queue_head(&hdev->cmd_q, skb);
+ 			queue_work(hdev->workqueue, &hdev->cmd_work);
 -- 
-BR
-Szymon Janc
+1.7.9.5
+
