@@ -1,50 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 8 Jun 2012 23:39:44 +0800
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ido Yariv <ido@wizery.com>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] attrib-server: Fix multiple channels detaching mix-up
-Message-ID: <20120608153944.GA28852@x220.docomointertouch.net>
-References: <1338322808-15503-1-git-send-email-ido@wizery.com>
- <20120530073701.GB6539@x220>
- <20120530183227.GA16709@WorkStation.localnet>
- <20120606091758.GA12782@WorkStation.localnet>
- <20120607154417.GC25119@x220.docomointertouch.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120607154417.GC25119@x220.docomointertouch.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Add support for encryption key refresh
+Date: Fri,  8 Jun 2012 23:31:13 +0800
+Message-Id: <1339169473-29187-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <20120608072044.GF1546@joana>
+References: <20120608072044.GF1546@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ido,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Thu, Jun 07, 2012, Johan Hedberg wrote:
-> Hi Ido,
-> 
-> On Wed, Jun 06, 2012, Ido Yariv wrote:
-> > On Wed, May 30, 2012 at 09:32:27PM +0300, Ido Yariv wrote:
-> > > From 78254bb099f80ad38e10075fbb73a4d990217630 Mon Sep 17 00:00:00 2001
-> > > From: Ido Yariv <ido@wizery.com>
-> > > Date: Tue, 29 May 2012 21:11:16 +0300
-> > > Subject: [PATCH v2] attrib-server: Fix multiple channels detaching mix-up
-> > > 
-> > > The identifier returned by g_attrib_register is not unique across
-> > > different channels. Since attrib_channel_detach assumes this identifier
-> > > to be unique, it may end up detaching the wrong channel when a device
-> > > disconnects.
-> > > 
-> > > Fix this by using the channel's pointer as a unique identifier for
-> > > detaching the channel. The identifier returned from g_attrib_register
-> > > will still be used to find the relevant event structure.
-> > 
-> > Any thoughts about this one?
-> 
-> I don't really like the idea of returning a pointer (even though an
-> opaque one) to code that shouldn't have access to data behind that
-> pointer. Could we instead just make this really simple by removing
-> attrib->next_evt_id and adding a static guint variable into the
-> g_attrib_register function?
+With LE/SMP the completion of a security level elavation from medium to
+high is indicated by a HCI Encryption Key Refresh Complete event. The
+necessary behavior upon receiving this event is a mix of what's done for
+auth_complete and encryption_change, which is also where most of the
+event handling code has been copied from.
 
-Since I haven't heard back from you and we're way overdue with the 4.100
-release I went ahead and pushed this simplified solution.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+v2: Rebased on top of latest bluetooth.git
 
-Johan
+ include/net/bluetooth/hci.h |    6 ++++++
+ net/bluetooth/hci_event.c   |   48 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 54 insertions(+)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 66a7b57..3def64b 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1144,6 +1144,12 @@ struct extended_inquiry_info {
+ 	__u8     data[240];
+ } __packed;
+ 
++#define HCI_EV_KEY_REFRESH_COMPLETE	0x30
++struct hci_ev_key_refresh_complete {
++	__u8	status;
++	__le16	handle;
++} __packed;
++
+ #define HCI_EV_IO_CAPA_REQUEST		0x31
+ struct hci_ev_io_capa_request {
+ 	bdaddr_t bdaddr;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 4eefb7f..94ad124 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3043,6 +3043,50 @@ static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static void hci_key_refresh_complete_evt(struct hci_dev *hdev,
++					 struct sk_buff *skb)
++{
++	struct hci_ev_key_refresh_complete *ev = (void *) skb->data;
++	struct hci_conn *conn;
++
++	BT_DBG("%s status %u handle %u", hdev->name, ev->status,
++	       __le16_to_cpu(ev->handle));
++
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
++	if (!conn)
++		goto unlock;
++
++	if (!ev->status)
++		conn->sec_level = conn->pending_sec_level;
++
++	clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
++
++	if (ev->status && conn->state == BT_CONNECTED) {
++		hci_acl_disconn(conn, HCI_ERROR_AUTH_FAILURE);
++		hci_conn_put(conn);
++		goto unlock;
++	}
++
++	if (conn->state == BT_CONFIG) {
++		if (!ev->status)
++			conn->state = BT_CONNECTED;
++
++		hci_proto_connect_cfm(conn, ev->status);
++		hci_conn_put(conn);
++	} else {
++		hci_auth_cfm(conn, ev->status);
++
++		hci_conn_hold(conn);
++		conn->disc_timeout = HCI_DISCONN_TIMEOUT;
++		hci_conn_put(conn);
++	}
++
++unlock:
++	hci_dev_unlock(hdev);
++}
++
+ static inline u8 hci_get_auth_req(struct hci_conn *conn)
+ {
+ 	/* If remote requests dedicated bonding follow that lead */
+@@ -3559,6 +3603,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_extended_inquiry_result_evt(hdev, skb);
+ 		break;
+ 
++	case HCI_EV_KEY_REFRESH_COMPLETE:
++		hci_key_refresh_complete_evt(hdev, skb);
++		break;
++
+ 	case HCI_EV_IO_CAPA_REQUEST:
+ 		hci_io_capa_request_evt(hdev, skb);
+ 		break;
+-- 
+1.7.10
+
