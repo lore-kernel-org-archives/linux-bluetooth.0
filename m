@@ -1,37 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/5] Bluetooth: Use standard HCI cmd timeout for RESET
-Date: Fri,  8 Jun 2012 14:03:20 +0300
-Message-Id: <1339153405-12070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1339152010.19312.32.camel@novo.hadess.net>
+Subject: Re: [RFC] Reorganizing the BlueZ source tree
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
+ <gustavo@padovan.org>,  linux-bluetooth@vger.kernel.org
+Date: Fri, 08 Jun 2012 11:40:10 +0100
+In-Reply-To: <CABBYNZKMHJ52-45uTamn48E6FDHYWZLDgQkhaKBX0=rmcn6aqw@mail.gmail.com>
+References: <20120524081405.GA30941@joana>
+	 <CABBYNZLhWfS6Ff0S8SkCwSXxzt61NzNCBH-K78hQB6dtpPvJ6Q@mail.gmail.com>
+	 <1337852769.2115.47.camel@novo.hadess.net>
+	 <1337853929.15105.84.camel@aeonflux>
+	 <1338998206.19312.10.camel@novo.hadess.net>
+	 <1339023575.1817.114.camel@aeonflux>
+	 <1339148670.19312.23.camel@novo.hadess.net>
+	 <CABBYNZKMHJ52-45uTamn48E6FDHYWZLDgQkhaKBX0=rmcn6aqw@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Fri, 2012-06-08 at 13:02 +0300, Luiz Augusto von Dentz wrote:
+> Hi Bastien
+> 
+> On Fri, Jun 8, 2012 at 12:44 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> > On Thu, 2012-06-07 at 07:59 +0900, Marcel Holtmann wrote:
+> >>
+> >> and I still have all the rights to do so.
+> >>
+> >> As long as we are still based on GLib, this will stay as it is. I am
+> >> not
+> >> jumping through any hoops, because David wouldn't respect prior art.
+> >
+> > How exactly would would have called a D-Bus implementation in GLib?
+> 
+> Well you could have called godbus as that is more a gobject binding
+> than a pure glib/GMainLoop one.
 
-Remove magic and use standard HCI cmd timeout
+GLib lives in a single tarball. It's only Marcel's hate for GObject and
+the apparent need to be able to replace glib that spawned this thin
+wrapper on top of libdbus you're using now.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_core.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a2e15436c..e5a9a09 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -783,7 +783,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	    test_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks)) {
- 		set_bit(HCI_INIT, &hdev->flags);
- 		__hci_request(hdev, hci_reset_req, 0,
--			      msecs_to_jiffies(250));
-+			      msecs_to_jiffies(HCI_CMD_TIMEOUT));
- 		clear_bit(HCI_INIT, &hdev->flags);
- 	}
- 
--- 
-1.7.9.5
-
+GLib's APIs don't differentiate which shared library they come from.
