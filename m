@@ -1,38 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 8 Jun 2012 21:12:46 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Add support for encryption key refresh
-Message-ID: <20120609001245.GA1492@joana>
-References: <20120608072044.GF1546@joana>
- <1339169473-29187-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 8 Jun 2012 11:02:47 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] Bluetooth: Lock l2cap chan in sockopt
+In-Reply-To: <1338993808-30783-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <alpine.DEB.2.02.1206081053160.15058@mathewm-linux>
+References: <1338993808-30783-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1339169473-29187-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2012-06-08 23:31:13 +0800]:
+Andrei -
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> With LE/SMP the completion of a security level elavation from medium to
-> high is indicated by a HCI Encryption Key Refresh Complete event. The
-> necessary behavior upon receiving this event is a mix of what's done for
-> auth_complete and encryption_change, which is also where most of the
-> event handling code has been copied from.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+On Wed, 6 Jun 2012, Andrei Emeltchenko wrote:
+
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+
+Commit message is quite short :)  (I know, it's just an RFC)
+
 > ---
-> v2: Rebased on top of latest bluetooth.git
-> 
->  include/net/bluetooth/hci.h |    6 ++++++
->  net/bluetooth/hci_event.c   |   48 +++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 54 insertions(+)
+> net/bluetooth/l2cap_sock.c |   12 ++++++++++++
+> 1 file changed, 12 insertions(+)
+>
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index a4bb27e..373ce9c 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -275,6 +275,7 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
+> 	if (get_user(len, optlen))
+> 		return -EFAULT;
+>
+> +	l2cap_chan_lock(chan);
+> 	lock_sock(sk);
+>
+> 	switch (optname) {
+> @@ -345,6 +346,8 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
+> 	}
+>
+> 	release_sock(sk);
+> +	l2cap_chan_unlock(chan);
+> +
+> 	return err;
+> }
+>
+> @@ -367,6 +370,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+> 	if (get_user(len, optlen))
+> 		return -EFAULT;
+>
+> +	l2cap_chan_lock(chan);
+> 	lock_sock(sk);
+>
+> 	switch (optname) {
+> @@ -442,6 +446,8 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+> 	}
+>
+> 	release_sock(sk);
+> +	l2cap_chan_unlock(chan);
+> +
+> 	return err;
+> }
+>
+> @@ -471,6 +477,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+>
+> 	BT_DBG("sk %p", sk);
+>
+> +	l2cap_chan_lock(chan);
+> 	lock_sock(sk);
+>
+> 	switch (optname) {
+> @@ -556,6 +563,8 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+> 	}
+>
+> 	release_sock(sk);
+> +	l2cap_chan_unlock(chan);
+> +
+> 	return err;
+> }
+>
+> @@ -577,6 +586,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+> 	if (level != SOL_BLUETOOTH)
+> 		return -ENOPROTOOPT;
+>
+> +	l2cap_chan_lock(chan);
+> 	lock_sock(sk);
+>
+> 	switch (optname) {
+> @@ -729,6 +739,8 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+> 	}
+>
+> 	release_sock(sk);
+> +	l2cap_chan_unlock(chan);
+> +
+> 	return err;
+> }
+>
+> -- 
+> 1.7.9.5
 
-Patch has been applied to bluetooth.git. Thanks.
+Code looks good to me.  In the near future, BT_CHANNEL_POLICY will 
+call in to the L2CAP core to do channel moves, but I think it helps to 
+already have the lock held in that case.
 
-	Gustavo
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
