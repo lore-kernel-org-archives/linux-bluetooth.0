@@ -1,51 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1339156003.1817.157.camel@aeonflux>
-Subject: Re: [RFC] Reorganizing the BlueZ source tree
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Date: Fri, 08 Jun 2012 20:46:43 +0900
-In-Reply-To: <1339152010.19312.32.camel@novo.hadess.net>
-References: <20120524081405.GA30941@joana>
-	 <CABBYNZLhWfS6Ff0S8SkCwSXxzt61NzNCBH-K78hQB6dtpPvJ6Q@mail.gmail.com>
-	 <1337852769.2115.47.camel@novo.hadess.net>
-	 <1337853929.15105.84.camel@aeonflux>
-	 <1338998206.19312.10.camel@novo.hadess.net>
-	 <1339023575.1817.114.camel@aeonflux>
-	 <1339148670.19312.23.camel@novo.hadess.net>
-	 <CABBYNZKMHJ52-45uTamn48E6FDHYWZLDgQkhaKBX0=rmcn6aqw@mail.gmail.com>
-	 <1339152010.19312.32.camel@novo.hadess.net>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCHv2 3/5] Bluetooth: Add opcode to error message
+Date: Fri, 8 Jun 2012 13:17:42 +0200
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1339153405-12070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>  <1339153405-12070-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1339153405-12070-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Message-ID: <201206081317.42898.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi,
 
-> > >> and I still have all the rights to do so.
-> > >>
-> > >> As long as we are still based on GLib, this will stay as it is. I am
-> > >> not
-> > >> jumping through any hoops, because David wouldn't respect prior art.
-> > >
-> > > How exactly would would have called a D-Bus implementation in GLib?
-> > 
-> > Well you could have called godbus as that is more a gobject binding
-> > than a pure glib/GMainLoop one.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> GLib lives in a single tarball. It's only Marcel's hate for GObject and
-> the apparent need to be able to replace glib that spawned this thin
-> wrapper on top of libdbus you're using now.
+> Sometimes HCI command sending timeouts and gives error message without
+> specifying which command causes error. Patch makes sure that opcode
+> is printed to help debugging.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/hci_core.c |   13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 0334ebe..146854f 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1366,11 +1366,18 @@ int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr)
+>  }
+>  
+>  /* HCI command timer function */
+> -static void hci_cmd_timer(unsigned long arg)
+> +static void hci_cmd_timeout(unsigned long arg)
+>  {
+>  	struct hci_dev *hdev = (void *) arg;
+>  
+> -	BT_ERR("%s command tx timeout", hdev->name);
+> +	if (hdev->sent_cmd) {
+> +		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
+> +		u16 opcode = __le16_to_cpu(sent->opcode);
+> +
+> +		BT_ERR("%s command 0x%4.4x tx timeout", hdev->name, opcode);
+> +	} else
+> +		BT_ERR("%s command tx timeout", hdev->name);
+> +
 
-plain fact is that our gdbus code was there first.
+Just a minor, 'else' should have braces as well.
 
-If you wanna turn this into a GObject discussion now, then please find a
-mailing list that cares. It is clearly not this one.
+>  	atomic_set(&hdev->cmd_cnt, 1);
+>  	queue_work(hdev->workqueue, &hdev->cmd_work);
+>  }
+> @@ -1670,7 +1677,7 @@ struct hci_dev *hci_alloc_dev(void)
+>  
+>  	init_waitqueue_head(&hdev->req_wait_q);
+>  
+> -	setup_timer(&hdev->cmd_timer, hci_cmd_timer, (unsigned long) hdev);
+> +	setup_timer(&hdev->cmd_timer, hci_cmd_timeout, (unsigned long) hdev);
+>  
+>  	hci_init_sysfs(hdev);
+>  	discovery_init(hdev);
+> 
 
-Regards
-
-Marcel
-
-
+-- 
+BR
+Szymon Janc
