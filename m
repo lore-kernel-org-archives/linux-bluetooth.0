@@ -1,149 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon@janc.net.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon@janc.net.pl>
-Subject: [PATCH] mgmtops: Fix adding UUID when EBUSY error is returned
-Date: Sun, 10 Jun 2012 21:50:51 +0200
-Message-Id: <1339357852-6326-1-git-send-email-szymon@janc.net.pl>
+Message-ID: <4FD4D920.6060207@shapeseeker.com>
+Date: Sun, 10 Jun 2012 18:28:00 +0100
+From: Brian Smith <door@shapeseeker.com>
+MIME-Version: 1.0
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Small Patch for scotest.c
+References: <4FD111EB.8070307@shapeseeker.com> <20120610084658.GB28539@x220.P-661HNU-F1>
+In-Reply-To: <20120610084658.GB28539@x220.P-661HNU-F1>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-MGMT_ADDP_UUID may return EBUSY error (when adding UUID triggered COD
-change) and UUID should be send to kernel one more time in such case.
----
- plugins/mgmtops.c |   63 ++++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 43 insertions(+), 20 deletions(-)
+Johan Hedberg wrote:
+> Hi Brian,
+>
+> On Thu, Jun 07, 2012, Brian Smith wrote:
+>   
+>> Hi there.
+>> Here is a tiny 3-line patch to scotest.c to get it working. (I've
+>> been trying to get bluez working on a Raspberry Pi, hitting USB
+>> problems, having a workng scotest is helpful). The problem is that
+>> bdaddr never gets initialized and tends to have random data in it,
+>> preventing the client/server end from matching up.
+>>
+>> 344a345,346
+>>     
+>>>       hci_devba(0, &bdaddr);
+>>>
+>>>       
+>
+> Please only send patches in unified diff format. If you want them
+> applied upstream they should be created using "git format-patch" and
+> preferably sent with "git send-email".
+>
+> However, in this case I don't think your patch is quite right even if it
+> was in the right format. Looking at bdaddr in scotest.c it's a static
+> variable and to my understanding those should (according to the C
+> standard) always get implicitly initialized to 0 if the code itself
+> doesn't do so. At least gcc should follow this, so which compiler are
+> you really using?
+>
+> Furthermore, assuming that this (zero-initialized bdaddr) is how scotest
+> behaves for most people (as it's existed many years and you're the first
+> one to face the issue), it's the same as using BDADDR_ANY. Therefore,
+> I'd just go ahead and remove the bdaddr variable and replace the places
+> where it was used with BDADDR_ANY (and please format the patch like I
+> described above). Thanks.
+>
+> Johan
+>
+>   
+Hi Johan.
+Thanks for taking the time to look at my email and the feedback. Yes, 
+you are right about the static variable initialization, bdaddr starts as 
+0:0:0:0:0:0, but my understanding of what hci_devba() does was wrong.  
+It changes baddrr from 0 to the MAC address of hci0, the local bluetooth 
+adapter, which does actually seem to make scotest work properly (In 
+practice it certainly does from the testing I've done. I can imagine 
+that when both the server and client MAC address are 0/BDADDR_ANY it 
+could cause problems). So I think the general idea of the patch is right 
+at least. (It just came from comparing scotest.c with l2test.c really). 
+Also I'm not the first person to see this, I found this unresolved issue 
+when googling the problem initially:
 
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index a196b1f..ee42de0 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -825,28 +825,16 @@ static void uuid_to_uuid128(uuid_t *uuid128, const uuid_t *uuid)
- 		memcpy(uuid128, uuid, sizeof(*uuid));
- }
- 
--static int mgmt_add_uuid(int index, uuid_t *uuid, uint8_t svc_hint)
-+static int send_uuid(int index, uuid_t *uuid, uint8_t svc_hint)
- {
- 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_add_uuid)];
- 	struct mgmt_hdr *hdr = (void *) buf;
- 	struct mgmt_cp_add_uuid *cp = (void *) &buf[sizeof(*hdr)];
--	struct controller_info *info = &controllers[index];
- 	uuid_t uuid128;
- 	uint128_t uint128;
- 
- 	DBG("index %d", index);
- 
--	if (info->pending_uuid) {
--		struct pending_uuid *pending = g_new0(struct pending_uuid, 1);
--
--		memcpy(&pending->uuid, uuid, sizeof(*uuid));
--		pending->svc_hint = svc_hint;
--
--		info->pending_uuids = g_slist_append(info->pending_uuids,
--								pending);
--		return 0;
--	}
--
- 	uuid_to_uuid128(&uuid128, uuid);
- 
- 	memset(buf, 0, sizeof(buf));
-@@ -859,9 +847,25 @@ static int mgmt_add_uuid(int index, uuid_t *uuid, uint8_t svc_hint)
- 
- 	cp->svc_hint = svc_hint;
- 
--	if (write(mgmt_sock, buf, sizeof(buf)) < 0)
-+	return write(mgmt_sock, buf, sizeof(buf));
-+}
-+
-+static int mgmt_add_uuid(int index, uuid_t *uuid, uint8_t svc_hint)
-+{
-+	struct controller_info *info = &controllers[index];
-+	struct pending_uuid *pending;
-+
-+	DBG("index %d", index);
-+
-+	if (!info->pending_uuid && send_uuid(index, uuid, svc_hint) < 0)
- 		return -errno;
- 
-+	pending = g_new0(struct pending_uuid, 1);
-+
-+	memcpy(&pending->uuid, uuid, sizeof(*uuid));
-+	pending->svc_hint = svc_hint;
-+
-+	info->pending_uuids = g_slist_append(info->pending_uuids, pending);
- 	info->pending_uuid = TRUE;
- 
- 	return 0;
-@@ -1278,7 +1282,7 @@ static void mgmt_add_uuid_complete(int sk, uint16_t index, void *buf,
- 	struct controller_info *info;
- 	struct pending_uuid *pending;
- 
--	DBG("add_uuid complete");
-+	DBG("index %d", index);
- 
- 	if (index > max_index) {
- 		error("Unexpected index %u in add_uuid_complete event", index);
-@@ -1287,9 +1291,13 @@ static void mgmt_add_uuid_complete(int sk, uint16_t index, void *buf,
- 
- 	info = &controllers[index];
- 
--	info->pending_uuid = FALSE;
-+	pending = info->pending_uuids->data;
-+	info->pending_uuids = g_slist_remove(info->pending_uuids, pending);
-+	g_free(pending);
- 
- 	if (g_slist_length(info->pending_uuids) == 0) {
-+		info->pending_uuid = FALSE;
-+
- 		if (info->pending_class) {
- 			info->pending_class = FALSE;
- 			mgmt_set_dev_class(index, info->major, info->minor);
-@@ -1305,10 +1313,7 @@ static void mgmt_add_uuid_complete(int sk, uint16_t index, void *buf,
- 
- 	pending = info->pending_uuids->data;
- 
--	mgmt_add_uuid(index, &pending->uuid, pending->svc_hint);
--
--	info->pending_uuids = g_slist_remove(info->pending_uuids, pending);
--	g_free(pending);
-+	send_uuid(index, &pending->uuid, pending->svc_hint);
- }
- 
- static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
-@@ -1434,6 +1439,20 @@ static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
- 	}
- }
- 
-+static void mgmt_add_uuid_resend(int sk, uint16_t index)
-+{
-+	struct controller_info *info;
-+	struct pending_uuid *pending;
-+
-+	DBG("index %d", index);
-+
-+	info = &controllers[index];
-+
-+	pending = info->pending_uuids->data;
-+
-+	send_uuid(index, &pending->uuid, pending->svc_hint);
-+}
-+
- static void mgmt_cmd_status(int sk, uint16_t index, void *buf, size_t len)
- {
- 	struct mgmt_ev_cmd_status *ev = buf;
-@@ -1460,6 +1479,10 @@ static void mgmt_cmd_status(int sk, uint16_t index, void *buf, size_t len)
- 	case MGMT_OP_READ_LOCAL_OOB_DATA:
- 		read_local_oob_data_failed(sk, index);
- 		break;
-+	case MGMT_OP_ADD_UUID:
-+		if (ev->status == MGMT_STATUS_BUSY)
-+			mgmt_add_uuid_resend(sk, index);
-+		break;
- 	}
- }
- 
+http://comments.gmane.org/gmane.linux.bluez.kernel/3122
+
 -- 
-1.7.10.4
-
+Brian Smith.
+"The bells of clocktowers stitch the sleeper's dreams together." - Memory Palace
 
