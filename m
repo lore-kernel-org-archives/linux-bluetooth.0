@@ -1,33 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Remove magic value in disconnect mgmt handler
-Date: Mon, 11 Jun 2012 18:41:12 -0300
-Message-Id: <1339450872-28438-1-git-send-email-andre.guedes@openbossa.org>
+From: Szymon Janc <szymon@janc.net.pl>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH] mgmtops: Fix adding UUID when EBUSY error is returned
+Date: Mon, 11 Jun 2012 22:18:14 +0200
+Cc: linux-bluetooth@vger.kernel.org
+References: <1339357852-6326-1-git-send-email-szymon@janc.net.pl> <20120611094011.GA16742@x220.ger.corp.intel.com>
+In-Reply-To: <20120611094011.GA16742@x220.ger.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201206112218.14428.szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch replaces the magic value of variable 'reason' by the
-proper macro.
+Hi Johan,
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
----
- net/bluetooth/mgmt.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Monday 11 June 2012 11:40:11 Johan Hedberg wrote:
+> It's there a risk that this ends up in an infinite loop if the kernel is
+> in some state where it always keeps sending STATUS_BUSY? Would it make
+> sense to add a counter for retries and give up after 5 or 10 attempts?
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 958f764..38bb7d5 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1611,7 +1611,7 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
- 	}
- 
- 	dc.handle = cpu_to_le16(conn->handle);
--	dc.reason = 0x13; /* Remote User Terminated Connection */
-+	dc.reason = HCI_ERROR_REMOTE_USER_TERM;
- 
- 	err = hci_send_cmd(hdev, HCI_OP_DISCONNECT, sizeof(dc), &dc);
- 	if (err < 0)
+That would meant host didn't get command complete for set COD command (meaning 
+something else is badly broken), but I guess adding counter 'just in case' 
+wouldn't hurt much.
+
+> Would it also make sense to add a small delay before resending the
+> command?
+
+I'm not sure up to how long can setting COD take, on my pc it takes <100ms for 
+`hciconfig hci0 class 0x540100` with USB dongle. Does g_timeout_add with 
+timeout ~50ms make sense?
+
 -- 
-1.7.10.3
+Szymon K. Janc
+szymon@janc.net.pl
 
